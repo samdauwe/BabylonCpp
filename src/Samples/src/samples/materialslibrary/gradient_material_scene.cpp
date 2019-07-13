@@ -3,8 +3,8 @@
 #include <babylon/cameras/free_camera.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materialslibrary/gradient/gradient_material.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh_builder.h>
-#include <babylon/meshes/vertex_data_options.h>
 
 namespace BABYLON {
 namespace Samples {
@@ -33,7 +33,8 @@ void GradientMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
   light->groundColor = Color3(1.f, 1.f, 1.f);
   light->intensity   = 1.f;
 
-  PlaneOptions options(1.f);
+  PlaneOptions options;
+  options.size        = 1.f;
   auto plane          = MeshBuilder::CreatePlane("plane", options, scene);
   plane->position().y = 0.f;
 

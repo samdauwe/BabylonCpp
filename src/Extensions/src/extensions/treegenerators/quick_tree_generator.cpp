@@ -6,7 +6,6 @@
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
-#include <babylon/meshes/vertex_data_options.h>
 #include <babylon/misc/tools.h>
 
 namespace BABYLON {

@@ -33,20 +33,27 @@
 #include <babylon/meshes/builders/cylinder_builder.h>
 #include <babylon/meshes/builders/decal_builder.h>
 #include <babylon/meshes/builders/disc_builder.h>
+#include <babylon/meshes/builders/ground_builder.h>
 #include <babylon/meshes/builders/hemisphere_builder.h>
 #include <babylon/meshes/builders/ico_sphere_builder.h>
+#include <babylon/meshes/builders/lathe_builder.h>
+#include <babylon/meshes/builders/lines_builder.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
+#include <babylon/meshes/builders/plane_builder.h>
+#include <babylon/meshes/builders/polygon_builder.h>
+#include <babylon/meshes/builders/polyhedron_builder.h>
 #include <babylon/meshes/builders/ribbon_builder.h>
+#include <babylon/meshes/builders/shape_builder.h>
 #include <babylon/meshes/builders/sphere_builder.h>
+#include <babylon/meshes/builders/torus_builder.h>
+#include <babylon/meshes/builders/torus_knot_builder.h>
 #include <babylon/meshes/builders/tube_builder.h>
 #include <babylon/meshes/geometry.h>
 #include <babylon/meshes/ground_mesh.h>
 #include <babylon/meshes/instanced_mesh.h>
-#include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/mesh_lod_level.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
-#include <babylon/meshes/vertex_data_options.h>
 #include <babylon/misc/tools.h>
 #include <babylon/morph/morph_target.h>
 #include <babylon/morph/morph_target_manager.h>
@@ -2726,8 +2733,8 @@ MeshPtr Mesh::CreateCylinder(const std::string& iName, float height,
 // Torus
 MeshPtr Mesh::CreateTorus(const std::string& iName, float diameter,
                           float thickness, unsigned int tessellation,
-                          Scene* scene, bool updatable,
-                          unsigned int sideOrientation)
+                          Scene* scene, const std::optional<bool>& updatable,
+                          const std::optional<unsigned int>& sideOrientation)
 {
   TorusOptions options;
   options.diameter        = diameter;
@@ -2736,14 +2743,15 @@ MeshPtr Mesh::CreateTorus(const std::string& iName, float diameter,
   options.sideOrientation = sideOrientation;
   options.updatable       = updatable;
 
-  return MeshBuilder::CreateTorus(iName, options, scene);
+  return TorusBuilder::CreateTorus(iName, options, scene);
 }
 
-MeshPtr Mesh::CreateTorusKnot(const std::string& iName, float radius,
-                              float tube, unsigned int radialSegments,
-                              unsigned int tubularSegments, float p, float q,
-                              Scene* scene, bool updatable,
-                              unsigned int sideOrientation)
+MeshPtr
+Mesh::CreateTorusKnot(const std::string& iName, float radius, float tube,
+                      unsigned int radialSegments, unsigned int tubularSegments,
+                      float p, float q, Scene* scene,
+                      const std::optional<bool>& updatable,
+                      const std::optional<unsigned int>& sideOrientation)
 {
   TorusKnotOptions options;
   options.radius          = radius;
@@ -2755,7 +2763,7 @@ MeshPtr Mesh::CreateTorusKnot(const std::string& iName, float radius,
   options.sideOrientation = sideOrientation;
   options.updatable       = updatable;
 
-  return MeshBuilder::CreateTorusKnot(iName, options, scene);
+  return TorusKnotBuilder::CreateTorusKnot(iName, options, scene);
 }
 
 LinesMeshPtr Mesh::CreateLines(const std::string& iName,
@@ -2767,7 +2775,7 @@ LinesMeshPtr Mesh::CreateLines(const std::string& iName,
   options.updatable = updatable;
   options.instance  = instance;
 
-  return MeshBuilder::CreateLines(iName, options, scene);
+  return LinesBuilder::CreateLines(iName, options, scene);
 }
 
 LinesMeshPtr Mesh::CreateDashedLines(const std::string& iName,
@@ -2785,7 +2793,7 @@ LinesMeshPtr Mesh::CreateDashedLines(const std::string& iName,
   options.updatable = updatable;
   options.instance  = instance;
 
-  return MeshBuilder::CreateDashedLines(iName, options, scene);
+  return LinesBuilder::CreateDashedLines(iName, options, scene);
 }
 
 MeshPtr Mesh::CreatePolygon(const std::string& iName,
@@ -2799,7 +2807,7 @@ MeshPtr Mesh::CreatePolygon(const std::string& iName,
   options.updatable       = updatable;
   options.sideOrientation = sideOrientation;
 
-  return MeshBuilder::CreatePolygon(iName, options, scene);
+  return PolygonBuilder::CreatePolygon(iName, options, scene);
 }
 
 MeshPtr Mesh::ExtrudePolygon(const std::string& iName,
@@ -2815,14 +2823,15 @@ MeshPtr Mesh::ExtrudePolygon(const std::string& iName,
   options.updatable       = updatable;
   options.sideOrientation = sideOrientation;
 
-  return MeshBuilder::ExtrudePolygon(iName, options, scene);
+  return PolygonBuilder::ExtrudePolygon(iName, options, scene);
 }
 
 MeshPtr Mesh::ExtrudeShape(const std::string& iName,
                            const std::vector<Vector3>& shape,
                            const std::vector<Vector3>& path, float scale,
                            float iRotation, unsigned int cap, Scene* scene,
-                           bool updatable, unsigned int sideOrientation,
+                           const std::optional<bool>& updatable,
+                           const std::optional<unsigned int>& sideOrientation,
                            const MeshPtr& instance)
 {
   ExtrudeShapeOptions options;
@@ -2830,12 +2839,12 @@ MeshPtr Mesh::ExtrudeShape(const std::string& iName,
   options.path            = path;
   options.scale           = scale;
   options.rotation        = iRotation;
-  options.cap             = cap;
+  options.cap             = (cap == 0) ? 0 : Mesh::NO_CAP;
   options.sideOrientation = sideOrientation;
   options.instance        = instance;
   options.updatable       = updatable;
 
-  return MeshBuilder::ExtrudeShape(iName, options, scene);
+  return ShapeBuilder::ExtrudeShape(iName, options, scene);
 }
 
 MeshPtr Mesh::ExtrudeShapeCustom(
@@ -2844,7 +2853,8 @@ MeshPtr Mesh::ExtrudeShapeCustom(
   const std::function<float(float i, float distance)>& scaleFunction,
   const std::function<float(float i, float distance)>& rotationFunction,
   bool ribbonCloseArray, bool ribbonClosePath, unsigned int cap, Scene* scene,
-  bool updatable, unsigned int sideOrientation, const MeshPtr& instance)
+  const std::optional<bool>& updatable,
+  const std::optional<unsigned int>& sideOrientation, const MeshPtr& instance)
 {
   ExtrudeShapeCustomOptions options;
   options.shape            = shape;
@@ -2858,13 +2868,14 @@ MeshPtr Mesh::ExtrudeShapeCustom(
   options.instance         = instance;
   options.updatable        = updatable;
 
-  return MeshBuilder::ExtrudeShapeCustom(iName, options, scene);
+  return ShapeBuilder::ExtrudeShapeCustom(iName, options, scene);
 }
 
 MeshPtr Mesh::CreateLathe(const std::string& iName,
                           const std::vector<Vector3>& shape, float radius,
                           unsigned int tessellation, Scene* scene,
-                          bool updatable, unsigned int sideOrientation)
+                          const std::optional<bool>& updatable,
+                          const std::optional<unsigned int>& sideOrientation)
 {
   LatheOptions options;
   options.shape           = shape;
@@ -2873,36 +2884,41 @@ MeshPtr Mesh::CreateLathe(const std::string& iName,
   options.sideOrientation = sideOrientation;
   options.updatable       = updatable;
 
-  return MeshBuilder::CreateLathe(iName, options, scene);
+  return LatheBuilder::CreateLathe(iName, options, scene);
 }
 
 MeshPtr Mesh::CreatePlane(const std::string& iName, float size, Scene* scene,
-                          bool updatable, unsigned int sideOrientation)
+                          const std::optional<bool>& updatable,
+                          const std::optional<unsigned int>& sideOrientation)
 {
-  PlaneOptions options(size);
+  PlaneOptions options;
+  options.size            = size;
+  options.width           = size;
+  options.height          = size;
   options.sideOrientation = sideOrientation;
   options.updatable       = updatable;
 
-  return MeshBuilder::CreatePlane(iName, options, scene);
+  return PlaneBuilder::CreatePlane(iName, options, scene);
 }
 
 MeshPtr Mesh::CreateGround(const std::string& iName, unsigned int width,
                            unsigned int height, unsigned int subdivisions,
-                           Scene* scene, bool updatable)
+                           Scene* scene, const std::optional<bool>& updatable)
 {
-  GroundOptions options(subdivisions);
-  options.width     = width;
-  options.height    = height;
-  options.updatable = updatable;
+  GroundOptions options;
+  options.subdivisions = subdivisions;
+  options.width        = width;
+  options.height       = height;
+  options.updatable    = updatable;
 
-  return MeshBuilder::CreateGround(iName, options, scene);
+  return GroundBuilder::CreateGround(iName, options, scene);
 }
 
 MeshPtr Mesh::CreateTiledGround(const std::string& iName, float xmin,
                                 float zmin, float xmax, float zmax,
                                 const ISize& subdivisions,
                                 const ISize& precision, Scene* scene,
-                                bool updatable)
+                                const std::optional<bool>& updatable)
 {
   TiledGroundOptions options;
   options.xmin         = xmin;
@@ -2913,14 +2929,14 @@ MeshPtr Mesh::CreateTiledGround(const std::string& iName, float xmin,
   options.precision    = precision;
   options.updatable    = updatable;
 
-  return MeshBuilder::CreateTiledGround(iName, options, scene);
+  return GroundBuilder::CreateTiledGround(iName, options, scene);
 }
 
 GroundMeshPtr Mesh::CreateGroundFromHeightMap(
   const std::string& iName, const std::string& url, unsigned int width,
   unsigned int height, unsigned int subdivisions, unsigned int minHeight,
   unsigned int maxHeight, Scene* scene, bool updatable,
-  const std::function<void(GroundMesh* mesh)>& iOnReady,
+  const std::function<void(const GroundMeshPtr& mesh)>& iOnReady,
   std::optional<float> alphaFilter)
 {
   GroundFromHeightMapOptions options;
@@ -2933,7 +2949,7 @@ GroundMeshPtr Mesh::CreateGroundFromHeightMap(
   options.onReady      = iOnReady;
   options.alphaFilter  = alphaFilter;
 
-  return MeshBuilder::CreateGroundFromHeightMap(iName, url, options, scene);
+  return GroundBuilder::CreateGroundFromHeightMap(iName, url, options, scene);
 }
 
 MeshPtr Mesh::CreateTube(
@@ -2970,7 +2986,7 @@ MeshPtr Mesh::CreateHemisphere(const std::string& iName, unsigned int segments,
 MeshPtr Mesh::CreatePolyhedron(const std::string& iName,
                                PolyhedronOptions& options, Scene* scene)
 {
-  return MeshBuilder::CreatePolyhedron(iName, options, scene);
+  return PolyhedronBuilder::CreatePolyhedron(iName, options, scene);
 }
 
 MeshPtr Mesh::CreateIcoSphere(const std::string& iName,

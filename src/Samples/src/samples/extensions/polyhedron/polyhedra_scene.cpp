@@ -7,9 +7,9 @@
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/standard_material.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
-#include <babylon/meshes/vertex_data_options.h>
 
 namespace BABYLON {
 namespace Samples {
@@ -56,7 +56,8 @@ void PolyhedraScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   unsigned int col = 0, row = 0, counter = 0;
   for (const auto& polyhedron : Extensions::Polyhedra().models()) {
-    PolyhedronOptions options(2.f);
+    PolyhedronOptions options;
+    options.size   = 2.f;
     options.custom = polyhedron;
     auto polygon   = Mesh::CreatePolyhedron(polyhedron.name, options, scene);
     // polygon->convertToFlatShadedMesh();

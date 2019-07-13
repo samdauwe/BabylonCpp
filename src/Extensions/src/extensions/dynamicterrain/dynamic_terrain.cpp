@@ -10,7 +10,6 @@
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
-#include <babylon/meshes/vertex_data_options.h>
 #include <babylon/misc/tools.h>
 
 namespace BABYLON {
@@ -716,7 +715,7 @@ void DynamicTerrain::CreateMapFromHeightMapToRef(
 
   const auto onError
     = [](const std::string& msg, const std::string& /*exception*/) {
-        BABYLON_LOG_ERROR("Tools", msg);
+        BABYLON_LOG_ERROR("Tools", msg)
       };
 
   Tools::LoadImageFromUrl(heightmapURL, onload, onError);

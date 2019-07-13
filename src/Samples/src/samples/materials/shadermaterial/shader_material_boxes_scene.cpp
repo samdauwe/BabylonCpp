@@ -6,8 +6,8 @@
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_shaders_store.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
-#include <babylon/meshes/vertex_data_options.h>
 
 namespace BABYLON {
 namespace Samples {

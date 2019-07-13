@@ -4,7 +4,6 @@
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/geometry.h>
 #include <babylon/meshes/vertex_data.h>
-#include <babylon/meshes/vertex_data_options.h>
 
 TEST(TestVertexData, CreateBox)
 {
@@ -66,10 +65,11 @@ TEST(TestVertexData, CreateGround)
   const unsigned int width        = 5;
   const unsigned int height       = 5;
   const unsigned int subdivisions = 2;
-  GroundOptions options(subdivisions);
-  options.width  = width;
-  options.height = height;
-  auto ground    = VertexData::CreateGround(options);
+  GroundOptions options;
+  options.subdivisions = subdivisions;
+  options.width        = width;
+  options.height       = height;
+  auto ground          = VertexData::CreateGround(options);
   // Set expected results
   Uint32Array expectedIndices{4, 1, 0, 3, 4, 0, 5, 2, 1, 4, 5, 1,      //
                               7, 4, 3, 6, 7, 3, 8, 5, 4, 7, 8, 4};     //
@@ -117,8 +117,9 @@ TEST(TestVertexData, CreatePlane)
   using namespace BABYLON;
   // Create test data
   const float size = 5.f;
-  PlaneOptions options(size);
-  auto plane = VertexData::CreatePlane(options);
+  PlaneOptions options;
+  options.size = size;
+  auto plane   = VertexData::CreatePlane(options);
   // Set expected results
   Uint32Array expectedIndices{0, 1, 2, 0, 2, 3};
   Float32Array expectedPositions{-2.5f, -2.5f, 0.f, 2.5f,  -2.5f, 0.f,  //

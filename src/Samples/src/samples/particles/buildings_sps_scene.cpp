@@ -11,7 +11,6 @@
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh_builder.h>
-#include <babylon/meshes/vertex_data_options.h>
 #include <babylon/particles/solid_particle_system.h>
 
 namespace BABYLON {
@@ -80,7 +79,8 @@ void BuldingsSPSScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   auto nbBuildings = 10000ull;
 
-  PlaneOptions planeOptions(_fact);
+  PlaneOptions planeOptions;
+  planeOptions.size       = _fact;
   _ground                 = MeshBuilder::CreatePlane("g", planeOptions, scene);
   _ground->rotation().x   = Math::PI_2;
   auto groundMat          = StandardMaterial::New("gm", scene);

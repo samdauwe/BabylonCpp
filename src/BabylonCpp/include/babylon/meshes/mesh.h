@@ -1059,8 +1059,10 @@ public:
   static MeshPtr CreateTorus(const std::string& name, float diameter = 1.f,
                              float thickness           = 0.5f,
                              unsigned int tessellation = 16, Scene* = nullptr,
-                             bool updatable               = false,
-                             unsigned int sideOrientation = Mesh::DEFAULTSIDE);
+                             const std::optional<bool>& updatable
+                             = std::nullopt,
+                             const std::optional<unsigned int>& sideOrientation
+                             = std::nullopt);
 
   /**
    * @brief Creates a torus knot mesh. Please consider using the same method
@@ -1082,12 +1084,12 @@ public:
    * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @returns a new Mesh
    */
-  static MeshPtr
-  CreateTorusKnot(const std::string& name, float radius = 2.f,
-                  float tube = 0.5f, unsigned int radialSegments = 32,
-                  unsigned int tubularSegments = 32, float p = 2.f,
-                  float q = 3.f, Scene* = nullptr, bool updatable = false,
-                  unsigned int sideOrientation = Mesh::DEFAULTSIDE);
+  static MeshPtr CreateTorusKnot(
+    const std::string& name, float radius = 2.f, float tube = 0.5f,
+    unsigned int radialSegments = 32, unsigned int tubularSegments = 32,
+    float p = 2.f, float q = 3.f, Scene* = nullptr,
+    const std::optional<bool>& updatable               = std::nullopt,
+    const std::optional<unsigned int>& sideOrientation = std::nullopt);
 
   /**
    * @brief Creates a line mesh. Please consider using the same method from the
@@ -1200,13 +1202,14 @@ public:
    * (http://doc.babylonjs.com/how_to/How_to_dynamically_morph_a_mesh#extruded-shape)
    * @returns a new Mesh
    */
-  static MeshPtr ExtrudeShape(const std::string& name,
-                              const std::vector<Vector3>& shape,
-                              const std::vector<Vector3>& path, float scale,
-                              float rotation, unsigned int cap, Scene*,
-                              bool updatable               = false,
-                              unsigned int sideOrientation = Mesh::DEFAULTSIDE,
-                              const MeshPtr& instance      = nullptr);
+  static MeshPtr
+  ExtrudeShape(const std::string& name, const std::vector<Vector3>& shape,
+               const std::vector<Vector3>& path, float scale, float rotation,
+               unsigned int cap, Scene*,
+               const std::optional<bool>& updatable = std::nullopt,
+               const std::optional<unsigned int>& sideOrientation
+               = std::nullopt,
+               const MeshPtr& instance = nullptr);
 
   /**
    * @brief Creates an custom extruded shape mesh.
@@ -1247,8 +1250,9 @@ public:
     const std::function<float(float i, float distance)>& scaleFunction,
     const std::function<float(float i, float distance)>& rotationFunction,
     bool ribbonCloseArray, bool ribbonClosePath, unsigned int cap, Scene*,
-    bool updatable = false, unsigned int sideOrientation = Mesh::DEFAULTSIDE,
-    const MeshPtr& instance = nullptr);
+    const std::optional<bool>& updatable               = std::nullopt,
+    const std::optional<unsigned int>& sideOrientation = std::nullopt,
+    const MeshPtr& instance                            = nullptr);
 
   /**
    * @brief Creates lathe mesh.
@@ -1268,11 +1272,12 @@ public:
    * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @returns a new Mesh
    */
-  static MeshPtr CreateLathe(const std::string& name,
-                             const std::vector<Vector3>& shape, float radius,
-                             unsigned int tessellation, Scene* = nullptr,
-                             bool updatable               = false,
-                             unsigned int sideOrientation = Mesh::DEFAULTSIDE);
+  static MeshPtr
+  CreateLathe(const std::string& name, const std::vector<Vector3>& shape,
+              float radius, unsigned int tessellation, Scene* = nullptr,
+              const std::optional<bool>& updatable = std::nullopt,
+              const std::optional<unsigned int>& sideOrientation
+              = std::nullopt);
 
   /**
    * @brief Creates a plane mesh. Please consider using the same method from the
@@ -1286,9 +1291,11 @@ public:
    * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @returns a new Mesh
    */
-  static MeshPtr CreatePlane(const std::string& name, float size,
-                             Scene* = nullptr, bool updatable = false,
-                             unsigned int sideOrientation = Mesh::DEFAULTSIDE);
+  static MeshPtr
+  CreatePlane(const std::string& name, float size, Scene* = nullptr,
+              const std::optional<bool>& updatable = std::nullopt,
+              const std::optional<unsigned int>& sideOrientation
+              = std::nullopt);
 
   /**
    * @brief Creates a ground mesh.
@@ -1304,7 +1311,8 @@ public:
   static MeshPtr CreateGround(const std::string& name, unsigned int width = 1,
                               unsigned int height       = 1,
                               unsigned int subdivisions = 1, Scene* = nullptr,
-                              bool updatable = false);
+                              const std::optional<bool>& updatable
+                              = std::nullopt);
 
   /**
    * @brief Creates a tiled ground mesh.
@@ -1325,11 +1333,11 @@ public:
    * @param updatable defines if the mesh must be flagged as updatable
    * @returns a new Mesh
    */
-  static MeshPtr CreateTiledGround(const std::string& name, float xmin,
-                                   float zmin, float xmax, float zmax,
-                                   const ISize& subdivisions = ISize(1, 1),
-                                   const ISize& precision    = ISize(1, 1),
-                                   Scene* = nullptr, bool updatable = false);
+  static MeshPtr
+  CreateTiledGround(const std::string& name, float xmin, float zmin, float xmax,
+                    float zmax, const ISize& subdivisions = ISize(1, 1),
+                    const ISize& precision = ISize(1, 1), Scene* = nullptr,
+                    const std::optional<bool>& updatable = std::nullopt);
 
   /**
    * @brief Creates a ground mesh from a height map.
@@ -1354,8 +1362,8 @@ public:
     const std::string& name, const std::string& url, unsigned int width,
     unsigned int height, unsigned int subdivisions, unsigned int minHeight,
     unsigned int maxHeight, Scene*, bool updatable = false,
-    const std::function<void(GroundMesh* mesh)>& onReady = nullptr,
-    std::optional<float> alphaFilter                     = std::nullopt);
+    const std::function<void(const GroundMeshPtr& mesh)>& onReady = nullptr,
+    std::optional<float> alphaFilter = std::nullopt);
 
   /**
    * @brief Creates a hemisphere mesh.
@@ -1474,7 +1482,7 @@ public:
    * @see http://doc.babylonjs.com/how_to/polyhedra_shapes#icosphere
    */
   static MeshPtr CreateIcoSphere(const std::string& name,
-                                 IcoSphereOptions& options, Scene*);
+                                 IcoSphereOptions& options, Scene* scene);
 
   /**
    * @brief Creates a decal mesh.

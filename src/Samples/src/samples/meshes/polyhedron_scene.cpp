@@ -9,9 +9,9 @@
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/standard_material.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
-#include <babylon/meshes/vertex_data_options.h>
 
 namespace BABYLON {
 namespace Samples {
@@ -58,7 +58,8 @@ void PolyhedronScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   int col = 0, row = 0;
   for (unsigned int type = 0; type < 15; ++type) {
-    PolyhedronOptions options(2.f);
+    PolyhedronOptions options;
+    options.size = 2.f;
     options.type = type;
     auto polygon = MeshBuilder::CreatePolyhedron(
       String::concat("Polyhedron", type), options, scene);

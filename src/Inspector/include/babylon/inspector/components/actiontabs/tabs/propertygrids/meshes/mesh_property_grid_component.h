@@ -17,11 +17,11 @@
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/meshes/mesh_reserved_data_store.h>
 #include <babylon/materials/material.h>
 #include <babylon/materialslibrary/normal/normal_material.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/vertex_buffer.h>
-#include <babylon/meshes/vertex_data_options.h>
 
 namespace BABYLON {
 

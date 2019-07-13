@@ -10,7 +10,6 @@
 #include <babylon/meshes/facet_parameters.h>
 #include <babylon/meshes/geometry.h>
 #include <babylon/meshes/vertex_buffer.h>
-#include <babylon/meshes/vertex_data_options.h>
 #include <babylon/misc/tools.h>
 
 namespace BABYLON {
@@ -544,16 +543,17 @@ VertexData::_ExtractFrom(IGetSetVerticesData* meshOrGeometry,
 
 std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
 {
-  auto& pathArray    = options.pathArray;
-  auto closeArray    = options.closeArray.value_or(false);
-  auto closePath     = options.closePath.value_or(false);
-  auto invertUV      = options.invertUV.value_or(false);
-  auto defaultOffset = static_cast<size_t>(std::floor(pathArray[0].size() / 2));
-  auto offset        = options.offset.value_or(defaultOffset);
+  auto& pathArray       = options.pathArray;
+  const auto closeArray = options.closeArray.value_or(false);
+  const auto closePath  = options.closePath.value_or(false);
+  const auto invertUV   = options.invertUV.value_or(false);
+  const auto defaultOffset
+    = static_cast<size_t>(std::floor(pathArray[0].size() / 2));
+  auto offset = options.offset.value_or(defaultOffset);
   // offset max allowed : defaultOffset
   offset = offset > defaultOffset ? defaultOffset :
                                     static_cast<size_t>(std::floor(offset));
-  auto sideOrientation
+  const auto sideOrientation
     = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
   const auto& customUV     = options.uvs;
   const auto& customColors = options.colors;
@@ -810,10 +810,10 @@ std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
                        0,  -1, 0,  0, -1, 0,  0,  -1, 0,  0,  -1, 0};
   Float32Array uvs;
   Float32Array positions;
-  auto width        = options.width.value_or(options.size.value_or(1.f));
-  auto height       = options.height.value_or(options.size.value_or(1.f));
-  auto depth        = options.depth.value_or(options.size.value_or(1.f));
-  auto wrap         = options.wrap.value_or(false);
+  const auto width  = options.width.value_or(options.size.value_or(1.f));
+  const auto height = options.height.value_or(options.size.value_or(1.f));
+  const auto depth  = options.depth.value_or(options.size.value_or(1.f));
+  const auto wrap   = options.wrap.value_or(false);
   auto topBaseAt    = options.topBaseAt.value_or(1u);
   auto bottomBaseAt = options.bottomBaseAt.value_or(0u);
   topBaseAt         = (topBaseAt + 4) % 4;    // places values as 0 to 3
@@ -918,18 +918,21 @@ std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
 
 std::unique_ptr<VertexData> VertexData::CreateSphere(SphereOptions& options)
 {
-  auto segments  = options.segments.value_or(32);
-  auto diameterX = options.diameterX.value_or(options.diameter.value_or(1.f));
-  auto diameterY = options.diameterY.value_or(options.diameter.value_or(1.f));
-  auto diameterZ = options.diameterZ.value_or(options.diameter.value_or(1.f));
-  auto arc
+  const auto segments = options.segments.value_or(32);
+  const auto diameterX
+    = options.diameterX.value_or(options.diameter.value_or(1.f));
+  const auto diameterY
+    = options.diameterY.value_or(options.diameter.value_or(1.f));
+  const auto diameterZ
+    = options.diameterZ.value_or(options.diameter.value_or(1.f));
+  const auto arc
     = options.arc.has_value() ?
         ((*options.arc <= 0.f || options.arc > 1.f) ? 1.f : *options.arc) :
         1.f;
-  auto slice = options.slice.has_value() ?
-                 ((*options.slice <= 0.f) ? 1.f : *options.slice) :
-                 1.f;
-  auto sideOrientation
+  const auto slice = options.slice.has_value() ?
+                       ((*options.slice <= 0.f) ? 1.f : *options.slice) :
+                       1.f;
+  const auto sideOrientation
     = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
 
   Vector3 radius(diameterX / 2.f, diameterY / 2.f, diameterZ / 2.f);
@@ -1003,20 +1006,20 @@ std::unique_ptr<VertexData> VertexData::CreateSphere(SphereOptions& options)
 // Cylinder and cone
 std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
 {
-  auto height = options.height.value_or(2.f);
-  auto diameterTop
+  const auto height = options.height.value_or(2.f);
+  const auto diameterTop
     = options.diameterTop.value_or(options.diameter.value_or(1.f));
-  auto diameterBottom
+  const auto diameterBottom
     = options.diameterBottom.value_or(options.diameter.value_or(1.f));
-  auto tessellation = options.tessellation.value_or(24);
-  auto subdivisions = options.subdivisions.value_or(1.f);
-  auto hasRings     = options.hasRings.value_or(false);
-  auto enclose      = options.enclose.value_or(false);
-  auto arc
+  const auto tessellation = options.tessellation.value_or(24);
+  const auto subdivisions = options.subdivisions.value_or(1.f);
+  const auto hasRings     = options.hasRings.value_or(false);
+  const auto enclose      = options.enclose.value_or(false);
+  const auto arc
     = options.arc.has_value() ?
         ((*options.arc <= 0.f || options.arc > 1.f) ? 1.f : *options.arc) :
         1.f;
-  auto sideOrientation
+  const auto sideOrientation
     = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
   auto& faceUV     = options.faceUV;
   auto& faceColors = options.faceColors;
@@ -1287,19 +1290,20 @@ std::unique_ptr<VertexData> VertexData::CreateTorus(TorusOptions& options)
   Float32Array normals;
   Float32Array uvs;
 
-  const auto& diameter        = options.diameter;
-  const auto& thickness       = options.thickness;
-  const auto& tessellation    = options.tessellation;
-  const auto& sideOrientation = options.sideOrientation;
+  const auto diameter     = options.diameter.value_or(1.f);
+  const auto thickness    = options.thickness.value_or(0.5f);
+  const auto tessellation = options.tessellation.value_or(16);
+  const auto sideOrientation
+    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
 
   auto stride = tessellation + 1;
 
   auto tessellationf = static_cast<float>(tessellation);
 
   for (uint32_t i = 0; i <= tessellation; ++i) {
-    float u = static_cast<float>(i) / tessellationf;
+    auto u = static_cast<float>(i) / tessellationf;
 
-    float outerAngle
+    auto outerAngle
       = static_cast<float>(i) * Math::PI * 2.f / tessellationf - Math::PI / 2.f;
 
     auto rotationY = Matrix::RotationY(outerAngle);
@@ -1307,12 +1311,12 @@ std::unique_ptr<VertexData> VertexData::CreateTorus(TorusOptions& options)
       = Matrix::Translation(diameter / 2.f, 0.f, 0.f).multiply(rotationY);
 
     for (uint32_t j = 0; j <= tessellation; ++j) {
-      float v = 1.f - static_cast<float>(j) / tessellationf;
+      auto v = 1.f - static_cast<float>(j) / tessellationf;
 
-      float innerAngle
+      auto innerAngle
         = static_cast<float>(j) * Math::PI * 2.f / tessellationf + Math::PI;
-      float dx = std::cos(innerAngle);
-      float dy = std::sin(innerAngle);
+      auto dx = std::cos(innerAngle);
+      auto dy = std::sin(innerAngle);
 
       // Create a vertex.
       Vector3 normal(dx, dy, 0.f);
@@ -1400,10 +1404,10 @@ VertexData::CreateLineSystem(LineSystemOptions& options)
 std::unique_ptr<VertexData>
 VertexData::CreateDashedLines(DashedLinesOptions& options)
 {
-  const auto& dashSize = options.dashSize;
-  const auto& gapSize  = options.gapSize;
-  const auto& dashNb   = options.dashNb;
-  const auto& points   = options.points;
+  const auto dashSize = options.dashSize.value_or(3.f);
+  const auto gapSize  = options.gapSize.value_or(1.f);
+  const auto dashNb   = options.dashNb.value_or(200);
+  const auto& points  = options.points;
 
   Float32Array positions;
   Uint32Array indices;
@@ -1426,7 +1430,7 @@ VertexData::CreateDashedLines(DashedLinesOptions& options)
     points[i + 1].subtractToRef(points[i], curvect);
     nb = std::floor(curvect.length() / shft);
     curvect.normalize();
-    for (float j = 0.f; j < nb; ++j) {
+    for (auto j = 0.f; j < nb; ++j) {
       curshft = shft * j;
       stl_util::concat(positions, {points[i].x + curshft * curvect.x,
                                    points[i].y + curshft * curvect.y,
@@ -1458,15 +1462,17 @@ std::unique_ptr<VertexData> VertexData::CreateGround(GroundOptions& options)
   float rowf, colf;
   float x, y, z;
 
-  const auto& width         = options.width;
-  const auto& height        = options.height;
-  const auto& subdivisionsX = options.subdivisionsX;
-  const auto& subdivisionsY = options.subdivisionsY;
+  const auto width  = options.width.value_or(1);
+  const auto height = options.height.value_or(1);
+  const auto subdivisionsX
+    = options.subdivisionsX.value_or(options.subdivisions.value_or(1));
+  const auto subdivisionsY
+    = options.subdivisionsY.value_or(options.subdivisions.value_or(1));
 
-  const float widthf         = static_cast<float>(width);
-  const float heightf        = static_cast<float>(height);
-  const float subdivisionsXf = static_cast<float>(subdivisionsX);
-  const float subdivisionsYf = static_cast<float>(subdivisionsY);
+  const auto widthf         = static_cast<float>(width);
+  const auto heightf        = static_cast<float>(height);
+  const auto subdivisionsXf = static_cast<float>(subdivisionsX);
+  const auto subdivisionsYf = static_cast<float>(subdivisionsY);
 
   for (row = 0; row <= subdivisionsY; ++row) {
     rowf = static_cast<float>(row);
@@ -1512,13 +1518,12 @@ std::unique_ptr<VertexData> VertexData::CreateGround(GroundOptions& options)
 std::unique_ptr<VertexData>
 VertexData::CreateTiledGround(TiledGroundOptions& options)
 {
-  const auto& xmin = options.xmin;
-  const auto& zmin = options.zmin;
-  const auto& xmax = options.xmax;
-  const auto& zmax = options.zmax;
-  ISize subdivisions
-    = {options.subdivisions.width, options.subdivisions.height};
-  ISize precision = {options.subdivisions.width, options.subdivisions.height};
+  const auto xmin   = options.xmin.value_or(-1.f);
+  const auto zmin   = options.zmin.value_or(-1.f);
+  const auto xmax   = options.xmax.value_or(1.f);
+  const auto zmax   = options.zmax.value_or(1.f);
+  auto subdivisions = options.subdivisions.value_or(ISize{1, 1});
+  auto precision    = options.precision.value_or(ISize{1, 1});
 
   Uint32Array indices;
   Float32Array positions;
@@ -1526,15 +1531,15 @@ VertexData::CreateTiledGround(TiledGroundOptions& options)
   Float32Array uvs;
   uint32_t row, col, tileRow, tileCol;
 
-  subdivisions.height = (subdivisions.width < 1) ? 1 : subdivisions.height;
+  subdivisions.height = (subdivisions.height < 1) ? 1 : subdivisions.height;
   subdivisions.width  = (subdivisions.width < 1) ? 1 : subdivisions.width;
   precision.width     = (precision.width < 1) ? 1 : precision.width;
   precision.height    = (precision.height < 1) ? 1 : precision.height;
 
-  uint32_t subdivisions_h = static_cast<unsigned>(subdivisions.height);
-  uint32_t subdivisions_w = static_cast<unsigned>(subdivisions.width);
-  uint32_t precision_h    = static_cast<unsigned>(precision.height);
-  uint32_t precision_w    = static_cast<unsigned>(precision.width);
+  const auto subdivisions_h = static_cast<uint32_t>(subdivisions.height);
+  const auto subdivisions_w = static_cast<uint32_t>(subdivisions.width);
+  const auto precision_h    = static_cast<uint32_t>(precision.height);
+  const auto precision_w    = static_cast<uint32_t>(precision.width);
 
   SizeF tileSize = {(xmax - xmin) / static_cast<float>(subdivisions.width), //
                     (zmax - zmin) / static_cast<float>(subdivisions.height)};
@@ -1565,12 +1570,12 @@ VertexData::CreateTiledGround(TiledGroundOptions& options)
         Vector3 position = Vector3::Zero();
         Vector3 normal(0.f, 1.f, 0.f);
         for (row = 0; row <= precision_h; ++row) {
-          float rowf = static_cast<float>(row);
+          auto rowf = static_cast<float>(row);
           position.z
             = (rowf * (zTileMax - zTileMin)) / static_cast<float>(precision_h)
               + zTileMin;
           for (col = 0; col <= precision_w; ++col) {
-            float colf = static_cast<float>(col);
+            auto colf = static_cast<float>(col);
             position.x
               = (colf * (xTileMax - xTileMin)) / static_cast<float>(precision_w)
                 + xTileMin;
@@ -1585,9 +1590,9 @@ VertexData::CreateTiledGround(TiledGroundOptions& options)
       };
 
   for (tileRow = 0; tileRow < subdivisions_h; ++tileRow) {
-    float tileRowf = static_cast<float>(tileRow);
+    auto tileRowf = static_cast<float>(tileRow);
     for (tileCol = 0; tileCol < subdivisions_w; ++tileCol) {
-      float tileColf = static_cast<float>(tileCol);
+      auto tileColf = static_cast<float>(tileCol);
       applyTile(xmin + tileColf * tileSize.width,         //
                 zmin + tileRowf * tileSize.height,        //
                 xmin + (tileColf + 1.f) * tileSize.width, //
@@ -1615,18 +1620,24 @@ VertexData::CreateGroundFromHeightMap(GroundFromHeightMapOptions& options)
   Float32Array uvs;
   uint32_t row, col;
   float rowf, colf;
+  auto filter      = options.colorFilter.value_or(Color3(0.3f, 0.59f, 0.11f));
+  auto alphaFilter = options.alphaFilter.value_or(0.f);
+  auto invert      = false;
 
-  const auto& width        = options.width;
-  const auto& height       = options.height;
-  const auto& subdivisions = options.subdivisions;
-  const auto subdivisionsf = static_cast<float>(options.subdivisions);
-  const auto& minHeight    = options.minHeight;
-  const auto& maxHeight    = options.maxHeight;
-  const auto bufferWidth   = static_cast<float>(options.bufferWidth);
-  const auto bufferHeight  = static_cast<float>(options.bufferHeight);
+  if (*options.minHeight > *options.maxHeight) {
+    invert = true;
+    std::swap(options.minHeight, options.maxHeight);
+  }
+
+  const auto subdivisions  = *options.subdivisions;
+  const auto subdivisionsf = static_cast<float>(subdivisions);
+  const auto width         = *options.width;
+  const auto height        = *options.height;
+  const auto minHeight     = *options.minHeight;
+  const auto maxHeight     = *options.maxHeight;
+  const auto bufferWidth   = *options.bufferWidth;
+  const auto bufferHeight  = *options.bufferHeight;
   const auto& buffer       = options.buffer;
-  const auto& filter       = options.colorFilter;
-  const auto alphaFilter   = options.alphaFilter;
 
   // Vertices
   for (row = 0; row <= subdivisions; ++row) {
@@ -1640,16 +1651,22 @@ VertexData::CreateGroundFromHeightMap(GroundFromHeightMapOptions& options)
       );
 
       // Compute height
-      uint32_t heightMapX = static_cast<unsigned>(
+      auto heightMapX = static_cast<unsigned>(
         ((position.x + width / 2.f) / width) * (bufferWidth - 1.f));
-      uint32_t heightMapY = static_cast<unsigned>(
+      auto heightMapY = static_cast<unsigned>(
         (1.f - (position.z + height / 2.f) / height) * (bufferHeight - 1.f));
 
-      const uint32_t pos = (heightMapX + heightMapY * options.bufferWidth) * 4;
-      const auto r       = static_cast<float>(buffer[pos]) / 255.f;
-      const auto g       = static_cast<float>(buffer[pos + 1]) / 255.f;
-      const auto b       = static_cast<float>(buffer[pos + 2]) / 255.f;
-      const auto a       = static_cast<float>(buffer[pos + 3]) / 255.f;
+      const uint32_t pos = (heightMapX + heightMapY * bufferWidth) * 4;
+      auto r             = static_cast<float>(buffer[pos]) / 255.f;
+      auto g             = static_cast<float>(buffer[pos + 1]) / 255.f;
+      auto b             = static_cast<float>(buffer[pos + 2]) / 255.f;
+      auto a             = static_cast<float>(buffer[pos + 3]) / 255.f;
+
+      if (invert) {
+        r = 1.f - r;
+        g = 1.f - g;
+        b = 1.f - b;
+      }
 
       const auto gradient = r * filter.r + g * filter.g + b * filter.b;
 
@@ -1678,7 +1695,6 @@ VertexData::CreateGroundFromHeightMap(GroundFromHeightMapOptions& options)
       const auto idx1 = col + 1 + (row + 1) * (subdivisions + 1);
       const auto idx2 = col + 1 + row * (subdivisions + 1);
       const auto idx3 = col + row * (subdivisions + 1);
-
       const auto idx4 = col + (row + 1) * (subdivisions + 1);
 
       // Check that all indices are visible (based on our special height)
@@ -1724,9 +1740,14 @@ std::unique_ptr<VertexData> VertexData::CreatePlane(PlaneOptions& options)
   Float32Array normals;
   Float32Array uvs;
 
+  const auto width  = options.width.value_or(options.size.value_or(1.f));
+  const auto height = options.height.value_or(options.size.value_or(1.f));
+  const auto sideOrientation
+    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
+
   // Vertices
-  float halfWidth  = options.width / 2.f;
-  float halfHeight = options.height / 2.f;
+  const auto halfWidth  = width / 2.f;
+  const auto halfHeight = height / 2.f;
 
   stl_util::concat(positions, {-halfWidth, -halfHeight, 0.f});
   stl_util::concat(normals, {0.f, 0.f, -1.f});
@@ -1754,8 +1775,8 @@ std::unique_ptr<VertexData> VertexData::CreatePlane(PlaneOptions& options)
   indices.emplace_back(3);
 
   // Sides
-  VertexData::_ComputeSides(options.sideOrientation, positions, indices,
-                            normals, uvs, options.frontUVs, options.backUVs);
+  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs,
+                            options.frontUVs, options.backUVs);
 
   // Result
   auto vertexData = std::make_unique<VertexData>();
@@ -2501,19 +2522,26 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
         {3, 6, 2, 0},      {9, 3, 1, 7},
         {9, 15, 12, 6, 3}, {22, 17, 11, 5, 4, 8, 14, 19, 23, 24}}};
 
-  auto type                = options.type;
-  type                     = (type >= polyhedraVertices.size()) ? 0 : type;
-  const auto& sizeX        = options.sizeX;
-  const auto& sizeY        = options.sizeY;
-  const auto& sizeZ        = options.sizeZ;
-  const auto& dataVertices = options.custom.vertices.empty() ?
-                               polyhedraVertices[type] :
-                               options.custom.vertices;
-  const auto& dataFaces = options.custom.faces.empty() ? polyhedraFaces[type] :
-                                                         options.custom.faces;
-  const auto nbfaces          = dataFaces.size();
-  const auto& flat            = options.flat;
-  const auto& sideOrientation = options.sideOrientation;
+  const auto type
+    = options.type.has_value() ?
+        (*options.type >= polyhedraVertices.size()) ? 0u : *options.type :
+        0u;
+  const auto size  = options.size.value_or(1.f);
+  const auto sizeX = options.sizeX.value_or(size);
+  const auto sizeY = options.sizeY.value_or(size);
+  const auto sizeZ = options.sizeZ.value_or(size);
+  const auto& dataVertices
+    = (!options.custom.has_value() && options.custom->vertices.empty()) ?
+        polyhedraVertices[type] :
+        options.custom->vertices;
+  const auto& dataFaces
+    = (!options.custom.has_value() && options.custom->faces.empty()) ?
+        polyhedraFaces[type] :
+        options.custom->faces;
+  const auto nbfaces = dataFaces.size();
+  const auto flat    = options.flat.value_or(true);
+  const auto sideOrientation
+    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
 
   Float32Array positions;
   Uint32Array indices;
@@ -2555,10 +2583,10 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
   }
   else {
     for (f = 0; f < nbfaces; ++f) {
-      size_t fl = dataFaces[f].size(); // number of vertices of the current face
-      ang       = Math::PI2 / static_cast<float>(fl);
-      x         = 0.5f * std::tan(ang / 2.f);
-      y         = 0.5f;
+      auto fl = dataFaces[f].size(); // number of vertices of the current face
+      ang     = Math::PI2 / static_cast<float>(fl);
+      x       = 0.5f * std::tan(ang / 2.f);
+      y       = 0.5f;
 
       // positions, uvs, colors
       for (i = 0; i < fl; ++i) {
@@ -2615,18 +2643,19 @@ VertexData::CreateTorusKnot(TorusKnotOptions& options)
   Float32Array normals;
   Float32Array uvs;
 
-  const auto& radius          = options.radius;
-  const auto& tube            = options.tube;
-  const auto& radialSegments  = options.radialSegments;
+  const auto radius           = options.radius.value_or(2.f);
+  const auto tube             = options.tube.value_or(0.5f);
+  const auto radialSegments   = options.radialSegments.value_or(32);
   const auto radialSegmentsf  = static_cast<float>(radialSegments);
-  const auto& tubularSegments = options.tubularSegments;
+  const auto tubularSegments  = options.tubularSegments.value_or(32);
   const auto tubularSegmentsf = static_cast<float>(tubularSegments);
-  const auto& p               = options.p;
-  const auto& q               = options.q;
-  const auto& sideOrientation = options.sideOrientation;
+  const auto p                = options.p.value_or(2.f);
+  const auto q                = options.q.value_or(3.f);
+  const auto sideOrientation
+    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
 
   // Helper
-  auto getPos = [&](float angle) {
+  const auto getPos = [&](float angle) -> Vector3 {
     auto cu      = std::cos(angle);
     auto su      = std::sin(angle);
     auto quOverP = q / p * angle;
@@ -2661,10 +2690,9 @@ VertexData::CreateTorusKnot(TorusKnotOptions& options)
 
     for (j = 0; j < tubularSegments; ++j) {
       modJ = j % tubularSegments;
-
-      v  = static_cast<float>(modJ) / tubularSegmentsf * 2.f * Math::PI;
-      cx = -tube * std::cos(v);
-      cy = tube * std::sin(v);
+      v    = static_cast<float>(modJ) / tubularSegmentsf * 2.f * Math::PI;
+      cx   = -tube * std::cos(v);
+      cy   = tube * std::sin(v);
 
       positions.emplace_back(p1.x + cx * n.x + cy * bitan.x);
       positions.emplace_back(p1.y + cx * n.y + cy * bitan.y);

@@ -61,6 +61,23 @@ CylinderOptions::~CylinderOptions()
 }
 
 //------------------------------------------------------------------------------
+// Dashed lines mesh options
+//------------------------------------------------------------------------------
+
+DashedLinesOptions::DashedLinesOptions()
+    : dashSize{std::nullopt}
+    , gapSize{std::nullopt}
+    , dashNb{std::nullopt}
+    , updatable{std::nullopt}
+    , instance{nullptr}
+{
+}
+
+DashedLinesOptions::~DashedLinesOptions()
+{
+}
+
+//------------------------------------------------------------------------------
 // Decal mesh options
 //------------------------------------------------------------------------------
 
@@ -92,6 +109,91 @@ DiscOptions::DiscOptions()
 }
 
 DiscOptions::~DiscOptions()
+{
+}
+
+//------------------------------------------------------------------------------
+// Extrude shape mesh options
+//------------------------------------------------------------------------------
+
+ExtrudeShapeOptions::ExtrudeShapeOptions()
+    : scale{std::nullopt}
+    , rotation{std::nullopt}
+    , cap{std::nullopt}
+    , updatable{std::nullopt}
+    , sideOrientation{std::nullopt}
+    , frontUVs{std::nullopt}
+    , backUVs{std::nullopt}
+    , instance{nullptr}
+    , invertUV{std::nullopt}
+{
+}
+
+ExtrudeShapeOptions::~ExtrudeShapeOptions()
+{
+}
+
+//------------------------------------------------------------------------------
+// Extrude shape custom mesh options
+//------------------------------------------------------------------------------
+
+ExtrudeShapeCustomOptions::ExtrudeShapeCustomOptions()
+    : scaleFunction{nullptr}
+    , rotationFunction{nullptr}
+    , ribbonCloseArray{std::nullopt}
+    , ribbonClosePath{std::nullopt}
+    , cap{std::nullopt}
+    , updatable{std::nullopt}
+    , sideOrientation{std::nullopt}
+    , frontUVs{std::nullopt}
+    , backUVs{std::nullopt}
+    , instance{}
+    , invertUV{std::nullopt}
+{
+}
+
+ExtrudeShapeCustomOptions::~ExtrudeShapeCustomOptions()
+{
+}
+
+//------------------------------------------------------------------------------
+// Ground from height map mesh options
+//------------------------------------------------------------------------------
+
+GroundFromHeightMapOptions::GroundFromHeightMapOptions()
+    : width{std::nullopt}
+    , height{std::nullopt}
+    , subdivisions{std::nullopt}
+    , minHeight{std::nullopt}
+    , maxHeight{std::nullopt}
+    , colorFilter{std::nullopt}
+    , alphaFilter{std::nullopt}
+    , updatable{std::nullopt}
+    , bufferWidth{std::nullopt}
+    , bufferHeight{std::nullopt}
+    , onReady{nullptr}
+{
+}
+
+GroundFromHeightMapOptions::~GroundFromHeightMapOptions()
+{
+}
+
+//------------------------------------------------------------------------------
+// Ground mesh options
+//------------------------------------------------------------------------------
+
+GroundOptions::GroundOptions()
+    : width{std::nullopt}
+    , height{std::nullopt}
+    , subdivisions{std::nullopt}
+    , subdivisionsX{std::nullopt}
+    , subdivisionsY{std::nullopt}
+    , updatable{std::nullopt}
+{
+}
+
+GroundOptions::~GroundOptions()
 {
 }
 
@@ -156,6 +258,105 @@ LatheOptions::~LatheOptions()
 }
 
 //------------------------------------------------------------------------------
+// Lines mesh options
+//------------------------------------------------------------------------------
+
+LinesOptions::LinesOptions()
+    : updatable{std::nullopt}, useVertexAlpha{std::nullopt}, instance{nullptr}
+{
+}
+
+LinesOptions::~LinesOptions()
+{
+}
+
+//------------------------------------------------------------------------------
+// Line system mesh options
+//------------------------------------------------------------------------------
+
+LineSystemOptions::LineSystemOptions()
+    : updatable{std::nullopt}, useVertexAlpha{std::nullopt}, instance{nullptr}
+{
+}
+
+LineSystemOptions::LineSystemOptions(LinesOptions& linesOptions)
+    : updatable{linesOptions.updatable}
+    , useVertexAlpha{linesOptions.useVertexAlpha}
+    , instance{linesOptions.instance}
+{
+  if (!linesOptions.points.empty()) {
+    lines.emplace_back(linesOptions.points);
+  }
+  if (!linesOptions.colors.empty()) {
+    colors.emplace_back(linesOptions.colors);
+  }
+}
+
+LineSystemOptions::~LineSystemOptions()
+{
+}
+
+//------------------------------------------------------------------------------
+// Plane mesh options
+//------------------------------------------------------------------------------
+
+PlaneOptions::PlaneOptions()
+    : size{std::nullopt}
+    , width{std::nullopt}
+    , height{std::nullopt}
+    , sideOrientation{std::nullopt}
+    , frontUVs{std::nullopt}
+    , backUVs{std::nullopt}
+    , updatable{std::nullopt}
+    , sourcePlane{nullptr}
+{
+}
+
+PlaneOptions::~PlaneOptions()
+{
+}
+
+//------------------------------------------------------------------------------
+// Polyhedron mesh options
+//------------------------------------------------------------------------------
+
+PolyhedronOptions::PolyhedronOptions()
+    : type{std::nullopt}
+    , size{std::nullopt}
+    , sizeX{std::nullopt}
+    , sizeY{std::nullopt}
+    , sizeZ{std::nullopt}
+    , custom{std::nullopt}
+    , flat{std::nullopt}
+    , updatable{std::nullopt}
+    , sideOrientation{std::nullopt}
+    , frontUVs{std::nullopt}
+    , backUVs{std::nullopt}
+{
+}
+
+PolyhedronOptions::~PolyhedronOptions()
+{
+}
+
+//------------------------------------------------------------------------------
+// Polygon mesh options
+//------------------------------------------------------------------------------
+
+PolygonOptions::PolygonOptions()
+    : depth{std::nullopt}
+    , updatable{std::nullopt}
+    , sideOrientation{std::nullopt}
+    , frontUVs{Vector4(0.f, 0.f, 1.f, 1.f)}
+    , backUVs{Vector4(0.f, 0.f, 1.f, 1.f)}
+{
+}
+
+PolygonOptions::~PolygonOptions()
+{
+}
+
+//------------------------------------------------------------------------------
 // Ribbon mesh options
 //------------------------------------------------------------------------------
 
@@ -196,6 +397,66 @@ SphereOptions::SphereOptions()
 }
 
 SphereOptions::~SphereOptions()
+{
+}
+
+//------------------------------------------------------------------------------
+// Tiled ground mesh options
+//------------------------------------------------------------------------------
+
+TiledGroundOptions::TiledGroundOptions()
+    : xmin{std::nullopt}
+    , zmin{std::nullopt}
+    , xmax{std::nullopt}
+    , zmax{std::nullopt}
+    , subdivisions{std::nullopt}
+    , precision{std::nullopt}
+    , updatable{std::nullopt}
+{
+}
+
+TiledGroundOptions::~TiledGroundOptions()
+{
+}
+
+//------------------------------------------------------------------------------
+// Torus mesh options
+//------------------------------------------------------------------------------
+
+TorusOptions::TorusOptions()
+    : diameter{std::nullopt}
+    , thickness{std::nullopt}
+    , tessellation{std::nullopt}
+    , updatable{std::nullopt}
+    , sideOrientation{std::nullopt}
+    , frontUVs{std::nullopt}
+    , backUVs{std::nullopt}
+{
+}
+
+TorusOptions::~TorusOptions()
+{
+}
+
+//------------------------------------------------------------------------------
+// TorusKnot mesh options
+//------------------------------------------------------------------------------
+
+TorusKnotOptions::TorusKnotOptions()
+    : radius{std::nullopt}
+    , tube{std::nullopt}
+    , radialSegments{std::nullopt}
+    , tubularSegments{std::nullopt}
+    , p{std::nullopt}
+    , q{std::nullopt}
+    , updatable{std::nullopt}
+    , sideOrientation{std::nullopt}
+    , frontUVs{std::nullopt}
+    , backUVs{std::nullopt}
+{
+}
+
+TorusKnotOptions::~TorusKnotOptions()
 {
 }
 

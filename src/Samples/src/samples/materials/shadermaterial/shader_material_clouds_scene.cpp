@@ -9,9 +9,9 @@
 #include <babylon/materials/effect_shaders_store.h>
 #include <babylon/materials/shader_material.h>
 #include <babylon/materials/textures/texture.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/vertex_data.h>
-#include <babylon/meshes/vertex_data_options.h>
 
 namespace BABYLON {
 namespace Samples {
@@ -71,7 +71,8 @@ void ShaderMaterialCloudsScene::initializeScene(ICanvas* /*canvas*/,
   std::unique_ptr<VertexData> globalVertexData = nullptr;
 
   for (size_t i = 0; i < count; ++i) {
-    PlaneOptions planeOptions(size);
+    PlaneOptions planeOptions;
+    planeOptions.size    = size;
     auto planeVertexData = VertexData::CreatePlane(planeOptions);
 
     planeVertexData->normals.clear(); // We do not need normals

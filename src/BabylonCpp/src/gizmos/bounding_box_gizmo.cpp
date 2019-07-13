@@ -12,7 +12,6 @@
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
-#include <babylon/meshes/vertex_data_options.h>
 #include <babylon/rendering/utility_layer_renderer.h>
 
 namespace BABYLON {

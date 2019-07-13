@@ -5,7 +5,6 @@
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
-#include <babylon/meshes/vertex_data_options.h>
 #include <babylon/physics/helper/physics_force_and_contact_point.h>
 #include <babylon/physics/helper/physics_vortex_event_data.h>
 #include <babylon/physics/iphysics_enabled_object.h>

@@ -86,15 +86,14 @@ public:
    * * If you create a double-sided mesh, you can choose what parts of the
    * texture image to crop and stick respectively on the front and the back
    * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
+   * https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once created
    * @param name defines the name of the mesh
    * @param options defines the options used to create the mesh
    * @param scene defines the hosting scene
    * @returns the sphere mesh
-   * @see
-   * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#sphere
+   * @see https://doc.babylonjs.com/how_to/set_shapes#sphere
    */
   static MeshPtr CreateSphere(const std::string& name, SphereOptions& options,
                               Scene* scene);
@@ -147,21 +146,21 @@ public:
    * * If you create a double-sided mesh, you can choose what parts of the
    * texture image to crop and stick respectively on the front and the back
    * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
+   * https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once created
    * @param name defines the name of the mesh
    * @param options defines the options used to create the mesh
    * @param scene defines the hosting scene
    * @returns the icosahedron mesh
-   * @see http://doc.babylonjs.com/how_to/polyhedra_shapes#icosphere
+   * @see https://doc.babylonjs.com/how_to/polyhedra_shapes#icosphere
    */
   static MeshPtr CreateIcoSphere(const std::string& name,
                                  IcoSphereOptions& options, Scene* scene);
 
   /**
    * @brief Creates a ribbon mesh. The ribbon is a parametric shape.  It has no
-   * predefined shape. Its final shape will depend on the input parameters.
+   * predefined shape. Its final shape will depend on the input parameters
    * * The parameter `pathArray` is a required array of paths, what are each an
    * array of successive Vector3. The pathArray parameter depicts the ribbon
    * geometry
@@ -176,14 +175,14 @@ public:
    * means the point 1 is joined to the point 11
    * * The optional parameter `instance` is an instance of an existing Ribbon
    * object to be updated with the passed `pathArray` parameter :
-   * http://doc.babylonjs.com/tutorials/How_to_dynamically_morph_a_mesh#ribbon
+   * https://doc.babylonjs.com/how_to/how_to_dynamically_morph_a_mesh#ribbon
    * * You can also set the mesh side orientation with the values :
    * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
    * BABYLON.Mesh.DOUBLESIDE
    * * If you create a double-sided mesh, you can choose what parts of the
    * texture image to crop and stick respectively on the front and the back
    * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
+   * https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * * The optional parameter `invertUV` (boolean, default false) swaps in the
    * geometry the U and V coordinates to apply a texture
    * * The parameter `uvs` is an optional flat array of `Vector2` to update/set
@@ -203,8 +202,8 @@ public:
    * @param options defines the options used to create the mesh
    * @param scene defines the hosting scene
    * @returns the ribbon mesh
-   * @see http://doc.babylonjs.com/tutorials/Ribbon_Tutorial
-   * @see http://doc.babylonjs.com/tutorials/Parametric_Shapes
+   * @see https://doc.babylonjs.com/how_to/ribbon_tutorial
+   * @see https://doc.babylonjs.com/how_to/parametric_shapes
    */
   static MeshPtr CreateRibbon(const std::string& name, RibbonOptions& options,
                               Scene* scene = nullptr);
@@ -245,14 +244,14 @@ public:
    * * If `enclose` is true, a ring surface is 3 successive elements in the
    * array : the tubular surface, then the two closing faces.
    * * Example how to set colors and textures on a sliced cylinder :
-   * http://www.html5gamedevs.com/topic/17945-creating-a-closed-slice-of-a-cylinder/#comment-106379
+   * https://www.html5gamedevs.com/topic/17945-creating-a-closed-slice-of-a-cylinder/#comment-106379
    * * You can also set the mesh side orientation with the values :
    * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
    * BABYLON.Mesh.DOUBLESIDE
    * * If you create a double-sided mesh, you can choose what parts of the
    * texture image to crop and stick respectively on the front and the back
    * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
+   * https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once
    * created.
@@ -260,67 +259,64 @@ public:
    * @param options defines the options used to create the mesh
    * @param scene defines the hosting scene
    * @returns the cylinder mesh
-   * @see
-   * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#cylinder-or-cone
+   * @see https://doc.babylonjs.com/how_to/set_shapes#cylinder-or-cone
    */
   static MeshPtr CreateCylinder(const std::string& name,
                                 CylinderOptions& options, Scene* scene);
 
   /**
    * @brief Creates a torus mesh.
-   * * The parameter `diameter` sets the diameter size (float) of the torus
-   * (default 1)
-   * * The parameter `thickness` sets the diameter size of the tube of the torus
-   * (float, default 0.5)
-   * * The parameter `tessellation` sets the number of torus sides (postive
-   * integer, default 16)
-   * * You can also set the mesh side orientation with the values :
-   * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
-   * BABYLON.Mesh.DOUBLESIDE
-   * * If you create a double-sided mesh, you can choose what parts of the
-   * texture image to crop and stick respectively on the front and the back
-   * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
-   * * The mesh can be set to updatable with the boolean parameter `updatable`
-   * (default false) if its internal geometry is supposed to change once
-   * created.
-   * @param name defines the name of the mesh
-   * @param options defines the options used to create the mesh
-   * @param scene defines the hosting scene
-   * @returns the torus mesh
-   * @see
-   * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#torus
-   */
+     * * The parameter `diameter` sets the diameter size (float) of the torus
+   (default 1)
+     * * The parameter `thickness` sets the diameter size of the tube of the
+   torus (float, default 0.5)
+     * * The parameter `tessellation` sets the number of torus sides (postive
+   integer, default 16)
+     * * You can also set the mesh side orientation with the values :
+   BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
+   BABYLON.Mesh.DOUBLESIDE
+     * * If you create a double-sided mesh, you can choose what parts of the
+   texture image to crop and stick respectively on the front and the back sides
+   with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
+   https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
+     * * The mesh can be set to updatable with the boolean parameter `updatable`
+   (default false) if its internal geometry is supposed to change once created.
+     * @param name defines the name of the mesh
+     * @param options defines the options used to create the mesh
+     * @param scene defines the hosting scene
+     * @returns the torus mesh
+
+     * @see https://doc.babylonjs.com/how_to/set_shapes#torus
+     */
   static MeshPtr CreateTorus(const std::string& name, TorusOptions& options,
                              Scene* scene);
 
   /**
    * @brief Creates a torus knot mesh.
-   * * The parameter `radius` sets the global radius size (float) of the torus
-   * knot (default 2)
-   * * The parameter `radialSegments` sets the number of sides on each tube
-   * segments (positive integer, default 32)
-   * * The parameter `tubularSegments` sets the number of tubes to decompose the
-   * knot into (positive integer, default 32)
-   * * The parameters `p` and `q` are the number of windings on each axis
-   * (positive integers, default 2 and 3)
-   * * You can also set the mesh side orientation with the values :
-   * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
-   * BABYLON.Mesh.DOUBLESIDE
-   * * If you create a double-sided mesh, you can choose what parts of the
-   * texture image to crop and stick respectively on the front and the back
-   * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
-   * * The mesh can be set to updatable with the boolean parameter `updatable`
-   * (default false) if its internal geometry is supposed to change once
-   * created.
-   * @param name defines the name of the mesh
-   * @param options defines the options used to create the mesh
-   * @param scene defines the hosting scene
-   * @returns the torus knot mesh
-   * @see
-   * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#torus-knot
-   */
+     * * The parameter `radius` sets the global radius size (float) of the torus
+   knot (default 2)
+     * * The parameter `radialSegments` sets the number of sides on each tube
+   segments (positive integer, default 32)
+     * * The parameter `tubularSegments` sets the number of tubes to decompose
+   the knot into (positive integer, default 32)
+     * * The parameters `p` and `q` are the number of windings on each axis
+   (positive integers, default 2 and 3)
+     * * You can also set the mesh side orientation with the values :
+   BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
+   BABYLON.Mesh.DOUBLESIDE
+     * * If you create a double-sided mesh, you can choose what parts of the
+   texture image to crop and stick respectively on the front and the back sides
+   with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
+   https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
+     * * The mesh can be set to updatable with the boolean parameter `updatable`
+   (default false) if its internal geometry is supposed to change once created.
+     * @param name defines the name of the mesh
+     * @param options defines the options used to create the mesh
+     * @param scene defines the hosting scene
+     * @returns the torus knot mesh
+
+     * @see  https://doc.babylonjs.com/how_to/set_shapes#torus-knot
+     */
   static MeshPtr CreateTorusKnot(const std::string& name,
                                  TorusKnotOptions& options, Scene* scene);
 
@@ -342,12 +338,12 @@ public:
    * `true`) when you don't need the alpha blending (faster)
    * * Updating a simple Line mesh, you just need to update every line in the
    * `lines` array :
-   * http://doc.babylonjs.com/tutorials/How_to_dynamically_morph_a_mesh#lines-and-dashedlines
+   * https://doc.babylonjs.com/how_to/how_to_dynamically_morph_a_mesh#lines-and-dashedlines
    * * When updating an instance, remember that only line point positions can
    * change, not the number of points, neither the number of lines
    * * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once created
-   * @see http://doc.babylonjs.com/how_to/parametric_shapes#line-system
+   * @see https://doc.babylonjs.com/how_to/parametric_shapes#line-system
    * @param name defines the name of the new line system
    * @param options defines the options used to create the line system
    * @param scene defines the hosting scene
@@ -367,7 +363,7 @@ public:
    * * The parameter `points` is an array successive Vector3
    * * The optional parameter `instance` is an instance of an existing LineMesh
    * object to be updated with the passed `points` parameter :
-   * http://doc.babylonjs.com/tutorials/How_to_dynamically_morph_a_mesh#lines-and-dashedlines
+   * https://doc.babylonjs.com/how_to/how_to_dynamically_morph_a_mesh#lines-and-dashedlines
    * * The optional parameter `colors` is an array of successive Color4, one per
    * line point
    * * The optional parameter `useVertexAlpha` is to be set to `false` (default
@@ -376,7 +372,7 @@ public:
    * not the number of points
    * * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once created
-   * @see http://doc.babylonjs.com/how_to/parametric_shapes#lines
+   * @see https://doc.babylonjs.com/how_to/parametric_shapes#lines
    * @param name defines the name of the new line system
    * @param options defines the options used to create the line system
    * @param scene defines the hosting scene
@@ -401,7 +397,7 @@ public:
    * dashes relatively the dash number (positive float, default 1)
    * * The optional parameter `instance` is an instance of an existing LineMesh
    * object to be updated with the passed `points` parameter :
-   * http://doc.babylonjs.com/tutorials/How_to_dynamically_morph_a_mesh#lines-and-dashedlines
+   * https://doc.babylonjs.com/how_to/how_to_dynamically_morph_a_mesh#lines-and-dashedlines
    * * When updating an instance, remember that only point positions can change,
    * not the number of points
    * * The mesh can be set to updatable with the boolean parameter `updatable`
@@ -410,54 +406,54 @@ public:
    * @param options defines the options used to create the mesh
    * @param scene defines the hosting scene
    * @returns the dashed line mesh
-   * @see http://doc.babylonjs.com/how_to/parametric_shapes#dashed-lines
+   * @see https://doc.babylonjs.com/how_to/parametric_shapes#dashed-lines
    */
   static LinesMeshPtr CreateDashedLines(const std::string& name,
                                         DashedLinesOptions& options,
                                         Scene* scene);
 
   /**
-   * @brief Creates an extruded shape mesh. The extrusion is a parametric shape.
-   * It has no predefined shape. Its final shape will depend on the input
-   * parameters.
-   * * The parameter `shape` is a required array of successive Vector3. This
-   * array depicts the shape to be extruded in its local space : the shape must
-   * be designed in the xOy plane and will be extruded along the Z axis.
-   * * The parameter `path` is a required array of successive Vector3. This is
-   * the axis curve the shape is extruded along.
-   * * The parameter `rotation` (float, default 0 radians) is the angle value to
-   * rotate the shape each step (each path point), from the former step (so
-   * rotation added each step) along the curve.
-   * * The parameter `scale` (float, default 1) is the value to scale the shape.
-   * * The parameter `cap` sets the way the extruded shape is capped. Possible
-   * values : BABYLON.Mesh.NO_CAP (default), BABYLON.Mesh.CAP_START,
-   * BABYLON.Mesh.CAP_END, BABYLON.Mesh.CAP_ALL
-   * * The optional parameter `instance` is an instance of an existing
-   * ExtrudedShape object to be updated with the passed `shape`, `path`, `scale`
-   * or `rotation` parameters :
-   * http://doc.babylonjs.com/tutorials/How_to_dynamically_morph_a_mesh#extruded-shape
-   * * Remember you can only change the shape or path point positions, not their
-   * number when updating an extruded shape.
-   * * You can also set the mesh side orientation with the values :
-   * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
-   * BABYLON.Mesh.DOUBLESIDE
-   * * If you create a double-sided mesh, you can choose what parts of the
-   * texture image to crop and stick respectively on the front and the back
-   * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
-   * * The optional parameter `invertUV` (boolean, default false) swaps in the
-   * geometry the U and V coordinates to apply a texture.
-   * * The mesh can be set to updatable with the boolean parameter `updatable`
-   * (default false) if its internal geometry is supposed to change once
-   * created.
-   * @param name defines the name of the mesh
-   * @param options defines the options used to create the mesh
-   * @param scene defines the hosting scene
-   * @returns the extruded shape mesh
-   * @see http://doc.babylonjs.com/tutorials/Parametric_Shapes
-   * @see http://doc.babylonjs.com/how_to/parametric_shapes#extruded-shapes
-   * @see http://doc.babylonjs.com/how_to/parametric_shapes#extruded-shapes
-   */
+   * @brief CCreates an extruded shape mesh. The extrusion is a parametric
+   shape. It has no predefined shape. Its final shape will depend on the input
+   parameters.
+     * * The parameter `shape` is a required array of successive Vector3. This
+   array depicts the shape to be extruded in its local space : the shape must be
+   designed in the xOy plane and will be extruded along the Z axis.
+     * * The parameter `path` is a required array of successive Vector3. This is
+   the axis curve the shape is extruded along.
+     * * The parameter `rotation` (float, default 0 radians) is the angle value
+   to rotate the shape each step (each path point), from the former step (so
+   rotation added each step) along the curve.
+     * * The parameter `scale` (float, default 1) is the value to scale the
+   shape.
+     * * The parameter `cap` sets the way the extruded shape is capped. Possible
+   values : BABYLON.Mesh.NO_CAP (default), BABYLON.Mesh.CAP_START,
+   BABYLON.Mesh.CAP_END, BABYLON.Mesh.CAP_ALL
+     * * The optional parameter `instance` is an instance of an existing
+   ExtrudedShape object to be updated with the passed `shape`, `path`, `scale`
+   or `rotation` parameters :
+   https://doc.babylonjs.com/how_to/how_to_dynamically_morph_a_mesh#extruded-shape
+     * * Remember you can only change the shape or path point positions, not
+   their number when updating an extruded shape.
+     * * You can also set the mesh side orientation with the values :
+   BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
+   BABYLON.Mesh.DOUBLESIDE
+     * * If you create a double-sided mesh, you can choose what parts of the
+   texture image to crop and stick respectively on the front and the back sides
+   with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
+   https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
+     * * The optional parameter `invertUV` (boolean, default false) swaps in the
+   geometry the U and V coordinates to apply a texture.
+     * * The mesh can be set to updatable with the boolean parameter `updatable`
+   (default false) if its internal geometry is supposed to change once created.
+     * @param name defines the name of the mesh
+     * @param options defines the options used to create the mesh
+     * @param scene defines the hosting scene
+     * @returns the extruded shape mesh
+     * @see https://doc.babylonjs.com/how_to/parametric_shapes
+     * @see https://doc.babylonjs.com/how_to/parametric_shapes#extruded-shapes
+
+     */
   static MeshPtr ExtrudeShape(const std::string& name,
                               ExtrudeShapeOptions& options, Scene* scene);
 
@@ -492,7 +488,7 @@ public:
    * * The optional parameter `instance` is an instance of an existing
    * ExtrudedShape object to be updated with the passed `shape`, `path`, `scale`
    * or `rotation` parameters :
-   * http://doc.babylonjs.com/tutorials/How_to_dynamically_morph_a_mesh#extruded-shape
+   * https://doc.babylonjs.com/how_to/how_to_dynamically_morph_a_mesh#extruded-shape
    * * Remember you can only change the shape or path point positions, not their
    * number when updating an extruded shape
    * * You can also set the mesh side orientation with the values :
@@ -501,7 +497,7 @@ public:
    * * If you create a double-sided mesh, you can choose what parts of the
    * texture image to crop and stick respectively on the front and the back
    * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
+   * https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * * The optional parameter `invertUV` (boolean, default false) swaps in the
    * geometry the U and V coordinates to apply a texture
    * * The mesh can be set to updatable with the boolean parameter `updatable`
@@ -511,9 +507,9 @@ public:
    * @param scene defines the hosting scene
    * @returns the custom extruded shape mesh
    * @see
-   * http://doc.babylonjs.com/how_to/parametric_shapes#custom-extruded-shapes
-   * @see http://doc.babylonjs.com/tutorials/Parametric_Shapes
-   * @see http://doc.babylonjs.com/how_to/parametric_shapes#extruded-shapes
+   * https://doc.babylonjs.com/how_to/parametric_shapes#custom-extruded-shapes
+   * @see https://doc.babylonjs.com/how_to/parametric_shapes
+   * @see https://doc.babylonjs.com/how_to/parametric_shapes#extruded-shapes
    */
   static MeshPtr ExtrudeShapeCustom(const std::string& name,
                                     ExtrudeShapeCustomOptions& options,
@@ -547,7 +543,7 @@ public:
    * * If you create a double-sided mesh, you can choose what parts of the
    * texture image to crop and stick respectively on the front and the back
    * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
+   * https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * * The optional parameter `invertUV` (boolean, default false) swaps in the
    * geometry the U and V coordinates to apply a texture
    * * The mesh can be set to updatable with the boolean parameter `updatable`
@@ -556,13 +552,13 @@ public:
    * @param options defines the options used to create the mesh
    * @param scene defines the hosting scene
    * @returns the lathe mesh
-   * @see http://doc.babylonjs.com/how_to/parametric_shapes#lathe
+   * @see https://doc.babylonjs.com/how_to/parametric_shapes#lathe
    */
   static MeshPtr CreateLathe(const std::string& name, LatheOptions& options,
                              Scene* scene);
 
   /**
-   * @brief Creates a plane mesh.
+   * @brief Creates a plane mesh
    * * The parameter `size` sets the size (float) of both sides of the plane at
    * once (default 1)
    * * You can set some different plane dimensions by using the parameters
@@ -575,15 +571,14 @@ public:
    * * If you create a double-sided mesh, you can choose what parts of the
    * texture image to crop and stick respectively on the front and the back
    * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
+   * https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once created
    * @param name defines the name of the mesh
    * @param options defines the options used to create the mesh
    * @param scene defines the hosting scene
    * @returns the plane mesh
-   * @see
-   * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#plane
+   * @see https://doc.babylonjs.com/how_to/set_shapes#plane
    */
   static MeshPtr CreatePlane(const std::string& name, PlaneOptions& options,
                              Scene* scene);
@@ -600,35 +595,33 @@ public:
    * @param options defines the options used to create the mesh
    * @param scene defines the hosting scene
    * @returns the ground mesh
-   * @see
-   * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#plane
+   * @see https://doc.babylonjs.com/how_to/set_shapes#ground
    */
-  static MeshPtr CreateGround(const std::string& name, GroundOptions& options,
-                              Scene* scene);
+  static GroundMeshPtr CreateGround(const std::string& name,
+                                    GroundOptions& options, Scene* scene);
 
   /**
    * @brief Creates a tiled ground mesh.
-   * * The parameters `xmin` and `xmax` (floats, default -1 and 1) set the
-   * ground minimum and maximum X coordinates
-   * * The parameters `zmin` and `zmax` (floats, default -1 and 1) set the
-   * ground minimum and maximum Z coordinates
-   * * The parameter `subdivisions` is a javascript object `{w: positive
-   * integer, h: positive integer}` (default `{w: 6, h: 6}`). `w` and `h` are
-   * the numbers of subdivisions on the ground width and height. Each
-   * subdivision is called a tile
-   * * The parameter `precision` is a javascript object `{w: positive integer,
-   * h: positive integer}` (default `{w: 2, h: 2}`). `w` and `h` are the numbers
-   * of subdivisions on the ground width and height of each tile
-   * * The mesh can be set to updatable with the boolean parameter `updatable`
-   * (default false) if its internal geometry is supposed to change once
-   * created.
-   * @param name defines the name of the mesh
-   * @param options defines the options used to create the mesh
-   * @param scene defines the hosting scene
-   * @returns the tiled ground mesh
-   * @see
-   * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#tiled-ground
-   */
+     * * The parameters `xmin` and `xmax` (floats, default -1 and 1) set the
+   ground minimum and maximum X coordinates
+     * * The parameters `zmin` and `zmax` (floats, default -1 and 1) set the
+   ground minimum and maximum Z coordinates
+     * * The parameter `subdivisions` is a javascript object `{w: positive
+   integer, h: positive integer}` (default `{w: 6, h: 6}`). `w` and `h` are the
+   numbers of subdivisions on the ground width and height. Each subdivision is
+   called a tile
+     * * The parameter `precision` is a javascript object `{w: positive integer,
+   h: positive integer}` (default `{w: 2, h: 2}`). `w` and `h` are the numbers
+   of subdivisions on the ground width and height of each tile
+     * * The mesh can be set to updatable with the boolean parameter `updatable`
+   (default false) if its internal geometry is supposed to change once created.
+     * @param name defines the name of the mesh
+     * @param options defines the options used to create the mesh
+     * @param scene defines the hosting scene
+     * @returns the tiled ground mesh
+
+     * @see https://doc.babylonjs.com/how_to/set_shapes#tiled-ground
+     */
   static MeshPtr CreateTiledGround(const std::string& name,
                                    TiledGroundOptions& options, Scene* scene);
 
@@ -658,9 +651,8 @@ public:
    * @param options defines the options used to create the mesh
    * @param scene defines the hosting scene
    * @returns the ground mesh
-   * @see http://doc.babylonjs.com/babylon101/height_map
-   * @see
-   * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#ground-from-a-height-map
+   * @see https://doc.babylonjs.com/babylon101/height_map
+   * @see https://doc.babylonjs.com/how_to/set_shapes#ground-from-a-height-map
    */
   static GroundMeshPtr
   CreateGroundFromHeightMap(const std::string& name, const std::string& url,
@@ -673,9 +665,8 @@ public:
    * * The parameter `shape` is a required array of successive Vector3
    * representing the corners of the polygon in th XoZ plane, that is y = 0 for
    * all vectors
-   * * You can set the mesh side orientation with the values :
-   * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
-   * BABYLON.Mesh.DOUBLESIDE
+   * * You can set the mesh side orientation with the values : Mesh.FRONTSIDE
+   * (default), Mesh.BACKSIDE or Mesh.DOUBLESIDE
    * * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once created
    * * If you create a double-sided mesh, you can choose what parts of the
@@ -686,6 +677,7 @@ public:
    * @param name defines the name of the mesh
    * @param options defines the options used to create the mesh
    * @param scene defines the hosting scene
+   * @param earcutInjection can be used to inject your own earcut reference
    * @returns the polygon mesh
    */
   static MeshPtr CreatePolygon(const std::string& name, PolygonOptions& options,
@@ -697,10 +689,11 @@ public:
    * extruded side by using the parameters `faceColors` (an array of 3 Color3
    * elements) and `faceUV` (an array of 3 Vector4 elements)
    * @see
-   * http://doc.babylonjs.com/tutorials/CreateBox_Per_Face_Textures_And_Colors
+   * https://doc.babylonjs.com/how_to/createbox_per_face_textures_and_colors
    * @param name defines the name of the mesh
    * @param options defines the options used to create the mesh
    * @param scene defines the hosting scene
+   * @param earcutInjection can be used to inject your own earcut reference
    * @returns the polygon mesh
    */
   static MeshPtr ExtrudePolygon(const std::string& name,
@@ -708,47 +701,47 @@ public:
 
   /**
    * @brief Creates a tube mesh.
-   * The tube is a parametric shape. It has no predefined shape. Its final shape
-   * will depend on the input parameters
-   * * The parameter `path` is a required array of successive Vector3. It is the
-   * curve used as the axis of the tube
-   * * The parameter `radius` (positive float, default 1) sets the tube radius
-   * size
-   * * The parameter `tessellation` (positive float, default 64) is the number
-   * of sides on the tubular surface
-   * * The parameter `radiusFunction` (javascript function, default null) is a
-   * vanilla javascript function. If it is not null, it overwrittes the
-   * parameter `radius`
-   * * This function is called on each point of the tube path and is passed the
-   * index `i` of the i-th point and the distance of this point from the first
-   * point of the path. It must return a radius value (positive float)
-   * * The parameter `arc` (positive float, maximum 1, default 1) is the ratio
-   * to apply to the tube circumference : 2 x PI x arc
-   * * The parameter `cap` sets the way the extruded shape is capped. Possible
-   * values : BABYLON.Mesh.NO_CAP (default), BABYLON.Mesh.CAP_START,
-   * BABYLON.Mesh.CAP_END, BABYLON.Mesh.CAP_ALL
-   * * The optional parameter `instance` is an instance of an existing Tube
-   * object to be updated with the passed `pathArray` parameter :
-   * http://doc.babylonjs.com/tutorials/How_to_dynamically_morph_a_mesh#tube
-   * * You can also set the mesh side orientation with the values :
-   * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
-   * BABYLON.Mesh.DOUBLESIDE
-   * * If you create a double-sided mesh, you can choose what parts of the
-   * texture image to crop and stick respectively on the front and the back
-   * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
-   * * The optional parameter `invertUV` (boolean, default false) swaps in the
-   * geometry the U and V coordinates to apply a texture
-   * * The mesh can be set to updatable with the boolean parameter `updatable`
-   * (default false) if its internal geometry is supposed to change once created
-   * @param name defines the name of the mesh
-   * @param options defines the options used to create the mesh
-   * @param scene defines the hosting scene
-   * @returns the tube mesh
-   * @see http://doc.babylonjs.com/tutorials/Parametric_Shapes
-   * @see
-   * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#tube
-   */
+     * The tube is a parametric shape. It has no predefined shape. Its final
+   shape will depend on the input parameters
+     * * The parameter `path` is a required array of successive Vector3. It is
+   the curve used as the axis of the tube
+     * * The parameter `radius` (positive float, default 1) sets the tube radius
+   size
+     * * The parameter `tessellation` (positive float, default 64) is the number
+   of sides on the tubular surface
+     * * The parameter `radiusFunction` (javascript function, default null) is a
+   vanilla javascript function. If it is not null, it overwrittes the parameter
+   `radius`
+     * * This function is called on each point of the tube path and is passed
+   the index `i` of the i-th point and the distance of this point from the first
+   point of the path. It must return a radius value (positive float)
+     * * The parameter `arc` (positive float, maximum 1, default 1) is the ratio
+   to apply to the tube circumference : 2 x PI x arc
+     * * The parameter `cap` sets the way the extruded shape is capped. Possible
+   values : BABYLON.Mesh.NO_CAP (default), BABYLON.Mesh.CAP_START,
+   BABYLON.Mesh.CAP_END, BABYLON.Mesh.CAP_ALL
+     * * The optional parameter `instance` is an instance of an existing Tube
+   object to be updated with the passed `pathArray` parameter :
+   https://doc.babylonjs.com/how_to/how_to_dynamically_morph_a_mesh#tube
+     * * You can also set the mesh side orientation with the values :
+   BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
+   BABYLON.Mesh.DOUBLESIDE
+     * * If you create a double-sided mesh, you can choose what parts of the
+   texture image to crop and stick respectively on the front and the back sides
+   with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
+   https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
+     * * The optional parameter `invertUV` (boolean, default false) swaps in the
+   geometry the U and V coordinates to apply a texture
+     * * The mesh can be set to updatable with the boolean parameter `updatable`
+   (default false) if its internal geometry is supposed to change once created
+     * @param name defines the name of the mesh
+     * @param options defines the options used to create the mesh
+     * @param scene defines the hosting scene
+     * @returns the tube mesh
+     * @see https://doc.babylonjs.com/how_to/parametric_shapes
+
+     * @see https://doc.babylonjs.com/how_to/set_shapes#tube
+     */
   static MeshPtr CreateTube(const std::string& name, TubeOptions& options,
                             Scene* scene = nullptr);
 
@@ -772,7 +765,7 @@ public:
    * * To understand how to set `faceUV` or `faceColors`, please read this by
    * considering the right number of faces of your polyhedron, instead of only 6
    * for the box :
-   * http://doc.babylonjs.com/tutorials/CreateBox_Per_Face_Textures_And_Colors
+   * https://doc.babylonjs.com/how_to/createbox_per_face_textures_and_colors
    * * The parameter `flat` (boolean, default true). If set to false, it gives
    * the polyhedron a single global face, so less vertices and shared normals.
    * In this case, `faceColors` and `faceUV` are ignored
@@ -782,14 +775,14 @@ public:
    * * If you create a double-sided mesh, you can choose what parts of the
    * texture image to crop and stick respectively on the front and the back
    * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
+   * https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once created
    * @param name defines the name of the mesh
    * @param options defines the options used to create the mesh
    * @param scene defines the hosting scene
    * @returns the polyhedron mesh
-   * @see http://doc.babylonjs.com/how_to/polyhedra_shapes
+   * @see https://doc.babylonjs.com/how_to/polyhedra_shapes
    */
   static MeshPtr CreatePolyhedron(const std::string& name,
                                   PolyhedronOptions& options, Scene* scene);
@@ -815,20 +808,6 @@ public:
   static MeshPtr CreateDecal(const std::string& name,
                              const AbstractMeshPtr& sourceMesh,
                              DecalOptions& options);
-
-private:
-  static MeshPtr _ExtrudeShapeGeneric(
-    const std::string& name, const std::vector<Vector3>& shape,
-    const std::vector<Vector3>& curve, const std::optional<float>& scale,
-    const std::optional<float>& rotation,
-    const std::function<float(float i, float distance)>& scaleFunction,
-    const std::function<float(float i, float distance)>& rotateFunction,
-    bool rbCA, bool rbCP, unsigned int cap, bool custom, Scene* scene,
-    bool updtbl, unsigned int side, MeshPtr instance, bool invertUV,
-    const std::optional<Vector4>& frontUVs,
-    const std::optional<Vector4>& backUVs);
-  static unsigned int updateSideOrientation(unsigned int orientation
-                                            = Mesh::FRONTSIDE);
 
 }; // end of class MeshBuilder
 

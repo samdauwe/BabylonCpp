@@ -15,7 +15,6 @@
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
-#include <babylon/meshes/vertex_data_options.h>
 #include <babylon/particles/depth_sorted_particle.h>
 #include <babylon/particles/model_shape.h>
 
