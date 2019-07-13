@@ -16,7 +16,7 @@
 namespace BABYLON {
 namespace Samples {
 
-BuldingsSPSScene::BuldingsSPSScene(ICanvas* iCanvas)
+BuildingsSPSScene::BuildingsSPSScene(ICanvas* iCanvas)
     : IRenderableScene(iCanvas)
     , _k{0.001f}   // nb of triangles
     , _fact{200.f} // cube size
@@ -27,16 +27,16 @@ BuldingsSPSScene::BuldingsSPSScene(ICanvas* iCanvas)
 {
 }
 
-BuldingsSPSScene::~BuldingsSPSScene()
+BuildingsSPSScene::~BuildingsSPSScene()
 {
 }
 
-const char* BuldingsSPSScene::getName()
+const char* BuildingsSPSScene::getName()
 {
   return "Buldings SPS Scene";
 }
 
-void BuldingsSPSScene::initializeScene(ICanvas* canvas, Scene* scene)
+void BuildingsSPSScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   scene->clearColor = Color3(0.1f, 0.1f, 0.15f);
 
@@ -118,8 +118,9 @@ void BuldingsSPSScene::initializeScene(ICanvas* canvas, Scene* scene)
   });
 }
 
-void BuldingsSPSScene::_positionFunction(SolidParticle* particle,
-                                         unsigned int /*i*/, unsigned int /*s*/)
+void BuildingsSPSScene::_positionFunction(SolidParticle* particle,
+                                          unsigned int /*i*/,
+                                          unsigned int /*s*/)
 {
   auto scaleX = Math::random() * 2.f + 0.8f;
   auto scaleY = Math::random() * Math::random() * Math::random() * 6.f + 0.8f;

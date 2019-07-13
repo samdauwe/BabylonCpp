@@ -23,11 +23,11 @@ namespace Samples {
  * @see https://playground.babylonjs.com/#2FPT1A#56
  * @see https://doc.babylonjs.com/how_to/solid_particle_system
  */
-class BuldingsSPSScene : public IRenderableScene {
+class BuildingsSPSScene : public IRenderableScene {
 
 public:
-  BuldingsSPSScene(ICanvas* iCanvas);
-  ~BuldingsSPSScene() override;
+  BuildingsSPSScene(ICanvas* iCanvas);
+  ~BuildingsSPSScene() override;
 
   const char* getName() override;
   void initializeScene(ICanvas* canvas, Scene* scene) override;
@@ -47,7 +47,7 @@ private:
   MeshPtr _ground;
   SolidParticleSystemPtr _sps;
 
-}; // end of class BuldingsSPSScene
+}; // end of class BuildingsSPSScene
 
 } // end of namespace Samples
 } // end of namespace BABYLON

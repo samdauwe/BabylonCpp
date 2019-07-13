@@ -12,11 +12,11 @@ _ParticlesSamplesIndex::_ParticlesSamplesIndex()
   // -- Particles examples --
 
   // Buildings SPS Scene
-  _samples["BuldingsSPSScene"]
-    = std::make_tuple(true,                                                 //
-                      [](ICanvas* iCanvas) {                                //
-                        return std::make_unique<BuldingsSPSScene>(iCanvas); //
-                      });                                                   //
+  _samples["BuildingsSPSScene"]
+    = std::make_tuple(true,                                                  //
+                      [](ICanvas* iCanvas) {                                 //
+                        return std::make_unique<BuildingsSPSScene>(iCanvas); //
+                      });                                                    //
   // Lighted SPS Scene
   _samples["LightedSPSScene"]
     = std::make_tuple(false,                                               //
