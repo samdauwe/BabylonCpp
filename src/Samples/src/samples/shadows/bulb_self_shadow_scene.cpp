@@ -18,6 +18,7 @@ BulbSelfShadowScene::BulbSelfShadowScene(ICanvas* iCanvas)
     : IRenderableScene(iCanvas)
     , _i{0.f}
     , _lightPos{Vector3(0.f, 8.f, 0.f)}
+    , _lightDiffuse{Color3(1.f, 1.f, 1.f)}
     , _light0{nullptr}
     , _light1{nullptr}
     , _torus{nullptr}
@@ -36,11 +37,9 @@ const char* BulbSelfShadowScene::getName()
 
 void BulbSelfShadowScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
-  auto lightDiffuse = Color3(1.f, 1.f, 1.f);
-
   // mats
   auto matEmit             = StandardMaterial::New("matEmit", scene);
-  matEmit->emissiveColor   = lightDiffuse;
+  matEmit->emissiveColor   = _lightDiffuse;
   matEmit->disableLighting = true;
 
   auto matMetal       = PBRMetallicRoughnessMaterial::New("matMetal", scene);
@@ -92,7 +91,7 @@ void BulbSelfShadowScene::initializeScene(ICanvas* canvas, Scene* scene)
     _light0            = SpotLight::New("light0", _lightPos,
                              _torus->position().subtract(_lightPos),
                              Math::PI * 2.f / 3.f, 0.f, scene);
-    _light0->diffuse   = lightDiffuse;
+    _light0->diffuse   = _lightDiffuse;
     _light0->intensity = 20.f;
     _light0->includedOnlyMeshes().emplace_back(_torus); // <<<<<<<<<<<<<<<<<<<<<
     auto shadowGen = ShadowGenerator::New(2048, _light0);
@@ -104,7 +103,7 @@ void BulbSelfShadowScene::initializeScene(ICanvas* canvas, Scene* scene)
   // pointlight that lits all meshes excepts the bulb
   {
     _light1            = PointLight::New("light1", _lightPos, scene);
-    _light1->diffuse   = lightDiffuse;
+    _light1->diffuse   = _lightDiffuse;
     _light1->intensity = 200.f;
     _light1->excludedMeshes().emplace_back(_bulb); // <<<<<<<<<<<<<<<<<<<<<<<<<<
     auto shadowGen  = ShadowGenerator::New(1024, _light1);

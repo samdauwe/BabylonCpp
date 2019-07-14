@@ -3,6 +3,7 @@
 
 #include <babylon/interfaces/irenderable_scene.h>
 
+#include <babylon/math/color3.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
@@ -33,6 +34,7 @@ public:
 private:
   float _i;
   Vector3 _lightPos;
+  Color3 _lightDiffuse;
   SpotLightPtr _light0;
   PointLightPtr _light1;
   MeshPtr _torus;
