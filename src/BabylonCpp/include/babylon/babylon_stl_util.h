@@ -255,6 +255,49 @@ inline int spaceship(const std::string& lhs, const std::string& rhs)
 
 // Container functions
 
+/**
+ * @brief Stores multiple values in the typed array, reading input values from a
+ * specified array.
+ * @param dst The array from which to copy values.
+ * @param src The source array
+ * @param offset The offset into the target array at which to begin writing
+ * values from the source array. If you omit this value, 0 is assumed (that is,
+ * the source array will overwrite values in the target array starting at index
+ * 0).
+ */
+template <typename T>
+constexpr void array_set(std::vector<T>& dst, const std::vector<T>& src,
+                      int offset = 0)
+{
+  const auto end = offset + static_cast<int>(src.size());
+  if (end >= 0 && static_cast<size_t>(end) >= dst.size()) {
+    dst.resize(static_cast<size_t>(end));
+  }
+  std::copy(src.begin(), src.end(), dst.begin() + offset);
+}
+
+/**
+ * @brief Creates a new sub vector using the specified range. The begin offset
+ * is inclusive and the end offset is exclusive.
+ * @param src The source array
+ * @param begin Element to begin at. The offset is inclusive. The whole array
+ * will be included in the new view if this value is not specified.
+ * @param end Element to end at. The offset is exclusive. If not specified, all
+ * elements from the one specified by begin to the end of the array are included
+ * in the new view.
+ * @param A new vector
+ */
+template <typename T>
+inline std::vector<T> subarray(const std::vector<T>& src, int begin = 0,
+                               int end = 0)
+{
+  if (end == 0) {
+    return std::vector<T>(src.begin() + begin, src.end());
+  }
+
+  return std::vector<T>(src.begin() + begin, src.begin() + (end - begin + 1));
+}
+
 template <typename T, typename... Ts>
 inline std::vector<T> to_vector(const T& t0, const Ts&... ts)
 {

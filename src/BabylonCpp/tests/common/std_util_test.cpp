@@ -375,6 +375,45 @@ TEST(TestStdUtil, remove_duplicates)
   EXPECT_THAT(result, ::testing::ContainerEq(expected));
 }
 
+TEST(TestStdUtil, array_set)
+{
+  using namespace BABYLON;
+
+  auto int32Array = Int32Array(8, 0);
+  stl_util::array_set(int32Array, {1, 2, 3}, 3);
+  const Int32Array expected{0, 0, 0, 1, 2, 3, 0, 0};
+  EXPECT_THAT(int32Array, ::testing::ContainerEq(expected));
+}
+
+TEST(TestStdUtil, subarray)
+{
+  using namespace BABYLON;
+
+  // start = 1, end = 3
+  {
+    auto int32Array = Int32Array({10, 20, 30, 40, 50});
+    auto result     = stl_util::subarray(int32Array, 1, 3);
+    const Int32Array expected{20, 30};
+    EXPECT_THAT(result, ::testing::ContainerEq(expected));
+  }
+
+  // start = 1, end = 0
+  {
+    auto int32Array = Int32Array({10, 20, 30, 40, 50});
+    auto result     = stl_util::subarray(int32Array, 1);
+    const Int32Array expected{20, 30, 40, 50};
+    EXPECT_THAT(result, ::testing::ContainerEq(expected));
+  }
+
+  // start = 0, end = 0
+  {
+    auto int32Array = Int32Array({10, 20, 30, 40, 50});
+    auto result     = stl_util::subarray(int32Array);
+    const Int32Array expected{10, 20, 30, 40, 50};
+    EXPECT_THAT(result, ::testing::ContainerEq(expected));
+  }
+}
+
 TEST(TestStdUtil, slice)
 {
   using namespace BABYLON;
