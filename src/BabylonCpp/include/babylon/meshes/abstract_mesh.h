@@ -175,6 +175,11 @@ public:
   virtual MaterialPtr getMaterial();
 
   /**
+   * @brief Hidden
+   */
+  AbstractMesh* _effectiveMesh();
+
+  /**
    * @brief Disables the mesh edge rendering mode.
    * @returns the currentAbstractMesh
    */

@@ -2057,9 +2057,19 @@ protected:
   int get_pointerX() const;
 
   /**
+   * @brief Sets the current on-screen X position of the pointer.
+   */
+  void set_pointerX(int value);
+
+  /**
    * @brief Gets the current on-screen Y position of the pointer.
    */
   int get_pointerY() const;
+
+  /**
+   * @brief Sets the current on-screen Y position of the pointer.
+   */
+  void set_pointerY(int value);
 
   /**
    * @brief Gets the performance counter for total vertices.
@@ -3034,12 +3044,12 @@ public:
   /**
    * Gets the current on-screen X position of the pointer
    */
-  ReadOnlyProperty<Scene, int> pointerX;
+  Property<Scene, int> pointerX;
 
   /**
    * Gets the current on-screen Y position of the pointer
    */
-  ReadOnlyProperty<Scene, int> pointerY;
+  Property<Scene, int> pointerY;
 
   /**
    * Gets the performance counter for total vertices

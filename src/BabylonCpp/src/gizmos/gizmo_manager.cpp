@@ -13,7 +13,8 @@
 namespace BABYLON {
 
 GizmoManager::GizmoManager(Scene* iScene)
-    : boundingBoxDragBehavior{std::make_unique<SixDofDragBehavior>()}
+    : clearGizmoOnEmptyPointerEvent{false}
+    , boundingBoxDragBehavior{std::make_unique<SixDofDragBehavior>()}
     , attachableMeshes{std::nullopt}
     , usePointerToAttachGizmos{true}
     , positionGizmoEnabled{this, &GizmoManager::get_positionGizmoEnabled,
@@ -33,7 +34,7 @@ GizmoManager::GizmoManager(Scene* iScene)
   _defaultKeepDepthUtilityLayer = UtilityLayerRenderer::New(iScene);
   _defaultKeepDepthUtilityLayer->utilityLayerScene->autoClearDepthAndStencil
     = false;
-  _defaultUtilityLayer = UtilityLayerRenderer::New(iScene);
+  _defaultUtilityLayer = UtilityLayerRenderer::DefaultUtilityLayer();
 
   // Instatiate/dispose gizmos based on pointer actions
   _pointerObserver = _scene->onPointerObservable.add(
@@ -72,11 +73,15 @@ GizmoManager::GizmoManager(Scene* iScene)
             }
           }
           else {
-            attachToMesh(nullptr);
+            if (clearGizmoOnEmptyPointerEvent) {
+              attachToMesh(nullptr);
+            }
           }
         }
         else {
-          attachToMesh(nullptr);
+          if (clearGizmoOnEmptyPointerEvent) {
+            attachToMesh(nullptr);
+          }
         }
       }
     });
@@ -109,6 +114,7 @@ void GizmoManager::attachToMesh(const AbstractMeshPtr& mesh)
   if (boundingBoxGizmoEnabled && _attachedMesh) {
     //  _attachedMesh.addBehavior(boundingBoxDragBehavior);
   }
+  onAttachedToMeshObservable.notifyObservers(mesh.get());
 }
 
 void GizmoManager::set_positionGizmoEnabled(bool value)
@@ -185,6 +191,9 @@ void GizmoManager::set_boundingBoxGizmoEnabled(bool value)
     }
   }
   else if (gizmos.boundingBoxGizmo) {
+    if (_attachedMesh) {
+      // _attachedMesh->removeBehavior(boundingBoxDragBehavior);
+    }
     gizmos.boundingBoxGizmo->attachedMesh = nullptr;
   }
   _gizmosEnabled.boundingBoxGizmo = value;
@@ -217,8 +226,8 @@ void GizmoManager::dispose(bool /*doNotRecurse*/,
     gizmos.boundingBoxGizmo = nullptr;
   }
   _defaultKeepDepthUtilityLayer->dispose();
-  _defaultUtilityLayer->dispose();
   boundingBoxDragBehavior->detach();
+  onAttachedToMeshObservable.clear();
 }
 
 } // end of namespace BABYLON

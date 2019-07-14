@@ -4,6 +4,7 @@
 #include <babylon/babylon_api.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/math/color3.h>
+#include <babylon/misc/observable.h>
 #include <babylon/misc/observer.h>
 
 namespace BABYLON {
@@ -90,6 +91,17 @@ public:
    * been enabled for the first time
    */
   Gizmos gizmos;
+
+  /**
+   * When true, the gizmo will be detached from the current object when a
+   * pointer down occurs with an empty picked mesh
+   */
+  bool clearGizmoOnEmptyPointerEvent;
+
+  /**
+   * Fires an event when the manager is attached to a mesh
+   */
+  Observable<AbstractMesh> onAttachedToMeshObservable;
 
   /**
    * When bounding box gizmo is enabled, this can be used to track drag/end

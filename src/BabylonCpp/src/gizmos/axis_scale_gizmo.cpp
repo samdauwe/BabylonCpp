@@ -3,18 +3,19 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/behaviors/meshes/pointer_drag_behavior.h>
 #include <babylon/engines/scene.h>
+#include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/builders/box_builder.h>
+#include <babylon/meshes/builders/cylinder_builder.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/lines_mesh.h>
-#include <babylon/meshes/mesh_builder.h>
 #include <babylon/rendering/utility_layer_renderer.h>
 
 namespace BABYLON {
 
-AxisScaleGizmo::AxisScaleGizmo(
-  const Vector3& dragAxis, const Color3& color,
-  const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
+AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
+                               const UtilityLayerRendererPtr& iGizmoLayer)
     : Gizmo{iGizmoLayer}
     , snapDistance{0.f}
     , uniformScaling{false}
@@ -25,26 +26,28 @@ AxisScaleGizmo::AxisScaleGizmo(
   // Create Material
   _coloredMaterial
     = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
-  _coloredMaterial->disableLighting = true;
-  _coloredMaterial->emissiveColor   = color;
+  _coloredMaterial->diffuseColor  = color;
+  _coloredMaterial->specularColor = color.subtract(Color3(0.1f, 0.1f, 0.1f));
 
   auto hoverMaterial
     = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
-  hoverMaterial->disableLighting = true;
-  hoverMaterial->emissiveColor   = color.add(Color3(0.3f, 0.3f, 0.3f));
+  hoverMaterial->diffuseColor = color.add(Color3(0.3f, 0.3f, 0.3f));
 
   // Build mesh on root node
   auto arrow = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
   BoxOptions boxOptions;
   boxOptions.size = 0.4f;
-  auto arrowMesh  = MeshBuilder::CreateBox("yPosMesh", boxOptions,
-                                          gizmoLayer->utilityLayerScene.get());
+  auto arrowMesh  = BoxBuilder::CreateBox("yPosMesh", boxOptions,
+                                         gizmoLayer->utilityLayerScene.get());
 
-  LinesOptions arrowTailOptions;
-  arrowTailOptions.points = {Vector3(0.f, 0.f, 0.f), Vector3(0.f, 1.1f, 0.f)};
-  auto arrowTail          = MeshBuilder::CreateLines(
-    "yPosMesh", arrowTailOptions, gizmoLayer->utilityLayerScene.get());
-  arrowTail->color = _coloredMaterial->emissiveColor;
+  CylinderOptions cylinderOptions;
+  cylinderOptions.diameterTop    = 0.005f;
+  cylinderOptions.height         = 0.275f;
+  cylinderOptions.diameterBottom = 0.005f;
+  cylinderOptions.tessellation   = 96;
+  auto arrowTail                 = CylinderBuilder::CreateCylinder(
+    "cylinder", cylinderOptions, gizmoLayer->utilityLayerScene.get());
+  arrowTail->material = _coloredMaterial;
   arrow->addChild(*arrowMesh);
   arrow->addChild(*arrowTail);
 
@@ -53,10 +56,9 @@ AxisScaleGizmo::AxisScaleGizmo(
   arrowMesh->material     = _coloredMaterial;
   arrowMesh->rotation().x = Math::PI_2;
   arrowMesh->position().z += 0.3f;
-  arrowTail->scaling().scaleInPlace(0.26f);
+  arrowTail->position().z += 0.275f / 2.f;
   arrowTail->rotation().x = Math::PI_2;
-  arrowTail->material     = _coloredMaterial;
-  arrow->lookAt(_rootMesh->position().subtract(dragAxis));
+  arrow->lookAt(_rootMesh->position().add(dragAxis));
   _rootMesh->addChild(*arrow);
   arrow->scaling().scaleInPlace(1.f / 3.f);
 
@@ -65,11 +67,18 @@ AxisScaleGizmo::AxisScaleGizmo(
   options.dragAxis           = dragAxis;
   dragBehavior               = std::make_unique<PointerDragBehavior>(options);
   dragBehavior->moveAttached = false;
-  // _rootMesh->addBehavior(dragBehavior.get());
+  // _rootMesh->addBehavior(dragBehavior);
 
   dragBehavior->onDragObservable.add(
     [&](DragMoveEvent* event, EventState& /*es*/) {
       if (attachedMesh()) {
+        // Drag strength is modified by the scale of the gizmo (eg. for small
+        // objects like boombox the strength will be increased to match the
+        // behavior of larger objects)
+        const auto dragStrength
+          = event->dragDistance
+            * ((scaleRatio * 3) / _rootMesh->scaling().length());
+
         // Snapping logic
         auto snapped   = false;
         auto dragSteps = 0;
@@ -83,13 +92,16 @@ AxisScaleGizmo::AxisScaleGizmo(
           _tmpVector.copyFrom(dragAxis);
         }
         if (snapDistance == 0.f) {
-          _tmpVector.scaleToRef(event->dragDistance, _tmpVector);
+          _tmpVector.scaleToRef(dragStrength, _tmpVector);
         }
         else {
-          _currentSnapDragDistance += event->dragDistance;
+          _currentSnapDragDistance += dragStrength;
           if (std::abs(_currentSnapDragDistance) > snapDistance) {
             dragSteps = static_cast<int>(
-              std::floor(_currentSnapDragDistance / snapDistance));
+              std::floor(std::abs(_currentSnapDragDistance) / snapDistance));
+            if (_currentSnapDragDistance < 0.f) {
+              dragSteps *= -1;
+            }
             _currentSnapDragDistance
               = std::fmod(_currentSnapDragDistance, snapDistance);
             _tmpVector.scaleToRef(snapDistance * dragSteps, _tmpVector);
@@ -125,10 +137,14 @@ AxisScaleGizmo::AxisScaleGizmo(
         m->material    = material;
         auto linesMesh = std::static_pointer_cast<LinesMesh>(m);
         if (linesMesh) {
-          linesMesh->color = material->emissiveColor;
+          linesMesh->color = material->diffuseColor;
         }
       }
     });
+
+  auto light                = gizmoLayer->_getSharedGizmoLight();
+  light->includedOnlyMeshes = stl_util::concat(light->includedOnlyMeshes(),
+                                               _rootMesh->getChildMeshes());
 }
 
 AxisScaleGizmo::~AxisScaleGizmo()
@@ -157,7 +173,7 @@ void AxisScaleGizmo::setCustomMesh(const MeshPtr& mesh, bool useGizmoMaterial)
     for (const auto& m : _rootMesh->getChildMeshes()) {
       m->material = _coloredMaterial;
       if (auto lm = std::static_pointer_cast<LinesMesh>(m)) {
-        lm->color = _coloredMaterial->emissiveColor;
+        lm->color = _coloredMaterial->diffuseColor;
       }
     }
     _customMeshSet = false;

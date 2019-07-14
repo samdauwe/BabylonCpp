@@ -10,11 +10,13 @@
 namespace BABYLON {
 
 class AbstractMesh;
+class HemisphericLight;
 class PickingInfo;
 class PointerInfo;
 class PointerInfoPre;
 class Scene;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+using AbstractMeshPtr     = std::shared_ptr<AbstractMesh>;
+using HemisphericLightPtr = std::shared_ptr<HemisphericLight>;
 
 /**
  * @brief Renders a layer on top of an existing scene.
@@ -46,6 +48,12 @@ public:
   virtual ~UtilityLayerRenderer();
 
   /**
+   * @brief Light which used by gizmos to get light shading.
+   * Hidden
+   */
+  HemisphericLightPtr& _getSharedGizmoLight();
+
+  /**
    * @brief Renders the utility layers scene on top of the original scene.
    */
   void render();
@@ -60,8 +68,10 @@ protected:
   /**
    * @brief Instantiates a UtilityLayerRenderer.
    * @param originalScene the original scene that will be rendered on top of
+   * @param handleEvents boolean indicating if the utility layer should handle
+   * events
    */
-  UtilityLayerRenderer(Scene* originalScene);
+  UtilityLayerRenderer(Scene* originalScene, bool handleEvents = true);
 
 private:
   void _notifyObservers(const PointerInfoPre& prePointerInfo,
@@ -70,6 +80,12 @@ private:
   void _updateCamera();
 
 public:
+  /**
+   * If the picking should be done on the utility layer prior to the actual
+   * scene (Default: true)
+   */
+  bool pickUtilitySceneFirst;
+
   /**
    * The scene that is rendered on top of the original scene
    */
@@ -99,6 +115,11 @@ public:
   Scene* originalScene;
 
   /**
+   * Boolean indicating if the utility layer should handle events
+   */
+  bool handleEvents;
+
+  /**
    * Observable raised when the pointer move from the utility layer scene to the
    * main scene
    */
@@ -117,6 +138,7 @@ private:
 private:
   std::unordered_map<int, bool> _pointerCaptures;
   std::unordered_map<int, bool> _lastPointerEvents;
+  HemisphericLightPtr _sharedGizmoLight;
   Observer<Scene>::Ptr _afterRenderObserver;
   Observer<Scene>::Ptr _sceneDisposeObserver;
   Observer<PointerInfoPre>::Ptr _originalPointerObserver;

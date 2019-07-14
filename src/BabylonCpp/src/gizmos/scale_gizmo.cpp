@@ -1,11 +1,14 @@
 #include <babylon/gizmos/scale_gizmo.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/behaviors/meshes/pointer_drag_behavior.h>
 #include <babylon/core/logging.h>
 #include <babylon/gizmos/axis_scale_gizmo.h>
+#include <babylon/lights/hemispheric_light.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/vector3.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
+#include <babylon/meshes/builders/polyhedron_builder.h>
 #include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
@@ -29,15 +32,18 @@ ScaleGizmo::ScaleGizmo(const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
   uniformScaleGizmo->uniformScaling                         = true;
   PolyhedronOptions options;
   options.type            = 1;
-  auto uniformScalingMesh = Mesh::CreatePolyhedron(
+  auto uniformScalingMesh = PolyhedronBuilder::CreatePolyhedron(
     "", options, uniformScaleGizmo->gizmoLayer->utilityLayerScene.get());
   uniformScalingMesh->scaling().scaleInPlace(0.02f);
   uniformScalingMesh->visibility = 0.f;
-  auto octahedron                = Mesh::CreatePolyhedron(
+  auto octahedron                = PolyhedronBuilder::CreatePolyhedron(
     "", options, uniformScaleGizmo->gizmoLayer->utilityLayerScene.get());
   octahedron->scaling().scaleInPlace(0.007f);
   uniformScalingMesh->addChild(*octahedron);
   uniformScaleGizmo->setCustomMesh(uniformScalingMesh, true);
+  auto light = gizmoLayer->_getSharedGizmoLight();
+  light->includedOnlyMeshes
+    = stl_util::concat(light->includedOnlyMeshes(), {octahedron});
 
   // Relay drag events
   for (const auto& gizmo :

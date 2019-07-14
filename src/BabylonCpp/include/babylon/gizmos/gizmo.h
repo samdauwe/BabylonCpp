@@ -95,6 +95,11 @@ protected:
 
 public:
   /**
+   * The root mesh of the gizmo
+   */
+  MeshPtr _rootMesh;
+
+  /**
    * Ratio for the scale of the gizmo (Default: 1)
    */
   Property<Gizmo, float> scaleRatio;
@@ -124,11 +129,6 @@ public:
   bool updateGizmoPositionToMatchAttachedMesh;
 
 protected:
-  /**
-   * The root mesh of the gizmo
-   */
-  MeshPtr _rootMesh;
-
   /**
    * If a custom mesh has been set (Default: false)
    */

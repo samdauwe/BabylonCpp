@@ -27,7 +27,7 @@ public:
    * @param gizmoLayer The utility layer the gizmo will be added to
    */
   AxisScaleGizmo(const Vector3& dragAxis, const Color3& color = Color3::Gray(),
-                 const std::shared_ptr<UtilityLayerRenderer>& gizmoLayer
+                 const UtilityLayerRendererPtr& gizmoLayer
                  = UtilityLayerRenderer::DefaultUtilityLayer());
   ~AxisScaleGizmo() override;
 

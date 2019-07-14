@@ -1116,6 +1116,13 @@ void AbstractMesh::_afterComputeWorldMatrix()
   _updateBoundingInfo();
 }
 
+AbstractMesh* AbstractMesh::_effectiveMesh()
+{
+  return (skeleton() && skeleton()->overrideMesh) ?
+           skeleton()->overrideMesh.get() :
+           this;
+}
+
 bool AbstractMesh::isInFrustum(const std::array<Plane, 6>& frustumPlanes,
                                unsigned int /*strategy*/)
 {

@@ -11,11 +11,28 @@
 namespace BABYLON {
 
 class PointerDragBehavior;
+class StandardMaterial;
+class TransformNode;
+using StandardMaterialPtr = std::shared_ptr<StandardMaterial>;
+using TransformNodePtr    = std::shared_ptr<TransformNode>;
 
 /**
  * @brief Single axis drag gizmo.
  */
 class BABYLON_SHARED_EXPORT AxisDragGizmo : public Gizmo {
+
+public:
+  /**
+   * @brief Hidden
+   */
+  static TransformNodePtr _CreateArrow(Scene* scene,
+                                       const StandardMaterialPtr& material);
+
+  /**
+   * @brief Hidden
+   */
+  static TransformNodePtr _CreateArrowInstance(Scene* scene,
+                                               const TransformNodePtr& arrow);
 
 public:
   /**
@@ -25,7 +42,7 @@ public:
    * @param gizmoLayer The utility layer the gizmo will be added to
    */
   AxisDragGizmo(const Vector3& dragAxis, const Color3& color = Color3::Gray(),
-                const std::shared_ptr<UtilityLayerRenderer>& gizmoLayer
+                const UtilityLayerRendererPtr& gizmoLayer
                 = UtilityLayerRenderer::DefaultUtilityLayer());
   ~AxisDragGizmo() override;
 

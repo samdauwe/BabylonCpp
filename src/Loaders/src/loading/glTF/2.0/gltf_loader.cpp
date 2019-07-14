@@ -536,8 +536,7 @@ TransformNodePtr GLTFLoader::loadNodeAsync(
   if (!node.mesh.has_value()) {
     const auto nodeName
       = !node.name.empty() ? node.name : String::printf("node%ld", node.index);
-    node._babylonTransformNode
-      = std::make_shared<TransformNode>(nodeName, babylonScene);
+    node._babylonTransformNode = TransformNode::New(nodeName, babylonScene);
     loadNode(node._babylonTransformNode);
   }
   else {
@@ -592,8 +591,7 @@ TransformNodePtr GLTFLoader::_loadMeshAsync(
     });
   }
   else {
-    node._babylonTransformNode
-      = std::make_shared<TransformNode>(name, babylonScene);
+    node._babylonTransformNode = TransformNode::New(name, babylonScene);
     node._primitiveBabylonMeshes.clear();
     for (auto& primitive : primitives) {
       promises.emplace_back([this, &context, &mesh, &name, &node,

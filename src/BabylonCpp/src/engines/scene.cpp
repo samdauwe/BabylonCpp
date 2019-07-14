@@ -191,8 +191,8 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , debugLayer{this, &Scene::get_debugLayer}
     , selectionOctree{this, &Scene::get_selectionOctree}
     , meshUnderPointer{this, &Scene::get_meshUnderPointer}
-    , pointerX{this, &Scene::get_pointerX}
-    , pointerY{this, &Scene::get_pointerY}
+    , pointerX{this, &Scene::get_pointerX, &Scene::set_pointerX}
+    , pointerY{this, &Scene::get_pointerY, &Scene::set_pointerY}
     , totalVerticesPerfCounter{this, &Scene::get_totalVerticesPerfCounter}
     , totalActiveIndicesPerfCounter{this,
                                     &Scene::get_totalActiveIndicesPerfCounter}
@@ -783,9 +783,19 @@ int Scene::get_pointerX() const
   return _pointerX;
 }
 
+void Scene::set_pointerX(int value)
+{
+  _pointerX = value;
+}
+
 int Scene::get_pointerY() const
 {
   return _pointerY;
+}
+
+void Scene::set_pointerY(int value)
+{
+  _pointerY = value;
 }
 
 std::vector<AbstractMesh*> Scene::_getDefaultMeshCandidates()

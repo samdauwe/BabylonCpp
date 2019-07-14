@@ -24,6 +24,7 @@ Gizmo::Gizmo(const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
     , _updateGizmoRotationToMatchAttachedMesh{true}
 {
   _rootMesh = Mesh::New("gizmoRootNode", gizmoLayer->utilityLayerScene.get());
+  _rootMesh->rotationQuaternion = Quaternion::Identity();
   _beforeRenderObserver
     = gizmoLayer->utilityLayerScene->onBeforeRenderObservable.add(
       [this](Scene* /*scene*/, EventState& /*es*/) { _update(); });
@@ -73,7 +74,7 @@ void Gizmo::setCustomMesh(const MeshPtr& mesh, bool /*useGizmoMaterial*/)
       "When setting a custom mesh on a gizmo, the custom meshes scene must be "
       "the same as the gizmos (eg. gizmo.gizmoLayer.utilityLayerScene)");
   }
-  for (auto& c : _rootMesh->getChildMeshes()) {
+  for (const auto& c : _rootMesh->getChildMeshes()) {
     c->dispose();
   }
   mesh->parent   = _rootMesh.get();
@@ -87,49 +88,36 @@ void Gizmo::_attachedMeshChanged(const AbstractMeshPtr& /*value*/)
 void Gizmo::_update()
 {
   if (attachedMesh()) {
-    if (updateGizmoRotationToMatchAttachedMesh) {
-      if (!_rootMesh->rotationQuaternion()) {
-        _rootMesh->rotationQuaternion = Quaternion::RotationYawPitchRoll(
-          _rootMesh->rotation().y, _rootMesh->rotation().x,
-          _rootMesh->rotation().z);
-      }
+    auto effectiveMesh = attachedMesh()->_effectiveMesh() ?
+                           attachedMesh()->_effectiveMesh() :
+                           attachedMesh().get();
 
-      // Remove scaling before getting rotation matrix to get rotation matrix
-      // unmodified by scale
-      _tempVector.copyFrom(attachedMesh()->scaling());
-      if (attachedMesh()->scaling().x < 0.f) {
-        attachedMesh()->scaling().x *= -1.f;
-      }
-      if (attachedMesh()->scaling().y < 0.f) {
-        attachedMesh()->scaling().y *= -1.f;
-      }
-      if (attachedMesh()->scaling().z < 0.f) {
-        attachedMesh()->scaling().z *= -1.f;
-      }
-      attachedMesh()->computeWorldMatrix().getRotationMatrixToRef(_tmpMatrix);
-      attachedMesh()->scaling().copyFrom(_tempVector);
-      attachedMesh()->computeWorldMatrix();
-      Quaternion::FromRotationMatrixToRef(_tmpMatrix,
-                                          *_rootMesh->rotationQuaternion());
+    // Position
+    if (updateGizmoPositionToMatchAttachedMesh) {
+      _rootMesh->position().copyFrom(effectiveMesh->absolutePosition);
     }
-    else if (_rootMesh->rotationQuaternion()) {
+
+    // Rotation
+    if (updateGizmoRotationToMatchAttachedMesh) {
+      effectiveMesh->getWorldMatrix().decompose(
+        std::nullopt, _rootMesh->rotationQuaternion(), std::nullopt);
+    }
+    else {
       _rootMesh->rotationQuaternion()->set(0.f, 0.f, 0.f, 1.f);
     }
-    if (updateGizmoPositionToMatchAttachedMesh) {
-      _rootMesh->position().copyFrom(attachedMesh()->absolutePosition());
-    }
-    if (_updateScale && gizmoLayer->utilityLayerScene->activeCamera
-        && attachedMesh()) {
-      auto cameraPosition
-        = gizmoLayer->utilityLayerScene->activeCamera->position();
-      /*
-      if((<WebVRFreeCamera>gizmoLayer.utilityLayerScene.activeCamera).devicePosition){
-          cameraPosition =
-      (<WebVRFreeCamera>gizmoLayer.utilityLayerScene.activeCamera).devicePosition;
-      }*/
+
+    // Scale
+    if (_updateScale) {
+      const auto& activeCamera   = gizmoLayer->utilityLayerScene->activeCamera;
+      const auto& cameraPosition = activeCamera->globalPosition();
       _rootMesh->position().subtractToRef(cameraPosition, _tempVector);
-      auto dist = _tempVector.length() * scaleRatio;
+      const auto dist = _tempVector.length() * scaleRatio;
       _rootMesh->scaling().set(dist, dist, dist);
+
+      // Account for handedness, similar to Matrix.decompose
+      if (effectiveMesh->_getWorldMatrixDeterminant() < 0.f) {
+        _rootMesh->scaling().y *= -1.f;
+      }
     }
   }
 }

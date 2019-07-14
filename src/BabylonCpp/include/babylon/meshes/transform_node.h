@@ -48,8 +48,15 @@ public:
   static constexpr unsigned int BILLBOARDMODE_ALL = 7;
 
 public:
-  TransformNode(const std::string& name, Scene* scene = nullptr,
-                bool isPure = true);
+  template <typename... Ts>
+  static TransformNodePtr New(Ts&&... args)
+  {
+    auto transformNode = std::shared_ptr<TransformNode>(
+      new TransformNode(std::forward<Ts>(args)...));
+    transformNode->addToScene(transformNode);
+
+    return transformNode;
+  }
   ~TransformNode() override;
 
   /**
@@ -472,6 +479,9 @@ public:
                bool disposeMaterialAndTextures = false) override;
 
 protected:
+  TransformNode(const std::string& name, Scene* scene = nullptr,
+                bool isPure = true);
+
   virtual void _afterComputeWorldMatrix();
 
   /**
