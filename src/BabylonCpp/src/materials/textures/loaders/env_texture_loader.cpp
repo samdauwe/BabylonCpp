@@ -8,41 +8,41 @@
 
 namespace BABYLON {
 
-ENVTextureLoader::ENVTextureLoader()
+_ENVTextureLoader::_ENVTextureLoader()
 {
 }
 
-ENVTextureLoader::~ENVTextureLoader()
+_ENVTextureLoader::~_ENVTextureLoader()
 {
 }
 
-bool ENVTextureLoader::supportCascades() const
+bool _ENVTextureLoader::supportCascades() const
 {
   return false;
 }
 
-bool ENVTextureLoader::canLoad(const std::string& extension,
-                               const std::string& /*textureFormatInUse*/,
-                               const InternalTexturePtr& /*fallback*/,
-                               bool /*isBase64*/, bool /*isBuffer*/)
+bool _ENVTextureLoader::canLoad(const std::string& extension,
+                                const std::string& /*textureFormatInUse*/,
+                                const InternalTexturePtr& /*fallback*/,
+                                bool /*isBase64*/, bool /*isBuffer*/)
 {
-  return String::endsWith(extension, ".env");
+  return String::startsWith(extension, ".env");
 }
 
 std::string
-ENVTextureLoader::transformUrl(const std::string& rootUrl,
-                               const std::string& /*textureFormatInUse*/)
+_ENVTextureLoader::transformUrl(const std::string& rootUrl,
+                                const std::string& /*textureFormatInUse*/)
 {
   return rootUrl;
 }
 
-std::string ENVTextureLoader::getFallbackTextureUrl(
+std::string _ENVTextureLoader::getFallbackTextureUrl(
   const std::string& /*rootUrl*/, const std::string& /*textureFormatInUse*/)
 {
   return "";
 }
 
-void ENVTextureLoader::loadCubeData(
+void _ENVTextureLoader::loadCubeData(
   const std::variant<std::string, ArrayBuffer>& iData,
   const InternalTexturePtr& texture, bool /*createPolynomials*/,
   const std::function<void(const CubeTextureData& data)>& onLoad,
@@ -73,7 +73,7 @@ void ENVTextureLoader::loadCubeData(
   }
 }
 
-void ENVTextureLoader::loadCubeData(
+void _ENVTextureLoader::loadCubeData(
   const std::vector<std::variant<std::string, ArrayBuffer>>& /*data*/,
   const InternalTexturePtr& /*texture*/, bool /*createPolynomials*/,
   const std::function<void(const CubeTextureData& data)>& /*onLoad*/,
@@ -82,7 +82,7 @@ void ENVTextureLoader::loadCubeData(
 {
 }
 
-void ENVTextureLoader::loadData(
+void _ENVTextureLoader::loadData(
   const ArrayBuffer& /*data*/, const InternalTexturePtr& /*texture*/,
   const std::function<void(
     int /*width*/, int /*height*/, bool /*loadMipmap*/, bool /*isCompressed*/,

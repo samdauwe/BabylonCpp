@@ -146,7 +146,7 @@ AxisDragGizmo::AxisDragGizmo(const Vector3& dragAxis, const Color3& color,
       }
     });
 
-  auto light                = gizmoLayer->_getSharedGizmoLight();
+  const auto& light         = gizmoLayer->_getSharedGizmoLight();
   light->includedOnlyMeshes = stl_util::concat(light->includedOnlyMeshes(),
                                                _rootMesh->getChildMeshes());
 }

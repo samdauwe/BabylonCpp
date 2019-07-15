@@ -1,5 +1,5 @@
-#ifndef BABYLON_MATERIALS_TEXTURES_LOADERS_ENV_TEXTURE_LOADER_H
-#define BABYLON_MATERIALS_TEXTURES_LOADERS_ENV_TEXTURE_LOADER_H
+#ifndef BABYLON_MATERIALS_TEXTURES_LOADERS_KTX_TEXTURE_LOADER_H
+#define BABYLON_MATERIALS_TEXTURES_LOADERS_KTX_TEXTURE_LOADER_H
 
 #include <babylon/materials/textures/iinternal_texture_loader.h>
 
@@ -8,10 +8,10 @@ namespace BABYLON {
 /**
  * @brief Implementation of the ENV Texture Loader.
  */
-struct BABYLON_SHARED_EXPORT _ENVTextureLoader : public IInternalTextureLoader {
+struct BABYLON_SHARED_EXPORT _KTXTextureLoader : public IInternalTextureLoader {
 
-  _ENVTextureLoader();
-  virtual ~_ENVTextureLoader();
+  _KTXTextureLoader();
+  virtual ~_KTXTextureLoader();
 
   /**
    * @brief Defines wether the loader supports cascade loading the different
@@ -101,8 +101,8 @@ struct BABYLON_SHARED_EXPORT _ENVTextureLoader : public IInternalTextureLoader {
       int width, int height, bool loadMipmap, bool isCompressed,
       const std::function<void()>& done, bool loadFailed)>& callback) override;
 
-}; // end of struct _ENVTextureLoader
+}; // end of struct _KTXTextureLoader
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_MATERIALS_TEXTURES_LOADERS_ENV_TEXTURE_LOADER_H
+#endif // end of BABYLON_MATERIALS_TEXTURES_LOADERS_KTX_TEXTURE_LOADER_H

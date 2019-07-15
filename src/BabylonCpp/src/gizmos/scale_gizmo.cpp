@@ -41,7 +41,7 @@ ScaleGizmo::ScaleGizmo(const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
   octahedron->scaling().scaleInPlace(0.007f);
   uniformScalingMesh->addChild(*octahedron);
   uniformScaleGizmo->setCustomMesh(uniformScalingMesh, true);
-  auto light = gizmoLayer->_getSharedGizmoLight();
+  const auto& light = gizmoLayer->_getSharedGizmoLight();
   light->includedOnlyMeshes
     = stl_util::concat(light->includedOnlyMeshes(), {octahedron});
 

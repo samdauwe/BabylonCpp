@@ -211,6 +211,7 @@ public:
   bool invertY;
 
   // Private
+  bool _invertVScale;
   int _initialSlot;
   int _designatedSlot;
   unsigned int _dataSource;

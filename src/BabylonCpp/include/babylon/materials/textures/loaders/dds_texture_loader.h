@@ -8,10 +8,10 @@ namespace BABYLON {
 /**
  * @brief Implementation of the DDS Texture Loader.
  */
-struct BABYLON_SHARED_EXPORT DDSTextureLoader : public IInternalTextureLoader {
+struct BABYLON_SHARED_EXPORT _DDSTextureLoader : public IInternalTextureLoader {
 
-  DDSTextureLoader();
-  virtual ~DDSTextureLoader();
+  _DDSTextureLoader();
+  virtual ~_DDSTextureLoader();
 
   /**
    * @brief Defines wether the loader supports cascade loading the different
@@ -101,7 +101,7 @@ struct BABYLON_SHARED_EXPORT DDSTextureLoader : public IInternalTextureLoader {
       int width, int height, bool loadMipmap, bool isCompressed,
       const std::function<void()>& done, bool loadFailed)>& callback) override;
 
-}; // end of struct DDSTextureLoader
+}; // end of struct _DDSTextureLoader
 
 } // end of namespace BABYLON
 

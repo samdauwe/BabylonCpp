@@ -28,6 +28,7 @@ InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource)
     : isReady{false}
     , isCube{false}
     , is3D{false}
+    , _invertVScale{false}
     , _initialSlot{-1}
     , _designatedSlot{-1}
     , _dataSource{dataSource}

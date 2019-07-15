@@ -29,6 +29,8 @@
 #include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/materials/textures/loaders/dds_texture_loader.h>
 #include <babylon/materials/textures/loaders/env_texture_loader.h>
+#include <babylon/materials/textures/loaders/ktx_texture_loader.h>
+#include <babylon/materials/textures/loaders/tga_texture_loader.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/materials/uniform_buffer.h>
@@ -52,8 +54,10 @@ namespace BABYLON {
 
 // Register the loaders
 std::vector<IInternalTextureLoaderPtr> Engine::_TextureLoaders = {
-  std::make_shared<DDSTextureLoader>(), // DDS Texture Loader
-  std::make_shared<ENVTextureLoader>()  // ENV Texture Loader
+  std::make_shared<_DDSTextureLoader>(), // DDS Texture Loader
+  std::make_shared<_ENVTextureLoader>(), // ENV Texture Loader
+  std::make_shared<_KTXTextureLoader>(), // KTX Texture Loader
+  std::make_shared<_TGATextureLoader>()  // TGA Texture Loader
 };
 
 std::string Engine::Version()

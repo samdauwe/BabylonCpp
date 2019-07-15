@@ -4,6 +4,7 @@
 #include <babylon/behaviors/meshes/pointer_drag_behavior.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/scene.h>
+#include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/mesh.h>
@@ -23,35 +24,29 @@ PlaneRotationGizmo::PlaneRotationGizmo(
   // Create Material
   auto coloredMaterial
     = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
-  coloredMaterial->disableLighting = true;
-  coloredMaterial->emissiveColor   = color;
+  coloredMaterial->diffuseColor  = color;
+  coloredMaterial->specularColor = color.subtract(Color3(0.1f, 0.1f, 0.1f));
 
   auto hoverMaterial
     = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
-  hoverMaterial->disableLighting = true;
-  hoverMaterial->emissiveColor   = color.add(Color3(0.3f, 0.3f, 0.3f));
+  hoverMaterial->diffuseColor = color.add(Color3(0.3f, 0.3f, 0.3f));
 
   // Build mesh on root node
   auto parentMesh = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
 
-  // Create circle out of lines
-  auto radius = 0.8f;
-  std::vector<Vector3> points;
-  for (size_t i = 0; i < tessellation; ++i) {
-    auto radian = (Math::PI2) * (i / (tessellation - 1));
-    points.emplace_back(
-      Vector3(radius * std::sin(radian), 0.f, radius * std::cos(radian)));
-  }
-  auto rotationMesh
-    = Mesh::CreateLines("", points, gizmoLayer->utilityLayerScene.get());
-  rotationMesh->color = coloredMaterial->emissiveColor;
+  auto drag              = Mesh::CreateTorus("", 0.6f, 0.03f, tessellation,
+                                gizmoLayer->utilityLayerScene.get());
+  drag->visibility       = 0.f;
+  auto rotationMesh      = Mesh::CreateTorus("", 0.6f, 0.005f, tessellation,
+                                        gizmoLayer->utilityLayerScene.get());
+  rotationMesh->material = coloredMaterial;
 
   // Position arrow pointing in its drag axis
-  rotationMesh->scaling().scaleInPlace(0.26f);
-  rotationMesh->material     = coloredMaterial;
   rotationMesh->rotation().x = Math::PI_2;
+  drag->rotation().x         = Math::PI_2;
   parentMesh->addChild(*rotationMesh);
-  parentMesh->lookAt(_rootMesh->position().subtract(planeNormal));
+  parentMesh->addChild(*drag);
+  parentMesh->lookAt(_rootMesh->position().add(planeNormal));
 
   _rootMesh->addChild(*parentMesh);
   parentMesh->scaling().scaleInPlace(1.f / 3.f);
@@ -80,16 +75,23 @@ PlaneRotationGizmo::PlaneRotationGizmo(
           attachedMesh()->rotation().y, attachedMesh()->rotation().x,
           attachedMesh()->rotation().z);
       }
+
+      // Remove parent priort to rotating
+      auto attachedMeshParent = attachedMesh()->parent();
+      if (attachedMeshParent) {
+        attachedMesh()->setParent(nullptr);
+      }
+
       // Calc angle over full 360 degree
       // (https://stackoverflow.com/questions/43493711/the-angle-between-two-3d-vectors-with-a-result-range-0-360)
-      auto newVector
+      auto Vector
         = event->dragPlanePoint.subtract(attachedMesh()->absolutePosition)
             .normalize();
       auto originalVector
         = _lastDragPosition.subtract(attachedMesh()->absolutePosition)
             .normalize();
-      auto cross = Vector3::Cross(newVector, originalVector);
-      auto dot   = Vector3::Dot(newVector, originalVector);
+      auto cross = Vector3::Cross(Vector, originalVector);
+      auto dot   = Vector3::Dot(Vector, originalVector);
       auto angle = std::atan2(cross.length(), dot);
       _planeNormalTowardsCamera.copyFrom(planeNormal);
       _localPlaneNormalTowardsCamera.copyFrom(planeNormal);
@@ -119,7 +121,11 @@ PlaneRotationGizmo::PlaneRotationGizmo(
       if (snapDistance != 0.f) {
         _currentSnapDragDistance += angle;
         if (std::abs(_currentSnapDragDistance) > snapDistance) {
-          auto dragSteps = std::floor(_currentSnapDragDistance / snapDistance);
+          auto dragSteps
+            = std::floor(std::abs(_currentSnapDragDistance) / snapDistance);
+          if (_currentSnapDragDistance < 0.f) {
+            dragSteps *= -1.f;
+          }
           _currentSnapDragDistance
             = std::fmod(_currentSnapDragDistance, snapDistance);
           angle   = snapDistance * dragSteps;
@@ -172,6 +178,11 @@ PlaneRotationGizmo::PlaneRotationGizmo(
         _tmpSnapEvent.snapDistance = angle;
         onSnapObservable.notifyObservers(&_tmpSnapEvent);
       }
+
+      // Restore parent
+      if (attachedMeshParent) {
+        attachedMesh()->setParent(attachedMeshParent);
+      }
     }
   });
 
@@ -188,10 +199,14 @@ PlaneRotationGizmo::PlaneRotationGizmo(
         // if ((static_cast<LinesMesh*>(m))->color)
         {
           std::static_pointer_cast<LinesMesh>(m)->color
-            = material->emissiveColor;
+            = material->diffuseColor;
         }
       }
     });
+
+  const auto& light         = gizmoLayer->_getSharedGizmoLight();
+  light->includedOnlyMeshes = stl_util::concat(
+    light->includedOnlyMeshes(), _rootMesh->getChildMeshes(false));
 }
 
 PlaneRotationGizmo::~PlaneRotationGizmo()

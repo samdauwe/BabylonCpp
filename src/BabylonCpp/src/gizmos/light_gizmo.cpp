@@ -63,7 +63,7 @@ void LightGizmo::set_light(const LightPtr& light)
     _lightMesh->parent = _rootMesh.get();
 
     // Add lighting to the light gizmo
-    auto gizmoLight                = gizmoLayer->_getSharedGizmoLight();
+    const auto& gizmoLight         = gizmoLayer->_getSharedGizmoLight();
     gizmoLight->includedOnlyMeshes = stl_util::concat(
       gizmoLight->includedOnlyMeshes(), _lightMesh->getChildMeshes(false));
 

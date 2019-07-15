@@ -7,41 +7,41 @@
 
 namespace BABYLON {
 
-DDSTextureLoader::DDSTextureLoader()
+_DDSTextureLoader::_DDSTextureLoader()
 {
 }
 
-DDSTextureLoader::~DDSTextureLoader()
+_DDSTextureLoader::~_DDSTextureLoader()
 {
 }
 
-bool DDSTextureLoader::supportCascades() const
+bool _DDSTextureLoader::supportCascades() const
 {
   return true;
 }
 
-bool DDSTextureLoader::canLoad(const std::string& extension,
-                               const std::string& /*textureFormatInUse*/,
-                               const InternalTexturePtr& /*fallback*/,
-                               bool /*isBase64*/, bool /*isBuffer*/)
+bool _DDSTextureLoader::canLoad(const std::string& extension,
+                                const std::string& /*textureFormatInUse*/,
+                                const InternalTexturePtr& /*fallback*/,
+                                bool /*isBase64*/, bool /*isBuffer*/)
 {
-  return String::endsWith(extension, ".dds");
+  return String::startsWith(extension, ".dds");
 }
 
 std::string
-DDSTextureLoader::transformUrl(const std::string& rootUrl,
-                               const std::string& /*textureFormatInUse*/)
+_DDSTextureLoader::transformUrl(const std::string& rootUrl,
+                                const std::string& /*textureFormatInUse*/)
 {
   return rootUrl;
 }
 
-std::string DDSTextureLoader::getFallbackTextureUrl(
+std::string _DDSTextureLoader::getFallbackTextureUrl(
   const std::string& /*rootUrl*/, const std::string& /*textureFormatInUse*/)
 {
   return "";
 }
 
-void DDSTextureLoader::loadCubeData(
+void _DDSTextureLoader::loadCubeData(
   const std::variant<std::string, ArrayBuffer>& img,
   const InternalTexturePtr& texture, bool createPolynomials,
   const std::function<void(const CubeTextureData& data)>& onLoad,
@@ -84,7 +84,7 @@ void DDSTextureLoader::loadCubeData(
   }
 }
 
-void DDSTextureLoader::loadCubeData(
+void _DDSTextureLoader::loadCubeData(
   const std::vector<std::variant<std::string, ArrayBuffer>>& imgs,
   const InternalTexturePtr& texture, bool createPolynomials,
   const std::function<void(const CubeTextureData& data)>& onLoad,
@@ -130,7 +130,7 @@ void DDSTextureLoader::loadCubeData(
   }
 }
 
-void DDSTextureLoader::loadData(
+void _DDSTextureLoader::loadData(
   const ArrayBuffer& data, const InternalTexturePtr& texture,
   const std::function<void(int width, int height, bool loadMipmap,
                            bool isCompressed, const std::function<void()>& done,
