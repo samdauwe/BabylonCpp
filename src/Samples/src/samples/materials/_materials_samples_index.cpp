@@ -1,5 +1,6 @@
 #include <babylon/samples/materials/_materials_samples_index.h>
 
+// Materials examples
 #include <babylon/samples/materials/fresnel_parameters_torus_knot_scene.h>
 #include <babylon/samples/materials/glossiness_and_roughness_scene.h>
 #include <babylon/samples/materials/materials_scene.h>
@@ -10,8 +11,12 @@
 #include <babylon/samples/materials/pbr_metallic_roughness_gold_material_scene.h>
 #include <babylon/samples/materials/pbr_metallic_roughness_material_scene.h>
 #include <babylon/samples/materials/pbr_metallic_roughness_texture_material_scene.h>
+#include <babylon/samples/materials/pbr_reflection_scene.h>
 #include <babylon/samples/materials/pbr_specular_glossiness_material_scene.h>
 #include <babylon/samples/materials/pbr_specular_glossiness_texture_material_scene.h>
+#include <babylon/samples/materials/x_ray_material_with_fresnel_skull_scene.h>
+
+// Shader material examples
 #include <babylon/samples/materials/shadermaterial/shader_material_box_scene.h>
 #include <babylon/samples/materials/shadermaterial/shader_material_boxes_scene.h>
 #include <babylon/samples/materials/shadermaterial/shader_material_carved_trees_scene.h>
@@ -45,7 +50,6 @@
 #include <babylon/samples/materials/shadermaterial/shader_material_with_fog_scene.h>
 #include <babylon/samples/materials/shadermaterial/shader_material_wolfenstein_3d_scene.h>
 #include <babylon/samples/materials/shadermaterial/shader_material_xyptonjtroz_scene.h>
-#include <babylon/samples/materials/x_ray_material_with_fresnel_skull_scene.h>
 
 namespace BABYLON {
 namespace Samples {
@@ -116,6 +120,12 @@ _MaterialsSamplesIndex::_MaterialsSamplesIndex()
       return std::make_unique<PBRMetallicRoughnessTextureMaterialScene>(
         iCanvas); //
     });           //
+  // PBR Reflection Scene
+  _samples["PBRReflectionScene"]
+    = std::make_tuple(true,                                                   //
+                      [](ICanvas* iCanvas) {                                  //
+                        return std::make_unique<PBRReflectionScene>(iCanvas); //
+                      });                                                     //
   // PBR Specular Glossiness Material Scene
   _samples["PBRSpecularGlossinessMaterialScene"] = std::make_tuple(
     true,                                                                   //
