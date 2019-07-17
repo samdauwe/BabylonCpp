@@ -16,6 +16,7 @@ struct IMotorEnabledJoint;
 class Mesh;
 class PhysicsImpostor;
 struct PhysicsImpostorJoint;
+class PhysicsRaycastResult;
 class Quaternion;
 class Vector3;
 
@@ -65,6 +66,8 @@ struct BABYLON_SHARED_EXPORT IPhysicsEnginePlugin {
     = 0;
   virtual void sleepBody(PhysicsImpostor* impostor)  = 0;
   virtual void wakeUpBody(PhysicsImpostor* impostor) = 0;
+  virtual PhysicsRaycastResult raycast(const Vector3& from, const Vector3& to)
+    = 0;
   // Joint Update
   virtual void updateDistanceJoint(DistanceJoint* joint, float maxDistance,
                                    float minDistance)

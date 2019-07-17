@@ -5,8 +5,8 @@
 
 namespace BABYLON {
 
-Hinge2Joint::Hinge2Joint(const PhysicsJointData& jointData)
-    : MotorEnabledJoint(PhysicsJoint::Hinge2Joint, jointData)
+Hinge2Joint::Hinge2Joint(const PhysicsJointData& iJointData)
+    : MotorEnabledJoint(PhysicsJoint::Hinge2Joint, iJointData)
 {
 }
 
@@ -14,9 +14,10 @@ Hinge2Joint::~Hinge2Joint()
 {
 }
 
-void Hinge2Joint::setMotor(float force, float maxForce, unsigned int motorIndex)
+void Hinge2Joint::setMotor(float targetSpeed, float maxForce,
+                           unsigned int motorIndex)
 {
-  _physicsPlugin->setMotor(this, force, maxForce, motorIndex);
+  _physicsPlugin->setMotor(this, targetSpeed, maxForce, motorIndex);
 }
 
 void Hinge2Joint::setLimit(float upperLimit, float lowerLimit,

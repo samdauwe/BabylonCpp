@@ -11,6 +11,7 @@ struct IPhysicsEnabledObject;
 struct IPhysicsEnginePlugin;
 class PhysicsImpostor;
 class PhysicsJoint;
+class PhysicsRaycastResult;
 
 /**
  * @brief Interface used to define a physics engine.
@@ -121,6 +122,15 @@ struct BABYLON_SHARED_EXPORT IPhysicsEngine {
    * @returns the PhysicsImpostor or null if not found
    */
   virtual PhysicsImpostor* getImpostorWithPhysicsBody(IPhysicsBody* body) = 0;
+
+  /**
+   * @brief Does a raycast in the physics world.
+   * @param from when should the ray start?
+   * @param to when should the ray end?
+   * @returns PhysicsRaycastResult
+   */
+  virtual PhysicsRaycastResult raycast(const Vector3& from, const Vector3& to)
+    = 0;
 
   /**
    * @brief Called by the scene. No need to call it.

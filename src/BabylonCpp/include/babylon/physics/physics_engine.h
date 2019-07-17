@@ -7,8 +7,12 @@
 namespace BABYLON {
 
 class PhysicsEngine;
+class PhysicsImpostor;
 struct PhysicsImpostorJoint;
-using PhysicsEnginePtr = std::shared_ptr<PhysicsEngine>;
+class PhysicsRaycastResult;
+using PhysicsEnginePtr        = std::shared_ptr<PhysicsEngine>;
+using PhysicsImpostorPtr      = std::shared_ptr<PhysicsImpostor>;
+using PhysicsImpostorJointPtr = std::shared_ptr<PhysicsImpostorJoint>;
 
 /**
  * @brief Class used to control physics engine.
@@ -117,7 +121,7 @@ public:
    * @brief Gets the list of physic impostors.
    * @returns an array of PhysicsImpostor
    */
-  std::vector<std::shared_ptr<PhysicsImpostor>>& getImpostors() override;
+  std::vector<PhysicsImpostorPtr>& getImpostors() override;
 
   /**
    * @brief Gets the impostor for a physics enabled object.
@@ -133,6 +137,14 @@ public:
    * @returns the PhysicsImpostor or null if not found
    */
   PhysicsImpostor* getImpostorWithPhysicsBody(IPhysicsBody* body) override;
+
+  /**
+   * @brief Does a raycast in the physics world.
+   * @param from when should the ray start?
+   * @param to when should the ray end?
+   * @returns PhysicsRaycastResult
+   */
+  PhysicsRaycastResult raycast(const Vector3& from, const Vector3& to) override;
 
   /**
    * @brief Returns whether or not the engine is initialized.
@@ -151,8 +163,8 @@ protected:
 private:
   bool _initialized;
   IPhysicsEnginePlugin* _physicsPlugin;
-  std::vector<std::shared_ptr<PhysicsImpostor>> _impostors;
-  std::vector<std::shared_ptr<PhysicsImpostorJoint>> _joints;
+  std::vector<PhysicsImpostorPtr> _impostors;
+  std::vector<PhysicsImpostorJointPtr> _joints;
 
 }; // end of class PhysicsEngine
 

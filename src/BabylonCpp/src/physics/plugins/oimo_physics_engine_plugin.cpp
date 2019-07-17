@@ -8,6 +8,7 @@
 #include <babylon/physics/joint/physics_joint.h>
 #include <babylon/physics/physics_impostor.h>
 #include <babylon/physics/physics_impostor_joint.h>
+#include <babylon/physics/physics_raycast_result.h>
 #include <oimo/collision/broadphase/broad_phase.h>
 #include <oimo/collision/shape/shape.h>
 #include <oimo/constraint/contact/contact.h>
@@ -243,6 +244,11 @@ void OimoPhysicsEnginePlugin::setLimit(IMotorEnabledJoint* /*joint*/,
 void OimoPhysicsEnginePlugin::dispose()
 {
   world->clear();
+}
+
+PhysicsRaycastResult raycast(Vector3& /*from*/, Vector3& /*to*/)
+{
+  return PhysicsRaycastResult();
 }
 
 } // end of namespace BABYLON

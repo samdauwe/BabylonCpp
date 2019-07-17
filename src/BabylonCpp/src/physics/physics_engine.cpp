@@ -5,6 +5,7 @@
 #include <babylon/physics/joint/physics_joint.h>
 #include <babylon/physics/physics_impostor.h>
 #include <babylon/physics/physics_impostor_joint.h>
+#include <babylon/physics/physics_raycast_result.h>
 
 namespace BABYLON {
 
@@ -49,7 +50,7 @@ float PhysicsEngine::getTimeStep() const
 
 void PhysicsEngine::dispose()
 {
-  for (auto& impostor : _impostors) {
+  for (const auto& impostor : _impostors) {
     impostor->dispose();
   }
   _physicsPlugin->dispose();
@@ -72,15 +73,13 @@ void PhysicsEngine::addImpostor(PhysicsImpostor* impostor)
 
 void PhysicsEngine::removeImpostor(PhysicsImpostor* impostor)
 {
-  auto it = std::find_if(
-    _impostors.begin(), _impostors.end(),
-    [&impostor](const std::shared_ptr<PhysicsImpostor>& _imposter) {
-      return _imposter.get() == impostor;
-    });
+  auto it = std::find_if(_impostors.begin(), _impostors.end(),
+                         [&impostor](const PhysicsImpostorPtr& _imposter) {
+                           return _imposter.get() == impostor;
+                         });
   if (it != _impostors.end()) {
-    // this will also remove it from the world.
-    (*it)->physicsBody = nullptr;
     _impostors.erase(it);
+    getPhysicsPlugin()->removePhysicsBody(impostor);
   }
 }
 
@@ -102,13 +101,12 @@ void PhysicsEngine::removeJoint(PhysicsImpostor* mainImpostor,
                                 PhysicsImpostor* connectedImpostor,
                                 PhysicsJoint* joint)
 {
-  std::vector<std::shared_ptr<PhysicsImpostorJoint>> matchingJoints(
-    _joints.size());
+  std::vector<PhysicsImpostorJointPtr> matchingJoints(_joints.size());
 
   auto it = std::copy_if(
     _joints.begin(), _joints.end(), matchingJoints.begin(),
-    [&connectedImpostor, &joint, &mainImpostor](
-      const std::shared_ptr<PhysicsImpostorJoint>& impostorJoint) {
+    [&connectedImpostor, &joint,
+     &mainImpostor](const PhysicsImpostorJointPtr& impostorJoint) {
       return (impostorJoint->connectedImpostor == connectedImpostor
               && impostorJoint->joint.get() == joint
               && impostorJoint->mainImpostor == mainImpostor);
@@ -148,7 +146,7 @@ IPhysicsEnginePlugin* PhysicsEngine::getPhysicsPlugin()
   return _physicsPlugin;
 }
 
-std::vector<std::shared_ptr<PhysicsImpostor>>& PhysicsEngine::getImpostors()
+std::vector<PhysicsImpostorPtr>& PhysicsEngine::getImpostors()
 {
   return _impostors;
 }
@@ -156,27 +154,31 @@ std::vector<std::shared_ptr<PhysicsImpostor>>& PhysicsEngine::getImpostors()
 PhysicsImpostor*
 PhysicsEngine::getImpostorForPhysicsObject(IPhysicsEnabledObject* object)
 {
-  auto it
-    = std::find_if(_impostors.begin(), _impostors.end(),
-                   [&object](const std::shared_ptr<PhysicsImpostor>& impostor) {
-                     return impostor->object == object;
-                   });
+  auto it = std::find_if(_impostors.begin(), _impostors.end(),
+                         [&object](const PhysicsImpostorPtr& impostor) {
+                           return impostor->object == object;
+                         });
   return (it == _impostors.end()) ? nullptr : (*it).get();
 }
 
 PhysicsImpostor* PhysicsEngine::getImpostorWithPhysicsBody(IPhysicsBody* body)
 {
-  auto it
-    = std::find_if(_impostors.begin(), _impostors.end(),
-                   [&body](const std::shared_ptr<PhysicsImpostor>& impostor) {
-                     return impostor->physicsBody() == body;
-                   });
+  auto it = std::find_if(_impostors.begin(), _impostors.end(),
+                         [&body](const PhysicsImpostorPtr& impostor) {
+                           return impostor->physicsBody() == body;
+                         });
   return (it == _impostors.end()) ? nullptr : (*it).get();
 }
 
 bool PhysicsEngine::isInitialized() const
 {
   return _initialized;
+}
+
+PhysicsRaycastResult PhysicsEngine::raycast(const Vector3& from,
+                                            const Vector3& to)
+{
+  return _physicsPlugin->raycast(from, to);
 }
 
 } // end of namespace BABYLON

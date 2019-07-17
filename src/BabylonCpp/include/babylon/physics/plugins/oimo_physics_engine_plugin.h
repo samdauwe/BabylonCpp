@@ -18,6 +18,7 @@ struct IMotorEnabledJoint;
 struct IWorld;
 class PhysicsImpostor;
 struct PhysicsImpostorJoint;
+class PhysicsRaycastResult;
 
 /**
  * @brief Hidden
@@ -59,6 +60,14 @@ public:
   void setLimit(IMotorEnabledJoint* joint, float upperLimit, float lowerLimit,
                 unsigned int motorIndex);
   void dispose();
+
+  /**
+   * @brief Does a raycast in the physics world.
+   * @param from when should the ray start?
+   * @param to when should the ray end?
+   * @returns PhysicsRaycastResult
+   */
+  PhysicsRaycastResult raycast(const Vector3& from, const Vector3& to);
 
 private:
   OIMO::Shape* getLastShape(OIMO::RigidBody* body);

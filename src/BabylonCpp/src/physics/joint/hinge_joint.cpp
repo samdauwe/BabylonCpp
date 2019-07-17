@@ -5,8 +5,8 @@
 
 namespace BABYLON {
 
-HingeJoint::HingeJoint(const PhysicsJointData& jointData)
-    : MotorEnabledJoint(PhysicsJoint::HingeJoint, jointData)
+HingeJoint::HingeJoint(const PhysicsJointData& iJointData)
+    : MotorEnabledJoint(PhysicsJoint::HingeJoint, iJointData)
 {
 }
 

@@ -5,9 +5,9 @@
 
 namespace BABYLON {
 
-MotorEnabledJoint::MotorEnabledJoint(unsigned int jointType,
-                                     const PhysicsJointData& jointData)
-    : PhysicsJoint(jointType, jointData)
+MotorEnabledJoint::MotorEnabledJoint(unsigned int iJointType,
+                                     const PhysicsJointData& iJointData)
+    : PhysicsJoint(iJointType, iJointData)
 {
 }
 

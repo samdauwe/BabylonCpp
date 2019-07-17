@@ -5,8 +5,8 @@
 
 namespace BABYLON {
 
-DistanceJoint::DistanceJoint(const DistanceJointData& jointData)
-    : PhysicsJoint(PhysicsJoint::DistanceJoint, jointData)
+DistanceJoint::DistanceJoint(const DistanceJointData& iJointData)
+    : PhysicsJoint(PhysicsJoint::DistanceJoint, iJointData)
 {
 }
 
