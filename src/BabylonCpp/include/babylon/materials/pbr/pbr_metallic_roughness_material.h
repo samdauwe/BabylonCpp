@@ -37,6 +37,18 @@ public:
   const std::string getClassName() const override;
 
   /**
+   * @brief Gets a property.
+   */
+  virtual AnimationValue
+  getProperty(const std::vector<std::string>& targetPropertyPath) override;
+
+  /**
+   * @brief Sets a property.
+   */
+  virtual void setProperty(const std::vector<std::string>& targetPropertyPath,
+                           const AnimationValue& value) override;
+
+  /**
    * @brief Return the active textures of the material.
    */
   std::vector<BaseTexturePtr> getActiveTextures() const override;

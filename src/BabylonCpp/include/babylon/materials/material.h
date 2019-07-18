@@ -151,6 +151,18 @@ public:
   virtual Type type() const override;
 
   /**
+   * @brief Gets a property.
+   */
+  virtual AnimationValue
+  getProperty(const std::vector<std::string>& targetPropertyPath) override;
+
+  /**
+   * @brief Sets a property.
+   */
+  virtual void setProperty(const std::vector<std::string>& targetPropertyPath,
+                           const AnimationValue& value) override;
+
+  /**
    * @param Returns a string representation of the current material.
    * @param fullDetails defines a boolean indicating which levels of logging is
    * desired
@@ -684,7 +696,7 @@ public:
   /**
    * Stores the animations for the material
    */
-  std::vector<Animation*> animations;
+  std::vector<AnimationPtr> animations;
 
   /**
    * Called during a dispose event

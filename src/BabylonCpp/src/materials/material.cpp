@@ -163,6 +163,18 @@ Type Material::type() const
   return Type::MATERIAL;
 }
 
+AnimationValue
+Material::getProperty(const std::vector<std::string>& /*targetPropertyPath*/)
+{
+  return AnimationValue();
+}
+
+void Material::setProperty(
+  const std::vector<std::string>& /*targetPropertyPath*/,
+  const AnimationValue& /*value*/)
+{
+}
+
 void Material::addMaterialToScene(const MaterialPtr& newMaterial)
 {
   _scene->materials.emplace_back(newMaterial);
@@ -230,7 +242,7 @@ void Material::set_useLogarithmicDepth(bool /*value*/)
 // Methods
 std::vector<AnimationPtr> Material::getAnimations()
 {
-  return std::vector<AnimationPtr>();
+  return animations;
 }
 
 // Events

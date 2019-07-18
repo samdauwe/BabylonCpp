@@ -2,6 +2,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include <babylon/animations/animation.h>
 #include <babylon/babylon_stl_util.h>
 
 namespace BABYLON {
@@ -36,6 +37,37 @@ PBRMetallicRoughnessMaterial::~PBRMetallicRoughnessMaterial()
 const std::string PBRMetallicRoughnessMaterial::getClassName() const
 {
   return "PBRMetallicRoughnessMaterial";
+}
+
+AnimationValue PBRMetallicRoughnessMaterial::getProperty(
+  const std::vector<std::string>& targetPropertyPath)
+{
+  if (targetPropertyPath.size() == 1) {
+    const auto& target = targetPropertyPath[0];
+    if (target == "baseColor") {
+      return baseColor();
+    }
+  }
+
+  return AnimationValue();
+}
+
+void PBRMetallicRoughnessMaterial::setProperty(
+  const std::vector<std::string>& targetPropertyPath,
+  const AnimationValue& value)
+{
+  const auto animationType = value.animationType();
+  if (animationType.has_value()) {
+    if (targetPropertyPath.size() == 1) {
+      const auto& target = targetPropertyPath[0];
+      if (*animationType == Animation::ANIMATIONTYPE_COLOR3()) {
+        auto color3Value = value.get<Color3>();
+        if (target == "baseColor") {
+          baseColor = color3Value;
+        }
+      }
+    }
+  }
 }
 
 Color3& PBRMetallicRoughnessMaterial::get_baseColor()
