@@ -383,7 +383,6 @@ target_include_directories(${TARGET}
     ${JSON_HPP_INCLUDE_DIRS}
     ${CMAKE_CURRENT_BINARY_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../OimoCpp/include
     PUBLIC
     INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
@@ -393,7 +392,6 @@ target_include_directories(${TARGET}
 # Libraries
 target_link_libraries(${TARGET}
     PRIVATE
-    OimoCpp
 )
 
 # Compile definitions

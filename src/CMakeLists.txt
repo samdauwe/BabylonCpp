@@ -15,8 +15,6 @@ endif()
 
 #-- Libraries --##
 set(IDE_FOLDER "")
-# - Oimo CPP
-add_subdirectory(OimoCpp)
 # - Babylon.js Cpp
 add_subdirectory(BabylonCpp)
 # - Extensions

@@ -109,7 +109,7 @@ def main():
         # Offline
         "database.ts", "IOfflineProvider.ts",
         # Physics / Plugins
-        "ammoJSPlugin.ts", "cannonJSPlugin.ts", "oimoJSPlugin.ts"
+        "cannonJSPlugin.ts", "oimoJSPlugin.ts"
     ]
     # Create mapping from BabylonJS version to full path
     for version in BabylonJsVersions:
