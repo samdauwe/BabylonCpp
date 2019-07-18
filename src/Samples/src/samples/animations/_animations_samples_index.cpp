@@ -11,6 +11,7 @@
 #include <babylon/samples/animations/easing/shape_easings_scene.h>
 #include <babylon/samples/animations/morph_mesh_scene.h>
 #include <babylon/samples/animations/morph_targets_scene.h>
+#include <babylon/samples/animations/pick_and_play_animation.h>
 #include <babylon/samples/animations/pump_jack_scene.h>
 #include <babylon/samples/animations/tube_animation_scene.h>
 
@@ -69,6 +70,12 @@ _AnimationsSamplesIndex::_AnimationsSamplesIndex()
                       [](ICanvas* iCanvas) {                                 //
                         return std::make_unique<MorphTargetsScene>(iCanvas); //
                       });                                                    //
+  // Pick And Play Animation Scene
+  _samples["PickAndPlayAnimationScene"] = std::make_tuple(
+    false,                                                         //
+    [](ICanvas* iCanvas) {                                         //
+      return std::make_unique<PickAndPlayAnimationScene>(iCanvas); //
+    });                                                            //
   // Cartoon Animations Scene
   _samples["CartoonAnimationsScene"] = std::make_tuple(
     false,                                                      //
