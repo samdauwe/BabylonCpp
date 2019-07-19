@@ -79,6 +79,22 @@ public:
    * Heightmap-Imposter type
    */
   static constexpr unsigned int HeightmapImpostor = 9;
+  /**
+   * ConvexHull-Impostor type (Ammo.js plugin only)
+   */
+  static constexpr unsigned int ConvexHullImpostor = 10;
+  /**
+   * Rope-Imposter type
+   */
+  static constexpr unsigned int RopeImpostor = 101;
+  /**
+   * Cloth-Imposter type
+   */
+  static constexpr unsigned int ClothImpostor = 102;
+  /**
+   * Softbody-Imposter type
+   */
+  static constexpr unsigned int SoftbodyImpostor = 103;
 
 public:
   PhysicsImpostor(IPhysicsEnabledObject* object, unsigned int type,
@@ -292,6 +308,35 @@ public:
                             const std::shared_ptr<PhysicsJoint>& joint);
 
   /**
+   * @brief Add an anchor to a cloth impostor.
+   * @param otherImpostor rigid impostor to anchor to
+   * @param width ratio across width from 0 to 1
+   * @param height ratio up height from 0 to 1
+   * @param influence the elasticity between cloth impostor and anchor from 0,
+   * very stretchy to 1, little strech
+   * @param noCollisionBetweenLinkedBodies when true collisions between cloth
+   * impostor and anchor are ignored; default false
+   * @returns impostor the soft imposter
+   */
+  PhysicsImpostor& addAnchor(const PhysicsImpostorPtr& otherImpostor, int width,
+                             int height, float influence,
+                             bool noCollisionBetweenLinkedBodies);
+
+  /**
+   * @brief Add a hook to a rope impostor.
+   * @param otherImpostor rigid impostor to anchor to
+   * @param length ratio across rope from 0 to 1
+   * @param influence the elasticity between rope impostor and anchor from 0,
+   * very stretchy to 1, little strech
+   * @param noCollisionBetweenLinkedBodies when true collisions between soft
+   * impostor and anchor are ignored; default false
+   * @returns impostor the rope imposter
+   */
+  PhysicsImpostor& addHook(const PhysicsImpostorPtr& otherImpostor,
+                           float length, float influence,
+                           bool noCollisionBetweenLinkedBodies);
+
+  /**
    * @brief Will keep this body still, in a sleep mode.
    * @returns the physics imposter
    */
@@ -412,6 +457,54 @@ private:
   void set_restitution(float value);
 
   /**
+   * @brief Gets the pressure of a soft body; only supported by the
+   * AmmoJSPlugin.
+   */
+  float get_pressure() const;
+
+  /**
+   * @brief Sets the pressure of a soft body; only supported by the
+   * AmmoJSPlugin.
+   */
+  void set_pressure(float value);
+
+  /**
+   * @brief Gets the stiffness of a soft body; only supported by the
+   * AmmoJSPlugin.
+   */
+  float get_stiffness() const;
+
+  /**
+   * @brief Sets the stiffness of a soft body; only supported by the
+   * AmmoJSPlugin.
+   */
+  void set_stiffness(float value);
+
+  /**
+   * @brief Gets the velocityIterations of a soft body; only supported by the
+   * AmmoJSPlugin.
+   */
+  size_t get_velocityIterations() const;
+
+  /**
+   * @brief Sets the velocityIterations of a soft body; only supported by the
+   * AmmoJSPlugin.
+   */
+  void set_velocityIterations(size_t value);
+
+  /**
+   * @brief Gets the positionIterations of a soft body; only supported by the
+   * AmmoJSPlugin.
+   */
+  size_t get_positionIterations() const;
+
+  /**
+   * @brief Sets the positionIterations of a soft body; only supported by the
+   * AmmoJSPlugin.
+   */
+  void set_positionIterations(size_t value);
+
+  /**
    * @brief Gets the body that holds this impostor. Either its own, or its.
    * parent.
    */
@@ -440,6 +533,11 @@ private:
 
 public:
   /**
+   * Hidden
+   */
+  bool _isFromLin;
+
+  /**
    * Specifies if the physics imposter is disposed
    */
   ReadOnlyProperty<PhysicsImpostor, bool> isDisposed;
@@ -460,10 +558,44 @@ public:
   Property<PhysicsImpostor, float> restitution;
 
   /**
+   * Gets or sets the pressure of a soft body; only supported by the
+   * AmmoJSPlugin
+   */
+  Property<PhysicsImpostor, float> pressure;
+
+  /**
+   * Gets or sets the stiffness of a soft body; only supported by the
+   * AmmoJSPlugin
+   */
+  Property<PhysicsImpostor, float> stiffness;
+
+  /**
+   * Gets or sets the velocityIterations of a soft body; only supported by the
+   * AmmoJSPlugin
+   */
+  Property<PhysicsImpostor, size_t> velocityIterations;
+
+  /**
+   * Gets or sets the positionIterations of a soft body; only supported by the
+   * AmmoJSPlugin
+   */
+  Property<PhysicsImpostor, size_t> positionIterations;
+
+  /**
    * The unique id of the physics imposter
    * set by the physics engine when adding this impostor to the array
    */
   size_t uniqueId;
+
+  /**
+   * Hidden
+   */
+  bool soft;
+
+  /**
+   * Hidden
+   */
+  unsigned int segments;
 
   /**
    * The physics-enabled object used as the physics imposter

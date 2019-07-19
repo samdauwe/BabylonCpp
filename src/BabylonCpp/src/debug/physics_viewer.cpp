@@ -50,7 +50,7 @@ void PhysicsViewer::_updateDebugMeshes()
       auto& mesh = _meshes[i];
 
       if (mesh && plugin) {
-        plugin->syncMeshWithImpostor(mesh.get(), impostor);
+        plugin->syncMeshWithImpostor(mesh.get(), *impostor);
       }
     }
   }

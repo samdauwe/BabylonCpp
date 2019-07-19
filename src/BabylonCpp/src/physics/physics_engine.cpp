@@ -67,7 +67,7 @@ void PhysicsEngine::addImpostor(PhysicsImpostor* impostor)
   impostor->uniqueId = _impostors.size();
   // if no parent, generate the body
   if (!impostor->parent()) {
-    _physicsPlugin->generatePhysicsBody(impostor);
+    _physicsPlugin->generatePhysicsBody(*impostor);
   }
 }
 
@@ -79,7 +79,7 @@ void PhysicsEngine::removeImpostor(PhysicsImpostor* impostor)
                          });
   if (it != _impostors.end()) {
     _impostors.erase(it);
-    getPhysicsPlugin()->removePhysicsBody(impostor);
+    getPhysicsPlugin()->removePhysicsBody(*impostor);
   }
 }
 
@@ -126,7 +126,7 @@ void PhysicsEngine::_step(float delta)
   // check if any mesh has no body / requires an update
   for (auto& impostor : _impostors) {
     if (impostor->isBodyInitRequired()) {
-      _physicsPlugin->generatePhysicsBody(impostor.get());
+      _physicsPlugin->generatePhysicsBody(*impostor);
     }
   }
 

@@ -19,6 +19,7 @@ struct PhysicsImpostorJoint;
 class PhysicsRaycastResult;
 class Quaternion;
 class Vector3;
+using PhysicsImpostorPtr = std::shared_ptr<PhysicsImpostor>;
 
 /**
  * @brief Hidden
@@ -33,39 +34,66 @@ struct BABYLON_SHARED_EXPORT IPhysicsEnginePlugin {
   executeStep(float delta,
               const std::vector<std::unique_ptr<PhysicsImpostor>>& impostors)
     = 0; // not forgetting pre and post events
-  virtual void applyImpulse(PhysicsImpostor* impostor, const Vector3& force,
-                            const Vector3& contactPoint)
+  virtual void applyImpulse(const PhysicsImpostor& impostor,
+                            const Vector3& force, const Vector3& contactPoint)
     = 0;
-  virtual void applyForce(PhysicsImpostor* impostor, const Vector3& force,
+  virtual void applyForce(const PhysicsImpostor& impostor, const Vector3& force,
                           const Vector3& contactPoint)
     = 0;
-  virtual void generatePhysicsBody(PhysicsImpostor* impostor)              = 0;
-  virtual void removePhysicsBody(PhysicsImpostor* impostor)                = 0;
-  virtual void generateJoint(PhysicsImpostorJoint* joint)                  = 0;
-  virtual void removeJoint(PhysicsImpostorJoint* joint)                    = 0;
-  virtual bool isSupported()                                               = 0;
-  virtual void setTransformationFromPhysicsBody(PhysicsImpostor* impostor) = 0;
-  virtual void setPhysicsBodyTransformation(PhysicsImpostor* impostor,
+  virtual void generatePhysicsBody(const PhysicsImpostor& impostor) = 0;
+  virtual void removePhysicsBody(const PhysicsImpostor& impostor)   = 0;
+  virtual void generateJoint(PhysicsImpostorJoint* joint)           = 0;
+  virtual void removeJoint(PhysicsImpostorJoint* joint)             = 0;
+  virtual bool isSupported()                                        = 0;
+  virtual void setTransformationFromPhysicsBody(const PhysicsImpostor& impostor)
+    = 0;
+  virtual void setPhysicsBodyTransformation(const PhysicsImpostor& impostor,
                                             const Vector3& newPosition,
                                             const Quaternion& newRotation)
     = 0;
-  virtual void setLinearVelocity(PhysicsImpostor* impostor,
+  virtual void setLinearVelocity(const PhysicsImpostor& impostor,
                                  const std::optional<Vector3>& velocity)
     = 0;
-  virtual void setAngularVelocity(PhysicsImpostor* impostor,
+  virtual void setAngularVelocity(const PhysicsImpostor& impostor,
                                   const std::optional<Vector3>& velocity)
     = 0;
-  virtual Vector3 getLinearVelocity(PhysicsImpostor* impostor)            = 0;
-  virtual Vector3 getAngularVelocity(PhysicsImpostor* impostor)           = 0;
-  virtual void setBodyMass(PhysicsImpostor* impostor, float mass)         = 0;
-  virtual float getBodyMass(const PhysicsImpostor* impostor)              = 0;
-  virtual float getBodyFriction(const PhysicsImpostor* impostor)          = 0;
-  virtual void setBodyFriction(PhysicsImpostor* impostor, float friction) = 0;
-  virtual float getBodyRestitution(const PhysicsImpostor* impostor)       = 0;
-  virtual void setBodyRestitution(PhysicsImpostor* impostor, float restitution)
+  virtual Vector3 getLinearVelocity(const PhysicsImpostor& impostor)    = 0;
+  virtual Vector3 getAngularVelocity(const PhysicsImpostor& impostor)   = 0;
+  virtual void setBodyMass(const PhysicsImpostor& impostor, float mass) = 0;
+  virtual float getBodyMass(const PhysicsImpostor& impostor)            = 0;
+  virtual float getBodyFriction(const PhysicsImpostor& impostor)        = 0;
+  virtual void setBodyFriction(const PhysicsImpostor& impostor, float friction)
     = 0;
-  virtual void sleepBody(PhysicsImpostor* impostor)  = 0;
-  virtual void wakeUpBody(PhysicsImpostor* impostor) = 0;
+  virtual float getBodyRestitution(const PhysicsImpostor& impostor) = 0;
+  virtual void setBodyRestitution(const PhysicsImpostor& impostor,
+                                  float restitution)
+    = 0;
+  virtual float getBodyPressure(const PhysicsImpostor& impostor) = 0;
+  virtual void setBodyPressure(const PhysicsImpostor& impostor, float pressure)
+    = 0;
+  virtual float getBodyStiffness(const PhysicsImpostor& impostor) = 0;
+  virtual void setBodyStiffness(const PhysicsImpostor& impostor,
+                                float stiffness)
+    = 0;
+  virtual size_t getBodyVelocityIterations(const PhysicsImpostor& impostor) = 0;
+  virtual void setBodyVelocityIterations(const PhysicsImpostor& impostor,
+                                         size_t velocityIterations)
+    = 0;
+  virtual size_t getBodyPositionIterations(const PhysicsImpostor& impostor) = 0;
+  virtual void setBodyPositionIterations(const PhysicsImpostor& impostor,
+                                         size_t positionIterations)
+    = 0;
+  virtual void appendAnchor(const PhysicsImpostor& impostor,
+                            const PhysicsImpostorPtr& otherImpostor, int width,
+                            int height, float influence,
+                            bool noCollisionBetweenLinkedBodies)
+    = 0;
+  virtual void appendHook(const PhysicsImpostor& impostor,
+                          const PhysicsImpostorPtr& otherImpostor, float length,
+                          float influence, bool noCollisionBetweenLinkedBodies)
+    = 0;
+  virtual void sleepBody(const PhysicsImpostor& impostor)  = 0;
+  virtual void wakeUpBody(const PhysicsImpostor& impostor) = 0;
   virtual PhysicsRaycastResult raycast(const Vector3& from, const Vector3& to)
     = 0;
   // Joint Update
@@ -78,10 +106,11 @@ struct BABYLON_SHARED_EXPORT IPhysicsEnginePlugin {
   virtual void setLimit(IMotorEnabledJoint* joint, float upperLimit,
                         float lowerLimit, unsigned int motorIndex = 0)
     = 0;
-  virtual float getRadius(const PhysicsImpostor* impostor)                 = 0;
-  virtual void getBoxSizeToRef(PhysicsImpostor* impostor, Vector3& result) = 0;
+  virtual float getRadius(const PhysicsImpostor& impostor) = 0;
+  virtual void getBoxSizeToRef(const PhysicsImpostor& impostor, Vector3& result)
+    = 0;
   virtual void syncMeshWithImpostor(AbstractMesh* mesh,
-                                    PhysicsImpostor* impostor)
+                                    const PhysicsImpostor& impostor)
     = 0;
   virtual void dispose() = 0;
 }; // end of struct IPhysicsEnginePlugin
