@@ -81,17 +81,15 @@ VertexData& VertexData::applyToGeometry(Geometry& geometry, bool updatable)
   return *this;
 }
 
-VertexData& VertexData::updateMesh(Mesh* mesh, bool updateExtends,
-                                   bool makeItUnique)
+VertexData& VertexData::updateMesh(Mesh* mesh)
 {
-  _update(mesh, updateExtends, makeItUnique);
+  _update(mesh);
   return *this;
 }
 
-VertexData& VertexData::updateGeometry(Geometry* geometry, bool updateExtends,
-                                       bool makeItUnique)
+VertexData& VertexData::updateGeometry(Geometry* geometry)
 {
-  _update(geometry, updateExtends, makeItUnique);
+  _update(geometry);
   return *this;
 }
 
@@ -2989,7 +2987,7 @@ void VertexData::ComputeNormals(const Float32Array& positions,
   }
 }
 
-void VertexData::_ComputeSides(uint32_t sideOrientation,
+void VertexData::_ComputeSides(std::optional<uint32_t> sideOrientation,
                                Float32Array& positions, Uint32Array& indices,
                                Float32Array& normals, Float32Array& uvs,
                                const std::optional<Vector4>& iFrontUVs,
@@ -2999,13 +2997,14 @@ void VertexData::_ComputeSides(uint32_t sideOrientation,
   size_t ln = normals.size();
   size_t i;
   size_t n;
+  sideOrientation = sideOrientation.value_or(VertexData::DEFAULTSIDE);
 
-  switch (sideOrientation) {
-    case Mesh::FRONTSIDE:
+  switch (*sideOrientation) {
+    case VertexData::FRONTSIDE:
     default:
       // nothing changed
       break;
-    case Mesh::BACKSIDE:
+    case VertexData::BACKSIDE:
       uint16_t tmp;
       // indices
       for (i = 0; i < li; i += 3) {
@@ -3018,7 +3017,7 @@ void VertexData::_ComputeSides(uint32_t sideOrientation,
         normals[n] = -normals[n];
       }
       break;
-    case Mesh::DOUBLESIDE:
+    case VertexData::DOUBLESIDE:
       // positions
       size_t lp  = positions.size();
       uint32_t l = static_cast<unsigned>(lp / 3);

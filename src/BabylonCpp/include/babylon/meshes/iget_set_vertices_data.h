@@ -68,18 +68,18 @@ struct BABYLON_SHARED_EXPORT IGetSetVerticesData {
    * @brief Update a specific associated vertex buffer.
    * @param kind defines which buffer to write to (positions, indices, normals,
    * etc). Possible `kind` values :
-   * - BABYLON.VertexBuffer.PositionKind
-   * - BABYLON.VertexBuffer.UVKind
-   * - BABYLON.VertexBuffer.UV2Kind
-   * - BABYLON.VertexBuffer.UV3Kind
-   * - BABYLON.VertexBuffer.UV4Kind
-   * - BABYLON.VertexBuffer.UV5Kind
-   * - BABYLON.VertexBuffer.UV6Kind
-   * - BABYLON.VertexBuffer.ColorKind
-   * - BABYLON.VertexBuffer.MatricesIndicesKind
-   * - BABYLON.VertexBuffer.MatricesIndicesExtraKind
-   * - BABYLON.VertexBuffer.MatricesWeightsKind
-   * - BABYLON.VertexBuffer.MatricesWeightsExtraKind
+   * - VertexBuffer.PositionKind
+   * - VertexBuffer.UVKind
+   * - VertexBuffer.UV2Kind
+   * - VertexBuffer.UV3Kind
+   * - VertexBuffer.UV4Kind
+   * - VertexBuffer.UV5Kind
+   * - VertexBuffer.UV6Kind
+   * - VertexBuffer.ColorKind
+   * - VertexBuffer.MatricesIndicesKind
+   * - VertexBuffer.MatricesIndicesExtraKind
+   * - VertexBuffer.MatricesWeightsKind
+   * - VertexBuffer.MatricesWeightsExtraKind
    * @param data defines the data source
    * @param updateExtends defines if extends info of the mesh must be updated
    * (can be null). This is mostly useful for "position" kind

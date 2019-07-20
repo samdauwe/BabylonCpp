@@ -84,28 +84,16 @@ public:
   /**
    * @brief Updates the associated mesh.
    * @param mesh the mesh to be updated
-   * @param updateExtends when true the mesh BoundingInfo will be renewed when
-   * and if position kind is updated, optional with default false
-   * @param makeItUnique when true, and when and if position kind is updated, a
-   * new global geometry will be  created from these positions and set to the
-   * mesh, optional with default false
    * @returns VertexData
    */
-  VertexData& updateMesh(Mesh* mesh, bool updateExtends = false,
-                         bool makeItUnique = false);
+  VertexData& updateMesh(Mesh* mesh);
 
   /**
    * @brief Updates the associated geometry.
    * @param geometry the geometry to be updated
-   * @param updateExtends when true BoundingInfo will be renewed when and if
-   * position kind is updated, optional with default false
-   * @param makeItUnique when true, and when and if position kind is updated, a
-   * new global geometry will be created from these positions and set to the
-   * mesh, optional with default false
    * @returns VertexData.
    */
-  VertexData& updateGeometry(Geometry* geometry, bool updateExtends = false,
-                             bool makeItUnique = false);
+  VertexData& updateGeometry(Geometry* geometry);
 
   /**
    * @brief Transforms each position and each normal of the vertexData according
@@ -170,8 +158,8 @@ public:
    * * offset a positive integer, only used when pathArray contains a single
    * path (offset = 10 means the point 1 is joined to the point 11), default
    * rounded half size of the pathArray length
-   * * sideOrientation optional and takes the values : BABYLON.Mesh.FRONTSIDE
-   * (default), BABYLON.Mesh.BACKSIDE or BABYLON.Mesh.DOUBLESIDE
+   * * sideOrientation optional and takes the values : Mesh.FRONTSIDE (default),
+   * Mesh.BACKSIDE or Mesh.DOUBLESIDE
    * * frontUvs only usable when you create a double-sided mesh, used to choose
    * what parts of the texture image to crop and apply on the front side,
    * optional, default vector4 (0, 0, 1, 1)
@@ -204,8 +192,8 @@ public:
    * each box side
    * * faceColors an array of 6 Color3 elements used to set different colors to
    * each box side
-   * * sideOrientation optional and takes the values : BABYLON.Mesh.FRONTSIDE
-   * (default), BABYLON.Mesh.BACKSIDE or BABYLON.Mesh.DOUBLESIDE
+   * * sideOrientation optional and takes the values : Mesh.FRONTSIDE (default),
+   * Mesh.BACKSIDE or Mesh.DOUBLESIDE
    * * frontUvs only usable when you create a double-sided mesh, used to choose
    * what parts of the texture image to crop and apply on the front side,
    * optional, default vector4 (0, 0, 1, 1)
@@ -235,8 +223,8 @@ public:
    * * slice a number from 0 to 1, to create an unclosed ellipsoid based on the
    * fraction of the height (latitude) given by the arc value, optional, default
    * 1
-   * * sideOrientation optional and takes the values : BABYLON.Mesh.FRONTSIDE
-   * (default), BABYLON.Mesh.BACKSIDE or BABYLON.Mesh.DOUBLESIDE
+   * * sideOrientation optional and takes the values : Mesh.FRONTSIDE (default),
+   * Mesh.BACKSIDE or Mesh.DOUBLESIDE
    * * frontUvs only usable when you create a double-sided mesh, used to choose
    * what parts of the texture image to crop and apply on the front side,
    * optional, default vector4 (0, 0, 1, 1)
@@ -272,8 +260,8 @@ public:
    * for faceUV and faceColors, optional, default false
    * * enclose when true closes an open cylinder by adding extra flat faces
    * between the height axis and vertical edges, think cut cake
-   * * sideOrientation optional and takes the values : BABYLON.Mesh.FRONTSIDE
-   * (default), BABYLON.Mesh.BACKSIDE or BABYLON.Mesh.DOUBLESIDE
+   * * sideOrientation optional and takes the values : Mesh.FRONTSIDE (default),
+   * Mesh.BACKSIDE or Mesh.DOUBLESIDE
    * * frontUvs only usable when you create a double-sided mesh, used to choose
    * what parts of the texture image to crop and apply on the front side,
    * optional, default vector4 (0, 0, 1, 1)
@@ -293,8 +281,8 @@ public:
    * 0.5
    * * tessellation the number of prism sides, 3 for a triangular prism,
    * optional, default 24
-   * * sideOrientation optional and takes the values : BABYLON.Mesh.FRONTSIDE
-   * (default), BABYLON.Mesh.BACKSIDE or BABYLON.Mesh.DOUBLESIDE
+   * * sideOrientation optional and takes the values : Mesh.FRONTSIDE (default),
+   * Mesh.BACKSIDE or Mesh.DOUBLESIDE
    * * frontUvs only usable when you create a double-sided mesh, used to choose
    * what parts of the texture image to crop and apply on the front side,
    * optional, default vector4 (0, 0, 1, 1)
@@ -394,8 +382,8 @@ public:
    * by size, optional, default size
    * * height sets the height (y direction) of the plane, overwrites the height
    * set by size, optional, default size
-   * * sideOrientation optional and takes the values : BABYLON.Mesh.FRONTSIDE
-   * (default), BABYLON.Mesh.BACKSIDE or BABYLON.Mesh.DOUBLESIDE
+   * * sideOrientation optional and takes the values : Mesh.FRONTSIDE (default),
+   * Mesh.BACKSIDE or Mesh.DOUBLESIDE
    * * frontUvs only usable when you create a double-sided mesh, used to choose
    * what parts of the texture image to crop and apply on the front side,
    * optional, default vector4 (0, 0, 1, 1)
@@ -414,8 +402,8 @@ public:
    * * tessellation the number of polygon sides, optional, default 64
    * * arc a number from 0 to 1, to create an unclosed polygon based on the
    * fraction of the circumference given by the arc value, optional, default 1
-   * * sideOrientation optional and takes the values : BABYLON.Mesh.FRONTSIDE
-   * (default), BABYLON.Mesh.BACKSIDE or BABYLON.Mesh.DOUBLESIDE
+   * * sideOrientation optional and takes the values : Mesh.FRONTSIDE (default),
+   * Mesh.BACKSIDE or Mesh.DOUBLESIDE
    * * frontUvs only usable when you create a double-sided mesh, used to choose
    * what parts of the texture image to crop and apply on the front side,
    * optional, default vector4 (0, 0, 1, 1)
@@ -428,11 +416,11 @@ public:
 
   /**
    * @brief Creates the VertexData for an irregular Polygon in the XoZ plane
-   * using a mesh built by polygonTriangulation.build(). All parameters are
-   * provided by MeshBuilder.CreatePolygon as needed
+   * using a mesh built by polygonTriangulation.build() All parameters are
+   * provided by MeshBuilder.CreatePolygon as needed.
    * @param polygon a mesh built from polygonTriangulation.build()
-   * @param sideOrientation takes the values BABYLON.Mesh.FRONTSIDE (default),
-   * BABYLON.Mesh.BACKSIDE or BABYLON.Mesh.DOUBLESIDE
+   * @param sideOrientation takes the values Mesh.FRONTSIDE (default),
+   * Mesh.BACKSIDE or Mesh.DOUBLESIDE
    * @param fUV an array of Vector4 elements used to set different images to the
    * top, rings and bottom respectively
    * @param fColors an array of Color3 elements used to set different colors to
@@ -462,8 +450,8 @@ public:
    * * flat when true creates a flat shaded mesh, optional, default true
    * * subdivisions increasing the subdivisions increases the number of faces,
    * optional, default 4
-   * * sideOrientation optional and takes the values : BABYLON.Mesh.FRONTSIDE
-   * (default), BABYLON.Mesh.BACKSIDE or BABYLON.Mesh.DOUBLESIDE
+   * * sideOrientation optional and takes the values : Mesh.FRONTSIDE (default),
+   * Mesh.BACKSIDE or Mesh.DOUBLESIDE
    * * frontUvs only usable when you create a double-sided mesh, used to choose
    * what parts of the texture image to crop and apply on the front side,
    * optional, default vector4 (0, 0, 1, 1)
@@ -501,8 +489,8 @@ public:
    * * flat when true creates a flat shaded mesh, optional, default true
    * * subdivisions increasing the subdivisions increases the number of faces,
    * optional, default 4
-   * * sideOrientation optional and takes the values : BABYLON.Mesh.FRONTSIDE
-   * (default), BABYLON.Mesh.BACKSIDE or BABYLON.Mesh.DOUBLESIDE
+   * * sideOrientation optional and takes the values : Mesh.FRONTSIDE (default),
+   * Mesh.BACKSIDE or Mesh.DOUBLESIDE
    * * frontUvs only usable when you create a double-sided mesh, used to choose
    * what parts of the texture image to crop and apply on the front side,
    * optional, default vector4 (0, 0, 1, 1)
@@ -528,8 +516,8 @@ public:
    * default 32
    * * p the number of windings around the z axis, optional,  default 2
    * * q the number of windings around the x axis, optional,  default 3
-   * * sideOrientation optional and takes the values : BABYLON.Mesh.FRONTSIDE
-   * (default), BABYLON.Mesh.BACKSIDE or BABYLON.Mesh.DOUBLESIDE
+   * * sideOrientation optional and takes the values : Mesh.FRONTSIDE (default),
+   * Mesh.BACKSIDE or Mesh.DOUBLESIDE
    * * frontUvs only usable when you create a double-sided mesh, used to choose
    * what parts of the texture image to crop and apply on the front side,
    * optional, default vector4 (0, 0, 1, 1)
@@ -584,9 +572,20 @@ public:
   static void ImportVertexData(const json& parsedVertexData,
                                Geometry& geometry);
 
+  /**
+   * @brief Hidden
+   * @param sideOrientation
+   * @param positions
+   * @param indices
+   * @param normals
+   * @param uvs
+   * @param frontUVs
+   * @param backUVs
+   */
   static void
-  _ComputeSides(unsigned int sideOrientation, Float32Array& positions,
-                Uint32Array& indices, Float32Array& normals, Float32Array& uvs,
+  _ComputeSides(std::optional<uint32_t> sideOrientation,
+                Float32Array& positions, Uint32Array& indices,
+                Float32Array& normals, Float32Array& uvs,
                 const std::optional<Vector4>& frontUVs = std::nullopt,
                 const std::optional<Vector4>& backUVs  = std::nullopt);
 
