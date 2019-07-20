@@ -2,21 +2,19 @@
 
 #include <babylon/collisions/picking_info.h>
 #include <babylon/culling/ray.h>
+#include <babylon/meshes/builders/sphere_builder.h>
 #include <babylon/meshes/mesh.h>
-#include <babylon/meshes/mesh_builder.h>
-#include <babylon/physics/helper/physics_force_and_contact_point.h>
-#include <babylon/physics/helper/physics_radial_explosion_event_data.h>
+#include <babylon/physics/helper/physics_event_data.h>
+#include <babylon/physics/helper/physics_hit_data.h>
 #include <babylon/physics/iphysics_enabled_object.h>
 #include <babylon/physics/physics_impostor.h>
 
 namespace BABYLON {
 
-PhysicsRadialExplosionEvent::PhysicsRadialExplosionEvent(Scene* scene)
-    : _scene{scene}, _sphere{nullptr}, _dataFetched{false}
+PhysicsRadialExplosionEvent::PhysicsRadialExplosionEvent(
+  Scene* scene, const PhysicsRadialExplosionEventOptions& options)
+    : _scene{scene}, _options{options}, _sphere{nullptr}, _dataFetched{false}
 {
-  _sphereOptions          = SphereOptions();
-  _sphereOptions.diameter = 1.f;
-  _sphereOptions.segments = 32;
 }
 
 PhysicsRadialExplosionEvent::~PhysicsRadialExplosionEvent()
@@ -29,34 +27,31 @@ PhysicsRadialExplosionEventData PhysicsRadialExplosionEvent::getData()
 
   return {
     _sphere, // sphere
-    _rays    // rays
   };
 }
 
-std::unique_ptr<PhysicsForceAndContactPoint>
-PhysicsRadialExplosionEvent::getImpostorForceAndContactPoint(
-  PhysicsImpostor* impostor, const Vector3& origin, float radius,
-  float strength, PhysicsRadialImpulseFalloff falloff)
+PhysicsHitDataPtr
+PhysicsRadialExplosionEvent::getImpostorHitData(PhysicsImpostor& impostor,
+                                                const Vector3& origin)
 {
-  if (impostor->mass == 0.f) {
+  if (impostor.mass == 0.f) {
     return nullptr;
   }
 
-  if (!_intersectsWithSphere(impostor, origin, radius)) {
+  if (!_intersectsWithSphere(impostor, origin, _options.radius)) {
     return nullptr;
   }
 
-  if (impostor->object->getClassName() != "Mesh"
-      && impostor->object->getClassName() != "InstancedMesh") {
+  if (impostor.object->getClassName() != "Mesh"
+      && impostor.object->getClassName() != "InstancedMesh") {
     return nullptr;
   }
 
-  auto impostorObjectCenter = impostor->getObjectCenter();
+  auto impostorObjectCenter = impostor.getObjectCenter();
   auto direction            = impostorObjectCenter.subtract(origin);
 
-  Ray ray{origin, direction, radius};
-  _rays.emplace_back(ray);
-  auto hit = ray.intersectsMesh(static_cast<AbstractMesh*>(impostor->object));
+  Ray ray{origin, direction, _options.radius};
+  auto hit = ray.intersectsMesh(static_cast<AbstractMesh*>(impostor.object));
 
   auto& contactPoint = hit.pickedPoint;
   if (!contactPoint) {
@@ -64,25 +59,38 @@ PhysicsRadialExplosionEvent::getImpostorForceAndContactPoint(
   }
 
   auto distanceFromOrigin = Vector3::Distance(origin, *contactPoint);
-  if (distanceFromOrigin > radius) {
+
+  if (distanceFromOrigin > _options.radius) {
     return nullptr;
   }
 
-  auto multiplier = (falloff == PhysicsRadialImpulseFalloff::Constant) ?
-                      strength :
-                      strength * (1.f - (distanceFromOrigin / radius));
+  auto multiplier
+    = (_options.falloff == PhysicsRadialImpulseFalloff::Constant) ?
+        _options.strength :
+        _options.strength * (1.f - (distanceFromOrigin / _options.radius));
 
   auto force = direction.multiplyByFloats(multiplier, multiplier, multiplier);
 
-  return std::make_unique<PhysicsForceAndContactPoint>(
-    PhysicsForceAndContactPoint{
-      force,        // force
-      *contactPoint // contactPoint
-    });
+  return std::make_shared<PhysicsHitData>(PhysicsHitData{
+    force,             // force
+    *contactPoint,     // contactPoint
+    distanceFromOrigin // distanceFromOrigin
+  });
+}
+
+void PhysicsRadialExplosionEvent::triggerAffectedImpostorsCallback(
+  const std::vector<PhysicsAffectedImpostorWithData>& affectedImpostorsWithData)
+{
+  if (_options.affectedImpostorsCallback) {
+    _options.affectedImpostorsCallback(affectedImpostorsWithData);
+  }
 }
 
 void PhysicsRadialExplosionEvent::dispose(bool force)
 {
+  if (!_sphere) {
+    return;
+  }
   if (force) {
     _sphere->dispose();
   }
@@ -96,16 +104,16 @@ void PhysicsRadialExplosionEvent::dispose(bool force)
 void PhysicsRadialExplosionEvent::_prepareSphere()
 {
   if (!_sphere) {
-    _sphere            = MeshBuilder::CreateSphere("radialExplosionEventSphere",
-                                        _sphereOptions, _scene);
+    _sphere = SphereBuilder::CreateSphere("radialExplosionEventSphere",
+                                          _options.sphere, _scene);
     _sphere->isVisible = false;
   }
 }
 
 bool PhysicsRadialExplosionEvent::_intersectsWithSphere(
-  PhysicsImpostor* impostor, const Vector3& origin, float radius)
+  PhysicsImpostor& impostor, const Vector3& origin, float radius)
 {
-  auto impostorObject = static_cast<AbstractMesh*>(impostor->object);
+  auto impostorObject = static_cast<AbstractMesh*>(impostor.object);
 
   _prepareSphere();
 

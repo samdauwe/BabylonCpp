@@ -505,6 +505,10 @@ class BABYLON_SHARED_EXPORT SphereOptions {
 
 public:
   SphereOptions();
+  SphereOptions(const SphereOptions& other);
+  SphereOptions(SphereOptions&& other);
+  SphereOptions& operator=(const SphereOptions& other);
+  SphereOptions& operator=(SphereOptions&& other);
   ~SphereOptions();
 
 public:

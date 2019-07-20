@@ -5,14 +5,14 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/math/vector3.h>
-#include <babylon/physics/helper/physics_helper_enums.h>
+#include <babylon/physics/helper/physics_event_options.h>
 
 namespace BABYLON {
 
 class EventState;
 struct IPhysicsEngine;
 class Mesh;
-struct PhysicsForceAndContactPoint;
+struct PhysicsHitData;
 class PhysicsImpostor;
 struct PhysicsUpdraftEventData;
 class Scene;
@@ -21,23 +21,18 @@ using MeshPtr           = std::shared_ptr<Mesh>;
 
 /**
  * @brief Represents a physics updraft event.
- * @see https://doc.babylonjs.com/how_to/using_the_physics_engine
  */
 class BABYLON_SHARED_EXPORT PhysicsUpdraftEvent {
 
 public:
   /**
    * @brief Initializes the physics updraft event.
-   * @param _scene BabylonJS scene
-   * @param _origin The origin position of the updraft
-   * @param _radius The radius of the updraft
-   * @param _strength The strength of the updraft
-   * @param _height The height of the updraft
-   * @param _updraftMode The mode of the updraft
+   * @param scene BabylonJS scene
+   * @param origin The origin position of the updraft
+   * @param options The options for the updraft event
    */
-  PhysicsUpdraftEvent(Scene* scene, Vector3 origin, float radius,
-                      float strength, float height,
-                      PhysicsUpdraftMode updraftMode);
+  PhysicsUpdraftEvent(Scene* scene, const Vector3& origin,
+                      const PhysicsUpdraftEventOptions& options);
   ~PhysicsUpdraftEvent();
 
   /**
@@ -57,14 +52,13 @@ public:
   void disable();
 
   /**
-   * @brief Disposes the sphere.
+   * @brief Disposes the cylinder.
    * @param force Specifies if the updraft should be disposed by force
    */
   void dispose(bool force = true);
 
 private:
-  std::unique_ptr<PhysicsForceAndContactPoint>
-  getImpostorForceAndContactPoint(PhysicsImpostor* impostor);
+  std::unique_ptr<PhysicsHitData> getImpostorHitData(PhysicsImpostor& impostor);
 
   void _tick();
 
@@ -72,21 +66,17 @@ private:
 
   void _prepareCylinder();
 
-  bool _intersectsWithCylinder(PhysicsImpostor* impostor);
+  bool _intersectsWithCylinder(PhysicsImpostor& impostor);
 
 private:
   Scene* _scene;
   Vector3 _origin;
-  float _radius;
-  float _strength;
-  float _height;
-  PhysicsUpdraftMode _updraftMode;
+  PhysicsUpdraftEventOptions _options;
   IPhysicsEnginePtr _physicsEngine;
   // the most upper part of the cylinder
   Vector3 _originTop;
   // used if the updraftMode is perpendicular
   Vector3 _originDirection;
-  float _updraftMultiplier;
   std::function<void(Scene* scene, EventState& es)> _tickCallback;
   MeshPtr _cylinder;
   // to keep the cylinders position, because normally the origin is in the

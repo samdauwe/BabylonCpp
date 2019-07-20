@@ -396,6 +396,74 @@ SphereOptions::SphereOptions()
 {
 }
 
+SphereOptions::SphereOptions(const SphereOptions& other)
+    : segments{other.segments}
+    , diameter{other.diameter}
+    , diameterX{other.diameterX}
+    , diameterY{other.diameterY}
+    , diameterZ{other.diameterZ}
+    , arc{other.arc}
+    , slice{other.slice}
+    , sideOrientation{other.sideOrientation}
+    , frontUVs{other.frontUVs}
+    , backUVs{other.backUVs}
+    , updatable{other.updatable}
+{
+}
+
+SphereOptions::SphereOptions(SphereOptions&& other)
+    : segments{std::move(other.segments)}
+    , diameter{std::move(other.diameter)}
+    , diameterX{std::move(other.diameterX)}
+    , diameterY{std::move(other.diameterY)}
+    , diameterZ{std::move(other.diameterZ)}
+    , arc{std::move(other.arc)}
+    , slice{std::move(other.slice)}
+    , sideOrientation{std::move(other.sideOrientation)}
+    , frontUVs{std::move(other.frontUVs)}
+    , backUVs{std::move(other.backUVs)}
+    , updatable{std::move(other.updatable)}
+{
+}
+
+SphereOptions& SphereOptions::operator=(const SphereOptions& other)
+{
+  if (&other != this) {
+    segments        = other.segments;
+    diameter        = other.diameter;
+    diameterX       = other.diameterX;
+    diameterY       = other.diameterY;
+    diameterZ       = other.diameterZ;
+    arc             = other.arc;
+    slice           = other.slice;
+    sideOrientation = other.sideOrientation;
+    frontUVs        = other.frontUVs;
+    backUVs         = other.backUVs;
+    updatable       = other.updatable;
+  }
+
+  return *this;
+}
+
+SphereOptions& SphereOptions::operator=(SphereOptions&& other)
+{
+  if (&other != this) {
+    segments        = std::move(other.segments);
+    diameter        = std::move(other.diameter);
+    diameterX       = std::move(other.diameterX);
+    diameterY       = std::move(other.diameterY);
+    diameterZ       = std::move(other.diameterZ);
+    arc             = std::move(other.arc);
+    slice           = std::move(other.slice);
+    sideOrientation = std::move(other.sideOrientation);
+    frontUVs        = std::move(other.frontUVs);
+    backUVs         = std::move(other.backUVs);
+    updatable       = std::move(other.updatable);
+  }
+
+  return *this;
+}
+
 SphereOptions::~SphereOptions()
 {
 }

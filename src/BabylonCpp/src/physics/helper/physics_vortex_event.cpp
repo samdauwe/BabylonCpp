@@ -2,38 +2,38 @@
 
 #include <babylon/culling/ray.h>
 #include <babylon/engines/scene.h>
+#include <babylon/meshes/builders/cylinder_builder.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
-#include <babylon/meshes/mesh_builder.h>
-#include <babylon/physics/helper/physics_force_and_contact_point.h>
-#include <babylon/physics/helper/physics_vortex_event_data.h>
+#include <babylon/physics/helper/physics_event_data.h>
+#include <babylon/physics/helper/physics_hit_data.h>
 #include <babylon/physics/iphysics_enabled_object.h>
 #include <babylon/physics/physics_engine.h>
 #include <babylon/physics/physics_impostor.h>
 
 namespace BABYLON {
 
-PhysicsVortexEvent::PhysicsVortexEvent(Scene* scene, Vector3 origin,
-                                       float radius, float strength,
-                                       float height)
+PhysicsVortexEvent::PhysicsVortexEvent(Scene* scene, const Vector3& origin,
+                                       const PhysicsVortexEventOptions& options)
     : _scene{scene}
     , _origin{origin}
-    , _radius{radius}
-    , _strength{strength}
-    , _height{height}
+    , _options{options}
+    , _physicsEngine{nullptr}
     , _originTop{Vector3::Zero()}
-    , _centripetalForceThreshold{0.7f}
-    , _updraftMultiplier{0.02f}
     , _tickCallback{nullptr}
     , _cylinder{nullptr}
     , _cylinderPosition{Vector3::Zero()}
     , _dataFetched{false}
-
 {
   _physicsEngine = _scene->getPhysicsEngine();
 
-  _origin.addToRef(Vector3(0.f, _height / 2.f, 0.f), _cylinderPosition);
-  _origin.addToRef(Vector3(0.f, _height, 0.f), _originTop);
+  _origin.addToRef(Vector3(0.f, _options.height / 2.f, 0.f), _cylinderPosition);
+  _origin.addToRef(Vector3(0.f, _options.height, 0.f), _originTop);
+
+  _tickCallback
+    = [this](Scene* /*scene*/, EventState & /*es*/) -> void { _tick(); };
+
+  _prepareCylinder();
 }
 
 PhysicsVortexEvent::~PhysicsVortexEvent()
@@ -51,14 +51,20 @@ PhysicsVortexEventData PhysicsVortexEvent::getData()
 
 void PhysicsVortexEvent::enable()
 {
+  _tick();
+  _scene->registerBeforeRender(_tickCallback);
 }
 
 void PhysicsVortexEvent::disable()
 {
+  _scene->unregisterBeforeRender(_tickCallback);
 }
 
 void PhysicsVortexEvent::dispose(bool force)
 {
+  if (!_cylinder) {
+    return;
+  }
   if (force) {
     _cylinder->dispose();
   }
@@ -69,10 +75,10 @@ void PhysicsVortexEvent::dispose(bool force)
   }
 }
 
-std::unique_ptr<PhysicsForceAndContactPoint>
-PhysicsVortexEvent::getImpostorForceAndContactPoint(PhysicsImpostor* impostor)
+std::unique_ptr<PhysicsHitData>
+PhysicsVortexEvent::getImpostorHitData(PhysicsImpostor& impostor)
 {
-  if (impostor->mass == 0.f) {
+  if (impostor.mass == 0.f) {
     return nullptr;
   }
 
@@ -80,69 +86,68 @@ PhysicsVortexEvent::getImpostorForceAndContactPoint(PhysicsImpostor* impostor)
     return nullptr;
   }
 
-  if (impostor->object->getClassName() != "Mesh"
-      && impostor->object->getClassName() != "InstancedMesh") {
+  if (impostor.object->getClassName() != "Mesh"
+      && impostor.object->getClassName() != "InstancedMesh") {
     return nullptr;
   }
 
-  auto impostorObjectCenter = impostor->getObjectCenter();
+  auto impostorObjectCenter = impostor.getObjectCenter();
   // the distance to the origin as if both objects were on a plane (Y-axis)
   Vector3 originOnPlane{_origin.x, impostorObjectCenter.y, _origin.z};
   auto originToImpostorDirection = impostorObjectCenter.subtract(originOnPlane);
 
-  Ray ray{originOnPlane, originToImpostorDirection, _radius};
-  auto hit = ray.intersectsMesh(static_cast<AbstractMesh*>(impostor->object));
+  Ray ray{originOnPlane, originToImpostorDirection, _options.radius};
+  auto hit = ray.intersectsMesh(static_cast<AbstractMesh*>(impostor.object));
   auto contactPoint = hit.pickedPoint;
   if (!contactPoint) {
     return nullptr;
   }
 
-  auto absoluteDistanceFromOrigin = hit.distance / _radius;
-  auto perpendicularDirection
-    = Vector3::Cross(originOnPlane, impostorObjectCenter).normalize();
-  auto contactPointTmp   = *contactPoint;
-  auto directionToOrigin = contactPointTmp.normalize();
-  if (absoluteDistanceFromOrigin > _centripetalForceThreshold) {
+  auto absoluteDistanceFromOrigin = hit.distance / _options.radius;
+
+  auto directionToOrigin = contactPoint->normalize();
+  if (absoluteDistanceFromOrigin > _options.centripetalForceThreshold) {
     directionToOrigin = directionToOrigin.negate();
   }
 
-  // TODO: find a more physically based solution
-  float forceX = 0.f;
-  float forceY = 0.f;
-  float forceZ = 0.f;
-  if (absoluteDistanceFromOrigin > _centripetalForceThreshold) {
-    forceX = directionToOrigin.x * _strength / 8.f;
-    forceY = directionToOrigin.y * _updraftMultiplier;
-    forceZ = directionToOrigin.z * _strength / 8.f;
+  auto forceX = 0.f, forceY = 0.f, forceZ = 0.f;
+  if (absoluteDistanceFromOrigin > _options.centripetalForceThreshold) {
+    forceX = directionToOrigin.x * _options.centripetalForceMultiplier;
+    forceY = directionToOrigin.y * _options.updraftForceMultiplier;
+    forceZ = directionToOrigin.z * _options.centripetalForceMultiplier;
   }
   else {
-    forceX = (perpendicularDirection.x + directionToOrigin.x) / 2.f;
-    forceY = _originTop.y * _updraftMultiplier;
-    forceZ = (perpendicularDirection.z + directionToOrigin.z) / 2.f;
+    const auto perpendicularDirection
+      = Vector3::Cross(originOnPlane, impostorObjectCenter).normalize();
+
+    forceX = (perpendicularDirection.x + directionToOrigin.x)
+             * _options.centrifugalForceMultiplier;
+    forceY = _originTop.y * _options.updraftForceMultiplier;
+    forceZ = (perpendicularDirection.z + directionToOrigin.z)
+             * _options.centrifugalForceMultiplier;
   }
 
-  Vector3 force{forceX, forceY, forceZ};
-  force = force.multiplyByFloats(_strength, _strength, _strength);
+  auto force = Vector3(forceX, forceY, forceZ);
+  force      = force.multiplyByFloats(_options.strength, _options.strength,
+                                 _options.strength);
 
-  return std::make_unique<PhysicsForceAndContactPoint>(
-    PhysicsForceAndContactPoint{
-      force,               // force,
-      impostorObjectCenter // contactPoint
-    });
+  return std::make_unique<PhysicsHitData>(PhysicsHitData{
+    force,                     // force,
+    impostorObjectCenter,      // contactPoint
+    absoluteDistanceFromOrigin // distanceFromOrigin
+  });
 }
 
 void PhysicsVortexEvent::_tick()
 {
   const auto& impostors = _physicsEngine->getImpostors();
   for (const auto& impostor : impostors) {
-    auto impostorForceAndContactPoint
-      = getImpostorForceAndContactPoint(impostor.get());
-    if (!impostorForceAndContactPoint) {
+    auto impostorHitData = getImpostorHitData(*impostor);
+    if (!impostorHitData) {
       return;
     }
 
-    impostor->applyForce(impostorForceAndContactPoint->force,
-                         impostorForceAndContactPoint->contactPoint);
+    impostor->applyForce(impostorHitData->force, impostorHitData->contactPoint);
   }
 }
 
@@ -150,19 +155,17 @@ void PhysicsVortexEvent::_prepareCylinder()
 {
   if (!_cylinder) {
     CylinderOptions options;
-    options.diameter = _radius * 2.f;
-    options.height   = _height;
+    options.height   = _options.height;
+    options.diameter = _options.radius * 2.f;
     _cylinder
-      = MeshBuilder::CreateCylinder("vortexEventCylinder", options, _scene);
+      = CylinderBuilder::CreateCylinder("vortexEventCylinder", options, _scene);
     _cylinder->isVisible = false;
   }
 }
 
-bool PhysicsVortexEvent::_intersectsWithCylinder(PhysicsImpostor* impostor)
+bool PhysicsVortexEvent::_intersectsWithCylinder(PhysicsImpostor& impostor)
 {
-  auto impostorObject = static_cast<AbstractMesh*>(impostor->object);
-
-  _prepareCylinder();
+  auto impostorObject = static_cast<AbstractMesh*>(impostor.object);
 
   _cylinder->position = _cylinderPosition;
 

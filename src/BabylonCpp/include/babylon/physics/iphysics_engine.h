@@ -12,6 +12,7 @@ struct IPhysicsEnginePlugin;
 class PhysicsImpostor;
 class PhysicsJoint;
 class PhysicsRaycastResult;
+using PhysicsImpostorPtr = std::shared_ptr<PhysicsImpostor>;
 
 /**
  * @brief Interface used to define a physics engine.
@@ -105,7 +106,7 @@ struct BABYLON_SHARED_EXPORT IPhysicsEngine {
    * @brief Gets the list of physic impostors
    * @returns an array of PhysicsImpostor
    */
-  virtual std::vector<std::shared_ptr<PhysicsImpostor>>& getImpostors() = 0;
+  virtual std::vector<PhysicsImpostorPtr>& getImpostors() = 0;
 
   /**
    * @brief Gets the impostor for a physics enabled object

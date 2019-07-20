@@ -1,27 +1,24 @@
 #include <babylon/physics/helper/physics_updraft_event.h>
 
 #include <babylon/engines/scene.h>
+#include <babylon/meshes/builders/cylinder_builder.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
-#include <babylon/meshes/mesh_builder.h>
-#include <babylon/physics/helper/physics_force_and_contact_point.h>
-#include <babylon/physics/helper/physics_updraft_event_data.h>
+#include <babylon/physics/helper/physics_event_data.h>
+#include <babylon/physics/helper/physics_hit_data.h>
 #include <babylon/physics/iphysics_enabled_object.h>
 #include <babylon/physics/physics_engine.h>
 #include <babylon/physics/physics_impostor.h>
 
 namespace BABYLON {
 
-PhysicsUpdraftEvent::PhysicsUpdraftEvent(Scene* scene, Vector3 origin,
-                                         float radius, float strength,
-                                         float height,
-                                         PhysicsUpdraftMode updraftMode)
+PhysicsUpdraftEvent::PhysicsUpdraftEvent(
+  Scene* scene, const Vector3& origin,
+  const PhysicsUpdraftEventOptions& options)
     : _scene{scene}
     , _origin{origin}
-    , _radius{radius}
-    , _strength{strength}
-    , _height{height}
-    , _updraftMode{updraftMode}
+    , _options{options}
+    , _physicsEngine{nullptr}
     , _originTop{Vector3::Zero()}
     , _originDirection{Vector3::Zero()}
     , _tickCallback{nullptr}
@@ -31,12 +28,17 @@ PhysicsUpdraftEvent::PhysicsUpdraftEvent(Scene* scene, Vector3 origin,
 {
   _physicsEngine = _scene->getPhysicsEngine();
 
-  _origin.addToRef(Vector3(0.f, _height / 2.f, 0.f), _cylinderPosition);
-  _origin.addToRef(Vector3(0.f, _height, 0.f), _originTop);
+  _origin.addToRef(Vector3(0.f, _options.height / 2.f, 0.f), _cylinderPosition);
+  _origin.addToRef(Vector3(0.f, _options.height, 0.f), _originTop);
 
-  if (_updraftMode == PhysicsUpdraftMode::Perpendicular) {
+  if (_options.updraftMode == PhysicsUpdraftMode::Perpendicular) {
     _originDirection = _origin.subtract(_originTop).normalize();
   }
+
+  _tickCallback
+    = [this](Scene* /*scene*/, EventState & /*es*/) -> void { _tick(); };
+
+  _prepareCylinder();
 }
 
 PhysicsUpdraftEvent::~PhysicsUpdraftEvent()
@@ -54,14 +56,20 @@ PhysicsUpdraftEventData PhysicsUpdraftEvent::getData()
 
 void PhysicsUpdraftEvent::enable()
 {
+  _tick();
+  _scene->registerBeforeRender(_tickCallback);
 }
 
 void PhysicsUpdraftEvent::disable()
 {
+  _scene->unregisterBeforeRender(_tickCallback);
 }
 
 void PhysicsUpdraftEvent::dispose(bool force)
 {
+  if (!_cylinder) {
+    return;
+  }
   if (force) {
     _cylinder->dispose();
   }
@@ -72,10 +80,10 @@ void PhysicsUpdraftEvent::dispose(bool force)
   }
 }
 
-std::unique_ptr<PhysicsForceAndContactPoint>
-PhysicsUpdraftEvent::getImpostorForceAndContactPoint(PhysicsImpostor* impostor)
+std::unique_ptr<PhysicsHitData>
+PhysicsUpdraftEvent::getImpostorHitData(PhysicsImpostor& impostor)
 {
-  if (impostor->mass == 0.f) {
+  if (impostor.mass == 0.f) {
     return nullptr;
   }
 
@@ -83,39 +91,39 @@ PhysicsUpdraftEvent::getImpostorForceAndContactPoint(PhysicsImpostor* impostor)
     return nullptr;
   }
 
-  auto impostorObjectCenter = impostor->getObjectCenter();
+  auto impostorObjectCenter = impostor.getObjectCenter();
 
   Vector3 direction;
-  if (_updraftMode == PhysicsUpdraftMode::Perpendicular) {
+  if (_options.updraftMode == PhysicsUpdraftMode::Perpendicular) {
     direction = _originDirection;
   }
   else {
     direction = impostorObjectCenter.subtract(_originTop);
   }
 
-  auto multiplier = _strength * -1.f;
+  auto distanceFromOrigin = Vector3::Distance(_origin, impostorObjectCenter);
+
+  auto multiplier = _options.strength * -1.f;
 
   auto force = direction.multiplyByFloats(multiplier, multiplier, multiplier);
 
-  return std::make_unique<PhysicsForceAndContactPoint>(
-    PhysicsForceAndContactPoint{
-      force,               // force,
-      impostorObjectCenter // contactPoint
-    });
+  return std::make_unique<PhysicsHitData>(PhysicsHitData{
+    force,                // force,
+    impostorObjectCenter, // contactPoint
+    distanceFromOrigin    // distanceFromOrigin
+  });
 }
 
 void PhysicsUpdraftEvent::_tick()
 {
   const auto& impostors = _physicsEngine->getImpostors();
   for (const auto& impostor : impostors) {
-    auto impostorForceAndContactPoint
-      = getImpostorForceAndContactPoint(impostor.get());
-    if (!impostorForceAndContactPoint) {
+    auto impostorHitData = getImpostorHitData(*impostor);
+    if (!impostorHitData) {
       return;
     }
 
-    impostor->applyForce(impostorForceAndContactPoint->force,
-                         impostorForceAndContactPoint->contactPoint);
+    impostor->applyForce(impostorHitData->force, impostorHitData->contactPoint);
   }
 }
 
@@ -123,19 +131,17 @@ void PhysicsUpdraftEvent::_prepareCylinder()
 {
   if (!_cylinder) {
     CylinderOptions options;
-    options.diameter = _radius * 2.f;
-    options.height   = _height;
-    _cylinder
-      = MeshBuilder::CreateCylinder("updraftEventCylinder", options, _scene);
+    options.height   = _options.height;
+    options.diameter = _options.radius * 2.f;
+    _cylinder = CylinderBuilder::CreateCylinder("updraftEventCylinder", options,
+                                                _scene);
     _cylinder->isVisible = false;
   }
 }
 
-bool PhysicsUpdraftEvent::_intersectsWithCylinder(PhysicsImpostor* impostor)
+bool PhysicsUpdraftEvent::_intersectsWithCylinder(PhysicsImpostor& impostor)
 {
-  auto impostorObject = static_cast<AbstractMesh*>(impostor->object);
-
-  _prepareCylinder();
+  auto impostorObject = static_cast<AbstractMesh*>(impostor.object);
 
   _cylinder->position = _cylinderPosition;
 
