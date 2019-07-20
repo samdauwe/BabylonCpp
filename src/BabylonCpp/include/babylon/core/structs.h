@@ -232,8 +232,10 @@ struct PointerEvent : public Event {
       , offsetY{other.offsetY}
       , pointerId{other.pointerId}
       , pointerType{other.pointerType}
+      , altKey{other.altKey}
       , ctrlKey{other.ctrlKey}
       , shiftKey{other.shiftKey}
+      , metaKey{other.metaKey}
       , button{other.button}
       , buttons{other.buttons}
       , srcElement{other.srcElement}
@@ -248,8 +250,10 @@ struct PointerEvent : public Event {
       , offsetY{std::move(other.offsetY)}
       , pointerId{std::move(other.pointerId)}
       , pointerType{std::move(other.pointerType)}
+      , altKey{std::move(other.altKey)}
       , ctrlKey{std::move(other.ctrlKey)}
       , shiftKey{std::move(other.shiftKey)}
+      , metaKey{std::move(other.metaKey)}
       , button{std::move(other.button)}
       , buttons{std::move(other.buttons)}
       , srcElement{std::move(other.srcElement)}
@@ -266,8 +270,10 @@ struct PointerEvent : public Event {
       offsetY     = other.offsetY;
       pointerId   = other.pointerId;
       pointerType = other.pointerType;
+      altKey      = other.altKey;
       ctrlKey     = other.ctrlKey;
       shiftKey    = other.shiftKey;
+      metaKey     = other.metaKey;
       button      = other.button;
       buttons     = other.buttons;
       srcElement  = other.srcElement;
@@ -286,8 +292,10 @@ struct PointerEvent : public Event {
       offsetY     = std::move(other.offsetY);
       pointerId   = std::move(other.pointerId);
       pointerType = std::move(other.pointerType);
+      altKey      = std::move(other.altKey);
       ctrlKey     = std::move(other.ctrlKey);
       shiftKey    = std::move(other.shiftKey);
+      metaKey     = std::move(other.metaKey);
       button      = std::move(other.button);
       buttons     = std::move(other.buttons);
       srcElement  = std::move(other.srcElement);
@@ -303,8 +311,10 @@ struct PointerEvent : public Event {
   int offsetY   = 0;
   int pointerId = 0;
   PointerType pointerType;
+  bool altKey   = false;
   bool ctrlKey  = false;
   bool shiftKey = false;
+  bool metaKey  = false;
   MouseButtonType button;
   int buttons         = 0;
   ICanvas* srcElement = nullptr;
@@ -312,6 +322,15 @@ struct PointerEvent : public Event {
   {
   }
 }; // end of struct PointerEvent
+
+struct PointerTouch {
+  int x                   = 0;
+  int y                   = 0;
+  int pointerId           = 0;
+  PointerType pointerType = PointerType::UNDEFINED;
+  bool isPaning           = false;
+  bool isPinching         = false;
+}; // end of struct PointerTouch
 
 struct MouseWheelEvent : public PointerEvent {
   MouseWheelEvent()

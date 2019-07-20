@@ -3,63 +3,23 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/cameras/arc_rotate_camera.h>
-#include <babylon/cameras/icamera_input.h>
-#include <babylon/core/structs.h>
-#include <babylon/events/pointer_info.h>
-#include <babylon/misc/observer.h>
+#include <babylon/cameras/inputs/base_camera_pointers_input.h>
 
 namespace BABYLON {
-
-struct ArcRotateCameraPointer {
-  int x;
-  int y;
-  int pointerId;
-  PointerType type;
-}; // end of struct ArcRotateCameraPointer
-
-struct MultiTouchPanPosition {
-  int x;
-  int y;
-  bool isPaning;
-  bool isPinching;
-}; // end of struct MultiTouchPanPosition
 
 /**
  * @brief Manage the pointers inputs to control an arc rotate camera.
  * @see http://doc.babylonjs.com/how_to/customizing_camera_inputs
  */
 class BABYLON_SHARED_EXPORT ArcRotateCameraPointersInput
-    : public ICameraInput<ArcRotateCamera> {
+    : public BaseCameraPointersInput<ArcRotateCamera> {
 
 public:
   /**
    * @brief Instantiate the input.
    */
   ArcRotateCameraPointersInput();
-  virtual ~ArcRotateCameraPointersInput();
-
-  /**
-   * @brief Attach the input controls to a specific dom element to get the input
-   * from.
-   * @param element Defines the element the controls should be listened from
-   * @param noPreventDefault Defines whether event caught by the controls should
-   * call preventdefault()
-   * (https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)
-   */
-  void attachControl(ICanvas* canvas, bool noPreventDefault = false) override;
-
-  /**
-   * @brief Detach the current controls from the specified dom element.
-   * @param element Defines the element to stop listening the inputs from
-   */
-  void detachControl(ICanvas* canvas) override;
-
-  /**
-   * @brief Update the current camera state depending on the inputs that have
-   * been used this frame. This is a dynamically created lambda to avoid the
-   * performance penalty of looping for inputs in the render loop.
-   */
-  void checkInputs() override;
+  ~ArcRotateCameraPointersInput() override;
 
   /**
    * @brief Gets the class name of the current intput.
@@ -68,17 +28,50 @@ public:
   const std::string getClassName() const override;
 
   /**
-   * @brief Get the friendly name associated with the input class.
-   * @returns the input friendly name
+   * @brief Called on pointer POINTERMOVE event if only a single touch is
+   * active. Override this method to provide functionality.
    */
-  const std::string getSimpleName() const override;
+  void onTouch(const std::optional<PointerTouch>& point, int offsetX,
+               int offsetY) override;
+
+  /**
+   * @brief Called on pointer POINTERDOUBLETAP event.
+   * Override this method to provide functionality on POINTERDOUBLETAP event.
+   */
+  void onDoubleTap(const std::string& type) override;
+
+  /**
+   * @brief Called on pointer POINTERMOVE event if multiple touches are active.
+   * Override this method to provide functionality.
+   */
+  void onMultiTouch(
+    const std::optional<PointerTouch>& pointA,
+    const std::optional<PointerTouch>& pointB,
+    float previousPinchSquaredDistance, float pinchSquaredDistance,
+    const std::optional<PointerTouch>& previousMultiTouchPanPosition,
+    const std::optional<PointerTouch>& multiTouchPanPosition) override;
+
+  /**
+   * @brief Called each time a new POINTERDOWN event occurs. Ie, for each button
+   * press.
+   * Override this method to provide functionality.
+   */
+  void onButtonDown(PointerEvent& evt) override;
+
+  /**
+   * @brief Called each time a new POINTERUP event occurs. Ie, for each button
+   * release.
+   * Override this method to provide functionality.
+   */
+  void onButtonUp(PointerEvent& evt) override;
+
+  /**
+   * @brief Called when window becomes inactive.
+   * Override this method to provide functionality.
+   */
+  void onLostFocus() override;
 
 public:
-  /**
-   * Defines the buttons associated with the input to handle camera move.
-   */
-  std::array<MouseButtonType, 3> buttons;
-
   /**
    * Defines the pointer angular sensibility  along the X axis or how fast is
    * the camera rotating.
@@ -126,29 +119,9 @@ public:
   bool pinchInwards;
 
 private:
-  ICanvas* _canvas;
-  Engine* _engine;
-  bool _noPreventDefault;
   bool _isPanClick;
-  std::function<void(PointerInfo* p, EventState& es)> _pointerInput;
-  Observer<PointerInfo>::Ptr _observer;
-  std::function<void(KeyboardEvent& e)> _onKeyDown;
-  std::function<void(KeyboardEvent& e)> _onKeyUp;
-  std::function<void(MouseEvent& e)> _onMouseMove;
-  std::function<void(GestureEvent& e)> _onGesture;
-  std::function<void(FocusEvent& e)> _onLostFocus;
-  std::function<void(PointerEvent&& e)> _onContextMenu;
-  // pointers
-  ArcRotateCameraPointer _cacheSoloPointer;
-  ArcRotateCameraPointer _pointA;
-  ArcRotateCameraPointer _pointB;
-  bool _cacheSoloPointerDefined;
-  bool _pointADefined;
-  bool _pointBDefined;
-  float _previousPinchSquaredDistance;
-  float _initialDistance;
-  unsigned int _twoFingerActivityCount;
-  MultiTouchPanPosition _previousMultiTouchPanPosition;
+  size_t _twoFingerActivityCount;
+  bool _isPinching;
 
 }; // end of class ArcRotateCameraPointersInput
 

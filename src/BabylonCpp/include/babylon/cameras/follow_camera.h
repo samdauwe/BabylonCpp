@@ -2,6 +2,7 @@
 #define BABYLON_CAMERAS_FOLLOW_CAMERA_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/cameras/follow_camera_inputs_manager.h>
 #include <babylon/cameras/target_camera.h>
 
 namespace BABYLON {
@@ -35,6 +36,25 @@ public:
   Type type() const override;
 
   /**
+   * @brief Attached controls to the current camera.
+   * @param element Defines the element the controls should be listened from
+   * @param noPreventDefault Defines whether event caught by the controls should
+   * call preventdefault()
+   * (https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)
+   */
+  void attachControl(ICanvas* element, bool noPreventDefault = false,
+                     bool useCtrlForPanning = true,
+                     MouseButtonType panningMouseButton
+                     = MouseButtonType::RIGHT) override;
+
+  /**
+   * @brief Detach the current controls from the camera.
+   * The camera will stop reacting to inputs.
+   * @param element Defines the element to stop listening the inputs from
+   */
+  void detachControl(ICanvas* element) override;
+
+  /**
    * @brief Hidden
    */
   void _checkInputs() override;
@@ -61,6 +81,7 @@ protected:
 
 private:
   void _follow(const AbstractMeshPtr& cameraTarget);
+  void _checkLimits();
 
 public:
   /**
@@ -69,15 +90,53 @@ public:
   float radius;
 
   /**
+   * Minimum allowed distance of the camera to the axis of rotation
+   * (The camera can not get closer).
+   * This can help limiting how the Camera is able to move in the scene.
+   */
+  std::optional<float> lowerRadiusLimit;
+
+  /**
+   * Maximum allowed distance of the camera to the axis of rotation
+   * (The camera can not get further).
+   * This can help limiting how the Camera is able to move in the scene.
+   */
+  std::optional<float> upperRadiusLimit;
+
+  /**
    * Define a rotation offset between the camera and the object it follows
    */
   float rotationOffset;
+
+  /**
+   * Minimum allowed angle to camera position relative to target object.
+   * This can help limiting how the Camera is able to move in the scene.
+   */
+  std::optional<float> lowerRotationOffsetLimit;
+
+  /**
+   * Maximum allowed angle to camera position relative to target object.
+   * This can help limiting how the Camera is able to move in the scene.
+   */
+  std::optional<float> upperRotationOffsetLimit;
 
   /**
    * Define a height offset between the camera and the object it follows.
    * It can help following an object from the top (like a car chaing a plane)
    */
   float heightOffset;
+
+  /**
+   * Minimum allowed height of camera position relative to target object.
+   * This can help limiting how the Camera is able to move in the scene.
+   */
+  std::optional<float> lowerHeightOffsetLimit;
+
+  /**
+   * Maximum allowed height of camera position relative to target object.
+   * This can help limiting how the Camera is able to move in the scene.
+   */
+  std::optional<float> upperHeightOffsetLimit;
 
   /**
    * Define how fast the camera can accelerate to follow it s target.
@@ -93,6 +152,11 @@ public:
    * Define the target of the camera.
    */
   AbstractMeshPtr lockedTarget;
+
+  /**
+   * Defines the input associated with the camera.
+   */
+  std::unique_ptr<FollowCameraInputsManager> inputs;
 
   static bool NodeConstructorAdded;
 

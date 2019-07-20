@@ -6,6 +6,7 @@
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/cameras/fly_camera.h>
+#include <babylon/cameras/follow_camera.h>
 #include <babylon/core/logging.h>
 
 namespace BABYLON {
@@ -166,6 +167,7 @@ void CameraInputsManager<TCamera>::parse(const json& /*parsedCamera*/)
 template class CameraInputsManager<ArcRotateCamera>;
 template class CameraInputsManager<Camera>;
 template class CameraInputsManager<FlyCamera>;
+template class CameraInputsManager<FollowCamera>;
 template class CameraInputsManager<FreeCamera>;
 
 } // end of namespace BABYLON

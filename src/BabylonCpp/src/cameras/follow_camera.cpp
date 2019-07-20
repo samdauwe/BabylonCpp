@@ -21,12 +21,23 @@ FollowCamera::FollowCamera(const std::string& iName, const Vector3& iPosition,
                            Scene* scene, const AbstractMeshPtr& iLockedTarget)
     : TargetCamera{iName, iPosition, scene}
     , radius{12.f}
+    , lowerRadiusLimit{std::nullopt}
+    , upperRadiusLimit{std::nullopt}
     , rotationOffset{0.f}
+    , lowerRotationOffsetLimit{std::nullopt}
+    , upperRotationOffsetLimit{std::nullopt}
     , heightOffset{4.f}
+    , lowerHeightOffsetLimit{std::nullopt}
+    , upperHeightOffsetLimit{std::nullopt}
     , cameraAcceleration{0.05f}
     , maxCameraSpeed{20.f}
     , lockedTarget{iLockedTarget}
+    , inputs{std::make_unique<FollowCameraInputsManager>(this)}
 {
+  inputs->addKeyboard().addMouseWheel().addPointers();
+  // Uncomment the following line when the relevant handlers have been
+  // implemented.
+  // inputs->addKeyboard().addMouseWheel().addPointers().addVRDeviceOrientation();
 }
 
 FollowCamera::~FollowCamera()
@@ -44,7 +55,7 @@ void FollowCamera::_follow(const AbstractMeshPtr& cameraTarget)
     return;
   }
 
-  float yRotation;
+  auto yRotation = 0.f;
   if (cameraTarget->rotationQuaternion()) {
     Matrix rotMatrix;
     cameraTarget->rotationQuaternion()->toRotationMatrix(rotMatrix);
@@ -53,17 +64,17 @@ void FollowCamera::_follow(const AbstractMeshPtr& cameraTarget)
   else {
     yRotation = cameraTarget->rotation().y;
   }
-  float radians       = Tools::ToRadians(rotationOffset) + yRotation;
+  auto radians        = Tools::ToRadians(rotationOffset) + yRotation;
   auto targetPosition = cameraTarget->getAbsolutePosition();
-  float targetX       = targetPosition.x + std::sin(radians) * radius;
-  float targetZ       = targetPosition.z + std::cos(radians) * radius;
+  auto targetX        = targetPosition.x + std::sin(radians) * radius;
+  auto targetZ        = targetPosition.z + std::cos(radians) * radius;
 
-  float dx = targetX - position().x;
-  float dy = (targetPosition.y + heightOffset) - position().y;
-  float dz = targetZ - position().z;
-  float vx = dx * cameraAcceleration * 2.f; // this is set to .05
-  float vy = dy * cameraAcceleration;
-  float vz = dz * cameraAcceleration * 2.f;
+  auto dx = targetX - position().x;
+  auto dy = (targetPosition.y + heightOffset) - position().y;
+  auto dz = targetZ - position().z;
+  auto vx = dx * cameraAcceleration * 2.f; // this is set to .05
+  auto vy = dy * cameraAcceleration;
+  auto vz = dz * cameraAcceleration * 2.f;
 
   if (vx > maxCameraSpeed || vx < -maxCameraSpeed) {
     vx = vx < 1.f ? -maxCameraSpeed : maxCameraSpeed;
@@ -81,11 +92,60 @@ void FollowCamera::_follow(const AbstractMeshPtr& cameraTarget)
   setTarget(targetPosition);
 }
 
+void FollowCamera::attachControl(ICanvas* element, bool noPreventDefault,
+                                 bool /*useCtrlForPanning*/,
+                                 MouseButtonType /*panningMouseButton*/
+)
+{
+  inputs->attachElement(element, noPreventDefault);
+
+  _reset = []() -> void {};
+}
+
+void FollowCamera::detachControl(ICanvas* element)
+{
+  inputs->detachElement(element);
+
+  if (_reset) {
+    _reset();
+  }
+}
+
 void FollowCamera::_checkInputs()
 {
+  inputs->checkInputs();
+  _checkLimits();
   TargetCamera::_checkInputs();
   if (lockedTarget) {
     _follow(lockedTarget);
+  }
+}
+
+void FollowCamera::_checkLimits()
+{
+  if (lowerRadiusLimit.has_value() && radius < *lowerRadiusLimit) {
+    radius = *lowerRadiusLimit;
+  }
+  if (upperRadiusLimit.has_value() && radius > *upperRadiusLimit) {
+    radius = *upperRadiusLimit;
+  }
+
+  if (lowerHeightOffsetLimit.has_value()
+      && heightOffset < *lowerHeightOffsetLimit) {
+    heightOffset = *lowerHeightOffsetLimit;
+  }
+  if (upperHeightOffsetLimit.has_value()
+      && heightOffset > *upperHeightOffsetLimit) {
+    heightOffset = *upperHeightOffsetLimit;
+  }
+
+  if (lowerRotationOffsetLimit.has_value()
+      && rotationOffset < *lowerRotationOffsetLimit) {
+    rotationOffset = *lowerRotationOffsetLimit;
+  }
+  if (upperRotationOffsetLimit.has_value()
+      && rotationOffset > *upperRotationOffsetLimit) {
+    rotationOffset = *upperRotationOffsetLimit;
   }
 }
 
