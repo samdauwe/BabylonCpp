@@ -184,13 +184,13 @@ int Tools::GetExponentOfTwo(int value, int max, unsigned int mode)
   int pot;
 
   switch (mode) {
-    case EngineConstants::SCALEMODE_FLOOR:
+    case Constants::SCALEMODE_FLOOR:
       pot = Tools::FloorPOT(value);
       break;
-    case EngineConstants::SCALEMODE_NEAREST:
+    case Constants::SCALEMODE_NEAREST:
       pot = Tools::NearestPOT(value);
       break;
-    case EngineConstants::SCALEMODE_CEILING:
+    case Constants::SCALEMODE_CEILING:
       pot = Tools::CeilingPOT(value);
       break;
   }
@@ -568,25 +568,8 @@ void Tools::ReadFile(
 
 void Tools::CheckExtends(Vector3& v, Vector3& min, Vector3& max)
 {
-  if (v.x < min.x) {
-    min.x = v.x;
-  }
-  if (v.y < min.y) {
-    min.y = v.y;
-  }
-  if (v.z < min.z) {
-    min.z = v.z;
-  }
-
-  if (v.x > max.x) {
-    max.x = v.x;
-  }
-  if (v.y > max.y) {
-    max.y = v.y;
-  }
-  if (v.z > max.z) {
-    max.z = v.z;
-  }
+  min.minimizeInPlace(v);
+  max.maximizeInPlace(v);
 }
 
 std::string Tools::RandomId()

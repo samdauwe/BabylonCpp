@@ -161,8 +161,8 @@ void SpriteManager::_appendSpriteVertex(size_t index, const Sprite& sprite,
 {
   size_t arrayOffset = index * 16;
 
-  float offsetXVal = static_cast<float>(offsetX);
-  float offsetYVal = static_cast<float>(offsetY);
+  auto offsetXVal = static_cast<float>(offsetX);
+  auto offsetYVal = static_cast<float>(offsetY);
 
   if (offsetX == 0) {
     offsetXVal = _epsilon;
@@ -291,8 +291,8 @@ void SpriteManager::render()
 
   // Sprites
   auto deltaTime = engine->getDeltaTime();
-  size_t max     = std::min(_capacity, sprites.size());
-  int rowSize    = baseSize.width / cellWidth;
+  auto max       = std::min(_capacity, sprites.size());
+  auto rowSize   = baseSize.width / cellWidth;
 
   auto offset   = 0u;
   auto noSprite = true;
@@ -357,10 +357,10 @@ void SpriteManager::render()
   engine->setColorWrite(true);
   effect->setBool("alphaTest", false);
 
-  engine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
+  engine->setAlphaMode(Constants::ALPHA_COMBINE);
   engine->drawElementsType(Material::TriangleFillMode, 0,
                            static_cast<int>((offset / 4.f) * 6));
-  engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
+  engine->setAlphaMode(Constants::ALPHA_DISABLE);
 }
 
 void SpriteManager::dispose(bool /*doNotRecurse*/,

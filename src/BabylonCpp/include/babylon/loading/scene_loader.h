@@ -2,8 +2,9 @@
 #define BABYLON_LOADING_SCENE_LOADER_H
 
 #include <optional>
-#include <variant>
 #include <unordered_map>
+#include <variant>
+
 #include <babylon/babylon_api.h>
 #include <babylon/misc/observable.h>
 

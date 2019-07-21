@@ -2,6 +2,7 @@
 
 #include <babylon/actions/action_event.h>
 #include <babylon/actions/action_manager.h>
+#include <babylon/engines/constants.h>
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/sprites/isprite_manager.h>
@@ -128,19 +129,19 @@ std::optional<PickingInfo> SpriteSceneComponent::_pointerDown(
         switch (evt.button) {
           case MouseButtonType::LEFT:
             pickResult->pickedSprite->actionManager->processTrigger(
-              ActionManager::OnLeftPickTrigger,
+              Constants::ACTION_OnLeftPickTrigger,
               ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, scene,
                                                evt));
             break;
           case MouseButtonType::MIDDLE:
             pickResult->pickedSprite->actionManager->processTrigger(
-              ActionManager::OnCenterPickTrigger,
+              Constants::ACTION_OnCenterPickTrigger,
               ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, scene,
                                                evt));
             break;
           case MouseButtonType::RIGHT:
             pickResult->pickedSprite->actionManager->processTrigger(
-              ActionManager::OnRightPickTrigger,
+              Constants::ACTION_OnRightPickTrigger,
               ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, scene,
                                                evt));
             break;
@@ -149,7 +150,7 @@ std::optional<PickingInfo> SpriteSceneComponent::_pointerDown(
         }
         if (pickResult->pickedSprite->actionManager) {
           pickResult->pickedSprite->actionManager->processTrigger(
-            ActionManager::OnPickDownTrigger,
+            Constants::ACTION_OnPickDownTrigger,
             ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, scene,
                                              evt));
         }
@@ -173,13 +174,13 @@ std::optional<PickingInfo> SpriteSceneComponent::_pointerUp(
       if (spritePickResult->hit && spritePickResult->pickedSprite) {
         if (spritePickResult->pickedSprite->actionManager) {
           spritePickResult->pickedSprite->actionManager->processTrigger(
-            ActionManager::OnPickUpTrigger,
+            Constants::ACTION_OnPickUpTrigger,
             ActionEvent::CreateNewFromSprite(spritePickResult->pickedSprite,
                                              scene, evt));
           if (spritePickResult->pickedSprite->actionManager) {
             if (!scene->_isPointerSwiping()) {
               spritePickResult->pickedSprite->actionManager->processTrigger(
-                ActionManager::OnPickTrigger,
+                Constants::ACTION_OnPickTrigger,
                 ActionEvent::CreateNewFromSprite(spritePickResult->pickedSprite,
                                                  scene, evt));
             }
@@ -189,7 +190,7 @@ std::optional<PickingInfo> SpriteSceneComponent::_pointerUp(
       if (scene->_pickedDownSprite && scene->_pickedDownSprite->actionManager
           && scene->_pickedDownSprite != spritePickResult->pickedSprite) {
         scene->_pickedDownSprite->actionManager->processTrigger(
-          ActionManager::OnPickOutTrigger,
+          Constants::ACTION_OnPickOutTrigger,
           ActionEvent::CreateNewFromSprite(scene->_pickedDownSprite, scene,
                                            evt));
       }

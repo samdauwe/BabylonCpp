@@ -6,7 +6,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
-#include <babylon/engines/engine_constants.h>
+#include <babylon/engines/constants.h>
 #include <babylon/misc/ivalue_gradient.h>
 
 namespace BABYLON {
@@ -89,8 +89,7 @@ struct BABYLON_SHARED_EXPORT Tools {
    * @returns closest exponent of two of the given value
    */
   static int GetExponentOfTwo(int value, int max,
-                              unsigned int mode
-                              = EngineConstants::SCALEMODE_NEAREST);
+                              unsigned int mode = Constants::SCALEMODE_NEAREST);
 
   /**
    * @brief Extracts the filename from a path.

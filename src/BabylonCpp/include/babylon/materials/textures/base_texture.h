@@ -122,6 +122,35 @@ public:
   ISize getBaseSize();
 
   /**
+   * @brief Update the sampling mode of the texture.
+   * Default is Trilinear mode.
+   *
+   * | Value | Type               | Description |
+   * | ----- | ------------------ | ----------- |
+   * | 1     | NEAREST_SAMPLINGMODE or NEAREST_NEAREST_MIPLINEAR  | Nearest is:
+   *mag = nearest, min = nearest, mip = linear |
+   * | 2     | BILINEAR_SAMPLINGMODE or LINEAR_LINEAR_MIPNEAREST | Bilinear is:
+   *mag = linear, min = linear, mip = nearest |
+   * | 3     | TRILINEAR_SAMPLINGMODE or LINEAR_LINEAR_MIPLINEAR | Trilinear is:
+   *mag = linear, min = linear, mip = linear |
+   * | 4     | NEAREST_NEAREST_MIPNEAREST |             |
+   * | 5    | NEAREST_LINEAR_MIPNEAREST |             |
+   * | 6    | NEAREST_LINEAR_MIPLINEAR |             |
+   * | 7    | NEAREST_LINEAR |             |
+   * | 8    | NEAREST_NEAREST |             |
+   * | 9   | LINEAR_NEAREST_MIPNEAREST |             |
+   * | 10   | LINEAR_NEAREST_MIPLINEAR |             |
+   * | 11   | LINEAR_LINEAR |             |
+   * | 12   | LINEAR_NEAREST |             |
+   *
+   *    > _mag_: magnification filter (close to the viewer)
+   *    > _min_: minification filter (far from the viewer)
+   *    > _mip_: filter used between mip map levels
+   *@param samplingMode Define the new sampling mode of the texture
+   */
+  void updateSamplingMode(unsigned int samplingMode);
+
+  /**
    * @brief Scales the texture if is `canRescale()`
    * @param ratio the resize factor we want to use to rescale
    */
@@ -136,7 +165,9 @@ public:
    * @brief Hidden
    */
   InternalTexturePtr _getFromCache(const std::string& url, bool noMipmap,
-                                   unsigned int sampling = 0);
+                                   unsigned int sampling = 0,
+                                   const std::optional<bool>& invertY
+                                   = std::nullopt);
   /**
    * @brief Hidden
    */
@@ -206,6 +237,11 @@ protected:
   bool get_hasAlpha() const;
   void set_coordinatesMode(unsigned int value);
   unsigned int get_coordinatesMode() const;
+  bool get_isCube() const;
+  void set_isCube(bool value);
+  bool get_is3D() const;
+  void set_is3D(bool value);
+  bool get_noMipmap() const;
 
   /**
    * @brief Gets whether or not the texture contains RGBD data.
@@ -323,12 +359,12 @@ public:
   /**
    * Define if the texture is a cube texture or if false a 2d texture.
    */
-  bool isCube;
+  Property<BaseTexture, bool> isCube;
 
   /**
    * Define if the texture is a 3d texture (webgl 2) or if false a 2d texture.
    */
-  bool is3D;
+  Property<BaseTexture, bool> is3D;
 
   /**
    * Define if the texture contains data in gamma space (most of the png/jpg
@@ -346,6 +382,11 @@ public:
    * Is Z inverted in the texture (useful in a cube texture).
    */
   bool invertZ;
+
+  /**
+   * Are mip maps generated for this texture or not.
+   */
+  ReadOnlyProperty<BaseTexture, bool> noMipmap;
 
   /**
    * Hidden

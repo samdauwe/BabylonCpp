@@ -21,16 +21,17 @@ BaseTexture::BaseTexture(Scene* scene)
     , coordinatesIndex{0}
     , coordinatesMode{this, &BaseTexture::get_coordinatesMode,
                       &BaseTexture::set_coordinatesMode}
-    , wrapU{TextureConstants::WRAP_ADDRESSMODE}
-    , wrapV{TextureConstants::WRAP_ADDRESSMODE}
-    , wrapR{TextureConstants::WRAP_ADDRESSMODE}
+    , wrapU{Constants::TEXTURE_WRAP_ADDRESSMODE}
+    , wrapV{Constants::TEXTURE_WRAP_ADDRESSMODE}
+    , wrapR{Constants::TEXTURE_WRAP_ADDRESSMODE}
     , anisotropicFilteringLevel{BaseTexture::
                                   DEFAULT_ANISOTROPIC_FILTERING_LEVEL}
-    , isCube{false}
-    , is3D{false}
+    , isCube{this, &BaseTexture::get_isCube, &BaseTexture::set_isCube}
+    , is3D{this, &BaseTexture::get_is3D, &BaseTexture::set_is3D}
     , gammaSpace{true}
     , isRGBD{this, &BaseTexture::get_isRGBD}
     , invertZ{false}
+    , noMipmap{this, &BaseTexture::get_noMipmap}
     , lodLevelInAlpha{false}
     , lodGenerationOffset{this, &BaseTexture::get_lodGenerationOffset,
                           &BaseTexture::set_lodGenerationOffset}
@@ -39,7 +40,7 @@ BaseTexture::BaseTexture(Scene* scene)
     , isRenderTarget{false}
     , uid{this, &BaseTexture::get_uid}
     , onDispose{this, &BaseTexture::set_onDispose}
-    , delayLoadState{EngineConstants::DELAYLOADSTATE_NONE}
+    , delayLoadState{Constants::DELAYLOADSTATE_NONE}
     , _texture{nullptr}
     , isBlocking{this, &BaseTexture::get_isBlocking,
                  &BaseTexture::set_isBlocking}
@@ -53,7 +54,7 @@ BaseTexture::BaseTexture(Scene* scene)
     , _lodTextureMid{this, &BaseTexture::get__lodTextureMid}
     , _lodTextureLow{this, &BaseTexture::get__lodTextureLow}
     , _hasAlpha{false}
-    , _coordinatesMode{TextureConstants::EXPLICIT_MODE}
+    , _coordinatesMode{Constants::TEXTURE_EXPLICIT_MODE}
     , _scene{scene ? scene : Engine::LastCreatedScene()}
     , _uid{Tools::RandomId()}
     , _onDisposeObserver{nullptr}
@@ -78,6 +79,7 @@ Type BaseTexture::type() const
 void BaseTexture::addToScene(const BaseTexturePtr& newTexture)
 {
   if (_scene) {
+    uniqueId = _scene->getUniqueId();
     _scene->textures.emplace_back(newTexture);
   }
 }
@@ -89,8 +91,8 @@ void BaseTexture::set_hasAlpha(bool value)
   }
   _hasAlpha = value;
   if (_scene) {
-    _scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag
-                                    | Material::MiscDirtyFlag);
+    _scene->markAllMaterialsAsDirty(Constants::MATERIAL_TextureDirtyFlag
+                                    | Constants::MATERIAL_MiscDirtyFlag);
   }
 }
 
@@ -106,13 +108,54 @@ void BaseTexture::set_coordinatesMode(unsigned int value)
   }
   _coordinatesMode = value;
   if (_scene) {
-    _scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag);
+    _scene->markAllMaterialsAsDirty(Constants::MATERIAL_TextureDirtyFlag);
   }
 }
 
 unsigned int BaseTexture::get_coordinatesMode() const
 {
   return _coordinatesMode;
+}
+
+bool BaseTexture::get_isCube() const
+{
+  if (!_texture) {
+    return false;
+  }
+
+  return _texture->isCube;
+}
+
+void BaseTexture::set_isCube(bool value)
+{
+  if (!_texture) {
+    return;
+  }
+
+  _texture->isCube = value;
+}
+
+bool BaseTexture::get_is3D() const
+{
+  if (!_texture) {
+    return false;
+  }
+
+  return _texture->is3D;
+}
+
+void BaseTexture::set_is3D(bool value)
+{
+  if (!_texture) {
+    return;
+  }
+
+  _texture->is3D = value;
+}
+
+bool BaseTexture::get_noMipmap() const
+{
+  return false;
 }
 
 bool BaseTexture::get_isRGBD() const
@@ -212,7 +255,7 @@ bool BaseTexture::isReadyOrNotBlocking()
 
 bool BaseTexture::isReady()
 {
-  if (delayLoadState == EngineConstants::DELAYLOADSTATE_NOTLOADED) {
+  if (delayLoadState == Constants::DELAYLOADSTATE_NOTLOADED) {
     delayLoad();
     return false;
   }
@@ -256,6 +299,21 @@ ISize BaseTexture::getBaseSize()
   return Size(_texture->baseWidth, _texture->baseHeight);
 }
 
+void BaseTexture::updateSamplingMode(unsigned int samplingMode)
+{
+  if (!_texture) {
+    return;
+  }
+
+  auto scene = getScene();
+
+  if (!scene) {
+    return;
+  }
+
+  scene->getEngine()->updateTextureSamplingMode(samplingMode, _texture);
+}
+
 void BaseTexture::scale(float /*ratio*/)
 {
 }
@@ -265,9 +323,10 @@ bool BaseTexture::canRescale()
   return false;
 }
 
-InternalTexturePtr BaseTexture::_getFromCache(const std::string& url,
-                                              bool noMipmap,
-                                              unsigned int sampling)
+InternalTexturePtr
+BaseTexture::_getFromCache(const std::string& url, bool noMipmap,
+                           unsigned int sampling,
+                           const std::optional<bool>& invertY)
 {
   if (!_scene) {
     return nullptr;
@@ -275,11 +334,13 @@ InternalTexturePtr BaseTexture::_getFromCache(const std::string& url,
 
   auto& texturesCache = _scene->getEngine()->getLoadedTexturesCache();
   for (auto& texturesCacheEntry : texturesCache) {
-    if ((texturesCacheEntry->url.compare(url) == 0)
-        && texturesCacheEntry->generateMipMaps != noMipmap) {
-      if (!sampling || sampling == texturesCacheEntry->samplingMode) {
-        texturesCacheEntry->incrementReferences();
-        return texturesCacheEntry;
+    if (!invertY.has_value() || *invertY == texturesCacheEntry->invertY) {
+      if ((texturesCacheEntry->url.compare(url) == 0)
+          && texturesCacheEntry->generateMipMaps != noMipmap) {
+        if (!sampling || sampling == texturesCacheEntry->samplingMode) {
+          texturesCacheEntry->incrementReferences();
+          return texturesCacheEntry;
+        }
       }
     }
   }
@@ -317,21 +378,19 @@ std::unique_ptr<BaseTexture> BaseTexture::clone() const
 unsigned int BaseTexture::get_textureType() const
 {
   if (!_texture) {
-    return EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+    return Constants::TEXTURETYPE_UNSIGNED_INT;
   }
 
-  return _texture->type ? _texture->type :
-                          EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+  return _texture->type ? _texture->type : Constants::TEXTURETYPE_UNSIGNED_INT;
 }
 
 unsigned int BaseTexture::get_textureFormat() const
 {
   if (!_texture) {
-    return EngineConstants::TEXTUREFORMAT_RGBA;
+    return Constants::TEXTUREFORMAT_RGBA;
   }
 
-  return _texture->format ? _texture->format :
-                            EngineConstants::TEXTUREFORMAT_RGBA;
+  return _texture->format ? _texture->format : Constants::TEXTUREFORMAT_RGBA;
 }
 
 ArrayBufferView BaseTexture::readPixels(unsigned int faceIndex, int iLevel,
