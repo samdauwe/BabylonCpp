@@ -103,13 +103,13 @@ def main():
         "andOrNotEvaluator.ts", "assetsManager.ts", "decorators.ts",
         "deepCopier.ts", "deferred.ts", "domManagement.ts", "filesInput.ts",
         "filesInputStore.ts", "logger.ts", "precisionDate.ts", "promise.ts",
-        "screenshotTools.ts", "smartArray.ts", "stringDictionary.ts", "tags.ts",
-        "typeStore.ts", "videoRecorder.ts", "virtualJoystick.ts",
-        "webRequest.ts", "workerPool.ts",
+        "sceneSerializer.ts", "screenshotTools.ts", "smartArray.ts",
+        "stringDictionary.ts", "tags.ts", "typeStore.ts", "videoRecorder.ts",
+        "virtualJoystick.ts", "webRequest.ts", "workerPool.ts",
         # Offline
         "database.ts", "IOfflineProvider.ts",
         # Physics / Plugins
-        "cannonJSPlugin.ts", "oimoJSPlugin.ts"
+        "ammoJSPlugin.ts", "cannonJSPlugin.ts", "oimoJSPlugin.ts"
     ]
     # Create mapping from BabylonJS version to full path
     for version in BabylonJsVersions:
