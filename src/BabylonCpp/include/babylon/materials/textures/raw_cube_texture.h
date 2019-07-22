@@ -2,7 +2,7 @@
 #define BABYLON_MATERIALS_TEXTURES_RAW_CUBE_TEXTURE_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/engines/engine_constants.h>
+#include <babylon/engines/constants.h>
 #include <babylon/materials/textures/cube_texture.h>
 #include <babylon/materials/textures/texture_constants.h>
 
@@ -20,21 +20,20 @@ struct BABYLON_SHARED_EXPORT RawCubeTexture : public CubeTexture {
    * @param size defines the size of the textures
    * @param format defines the format of the data
    * @param type defines the type of the data (like
-   * BABYLON.Engine.TEXTURETYPE_UNSIGNED_INT)
+   * Engine.TEXTURETYPE_UNSIGNED_INT)
    * @param generateMipMaps  defines if the engine should generate the mip
    * levels
    * @param invertY defines if data must be stored with Y axis inverted
    * @param samplingMode defines the required sampling mode (like
-   * BABYLON.Texture.NEAREST_SAMPLINGMODE)
+   * Texture.NEAREST_SAMPLINGMODE)
    * @param compression defines the compression used (null by default)
    */
   RawCubeTexture(Scene* scene, const std::vector<ArrayBufferView>& data,
-                 int size,
-                 unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA,
-                 unsigned int type = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+                 int size, unsigned int format = Constants::TEXTUREFORMAT_RGBA,
+                 unsigned int type    = Constants::TEXTURETYPE_UNSIGNED_INT,
                  bool generateMipMaps = false, bool invertY = false,
                  unsigned int samplingMode
-                 = TextureConstants::TRILINEAR_SAMPLINGMODE,
+                 = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
                  const std::string& compression = "");
   ~RawCubeTexture();
 
@@ -42,8 +41,8 @@ struct BABYLON_SHARED_EXPORT RawCubeTexture : public CubeTexture {
    * @brief Updates the raw cube texture.
    * @param data defines the data to store
    * @param format defines the data format
-   * @param type defines the type fo the data
-   * (BABYLON.Engine.TEXTURETYPE_UNSIGNED_INT by default)
+   * @param type defines the type fo the data (Engine.TEXTURETYPE_UNSIGNED_INT
+   * by default)
    * @param invertY defines if data must be stored with Y axis inverted
    * @param compression defines the compression used (null by default)
    * @param level defines which level of the texture to update

@@ -24,7 +24,7 @@ DynamicTexture::DynamicTexture(const std::string& iName,
   wrapU   = TextureConstants::CLAMP_ADDRESSMODE;
   wrapV   = TextureConstants::CLAMP_ADDRESSMODE;
 
-  _samplingMode = samplingMode;
+  _generateMipMaps = generateMipMaps;
 
   if (options.canvas) {
     _canvas  = options.canvas;

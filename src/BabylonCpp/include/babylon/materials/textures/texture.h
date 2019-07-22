@@ -8,6 +8,7 @@
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/math/matrix.h>
+#include <babylon/misc/iinspectable.h>
 #include <babylon/misc/observable.h>
 
 namespace BABYLON {
@@ -53,47 +54,20 @@ public:
    * during construction.
    * @param url the url of the texture
    * @param buffer the buffer of the texture (defaults to null)
+   * @param onLoad callback called when the texture is loaded  (defaults to
+   * null)
    */
   void updateURL(
     const std::string& iUrl,
     const std::optional<std::variant<std::string, ArrayBuffer, Image>>& buffer
-    = std::nullopt);
+    = std::nullopt,
+    const std::function<void(InternalTexture*, EventState&)>& onLoad = nullptr);
 
   /**
    * @brief Finish the loading sequence of a texture flagged as delayed load.
    * @hidden
    */
   void delayLoad(const std::string& forcedExtension = "") override;
-
-  /**
-   * @brief Update the sampling mode of the texture.
-   * Default is Trilinear mode.
-   *
-   * | Value | Type               | Description |
-   * | ----- | ------------------ | ----------- |
-   * | 1     | NEAREST_SAMPLINGMODE or NEAREST_NEAREST_MIPLINEAR  | Nearest is:
-   * mag = nearest, min = nearest, mip = linear |
-   * | 2     | BILINEAR_SAMPLINGMODE or LINEAR_LINEAR_MIPNEAREST | Bilinear is:
-   * mag = linear, min = linear, mip = nearest |
-   * | 3     | TRILINEAR_SAMPLINGMODE or
-   * LINEAR_LINEAR_MIPLINEAR | Trilinear is: mag = linear, min = linear, mip =
-   * linear |
-   * | 4     | NEAREST_NEAREST_MIPNEAREST |             |
-   * | 5     | NEAREST_LINEAR_MIPNEAREST |             |
-   * | 6     | NEAREST_LINEAR_MIPLINEAR |             |
-   * | 7     | NEAREST_LINEAR |             |
-   * | 8     | NEAREST_NEAREST |             |
-   * | 9     | LINEAR_NEAREST_MIPNEAREST |             |
-   * | 10    | LINEAR_NEAREST_MIPLINEAR |             |
-   * | 11    | LINEAR_LINEAR |             |
-   * | 12    | LINEAR_NEAREST |             |
-   *
-   *    > _mag_: magnification filter (close to the viewer)
-   *    > _min_: minification filter (far from the viewer)
-   *    > _mip_: filter used between mip map levels
-   *@param samplingMode Define the new sampling mode of the texture
-   */
-  void updateSamplingMode(unsigned int samplingMode);
 
   /**
    * @brief Get the current texture matrix which includes the requested
@@ -123,7 +97,7 @@ public:
   json serialize() const;
 
   /**
-   * @brief Get the current class name of the texture usefull for serialization
+   * @brief Get the current class name of the texture useful for serialization
    * or dynamic coding.
    * @returns "Texture"
    */
@@ -204,7 +178,7 @@ public:
     const std::optional<std::variant<std::string, ArrayBuffer, Image>>& buffer,
     Scene* scene, bool deleteBuffer = false, bool noMipmap = false,
     bool invertY              = true,
-    unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
+    unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
     const std::function<void()>& onLoad = nullptr,
     const std::function<void(const std::string& message,
                              const std::string& exception)>& onError
@@ -255,11 +229,27 @@ protected:
     bool deleteBuffer                         = false,
     const std::optional<unsigned int>& format = std::nullopt);
 
-  bool get_noMipmap() const;
+  bool get_noMipmap() const override;
+
+  /**
+   * @brief Is the texture preventing material to render while loading.
+   * If false, a default texture will be used instead of the loading one during
+   * the preparation step.
+   */
   void set_isBlocking(bool value) override;
   bool get_isBlocking() const override;
+
+  /**
+   * @brief Get the current sampling mode associated with the texture.
+   */
   unsigned int get_samplingMode() const;
+
+  /**
+   * @brief Gets a boolean indicating if the texture needs to be inverted on the
+   * y axis during loading.
+   */
   bool get_invertY() const;
+
   Observable<Texture>& get_onLoadObservable();
 
 private:
@@ -332,19 +322,15 @@ public:
   float wRotationCenter;
 
   /**
-   * Are mip maps generated for this texture or not.
+   * @brief List of inspectable custom properties (used by the Inspector).
+   * @see https://doc.babylonjs.com/how_to/debug_layer#extensibility
    */
-  ReadOnlyProperty<Texture, bool> noMipmap;
+  std::vector<IInspectable> inspectableCustomProperties;
 
   /**
    * Hidden
    */
   bool _invertY;
-
-  /**
-   * Get the current sampling mode associated with the texture.
-   */
-  unsigned int _samplingMode;
 
   /**
    * Get the current sampling mode associated with the texture.
@@ -363,7 +349,12 @@ public:
   ReadOnlyProperty<Texture, Observable<Texture>> onLoadObservable;
 
 protected:
-  const std::optional<unsigned int> _format;
+  /**
+   * Get the current sampling mode associated with the texture.
+   */
+  unsigned int _initialSamplingMode;
+
+  std::optional<unsigned int> _format;
   Observable<Texture> _onLoadObservable;
   bool _isBlocking;
 
@@ -372,9 +363,9 @@ private:
   std::unique_ptr<Matrix> _rowGenerationMatrix;
   std::unique_ptr<Matrix> _cachedTextureMatrix;
   std::unique_ptr<Matrix> _projectionModeMatrix;
-  Vector3 _t0;
-  Vector3 _t1;
-  Vector3 _t2;
+  std::unique_ptr<Vector3> _t0;
+  std::unique_ptr<Vector3> _t1;
+  std::unique_ptr<Vector3> _t2;
 
   float _cachedUOffset;
   float _cachedVOffset;
@@ -384,7 +375,7 @@ private:
   float _cachedVAng;
   float _cachedWAng;
   int _cachedProjectionMatrixId;
-  unsigned int _cachedCoordinatesMode;
+  int _cachedCoordinatesMode;
   std::optional<std::variant<std::string, ArrayBuffer, Image>> _buffer;
   bool _deleteBuffer;
   std::function<void(InternalTexture*, EventState&)> _delayedOnLoad;

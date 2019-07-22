@@ -241,7 +241,7 @@ protected:
   void set_isCube(bool value);
   bool get_is3D() const;
   void set_is3D(bool value);
-  bool get_noMipmap() const;
+  virtual bool get_noMipmap() const;
 
   /**
    * @brief Gets whether or not the texture contains RGBD data.

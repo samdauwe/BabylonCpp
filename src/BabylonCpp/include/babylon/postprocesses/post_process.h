@@ -238,7 +238,7 @@ protected:
     unsigned int samplingMode = TextureConstants::NEAREST_SAMPLINGMODE,
     Engine* engine = nullptr, bool reusable = false,
     const std::string& defines   = "",
-    unsigned int textureType     = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+    unsigned int textureType     = Constants::TEXTURETYPE_UNSIGNED_INT,
     const std::string& vertexUrl = "postprocess",
     const std::unordered_map<std::string, unsigned int>& indexParameters = {},
     bool blockCompilation = false);

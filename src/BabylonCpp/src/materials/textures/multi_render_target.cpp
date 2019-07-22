@@ -50,7 +50,7 @@ MultiRenderTarget::MultiRenderTarget(
     else {
       types.emplace_back(options && (*options).defaultType ?
                            *(*options).defaultType :
-                           EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+                           Constants::TEXTURETYPE_UNSIGNED_INT);
     }
 
     if (options && i < (*options).samplingModes.size()) {
@@ -73,15 +73,15 @@ MultiRenderTarget::MultiRenderTarget(
   _size = size;
 
   _multiRenderTargetOptions = IMultiRenderTargetOptions{
-    generateMipMaps,                          // generateMipMaps
-    types,                                    // types
-    samplingModes,                            // samplingModes
-    generateDepthBuffer,                      // generateDepthBuffer
-    generateStencilBuffer,                    // generateStencilBuffer
-    generateDepthTexture,                     // generateDepthTexture
-    doNotChangeAspectRatio,                   // doNotChangeAspectRatio
-    count,                                    // textureCount
-    EngineConstants::TEXTURETYPE_UNSIGNED_INT // defaultType
+    generateMipMaps,                    // generateMipMaps
+    types,                              // types
+    samplingModes,                      // samplingModes
+    generateDepthBuffer,                // generateDepthBuffer
+    generateStencilBuffer,              // generateStencilBuffer
+    generateDepthTexture,               // generateDepthTexture
+    doNotChangeAspectRatio,             // doNotChangeAspectRatio
+    count,                              // textureCount
+    Constants::TEXTURETYPE_UNSIGNED_INT // defaultType
   };
 
   _createInternalTextures();
