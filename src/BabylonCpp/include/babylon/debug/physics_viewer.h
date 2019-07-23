@@ -17,10 +17,12 @@ class Mesh;
 class PhysicsImpostor;
 class Scene;
 class StandardMaterial;
-using AbstractMeshPtr     = std::shared_ptr<AbstractMesh>;
-using MaterialPtr         = std::shared_ptr<Material>;
-using MeshPtr             = std::shared_ptr<Mesh>;
-using StandardMaterialPtr = std::shared_ptr<StandardMaterial>;
+class UtilityLayerRenderer;
+using AbstractMeshPtr         = std::shared_ptr<AbstractMesh>;
+using MaterialPtr             = std::shared_ptr<Material>;
+using MeshPtr                 = std::shared_ptr<Mesh>;
+using StandardMaterialPtr     = std::shared_ptr<StandardMaterial>;
+using UtilityLayerRendererPtr = std::shared_ptr<UtilityLayerRenderer>;
 
 namespace Debug {
 
@@ -40,8 +42,11 @@ public:
   /**
    * @brief Renders a specified physic impostor.
    * @param impostor defines the impostor to render
+   * @param targetMesh defines the mesh represented by the impostor
+   * @returns the new debug mesh used to render the impostor
    */
-  void showImpostor(PhysicsImpostor* impostor);
+  AbstractMeshPtr showImpostor(PhysicsImpostor* impostor,
+                               const MeshPtr& targetMesh = nullptr);
 
   /**
    * @brief Hides a specified physic impostor.
@@ -64,7 +69,10 @@ private:
   MaterialPtr _getDebugMaterial(Scene* scene);
   AbstractMeshPtr _getDebugBoxMesh(Scene* scene);
   AbstractMeshPtr _getDebugSphereMesh(Scene* scene);
-  AbstractMeshPtr _getDebugMesh(PhysicsImpostor* impostor, Scene* scene);
+  AbstractMeshPtr _getDebugCylinderMesh(Scene* scene);
+  AbstractMeshPtr _getDebugMeshMesh(const MeshPtr& mesh, Scene* scene);
+  AbstractMeshPtr _getDebugMesh(PhysicsImpostor* impostor,
+                                const MeshPtr& targetMesh);
 
 protected:
   /**
@@ -94,9 +102,12 @@ protected:
 
 private:
   std::function<void(Scene* scene, EventState& es)> _renderFunction;
+  UtilityLayerRendererPtr _utilityLayer;
   MeshPtr _debugBoxMesh;
   MeshPtr _debugSphereMesh;
+  MeshPtr _debugCylinderMesh;
   StandardMaterialPtr _debugMaterial;
+  std::vector<MeshPtr> _debugMeshMeshes;
 
 }; // end of class PhysicsViewer
 

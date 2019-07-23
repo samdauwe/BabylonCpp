@@ -85,6 +85,8 @@ def main():
         "webXRCamera.ts", "webXREnterExitUI.ts", "webXRInput.ts",
         "webXRExperienceHelper.ts", "webXRManagedOutputCanvas.ts",
         "webXRSessionManager.ts",
+        # Debug
+        "debugLayer.ts",
         # Engines
         "nullEngine.ts",
         # Engines / Extensions

@@ -5,13 +5,14 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
 
-class LinesMesh;
 class Scene;
 class Vector3;
-using LinesMeshPtr = std::shared_ptr<LinesMesh>;
+class TransformNode;
+using TransformNodePtr = std::shared_ptr<TransformNode>;
 
 namespace Debug {
 
@@ -25,8 +26,16 @@ public:
    * @brief Creates a new AxesViewer.
    * @param scene defines the hosting scene
    * @param scaleLines defines a number used to scale line length (1 by default)
+   * @param renderingGroupId defines a number used to set the renderingGroupId
+   * of the meshes (2 by default)
+   * @param xAxis defines the node hierarchy used to render the x-axis
+   * @param yAxis defines the node hierarchy used to render the y-axis
+   * @param zAxis defines the node hierarchy used to render the z-axis
    */
-  AxesViewer(Scene* scene, float scaleLines = 1.f);
+  AxesViewer(Scene* scene, float scaleLines = 1.f,
+             const std::optional<int>& renderingGroupId = 2,
+             TransformNodePtr xAxis = nullptr, TransformNodePtr yAxis = nullptr,
+             TransformNodePtr zAxis = nullptr);
   ~AxesViewer();
 
   /**
@@ -40,9 +49,34 @@ public:
               const Vector3& yaxis, const Vector3& zaxis);
 
   /**
+   * @brief Creates an instance of this axes viewer.
+   * @returns a new axes viewer with instanced meshes
+   */
+  std::unique_ptr<AxesViewer> createInstance() const;
+
+  /**
    * @brief Releases resources.
    */
   void dispose();
+
+protected:
+  /**
+   * @brief Gets the node hierarchy used to render x-axis.
+   */
+  TransformNodePtr& get_xAxis();
+
+  /**
+   * @brief Gets the node hierarchy used to render y-axis.
+   */
+  TransformNodePtr& get_yAxis();
+
+  /**
+   * @brief Gets the node hierarchy used to render z-axis.
+   */
+  TransformNodePtr& get_zAxis();
+
+private:
+  static void _SetRenderingGroupId(const TransformNodePtr& node, int id);
 
 public:
   /**
@@ -55,14 +89,27 @@ public:
    */
   float scaleLines;
 
-private:
-  std::vector<Vector3> _xline;
-  std::vector<Vector3> _yline;
-  std::vector<Vector3> _zline;
+  /**
+   * Gets the node hierarchy used to render x-axis
+   */
+  ReadOnlyProperty<AxesViewer, TransformNodePtr> xAxis;
 
-  LinesMeshPtr _xmesh;
-  LinesMeshPtr _ymesh;
-  LinesMeshPtr _zmesh;
+  /**
+   * Gets the node hierarchy used to render y-axis
+   */
+  ReadOnlyProperty<AxesViewer, TransformNodePtr> yAxis;
+
+  /**
+   * Gets the node hierarchy used to render z-axis
+   */
+  ReadOnlyProperty<AxesViewer, TransformNodePtr> zAxis;
+
+private:
+  TransformNodePtr _xAxis;
+  TransformNodePtr _yAxis;
+  TransformNodePtr _zAxis;
+  float _scaleLinesFactor;
+  bool _instanced;
 
 }; // end of class AxesViewer
 

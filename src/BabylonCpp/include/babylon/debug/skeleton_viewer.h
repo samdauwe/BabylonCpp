@@ -16,8 +16,10 @@ class Matrix;
 class Scene;
 class Skeleton;
 class Vector3;
-using BonePtr      = std::shared_ptr<Bone>;
-using LinesMeshPtr = std::shared_ptr<LinesMesh>;
+class UtilityLayerRenderer;
+using BonePtr                 = std::shared_ptr<Bone>;
+using LinesMeshPtr            = std::shared_ptr<LinesMesh>;
+using UtilityLayerRendererPtr = std::shared_ptr<UtilityLayerRenderer>;
 
 namespace Debug {
 
@@ -54,6 +56,11 @@ public:
 
 protected:
   /**
+   * @brief Returns the mesh used to render the bones.
+   */
+  LinesMeshPtr& get_debugMesh();
+
+  /**
    * @brief Sets a boolean indicating if the viewer is enabled.
    */
   void set_isEnabled(bool value);
@@ -78,6 +85,11 @@ public:
    * Gets or sets the color used to render the skeleton
    */
   Color3 color;
+
+  /**
+   * Returns the mesh used to render the bones
+   */
+  ReadOnlyProperty<SkeletonViewer, LinesMeshPtr> debugMesh;
 
   /**
    * Defines the skeleton to render
@@ -108,6 +120,7 @@ private:
   LinesMeshPtr _debugMesh;
   bool _isEnabled;
   std::function<void(Scene*, EventState&)> _renderFunction;
+  UtilityLayerRendererPtr _utilityLayer;
 
 }; // end of class SkeletonViewer
 
