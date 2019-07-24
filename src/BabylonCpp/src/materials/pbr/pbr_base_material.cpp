@@ -23,7 +23,7 @@
 #include <babylon/meshes/instanced_mesh.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
-#include <babylon/misc/texture_tools.h>
+#include <babylon/misc/brdf_texture_tools.h>
 
 namespace BABYLON {
 
@@ -125,7 +125,7 @@ PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
     return _renderTargets;
   };
 
-  _environmentBRDFTexture = TextureTools::GetEnvironmentBRDFTexture(scene);
+  _environmentBRDFTexture = BRDFTextureTools::GetEnvironmentBRDFTexture(scene);
 }
 
 PBRBaseMaterial::~PBRBaseMaterial()

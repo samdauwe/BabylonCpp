@@ -5,7 +5,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/materials/color_curves.h>
 #include <babylon/materials/image_processing_configuration.h>
-#include <babylon/misc/texture_tools.h>
+#include <babylon/misc/brdf_texture_tools.h>
 
 namespace BABYLON {
 
@@ -245,7 +245,7 @@ PBRMaterial::PBRMaterial(const std::string& iName, Scene* scene)
     useRadianceOcclusion                      = true;
     unlit                                     = false;
   }
-  _environmentBRDFTexture = TextureTools::GetEnvironmentBRDFTexture(scene);
+  _environmentBRDFTexture = BRDFTextureTools::GetEnvironmentBRDFTexture(scene);
 }
 
 PBRMaterial::~PBRMaterial()

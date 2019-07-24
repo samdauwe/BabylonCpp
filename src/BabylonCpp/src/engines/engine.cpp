@@ -3093,11 +3093,11 @@ void Engine::updateRawTexture(const InternalTexturePtr& texture,
 
   // babylon's internalSizedFomat but gl's texImage2D internalFormat
   auto internalSizedFomat = _getRGBABufferInternalSizedFormat(type, format);
+
   // babylon's internalFormat but gl's texImage2D format
   auto internalFormat = _getInternalFormat(format);
   auto textureType    = _getWebGLTextureType(type);
   _bindTextureDirectly(GL::TEXTURE_2D, texture, true);
-
   _unpackFlipY(invertY ? true : false);
 
   if (!_doNotHandleContextLost) {
@@ -4497,7 +4497,7 @@ void Engine::updateRawCubeTexture(const InternalTexturePtr& texture,
   auto internalFormat     = _getInternalFormat(format);
   auto internalSizedFomat = _getRGBABufferInternalSizedFormat(type);
 
-  bool needConversion = false;
+  auto needConversion = false;
   if (internalFormat == GL::RGB) {
     internalFormat = GL::RGBA;
     needConversion = true;
@@ -4610,8 +4610,8 @@ InternalTexturePtr Engine::createRawCubeTexture(
                      "generation forced to false.")
   }
 
-  int width  = size;
-  int height = width;
+  auto width  = size;
+  auto height = width;
 
   texture->width  = width;
   texture->height = height;
@@ -4624,14 +4624,13 @@ InternalTexturePtr Engine::createRawCubeTexture(
   if (!isPot) {
     generateMipMaps = false;
   }
-  texture->generateMipMaps = generateMipMaps;
 
   // Upload data if needed. The texture won't be ready until then.
   if (!data.empty()) {
     updateRawCubeTexture(texture, data, format, type, invertY, compression);
   }
 
-  _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, texture);
+  _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, texture, true);
 
   // Filters
   if (!data.empty() && generateMipMaps) {

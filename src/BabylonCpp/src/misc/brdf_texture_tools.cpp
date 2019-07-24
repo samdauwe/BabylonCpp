@@ -87,7 +87,9 @@ void BRDFTextureTools::_ExpandDefaultBRDFTexture(
 
 BaseTexturePtr BRDFTextureTools::GetEnvironmentBRDFTexture(Scene* scene)
 {
+
   if (!scene->environmentBRDFTexture) {
+#if 0
     // Forces Delayed Texture Loading to prevent undefined error whilst setting
     // RGBD values.
     auto useDelayedTextureLoading   = scene->useDelayedTextureLoading;
@@ -107,6 +109,15 @@ BaseTexturePtr BRDFTextureTools::GetEnvironmentBRDFTexture(Scene* scene)
       [](Texture* texture, EventState & /*es*/) -> void {
         BRDFTextureTools::_ExpandDefaultBRDFTexture(texture->_texture);
       });
+#else
+    auto texture
+      = Texture::New("textures/_environmentBRDFBase64Texture.png", scene, true,
+                     false, TextureConstants::BILINEAR_SAMPLINGMODE);
+    texture->wrapU                = TextureConstants::CLAMP_ADDRESSMODE;
+    texture->wrapV                = TextureConstants::CLAMP_ADDRESSMODE;
+    texture->_texture->isReady    = true;
+    scene->environmentBRDFTexture = texture;
+#endif
   }
 
   return scene->environmentBRDFTexture;
