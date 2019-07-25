@@ -25,7 +25,7 @@ class BABYLON_SHARED_EXPORT OctreeSceneComponent : public ISceneComponent {
 
 public:
   /**
-   * The component name helpfull to identify the component in the list of scene
+   * The component name help to identify the component in the list of scene
    * components.
    */
   static constexpr const char* name = SceneComponentConstants::NAME_OCTREE;

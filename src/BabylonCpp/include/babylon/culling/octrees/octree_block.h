@@ -59,11 +59,18 @@ public:
   Vector3& maxPoint();
 
   /** Methods **/
+
   /**
    * @brief Add a new element to this block.
    * @param entry defines the element to add
    */
   void addEntry(T& entry);
+
+  /**
+   * @brief Remove an element from this block.
+   * @param entry defines the element to remove
+   */
+  void removeEntry(T& entry);
 
   /**
    * @brief Add an array of elements to this block.
@@ -110,6 +117,16 @@ public:
    * empty).
    */
   void createInnerBlocks();
+
+  /**
+   * @brief Hidden
+   */
+  static void
+  _CreateBlocks(const Vector3& worldMin, const Vector3& worldMax,
+                std::vector<T>& entries, size_t maxBlockCapacity,
+                size_t currentDepth, size_t maxDepth,
+                IOctreeContainer<T>& target,
+                const std::function<void(T&, OctreeBlock<T>&)>& creationFunc);
 
 public:
   /**

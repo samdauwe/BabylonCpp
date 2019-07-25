@@ -40,6 +40,7 @@ public:
   ~Octree();
 
   /** Methods **/
+
   /**
    * @brief Updates the octree by adding blocks for the passed in meshes within
    * the min and max world parameters.
@@ -59,6 +60,12 @@ public:
    * @param entry Mesh to add to the octree
    */
   void addMesh(T& entry);
+
+  /**
+   * @brief Remove an element from the octree.
+   * @param entry defines the element to remove
+   */
+  void removeMesh(T& entry);
 
   /**
    * @brief Selects an array of meshes within the frustum.
@@ -92,14 +99,6 @@ public:
   std::vector<T>& intersectsRay(const Ray& ray);
 
   /** Statics **/
-  /**
-   * @brief Hidden
-   */
-  static void _CreateBlocks(
-    const Vector3& worldMin, const Vector3& worldMax, std::vector<T>& entries,
-    std::size_t maxBlockCapacity, std::size_t currentDepth,
-    std::size_t maxDepth, IOctreeContainer<T>& target,
-    std::function<void(T& entry, OctreeBlock<T>& block)>& creationFunc);
 
   /**
    * @brief Adds a mesh into the octree block if it intersects the block.

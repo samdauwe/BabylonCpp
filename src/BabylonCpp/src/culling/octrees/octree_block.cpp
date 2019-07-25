@@ -14,13 +14,15 @@ OctreeBlock<T>::OctreeBlock(
   const Vector3& iMinPoint, const Vector3& iMaxPoint, size_t iCapacity,
   size_t depth, size_t maxDepth,
   const std::function<void(T&, OctreeBlock<T>&)>& creationFunc)
-    : _depth{depth}
-    , _maxDepth{maxDepth}
-    , _capacity{iCapacity}
-    , _minPoint{iMinPoint}
-    , _maxPoint{iMaxPoint}
-    , _creationFunc{creationFunc}
 {
+  _capacity     = iCapacity;
+  _depth        = depth;
+  _maxDepth     = maxDepth;
+  _creationFunc = creationFunc;
+
+  _minPoint = iMinPoint;
+  _maxPoint = iMaxPoint;
+
   _boundingVectors[0] = _minPoint;
   _boundingVectors[1] = _maxPoint;
 
@@ -80,6 +82,23 @@ void OctreeBlock<T>::addEntry(T& entry)
 
   if (entries.size() > _capacity && _depth < _maxDepth) {
     createInnerBlocks();
+  }
+}
+
+template <class T>
+void OctreeBlock<T>::removeEntry(T& entry)
+{
+  if (!IOctreeContainer<T>::blocks.empty()) {
+    for (auto& block : IOctreeContainer<T>::blocks) {
+      block.removeEntry(entry);
+    }
+    return;
+  }
+
+  const auto entryIndex = std::find(entries.begin(), entries.end(), entry);
+
+  if (entryIndex != entries.end()) {
+    entries.erase(entryIndex);
   }
 }
 
@@ -151,8 +170,38 @@ void OctreeBlock<T>::intersectsRay(const Ray& ray, std::vector<T>& selection)
 template <class T>
 void OctreeBlock<T>::createInnerBlocks()
 {
-  Octree<T>::_CreateBlocks(_minPoint, _maxPoint, entries, _capacity, _depth,
-                           _maxDepth, *this, _creationFunc);
+  OctreeBlock<T>::_CreateBlocks(_minPoint, _maxPoint, entries, _capacity,
+                                _depth, _maxDepth, *this, _creationFunc);
+}
+
+template <class T>
+void OctreeBlock<T>::_CreateBlocks(
+  const Vector3& worldMin, const Vector3& worldMax, std::vector<T>& entries,
+  size_t maxBlockCapacity, size_t currentDepth, size_t maxDepth,
+  IOctreeContainer<T>& target,
+  const std::function<void(T&, OctreeBlock<T>&)>& creationFunc)
+{
+  target.blocks.clear();
+  Vector3 blockSize((worldMax.x - worldMin.x) / 2.f,
+                    (worldMax.y - worldMin.y) / 2.f,
+                    (worldMax.z - worldMin.z) / 2.f);
+
+  // Segmenting space
+  for (float x = 0.f; x < 2.f; ++x) {
+    for (float y = 0.f; y < 2.f; ++y) {
+      for (float z = 0.f; z < 2.f; ++z) {
+        const auto& localMin
+          = worldMin.add(blockSize.multiplyByFloats(x, y, z));
+        const auto& localMax
+          = worldMin.add(blockSize.multiplyByFloats(x + 1.f, y + 1.f, z + 1.f));
+
+        OctreeBlock<T> block(localMin, localMax, maxBlockCapacity,
+                             currentDepth + 1, maxDepth, creationFunc);
+        block.addEntries(entries);
+        target.blocks.emplace_back(block);
+      }
+    }
+  }
 }
 
 template class OctreeBlock<AbstractMesh*>;
