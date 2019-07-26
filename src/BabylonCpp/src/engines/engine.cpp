@@ -1891,7 +1891,7 @@ void Engine::drawArraysType(unsigned int fillMode, int verticesStart,
   }
 }
 
-unsigned int Engine::_drawMode(unsigned int fillMode)
+unsigned int Engine::_drawMode(unsigned int fillMode) const
 {
   switch (fillMode) {
     // Triangle views

@@ -1728,8 +1728,8 @@ public:
    * generated (false by default)
    * @param onLoad defines an optional callback raised when the texture is
    * loaded
-   * @param onError defines an optional callback raised if there is an issue
-   * to load the texture
+   * @param onError defines an optional callback raised if there is an issue to
+   * load the texture
    * @param format defines the format of the data
    * @param forcedExtension defines the extension to use to pick the right
    * loader
@@ -1739,8 +1739,10 @@ public:
    * manages the range of LOD level used for IBL according to the roughness
    * @param lodOffset defines the offset applied to environment texture. This
    * manages first LOD level used for IBL according to the roughness
-   * @param fallback defines texture to use while falling back when
-   * (compressed) texture file not found.
+   * @param fallback defines texture to use while falling back when (compressed)
+   * texture file not found.
+   * @param excludeLoaders array of texture loaders that should be excluded when
+   * picking a loader for the texture (defualt: empty array)
    * @returns the cube texture as an InternalTexture
    */
   InternalTexturePtr createCubeTexture(
@@ -2346,7 +2348,7 @@ private:
   _createDepthStencilCubeTexture(int size,
                                  const DepthTextureCreationOptions& options);
 
-  unsigned int _drawMode(unsigned int fillMode);
+  unsigned int _drawMode(unsigned int fillMode) const;
   GLShaderPtr _compileShader(const std::string& source, const std::string& type,
                              const std::string& defines,
                              const std::string& shaderVersion);
