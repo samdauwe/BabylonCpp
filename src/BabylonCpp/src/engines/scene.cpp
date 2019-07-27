@@ -298,6 +298,8 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , _cachedRayForTransform{nullptr}
     , _audioEnabled{std::nullopt}
     , _headphone{std::nullopt}
+    , _transformMatrixR{Matrix::Zero()}
+    , _multiviewSceneUbo{nullptr}
 {
   engine->scenes.emplace_back(this);
 
@@ -5010,6 +5012,73 @@ Scene::_loadFileAsync(const std::string& /*url*/,
                       const std::optional<bool>& /*useArrayBuffer*/)
 {
   return ArrayBuffer();
+}
+
+void Scene::_createMultiviewUbo()
+{
+  _multiviewSceneUbo
+    = std::make_unique<UniformBuffer>(getEngine(), Float32Array(), true);
+  _multiviewSceneUbo->addUniform("viewProjection", 16);
+  _multiviewSceneUbo->addUniform("viewProjectionR", 16);
+  _multiviewSceneUbo->addUniform("view", 16);
+}
+
+void Scene::_updateMultiviewUbo(std::optional<Matrix> viewR,
+                                std::optional<Matrix> projectionR)
+{
+  if (viewR && projectionR) {
+    viewR->multiplyToRef(*projectionR, _transformMatrixR);
+  }
+
+  if (viewR && projectionR) {
+    viewR->multiplyToRef(*projectionR, Tmp::MatrixArray[0]);
+    Frustum::GetRightPlaneToRef(
+      Tmp::MatrixArray[0],
+      _frustumPlanes[3]); // Replace right plane by second camera right plane
+  }
+
+  if (_multiviewSceneUbo) {
+    _multiviewSceneUbo->updateMatrix("viewProjection", getTransformMatrix());
+    _multiviewSceneUbo->updateMatrix("viewProjectionR", _transformMatrixR);
+    _multiviewSceneUbo->updateMatrix("view", _viewMatrix);
+    _multiviewSceneUbo->update();
+  }
+}
+
+void Scene::_renderMultiviewToSingleView(const CameraPtr& camera)
+{
+  // Multiview is only able to be displayed directly for API's such as webXR
+  // This displays a multiview image by rendering to the multiview image and
+  // then copying the result into the sub cameras instead of rendering them and
+  // proceeding as normal from there
+
+  // Render to a multiview texture
+  camera->_resizeOrCreateMultiviewTexture(
+    (camera->_rigPostProcess && camera->_rigPostProcess
+     && camera->_rigPostProcess->width > 0) ?
+      camera->_rigPostProcess->width / 2 :
+      getEngine()->getRenderWidth(true) / 2,
+    (camera->_rigPostProcess && camera->_rigPostProcess
+     && camera->_rigPostProcess->height > 0) ?
+      camera->_rigPostProcess->height :
+      getEngine()->getRenderHeight(true));
+  if (!_multiviewSceneUbo) {
+    _createMultiviewUbo();
+  }
+  camera->outputRenderTarget = camera->_multiviewTexture;
+  _renderForCamera(camera);
+  camera->outputRenderTarget = nullptr;
+
+  // Consume the multiview texture through a shader for each eye
+  auto engine = getEngine();
+  for (size_t index = 0; index < camera->_rigCameras.size(); index++) {
+    activeCamera = camera->_rigCameras[index];
+    engine->setViewport(activeCamera->viewport);
+    if (postProcessManager) {
+      postProcessManager->_prepareFrame();
+      postProcessManager->_finalizeFrame(activeCamera->isIntermediate);
+    }
+  }
 }
 
 } // end of namespace BABYLON

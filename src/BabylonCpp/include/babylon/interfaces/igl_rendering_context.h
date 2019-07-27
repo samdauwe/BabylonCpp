@@ -491,6 +491,7 @@ enum GLEnums : GLenum {
   RENDERBUFFER_BINDING                         = 0x8CA7,
   READ_FRAMEBUFFER                             = 0x8CA8,
   DRAW_FRAMEBUFFER                             = 0x8CA9,
+  DEPTH32F_STENCIL8                            = 0x8CAD,
   MAX_RENDERBUFFER_SIZE                        = 0x84E8,
   INVALID_FRAMEBUFFER_OPERATION                = 0x0506,
   /* WebGL-specific enums */
@@ -746,7 +747,7 @@ public:
   int TRANSFORM_FEEDBACK_BUFFER;
 
 public:
-  virtual ~IGLRenderingContext() = default;
+  virtual ~IGLRenderingContext()                          = default;
   virtual bool initialize(bool enableGLDebugging = false) = 0;
   virtual void backupGLState()                            = 0;
   virtual void restoreGLState()                           = 0;
@@ -1514,6 +1515,22 @@ public:
     = 0;
 
   /**
+   * @brief Addresses the inefficiency of sequential multiview rendering by
+   * adding a means to render to multiple elements of a 2D texture array
+   * simultaneously.  In multiview rendering, draw calls are instanced into each
+   * corresponding element of the texture array.  The vertex program uses a new
+   * gl_ViewID_OVR variable to compute per-view values, typically the vertex
+   * position and view-dependent variables like reflection.
+   * @see
+   * https://www.khronos.org/registry/OpenGL/extensions/OVR/OVR_multiview.txt
+   */
+  virtual void framebufferTextureMultiviewOVR(GLenum target, GLenum attachment,
+                                              IGLTexture* texture, GLint level,
+                                              GLint baseViewIndex,
+                                              GLint numViews)
+    = 0;
+
+  /**
    * @brief Specifies whether polygons are front- or back-facing by setting a
    * winding orientation.
    * @param mode Sets the winding orientation.
@@ -2071,6 +2088,23 @@ public:
    * parameter pname.
    */
   virtual void texParameteri(GLenum target, GLenum pname, GLint param) = 0;
+
+  /**
+   * @brief Specifies all levels of a three-dimensional texture or
+   * two-dimensional array texture.
+   * @param target A GLenum specifying the binding point (target) of the active
+   * texture. Possible values:
+   *    * gl.TEXTURE_3D: A three-dimensional texture.
+   *    * gl.TEXTURE_2D_ARRAY: A two-dimensional array texture.
+   * @param levels A GLint specifying the number of texture levels.
+   * @param internalformat A GLenum specifying the texture store format.
+   * @param width A GLsizei specifying the width of the texture.
+   * @param height A GLsizei specifying the height of the texture.
+   * @param depth A GLsizei specifying the depth of the texture.
+   */
+  virtual void texStorage3D(GLenum target, GLint levels, GLenum internalformat,
+                            GLsizei width, GLsizei height, GLsizei depth)
+    = 0;
 
   /**
    * @brief Specifies a sub-rectangle of the current texture.

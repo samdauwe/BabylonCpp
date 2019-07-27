@@ -24,10 +24,12 @@ constexpr unsigned int InternalTexture::DATASOURCE_RAW3D;
 constexpr unsigned int InternalTexture::DATASOURCE_DEPTHTEXTURE;
 constexpr unsigned int InternalTexture::DATASOURCE_CUBERAW_RGBD;
 
-InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource)
+InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource,
+                                 bool delayAllocation)
     : isReady{false}
     , isCube{false}
     , is3D{false}
+    , isMultiview{false}
     , _invertVScale{false}
     , _initialSlot{-1}
     , _designatedSlot{-1}
@@ -40,6 +42,8 @@ InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource)
     , _sphericalPolynomial{nullptr}
     , _lodGenerationScale{0}
     , _lodGenerationOffset{0}
+    , _colorTextureArray{nullptr}
+    , _depthStencilTextureArray{nullptr}
     , _lodTextureHigh{nullptr}
     , _lodTextureMid{nullptr}
     , _lodTextureLow{nullptr}
@@ -50,7 +54,9 @@ InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource)
   previous = nullptr;
   next     = nullptr;
 
-  _webGLTexture = engine->_createTexture();
+  if (!delayAllocation) {
+    _webGLTexture = engine->_createTexture();
+  }
 }
 
 InternalTexture::~InternalTexture()

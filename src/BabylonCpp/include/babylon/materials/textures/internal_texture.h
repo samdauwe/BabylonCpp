@@ -91,9 +91,12 @@ public:
    * @brief Creates a new InternalTexture.
    * @param engine defines the engine to use
    * @param dataSource defines the type of data that will be used
+   * @param delayAllocation if the texture allocation should be delayed
+   * (default: false)
    */
-  InternalTexture(Engine* engine, unsigned int dataSource
-                                  = InternalTexture::DATASOURCE_UNKNOWN);
+  InternalTexture(Engine* engine,
+                  unsigned int dataSource = InternalTexture::DATASOURCE_UNKNOWN,
+                  bool delayAllocation    = false);
   ~InternalTexture();
 
   /**
@@ -150,6 +153,10 @@ public:
    * Defines if the texture contains 3D data
    */
   bool is3D;
+  /**
+   * Defines if the texture contains multiview data
+   */
+  bool isMultiview;
   /**
    * Gets the URL used to load this texture
    */
@@ -242,6 +249,13 @@ public:
   SphericalPolynomialPtr _sphericalPolynomial;
   float _lodGenerationScale;
   float _lodGenerationOffset;
+
+  // Multiview
+  /** Hidden */
+  std::unique_ptr<GL::IGLTexture> _colorTextureArray;
+  /** Hidden */
+  std::unique_ptr<GL::IGLTexture> _depthStencilTextureArray;
+
   // The following three fields helps sharing generated fixed LODs for texture
   // filtering
   // In environment not supporting the textureLOD extension like EDGE. They are

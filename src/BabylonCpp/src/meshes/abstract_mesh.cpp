@@ -2059,6 +2059,7 @@ bool AbstractMesh::_checkOcclusionQuery()
   }
 
   if (isOcclusionQueryInProgress && _occlusionQuery) {
+
     auto isOcclusionQueryAvailable
       = engine->isQueryResultAvailable(_occlusionQuery);
     if (isOcclusionQueryAvailable) {

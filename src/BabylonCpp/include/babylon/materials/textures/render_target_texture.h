@@ -269,8 +269,9 @@ protected:
     bool isCube                 = false,
     unsigned int samplingMode   = TextureConstants::TRILINEAR_SAMPLINGMODE,
     bool generateDepthBuffer = true, bool generateStencilBuffer = false,
-    bool isMulti        = false,
-    unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
+    bool isMulti         = false,
+    unsigned int format  = EngineConstants::TEXTUREFORMAT_RGBA,
+    bool delayAllocation = false);
 
   /**
    * @brief Use this list to define the list of mesh you want to render.

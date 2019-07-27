@@ -475,6 +475,14 @@ public:
   Matrix& computeWorldMatrix(bool force             = false,
                              bool useWasUpdatedFlag = false) override;
 
+  /**
+   * @brief Ensures the multiview texture of the camera exists and has the
+   * specified width/height.
+   * @param width height to set on the multiview texture
+   * @param height width to set on the multiview texture
+   */
+  void _resizeOrCreateMultiviewTexture(int width, int height);
+
   /** Hidden */
   static void _setStereoscopicRigMode(Camera& camera);
 
@@ -759,6 +767,20 @@ public:
    * Gets the right camera of a rig setup in case of Rigged Camera
    */
   ReadOnlyProperty<Camera, bool> isRightCamera;
+
+  /**
+   * For cameras that cannot use multiview images to display directly. (e.g.
+   * webVR camera will render to multiview texture, then copy to each eye
+   * texture and go from there)
+   */
+  bool _useMultiviewToSingleView;
+
+  /**
+   * For cameras that cannot use multiview images to display directly. (e.g.
+   * webVR camera will render to multiview texture, then copy to each eye
+   * texture and go from there)
+   */
+  RenderTargetTexturePtr _multiviewTexture;
 
 protected:
   Matrix _webvrViewMatrix;

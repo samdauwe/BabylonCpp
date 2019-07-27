@@ -1168,10 +1168,12 @@ void Engine::unBindMultiColorAttachmentFramebuffer(
   _currentRenderTarget = nullptr;
 
   // If MSAA, we need to bitblt back to main texture
+  auto& gl = *_gl;
+
   if (textures[0]->_MSAAFramebuffer) {
-    _gl->bindFramebuffer(GL::READ_FRAMEBUFFER,
-                         textures[0]->_MSAAFramebuffer.get());
-    _gl->bindFramebuffer(GL::DRAW_FRAMEBUFFER, textures[0]->_framebuffer.get());
+    gl.bindFramebuffer(GL::READ_FRAMEBUFFER,
+                       textures[0]->_MSAAFramebuffer.get());
+    gl.bindFramebuffer(GL::DRAW_FRAMEBUFFER, textures[0]->_framebuffer.get());
 
     auto& attachments = textures[0]->_attachments;
     if (attachments.empty()) {
@@ -1188,21 +1190,21 @@ void Engine::unBindMultiColorAttachmentFramebuffer(
       }
 
       attachments[i]
-        = (*_gl)[webGLVersion() > 1.f ? "COLOR_ATTACHMENT" + iStr :
-                                        "COLOR_ATTACHMENT" + iStr + "_WEBGL"];
-      _gl->readBuffer(attachments[i]);
-      _gl->drawBuffers(attachments);
-      _gl->blitFramebuffer(0, 0, texture->width, texture->height, 0, 0,
-                           texture->width, texture->height,
-                           GL::COLOR_BUFFER_BIT, GL::NEAREST);
+        = gl[webGLVersion() > 1.f ? "COLOR_ATTACHMENT" + iStr :
+                                    "COLOR_ATTACHMENT" + iStr + "_WEBGL"];
+      gl.readBuffer(attachments[i]);
+      gl.drawBuffers(attachments);
+      gl.blitFramebuffer(0, 0, texture->width, texture->height, 0, 0,
+                         texture->width, texture->height, GL::COLOR_BUFFER_BIT,
+                         GL::NEAREST);
     }
     for (size_t i = 0; i < attachments.size(); i++) {
       const auto iStr = std::to_string(i);
       attachments[i]
-        = (*_gl)[webGLVersion() > 1.f ? "COLOR_ATTACHMENT" + iStr :
-                                        "COLOR_ATTACHMENT" + iStr + "_WEBGL"];
+        = gl[webGLVersion() > 1.f ? "COLOR_ATTACHMENT" + iStr :
+                                    "COLOR_ATTACHMENT" + iStr + "_WEBGL"];
     }
-    _gl->drawBuffers(attachments);
+    gl.drawBuffers(attachments);
   }
 
   for (size_t i = 0; i < textures.size(); i++) {
@@ -1210,7 +1212,7 @@ void Engine::unBindMultiColorAttachmentFramebuffer(
     if (texture->generateMipMaps && !disableGenerateMipMaps
         && !texture->isCube) {
       _bindTextureDirectly(GL::TEXTURE_2D, texture);
-      _gl->generateMipmap(GL::TEXTURE_2D);
+      gl.generateMipmap(GL::TEXTURE_2D);
       _bindTextureDirectly(GL::TEXTURE_2D, nullptr);
     }
   }
@@ -3476,6 +3478,7 @@ InternalTexturePtr Engine::_createDepthStencilCubeTexture(
   internalOptions.generateStencil
     = options.generateStencil.has_value() ? *options.generateStencil : false;
 
+  auto& gl = *_gl;
   _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, internalTexture, true);
 
   _setupDepthStencilTexture(
@@ -3486,14 +3489,14 @@ InternalTexturePtr Engine::_createDepthStencilCubeTexture(
   for (unsigned int face = 0; face < 6; ++face) {
     if (internalOptions.generateStencil.has_value()
         && *internalOptions.generateStencil) {
-      _gl->texImage2D(GL::TEXTURE_CUBE_MAP_POSITIVE_X + face, 0,
-                      GL::DEPTH24_STENCIL8, size, size, 0, GL::DEPTH_STENCIL,
-                      GL::UNSIGNED_INT_24_8, nullptr);
+      gl.texImage2D(GL::TEXTURE_CUBE_MAP_POSITIVE_X + face, 0,
+                    GL::DEPTH24_STENCIL8, size, size, 0, GL::DEPTH_STENCIL,
+                    GL::UNSIGNED_INT_24_8, nullptr);
     }
     else {
-      _gl->texImage2D(GL::TEXTURE_CUBE_MAP_POSITIVE_X + face, 0,
-                      GL::DEPTH_COMPONENT24, size, size, 0, GL::DEPTH_COMPONENT,
-                      GL::UNSIGNED_INT, nullptr);
+      gl.texImage2D(GL::TEXTURE_CUBE_MAP_POSITIVE_X + face, 0,
+                    GL::DEPTH_COMPONENT24, size, size, 0, GL::DEPTH_COMPONENT,
+                    GL::UNSIGNED_INT, nullptr);
     }
   }
 
@@ -3669,11 +3672,11 @@ std::vector<InternalTexturePtr>
 Engine::createMultipleRenderTarget(ISize size,
                                    const IMultiRenderTargetOptions& options)
 {
-  auto generateMipMaps       = options.generateMipMaps;
-  auto generateDepthBuffer   = options.generateDepthBuffer;
-  auto generateStencilBuffer = options.generateStencilBuffer;
-  auto generateDepthTexture  = options.generateDepthTexture;
-  auto textureCount          = options.textureCount;
+  auto generateMipMaps       = options.generateMipMaps.value_or(false);
+  auto generateDepthBuffer   = options.generateDepthBuffer.value_or(true);
+  auto generateStencilBuffer = options.generateStencilBuffer.value_or(false);
+  auto generateDepthTexture  = options.generateDepthTexture.value_or(false);
+  auto textureCount          = options.textureCount.value_or(1);
 
   auto defaultType         = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
   auto defaultSamplingMode = EngineConstants::TEXTURE_TRILINEAR_SAMPLINGMODE;
@@ -3684,15 +3687,16 @@ Engine::createMultipleRenderTarget(ISize size,
   auto width  = size.width;
   auto height = size.height;
 
+  auto& gl = *_gl;
   // Create the framebuffer
-  auto framebuffer = _gl->createFramebuffer();
+  auto framebuffer = gl.createFramebuffer();
   bindUnboundFramebuffer(framebuffer.get());
 
   std::vector<InternalTexturePtr> textures;
   std::vector<GL::GLenum> attachments;
 
   auto depthStencilBuffer = _setupFramebufferDepthAttachments(
-    *generateStencilBuffer, *generateDepthBuffer, width, height);
+    generateStencilBuffer, generateDepthBuffer, width, height);
 
   for (unsigned int i = 0; i < textureCount; ++i) {
     const auto iStr = std::to_string(i);
@@ -3712,7 +3716,7 @@ Engine::createMultipleRenderTarget(ISize size,
       samplingMode = EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE;
     }
 
-    auto filters = _getSamplingParameters(samplingMode, *generateMipMaps);
+    auto filters = _getSamplingParameters(samplingMode, generateMipMaps);
     if (type == EngineConstants::TEXTURETYPE_FLOAT && !_caps.textureFloat) {
       type = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
       BABYLON_LOG_WARN("Engine",
@@ -3723,47 +3727,47 @@ Engine::createMultipleRenderTarget(ISize size,
     auto texture = std::make_shared<InternalTexture>(
       this, InternalTexture::DATASOURCE_MULTIRENDERTARGET);
     auto attachment
-      = (*_gl)[webGLVersion() > 1 ? "COLOR_ATTACHMENT" + iStr :
-                                    "COLOR_ATTACHMENT" + iStr + "_WEBGL"];
+      = gl[webGLVersion() > 1 ? "COLOR_ATTACHMENT" + iStr :
+                                "COLOR_ATTACHMENT" + iStr + "_WEBGL"];
     textures.emplace_back(texture);
     attachments.emplace_back(attachment);
 
-    _gl->activeTexture((*_gl)["TEXTURE0"] + i);
-    _gl->bindTexture(GL::TEXTURE_2D, texture->_webGLTexture.get());
+    gl.activeTexture(gl["TEXTURE0"] + i);
+    gl.bindTexture(GL::TEXTURE_2D, texture->_webGLTexture.get());
 
-    _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, filters.mag);
-    _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER, filters.min);
-    _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S, GL::CLAMP_TO_EDGE);
-    _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T, GL::CLAMP_TO_EDGE);
+    gl.texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, filters.mag);
+    gl.texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER, filters.min);
+    gl.texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S, GL::CLAMP_TO_EDGE);
+    gl.texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T, GL::CLAMP_TO_EDGE);
 
-    _gl->texImage2D(GL::TEXTURE_2D, 0,
-                    static_cast<int>(_getRGBABufferInternalSizedFormat(type)),
-                    width, height, 0, GL::RGBA, _getWebGLTextureType(type),
-                    nullptr);
+    gl.texImage2D(GL::TEXTURE_2D, 0,
+                  static_cast<int>(_getRGBABufferInternalSizedFormat(type)),
+                  width, height, 0, GL::RGBA, _getWebGLTextureType(type),
+                  nullptr);
 
-    _gl->framebufferTexture2D(GL::DRAW_FRAMEBUFFER, attachment, GL::TEXTURE_2D,
-                              texture->_webGLTexture.get(), 0);
+    gl.framebufferTexture2D(GL::DRAW_FRAMEBUFFER, attachment, GL::TEXTURE_2D,
+                            texture->_webGLTexture.get(), 0);
 
     if (generateMipMaps) {
-      _gl->generateMipmap(GL::TEXTURE_2D);
+      gl.generateMipmap(GL::TEXTURE_2D);
     }
 
     // Unbind
     _bindTextureDirectly(GL::TEXTURE_2D, nullptr);
 
-    texture->_framebuffer           = std::move(framebuffer);        // FIXME
-    texture->_depthStencilBuffer    = std::move(depthStencilBuffer); // FIXME
+    texture->_framebuffer           = std::move(framebuffer);
+    texture->_depthStencilBuffer    = std::move(depthStencilBuffer);
     texture->baseWidth              = width;
     texture->baseHeight             = height;
     texture->width                  = width;
     texture->height                 = height;
     texture->isReady                = true;
     texture->samples                = 1;
-    texture->generateMipMaps        = *generateMipMaps;
+    texture->generateMipMaps        = generateMipMaps;
     texture->samplingMode           = samplingMode;
     texture->type                   = type;
-    texture->_generateDepthBuffer   = *generateDepthBuffer;
-    texture->_generateStencilBuffer = *generateStencilBuffer;
+    texture->_generateDepthBuffer   = generateDepthBuffer;
+    texture->_generateStencilBuffer = generateStencilBuffer;
     texture->_attachments           = attachments;
 
     _internalTexturesCache.emplace_back(texture.get());
@@ -3774,48 +3778,48 @@ Engine::createMultipleRenderTarget(ISize size,
     auto depthTexture = std::make_shared<InternalTexture>(
       this, InternalTexture::DATASOURCE_MULTIRENDERTARGET);
 
-    _gl->activeTexture(GL::TEXTURE0);
-    _gl->bindTexture(GL::TEXTURE_2D, depthTexture->_webGLTexture.get());
-    _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, GL::NEAREST);
-    _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER, GL::NEAREST);
-    _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S, GL::CLAMP_TO_EDGE);
-    _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T, GL::CLAMP_TO_EDGE);
-    _gl->texImage2D(GL::TEXTURE_2D, //
-                    0,              //
-                    webGLVersion() < 2.f ? GL::DEPTH_COMPONENT :
-                                           GL::DEPTH_COMPONENT16, //
-                    width, height,                                //
-                    0,                                            //
-                    GL::DEPTH_COMPONENT,                          //
-                    GL::UNSIGNED_SHORT,                           //
-                    nullptr                                       //
+    gl.activeTexture(GL::TEXTURE0);
+    gl.bindTexture(GL::TEXTURE_2D, depthTexture->_webGLTexture.get());
+    gl.texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, GL::NEAREST);
+    gl.texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER, GL::NEAREST);
+    gl.texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S, GL::CLAMP_TO_EDGE);
+    gl.texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T, GL::CLAMP_TO_EDGE);
+    gl.texImage2D(GL::TEXTURE_2D, //
+                  0,              //
+                  webGLVersion() < 2.f ? GL::DEPTH_COMPONENT :
+                                         GL::DEPTH_COMPONENT16, //
+                  width, height,                                //
+                  0,                                            //
+                  GL::DEPTH_COMPONENT,                          //
+                  GL::UNSIGNED_SHORT,                           //
+                  nullptr                                       //
     );
 
-    _gl->framebufferTexture2D(GL::FRAMEBUFFER,                   //
-                              GL::DEPTH_ATTACHMENT,              //
-                              GL::TEXTURE_2D,                    //
-                              depthTexture->_webGLTexture.get(), //
-                              0                                  //
+    gl.framebufferTexture2D(GL::FRAMEBUFFER,                   //
+                            GL::DEPTH_ATTACHMENT,              //
+                            GL::TEXTURE_2D,                    //
+                            depthTexture->_webGLTexture.get(), //
+                            0                                  //
     );
 
-    depthTexture->_framebuffer           = std::move(framebuffer); // FIXME
+    depthTexture->_framebuffer           = std::move(framebuffer);
     depthTexture->baseWidth              = width;
     depthTexture->baseHeight             = height;
     depthTexture->width                  = width;
     depthTexture->height                 = height;
     depthTexture->isReady                = true;
     depthTexture->samples                = 1;
-    depthTexture->generateMipMaps        = *generateMipMaps;
+    depthTexture->generateMipMaps        = generateMipMaps;
     depthTexture->samplingMode           = GL::NEAREST;
-    depthTexture->_generateDepthBuffer   = *generateDepthBuffer;
-    depthTexture->_generateStencilBuffer = *generateStencilBuffer;
+    depthTexture->_generateDepthBuffer   = generateDepthBuffer;
+    depthTexture->_generateStencilBuffer = generateStencilBuffer;
 
     textures.emplace_back(depthTexture);
     _internalTexturesCache.emplace_back(depthTexture);
   }
 
-  _gl->drawBuffers(attachments);
-  _gl->bindRenderbuffer(GL::RENDERBUFFER, nullptr);
+  gl.drawBuffers(attachments);
+  gl.bindRenderbuffer(GL::RENDERBUFFER, nullptr);
   bindUnboundFramebuffer(nullptr);
 
   resetTextureCache();
@@ -3953,29 +3957,31 @@ unsigned int Engine::updateMultipleRenderTargetTextureSampleCount(
     return samples;
   }
 
-  samples = std::min(
-    samples, static_cast<unsigned>(_gl->getParameteri(GL::MAX_SAMPLES)));
+  auto& gl = *_gl;
+
+  samples = std::min(samples,
+                     static_cast<unsigned>(gl.getParameteri(GL::MAX_SAMPLES)));
 
   // Dispose previous render buffers
   if (textures[0]->_depthStencilBuffer) {
-    _gl->deleteRenderbuffer(textures[0]->_depthStencilBuffer.get());
+    gl.deleteRenderbuffer(textures[0]->_depthStencilBuffer.get());
     textures[0]->_depthStencilBuffer = nullptr;
   }
 
   if (textures[0]->_MSAAFramebuffer) {
-    _gl->deleteFramebuffer(textures[0]->_MSAAFramebuffer.get());
+    gl.deleteFramebuffer(textures[0]->_MSAAFramebuffer.get());
     textures[0]->_MSAAFramebuffer = nullptr;
   }
 
-  for (auto& texture : textures) {
+  for (const auto& texture : textures) {
     if (texture->_MSAARenderBuffer) {
-      _gl->deleteRenderbuffer(texture->_MSAARenderBuffer.get());
+      gl.deleteRenderbuffer(texture->_MSAARenderBuffer.get());
       texture->_MSAARenderBuffer = nullptr;
     }
   }
 
   if (samples > 1) {
-    auto framebuffer = _gl->createFramebuffer();
+    auto framebuffer = gl.createFramebuffer();
 
     if (!framebuffer) {
       BABYLON_LOG_ERROR("Engine", "Unable to create multi sampled framebuffer")
@@ -3994,10 +4000,10 @@ unsigned int Engine::updateMultipleRenderTargetTextureSampleCount(
       auto iStr     = std::to_string(i);
       auto& texture = textures[i];
       auto attachment
-        = (*_gl)[webGLVersion() > 1.f ? "COLOR_ATTACHMENT" + iStr :
-                                        "COLOR_ATTACHMENT" + iStr + "_WEBGL"];
+        = gl[webGLVersion() > 1.f ? "COLOR_ATTACHMENT" + iStr :
+                                    "COLOR_ATTACHMENT" + iStr + "_WEBGL"];
 
-      auto colorRenderbuffer = _gl->createRenderbuffer();
+      auto colorRenderbuffer = gl.createRenderbuffer();
 
       if (!colorRenderbuffer) {
         BABYLON_LOG_ERROR("Engine",
@@ -4005,23 +4011,23 @@ unsigned int Engine::updateMultipleRenderTargetTextureSampleCount(
         return 0;
       }
 
-      _gl->bindRenderbuffer(GL::RENDERBUFFER, colorRenderbuffer);
-      _gl->renderbufferStorageMultisample(
+      gl.bindRenderbuffer(GL::RENDERBUFFER, colorRenderbuffer);
+      gl.renderbufferStorageMultisample(
         GL::RENDERBUFFER, static_cast<int>(samples),
         _getRGBAMultiSampleBufferFormat(texture->type), texture->width,
         texture->height);
 
-      _gl->framebufferRenderbuffer(GL::FRAMEBUFFER, attachment,
-                                   GL::RENDERBUFFER, colorRenderbuffer);
+      gl.framebufferRenderbuffer(GL::FRAMEBUFFER, attachment, GL::RENDERBUFFER,
+                                 colorRenderbuffer);
 
       texture->_MSAAFramebuffer    = std::move(framebuffer);
       texture->_MSAARenderBuffer   = std::move(colorRenderbuffer);
       texture->samples             = samples;
       texture->_depthStencilBuffer = std::move(depthStencilBuffer);
-      _gl->bindRenderbuffer(GL::RENDERBUFFER, nullptr);
+      gl.bindRenderbuffer(GL::RENDERBUFFER, nullptr);
       attachments.emplace_back(attachment);
     }
-    _gl->drawBuffers(attachments);
+    gl.drawBuffers(attachments);
   }
   else {
     bindUnboundFramebuffer(textures[0]->_framebuffer.get());
@@ -4143,6 +4149,7 @@ InternalTexturePtr Engine::createRenderTargetCubeTexture(
     // if floating point linear (HALF_FLOAT) then force to NEAREST_SAMPLINGMODE
     fullOptions.samplingMode = EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE;
   }
+  auto& gl = *_gl;
 
   auto texture = std::make_shared<InternalTexture>(
     this, InternalTexture::DATASOURCE_RENDERTARGET);
@@ -4159,25 +4166,22 @@ InternalTexturePtr Engine::createRenderTargetCubeTexture(
                      "forced to TEXTURETYPE_UNESIGNED_BYTE type")
   }
 
-  _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MAG_FILTER, filters.mag);
-  _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MIN_FILTER, filters.min);
-  _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_S,
-                     GL::CLAMP_TO_EDGE);
-  _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_T,
-                     GL::CLAMP_TO_EDGE);
+  gl.texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MAG_FILTER, filters.mag);
+  gl.texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MIN_FILTER, filters.min);
+  gl.texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_S, GL::CLAMP_TO_EDGE);
+  gl.texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_T, GL::CLAMP_TO_EDGE);
 
   for (unsigned int face = 0; face < 6; ++face) {
-    _gl->texImage2D((GL::TEXTURE_CUBE_MAP_POSITIVE_X + face), 0,
-                    static_cast<GL::GLint>(_getRGBABufferInternalSizedFormat(
-                      fullOptions.type.value(), fullOptions.format.value())),
-                    size.width, size.height, 0,
-                    _getInternalFormat(fullOptions.format.value()),
-                    _getWebGLTextureType(fullOptions.type.value()),
-                    Uint8Array());
+    gl.texImage2D((GL::TEXTURE_CUBE_MAP_POSITIVE_X + face), 0,
+                  static_cast<GL::GLint>(_getRGBABufferInternalSizedFormat(
+                    fullOptions.type.value(), fullOptions.format.value())),
+                  size.width, size.height, 0,
+                  _getInternalFormat(fullOptions.format.value()),
+                  _getWebGLTextureType(fullOptions.type.value()), Uint8Array());
   }
 
   // Create the framebuffer
-  auto framebuffer = _gl->createFramebuffer();
+  auto framebuffer = gl.createFramebuffer();
   bindUnboundFramebuffer(framebuffer.get());
 
   texture->_depthStencilBuffer = _setupFramebufferDepthAttachments(
@@ -4186,12 +4190,12 @@ InternalTexturePtr Engine::createRenderTargetCubeTexture(
 
   // Mipmaps
   if (texture->generateMipMaps) {
-    _gl->generateMipmap(GL::TEXTURE_CUBE_MAP);
+    gl.generateMipmap(GL::TEXTURE_CUBE_MAP);
   }
 
   // Unbind
   _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, nullptr);
-  _gl->bindRenderbuffer(GL::RENDERBUFFER, nullptr);
+  gl.bindRenderbuffer(GL::RENDERBUFFER, nullptr);
   bindUnboundFramebuffer(nullptr);
 
   texture->_framebuffer           = std::move(framebuffer);
@@ -4338,6 +4342,8 @@ InternalTexturePtr Engine::createCubeTexture(
   bool createPolynomials, float lodScale, float lodOffset,
   const InternalTexturePtr& fallback)
 {
+  auto& gl = *_gl;
+
   auto texture = fallback ? fallback :
                             std::make_shared<InternalTexture>(
                               this, InternalTexture::DATASOURCE_CUBE);
@@ -4429,17 +4435,17 @@ InternalTexturePtr Engine::createCubeTexture(
 #if 0
           _workingContext->drawImage(imgs[index], 0, 0, imgs[index].width,
                                      imgs[index].height, 0, 0, width, height);
-          _gl->texImage2D(faces[index], 0, internalFormat, internalFormat,
-                          GL::UNSIGNED_BYTE, _workingCanvas);
+          gl.texImage2D(faces[index], 0, internalFormat, internalFormat,
+                        GL::UNSIGNED_BYTE, _workingCanvas);
 #else
-          _gl->texImage2D(faces[index], 0, static_cast<int>(internalFormat),
-                          imgs[index].width, imgs[index].height, 0, GL::RGBA,
-                          GL::UNSIGNED_BYTE, imgs[index].data);
+          gl.texImage2D(faces[index], 0, static_cast<int>(internalFormat),
+                        imgs[index].width, imgs[index].height, 0, GL::RGBA,
+                        GL::UNSIGNED_BYTE, imgs[index].data);
 #endif
         }
 
         if (!noMipmap) {
-          _gl->generateMipmap(GL::TEXTURE_CUBE_MAP);
+          gl.generateMipmap(GL::TEXTURE_CUBE_MAP);
         }
 
         _setCubeMapTextureParams(!noMipmap);
@@ -4493,6 +4499,7 @@ void Engine::updateRawCubeTexture(const InternalTexturePtr& texture,
   texture->invertY          = invertY;
   texture->_compression     = compression;
 
+  auto& gl                = *_gl;
   auto textureType        = _getWebGLTextureType(type);
   auto internalFormat     = _getInternalFormat(format);
   auto internalSizedFomat = _getRGBABufferInternalSizedFormat(type);
@@ -4507,7 +4514,7 @@ void Engine::updateRawCubeTexture(const InternalTexturePtr& texture,
   _unpackFlipY(invertY ? true : false);
 
   if (texture->width % 4 != 0) {
-    _gl->pixelStorei(GL::UNPACK_ALIGNMENT, 1);
+    gl.pixelStorei(GL::UNPACK_ALIGNMENT, 1);
   }
 
   const std::vector<unsigned int> facesIndex
@@ -4521,7 +4528,7 @@ void Engine::updateRawCubeTexture(const InternalTexturePtr& texture,
 
     if (!compression.empty()) {
 #if 0
-      _gl->compressedTexImage2D(facesIndex[index], level,
+      gl.compressedTexImage2D(facesIndex[index], level,
                                 getCaps().s3tc[compression], texture->width,
                                 texture->height, 0, faceData.uint8Array);
 #endif
@@ -4530,16 +4537,16 @@ void Engine::updateRawCubeTexture(const InternalTexturePtr& texture,
       if (needConversion) {
         auto convertedFaceData = _convertRGBtoRGBATextureData(
           faceData, texture->width, texture->height, type);
-        _gl->texImage2D(facesIndex[index], static_cast<int>(level),
-                        static_cast<int>(internalSizedFomat), texture->width,
-                        texture->height, 0, internalFormat, textureType,
-                        convertedFaceData.uint8Array);
+        gl.texImage2D(facesIndex[index], static_cast<int>(level),
+                      static_cast<int>(internalSizedFomat), texture->width,
+                      texture->height, 0, internalFormat, textureType,
+                      convertedFaceData.uint8Array);
       }
       else {
-        _gl->texImage2D(facesIndex[index], static_cast<int>(level),
-                        static_cast<int>(internalSizedFomat), texture->width,
-                        texture->height, 0, internalFormat, textureType,
-                        faceData.uint8Array);
+        gl.texImage2D(facesIndex[index], static_cast<int>(level),
+                      static_cast<int>(internalSizedFomat), texture->width,
+                      texture->height, 0, internalFormat, textureType,
+                      faceData.uint8Array);
       }
     }
   }
@@ -4549,7 +4556,7 @@ void Engine::updateRawCubeTexture(const InternalTexturePtr& texture,
       || (Tools::IsExponentOfTwo(static_cast<size_t>(texture->width))
           && Tools::IsExponentOfTwo(static_cast<size_t>(texture->height)));
   if (isPot && texture->generateMipMaps && level == 0) {
-    _gl->generateMipmap(GL::TEXTURE_CUBE_MAP);
+    gl.generateMipmap(GL::TEXTURE_CUBE_MAP);
   }
   _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, nullptr);
 
@@ -4562,6 +4569,7 @@ InternalTexturePtr Engine::createRawCubeTexture(
   unsigned int type, bool generateMipMaps, bool invertY,
   unsigned int samplingMode, const std::string& compression)
 {
+  auto& gl     = *_gl;
   auto texture = std::make_shared<InternalTexture>(
     this, InternalTexture::DATASOURCE_CUBERAW);
   texture->isCube = true;
@@ -4634,17 +4642,15 @@ InternalTexturePtr Engine::createRawCubeTexture(
 
   // Filters
   if (!data.empty() && generateMipMaps) {
-    _gl->generateMipmap(GL::TEXTURE_CUBE_MAP);
+    gl.generateMipmap(GL::TEXTURE_CUBE_MAP);
   }
 
   auto filters = _getSamplingParameters(samplingMode, generateMipMaps);
-  _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MAG_FILTER, filters.mag);
-  _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MIN_FILTER, filters.min);
+  gl.texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MAG_FILTER, filters.mag);
+  gl.texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MIN_FILTER, filters.min);
 
-  _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_S,
-                     GL::CLAMP_TO_EDGE);
-  _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_T,
-                     GL::CLAMP_TO_EDGE);
+  gl.texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_S, GL::CLAMP_TO_EDGE);
+  gl.texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_T, GL::CLAMP_TO_EDGE);
   _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, nullptr);
 
   texture->generateMipMaps = generateMipMaps;
@@ -4664,6 +4670,7 @@ InternalTexturePtr Engine::createRawCubeTextureFromUrl(
                            const std::string& exception)>& onError,
   unsigned int samplingMode, bool invertY)
 {
+  auto& gl     = *_gl;
   auto texture = createRawCubeTexture({}, size, format, type, !noMipmap,
                                       invertY, samplingMode);
   scene->_addPendingData(texture);
@@ -4717,10 +4724,9 @@ InternalTexturePtr Engine::createRawCubeTextureFromUrl(
             mipFaceData = _convertRGBtoRGBATextureData(mipFaceData, mipSize,
                                                        mipSize, type);
           }
-          _gl->texImage2D(faceIndex, static_cast<int>(level),
-                          static_cast<int>(internalSizedFomat), mipSize,
-                          mipSize, 0, internalFormat, textureType,
-                          mipFaceData.uint8Array);
+          gl.texImage2D(faceIndex, static_cast<int>(level),
+                        static_cast<int>(internalSizedFomat), mipSize, mipSize,
+                        0, internalFormat, textureType, mipFaceData.uint8Array);
         }
       }
 
@@ -4840,6 +4846,59 @@ Engine::createRawTexture3D(const ArrayBufferView& data, int width, int height,
   _internalTexturesCache.emplace_back(texture);
 
   return texture;
+}
+
+InternalTexturePtr Engine::createMultiviewRenderTargetTexture(int width,
+                                                              int height)
+{
+  auto& gl = *_gl;
+
+  if (!getCaps().multiview) {
+    BABYLON_LOG_ERROR("Engine", "Multiview is not supported")
+    return nullptr;
+  }
+
+  auto internalTexture = std::make_shared<InternalTexture>(
+    this, InternalTexture::DATASOURCE_UNKNOWN, true);
+  internalTexture->width        = width;
+  internalTexture->height       = height;
+  internalTexture->_framebuffer = gl.createFramebuffer();
+
+  internalTexture->_colorTextureArray = gl.createTexture();
+  gl.bindTexture(GL::TEXTURE_2D_ARRAY,
+                 internalTexture->_colorTextureArray.get());
+  gl.texStorage3D(GL::TEXTURE_2D_ARRAY, 1, GL::RGBA8, width, height, 2);
+
+  internalTexture->_depthStencilTextureArray = gl.createTexture();
+  gl.bindTexture(GL::TEXTURE_2D_ARRAY,
+                 internalTexture->_depthStencilTextureArray.get());
+  gl.texStorage3D(GL::TEXTURE_2D_ARRAY, 1, GL::DEPTH32F_STENCIL8, width, height,
+                  2);
+  internalTexture->isReady = true;
+  return internalTexture;
+}
+
+void Engine::bindMultiviewFramebuffer(
+  const InternalTexturePtr& multiviewTexture)
+{
+  auto& gl = *_gl;
+
+  bindFramebuffer(multiviewTexture, std::nullopt, std::nullopt, std::nullopt,
+                  true);
+  gl.bindFramebuffer(GL::DRAW_FRAMEBUFFER,
+                     multiviewTexture->_framebuffer.get());
+  if (multiviewTexture->_colorTextureArray
+      && multiviewTexture->_depthStencilTextureArray) {
+    gl.framebufferTextureMultiviewOVR(
+      GL::DRAW_FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
+      multiviewTexture->_colorTextureArray.get(), 0, 0, 2);
+    gl.framebufferTextureMultiviewOVR(
+      GL::DRAW_FRAMEBUFFER, GL::DEPTH_STENCIL_ATTACHMENT,
+      multiviewTexture->_depthStencilTextureArray.get(), 0, 0, 2);
+  }
+  else {
+    BABYLON_LOG_ERROR("Engine", "Invalid multiview frame buffer")
+  }
 }
 
 void Engine::_prepareWebGLTextureContinuation(const InternalTexturePtr& texture,

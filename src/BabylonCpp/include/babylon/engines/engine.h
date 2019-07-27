@@ -1870,6 +1870,20 @@ public:
     unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
 
   /**
+   * @brief Creates a new multiview render target.
+   * @param width defines the width of the texture
+   * @param height defines the height of the texture
+   * @returns the created multiview texture
+   */
+  InternalTexturePtr createMultiviewRenderTargetTexture(int width, int height);
+
+  /**
+   * Binds a multiview framebuffer to be drawn to
+   * @param multiviewTexture texture to bind
+   */
+  void bindMultiviewFramebuffer(const InternalTexturePtr& multiviewTexture);
+
+  /**
    * @brief Hidden
    */
   void _releaseFramebufferObjects(InternalTexture* texture);
@@ -2133,7 +2147,7 @@ public:
 
   /**
    * @brief Starts a time query (used to measure time spent by the GPU on a
-   * specific frame). Please note that only one query can be issued at a time
+   * specific frame) Please note that only one query can be issued at a time.
    * @returns a time token used to track the time span
    */
   std::optional<_TimeToken> startTimeQuery();

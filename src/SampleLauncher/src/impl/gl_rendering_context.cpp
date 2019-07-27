@@ -693,6 +693,12 @@ void GLRenderingContext::framebufferTexture2D(GLenum target, GLenum attachment,
   glFramebufferTexture2D(target, attachment, textarget, texture->value, level);
 }
 
+void GLRenderingContext::framebufferTextureMultiviewOVR(
+  GLenum /*target*/, GLenum /*attachment*/, IGLTexture* /*texture*/,
+  GLint /*level*/, GLint /*baseViewIndex*/, GLint /*numViews*/)
+{
+}
+
 void GLRenderingContext::frontFace(GLenum mode)
 {
   glFrontFace(mode);
@@ -1090,6 +1096,13 @@ void GLRenderingContext::texParameterf(GLenum target, GLenum pname,
 void GLRenderingContext::texParameteri(GLenum target, GLenum pname, GLint param)
 {
   glTexParameteri(target, pname, param);
+}
+
+void GLRenderingContext::texStorage3D(GLenum target, GLint levels,
+                                      GLenum internalformat, GLsizei width,
+                                      GLsizei height, GLsizei depth)
+{
+  glTexStorage3D(target, levels, internalformat, width, height, depth);
 }
 
 void GLRenderingContext::texSubImage2D(GLenum target, GLint level,

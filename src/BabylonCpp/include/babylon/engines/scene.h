@@ -1698,6 +1698,22 @@ public:
                  const std::optional<bool>& useDatabase    = std::nullopt,
                  const std::optional<bool>& useArrayBuffer = std::nullopt);
 
+  /**
+   * @brief Hidden
+   */
+  void _createMultiviewUbo();
+
+  /**
+   * @brief Hidden
+   */
+  void _updateMultiviewUbo(std::optional<Matrix> viewR       = std::nullopt,
+                           std::optional<Matrix> projectionR = std::nullopt);
+
+  /**
+   * @brief Hidden
+   */
+  void _renderMultiviewToSingleView(const CameraPtr& camera);
+
 protected:
   /**
    * @brief Creates a new Scene.
@@ -3472,6 +3488,11 @@ private:
 
   std::optional<bool> _audioEnabled;
   std::optional<bool> _headphone;
+
+  /** Hidden */
+  Matrix _transformMatrixR;
+  /** Hidden */
+  std::unique_ptr<UniformBuffer> _multiviewSceneUbo;
 
 }; // end of class Scene
 

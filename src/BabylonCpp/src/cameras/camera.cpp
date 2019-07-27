@@ -15,6 +15,7 @@
 #include <babylon/culling/ray.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
+#include <babylon/materials/textures/multiview_render_target.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/math/frustum.h>
 #include <babylon/misc/serialization_helper.h>
@@ -64,6 +65,8 @@ Camera::Camera(const std::string& iName, const Vector3& iPosition, Scene* scene,
     , isLeftCamera{this, &Camera::get_isLeftCamera}
     , _isRightCamera{true}
     , isRightCamera{this, &Camera::get_isRightCamera}
+    , _useMultiviewToSingleView{false}
+    , _multiviewTexture{nullptr}
     , _webvrViewMatrix{Matrix::Identity()}
     , _globalPosition{Vector3::Zero()}
     , _doNotComputeProjectionMatrix{false}
@@ -872,6 +875,20 @@ void Camera::getDirectionToRef(const Vector3& localAxis, Vector3& result)
 Matrix& Camera::computeWorldMatrix(bool /*force*/, bool /*useWasUpdatedFlag*/)
 {
   return getWorldMatrix();
+}
+
+void Camera::_resizeOrCreateMultiviewTexture(int width, int height)
+{
+  if (!_multiviewTexture) {
+    _multiviewTexture
+      = MultiviewRenderTarget::New(getScene(), ISize{width, height});
+  }
+  else if (_multiviewTexture->getRenderWidth() != width
+           || _multiviewTexture->getRenderHeight() != height) {
+    _multiviewTexture->dispose();
+    _multiviewTexture
+      = MultiviewRenderTarget::New(getScene(), ISize{width, height});
+  }
 }
 
 std::function<CameraPtr()> Camera::GetConstructorFromName(

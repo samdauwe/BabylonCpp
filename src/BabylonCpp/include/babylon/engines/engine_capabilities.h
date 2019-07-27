@@ -99,6 +99,9 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   GL::EXT_disjoint_timer_query* timerQuery = nullptr;
   /** Defines if timestamp can be used with timer query */
   bool canUseTimestampForTimerQuery;
+  /** Defines if multiview is supported
+   * (https://www.khronos.org/registry/webgl/extensions/WEBGL_multiview/) */
+  bool multiview = false;
   /** Function used to let the system compiles shaders in background */
   bool parallelShaderCompile;
 }; // end of struct EngineCapabilities

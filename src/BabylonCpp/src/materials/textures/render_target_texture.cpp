@@ -22,9 +22,9 @@ namespace BABYLON {
 RenderTargetTexture::RenderTargetTexture(
   const std::string& iName, const std::variant<ISize, float>& size,
   Scene* scene, bool generateMipMaps, bool doNotChangeAspectRatio,
-  unsigned int type, bool iIsCube, unsigned int samplingMode,
+  unsigned int type, bool iIsCube, unsigned int iSamplingMode,
   bool generateDepthBuffer, bool generateStencilBuffer, bool isMulti,
-  unsigned int format)
+  unsigned int format, bool /*delayAllocation*/)
     : Texture{"", scene, !generateMipMaps}
     , renderListPredicate{nullptr}
     , renderList{this, &RenderTargetTexture::get_renderList,
@@ -85,11 +85,11 @@ RenderTargetTexture::RenderTargetTexture(
   _renderTargetOptions.generateMipMaps       = generateMipMaps;
   _renderTargetOptions.type                  = type;
   _renderTargetOptions.format                = format;
-  _renderTargetOptions.samplingMode          = samplingMode;
+  _renderTargetOptions.samplingMode          = iSamplingMode;
   _renderTargetOptions.generateDepthBuffer   = generateDepthBuffer;
   _renderTargetOptions.generateStencilBuffer = generateStencilBuffer;
 
-  if (samplingMode == TextureConstants::NEAREST_SAMPLINGMODE) {
+  if (iSamplingMode == TextureConstants::NEAREST_SAMPLINGMODE) {
     wrapU = TextureConstants::CLAMP_ADDRESSMODE;
     wrapV = TextureConstants::CLAMP_ADDRESSMODE;
   }

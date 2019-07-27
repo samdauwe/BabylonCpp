@@ -7,9 +7,9 @@
 namespace BABYLON {
 
 MultiRenderTarget::MultiRenderTarget(
-  const std::string& name, Size size, std::size_t count, Scene* scene,
+  const std::string& iName, Size size, std::size_t count, Scene* scene,
   const std::optional<IMultiRenderTargetOptions>& options)
-    : RenderTargetTexture{name, size, scene,
+    : RenderTargetTexture{iName, size, scene,
                           options && (*options).generateMipMaps ?
                             *(*options).generateMipMaps :
                             false,

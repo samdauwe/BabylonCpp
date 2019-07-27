@@ -1,8 +1,8 @@
 #ifndef BABYLON_IMPL_GL_RENDERING_CONTEXT_H
 #define BABYLON_IMPL_GL_RENDERING_CONTEXT_H
 
-#include <unordered_map>
 #include <babylon/interfaces/igl_rendering_context.h>
+#include <unordered_map>
 
 namespace BABYLON {
 namespace GL {
@@ -11,7 +11,7 @@ class GLRenderingContext : public BABYLON::GL::IGLRenderingContext {
 
 public:
   GLRenderingContext();
-  virtual ~GLRenderingContext();
+  ~GLRenderingContext() override;
 
   bool initialize(bool enableGLDebugging = false) override;
   void backupGLState() override;
@@ -135,6 +135,10 @@ public:
     const std::unique_ptr<IGLRenderbuffer>& renderbuffer) override;
   void framebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget,
                             IGLTexture* texture, GLint level) override;
+  void framebufferTextureMultiviewOVR(GLenum target, GLenum attachment,
+                                      IGLTexture* texture, GLint level,
+                                      GLint baseViewIndex,
+                                      GLint numViews) override;
   void frontFace(GLenum mode) override;
   void generateMipmap(GLenum target) override;
   std::vector<IGLShader*> getAttachedShaders(IGLProgram* program) override;
@@ -216,6 +220,8 @@ public:
                   const Uint8Array& pixels) override;
   void texParameterf(GLenum target, GLenum pname, GLfloat param) override;
   void texParameteri(GLenum target, GLenum pname, GLint param) override;
+  void texStorage3D(GLenum target, GLint levels, GLenum internalformat,
+                    GLsizei width, GLsizei height, GLsizei depth) override;
   void texSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset,
                      GLsizei width, GLsizei height, GLenum format, GLenum type,
                      any pixels) override;
