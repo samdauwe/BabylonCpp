@@ -19,4 +19,14 @@ const std::string InstancedLinesMesh::getClassName() const
   return "InstancedLinesMesh";
 }
 
+InstancedLinesMesh&
+InstancedLinesMesh::enableEdgesRendering(float epsilon,
+                                         bool checkVerticesInsteadOfIndices)
+{
+  LinesMesh::enableEdgesRendering(
+    std::static_pointer_cast<AbstractMesh>(shared_from_this()), epsilon,
+    checkVerticesInsteadOfIndices);
+  return *this;
+}
+
 } // end of namespace BABYLON

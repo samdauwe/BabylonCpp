@@ -56,6 +56,11 @@ public:
 
 public:
   /**
+   * If the object should rotate to face the drag origin
+   */
+  bool rotateDraggedObject;
+
+  /**
    * If the behavior is currently in a dragging state
    */
   bool dragging;

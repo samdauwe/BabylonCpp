@@ -81,6 +81,20 @@ public:
    */
   InstancedLinesMeshPtr createInstance(const std::string& name);
 
+  /**
+   * @brief Enables the edge rendering mode on the mesh.
+   * This mode makes the mesh edges visible
+   * @param epsilon defines the maximal distance between two angles to detect a
+   * face
+   * @param checkVerticesInsteadOfIndices indicates that we should check vertex
+   * list directly instead of faces
+   * @returns the currentAbstractMesh
+   * @see https://www.babylonjs-playground.com/#19O9TU#0
+   */
+  static AbstractMeshPtr
+  enableEdgesRendering(const AbstractMeshPtr& source, float epsilon = 0.95f,
+                       bool checkVerticesInsteadOfIndices = false);
+
 protected:
   /**
    * @brief Creates a new LinesMesh.

@@ -1,6 +1,7 @@
 #include <babylon/materials/textures/internal_texture.h>
 
 #include <babylon/core/array_buffer_view.h>
+#include <babylon/engines/constants.h>
 #include <babylon/engines/depth_texture_creation_options.h>
 #include <babylon/engines/engine.h>
 #include <babylon/materials/textures/base_texture.h>
@@ -30,14 +31,36 @@ InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource,
     , isCube{false}
     , is3D{false}
     , isMultiview{false}
+    , url{""}
+    , generateMipMaps{false}
+    , samples{0}
+    , width{0}
+    , height{0}
+    , depth{0}
+    , baseWidth{0}
+    , baseHeight{0}
+    , baseDepth{0}
+    , invertY{false}
     , _invertVScale{false}
-    , _initialSlot{-1}
-    , _designatedSlot{-1}
+    , _associatedChannel{-1}
     , _dataSource{dataSource}
     , _size{0}
+    , _extension{""}
+    , _workingCanvas{nullptr}
+    , _workingContext{nullptr}
+    , _framebuffer{nullptr}
+    , _depthStencilBuffer{nullptr}
+    , _MSAAFramebuffer{nullptr}
+    , _MSAARenderBuffer{nullptr}
+    , _cachedCoordinatesMode{0}
     , _cachedWrapU{0}
     , _cachedWrapV{0}
     , _cachedWrapR{0}
+    , _cachedAnisotropicFilteringLevel{0}
+    , _isDisabled{false}
+    , _compression{""}
+    , _generateStencilBuffer{false}
+    , _generateDepthBuffer{false}
     , _comparisonFunction{0}
     , _sphericalPolynomial{nullptr}
     , _lodGenerationScale{0}
@@ -48,6 +71,7 @@ InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource,
     , _lodTextureMid{nullptr}
     , _lodTextureLow{nullptr}
     , _isRGBD{false}
+    , _webGLTexture{nullptr}
     , _references{1}
     , _engine{engine}
 {
@@ -132,6 +156,9 @@ void InternalTexture::_rebuild()
       proxy = _engine->createDynamicTexture(baseWidth, baseHeight,
                                             generateMipMaps, samplingMode);
       proxy->_swapAndDie(this);
+      // _engine->updateDynamicTexture(this, _engine->getRenderingCanvas(),
+      // invertY, undefined, undefined, true);
+
       // The engine will make sure to update content so no need to flag it as
       // isReady = true
     }
@@ -160,7 +187,7 @@ void InternalTexture::_rebuild()
     case InternalTexture::DATASOURCE_DEPTHTEXTURE: {
       DepthTextureCreationOptions depthTextureOptions;
       depthTextureOptions.bilinearFiltering
-        = samplingMode != TextureConstants::BILINEAR_SAMPLINGMODE;
+        = samplingMode != Constants::TEXTURE_BILINEAR_SAMPLINGMODE;
       depthTextureOptions.comparisonFunction = _comparisonFunction;
       depthTextureOptions.generateStencil    = _generateStencilBuffer;
       depthTextureOptions.isCube             = isCube;
@@ -196,7 +223,7 @@ void InternalTexture::_rebuild()
                                             generateMipMaps, invertY,
                                             samplingMode, _compression);
 #if 0
-      RawCubeTexture::_UpdateRGBDAsync(
+      InternalTexture::_UpdateRGBDAsync(
         proxy, _bufferViewArrayArray !, _sphericalPolynomial,
         _lodGenerationScale, _lodGenerationOffset)
         .then(() = > { isReady = true; });
@@ -224,6 +251,7 @@ void InternalTexture::_rebuild()
 void InternalTexture::_swapAndDie(InternalTexture* target)
 {
   target->_webGLTexture = _webGLTexture;
+  target->_isRGBD       = _isRGBD;
 
   if (_framebuffer) {
     target->_framebuffer = _framebuffer;
@@ -272,8 +300,6 @@ void InternalTexture::dispose()
   if (_references == 0) {
     _engine->_releaseTexture(this);
     _webGLTexture = nullptr;
-    previous      = nullptr;
-    next          = nullptr;
   }
 }
 

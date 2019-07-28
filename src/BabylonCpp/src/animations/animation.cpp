@@ -1,5 +1,6 @@
 #include <babylon/animations/animation.h>
 
+#include <babylon/animations/_ianimation_state.h>
 #include <babylon/animations/animatable.h>
 #include <babylon/animations/easing/ieasing_function.h>
 #include <babylon/animations/ianimation_key.h>
@@ -165,20 +166,21 @@ bool Animation::get_hasRunningRuntimeAnimations() const
 
 Animation::Animation(const std::string& iName,
                      const std::string& iTargetProperty, size_t iFramePerSecond,
-                     int iDataType, unsigned int iLoopMode)
+                     int iDataType, unsigned int iLoopMode,
+                     bool iEnableBlending)
 
     : name{iName}
     , targetProperty{iTargetProperty}
     , targetPropertyPath{String::split(targetProperty, '.')}
-    , framePerSecond{iFramePerSecond}
-    , dataType{iDataType}
-    , loopMode{iLoopMode}
     , blendingSpeed{0.01f}
-    , enableBlending{false}
     , hasRunningRuntimeAnimations{this,
                                   &Animation::get_hasRunningRuntimeAnimations}
     , _easingFunction{nullptr}
 {
+  framePerSecond = iFramePerSecond;
+  dataType       = iDataType;
+  loopMode       = iLoopMode;
+  enableBlending = iEnableBlending;
 }
 
 Animation::~Animation()
@@ -221,11 +223,12 @@ void Animation::addEvent(const AnimationEvent& event)
   _events.emplace_back(event);
 }
 
-void Animation::removeEvents(int frame)
+void Animation::removeEvents(float frame)
 {
   _events.erase(std::remove_if(_events.begin(), _events.end(),
                                [frame](const AnimationEvent& event) {
-                                 return event.frame == frame;
+                                 return stl_util::almost_equal(event.frame,
+                                                               frame);
                                }),
                 _events.end());
 }
@@ -372,20 +375,20 @@ AnimationValue Animation::_getKeyValue(const AnimationValue& value) const
   return value;
 }
 
-AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
-                                       std::optional<AnimationValue>& workValue,
-                                       unsigned int iLoopMode,
-                                       const AnimationValue& offsetValue,
-                                       const AnimationValue& highLimitValue)
+AnimationValue Animation::_interpolate(float currentFrame,
+                                       _IAnimationState& state)
 {
-  if (loopMode == Animation::ANIMATIONLOOPMODE_CONSTANT() && repeatCount > 0) {
-    return highLimitValue.copy();
+  if (state.loopMode == Animation::ANIMATIONLOOPMODE_CONSTANT()
+      && state.repeatCount > 0) {
+    return state.highLimitValue.copy();
   }
 
-  auto _repeatCount = static_cast<float>(repeatCount);
+  auto& keys = _keys;
+  if (keys.size() == 1) {
+    return _getKeyValue(keys[0].value);
+  }
 
-  auto& keys = getKeys();
-
+#if 1
   // Try to get a hash to find the right key
   int _keysLength   = static_cast<int>(keys.size());
   int startKeyIndex = std::max(
@@ -394,6 +397,9 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
                   std::floor(_keysLength * (currentFrame - keys[0].frame)
                              / (keys.back().frame - keys[0].frame))
                   - 1)));
+#else
+  auto startKeyIndex = state.key;
+#endif
 
   if (keys[static_cast<unsigned int>(startKeyIndex)].frame >= currentFrame) {
     while (startKeyIndex - 1 >= 0
@@ -409,6 +415,7 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
 
     if (endKey.frame >= currentFrame) {
 
+      state.key            = static_cast<int>(key);
       const auto& startKey = keys[key];
       auto startValue      = _getKeyValue(startKey.value);
       if ((*startKey.interpolation).animationType().has_value()
@@ -444,13 +451,14 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
                   gradient) :
                 floatInterpolateFunction(startValue.get<float>(),
                                          endValue.get<float>(), gradient);
-          switch (iLoopMode) {
+          switch (state.loopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
               newVale = floatValue;
               return newVale;
             case Animation::ANIMATIONLOOPMODE_RELATIVE():
-              newVale = offsetValue.get<float>() * _repeatCount + floatValue;
+              newVale = state.offsetValue.get<float>() * state.repeatCount
+                        + floatValue;
               return newVale;
             default:
               break;
@@ -469,14 +477,14 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
                 quaternionInterpolateFunction(startValue.get<Quaternion>(),
                                               endValue.get<Quaternion>(),
                                               gradient);
-          switch (iLoopMode) {
+          switch (state.loopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
               newVale = quatValue;
               return newVale;
             case Animation::ANIMATIONLOOPMODE_RELATIVE():
               newVale = quatValue.add(
-                offsetValue.get<Quaternion>().scale(_repeatCount));
+                state.offsetValue.get<Quaternion>().scale(state.repeatCount));
               return newVale;
             default:
               break;
@@ -494,14 +502,14 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
                   gradient) :
                 vector3InterpolateFunction(startValue.get<Vector3>(),
                                            endValue.get<Vector3>(), gradient);
-          switch (iLoopMode) {
+          switch (state.loopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
               newVale = vec3Value;
               return newVale;
             case Animation::ANIMATIONLOOPMODE_RELATIVE():
-              newVale
-                = vec3Value.add(offsetValue.get<Vector3>().scale(_repeatCount));
+              newVale = vec3Value.add(
+                state.offsetValue.get<Vector3>().scale(state.repeatCount));
               return newVale;
             default:
               break;
@@ -519,14 +527,14 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
                   gradient) :
                 vector2InterpolateFunction(startValue.get<Vector2>(),
                                            endValue.get<Vector2>(), gradient);
-          switch (iLoopMode) {
+          switch (state.loopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
               newVale = vec2Value;
               return newVale;
             case Animation::ANIMATIONLOOPMODE_RELATIVE():
-              newVale
-                = vec2Value.add(offsetValue.get<Vector2>().scale(_repeatCount));
+              newVale = vec2Value.add(
+                state.offsetValue.get<Vector2>().scale(state.repeatCount));
               return newVale;
             default:
               break;
@@ -534,7 +542,7 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
         } break;
         // Size
         case Animation::ANIMATIONTYPE_SIZE():
-          switch (iLoopMode) {
+          switch (state.loopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
               newVale = sizeInterpolateFunction(startValue.get<Size>(),
@@ -543,7 +551,8 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
             case Animation::ANIMATIONLOOPMODE_RELATIVE():
               newVale = sizeInterpolateFunction(startValue.get<Size>(),
                                                 endValue.get<Size>(), gradient)
-                          .add(offsetValue.get<Size>().scale(_repeatCount));
+                          .add(state.offsetValue.get<Size>().scale(
+                            state.repeatCount));
               return newVale;
             default:
               break;
@@ -551,7 +560,7 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
           break;
         // Color3
         case Animation::ANIMATIONTYPE_COLOR3():
-          switch (iLoopMode) {
+          switch (state.loopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
               newVale = color3InterpolateFunction(
@@ -561,7 +570,8 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
               newVale
                 = color3InterpolateFunction(startValue.get<Color3>(),
                                             endValue.get<Color3>(), gradient)
-                    .add(offsetValue.get<Color3>().scale(_repeatCount));
+                    .add(
+                      state.offsetValue.get<Color3>().scale(state.repeatCount));
               return newVale;
             default:
               break;
@@ -569,16 +579,16 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
           break;
         // Matrix
         case Animation::ANIMATIONTYPE_MATRIX():
-          switch (iLoopMode) {
+          switch (state.loopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
               if (Animation::AllowMatricesInterpolation()) {
-                if (workValue) {
-                  auto& _workValue = *workValue;
+                if (state.workValue) {
+                  auto& _workValue = *state.workValue;
                   newVale          = matrixInterpolateFunction(
                     startValue.get<Matrix>(), endValue.get<Matrix>(), gradient,
                     _workValue.get<Matrix>());
-                  workValue = _workValue;
+                  state.workValue = _workValue;
                 }
                 return newVale;
               }

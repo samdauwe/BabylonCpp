@@ -224,6 +224,8 @@ public:
    */
   std::function<void()> onAnimationEnd;
 
+  std::function<void()> onAnimationLoop;
+
   /**
    * Observer raised when the animation ends
    */

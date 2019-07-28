@@ -2,6 +2,7 @@
 
 #include <cmath>
 
+#include <babylon/animations/_ianimation_state.h>
 #include <babylon/animations/animatable.h>
 #include <babylon/animations/animation.h>
 #include <babylon/animations/easing/ieasing_function.h>
@@ -132,8 +133,14 @@ AnimationValue RuntimeAnimation::_interpolate(
     _workValue = Matrix::Zero();
   }
 
-  return _animation->_interpolate(currentFrame, repeatCount, _workValue,
-                                  loopMode, offsetValue, highLimitValue);
+  _IAnimationState state;
+  state.repeatCount    = repeatCount;
+  state.workValue      = _workValue;
+  state.loopMode       = loopMode;
+  state.offsetValue    = offsetValue;
+  state.highLimitValue = highLimitValue;
+
+  return _animation->_interpolate(currentFrame, state);
 }
 
 void RuntimeAnimation::setValue(const AnimationValue& iCurrentValue,

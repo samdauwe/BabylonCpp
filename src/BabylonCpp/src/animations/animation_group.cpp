@@ -15,16 +15,22 @@ AnimationGroup::AnimationGroup(const std::string& iName, Scene* scene)
     , from{this, &AnimationGroup::get_from}
     , to{this, &AnimationGroup::get_to}
     , isStarted{this, &AnimationGroup::get_isStarted}
+    , isPlaying{this, &AnimationGroup::get_isPlaying}
     , speedRatio{this, &AnimationGroup::get_speedRatio,
                  &AnimationGroup::set_speedRatio}
+    , loopAnimation{this, &AnimationGroup::get_loopAnimation,
+                    &AnimationGroup::set_loopAnimation}
     , targetedAnimations{this, &AnimationGroup::get_targetedAnimations}
     , animatables{this, &AnimationGroup::get_animatables}
-    , _scene{scene ? scene : Engine::LastCreatedScene()}
     , _from{std::numeric_limits<float>::max()}
     , _to{std::numeric_limits<float>::lowest()}
     , _isStarted{false}
+    , _isPaused{false}
     , _speedRatio{1.f}
+    , _loopAnimation{false}
 {
+  _scene   = scene ? scene : Engine::LastCreatedScene();
+  uniqueId = _scene->getUniqueId();
 }
 
 AnimationGroup::~AnimationGroup()
@@ -51,6 +57,11 @@ bool AnimationGroup::get_isStarted() const
   return _isStarted;
 }
 
+bool AnimationGroup::get_isPlaying() const
+{
+  return _isStarted && !_isPaused;
+}
+
 float AnimationGroup::get_speedRatio() const
 {
   return _speedRatio;
@@ -64,8 +75,26 @@ void AnimationGroup::set_speedRatio(float value)
 
   _speedRatio = value;
 
-  for (auto& animatable : _animatables) {
+  for (const auto& animatable : _animatables) {
     animatable->speedRatio = _speedRatio;
+  }
+}
+
+bool AnimationGroup::get_loopAnimation() const
+{
+  return _loopAnimation;
+}
+
+void AnimationGroup::set_loopAnimation(bool value)
+{
+  if (_loopAnimation == value) {
+    return;
+  }
+
+  _loopAnimation = value;
+
+  for (const auto& animatable : _animatables) {
+    animatable->loopAnimation = _loopAnimation;
   }
 }
 
@@ -146,21 +175,38 @@ AnimationGroup& AnimationGroup::start(bool loop, float iSpeedRatio,
     return *this;
   }
 
+  _loopAnimation = loop;
+
   for (auto& targetedAnimation : _targetedAnimations) {
     auto animatable = _scene->beginDirectAnimation(
       targetedAnimation->target, {targetedAnimation->animation},
       iFrom.has_value() ? *iFrom : _from, iTo.has_value() ? *iTo : _to, loop,
       iSpeedRatio);
-    animatable->onAnimationEnd = [&]() {
+    animatable->onAnimationEnd = [&]() -> void {
       onAnimationEndObservable.notifyObservers(targetedAnimation.get());
       _checkAnimationGroupEnded(animatable);
+    };
+    animatable->onAnimationLoop = [this, &targetedAnimation]() -> void {
+      onAnimationLoopObservable.notifyObservers(targetedAnimation.get());
     };
     _animatables.emplace_back(animatable);
   }
 
   _speedRatio = iSpeedRatio;
 
+  if (iFrom.has_value() && iTo.has_value()) {
+    if (*iFrom < *iTo && _speedRatio < 0.f) {
+      std::swap(iFrom, iTo);
+    }
+    else if (*iFrom > *iTo && _speedRatio > 0.f) {
+      _speedRatio = -speedRatio;
+    }
+  }
+
   _isStarted = true;
+  _isPaused  = false;
+
+  onAnimationGroupPlayObservable.notifyObservers(this);
 
   return *this;
 }
@@ -171,7 +217,9 @@ AnimationGroup& AnimationGroup::pause()
     return *this;
   }
 
-  for (auto& animatable : _animatables) {
+  _isPaused = true;
+
+  for (const auto& animatable : _animatables) {
     animatable->pause();
   }
 
@@ -180,19 +228,21 @@ AnimationGroup& AnimationGroup::pause()
   return *this;
 }
 
-AnimationGroup& AnimationGroup::play(bool loop)
+AnimationGroup& AnimationGroup::play(const std::optional<bool> loop)
 {
   // only if all animatables are ready and exist
   if (isStarted() && _animatables.size() == _targetedAnimations.size()) {
-    for (auto& animatable : _animatables) {
-      animatable->loopAnimation = loop;
+    if (loop.has_value()) {
+      loopAnimation = *loop;
     }
     restart();
   }
   else {
     stop();
-    start(loop, _speedRatio);
+    start(loop.value_or(false), _speedRatio);
   }
+
+  _isPaused = false;
 
   return *this;
 }
@@ -203,7 +253,7 @@ AnimationGroup& AnimationGroup::reset()
     return *this;
   }
 
-  for (auto& animatable : _animatables) {
+  for (const auto& animatable : _animatables) {
     animatable->reset();
   }
 
@@ -218,11 +268,11 @@ AnimationGroup& AnimationGroup::restart()
     return *this;
   }
 
-  for (auto& animatable : _animatables) {
+  for (const auto& animatable : _animatables) {
     animatable->restart();
   }
 
-  _isStarted = false;
+  onAnimationGroupPlayObservable.notifyObservers(this);
 
   return *this;
 }
@@ -233,7 +283,7 @@ AnimationGroup& AnimationGroup::stop()
     return *this;
   }
 
-  for (auto& animatable : _animatables) {
+  for (const auto& animatable : _animatables) {
     animatable->stop();
   }
 
@@ -244,7 +294,7 @@ AnimationGroup& AnimationGroup::stop()
 
 AnimationGroup& AnimationGroup::setWeightForAllAnimatables(float weight)
 {
-  for (auto& animatable : _animatables) {
+  for (const auto& animatable : _animatables) {
     animatable->weight = weight;
   }
 
@@ -253,7 +303,7 @@ AnimationGroup& AnimationGroup::setWeightForAllAnimatables(float weight)
 
 AnimationGroup& AnimationGroup::syncAllAnimationsWith(Animatable* root)
 {
-  for (auto& animatable : _animatables) {
+  for (const auto& animatable : _animatables) {
     animatable->syncWith(root);
   }
 
@@ -266,7 +316,7 @@ AnimationGroup& AnimationGroup::goToFrame(float frame)
     return *this;
   }
 
-  for (auto& animatable : _animatables) {
+  for (const auto& animatable : _animatables) {
     animatable->goToFrame(frame);
   }
 
@@ -286,6 +336,12 @@ void AnimationGroup::dispose(bool /*doNotRecurse*/,
                      return animationGroup.get() == this;
                    }),
     _scene->animationGroups.end());
+
+  onAnimationEndObservable.clear();
+  onAnimationGroupEndObservable.clear();
+  onAnimationGroupPauseObservable.clear();
+  onAnimationGroupPlayObservable.clear();
+  onAnimationLoopObservable.clear();
 }
 
 void AnimationGroup::_checkAnimationGroupEnded(const AnimatablePtr& animatable)
@@ -300,6 +356,23 @@ void AnimationGroup::_checkAnimationGroupEnded(const AnimatablePtr& animatable)
     _isStarted = false;
     onAnimationGroupEndObservable.notifyObservers(this);
   }
+}
+
+AnimationGroupPtr AnimationGroup::clone(
+  const std::string& newName,
+  const std::function<IAnimatablePtr(const IAnimatablePtr& animatible)>&
+    targetConverter)
+{
+  auto newGroup = AnimationGroup::New(newName.empty() ? name : newName, _scene);
+
+  for (const auto& targetAnimation : _targetedAnimations) {
+    newGroup->addTargetedAnimation(targetAnimation->animation->clone(),
+                                   targetConverter ?
+                                     targetConverter(targetAnimation->target) :
+                                     targetAnimation->target);
+  }
+
+  return newGroup;
 }
 
 AnimationGroupPtr AnimationGroup::Parse(const json& /*parsedAnimationGroup*/,

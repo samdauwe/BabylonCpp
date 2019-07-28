@@ -3,15 +3,16 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
-#include <babylon/gizmos/bounding_box_gizmo.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/misc/pivot_tools.h>
 
 namespace BABYLON {
 
 std::unique_ptr<Scene> SixDofDragBehavior::_virtualScene = nullptr;
 
 SixDofDragBehavior::SixDofDragBehavior()
-    : dragging{false}
+    : rotateDraggedObject{true}
+    , dragging{false}
     , dragDeltaRatio{0.2f}
     , currentDraggingPointerID{-1}
     , detachCameraControls{true}
@@ -51,7 +52,7 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
   }
 
   AbstractMeshPtr pickedMesh = nullptr;
-  Vector3 lastSixDofOriginPosition(0, 0, 0);
+  Vector3 lastSixDofOriginPosition(0.f, 0.f, 0.f);
 
   // Setup virtual meshes to be used for dragging without dirtying the existing
   // scene
@@ -77,12 +78,12 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
         if (_scene->activeCamera
             && _scene->activeCamera->cameraRigMode == Camera::RIG_MODE_NONE) {
           auto ray = *pointerInfo->pickInfo.ray;
-          ray.origin.copyFrom(_scene->activeCamera->position);
+          ray.origin.copyFrom(_scene->activeCamera->globalPosition);
           pointerInfo->pickInfo.ray = ray;
         }
 
         pickedMesh = _ownerNode;
-        BoundingBoxGizmo::_RemoveAndStorePivotPoint(pickedMesh);
+        PivotTools::_RemoveAndStorePivotPoint(pickedMesh);
         lastSixDofOriginPosition.copyFrom((*pointerInfo->pickInfo.ray).origin);
 
         // Set position and orientation of the controller
@@ -90,7 +91,7 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
           (*pointerInfo->pickInfo.ray).origin);
         _virtualOriginMesh->lookAt(
           (*pointerInfo->pickInfo.ray)
-            .origin.subtract((*pointerInfo->pickInfo.ray).direction));
+            .origin.add((*pointerInfo->pickInfo.ray).direction));
 
         // Attach the virtual drag mesh to the virtual origin mesh so it can be
         // dragged
@@ -126,7 +127,7 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
             attachedElement = nullptr;
           }
         }
-        BoundingBoxGizmo::_RestorePivotPoint(pickedMesh);
+        PivotTools::_RestorePivotPoint(pickedMesh);
         onDragStartObservable.notifyObservers({});
       }
     }
@@ -153,7 +154,7 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
         if (_scene->activeCamera
             && _scene->activeCamera->cameraRigMode == Camera::RIG_MODE_NONE) {
           auto ray = *pointerInfo->pickInfo.ray;
-          ray.origin.copyFrom(_scene->activeCamera->position);
+          ray.origin.copyFrom(_scene->activeCamera->globalPosition);
           pointerInfo->pickInfo.ray = ray;
           _zDragFactor              = 0.f;
         }
@@ -184,7 +185,7 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
           (*pointerInfo->pickInfo.ray).origin);
         _virtualOriginMesh->lookAt(
           (*pointerInfo->pickInfo.ray)
-            .origin.subtract((*pointerInfo->pickInfo.ray).direction));
+            .origin.add((*pointerInfo->pickInfo.ray).direction));
         _virtualOriginMesh->removeChild(*_virtualDragMesh);
 
         // Move the virtualObjectsPosition into the picked mesh's space if
@@ -211,31 +212,41 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
   _sceneRenderObserver = ownerNode->getScene()->onBeforeRenderObservable.add(
     [&](Scene* /*scene*/, EventState& /*es*/) {
       if (dragging && _moving && pickedMesh) {
-        BoundingBoxGizmo::_RemoveAndStorePivotPoint(pickedMesh);
+        PivotTools::_RemoveAndStorePivotPoint(pickedMesh);
         // Slowly move mesh to avoid jitter
         pickedMesh->position().addInPlace(
           _targetPosition.subtract(pickedMesh->position())
             .scale(dragDeltaRatio));
 
-        // Get change in rotation
-        tmpQuaternion.copyFrom(_startingOrientation);
-        tmpQuaternion.x = -tmpQuaternion.x;
-        tmpQuaternion.y = -tmpQuaternion.y;
-        tmpQuaternion.z = -tmpQuaternion.z;
-        _virtualDragMesh->rotationQuaternion()->multiplyToRef(tmpQuaternion,
-                                                              tmpQuaternion);
-        // Convert change in rotation to only y axis rotation
-        Quaternion::RotationYawPitchRollToRef(
-          tmpQuaternion.toEulerAngles("xyz").y, 0, 0, tmpQuaternion);
-        tmpQuaternion.multiplyToRef(_startingOrientation, tmpQuaternion);
-        // Slowly move mesh to avoid jitter
-        auto oldParent = pickedMesh->parent();
-        pickedMesh->setParent(nullptr);
-        Quaternion::SlerpToRef(*pickedMesh->rotationQuaternion(), tmpQuaternion,
-                               dragDeltaRatio,
-                               *pickedMesh->rotationQuaternion());
-        pickedMesh->setParent(oldParent);
-        BoundingBoxGizmo::_RestorePivotPoint(pickedMesh);
+        if (rotateDraggedObject) {
+          // Get change in rotation
+          tmpQuaternion.copyFrom(_startingOrientation);
+          tmpQuaternion.x = -tmpQuaternion.x;
+          tmpQuaternion.y = -tmpQuaternion.y;
+          tmpQuaternion.z = -tmpQuaternion.z;
+          _virtualDragMesh->rotationQuaternion()->multiplyToRef(tmpQuaternion,
+                                                                tmpQuaternion);
+          // Convert change in rotation to only y axis rotation
+          Quaternion::RotationYawPitchRollToRef(
+            tmpQuaternion.toEulerAngles("xyz").y, 0, 0, tmpQuaternion);
+          tmpQuaternion.multiplyToRef(_startingOrientation, tmpQuaternion);
+          // Slowly move mesh to avoid jitter
+          auto oldParent = pickedMesh->parent();
+
+          // Only rotate the mesh if it's parent has uniform scaling
+          if (!oldParent
+              || (static_cast<Mesh*>(oldParent)
+                  && !(static_cast<Mesh*>(oldParent)
+                         ->scaling()
+                         .isNonUniformWithinEpsilon(0.001f)))) {
+            pickedMesh->setParent(nullptr);
+            Quaternion::SlerpToRef(*pickedMesh->rotationQuaternion(),
+                                   tmpQuaternion, dragDeltaRatio,
+                                   *pickedMesh->rotationQuaternion());
+            pickedMesh->setParent(oldParent);
+          }
+        }
+        PivotTools::_RestorePivotPoint(pickedMesh);
       }
     });
 }

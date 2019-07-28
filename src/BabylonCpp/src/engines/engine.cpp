@@ -509,18 +509,7 @@ void Engine::_prepareWorkingCanvas()
 void Engine::resetTextureCache()
 {
   for (auto& boundTextureItem : _boundTexturesCache) {
-    auto& boundTexture = boundTextureItem.second;
-    if (boundTexture) {
-      _removeDesignatedSlot(boundTexture);
-    }
     boundTextureItem.second = nullptr;
-  }
-
-  if (!disableTextureBindingOptimization) {
-    _nextFreeTextureSlots.clear();
-    for (unsigned int slot = 0; slot < _maxSimultaneousTextures; ++slot) {
-      _nextFreeTextureSlots.emplace_back(slot);
-    }
   }
 
   _currentTextureChannel = -1;
@@ -5137,45 +5126,6 @@ void Engine::_moveBoundTextureOnTop(const InternalTexturePtr& internalTexture)
   _linkTrackers(internalTexture, _lastBoundInternalTextureTracker);
 }
 
-int Engine::_getCorrectTextureChannel(int channel,
-                                      const InternalTexturePtr& internalTexture)
-{
-  if (!internalTexture) {
-    return -1;
-  }
-
-  internalTexture->_initialSlot = channel;
-
-  if (disableTextureBindingOptimization) { // We want texture sampler ID ===
-                                           // texture channel
-    if (channel != internalTexture->_designatedSlot) {
-      _textureCollisions.addCount(1, false);
-    }
-  }
-  else {
-    if (channel != internalTexture->_designatedSlot) {
-      if (internalTexture->_designatedSlot
-          > -1) { // Texture is already assigned to a slot
-        return internalTexture->_designatedSlot;
-      }
-      else {
-        // No slot for this texture, let's pick a new one (if we find a free
-        // slot)
-        if (!_nextFreeTextureSlots.empty()) {
-          return _nextFreeTextureSlots.front();
-        }
-
-        // We need to recycle the oldest bound texture, sorry.
-        _textureCollisions.addCount(1, false);
-        return _removeDesignatedSlot(std::static_pointer_cast<InternalTexture>(
-          _firstBoundInternalTextureTracker->next));
-      }
-    }
-  }
-
-  return channel;
-}
-
 void Engine::_linkTrackers(const IInternalTextureTrackerPtr& previous,
                            const IInternalTextureTrackerPtr& next)
 {
@@ -5185,29 +5135,6 @@ void Engine::_linkTrackers(const IInternalTextureTrackerPtr& previous,
   if (next) {
     next->previous = previous;
   }
-}
-
-int Engine::_removeDesignatedSlot(const InternalTexturePtr& internalTexture)
-{
-  const auto currentSlot = internalTexture->_designatedSlot;
-  if (currentSlot == -1) {
-    return -1;
-  }
-
-  internalTexture->_designatedSlot = -1;
-
-  if (disableTextureBindingOptimization) {
-    return -1;
-  }
-
-  // Remove from bound list
-  _linkTrackers(internalTexture->previous, internalTexture->next);
-
-  // Free the slot
-  _boundTexturesCache[currentSlot] = nullptr;
-  _nextFreeTextureSlots.emplace_back(currentSlot);
-
-  return currentSlot;
 }
 
 void Engine::_activateCurrentTexture()
@@ -5223,36 +5150,33 @@ bool Engine::_bindTextureDirectly(unsigned int target,
                                   const InternalTexturePtr& texture,
                                   bool forTextureDataUpdate, bool force)
 {
-  bool wasPreviouslyBound = false;
-  if (forTextureDataUpdate && texture && texture->_designatedSlot > -1) {
-    _activeChannel = texture->_designatedSlot;
+  auto wasPreviouslyBound    = false;
+  auto isTextureForRendering = texture && texture->_associatedChannel > -1;
+  if (forTextureDataUpdate && isTextureForRendering) {
+    _activeChannel = texture->_associatedChannel;
   }
 
-  auto& currentTextureBound  = _boundTexturesCache[_activeChannel];
-  auto isTextureForRendering = texture && (texture->_initialSlot > -1);
+  InternalTexturePtr currentTextureBound = nullptr;
+  if (stl_util::contains(_boundTexturesCache, _activeChannel)) {
+    currentTextureBound = _boundTexturesCache[_activeChannel];
+  }
 
   if (currentTextureBound != texture || force) {
-    if (currentTextureBound) {
-      _removeDesignatedSlot(currentTextureBound);
-    }
-
     _activateCurrentTexture();
 
-    _gl->bindTexture(target, texture ? texture->_webGLTexture.get() : nullptr);
+    if (texture && texture->isMultiview) {
+      _gl->bindTexture(target,
+                       texture ? texture->_colorTextureArray.get() : nullptr);
+    }
+    else {
+      _gl->bindTexture(target,
+                       texture ? texture->_webGLTexture.get() : nullptr);
+    }
+
     _boundTexturesCache[_activeChannel] = texture;
 
     if (texture) {
-      if (!disableTextureBindingOptimization) {
-        _nextFreeTextureSlots.erase(std::remove(_nextFreeTextureSlots.begin(),
-                                                _nextFreeTextureSlots.end(),
-                                                _activeChannel),
-                                    _nextFreeTextureSlots.end());
-
-        _linkTrackers(_lastBoundInternalTextureTracker->previous, texture);
-        _linkTrackers(texture, _lastBoundInternalTextureTracker);
-      }
-
-      texture->_designatedSlot = _activeChannel;
+      texture->_associatedChannel = _activeChannel;
     }
   }
   else if (forTextureDataUpdate) {
@@ -5260,8 +5184,8 @@ bool Engine::_bindTextureDirectly(unsigned int target,
     _activateCurrentTexture();
   }
 
-  if (isTextureForRendering && !forTextureDataUpdate && texture) {
-    _bindSamplerUniformToChannel(texture->_initialSlot, _activeChannel);
+  if (isTextureForRendering && !forTextureDataUpdate) {
+    _bindSamplerUniformToChannel(texture->_associatedChannel, _activeChannel);
   }
 
   return wasPreviouslyBound;
@@ -5274,7 +5198,7 @@ void Engine::_bindTexture(int channel, const InternalTexturePtr& texture)
   }
 
   if (texture) {
-    channel = _getCorrectTextureChannel(channel, texture);
+    texture->_associatedChannel = channel;
   }
 
   _activeChannel = channel;
@@ -5405,16 +5329,16 @@ bool Engine::_setTexture(int channel, const BaseTexturePtr& texture,
     internalTexture = emptyTexture();
   }
 
-  if (!isPartOfTextureArray) {
-    channel = _getCorrectTextureChannel(channel, internalTexture);
+  if (!isPartOfTextureArray && internalTexture) {
+    internalTexture->_associatedChannel = channel;
   }
 
   bool needToBind = true;
   if ((_boundTexturesCache.find(channel) != _boundTexturesCache.end())
       && (_boundTexturesCache[channel] == internalTexture)) {
-    _moveBoundTextureOnTop(internalTexture);
     if (!isPartOfTextureArray) {
-      _bindSamplerUniformToChannel(internalTexture->_initialSlot, channel);
+      _bindSamplerUniformToChannel(internalTexture->_associatedChannel,
+                                   channel);
     }
     needToBind = false;
   }
@@ -5512,9 +5436,17 @@ void Engine::setTextureArray(int channel, GL::IGLUniformLocation* uniform,
     _textureUnits.clear();
     _textureUnits.resize(textures.size());
   }
+  auto _channel = static_cast<size_t>(channel);
   for (unsigned int i = 0; i < textures.size(); ++i) {
-    _textureUnits[i] = _getCorrectTextureChannel(
-      channel + static_cast<int>(i), textures[i]->getInternalTexture());
+    auto texture = textures[i]->getInternalTexture();
+
+    if (texture) {
+      _textureUnits[_channel + i] = static_cast<int>(_channel + i);
+      texture->_associatedChannel = static_cast<int>(_channel + i);
+    }
+    else {
+      _textureUnits[_channel + i] = -1;
+    }
   }
   _gl->uniform1iv(uniform, _textureUnits);
 

@@ -2,9 +2,9 @@
 
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
+#include <babylon/math/tmp.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
-#include <babylon/rendering/face_adjacencies.h>
 
 namespace BABYLON {
 
@@ -19,60 +19,6 @@ LineEdgesRenderer::LineEdgesRenderer(const AbstractMeshPtr& source,
 LineEdgesRenderer::~LineEdgesRenderer()
 {
 }
-void LineEdgesRenderer::_checkEdge(size_t /*faceIndex*/, int /*edge*/,
-                                   const std::vector<Vector3>& /*faceNormals*/,
-                                   const Vector3& p0, const Vector3& p1)
-{
-  auto offset = static_cast<uint32_t>(_linesPositions.size() / 3);
-  auto normal = p0.subtract(p1);
-  normal.normalize();
-
-  // Positions
-  _linesPositions.emplace_back(p0.x);
-  _linesPositions.emplace_back(p0.y);
-  _linesPositions.emplace_back(p0.z);
-
-  _linesPositions.emplace_back(p0.x);
-  _linesPositions.emplace_back(p0.y);
-  _linesPositions.emplace_back(p0.z);
-
-  _linesPositions.emplace_back(p1.x);
-  _linesPositions.emplace_back(p1.y);
-  _linesPositions.emplace_back(p1.z);
-
-  _linesPositions.emplace_back(p1.x);
-  _linesPositions.emplace_back(p1.y);
-  _linesPositions.emplace_back(p1.z);
-
-  // Normals
-  _linesNormals.emplace_back(p1.x);
-  _linesNormals.emplace_back(p1.y);
-  _linesNormals.emplace_back(p1.z);
-  _linesNormals.emplace_back(-1.f);
-
-  _linesNormals.emplace_back(p1.x);
-  _linesNormals.emplace_back(p1.y);
-  _linesNormals.emplace_back(p1.z);
-  _linesNormals.emplace_back(1.f);
-
-  _linesNormals.emplace_back(p0.x);
-  _linesNormals.emplace_back(p0.y);
-  _linesNormals.emplace_back(p0.z);
-  _linesNormals.emplace_back(-1.f);
-
-  _linesNormals.emplace_back(p0.x);
-  _linesNormals.emplace_back(p0.y);
-  _linesNormals.emplace_back(p0.z);
-  _linesNormals.emplace_back(1.f);
-
-  // Indices
-  _linesIndices.emplace_back(offset);
-  _linesIndices.emplace_back(offset + 1);
-  _linesIndices.emplace_back(offset + 2);
-  _linesIndices.emplace_back(offset);
-  _linesIndices.emplace_back(offset + 2);
-  _linesIndices.emplace_back(offset + 3);
-}
 
 void LineEdgesRenderer::_generateEdgesLines()
 {
@@ -83,24 +29,13 @@ void LineEdgesRenderer::_generateEdgesLines()
     return;
   }
 
-  // First let's find adjacencies
-  std::vector<FaceAdjacencies> adjacencies;
-  std::vector<Vector3> faceNormals;
-  for (size_t i = 0; i < (positions.size() / 3) - 1; ++i) {
-    FaceAdjacencies currentAdjecancy;
-    currentAdjecancy.p0
-      = Vector3(positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2]);
-    currentAdjecancy.p1
-      = Vector3(positions[(i + 1) * 3], positions[(i + 1) * 3 + 1],
-                positions[(i + 1) * 3 + 2]);
-    adjacencies.emplace_back(currentAdjecancy);
-  }
-  // Create lines
-  for (size_t index = 0; index < adjacencies.size(); index++) {
-    // We need a line when a face has no adjacency on a specific edge or if all
-    // the adjacencies has an angle greater than epsilon
-    const auto& current = adjacencies[index];
-    _checkEdge(index, current.edges[0], faceNormals, current.p0, current.p1);
+  auto& p0 = Tmp::Vector3Array[0];
+  auto& p1 = Tmp::Vector3Array[1];
+  auto len = indices.size() - 1;
+  for (uint32_t i = 0, offset = 0; i < len; i += 2, offset += 4) {
+    Vector3::FromArrayToRef(positions, 3 * indices[i], p0);
+    Vector3::FromArrayToRef(positions, 3 * indices[i + 1], p1);
+    createLine(p0, p1, offset);
   }
 
   // Merge into a single mesh

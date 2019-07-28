@@ -11,18 +11,21 @@
 
 namespace BABYLON {
 
+class AbstractMesh;
 class Mesh;
 class PointerInfo;
 class Ray;
 class Scene;
-using MeshPtr = std::shared_ptr<Mesh>;
-using NodePtr = std::shared_ptr<Node>;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+using MeshPtr         = std::shared_ptr<Mesh>;
+using NodePtr         = std::shared_ptr<Node>;
 
 /**
  * @brief A behavior that when attached to a mesh will allow the mesh to be
  * dragged around the screen based on pointer events.
  */
-class BABYLON_SHARED_EXPORT PointerDragBehavior : public Behavior<Mesh> {
+class BABYLON_SHARED_EXPORT PointerDragBehavior
+    : public Behavior<AbstractMesh> {
 
 public:
   /**
@@ -49,7 +52,7 @@ public:
    * @brief Attaches the drag behavior the passed in mesh.
    * @param ownerNode The mesh that will be dragged around once attached
    */
-  void attach(const MeshPtr& ownerNode) override;
+  void attach(const AbstractMeshPtr& ownerNode) override;
 
   /**
    * @brief Force relase the drag action by code.
@@ -95,33 +98,40 @@ public:
    * rays to trigger pointer events. Set to 0 to allow any angle (default: 0)
    */
   float maxDragAngle;
+
   /**
    * Hidden
    */
   bool _useAlternatePickedPointAboveMaxDragAngle;
+
   /**
    * The id of the pointer that is currently interacting with the behavior (-1
    * when no pointer is active)
    */
   int currentDraggingPointerID;
+
   /**
    * The last position where the pointer hit the drag plane in world space
    */
   Vector3 lastDragPosition;
+
   /**
    * If the behavior is currently in a dragging state
    */
   bool dragging;
+
   /**
    * The distance towards the target drag position to move each frame. This
    * can be useful to avoid jitter. Set this to 1 for no delay. (Default: 0.2)
    */
   float dragDeltaRatio;
+
   /**
    * If the drag plane orientation should be updated during the dragging
    * (Default: true)
    */
   bool updateDragPlane;
+
   /**
    *  Fires each time the attached mesh is dragged with the pointer
    *  * delta between last drag position and current drag position in world
@@ -131,41 +141,54 @@ public:
    *  * dragPlanePoint in world space where the drag intersects the drag plane
    */
   Observable<DragMoveEvent> onDragObservable;
+
   /**
    * Fires each time a drag begins (eg. mouse down on mesh)
    */
   Observable<DragStartOrEndEvent> onDragStartObservable;
+
   /**
    * Fires each time a drag ends (eg. mouse release after drag)
    */
   Observable<DragStartOrEndEvent> onDragEndObservable;
+
   /**
    * If the attached mesh should be moved when dragged
    */
   bool moveAttached;
+
   /**
    *  If the drag behavior will react to drag events (Default: true)
    */
   bool enabled;
+
   /**
    * If camera controls should be detached during the drag
    */
   bool detachCameraControls;
+
   /**
    * If set, the drag plane/axis will be rotated based on the attached mesh's
    * world rotation (Default: true)
    */
   bool useObjectOrienationForDragging;
 
+  /**
+   * Predicate to determine if it is valid to move the object to a new position
+   * when it is moved
+   */
+  std::function<bool(const Vector3& targetPosition)> validateDrag;
+
   static std::unique_ptr<Scene> _planeScene;
 
 private:
   static int _AnyMouseID;
-  MeshPtr _attachedNode;
+  AbstractMeshPtr _attachedNode;
   MeshPtr _dragPlane;
   Scene* _scene;
   Observer<PointerInfo>::Ptr _pointerObserver;
   Observer<Scene>::Ptr _beforeRenderObserver;
+  float _useAlternatePickedPointAboveMaxDragAngleDragSpeed;
   int _draggingID;
   // Debug mode will display drag planes to help visualize behavior
   bool _debugMode;

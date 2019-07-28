@@ -163,56 +163,35 @@ void EdgesRenderer::_checkEdge(size_t faceIndex, int edge,
   }
 
   if (needToCreateLine) {
-    auto offset = static_cast<int32_t>(_linesPositions.size() / 3);
-    auto normal = p0.subtract(p1);
-    normal.normalize();
-
-    // Positions
-    _linesPositions.emplace_back(p0.x);
-    _linesPositions.emplace_back(p0.y);
-    _linesPositions.emplace_back(p0.z);
-
-    _linesPositions.emplace_back(p0.x);
-    _linesPositions.emplace_back(p0.y);
-    _linesPositions.emplace_back(p0.z);
-
-    _linesPositions.emplace_back(p1.x);
-    _linesPositions.emplace_back(p1.y);
-    _linesPositions.emplace_back(p1.z);
-
-    _linesPositions.emplace_back(p1.x);
-    _linesPositions.emplace_back(p1.y);
-    _linesPositions.emplace_back(p1.z);
-
-    // Normals
-    _linesNormals.emplace_back(p1.x);
-    _linesNormals.emplace_back(p1.y);
-    _linesNormals.emplace_back(p1.z);
-    _linesNormals.emplace_back(-1.f);
-
-    _linesNormals.emplace_back(p1.x);
-    _linesNormals.emplace_back(p1.y);
-    _linesNormals.emplace_back(p1.z);
-    _linesNormals.emplace_back(1.f);
-
-    _linesNormals.emplace_back(p0.x);
-    _linesNormals.emplace_back(p0.y);
-    _linesNormals.emplace_back(p0.z);
-    _linesNormals.emplace_back(-1.f);
-
-    _linesNormals.emplace_back(p0.x);
-    _linesNormals.emplace_back(p0.y);
-    _linesNormals.emplace_back(p0.z);
-    _linesNormals.emplace_back(1.f);
-
-    // Indices
-    _linesIndices.emplace_back(offset);
-    _linesIndices.emplace_back(offset + 1);
-    _linesIndices.emplace_back(offset + 2);
-    _linesIndices.emplace_back(offset);
-    _linesIndices.emplace_back(offset + 2);
-    _linesIndices.emplace_back(offset + 3);
+    const auto offset = static_cast<uint32_t>(_linesPositions.size() / 3);
+    createLine(p0, p1, offset);
   }
+}
+
+void EdgesRenderer::createLine(const Vector3& p0, const Vector3& p1,
+                               uint32_t offset)
+{
+  // Positions
+  stl_util::concat(_linesPositions, {
+                                      p0.x, p0.y, p0.z, //
+                                      p0.x, p0.y, p0.z, //
+                                      p1.x, p1.y, p1.z, //
+                                      p1.x, p1.y, p1.z  //
+                                    });
+
+  // Normals
+  stl_util::concat(_linesNormals, {
+                                    p1.x, p1.y, p1.z, -1.f, //
+                                    p1.x, p1.y, p1.z, 1.f,  //
+                                    p0.x, p0.y, p0.z, -1.f, //
+                                    p0.x, p0.y, p0.z, 1.f   //
+                                  });
+
+  // Indices
+  stl_util::concat(_linesIndices, {
+                                    offset, offset + 1, offset + 2, //
+                                    offset, offset + 2, offset + 3  //
+                                  });
 }
 
 void EdgesRenderer::_generateEdgesLines()
@@ -381,10 +360,10 @@ void EdgesRenderer::render()
   _lineShader->_preBind();
 
   if (_source->edgesColor.a != 1.f) {
-    engine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
+    engine->setAlphaMode(Constants::ALPHA_COMBINE);
   }
   else {
-    engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
+    engine->setAlphaMode(Constants::ALPHA_DISABLE);
   }
 
   // VBOs

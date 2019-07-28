@@ -4,8 +4,8 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
-#include <babylon/gizmos/bounding_box_gizmo.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/misc/pivot_tools.h>
 
 namespace BABYLON {
 
@@ -28,6 +28,7 @@ PointerDragBehavior::PointerDragBehavior(
     , _scene{nullptr}
     , _pointerObserver{nullptr}
     , _beforeRenderObserver{nullptr}
+    , _useAlternatePickedPointAboveMaxDragAngleDragSpeed{-1.1f}
     , _draggingID{-1}
     , _debugMode{false}
     , _moving{false}
@@ -46,7 +47,7 @@ PointerDragBehavior::PointerDragBehavior(
     , _localAxis{Vector3{0.f, 0.f, 0.f}}
     , _lookAt{Vector3{0.f, 0.f, 0.f}}
 {
-  unsigned int optionCount = 0;
+  auto optionCount = 0u;
   if (_options.dragAxis) {
     ++optionCount;
   }
@@ -58,6 +59,9 @@ PointerDragBehavior::PointerDragBehavior(
       "Multiple drag modes specified in dragBehavior options. Only one "
       "expected");
   }
+
+  validateDrag
+    = [](const Vector3 & /*targetPosition*/) -> bool { return true; };
 }
 
 PointerDragBehavior::~PointerDragBehavior()
@@ -73,7 +77,7 @@ void PointerDragBehavior::init()
 {
 }
 
-void PointerDragBehavior::attach(const MeshPtr& ownerNode)
+void PointerDragBehavior::attach(const AbstractMeshPtr& ownerNode)
 {
   _scene        = ownerNode->getScene();
   _attachedNode = ownerNode;
@@ -162,14 +166,16 @@ void PointerDragBehavior::attach(const MeshPtr& ownerNode)
   _beforeRenderObserver = _scene->onBeforeRenderObservable.add(
     [&](Scene* /*scene*/, EventState& /*es*/) {
       if (_moving && moveAttached) {
-        BoundingBoxGizmo::_RemoveAndStorePivotPoint(_attachedNode);
+        PivotTools::_RemoveAndStorePivotPoint(_attachedNode);
         // Slowly move mesh to avoid jitter
         _targetPosition.subtractToRef((_attachedNode)->absolutePosition,
                                       _tmpVector);
         _tmpVector.scaleInPlace(dragDeltaRatio);
         (_attachedNode)->getAbsolutePosition().addToRef(_tmpVector, _tmpVector);
-        (_attachedNode)->setAbsolutePosition(_tmpVector);
-        BoundingBoxGizmo::_RestorePivotPoint(_attachedNode);
+        if (validateDrag(_tmpVector)) {
+          (_attachedNode)->setAbsolutePosition(_tmpVector);
+        }
+        PivotTools::_RestorePivotPoint(_attachedNode);
       }
     });
 }
@@ -220,7 +226,7 @@ void PointerDragBehavior::_startDrag(
     return;
   }
 
-  BoundingBoxGizmo::_RemoveAndStorePivotPoint(_attachedNode);
+  PivotTools::_RemoveAndStorePivotPoint(_attachedNode);
   // Create start ray from the camera to the object
   if (fromRay) {
     _startDragRay.direction.copyFrom(fromRay->direction);
@@ -263,7 +269,7 @@ void PointerDragBehavior::_startDrag(
       }
     }
   }
-  BoundingBoxGizmo::_RestorePivotPoint(_attachedNode);
+  PivotTools::_RestorePivotPoint(_attachedNode);
 }
 
 void PointerDragBehavior::_moveDrag(const Ray& ray)
@@ -331,7 +337,8 @@ PointerDragBehavior::_pickWithRayOnDragPlane(const std::optional<Ray>& ray)
                                                       _alternatePickedPoint);
       _alternatePickedPoint.normalize();
       _alternatePickedPoint.scaleInPlace(
-        -2.f * Vector3::Dot(_alternatePickedPoint, _tmpVector));
+        _useAlternatePickedPointAboveMaxDragAngleDragSpeed
+        * Vector3::Dot(_alternatePickedPoint, _tmpVector));
       _tmpVector.addInPlace(_alternatePickedPoint);
 
       // Project resulting vector onto the drag plane and add it to the attached
@@ -384,7 +391,7 @@ void PointerDragBehavior::_updateDragPlanePosition(
     _lookAt.normalize();
 
     _dragPlane->position().copyFrom(_pointA);
-    _pointA.subtractToRef(_lookAt, _lookAt);
+    _pointA.addToRef(_lookAt, _lookAt);
     _dragPlane->lookAt(_lookAt);
   }
   else if (_options.dragPlaneNormal) {
@@ -394,13 +401,17 @@ void PointerDragBehavior::_updateDragPlanePosition(
         _attachedNode.getWorldMatrix()->getRotationMatrix(), _localAxis) :
       _localAxis.copyFrom(*_options.dragPlaneNormal);*/
     _dragPlane->position().copyFrom(_pointA);
-    _pointA.subtractToRef(_localAxis, _lookAt);
+    _pointA.addToRef(_localAxis, _lookAt);
     _dragPlane->lookAt(_lookAt);
   }
   else {
     _dragPlane->position().copyFrom(_pointA);
     _dragPlane->lookAt(ray.origin);
   }
+  // Update the position of the drag plane so it doesn't get out of sync with
+  // the node (eg. when moving back and forth quickly)
+  _dragPlane->position().copyFrom(_attachedNode->absolutePosition());
+
   _dragPlane->computeWorldMatrix(true);
 }
 
@@ -412,6 +423,7 @@ void PointerDragBehavior::detach()
   if (_beforeRenderObserver) {
     _scene->onBeforeRenderObservable.remove(_beforeRenderObserver);
   }
+  releaseDrag();
 }
 
 } // end of namespace BABYLON

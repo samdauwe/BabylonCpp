@@ -107,7 +107,7 @@ public:
 
   /**
    * @brief Gets the data source type of the texture (can be one of the
-   * BABYLON.InternalTexture.DATASOURCE_XXXX).
+   * InternalTexture.DATASOURCE_XXXX).
    */
   unsigned int dataSource() const;
 
@@ -219,8 +219,7 @@ public:
 
   // Private
   bool _invertVScale;
-  int _initialSlot;
-  int _designatedSlot;
+  int _associatedChannel;
   unsigned int _dataSource;
   std::variant<std::string, ArrayBuffer, Image> _buffer;
   ArrayBuffer _bufferView;

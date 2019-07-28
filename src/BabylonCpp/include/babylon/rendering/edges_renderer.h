@@ -1,12 +1,12 @@
-#ifndef BABYLON_RENDERING_EDGES_RENDERER_H
+﻿#ifndef BABYLON_RENDERING_EDGES_RENDERER_H
 #define BABYLON_RENDERING_EDGES_RENDERER_H
 
 #include <unordered_map>
 
 #include <babylon/babylon_api.h>
 #include <babylon/math/vector3.h>
-#include <babylon/rendering/iedges_renderer.h>
 #include <babylon/misc/observer.h>
+#include <babylon/rendering/iedges_renderer.h>
 
 namespace BABYLON {
 
@@ -35,14 +35,15 @@ public:
    * objects as the adjacencies computation can be really long.
    * @param  source Mesh used to create edges
    * @param  epsilon sum of angles in adjacency to check for edge
-   * @param  checkVerticesInsteadOfIndices
+   * @param  checkVerticesInsteadOfIndices bases the edges detection on vertices
+   * vs indices
    * @param  generateEdgesLines - should generate Lines or only prepare
    * resources.
    */
   EdgesRenderer(const AbstractMeshPtr& source, float epsilon = 0.95f,
                 bool checkVerticesInsteadOfIndices = false,
                 bool generateEdgesLines            = true);
-  virtual ~EdgesRenderer();
+  ~EdgesRenderer() override;
 
   /**
    * @brief Hidden
@@ -88,6 +89,12 @@ protected:
   virtual void _checkEdge(size_t faceIndex, int edge,
                           const std::vector<Vector3>& faceNormals,
                           const Vector3& p0, const Vector3& p1);
+
+  /**
+   * @brief Push line into the position, normal and index buffer.
+   */
+  virtual void createLine(const Vector3& p0, const Vector3& p1,
+                          uint32_t offset);
 
   /**
    * @brief Generates lines edges from adjacencjes.

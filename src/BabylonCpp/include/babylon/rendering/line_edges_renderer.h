@@ -23,20 +23,6 @@ public:
                     bool checkVerticesInsteadOfIndices = false);
   ~LineEdgesRenderer() override;
 
-protected:
-  /**
-   * @brief Always create the edge since its a line so only important things are
-   * p0 and p1.
-   * @param  faceIndex not important for LineMesh
-   * @param  edge not important for LineMesh
-   * @param  faceNormals not important for LineMesh
-   * @param  p0 beginnig of line
-   * @param  p1 end of line
-   */
-  void _checkEdge(size_t faceIndex, int edge,
-                  const std::vector<Vector3>& faceNormals, const Vector3& p0,
-                  const Vector3& p1) override;
-
 private:
   /**
    * @brief Generate edges for each line in LinesMesh. Every Line should be

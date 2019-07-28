@@ -1,8 +1,8 @@
 #ifndef BABYLON_ANIMATIONS_ANIMATION_H
 #define BABYLON_ANIMATIONS_ANIMATION_H
 
-#include <unordered_map>
 #include <nlohmann/json_fwd.hpp>
+#include <unordered_map>
 
 #include <babylon/animations/animation_event.h>
 #include <babylon/animations/animation_range.h>
@@ -14,6 +14,7 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
+struct _IAnimationState;
 class Animatable;
 class Animation;
 class IAnimatable;
@@ -401,7 +402,7 @@ public:
    * @brief Remove all events found at the given frame.
    * @param frame The frame to remove events from
    */
-  void removeEvents(int frame);
+  void removeEvents(float frame);
 
   /**
    * @brief Retrieves all the events from the animation.
@@ -588,11 +589,7 @@ public:
   /**
    * @brief Hidden Internal use only.
    */
-  AnimationValue
-  _interpolate(float currentFrame, int repeatCount,
-               std::optional<AnimationValue>& workValue, unsigned int loopMode,
-               const AnimationValue& offsetValue    = AnimationValue(),
-               const AnimationValue& highLimitValue = AnimationValue());
+  AnimationValue _interpolate(float currentFrame, _IAnimationState& state);
 
   /**
    * @brief Defines the function to use to interpolate matrices.
@@ -657,11 +654,12 @@ protected:
    * @param framePerSecond The frames per second of the animation
    * @param dataType The data type of the animation
    * @param loopMode The loop mode of the animation
-   * @param enableBlendings Specifies if blending should be enabled
+   * @param enableBlending Specifies if blending should be enabled
    */
   Animation(const std::string& name, const std::string& targetProperty,
             size_t framePerSecond, int dataType,
-            unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE());
+            unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE(),
+            bool enableBlending   = false);
 
 private:
   /**

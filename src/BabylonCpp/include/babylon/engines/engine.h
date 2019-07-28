@@ -2316,12 +2316,8 @@ private:
   void _unbindVertexArrayObject();
   void setProgram(GL::IGLProgram* program);
   void _moveBoundTextureOnTop(const InternalTexturePtr& internalTexture);
-  int _getCorrectTextureChannel(int channel,
-                                const InternalTexturePtr& internalTexture
-                                = nullptr);
   void _linkTrackers(const IInternalTextureTrackerPtr& previous,
                      const IInternalTextureTrackerPtr& next);
-  int _removeDesignatedSlot(const InternalTexturePtr& internalTexture);
   void _activateCurrentTexture();
   void _cascadeLoadImgs(
     const std::string& rootUrl, Scene* scene,

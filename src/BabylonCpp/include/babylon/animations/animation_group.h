@@ -90,7 +90,7 @@ public:
    * @param loop defines if animations must loop
    * @returns the animation group
    */
-  AnimationGroup& play(bool loop = false);
+  AnimationGroup& play(std::optional<bool> loop = std::nullopt);
 
   /**
    * @brief Reset all animations to initial state.
@@ -127,8 +127,7 @@ public:
   AnimationGroup& syncAllAnimationsWith(Animatable* root);
 
   /**
-   * @brief Goes to a specific frame in this animation group
-   *
+   * @brief Goes to a specific frame in this animation group.
    * @param frame the frame number to go to
    * @return the animationGroup
    */
@@ -139,6 +138,19 @@ public:
    */
   void dispose(bool doNotRecurse               = false,
                bool disposeMaterialAndTextures = false) override;
+
+  /**
+   * @brief Clone the current animation group and returns a copy
+   * @param newName defines the name of the new group
+   * @param targetConverter defines an optional function used to convert current
+   * animation targets to new ones
+   * @returns the new aniamtion group
+   */
+  AnimationGroupPtr
+  clone(const std::string& newName,
+        const std::function<IAnimatablePtr(const IAnimatablePtr& animatible)>&
+          targetConverter
+        = nullptr);
 
   // Statics
 
@@ -192,14 +204,29 @@ private:
   bool get_isStarted() const;
 
   /**
-   * @brief Gets or sets the speed ratio to use for all animations.
+   * @brief Gets a value indicating that the current group is playing.
+   */
+  bool get_isPlaying() const;
+
+  /**
+   * @brief Gets the speed ratio to use for all animations.
    */
   float get_speedRatio() const;
 
   /**
-   * @brief Gets or sets the speed ratio to use for all animations.
+   * @brief Sets the speed ratio to use for all animations.
    */
   void set_speedRatio(float value);
+
+  /**
+   * @brief Gets if all animations should loop or not.
+   */
+  bool get_loopAnimation() const;
+
+  /**
+   * @brief Sets if all animations should loop or not.
+   */
+  void set_loopAnimation(bool value);
 
   /**
    * @brief Gets the targeted animations for this animation group.
@@ -216,6 +243,11 @@ private:
 
 public:
   /**
+   * Gets or sets the unique id of the node
+   */
+  size_t uniqueId;
+
+  /**
    * The name of the animation group
    */
   std::string name;
@@ -226,6 +258,11 @@ public:
   Observable<TargetedAnimation> onAnimationEndObservable;
 
   /**
+   * Observer raised when one animation loops
+   */
+  Observable<TargetedAnimation> onAnimationLoopObservable;
+
+  /**
    * This observable will notify when all animations have ended.
    */
   Observable<AnimationGroup> onAnimationGroupEndObservable;
@@ -234,6 +271,11 @@ public:
    * This observable will notify when all animations have paused.
    */
   Observable<AnimationGroup> onAnimationGroupPauseObservable;
+
+  /**
+   * This observable will notify when all animations are playing.
+   */
+  Observable<AnimationGroup> onAnimationGroupPlayObservable;
 
   /**
    * Gets the first frame
@@ -251,9 +293,19 @@ public:
   ReadOnlyProperty<AnimationGroup, bool> isStarted;
 
   /**
+   * Gets a value indicating that the current group is playing
+   */
+  ReadOnlyProperty<AnimationGroup, bool> isPlaying;
+
+  /**
    * Speed ratio to use for all animations.
    */
   Property<AnimationGroup, float> speedRatio;
+
+  /**
+   * Gets or sets if all animations should loop or not
+   */
+  Property<AnimationGroup, bool> loopAnimation;
 
   /**
    * Targeted animations for this animation group.
@@ -274,7 +326,9 @@ private:
   float _from;
   float _to;
   bool _isStarted;
+  bool _isPaused;
   float _speedRatio;
+  bool _loopAnimation;
 
 }; // end of class AnimationGroup
 

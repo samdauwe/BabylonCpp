@@ -205,4 +205,14 @@ InstancedLinesMeshPtr LinesMesh::createInstance(const std::string& iName)
   return InstancedLinesMesh::New(iName, this);
 }
 
+AbstractMeshPtr
+LinesMesh::enableEdgesRendering(const AbstractMeshPtr& iSource, float epsilon,
+                                bool checkVerticesInsteadOfIndices)
+{
+  iSource->disableEdgesRendering();
+  iSource->_edgesRenderer = std::make_shared<LineEdgesRenderer>(
+    iSource, epsilon, checkVerticesInsteadOfIndices);
+  return iSource;
+}
+
 } // end of namespace BABYLON
