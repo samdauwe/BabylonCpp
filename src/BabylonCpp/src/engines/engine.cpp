@@ -13,6 +13,7 @@
 #include <babylon/engines/depth_texture_creation_options.h>
 #include <babylon/engines/instancing_attribute_info.h>
 #include <babylon/engines/scene.h>
+#include <babylon/engines/webgl/webgl_pipeline_context.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/interfaces/icanvas_rendering_context2D.h>
 #include <babylon/interfaces/igl_rendering_context.h>
@@ -2164,6 +2165,12 @@ void Engine::_finalizeProgram(
 }
 
 bool Engine::_isProgramCompiled(GL::IGLProgram* /*shaderProgram*/)
+{
+  return false;
+}
+
+bool Engine::_isRenderingStateCompiled(
+  IPipelineContext const* /*pipelineContext*/)
 {
   return false;
 }

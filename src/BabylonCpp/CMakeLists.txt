@@ -99,7 +99,8 @@ file(GLOB CORE_HDR_FILES            ${INCLUDE_PATH}/core/*.h
 file(GLOB CULLING_HDR_FILES         ${INCLUDE_PATH}/culling/*.h
                                     ${INCLUDE_PATH}/culling/octrees/*.h)
 file(GLOB DEBUG_HDR_FILES           ${INCLUDE_PATH}/debug/*.h)
-file(GLOB ENGINES_HDR_FILES         ${INCLUDE_PATH}/engines/*.h)
+file(GLOB ENGINES_HDR_FILES         ${INCLUDE_PATH}/engines/*.h
+                                    ${INCLUDE_PATH}/engines/webgl/*.h)
 file(GLOB EVENTS_HDR_FILES          ${INCLUDE_PATH}/events/*.h)
 file(GLOB GAMEPADS_HDR_FILES        ${INCLUDE_PATH}/gamepads/*.h
                                     ${INCLUDE_PATH}/gamepads/controllers/*.h)
@@ -223,7 +224,8 @@ file(GLOB CORE_SRC_FILES            ${SOURCE_PATH}/core/*.cpp
 file(GLOB CULLING_SRC_FILES         ${SOURCE_PATH}/culling/*.cpp
                                     ${SOURCE_PATH}/culling/octrees/*.cpp)
 file(GLOB DEBUG_SRC_FILES           ${SOURCE_PATH}/debug/*.cpp)
-file(GLOB ENGINES_SRC_FILES         ${SOURCE_PATH}/engines/*.cpp)
+file(GLOB ENGINES_SRC_FILES         ${SOURCE_PATH}/engines/*.cpp
+                                    ${SOURCE_PATH}/engines/webgl/*.cpp)
 file(GLOB EVENTS_SRC_FILES          ${SOURCE_PATH}/events/*.cpp)
 file(GLOB GAMEPADS_SRC_FILES        ${SOURCE_PATH}/gamepads/*.cpp
                                     ${SOURCE_PATH}/gamepads/controllers/*.cpp)

@@ -45,6 +45,7 @@ class ILoadingScreen;
 struct InstancingAttributeInfo;
 struct IMultiRenderTargetOptions;
 class InternalTexture;
+class IPipelineContext;
 struct IRenderTargetOptions;
 class Material;
 class PassPostProcess;
@@ -1077,6 +1078,11 @@ public:
    * @brief Hidden
    */
   bool _isProgramCompiled(GL::IGLProgram* shaderProgram);
+
+  /**
+   * @brief Hidden
+   */
+  bool _isRenderingStateCompiled(IPipelineContext const* pipelineContext);
 
   /**
    * @brief Gets the list of webGL uniform locations associated with a specific
