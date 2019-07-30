@@ -1323,8 +1323,8 @@ Mesh& Mesh::_onBeforeDraw(bool isInstance, Matrix& world,
 std::vector<IParticleSystemPtr> Mesh::getEmittedParticleSystems()
 {
   std::vector<IParticleSystemPtr> results;
-  for (auto& particleSystem : getScene()->particleSystems) {
-    auto& emitter = particleSystem->emitter;
+  for (const auto& particleSystem : getScene()->particleSystems) {
+    const auto& emitter = particleSystem->emitter;
     if (std::holds_alternative<AbstractMeshPtr>(emitter)
         && (std::get<AbstractMeshPtr>(emitter).get() == this)) {
       results.emplace_back(particleSystem);
@@ -1340,7 +1340,7 @@ std::vector<IParticleSystemPtr> Mesh::getHierarchyEmittedParticleSystems()
   auto descendants = getDescendants();
   descendants.emplace_back(this);
 
-  for (auto& particleSystem : getScene()->particleSystems) {
+  for (const auto& particleSystem : getScene()->particleSystems) {
     if (std::holds_alternative<AbstractMeshPtr>(particleSystem->emitter)) {
       if (std::find(descendants.begin(), descendants.end(),
                     std::get<AbstractMeshPtr>(particleSystem->emitter))

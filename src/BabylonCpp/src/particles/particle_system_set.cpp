@@ -4,8 +4,8 @@
 
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
+#include <babylon/meshes/builders/sphere_builder.h>
 #include <babylon/meshes/mesh.h>
-#include <babylon/meshes/mesh_builder.h>
 #include <babylon/particles/iparticle_system.h>
 
 namespace BABYLON {
@@ -44,14 +44,14 @@ void ParticleSystemSet::setEmitterAsSphere(
   sphereOptions.segments = options.segments;
 
   auto emitterMesh
-    = MeshBuilder::CreateSphere("emitterSphere", sphereOptions, scene);
+    = SphereBuilder::CreateSphere("emitterSphere", sphereOptions, scene);
   emitterMesh->renderingGroupId = static_cast<int>(renderingGroupId);
 
   auto material = StandardMaterial::New("emitterSphereMaterial", scene);
   material->emissiveColor = options.color;
   emitterMesh->material   = material;
 
-  for (auto& system : systems) {
+  for (const auto& system : systems) {
     system->emitter = emitterMesh;
   }
 
@@ -60,7 +60,7 @@ void ParticleSystemSet::setEmitterAsSphere(
 
 void ParticleSystemSet::start(const AbstractMeshPtr& emitter)
 {
-  for (auto& system : systems) {
+  for (const auto& system : systems) {
     if (emitter) {
       system->emitter = emitter;
     }
@@ -71,7 +71,7 @@ void ParticleSystemSet::start(const AbstractMeshPtr& emitter)
 void ParticleSystemSet::dispose(bool doNotRecurse,
                                 bool disposeMaterialAndTextures)
 {
-  for (auto& system : systems) {
+  for (const auto& system : systems) {
     system->dispose(doNotRecurse, disposeMaterialAndTextures);
   }
 
