@@ -125,7 +125,8 @@ file(GLOB MESHES_HDR_FILES          ${INCLUDE_PATH}/meshes/*.h
                                     ${INCLUDE_PATH}/meshes/builders/*.h
                                     ${INCLUDE_PATH}/meshes/csg/*.h
                                     ${INCLUDE_PATH}/meshes/polygonmesh/*.h
-                                    ${INCLUDE_PATH}/meshes/simplification/*.h)
+                                    ${INCLUDE_PATH}/meshes/simplification/*.h
+                                    ${INCLUDE_PATH}/meshes/webgl/*.h)
 file(GLOB MISC_HDR_FILES            ${INCLUDE_PATH}/misc/*.h
                                     ${INCLUDE_PATH}/misc/highdynamicrange/*.h
                                     ${INCLUDE_PATH}/misc/optimization/*.h)
@@ -250,7 +251,8 @@ file(GLOB MESHES_SRC_FILES          ${SOURCE_PATH}/meshes/*.cpp
                                     ${SOURCE_PATH}/meshes/builders/*.cpp
                                     ${SOURCE_PATH}/meshes/csg/*.cpp
                                     ${SOURCE_PATH}/meshes/polygonmesh/*.cpp
-                                    ${SOURCE_PATH}/meshes/simplification/*.cpp)
+                                    ${SOURCE_PATH}/meshes/simplification/*.cpp
+                                    ${SOURCE_PATH}/meshes/webgl/*.cpp)
 file(GLOB MISC_SRC_FILES            ${SOURCE_PATH}/misc/*.cpp
                                     ${SOURCE_PATH}/misc/highdynamicrange/*.cpp
                                     ${SOURCE_PATH}/misc/optimization/*.cpp)
