@@ -13,8 +13,11 @@
 namespace BABYLON {
 
 class Node;
+class PointerDragBehavior;
+class StandardMaterial;
 class UtilityLayerRenderer;
 using NodePtr                 = std::shared_ptr<Node>;
+using StandardMaterialPtr     = std::shared_ptr<StandardMaterial>;
 using UtilityLayerRendererPtr = std::shared_ptr<UtilityLayerRenderer>;
 
 /**
@@ -34,14 +37,10 @@ public:
   ~BoundingBoxGizmo() override;
 
   /**
-   * @brief Hidden
+   * @brief Sets the color of the bounding box gizmo.
+   * @param color the color to set
    */
-  static void _RemoveAndStorePivotPoint(const AbstractMeshPtr& mesh);
-
-  /**
-   * @brief Hidden
-   */
-  static void _RestorePivotPoint(const AbstractMeshPtr& mesh);
+  void setColor(const Color3& color);
 
   /**
    * @brief Updates the bounding box information for the Gizmo.
@@ -54,6 +53,17 @@ public:
    * @param axis The list of axis that should be enabled (eg. "xy" or "xyz")
    */
   void setEnabledRotationAxis(const std::string axis);
+
+  /**
+   * @brief Enables/disables scaling.
+   * @param enable if scaling should be enabled
+   */
+  void setEnabledScaling(bool enable);
+
+  /**
+   * @brief Enables a pointer drag behavior on the bounding box of the gizmo.
+   */
+  void enableDragBehavior();
 
   /**
    * @brief Disposes of the gizmo.
@@ -81,7 +91,10 @@ protected:
   void _attachedMeshChanged(const AbstractMeshPtr& value) override;
 
 private:
+  void _updateRotationSpheres();
+  void _updateScaleBoxes();
   void _selectNode(const MeshPtr& selectedMesh);
+  void _updateDummy();
 
 public:
   /**
@@ -158,16 +171,19 @@ private:
   Vector3 _tmpVector;
   Matrix _tmpRotationMatrix;
 
+  /**
+   * Mesh used as a pivot to rotate the attached mesh
+   */
   AbstractMeshPtr _anchorMesh;
   Vector3 _existingMeshScale;
 
-  // Stores the state of the pivot cache (_oldPivotPoint, _pivotTranslation)
-  // store/remove pivot point should only be applied during their outermost
-  // calls
-  static int _PivotCached;
-  static Vector3 _OldPivotPoint;
-  static Vector3 _PivotTranslation;
-  static Vector3 _PivotTmpVector;
+  // Dragging
+  MeshPtr _dragMesh;
+  std::unique_ptr<PointerDragBehavior> pointerDragBehavior;
+  StandardMaterialPtr coloredMaterial;
+  StandardMaterialPtr hoverColoredMaterial;
+  Vector3 startingTurnDirection;
+  float totalTurnAmountOfDrag;
 
 }; // end of class BoundingBoxGizmo
 
