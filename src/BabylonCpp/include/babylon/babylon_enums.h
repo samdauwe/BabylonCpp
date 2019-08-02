@@ -26,7 +26,9 @@ enum class AnimationKeyInterpolation {
   STEP = 1
 }; // end of enum class AnimationKeyInterpolation
 
-/** Event types **/
+/**
+ * @brief Event types
+ */
 enum class EventType {
   CONTEXT_MENU      = 0,
   MOUSE_BUTTON_DOWN = 1,
@@ -41,7 +43,9 @@ enum class EventType {
   UNKNOWN           = 10,
 }; // end of enum class EventType
 
-/** Mouse button types **/
+/**
+ * @brief Mouse button types
+ */
 enum class MouseButtonType {
   UNDEFINED = -1,
   LEFT      = 0,
@@ -49,14 +53,18 @@ enum class MouseButtonType {
   RIGHT     = 2
 }; // end of enum class MouseButtonType
 
-/** Pointer types **/
+/**
+ * @brief Pointer types
+ */
 enum class PointerType {
   UNDEFINED = -1,
   MOUSE     = 0,
   TOUCH     = 1,
 }; // end of enum class MouseButtonType
 
-/** Property types **/
+/**
+ * @brief Property types
+ */
 enum class PropertyType : unsigned int {
   ROTATION = 100
 }; // end of enum class PropertyType
