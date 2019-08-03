@@ -60,7 +60,7 @@ Texture::Texture(
 {
   name                 = iUrl;
   url                  = iUrl;
-  _noMipmap            = noMipmap;
+  _noMipmap            = iNoMipmap;
   _invertY             = invertY;
   _initialSamplingMode = samplingMode;
   _buffer              = buffer;

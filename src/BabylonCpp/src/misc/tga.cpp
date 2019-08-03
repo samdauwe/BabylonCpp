@@ -79,6 +79,8 @@ void TGATools::UploadContent(const InternalTexturePtr& texture,
     case TGATools::_TYPE_GREY:
       use_grey = true;
       break;
+    default:
+      break;
   }
 
   Uint8Array pixel_data;
