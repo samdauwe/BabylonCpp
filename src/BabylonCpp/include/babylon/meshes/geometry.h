@@ -128,7 +128,7 @@ public:
 
   /**
    * @brief Update a specific vertex buffer.
-   * This function will directly update the underlying WebGLBuffer according to
+   * This function will directly update the underlying DataBuffer according to
    * the passed numeric array or Float32Array It will do nothing if the buffer
    * is not updatable
    * @param kind defines the data kind (Position, normal, etc...)
@@ -219,8 +219,12 @@ public:
    * @param indices defines the indices to store in the index buffer
    * @param offset defines the offset in the target buffer where to store the
    * data
+   * @param gpuMemoryOnly defines a boolean indicating that only the GPU memory
+   * must be updated leaving the CPU version of the indices unchanged (false by
+   * default)
    */
-  void updateIndices(const IndicesArray& indices, int offset = 0);
+  void updateIndices(const IndicesArray& indices, int offset = 0,
+                     bool gpuMemoryOnly = false);
 
   /**
    * @brief Creates a new index buffer.
@@ -429,6 +433,11 @@ public:
    * Gets or sets the unique ID of the geometry
    */
   std::string id;
+
+  /**
+   * Gets or sets the unique ID of the geometry
+   */
+  size_t uniqueId;
 
   /**
    * Gets the delay loading state of the geometry (none by default which means

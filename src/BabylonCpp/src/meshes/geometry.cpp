@@ -5,10 +5,12 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/culling/bounding_info.h>
+#include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/loading/scene_loader.h>
+#include <babylon/loading/scene_loader_flags.h>
 #include <babylon/materials/effect.h>
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/mesh.h>
@@ -21,15 +23,11 @@ namespace BABYLON {
 
 Geometry::Geometry(const std::string& iId, Scene* scene, VertexData* vertexData,
                    bool updatable, Mesh* mesh)
-    : id{iId}
-    , delayLoadState{EngineConstants::DELAYLOADSTATE_NONE}
+    : delayLoadState{Constants::DELAYLOADSTATE_NONE}
     , boundingBias(this, &Geometry::get_boundingBias,
                    &Geometry::set_boundingBias)
-    , _updatable{updatable}
     , extend(this, &Geometry::get_extend)
     , doNotSerialize(this, &Geometry::get_doNotSerialize)
-    , _scene{scene}
-    , _engine{scene->getEngine()}
     , _totalVertices{0}
     , _isDisposed{false}
     , _extend{MinMax{Vector3::Zero(), Vector3::Zero()}}
@@ -37,10 +35,15 @@ Geometry::Geometry(const std::string& iId, Scene* scene, VertexData* vertexData,
     , _indexBuffer{nullptr}
     , _indexBufferIsUpdatable{false}
 {
+  id       = iId;
+  uniqueId = scene->getUniqueId();
+  _engine  = scene->getEngine();
   _meshes.clear();
+  _scene = scene;
   // Init vertex buffer cache
   _vertexBuffers.clear();
   _indices.clear();
+  _updatable = updatable;
 
   // vertexData
   if (vertexData) {
@@ -57,12 +60,6 @@ Geometry::Geometry(const std::string& iId, Scene* scene, VertexData* vertexData,
 
   // applyToMesh
   if (mesh) {
-    if (mesh->type() == Type::LINESMESH) {
-      auto linesMesh = static_cast<LinesMesh*>(mesh);
-      boundingBias   = Vector2(0, linesMesh->intersectionThreshold);
-      _updateExtend(Float32Array());
-    }
-
     applyToMesh(mesh);
     mesh->computeWorldMatrix(true);
   }
@@ -85,10 +82,6 @@ std::optional<Vector2>& Geometry::get_boundingBias()
 void Geometry::set_boundingBias(const std::optional<Vector2>& value)
 {
   if (_boundingBias && value.has_value()) {
-    if (_boundingBias->equals(*value)) {
-      return;
-    }
-
     _boundingBias->copyFrom(*value);
   }
   else {
@@ -127,8 +120,8 @@ Engine* Geometry::getEngine()
 
 bool Geometry::isReady() const
 {
-  return delayLoadState == EngineConstants::DELAYLOADSTATE_LOADED
-         || delayLoadState == EngineConstants::DELAYLOADSTATE_NONE;
+  return delayLoadState == Constants::DELAYLOADSTATE_LOADED
+         || delayLoadState == Constants::DELAYLOADSTATE_NONE;
 }
 
 bool Geometry::get_doNotSerialize() const
@@ -154,7 +147,7 @@ void Geometry::_rebuild()
   }
 
   // Vertex buffers
-  for (auto& item : _vertexBuffers) {
+  for (const auto& item : _vertexBuffers) {
     item.second->_rebuild();
   }
 }
@@ -213,7 +206,7 @@ void Geometry::setVerticesBuffer(const VertexBufferPtr& buffer,
     _updateExtend(data);
     _resetPointsArrayCache();
 
-    for (auto& mesh : _meshes) {
+    for (const auto& mesh : _meshes) {
       mesh->_boundingInfo
         = std::make_unique<BoundingInfo>(extend().min, extend().max);
       mesh->_createGlobalSubMesh(false);
@@ -273,12 +266,17 @@ void Geometry::_updateBoundingInfo(bool updateExtends, const Float32Array& data)
 
   _resetPointsArrayCache();
 
-  for (auto& mesh : _meshes) {
-    if (updateExtends) {
-      mesh->_boundingInfo
-        = std::make_unique<BoundingInfo>(extend().min, extend().max);
+  if (updateExtends) {
+    for (const auto& mesh : _meshes) {
+      if (mesh->_boundingInfo) {
+        mesh->_boundingInfo->reConstruct(extend().min, extend().max);
+      }
+      else {
+        mesh->_boundingInfo
+          = std::make_unique<BoundingInfo>(extend().min, extend().max);
+      }
 
-      for (auto& subMesh : mesh->subMeshes) {
+      for (const auto& subMesh : mesh->subMeshes) {
         subMesh->refreshBoundingInfo();
       }
     }
@@ -402,12 +400,12 @@ std::vector<std::string> Geometry::getVerticesDataKinds()
 {
   std::vector<std::string> result;
   if (_vertexBuffers.empty() && !_delayInfo.empty()) {
-    for (auto& kind : _delayInfo) {
+    for (const auto& kind : _delayInfo) {
       result.emplace_back(kind);
     }
   }
   else {
-    for (auto& item : _vertexBuffers) {
+    for (const auto& item : _vertexBuffers) {
       result.emplace_back(item.first);
     }
   }
@@ -415,7 +413,8 @@ std::vector<std::string> Geometry::getVerticesDataKinds()
   return result;
 }
 
-void Geometry::updateIndices(const IndicesArray& indices, int offset)
+void Geometry::updateIndices(const IndicesArray& indices, int offset,
+                             bool gpuMemoryOnly)
 {
   if (!_indexBuffer) {
     return;
@@ -425,7 +424,17 @@ void Geometry::updateIndices(const IndicesArray& indices, int offset)
     setIndices(indices, 0, true);
   }
   else {
+    const auto needToUpdateSubMeshes = indices.size() != _indices.size();
+
+    if (!gpuMemoryOnly) {
+      _indices = indices;
+    }
     _engine->updateDynamicIndexBuffer(_indexBuffer, indices, offset);
+    if (needToUpdateSubMeshes) {
+      for (const auto& mesh : _meshes) {
+        mesh->_createGlobalSubMesh(true);
+      }
+    }
   }
 }
 
@@ -449,7 +458,7 @@ AbstractMesh* Geometry::setIndices(const IndicesArray& indices,
     _totalVertices = static_cast<size_t>(totalVertices);
   }
 
-  for (auto& mesh : _meshes) {
+  for (const auto& mesh : _meshes) {
     mesh->_createGlobalSubMesh(true);
   }
 
@@ -560,7 +569,7 @@ void Geometry::_applyToMesh(Mesh* mesh)
   auto numOfMeshes = _meshes.size();
 
   // vertexBuffers
-  for (auto& item : _vertexBuffers) {
+  for (const auto& item : _vertexBuffers) {
     const auto& kind = item.first;
     if (numOfMeshes == 1) {
       _vertexBuffers[kind]->create();
@@ -597,6 +606,9 @@ void Geometry::_applyToMesh(Mesh* mesh)
 
   // morphTargets
   mesh->_syncGeometryWithMorphTargetManager();
+
+  // instances
+  mesh->synchronizeInstances();
 }
 
 void Geometry::notifyUpdate(const std::string& kind)
@@ -605,14 +617,14 @@ void Geometry::notifyUpdate(const std::string& kind)
     onGeometryUpdated(this, kind);
   }
 
-  for (auto& mesh : _meshes) {
+  for (const auto& mesh : _meshes) {
     mesh->_markSubMeshesAsAttributesDirty();
   }
 }
 
 void Geometry::load(Scene* scene, const std::function<void()>& onLoaded)
 {
-  if (delayLoadState == EngineConstants::DELAYLOADSTATE_LOADING) {
+  if (delayLoadState == Constants::DELAYLOADSTATE_LOADING) {
     return;
   }
 
@@ -623,7 +635,7 @@ void Geometry::load(Scene* scene, const std::function<void()>& onLoaded)
     return;
   }
 
-  delayLoadState = EngineConstants::DELAYLOADSTATE_LOADING;
+  delayLoadState = Constants::DELAYLOADSTATE_LOADING;
 
   _queueLoad(scene, onLoaded);
 }
@@ -697,7 +709,7 @@ bool Geometry::isDisposed() const
 void Geometry::_disposeVertexArrayObjects()
 {
   if (!_vertexArrayObjects.empty()) {
-    for (auto& item : _vertexArrayObjects) {
+    for (const auto& item : _vertexArrayObjects) {
       _engine->releaseVertexArrayObject(item.second.get());
     }
     _vertexArrayObjects.clear();
@@ -713,7 +725,7 @@ void Geometry::dispose()
 
   _disposeVertexArrayObjects();
 
-  for (auto& item : _vertexBuffers) {
+  for (const auto& item : _vertexBuffers) {
     _vertexBuffers[item.first]->dispose();
     _vertexBuffers[item.first] = nullptr;
   }
@@ -726,7 +738,7 @@ void Geometry::dispose()
   _indexBuffer = nullptr;
   _indices.clear();
 
-  delayLoadState = EngineConstants::DELAYLOADSTATE_NONE;
+  delayLoadState = Constants::DELAYLOADSTATE_NONE;
   delayLoadingFile.clear();
   _delayLoadingFunction = nullptr;
   _delayInfo.clear();
@@ -746,24 +758,27 @@ GeometryPtr Geometry::copy(const std::string& iId)
   auto indices = getIndices();
   if (!indices.empty()) {
     vertexData->indices.reserve(indices.size());
-    for (auto& index : indices) {
+    for (const auto& index : indices) {
       vertexData->indices.emplace_back(index);
     }
   }
 
-  bool updatable    = false;
-  bool stopChecking = false;
+  auto updatable    = false;
+  auto stopChecking = false;
   std::string kind;
-  for (auto& vertexBuffer : _vertexBuffers) {
+  for (const auto& vertexBuffer : _vertexBuffers) {
     kind      = vertexBuffer.first;
     auto data = getVerticesData(kind);
-    vertexData->set(data, kind);
-    if (!stopChecking) {
-      auto vb = getVertexBuffer(kind);
 
-      if (vb) {
-        updatable    = getVertexBuffer(kind)->isUpdatable();
-        stopChecking = !updatable;
+    if (!data.empty()) {
+      vertexData->set(data, kind);
+      if (!stopChecking) {
+        auto vb = getVertexBuffer(kind);
+
+        if (vb) {
+          updatable    = getVertexBuffer(kind)->isUpdatable();
+          stopChecking = !updatable;
+        }
       }
     }
   }
@@ -961,7 +976,7 @@ void Geometry::_ImportGeometry(const json& parsedGeometry, const MeshPtr& mesh)
       && !json_util::is_null(parsedGeometry["subMeshes"])
       && parsedGeometry["subMeshes"].is_array()) {
     mesh->subMeshes.clear();
-    for (auto& parsedSubMesh :
+    for (const auto& parsedSubMesh :
          json_util::get_array<json>(parsedGeometry, "subMeshes")) {
       SubMesh::AddToMesh(
         json_util::get_number(parsedSubMesh, "materialIndex", 0u),
@@ -987,7 +1002,7 @@ void Geometry::_CleanMatricesWeights(const json& parsedGeometry,
                                      const MeshPtr& mesh)
 {
   const auto epsilon = 1e-3f;
-  if (!SceneLoader::CleanBoneMatrixWeights()) {
+  if (!SceneLoaderFlags::CleanBoneMatrixWeights()) {
     return;
   }
   size_t noInfluenceBoneIndex = 0;
@@ -1090,7 +1105,7 @@ GeometryPtr Geometry::Parse(const json& parsedVertexData, Scene* scene,
   // Tags.AddTagsTo(geometry, parsedVertexData.tags);
 
   if (json_util::has_key(parsedVertexData, "delayLoadingFile")) {
-    geometry->delayLoadState = EngineConstants::DELAYLOADSTATE_NOTLOADED;
+    geometry->delayLoadState = Constants::DELAYLOADSTATE_NOTLOADED;
     geometry->delayLoadingFile
       = rootUrl + json_util::get_string(parsedVertexData, "delayLoadingFile");
     geometry->_boundingInfo = std::make_unique<BoundingInfo>(
