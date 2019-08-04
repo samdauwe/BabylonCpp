@@ -35,8 +35,23 @@ using SubMeshPtr                  = std::shared_ptr<SubMesh>;
 class BABYLON_SHARED_EXPORT RenderTargetTexture : public Texture {
 
 public:
-  static constexpr unsigned int REFRESHRATE_RENDER_ONCE             = 0;
-  static constexpr unsigned int REFRESHRATE_RENDER_ONEVERYFRAME     = 1;
+  /**
+   * The texture will only be rendered once which can be useful to improve
+   * performance if everything in your render is static for instance.
+   */
+  static constexpr unsigned int REFRESHRATE_RENDER_ONCE = 0;
+
+  /**
+   * The texture will only be rendered rendered every frame and is recomended
+   * for dynamic contents.
+   */
+  static constexpr unsigned int REFRESHRATE_RENDER_ONEVERYFRAME = 1;
+
+  /**
+   * The texture will be rendered every 2 frames which could be enough if your
+   * dynamic objects are not the central point of your effect and can save a lot
+   * of performances.
+   */
   static constexpr unsigned int REFRESHRATE_RENDER_ONEVERYTWOFRAMES = 2;
 
 public:
@@ -70,8 +85,8 @@ public:
 
   /**
    * @brief Resets the refresh counter of the texture and start bak from
-   * scratch. Could be usefull to regenerate the texture if it is setup to
-   * render only once.
+   * scratch. Could be useful to regenerate the texture if it is setup to render
+   * only once.
    */
   void resetRefreshCounter();
 
@@ -160,6 +175,12 @@ public:
    * (copied) for debugging purpose
    */
   void render(bool useCameraPostProcess = false, bool dumpForDebug = false);
+
+  /**
+   * @brief Hidden
+   * @param faceIndex face index to bind to if this is a cubetexture
+   */
+  void _bindFrameBuffer(unsigned int faceIndex);
 
   /**
    * @brief Overrides the default sort function applied in the renderging group
@@ -260,18 +281,21 @@ protected:
    * @param isMulti True if multiple textures need to be created (Draw Buffers)
    * @param format The internal format of the buffer in the RTT (RED, RG, RGB,
    * RGBA, ALPHA...)
+   * @param delayAllocation if the texture allocation should be delayed
+   * (default: false)
    */
-  RenderTargetTexture(
-    const std::string& name, const std::variant<ISize, float>& size,
-    Scene* scene, bool generateMipMaps = false,
-    bool doNotChangeAspectRatio = true,
-    unsigned int type           = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
-    bool isCube                 = false,
-    unsigned int samplingMode   = TextureConstants::TRILINEAR_SAMPLINGMODE,
-    bool generateDepthBuffer = true, bool generateStencilBuffer = false,
-    bool isMulti         = false,
-    unsigned int format  = EngineConstants::TEXTUREFORMAT_RGBA,
-    bool delayAllocation = false);
+  RenderTargetTexture(const std::string& name,
+                      const std::variant<ISize, float>& size, Scene* scene,
+                      bool generateMipMaps        = false,
+                      bool doNotChangeAspectRatio = true,
+                      unsigned int type = Constants::TEXTURETYPE_UNSIGNED_INT,
+                      bool isCube       = false,
+                      unsigned int samplingMode
+                      = TextureConstants::TRILINEAR_SAMPLINGMODE,
+                      bool generateDepthBuffer   = true,
+                      bool generateStencilBuffer = false, bool isMulti = false,
+                      unsigned int format  = Constants::TEXTUREFORMAT_RGBA,
+                      bool delayAllocation = false);
 
   /**
    * @brief Use this list to define the list of mesh you want to render.
@@ -315,8 +339,7 @@ private:
                                            float scale) const;
   void renderToTarget(unsigned int faceIndex,
                       const std::vector<AbstractMesh*>& currentRenderList,
-                      size_t currentRenderListLength, bool useCameraPostProcess,
-                      bool dumpForDebug);
+                      bool useCameraPostProcess, bool dumpForDebug);
 
 public:
   /**

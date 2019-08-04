@@ -136,6 +136,7 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , edgesRenderer{this, &AbstractMesh::get_edgesRenderer}
     , isBlocked{this, &AbstractMesh::get_isBlocked}
     , useBones{this, &AbstractMesh::get_useBones}
+    , isAnInstance{this, &AbstractMesh::get_isAnInstance}
     , checkCollisions{this, &AbstractMesh::get_checkCollisions,
                       &AbstractMesh::set_checkCollisions}
     , collider{this, &AbstractMesh::get_collider}
@@ -886,6 +887,11 @@ float AbstractMesh::_getWorldMatrixDeterminant()
   }
 
   return TransformNode::_getWorldMatrixDeterminant();
+}
+
+bool AbstractMesh::get_isAnInstance() const
+{
+  return false;
 }
 
 AbstractMesh& AbstractMesh::movePOV(float amountRight, float amountUp,

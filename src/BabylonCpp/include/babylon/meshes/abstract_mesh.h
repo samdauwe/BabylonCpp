@@ -1219,6 +1219,12 @@ protected:
    */
   bool get_useBones() const;
 
+  /**
+   * @brief Gets a boolean indicating if this mesh is an instance or a regular
+   * mesh
+   */
+  virtual bool get_isAnInstance() const;
+
   /** Collisions **/
 
   /**
@@ -1748,6 +1754,11 @@ public:
    * skeleton
    */
   ReadOnlyProperty<AbstractMesh, bool> useBones;
+
+  /**
+   * Gets a boolean indicating if this mesh is an instance or a regular mesh
+   */
+  ReadOnlyProperty<AbstractMesh, bool> isAnInstance;
 
   /** Collisions **/
 
