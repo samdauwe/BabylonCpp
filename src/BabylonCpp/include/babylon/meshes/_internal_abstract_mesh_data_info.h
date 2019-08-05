@@ -23,7 +23,7 @@ struct BABYLON_SHARED_EXPORT _InternalAbstractMeshDataInfo {
   _FacetDataStorage _facetData;
   float _visibility                  = 1.f;
   SkeletonPtr _skeleton              = nullptr;
-  int _layerMask                     = 0x0FFFFFFF;
+  unsigned int _layerMask            = 0x0FFFFFFF;
   bool _computeBonesUsingShaders     = true;
   bool _isActive                     = false;
   bool _onlyForInstances             = false;

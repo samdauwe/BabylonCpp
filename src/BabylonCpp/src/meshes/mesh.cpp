@@ -873,13 +873,15 @@ Mesh* Mesh::setIndices(const IndicesArray& indices, size_t totalVertices,
   return this;
 }
 
-Mesh& Mesh::updateIndices(const IndicesArray& indices, int offset)
+Mesh& Mesh::updateIndices(const IndicesArray& indices,
+                          const std::optional<int>& offset,
+                          bool /*gpuMemoryOnly*/)
 {
   if (!_geometry) {
     return *this;
   }
 
-  _geometry->updateIndices(indices, offset);
+  _geometry->updateIndices(indices, offset.value_or(0));
   return *this;
 }
 

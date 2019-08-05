@@ -4,6 +4,7 @@
 #include <nlohmann/json_fwd.hpp>
 
 #include <babylon/babylon_api.h>
+#include <babylon/collisions/_mesh_collision_data.h>
 #include <babylon/collisions/collider.h>
 #include <babylon/culling/icullable.h>
 #include <babylon/culling/octrees/octree.h>
@@ -12,9 +13,7 @@
 #include <babylon/math/color3.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/matrix.h>
-#include <babylon/meshes/_facet_data_storage.h>
 #include <babylon/meshes/_internal_abstract_mesh_data_info.h>
-#include <babylon/meshes/abstract_mesh_constants.h>
 #include <babylon/meshes/facet_parameters.h>
 #include <babylon/meshes/iget_set_vertices_data.h>
 #include <babylon/meshes/transform_node.h>
@@ -26,8 +25,8 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
+class _MeshCollisionData;
 struct _OcclusionDataStorage;
-class ActionManager;
 class BoundingInfo;
 class Camera;
 class Collider;
@@ -62,29 +61,66 @@ class BABYLON_SHARED_EXPORT AbstractMesh : public TransformNode,
                                            public IGetSetVerticesData {
 
 public:
-  /** No occlusion */
-  static constexpr unsigned int OCCLUSION_TYPE_NONE
-    = AbstractMeshConstants::OCCLUSION_TYPE_NONE;
-  /** Occlusion set to optimisitic */
-  static constexpr unsigned int OCCLUSION_TYPE_OPTIMISTIC
-    = AbstractMeshConstants::OCCLUSION_TYPE_OPTIMISTIC;
-  /** Occlusion set to strict */
-  static constexpr unsigned int OCCLUSION_TYPE_STRICT
-    = AbstractMeshConstants::OCCLUSION_TYPE_STRICT;
-  /** Use an accurante occlusion algorithm */
-  static constexpr unsigned int OCCLUSION_ALGORITHM_TYPE_ACCURATE
-    = AbstractMeshConstants::OCCLUSION_ALGORITHM_TYPE_ACCURATE;
-  /** Use a conservative occlusion algorithm */
-  static constexpr unsigned int OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE
-    = AbstractMeshConstants::OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
+  using TrianglePickingPredicate = std::function<bool(
+    const Vector3& p0, const Vector3& p1, const Vector3& p2, const Ray& ray)>;
 
-  /** Default culling strategy with bounding box and bounding sphere and then
-   * frustum culling */
+public:
+  /** No occlusion */
+  static constexpr unsigned int OCCLUSION_TYPE_NONE = 0;
+  /** Occlusion set to optimisitic */
+  static constexpr unsigned int OCCLUSION_TYPE_OPTIMISTIC = 1;
+  /** Occlusion set to strict */
+  static constexpr unsigned int OCCLUSION_TYPE_STRICT = 2;
+  /** Use an accurante occlusion algorithm */
+  static constexpr unsigned int OCCLUSION_ALGORITHM_TYPE_ACCURATE = 0;
+  /** Use a conservative occlusion algorithm */
+  static constexpr unsigned int OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE = 1;
+
+  /**
+   * Default culling strategy : this is an exclusion test and it's the more
+   * accurate. Test order : Is the bounding sphere outside the frustum ? If not,
+   * are the bounding box vertices outside the frustum ? It not, then the
+   * cullable object is in the frustum.
+   */
   static constexpr unsigned int CULLINGSTRATEGY_STANDARD
-    = AbstractMeshConstants::CULLINGSTRATEGY_STANDARD;
-  /** Culling strategy with bounding sphere only and then frustum culling */
+    = Constants::MESHES_CULLINGSTRATEGY_STANDARD;
+  /**
+   * Culling strategy : Bounding Sphere Only.
+   *  This is an exclusion test. It's faster than the standard strategy because
+   * the bounding box is not tested. It's also less accurate than the standard
+   * because some not visible objects can still be selected. Test : is the
+   * bounding sphere outside the frustum ? If not, then the cullable object is
+   * in the frustum.
+   */
   static constexpr unsigned int CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY
-    = AbstractMeshConstants::CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY;
+    = Constants::MESHES_CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY;
+  /**
+   * Culling strategy : Optimistic Inclusion.
+   *  This in an inclusion test first, then the standard exclusion test.
+   *  This can be faster when a cullable object is expected to be almost always
+   * in the camera frustum. This could also be a little slower than the standard
+   * test when the tested object center is not the frustum but one of its
+   * bounding box vertex is still inside. Anyway, it's as accurate as the
+   * standard strategy. Test : Is the cullable object bounding sphere center in
+   * the frustum ? If not, apply the default culling strategy.
+   */
+  static constexpr unsigned int CULLINGSTRATEGY_OPTIMISTIC_INCLUSION
+    = Constants::MESHES_CULLINGSTRATEGY_OPTIMISTIC_INCLUSION;
+  /**
+   * Culling strategy : Optimistic Inclusion then Bounding Sphere Only.
+   *  This in an inclusion test first, then the bounding sphere only exclusion
+   * test. This can be the fastest test when a cullable object is expected to be
+   * almost always in the camera frustum. This could also be a little slower
+   * than the BoundingSphereOnly strategy when the tested object center is not
+   * in the frustum but its bounding sphere still intersects it. It's less
+   * accurate than the standard strategy and as accurate as the
+   * BoundingSphereOnly strategy. Test : Is the cullable object bounding sphere
+   * center in the frustum ? If not, apply the Bounding Sphere Only strategy. No
+   * Bounding Box is tested here.
+   */
+  static constexpr unsigned int
+    CULLINGSTRATEGY_OPTIMISTIC_INCLUSION_THEN_BSPHERE_ONLY
+    = Constants::MESHES_CULLINGSTRATEGY_OPTIMISTIC_INCLUSION_THEN_BSPHERE_ONLY;
 
 public:
   static Vector3 _lookAtVectorCache;
@@ -121,6 +157,14 @@ public:
    * @returns a string representation of the current mesh
    */
   std::string toString(bool fullDetails = false) const;
+
+  /**
+   * @brief Hidden
+   */
+  AbstractActionManagerPtr
+  _getActionManagerForTrigger(const std::optional<unsigned int>& trigger
+                              = std::nullopt,
+                              bool initialCall = true) override;
 
   /**
    * @brief Hidden
@@ -238,18 +282,18 @@ public:
    * BoundingInfo is renewed, so the bounding box and sphere, and the mesh World
    * Matrix is recomputed.
    * @param kind defines vertex data kind:
-   * * BABYLON.VertexBuffer.PositionKind
-   * * BABYLON.VertexBuffer.UVKind
-   * * BABYLON.VertexBuffer.UV2Kind
-   * * BABYLON.VertexBuffer.UV3Kind
-   * * BABYLON.VertexBuffer.UV4Kind
-   * * BABYLON.VertexBuffer.UV5Kind
-   * * BABYLON.VertexBuffer.UV6Kind
-   * * BABYLON.VertexBuffer.ColorKind
-   * * BABYLON.VertexBuffer.MatricesIndicesKind
-   * * BABYLON.VertexBuffer.MatricesIndicesExtraKind
-   * * BABYLON.VertexBuffer.MatricesWeightsKind
-   * * BABYLON.VertexBuffer.MatricesWeightsExtraKind
+   * * VertexBuffer.PositionKind
+   * * VertexBuffer.UVKind
+   * * VertexBuffer.UV2Kind
+   * * VertexBuffer.UV3Kind
+   * * VertexBuffer.UV4Kind
+   * * VertexBuffer.UV5Kind
+   * * VertexBuffer.UV6Kind
+   * * VertexBuffer.ColorKind
+   * * VertexBuffer.MatricesIndicesKind
+   * * VertexBuffer.MatricesIndicesExtraKind
+   * * VertexBuffer.MatricesWeightsKind
+   * * VertexBuffer.MatricesWeightsExtraKind
    * @param data defines the data source
    * @param updatable defines if the data must be flagged as updatable (or
    * static)
@@ -267,18 +311,18 @@ public:
    * requested `kind`. If the mesh has no geometry, it is simply returned as it
    * is.
    * @param kind defines vertex data kind:
-   * * BABYLON.VertexBuffer.PositionKind
-   * * BABYLON.VertexBuffer.UVKind
-   * * BABYLON.VertexBuffer.UV2Kind
-   * * BABYLON.VertexBuffer.UV3Kind
-   * * BABYLON.VertexBuffer.UV4Kind
-   * * BABYLON.VertexBuffer.UV5Kind
-   * * BABYLON.VertexBuffer.UV6Kind
-   * * BABYLON.VertexBuffer.ColorKind
-   * * BABYLON.VertexBuffer.MatricesIndicesKind
-   * * BABYLON.VertexBuffer.MatricesIndicesExtraKind
-   * * BABYLON.VertexBuffer.MatricesWeightsKind
-   * * BABYLON.VertexBuffer.MatricesWeightsExtraKind
+   * * VertexBuffer.PositionKind
+   * * VertexBuffer.UVKind
+   * * VertexBuffer.UV2Kind
+   * * VertexBuffer.UV3Kind
+   * * VertexBuffer.UV4Kind
+   * * VertexBuffer.UV5Kind
+   * * VertexBuffer.UV6Kind
+   * * VertexBuffer.ColorKind
+   * * VertexBuffer.MatricesIndicesKind
+   * * VertexBuffer.MatricesIndicesExtraKind
+   * * VertexBuffer.MatricesWeightsKind
+   * * VertexBuffer.MatricesWeightsExtraKind
    * @param data defines the data source
    * @param updateExtends If `kind` is `PositionKind` and if `updateExtends` is
    * true, the mesh BoundingInfo is renewed, so the bounding box and sphere, and
@@ -323,10 +367,13 @@ public:
    * @brief Uniformly scales the mesh to fit inside of a unit cube (1 X 1 X 1
    * units).
    * @param includeDescendants Use the hierarchy's bounding box instead of the
-   * mesh's bounding box
+   * mesh's bounding box. Default is true
+   * @param ignoreRotation ignore rotation when computing the scale (ie. object
+   * will be axis aligned). Default is false
    * @returns the current mesh
    */
-  AbstractMesh& normalizeToUnitCube(bool includeDescendants = true);
+  AbstractMesh& normalizeToUnitCube(bool includeDescendants = true,
+                                    bool ignoreRotation     = false);
 
   /**
    * @brief Overwrite the current bounding info.
@@ -349,6 +396,21 @@ public:
    * @brief Hidden
    */
   virtual bool _activate(int renderId, bool intermediateRendering);
+
+  /**
+   * @brief Hidden
+   */
+  virtual void _postActivate();
+
+  /**
+   * @brief Hidden
+   */
+  virtual void _freeze();
+
+  /**
+   * @brief Hidden
+   */
+  virtual void _unFreeze();
 
   /**
    * @brief Gets the current world matrix.
@@ -411,20 +473,6 @@ public:
    * @returns the new rotation vector
    */
   Vector3 calcRotatePOV(float flipBack, float twirlClockwise, float tiltRight);
-
-  /**
-   * @brief Return the minimum and maximum world vectors of the entire hierarchy
-   * under current mesh
-   * @param includeDescendants Include bounding info from descendants as well
-   * (true by default)
-   * @param predicate defines a callback function that can be customize to
-   * filter what meshes should be included in the list used to compute the
-   * bounding vectors
-   * @returns the new bounding vectors
-   */
-  MinMax getHierarchyBoundingVectors(
-    bool includeDescendants                                          = true,
-    const std::function<bool(AbstractMesh* abstractMesh)>& predicate = nullptr);
 
   /**
    * @brief This method recomputes and sets a new BoundingInfo to the mesh
@@ -521,20 +569,6 @@ public:
   PhysicsImpostorPtr& getPhysicsImpostor();
 
   /**
-   * @brief Gets the position of the current mesh in camera space.
-   * @param camera defines the camera to use
-   * @returns a position
-   */
-  Vector3 getPositionInCameraSpace(CameraPtr camera = nullptr);
-
-  /**
-   * @brief Returns the distance from the mesh to the active camera.
-   * @param camera defines the camera to use
-   * @returns the distance
-   */
-  float getDistanceToCamera(CameraPtr camera = nullptr);
-
-  /**
    * @brief Apply a physic impulse to the mesh.
    * @param force defines the force to apply
    * @param contactPoint defines where to apply the force
@@ -616,10 +650,14 @@ public:
    * @param ray defines the ray to use
    * @param fastCheck defines if fast mode (but less precise) must be used
    * (false by default)
+   * @param trianglePredicate defines an optional predicate used to select faces
+   * when a mesh intersection is detected
    * @returns the picking info
    * @see http://doc.babylonjs.com/babylon101/intersect_collisions_-_mesh
    */
-  virtual PickingInfo intersects(Ray& ray, bool fastCheck = true);
+  virtual PickingInfo
+  intersects(Ray& ray, bool fastCheck = true,
+             const TrianglePickingPredicate& trianglePredicate = nullptr);
 
   /**
    * @brief Clones the current mesh.
@@ -810,9 +848,17 @@ public:
   /**
    * @brief Updates the AbstractMesh indices array.
    * @param indices defines the data source
+   * @param offset defines the offset in the index buffer where to store the new
+   * data (can be null)
+   * @param gpuMemoryOnly defines a boolean indicating that only the GPU memory
+   * must be updated leaving the CPU version of the indices unchanged (false by
+   * default)
    * @returns the current mesh
    */
-  AbstractMesh& updateIndices(const IndicesArray& indices);
+  virtual AbstractMesh& updateIndices(const IndicesArray& indices,
+                                      const std::optional<int>& offset
+                                      = std::nullopt,
+                                      bool gpuMemoryOnly = false);
 
   /**
    * @brief Creates new normals data for the mesh.
@@ -1175,7 +1221,6 @@ protected:
 
   /**
    * @brief Hidden
-   * @return
    */
   virtual std::vector<Vector3>& get__positions();
 
@@ -1190,6 +1235,11 @@ protected:
    * @see http://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons
    */
   virtual SkeletonPtr& get_skeleton();
+
+  /**
+   * @brief Hidden
+   */
+  Node* _getEffectiveParent();
 
   /**
    * @brief Gets a Vector3 depicting the mesh scaling along each local axis X,
@@ -1312,8 +1362,16 @@ public:
   _InternalAbstractMeshDataInfo _internalAbstractMeshDataInfo;
 
   /**
-   * Gets ot sets the culling strategy to use to find visible meshes
-   */
+   * The culling strategy to use to check whether the mesh must be rendered or
+   * not. This value can be changed at any time and will be used on the next
+   * render mesh selection. The possible values are :
+   * - AbstractMesh.CULLINGSTRATEGY_STANDARD
+   * - AbstractMesh.CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY
+   * - AbstractMesh.CULLINGSTRATEGY_OPTIMISTIC_INCLUSION
+   * - AbstractMesh.CULLINGSTRATEGY_OPTIMISTIC_INCLUSION_THEN_BSPHERE_ONLY
+   * Please read each static variable documentation to get details about the
+   * culling process.
+   * */
   unsigned int cullingStrategy;
 
   /**
@@ -1613,10 +1671,16 @@ public:
   bool alwaysSelectAsActiveMesh;
 
   /**
+   * Gets or sets a boolean indicating that the bounding info does not need to
+   * be kept in sync (for performance reason)
+   */
+  bool doNotSyncBoundingInfo;
+
+  /**
    * Gets or sets the current action manager
    * @see http://doc.babylonjs.com/how_to/how_to_use_actions
    */
-  ActionManager* actionManager;
+  AbstractActionManagerPtr actionManager;
 
   /**
    * Gets or sets impostor used for physic simulation
@@ -1777,32 +1841,15 @@ public:
   ReadOnlyProperty<AbstractMesh, ColliderPtr> collider;
 
 private:
-  _FacetDataStorage _facetData;
-  // Events
-  Observer<AbstractMesh>::Ptr _onCollideObserver;
-  Observer<Vector3>::Ptr _onCollisionPositionChangeObserver;
+  // Collisions
+  _MeshCollisionData _meshCollisionData;
   // Properties
-  float _visibility;
   int _renderingGroupId;
   MaterialPtr _material;
-  bool _receiveShadows;
   /** Hidden (Backing field) */
   bool _renderOutline;
   /** Hidden (Backing field) */
   bool _renderOverlay;
-  bool _hasVertexAlpha;
-  bool _useVertexColors;
-  bool _computeBonesUsingShaders;
-  unsigned int _numBoneInfluencers;
-  bool _applyFog;
-  unsigned int _layerMask;
-  // Collisions
-  bool _checkCollisions;
-  int _collisionMask;
-  int _collisionGroup;
-  ColliderPtr _collider;
-  Vector3 _oldPositionForCollisions;
-  Vector3 _diffPositionForCollisions;
   /** Hidden */
   PhysicsImpostorPtr _physicsImpostor;
   /** Hidden */
@@ -1812,8 +1859,6 @@ private:
   // Cache
   Matrix _collisionsTransformMatrix;
   Matrix _collisionsScalingMatrix;
-  // Skeleton
-  SkeletonPtr _skeleton;
   // Rendering
   bool _showBoundingBox;
 

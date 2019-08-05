@@ -58,7 +58,9 @@ public:
   void _draw(SubMesh* subMesh, int fillMode, size_t instancesCount = 0,
              bool alternate = false) override;
 
-  PickingInfo intersects(Ray& ray, bool fastCheck = true) override;
+  PickingInfo intersects(Ray& ray, bool fastCheck = true,
+                         const TrianglePickingPredicate& trianglePredicate
+                         = nullptr) override;
 
   /**
    * @brief Disposes of the line mesh.

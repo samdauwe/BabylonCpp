@@ -1,6 +1,6 @@
 #include <babylon/engines/asset_container.h>
 
-#include <babylon/actions/action_manager.h>
+#include <babylon/actions/abstract_action_manager.h>
 #include <babylon/animations/animation.h>
 #include <babylon/animations/animation_group.h>
 #include <babylon/audio/sound.h>

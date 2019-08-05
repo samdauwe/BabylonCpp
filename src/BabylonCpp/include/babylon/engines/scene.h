@@ -775,8 +775,8 @@ public:
    * @param toRemove The action manager to remove
    * @returns The index of the removed action manager
    */
-  int removeActionManager(const ActionManagerPtr& toRemove);
-  int removeActionManager(ActionManager* toRemove);
+  int removeActionManager(const AbstractActionManagerPtr& toRemove);
+  int removeActionManager(AbstractActionManager* toRemove);
 
   /**
    * @brief Removes the given texture from this scene.
@@ -856,7 +856,7 @@ public:
    * @brief Adds the given action manager to this scene.
    * @param newActionManager The action manager to add
    */
-  void addActionManager(const std::shared_ptr<ActionManager>& newActionManager);
+  void addActionManager(const AbstractActionManagerPtr& newActionManager);
 
   /**
    * @brief Adds the given texture to this scene.
@@ -2912,7 +2912,7 @@ public:
    * Gets or sets the action manager associated with the scene
    * @see http://doc.babylonjs.com/how_to/how_to_use_actions
    */
-  ActionManager* actionManager;
+  AbstractActionManagerPtr actionManager;
 
   // Procedural textures
 
@@ -3330,7 +3330,8 @@ private:
     const std::function<void(const ClickInfo& clickInfo,
                              std::optional<PickingInfo>& pickResult)>& cb)>
     _initClickEvent;
-  std::function<ActionManager*(ActionManager* act, const ClickInfo& clickInfo)>
+  std::function<AbstractActionManagerPtr(const AbstractActionManagerPtr& act,
+                                         const ClickInfo& clickInfo)>
     _initActionManager;
   std::function<void(
     unsigned int btn, const ClickInfo& clickInfo,

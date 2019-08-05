@@ -176,8 +176,9 @@ public:
    * @brief Hidden
    */
   virtual AbstractActionManagerPtr
-  _getActionManagerForTrigger(const std::optional<int>& trigger = std::nullopt,
-                              bool initialCall                  = true);
+  _getActionManagerForTrigger(const std::optional<unsigned int>& trigger
+                              = std::nullopt,
+                              bool initialCall = true);
 
   /**
    * @brief Hidden

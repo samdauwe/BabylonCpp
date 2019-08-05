@@ -15,8 +15,8 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
+class AbstractActionManager;
 class AbstractMesh;
-class ActionManager;
 class Animation;
 class AnimationGroup;
 class AssetContainer;
@@ -39,29 +39,29 @@ class Scene;
 class Skeleton;
 class Sound;
 class TransformNode;
-using AbstractMeshPtr       = std::shared_ptr<AbstractMesh>;
-using ActionManagerPtr      = std::shared_ptr<ActionManager>;
-using AnimationPtr          = std::shared_ptr<Animation>;
-using AnimationGroupPtr     = std::shared_ptr<AnimationGroup>;
-using AssetContainerPtr     = std::shared_ptr<AssetContainer>;
-using BaseTexturePtr        = std::shared_ptr<BaseTexture>;
-using CameraPtr             = std::shared_ptr<Camera>;
-using EffectLayerPtr        = std::shared_ptr<EffectLayer>;
-using GeometryPtr           = std::shared_ptr<Geometry>;
-using GlowLayerPtr          = std::shared_ptr<GlowLayer>;
-using HighlightLayerPtr     = std::shared_ptr<HighlightLayer>;
-using IParticleSystemPtr    = std::shared_ptr<IParticleSystem>;
-using LayerPtr              = std::shared_ptr<Layer>;
-using LensFlareSystemPtr    = std::shared_ptr<LensFlareSystem>;
-using LightPtr              = std::shared_ptr<Light>;
-using MaterialPtr           = std::shared_ptr<Material>;
-using MorphTargetManagerPtr = std::shared_ptr<MorphTargetManager>;
-using MultiMaterialPtr      = std::shared_ptr<MultiMaterial>;
-using NodePtr               = std::shared_ptr<Node>;
-using ReflectionProbePtr    = std::shared_ptr<ReflectionProbe>;
-using SkeletonPtr           = std::shared_ptr<Skeleton>;
-using SoundPtr              = std::shared_ptr<Sound>;
-using TransformNodePtr      = std::shared_ptr<TransformNode>;
+using AbstractActionManagerPtr = std::shared_ptr<AbstractActionManager>;
+using AbstractMeshPtr          = std::shared_ptr<AbstractMesh>;
+using AnimationPtr             = std::shared_ptr<Animation>;
+using AnimationGroupPtr        = std::shared_ptr<AnimationGroup>;
+using AssetContainerPtr        = std::shared_ptr<AssetContainer>;
+using BaseTexturePtr           = std::shared_ptr<BaseTexture>;
+using CameraPtr                = std::shared_ptr<Camera>;
+using EffectLayerPtr           = std::shared_ptr<EffectLayer>;
+using GeometryPtr              = std::shared_ptr<Geometry>;
+using GlowLayerPtr             = std::shared_ptr<GlowLayer>;
+using HighlightLayerPtr        = std::shared_ptr<HighlightLayer>;
+using IParticleSystemPtr       = std::shared_ptr<IParticleSystem>;
+using LayerPtr                 = std::shared_ptr<Layer>;
+using LensFlareSystemPtr       = std::shared_ptr<LensFlareSystem>;
+using LightPtr                 = std::shared_ptr<Light>;
+using MaterialPtr              = std::shared_ptr<Material>;
+using MorphTargetManagerPtr    = std::shared_ptr<MorphTargetManager>;
+using MultiMaterialPtr         = std::shared_ptr<MultiMaterial>;
+using NodePtr                  = std::shared_ptr<Node>;
+using ReflectionProbePtr       = std::shared_ptr<ReflectionProbe>;
+using SkeletonPtr              = std::shared_ptr<Skeleton>;
+using SoundPtr                 = std::shared_ptr<Sound>;
+using TransformNodePtr         = std::shared_ptr<TransformNode>;
 
 /**
  * Defines how the parser contract is defined.
@@ -270,6 +270,10 @@ public:
 
   /**
    * All of the materials added to this scene
+   * In the context of a Scene, it is not supposed to be modified manually.
+   * Any addition or removal should be done using the addMaterial and
+   * removeMAterial Scene methods. Note also that the order of the Material
+   * wihin the array is not significant and might change.
    * @see http://doc.babylonjs.com/babylon101/materials
    */
   std::vector<MaterialPtr> materials;
@@ -287,6 +291,10 @@ public:
 
   /**
    * All of the tranform nodes added to this scene
+   * In the context of a Scene, it is not supposed to be modified manually.
+   * Any addition or removal should be done using the addTransformNode and
+   * removeTransformNode Scene methods. Note also that the order of the
+   * TransformNode wihin the array is not significant and might change.
    * @see http://doc.babylonjs.com/how_to/transformnode
    */
   std::vector<TransformNodePtr> transformNodes;
@@ -294,7 +302,7 @@ public:
   /**
    * ActionManagers available on the scene.
    */
-  std::vector<ActionManagerPtr> actionManagers;
+  std::vector<AbstractActionManagerPtr> actionManagers;
 
   /**
    * Textures to keep.

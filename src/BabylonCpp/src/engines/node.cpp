@@ -280,7 +280,7 @@ void Node::updateCache(bool force)
 }
 
 AbstractActionManagerPtr
-Node::_getActionManagerForTrigger(const std::optional<int>& trigger,
+Node::_getActionManagerForTrigger(const std::optional<unsigned int>& trigger,
                                   bool /*initialCall*/)
 {
   if (!parent()) {

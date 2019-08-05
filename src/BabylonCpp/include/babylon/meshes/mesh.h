@@ -531,7 +531,9 @@ public:
    * data (can be null)
    * @returns the current mesh
    */
-  Mesh& updateIndices(const IndicesArray& indices, int offset = 0);
+  Mesh& updateIndices(const IndicesArray& indices,
+                      const std::optional<int>& offset = std::nullopt,
+                      bool gpuMemoryOnly               = false) override;
 
   /**
    * @brief Invert the geometry to move from a right handed system to a left

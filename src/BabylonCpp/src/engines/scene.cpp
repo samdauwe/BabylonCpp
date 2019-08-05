@@ -1,5 +1,6 @@
 #include <babylon/engines/scene.h>
 
+#include <babylon/actions/abstract_action_manager.h>
 #include <babylon/actions/action_event.h>
 #include <babylon/actions/action_manager.h>
 #include <babylon/animations/animatable.h>
@@ -1122,6 +1123,7 @@ Scene& Scene::_processPointerDown(std::optional<PickingInfo>& pickResult,
     _pickedDownMesh     = (*pickResult).pickedMesh.get();
     auto iActionManager = _pickedDownMesh->actionManager;
     if (iActionManager) {
+#if 0
       if (iActionManager->hasPickTriggers()) {
         iActionManager->processTrigger(
           ActionManager::OnPickDownTrigger,
@@ -1146,6 +1148,7 @@ Scene& Scene::_processPointerDown(std::optional<PickingInfo>& pickResult,
             break;
         }
       }
+#endif
 
       if (iActionManager->hasSpecificTrigger(
             ActionManager::OnLongPressTrigger)) {
@@ -1238,6 +1241,7 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult,
       }
     }
     if (_pickedUpMesh->actionManager) {
+#if 0
       if (clickInfo.ignore()) {
         _pickedUpMesh->actionManager->processTrigger(
           ActionManager::OnPickUpTrigger,
@@ -1256,6 +1260,7 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult,
           ActionManager::OnDoublePickTrigger,
           ActionEvent::CreateNew(_pickedUpMesh, evt));
       }
+#endif
     }
   }
   else {
@@ -1271,9 +1276,11 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult,
       && _pickedDownMesh->actionManager->hasSpecificTrigger(
         ActionManager::OnPickOutTrigger)
       && _pickedDownMesh != _pickedUpMesh) {
+#if 0
     _pickedDownMesh->actionManager->processTrigger(
       ActionManager::OnPickOutTrigger,
       ActionEvent::CreateNew(_pickedDownMesh, evt));
+#endif
   }
 
   auto type = PointerEventTypes::POINTERUP;
@@ -1330,8 +1337,8 @@ bool Scene::_isPointerSwiping() const
 void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
 {
   _initActionManager
-    = [this](ActionManager* act,
-             const ClickInfo & /*clickInfo*/) -> ActionManager* {
+    = [this](const AbstractActionManagerPtr& act,
+             const ClickInfo & /*clickInfo*/) -> AbstractActionManagerPtr {
     if (!_meshPickProceed) {
       auto pickResult
         = pick(_unTranslatedPointerX, _unTranslatedPointerY,
@@ -1343,10 +1350,12 @@ void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
         _currentPickResult = std::nullopt;
       }
       if (pickResult) {
+#if 0
         const auto _pickResult = *pickResult;
         act                    = (_pickResult.hit && _pickResult.pickedMesh) ?
                 _pickResult.pickedMesh->actionManager :
                 nullptr;
+#endif
       }
       _meshPickProceed = true;
     }
@@ -1360,8 +1369,8 @@ void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
                              const ClickInfo& clickInfo,
                              std::optional<PickingInfo>& pickResult)>& cb) {
     ClickInfo clickInfo;
-    _currentPickResult = std::nullopt;
-    ActionManager* act = nullptr;
+    _currentPickResult           = std::nullopt;
+    AbstractActionManagerPtr act = nullptr;
 
     auto checkPicking
       = obs1.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERPICK))
@@ -1748,8 +1757,10 @@ void Scene::_onKeyDownEvent(KeyboardEvent&& evt)
   }
 
   if (actionManager) {
+#if 0
     actionManager->processTrigger(ActionManager::OnKeyDownTrigger,
                                   ActionEvent::CreateNewFromScene(this, evt));
+#endif
   }
 }
 
@@ -1770,8 +1781,10 @@ void Scene::_onKeyUpEvent(KeyboardEvent&& evt)
   }
 
   if (actionManager) {
+#if 0
     actionManager->processTrigger(ActionManager::OnKeyUpTrigger,
                                   ActionEvent::CreateNewFromScene(this, evt));
+#endif
   }
 }
 
@@ -2601,17 +2614,18 @@ int Scene::removeMaterial(Material* toRemove)
   return index;
 }
 
-int Scene::removeActionManager(const ActionManagerPtr& toRemove)
+int Scene::removeActionManager(const AbstractActionManagerPtr& toRemove)
 {
   return removeActionManager(toRemove.get());
 }
 
-int Scene::removeActionManager(ActionManager* toRemove)
+int Scene::removeActionManager(AbstractActionManager* toRemove)
 {
-  auto it   = std::find_if(actionManagers.begin(), actionManagers.end(),
-                         [toRemove](const ActionManagerPtr& actionManager) {
-                           return actionManager.get() == toRemove;
-                         });
+  auto it
+    = std::find_if(actionManagers.begin(), actionManagers.end(),
+                   [toRemove](const AbstractActionManagerPtr& actionManager) {
+                     return actionManager.get() == toRemove;
+                   });
   int index = static_cast<int>(it - actionManagers.begin());
   if (it != actionManagers.end()) {
     actionManagers.erase(it);
@@ -2715,8 +2729,7 @@ void Scene::addGeometry(const GeometryPtr& newGeometry)
   geometries.emplace_back(newGeometry);
 }
 
-void Scene::addActionManager(
-  const std::shared_ptr<ActionManager>& newActionManager)
+void Scene::addActionManager(const AbstractActionManagerPtr& newActionManager)
 {
   actionManagers.emplace_back(newActionManager);
 }
@@ -4671,7 +4684,7 @@ void Scene::setPointerOverMesh(AbstractMesh* mesh)
   if (_pointerOverMesh == mesh) {
     return;
   }
-
+#if 0
   if (_pointerOverMesh && _pointerOverMesh->actionManager) {
     _pointerOverMesh->actionManager->processTrigger(
       ActionManager::OnPointerOutTrigger,
@@ -4684,6 +4697,7 @@ void Scene::setPointerOverMesh(AbstractMesh* mesh)
       ActionManager::OnPointerOverTrigger,
       ActionEvent::CreateNew(_pointerOverMesh));
   }
+#endif
 }
 
 void Scene::setPointerOverSprite(const SpritePtr& sprite)

@@ -108,7 +108,8 @@ public:
    * box. When null, all descendants are included. If ignoreChildren is set this
    * will be ignored. (Default: null)
    */
-  std::function<bool(AbstractMesh* abstractMesh)> includeChildPredicate;
+  std::function<bool(const AbstractMeshPtr& abstractMesh)>
+    includeChildPredicate;
 
   /**
    * The size of the rotation spheres attached to the bounding box (Default:

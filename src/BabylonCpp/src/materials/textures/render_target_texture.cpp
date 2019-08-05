@@ -475,8 +475,7 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
       currentRenderList().emplace_back(static_cast<AbstractMesh*>(mesh));
     }
   }
-  auto currentRenderListLength = currentRenderList().size();
-  auto sceneRenderId           = scene->getRenderId();
+  auto sceneRenderId = scene->getRenderId();
   for (auto& mesh : currentRenderList()) {
     if (mesh) {
       if (!mesh->isReady(refreshRate() == 0)) {
