@@ -30,9 +30,11 @@ ActionManager::~ActionManager()
 }
 
 void ActionManager::addToScene(
-  const std::shared_ptr<ActionManager>& newActionManager)
+  const std::shared_ptr<ActionManager>& /*newActionManager*/)
 {
+#if 0
   _scene->actionManagers.emplace_back(newActionManager);
+#endif
 }
 
 void ActionManager::dispose()
@@ -43,13 +45,14 @@ void ActionManager::dispose()
       --ActionManager::Triggers[action->trigger];
     }
   }
-
+#if 0
   _scene->actionManagers.erase(
     std::remove_if(_scene->actionManagers.begin(), _scene->actionManagers.end(),
                    [this](const std::shared_ptr<ActionManager>& actionManager) {
                      return actionManager.get() == this;
                    }),
     _scene->actionManagers.end());
+#endif
 }
 
 Scene* ActionManager::getScene() const
@@ -152,12 +155,14 @@ bool ActionManager::HasSpecificTrigger(unsigned int trigger)
 Action* ActionManager::registerAction(Action* action)
 {
   if (action->trigger == ActionManager::OnEveryFrameTrigger) {
+#if 0
     if (getScene()->actionManager != this) {
       BABYLON_LOG_WARN(
         "ActionManager",
         "OnEveryFrameTrigger can only be used with scene.actionManager");
       return nullptr;
     }
+#endif
   }
 
   actions.emplace_back(action);
