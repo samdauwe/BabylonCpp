@@ -1,21 +1,15 @@
 #ifndef BABYLON_ACTIONS_ACTIONEVENT_H
 #define BABYLON_ACTIONS_ACTIONEVENT_H
 
+#include <babylon/actions/iaction_event.h>
 #include <babylon/babylon_api.h>
-#include <babylon/core/structs.h>
 
 namespace BABYLON {
-
-class AbstractMesh;
-class Scene;
-class Sprite;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
-using SpritePtr       = std::shared_ptr<Sprite>;
 
 /**
  * @brief ActionEvent is the event being sent when an action is triggered.
  */
-class BABYLON_SHARED_EXPORT ActionEvent {
+class BABYLON_SHARED_EXPORT ActionEvent : public IActionEvent {
 
 public:
   /**
@@ -28,7 +22,7 @@ public:
    * ActionEvent
    * @param additionalData additional data for the event
    */
-  ActionEvent(AbstractMesh* source, int pointerX, int pointerY,
+  ActionEvent(const AbstractMeshPtr& source, int pointerX, int pointerY,
               AbstractMesh* meshUnderPointer,
               const std::optional<Event>& sourceEvent,
               const std::string& additionalData = "");
@@ -45,7 +39,7 @@ public:
    * @param additionalData additional data for the event
    * @returns the new ActionEvent
    */
-  static ActionEvent CreateNew(AbstractMesh* source,
+  static ActionEvent CreateNew(const AbstractMeshPtr& source,
                                const std::optional<Event>& evt = std::nullopt);
 
   /**
@@ -77,25 +71,9 @@ public:
    * @returns the new ActionEvent
    */
   static ActionEvent
-  CreateNewFromPrimitive(AbstractMesh* prim, const Vector2& pointerPos,
+  CreateNewFromPrimitive(const AbstractMeshPtr& prim, const Vector2& pointerPos,
                          const Event& evt,
                          const std::string& additionalData = "");
-
-public:
-  /** The mesh that triggered the action */
-  AbstractMeshPtr source;
-  /** The sprite that triggered the action */
-  SpritePtr sprite;
-  /** The X mouse cursor position at the time of the event */
-  int pointerX;
-  /** The Y mouse cursor position at the time of the event */
-  int pointerY;
-  /** The mesh that is currently pointed at (can be null) */
-  AbstractMesh* meshUnderPointer;
-  /** The original (browser) event that triggered the ActionEvent */
-  std::optional<Event> sourceEvent;
-  /** Additional data for the event */
-  std::string additionalData;
 
 }; // end of class ActionEvent
 
