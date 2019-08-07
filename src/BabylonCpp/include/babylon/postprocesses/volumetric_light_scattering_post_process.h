@@ -61,7 +61,7 @@ public:
    * @brief Disposes the internal assets and detaches the post-process from the
    * camera.
    */
-  void dispose(Camera* camera);
+  void dispose(Camera* camera) override;
 
   /**
    * @brief Returns the render target texture used by the post-process.

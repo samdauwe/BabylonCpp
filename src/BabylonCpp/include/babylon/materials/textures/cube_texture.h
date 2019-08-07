@@ -181,7 +181,7 @@ protected:
   /**
    * @brief Are mip maps generated for this texture or not.
    */
-  bool get_noMipmap() const;
+  bool get_noMipmap() const override;
 
   /**
    * @brief Gets a boolean indicating if the cube texture contains prefiltered
