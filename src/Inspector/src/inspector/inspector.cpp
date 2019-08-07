@@ -211,8 +211,8 @@ void Inspector::_renderInspector()
   auto size = ImGui::GetIO().DisplaySize;
   size.y -= pos.y;
 
-  ImGui::SetNextWindowPos(pos, ImGuiSetCond_Always);
-  ImGui::SetNextWindowSize(size, ImGuiSetCond_Always);
+  ImGui::SetNextWindowPos(pos, ImGuiCond_Always);
+  ImGui::SetNextWindowSize(size, ImGuiCond_Always);
   if (ImGui::Begin("INSPECTOR", &_showInspectorWindow,
                    ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize
                      | ImGuiWindowFlags_NoScrollbar
