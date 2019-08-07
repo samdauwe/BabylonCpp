@@ -87,6 +87,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
         /W4           # -> warning level 4
         # /WX         # -> treat warnings as errors
         /wd4251       # -> disable warning: 'identifier': class 'type' needs to have dll-interface to be used by clients of class 'type2'
+        /wd4275       # -> disable warning: non dll-interface struct '...' used as base for dll-interface class '...'
         /wd4592       # -> disable warning: 'identifier': symbol will be dynamically initialized (implementation limitation)
         # /wd4201     # -> disable warning: nonstandard extension used: nameless struct/union (caused by GLM)
         /wd4127       # -> disable warning: conditional expression is constant (caused by Qt)
@@ -97,7 +98,50 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
         /bigobj       # (Increase Number of Sections in .Obj file)
     )
     string(REPLACE ";" " " WFLAGS "${WFLAGS}")
+    message("WFLAGS is ${WFLAGS}")
 endif ()
+
+# clang compiler options : add some very useful warnings by default
+
+if ( ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") OR ("${CMAKE_CXX_COMPILER_ID}" MATCHES "AppleClang") )
+  set(CLANG_ADDITIONAL_FLAGS
+    "${EXTRA_FLAGS} "
+      "-Wshadow "                    # Variable shadowing
+      "-Winvalid-source-encoding "
+      "-Wconditional-uninitialized " # Variable used when uninitialized
+      "-Wnon-virtual-dtor"           # missing virtual dtor
+      "-Winconsistent-missing-override "
+      "-Wheader-hygiene "            # "using namespace" in a header
+      "-Wunused-variable -Wunused-private-field"
+      "-Wignored-qualifiers" # ignored "const" qualifiers
+      "-Wunreachable-code-return"
+      "-Wmissing-field-initializers"
+
+      # conversion issues : those should be enabled later!
+      # "-Wfloat-equal "
+      #"-Wsign-conversion "
+      #"-Wconversion "
+  )
+
+  # Those flags can safely be disabled
+  set(CLANG_DISABLED_FLAGS_LEGIT
+    # https://stackoverflow.com/questions/13905200/is-it-wise-to-ignore-gcc-clangs-wmissing-braces-warning/13905432
+    "-Wno-missing-braces"
+  )
+
+  # Those flags should be activated later (they denote real issues)
+  set(CLANG_DISABLED_FLAGS_DUBIOUS
+    "-Wno-float-equal " # comparing floating point with == or != is unsafe [-Wfloat-equal]
+    "-Wno-sign-conversion"
+    "-Wno-conversion"
+  )
+
+  set(EXTRA_FLAGS ${CLANG_ADDITIONAL_FLAGS} ${CLANG_DISABLED_FLAGS_LEGIT} ${CLANG_DISABLED_FLAGS_DUBIOUS})
+  string(REPLACE ";" " " EXTRA_FLAGS "${EXTRA_FLAGS}")
+endif()
+
+
+# GCC compiler options
 
 # Add "-Werror" flag if requested
 if(OPTION_CXX_WARNINGS_AS_ERRORS)
