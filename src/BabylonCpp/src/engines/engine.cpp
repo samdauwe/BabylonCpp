@@ -1100,7 +1100,7 @@ void Engine::bindFramebuffer(const InternalTexturePtr& texture,
     if (!requiredHeight) {
       requiredHeight = texture->height;
       if (lodLevel) {
-        requiredHeight = *requiredHeight / std::pow(2, lodLevel);
+        requiredHeight = static_cast<int>(*requiredHeight / std::pow(2, lodLevel));
       }
     }
 

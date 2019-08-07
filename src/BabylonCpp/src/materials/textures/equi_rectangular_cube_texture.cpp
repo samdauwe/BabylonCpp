@@ -139,7 +139,7 @@ Float32Array EquiRectangularCubeTexture::getFloat32ArrayFromArrayBuffer(
   for (size_t i = 0; i < buffer.size(); ++i) {
     // We drop the transparency channel, because we do not need/want it
     if ((i + 1) % 4 != 0) {
-      floatImageData[k++] = dataView.getUint8(i) / 255;
+      floatImageData[k++] =  static_cast<float>(dataView.getUint8(i)) / 255.f;
     }
   }
 

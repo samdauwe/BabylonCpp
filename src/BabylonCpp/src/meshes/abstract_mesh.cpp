@@ -1345,11 +1345,11 @@ AbstractMesh& AbstractMesh::moveWithCollisions(Vector3& displacement)
   coordinator->getNewPosition(
     _meshCollisionData._oldPositionForCollisions, displacement,
     _meshCollisionData._collider, 3, shared_from_base<AbstractMesh>(),
-    [this](int collisionId, Vector3& newPosition,
+    [this](size_t collisionId, Vector3& newPosition,
            const AbstractMeshPtr& collidedMesh) {
-      _onCollisionPositionChange(collisionId, newPosition, collidedMesh);
+      _onCollisionPositionChange(static_cast<int>(collisionId), newPosition, collidedMesh);
     },
-    static_cast<unsigned int>(uniqueId));
+    uniqueId);
   return *this;
 }
 

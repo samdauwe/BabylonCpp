@@ -78,7 +78,8 @@ void PBRReflectionScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto ground = MeshBuilder::CreateGround("ground", groundOptions, scene);
   auto mat1   = PBRMaterial::New("mat1", scene);
   auto mat1ReflectionTexture
-    = MirrorTexture::New("tex1", std::pow(2, 10), scene, true);
+    = MirrorTexture::New("tex1", static_cast<float>(std::pow(2, 10)), scene, true);
+
   mat1ReflectionTexture->mirrorPlane = Plane(0.f, -1.f, 0.f, 0.f);
   // mirrorplane normal is pointing towards "mirror image"
   //
@@ -117,7 +118,7 @@ void PBRReflectionScene::initializeScene(ICanvas* canvas, Scene* scene)
 
     mat2 = PBRMaterial::New("mat2", scene);
     mat2ReflectionTexture
-      = MirrorTexture::New("tex2", std::pow(2, 10), scene, true);
+      = MirrorTexture::New("tex2", static_cast<float>(std::pow(2, 10)), scene, true);
     mat2ReflectionTexture->renderList = {mesh0.get(), ground.get()};
     mat2ReflectionTexture->mirrorPlane
       = Plane::FromPositionAndNormal(plane0->position(), newNormal.negate());
@@ -151,7 +152,7 @@ void PBRReflectionScene::initializeScene(ICanvas* canvas, Scene* scene)
   plane0->receiveShadows           = true;
   mesh0->receiveShadows            = true;
   mesh1->receiveShadows            = true;
-  auto sg                          = ShadowGenerator::New(pow(2, 11), light0);
+  auto sg                          = ShadowGenerator::New(static_cast<int>(pow(2, 11)), light0);
   sg->usePercentageCloserFiltering = true;
   sg->filteringQuality             = ShadowGenerator::QUALITY_HIGH();
   sg->addShadowCaster(plane0);

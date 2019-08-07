@@ -484,7 +484,7 @@ AnimationValue Animation::_interpolate(float currentFrame,
               return newVale;
             case Animation::ANIMATIONLOOPMODE_RELATIVE():
               newVale = quatValue.add(
-                state.offsetValue.get<Quaternion>().scale(state.repeatCount));
+                state.offsetValue.get<Quaternion>().scale(static_cast<float>(state.repeatCount)));
               return newVale;
             default:
               break;
@@ -509,7 +509,7 @@ AnimationValue Animation::_interpolate(float currentFrame,
               return newVale;
             case Animation::ANIMATIONLOOPMODE_RELATIVE():
               newVale = vec3Value.add(
-                state.offsetValue.get<Vector3>().scale(state.repeatCount));
+                state.offsetValue.get<Vector3>().scale(static_cast<float>(state.repeatCount)));
               return newVale;
             default:
               break;
@@ -534,7 +534,7 @@ AnimationValue Animation::_interpolate(float currentFrame,
               return newVale;
             case Animation::ANIMATIONLOOPMODE_RELATIVE():
               newVale = vec2Value.add(
-                state.offsetValue.get<Vector2>().scale(state.repeatCount));
+                state.offsetValue.get<Vector2>().scale(static_cast<float>(state.repeatCount)));
               return newVale;
             default:
               break;
@@ -552,7 +552,7 @@ AnimationValue Animation::_interpolate(float currentFrame,
               newVale = sizeInterpolateFunction(startValue.get<Size>(),
                                                 endValue.get<Size>(), gradient)
                           .add(state.offsetValue.get<Size>().scale(
-                            state.repeatCount));
+                            static_cast<float>(state.repeatCount)));
               return newVale;
             default:
               break;
@@ -571,7 +571,7 @@ AnimationValue Animation::_interpolate(float currentFrame,
                 = color3InterpolateFunction(startValue.get<Color3>(),
                                             endValue.get<Color3>(), gradient)
                     .add(
-                      state.offsetValue.get<Color3>().scale(state.repeatCount));
+                      state.offsetValue.get<Color3>().scale(static_cast<float>(state.repeatCount)));
               return newVale;
             default:
               break;
