@@ -25,6 +25,7 @@ using PhysicsImpostorPtr = std::shared_ptr<PhysicsImpostor>;
  * @brief Hidden
  */
 struct BABYLON_SHARED_EXPORT IPhysicsEnginePlugin {
+  virtual ~IPhysicsEnginePlugin() = default;
   Mesh* world;
   std::string name;
   virtual void setGravity(const Vector3& gravity) = 0;

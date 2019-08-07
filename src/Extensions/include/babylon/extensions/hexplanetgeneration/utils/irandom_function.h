@@ -8,6 +8,7 @@ namespace BABYLON {
 namespace Extensions {
 
 struct IRandomFunction {
+  virtual ~IRandomFunction() = default;
   virtual size_t next()                                       = 0;
   virtual float unit()                                        = 0;
   virtual float unitInclusive()                               = 0;

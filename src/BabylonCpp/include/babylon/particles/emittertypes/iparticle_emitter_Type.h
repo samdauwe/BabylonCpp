@@ -23,7 +23,7 @@ class Vector3;
  * like cone/sphere/box.
  */
 struct BABYLON_SHARED_EXPORT IParticleEmitterType {
-
+  virtual ~IParticleEmitterType() = default;
   /**
    * @brief Called by the particle System when the direction is computed for the
    * created particle.

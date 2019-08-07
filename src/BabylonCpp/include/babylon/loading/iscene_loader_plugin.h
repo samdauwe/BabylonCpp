@@ -26,7 +26,7 @@ using SkeletonPtr        = std::shared_ptr<Skeleton>;
  * @brief Interface used to define a SceneLoader plugin.
  */
 struct BABYLON_SHARED_EXPORT ISceneLoaderPlugin {
-
+  virtual ~ISceneLoaderPlugin () = default;
   /**
    * The friendly name of this plugin.
    */

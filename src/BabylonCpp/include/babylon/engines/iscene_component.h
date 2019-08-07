@@ -18,7 +18,7 @@ class Scene;
  */
 struct BABYLON_SHARED_EXPORT ISceneComponent
     : public std::enable_shared_from_this<ISceneComponent> {
-
+  virtual ~ISceneComponent() = default;
   /**
    * @brief The name of the component. Each component must have a unique name.
    */

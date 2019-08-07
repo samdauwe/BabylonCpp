@@ -11,6 +11,7 @@ namespace BABYLON {
  */
 template <class T>
 struct BABYLON_SHARED_EXPORT DataBuffer {
+  virtual ~DataBuffer() = default;
   /**
    * Gets or sets the number of objects referencing this buffer
    */

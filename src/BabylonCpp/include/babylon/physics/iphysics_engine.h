@@ -19,7 +19,7 @@ using PhysicsImpostorPtr = std::shared_ptr<PhysicsImpostor>;
  * @see http://doc.babylonjs.com/how_to/using_the_physics_engine
  */
 struct BABYLON_SHARED_EXPORT IPhysicsEngine {
-
+  virtual ~IPhysicsEngine() = default;
   /**
    * Gets the gravity vector used by the simulation
    */

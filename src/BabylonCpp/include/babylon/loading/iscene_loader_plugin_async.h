@@ -35,7 +35,7 @@ struct ImportedMeshes {
 }; // end of struct ImportedMeshes
 
 struct BABYLON_SHARED_EXPORT ISceneLoaderPluginAsync {
-
+  virtual ~ISceneLoaderPluginAsync() = default;
   /**
    * The friendly name of this plugin.
    */

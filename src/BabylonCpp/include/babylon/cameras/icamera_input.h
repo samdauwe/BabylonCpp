@@ -16,6 +16,7 @@ class ICanvas;
  */
 template <class TCamera>
 struct BABYLON_SHARED_EXPORT ICameraInput {
+  virtual ~ICameraInput() = default;
   /**
    * Defines the camera the input is attached to.
    */

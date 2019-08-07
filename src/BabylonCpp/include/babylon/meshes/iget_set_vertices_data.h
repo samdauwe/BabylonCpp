@@ -13,7 +13,7 @@ class AbstractMesh;
  * vertices.
  */
 struct BABYLON_SHARED_EXPORT IGetSetVerticesData {
-
+  virtual ~IGetSetVerticesData() = default;
   /**
    * @brief Gets a boolean indicating if specific vertex data is present.
    * @param kind defines the vertex data kind to use
