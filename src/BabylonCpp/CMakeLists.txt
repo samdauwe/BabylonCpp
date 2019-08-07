@@ -106,6 +106,7 @@ file(GLOB GAMEPADS_HDR_FILES        ${INCLUDE_PATH}/gamepads/*.h
                                     ${INCLUDE_PATH}/gamepads/controllers/*.h)
 file(GLOB GIZMOS_HDR_FILES          ${INCLUDE_PATH}/gizmos/*.h)
 file(GLOB HELPERS_HDR_FILES         ${INCLUDE_PATH}/helpers/*.h)
+file(GLOB INPUTS_HDR_FILES          ${INCLUDE_PATH}/inputs/*.h)
 file(GLOB INSTRUMENTATION_HDR_FILES ${INCLUDE_PATH}/instrumentation/*.h)
 file(GLOB INTERFACES_HDR_FILES      ${INCLUDE_PATH}/interfaces/*.h)
 file(GLOB LAYER_HDR_FILES           ${INCLUDE_PATH}/layer/*.h)
@@ -179,6 +180,7 @@ set(BABYLON_HEADERS
     ${GAMEPADS_HDR_FILES}
     ${GIZMOS_HDR_FILES}
     ${HELPERS_HDR_FILES}
+    ${INPUTS_HDR_FILES}
     ${INSTRUMENTATION_HDR_FILES}
     ${INTERFACES_HDR_FILES}
     ${LAYER_HDR_FILES}
@@ -232,6 +234,7 @@ file(GLOB GAMEPADS_SRC_FILES        ${SOURCE_PATH}/gamepads/*.cpp
                                     ${SOURCE_PATH}/gamepads/controllers/*.cpp)
 file(GLOB GIZMOS_SRC_FILES          ${SOURCE_PATH}/gizmos/*.cpp)
 file(GLOB HELPERS_SRC_FILES         ${SOURCE_PATH}/helpers/*.cpp)
+file(GLOB INPUTS_SRC_FILES          ${SOURCE_PATH}/inputs/*.cpp)
 file(GLOB INSTRUMENTATION_SRC_FILES ${SOURCE_PATH}/instrumentation/*.cpp)
 file(GLOB INTERFACES_SRC_FILES      ${SOURCE_PATH}/interfaces/*.cpp)
 file(GLOB LAYER_SRC_FILES           ${SOURCE_PATH}/layer/*.cpp)
@@ -301,6 +304,7 @@ set(BABYLON_SOURCES
     ${GAMEPADS_SRC_FILES}
     ${GIZMOS_SRC_FILES}
     ${HELPERS_SRC_FILES}
+    ${INPUTS_SRC_FILES}
     ${INSTRUMENTATION_SRC_FILES}
     ${INTERFACES_SRC_FILES}
     ${LAYER_SRC_FILES}

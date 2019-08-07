@@ -1,4 +1,4 @@
-#include <babylon/engines/click_info.h>
+#include <babylon/inputs/click_info.h>
 
 namespace BABYLON {
 

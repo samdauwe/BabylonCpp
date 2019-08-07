@@ -1,5 +1,5 @@
-#ifndef BABYLON_ENGINES_CLICK_INFO_H
-#define BABYLON_ENGINES_CLICK_INFO_H
+#ifndef BABYLON_INPUTS_CLICK_INFO_H
+#define BABYLON_INPUTS_CLICK_INFO_H
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
@@ -42,8 +42,8 @@ private:
   bool _hasSwiped;
   bool _ignore;
 
-}; // end of class PointerInfo
+}; // end of class ClickInfo
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_ENGINES_CLICK_INFO_H
+#endif // end of BABYLON_INPUTS_CLICK_INFO_H

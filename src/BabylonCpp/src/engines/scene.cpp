@@ -24,7 +24,6 @@
 #include <babylon/culling/octrees/octree_scene_component.h>
 #include <babylon/culling/ray.h>
 #include <babylon/debug/debug_layer.h>
-#include <babylon/engines/click_info.h>
 #include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/iscene_component.h>
@@ -35,6 +34,7 @@
 #include <babylon/gamepads/gamepad_manager.h>
 #include <babylon/gamepads/gamepad_system_scene_component.h>
 #include <babylon/helpers/environment_helper.h>
+#include <babylon/inputs/click_info.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/layer/effect_layer.h>
 #include <babylon/layer/glow_layer.h>
