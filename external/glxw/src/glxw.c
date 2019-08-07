@@ -1,5 +1,10 @@
 #include <GLXW/glxw.h>
 
+#ifdef _MSC_VER
+#pragma warning(disable:4152)
+#pragma warning(disable:4706)
+#endif
+
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN 1
 #include <windows.h>
