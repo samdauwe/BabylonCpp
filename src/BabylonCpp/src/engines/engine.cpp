@@ -1426,7 +1426,9 @@ Engine::GLBufferPtr Engine::createIndexBuffer(const IndicesArray& indices,
   }
   else {
     Uint16Array arrayBuffer;
-    arrayBuffer.assign(indices.begin(), indices.end());
+    for (auto v : indices)
+      arrayBuffer.push_back(static_cast<uint16_t>(v));
+
     _gl->bufferData(GL::ELEMENT_ARRAY_BUFFER, arrayBuffer,
                     updatable ? GL::DYNAMIC_DRAW : GL::STATIC_DRAW);
   }
