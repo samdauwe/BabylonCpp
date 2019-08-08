@@ -150,40 +150,6 @@ void PBRMetallicRoughnessMaterial::set_metallicRoughnessTexture(
   _markAllSubMeshesAsTexturesDirty();
 }
 
-std::vector<BaseTexturePtr>
-PBRMetallicRoughnessMaterial::getActiveTextures() const
-{
-  auto activeTextures = PBRBaseSimpleMaterial::getActiveTextures();
-
-  if (baseTexture()) {
-    activeTextures.emplace_back(baseTexture);
-  }
-
-  if (metallicRoughnessTexture()) {
-    activeTextures.emplace_back(metallicRoughnessTexture);
-  }
-
-  return activeTextures;
-}
-
-bool PBRMetallicRoughnessMaterial::hasTexture(
-  const BaseTexturePtr& texture) const
-{
-  if (PBRBaseSimpleMaterial::hasTexture(texture)) {
-    return true;
-  }
-
-  if (baseTexture() == texture) {
-    return true;
-  }
-
-  if (metallicRoughnessTexture() == texture) {
-    return true;
-  }
-
-  return false;
-}
-
 MaterialPtr PBRMetallicRoughnessMaterial::clone(const std::string& /*name*/,
                                                 bool /*cloneChildren*/) const
 {

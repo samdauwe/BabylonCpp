@@ -285,44 +285,4 @@ bool PBRBaseSimpleMaterial::_shouldUseAlphaFromAlbedoTexture() const
          && _transparencyMode != PBRMaterial::PBRMATERIAL_OPAQUE;
 }
 
-std::vector<BaseTexturePtr> PBRBaseSimpleMaterial::getActiveTextures() const
-{
-  auto activeTextures = PBRBaseMaterial::getActiveTextures();
-
-  if (environmentTexture()) {
-    activeTextures.emplace_back(environmentTexture());
-  }
-
-  if (normalTexture()) {
-    activeTextures.emplace_back(normalTexture());
-  }
-
-  if (emissiveTexture()) {
-    activeTextures.emplace_back(emissiveTexture());
-  }
-
-  if (occlusionTexture()) {
-    activeTextures.emplace_back(occlusionTexture());
-  }
-
-  if (lightmapTexture()) {
-    activeTextures.emplace_back(lightmapTexture());
-  }
-
-  return activeTextures;
-}
-
-bool PBRBaseSimpleMaterial::hasTexture(const BaseTexturePtr& texture) const
-{
-  if (PBRBaseMaterial::hasTexture(texture)) {
-    return true;
-  }
-
-  if (lightmapTexture() == texture) {
-    return true;
-  }
-
-  return false;
-}
-
 } // end of namespace BABYLON

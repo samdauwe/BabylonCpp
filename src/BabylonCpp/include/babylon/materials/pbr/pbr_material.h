@@ -25,32 +25,37 @@ public:
    * PBRMaterialTransparencyMode: No transparency mode, Alpha channel is not
    * use.
    */
-  static constexpr unsigned int PBRMATERIAL_OPAQUE = 0;
+  static constexpr unsigned int PBRMATERIAL_OPAQUE
+    = PBRBaseMaterial::PBRMATERIAL_OPAQUE;
 
   /**
    * PBRMaterialTransparencyMode: Alpha Test mode, pixel are discarded below a
    * certain threshold defined by the alpha cutoff value.
    */
-  static constexpr unsigned int PBRMATERIAL_ALPHATEST = 1;
+  static constexpr unsigned int PBRMATERIAL_ALPHATEST
+    = PBRBaseMaterial::PBRMATERIAL_ALPHATEST;
 
   /**
    * PBRMaterialTransparencyMode: Pixels are blended (according to the alpha
    * mode) with the already drawn pixels in the current frame buffer.
    */
-  static constexpr unsigned int PBRMATERIAL_ALPHABLEND = 2;
+  static constexpr unsigned int PBRMATERIAL_ALPHABLEND
+    = PBRBaseMaterial::PBRMATERIAL_ALPHABLEND;
 
   /**
    * PBRMaterialTransparencyMode: Pixels are blended (according to the alpha
    * mode) with the already drawn pixels in the current frame buffer. They are
    * also discarded below the alpha cutoff threshold to improve performances.
    */
-  static constexpr unsigned int PBRMATERIAL_ALPHATESTANDBLEND = 3;
+  static constexpr unsigned int PBRMATERIAL_ALPHATESTANDBLEND
+    = PBRBaseMaterial::PBRMATERIAL_ALPHATESTANDBLEND;
 
   /**
    * Defines the default value of how much AO map is occluding the analytical
    * lights (point spot...).
    */
-  static constexpr unsigned int DEFAULT_AO_ON_ANALYTICAL_LIGHTS = 1;
+  static constexpr unsigned int DEFAULT_AO_ON_ANALYTICAL_LIGHTS
+    = PBRBaseMaterial::DEFAULT_AO_ON_ANALYTICAL_LIGHTS;
 
 public:
   template <typename... Ts>
@@ -68,19 +73,6 @@ public:
    * @brief Returns the name of this material class.
    */
   const std::string getClassName() const override;
-
-  /**
-   * @brief Returns an array of the actively used textures.
-   * @returns - Array of BaseTextures
-   */
-  std::vector<BaseTexturePtr> getActiveTextures() const override;
-
-  /**
-   * @brief Checks to see if a texture is used in the material.
-   * @param texture - Base texture to use.
-   * @returns - Boolean specifying if a texture is used in the material.
-   */
-  bool hasTexture(const BaseTexturePtr& texture) const override;
 
   /**
    * @brief Makes a duplicate of the current material.
@@ -293,7 +285,7 @@ protected:
   void set_indexOfRefraction(float value);
 
   /**
-   * Controls if refraction needs to be inverted on Y. This could be usefull for
+   * Controls if refraction needs to be inverted on Y. This could be useful for
    * procedural texture.
    */
   bool get_invertRefractionY() const;
@@ -511,9 +503,16 @@ protected:
   void set_useLinearAlphaFresnel(bool value);
 
   /**
-   * A fresnel is applied to the alpha of the model to ensure grazing angles
-   * edges are not alpha tested.
-   * And/Or occlude the blended part.
+   * Let user defines the brdf lookup texture used for IBL.
+   * A default 8bit version is embedded but you could point at :
+   * * Default texture:
+   * https://assets.babylonjs.com/environments/correlatedMSBRDF.png
+   * * Default 16bit pixel depth texture:
+   * https://assets.babylonjs.com/environments/correlatedMSBRDF.dds
+   * * LEGACY Default None correlated
+   * https://assets.babylonjs.com/environments/uncorrelatedBRDF.png
+   * * LEGACY Default None correlated 16bit pixel depth
+   * https://assets.babylonjs.com/environments/uncorrelatedBRDF.dds
    */
   BaseTexturePtr& get_environmentBRDFTexture();
   void set_environmentBRDFTexture(const BaseTexturePtr& value);
@@ -818,7 +817,7 @@ public:
   Property<PBRMaterial, float> indexOfRefraction;
 
   /**
-   * Controls if refraction needs to be inverted on Y. This could be usefull for
+   * Controls if refraction needs to be inverted on Y. This could be useful for
    * procedural texture.
    */
   Property<PBRMaterial, bool> invertRefractionY;
@@ -995,9 +994,16 @@ public:
   Property<PBRMaterial, bool> useLinearAlphaFresnel;
 
   /**
-   * A fresnel is applied to the alpha of the model to ensure grazing angles
-   * edges are not alpha tested.
-   * And/Or occlude the blended part.
+   * Let user defines the brdf lookup texture used for IBL.
+   * A default 8bit version is embedded but you could point at :
+   * * Default texture:
+   * https://assets.babylonjs.com/environments/correlatedMSBRDF.png
+   * * Default 16bit pixel depth texture:
+   * https://assets.babylonjs.com/environments/correlatedMSBRDF.dds
+   * * LEGACY Default None correlated
+   * https://assets.babylonjs.com/environments/uncorrelatedBRDF.png
+   * * LEGACY Default None correlated 16bit pixel depth
+   * https://assets.babylonjs.com/environments/uncorrelatedBRDF.dds
    */
   Property<PBRMaterial, BaseTexturePtr> environmentBRDFTexture;
 

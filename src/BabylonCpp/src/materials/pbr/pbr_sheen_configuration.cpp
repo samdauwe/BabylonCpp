@@ -84,8 +84,8 @@ void PBRSheenConfiguration::_markAllSubMeshesAsTexturesDirty()
   _internalMarkAllSubMeshesAsTexturesDirty();
 }
 
-bool PBRSheenConfiguration::isReadyForSubMesh(
-  const IMaterialSheenDefines& defines, Scene* scene) const
+bool PBRSheenConfiguration::isReadyForSubMesh(const MaterialDefines& defines,
+                                              Scene* scene) const
 {
   if (defines._areTexturesDirty) {
     if (scene->texturesEnabled()) {
@@ -100,7 +100,7 @@ bool PBRSheenConfiguration::isReadyForSubMesh(
   return true;
 }
 
-void PBRSheenConfiguration::prepareDefines(IMaterialSheenDefines& defines,
+void PBRSheenConfiguration::prepareDefines(MaterialDefines& defines,
                                            Scene* scene)
 {
   if (_isEnabled) {
@@ -189,10 +189,9 @@ const std::string PBRSheenConfiguration::getClassName() const
   return "PBRSheenConfiguration";
 }
 
-unsigned int
-PBRSheenConfiguration::AddFallbacks(const IMaterialSheenDefines& defines,
-                                    EffectFallbacks& fallbacks,
-                                    unsigned int currentRank)
+unsigned int PBRSheenConfiguration::AddFallbacks(const MaterialDefines& defines,
+                                                 EffectFallbacks& fallbacks,
+                                                 unsigned int currentRank)
 {
   if (defines["SHEEN"]) {
     fallbacks.addFallback(currentRank++, "SHEEN");

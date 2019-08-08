@@ -31,13 +31,6 @@ public:
    */
   const std::string getClassName() const override;
 
-  /**
-   * @brief Return the active textures of the material.
-   */
-  std::vector<BaseTexturePtr> getActiveTextures() const override;
-
-  bool hasTexture(const BaseTexturePtr& texture) const override;
-
 public:
   /**
    * Number of Simultaneous lights allowed on the material.

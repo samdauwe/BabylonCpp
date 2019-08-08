@@ -143,7 +143,7 @@ void PBRClearCoatConfiguration::_markAllSubMeshesAsTexturesDirty()
 }
 
 bool PBRClearCoatConfiguration::isReadyForSubMesh(
-  const IMaterialClearCoatDefines& defines, Scene* scene, Engine* engine,
+  const MaterialDefines& defines, Scene* scene, Engine* engine,
   bool disableBumpMap) const
 {
   if (defines._areTexturesDirty) {
@@ -174,8 +174,8 @@ bool PBRClearCoatConfiguration::isReadyForSubMesh(
   return true;
 }
 
-void PBRClearCoatConfiguration::prepareDefines(
-  IMaterialClearCoatDefines& defines, Scene* scene)
+void PBRClearCoatConfiguration::prepareDefines(MaterialDefines& defines,
+                                               Scene* scene)
 {
   if (_isEnabled) {
     defines.boolDef["CLEARCOAT"] = true;

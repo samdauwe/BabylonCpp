@@ -9,10 +9,22 @@ namespace BABYLON {
 
 class IAnimatable;
 class ImageProcessingConfiguration;
+class PBRAnisotropicConfiguration;
+class PBRBRDFConfiguration;
+class PBRClearCoatConfiguration;
 struct PBRMaterialDefines;
+class PBRSheenConfiguration;
+class PBRSubSurfaceConfiguration;
 using IAnimatablePtr = std::shared_ptr<IAnimatable>;
 using ImageProcessingConfigurationPtr
   = std::shared_ptr<ImageProcessingConfiguration>;
+using PBRAnisotropicConfigurationPtr
+  = std::shared_ptr<PBRAnisotropicConfiguration>;
+using PBRBRDFConfigurationPtr      = std::shared_ptr<PBRBRDFConfiguration>;
+using PBRClearCoatConfigurationPtr = std::shared_ptr<PBRClearCoatConfiguration>;
+using PBRSheenConfigurationPtr     = std::shared_ptr<PBRSheenConfiguration>;
+using PBRSubSurfaceConfigurationPtr
+  = std::shared_ptr<PBRSubSurfaceConfiguration>;
 
 /**
  * @brief The Physically based material base class of BJS.
@@ -24,6 +36,37 @@ using ImageProcessingConfigurationPtr
 class BABYLON_SHARED_EXPORT PBRBaseMaterial : public PushMaterial {
 
 public:
+  /**
+   * PBRMaterialTransparencyMode: No transparency mode, Alpha channel is not
+   * use.
+   */
+  static constexpr unsigned int PBRMATERIAL_OPAQUE = 0;
+
+  /**
+   * PBRMaterialTransparencyMode: Alpha Test mode, pixel are discarded below a
+   * certain threshold defined by the alpha cutoff value.
+   */
+  static constexpr unsigned int PBRMATERIAL_ALPHATEST = 1;
+
+  /**
+   * PBRMaterialTransparencyMode: Pixels are blended (according to the alpha
+   * mode) with the already drawn pixels in the current frame buffer.
+   */
+  static constexpr unsigned int PBRMATERIAL_ALPHABLEND = 2;
+
+  /**
+   * PBRMaterialTransparencyMode: Pixels are blended (according to the alpha
+   * mode) with the already drawn pixels in the current frame buffer. They are
+   * also discarded below the alpha cutoff threshold to improve performances.
+   */
+  static constexpr unsigned int PBRMATERIAL_ALPHATESTANDBLEND = 3;
+
+  /**
+   * Defines the default value of how much AO map is occluding the analytical
+   * lights (point spot...).
+   */
+  static constexpr unsigned int DEFAULT_AO_ON_ANALYTICAL_LIGHTS = 0;
+
   /**
    * PBRMaterialLightFalloff Physical: light is falling off following the
    * inverse squared distance law.
@@ -115,7 +158,7 @@ public:
   void buildUniformLayout();
 
   /**
-   * @brief Unbinds the textures.
+   * @brief Unbinds the material from the mesh.
    */
   void unbind() override;
 
@@ -132,6 +175,19 @@ public:
    * @returns - Array of animatable textures.
    */
   std::vector<IAnimatablePtr> getAnimatables() const;
+
+  /**
+   * @brief Returns an array of the actively used textures.
+   * @returns - Array of BaseTextures
+   */
+  std::vector<BaseTexturePtr> getActiveTextures() const override;
+
+  /**
+   * @brief Checks to see if a texture is used in the material.
+   * @param texture - Base texture to use.
+   * @returns - Boolean specifying if a texture is used in the material.
+   */
+  bool hasTexture(const BaseTexturePtr& texture) const override;
 
   /**
    * @brief Disposes the resources of the material.
@@ -188,6 +244,15 @@ protected:
    */
   void set_transparencyMode(const std::optional<unsigned int>& value);
 
+  /**
+   * @brief hidden
+   * This is reserved for the inspector.
+   * Defines the material debug mode.
+   * It helps seeing only some components of the material while troubleshooting.
+   */
+  int get_debugMode() const;
+  void set_debugMode(int value);
+
 private:
   EffectPtr _prepareEffect(
     AbstractMesh* mesh, PBRMaterialDefines& defines,
@@ -206,14 +271,6 @@ private:
    * environment texture.
    */
   BaseTexturePtr _getReflectionTexture() const;
-
-  /**
-   * @brief Returns the texture used for refraction or null if none is used.
-   * @returns - Refection texture if present.  If no refraction texture and
-   * refraction is linked with transparency, returns environment texture.
-   * Otherwise, returns null.
-   */
-  BaseTexturePtr _getRefractionTexture() const;
 
 public:
   /**
@@ -289,11 +346,6 @@ protected:
   BaseTexturePtr _reflectionTexture;
 
   /**
-   * Stores the refraction values in a texture.
-   */
-  BaseTexturePtr _refractionTexture;
-
-  /**
    * Stores the emissive values in a texture.
    */
   BaseTexturePtr _emissiveTexture;
@@ -366,25 +418,6 @@ protected:
    * AKA Glossiness in other nomenclature.
    */
   float _microSurface;
-
-  /**
-   * source material index of refraction (IOR)' / 'destination material IOR.
-   */
-  float _indexOfRefraction;
-
-  /**
-   * Controls if refraction needs to be inverted on Y. This could be usefull for
-   * procedural texture.
-   */
-  bool _invertRefractionY;
-
-  /**
-   * This parameters will make the material used its opacity to control how much
-   * it is refracting aginst not.
-   * Materials half opaque for instance using refraction could benefit from this
-   * control.
-   */
-  bool _linkRefractionWithTransparency;
 
   /**
    * Specifies that the material will use the light map as a show map.
@@ -592,12 +625,51 @@ protected:
    */
   bool _unlit;
 
-private:
   /**
-   * Stores the reflectivity values based on metallic roughness workflow.
+   * This is reserved for the inspector.
+   * Defines the material debug mode.
+   * It helps seeing only some components of the material while
+   * troubleshooting.
    */
-  static Color3 _scaledReflectivity;
+  Property<PBRBaseMaterial, int> debugMode;
 
+  /**
+   * Defines the clear coat layer parameters for the material.
+   */
+  PBRClearCoatConfigurationPtr clearCoat;
+
+  /**
+   * Defines the anisotropic parameters for the material.
+   */
+  PBRAnisotropicConfigurationPtr anisotropy;
+
+  /**
+   * Defines the BRDF parameters for the material.
+   */
+  PBRBRDFConfigurationPtr brdf;
+
+  /**
+   * Defines the Sheen parameters for the material.
+   */
+  PBRSheenConfigurationPtr sheen;
+
+  /**
+   * Defines the SubSurface parameters for the material.
+   */
+  PBRSubSurfaceConfigurationPtr subSurface;
+
+  /**
+   * Custom callback helping to override the default shader used in the
+   * material.
+   */
+  std::function<std::string(const std::string& shaderName,
+                            const std::vector<std::string>& uniforms,
+                            const std::vector<std::string>& uniformBuffers,
+                            const std::vector<std::string>& samplers,
+                            const PBRMaterialDefines& defines)>
+    customShaderNameResolve;
+
+private:
   /**
    * This stores the direct, emissive, environment, and specular light
    * intensities into a Vector4.
@@ -624,6 +696,30 @@ private:
    * buffers.
    */
   bool _useLogarithmicDepth;
+
+  /**
+   * This is reserved for the inspector.
+   * Defines the material debug mode.
+   * It helps seeing only some components of the material while troubleshooting.
+   */
+  int _debugMode;
+
+  /**
+   * This is reserved for the inspector.
+   * Specify from where on screen the debug mode should start.
+   * The value goes from -1 (full screen) to 1 (not visible)
+   * It helps with side by side comparison against the final render
+   * This defaults to -1
+   */
+  float debugLimit;
+
+  /**
+   * This is reserved for the inspector.
+   * As the default viewing range might not be enough (if the ambient is really
+   * small for instance) You can use the factor to better multiply the final
+   * value.
+   */
+  float debugFactor;
 
 }; // end of class PBRBaseMaterial
 

@@ -5,6 +5,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/materials/color_curves.h>
 #include <babylon/materials/image_processing_configuration.h>
+#include <babylon/materials/pbr/pbr_sub_surface_configuration.h>
 #include <babylon/misc/brdf_texture_tools.h>
 
 namespace BABYLON {
@@ -538,17 +539,18 @@ void PBRMaterial::set_lightmapTexture(const BaseTexturePtr& value)
 
 BaseTexturePtr& PBRMaterial::get_refractionTexture()
 {
-  return _refractionTexture;
+  return subSurface->refractionTexture;
 }
 
 void PBRMaterial::set_refractionTexture(const BaseTexturePtr& value)
 {
-  if (_refractionTexture == value) {
-    return;
+  subSurface->refractionTexture = value;
+  if (value) {
+    subSurface->isRefractionEnabled = true;
   }
-
-  _refractionTexture = value;
-  _markAllSubMeshesAsTexturesDirty();
+  else if (!subSurface->linkRefractionWithTransparency()) {
+    subSurface->isRefractionEnabled = false;
+  }
 }
 
 Color3& PBRMaterial::get_ambientColor()
@@ -643,47 +645,35 @@ void PBRMaterial::set_microSurface(float value)
 
 float PBRMaterial::get_indexOfRefraction() const
 {
-  return _indexOfRefraction;
+  return 1.f / subSurface->indexOfRefraction();
 }
 
 void PBRMaterial::set_indexOfRefraction(float value)
 {
-  if (stl_util::almost_equal(_indexOfRefraction, value)) {
-    return;
-  }
-
-  _indexOfRefraction = value;
-  _markAllSubMeshesAsTexturesDirty();
+  subSurface->indexOfRefraction = 1.f / value;
 }
 
 bool PBRMaterial::get_invertRefractionY() const
 {
-  return _invertRefractionY;
+  return subSurface->invertRefractionY();
 }
 
 void PBRMaterial::set_invertRefractionY(bool value)
 {
-  if (_invertRefractionY == value) {
-    return;
-  }
-
-  _invertRefractionY = value;
-  _markAllSubMeshesAsTexturesDirty();
+  subSurface->invertRefractionY = value;
 }
 
 bool PBRMaterial::get_linkRefractionWithTransparency() const
 {
-  return _linkRefractionWithTransparency;
+  return subSurface->linkRefractionWithTransparency();
 }
 
 void PBRMaterial::set_linkRefractionWithTransparency(bool value)
 {
-  if (_linkRefractionWithTransparency == value) {
-    return;
+  subSurface->linkRefractionWithTransparency = value;
+  if (value) {
+    subSurface->isRefractionEnabled = true;
   }
-
-  _linkRefractionWithTransparency = value;
-  _markAllSubMeshesAsTexturesDirty();
 }
 
 bool PBRMaterial::get_useLightmapAsShadowmap() const
@@ -1278,106 +1268,6 @@ void PBRMaterial::set_cameraColorCurves(const ColorCurvesPtr& value)
 const std::string PBRMaterial::getClassName() const
 {
   return "PBRMaterial";
-}
-
-std::vector<BaseTexturePtr> PBRMaterial::getActiveTextures() const
-{
-  auto activeTextures = PBRBaseMaterial::getActiveTextures();
-
-  if (_albedoTexture) {
-    activeTextures.emplace_back(_albedoTexture);
-  }
-
-  if (_ambientTexture) {
-    activeTextures.emplace_back(_ambientTexture);
-  }
-
-  if (_opacityTexture) {
-    activeTextures.emplace_back(_opacityTexture);
-  }
-
-  if (_reflectionTexture) {
-    activeTextures.emplace_back(_reflectionTexture);
-  }
-
-  if (_emissiveTexture) {
-    activeTextures.emplace_back(_emissiveTexture);
-  }
-
-  if (_reflectivityTexture) {
-    activeTextures.emplace_back(_reflectivityTexture);
-  }
-
-  if (_metallicTexture) {
-    activeTextures.emplace_back(_metallicTexture);
-  }
-
-  if (_microSurfaceTexture) {
-    activeTextures.emplace_back(_microSurfaceTexture);
-  }
-
-  if (_bumpTexture) {
-    activeTextures.emplace_back(_bumpTexture);
-  }
-
-  if (_lightmapTexture) {
-    activeTextures.emplace_back(_lightmapTexture);
-  }
-
-  if (_refractionTexture) {
-    activeTextures.emplace_back(_refractionTexture);
-  }
-
-  return activeTextures;
-}
-
-bool PBRMaterial::hasTexture(const BaseTexturePtr& texture) const
-{
-  if (PBRBaseMaterial::hasTexture(texture)) {
-    return true;
-  }
-
-  if (_albedoTexture == texture) {
-    return true;
-  }
-
-  if (_ambientTexture == texture) {
-    return true;
-  }
-
-  if (_opacityTexture == texture) {
-    return true;
-  }
-
-  if (_reflectionTexture == texture) {
-    return true;
-  }
-
-  if (_reflectivityTexture == texture) {
-    return true;
-  }
-
-  if (_metallicTexture == texture) {
-    return true;
-  }
-
-  if (_microSurfaceTexture == texture) {
-    return true;
-  }
-
-  if (_bumpTexture == texture) {
-    return true;
-  }
-
-  if (_lightmapTexture == texture) {
-    return true;
-  }
-
-  if (_refractionTexture == texture) {
-    return true;
-  }
-
-  return false;
 }
 
 MaterialPtr PBRMaterial::clone(const std::string& /*name*/,

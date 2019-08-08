@@ -16,7 +16,7 @@ class AbstractMesh;
 class IAnimatable;
 class BaseTexture;
 class EffectFallbacks;
-struct IMaterialAnisotropicDefines;
+struct MaterialDefines;
 class Scene;
 class UniformBuffer;
 using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
@@ -50,8 +50,7 @@ public:
    * @param scene defines the scene the material belongs to.
    * @returns - boolean indicating that the submesh is ready or not.
    */
-  bool isReadyForSubMesh(const IMaterialAnisotropicDefines& defines,
-                         Scene* scene) const;
+  bool isReadyForSubMesh(const MaterialDefines& defines, Scene* scene) const;
 
   /**
    * @brief Checks to see if a texture is used in the material.
@@ -59,8 +58,8 @@ public:
    * @param mesh the mesh we are preparing the defines for.
    * @param scene defines the scene the material belongs to.
    */
-  void prepareDefines(IMaterialAnisotropicDefines& defines,
-                      const AbstractMeshPtr& mesh, Scene* scene);
+  void prepareDefines(MaterialDefines& defines, AbstractMesh& mesh,
+                      Scene* scene);
 
   /**
    * @brief Binds the material data.
@@ -110,7 +109,7 @@ public:
    * @param currentRank defines the current fallback rank.
    * @returns the new fallback rank.
    */
-  static unsigned int AddFallbacks(const IMaterialAnisotropicDefines& defines,
+  static unsigned int AddFallbacks(const MaterialDefines& defines,
                                    EffectFallbacks& fallbacks,
                                    unsigned int currentRank);
 

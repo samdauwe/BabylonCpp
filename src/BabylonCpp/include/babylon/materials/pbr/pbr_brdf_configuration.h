@@ -12,7 +12,7 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
-struct IMaterialBRDFDefines;
+struct MaterialDefines;
 
 /**
  * @brief Define the code related to the BRDF parameters of the pbr material.
@@ -59,7 +59,7 @@ public:
    * @brief Checks to see if a texture is used in the material.
    * @param defines the list of "defines" to update.
    */
-  void prepareDefines(IMaterialBRDFDefines& defines);
+  void prepareDefines(MaterialDefines& defines);
 
   /**
    * @brief Get the current class name of the texture useful for serialization

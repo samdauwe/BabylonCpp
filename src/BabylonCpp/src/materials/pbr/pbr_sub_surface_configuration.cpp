@@ -132,14 +132,14 @@ void PBRSubSurfaceConfiguration::set_refractionTexture(
   _markAllSubMeshesAsTexturesDirty();
 }
 
-unsigned int PBRSubSurfaceConfiguration::get_indexOfRefraction() const
+float PBRSubSurfaceConfiguration::get_indexOfRefraction() const
 {
   return _indexOfRefraction;
 }
 
-void PBRSubSurfaceConfiguration::set_indexOfRefraction(unsigned int value)
+void PBRSubSurfaceConfiguration::set_indexOfRefraction(float value)
 {
-  if (_indexOfRefraction == value) {
+  if (stl_util::almost_equal(_indexOfRefraction, value)) {
     return;
   }
 
@@ -198,7 +198,7 @@ void PBRSubSurfaceConfiguration::_markAllSubMeshesAsTexturesDirty()
 }
 
 bool PBRSubSurfaceConfiguration::isReadyForSubMesh(
-  const IMaterialSubSurfaceDefines& defines, Scene* scene) const
+  const MaterialDefines& defines, Scene* scene) const
 {
   if (defines._areTexturesDirty) {
     if (scene->texturesEnabled()) {
@@ -220,8 +220,8 @@ bool PBRSubSurfaceConfiguration::isReadyForSubMesh(
   return true;
 }
 
-void PBRSubSurfaceConfiguration::prepareDefines(
-  IMaterialSubSurfaceDefines& defines, Scene* scene)
+void PBRSubSurfaceConfiguration::prepareDefines(MaterialDefines& defines,
+                                                Scene* scene)
 {
   if (defines._areTexturesDirty) {
     defines.boolDef["SUBSURFACE"] = false;
@@ -457,9 +457,10 @@ const std::string PBRSubSurfaceConfiguration::getClassName() const
   return "PBRSubSurfaceConfiguration";
 }
 
-unsigned int PBRSubSurfaceConfiguration::AddFallbacks(
-  const IMaterialSubSurfaceDefines& defines, EffectFallbacks& fallbacks,
-  unsigned int currentRank)
+unsigned int
+PBRSubSurfaceConfiguration::AddFallbacks(const MaterialDefines& defines,
+                                         EffectFallbacks& fallbacks,
+                                         unsigned int currentRank)
 {
   if (defines["SS_SCATERRING"]) {
     fallbacks.addFallback(currentRank++, "SS_SCATERRING");

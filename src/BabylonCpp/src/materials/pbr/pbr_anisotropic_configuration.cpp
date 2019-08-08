@@ -67,7 +67,7 @@ void PBRAnisotropicConfiguration::_markAllSubMeshesAsTexturesDirty()
 }
 
 bool PBRAnisotropicConfiguration::isReadyForSubMesh(
-  const IMaterialAnisotropicDefines& defines, Scene* scene) const
+  const MaterialDefines& defines, Scene* scene) const
 {
   if (defines._areTexturesDirty) {
     if (scene->texturesEnabled()) {
@@ -82,13 +82,13 @@ bool PBRAnisotropicConfiguration::isReadyForSubMesh(
   return true;
 }
 
-void PBRAnisotropicConfiguration::prepareDefines(
-  IMaterialAnisotropicDefines& defines, const AbstractMeshPtr& mesh,
-  Scene* scene)
+void PBRAnisotropicConfiguration::prepareDefines(MaterialDefines& defines,
+                                                 AbstractMesh& mesh,
+                                                 Scene* scene)
 {
   if (_isEnabled) {
     defines.boolDef["ANISOTROPIC"] = _isEnabled;
-    if (_isEnabled && !mesh->isVerticesDataPresent(VertexBuffer::TangentKind)) {
+    if (_isEnabled && !mesh.isVerticesDataPresent(VertexBuffer::TangentKind)) {
       defines._needUVs           = true;
       defines.boolDef["MAINUV1"] = true;
     }
@@ -175,9 +175,10 @@ const std::string PBRAnisotropicConfiguration::getClassName() const
   return "PBRAnisotropicConfiguration";
 }
 
-unsigned int PBRAnisotropicConfiguration::AddFallbacks(
-  const IMaterialAnisotropicDefines& defines, EffectFallbacks& fallbacks,
-  unsigned int currentRank)
+unsigned int
+PBRAnisotropicConfiguration::AddFallbacks(const MaterialDefines& defines,
+                                          EffectFallbacks& fallbacks,
+                                          unsigned int currentRank)
 {
   if (defines["ANISOTROPIC"]) {
     fallbacks.addFallback(currentRank++, "ANISOTROPIC");

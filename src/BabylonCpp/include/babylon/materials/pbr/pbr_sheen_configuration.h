@@ -16,7 +16,7 @@ namespace BABYLON {
 class BaseTexture;
 class EffectFallbacks;
 class IAnimatable;
-struct IMaterialSheenDefines;
+struct MaterialDefines;
 class Scene;
 class UniformBuffer;
 using BaseTexturePtr = std::shared_ptr<BaseTexture>;
@@ -48,15 +48,14 @@ public:
    * @param scene defines the scene the material belongs to.
    * @returns - boolean indicating that the submesh is ready or not.
    */
-  bool isReadyForSubMesh(const IMaterialSheenDefines& defines,
-                         Scene* scene) const;
+  bool isReadyForSubMesh(const MaterialDefines& defines, Scene* scene) const;
 
   /**
    * @brief Checks to see if a texture is used in the material.
    * @param defines the list of "defines" to update.
    * @param scene defines the scene the material belongs to.
    */
-  void prepareDefines(IMaterialSheenDefines& defines, Scene* scene);
+  void prepareDefines(MaterialDefines& defines, Scene* scene);
 
   /**
    * @brief Binds the material data.
@@ -106,7 +105,7 @@ public:
    * @param currentRank defines the current fallback rank.
    * @returns the new fallback rank.
    */
-  static unsigned int AddFallbacks(const IMaterialSheenDefines& defines,
+  static unsigned int AddFallbacks(const MaterialDefines& defines,
                                    EffectFallbacks& fallbacks,
                                    unsigned int currentRank);
 

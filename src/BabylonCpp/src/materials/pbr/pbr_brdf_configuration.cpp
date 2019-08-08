@@ -87,7 +87,7 @@ void PBRBRDFConfiguration::_markAllSubMeshesAsMiscDirty()
   _internalMarkAllSubMeshesAsMiscDirty();
 }
 
-void PBRBRDFConfiguration::prepareDefines(IMaterialBRDFDefines& defines)
+void PBRBRDFConfiguration::prepareDefines(MaterialDefines& defines)
 {
   defines.boolDef["BRDF_V_HEIGHT_CORRELATED"]
     = _useSmithVisibilityHeightCorrelated;

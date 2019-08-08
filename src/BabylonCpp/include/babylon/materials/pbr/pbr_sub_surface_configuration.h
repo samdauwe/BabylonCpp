@@ -17,7 +17,7 @@ class BaseTexture;
 class Effect;
 class EffectFallbacks;
 class Engine;
-struct IMaterialSubSurfaceDefines;
+struct MaterialDefines;
 class RenderTargetTexture;
 class Scene;
 class UniformBuffer;
@@ -52,15 +52,14 @@ public:
    * @param scene defines the scene the material belongs to.
    * @returns - boolean indicating that the submesh is ready or not.
    */
-  bool isReadyForSubMesh(const IMaterialSubSurfaceDefines& defines,
-                         Scene* scene) const;
+  bool isReadyForSubMesh(const MaterialDefines& defines, Scene* scene) const;
 
   /**
    * @brief Checks to see if a texture is used in the material.
    * @param defines the list of "defines" to update.
    * @param scene defines the scene to the material belongs to.
    */
-  void prepareDefines(IMaterialSubSurfaceDefines& defines, Scene* scene);
+  void prepareDefines(MaterialDefines& defines, Scene* scene);
 
   /**
    * @brief Binds the material data.
@@ -139,7 +138,7 @@ public:
    * @param currentRank defines the current fallback rank.
    * @returns the new fallback rank.
    */
-  static unsigned int AddFallbacks(const IMaterialSubSurfaceDefines& defines,
+  static unsigned int AddFallbacks(const MaterialDefines& defines,
                                    EffectFallbacks& fallbacks,
                                    unsigned int currentRank);
 
@@ -188,8 +187,8 @@ protected:
   void set_thicknessTexture(const BaseTexturePtr& value);
   BaseTexturePtr& get_refractionTexture();
   void set_refractionTexture(const BaseTexturePtr& value);
-  unsigned int get_indexOfRefraction() const;
-  void set_indexOfRefraction(unsigned int value);
+  float get_indexOfRefraction() const;
+  void set_indexOfRefraction(float value);
   bool get_invertRefractionY() const;
   void set_invertRefractionY(bool value);
   bool get_linkRefractionWithTransparency() const;
@@ -257,7 +256,7 @@ public:
    * Defines the indice of refraction used in the material.
    * https://en.wikipedia.org/wiki/List_of_refractive_indices
    */
-  Property<PBRSubSurfaceConfiguration, unsigned int> indexOfRefraction;
+  Property<PBRSubSurfaceConfiguration, float> indexOfRefraction;
 
   /**
    * Controls if refraction needs to be inverted on Y. This could be useful for
@@ -317,7 +316,7 @@ private:
   bool _isScatteringEnabled;
   BaseTexturePtr _thicknessTexture;
   BaseTexturePtr _refractionTexture;
-  unsigned int _indexOfRefraction;
+  float _indexOfRefraction;
   bool _invertRefractionY;
   bool _linkRefractionWithTransparency;
   bool _useMaskFromThicknessTexture;

@@ -49,6 +49,7 @@ PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
     {"METALLNESSSTOREINMETALMAPBLUE", false}, //
     {"AOSTOREINMETALMAPRED", false},          //
     {"ENVIRONMENTBRDF", false},               //
+    {"ENVIRONMENTBRDF_RGBD", false},          //
 
     {"NORMAL", false},                //
     {"TANGENT", false},               //
@@ -77,6 +78,7 @@ PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
     {"REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED", false}, //
     {"INVERTCUBICMAP", false},                              //
     {"USESPHERICALFROMREFLECTIONMAP", false},               //
+    {"SPHERICAL_HARMONICS", false},                         //
     {"USESPHERICALINVERTEX", false},                        //
     {"REFLECTIONMAP_OPPOSITEZ", false},                     //
     {"LODINREFLECTIONALPHA", false},                        //
@@ -85,15 +87,9 @@ PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
     {"RADIANCEOCCLUSION", false},                           //
     {"HORIZONOCCLUSION", false},                            //
 
-    {"REFRACTION", false},                   //
-    {"REFRACTIONMAP_3D", false},             //
-    {"REFRACTIONMAP_OPPOSITEZ", false},      //
-    {"LODINREFRACTIONALPHA", false},         //
-    {"GAMMAREFRACTION", false},              //
-    {"RGBDREFRACTION", false},               //
-    {"LINKREFRACTIONTOTRANSPARENCY", false}, //
-
     {"INSTANCES", false}, //
+
+    {"BONETEXTURE", false}, //
 
     {"NONUNIFORMSCALING", false}, //
 
@@ -115,6 +111,7 @@ PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
     {"SAMPLER3DBGRMAP", false},            //
     {"IMAGEPROCESSINGPOSTPROCESS", false}, //
     {"EXPOSURE", false},                   //
+    {"MULTIVIEW", false},                  //
 
     {"USEPHYSICALLIGHTFALLOFF", false}, //
     {"USEGLTFLIGHTFALLOFF", false},     //
@@ -132,21 +129,62 @@ PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
 
     {"SPECULARAA", false}, //
 
+    {"CLEARCOAT", false},              //
+    {"CLEARCOAT_DEFAULTIOR", false},   //
+    {"CLEARCOAT_TEXTURE", false},      //
+    {"CLEARCOAT_BUMP", false},         //
+    {"CLEARCOAT_TINT", false},         //
+    {"CLEARCOAT_TINT_TEXTURE", false}, //
+
+    {"ANISOTROPIC", false},         //
+    {"ANISOTROPIC_TEXTURE", false}, //
+
+    {"BRDF_V_HEIGHT_CORRELATED", false},    //
+    {"MS_BRDF_ENERGY_CONSERVATION", false}, //
+
+    {"SHEEN", false},                //
+    {"SHEEN_TEXTURE", false},        //
+    {"SHEEN_LINKWITHALBEDO", false}, //
+
+    {"SUBSURFACE", false}, //
+
+    {"SS_REFRACTION", false},   //
+    {"SS_TRANSLUCENCY", false}, //
+    {"SS_SCATERRING", false},   //
+
+    {"SS_THICKNESSANDMASK_TEXTURE", false}, //
+
+    {"SS_REFRACTIONMAP_3D", false},             //
+    {"SS_REFRACTIONMAP_OPPOSITEZ", false},      //
+    {"SS_LODINREFRACTIONALPHA", false},         //
+    {"SS_GAMMAREFRACTION", false},              //
+    {"SS_RGBDREFRACTION", false},               //
+    {"SS_LINKREFRACTIONTOTRANSPARENCY", false}, //
+
+    {"SS_MASK_FROM_THICKNESS_TEXTURE", false}, //
+
     {"UNLIT", false}, //
   };
 
   intDef = {
-    {"AMBIENTDIRECTUV", 0},         //
-    {"ALBEDODIRECTUV", 0},          //
-    {"OPACITYDIRECTUV", 0},         //
-    {"EMISSIVEDIRECTUV", 0},        //
-    {"REFLECTIVITYDIRECTUV", 0},    //
-    {"MICROSURFACEMAPDIRECTUV", 0}, //
-    {"BUMPDIRECTUV", 0},            //
-    {"LIGHTMAPDIRECTUV", 0},        //
-    {"NUM_BONE_INFLUENCERS", 0},    //
-    {"BonesPerMesh", 0},            //
-    {"NUM_MORPH_INFLUENCERS", 0},   //
+    {"AMBIENTDIRECTUV", 0},                     //
+    {"ALBEDODIRECTUV", 0},                      //
+    {"OPACITYDIRECTUV", 0},                     //
+    {"EMISSIVEDIRECTUV", 0},                    //
+    {"REFLECTIVITYDIRECTUV", 0},                //
+    {"MICROSURFACEMAPDIRECTUV", 0},             //
+    {"BUMPDIRECTUV", 0},                        //
+    {"LIGHTMAPDIRECTUV", 0},                    //
+    {"NUM_BONE_INFLUENCERS", 0},                //
+    {"BonesPerMesh", 0},                        //
+    {"NUM_MORPH_INFLUENCERS", 0},               //
+    {"CLEARCOAT_TEXTUREDIRECTUV", 0},           //
+    {"CLEARCOAT_BUMPDIRECTUV", 0},              //
+    {"CLEARCOAT_TINT_TEXTUREDIRECTUV", 0},      //
+    {"ANISOTROPIC_TEXTUREDIRECTUV", 0},         //
+    {"SHEEN_TEXTUREDIRECTUV", 0},               //
+    {"SS_THICKNESSANDMASK_TEXTUREDIRECTUV", 0}, //
+    {"DEBUGMODE", 0},                           //
   };
 
   stringDef = {

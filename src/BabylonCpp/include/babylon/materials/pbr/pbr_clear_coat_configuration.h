@@ -18,6 +18,7 @@ class Effect;
 class EffectFallbacks;
 class Engine;
 struct IMaterialClearCoatDefines;
+struct MaterialDefines;
 class RenderTargetTexture;
 class Scene;
 class UniformBuffer;
@@ -54,7 +55,7 @@ public:
    * @param disableBumpMap defines wether the material disables bump or not.
    * @returns - boolean indicating that the submesh is ready or not.
    */
-  bool isReadyForSubMesh(const IMaterialClearCoatDefines& defines, Scene* scene,
+  bool isReadyForSubMesh(const MaterialDefines& defines, Scene* scene,
                          Engine* engine, bool disableBumpMap) const;
 
   /**
@@ -62,7 +63,7 @@ public:
    * @param defines the list of "defines" to update.
    * @param scene defines the scene to the material belongs to.
    */
-  void prepareDefines(IMaterialClearCoatDefines& defines, Scene* scene);
+  void prepareDefines(MaterialDefines& defines, Scene* scene);
 
   /**
    * @brief Binds the material data.

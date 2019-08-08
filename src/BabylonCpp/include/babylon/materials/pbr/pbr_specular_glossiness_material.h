@@ -37,18 +37,6 @@ public:
   const std::string getClassName() const override;
 
   /**
-   * @brief Return the active textures of the material.
-   */
-  std::vector<BaseTexturePtr> getActiveTextures() const override;
-
-  /**
-   * @brief Checks to see if a texture is used in the material.
-   * @param texture - Base texture to use.
-   * @returns - Boolean specifying if a texture is used in the material.
-   */
-  bool hasTexture(const BaseTexturePtr& texture) const override;
-
-  /**
    * @brief Makes a duplicate of the current material.
    * @param name - name to use for the new material.
    */
