@@ -13,15 +13,14 @@ set(EARCUT_HPP_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/earcut.hpp/include/mapbox
     CACHE INTERNAL "Include directories of Earcut hpp")
 
-# GLXW (OpenGL loader).
-# https://github.com/rikusalminen/glxw
-include_directories("glxw")
-set(GLXW_INCLUDE_DIRS
-    ${CMAKE_CURRENT_SOURCE_DIR}/glxw/include
-    CACHE INTERNAL "Include directories of GLXW")
-set(GLXW_SOURCE_DIRS
-    ${CMAKE_CURRENT_SOURCE_DIR}/glxw/src
-    CACHE INTERNAL "Source directories of GLXW")
+include_directories("glad/include")
+set(GLAD_INCLUDE_DIRS
+    ${CMAKE_CURRENT_SOURCE_DIR}/glad/include
+    CACHE INTERNAL "Include directories of glad")
+set(GLAD_SOURCE_DIRS
+    ${CMAKE_CURRENT_SOURCE_DIR}/glad/src
+    CACHE INTERNAL "Source directories of glad")
+    
 
 # GLFW (Free, open source, portable framework for OpenGL application development).
 SET(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries" FORCE)

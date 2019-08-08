@@ -31,13 +31,13 @@ endif()
 
 # Header files
 file(GLOB_RECURSE HEADER_FILES
-    ${GLXW_INCLUDE_DIRS}/GL/*.h
-    ${GLXW_INCLUDE_DIRS}/GLXW/glxw.h
+    ${GLAD_INCLUDE_DIRS}/glad/glad.h
+    ${GLAD_INCLUDE_DIRS}/KHR/khrplatform.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h)
 
 # Source files
 file(GLOB_RECURSE SOURCE_FILES
-    ${GLXW_SOURCE_DIRS}/glxw.c
+    ${GLAD_SOURCE_DIRS}/glad.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 
@@ -60,7 +60,7 @@ add_executable(${TARGET}
 target_include_directories(${TARGET}
     PRIVATE
     ${GLFW_INCLUDE_DIRS}
-    ${GLXW_INCLUDE_DIRS}
+    ${GLAD_INCLUDE_DIRS}
     ${JSON_HPP_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/../BabylonCpp/include
     ${CMAKE_CURRENT_BINARY_DIR}/../BabylonCpp/include

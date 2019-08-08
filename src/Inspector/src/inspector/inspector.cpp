@@ -3,8 +3,8 @@
 #include <iomanip>
 #include <sstream>
 
-// GLXW
-#include <GLXW/glxw.h>
+// glad
+#include <glad/glad.h>
 
 // GLFW
 #include <GLFW/glfw3.h>
@@ -83,9 +83,9 @@ void Inspector::setScene(Scene* scene)
 
 void Inspector::intialize()
 {
-  // Initialize GLXW
-  if (glxwInit() != 0) {
-    fprintf(stderr, "Failed to initialize GLXW\n");
+  // Initialize glad
+  if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
+    fprintf(stderr, "Failed to initialize glad\n");
     return;
   }
 

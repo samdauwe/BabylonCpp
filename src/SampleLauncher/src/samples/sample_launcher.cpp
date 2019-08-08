@@ -1,7 +1,7 @@
 #include <babylon/samples/sample_launcher.h>
 
-// GLXW
-#include <GLXW/glxw.h>
+// glad
+#include <glad/glad.h>
 
 // GLFW
 #include <GLFW/glfw3.h>
