@@ -1,6 +1,5 @@
 #include <argtable3/argtable3.h>
 
-#include <filesystem>
 #include <sstream>
 #include <utility>
 #include <babylon/babylon_version.h>
@@ -16,6 +15,7 @@
 #if _MSC_VER
 #include <windows.h>
 #include <direct.h>
+#include <filesystem>
 #endif
 
 struct ConsoleLogger {
@@ -204,6 +204,7 @@ int sampleLauncherMain(int l, int v, int i, const char* sampleGroup,
   return exitcode;
 }
 
+#ifdef _MSC_VER
 void ChdirToExePath(char *argv0)
 {
   std::filesystem::path exeFolder = std::filesystem::weakly_canonical(std::filesystem::path(argv0)).parent_path();
@@ -213,6 +214,7 @@ void ChdirToExePath(char *argv0)
   chdir(exeFolder.string().c_str());
 #endif
 }
+#endif // _MSC_VER
 
 int main(int argc, char** argv)
 {

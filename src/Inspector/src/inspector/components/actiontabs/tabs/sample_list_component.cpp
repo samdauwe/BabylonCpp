@@ -1,4 +1,6 @@
+#ifdef _MSC_VER
 #include <filesystem>
+#endif
 #include <babylon/core/string.h>
 #include <babylon/imgui/icons_font_awesome_5.h>
 #include <babylon/inspector/components/actiontabs/tabs/sample_list_component.h>
@@ -27,11 +29,11 @@ namespace
   }
   void openFile(const std::string &filename)
   {
-    std::string canonical_path = std::filesystem::canonical(std::filesystem::path(filename)).string();
-    std::string cmd = std::string("open ") + canonical_path;
 #ifndef _WIN32
+    std::string cmd = std::string("open ") + filename;
     system(cmd.c_str());
 #else
+    std::string canonical_path = std::filesystem::canonical(std::filesystem::path(filename)).string();
     ShellExecute(0, 0, canonical_path.c_str(), 0, 0, SW_SHOW);
 #endif
   }
