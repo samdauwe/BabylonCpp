@@ -28,7 +28,7 @@ struct CubeTextureData {
  * loader.
  */
 struct BABYLON_SHARED_EXPORT IInternalTextureLoader {
-
+  virtual ~IInternalTextureLoader() = default;
   /**
    * @brief Defines wether the loader supports cascade loading the different
    * faces.

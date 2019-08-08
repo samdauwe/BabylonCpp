@@ -357,11 +357,14 @@ void Engine::_initGLContext()
     = _gl->getParameteri(GL::MAX_CUBE_MAP_TEXTURE_SIZE);
   _caps.maxRenderTextureSize = _gl->getParameteri(GL::MAX_RENDERBUFFER_SIZE);
   _caps.maxVertexAttribs     = _gl->getParameteri(GL::MAX_VERTEX_ATTRIBS);
-  _caps.maxVaryingVectors    = _gl->getParameteri(GL::MAX_VARYING_VECTORS);
-  _caps.maxFragmentUniformVectors
-    = _gl->getParameteri(GL::MAX_FRAGMENT_UNIFORM_VECTORS);
-  _caps.maxVertexUniformVectors
-    = _gl->getParameteri(GL::MAX_VERTEX_UNIFORM_VECTORS);
+
+  // Those parameters cannot always be reliably queried
+  // (GlGetError returns INVALID_ENUM under windows 10 (VM with parallels desktop opengl driver)
+  //_caps.maxVaryingVectors    = _gl->getParameteri(GL::MAX_VARYING_VECTORS);
+  //_caps.maxFragmentUniformVectors
+  //  = _gl->getParameteri(GL::MAX_FRAGMENT_UNIFORM_VECTORS);
+  //_caps.maxVertexUniformVectors
+  //  = _gl->getParameteri(GL::MAX_VERTEX_UNIFORM_VECTORS);
 
   // Infos
   _glVersion  = _gl->getString(GL::VERSION);
@@ -1100,7 +1103,7 @@ void Engine::bindFramebuffer(const InternalTexturePtr& texture,
     if (!requiredHeight) {
       requiredHeight = texture->height;
       if (lodLevel) {
-        requiredHeight = *requiredHeight / std::pow(2, lodLevel);
+        requiredHeight = static_cast<int>(*requiredHeight / std::pow(2, lodLevel));
       }
     }
 
@@ -1426,7 +1429,9 @@ Engine::GLBufferPtr Engine::createIndexBuffer(const IndicesArray& indices,
   }
   else {
     Uint16Array arrayBuffer;
-    arrayBuffer.assign(indices.begin(), indices.end());
+    for (auto v : indices)
+      arrayBuffer.push_back(static_cast<uint16_t>(v));
+
     _gl->bufferData(GL::ELEMENT_ARRAY_BUFFER, arrayBuffer,
                     updatable ? GL::DYNAMIC_DRAW : GL::STATIC_DRAW);
   }

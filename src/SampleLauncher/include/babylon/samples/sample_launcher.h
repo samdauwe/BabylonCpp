@@ -66,10 +66,11 @@ public:
   /**
    * @brief Runs the sample.
    * @param runTime time in millseconds to run the sample, When set to 0, the
+   * @param exitRequired : enables to stop the sample when this function returns true
    * sample runs until the window is closed.
    * @return exit code
    */
-  int run(long runTimeMillis = 0);
+  int run(std::function<bool(void)> exitRequired, long runTimeMillis = 0);
 
   void destroy();
 

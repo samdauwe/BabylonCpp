@@ -13,6 +13,7 @@ namespace BABYLON {
  */
 template <class T>
 struct BABYLON_SHARED_EXPORT Behavior {
+  virtual ~Behavior() = default;
   /**
    * gets or sets behavior's name
    */

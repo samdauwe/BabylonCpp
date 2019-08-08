@@ -31,7 +31,7 @@ struct ShadowGeneratorCompileOptions {
  * BJS.
  */
 struct BABYLON_SHARED_EXPORT IShadowGenerator {
-
+  virtual ~IShadowGenerator() = default;
   /**
    * @brief Gets the main RTT containing the shadow map (usually storing depth
    * from the light point of view).

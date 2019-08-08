@@ -9,6 +9,7 @@
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT PoseControlled {
+  virtual ~PoseControlled() = default;
   Vector3 position;
   Quaternion rotationQuaternion;
   Vector3 devicePosition;

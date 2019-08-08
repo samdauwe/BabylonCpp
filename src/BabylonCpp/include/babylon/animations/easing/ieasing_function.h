@@ -11,7 +11,7 @@ namespace BABYLON {
  * @see http://doc.babylonjs.com/babylon101/animations#easing-functions
  */
 struct BABYLON_SHARED_EXPORT IEasingFunction {
-
+  virtual ~IEasingFunction() = default;
   /**
    * @brief Given an input gradient between 0 and 1, this returns the
    * corrseponding value of the easing function. The link below provides some of

@@ -140,13 +140,13 @@ void PickAndPlayAnimationScene::initializeScene(ICanvas* canvas, Scene* scene)
   //
 
   auto light0       = SpotLight::New("light0", Vector3(10.f, 20.f, 0.f),
-                               Vector3(-1.f, -2.f, 0.f), Math::PI_2, 1, scene);
+                               Vector3(-1.f, -2.f, 0.f), Math::PI_2, 1.f, scene);
   light0->intensity = 1500.f;
   auto light1       = SpotLight::New("light1", Vector3(-10.f, 20.f, 0.f),
-                               Vector3(1.f, -2.f, 0.f), Math::PI_2, 1, scene);
+                               Vector3(1.f, -2.f, 0.f), Math::PI_2, 1.f, scene);
   light1->intensity = 1500.f;
-  auto sg0          = ShadowGenerator::New(std::pow(2, 11), light0);
-  auto sg1          = ShadowGenerator::New(std::pow(2, 11), light1);
+  auto sg0          = ShadowGenerator::New(static_cast<int>(std::pow(2, 11)), light0);
+  auto sg1          = ShadowGenerator::New(static_cast<int>(std::pow(2, 11)), light1);
   sg0->useCloseExponentialShadowMap = true;
   sg0->bias                         = -0.005f;
   sg1->useCloseExponentialShadowMap = true;

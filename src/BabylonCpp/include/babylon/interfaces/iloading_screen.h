@@ -10,6 +10,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT ILoadingScreen {
 
 public:
+  virtual ~ILoadingScreen() = default;
   virtual void displayLoadingUI() = 0;
   virtual void hideLoadingUI()    = 0;
 

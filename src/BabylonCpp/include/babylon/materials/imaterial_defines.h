@@ -10,6 +10,7 @@ namespace BABYLON {
 struct MaterialDefines;
 
 struct BABYLON_SHARED_EXPORT IMaterialDefines {
+  virtual ~IMaterialDefines() = default;
   virtual bool isDirty() const                             = 0;
   virtual void markAsProcessed()                           = 0;
   virtual void markAsUnprocessed()                         = 0;

@@ -13,6 +13,8 @@ using IBrowserGamepadPtr = std::shared_ptr<IBrowserGamepad>;
 using WebVRControllerPtr = std::shared_ptr<WebVRController>;
 
 struct _GamePadFactory {
+  virtual ~_GamePadFactory() = default;
+
   /**
    * @brief Returns wether or not the current gamepad can be created for this
    * type of controller.

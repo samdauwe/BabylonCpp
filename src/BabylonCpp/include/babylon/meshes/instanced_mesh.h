@@ -201,7 +201,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _postActivate();
+  void _postActivate() override;
 
   Matrix& getWorldMatrix() override;
 

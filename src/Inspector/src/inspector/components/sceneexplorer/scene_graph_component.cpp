@@ -135,7 +135,7 @@ SceneGraphComponent::_createMaterialTreeItem(const MaterialPtr& material)
   }
 
   sprintf(treeItem.label, "%s", label.c_str());
-  sprintf(treeItem.key, "%ld", key);
+  sprintf(treeItem.key, "%zd", key);
 
   return treeItem;
 }
@@ -176,7 +176,7 @@ TreeItem SceneGraphComponent::_createNodeTreeItem(const NodePtr& node)
   }
 
   sprintf(treeItem.label, "%s", label.c_str());
-  sprintf(treeItem.key, "%ld", key);
+  sprintf(treeItem.key, "%zd", key);
 
   return treeItem;
 }

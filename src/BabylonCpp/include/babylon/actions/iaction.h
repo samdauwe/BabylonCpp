@@ -20,7 +20,7 @@ class ActionManager;
  * @brief Interface used to define Action.
  */
 struct BABYLON_SHARED_EXPORT IAction {
-
+  virtual ~IAction() = default;
   /**
    * Trigger for the action
    */

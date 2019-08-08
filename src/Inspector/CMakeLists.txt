@@ -66,7 +66,8 @@ set(TESTS_PATH   "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 # Header files
 file(GLOB_RECURSE INSPECTOR_HDR_FILES
     ${GLXW_INCLUDE_DIRS}/GL/*.h
-    ${GLXW_INCLUDE_DIRS}/GLXW/glxw.h
+    ${GLAD_INCLUDE_DIRS}/glad/glad.h
+    ${GLAD_INCLUDE_DIRS}/KHR/khrplatform.h
     ${IMGUI_INCLUDE_DIRS}/imgui.h
     ${IMGUI_INCLUDE_DIRS}/imconfig.h
     ${IMGUI_INCLUDE_DIRS}/imgui_internal.h
@@ -79,7 +80,7 @@ set(BABYLON_INSPECTOR_HEADERS
 
 # Source files
 file(GLOB_RECURSE INSPECTOR_SRC_FILES
-    ${GLXW_SOURCE_DIRS}/glxw.c
+    ${GLAD_SOURCE_DIRS}/glad.c
     ${IMGUI_SOURCE_DIRS}/imgui.cpp
     ${IMGUI_SOURCE_DIRS}/imgui_draw.cpp
     ${IMGUI_SOURCE_DIRS}/imgui_demo.cpp
@@ -149,7 +150,7 @@ set_target_properties(${TARGET}
 target_include_directories(${TARGET}
     PRIVATE
     ${GLFW_INCLUDE_DIRS}
-    ${GLXW_INCLUDE_DIRS}
+    ${GLAD_INCLUDE_DIRS}
     ${IMGUI_INCLUDE_DIRS}
     ${JSON_HPP_INCLUDE_DIRS}
     ${CMAKE_CURRENT_BINARY_DIR}/include
@@ -169,6 +170,7 @@ target_link_libraries(${TARGET}
     glfw
     BabylonCpp
     MaterialsLibrary
+    Samples
 )
 if (APPLE) # Special case for Apple OpenGL framework
     target_link_libraries(${TARGET} PRIVATE "-framework OpenGL")

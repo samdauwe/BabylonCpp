@@ -99,8 +99,8 @@
 #elif defined(IMGUI_IMPL_OPENGL_LOADER_GLAD)
 #include <glad/glad.h>  // Needs to be initialized with gladLoadGL() in user's code
 #else
-// GLXW
-#include <GLXW/glxw.h>
+// glad
+#include <glad/glad.h>
 #endif
 #endif
 

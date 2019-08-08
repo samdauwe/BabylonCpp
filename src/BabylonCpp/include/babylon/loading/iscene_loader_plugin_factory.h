@@ -19,6 +19,7 @@ using ISceneLoaderPluginAsyncPtr = std::shared_ptr<ISceneLoaderPluginAsync>;
  * @brief Interface used by SceneLoader plugin factory.
  */
 struct BABYLON_SHARED_EXPORT ISceneLoaderPluginFactory {
+  virtual ~ISceneLoaderPluginFactory () = default;
   /**
    * Defines the name of the factory
    */

@@ -9,7 +9,7 @@
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT TreeItemSpecializedComponent {
-
+  virtual ~TreeItemSpecializedComponent() = default;
   virtual void render() = 0;
 
   // Label to be rendered in the item tree

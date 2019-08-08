@@ -1,7 +1,7 @@
 #include <babylon/samples/sample_launcher.h>
 
-// GLXW
-#include <GLXW/glxw.h>
+// glad
+#include <glad/glad.h>
 
 // GLFW
 #include <GLFW/glfw3.h>
@@ -381,7 +381,7 @@ bool SampleLauncher::intialize()
   return true;
 }
 
-int SampleLauncher::run(long runTime)
+int SampleLauncher::run(std::function<bool(void)> exitRequired, long runTime)
 {
   _sampleLauncherState = State::RUNNING;
   auto startTime       = Time::unixtimeInMs();
@@ -439,7 +439,7 @@ int SampleLauncher::run(long runTime)
                          glfwWindowShouldClose(_inspectorWindow.glfwWindow) :
                          false);
 #endif
-    _sampleLauncherState = (maxRunTimeReached || windowClosed
+    _sampleLauncherState = (maxRunTimeReached || windowClosed || exitRequired()
                             || (_sampleLauncherState == State::FINISHED)) ?
                              State::FINISHED :
                              _sampleLauncherState;
@@ -514,9 +514,9 @@ int SampleLauncher::initGLFW()
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // 3.2+ only
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // Required on Mac
 #else
-  // GL 3.2
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+  // GL 3.3
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
   // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // 3.2+ only
   // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);           // 3.0+ only

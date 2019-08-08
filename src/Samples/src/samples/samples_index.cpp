@@ -19,6 +19,10 @@
 #include <babylon/samples/specialfx/_special_fx_samples_index.h>
 #include <babylon/samples/textures/_textures_samples_index.h>
 
+#include <nlohmann/json.hpp>
+#include <iostream>
+#include <fstream>
+
 namespace BABYLON {
 namespace Samples {
 
@@ -71,7 +75,7 @@ SamplesIndex::~SamplesIndex()
 {
 }
 
-bool SamplesIndex::isSampleEnabled(const std::string& sampleName)
+bool SamplesIndex::isSampleEnabled(const std::string& sampleName) const
 {
   for (const auto& item : _samplesIndex) {
     if (stl_util::contains(item.second.samples(), sampleName)) {
@@ -82,7 +86,7 @@ bool SamplesIndex::isSampleEnabled(const std::string& sampleName)
   return false;
 }
 
-bool SamplesIndex::sampleExists(const std::string& sampleName)
+bool SamplesIndex::sampleExists(const std::string& sampleName) const
 {
   for (const auto& item : _samplesIndex) {
     if (stl_util::contains(item.second.samples(), sampleName)) {
@@ -91,6 +95,48 @@ bool SamplesIndex::sampleExists(const std::string& sampleName)
   }
 
   return false;
+}
+
+nlohmann::json ReadSampleInfoFile()
+{
+  std::ifstream is("samples_info.json");
+  if (! is.good())
+    is = std::ifstream("../samples_info.json");
+  if (! is.good())
+    is = std::ifstream("../../samples_info.json");
+  if (is.good())
+  {
+    nlohmann::json j;
+    is >> j;
+    return j;
+  }
+  else
+    return nlohmann::json();
+}
+
+SampleInfo SamplesIndex::getSampleInfo(const std::string& sampleName) const
+{
+  static nlohmann::json _samplesInfo = ReadSampleInfoFile();
+  static std::map<std::string, SampleInfo> cache;
+  if (cache.find(sampleName) != cache.end())
+    return cache.at(sampleName);
+
+  SampleInfo result;
+  for (const auto & element : _samplesInfo)
+  {
+    if (element["sample_name"] == sampleName)
+    {
+      result.Brief = element["brief"];
+      result.HeaderFile = element["header_file"];
+      result.SourceFile = element["source_file"];
+      for (const auto & link : element["links"])
+      {
+        result.Links.push_back(link);
+      }
+    }
+  }
+  cache[sampleName] = result;
+  return result;
 }
 
 std::vector<std::string> SamplesIndex::getSampleNames() const
@@ -123,7 +169,7 @@ std::vector<std::string> SamplesIndex::getCategoryNames() const
   return categoryNames;
 }
 
-bool SamplesIndex::categoryExists(const std::string& categoryNameToSearch)
+bool SamplesIndex::categoryExists(const std::string& categoryNameToSearch) const
 {
   bool _categoryExists = false;
 

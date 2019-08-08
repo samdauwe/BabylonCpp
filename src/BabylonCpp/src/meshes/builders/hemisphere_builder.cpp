@@ -12,7 +12,7 @@ MeshPtr HemisphereBuilder::CreateHemisphere(const std::string& name,
                                             Scene* scene)
 {
   if (!options.diameter) {
-    options.diameter = 1;
+    options.diameter = 1.f;
   }
   if (!options.segments) {
     options.segments = 16;

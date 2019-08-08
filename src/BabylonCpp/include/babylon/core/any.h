@@ -145,9 +145,9 @@ class some : A {
       return a.template copy<data>(get());
     }
 
-    base* move(A& a, base*& p) override
+    base* move(A& a, base*& p2) override
     {
-      return a.template move<data>(std::move(get()), p);
+      return a.template move<data>(std::move(get()), p2);
     }
 
     void free(A& a) override

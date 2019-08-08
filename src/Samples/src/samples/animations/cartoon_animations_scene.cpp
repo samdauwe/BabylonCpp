@@ -37,7 +37,7 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
   light1->intensity = 0.25f;
   light2->intensity = 0.5f;
 
-  auto frameRate = 20.f;
+  size_t frameRate = 20;
 
   /********* Performers *********/
 

@@ -15,7 +15,7 @@ struct Behavior;
  */
 template <class T>
 struct BABYLON_SHARED_EXPORT IBehaviorAware {
-
+  virtual ~IBehaviorAware() = default;
   /**
    * @brief Attach a behavior.
    * @param behavior defines the behavior to attach

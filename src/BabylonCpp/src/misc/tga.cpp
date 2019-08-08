@@ -10,24 +10,29 @@ namespace BABYLON {
 TGAHeader TGATools::GetTGAHeader(const Uint8Array& data)
 {
   auto offset = 0u;
+  auto next_data = [&](){
+    auto r = data[offset];
+    offset++;
+    return r;
+  };
 
   TGAHeader header{
-    data[offset++], // id_length
-    data[offset++], // colormap_type
-    data[offset++], // image_type
-    static_cast<uint32_t>(data[offset++]
-                          | data[offset++] << 8), // colormap_index
-    static_cast<uint32_t>(data[offset++]
-                          | data[offset++] << 8), // colormap_length
-    data[offset++],                               // colormap_size
+    next_data(), // id_length
+    next_data(), // colormap_type
+    next_data(), // image_type
+    static_cast<uint32_t>(next_data()
+                          | next_data() << 8), // colormap_index
+    static_cast<uint32_t>(next_data()
+                          | next_data() << 8), // colormap_length
+    next_data(),                               // colormap_size
     {
-      static_cast<uint32_t>(data[offset++] | data[offset++] << 8), //
-      static_cast<uint32_t>(data[offset++] | data[offset++] << 8)  //
+      static_cast<uint32_t>(next_data() | next_data() << 8), //
+      static_cast<uint32_t>(next_data() | next_data() << 8)  //
     },                                                             // origin
-    data[offset++] | data[offset++] << 8,                          // width
-    data[offset++] | data[offset++] << 8,                          // height
-    data[offset++],                                                // pixel_size
-    data[offset++]                                                 // flags
+    next_data() | next_data() << 8,                          // width
+    next_data() | next_data() << 8,                          // height
+    next_data(),                                                // pixel_size
+    next_data()                                                 // flags
   };
 
   return header;
@@ -49,7 +54,7 @@ void TGATools::UploadContent(const InternalTexturePtr& texture,
 
   // Assume it's a valid Targa file.
   if (header.id_length + offset > data.size()) {
-    BABYLON_LOG_ERROR("Unable to load TGA file - Not enough data")
+    BABYLON_LOG_ERROR("tga", "Unable to load TGA file - Not enough data")
     return;
   }
 

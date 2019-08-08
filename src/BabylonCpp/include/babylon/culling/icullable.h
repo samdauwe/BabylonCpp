@@ -14,6 +14,7 @@ class Plane;
  * @see https://doc.babylonjs.com/babylon101/materials#back-face-culling
  */
 struct ICullable {
+  virtual ~ICullable() = default;
   /**
    * @brief Checks if the object or part of the object is in the frustum.
    * @param frustumPlanes Camera near/planes

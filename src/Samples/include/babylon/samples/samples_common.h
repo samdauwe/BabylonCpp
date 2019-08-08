@@ -20,8 +20,8 @@ using Sample        = std::tuple<bool, FactoryMethod>;
 class _ISamplesIndex {
 
 public:
-  _ISamplesIndex();
-  ~_ISamplesIndex();
+  _ISamplesIndex() = default;
+  ~_ISamplesIndex() = default;
 
   /**
    * @brief Returns the list with example.

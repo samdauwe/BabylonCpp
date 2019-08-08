@@ -3,8 +3,8 @@
 #include <iomanip>
 #include <sstream>
 
-// GLXW
-#include <GLXW/glxw.h>
+// glad
+#include <glad/glad.h>
 
 // GLFW
 #include <GLFW/glfw3.h>
@@ -35,10 +35,17 @@
 #include <babylon/inspector/components/global_state.h>
 #include <babylon/inspector/components/sceneexplorer/scene_explorer_component.h>
 
+#ifdef _WIN32
+// See warning about windows mixing dll and stl in this file!
+#include <babylon/core/logging/log_levels_statics.cpp.h> 
+#endif
+
 namespace BABYLON {
 
 static ImFont* _fontRegular = nullptr;
 static ImFont* _fontSolid   = nullptr;
+
+std::function<void(const std::string &)> Inspector::OnSampleChanged;
 
 Inspector::Inspector(GLFWwindow* glfwWindow, Scene* scene)
     : _glfwWindow{glfwWindow}
@@ -83,9 +90,9 @@ void Inspector::setScene(Scene* scene)
 
 void Inspector::intialize()
 {
-  // Initialize GLXW
-  if (glxwInit() != 0) {
-    fprintf(stderr, "Failed to initialize GLXW\n");
+  // Initialize glad
+  if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
+    fprintf(stderr, "Failed to initialize glad\n");
     return;
   }
 
@@ -207,7 +214,7 @@ void Inspector::_renderInspector()
   }
 
   // Setup window size
-  auto pos  = ImVec2(0, _menuHeight);
+  auto pos  = ImVec2(0.f, static_cast<float>(_menuHeight));
   auto size = ImGui::GetIO().DisplaySize;
   size.y -= pos.y;
 
