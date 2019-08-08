@@ -310,13 +310,13 @@ set_policy(CMP0037 OLD)
 # Function: Build test and add command to execute it via target 'test'
 function(add_test_without_ctest target)
     add_subdirectory(${target})
-    
+
     if(NOT TARGET ${target})
         return()
     endif()
-    
+
     add_dependencies(test ${target})
-    add_custom_command(TARGET test POST_BUILD 
+    add_custom_command(TARGET test POST_BUILD
        COMMAND $<TARGET_FILE:${target}> --gtest_output=xml:gtests-${target}.xml)
 endfunction()
 
@@ -370,3 +370,10 @@ endif()
 copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/scenes")
 ## - Textures
 copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/textures")
+# - samples_info.json
+add_custom_target(
+        create_samples_info
+        ALL
+        python ${CMAKE_SOURCE_DIR}/codegeneration/make_samples_info.py
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+)

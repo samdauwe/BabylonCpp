@@ -2,13 +2,16 @@
 
 #include <filesystem>
 #include <sstream>
-
+#include <utility>
 #include <babylon/babylon_version.h>
 #include <babylon/core/delegates/delegate.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
 #include <babylon/samples/sample_launcher.h>
 #include <babylon/samples/samples_index.h>
+#ifdef WITH_INSPECTOR
+#include <babylon/inspector/inspector.h>
+#endif
 
 #if _MSC_VER
 #include <windows.h>
@@ -63,6 +66,19 @@ void initializeLogging()
   }
 }
 
+// a simple "Consumable value", i.e a value that is reset when it is consumed
+template<typename T>
+class ConsumableValue
+{
+public:
+  ConsumableValue(std::optional<T> v = std::nullopt) : _value(v) {};
+  bool hasValue() { return _value.has_value(); }
+  void setValue(T value) { _value = value; }
+  T consumeValue() { return std::exchange(_value, std::nullopt).value(); } // will throw if empty!
+private:
+   std::optional<T> _value;
+};
+
 /**
  * @brief Runs a sample with the specified name
  * @param samples list with available samples
@@ -71,22 +87,37 @@ void initializeLogging()
  * @return exit code
  */
 int runSample(const BABYLON::Samples::SamplesIndex& samples,
-              const std::string& sampleName, bool showInspectorWindow,
+              const std::string& startSampleName, bool showInspectorWindow,
               long runTimeMillis = 0)
 {
-  using namespace BABYLON::Samples;
+  // The inspector enables to switch to another sample via
+  // the callback BABYLON::Inspector::OnSampleChanged
+  // which will the content of "nextSample"
+  ConsumableValue<std::string> nextSample(startSampleName);
+  #ifdef WITH_INSPECTOR
+  BABYLON::Inspector::OnSampleChanged = [&nextSample](const std::string & s) {
+    nextSample.setValue(s);
+  };
+  #endif
+
   int exitcode = 0;
   // Create the sample launcher
-  SampleLauncherOptions options;
+  BABYLON::Samples::SampleLauncherOptions options;
   options.showInspectorWindow = showInspectorWindow;
-  SampleLauncher sampleLauncher{options};
-  if (sampleLauncher.intialize()) {
-    // Create the renderable scene
-    auto canvas = sampleLauncher.getRenderCanvas();
-    auto scene  = samples.createRenderableScene(sampleName, canvas);
-    sampleLauncher.setRenderableScene(scene);
-    // Run the example
-    exitcode = sampleLauncher.run(runTimeMillis);
+
+
+  while (nextSample.hasValue())
+  {
+    std::string sampleName = nextSample.consumeValue();
+    BABYLON::Samples::SampleLauncher sampleLauncher{options};
+    if (sampleLauncher.intialize()) {
+      // Create the renderable scene
+      auto canvas = sampleLauncher.getRenderCanvas();
+      auto scene  = samples.createRenderableScene(sampleName, canvas);
+      sampleLauncher.setRenderableScene(scene);
+      // Run the example: it will stop when a new sample was selected via the inspector
+      exitcode = sampleLauncher.run([&nextSample]() { return nextSample.hasValue(); }, runTimeMillis);
+    }
   }
   return exitcode;
 }

@@ -4,6 +4,7 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
+#include <functional>
 
 struct GLFWwindow;
 
@@ -31,6 +32,10 @@ public:
   void render();
   void dispose();
 
+  // Global function that will be called when a new sample is selected
+  // (This function is set from SampleLauncher/src/main.cpp)
+  static std::function<void(const std::string &)> OnSampleChanged;
+
 private:
   void _fileMenu();
   void _addActions();
@@ -52,7 +57,6 @@ private:
   // Widgets
   std::unique_ptr<SceneExplorerComponent> _sceneExplorerHost;
   std::unique_ptr<ActionTabsComponent> _actionTabsHost;
-
 }; // end of class Inspector
 
 } // end of namespace BABYLON

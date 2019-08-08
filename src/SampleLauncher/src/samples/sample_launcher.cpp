@@ -381,7 +381,7 @@ bool SampleLauncher::intialize()
   return true;
 }
 
-int SampleLauncher::run(long runTime)
+int SampleLauncher::run(std::function<bool(void)> exitRequired, long runTime)
 {
   _sampleLauncherState = State::RUNNING;
   auto startTime       = Time::unixtimeInMs();
@@ -439,7 +439,7 @@ int SampleLauncher::run(long runTime)
                          glfwWindowShouldClose(_inspectorWindow.glfwWindow) :
                          false);
 #endif
-    _sampleLauncherState = (maxRunTimeReached || windowClosed
+    _sampleLauncherState = (maxRunTimeReached || windowClosed || exitRequired()
                             || (_sampleLauncherState == State::FINISHED)) ?
                              State::FINISHED :
                              _sampleLauncherState;

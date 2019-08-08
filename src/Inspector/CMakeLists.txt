@@ -170,6 +170,7 @@ target_link_libraries(${TARGET}
     glfw
     BabylonCpp
     MaterialsLibrary
+    Samples
 )
 if (APPLE) # Special case for Apple OpenGL framework
     target_link_libraries(${TARGET} PRIVATE "-framework OpenGL")

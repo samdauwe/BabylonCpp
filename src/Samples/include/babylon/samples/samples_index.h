@@ -1,11 +1,19 @@
 #ifndef BABYLON_SAMPLES_SAMPLES_INDEX_H
 #define BABYLON_SAMPLES_SAMPLES_INDEX_H
 
+#include <vector>
 #include <babylon/babylon_api.h>
 #include <babylon/samples/samples_common.h>
 
 namespace BABYLON {
 namespace Samples {
+
+struct SampleInfo {
+  std::string HeaderFile;
+  std::string SourceFile;
+  std::string Brief;
+  std::vector<std::string> Links;
+};
 
 class BABYLON_SHARED_EXPORT SamplesIndex {
 
@@ -18,14 +26,21 @@ public:
    * @param sampleName the name of the sample to check
    * @return whether or not the example is enabled
    */
-  bool isSampleEnabled(const std::string& sampleName);
+  bool isSampleEnabled(const std::string& sampleName) const;
 
   /**
    * @brief Returns whether or not the example exists.
    * @param sampleName the name of the sample to check
    * @return whether or not the example exists
    */
-  bool sampleExists(const std::string& sampleName);
+  bool sampleExists(const std::string& sampleName) const;
+
+  /**
+   * @brief Returns info about the sample, by parsing the source file tree.
+   * @param sampleName the name of the sample to check
+   * @return SampleInfo struct. May throw if sample was not found.
+   */
+  SampleInfo getSampleInfo(const std::string& sampleName) const;
 
   /**
    * @brief Returns a sorted list containing the enabled examples.
@@ -44,7 +59,7 @@ public:
    * @param categoryNameToSearch the name of the category to check
    * @return whether or not the category exists
    */
-  bool categoryExists(const std::string& categoryNameToSearch);
+  bool categoryExists(const std::string& categoryNameToSearch) const;
 
   /**
    * @brief Returns a sorted list containing the enabled examples in the
