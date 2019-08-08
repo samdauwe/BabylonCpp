@@ -6,7 +6,7 @@ namespace BABYLON {
 extern const char* gpuUpdateParticlesVertexShader;
 
 const char* gpuUpdateParticlesVertexShader
-  = "#version 300 es\n"
+  = BABYLONCPP_GLSL_VERSION_3
     "\n"
     "#define PI 3.14159\n"
     "\n"
