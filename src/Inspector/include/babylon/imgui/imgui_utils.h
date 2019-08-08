@@ -4,6 +4,10 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4996) // warning C4996: 'strncpy and co': This function or variable may be unsafe.
+#endif
+
 // from https://github.com/juliettef/IconFontCppHeaders
 #include <babylon/imgui/icons_font_awesome_5.h>
 

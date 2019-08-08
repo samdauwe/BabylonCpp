@@ -35,6 +35,11 @@
 #include <babylon/inspector/components/global_state.h>
 #include <babylon/inspector/components/sceneexplorer/scene_explorer_component.h>
 
+#ifdef _WIN32
+// See warning about windows mixing dll and stl in this file!
+#include <babylon/core/logging/log_levels_statics.cpp.h> 
+#endif
+
 namespace BABYLON {
 
 static ImFont* _fontRegular = nullptr;

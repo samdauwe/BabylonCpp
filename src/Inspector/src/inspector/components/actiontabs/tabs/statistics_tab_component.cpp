@@ -118,32 +118,32 @@ void StatisticsTabComponent::render()
                        / sceneInstrumentation->frameTimeCounter().current()));
     ValueLineComponent::render(
       "Meshes selection",
-      sceneInstrumentation->activeMeshesEvaluationTimeCounter().current(),
+      static_cast<float>(sceneInstrumentation->activeMeshesEvaluationTimeCounter().current()),
       std::nullopt, std::nullopt, "ms");
     ValueLineComponent::render(
       "Render targets",
-      sceneInstrumentation->renderTargetsRenderTimeCounter().current(),
+      static_cast<float>(sceneInstrumentation->renderTargetsRenderTimeCounter().current()),
       std::nullopt, std::nullopt, "ms");
     ValueLineComponent::render(
-      "Particles", sceneInstrumentation->particlesRenderTimeCounter().current(),
+      "Particles", static_cast<float>(sceneInstrumentation->particlesRenderTimeCounter().current()),
       std::nullopt, std::nullopt, "ms");
     ValueLineComponent::render(
-      "Sprites", sceneInstrumentation->spritesRenderTimeCounter().current(),
+      "Sprites", static_cast<float>(sceneInstrumentation->spritesRenderTimeCounter().current()),
       std::nullopt, std::nullopt, "ms");
     ValueLineComponent::render(
-      "Animations", sceneInstrumentation->animationsTimeCounter().current(),
+      "Animations", static_cast<float>(sceneInstrumentation->animationsTimeCounter().current()),
       std::nullopt, std::nullopt, "ms");
     ValueLineComponent::render(
-      "Physics", sceneInstrumentation->physicsTimeCounter().current(),
+      "Physics", static_cast<float>(sceneInstrumentation->physicsTimeCounter().current()),
       std::nullopt, std::nullopt, "ms");
     ValueLineComponent::render(
-      "Render", sceneInstrumentation->renderTimeCounter().current(),
+      "Render", static_cast<float>(sceneInstrumentation->renderTimeCounter().current()),
       std::nullopt, std::nullopt, "ms");
     ValueLineComponent::render(
-      "Frame total", sceneInstrumentation->frameTimeCounter().current(),
+      "Frame total", static_cast<float>(sceneInstrumentation->frameTimeCounter().current()),
       std::nullopt, std::nullopt, "ms");
     ValueLineComponent::render(
-      "Inter-frame", sceneInstrumentation->interFrameTimeCounter().current(),
+      "Inter-frame", static_cast<float>(sceneInstrumentation->interFrameTimeCounter().current()),
       std::nullopt, std::nullopt, "ms");
     ValueLineComponent::render(
       "GPU Frame time",
