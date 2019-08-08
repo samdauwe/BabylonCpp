@@ -9,6 +9,10 @@
 #include <babylon/samples/sample_launcher.h>
 #include <babylon/samples/samples_index.h>
 
+#if _MSC_VER
+#include <windows.h>
+#endif
+
 struct ConsoleLogger {
 
   using log_message_t = SA::delegate<void(const BABYLON::LogMessage&)>;
@@ -16,6 +20,9 @@ struct ConsoleLogger {
   static void onLogMessage(const BABYLON::LogMessage& logMessage)
   {
     printf("%s\n", logMessage.toString().c_str());
+#if _MSC_VER
+    OutputDebugString(logMessage.toString().c_str());
+#endif
   }
 
   static log_message_t logListenerDelegate;
