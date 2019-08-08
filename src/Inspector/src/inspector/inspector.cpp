@@ -214,7 +214,7 @@ void Inspector::_renderInspector()
   }
 
   // Setup window size
-  auto pos  = ImVec2(0, _menuHeight);
+  auto pos  = ImVec2(0.f, static_cast<float>(_menuHeight));
   auto size = ImGui::GetIO().DisplaySize;
   size.y -= pos.y;
 

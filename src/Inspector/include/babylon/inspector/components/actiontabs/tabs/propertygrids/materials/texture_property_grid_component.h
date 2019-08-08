@@ -71,7 +71,7 @@ struct BABYLON_SHARED_EXPORT TexturePropertyGridComponent {
       TextLineComponent::render("Is render target",
                                 texture->isRenderTarget ? "Yes" : "No");
       auto sliderChange = SliderLineComponent::render(
-        "UV set", texture->coordinatesIndex, 0, 3, 1, "%.3f");
+        "UV set", static_cast<float>(texture->coordinatesIndex), 0.f, 3.f, 1.f, "%.3f");
       if (sliderChange) {
         texture->coordinatesIndex
           = static_cast<unsigned int>(sliderChange.value());
@@ -162,7 +162,7 @@ struct BABYLON_SHARED_EXPORT TexturePropertyGridComponent {
             "%.1f");
           if (sliderChange) {
             cubeTexture->rotationY
-              = static_cast<unsigned int>(sliderChange.value());
+              = static_cast<float>(sliderChange.value());
           }
         }
         else {
@@ -174,7 +174,7 @@ struct BABYLON_SHARED_EXPORT TexturePropertyGridComponent {
               "%.1f");
             if (sliderChange) {
               hdrCubeTexture->rotationY
-                = static_cast<unsigned int>(sliderChange.value());
+                = static_cast<float>(sliderChange.value());
             }
           }
         }

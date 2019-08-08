@@ -49,7 +49,7 @@ struct BABYLON_SHARED_EXPORT TextureLineComponent {
     }
     else {
       auto passCubePostProcess = PassCubePostProcess::New(
-        "pass", 1, nullptr, TextureConstants::NEAREST_SAMPLINGMODE, engine,
+        "pass", 1.f, nullptr, TextureConstants::NEAREST_SAMPLINGMODE, engine,
         false, Constants::TEXTURETYPE_UNSIGNED_INT);
       passCubePostProcess->face = textureReservedDataStore.face;
 

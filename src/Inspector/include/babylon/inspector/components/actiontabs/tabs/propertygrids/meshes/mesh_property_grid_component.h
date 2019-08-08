@@ -191,7 +191,7 @@ struct BABYLON_SHARED_EXPORT MeshPropertyGridComponent {
         mesh->visibility = sliderChange.value();
       }
       auto valueChange
-        = FloatLineComponent::render("Alpha index", mesh->alphaIndex);
+        = FloatLineComponent::render("Alpha index", static_cast<float>(mesh->alphaIndex));
       if (valueChange) {
         mesh->alphaIndex = static_cast<int>(valueChange.value());
       }
