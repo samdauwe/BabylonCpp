@@ -198,7 +198,7 @@ bool MaterialHelper::PrepareDefinesForAttributes(
         defines.boolDef["BONETEXTURE"] = true;
       }
       else {
-        defines.boolDef["BonesPerMesh"] = (mesh->skeleton()->bones.size() + 1);
+        defines.intDef["BonesPerMesh"] = static_cast<int>((mesh->skeleton()->bones.size() + 1));
         defines.boolDef["BONETEXTURE"]  = false;
       }
     }
