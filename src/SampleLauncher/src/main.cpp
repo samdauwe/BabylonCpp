@@ -26,7 +26,8 @@ struct ConsoleLogger {
   {
     printf("%s\n", logMessage.toString().c_str());
 #if _MSC_VER
-    OutputDebugString(logMessage.toString().c_str());
+    std::string msg_n = logMessage.toString() + "\n";
+    OutputDebugString(msg_n.c_str());
 #endif
   }
 
