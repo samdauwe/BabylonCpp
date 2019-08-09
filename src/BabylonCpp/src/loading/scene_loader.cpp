@@ -11,57 +11,54 @@
 #include <babylon/loading/iscene_loader_plugin_async.h>
 #include <babylon/loading/iscene_loader_plugin_factory.h>
 #include <babylon/loading/plugins/babylon/babylon_file_loader.h>
+#include <babylon/loading/scene_loader_flags.h>
 #include <babylon/loading/scene_loader_progress_event.h>
 #include <babylon/misc/tools.h>
 
 namespace BABYLON {
 
-bool SceneLoader::_ForceFullSceneLoadingForIncremental = false;
-bool SceneLoader::_ShowLoadingScreen                   = true;
-bool SceneLoader::_CleanBoneMatrixWeights              = false;
-unsigned int SceneLoader::_loggingLevel = SceneLoader::NO_LOGGING;
 Observable<ISceneLoaderPlugin> SceneLoader::OnPluginActivatedObservable;
 Observable<ISceneLoaderPluginAsync>
   SceneLoader::OnPluginAsyncActivatedObservable;
 
 bool SceneLoader::ForceFullSceneLoadingForIncremental()
 {
-  return SceneLoader::_ForceFullSceneLoadingForIncremental;
+  return SceneLoaderFlags::ForceFullSceneLoadingForIncremental();
 }
 
 void SceneLoader::setForceFullSceneLoadingForIncremental(bool value)
 {
-  SceneLoader::_ForceFullSceneLoadingForIncremental = value;
+  SceneLoaderFlags::setForceFullSceneLoadingForIncremental(value);
 }
 
 bool SceneLoader::ShowLoadingScreen()
 {
-  return SceneLoader::_ShowLoadingScreen;
+  return SceneLoaderFlags::ShowLoadingScreen();
 }
 
 void SceneLoader::setShowLoadingScreen(bool value)
 {
-  SceneLoader::_ShowLoadingScreen = value;
+  SceneLoaderFlags::setShowLoadingScreen(value);
 }
 
 unsigned int SceneLoader::LoggingLevel()
 {
-  return SceneLoader::_loggingLevel;
+  return SceneLoaderFlags::loggingLevel();
 }
 
 void SceneLoader::setLoggingLevel(unsigned int value)
 {
-  SceneLoader::_loggingLevel = value;
+  SceneLoaderFlags::setloggingLevel(value);
 }
 
 bool SceneLoader::CleanBoneMatrixWeights()
 {
-  return SceneLoader::_CleanBoneMatrixWeights;
+  return SceneLoaderFlags::CleanBoneMatrixWeights();
 }
 
 void SceneLoader::setCleanBoneMatrixWeights(bool value)
 {
-  SceneLoader::_CleanBoneMatrixWeights = value;
+  SceneLoaderFlags::setCleanBoneMatrixWeights(value);
 }
 
 std::unordered_map<std::string, IRegisteredPlugin>
@@ -194,6 +191,13 @@ SceneLoader::_loadData(
     plugin = asyncedPlugin
       = std::get<ISceneLoaderPluginAsyncPtr>(registeredPlugin.plugin);
   }
+  else {
+    throw std::runtime_error(
+      "The loader plugin corresponding to the file type you are trying to load "
+      "has not been found. If using es6, please import the plugin you wish to "
+      "use before.");
+  }
+
   auto& useArrayBuffer = registeredPlugin.isBinary;
 
   if (syncedPlugin) {
@@ -272,9 +276,10 @@ SceneLoader::_getFileInfo(std::string rootUrl, const std::string& sceneFilename)
   }
 
   return IFileInfo{
-    url,     // url
-    rootUrl, // rootUrl
-    name,    // name
+    url,         // url
+    rootUrl,     // rootUrl
+    name,        // name
+    std::nullopt // file
   };
 }
 
@@ -445,6 +450,11 @@ std::unique_ptr<Scene> SceneLoader::Load(
                            const std::string& exception)>& onError,
   const std::string& pluginExtension)
 {
+  if (!engine) {
+    BABYLON_LOG_ERROR("SceneLoader", "No engine available")
+    return nullptr;
+  }
+
   auto scene = Scene::New(engine);
   SceneLoader::Append(rootUrl, sceneFilename, scene.get(), onsuccess,
                       onProgress, onError, pluginExtension);

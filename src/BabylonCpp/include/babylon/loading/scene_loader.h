@@ -6,6 +6,7 @@
 #include <variant>
 
 #include <babylon/babylon_api.h>
+#include <babylon/engines/constants.h>
 #include <babylon/misc/observable.h>
 
 namespace BABYLON {
@@ -37,33 +38,29 @@ using SkeletonPtr                  = std::shared_ptr<Skeleton>;
  */
 class BABYLON_SHARED_EXPORT SceneLoader {
 
-private:
-  // Flags
-  static bool _ForceFullSceneLoadingForIncremental;
-  static bool _ShowLoadingScreen;
-  static bool _CleanBoneMatrixWeights;
-  static unsigned int _loggingLevel;
-
 public:
   /**
    * No logging while loading
    */
-  static constexpr unsigned int NO_LOGGING = 0;
+  static constexpr unsigned int NO_LOGGING = Constants::SCENELOADER_NO_LOGGING;
 
   /**
    * Minimal logging while loading
    */
-  static constexpr unsigned int MINIMAL_LOGGING = 1;
+  static constexpr unsigned int MINIMAL_LOGGING
+    = Constants::SCENELOADER_MINIMAL_LOGGING;
 
   /**
    * Summary logging while loading
    */
-  static constexpr unsigned int SUMMARY_LOGGING = 2;
+  static constexpr unsigned int SUMMARY_LOGGING
+    = Constants::SCENELOADER_SUMMARY_LOGGING;
 
   /**
    * Detailled logging while loading
    */
-  static constexpr unsigned int DETAILED_LOGGING = 3;
+  static constexpr unsigned int DETAILED_LOGGING
+    = Constants::SCENELOADER_DETAILED_LOGGING;
 
   /**
    * @brief Gets a boolean indicating if entire scene must be loaded even if
@@ -160,15 +157,15 @@ public:
                                     ISceneLoaderPluginAsyncPtr>& plugin);
 
   /**
-   * @brief Import meshes into a scene
+   * @brief Import meshes into a scene.
    * @param meshNames an array of mesh names, a single mesh name, or empty
    * string for all meshes that filter what meshes are imported
    * @param rootUrl a string that defines the root url for the scene and
    * resources or the concatenation of rootURL and filename (e.g.
    * http://example.com/test.glb)
    * @param sceneFilename a string that defines the name of the scene file or
-   * starts with "data:" following by the stringified version of the scene
-   * (default: empty string)
+   * starts with "data:" following by the stringified version of the scene or a
+   * File object (default: empty string)
    * @param scene the instance of BABYLON.Scene to append to
    * @param onSuccess a callback with a list of imported meshes,
    * particleSystems, and skeletons when import succeeds
@@ -203,8 +200,8 @@ public:
    * resources or the concatenation of rootURL and filename (e.g.
    * http://example.com/test.glb)
    * @param sceneFilename a string that defines the name of the scene file or
-   * starts with "data:" following by the stringified version of the scene
-   * (default: empty string)
+   * starts with "data:" following by the stringified version of the scene or a
+   * File object (default: empty string)
    * @param engine is the instance of BABYLON.Engine to use to create the scene
    * @param onSuccess a callback with the scene when import succeeds
    * @param onProgress a callback with a progress event for each file being
@@ -231,8 +228,8 @@ public:
    * resources or the concatenation of rootURL and filename (e.g.
    * http://example.com/test.glb)
    * @param sceneFilename a string that defines the name of the scene file or
-   * starts with "data:" following by the stringified version of the scene
-   * (default: empty string)
+   * starts with "data:" following by the stringified version of the scene or a
+   * File object (default: empty string)
    * @param scene is the instance of BABYLON.Scene to append to
    * @param onSuccess a callback with the scene when import succeeds
    * @param onProgress a callback with a progress event for each file being
