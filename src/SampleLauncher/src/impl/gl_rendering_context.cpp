@@ -1113,27 +1113,25 @@ void GLRenderingContext::stencilOpSeparate(GLenum face, GLenum fail,
 void GLRenderingContext::texImage2D(GLenum target, GLint level,
                                     GLint internalformat, GLsizei width,
                                     GLsizei height, GLint border, GLenum format,
-                                    GLenum type, const Uint8Array& pixels)
+                                    GLenum type, const Uint8Array* const pixels)
 {
-  glTexImage2D(target, level, internalformat, width, height, border, format,
-               type, &pixels[0]);
+  if (pixels == nullptr)
+  {
+    glTexImage2D(target, level, internalformat, width, height, border, format,
+      type, nullptr);
+  }
+  else
+  {
+    glTexImage2D(target, level, internalformat, width, height, border, format,
+      type, pixels->data());
+  }
 }
 
 void GLRenderingContext::texImage2D(GLenum /*target*/, GLint /*level*/,
                                     GLint /*internalformat*/, GLenum /*format*/,
                                     GLenum /*type*/, ICanvas* /*pixels*/)
 {
-}
-
-void GLRenderingContext::texImage2D(GLenum target, GLint level,
-                                    GLint internalformat, GLsizei width,
-                                    GLsizei height, GLsizei border,
-                                    GLenum format, GLenum type, ICanvas* pixels)
-{
-  if (!pixels) {
-    glTexImage2D(target, level, internalformat, width, height, border, format,
-                 type, nullptr);
-  }
+#pragma message("TODO: texImage2D is not implemented for ICanvas!")
 }
 
 void GLRenderingContext::texImage3D(GLenum target, GLint level,

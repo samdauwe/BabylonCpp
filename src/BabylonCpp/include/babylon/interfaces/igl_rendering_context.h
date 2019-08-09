@@ -2006,11 +2006,11 @@ public:
    * @param border A GLint specifying the width of the border. Must be 0.
    * @param format A GLenum specifying the format of the texel data.
    * @param type A GLenum specifying the data type of the texel data.
-   * @param pixels An Uint8Array pixel source for the texture.
+   * @param pixels An Uint8Array pixel source for the texture (can be nullptr)
    */
   virtual void texImage2D(GLenum target, GLint level, GLint internalformat,
                           GLsizei width, GLsizei height, GLint border,
-                          GLenum format, GLenum type, const Uint8Array& pixels)
+                          GLenum format, GLenum type, const Uint8Array* const pixels)
     = 0;
 
   /**
@@ -2026,26 +2026,6 @@ public:
    * @param pixels An ICanvas pixel source for the texture.
    */
   virtual void texImage2D(GLenum target, GLint level, GLint internalformat,
-                          GLenum format, GLenum type, ICanvas* pixels)
-    = 0;
-
-  /**
-   * @brief Specifies a two-dimensional texture image.
-   * @param target A GLenum specifying the binding point (target) of the active
-   * texture.
-   * @param level A GLint specifying the level of detail. Level 0 is the base
-   * image level and level n is the nth mipmap reduction level.
-   * @param internalformat A GLint specifying the color components in the
-   * texture.
-   * @param width A GLsizei specifying the width of the texture.
-   * @param height A GLsizei specifying the height of the texture.
-   * @param border A GLint specifying the width of the border. Must be 0.
-   * @param format A GLenum specifying the format of the texel data.
-   * @param type A GLenum specifying the data type of the texel data.
-   * @param pixels An ICanvas pixel source for the texture.
-   */
-  virtual void texImage2D(GLenum target, GLint level, GLint internalformat,
-                          GLsizei width, GLsizei height, GLsizei border,
                           GLenum format, GLenum type, ICanvas* pixels)
     = 0;
 
