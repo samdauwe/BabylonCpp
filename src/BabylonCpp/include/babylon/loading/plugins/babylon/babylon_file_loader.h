@@ -17,7 +17,7 @@ using MaterialPtr = std::shared_ptr<Material>;
 struct BABYLON_SHARED_EXPORT BabylonFileLoader : public ISceneLoaderPlugin {
 
   BabylonFileLoader();
-  virtual ~BabylonFileLoader();
+  virtual ~BabylonFileLoader() override;
 
   MaterialPtr parseMaterialById(const std::string& id, const json& parsedData,
                                 Scene* scene, const std::string& rootUrl) const;
@@ -26,6 +26,7 @@ struct BABYLON_SHARED_EXPORT BabylonFileLoader : public ISceneLoaderPlugin {
   std::string logOperation(const std::string& operation) const;
   std::string logOperation(const std::string& operation,
                            const json& producer) const;
+  void loadDetailLevels(Scene* scene, const AbstractMeshPtr& mesh) const;
 
   bool
   importMesh(const std::vector<std::string>& meshesNames, Scene* scene,

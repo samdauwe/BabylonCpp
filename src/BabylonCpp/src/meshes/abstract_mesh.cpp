@@ -132,8 +132,12 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , _submeshesOctree{nullptr}
     , _unIndexed{false}
     , lightSources{this, &AbstractMesh::get_lightSources}
-    , _waitingFreezeWorldMatrix{std::nullopt}
     , _positions{this, &AbstractMesh::get__positions}
+    , _waitingData{_WaitingData{
+        std::nullopt, // lods
+        {},           // actions
+        std::nullopt  // freezeWorldMatrix
+      }}
     , skeleton{this, &AbstractMesh::get_skeleton, &AbstractMesh::set_skeleton}
     , edgesRenderer{this, &AbstractMesh::get_edgesRenderer}
     , isBlocked{this, &AbstractMesh::get_isBlocked}
@@ -534,8 +538,8 @@ std::string AbstractMesh::toString(bool fullDetails) const
     }
     oss << ", freeze wrld mat: "
         << (_isWorldMatrixFrozen
-                || (_waitingFreezeWorldMatrix.has_value()
-                    && *_waitingFreezeWorldMatrix) ?
+                || (_waitingData.freezeWorldMatrix.has_value()
+                    && *_waitingData.freezeWorldMatrix) ?
               "YES" :
               "NO");
   }
@@ -551,9 +555,8 @@ Node* AbstractMesh::_getEffectiveParent()
   return TransformNode::_getEffectiveParent();
 }
 
-AbstractActionManagerPtr
-AbstractMesh::_getActionManagerForTrigger(const std::optional<unsigned int>& trigger,
-                                          bool initialCall)
+AbstractActionManagerPtr AbstractMesh::_getActionManagerForTrigger(
+  const std::optional<unsigned int>& trigger, bool initialCall)
 {
   if (actionManager && (initialCall || actionManager->isRecursive)) {
     if (trigger) {
@@ -1347,7 +1350,8 @@ AbstractMesh& AbstractMesh::moveWithCollisions(Vector3& displacement)
     _meshCollisionData._collider, 3, shared_from_base<AbstractMesh>(),
     [this](size_t collisionId, Vector3& newPosition,
            const AbstractMeshPtr& collidedMesh) {
-      _onCollisionPositionChange(static_cast<int>(collisionId), newPosition, collidedMesh);
+      _onCollisionPositionChange(static_cast<int>(collisionId), newPosition,
+                                 collidedMesh);
     },
     uniqueId);
   return *this;

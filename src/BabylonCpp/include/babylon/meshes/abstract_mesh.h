@@ -14,6 +14,7 @@
 #include <babylon/math/color4.h>
 #include <babylon/math/matrix.h>
 #include <babylon/meshes/_internal_abstract_mesh_data_info.h>
+#include <babylon/meshes/_waiting_data.h>
 #include <babylon/meshes/facet_parameters.h>
 #include <babylon/meshes/iget_set_vertices_data.h>
 #include <babylon/meshes/transform_node.h>
@@ -1775,18 +1776,16 @@ public:
   // Loading properties
 
   /** Hidden */
-  std::vector<json> _waitingActions;
-
-  /** Hidden */
-  std::optional<bool> _waitingFreezeWorldMatrix;
-
-  /** Hidden */
   std::vector<Vector3> _emptyPositions;
 
   /**
    * Cache
    */
   ReadOnlyProperty<AbstractMesh, std::vector<Vector3>> _positions;
+
+  // Loading properties
+  /** Hidden */
+  _WaitingData _waitingData;
 
   // Skeleton
 

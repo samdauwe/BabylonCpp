@@ -2435,7 +2435,7 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
 
   // freezeWorldMatrix
   if (json_util::has_valid_key_value(parsedMesh, "freezeWorldMatrix")) {
-    mesh->_waitingFreezeWorldMatrix
+    mesh->_waitingData.freezeWorldMatrix
       = json_util::get_bool(parsedMesh, "freezeWorldMatrix");
   }
 
@@ -2446,7 +2446,8 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
 
   // Actions
   if (json_util::has_valid_key_value(parsedMesh, "actions")) {
-    mesh->_waitingActions = json_util::get_array<json>(parsedMesh, "actions");
+    mesh->_waitingData.actions
+      = json_util::get_array<json>(parsedMesh, "actions");
   }
 
   // Overlay

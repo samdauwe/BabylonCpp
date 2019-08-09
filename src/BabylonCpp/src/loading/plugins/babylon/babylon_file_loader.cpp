@@ -1,9 +1,10 @@
-#include <babylon/loading/plugins/babylon/babylon_file_loader.h>
+﻿#include <babylon/loading/plugins/babylon/babylon_file_loader.h>
 
 #include <babylon/actions/action_manager.h>
 #include <babylon/animations/animation.h>
 #include <babylon/animations/animation_group.h>
 #include <babylon/babylon_stl_util.h>
+#include <babylon/bones/bone.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json_util.h>
@@ -25,6 +26,7 @@
 #include <babylon/misc/tools.h>
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/particles/particle_system.h>
+#include <babylon/probes/reflection_probe.h>
 
 namespace BABYLON {
 
@@ -91,6 +93,51 @@ std::string BabylonFileLoader::logOperation(const std::string& operation,
          + json_util::get_string(producer, "name") + " version: "
          + json_util::get_string(producer, "version") + ", exporter version: "
          + json_util::get_string(producer, "exporter_version");
+}
+
+void BabylonFileLoader::loadDetailLevels(Scene* scene,
+                                         const AbstractMeshPtr& mesh) const
+{
+  auto mastermesh = std::static_pointer_cast<Mesh>(mesh);
+
+  // Every value specified in the ids array of the lod data points to another
+  // mesh which should be used as the lower LOD level. The distances (or
+  // coverages) array values specified are used along with the lod mesh ids as a
+  // hint to determine the switching threshold for the various LODs.
+  if (mesh->_waitingData.lods.has_value()) {
+    if (!mesh->_waitingData.lods->ids.empty()) {
+      const auto& lodmeshes = mesh->_waitingData.lods->ids;
+      const auto wasenabled = mastermesh->isEnabled(false);
+      if (!mesh->_waitingData.lods->distances.empty()) {
+        const auto& distances = mesh->_waitingData.lods->distances;
+        if (distances.size() >= lodmeshes.size()) {
+          const auto culling
+            = (distances.size() > lodmeshes.size()) ? distances.back() : 0.f;
+          mastermesh->setEnabled(false);
+          for (size_t index = 0; index < lodmeshes.size(); index++) {
+            const auto& lodid = lodmeshes[index];
+            auto lodmesh
+              = std::static_pointer_cast<Mesh>(scene->getMeshByID(lodid));
+            if (lodmesh != nullptr) {
+              mastermesh->addLODLevel(distances[index], lodmesh);
+            }
+          }
+          if (culling > 0.f) {
+            mastermesh->addLODLevel(culling, nullptr);
+          }
+          if (wasenabled == true) {
+            mastermesh->setEnabled(true);
+          }
+        }
+        else {
+          BABYLON_LOGF_WARN("BabylonFileLoader",
+                            "Invalid level of detail distances for %s",
+                            mesh->name.c_str())
+        }
+      }
+    }
+    mesh->_waitingData.lods = std::nullopt;
+  }
 }
 
 bool BabylonFileLoader::importMesh(
@@ -201,8 +248,8 @@ bool BabylonFileLoader::importMesh(
                   }
                 }
                 loadedMaterialsIds.emplace_back(parsedMultiMaterialId);
-                auto mmat
-                  = Material::ParseMultiMaterial(parsedMultiMaterial, scene);
+                auto mmat = MultiMaterial::ParseMultiMaterial(
+                  parsedMultiMaterial, scene);
                 if (mmat) {
                   materialFound = true;
                   log << "\n\tMulti-Material " << mmat->toString(fullDetails);
@@ -266,20 +313,43 @@ bool BabylonFileLoader::importMesh(
       }
     }
 
-    // Connecting parents
-    for (auto& currentMesh : scene->meshes) {
+    // Connecting parents and lods
+    for (const auto& currentMesh : scene->meshes) {
       if (!currentMesh->_waitingParentId.empty()) {
         std::static_pointer_cast<Node>(currentMesh)->parent
           = scene->getLastEntryByID(currentMesh->_waitingParentId).get();
         currentMesh->_waitingParentId = "";
       }
+      if (currentMesh->_waitingData.lods.has_value()) {
+        loadDetailLevels(scene, currentMesh);
+      }
+    }
+
+    // link skeleton transform nodes
+    for (const auto& skeleton : scene->skeletons) {
+      if (skeleton->_hasWaitingData.has_value()) {
+        if (!skeleton->bones.empty()) {
+          for (const auto& bone : skeleton->bones) {
+            if (!bone->_waitingTransformNodeId.empty()) {
+              auto linkTransformNode = std::static_pointer_cast<TransformNode>(
+                scene->getLastEntryByID(bone->_waitingTransformNodeId));
+              if (linkTransformNode) {
+                bone->linkTransformNode(linkTransformNode);
+              }
+              bone->_waitingTransformNodeId.clear();
+            }
+          }
+        }
+        skeleton->_hasWaitingData = std::nullopt;
+      }
     }
 
     // freeze and compute world matrix application
-    for (auto& currentMesh : scene->meshes) {
-      if (currentMesh->_waitingFreezeWorldMatrix) {
+    for (const auto& currentMesh : scene->meshes) {
+      if (currentMesh->_waitingData.freezeWorldMatrix.has_value()
+          && *currentMesh->_waitingData.freezeWorldMatrix) {
         currentMesh->freezeWorldMatrix();
-        currentMesh->_waitingFreezeWorldMatrix = false;
+        currentMesh->_waitingData.freezeWorldMatrix = std::nullopt;
       }
       else {
         currentMesh->computeWorldMatrix(true);
@@ -415,6 +485,11 @@ bool BabylonFileLoader::load(
         = json_util::get_bool(parsedData, "collisionsEnabled", true);
     }
 
+    auto container = loadAssetContainer(scene, data, rootUrl, onError, true);
+    if (!container) {
+      return false;
+    }
+
     if (json_util::get_bool(parsedData, "autoAnimate", false)) {
 #if 0
       scene->beginAnimation(
@@ -425,7 +500,6 @@ bool BabylonFileLoader::load(
 #endif
     }
 
-    // Collisions, if defined. otherwise, default is true
     if (json_util::has_valid_key_value(parsedData, "activeCameraID")) {
       scene->setActiveCameraByID(
         json_util::get_string(parsedData, "activeCameraID"));
@@ -433,17 +507,20 @@ bool BabylonFileLoader::load(
 
     // Environment texture
     if (json_util::has_valid_key_value(parsedData, "environmentTexture")) {
-      if (json_util::has_key(parsedData, "environmentTextureType")
+      const auto environmentTextureStr
+        = json_util::get_string(parsedData, "environmentTexture");
+      // PBR needed for both HDR texture (gamma space) & a sky box
+      auto isPBR = json_util::get_bool(parsedData, "isPBR", true);
+      if (json_util::has_valid_key_value(parsedData, "environmentTextureType")
           && json_util::get_string(parsedData, "environmentTextureType")
                == "BABYLON.HDRCubeTexture") {
-        size_t hdrSize
-          = (json_util::has_key(parsedData, "environmentTextureSize")) ?
-              json_util::get_number<size_t>(parsedData,
-                                            "environmentTextureSize") :
-              128;
-        auto hdrTexture = HDRCubeTexture::New(
-          rootUrl + json_util::get_string(parsedData, "environmentTexture"),
-          scene, hdrSize);
+        size_t hdrSize = (json_util::has_valid_key_value(
+                           parsedData, "environmentTextureSize")) ?
+                           json_util::get_number<size_t>(
+                             parsedData, "environmentTextureSize") :
+                           128;
+        auto hdrTexture = HDRCubeTexture::New(rootUrl + environmentTextureStr,
+                                              scene, hdrSize, true, !isPBR);
         if (json_util::has_key(parsedData, "environmentTextureRotationY")) {
           hdrTexture->rotationY = json_util::get_number<float>(
             parsedData, "environmentTextureRotationY");
@@ -451,14 +528,25 @@ bool BabylonFileLoader::load(
         scene->environmentTexture = hdrTexture;
       }
       else {
-        auto cubeTexture = CubeTexture::CreateFromPrefilteredData(
-          rootUrl + json_util::get_string(parsedData, "environmentTexture"),
-          scene);
-        if (json_util::has_key(parsedData, "environmentTextureRotationY")) {
-          cubeTexture->rotationY = json_util::get_number<float>(
-            parsedData, "environmentTextureRotationY");
+        if (String::endsWith(environmentTextureStr, ".env")) {
+          auto compressedTexture
+            = CubeTexture::New(rootUrl + environmentTextureStr, scene);
+          if (json_util::has_valid_key_value(parsedData,
+                                             "environmentTextureRotationY")) {
+            compressedTexture->rotationY = json_util::get_number<float>(
+              parsedData, "environmentTextureRotationY");
+          }
+          scene->environmentTexture = compressedTexture;
         }
-        scene->environmentTexture = cubeTexture;
+        else {
+          auto cubeTexture = CubeTexture::CreateFromPrefilteredData(
+            rootUrl + environmentTextureStr, scene);
+          if (json_util::has_key(parsedData, "environmentTextureRotationY")) {
+            cubeTexture->rotationY = json_util::get_number<float>(
+              parsedData, "environmentTextureRotationY");
+          }
+          scene->environmentTexture = cubeTexture;
+        }
       }
       if (json_util::has_key(parsedData, "createDefaultSkybox")
           && json_util::get_bool(parsedData, "createDefaultSkybox")) {
@@ -468,7 +556,8 @@ bool BabylonFileLoader::load(
               1000.f;
         float skyboxBlurLevel
           = json_util::get_number<float>(parsedData, "skyboxBlurLevel", 0.f);
-        scene->createDefaultSkybox(nullptr, true, skyboxScale, skyboxBlurLevel);
+        scene->createDefaultSkybox(scene->environmentTexture(), isPBR,
+                                   skyboxScale, skyboxBlurLevel);
       }
     }
 
@@ -523,6 +612,70 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
     auto fullDetails
       = SceneLoader::LoggingLevel() == SceneLoader::DETAILED_LOGGING;
 
+    // Environment texture
+    if (json_util::has_valid_key_value(parsedData, "environmentTexture")) {
+      const auto environmentTextureStr
+        = json_util::get_string(parsedData, "environmentTexture");
+      // PBR needed for both HDR texture (gamma space) & a sky box
+      auto isPBR = json_util::get_bool(parsedData, "isPBR", true);
+      if (json_util::has_valid_key_value(parsedData, "environmentTextureType")
+          && json_util::get_string(parsedData, "environmentTextureType")
+               == "BABYLON.HDRCubeTexture") {
+        const auto hdrSize = json_util::get_number<size_t>(
+          parsedData, "environmentTextureSize", 128);
+        const std::regex re("https?://", std::regex::optimize);
+        const auto regexMatch = String::regexMatch(environmentTextureStr, re);
+        auto hdrTexture       = HDRCubeTexture::New(
+          (!regexMatch.empty() ? "" : rootUrl) + environmentTextureStr, scene,
+          hdrSize, true, !isPBR);
+        if (json_util::has_valid_key_value(parsedData,
+                                           "environmentTextureRotationY")) {
+          hdrTexture->rotationY = json_util::get_number<float>(
+            parsedData, "environmentTextureRotationY");
+        }
+        scene->environmentTexture = hdrTexture;
+      }
+      else {
+        if (String::endsWith(environmentTextureStr, ".env")) {
+          const std::regex re("https?://", std::regex::optimize);
+          const auto regexMatch = String::regexMatch(environmentTextureStr, re);
+          auto compressedTexture = CubeTexture::New(
+            (!regexMatch.empty() ? "" : rootUrl) + environmentTextureStr,
+            scene);
+          if (json_util::has_valid_key_value(parsedData,
+                                             "environmentTextureRotationY")) {
+            compressedTexture->rotationY = json_util::get_number<float>(
+              parsedData, "environmentTextureRotationY");
+          }
+          scene->environmentTexture = compressedTexture;
+        }
+        else {
+          const std::regex re("https?://", std::regex::optimize);
+          const auto regexMatch = String::regexMatch(environmentTextureStr, re);
+          auto cubeTexture      = CubeTexture::CreateFromPrefilteredData(
+            (!regexMatch.empty() ? "" : rootUrl) + environmentTextureStr,
+            scene);
+          if (json_util::has_valid_key_value(parsedData,
+                                             "environmentTextureRotationY")) {
+            cubeTexture->rotationY = json_util::get_number<float>(
+              parsedData, "environmentTextureRotationY");
+          }
+          scene->environmentTexture = cubeTexture;
+        }
+      }
+      if (json_util::get_bool(parsedData, "createDefaultSkybox") == true) {
+        const auto skyboxScale
+          = (scene->activeCamera != nullptr) ?
+              (scene->activeCamera->maxZ - scene->activeCamera->minZ) / 2.f :
+              1000.f;
+        const auto skyboxBlurLevel
+          = json_util::get_number<float>(parsedData, "skyboxBlurLevel", 0.f);
+        scene->createDefaultSkybox(scene->environmentTexture, isPBR,
+                                   skyboxScale, skyboxBlurLevel);
+      }
+      container->environmentTexture = scene->environmentTexture();
+    }
+
     // Lights
     unsigned int index = 0;
     for (const auto& parsedLight :
@@ -534,6 +687,19 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
         log << "\n\t\t" << light->toString(fullDetails);
       }
       ++index;
+    }
+
+    // Reflection probes
+    index = 0;
+    for (const auto& parsedReflectionProbe :
+         json_util::get_array<json>(parsedData, "reflectionProbes")) {
+      auto reflectionProbe
+        = ReflectionProbe::Parse(parsedReflectionProbe, scene, rootUrl);
+      if (reflectionProbe) {
+        container->reflectionProbes.emplace_back(reflectionProbe);
+        log << (index == 0 ? "\n\tReflection Probes:" : "");
+        log << "\n\t\t" << reflectionProbe->toString(fullDetails);
+      }
     }
 
     // Animations
@@ -553,9 +719,18 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
     for (const auto& parsedMaterial :
          json_util::get_array<json>(parsedData, "materials")) {
       auto mat = Material::Parse(parsedMaterial, scene, rootUrl);
-      container->materials.emplace_back(mat);
-      log << (index == 0 ? "\n\tMaterials:" : "");
-      log << "\n\t\t" << mat->toString(fullDetails);
+      if (mat) {
+        container->materials.emplace_back(mat);
+        log << (index == 0 ? "\n\tMaterials:" : "");
+        log << "\n\t\t" << mat->toString(fullDetails);
+
+        // Textures
+        for (const auto& t : mat->getActiveTextures()) {
+          if (!stl_util::contains(container->textures, t)) {
+            container->textures.emplace_back(t);
+          }
+        }
+      }
       ++index;
     }
 
@@ -563,10 +738,19 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
     index = 0;
     for (const auto& parsedMultiMaterial :
          json_util::get_array<json>(parsedData, "multiMaterials")) {
-      auto mmat = Material::ParseMultiMaterial(parsedMultiMaterial, scene);
-      container->multiMaterials.emplace_back(mmat);
-      log << (index == 0 ? "\n\tMultiMaterials:" : "");
-      log << "\n\t\t" << mmat->toString(fullDetails);
+      auto mmat = MultiMaterial::ParseMultiMaterial(parsedMultiMaterial, scene);
+      if (mmat) {
+        container->multiMaterials.emplace_back(mmat);
+        log << (index == 0 ? "\n\tMultiMaterials:" : "");
+        log << "\n\t\t" << mmat->toString(fullDetails);
+
+        // Textures
+        for (const auto& t : mmat->getActiveTextures()) {
+          if (!stl_util::contains(container->textures, t)) {
+            container->textures.emplace_back(t);
+          }
+        }
+      }
       ++index;
     }
 
@@ -588,6 +772,7 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
       ++index;
     }
 
+    // Geometries
     if (json_util::has_valid_key_value(parsedData, "geometries")) {
       const auto geometries = parsedData["geometries"];
       std::vector<GeometryPtr> addedGeometry;
@@ -647,7 +832,7 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
     }
 
     // Browsing all the graph to connect the dots
-    for (auto& camera : scene->cameras) {
+    for (const auto& camera : scene->cameras) {
       if (!camera->_waitingParentId.empty()) {
         camera->parent
           = scene->getLastEntryByID(camera->_waitingParentId).get();
@@ -655,34 +840,57 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
       }
     }
 
-    for (auto& light : scene->lights) {
+    for (const auto& light : scene->lights) {
       if (!light->_waitingParentId.empty()) {
         light->parent = scene->getLastEntryByID(light->_waitingParentId).get();
         light->_waitingParentId.clear();
       }
     }
 
-    // Connect parents & children and parse actions
-    for (auto& transformNode : scene->transformNodes) {
+    // Connect parents & children and parse actions and lods
+    for (const auto& transformNode : scene->transformNodes) {
       if (!transformNode->_waitingParentId.empty()) {
         static_cast<Node*>(transformNode.get())->parent
           = scene->getLastEntryByID(transformNode->_waitingParentId).get();
         transformNode->_waitingParentId.clear();
       }
     }
-    for (auto& mesh : scene->meshes) {
+    for (const auto& mesh : scene->meshes) {
       if (!mesh->_waitingParentId.empty()) {
         static_cast<Node*>(mesh.get())->parent
           = scene->getLastEntryByID(mesh->_waitingParentId).get();
         mesh->_waitingParentId.clear();
       }
+      if (mesh->_waitingData.lods.has_value()) {
+        loadDetailLevels(scene, mesh);
+      }
     }
 
-    // Freeze world matrix application
-    for (auto& currentMesh : scene->meshes) {
-      if (currentMesh->_waitingFreezeWorldMatrix) {
+    // link skeleton transform nodes
+    for (const auto& skeleton : scene->skeletons) {
+      if (skeleton->_hasWaitingData.has_value()) {
+        if (!skeleton->bones.empty()) {
+          for (const auto& bone : skeleton->bones) {
+            if (!bone->_waitingTransformNodeId.empty()) {
+              auto linkTransformNode = std::static_pointer_cast<TransformNode>(
+                scene->getLastEntryByID(bone->_waitingTransformNodeId));
+              if (linkTransformNode) {
+                bone->linkTransformNode(linkTransformNode);
+              }
+              bone->_waitingTransformNodeId.clear();
+            }
+          }
+        }
+        skeleton->_hasWaitingData = std::nullopt;
+      }
+    }
+
+    // freeze and compute world matrix application
+    for (const auto& currentMesh : scene->meshes) {
+      if (currentMesh->_waitingData.freezeWorldMatrix.has_value()
+          && *currentMesh->_waitingData.freezeWorldMatrix) {
         currentMesh->freezeWorldMatrix();
-        currentMesh->_waitingFreezeWorldMatrix = false;
+        currentMesh->_waitingData.freezeWorldMatrix = std::nullopt;
       }
       else {
         currentMesh->computeWorldMatrix(true);
@@ -690,7 +898,7 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
     }
 
     // Lights exclusions / inclusions
-    for (auto& light : scene->lights) {
+    for (const auto& light : scene->lights) {
       // Excluded check
       if (!light->_excludedMeshesIds.empty()) {
         for (const auto& excludedMeshesId : light->_excludedMeshesIds) {
@@ -721,10 +929,10 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
     AbstractScene::Parse(parsedData, scene, container, rootUrl);
 
     // Actions (scene) Done last as it can access other objects.
-    for (auto& mesh : scene->meshes) {
-      if (!mesh->_waitingActions.empty()) {
-        ActionManager::Parse(mesh->_waitingActions, mesh, scene);
-        mesh->_waitingActions.clear();
+    for (const auto& mesh : scene->meshes) {
+      if (!mesh->_waitingData.actions.empty()) {
+        ActionManager::Parse(mesh->_waitingData.actions, mesh, scene);
+        mesh->_waitingData.actions.clear();
       }
     }
     if (json_util::has_key(parsedData, "actions")
