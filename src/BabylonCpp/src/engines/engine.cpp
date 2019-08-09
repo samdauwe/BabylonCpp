@@ -2966,7 +2966,7 @@ InternalTexturePtr Engine::createTexture(
           if (isPot) {
             _gl->texImage2D(GL::TEXTURE_2D, 0, static_cast<int>(internalFormat),
                             img.width, img.height, 0, GL::RGBA,
-                            GL::UNSIGNED_BYTE, img.data);
+                            GL::UNSIGNED_BYTE, &img.data);
             return false;
           }
 
@@ -2999,7 +2999,7 @@ InternalTexturePtr Engine::createTexture(
             _bindTextureDirectly(GL::TEXTURE_2D, source);
             _gl->texImage2D(GL::TEXTURE_2D, 0, static_cast<int>(internalFormat),
                             img.width, img.height, 0, GL::RGBA,
-                            GL::UNSIGNED_BYTE, img.data);
+                            GL::UNSIGNED_BYTE, &img.data);
 
             _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER,
                                GL::LINEAR);
@@ -3122,7 +3122,7 @@ void Engine::updateRawTexture(const InternalTexturePtr& texture,
   else {
     auto _internalSizedFomat = static_cast<GL::GLint>(internalSizedFomat);
     _gl->texImage2D(GL::TEXTURE_2D, 0, _internalSizedFomat, texture->width,
-                    texture->height, 0, internalFormat, textureType, data);
+                    texture->height, 0, internalFormat, textureType, &data);
   }
 
   if (texture->generateMipMaps) {
@@ -3625,7 +3625,7 @@ Engine::createRenderTargetTexture(const std::variant<ISize, float>& size,
                     fullOptions.type.value(), fullOptions.format.value())),
                   width, height, 0,
                   _getInternalFormat(fullOptions.format.value()),
-                  _getWebGLTextureType(fullOptions.type.value()), Uint8Array());
+                  _getWebGLTextureType(fullOptions.type.value()), nullptr);
 
   // Create the framebuffer
   auto currentFrameBuffer = _currentFramebuffer;
@@ -4072,7 +4072,7 @@ void Engine::_uploadDataToTextureDirectly(const InternalTexturePtr& texture,
     = static_cast<int>(std::pow(2, std::max(lodMaxHeight - lod, 0)));
 
   _gl->texImage2D(target, lod, internalFormat, width, height, 0, format,
-                  textureType, imageData.uint8Array);
+                  textureType, &imageData.uint8Array);
 }
 
 void Engine::_uploadArrayBufferViewToTexture(const InternalTexturePtr& texture,
@@ -4109,7 +4109,7 @@ void Engine::_uploadImageToTexture(const InternalTexturePtr& texture,
   }
 
   _gl->texImage2D(target, lod, static_cast<int>(internalFormat), image.width,
-                  image.height, 0, format, textureType, image.data);
+                  image.height, 0, format, textureType, &image.data);
   _bindTextureDirectly(bindTarget, nullptr, true);
 }
 
@@ -4178,7 +4178,7 @@ InternalTexturePtr Engine::createRenderTargetCubeTexture(
                     fullOptions.type.value(), fullOptions.format.value())),
                   size.width, size.height, 0,
                   _getInternalFormat(fullOptions.format.value()),
-                  _getWebGLTextureType(fullOptions.type.value()), Uint8Array());
+                  _getWebGLTextureType(fullOptions.type.value()), nullptr);
   }
 
   // Create the framebuffer
@@ -4441,7 +4441,7 @@ InternalTexturePtr Engine::createCubeTexture(
 #else
           gl.texImage2D(faces[index], 0, static_cast<int>(internalFormat),
                         imgs[index].width, imgs[index].height, 0, GL::RGBA,
-                        GL::UNSIGNED_BYTE, imgs[index].data);
+                        GL::UNSIGNED_BYTE, &imgs[index].data);
 #endif
         }
 
@@ -4541,13 +4541,13 @@ void Engine::updateRawCubeTexture(const InternalTexturePtr& texture,
         gl.texImage2D(facesIndex[index], static_cast<int>(level),
                       static_cast<int>(internalSizedFomat), texture->width,
                       texture->height, 0, internalFormat, textureType,
-                      convertedFaceData.uint8Array);
+                      &convertedFaceData.uint8Array);
       }
       else {
         gl.texImage2D(facesIndex[index], static_cast<int>(level),
                       static_cast<int>(internalSizedFomat), texture->width,
                       texture->height, 0, internalFormat, textureType,
-                      faceData.uint8Array);
+                      &faceData.uint8Array);
       }
     }
   }
@@ -4727,7 +4727,7 @@ InternalTexturePtr Engine::createRawCubeTextureFromUrl(
           }
           gl.texImage2D(faceIndex, static_cast<int>(level),
                         static_cast<int>(internalSizedFomat), mipSize, mipSize,
-                        0, internalFormat, textureType, mipFaceData.uint8Array);
+                        0, internalFormat, textureType, &mipFaceData.uint8Array);
         }
       }
 

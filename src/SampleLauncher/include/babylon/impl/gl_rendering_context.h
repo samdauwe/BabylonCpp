@@ -208,12 +208,9 @@ public:
                          GLenum zpass) override;
   void texImage2D(GLenum target, GLint level, GLint internalformat,
                   GLsizei width, GLsizei height, GLint border, GLenum format,
-                  GLenum type, const Uint8Array& pixels) override;
+                  GLenum type, const Uint8Array* const pixels) override;
   void texImage2D(GLenum target, GLint level, GLint internalformat,
                   GLenum format, GLenum type, ICanvas* pixels) override;
-  void texImage2D(GLenum target, GLint level, GLint internalformat,
-                  GLsizei width, GLsizei height, GLsizei border, GLenum format,
-                  GLenum type, ICanvas* pixels) override;
   void texImage3D(GLenum target, GLint level, GLint internalformat,
                   GLsizei width, GLsizei height, GLsizei depth, GLint border,
                   GLenum format, GLenum type,

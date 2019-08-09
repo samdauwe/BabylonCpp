@@ -262,6 +262,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , _engine{engine ? engine : Engine::LastCreatedEngine()}
     , _animationRatio{1.f}
     , _animationTimeLastSet{false}
+    , _animationTime(0)
     , _renderId{0}
     , _frameId{0}
     , _executeWhenReadyTimeoutId{-1}
@@ -2120,7 +2121,11 @@ void Scene::_animate()
                        * animationTimeScale;
   _animationTime += static_cast<int>(deltaTime);
   _animationTimeLast = now;
-  for (auto& activeAnimatable : _activeAnimatables) {
+
+  // We copy _activeAnimatables before looping since, 
+  // activeAnimatable->_animate can remove items from _scene->_activeAnimatables
+  std::vector<AnimatablePtr> _activeAnimatables_copy = _activeAnimatables;
+  for (auto& activeAnimatable : _activeAnimatables_copy) {
     if (activeAnimatable) {
       activeAnimatable->_animate(std::chrono::milliseconds(_animationTime));
     }
