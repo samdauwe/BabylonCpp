@@ -39,3 +39,5 @@ add_subdirectory(Samples)
 add_subdirectory(SampleLauncher)
 # - Studio
 # add_subdirectory(Studio)
+# - Sample Launcher
+add_subdirectory(SamplesRunner)
