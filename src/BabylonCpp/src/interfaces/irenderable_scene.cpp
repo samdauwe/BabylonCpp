@@ -17,11 +17,16 @@ IRenderableScene::~IRenderableScene()
 {
 }
 
-void IRenderableScene::initialize()
+void IRenderableScene::initialize(ICanvas* canvas)
 {
-  if (_initialized) {
+  if (canvas && (canvas != _canvas))
+    _initialized = false;
+  _canvas = canvas;
+  if (!_canvas)
+    throw std::runtime_error("IRenderableScene::initialize without any canvas set");
+
+  if (_initialized)
     return;
-  }
 
   // Load the 3D engine
   _engine = Engine::New(_canvas);

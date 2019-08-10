@@ -15,10 +15,10 @@ class Scene;
 class BABYLON_SHARED_EXPORT IRenderableScene {
 
 public:
-  IRenderableScene(ICanvas* canvas);
+  IRenderableScene(ICanvas* canvas = nullptr); // The canvas can be set later via initialize()
   virtual ~IRenderableScene();
 
-  void initialize();
+  void initialize(ICanvas* canvas = nullptr);
 
   virtual void render();
   virtual const char* getName()                               = 0;
