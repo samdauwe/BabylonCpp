@@ -129,6 +129,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , hoverCursor{"pointer"}
     , defaultCursor{""}
     , preventDefaultOnPointerDown{true}
+    , preventDefaultOnPointerUp{true}
     , gamepadManager{this, &Scene::get_gamepadManager}
     , unTranslatedPointer{this, &Scene::get_unTranslatedPointer}
     , cameraToUseForPointers(nullptr)
@@ -2122,7 +2123,7 @@ void Scene::_animate()
   _animationTime += static_cast<int>(deltaTime);
   _animationTimeLast = now;
 
-  // We copy _activeAnimatables before looping since, 
+  // We copy _activeAnimatables before looping since,
   // activeAnimatable->_animate can remove items from _scene->_activeAnimatables
   std::vector<AnimatablePtr> _activeAnimatables_copy = _activeAnimatables;
   for (auto& activeAnimatable : _activeAnimatables_copy) {

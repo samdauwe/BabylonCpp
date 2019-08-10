@@ -2588,6 +2588,12 @@ public:
    */
   bool preventDefaultOnPointerDown;
 
+  /**
+   * This is used to call preventDefault() on pointer up
+   * in order to block unwanted artifacts like system double clicks
+   */
+  bool preventDefaultOnPointerUp;
+
   // Metadata
 
   /**
