@@ -1,9 +1,12 @@
 #include "SamplesRunner/impl/framebuffer_canvas.h"
-#include "SamplesRunner/imgui_scene_renderer.h"
+#include "SamplesRunner/scene_widget_imgui.h"
 #include <imgui.h>
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4312)
+#endif
+
 namespace BABYLON {
-namespace ImGuiRender {
 
   float distVec2(ImVec2 p1, ImVec2 p2)
   {
@@ -12,26 +15,33 @@ namespace ImGuiRender {
     return sqrt(dx * dx + dy * dy);
   }
 
-  ImGuiSceneRenderer::ImGuiSceneRenderer(int width, int height)
+  SceneWidget_ImGui::SceneWidget_ImGui(ImVec2 size)
   {
     _framebuffer_canvas = std::make_unique<BABYLON::impl::FramebufferCanvas>();
+    if (size.x < 0.1f) {
+      size = ImGui::GetIO().DisplaySize;
+      size.y -= 20.f;
+    }
+
+    int width = static_cast<int>(size.x);
+    int height = static_cast<int>(size.y);
     _framebuffer_canvas->clientWidth = width;
     _framebuffer_canvas->clientHeight = height;
     _framebuffer_canvas->initializeFrameBuffer();
   }
 
-  BABYLON::ICanvas * ImGuiSceneRenderer::getCanvas()
+  BABYLON::ICanvas * SceneWidget_ImGui::getCanvas()
   {
     return _framebuffer_canvas.get();
   }
 
-  void ImGuiSceneRenderer::setScene(BABYLON::IRenderableScene * scene)
+  void SceneWidget_ImGui::setScene(std::shared_ptr<BABYLON::IRenderableScene> scene)
   {
     _scene = scene;
-    _scene->initialize();
+    _scene->initialize(_framebuffer_canvas.get());
   }
 
-  void ImGuiSceneRenderer::showGui()
+  void SceneWidget_ImGui::render()
   {
     ImVec2 canvasSize(
       static_cast<float>(_framebuffer_canvas->width),
@@ -82,14 +92,6 @@ namespace ImGuiRender {
     //_sceneWindow.renderCanvas->onMouseWheel(
     //  ctrlKey, shiftKey, static_cast<int>(xpos), static_cast<int>(ypos),
     //  RescaleMouseScroll(yoffset));
-
-
   }
 
-
-
-
-} // namespace ImGui
-
 } // namespace BABYLON
-

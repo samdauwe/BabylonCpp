@@ -48,7 +48,7 @@ namespace ImGuiUtils
 
     void ShowDemo()
     {
-      ImGuiUtils::ImGuiRunner::WindowParams params;
+      ImGuiUtils::ImGuiRunner::AppWindowParams params;
       //params.FullScreen = true;
       params.Title = "Hello World";
       ImGuiUtils::ImGuiRunner::RunGui(DemoGui, params);

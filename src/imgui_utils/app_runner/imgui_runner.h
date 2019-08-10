@@ -20,7 +20,7 @@ namespace ImGuiUtils
 
     inline void EmptyPostInitFunction() {}
 
-    struct WindowParams
+    struct AppWindowParams
     {
       bool FullScreen = false;
       int Width = 1280;
@@ -28,16 +28,18 @@ namespace ImGuiUtils
       std::string Title = "My Window";
       GLFWwindow *ParentWindow = nullptr;
       ImVec4 ClearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+      bool ProvideFullScreenWindow = true;
+      bool ConfigWindowsMoveFromTitleBarOnly = true;
     };
 
     void RunGui(
       GuiFunctionWithExit guiFunction,
-      WindowParams windowParams = WindowParams(),
+      AppWindowParams appWindowParams = AppWindowParams(),
       PostInitFunction postInitFunction = EmptyPostInitFunction
       );
     void RunGui(
       GuiFunction guiFunction,
-      WindowParams windowParams = WindowParams(),
+      AppWindowParams appWindowParams = AppWindowParams(),
       PostInitFunction postInitFunction = EmptyPostInitFunction
     );
 

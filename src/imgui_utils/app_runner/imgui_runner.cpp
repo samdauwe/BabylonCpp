@@ -77,7 +77,7 @@ namespace ImGuiUtils
 
     void RunGui(
       GuiFunctionWithExit guiFunction,
-      WindowParams windowParams,
+      AppWindowParams appWindowParams,
       PostInitFunction postInitFunction
     )
     {
@@ -86,18 +86,17 @@ namespace ImGuiUtils
       // Create GLFWwindow
       GlfwRunner::GLFWWindowParams glfwWindowParams;
       {
-        glfwWindowParams.FullScreen = windowParams.FullScreen;
-        glfwWindowParams.Height = windowParams.Height;
-        glfwWindowParams.Width = windowParams.Width;
-        glfwWindowParams.ParentWindow = windowParams.ParentWindow;
-        glfwWindowParams.Title = windowParams.Title;
+        glfwWindowParams.FullScreen = appWindowParams.FullScreen;
+        glfwWindowParams.Height = appWindowParams.Height;
+        glfwWindowParams.Width = appWindowParams.Width;
+        glfwWindowParams.ParentWindow = appWindowParams.ParentWindow;
+        glfwWindowParams.Title = appWindowParams.Title;
       }
       GLFWwindow* window = GlfwRunner::GLFW_CreateWindow(glfwWindowParams);
 
       GlfwRunner::Glad_Init();
       ImGui_Init(window);      
 
-      postInitFunction();
 
       // Main loop
       while (!glfwWindowShouldClose(window))
@@ -111,9 +110,27 @@ namespace ImGuiUtils
 
         ImGui_PrepareNewFrame();
 
+        static bool postInited = false;
+        if (!postInited)
+        {
+          postInitFunction();
+          ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = appWindowParams.ConfigWindowsMoveFromTitleBarOnly;
+          postInited = true;
+        }
+
+        if (appWindowParams.ProvideFullScreenWindow)
+        {
+          ImGui::SetNextWindowPos(ImVec2(0, 0));
+          ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
+          ImGui::Begin("Main window (title bar invisible)", NULL, ImGuiWindowFlags_NoDecoration);
+        }
+
         bool shouldExit = guiFunction();
 
-        ImGui_ImplRender(window, windowParams.ClearColor);
+        if (appWindowParams.ProvideFullScreenWindow)
+          ImGui::End();
+
+        ImGui_ImplRender(window, appWindowParams.ClearColor);
 
         glfwSwapBuffers(window);
 
@@ -128,7 +145,7 @@ namespace ImGuiUtils
 
     void RunGui(
       GuiFunction guiFunction,
-      WindowParams windowParams,
+      AppWindowParams windowParams,
       PostInitFunction postInitFunction)
     {
       GuiFunctionWithExit guiFunctionWithExit = [&]() -> bool {
