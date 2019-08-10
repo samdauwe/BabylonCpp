@@ -3,7 +3,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-namespace BABYLON
+namespace ImGuiUtils
 {
   namespace GlfwRunner
   {
@@ -33,7 +33,7 @@ namespace BABYLON
   } // namespace Glfw_Helpers
 
 
-} // namespace BABYLON
+} // namespace imgui_utilss
 
 
 

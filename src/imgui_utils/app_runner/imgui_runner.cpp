@@ -8,7 +8,7 @@
 #include <imgui_utils/app_runner/details/glfw_runner.h>
 #include <imgui_utils/app_runner/imgui_runner.h>
 
-namespace imgui_utils
+namespace ImGuiUtils
 {
   namespace ImGuiRunner
   {
@@ -63,7 +63,7 @@ namespace imgui_utils
       ImGui::NewFrame();
     }
 
-    void ImGui_ImplRender(GLFWwindow* window, ImVec4 &clear_color)
+    void ImGui_ImplRender(GLFWwindow* window, const ImVec4 &clear_color)
     {
       // Rendering
       ImGui::Render();
@@ -75,16 +75,29 @@ namespace imgui_utils
       ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
-    void RunGui(GuiFunction guiFunction)
+    void RunGui(
+      GuiFunctionWithExit guiFunction,
+      WindowParams windowParams,
+      PostInitFunction postInitFunction
+    )
     {
       GlfwRunner::GLFW_Init();
+
       // Create GLFWwindow
       GlfwRunner::GLFWWindowParams glfwWindowParams;
+      {
+        glfwWindowParams.FullScreen = windowParams.FullScreen;
+        glfwWindowParams.Height = windowParams.Height;
+        glfwWindowParams.Width = windowParams.Width;
+        glfwWindowParams.ParentWindow = windowParams.ParentWindow;
+        glfwWindowParams.Title = windowParams.Title;
+      }
       GLFWwindow* window = GlfwRunner::GLFW_CreateWindow(glfwWindowParams);
-      GlfwRunner::Glad_Init();
-      ImGui_Init(window);
 
-      ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+      GlfwRunner::Glad_Init();
+      ImGui_Init(window);      
+
+      postInitFunction();
 
       // Main loop
       while (!glfwWindowShouldClose(window))
@@ -98,17 +111,32 @@ namespace imgui_utils
 
         ImGui_PrepareNewFrame();
 
-        guiFunction();
+        bool shouldExit = guiFunction();
 
-        ImGui_ImplRender(window, clear_color);
+        ImGui_ImplRender(window, windowParams.ClearColor);
 
         glfwSwapBuffers(window);
+
+        if (shouldExit)
+          break;
       }
 
       ImGui_Cleanup();
       GlfwRunner::GLFW_Cleanup(window);
     }
 
+
+    void RunGui(
+      GuiFunction guiFunction,
+      WindowParams windowParams,
+      PostInitFunction postInitFunction)
+    {
+      GuiFunctionWithExit guiFunctionWithExit = [&]() -> bool {
+        guiFunction();
+        return false;
+      };
+      RunGui(guiFunctionWithExit, windowParams, postInitFunction);
+    }
 
   } // namespace ImGuiRunner
 } // namespace imgui_utils

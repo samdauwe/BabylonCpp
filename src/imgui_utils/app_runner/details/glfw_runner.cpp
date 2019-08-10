@@ -1,6 +1,6 @@
 #include <imgui_utils/app_runner/details/glfw_runner.h>
 
-namespace imgui_utils
+namespace ImGuiUtils
 {
   namespace GlfwRunner
   {
@@ -44,31 +44,31 @@ namespace imgui_utils
 
     GLFWwindow* GLFW_CreateWindow(const GLFWWindowParams & params)
     {
-      GLFWmonitor* monitor = nullptr; // will be set only if full screen is required
+      GLFWwindow* window = nullptr;
 
       // Check if full screen mode is requested
       if (params.FullScreen)
       {
-        monitor = glfwGetPrimaryMonitor();
-        const auto videoMode = glfwGetVideoMode(monitor);
-        glfwWindowHint(GLFW_REFRESH_RATE, videoMode->refreshRate);
-        glfwWindowHint(GLFW_RED_BITS, videoMode->redBits);
-        glfwWindowHint(GLFW_BLUE_BITS, videoMode->blueBits);
-        glfwWindowHint(GLFW_GREEN_BITS, videoMode->greenBits);
-        glfwWindowHint(GLFW_ALPHA_BITS, videoMode->redBits);
-        glfwWindowHint(GLFW_DEPTH_BITS, videoMode->redBits * 4);
-      }
+        GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 
-      GLFWwindow* glfwWindow = glfwCreateWindow(params.Width, params.Height, params.Title.c_str(), nullptr, params.ParentWindow);
+        const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+        glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+        glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+        glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+        glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+        window = glfwCreateWindow(mode->width, mode->height, "My Title", monitor, params.ParentWindow);
+      }
+      else
+        window = glfwCreateWindow(params.Width, params.Height, params.Title.c_str(), nullptr, params.ParentWindow);
 
       // Confirm that GLFW window was created successfully
-      if (!glfwWindow) {
+      if (!window) {
         glfwTerminate();
         throw std::runtime_error("CreateGLFWWindow Failed");
       }
 
       // Make the window's context current
-      glfwMakeContextCurrent(glfwWindow);
+      glfwMakeContextCurrent(window);
 
       // Enable vsync
       glfwSwapInterval(1);
@@ -85,7 +85,7 @@ namespace imgui_utils
       //// Window resize events
       //glfwSetWindowSizeCallback(window.glfwWindow, GLFWWindowSizeCallback);
 
-      return glfwWindow;
+      return window;
     }
 
     void GLFW_Cleanup(GLFWwindow* window)
