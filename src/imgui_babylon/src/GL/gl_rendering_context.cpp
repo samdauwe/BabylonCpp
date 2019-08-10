@@ -1,4 +1,4 @@
-#include <SamplesRunner/impl/gl_rendering_context.h>
+#include <babylon/GL/gl_rendering_context.h>
 
 #include <array>
 

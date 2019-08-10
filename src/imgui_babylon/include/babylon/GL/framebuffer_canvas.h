@@ -1,13 +1,14 @@
 #ifndef BABYLON_IMPL_CANVAS_H
 #define BABYLON_IMPL_CANVAS_H
 
-#include <SamplesRunner/impl/gl_rendering_context.h>
+#include <babylon/GL/gl_rendering_context.h>
 #include <babylon/interfaces/icanvas.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 namespace impl {
 
-class FramebufferCanvas : public ICanvas 
+class FramebufferCanvas : public ICanvas
 {
 
 public:

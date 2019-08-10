@@ -3,6 +3,7 @@
 
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <unordered_map>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 namespace GL {

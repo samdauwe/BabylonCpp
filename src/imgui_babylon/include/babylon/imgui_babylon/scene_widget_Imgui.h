@@ -1,6 +1,7 @@
 #include <babylon/interfaces/irenderable_scene.h>
-#include "SamplesRunner/impl/framebuffer_canvas.h"
+#include "babylon/GL/framebuffer_canvas.h"
 #include <imgui.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
   class SceneWidget_ImGui

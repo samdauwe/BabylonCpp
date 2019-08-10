@@ -1,5 +1,5 @@
-#include "SamplesRunner/impl/framebuffer_canvas.h"
-#include "SamplesRunner/scene_widget_imgui.h"
+#include "babylon/GL/framebuffer_canvas.h"
+#include "babylon/imgui_babylon/scene_widget_imgui.h"
 #include <imgui.h>
 
 #ifdef _MSC_VER

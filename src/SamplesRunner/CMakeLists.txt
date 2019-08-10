@@ -58,6 +58,7 @@ target_link_libraries(${TARGET}
     glad
     imgui
     imgui_utils
+    imgui_babylon
     ${OPENGL_LIBRARIES}
     BabylonCpp
     Samples

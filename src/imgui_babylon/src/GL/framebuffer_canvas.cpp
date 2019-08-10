@@ -1,5 +1,5 @@
-#include <SamplesRunner/impl/framebuffer_canvas.h>
-#include <SamplesRunner/impl/gl_rendering_context.h>
+#include <babylon/GL/framebuffer_canvas.h>
+#include <babylon/GL/gl_rendering_context.h>
 #include <glad/glad.h>
 
 namespace BABYLON {

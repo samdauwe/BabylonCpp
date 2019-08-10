@@ -1,6 +1,6 @@
 #include <imgui_utils/app_runner/imgui_runner.h>
+#include <babylon/imgui_babylon/scene_widget_Imgui.h>
 #include "SamplesRunner/HelloScene.h"
-#include "SamplesRunner/scene_widget_imgui.h"
 
 struct AppContext
 {
