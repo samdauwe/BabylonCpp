@@ -173,6 +173,7 @@ void glad_pre_call_callback(const char* name, void* /*funcptr*/,
 
 bool GLRenderingContext::initialize(bool enableGLDebugging)
 {
+  // HUM : glad already loaded by imgui ?
   // Initialize glad
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
     fprintf(stderr, "gladLoadGLLoader: Failed to initialize OpenGL context\n");

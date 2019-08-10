@@ -84,6 +84,9 @@ public:
 
 private:
   int initGLFW();
+
+  void InitGlfw_Hints();
+
   bool initGL(Window& window);
   void updateWindowFPS(Window& window);
   int initializeScene();

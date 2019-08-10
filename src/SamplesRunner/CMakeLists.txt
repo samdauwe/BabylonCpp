@@ -53,10 +53,11 @@ target_include_directories(${TARGET}
 
 # Libraries
 target_link_libraries(${TARGET}
-    PUBLIC
+    PRIVATE
     glfw
     glad
     imgui
+    imgui_utils
     ${OPENGL_LIBRARIES}
     BabylonCpp
     Samples
