@@ -95,7 +95,7 @@ private:
 private:
   State _sampleLauncherState;
   int _defaultWinResX, _defaultWinResY;
-#ifdef WITH_INSPECTOR
+#ifdef WITH_IMGUI_BABYLON
   bool _showInspectorWindow;
   // Inspector
   std::unique_ptr<Inspector> _inspector;

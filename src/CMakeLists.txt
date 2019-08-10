@@ -1,7 +1,7 @@
 # ============================================================================ #
 #                            Configuration options                             #
 # ============================================================================ #
-option(OPTION_BUILD_INSPECTOR "Build the inspector debugging tool."  ON)
+option(OPTION_BUILD_IMGUI_BABYLON "Build the inspector debugging tool."  ON)
 option(OPTION_BUILD_LOADERS   "Build the loader plugins."            ON)
 
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
@@ -28,10 +28,9 @@ if (OPTION_BUILD_LOADERS)
     # - Loaders
     add_subdirectory(Loaders)
 endif()
-# - Inspector
-if (OPTION_BUILD_INSPECTOR)
-    # Include Inspector
-    add_subdirectory(Inspector)
+# - imgui_babylon and Inspector
+if (OPTION_BUILD_IMGUI_BABYLON)
+    add_subdirectory(imgui_babylon)
 endif()
 # - Samples
 add_subdirectory(Samples)

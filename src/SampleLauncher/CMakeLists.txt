@@ -19,10 +19,10 @@ project(${TARGET} C CXX)
 # Print status message
 message(STATUS "App ${TARGET}")
 
-# Inspector
-if (OPTION_BUILD_INSPECTOR)
+# imgui_babylon and Inspector
+if (OPTION_BUILD_IMGUI_BABYLON)
     # Set define for usage in source code
-    add_definitions(-DWITH_INSPECTOR)
+    add_definitions(-DWITH_IMGUI_BABYLON)
 endif()
 
 # ============================================================================ #
@@ -65,11 +65,11 @@ target_include_directories(${TARGET}
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-if (OPTION_BUILD_INSPECTOR)
+if (OPTION_BUILD_IMGUI_BABYLON)
     target_include_directories(${TARGET}
         PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/../Inspector/include
-        ${CMAKE_CURRENT_BINARY_DIR}/../Inspector/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/../imgui_babylon/include
+        ${CMAKE_CURRENT_BINARY_DIR}/../imgui_babylon/include
     )
 endif()
 
@@ -83,10 +83,10 @@ target_link_libraries(${TARGET}
     glad
 )
 
-if (OPTION_BUILD_INSPECTOR)
+if (OPTION_BUILD_IMGUI_BABYLON)
     target_link_libraries(${TARGET}
         PUBLIC
-        Inspector
+        imgui_babylon
     )
 endif()
 

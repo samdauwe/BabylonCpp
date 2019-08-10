@@ -8,7 +8,7 @@
 #include <babylon/core/string.h>
 #include <babylon/samples/sample_launcher.h>
 #include <babylon/samples/samples_index.h>
-#ifdef WITH_INSPECTOR
+#ifdef WITH_IMGUI_BABYLON
 #include <babylon/inspector/inspector.h>
 #endif
 
@@ -95,7 +95,7 @@ int runSample(const BABYLON::Samples::SamplesIndex& samples,
   // the callback BABYLON::Inspector::OnSampleChanged
   // which will the content of "nextSample"
   ConsumableValue<std::string> nextSample(startSampleName);
-  #ifdef WITH_INSPECTOR
+  #ifdef WITH_IMGUI_BABYLON
   BABYLON::Inspector::OnSampleChanged = [&nextSample](const std::string & s) {
     nextSample.setValue(s);
   };
