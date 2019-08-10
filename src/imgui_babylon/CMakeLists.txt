@@ -81,6 +81,7 @@ source_group_by_path(${SOURCE_PATH}  "\\\\.cpp$|\\\\.c$|\\\\.h$|\\\\.hpp$"
 
 # Build library
 add_library(${TARGET}
+    STATIC
     ${BABYLON_INSPECTOR_SOURCES}
     ${BABYLON_INSPECTOR_HEADERS}
 )
