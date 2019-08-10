@@ -23,9 +23,20 @@ function(source_group_by_path PARENT_PATH REGEX GROUP)
         file(RELATIVE_PATH FILEPATH ${PARENT_PATH} ${FILEPATH})
         get_filename_component(FILEPATH "${FILEPATH}" DIRECTORY)
         string(REPLACE "/" "\\" FILEPATH "${FILEPATH}")
-	source_group("${GROUP}\\${FILEPATH}" REGULAR_EXPRESSION "${REGEX}" FILES ${FILENAME})
+	      source_group("${GROUP}\\${FILEPATH}" REGULAR_EXPRESSION "${REGEX}" FILES ${FILENAME})
     endforeach()
 endfunction(source_group_by_path)
+
+function(source_group_by_path_all PARENT_PATH)
+    foreach (FILENAME ${ARGN})
+        get_filename_component(FILEPATH "${FILENAME}" REALPATH)
+        file(RELATIVE_PATH FILEPATH ${PARENT_PATH} ${FILEPATH})
+        get_filename_component(FILEPATH "${FILEPATH}" DIRECTORY)
+        string(REPLACE "/" "\\" FILEPATH "${FILEPATH}")
+    source_group("${FILEPATH}" FILES ${FILENAME})
+endforeach()
+
+endfunction(source_group_by_path_all)
 
 
 # Function that extract entries matching a given regex from a list.
