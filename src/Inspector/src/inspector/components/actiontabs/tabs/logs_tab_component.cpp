@@ -1,7 +1,7 @@
 #include <babylon/inspector/components/actiontabs/tabs/logs_tab_component.h>
 
 #include <babylon/core/logging.h>
-#include <babylon/imgui/imgui_utils.h>
+#include <imgui_utils/imgui_utils.h>
 
 #include <iostream>
 

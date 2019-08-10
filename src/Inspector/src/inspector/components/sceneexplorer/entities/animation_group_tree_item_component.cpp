@@ -2,7 +2,7 @@
 
 #include <babylon/animations/animation_group.h>
 #include <babylon/core/string.h>
-#include <babylon/imgui/imgui_utils.h>
+#include <imgui_utils/imgui_utils.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_label_component.h>
 
 namespace BABYLON {

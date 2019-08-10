@@ -14,6 +14,8 @@ endif()
 
 #-- Libraries --##
 set(IDE_FOLDER "")
+# - imgui_utils
+add_subdirectory(imgui_utils)
 # - Babylon.js Cpp
 add_subdirectory(BabylonCpp)
 # - Extensions

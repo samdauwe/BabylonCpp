@@ -5,7 +5,7 @@
 #include <string>
 
 #include <babylon/babylon_api.h>
-#include <babylon/imgui/icons_font_awesome_5.h>
+#include <imgui_utils/icons_font_awesome_5.h>
 #include <babylon/inspector/components/actiontabs/pane_component.h>
 #include <babylon/inspector/entity.h>
 #include <babylon/misc/observer.h>

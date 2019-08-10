@@ -9,7 +9,7 @@
 #endif
 
 // from https://github.com/juliettef/IconFontCppHeaders
-#include <babylon/imgui/icons_font_awesome_5.h>
+#include <imgui_utils/icons_font_awesome_5.h>
 
 namespace ImGui {
 

@@ -2,7 +2,7 @@
 #define BABYLON_INSPECTOR_COMPONENTS_SCENE_EXPLORER_TREE_ITEM_ICON_COMPONENT_H
 
 // ImGui
-#include <babylon/imgui/imgui_utils.h>
+#include <imgui_utils/imgui_utils.h>
 
 #include <babylon/babylon_api.h>
 

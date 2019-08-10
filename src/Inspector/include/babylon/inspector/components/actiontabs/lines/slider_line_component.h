@@ -4,7 +4,7 @@
 #include <optional>
 
 #include <babylon/babylon_api.h>
-#include <babylon/imgui/imgui_utils.h>
+#include <imgui_utils/imgui_utils.h>
 
 namespace BABYLON {
 

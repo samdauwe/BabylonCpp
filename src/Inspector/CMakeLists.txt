@@ -64,23 +64,8 @@ set(SOURCE_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(TESTS_PATH   "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 
 # Header files
-file(GLOB_RECURSE INSPECTOR_HDR_FILES
-    ${GLXW_INCLUDE_DIRS}/GL/*.h
-    ${INCLUDE_PATH}/*.h
-)
-
-set(BABYLON_INSPECTOR_HEADERS
-    ${INSPECTOR_HDR_FILES}
-)
-
-# Source files
-file(GLOB_RECURSE INSPECTOR_SRC_FILES
-    ${SOURCE_PATH}/*.cpp
-)
-
-set(BABYLON_INSPECTOR_SOURCES
-    ${INSPECTOR_SRC_FILES}
-)
+file(GLOB_RECURSE BABYLON_INSPECTOR_HEADERS ${INCLUDE_PATH}/*.h)
+file(GLOB_RECURSE BABYLON_INSPECTOR_SOURCES ${SOURCE_PATH}/*.cpp)
 
 # Group source files
 set(HEADER_GROUP "Header Files (API)")
@@ -160,6 +145,7 @@ target_link_libraries(${TARGET}
     Samples
     glad
     imgui
+    imgui_utils
 )
 if (APPLE) # Special case for Apple OpenGL framework
     target_link_libraries(${TARGET} PRIVATE "-framework OpenGL")

@@ -2,7 +2,7 @@
 #include <filesystem>
 #endif
 #include <babylon/core/string.h>
-#include <babylon/imgui/icons_font_awesome_5.h>
+#include <imgui_utils/icons_font_awesome_5.h>
 #include <babylon/inspector/components/actiontabs/tabs/sample_list_component.h>
 
 #include <imgui.h>
