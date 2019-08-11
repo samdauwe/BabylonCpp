@@ -29,7 +29,7 @@ void SwitchBooleanAction::_prepare()
   _property        = _getProperty(propertyPath);
 }
 
-void SwitchBooleanAction::execute(const ActionEvent& /*evt*/)
+void SwitchBooleanAction::execute(const std::optional<IActionEvent>& /*evt*/)
 {
   auto prop = _effectiveTarget->getProperty({_property});
   if (prop && (prop.animationType() == Animation::ANIMATIONTYPE_BOOL())) {

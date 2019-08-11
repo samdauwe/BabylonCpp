@@ -17,7 +17,7 @@ SetStateAction::~SetStateAction()
 {
 }
 
-void SetStateAction::execute(const ActionEvent& /*evt*/)
+void SetStateAction::execute(const std::optional<IActionEvent>& /*evt*/)
 {
   _target->state = value;
 }

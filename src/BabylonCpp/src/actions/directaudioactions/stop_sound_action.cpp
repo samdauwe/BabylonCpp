@@ -19,7 +19,7 @@ void StopSoundAction::_prepare()
 {
 }
 
-void StopSoundAction::execute(const ActionEvent& /*evt*/)
+void StopSoundAction::execute(const std::optional<IActionEvent>& /*evt*/)
 {
   if (_sound != nullptr) {
     _sound->stop();

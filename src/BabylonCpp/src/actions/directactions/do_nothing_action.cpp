@@ -14,7 +14,7 @@ DoNothingAction::~DoNothingAction()
 {
 }
 
-void DoNothingAction::execute(const ActionEvent& /*evt*/)
+void DoNothingAction::execute(const std::optional<IActionEvent>& /*evt*/)
 {
 }
 

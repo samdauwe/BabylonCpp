@@ -39,7 +39,7 @@ public:
    */
   Action(unsigned int triggerOptions, Condition* condition = nullptr);
   Action(const TriggerOptions& triggerOptions, Condition* condition = nullptr);
-  virtual ~Action();
+  virtual ~Action() override;
 
   /** Methods **/
 
@@ -57,13 +57,13 @@ public:
   /**
    * @brief Internal only - executes current action event.
    */
-  void _executeCurrent(const ActionEvent& evt) override;
+  void _executeCurrent(const std::optional<IActionEvent>& evt) override;
 
   /**
    * @brief Execute placeholder for child classes.
    * @param evt optional action event
    */
-  virtual void execute(const ActionEvent& evt);
+  virtual void execute(const std::optional<IActionEvent>& evt);
 
   /**
    * @brief Skips to next active action.

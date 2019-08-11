@@ -19,7 +19,7 @@ void PlaySoundAction::_prepare()
 {
 }
 
-void PlaySoundAction::execute(const ActionEvent& /*evt*/)
+void PlaySoundAction::execute(const std::optional<IActionEvent>& /*evt*/)
 {
   if (_sound != nullptr) {
     _sound->play();

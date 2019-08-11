@@ -23,7 +23,7 @@ void CombineAction::_prepare()
   }
 }
 
-void CombineAction::execute(const ActionEvent& evt)
+void CombineAction::execute(const std::optional<IActionEvent>& evt)
 {
   for (auto& child : children) {
     child->execute(evt);

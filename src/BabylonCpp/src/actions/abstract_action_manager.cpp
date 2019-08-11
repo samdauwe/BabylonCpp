@@ -2,6 +2,9 @@
 
 namespace BABYLON {
 
+std::array<unsigned int, 17> AbstractActionManager::Triggers{
+  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+
 AbstractActionManager::AbstractActionManager()
     : hoverCursor{""}
     , isRecursive{false}

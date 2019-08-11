@@ -15,6 +15,7 @@ namespace BABYLON {
 
 class ActionEvent;
 class ActionManager;
+struct IActionEvent;
 
 /**
  * @brief Interface used to define Action.
@@ -41,7 +42,7 @@ struct BABYLON_SHARED_EXPORT IAction {
    * @brief Internal only - executes current action event.
    * Hidden
    */
-  virtual void _executeCurrent(const ActionEvent& evt) = 0;
+  virtual void _executeCurrent(const std::optional<IActionEvent>& evt) = 0;
 
   /**
    * @brief Serialize placeholder for child classes.

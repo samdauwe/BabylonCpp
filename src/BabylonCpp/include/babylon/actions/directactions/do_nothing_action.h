@@ -27,7 +27,7 @@ public:
   /**
    * @brief Execute the action and do nothing.
    */
-  void execute(const ActionEvent& evt) override;
+  void execute(const std::optional<IActionEvent>& evt) override;
 
   /**
    * @brief Serializes the actions and its related information.

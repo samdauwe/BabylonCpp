@@ -15,13 +15,9 @@
 
 namespace BABYLON {
 
-std::array<unsigned int, 17> ActionManager::Triggers{
-  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
-size_t ActionManager::DragMovementThreshold = 10;  // in pixels
-size_t ActionManager::LongPressDelay        = 500; // in milliseconds
-
 ActionManager::ActionManager(Scene* scene)
-    : hoverCursor{""}, _scene{scene ? scene : Engine::LastCreatedScene()}
+    : AbstractActionManager{}
+    , _scene{scene ? scene : Engine::LastCreatedScene()}
 {
 }
 
@@ -29,30 +25,26 @@ ActionManager::~ActionManager()
 {
 }
 
-void ActionManager::addToScene(
-  const std::shared_ptr<ActionManager>& /*newActionManager*/)
+void ActionManager::addToScene(const ActionManagerPtr& newActionManager)
 {
-#if 0
   _scene->actionManagers.emplace_back(newActionManager);
-#endif
 }
 
-void ActionManager::dispose()
+void ActionManager::dispose(bool /*doNotRecurse*/,
+                            bool /*disposeMaterialAndTextures*/)
 {
-  for (auto& action : actions) {
+  for (const auto& action : actions) {
     if ((action->trigger < ActionManager::Triggers.size())
         && (ActionManager::Triggers[action->trigger] > 0)) {
       --ActionManager::Triggers[action->trigger];
     }
   }
-#if 0
   _scene->actionManagers.erase(
     std::remove_if(_scene->actionManagers.begin(), _scene->actionManagers.end(),
-                   [this](const std::shared_ptr<ActionManager>& actionManager) {
+                   [this](const AbstractActionManagerPtr& actionManager) {
                      return actionManager.get() == this;
                    }),
     _scene->actionManagers.end());
-#endif
 }
 
 Scene* ActionManager::getScene() const
@@ -63,7 +55,7 @@ Scene* ActionManager::getScene() const
 bool ActionManager::hasSpecificTriggers(const Uint32Array& triggers) const
 {
   return std::find_if(actions.begin(), actions.end(),
-                      [&triggers](Action* action) {
+                      [&triggers](const IActionPtr& action) {
                         return std::find(triggers.begin(), triggers.end(),
                                          action->trigger)
                                != triggers.end();
@@ -90,7 +82,7 @@ bool ActionManager::hasSpecificTrigger(
 {
   return std::find_if(
            actions.begin(), actions.end(),
-           [&trigger, &parameterPredicate](Action* action) {
+           [&trigger, &parameterPredicate](const IActionPtr& action) {
              if (action->trigger == trigger) {
                if (parameterPredicate) {
                  if (parameterPredicate(action->getTriggerParameter())) {
@@ -106,11 +98,11 @@ bool ActionManager::hasSpecificTrigger(
          != actions.end();
 }
 
-bool ActionManager::hasPointerTriggers() const
+bool ActionManager::get_hasPointerTriggers() const
 {
 
   return std::find_if(actions.begin(), actions.end(),
-                      [](Action* action) {
+                      [](const IActionPtr& action) {
                         return action->trigger >= ActionManager::OnPickTrigger
                                && action->trigger
                                     <= ActionManager::OnPointerOutTrigger;
@@ -118,10 +110,10 @@ bool ActionManager::hasPointerTriggers() const
          != actions.end();
 }
 
-bool ActionManager::hasPickTriggers() const
+bool ActionManager::get_hasPickTriggers() const
 {
   return std::find_if(actions.begin(), actions.end(),
-                      [](Action* action) {
+                      [](const IActionPtr& action) {
                         return action->trigger >= ActionManager::OnPickTrigger
                                && action->trigger
                                     <= ActionManager::OnPickUpTrigger;
@@ -152,17 +144,15 @@ bool ActionManager::HasSpecificTrigger(unsigned int trigger)
          && (ActionManager::Triggers[trigger] > 0);
 }
 
-Action* ActionManager::registerAction(Action* action)
+IActionPtr ActionManager::registerAction(const IActionPtr& action)
 {
   if (action->trigger == ActionManager::OnEveryFrameTrigger) {
-#if 0
-    if (getScene()->actionManager != this) {
+    if (!getScene()->actionManager && getScene()->actionManager.get() != this) {
       BABYLON_LOG_WARN(
         "ActionManager",
-        "OnEveryFrameTrigger can only be used with scene.actionManager");
+        "OnEveryFrameTrigger can only be used with scene.actionManager")
       return nullptr;
     }
-#endif
   }
 
   actions.emplace_back(action);
@@ -177,7 +167,7 @@ Action* ActionManager::registerAction(Action* action)
   return action;
 }
 
-bool ActionManager::unregisterAction(Action* action)
+bool ActionManager::unregisterAction(const IActionPtr& action)
 {
   auto index = stl_util::index_of(actions, action);
   if (index == -1) {
@@ -193,30 +183,32 @@ bool ActionManager::unregisterAction(Action* action)
 }
 
 void ActionManager::processTrigger(unsigned int trigger,
-                                   const ActionEvent& evt) const
+                                   const std::optional<IActionEvent>& evt)
 {
   for (const auto& action : actions) {
     if (action->trigger == trigger) {
-      if (trigger == ActionManager::OnKeyUpTrigger
-          || trigger == ActionManager::OnKeyDownTrigger) {
-        const auto parameter   = action->getTriggerParameter();
-        const auto sourceEvent = *evt.sourceEvent;
-        if (!parameter.empty()
-            && parameter
-                 != std::to_string(static_cast<char>(sourceEvent.keyCode))) {
-          auto lowerCase = String::toLowerCase(parameter);
-          if (lowerCase.empty()) {
-            continue;
-          }
-
-          if (lowerCase
-              != std::to_string(static_cast<char>(sourceEvent.keyCode))) {
-            auto unicode = sourceEvent.charCode ? sourceEvent.charCode :
-                                                  sourceEvent.keyCode;
-            auto actualkey
-              = String::toLowerCase(std::to_string(static_cast<char>(unicode)));
-            if (actualkey != lowerCase) {
+      if (evt.has_value()) {
+        if (trigger == ActionManager::OnKeyUpTrigger
+            || trigger == ActionManager::OnKeyDownTrigger) {
+          const auto parameter   = action->getTriggerParameter();
+          const auto sourceEvent = *evt->sourceEvent;
+          if (!parameter.empty()
+              && parameter
+                   != std::to_string(static_cast<char>(sourceEvent.keyCode))) {
+            auto lowerCase = String::toLowerCase(parameter);
+            if (lowerCase.empty()) {
               continue;
+            }
+
+            if (lowerCase
+                != std::to_string(static_cast<char>(sourceEvent.keyCode))) {
+              auto unicode = sourceEvent.charCode ? sourceEvent.charCode :
+                                                    sourceEvent.keyCode;
+              auto actualkey = String::toLowerCase(
+                std::to_string(static_cast<char>(unicode)));
+              if (actualkey != lowerCase) {
+                continue;
+              }
             }
           }
         }
@@ -224,10 +216,6 @@ void ActionManager::processTrigger(unsigned int trigger,
       action->_executeCurrent(evt);
     }
   }
-}
-
-void ActionManager::processTrigger(unsigned int /*trigger*/) const
-{
 }
 
 IAnimatablePtr
@@ -258,7 +246,6 @@ json ActionManager::serialize(const std::string& /*name*/) const
 void ActionManager::Parse(const std::vector<json>& /*parsedActions*/,
                           const AbstractMeshPtr& /*object*/, Scene* /*scene*/)
 {
-  // TODO FIXME
 }
 
 std::string ActionManager::GetTriggerName(unsigned int trigger)

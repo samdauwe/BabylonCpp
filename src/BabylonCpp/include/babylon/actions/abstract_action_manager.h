@@ -45,7 +45,8 @@ public:
    * @param evt defines the event details to be processed
    */
   virtual void processTrigger(unsigned int trigger,
-                              std::optional<IActionEvent> evt = std::nullopt)
+                              const std::optional<IActionEvent>& evt
+                              = std::nullopt)
     = 0;
 
   /**
@@ -55,7 +56,7 @@ public:
    * @return a boolean indicating whether one (or more) of the triggers is
    * handled
    */
-  virtual bool hasSpecificTriggers(Uint32Array triggers) = 0;
+  virtual bool hasSpecificTriggers(const Uint32Array& triggers) const = 0;
 
   /**
    * @brief Does this action manager handles actions of any of the given
@@ -66,8 +67,7 @@ public:
    * handled
    */
   virtual bool hasSpecificTriggers2(unsigned int triggerA,
-                                    unsigned int triggerB)
-    = 0;
+                                    unsigned int triggerB) const = 0;
 
   /**
    * @brief Does this action manager handles actions of a given trigger.
@@ -76,17 +76,17 @@ public:
    * by parameter
    * @return whether the trigger is handled
    */
-  virtual bool hasSpecificTrigger(unsigned int trigger,
-                                  const std::function<bool()> parameterPredicate
-                                  = nullptr)
-    = 0;
+  virtual bool hasSpecificTrigger(
+    unsigned int trigger,
+    const std::function<bool(const std::string& parameter)>& parameterPredicate
+    = nullptr) const = 0;
 
   /**
    * @brief Serialize this manager to a JSON object.
    * @param name defines the property name to store this manager
    * @returns a JSON representation of this manager
    */
-  virtual json serialize(const std::string& name) = 0;
+  virtual json serialize(const std::string& name) const = 0;
 
   /**
    * @brief Registers an action to this action manager.

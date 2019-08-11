@@ -23,7 +23,7 @@ void StopAnimationAction::_prepare()
 {
 }
 
-void StopAnimationAction::execute(const ActionEvent& /*evt*/)
+void StopAnimationAction::execute(const std::optional<IActionEvent>& /*evt*/)
 {
   // auto scene = _actionManager->getScene();
   // scene->stopAnimation(_target);
