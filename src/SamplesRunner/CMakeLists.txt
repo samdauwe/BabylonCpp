@@ -59,6 +59,7 @@ target_link_libraries(${TARGET}
     imgui
     imgui_utils
     imgui_babylon
+    ImGuiColorTextEdit
     ${OPENGL_LIBRARIES}
     BabylonCpp
     Samples
