@@ -22,27 +22,33 @@ using GlobalStatePtr = std::shared_ptr<GlobalState>;
 class Inspector {
 
 public:
-  Inspector(GLFWwindow* glfwWindow, Scene* scene = nullptr);
+  Inspector(GLFWwindow* glfwWindow = nullptr, Scene* scene = nullptr);
   ~Inspector();
 
   Scene* scene() const;
   void setScene(Scene* scene);
+  void render(bool createWindow);
 
-  void intialize();
-  void render();
-  void dispose();
+  // these methods handle the internals of imgui
+  // they are not part of the inspector interface
+  // when imgui is handled elsewhere
+  void imgui_initialize();
+  void imgui_LoadFontAwesome();
+  void imgui_render_and_display();
+  void imgui_dispose();
 
   // Global function that will be called when a new sample is selected
   // (This function is set from SampleLauncher/src/main.cpp)
   static std::function<void(const std::string &)> OnSampleChanged;
 
 private:
+  void _showFps();
   void _fileMenu();
   void _addActions();
   void _doMenuItem(InspectorAction& a, bool enabled);
   void _pushFonts();
   void _popFonts();
-  void _renderInspector();
+  void _renderInspector(bool createWindow);
 
 private:
   GLFWwindow* _glfwWindow;

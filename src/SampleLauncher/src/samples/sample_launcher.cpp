@@ -420,7 +420,7 @@ int SampleLauncher::run(std::function<bool(void)> exitRequired, long runTime)
       // Make the window's context current
       glfwMakeContextCurrent(_inspectorWindow.glfwWindow);
       // Render inspector window
-      _inspector->render();
+      _inspector->imgui_render_and_display();
       // Swap front and back buffers
       glfwSwapBuffers(_inspectorWindow.glfwWindow);
     }
@@ -454,7 +454,7 @@ void SampleLauncher::destroy()
   glfwDestroyWindow(_sceneWindow.glfwWindow);
 #ifdef WITH_IMGUI_BABYLON
   if (_showInspectorWindow && _inspector) {
-    _inspector->dispose();
+    _inspector->imgui_dispose();
   }
 #endif
   // Terminate GLFW
@@ -517,7 +517,7 @@ int SampleLauncher::initGLFW()
                      _inspectorWindow.title.c_str(), nullptr, &_sceneWindow);
     _inspectorWindow.lastTime = glfwGetTime();
     _inspector = std::make_unique<Inspector>(_inspectorWindow.glfwWindow);
-    _inspector->intialize();
+    _inspector->imgui_initialize();
   }
 #endif
 

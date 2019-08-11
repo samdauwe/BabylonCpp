@@ -7,11 +7,46 @@
 #include <imgui_impl_opengl3.h>
 #include <imgui_utils/app_runner/details/glfw_runner.h>
 #include <imgui_utils/app_runner/imgui_runner.h>
+#include <imgui_utils/icons_font_awesome_5.h>
+#include <imgui_utils/imgui_utils.h>
 
 namespace ImGuiUtils
 {
   namespace ImGuiRunner
   {
+    static ImFont* _fontRegular = nullptr;
+    static ImFont* _fontSolid = nullptr;
+
+    void LoadFontAwesome()
+    {
+      // Loads fonts
+      ImGuiIO& io = ImGui::GetIO();
+      io.Fonts->AddFontDefault();
+      static ImWchar ranges[] = { 0xf000, 0xf82f, 0 };
+      ImFontConfig config;
+      config.MergeMode = true;
+      auto fontRegularPath
+        = std::string("../assets/fonts/") + FONT_ICON_FILE_NAME_FAR;
+      _fontRegular = io.Fonts->AddFontFromFileTTF(fontRegularPath.c_str(),
+        ImGui::IconSize, &config, ranges);
+      auto fontSolidPath
+        = std::string("../assets/fonts/") + FONT_ICON_FILE_NAME_FAS;
+      _fontSolid = io.Fonts->AddFontFromFileTTF(fontSolidPath.c_str(),
+        ImGui::IconSize, &config, ranges);
+    }
+
+    void pushFontAwesome()
+    {
+      ImGui::PushFont(_fontRegular);
+      ImGui::PushFont(_fontSolid);
+    }
+
+    void popFontAwesome()
+    {
+      ImGui::PopFont();
+      ImGui::PopFont();
+    }
+
 
     void ImGui_Init(GLFWwindow* window)
     {
@@ -95,7 +130,10 @@ namespace ImGuiUtils
       GLFWwindow* window = GlfwRunner::GLFW_CreateWindow(glfwWindowParams);
 
       GlfwRunner::Glad_Init();
-      ImGui_Init(window);      
+      ImGui_Init(window);
+
+      if (appWindowParams.LoadFontAwesome)
+        LoadFontAwesome();
 
 
       // Main loop
@@ -110,6 +148,9 @@ namespace ImGuiUtils
 
         ImGui_PrepareNewFrame();
 
+        if (appWindowParams.LoadFontAwesome)
+          pushFontAwesome();
+
         static bool postInited = false;
         if (!postInited)
         {
@@ -121,14 +162,20 @@ namespace ImGuiUtils
         if (appWindowParams.ProvideFullScreenWindow)
         {
           ImGui::SetNextWindowPos(ImVec2(0, 0));
-          ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
-          ImGui::Begin("Main window (title bar invisible)", NULL, ImGuiWindowFlags_NoDecoration);
+          ImVec2 winSize = ImGui::GetIO().DisplaySize;
+          //winSize.y -= 10.f;
+          ImGui::SetNextWindowSize(winSize);
+          ImGui::Begin("Main window (title bar invisible)", NULL, 
+            ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse);
         }
 
         bool shouldExit = guiFunction();
 
         if (appWindowParams.ProvideFullScreenWindow)
           ImGui::End();
+
+        if (appWindowParams.LoadFontAwesome)
+          popFontAwesome();
 
         ImGui_ImplRender(window, appWindowParams.ClearColor);
 

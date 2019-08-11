@@ -9,12 +9,14 @@ namespace BABYLON {
   public:
     SceneWidget_ImGui(ImVec2 size = ImVec2(0.f, 0.f));
     BABYLON::ICanvas * getCanvas();
-    void setScene(std::shared_ptr<BABYLON::IRenderableScene> scene);
+    void setRenderableScene(std::shared_ptr<BABYLON::IRenderableScene> scene);
+    BABYLON::IRenderableScene * getRenderableScene();
+    BABYLON::Scene * getScene();
     void render();
 
   private:
     std::unique_ptr<BABYLON::impl::FramebufferCanvas> _framebuffer_canvas;
-    std::shared_ptr<BABYLON::IRenderableScene> _scene;
+    std::shared_ptr<BABYLON::IRenderableScene> _renderableScene;
   };
 
 } // namespace BABYLON

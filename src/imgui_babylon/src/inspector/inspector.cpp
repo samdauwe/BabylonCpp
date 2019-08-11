@@ -88,7 +88,7 @@ void Inspector::setScene(Scene* scene)
   _actionTabsHost->setScene(scene);
 }
 
-void Inspector::intialize()
+void Inspector::imgui_initialize()
 {
   // Initialize glad
   if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
@@ -98,20 +98,7 @@ void Inspector::intialize()
 
   // Setup Dear ImGui context
   ImGui::CreateContext();
-  // Loads fonts
-  ImGuiIO& io = ImGui::GetIO();
-  io.Fonts->AddFontDefault();
-  static ImWchar ranges[] = {0xf000, 0xf82f, 0};
-  ImFontConfig config;
-  config.MergeMode = true;
-  auto fontRegularPath
-    = String::concat("../assets/fonts/", FONT_ICON_FILE_NAME_FAR);
-  _fontRegular = io.Fonts->AddFontFromFileTTF(fontRegularPath.c_str(),
-                                              ImGui::IconSize, &config, ranges);
-  auto fontSolidPath
-    = String::concat("../assets/fonts/", FONT_ICON_FILE_NAME_FAS);
-  _fontSolid = io.Fonts->AddFontFromFileTTF(fontSolidPath.c_str(),
-                                            ImGui::IconSize, &config, ranges);
+  imgui_LoadFontAwesome();
   // Setup Dear ImGui style
   ImGui::StyleColorsDark();
   // Setup Platform/Renderer bindings
@@ -128,7 +115,25 @@ void Inspector::intialize()
   _addActions();
 }
 
-void Inspector::render()
+void Inspector::imgui_LoadFontAwesome()
+{
+  // Loads fonts
+  ImGuiIO& io = ImGui::GetIO();
+  io.Fonts->AddFontDefault();
+  static ImWchar ranges[] = { 0xf000, 0xf82f, 0 };
+  ImFontConfig config;
+  config.MergeMode = true;
+  auto fontRegularPath
+    = String::concat("../assets/fonts/", FONT_ICON_FILE_NAME_FAR);
+  _fontRegular = io.Fonts->AddFontFromFileTTF(fontRegularPath.c_str(),
+    ImGui::IconSize, &config, ranges);
+  auto fontSolidPath
+    = String::concat("../assets/fonts/", FONT_ICON_FILE_NAME_FAS);
+  _fontSolid = io.Fonts->AddFontFromFileTTF(fontSolidPath.c_str(),
+    ImGui::IconSize, &config, ranges);
+}
+
+void Inspector::imgui_render_and_display()
 {
   // Start the Dear ImGui frame
   ImGui_ImplOpenGL3_NewFrame();
@@ -136,26 +141,7 @@ void Inspector::render()
   ImGui::NewFrame();
   // Push Font
   _pushFonts();
-  // Render main menu bar
-  if (ImGui::BeginMainMenuBar()) {
-    _fileMenu();
-    {
-      static std::ostringstream oss;
-      oss.str("");
-      oss << std::fixed << std::setprecision(1);
-      oss << "FPS: " << ImGui::GetIO().Framerate << std::ends;
-      oss << std::resetiosflags(std::ios_base::fixed
-                                | std::ios_base::floatfield);
-      const char* stats = oss.str().data();
-      auto statsSize    = ImGui::CalcTextSize(stats);
-      ImGui::SameLine(ImGui::GetContentRegionMax().x - statsSize.x);
-      ImGui::Text("%s", stats);
-    }
-    _menuHeight = static_cast<int>(ImGui::GetWindowSize().y);
-    ImGui::EndMainMenuBar();
-  }
-  // Render inspector
-  _renderInspector();
+  render(true);
   // Pop font
   _popFonts();
   // Rendering
@@ -163,7 +149,29 @@ void Inspector::render()
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void Inspector::dispose()
+void Inspector::render(bool createWindow)
+{
+  // Render main menu bar
+  if (ImGui::BeginMainMenuBar()) 
+  {
+    _fileMenu();
+    _menuHeight = static_cast<int>(ImGui::GetWindowSize().y);
+    ImGui::EndMainMenuBar();
+  }
+  // Render inspector
+  _renderInspector(createWindow);
+}
+
+void Inspector::_showFps()
+{
+  char stats[1000];
+  sprintf(stats, "FPS: %.1lf", ImGui::GetIO().Framerate);
+  //auto statsSize = ImGui::CalcTextSize(stats);
+  //ImGui::SameLine(ImGui::GetContentRegionMax().x - statsSize.x);
+  ImGui::Text("%s", stats);
+}
+
+void Inspector::imgui_dispose()
 {
   // Cleanup ImGui
   ImGui_ImplOpenGL3_Shutdown();
@@ -207,44 +215,65 @@ void Inspector::_popFonts()
   ImGui::PopFont();
 }
 
-void Inspector::_renderInspector()
+void Inspector::_renderInspector(bool createWindow)
 {
   if (ImGui::GetIO().DisplaySize.y <= 0) {
     return;
   }
 
-  // Setup window size
-  auto pos  = ImVec2(0.f, static_cast<float>(_menuHeight));
-  auto size = ImGui::GetIO().DisplaySize;
-  size.y -= pos.y;
+  float width;
+  float sz1;
+  float sz2;
 
-  ImGui::SetNextWindowPos(pos, ImGuiCond_Always);
-  ImGui::SetNextWindowSize(size, ImGuiCond_Always);
-  if (ImGui::Begin("INSPECTOR", &_showInspectorWindow,
-                   ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize
-                     | ImGuiWindowFlags_NoScrollbar
-                     | ImGuiWindowFlags_NoScrollWithMouse
-                     | ImGuiWindowFlags_NoBringToFrontOnFocus)) {
-    auto width      = ImGui::GetContentRegionMax().x - 4.f;
-    static auto sz1 = ImGui::GetContentRegionMax().y / 2.f;
-    auto sz2        = ImGui::GetContentRegionMax().y - sz1 - 8.f;
-    ImGui::Splitter(false, 1.f, &sz1, &sz2, 4, 4, width);
-    // Render the scene explorer
-    if (ImGui::BeginChild("SceneExplorer", ImVec2(width, sz1), true)) {
-      if (_sceneExplorerHost) {
-        _sceneExplorerHost->render();
-      }
-    }
-    ImGui::EndChild();
-    // Render the action tabs
-    if (ImGui::BeginChild("ActionTabs", ImVec2(width, sz2), true)) {
-      if (_actionTabsHost) {
-        _actionTabsHost->render();
-      }
-    }
-    ImGui::EndChild();
+  if (createWindow)
+  {
+    // Setup window size
+    auto pos = ImVec2(0.f, static_cast<float>(_menuHeight));
+    auto size = ImGui::GetIO().DisplaySize;
+    size.y -= pos.y;
+
+    ImGui::SetNextWindowPos(pos, ImGuiCond_Always);
+    ImGui::SetNextWindowSize(size, ImGuiCond_Always);
+    ImGui::Begin("INSPECTOR", &_showInspectorWindow,
+      ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize
+      | ImGuiWindowFlags_NoScrollbar
+      | ImGuiWindowFlags_NoScrollWithMouse
+      | ImGuiWindowFlags_NoBringToFrontOnFocus);
+
+    width = ImGui::GetContentRegionMax().x - 4.f;
+    sz1 = ImGui::GetContentRegionMax().y / 2.f;
+    sz2 = ImGui::GetContentRegionMax().y - sz1 - 8.f;
   }
-  ImGui::End();
+  else
+  {
+    width = 400.f;
+    sz1 = ImGui::GetContentRegionMax().y / 2.f;
+    sz2 = ImGui::GetContentRegionMax().y - sz1 - 20.f;
+    ImGui::BeginGroup();
+  }
+
+  _showFps();
+
+  ImGui::Splitter(false, 1.f, &sz1, &sz2, 4, 4, width);
+  // Render the scene explorer
+  if (ImGui::BeginChild("SceneExplorer", ImVec2(width, sz1), true)) {
+    if (_sceneExplorerHost) {
+      _sceneExplorerHost->render();
+    }
+  }
+  ImGui::EndChild();
+  // Render the action tabs
+  if (ImGui::BeginChild("ActionTabs", ImVec2(width, sz2), true)) {
+    if (_actionTabsHost) {
+      _actionTabsHost->render();
+    }
+  }
+  ImGui::EndChild();
+
+  if (createWindow)
+    ImGui::End();
+  else
+    ImGui::EndGroup();
 }
 
 } // end of namespace BABYLON

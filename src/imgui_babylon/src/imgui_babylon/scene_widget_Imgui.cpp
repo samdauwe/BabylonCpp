@@ -35,10 +35,20 @@ namespace BABYLON {
     return _framebuffer_canvas.get();
   }
 
-  void SceneWidget_ImGui::setScene(std::shared_ptr<BABYLON::IRenderableScene> scene)
+  void SceneWidget_ImGui::setRenderableScene(std::shared_ptr<BABYLON::IRenderableScene> scene)
   {
-    _scene = scene;
-    _scene->initialize(_framebuffer_canvas.get());
+    _renderableScene = scene;
+    _renderableScene->initialize(_framebuffer_canvas.get());
+  }
+
+  BABYLON::IRenderableScene * SceneWidget_ImGui::getRenderableScene()
+  {
+    return _renderableScene.get();
+  }
+
+  BABYLON::Scene * SceneWidget_ImGui::getScene()
+  {
+    return _renderableScene->getScene();
   }
 
   void SceneWidget_ImGui::render()
@@ -48,7 +58,7 @@ namespace BABYLON {
       static_cast<float>(_framebuffer_canvas->height));
 
     _framebuffer_canvas->bind();
-    _scene->render();
+    _renderableScene->render();
     _framebuffer_canvas->unbind();
 
     auto id = _framebuffer_canvas->TextureId();
