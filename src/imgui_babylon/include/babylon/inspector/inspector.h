@@ -19,7 +19,7 @@ class SceneExplorerComponent;
 class Tab;
 using GlobalStatePtr = std::shared_ptr<GlobalState>;
 
-class BABYLON_SHARED_EXPORT Inspector {
+class Inspector {
 
 public:
   Inspector(GLFWwindow* glfwWindow, Scene* scene = nullptr);

@@ -61,7 +61,7 @@ void initializeLogging()
   for (auto& logLevel : _logLevels) {
     unsigned int logType = logLevel.first;
     if (logType != BABYLON::LogLevels::LEVEL_QUIET) {
-      BABYLON::Logger::Instance().registerLogMessageListener(
+      BABYLON::LoggerInstance().registerLogMessageListener(
         logType, ConsoleLogger::logListenerDelegate);
     }
   }

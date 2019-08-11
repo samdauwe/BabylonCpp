@@ -43,7 +43,7 @@ void LogsTabComponent::componentWillMount()
     bool isSubscribed    = false;
     unsigned int logType = logLevel.first;
     if (logType == LogLevels::LEVEL_INFO) {
-      Logger::Instance().registerLogMessageListener(LogLevels::LEVEL_INFO,
+      LoggerInstance().registerLogMessageListener(LogLevels::LEVEL_INFO,
                                                     logListenerDelegate);
       isSubscribed = true;
     }
@@ -53,7 +53,7 @@ void LogsTabComponent::componentWillMount()
 
 void LogsTabComponent::componentWillUnmount()
 {
-  Logger::Instance().unregisterLogMessageListener(logListenerDelegate);
+  LoggerInstance().unregisterLogMessageListener(logListenerDelegate);
 }
 
 void LogsTabComponent::render()
@@ -75,15 +75,15 @@ void LogsTabComponent::render()
     // Register / unregister
     if (subscribeToLogChannel != _subscribedLogChannels[channelType]) {
       if (subscribeToLogChannel) {
-        Logger::Instance().registerLogMessageListener(channelType,
+        LoggerInstance().registerLogMessageListener(channelType,
                                                       logListenerDelegate);
       }
       else {
-        Logger::Instance().unregisterLogMessageListener(channelType,
+        LoggerInstance().unregisterLogMessageListener(channelType,
                                                         logListenerDelegate);
       }
       _subscribedLogChannels[channelType]
-        = Logger::Instance().isSubscribed(channelType, logListenerDelegate);
+        = LoggerInstance().isSubscribed(channelType, logListenerDelegate);
     }
   }
   // Log messages
