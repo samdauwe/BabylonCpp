@@ -58,3 +58,14 @@ set(GLAD_FILES
 source_group_by_path_all(${GLAD_DIR} ${GLAD_FILES})
 add_library(glad STATIC ${GLAD_FILES})
 target_include_directories(glad PUBLIC ${GLAD_DIR}/include)
+
+# ImGuiColorTextEdit as a standalone *static* library
+set(IMGUI_EDITOR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ImGuiColorTextEdit)
+set(IMGUI_EDITOR_FILES 
+    ${IMGUI_EDITOR_DIR}/TextEditor.cpp
+    ${IMGUI_EDITOR_DIR}/TextEditor.h)
+source_group_by_path_all(${IMGUI_EDITOR_DIR} ${IMGUI_EDITOR_FILES})
+add_library(ImGuiColorTextEdit STATIC ${IMGUI_EDITOR_FILES})
+target_include_directories(ImGuiColorTextEdit PUBLIC ${IMGUI_EDITOR_DIR})
+target_link_libraries(ImGuiColorTextEdit PUBLIC imgui)
+
