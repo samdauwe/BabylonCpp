@@ -375,7 +375,7 @@ void HighlightLayer::addExcludedMesh(Mesh* mesh)
     IHighlightLayerExcludedMesh meshExcluded;
     meshExcluded.mesh = mesh;
     meshExcluded.beforeBind
-      = mesh->onBeforeBindObservable.add([](Mesh* mesh, EventState&) {
+      = mesh->onBeforeBindObservable().add([](Mesh* mesh, EventState&) {
           mesh->getEngine()->setStencilBuffer(false);
         });
     meshExcluded.afterRender
@@ -395,7 +395,7 @@ void HighlightLayer::removeExcludedMesh(Mesh* mesh)
   if (stl_util::contains(_excludedMeshes, mesh->uniqueId)) {
     auto& meshExcluded = _excludedMeshes[mesh->uniqueId];
     if (meshExcluded.beforeBind) {
-      mesh->onBeforeBindObservable.remove(meshExcluded.beforeBind);
+      mesh->onBeforeBindObservable().remove(meshExcluded.beforeBind);
     }
 
     if (meshExcluded.afterRender) {
@@ -435,7 +435,7 @@ void HighlightLayer::addMesh(const MeshPtr& mesh, const Color3& color,
     newMesh.color = color;
     // Lambda required for capture due to Observable this context
     newMesh.observerHighlight
-      = mesh->onBeforeBindObservable.add([&](Mesh* mesh, EventState&) {
+      = mesh->onBeforeBindObservable().add([&](Mesh* mesh, EventState&) {
           if (!_excludedMeshes.empty()
               && stl_util::contains(_excludedMeshes, mesh->uniqueId)) {
             _defaultStencilReference(mesh);
@@ -468,7 +468,7 @@ void HighlightLayer::removeMesh(Mesh* mesh)
   if (stl_util::contains(_meshes, mesh->uniqueId)) {
     auto& meshHighlight = _meshes[mesh->uniqueId];
     if (meshHighlight.observerHighlight) {
-      mesh->onBeforeBindObservable.remove(meshHighlight.observerHighlight);
+      mesh->onBeforeBindObservable().remove(meshHighlight.observerHighlight);
     }
 
     if (meshHighlight.observerDefault) {
@@ -506,7 +506,7 @@ void HighlightLayer::dispose()
       auto& meshHighlight = item.second;
       if (meshHighlight.mesh) {
         if (meshHighlight.observerHighlight) {
-          meshHighlight.mesh->onBeforeBindObservable.remove(
+          meshHighlight.mesh->onBeforeBindObservable().remove(
             meshHighlight.observerHighlight);
         }
         if (meshHighlight.observerDefault) {
@@ -519,10 +519,10 @@ void HighlightLayer::dispose()
   }
 
   if (_excludedMeshes.empty()) {
-    for (auto item : _excludedMeshes) {
+    for (auto& item : _excludedMeshes) {
       auto& meshHighlight = item.second;
       if (meshHighlight.beforeBind) {
-        meshHighlight.mesh->onBeforeBindObservable.remove(
+        meshHighlight.mesh->onBeforeBindObservable().remove(
           meshHighlight.beforeBind);
       }
       if (meshHighlight.afterRender) {

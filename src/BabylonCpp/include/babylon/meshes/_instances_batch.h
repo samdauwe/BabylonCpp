@@ -17,6 +17,7 @@ struct BABYLON_SHARED_EXPORT _InstancesBatch {
   bool mustReturn = false;
   std::unordered_map<size_t, std::vector<InstancedMesh*>> visibleInstances;
   std::unordered_map<size_t, bool> renderSelf;
+  std::vector<bool> hardwareInstancedRendering;
 }; // end of struct InstancesBatch
 
 } // end of namespace BABYLON

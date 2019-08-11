@@ -6,12 +6,14 @@
 #include <babylon/math/path3d.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/iget_set_vertices_data.h>
+#include <babylon/meshes/vertex_data_constants.h>
 
 namespace BABYLON {
 
 struct _CreationDataStorage;
 struct _InstancesBatch;
 struct _InstanceDataStorage;
+struct _InternalMeshDataInfo;
 struct _VisibleInstances;
 class Buffer;
 class Effect;
@@ -59,23 +61,23 @@ public:
   /**
    * Mesh side orientation : usually the external or front surface
    */
-  static constexpr unsigned int FRONTSIDE = 0;
+  static constexpr unsigned int FRONTSIDE = VertexDataConstants::FRONTSIDE;
 
   /**
    * Mesh side orientation : usually the internal or back surface
    */
-  static constexpr unsigned int BACKSIDE = 1;
+  static constexpr unsigned int BACKSIDE = VertexDataConstants::BACKSIDE;
 
   /**
    * Mesh side orientation : both internal and external or front and back
    * surfaces
    */
-  static constexpr unsigned int DOUBLESIDE = 2;
+  static constexpr unsigned int DOUBLESIDE = VertexDataConstants::DOUBLESIDE;
 
   /**
    * Mesh side orientation : by default, `FRONTSIDE`
    */
-  static constexpr unsigned int DEFAULTSIDE = 0;
+  static constexpr unsigned int DEFAULTSIDE = VertexDataConstants::DEFAULTSIDE;
 
   /**
    * Mesh cap setting : no cap
@@ -102,7 +104,6 @@ public:
    * @brief Gets the default side orientation.
    * @param orientation the orientation to value to attempt to get
    * @returns the default orientation
-   * Hidden
    */
   static constexpr unsigned int
   _GetDefaultSideOrientation(const std::optional<unsigned int>& orientation
@@ -210,18 +211,18 @@ public:
    * @brief Returns the content of an associated vertex buffer.
    * @param kind defines which buffer to read from (positions, indices, normals,
    * etc). Possible `kind` values :
-   * - BABYLON.VertexBuffer.PositionKind
-   * - BABYLON.VertexBuffer.UVKind
-   * - BABYLON.VertexBuffer.UV2Kind
-   * - BABYLON.VertexBuffer.UV3Kind
-   * - BABYLON.VertexBuffer.UV4Kind
-   * - BABYLON.VertexBuffer.UV5Kind
-   * - BABYLON.VertexBuffer.UV6Kind
-   * - BABYLON.VertexBuffer.ColorKind
-   * - BABYLON.VertexBuffer.MatricesIndicesKind
-   * - BABYLON.VertexBuffer.MatricesIndicesExtraKind
-   * - BABYLON.VertexBuffer.MatricesWeightsKind
-   * - BABYLON.VertexBuffer.MatricesWeightsExtraKind
+   * - VertexBuffer.PositionKind
+   * - VertexBuffer.UVKind
+   * - VertexBuffer.UV2Kind
+   * - VertexBuffer.UV3Kind
+   * - VertexBuffer.UV4Kind
+   * - VertexBuffer.UV5Kind
+   * - VertexBuffer.UV6Kind
+   * - VertexBuffer.ColorKind
+   * - VertexBuffer.MatricesIndicesKind
+   * - VertexBuffer.MatricesIndicesExtraKind
+   * - VertexBuffer.MatricesWeightsKind
+   * - VertexBuffer.MatricesWeightsExtraKind
    * @param copyWhenShared defines a boolean indicating that if the mesh
    * geometry is shared among some other meshes, the returned array is a copy of
    * the internal one
@@ -238,18 +239,18 @@ public:
    * @brief Returns the mesh VertexBuffer object from the requested `kind`.
    * @param kind defines which buffer to read from (positions, indices, normals,
    * etc). Possible `kind` values :
-   * - BABYLON.VertexBuffer.PositionKind
-   * - BABYLON.VertexBuffer.UVKind
-   * - BABYLON.VertexBuffer.UV2Kind
-   * - BABYLON.VertexBuffer.UV3Kind
-   * - BABYLON.VertexBuffer.UV4Kind
-   * - BABYLON.VertexBuffer.UV5Kind
-   * - BABYLON.VertexBuffer.UV6Kind
-   * - BABYLON.VertexBuffer.ColorKind
-   * - BABYLON.VertexBuffer.MatricesIndicesKind
-   * - BABYLON.VertexBuffer.MatricesIndicesExtraKind
-   * - BABYLON.VertexBuffer.MatricesWeightsKind
-   * - BABYLON.VertexBuffer.MatricesWeightsExtraKind
+   * - VertexBuffer.PositionKind
+   * - VertexBuffer.UVKind
+   * - VertexBuffer.UV2Kind
+   * - VertexBuffer.UV3Kind
+   * - VertexBuffer.UV4Kind
+   * - VertexBuffer.UV5Kind
+   * - VertexBuffer.UV6Kind
+   * - VertexBuffer.ColorKind
+   * - VertexBuffer.MatricesIndicesKind
+   * - VertexBuffer.MatricesIndicesExtraKind
+   * - VertexBuffer.MatricesWeightsKind
+   * - VertexBuffer.MatricesWeightsExtraKind
    * @returns a FloatArray or null if the mesh has no vertex buffer for this
    * kind.
    */
@@ -259,18 +260,18 @@ public:
    * @brief Tests if a specific vertex buffer is associated with this mesh.
    * @param kind defines which buffer to check (positions, indices, normals,
    * etc). Possible `kind` values :
-   * - BABYLON.VertexBuffer.PositionKind
-   * - BABYLON.VertexBuffer.UVKind
-   * - BABYLON.VertexBuffer.UV2Kind
-   * - BABYLON.VertexBuffer.UV3Kind
-   * - BABYLON.VertexBuffer.UV4Kind
-   * - BABYLON.VertexBuffer.UV5Kind
-   * - BABYLON.VertexBuffer.UV6Kind
-   * - BABYLON.VertexBuffer.ColorKind
-   * - BABYLON.VertexBuffer.MatricesIndicesKind
-   * - BABYLON.VertexBuffer.MatricesIndicesExtraKind
-   * - BABYLON.VertexBuffer.MatricesWeightsKind
-   * - BABYLON.VertexBuffer.MatricesWeightsExtraKind
+   * - VertexBuffer.PositionKind
+   * - VertexBuffer.UVKind
+   * - VertexBuffer.UV2Kind
+   * - VertexBuffer.UV3Kind
+   * - VertexBuffer.UV4Kind
+   * - VertexBuffer.UV5Kind
+   * - VertexBuffer.UV6Kind
+   * - VertexBuffer.ColorKind
+   * - VertexBuffer.MatricesIndicesKind
+   * - VertexBuffer.MatricesIndicesExtraKind
+   * - VertexBuffer.MatricesWeightsKind
+   * - VertexBuffer.MatricesWeightsExtraKind
    * @returns a boolean
    */
   bool isVerticesDataPresent(const std::string& kind) const override;
@@ -280,18 +281,18 @@ public:
    * `kind` is updatable.
    * @param kind defines which buffer to check (positions, indices, normals,
    * etc). Possible `kind` values :
-   * - BABYLON.VertexBuffer.PositionKind
-   * - BABYLON.VertexBuffer.UVKind
-   * - BABYLON.VertexBuffer.UV2Kind
-   * - BABYLON.VertexBuffer.UV3Kind
-   * - BABYLON.VertexBuffer.UV4Kind
-   * - BABYLON.VertexBuffer.UV5Kind
-   * - BABYLON.VertexBuffer.UV6Kind
-   * - BABYLON.VertexBuffer.ColorKind
-   * - BABYLON.VertexBuffer.MatricesIndicesKind
-   * - BABYLON.VertexBuffer.MatricesIndicesExtraKind
-   * - BABYLON.VertexBuffer.MatricesWeightsKind
-   * - BABYLON.VertexBuffer.MatricesWeightsExtraKind
+   * - VertexBuffer.PositionKind
+   * - VertexBuffer.UVKind
+   * - VertexBuffer.UV2Kind
+   * - VertexBuffer.UV3Kind
+   * - VertexBuffer.UV4Kind
+   * - VertexBuffer.UV5Kind
+   * - VertexBuffer.UV6Kind
+   * - VertexBuffer.ColorKind
+   * - VertexBuffer.MatricesIndicesKind
+   * - VertexBuffer.MatricesIndicesExtraKind
+   * - VertexBuffer.MatricesWeightsKind
+   * - VertexBuffer.MatricesWeightsExtraKind
    * @returns a boolean
    */
   bool isVertexBufferUpdatable(const std::string& kind) const;
@@ -301,18 +302,18 @@ public:
    * Vertex Data associated with this mesh.
    * @param kind defines which buffer to read from (positions, indices, normals,
    * etc). Possible `kind` values :
-   * - BABYLON.VertexBuffer.PositionKind
-   * - BABYLON.VertexBuffer.UVKind
-   * - BABYLON.VertexBuffer.UV2Kind
-   * - BABYLON.VertexBuffer.UV3Kind
-   * - BABYLON.VertexBuffer.UV4Kind
-   * - BABYLON.VertexBuffer.UV5Kind
-   * - BABYLON.VertexBuffer.UV6Kind
-   * - BABYLON.VertexBuffer.ColorKind
-   * - BABYLON.VertexBuffer.MatricesIndicesKind
-   * - BABYLON.VertexBuffer.MatricesIndicesExtraKind
-   * - BABYLON.VertexBuffer.MatricesWeightsKind
-   * - BABYLON.VertexBuffer.MatricesWeightsExtraKind
+   * - VertexBuffer.PositionKind
+   * - VertexBuffer.UVKind
+   * - VertexBuffer.UV2Kind
+   * - VertexBuffer.UV3Kind
+   * - VertexBuffer.UV4Kind
+   * - VertexBuffer.UV5Kind
+   * - VertexBuffer.UV6Kind
+   * - VertexBuffer.ColorKind
+   * - VertexBuffer.MatricesIndicesKind
+   * - VertexBuffer.MatricesIndicesExtraKind
+   * - VertexBuffer.MatricesWeightsKind
+   * - VertexBuffer.MatricesWeightsExtraKind
    * @returns an array of strings
    */
   std::vector<std::string> getVerticesDataKinds() const;
@@ -387,14 +388,11 @@ public:
    * @brief This method recomputes and sets a new BoundingInfo to the mesh
    * unless it is locked. This means the mesh underlying bounding box and sphere
    * are recomputed.
+   * @param applySkeleton defines whether to apply the skeleton before computing
+   * the bounding info
    * @returns the current mesh
    */
-  Mesh& refreshBoundingInfo();
-
-  /**
-   * @brief Hidden
-   */
-  Mesh& _refreshBoundingInfo(bool applySkeleton);
+  Mesh& refreshBoundingInfo(bool applySkeleton = false);
 
   /**
    * @brief Hidden
@@ -411,18 +409,18 @@ public:
    * @brief Copy a FloatArray into a specific associated vertex buffer.
    * @param kind defines which buffer to write to (positions, indices, normals,
    * etc). Possible `kind` values :
-   * - BABYLON.VertexBuffer.PositionKind
-   * - BABYLON.VertexBuffer.UVKind
-   * - BABYLON.VertexBuffer.UV2Kind
-   * - BABYLON.VertexBuffer.UV3Kind
-   * - BABYLON.VertexBuffer.UV4Kind
-   * - BABYLON.VertexBuffer.UV5Kind
-   * - BABYLON.VertexBuffer.UV6Kind
-   * - BABYLON.VertexBuffer.ColorKind
-   * - BABYLON.VertexBuffer.MatricesIndicesKind
-   * - BABYLON.VertexBuffer.MatricesIndicesExtraKind
-   * - BABYLON.VertexBuffer.MatricesWeightsKind
-   * - BABYLON.VertexBuffer.MatricesWeightsExtraKind
+   * - VertexBuffer.PositionKind
+   * - VertexBuffer.UVKind
+   * - VertexBuffer.UV2Kind
+   * - VertexBuffer.UV3Kind
+   * - VertexBuffer.UV4Kind
+   * - VertexBuffer.UV5Kind
+   * - VertexBuffer.UV6Kind
+   * - VertexBuffer.ColorKind
+   * - VertexBuffer.MatricesIndicesKind
+   * - VertexBuffer.MatricesIndicesExtraKind
+   * - VertexBuffer.MatricesWeightsKind
+   * - VertexBuffer.MatricesWeightsExtraKind
    * @param data defines the data source
    * @param updatable defines if the updated vertex buffer must be flagged as
    * updatable
@@ -438,18 +436,18 @@ public:
    * @brief Flags an associated vertex buffer as updatable.
    * @param kind defines which buffer to use (positions, indices, normals, etc).
    * Possible `kind` values :
-   * - BABYLON.VertexBuffer.PositionKind
-   * - BABYLON.VertexBuffer.UVKind
-   * - BABYLON.VertexBuffer.UV2Kind
-   * - BABYLON.VertexBuffer.UV3Kind
-   * - BABYLON.VertexBuffer.UV4Kind
-   * - BABYLON.VertexBuffer.UV5Kind
-   * - BABYLON.VertexBuffer.UV6Kind
-   * - BABYLON.VertexBuffer.ColorKind
-   * - BABYLON.VertexBuffer.MatricesIndicesKind
-   * - BABYLON.VertexBuffer.MatricesIndicesExtraKind
-   * - BABYLON.VertexBuffer.MatricesWeightsKind
-   * - BABYLON.VertexBuffer.MatricesWeightsExtraKind
+   * - VertexBuffer.PositionKind
+   * - VertexBuffer.UVKind
+   * - VertexBuffer.UV2Kind
+   * - VertexBuffer.UV3Kind
+   * - VertexBuffer.UV4Kind
+   * - VertexBuffer.UV5Kind
+   * - VertexBuffer.UV6Kind
+   * - VertexBuffer.ColorKind
+   * - VertexBuffer.MatricesIndicesKind
+   * - VertexBuffer.MatricesIndicesExtraKind
+   * - VertexBuffer.MatricesWeightsKind
+   * - VertexBuffer.MatricesWeightsExtraKind
    * @param updatable defines if the updated vertex buffer must be flagged as
    * updatable
    */
@@ -467,18 +465,18 @@ public:
    * @brief Update a specific associated vertex buffer.
    * @param kind defines which buffer to write to (positions, indices, normals,
    * etc). Possible `kind` values :
-   * - BABYLON.VertexBuffer.PositionKind
-   * - BABYLON.VertexBuffer.UVKind
-   * - BABYLON.VertexBuffer.UV2Kind
-   * - BABYLON.VertexBuffer.UV3Kind
-   * - BABYLON.VertexBuffer.UV4Kind
-   * - BABYLON.VertexBuffer.UV5Kind
-   * - BABYLON.VertexBuffer.UV6Kind
-   * - BABYLON.VertexBuffer.ColorKind
-   * - BABYLON.VertexBuffer.MatricesIndicesKind
-   * - BABYLON.VertexBuffer.MatricesIndicesExtraKind
-   * - BABYLON.VertexBuffer.MatricesWeightsKind
-   * - BABYLON.VertexBuffer.MatricesWeightsExtraKind
+   * - VertexBuffer.PositionKind
+   * - VertexBuffer.UVKind
+   * - VertexBuffer.UV2Kind
+   * - VertexBuffer.UV3Kind
+   * - VertexBuffer.UV4Kind
+   * - VertexBuffer.UV5Kind
+   * - VertexBuffer.UV6Kind
+   * - VertexBuffer.ColorKind
+   * - VertexBuffer.MatricesIndicesKind
+   * - VertexBuffer.MatricesIndicesExtraKind
+   * - VertexBuffer.MatricesWeightsKind
+   * - VertexBuffer.MatricesWeightsExtraKind
    * @param data defines the data source
    * @param updateExtends defines if extends info of the mesh must be updated
    * (can be null). This is mostly useful for "position" kind
@@ -529,6 +527,9 @@ public:
    * @param indices defines the source data
    * @param offset defines the offset in the index buffer where to store the new
    * data (can be null)
+   * @param gpuMemoryOnly defines a boolean indicating that only the GPU memory
+   * must be updated leaving the CPU version of the indices unchanged (false by
+   * default)
    * @returns the current mesh
    */
   Mesh& updateIndices(const IndicesArray& indices,
@@ -613,6 +614,16 @@ public:
                                        Material* effectiveMaterial)>
                       onBeforeDraw,
                     Material* effectiveMaterial = nullptr);
+
+  /**
+   * @brief Hidden
+   */
+  void _freeze() override;
+
+  /**
+   * @brief Hidden
+   */
+  void _unFreeze() override;
 
   /**
    * @brief Triggers the draw call for the mesh. Usually, you don't need to call
@@ -764,8 +775,7 @@ public:
    * A displacement map is a colored image. Each pixel color value (actually a
    * gradient computed from red, green, blue values) will give the displacement
    * to apply to each mesh vertex. The mesh must be set as updatable. Its
-   * internal geometry is directly modified, no new buffer are allocated. This
-   * method returns nothing.
+   * internal geometry is directly modified, no new buffer are allocated.
    * @param url is a string, the URL from the image file is to be downloaded.
    * @param minHeight is the lower limit of the displacement.
    * @param maxHeight is the upper limit of the displacement.
@@ -775,7 +785,7 @@ public:
    * @param uvOffset is an optional vector2 used to offset UV.
    * @param uvScale is an optional vector2 used to scale UV.
    * @param forceUpdate defines whether or not to force an update of the
-   * generated buffers. This is usefull to apply on a deserialized model for
+   * generated buffers. This is useful to apply on a deserialized model for
    * instance.
    * @returns the Mesh.
    */
@@ -805,7 +815,7 @@ public:
    * @param uvOffset is an optional vector2 used to offset UV.
    * @param uvScale is an optional vector2 used to scale UV.
    * @param forceUpdate defines whether or not to force an update of the
-   * generated buffers. This is usefull to apply on a deserialized model for
+   * generated buffers. This is useful to apply on a deserialized model for
    * instance.
    * @returns the Mesh.
    */
@@ -844,6 +854,25 @@ public:
    * @returns current mesh
    */
   Mesh& flipFaces(bool flipNormals = false);
+
+  /**
+   * @brief Increase the number of facets and hence vertices in a mesh.
+   * Vertex normals are interpolated from existing vertex normals.
+   * Warning : the mesh is really modified even if not set originally as
+   * updatable. A new VertexBuffer is created under the hood each call.
+   * @param numberPerEdge the number of new vertices to add to each edge of a
+   * facet, optional default 1
+   */
+  void increaseVertices(size_t numberPerEdge);
+
+  /**
+   * @brief Force adjacent facets to share vertices and remove any facets that
+   * have all vertices in a line This will undo any application of
+   * covertToFlatShadedMesh Warning : the mesh is really modified even if not
+   * set originally as updatable. A new VertexBuffer is created under the hood
+   * each call.
+   */
+  void forceSharedVertices();
 
   /** Instances **/
 
@@ -1015,6 +1044,20 @@ public:
     const std::string& name, unsigned int segments = 32, float diameter = 1.f,
     Scene* = nullptr, const std::optional<bool>& updatable = std::nullopt,
     const std::optional<unsigned int>& sideOrientation = std::nullopt);
+
+  /**
+   * @brief Creates a hemisphere mesh. Please consider using the same method
+   * from the MeshBuilder class instead.
+   * @param name defines the name of the mesh to create
+   * @param segments sets the sphere number of horizontal stripes (positive
+   * integer, default 32)
+   * @param diameter sets the diameter size (float) of the sphere (default 1)
+   * @param scene defines the hosting scene
+   * @returns a new Mesh
+   */
+  static MeshPtr CreateHemisphere(const std::string& name,
+                                  unsigned int segments = 32,
+                                  float diameter = 1.f, Scene* = nullptr);
 
   /**
    * @brief Creates a cylinder or a cone mesh. Please consider using the same
@@ -1368,13 +1411,6 @@ public:
     std::optional<float> alphaFilter = std::nullopt);
 
   /**
-   * @brief Creates a hemisphere mesh.
-   */
-  static MeshPtr CreateHemisphere(const std::string& name,
-                                  unsigned int segments, float diameter,
-                                  Scene* scene = nullptr);
-
-  /**
    * @brief Creates a tube mesh.
    * The tube is a parametric shape.
    * It has no predefined shape. Its final shape will depend on the input
@@ -1391,8 +1427,7 @@ public:
    * of the tube path and is passed the index `i` of the i-th point and the
    * distance of this point from the first point of the path
    * @param cap sets the way the extruded shape is capped. Possible values :
-   * BABYLON.Mesh.NO_CAP (default), BABYLON.Mesh.CAP_START,
-   * BABYLON.Mesh.CAP_END, BABYLON.Mesh.CAP_ALL
+   * Mesh.NO_CAP (default), Mesh.CAP_START, Mesh.CAP_END, Mesh.CAP_ALL
    * @param scene defines the hosting scene
    * @param updatable defines if the mesh must be flagged as updatable
    * @param sideOrientation defines the mesh side orientation
@@ -1433,13 +1468,12 @@ public:
    * * To understand how to set `faceUV` or `faceColors`, please read this by
    * considering the right number of faces of your polyhedron, instead of only 6
    * for the box :
-   * http://doc.babylonjs.com/tutorials/CreateBox_Per_Face_Textures_And_Colors
+   * https://doc.babylonjs.com/how_to/createbox_per_face_textures_and_colors
    * * The parameter `flat` (boolean, default true). If set to false, it gives
    * the polyhedron a single global face, so less vertices and shared normals.
    * In this case, `faceColors` and `faceUV` are ignored
    * * You can also set the mesh side orientation with the values :
-   * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
-   * BABYLON.Mesh.DOUBLESIDE
+   * Mesh.FRONTSIDE (default), Mesh.BACKSIDE or Mesh.DOUBLESIDE
    * * If you create a double-sided mesh, you can choose what parts of the
    * texture image to crop and stick respectively on the front and the back
    * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
@@ -1469,8 +1503,7 @@ public:
    * normals. Set it to false to get a smooth continuous light reflection on the
    * surface
    * * You can also set the mesh side orientation with the values :
-   * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
-   * BABYLON.Mesh.DOUBLESIDE
+   * Mesh.FRONTSIDE (default), Mesh.BACKSIDE or Mesh.DOUBLESIDE
    * * If you create a double-sided mesh, you can choose what parts of the
    * texture image to crop and stick respectively on the front and the back
    * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
@@ -1563,13 +1596,16 @@ public:
    * then be merged into a Mesh sub-class.
    * @param subdivideWithSubMeshes when true (false default), subdivide mesh to
    * his subMesh array with meshes source.
+   * @param multiMultiMaterials when true (false default), subdivide mesh and
+   * accept multiple multi materials, ignores subdivideWithSubMeshes.
    * @returns a new mesh
    */
   static MeshPtr MergeMeshes(const std::vector<MeshPtr>& meshes,
                              bool disposeSource          = true,
                              bool allow32BitsIndices     = true,
                              MeshPtr meshSubclass        = nullptr,
-                             bool subdivideWithSubMeshes = false);
+                             bool subdivideWithSubMeshes = false,
+                             bool multiMultiMaterials    = false);
 
   /**
    * @brief Hidden
@@ -1602,6 +1638,11 @@ protected:
    * @brief An event triggered before rendering the mesh.
    */
   Observable<Mesh>& get_onBeforeRenderObservable();
+
+  /**
+   * @brief An event triggered before binding the mesh.
+   */
+  Observable<Mesh>& get_onBeforeBindObservable();
 
   /**
    * @brief An event triggered after rendering the mesh.
@@ -1648,6 +1689,11 @@ protected:
   void set_isUnIndexed(bool value);
 
   /**
+   * @brief Hidden
+   */
+  bool get__isMesh() const;
+
+  /**
    * @brief Gets a boolean indicating if this mesh has LOD.
    */
   bool get_hasLODLevels() const;
@@ -1692,12 +1738,15 @@ private:
 public:
   /** Events **/
 
-  Observable<Mesh> onBeforeBindObservable;
-
   /**
    * An event triggered before rendering the mesh
    */
   ReadOnlyProperty<Mesh, Observable<Mesh>> onBeforeRenderObservable;
+
+  /**
+   * An event triggered before binding the mesh
+   */
+  ReadOnlyProperty<Mesh, Observable<Mesh>> onBeforeBindObservable;
 
   /**
    * An event triggered after rendering the mesh
@@ -1724,6 +1773,9 @@ public:
 
   /**
    * Gets the list of instances created from this mesh
+   * it is not supposed to be modified manually.
+   * Note also that the order of the InstancedMesh wihin the array is not
+   * significant and might change.
    * @see http://doc.babylonjs.com/how_to/how_to_use_instances
    */
   std::vector<InstancedMesh*> instances;
@@ -1798,6 +1850,11 @@ public:
   Property<Mesh, bool> isUnIndexed;
 
   /**
+   * Hidden
+   */
+  ReadOnlyProperty<Mesh, bool> _isMesh;
+
+  /**
    * Gets a boolean indicating if this mesh has LOD
    */
   ReadOnlyProperty<Mesh, bool> hasLODLevels;
@@ -1821,27 +1878,14 @@ public:
   WriteOnlyProperty<Mesh, size_t> overridenInstanceCount;
 
 private:
-  // Events
-  Observable<Mesh> _onBeforeRenderObservable;
-  Observable<Mesh> _onAfterRenderObservable;
-  Observable<Mesh> _onBeforeDrawObservable;
+  // Internal data
+  std::unique_ptr<_InternalMeshDataInfo> _internalMeshDataInfo;
   // Members
   Observer<Mesh>::Ptr _onBeforeDrawObserver;
-  std::vector<std::unique_ptr<MeshLODLevel>> _LODLevels;
   // Morph
-  MorphTargetManagerPtr _morphTargetManager;
   std::vector<VertexBuffer*> _delayInfo;
   std::unique_ptr<_InstanceDataStorage> _instanceDataStorage;
   MaterialPtr _effectiveMaterial;
-  int _preActivateId;
-  // Will be used by ribbons mainly
-  bool _areNormalsFrozen;
-  // Will be used to save original positions when using software skinning
-  Float32Array _sourcePositions;
-  // Will be used to save original normals when using software skinning
-  Float32Array _sourceNormals;
-  // Will be used to save a source mesh reference, If any
-  Mesh* _source;
   // For extrusion and tube
   Path3D _path3D;
   std::vector<std::vector<Vector3>> _pathArray;

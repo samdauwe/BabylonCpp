@@ -28,6 +28,10 @@ struct BABYLON_SHARED_EXPORT _InstanceDataStorage {
   BufferPtr instancesBuffer        = nullptr;
   Float32Array instancesData;
   size_t overridenInstanceCount;
+  bool isFrozen                    = false;
+  _InstancesBatchPtr previousBatch = nullptr;
+  bool hardwareInstancedRendering  = false;
+  unsigned int sideOrientation     = 0;
 }; // end of struct _InstanceDataStorage
 
 } // end of namespace BABYLON

@@ -6,6 +6,7 @@
 #include <babylon/babylon_api.h>
 #include <babylon/math/vector4.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/meshes/vertex_data_constants.h>
 
 namespace BABYLON {
 
@@ -33,20 +34,20 @@ public:
   /**
    * Mesh side orientation : usually the external or front surface
    */
-  static constexpr unsigned int FRONTSIDE = 0;
+  static constexpr unsigned int FRONTSIDE = VertexDataConstants::FRONTSIDE;
   /**
    * Mesh side orientation : usually the internal or back surface
    */
-  static constexpr unsigned int BACKSIDE = 1;
+  static constexpr unsigned int BACKSIDE = VertexDataConstants::BACKSIDE;
   /**
    * Mesh side orientation : both internal and external or front and back
    * surfaces
    */
-  static constexpr unsigned int DOUBLESIDE = 2;
+  static constexpr unsigned int DOUBLESIDE = VertexDataConstants::DOUBLESIDE;
   /**
    * Mesh side orientation : by default, `FRONTSIDE`
    */
-  static constexpr unsigned int DEFAULTSIDE = 0;
+  static constexpr unsigned int DEFAULTSIDE = VertexDataConstants::DEFAULTSIDE;
 
 public:
   VertexData();

@@ -15,6 +15,7 @@ namespace BABYLON {
 struct LODItem {
   std::vector<std::string> ids;
   Float32Array distances;
+  Float32Array coverages;
 }; // end of struct Lod
 
 /**
