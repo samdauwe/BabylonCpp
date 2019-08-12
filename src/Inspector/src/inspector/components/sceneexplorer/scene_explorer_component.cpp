@@ -15,10 +15,10 @@ SceneExplorerComponent::SceneExplorerComponent(
   const ISceneExplorerComponentProps& iProps)
     : props{iProps}
 {
-  SceneGraphComponentProps props;
-  props.scene          = iProps.scene;
-  props.globalState    = iProps.globalState;
-  _sceneGraphComponent = std::make_unique<SceneGraphComponent>(props);
+  SceneGraphComponentProps compProps;
+  compProps.scene       = iProps.scene;
+  compProps.globalState = iProps.globalState;
+  _sceneGraphComponent  = std::make_unique<SceneGraphComponent>(compProps);
 }
 
 SceneExplorerComponent::~SceneExplorerComponent()

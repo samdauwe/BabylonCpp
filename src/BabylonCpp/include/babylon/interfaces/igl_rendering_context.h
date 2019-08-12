@@ -1665,7 +1665,7 @@ public:
    * @return Depends on the requested information (as specified with pname).
    * Either a GLint or a GLenum.
    */
-  virtual any getRenderbufferParameter(GLenum target, GLenum pname) = 0;
+  virtual GLint getRenderbufferParameter(GLenum target, GLenum pname) = 0;
 
   /**
    * @brief Returns the information log for the specified IGLShader object. It
@@ -2010,23 +2010,8 @@ public:
    */
   virtual void texImage2D(GLenum target, GLint level, GLint internalformat,
                           GLsizei width, GLsizei height, GLint border,
-                          GLenum format, GLenum type, const Uint8Array* const pixels)
-    = 0;
-
-  /**
-   * @brief Specifies a two-dimensional texture image.
-   * @param target A GLenum specifying the binding point (target) of the active
-   * texture.
-   * @param level A GLint specifying the level of detail. Level 0 is the base
-   * image level and level n is the nth mipmap reduction level.
-   * @param internalformat A GLint specifying the color components in the
-   * texture.
-   * @param format A GLenum specifying the format of the texel data.
-   * @param type A GLenum specifying the data type of the texel data.
-   * @param pixels An ICanvas pixel source for the texture.
-   */
-  virtual void texImage2D(GLenum target, GLint level, GLint internalformat,
-                          GLenum format, GLenum type, ICanvas* pixels)
+                          GLenum format, GLenum type,
+                          const Uint8Array* const pixels)
     = 0;
 
   /**

@@ -359,7 +359,8 @@ void Engine::_initGLContext()
   _caps.maxVertexAttribs     = _gl->getParameteri(GL::MAX_VERTEX_ATTRIBS);
 
   // Those parameters cannot always be reliably queried
-  // (GlGetError returns INVALID_ENUM under windows 10 (VM with parallels desktop opengl driver)
+  // (GlGetError returns INVALID_ENUM under windows 10 (VM with parallels
+  // desktop opengl driver)
   //_caps.maxVaryingVectors    = _gl->getParameteri(GL::MAX_VARYING_VECTORS);
   //_caps.maxFragmentUniformVectors
   //  = _gl->getParameteri(GL::MAX_FRAGMENT_UNIFORM_VECTORS);
@@ -1103,7 +1104,8 @@ void Engine::bindFramebuffer(const InternalTexturePtr& texture,
     if (!requiredHeight) {
       requiredHeight = texture->height;
       if (lodLevel) {
-        requiredHeight = static_cast<int>(*requiredHeight / std::pow(2, lodLevel));
+        requiredHeight
+          = static_cast<int>(*requiredHeight / std::pow(2, lodLevel));
       }
     }
 
@@ -2983,9 +2985,10 @@ InternalTexturePtr Engine::createTexture(
 
             _workingContext->drawImage(img, 0, 0, img.width, img.height, 0, 0,
                                        potWidth, potHeight);
+#if 0
             _gl->texImage2D(GL::TEXTURE_2D, 0, static_cast<int>(internalFormat),
                             internalFormat, GL::UNSIGNED_BYTE, _workingCanvas);
-
+#endif
             texture->width  = potWidth;
             texture->height = potHeight;
 
@@ -3262,8 +3265,8 @@ void Engine::updateTextureSamplingMode(unsigned int samplingMode,
 }
 
 void Engine::updateDynamicTexture(const InternalTexturePtr& texture,
-                                  ICanvas* canvas, bool invertY,
-                                  bool premulAlpha, unsigned int format)
+                                  ICanvas* /*canvas*/, bool invertY,
+                                  bool premulAlpha, unsigned int /*format*/)
 {
   if (!texture) {
     return;
@@ -3275,9 +3278,11 @@ void Engine::updateDynamicTexture(const InternalTexturePtr& texture,
   if (premulAlpha) {
     _gl->pixelStorei(GL::UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
   }
+#if 0
   auto internalFormat = format ? _getInternalFormat(format) : GL::RGBA;
   _gl->texImage2D(GL::TEXTURE_2D, 0, static_cast<int>(internalFormat),
                   internalFormat, GL::UNSIGNED_BYTE, canvas);
+#endif
   if (texture->generateMipMaps) {
     _gl->generateMipmap(GL::TEXTURE_2D);
   }
@@ -4362,8 +4367,8 @@ InternalTexturePtr Engine::createCubeTexture(
   auto lastDot   = String::lastIndexOf(rootUrl, ".");
   auto extension = !forcedExtension.empty() ?
                      forcedExtension :
-                     (lastDot > -1 ? String::toLowerCase(
-                        rootUrl.substr(static_cast<unsigned long>(lastDot))) :
+                     (lastDot > -1 ? String::toLowerCase(rootUrl.substr(
+                                       static_cast<unsigned long>(lastDot))) :
                                      "");
 
   IInternalTextureLoaderPtr loader = nullptr;
@@ -4410,9 +4415,10 @@ InternalTexturePtr Engine::createCubeTexture(
     _cascadeLoadImgs(
       rootUrl, scene,
       [&](const std::vector<Image>& imgs) {
-        auto width = needPOTTextures() ? Tools::GetExponentOfTwo(
-                       imgs[0].width, _caps.maxCubemapTextureSize) :
-                                         imgs[0].width;
+        auto width = needPOTTextures() ?
+                       Tools::GetExponentOfTwo(imgs[0].width,
+                                               _caps.maxCubemapTextureSize) :
+                       imgs[0].width;
         auto height = width;
 
         _prepareWorkingCanvas();
@@ -4727,7 +4733,8 @@ InternalTexturePtr Engine::createRawCubeTextureFromUrl(
           }
           gl.texImage2D(faceIndex, static_cast<int>(level),
                         static_cast<int>(internalSizedFomat), mipSize, mipSize,
-                        0, internalFormat, textureType, &mipFaceData.uint8Array);
+                        0, internalFormat, textureType,
+                        &mipFaceData.uint8Array);
         }
       }
 
@@ -4746,13 +4753,12 @@ InternalTexturePtr Engine::createRawCubeTextureFromUrl(
     }
   };
 
-  _loadFile(
-    url,
-    [&](const std::variant<std::string, ArrayBuffer>& data,
-        const std::string& responseURL) -> void {
-      internalCallback(data, responseURL);
-    },
-    nullptr, true, onerror);
+  _loadFile(url,
+            [&](const std::variant<std::string, ArrayBuffer>& data,
+                const std::string& responseURL) -> void {
+              internalCallback(data, responseURL);
+            },
+            nullptr, true, onerror);
 
   return texture;
 }

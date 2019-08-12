@@ -3,12 +3,11 @@
 #include <array>
 
 // glad
-// GLAD_DEBUG  enables to debug all the OpenGl calls (calls GlGetError at each step)
-// in order to use this, you need to replace the folder external/glad/ content
-// by the content of external/glad.debug, and to define GLAD_DEBUG below.
-// #define GLAD_DEBUG
+// GLAD_DEBUG  enables to debug all the OpenGl calls (calls GlGetError at each
+// step) in order to use this, you need to replace the folder external/glad/
+// content by the content of external/glad.debug, and to define GLAD_DEBUG
+// below. #define GLAD_DEBUG
 #include <glad/glad.h>
-
 
 // GLFW
 #include <GLFW/glfw3.h>
@@ -118,26 +117,41 @@ GLRenderingContext::~GLRenderingContext()
 std::string GlErrorCodeStr(GLenum error_code)
 {
   std::string error;
-  switch (error_code)
-  {
-    case GL_INVALID_ENUM:                  error = "INVALID_ENUM"; break;
-    case GL_INVALID_VALUE:                 error = "INVALID_VALUE"; break;
-    case GL_INVALID_OPERATION:             error = "INVALID_OPERATION"; break;
-    case GL_STACK_OVERFLOW:                error = "STACK_OVERFLOW"; break;
-    case GL_STACK_UNDERFLOW:               error = "STACK_UNDERFLOW"; break;
-    case GL_OUT_OF_MEMORY:                 error = "OUT_OF_MEMORY"; break;
-    case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
+  switch (error_code) {
+    case GL_INVALID_ENUM:
+      error = "INVALID_ENUM";
+      break;
+    case GL_INVALID_VALUE:
+      error = "INVALID_VALUE";
+      break;
+    case GL_INVALID_OPERATION:
+      error = "INVALID_OPERATION";
+      break;
+    case GL_STACK_OVERFLOW:
+      error = "STACK_OVERFLOW";
+      break;
+    case GL_STACK_UNDERFLOW:
+      error = "STACK_UNDERFLOW";
+      break;
+    case GL_OUT_OF_MEMORY:
+      error = "OUT_OF_MEMORY";
+      break;
+    case GL_INVALID_FRAMEBUFFER_OPERATION:
+      error = "INVALID_FRAMEBUFFER_OPERATION";
+      break;
   }
   return error;
 }
 
-void glad_post_call_callback(const char *name, void * /*funcptr*/, int /*len_args*/, ...)
+void glad_post_call_callback(const char* name, void* /*funcptr*/,
+                             int /*len_args*/, ...)
 {
   GLenum error_code;
   error_code = glad_glGetError();
 
   std::stringstream msg_str;
-  msg_str << "ERROR " << GlErrorCodeStr(error_code) << "(" << error_code << ") in " << name << "\n";
+  msg_str << "ERROR " << GlErrorCodeStr(error_code) << "(" << error_code
+          << ") in " << name << "\n";
   if (error_code != GL_NO_ERROR) {
     fprintf(stderr, "%s", msg_str.str().c_str());
 #ifdef _MSC_VER
@@ -146,22 +160,21 @@ void glad_post_call_callback(const char *name, void * /*funcptr*/, int /*len_arg
   }
 }
 
-void glad_pre_call_callback(const char *name, void * /*funcptr*/, int /*len_args*/, ...)
+void glad_pre_call_callback(const char* name, void* /*funcptr*/,
+                            int /*len_args*/, ...)
 {
   std::stringstream msg_str;
   msg_str << "glad_pre_call_callback " << name << "\n";
   fprintf(stderr, "%s", msg_str.str().c_str());
 #ifdef _MSC_VER
-    OutputDebugString(msg_str.str().c_str());
+  OutputDebugString(msg_str.str().c_str());
 #endif
 }
-
 
 bool GLRenderingContext::initialize(bool enableGLDebugging)
 {
   // Initialize glad
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-  {
+  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
     fprintf(stderr, "gladLoadGLLoader: Failed to initialize OpenGL context\n");
     return false;
   }
@@ -880,8 +893,9 @@ std::string GLRenderingContext::getProgramInfoLog(
 {
   GLint k = -1;
   glGetProgramiv(program->value, GL_INFO_LOG_LENGTH, &k);
-  if (k <= 0)
+  if (k <= 0) {
     return "";
+  }
 
   std::string result;
   result.reserve(static_cast<size_t>(k + 1));
@@ -889,11 +903,11 @@ std::string GLRenderingContext::getProgramInfoLog(
   return result;
 }
 
-any GLRenderingContext::getRenderbufferParameter(GLenum target, GLenum pname)
+GLint GLRenderingContext::getRenderbufferParameter(GLenum target, GLenum pname)
 {
   GLint params;
   glGetRenderbufferParameteriv(target, pname, &params);
-  return reinterpret_cast<any>(params);
+  return params;
 }
 
 GLint GLRenderingContext::getShaderParameter(
@@ -1115,23 +1129,14 @@ void GLRenderingContext::texImage2D(GLenum target, GLint level,
                                     GLsizei height, GLint border, GLenum format,
                                     GLenum type, const Uint8Array* const pixels)
 {
-  if (pixels == nullptr)
-  {
+  if (pixels == nullptr) {
     glTexImage2D(target, level, internalformat, width, height, border, format,
-      type, nullptr);
+                 type, nullptr);
   }
-  else
-  {
+  else {
     glTexImage2D(target, level, internalformat, width, height, border, format,
-      type, pixels->data());
+                 type, pixels->data());
   }
-}
-
-void GLRenderingContext::texImage2D(GLenum /*target*/, GLint /*level*/,
-                                    GLint /*internalformat*/, GLenum /*format*/,
-                                    GLenum /*type*/, ICanvas* /*pixels*/)
-{
-#pragma message("TODO: texImage2D is not implemented for ICanvas!")
 }
 
 void GLRenderingContext::texImage3D(GLenum target, GLint level,

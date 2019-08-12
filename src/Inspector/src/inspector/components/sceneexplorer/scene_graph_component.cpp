@@ -127,11 +127,11 @@ SceneGraphComponent::_createMaterialTreeItem(const MaterialPtr& material)
   size_t key = 0;
 
   if (material) {
-    IMaterialTreeItemComponentProps props;
-    props.material     = material;
-    label              = props.material->name;
-    key                = props.material->uniqueId;
-    treeItem.component = std::make_shared<MaterialTreeItemComponent>(props);
+    IMaterialTreeItemComponentProps compProps;
+    compProps.material = material;
+    label              = compProps.material->name;
+    key                = compProps.material->uniqueId;
+    treeItem.component = std::make_shared<MaterialTreeItemComponent>(compProps);
   }
 
   sprintf(treeItem.label, "%s", label.c_str());
@@ -150,27 +150,27 @@ TreeItem SceneGraphComponent::_createNodeTreeItem(const NodePtr& node)
     if (String::contains(node->getClassName(), "Bone")) {
     }
     else if (String::contains(node->getClassName(), "Camera")) {
-      ICameraTreeItemComponentProps props;
-      props.camera       = std::static_pointer_cast<Camera>(node);
-      label              = props.camera->name;
-      key                = props.camera->uniqueId;
-      treeItem.component = std::make_shared<CameraTreeItemComponent>(props);
+      ICameraTreeItemComponentProps compProps;
+      compProps.camera   = std::static_pointer_cast<Camera>(node);
+      label              = compProps.camera->name;
+      key                = compProps.camera->uniqueId;
+      treeItem.component = std::make_shared<CameraTreeItemComponent>(compProps);
     }
     else if (String::contains(node->getClassName(), "Light")) {
-      ILightTreeItemComponentProps props;
-      props.light        = std::static_pointer_cast<Light>(node);
-      label              = props.light->name;
-      key                = props.light->uniqueId;
-      treeItem.component = std::make_shared<LightTreeItemComponent>(props);
+      ILightTreeItemComponentProps compProps;
+      compProps.light    = std::static_pointer_cast<Light>(node);
+      label              = compProps.light->name;
+      key                = compProps.light->uniqueId;
+      treeItem.component = std::make_shared<LightTreeItemComponent>(compProps);
     }
     else if (String::contains(node->getClassName(), "Mesh")) {
       auto mesh = std::static_pointer_cast<Mesh>(node);
       if (mesh->getTotalVertices() > 0) {
-        IMeshTreeItemComponentProps props;
-        props.mesh         = std::static_pointer_cast<Mesh>(node);
-        label              = props.mesh->name;
-        key                = props.mesh->uniqueId;
-        treeItem.component = std::make_shared<MeshTreeItemComponent>(props);
+        IMeshTreeItemComponentProps compProps;
+        compProps.mesh     = std::static_pointer_cast<Mesh>(node);
+        label              = compProps.mesh->name;
+        key                = compProps.mesh->uniqueId;
+        treeItem.component = std::make_shared<MeshTreeItemComponent>(compProps);
       }
     }
   }
@@ -186,10 +186,10 @@ TreeItem SceneGraphComponent::_createSceneTreeItem(Scene* scene)
   TreeItem treeItem;
 
   if (scene) {
-    ISceneTreeItemComponentProps props;
-    props.scene = scene;
+    ISceneTreeItemComponentProps compProps;
+    compProps.scene = scene;
     sprintf(treeItem.key, "%s", "Scene");
-    treeItem.component = std::make_shared<SceneTreeItemComponent>(props);
+    treeItem.component = std::make_shared<SceneTreeItemComponent>(compProps);
   }
 
   return treeItem;
@@ -201,11 +201,11 @@ SceneGraphComponent::_createTextureTreeItem(const BaseTexturePtr& texture)
   TreeItem treeItem;
 
   if (texture) {
-    ITextureTreeItemComponentProps props;
-    props.texture = texture;
+    ITextureTreeItemComponentProps compProps;
+    compProps.texture = texture;
     sprintf(treeItem.label, "%s", texture->name.c_str());
     sprintf(treeItem.key, "%s", texture->name.c_str());
-    treeItem.component = std::make_shared<TextureTreeItemComponent>(props);
+    treeItem.component = std::make_shared<TextureTreeItemComponent>(compProps);
   }
 
   return treeItem;
