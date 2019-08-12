@@ -4,16 +4,17 @@
 
 #include <babylon/math/vector4.h>
 
-namespace {
+namespace TestVector4 {
 float x = 1.2f;
 float y = 3.4f;
 float z = 5.6f;
 float w = 7.8f;
-} // namespace
+} // namespace TestVector4
 
 TEST(TestVector4, Constructor)
 {
   using namespace BABYLON;
+  using namespace TestVector4;
 
   // Constructor
   Vector4 v;
@@ -39,6 +40,7 @@ TEST(TestVector4, Constructor)
 TEST(TestVector4, CopyFrom)
 {
   using namespace BABYLON;
+  using namespace TestVector4;
 
   Vector4 a{x, y, z, w};
   Vector4 b = Vector4().copyFrom(a);
@@ -61,6 +63,7 @@ TEST(TestVector4, CopyFrom)
 TEST(TestVector4, CopyFromFloats)
 {
   using namespace BABYLON;
+  using namespace TestVector4;
 
   Vector4 v;
   EXPECT_FLOAT_EQ(0.f, v.x);
@@ -78,6 +81,7 @@ TEST(TestVector4, CopyFromFloats)
 TEST(TestVector4, GetHashCode)
 {
   using namespace BABYLON;
+  using namespace TestVector4;
 
   std::array<Vector4, 16> vects{{
     Vector4{x, y, z, w},    // 0000
@@ -113,6 +117,7 @@ TEST(TestVector4, GetHashCode)
 TEST(TestVector4, Add)
 {
   using namespace BABYLON;
+  using namespace TestVector4;
 
   Vector4 a{x, y, z, w};
   Vector4 b{-x, -y, -z, -w};
@@ -136,6 +141,7 @@ TEST(TestVector4, Add)
 TEST(TestVector4, Subtract)
 {
   using namespace BABYLON;
+  using namespace TestVector4;
 
   Vector4 a{x, y, z, w};
   Vector4 b{-x, -y, -z, -w};
@@ -166,6 +172,7 @@ TEST(TestVector4, Subtract)
 TEST(TestVector4, Multiply)
 {
   using namespace BABYLON;
+  using namespace TestVector4;
 
   Vector4 a{x, y, z, w};
   Vector4 b{-x, -y, -z, -w};
@@ -203,6 +210,7 @@ TEST(TestVector4, Multiply)
 TEST(TestVector4, Divide)
 {
   using namespace BABYLON;
+  using namespace TestVector4;
 
   Vector4 a{x, y, z, w};
   Vector4 b{-x, -y, -z, -w};
@@ -226,6 +234,7 @@ TEST(TestVector4, Divide)
 TEST(TestVector4, Negate)
 {
   using namespace BABYLON;
+  using namespace TestVector4;
 
   Vector4 v{x, y, z, w};
 
@@ -240,6 +249,7 @@ TEST(TestVector4, Negate)
 TEST(TestVector4, Length)
 {
   using namespace BABYLON;
+  using namespace TestVector4;
 
   Vector4 a{x, 0.f, 0.f, 0.f};
   Vector4 b{0.f, -y, 0.f, 0.f};
@@ -260,6 +270,7 @@ TEST(TestVector4, Length)
 TEST(TestVector4, LengthSquared)
 {
   using namespace BABYLON;
+  using namespace TestVector4;
 
   Vector4 a{x, 0.f, 0.f, 0.f};
   Vector4 b{0.f, -y, 0.f, 0.f};
@@ -280,6 +291,7 @@ TEST(TestVector4, LengthSquared)
 TEST(TestVector4, Normalize)
 {
   using namespace BABYLON;
+  using namespace TestVector4;
 
   Vector4 a{x, 0.f, 0.f, 0.f};
   Vector4 b{0.f, -y, 0.f, 0.f};
@@ -306,6 +318,7 @@ TEST(TestVector4, Normalize)
 TEST(TestVector4, Distance)
 {
   using namespace BABYLON;
+  using namespace TestVector4;
 
   Vector4 a{x, 0.f, 0.f, 0.f};
   Vector4 b{0.f, -y, 0.f, 0.f};
@@ -322,6 +335,7 @@ TEST(TestVector4, Distance)
 TEST(TestVector4, DistanceSquared)
 {
   using namespace BABYLON;
+  using namespace TestVector4;
 
   Vector4 a{x, 0.f, 0.f, 0.f};
   Vector4 b{0.f, -y, 0.f, 0.f};
@@ -338,6 +352,7 @@ TEST(TestVector4, DistanceSquared)
 TEST(TestVector4, Equals)
 {
   using namespace BABYLON;
+  using namespace TestVector4;
 
   Vector4 a{x, 0.f, z, 0.f};
   Vector4 b{0.f, -y, 0.f, -w};
