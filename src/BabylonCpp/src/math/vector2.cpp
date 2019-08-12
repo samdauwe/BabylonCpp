@@ -11,6 +11,11 @@ Vector2::Vector2(float ix, float iy) : x{ix}, y{iy}
 {
 }
 
+Vector2::Vector2(int ix, int iy)
+    : x{static_cast<float>(ix)}, y{static_cast<float>(iy)}
+{
+}
+
 Vector2::Vector2(const Vector2& otherVector)
     : x{otherVector.x}, y{otherVector.y}
 {

@@ -114,13 +114,14 @@ Vector3& PhysicsRaycastResult::get_rayToWorld()
   return _rayToWorld;
 }
 
-void PhysicsRaycastResult::setHitData(const IXYZ& hitNormalWorld,
-                                      const IXYZ& hitPointWorld)
+void PhysicsRaycastResult::setHitData(const IXYZ& iHitNormalWorld,
+                                      const IXYZ& iHitPointWorld)
 {
   _hasHit = true;
   _hitNormalWorld
-    = Vector3(hitNormalWorld.x, hitNormalWorld.y, hitNormalWorld.z);
-  _hitPointWorld = Vector3(hitPointWorld.x, hitPointWorld.y, hitPointWorld.z);
+    = Vector3(iHitNormalWorld.x, iHitNormalWorld.y, iHitNormalWorld.z);
+  _hitPointWorld
+    = Vector3(iHitPointWorld.x, iHitPointWorld.y, iHitPointWorld.z);
 }
 
 void PhysicsRaycastResult::setHitDistance(float distance)

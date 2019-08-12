@@ -32,24 +32,24 @@ LightGizmo::~LightGizmo()
 {
 }
 
-void LightGizmo::set_light(const LightPtr& light)
+void LightGizmo::set_light(const LightPtr& iLight)
 {
-  _light = light;
-  if (light) {
+  _light = iLight;
+  if (iLight) {
     // Create the mesh for the given light type
     if (_lightMesh) {
       _lightMesh->dispose();
     }
 
-    if (light->type() == Type::HEMISPHERICLIGHT) {
+    if (iLight->type() == Type::HEMISPHERICLIGHT) {
       _lightMesh = LightGizmo::_CreateHemisphericLightMesh(
         gizmoLayer->utilityLayerScene.get());
     }
-    else if (light->type() == Type::DIRECTIONALLIGHT) {
+    else if (iLight->type() == Type::DIRECTIONALLIGHT) {
       _lightMesh = LightGizmo::_CreateDirectionalLightMesh(
         gizmoLayer->utilityLayerScene.get());
     }
-    else if (light->type() == Type::SPOTLIGHT) {
+    else if (iLight->type() == Type::SPOTLIGHT) {
       _lightMesh
         = LightGizmo::_CreateSpotLightMesh(gizmoLayer->utilityLayerScene.get());
     }
@@ -71,10 +71,8 @@ void LightGizmo::set_light(const LightPtr& light)
 
     // Get update position and direction if the light has it
     auto shadowLight = std::static_pointer_cast<ShadowLight>(_light);
-    if (shadowLight) {
+    if (shadowLight && attachedMesh()) {
       attachedMesh()->position().copyFrom(shadowLight->position());
-    }
-    if (shadowLight) {
       attachedMesh()->setDirection(shadowLight->direction());
     }
 

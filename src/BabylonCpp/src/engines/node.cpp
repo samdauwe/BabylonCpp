@@ -527,9 +527,9 @@ AnimatablePtr Node::beginAnimation(const std::string& iName, bool loop,
 std::vector<AnimationRange> Node::serializeAnimationRanges()
 {
   std::vector<AnimationRange> serializationRanges;
-  for (const auto& [name, range] : _ranges) {
+  for (const auto& [rangeName, range] : _ranges) {
     serializationRanges.emplace_back(
-      AnimationRange(name, range->from, range->to));
+      AnimationRange(rangeName, range->from, range->to));
   }
 
   return serializationRanges;

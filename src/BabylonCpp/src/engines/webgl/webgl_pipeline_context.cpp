@@ -39,10 +39,10 @@ bool WebGLPipelineContext::get_isReady() const
 }
 
 void WebGLPipelineContext::_handlesSpectorRebuildCallback(
-  const std::function<void(GL::IGLProgram* program)>& onCompiled)
+  const std::function<void(GL::IGLProgram* program)>& iOnCompiled)
 {
-  if (onCompiled && program) {
-    onCompiled(program);
+  if (iOnCompiled && program) {
+    iOnCompiled(program);
   }
 }
 

@@ -119,7 +119,7 @@ std::unique_ptr<VertexData> PolygonMeshBuilder::buildVertexData(float depth)
   std::vector<std::vector<Point2D>> polygon;
   // Earcut.hpp has no 'holes' argument, adding the holes to the input array
   addHoles(_epoints, _eholes, polygon);
-  auto res = mapbox::earcut<int32_t>(polygon);
+  auto res = mapbox::earcut<uint32_t>(polygon);
 
   Uint32Array indices;
   for (auto r : res) {

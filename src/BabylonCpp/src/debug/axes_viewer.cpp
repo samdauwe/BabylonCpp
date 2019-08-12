@@ -95,11 +95,11 @@ void AxesViewer::update(const Vector3& position, const Vector3& xaxis,
 
 std::unique_ptr<AxesViewer> AxesViewer::createInstance() const
 {
-  const auto xAxis = AxisDragGizmo::_CreateArrowInstance(scene, _xAxis);
-  const auto yAxis = AxisDragGizmo::_CreateArrowInstance(scene, _yAxis);
-  const auto zAxis = AxisDragGizmo::_CreateArrowInstance(scene, _zAxis);
-  auto axesViewer  = std::make_unique<AxesViewer>(
-    scene, scaleLines, std::nullopt, xAxis, yAxis, zAxis);
+  const auto iXAxis = AxisDragGizmo::_CreateArrowInstance(scene, _xAxis);
+  const auto iYAxis = AxisDragGizmo::_CreateArrowInstance(scene, _yAxis);
+  const auto iZAxis = AxisDragGizmo::_CreateArrowInstance(scene, _zAxis);
+  auto axesViewer   = std::make_unique<AxesViewer>(
+    scene, scaleLines, std::nullopt, iXAxis, iYAxis, iZAxis);
   axesViewer->_instanced = true;
   return axesViewer;
 }

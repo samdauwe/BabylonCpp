@@ -1179,21 +1179,26 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
       // Texture uniforms
       if (scene->texturesEnabled()) {
         if (_albedoTexture && MaterialFlags::DiffuseTextureEnabled()) {
-          ubo.updateFloat2("vAlbedoInfos", _albedoTexture->coordinatesIndex,
+          ubo.updateFloat2("vAlbedoInfos",
+                           static_cast<float>(_albedoTexture->coordinatesIndex),
                            _albedoTexture->level, "");
           MaterialHelper::BindTextureMatrix(*_albedoTexture, ubo, "albedo");
         }
 
         if (_ambientTexture && MaterialFlags::AmbientTextureEnabled()) {
-          ubo.updateFloat4("vAmbientInfos", _ambientTexture->coordinatesIndex,
-                           _ambientTexture->level, _ambientTextureStrength,
-                           _ambientTextureImpactOnAnalyticalLights, "");
+          ubo.updateFloat4(
+            "vAmbientInfos",
+            static_cast<float>(_ambientTexture->coordinatesIndex),
+            _ambientTexture->level, _ambientTextureStrength,
+            static_cast<float>(_ambientTextureImpactOnAnalyticalLights), "");
           MaterialHelper::BindTextureMatrix(*_ambientTexture, ubo, "ambient");
         }
 
         if (_opacityTexture && MaterialFlags::OpacityTextureEnabled()) {
-          ubo.updateFloat2("vOpacityInfos", _opacityTexture->coordinatesIndex,
-                           _opacityTexture->level, "");
+          ubo.updateFloat2(
+            "vOpacityInfos",
+            static_cast<float>(_opacityTexture->coordinatesIndex),
+            _opacityTexture->level, "");
           MaterialHelper::BindTextureMatrix(*_opacityTexture, ubo, "opacity");
         }
 
@@ -1263,44 +1268,52 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
             }
           }
 
-          ubo.updateFloat3("vReflectionMicrosurfaceInfos",
-                           reflectionTexture->getSize().width,
-                           reflectionTexture->lodGenerationScale(),
-                           reflectionTexture->lodGenerationOffset(), "");
+          ubo.updateFloat3(
+            "vReflectionMicrosurfaceInfos",
+            static_cast<float>(reflectionTexture->getSize().width),
+            reflectionTexture->lodGenerationScale(),
+            reflectionTexture->lodGenerationOffset(), "");
         }
 
         if (_emissiveTexture && MaterialFlags::EmissiveTextureEnabled()) {
-          ubo.updateFloat2("vEmissiveInfos", _emissiveTexture->coordinatesIndex,
-                           _emissiveTexture->level, "");
+          ubo.updateFloat2(
+            "vEmissiveInfos",
+            static_cast<float>(_emissiveTexture->coordinatesIndex),
+            _emissiveTexture->level, "");
           MaterialHelper::BindTextureMatrix(*_emissiveTexture, ubo, "emissive");
         }
 
         if (_lightmapTexture && MaterialFlags::LightmapTextureEnabled()) {
-          ubo.updateFloat2("vLightmapInfos", _lightmapTexture->coordinatesIndex,
-                           _lightmapTexture->level, "");
+          ubo.updateFloat2(
+            "vLightmapInfos",
+            static_cast<float>(_lightmapTexture->coordinatesIndex),
+            _lightmapTexture->level, "");
           MaterialHelper::BindTextureMatrix(*_lightmapTexture, ubo, "lightmap");
         }
 
         if (MaterialFlags::SpecularTextureEnabled()) {
           if (_metallicTexture) {
             ubo.updateFloat3(
-              "vReflectivityInfos", _metallicTexture->coordinatesIndex,
+              "vReflectivityInfos",
+              static_cast<float>(_metallicTexture->coordinatesIndex),
               _metallicTexture->level, _ambientTextureStrength, "");
             MaterialHelper::BindTextureMatrix(*_metallicTexture, ubo,
                                               "reflectivity");
           }
           else if (_reflectivityTexture) {
-            ubo.updateFloat3("vReflectivityInfos",
-                             _reflectivityTexture->coordinatesIndex,
-                             _reflectivityTexture->level, 1.f, "");
+            ubo.updateFloat3(
+              "vReflectivityInfos",
+              static_cast<float>(_reflectivityTexture->coordinatesIndex),
+              _reflectivityTexture->level, 1.f, "");
             MaterialHelper::BindTextureMatrix(*_reflectivityTexture, ubo,
                                               "reflectivity");
           }
 
           if (_microSurfaceTexture) {
-            ubo.updateFloat2("vMicroSurfaceSamplerInfos",
-                             _microSurfaceTexture->coordinatesIndex,
-                             _microSurfaceTexture->level, "");
+            ubo.updateFloat2(
+              "vMicroSurfaceSamplerInfos",
+              static_cast<float>(_microSurfaceTexture->coordinatesIndex),
+              _microSurfaceTexture->level, "");
             MaterialHelper::BindTextureMatrix(*_microSurfaceTexture, ubo,
                                               "microSurfaceSampler");
           }
@@ -1308,7 +1321,8 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
 
         if (_bumpTexture && engine->getCaps().standardDerivatives
             && MaterialFlags::BumpTextureEnabled() && !_disableBumpMap) {
-          ubo.updateFloat3("vBumpInfos", _bumpTexture->coordinatesIndex,
+          ubo.updateFloat3("vBumpInfos",
+                           static_cast<float>(_bumpTexture->coordinatesIndex),
                            _bumpTexture->level, _parallaxScaleBias, "");
           MaterialHelper::BindTextureMatrix(*_bumpTexture, ubo, "bump");
 
@@ -1320,7 +1334,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
           else {
             ubo.updateFloat2("vTangentSpaceParams",
                              _invertNormalMapX ? -1.f : 1.f,
-                             _invertNormalMapY ? -1.0 : 1.f, "");
+                             _invertNormalMapY ? -1.f : 1.f, "");
           }
         }
       }

@@ -90,7 +90,7 @@ void CrowdSimulationScene10::setupScenario(Scene* scene)
 
       agentId = _crowdSimulation->addAgent(
         _agentMeshes[index++], Vector3(-150.f - i * 1.f, 0.f, 0.f + j * 1.f));
-      _crowdSimulation->setAgentGoal(agentId, Vector2(150.0, 0));
+      _crowdSimulation->setAgentGoal(agentId, Vector2(150.f, 0.f));
 
       agentId = _crowdSimulation->addAgent(
         _agentMeshes[index++], Vector3(0.f + i * 1.f, 0.f, 150.f + j * 1.f));

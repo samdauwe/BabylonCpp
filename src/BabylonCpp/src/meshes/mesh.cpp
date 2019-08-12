@@ -316,7 +316,7 @@ bool Mesh::get_hasLODLevels() const
   return _internalMeshDataInfo->_LODLevels.size() > 0;
 }
 
-std::vector<std::unique_ptr<MeshLODLevel>>& Mesh::getLODLevels()
+std::vector<MeshLODLevelPtr>& Mesh::getLODLevels()
 {
   return _internalMeshDataInfo->_LODLevels;
 }
@@ -325,8 +325,7 @@ void Mesh::_sortLODLevels()
 {
   auto& _LODLevels = _internalMeshDataInfo->_LODLevels;
   std::sort(_LODLevels.begin(), _LODLevels.end(),
-            [](const std::unique_ptr<MeshLODLevel>& a,
-               const std::unique_ptr<MeshLODLevel>& b) {
+            [](const MeshLODLevelPtr& a, const MeshLODLevelPtr& b) {
               if (a->distance < b->distance) {
                 return 1;
               }
@@ -2127,8 +2126,8 @@ void Mesh::increaseVertices(size_t numberPerEdge)
     for (size_t i = 0; i < segments + 1; ++i) {
       tempIndices[i] = {};
     }
-    auto a             = 0ull; // vertex index of one end of a side
-    auto b             = 0ull; // vertex index of other end of the side
+    auto a             = 0u; // vertex index of one end of a side
+    auto b             = 0u; // vertex index of other end of the side
     auto deltaPosition = Vector3(0.f, 0.f, 0.f);
     auto deltaNormal   = Vector3(0.f, 0.f, 0.f);
     auto deltaUV       = Vector2(0.f, 0.f);
@@ -2175,7 +2174,8 @@ void Mesh::increaseVertices(size_t numberPerEdge)
           deltaUV.y     = (uvs[2 * b + 1] - uvs[2 * a + 1]) / segments;
           side[a][b].emplace_back(a);
           for (size_t k = 1; k < segments; k++) {
-            side[a][b].emplace_back(positions.size() / 3);
+            side[a][b].emplace_back(
+              static_cast<uint32_t>(positions.size() / 3));
             positions[positionPtr] = positions[3 * a] + k * deltaPosition.x;
             normals[positionPtr++] = normals[3 * a] + k * deltaNormal.x;
             positions[positionPtr] = positions[3 * a + 1] + k * deltaPosition.y;
@@ -2287,7 +2287,7 @@ void Mesh::forceSharedVertices()
 
     auto indexPtr = 0ull; // pointer to next available index value
     std::vector<std::string> uniquePositions; // unique vertex positions
-    auto ptr = 0ull; // pointer to element in uniquePositions
+    auto ptr = 0; // pointer to element in uniquePositions
     IndicesArray facet;
 
     for (size_t i = 0; i < currentIndices.size(); i += 3) {
@@ -2327,7 +2327,7 @@ void Mesh::forceSharedVertices()
             }
           }
           // add new index pointer to indices array
-          ptr = static_cast<size_t>(ptrTmp);
+          ptr = static_cast<uint32_t>(ptrTmp);
           indices.emplace_back(ptr);
         }
       }
@@ -3624,12 +3624,13 @@ MeshPtr Mesh::MergeMeshes(const std::vector<MeshPtr>& meshes,
               }
             }
             for (subIndex = 0; subIndex < mesh->subMeshes.size(); ++subIndex) {
-              const auto index = stl_util::index_of(
+              const auto materialIndex = stl_util::index_of(
                 materialArray,
                 material
                   ->subMaterials()[mesh->subMeshes[subIndex]->materialIndex]);
-              materialIndexArray.emplace_back(index);
-              indiceArray.emplace_back(mesh->subMeshes[subIndex]->indexCount);
+              materialIndexArray.emplace_back(materialIndex);
+              indiceArray.emplace_back(
+                static_cast<uint32_t>(mesh->subMeshes[subIndex]->indexCount));
             }
           }
           else {
@@ -3637,16 +3638,19 @@ MeshPtr Mesh::MergeMeshes(const std::vector<MeshPtr>& meshes,
               materialArray.emplace_back(material);
             }
             for (subIndex = 0; subIndex < mesh->subMeshes.size(); ++subIndex) {
-              const auto index = stl_util::index_of(materialArray, material);
-              materialIndexArray.emplace_back(index);
-              indiceArray.emplace_back(mesh->subMeshes[subIndex]->indexCount);
+              const auto materialIndex
+                = stl_util::index_of(materialArray, material);
+              materialIndexArray.emplace_back(materialIndex);
+              indiceArray.emplace_back(
+                static_cast<uint32_t>(mesh->subMeshes[subIndex]->indexCount));
             }
           }
         }
         else {
           for (subIndex = 0; subIndex < mesh->subMeshes.size(); ++subIndex) {
             materialIndexArray.emplace_back(0);
-            indiceArray.emplace_back(mesh->subMeshes[subIndex]->indexCount);
+            indiceArray.emplace_back(
+              static_cast<uint32_t>(mesh->subMeshes[subIndex]->indexCount));
           }
         }
       }

@@ -70,11 +70,12 @@ PhotoDome::PhotoDome(
   if (*options.faceForward && scene->activeCamera) {
     auto& camera = scene->activeCamera;
 
-    auto forward   = Vector3::Forward();
-    auto direction = Vector3::TransformNormal(forward, camera->getViewMatrix());
+    auto iForward = Vector3::Forward();
+    auto direction
+      = Vector3::TransformNormal(iForward, camera->getViewMatrix());
     direction.normalize();
 
-    rotation().y = std::acos(Vector3::Dot(forward, direction));
+    rotation().y = std::acos(Vector3::Dot(iForward, direction));
   }
 }
 

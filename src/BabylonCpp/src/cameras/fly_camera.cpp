@@ -250,17 +250,17 @@ void FlyCamera::set_collisionMask(int mask)
 
 void FlyCamera::_collideWithWorld(const Vector3& displacement)
 {
-  Vector3 globalPosition;
+  Vector3 iGlobalPosition;
 
   if (parent) {
-    globalPosition
+    iGlobalPosition
       = Vector3::TransformCoordinates(position, parent()->getWorldMatrix());
   }
   else {
-    globalPosition = position();
+    iGlobalPosition = position();
   }
 
-  globalPosition.subtractFromFloatsToRef(0, ellipsoid.y, 0, _oldPosition);
+  iGlobalPosition.subtractFromFloatsToRef(0, ellipsoid.y, 0, _oldPosition);
   _oldPosition.addInPlace(ellipsoidOffset);
   auto& coordinator = getScene()->collisionCoordinator();
 

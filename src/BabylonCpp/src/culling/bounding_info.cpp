@@ -106,13 +106,13 @@ void BoundingInfo::update(const Matrix& world)
 BoundingInfo& BoundingInfo::centerOn(const Vector3& center,
                                      const Vector3& extend)
 {
-  auto& minimum
+  auto& iMinimum
     = BoundingInfo::TmpVector3[0].copyFrom(center).subtractInPlace(extend);
-  auto& maximum
+  auto& iMaximum
     = BoundingInfo::TmpVector3[1].copyFrom(center).addInPlace(extend);
 
-  boundingBox.reConstruct(minimum, maximum, boundingBox.getWorldMatrix());
-  boundingSphere.reConstruct(minimum, maximum, boundingBox.getWorldMatrix());
+  boundingBox.reConstruct(iMinimum, iMaximum, boundingBox.getWorldMatrix());
+  boundingSphere.reConstruct(iMinimum, iMaximum, boundingBox.getWorldMatrix());
 
   return *this;
 }
@@ -132,7 +132,7 @@ bool BoundingInfo::isInFrustum(const std::array<Plane, 6>& frustumPlanes,
     = (strategy == Constants::MESHES_CULLINGSTRATEGY_OPTIMISTIC_INCLUSION
        || strategy
             == Constants::
-              MESHES_CULLINGSTRATEGY_OPTIMISTIC_INCLUSION_THEN_BSPHERE_ONLY);
+                 MESHES_CULLINGSTRATEGY_OPTIMISTIC_INCLUSION_THEN_BSPHERE_ONLY);
   if (inclusionTest) {
     if (boundingSphere.isCenterInFrustum(frustumPlanes)) {
       return true;
@@ -147,7 +147,7 @@ bool BoundingInfo::isInFrustum(const std::array<Plane, 6>& frustumPlanes,
     = (strategy == Constants::MESHES_CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY
        || strategy
             == Constants::
-              MESHES_CULLINGSTRATEGY_OPTIMISTIC_INCLUSION_THEN_BSPHERE_ONLY);
+                 MESHES_CULLINGSTRATEGY_OPTIMISTIC_INCLUSION_THEN_BSPHERE_ONLY);
   if (bSphereOnlyTest) {
     return true;
   }

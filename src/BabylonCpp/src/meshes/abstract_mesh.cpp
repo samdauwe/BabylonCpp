@@ -522,9 +522,9 @@ std::string AbstractMesh::toString(bool fullDetails) const
   oss << "Name: " << name << ", isInstance: ";
   oss << (getClassName() == "InstancedMesh" ? "YES" : "NO");
   oss << ", # of submeshes: " << (subMeshes.size());
-  auto& skeleton = _internalAbstractMeshDataInfo._skeleton;
-  if (skeleton) {
-    oss << ", skeleton: " << skeleton->name;
+  auto& iSkeleton = _internalAbstractMeshDataInfo._skeleton;
+  if (iSkeleton) {
+    oss << ", skeleton: " << iSkeleton->name;
   }
   if (fullDetails) {
     oss << ", billboard mode: ";
@@ -712,9 +712,9 @@ std::vector<Vector3>& AbstractMesh::get__positions()
 
 void AbstractMesh::set_skeleton(const SkeletonPtr& value)
 {
-  auto& skeleton = _internalAbstractMeshDataInfo._skeleton;
-  if (skeleton && skeleton->needInitialSkinMatrix) {
-    skeleton->_unregisterMeshWithPoseMatrix(this);
+  auto& iSkeleton = _internalAbstractMeshDataInfo._skeleton;
+  if (iSkeleton && iSkeleton->needInitialSkinMatrix) {
+    iSkeleton->_unregisterMeshWithPoseMatrix(this);
   }
 
   if (value && value->needInitialSkinMatrix) {

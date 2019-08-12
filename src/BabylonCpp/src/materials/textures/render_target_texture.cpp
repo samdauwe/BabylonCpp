@@ -516,9 +516,9 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
 
   for (const auto& particleSystem : scene->particleSystems) {
     if (!particleSystem->isStarted() || !particleSystem->hasEmitter()
-        || !(
-          std::holds_alternative<AbstractMeshPtr>(particleSystem->emitter)
-          && std::get<AbstractMeshPtr>(particleSystem->emitter)->isEnabled())) {
+        || !(std::holds_alternative<AbstractMeshPtr>(particleSystem->emitter)
+             && std::get<AbstractMeshPtr>(particleSystem->emitter)
+                  ->isEnabled())) {
       continue;
     }
     if (stl_util::index_of(
@@ -575,12 +575,12 @@ void RenderTargetTexture::_bindFrameBuffer(unsigned int faceIndex)
 
   auto engine = scene->getEngine();
   if (_texture) {
-    std::optional<unsigned int> _faceIndex = std::nullopt;
+    std::optional<unsigned int> iFaceIndex = std::nullopt;
     if (isCube()) {
-      _faceIndex = faceIndex;
+      iFaceIndex = faceIndex;
     }
     engine->bindFramebuffer(
-      _texture, _faceIndex, std::nullopt, std::nullopt, ignoreCameraViewport,
+      _texture, iFaceIndex, std::nullopt, std::nullopt, ignoreCameraViewport,
       depthStencilTexture ? depthStencilTexture.get() : nullptr);
   }
 }

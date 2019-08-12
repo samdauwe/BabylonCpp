@@ -24,6 +24,7 @@ public:
    * @param y defines the second coordinate
    */
   Vector2(float x = 0.f, float y = 0.f);
+  Vector2(int x, int y);
   Vector2(const Vector2& otherVector);
   Vector2(Vector2&& otherVector);
   Vector2& operator=(const Vector2& otherVector);

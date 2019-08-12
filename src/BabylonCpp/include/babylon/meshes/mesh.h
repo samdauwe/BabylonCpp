@@ -37,6 +37,7 @@ using IAnimatablePtr          = std::shared_ptr<IAnimatable>;
 using InstancedMeshPtr        = std::shared_ptr<InstancedMesh>;
 using IParticleSystemPtr      = std::shared_ptr<IParticleSystem>;
 using LinesMeshPtr            = std::shared_ptr<LinesMesh>;
+using MeshLODLevelPtr         = std::shared_ptr<MeshLODLevel>;
 using MeshPtr                 = std::shared_ptr<Mesh>;
 using MorphTargetManagerPtr   = std::shared_ptr<MorphTargetManager>;
 using SubMeshPtr              = std::shared_ptr<SubMesh>;
@@ -156,7 +157,7 @@ public:
    * @brief Gets the list of MeshLODLevel associated with the current mesh.
    * @returns an array of MeshLODLevel
    */
-  std::vector<std::unique_ptr<MeshLODLevel>>& getLODLevels();
+  std::vector<MeshLODLevelPtr>& getLODLevels();
 
   /**
    * @brief Add a mesh as LOD level triggered at the given distance.

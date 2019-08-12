@@ -111,10 +111,9 @@ Matrix& BoundingSphere::getWorldMatrix()
   return _worldMatrix;
 }
 
-void BoundingSphere::_update(const Matrix& worldMatrix)
+void BoundingSphere::_update(Matrix worldMatrix)
 {
-  auto _worldMatrix = worldMatrix;
-  if (!_worldMatrix.isIdentity()) {
+  if (!worldMatrix.isIdentity()) {
     Vector3::TransformCoordinatesToRef(center, worldMatrix, centerWorld);
     auto& tempVector = BoundingSphere::TmpVector3[0];
     Vector3::TransformNormalFromFloatsToRef(1.f, 1.f, 1.f, worldMatrix,
@@ -133,10 +132,10 @@ void BoundingSphere::_update(const Matrix& worldMatrix)
 bool BoundingSphere::isInFrustum(
   const std::array<Plane, 6>& frustumPlanes) const
 {
-  const auto& center = centerWorld;
-  const auto& radius = radiusWorld;
+  const auto& iCenter = centerWorld;
+  const auto& iRadius = radiusWorld;
   for (auto i = 0u; i < 6; ++i) {
-    if (frustumPlanes[i].dotCoordinate(center) <= -radius) {
+    if (frustumPlanes[i].dotCoordinate(iCenter) <= -iRadius) {
       return false;
     }
   }
@@ -146,9 +145,9 @@ bool BoundingSphere::isInFrustum(
 bool BoundingSphere::isCenterInFrustum(
   const std::array<Plane, 6>& frustumPlanes) const
 {
-  const auto& center = centerWorld;
+  const auto& iCenter = centerWorld;
   for (auto i = 0u; i < 6; ++i) {
-    if (frustumPlanes[i].dotCoordinate(center) < 0.f) {
+    if (frustumPlanes[i].dotCoordinate(iCenter) < 0.f) {
       return false;
     }
   }

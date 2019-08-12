@@ -324,7 +324,7 @@ bool BaseTexture::canRescale()
 }
 
 InternalTexturePtr
-BaseTexture::_getFromCache(const std::string& url, bool noMipmap,
+BaseTexture::_getFromCache(const std::string& url, bool iNoMipmap,
                            unsigned int sampling,
                            const std::optional<bool>& invertY)
 {
@@ -336,7 +336,7 @@ BaseTexture::_getFromCache(const std::string& url, bool noMipmap,
   for (auto& texturesCacheEntry : texturesCache) {
     if (!invertY.has_value() || *invertY == texturesCacheEntry->invertY) {
       if ((texturesCacheEntry->url.compare(url) == 0)
-          && texturesCacheEntry->generateMipMaps != noMipmap) {
+          && texturesCacheEntry->generateMipMaps != iNoMipmap) {
         if (!sampling || sampling == texturesCacheEntry->samplingMode) {
           texturesCacheEntry->incrementReferences();
           return texturesCacheEntry;

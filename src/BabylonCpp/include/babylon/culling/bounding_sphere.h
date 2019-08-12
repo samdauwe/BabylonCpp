@@ -55,7 +55,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _update(const Matrix& worldMatrix);
+  void _update(Matrix worldMatrix);
 
   /**
    * @brief Tests if the bounding sphere is intersecting the frustum planes.

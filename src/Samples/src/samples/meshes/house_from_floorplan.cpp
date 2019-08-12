@@ -221,9 +221,9 @@ MeshPtr HouseFromFloorplanScene::buildFromPlan(std::vector<Wall>& walls,
         walls[w].doorSpaces[d].left + walls[w].doorSpaces[d].door.width, 0.f));
     }
 
-    polygonCorners.emplace_back(Vector2(wallLength, 0));
+    polygonCorners.emplace_back(Vector2(wallLength, 0.f));
     polygonCorners.emplace_back(Vector2(wallLength, height));
-    polygonCorners.emplace_back(Vector2(0, height));
+    polygonCorners.emplace_back(Vector2(0.f, height));
 
     // Construct triangulation of polygon using its corners
     PolygonMeshBuilder polygonTriangulation

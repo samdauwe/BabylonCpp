@@ -9,30 +9,28 @@ namespace BABYLON {
 
 TGAHeader TGATools::GetTGAHeader(const Uint8Array& data)
 {
-  auto offset = 0u;
-  auto next_data = [&](){
+  auto offset    = 0u;
+  auto next_data = [&]() {
     auto r = data[offset];
     offset++;
     return r;
   };
 
   TGAHeader header{
-    next_data(), // id_length
-    next_data(), // colormap_type
-    next_data(), // image_type
-    static_cast<uint32_t>(next_data()
-                          | next_data() << 8), // colormap_index
-    static_cast<uint32_t>(next_data()
-                          | next_data() << 8), // colormap_length
-    next_data(),                               // colormap_size
+    next_data(),                                           // id_length
+    next_data(),                                           // colormap_type
+    next_data(),                                           // image_type
+    static_cast<uint32_t>(next_data() | next_data() << 8), // colormap_index
+    static_cast<uint32_t>(next_data() | next_data() << 8), // colormap_length
+    next_data(),                                           // colormap_size
     {
       static_cast<uint32_t>(next_data() | next_data() << 8), //
       static_cast<uint32_t>(next_data() | next_data() << 8)  //
-    },                                                             // origin
+    },                                                       // origin
     next_data() | next_data() << 8,                          // width
     next_data() | next_data() << 8,                          // height
-    next_data(),                                                // pixel_size
-    next_data()                                                 // flags
+    next_data(),                                             // pixel_size
+    next_data()                                              // flags
   };
 
   return header;
@@ -126,8 +124,8 @@ void TGATools::UploadContent(const InternalTexturePtr& texture,
 
         // Copy pixel array
         for (i = 0; i < count; ++i) {
-          const auto offset = static_cast<int>(localOffset + i * pixel_size);
-          stl_util::array_set(pixel_data, pixels, offset);
+          stl_util::array_set(pixel_data, pixels,
+                              static_cast<int>(localOffset + i * pixel_size));
         }
 
         localOffset += pixel_size * count;

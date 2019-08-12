@@ -13,6 +13,7 @@ namespace BABYLON {
 class Mesh;
 class MeshLODLevel;
 class MorphTargetManager;
+using MeshLODLevelPtr       = std::shared_ptr<MeshLODLevel>;
 using MorphTargetManagerPtr = std::shared_ptr<MorphTargetManager>;
 
 /**
@@ -38,7 +39,7 @@ struct BABYLON_SHARED_EXPORT _InternalMeshDataInfo {
   std::unordered_map<std::string, Mesh*> meshMap;
 
   int _preActivateId = -1;
-  std::vector<std::unique_ptr<MeshLODLevel>> _LODLevels;
+  std::vector<MeshLODLevelPtr> _LODLevels;
 
   // Morph
   MorphTargetManagerPtr _morphTargetManager = nullptr;
