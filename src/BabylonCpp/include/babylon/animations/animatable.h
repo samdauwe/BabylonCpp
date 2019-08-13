@@ -133,8 +133,8 @@ public:
 
 protected:
   /**
-   * @brief Creates a new Animatable.
-   * @param scene defines the hosting scene
+   * @brief Creates a new Animatable.     * @param scene defines the hosting
+   * scene
    * @param target defines the target object
    * @param fromFrame defines the starting frame number (default is 0)
    * @param toFrame defines the ending frame number (default is 100)
@@ -144,12 +144,14 @@ protected:
    * @param onAnimationEnd defines a callback to call when animation ends if it
    * is not looping
    * @param animations defines a group of animation to add to the new Animatable
+   * @param onAnimationLoop defines a callback to call when animation loops
    */
   Animatable(Scene* scene, const IAnimatablePtr& target, float fromFrame = 0.f,
              float toFrame = 100.f, bool loopAnimation = false,
-             float speedRatio                            = 1.f,
-             const std::function<void()>& onAnimationEnd = nullptr,
-             const std::vector<AnimationPtr>& animations = {});
+             float speedRatio                             = 1.f,
+             const std::function<void()>& onAnimationEnd  = nullptr,
+             const std::vector<AnimationPtr>& animations  = {},
+             const std::function<void()>& onAnimationLoop = nullptr);
 
 private:
   /**
@@ -184,6 +186,9 @@ private:
    */
   void set_speedRatio(float value);
 
+  /**
+   * @brief Hidden
+   */
   void _raiseOnAnimationEnd();
 
 public:
@@ -224,6 +229,9 @@ public:
    */
   std::function<void()> onAnimationEnd;
 
+  /**
+   * Defines a callback to call when animation loops
+   */
   std::function<void()> onAnimationLoop;
 
   /**
@@ -232,22 +240,28 @@ public:
   Observable<Animatable> onAnimationEndObservable;
 
   /**
+   * Observer raised when the animation loops
+   */
+  Observable<Animatable> onAnimationLoopObservable;
+
+  /**
    * Root Animatable used to synchronize and normalize animations
    */
   ReadOnlyProperty<Animatable, Animatable*> syncRoot;
 
   /**
-   * Current frame of the first RuntimeAnimation
+   * Gets the current frame of the first RuntimeAnimation
+   * Used to synchronize Animatables
    */
   ReadOnlyProperty<Animatable, float> masterFrame;
 
   /**
-   * Animatable weight (-1.0 by default meaning not weighted)
+   * Gets or sets the animatable weight (-1.0 by default meaning not weighted)
    */
   Property<Animatable, float> weight;
 
   /**
-   * Speed ratio to apply to the animatable (1.0 by default)
+   * Gets or sets the speed ratio to apply to the animatable (1.0 by default)
    */
   Property<Animatable, float> speedRatio;
 

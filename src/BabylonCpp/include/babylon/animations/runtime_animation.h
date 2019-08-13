@@ -1,6 +1,7 @@
 #ifndef BABYLON_ANIMATIONS_RUNTIME_ANIMATION_H
 #define BABYLON_ANIMATIONS_RUNTIME_ANIMATION_H
 
+#include <functional>
 #include <unordered_map>
 
 #include <babylon/animations/animation_value.h>
@@ -184,6 +185,11 @@ public:
    * Actual target of the runtime animation
    */
   ReadOnlyProperty<RuntimeAnimation, IAnimatablePtr> target;
+
+  /**
+   * Hidden
+   */
+  std::function<void()> _onLoop;
 
 private:
   std::vector<AnimationEvent> _events;
