@@ -326,44 +326,43 @@ void Bone::_markAsDirtyAndDecompose()
 
 bool Bone::copyAnimationRange(Bone* source, const std::string& rangeName,
                               int frameOffset, bool rescaleAsRequired,
-                              const Vector3& skelDimensionsRatio,
-                              bool hasSkelDimensionsRatio)
+                              const std::optional<Vector3>& skelDimensionsRatio)
 {
   // all animation may be coming from a library skeleton, so may need to create
   // animation
-  /*if (animations.empty()) {
-    animations.emplace_back(std::make_shared<Animation>(
-      name, "_matrix", source->animations[0]->framePerSecond,
-      Animation::ANIMATIONTYPE_MATRIX, 0));
-  }*/
+  if (animations.empty()) {
+    animations.emplace_back(
+      Animation::New(name, "_matrix", source->animations[0]->framePerSecond,
+                     Animation::ANIMATIONTYPE_MATRIX(), 0));
+    animations[0]->setKeys({});
+  }
 
   // get animation info / verify there is such a range from the source bone
+  const auto& sourceRange = source->animations[0]->getRange(rangeName);
   if (source->animations.empty() || !source->animations[0]) {
     return false;
   }
 
-  const auto& sourceRange = source->animations[0]->getRange(rangeName);
-  float from              = sourceRange.from;
-  float to                = sourceRange.to;
-  const auto& sourceKeys  = source->animations[0]->getKeys();
+  const auto from        = sourceRange.from;
+  const auto to          = sourceRange.to;
+  const auto& sourceKeys = source->animations[0]->getKeys();
 
   // rescaling prep
-  auto sourceBoneLength  = source->length;
-  auto sourceParent      = source->getParent();
-  auto parentBone        = getParent();
-  bool parentScalingReqd = rescaleAsRequired && sourceParent
-                           && sourceBoneLength > 0 && length > 0
-                           && !stl_util::almost_equal(sourceBoneLength, length);
-  float parentRatio = parentScalingReqd && parentBone && sourceParent ?
-                        static_cast<float>(parentBone->length)
-                          / static_cast<float>(sourceParent->length) :
-                        1.f;
+  const auto sourceBoneLength = source->length;
+  const auto sourceParent     = source->getParent();
+  const auto parentBone       = getParent();
+  const auto parentScalingReqd
+    = rescaleAsRequired && sourceParent && sourceBoneLength > 0.f
+      && length > 0.f && !stl_util::almost_equal(sourceBoneLength, length);
+  const auto parentRatio = parentScalingReqd && parentBone && sourceParent ?
+                             parentBone->length / sourceParent->length :
+                             1.f;
 
-  bool dimensionsScalingReqd
-    = rescaleAsRequired && !parentBone && hasSkelDimensionsRatio
-      && (!stl_util::almost_equal(skelDimensionsRatio.x, 1.f)
-          || !stl_util::almost_equal(skelDimensionsRatio.y, 1.f)
-          || !stl_util::almost_equal(skelDimensionsRatio.z, 1.f));
+  const auto dimensionsScalingReqd
+    = rescaleAsRequired && !parentBone && skelDimensionsRatio.has_value()
+      && (!stl_util::almost_equal(skelDimensionsRatio->x, 1.f)
+          || !stl_util::almost_equal(skelDimensionsRatio->y, 1.f)
+          || !stl_util::almost_equal(skelDimensionsRatio->z, 1.f));
 
   auto& destKeys = animations[0]->getKeys();
 
@@ -376,20 +375,20 @@ bool Bone::copyAnimationRange(Bone* source, const std::string& rangeName,
       if (rescaleAsRequired) {
         mat = orig.value.get<Matrix>();
 
+        // scale based on parent ratio, when bone has parent
         if (parentScalingReqd) {
-          // scale based on parent ratio, when bone has parent
           origTranslation = mat.getTranslation();
           mat.setTranslation(origTranslation.scaleInPlace(parentRatio));
         }
+        // scale based on skeleton dimension ratio when root bone, and value is
+        // passed
         else if (dimensionsScalingReqd) {
-          // scale based on skeleton dimension ratio when root bone, and value
-          // is passed
           origTranslation = mat.getTranslation();
           mat.setTranslation(
-            origTranslation.multiplyInPlace(skelDimensionsRatio));
+            origTranslation.multiplyInPlace(*skelDimensionsRatio));
         }
+        // use original when root bone, and no data for skelDimensionsRatio
         else {
-          // use original when root bone, and no data for skelDimensionsRatio
           mat = orig.value.get<Matrix>();
         }
       }

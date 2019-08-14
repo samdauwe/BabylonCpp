@@ -491,6 +491,7 @@ public:
    * @param targetMask defines if the target should be animated if animations
    * are present (this is called recursively on descendant animatables
    * regardless of return value)
+   * @param onAnimationLoop defines the callback to call when an animation loops
    * @returns the animatable object created for this animation
    */
   AnimatablePtr beginWeightedAnimation(
@@ -498,7 +499,8 @@ public:
     bool loop = false, float speedRatio = 1.f,
     const std::function<void()>& onAnimationEnd                = nullptr,
     AnimatablePtr animatable                                   = nullptr,
-    const std::function<bool(IAnimatable* target)>& targetMask = nullptr);
+    const std::function<bool(IAnimatable* target)>& targetMask = nullptr,
+    const std::function<void()>& onAnimationLoop               = nullptr);
 
   /**
    * @brief Will start the animation sequence of a given target.
@@ -514,9 +516,10 @@ public:
    * will be created from the given params
    * @param stopCurrent defines if the current animations must be stopped first
    * (true by default)
-   * @param targetMask defines if the target should be animated if animations
-   * are present (this is called recursively on descendant animatables
-   * regardless of return value)
+   * @param targetMask defines if the target should be animate if animations are
+   * present (this is called recursively on descendant animatables regardless of
+   * return value)
+   * @param onAnimationLoop defines the callback to call when an animation loops
    * @returns the animatable object created for this animation
    */
   AnimatablePtr
@@ -525,7 +528,40 @@ public:
                  const std::function<void()>& onAnimationEnd = nullptr,
                  AnimatablePtr animatable = nullptr, bool stopCurrent = true,
                  const std::function<bool(IAnimatable* target)>& targetMask
-                 = nullptr);
+                 = nullptr,
+                 const std::function<void()>& onAnimationLoop = nullptr);
+
+  /**
+   * @brief Will start the animation sequence of a given target and its
+   * hierarchy.
+   * @param target defines the target
+   * @param directDescendantsOnly if true only direct descendants will be used,
+   * if false direct and also indirect (children of children, an so on in a
+   * recursive manner) descendants will be used.
+   * @param from defines from which frame should animation start
+   * @param to defines until which frame should animation run.
+   * @param loop defines if the animation loops
+   * @param speedRatio defines the speed in which to run the animation (1.0 by
+   * default)
+   * @param onAnimationEnd defines the function to be executed when the
+   * animation ends
+   * @param animatable defines an animatable object. If not provided a new one
+   * will be created from the given params
+   * @param stopCurrent defines if the current animations must be stopped first
+   * (true by default)
+   * @param targetMask defines if the target should be animated if animations
+   * are present (this is called recursively on descendant animatables
+   * regardless of return value)
+   * @param onAnimationLoop defines the callback to call when an animation loops
+   * @returns the list of created animatables
+   */
+  std::vector<AnimatablePtr> beginHierarchyAnimation(
+    const NodePtr& target, bool directDescendantsOnly, float from, float to,
+    bool loop = false, float speedRatio = 1.f,
+    const std::function<void()>& onAnimationEnd = nullptr,
+    AnimatablePtr animatable = nullptr, bool stopCurrent = true,
+    const std::function<bool(IAnimatable* target)>& targetMask = nullptr,
+    const std::function<void()>& onAnimationLoop               = nullptr);
 
   /**
    * @brief Begin a new animation on a given node.
@@ -537,13 +573,15 @@ public:
    * @param speedRatio defines the speed ratio to apply to all animations
    * @param onAnimationEnd defines the callback to call when an animation ends
    * (will be called once per node)
+   * @param onAnimationLoop defines the callback to call when an animation loops
    * @returns the list of created animatables
    */
   AnimatablePtr
   beginDirectAnimation(const IAnimatablePtr& target,
                        const std::vector<AnimationPtr>& animations, float from,
                        float to, bool loop = false, float speedRatio = 1.f,
-                       const std::function<void()>& onAnimationEnd = nullptr);
+                       const std::function<void()>& onAnimationEnd  = nullptr,
+                       const std::function<void()>& onAnimationLoop = nullptr);
 
   /**
    * @brief Begin a new animation on a given node and its hierarchy.
@@ -558,13 +596,15 @@ public:
    * @param speedRatio defines the speed ratio to apply to all animations
    * @param onAnimationEnd defines the callback to call when an animation ends
    * (will be called once per node)
+   * @param onAnimationLoop defines the callback to call when an animation loops
    * @returns the list of animatables created for all nodes
    */
   std::vector<AnimatablePtr> beginDirectHierarchyAnimation(
     const NodePtr& target, bool directDescendantsOnly,
     const std::vector<AnimationPtr>& animations, float from, float to,
     bool loop = false, float speedRatio = 1.f,
-    const std::function<void()>& onAnimationEnd = nullptr);
+    const std::function<void()>& onAnimationEnd  = nullptr,
+    const std::function<void()>& onAnimationLoop = nullptr);
 
   /**
    * @brief Gets the animatable associated with a specific target.
@@ -595,12 +635,23 @@ public:
                      const std::string& animationName = "",
                      const std::function<bool(IAnimatable* target)>& targetMask
                      = nullptr);
+
+  /**
+   * @brief Will stop the animation of the given target.
+   * @param target - the target
+   * @param animationName - the name of the animation to stop (all animations
+   * will be stopped if both this and targetMask are empty)
+   * @param targetMask - a function that determines if the animation should be
+   * stopped based on its target (all animations will be stopped if both this
+   * and animationName are empty)
+   */
   void stopAnimation(IAnimatable* target, const std::string& animationName = "",
                      const std::function<bool(IAnimatable* target)>& targetMask
                      = nullptr);
 
   /**
-   * @brief Stops and removes all animations that have been applied to the scene
+   * @brief Stops and removes all animations that have been applied to the
+   * scene.
    */
   void stopAllAnimations();
 
@@ -1747,12 +1798,21 @@ private:
   Scene& _processPointerUp(std::optional<PickingInfo>& pickResult,
                            const PointerEvent& evt, const ClickInfo& clickInfo);
   void _animate();
+  /**
+   * @brief Hidden
+   */
   AnimationValue _processLateAnimationBindingsForMatrices(
     float holderTotalWeight, std::vector<RuntimeAnimation*>& holderAnimations,
     Matrix& holderOriginalValue);
+  /**
+   * @brief Hidden
+   */
   Quaternion _processLateAnimationBindingsForQuaternions(
     float holderTotalWeight, std::vector<RuntimeAnimation*>& holderAnimations,
     Quaternion& holderOriginalValue, Quaternion& refQuaternion);
+  /**
+   * @brief Hidden
+   */
   void _processLateAnimationBindings();
   void _evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh);
   void _evaluateActiveMeshes();
@@ -3410,8 +3470,7 @@ private:
   // Performance counters
   PerfCounter _totalVertices;
   float _animationRatio;
-  bool _animationTimeLastSet;
-  high_res_time_point_t _animationTimeLast;
+  std::optional<high_res_time_point_t> _animationTimeLast;
   int _animationTime;
   int _renderId;
   int _frameId;

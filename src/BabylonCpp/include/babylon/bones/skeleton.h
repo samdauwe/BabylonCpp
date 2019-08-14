@@ -179,6 +179,9 @@ public:
    */
   std::vector<IAnimatablePtr> getAnimatables();
 
+  /**
+   * @brief Hidden
+   */
   std::vector<AnimationPtr> getAnimations() override;
 
   /**

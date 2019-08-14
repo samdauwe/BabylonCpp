@@ -260,7 +260,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , _mainSoundTrack{nullptr}
     , _engine{engine ? engine : Engine::LastCreatedEngine()}
     , _animationRatio{1.f}
-    , _animationTimeLastSet{false}
+    , _animationTimeLast{std::nullopt}
     , _animationTime(0)
     , _renderId{0}
     , _frameId{0}
@@ -1048,7 +1048,7 @@ Scene& Scene::_processPointerMove(std::optional<PickingInfo>& pickResult,
     setPointerOverMesh(nullptr);
   }
 
-  for (auto& step : _pointerMoveStage) {
+  for (const auto& step : _pointerMoveStage) {
     pickResult = step.action(_unTranslatedPointerX, _unTranslatedPointerY,
                              pickResult, isMeshPicked, canvas);
   }
@@ -1183,7 +1183,7 @@ Scene& Scene::_processPointerDown(std::optional<PickingInfo>& pickResult,
     }
   }
   else {
-    for (auto& step : _pointerDownStage) {
+    for (const auto& step : _pointerDownStage) {
       pickResult = step.action(_unTranslatedPointerX, _unTranslatedPointerY,
                                pickResult, evt);
     }
@@ -1265,7 +1265,7 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult,
   }
   else {
     if (!clickInfo.ignore) {
-      for (auto& step : _pointerUpStage) {
+      for (const auto& step : _pointerUpStage) {
         pickResult = step.action(_unTranslatedPointerX, _unTranslatedPointerY,
                                  pickResult, evt);
       }
@@ -1838,7 +1838,7 @@ bool Scene::isReady()
 
   // Post-processes
   if (!activeCameras.empty()) {
-    for (auto& camera : activeCameras) {
+    for (const auto& camera : activeCameras) {
       if (!camera->isReady(true)) {
         return false;
       }
@@ -1851,7 +1851,7 @@ bool Scene::isReady()
   }
 
   // Particles
-  for (auto& particleSystem : particleSystems) {
+  for (const auto& particleSystem : particleSystems) {
     if (!particleSystem->isReady()) {
       return false;
     }
@@ -1949,11 +1949,12 @@ AnimatablePtr Scene::beginWeightedAnimation(
   const IAnimatablePtr& target, float from, float to, float weight, bool loop,
   float speedRatio, const std::function<void()>& onAnimationEnd,
   AnimatablePtr animatable,
-  const std::function<bool(IAnimatable* target)>& targetMask)
+  const std::function<bool(IAnimatable* target)>& targetMask,
+  const std::function<void()>& onAnimationLoop)
 {
   auto returnedAnimatable
     = beginAnimation(target, from, to, loop, speedRatio, onAnimationEnd,
-                     animatable, false, targetMask);
+                     animatable, false, targetMask, onAnimationLoop);
   returnedAnimatable->weight = weight;
 
   return returnedAnimatable;
@@ -1963,7 +1964,8 @@ AnimatablePtr Scene::beginAnimation(
   const IAnimatablePtr& target, float from, float to, bool loop,
   float speedRatio, const std::function<void()>& onAnimationEnd,
   AnimatablePtr animatable, bool stopCurrent,
-  const std::function<bool(IAnimatable* target)>& targetMask)
+  const std::function<bool(IAnimatable* target)>& targetMask,
+  const std::function<void()>& onAnimationLoop)
 {
   if (from > to && speedRatio > 0.f) {
     speedRatio *= -1.f;
@@ -1974,8 +1976,10 @@ AnimatablePtr Scene::beginAnimation(
   }
 
   if (!animatable) {
-    animatable = Animatable::New(this, target, from, to, loop, speedRatio,
-                                 onAnimationEnd);
+    std::vector<AnimationPtr> animationList;
+    animatable
+      = Animatable::New(this, target, from, to, loop, speedRatio,
+                        onAnimationEnd, animationList, onAnimationLoop);
   }
 
   auto shouldRunTargetAnimations = targetMask ? targetMask(target.get()) : true;
@@ -1999,9 +2003,10 @@ AnimatablePtr Scene::beginAnimation(
   }
 
   if (!animatables.empty()) {
-    for (auto& childAnimatable : animatables) {
+    for (const auto& childAnimatable : animatables) {
       beginAnimation(childAnimatable, from, to, loop, speedRatio,
-                     onAnimationEnd, animatable, stopCurrent, targetMask);
+                     onAnimationEnd, animatable, stopCurrent, targetMask,
+                     onAnimationLoop);
     }
   }
 
@@ -2010,31 +2015,55 @@ AnimatablePtr Scene::beginAnimation(
   return animatable;
 }
 
+std::vector<AnimatablePtr> Scene::beginHierarchyAnimation(
+  const NodePtr& target, bool directDescendantsOnly, float from, float to,
+  bool loop, float speedRatio, const std::function<void()>& onAnimationEnd,
+  AnimatablePtr animatable, bool stopCurrent,
+  const std::function<bool(IAnimatable* target)>& targetMask,
+  const std::function<void()>& onAnimationLoop)
+{
+  auto children = target->getDescendants(directDescendantsOnly);
+
+  std::vector<AnimatablePtr> result;
+  result.emplace_back(beginAnimation(target, from, to, loop, speedRatio,
+                                     onAnimationEnd, animatable, stopCurrent,
+                                     targetMask, onAnimationLoop));
+  for (const auto& child : children) {
+    result.emplace_back(beginAnimation(child, from, to, loop, speedRatio,
+                                       onAnimationEnd, animatable, stopCurrent,
+                                       targetMask, onAnimationLoop));
+  }
+
+  return result;
+}
+
 AnimatablePtr
 Scene::beginDirectAnimation(const IAnimatablePtr& target,
                             const std::vector<AnimationPtr>& _animations,
                             float from, float to, bool loop, float speedRatio,
-                            const std::function<void()>& onAnimationEnd)
+                            const std::function<void()>& onAnimationEnd,
+                            const std::function<void()>& onAnimationLoop)
 {
   return Animatable::New(this, target, from, to, loop, speedRatio,
-                         onAnimationEnd, _animations);
+                         onAnimationEnd, _animations, onAnimationLoop);
 }
 
 std::vector<AnimatablePtr> Scene::beginDirectHierarchyAnimation(
   const NodePtr& target, bool directDescendantsOnly,
   const std::vector<AnimationPtr>& iAnimations, float from, float to, bool loop,
-  float speedRatio, const std::function<void()>& onAnimationEnd)
+  float speedRatio, const std::function<void()>& onAnimationEnd,
+  const std::function<void()>& onAnimationLoop)
 {
   auto children = target->getDescendants(directDescendantsOnly);
 
   std::vector<AnimatablePtr> result;
-  result.emplace_back(beginDirectAnimation(
-    target, iAnimations, static_cast<float>(from), static_cast<float>(to), loop,
-    speedRatio, onAnimationEnd));
-  for (auto& child : children) {
-    result.emplace_back(beginDirectAnimation(
-      child, iAnimations, static_cast<float>(from), static_cast<float>(to),
-      loop, speedRatio, onAnimationEnd));
+  result.emplace_back(beginDirectAnimation(target, iAnimations, from, to, loop,
+                                           speedRatio, onAnimationEnd,
+                                           onAnimationLoop));
+  for (const auto& child : children) {
+    result.emplace_back(
+      beginDirectAnimation(child, iAnimations, from, static_cast<float>(to),
+                           loop, speedRatio, onAnimationEnd, onAnimationLoop));
   }
 
   return result;
@@ -2080,7 +2109,7 @@ void Scene::stopAnimation(
 {
   auto animatables = getAllAnimatablesByTarget(target);
 
-  for (auto& animatable : animatables) {
+  for (const auto& animatable : animatables) {
     animatable->stop(animationName, targetMask);
   }
 }
@@ -2088,45 +2117,48 @@ void Scene::stopAnimation(
 void Scene::stopAllAnimations()
 {
   if (!_activeAnimatables.empty()) {
-    for (auto& activeAnimatable : _activeAnimatables) {
+    for (const auto& activeAnimatable : _activeAnimatables) {
       activeAnimatable->stop();
     }
     _activeAnimatables.clear();
   }
 
-  for (auto& group : animationGroups) {
+  for (const auto& group : animationGroups) {
     group->stop();
   }
 }
 
 void Scene::_animate()
 {
-  if (!animationsEnabled || _activeAnimatables.empty()) {
+  if (!animationsEnabled) {
+    return;
+  }
+
+  const auto& animatables = _activeAnimatables;
+  if (animatables.empty()) {
     return;
   }
 
   // Getting time
   auto now = Time::highresTimepointNow();
-  if (!_animationTimeLastSet) {
+  if (!_animationTimeLast.has_value()) {
     if (!_pendingData.empty()) {
       return;
     }
-    _animationTimeLast    = now;
-    _animationTimeLastSet = true;
+    _animationTimeLast = now;
   }
-  auto deltaTime = useConstantAnimationDeltaTime ?
-                     16.f :
-                     Time::fpTimeSince<size_t, std::milli>(_animationTimeLast)
-                       * animationTimeScale;
+  const auto deltaTime
+    = useConstantAnimationDeltaTime ?
+        16.f :
+        Time::fpTimeSince<size_t, std::milli>(*_animationTimeLast)
+          * animationTimeScale;
   _animationTime += static_cast<int>(deltaTime);
-  _animationTimeLast = now;
+  const auto& animationTime = _animationTime;
+  _animationTimeLast        = now;
 
-  // We copy _activeAnimatables before looping since,
-  // activeAnimatable->_animate can remove items from _scene->_activeAnimatables
-  std::vector<AnimatablePtr> _activeAnimatables_copy = _activeAnimatables;
-  for (auto& activeAnimatable : _activeAnimatables_copy) {
-    if (activeAnimatable) {
-      activeAnimatable->_animate(std::chrono::milliseconds(_animationTime));
+  for (const auto& animatable : animatables) {
+    if (animatable) {
+      animatable->_animate(std::chrono::milliseconds(animationTime));
     }
   }
 
@@ -2239,7 +2271,7 @@ Quaternion Scene::_processLateAnimationBindingsForQuaternions(
 
     normalizer = holderTotalWeight;
   }
-  for (auto& runtimeAnimation : holderAnimations) {
+  for (const auto& runtimeAnimation : holderAnimations) {
     quaternions.emplace_back(
       (*runtimeAnimation->currentValue()).get<Quaternion>());
     weights.emplace_back(runtimeAnimation->weight / normalizer);
@@ -2396,7 +2428,7 @@ void Scene::addMesh(const AbstractMeshPtr& newMesh, bool recursive)
   onNewMeshAddedObservable.notifyObservers(newMesh.get());
 
   if (recursive) {
-    // for (auto& m : newMesh->getChildMeshes()) {
+    // for (const auto& m : newMesh->getChildMeshes()) {
     //   addMesh(m);
     // }
   }
@@ -2421,7 +2453,7 @@ int Scene::removeMesh(AbstractMesh* toRemove, bool recursive)
   onMeshRemovedObservable.notifyObservers(toRemove);
 
   if (recursive) {
-    for (auto& m : toRemove->getChildMeshes()) {
+    for (const auto& m : toRemove->getChildMeshes()) {
       removeMesh(m);
     }
   }
@@ -2504,7 +2536,7 @@ int Scene::removeLight(Light* toRemove)
   int index = static_cast<int>(it - lights.begin());
   if (it != lights.end()) {
     // Remove from meshes
-    for (auto& mesh : meshes) {
+    for (const auto& mesh : meshes) {
       mesh->_removeLightSource(toRemove);
     }
     // Remove from the scene if mesh found
@@ -2664,7 +2696,7 @@ void Scene::addLight(const LightPtr& newLight)
 
   // Add light to all meshes (To support if the light is removed and then
   // readded)
-  for (auto& mesh : meshes) {
+  for (const auto& mesh : meshes) {
     if (!stl_util::contains(mesh->_lightSources, newLight)) {
       mesh->_lightSources.emplace_back(newLight);
       mesh->_resyncLightSources();
@@ -2854,8 +2886,8 @@ CameraPtr Scene::getCameraByName(const std::string& name)
 
 BonePtr Scene::getBoneByID(const std::string& id)
 {
-  for (auto& skeleton : skeletons) {
-    for (auto& bone : skeleton->bones) {
+  for (const auto& skeleton : skeletons) {
+    for (const auto& bone : skeleton->bones) {
       if (bone->id == id) {
         return bone;
       }
@@ -2867,8 +2899,8 @@ BonePtr Scene::getBoneByID(const std::string& id)
 
 BonePtr Scene::getBoneByUniqueID(size_t uniqueId)
 {
-  for (auto& skeleton : skeletons) {
-    for (auto& bone : skeleton->bones) {
+  for (const auto& skeleton : skeletons) {
+    for (const auto& bone : skeleton->bones) {
       if (bone->uniqueId == uniqueId) {
         return bone;
       }
@@ -2880,8 +2912,8 @@ BonePtr Scene::getBoneByUniqueID(size_t uniqueId)
 
 BonePtr Scene::getBoneByName(const std::string& name)
 {
-  for (auto& skeleton : skeletons) {
-    for (auto& bone : skeleton->bones) {
+  for (const auto& skeleton : skeletons) {
+    for (const auto& bone : skeleton->bones) {
       if (bone->name == name) {
         return bone;
       }
@@ -3278,7 +3310,7 @@ void Scene::freeActiveMeshes()
     activeCamera->_activeMeshes.clear();
   }
   if (!activeCameras.empty()) {
-    for (auto& iActiveCamera : activeCameras) {
+    for (const auto& iActiveCamera : activeCameras) {
       if (iActiveCamera && !iActiveCamera->_activeMeshes.empty()) {
         iActiveCamera->_activeMeshes.clear();
       }
@@ -3292,7 +3324,7 @@ void Scene::freeRenderingGroups()
     _renderingManager->freeRenderingGroups();
   }
   if (!textures.empty()) {
-    for (auto& texture : textures) {
+    for (const auto& texture : textures) {
       if (texture) {
         auto renderTargetTexture
           = std::dynamic_pointer_cast<RenderTargetTexture>(texture);
@@ -3322,7 +3354,7 @@ void Scene::_evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh)
                       material)
             == _processedMaterials.end()) {
           _processedMaterials.emplace_back(material);
-          for (auto& renderTarget : material->getRenderTargetTextures()) {
+          for (const auto& renderTarget : material->getRenderTargetTextures()) {
             if (std::find(_renderTargets.begin(), _renderTargets.end(),
                           renderTarget)
                 == _renderTargets.end()) {
@@ -3405,7 +3437,7 @@ void Scene::_evaluateActiveMeshes()
   auto _meshes = getActiveMeshCandidates();
 
   // Check each mesh
-  for (auto& mesh : _meshes) {
+  for (const auto& mesh : _meshes) {
     if (mesh->isBlocked()) {
       continue;
     }
@@ -3459,7 +3491,7 @@ void Scene::_evaluateActiveMeshes()
   // Particle systems
   if (particlesEnabled) {
     onBeforeParticlesRenderingObservable.notifyObservers(this);
-    for (auto& particleSystem : particleSystems) {
+    for (const auto& particleSystem : particleSystems) {
       if (!particleSystem->isStarted() || !particleSystem->hasEmitter()) {
         continue;
       }
@@ -3502,7 +3534,7 @@ void Scene::_activeMesh(AbstractMesh* sourceMesh, AbstractMesh* mesh)
 
   if (mesh && !mesh->subMeshes.empty()) {
     auto subMeshes = getActiveSubMeshCandidates(mesh);
-    for (auto& subMesh : subMeshes) {
+    for (const auto& subMesh : subMeshes) {
       _evaluateSubMesh(subMesh, mesh);
     }
   }
@@ -3559,7 +3591,7 @@ void Scene::_renderForCamera(const CameraPtr& camera,
   _evaluateActiveMeshes();
 
   // Software skinning
-  for (auto& mesh : _softwareSkinnedMeshes) {
+  for (const auto& mesh : _softwareSkinnedMeshes) {
     mesh->applySkeleton(mesh->skeleton());
   }
 
@@ -3577,7 +3609,7 @@ void Scene::_renderForCamera(const CameraPtr& camera,
   }
 
   // Collects render targets from external components.
-  for (auto& step : _gatherActiveCameraRenderTargetsStage) {
+  for (const auto& step : _gatherActiveCameraRenderTargetsStage) {
     step.action(_renderTargets);
   }
 
@@ -3586,7 +3618,7 @@ void Scene::_renderForCamera(const CameraPtr& camera,
 
     if (!_renderTargets.empty()) {
       Tools::StartPerformanceCounter("Render targets", !_renderTargets.empty());
-      for (auto& renderTarget : _renderTargets) {
+      for (const auto& renderTarget : _renderTargets) {
         if (renderTarget->_shouldRender()) {
           ++_renderId;
           bool hasSpecialRenderTargetCamera
@@ -3653,7 +3685,7 @@ void Scene::_processSubCameras(const CameraPtr& camera)
   }
 
   // rig cameras
-  for (auto& rigCamera : camera->_rigCameras) {
+  for (const auto& rigCamera : camera->_rigCameras) {
     _renderForCamera(rigCamera, camera);
   }
 
@@ -3759,11 +3791,11 @@ void Scene::render(bool updateCameras)
   // Update Cameras
   if (updateCameras) {
     if (!activeCameras.empty()) {
-      for (auto& camera : activeCameras) {
+      for (const auto& camera : activeCameras) {
         camera->update();
         if (camera->cameraRigMode != Camera::RIG_MODE_NONE) {
           // Rig cameras
-          for (auto& rigCamera : camera->_rigCameras) {
+          for (const auto& rigCamera : camera->_rigCameras) {
             rigCamera->update();
           }
         }
@@ -3773,7 +3805,7 @@ void Scene::render(bool updateCameras)
       activeCamera->update();
       if (activeCamera->cameraRigMode != Camera::RIG_MODE_NONE) {
         // rig cameras
-        for (auto& rigCamera : activeCamera->_rigCameras) {
+        for (const auto& rigCamera : activeCamera->_rigCameras) {
           rigCamera->update();
         }
       }
@@ -3791,7 +3823,7 @@ void Scene::render(bool updateCameras)
     Tools::StartPerformanceCounter("Custom render targets",
                                    !customRenderTargets.empty());
     _intermediateRendering = true;
-    for (auto& renderTarget : customRenderTargets) {
+    for (const auto& renderTarget : customRenderTargets) {
       if (renderTarget->_shouldRender()) {
         ++_renderId;
 
@@ -3828,7 +3860,7 @@ void Scene::render(bool updateCameras)
   onAfterRenderTargetsRenderObservable.notifyObservers(this);
   activeCamera = currentActiveCamera;
 
-  for (auto& step : _beforeClearStage) {
+  for (const auto& step : _beforeClearStage) {
     step.action();
   }
 
@@ -3847,7 +3879,7 @@ void Scene::render(bool updateCameras)
   }
 
   // Collects render targets from external components.
-  for (auto& step : _gatherRenderTargetsStage) {
+  for (const auto& step : _gatherRenderTargetsStage) {
     step.action(_renderTargets);
   }
 
@@ -3875,7 +3907,7 @@ void Scene::render(bool updateCameras)
   _checkIntersections();
 
   // Executes the after render stage actions.
-  for (auto& step : _afterRenderStage) {
+  for (const auto& step : _afterRenderStage) {
     step.action();
   }
 
@@ -4037,14 +4069,14 @@ void Scene::disableGeometryBufferRenderer()
 
 void Scene::freezeMaterials()
 {
-  for (auto& material : materials) {
+  for (const auto& material : materials) {
     material->freeze();
   }
 }
 
 void Scene::unfreezeMaterials()
 {
-  for (auto& material : materials) {
+  for (const auto& material : materials) {
     material->unfreeze();
   }
 }
@@ -4106,7 +4138,7 @@ void Scene::dispose()
   _toBeDisposed.clear();
 
   // Abort active requests
-  for (auto& request : _activeRequests) {
+  for (const auto& request : _activeRequests) {
     if (request.abort) {
       request.abort();
     }
@@ -4161,33 +4193,33 @@ void Scene::dispose()
   // Detach cameras
   auto canvas = _engine->getRenderingCanvas();
   if (canvas) {
-    for (auto& camera : cameras) {
+    for (const auto& camera : cameras) {
       camera->detachControl(canvas);
     }
   }
 
   // Release animation groups
-  for (auto& animationGroup : animationGroups) {
+  for (const auto& animationGroup : animationGroups) {
     animationGroup->dispose();
   }
 
   // Release lights
-  for (auto& light : lights) {
+  for (const auto& light : lights) {
     light->dispose();
   }
 
   // Release meshes
-  for (auto& mesh : meshes) {
+  for (const auto& mesh : meshes) {
     mesh->dispose(true);
   }
 
   // Release transform nodes
-  for (auto& transformNode : transformNodes) {
+  for (const auto& transformNode : transformNodes) {
     removeTransformNode(transformNode);
   }
 
   // Release cameras
-  for (auto& camera : cameras) {
+  for (const auto& camera : cameras) {
     camera->dispose();
   }
 
@@ -4195,25 +4227,25 @@ void Scene::dispose()
   if (defaultMaterial()) {
     defaultMaterial()->dispose();
   }
-  for (auto& multiMaterial : multiMaterials) {
+  for (const auto& multiMaterial : multiMaterials) {
     multiMaterial->dispose();
   }
-  for (auto& material : materials) {
+  for (const auto& material : materials) {
     material->dispose();
   }
 
   // Release particles
-  for (auto& particleSystem : particleSystems) {
+  for (const auto& particleSystem : particleSystems) {
     particleSystem->dispose();
   }
 
   // Release postProcesses
-  for (auto& postProcess : postProcesses) {
+  for (const auto& postProcess : postProcesses) {
     postProcess->dispose();
   }
 
   // Release textures
-  for (auto& texture : textures) {
+  for (const auto& texture : textures) {
     texture->dispose();
   }
 
@@ -4261,7 +4293,7 @@ void Scene::set_blockMaterialDirtyMechanism(bool value)
 
 void Scene::clearCachedVertexData()
 {
-  for (auto& abstractmesh : meshes) {
+  for (const auto& abstractmesh : meshes) {
     auto mesh = static_cast<Mesh*>(abstractmesh.get());
     if (mesh) {
       auto geometry = mesh->geometry();
@@ -4269,7 +4301,7 @@ void Scene::clearCachedVertexData()
       if (geometry) {
         geometry->_indices.clear();
 
-        for (auto& vb : geometry->_vertexBuffers) {
+        for (const auto& vb : geometry->_vertexBuffers) {
           if (!stl_util::contains(geometry->_vertexBuffers, vb.first)) {
             continue;
           }
@@ -4282,7 +4314,7 @@ void Scene::clearCachedVertexData()
 
 void Scene::cleanCachedTextureBuffer()
 {
-  for (auto& baseTexture : textures) {
+  for (const auto& baseTexture : textures) {
     auto texture = static_cast<Texture*>(baseTexture.get());
     if (texture) {
       auto buffer = texture->_buffer;
@@ -4307,7 +4339,7 @@ MinMax Scene::getWorldExtends(
 
   std::vector<AbstractMeshPtr> filteredMeshes;
   if (filterPredicate) {
-    for (auto& mesh : meshes) {
+    for (const auto& mesh : meshes) {
       if (filterPredicate(mesh)) {
         filteredMeshes.emplace_back(mesh);
       }
@@ -4317,7 +4349,7 @@ MinMax Scene::getWorldExtends(
     filteredMeshes = meshes;
   }
 
-  for (auto& mesh : filteredMeshes) {
+  for (const auto& mesh : filteredMeshes) {
     if (mesh->subMeshes.empty() || mesh->infiniteDistance) {
       continue;
     }
@@ -4534,7 +4566,7 @@ std::optional<PickingInfo> Scene::_internalPickSprites(
   }
 
   if (spriteManagers.size() > 0) {
-    for (auto& spriteManager : spriteManagers) {
+    for (const auto& spriteManager : spriteManagers) {
       if (!spriteManager->isPickable) {
         continue;
       }
@@ -4786,11 +4818,11 @@ void Scene::_advancePhysicsEngineStep(float step)
 
 void Scene::_rebuildGeometries()
 {
-  for (auto& geometry : geometries) {
+  for (const auto& geometry : geometries) {
     geometry->_rebuild();
   }
 
-  for (auto& mesh : meshes) {
+  for (const auto& mesh : meshes) {
     mesh->_rebuild();
   }
 
@@ -4802,13 +4834,13 @@ void Scene::_rebuildGeometries()
     component->rebuild();
   }
 
-  for (auto& system : particleSystems) {
+  for (const auto& system : particleSystems) {
     system->rebuild();
   }
 }
 void Scene::_rebuildTextures()
 {
-  for (auto& texture : textures) {
+  for (const auto& texture : textures) {
     texture->_rebuild();
   }
 
@@ -4820,7 +4852,7 @@ void Scene::createDefaultLight(bool replace)
   // Dispose existing light in replace mode.
   if (replace) {
     if (!lights.empty()) {
-      for (auto& light : lights) {
+      for (const auto& light : lights) {
         light->dispose();
       }
     }
@@ -5005,7 +5037,7 @@ void Scene::markAllMaterialsAsDirty(
     return;
   }
 
-  for (auto& material : materials) {
+  for (const auto& material : materials) {
     if (predicate && !predicate(material.get())) {
       continue;
     }

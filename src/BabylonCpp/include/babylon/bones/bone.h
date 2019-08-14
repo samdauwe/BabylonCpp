@@ -167,8 +167,8 @@ public:
    */
   bool copyAnimationRange(Bone* source, const std::string& rangeName,
                           int frameOffset, bool rescaleAsRequired = false,
-                          const Vector3& skelDimensionsRatio = Vector3(),
-                          bool hasSkelDimensionsRatio        = false);
+                          const std::optional<Vector3>& skelDimensionsRatio
+                          = std::nullopt);
 
   /**
    * @brief Translate the bone in local or world space.

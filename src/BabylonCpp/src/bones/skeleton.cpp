@@ -156,7 +156,7 @@ std::string Skeleton::toString(bool fullDetails)
   if (fullDetails) {
     oss << ", Ranges: {";
     bool first = true;
-    for (auto& item : _ranges) {
+    for (const auto& item : _ranges) {
       if (!first) {
         oss << ", ";
         first = false;
@@ -185,7 +185,7 @@ void Skeleton::createAnimationRange(const std::string& _name, float from,
   // check name not already in use
   if (!stl_util::contains(_ranges, _name)) {
     _ranges[_name] = AnimationRange(_name, from, to);
-    for (auto& bone : bones) {
+    for (const auto& bone : bones) {
       if (!bone->animations.empty() && (bone->animations[0] != nullptr)) {
         bone->animations[0]->createRange(_name, from, to);
       }
@@ -195,7 +195,7 @@ void Skeleton::createAnimationRange(const std::string& _name, float from,
 
 void Skeleton::deleteAnimationRange(const std::string& _name, bool deleteFrames)
 {
-  for (auto& bone : bones) {
+  for (const auto& bone : bones) {
     if (!bone->animations.empty() && (bone->animations[0] != nullptr)) {
       bone->animations[0]->deleteRange(_name, deleteFrames);
     }
@@ -227,14 +227,14 @@ bool Skeleton::copyAnimationRange(Skeleton* source, const std::string& _name,
   if (stl_util::contains(_ranges, _name) || !source->getAnimationRange(_name)) {
     return false;
   }
-  bool ret         = true;
+  auto ret         = true;
   auto frameOffset = _getHighestAnimationFrame() + 1;
 
   // make a dictionary of source skeleton's bones, so exact same order or
   // doublely nested loop is not required
   std::unordered_map<std::string, Bone*> boneDict;
   auto& sourceBones = source->bones;
-  for (auto& bone : sourceBones) {
+  for (const auto& bone : sourceBones) {
     boneDict[bone->name] = bone.get();
   }
 
@@ -246,18 +246,17 @@ bool Skeleton::copyAnimationRange(Skeleton* source, const std::string& _name,
     ret = false;
   }
 
-  Vector3 skelDimensionsRatio;
-  bool hasSkelDimensionsRatio = false;
+  std::optional<Vector3> skelDimensionsRatio = std::nullopt;
   if (rescaleAsRequired && dimensionsAtRest && source->dimensionsAtRest) {
-    dimensionsAtRest->divide(*source->dimensionsAtRest);
+    skelDimensionsRatio = dimensionsAtRest->divide(*source->dimensionsAtRest);
   }
 
-  for (auto& bone : bones) {
+  for (const auto& bone : bones) {
     if (stl_util::contains(boneDict, bone->name)) {
       ret = ret
-            && bone->copyAnimationRange(
-              boneDict[bone->name], _name, static_cast<int>(frameOffset),
-              rescaleAsRequired, skelDimensionsRatio, hasSkelDimensionsRatio);
+            && bone->copyAnimationRange(boneDict[bone->name], _name,
+                                        static_cast<int>(frameOffset),
+                                        rescaleAsRequired, skelDimensionsRatio);
     }
     else {
       BABYLON_LOGF_WARN(
@@ -278,7 +277,7 @@ bool Skeleton::copyAnimationRange(Skeleton* source, const std::string& _name,
 
 void Skeleton::returnToRest()
 {
-  for (auto& bone : bones) {
+  for (const auto& bone : bones) {
     bone->returnToRest();
   }
 }
@@ -286,7 +285,7 @@ void Skeleton::returnToRest()
 float Skeleton::_getHighestAnimationFrame()
 {
   float ret = 0.f;
-  for (auto& bone : bones) {
+  for (const auto& bone : bones) {
     if (!bone->animations.empty() && bone->animations[0]) {
       auto highest = bone->animations[0]->getHighestFrame();
       if (ret < highest) {
@@ -387,7 +386,7 @@ void Skeleton::prepare()
   }
 
   if (needInitialSkinMatrix) {
-    for (auto& mesh : _meshesWithPoseMatrix) {
+    for (const auto& mesh : _meshesWithPoseMatrix) {
 
       auto poseMatrix = mesh->getPoseMatrix();
 
@@ -398,7 +397,7 @@ void Skeleton::prepare()
       if (_synchronizedWithMesh != mesh) {
         _synchronizedWithMesh = mesh;
         // Prepare bones
-        for (auto& bone : bones) {
+        for (const auto& bone : bones) {
           if (!bone->getParent()) {
             auto& tmpMatrix = Tmp::MatrixArray[0];
             auto& matrix    = bone->getBaseMatrix();
@@ -444,7 +443,7 @@ std::vector<IAnimatablePtr> Skeleton::getAnimatables()
   if (_animatables.size() != bones.size()) {
     _animatables.clear();
 
-    for (auto& bone : bones) {
+    for (const auto& bone : bones) {
       _animatables.emplace_back(bone);
     }
   }
