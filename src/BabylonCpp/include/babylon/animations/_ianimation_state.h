@@ -15,7 +15,7 @@ struct BABYLON_SHARED_EXPORT _IAnimationState {
   int key;
   int repeatCount;
   std::optional<AnimationValue> workValue = std::nullopt;
-  unsigned int loopMode;
+  std::optional<unsigned int> loopMode    = std::nullopt;
   AnimationValue offsetValue;
   AnimationValue highLimitValue;
 }; // end of struct _IAnimationState

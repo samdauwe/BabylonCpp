@@ -437,13 +437,13 @@ protected:
   /**
    * @brief Gets the animation properties override.
    */
-  AnimationPropertiesOverride*& get_animationPropertiesOverride();
+  AnimationPropertiesOverride*& get_animationPropertiesOverride() override;
 
   /**
    * @brief Sets the animation properties override.
    */
-  void
-  set_animationPropertiesOverride(AnimationPropertiesOverride* const& value);
+  void set_animationPropertiesOverride(
+    AnimationPropertiesOverride* const& value) override;
 
   /**
    * @brief Sets a callback that will be raised when the node will be disposed.
@@ -532,11 +532,6 @@ public:
   float _worldMatrixDeterminant;
   /** Hidden */
   bool _worldMatrixDeterminantIsDirty;
-
-  /**
-   * Animation properties override.
-   */
-  Property<Node, AnimationPropertiesOverride*> animationPropertiesOverride;
 
   /**
    * An event triggered when the mesh is disposed.

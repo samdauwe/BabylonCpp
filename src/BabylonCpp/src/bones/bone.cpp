@@ -16,7 +16,7 @@ std::array<Matrix, 5> Bone::_tmpMats{{Matrix::Identity(), Matrix::Identity(),
 
 Bone::Bone(const std::string& iName, Skeleton* skeleton, Bone* parentBone,
            const std::optional<Matrix>& localMatrix,
-           const std::optional<Matrix>& restPose,
+           const std::optional<Matrix>& iRestPose,
            const std::optional<Matrix>& baseMatrix, std::optional<int> index)
     : Node{iName, skeleton->getScene(), false}
     , length{-1}
@@ -28,10 +28,9 @@ Bone::Bone(const std::string& iName, Skeleton* skeleton, Bone* parentBone,
     , rotationQuaternion{this, &Bone::get_rotationQuaternion,
                          &Bone::set_rotationQuaternion}
     , scaling{this, &Bone::get_scaling, &Bone::set_scaling}
-    , animationPropertiesOverride{this, &Bone::get_animationPropertiesOverride}
     , _skeleton{skeleton}
     , _localMatrix{localMatrix ? *localMatrix : Matrix::Identity()}
-    , _restPose{restPose ? *restPose : Matrix::Identity()}
+    , _restPose{iRestPose ? *iRestPose : Matrix::Identity()}
     , _baseMatrix{baseMatrix ? *baseMatrix : _localMatrix}
     , _invertedAbsoluteTransform{std::make_unique<Matrix>()}
     , _parent{nullptr}
@@ -135,7 +134,7 @@ Matrix& Bone::getBaseMatrix()
   return _baseMatrix;
 }
 
-Matrix& Bone::getRestPose()
+std::optional<Matrix>& Bone::getRestPose()
 {
   return _restPose;
 }
@@ -147,7 +146,7 @@ Matrix& Bone::getWorldMatrix()
 
 void Bone::returnToRest()
 {
-  updateMatrix(_restPose);
+  updateMatrix(_restPose.value_or(Matrix::Identity()));
 }
 
 Matrix& Bone::getInvertedAbsoluteTransform()

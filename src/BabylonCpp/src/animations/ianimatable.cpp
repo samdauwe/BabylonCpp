@@ -4,8 +4,13 @@ namespace BABYLON {
 
 IAnimatable::IAnimatable()
     : parent{this, &IAnimatable::get_parent, &IAnimatable::set_parent}
+    , animationPropertiesOverride{this,
+                                  &IAnimatable::get_animationPropertiesOverride,
+                                  &IAnimatable::set_animationPropertiesOverride}
     , nullNode{nullptr}
     , _identityMatrix{Matrix::Identity()}
+    , _nullMatrix{std::nullopt}
+    , _nullAnimationPropertiesOverride{nullptr}
 {
 }
 
@@ -19,6 +24,16 @@ Node*& IAnimatable::get_parent()
 }
 
 void IAnimatable::set_parent(Node* const& /*parent*/)
+{
+}
+
+AnimationPropertiesOverride*& IAnimatable::get_animationPropertiesOverride()
+{
+  return _nullAnimationPropertiesOverride;
+}
+
+void IAnimatable::set_animationPropertiesOverride(
+  AnimationPropertiesOverride* const& /*value*/)
 {
 }
 
@@ -44,6 +59,11 @@ void IAnimatable::markAsDirty(unsigned int /*flag*/)
 Matrix& IAnimatable::getWorldMatrix()
 {
   return _identityMatrix;
+}
+
+std::optional<Matrix>& IAnimatable::getRestPose()
+{
+  return _nullMatrix;
 }
 
 AnimationValue

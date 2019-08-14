@@ -451,7 +451,7 @@ AnimationValue Animation::_interpolate(float currentFrame,
                   gradient) :
                 floatInterpolateFunction(startValue.get<float>(),
                                          endValue.get<float>(), gradient);
-          switch (state.loopMode) {
+          switch (state.loopMode.value()) {
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
               newVale = floatValue;
@@ -477,14 +477,14 @@ AnimationValue Animation::_interpolate(float currentFrame,
                 quaternionInterpolateFunction(startValue.get<Quaternion>(),
                                               endValue.get<Quaternion>(),
                                               gradient);
-          switch (state.loopMode) {
+          switch (state.loopMode.value()) {
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
               newVale = quatValue;
               return newVale;
             case Animation::ANIMATIONLOOPMODE_RELATIVE():
-              newVale = quatValue.add(
-                state.offsetValue.get<Quaternion>().scale(static_cast<float>(state.repeatCount)));
+              newVale = quatValue.add(state.offsetValue.get<Quaternion>().scale(
+                static_cast<float>(state.repeatCount)));
               return newVale;
             default:
               break;
@@ -502,14 +502,14 @@ AnimationValue Animation::_interpolate(float currentFrame,
                   gradient) :
                 vector3InterpolateFunction(startValue.get<Vector3>(),
                                            endValue.get<Vector3>(), gradient);
-          switch (state.loopMode) {
+          switch (state.loopMode.value()) {
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
               newVale = vec3Value;
               return newVale;
             case Animation::ANIMATIONLOOPMODE_RELATIVE():
-              newVale = vec3Value.add(
-                state.offsetValue.get<Vector3>().scale(static_cast<float>(state.repeatCount)));
+              newVale = vec3Value.add(state.offsetValue.get<Vector3>().scale(
+                static_cast<float>(state.repeatCount)));
               return newVale;
             default:
               break;
@@ -527,14 +527,14 @@ AnimationValue Animation::_interpolate(float currentFrame,
                   gradient) :
                 vector2InterpolateFunction(startValue.get<Vector2>(),
                                            endValue.get<Vector2>(), gradient);
-          switch (state.loopMode) {
+          switch (state.loopMode.value()) {
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
               newVale = vec2Value;
               return newVale;
             case Animation::ANIMATIONLOOPMODE_RELATIVE():
-              newVale = vec2Value.add(
-                state.offsetValue.get<Vector2>().scale(static_cast<float>(state.repeatCount)));
+              newVale = vec2Value.add(state.offsetValue.get<Vector2>().scale(
+                static_cast<float>(state.repeatCount)));
               return newVale;
             default:
               break;
@@ -542,7 +542,7 @@ AnimationValue Animation::_interpolate(float currentFrame,
         } break;
         // Size
         case Animation::ANIMATIONTYPE_SIZE():
-          switch (state.loopMode) {
+          switch (state.loopMode.value()) {
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
               newVale = sizeInterpolateFunction(startValue.get<Size>(),
@@ -560,7 +560,7 @@ AnimationValue Animation::_interpolate(float currentFrame,
           break;
         // Color3
         case Animation::ANIMATIONTYPE_COLOR3():
-          switch (state.loopMode) {
+          switch (state.loopMode.value()) {
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
               newVale = color3InterpolateFunction(
@@ -570,8 +570,8 @@ AnimationValue Animation::_interpolate(float currentFrame,
               newVale
                 = color3InterpolateFunction(startValue.get<Color3>(),
                                             endValue.get<Color3>(), gradient)
-                    .add(
-                      state.offsetValue.get<Color3>().scale(static_cast<float>(state.repeatCount)));
+                    .add(state.offsetValue.get<Color3>().scale(
+                      static_cast<float>(state.repeatCount)));
               return newVale;
             default:
               break;
@@ -579,7 +579,7 @@ AnimationValue Animation::_interpolate(float currentFrame,
           break;
         // Matrix
         case Animation::ANIMATIONTYPE_MATRIX():
-          switch (state.loopMode) {
+          switch (state.loopMode.value()) {
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
               if (Animation::AllowMatricesInterpolation()) {

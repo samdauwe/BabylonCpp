@@ -1853,13 +1853,13 @@ protected:
   /**
    * @brief Gets the animation properties override.
    */
-  AnimationPropertiesOverride*& get_animationPropertiesOverride();
+  AnimationPropertiesOverride*& get_animationPropertiesOverride() override;
 
   /**
    * @brief Sets the animation properties override.
    */
-  void
-  set_animationPropertiesOverride(AnimationPropertiesOverride* const& value);
+  void set_animationPropertiesOverride(
+    AnimationPropertiesOverride* const& value) override;
 
   // Events
   /**
@@ -2552,11 +2552,6 @@ public:
    * Gets or sets a boolean indicating if animations are enabled
    */
   bool animationsEnabled;
-
-  /**
-   * Animation properties override.
-   */
-  Property<Scene, AnimationPropertiesOverride*> animationPropertiesOverride;
 
   /**
    * Gets or sets a boolean indicating if a constant deltatime has to be used

@@ -265,13 +265,13 @@ protected:
   /**
    * @brief Gets the animation properties override.
    */
-  AnimationPropertiesOverride*& get_animationPropertiesOverride();
+  AnimationPropertiesOverride*& get_animationPropertiesOverride() override;
 
   /**
    * @brief Sets the animation properties override.
    */
-  void
-  set_animationPropertiesOverride(AnimationPropertiesOverride* const& value);
+  void set_animationPropertiesOverride(
+    AnimationPropertiesOverride* const& value) override;
 
   /**
    * @brief Gets a boolean indicating that the skeleton effectively stores
@@ -341,11 +341,6 @@ public:
    * the hardware does not support it
    */
   Property<Skeleton, bool> useTextureToStoreBoneMatrices;
-
-  /**
-   * Animation properties override
-   */
-  Property<Skeleton, AnimationPropertiesOverride*> animationPropertiesOverride;
 
   /**
    * List of inspectable custom properties (used by the Inspector)

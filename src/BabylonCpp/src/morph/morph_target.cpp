@@ -13,9 +13,6 @@ namespace BABYLON {
 MorphTarget::MorphTarget(const std::string& name, float iInfluence,
                          Scene* scene)
     : influence{this, &MorphTarget::get_influence, &MorphTarget::set_influence}
-    , animationPropertiesOverride{this,
-                                  &MorphTarget::get_animationPropertiesOverride,
-                                  &MorphTarget::set_animationPropertiesOverride}
     , hasPositions{this, &MorphTarget::get_hasPositions}
     , hasNormals{this, &MorphTarget::get_hasNormals}
     , hasTangents{this, &MorphTarget::get_hasTangents}

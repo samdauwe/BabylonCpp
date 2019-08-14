@@ -154,13 +154,13 @@ protected:
   /**
    * @brief Gets the animation properties override
    */
-  AnimationPropertiesOverride*& get_animationPropertiesOverride();
+  AnimationPropertiesOverride*& get_animationPropertiesOverride() override;
 
   /**
    * @brief Sets the animation properties override
    */
-  void
-  set_animationPropertiesOverride(AnimationPropertiesOverride* const& value);
+  void set_animationPropertiesOverride(
+    AnimationPropertiesOverride* const& value) override;
 
   /**
    * @brief Gets a boolean defining if the target contains position data.
@@ -211,12 +211,6 @@ public:
    * Gets or sets the id of the morph Target
    */
   std::string id;
-
-  /**
-   * Animation properties override
-   */
-  Property<MorphTarget, AnimationPropertiesOverride*>
-    animationPropertiesOverride;
 
   /**
    * Boolean defining if the target contains position data

@@ -86,7 +86,7 @@ public:
    * @brief Gets the rest pose matrix.
    * @returns a matrix
    */
-  Matrix& getRestPose();
+  std::optional<Matrix>& getRestPose() override;
 
   /**
    * @brief Gets a matrix used to store world matrix (ie. the matrix sent to
@@ -533,7 +533,7 @@ protected:
   /**
    * @brief Gets the animation properties override.
    */
-  AnimationPropertiesOverride*& get_animationPropertiesOverride();
+  AnimationPropertiesOverride*& get_animationPropertiesOverride() override;
 
 private:
   void _decompose();
@@ -593,12 +593,6 @@ public:
    */
   Property<Bone, std::optional<Vector3>> scaling;
 
-  /**
-   * Animation properties override
-   */
-  ReadOnlyProperty<Bone, AnimationPropertiesOverride*>
-    animationPropertiesOverride;
-
 private:
   static std::array<Vector3, 2> _tmpVecs;
   static Quaternion _tmpQuat;
@@ -607,7 +601,7 @@ private:
 private:
   Skeleton* _skeleton;
   Matrix _localMatrix;
-  Matrix _restPose;
+  std::optional<Matrix> _restPose;
   Matrix _baseMatrix;
   Matrix _absoluteTransform;
   std::unique_ptr<Matrix> _invertedAbsoluteTransform;

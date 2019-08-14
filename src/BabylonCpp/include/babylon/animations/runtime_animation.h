@@ -4,6 +4,7 @@
 #include <functional>
 #include <unordered_map>
 
+#include <babylon/animations/_ianimation_state.h>
 #include <babylon/animations/animation_value.h>
 #include <babylon/babylon_api.h>
 
@@ -13,6 +14,7 @@ class Animatable;
 class Animation;
 class AnimationEvent;
 class IAnimatable;
+struct IAnimationKey;
 class RuntimeAnimation;
 class Scene;
 using AnimationPtr        = std::shared_ptr<Animation>;
@@ -94,6 +96,7 @@ public:
    * @param speedRatio defines the current speed ratio
    * @param weight defines the weight of the animation (default is -1 so no
    * weight)
+   * @param onLoop optional callback called when animation loops
    * @returns a boolean indicating if the animation is running
    */
   bool animate(millisecond_t delay, float from, float to, bool loop,
@@ -136,25 +139,19 @@ protected:
   IAnimatablePtr& get_target();
 
 private:
-  /**
-   * @brief Interpolates the animation from the current frame.
-   * @param currentFrame The frame to interpolate the animation to
-   * @param repeatCount The number of times that the animation should loop
-   * @param loopMode The type of looping mode to use
-   * @param offsetValue Animation offset value
-   * @param highLimitValue The high limit value
-   * @returns The interpolated value
-   */
-  AnimationValue
-  _interpolate(float currentFrame, int repeatCount, unsigned int loopMode,
-               const AnimationValue& offsetValue    = AnimationValue(),
-               const AnimationValue& highLimitValue = AnimationValue());
-
+  void _preparePath(const IAnimatablePtr& target, unsigned int targetIndex = 0);
+  void _getOriginalValues(unsigned int targetIndex = 0);
   void _setValue(const IAnimatablePtr& target,
+                 const IAnimatablePtr& destination,
                  const AnimationValue& currentValue, float weight,
                  unsigned int targetIndex = 0);
 
 public:
+  /**
+   * Hidden
+   */
+  _IAnimationState _animationState;
+
   /**
    * Current frame of the runtime animation
    */
@@ -170,11 +167,6 @@ public:
    */
   ReadOnlyProperty<RuntimeAnimation, std::optional<AnimationValue>>
     currentValue;
-
-  /**
-   * Hidden
-   */
-  std::optional<AnimationValue> _workValue;
 
   /**
    * Target path of the runtime animation
@@ -222,7 +214,7 @@ private:
   /**
    * The original blend value of the runtime animation
    */
-  AnimationValue _originalBlendValue;
+  std::optional<AnimationValue> _originalBlendValue;
 
   /**
    * The offsets cache of the runtime animation
@@ -257,7 +249,9 @@ private:
   /**
    * The active target of the runtime animation
    */
-  IAnimatablePtr _activeTarget;
+  std::vector<IAnimatablePtr> _activeTargets;
+  IAnimatablePtr _currentActiveTarget;
+  IAnimatablePtr _directTarget;
 
   /**
    * The target path of the runtime animation
@@ -283,6 +277,15 @@ private:
    * The previous ratio of the runtime animation
    */
   float _previousRatio;
+
+  bool _enableBlending;
+
+  std::vector<IAnimationKey> _keys;
+  float _minFrame;
+  float _maxFrame;
+  float _minValue;
+  float _maxValue;
+  float _targetIsArray;
 
 }; // end of class RuntimeAnimation
 

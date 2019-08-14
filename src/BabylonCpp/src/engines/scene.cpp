@@ -122,8 +122,6 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , forceShowBoundingBoxes{this, &Scene::get_forceShowBoundingBoxes,
                              &Scene::set_forceShowBoundingBoxes}
     , animationsEnabled{true}
-    , animationPropertiesOverride{this, &Scene::get_animationPropertiesOverride,
-                                  &Scene::set_animationPropertiesOverride}
     , useConstantAnimationDeltaTime{false}
     , constantlyUpdateMeshUnderPointer{false}
     , hoverCursor{"pointer"}
@@ -2194,11 +2192,11 @@ AnimationValue Scene::_processLateAnimationBindingsForMatrices(
     currentPosition.scaleAndAddToRef(iScale, finalPosition);
   }
 
-  auto workValue = *originalAnimation->_workValue;
+  auto& workValue = *originalAnimation->_animationState.workValue;
   Matrix::ComposeToRef(finalScaling, finalQuaternion, finalPosition,
                        workValue.get<Matrix>());
-  originalAnimation->_workValue = workValue;
-  return (*originalAnimation->_workValue);
+  originalAnimation->_animationState.workValue = workValue;
+  return (*originalAnimation->currentValue());
 }
 
 Quaternion Scene::_processLateAnimationBindingsForQuaternions(

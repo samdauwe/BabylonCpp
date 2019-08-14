@@ -5,6 +5,7 @@
 #include <babylon/animations/_ianimation_state.h>
 #include <babylon/animations/animatable.h>
 #include <babylon/animations/animation.h>
+#include <babylon/animations/animation_properties_override.h>
 #include <babylon/animations/easing/ieasing_function.h>
 #include <babylon/animations/ianimatable.h>
 #include <babylon/animations/ianimation_key.h>
@@ -18,23 +19,63 @@ RuntimeAnimation::RuntimeAnimation(const IAnimatablePtr& iTarget,
     : currentFrame{this, &RuntimeAnimation::get_currentFrame}
     , weight{this, &RuntimeAnimation::get_weight}
     , currentValue{this, &RuntimeAnimation::get_currentValue}
-    , _workValue{std::nullopt}
     , targetPath{this, &RuntimeAnimation::get_targetPath}
     , target{this, &RuntimeAnimation::get_target}
+    , _onLoop{nullptr}
     , _currentFrame{0}
-    , _animation{animation}
-    , _target{iTarget}
-    , _host{host}
+    , _originalBlendValue{std::nullopt}
     , _stopped{false}
     , _blendingFactor{0.f}
-    , _scene{scene}
     , _currentValue{std::nullopt}
+    , _currentActiveTarget{nullptr}
+    , _directTarget{nullptr}
     , _targetPath{""}
     , _weight{1.f}
     , _ratioOffset{0.f}
     , _previousDelay{millisecond_t{0}}
     , _previousRatio{0.f}
+    , _targetIsArray{false}
 {
+  _animation     = animation;
+  _target        = iTarget;
+  _scene         = scene;
+  _host          = host;
+  _activeTargets = {};
+
+  // State
+  _animationState.key         = 0;
+  _animationState.repeatCount = 0;
+  _animationState.loopMode    = _getCorrectLoopMode();
+
+  if (_animation->dataType
+      == static_cast<int>(Animation::ANIMATIONTYPE_MATRIX())) {
+    _animationState.workValue = Matrix::Zero();
+  }
+
+  // Limits
+  _keys     = _animation->getKeys();
+  _minFrame = _keys[0].frame;
+  _maxFrame = _keys.back().frame;
+  _minValue = _keys[0].value;
+  _maxValue = _keys.back().value;
+
+  // Add a start key at frame 0 if missing
+  if (_minFrame != 0.f) {
+    const auto newKey = IAnimationKey{
+      0.f,       // frame
+      _minValue, // value
+    };
+    _keys.insert(_keys.begin(), newKey);
+  }
+
+  // Check data
+  {
+    _preparePath(_target);
+    _getOriginalValues();
+    _targetIsArray = false;
+    _directTarget  = _activeTargets[0];
+  }
+
   // Cloning events locally
   const auto& events = animation->getEvents();
   if (!events.empty()) {
@@ -42,6 +83,10 @@ RuntimeAnimation::RuntimeAnimation(const IAnimatablePtr& iTarget,
       _events.emplace_back(e);
     }
   }
+
+  _enableBlending = iTarget && iTarget->animationPropertiesOverride() ?
+                      iTarget->animationPropertiesOverride()->enableBlending :
+                      _animation->enableBlending;
 }
 
 RuntimeAnimation::~RuntimeAnimation()
@@ -76,7 +121,26 @@ std::string RuntimeAnimation::get_targetPath() const
 
 IAnimatablePtr& RuntimeAnimation::get_target()
 {
-  return _activeTarget;
+  return _currentActiveTarget;
+}
+
+void RuntimeAnimation::_preparePath(const IAnimatablePtr& iTarget,
+                                    unsigned int targetIndex)
+{
+  const auto& targetPropertyPath = _animation->targetPropertyPath;
+
+  if (targetIndex >= _activeTargets.size()) {
+    _activeTargets.resize(targetIndex + 1);
+  }
+
+  if (targetPropertyPath.size() > 1) {
+    _targetPath                 = targetPropertyPath.back();
+    _activeTargets[targetIndex] = iTarget;
+  }
+  else {
+    _targetPath                 = targetPropertyPath[0];
+    _activeTargets[targetIndex] = iTarget;
+  }
 }
 
 AnimationPtr& RuntimeAnimation::animation()
@@ -88,7 +152,7 @@ void RuntimeAnimation::reset(bool restoreOriginal)
 {
   if (restoreOriginal) {
     if (!_originalValue.empty() && _originalValue[0] != std::nullopt) {
-      // _setValue(_target, _originalValue[0], -1);
+      _setValue(_target, _directTarget, *_originalValue[0], -1.f, 0);
     }
   }
 
@@ -120,57 +184,49 @@ void RuntimeAnimation::dispose()
     runtimeAnimations.end());
 }
 
-AnimationValue RuntimeAnimation::_interpolate(
-  float iCurrentFrame, int repeatCount, unsigned int loopMode,
-  const AnimationValue& offsetValue, const AnimationValue& highLimitValue)
-{
-  _currentFrame = iCurrentFrame;
-
-  if (_animation->dataType != -1
-      && static_cast<unsigned>(_animation->dataType)
-           == Animation::ANIMATIONTYPE_MATRIX()
-      && !_workValue) {
-    _workValue = Matrix::Zero();
-  }
-
-  _IAnimationState state;
-  state.repeatCount    = repeatCount;
-  state.workValue      = _workValue;
-  state.loopMode       = loopMode;
-  state.offsetValue    = offsetValue;
-  state.highLimitValue = highLimitValue;
-
-  return _animation->_interpolate(currentFrame, state);
-}
-
 void RuntimeAnimation::setValue(const AnimationValue& iCurrentValue,
                                 float iWeight)
 {
-  _setValue(_target, iCurrentValue, iWeight);
+  _setValue(_target, _directTarget, iCurrentValue, iWeight);
+}
+
+void RuntimeAnimation::_getOriginalValues(unsigned int targetIndex)
+{
+  if (targetIndex >= _activeTargets.size()) {
+    return;
+  }
+
+  if (targetIndex >= _originalValue.size()) {
+    _originalValue.resize(targetIndex + 1);
+  }
+
+  AnimationValue originalValue;
+  auto& iTarget = _activeTargets[targetIndex];
+
+  if (iTarget->getRestPose().has_value()
+      && _targetPath == "_matrix") { // For bones
+    originalValue = *iTarget->getRestPose();
+  }
+  else {
+    originalValue = iTarget->getProperty({_targetPath});
+  }
+
+  if (originalValue) {
+    _originalValue[targetIndex] = originalValue;
+  }
+  else {
+    _originalValue[targetIndex] = originalValue;
+  }
 }
 
 void RuntimeAnimation::_setValue(const IAnimatablePtr& iTarget,
+                                 const IAnimatablePtr& destination,
                                  const AnimationValue& iCurrentValue,
                                  float iWeight, unsigned int targetIndex)
 {
   // Set value
-  std::string path           = "";
-  IAnimatablePtr destination = nullptr;
-
-  const auto& targetPropertyPath = _animation->targetPropertyPath;
-
-  if (targetPropertyPath.size() > 1) {
-    path        = targetPropertyPath.back();
-    destination = iTarget;
-  }
-  else {
-    path        = targetPropertyPath[0];
-    destination = iTarget;
-  }
-
-  _targetPath   = path;
-  _activeTarget = destination;
-  _weight       = iWeight;
+  _currentActiveTarget = destination;
+  _weight              = iWeight;
 
   if (targetIndex >= _originalValue.size()) {
     _originalValue.resize(targetIndex + 1);
@@ -180,6 +236,7 @@ void RuntimeAnimation::_setValue(const IAnimatablePtr& iTarget,
   // Blending
   auto enableBlending = false;
   if (enableBlending && _blendingFactor <= 1.f) {
+    // @TODO: implement
   }
   else {
     _currentValue = iCurrentValue;
@@ -189,31 +246,40 @@ void RuntimeAnimation::_setValue(const IAnimatablePtr& iTarget,
   }
   else {
     if (_currentValue.has_value()) {
+      const auto& targetPropertyPath = _animation->targetPropertyPath;
       destination->setProperty(targetPropertyPath, _currentValue.value());
     }
+  }
+
+  /* if (iTarget->markAsDirty) */ {
+    iTarget->markAsDirty(_animation->targetProperty);
   }
 }
 
 std::optional<unsigned int> RuntimeAnimation::_getCorrectLoopMode() const
 {
-  return 0u;
+  if (_target && _target->animationPropertiesOverride) {
+    return _target->animationPropertiesOverride()->loopMode;
+  }
+
+  return _animation->loopMode;
 }
 
 void RuntimeAnimation::goToFrame(float frame)
 {
   auto& keys = _animation->getKeys();
 
-  float _frame = frame;
-  if (_frame < keys[0].frame) {
-    _frame = keys[0].frame;
+  if (frame < keys[0].frame) {
+    frame = keys[0].frame;
   }
-  else if (_frame > keys.back().frame) {
-    _frame = keys.back().frame;
+  else if (frame > keys.back().frame) {
+    frame = keys.back().frame;
   }
 
-  auto iCurrentValue = _interpolate(_frame, 0, _animation->loopMode);
+  _currentFrame      = frame;
+  auto iCurrentValue = _animation->_interpolate(frame, _animationState);
 
-  setValue(iCurrentValue);
+  setValue(iCurrentValue, -1);
 }
 
 void RuntimeAnimation::_prepareForSpeedRatioChange(float newSpeedRatio)
@@ -226,7 +292,8 @@ void RuntimeAnimation::_prepareForSpeedRatioChange(float newSpeedRatio)
 bool RuntimeAnimation::animate(millisecond_t delay, float from, float to,
                                bool loop, float speedRatio, float iWeight)
 {
-  const auto& targetPropertyPath = _animation->targetPropertyPath;
+  auto& animation                = *_animation;
+  const auto& targetPropertyPath = animation.targetPropertyPath;
   if (targetPropertyPath.empty()) {
     _stopped = true;
     return false;
@@ -234,98 +301,79 @@ bool RuntimeAnimation::animate(millisecond_t delay, float from, float to,
 
   auto returnValue = true;
 
-  auto& keys = _animation->getKeys();
-
-  // Adding a start key at frame 0 if missing
-  if (keys[0].frame > 0.f) {
-    keys.insert(keys.begin(), IAnimationKey(0, keys[0].value));
-  }
-  // Adding a duplicate key when there is only one key at frame zero
-  else if (keys.size() == 1) {
-    keys.emplace_back(IAnimationKey(0.001f, keys[0].value));
-  }
-
   // Check limits
-  if (from < keys[0].frame || from > keys.back().frame) {
-    from = keys[0].frame;
+  if (from < _minFrame || from > _maxFrame) {
+    from = _minFrame;
   }
-  if (to < keys[0].frame || to > keys.back().frame) {
-    to = keys.back().frame;
-  }
-
-  // to and from cannot be the same key
-  if (stl_util::almost_equal(from, to)) {
-    if (from > keys[0].frame) {
-      from--;
-    }
-    else if (to < keys.back().frame) {
-      to++;
-    }
+  if (to < _minFrame || to > _maxFrame) {
+    to = _maxFrame;
   }
 
   // Compute ratio
   auto range = to - from;
   AnimationValue offsetValue;
-  // ratio represents the frame delta between from and to
-  float ratio = (static_cast<float>(delay.count())
-                 * (_animation->framePerSecond * speedRatio) / 1000.f)
-                + _ratioOffset;
+
+  // Compute ratio which represents the frame delta between from and to
+  auto ratio = (static_cast<float>(delay.count())
+                * (animation.framePerSecond * speedRatio) / 1000.f)
+               + _ratioOffset;
   AnimationValue highLimitValue(0.f);
 
   _previousDelay = delay;
   _previousRatio = ratio;
 
-  if (((to > from && ratio >= range) || (from > to && ratio <= range))
-      && !loop) {
+  if (!loop && (to >= from && ratio >= range)) {
     // If we are out of range and not looping get back to caller
-    returnValue = false;
-    // @TODO FIXME
-    // highLimitValue = _getKeyValue(keys.back().value);
+    returnValue    = false;
+    highLimitValue = animation._getKeyValue(_minValue);
   }
-  else {
-    // Get max value if required
-    if (_animation->loopMode != Animation::ANIMATIONLOOPMODE_CYCLE()) {
-      std::string keyOffset = std::to_string(to) + std::to_string(from);
-      if (!_offsetsCache.count(keyOffset)) {
-        AnimationValue fromValue
-          = _interpolate(from, 0, Animation::ANIMATIONLOOPMODE_CYCLE());
-        AnimationValue toValue
-          = _interpolate(to, 0, Animation::ANIMATIONLOOPMODE_CYCLE());
-        switch (_animation->dataType) {
-          // Float
-          case Animation::ANIMATIONTYPE_FLOAT():
-            _offsetsCache[keyOffset] = toValue - fromValue;
-            break;
-          // Quaternion
-          case Animation::ANIMATIONTYPE_QUATERNION():
-            _offsetsCache[keyOffset] = toValue.subtract(fromValue);
-            break;
-          // Vector3
-          case Animation::ANIMATIONTYPE_VECTOR3():
-            _offsetsCache[keyOffset] = toValue.subtract(fromValue);
-            break;
-          // Vector2
-          case Animation::ANIMATIONTYPE_VECTOR2():
-            _offsetsCache[keyOffset] = toValue.subtract(fromValue);
-            break;
-          // Size
-          case Animation::ANIMATIONTYPE_SIZE():
-            _offsetsCache[keyOffset] = toValue.subtract(fromValue);
-            break;
-          // Color3
-          case Animation::ANIMATIONTYPE_COLOR3():
-            _offsetsCache[keyOffset] = toValue.subtract(fromValue);
-            break;
-          default:
-            break;
-        }
+  else if (!loop && (from >= to && ratio <= range)) {
+    returnValue    = false;
+    highLimitValue = animation._getKeyValue(_minValue);
+  }
+  else if (_animationState.loopMode != Animation::ANIMATIONLOOPMODE_CYCLE()) {
+    std::string keyOffset = std::to_string(to) + std::to_string(from);
+    if (!_offsetsCache.count(keyOffset)) {
+      _animationState.repeatCount = 0;
+      _animationState.loopMode    = Animation::ANIMATIONLOOPMODE_CYCLE();
+      auto fromValue = animation._interpolate(from, _animationState);
+      auto toValue   = animation._interpolate(to, _animationState);
 
-        _highLimitsCache[keyOffset] = toValue;
+      _animationState.loopMode = _getCorrectLoopMode();
+      switch (_animation->dataType) {
+        // Float
+        case Animation::ANIMATIONTYPE_FLOAT():
+          _offsetsCache[keyOffset] = toValue - fromValue;
+          break;
+        // Quaternion
+        case Animation::ANIMATIONTYPE_QUATERNION():
+          _offsetsCache[keyOffset] = toValue.subtract(fromValue);
+          break;
+        // Vector3
+        case Animation::ANIMATIONTYPE_VECTOR3():
+          _offsetsCache[keyOffset] = toValue.subtract(fromValue);
+          break;
+        // Vector2
+        case Animation::ANIMATIONTYPE_VECTOR2():
+          _offsetsCache[keyOffset] = toValue.subtract(fromValue);
+          break;
+        // Size
+        case Animation::ANIMATIONTYPE_SIZE():
+          _offsetsCache[keyOffset] = toValue.subtract(fromValue);
+          break;
+        // Color3
+        case Animation::ANIMATIONTYPE_COLOR3():
+          _offsetsCache[keyOffset] = toValue.subtract(fromValue);
+          break;
+        default:
+          break;
       }
 
-      highLimitValue = _highLimitsCache[keyOffset];
-      offsetValue    = _offsetsCache[keyOffset];
+      _highLimitsCache[keyOffset] = toValue;
     }
+
+    highLimitValue = _highLimitsCache[keyOffset];
+    offsetValue    = _offsetsCache[keyOffset];
   }
 
   auto animationType = offsetValue.animationType();
@@ -361,8 +409,7 @@ bool RuntimeAnimation::animate(millisecond_t delay, float from, float to,
   }
 
   // Compute value
-  auto repeatCount   = static_cast<int>(ratio / range);
-  auto iCurrentFrame = returnValue ? from + std::fmod(ratio, range) : to;
+  auto iCurrentFrame = 0.f;
 
   // Need to normalize?
   if (_host && _host->syncRoot) {
@@ -371,48 +418,62 @@ bool RuntimeAnimation::animate(millisecond_t delay, float from, float to,
                                / (syncRoot->toFrame - syncRoot->fromFrame);
     iCurrentFrame = from + (to - from) * hostNormalizedFrame;
   }
+  else {
+    iCurrentFrame
+      = (returnValue && range != 0.f) ? from + std::fmod(ratio, range) : to;
+  }
 
   // Reset events if looping
   auto& events = _events;
   if ((range > 0.f && currentFrame > currentFrame)
       || (range < 0.f && currentFrame < currentFrame)) {
+    _onLoop();
+
     // Need to reset animation events
-    for (auto& event : events) {
-      if (!event.onlyOnce) {
-        // reset event, the animation is looping
-        event.isDone = false;
+    if (!events.empty()) {
+      for (auto& event : events) {
+        if (!event.onlyOnce) {
+          // reset event, the animation is looping
+          event.isDone = false;
+        }
       }
     }
   }
+  _currentFrame = currentFrame;
+  _animationState.repeatCount
+    = range == 0.f ? 0 : static_cast<int>(ratio / range) >> 0;
+  _animationState.highLimitValue = highLimitValue;
+  _animationState.offsetValue    = offsetValue;
 
-  auto iCurrentValue
-    = _interpolate(iCurrentFrame, repeatCount, *_getCorrectLoopMode(),
-                   offsetValue, highLimitValue);
+  auto iCurrentValue = animation._interpolate(iCurrentFrame, _animationState);
 
   // Set value
   setValue(iCurrentValue, iWeight);
 
   // Check events
-  for (unsigned int index = 0; index < events.size(); ++index) {
-    // Make sure current frame has passed event frame and that event frame is
-    // within the current range
-    // Also, handle both forward and reverse animations
-    if ((range > 0.f && iCurrentFrame >= events[index].frame
-         && events[index].frame >= from)
-        || (range < 0.f && iCurrentFrame <= events[index].frame
-            && events[index].frame <= from)) {
-      auto& event = events[index];
-      if (!event.isDone) {
-        // If event should be done only once, remove it.
-        if (event.onlyOnce) {
-          events.erase(events.begin() + index);
-          --index;
-        }
-        event.isDone = true;
-        event.action(iCurrentFrame);
-      } // Don't do anything if the event has already be done.
+  if (!events.empty()) {
+    for (unsigned int index = 0; index < events.size(); ++index) {
+      // Make sure current frame has passed event frame and that event frame is
+      // within the current range
+      // Also, handle both forward and reverse animations
+      if ((range > 0.f && iCurrentFrame >= events[index].frame
+           && events[index].frame >= from)
+          || (range < 0.f && iCurrentFrame <= events[index].frame
+              && events[index].frame <= from)) {
+        auto& event = events[index];
+        if (!event.isDone) {
+          // If event should be done only once, remove it.
+          if (event.onlyOnce) {
+            events.erase(events.begin() + index);
+            --index;
+          }
+          event.isDone = true;
+          event.action(iCurrentFrame);
+        } // Don't do anything if the event has already be done.
+      }
     }
   }
+
   if (!returnValue) {
     _stopped = true;
   }

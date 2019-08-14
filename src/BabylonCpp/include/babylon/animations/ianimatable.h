@@ -8,6 +8,7 @@
 namespace BABYLON {
 
 class Animation;
+struct AnimationPropertiesOverride;
 class Node;
 using AnimationPtr = std::shared_ptr<Animation>;
 
@@ -23,6 +24,7 @@ public:
   virtual IAnimatable& markAsDirty(const std::string& property = "");
   virtual void markAsDirty(unsigned int /*flag*/);
   virtual Matrix& getWorldMatrix();
+  virtual std::optional<Matrix>& getRestPose();
 
   virtual AnimationValue
   getProperty(const std::vector<std::string>& targetPropertyPath);
@@ -50,12 +52,21 @@ public:
 protected:
   virtual Node*& get_parent();
   virtual void set_parent(Node* const& parent);
+  virtual AnimationPropertiesOverride*& get_animationPropertiesOverride();
+  virtual void
+  set_animationPropertiesOverride(AnimationPropertiesOverride* const& value);
 
 public:
   /**
    * Parent of the node.
    */
   Property<IAnimatable, Node*> parent;
+
+  /**
+   * Gets the animation properties override
+   */
+  Property<IAnimatable, AnimationPropertiesOverride*>
+    animationPropertiesOverride;
 
   /**
    * Gets or sets a string used to store user defined state for the node
@@ -65,6 +76,8 @@ public:
 private:
   Node* nullNode;
   Matrix _identityMatrix;
+  std::optional<Matrix> _nullMatrix;
+  AnimationPropertiesOverride* _nullAnimationPropertiesOverride;
 
 }; // end of struct IAnimatable
 

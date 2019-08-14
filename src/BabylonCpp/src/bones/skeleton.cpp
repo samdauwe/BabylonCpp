@@ -28,9 +28,6 @@ Skeleton::Skeleton(const std::string& iName, const std::string& iId,
                                       get_useTextureToStoreBoneMatrices,
                                     &Skeleton::
                                       set_useTextureToStoreBoneMatrices}
-    , animationPropertiesOverride{this,
-                                  &Skeleton::get_animationPropertiesOverride,
-                                  &Skeleton::set_animationPropertiesOverride}
     , isUsingTextureForMatrices{this, &Skeleton::get_isUsingTextureForMatrices}
     , uniqueId{this, &Skeleton::get_uniqueId}
     , _isDirty{true}
