@@ -27,7 +27,7 @@ class BABYLON_SHARED_EXPORT ArrayTools {
   {
     std::vector<T> a;
     a.reserve(size);
-    for (auto i = 0ull; i < size; ++i) {
+    for (size_t i = 0ull; i < size; ++i) {
       a.emplace_back(itemBuilder());
     }
     return a;

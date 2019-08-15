@@ -205,7 +205,7 @@ void MultiRenderTarget::releaseInternalTextures()
     return;
   }
 
-  for (auto i = _internalTextures.size(); i-- > 0;) {
+  for (size_t i = _internalTextures.size(); i-- > 0;) {
     if (_internalTextures[i] != nullptr) {
       _internalTextures[i]->dispose();
     }

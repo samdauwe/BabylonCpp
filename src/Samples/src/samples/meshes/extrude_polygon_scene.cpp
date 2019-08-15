@@ -416,7 +416,7 @@ void ExtrudePolygonScene::initializeScene(ICanvas* canvas, Scene* scene)
   stairs.emplace_back(Vector3(x, 0.f, z));
   z += stairsHeight / nBStairs - stairsThickness;
   stairs.emplace_back(Vector3(x, 0.f, z));
-  for (auto i = 0; i < nBStairs; ++i) {
+  for (int i = 0; i < nBStairs; ++i) {
     x += stairsDepth / nBStairs;
     stairs.emplace_back(Vector3(x, 0.f, z));
     z += stairsHeight / nBStairs;
@@ -426,7 +426,7 @@ void ExtrudePolygonScene::initializeScene(ICanvas* canvas, Scene* scene)
   stairs.emplace_back(Vector3(x, 0.f, z));
 
   // Down
-  for (auto i = 0; i <= nBStairs; i++) {
+  for (int i = 0; i <= nBStairs; i++) {
     x -= stairsDepth / nBStairs;
     stairs.emplace_back(Vector3(x, 0.f, z));
     z -= stairsHeight / nBStairs;

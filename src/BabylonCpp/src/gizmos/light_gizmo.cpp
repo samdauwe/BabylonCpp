@@ -149,7 +149,7 @@ MeshPtr LightGizmo::_createLightLines(float levels, Scene* scene)
   if (levels < 2.f) {
     return linePivot;
   }
-  for (auto i = 0u; i < 4; i++) {
+  for (unsigned i = 0u; i < 4; i++) {
     auto l          = linePivot->clone("lineParentClone");
     l->rotation().z = Math::PI_4;
     l->rotation().y = (Math::PI_2) + (Math::PI_2 * i);
@@ -164,7 +164,7 @@ MeshPtr LightGizmo::_createLightLines(float levels, Scene* scene)
   if (levels < 3.f) {
     return root;
   }
-  for (auto i = 0u; i < 4; i++) {
+  for (unsigned i = 0u; i < 4; i++) {
     auto l          = linePivot->clone("linePivotClone");
     l->rotation().z = Math::PI_2;
     l->rotation().y = (Math::PI_2 * i);
@@ -173,7 +173,7 @@ MeshPtr LightGizmo::_createLightLines(float levels, Scene* scene)
   if (levels < 4.f) {
     return root;
   }
-  for (auto i = 0u; i < 4; i++) {
+  for (unsigned i = 0u; i < 4; i++) {
     auto l          = linePivot->clone("linePivotClone");
     l->rotation().z = Math::PI + (Math::PI_4);
     l->rotation().y = (Math::PI_2) + (Math::PI_2 * i);

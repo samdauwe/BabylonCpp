@@ -95,7 +95,7 @@ MeshPtr ShapeBuilder::_ExtrudeShapeGeneric(
         auto& rotationMatrix = Tmp::MatrixArray[0];
         shapePaths.resize(_curve.size());
 
-        for (auto i = 0ull; i < _curve.size(); ++i) {
+        for (size_t i = 0ull; i < _curve.size(); ++i) {
           std::vector<Vector3> shapePath;
           auto angleStep  = rotate(static_cast<float>(i), distances[i]);
           auto scaleRatio = scl(static_cast<float>(i), distances[i]);
@@ -117,11 +117,11 @@ MeshPtr ShapeBuilder::_ExtrudeShapeGeneric(
         const auto capPath = [&](const std::vector<Vector3>& shapePath) {
           std::vector<Vector3> pointCap;
           auto barycenter = Vector3::Zero();
-          for (auto i = 0ull; i < shapePath.size(); ++i) {
+          for (size_t i = 0ull; i < shapePath.size(); ++i) {
             barycenter.addInPlace(shapePath[i]);
           }
           barycenter.scaleInPlace(1.f / static_cast<float>(shapePath.size()));
-          for (auto i = 0ull; i < shapePath.size(); ++i) {
+          for (size_t i = 0ull; i < shapePath.size(); ++i) {
             pointCap.emplace_back(barycenter);
           }
           return pointCap;

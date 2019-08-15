@@ -63,7 +63,7 @@ void FireMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   std::vector<IAnimationKey> keys;
   std::optional<float> previous = std::nullopt;
-  for (auto i = 0; i < 20; i++) {
+  for (int i = 0; i < 20; i++) {
     auto rand = Scalar::Clamp(Math::random(), 0.5f, 1.f);
 
     if (previous.has_value()) {

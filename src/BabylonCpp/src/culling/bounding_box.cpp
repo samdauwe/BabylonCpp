@@ -274,9 +274,9 @@ bool BoundingBox::IsCompletelyInFrustum(
   const std::array<Vector3, 8>& boundingVectors,
   const std::array<Plane, 6>& frustumPlanes)
 {
-  for (auto p = 0u; p < 6; ++p) {
+  for (unsigned p = 0u; p < 6; ++p) {
     const auto& frustumPlane = frustumPlanes[p];
-    for (auto i = 0u; i < 8; ++i) {
+    for (unsigned i = 0u; i < 8; ++i) {
       if (frustumPlane.dotCoordinate(boundingVectors[i]) < 0.f) {
         return false;
       }
@@ -288,10 +288,10 @@ bool BoundingBox::IsCompletelyInFrustum(
 bool BoundingBox::IsInFrustum(const std::array<Vector3, 8>& boundingVectors,
                               const std::array<Plane, 6>& frustumPlanes)
 {
-  for (auto p = 0u; p < 6; ++p) {
+  for (unsigned p = 0u; p < 6; ++p) {
     auto canReturnFalse      = true;
     const auto& frustumPlane = frustumPlanes[p];
-    for (auto i = 0u; i < 8; ++i) {
+    for (unsigned i = 0u; i < 8; ++i) {
       if (frustumPlane.dotCoordinate(boundingVectors[i]) >= 0) {
         canReturnFalse = false;
         break;

@@ -114,7 +114,7 @@ public:
       std::string operator()() const
       {
         std::stringstream ss;
-        for (auto i = 0; i < value.size(); ++i) {
+        for (size_t i = 0ull; i < value.size(); ++i) {
           const auto& obj = value[i];
           ss << name << "[]=" << obj;
           if (i < value.size() - 1) {

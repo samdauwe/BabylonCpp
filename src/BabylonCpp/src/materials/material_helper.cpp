@@ -198,8 +198,9 @@ bool MaterialHelper::PrepareDefinesForAttributes(
         defines.boolDef["BONETEXTURE"] = true;
       }
       else {
-        defines.intDef["BonesPerMesh"] = static_cast<int>((mesh->skeleton()->bones.size() + 1));
-        defines.boolDef["BONETEXTURE"]  = false;
+        defines.intDef["BonesPerMesh"]
+          = static_cast<int>((mesh->skeleton()->bones.size() + 1));
+        defines.boolDef["BONETEXTURE"] = false;
       }
     }
     else {
@@ -631,7 +632,7 @@ void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh,
   auto len = std::min(mesh->lightSources().size(),
                       static_cast<size_t>(maxSimultaneousLights));
 
-  for (auto i = 0u; i < len; ++i) {
+  for (unsigned i = 0u; i < len; ++i) {
 
     auto& light    = mesh->lightSources()[i];
     auto iAsString = std::to_string(i);

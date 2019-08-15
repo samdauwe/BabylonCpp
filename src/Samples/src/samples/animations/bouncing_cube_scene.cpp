@@ -96,7 +96,7 @@ void BouncingCubeScene::initializeScene(ICanvas* canvas, Scene* scene)
     platformMinSize + Math::random() * platformMaxDepth);
 
   _platforms.emplace_back(platform);
-  for (auto i = 1; i < platformNb; ++i) {
+  for (int i = 1; i < platformNb; ++i) {
     auto instance = platform->createInstance("platform" + std::to_string(i));
     instance->position = Vector3((0.5f - Math::random()) * platformLimit,
                                  (0.5f - Math::random()) * platformLimit,

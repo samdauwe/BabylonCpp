@@ -134,7 +134,7 @@ bool BoundingSphere::isInFrustum(
 {
   const auto& iCenter = centerWorld;
   const auto& iRadius = radiusWorld;
-  for (auto i = 0u; i < 6; ++i) {
+  for (unsigned i = 0u; i < 6; ++i) {
     if (frustumPlanes[i].dotCoordinate(iCenter) <= -iRadius) {
       return false;
     }
@@ -146,7 +146,7 @@ bool BoundingSphere::isCenterInFrustum(
   const std::array<Plane, 6>& frustumPlanes) const
 {
   const auto& iCenter = centerWorld;
-  for (auto i = 0u; i < 6; ++i) {
+  for (unsigned i = 0u; i < 6; ++i) {
     if (frustumPlanes[i].dotCoordinate(iCenter) < 0.f) {
       return false;
     }

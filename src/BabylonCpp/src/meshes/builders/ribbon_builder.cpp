@@ -88,7 +88,7 @@ MeshPtr RibbonBuilder::CreateRibbon(const std::string& name,
     }
     if (!options.uvs.empty()) {
       auto uvs = instance->getVerticesData(VertexBuffer::UVKind);
-      for (auto i = 0ull; i < options.uvs.size(); ++i) {
+      for (size_t i = 0ull; i < options.uvs.size(); ++i) {
         uvs[i * 2]     = options.uvs[i].x;
         uvs[i * 2 + 1] = options.uvs[i].y;
       }
