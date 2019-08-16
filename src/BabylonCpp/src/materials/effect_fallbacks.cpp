@@ -129,7 +129,7 @@ std::string EffectFallbacks::reduce(std::string currentDefines, Effect* effect)
     effect->_bonesComputationForcedToCPU = true;
 
     auto scene = _mesh->getScene();
-    for (auto& otherMesh : scene->meshes) {
+    for (const auto& otherMesh : scene->meshes) {
       if (!otherMesh->material()) {
         continue;
       }
@@ -143,7 +143,7 @@ std::string EffectFallbacks::reduce(std::string currentDefines, Effect* effect)
         otherMesh->computeBonesUsingShaders = false;
       }
       else if (!otherMesh->subMeshes.empty()) {
-        for (auto& subMesh : otherMesh->subMeshes) {
+        for (const auto& subMesh : otherMesh->subMeshes) {
           auto subMeshEffect = subMesh->effect();
 
           if (subMeshEffect.get() == effect) {
@@ -157,7 +157,7 @@ std::string EffectFallbacks::reduce(std::string currentDefines, Effect* effect)
   else {
     if (_defines.find(_currentRank) != _defines.end()
         && !_defines[_currentRank].empty()) {
-      for (auto& currentFallback : _defines[_currentRank]) {
+      for (const auto& currentFallback : _defines[_currentRank]) {
         String::replaceInPlace(currentDefines, "#define " + currentFallback,
                                "");
       }

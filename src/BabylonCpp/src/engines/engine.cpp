@@ -96,6 +96,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , disablePerformanceMonitorInBackground{false}
     , premultipliedAlpha{options.premultipliedAlpha}
     , enableUnpackFlipYCached{true}
+    , _highPrecisionShadersAllowed{true}
     , _depthCullingState{std::make_unique<_DepthCullingState>()}
     , _stencilState{std::make_unique<_StencilState>()}
     , _alphaState{std::make_unique<_AlphaState>()}
@@ -251,8 +252,8 @@ Scene* Engine::LastCreatedScene()
 void Engine::MarkAllMaterialsAsDirty(
   unsigned int flag, const std::function<bool(Material* mat)>& predicate)
 {
-  for (auto& engine : Engine::Instances) {
-    for (auto& scene : engine->scenes) {
+  for (const auto& engine : Engine::Instances) {
+    for (const auto& scene : engine->scenes) {
       scene->markAllMaterialsAsDirty(flag, predicate);
     }
   }
@@ -314,14 +315,14 @@ InternalTexturePtr& Engine::emptyCubeTexture()
 
 void Engine::_rebuildInternalTextures()
 {
-  for (auto& internalTexture : _internalTexturesCache) {
+  for (const auto& internalTexture : _internalTexturesCache) {
     internalTexture->_rebuild();
   }
 }
 
 void Engine::_rebuildEffects()
 {
-  for (auto& item : _compiledEffects) {
+  for (const auto& item : _compiledEffects) {
     item.second->_prepareEffect();
   }
 
@@ -331,14 +332,14 @@ void Engine::_rebuildEffects()
 void Engine::_rebuildBuffers()
 {
   // Index / Vertex
-  for (auto& scene : scenes) {
+  for (const auto& scene : scenes) {
     scene->resetCachedMaterial();
     scene->_rebuildGeometries();
     scene->_rebuildTextures();
   }
 
   // Uniforms
-  for (auto& uniformBuffer : _uniformBuffers) {
+  for (const auto& uniformBuffer : _uniformBuffers) {
     uniformBuffer->_rebuild();
   }
 }
@@ -383,7 +384,7 @@ void Engine::_initGLContext()
   // Extensions
   auto extensionList = String::split(_gl->getString(GL::EXTENSIONS), ' ');
   std::set<std::string> extensions;
-  for (auto& extension : extensionList) {
+  for (const auto& extension : extensionList) {
     extensions.insert(extension);
   }
 
@@ -470,6 +471,11 @@ bool Engine::isInVRExclusivePointerMode() const
 bool Engine::supportsUniformBuffers() const
 {
   return webGLVersion() > 1.f && !disableUniformBuffers;
+}
+
+bool Engine::_shouldUseHighPrecisionShader() const
+{
+  return _caps.highPrecisionShaderSupported && _highPrecisionShadersAllowed;
 }
 
 bool Engine::needPOTTextures() const
@@ -808,7 +814,7 @@ void Engine::_renderLoop()
       // Start new frame
       beginFrame();
 
-      for (auto& renderFunction : _activeRenderLoops) {
+      for (const auto& renderFunction : _activeRenderLoops) {
         renderFunction();
       }
 
@@ -1032,8 +1038,8 @@ void Engine::setSize(int width, int height)
   _renderingCanvas->width  = width;
   _renderingCanvas->height = height;
 
-  for (auto& scene : scenes) {
-    for (auto& cam : scene->cameras) {
+  for (const auto& scene : scenes) {
+    for (const auto& cam : scene->cameras) {
       cam->_currentRenderId = 0;
     }
   }
@@ -1462,11 +1468,15 @@ void Engine::bindUniformBufferBase(GL::IGLBuffer* buffer, unsigned int location)
   _gl->bindBufferBase(GL::UNIFORM_BUFFER, location, buffer);
 }
 
-void Engine::bindUniformBlock(GL::IGLProgram* shaderProgram,
+void Engine::bindUniformBlock(const IPipelineContextPtr& pipelineContext,
                               const std::string blockName, unsigned int index)
 {
-  auto uniformLocation = _gl->getUniformBlockIndex(shaderProgram, blockName);
-  _gl->uniformBlockBinding(shaderProgram, uniformLocation, index);
+  auto program
+    = std::static_pointer_cast<WebGLPipelineContext>(pipelineContext)->program;
+
+  auto uniformLocation = _gl->getUniformBlockIndex(program.get(), blockName);
+
+  _gl->uniformBlockBinding(program.get(), uniformLocation, index);
 }
 
 void Engine::bindIndexBuffer(GL::IGLBuffer* buffer)
@@ -1929,8 +1939,24 @@ void Engine::_releaseEffect(Effect* effect)
     }
   }
   if (hasEffect) {
-    _deleteProgram(effect->getProgram());
+    _deletePipelineContext(effect->getPipelineContext());
     _compiledEffects.erase(effect->_key);
+  }
+}
+
+void Engine::_deletePipelineContext(const IPipelineContextPtr& pipelineContext)
+{
+  auto webGLPipelineContext
+    = std::static_pointer_cast<WebGLPipelineContext>(pipelineContext);
+  if (webGLPipelineContext && webGLPipelineContext->program) {
+    webGLPipelineContext->program->__SPECTOR_rebuildProgram = nullptr;
+
+    if (webGLPipelineContext->transformFeedback) {
+      deleteTransformFeedback(webGLPipelineContext->transformFeedback.get());
+      webGLPipelineContext->transformFeedback = nullptr;
+    }
+
+    _gl->deleteProgram(webGLPipelineContext->program.get());
   }
 }
 
@@ -1940,7 +1966,7 @@ void Engine::_deleteProgram(GL::IGLProgram* program)
     program->__SPECTOR_rebuildProgram = nullptr;
 
     if (program->transformFeedback) {
-      deleteTransformFeedback(program->transformFeedback);
+      deleteTransformFeedback(program->transformFeedback.get());
       program->transformFeedback = nullptr;
     }
 
@@ -2027,17 +2053,17 @@ EffectPtr Engine::createEffectForParticles(const std::string& fragmentName,
   return createEffect(baseName, effectOptions, this);
 }
 
-std::unique_ptr<GL::IGLShader>
-Engine::_compileShader(const std::string& source, const std::string& type,
-                       const std::string& defines,
-                       const std::string& shaderVersion)
+GL::IGLShaderPtr Engine::_compileShader(const std::string& source,
+                                        const std::string& type,
+                                        const std::string& defines,
+                                        const std::string& shaderVersion)
 {
   return _compileRawShader(
     shaderVersion + ((!defines.empty()) ? defines + "\n" : "") + source, type);
 }
 
-std::unique_ptr<GL::IGLShader>
-Engine::_compileRawShader(const std::string& source, const std::string& type)
+GL::IGLShaderPtr Engine::_compileRawShader(const std::string& source,
+                                           const std::string& type)
 {
   auto shader = _gl->createShader(type == "vertex" ? GL::VERTEX_SHADER :
                                                      GL::FRAGMENT_SHADER);
@@ -2048,11 +2074,11 @@ Engine::_compileRawShader(const std::string& source, const std::string& type)
     return nullptr;
   }
 
-  _gl->shaderSource(shader, source);
-  _gl->compileShader(shader);
+  _gl->shaderSource(shader.get(), source);
+  _gl->compileShader(shader.get());
 
-  if (!_gl->getShaderParameter(shader, GL::COMPILE_STATUS)) {
-    auto log = _gl->getShaderInfoLog(shader);
+  if (!_gl->getShaderParameter(shader.get(), GL::COMPILE_STATUS)) {
+    auto log = _gl->getShaderInfoLog(shader.get());
     if (!log.empty()) {
       BABYLON_LOG_ERROR("Engine", log)
       BABYLON_LOG_ERROR("Engine", source)
@@ -2063,9 +2089,9 @@ Engine::_compileRawShader(const std::string& source, const std::string& type)
   return shader;
 }
 
-std::unique_ptr<GL::IGLProgram> Engine::createRawShaderProgram(
-  const std::string& vertexCode, const std::string& fragmentCode,
-  GL::IGLRenderingContext* context,
+GL::IGLProgramPtr Engine::createRawShaderProgram(
+  const IPipelineContextPtr& pipelineContext, const std::string& vertexCode,
+  const std::string& fragmentCode, GL::IGLRenderingContext* context,
   const std::vector<std::string>& transformFeedbackVaryings)
 {
   context = context ? context : _gl;
@@ -2073,13 +2099,15 @@ std::unique_ptr<GL::IGLProgram> Engine::createRawShaderProgram(
   auto vertexShader   = _compileRawShader(vertexCode, "vertex");
   auto fragmentShader = _compileRawShader(fragmentCode, "fragment");
 
-  return _createShaderProgram(vertexShader, fragmentShader, context,
-                              transformFeedbackVaryings);
+  return _createShaderProgram(
+    std::static_pointer_cast<WebGLPipelineContext>(pipelineContext),
+    vertexShader, fragmentShader, context, transformFeedbackVaryings);
 }
 
-std::unique_ptr<GL::IGLProgram> Engine::createShaderProgram(
-  const std::string& vertexCode, const std::string& fragmentCode,
-  const std::string& defines, GL::IGLRenderingContext* context,
+GL::IGLProgramPtr Engine::createShaderProgram(
+  const IPipelineContextPtr& pipelineContext, const std::string& vertexCode,
+  const std::string& fragmentCode, const std::string& defines,
+  GL::IGLRenderingContext* context,
   const std::vector<std::string>& transformFeedbackVaryings)
 {
   context = context ? context : _gl;
@@ -2094,119 +2122,204 @@ std::unique_ptr<GL::IGLProgram> Engine::createShaderProgram(
   auto fragmentShader
     = _compileShader(fragmentCode, "fragment", defines, shaderVersion);
 
-  auto program = _createShaderProgram(vertexShader, fragmentShader, context,
-                                      transformFeedbackVaryings);
+  auto program = _createShaderProgram(
+    std::static_pointer_cast<WebGLPipelineContext>(pipelineContext),
+    vertexShader, fragmentShader, context, transformFeedbackVaryings);
 
   onAfterShaderCompilationObservable.notifyObservers(this);
 
   return program;
 }
 
-std::unique_ptr<GL::IGLProgram> Engine::_createShaderProgram(
-  const std::unique_ptr<GL::IGLShader>& vertexShader,
-  const std::unique_ptr<GL::IGLShader>& fragmentShader,
+IPipelineContextPtr Engine::createPipelineContext()
+{
+  auto pipelineContext    = std::make_shared<WebGLPipelineContext>();
+  pipelineContext->engine = this;
+
+  if (_caps.parallelShaderCompile) {
+    pipelineContext->isParallelCompiled = true;
+  }
+
+  return pipelineContext;
+}
+
+GL::IGLProgramPtr Engine::_createShaderProgram(
+  const WebGLPipelineContextPtr& pipelineContext,
+  const GL::IGLShaderPtr& vertexShader, const GL::IGLShaderPtr& fragmentShader,
   GL::IGLRenderingContext* context,
   const std::vector<std::string>& transformFeedbackVaryings)
 {
-  auto shaderProgram = context->createProgram();
+  auto shaderProgram       = context->createProgram();
+  pipelineContext->program = shaderProgram;
+
   if (!shaderProgram) {
     BABYLON_LOG_ERROR("Engine", "Unable to create program")
     return nullptr;
   }
 
-  context->attachShader(shaderProgram, vertexShader);
-  context->attachShader(shaderProgram, fragmentShader);
+  context->attachShader(shaderProgram.get(), vertexShader.get());
+  context->attachShader(shaderProgram.get(), fragmentShader.get());
 
   if (webGLVersion() > 1.f && !transformFeedbackVaryings.empty()) {
     auto transformFeedback = createTransformFeedback();
 
     bindTransformFeedback(transformFeedback.get());
     setTranformFeedbackVaryings(shaderProgram.get(), transformFeedbackVaryings);
-    shaderProgram->transformFeedback = transformFeedback.get();
+    pipelineContext->transformFeedback = transformFeedback;
   }
 
-  bool linked = context->linkProgram(shaderProgram);
+  context->linkProgram(shaderProgram.get());
 
   if (webGLVersion() > 1.f && !transformFeedbackVaryings.empty()) {
     bindTransformFeedback(nullptr);
   }
 
-  if (!_caps.parallelShaderCompile) {
-    _finalizeProgram(shaderProgram, vertexShader, fragmentShader, context,
-                     linked);
-  }
-  else {
-    shaderProgram->isParallelCompiled = true;
+  pipelineContext->context        = context;
+  pipelineContext->vertexShader   = vertexShader;
+  pipelineContext->fragmentShader = fragmentShader;
+
+  if (!pipelineContext->isParallelCompiled) {
+    _finalizePipelineContext(pipelineContext);
   }
 
   return shaderProgram;
 }
 
-void Engine::_finalizeProgram(
-  const std::unique_ptr<GL::IGLProgram>& shaderProgram,
-  const std::unique_ptr<GL::IGLShader>& vertexShader,
-  const std::unique_ptr<GL::IGLShader>& fragmentShader,
-  GL::IGLRenderingContext* context, bool linked)
+void Engine::_finalizePipelineContext(
+  const WebGLPipelineContextPtr& pipelineContext)
 {
-  if (!linked) {
-    const auto error = context->getProgramInfoLog(shaderProgram);
+  auto& context       = pipelineContext->context;
+  auto vertexShader   = pipelineContext->vertexShader.get();
+  auto fragmentShader = pipelineContext->fragmentShader.get();
+  auto program        = pipelineContext->program.get();
+
+  auto linked = context->getProgramParameter(program, GL::LINK_STATUS);
+
+  if (!linked) { // Get more info
+
+    // Vertex
+    if (!_gl->getShaderParameter(vertexShader, GL::COMPILE_STATUS)) {
+      auto log = _gl->getShaderInfoLog(vertexShader);
+      if (!log.empty()) {
+        throw std::runtime_error(log);
+      }
+    }
+
+    // Fragment
+    if (!_gl->getShaderParameter(fragmentShader, GL::COMPILE_STATUS)) {
+      auto log = _gl->getShaderInfoLog(fragmentShader);
+      if (!log.empty()) {
+        throw std::runtime_error(log);
+      }
+    }
+
+    auto error = context->getProgramInfoLog(program);
     if (!error.empty()) {
-      BABYLON_LOG_ERROR("Engine", error)
+      throw std::runtime_error(error);
     }
   }
 
   if (validateShaderPrograms) {
-    context->validateProgram(shaderProgram.get());
-    auto validated
-      = context->getProgramParameter(shaderProgram.get(), GL::VALIDATE_STATUS);
+    context->validateProgram(program);
+    auto validated = context->getProgramParameter(program, GL::VALIDATE_STATUS);
+
     if (!validated) {
-      const auto error = context->getProgramInfoLog(shaderProgram);
+      auto error = context->getProgramInfoLog(program);
       if (!error.empty()) {
-        BABYLON_LOG_ERROR("Engine", error)
+        throw std::runtime_error(error);
       }
     }
   }
 
   context->deleteShader(vertexShader);
   context->deleteShader(fragmentShader);
+
+  pipelineContext->vertexShader   = nullptr;
+  pipelineContext->fragmentShader = nullptr;
+
+  if (pipelineContext->onCompiled) {
+    pipelineContext->onCompiled();
+    pipelineContext->onCompiled = nullptr;
+  }
 }
 
-bool Engine::_isProgramCompiled(GL::IGLProgram* /*shaderProgram*/)
+void Engine::_preparePipelineContext(
+  const IPipelineContextPtr& pipelineContext,
+  const std::string& vertexSourceCode, const std::string& fragmentSourceCode,
+  bool createAsRaw,
+  const std::function<void(
+    const std::string& vertexSourceCode, const std::string& fragmentSourceCode,
+    const std::function<void(const IPipelineContextPtr& pipelineContext)>&
+      onCompiled,
+    const std::function<void(const std::string& message)>& onError)>&
+  /*rebuildRebind*/,
+  const std::string& defines,
+  const std::vector<std::string>& transformFeedbackVaryings)
 {
-  return false;
+  auto webGLRenderingState
+    = std::static_pointer_cast<WebGLPipelineContext>(pipelineContext);
+
+  if (createAsRaw) {
+    webGLRenderingState->program = createRawShaderProgram(
+      webGLRenderingState, vertexSourceCode, fragmentSourceCode, nullptr,
+      transformFeedbackVaryings);
+  }
+  else {
+    webGLRenderingState->program = createShaderProgram(
+      webGLRenderingState, vertexSourceCode, fragmentSourceCode, defines,
+      nullptr, transformFeedbackVaryings);
+  }
+  // webGLRenderingState->program->__SPECTOR_rebuildProgram = rebuildRebind;
 }
 
 bool Engine::_isRenderingStateCompiled(
   IPipelineContext const* /*pipelineContext*/)
 {
-  return false;
+  return true;
 }
 
-std::unordered_map<std::string, std::unique_ptr<GL::IGLUniformLocation>>
-Engine::getUniforms(GL::IGLProgram* shaderProgram,
+void Engine::_executeWhenRenderingStateIsCompiled(
+  const IPipelineContextPtr& pipelineContext,
+  const std::function<void()>& action)
+{
+  auto webGLPipelineContext
+    = std::static_pointer_cast<WebGLPipelineContext>(pipelineContext);
+
+  if (!webGLPipelineContext->isParallelCompiled) {
+    action();
+    return;
+  }
+
+  webGLPipelineContext->onCompiled = action;
+}
+
+std::vector<std::unique_ptr<GL::IGLUniformLocation>>
+Engine::getUniforms(const IPipelineContextPtr& pipelineContext,
                     const std::vector<std::string>& uniformsNames)
 {
-  std::unordered_map<std::string, std::unique_ptr<GL::IGLUniformLocation>>
-    results;
+  std::vector<std::unique_ptr<GL::IGLUniformLocation>> results;
+  auto webGLPipelineContext
+    = std::static_pointer_cast<WebGLPipelineContext>(pipelineContext);
 
-  for (auto& name : uniformsNames) {
-    auto uniform = _gl->getUniformLocation(shaderProgram, name);
-    if (uniform) {
-      results[name] = std::move(uniform);
-    }
+  for (const auto& name : uniformsNames) {
+    results.emplace_back(
+      _gl->getUniformLocation(webGLPipelineContext->program.get(), name));
   }
 
   return results;
 }
 
 Int32Array
-Engine::getAttributes(GL::IGLProgram* shaderProgram,
+Engine::getAttributes(const IPipelineContextPtr& pipelineContext,
                       const std::vector<std::string>& attributesNames)
 {
   Int32Array results;
+  auto webGLPipelineContext
+    = std::static_pointer_cast<WebGLPipelineContext>(pipelineContext);
 
-  for (auto& attributesName : attributesNames) {
-    results.emplace_back(_gl->getAttribLocation(shaderProgram, attributesName));
+  for (const auto& attributesName : attributesNames) {
+    results.emplace_back(_gl->getAttribLocation(
+      webGLPipelineContext->program.get(), attributesName));
   }
 
   return results;
@@ -3855,7 +3968,7 @@ Engine::_setupFramebufferDepthAttachments(bool generateStencilBuffer,
     }
 
     _gl->framebufferRenderbuffer(GL::FRAMEBUFFER, GL::DEPTH_STENCIL_ATTACHMENT,
-                                 GL::RENDERBUFFER, depthStencilBuffer);
+                                 GL::RENDERBUFFER, depthStencilBuffer.get());
   }
   else if (generateDepthBuffer) {
     depthStencilBuffer = _gl->createRenderbuffer();
@@ -3871,7 +3984,7 @@ Engine::_setupFramebufferDepthAttachments(bool generateStencilBuffer,
     }
 
     _gl->framebufferRenderbuffer(GL::FRAMEBUFFER, GL::DEPTH_ATTACHMENT,
-                                 GL::RENDERBUFFER, depthStencilBuffer);
+                                 GL::RENDERBUFFER, depthStencilBuffer.get());
   }
 
   return depthStencilBuffer;
@@ -3933,7 +4046,7 @@ Engine::updateRenderTargetTextureSampleCount(const InternalTexturePtr& texture,
       texture->height);
 
     _gl->framebufferRenderbuffer(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
-                                 GL::RENDERBUFFER, colorRenderbuffer);
+                                 GL::RENDERBUFFER, colorRenderbuffer.get());
 
     texture->_MSAARenderBuffer = std::move(colorRenderbuffer);
   }
@@ -4024,7 +4137,7 @@ unsigned int Engine::updateMultipleRenderTargetTextureSampleCount(
         texture->height);
 
       gl.framebufferRenderbuffer(GL::FRAMEBUFFER, attachment, GL::RENDERBUFFER,
-                                 colorRenderbuffer);
+                                 colorRenderbuffer.get());
 
       texture->_MSAAFramebuffer    = std::move(framebuffer);
       texture->_MSAARenderBuffer   = std::move(colorRenderbuffer);
@@ -4367,8 +4480,8 @@ InternalTexturePtr Engine::createCubeTexture(
   auto lastDot   = String::lastIndexOf(rootUrl, ".");
   auto extension = !forcedExtension.empty() ?
                      forcedExtension :
-                     (lastDot > -1 ? String::toLowerCase(rootUrl.substr(
-                                       static_cast<unsigned long>(lastDot))) :
+                     (lastDot > -1 ? String::toLowerCase(
+                        rootUrl.substr(static_cast<unsigned long>(lastDot))) :
                                      "");
 
   IInternalTextureLoaderPtr loader = nullptr;
@@ -4415,10 +4528,9 @@ InternalTexturePtr Engine::createCubeTexture(
     _cascadeLoadImgs(
       rootUrl, scene,
       [&](const std::vector<Image>& imgs) {
-        auto width = needPOTTextures() ?
-                       Tools::GetExponentOfTwo(imgs[0].width,
-                                               _caps.maxCubemapTextureSize) :
-                       imgs[0].width;
+        auto width = needPOTTextures() ? Tools::GetExponentOfTwo(
+                       imgs[0].width, _caps.maxCubemapTextureSize) :
+                                         imgs[0].width;
         auto height = width;
 
         _prepareWorkingCanvas();
@@ -4753,12 +4865,13 @@ InternalTexturePtr Engine::createRawCubeTextureFromUrl(
     }
   };
 
-  _loadFile(url,
-            [&](const std::variant<std::string, ArrayBuffer>& data,
-                const std::string& responseURL) -> void {
-              internalCallback(data, responseURL);
-            },
-            nullptr, true, onerror);
+  _loadFile(
+    url,
+    [&](const std::variant<std::string, ArrayBuffer>& data,
+        const std::string& responseURL) -> void {
+      internalCallback(data, responseURL);
+    },
+    nullptr, true, onerror);
 
   return texture;
 }
@@ -5086,14 +5199,14 @@ void Engine::_releaseTexture(InternalTexture* texture)
 
   // Set output texture of post process to null if the texture has been
   // released/disposed
-  for (auto& scene : scenes) {
-    for (auto& postProcess : scene->postProcesses) {
+  for (const auto& scene : scenes) {
+    for (const auto& postProcess : scene->postProcesses) {
       if (postProcess->_outputTexture.get() == texture) {
         postProcess->_outputTexture = nullptr;
       }
     }
-    for (auto& camera : scene->cameras) {
-      for (auto& postProcess : camera->_postProcesses) {
+    for (const auto& camera : scene->cameras) {
+      for (const auto& postProcess : camera->_postProcesses) {
         if (postProcess) {
           if (postProcess->_outputTexture.get() == texture) {
             postProcess->_outputTexture = nullptr;
@@ -5104,18 +5217,19 @@ void Engine::_releaseTexture(InternalTexture* texture)
   }
 }
 
-void Engine::setProgram(GL::IGLProgram* program)
+void Engine::setProgram(const GL::IGLProgramPtr& program)
 {
   if (_currentProgram != program) {
-    _gl->useProgram(program);
+    _gl->useProgram(program.get());
     _currentProgram = program;
   }
 }
 
 void Engine::bindSamplers(Effect& effect)
 {
-  setProgram(effect.getProgram());
-
+  auto webGLPipelineContext = std::static_pointer_cast<WebGLPipelineContext>(
+    effect.getPipelineContext());
+  setProgram(webGLPipelineContext->program);
   const auto& samplers = effect.getSamplers();
   for (size_t index = 0; index < samplers.size(); ++index) {
     auto uniform = effect.getUniform(samplers[index]);
@@ -5469,7 +5583,7 @@ void Engine::setTextureArray(int channel, GL::IGLUniformLocation* uniform,
   _gl->uniform1iv(uniform, _textureUnits);
 
   unsigned int index = 0;
-  for (auto& texture : textures) {
+  for (const auto& texture : textures) {
     _setTexture(_textureUnits[index], texture, true);
     ++index;
   }
@@ -5564,8 +5678,10 @@ void Engine::unbindAllAttributes()
 
 void Engine::releaseEffects()
 {
-  for (auto& item : _compiledEffects) {
-    _deleteProgram(item.second->getProgram());
+  for (const auto& item : _compiledEffects) {
+    auto webGLPipelineContext = std::static_pointer_cast<WebGLPipelineContext>(
+      item.second->getPipelineContext());
+    _deletePipelineContext(webGLPipelineContext);
   }
 
   _compiledEffects.clear();
@@ -5578,7 +5694,7 @@ void Engine::dispose()
   stopRenderLoop();
 
   // Release postProcesses
-  for (auto& postProcess : postProcesses) {
+  for (const auto& postProcess : postProcesses) {
     postProcess->dispose();
   }
 
@@ -5599,7 +5715,7 @@ void Engine::dispose()
   }
 
   // Release scenes
-  for (auto& scene : scenes) {
+  for (const auto& scene : scenes) {
     scene->dispose();
   }
   scenes.clear();
@@ -6145,19 +6261,19 @@ Engine::GLQueryPtr Engine::createQuery()
   return _gl->createQuery();
 }
 
-Engine& Engine::deleteQuery(const GLQueryPtr& query)
+Engine& Engine::deleteQuery(GL::IGLQuery* query)
 {
   _gl->deleteQuery(query);
 
   return *this;
 }
 
-bool Engine::isQueryResultAvailable(const GLQueryPtr& query)
+bool Engine::isQueryResultAvailable(GL::IGLQuery* query)
 {
   return _gl->getQueryParameterb(query, GL::QUERY_RESULT_AVAILABLE);
 }
 
-unsigned int Engine::getQueryResult(const GLQueryPtr& query)
+unsigned int Engine::getQueryResult(GL::IGLQuery* query)
 {
   return _gl->getQueryParameteri(query, GL::QUERY_RESULT);
 }
@@ -6184,17 +6300,17 @@ Engine::GLQueryPtr Engine::_createTimeQuery()
   return createQuery();
 }
 
-void Engine::_deleteTimeQuery(const Engine::GLQueryPtr& query)
+void Engine::_deleteTimeQuery(GL::IGLQuery* query)
 {
   deleteQuery(query);
 }
 
-unsigned int Engine::_getTimeQueryResult(const Engine::GLQueryPtr& query)
+unsigned int Engine::_getTimeQueryResult(GL::IGLQuery* query)
 {
   return getQueryResult(query);
 }
 
-bool Engine::_getTimeQueryAvailability(const Engine::GLQueryPtr& query)
+bool Engine::_getTimeQueryAvailability(GL::IGLQuery* query)
 {
   return isQueryResultAvailable(query);
 }
@@ -6216,7 +6332,7 @@ unsigned int Engine::_getGlAlgorithmType(unsigned int algorithmType) const
            GL::ANY_SAMPLES_PASSED;
 }
 
-Engine::GLTransformFeedbackPtr Engine::createTransformFeedback()
+GL::IGLTransformFeedbackPtr Engine::createTransformFeedback()
 {
   return _gl->createTransformFeedback();
 }

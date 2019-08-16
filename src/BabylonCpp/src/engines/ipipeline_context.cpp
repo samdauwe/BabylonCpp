@@ -5,6 +5,7 @@ namespace BABYLON {
 IPipelineContext::IPipelineContext()
     : isAsync{this, &IPipelineContext::get_isAsync}
     , isReady{this, &IPipelineContext::get_isReady}
+    , _handlesSpectorRebuildCallback{nullptr}
     , _isAsync{false}
     , _isReady{false}
 {

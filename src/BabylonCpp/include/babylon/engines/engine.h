@@ -57,6 +57,7 @@ class Scene;
 class Texture;
 class UniformBuffer;
 class VertexBuffer;
+class WebGLPipelineContext;
 using BaseTexturePtr = std::shared_ptr<BaseTexture>;
 using DummyInternalTextureTrackerPtr
   = std::shared_ptr<DummyInternalTextureTracker>;
@@ -65,10 +66,12 @@ using EffectPtr                  = std::shared_ptr<Effect>;
 using IInternalTextureLoaderPtr  = std::shared_ptr<IInternalTextureLoader>;
 using IInternalTextureTrackerPtr = std::shared_ptr<IInternalTextureTracker>;
 using InternalTexturePtr         = std::shared_ptr<InternalTexture>;
+using IPipelineContextPtr        = std::shared_ptr<IPipelineContext>;
 using PassPostProcessPtr         = std::shared_ptr<PassPostProcess>;
 using PostProcessPtr             = std::shared_ptr<PostProcess>;
 using RenderTargetTexturePtr     = std::shared_ptr<RenderTargetTexture>;
 using VertexBufferPtr            = std::shared_ptr<VertexBuffer>;
+using WebGLPipelineContextPtr    = std::shared_ptr<WebGLPipelineContext>;
 
 /**
  * @brief The engine class is responsible for interfacing with all lower-level
@@ -80,12 +83,9 @@ public:
   using ArrayBufferViewArray   = std::vector<ArrayBufferView>;
   using GLBufferPtr            = std::unique_ptr<GL::IGLBuffer>;
   using GLFrameBufferPtr       = std::unique_ptr<GL::IGLFramebuffer>;
-  using GLProgramPtr           = std::unique_ptr<GL::IGLProgram>;
   using GLQueryPtr             = std::unique_ptr<GL::IGLQuery>;
   using GLRenderBufferPtr      = std::unique_ptr<GL::IGLRenderbuffer>;
-  using GLShaderPtr            = std::unique_ptr<GL::IGLShader>;
   using GLTexturePtr           = std::unique_ptr<GL::IGLTexture>;
-  using GLTransformFeedbackPtr = std::unique_ptr<GL::IGLTransformFeedback>;
   using GLUniformLocationPtr   = std::unique_ptr<GL::IGLUniformLocation>;
   using GLVertexArrayObjectPtr = std::unique_ptr<GL::IGLVertexArrayObject>;
 
@@ -192,6 +192,11 @@ public:
    * @see http://doc.babylonjs.com/features/webgl2#uniform-buffer-objets
    */
   bool supportsUniformBuffers() const;
+
+  /**
+   * @brief Hidden
+   */
+  bool _shouldUseHighPrecisionShader() const;
 
   /**
    * @brief Gets a boolean indicating that only power of 2 textures are
@@ -787,11 +792,11 @@ public:
 
   /**
    * @brief Bind a specific block at a given index in a specific shader program.
-   * @param shaderProgram defines the shader program
+   * @param pipelineContext defines the pipeline context to use
    * @param blockName defines the block name
    * @param index defines the index where to bind the block
    */
-  void bindUniformBlock(GL::IGLProgram* shaderProgram,
+  void bindUniformBlock(const IPipelineContextPtr& pipelineContext,
                         const std::string blockName, unsigned int index);
 
   /**
@@ -970,6 +975,11 @@ public:
   /**
    * @brief Hidden
    */
+  void _deletePipelineContext(const IPipelineContextPtr& pipelineContext);
+
+  /**
+   * @brief Hidden
+   */
   void _deleteProgram(GL::IGLProgram* program);
 
   /**
@@ -1044,6 +1054,7 @@ public:
 
   /**
    * @brief Directly creates a webGL program.
+   * @param pipelineContext  defines the pipeline context to attach to
    * @param vertexCode defines the vertex shader code to use
    * @param fragmentCode defines the fragment shader code to use
    * @param context defines the webGL context to use (if not set, the current
@@ -1052,13 +1063,14 @@ public:
    * varyings to use
    * @returns the new webGL program
    */
-  GLProgramPtr createRawShaderProgram(
-    const std::string& vertexCode, const std::string& fragmentCode,
-    GL::IGLRenderingContext* context                          = nullptr,
+  GL::IGLProgramPtr createRawShaderProgram(
+    const IPipelineContextPtr& pipelineContext, const std::string& vertexCode,
+    const std::string& fragmentCode, GL::IGLRenderingContext* context = nullptr,
     const std::vector<std::string>& transformFeedbackVaryings = {});
 
   /**
    * @brief Creates a webGL program.
+   * @param pipelineContext  defines the pipeline context to attach to
    * @param vertexCode  defines the vertex shader code to use
    * @param fragmentCode defines the fragment shader code to use
    * @param defines defines the string containing the defines to use to compile
@@ -1069,15 +1081,34 @@ public:
    * varyings to use
    * @returns the new webGL program
    */
-  GLProgramPtr createShaderProgram(
-    const std::string& vertexCode, const std::string& fragmentCode,
-    const std::string& defines, GL::IGLRenderingContext* context = nullptr,
+  GL::IGLProgramPtr createShaderProgram(
+    const IPipelineContextPtr& pipelineContext, const std::string& vertexCode,
+    const std::string& fragmentCode, const std::string& defines,
+    GL::IGLRenderingContext* context                          = nullptr,
     const std::vector<std::string>& transformFeedbackVaryings = {});
+
+  /**
+   * @brief Creates a new pipeline context.
+   * @returns the new pipeline
+   */
+  IPipelineContextPtr createPipelineContext();
 
   /**
    * @brief Hidden
    */
-  bool _isProgramCompiled(GL::IGLProgram* shaderProgram);
+  void _preparePipelineContext(
+    const IPipelineContextPtr& pipelineContext,
+    const std::string& vertexSourceCode, const std::string& fragmentSourceCode,
+    bool createAsRaw,
+    const std::function<void(
+      const std::string& vertexSourceCode,
+      const std::string& fragmentSourceCode,
+      const std::function<void(const IPipelineContextPtr& pipelineContext)>&
+        onCompiled,
+      const std::function<void(const std::string& message)>& onError)>&
+      rebuildRebind,
+    const std::string& defines,
+    const std::vector<std::string>& transformFeedbackVaryings);
 
   /**
    * @brief Hidden
@@ -1085,23 +1116,30 @@ public:
   bool _isRenderingStateCompiled(IPipelineContext const* pipelineContext);
 
   /**
+   * @brief Hidden
+   */
+  void _executeWhenRenderingStateIsCompiled(
+    const IPipelineContextPtr& pipelineContext,
+    const std::function<void()>& action);
+
+  /**
    * @brief Gets the list of webGL uniform locations associated with a specific
    * program based on a list of uniform names.
-   * @param shaderProgram defines the webGL program to use
+   * @param pipelineContext defines the pipeline context to use
    * @param uniformsNames defines the list of uniform names
    * @returns an array of webGL uniform locations
    */
-  std::unordered_map<std::string, GLUniformLocationPtr>
-  getUniforms(GL::IGLProgram* shaderProgram,
+  std::vector<GLUniformLocationPtr>
+  getUniforms(const IPipelineContextPtr& pipelineContext,
               const std::vector<std::string>& uniformsNames);
 
   /**
    * @brief Gets the lsit of active attributes for a given webGL program.
-   * @param shaderProgram defines the webGL program to use
+   * @param pipelineContext defines the pipeline context to use
    * @param attributesNames defines the list of attribute names to get
    * @returns an array of indices indicating the offset of each attribute
    */
-  Int32Array getAttributes(GL::IGLProgram* shaderProgram,
+  Int32Array getAttributes(const IPipelineContextPtr& pipelineContext,
                            const std::vector<std::string>& attributesNames);
 
   /**
@@ -1984,9 +2022,9 @@ public:
   void unbindAllAttributes();
 
   /**
-   * @brief Force the engine to release all cached effects. This means that
-   * next effect compilation will have to be done completely even if a similar
-   * effect was already compiled.
+   * @brief Force the engine to release all cached effects. This means that next
+   * effect compilation will have to be done completely even if a similar effect
+   * was already compiled
    */
   void releaseEffects();
 
@@ -2115,21 +2153,21 @@ public:
    * @param query defines the query to delete
    * @return the current engine
    */
-  Engine& deleteQuery(const GLQueryPtr& query);
+  Engine& deleteQuery(GL::IGLQuery* query);
 
   /**
    * @brief Check if a given query has resolved and got its value.
    * @param query defines the query to check
    * @returns true if the query got its value
    */
-  bool isQueryResultAvailable(const GLQueryPtr& query);
+  bool isQueryResultAvailable(GL::IGLQuery* query);
 
   /**
    * @brief Gets the value of a given query.
    * @param query defines the query to check
    * @returns the value of the query
    */
-  unsigned int getQueryResult(const GLQueryPtr& query);
+  unsigned int getQueryResult(GL::IGLQuery* query);
 
   /**
    * @brief Initiates an occlusion query.
@@ -2173,7 +2211,7 @@ public:
    * running webGL 2+
    * @returns the webGL transform feedback object
    */
-  GLTransformFeedbackPtr createTransformFeedback();
+  GL::IGLTransformFeedbackPtr createTransformFeedback();
 
   /**
    * @brief Delete a webGL transform feedback object.
@@ -2320,7 +2358,7 @@ private:
     const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers,
     const EffectPtr& effect);
   void _unbindVertexArrayObject();
-  void setProgram(GL::IGLProgram* program);
+  void setProgram(const GL::IGLProgramPtr& program);
   void _moveBoundTextureOnTop(const InternalTexturePtr& internalTexture);
   void _linkTrackers(const IInternalTextureTrackerPtr& previous,
                      const IInternalTextureTrackerPtr& next);
@@ -2365,21 +2403,18 @@ private:
                                  const DepthTextureCreationOptions& options);
 
   unsigned int _drawMode(unsigned int fillMode) const;
-  GLShaderPtr _compileShader(const std::string& source, const std::string& type,
-                             const std::string& defines,
-                             const std::string& shaderVersion);
-  GLShaderPtr _compileRawShader(const std::string& source,
-                                const std::string& type);
-  GLProgramPtr
-  _createShaderProgram(const std::unique_ptr<GL::IGLShader>& vertexShader,
-                       const std::unique_ptr<GL::IGLShader>& fragmentShader,
-                       GL::IGLRenderingContext* context,
-                       const std::vector<std::string>& transformFeedbackVaryings
-                       = {});
-  void _finalizeProgram(const std::unique_ptr<GL::IGLProgram>& shaderProgram,
-                        const std::unique_ptr<GL::IGLShader>& vertexShader,
-                        const std::unique_ptr<GL::IGLShader>& fragmentShader,
-                        GL::IGLRenderingContext* context, bool linked);
+  GL::IGLShaderPtr _compileShader(const std::string& source,
+                                  const std::string& type,
+                                  const std::string& defines,
+                                  const std::string& shaderVersion);
+  GL::IGLShaderPtr _compileRawShader(const std::string& source,
+                                     const std::string& type);
+  GL::IGLProgramPtr _createShaderProgram(
+    const WebGLPipelineContextPtr& pipelineContext,
+    const GL::IGLShaderPtr& vertexShader,
+    const GL::IGLShaderPtr& fragmentShader, GL::IGLRenderingContext* context,
+    const std::vector<std::string>& transformFeedbackVaryings = {});
+  void _finalizePipelineContext(const WebGLPipelineContextPtr& pipelineContext);
   SamplingParameters _getSamplingParameters(unsigned int samplingMode,
                                             bool generateMipMaps);
   GLRenderBufferPtr
@@ -2422,7 +2457,7 @@ private:
   /**
    * @brief Hidden
    */
-  void _deleteTimeQuery(const GLQueryPtr& query);
+  void _deleteTimeQuery(GL::IGLQuery* query);
 
   /**
    * @brief Hidden
@@ -2432,12 +2467,12 @@ private:
   /**
    * @brief Hidden
    */
-  unsigned int _getTimeQueryResult(const GLQueryPtr& query);
+  unsigned int _getTimeQueryResult(GL::IGLQuery* query);
 
   /**
    * @brief Hidden
    */
-  bool _getTimeQueryAvailability(const GLQueryPtr& query);
+  bool _getTimeQueryAvailability(GL::IGLQuery* query);
 
   /** File loading */
   void _cascadeLoadFiles(
@@ -2652,6 +2687,11 @@ protected:
   /**
    * Hidden
    */
+  bool _highPrecisionShadersAllowed;
+
+  /**
+   * Hidden
+   */
   EngineCapabilities _caps;
 
   // States
@@ -2697,7 +2737,7 @@ protected:
   /**
    * Hidden
    */
-  GL::IGLProgram* _currentProgram;
+  GL::IGLProgramPtr _currentProgram;
 
   /**
    * Hidden
