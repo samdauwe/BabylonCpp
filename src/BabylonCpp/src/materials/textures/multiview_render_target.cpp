@@ -19,7 +19,7 @@ MultiviewRenderTarget::MultiviewRenderTarget(Scene* scene, const ISize& size)
       false,                                    // generateDepthBuffer
       false,                                    // generateStencilBuffer
       true,                                     // isMulti
-      EngineConstants::TEXTUREFORMAT_RGBA,      // format
+      Constants::TEXTUREFORMAT_RGBA,            // format
       true                                      // delayAllocation
     }
 {

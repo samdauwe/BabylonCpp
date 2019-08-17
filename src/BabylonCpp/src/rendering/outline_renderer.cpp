@@ -245,7 +245,7 @@ void OutlineRenderer::_afterRenderingMesh(AbstractMesh* mesh, SubMesh* subMesh,
   // Overlay
   if (mesh->renderOverlay) {
     auto currentMode = _engine->getAlphaMode();
-    _engine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
+    _engine->setAlphaMode(Constants::ALPHA_COMBINE);
     render(subMesh, batch, true);
     _engine->setAlphaMode(currentMode);
   }

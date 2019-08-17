@@ -500,6 +500,8 @@ enum GLEnums : GLenum {
   CONTEXT_LOST_WEBGL                 = 0x9242,
   UNPACK_COLORSPACE_CONVERSION_WEBGL = 0x9243,
   BROWSER_DEFAULT_WEBGL              = 0x9244,
+  /* KHR_parallel_shader_compile */
+  COMPLETION_STATUS_KHR = 0x91B1,
   // IGL_EXT_texture_filter_anisotropic
   TEXTURE_MAX_ANISOTROPY_EXT     = 0x84FE,
   MAX_TEXTURE_MAX_ANISOTROPY_EXT = 0x84FF

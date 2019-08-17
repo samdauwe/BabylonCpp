@@ -5,7 +5,7 @@
 #include <optional>
 
 #include <babylon/babylon_api.h>
-#include <babylon/engines/engine_constants.h>
+#include <babylon/engines/constants.h>
 
 namespace BABYLON {
 
@@ -33,7 +33,7 @@ struct BABYLON_SHARED_EXPORT IEffectLayerOptions {
    * Alpha blending mode used to apply the blur. Default depends of the
    * implementation.
    */
-  unsigned int alphaBlendingMode = EngineConstants::ALPHA_COMBINE;
+  unsigned int alphaBlendingMode = Constants::ALPHA_COMBINE;
 
   /**
    * The camera attached to the layer.

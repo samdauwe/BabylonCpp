@@ -21,6 +21,10 @@ struct BABYLON_SHARED_EXPORT InstancedArrays {
     drawArraysInstancedANGLE;
 }; // end of struct InstancedArrays
 
+struct BABYLON_SHARED_EXPORT ParallelShaderCompile {
+  unsigned int COMPLETION_STATUS_KHR = GL::COMPLETION_STATUS_KHR;
+}; // end of struct ParallelShaderCompile
+
 /**
  * @brief Class used to describe the capabilities of the engine relatively to
  * the current browser.
@@ -103,7 +107,7 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
    * (https://www.khronos.org/registry/webgl/extensions/WEBGL_multiview/) */
   bool multiview = false;
   /** Function used to let the system compiles shaders in background */
-  bool parallelShaderCompile;
+  std::optional<ParallelShaderCompile> parallelShaderCompile = std::nullopt;
 }; // end of struct EngineCapabilities
 
 } // end of namespace BABYLON

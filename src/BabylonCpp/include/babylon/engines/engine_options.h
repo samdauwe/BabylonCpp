@@ -51,14 +51,14 @@ struct BABYLON_SHARED_EXPORT EngineOptions {
    */
   unsigned int lockstepMaxSteps = 4;
   /**
-   * Defines that engine should ignore context lost events
-   * If this event happens when this parameter is true, you will have to reload
-   * the page to restore rendering
+   * Defines that engine should ignore modifying touch action attribute and
+   * style If not handle, you might need to set it up on your side for expected
+   * touch devices behavior.
    */
   bool doNotHandleContextLost = false;
   /**
-   * Defines whether the engine has been created with the premultipliedAlpha
-   * option on or not.
+   * Defines that engine should compile shaders with high precision floats (if
+   * supported). True by default
    */
   bool premultipliedAlpha = true;
 }; // end of struct EngineOptions

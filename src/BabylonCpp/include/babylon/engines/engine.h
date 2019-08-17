@@ -8,8 +8,8 @@
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/core/delegates/delegate.h>
 #include <babylon/core/structs.h>
+#include <babylon/engines/constants.h>
 #include <babylon/engines/engine_capabilities.h>
-#include <babylon/engines/engine_constants.h>
 #include <babylon/engines/engine_options.h>
 #include <babylon/instrumentation/_time_token.h>
 #include <babylon/materials/textures/texture_constants.h>
@@ -104,6 +104,11 @@ public:
   static std::string Version();
 
   /**
+   * @brief Returns a string describing the current engine.
+   */
+  std::string description() const;
+
+  /**
    * @brief Gets the audio engine.
    * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
    */
@@ -117,23 +122,29 @@ public:
   static float CollisionsEpsilon;
 
   /**
-   * Gets or sets the relative url used to load code if using the engine in
+   * @brief Gets the relative url used to load shaders if using the engine in
    * non-minified mode
    */
-  static std::string CodeRepository;
+  static std::string ShadersRepository();
 
   /**
-   * Gets or sets the relative url used to load shaders if using the engine in
+   * @brief Sets the relative url used to load shaders if using the engine in
    * non-minified mode
    */
-  static std::string ShadersRepository;
+  static void setShadersRepository(const std::string& value);
+
+  /**
+   * Method called to create the default rescale post process on each engine.
+   */
+  static std::function<PostProcessPtr(Engine* engine)>
+    _RescalePostProcessFactory;
 
   // Engine instances
 
   /**
    * Gets the list of created engines
    */
-  static std::vector<Engine*> Instances;
+  static std::vector<Engine*> Instances();
 
 public:
   template <typename... Ts>
@@ -233,6 +244,24 @@ public:
    * creation option of the context.
    */
   bool isStencilEnable() const;
+
+  /**
+   * @brief Gets a boolean indicating that the system is in VR mode and is
+   * presenting
+   * @returns true if VR mode is engaged
+   */
+  bool isVRPresenting() const;
+
+  /**
+   * @brief Gets a boolean indicating if all created effects are ready.
+   * @returns true if all effects are ready
+   */
+  bool areAllEffectsReady() const;
+
+  /**
+   * @brief Hidden
+   */
+  void _prepareWorkingCanvas();
 
   /**
    * @brief Reset the texture cache to empty state.
@@ -338,16 +367,6 @@ public:
    * @returns the EngineCapabilities object
    */
   EngineCapabilities& getCaps();
-
-  /**
-   * @brief Hidden
-   */
-  size_t drawCalls() const;
-
-  /**
-   * @brief Hidden
-   */
-  std::optional<PerfCounter> drawCallsPerfCounter();
 
   /** Methods **/
 
@@ -550,6 +569,18 @@ public:
   void switchFullscreen(bool requestPointerLock);
 
   /**
+   * @brief Enters full screen mode.
+   * @param requestPointerLock defines if a pointer lock should be requested
+   * from the user
+   */
+  void enterFullscreen(bool requestPointerLock);
+
+  /**
+   * @brief Exits full screen mode.
+   */
+  void exitFullscreen();
+
+  /**
    * @brief Clear the current render buffer or the current render target (if any
    * is set up).
    * @param depth defines if the depth buffer must be cleared
@@ -580,6 +611,22 @@ public:
    */
   void scissorClear(int x, int y, int width, int height,
                     const Color4& clearColor);
+
+  /**
+   * @brief Enable scissor test on a specific rectangle (ie. render will only be
+   * executed on a specific portion of the screen).
+   * @param x defines the x-coordinate of the top left corner of the clear
+   * rectangle
+   * @param y defines the y-coordinate of the corner of the clear rectangle
+   * @param width defines the width of the clear rectangle
+   * @param height defines the height of the clear rectangle
+   */
+  void enableScissor(int x, int y, int width, int height);
+
+  /**
+   * @brief Disable previously set scissor test rectangle.
+   */
+  void disableScissor();
 
   /**
    * @brief Hidden
@@ -651,6 +698,11 @@ public:
                        = std::nullopt,
                        InternalTexture* depthStencilTexture = nullptr,
                        int lodLevel                         = 0);
+
+  /**
+   * @brief Hidden
+   */
+  void _bindUnboundFramebuffer(GL::IGLFramebuffer* framebuffer);
 
   /**
    * @brief Unbind the current render target texture from the webGL context.
@@ -1113,7 +1165,7 @@ public:
   /**
    * @brief Hidden
    */
-  bool _isRenderingStateCompiled(IPipelineContext const* pipelineContext);
+  bool _isRenderingStateCompiled(const IPipelineContext* pipelineContext);
 
   /**
    * @brief Hidden
@@ -1409,7 +1461,7 @@ public:
 
   /**
    * @brief Sets the current alpha mode.
-   * @param mode defines the mode to use (one of the BABYLON.Engine.ALPHA_XXX)
+   * @param mode defines the mode to use (one of the Engine.ALPHA_XXX)
    * @param noDepthWriteChange defines if depth writing state should remains
    * unchanged (false by default)
    * @see
@@ -1479,6 +1531,12 @@ public:
   /**
    * @brief Hidden
    */
+  SamplingParameters _getSamplingParameters(unsigned int samplingMode,
+                                            bool generateMipMaps);
+
+  /**
+   * @brief Hidden
+   */
   InternalTexturePtr createTexture(
     const std::vector<std::string>& list, bool noMipmap, bool invertY,
     Scene* scene,
@@ -1491,7 +1549,7 @@ public:
     = std::variant<std::string, ArrayBuffer, Image>());
 
   /**
-   * @brief HUsually called from BABYLON.Texture.ts.
+   * @brief Usually called from Texture.ts.
    * Passed information to create a WebGLTexture
    * @param urlArg defines a value which contains one of the following:
    * * A conventional http URL, e.g. 'http://...' or 'file://...'
@@ -1502,10 +1560,11 @@ public:
    * @param noMipmap defines a boolean indicating that no mipmaps shall be
    * generated.  Ignored for compressed textures.  They must be in the file
    * @param invertY when true, image is flipped when loaded.  You probably want
-   * true. Ignored for compressed textures.  Must be flipped in the file
+   * true. Certain compressed textures may invert this if their default is
+   * inverted (eg. ktx)
    * @param scene needed for loading to the correct scene
    * @param samplingMode mode with should be used sample / access the texture
-   * (Default: BABYLON.Texture.TRILINEAR_SAMPLINGMODE)
+   * (Default: Texture.TRILINEAR_SAMPLINGMODE)
    * @param onLoad optional callback to be called upon successful completion
    * @param onError optional callback to be called upon failure
    * @param buffer a source of a file previously fetched as either a base64
@@ -1515,6 +1574,10 @@ public:
    * again, due to etc1 not having alpha capabilities
    * @param format internal format.  Default: RGB when extension is '.jpg' else
    * RGBA.  Ignored for compressed textures
+   * @param forcedExtension defines the extension to use to pick the right
+   * loader
+   * @param excludeLoaders array of texture loaders that should be excluded when
+   * picking a loader for the texture (default: empty array)
    * @returns a InternalTexture for assignment back into BABYLON.Texture
    */
   InternalTexturePtr createTexture(
@@ -1527,7 +1590,8 @@ public:
     const std::optional<std::variant<std::string, ArrayBuffer, Image>>& buffer
     = std::nullopt,
     const InternalTexturePtr& fallBack        = nullptr,
-    const std::optional<unsigned int>& format = std::nullopt);
+    const std::optional<unsigned int>& format = std::nullopt,
+    const std::string& forcedExtension        = "");
 
   /**
    * @brief Update a raw texture.
@@ -1539,12 +1603,11 @@ public:
    * @param type defines the type fo the data (Engine.TEXTURETYPE_UNSIGNED_INT
    * by default)
    */
-  void updateRawTexture(const InternalTexturePtr& texture,
-                        const Uint8Array& data, unsigned int format,
-                        bool invertY                   = true,
-                        const std::string& compression = "",
-                        unsigned int type
-                        = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+  void
+  updateRawTexture(const InternalTexturePtr& texture, const Uint8Array& data,
+                   unsigned int format, bool invertY = true,
+                   const std::string& compression = "",
+                   unsigned int type = Constants::TEXTURETYPE_UNSIGNED_INT);
 
   /**
    * @brief Creates a raw texture.
@@ -1561,11 +1624,12 @@ public:
    * by default)
    * @returns the raw texture inside an InternalTexture
    */
-  InternalTexturePtr createRawTexture(
-    const Uint8Array& data, int width, int height, unsigned int format,
-    bool generateMipMaps, bool invertY, unsigned int samplingMode,
-    const std::string& compression = "",
-    unsigned int type              = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+  InternalTexturePtr
+  createRawTexture(const Uint8Array& data, int width, int height,
+                   unsigned int format, bool generateMipMaps, bool invertY,
+                   unsigned int samplingMode,
+                   const std::string& compression = "",
+                   unsigned int type = Constants::TEXTURETYPE_UNSIGNED_INT);
 
   /**
    * @brief hidden
@@ -1588,7 +1652,7 @@ public:
    * @param height defines the height of the texture
    * @param generateMipMaps defines if the engine should generate the mip levels
    * @param samplingMode defines the required sampling mode
-   * (BABYLON.Texture.NEAREST_SAMPLINGMODE by default)
+   * (Texture.NEAREST_SAMPLINGMODE by default)
    * @returns the dynamic texture inside an InternalTexture
    */
   InternalTexturePtr createDynamicTexture(int width, int height,
@@ -1610,11 +1674,13 @@ public:
    * @param invertY defines if data must be stored with Y axis inverted
    * @param premulAlpha defines if alpha is stored as premultiplied
    * @param format defines the format of the data
+   * @param forceBindTexture if the texture should be forced to be bound eg.
+   * after a graphics context loss (Default: false)
    */
   void updateDynamicTexture(const InternalTexturePtr& texture, ICanvas* canvas,
                             bool invertY, bool premulAlpha = false,
-                            unsigned int format
-                            = EngineConstants::TEXTUREFORMAT_RGBA);
+                            unsigned int format = Constants::TEXTUREFORMAT_RGBA,
+                            bool forceBindTexture = false);
 
   /**
    *@brief Updates a depth texture Comparison Mode and Function.
@@ -1627,6 +1693,14 @@ public:
    */
   void updateTextureComparisonFunction(const InternalTexturePtr& texture,
                                        int comparisonFunction);
+
+  /**
+   * @brief Hidden
+   */
+  void _setupDepthStencilTexture(InternalTexture* internalTexture,
+                                 const std::variant<int, ISize>& size,
+                                 bool generateStencil, bool bilinearFiltering,
+                                 int comparisonFunction);
 
   /**
    * @brief Creates a depth stencil texture.
@@ -1667,6 +1741,14 @@ public:
   std::vector<InternalTexturePtr>
   createMultipleRenderTarget(ISize size,
                              const IMultiRenderTargetOptions& options);
+
+  /**
+   * @brief Hidden
+   */
+  GLRenderBufferPtr
+  _setupFramebufferDepthAttachments(bool generateStencilBuffer,
+                                    bool generateDepthBuffer, int width,
+                                    int height, int samples = 1);
 
   /**
    * @brief Updates the sample count of a render target texture.
@@ -1890,7 +1972,7 @@ public:
                           bool invertY                   = true,
                           const std::string& compression = "",
                           unsigned int textureType
-                          = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+                          = Constants::TEXTURETYPE_UNSIGNED_INT);
 
   /**
    * @brief Creates a new raw 3D texture.
@@ -1902,7 +1984,7 @@ public:
    * @param generateMipMaps defines if the engine must generate mip levels
    * @param invertY defines if data must be stored with Y axis inverted
    * @param samplingMode defines the required sampling mode (like
-   * BABYLON.Texture.NEAREST_SAMPLINGMODE)
+   * Texture.NEAREST_SAMPLINGMODE)
    * @param compression defines the compressed used (can be null)
    * @param textureType defines the compressed used (can be null)
    * @returns a new raw 3D texture (stored in an InternalTexture)
@@ -1911,7 +1993,7 @@ public:
     const ArrayBufferView& data, int width, int height, int depth,
     unsigned int format, bool generateMipMaps, bool invertY,
     unsigned int samplingMode, const std::string& compression = "",
-    unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+    unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT);
 
   /**
    * @brief Creates a new multiview render target.
@@ -1930,6 +2012,13 @@ public:
   /**
    * @brief Hidden
    */
+  ArrayBufferView _convertRGBtoRGBATextureData(const ArrayBufferView& rgbData,
+                                               int width, int height,
+                                               unsigned int textureType);
+
+  /**
+   * @brief Hidden
+   */
   void _releaseFramebufferObjects(InternalTexture* texture);
 
   /**
@@ -1942,6 +2031,14 @@ public:
    * @param effect defines the effect to bind
    */
   void bindSamplers(Effect& effect);
+
+  /**
+   * @brief Hidden
+   */
+  bool _bindTextureDirectly(unsigned int target,
+                            const InternalTexturePtr& texture,
+                            bool forTextureDataUpdate = false,
+                            bool force                = false);
 
   /**
    * @brief Hidden
@@ -2125,6 +2222,11 @@ public:
    * @brief Hidden
    */
   GL::GLenum _getWebGLTextureType(unsigned int type) const;
+
+  /**
+   * @brief Hidden
+   */
+  GL::GLenum _getInternalFormat(unsigned int format) const;
 
   /**
    * @brief Hidden
@@ -2320,16 +2422,7 @@ protected:
    */
   Engine(ICanvas* canvas, const EngineOptions& options = EngineOptions());
 
-  /**
-   * @brief Hidden
-   */
-  bool _bindTextureDirectly(unsigned int target,
-                            const InternalTexturePtr& texture,
-                            bool forTextureDataUpdate = false,
-                            bool force                = false);
-
 private:
-  void _prepareWorkingCanvas();
   void _rebuildInternalTextures();
   void _rebuildEffects();
   void _rebuildBuffers();
@@ -2347,7 +2440,6 @@ private:
   void _setTextureParameterInteger(unsigned int target, unsigned int parameter,
                                    int value,
                                    const InternalTexturePtr& texture = nullptr);
-  void bindUnboundFramebuffer(GL::IGLFramebuffer* framebuffer);
   void bindIndexBuffer(GL::IGLBuffer* buffer);
   void bindBuffer(GL::IGLBuffer* buffer, int target);
   void _vertexAttribPointer(GL::IGLBuffer* buffer, unsigned int indx, int size,
@@ -2359,9 +2451,6 @@ private:
     const EffectPtr& effect);
   void _unbindVertexArrayObject();
   void setProgram(const GL::IGLProgramPtr& program);
-  void _moveBoundTextureOnTop(const InternalTexturePtr& internalTexture);
-  void _linkTrackers(const IInternalTextureTrackerPtr& previous,
-                     const IInternalTextureTrackerPtr& next);
   void _activateCurrentTexture();
   void _cascadeLoadImgs(
     const std::string& rootUrl, Scene* scene,
@@ -2374,10 +2463,6 @@ private:
                        const InternalTexturePtr& destination, Scene* scene,
                        unsigned int internalFormat,
                        const std::function<void()>& onComplete);
-  void _setupDepthStencilTexture(InternalTexture* internalTexture,
-                                 const std::variant<int, ISize>& size,
-                                 bool generateStencil, bool bilinearFiltering,
-                                 int comparisonFunction);
 
   /**
    * @brief Creates a depth stencil texture.
@@ -2410,17 +2495,10 @@ private:
   GL::IGLShaderPtr _compileRawShader(const std::string& source,
                                      const std::string& type);
   GL::IGLProgramPtr _createShaderProgram(
-    const WebGLPipelineContextPtr& pipelineContext,
-    const GL::IGLShaderPtr& vertexShader,
+    WebGLPipelineContext* pipelineContext, const GL::IGLShaderPtr& vertexShader,
     const GL::IGLShaderPtr& fragmentShader, GL::IGLRenderingContext* context,
     const std::vector<std::string>& transformFeedbackVaryings = {});
-  void _finalizePipelineContext(const WebGLPipelineContextPtr& pipelineContext);
-  SamplingParameters _getSamplingParameters(unsigned int samplingMode,
-                                            bool generateMipMaps);
-  GLRenderBufferPtr
-  _setupFramebufferDepthAttachments(bool generateStencilBuffer,
-                                    bool generateDepthBuffer, int width,
-                                    int height, int samples = 1);
+  void _finalizePipelineContext(WebGLPipelineContext* pipelineContext);
   void _prepareWebGLTextureContinuation(const InternalTexturePtr& texture,
                                         Scene* scene, bool noMipmap,
                                         bool isCompressed,
@@ -2431,11 +2509,8 @@ private:
     const std::function<
       bool(int width, int height,
            const std::function<void()>& continuationCallback)>& processFunction,
-    unsigned int samplingMode
-    = EngineConstants::TEXTURE_TRILINEAR_SAMPLINGMODE);
-  ArrayBufferView _convertRGBtoRGBATextureData(const ArrayBufferView& rgbData,
-                                               int width, int height,
-                                               unsigned int textureType);
+    unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE);
+
   /** VBOs **/
   void _resetVertexBufferBinding();
   void _resetIndexBufferBinding();
@@ -2445,7 +2520,6 @@ private:
   bool _canRenderToFloatFramebuffer();
   bool _canRenderToHalfFloatFramebuffer();
   bool _canRenderToFramebuffer(unsigned int type);
-  GL::GLenum _getInternalFormat(unsigned int format) const;
 
   /** Occlusion Queries **/
 
@@ -2526,8 +2600,7 @@ public:
 
   /**
    * Gets or sets a boolean to enable/disable checking manifest if IndexedDB
-   * support is enabled (Babylon.js will always consider the database is up to
-   * date)
+   *support is enabled (js will always consider the database is up to date)
    **/
   bool disableManifestCheck;
 
@@ -2535,6 +2608,11 @@ public:
    * Gets the list of created scenes
    */
   std::vector<Scene*> scenes;
+
+  /**
+   * Event raised when a new scene is created
+   */
+  Observable<Scene> onNewSceneAddedObservable;
 
   /**
    * Gets the list of created postprocesses
@@ -2604,26 +2682,6 @@ public:
    */
   bool _badDesktopOS;
 
-  /**
-   * Gets or sets a value indicating if we want to disable texture binding
-   * optmization. This could be required on some buggy drivers which wants to
-   * have textures bound in a progressive order. By default Babylon.js will
-   * try to let textures bound where they are and only update the samplers to
-   * point where the texture is
-   */
-  bool disableTextureBindingOptimization;
-
-  // WebVR
-
-  // The new WebVR uses promises.
-  // this promise resolves with the current devices available.
-  int vrDisplaysPromise;
-  int _vrDisplays;
-  bool _vrDisplayEnabled;
-  Size _oldSize;
-  int _oldHardwareScaleFactor;
-  int _vrAnimationFrameHandler;
-
   // Uniform buffers list
 
   /**
@@ -2641,6 +2699,11 @@ public:
    * Hidden
    */
   GL::IGLRenderingContext* _gl;
+
+  /**
+   * Hidden
+   */
+  EngineCapabilities _caps;
 
   /**
    * Hidden
@@ -2665,10 +2728,34 @@ public:
   Observable<Engine> onContextRestoredObservable;
 
   /**
+   * Hidden
+   */
+  bool _doNotHandleContextLost;
+
+  /**
    * Turn this value on if you want to pause FPS computation when in
    * background
    */
   bool disablePerformanceMonitorInBackground;
+
+  /**
+   * Gets or sets a boolean indicating that vertex array object must be disabled
+   * even if they are supported
+   */
+  bool disableVertexArrayObjects;
+
+  // Cache
+  std::vector<InternalTexturePtr> _internalTexturesCache;
+
+  /**
+   * Hidden
+   */
+  InternalTexturePtr _currentRenderTarget;
+  ICanvas* _workingCanvas;
+  ICanvasRenderingContext2D* _workingContext;
+  std::function<void()> _bindedRenderFunction;
+  int _frameHandler;
+  std::string _textureFormatInUse;
 
   /**
    * Defines whether the engine has been created with the premultipliedAlpha
@@ -2688,11 +2775,6 @@ protected:
    * Hidden
    */
   bool _highPrecisionShadersAllowed;
-
-  /**
-   * Hidden
-   */
-  EngineCapabilities _caps;
 
   // States
 
@@ -2715,9 +2797,6 @@ protected:
    * Hidden
    */
   unsigned int _alphaMode;
-
-  // Cache
-  std::vector<InternalTexturePtr> _internalTexturesCache;
 
   /**
    * Hidden
@@ -2767,11 +2846,6 @@ protected:
   /**
    * Hidden
    */
-  InternalTexturePtr _currentRenderTarget;
-
-  /**
-   * Hidden
-   */
   GL::IGLFramebuffer* _currentFramebuffer;
 
 private:
@@ -2817,7 +2891,6 @@ private:
   std::function<void(Event&& evt)> _onContextLost;
   std::function<void(Event&& evt)> _onContextRestored;
   bool _contextWasLost;
-  bool _doNotHandleContextLost;
 
   // FPS
   std::unique_ptr<PerformanceMonitor> _performanceMonitor;
@@ -2839,24 +2912,17 @@ private:
   Int32Array _currentInstanceLocations;
   std::vector<GL::IGLBuffer*> _currentInstanceBuffers;
   Int32Array _textureUnits;
-  DummyInternalTextureTrackerPtr _firstBoundInternalTextureTracker;
-  DummyInternalTextureTrackerPtr _lastBoundInternalTextureTracker;
-  ICanvas* _workingCanvas;
-  ICanvasRenderingContext2D* _workingContext;
   PassPostProcessPtr _rescalePostProcess;
   std::unique_ptr<GL::IGLFramebuffer> _dummyFramebuffer;
-  std::function<void()> _bindedRenderFunction;
   bool _vaoRecordInProgress;
   bool _mustWipeVertexAttributes;
   InternalTexturePtr _emptyTexture;
   InternalTexturePtr _emptyCubeTexture;
   InternalTexturePtr _emptyTexture3D;
-  int _frameHandler;
   // Hardware supported Compressed Textures
   std::vector<std::string> _texturesSupported;
   Int32Array _nextFreeTextureSlots;
   unsigned int _maxSimultaneousTextures;
-  std::string _textureFormatInUse;
   std::unordered_map<int, GL::IGLUniformLocation*> _boundUniforms;
   Vector4 _viewportCached;
   std::optional<bool> _unpackFlipYCached;

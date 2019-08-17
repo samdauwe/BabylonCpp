@@ -4,7 +4,6 @@
 #include <variant>
 
 #include <babylon/babylon_api.h>
-#include <babylon/engines/engine_constants.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/math/matrix.h>
@@ -147,7 +146,7 @@ public:
     const std::function<void(const std::string& message,
                              const std::string& exception)>& onError
     = nullptr,
-    unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
+    unsigned int format = Constants::TEXTUREFORMAT_RGBA);
 
   /**
    * @brief Creates a texture from its data: representation. (data: will be
@@ -183,7 +182,7 @@ public:
     const std::function<void(const std::string& message,
                              const std::string& exception)>& onError
     = nullptr,
-    unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
+    unsigned int format = Constants::TEXTUREFORMAT_RGBA);
 
   /**
    * @brief Hidden

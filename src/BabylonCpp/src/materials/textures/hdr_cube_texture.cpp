@@ -26,7 +26,7 @@ std::vector<std::string> HDRCubeTexture::_facesMapping{
 };
 
 HDRCubeTexture::HDRCubeTexture(
-  const std::string& iUrl, Scene* scene, size_t size, bool noMipmap,
+  const std::string& iUrl, Scene* scene, size_t size, bool iNoMipmap,
   bool generateHarmonics, bool iGammaSpace, bool /*reserved*/,
   const std::function<void()>& onLoad,
   const std::function<void(const std::string& message,
@@ -39,7 +39,7 @@ HDRCubeTexture::HDRCubeTexture(
     , _isBlocking{true}
     , _rotationY{0.f}
     , _generateHarmonics{generateHarmonics}
-    , _noMipmap{noMipmap}
+    , _noMipmap{iNoMipmap}
     , _size{size}
     , _onLoad{onLoad}
     , _onError{onError}
@@ -69,7 +69,7 @@ HDRCubeTexture::HDRCubeTexture(
       loadTexture();
     }
     else {
-      delayLoadState = EngineConstants::DELAYLOADSTATE_NOTLOADED;
+      delayLoadState = Constants::DELAYLOADSTATE_NOTLOADED;
     }
   }
   else if (onLoad) {
@@ -219,10 +219,10 @@ void HDRCubeTexture::loadTexture()
   auto scene = getScene();
   if (scene) {
     _texture = scene->getEngine()->createRawCubeTextureFromUrl(
-      url, scene, static_cast<int>(_size), EngineConstants::TEXTUREFORMAT_RGB,
+      url, scene, static_cast<int>(_size), Constants::TEXTUREFORMAT_RGB,
       scene->getEngine()->getCaps().textureFloat ?
-        EngineConstants::TEXTURETYPE_FLOAT :
-        EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+        Constants::TEXTURETYPE_FLOAT :
+        Constants::TEXTURETYPE_UNSIGNED_INT,
       _noMipmap, callback, nullptr, _onLoad, _onError);
   }
 }
@@ -249,11 +249,11 @@ HDRCubeTexturePtr HDRCubeTexture::clone() const
 
 void HDRCubeTexture::delayLoad(const std::string& /*forcedExtension*/)
 {
-  if (delayLoadState != EngineConstants::DELAYLOADSTATE_NOTLOADED) {
+  if (delayLoadState != Constants::DELAYLOADSTATE_NOTLOADED) {
     return;
   }
 
-  delayLoadState = EngineConstants::DELAYLOADSTATE_LOADED;
+  delayLoadState = Constants::DELAYLOADSTATE_LOADED;
   _texture       = _getFromCache(url, _noMipmap);
 
   if (!_texture) {

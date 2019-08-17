@@ -4,7 +4,6 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
-#include <babylon/engines/engine_constants.h>
 #include <babylon/inspector/components/actiontabs/lines/check_box_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/options_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/slider_line_component.h>
@@ -35,13 +34,13 @@ struct BABYLON_SHARED_EXPORT CommonMaterialPropertyGridComponent {
       };
 
     static std::vector<std::pair<const char*, unsigned int>> alphaModeOptions{
-      {"Combine", EngineConstants::ALPHA_COMBINE},
-      {"One one", EngineConstants::ALPHA_ONEONE},
-      {"Add", EngineConstants::ALPHA_ADD},
-      {"Subtract", EngineConstants::ALPHA_SUBTRACT},
-      {"Multiply", EngineConstants::ALPHA_MULTIPLY},
-      {"Maximized", EngineConstants::ALPHA_MAXIMIZED},
-      {"Pre-multiplied", EngineConstants::ALPHA_PREMULTIPLIED},
+      {"Combine", Constants::ALPHA_COMBINE},
+      {"One one", Constants::ALPHA_ONEONE},
+      {"Add", Constants::ALPHA_ADD},
+      {"Subtract", Constants::ALPHA_SUBTRACT},
+      {"Multiply", Constants::ALPHA_MULTIPLY},
+      {"Maximized", Constants::ALPHA_MAXIMIZED},
+      {"Pre-multiplied", Constants::ALPHA_PREMULTIPLIED},
     };
 
     // --- GENERAL ---

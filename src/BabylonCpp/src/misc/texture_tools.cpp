@@ -48,7 +48,7 @@ TexturePtr TextureTools::CreateResizedCopy(const TexturePtr& texture, int width,
     "pass", 1.f, nullptr,
     useBilinearMode ? TextureConstants::BILINEAR_SAMPLINGMODE :
                       TextureConstants::NEAREST_SAMPLINGMODE,
-    engine, false, EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+    engine, false, Constants::TEXTURETYPE_UNSIGNED_INT);
   passPostProcess->getEffect()->executeWhenCompiled([&](Effect* /*effect*/) {
     passPostProcess->onApply = [&](Effect* effect, EventState&) {
       effect->setTexture("textureSampler", texture);

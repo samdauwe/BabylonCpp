@@ -1,7 +1,6 @@
 #include <babylon/samples/materials/fresnel_parameters_torus_knot_scene.h>
 
 #include <babylon/cameras/arc_rotate_camera.h>
-#include <babylon/engines/engine_constants.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/fresnel_parameters.h>
 #include <babylon/materials/standard_material.h>
@@ -44,7 +43,7 @@ void FresnelParametersTorusKnotScene::initializeScene(ICanvas* canvas,
   material->emissiveColor = Color3(1.f, 1.f, 1.f);
   material->specularPower = 128.f;
   material->alpha         = 0.2f;
-  material->alphaMode     = EngineConstants::ALPHA_PREMULTIPLIED;
+  material->alphaMode     = Constants::ALPHA_PREMULTIPLIED;
   torusKnot->material     = material;
 
   // Set opacity fresnel parameters

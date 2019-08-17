@@ -1831,7 +1831,7 @@ bool Scene::isReady()
 
   // Geometries
   for (const auto& geometry : geometries) {
-    if (geometry->delayLoadState == EngineConstants::DELAYLOADSTATE_LOADING) {
+    if (geometry->delayLoadState == Constants::DELAYLOADSTATE_LOADING) {
       return false;
     }
   }

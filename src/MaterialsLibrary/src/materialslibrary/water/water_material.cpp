@@ -533,7 +533,7 @@ void WaterMaterial::_createRenderTargets(Scene* scene,
   // Render targets
   _refractionRTT = RenderTargetTexture::New(
     name + "_refraction", ISize{renderTargetSizeX, renderTargetSizeY}, scene,
-    false, true, EngineConstants::TEXTURETYPE_UNSIGNED_INT, false,
+    false, true, Constants::TEXTURETYPE_UNSIGNED_INT, false,
     TextureConstants::TRILINEAR_SAMPLINGMODE, true, false);
   _refractionRTT->wrapU                = TextureConstants::MIRROR_ADDRESSMODE;
   _refractionRTT->wrapV                = TextureConstants::MIRROR_ADDRESSMODE;
@@ -541,7 +541,7 @@ void WaterMaterial::_createRenderTargets(Scene* scene,
 
   _reflectionRTT = RenderTargetTexture::New(
     name + "_reflection", ISize{renderTargetSizeX, renderTargetSizeY}, scene,
-    false, true, EngineConstants::TEXTURETYPE_UNSIGNED_INT, false,
+    false, true, Constants::TEXTURETYPE_UNSIGNED_INT, false,
     TextureConstants::TRILINEAR_SAMPLINGMODE, true, false);
   _reflectionRTT->wrapU                = TextureConstants::MIRROR_ADDRESSMODE;
   _reflectionRTT->wrapV                = TextureConstants::MIRROR_ADDRESSMODE;
