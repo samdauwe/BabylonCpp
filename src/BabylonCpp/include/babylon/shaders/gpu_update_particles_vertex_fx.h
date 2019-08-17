@@ -18,6 +18,7 @@ const char* gpuUpdateParticlesVertexShader
     "uniform vec2 emitPower;\n"
     "uniform vec2 sizeRange;\n"
     "uniform vec4 scaleRange;\n"
+    "\n"
     "#ifndef COLORGRADIENTS\n"
     "uniform vec4 color1;\n"
     "uniform vec4 color2;\n"

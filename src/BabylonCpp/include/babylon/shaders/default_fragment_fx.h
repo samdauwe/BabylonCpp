@@ -448,6 +448,8 @@ const char* defaultPixelShader
     "  #endif\n"
     "#endif\n"
     "\n"
+    "  color.a *= visibility;\n"
+    "\n"
     "#ifdef PREMULTIPLYALPHA\n"
     "  // Convert to associative (premultiplied) format if needed.\n"
     "  color.rgb *= color.a;\n"

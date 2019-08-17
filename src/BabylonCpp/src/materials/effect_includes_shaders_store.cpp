@@ -47,9 +47,16 @@
 #include <babylon/shaders/shadersinclude/morph_targets_vertex_fx.h>
 #include <babylon/shaders/shadersinclude/morph_targets_vertex_global_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/mrt_fragment_declaration_fx.h>
+#include <babylon/shaders/shadersinclude/pbr_brdf_functions_fx.h>
+#include <babylon/shaders/shadersinclude/pbr_debug_fx.h>
+#include <babylon/shaders/shadersinclude/pbr_direct_lighting_falloff_functions_fx.h>
+#include <babylon/shaders/shadersinclude/pbr_direct_lighting_functions_fx.h>
+#include <babylon/shaders/shadersinclude/pbr_direct_lighting_setup_functions_fx.h>
 #include <babylon/shaders/shadersinclude/pbr_fragment_declaration_fx.h>
-#include <babylon/shaders/shadersinclude/pbr_functions_fx.h>
-#include <babylon/shaders/shadersinclude/pbr_light_functions_fx.h>
+#include <babylon/shaders/shadersinclude/pbr_fragment_extra_declaration_fx.h>
+#include <babylon/shaders/shadersinclude/pbr_fragment_samplers_declaration_fx.h>
+#include <babylon/shaders/shadersinclude/pbr_helper_functions_fx.h>
+#include <babylon/shaders/shadersinclude/pbr_ibl_functions_fx.h>
 #include <babylon/shaders/shadersinclude/pbr_ubo_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/pbr_vertex_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/point_cloud_vertex_declaration_fx.h>
@@ -130,9 +137,16 @@ std::unordered_map<std::string, std::string>
      {"morphTargetsVertexGlobalDeclaration",
       morphTargetsVertexGlobalDeclaration},
      {"mrtFragmentDeclaration", mrtFragmentDeclaration},
+     {"pbrBRDFFunctions", pbrBRDFFunctions},
+     {"pbrDebug", pbrDebug},
+     {"pbrDirectLightingFalloffFunctions", pbrDirectLightingFalloffFunctions},
+     {"pbrDirectLightingFunctions", pbrDirectLightingFunctions},
+     {"pbrDirectLightingSetupFunctions", pbrDirectLightingSetupFunctions},
      {"pbrFragmentDeclaration", pbrFragmentDeclaration},
-     {"pbrFunctions", pbrFunctions},
-     {"pbrLightFunctions", pbrLightFunctions},
+     {"pbrFragmentExtraDeclaration", pbrFragmentExtraDeclaration},
+     {"pbrFragmentSamplersDeclaration", pbrFragmentSamplersDeclaration},
+     {"pbrHelperFunctions", pbrHelperFunctions},
+     {"pbrIBLFunctions", pbrIBLFunctions},
      {"pbrUboDeclaration", pbrUboDeclaration},
      {"pbrVertexDeclaration", pbrVertexDeclaration},
      {"pointCloudVertex", pointCloudVertex},
