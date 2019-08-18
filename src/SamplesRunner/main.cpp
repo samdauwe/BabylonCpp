@@ -84,7 +84,7 @@ int main(int , char** argv)
   AppContext appContext;
 
   auto OnNewRenderableScene = [&](std::shared_ptr<BABYLON::IRenderableScene> scene) {
-    //appContext._inspector.setScene(nullptr);
+    appContext._inspector.setScene(nullptr);
     appContext._sceneWidget->setRenderableScene(scene);
     appContext._inspector.setScene(appContext._sceneWidget->getScene());
   };
