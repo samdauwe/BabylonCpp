@@ -21,6 +21,8 @@ FramebufferCanvas::FramebufferCanvas() :
 
 FramebufferCanvas::~FramebufferCanvas()
 {
+  _renderingContext->deleteFramebuffer(mFrameBuffer.get());
+  _renderingContext->deleteTexture(mTextureColorBuffer.get());
 }
 
 void FramebufferCanvas::initializeFrameBuffer()

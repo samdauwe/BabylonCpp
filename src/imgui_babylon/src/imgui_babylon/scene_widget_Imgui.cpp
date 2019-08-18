@@ -15,16 +15,22 @@ namespace BABYLON {
     return sqrt(dx * dx + dy * dy);
   }
 
-  SceneWidget_ImGui::SceneWidget_ImGui(ImVec2 size)
+  SceneWidget_ImGui::SceneWidget_ImGui(ImVec2 size) :
+    _size(size)
   {
+  }
+
+  void SceneWidget_ImGui::initializeFramebufferCanvas()
+  {
+    ImVec2 realSize(_size);
     _framebuffer_canvas = std::make_unique<BABYLON::impl::FramebufferCanvas>();
-    if (size.x < 0.1f) {
-      size = ImGui::GetIO().DisplaySize;
-      size.y -= 20.f;
+    if (realSize.x < 0.1f) {
+      realSize = ImGui::GetIO().DisplaySize;
+      realSize.y -= 20.f;
     }
 
-    int width = static_cast<int>(size.x);
-    int height = static_cast<int>(size.y);
+    int width = static_cast<int>(realSize.x);
+    int height = static_cast<int>(realSize.y);
     _framebuffer_canvas->clientWidth = width;
     _framebuffer_canvas->clientHeight = height;
     _framebuffer_canvas->initializeFrameBuffer();
@@ -37,6 +43,8 @@ namespace BABYLON {
 
   void SceneWidget_ImGui::setRenderableScene(std::shared_ptr<BABYLON::IRenderableScene> scene)
   {
+    initializeFramebufferCanvas();
+
     _renderableScene = scene;
     _renderableScene->initialize(_framebuffer_canvas.get());
   }
