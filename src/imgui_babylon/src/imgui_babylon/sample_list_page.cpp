@@ -3,7 +3,8 @@
 #endif
 #include <babylon/core/string.h>
 #include <imgui_utils/icons_font_awesome_5.h>
-#include <babylon/inspector/components/actiontabs/tabs/sample_list_component.h>
+#include <babylon/imgui_babylon/sample_list_page.h>
+#include <babylon/interfaces/irenderable_scene.h>
 
 #include <imgui.h>
 
@@ -39,21 +40,29 @@ namespace
   }
 }
 
-SampleListComponent::SampleListComponent()
+SampleListPage::SampleListPage()
+  : _samplesIndex()
 {
 }
 
-void GuiOneSample(const std::string &sampleName)
+void SampleListPage::guiOneSample(const std::string &sampleName)
 {
-  bool canLaunch = Inspector::OnSampleChanged ?  true : false;
+  //bool canLaunch = Inspector::OnSampleChanged ?  true : false;
 
-  static auto samples = Samples::SamplesIndex();
-  auto sampleInfo = samples.getSampleInfo(sampleName);
+  auto sampleInfo = _samplesIndex.getSampleInfo(sampleName);
   ImGui::TextColored(ImVec4(0.7f, 0.9f, 0.7f, 1.f), "%s", sampleName.c_str());
   ImGui::TextWrapped("%s", sampleInfo.Brief.c_str());
 
-  if (canLaunch) {
-    if (ImGui::Button(ICON_FA_PLAY_CIRCLE " Run"))
+  //if (canLaunch) {
+  if (ImGui::Button(ICON_FA_PLAY_CIRCLE " Run"))
+  {
+    if (OnNewRenderableScene)
+    {
+      BABYLON::ICanvas *dummyCanvas = nullptr;
+      auto scene = _samplesIndex.createRenderableScene(sampleName, dummyCanvas);
+      OnNewRenderableScene(std::move(scene));
+    }
+    if (Inspector::OnSampleChanged)
       Inspector::OnSampleChanged(sampleName);
   }
 
@@ -95,7 +104,8 @@ bool ImGuiListBox_Helper(
   return ImGui::ListBox(label.c_str(), current_item, as_char_ptr.data(), (int)as_char_ptr.size(), height_in_items);
 }
 
-void ShowSearchSamples() {
+void SampleListPage::guiBrowseSamples() 
+{
   static auto samples = BABYLON::Samples::SamplesIndex();
   static char search[200];
   bool searchEdited = ImGui::InputText("Filter" , search, 200);
@@ -110,8 +120,12 @@ void ShowSearchSamples() {
     return true;
   };
 
-  std::vector<std::string> matchingSamples;
+  static std::vector<std::string> matchingSamples;
+  static bool matchingSamplesInited = false;
+  if (searchEdited || (!matchingSamplesInited))
   {
+    matchingSamplesInited = true;
+    matchingSamples.clear();
     auto categoryNames = samples.getCategoryNames();
     for (const auto& categoryName : categoryNames) {
       auto sampleNames = samples.getSampleNamesInCategory(categoryName);
@@ -137,13 +151,13 @@ void ShowSearchSamples() {
     ImGui::Separator();
     auto sampleCatAndName = matchingSamples[currentIndex];
     auto sampleName = BABYLON::String::split(sampleCatAndName, '/')[1];
-    GuiOneSample(sampleName);
+    guiOneSample(sampleName);
   }
 }
 
-void SampleListComponent::render()
+void SampleListPage::render()
 {
-  ShowSearchSamples();
+  guiBrowseSamples();
 }
 
 } // end of namespace BABYLON
