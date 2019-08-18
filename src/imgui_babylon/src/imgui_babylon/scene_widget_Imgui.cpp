@@ -62,7 +62,9 @@ namespace BABYLON {
     _framebuffer_canvas->unbind();
 
     auto id = _framebuffer_canvas->TextureId();
-    ImGui::Image(reinterpret_cast<void*>(id), canvasSize);
+    const ImVec2 uv0 = ImVec2(0, 1);
+    const ImVec2 uv1 = ImVec2(1, 0);
+    ImGui::Image(reinterpret_cast<void*>(id), canvasSize, uv0, uv1);
 
     int maxKey = 512;
     bool ctrlKey = ImGui::GetIO().KeyCtrl;
