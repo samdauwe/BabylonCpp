@@ -1,12 +1,11 @@
 #include <babylon/inspector/components/actiontabs/action_tabs_component.h>
 
 #include <imgui.h>
-
 #include <babylon/core/string.h>
 #include <babylon/inspector/components/actiontabs/tabs/debug_tab_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/logs_tab_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/property_grid_tab_component.h>
-#include <babylon/inspector/components/actiontabs/tabs/sample_list_component.h>
+#include <babylon/imgui_babylon/sample_list_page.h>
 #include <babylon/inspector/components/actiontabs/tabs/statistics_tab_component.h>
 #include <babylon/inspector/components/global_state.h>
 
@@ -21,7 +20,7 @@ ActionTabsComponent::ActionTabsComponent(
     , _debugTabComponent{nullptr}
     , _statisticsTabComponent{nullptr}
     , _logsTabComponent{nullptr}
-    , _sampleListComponent(new SampleListComponent())
+    , _sampleListPage(new SampleListPage())
     , _onSelectionChangeObserver{nullptr}
 {
   componentWillMount();
@@ -125,7 +124,7 @@ void ActionTabsComponent::render()
           = String::concat(ICON_FA_PALETTE, " ", "Browse samples");
       if (ImGui::BeginTabItem(sampleTabLabel.c_str())) {
         if (ImGui::BeginChild("scrollingArea")) {
-          _sampleListComponent->render();
+          _sampleListPage->render();
           ImGui::EndChild();
         }
         ImGui::EndTabItem();
