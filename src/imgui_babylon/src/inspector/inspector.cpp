@@ -37,7 +37,7 @@
 
 #ifdef _WIN32
 // See warning about windows mixing dll and stl in this file!
-#include <babylon/core/logging/log_levels_statics.cpp.h> 
+//#include <babylon/core/logging/log_levels_statics.cpp.h> 
 #endif
 
 namespace BABYLON {
