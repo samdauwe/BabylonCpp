@@ -197,12 +197,9 @@ source_group_by_path(${SOURCE_PATH}  "\\\\.cpp$|\\\\.c$|\\\\.h$|\\\\.hpp$"
 
 # Build library
 add_library(${TARGET}
-    STATIC
     ${BABYLON_SAMPLES_SOURCES}
     ${BABYLON_SAMPLES_HEADERS}
 )
-
-target_compile_definitions(${TARGET} PRIVATE -DBABYLONCPP_STATIC_DEFINE)
 
 # Create namespaced alias
 add_library(${META_PROJECT_NAME}::${TARGET} ALIAS ${TARGET})
