@@ -161,7 +161,7 @@ public:
   GLint getProgramParameter(IGLProgram* program, GLenum pname) override;
   std::string
   getProgramInfoLog(const std::unique_ptr<IGLProgram>& program) override;
-  any getRenderbufferParameter(GLenum target, GLenum pname) override;
+  GLint getRenderbufferParameter(GLenum target, GLenum pname) override;
   std::string
   getShaderInfoLog(const std::unique_ptr<IGLShader>& shader) override;
   GLint getShaderParameter(const std::unique_ptr<IGLShader>& shader,
@@ -210,8 +210,6 @@ public:
   void texImage2D(GLenum target, GLint level, GLint internalformat,
                   GLsizei width, GLsizei height, GLint border, GLenum format,
                   GLenum type, const Uint8Array* const pixels) override;
-  void texImage2D(GLenum target, GLint level, GLint internalformat,
-                  GLenum format, GLenum type, ICanvas* pixels) override;
   void texImage3D(GLenum target, GLint level, GLint internalformat,
                   GLsizei width, GLsizei height, GLsizei depth, GLint border,
                   GLenum format, GLenum type,

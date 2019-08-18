@@ -890,11 +890,11 @@ std::string GLRenderingContext::getProgramInfoLog(
   return result;
 }
 
-any GLRenderingContext::getRenderbufferParameter(GLenum target, GLenum pname)
+GLint GLRenderingContext::getRenderbufferParameter(GLenum target, GLenum pname)
 {
   GLint params;
   glGetRenderbufferParameteriv(target, pname, &params);
-  return reinterpret_cast<any>(params);
+  return params;
 }
 
 GLint GLRenderingContext::getShaderParameter(
@@ -1126,13 +1126,6 @@ void GLRenderingContext::texImage2D(GLenum target, GLint level,
     glTexImage2D(target, level, internalformat, width, height, border, format,
       type, pixels->data());
   }
-}
-
-void GLRenderingContext::texImage2D(GLenum /*target*/, GLint /*level*/,
-                                    GLint /*internalformat*/, GLenum /*format*/,
-                                    GLenum /*type*/, ICanvas* /*pixels*/)
-{
-#pragma message("TODO: texImage2D is not implemented for ICanvas!")
 }
 
 void GLRenderingContext::texImage3D(GLenum target, GLint level,
