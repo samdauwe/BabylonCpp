@@ -267,7 +267,7 @@ public:
     state.skipNextObservers = false;
     state.lastReturnValue   = eventData;
 
-    for (const auto& obs : _observers) {
+    for (auto& obs : _observers) {
       if (obs->_willBeUnregistered) {
         continue;
       }
