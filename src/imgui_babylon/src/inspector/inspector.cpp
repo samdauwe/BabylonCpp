@@ -133,7 +133,7 @@ void Inspector::imgui_LoadFontAwesome()
     ImGui::IconSize, &config, ranges);
 }
 
-void Inspector::imgui_render_and_display()
+void Inspector::imgui_render_and_display() // oldie
 {
   // Start the Dear ImGui frame
   ImGui_ImplOpenGL3_NewFrame();
@@ -141,7 +141,7 @@ void Inspector::imgui_render_and_display()
   ImGui::NewFrame();
   // Push Font
   _pushFonts();
-  render(true);
+  render(true, 400);
   // Pop font
   _popFonts();
   // Rendering
@@ -149,7 +149,7 @@ void Inspector::imgui_render_and_display()
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void Inspector::render(bool createWindow)
+void Inspector::render(bool createWindow, int width)
 {
   // Render main menu bar
   if (ImGui::BeginMainMenuBar()) 
@@ -159,7 +159,7 @@ void Inspector::render(bool createWindow)
     ImGui::EndMainMenuBar();
   }
   // Render inspector
-  _renderInspector(createWindow);
+  _renderInspector(createWindow, width);
 }
 
 void Inspector::_showFps()
@@ -215,7 +215,7 @@ void Inspector::_popFonts()
   ImGui::PopFont();
 }
 
-void Inspector::_renderInspector(bool createWindow)
+void Inspector::_renderInspector(bool createWindow, int width_)
 {
   if (ImGui::GetIO().DisplaySize.y <= 0) {
     return;
@@ -246,7 +246,7 @@ void Inspector::_renderInspector(bool createWindow)
   }
   else
   {
-    width = 400.f;
+    width = static_cast<float>(width_);
     sz1 = ImGui::GetContentRegionMax().y / 2.f;
     sz2 = ImGui::GetContentRegionMax().y - sz1 - 20.f;
     ImGui::BeginGroup();

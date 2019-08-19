@@ -27,7 +27,7 @@ public:
 
   Scene* scene() const;
   void setScene(Scene* scene);
-  void render(bool createWindow);
+  void render(bool createWindow, int width);
 
   // these methods handle the internals of imgui
   // they are not part of the inspector interface
@@ -48,7 +48,7 @@ private:
   void _doMenuItem(InspectorAction& a, bool enabled);
   void _pushFonts();
   void _popFonts();
-  void _renderInspector(bool createWindow);
+  void _renderInspector(bool createWindow, int width = 400);
 
 private:
   GLFWwindow* _glfwWindow;
