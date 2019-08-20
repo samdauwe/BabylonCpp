@@ -35,6 +35,7 @@
 #include <babylon/gamepads/gamepad_system_scene_component.h>
 #include <babylon/helpers/environment_helper.h>
 #include <babylon/inputs/click_info.h>
+#include <babylon/inputs/input_manager.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/layer/effect_layer.h>
 #include <babylon/layer/glow_layer.h>
@@ -96,6 +97,7 @@ bool Scene::ExclusiveDoubleClickMode      = false;
 
 Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     : AbstractScene{}
+    , _inputManager{std::make_unique<InputManager>(this)}
     , autoClear{true}
     , autoClearDepthAndStencil{true}
     , clearColor{Color4(0.2f, 0.2f, 0.3f, 1.f)}
@@ -143,7 +145,8 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , shadowsEnabled{this, &Scene::get_shadowsEnabled,
                      &Scene::set_shadowsEnabled}
     , lightsEnabled{this, &Scene::get_lightsEnabled, &Scene::set_lightsEnabled}
-    , activeCamera{nullptr}
+    , _activeCamera{nullptr}
+    , activeCamera{this, &Scene::get_activeCamera, &Scene::set_activeCamera}
     , defaultMaterial{this, &Scene::get_defaultMaterial,
                       &Scene::set_defaultMaterial}
     , texturesEnabled{this, &Scene::get_texturesEnabled,
@@ -465,7 +468,7 @@ void Scene::set_environmentTexture(const BaseTexturePtr& value)
   }
 
   _environmentTexture = value;
-  markAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  markAllMaterialsAsDirty(Constants::MATERIAL_TextureDirtyFlag);
 }
 
 bool Scene::get_useRightHandedSystem() const
@@ -617,7 +620,7 @@ void Scene::set_texturesEnabled(bool value)
     return;
   }
   _texturesEnabled = value;
-  markAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  markAllMaterialsAsDirty(Constants::MATERIAL_TextureDirtyFlag);
 }
 
 bool Scene::get_texturesEnabled() const
@@ -725,6 +728,21 @@ void Scene::set_geometryBufferRenderer(const GeometryBufferRendererPtr& value)
 void Scene::setMirroredCameraPosition(const Vector3& newPosition)
 {
   _mirroredCameraPosition = std::make_unique<Vector3>(newPosition);
+}
+
+CameraPtr& Scene::get_activeCamera()
+{
+  return _activeCamera;
+}
+
+void Scene::set_activeCamera(const CameraPtr& value)
+{
+  if (value == _activeCamera) {
+    return;
+  }
+
+  _activeCamera = value;
+  onActiveCameraChanged.notifyObservers(this);
 }
 
 MaterialPtr& Scene::get_defaultMaterial()
@@ -3389,22 +3407,30 @@ IActiveMeshCandidateProvider* Scene::getActiveMeshCandidateProvider() const
 
 Scene& Scene::freezeActiveMeshes()
 {
-  if (!activeCamera) {
+  if (!activeCamera()) {
     return *this;
   }
 
-  if (!_frustumPlanesSet) {
-    setTransformMatrix(activeCamera->getViewMatrix(),
-                       activeCamera->getProjectionMatrix());
+  if (_frustumPlanes.empty()) {
+    setTransformMatrix(activeCamera()->getViewMatrix(),
+                       activeCamera()->getProjectionMatrix());
   }
 
   _evaluateActiveMeshes();
   _activeMeshesFrozen = true;
+
+  for (const auto& mesh : _activeMeshes) {
+    mesh->_freeze();
+  }
   return *this;
 }
 
 Scene& Scene::unfreezeActiveMeshes()
 {
+  for (const auto& mesh : _activeMeshes) {
+    mesh->_unFreeze();
+  }
+
   _activeMeshesFrozen = false;
   return *this;
 }
@@ -3412,16 +3438,21 @@ Scene& Scene::unfreezeActiveMeshes()
 void Scene::_evaluateActiveMeshes()
 {
   if (_activeMeshesFrozen && !_activeMeshes.empty()) {
+
+    for (const auto& mesh : _activeMeshes) {
+      mesh->computeWorldMatrix();
+    }
+
     return;
   }
 
-  if (!activeCamera) {
+  if (!activeCamera()) {
     return;
   }
 
   onBeforeActiveMeshesEvaluationObservable.notifyObservers(this);
 
-  activeCamera->_activeMeshes.clear();
+  activeCamera()->_activeMeshes.clear();
   _activeMeshes.clear();
   _renderingManager->reset();
   _processedMaterials.clear();
@@ -3444,7 +3475,8 @@ void Scene::_evaluateActiveMeshes()
 
     _totalVertices.addCount(mesh->getTotalVertices(), false);
 
-    if (!mesh->isReady() || !mesh->isEnabled()) {
+    if (!mesh->isReady() || !mesh->isEnabled()
+        || mesh->scaling().lengthSquared() == 0.f) {
       continue;
     }
 
@@ -3453,8 +3485,8 @@ void Scene::_evaluateActiveMeshes()
     // Intersections
     if (mesh->actionManager
         && mesh->actionManager->hasSpecificTriggers2(
-          ActionManager::OnIntersectionEnterTrigger,
-          ActionManager::OnIntersectionExitTrigger)) {
+          Constants::ACTION_OnIntersectionEnterTrigger,
+          Constants::ACTION_OnIntersectionExitTrigger)) {
       if (std::find(_meshesForIntersections.begin(),
                     _meshesForIntersections.end(), mesh)
           == _meshesForIntersections.end()) {
@@ -3463,26 +3495,42 @@ void Scene::_evaluateActiveMeshes()
     }
 
     // Switch to current LOD
-    auto meshLOD = mesh->getLOD(activeCamera);
-    if (!meshLOD) {
+    auto meshToRender = customLODSelector ?
+                          customLODSelector(mesh, activeCamera()) :
+                          mesh->getLOD(activeCamera);
+    if (meshToRender == nullptr) {
       continue;
+    }
+
+    // Compute world matrix if LOD is billboard
+    if (meshToRender != mesh
+        && meshToRender->billboardMode != TransformNode::BILLBOARDMODE_NONE) {
+      meshToRender->computeWorldMatrix();
     }
 
     mesh->_preActivate();
 
     if (mesh->isVisible && mesh->visibility > 0
-        && (mesh->alwaysSelectAsActiveMesh
-            || ((mesh->layerMask & activeCamera->layerMask) != 0
-                && mesh->isInFrustum(_frustumPlanes)))) {
+        && ((mesh->alwaysSelectAsActiveMesh
+             || (((mesh->layerMask & activeCamera()->layerMask) != 0)
+                 && (mesh->alwaysSelectAsActiveMesh
+                     || mesh->isInFrustum(_frustumPlanes)))))) {
       _activeMeshes.emplace_back(mesh);
-      activeCamera->_activeMeshes.emplace_back(_activeMeshes.back());
+      activeCamera()->_activeMeshes.emplace_back(_activeMeshes.back());
 
-      mesh->_activate(_renderId, false);
-      if (meshLOD != mesh) {
-        meshLOD->_activate(_renderId, false);
+      if (meshToRender != mesh) {
+        meshToRender->_activate(_renderId, false);
       }
 
-      _activeMesh(mesh, meshLOD);
+      if (mesh->_activate(_renderId, false)) {
+        if (!mesh->isAnInstance) {
+          meshToRender->_internalAbstractMeshDataInfo._onlyForInstances = false;
+        }
+        meshToRender->_internalAbstractMeshDataInfo._isActive = true;
+        _activeMesh(mesh, meshToRender);
+      }
+
+      mesh->_postActivate();
     }
   }
 
@@ -3535,25 +3583,48 @@ void Scene::_activeMesh(AbstractMesh* sourceMesh, AbstractMesh* mesh)
   if (mesh && !mesh->subMeshes.empty()) {
     auto subMeshes = getActiveSubMeshCandidates(mesh);
     for (const auto& subMesh : subMeshes) {
-      _evaluateSubMesh(subMesh, mesh);
+      _evaluateSubMesh(subMesh, mesh, _sourceMesh);
     }
   }
 }
 
 void Scene::updateTransformMatrix(bool force)
 {
-  if (!activeCamera) {
+  if (!activeCamera()) {
     return;
   }
 
-  setTransformMatrix(activeCamera->getViewMatrix(force),
-                     activeCamera->getProjectionMatrix(force));
+  setTransformMatrix(activeCamera()->getViewMatrix(force),
+                     activeCamera()->getProjectionMatrix(force));
 }
 
-void Scene::updateAlternateTransformMatrix(Camera* alternateCamera)
+void Scene::_bindFrameBuffer()
 {
-  _setAlternateTransformMatrix(alternateCamera->getViewMatrix(),
-                               alternateCamera->getProjectionMatrix());
+  if (activeCamera() && activeCamera()->_multiviewTexture) {
+    activeCamera()->_multiviewTexture->_bindFrameBuffer();
+  }
+  else if (activeCamera() && activeCamera()->outputRenderTarget) {
+    auto useMultiview
+      = getEngine()->getCaps().multiview && activeCamera()->outputRenderTarget
+        && activeCamera()->outputRenderTarget->getViewCount() > 1;
+    if (useMultiview) {
+      activeCamera()->outputRenderTarget->_bindFrameBuffer();
+    }
+    else {
+      auto internalTexture
+        = activeCamera()->outputRenderTarget->getInternalTexture();
+      if (internalTexture) {
+        getEngine()->bindFramebuffer(internalTexture);
+      }
+      else {
+        BABYLON_LOG_ERROR("Engine",
+                          "Camera contains invalid customDefaultRenderTarget")
+      }
+    }
+  }
+  else {
+    getEngine()->restoreDefaultFramebuffer(); // Restore back buffer if needed
+  }
 }
 
 void Scene::_renderForCamera(const CameraPtr& camera,
@@ -3565,27 +3636,35 @@ void Scene::_renderForCamera(const CameraPtr& camera,
 
   auto engine = _engine;
 
-  activeCamera = camera;
+  // Use _activeCamera instead of activeCamera to avoid onActiveCameraChanged
+  _activeCamera = camera;
 
-  if (!activeCamera) {
+  if (!activeCamera()) {
     BABYLON_LOG_ERROR("Scene", "Active camera not set")
     return;
   }
 
   // Viewport
-  engine->setViewport(activeCamera->viewport);
+  engine->setViewport(activeCamera()->viewport);
 
   // Camera
   resetCachedMaterial();
   ++_renderId;
-  updateTransformMatrix();
 
-  /*if (camera->_alternateCamera) {
-    updateAlternateTransformMatrix(camera->_alternateCamera);
-    _alternateRendering = true;
-  }*/
+  auto useMultiview = getEngine()->getCaps().multiview
+                      && camera->outputRenderTarget
+                      && camera->outputRenderTarget->getViewCount() > 1;
+  if (useMultiview) {
+    setTransformMatrix(camera->_rigCameras[0]->getViewMatrix(),
+                       camera->_rigCameras[0]->getProjectionMatrix(),
+                       camera->_rigCameras[1]->getViewMatrix(),
+                       camera->_rigCameras[1]->getProjectionMatrix());
+  }
+  else {
+    updateTransformMatrix();
+  }
 
-  onBeforeCameraRenderObservable.notifyObservers(activeCamera.get());
+  onBeforeCameraRenderObservable.notifyObservers(activeCamera().get());
 
   // Meshes
   _evaluateActiveMeshes();
@@ -3615,6 +3694,7 @@ void Scene::_renderForCamera(const CameraPtr& camera,
 
   if (renderTargetsEnabled) {
     _intermediateRendering = true;
+    auto needRebind        = false;
 
     if (!_renderTargets.empty()) {
       Tools::StartPerformanceCounter("Render targets", !_renderTargets.empty());
@@ -3623,9 +3703,10 @@ void Scene::_renderForCamera(const CameraPtr& camera,
           ++_renderId;
           bool hasSpecialRenderTargetCamera
             = renderTarget->activeCamera
-              && renderTarget->activeCamera != activeCamera;
+              && renderTarget->activeCamera != activeCamera();
           renderTarget->render(hasSpecialRenderTargetCamera,
                                dumpNextRenderTargets);
+          needRebind = true;
         }
       }
       Tools::EndPerformanceCounter("Render targets", !_renderTargets.empty());
@@ -3634,24 +3715,27 @@ void Scene::_renderForCamera(const CameraPtr& camera,
     }
 
     for (const auto& step : _cameraDrawRenderTargetStage) {
-      step.action(activeCamera.get());
+      needRebind = step.action(activeCamera().get()) || needRebind;
     }
 
     _intermediateRendering = false;
 
-    engine->restoreDefaultFramebuffer(); // Restore back buffer
+    // Restore framebuffer after rendering to targets
+    if (needRebind) {
+      _bindFrameBuffer();
+    }
   }
 
   onAfterRenderTargetsRenderObservable.notifyObservers(this);
 
   // Prepare Frame
-  if (postProcessManager) {
+  if (postProcessManager && !camera->_multiviewTexture) {
     postProcessManager->_prepareFrame(nullptr);
   }
 
   // Before Camera Draw
   for (const auto& step : _beforeCameraDrawStage) {
-    step.action(activeCamera.get());
+    step.action(activeCamera().get());
   }
 
   // Render
@@ -3661,68 +3745,52 @@ void Scene::_renderForCamera(const CameraPtr& camera,
 
   // After Camera Draw
   for (const auto& step : _afterCameraDrawStage) {
-    step.action(activeCamera.get());
+    step.action(activeCamera().get());
   }
 
   // Finalize frame
-  if (postProcessManager) {
+  if (postProcessManager && !camera->_multiviewTexture) {
     postProcessManager->_finalizeFrame(camera->isIntermediate);
   }
 
   // Reset some special arrays
   _renderTargets.clear();
 
-  _alternateRendering = false;
-
-  onAfterCameraRenderObservable.notifyObservers(activeCamera.get());
+  onAfterCameraRenderObservable.notifyObservers(activeCamera().get());
 }
 
 void Scene::_processSubCameras(const CameraPtr& camera)
 {
-  if (camera->cameraRigMode == Camera::RIG_MODE_NONE) {
+  if (camera->cameraRigMode == Camera::RIG_MODE_NONE
+      || (camera->outputRenderTarget
+          && camera->outputRenderTarget->getViewCount() > 1
+          && getEngine()->getCaps().multiview)) {
     _renderForCamera(camera);
     return;
   }
 
-  // rig cameras
-  for (const auto& rigCamera : camera->_rigCameras) {
-    _renderForCamera(rigCamera, camera);
+  if (camera->_useMultiviewToSingleView) {
+    _renderMultiviewToSingleView(camera);
+  }
+  else {
+    // rig cameras
+    for (const auto& rigCamera : camera->_rigCameras) {
+      _renderForCamera(rigCamera, camera);
+    }
   }
 
-  activeCamera = camera;
-  setTransformMatrix(activeCamera->getViewMatrix(),
-                     activeCamera->getProjectionMatrix());
+  // Use _activeCamera instead of activeCamera to avoid onActiveCameraChanged
+  _activeCamera = camera;
+  setTransformMatrix(_activeCamera->getViewMatrix(),
+                     _activeCamera->getProjectionMatrix());
 }
 
 void Scene::_checkIntersections()
 {
 }
 
-void Scene::render(bool updateCameras)
+void Scene::animate()
 {
-  if (isDisposed()) {
-    return;
-  }
-
-  ++_frameId;
-
-  // Register components that have been associated lately to the scene.
-  _registerTransientComponents();
-
-  _activeParticles.fetchNewFrame();
-  _totalVertices.fetchNewFrame();
-  _activeIndices.fetchNewFrame();
-  _activeBones.fetchNewFrame();
-  _meshesForIntersections.clear();
-  resetCachedMaterial();
-
-  onBeforeAnimationsObservable.notifyObservers(this);
-
-  // Actions
-  if (actionManager) {
-    actionManager->processTrigger(ActionManager::OnEveryFrameTrigger);
-  }
-
   if (_engine->isDeterministicLockStep()) {
     auto deltaTime
       = (std::max(static_cast<float>(Scene::MinDeltaTime.count()),
@@ -3781,6 +3849,37 @@ void Scene::render(bool updateCameras)
 
     // Physics
     _advancePhysicsEngineStep(deltaTime);
+  }
+}
+
+void Scene::render(bool updateCameras, bool ignoreAnimations)
+{
+  if (isDisposed()) {
+    return;
+  }
+
+  ++_frameId;
+
+  // Register components that have been associated lately to the scene.
+  _registerTransientComponents();
+
+  _activeParticles.fetchNewFrame();
+  _totalVertices.fetchNewFrame();
+  _activeIndices.fetchNewFrame();
+  _activeBones.fetchNewFrame();
+  _meshesForIntersections.clear();
+  resetCachedMaterial();
+
+  onBeforeAnimationsObservable.notifyObservers(this);
+
+  // Actions
+  if (actionManager) {
+    actionManager->processTrigger(Constants::ACTION_OnEveryFrameTrigger);
+  }
+
+  // Animations
+  if (!ignoreAnimations) {
+    animate();
   }
 
   // Before camera update steps
@@ -3853,12 +3952,10 @@ void Scene::render(bool updateCameras)
   }
 
   // Restore back buffer
-  if (!customRenderTargets.empty()) {
-    engine->restoreDefaultFramebuffer();
-  }
+  activeCamera = currentActiveCamera;
+  _bindFrameBuffer();
 
   onAfterRenderTargetsRenderObservable.notifyObservers(this);
-  activeCamera = currentActiveCamera;
 
   for (const auto& step : _beforeClearStage) {
     step.action();
@@ -3910,6 +4007,8 @@ void Scene::render(bool updateCameras)
   for (const auto& step : _afterRenderStage) {
     step.action();
   }
+
+  // After render
 
   onAfterRenderObservable.notifyObservers(this);
 
@@ -4095,16 +4194,17 @@ void Scene::dispose()
   _activeMeshStage.clear();
   _cameraDrawRenderTargetStage.clear();
   _beforeCameraDrawStage.clear();
+  _beforeRenderTargetDrawStage.clear();
   _beforeRenderingGroupDrawStage.clear();
   _beforeRenderingMeshStage.clear();
   _afterRenderingMeshStage.clear();
   _afterRenderingGroupDrawStage.clear();
   _afterCameraDrawStage.clear();
+  _afterRenderTargetDrawStage.clear();
   _afterRenderStage.clear();
   _beforeCameraUpdateStage.clear();
   _beforeClearStage.clear();
   _gatherRenderTargetsStage.clear();
-
   _gatherActiveCameraRenderTargetsStage.clear();
   _pointerMoveStage.clear();
   _pointerDownStage.clear();
@@ -4134,7 +4234,6 @@ void Scene::dispose()
   _renderTargets.clear();
   _registeredForLateAnimationBindings.clear();
   _meshesForIntersections.clear();
-
   _toBeDisposed.clear();
 
   // Abort active requests
@@ -4179,6 +4278,8 @@ void Scene::dispose()
   onTransformNodeRemovedObservable.clear();
   onNewMeshAddedObservable.clear();
   onMeshRemovedObservable.clear();
+  onNewSkeletonAddedObservable.clear();
+  onSkeletonRemovedObservable.clear();
   onNewMaterialAddedObservable.clear();
   onMaterialRemovedObservable.clear();
   onNewTextureAddedObservable.clear();
@@ -4187,6 +4288,7 @@ void Scene::dispose()
   onPointerObservable.clear();
   onPreKeyboardObservable.clear();
   onKeyboardObservable.clear();
+  onActiveCameraChanged.clear();
 
   detachControl();
 
@@ -4215,7 +4317,7 @@ void Scene::dispose()
 
   // Release transform nodes
   for (const auto& transformNode : transformNodes) {
-    removeTransformNode(transformNode);
+    transformNode->dispose();
   }
 
   // Release cameras
@@ -4224,8 +4326,8 @@ void Scene::dispose()
   }
 
   // Release materials
-  if (defaultMaterial()) {
-    defaultMaterial()->dispose();
+  if (_defaultMaterial) {
+    _defaultMaterial->dispose();
   }
   for (const auto& multiMaterial : multiMaterials) {
     multiMaterial->dispose();
@@ -4252,8 +4354,8 @@ void Scene::dispose()
   // Release UBO
   _sceneUbo->dispose();
 
-  if (_alternateSceneUbo) {
-    _alternateSceneUbo->dispose();
+  if (_multiviewSceneUbo) {
+    _multiviewSceneUbo->dispose();
   }
 
   // Post-processes
@@ -4287,7 +4389,7 @@ void Scene::set_blockMaterialDirtyMechanism(bool value)
   _blockMaterialDirtyMechanism = value;
 
   if (!value) { // Do a complete update
-    markAllMaterialsAsDirty(Material::AllDirtyFlag);
+    markAllMaterialsAsDirty(Constants::MATERIAL_AllDirtyFlag);
   }
 }
 
@@ -4426,9 +4528,9 @@ Scene& Scene::createPickingRayToRef(int x, int y,
   auto identity = Matrix::Identity();
 
   // Moving coordinates to local viewport world
-  float _x = static_cast<float>(x);
+  auto _x = static_cast<float>(x);
   _x /= static_cast<float>(_engine->getHardwareScalingLevel() - viewport.x);
-  float _y = static_cast<float>(y);
+  auto _y = static_cast<float>(y);
   _y /= static_cast<float>(
     _engine->getHardwareScalingLevel()
     - (_engine->getRenderHeight() - viewport.y - viewport.height));
@@ -4470,9 +4572,9 @@ Scene& Scene::createPickingRayInCameraSpaceToRef(int x, int y, Ray& result,
   auto identity        = Matrix::Identity();
 
   // Moving coordinates to local viewport world
-  float _x = static_cast<float>(x);
+  auto _x = static_cast<float>(x);
   _x /= static_cast<float>(_engine->getHardwareScalingLevel() - viewport.x);
-  float _y = static_cast<float>(y);
+  auto _y = static_cast<float>(y);
   _y /= static_cast<float>(
     _engine->getHardwareScalingLevel()
     - (_engine->getRenderHeight() - viewport.y - viewport.height));
@@ -4485,7 +4587,7 @@ Scene& Scene::createPickingRayInCameraSpaceToRef(int x, int y, Ray& result,
 std::optional<PickingInfo> Scene::_internalPick(
   const std::function<Ray(Matrix& world)>& rayFunction,
   const std::function<bool(const AbstractMeshPtr& mesh)>& predicate,
-  bool fastCheck)
+  bool fastCheck, const TrianglePickingPredicate& trianglePredicate)
 {
   std::optional<PickingInfo> pickingInfo = std::nullopt;
 
@@ -4502,7 +4604,7 @@ std::optional<PickingInfo> Scene::_internalPick(
     auto world = mesh->getWorldMatrix();
     auto ray   = rayFunction(world);
 
-    auto result = mesh->intersects(ray, fastCheck);
+    auto result = mesh->intersects(ray, fastCheck, trianglePredicate);
     if (/*!result || */ !result.hit) {
       continue;
     }
@@ -4524,7 +4626,8 @@ std::optional<PickingInfo> Scene::_internalPick(
 
 std::vector<std::optional<PickingInfo>> Scene::_internalMultiPick(
   const std::function<Ray(Matrix& world)>& rayFunction,
-  const std::function<bool(AbstractMesh* mesh)>& predicate)
+  const std::function<bool(AbstractMesh* mesh)>& predicate,
+  const TrianglePickingPredicate& trianglePredicate)
 {
   std::vector<std::optional<PickingInfo>> pickingInfos;
 
@@ -4541,7 +4644,7 @@ std::vector<std::optional<PickingInfo>> Scene::_internalMultiPick(
     auto world = mesh->getWorldMatrix();
     auto ray   = rayFunction(world);
 
-    auto result = mesh->intersects(ray, false);
+    auto result = mesh->intersects(ray, false, trianglePredicate);
     if (/*!result || */ !result.hit) {
       continue;
     }
@@ -4596,14 +4699,15 @@ std::optional<PickingInfo> Scene::_internalPickSprites(
 std::optional<PickingInfo>
 Scene::pick(int x, int y,
             const std::function<bool(const AbstractMeshPtr& mesh)>& predicate,
-            bool fastCheck, const CameraPtr& camera)
+            bool fastCheck, const CameraPtr& camera,
+            const TrianglePickingPredicate& trianglePredicate)
 {
   auto result = _internalPick(
     [this, x, y, &camera](Matrix& world) -> Ray {
       createPickingRayToRef(x, y, world, *_tempPickingRay, camera);
       return *_tempPickingRay;
     },
-    predicate, fastCheck);
+    predicate, fastCheck, trianglePredicate);
   if (result) {
     auto _result     = *result;
     auto identityMat = Matrix::Identity();
@@ -4649,7 +4753,7 @@ Scene::pickSpriteWithRay(const Ray& ray,
 std::optional<PickingInfo> Scene::pickWithRay(
   const Ray& ray,
   const std::function<bool(const AbstractMeshPtr& mesh)>& predicate,
-  bool fastCheck)
+  bool fastCheck, const TrianglePickingPredicate& trianglePredicate)
 {
   auto result = _internalPick(
     [this, &ray](Matrix& world) -> Ray {
@@ -4667,7 +4771,7 @@ std::optional<PickingInfo> Scene::pickWithRay(
                           *_cachedRayForTransform);
       return *_cachedRayForTransform;
     },
-    predicate, fastCheck);
+    predicate, fastCheck, trianglePredicate);
   if (result) {
     auto _result = *result;
     _result.ray  = ray;
@@ -4676,20 +4780,20 @@ std::optional<PickingInfo> Scene::pickWithRay(
   return result;
 }
 
-std::vector<std::optional<PickingInfo>>
-Scene::multiPick(int x, int y,
-                 const std::function<bool(AbstractMesh* mesh)>& predicate,
-                 const CameraPtr& camera)
+std::vector<std::optional<PickingInfo>> Scene::multiPick(
+  int x, int y, const std::function<bool(AbstractMesh* mesh)>& predicate,
+  const CameraPtr& camera, const TrianglePickingPredicate& trianglePredicate)
 {
   return _internalMultiPick(
     [this, x, y, &camera](Matrix& world) -> Ray {
       return createPickingRay(x, y, world, camera);
     },
-    predicate);
+    predicate, trianglePredicate);
 }
 
 std::vector<std::optional<PickingInfo>> Scene::multiPickWithRay(
-  const Ray& ray, const std::function<bool(AbstractMesh* mesh)>& predicate)
+  const Ray& ray, const std::function<bool(AbstractMesh* mesh)>& predicate,
+  const TrianglePickingPredicate& trianglePredicate)
 {
   return _internalMultiPick(
     [this, &ray](Matrix& world) -> Ray {
@@ -4707,33 +4811,17 @@ std::vector<std::optional<PickingInfo>> Scene::multiPickWithRay(
                           *_cachedRayForTransform);
       return *_cachedRayForTransform;
     },
-    predicate);
+    predicate, trianglePredicate);
 }
 
-AbstractMesh* Scene::getPointerOverMesh()
+AbstractMeshPtr& Scene::getPointerOverMesh()
 {
-  return _pointerOverMesh;
+  return _inputManager->getPointerOverMesh();
 }
 
-void Scene::setPointerOverMesh(AbstractMesh* mesh)
+void Scene::setPointerOverMesh(const AbstractMeshPtr& mesh)
 {
-  if (_pointerOverMesh == mesh) {
-    return;
-  }
-#if 0
-  if (_pointerOverMesh && _pointerOverMesh->actionManager) {
-    _pointerOverMesh->actionManager->processTrigger(
-      ActionManager::OnPointerOutTrigger,
-      ActionEvent::CreateNew(_pointerOverMesh));
-  }
-
-  _pointerOverMesh = mesh;
-  if (_pointerOverMesh && _pointerOverMesh->actionManager) {
-    _pointerOverMesh->actionManager->processTrigger(
-      ActionManager::OnPointerOverTrigger,
-      ActionEvent::CreateNew(_pointerOverMesh));
-  }
-#endif
+  _inputManager->setPointerOverMesh(mesh);
 }
 
 void Scene::setPointerOverSprite(const SpritePtr& sprite)
@@ -4844,7 +4932,7 @@ void Scene::_rebuildTextures()
     texture->_rebuild();
   }
 
-  markAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  markAllMaterialsAsDirty(Constants::MATERIAL_TextureDirtyFlag);
 }
 
 void Scene::createDefaultLight(bool replace)

@@ -179,7 +179,7 @@ public:
    * @brief Hidden
    * @param faceIndex face index to bind to if this is a cubetexture
    */
-  void _bindFrameBuffer(unsigned int faceIndex);
+  void _bindFrameBuffer(unsigned int faceIndex = 0);
 
   /**
    * @brief Overrides the default sort function applied in the renderging group

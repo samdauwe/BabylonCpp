@@ -1,4 +1,4 @@
-#ifndef BABYLON_ENGINES_SCENE_H
+﻿#ifndef BABYLON_ENGINES_SCENE_H
 #define BABYLON_ENGINES_SCENE_H
 
 #include <nlohmann/json.hpp>
@@ -46,6 +46,7 @@ struct IActiveMeshCandidateProvider;
 class IAnimatable;
 struct ICollisionCoordinator;
 class ImageProcessingConfiguration;
+class InputManager;
 class InternalTexture;
 struct IPhysicsEngine;
 struct IPhysicsEnginePlugin;
@@ -99,6 +100,9 @@ using SubMeshPtr             = std::shared_ptr<SubMesh>;
 class BABYLON_SHARED_EXPORT Scene : public AbstractScene, public IAnimatable {
 
 public:
+  using TrianglePickingPredicate = std::function<bool(
+    const Vector3& p0, const Vector3& p1, const Vector3& p2, const Ray& ray)>;
+
   static size_t _uniqueIdCounter;
 
   /** The fog is deactivated */
@@ -1258,19 +1262,18 @@ public:
   void updateTransformMatrix(bool force = false);
 
   /**
-   * @brief Defines an alternate camera (used mostly in VR-like scenario where
-   * two cameras can render the same scene from a slightly different point of
-   * view).
-   * @param alternateCamera defines the camera to use
+   * @brief Execute all animations (for a frame).
    */
-  void updateAlternateTransformMatrix(Camera* alternateCamera);
+  void animate();
 
   /**
-   * Render the scene.
+   * @brief Render the scene.
    * @param updateCameras defines a boolean indicating if cameras must update
    * according to their inputs (true by default)
+   * @param ignoreAnimations defines a boolean indicating if animations should
+   * not be executed (false by default)
    */
-  void render(bool updateCameras = true);
+  void render(bool updateCameras = true, bool ignoreAnimations = false);
 
   /** Rendering **/
 
@@ -1420,13 +1423,16 @@ public:
    * set to null.
    * @param camera to use for computing the picking ray. Can be set to null. In
    * this case, the scene.activeCamera will be used
+   * @param trianglePredicate defines an optional predicate used to select faces
+   * when a mesh intersection is detected
    * @returns a PickingInfo
    */
   std::optional<PickingInfo>
   pick(int x, int y,
        const std::function<bool(const AbstractMeshPtr& mesh)>& predicate
        = nullptr,
-       bool fastCheck = false, const CameraPtr& camera = nullptr);
+       bool fastCheck = false, const CameraPtr& camera = nullptr,
+       const TrianglePickingPredicate& trianglePredicate = nullptr);
 
   /**
    * @brief Launch a ray to try to pick a sprite in the scene.
@@ -1468,13 +1474,16 @@ public:
    * be set to null. In this case, a mesh must have isPickable set to true
    * @param fastCheck Launch a fast check only using the bounding boxes. Can be
    * set to null
+   * @param trianglePredicate defines an optional predicate used to select faces
+   * when a mesh intersection is detected
    * @returns a PickingInfo
    */
   std::optional<PickingInfo>
   pickWithRay(const Ray& ray,
               const std::function<bool(const AbstractMeshPtr& mesh)>& predicate
               = nullptr,
-              bool fastCheck = false);
+              bool fastCheck                                    = false,
+              const TrianglePickingPredicate& trianglePredicate = nullptr);
 
   /**
    * @brief Launch a ray to try to pick a mesh in the scene.
@@ -1485,12 +1494,15 @@ public:
    * isPickable set to true
    * @param camera camera to use for computing the picking ray. Can be set to
    * null. In this case, the scene.activeCamera will be used
+   * @param trianglePredicate defines an optional predicate used to select faces
+   * when a mesh intersection is detected
    * @returns an array of PickingInfo
    */
   std::vector<std::optional<PickingInfo>>
   multiPick(int x, int y,
             const std::function<bool(AbstractMesh* mesh)>& predicate,
-            const CameraPtr& camera = nullptr);
+            const CameraPtr& camera                           = nullptr,
+            const TrianglePickingPredicate& trianglePredicate = nullptr);
 
   /**
    * @brief Launch a ray to try to pick a mesh in the scene.
@@ -1498,23 +1510,26 @@ public:
    * @param predicate Predicate function used to determine eligible meshes. Can
    * be set to null. In this case, a mesh must be enabled, visible and with
    * isPickable set to true
+   * @param trianglePredicate defines an optional predicate used to select faces
+   * when a mesh intersection is detected
    * @returns an array of PickingInfo
    */
   std::vector<std::optional<PickingInfo>>
   multiPickWithRay(const Ray& ray,
-                   const std::function<bool(AbstractMesh* mesh)>& predicate);
+                   const std::function<bool(AbstractMesh* mesh)>& predicate,
+                   const TrianglePickingPredicate& trianglePredicate = nullptr);
 
   /**
    * @brief Force the value of meshUnderPointer.
    * @param mesh defines the mesh to use
    */
-  void setPointerOverMesh(AbstractMesh* mesh);
+  void setPointerOverMesh(const AbstractMeshPtr& mesh);
 
   /**
    * @brief Gets the mesh under the pointer.
    * @returns a Mesh or null if no mesh is under the pointer
    */
-  AbstractMesh* getPointerOverMesh();
+  AbstractMeshPtr& getPointerOverMesh();
 
   /**
    * @brief Force the sprite under the pointer.
@@ -1555,6 +1570,12 @@ public:
    * @returns a boolean indicating if there is an active physics engine
    */
   bool isPhysicsEnabled();
+
+  /**
+   * @brief Hidden
+   */
+  void _renderForCamera(const CameraPtr& camera,
+                        const CameraPtr& rigParent = nullptr);
 
   /**
    * @brief Hidden
@@ -1817,8 +1838,7 @@ private:
   void _evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh);
   void _evaluateActiveMeshes();
   void _activeMesh(AbstractMesh* sourceMesh, AbstractMesh* mesh);
-  void _renderForCamera(const CameraPtr& camera,
-                        const CameraPtr& rigParent = nullptr);
+  void _bindFrameBuffer();
   void _processSubCameras(const CameraPtr& camera);
   void _checkIntersections();
   /** Pointers handling **/
@@ -1831,10 +1851,13 @@ private:
   std::optional<PickingInfo> _internalPick(
     const std::function<Ray(Matrix& world)>& rayFunction,
     const std::function<bool(const AbstractMeshPtr& mesh)>& predicate,
-    bool fastCheck);
+    bool fastCheck,
+    const TrianglePickingPredicate& trianglePredicate = nullptr);
   std::vector<std::optional<PickingInfo>>
   _internalMultiPick(const std::function<Ray(Matrix& world)>& rayFunction,
-                     const std::function<bool(AbstractMesh* mesh)>& predicate);
+                     const std::function<bool(AbstractMesh* mesh)>& predicate,
+                     const TrianglePickingPredicate& trianglePredicate
+                     = nullptr);
 
   /**
    * @Brief hidden
@@ -2023,6 +2046,16 @@ protected:
    * @brief Gets a boolean indicating if lights are enabled on this scene.
    */
   bool get_lightsEnabled() const;
+
+  /**
+   * @brief Gets the current active camera.
+   */
+  CameraPtr& get_activeCamera();
+
+  /**
+   * @brief Sets the current active camera.
+   */
+  void set_activeCamera(const CameraPtr& value);
 
   /**
    * @brief Gets the default material used on meshes when no material is
@@ -2227,6 +2260,11 @@ protected:
 
 public:
   // Members
+
+  /**
+   * Hidden
+   */
+  std::unique_ptr<InputManager> _inputManager;
 
   /**
    * Gets or sets a boolean that indicates if the scene must clear the render
@@ -2467,6 +2505,16 @@ public:
   Observable<AbstractMesh> onMeshRemovedObservable;
 
   /**
+   * An event triggered when a skeleton is created
+   */
+  Observable<Skeleton> onNewSkeletonAddedObservable;
+
+  /**
+   * An event triggered when a skeleton is removed
+   */
+  Observable<Skeleton> onSkeletonRemovedObservable;
+
+  /**
    * An event triggered when a material is created
    */
   Observable<Material> onNewMaterialAddedObservable;
@@ -2509,6 +2557,11 @@ public:
   Observable<Scene> onAfterStepObservable;
 
   /**
+   * An event triggered when the activeCamera property is updated
+   */
+  Observable<Scene> onActiveCameraChanged;
+
+  /**
    * This Observable will be triggered before rendering each renderingGroup of
    * each rendered camera. The RenderinGroupInfo class contains all the
    * information about the context in which the observable is called If you wish
@@ -2532,6 +2585,15 @@ public:
    * This Observable will when a mesh has been imported into the scene.
    */
   Observable<AbstractMesh> onMeshImportedObservable;
+
+  /**
+   * Gets or sets a user defined funtion to select LOD from a mesh and a camera.
+   * By default this function is undefined and Babylon.js will select LOD based
+   * on distance to camera
+   */
+  const std::function<AbstractMesh*(AbstractMesh* mesh,
+                                    const CameraPtr& camera)>
+    customLODSelector;
 
   // Pointers
 
@@ -2801,9 +2863,14 @@ public:
   std::vector<CameraPtr> activeCameras;
 
   /**
+   * @brief Hidden
+   */
+  CameraPtr _activeCamera;
+
+  /**
    * The current active camera
    */
-  CameraPtr activeCamera;
+  Property<Scene, CameraPtr> activeCamera;
 
   // Materials
 
