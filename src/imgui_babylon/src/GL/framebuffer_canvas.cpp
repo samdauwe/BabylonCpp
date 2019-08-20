@@ -2,6 +2,9 @@
 #include <babylon/GL/gl_rendering_context.h>
 #include <glad/glad.h>
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <babylon/utils/stb_image_write.h>
+
 namespace BABYLON {
 namespace impl {
 
@@ -102,10 +105,63 @@ void FramebufferCanvas::unbind()
   _renderingContext->bindFramebuffer(GL_FRAMEBUFFER, nullptr);
 }
 
-unsigned int FramebufferCanvas::TextureId()
+unsigned int FramebufferCanvas::textureId()
 {
   return mTextureColorBuffer->value;
   //return mFrameBuffer->value;
+}
+
+
+Uint8Array reverse_pixels_rows(
+  const Uint8Array & pixels,
+  int width, 
+  int height, 
+  int nbChannels)
+{
+  Uint8Array pixels_reverse_rows;
+  pixels_reverse_rows.resize(width * height * 3, 0);
+  for (int row = 0; row < height; row++)
+  {
+    const uint8_t * src = &(pixels[(height - 1 - row) * nbChannels * width]);
+    uint8_t * dst = &(pixels_reverse_rows[row * nbChannels * width]);
+    for (int col = 0; col < width; col++)
+    {
+      for (int channel = 0; channel < nbChannels; channel++)
+      {
+        *dst++ = *src++;
+      }
+    }
+  }
+  return pixels_reverse_rows;
+}
+
+Uint8Array FramebufferCanvas::readPixelsRgb()
+{  
+  Uint8Array pixels;
+  pixels.resize(clientWidth * clientHeight * 3, 0);
+  _renderingContext->readPixels(0, clientHeight, clientWidth, clientHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+  // rows are inversed in the framebuffer: invert them now
+  auto pixels_reverse_rows = reverse_pixels_rows(pixels, clientWidth, clientHeight, 3);
+  return pixels_reverse_rows;
+}
+
+void FramebufferCanvas::saveScreenshotJpg(const char * filename, int quality)
+{
+  bind();
+  auto pixels = readPixelsRgb();
+  unbind();
+  int nbChannels = 3;
+  stbi_write_jpg(filename, clientWidth, clientHeight, nbChannels, pixels.data(), quality);
+}
+
+void FramebufferCanvas::saveScreenshotPng(const char * filename)
+{
+  bind();
+  auto pixels = readPixelsRgb();
+  unbind();
+  int nbChannels = 3;
+  int stride_in_bytes = clientWidth * nbChannels;
+  stbi_write_png(filename, clientWidth, clientHeight, nbChannels, pixels.data(), stride_in_bytes);
 }
 
 } // end of namespace impl

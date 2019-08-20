@@ -25,7 +25,10 @@ public:
   void bind();
   void unbind();
 
-  unsigned int TextureId();
+  unsigned int textureId();
+  Uint8Array readPixelsRgb();
+  void saveScreenshotJpg(const char * filename, int quality);
+  void saveScreenshotPng(const char * filename);
 
 
 private:

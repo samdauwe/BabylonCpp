@@ -1,6 +1,7 @@
 #include <imgui_utils/icons_font_awesome_5.h>
 #include <babylon/inspector/babylon_inspector_app.h>
 #include <imgui_utils/app_runner/imgui_runner.h>
+#include <babylon/GL/framebuffer_canvas.h>
 
 namespace BABYLON
 {
@@ -61,6 +62,12 @@ namespace BABYLON
     else if (_appContext._viewState == ViewState::SampleBrowser)
       _appContext._sampleListComponent.render();
     //_appContext._sceneWidget->render();
+
+    if (ImGui::Button("Save"))
+    {
+      auto canvas = _appContext._sceneWidget->getCanvas();
+      canvas->saveScreenshotJpg("f:/tmp/tt.jpg", 75);
+    }
 
     ImGui::EndGroup();
   }

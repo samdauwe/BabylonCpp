@@ -36,7 +36,7 @@ namespace BABYLON {
     _framebuffer_canvas->initializeFrameBuffer();
   }
 
-  BABYLON::ICanvas * SceneWidget_ImGui::getCanvas()
+  BABYLON::impl::FramebufferCanvas * SceneWidget_ImGui::getCanvas()
   {
     return _framebuffer_canvas.get();
   }
@@ -69,7 +69,7 @@ namespace BABYLON {
     _renderableScene->render();
     _framebuffer_canvas->unbind();
 
-    auto id = _framebuffer_canvas->TextureId();
+    auto id = _framebuffer_canvas->textureId();
     const ImVec2 uv0 = ImVec2(0, 1);
     const ImVec2 uv1 = ImVec2(1, 0);
     ImGui::Image(reinterpret_cast<void*>(id), canvasSize, uv0, uv1);

@@ -9,7 +9,7 @@ namespace BABYLON {
   public:
     SceneWidget_ImGui(ImVec2 size = ImVec2(0.f, 0.f));
 
-    BABYLON::ICanvas * getCanvas();
+    BABYLON::impl::FramebufferCanvas * getCanvas();
     void setRenderableScene(std::shared_ptr<BABYLON::IRenderableScene> scene);
     BABYLON::IRenderableScene * getRenderableScene();
     BABYLON::Scene * getScene();
