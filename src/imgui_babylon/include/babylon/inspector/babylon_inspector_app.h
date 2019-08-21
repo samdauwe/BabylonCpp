@@ -31,6 +31,8 @@ namespace BABYLON {
     void setRenderableScene(std::shared_ptr<BABYLON::IRenderableScene> scene);
 
   private:
+    void loopSamples();
+
     struct AppContext
     {
       std::unique_ptr<BABYLON::SceneWidget_ImGui> _sceneWidget;

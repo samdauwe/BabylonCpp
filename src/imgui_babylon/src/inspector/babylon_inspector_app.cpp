@@ -3,6 +3,9 @@
 #include <imgui_utils/app_runner/imgui_runner.h>
 #include <babylon/GL/framebuffer_canvas.h>
 
+#include <babylon/core/logging.h>
+#include <babylon/samples/samples_index.h>
+
 namespace BABYLON
 {
   const int INSPECTOR_WIDTH = 400;
@@ -70,6 +73,8 @@ namespace BABYLON
     }
 
     ImGui::EndGroup();
+
+    loopSamples();
   }
 
   void BabylonInspectorApp::setRenderableScene(std::shared_ptr<BABYLON::IRenderableScene> scene)
@@ -78,6 +83,47 @@ namespace BABYLON
     _appContext._sceneWidget->setRenderableScene(scene);
     _appContext._inspector.setScene(_appContext._sceneWidget->getScene());
     _appContext._viewState = ViewState::Scene3d;
+  }
+
+  void BabylonInspectorApp::loopSamples()
+  {
+    static BABYLON::Samples::SamplesIndex samplesIndex;
+    static std::vector<std::string> allSamples = samplesIndex.getSampleNames();
+    
+    static int frame_counter = 0;
+    const int max_frames = 30;
+
+    static int sample_counter = 0;
+
+    if (frame_counter > max_frames)
+    {
+      std::string sampleName = allSamples[sample_counter];
+      std::vector<std::string> excludedSamples = {
+        //"BasicElementsScene", 
+        //"BlurModeForMirrorsScene"
+      };
+      if (std::find(excludedSamples.begin(), excludedSamples.end(), sampleName) == excludedSamples.end())
+      {
+        BABYLON_LOG_ERROR("LoopSample", sampleName);
+        auto scene_unique = samplesIndex.createRenderableScene(sampleName, nullptr);
+        std::shared_ptr<BABYLON::IRenderableScene> scene_shared(std::move(scene_unique));
+        try
+        {
+          this->setRenderableScene(scene_shared);
+        }
+        catch (...)
+        {
+          this->setRenderableScene(nullptr);
+        }
+      }
+
+      if (sample_counter < allSamples.size() - 2)
+        sample_counter++;
+
+      frame_counter = 0;
+    }
+    else
+      frame_counter++;
   }
 
   BabylonInspectorApp::BabylonInspectorApp()
