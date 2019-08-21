@@ -211,6 +211,11 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , getIntersectingSubMeshCandidates{nullptr}
     , getCollidingSubMeshCandidates{nullptr}
     , _physicsEngine{nullptr}
+    , blockfreeActiveMeshesAndRenderingGroups{this,
+                                              &Scene::
+                                                get_blockfreeActiveMeshesAndRenderingGroups,
+                                              &Scene::
+                                                set_blockfreeActiveMeshesAndRenderingGroups}
     , _environmentTexture{nullptr}
     , _animationPropertiesOverride{nullptr}
     , _spritePredicate{nullptr}
@@ -301,6 +306,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , _headphone{std::nullopt}
     , _transformMatrixR{Matrix::Zero()}
     , _multiviewSceneUbo{nullptr}
+    , _preventFreeActiveMeshesAndRenderingGroups{false}
 {
   engine->scenes.emplace_back(this);
 
@@ -330,7 +336,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
   setDefaultCandidateProviders();
 
   if (options && *options->useGeometryIdsMap == true) {
-    geometriesById = {};
+    geometriesByUniqueId = {};
   }
 }
 
@@ -2749,6 +2755,7 @@ void Scene::addMultiMaterial(const MultiMaterialPtr& newMultiMaterial)
 
 void Scene::addMaterial(const MaterialPtr& newMaterial)
 {
+  newMaterial->_indexInSceneMaterialArray = static_cast<int>(materials.size());
   materials.emplace_back(newMaterial);
   onNewMaterialAddedObservable.notifyObservers(newMaterial.get());
 }
@@ -2761,7 +2768,7 @@ void Scene::addMorphTargetManager(
 
 void Scene::addGeometry(const GeometryPtr& newGeometry)
 {
-  geometriesById[newGeometry->id] = geometries.size();
+  geometriesByUniqueId[newGeometry->uniqueId] = geometries.size();
   geometries.emplace_back(newGeometry);
 }
 
@@ -2828,21 +2835,21 @@ AnimationGroupPtr Scene::getAnimationGroupByName(const std::string& name)
   return (it == animationGroups.end()) ? nullptr : *it;
 }
 
-MaterialPtr Scene::getMaterialByID(const std::string& id)
-{
-  auto it = std::find_if(
-    materials.begin(), materials.end(),
-    [&id](const MaterialPtr& material) { return material->id == id; });
-
-  return (it == materials.end()) ? nullptr : *it;
-}
-
 MaterialPtr Scene::getMaterialByUniqueID(size_t uniqueId)
 {
   auto it = std::find_if(materials.begin(), materials.end(),
                          [uniqueId](const MaterialPtr& material) {
                            return material->uniqueId == uniqueId;
                          });
+
+  return (it == materials.end()) ? nullptr : *it;
+}
+
+MaterialPtr Scene::getMaterialByID(const std::string& id)
+{
+  auto it = std::find_if(
+    materials.begin(), materials.end(),
+    [&id](const MaterialPtr& material) { return material->id == id; });
 
   return (it == materials.end()) ? nullptr : *it;
 }
@@ -2962,18 +2969,27 @@ IParticleSystemPtr Scene::getParticleSystemByID(const std::string& id)
 
 GeometryPtr Scene::getGeometryByID(const std::string& id)
 {
-  if (!geometriesById.empty() && stl_util::contains(geometriesById, id)) {
-    const auto index = geometriesById[id];
-    if (index < geometries.size()) {
+  auto it = std::find_if(
+    geometries.begin(), geometries.end(),
+    [&id](const GeometryPtr& geometry) { return geometry->id == id; });
+
+  return (it == geometries.end()) ? nullptr : *it;
+}
+
+GeometryPtr Scene::_getGeometryByUniqueID(size_t uniqueId)
+{
+  if (!geometriesByUniqueId.empty()) {
+    if (!stl_util::contains(geometriesByUniqueId, uniqueId)) {
+      const auto index = geometriesByUniqueId[uniqueId];
       return geometries[index];
     }
   }
   else {
-    auto it = std::find_if(
-      geometries.begin(), geometries.end(),
-      [&id](const GeometryPtr& geometry) { return geometry->id == id; });
-
-    return (it == geometries.end()) ? nullptr : *it;
+    for (const auto& geometry : geometries) {
+      if (geometry->uniqueId == uniqueId) {
+        return geometry;
+      }
+    }
   }
 
   return nullptr;
@@ -2981,7 +2997,7 @@ GeometryPtr Scene::getGeometryByID(const std::string& id)
 
 bool Scene::pushGeometry(const GeometryPtr& geometry, bool force)
 {
-  if (!force && getGeometryByID(geometry->id)) {
+  if (!force && _getGeometryByUniqueID(geometry->uniqueId)) {
     return false;
   }
 
@@ -3000,11 +3016,11 @@ bool Scene::removeGeometry(const GeometryPtr& geometry)
 bool Scene::removeGeometry(Geometry* geometry)
 {
   size_t index = 0;
-  if (!geometriesById.empty()) {
-    if (!stl_util::contains(geometriesById, geometry->id)) {
+  if (!geometriesByUniqueId.empty()) {
+    if (!stl_util::contains(geometriesByUniqueId, geometry->uniqueId)) {
       return false;
     }
-    index = geometriesById[geometry->id];
+    index = geometriesByUniqueId[geometry->uniqueId];
   }
   else {
     auto it = std::find_if(geometries.begin(), geometries.end(),
@@ -3020,9 +3036,9 @@ bool Scene::removeGeometry(Geometry* geometry)
   if (index != geometries.size() - 1) {
     auto lastGeometry = geometries.back();
     geometries[index] = lastGeometry;
-    if (!geometriesById.empty()) {
-      geometriesById[lastGeometry->id] = index;
-      geometriesById.erase(geometry->id);
+    if (!geometriesByUniqueId.empty()) {
+      geometriesByUniqueId[lastGeometry->uniqueId] = index;
+      geometriesByUniqueId.erase(geometry->uniqueId);
     }
   }
 
@@ -3156,6 +3172,12 @@ NodePtr Scene::getNodeByID(const std::string& id)
     return mesh;
   }
 
+  auto transformNode = getTransformNodeByID(id);
+
+  if (transformNode) {
+    return transformNode;
+  }
+
   auto light = getLightByID(id);
 
   if (light) {
@@ -3170,7 +3192,11 @@ NodePtr Scene::getNodeByID(const std::string& id)
 
   auto bone = getBoneByID(id);
 
-  return bone;
+  if (bone) {
+    return bone;
+  }
+
+  return nullptr;
 }
 
 NodePtr Scene::getNodeByName(const std::string& name)
@@ -3179,6 +3205,12 @@ NodePtr Scene::getNodeByName(const std::string& name)
 
   if (mesh) {
     return mesh;
+  }
+
+  auto transformNode = getTransformNodeByName(name);
+
+  if (transformNode) {
+    return transformNode;
   }
 
   auto light = getLightByName(name);
@@ -3195,7 +3227,11 @@ NodePtr Scene::getNodeByName(const std::string& name)
 
   auto bone = getBoneByName(name);
 
-  return bone;
+  if (bone) {
+    return bone;
+  }
+
+  return nullptr;
 }
 
 AbstractMeshPtr Scene::getMeshByName(const std::string& name)
@@ -3255,6 +3291,16 @@ SkeletonPtr Scene::getLastSkeletonByID(const std::string& id)
   return nullptr;
 }
 
+SkeletonPtr Scene::getSkeletonByUniqueId(size_t uniqueId)
+{
+  auto it = std::find_if(skeletons.begin(), skeletons.end(),
+                         [&uniqueId](const SkeletonPtr& skeleton) {
+                           return skeleton->uniqueId() == uniqueId;
+                         });
+
+  return (it == skeletons.end()) ? nullptr : *it;
+}
+
 SkeletonPtr Scene::getSkeletonById(const std::string& id)
 {
   auto it = std::find_if(
@@ -3273,7 +3319,7 @@ SkeletonPtr Scene::getSkeletonByName(const std::string& name)
   return (it == skeletons.end()) ? nullptr : *it;
 }
 
-MorphTargetManagerPtr Scene::getMorphTargetManagerById(unsigned int id)
+MorphTargetManagerPtr Scene::getMorphTargetManagerById(size_t id)
 {
   auto it
     = std::find_if(morphTargetManagers.begin(), morphTargetManagers.end(),
@@ -3282,6 +3328,19 @@ MorphTargetManagerPtr Scene::getMorphTargetManagerById(unsigned int id)
                    });
 
   return (it == morphTargetManagers.end()) ? nullptr : *it;
+}
+
+MorphTargetPtr Scene::getMorphTargetById(const std::string& id)
+{
+  for (const auto& morphTargetManager : morphTargetManagers) {
+    for (size_t index = 0; index < morphTargetManager->numTargets(); ++index) {
+      const auto target = morphTargetManager->getTarget(index);
+      if (target->id == id) {
+        return target;
+      }
+    }
+  }
+  return nullptr;
 }
 
 bool Scene::isActiveMesh(const AbstractMeshPtr& mesh)
@@ -3303,8 +3362,31 @@ void Scene::freeProcessedMaterials()
   _processedMaterials.clear();
 }
 
+bool Scene::get_blockfreeActiveMeshesAndRenderingGroups() const
+{
+  return _preventFreeActiveMeshesAndRenderingGroups;
+}
+
+void Scene::set_blockfreeActiveMeshesAndRenderingGroups(bool value)
+{
+  if (_preventFreeActiveMeshesAndRenderingGroups == value) {
+    return;
+  }
+
+  if (value) {
+    freeActiveMeshes();
+    freeRenderingGroups();
+  }
+
+  _preventFreeActiveMeshesAndRenderingGroups = value;
+}
+
 void Scene::freeActiveMeshes()
 {
+  if (blockfreeActiveMeshesAndRenderingGroups()) {
+    return;
+  }
+
   _activeMeshes.clear();
   if (activeCamera && !activeCamera->_activeMeshes.empty()) {
     activeCamera->_activeMeshes.clear();
@@ -3320,6 +3402,10 @@ void Scene::freeActiveMeshes()
 
 void Scene::freeRenderingGroups()
 {
+  if (blockfreeActiveMeshesAndRenderingGroups()) {
+    return;
+  }
+
   if (_renderingManager) {
     _renderingManager->freeRenderingGroups();
   }
@@ -3336,10 +3422,12 @@ void Scene::freeRenderingGroups()
   }
 }
 
-void Scene::_evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh)
+void Scene::_evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh,
+                             AbstractMesh* initialMesh)
 {
-  if (dispatchAllSubMeshesOfActiveMeshes || mesh->alwaysSelectAsActiveMesh
-      || mesh->subMeshes.size() == 1 || subMesh->isInFrustum(_frustumPlanes)) {
+  if (initialMesh->isAnInstance() || dispatchAllSubMeshesOfActiveMeshes
+      || mesh->alwaysSelectAsActiveMesh || mesh->subMeshes.size() == 1
+      || subMesh->isInFrustum(_frustumPlanes)) {
 
     for (const auto& step : _evaluateSubMeshStage) {
       step.action(mesh, subMesh);
@@ -3349,7 +3437,7 @@ void Scene::_evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh)
     if (material) {
       // Render targets
       if (material->hasRenderTargetTextures
-          && material->getRenderTargetTextures) {
+          && material->getRenderTargetTextures != nullptr) {
         if (std::find(_processedMaterials.begin(), _processedMaterials.end(),
                       material)
             == _processedMaterials.end()) {
@@ -3532,12 +3620,15 @@ void Scene::_activeMesh(AbstractMesh* sourceMesh, AbstractMesh* mesh)
     step.action(sourceMesh, mesh);
   }
 
+  // TODO FIXME
+#if 0
   if (mesh && !mesh->subMeshes.empty()) {
     auto subMeshes = getActiveSubMeshCandidates(mesh);
     for (const auto& subMesh : subMeshes) {
       _evaluateSubMesh(subMesh, mesh);
     }
   }
+#endif
 }
 
 void Scene::updateTransformMatrix(bool force)
