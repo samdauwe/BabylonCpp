@@ -57,6 +57,7 @@ struct ISpriteManager;
 class KeyboardInfo;
 class KeyboardInfoPre;
 class Mesh;
+class MorphTarget;
 class Node;
 class OutlineRenderer;
 class PostProcess;
@@ -84,6 +85,7 @@ using ISceneComponentPtr = std::shared_ptr<ISceneComponent>;
 using ISceneSerializableComponentPtr
   = std::shared_ptr<ISceneSerializableComponent>;
 using ISpriteManagerPtr      = std::shared_ptr<ISpriteManager>;
+using MorphTargetPtr         = std::shared_ptr<MorphTarget>;
 using NodePtr                = std::shared_ptr<Node>;
 using MeshPtr                = std::shared_ptr<Mesh>;
 using OutlineRendererPtr     = std::shared_ptr<OutlineRenderer>;
@@ -943,11 +945,18 @@ public:
   CameraPtr setActiveCameraByName(const std::string& name);
 
   /**
-   * Gets an animation group using its name.
+   * @brief Gets an animation group using its name.
    * @param name defines the material's name
    * @return the animation group or null if none found.
    */
   AnimationGroupPtr getAnimationGroupByName(const std::string& name);
+
+  /**
+   * @brief Get a material using its unique id.
+   * @param uniqueId defines the material's unique id
+   * @return the material or null if none found.
+   */
+  MaterialPtr getMaterialByUniqueID(size_t uniqueId);
 
   /**
    * @brief Gets a material using its id.
@@ -955,13 +964,6 @@ public:
    * @return the material or null if none found.
    */
   MaterialPtr getMaterialByID(const std::string& id);
-
-  /**
-   * @brief Gets a material using its unique id.
-   * @param uniqueId defines the unique id to look for
-   * @returns the material or null if not found
-   */
-  MaterialPtr getMaterialByUniqueID(size_t uniqueId);
 
   /**
    * @brief Gets a material using its name.
@@ -1175,6 +1177,13 @@ public:
   SkeletonPtr getLastSkeletonByID(const std::string& id);
 
   /**
+   * @brief Gets a skeleton using a given auto generated unique id.
+   * @param  uniqueId defines the unique id to search for
+   * @return the found skeleton or null if not found at all.
+   */
+  SkeletonPtr getSkeletonByUniqueId(size_t uniqueId);
+
+  /**
    * @brief Gets a skeleton using a given id (if many are found, this function
    * will pick the first one).
    * @param id defines the id to search for
@@ -1195,7 +1204,15 @@ public:
    * @param id defines the id to search for
    * @return the found morph target manager or null if not found at all.
    */
-  MorphTargetManagerPtr getMorphTargetManagerById(unsigned int id);
+  MorphTargetManagerPtr getMorphTargetManagerById(size_t id);
+
+  /**
+   * @brief Gets a morph target using a given id (if many are found, this
+   * function will pick the first one)
+   * @param id defines the id to search for
+   * @return the found morph target or null if not found at all.
+   */
+  MorphTargetPtr getMorphTargetById(const std::string& id);
 
   /**
    * @brief Gets a boolean indicating if the given mesh is active.
@@ -1835,7 +1852,8 @@ private:
    * @brief Hidden
    */
   void _processLateAnimationBindings();
-  void _evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh);
+  void _evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh,
+                        AbstractMesh* initialMesh);
   void _evaluateActiveMeshes();
   void _activeMesh(AbstractMesh* sourceMesh, AbstractMesh* mesh);
   void _bindFrameBuffer();
@@ -2257,6 +2275,29 @@ protected:
    * (ie. the materials won't be updated if they are out of sync)
    */
   void set_blockMaterialDirtyMechanism(bool value);
+
+  /**
+   * @brief Gets a boolean blocking all the calls to freeActiveMeshes and
+   * freeRenderingGroups It can be used in order to prevent going through
+   * methods freeRenderingGroups and freeActiveMeshes several times to improve
+   * performance when disposing several meshes in a row or a hierarchy of
+   * meshes. When used, it is the responsability of the user to
+   * blockfreeActiveMeshesAndRenderingGroups back to false.
+   */
+  bool get_blockfreeActiveMeshesAndRenderingGroups() const;
+
+  /**
+   * @brief Sets a boolean blocking all the calls to freeActiveMeshes and
+   * freeRenderingGroups It can be used in order to prevent going through
+   * methods freeRenderingGroups and freeActiveMeshes several times to improve
+   * performance when disposing several meshes in a row or a hierarchy of
+   * meshes. When used, it is the responsability of the user to
+   * blockfreeActiveMeshesAndRenderingGroups back to false.
+   */
+  void set_blockfreeActiveMeshesAndRenderingGroups(bool value);
+
+private:
+  GeometryPtr _getGeometryByUniqueID(size_t uniqueId);
 
 public:
   // Members
@@ -3427,6 +3468,16 @@ public:
    */
   std::function<float()> getDeterministicFrameTime;
 
+  /**
+   * Gets or sets a boolean blocking all the calls to freeActiveMeshes and
+   * freeRenderingGroups It can be used in order to prevent going through
+   * methods freeRenderingGroups and freeActiveMeshes several times to improve
+   * performance when disposing several meshes in a row or a hierarchy of
+   * meshes. When used, it is the responsability of the user to
+   * blockfreeActiveMeshesAndRenderingGroups back to false.
+   */
+  Property<Scene, bool> blockfreeActiveMeshesAndRenderingGroups;
+
 protected:
   /** Hidden */
   BaseTexturePtr _environmentTexture;
@@ -3567,7 +3618,7 @@ private:
    * An optional map from Geometry Id to Geometry index in the 'geometries'
    * array
    */
-  std::unordered_map<std::string, size_t> geometriesById;
+  std::unordered_map<size_t, size_t> geometriesByUniqueId;
 
   /** Hidden (Backing field) */
   SimplificationQueuePtr _simplificationQueue;
@@ -3621,6 +3672,8 @@ private:
   Matrix _transformMatrixR;
   /** Hidden */
   std::unique_ptr<UniformBuffer> _multiviewSceneUbo;
+  /** Hidden */
+  bool _preventFreeActiveMeshesAndRenderingGroups;
 
 }; // end of class Scene
 

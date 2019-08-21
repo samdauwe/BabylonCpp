@@ -213,7 +213,7 @@ inline bool writeFileLines(const char* filename,
   bool writtentoFile = false;
   std::ofstream out(filename, std::ios::out);
   if (out) {
-    for (auto& line : lines) {
+    for (const auto& line : lines) {
       out.write(line.c_str(), static_cast<long>(line.size()));
       out.write("\n", 1);
     }

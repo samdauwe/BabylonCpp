@@ -98,9 +98,9 @@ This code results in the following scene:
 Example scenes can be found on the [samples](https://github.com/samdauwe/BabylonCpp/tree/master/src/Samples) page.
 
 # Status
-The master branch code is in sync with the last released version [Babylon.js 3.3.0](https://doc.babylonjs.com/whats-new).
+The master branch code in an unstable state due to the upgrade to [Babylon.js 4.0.0](https://doc.babylonjs.com/whats-new).
 
-The [example scenes](https://github.com/samdauwe/BabylonCpp/tree/master/src/Samples) give a good overview which features are currenlty ported and working.
+The [example scenes](https://github.com/samdauwe/BabylonCpp/tree/master/src/Samples) give a good overview which features are currenlty ported and working for [Babylon.js 3.3.0](https://doc.babylonjs.com/whats-new).
 
 Known issues are summarized [here](https://github.com/samdauwe/BabylonCpp/issues).
 

@@ -155,7 +155,7 @@ std::vector<RuntimeAnimationPtr>& Animation::runtimeAnimations()
 
 bool Animation::get_hasRunningRuntimeAnimations() const
 {
-  for (auto& runtimeAnimation : _runtimeAnimations) {
+  for (const auto& runtimeAnimation : _runtimeAnimations) {
     if (!runtimeAnimation->isStopped()) {
       return true;
     }
@@ -206,7 +206,7 @@ std::string Animation::toString(bool fullDetails) const
   if (fullDetails) {
     oss << ", Ranges: {";
     bool first = true;
-    for (auto& range : _ranges) {
+    for (const auto& range : _ranges) {
       if (first) {
         oss << ", ";
         first = false;
@@ -276,7 +276,7 @@ std::vector<IAnimationKey>& Animation::getKeys()
 float Animation::getHighestFrame() const
 {
   float ret = 0;
-  for (auto& key : _keys) {
+  for (const auto& key : _keys) {
     if (ret < key.frame) {
       ret = key.frame;
     }
@@ -647,7 +647,7 @@ AnimationPtr Animation::clone() const
   }
 
   if (!_ranges.empty()) {
-    for (auto& range : _ranges) {
+    for (const auto& range : _ranges) {
       clonedAnimation->_ranges[range.first] = range.second.copy();
     }
   }
@@ -688,7 +688,7 @@ AnimationPtr Animation::Parse(const json& parsedAnimation)
       = json_util::get_number<float>(parsedAnimation, "blendingSpeed");
   }
 
-  for (auto& key : json_util::get_array<json>(parsedAnimation, "keys")) {
+  for (const auto& key : json_util::get_array<json>(parsedAnimation, "keys")) {
     std::optional<AnimationValue> inTangent  = std::nullopt;
     std::optional<AnimationValue> outTangent = std::nullopt;
     AnimationValue data;
