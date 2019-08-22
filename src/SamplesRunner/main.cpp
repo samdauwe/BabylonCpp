@@ -1,19 +1,19 @@
 #include <babylon/inspector/babylon_inspector_app.h>
+#include <babylon/core/system.h>
 #include "SamplesRunner/HelloScene.h"
 #include <babylon/samples/samples_index.h>
 #include <babylon/core/logging.h>
 #include <iostream>
 #include "console_logger.h"
-#include "chdir_to_exe.h"
 #include "CLI11.h"
 #include "spawn_screenshots.h"
 #include <imgui_utils/code_editor.h>
 
 int main(int argc, char** argv)
 {
-  ChdirToExe(argv[0]);
+  BABYLON::System::chdirToExecutableFolder();
 
-  testCodeEditor(); exit(0);
+  ImGuiUtils::demoCodeEditor(); exit(0);
 
   BABYLON::Samples::SamplesIndex samplesIndex;
   bool flagVerbose = false;

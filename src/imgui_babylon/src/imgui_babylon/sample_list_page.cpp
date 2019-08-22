@@ -4,6 +4,7 @@
 #include <map>
 #include <babylon/core/string.h>
 #include <babylon/core/filesystem.h>
+#include <babylon/core/system.h>
 #include <imgui_utils/icons_font_awesome_5.h>
 #include <imgui_utils/imgui_utils.h>
 #include <babylon/imgui_babylon/sample_list_page.h>
@@ -14,9 +15,7 @@
 #include <babylon/inspector/inspector.h>
 #include <babylon/samples/samples_index.h>
 
-#ifdef _WIN32
-#include <windows.h>
-#endif // _WIN32
+
 
 namespace
 {
@@ -54,30 +53,6 @@ std::string repositoryRelativePath(const std::string & path)
 
 
 namespace BABYLON {
-
-namespace
-{
-  void openBrowser(const std::string &url)
-  {
-#ifndef _WIN32
-    std::string cmd = std::string("open ") + url;
-    system(cmd.c_str());
-#else
-    ShellExecute(0, 0, url.c_str(), 0, 0, SW_SHOW);
-#endif
-  }
-  void openFile(const std::string &filename)
-  {
-#ifndef _WIN32
-    std::string cmd = std::string("open ") + filename;
-    system(cmd.c_str());
-#else
-    std::string canonical_path = std::filesystem::canonical(std::filesystem::path(filename)).string();
-    ShellExecute(0, 0, canonical_path.c_str(), 0, 0, SW_SHOW);
-#endif
-  }
-}
-
 
 
 using namespace BABYLON::Samples;
@@ -192,13 +167,13 @@ private:
 
     std::string btnHeaderString = std::string(ICON_FA_EYE "##") + sampleInfo.HeaderFile;
     if (ImGui::Button(btnHeaderString.c_str()))
-      openFile(sampleInfo.HeaderFile);
+      BABYLON::System::openFile(sampleInfo.HeaderFile);
     ImGui::SameLine();
     ImGui::TextDisabled(".h  : %s", repositoryRelativePath(sampleInfo.HeaderFile).c_str());
 
     std::string btnSourceString = std::string(ICON_FA_EYE "##") + sampleInfo.SourceFile;
     if (ImGui::Button(btnSourceString.c_str()))
-      openFile(sampleInfo.SourceFile);
+      BABYLON::System::openFile(sampleInfo.SourceFile);
     ImGui::SameLine();
     ImGui::TextDisabled(".cpp: %s", repositoryRelativePath(sampleInfo.SourceFile).c_str());
 
@@ -206,7 +181,7 @@ private:
       for (auto link : sampleInfo.Links) {
         std::string btnUrlString = std::string(ICON_FA_EXTERNAL_LINK_ALT "##") + link;
         if (ImGui::Button(btnUrlString.c_str()))
-          openBrowser(link);
+          BABYLON::System::openBrowser(link);
         ImGui::SameLine();
         ImVec4 linkColor(0.5f, 0.5f, 0.95f, 1.f);
         ImGui::TextColored(linkColor, "%s", link.c_str());
