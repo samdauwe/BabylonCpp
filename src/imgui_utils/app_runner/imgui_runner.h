@@ -1,3 +1,4 @@
+#include <string>
 #include <imgui.h>
 #include <functional>
 
@@ -14,7 +15,7 @@ namespace ImGuiUtils
     // and returns true if exit is desired
     using GuiFunctionWithExit = std::function<bool(void)>;
 
-    // PostInitFunction : any function that will be called once 
+    // PostInitFunction : any function that will be called once
     // OpenGl, Glfw, Glad and ImGui are inited
     using PostInitFunction = std::function<void(void)>;
 

@@ -1,4 +1,5 @@
 #include <string>
+#include <iostream>
 #include <babylon/core/filesystem.h>
 #include <babylon/core/system.h>
 #include <imgui_utils/icons_font_awesome_5.h>
@@ -12,7 +13,7 @@ namespace ImGuiUtils {
 class OneCodeEditor
 {
 public:
-  OneCodeEditor(const std::string &filePath) : _filePath(filePath) 
+  OneCodeEditor(const std::string &filePath) : _filePath(filePath)
   {
     auto lang = TextEditor::LanguageDefinition::CPlusPlus();
     _textEditor.SetLanguageDefinition(lang);
@@ -150,7 +151,7 @@ public:
   {
     setFiles(filePaths);
   }
-  
+
   void setFiles(const std::vector<std::string> &filePaths)
   {
     _editors.clear();
@@ -237,12 +238,12 @@ private:
 
 
 
-CodeEditor::CodeEditor(const std::string &filePath) 
+CodeEditor::CodeEditor(const std::string &filePath)
   : _pImpl(std::make_unique<MultipleCodeEditorImpl>(filePath))
 {
 }
 
-CodeEditor::CodeEditor(const std::vector<std::string> &filePaths) 
+CodeEditor::CodeEditor(const std::vector<std::string> &filePaths)
   : _pImpl(std::make_unique<MultipleCodeEditorImpl>(filePaths))
 {
 }
@@ -281,5 +282,3 @@ void demoCodeEditor()
 }
 
 } // namespace ImGuiUtils
-
-
