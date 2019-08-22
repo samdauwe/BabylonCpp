@@ -7,7 +7,7 @@
 #include <babylon/core/system.h>
 #include <imgui_utils/icons_font_awesome_5.h>
 #include <imgui_utils/imgui_utils.h>
-#include <babylon/imgui_babylon/sample_list_page.h>
+#include <babylon/inspector/samples_browser.h>
 #include <babylon/interfaces/irenderable_scene.h>
 
 #include <imgui.h>
@@ -49,13 +49,13 @@ namespace BABYLON {
 
 using namespace BABYLON::Samples;
 
-class SampleListPageImpl
+class SamplesBrowserImpl
 {
 public:
   using CategoryName = std::string;
   using SampleName = std::string;
 
-  SampleListPageImpl()
+  SamplesBrowserImpl()
   {
     for (const std::string & sample : _samplesIndex.getSampleNames())
       _samplesInfos[sample] = _samplesIndex.getSampleInfo(sample);
@@ -75,8 +75,8 @@ public:
     ImGui::NewLine();
   }
 
-  SampleListPage::CallbackNewRenderableScene OnNewRenderableScene;
-  SampleListPage::CallbackEditFiles OnEditFiles;
+  SamplesBrowser::CallbackNewRenderableScene OnNewRenderableScene;
+  SamplesBrowser::CallbackEditFiles OnEditFiles;
 
 private:
   void render_filter()
@@ -294,15 +294,15 @@ private:
 };
 
 
-SampleListPage::SampleListPage()
+SamplesBrowser::SamplesBrowser()
 {
-  pImpl = std::make_unique<SampleListPageImpl>();
+  pImpl = std::make_unique<SamplesBrowserImpl>();
 }
 
 
-SampleListPage::~SampleListPage() = default;
+SamplesBrowser::~SamplesBrowser() = default;
 
-void SampleListPage::render()
+void SamplesBrowser::render()
 {
   pImpl->OnNewRenderableScene = OnNewRenderableScene;
   pImpl->OnEditFiles = OnEditFiles;

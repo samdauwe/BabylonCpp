@@ -1,5 +1,5 @@
 #include "run_with_inspector.h"
-#include <babylon/inspector/babylon_inspector_app.h>
+#include <babylon/babylon_imgui/babylon_inspector_app.h>
 
 // This file demonstrates how to run a scene inside the inspector window
 void runWithInspector(

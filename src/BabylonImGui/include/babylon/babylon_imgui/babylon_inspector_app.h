@@ -1,9 +1,9 @@
 #ifndef BABYLON_INSPECTOR_APP_H
 #define BABYLON_INSPECTOR_APP_H
 #include <map>
-#include <babylon/imgui_babylon/scene_widget_Imgui.h>
+#include <babylon/babylon_imgui/scene_widget_Imgui.h>
 #include <babylon/inspector/inspector.h>
-#include <babylon/imgui_babylon/sample_list_page.h>
+#include <babylon/inspector/samples_browser.h>
 #include <imgui_utils/code_editor.h>
 
 // Note : the api could be vastly simplified by hiding this class inside the cpp file
@@ -44,7 +44,7 @@ namespace BABYLON {
     {
       std::unique_ptr<BABYLON::SceneWidget_ImGui> _sceneWidget;
       BABYLON::Inspector _inspector;
-      BABYLON::SampleListPage _sampleListComponent;
+      BABYLON::SamplesBrowser _sampleListComponent;
       ViewState _viewState = ViewState::Scene3d;
       std::string _sceneName = "";
       bool _screenshotAndExit;

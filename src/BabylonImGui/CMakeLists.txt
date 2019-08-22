@@ -84,6 +84,7 @@ add_library(${TARGET}
     STATIC
     ${BABYLON_INSPECTOR_SOURCES}
     ${BABYLON_INSPECTOR_HEADERS}
+    Readme.md
 )
 
 # Create namespaced alias

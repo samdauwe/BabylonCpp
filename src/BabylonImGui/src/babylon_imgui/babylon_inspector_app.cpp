@@ -1,5 +1,5 @@
 #include <imgui_utils/icons_font_awesome_5.h>
-#include <babylon/inspector/babylon_inspector_app.h>
+#include <babylon/babylon_imgui/babylon_inspector_app.h>
 #include <imgui_utils/app_runner/imgui_runner.h>
 #include <babylon/GL/framebuffer_canvas.h>
 

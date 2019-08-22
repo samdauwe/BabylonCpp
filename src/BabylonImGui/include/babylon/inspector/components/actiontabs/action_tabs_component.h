@@ -18,7 +18,7 @@ class LogsTabComponent;
 class PropertyGridTabComponent;
 class Scene;
 class StatisticsTabComponent;
-class SampleListPage;
+class SamplesBrowser;
 using GlobalStatePtr = std::shared_ptr<GlobalState>;
 
 struct BABYLON_SHARED_EXPORT IActionTabsComponentProps {
@@ -56,7 +56,6 @@ private:
   std::unique_ptr<DebugTabComponent> _debugTabComponent;
   std::unique_ptr<StatisticsTabComponent> _statisticsTabComponent;
   std::unique_ptr<LogsTabComponent> _logsTabComponent;
-  std::unique_ptr<SampleListPage> _sampleListPage;
   // Observers
   Observer<EntityInfo>::Ptr _onSelectionChangeObserver;
 

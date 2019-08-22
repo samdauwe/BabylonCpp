@@ -5,7 +5,6 @@
 #include <babylon/inspector/components/actiontabs/tabs/debug_tab_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/logs_tab_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/property_grid_tab_component.h>
-#include <babylon/imgui_babylon/sample_list_page.h>
 #include <babylon/inspector/components/actiontabs/tabs/statistics_tab_component.h>
 #include <babylon/inspector/components/global_state.h>
 
@@ -20,7 +19,6 @@ ActionTabsComponent::ActionTabsComponent(
     , _debugTabComponent{nullptr}
     , _statisticsTabComponent{nullptr}
     , _logsTabComponent{nullptr}
-    , _sampleListPage(new SampleListPage())
     , _onSelectionChangeObserver{nullptr}
 {
   componentWillMount();
@@ -113,18 +111,6 @@ void ActionTabsComponent::render()
       if (ImGui::BeginTabItem(logsTabLabel.c_str())) {
         if (ImGui::BeginChild("scrollingArea")) {
           _logsTabComponent->render();
-          ImGui::EndChild();
-        }
-        ImGui::EndTabItem();
-      }
-    }
-    // Sample List Tab
-    if (_logsTabComponent) {
-      static const auto sampleTabLabel
-          = String::concat(ICON_FA_PALETTE, " ", "Browse samples");
-      if (ImGui::BeginTabItem(sampleTabLabel.c_str())) {
-        if (ImGui::BeginChild("scrollingArea")) {
-          _sampleListPage->render();
           ImGui::EndChild();
         }
         ImGui::EndTabItem();

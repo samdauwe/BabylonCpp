@@ -1,17 +1,16 @@
-#ifndef BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_SAMPLE_LIST_COMPONENT_H
-#define BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_SAMPLE_LIST_COMPONENT_H
+#ifndef BABYLON_INSPECTOR_SAMPLES_BROWSER_H
+#define BABYLON_INSPECTOR_SAMPLES_BROWSER_H
 
-#include <babylon/inspector/components/actiontabs/pane_component.h>
 #include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
 
-class SampleListPageImpl;
+class SamplesBrowserImpl;
 
-class SampleListPage {
+class SamplesBrowser {
 public:
-  SampleListPage();
-  ~SampleListPage();
+  SamplesBrowser();
+  ~SamplesBrowser();
   void render();
 
   using CallbackNewRenderableScene = std::function<void(std::shared_ptr<IRenderableScene>)>;
@@ -21,10 +20,10 @@ public:
   CallbackEditFiles OnEditFiles;
 
 private:
-  std::unique_ptr<SampleListPageImpl> pImpl;
+  std::unique_ptr<SamplesBrowserImpl> pImpl;
 }; // end of class SampleListComponent
 
 } // end of namespace BABYLON
 
 #endif // end of
-       // BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_SAMPLE_LIST_COMPONENT_H
+       // BABYLON_INSPECTOR_SAMPLES_BROWSER_H
