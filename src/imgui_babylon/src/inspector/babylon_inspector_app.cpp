@@ -157,7 +157,7 @@ namespace BABYLON
     //params.FullScreen = true;
     params.Width = 1280;
     params.Height = 720;
-    params.Title = "Hello app";
+    params.Title = "BabylonCpp inspector";
     std::function<bool(void)> showGuiLambda = [this]() -> bool {
       return this->render();
     };
