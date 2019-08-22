@@ -10,7 +10,7 @@
 namespace BABYLON {
 namespace impl {
 
-FramebufferCanvas::FramebufferCanvas() : 
+FramebufferCanvas::FramebufferCanvas() :
   ICanvas{}
 {
   _renderingContext          = std::make_unique<GL::GLRenderingContext>();
@@ -34,14 +34,14 @@ void FramebufferCanvas::initializeFrameBuffer()
 {
   _renderingContext->drawingBufferWidth = clientWidth;
   _renderingContext->drawingBufferHeight = clientHeight;
-  
+
   //glGenFramebuffers(1, &mFrameBuffer_Id);
-  mFrameBuffer = std::move(_renderingContext->createFramebuffer());
+  mFrameBuffer = _renderingContext->createFramebuffer();
   //glBindFramebuffer(GL_FRAMEBUFFER, mFrameBuffer_Id);
   _renderingContext->bindFramebuffer(GL_FRAMEBUFFER, mFrameBuffer.get());
 
   // create a color attachment texture
-  mTextureColorBuffer = std::move(_renderingContext->createTexture());
+  mTextureColorBuffer = _renderingContext->createTexture();
   _renderingContext->bindTexture(GL_TEXTURE_2D, mTextureColorBuffer.get());
   _renderingContext->texImage2D(GL_TEXTURE_2D, 0, GL_RGB, clientWidth, clientHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
   _renderingContext->texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -59,7 +59,7 @@ void FramebufferCanvas::initializeFrameBuffer()
   //
   // OUCH : rbo may be dead here !!!
   //
-  _renderingContext->framebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); 
+  _renderingContext->framebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
   if ( _renderingContext->checkFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     throw std::runtime_error("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
@@ -116,8 +116,8 @@ unsigned int FramebufferCanvas::textureId()
 
 Uint8Array reverse_pixels_rows(
   const Uint8Array & pixels,
-  int width, 
-  int height, 
+  int width,
+  int height,
   int nbChannels)
 {
   Uint8Array pixels_reverse_rows;
@@ -138,7 +138,7 @@ Uint8Array reverse_pixels_rows(
 }
 
 Uint8Array FramebufferCanvas::readPixelsRgb()
-{  
+{
   Uint8Array pixels;
   pixels.resize(clientWidth * clientHeight * 3, 0);
   _renderingContext->readPixels(0, 0, clientWidth, clientHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
@@ -153,7 +153,7 @@ void FramebufferCanvas::saveScreenshotJpg(const char * filename, int quality, in
   auto pixels = readPixelsRgb();
   unbind();
   int nbChannels = 3;
-  
+
   if (imageWidth == -1)
     stbi_write_jpg(filename, clientWidth, clientHeight, nbChannels, pixels.data(), quality);
   else

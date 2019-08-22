@@ -40,14 +40,6 @@ std::string to_snake_case(const std::string &sPascalCase)
 
 const std::string screenshotsFolderCurrent = "../../../assets/screenshots/samples_current/";
 const std::string screenshotsFolderOriginal = "../../../assets/screenshots/samples/";
-const std::string repositoryPath = BABYLON::Filesystem::absolutePath("../../../");
-
-std::string repositoryRelativePath(const std::string & path)
-{
-  std::string absPath = BABYLON::Filesystem::absolutePath(path);
-  std::string fromRepo = BABYLON::String::removeSubstring(absPath, repositoryPath);
-  return fromRepo;
-}
 
 } // end anonymous namespace
 

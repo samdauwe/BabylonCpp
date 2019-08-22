@@ -5,8 +5,10 @@
 
 #include <babylon/core/logging.h>
 #include <babylon/samples/samples_index.h>
-#include <windows.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
 namespace BABYLON
 {
   const int INSPECTOR_WIDTH = 400;
@@ -94,7 +96,7 @@ namespace BABYLON
       return false;
     int imageWidth = 200;
     int jpgQuality = 75;
-    this->_appContext._sceneWidget->getCanvas()->saveScreenshotJpg((_appContext._sceneName + ".jpg").c_str(), 
+    this->_appContext._sceneWidget->getCanvas()->saveScreenshotJpg((_appContext._sceneName + ".jpg").c_str(),
       jpgQuality, imageWidth);
     return true;
   }
@@ -106,13 +108,13 @@ namespace BABYLON
     static int frame_counter = 0;
     const int max_frames = 30;
 
-    static int sample_counter = 0;
+    static size_t sample_counter = 0;
 
     if (frame_counter > max_frames)
     {
       std::string sampleName = allSamples[sample_counter];
       std::vector<std::string> excludedSamples = {
-        //"BasicElementsScene", 
+        //"BasicElementsScene",
         //"BlurModeForMirrorsScene"
       };
       if (std::find(excludedSamples.begin(), excludedSamples.end(), sampleName) == excludedSamples.end())
@@ -144,7 +146,7 @@ namespace BABYLON
   }
 
   void BabylonInspectorApp::RunApp(
-    std::shared_ptr<BABYLON::IRenderableScene> initialScene /*= nullptr*/, 
+    std::shared_ptr<BABYLON::IRenderableScene> initialScene /*= nullptr*/,
     std::string sceneName /*= ""*/,
     bool screenshotAndExit /*= false*/)
   {

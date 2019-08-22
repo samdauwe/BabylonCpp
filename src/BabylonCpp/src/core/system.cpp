@@ -19,6 +19,7 @@ std::string getExecutablePath()
 #else
   char filename[PATH_MAX];
   ssize_t count = readlink("/proc/self/exe", filename, PATH_MAX);
+  (void) count;
   return std::string(filename);
 #endif
 }
