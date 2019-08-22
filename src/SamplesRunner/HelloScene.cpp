@@ -4,6 +4,7 @@
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/meshes/mesh.h>
 
+// This files demonstrates how to create a very simple renderable scene
 struct HelloScene : public BABYLON::IRenderableScene
 {
   HelloScene() : IRenderableScene() {}
