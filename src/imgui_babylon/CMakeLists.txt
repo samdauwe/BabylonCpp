@@ -218,24 +218,28 @@ endif(OPTION_BUILD_TESTS AND EXISTS ${TESTS_PATH})
 #                       Deployment                                             #
 # ============================================================================ #
 
-# 'make install' to the correct location
-install(TARGETS ${TARGET}
-    EXPORT   ${TARGET}Config
-    ARCHIVE  DESTINATION ${ARCHIVE_OUTPUT_PATH}
-    RUNTIME  DESTINATION ${EXECUTABLE_OUTPUT_PATH}
-    LIBRARY  DESTINATION ${LIBRARY_OUTPUT_PATH}
-)
-install(DIRECTORY include/ DESTINATION ${INCLUDE_OUTPUT_PATH})
+set(HACK_DISABLE_INSTALL ON)
 
-# Make the project importable from the install directory
-install(EXPORT ${TARGET}Config
-    DESTINATION ${TARGET}/${CMAKE_OUTPUT_PATH}
-)
+if (NOT HACK_DISABLE_INSTALL)
+    # 'make install' to the correct location
+    install(TARGETS ${TARGET}
+        EXPORT   ${TARGET}Config
+        ARCHIVE  DESTINATION ${ARCHIVE_OUTPUT_PATH}
+        RUNTIME  DESTINATION ${EXECUTABLE_OUTPUT_PATH}
+        LIBRARY  DESTINATION ${LIBRARY_OUTPUT_PATH}
+    )
+    install(DIRECTORY include/ DESTINATION ${INCLUDE_OUTPUT_PATH})
 
-# Make the project importable from the build directory
-export(TARGETS ${TARGET}
-    FILE ${TARGET}Config.cmake
-)
+    # Make the project importable from the install directory
+    install(EXPORT ${TARGET}Config
+        DESTINATION ${TARGET}/${CMAKE_OUTPUT_PATH}
+    )
+
+    # Make the project importable from the build directory
+    export(TARGETS ${TARGET}
+        FILE ${TARGET}Config.cmake
+    )
+endif()
 
 # Copy asset directories
 ## - Fonts
