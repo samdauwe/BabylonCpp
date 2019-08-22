@@ -17,7 +17,7 @@ struct BABYLON_SHARED_EXPORT SceneOptions {
    * look-up by Id It will improve performance when the number of geometries
    * becomes important.
    */
-  std::optional<bool> useGeometryIdsMap = std::nullopt;
+  std::optional<bool> useGeometryUniqueIdsMap = std::nullopt;
 
 }; // end of struct SceneOptions
 

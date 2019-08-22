@@ -205,6 +205,12 @@ public:
   void setMirroredCameraPosition(const Vector3& newPosition);
 
   /**
+   * @brief Gets a string idenfifying the name of the class.
+   * @returns "Scene" string
+   */
+  const std::string getClassName() const;
+
+  /**
    * @brief Hidden
    */
   std::vector<AbstractMesh*> _getDefaultMeshCandidates();
@@ -366,9 +372,12 @@ public:
    * event on
    * @param pointerEventInit pointer event state to be used when simulating the
    * pointer event (eg. pointer id for multitouch)
+   * @param doubleTap indicates that the pointer up event should be considered
+   * as part of a double click (false by default)
    * @returns the current scene
    */
-  Scene& simulatePointerUp(std::optional<PickingInfo>& pickResult);
+  Scene& simulatePointerUp(std::optional<PickingInfo>& pickResult,
+                           bool doubleTap = false);
 
   /**
    * @brief Gets a boolean indicating if the current pointer event is captured
@@ -378,11 +387,6 @@ public:
    * @returns true if the pointer was captured
    */
   bool isPointerCaptured(int pointerId = 0);
-
-  /**
-   * @brief Hidden
-   */
-  bool _isPointerSwiping() const;
 
   /**
    * @brief Attach events to the canvas (To handle actionManagers triggers and
@@ -479,7 +483,7 @@ public:
   /**
    * @brief Gets all animations attached to the scene.
    */
-  std::vector<AnimationPtr> getAnimations() override;
+  std::vector<AnimatablePtr> getAnimations() override;
 
   /**
    * @brief Will start the animation sequence of a given target.
@@ -629,6 +633,13 @@ public:
   std::vector<AnimatablePtr> getAllAnimatablesByTarget(IAnimatable* target);
 
   /**
+   * @brief Resets the last animation time frame.
+   * Useful to override when animations start running when loading a scene for
+   * the first time.
+   */
+  void resetLastAnimationTimeFrame();
+
+  /**
    * @brief Will stop the animation of the given target.
    * @param target - the target
    * @param animationName - the name of the animation to stop (all animations
@@ -671,15 +682,16 @@ public:
   /** Matrix **/
 
   /**
-   * @brief Hidden
+   * @brief Gets the current view matrix.
+   * @returns a Matrix
    */
-  void _switchToAlternateCameraConfiguration(bool active);
+  Matrix& getViewMatrix();
 
   /**
    * @brief Gets the current view matrix.
    * @returns a Matrix
    */
-  Matrix getViewMatrix();
+  const Matrix& getViewMatrix() const;
 
   /**
    * @brief Gets the current projection matrix.
@@ -697,25 +709,31 @@ public:
    * @brief Gets the current transform matrix.
    * @returns a Matrix made of View * Projection
    */
-  Matrix getTransformMatrix();
+  Matrix& getTransformMatrix();
+
+  /**
+   * @brief Gets the current transform matrix.
+   * @returns a Matrix made of View * Projection
+   */
+  const Matrix& getTransformMatrix() const;
 
   /**
    * @brief Sets the current transform matrix.
-   * @param view defines the View matrix to use
-   * @param projection defines the Projection matrix to use
+   * @param viewL defines the View matrix to use
+   * @param projectionL defines the Projection matrix to use
+   * @param viewR defines the right View matrix to use (if provided)
+   * @param projectionR defines the right Projection matrix to use (if provided)
    */
-  void setTransformMatrix(Matrix& view, Matrix& projection);
-
-  /**
-   * @brief Hidden
-   */
-  void _setAlternateTransformMatrix(Matrix& view, Matrix& projection);
+  void setTransformMatrix(const Matrix& viewL, const Matrix& projectionL,
+                          const std::optional<Matrix>& viewR = std::nullopt,
+                          const std::optional<Matrix>& projectionR
+                          = std::nullopt);
 
   /**
    * @brief Gets the uniform buffer used to store scene data.
    * @returns a UniformBuffer
    */
-  UniformBuffer* getSceneUniformBuffer();
+  std::unique_ptr<UniformBuffer>& getSceneUniformBuffer();
 
   /**
    * @brief Gets an unique (relatively to the current scene) Id.
@@ -1817,24 +1835,12 @@ private:
    */
   void _registerTransientComponents();
 
-  void _updatePointerPosition(const PointerEvent evt);
   void _createUbo();
-  void _createAlternateUbo();
   // Pointers handling
   std::optional<PickingInfo> _pickSpriteButKeepRay(
     const std::optional<PickingInfo>& originalPointerInfo, int x, int y,
     const std::function<bool(Sprite* sprite)>& predicate = nullptr,
     bool fastCheck = false, const CameraPtr& camera = nullptr);
-  void _setRayOnPointerInfo(PointerInfo& pointerInfo);
-  Scene& _processPointerMove(std::optional<PickingInfo>& pickResult,
-                             const PointerEvent& evt);
-  bool _checkPrePointerObservable(const std::optional<PickingInfo>& pickResult,
-                                  const PointerEvent& evt,
-                                  PointerEventTypes type);
-  Scene& _processPointerDown(std::optional<PickingInfo>& pickResult,
-                             const PointerEvent& evt);
-  Scene& _processPointerUp(std::optional<PickingInfo>& pickResult,
-                           const PointerEvent& evt, const ClickInfo& clickInfo);
   void _animate();
   /**
    * @brief Hidden
@@ -1859,12 +1865,6 @@ private:
   void _bindFrameBuffer();
   void _processSubCameras(const CameraPtr& camera);
   void _checkIntersections();
-  /** Pointers handling **/
-  void _onPointerMoveEvent(PointerEvent&& evt);
-  void _onPointerDownEvent(PointerEvent&& evt);
-  void _onPointerUpEvent(PointerEvent&& evt);
-  void _onKeyDownEvent(KeyboardEvent&& evt);
-  void _onKeyUpEvent(KeyboardEvent&& evt);
   /** Picking **/
   std::optional<PickingInfo> _internalPick(
     const std::function<Ray(Matrix& world)>& rayFunction,
@@ -2176,7 +2176,7 @@ protected:
   /**
    * @brief Gets the mesh that is currently under the pointer.
    */
-  AbstractMesh*& get_meshUnderPointer();
+  AbstractMeshPtr& get_meshUnderPointer();
 
   /**
    * @brief Gets the current on-screen X position of the pointer.
@@ -3224,7 +3224,7 @@ public:
   /**
    * Gets the mesh that is currently under the pointer
    */
-  ReadOnlyProperty<Scene, AbstractMesh*> meshUnderPointer;
+  ReadOnlyProperty<Scene, AbstractMeshPtr> meshUnderPointer;
 
   /**
    * Gets the current on-screen X position of the pointer
