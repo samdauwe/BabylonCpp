@@ -106,12 +106,11 @@ namespace BABYLON {
         if (ImGui::IsMouseReleased(mouseButton))
           _framebuffer_canvas->onMouseButtonUp(ctrlKey, shiftKey, xpos, ypos, BABYLON::MouseButtonType(mouseButton));
       }
-    }
 
-    // Mouse wheel is not handled!
-    //_sceneWindow.renderCanvas->onMouseWheel(
-    //  ctrlKey, shiftKey, static_cast<int>(xpos), static_cast<int>(ypos),
-    //  RescaleMouseScroll(yoffset));
+      float mouseWheel = ImGui::GetIO().MouseWheel;
+      if (fabs(mouseWheel) > 0.01f)
+        _framebuffer_canvas->onMouseWheel(ctrlKey, shiftKey, xpos, ypos, mouseWheel);
+    }
   }
 
 } // namespace BABYLON
