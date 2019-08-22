@@ -63,3 +63,6 @@ src/InspectorV1
 .idea/
 cmake-build-debug/
 cmake-build-release/
+
+# cquery
+.cquery_cache
