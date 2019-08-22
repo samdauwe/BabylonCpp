@@ -4,7 +4,7 @@
 #include <babylon/samples/samples_index.h>
 #include <babylon/core/logging.h>
 #include <iostream>
-#include "console_logger.h"
+#include <babylon/core/logging/init_console_logger.h>
 #include <babylon/utils/CLI11.h>
 #include "spawn_screenshots.h"
 #include <imgui_utils/code_editor.h>
@@ -32,7 +32,7 @@ int main(int argc, char** argv)
   }
 
   if (flagVerbose)
-    BABYLON::impl::initializeConsoleLogger();
+    BABYLON::initConsoleLogger();
 
   if (flagSpawnScreenshots) {
     bool skipFailingSamples = true;
