@@ -3,6 +3,7 @@
 #endif
 #include <map>
 #include <babylon/core/string.h>
+#include <babylon/core/filesystem.h>
 #include <imgui_utils/icons_font_awesome_5.h>
 #include <imgui_utils/imgui_utils.h>
 #include <babylon/imgui_babylon/sample_list_page.h>
@@ -40,6 +41,14 @@ std::string to_snake_case(const std::string &sPascalCase)
 
 const std::string screenshotsFolderCurrent = "../../../assets/screenshots/samples_current/";
 const std::string screenshotsFolderOriginal = "../../../assets/screenshots/samples/";
+const std::string repositoryPath = BABYLON::Filesystem::absolutePath("../../../");
+
+std::string repositoryRelativePath(const std::string & path)
+{
+  std::string absPath = BABYLON::Filesystem::absolutePath(path);
+  std::string fromRepo = BABYLON::String::removeSubstring(absPath, repositoryPath);
+  return fromRepo;
+}
 
 } // end anonymous namespace
 
@@ -185,13 +194,13 @@ private:
     if (ImGui::Button(btnHeaderString.c_str()))
       openFile(sampleInfo.HeaderFile);
     ImGui::SameLine();
-    ImGui::TextDisabled(".h  : %s", sampleInfo.HeaderFile.c_str());
+    ImGui::TextDisabled(".h  : %s", repositoryRelativePath(sampleInfo.HeaderFile).c_str());
 
     std::string btnSourceString = std::string(ICON_FA_EYE "##") + sampleInfo.SourceFile;
     if (ImGui::Button(btnSourceString.c_str()))
       openFile(sampleInfo.SourceFile);
     ImGui::SameLine();
-    ImGui::TextDisabled(".cpp: %s", sampleInfo.SourceFile.c_str());
+    ImGui::TextDisabled(".cpp: %s", repositoryRelativePath(sampleInfo.SourceFile).c_str());
 
     if (!sampleInfo.Links.empty()) {
       for (auto link : sampleInfo.Links) {
