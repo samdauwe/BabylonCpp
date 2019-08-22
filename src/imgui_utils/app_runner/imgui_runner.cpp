@@ -165,8 +165,10 @@ namespace ImGuiUtils
           ImVec2 winSize = ImGui::GetIO().DisplaySize;
           //winSize.y -= 10.f;
           ImGui::SetNextWindowSize(winSize);
-          ImGui::Begin("Main window (title bar invisible)", NULL, 
-            ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse);
+          ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse;
+          if (appWindowParams.ShowMenuBar)
+            windowFlags |= ImGuiWindowFlags_MenuBar;
+          ImGui::Begin("Main window (title bar invisible)", NULL, windowFlags);
         }
 
         bool shouldExit = guiFunction();

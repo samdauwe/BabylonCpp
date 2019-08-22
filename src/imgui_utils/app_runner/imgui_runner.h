@@ -29,6 +29,7 @@ namespace ImGuiUtils
       GLFWwindow *ParentWindow = nullptr;
       ImVec4 ClearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
       bool ProvideFullScreenWindow = true;
+      bool ShowMenuBar = false;
       bool ConfigWindowsMoveFromTitleBarOnly = true;
       bool LoadFontAwesome = true;
     };

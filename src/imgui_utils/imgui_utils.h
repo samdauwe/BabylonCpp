@@ -552,4 +552,18 @@ struct FrameTimeHistogram {
 namespace ImGuiUtils
 {
   void ImageFromFile(const std::string &filename, ImVec2 size = ImVec2(0.f, 0.f));
+
+  inline bool Button_WithEnable(const char* label, bool enabled, const ImVec2& size = ImVec2(0, 0))
+  {
+    if (enabled)
+      return ImGui::Button(label, size);
+    else
+    {
+      ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.4f);
+      bool r = ImGui::Button(label, size);
+      (void)r; // for disabled buttons, the result is always dismissed
+      ImGui::PopStyleVar();
+      return false;
+    }
+  }
 }
