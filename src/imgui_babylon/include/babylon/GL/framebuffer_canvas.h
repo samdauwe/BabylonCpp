@@ -6,7 +6,7 @@
 #include <babylon/babylon_api.h>
 
 namespace BABYLON {
-namespace impl {
+namespace GL {
 
 class FramebufferCanvas : public ICanvas
 {

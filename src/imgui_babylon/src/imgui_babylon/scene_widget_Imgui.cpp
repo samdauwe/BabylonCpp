@@ -23,7 +23,7 @@ namespace BABYLON {
   void SceneWidget_ImGui::initializeFramebufferCanvas()
   {
     ImVec2 realSize(_size);
-    _framebuffer_canvas = std::make_unique<BABYLON::impl::FramebufferCanvas>();
+    _framebuffer_canvas = std::make_unique<BABYLON::GL::FramebufferCanvas>();
     if (realSize.x < 0.1f) {
       realSize = ImGui::GetIO().DisplaySize;
       realSize.y -= 20.f;
@@ -36,7 +36,7 @@ namespace BABYLON {
     _framebuffer_canvas->initializeFrameBuffer();
   }
 
-  BABYLON::impl::FramebufferCanvas * SceneWidget_ImGui::getCanvas()
+  BABYLON::GL::FramebufferCanvas * SceneWidget_ImGui::getCanvas()
   {
     return _framebuffer_canvas.get();
   }

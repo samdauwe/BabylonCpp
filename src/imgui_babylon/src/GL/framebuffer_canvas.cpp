@@ -8,7 +8,7 @@
 #include <babylon/utils/stb_image_resize.h>
 
 namespace BABYLON {
-namespace impl {
+namespace GL {
 
 FramebufferCanvas::FramebufferCanvas() :
   ICanvas{}
