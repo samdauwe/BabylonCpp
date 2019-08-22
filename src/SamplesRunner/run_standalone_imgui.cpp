@@ -4,14 +4,17 @@
 
 
 // This file demonstrates how to run a standalone scene, using imgui as a backend
-void runStandalone_imgui(std::shared_ptr<BABYLON::IRenderableScene> scene, const std::string & sceneName)
+void runStandalone_imgui(
+  std::shared_ptr<BABYLON::IRenderableScene> scene, 
+  const std::string & sceneName,
+  bool fullscreen)
 {
   // First, set the applications params (title, size, options)
   ImGuiUtils::ImGuiRunner::AppWindowParams params;
   params.Title = sceneName;
   params.Width = 1280;
   params.Height = 720;
-  //params.FullScreen = true;
+  params.FullScreen = fullscreen;
 
   // BABYLON::SceneWidget_ImGui is am ImGui widget that will display the scene
   // It *cannot* be initialized before Glfw and ImGui

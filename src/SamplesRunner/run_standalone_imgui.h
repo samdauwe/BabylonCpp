@@ -6,4 +6,6 @@
 // This file demonstrates how to run a standalone scene, using imgui as a backend
 void runStandalone_imgui(
   std::shared_ptr<BABYLON::IRenderableScene> scene,
-  const std::string & sceneName);
+  const std::string & sceneName,
+  bool fullscreen
+  );

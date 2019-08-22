@@ -1,3 +1,6 @@
+#ifndef IMGUI_UTILS_IMGUI_RUNNER_H
+#define IMGUI_UTILS_IMGUI_RUNNER_H
+
 #include <string>
 #include <imgui.h>
 #include <functional>
@@ -49,3 +52,5 @@ namespace ImGuiUtils
 
   }
 }
+
+#endif // #ifdef IMGUI_UTILS_IMGUI_RUNNER_H
