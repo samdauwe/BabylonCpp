@@ -1,17 +1,21 @@
+#ifndef IMGUI_UTILS_CODEEDITOR_H
+#define IMGUI_UTILS_CODEEDITOR_H
+
 #include <string>
 
 namespace ImGuiUtils {
 
   class MultipleCodeEditorImpl;
 
-  class MultipleCodeEditor
+  class CodeEditor
   {
   public:
-    MultipleCodeEditor(const std::string &filePath);
-    MultipleCodeEditor(const std::vector<std::string> &filePaths);
-    ~MultipleCodeEditor();
+    CodeEditor(const std::string &filePath);
+    CodeEditor(const std::vector<std::string> &filePaths = {});
+    ~CodeEditor();
 
-    bool render();
+    void setFiles(const std::vector<std::string> &filePaths);
+    void render();
 
   private:
     std::unique_ptr<MultipleCodeEditorImpl> _pImpl;
@@ -21,3 +25,5 @@ namespace ImGuiUtils {
   void demoCodeEditor();
 
 } // namespace ImGuiUtils
+
+#endif // #ifndef IMGUI_UTILS_CODEEDITOR_H

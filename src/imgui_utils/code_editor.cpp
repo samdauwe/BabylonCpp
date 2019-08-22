@@ -20,7 +20,8 @@ public:
     _fileContent_Saved = _fileContent_Startup;
     _textEditor.SetText(_fileContent_Startup);
   }
-  bool render()
+
+  void render()
   {
     //ImGui::ShowDemoWindow();
     checkExternalModifications();
@@ -29,7 +30,6 @@ public:
     renderCommandLine();
     ImGui::Separator();
     _textEditor.Render("TextEditor");
-    return false;
   }
 
   std::string filePath() const { return _filePath; }
@@ -41,6 +41,8 @@ public:
 private:
   bool canSave()
   {
+    if (_textEditor.IsReadOnly())
+      return false;
     return (_textEditor.GetText() != _fileContent_Saved);
   }
   void save()
@@ -50,40 +52,47 @@ private:
   }
   bool canRestore()
   {
+    if (_textEditor.IsReadOnly())
+      return false;
     return _textEditor.CanUndo();
   }
   void restore()
   {
+    if (_textEditor.IsReadOnly())
+      return;
     _textEditor.SetText(_fileContent_Startup);
   }
 
   void renderCommandLine()
   {
-    if (ImGuiUtils::Button_WithEnable(ICON_FA_SAVE " Save", canSave()))
+    if (!_textEditor.IsReadOnly())
     {
-      save();
+      if (ImGuiUtils::Button_WithEnable(ICON_FA_SAVE " Save", canSave()))
+      {
+        save();
+      }
+      ImGui::SameLine();
+      if (ImGuiUtils::Button_WithEnable(ICON_FA_UNDO ICON_FA_UNDO " Restore", canRestore()))
+        restore();
+      ImGui::SameLine(0.f, 50.f);
+
+      if (ImGuiUtils::Button_WithEnable(ICON_FA_UNDO, _textEditor.CanUndo()))
+        _textEditor.Undo();
+      ImGui::SameLine();
+
+      if (ImGuiUtils::Button_WithEnable(ICON_FA_REDO, _textEditor.CanRedo()))
+        _textEditor.Redo();
+      ImGui::SameLine();
+
+      if (ImGuiUtils::Button_WithEnable(ICON_FA_COPY, _textEditor.HasSelection()))
+        _textEditor.Copy();
+      ImGui::SameLine();
+      if (ImGuiUtils::Button_WithEnable(ICON_FA_CUT, _textEditor.HasSelection()))
+        _textEditor.Cut();
+      ImGui::SameLine();
+      if (ImGuiUtils::Button_WithEnable(ICON_FA_PASTE, ImGui::GetClipboardText() != nullptr))
+        _textEditor.Paste();
     }
-    ImGui::SameLine();
-    if (ImGuiUtils::Button_WithEnable(ICON_FA_UNDO ICON_FA_UNDO " Restore", canRestore()))
-      restore();
-    ImGui::SameLine(0.f, 50.f);
-
-    if (ImGuiUtils::Button_WithEnable(ICON_FA_UNDO, _textEditor.CanUndo()))
-      _textEditor.Undo();
-    ImGui::SameLine();
-
-    if (ImGuiUtils::Button_WithEnable(ICON_FA_REDO, _textEditor.CanRedo()))
-      _textEditor.Redo();
-    ImGui::SameLine();
-
-    if (ImGuiUtils::Button_WithEnable(ICON_FA_COPY, _textEditor.HasSelection()))
-      _textEditor.Copy();
-    ImGui::SameLine();
-    if (ImGuiUtils::Button_WithEnable(ICON_FA_CUT, _textEditor.HasSelection()))
-      _textEditor.Cut();
-    ImGui::SameLine();
-    if (ImGuiUtils::Button_WithEnable(ICON_FA_PASTE, ImGui::GetClipboardText() != nullptr))
-      _textEditor.Paste();
 
     ImGui::SameLine(ImGui::GetWindowContentRegionWidth() - 200.f);
     if (ImGui::Button("Open in text editor"))
@@ -135,22 +144,45 @@ class MultipleCodeEditorImpl
 public:
   MultipleCodeEditorImpl(const std::string &filePath)
   {
-    _editors.push_back(OneCodeEditor(filePath));
-    _currentEditor = &_editors.front();
+    setFiles({ filePath });
   }
   MultipleCodeEditorImpl(const std::vector<std::string> &filePaths)
   {
-    for (auto filePath: filePaths)
-      _editors.push_back(OneCodeEditor(filePath));
-    _currentEditor = &_editors.front();
+    setFiles(filePaths);
   }
   
-  bool render()
+  void setFiles(const std::vector<std::string> &filePaths)
   {
+    _editors.clear();
+    for (auto filePath : filePaths)
+      _editors.push_back(OneCodeEditor(filePath));
+    if (!_editors.empty())
+      _currentEditor = &_editors.back();
+    updateReadOnly();
+  }
+
+  void updateReadOnly()
+  {
+    for (auto & editor : _editors)
+    {
+      editor.getTextEditor().SetReadOnly(!_canEdit);
+    }
+  }
+
+  void render()
+  {
+    if (_editors.empty())
+      return;
+
+    if (ImGui::Checkbox("Allow edition", &_canEdit))
+      updateReadOnly();
+    ImGui::SameLine();
+
     renderTabs();
     ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 200.f);
     renderPalette();
-    return currentEditor().render();
+    if (_currentEditor)
+      currentEditor().render();
   }
 
 private:
@@ -197,26 +229,32 @@ private:
   }
 
   std::vector<OneCodeEditor> _editors;
-  OneCodeEditor * _currentEditor;
+  OneCodeEditor * _currentEditor = nullptr;
   int _palette = 0;
+  bool _canEdit = false;
 };
 
 
 
 
-MultipleCodeEditor::MultipleCodeEditor(const std::string &filePath) 
+CodeEditor::CodeEditor(const std::string &filePath) 
   : _pImpl(std::make_unique<MultipleCodeEditorImpl>(filePath))
 {
 }
 
-MultipleCodeEditor::MultipleCodeEditor(const std::vector<std::string> &filePaths) 
+CodeEditor::CodeEditor(const std::vector<std::string> &filePaths) 
   : _pImpl(std::make_unique<MultipleCodeEditorImpl>(filePaths))
 {
 }
 
-MultipleCodeEditor::~MultipleCodeEditor() = default;
+void CodeEditor::setFiles(const std::vector<std::string> &filePaths)
+{
+  _pImpl->setFiles(filePaths);
+}
 
-bool MultipleCodeEditor::render()
+CodeEditor::~CodeEditor() = default;
+
+void CodeEditor::render()
 {
   return _pImpl->render();
 }
@@ -229,7 +267,7 @@ void demoCodeEditor()
     "../../../src/imgui_babylon/src/imgui_babylon/sample_list_page.cpp",
     "../../../src/imgui_babylon/include/babylon/imgui_babylon/sample_list_page.h"
   };
-  ImGuiUtils::MultipleCodeEditor codeEditor(path);
+  ImGuiUtils::CodeEditor codeEditor(path);
   auto demoGui = [&]() {
     codeEditor.render();
   };

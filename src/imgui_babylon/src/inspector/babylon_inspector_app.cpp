@@ -36,6 +36,7 @@ namespace BABYLON
         ImGui::SameLine();
       }
       ImGui::NewLine();
+      ImGui::Separator();
       return changed;
     }
 
@@ -62,7 +63,7 @@ namespace BABYLON
     if (_appContext._viewState == ViewState::Scene3d)
       _appContext._sceneWidget->render();
     if (_appContext._viewState == ViewState::CodeEditor)
-      ImGui::Text("editor");
+      _codeEditor.render();
     else if (_appContext._viewState == ViewState::SampleBrowser)
       _appContext._sampleListComponent.render();
 
@@ -169,6 +170,10 @@ namespace BABYLON
   {
     _appContext._sampleListComponent.OnNewRenderableScene = [&](std::shared_ptr<IRenderableScene> scene) {
       this->setRenderableScene(scene);
+    };
+    _appContext._sampleListComponent.OnEditFiles = [&](const std::vector<std::string> & files) {
+      _codeEditor.setFiles(files);
+      _appContext._viewState = ViewState::CodeEditor;
     };
 
     ImVec2 sceneSize = ImGui::GetIO().DisplaySize;

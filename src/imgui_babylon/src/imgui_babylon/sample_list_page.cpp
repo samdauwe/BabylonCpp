@@ -84,6 +84,7 @@ public:
   }
 
   SampleListPage::CallbackNewRenderableScene OnNewRenderableScene;
+  SampleListPage::CallbackEditFiles OnEditFiles;
 
 private:
   void render_filter()
@@ -165,17 +166,25 @@ private:
         Inspector::OnSampleChanged(sampleName);
     }
 
-    std::string btnHeaderString = std::string(ICON_FA_EYE "##") + sampleInfo.HeaderFile;
-    if (ImGui::Button(btnHeaderString.c_str()))
-      BABYLON::System::openFile(sampleInfo.HeaderFile);
-    ImGui::SameLine();
-    ImGui::TextDisabled(".h  : %s", repositoryRelativePath(sampleInfo.HeaderFile).c_str());
+    if (OnEditFiles)
+    {
+      ImGui::SameLine();
+      std::string viewCodeLabel = ICON_FA_EDIT " View code##" + sampleName;
+      if (ImGui::Button(viewCodeLabel.c_str()))
+        OnEditFiles({ sampleInfo.HeaderFile, sampleInfo.SourceFile });
+    }
 
-    std::string btnSourceString = std::string(ICON_FA_EYE "##") + sampleInfo.SourceFile;
-    if (ImGui::Button(btnSourceString.c_str()))
-      BABYLON::System::openFile(sampleInfo.SourceFile);
-    ImGui::SameLine();
-    ImGui::TextDisabled(".cpp: %s", repositoryRelativePath(sampleInfo.SourceFile).c_str());
+    //std::string btnHeaderString = std::string(ICON_FA_EYE "##") + sampleInfo.HeaderFile;
+    //if (ImGui::Button(btnHeaderString.c_str()))
+    //  BABYLON::System::openFile(sampleInfo.HeaderFile);
+    //ImGui::SameLine();
+    //ImGui::TextDisabled(".h  : %s", repositoryRelativePath(sampleInfo.HeaderFile).c_str());
+
+    //std::string btnSourceString = std::string(ICON_FA_EYE "##") + sampleInfo.SourceFile;
+    //if (ImGui::Button(btnSourceString.c_str()))
+    //  BABYLON::System::openFile(sampleInfo.SourceFile);
+    //ImGui::SameLine();
+    //ImGui::TextDisabled(".cpp: %s", repositoryRelativePath(sampleInfo.SourceFile).c_str());
 
     if (!sampleInfo.Links.empty()) {
       for (auto link : sampleInfo.Links) {
@@ -304,6 +313,7 @@ SampleListPage::~SampleListPage() = default;
 void SampleListPage::render()
 {
   pImpl->OnNewRenderableScene = OnNewRenderableScene;
+  pImpl->OnEditFiles = OnEditFiles;
   pImpl->render();
 }
 

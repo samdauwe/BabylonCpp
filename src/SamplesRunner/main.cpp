@@ -13,8 +13,6 @@ int main(int argc, char** argv)
 {
   BABYLON::System::chdirToExecutableFolder();
 
-  ImGuiUtils::demoCodeEditor(); exit(0);
-
   BABYLON::Samples::SamplesIndex samplesIndex;
   bool flagVerbose = false;
   bool flagSpawnScreenshots = false;

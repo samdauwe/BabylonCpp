@@ -16,6 +16,10 @@ public:
 
   using CallbackNewRenderableScene = std::function<void(std::shared_ptr<IRenderableScene>)>;
   CallbackNewRenderableScene OnNewRenderableScene;
+
+  using CallbackEditFiles = std::function<void(const std::vector<std::string> &)>;
+  CallbackEditFiles OnEditFiles;
+
 private:
   std::unique_ptr<SampleListPageImpl> pImpl;
 }; // end of class SampleListComponent

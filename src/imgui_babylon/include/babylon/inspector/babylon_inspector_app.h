@@ -4,6 +4,7 @@
 #include <babylon/imgui_babylon/scene_widget_Imgui.h>
 #include <babylon/inspector/inspector.h>
 #include <babylon/imgui_babylon/sample_list_page.h>
+#include <imgui_utils/code_editor.h>
 
 // Note : the api could be vastly simplified by hiding this class inside the cpp file
 // Only one function would be provided:
@@ -51,6 +52,7 @@ namespace BABYLON {
     };
 
     AppContext _appContext;
+    ImGuiUtils::CodeEditor _codeEditor;
   }; // end of class BabylonInspectorApp
 
 } // end of namespace BABYLON
