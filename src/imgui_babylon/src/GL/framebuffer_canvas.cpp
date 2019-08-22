@@ -4,6 +4,8 @@
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <babylon/utils/stb_image_write.h>
+#define STB_IMAGE_RESIZE_IMPLEMENTATION
+#include <babylon/utils/stb_image_resize.h>
 
 namespace BABYLON {
 namespace impl {
@@ -139,19 +141,33 @@ Uint8Array FramebufferCanvas::readPixelsRgb()
 {  
   Uint8Array pixels;
   pixels.resize(clientWidth * clientHeight * 3, 0);
-  _renderingContext->readPixels(0, clientHeight, clientWidth, clientHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+  _renderingContext->readPixels(0, 0, clientWidth, clientHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
   // rows are inversed in the framebuffer: invert them now
   auto pixels_reverse_rows = reverse_pixels_rows(pixels, clientWidth, clientHeight, 3);
   return pixels_reverse_rows;
 }
 
-void FramebufferCanvas::saveScreenshotJpg(const char * filename, int quality)
+void FramebufferCanvas::saveScreenshotJpg(const char * filename, int quality, int imageWidth)
 {
   bind();
   auto pixels = readPixelsRgb();
   unbind();
   int nbChannels = 3;
-  stbi_write_jpg(filename, clientWidth, clientHeight, nbChannels, pixels.data(), quality);
+  
+  if (imageWidth == -1)
+    stbi_write_jpg(filename, clientWidth, clientHeight, nbChannels, pixels.data(), quality);
+  else
+  {
+    Uint8Array pixels_resized;
+    int imageHeight = (int)((double)clientHeight * (double)imageWidth / (double)clientWidth + 0.5);
+    pixels_resized.resize(imageWidth * imageHeight * 3);
+    stbir_resize_uint8(
+      pixels.data(), clientWidth, clientHeight, 0,
+      pixels_resized.data(), imageWidth, imageHeight, 0, 3);
+    stbi_write_jpg(filename, imageWidth, imageHeight, nbChannels, pixels_resized.data(), quality);
+  }
+
+
 }
 
 void FramebufferCanvas::saveScreenshotPng(const char * filename)

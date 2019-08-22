@@ -27,7 +27,7 @@ public:
 
   unsigned int textureId();
   Uint8Array readPixelsRgb();
-  void saveScreenshotJpg(const char * filename, int quality);
+  void saveScreenshotJpg(const char * filename, int quality, int imageWidth = -1);
   void saveScreenshotPng(const char * filename);
 
 
