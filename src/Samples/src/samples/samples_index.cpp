@@ -28,6 +28,39 @@ namespace Samples {
 
 SamplesIndex::SamplesIndex()
 {
+  _samplesFailures = {
+  {"BasicElementsScene", SampleFailureReason::outOfBoundAccess},
+  {"BlurModeForMirrorsScene", SampleFailureReason::outOfBoundAccess},
+  {"BuildingInstancesGridScene", SampleFailureReason::processHung},
+  {"BulbSelfShadowScene", SampleFailureReason::outOfBoundAccess},
+  {"CannonBallScene", SampleFailureReason::outOfBoundAccess},
+  {"CircleCurvesFromBeziersScene", SampleFailureReason::invalidComparator},
+  {"ColoredRibbonScene", SampleFailureReason::outOfBoundAccess},
+  {"ConvolutionPostProcessScene", SampleFailureReason::outOfBoundAccess},
+  {"CurvedHelixMeshesScene", SampleFailureReason::outOfBoundAccess},
+  {"EquirectangularMapAsReflectionTextureScene", SampleFailureReason::outOfBoundAccess},
+  {"ExtrusionScene", SampleFailureReason::outOfBoundAccess},
+  {"FireworksWithShaderCodeScene", SampleFailureReason::outOfBoundAccess},
+  {"FogScene", SampleFailureReason::outOfBoundAccess},
+  {"FresnelScene", SampleFailureReason::invalidComparator},
+  {"GlassWubbleBallScene", SampleFailureReason::vectorIteratorInvalid},
+  {"KernelBasedBlurScene", SampleFailureReason::outOfBoundAccess},
+  {"LatheScene", SampleFailureReason::outOfBoundAccess},
+  {"LightsScene", SampleFailureReason::outOfBoundAccess},
+  {"MandelbrotFractalScene", SampleFailureReason::outOfBoundAccess},
+  {"MirrorsScene", SampleFailureReason::vectorIteratorInvalid},
+  {"MultiSampleRenderTargetsScene", SampleFailureReason::vectorIteratorInvalid},
+  {"MultiViewsScene", SampleFailureReason::invalidComparator},
+  {"PBRReflectionScene", SampleFailureReason::outOfBoundAccess},
+  {"RayHelperScene", SampleFailureReason::invalidComparator},
+  {"RollercoasterScene", SampleFailureReason::outOfBoundAccess},
+  {"ShaderMaterialCloudsScene", SampleFailureReason::invalidComparator},
+  {"SimplePostProcessRenderPipelineScene", SampleFailureReason::outOfBoundAccess},
+  {"SphericalReflectionTextureScene", SampleFailureReason::vectorIteratorInvalid},
+  {"TubeScene", SampleFailureReason::outOfBoundAccess},
+  {"XRayMaterialWithFresnelSkullScene", SampleFailureReason::invalidComparator},
+  };
+
   // Initialize the samples index
   _samplesIndex = {
     // Animations samples
@@ -84,6 +117,14 @@ bool SamplesIndex::isSampleEnabled(const std::string& sampleName) const
   }
 
   return false;
+}
+
+std::optional<BABYLON::Samples::SampleFailureReason> SamplesIndex::doesSampleFail(const std::string& sampleName) const
+{
+  if (_samplesFailures.find(sampleName) == _samplesFailures.end())
+    return std::nullopt;
+  else
+    return _samplesFailures.at(sampleName);
 }
 
 bool SamplesIndex::sampleExists(const std::string& sampleName) const
@@ -208,7 +249,7 @@ SamplesIndex::getSampleNamesInCategory(const std::string& categoryName) const
   return sampleNames;
 }
 
-std::unique_ptr<IRenderableScene>
+IRenderableScenePtr
 SamplesIndex::createRenderableScene(const std::string& sampleName,
                                     ICanvas* iCanvas) const
 {
@@ -219,6 +260,46 @@ SamplesIndex::createRenderableScene(const std::string& sampleName,
   }
 
   return nullptr;
+}
+
+void SamplesIndex::listSamples()
+{
+  auto categories = getCategoryNames();
+  for (const auto & category : categories)
+  {
+    std::cout << "********************************************" << "\n";
+    std::cout << "Category: " << category << "\n";
+    std::cout << "********************************************" << "\n";
+    auto samples = getSampleNamesInCategory(category);
+    for (const auto & sample : samples) 
+    {
+      std::string ko = (!isSampleEnabled(sample)) ? " (KO)" : "";
+      std::cout << sample << ko << "\n";
+    }
+  }
+}
+
+std::string SampleFailureReason_Str(SampleFailureReason s)
+{
+  switch (s) {
+    case SampleFailureReason::blankDisplay:
+      return "Blank display";
+      break;
+    case SampleFailureReason::outOfBoundAccess :
+      return "Out of bounds access";
+      break;
+    case SampleFailureReason::processHung:
+      return "Process hung";
+      break;
+    case SampleFailureReason::invalidComparator:
+      return "Invalid comparator";
+      break;
+    case SampleFailureReason::vectorIteratorInvalid:
+      return "vector iterators in range are from different containers";
+      break;
+    default:
+      throw "Unhandled enum!";
+  }
 }
 
 } // end of namespace Samples

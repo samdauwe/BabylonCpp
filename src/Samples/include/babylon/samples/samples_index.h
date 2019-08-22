@@ -1,6 +1,6 @@
 #ifndef BABYLON_SAMPLES_SAMPLES_INDEX_H
 #define BABYLON_SAMPLES_SAMPLES_INDEX_H
-
+#include <optional>
 #include <vector>
 #include <babylon/babylon_api.h>
 #include <babylon/samples/samples_common.h>
@@ -15,6 +15,15 @@ struct SampleInfo {
   std::vector<std::string> Links;
 };
 
+enum class SampleFailureReason {
+  outOfBoundAccess,
+  processHung,
+  blankDisplay,
+  invalidComparator,
+  vectorIteratorInvalid
+};
+std::string BABYLON_SHARED_EXPORT SampleFailureReason_Str(SampleFailureReason s);
+
 class BABYLON_SHARED_EXPORT SamplesIndex {
 
 public:
@@ -27,6 +36,14 @@ public:
    * @return whether or not the example is enabled
    */
   bool isSampleEnabled(const std::string& sampleName) const;
+
+
+  /**
+   * @brief Check if the sample is currently known to fail
+   * @param sampleName the name of the sample to check
+   * @ return an optional string describing why it fails
+   */
+  std::optional<SampleFailureReason> doesSampleFail(const std::string& sampleName) const;
 
   /**
    * @brief Returns whether or not the example exists.
@@ -76,12 +93,18 @@ public:
    * @param iCanvas the canves to be used
    * @return the renderable scene
    */
-  std::unique_ptr<IRenderableScene>
+  IRenderableScenePtr
   createRenderableScene(const std::string& sampleName, ICanvas* iCanvas) const;
+
+  /**
+  * @ brief Output the list of samples to stdout
+  **/
+  void listSamples();
 
 private:
   // Contains the mapping from category to samples index
   std::unordered_map<std::string, _ISamplesIndex> _samplesIndex;
+  std::unordered_map<std::string, SampleFailureReason> _samplesFailures;
 
 }; // end of class SamplesIndex
 

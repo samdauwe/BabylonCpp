@@ -10,7 +10,7 @@ namespace BABYLON {
 
 class ICanvas;
 class IRenderableScene;
-using IRenderableScenePtr = std::unique_ptr<IRenderableScene>;
+using IRenderableScenePtr = std::shared_ptr<IRenderableScene>;
 
 namespace Samples {
 

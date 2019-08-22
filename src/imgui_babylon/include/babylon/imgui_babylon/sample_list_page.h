@@ -6,19 +6,18 @@
 
 namespace BABYLON {
 
+class SampleListPageImpl;
+
 class SampleListPage {
 public:
   SampleListPage();
+  ~SampleListPage();
   void render();
 
   using CallbackNewRenderableScene = std::function<void(std::shared_ptr<IRenderableScene>)>;
   CallbackNewRenderableScene OnNewRenderableScene;
-
 private:
-  void guiOneSample(const std::string &sampleName);
-  void guiBrowseSamples();
-  
-  BABYLON::Samples::SamplesIndex _samplesIndex;
+  std::unique_ptr<SampleListPageImpl> pImpl;
 }; // end of class SampleListComponent
 
 } // end of namespace BABYLON

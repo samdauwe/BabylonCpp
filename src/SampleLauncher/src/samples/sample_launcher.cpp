@@ -468,12 +468,12 @@ ICanvas* SampleLauncher::getRenderCanvas()
 }
 
 void SampleLauncher::setRenderableScene(
-  std::unique_ptr<IRenderableScene>& renderableScene)
+  std::shared_ptr<IRenderableScene>& renderableScene)
 {
   // Main scene window
   if (renderableScene && !_sceneWindow.renderableScene) {
     renderableScene->initialize();
-    _sceneWindow.renderableScene = std::move(renderableScene);
+    _sceneWindow.renderableScene = renderableScene;
     // Update the title
     char title[256];
     title[255] = '\0';

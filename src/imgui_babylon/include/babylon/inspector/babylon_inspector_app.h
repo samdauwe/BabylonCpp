@@ -15,7 +15,11 @@ namespace BABYLON {
   public:
 
     BabylonInspectorApp();
-    void RunApp(std::shared_ptr<BABYLON::IRenderableScene> initialScene = nullptr);
+    void RunApp(
+      std::shared_ptr<BABYLON::IRenderableScene> initialScene = nullptr, 
+      std::string sceneName = "",
+      bool screenshotAndExit = false
+      );
 
   private:
     enum class ViewState
@@ -27,8 +31,10 @@ namespace BABYLON {
     static std::map<BabylonInspectorApp::ViewState, std::string> ViewStateLabels;
 
     void initScene();
-    void render();
+    bool render(); // renders the GUI. Returns true when exit required
     void setRenderableScene(std::shared_ptr<BABYLON::IRenderableScene> scene);
+    // Saves a screenshot after  few frames (eeturns true when done)
+    bool saveScreenshot();
 
   private:
     void loopSamples();
@@ -39,6 +45,9 @@ namespace BABYLON {
       BABYLON::Inspector _inspector;
       BABYLON::SampleListPage _sampleListComponent;
       ViewState _viewState = ViewState::Scene3d;
+      std::string _sceneName = "";
+      bool _screenshotAndExit;
+      int _frameCounter = 0;
     };
 
     AppContext _appContext;

@@ -5,6 +5,7 @@
 
 #include <babylon/core/logging.h>
 #include <babylon/samples/samples_index.h>
+#include <windows.h>
 
 namespace BABYLON
 {
@@ -47,7 +48,7 @@ namespace BABYLON
   };
 
 
-  void BabylonInspectorApp::render()
+  bool BabylonInspectorApp::render()
   {
     _appContext._inspector.render(false, INSPECTOR_WIDTH);
     ImGui::SameLine();
@@ -64,17 +65,17 @@ namespace BABYLON
       ImGui::Text("editor");
     else if (_appContext._viewState == ViewState::SampleBrowser)
       _appContext._sampleListComponent.render();
-    //_appContext._sceneWidget->render();
 
-    if (ImGui::Button("Save"))
-    {
-      auto canvas = _appContext._sceneWidget->getCanvas();
-      canvas->saveScreenshotJpg("f:/tmp/tt.jpg", 75);
-    }
+    //ImGui::ShowDemoWindow(nullptr);
 
     ImGui::EndGroup();
 
-    loopSamples();
+    // loopSamples();
+
+    if (_appContext._screenshotAndExit)
+      return saveScreenshot();
+    else
+      return false;
   }
 
   void BabylonInspectorApp::setRenderableScene(std::shared_ptr<BABYLON::IRenderableScene> scene)
@@ -85,11 +86,22 @@ namespace BABYLON
     _appContext._viewState = ViewState::Scene3d;
   }
 
+  bool BabylonInspectorApp::saveScreenshot()
+  {
+    _appContext._frameCounter++;
+    if (_appContext._frameCounter < 30)
+      return false;
+    int imageWidth = 200;
+    int jpgQuality = 75;
+    this->_appContext._sceneWidget->getCanvas()->saveScreenshotJpg((_appContext._sceneName + ".jpg").c_str(), 
+      jpgQuality, imageWidth);
+    return true;
+  }
+
   void BabylonInspectorApp::loopSamples()
   {
     static BABYLON::Samples::SamplesIndex samplesIndex;
     static std::vector<std::string> allSamples = samplesIndex.getSampleNames();
-    
     static int frame_counter = 0;
     const int max_frames = 30;
 
@@ -130,15 +142,21 @@ namespace BABYLON
   {
   }
 
-  void BabylonInspectorApp::RunApp(std::shared_ptr<BABYLON::IRenderableScene> initialScene /*= nullptr*/)
+  void BabylonInspectorApp::RunApp(
+    std::shared_ptr<BABYLON::IRenderableScene> initialScene /*= nullptr*/, 
+    std::string sceneName /*= ""*/,
+    bool screenshotAndExit /*= false*/)
   {
+    _appContext._sceneName = sceneName;
+    _appContext._screenshotAndExit = screenshotAndExit;
+
     ImGuiUtils::ImGuiRunner::AppWindowParams params;
     //params.FullScreen = true;
     params.Width = 1280;
     params.Height = 720;
     params.Title = "Hello app";
-    auto showGuiLambda = [this]() {
-      this->render();
+    std::function<bool(void)> showGuiLambda = [this]() -> bool {
+      return this->render();
     };
     auto initSceneLambda = [&]() {
       this->initScene();
