@@ -47,7 +47,7 @@ int main(int argc, char** argv)
   if (!sampleName.empty())
     scene = samplesIndex.createRenderableScene(sampleName, nullptr);
   else
-    scene = SamplesRunner::MakeHelloScene();
+    scene = MakeHelloScene();
 
   BABYLON::BabylonInspectorApp app;
   app.RunApp(scene, sampleName, flagScreenshotOneSampleAndExit);
