@@ -40,7 +40,7 @@ private:
   bool saveScreenshot();
 
 private:
-  void loopSamples();
+  void handleLoopSamples();
 
   struct AppContext
   {
@@ -50,6 +50,13 @@ private:
     ViewState _viewState = ViewState::Scene3d;
     int _frameCounter = 0;
     SceneWithInspectorOptions _options;
+
+    struct
+    {
+      bool flagLoop = false;
+      size_t currentIdx = 0;
+      std::vector<std::string> samplesToLoop;
+    } _loopSamples;
   };
 
   AppContext _appContext;
@@ -113,11 +120,9 @@ bool BabylonInspectorApp::render()
   else if (_appContext._viewState == ViewState::SampleBrowser)
     _appContext._sampleListComponent.render();
 
-  //ImGui::ShowDemoWindow(nullptr);
-
   ImGui::EndGroup();
 
-  // loopSamples();
+  handleLoopSamples();
 
   if (_appContext._options._flagScreenshotOneSampleAndExit)
     return saveScreenshot();
@@ -145,39 +150,26 @@ bool BabylonInspectorApp::saveScreenshot()
   return true;
 }
 
-void BabylonInspectorApp::loopSamples()
+void BabylonInspectorApp::handleLoopSamples()
 {
   static BABYLON::Samples::SamplesIndex samplesIndex;
-  static std::vector<std::string> allSamples = samplesIndex.getSampleNames();
-  static int frame_counter = 0;
-  const int max_frames = 30;
+  if (!_appContext._loopSamples.flagLoop)
+    return;
 
-  static size_t sample_counter = 0;
+  static int frame_counter = 0;
+  const int max_frames = 60;
 
   if (frame_counter > max_frames)
   {
-    std::string sampleName = allSamples[sample_counter];
-    std::vector<std::string> excludedSamples = {
-      //"BasicElementsScene",
-      //"BlurModeForMirrorsScene"
-    };
-    if (std::find(excludedSamples.begin(), excludedSamples.end(), sampleName) == excludedSamples.end())
-    {
-      BABYLON_LOG_ERROR("LoopSample", sampleName);
-      auto scene_unique = samplesIndex.createRenderableScene(sampleName, nullptr);
-      std::shared_ptr<BABYLON::IRenderableScene> scene_shared(std::move(scene_unique));
-      try
-      {
-        this->setRenderableScene(scene_shared);
-      }
-      catch (...)
-      {
-        this->setRenderableScene(nullptr);
-      }
-    }
+    std::string sampleName = _appContext._loopSamples.samplesToLoop[_appContext._loopSamples.currentIdx];
+    BABYLON_LOG_ERROR("LoopSample", sampleName);
+    auto scene = samplesIndex.createRenderableScene(sampleName, nullptr);
+    this->setRenderableScene(scene);
 
-    if (sample_counter < allSamples.size() - 2)
-      sample_counter++;
+    if (_appContext._loopSamples.currentIdx < _appContext._loopSamples.samplesToLoop.size() - 2)
+      _appContext._loopSamples.currentIdx++;
+    else
+      _appContext._loopSamples.flagLoop = false;
 
     frame_counter = 0;
   }
@@ -213,6 +205,12 @@ void BabylonInspectorApp::initScene()
   _appContext._sampleListComponent.OnEditFiles = [&](const std::vector<std::string> & files) {
     _codeEditor.setFiles(files);
     _appContext._viewState = ViewState::CodeEditor;
+  };
+  _appContext._sampleListComponent.OnLoopSamples = [&](const std::vector<std::string> & samples) {
+    _appContext._loopSamples.flagLoop = true;
+    _appContext._loopSamples.samplesToLoop = samples;
+    _appContext._loopSamples.currentIdx = 0;
+    _appContext._viewState = ViewState::Scene3d;
   };
 
   ImVec2 sceneSize = ImGui::GetIO().DisplaySize;

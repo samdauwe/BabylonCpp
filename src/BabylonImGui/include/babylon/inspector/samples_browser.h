@@ -19,6 +19,9 @@ public:
   using CallbackEditFiles = std::function<void(const std::vector<std::string> &)>;
   CallbackEditFiles OnEditFiles;
 
+  using CallbackLoopSamples = std::function<void(const std::vector<std::string> &)>;
+  CallbackLoopSamples OnLoopSamples;
+
 private:
   std::unique_ptr<SamplesBrowserImpl> pImpl;
 }; // end of class SampleListComponent

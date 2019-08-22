@@ -77,6 +77,7 @@ public:
 
   SamplesBrowser::CallbackNewRenderableScene OnNewRenderableScene;
   SamplesBrowser::CallbackEditFiles OnEditFiles;
+  SamplesBrowser::CallbackLoopSamples OnLoopSamples;
 
 private:
   void render_filter()
@@ -113,6 +114,22 @@ private:
     ImGui::SameLine();
     if (ImGui::Button("Expand All"))
       collapseMode = CollapseMode::ExpandAll;
+
+    if (OnLoopSamples)
+    {
+      ImGui::SameLine(ImGui::GetContentRegionAvailWidth() - 150.f);
+      if (ImGui::Button("Loop filtered samples"))
+      {
+        std::vector<std::string> filteredSamples;
+        for (const auto & kv : _matchingSamples)
+        {
+          for (auto sampleName : kv.second)
+            filteredSamples.push_back(sampleName);
+        }
+        OnLoopSamples(filteredSamples);
+      }
+    }
+      
 
     ImGui::BeginChild("Child1");
     for (const auto & kv : _matchingSamples)
@@ -306,6 +323,7 @@ void SamplesBrowser::render()
 {
   pImpl->OnNewRenderableScene = OnNewRenderableScene;
   pImpl->OnEditFiles = OnEditFiles;
+  pImpl->OnLoopSamples = OnLoopSamples;
   pImpl->render();
 }
 

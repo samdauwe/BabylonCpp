@@ -19,12 +19,10 @@ int main(int argc, char** argv)
   bool listSamples = false;
   bool flagStandaloneImgui = false;
   std::string sampleName = "Hello Scene";
-  std::string sampleGroup = "";
   {
     CLI::App arg_cli{ "BabylonCpp samples runner" };
     arg_cli.add_flag("-v,--verbose", flagVerbose, "Verbose mode");
     arg_cli.add_option("-s,--sample", sampleName, "Which sample to run");
-    arg_cli.add_option("-g,--sample-group", sampleGroup, "Which sample group to run");
     arg_cli.add_flag("-l,--list", listSamples, "List samples");
     arg_cli.add_flag("-f,--fullscreen", flagFullscreen, "run in fullscreen");
     arg_cli.add_flag("-i,--standalone-imgui", flagStandaloneImgui, "run standalone scene in imgui, without the inspector");
