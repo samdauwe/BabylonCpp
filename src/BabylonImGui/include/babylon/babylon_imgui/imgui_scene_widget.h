@@ -4,10 +4,10 @@
 #include <babylon/babylon_api.h>
 
 namespace BABYLON {
-  class SceneWidget_ImGui
+  class ImGuiSceneWidget
   {
   public:
-    SceneWidget_ImGui(ImVec2 size = ImVec2(0.f, 0.f));
+    ImGuiSceneWidget(ImVec2 size = ImVec2(0.f, 0.f));
 
     BABYLON::GL::FramebufferCanvas * getCanvas();
     void setRenderableScene(std::shared_ptr<BABYLON::IRenderableScene> scene);

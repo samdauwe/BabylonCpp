@@ -1,6 +1,6 @@
 #include "run_standalone_imgui.h"
 #include <imgui_utils/app_runner/imgui_runner.h>
-#include <babylon/babylon_imgui/scene_widget_Imgui.h>
+#include <babylon/babylon_imgui/imgui_scene_widget.h>
 
 
 // This file demonstrates how to run a standalone scene, using imgui as a backend
@@ -18,12 +18,12 @@ void runStandalone_imgui(
 
   // BABYLON::SceneWidget_ImGui is am ImGui widget that will display the scene
   // It *cannot* be initialized before Glfw and ImGui
-  std::unique_ptr<BABYLON::SceneWidget_ImGui> sceneWidget;
+  std::unique_ptr<BABYLON::ImGuiSceneWidget> sceneWidget;
 
   // This lambda will init the scene widget *after* Glfw and ImGui are inited
   auto initScene = [&]() {
     ImVec2 sceneSize = ImGui::GetIO().DisplaySize;
-    sceneWidget = std::make_unique<BABYLON::SceneWidget_ImGui>(sceneSize);
+    sceneWidget = std::make_unique<BABYLON::ImGuiSceneWidget>(sceneSize);
     sceneWidget->setRenderableScene(scene);
   };
 

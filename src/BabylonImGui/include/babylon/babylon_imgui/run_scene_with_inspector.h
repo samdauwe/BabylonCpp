@@ -1,7 +1,7 @@
 #ifndef BABYLON_INSPECTOR_APP_H
 #define BABYLON_INSPECTOR_APP_H
 #include <map>
-#include <babylon/babylon_imgui/scene_widget_Imgui.h>
+#include <babylon/babylon_imgui/imgui_scene_widget.h>
 #include <babylon/inspector/inspector.h>
 #include <babylon/inspector/samples_browser.h>
 #include <imgui_utils/code_editor.h>

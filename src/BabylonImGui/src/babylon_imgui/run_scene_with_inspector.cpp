@@ -44,7 +44,7 @@ private:
 
   struct AppContext
   {
-    std::unique_ptr<BABYLON::SceneWidget_ImGui> _sceneWidget;
+    std::unique_ptr<BABYLON::ImGuiSceneWidget> _sceneWidget;
     BABYLON::Inspector _inspector;
     BABYLON::SamplesBrowser _sampleListComponent;
     ViewState _viewState = ViewState::Scene3d;
@@ -219,7 +219,7 @@ void BabylonInspectorApp::initScene()
   sceneSize.x -= INSPECTOR_WIDTH;
   sceneSize.y -= 60;
 
-  _appContext._sceneWidget = std::make_unique<BABYLON::SceneWidget_ImGui>(sceneSize);
+  _appContext._sceneWidget = std::make_unique<BABYLON::ImGuiSceneWidget>(sceneSize);
 }
 
 } // namespace impl

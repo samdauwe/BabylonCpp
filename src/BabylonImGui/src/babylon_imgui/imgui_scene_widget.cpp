@@ -1,5 +1,5 @@
 #include "babylon/GL/framebuffer_canvas.h"
-#include "babylon/babylon_imgui/scene_widget_Imgui.h"
+#include "babylon/babylon_imgui/imgui_scene_widget.h"
 #include <imgui.h>
 
 #ifdef _MSC_VER
@@ -15,12 +15,12 @@ namespace BABYLON {
     return sqrt(dx * dx + dy * dy);
   }
 
-  SceneWidget_ImGui::SceneWidget_ImGui(ImVec2 size) :
+  ImGuiSceneWidget::ImGuiSceneWidget(ImVec2 size) :
     _size(size)
   {
   }
 
-  void SceneWidget_ImGui::initializeFramebufferCanvas()
+  void ImGuiSceneWidget::initializeFramebufferCanvas()
   {
     ImVec2 realSize(_size);
     _framebuffer_canvas = std::make_unique<BABYLON::GL::FramebufferCanvas>();
@@ -36,12 +36,12 @@ namespace BABYLON {
     _framebuffer_canvas->initializeFrameBuffer();
   }
 
-  BABYLON::GL::FramebufferCanvas * SceneWidget_ImGui::getCanvas()
+  BABYLON::GL::FramebufferCanvas * ImGuiSceneWidget::getCanvas()
   {
     return _framebuffer_canvas.get();
   }
 
-  void SceneWidget_ImGui::setRenderableScene(std::shared_ptr<BABYLON::IRenderableScene> scene)
+  void ImGuiSceneWidget::setRenderableScene(std::shared_ptr<BABYLON::IRenderableScene> scene)
   {
     initializeFramebufferCanvas();
 
@@ -49,17 +49,17 @@ namespace BABYLON {
     _renderableScene->initialize(_framebuffer_canvas.get());
   }
 
-  BABYLON::IRenderableScene * SceneWidget_ImGui::getRenderableScene()
+  BABYLON::IRenderableScene * ImGuiSceneWidget::getRenderableScene()
   {
     return _renderableScene.get();
   }
 
-  BABYLON::Scene * SceneWidget_ImGui::getScene()
+  BABYLON::Scene * ImGuiSceneWidget::getScene()
   {
     return _renderableScene->getScene();
   }
 
-  void SceneWidget_ImGui::render()
+  void ImGuiSceneWidget::render()
   {
     ImVec2 canvasSize(
       static_cast<float>(_framebuffer_canvas->width),
