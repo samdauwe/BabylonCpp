@@ -31,6 +31,27 @@ static ImVec4 red            = ImColor(1.00f, 0.00f, 0.00f, 1.0f); // #FF0000
 static ImVec4 yellow         = ImColor(1.00f, 1.00f, 0.00f, 1.0f); // #FFFF00
 
 /**
+ * @brief Same as ImGui original InputText, but works with an in/out std::string
+ * @return color "color-bot"
+ */
+inline bool InputText_String(
+  const std::string &label, 
+  std::string & inOutStr,
+  ImGuiInputTextFlags flags = 0,
+  ImGuiInputTextCallback callback = NULL, 
+  void* user_data = NULL
+  )
+{
+  size_t buf_size = inOutStr.size() + 1000;
+  char *buf = (char *)malloc(buf_size);
+  strcpy(buf, inOutStr.c_str());
+  bool changed = ImGui::InputText(label.c_str(), buf, buf_size, flags, callback, user_data);
+  inOutStr = std::string(buf);
+  free(buf);
+  return changed;
+}
+
+/**
  * @brief Returns color "color-bot" #5db0d7 -> rgba(93, 176, 215, 1)
  * @return color "color-bot"
  */
@@ -527,3 +548,8 @@ struct FrameTimeHistogram {
 }; // end of struct FrameTimeHistogram
 
 } // namespace ImGui
+
+namespace ImGuiUtils
+{
+  void ImageFromFile(const std::string &filename, ImVec2 size = ImVec2(0.f, 0.f));
+}

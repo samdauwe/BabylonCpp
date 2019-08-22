@@ -51,4 +51,5 @@ target_link_libraries(${TARGET}
     glad
     imgui
     ${OPENGL_LIBRARIES}
+    BabylonCpp
 )
