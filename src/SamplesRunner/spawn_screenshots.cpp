@@ -1,5 +1,6 @@
 #include <babylon/samples/samples_index.h>
 #include <babylon/core/logging.h>
+#include <iostream>
 
 #ifdef _WIN32
 #include <process.h>
@@ -8,6 +9,7 @@
 namespace BABYLON {
 namespace impl {
 
+#ifdef _WIN32
 void spawnScreenshots(const std::string & exeName, bool skipFailing)
 {
   BABYLON::Samples::SamplesIndex samplesIndex;
@@ -23,6 +25,15 @@ void spawnScreenshots(const std::string & exeName, bool skipFailing)
       _spawnl(P_WAIT, exeName.c_str(), exeName.c_str(), "-s", sample.c_str(), "-p", NULL);
   }
 }
+#else
+
+#pragma message("spawnScreenshots is not yet implmented on *nixes")
+
+void spawnScreenshots(const std::string & , bool)
+{
+  std::cerr << "spawnScreenshots is not yet implmented on *nixes";
+}
+#endif
 
 } // namespace impl
 } // namespace BABYLON
