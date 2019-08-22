@@ -58,7 +58,7 @@ target_link_libraries(${TARGET}
     glad
     imgui
     imgui_utils
-    imgui_babylon
+    BabylonImGui
     ImGuiColorTextEdit
     ${OPENGL_LIBRARIES}
     BabylonCpp

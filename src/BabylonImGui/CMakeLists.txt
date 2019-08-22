@@ -6,7 +6,7 @@
 include(../../cmake/BuildEnvironment.cmake)
 
 # Target name
-set(TARGET imgui_babylon)
+set(TARGET BabylonImGui)
 
 # Project name
 project(${TARGET} C CXX)

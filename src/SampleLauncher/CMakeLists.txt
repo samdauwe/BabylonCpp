@@ -86,7 +86,7 @@ target_link_libraries(${TARGET}
 if (OPTION_BUILD_IMGUI_BABYLON)
     target_link_libraries(${TARGET}
         PUBLIC
-        imgui_babylon
+        BabylonImGui
     )
 endif()
 

@@ -30,7 +30,7 @@ if (OPTION_BUILD_LOADERS)
 endif()
 # - imgui_babylon and Inspector
 if (OPTION_BUILD_IMGUI_BABYLON)
-    add_subdirectory(imgui_babylon)
+    add_subdirectory(BabylonImGui)
 endif()
 # - Samples
 add_subdirectory(Samples)
