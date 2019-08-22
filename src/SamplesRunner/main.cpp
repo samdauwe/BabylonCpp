@@ -5,7 +5,7 @@
 #include <babylon/core/logging.h>
 #include <iostream>
 #include "console_logger.h"
-#include "CLI11.h"
+#include <babylon/utils/CLI11.h>
 #include "spawn_screenshots.h"
 #include <imgui_utils/code_editor.h>
 
