@@ -65,9 +65,6 @@ public:
   void render()
   {
     render_filter();
-    ImGui::Checkbox("Show original screenshots", &_showOriginalScreenshots);
-    ImGui::SameLine();
-    ImGui::Checkbox("Show current screenshots", &_showCurrentScreenshots);
     ImGui::Separator();
     render_list();
     ImGui::NewLine();
@@ -98,22 +95,8 @@ private:
 
     if (changed)
       fillMatchingSamples();
-  }
 
-  void render_list()
-  {
-    enum class CollapseMode
-    {
-      None,
-      CollapseAll,
-      ExpandAll
-    };
-    CollapseMode collapseMode = CollapseMode::None;
-    if (ImGui::Button("Collapse All"))
-      collapseMode = CollapseMode::CollapseAll;
-    ImGui::SameLine();
-    if (ImGui::Button("Expand All"))
-      collapseMode = CollapseMode::ExpandAll;
+    ImGui::Text("Matching samples : %zi", nbMatchingSamples());
 
     if (OnLoopSamples)
     {
@@ -129,8 +112,30 @@ private:
         OnLoopSamples(filteredSamples);
       }
     }
-      
+  }
 
+  void render_list()
+  {
+    ImGui::Checkbox("Show original screenshots", &_showOriginalScreenshots);
+    ImGui::SameLine();
+    ImGui::Checkbox("Show current screenshots", &_showCurrentScreenshots);
+
+    enum class CollapseMode
+    {
+      None,
+      CollapseAll,
+      ExpandAll
+    };
+    CollapseMode collapseMode = CollapseMode::None;
+    if (ImGui::Button("Collapse All"))
+      collapseMode = CollapseMode::CollapseAll;
+    ImGui::SameLine();
+    if (ImGui::Button("Expand All"))
+      collapseMode = CollapseMode::ExpandAll;
+
+
+    ImGui::Separator();
+      
     ImGui::BeginChild("Child1");
     for (const auto & kv : _matchingSamples)
     {
@@ -293,6 +298,14 @@ private:
         _matchingSamples[category] = s;
       }
     }
+  }
+
+  size_t nbMatchingSamples()
+  {
+    size_t r = 0;
+    for (const auto &kv : _matchingSamples)
+      r += kv.second.size();
+    return r;
   }
 
   std::map<SampleName, SampleInfo> _samplesInfos;
