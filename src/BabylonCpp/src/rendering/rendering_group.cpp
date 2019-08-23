@@ -18,11 +18,11 @@ namespace BABYLON {
 
 RenderingGroup::RenderingGroup(
   unsigned int iIndex, Scene* scene,
-  const std::function<int(const SubMesh* a, const SubMesh* b)>&
+  const std::function<bool(const SubMesh* a, const SubMesh* b)>&
     iOpaqueSortCompareFn,
-  const std::function<int(const SubMesh* a, const SubMesh* b)>&
+  const std::function<bool(const SubMesh* a, const SubMesh* b)>&
     iAlphaTestSortCompareFn,
-  const std::function<int(const SubMesh* a, const SubMesh* b)>&
+  const std::function<bool(const SubMesh* a, const SubMesh* b)>&
     iTransparentSortCompareFn)
     : index{iIndex}
     , onBeforeTransparentRendering{nullptr}
@@ -57,7 +57,7 @@ RenderingGroup::~RenderingGroup()
 }
 
 void RenderingGroup::set_opaqueSortCompareFn(
-  const std::function<int(const SubMesh* a, const SubMesh* b)>& value)
+  const std::function<bool(const SubMesh* a, const SubMesh* b)>& value)
 {
   _opaqueSortCompareFn = value;
   if (value) {
@@ -73,7 +73,7 @@ void RenderingGroup::set_opaqueSortCompareFn(
 }
 
 void RenderingGroup::set_alphaTestSortCompareFn(
-  const std::function<int(const SubMesh* a, const SubMesh* b)>& value)
+  const std::function<bool(const SubMesh* a, const SubMesh* b)>& value)
 {
   _alphaTestSortCompareFn = value;
   if (value) {
@@ -89,7 +89,7 @@ void RenderingGroup::set_alphaTestSortCompareFn(
 }
 
 void RenderingGroup::set_transparentSortCompareFn(
-  const std::function<int(const SubMesh* a, const SubMesh* b)>& value)
+  const std::function<bool(const SubMesh* a, const SubMesh* b)>& value)
 {
   if (value) {
     _transparentSortCompareFn = value;
@@ -200,7 +200,7 @@ void RenderingGroup::renderTransparentSorted(
 
 void RenderingGroup::renderSorted(
   const std::vector<SubMesh*>& subMeshes,
-  const std::function<int(const SubMesh* a, const SubMesh* b)>& sortCompareFn,
+  const std::function<bool(const SubMesh* a, const SubMesh* b)>& sortCompareFn,
   const CameraPtr& camera, bool transparent)
 {
   auto cameraPosition = camera ? camera->globalPosition() : Vector3::Zero();
@@ -243,45 +243,45 @@ void RenderingGroup::renderUnsorted(const std::vector<SubMesh*>& subMeshes)
   }
 }
 
-int RenderingGroup::defaultTransparentSortCompare(const SubMesh* a,
+bool RenderingGroup::defaultTransparentSortCompare(const SubMesh* a,
                                                   const SubMesh* b)
 {
   // Alpha index first
   if (a->_alphaIndex > b->_alphaIndex) {
-    return 1;
+    return true;
   }
   if (a->_alphaIndex < b->_alphaIndex) {
-    return -1;
+    return false;
   }
 
   // Then distance to camera
   return RenderingGroup::backToFrontSortCompare(a, b);
 }
 
-int RenderingGroup::backToFrontSortCompare(const SubMesh* a, const SubMesh* b)
+bool RenderingGroup::backToFrontSortCompare(const SubMesh* a, const SubMesh* b)
 {
   // Then distance to camera
   if (a->_distanceToCamera < b->_distanceToCamera) {
-    return 1;
+    return true;
   }
   if (a->_distanceToCamera > b->_distanceToCamera) {
-    return -1;
+    return false;
   }
 
-  return 0;
+  return false;
 }
 
-int RenderingGroup::frontToBackSortCompare(SubMesh* a, SubMesh* b)
+bool RenderingGroup::frontToBackSortCompare(SubMesh* a, SubMesh* b)
 {
   // Then distance to camera
   if (a->_distanceToCamera < b->_distanceToCamera) {
-    return -1;
+    return false;
   }
   if (a->_distanceToCamera > b->_distanceToCamera) {
-    return 1;
+    return true;
   }
 
-  return 0;
+  return false;
 }
 
 void RenderingGroup::prepare()
