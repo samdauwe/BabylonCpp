@@ -12,4 +12,4 @@
 	url = https://github.com/ocornut/imgui
 [submodule "external/ImGuiColorTextEdit"]
 	path = external/ImGuiColorTextEdit
-	url = git@github.com:BalazsJako/ImGuiColorTextEdit.git
+	url = https://github.com/BalazsJako/ImGuiColorTextEdit.git
