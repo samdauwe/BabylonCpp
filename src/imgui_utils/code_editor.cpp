@@ -1,3 +1,4 @@
+#include <functional>
 #include <string>
 #include <iostream>
 #include <babylon/core/filesystem.h>
@@ -9,6 +10,9 @@
 #include <imgui_utils/app_runner/imgui_runner.h>
 
 namespace ImGuiUtils {
+
+std::function<void(void)> guiAllowEdition;
+
 
 class OneCodeEditor
 {
@@ -95,20 +99,26 @@ private:
         _textEditor.Paste();
     }
 
-    ImGui::SameLine(ImGui::GetWindowContentRegionWidth() - 200.f);
-    if (ImGui::Button("Open in text editor"))
-      BABYLON::System::openFile(_filePath);
   }
 
   void renderStatusLine()
   {
+
     auto cpos = _textEditor.GetCursorPosition();
     bool isTextModified = (_fileContent_Saved != _textEditor.GetText());
-    ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1, cpos.mColumn + 1, _textEditor.GetTotalLines(),
-      _textEditor.IsOverwrite() ? "Ovr" : "Ins",
+    ImGui::Text("%s", _filePath.c_str());
+    ImGui::Text("%6d/%-6d %6d lines | %s | %s | %s ", cpos.mLine + 1, cpos.mColumn + 1, _textEditor.GetTotalLines(),
       isTextModified ? "*" : " ",
       _textEditor.GetLanguageDefinition().mName.c_str(),
-      _filePath.c_str());
+      _textEditor.IsOverwrite() ? "Ovr" : "Ins"
+      );
+
+    ImGui::SameLine(0., 100.f);
+    if (guiAllowEdition)
+      guiAllowEdition();
+    ImGui::SameLine();
+    if (ImGui::Button(ICON_FA_EDIT "external editor"))
+      BABYLON::System::openFile(_filePath);
   }
 
   void checkExternalModifications()
@@ -159,6 +169,11 @@ public:
       _editors.push_back(OneCodeEditor(filePath));
     if (!_editors.empty())
       _currentEditor = &_editors.back();
+
+    guiAllowEdition = [this]() {
+      this->renderAllowEdition();
+    };
+
     updateReadOnly();
   }
 
@@ -170,14 +185,16 @@ public:
     }
   }
 
+  void renderAllowEdition()
+  {
+    if (ImGui::Checkbox("Allow edition", &_canEdit))
+      updateReadOnly();
+  }
+
   void render()
   {
     if (_editors.empty())
       return;
-
-    if (ImGui::Checkbox("Allow edition", &_canEdit))
-      updateReadOnly();
-    ImGui::SameLine();
 
     renderTabs();
     ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 200.f);
