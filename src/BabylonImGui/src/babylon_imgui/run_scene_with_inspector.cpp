@@ -88,8 +88,8 @@ namespace
         ImGui::PopStyleColor();
       ImGui::SameLine();
     }
-    ImGui::NewLine();
-    ImGui::Separator();
+    //ImGui::NewLine();
+    //ImGui::Separator();
     return changed;
   }
 
@@ -104,14 +104,22 @@ std::map<BabylonInspectorApp::ViewState, std::string> BabylonInspectorApp::ViewS
 
 bool BabylonInspectorApp::render()
 {
+  bool shallExit = false;
+
   _appContext._inspector.render(false, INSPECTOR_WIDTH);
   ImGui::SameLine();
 
   ImGui::BeginGroup();
   ImGui::Text("%s", _appContext._sceneWidget->getRenderableScene()->getName());
-  ImGui::SameLine(0., 200.);
+  ImGui::SameLine(0., 100.);
 
   ShowTabBarEnum(ViewStateLabels, &_appContext._viewState);
+
+  ImGui::SameLine(0.f, 150.f);
+  if (ImGui::Button(ICON_FA_DOOR_OPEN  "Exit"))
+    shallExit = true;
+
+  ImGui::Separator();
 
   if (_appContext._viewState == ViewState::Scene3d)
     _appContext._sceneWidget->render();
@@ -120,6 +128,7 @@ bool BabylonInspectorApp::render()
   else if (_appContext._viewState == ViewState::SampleBrowser)
     _appContext._sampleListComponent.render();
 
+
   ImGui::EndGroup();
 
   handleLoopSamples();
@@ -127,7 +136,7 @@ bool BabylonInspectorApp::render()
   if (_appContext._options._flagScreenshotOneSampleAndExit)
     return saveScreenshot();
   else
-    return false;
+    return shallExit;
 }
 
 void BabylonInspectorApp::setRenderableScene(std::shared_ptr<BABYLON::IRenderableScene> scene)
