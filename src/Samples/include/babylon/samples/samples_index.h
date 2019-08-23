@@ -20,7 +20,8 @@ enum class SampleFailureReason {
   processHung,
   blankDisplay,
   invalidComparator,
-  vectorIteratorInvalid
+  vectorIteratorInvalid,
+  empty3d
 };
 std::string BABYLON_SHARED_EXPORT SampleFailureReason_Str(SampleFailureReason s);
 

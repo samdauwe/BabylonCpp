@@ -59,6 +59,37 @@ SamplesIndex::SamplesIndex()
   {"SphericalReflectionTextureScene", SampleFailureReason::vectorIteratorInvalid},
   {"TubeScene", SampleFailureReason::outOfBoundAccess},
   {"XRayMaterialWithFresnelSkullScene", SampleFailureReason::invalidComparator},
+
+  // Empty 3d
+  {"BoneRotationInWorldSpaceScene", SampleFailureReason::empty3d},
+  {"BoxShadowScene", SampleFailureReason::empty3d},
+  {"BrickProceduralTextureScene", SampleFailureReason::empty3d},
+  {"CloudProceduralTextureScene", SampleFailureReason::empty3d},
+  {"CustomRenderTargetsScene", SampleFailureReason::empty3d},
+  {"DawnBringerScene", SampleFailureReason::empty3d},
+  {"FadeInOutScene", SampleFailureReason::empty3d},
+  {"FireProceduralTextureScene", SampleFailureReason::empty3d},
+  {"GrassProceduralTextureScene", SampleFailureReason::empty3d},
+  {"HeatWaveScene", SampleFailureReason::empty3d},
+  {"HighlightLayerScene", SampleFailureReason::empty3d},
+  {"ImportDudeScene", SampleFailureReason::empty3d},
+  {"ImportDummy3Scene", SampleFailureReason::empty3d},
+  {"ImportRabbitScene", SampleFailureReason::empty3d},
+  {"MarbleProceduralTextureScene", SampleFailureReason::empty3d},
+  {"PBRMaterialScene", SampleFailureReason::empty3d},
+  {"PerlinNoiseProceduralTextureScene", SampleFailureReason::empty3d},
+  {"PortalsScene", SampleFailureReason::empty3d},
+  {"ProceduralTexturesScene", SampleFailureReason::empty3d},
+  {"RealtimeRefractionScene", SampleFailureReason::empty3d},
+  {"RenderTargetTextureScene", SampleFailureReason::empty3d},
+  {"RGBShiftGlitchScene", SampleFailureReason::empty3d},
+  {"RoadProceduralTextureScene", SampleFailureReason::empty3d},
+  {"ShaderMaterialWarpSpeedScene", SampleFailureReason::empty3d},
+  {"ShadowsScene", SampleFailureReason::empty3d},
+  {"StarfieldProceduralTextureScene", SampleFailureReason::empty3d},
+  {"WaterMaterialScene", SampleFailureReason::empty3d},
+  {"WoodProceduralTextureScene", SampleFailureReason::empty3d},
+
   };
 
   // Initialize the samples index
@@ -296,6 +327,9 @@ std::string SampleFailureReason_Str(SampleFailureReason s)
       break;
     case SampleFailureReason::vectorIteratorInvalid:
       return "vector iterators in range are from different containers";
+      break;
+    case SampleFailureReason::empty3d:
+      return "3D rendering is empty";
       break;
     default:
       throw "Unhandled enum!";
