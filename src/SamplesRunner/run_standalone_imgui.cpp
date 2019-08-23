@@ -39,7 +39,11 @@ void runStandalone_imgui(
     }
 
     // This will display the 3d scene, and handle the mouse & keyboard events
-    sceneWidget->render();
+    // The scene is 40px less high than the window in order to give some room for
+    // the additional checkbox
+    // Feel free to use all the space!
+    ImVec2 widgetSize(ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y - 40.f);
+    sceneWidget->render(widgetSize);
   };
 
   // this will run the application

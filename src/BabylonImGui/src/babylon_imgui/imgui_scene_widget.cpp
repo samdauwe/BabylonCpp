@@ -16,24 +16,17 @@ namespace BABYLON {
     return sqrt(dx * dx + dy * dy);
   }
 
-  ImGuiSceneWidget::ImGuiSceneWidget(ImVec2 size) :
-    _size(size)
+  ImGuiSceneWidget::ImGuiSceneWidget(ImVec2 size)
   {
+    _width = static_cast<int>(size.x);
+    _height = static_cast<int>(size.y);
   }
 
   void ImGuiSceneWidget::initializeFramebufferCanvas()
   {
-    ImVec2 realSize(_size);
     _framebuffer_canvas = std::make_unique<BABYLON::GL::FramebufferCanvas>();
-    if (realSize.x < 0.1f) {
-      realSize = ImGui::GetIO().DisplaySize;
-      realSize.y -= 20.f;
-    }
-
-    int width = static_cast<int>(realSize.x);
-    int height = static_cast<int>(realSize.y);
-    _framebuffer_canvas->clientWidth = width;
-    _framebuffer_canvas->clientHeight = height;
+    _framebuffer_canvas->clientWidth = _width;
+    _framebuffer_canvas->clientHeight = _height;
     _framebuffer_canvas->initializeFrameBuffer();
   }
 
@@ -45,8 +38,15 @@ namespace BABYLON {
   void ImGuiSceneWidget::setRenderableScene(std::shared_ptr<BABYLON::IRenderableScene> scene)
   {
     initializeFramebufferCanvas();
-
     _renderableScene = scene;
+    _renderableScene->initialize(_framebuffer_canvas.get());
+  }
+
+  void ImGuiSceneWidget::resizeFramebuffer()
+  {
+    for (auto callback : OnBeforeResize)
+      callback();
+    initializeFramebufferCanvas();
     _renderableScene->initialize(_framebuffer_canvas.get());
   }
 
@@ -60,8 +60,22 @@ namespace BABYLON {
     return _renderableScene->getScene();
   }
 
-  void ImGuiSceneWidget::render()
+  void ImGuiSceneWidget::render(ImVec2 size)
   {
+    // Resize framebuffer if needed 
+    int width = static_cast<int>(size.x);
+    int height = static_cast<int>(size.y);
+
+    if ((width > 0) && (height  > 0))
+    {
+      if ( (width != _width) || (height != _height))
+      {
+        _width = width;
+        _height = height;
+        resizeFramebuffer();
+      }
+    }
+
     ImVec2 canvasSize(
       static_cast<float>(_framebuffer_canvas->width),
       static_cast<float>(_framebuffer_canvas->height));

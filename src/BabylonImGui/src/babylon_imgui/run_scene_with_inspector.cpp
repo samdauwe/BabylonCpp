@@ -95,18 +95,38 @@ private:
       _appContext._viewState = ViewState::Scene3d;
     };
 
+    _appContext._sceneWidget = std::make_unique<BABYLON::ImGuiSceneWidget>(getSceneSize());
+    _appContext._sceneWidget->OnBeforeResize.push_back(
+      [this]() {
+        _appContext._inspector.release();
+    }
+    );
+  }
+
+  ImVec2 getSceneSize()
+  {
     ImVec2 sceneSize = ImGui::GetIO().DisplaySize;
     sceneSize.x -= INSPECTOR_WIDTH;
     sceneSize.y -= 60;
+    return sceneSize;
+  }
 
-    _appContext._sceneWidget = std::make_unique<BABYLON::ImGuiSceneWidget>(sceneSize);
+  void createInspectorIfNeeded()
+  {
+    auto currentScene = _appContext._sceneWidget->getScene();
+    if ((! _appContext._inspector) || (_appContext._inspector->scene() != currentScene))
+    {
+      _appContext._inspector = std::make_unique<BABYLON::Inspector>(nullptr, _appContext._sceneWidget->getScene());
+      _appContext._inspector->setScene(currentScene);
+    }
   }
 
   bool render() // renders the GUI. Returns true when exit required
   {
-    bool shallExit = false;
 
-    _appContext._inspector.render(false, INSPECTOR_WIDTH);
+    bool shallExit = false;
+    createInspectorIfNeeded();
+    _appContext._inspector->render(false, INSPECTOR_WIDTH);
     ImGui::SameLine();
 
     ImGui::BeginGroup();
@@ -122,7 +142,7 @@ private:
     ImGui::Separator();
 
     if (_appContext._viewState == ViewState::Scene3d)
-      _appContext._sceneWidget->render();
+      _appContext._sceneWidget->render(getSceneSize());
     if (_appContext._viewState == ViewState::CodeEditor)
       _codeEditor.render();
     else if (_appContext._viewState == ViewState::SampleBrowser)
@@ -141,9 +161,7 @@ private:
 
   void setRenderableScene(std::shared_ptr<BABYLON::IRenderableScene> scene)
   {
-    _appContext._inspector.setScene(nullptr);
     _appContext._sceneWidget->setRenderableScene(scene);
-    _appContext._inspector.setScene(_appContext._sceneWidget->getScene());
     _appContext._viewState = ViewState::Scene3d;
   }
 
@@ -193,7 +211,7 @@ private:
   struct AppContext
   {
     std::unique_ptr<BABYLON::ImGuiSceneWidget> _sceneWidget;
-    BABYLON::Inspector _inspector;
+    std::unique_ptr< BABYLON::Inspector> _inspector;
     BABYLON::SamplesBrowser _sampleListComponent;
     ViewState _viewState = ViewState::Scene3d;
     int _frameCounter = 0;

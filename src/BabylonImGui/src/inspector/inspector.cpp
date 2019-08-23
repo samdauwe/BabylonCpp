@@ -47,7 +47,7 @@ static ImFont* _fontSolid   = nullptr;
 
 std::function<void(const std::string &)> Inspector::OnSampleChanged;
 
-Inspector::Inspector(GLFWwindow* glfwWindow, Scene* scene)
+Inspector::Inspector(GLFWwindow* glfwWindow, Scene* scene) // KK remove glfwWindow
     : _glfwWindow{glfwWindow}
     , _scene{scene}
     , _actionStore{std::make_unique<ActionStore>()}
