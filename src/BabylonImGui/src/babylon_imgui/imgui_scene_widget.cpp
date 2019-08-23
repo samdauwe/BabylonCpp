@@ -1,5 +1,6 @@
 #include "babylon/GL/framebuffer_canvas.h"
 #include "babylon/babylon_imgui/imgui_scene_widget.h"
+#include <cmath>
 #include <imgui.h>
 
 #ifdef _MSC_VER
