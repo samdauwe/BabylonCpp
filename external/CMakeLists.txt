@@ -68,4 +68,10 @@ source_group_by_path_all(${IMGUI_EDITOR_DIR} ${IMGUI_EDITOR_FILES})
 add_library(ImGuiColorTextEdit STATIC ${IMGUI_EDITOR_FILES})
 target_include_directories(ImGuiColorTextEdit PUBLIC ${IMGUI_EDITOR_DIR} ${IMGUI_EDITOR_DIR}/..)
 target_link_libraries(ImGuiColorTextEdit PUBLIC imgui)
-
+# Disable ImGuiColorTextEdit specific warnings
+if (MSVC)
+    target_compile_options(ImGuiColorTextEdit PRIVATE  /wd4244)
+endif()
+if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
+    target_compile_options(ImGuiColorTextEdit PRIVATE -Wno-reorder -Wno-sign-compare -Wno-unused-variable)
+endif()
