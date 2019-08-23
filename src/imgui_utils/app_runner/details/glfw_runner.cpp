@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include <imgui_utils/app_runner/details/glfw_runner.h>
 
 namespace ImGuiUtils
