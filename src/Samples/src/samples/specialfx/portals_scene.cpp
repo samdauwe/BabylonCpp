@@ -62,8 +62,8 @@ void PortalsScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Plane
   auto plane          = Mesh::CreatePlane("map", 10, scene);
   plane->position().z = -20.f;
-  plane->scaling().x  = 5.f / engine->getAspectRatio(*scene->activeCamera);
-  plane->scaling().y  = 5.f / engine->getAspectRatio(*scene->activeCamera);
+  plane->scaling().x  = 5.f / engine->getAspectRatio(*scene->activeCamera());
+  plane->scaling().y  = 5.f / engine->getAspectRatio(*scene->activeCamera());
   plane->visibility   = 1.f;
 
   // Render target

@@ -130,24 +130,52 @@ public:
   static microseconds_t MaxDeltaTime;
 
   /**
-   * The distance in pixel that you have to move to prevent some events.
+   * @brief Gets the distance in pixel that you have to move to prevent some
+   * events. Default is 10 pixels
    */
-  static unsigned int DragMovementThreshold;
+  static unsigned int DragMovementThreshold();
+
   /**
-   * Time in milliseconds to wait to raise long press events if button is still
-   * pressed.
+   * @brief Sets the distance in pixel that you have to move to prevent some
+   * events.
    */
-  static milliseconds_t LongPressDelay;
+  static void setDragMovementThreshold(unsigned int value);
+
   /**
-   * Time in milliseconds with two consecutive clicks will be considered as a
-   * double click.
+   * @brief Sets the time in milliseconds to wait to raise long press events if
+   * button is still pressed. Default is 500 ms
    */
-  static milliseconds_t DoubleClickDelay;
+  static milliseconds_t LongPressDelay();
+
   /**
-   * If you need to check double click without raising a single click at first
-   * click, enable this flag.
+   * @brief Sets the time in milliseconds to wait to raise long press events if
+   * button is still pressed.
    */
-  static bool ExclusiveDoubleClickMode;
+  static void setLongPressDelay(milliseconds_t value);
+
+  /**
+   * @brief Gets the time in milliseconds to wait to raise long press events if
+   * button is still pressed. Default is 300 ms
+   */
+  static milliseconds_t DoubleClickDelay();
+
+  /**
+   * @brief Sets the time in milliseconds to wait to raise long press events if
+   * button is still pressed.
+   */
+  static void setDoubleClickDelay(milliseconds_t value);
+
+  /**
+   * @brief If you need to check double click without raising a single click at
+   * first click, enable this flag.
+   */
+  static bool ExclusiveDoubleClickMode();
+
+  /**
+   * @brief If you need to check double click without raising a single click at
+   * first click, enable this flag.
+   */
+  static void setExclusiveDoubleClickMode(bool value);
 
   template <typename... Ts>
   static std::unique_ptr<Scene> New(Ts&&... args)
@@ -479,11 +507,6 @@ public:
   void _checkIsReady();
 
   /** Animations **/
-
-  /**
-   * @brief Gets all animations attached to the scene.
-   */
-  std::vector<AnimatablePtr> getAnimations() override;
 
   /**
    * @brief Will start the animation sequence of a given target.
@@ -2137,11 +2160,6 @@ protected:
   void set_simplificationQueue(const SimplificationQueuePtr& value);
 
   /**
-   * @brief Hidden
-   */
-  bool get_isAlternateRenderingEnabled() const;
-
-  /**
    * @brief Gets the list of frustum planes (built from the active camera).
    */
   std::array<Plane, 6>& get_frustumPlanes();
@@ -2306,6 +2324,17 @@ public:
    * Hidden
    */
   std::unique_ptr<InputManager> _inputManager;
+
+  /**
+   * Define this parameter if you are using multiple cameras and you want to
+   * specify which one should be used for pointer position
+   */
+  CameraPtr cameraToUseForPointers;
+
+  /**
+   * Hidden
+   */
+  const bool _isScene;
 
   /**
    * Gets or sets a boolean that indicates if the scene must clear the render
@@ -2654,22 +2683,25 @@ public:
    */
   std::function<bool(const AbstractMeshPtr& mesh)> pointerMovePredicate;
 
-  /** Deprecated. Use onPointerObservable instead */
+  /** Callback called when a pointer move is detected */
   std::function<void(const PointerEvent& evt,
                      const std::optional<PickingInfo>& pickInfo,
                      PointerEventTypes type)>
     onPointerMove;
-  /** Deprecated. Use onPointerObservable instead */
+
+  /** Callback called when a pointer down is detected  */
   std::function<void(const PointerEvent& evt,
                      const std::optional<PickingInfo>& pickInfo,
                      PointerEventTypes type)>
     onPointerDown;
-  /** Deprecated. Use onPointerObservable instead */
+
+  /** Callback called when a pointer up is detected  */
   std::function<void(const PointerEvent& evt,
                      const std::optional<PickingInfo>& pickInfo,
                      PointerEventTypes type)>
     onPointerUp;
-  /** Deprecated. Use onPointerObservable instead */
+
+  /** Callback called when a pointer pick is detected */
   std::function<void(const PointerEvent& evt,
                      const std::optional<PickingInfo>& pickInfo)>
     onPointerPick;
@@ -2760,6 +2792,11 @@ public:
   json metadata;
 
   /**
+   * For internal use only. Please do not use.
+   */
+  json reservedDataStore;
+
+  /**
    * Gets the name of the plugin used to load this scene (null by default)
    */
   std::string loadingPluginName;
@@ -2801,12 +2838,6 @@ public:
    * out of the pointer event)
    */
   ReadOnlyProperty<Scene, Vector2> unTranslatedPointer;
-
-  /**
-   * Define this parameter if you are using multiple cameras and you want to
-   * specify which one should be used for pointer position.
-   */
-  CameraPtr cameraToUseForPointers;
 
   // Mirror
 
@@ -3128,6 +3159,12 @@ public:
   /** Hidden */
   PerfCounter _activeBones;
 
+  /** Hidden */
+  std::optional<high_res_time_point_t> _animationTimeLast;
+
+  /** Hidden */
+  int _animationTime;
+
   /**
    * Gets or sets a general scale for animation speed
    * @see https://www.babylonjs-playground.com/#IBU2W7#3
@@ -3142,6 +3179,8 @@ public:
   std::optional<float> _cachedVisibility;
   /** Hidden */
   std::vector<IDisposable*> _toBeDisposed;
+  /** Hidden */
+  std::vector<std::string> _pendingData;
 
   /**
    * Gets or sets a boolean indicating that all submeshes of active meshes must
@@ -3157,12 +3196,12 @@ public:
   std::vector<AnimatablePtr> _activeAnimatables;
 
   /** Hidden */
-  std::unique_ptr<Vector3> _forcedViewPosition;
+  Matrix _viewMatrix;
 
-  /**
-   * Hidden
-   */
-  ReadOnlyProperty<Scene, bool> _isAlternateRenderingEnabled;
+  std::array<Plane, 6> _frustumPlanes;
+
+  /** Hidden */
+  std::unique_ptr<Vector3> _forcedViewPosition;
 
   /**
    * Gets the list of frustum planes (built from the active camera)
@@ -3179,12 +3218,12 @@ public:
   /**
    * Hidden
    */
-  const bool useMaterialMeshMap;
+  bool useMaterialMeshMap;
 
   /**
    * Hidden
    */
-  const bool useClonedMeshhMap;
+  bool useClonedMeshhMap;
 
   /**
    * Backing store of defined scene components
@@ -3347,7 +3386,7 @@ public:
    * Defines the actions happening during the per camera render target step
    * Hidden
    */
-  Stage<CameraStageAction> _cameraDrawRenderTargetStage;
+  Stage<CameraStageFrameBufferAction> _cameraDrawRenderTargetStage;
 
   /**
    * Defines the actions happening just before the active camera is drawing
@@ -3496,46 +3535,8 @@ private:
   Observer<Camera>::Ptr _onAfterCameraRenderObserver;
   // Animations
   std::vector<std::string> _registeredForLateAnimationBindings;
-  // Pointers
-  std::function<void(PointerEvent&& evt)> _onPointerMove;
-  std::function<void(PointerEvent&& evt)> _onPointerDown;
-  std::function<void(PointerEvent&& evt)> _onPointerUp;
   // Gamepads
   std::unique_ptr<GamepadManager> _gamepadManager;
-  // Click events
-  std::function<void(
-    Observable<PointerInfoPre>& obs1, Observable<PointerInfo>& obs2,
-    const PointerEvent& evt,
-    const std::function<void(const ClickInfo& clickInfo,
-                             std::optional<PickingInfo>& pickResult)>& cb)>
-    _initClickEvent;
-  std::function<AbstractActionManagerPtr(const AbstractActionManagerPtr& act,
-                                         const ClickInfo& clickInfo)>
-    _initActionManager;
-  std::function<void(
-    unsigned int btn, const ClickInfo& clickInfo,
-    const std::function<void(const ClickInfo& clickInfo,
-                             const PointerInfo& pickResult)>& cb)>
-    _delayedSimpleClick;
-  milliseconds_t _delayedSimpleClickTimeout;
-  milliseconds_t _previousDelayedSimpleClickTimeout;
-  bool _meshPickProceed;
-  MouseButtonType _previousButtonPressed;
-  bool _previousHasSwiped;
-  std::optional<PickingInfo> _currentPickResult;
-  std::optional<PickingInfo> _previousPickResult;
-  int _totalPointersPressed;
-  bool _doubleClickOccured;
-  int _pointerX;
-  int _pointerY;
-  int _unTranslatedPointerX;
-  int _unTranslatedPointerY;
-  Vector2 _startingPointerPosition;
-  Vector2 _previousStartingPointerPosition;
-  high_res_time_point_t _startingPointerTime;
-  high_res_time_point_t _previousStartingPointerTime;
-  std::unordered_map<int, bool> _pointerCaptures;
-  // AbstractMesh* _meshUnderPointer;
   // Deterministic lockstep
   float _timeAccumulator;
   unsigned int _currentStepId;
@@ -3588,18 +3589,13 @@ private:
   // Performance counters
   PerfCounter _totalVertices;
   float _animationRatio;
-  std::optional<high_res_time_point_t> _animationTimeLast;
-  int _animationTime;
   int _renderId;
   int _frameId;
   int _executeWhenReadyTimeoutId;
   bool _intermediateRendering;
   int _viewUpdateFlag;
   int _projectionUpdateFlag;
-  int _alternateViewUpdateFlag;
-  int _alternateProjectionUpdateFlag;
   std::vector<IFileRequest> _activeRequests;
-  std::vector<std::string> _pendingData;
   bool _isDisposed;
   std::vector<AbstractMesh*> _activeMeshes;
   IActiveMeshCandidateProvider* _activeMeshCandidateProvider;
@@ -3611,7 +3607,6 @@ private:
   std::unique_ptr<RenderingManager> _renderingManager;
   Matrix _transformMatrix;
   std::unique_ptr<UniformBuffer> _sceneUbo;
-  std::unique_ptr<UniformBuffer> _alternateSceneUbo;
   std::unique_ptr<Matrix> _pickWithRayInverseMatrix;
 
   /**
@@ -3631,26 +3626,17 @@ private:
 
   /** Hidden */
   OutlineRendererPtr _outlineRenderer;
-  Matrix _viewMatrix;
   Matrix _projectionMatrix;
-  Matrix _alternateViewMatrix;
-  Matrix _alternateProjectionMatrix;
-  std::unique_ptr<Matrix> _alternateTransformMatrix;
-  bool _useAlternateCameraConfiguration;
-  bool _alternateRendering;
-  bool _frustumPlanesSet;
-  std::array<Plane, 6> _frustumPlanes;
 
   /** Hidden (Backing field) */
   Octree<AbstractMesh*>* _selectionOctree;
 
-  Vector2 _unTranslatedPointer;
-  AbstractMesh* _pointerOverMesh;
+  /** Hidden */
+  bool _frustumPlanesSet;
+
   std::unique_ptr<DebugLayer> _debugLayer;
   std::unordered_map<std::string, DepthRendererPtr> _depthRenderer;
   GeometryBufferRendererPtr _geometryBufferRenderer;
-  AbstractMesh* _pickedDownMesh;
-  AbstractMesh* _pickedUpMesh;
   std::string _uid;
   bool _blockMaterialDirtyMechanism;
 

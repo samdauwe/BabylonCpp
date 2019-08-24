@@ -699,7 +699,7 @@ void StandardRenderingPipeline::_createVolumetricLightPostProcess(Scene* scene,
   volumetricLightPostProcess->onApply
     = [&](Effect* effect, EventState& /*es*/) {
         if (sourceLight && sourceLight->getShadowGenerator()
-            && _scene->activeCamera) {
+            && _scene->activeCamera()) {
           auto depthValues = Vector2::Zero();
           auto generator   = sourceLight->getShadowGenerator();
 
@@ -712,15 +712,15 @@ void StandardRenderingPipeline::_createVolumetricLightPostProcess(Scene* scene,
                                ->getShadowDirection());
 
           effect->setVector3("cameraPosition",
-                             scene->activeCamera->globalPosition());
+                             scene->activeCamera()->globalPosition());
           effect->setMatrix("shadowViewProjection",
                             generator->getTransformMatrix());
 
           effect->setFloat("scatteringCoefficient", volumetricLightCoefficient);
           effect->setFloat("scatteringPower", volumetricLightPower);
 
-          depthValues.x = sourceLight->getDepthMinZ(*_scene->activeCamera);
-          depthValues.y = sourceLight->getDepthMaxZ(*_scene->activeCamera);
+          depthValues.x = sourceLight->getDepthMinZ(*_scene->activeCamera());
+          depthValues.y = sourceLight->getDepthMaxZ(*_scene->activeCamera());
           effect->setVector2("depthValues", depthValues);
         }
       };
@@ -971,7 +971,7 @@ void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene,
 
   // Compose
   lensFlareComposePostProcess->onApply = [&](Effect* effect, EventState&) {
-    if (!_scene->activeCamera) {
+    if (!_scene->activeCamera()) {
       return;
     }
 
@@ -981,8 +981,8 @@ void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene,
     effect->setTexture("lensStarSampler", lensStarTexture);
 
     // Lens start rotation matrix
-    auto camerax = *(_scene->activeCamera->getViewMatrix().getRow(0));
-    auto cameraz = *(_scene->activeCamera->getViewMatrix().getRow(2));
+    auto camerax = *(_scene->activeCamera()->getViewMatrix().getRow(0));
+    auto cameraz = *(_scene->activeCamera()->getViewMatrix().getRow(2));
     auto camRot  = Vector3::Dot(camerax.toVector3(), Vector3(1.f, 0.f, 0.f))
                   + Vector3::Dot(cameraz.toVector3(), Vector3(0.f, 0.f, 1.f));
     camRot *= 4.f;

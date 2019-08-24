@@ -452,15 +452,15 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
     engine->setViewport(activeCamera->viewport, getRenderWidth(),
                         getRenderHeight());
 
-    if (activeCamera != scene->activeCamera) {
+    if (activeCamera != scene->activeCamera()) {
       scene->setTransformMatrix(activeCamera->getViewMatrix(),
                                 activeCamera->getProjectionMatrix(true));
     }
   }
   else {
-    camera = scene->activeCamera;
+    camera = scene->activeCamera();
     if (camera) {
-      engine->setViewport(scene->activeCamera->viewport, getRenderWidth(),
+      engine->setViewport(scene->activeCamera()->viewport, getRenderWidth(),
                           getRenderHeight());
     }
   }
@@ -516,9 +516,9 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
 
   for (const auto& particleSystem : scene->particleSystems) {
     if (!particleSystem->isStarted() || !particleSystem->hasEmitter()
-        || !(std::holds_alternative<AbstractMeshPtr>(particleSystem->emitter)
-             && std::get<AbstractMeshPtr>(particleSystem->emitter)
-                  ->isEnabled())) {
+        || !(
+          std::holds_alternative<AbstractMeshPtr>(particleSystem->emitter)
+          && std::get<AbstractMeshPtr>(particleSystem->emitter)->isEnabled())) {
       continue;
     }
     if (stl_util::index_of(
@@ -543,12 +543,13 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
 
   onAfterUnbindObservable.notifyObservers(this);
 
-  if (scene->activeCamera) {
-    if (activeCamera && activeCamera != scene->activeCamera) {
-      scene->setTransformMatrix(scene->activeCamera->getViewMatrix(),
-                                scene->activeCamera->getProjectionMatrix(true));
+  if (scene->activeCamera()) {
+    if (activeCamera && activeCamera != scene->activeCamera()) {
+      scene->setTransformMatrix(
+        scene->activeCamera()->getViewMatrix(),
+        scene->activeCamera()->getProjectionMatrix(true));
     }
-    engine->setViewport(scene->activeCamera->viewport);
+    engine->setViewport(scene->activeCamera()->viewport);
   }
 
   scene->resetCachedMaterial();

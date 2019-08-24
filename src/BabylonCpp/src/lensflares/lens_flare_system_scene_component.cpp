@@ -22,7 +22,10 @@ void LensFlareSystemSceneComponent::_register()
 {
   scene->_afterCameraDrawStage.registerStep(
     SceneComponentConstants::STEP_AFTERCAMERADRAW_LENSFLARESYSTEM, this,
-    [this](Camera* camera) { _draw(camera); });
+    [this](Camera* camera) -> bool {
+      _draw(camera);
+      return true;
+    });
 }
 
 void LensFlareSystemSceneComponent::rebuild()

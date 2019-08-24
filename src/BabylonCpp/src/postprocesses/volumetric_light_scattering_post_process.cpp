@@ -350,11 +350,11 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
           for (auto& submesh : transparentSubMeshes) {
             auto& boundingInfo = *submesh->getBoundingInfo();
 
-            if (scene->activeCamera) {
+            if (scene->activeCamera()) {
               submesh->_alphaIndex = submesh->getMesh()->alphaIndex;
               submesh->_distanceToCamera
                 = boundingInfo.boundingSphere.centerWorld
-                    .subtract(scene->activeCamera->position)
+                    .subtract(scene->activeCamera()->position)
                     .length();
             }
           }

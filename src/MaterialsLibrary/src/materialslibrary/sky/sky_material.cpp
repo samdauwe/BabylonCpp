@@ -189,7 +189,7 @@ void SkyMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
   MaterialHelper::BindFogParameters(scene, mesh, _activeEffect);
 
   // Sky
-  auto camera = scene->activeCamera;
+  const auto& camera = scene->activeCamera();
   if (camera) {
     const auto& cameraWorldMatrixM = camera->getWorldMatrix().m();
     _cameraPosition.x              = cameraWorldMatrixM[12];

@@ -38,7 +38,7 @@ void SimpleSparseAccessorScene::initializeScene(ICanvas* /*canvas*/,
       scene->createDefaultCameraOrLight(true, true, true);
       // Set the camera position
       auto camera
-        = std::static_pointer_cast<ArcRotateCamera>(scene->activeCamera);
+        = std::static_pointer_cast<ArcRotateCamera>(scene->activeCamera());
       if (camera) {
         camera->setTarget(Vector3(-3.f, 2.f, 0.f));
         camera->alpha  = Math::PI_2;

@@ -596,7 +596,7 @@ void WaterMaterial::_createRenderTargets(Scene* scene,
         scene->setTransformMatrix(_reflectionTransform, projectionMatrix);
         scene->getEngine()->cullBackFaces = false;
         scene->setMirroredCameraPosition(Vector3::TransformCoordinates(
-          scene->activeCamera->position, _mirrorMatrix));
+          scene->activeCamera()->position, _mirrorMatrix));
       };
 
   _reflectionRTT->onAfterRender
@@ -710,9 +710,9 @@ WaterMaterial* WaterMaterial::Parse(const json& /*source*/, Scene* /*scene*/,
   return nullptr;
 }
 
-MeshPtr WaterMaterial::CreateDefaultMesh(const std::string& name, Scene* scene)
+MeshPtr WaterMaterial::CreateDefaultMesh(const std::string& iName, Scene* scene)
 {
-  auto mesh = Mesh::CreateGround(name, 512, 512, 32, scene, false);
+  auto mesh = Mesh::CreateGround(iName, 512, 512, 32, scene, false);
   return mesh;
 }
 

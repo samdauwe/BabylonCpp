@@ -33,11 +33,17 @@ void EffectLayerSceneComponent::_register()
 
   scene->_cameraDrawRenderTargetStage.registerStep(
     SceneComponentConstants::STEP_CAMERADRAWRENDERTARGET_EFFECTLAYER, this,
-    [this](Camera* camera) { _renderMainTexture(camera); });
+    [this](Camera* camera) -> bool {
+      _renderMainTexture(camera);
+      return true;
+    });
 
   scene->_beforeCameraDrawStage.registerStep(
     SceneComponentConstants::STEP_BEFORECAMERADRAW_EFFECTLAYER, this,
-    [this](Camera* /*camera*/) { _setStencil(); });
+    [this](Camera * /*camera*/) -> bool {
+      _setStencil();
+      return true;
+    });
 
   scene->_afterRenderingGroupDrawStage.registerStep(
     SceneComponentConstants::STEP_AFTERRENDERINGGROUPDRAW_EFFECTLAYER_DRAW,
@@ -46,10 +52,16 @@ void EffectLayerSceneComponent::_register()
 
   scene->_afterCameraDrawStage.registerStep(
     SceneComponentConstants::STEP_AFTERCAMERADRAW_EFFECTLAYER, this,
-    [this](Camera* /*camera*/) { _setStencilBack(); });
+    [this](Camera * /*camera*/) -> bool {
+      _setStencilBack();
+      return true;
+    });
   scene->_afterCameraDrawStage.registerStep(
     SceneComponentConstants::STEP_AFTERCAMERADRAW_EFFECTLAYER_DRAW, this,
-    [this](Camera* /*camera*/) { _drawCamera(); });
+    [this](Camera * /*camera*/) -> bool {
+      _drawCamera();
+      return true;
+    });
 }
 
 void EffectLayerSceneComponent::rebuild()

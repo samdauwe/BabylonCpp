@@ -191,9 +191,9 @@ void PointerDragBehavior::releaseDrag()
   _moving                  = false;
 
   // Reattach camera controls
-  if (detachCameraControls && _attachedElement && _scene->activeCamera
-      && !_scene->activeCamera->leftCamera()) {
-    _scene->activeCamera->attachControl(_attachedElement, true);
+  if (detachCameraControls && _attachedElement && _scene->activeCamera()
+      && !_scene->activeCamera()->leftCamera()) {
+    _scene->activeCamera()->attachControl(_attachedElement, true);
   }
 }
 
@@ -222,7 +222,7 @@ void PointerDragBehavior::_startDrag(
   int pointerId, const std::optional<Ray>& fromRay,
   const std::optional<Vector3>& startPickedPoint)
 {
-  if (!_scene->activeCamera || dragging || !_attachedNode) {
+  if (!_scene->activeCamera() || dragging || !_attachedNode) {
     return;
   }
 
@@ -233,9 +233,9 @@ void PointerDragBehavior::_startDrag(
     _startDragRay.origin.copyFrom(fromRay->origin);
   }
   else {
-    _startDragRay.origin.copyFrom(_scene->activeCamera->position);
+    _startDragRay.origin.copyFrom(_scene->activeCamera()->position);
     _attachedNode->getWorldMatrix().getTranslationToRef(_tmpVector);
-    _tmpVector.subtractToRef(_scene->activeCamera->position,
+    _tmpVector.subtractToRef(_scene->activeCamera()->position,
                              _startDragRay.direction);
   }
 
@@ -257,12 +257,12 @@ void PointerDragBehavior::_startDrag(
       std::dynamic_pointer_cast<Mesh>(_attachedNode)->absolutePosition);
 
     // Detatch camera controls
-    if (detachCameraControls && _scene->activeCamera
-        && !_scene->activeCamera->leftCamera()) {
-      if (_scene->activeCamera->inputs.attachedElement) {
-        _attachedElement = _scene->activeCamera->inputs.attachedElement;
-        _scene->activeCamera->detachControl(
-          _scene->activeCamera->inputs.attachedElement);
+    if (detachCameraControls && _scene->activeCamera()
+        && !_scene->activeCamera()->leftCamera()) {
+      if (_scene->activeCamera()->inputs.attachedElement) {
+        _attachedElement = _scene->activeCamera()->inputs.attachedElement;
+        _scene->activeCamera()->detachControl(
+          _scene->activeCamera()->inputs.attachedElement);
       }
       else {
         _attachedElement = nullptr;

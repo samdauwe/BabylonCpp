@@ -34,7 +34,7 @@ void MaterialHelper::BindEyePosition(const EffectPtr& effect, Scene* scene)
     effect->setVector3("vEyePosition", *scene->_forcedViewPosition.get());
     return;
   }
-  const auto& globalPosition = scene->activeCamera->globalPosition();
+  const auto& globalPosition = scene->activeCamera()->globalPosition();
 
   effect->setVector3("vEyePosition", scene->_mirroredCameraPosition ?
                                        *scene->_mirroredCameraPosition.get() :
@@ -199,7 +199,7 @@ bool MaterialHelper::PrepareDefinesForAttributes(
       }
       else {
         defines.intDef["BonesPerMesh"]
-          = static_cast<int>((mesh->skeleton()->bones.size() + 1));
+          = static_cast<unsigned int>((mesh->skeleton()->bones.size() + 1));
         defines.boolDef["BONETEXTURE"] = false;
       }
     }
@@ -235,11 +235,11 @@ bool MaterialHelper::PrepareDefinesForAttributes(
 void MaterialHelper::PrepareDefinesForMultiview(Scene* scene,
                                                 MaterialDefines& defines)
 {
-  if (scene->activeCamera) {
+  if (scene->activeCamera()) {
     const auto previousMultiview = defines["MULTIVIEW"];
     defines.boolDef["MULTIVIEW"]
-      = (scene->activeCamera->outputRenderTarget != nullptr
-         && scene->activeCamera->outputRenderTarget->getViewCount() > 1);
+      = (scene->activeCamera()->outputRenderTarget != nullptr
+         && scene->activeCamera()->outputRenderTarget->getViewCount() > 1);
     if (defines["MULTIVIEW"] != previousMultiview) {
       defines.markAsUnprocessed();
     }
@@ -732,7 +732,7 @@ void MaterialHelper::BindLogDepth(MaterialDefines& defines,
   if (defines["LOGARITHMICDEPTH"]) {
     effect->setFloat(
       "logarithmicDepthConstant",
-      2.f / (std::log(scene->activeCamera->maxZ + 1.f) / Math::LN2));
+      2.f / (std::log(scene->activeCamera()->maxZ + 1.f) / Math::LN2));
   }
 }
 

@@ -90,14 +90,51 @@ size_t Scene::_uniqueIdCounter = 0;
 microseconds_t Scene::MinDeltaTime = std::chrono::milliseconds(1);
 microseconds_t Scene::MaxDeltaTime = std::chrono::milliseconds(1000);
 
-unsigned int Scene::DragMovementThreshold = 10;
-milliseconds_t Scene::LongPressDelay      = std::chrono::milliseconds(500);
-milliseconds_t Scene::DoubleClickDelay    = std::chrono::milliseconds(300);
-bool Scene::ExclusiveDoubleClickMode      = false;
+unsigned int Scene::DragMovementThreshold()
+{
+  return InputManager::DragMovementThreshold;
+}
+
+void Scene::setDragMovementThreshold(unsigned int value)
+{
+  InputManager::DragMovementThreshold = value;
+}
+
+milliseconds_t Scene::LongPressDelay()
+{
+  return InputManager::LongPressDelay;
+}
+
+void Scene::setLongPressDelay(milliseconds_t value)
+{
+  InputManager::LongPressDelay = value;
+}
+
+milliseconds_t Scene::DoubleClickDelay()
+{
+  return InputManager::DoubleClickDelay;
+}
+
+void Scene::setDoubleClickDelay(milliseconds_t value)
+{
+  InputManager::DoubleClickDelay = value;
+}
+
+bool Scene::ExclusiveDoubleClickMode()
+{
+  return InputManager::ExclusiveDoubleClickMode;
+}
+
+void Scene::setExclusiveDoubleClickMode(bool value)
+{
+  InputManager::ExclusiveDoubleClickMode = value;
+}
 
 Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     : AbstractScene{}
     , _inputManager{std::make_unique<InputManager>(this)}
+    , cameraToUseForPointers{nullptr}
+    , _isScene{true}
     , autoClear{true}
     , autoClearDepthAndStencil{true}
     , clearColor{Color4(0.2f, 0.2f, 0.3f, 1.f)}
@@ -132,7 +169,6 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , preventDefaultOnPointerUp{true}
     , gamepadManager{this, &Scene::get_gamepadManager}
     , unTranslatedPointer{this, &Scene::get_unTranslatedPointer}
-    , cameraToUseForPointers(nullptr)
     , _mirroredCameraPosition{nullptr}
     , useRightHandedSystem{this, &Scene::get_useRightHandedSystem,
                            &Scene::set_useRightHandedSystem}
@@ -176,14 +212,15 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , mainSoundTrack{this, &Scene::get_mainSoundTrack}
     , simplificationQueue{this, &Scene::get_simplificationQueue,
                           &Scene::set_simplificationQueue}
+    , _animationTimeLast{std::nullopt}
+    , _animationTime(0)
     , animationTimeScale{1}
     , _cachedMaterial{nullptr}
     , _cachedEffect{nullptr}
     , _cachedVisibility{0.f}
     , dispatchAllSubMeshesOfActiveMeshes{false}
+    , _frustumPlanes{}
     , _forcedViewPosition{nullptr}
-    , _isAlternateRenderingEnabled{this,
-                                   &Scene::get_isAlternateRenderingEnabled}
     , frustumPlanes{this, &Scene::get_frustumPlanes}
     , requireLightSorting{false}
     , useMaterialMeshMap{false}
@@ -227,24 +264,6 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , _onAfterRenderObserver{nullptr}
     , _onBeforeCameraRenderObserver{nullptr}
     , _onAfterCameraRenderObserver{nullptr}
-    , _onPointerMove{nullptr}
-    , _onPointerDown{nullptr}
-    , _onPointerUp{nullptr}
-    , _initClickEvent{nullptr}
-    , _initActionManager{nullptr}
-    , _delayedSimpleClick{nullptr}
-    , _meshPickProceed{false}
-    , _previousHasSwiped{false}
-    , _currentPickResult{std::nullopt}
-    , _previousPickResult{std::nullopt}
-    , _totalPointersPressed{0}
-    , _doubleClickOccured{false}
-    , _pointerX{0}
-    , _pointerY{0}
-    , _startingPointerPosition{Vector2(0.f, 0.f)}
-    , _previousStartingPointerPosition{Vector2(0.f, 0.f)}
-    , _startingPointerTime{high_res_time_point_t()}
-    , _previousStartingPointerTime{high_res_time_point_t()}
     , _timeAccumulator{0}
     , _currentStepId{0}
     , _currentInternalStep{0}
@@ -268,39 +287,27 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , _mainSoundTrack{nullptr}
     , _engine{engine ? engine : Engine::LastCreatedEngine()}
     , _animationRatio{1.f}
-    , _animationTimeLast{std::nullopt}
-    , _animationTime(0)
     , _renderId{0}
     , _frameId{0}
     , _executeWhenReadyTimeoutId{-1}
     , _intermediateRendering{false}
     , _viewUpdateFlag{-1}
     , _projectionUpdateFlag{-1}
-    , _alternateViewUpdateFlag{-1}
-    , _alternateProjectionUpdateFlag{-1}
     , _isDisposed{false}
     , _activeMeshCandidateProvider{nullptr}
     , _activeMeshesFrozen{false}
     , _renderingManager{nullptr}
     , _transformMatrix{Matrix::Zero()}
     , _sceneUbo{nullptr}
-    , _alternateSceneUbo{nullptr}
     , _pickWithRayInverseMatrix{nullptr}
     , _simplificationQueue{nullptr}
     , _boundingBoxRenderer{nullptr}
     , _forceShowBoundingBoxes{false}
     , _outlineRenderer{nullptr}
-    , _alternateTransformMatrix{nullptr}
-    , _useAlternateCameraConfiguration{false}
-    , _alternateRendering{false}
-    , _frustumPlanesSet{false}
-    , _frustumPlanes{}
     , _selectionOctree{nullptr}
-    , _pointerOverMesh{nullptr}
+    , _frustumPlanesSet{false}
     , _debugLayer{nullptr}
     , _geometryBufferRenderer{nullptr}
-    , _pickedDownMesh{nullptr}
-    , _pickedUpMesh{nullptr}
     , _uid{Tools::RandomId()}
     , _blockMaterialDirtyMechanism{false}
     , _tempPickingRay{std::make_unique<Ray>(Ray::Zero())}
@@ -463,10 +470,7 @@ std::unique_ptr<GamepadManager>& Scene::get_gamepadManager()
 // Pointers
 Vector2& Scene::get_unTranslatedPointer()
 {
-  _unTranslatedPointer = Vector2(static_cast<float>(_unTranslatedPointerX),
-                                 static_cast<float>(_unTranslatedPointerY));
-
-  return _unTranslatedPointer;
+  return _inputManager->unTranslatedPointer();
 }
 
 // Properties
@@ -497,7 +501,7 @@ void Scene::set_useRightHandedSystem(bool value)
     return;
   }
   _useRightHandedSystem = value;
-  markAllMaterialsAsDirty(Material::MiscDirtyFlag);
+  markAllMaterialsAsDirty(Constants::MATERIAL_MiscDirtyFlag);
 }
 
 void Scene::setStepId(unsigned int newStepId)
@@ -526,7 +530,7 @@ void Scene::set_forceWireframe(bool value)
     return;
   }
   _forceWireframe = value;
-  markAllMaterialsAsDirty(Material::MiscDirtyFlag);
+  markAllMaterialsAsDirty(Constants::MATERIAL_MiscDirtyFlag);
 }
 
 bool Scene::get_forceWireframe() const
@@ -545,7 +549,7 @@ void Scene::set_forcePointsCloud(bool value)
     return;
   }
   _forcePointsCloud = value;
-  markAllMaterialsAsDirty(Material::MiscDirtyFlag);
+  markAllMaterialsAsDirty(Constants::MATERIAL_MiscDirtyFlag);
 }
 
 bool Scene::get_forceShowBoundingBoxes() const
@@ -579,7 +583,7 @@ void Scene::set_fogEnabled(bool value)
     return;
   }
   _fogEnabled = value;
-  markAllMaterialsAsDirty(Material::MiscDirtyFlag);
+  markAllMaterialsAsDirty(Constants::MATERIAL_MiscDirtyFlag);
 }
 
 bool Scene::get_fogEnabled() const
@@ -593,7 +597,7 @@ void Scene::set_fogMode(unsigned int value)
     return;
   }
   _fogMode = value;
-  markAllMaterialsAsDirty(Material::MiscDirtyFlag);
+  markAllMaterialsAsDirty(Constants::MATERIAL_MiscDirtyFlag);
 }
 
 unsigned int Scene::get_fogMode() const
@@ -607,7 +611,7 @@ void Scene::set_shadowsEnabled(bool value)
     return;
   }
   _shadowsEnabled = value;
-  markAllMaterialsAsDirty(Material::LightDirtyFlag);
+  markAllMaterialsAsDirty(Constants::MATERIAL_LightDirtyFlag);
 }
 
 bool Scene::get_shadowsEnabled() const
@@ -621,12 +625,27 @@ void Scene::set_lightsEnabled(bool value)
     return;
   }
   _lightsEnabled = value;
-  markAllMaterialsAsDirty(Material::LightDirtyFlag);
+  markAllMaterialsAsDirty(Constants::MATERIAL_LightDirtyFlag);
 }
 
 bool Scene::get_lightsEnabled() const
 {
   return _lightsEnabled;
+}
+
+CameraPtr& Scene::get_activeCamera()
+{
+  return _activeCamera;
+}
+
+void Scene::set_activeCamera(const CameraPtr& value)
+{
+  if (value == _activeCamera) {
+    return;
+  }
+
+  _activeCamera = value;
+  onActiveCameraChanged.notifyObservers(this);
 }
 
 void Scene::set_texturesEnabled(bool value)
@@ -649,7 +668,7 @@ void Scene::set_skeletonsEnabled(bool value)
     return;
   }
   _skeletonsEnabled = value;
-  markAllMaterialsAsDirty(Material::AttributesDirtyFlag);
+  markAllMaterialsAsDirty(Constants::MATERIAL_AttributesDirtyFlag);
 }
 
 bool Scene::get_skeletonsEnabled() const
@@ -745,21 +764,6 @@ void Scene::setMirroredCameraPosition(const Vector3& newPosition)
   _mirroredCameraPosition = std::make_unique<Vector3>(newPosition);
 }
 
-CameraPtr& Scene::get_activeCamera()
-{
-  return _activeCamera;
-}
-
-void Scene::set_activeCamera(const CameraPtr& value)
-{
-  if (value == _activeCamera) {
-    return;
-  }
-
-  _activeCamera = value;
-  onActiveCameraChanged.notifyObservers(this);
-}
-
 MaterialPtr& Scene::get_defaultMaterial()
 {
   if (!_defaultMaterial) {
@@ -772,11 +776,6 @@ MaterialPtr& Scene::get_defaultMaterial()
 void Scene::set_defaultMaterial(const MaterialPtr& value)
 {
   _defaultMaterial = value;
-}
-
-bool Scene::get_isAlternateRenderingEnabled() const
-{
-  return _alternateRendering;
 }
 
 std::array<Plane, 6>& Scene::get_frustumPlanes()
@@ -1087,8 +1086,8 @@ bool Scene::isReady()
       }
     }
   }
-  else if (activeCamera()) {
-    if (!activeCamera()->isReady(true)) {
+  else if (_activeCamera) {
+    if (!_activeCamera->isReady(true)) {
       return false;
     }
   }
@@ -1181,11 +1180,6 @@ void Scene::_checkIsReady()
     _executeWhenReadyTimeoutId = -1;
     return;
   }
-}
-
-std::vector<AnimatablePtr> Scene::getAnimations()
-{
-  return _activeAnimatables;
 }
 
 AnimatablePtr Scene::beginWeightedAnimation(
@@ -1604,8 +1598,9 @@ void Scene::setTransformMatrix(const Matrix& viewL, const Matrix& projectionL,
   _viewMatrix.multiplyToRef(_projectionMatrix, _transformMatrix);
 
   // Update frustum
-  if (_frustumPlanes.empty()) {
-    _frustumPlanes = Frustum::GetPlanes(_transformMatrix);
+  if (!_frustumPlanesSet) {
+    _frustumPlanesSet = true;
+    _frustumPlanes    = Frustum::GetPlanes(_transformMatrix);
   }
   else {
     Frustum::GetPlanesToRef(_transformMatrix, _frustumPlanes);
@@ -1793,7 +1788,7 @@ int Scene::removeCamera(Camera* toRemove)
     activeCameras.erase(it2);
   }
   // Reset the activeCamera
-  if (activeCamera().get() == toRemove) {
+  if (_activeCamera.get() == toRemove) {
     if (!cameras.empty()) {
       activeCamera = cameras.front();
     }
@@ -2010,8 +2005,8 @@ void Scene::switchActiveCamera(const CameraPtr& newCamera, bool attachControl)
     return;
   }
 
-  if (activeCamera) {
-    activeCamera->detachControl(canvas);
+  if (_activeCamera) {
+    _activeCamera->detachControl(canvas);
   }
 
   activeCamera = newCamera;
@@ -2607,8 +2602,8 @@ void Scene::freeActiveMeshes()
   }
 
   _activeMeshes.clear();
-  if (activeCamera && !activeCamera->_activeMeshes.empty()) {
-    activeCamera->_activeMeshes.clear();
+  if (_activeCamera && !_activeCamera->_activeMeshes.empty()) {
+    _activeCamera->_activeMeshes.clear();
   }
   if (!activeCameras.empty()) {
     for (const auto& iActiveCamera : activeCameras) {
@@ -2696,13 +2691,14 @@ IActiveMeshCandidateProvider* Scene::getActiveMeshCandidateProvider() const
 
 Scene& Scene::freezeActiveMeshes()
 {
-  if (!activeCamera()) {
+  if (!_activeCamera) {
     return *this;
   }
 
-  if (_frustumPlanes.empty()) {
-    setTransformMatrix(activeCamera()->getViewMatrix(),
-                       activeCamera()->getProjectionMatrix());
+  if (!_frustumPlanesSet) {
+    _frustumPlanesSet = true;
+    setTransformMatrix(_activeCamera->getViewMatrix(),
+                       _activeCamera->getProjectionMatrix());
   }
 
   _evaluateActiveMeshes();
@@ -2735,13 +2731,13 @@ void Scene::_evaluateActiveMeshes()
     return;
   }
 
-  if (!activeCamera()) {
+  if (!_activeCamera) {
     return;
   }
 
   onBeforeActiveMeshesEvaluationObservable.notifyObservers(this);
 
-  activeCamera()->_activeMeshes.clear();
+  _activeCamera->_activeMeshes.clear();
   _activeMeshes.clear();
   _renderingManager->reset();
   _processedMaterials.clear();
@@ -2785,7 +2781,7 @@ void Scene::_evaluateActiveMeshes()
 
     // Switch to current LOD
     auto meshToRender = customLODSelector ?
-                          customLODSelector(mesh, activeCamera()) :
+                          customLODSelector(mesh, _activeCamera) :
                           mesh->getLOD(activeCamera);
     if (meshToRender == nullptr) {
       continue;
@@ -2801,11 +2797,11 @@ void Scene::_evaluateActiveMeshes()
 
     if (mesh->isVisible && mesh->visibility > 0
         && ((mesh->alwaysSelectAsActiveMesh
-             || (((mesh->layerMask & activeCamera()->layerMask) != 0)
+             || (((mesh->layerMask & _activeCamera->layerMask) != 0)
                  && (mesh->alwaysSelectAsActiveMesh
                      || mesh->isInFrustum(_frustumPlanes)))))) {
       _activeMeshes.emplace_back(mesh);
-      activeCamera()->_activeMeshes.emplace_back(_activeMeshes.back());
+      _activeCamera->_activeMeshes.emplace_back(_activeMeshes.back());
 
       if (meshToRender != mesh) {
         meshToRender->_activate(_renderId, false);
@@ -2879,29 +2875,29 @@ void Scene::_activeMesh(AbstractMesh* sourceMesh, AbstractMesh* mesh)
 
 void Scene::updateTransformMatrix(bool force)
 {
-  if (!activeCamera()) {
+  if (!_activeCamera) {
     return;
   }
 
-  setTransformMatrix(activeCamera()->getViewMatrix(force),
-                     activeCamera()->getProjectionMatrix(force));
+  setTransformMatrix(_activeCamera->getViewMatrix(force),
+                     _activeCamera->getProjectionMatrix(force));
 }
 
 void Scene::_bindFrameBuffer()
 {
-  if (activeCamera() && activeCamera()->_multiviewTexture) {
-    activeCamera()->_multiviewTexture->_bindFrameBuffer();
+  if (_activeCamera && _activeCamera->_multiviewTexture) {
+    _activeCamera->_multiviewTexture->_bindFrameBuffer();
   }
-  else if (activeCamera() && activeCamera()->outputRenderTarget) {
+  else if (_activeCamera && _activeCamera->outputRenderTarget) {
     auto useMultiview
-      = getEngine()->getCaps().multiview && activeCamera()->outputRenderTarget
-        && activeCamera()->outputRenderTarget->getViewCount() > 1;
+      = getEngine()->getCaps().multiview && _activeCamera->outputRenderTarget
+        && _activeCamera->outputRenderTarget->getViewCount() > 1;
     if (useMultiview) {
-      activeCamera()->outputRenderTarget->_bindFrameBuffer();
+      _activeCamera->outputRenderTarget->_bindFrameBuffer();
     }
     else {
       auto internalTexture
-        = activeCamera()->outputRenderTarget->getInternalTexture();
+        = _activeCamera->outputRenderTarget->getInternalTexture();
       if (internalTexture) {
         getEngine()->bindFramebuffer(internalTexture);
       }
@@ -2928,13 +2924,13 @@ void Scene::_renderForCamera(const CameraPtr& camera,
   // Use _activeCamera instead of activeCamera to avoid onActiveCameraChanged
   _activeCamera = camera;
 
-  if (!activeCamera()) {
+  if (!_activeCamera) {
     BABYLON_LOG_ERROR("Scene", "Active camera not set")
     return;
   }
 
   // Viewport
-  engine->setViewport(activeCamera()->viewport);
+  engine->setViewport(_activeCamera->viewport);
 
   // Camera
   resetCachedMaterial();
@@ -2953,7 +2949,7 @@ void Scene::_renderForCamera(const CameraPtr& camera,
     updateTransformMatrix();
   }
 
-  onBeforeCameraRenderObservable.notifyObservers(activeCamera().get());
+  onBeforeCameraRenderObservable.notifyObservers(_activeCamera.get());
 
   // Meshes
   _evaluateActiveMeshes();
@@ -2992,7 +2988,7 @@ void Scene::_renderForCamera(const CameraPtr& camera,
           ++_renderId;
           bool hasSpecialRenderTargetCamera
             = renderTarget->activeCamera
-              && renderTarget->activeCamera != activeCamera();
+              && renderTarget->activeCamera != _activeCamera;
           renderTarget->render(hasSpecialRenderTargetCamera,
                                dumpNextRenderTargets);
           needRebind = true;
@@ -3004,7 +3000,7 @@ void Scene::_renderForCamera(const CameraPtr& camera,
     }
 
     for (const auto& step : _cameraDrawRenderTargetStage) {
-      needRebind = step.action(activeCamera().get()) || needRebind;
+      needRebind = step.action(_activeCamera.get()) || needRebind;
     }
 
     _intermediateRendering = false;
@@ -3024,7 +3020,7 @@ void Scene::_renderForCamera(const CameraPtr& camera,
 
   // Before Camera Draw
   for (const auto& step : _beforeCameraDrawStage) {
-    step.action(activeCamera().get());
+    step.action(_activeCamera.get());
   }
 
   // Render
@@ -3034,7 +3030,7 @@ void Scene::_renderForCamera(const CameraPtr& camera,
 
   // After Camera Draw
   for (const auto& step : _afterCameraDrawStage) {
-    step.action(activeCamera().get());
+    step.action(_activeCamera.get());
   }
 
   // Finalize frame
@@ -3045,7 +3041,7 @@ void Scene::_renderForCamera(const CameraPtr& camera,
   // Reset some special arrays
   _renderTargets.clear();
 
-  onAfterCameraRenderObservable.notifyObservers(activeCamera().get());
+  onAfterCameraRenderObservable.notifyObservers(_activeCamera.get());
 }
 
 void Scene::_processSubCameras(const CameraPtr& camera)
@@ -3189,11 +3185,11 @@ void Scene::render(bool updateCameras, bool ignoreAnimations)
         }
       }
     }
-    else if (activeCamera) {
-      activeCamera->update();
-      if (activeCamera->cameraRigMode != Camera::RIG_MODE_NONE) {
+    else if (_activeCamera) {
+      _activeCamera->update();
+      if (_activeCamera->cameraRigMode != Camera::RIG_MODE_NONE) {
         // rig cameras
-        for (const auto& rigCamera : activeCamera->_rigCameras) {
+        for (const auto& rigCamera : _activeCamera->_rigCameras) {
           rigCamera->update();
         }
       }
@@ -3205,8 +3201,8 @@ void Scene::render(bool updateCameras, bool ignoreAnimations)
 
   // Customs render targets
   onBeforeRenderTargetsRenderObservable.notifyObservers(this);
-  auto engine              = getEngine();
-  auto currentActiveCamera = activeCamera;
+  auto engine               = getEngine();
+  auto& currentActiveCamera = _activeCamera;
   if (renderTargetsEnabled) {
     Tools::StartPerformanceCounter("Custom render targets",
                                    !customRenderTargets.empty());
@@ -3218,18 +3214,18 @@ void Scene::render(bool updateCameras, bool ignoreAnimations)
         activeCamera = renderTarget->activeCamera ? renderTarget->activeCamera :
                                                     activeCamera;
 
-        if (!activeCamera) {
+        if (!_activeCamera) {
           BABYLON_LOG_ERROR("Scene", "Active camera not set")
           return;
         }
 
         // Viewport
-        engine->setViewport(activeCamera->viewport);
+        engine->setViewport(_activeCamera->viewport);
 
         // Camera
         updateTransformMatrix();
 
-        renderTarget->render(currentActiveCamera != activeCamera,
+        renderTarget->render(currentActiveCamera != _activeCamera,
                              dumpNextRenderTargets);
       }
     }
@@ -3281,7 +3277,7 @@ void Scene::render(bool updateCameras, bool ignoreAnimations)
     }
   }
   else {
-    if (!activeCamera) {
+    if (!_activeCamera) {
       BABYLON_LOG_ERROR("Scene", "No camera defined")
       return;
     }
@@ -3510,8 +3506,8 @@ void Scene::dispose()
   resetCachedMaterial();
 
   // Smart arrays
-  if (activeCamera) {
-    activeCamera->_activeMeshes.clear();
+  if (_activeCamera) {
+    _activeCamera->_activeMeshes.clear();
     activeCamera = nullptr;
   }
   _activeMeshes.clear();
@@ -3802,7 +3798,7 @@ Scene& Scene::createPickingRayToRef(int x, int y,
   auto engine = _engine;
 
   if (!camera) {
-    if (!activeCamera) {
+    if (!_activeCamera) {
       BABYLON_LOG_ERROR("Scene", "Active camera not set")
       return *this;
     }
@@ -3847,7 +3843,7 @@ Scene& Scene::createPickingRayInCameraSpaceToRef(int x, int y, Ray& result,
   auto engine = _engine;
 
   if (!camera) {
-    if (!activeCamera) {
+    if (!_activeCamera) {
       BABYLON_LOG_ERROR("Scene", "Active camera not set")
       return *this;
     }
@@ -3951,7 +3947,7 @@ std::optional<PickingInfo> Scene::_internalPickSprites(
   std::optional<PickingInfo> pickingInfo = std::nullopt;
 
   if (!camera) {
-    if (!activeCamera) {
+    if (!_activeCamera) {
       return std::nullopt;
     }
     camera = activeCamera;
@@ -4027,7 +4023,7 @@ Scene::pickSpriteWithRay(const Ray& ray,
   }
 
   if (!camera) {
-    if (!activeCamera) {
+    if (!_activeCamera) {
       return std::nullopt;
     }
     camera = activeCamera;
@@ -4246,14 +4242,14 @@ void Scene::createDefaultCamera(bool createArcRotateCamera, bool replace,
 {
   // Dispose existing camera in replace mode.
   if (replace) {
-    if (activeCamera) {
-      activeCamera->dispose();
+    if (_activeCamera) {
+      _activeCamera->dispose();
       activeCamera = nullptr;
     }
   }
 
   // Camera
-  if (!activeCamera) {
+  if (!_activeCamera) {
     auto worldExtends = getWorldExtends();
     auto worldSize    = worldExtends.max.subtract(worldExtends.min);
     auto worldCenter  = worldExtends.min.add(worldSize.scale(0.5f));
@@ -4500,10 +4496,10 @@ void Scene::_renderMultiviewToSingleView(const CameraPtr& camera)
   auto engine = getEngine();
   for (size_t index = 0; index < camera->_rigCameras.size(); index++) {
     activeCamera = camera->_rigCameras[index];
-    engine->setViewport(activeCamera->viewport);
+    engine->setViewport(_activeCamera->viewport);
     if (postProcessManager) {
       postProcessManager->_prepareFrame();
-      postProcessManager->_finalizeFrame(activeCamera->isIntermediate);
+      postProcessManager->_finalizeFrame(_activeCamera->isIntermediate);
     }
   }
 }

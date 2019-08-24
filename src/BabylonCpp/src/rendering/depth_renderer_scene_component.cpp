@@ -62,7 +62,7 @@ void DepthRendererSceneComponent::_gatherActiveCameraRenderTargets(
     for (const auto& item : scene->depthRenderer()) {
       const auto& depthRenderer = item.second;
       if (depthRenderer->useOnlyInActiveCamera
-          && scene->activeCamera->id == item.first) {
+          && scene->activeCamera()->id == item.first) {
         renderTargets.emplace_back(depthRenderer->getDepthMap());
       }
     }

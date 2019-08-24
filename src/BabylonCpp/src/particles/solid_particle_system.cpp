@@ -52,7 +52,7 @@ SolidParticleSystem::SolidParticleSystem(
 {
   name       = iName;
   _scene     = scene ? scene : Engine::LastCreatedScene();
-  _camera    = std::static_pointer_cast<TargetCamera>(_scene->activeCamera);
+  _camera    = std::static_pointer_cast<TargetCamera>(_scene->activeCamera());
   _pickable  = options ? options->isPickable : false;
   _depthSort = options ? options->enableDepthSort : false;
   _particlesIntersect  = options ? options->particleIntersection : false;

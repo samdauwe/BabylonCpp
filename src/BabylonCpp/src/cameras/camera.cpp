@@ -90,7 +90,7 @@ Type Camera::type() const
 
 void Camera::addToScene(const CameraPtr& newCamera)
 {
-  if (_setActiveOnSceneIfNoneActive && !getScene()->activeCamera) {
+  if (_setActiveOnSceneIfNoneActive && !getScene()->activeCamera()) {
     getScene()->activeCamera = newCamera;
   }
 

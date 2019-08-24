@@ -1457,7 +1457,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
                          *scene->_forcedViewPosition :
                          (scene->_mirroredCameraPosition ?
                             *scene->_mirroredCameraPosition :
-                            scene->activeCamera->globalPosition());
+                            scene->activeCamera()->globalPosition());
     auto invertNormal = (scene->useRightHandedSystem()
                          == (scene->_mirroredCameraPosition != nullptr));
     effect->setFloat4("vEyePosition", eyePosition.x, eyePosition.y,

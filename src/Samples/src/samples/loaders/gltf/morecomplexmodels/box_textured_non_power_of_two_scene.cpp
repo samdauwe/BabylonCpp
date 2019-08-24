@@ -37,7 +37,7 @@ void BoxTexturedNonPowerOfTwoScene::initializeScene(ICanvas* /*canvas*/,
       scene->createDefaultCameraOrLight(true, true, true);
       // Set the camera position
       auto camera
-        = std::static_pointer_cast<ArcRotateCamera>(scene->activeCamera);
+        = std::static_pointer_cast<ArcRotateCamera>(scene->activeCamera());
       if (camera) {
         camera->setTarget(Vector3::Zero());
         camera->alpha  = 0.9f;

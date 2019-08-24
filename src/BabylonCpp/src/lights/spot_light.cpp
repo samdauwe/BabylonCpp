@@ -198,7 +198,7 @@ void SpotLight::_setDefaultShadowProjectionMatrix(
   Matrix& matrix, const Matrix& /*viewMatrix*/,
   const std::vector<AbstractMesh*>& /*renderList*/)
 {
-  auto activeCamera = getScene()->activeCamera;
+  auto activeCamera = getScene()->activeCamera();
 
   if (!activeCamera) {
     return;

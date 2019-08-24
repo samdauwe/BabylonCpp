@@ -18,7 +18,7 @@ CameraTreeItemComponent::CameraTreeItemComponent(
   const auto& scene  = camera->getScene();
 
   sprintf(label, "%s", props.camera->name.c_str());
-  state.isActive = scene->activeCamera == camera;
+  state.isActive = scene->activeCamera() == camera;
 
   // Set the entity info
   entityInfo.uniqueId  = camera->uniqueId;

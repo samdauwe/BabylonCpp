@@ -77,7 +77,7 @@ void CustomRenderTargetsScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Plane
   auto plane           = Mesh::CreatePlane("map", 10, scene);
   plane->billboardMode = AbstractMesh::BILLBOARDMODE_ALL;
-  plane->scaling().y   = 1.f / engine->getAspectRatio(*scene->activeCamera);
+  plane->scaling().y   = 1.f / engine->getAspectRatio(*scene->activeCamera());
 
   // Render target
   _renderTarget = RenderTargetTexture::New("depth", 1024.f, scene, true);

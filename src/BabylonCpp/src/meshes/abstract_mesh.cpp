@@ -1767,7 +1767,7 @@ AbstractMesh& AbstractMesh::updateFacetData()
           return (diff < 0.f) ? -1 : (diff > 0.f) ? 1 : 0;
         };
     if (!data.facetDepthSortFrom) {
-      auto& camera            = getScene()->activeCamera;
+      auto& camera            = getScene()->activeCamera();
       data.facetDepthSortFrom = (camera) ? camera->position : Vector3::Zero();
     }
     data.depthSortedFacets.clear();

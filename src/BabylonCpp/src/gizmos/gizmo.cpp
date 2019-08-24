@@ -108,7 +108,7 @@ void Gizmo::_update()
 
     // Scale
     if (_updateScale) {
-      const auto& activeCamera   = gizmoLayer->utilityLayerScene->activeCamera;
+      const auto& activeCamera = gizmoLayer->utilityLayerScene->activeCamera();
       const auto& cameraPosition = activeCamera->globalPosition();
       _rootMesh->position().subtractToRef(cameraPosition, _tempVector);
       const auto dist = _tempVector.length() * scaleRatio;

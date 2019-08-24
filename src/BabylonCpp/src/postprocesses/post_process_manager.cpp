@@ -69,7 +69,7 @@ bool PostProcessManager::_prepareFrame(
   const InternalTexturePtr& sourceTexture,
   const std::vector<PostProcessPtr>& iPostProcesses)
 {
-  auto camera = _scene->activeCamera;
+  const auto& camera = _scene->activeCamera();
   if (!camera) {
     return false;
   }
@@ -100,7 +100,7 @@ void PostProcessManager::directRender(
 
   for (unsigned int index = 0; index < postProcesses.size(); ++index) {
     if (index < postProcesses.size() - 1) {
-      postProcesses[index + 1]->activate(_scene->activeCamera, targetTexture);
+      postProcesses[index + 1]->activate(_scene->activeCamera(), targetTexture);
     }
     else {
       if (targetTexture) {
@@ -140,7 +140,7 @@ void PostProcessManager::_finalizeFrame(
   unsigned int faceIndex, const std::vector<PostProcessPtr>& _postProcesses,
   bool forceFullscreenViewport)
 {
-  auto camera = _scene->activeCamera;
+  const auto& camera = _scene->activeCamera();
   if (!camera) {
     return;
   }

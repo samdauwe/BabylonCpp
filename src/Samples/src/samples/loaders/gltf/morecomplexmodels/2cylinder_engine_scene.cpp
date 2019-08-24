@@ -36,7 +36,7 @@ void TwoCylinderEngineScene::initializeScene(ICanvas* /*canvas*/, Scene* scene)
       scene->createDefaultCameraOrLight(true, true, true);
       // Set the camera position
       auto camera
-        = std::static_pointer_cast<ArcRotateCamera>(scene->activeCamera);
+        = std::static_pointer_cast<ArcRotateCamera>(scene->activeCamera());
       if (camera) {
         camera->setTarget(Vector3(-35.f, 80.f, 0.f));
         camera->alpha  = Math::PI / 1.5f;
