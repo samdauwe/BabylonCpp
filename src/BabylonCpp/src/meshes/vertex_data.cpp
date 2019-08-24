@@ -686,8 +686,8 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
   else {
     for (p = 0; p < pathArray.size(); ++p) {
       for (i = 0; i < minlg + closePathCorr; ++i) {
-        u = (uTotalDistance[p] != 0.f) ? us[p][i] / uTotalDistance[p] : 0.f;
-        v = (vTotalDistance[i] != 0.f) ? vs[i][p] / vTotalDistance[i] : 0.f;
+        u = (uTotalDistance[p] != 0.f) ? us[p][i % us[p].size()] / uTotalDistance[p] : 0.f;
+        v = (vTotalDistance[i] != 0.f) ? vs[i][p % vs[i].size()] / vTotalDistance[i] : 0.f;
         if (invertUV) {
           stl_util::concat(uvs, {v, u});
         }
