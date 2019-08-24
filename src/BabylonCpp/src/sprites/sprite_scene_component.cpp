@@ -178,12 +178,12 @@ std::optional<PickingInfo> SpriteSceneComponent::_pointerUp(
             ActionEvent::CreateNewFromSprite(spritePickResult->pickedSprite,
                                              scene, evt));
           if (spritePickResult->pickedSprite->actionManager) {
-            if (!scene->_isPointerSwiping()) {
+            /*if (!scene->_isPointerSwiping()) {
               spritePickResult->pickedSprite->actionManager->processTrigger(
                 Constants::ACTION_OnPickTrigger,
                 ActionEvent::CreateNewFromSprite(spritePickResult->pickedSprite,
                                                  scene, evt));
-            }
+            }*/
           }
         }
       }

@@ -833,7 +833,7 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
   auto iParent          = _getEffectiveParent();
   auto useBillboardPath = _billboardMode != TransformNode::BILLBOARDMODE_NONE
                           && !preserveParentRotationForBillboard();
-  auto& camera = getScene()->activeCamera;
+  auto& camera = getScene()->activeCamera();
 
   // Scaling
   auto& iScaling     = cache.scaling;
@@ -1047,7 +1047,7 @@ Vector3 TransformNode::getPositionInCameraSpace(const CameraPtr& camera) const
 {
   if (!camera) {
     return Vector3::TransformCoordinates(
-      absolutePosition(), getScene()->activeCamera->getViewMatrix());
+      absolutePosition(), getScene()->activeCamera()->getViewMatrix());
   }
   else {
     return Vector3::TransformCoordinates(absolutePosition(),
@@ -1059,7 +1059,7 @@ float TransformNode::getDistanceToCamera(const CameraPtr& camera)
 {
   if (!camera) {
     return absolutePosition()
-      .subtract(getScene()->activeCamera->globalPosition())
+      .subtract(getScene()->activeCamera()->globalPosition())
       .length();
   }
   else {

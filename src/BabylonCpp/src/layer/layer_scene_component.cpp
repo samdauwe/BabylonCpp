@@ -23,10 +23,16 @@ void LayerSceneComponent::_register()
 {
   scene->_beforeCameraDrawStage.registerStep(
     SceneComponentConstants::STEP_BEFORECAMERADRAW_LAYER, this,
-    [this](Camera* camera) -> void { _drawCameraBackground(camera); });
+    [this](Camera* camera) -> bool {
+      _drawCameraBackground(camera);
+      return true;
+    });
   scene->_afterCameraDrawStage.registerStep(
     SceneComponentConstants::STEP_AFTERCAMERADRAW_LAYER, this,
-    [this](Camera* camera) -> void { _drawCameraForeground(camera); });
+    [this](Camera* camera) -> bool {
+      _drawCameraForeground(camera);
+      return true;
+    });
 
   scene->_beforeRenderTargetDrawStage.registerStep(
     SceneComponentConstants::STEP_BEFORERENDERTARGETDRAW_LAYER, this,
@@ -114,7 +120,7 @@ void LayerSceneComponent::_drawRenderTargetBackground(
 {
   _draw([this, &renderTarget](const Layer& layer) -> bool {
     return _drawRenderTargetPredicate(
-      layer, true, scene->activeCamera->layerMask, renderTarget);
+      layer, true, scene->activeCamera()->layerMask, renderTarget);
   });
 }
 
@@ -123,7 +129,7 @@ void LayerSceneComponent::_drawRenderTargetForeground(
 {
   _draw([this, &renderTarget](const Layer& layer) -> bool {
     return _drawRenderTargetPredicate(
-      layer, false, scene->activeCamera->layerMask, renderTarget);
+      layer, false, scene->activeCamera()->layerMask, renderTarget);
   });
 }
 

@@ -20,6 +20,12 @@ const char* bumpFragment
     "  #else\n"
     "  mat3 TBN = cotangent_frame(normalW * normalScale, vPositionW, vBumpUV);\n"
     "  #endif\n"
+    "#elif defined(ANISOTROPIC)\n"
+    "  #if defined(TANGENT) && defined(NORMAL)\n"
+    "  mat3 TBN = vTBN;\n"
+    "  #else\n"
+    "  mat3 TBN = cotangent_frame(normalW, vPositionW, vMainUV1, vec2(1., 1.));\n"
+    "  #endif\n"
     "#endif\n"
     "\n"
     "#ifdef PARALLAX\n"
@@ -33,12 +39,12 @@ const char* bumpFragment
     "#endif\n"
     "\n"
     "#ifdef BUMP\n"
-    "#ifdef OBJECTSPACE_NORMALMAP\n"
+    "  #ifdef OBJECTSPACE_NORMALMAP\n"
     "  normalW = normalize(texture2D(bumpSampler, vBumpUV).xyz  * 2.0 - 1.0);\n"
     "  normalW = normalize(mat3(normalMatrix) * normalW);  \n"
-    "#else\n"
+    "  #else\n"
     "  normalW = perturbNormal(TBN, vBumpUV + uvOffset);\n"
-    "#endif\n"
+    "  #endif\n"
     "#endif\n";
 
 } // end of namespace BABYLON

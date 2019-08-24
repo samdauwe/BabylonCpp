@@ -71,7 +71,7 @@ void ShaderMaterialWarpSpeedScene::initializeScene(ICanvas* canvas,
     _time += 0.02f;
 
     _shaderMaterial->setVector3("cameraPosition",
-                                _scene->activeCamera->position);
+                                _scene->activeCamera()->position);
   });
 }
 

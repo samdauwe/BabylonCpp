@@ -38,7 +38,7 @@ void EnvironmentTextureScene::initializeScene(ICanvas* /*canvas*/, Scene* scene)
   hdrTexture->gammaSpace = false;
   scene->createDefaultSkybox(
     hdrTexture, true,
-    (scene->activeCamera->maxZ - scene->activeCamera->minZ) / 2.f, 0.f);
+    (scene->activeCamera()->maxZ - scene->activeCamera()->minZ) / 2.f, 0.f);
 }
 
 } // end of namespace Samples

@@ -34,6 +34,9 @@ const char* backgroundUboDeclaration
     "\n"
     "uniform Scene {\n"
     "  mat4 viewProjection;\n"
+    "#ifdef MULTIVIEW\n"
+    "  mat4 viewProjectionR;\n"
+    "#endif \n"
     "  mat4 view;\n"
     "};\n";
 

@@ -6,7 +6,7 @@ namespace BABYLON {
 extern const char* bumpVertex;
 
 const char* bumpVertex
-  = "#if defined(BUMP) || defined(PARALLAX)\n"
+  = "#if defined(BUMP) || defined(PARALLAX) || defined(CLEARCOAT_BUMP)\n"
     "  #if defined(TANGENT) && defined(NORMAL)\n"
     "  vec3 tbnNormal = normalize(normalUpdated);\n"
     "  vec3 tbnTangent = normalize(tangentUpdated.xyz);\n"

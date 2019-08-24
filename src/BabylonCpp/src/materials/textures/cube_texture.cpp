@@ -15,7 +15,7 @@ namespace BABYLON {
 
 CubeTexturePtr
 CubeTexture::CreateFromImages(const std::vector<std::string>& iFiles,
-                              Scene* scene, bool noMipmap)
+                              Scene* scene, bool iNoMipmap)
 {
   std::string rootUrlKey = "";
 
@@ -24,7 +24,8 @@ CubeTexture::CreateFromImages(const std::vector<std::string>& iFiles,
   }
 
   const std::vector<std::string> emptyStringList;
-  return CubeTexture::New(rootUrlKey, scene, emptyStringList, noMipmap, iFiles);
+  return CubeTexture::New(rootUrlKey, scene, emptyStringList, iNoMipmap,
+                          iFiles);
 }
 
 CubeTexturePtr
@@ -34,13 +35,13 @@ CubeTexture::CreateFromPrefilteredData(const std::string& url, Scene* scene,
 {
   const std::vector<std::string> emptyStringList;
   return CubeTexture::New(url, scene, emptyStringList, false, emptyStringList,
-                          nullptr, nullptr, EngineConstants::TEXTUREFORMAT_RGBA,
-                          true, forcedExtension, createPolynomials);
+                          nullptr, nullptr, Constants::TEXTUREFORMAT_RGBA, true,
+                          forcedExtension, createPolynomials);
 }
 
 CubeTexture::CubeTexture(
   const std::string& rootUrl, Scene* scene,
-  const std::vector<std::string>& extensions, bool noMipmap,
+  const std::vector<std::string>& extensions, bool iNoMipmap,
   const std::vector<std::string>& iFiles,
   const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
   const std::function<void(const std::string& message,
@@ -57,7 +58,7 @@ CubeTexture::CubeTexture(
     , _delayedOnLoad{nullptr}
     , _boundingBoxSize{std::nullopt}
     , _rotationY{0.f}
-    , _noMipmap{noMipmap}
+    , _noMipmap{iNoMipmap}
     , _textureMatrix{std::make_unique<Matrix>(Matrix::Identity())}
     , _format{format}
     , _forcedExtension{forcedExtension}
@@ -285,7 +286,7 @@ CubeTexturePtr CubeTexture::Parse(const json& parsedTexture, Scene* scene,
         rootUrl + json_util::get_string(parsedTexture, "name"), scene,
         json_util::get_array<std::string>(parsedTexture, "extensions"), false,
         std::vector<std::string>{}, nullptr, nullptr,
-        EngineConstants::TEXTUREFORMAT_RGBA, prefiltered);
+        Constants::TEXTUREFORMAT_RGBA, prefiltered);
     },
     parsedTexture, scene);
 

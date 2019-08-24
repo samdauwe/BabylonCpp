@@ -1,10 +1,16 @@
 #ifndef BABYLON_ENGINES_IPIPELINE_CONTEXT_H
 #define BABYLON_ENGINES_IPIPELINE_CONTEXT_H
 
+#include <functional>
+#include <memory>
+
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
 
 namespace BABYLON {
+
+class IPipelineContext;
+using IPipelineContextPtr = std::shared_ptr<IPipelineContext>;
 
 /**
  * @brief Class used to store and describe the pipeline context associated with
@@ -26,11 +32,19 @@ public:
    * asynchronous creating
    */
   ReadOnlyProperty<IPipelineContext, bool> isAsync;
+
   /**
    * Gets a boolean indicating that the context is ready to be used (like
    * shaders / pipelines are compiled and ready for instance)
    */
   ReadOnlyProperty<IPipelineContext, bool> isReady;
+
+  /**
+   * Hidden
+   */
+  std::function<void(const std::function<void(const IPipelineContextPtr&
+                                                pipelineContext)>& onCompiled)>
+    _handlesSpectorRebuildCallback;
 
 private:
   bool _isAsync;

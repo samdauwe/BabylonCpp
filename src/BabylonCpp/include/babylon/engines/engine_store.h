@@ -10,8 +10,6 @@ namespace BABYLON {
 
 class Engine;
 class Scene;
-using EnginePtr = std::shared_ptr<Engine>;
-using ScenePtr  = std::shared_ptr<Scene>;
 
 /**
  * @brief The engine store class is responsible to hold all the instances of
@@ -20,20 +18,20 @@ using ScenePtr  = std::shared_ptr<Scene>;
 struct BABYLON_SHARED_EXPORT EngineStore {
 
   /** Gets the list of created engines */
-  static std::vector<EnginePtr> Instances;
+  static std::vector<Engine*> Instances;
 
   /** Hidden */
-  static ScenePtr _LastCreatedScene;
+  static Scene* _LastCreatedScene;
 
   /**
    * @brief Gets the latest created engine.
    */
-  static EnginePtr LastCreatedEngine();
+  static Engine* LastCreatedEngine();
 
   /**
    * @brief Gets the latest created scene.
    */
-  static ScenePtr LastCreatedScene();
+  static Scene* LastCreatedScene();
 
 }; // end of struct EngineStore
 

@@ -99,7 +99,7 @@ void DirectionalLight::_setDefaultShadowProjectionMatrix(
 void DirectionalLight::_setDefaultFixedFrustumShadowProjectionMatrix(
   Matrix& matrix)
 {
-  auto& activeCamera = getScene()->activeCamera;
+  auto& activeCamera = getScene()->activeCamera();
 
   if (!activeCamera) {
     return;
@@ -115,7 +115,7 @@ void DirectionalLight::_setDefaultAutoExtendShadowProjectionMatrix(
   Matrix& matrix, const Matrix& viewMatrix,
   const std::vector<AbstractMesh*>& renderList)
 {
-  auto& activeCamera = getScene()->activeCamera;
+  auto& activeCamera = getScene()->activeCamera();
 
   if (!activeCamera) {
     return;

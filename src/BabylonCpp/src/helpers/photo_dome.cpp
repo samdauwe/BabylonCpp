@@ -26,11 +26,12 @@ PhotoDome::PhotoDome(
   name = !iName.empty() ? iName : "photoDome";
   options.resolution
     = options.resolution.has_value() ? *options.resolution : 32u;
-  options.size = options.size.has_value() ?
-                   *options.size :
-                   (scene->activeCamera ?
-                      static_cast<unsigned>(scene->activeCamera->maxZ * 0.48f) :
-                      1000u);
+  options.size
+    = options.size.has_value() ?
+        *options.size :
+        (scene->activeCamera() ?
+           static_cast<unsigned>(scene->activeCamera()->maxZ * 0.48f) :
+           1000u);
 
   if (!options.useDirectMapping.has_value()) {
     _useDirectMapping = true;
@@ -67,8 +68,8 @@ PhotoDome::PhotoDome(
   _mesh->parent   = this;
 
   // Initial rotation
-  if (*options.faceForward && scene->activeCamera) {
-    auto& camera = scene->activeCamera;
+  if (*options.faceForward && scene->activeCamera()) {
+    auto& camera = scene->activeCamera();
 
     auto iForward = Vector3::Forward();
     auto direction

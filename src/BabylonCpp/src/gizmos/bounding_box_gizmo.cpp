@@ -556,9 +556,9 @@ void BoundingBoxGizmo::_updateRotationSpheres()
                 .add(rotateSpheres[index]->position));
           }
           if (fixedDragMeshScreenSize
-              && gizmoLayer->utilityLayerScene->activeCamera) {
+              && gizmoLayer->utilityLayerScene->activeCamera()) {
             rotateSpheres[index]->absolutePosition().subtractToRef(
-              gizmoLayer->utilityLayerScene->activeCamera->position,
+              gizmoLayer->utilityLayerScene->activeCamera()->position(),
               _tmpVector);
             auto distanceFromCamera = rotationSphereSize * _tmpVector.length()
                                       / fixedDragMeshScreenSizeDistanceFactor;
@@ -591,9 +591,9 @@ void BoundingBoxGizmo::_updateScaleBoxes()
             Vector3(-_boundingDimensions.x / 2.f, -_boundingDimensions.y / 2.f,
                     -_boundingDimensions.z / 2.f));
           if (fixedDragMeshScreenSize
-              && gizmoLayer->utilityLayerScene->activeCamera) {
+              && gizmoLayer->utilityLayerScene->activeCamera()) {
             scaleBoxes[index]->absolutePosition().subtractToRef(
-              gizmoLayer->utilityLayerScene->activeCamera->position,
+              gizmoLayer->utilityLayerScene->activeCamera()->position(),
               _tmpVector);
             auto distanceFromCamera = scaleBoxSize * _tmpVector.length()
                                       / fixedDragMeshScreenSizeDistanceFactor;

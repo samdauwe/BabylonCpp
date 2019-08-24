@@ -13,6 +13,9 @@ class IGLProgram;
 class IGLRenderingContext;
 class IGLShader;
 class IGLTransformFeedback;
+using IGLProgramPtr           = std::shared_ptr<IGLProgram>;
+using IGLShaderPtr            = std::shared_ptr<IGLShader>;
+using IGLTransformFeedbackPtr = std::shared_ptr<IGLTransformFeedback>;
 } // end of namespace GL
 
 class Engine;
@@ -27,7 +30,7 @@ public:
   ~WebGLPipelineContext() override;
 
   void _handlesSpectorRebuildCallback(
-    const std::function<void(GL::IGLProgram* program)>& onCompiled);
+    const std::function<void(const GL::IGLProgramPtr& program)>& onCompiled);
 
 protected:
   bool get_isAsync() const override;
@@ -35,13 +38,13 @@ protected:
 
 public:
   Engine* engine;
-  GL::IGLProgram* program;
+  GL::IGLProgramPtr program;
   GL::IGLRenderingContext* context;
-  GL::IGLShader* vertexShader;
-  GL::IGLShader* fragmentShader;
+  GL::IGLShaderPtr vertexShader;
+  GL::IGLShaderPtr fragmentShader;
   bool isParallelCompiled;
   std::function<void()> onCompiled;
-  GL::IGLTransformFeedback* transformFeedback;
+  GL::IGLTransformFeedbackPtr transformFeedback;
 
 }; // end of class WebGLPipelineContext
 

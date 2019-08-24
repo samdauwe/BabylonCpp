@@ -174,7 +174,7 @@ void glad_pre_call_callback(const char* name, void* /*funcptr*/,
 bool GLRenderingContext::initialize(bool enableGLDebugging)
 {
   // Initialize glad
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+  if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
     fprintf(stderr, "gladLoadGLLoader: Failed to initialize OpenGL context\n");
     return false;
   }
@@ -188,7 +188,7 @@ bool GLRenderingContext::initialize(bool enableGLDebugging)
 
   // Log the GL version
   BABYLON_LOGF_INFO("GLRenderingContext", "Using GL version: %s",
-                    glGetString(GL_VERSION));
+                    glGetString(GL_VERSION))
 
   // Setup OpenGL options
   glEnable(GL_MULTISAMPLE);
@@ -281,9 +281,7 @@ void GLRenderingContext::activeTexture(GLenum texture)
   glActiveTexture(texture);
 }
 
-void GLRenderingContext::attachShader(
-  const std::unique_ptr<IGLProgram>& program,
-  const std::unique_ptr<IGLShader>& shader)
+void GLRenderingContext::attachShader(IGLProgram* program, IGLShader* shader)
 {
   glAttachShader(program->value, shader ? shader->value : 0);
 }
@@ -503,7 +501,7 @@ void GLRenderingContext::colorMask(GLboolean red, GLboolean green,
   glColorMask(red, green, blue, alpha);
 }
 
-void GLRenderingContext::compileShader(const std::unique_ptr<IGLShader>& shader)
+void GLRenderingContext::compileShader(IGLShader* shader)
 {
   glCompileShader(shader->value);
 }
@@ -558,7 +556,7 @@ std::unique_ptr<IGLFramebuffer> GLRenderingContext::createFramebuffer()
   return std::make_unique<IGLFramebuffer>(buffer);
 }
 
-std::unique_ptr<IGLProgram> GLRenderingContext::createProgram()
+IGLProgramPtr GLRenderingContext::createProgram()
 {
   return std::make_unique<IGLProgram>(glCreateProgram());
 }
@@ -575,7 +573,7 @@ std::unique_ptr<IGLRenderbuffer> GLRenderingContext::createRenderbuffer()
   return std::make_unique<IGLRenderbuffer>(buffer);
 }
 
-std::unique_ptr<IGLShader> GLRenderingContext::createShader(GLenum type)
+IGLShaderPtr GLRenderingContext::createShader(GLenum type)
 {
   return std::make_unique<IGLShader>(glCreateShader(type));
 }
@@ -587,12 +585,11 @@ std::unique_ptr<IGLTexture> GLRenderingContext::createTexture()
   return std::make_unique<IGLTexture>(texture);
 }
 
-std::unique_ptr<IGLTransformFeedback>
-GLRenderingContext::createTransformFeedback()
+IGLTransformFeedbackPtr GLRenderingContext::createTransformFeedback()
 {
   GLuint transformFeedbackArray = 0;
   glGenTransformFeedbacks(1, &transformFeedbackArray);
-  return std::make_unique<IGLTransformFeedback>(transformFeedbackArray);
+  return std::make_shared<IGLTransformFeedback>(transformFeedbackArray);
 }
 
 std::unique_ptr<IGLVertexArrayObject> GLRenderingContext::createVertexArray()
@@ -624,7 +621,7 @@ void GLRenderingContext::deleteProgram(IGLProgram* program)
   glDeleteProgram(program->value);
 }
 
-void GLRenderingContext::deleteQuery(const std::unique_ptr<IGLQuery>& /*query*/)
+void GLRenderingContext::deleteQuery(IGLQuery* /*query*/)
 {
 }
 
@@ -634,7 +631,7 @@ void GLRenderingContext::deleteRenderbuffer(IGLRenderbuffer* renderbuffer)
   renderbuffer->value = 0;
 }
 
-void GLRenderingContext::deleteShader(const std::unique_ptr<IGLShader>& shader)
+void GLRenderingContext::deleteShader(IGLShader* shader)
 {
   glDeleteShader(shader ? shader->value : 0);
 }
@@ -750,9 +747,10 @@ void GLRenderingContext::flush()
   glFlush();
 }
 
-void GLRenderingContext::framebufferRenderbuffer(
-  GLenum target, GLenum attachment, GLenum renderbuffertarget,
-  const std::unique_ptr<IGLRenderbuffer>& renderbuffer)
+void GLRenderingContext::framebufferRenderbuffer(GLenum target,
+                                                 GLenum attachment,
+                                                 GLenum renderbuffertarget,
+                                                 IGLRenderbuffer* renderbuffer)
 {
   glFramebufferRenderbuffer(target, attachment, renderbuffertarget,
                             renderbuffer->value);
@@ -818,18 +816,14 @@ GLfloat GLRenderingContext::getParameterf(GLenum pname)
   return parameter;
 }
 
-GLboolean
-GLRenderingContext::getQueryParameterb(const std::unique_ptr<IGLQuery>& query,
-                                       GLenum pname)
+GLboolean GLRenderingContext::getQueryParameterb(IGLQuery* query, GLenum pname)
 {
   int parameter = 0;
   glGetQueryObjectiv(query->value, pname, &parameter);
   return parameter == GL_TRUE;
 }
 
-GLuint
-GLRenderingContext::getQueryParameteri(const std::unique_ptr<IGLQuery>& query,
-                                       GLenum pname)
+GLuint GLRenderingContext::getQueryParameteri(IGLQuery* query, GLenum pname)
 {
   unsigned int parameter = 0;
   glGetQueryObjectuiv(query->value, pname, &parameter);
@@ -888,8 +882,7 @@ GLint GLRenderingContext::getProgramParameter(IGLProgram* program, GLenum pname)
   return parameter;
 }
 
-std::string GLRenderingContext::getProgramInfoLog(
-  const std::unique_ptr<IGLProgram>& program)
+std::string GLRenderingContext::getProgramInfoLog(IGLProgram* program)
 {
   GLint k = -1;
   glGetProgramiv(program->value, GL_INFO_LOG_LENGTH, &k);
@@ -910,8 +903,7 @@ GLint GLRenderingContext::getRenderbufferParameter(GLenum target, GLenum pname)
   return params;
 }
 
-GLint GLRenderingContext::getShaderParameter(
-  const std::unique_ptr<IGLShader>& shader, GLenum pname)
+GLint GLRenderingContext::getShaderParameter(IGLShader* shader, GLenum pname)
 {
   GLint parameter = 0;
   glGetShaderiv(shader->value, pname, &parameter);
@@ -925,8 +917,7 @@ IGLShaderPrecisionFormat*
   return nullptr;
 }
 
-std::string
-GLRenderingContext::getShaderInfoLog(const std::unique_ptr<IGLShader>& shader)
+std::string GLRenderingContext::getShaderInfoLog(IGLShader* shader)
 {
   GLint logSize = -1;
   glGetShaderiv(shader->value, GL_INFO_LOG_LENGTH, &logSize);
@@ -989,8 +980,7 @@ GLboolean GLRenderingContext::isFramebuffer(IGLFramebuffer* framebuffer)
   return glIsFramebuffer(framebuffer->value) == GL_TRUE;
 }
 
-GLboolean
-GLRenderingContext::isProgram(const std::unique_ptr<IGLProgram>& program)
+GLboolean GLRenderingContext::isProgram(IGLProgram* program)
 {
   return glIsProgram(program->value) == GL_TRUE;
 }
@@ -1015,7 +1005,7 @@ void GLRenderingContext::lineWidth(GLfloat width)
   glLineWidth(width);
 }
 
-bool GLRenderingContext::linkProgram(const std::unique_ptr<IGLProgram>& program)
+bool GLRenderingContext::linkProgram(IGLProgram* program)
 {
   glLinkProgram(program->value);
 
@@ -1084,7 +1074,7 @@ void GLRenderingContext::scissor(GLint x, GLint y, GLint width, GLint height)
   glScissor(x, y, width, height);
 }
 
-void GLRenderingContext::shaderSource(const std::unique_ptr<IGLShader>& shader,
+void GLRenderingContext::shaderSource(IGLShader* shader,
                                       const std::string& source)
 {
   GLint length       = static_cast<int>(source.length());

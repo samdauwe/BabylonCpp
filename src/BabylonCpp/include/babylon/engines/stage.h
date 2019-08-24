@@ -41,7 +41,7 @@ using ActiveMeshStageAction
 /**
  * Strong typing of a Camera related stage step action
  */
-using CameraStageAction = std::function<void(Camera* camera)>;
+using CameraStageAction = std::function<bool(Camera* camera)>;
 
 /**
  * Strong typing of a Camera Frame buffer related stage step action
@@ -150,9 +150,10 @@ public:
   void registerStep(unsigned int index, ISceneComponent* component,
                     const T& action)
   {
-    size_t i        = 0;
-    // Additional parenthesis below are here in order to defeat WinDef.h's "max" macro.
-    size_t maxIndex = (std::numeric_limits<size_t>::max)(); 
+    size_t i = 0;
+    // Additional parenthesis below are here in order to defeat WinDef.h's "max"
+    // macro.
+    size_t maxIndex = (std::numeric_limits<size_t>::max)();
     for (; i < _steps.size(); ++i) {
       const auto& step = _steps[i];
       maxIndex         = step.index;

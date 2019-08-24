@@ -77,7 +77,7 @@ void OutlineRenderer::render(SubMesh* subMesh, const _InstancesBatchPtr& batch,
   auto mesh     = subMesh->getRenderingMesh();
   auto material = subMesh->getMaterial();
 
-  if (!material || !scene->activeCamera) {
+  if (!material || !scene->activeCamera()) {
     return;
   }
 
@@ -87,7 +87,7 @@ void OutlineRenderer::render(SubMesh* subMesh, const _InstancesBatchPtr& batch,
   if (material->useLogarithmicDepth()) {
     _effect->setFloat(
       "logarithmicDepthConstant",
-      2.f / (std::log(scene->activeCamera->maxZ + 1.f) / Math::LN2));
+      2.f / (std::log(scene->activeCamera()->maxZ + 1.f) / Math::LN2));
   }
 
   _effect->setFloat("offset", useOverlay ? 0 : mesh->outlineWidth);
@@ -245,7 +245,7 @@ void OutlineRenderer::_afterRenderingMesh(AbstractMesh* mesh, SubMesh* subMesh,
   // Overlay
   if (mesh->renderOverlay) {
     auto currentMode = _engine->getAlphaMode();
-    _engine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
+    _engine->setAlphaMode(Constants::ALPHA_COMBINE);
     render(subMesh, batch, true);
     _engine->setAlphaMode(currentMode);
   }

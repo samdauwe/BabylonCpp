@@ -23,7 +23,7 @@ public:
    * @param additionalData additional data for the event
    */
   ActionEvent(const AbstractMeshPtr& source, int pointerX, int pointerY,
-              AbstractMesh* meshUnderPointer,
+              const AbstractMeshPtr& meshUnderPointer,
               const std::optional<Event>& sourceEvent,
               const std::string& additionalData = "");
   ActionEvent(const ActionEvent& other);

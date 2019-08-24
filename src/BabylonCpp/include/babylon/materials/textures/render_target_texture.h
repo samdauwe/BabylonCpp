@@ -2,7 +2,6 @@
 #define BABYLON_MATERIALS_TEXTURES_RENDER_TARGET_TEXTURE_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/engines/engine_constants.h>
 #include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/misc/observable.h>
@@ -180,7 +179,7 @@ public:
    * @brief Hidden
    * @param faceIndex face index to bind to if this is a cubetexture
    */
-  void _bindFrameBuffer(unsigned int faceIndex);
+  void _bindFrameBuffer(unsigned int faceIndex = 0);
 
   /**
    * @brief Overrides the default sort function applied in the renderging group

@@ -14,10 +14,25 @@ struct BABYLON_SHARED_EXPORT SceneOptions {
 
   /**
    * Defines that scene should keep up-to-date a map of geometry to enable fast
-   * look-up by Id It will improve performance when the number of geometries
-   * becomes important.
+   * look-up by uniqueId It will improve performance when the number of
+   * geometries becomes important.
    */
-  std::optional<bool> useGeometryIdsMap = std::nullopt;
+  std::optional<bool> useGeometryUniqueIdsMap = std::nullopt;
+
+  /**
+   * Defines that each material of the scene should keep up-to-date a map of
+   * referencing meshes for fast diposing It will improve performance when the
+   * number of mesh becomes important, but might consume a bit more memory
+   */
+  std::optional<bool> useMaterialMeshMap = std::nullopt;
+
+  /**
+   * Defines that each mesh of the scene should keep up-to-date a map of
+   * referencing cloned meshes for fast diposing It will improve performance
+   * when the number of mesh becomes important, but might consume a bit more
+   * memory
+   */
+  std::optional<bool> useClonedMeshhMap = std::nullopt;
 
 }; // end of struct SceneOptions
 

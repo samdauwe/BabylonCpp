@@ -37,7 +37,7 @@ void SimpleTextureScene::initializeScene(ICanvas* /*canvas*/, Scene* scene)
       scene->createDefaultCameraOrLight(true, true, true);
       // Set the camera position
       auto camera
-        = std::static_pointer_cast<ArcRotateCamera>(scene->activeCamera);
+        = std::static_pointer_cast<ArcRotateCamera>(scene->activeCamera());
       if (camera) {
         camera->setTarget(Vector3(-0.5f, 0.5f, 0.f));
         camera->alpha  = Math::PI_2;

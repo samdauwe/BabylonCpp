@@ -746,11 +746,11 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
       _effect->setVector3("lightData", _cachedPosition);
     }
 
-    if (scene->activeCamera) {
+    if (scene->activeCamera()) {
       _effect->setFloat2("depthValues",
-                         getLight()->getDepthMinZ(*scene->activeCamera),
-                         getLight()->getDepthMinZ(*scene->activeCamera)
-                           + getLight()->getDepthMaxZ(*scene->activeCamera));
+                         getLight()->getDepthMinZ(*scene->activeCamera()),
+                         getLight()->getDepthMinZ(*scene->activeCamera())
+                           + getLight()->getDepthMaxZ(*scene->activeCamera()));
     }
 
     // Alpha test
@@ -1134,7 +1134,7 @@ void ShadowGenerator::bindShadowLight(const std::string& lightIndex,
     return;
   }
 
-  auto& camera = scene->activeCamera;
+  auto& camera = scene->activeCamera();
   if (!camera) {
     return;
   }

@@ -181,21 +181,21 @@ void RenderingGroup::render(
 void RenderingGroup::renderOpaqueSorted(const std::vector<SubMesh*>& subMeshes)
 {
   return RenderingGroup::renderSorted(subMeshes, _opaqueSortCompareFn,
-                                      _scene->activeCamera, false);
+                                      _scene->activeCamera(), false);
 }
 
 void RenderingGroup::renderAlphaTestSorted(
   const std::vector<SubMesh*>& subMeshes)
 {
   return RenderingGroup::renderSorted(subMeshes, _alphaTestSortCompareFn,
-                                      _scene->activeCamera, false);
+                                      _scene->activeCamera(), false);
 }
 
 void RenderingGroup::renderTransparentSorted(
   const std::vector<SubMesh*>& subMeshes)
 {
   return RenderingGroup::renderSorted(subMeshes, _transparentSortCompareFn,
-                                      _scene->activeCamera, true);
+                                      _scene->activeCamera(), true);
 }
 
 void RenderingGroup::renderSorted(
@@ -363,7 +363,7 @@ void RenderingGroup::_renderParticles(
   }
 
   // Particles
-  auto& activeCamera = _scene->activeCamera;
+  const auto& activeCamera = _scene->activeCamera();
   _scene->onBeforeParticlesRenderingObservable.notifyObservers(_scene);
   for (auto& particleSystem : _particleSystems) {
     if ((activeCamera && activeCamera->layerMask & particleSystem->layerMask)
@@ -389,7 +389,7 @@ void RenderingGroup::_renderSprites()
   }
 
   // Sprites
-  auto& activeCamera = _scene->activeCamera;
+  auto& activeCamera = _scene->activeCamera();
   _scene->onBeforeSpritesRenderingObservable.notifyObservers(_scene);
   for (auto& spriteManager : _spriteManagers) {
     if (((activeCamera && activeCamera->layerMask & spriteManager->layerMask)

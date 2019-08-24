@@ -297,9 +297,9 @@ ISceneSize EnvironmentHelper::_getSceneSize()
   const auto sceneDiagonal = sceneExtends.max.subtract(sceneExtends.min);
 
   if (_options.sizeAuto) {
-    if (_scene->activeCamera->type() == Type::ARCROTATECAMERA) {
+    if (_scene->activeCamera()->type() == Type::ARCROTATECAMERA) {
       auto activecamera
-        = std::static_pointer_cast<ArcRotateCamera>(_scene->activeCamera);
+        = std::static_pointer_cast<ArcRotateCamera>(_scene->activeCamera());
       if (activecamera->upperRadiusLimit.has_value()) {
         groundSize = *activecamera->upperRadiusLimit * 2.f;
         skyboxSize = groundSize;

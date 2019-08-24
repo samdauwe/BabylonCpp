@@ -1,4 +1,4 @@
-#ifndef BABYLON_ENGINES_SCENE_H
+﻿#ifndef BABYLON_ENGINES_SCENE_H
 #define BABYLON_ENGINES_SCENE_H
 
 #include <nlohmann/json.hpp>
@@ -46,6 +46,7 @@ struct IActiveMeshCandidateProvider;
 class IAnimatable;
 struct ICollisionCoordinator;
 class ImageProcessingConfiguration;
+class InputManager;
 class InternalTexture;
 struct IPhysicsEngine;
 struct IPhysicsEnginePlugin;
@@ -101,6 +102,9 @@ using SubMeshPtr             = std::shared_ptr<SubMesh>;
 class BABYLON_SHARED_EXPORT Scene : public AbstractScene, public IAnimatable {
 
 public:
+  using TrianglePickingPredicate = std::function<bool(
+    const Vector3& p0, const Vector3& p1, const Vector3& p2, const Ray& ray)>;
+
   static size_t _uniqueIdCounter;
 
   /** The fog is deactivated */
@@ -126,24 +130,52 @@ public:
   static microseconds_t MaxDeltaTime;
 
   /**
-   * The distance in pixel that you have to move to prevent some events.
+   * @brief Gets the distance in pixel that you have to move to prevent some
+   * events. Default is 10 pixels
    */
-  static unsigned int DragMovementThreshold;
+  static unsigned int DragMovementThreshold();
+
   /**
-   * Time in milliseconds to wait to raise long press events if button is still
-   * pressed.
+   * @brief Sets the distance in pixel that you have to move to prevent some
+   * events.
    */
-  static milliseconds_t LongPressDelay;
+  static void setDragMovementThreshold(unsigned int value);
+
   /**
-   * Time in milliseconds with two consecutive clicks will be considered as a
-   * double click.
+   * @brief Sets the time in milliseconds to wait to raise long press events if
+   * button is still pressed. Default is 500 ms
    */
-  static milliseconds_t DoubleClickDelay;
+  static milliseconds_t LongPressDelay();
+
   /**
-   * If you need to check double click without raising a single click at first
-   * click, enable this flag.
+   * @brief Sets the time in milliseconds to wait to raise long press events if
+   * button is still pressed.
    */
-  static bool ExclusiveDoubleClickMode;
+  static void setLongPressDelay(milliseconds_t value);
+
+  /**
+   * @brief Gets the time in milliseconds to wait to raise long press events if
+   * button is still pressed. Default is 300 ms
+   */
+  static milliseconds_t DoubleClickDelay();
+
+  /**
+   * @brief Sets the time in milliseconds to wait to raise long press events if
+   * button is still pressed.
+   */
+  static void setDoubleClickDelay(milliseconds_t value);
+
+  /**
+   * @brief If you need to check double click without raising a single click at
+   * first click, enable this flag.
+   */
+  static bool ExclusiveDoubleClickMode();
+
+  /**
+   * @brief If you need to check double click without raising a single click at
+   * first click, enable this flag.
+   */
+  static void setExclusiveDoubleClickMode(bool value);
 
   template <typename... Ts>
   static std::unique_ptr<Scene> New(Ts&&... args)
@@ -199,6 +231,12 @@ public:
    * @brief Hidden
    */
   void setMirroredCameraPosition(const Vector3& newPosition);
+
+  /**
+   * @brief Gets a string idenfifying the name of the class.
+   * @returns "Scene" string
+   */
+  const std::string getClassName() const;
 
   /**
    * @brief Hidden
@@ -362,9 +400,12 @@ public:
    * event on
    * @param pointerEventInit pointer event state to be used when simulating the
    * pointer event (eg. pointer id for multitouch)
+   * @param doubleTap indicates that the pointer up event should be considered
+   * as part of a double click (false by default)
    * @returns the current scene
    */
-  Scene& simulatePointerUp(std::optional<PickingInfo>& pickResult);
+  Scene& simulatePointerUp(std::optional<PickingInfo>& pickResult,
+                           bool doubleTap = false);
 
   /**
    * @brief Gets a boolean indicating if the current pointer event is captured
@@ -374,11 +415,6 @@ public:
    * @returns true if the pointer was captured
    */
   bool isPointerCaptured(int pointerId = 0);
-
-  /**
-   * @brief Hidden
-   */
-  bool _isPointerSwiping() const;
 
   /**
    * @brief Attach events to the canvas (To handle actionManagers triggers and
@@ -471,11 +507,6 @@ public:
   void _checkIsReady();
 
   /** Animations **/
-
-  /**
-   * @brief Gets all animations attached to the scene.
-   */
-  std::vector<AnimationPtr> getAnimations() override;
 
   /**
    * @brief Will start the animation sequence of a given target.
@@ -625,6 +656,13 @@ public:
   std::vector<AnimatablePtr> getAllAnimatablesByTarget(IAnimatable* target);
 
   /**
+   * @brief Resets the last animation time frame.
+   * Useful to override when animations start running when loading a scene for
+   * the first time.
+   */
+  void resetLastAnimationTimeFrame();
+
+  /**
    * @brief Will stop the animation of the given target.
    * @param target - the target
    * @param animationName - the name of the animation to stop (all animations
@@ -667,15 +705,16 @@ public:
   /** Matrix **/
 
   /**
-   * @brief Hidden
+   * @brief Gets the current view matrix.
+   * @returns a Matrix
    */
-  void _switchToAlternateCameraConfiguration(bool active);
+  Matrix& getViewMatrix();
 
   /**
    * @brief Gets the current view matrix.
    * @returns a Matrix
    */
-  Matrix getViewMatrix();
+  const Matrix& getViewMatrix() const;
 
   /**
    * @brief Gets the current projection matrix.
@@ -693,25 +732,31 @@ public:
    * @brief Gets the current transform matrix.
    * @returns a Matrix made of View * Projection
    */
-  Matrix getTransformMatrix();
+  Matrix& getTransformMatrix();
+
+  /**
+   * @brief Gets the current transform matrix.
+   * @returns a Matrix made of View * Projection
+   */
+  const Matrix& getTransformMatrix() const;
 
   /**
    * @brief Sets the current transform matrix.
-   * @param view defines the View matrix to use
-   * @param projection defines the Projection matrix to use
+   * @param viewL defines the View matrix to use
+   * @param projectionL defines the Projection matrix to use
+   * @param viewR defines the right View matrix to use (if provided)
+   * @param projectionR defines the right Projection matrix to use (if provided)
    */
-  void setTransformMatrix(Matrix& view, Matrix& projection);
-
-  /**
-   * @brief Hidden
-   */
-  void _setAlternateTransformMatrix(Matrix& view, Matrix& projection);
+  void setTransformMatrix(const Matrix& viewL, const Matrix& projectionL,
+                          const std::optional<Matrix>& viewR = std::nullopt,
+                          const std::optional<Matrix>& projectionR
+                          = std::nullopt);
 
   /**
    * @brief Gets the uniform buffer used to store scene data.
    * @returns a UniformBuffer
    */
-  UniformBuffer* getSceneUniformBuffer();
+  std::unique_ptr<UniformBuffer>& getSceneUniformBuffer();
 
   /**
    * @brief Gets an unique (relatively to the current scene) Id.
@@ -1275,19 +1320,18 @@ public:
   void updateTransformMatrix(bool force = false);
 
   /**
-   * @brief Defines an alternate camera (used mostly in VR-like scenario where
-   * two cameras can render the same scene from a slightly different point of
-   * view).
-   * @param alternateCamera defines the camera to use
+   * @brief Execute all animations (for a frame).
    */
-  void updateAlternateTransformMatrix(Camera* alternateCamera);
+  void animate();
 
   /**
-   * Render the scene.
+   * @brief Render the scene.
    * @param updateCameras defines a boolean indicating if cameras must update
    * according to their inputs (true by default)
+   * @param ignoreAnimations defines a boolean indicating if animations should
+   * not be executed (false by default)
    */
-  void render(bool updateCameras = true);
+  void render(bool updateCameras = true, bool ignoreAnimations = false);
 
   /** Rendering **/
 
@@ -1437,13 +1481,16 @@ public:
    * set to null.
    * @param camera to use for computing the picking ray. Can be set to null. In
    * this case, the scene.activeCamera will be used
+   * @param trianglePredicate defines an optional predicate used to select faces
+   * when a mesh intersection is detected
    * @returns a PickingInfo
    */
   std::optional<PickingInfo>
   pick(int x, int y,
        const std::function<bool(const AbstractMeshPtr& mesh)>& predicate
        = nullptr,
-       bool fastCheck = false, const CameraPtr& camera = nullptr);
+       bool fastCheck = false, const CameraPtr& camera = nullptr,
+       const TrianglePickingPredicate& trianglePredicate = nullptr);
 
   /**
    * @brief Launch a ray to try to pick a sprite in the scene.
@@ -1485,13 +1532,16 @@ public:
    * be set to null. In this case, a mesh must have isPickable set to true
    * @param fastCheck Launch a fast check only using the bounding boxes. Can be
    * set to null
+   * @param trianglePredicate defines an optional predicate used to select faces
+   * when a mesh intersection is detected
    * @returns a PickingInfo
    */
   std::optional<PickingInfo>
   pickWithRay(const Ray& ray,
               const std::function<bool(const AbstractMeshPtr& mesh)>& predicate
               = nullptr,
-              bool fastCheck = false);
+              bool fastCheck                                    = false,
+              const TrianglePickingPredicate& trianglePredicate = nullptr);
 
   /**
    * @brief Launch a ray to try to pick a mesh in the scene.
@@ -1502,12 +1552,15 @@ public:
    * isPickable set to true
    * @param camera camera to use for computing the picking ray. Can be set to
    * null. In this case, the scene.activeCamera will be used
+   * @param trianglePredicate defines an optional predicate used to select faces
+   * when a mesh intersection is detected
    * @returns an array of PickingInfo
    */
   std::vector<std::optional<PickingInfo>>
   multiPick(int x, int y,
             const std::function<bool(AbstractMesh* mesh)>& predicate,
-            const CameraPtr& camera = nullptr);
+            const CameraPtr& camera                           = nullptr,
+            const TrianglePickingPredicate& trianglePredicate = nullptr);
 
   /**
    * @brief Launch a ray to try to pick a mesh in the scene.
@@ -1515,23 +1568,26 @@ public:
    * @param predicate Predicate function used to determine eligible meshes. Can
    * be set to null. In this case, a mesh must be enabled, visible and with
    * isPickable set to true
+   * @param trianglePredicate defines an optional predicate used to select faces
+   * when a mesh intersection is detected
    * @returns an array of PickingInfo
    */
   std::vector<std::optional<PickingInfo>>
   multiPickWithRay(const Ray& ray,
-                   const std::function<bool(AbstractMesh* mesh)>& predicate);
+                   const std::function<bool(AbstractMesh* mesh)>& predicate,
+                   const TrianglePickingPredicate& trianglePredicate = nullptr);
 
   /**
    * @brief Force the value of meshUnderPointer.
    * @param mesh defines the mesh to use
    */
-  void setPointerOverMesh(AbstractMesh* mesh);
+  void setPointerOverMesh(const AbstractMeshPtr& mesh);
 
   /**
    * @brief Gets the mesh under the pointer.
    * @returns a Mesh or null if no mesh is under the pointer
    */
-  AbstractMesh* getPointerOverMesh();
+  AbstractMeshPtr& getPointerOverMesh();
 
   /**
    * @brief Force the sprite under the pointer.
@@ -1572,6 +1628,12 @@ public:
    * @returns a boolean indicating if there is an active physics engine
    */
   bool isPhysicsEnabled();
+
+  /**
+   * @brief Hidden
+   */
+  void _renderForCamera(const CameraPtr& camera,
+                        const CameraPtr& rigParent = nullptr);
 
   /**
    * @brief Hidden
@@ -1796,24 +1858,12 @@ private:
    */
   void _registerTransientComponents();
 
-  void _updatePointerPosition(const PointerEvent evt);
   void _createUbo();
-  void _createAlternateUbo();
   // Pointers handling
   std::optional<PickingInfo> _pickSpriteButKeepRay(
     const std::optional<PickingInfo>& originalPointerInfo, int x, int y,
     const std::function<bool(Sprite* sprite)>& predicate = nullptr,
     bool fastCheck = false, const CameraPtr& camera = nullptr);
-  void _setRayOnPointerInfo(PointerInfo& pointerInfo);
-  Scene& _processPointerMove(std::optional<PickingInfo>& pickResult,
-                             const PointerEvent& evt);
-  bool _checkPrePointerObservable(const std::optional<PickingInfo>& pickResult,
-                                  const PointerEvent& evt,
-                                  PointerEventTypes type);
-  Scene& _processPointerDown(std::optional<PickingInfo>& pickResult,
-                             const PointerEvent& evt);
-  Scene& _processPointerUp(std::optional<PickingInfo>& pickResult,
-                           const PointerEvent& evt, const ClickInfo& clickInfo);
   void _animate();
   /**
    * @brief Hidden
@@ -1835,24 +1885,20 @@ private:
                         AbstractMesh* initialMesh);
   void _evaluateActiveMeshes();
   void _activeMesh(AbstractMesh* sourceMesh, AbstractMesh* mesh);
-  void _renderForCamera(const CameraPtr& camera,
-                        const CameraPtr& rigParent = nullptr);
+  void _bindFrameBuffer();
   void _processSubCameras(const CameraPtr& camera);
   void _checkIntersections();
-  /** Pointers handling **/
-  void _onPointerMoveEvent(PointerEvent&& evt);
-  void _onPointerDownEvent(PointerEvent&& evt);
-  void _onPointerUpEvent(PointerEvent&& evt);
-  void _onKeyDownEvent(KeyboardEvent&& evt);
-  void _onKeyUpEvent(KeyboardEvent&& evt);
   /** Picking **/
   std::optional<PickingInfo> _internalPick(
     const std::function<Ray(Matrix& world)>& rayFunction,
     const std::function<bool(const AbstractMeshPtr& mesh)>& predicate,
-    bool fastCheck);
+    bool fastCheck,
+    const TrianglePickingPredicate& trianglePredicate = nullptr);
   std::vector<std::optional<PickingInfo>>
   _internalMultiPick(const std::function<Ray(Matrix& world)>& rayFunction,
-                     const std::function<bool(AbstractMesh* mesh)>& predicate);
+                     const std::function<bool(AbstractMesh* mesh)>& predicate,
+                     const TrianglePickingPredicate& trianglePredicate
+                     = nullptr);
 
   /**
    * @Brief hidden
@@ -2043,6 +2089,16 @@ protected:
   bool get_lightsEnabled() const;
 
   /**
+   * @brief Gets the current active camera.
+   */
+  CameraPtr& get_activeCamera();
+
+  /**
+   * @brief Sets the current active camera.
+   */
+  void set_activeCamera(const CameraPtr& value);
+
+  /**
    * @brief Gets the default material used on meshes when no material is
    * affected.
    */
@@ -2104,11 +2160,6 @@ protected:
   void set_simplificationQueue(const SimplificationQueuePtr& value);
 
   /**
-   * @brief Hidden
-   */
-  bool get_isAlternateRenderingEnabled() const;
-
-  /**
    * @brief Gets the list of frustum planes (built from the active camera).
    */
   std::array<Plane, 6>& get_frustumPlanes();
@@ -2143,7 +2194,7 @@ protected:
   /**
    * @brief Gets the mesh that is currently under the pointer.
    */
-  AbstractMesh*& get_meshUnderPointer();
+  AbstractMeshPtr& get_meshUnderPointer();
 
   /**
    * @brief Gets the current on-screen X position of the pointer.
@@ -2268,6 +2319,22 @@ private:
 
 public:
   // Members
+
+  /**
+   * Hidden
+   */
+  std::unique_ptr<InputManager> _inputManager;
+
+  /**
+   * Define this parameter if you are using multiple cameras and you want to
+   * specify which one should be used for pointer position
+   */
+  CameraPtr cameraToUseForPointers;
+
+  /**
+   * Hidden
+   */
+  const bool _isScene;
 
   /**
    * Gets or sets a boolean that indicates if the scene must clear the render
@@ -2508,6 +2575,16 @@ public:
   Observable<AbstractMesh> onMeshRemovedObservable;
 
   /**
+   * An event triggered when a skeleton is created
+   */
+  Observable<Skeleton> onNewSkeletonAddedObservable;
+
+  /**
+   * An event triggered when a skeleton is removed
+   */
+  Observable<Skeleton> onSkeletonRemovedObservable;
+
+  /**
    * An event triggered when a material is created
    */
   Observable<Material> onNewMaterialAddedObservable;
@@ -2550,6 +2627,11 @@ public:
   Observable<Scene> onAfterStepObservable;
 
   /**
+   * An event triggered when the activeCamera property is updated
+   */
+  Observable<Scene> onActiveCameraChanged;
+
+  /**
    * This Observable will be triggered before rendering each renderingGroup of
    * each rendered camera. The RenderinGroupInfo class contains all the
    * information about the context in which the observable is called If you wish
@@ -2574,6 +2656,15 @@ public:
    */
   Observable<AbstractMesh> onMeshImportedObservable;
 
+  /**
+   * Gets or sets a user defined funtion to select LOD from a mesh and a camera.
+   * By default this function is undefined and Babylon.js will select LOD based
+   * on distance to camera
+   */
+  const std::function<AbstractMesh*(AbstractMesh* mesh,
+                                    const CameraPtr& camera)>
+    customLODSelector;
+
   // Pointers
 
   /**
@@ -2592,22 +2683,25 @@ public:
    */
   std::function<bool(const AbstractMeshPtr& mesh)> pointerMovePredicate;
 
-  /** Deprecated. Use onPointerObservable instead */
+  /** Callback called when a pointer move is detected */
   std::function<void(const PointerEvent& evt,
                      const std::optional<PickingInfo>& pickInfo,
                      PointerEventTypes type)>
     onPointerMove;
-  /** Deprecated. Use onPointerObservable instead */
+
+  /** Callback called when a pointer down is detected  */
   std::function<void(const PointerEvent& evt,
                      const std::optional<PickingInfo>& pickInfo,
                      PointerEventTypes type)>
     onPointerDown;
-  /** Deprecated. Use onPointerObservable instead */
+
+  /** Callback called when a pointer up is detected  */
   std::function<void(const PointerEvent& evt,
                      const std::optional<PickingInfo>& pickInfo,
                      PointerEventTypes type)>
     onPointerUp;
-  /** Deprecated. Use onPointerObservable instead */
+
+  /** Callback called when a pointer pick is detected */
   std::function<void(const PointerEvent& evt,
                      const std::optional<PickingInfo>& pickInfo)>
     onPointerPick;
@@ -2698,6 +2792,11 @@ public:
   json metadata;
 
   /**
+   * For internal use only. Please do not use.
+   */
+  json reservedDataStore;
+
+  /**
    * Gets the name of the plugin used to load this scene (null by default)
    */
   std::string loadingPluginName;
@@ -2739,12 +2838,6 @@ public:
    * out of the pointer event)
    */
   ReadOnlyProperty<Scene, Vector2> unTranslatedPointer;
-
-  /**
-   * Define this parameter if you are using multiple cameras and you want to
-   * specify which one should be used for pointer position.
-   */
-  CameraPtr cameraToUseForPointers;
 
   // Mirror
 
@@ -2842,9 +2935,14 @@ public:
   std::vector<CameraPtr> activeCameras;
 
   /**
+   * @brief Hidden
+   */
+  CameraPtr _activeCamera;
+
+  /**
    * The current active camera
    */
-  CameraPtr activeCamera;
+  Property<Scene, CameraPtr> activeCamera;
 
   // Materials
 
@@ -3061,6 +3159,12 @@ public:
   /** Hidden */
   PerfCounter _activeBones;
 
+  /** Hidden */
+  std::optional<high_res_time_point_t> _animationTimeLast;
+
+  /** Hidden */
+  int _animationTime;
+
   /**
    * Gets or sets a general scale for animation speed
    * @see https://www.babylonjs-playground.com/#IBU2W7#3
@@ -3075,6 +3179,8 @@ public:
   std::optional<float> _cachedVisibility;
   /** Hidden */
   std::vector<IDisposable*> _toBeDisposed;
+  /** Hidden */
+  std::vector<std::string> _pendingData;
 
   /**
    * Gets or sets a boolean indicating that all submeshes of active meshes must
@@ -3090,12 +3196,12 @@ public:
   std::vector<AnimatablePtr> _activeAnimatables;
 
   /** Hidden */
-  std::unique_ptr<Vector3> _forcedViewPosition;
+  Matrix _viewMatrix;
 
-  /**
-   * Hidden
-   */
-  ReadOnlyProperty<Scene, bool> _isAlternateRenderingEnabled;
+  std::array<Plane, 6> _frustumPlanes;
+
+  /** Hidden */
+  std::unique_ptr<Vector3> _forcedViewPosition;
 
   /**
    * Gets the list of frustum planes (built from the active camera)
@@ -3112,12 +3218,12 @@ public:
   /**
    * Hidden
    */
-  const bool useMaterialMeshMap;
+  bool useMaterialMeshMap;
 
   /**
    * Hidden
    */
-  const bool useClonedMeshhMap;
+  bool useClonedMeshhMap;
 
   /**
    * Backing store of defined scene components
@@ -3157,7 +3263,7 @@ public:
   /**
    * Gets the mesh that is currently under the pointer
    */
-  ReadOnlyProperty<Scene, AbstractMesh*> meshUnderPointer;
+  ReadOnlyProperty<Scene, AbstractMeshPtr> meshUnderPointer;
 
   /**
    * Gets the current on-screen X position of the pointer
@@ -3280,7 +3386,7 @@ public:
    * Defines the actions happening during the per camera render target step
    * Hidden
    */
-  Stage<CameraStageAction> _cameraDrawRenderTargetStage;
+  Stage<CameraStageFrameBufferAction> _cameraDrawRenderTargetStage;
 
   /**
    * Defines the actions happening just before the active camera is drawing
@@ -3429,46 +3535,8 @@ private:
   Observer<Camera>::Ptr _onAfterCameraRenderObserver;
   // Animations
   std::vector<std::string> _registeredForLateAnimationBindings;
-  // Pointers
-  std::function<void(PointerEvent&& evt)> _onPointerMove;
-  std::function<void(PointerEvent&& evt)> _onPointerDown;
-  std::function<void(PointerEvent&& evt)> _onPointerUp;
   // Gamepads
   std::unique_ptr<GamepadManager> _gamepadManager;
-  // Click events
-  std::function<void(
-    Observable<PointerInfoPre>& obs1, Observable<PointerInfo>& obs2,
-    const PointerEvent& evt,
-    const std::function<void(const ClickInfo& clickInfo,
-                             std::optional<PickingInfo>& pickResult)>& cb)>
-    _initClickEvent;
-  std::function<AbstractActionManagerPtr(const AbstractActionManagerPtr& act,
-                                         const ClickInfo& clickInfo)>
-    _initActionManager;
-  std::function<void(
-    unsigned int btn, const ClickInfo& clickInfo,
-    const std::function<void(const ClickInfo& clickInfo,
-                             const PointerInfo& pickResult)>& cb)>
-    _delayedSimpleClick;
-  milliseconds_t _delayedSimpleClickTimeout;
-  milliseconds_t _previousDelayedSimpleClickTimeout;
-  bool _meshPickProceed;
-  MouseButtonType _previousButtonPressed;
-  bool _previousHasSwiped;
-  std::optional<PickingInfo> _currentPickResult;
-  std::optional<PickingInfo> _previousPickResult;
-  int _totalPointersPressed;
-  bool _doubleClickOccured;
-  int _pointerX;
-  int _pointerY;
-  int _unTranslatedPointerX;
-  int _unTranslatedPointerY;
-  Vector2 _startingPointerPosition;
-  Vector2 _previousStartingPointerPosition;
-  high_res_time_point_t _startingPointerTime;
-  high_res_time_point_t _previousStartingPointerTime;
-  std::unordered_map<int, bool> _pointerCaptures;
-  // AbstractMesh* _meshUnderPointer;
   // Deterministic lockstep
   float _timeAccumulator;
   unsigned int _currentStepId;
@@ -3521,18 +3589,13 @@ private:
   // Performance counters
   PerfCounter _totalVertices;
   float _animationRatio;
-  std::optional<high_res_time_point_t> _animationTimeLast;
-  int _animationTime;
   int _renderId;
   int _frameId;
   int _executeWhenReadyTimeoutId;
   bool _intermediateRendering;
   int _viewUpdateFlag;
   int _projectionUpdateFlag;
-  int _alternateViewUpdateFlag;
-  int _alternateProjectionUpdateFlag;
   std::vector<IFileRequest> _activeRequests;
-  std::vector<std::string> _pendingData;
   bool _isDisposed;
   std::vector<AbstractMesh*> _activeMeshes;
   IActiveMeshCandidateProvider* _activeMeshCandidateProvider;
@@ -3544,7 +3607,6 @@ private:
   std::unique_ptr<RenderingManager> _renderingManager;
   Matrix _transformMatrix;
   std::unique_ptr<UniformBuffer> _sceneUbo;
-  std::unique_ptr<UniformBuffer> _alternateSceneUbo;
   std::unique_ptr<Matrix> _pickWithRayInverseMatrix;
 
   /**
@@ -3564,26 +3626,17 @@ private:
 
   /** Hidden */
   OutlineRendererPtr _outlineRenderer;
-  Matrix _viewMatrix;
   Matrix _projectionMatrix;
-  Matrix _alternateViewMatrix;
-  Matrix _alternateProjectionMatrix;
-  std::unique_ptr<Matrix> _alternateTransformMatrix;
-  bool _useAlternateCameraConfiguration;
-  bool _alternateRendering;
-  bool _frustumPlanesSet;
-  std::array<Plane, 6> _frustumPlanes;
 
   /** Hidden (Backing field) */
   Octree<AbstractMesh*>* _selectionOctree;
 
-  Vector2 _unTranslatedPointer;
-  AbstractMesh* _pointerOverMesh;
+  /** Hidden */
+  bool _frustumPlanesSet;
+
   std::unique_ptr<DebugLayer> _debugLayer;
   std::unordered_map<std::string, DepthRendererPtr> _depthRenderer;
   GeometryBufferRendererPtr _geometryBufferRenderer;
-  AbstractMesh* _pickedDownMesh;
-  AbstractMesh* _pickedUpMesh;
   std::string _uid;
   bool _blockMaterialDirtyMechanism;
 

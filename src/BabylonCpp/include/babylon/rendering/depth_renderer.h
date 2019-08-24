@@ -2,7 +2,7 @@
 #define BABYLON_RENDERING_DEPTH_RENDERER_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/engines/engine_constants.h>
+#include <babylon/engines/constants.h>
 #include <babylon/math/matrix.h>
 
 namespace BABYLON {
@@ -32,8 +32,7 @@ public:
    * @param camera The camera to be used to render the depth map (default:
    * scene's active camera)
    */
-  DepthRenderer(Scene* scene,
-                unsigned int type       = EngineConstants::TEXTURETYPE_FLOAT,
+  DepthRenderer(Scene* scene, unsigned int type = Constants::TEXTURETYPE_FLOAT,
                 const CameraPtr& camera = nullptr);
   virtual ~DepthRenderer();
 

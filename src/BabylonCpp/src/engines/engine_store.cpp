@@ -2,11 +2,11 @@
 
 namespace BABYLON {
 
-std::vector<EnginePtr> EngineStore::Instances;
+std::vector<Engine*> EngineStore::Instances;
 
-ScenePtr EngineStore::_LastCreatedScene = nullptr;
+Scene* EngineStore::_LastCreatedScene = nullptr;
 
-EnginePtr EngineStore::LastCreatedEngine()
+Engine* EngineStore::LastCreatedEngine()
 {
   if (Instances.empty()) {
     return nullptr;
@@ -15,7 +15,7 @@ EnginePtr EngineStore::LastCreatedEngine()
   return Instances.back();
 }
 
-ScenePtr EngineStore::LastCreatedScene()
+Scene* EngineStore::LastCreatedScene()
 {
   return _LastCreatedScene;
 }

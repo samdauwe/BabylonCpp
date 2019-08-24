@@ -1614,7 +1614,7 @@ size_t ParticleSystem::_render(unsigned int iBlendMode)
                     textureMask.a);
 
   if (_isBillboardBased) {
-    auto camera = _scene->activeCamera;
+    const auto& camera = _scene->activeCamera();
     effect->setVector3("eyePosition", camera->globalPosition);
   }
 

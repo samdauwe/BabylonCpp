@@ -6,6 +6,7 @@
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
 #include <babylon/engines/engine.h>
+#include <babylon/engines/ipipeline_context.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
@@ -15,11 +16,13 @@
 #include <babylon/math/color3.h>
 #include <babylon/math/vector2.h>
 #include <babylon/math/vector4.h>
-#include <babylon/shaders/shadersinclude/glsl_version_3.h>
 #include <babylon/misc/tools.h>
+#include <babylon/shaders/shadersinclude/glsl_version_3.h>
 #include <babylon/utils/base64.h>
 
 namespace BABYLON {
+
+std::string Effect::ShadersRepository = "src/Shaders/";
 
 std::unordered_map<std::string, std::string>& Effect::ShadersStore()
 {
@@ -44,16 +47,21 @@ Effect::Effect(const std::string& baseName, EffectCreationOptions& options,
     , uniqueId{Effect::_uniqueIdSeed++}
     , _bonesComputationForcedToCPU{false}
     , onBindObservable{this, &Effect::get_onBindObservable}
-    , _program{nullptr}
+    , _key{""}
+    , _pipelineContext{nullptr}
     , _onCompileObserver{nullptr}
     , _engine{engine}
     , _uniformsNames{options.uniformsNames}
-    , _samplers{options.samplers}
+    , _samplerList{options.samplers}
     , _isReady{false}
     , _compilationError{""}
     , _attributesNames{options.attributes}
     , _indexParameters{options.indexParameters}
     , _fallbacks{std::move(options.fallbacks)}
+    , _vertexSourceCode{""}
+    , _fragmentSourceCode{""}
+    , _vertexSourceCodeOverride{""}
+    , _fragmentSourceCodeOverride{""}
     , _transformFeedbackVaryings{options.transformFeedbackVaryings}
 {
   stl_util::concat(_uniformsNames, options.samplers);
@@ -118,16 +126,21 @@ Effect::Effect(const std::unordered_map<std::string, std::string>& baseName,
     , uniqueId{Effect::_uniqueIdSeed++}
     , _bonesComputationForcedToCPU{false}
     , onBindObservable{this, &Effect::get_onBindObservable}
-    , _program{nullptr}
+    , _key{""}
+    , _pipelineContext{nullptr}
     , _onCompileObserver{nullptr}
     , _engine{engine}
     , _uniformsNames{options.uniformsNames}
-    , _samplers{options.samplers}
+    , _samplerList{options.samplers}
     , _isReady{false}
     , _compilationError{""}
     , _attributesNames{options.attributes}
     , _indexParameters{options.indexParameters}
     , _fallbacks{std::move(options.fallbacks)}
+    , _vertexSourceCode{""}
+    , _fragmentSourceCode{""}
+    , _vertexSourceCodeOverride{""}
+    , _fragmentSourceCodeOverride{""}
     , _transformFeedbackVaryings{options.transformFeedbackVaryings}
 {
   stl_util::concat(_uniformsNames, options.samplers);
@@ -218,12 +231,13 @@ std::string Effect::key() const
 
 bool Effect::isReady() const
 {
-#if 0
-  if (!_isReady && _program && _program->isParallelCompiled) {
-    return _engine->_isProgramCompiled(_program.get());
+  if (_isReady) {
+    return true;
   }
-#endif
-  return _isReady;
+  if (_pipelineContext) {
+    return _pipelineContext->isReady();
+  }
+  return false;
 }
 
 Engine* Effect::getEngine() const
@@ -231,9 +245,9 @@ Engine* Effect::getEngine() const
   return _engine;
 }
 
-GL::IGLProgram* Effect::getProgram()
+IPipelineContextPtr& Effect::getPipelineContext()
 {
-  return _program.get();
+  return _pipelineContext;
 }
 
 std::vector<std::string>& Effect::getAttributesNames()
@@ -278,7 +292,7 @@ GL::IGLUniformLocation* Effect::getUniform(const std::string& uniformName)
 
 std::vector<std::string>& Effect::getSamplers()
 {
-  return _samplers;
+  return _samplerList;
 }
 
 std::string Effect::getCompilationError()
@@ -295,6 +309,14 @@ void Effect::executeWhenCompiled(
   }
 
   onCompileObservable.add([&](Effect* effect, EventState&) { func(effect); });
+
+  if (!_pipelineContext || _pipelineContext->isAsync()) {
+    _checkIsReady();
+  }
+}
+
+void Effect::_checkIsReady()
+{
 }
 
 void Effect::_loadVertexShader(
@@ -322,7 +344,7 @@ void Effect::_loadVertexShader(
     vertexShaderUrl = vertex;
   }
   else {
-    vertexShaderUrl = Engine::ShadersRepository + vertex;
+    vertexShaderUrl = Effect::ShadersRepository + vertex;
   }
 
   // Vertex shader
@@ -360,7 +382,7 @@ void Effect::_loadFragmentShader(
     fragmentShaderUrl = fragment;
   }
   else {
-    fragmentShaderUrl = Engine::ShadersRepository + fragment;
+    fragmentShaderUrl = Effect::ShadersRepository + fragment;
   }
 
   // Fragment shader
@@ -429,8 +451,8 @@ void Effect::_processShaderConversion(
   // #extension GL_EXT_frag_depth : enable
   // #extension GL_EXT_draw_buffers : require
   const std::string regex(
-    "#extension.+(GL_OES_standard_derivatives|GL_EXT_shader_texture_lod|GL_EXT_"
-    "frag_depth|GL_EXT_draw_buffers).+(enable|require)");
+    "#extension.+(GL_OVR_multiview2|GL_OES_standard_derivatives|GL_EXT_shader_"
+    "texture_lod|GL_EXT_frag_depth|GL_EXT_draw_buffers).+(enable|require)");
   auto result = String::regexReplace(preparedSourceCode, regex, "");
 
   // Migrate to GLSL v300
@@ -438,6 +460,7 @@ void Effect::_processShaderConversion(
                                 isFragment ? "in " : "out ");
   result = String::regexReplace(result, "attribute[ \t]", "in ");
   result = String::regexReplace(result, "[ \t]attribute", " in");
+  result = String::regexReplace(result, "texture2D\\s*\\(", "texture(");
 
   if (isFragment) {
     const std::vector<std::pair<std::string, std::string>> fragmentMappings{
@@ -459,6 +482,14 @@ void Effect::_processShaderConversion(
       result = String::regexReplace(result, fragmentMapping.first,
                                     fragmentMapping.second);
     }
+  }
+
+  // Add multiview setup to top of file when defined
+  auto hasMultiviewExtension = String::contains(defines, "#define MULTIVIEW\n");
+  if (hasMultiviewExtension && !isFragment) {
+    result
+      = "#extension GL_OVR_multiview2 : require\nlayout (num_views = 2) in;\n"
+        + result;
   }
 
   callback(result);
@@ -582,9 +613,11 @@ void Effect::_processIncludes(
 
 std::string Effect::_processPrecision(std::string source)
 {
+  auto shouldUseHighPrecisionShader = _engine->_shouldUseHighPrecisionShader();
+
   if (!String::contains(source, "precision highp float")
       && !String::contains(source, "precision mediump float")) {
-    if (!_engine->getCaps().highPrecisionShaderSupported) {
+    if (!shouldUseHighPrecisionShader) {
       source = "precision mediump float;\n" + source;
     }
     else {
@@ -592,7 +625,7 @@ std::string Effect::_processPrecision(std::string source)
     }
   }
   else {
-    if (!_engine->getCaps().highPrecisionShaderSupported) {
+    if (!shouldUseHighPrecisionShader) {
       // Moving highp to mediump
       String::replaceInPlace(source, "precision highp float",
                              "precision mediump float");
@@ -641,7 +674,8 @@ std::string Effect::_processPrecision(std::string source)
 
 void Effect::_rebuildProgram(
   const std::string& vertexSourceCode, const std::string& fragmentSourceCode,
-  const std::function<void(GL::IGLProgram* program)>& iOnCompiled,
+  const std::function<void(const IPipelineContextPtr& pipelineContext)>&
+    iOnCompiled,
   const std::function<void(const std::string& message)>& iOnError)
 {
   _isReady = false;
@@ -654,94 +688,110 @@ void Effect::_rebuildProgram(
     }
   };
   this->onCompiled = [&](const Effect* /*effect*/) {
-    for (auto& scene : getEngine()->scenes) {
-      scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag);
+    for (const auto& scene : getEngine()->scenes) {
+      scene->markAllMaterialsAsDirty(Constants::MATERIAL_AllDirtyFlag);
     }
 
-    if (onCompiled) {
-      iOnCompiled(_program.get());
+    if (_pipelineContext && _pipelineContext->_handlesSpectorRebuildCallback) {
+      _pipelineContext->_handlesSpectorRebuildCallback(iOnCompiled);
     }
   };
   _fallbacks = nullptr;
   _prepareEffect();
 }
 
-std::unordered_map<std::string, std::unique_ptr<GL::IGLUniformLocation>>
-Effect::getSpecificUniformLocations(const std::vector<std::string>& names)
-{
-  return _engine->getUniforms(_program.get(), names);
-}
-
 void Effect::_prepareEffect()
 {
   auto attributesNames = _attributesNames;
-  auto& _defines       = defines;
   auto& fallbacks      = _fallbacks;
   _valueCache.clear();
 
-  auto& previousProgram = _program;
+  auto& previousPipelineContext = _pipelineContext;
 
   try {
     auto engine = _engine;
 
-    if (previousProgram) {
-      getEngine()->_deleteProgram(previousProgram.get());
-    }
+    _pipelineContext = engine->createPipelineContext();
+
+    const auto rebuildRebind
+      = [this](
+          const std::string& vertexSourceCode,
+          const std::string& fragmentSourceCode,
+          const std::function<void(const IPipelineContextPtr& pipelineContext)>&
+            onCompiled,
+          const std::function<void(const std::string& message)>& onError)
+      -> void {
+      _rebuildProgram(vertexSourceCode, fragmentSourceCode, onCompiled,
+                      onError);
+    };
 
     if (!_vertexSourceCodeOverride.empty()
         && !_fragmentSourceCodeOverride.empty()) {
-      _program = engine->createRawShaderProgram(
-        _vertexSourceCodeOverride, _fragmentSourceCodeOverride, nullptr,
+      engine->_preparePipelineContext(
+        _pipelineContext, _vertexSourceCodeOverride,
+        _fragmentSourceCodeOverride, true, rebuildRebind, nullptr,
         _transformFeedbackVaryings);
     }
     else {
-      _program = engine->createShaderProgram(
-        _vertexSourceCode, _fragmentSourceCode, defines, nullptr,
-        _transformFeedbackVaryings);
-    }
-    _program->__SPECTOR_rebuildProgram
-      = [this](const std::string& vertexSourceCode,
-               const std::string& fragmentSourceCode,
-               const std::function<void(GL::IGLProgram * program)>& onCompiled,
-               const std::function<void(const std::string& message)>& onError) {
-          _rebuildProgram(vertexSourceCode, fragmentSourceCode, onCompiled,
-                          onError);
-        };
-
-    _program = engine->createShaderProgram(_vertexSourceCode,
-                                           _fragmentSourceCode, _defines);
-
-    if (engine->supportsUniformBuffers()) {
-      for (auto& item : _uniformBuffersNames) {
-        bindUniformBlock(item.first, item.second);
-      }
+      engine->_preparePipelineContext(_pipelineContext, _vertexSourceCode,
+                                      _fragmentSourceCode, false, rebuildRebind,
+                                      defines, _transformFeedbackVaryings);
     }
 
-    _uniforms   = engine->getUniforms(_program.get(), _uniformsNames);
-    _attributes = engine->getAttributes(_program.get(), attributesNames);
+    engine->_executeWhenRenderingStateIsCompiled(
+      _pipelineContext, [&]() -> void {
+        if (engine->supportsUniformBuffers()) {
+          for (const auto& [name, value] : _uniformBuffersNames) {
+            bindUniformBlock(name, value);
+          }
+        }
 
-    for (unsigned int index = 0; index < _samplers.size(); ++index) {
-      auto sampler = getUniform(_samplers[index]);
-      if (!sampler) {
-        _samplers.erase(_samplers.begin() + index,
-                        _samplers.begin() + index + 1);
-        --index;
-      }
-    }
+        auto uniforms = engine->getUniforms(_pipelineContext, _uniformsNames);
+        unsigned int index = 0;
+        for (auto& uniform : uniforms) {
+          _uniforms[_uniformsNames[index]] = std::move(uniform);
+          ++index;
+        }
 
-    engine->bindSamplers(*this);
+        _attributes = engine->getAttributes(_pipelineContext, attributesNames);
 
-    _compilationError.clear();
-    _isReady = true;
-    if (onCompiled) {
-      onCompiled(this);
-    }
-    onCompileObservable.notifyObservers(this);
-    onCompileObservable.clear();
+        for (index = 0; index < _samplerList.size(); index++) {
+          auto sampler = getUniform(_samplerList[index]);
 
-    // Unbind mesh reference in fallbacks
-    if (_fallbacks) {
-      _fallbacks->unBindMesh();
+          if (sampler == nullptr) {
+            stl_util::splice(_samplerList, static_cast<int>(index), 1);
+            --index;
+          }
+        }
+
+        index = 0;
+        for (const auto& name : _samplerList) {
+          _samplers[name] = index;
+          ++index;
+        }
+
+        engine->bindSamplers(*this);
+
+        _compilationError = "";
+        _isReady          = true;
+        if (onCompiled) {
+          onCompiled(this);
+        }
+        onCompileObservable.notifyObservers(this);
+        onCompileObservable.clear();
+
+        // Unbind mesh reference in fallbacks
+        if (_fallbacks) {
+          _fallbacks->unBindMesh();
+        }
+
+        if (previousPipelineContext) {
+          getEngine()->_deletePipelineContext(previousPipelineContext);
+        }
+      });
+
+    if (_pipelineContext->isAsync()) {
+      _checkIsReady();
     }
   }
   catch (const std::exception& e) {
@@ -756,9 +806,9 @@ void Effect::_prepareEffect()
     BABYLON_LOGF_ERROR("Effect", "Attributes: %s",
                        String::join(attributesNames, ' ').c_str())
     BABYLON_LOGF_ERROR("Effect", "Error: %s", _compilationError.c_str())
-    if (previousProgram) {
-      _program = std::move(previousProgram);
-      _isReady = true;
+    if (previousPipelineContext) {
+      _pipelineContext = previousPipelineContext;
+      _isReady         = true;
       if (onError) {
         onError(this, _compilationError);
       }
@@ -790,53 +840,60 @@ bool Effect::isSupported() const
   return _compilationError.empty();
 }
 
+int Effect::_getSamplerIndex(const std::string& channel)
+{
+  return stl_util::contains(_samplers, channel) ?
+           static_cast<int>(_samplers[channel]) :
+           -1;
+}
+
 void Effect::_bindTexture(const std::string& channel,
                           const InternalTexturePtr& texture)
 {
-  _engine->_bindTexture(stl_util::index_of(_samplers, channel), texture);
+  _engine->_bindTexture(_getSamplerIndex(channel), texture);
 }
 
 void Effect::setTexture(const std::string& channel,
                         const BaseTexturePtr& texture)
 {
-  _engine->setTexture(stl_util::index_of(_samplers, channel),
-                      getUniform(channel), texture);
+  _engine->setTexture(_getSamplerIndex(channel), getUniform(channel), texture);
 }
 
 void Effect::setDepthStencilTexture(const std::string& channel,
                                     const RenderTargetTexturePtr& texture)
 {
-  _engine->setDepthStencilTexture(stl_util::index_of(_samplers, channel),
+  _engine->setDepthStencilTexture(_getSamplerIndex(channel),
                                   getUniform(channel), texture);
 }
 
 void Effect::setTextureArray(const std::string& channel,
                              const std::vector<BaseTexturePtr>& textures)
 {
-  if (stl_util::index_of(_samplers, channel + "Ex") == -1) {
-    auto initialPos = stl_util::index_of(_samplers, channel);
+  const std::string exName = channel + "Ex";
+  if (stl_util::index_of(_samplerList, exName) == -1) {
+    auto initialPos = _getSamplerIndex(channel);
     for (unsigned int index = 1; index < textures.size(); ++index) {
-      stl_util::splice(_samplers, initialPos + static_cast<int>(index), 0,
-                       {channel + "Ex"});
+      stl_util::splice(_samplerList, initialPos + static_cast<int>(index), 0,
+                       {exName});
+      _samplers[exName] = static_cast<unsigned>(initialPos) + index;
     }
   }
 
-  _engine->setTextureArray(stl_util::index_of(_samplers, channel),
-                           getUniform(channel), textures);
+  _engine->setTextureArray(_getSamplerIndex(channel), getUniform(channel),
+                           textures);
 }
 
 void Effect::setTextureFromPostProcess(const std::string& channel,
                                        PostProcess* postProcess)
 {
-  _engine->setTextureFromPostProcess(stl_util::index_of(_samplers, channel),
-                                     postProcess);
+  _engine->setTextureFromPostProcess(_getSamplerIndex(channel), postProcess);
 }
 
 void Effect::setTextureFromPostProcessOutput(const std::string& channel,
                                              PostProcess* postProcess)
 {
-  _engine->setTextureFromPostProcessOutput(
-    stl_util::index_of(_samplers, channel), postProcess);
+  _engine->setTextureFromPostProcessOutput(_getSamplerIndex(channel),
+                                           postProcess);
 }
 
 bool Effect::_cacheMatrix(const std::string& uniformName, const Matrix& matrix)
@@ -955,7 +1012,7 @@ void Effect::bindUniformBuffer(GL::IGLBuffer* _buffer, const std::string& iName)
 
 void Effect::bindUniformBlock(const std::string& blockName, unsigned index)
 {
-  _engine->bindUniformBlock(_program.get(), blockName, index);
+  _engine->bindUniformBlock(_pipelineContext, blockName, index);
 }
 
 Effect& Effect::setInt(const std::string& uniformName, int value)
@@ -1236,7 +1293,7 @@ Effect& Effect::setDirectColor4(const std::string& uniformName,
   return *this;
 }
 
-void Effect::dispose()
+void Effect::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextures*/)
 {
   _engine->_releaseEffect(this);
 }

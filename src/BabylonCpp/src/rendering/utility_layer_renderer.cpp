@@ -75,7 +75,7 @@ UtilityLayerRenderer::UtilityLayerRenderer(Scene* iOriginalScene,
   if (handleEvents) {
     _originalPointerObserver = originalScene->onPrePointerObservable.add(
       [&](PointerInfoPre* prePointerInfo, EventState& /*es*/) {
-        if (!utilityLayerScene->activeCamera) {
+        if (!utilityLayerScene->activeCamera()) {
           return;
         }
         if (!processAllEvents) {
@@ -281,10 +281,10 @@ void UtilityLayerRenderer::_notifyObservers(
 void UtilityLayerRenderer::render()
 {
   _updateCamera();
-  if (utilityLayerScene->activeCamera) {
+  if (utilityLayerScene->activeCamera()) {
     // Set the camera's scene to utility layers scene
-    auto oldScene  = utilityLayerScene->activeCamera->getScene();
-    auto camera    = utilityLayerScene->activeCamera;
+    auto oldScene  = utilityLayerScene->activeCamera()->getScene();
+    auto camera    = utilityLayerScene->activeCamera();
     camera->_scene = utilityLayerScene.get();
     if (camera->leftCamera()) {
       camera->leftCamera()->_scene = utilityLayerScene.get();
@@ -329,7 +329,7 @@ void UtilityLayerRenderer::_updateCamera()
     utilityLayerScene->activeCamera = originalScene->activeCameras.back();
   }
   else {
-    utilityLayerScene->activeCamera = originalScene->activeCamera;
+    utilityLayerScene->activeCamera = originalScene->activeCamera();
   }
 }
 

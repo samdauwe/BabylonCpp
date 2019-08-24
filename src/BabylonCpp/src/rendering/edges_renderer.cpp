@@ -352,7 +352,7 @@ void EdgesRenderer::render()
 {
   auto scene = _source->getScene();
 
-  if (!isReady() || !scene->activeCamera) {
+  if (!isReady() || !scene->activeCamera()) {
     return;
   }
 
@@ -372,7 +372,7 @@ void EdgesRenderer::render()
   scene->resetCachedMaterial();
   _lineShader->setColor4("color", _source->edgesColor);
 
-  if (scene->activeCamera->mode == Camera::ORTHOGRAPHIC_CAMERA) {
+  if (scene->activeCamera()->mode == Camera::ORTHOGRAPHIC_CAMERA) {
     _lineShader->setFloat("width", _source->edgesWidth
                                      / edgesWidthScalerForOrthographic);
   }
@@ -382,7 +382,7 @@ void EdgesRenderer::render()
   }
 
   _lineShader->setFloat("aspectRatio",
-                        engine->getAspectRatio(*scene->activeCamera));
+                        engine->getAspectRatio(*scene->activeCamera()));
   _lineShader->bind(_source->getWorldMatrix());
 
   // Draw order

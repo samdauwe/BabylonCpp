@@ -23,9 +23,9 @@ DepthOfFieldBlurPostProcess::DepthOfFieldBlurPostProcess(
     }
     effect->setTextureFromPostProcessOutput("circleOfConfusionSampler",
                                             circleOfConfusion);
-    if (scene->activeCamera) {
-      effect->setFloat2("cameraMinMaxZ", scene->activeCamera->minZ,
-                        scene->activeCamera->maxZ);
+    if (scene->activeCamera()) {
+      effect->setFloat2("cameraMinMaxZ", scene->activeCamera()->minZ,
+                        scene->activeCamera()->maxZ);
     }
   });
 }

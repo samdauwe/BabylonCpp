@@ -18,7 +18,7 @@ using SpritePtr       = std::shared_ptr<Sprite>;
 struct BABYLON_SHARED_EXPORT IActionEvent {
 
   IActionEvent(const AbstractMeshPtr& source, int pointerX, int pointerY,
-               AbstractMesh* meshUnderPointer,
+               const AbstractMeshPtr& meshUnderPointer,
                const std::optional<Event>& sourceEvent,
                const std::string& additionalData = "");
   IActionEvent(const IActionEvent& other);
@@ -36,7 +36,7 @@ struct BABYLON_SHARED_EXPORT IActionEvent {
   /** The Y mouse cursor position at the time of the event */
   int pointerY;
   /** The mesh that is currently pointed at (can be null) */
-  AbstractMesh* meshUnderPointer;
+  AbstractMeshPtr meshUnderPointer;
   /** The original (browser) event that triggered the ActionEvent */
   std::optional<Event> sourceEvent;
   /** Additional data for the event */

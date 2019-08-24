@@ -37,7 +37,7 @@ void AlphaBlendModeTestScene::initializeScene(ICanvas* /*canvas*/, Scene* scene)
       scene->createDefaultCameraOrLight(true, true, true);
       // Set the camera position
       auto camera
-        = std::static_pointer_cast<ArcRotateCamera>(scene->activeCamera);
+        = std::static_pointer_cast<ArcRotateCamera>(scene->activeCamera());
       if (camera) {
         camera->setTarget(Vector3::Zero());
         camera->alpha  = Math::PI_2;

@@ -439,9 +439,9 @@ void LensRenderingPipeline::_createDepthOfFieldPostProcess(float ratio)
     effect->setBool("highlights",
                     !stl_util::almost_equal(_highlightsGain, -1.f));
 
-    if (_scene->activeCamera) {
-      effect->setFloat("near", _scene->activeCamera->minZ);
-      effect->setFloat("far", _scene->activeCamera->maxZ);
+    if (_scene->activeCamera()) {
+      effect->setFloat("near", _scene->activeCamera()->minZ);
+      effect->setFloat("far", _scene->activeCamera()->maxZ);
     }
   };
 }

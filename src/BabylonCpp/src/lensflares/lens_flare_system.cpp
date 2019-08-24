@@ -49,9 +49,9 @@ LensFlareSystem::LensFlareSystem(const std::string iName,
   id       = iName;
 
   meshesSelectionPredicate = [this](const AbstractMeshPtr& m) {
-    return _scene->activeCamera && m->material() && m->isVisible
+    return _scene->activeCamera() && m->material() && m->isVisible
            && m->isEnabled() && m->isBlocker
-           && ((m->layerMask() & _scene->activeCamera->layerMask) != 0);
+           && ((m->layerMask() & _scene->activeCamera()->layerMask) != 0);
   };
 
   auto engine = scene->getEngine();
@@ -175,17 +175,17 @@ bool LensFlareSystem::computeEffectivePosition(Viewport& globalViewport)
 
 bool LensFlareSystem::_isVisible()
 {
-  if (!_isEnabled || !_scene->activeCamera) {
+  if (!_isEnabled || !_scene->activeCamera()) {
     return false;
   }
 
   auto emitterPosition = getEmitterPosition();
   auto direction
-    = emitterPosition.subtract(_scene->activeCamera->globalPosition());
+    = emitterPosition.subtract(_scene->activeCamera()->globalPosition());
   auto distance = direction.length();
   direction.normalize();
 
-  Ray ray(_scene->activeCamera->globalPosition(), direction);
+  Ray ray(_scene->activeCamera()->globalPosition(), direction);
   auto pickInfo = _scene->pickWithRay(ray, meshesSelectionPredicate, true);
   if (!pickInfo) {
     return false;
@@ -196,12 +196,12 @@ bool LensFlareSystem::_isVisible()
 
 bool LensFlareSystem::render()
 {
-  if (!_effect->isReady() || !_scene->activeCamera) {
+  if (!_effect->isReady() || !_scene->activeCamera()) {
     return false;
   }
 
   auto engine         = _scene->getEngine();
-  auto viewport       = _scene->activeCamera->viewport;
+  auto viewport       = _scene->activeCamera()->viewport;
   auto globalViewport = viewport.toGlobal(engine->getRenderWidth(true),
                                           engine->getRenderHeight(true));
 
@@ -295,7 +295,7 @@ bool LensFlareSystem::render()
     auto y = centerY - (distY * flare->position);
 
     auto cw = flare->size;
-    auto ch = flare->size * engine->getAspectRatio(*_scene->activeCamera);
+    auto ch = flare->size * engine->getAspectRatio(*_scene->activeCamera());
     auto cx = 2.f * (x / (globalViewport_width + globalViewport_x * 2.f)) - 1.f;
     auto cy
       = 1.f - 2.f * (y / (globalViewport_height + globalViewport_y * 2.f));

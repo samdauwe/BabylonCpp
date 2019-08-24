@@ -91,20 +91,21 @@ void AttachToBoxBehavior::attach(const MeshPtr& target)
   // Every frame, update the app bars position
   _onRenderObserver = _scene->onBeforeRenderObservable.add(
     [this, target](Scene* /*scene*/, EventState& /*es*/) {
-      if (!_scene->activeCamera) {
+      if (!_scene->activeCamera()) {
         return;
       }
 
       // Find the face closest to the cameras position
-      auto cameraPos = _scene->activeCamera->position();
+      auto cameraPos = _scene->activeCamera()->position();
       auto facing    = _closestFace(cameraPos.subtract(target->position()));
-      if (_scene->activeCamera->leftCamera()) {
-        _scene->activeCamera->leftCamera()
+      if (_scene->activeCamera()->leftCamera()) {
+        _scene->activeCamera()
+          ->leftCamera()
           ->computeWorldMatrix()
           .getRotationMatrixToRef(_tmpMatrix);
       }
       else {
-        _scene->activeCamera->computeWorldMatrix().getRotationMatrixToRef(
+        _scene->activeCamera()->computeWorldMatrix().getRotationMatrixToRef(
           _tmpMatrix);
       }
 

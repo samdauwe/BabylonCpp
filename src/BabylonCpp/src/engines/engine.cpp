@@ -11,6 +11,7 @@
 #include <babylon/core/string.h>
 #include <babylon/core/time.h>
 #include <babylon/engines/depth_texture_creation_options.h>
+#include <babylon/engines/engine_store.h>
 #include <babylon/engines/instancing_attribute_info.h>
 #include <babylon/engines/scene.h>
 #include <babylon/engines/webgl/webgl_pipeline_context.h>
@@ -66,16 +67,42 @@ std::string Engine::Version()
   return BABYLONCPP_VERSION;
 }
 
+std::string Engine::description() const
+{
+  std::ostringstream description;
+  description << "WebGL" << webGLVersion();
+
+  if (_caps.parallelShaderCompile.has_value()) {
+    description << " - Parallel shader compilation";
+  }
+
+  return description.str();
+}
+
 AudioEnginePtr Engine::AudioEngine()
 {
   return _audioEngine;
 }
 
-AudioEnginePtr Engine::_audioEngine   = nullptr;
-float Engine::CollisionsEpsilon       = 0.001f;
-std::string Engine::CodeRepository    = "src/";
-std::string Engine::ShadersRepository = "src/shaders/";
-std::vector<Engine*> Engine::Instances{};
+AudioEnginePtr Engine::_audioEngine = nullptr;
+float Engine::CollisionsEpsilon     = 0.001f;
+std::function<PostProcessPtr(Engine* engine)> Engine::_RescalePostProcessFactory
+  = nullptr;
+
+std::vector<Engine*> Engine::Instances()
+{
+  return EngineStore::Instances;
+}
+
+std::string Engine::ShadersRepository()
+{
+  return Effect::ShadersRepository;
+}
+
+void Engine::setShadersRepository(const std::string& value)
+{
+  Effect::ShadersRepository = value;
+}
 
 Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     : forcePOTTextures{false}
@@ -89,17 +116,22 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , validateShaderPrograms{false}
     , _badOS{false}
     , _badDesktopOS{false}
-    , disableTextureBindingOptimization{false}
-    , _vrDisplayEnabled{false}
     , disableUniformBuffers{false}
     , _gl{nullptr}
+    , _doNotHandleContextLost{options.doNotHandleContextLost ? true : false}
     , disablePerformanceMonitorInBackground{false}
+    , disableVertexArrayObjects{false}
+    , _currentRenderTarget{nullptr}
+    , _workingCanvas{nullptr}
+    , _workingContext{nullptr}
+    , _bindedRenderFunction{nullptr}
     , premultipliedAlpha{options.premultipliedAlpha}
     , enableUnpackFlipYCached{true}
+    , _highPrecisionShadersAllowed{true}
     , _depthCullingState{std::make_unique<_DepthCullingState>()}
     , _stencilState{std::make_unique<_StencilState>()}
     , _alphaState{std::make_unique<_AlphaState>()}
-    , _alphaMode{EngineConstants::ALPHA_DISABLE}
+    , _alphaMode{Constants::ALPHA_DISABLE}
     , _activeChannel{0}
     , _currentEffect{nullptr}
     , _currentProgram{nullptr}
@@ -107,7 +139,6 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _cachedVertexBuffers{nullptr}
     , _cachedIndexBuffer{nullptr}
     , _cachedEffectForVertexBuffers{nullptr}
-    , _currentRenderTarget{nullptr}
     , _currentFramebuffer{nullptr}
     , _vrExclusivePointerMode{false}
     , _renderingCanvas{canvas}
@@ -119,7 +150,6 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _deterministicLockstep{false}
     , _lockstepMaxSteps{4}
     , _contextWasLost{false}
-    , _doNotHandleContextLost{options.doNotHandleContextLost ? true : false}
     , _performanceMonitor{std::make_unique<PerformanceMonitor>()}
     , _fps{60.f}
     , _deltaTime{0.f}
@@ -127,15 +157,8 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _currentNonTimestampToken{std::nullopt}
     , _cachedVertexArrayObject{nullptr}
     , _uintIndicesCurrentlySet{false}
-    , _firstBoundInternalTextureTracker{std::make_unique<
-        DummyInternalTextureTracker>()}
-    , _lastBoundInternalTextureTracker{std::make_unique<
-        DummyInternalTextureTracker>()}
-    , _workingCanvas{nullptr}
-    , _workingContext{nullptr}
     , _rescalePostProcess{nullptr}
     , _dummyFramebuffer{nullptr}
-    , _bindedRenderFunction{nullptr}
     , _vaoRecordInProgress{false}
     , _mustWipeVertexAttributes{false}
     , _emptyTexture{nullptr}
@@ -144,7 +167,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _maxSimultaneousTextures{0}
     , _unpackFlipYCached{std::nullopt}
 {
-  Engine::Instances.emplace_back(this);
+  Engine::Instances().emplace_back(this);
 
   if (!canvas) {
     return;
@@ -170,6 +193,9 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     BABYLON_LOG_ERROR("Engine", "GL not supported")
     return;
   }
+
+  // Ensures a consistent color space unpacking of textures cross browser.
+  _gl->pixelStorei(GL::UNPACK_COLORSPACE_CONVERSION_WEBGL, GL::NONE);
 
   _onCanvasFocus = [this]() { onCanvasFocusObservable.notifyObservers(this); };
 
@@ -209,16 +235,8 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     _currentBufferPointers[i] = BufferPointer();
   }
 
-  _linkTrackers(_firstBoundInternalTextureTracker,
-                _lastBoundInternalTextureTracker);
-
-  // Load WebVR Devices
-  // if (options.autoEnableWebVR) {
-  //  initWebVR();
-  //}
-
-  BABYLON_LOGF_INFO("Engine", "BabylonCpp engine (v%s) launched",
-                    Engine::Version().c_str())
+  BABYLON_LOGF_INFO("Engine", "BabylonCpp v%s - %s", Engine::Version().c_str(),
+                    description().c_str())
 }
 
 Engine::~Engine()
@@ -227,32 +245,19 @@ Engine::~Engine()
 
 Engine* Engine::LastCreatedEngine()
 {
-  if (Engine::Instances.empty()) {
-    return nullptr;
-  }
-
-  return Engine::Instances.back();
+  return EngineStore::LastCreatedEngine();
 }
 
 Scene* Engine::LastCreatedScene()
 {
-  auto lastCreatedEngine = Engine::LastCreatedEngine();
-  if (!lastCreatedEngine) {
-    return nullptr;
-  }
-
-  if (lastCreatedEngine->scenes.empty()) {
-    return nullptr;
-  }
-
-  return lastCreatedEngine->scenes.back();
+  return EngineStore::LastCreatedScene();
 }
 
 void Engine::MarkAllMaterialsAsDirty(
   unsigned int flag, const std::function<bool(Material* mat)>& predicate)
 {
-  for (auto& engine : Engine::Instances) {
-    for (auto& scene : engine->scenes) {
+  for (const auto& engine : Engine::Instances()) {
+    for (const auto& scene : engine->scenes) {
       scene->markAllMaterialsAsDirty(flag, predicate);
     }
   }
@@ -276,9 +281,9 @@ Viewport* Engine::currentViewport() const
 InternalTexturePtr& Engine::emptyTexture()
 {
   if (!_emptyTexture) {
-    _emptyTexture = createRawTexture(
-      Uint8Array(4), 1, 1, EngineConstants::TEXTUREFORMAT_RGBA, false, false,
-      EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE);
+    _emptyTexture
+      = createRawTexture(Uint8Array(4), 1, 1, Constants::TEXTUREFORMAT_RGBA,
+                         false, false, Constants::TEXTURE_NEAREST_SAMPLINGMODE);
   }
 
   return _emptyTexture;
@@ -288,8 +293,8 @@ InternalTexturePtr& Engine::emptyTexture3D()
 {
   if (!_emptyTexture3D) {
     _emptyTexture3D = createRawTexture3D(
-      Uint8Array(4), 1, 1, 1, EngineConstants::TEXTUREFORMAT_RGBA, false, false,
-      EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE);
+      Uint8Array(4), 1, 1, 1, Constants::TEXTUREFORMAT_RGBA, false, false,
+      Constants::TEXTURE_NEAREST_SAMPLINGMODE);
   }
 
   return _emptyTexture3D;
@@ -303,42 +308,60 @@ InternalTexturePtr& Engine::emptyCubeTexture()
     std::vector<Uint8Array> cubeData{faceData, faceData, faceData,
                                      faceData, faceData, faceData};
     _emptyCubeTexture = createRawCubeTexture(
-      cubeData, 1, EngineConstants::TEXTUREFORMAT_RGBA,
-      EngineConstants::TEXTURETYPE_UNSIGNED_INT, false, false,
-      EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE);
+      cubeData, 1, Constants::TEXTUREFORMAT_RGBA,
+      Constants::TEXTURETYPE_UNSIGNED_INT, false, false,
+      Constants::TEXTURE_NEAREST_SAMPLINGMODE);
 #endif
   }
 
   return _emptyCubeTexture;
 }
 
+bool Engine::isVRPresenting() const
+{
+  return false;
+}
+
 void Engine::_rebuildInternalTextures()
 {
-  for (auto& internalTexture : _internalTexturesCache) {
+  for (const auto& internalTexture : _internalTexturesCache) {
     internalTexture->_rebuild();
   }
 }
 
 void Engine::_rebuildEffects()
 {
-  for (auto& item : _compiledEffects) {
+  for (const auto& item : _compiledEffects) {
     item.second->_prepareEffect();
   }
 
   Effect::ResetCache();
 }
 
+bool Engine::areAllEffectsReady() const
+{
+  for (const auto& item : _compiledEffects) {
+    const auto& effect = item.second;
+
+    if (!effect->isReady()) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 void Engine::_rebuildBuffers()
 {
   // Index / Vertex
-  for (auto& scene : scenes) {
+  for (const auto& scene : scenes) {
     scene->resetCachedMaterial();
     scene->_rebuildGeometries();
     scene->_rebuildTextures();
   }
 
   // Uniforms
-  for (auto& uniformBuffer : _uniformBuffers) {
+  for (const auto& uniformBuffer : _uniformBuffers) {
     uniformBuffer->_rebuild();
   }
 }
@@ -383,7 +406,7 @@ void Engine::_initGLContext()
   // Extensions
   auto extensionList = String::split(_gl->getString(GL::EXTENSIONS), ' ');
   std::set<std::string> extensions;
-  for (auto& extension : extensionList) {
+  for (const auto& extension : extensionList) {
     extensions.insert(extension);
   }
 
@@ -392,7 +415,7 @@ void Engine::_initGLContext()
     _gl->getParameteri(GL::MAX_TEXTURE_MAX_ANISOTROPY_EXT));
   _caps.uintIndices                  = (_webGLVersion > 1.f);
   _caps.fragmentDepthSupported       = (_webGLVersion > 1.f);
-  _caps.highPrecisionShaderSupported = true;
+  _caps.highPrecisionShaderSupported = false;
 
   // Checks if some of the format renders first to allow the use of webgl
   // inspector.
@@ -421,7 +444,7 @@ void Engine::_initGLContext()
   }
 
   // Shader compiler threads
-  _caps.parallelShaderCompile = false;
+  _caps.parallelShaderCompile = std::nullopt;
 
   // Depth Texture
   if (_webGLVersion > 1.f) {
@@ -429,7 +452,10 @@ void Engine::_initGLContext()
   }
 
   // Vertex array object
-  if (_webGLVersion > 1.f) {
+  if (disableVertexArrayObjects) {
+    _caps.vertexArrayObject = false;
+  }
+  else if (_webGLVersion > 1.f) {
     _caps.vertexArrayObject = true;
   }
 
@@ -470,6 +496,11 @@ bool Engine::isInVRExclusivePointerMode() const
 bool Engine::supportsUniformBuffers() const
 {
   return webGLVersion() > 1.f && !disableUniformBuffers;
+}
+
+bool Engine::_shouldUseHighPrecisionShader() const
+{
+  return _caps.highPrecisionShaderSupported && _highPrecisionShadersAllowed;
 }
 
 bool Engine::needPOTTextures() const
@@ -603,21 +634,6 @@ std::vector<InternalTexturePtr>& Engine::getLoadedTexturesCache()
 EngineCapabilities& Engine::getCaps()
 {
   return _caps;
-}
-
-size_t Engine::drawCalls() const
-{
-  BABYLON_LOG_WARN(
-    "Engine", "drawCalls is deprecated. Please use SceneInstrumentation class")
-  return 0;
-}
-
-std::optional<PerfCounter> Engine::drawCallsPerfCounter()
-{
-  BABYLON_LOG_WARN("Engine",
-                   "drawCallsPerfCounter is deprecated. Please use "
-                   "SceneInstrumentation class")
-  return std::nullopt;
 }
 
 // Methods
@@ -808,7 +824,7 @@ void Engine::_renderLoop()
       // Start new frame
       beginFrame();
 
-      for (auto& renderFunction : _activeRenderLoops) {
+      for (const auto& renderFunction : _activeRenderLoops) {
         renderFunction();
       }
 
@@ -860,13 +876,27 @@ void Engine::renderFunction(const std::function<void()>& renderFunction)
 void Engine::switchFullscreen(bool requestPointerLock)
 {
   if (isFullscreen) {
-    Tools::ExitFullscreen();
+    exitFullscreen();
   }
   else {
+    enterFullscreen(requestPointerLock);
+  }
+}
+
+void Engine::enterFullscreen(bool requestPointerLock)
+{
+  if (!isFullscreen) {
     _pointerLockRequested = requestPointerLock;
     if (_renderingCanvas) {
       Tools::RequestFullscreen(_renderingCanvas);
     }
+  }
+}
+
+void Engine::exitFullscreen()
+{
+  if (isFullscreen) {
+    Tools::ExitFullscreen();
   }
 }
 
@@ -915,27 +945,21 @@ void Engine::clear(const Color4& color, bool backBuffer, bool depth,
 void Engine::scissorClear(int x, int y, int width, int height,
                           const Color4& clearColor)
 {
-  // Save state
-  auto curScissor    = _gl->getParameteri(GL::SCISSOR_TEST);
-  auto curScissorBox = _gl->getScissorBoxParameter();
+  enableScissor(x, y, width, height);
+  clear(clearColor, true, true, true);
+  disableScissor();
+}
 
+void Engine::enableScissor(int x, int y, int width, int height)
+{
   // Change state
   _gl->enable(GL::SCISSOR_TEST);
   _gl->scissor(x, y, width, height);
+}
 
-  // Clear
-  clear(clearColor, true, true, true);
-
-  // Restore state
-  _gl->scissor(curScissorBox[0], curScissorBox[1], curScissorBox[2],
-               curScissorBox[3]);
-
-  if (curScissor == 1) {
-    _gl->enable(GL::SCISSOR_TEST);
-  }
-  else {
-    _gl->disable(GL::SCISSOR_TEST);
-  }
+void Engine::disableScissor()
+{
+  _gl->disable(GL::SCISSOR_TEST);
 }
 
 void Engine::_viewport(float x, float y, float width, float height)
@@ -1001,10 +1025,7 @@ void Engine::endFrame()
     flushFramebuffer();
   }
 
-  // Submit frame to the vr device, if enabled
-  // if (_vrDisplayEnabled && _vrDisplayEnabled.isPresenting) {
-  //  _vrDisplayEnabled.submitFrame()
-  //}
+  // _submitVRFrame();
 
   onEndFrameObservable.notifyObservers(this);
 }
@@ -1012,9 +1033,9 @@ void Engine::endFrame()
 void Engine::resize()
 {
   // We're not resizing the size of the canvas while in VR mode & presenting
-  if (!_vrDisplayEnabled) {
-    const int width  = _renderingCanvas ? _renderingCanvas->clientWidth : 0;
-    const int height = _renderingCanvas ? _renderingCanvas->clientHeight : 0;
+  if (!isVRPresenting()) {
+    const auto width  = _renderingCanvas ? _renderingCanvas->clientWidth : 0;
+    const auto height = _renderingCanvas ? _renderingCanvas->clientHeight : 0;
     setSize(width / _hardwareScalingLevel, height / _hardwareScalingLevel);
   }
 }
@@ -1032,8 +1053,8 @@ void Engine::setSize(int width, int height)
   _renderingCanvas->width  = width;
   _renderingCanvas->height = height;
 
-  for (auto& scene : scenes) {
-    for (auto& cam : scene->cameras) {
+  for (const auto& scene : scenes) {
+    for (const auto& cam : scene->cameras) {
       cam->_currentRenderId = 0;
     }
   }
@@ -1062,9 +1083,9 @@ void Engine::bindFramebuffer(const InternalTexturePtr& texture,
     unBindFramebuffer(_currentRenderTarget);
   }
   _currentRenderTarget = texture;
-  bindUnboundFramebuffer(texture->_MSAAFramebuffer ?
-                           texture->_MSAAFramebuffer.get() :
-                           texture->_framebuffer.get());
+  _bindUnboundFramebuffer(texture->_MSAAFramebuffer ?
+                            texture->_MSAAFramebuffer.get() :
+                            texture->_framebuffer.get());
   if (texture->isCube) {
     if (!faceIndex.has_value()) {
       faceIndex = 0u;
@@ -1116,7 +1137,7 @@ void Engine::bindFramebuffer(const InternalTexturePtr& texture,
   wipeCaches();
 }
 
-void Engine::bindUnboundFramebuffer(GL::IGLFramebuffer* framebuffer)
+void Engine::_bindUnboundFramebuffer(GL::IGLFramebuffer* framebuffer)
 {
   if (_currentFramebuffer != framebuffer) {
     _gl->bindFramebuffer(GL::FRAMEBUFFER, framebuffer);
@@ -1146,14 +1167,14 @@ void Engine::unBindFramebuffer(const InternalTexturePtr& texture,
   if (onBeforeUnbind) {
     if (texture->_MSAAFramebuffer) {
       // Bind the correct framebuffer
-      bindUnboundFramebuffer(texture->_framebuffer.get());
+      _bindUnboundFramebuffer(texture->_framebuffer.get());
     }
     onBeforeUnbind();
   }
 
   _currentRenderTarget = nullptr;
 
-  bindUnboundFramebuffer(nullptr);
+  _bindUnboundFramebuffer(nullptr);
 }
 
 void Engine::unBindMultiColorAttachmentFramebuffer(
@@ -1215,12 +1236,12 @@ void Engine::unBindMultiColorAttachmentFramebuffer(
   if (onBeforeUnbind) {
     if (textures[0]->_MSAAFramebuffer) {
       // Bind the correct framebuffer
-      bindUnboundFramebuffer(textures[0]->_framebuffer.get());
+      _bindUnboundFramebuffer(textures[0]->_framebuffer.get());
     }
     onBeforeUnbind();
   }
 
-  bindUnboundFramebuffer(nullptr);
+  _bindUnboundFramebuffer(nullptr);
 }
 
 void Engine::generateMipMapsForCubemap(const InternalTexturePtr& texture)
@@ -1243,7 +1264,7 @@ void Engine::restoreDefaultFramebuffer()
     unBindFramebuffer(_currentRenderTarget);
   }
   else {
-    bindUnboundFramebuffer(nullptr);
+    _bindUnboundFramebuffer(nullptr);
   }
 
   if (_cachedViewport) {
@@ -1270,6 +1291,7 @@ Engine::createUniformBuffer(const Float32Array& elements)
   bindUniformBuffer(nullptr);
 
   ubo->references = 1;
+
   return ubo;
 }
 
@@ -1289,6 +1311,7 @@ Engine::createDynamicUniformBuffer(const Float32Array& elements)
   bindUniformBuffer(nullptr);
 
   ubo->references = 1;
+
   return ubo;
 }
 
@@ -1462,11 +1485,15 @@ void Engine::bindUniformBufferBase(GL::IGLBuffer* buffer, unsigned int location)
   _gl->bindBufferBase(GL::UNIFORM_BUFFER, location, buffer);
 }
 
-void Engine::bindUniformBlock(GL::IGLProgram* shaderProgram,
+void Engine::bindUniformBlock(const IPipelineContextPtr& pipelineContext,
                               const std::string blockName, unsigned int index)
 {
-  auto uniformLocation = _gl->getUniformBlockIndex(shaderProgram, blockName);
-  _gl->uniformBlockBinding(shaderProgram, uniformLocation, index);
+  auto program
+    = std::static_pointer_cast<WebGLPipelineContext>(pipelineContext)->program;
+
+  auto uniformLocation = _gl->getUniformBlockIndex(program.get(), blockName);
+
+  _gl->uniformBlockBinding(program.get(), uniformLocation, index);
 }
 
 void Engine::bindIndexBuffer(GL::IGLBuffer* buffer)
@@ -1929,8 +1956,24 @@ void Engine::_releaseEffect(Effect* effect)
     }
   }
   if (hasEffect) {
-    _deleteProgram(effect->getProgram());
+    _deletePipelineContext(effect->getPipelineContext());
     _compiledEffects.erase(effect->_key);
+  }
+}
+
+void Engine::_deletePipelineContext(const IPipelineContextPtr& pipelineContext)
+{
+  auto webGLPipelineContext
+    = std::static_pointer_cast<WebGLPipelineContext>(pipelineContext);
+  if (webGLPipelineContext && webGLPipelineContext->program) {
+    webGLPipelineContext->program->__SPECTOR_rebuildProgram = nullptr;
+
+    if (webGLPipelineContext->transformFeedback) {
+      deleteTransformFeedback(webGLPipelineContext->transformFeedback.get());
+      webGLPipelineContext->transformFeedback = nullptr;
+    }
+
+    _gl->deleteProgram(webGLPipelineContext->program.get());
   }
 }
 
@@ -1940,7 +1983,7 @@ void Engine::_deleteProgram(GL::IGLProgram* program)
     program->__SPECTOR_rebuildProgram = nullptr;
 
     if (program->transformFeedback) {
-      deleteTransformFeedback(program->transformFeedback);
+      deleteTransformFeedback(program->transformFeedback.get());
       program->transformFeedback = nullptr;
     }
 
@@ -2027,17 +2070,17 @@ EffectPtr Engine::createEffectForParticles(const std::string& fragmentName,
   return createEffect(baseName, effectOptions, this);
 }
 
-std::unique_ptr<GL::IGLShader>
-Engine::_compileShader(const std::string& source, const std::string& type,
-                       const std::string& defines,
-                       const std::string& shaderVersion)
+GL::IGLShaderPtr Engine::_compileShader(const std::string& source,
+                                        const std::string& type,
+                                        const std::string& defines,
+                                        const std::string& shaderVersion)
 {
   return _compileRawShader(
     shaderVersion + ((!defines.empty()) ? defines + "\n" : "") + source, type);
 }
 
-std::unique_ptr<GL::IGLShader>
-Engine::_compileRawShader(const std::string& source, const std::string& type)
+GL::IGLShaderPtr Engine::_compileRawShader(const std::string& source,
+                                           const std::string& type)
 {
   auto shader = _gl->createShader(type == "vertex" ? GL::VERTEX_SHADER :
                                                      GL::FRAGMENT_SHADER);
@@ -2048,11 +2091,11 @@ Engine::_compileRawShader(const std::string& source, const std::string& type)
     return nullptr;
   }
 
-  _gl->shaderSource(shader, source);
-  _gl->compileShader(shader);
+  _gl->shaderSource(shader.get(), source);
+  _gl->compileShader(shader.get());
 
-  if (!_gl->getShaderParameter(shader, GL::COMPILE_STATUS)) {
-    auto log = _gl->getShaderInfoLog(shader);
+  if (!_gl->getShaderParameter(shader.get(), GL::COMPILE_STATUS)) {
+    auto log = _gl->getShaderInfoLog(shader.get());
     if (!log.empty()) {
       BABYLON_LOG_ERROR("Engine", log)
       BABYLON_LOG_ERROR("Engine", source)
@@ -2063,9 +2106,9 @@ Engine::_compileRawShader(const std::string& source, const std::string& type)
   return shader;
 }
 
-std::unique_ptr<GL::IGLProgram> Engine::createRawShaderProgram(
-  const std::string& vertexCode, const std::string& fragmentCode,
-  GL::IGLRenderingContext* context,
+GL::IGLProgramPtr Engine::createRawShaderProgram(
+  const IPipelineContextPtr& pipelineContext, const std::string& vertexCode,
+  const std::string& fragmentCode, GL::IGLRenderingContext* context,
   const std::vector<std::string>& transformFeedbackVaryings)
 {
   context = context ? context : _gl;
@@ -2073,13 +2116,15 @@ std::unique_ptr<GL::IGLProgram> Engine::createRawShaderProgram(
   auto vertexShader   = _compileRawShader(vertexCode, "vertex");
   auto fragmentShader = _compileRawShader(fragmentCode, "fragment");
 
-  return _createShaderProgram(vertexShader, fragmentShader, context,
-                              transformFeedbackVaryings);
+  return _createShaderProgram(
+    static_cast<WebGLPipelineContext*>(pipelineContext.get()), vertexShader,
+    fragmentShader, context, transformFeedbackVaryings);
 }
 
-std::unique_ptr<GL::IGLProgram> Engine::createShaderProgram(
-  const std::string& vertexCode, const std::string& fragmentCode,
-  const std::string& defines, GL::IGLRenderingContext* context,
+GL::IGLProgramPtr Engine::createShaderProgram(
+  const IPipelineContextPtr& pipelineContext, const std::string& vertexCode,
+  const std::string& fragmentCode, const std::string& defines,
+  GL::IGLRenderingContext* context,
   const std::vector<std::string>& transformFeedbackVaryings)
 {
   context = context ? context : _gl;
@@ -2094,119 +2139,212 @@ std::unique_ptr<GL::IGLProgram> Engine::createShaderProgram(
   auto fragmentShader
     = _compileShader(fragmentCode, "fragment", defines, shaderVersion);
 
-  auto program = _createShaderProgram(vertexShader, fragmentShader, context,
-                                      transformFeedbackVaryings);
+  auto program = _createShaderProgram(
+    static_cast<WebGLPipelineContext*>(pipelineContext.get()), vertexShader,
+    fragmentShader, context, transformFeedbackVaryings);
 
   onAfterShaderCompilationObservable.notifyObservers(this);
 
   return program;
 }
 
-std::unique_ptr<GL::IGLProgram> Engine::_createShaderProgram(
-  const std::unique_ptr<GL::IGLShader>& vertexShader,
-  const std::unique_ptr<GL::IGLShader>& fragmentShader,
-  GL::IGLRenderingContext* context,
+IPipelineContextPtr Engine::createPipelineContext()
+{
+  auto pipelineContext    = std::make_shared<WebGLPipelineContext>();
+  pipelineContext->engine = this;
+
+  if (_caps.parallelShaderCompile) {
+    pipelineContext->isParallelCompiled = true;
+  }
+
+  return pipelineContext;
+}
+
+GL::IGLProgramPtr Engine::_createShaderProgram(
+  WebGLPipelineContext* pipelineContext, const GL::IGLShaderPtr& vertexShader,
+  const GL::IGLShaderPtr& fragmentShader, GL::IGLRenderingContext* context,
   const std::vector<std::string>& transformFeedbackVaryings)
 {
-  auto shaderProgram = context->createProgram();
+  auto shaderProgram       = context->createProgram();
+  pipelineContext->program = shaderProgram;
+
   if (!shaderProgram) {
     BABYLON_LOG_ERROR("Engine", "Unable to create program")
     return nullptr;
   }
 
-  context->attachShader(shaderProgram, vertexShader);
-  context->attachShader(shaderProgram, fragmentShader);
+  context->attachShader(shaderProgram.get(), vertexShader.get());
+  context->attachShader(shaderProgram.get(), fragmentShader.get());
 
   if (webGLVersion() > 1.f && !transformFeedbackVaryings.empty()) {
     auto transformFeedback = createTransformFeedback();
 
     bindTransformFeedback(transformFeedback.get());
     setTranformFeedbackVaryings(shaderProgram.get(), transformFeedbackVaryings);
-    shaderProgram->transformFeedback = transformFeedback.get();
+    pipelineContext->transformFeedback = transformFeedback;
   }
 
-  bool linked = context->linkProgram(shaderProgram);
+  context->linkProgram(shaderProgram.get());
 
   if (webGLVersion() > 1.f && !transformFeedbackVaryings.empty()) {
     bindTransformFeedback(nullptr);
   }
 
-  if (!_caps.parallelShaderCompile) {
-    _finalizeProgram(shaderProgram, vertexShader, fragmentShader, context,
-                     linked);
-  }
-  else {
-    shaderProgram->isParallelCompiled = true;
+  pipelineContext->context        = context;
+  pipelineContext->vertexShader   = vertexShader;
+  pipelineContext->fragmentShader = fragmentShader;
+
+  if (!pipelineContext->isParallelCompiled) {
+    _finalizePipelineContext(pipelineContext);
   }
 
   return shaderProgram;
 }
 
-void Engine::_finalizeProgram(
-  const std::unique_ptr<GL::IGLProgram>& shaderProgram,
-  const std::unique_ptr<GL::IGLShader>& vertexShader,
-  const std::unique_ptr<GL::IGLShader>& fragmentShader,
-  GL::IGLRenderingContext* context, bool linked)
+void Engine::_finalizePipelineContext(WebGLPipelineContext* pipelineContext)
 {
-  if (!linked) {
-    const auto error = context->getProgramInfoLog(shaderProgram);
+  auto& context       = pipelineContext->context;
+  auto vertexShader   = pipelineContext->vertexShader.get();
+  auto fragmentShader = pipelineContext->fragmentShader.get();
+  auto program        = pipelineContext->program.get();
+
+  auto linked = context->getProgramParameter(program, GL::LINK_STATUS);
+
+  if (!linked) { // Get more info
+
+    // Vertex
+    if (!_gl->getShaderParameter(vertexShader, GL::COMPILE_STATUS)) {
+      auto log = _gl->getShaderInfoLog(vertexShader);
+      if (!log.empty()) {
+        throw std::runtime_error(log);
+      }
+    }
+
+    // Fragment
+    if (!_gl->getShaderParameter(fragmentShader, GL::COMPILE_STATUS)) {
+      auto log = _gl->getShaderInfoLog(fragmentShader);
+      if (!log.empty()) {
+        throw std::runtime_error(log);
+      }
+    }
+
+    auto error = context->getProgramInfoLog(program);
     if (!error.empty()) {
-      BABYLON_LOG_ERROR("Engine", error)
+      throw std::runtime_error(error);
     }
   }
 
   if (validateShaderPrograms) {
-    context->validateProgram(shaderProgram.get());
-    auto validated
-      = context->getProgramParameter(shaderProgram.get(), GL::VALIDATE_STATUS);
+    context->validateProgram(program);
+    auto validated = context->getProgramParameter(program, GL::VALIDATE_STATUS);
+
     if (!validated) {
-      const auto error = context->getProgramInfoLog(shaderProgram);
+      auto error = context->getProgramInfoLog(program);
       if (!error.empty()) {
-        BABYLON_LOG_ERROR("Engine", error)
+        throw std::runtime_error(error);
       }
     }
   }
 
   context->deleteShader(vertexShader);
   context->deleteShader(fragmentShader);
+
+  pipelineContext->vertexShader   = nullptr;
+  pipelineContext->fragmentShader = nullptr;
+
+  if (pipelineContext->onCompiled) {
+    pipelineContext->onCompiled();
+    pipelineContext->onCompiled = nullptr;
+  }
 }
 
-bool Engine::_isProgramCompiled(GL::IGLProgram* /*shaderProgram*/)
+void Engine::_preparePipelineContext(
+  const IPipelineContextPtr& pipelineContext,
+  const std::string& vertexSourceCode, const std::string& fragmentSourceCode,
+  bool createAsRaw,
+  const std::function<void(
+    const std::string& vertexSourceCode, const std::string& fragmentSourceCode,
+    const std::function<void(const IPipelineContextPtr& pipelineContext)>&
+      onCompiled,
+    const std::function<void(const std::string& message)>& onError)>&
+  /*rebuildRebind*/,
+  const std::string& defines,
+  const std::vector<std::string>& transformFeedbackVaryings)
 {
+  auto webGLRenderingState
+    = std::static_pointer_cast<WebGLPipelineContext>(pipelineContext);
+
+  if (createAsRaw) {
+    webGLRenderingState->program = createRawShaderProgram(
+      webGLRenderingState, vertexSourceCode, fragmentSourceCode, nullptr,
+      transformFeedbackVaryings);
+  }
+  else {
+    webGLRenderingState->program = createShaderProgram(
+      webGLRenderingState, vertexSourceCode, fragmentSourceCode, defines,
+      nullptr, transformFeedbackVaryings);
+  }
+  // webGLRenderingState->program->__SPECTOR_rebuildProgram = rebuildRebind;
+}
+
+bool Engine::_isRenderingStateCompiled(const IPipelineContext* pipelineContext)
+{
+  auto webGLPipelineContext
+    = static_cast<WebGLPipelineContext const*>(pipelineContext);
+  if (_caps.parallelShaderCompile.has_value()
+      && _gl->getProgramParameter(
+        webGLPipelineContext->program.get(),
+        _caps.parallelShaderCompile->COMPLETION_STATUS_KHR)) {
+    _finalizePipelineContext(
+      const_cast<WebGLPipelineContext*>(webGLPipelineContext));
+    return true;
+  }
+
   return false;
 }
 
-bool Engine::_isRenderingStateCompiled(
-  IPipelineContext const* /*pipelineContext*/)
+void Engine::_executeWhenRenderingStateIsCompiled(
+  const IPipelineContextPtr& pipelineContext,
+  const std::function<void()>& action)
 {
-  return false;
+  auto webGLPipelineContext
+    = std::static_pointer_cast<WebGLPipelineContext>(pipelineContext);
+
+  if (!webGLPipelineContext->isParallelCompiled) {
+    action();
+    return;
+  }
+
+  webGLPipelineContext->onCompiled = action;
 }
 
-std::unordered_map<std::string, std::unique_ptr<GL::IGLUniformLocation>>
-Engine::getUniforms(GL::IGLProgram* shaderProgram,
+std::vector<std::unique_ptr<GL::IGLUniformLocation>>
+Engine::getUniforms(const IPipelineContextPtr& pipelineContext,
                     const std::vector<std::string>& uniformsNames)
 {
-  std::unordered_map<std::string, std::unique_ptr<GL::IGLUniformLocation>>
-    results;
+  std::vector<std::unique_ptr<GL::IGLUniformLocation>> results;
+  auto webGLPipelineContext
+    = std::static_pointer_cast<WebGLPipelineContext>(pipelineContext);
 
-  for (auto& name : uniformsNames) {
-    auto uniform = _gl->getUniformLocation(shaderProgram, name);
-    if (uniform) {
-      results[name] = std::move(uniform);
-    }
+  for (const auto& name : uniformsNames) {
+    results.emplace_back(
+      _gl->getUniformLocation(webGLPipelineContext->program.get(), name));
   }
 
   return results;
 }
 
 Int32Array
-Engine::getAttributes(GL::IGLProgram* shaderProgram,
+Engine::getAttributes(const IPipelineContextPtr& pipelineContext,
                       const std::vector<std::string>& attributesNames)
 {
   Int32Array results;
+  auto webGLPipelineContext
+    = std::static_pointer_cast<WebGLPipelineContext>(pipelineContext);
 
-  for (auto& attributesName : attributesNames) {
-    results.emplace_back(_gl->getAttribLocation(shaderProgram, attributesName));
+  for (const auto& attributesName : attributesNames) {
+    results.emplace_back(_gl->getAttribLocation(
+      webGLPipelineContext->program.get(), attributesName));
   }
 
   return results;
@@ -2547,56 +2685,56 @@ void Engine::setAlphaMode(unsigned int mode, bool noDepthWriteChange)
   }
 
   switch (mode) {
-    case EngineConstants::ALPHA_DISABLE:
+    case Constants::ALPHA_DISABLE:
       _alphaState->alphaBlend = false;
       break;
-    case EngineConstants::ALPHA_PREMULTIPLIED:
+    case Constants::ALPHA_PREMULTIPLIED:
       _alphaState->setAlphaBlendFunctionParameters(
         GL::ONE, GL::ONE_MINUS_SRC_ALPHA, GL::ONE, GL::ONE);
       _alphaState->alphaBlend = true;
       break;
-    case EngineConstants::ALPHA_PREMULTIPLIED_PORTERDUFF:
+    case Constants::ALPHA_PREMULTIPLIED_PORTERDUFF:
       _alphaState->setAlphaBlendFunctionParameters(
         GL::ONE, GL::ONE_MINUS_SRC_ALPHA, GL::ONE, GL::ONE_MINUS_SRC_ALPHA);
       _alphaState->alphaBlend = true;
       break;
-    case EngineConstants::ALPHA_COMBINE:
+    case Constants::ALPHA_COMBINE:
       _alphaState->setAlphaBlendFunctionParameters(
         GL::SRC_ALPHA, GL::ONE_MINUS_SRC_ALPHA, GL::ONE, GL::ONE);
       _alphaState->alphaBlend = true;
       break;
-    case EngineConstants::ALPHA_ONEONE:
+    case Constants::ALPHA_ONEONE:
       _alphaState->setAlphaBlendFunctionParameters(GL::ONE, GL::ONE, GL::ZERO,
                                                    GL::ONE);
       _alphaState->alphaBlend = true;
       break;
-    case EngineConstants::ALPHA_ADD:
+    case Constants::ALPHA_ADD:
       _alphaState->setAlphaBlendFunctionParameters(GL::SRC_ALPHA, GL::ONE,
                                                    GL::ZERO, GL::ONE);
       _alphaState->alphaBlend = true;
       break;
-    case EngineConstants::ALPHA_SUBTRACT:
+    case Constants::ALPHA_SUBTRACT:
       _alphaState->setAlphaBlendFunctionParameters(
         GL::ZERO, GL::ONE_MINUS_SRC_COLOR, GL::ONE, GL::ONE);
       _alphaState->alphaBlend = true;
       break;
-    case EngineConstants::ALPHA_MULTIPLY:
+    case Constants::ALPHA_MULTIPLY:
       _alphaState->setAlphaBlendFunctionParameters(GL::DST_COLOR, GL::ZERO,
                                                    GL::ONE, GL::ONE);
       _alphaState->alphaBlend = true;
       break;
-    case EngineConstants::ALPHA_MAXIMIZED:
+    case Constants::ALPHA_MAXIMIZED:
       _alphaState->setAlphaBlendFunctionParameters(
         GL::SRC_ALPHA, GL::ONE_MINUS_SRC_COLOR, GL::ONE, GL::ONE);
       _alphaState->alphaBlend = true;
       break;
-    case EngineConstants::ALPHA_INTERPOLATE:
+    case Constants::ALPHA_INTERPOLATE:
       _alphaState->setAlphaBlendFunctionParameters(
         GL::CONSTANT_COLOR, GL::ONE_MINUS_CONSTANT_COLOR, GL::CONSTANT_ALPHA,
         GL::ONE_MINUS_CONSTANT_ALPHA);
       _alphaState->alphaBlend = true;
       break;
-    case EngineConstants::ALPHA_SCREENMODE:
+    case Constants::ALPHA_SCREENMODE:
       _alphaState->setAlphaBlendFunctionParameters(
         GL::ONE, GL::ONE_MINUS_SRC_COLOR, GL::ONE, GL::ONE_MINUS_SRC_ALPHA);
       _alphaState->alphaBlend = true;
@@ -2605,7 +2743,7 @@ void Engine::setAlphaMode(unsigned int mode, bool noDepthWriteChange)
       break;
   }
   if (!noDepthWriteChange) {
-    setDepthWrite(mode == EngineConstants::ALPHA_DISABLE);
+    setDepthWrite(mode == Constants::ALPHA_DISABLE);
   }
   _alphaMode = mode;
 }
@@ -2833,14 +2971,15 @@ InternalTexturePtr Engine::createTexture(
   const std::function<void(const std::string& message,
                            const std::string& exception)>& onError,
   const std::optional<std::variant<std::string, ArrayBuffer, Image>>& buffer,
-  const InternalTexturePtr& fallback, const std::optional<unsigned int>& format)
+  const InternalTexturePtr& fallback, const std::optional<unsigned int>& format,
+  const std::string& forcedExtension)
 {
   // assign a new string, so that the original is still available in case of
   // fallback
   auto url      = urlArg;
   auto fromData = url.substr(0, 5) == "data:";
   auto fromBlob = url.substr(0, 5) == "blob:";
-  auto isBase64 = fromData && String::contains(url, "base64");
+  auto isBase64 = fromData && String::contains(url, ";base64,");
 
   auto texture = fallback ? fallback :
                             std::make_shared<InternalTexture>(
@@ -2849,13 +2988,16 @@ InternalTexturePtr Engine::createTexture(
   // establish the file extension, if possible
   auto lastDotTmp = String::lastIndexOf(url, ".");
   auto lastDot    = lastDotTmp >= 0 ? static_cast<size_t>(lastDotTmp) : 0ull;
-  auto extension
-    = (lastDot > 0) ? String::toLowerCase(url.substr(lastDot, url.size())) : "";
+  auto extension  = !forcedExtension.empty() ?
+                     forcedExtension :
+                     (lastDot > 0) ?
+                     String::toLowerCase(url.substr(lastDot, url.size())) :
+                     "";
 
   IInternalTextureLoaderPtr loader = nullptr;
   for (const auto& availableLoader : Engine::_TextureLoaders) {
     if (availableLoader->canLoad(extension, _textureFormatInUse, fallback,
-                                 false, false)) {
+                                 isBase64, buffer ? true : false)) {
       loader = availableLoader;
       break;
     }
@@ -2887,38 +3029,42 @@ InternalTexturePtr Engine::createTexture(
     _internalTexturesCache.emplace_back(texture);
   }
 
-  const auto onInternalError
-    = [&](const std::string& message, const std::string& exception) {
-        if (scene) {
-          scene->_removePendingData(texture);
-        }
+  const auto onInternalError = [&](const std::string& message,
+                                   const std::string& exception) {
+    if (scene) {
+      scene->_removePendingData(texture);
+    }
 
-        bool customFallback = false;
-        if (loader) {
-          auto fallbackUrl
-            = loader->getFallbackTextureUrl(url, _textureFormatInUse);
-          if (!fallbackUrl.empty()) {
-            // Add Back
-            customFallback = true;
-            createTexture(urlArg, noMipmap, invertY, scene, samplingMode,
-                          nullptr, onError, buffer, texture);
-          }
-        }
+    auto customFallback = false;
+    if (loader) {
+      auto fallbackUrl
+        = loader->getFallbackTextureUrl(url, _textureFormatInUse);
+      if (!fallbackUrl.empty()) {
+        // Add Back
+        customFallback = true;
+        BABYLON_LOGF_WARN("Engine",
+                          "Failed when trying to load %s, falling back to the "
+                          "next supported loader",
+                          texture->url.c_str())
+        createTexture(urlArg, noMipmap, texture->invertY, scene, samplingMode,
+                      nullptr, nullptr, buffer, texture);
+      }
+    }
 
-        if (!customFallback) {
-          if (onLoadObserver) {
-            texture->onLoadedObservable.remove(onLoadObserver);
-          }
-          if (Tools::UseFallbackTexture) {
-            createTexture(Tools::fallbackTexture, noMipmap, invertY, scene,
-                          samplingMode, nullptr, onError, buffer, texture);
-          }
-        }
+    if (!customFallback) {
+      if (onLoadObserver) {
+        texture->onLoadedObservable.remove(onLoadObserver);
+      }
+      if (Tools::UseFallbackTexture) {
+        createTexture(Tools::fallbackTexture, noMipmap, texture->invertY, scene,
+                      samplingMode, nullptr, nullptr, buffer, texture);
+      }
+    }
 
-        if (onError) {
-          onError(message.empty() ? "Unknown error" : message, exception);
-        }
-      };
+    if (onError) {
+      onError(message.empty() ? "Unknown error" : message, exception);
+    }
+  };
 
   // processing for non-image formats
   if (loader) {
@@ -2928,16 +3074,21 @@ InternalTexturePtr Engine::createTexture(
       loader->loadData(
         std::get<ArrayBuffer>(data), texture,
         [&](int width, int height, bool loadMipmap, bool isCompressed,
-            const std::function<void()>& done, bool /*loadFailed*/) -> void {
-          _prepareWebGLTexture(
-            texture, scene, width, height, invertY, !loadMipmap, isCompressed,
-            [&](
-              int /*width*/, int /*height*/,
-              const std::function<void()> & /*continuationCallback*/) -> bool {
-              done();
-              return false;
-            },
-            samplingMode);
+            const std::function<void()>& done, bool loadFailed) -> void {
+          if (loadFailed) {
+            onInternalError("TextureLoader failed to load data", "");
+          }
+          else {
+            _prepareWebGLTexture(
+              texture, scene, width, height, invertY, !loadMipmap, isCompressed,
+              [&](int /*width*/, int /*height*/,
+                  const std::function<void()> & /*continuationCallback*/)
+                -> bool {
+                done();
+                return false;
+              },
+              samplingMode);
+          }
         });
     };
 
@@ -2957,7 +3108,8 @@ InternalTexturePtr Engine::createTexture(
       }
 
       _prepareWebGLTexture(
-        texture, scene, img.width, img.height, invertY, noMipmap, false,
+        texture, scene, img.width, img.height, texture->invertY, noMipmap,
+        false,
         [&](int potWidth, int potHeight,
             const std::function<void()>& continuationCallback) {
           auto isPot = (img.width == potWidth && img.height == potHeight);
@@ -3046,10 +3198,10 @@ void Engine::_rescaleTexture(const InternalTexturePtr& source,
                              const std::function<void()>& onComplete)
 {
   IRenderTargetOptions options;
-  options.generateMipMaps     = false;
-  options.type                = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
-  options.samplingMode        = EngineConstants::TEXTURE_BILINEAR_SAMPLINGMODE;
-  options.generateDepthBuffer = false;
+  options.generateMipMaps       = false;
+  options.type                  = Constants::TEXTURETYPE_UNSIGNED_INT;
+  options.samplingMode          = Constants::TEXTURE_BILINEAR_SAMPLINGMODE;
+  options.generateDepthBuffer   = false;
   options.generateStencilBuffer = false;
 
   auto rtt = createRenderTargetTexture(
@@ -3057,8 +3209,8 @@ void Engine::_rescaleTexture(const InternalTexturePtr& source,
 
   if (!_rescalePostProcess) {
     _rescalePostProcess = PassPostProcess::New(
-      "rescale", 1.f, nullptr, EngineConstants::TEXTURE_BILINEAR_SAMPLINGMODE,
-      this, false, EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+      "rescale", 1.f, nullptr, Constants::TEXTURE_BILINEAR_SAMPLINGMODE, this,
+      false, Constants::TEXTURETYPE_UNSIGNED_INT);
   }
 
   _rescalePostProcess->getEffect()->executeWhenCompiled(
@@ -3266,14 +3418,14 @@ void Engine::updateTextureSamplingMode(unsigned int samplingMode,
 
 void Engine::updateDynamicTexture(const InternalTexturePtr& texture,
                                   ICanvas* /*canvas*/, bool invertY,
-                                  bool premulAlpha, unsigned int /*format*/)
+                                  bool premulAlpha, unsigned int /*format*/,
+                                  bool forceBindTexture)
 {
   if (!texture) {
     return;
   }
 
-  _bindTextureDirectly(GL::TEXTURE_2D, texture, true);
-
+  _bindTextureDirectly(GL::TEXTURE_2D, texture, true, forceBindTexture);
   _unpackFlipY(invertY);
   if (premulAlpha) {
     _gl->pixelStorei(GL::UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
@@ -3307,7 +3459,7 @@ void Engine::updateTextureComparisonFunction(const InternalTexturePtr& texture,
 
     if (comparisonFunction == 0) {
       _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_COMPARE_FUNC,
-                         EngineConstants::LEQUAL);
+                         Constants::LEQUAL);
       _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_COMPARE_MODE,
                          GL::NONE);
     }
@@ -3325,7 +3477,7 @@ void Engine::updateTextureComparisonFunction(const InternalTexturePtr& texture,
 
     if (comparisonFunction == 0) {
       _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_COMPARE_FUNC,
-                         EngineConstants::LEQUAL);
+                         Constants::LEQUAL);
       _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_COMPARE_MODE, GL::NONE);
     }
     else {
@@ -3361,10 +3513,10 @@ void Engine::_setupDepthStencilTexture(InternalTexture* internalTexture,
   internalTexture->generateMipMaps        = false;
   internalTexture->_generateDepthBuffer   = true;
   internalTexture->_generateStencilBuffer = generateStencil;
-  internalTexture->samplingMode
-    = bilinearFiltering ? EngineConstants::TEXTURE_BILINEAR_SAMPLINGMODE :
-                          EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE;
-  internalTexture->type = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+  internalTexture->samplingMode           = bilinearFiltering ?
+                                    Constants::TEXTURE_BILINEAR_SAMPLINGMODE :
+                                    Constants::TEXTURE_NEAREST_SAMPLINGMODE;
+  internalTexture->type                = Constants::TEXTURETYPE_UNSIGNED_INT;
   internalTexture->_comparisonFunction = comparisonFunction;
 
   auto target = internalTexture->isCube ? GL::TEXTURE_CUBE_MAP : GL::TEXTURE_2D;
@@ -3376,8 +3528,7 @@ void Engine::_setupDepthStencilTexture(InternalTexture* internalTexture,
   _gl->texParameteri(target, GL::TEXTURE_WRAP_T, GL::CLAMP_TO_EDGE);
 
   if (comparisonFunction == 0) {
-    _gl->texParameteri(target, GL::TEXTURE_COMPARE_FUNC,
-                       EngineConstants::LEQUAL);
+    _gl->texParameteri(target, GL::TEXTURE_COMPARE_FUNC, Constants::LEQUAL);
     _gl->texParameteri(target, GL::TEXTURE_COMPARE_MODE, GL::NONE);
   }
   else {
@@ -3523,7 +3674,7 @@ void Engine::setFrameBufferDepthStencilTexture(
 
   auto& depthStencilTexture = renderTarget->depthStencilTexture;
 
-  bindUnboundFramebuffer(internalTexture->_framebuffer.get());
+  _bindUnboundFramebuffer(internalTexture->_framebuffer.get());
   if (depthStencilTexture->isCube) {
     if (depthStencilTexture->_generateStencilBuffer) {
       _gl->framebufferTexture2D(GL::FRAMEBUFFER, GL::DEPTH_STENCIL_ATTACHMENT,
@@ -3548,7 +3699,7 @@ void Engine::setFrameBufferDepthStencilTexture(
                                 depthStencilTexture->_webGLTexture.get(), 0);
     }
   }
-  bindUnboundFramebuffer(nullptr);
+  _bindUnboundFramebuffer(nullptr);
 }
 
 InternalTexturePtr
@@ -3569,26 +3720,26 @@ Engine::createRenderTargetTexture(const std::variant<ISize, float>& size,
             false);
   fullOptions.type = options.type.has_value() ?
                        options.type.value() :
-                       EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+                       Constants::TEXTURETYPE_UNSIGNED_INT;
   fullOptions.samplingMode = options.samplingMode.has_value() ?
                                options.samplingMode.value() :
-                               EngineConstants::TEXTURE_TRILINEAR_SAMPLINGMODE;
+                               Constants::TEXTURE_TRILINEAR_SAMPLINGMODE;
   fullOptions.format = options.format.has_value() ?
                          options.format.value() :
-                         EngineConstants::TEXTUREFORMAT_RGBA;
+                         Constants::TEXTUREFORMAT_RGBA;
   fullOptions.generateStencilBuffer
     = fullOptions.generateDepthBuffer.value()
       && fullOptions.generateStencilBuffer.value();
 
-  if (fullOptions.type.value() == EngineConstants::TEXTURETYPE_FLOAT
+  if (fullOptions.type.value() == Constants::TEXTURETYPE_FLOAT
       && !_caps.textureFloatLinearFiltering) {
     // if floating point linear (gl.FLOAT) then force to NEAREST_SAMPLINGMODE
-    fullOptions.samplingMode = EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE;
+    fullOptions.samplingMode = Constants::TEXTURE_NEAREST_SAMPLINGMODE;
   }
-  else if (fullOptions.type.value() == EngineConstants::TEXTURETYPE_HALF_FLOAT
+  else if (fullOptions.type.value() == Constants::TEXTURETYPE_HALF_FLOAT
            && !_caps.textureHalfFloatLinearFiltering) {
     // if floating point linear (HALF_FLOAT) then force to NEAREST_SAMPLINGMODE
-    fullOptions.samplingMode = EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE;
+    fullOptions.samplingMode = Constants::TEXTURE_NEAREST_SAMPLINGMODE;
   }
 
   auto texture = std::make_shared<InternalTexture>(
@@ -3611,9 +3762,9 @@ Engine::createRenderTargetTexture(const std::variant<ISize, float>& size,
     fullOptions.samplingMode.value(),
     fullOptions.generateMipMaps.value() ? true : false);
 
-  if (fullOptions.type.value() == EngineConstants::TEXTURETYPE_FLOAT
+  if (fullOptions.type.value() == Constants::TEXTURETYPE_FLOAT
       && !_caps.textureFloat) {
-    fullOptions.type = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+    fullOptions.type = Constants::TEXTURETYPE_UNSIGNED_INT;
     BABYLON_LOG_WARN(
       "Engine",
       "Float textures are not supported. Render target forced to "
@@ -3635,7 +3786,7 @@ Engine::createRenderTargetTexture(const std::variant<ISize, float>& size,
   // Create the framebuffer
   auto currentFrameBuffer = _currentFramebuffer;
   auto framebuffer        = _gl->createFramebuffer();
-  bindUnboundFramebuffer(framebuffer.get());
+  _bindUnboundFramebuffer(framebuffer.get());
   _gl->framebufferTexture2D(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
                             GL::TEXTURE_2D, texture->_webGLTexture.get(), 0);
 
@@ -3650,7 +3801,7 @@ Engine::createRenderTargetTexture(const std::variant<ISize, float>& size,
   // Unbind
   _bindTextureDirectly(GL::TEXTURE_2D, nullptr);
   _gl->bindRenderbuffer(GL::RENDERBUFFER, nullptr);
-  bindUnboundFramebuffer(currentFrameBuffer);
+  _bindUnboundFramebuffer(currentFrameBuffer);
 
   texture->_framebuffer    = std::move(framebuffer);
   texture->baseWidth       = width;
@@ -3684,8 +3835,8 @@ Engine::createMultipleRenderTarget(ISize size,
   auto generateDepthTexture  = options.generateDepthTexture.value_or(false);
   auto textureCount          = options.textureCount.value_or(1);
 
-  auto defaultType         = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
-  auto defaultSamplingMode = EngineConstants::TEXTURE_TRILINEAR_SAMPLINGMODE;
+  auto defaultType         = Constants::TEXTURETYPE_UNSIGNED_INT;
+  auto defaultSamplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE;
 
   const auto& types         = options.types;
   const auto& samplingModes = options.samplingModes;
@@ -3696,7 +3847,7 @@ Engine::createMultipleRenderTarget(ISize size,
   auto& gl = *_gl;
   // Create the framebuffer
   auto framebuffer = gl.createFramebuffer();
-  bindUnboundFramebuffer(framebuffer.get());
+  _bindUnboundFramebuffer(framebuffer.get());
 
   std::vector<InternalTexturePtr> textures;
   std::vector<GL::GLenum> attachments;
@@ -3710,21 +3861,21 @@ Engine::createMultipleRenderTarget(ISize size,
       = (i < samplingModes.size()) ? samplingModes[i] : defaultSamplingMode;
     auto type = (i < types.size()) ? types[i] : defaultType;
 
-    if (type == EngineConstants::TEXTURETYPE_FLOAT
+    if (type == Constants::TEXTURETYPE_FLOAT
         && !_caps.textureFloatLinearFiltering) {
       // if floating point linear (gl.FLOAT) then force to NEAREST_SAMPLINGMODE
-      samplingMode = EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE;
+      samplingMode = Constants::TEXTURE_NEAREST_SAMPLINGMODE;
     }
-    else if (type == EngineConstants::TEXTURETYPE_HALF_FLOAT
+    else if (type == Constants::TEXTURETYPE_HALF_FLOAT
              && !_caps.textureHalfFloatLinearFiltering) {
       // if floating point linear (HALF_FLOAT) then force to
       // NEAREST_SAMPLINGMODE
-      samplingMode = EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE;
+      samplingMode = Constants::TEXTURE_NEAREST_SAMPLINGMODE;
     }
 
     auto filters = _getSamplingParameters(samplingMode, generateMipMaps);
-    if (type == EngineConstants::TEXTURETYPE_FLOAT && !_caps.textureFloat) {
-      type = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+    if (type == Constants::TEXTURETYPE_FLOAT && !_caps.textureFloat) {
+      type = Constants::TEXTURETYPE_UNSIGNED_INT;
       BABYLON_LOG_WARN("Engine",
                        "Float textures are not supported. Render target forced "
                        "to TEXTURETYPE_UNSIGNED_BYTE type")
@@ -3826,7 +3977,7 @@ Engine::createMultipleRenderTarget(ISize size,
 
   gl.drawBuffers(attachments);
   gl.bindRenderbuffer(GL::RENDERBUFFER, nullptr);
-  bindUnboundFramebuffer(nullptr);
+  _bindUnboundFramebuffer(nullptr);
 
   resetTextureCache();
 
@@ -3855,7 +4006,7 @@ Engine::_setupFramebufferDepthAttachments(bool generateStencilBuffer,
     }
 
     _gl->framebufferRenderbuffer(GL::FRAMEBUFFER, GL::DEPTH_STENCIL_ATTACHMENT,
-                                 GL::RENDERBUFFER, depthStencilBuffer);
+                                 GL::RENDERBUFFER, depthStencilBuffer.get());
   }
   else if (generateDepthBuffer) {
     depthStencilBuffer = _gl->createRenderbuffer();
@@ -3871,7 +4022,7 @@ Engine::_setupFramebufferDepthAttachments(bool generateStencilBuffer,
     }
 
     _gl->framebufferRenderbuffer(GL::FRAMEBUFFER, GL::DEPTH_ATTACHMENT,
-                                 GL::RENDERBUFFER, depthStencilBuffer);
+                                 GL::RENDERBUFFER, depthStencilBuffer.get());
   }
 
   return depthStencilBuffer;
@@ -3917,7 +4068,7 @@ Engine::updateRenderTargetTextureSampleCount(const InternalTexturePtr& texture,
     }
 
     texture->_MSAAFramebuffer = std::move(framebuffer);
-    bindUnboundFramebuffer(texture->_MSAAFramebuffer.get());
+    _bindUnboundFramebuffer(texture->_MSAAFramebuffer.get());
 
     auto colorRenderbuffer = _gl->createRenderbuffer();
 
@@ -3933,12 +4084,12 @@ Engine::updateRenderTargetTextureSampleCount(const InternalTexturePtr& texture,
       texture->height);
 
     _gl->framebufferRenderbuffer(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
-                                 GL::RENDERBUFFER, colorRenderbuffer);
+                                 GL::RENDERBUFFER, colorRenderbuffer.get());
 
     texture->_MSAARenderBuffer = std::move(colorRenderbuffer);
   }
   else {
-    bindUnboundFramebuffer(texture->_framebuffer.get());
+    _bindUnboundFramebuffer(texture->_framebuffer.get());
   }
 
   texture->samples             = samples;
@@ -3947,7 +4098,7 @@ Engine::updateRenderTargetTextureSampleCount(const InternalTexturePtr& texture,
     texture->width, texture->height, static_cast<int>(samples));
 
   _gl->bindRenderbuffer(GL::RENDERBUFFER, nullptr);
-  bindUnboundFramebuffer(nullptr);
+  _bindUnboundFramebuffer(nullptr);
 
   return samples;
 }
@@ -3994,7 +4145,7 @@ unsigned int Engine::updateMultipleRenderTargetTextureSampleCount(
       return 0;
     }
 
-    bindUnboundFramebuffer(framebuffer.get());
+    _bindUnboundFramebuffer(framebuffer.get());
 
     auto depthStencilBuffer = _setupFramebufferDepthAttachments(
       textures[0]->_generateStencilBuffer, textures[0]->_generateDepthBuffer,
@@ -4024,7 +4175,7 @@ unsigned int Engine::updateMultipleRenderTargetTextureSampleCount(
         texture->height);
 
       gl.framebufferRenderbuffer(GL::FRAMEBUFFER, attachment, GL::RENDERBUFFER,
-                                 colorRenderbuffer);
+                                 colorRenderbuffer.get());
 
       texture->_MSAAFramebuffer    = std::move(framebuffer);
       texture->_MSAARenderBuffer   = std::move(colorRenderbuffer);
@@ -4036,10 +4187,10 @@ unsigned int Engine::updateMultipleRenderTargetTextureSampleCount(
     gl.drawBuffers(attachments);
   }
   else {
-    bindUnboundFramebuffer(textures[0]->_framebuffer.get());
+    _bindUnboundFramebuffer(textures[0]->_framebuffer.get());
   }
 
-  bindUnboundFramebuffer(nullptr);
+  _bindUnboundFramebuffer(nullptr);
 
   return samples;
 }
@@ -4134,26 +4285,26 @@ InternalTexturePtr Engine::createRenderTargetCubeTexture(
         false;
   fullOptions.type = options.type.has_value() ?
                        options.type.value() :
-                       EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+                       Constants::TEXTURETYPE_UNSIGNED_INT;
   fullOptions.samplingMode = options.samplingMode.has_value() ?
                                options.samplingMode.value() :
-                               EngineConstants::TEXTURE_TRILINEAR_SAMPLINGMODE;
+                               Constants::TEXTURE_TRILINEAR_SAMPLINGMODE;
   fullOptions.format = options.format.has_value() ?
                          options.format.value() :
-                         EngineConstants::TEXTUREFORMAT_RGBA;
+                         Constants::TEXTUREFORMAT_RGBA;
   fullOptions.generateStencilBuffer
     = fullOptions.generateDepthBuffer.value()
       && fullOptions.generateStencilBuffer.value();
 
-  if (fullOptions.type.value() == EngineConstants::TEXTURETYPE_FLOAT
+  if (fullOptions.type.value() == Constants::TEXTURETYPE_FLOAT
       && !_caps.textureFloatLinearFiltering) {
     // if floating point linear (gl.FLOAT) then force to NEAREST_SAMPLINGMODE
-    fullOptions.samplingMode = EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE;
+    fullOptions.samplingMode = Constants::TEXTURE_NEAREST_SAMPLINGMODE;
   }
-  else if (fullOptions.type.value() == EngineConstants::TEXTURETYPE_HALF_FLOAT
+  else if (fullOptions.type.value() == Constants::TEXTURETYPE_HALF_FLOAT
            && !_caps.textureHalfFloatLinearFiltering) {
     // if floating point linear (HALF_FLOAT) then force to NEAREST_SAMPLINGMODE
-    fullOptions.samplingMode = EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE;
+    fullOptions.samplingMode = Constants::TEXTURE_NEAREST_SAMPLINGMODE;
   }
   auto& gl = *_gl;
 
@@ -4164,9 +4315,9 @@ InternalTexturePtr Engine::createRenderTargetCubeTexture(
   auto filters = Engine::_getSamplingParameters(
     fullOptions.samplingMode.value(), fullOptions.generateMipMaps.value());
 
-  if (fullOptions.type.value() == EngineConstants::TEXTURETYPE_FLOAT
+  if (fullOptions.type.value() == Constants::TEXTURETYPE_FLOAT
       && !_caps.textureFloat) {
-    fullOptions.type = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+    fullOptions.type = Constants::TEXTURETYPE_UNSIGNED_INT;
     BABYLON_LOG_WARN("Engine",
                      "Float textures are not supported. Cube render target "
                      "forced to TEXTURETYPE_UNESIGNED_BYTE type")
@@ -4188,7 +4339,7 @@ InternalTexturePtr Engine::createRenderTargetCubeTexture(
 
   // Create the framebuffer
   auto framebuffer = gl.createFramebuffer();
-  bindUnboundFramebuffer(framebuffer.get());
+  _bindUnboundFramebuffer(framebuffer.get());
 
   texture->_depthStencilBuffer = _setupFramebufferDepthAttachments(
     fullOptions.generateStencilBuffer.value(),
@@ -4202,7 +4353,7 @@ InternalTexturePtr Engine::createRenderTargetCubeTexture(
   // Unbind
   _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, nullptr);
   gl.bindRenderbuffer(GL::RENDERBUFFER, nullptr);
-  bindUnboundFramebuffer(nullptr);
+  _bindUnboundFramebuffer(nullptr);
 
   texture->_framebuffer           = std::move(framebuffer);
   texture->width                  = size.width;
@@ -4367,8 +4518,8 @@ InternalTexturePtr Engine::createCubeTexture(
   auto lastDot   = String::lastIndexOf(rootUrl, ".");
   auto extension = !forcedExtension.empty() ?
                      forcedExtension :
-                     (lastDot > -1 ? String::toLowerCase(rootUrl.substr(
-                                       static_cast<unsigned long>(lastDot))) :
+                     (lastDot > -1 ? String::toLowerCase(
+                        rootUrl.substr(static_cast<unsigned long>(lastDot))) :
                                      "");
 
   IInternalTextureLoaderPtr loader = nullptr;
@@ -4415,10 +4566,9 @@ InternalTexturePtr Engine::createCubeTexture(
     _cascadeLoadImgs(
       rootUrl, scene,
       [&](const std::vector<Image>& imgs) {
-        auto width = needPOTTextures() ?
-                       Tools::GetExponentOfTwo(imgs[0].width,
-                                               _caps.maxCubemapTextureSize) :
-                       imgs[0].width;
+        auto width = needPOTTextures() ? Tools::GetExponentOfTwo(
+                       imgs[0].width, _caps.maxCubemapTextureSize) :
+                                         imgs[0].width;
         auto height = width;
 
         _prepareWorkingCanvas();
@@ -4597,7 +4747,7 @@ InternalTexturePtr Engine::createRawCubeTexture(
   // color-renderable and texture-filterable
   if (textureType == GL::FLOAT && !_caps.textureFloatLinearFiltering) {
     generateMipMaps = false;
-    samplingMode    = EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE;
+    samplingMode    = Constants::TEXTURE_NEAREST_SAMPLINGMODE;
     BABYLON_LOG_WARN("Engine",
                      "Float texture filtering is not supported. Mipmap "
                      "generation and sampling mode are forced to false and "
@@ -4606,7 +4756,7 @@ InternalTexturePtr Engine::createRawCubeTexture(
   else if (textureType == GL::HALF_FLOAT_OES
            && !_caps.textureHalfFloatLinearFiltering) {
     generateMipMaps = false;
-    samplingMode    = EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE;
+    samplingMode    = Constants::TEXTURE_NEAREST_SAMPLINGMODE;
     BABYLON_LOG_WARN("Engine",
                      "Half float texture filtering is not supported. Mipmap "
                      "generation and sampling mode are forced to false and "
@@ -4753,12 +4903,13 @@ InternalTexturePtr Engine::createRawCubeTextureFromUrl(
     }
   };
 
-  _loadFile(url,
-            [&](const std::variant<std::string, ArrayBuffer>& data,
-                const std::string& responseURL) -> void {
-              internalCallback(data, responseURL);
-            },
-            nullptr, true, onerror);
+  _loadFile(
+    url,
+    [&](const std::variant<std::string, ArrayBuffer>& data,
+        const std::string& responseURL) -> void {
+      internalCallback(data, responseURL);
+    },
+    nullptr, true, onerror);
 
   return texture;
 }
@@ -4994,7 +5145,7 @@ Engine::_convertRGBtoRGBATextureData(const ArrayBufferView& rgbData, int width,
                                      int height, unsigned int textureType)
 {
   // Create new RGBA data container.
-  if (textureType == EngineConstants::TEXTURETYPE_FLOAT) {
+  if (textureType == Constants::TEXTURETYPE_FLOAT) {
     Float32Array rgbaData(static_cast<size_t>(width * height * 4));
     // Convert each pixel.
     for (int x = 0; x < width; ++x) {
@@ -5086,14 +5237,14 @@ void Engine::_releaseTexture(InternalTexture* texture)
 
   // Set output texture of post process to null if the texture has been
   // released/disposed
-  for (auto& scene : scenes) {
-    for (auto& postProcess : scene->postProcesses) {
+  for (const auto& scene : scenes) {
+    for (const auto& postProcess : scene->postProcesses) {
       if (postProcess->_outputTexture.get() == texture) {
         postProcess->_outputTexture = nullptr;
       }
     }
-    for (auto& camera : scene->cameras) {
-      for (auto& postProcess : camera->_postProcesses) {
+    for (const auto& camera : scene->cameras) {
+      for (const auto& postProcess : camera->_postProcesses) {
         if (postProcess) {
           if (postProcess->_outputTexture.get() == texture) {
             postProcess->_outputTexture = nullptr;
@@ -5104,18 +5255,19 @@ void Engine::_releaseTexture(InternalTexture* texture)
   }
 }
 
-void Engine::setProgram(GL::IGLProgram* program)
+void Engine::setProgram(const GL::IGLProgramPtr& program)
 {
   if (_currentProgram != program) {
-    _gl->useProgram(program);
+    _gl->useProgram(program.get());
     _currentProgram = program;
   }
 }
 
 void Engine::bindSamplers(Effect& effect)
 {
-  setProgram(effect.getProgram());
-
+  auto webGLPipelineContext = std::static_pointer_cast<WebGLPipelineContext>(
+    effect.getPipelineContext());
+  setProgram(webGLPipelineContext->program);
   const auto& samplers = effect.getSamplers();
   for (size_t index = 0; index < samplers.size(); ++index) {
     auto uniform = effect.getUniform(samplers[index]);
@@ -5125,34 +5277,6 @@ void Engine::bindSamplers(Effect& effect)
     }
   }
   _currentEffect = nullptr;
-}
-
-void Engine::_moveBoundTextureOnTop(const InternalTexturePtr& internalTexture)
-{
-  if (disableTextureBindingOptimization
-      || _lastBoundInternalTextureTracker->previous == internalTexture) {
-    return;
-  }
-
-  // Remove
-  _linkTrackers(internalTexture->previous, internalTexture->next);
-
-  // Bind last to it
-  _linkTrackers(_lastBoundInternalTextureTracker->previous, internalTexture);
-
-  // Bind to dummy
-  _linkTrackers(internalTexture, _lastBoundInternalTextureTracker);
-}
-
-void Engine::_linkTrackers(const IInternalTextureTrackerPtr& previous,
-                           const IInternalTextureTrackerPtr& next)
-{
-  if (previous) {
-    previous->next = next;
-  }
-  if (next) {
-    next->previous = previous;
-  }
 }
 
 void Engine::_activateCurrentTexture()
@@ -5168,7 +5292,8 @@ bool Engine::_bindTextureDirectly(unsigned int target,
                                   const InternalTexturePtr& texture,
                                   bool forTextureDataUpdate, bool force)
 {
-  auto wasPreviouslyBound    = false;
+  auto wasPreviouslyBound = false;
+
   auto isTextureForRendering = texture && texture->_associatedChannel > -1;
   if (forTextureDataUpdate && isTextureForRendering) {
     _activeChannel = texture->_associatedChannel;
@@ -5295,11 +5420,11 @@ void Engine::_bindSamplerUniformToChannel(int sourceSlot, int destination)
 unsigned int Engine::_getTextureWrapMode(unsigned int mode) const
 {
   switch (mode) {
-    case EngineConstants::TEXTURE_WRAP_ADDRESSMODE:
+    case Constants::TEXTURE_WRAP_ADDRESSMODE:
       return GL::REPEAT;
-    case EngineConstants::TEXTURE_CLAMP_ADDRESSMODE:
+    case Constants::TEXTURE_CLAMP_ADDRESSMODE:
       return GL::CLAMP_TO_EDGE;
-    case EngineConstants::TEXTURE_MIRROR_ADDRESSMODE:
+    case Constants::TEXTURE_MIRROR_ADDRESSMODE:
       return GL::MIRRORED_REPEAT;
   }
   return GL::REPEAT;
@@ -5323,7 +5448,7 @@ bool Engine::_setTexture(int channel, const BaseTexturePtr& texture,
   }
 
   // Video (not supported)
-  if (texture->delayLoadState == EngineConstants::DELAYLOADSTATE_NOTLOADED) {
+  if (texture->delayLoadState == Constants::DELAYLOADSTATE_NOTLOADED) {
     // Delay loading
     texture->delayLoad();
     return false;
@@ -5351,7 +5476,7 @@ bool Engine::_setTexture(int channel, const BaseTexturePtr& texture,
     internalTexture->_associatedChannel = channel;
   }
 
-  bool needToBind = true;
+  auto needToBind = true;
   if ((_boundTexturesCache.find(channel) != _boundTexturesCache.end())
       && (_boundTexturesCache[channel] == internalTexture)) {
     if (!isPartOfTextureArray) {
@@ -5363,7 +5488,13 @@ bool Engine::_setTexture(int channel, const BaseTexturePtr& texture,
 
   _activeChannel = channel;
 
-  if (internalTexture && internalTexture->is3D) {
+  if (internalTexture && internalTexture->isMultiview) {
+    if (needToBind) {
+      _bindTextureDirectly(GL::TEXTURE_2D_ARRAY, internalTexture,
+                           isPartOfTextureArray);
+    }
+  }
+  else if (internalTexture && internalTexture->is3D) {
     if (needToBind) {
       _bindTextureDirectly(GL::TEXTURE_3D, internalTexture,
                            isPartOfTextureArray);
@@ -5403,9 +5534,8 @@ bool Engine::_setTexture(int channel, const BaseTexturePtr& texture,
       // CUBIC_MODE and SKYBOX_MODE both require CLAMP_TO_EDGE.  All other modes
       // use REPEAT.
       auto textureWrapMode
-        = (texture->coordinatesMode() != EngineConstants::TEXTURE_CUBIC_MODE
-           && texture->coordinatesMode()
-                != EngineConstants::TEXTURE_SKYBOX_MODE) ?
+        = (texture->coordinatesMode() != Constants::TEXTURE_CUBIC_MODE
+           && texture->coordinatesMode() != Constants::TEXTURE_SKYBOX_MODE) ?
             GL::REPEAT :
             GL::CLAMP_TO_EDGE;
       _setTextureParameterInteger(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_S,
@@ -5455,7 +5585,7 @@ void Engine::setTextureArray(int channel, GL::IGLUniformLocation* uniform,
     _textureUnits.resize(textures.size());
   }
   auto _channel = static_cast<size_t>(channel);
-  for (unsigned int i = 0; i < textures.size(); ++i) {
+  for (size_t i = 0; i < textures.size(); ++i) {
     auto texture = textures[i]->getInternalTexture();
 
     if (texture) {
@@ -5469,7 +5599,7 @@ void Engine::setTextureArray(int channel, GL::IGLUniformLocation* uniform,
   _gl->uniform1iv(uniform, _textureUnits);
 
   unsigned int index = 0;
-  for (auto& texture : textures) {
+  for (const auto& texture : textures) {
     _setTexture(_textureUnits[index], texture, true);
     ++index;
   }
@@ -5488,11 +5618,10 @@ void Engine::_setAnisotropicLevel(unsigned int target,
   auto value                      = texture->anisotropicFilteringLevel;
 
   if (internalTexture->samplingMode
-        != EngineConstants::TEXTURE_LINEAR_LINEAR_MIPNEAREST
+        != Constants::TEXTURE_LINEAR_LINEAR_MIPNEAREST
       && internalTexture->samplingMode
-           != EngineConstants::TEXTURE_LINEAR_LINEAR_MIPLINEAR
-      && internalTexture->samplingMode
-           != EngineConstants::TEXTURE_LINEAR_LINEAR) {
+           != Constants::TEXTURE_LINEAR_LINEAR_MIPLINEAR
+      && internalTexture->samplingMode != Constants::TEXTURE_LINEAR_LINEAR) {
     value = 1; // Forcing the anisotropic to 1 because else webgl will force
                // filters to linear
   }
@@ -5564,8 +5693,10 @@ void Engine::unbindAllAttributes()
 
 void Engine::releaseEffects()
 {
-  for (auto& item : _compiledEffects) {
-    _deleteProgram(item.second->getProgram());
+  for (const auto& item : _compiledEffects) {
+    auto webGLPipelineContext = std::static_pointer_cast<WebGLPipelineContext>(
+      item.second->getPipelineContext());
+    _deletePipelineContext(webGLPipelineContext);
   }
 
   _compiledEffects.clear();
@@ -5575,10 +5706,13 @@ void Engine::releaseEffects()
 void Engine::dispose()
 {
   hideLoadingUI();
+
   stopRenderLoop();
 
+  onNewSceneAddedObservable.clear();
+
   // Release postProcesses
-  for (auto& postProcess : postProcesses) {
+  for (const auto& postProcess : postProcesses) {
     postProcess->dispose();
   }
 
@@ -5599,7 +5733,7 @@ void Engine::dispose()
   }
 
   // Release scenes
-  for (auto& scene : scenes) {
+  for (const auto& scene : scenes) {
     scene->dispose();
   }
   scenes.clear();
@@ -5624,9 +5758,9 @@ void Engine::dispose()
   // disableVR();
 
   // Remove from Instances
-  Engine::Instances.erase(
-    std::remove(Engine::Instances.begin(), Engine::Instances.end(), this),
-    Engine::Instances.end());
+  Engine::Instances().erase(
+    std::remove(Engine::Instances().begin(), Engine::Instances().end(), this),
+    Engine::Instances().end());
 
   _workingCanvas  = nullptr;
   _workingContext = nullptr;
@@ -5792,7 +5926,7 @@ bool Engine::_canRenderToFloatFramebuffer()
   if (_webGLVersion > 1.f) {
     return _caps.colorBufferFloat;
   }
-  return _canRenderToFramebuffer(EngineConstants::TEXTURETYPE_FLOAT);
+  return _canRenderToFramebuffer(Constants::TEXTURETYPE_FLOAT);
 }
 
 bool Engine::_canRenderToHalfFloatFramebuffer()
@@ -5801,7 +5935,7 @@ bool Engine::_canRenderToHalfFloatFramebuffer()
     return _caps.colorBufferFloat;
   }
 
-  return _canRenderToFramebuffer(EngineConstants::TEXTURETYPE_HALF_FLOAT);
+  return _canRenderToFramebuffer(Constants::TEXTURETYPE_HALF_FLOAT);
 }
 
 // Thank you :
@@ -5868,48 +6002,48 @@ GL::GLenum Engine::_getWebGLTextureType(unsigned int type) const
 {
   if (_webGLVersion == 1.f) {
     switch (type) {
-      case EngineConstants::TEXTURETYPE_FLOAT:
+      case Constants::TEXTURETYPE_FLOAT:
         return GL::FLOAT;
-      case EngineConstants::TEXTURETYPE_HALF_FLOAT:
+      case Constants::TEXTURETYPE_HALF_FLOAT:
         return GL::HALF_FLOAT_OES;
-      case EngineConstants::TEXTURETYPE_UNSIGNED_BYTE:
+      case Constants::TEXTURETYPE_UNSIGNED_BYTE:
         return GL::UNSIGNED_BYTE;
     }
     return GL::UNSIGNED_BYTE;
   }
 
   switch (type) {
-    case EngineConstants::TEXTURETYPE_BYTE:
+    case Constants::TEXTURETYPE_BYTE:
       return GL::BYTE;
-    case EngineConstants::TEXTURETYPE_UNSIGNED_BYTE:
+    case Constants::TEXTURETYPE_UNSIGNED_BYTE:
       return GL::UNSIGNED_BYTE;
-    case EngineConstants::TEXTURETYPE_SHORT:
+    case Constants::TEXTURETYPE_SHORT:
       return GL::SHORT;
-    case EngineConstants::TEXTURETYPE_UNSIGNED_SHORT:
+    case Constants::TEXTURETYPE_UNSIGNED_SHORT:
       return GL::UNSIGNED_SHORT;
-    case EngineConstants::TEXTURETYPE_INT:
+    case Constants::TEXTURETYPE_INT:
       return GL::INT;
-    case EngineConstants::TEXTURETYPE_UNSIGNED_INTEGER:
+    case Constants::TEXTURETYPE_UNSIGNED_INTEGER:
       return GL::UNSIGNED_INT; // Refers to UNSIGNED_INT
-    case EngineConstants::TEXTURETYPE_FLOAT:
+    case Constants::TEXTURETYPE_FLOAT:
       return GL::FLOAT;
-    case EngineConstants::TEXTURETYPE_HALF_FLOAT:
+    case Constants::TEXTURETYPE_HALF_FLOAT:
       return GL::HALF_FLOAT;
-    case EngineConstants::TEXTURETYPE_UNSIGNED_SHORT_4_4_4_4:
+    case Constants::TEXTURETYPE_UNSIGNED_SHORT_4_4_4_4:
       return GL::UNSIGNED_SHORT_4_4_4_4;
-    case EngineConstants::TEXTURETYPE_UNSIGNED_SHORT_5_5_5_1:
+    case Constants::TEXTURETYPE_UNSIGNED_SHORT_5_5_5_1:
       return GL::UNSIGNED_SHORT_5_5_5_1;
-    case EngineConstants::TEXTURETYPE_UNSIGNED_SHORT_5_6_5:
+    case Constants::TEXTURETYPE_UNSIGNED_SHORT_5_6_5:
       return GL::UNSIGNED_SHORT_5_6_5;
-    case EngineConstants::TEXTURETYPE_UNSIGNED_INT_2_10_10_10_REV:
+    case Constants::TEXTURETYPE_UNSIGNED_INT_2_10_10_10_REV:
       return GL::UNSIGNED_INT_2_10_10_10_REV;
-    case EngineConstants::TEXTURETYPE_UNSIGNED_INT_24_8:
+    case Constants::TEXTURETYPE_UNSIGNED_INT_24_8:
       return GL::UNSIGNED_INT_24_8;
-    case EngineConstants::TEXTURETYPE_UNSIGNED_INT_10F_11F_11F_REV:
+    case Constants::TEXTURETYPE_UNSIGNED_INT_10F_11F_11F_REV:
       return GL::UNSIGNED_INT_10F_11F_11F_REV;
-    case EngineConstants::TEXTURETYPE_UNSIGNED_INT_5_9_9_9_REV:
+    case Constants::TEXTURETYPE_UNSIGNED_INT_5_9_9_9_REV:
       return GL::UNSIGNED_INT_5_9_9_9_REV;
-    case EngineConstants::TEXTURETYPE_FLOAT_32_UNSIGNED_INT_24_8_REV:
+    case Constants::TEXTURETYPE_FLOAT_32_UNSIGNED_INT_24_8_REV:
       return GL::FLOAT_32_UNSIGNED_INT_24_8_REV;
   }
 
@@ -5921,41 +6055,41 @@ GL::GLenum Engine::_getInternalFormat(unsigned int format) const
   GL::GLenum internalFormat = GL::RGBA;
 
   switch (format) {
-    case EngineConstants::TEXTUREFORMAT_ALPHA:
+    case Constants::TEXTUREFORMAT_ALPHA:
       internalFormat = GL::ALPHA;
       break;
-    case EngineConstants::TEXTUREFORMAT_LUMINANCE:
+    case Constants::TEXTUREFORMAT_LUMINANCE:
       internalFormat = GL::LUMINANCE;
       break;
-    case EngineConstants::TEXTUREFORMAT_LUMINANCE_ALPHA:
+    case Constants::TEXTUREFORMAT_LUMINANCE_ALPHA:
       internalFormat = GL::LUMINANCE_ALPHA;
       break;
-    case EngineConstants::TEXTUREFORMAT_RED:
+    case Constants::TEXTUREFORMAT_RED:
       internalFormat = GL::RED;
       break;
-    case EngineConstants::TEXTUREFORMAT_RG:
+    case Constants::TEXTUREFORMAT_RG:
       internalFormat = GL::RG;
       break;
-    case EngineConstants::TEXTUREFORMAT_RGB:
+    case Constants::TEXTUREFORMAT_RGB:
       internalFormat = GL::RGB;
       break;
-    case EngineConstants::TEXTUREFORMAT_RGBA:
+    case Constants::TEXTUREFORMAT_RGBA:
       internalFormat = GL::RGBA;
       break;
   }
 
   if (_webGLVersion > 1.f) {
     switch (format) {
-      case EngineConstants::TEXTUREFORMAT_RED_INTEGER:
+      case Constants::TEXTUREFORMAT_RED_INTEGER:
         internalFormat = GL::RED_INTEGER;
         break;
-      case EngineConstants::TEXTUREFORMAT_RG_INTEGER:
+      case Constants::TEXTUREFORMAT_RG_INTEGER:
         internalFormat = GL::RG_INTEGER;
         break;
-      case EngineConstants::TEXTUREFORMAT_RGB_INTEGER:
+      case Constants::TEXTUREFORMAT_RGB_INTEGER:
         internalFormat = GL::RGB_INTEGER;
         break;
-      case EngineConstants::TEXTUREFORMAT_RGBA_INTEGER:
+      case Constants::TEXTUREFORMAT_RGBA_INTEGER:
         internalFormat = GL::RGBA_INTEGER;
         break;
     }
@@ -5970,11 +6104,11 @@ GL::GLenum Engine::_getRGBABufferInternalSizedFormat(
   if (_webGLVersion == 1.f) {
     if (format) {
       switch (*format) {
-        case EngineConstants::TEXTUREFORMAT_ALPHA:
+        case Constants::TEXTUREFORMAT_ALPHA:
           return GL::ALPHA;
-        case EngineConstants::TEXTUREFORMAT_LUMINANCE:
+        case Constants::TEXTUREFORMAT_LUMINANCE:
           return GL::LUMINANCE;
-        case EngineConstants::TEXTUREFORMAT_LUMINANCE_ALPHA:
+        case Constants::TEXTUREFORMAT_LUMINANCE_ALPHA:
           return GL::LUMINANCE_ALPHA;
       }
     }
@@ -5982,143 +6116,149 @@ GL::GLenum Engine::_getRGBABufferInternalSizedFormat(
   }
 
   switch (type) {
-    case EngineConstants::TEXTURETYPE_BYTE:
+    case Constants::TEXTURETYPE_BYTE:
       switch (*format) {
-        case EngineConstants::TEXTUREFORMAT_RED:
+        case Constants::TEXTUREFORMAT_RED:
           return GL::R8_SNORM;
-        case EngineConstants::TEXTUREFORMAT_RG:
+        case Constants::TEXTUREFORMAT_RG:
           return GL::RG8_SNORM;
-        case EngineConstants::TEXTUREFORMAT_RGB:
+        case Constants::TEXTUREFORMAT_RGB:
           return GL::RGB8_SNORM;
-        case EngineConstants::TEXTUREFORMAT_RED_INTEGER:
+        case Constants::TEXTUREFORMAT_RED_INTEGER:
           return GL::R8I;
-        case EngineConstants::TEXTUREFORMAT_RG_INTEGER:
+        case Constants::TEXTUREFORMAT_RG_INTEGER:
           return GL::RG8I;
-        case EngineConstants::TEXTUREFORMAT_RGB_INTEGER:
+        case Constants::TEXTUREFORMAT_RGB_INTEGER:
           return GL::RGB8I;
-        case EngineConstants::TEXTUREFORMAT_RGBA_INTEGER:
+        case Constants::TEXTUREFORMAT_RGBA_INTEGER:
           return GL::RGBA8I;
         default:
           return GL::RGBA8_SNORM;
       }
-    case EngineConstants::TEXTURETYPE_UNSIGNED_BYTE:
+    case Constants::TEXTURETYPE_UNSIGNED_BYTE:
       switch (*format) {
-        case EngineConstants::TEXTUREFORMAT_RED:
+        case Constants::TEXTUREFORMAT_RED:
           return GL::R8;
-        case EngineConstants::TEXTUREFORMAT_RG:
+        case Constants::TEXTUREFORMAT_RG:
           return GL::RG8;
-        case EngineConstants::TEXTUREFORMAT_RGB:
+        case Constants::TEXTUREFORMAT_RGB:
           return GL::RGB8; // By default. Other possibilities are RGB565, SRGB8.
-        case EngineConstants::TEXTUREFORMAT_RGBA:
+        case Constants::TEXTUREFORMAT_RGBA:
           return GL::RGBA8; // By default. Other possibilities are RGB5_A1,
                             // RGBA4, SRGB8_ALPHA8.
-        case EngineConstants::TEXTUREFORMAT_RED_INTEGER:
+        case Constants::TEXTUREFORMAT_RED_INTEGER:
           return GL::R8UI;
-        case EngineConstants::TEXTUREFORMAT_RG_INTEGER:
+        case Constants::TEXTUREFORMAT_RG_INTEGER:
           return GL::RG8UI;
-        case EngineConstants::TEXTUREFORMAT_RGB_INTEGER:
+        case Constants::TEXTUREFORMAT_RGB_INTEGER:
           return GL::RGB8UI;
-        case EngineConstants::TEXTUREFORMAT_RGBA_INTEGER:
+        case Constants::TEXTUREFORMAT_RGBA_INTEGER:
           return GL::RGBA8UI;
+        case Constants::TEXTUREFORMAT_ALPHA:
+          return GL::ALPHA;
+        case Constants::TEXTUREFORMAT_LUMINANCE:
+          return GL::LUMINANCE;
+        case Constants::TEXTUREFORMAT_LUMINANCE_ALPHA:
+          return GL::LUMINANCE_ALPHA;
         default:
           return GL::RGBA8;
       }
-    case EngineConstants::TEXTURETYPE_SHORT:
+    case Constants::TEXTURETYPE_SHORT:
       switch (*format) {
-        case EngineConstants::TEXTUREFORMAT_RED_INTEGER:
+        case Constants::TEXTUREFORMAT_RED_INTEGER:
           return GL::R16I;
-        case EngineConstants::TEXTUREFORMAT_RG_INTEGER:
+        case Constants::TEXTUREFORMAT_RG_INTEGER:
           return GL::RG16I;
-        case EngineConstants::TEXTUREFORMAT_RGB_INTEGER:
+        case Constants::TEXTUREFORMAT_RGB_INTEGER:
           return GL::RGB16I;
-        case EngineConstants::TEXTUREFORMAT_RGBA_INTEGER:
+        case Constants::TEXTUREFORMAT_RGBA_INTEGER:
           return GL::RGBA16I;
         default:
           return GL::RGBA16I;
       }
-    case EngineConstants::TEXTURETYPE_UNSIGNED_SHORT:
+    case Constants::TEXTURETYPE_UNSIGNED_SHORT:
       switch (*format) {
-        case EngineConstants::TEXTUREFORMAT_RED_INTEGER:
+        case Constants::TEXTUREFORMAT_RED_INTEGER:
           return GL::R16UI;
-        case EngineConstants::TEXTUREFORMAT_RG_INTEGER:
+        case Constants::TEXTUREFORMAT_RG_INTEGER:
           return GL::RG16UI;
-        case EngineConstants::TEXTUREFORMAT_RGB_INTEGER:
+        case Constants::TEXTUREFORMAT_RGB_INTEGER:
           return GL::RGB16UI;
-        case EngineConstants::TEXTUREFORMAT_RGBA_INTEGER:
+        case Constants::TEXTUREFORMAT_RGBA_INTEGER:
           return GL::RGBA16UI;
         default:
           return GL::RGBA16UI;
       }
-    case EngineConstants::TEXTURETYPE_INT:
+    case Constants::TEXTURETYPE_INT:
       switch (*format) {
-        case EngineConstants::TEXTUREFORMAT_RED_INTEGER:
+        case Constants::TEXTUREFORMAT_RED_INTEGER:
           return GL::R32I;
-        case EngineConstants::TEXTUREFORMAT_RG_INTEGER:
+        case Constants::TEXTUREFORMAT_RG_INTEGER:
           return GL::RG32I;
-        case EngineConstants::TEXTUREFORMAT_RGB_INTEGER:
+        case Constants::TEXTUREFORMAT_RGB_INTEGER:
           return GL::RGB32I;
-        case EngineConstants::TEXTUREFORMAT_RGBA_INTEGER:
+        case Constants::TEXTUREFORMAT_RGBA_INTEGER:
           return GL::RGBA32I;
         default:
           return GL::RGBA32I;
       }
-    case EngineConstants::TEXTURETYPE_UNSIGNED_INTEGER: // Refers to
-                                                        // UNSIGNED_INT
+    case Constants::TEXTURETYPE_UNSIGNED_INTEGER: // Refers to
+                                                  // UNSIGNED_INT
       switch (*format) {
-        case EngineConstants::TEXTUREFORMAT_RED_INTEGER:
+        case Constants::TEXTUREFORMAT_RED_INTEGER:
           return GL::R32UI;
-        case EngineConstants::TEXTUREFORMAT_RG_INTEGER:
+        case Constants::TEXTUREFORMAT_RG_INTEGER:
           return GL::RG32UI;
-        case EngineConstants::TEXTUREFORMAT_RGB_INTEGER:
+        case Constants::TEXTUREFORMAT_RGB_INTEGER:
           return GL::RGB32UI;
-        case EngineConstants::TEXTUREFORMAT_RGBA_INTEGER:
+        case Constants::TEXTUREFORMAT_RGBA_INTEGER:
           return GL::RGBA32UI;
         default:
           return GL::RGBA32UI;
       }
-    case EngineConstants::TEXTURETYPE_FLOAT:
+    case Constants::TEXTURETYPE_FLOAT:
       switch (*format) {
-        case EngineConstants::TEXTUREFORMAT_RED:
+        case Constants::TEXTUREFORMAT_RED:
           return GL::R32F; // By default. Other possibility is R16F.
-        case EngineConstants::TEXTUREFORMAT_RG:
+        case Constants::TEXTUREFORMAT_RG:
           return GL::RG32F; // By default. Other possibility is RG16F.
-        case EngineConstants::TEXTUREFORMAT_RGB:
+        case Constants::TEXTUREFORMAT_RGB:
           return GL::RGB32F; // By default. Other possibilities are RGB16F,
                              // R11F_G11F_B10F, RGB9_E5.
-        case EngineConstants::TEXTUREFORMAT_RGBA:
+        case Constants::TEXTUREFORMAT_RGBA:
           return GL::RGBA32F; // By default. Other possibility is RGBA16F.
         default:
           return GL::RGBA32F;
       }
-    case EngineConstants::TEXTURETYPE_HALF_FLOAT:
+    case Constants::TEXTURETYPE_HALF_FLOAT:
       switch (*format) {
-        case EngineConstants::TEXTUREFORMAT_RED:
+        case Constants::TEXTUREFORMAT_RED:
           return GL::R16F;
-        case EngineConstants::TEXTUREFORMAT_RG:
+        case Constants::TEXTUREFORMAT_RG:
           return GL::RG16F;
-        case EngineConstants::TEXTUREFORMAT_RGB:
+        case Constants::TEXTUREFORMAT_RGB:
           return GL::RGB16F; // By default. Other possibilities are
                              // R11F_G11F_B10F, RGB9_E5.
-        case EngineConstants::TEXTUREFORMAT_RGBA:
+        case Constants::TEXTUREFORMAT_RGBA:
           return GL::RGBA16F;
         default:
           return GL::RGBA16F;
       }
-    case EngineConstants::TEXTURETYPE_UNSIGNED_SHORT_5_6_5:
+    case Constants::TEXTURETYPE_UNSIGNED_SHORT_5_6_5:
       return GL::RGB565;
-    case EngineConstants::TEXTURETYPE_UNSIGNED_INT_10F_11F_11F_REV:
+    case Constants::TEXTURETYPE_UNSIGNED_INT_10F_11F_11F_REV:
       return GL::R11F_G11F_B10F;
-    case EngineConstants::TEXTURETYPE_UNSIGNED_INT_5_9_9_9_REV:
+    case Constants::TEXTURETYPE_UNSIGNED_INT_5_9_9_9_REV:
       return GL::RGB9_E5;
-    case EngineConstants::TEXTURETYPE_UNSIGNED_SHORT_4_4_4_4:
+    case Constants::TEXTURETYPE_UNSIGNED_SHORT_4_4_4_4:
       return GL::RGBA4;
-    case EngineConstants::TEXTURETYPE_UNSIGNED_SHORT_5_5_5_1:
+    case Constants::TEXTURETYPE_UNSIGNED_SHORT_5_5_5_1:
       return GL::RGB5_A1;
-    case EngineConstants::TEXTURETYPE_UNSIGNED_INT_2_10_10_10_REV:
+    case Constants::TEXTURETYPE_UNSIGNED_INT_2_10_10_10_REV:
       switch (*format) {
-        case EngineConstants::TEXTUREFORMAT_RGBA:
+        case Constants::TEXTUREFORMAT_RGBA:
           return GL::RGB10_A2; // By default. Other possibility is RGB5_A1.
-        case EngineConstants::TEXTUREFORMAT_RGBA_INTEGER:
+        case Constants::TEXTUREFORMAT_RGBA_INTEGER:
           return GL::RGB10_A2UI;
         default:
           return GL::RGB10_A2;
@@ -6130,10 +6270,10 @@ GL::GLenum Engine::_getRGBABufferInternalSizedFormat(
 
 GL::GLenum Engine::_getRGBAMultiSampleBufferFormat(unsigned int type) const
 {
-  if (type == EngineConstants::TEXTURETYPE_FLOAT) {
+  if (type == Constants::TEXTURETYPE_FLOAT) {
     return GL::RGBA32F;
   }
-  else if (type == EngineConstants::TEXTURETYPE_HALF_FLOAT) {
+  else if (type == Constants::TEXTURETYPE_HALF_FLOAT) {
     return GL::RGBA16F;
   }
 
@@ -6145,19 +6285,19 @@ Engine::GLQueryPtr Engine::createQuery()
   return _gl->createQuery();
 }
 
-Engine& Engine::deleteQuery(const GLQueryPtr& query)
+Engine& Engine::deleteQuery(GL::IGLQuery* query)
 {
   _gl->deleteQuery(query);
 
   return *this;
 }
 
-bool Engine::isQueryResultAvailable(const GLQueryPtr& query)
+bool Engine::isQueryResultAvailable(GL::IGLQuery* query)
 {
   return _gl->getQueryParameterb(query, GL::QUERY_RESULT_AVAILABLE);
 }
 
-unsigned int Engine::getQueryResult(const GLQueryPtr& query)
+unsigned int Engine::getQueryResult(GL::IGLQuery* query)
 {
   return _gl->getQueryParameteri(query, GL::QUERY_RESULT);
 }
@@ -6184,17 +6324,17 @@ Engine::GLQueryPtr Engine::_createTimeQuery()
   return createQuery();
 }
 
-void Engine::_deleteTimeQuery(const Engine::GLQueryPtr& query)
+void Engine::_deleteTimeQuery(GL::IGLQuery* query)
 {
   deleteQuery(query);
 }
 
-unsigned int Engine::_getTimeQueryResult(const Engine::GLQueryPtr& query)
+unsigned int Engine::_getTimeQueryResult(GL::IGLQuery* query)
 {
   return getQueryResult(query);
 }
 
-bool Engine::_getTimeQueryAvailability(const Engine::GLQueryPtr& query)
+bool Engine::_getTimeQueryAvailability(GL::IGLQuery* query)
 {
   return isQueryResultAvailable(query);
 }
@@ -6216,7 +6356,7 @@ unsigned int Engine::_getGlAlgorithmType(unsigned int algorithmType) const
            GL::ANY_SAMPLES_PASSED;
 }
 
-Engine::GLTransformFeedbackPtr Engine::createTransformFeedback()
+GL::IGLTransformFeedbackPtr Engine::createTransformFeedback()
 {
   return _gl->createTransformFeedback();
 }

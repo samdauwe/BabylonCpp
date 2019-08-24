@@ -551,8 +551,9 @@ bool BabylonFileLoader::load(
       if (json_util::has_key(parsedData, "createDefaultSkybox")
           && json_util::get_bool(parsedData, "createDefaultSkybox")) {
         auto skyboxScale
-          = (scene->activeCamera != nullptr) ?
-              (scene->activeCamera->maxZ - scene->activeCamera->minZ) / 2.f :
+          = (scene->activeCamera() != nullptr) ?
+              (scene->activeCamera()->maxZ - scene->activeCamera()->minZ)
+                / 2.f :
               1000.f;
         float skyboxBlurLevel
           = json_util::get_number<float>(parsedData, "skyboxBlurLevel", 0.f);
@@ -665,8 +666,9 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
       }
       if (json_util::get_bool(parsedData, "createDefaultSkybox") == true) {
         const auto skyboxScale
-          = (scene->activeCamera != nullptr) ?
-              (scene->activeCamera->maxZ - scene->activeCamera->minZ) / 2.f :
+          = (scene->activeCamera() != nullptr) ?
+              (scene->activeCamera()->maxZ - scene->activeCamera()->minZ)
+                / 2.f :
               1000.f;
         const auto skyboxBlurLevel
           = json_util::get_number<float>(parsedData, "skyboxBlurLevel", 0.f);

@@ -240,15 +240,15 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio,
     false,
     "#define BILATERAL_BLUR\n#define BILATERAL_BLUR_H\n#define SAMPLES 16");
   _blurHPostProcess->onApply = [&](Effect* effect, EventState&) {
-    if (!_scene->activeCamera) {
+    if (!_scene->activeCamera()) {
       return;
     }
     effect->setFloat("outSize",
                      static_cast<float>(_ssaoCombinePostProcess->width > 0 ?
                                           _ssaoCombinePostProcess->width :
                                           _originalColorPostProcess->width));
-    effect->setFloat("near", _scene->activeCamera->minZ);
-    effect->setFloat("far", _scene->activeCamera->maxZ);
+    effect->setFloat("near", _scene->activeCamera()->minZ);
+    effect->setFloat("far", _scene->activeCamera()->maxZ);
     effect->setFloat("radius", radius);
     effect->setTexture("depthSampler", _depthTexture);
 
@@ -262,15 +262,15 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio,
     nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(),
     false, "#define BILATERAL_BLUR\n#define SAMPLES 16");
   _blurVPostProcess->onApply = [&](Effect* effect, EventState&) {
-    if (!_scene->activeCamera) {
+    if (!_scene->activeCamera()) {
       return;
     }
     effect->setFloat("outSize",
                      static_cast<float>(_ssaoCombinePostProcess->height > 0 ?
                                           _ssaoCombinePostProcess->height :
                                           _originalColorPostProcess->height));
-    effect->setFloat("near", _scene->activeCamera->minZ);
-    effect->setFloat("far", _scene->activeCamera->maxZ);
+    effect->setFloat("near", _scene->activeCamera()->minZ);
+    effect->setFloat("far", _scene->activeCamera()->maxZ);
     effect->setFloat("radius", radius);
     effect->setTexture("depthSampler", _depthTexture);
 
@@ -365,7 +365,7 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
       effect->setFloat("randTextureTiles", 32.f);
     }
 
-    if (!_scene->activeCamera) {
+    if (!_scene->activeCamera()) {
       return;
     }
 
@@ -378,12 +378,12 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
     effect->setFloat("maxZ", maxZ);
     effect->setFloat("minZAspect", minZAspect);
     effect->setFloat("base", base);
-    effect->setFloat("near", _scene->activeCamera->minZ);
-    effect->setFloat("far", _scene->activeCamera->maxZ);
-    effect->setFloat("xViewport", std::tan(_scene->activeCamera->fov / 2.f)
+    effect->setFloat("near", _scene->activeCamera()->minZ);
+    effect->setFloat("far", _scene->activeCamera()->maxZ);
+    effect->setFloat("xViewport", std::tan(_scene->activeCamera()->fov / 2.f)
                                     * _scene->getEngine()->getAspectRatio(
-                                      *_scene->activeCamera, true));
-    effect->setFloat("yViewport", std::tan(_scene->activeCamera->fov / 2.f));
+                                      *_scene->activeCamera(), true));
+    effect->setFloat("yViewport", std::tan(_scene->activeCamera()->fov / 2.f));
     effect->setMatrix("projection", _scene->getProjectionMatrix());
 
     effect->setTexture("textureSampler", _depthTexture);
@@ -401,7 +401,7 @@ void SSAO2RenderingPipeline::_createSSAOCombinePostProcess(float ratio)
     false);
 
   _ssaoCombinePostProcess->onApply = [&](Effect* effect, EventState&) {
-    const auto& viewport = _scene->activeCamera->viewport;
+    const auto& viewport = _scene->activeCamera()->viewport;
     effect->setVector4("viewport", Tmp::Vector4Array[0].copyFromFloats(
                                      static_cast<float>(viewport.x),
                                      static_cast<float>(viewport.y),

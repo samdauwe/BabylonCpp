@@ -1323,7 +1323,7 @@ size_t GPUParticleSystem::render(bool preWarm)
     }
 
     if (_isBillboardBased) {
-      auto camera = _scene->activeCamera;
+      const auto& camera = _scene->activeCamera();
       _renderEffect->setVector3("eyePosition", camera->globalPosition);
     }
 
