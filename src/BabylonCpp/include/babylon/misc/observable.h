@@ -1,7 +1,6 @@
 #ifndef BABYLON_MISC_OBSERVABLE_H
 #define BABYLON_MISC_OBSERVABLE_H
 
-#include <babylon/babylon_api.h>
 #include <babylon/misc/event_state.h>
 #include <babylon/misc/observer.h>
 
@@ -23,7 +22,7 @@ namespace BABYLON {
  * never be for Turn Left/Right.
  */
 template <class T>
-class BABYLON_SHARED_EXPORT Observable {
+class Observable {
 
 public:
   using CallbackFunc
