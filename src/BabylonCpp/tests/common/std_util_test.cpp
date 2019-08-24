@@ -484,33 +484,29 @@ TEST(TestStdUtil, splice)
 
   // At position 2, add the new items
   {
-    std::vector<std::string> v{"DIFFUSE", "CLIPPLANE", "POINTSIZE", "FOG"};
-    std::vector<std::string> expected{"DIFFUSE",     "CLIPPLANE", "SHADOW",
-                                      "VERTEXALPHA", "POINTSIZE", "FOG"};
-    std::vector<std::string> r
-      = stl_util::splice(v, 2, 0, {"SHADOW", "VERTEXALPHA"});
+    std::vector<std::string> v{"0", "1", "2", "3"};
+    std::vector<std::string> expected{"0", "1", "4", "5", "2", "3"};
+    std::vector<std::string> r = stl_util::splice(v, 2, 0, {"4", "5"});
     EXPECT_THAT(v, ::testing::ContainerEq(expected));
     EXPECT_TRUE(r.empty());
   }
 
   // At position 2, add the new items, and remove 1 item
   {
-    std::vector<std::string> v{"DIFFUSE", "CLIPPLANE", "POINTSIZE", "FOG"};
-    std::vector<std::string> expected{"DIFFUSE", "CLIPPLANE", "SHADOW",
-                                      "VERTEXALPHA", "FOG"};
-    std::vector<std::string> expectedRemovedItem{"POINTSIZE"};
+    std::vector<std::string> v{"0", "1", "2", "3"};
+    std::vector<std::string> expected{"0", "1", "4", "5", "3"};
+    std::vector<std::string> expectedRemovedItem{"2"};
     std::vector<std::string> r
-      = stl_util::splice(v, 2, 1, {"SHADOW", "VERTEXALPHA"});
+      = stl_util::splice(v, 2, 1, {"4", "5"});
     EXPECT_THAT(v, ::testing::ContainerEq(expected));
     EXPECT_THAT(r, ::testing::ContainerEq(expectedRemovedItem));
   }
 
   // At position 2, remove 2 items
   {
-    std::vector<std::string> v{"DIFFUSE", "CLIPPLANE", "SHADOW", "VERTEXALPHA",
-                               "FOG"};
-    std::vector<std::string> expected{"DIFFUSE", "CLIPPLANE", "FOG"};
-    std::vector<std::string> expectedRemovedItems{"SHADOW", "VERTEXALPHA"};
+    std::vector<std::string> v{"0", "1", "4", "5", "3"};
+    std::vector<std::string> expected{"0", "1", "3"};
+    std::vector<std::string> expectedRemovedItems{"4", "5"};
     std::vector<std::string> r = stl_util::splice(v, 2, 2);
     EXPECT_THAT(v, ::testing::ContainerEq(expected));
     EXPECT_THAT(r, ::testing::ContainerEq(expectedRemovedItems));
@@ -518,10 +514,19 @@ TEST(TestStdUtil, splice)
 
   // Remove last item
   {
-    std::vector<std::string> v{"DIFFUSE", "CLIPPLANE", "SHADOW", "FOG"};
-    std::vector<std::string> expected{"DIFFUSE", "CLIPPLANE", "SHADOW"};
-    std::vector<std::string> expectedRemovedItem{"FOG"};
+    std::vector<std::string> v{"0", "1", "2", "3"};
+    std::vector<std::string> expected{"0", "1", "2"};
+    std::vector<std::string> expectedRemovedItem{"3"};
     std::vector<std::string> r = stl_util::splice(v, -1, 1);
+    EXPECT_THAT(v, ::testing::ContainerEq(expected));
+    EXPECT_THAT(r, ::testing::ContainerEq(expectedRemovedItem));
+  }
+  // Remove item n-2 & insert
+  {
+    std::vector<std::string> v{ "0", "1", "2", "3" };
+    std::vector<std::string> expected{ "0", "1", "4", "5", "3" };
+    std::vector<std::string> expectedRemovedItem{ "2" };
+    std::vector<std::string> r = stl_util::splice(v, -2, 1, {"4", "5"});
     EXPECT_THAT(v, ::testing::ContainerEq(expected));
     EXPECT_THAT(r, ::testing::ContainerEq(expectedRemovedItem));
   }

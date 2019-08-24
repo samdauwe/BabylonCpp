@@ -682,8 +682,8 @@ inline std::vector<T> splice(std::vector<T>& v, int index = 0, int howmany = 0,
     const auto end   = std::min(v.end(), start + howmany);
     std::vector<T> removedItems(start, end);
     v.erase(start, end);
-    v.insert(end - static_cast<int>(removedItems.size()), itemsToAdd.begin(),
-             itemsToAdd.end());
+    auto insertion_point = std::max(v.end() - howmany, v.begin());
+    v.insert(insertion_point, itemsToAdd.begin(), itemsToAdd.end());
     return removedItems;
   }
   else {
@@ -691,8 +691,8 @@ inline std::vector<T> splice(std::vector<T>& v, int index = 0, int howmany = 0,
     const auto end   = std::min(v.end(), start + howmany);
     std::vector<T> removedItems(start, end);
     v.erase(start, end);
-    v.insert(end - static_cast<int>(removedItems.size()), itemsToAdd.begin(),
-             itemsToAdd.end());
+    auto insertion_point = std::min(v.begin() + index, v.end());
+    v.insert(insertion_point, itemsToAdd.begin(), itemsToAdd.end());
     return removedItems;
   }
 }
