@@ -370,17 +370,17 @@ void Engine::_initGLContext()
   // replace values by reasonnable values if failure
   if (_caps.maxVaryingVectors == 0)
   {
-    BABYLON_LOGF_WARN("_initGLContext", "_caps.maxVaryingVectors could not be read. Assuming it is 8");
+    BABYLON_LOG_WARN("_initGLContext", "_caps.maxVaryingVectors could not be read. Assuming it is 8");
     _caps.maxVaryingVectors = 8;
   }
   if (_caps.maxFragmentUniformVectors == 0)
   {
-    BABYLON_LOGF_WARN("_initGLContext", "_caps.maxFragmentUniformVectors could not be read. Assuming it is 1024");
+    BABYLON_LOG_WARN("_initGLContext", "_caps.maxFragmentUniformVectors could not be read. Assuming it is 1024");
     _caps.maxFragmentUniformVectors = 1024;
   }
   if (_caps.maxVertexUniformVectors == 0)
   {
-    BABYLON_LOGF_WARN("_initGLContext", "_caps.maxVertexUniformVectors could not be read. Assuming it is 4096");
+    BABYLON_LOG_WARN("_initGLContext", "_caps.maxVertexUniformVectors could not be read. Assuming it is 4096");
     _caps.maxVertexUniformVectors = 4096;
   }
 
