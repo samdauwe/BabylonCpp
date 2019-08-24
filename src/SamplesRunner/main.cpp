@@ -35,7 +35,7 @@ int main(int argc, char** argv)
     BABYLON::initConsoleLogger();
 
   if (flagSpawnScreenshots) {
-    bool skipFailingSamples = true;
+    bool skipFailingSamples = false;
     BABYLON::impl::spawnScreenshots(argv[0], skipFailingSamples); exit(0);
   }
 

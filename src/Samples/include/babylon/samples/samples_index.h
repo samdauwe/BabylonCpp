@@ -21,7 +21,9 @@ enum class SampleFailureReason {
   blankDisplay,
   invalidComparator,
   vectorIteratorInvalid,
-  empty3d
+  readAccessViolation,
+  empty3d,
+  incomplete3d
 };
 std::string BABYLON_SHARED_EXPORT SampleFailureReason_Str(SampleFailureReason s);
 
