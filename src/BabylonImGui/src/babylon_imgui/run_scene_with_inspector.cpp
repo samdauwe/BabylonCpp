@@ -161,7 +161,11 @@ private:
 
   void setRenderableScene(std::shared_ptr<BABYLON::IRenderableScene> scene)
   {
+    if (_appContext._inspector)
+      _appContext._inspector->setScene(nullptr);
     _appContext._sceneWidget->setRenderableScene(scene);
+    if (_appContext._inspector)
+      _appContext._inspector->setScene(_appContext._sceneWidget->getScene());
     _appContext._viewState = ViewState::Scene3d;
   }
 
