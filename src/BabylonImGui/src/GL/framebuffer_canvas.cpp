@@ -10,10 +10,9 @@
 namespace BABYLON {
 namespace GL {
 
-FramebufferCanvas::FramebufferCanvas() :
-  ICanvas{}
+FramebufferCanvas::FramebufferCanvas() : ICanvas{}
 {
-  _renderingContext          = std::make_unique<GL::GLRenderingContext>();
+  _renderingContext = std::make_unique<GL::GLRenderingContext>();
   _renderingContext->initialize();
   _boundingClientRect.bottom = clientHeight;
   _boundingClientRect.height = clientHeight;
@@ -21,7 +20,6 @@ FramebufferCanvas::FramebufferCanvas() :
   _boundingClientRect.right  = clientWidth;
   _boundingClientRect.top    = 0;
   _boundingClientRect.width  = clientWidth;
-
 }
 
 FramebufferCanvas::~FramebufferCanvas()
@@ -32,41 +30,54 @@ FramebufferCanvas::~FramebufferCanvas()
 
 void FramebufferCanvas::initializeFrameBuffer()
 {
-  _renderingContext->drawingBufferWidth = clientWidth;
+  _renderingContext->drawingBufferWidth  = clientWidth;
   _renderingContext->drawingBufferHeight = clientHeight;
 
-  //glGenFramebuffers(1, &mFrameBuffer_Id);
+  // glGenFramebuffers(1, &mFrameBuffer_Id);
   mFrameBuffer = _renderingContext->createFramebuffer();
-  //glBindFramebuffer(GL_FRAMEBUFFER, mFrameBuffer_Id);
+  // glBindFramebuffer(GL_FRAMEBUFFER, mFrameBuffer_Id);
   _renderingContext->bindFramebuffer(GL_FRAMEBUFFER, mFrameBuffer.get());
 
   // create a color attachment texture
   mTextureColorBuffer = _renderingContext->createTexture();
   _renderingContext->bindTexture(GL_TEXTURE_2D, mTextureColorBuffer.get());
-  _renderingContext->texImage2D(GL_TEXTURE_2D, 0, GL_RGB, clientWidth, clientHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-  _renderingContext->texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  _renderingContext->texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  _renderingContext->framebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mTextureColorBuffer.get(), 0);
+  _renderingContext->texImage2D(GL_TEXTURE_2D, 0, GL_RGB, clientWidth,
+                                clientHeight, 0, GL_RGB, GL_UNSIGNED_BYTE,
+                                nullptr);
+  _renderingContext->texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                                   GL_LINEAR);
+  _renderingContext->texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+                                   GL_LINEAR);
+  _renderingContext->framebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                                          GL_TEXTURE_2D,
+                                          mTextureColorBuffer.get(), 0);
 
-  // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
-  //unsigned int rbo;
-  //glGenRenderbuffers(1, &rbo);
+  // create a renderbuffer object for depth and stencil attachment (we won't be
+  // sampling these)
+  // unsigned int rbo;
+  // glGenRenderbuffers(1, &rbo);
   auto rbo = _renderingContext->createRenderbuffer();
   _renderingContext->bindRenderbuffer(GL_RENDERBUFFER, rbo);
-  _renderingContext->renderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, clientWidth, clientHeight); // use a single renderbuffer object for both a depth AND stencil buffer.
+  _renderingContext->renderbufferStorage(
+    GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, clientWidth,
+    clientHeight); // use a single renderbuffer object for both a depth AND
+                   // stencil buffer.
   // now actually attach it
-  // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
+  // now that we actually created the framebuffer and added all attachments we
+  // want to check if it is actually complete now
   //
   // OUCH : rbo may be dead here !!!
   //
-  _renderingContext->framebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+  _renderingContext->framebufferRenderbuffer(
+    GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo.get());
 
-  if ( _renderingContext->checkFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-    throw std::runtime_error("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
+  if (_renderingContext->checkFramebufferStatus(GL_FRAMEBUFFER)
+      != GL_FRAMEBUFFER_COMPLETE)
+    throw std::runtime_error(
+      "ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
 
-  _renderingContext->bindFramebuffer(GL_FRAMEBUFFER, 0);
+  _renderingContext->bindFramebuffer(GL_FRAMEBUFFER, nullptr);
 }
-
 
 bool FramebufferCanvas::initializeContext3d()
 {
@@ -92,7 +103,8 @@ ICanvasRenderingContext2D* FramebufferCanvas::getContext2d()
   return nullptr;
 }
 
-GL::IGLRenderingContext* FramebufferCanvas::getContext3d(const EngineOptions& /*options*/)
+GL::IGLRenderingContext*
+FramebufferCanvas::getContext3d(const EngineOptions& /*options*/)
 {
   return _renderingContext.get();
 }
@@ -110,26 +122,19 @@ void FramebufferCanvas::unbind()
 unsigned int FramebufferCanvas::textureId()
 {
   return mTextureColorBuffer->value;
-  //return mFrameBuffer->value;
+  // return mFrameBuffer->value;
 }
 
-
-Uint8Array reverse_pixels_rows(
-  const Uint8Array & pixels,
-  int width,
-  int height,
-  int nbChannels)
+Uint8Array reverse_pixels_rows(const Uint8Array& pixels, int width, int height,
+                               int nbChannels)
 {
   Uint8Array pixels_reverse_rows;
   pixels_reverse_rows.resize(width * height * 3, 0);
-  for (int row = 0; row < height; row++)
-  {
-    const uint8_t * src = &(pixels[(height - 1 - row) * nbChannels * width]);
-    uint8_t * dst = &(pixels_reverse_rows[row * nbChannels * width]);
-    for (int col = 0; col < width; col++)
-    {
-      for (int channel = 0; channel < nbChannels; channel++)
-      {
+  for (int row = 0; row < height; row++) {
+    const uint8_t* src = &(pixels[(height - 1 - row) * nbChannels * width]);
+    uint8_t* dst       = &(pixels_reverse_rows[row * nbChannels * width]);
+    for (int col = 0; col < width; col++) {
+      for (int channel = 0; channel < nbChannels; channel++) {
         *dst++ = *src++;
       }
     }
@@ -141,13 +146,16 @@ Uint8Array FramebufferCanvas::readPixelsRgb()
 {
   Uint8Array pixels;
   pixels.resize(clientWidth * clientHeight * 3, 0);
-  _renderingContext->readPixels(0, 0, clientWidth, clientHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+  _renderingContext->readPixels(0, 0, clientWidth, clientHeight, GL_RGB,
+                                GL_UNSIGNED_BYTE, pixels);
   // rows are inversed in the framebuffer: invert them now
-  auto pixels_reverse_rows = reverse_pixels_rows(pixels, clientWidth, clientHeight, 3);
+  auto pixels_reverse_rows
+    = reverse_pixels_rows(pixels, clientWidth, clientHeight, 3);
   return pixels_reverse_rows;
 }
 
-void FramebufferCanvas::saveScreenshotJpg(const char * filename, int quality, int imageWidth)
+void FramebufferCanvas::saveScreenshotJpg(const char* filename, int quality,
+                                          int imageWidth)
 {
   bind();
   auto pixels = readPixelsRgb();
@@ -155,30 +163,31 @@ void FramebufferCanvas::saveScreenshotJpg(const char * filename, int quality, in
   int nbChannels = 3;
 
   if (imageWidth == -1)
-    stbi_write_jpg(filename, clientWidth, clientHeight, nbChannels, pixels.data(), quality);
-  else
-  {
+    stbi_write_jpg(filename, clientWidth, clientHeight, nbChannels,
+                   pixels.data(), quality);
+  else {
     Uint8Array pixels_resized;
-    int imageHeight = (int)((double)clientHeight * (double)imageWidth / (double)clientWidth + 0.5);
+    int imageHeight
+      = (int)((double)clientHeight * (double)imageWidth / (double)clientWidth
+              + 0.5);
     pixels_resized.resize(imageWidth * imageHeight * 3);
-    stbir_resize_uint8(
-      pixels.data(), clientWidth, clientHeight, 0,
-      pixels_resized.data(), imageWidth, imageHeight, 0, 3);
-    stbi_write_jpg(filename, imageWidth, imageHeight, nbChannels, pixels_resized.data(), quality);
+    stbir_resize_uint8(pixels.data(), clientWidth, clientHeight, 0,
+                       pixels_resized.data(), imageWidth, imageHeight, 0, 3);
+    stbi_write_jpg(filename, imageWidth, imageHeight, nbChannels,
+                   pixels_resized.data(), quality);
   }
-
-
 }
 
-void FramebufferCanvas::saveScreenshotPng(const char * filename)
+void FramebufferCanvas::saveScreenshotPng(const char* filename)
 {
   bind();
   auto pixels = readPixelsRgb();
   unbind();
-  int nbChannels = 3;
+  int nbChannels      = 3;
   int stride_in_bytes = clientWidth * nbChannels;
-  stbi_write_png(filename, clientWidth, clientHeight, nbChannels, pixels.data(), stride_in_bytes);
+  stbi_write_png(filename, clientWidth, clientHeight, nbChannels, pixels.data(),
+                 stride_in_bytes);
 }
 
-} // end of namespace impl
+} // namespace GL
 } // end of namespace BABYLON

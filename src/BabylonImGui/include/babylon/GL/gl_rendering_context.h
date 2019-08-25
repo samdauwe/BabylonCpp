@@ -1,9 +1,9 @@
 #ifndef BABYLON_IMPL_GL_RENDERING_CONTEXT_H
 #define BABYLON_IMPL_GL_RENDERING_CONTEXT_H
 
+#include <babylon/babylon_api.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <unordered_map>
-#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 namespace GL {
@@ -19,8 +19,7 @@ public:
   void restoreGLState() override;
   GLenum operator[](const std::string& name) override;
   void activeTexture(GLenum texture) override;
-  void attachShader(const std::unique_ptr<IGLProgram>& program,
-                    const std::unique_ptr<IGLShader>& shader) override;
+  void attachShader(IGLProgram* program, IGLShader* shader) override;
   void beginQuery(GLenum target,
                   const std::unique_ptr<IGLQuery>& query) override;
   void beginTransformFeedback(GLenum primitiveMode) override;
@@ -78,7 +77,7 @@ public:
   void clearStencil(GLint stencil) override;
   void colorMask(GLboolean red, GLboolean green, GLboolean blue,
                  GLboolean alpha) override;
-  void compileShader(const std::unique_ptr<IGLShader>& shader) override;
+  void compileShader(IGLShader* shader) override;
   void compressedTexImage2D(GLenum target, GLint level, GLenum internalformat,
                             GLsizei width, GLsizei height, GLint border,
                             const Uint8Array& pixels) override;
@@ -93,20 +92,20 @@ public:
                          GLint height) override;
   std::unique_ptr<IGLBuffer> createBuffer() override;
   std::unique_ptr<IGLFramebuffer> createFramebuffer() override;
-  std::unique_ptr<IGLProgram> createProgram() override;
+  IGLProgramPtr createProgram() override;
   std::unique_ptr<IGLQuery> createQuery() override;
   std::unique_ptr<IGLRenderbuffer> createRenderbuffer() override;
-  std::unique_ptr<IGLShader> createShader(GLenum type) override;
+  IGLShaderPtr createShader(GLenum type) override;
   std::unique_ptr<IGLTexture> createTexture() override;
-  std::unique_ptr<IGLTransformFeedback> createTransformFeedback() override;
+  IGLTransformFeedbackPtr createTransformFeedback() override;
   std::unique_ptr<IGLVertexArrayObject> createVertexArray() override;
   void cullFace(GLenum mode) override;
   void deleteBuffer(IGLBuffer* buffer) override;
   void deleteFramebuffer(IGLFramebuffer* framebuffer) override;
   void deleteProgram(IGLProgram* program) override;
-  void deleteQuery(const std::unique_ptr<IGLQuery>& query) override;
+  void deleteQuery(IGLQuery* query) override;
   void deleteRenderbuffer(IGLRenderbuffer* renderbuffer) override;
-  void deleteShader(const std::unique_ptr<IGLShader>& shader) override;
+  void deleteShader(IGLShader* shader) override;
   void deleteTexture(IGLTexture* texture) override;
   void
   deleteTransformFeedback(IGLTransformFeedback* transformFeedback) override;
@@ -131,9 +130,9 @@ public:
   void endTransformFeedback() override;
   void finish() override;
   void flush() override;
-  void framebufferRenderbuffer(
-    GLenum target, GLenum attachment, GLenum renderbuffertarget,
-    const std::unique_ptr<IGLRenderbuffer>& renderbuffer) override;
+  void framebufferRenderbuffer(GLenum target, GLenum attachment,
+                               GLenum renderbuffertarget,
+                               IGLRenderbuffer* renderbuffer) override;
   void framebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget,
                             IGLTexture* texture, GLint level) override;
   void framebufferTextureMultiviewOVR(GLenum target, GLenum attachment,
@@ -149,23 +148,18 @@ public:
   std::array<int, 3> getScissorBoxParameter() override; // GL::SCISSOR_BOX
   GLint getParameteri(GLenum pname) override;
   GLfloat getParameterf(GLenum pname) override;
-  GLboolean getQueryParameterb(const std::unique_ptr<IGLQuery>& query,
-                               GLenum pname) override;
-  GLuint getQueryParameteri(const std::unique_ptr<IGLQuery>& query,
-                            GLenum pname) override;
+  GLboolean getQueryParameterb(IGLQuery* query, GLenum pname) override;
+  GLuint getQueryParameteri(IGLQuery* query, GLenum pname) override;
   std::string getString(GLenum pname) override;
   GLint getTexParameteri(GLenum pname) override;
   GLfloat getTexParameterf(GLenum pname) override;
   GLenum getError() override;
   const char* getErrorString(GLenum err) override;
   GLint getProgramParameter(IGLProgram* program, GLenum pname) override;
-  std::string
-  getProgramInfoLog(const std::unique_ptr<IGLProgram>& program) override;
+  std::string getProgramInfoLog(IGLProgram* program) override;
   GLint getRenderbufferParameter(GLenum target, GLenum pname) override;
-  std::string
-  getShaderInfoLog(const std::unique_ptr<IGLShader>& shader) override;
-  GLint getShaderParameter(const std::unique_ptr<IGLShader>& shader,
-                           GLenum pname) override;
+  std::string getShaderInfoLog(IGLShader* shader) override;
+  GLint getShaderParameter(IGLShader* shader, GLenum pname) override;
   IGLShaderPrecisionFormat*
   getShaderPrecisionFormat(GLenum shadertype, GLenum precisiontype) override;
   std::string getShaderSource(IGLShader* shader) override;
@@ -177,12 +171,12 @@ public:
   GLboolean isBuffer(IGLBuffer* buffer) override;
   GLboolean isEnabled(GLenum cap) override;
   GLboolean isFramebuffer(IGLFramebuffer* framebuffer) override;
-  GLboolean isProgram(const std::unique_ptr<IGLProgram>& program) override;
+  GLboolean isProgram(IGLProgram* program) override;
   GLboolean isRenderbuffer(IGLRenderbuffer* renderbuffer) override;
   GLboolean isShader(IGLShader* shader) override;
   GLboolean isTexture(IGLTexture* texture) override;
   void lineWidth(GLfloat width) override;
-  bool linkProgram(const std::unique_ptr<IGLProgram>& program) override;
+  bool linkProgram(IGLProgram* program) override;
   void pixelStorei(GLenum pname, GLint param) override;
   void polygonOffset(GLfloat factor, GLfloat units) override;
   void readBuffer(GLenum src) override;
@@ -197,8 +191,7 @@ public:
                                       GLsizei height) override;
   void sampleCoverage(GLclampf value, GLboolean invert) override;
   void scissor(GLint x, GLint y, GLsizei width, GLsizei height) override;
-  void shaderSource(const std::unique_ptr<IGLShader>& shader,
-                    const std::string& source) override;
+  void shaderSource(IGLShader* shader, const std::string& source) override;
   void stencilFunc(GLenum func, GLint ref, GLuint mask) override;
   void stencilFuncSeparate(GLenum face, GLenum func, GLint ref,
                            GLuint mask) override;
