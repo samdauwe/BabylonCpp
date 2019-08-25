@@ -19,10 +19,10 @@ project(${TARGET} C CXX)
 # Print status message
 message(STATUS "App ${TARGET}")
 
-# Inspector
-if (OPTION_BUILD_INSPECTOR)
+# imgui_babylon and Inspector
+if (OPTION_BUILD_IMGUI_BABYLON)
     # Set define for usage in source code
-    add_definitions(-DWITH_INSPECTOR)
+    add_definitions(-DWITH_IMGUI_BABYLON)
 endif()
 
 # ============================================================================ #
@@ -31,13 +31,10 @@ endif()
 
 # Header files
 file(GLOB_RECURSE HEADER_FILES
-    ${GLAD_INCLUDE_DIRS}/glad/glad.h
-    ${GLAD_INCLUDE_DIRS}/KHR/khrplatform.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h)
 
 # Source files
 file(GLOB_RECURSE SOURCE_FILES
-    ${GLAD_SOURCE_DIRS}/glad.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 
@@ -59,8 +56,6 @@ add_executable(${TARGET}
 # Include directories
 target_include_directories(${TARGET}
     PRIVATE
-    ${GLFW_INCLUDE_DIRS}
-    ${GLAD_INCLUDE_DIRS}
     ${JSON_HPP_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/../BabylonCpp/include
     ${CMAKE_CURRENT_BINARY_DIR}/../BabylonCpp/include
@@ -70,11 +65,11 @@ target_include_directories(${TARGET}
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-if (OPTION_BUILD_INSPECTOR)
+if (OPTION_BUILD_IMGUI_BABYLON)
     target_include_directories(${TARGET}
         PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/../Inspector/include
-        ${CMAKE_CURRENT_BINARY_DIR}/../Inspector/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/../imgui_babylon/include
+        ${CMAKE_CURRENT_BINARY_DIR}/../imgui_babylon/include
     )
 endif()
 
@@ -85,12 +80,13 @@ target_link_libraries(${TARGET}
     ${OPENGL_LIBRARIES}
     BabylonCpp
     Samples
+    glad
 )
 
-if (OPTION_BUILD_INSPECTOR)
+if (OPTION_BUILD_IMGUI_BABYLON)
     target_link_libraries(${TARGET}
         PUBLIC
-        Inspector
+        BabylonImGui
     )
 endif()
 

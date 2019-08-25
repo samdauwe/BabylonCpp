@@ -24,7 +24,7 @@
 #include <babylon/meshes/abstract_mesh.h>
 
 // Inspector
-#ifdef WITH_INSPECTOR
+#ifdef WITH_IMGUI_BABYLON
 #include <babylon/inspector/inspector.h>
 #endif
 
@@ -44,7 +44,7 @@ const SampleLauncher::ResolutionSize SampleLauncher::FULL_RESOLUTION_SIZE
   = std::make_pair(0, 0);
 
 static Window _sceneWindow;
-#ifdef WITH_INSPECTOR
+#ifdef WITH_IMGUI_BABYLON
 static Window _inspectorWindow;
 #endif
 
@@ -336,7 +336,7 @@ SampleLauncher::SampleLauncher(const SampleLauncherOptions& options)
 {
   options.size.second
 }
-#ifdef WITH_INSPECTOR
+#ifdef WITH_IMGUI_BABYLON
 , _showInspectorWindow{options.showInspectorWindow}, _inspector
 {
   nullptr
@@ -349,7 +349,7 @@ SampleLauncher::SampleLauncher(const SampleLauncherOptions& options)
   _sceneWindow.renderCanvas    = std::make_unique<BABYLON::impl::Canvas>();
   _sceneWindow.renderableScene = nullptr;
   if (options.showInspectorWindow) {
-#ifdef WITH_INSPECTOR
+#ifdef WITH_IMGUI_BABYLON
     _inspectorWindow       = Window();
     _inspectorWindow.title = "Inspector";
 #else
@@ -392,7 +392,7 @@ int SampleLauncher::run(std::function<bool(void)> exitRequired, long runTime)
     return 1;
   }
 
-#ifdef WITH_INSPECTOR
+#ifdef WITH_IMGUI_BABYLON
   auto previousTimestamp = Time::highresTimepointNow();
 #endif
 
@@ -411,7 +411,7 @@ int SampleLauncher::run(std::function<bool(void)> exitRequired, long runTime)
       glfwSwapBuffers(_sceneWindow.glfwWindow);
     }
     //*** Inspector Window ***//
-#ifdef WITH_INSPECTOR
+#ifdef WITH_IMGUI_BABYLON
     auto currentTimestamp = Time::highresTimepointNow();
     auto diffMillis = Time::fpTimeDiff<size_t, std::milli>(previousTimestamp,
                                                            currentTimestamp);
@@ -420,7 +420,7 @@ int SampleLauncher::run(std::function<bool(void)> exitRequired, long runTime)
       // Make the window's context current
       glfwMakeContextCurrent(_inspectorWindow.glfwWindow);
       // Render inspector window
-      _inspector->render();
+      _inspector->imgui_render_and_display();
       // Swap front and back buffers
       glfwSwapBuffers(_inspectorWindow.glfwWindow);
     }
@@ -433,7 +433,7 @@ int SampleLauncher::run(std::function<bool(void)> exitRequired, long runTime)
     maxRunTimeReached
       = (runTime > 0 && (Time::unixtimeInMs() - startTime > runTime));
     windowClosed = glfwWindowShouldClose(_sceneWindow.glfwWindow);
-#ifdef WITH_INSPECTOR
+#ifdef WITH_IMGUI_BABYLON
     windowClosed = windowClosed
                    || (_showInspectorWindow ?
                          glfwWindowShouldClose(_inspectorWindow.glfwWindow) :
@@ -452,9 +452,9 @@ void SampleLauncher::destroy()
 {
   // Cleanup window(s)
   glfwDestroyWindow(_sceneWindow.glfwWindow);
-#ifdef WITH_INSPECTOR
+#ifdef WITH_IMGUI_BABYLON
   if (_showInspectorWindow && _inspector) {
-    _inspector->dispose();
+    _inspector->imgui_dispose();
   }
 #endif
   // Terminate GLFW
@@ -468,12 +468,12 @@ ICanvas* SampleLauncher::getRenderCanvas()
 }
 
 void SampleLauncher::setRenderableScene(
-  std::unique_ptr<IRenderableScene>& renderableScene)
+  std::shared_ptr<IRenderableScene>& renderableScene)
 {
   // Main scene window
   if (renderableScene && !_sceneWindow.renderableScene) {
     renderableScene->initialize();
-    _sceneWindow.renderableScene = std::move(renderableScene);
+    _sceneWindow.renderableScene = renderableScene;
     // Update the title
     char title[256];
     title[255] = '\0';
@@ -482,7 +482,7 @@ void SampleLauncher::setRenderableScene(
     glfwSetWindowTitle(_sceneWindow.glfwWindow, title);
   }
   // Inspector window
-#ifdef WITH_INSPECTOR
+#ifdef WITH_IMGUI_BABYLON
   if (_showInspectorWindow && _inspector && _sceneWindow.renderableScene) {
     auto scene = _sceneWindow.renderableScene->getScene();
     _inspector->setScene(scene);
@@ -503,6 +503,29 @@ int SampleLauncher::initGLFW()
     exit(EXIT_FAILURE);
   }
 
+  InitGlfw_Hints();
+
+  // Create the scene window
+  CreateGLFWWindow(_sceneWindow, _defaultWinResX, _defaultWinResY,
+                   _sceneWindow.title.c_str(), nullptr, nullptr);
+  _sceneWindow.lastTime = glfwGetTime();
+
+  // Create the inspector window
+#ifdef WITH_IMGUI_BABYLON
+  if (_showInspectorWindow) {
+    CreateGLFWWindow(_inspectorWindow, _defaultWinResX / 2, _defaultWinResY,
+                     _inspectorWindow.title.c_str(), nullptr, &_sceneWindow);
+    _inspectorWindow.lastTime = glfwGetTime();
+    _inspector = std::make_unique<Inspector>(_inspectorWindow.glfwWindow);
+    _inspector->imgui_initialize();
+  }
+#endif
+
+  return 0;
+}
+
+void SampleLauncher::InitGlfw_Hints()
+{
   // Draw smooth line with antialias
   glfwWindowHint(GLFW_SAMPLES, 4); // 4x antialiasing
 
@@ -521,24 +544,6 @@ int SampleLauncher::initGLFW()
   // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // 3.2+ only
   // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);           // 3.0+ only
 #endif
-
-  // Create the scene window
-  CreateGLFWWindow(_sceneWindow, _defaultWinResX, _defaultWinResY,
-                   _sceneWindow.title.c_str(), nullptr, nullptr);
-  _sceneWindow.lastTime = glfwGetTime();
-
-  // Create the inspector window
-#ifdef WITH_INSPECTOR
-  if (_showInspectorWindow) {
-    CreateGLFWWindow(_inspectorWindow, _defaultWinResX / 2, _defaultWinResY,
-                     _inspectorWindow.title.c_str(), nullptr, &_sceneWindow);
-    _inspectorWindow.lastTime = glfwGetTime();
-    _inspector = std::make_unique<Inspector>(_inspectorWindow.glfwWindow);
-    _inspector->intialize();
-  }
-#endif
-
-  return 0;
 }
 
 void SampleLauncher::CreateGLFWWindow(Window& window, int width, int height,

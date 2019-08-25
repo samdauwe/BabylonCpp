@@ -45,19 +45,11 @@ struct LogMessageHandler {
 class BABYLON_SHARED_EXPORT Logger {
 
 public:
+  friend BABYLON_SHARED_EXPORT Logger & LoggerInstance();
   using LogMessageListener = SA::delegate<void(const LogMessage&)>;
 
 public:
-  static Logger& Instance()
-  {
-    // Since it's a static variable, if the class has already been created,
-    // It won't be created again.
-    // And it **is** thread-safe in C++11.
-    static Logger loggerInstance;
-
-    // Return a reference to our instance.
-    return loggerInstance;
-  }
+  //static Logger& Instance();
 
   // Delete copy and move constructors and assign operators
   Logger(Logger const&) = delete;            // Copy constructor
@@ -86,30 +78,33 @@ protected:
 private:
   LogMessageHandler _impl;
 
-}; // end of class LogChannel
+}; // end of class Logger
+
+BABYLON_SHARED_EXPORT Logger & LoggerInstance();
 
 } // end of namespace BABYLON
 
+
 #define BABYLON_LOG_MSG(level, context, ...)                                   \
-  if (BABYLON::Logger::Instance().takes(level)) {                              \
+  if (BABYLON::LoggerInstance().takes(level)) {                              \
     std::ostringstream _ctx;                                                   \
     _ctx << context;                                                           \
     BABYLON::LogMessage _logMessage                                            \
       = BABYLON::Logger::CreateMessage(level, _ctx.str(), __FILE__, __LINE__,  \
                                        __FUNCTION__, __PRETTY_FUNCTION__);     \
     _logMessage.write(__VA_ARGS__);                                            \
-    BABYLON::Logger::Instance().log(std::move(_logMessage));                   \
+    BABYLON::LoggerInstance().log(std::move(_logMessage));                   \
   }
 
 #define BABYLON_LOGF_MSG(level, context, printf_like_message, ...)             \
-  if (BABYLON::Logger::Instance().takes(level)) {                              \
+  if (BABYLON::LoggerInstance().takes(level)) {                              \
     std::ostringstream _ctx;                                                   \
     _ctx << context;                                                           \
     BABYLON::LogMessage _logMessage                                            \
       = BABYLON::Logger::CreateMessage(level, _ctx.str(), __FILE__, __LINE__,  \
                                        __FUNCTION__, __PRETTY_FUNCTION__);     \
     _logMessage.writef(printf_like_message, __VA_ARGS__);                      \
-    BABYLON::Logger::Instance().log(std::move(_logMessage));                   \
+    BABYLON::LoggerInstance().log(std::move(_logMessage));                   \
   }
 
 // -- Default API syntax with variadic input parameters --

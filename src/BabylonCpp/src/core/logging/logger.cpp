@@ -27,6 +27,29 @@ void LogMessageHandler::handle(const LogMessage& logMessage)
   }
 }
 
+//BABYLON::Logger& Logger::Instance()
+//{
+//  // Since it's a static variable, if the class has already been created,
+//  // It won't be created again.
+//  // And it **is** thread-safe in C++11.
+//  static Logger loggerInstance;
+//
+//  // Return a reference to our instance.
+//  return loggerInstance;
+//}
+
+Logger & LoggerInstance()
+{
+  // Since it's a static variable, if the class has already been created,
+  // It won't be created again.
+  // And it **is** thread-safe in C++11.
+  static Logger loggerInstance;
+
+  // Return a reference to our instance.
+  return loggerInstance;
+}
+
+
 Logger::Logger()
 {
 }
@@ -132,4 +155,6 @@ void Logger::unregisterLogMessageListener(
   }
 } // namespace BABYLON
 
+
 } // end of namespace BABYLON
+
