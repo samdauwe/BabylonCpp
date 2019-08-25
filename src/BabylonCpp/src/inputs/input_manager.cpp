@@ -31,6 +31,8 @@ InputManager::InputManager(Scene* scene)
     , _initClickEvent{nullptr}
     , _initActionManager{nullptr}
     , _delayedSimpleClick{nullptr}
+    , _delayedSimpleClickTimeout{0}
+    , _previousDelayedSimpleClickTimeout{0}
     , _meshPickProceed{false}
     , _currentPickResult{std::nullopt}
     , _previousPickResult{std::nullopt}
