@@ -384,11 +384,28 @@ void Engine::_initGLContext()
   // Those parameters cannot always be reliably queried
   // (GlGetError returns INVALID_ENUM under windows 10 (VM with parallels
   // desktop opengl driver)
-  //_caps.maxVaryingVectors    = _gl->getParameteri(GL::MAX_VARYING_VECTORS);
-  //_caps.maxFragmentUniformVectors
-  //  = _gl->getParameteri(GL::MAX_FRAGMENT_UNIFORM_VECTORS);
-  //_caps.maxVertexUniformVectors
-  //  = _gl->getParameteri(GL::MAX_VERTEX_UNIFORM_VECTORS);
+  _caps.maxVaryingVectors    = _gl->getParameteri(GL::MAX_VARYING_VECTORS); // 8
+  _caps.maxFragmentUniformVectors
+    = _gl->getParameteri(GL::MAX_FRAGMENT_UNIFORM_VECTORS); // 1024
+  _caps.maxVertexUniformVectors
+    = _gl->getParameteri(GL::MAX_VERTEX_UNIFORM_VECTORS); // 4096
+
+  // replace values by reasonnable values if failure
+  if (_caps.maxVaryingVectors == 0)
+  {
+    BABYLON_LOG_WARN("_initGLContext", "_caps.maxVaryingVectors could not be read. Assuming it is 8");
+    _caps.maxVaryingVectors = 8;
+  }
+  if (_caps.maxFragmentUniformVectors == 0)
+  {
+    BABYLON_LOG_WARN("_initGLContext", "_caps.maxFragmentUniformVectors could not be read. Assuming it is 1024");
+    _caps.maxFragmentUniformVectors = 1024;
+  }
+  if (_caps.maxVertexUniformVectors == 0)
+  {
+    BABYLON_LOG_WARN("_initGLContext", "_caps.maxVertexUniformVectors could not be read. Assuming it is 4096");
+    _caps.maxVertexUniformVectors = 4096;
+  }
 
   // Infos
   _glVersion  = _gl->getString(GL::VERSION);

@@ -277,12 +277,13 @@ void HDRCubeTexture::setReflectionTextureMatrix(Matrix& value)
   if (value.isIdentity() != _textureMatrix.isIdentity()) {
     getScene()->markAllMaterialsAsDirty(
       Constants::MATERIAL_TextureDirtyFlag, [this](Material* mat) -> bool {
-        auto it = std::find_if(mat->getActiveTextures().begin(),
-                               mat->getActiveTextures().end(),
+        auto activeTextures = mat->getActiveTextures();
+        auto it = std::find_if(activeTextures.begin(),
+                               activeTextures.end(),
                                [this](const BaseTexturePtr& texture) {
                                  return texture.get() == this;
                                });
-        return it != mat->getActiveTextures().end();
+        return it != activeTextures.end();
       });
   }
 }

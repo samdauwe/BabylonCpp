@@ -28,6 +28,59 @@ namespace Samples {
 
 SamplesIndex::SamplesIndex()
 {
+  _samplesFailures = {
+  {"ColoredRibbonScene", SampleFailureReason::outOfBoundAccess},
+  {"CurvedHelixMeshesScene", SampleFailureReason::outOfBoundAccess},
+  {"ExtrusionScene", SampleFailureReason::outOfBoundAccess},
+  {"MirrorTextureScene", SampleFailureReason::readAccessViolation},
+
+  // Empty 3d
+  {"BlurModeForMirrorsScene", SampleFailureReason::empty3d},
+  {"BoneRotationInWorldSpaceScene", SampleFailureReason::empty3d},
+  {"BoxShadowScene", SampleFailureReason::empty3d},
+  {"BrickProceduralTextureScene", SampleFailureReason::empty3d},
+  {"BulbSelfShadowScene", SampleFailureReason::empty3d},
+  {"CloudProceduralTextureScene", SampleFailureReason::empty3d},
+  {"ConvolutionPostProcessScene", SampleFailureReason::empty3d},
+  {"CustomRenderTargetsScene", SampleFailureReason::empty3d},
+  {"DawnBringerScene", SampleFailureReason::empty3d},
+  {"FadeInOutScene", SampleFailureReason::empty3d},
+  {"FireProceduralTextureScene", SampleFailureReason::empty3d},
+  {"GrassProceduralTextureScene", SampleFailureReason::empty3d},
+  {"HeatWaveScene", SampleFailureReason::empty3d},
+  {"HighlightLayerScene", SampleFailureReason::empty3d},
+  {"ImportDudeScene", SampleFailureReason::empty3d},
+  {"ImportDummy3Scene", SampleFailureReason::empty3d},
+  {"ImportRabbitScene", SampleFailureReason::empty3d},
+  {"KernelBasedBlurScene", SampleFailureReason::empty3d},
+  {"MarbleProceduralTextureScene", SampleFailureReason::empty3d},
+  {"MirrorsScene", SampleFailureReason::empty3d},
+  {"MultiSampleRenderTargetsScene", SampleFailureReason::empty3d},
+  {"PBRMaterialScene", SampleFailureReason::empty3d},
+  {"PBRMetallicRoughnessMaterialScene", SampleFailureReason::empty3d},
+  {"PBRReflectionScene", SampleFailureReason::empty3d},
+  {"PerlinNoiseProceduralTextureScene", SampleFailureReason::empty3d},
+  {"PortalsScene", SampleFailureReason::empty3d},
+  {"ProceduralTexturesScene", SampleFailureReason::empty3d},
+  {"RealtimeRefractionScene", SampleFailureReason::empty3d},
+  {"RenderTargetTextureScene", SampleFailureReason::empty3d},
+  {"RGBShiftGlitchScene", SampleFailureReason::empty3d},
+  {"RoadProceduralTextureScene", SampleFailureReason::empty3d},
+  {"ShaderMaterialWarpSpeedScene", SampleFailureReason::empty3d},
+  {"ShadowsScene", SampleFailureReason::empty3d},
+  {"SimplePostProcessRenderPipelineScene", SampleFailureReason::empty3d},
+  {"StarfieldProceduralTextureScene", SampleFailureReason::empty3d},
+  {"WaterMaterialScene", SampleFailureReason::empty3d},
+  {"WoodProceduralTextureScene", SampleFailureReason::empty3d},
+
+  {"MorphTargetsScene", SampleFailureReason::incomplete3d},
+  {"PBRMaterialCheckerORMScene", SampleFailureReason::incomplete3d},
+  {"PBRMaterialORMWoodScene", SampleFailureReason::incomplete3d},
+  {"PBRMetallicRoughnessGoldMaterialScene", SampleFailureReason::incomplete3d},
+  {"PBRMetallicRoughnessTextureMaterialScene", SampleFailureReason::incomplete3d},
+
+  };
+
   // Initialize the samples index
   _samplesIndex = {
     // Animations samples
@@ -84,6 +137,14 @@ bool SamplesIndex::isSampleEnabled(const std::string& sampleName) const
   }
 
   return false;
+}
+
+std::optional<BABYLON::Samples::SampleFailureReason> SamplesIndex::doesSampleFail(const std::string& sampleName) const
+{
+  if (_samplesFailures.find(sampleName) == _samplesFailures.end())
+    return std::nullopt;
+  else
+    return _samplesFailures.at(sampleName);
 }
 
 bool SamplesIndex::sampleExists(const std::string& sampleName) const
@@ -208,7 +269,7 @@ SamplesIndex::getSampleNamesInCategory(const std::string& categoryName) const
   return sampleNames;
 }
 
-std::unique_ptr<IRenderableScene>
+IRenderableScenePtr
 SamplesIndex::createRenderableScene(const std::string& sampleName,
                                     ICanvas* iCanvas) const
 {
@@ -219,6 +280,55 @@ SamplesIndex::createRenderableScene(const std::string& sampleName,
   }
 
   return nullptr;
+}
+
+void SamplesIndex::listSamples()
+{
+  auto categories = getCategoryNames();
+  for (const auto & category : categories)
+  {
+    std::cout << "********************************************" << "\n";
+    std::cout << "Category: " << category << "\n";
+    std::cout << "********************************************" << "\n";
+    auto samples = getSampleNamesInCategory(category);
+    for (const auto & sample : samples) 
+    {
+      std::string ko = (!isSampleEnabled(sample)) ? " (KO)" : "";
+      std::cout << sample << ko << "\n";
+    }
+  }
+}
+
+std::string SampleFailureReason_Str(SampleFailureReason s)
+{
+  switch (s) {
+    case SampleFailureReason::blankDisplay:
+      return "Blank display";
+      break;
+    case SampleFailureReason::outOfBoundAccess :
+      return "Out of bounds access";
+      break;
+    case SampleFailureReason::processHung:
+      return "Process hung";
+      break;
+    case SampleFailureReason::invalidComparator:
+      return "Invalid comparator";
+      break;
+    case SampleFailureReason::vectorIteratorInvalid:
+      return "vector iterators in range are from different containers";
+      break;
+    case SampleFailureReason::empty3d:
+      return "3D rendering is empty";
+      break;
+    case SampleFailureReason::readAccessViolation:
+      return "Read Access Violation";
+      break;
+    case SampleFailureReason::incomplete3d:
+      return "Incomplete 3d (black textures and co)";
+      break;
+    default:
+      throw "Unhandled enum!";
+  }
 }
 
 } // end of namespace Samples

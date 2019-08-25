@@ -1,7 +1,7 @@
 # ============================================================================ #
 #                            Configuration options                             #
 # ============================================================================ #
-option(OPTION_BUILD_INSPECTOR "Build the inspector debugging tool."  ON)
+option(OPTION_BUILD_IMGUI_BABYLON "Build the inspector debugging tool."  ON)
 option(OPTION_BUILD_LOADERS   "Build the loader plugins."            ON)
 
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
@@ -14,6 +14,8 @@ endif()
 
 #-- Libraries --##
 set(IDE_FOLDER "")
+# - imgui_utils
+add_subdirectory(imgui_utils)
 # - Babylon.js Cpp
 add_subdirectory(BabylonCpp)
 # - Extensions
@@ -26,10 +28,9 @@ if (OPTION_BUILD_LOADERS)
     # - Loaders
     add_subdirectory(Loaders)
 endif()
-# - Inspector
-if (OPTION_BUILD_INSPECTOR)
-    # Include Inspector
-    add_subdirectory(Inspector)
+# - imgui_babylon and Inspector
+if (OPTION_BUILD_IMGUI_BABYLON)
+    add_subdirectory(BabylonImGui)
 endif()
 # - Samples
 add_subdirectory(Samples)
@@ -39,3 +40,5 @@ add_subdirectory(Samples)
 add_subdirectory(SampleLauncher)
 # - Studio
 # add_subdirectory(Studio)
+# - Sample Launcher
+add_subdirectory(SamplesRunner)

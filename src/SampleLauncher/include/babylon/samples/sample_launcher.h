@@ -30,7 +30,7 @@ struct Window {
   // Babylon scene related variables
   bool sceneIntialized                              = false;
   std::unique_ptr<ICanvas> renderCanvas             = nullptr;
-  std::unique_ptr<IRenderableScene> renderableScene = nullptr;
+  std::shared_ptr<IRenderableScene> renderableScene = nullptr;
   double lastTime                                   = 0.0;
   int frameCount                                    = 0;
 }; // end of struct Window
@@ -75,7 +75,7 @@ public:
   void destroy();
 
   ICanvas* getRenderCanvas();
-  void setRenderableScene(std::unique_ptr<IRenderableScene>& renderableScene);
+  void setRenderableScene(std::shared_ptr<IRenderableScene>& renderableScene);
 
 public:
   static void CreateGLFWWindow(Window& window, int width, int height,
@@ -84,6 +84,9 @@ public:
 
 private:
   int initGLFW();
+
+  void InitGlfw_Hints();
+
   bool initGL(Window& window);
   void updateWindowFPS(Window& window);
   int initializeScene();
@@ -92,7 +95,7 @@ private:
 private:
   State _sampleLauncherState;
   int _defaultWinResX, _defaultWinResY;
-#ifdef WITH_INSPECTOR
+#ifdef WITH_IMGUI_BABYLON
   bool _showInspectorWindow;
   // Inspector
   std::unique_ptr<Inspector> _inspector;
