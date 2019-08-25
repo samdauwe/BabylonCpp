@@ -73,10 +73,15 @@ get_target_property(TEST_EXCLUDE_FROM_DEFAULT_BUILD
     BabylonCppTests EXCLUDE_FROM_DEFAULT_BUILD
 )
 
-if(NOT TEST_EXCLUDE_FROM_DEFAULT_BUILD)
-    add_custom_command (
-      TARGET ${TARGET} POST_BUILD
-      COMMAND ${TARGET} --gtest_output=xml:${TARGET}.xml
-      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}
-    )
+if (NOT MSVC)
+    if(NOT TEST_EXCLUDE_FROM_DEFAULT_BUILD)
+        add_custom_command (
+        TARGET ${TARGET} POST_BUILD
+        COMMAND ${TARGET} --gtest_output=xml:${TARGET}.xml
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}
+        )
+    endif()
+else()
+    add_test(NAME ${TARGET} COMMAND ${TARGET})
+    enable_testing()
 endif()

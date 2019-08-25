@@ -38,7 +38,7 @@ TEST(TestAny, Initialization)
   EXPECT_EQ(a1._<char>(), 'A');
   EXPECT_EQ(a2._<int>(), 6);
   EXPECT_EQ(a3._<double>(), 3.14);
-  EXPECT_EQ(a4._<const char*>(), "hello,");
+  EXPECT_STREQ(a4._<const char*>(), "hello,");
   EXPECT_THAT(a5._<std::vector<int>>(), ::testing::ContainerEq(testArray));
   EXPECT_EQ(a6._<double>(), 2.71);
   EXPECT_EQ(a7._<std::string>(), "world!");
@@ -81,7 +81,7 @@ TEST(TestAny, CopyAssignment)
   EXPECT_EQ(c1._<char>(), 'A');
   EXPECT_EQ(c2._<int>(), 6);
   EXPECT_EQ(c3._<double>(), 3.14);
-  EXPECT_EQ(c4._<const char*>(), "hello,");
+  EXPECT_STREQ(c4._<const char*>(), "hello,");
   EXPECT_THAT(c5._<std::vector<int>>(), ::testing::ContainerEq(testArray));
   EXPECT_EQ(c6._<double>(), 2.71);
   EXPECT_EQ(c7._<std::string>(), "world!");
@@ -115,7 +115,7 @@ TEST(TestAny, MoveAssignment)
   EXPECT_EQ(m1._<char>(), 'A');
   EXPECT_EQ(m2._<int>(), 6);
   EXPECT_EQ(m3._<double>(), 3.14);
-  EXPECT_EQ(m4._<const char*>(), "hello,");
+  EXPECT_STREQ(m4._<const char*>(), "hello,");
   EXPECT_THAT(m5._<std::vector<int>>(), ::testing::ContainerEq(testArray));
   EXPECT_EQ(m6._<double>(), 2.71);
   EXPECT_EQ(m7._<std::string>(), "world!");
@@ -141,7 +141,7 @@ TEST(TestAny, InitializeVector)
   EXPECT_EQ(a[1]._<char>(), 'A');
   EXPECT_EQ(a[2]._<int>(), 6);
   EXPECT_EQ(a[3]._<double>(), 3.14);
-  EXPECT_EQ(a[4]._<const char*>(), "hello,");
+  EXPECT_STREQ(a[4]._<const char*>(), "hello,");
   EXPECT_THAT(a[5]._<std::vector<int>>(), ::testing::ContainerEq(testArray));
   EXPECT_EQ(a[6]._<double>(), 2.71);
   EXPECT_EQ(a[7]._<std::string>(), "world!");
@@ -176,7 +176,7 @@ TEST(TestAny, AssignToVectorElements)
   EXPECT_EQ(a[1]._<char>(), 'A');
   EXPECT_EQ(a[2]._<int>(), 6);
   EXPECT_EQ(a[3]._<double>(), 3.14);
-  EXPECT_EQ(a[4]._<const char*>(), "hello,");
+  EXPECT_STREQ(a[4]._<const char*>(), "hello,");
   EXPECT_THAT(a[5]._<std::vector<int>>(), ::testing::ContainerEq(testArray));
   EXPECT_EQ(a[6]._<double>(), 2.71);
   EXPECT_EQ(a[7]._<std::string>(), "world!");
@@ -211,7 +211,7 @@ TEST(TestAny, MoveToVectorElements)
   EXPECT_EQ(a[1]._<char>(), 'A');
   EXPECT_EQ(a[2]._<int>(), 6);
   EXPECT_EQ(a[3]._<double>(), 3.14);
-  EXPECT_EQ(a[4]._<const char*>(), "hello,");
+  EXPECT_STREQ(a[4]._<const char*>(), "hello,");
   EXPECT_THAT(a[5]._<std::vector<int>>(), ::testing::ContainerEq(testArray));
   EXPECT_EQ(a[6]._<double>(), 2.71);
   EXPECT_EQ(a[7]._<std::string>(), "world!");
@@ -335,7 +335,7 @@ TEST(TestAny, CopyConstructor)
   EXPECT_EQ(a1._<char>(), 'B');
   EXPECT_EQ(a2._<int>(), 8);
   EXPECT_EQ(a3._<double>(), -3.14);
-  EXPECT_EQ(a4._<const char*>(), "Hello,");
+  EXPECT_STREQ(a4._<const char*>(), "Hello,");
   EXPECT_THAT(a5._<std::vector<int>>(), ::testing::ContainerEq(expected));
   EXPECT_EQ(a6._<double>(), -2.71);
   EXPECT_EQ(a7._<std::string>(), "World! ...");
@@ -388,7 +388,7 @@ TEST(TestAny, MoveConstructor)
   EXPECT_EQ(a1._<char>(), 'C');
   EXPECT_EQ(a2._<int>(), 12);
   EXPECT_EQ(a3._<double>(), 3.14159);
-  EXPECT_EQ(a4._<const char*>(), "HEllo,");
+  EXPECT_STREQ(a4._<const char*>(), "HEllo,");
   EXPECT_THAT(a5._<std::vector<int>>(), ::testing::ContainerEq(expected));
   EXPECT_EQ(a6._<double>(), 2.71828);
   EXPECT_EQ(a7._<std::string>(), "wOrld! !!!");
@@ -422,7 +422,7 @@ TEST(TestAny, FromAnyToTypeByCopy)
   EXPECT_EQ(x1, 'A');
   EXPECT_EQ(x2, 6);
   EXPECT_EQ(x3, 3.14);
-  EXPECT_EQ(x4, "hello,");
+  EXPECT_STREQ(x4, "hello,");
   EXPECT_THAT(x5, ::testing::ContainerEq(testArray));
   EXPECT_EQ(x6, 2.71);
   EXPECT_EQ(x7, "world!");
@@ -456,7 +456,7 @@ TEST(TestAny, FromAnyToTypeByMove)
   EXPECT_EQ(y1, 'A');
   EXPECT_EQ(y2, 6);
   EXPECT_EQ(y3, 3.14);
-  EXPECT_EQ(y4, "hello,");
+  EXPECT_STREQ(y4, "hello,");
   EXPECT_THAT(y5, ::testing::ContainerEq(testArray));
   EXPECT_EQ(y6, 2.71);
   EXPECT_EQ(y7, "world!");

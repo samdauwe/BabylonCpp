@@ -451,8 +451,10 @@ function(add_test_without_ctest target)
     endif()
 
     add_dependencies(test ${target})
-    add_custom_command(TARGET test POST_BUILD
-       COMMAND $<TARGET_FILE:${target}> --gtest_output=xml:gtests-${target}.xml)
+    if (NOT MSVC)
+        add_custom_command(TARGET test POST_BUILD
+        COMMAND $<TARGET_FILE:${target}> --gtest_output=xml:gtests-${target}.xml)
+    endif()
 endfunction()
 
 # Build gmock
@@ -477,14 +479,16 @@ target_link_libraries(gmock-dev
     gmock
 )
 
-if(NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
-# Target 'tests'
-add_custom_target(BabylonCppUnitTests)
-set_target_properties(BabylonCppUnitTests
-    PROPERTIES TEST_EXCLUDE_FROM_DEFAULT_BUILD 0)
-
-# Tests
-add_test_without_ctest(tests)
+if(NOT MSVC)
+    # Target 'tests'
+    add_custom_target(BabylonCppUnitTests)
+    set_target_properties(BabylonCppUnitTests
+        PROPERTIES TEST_EXCLUDE_FROM_DEFAULT_BUILD 0)
+    # Tests
+    add_test_without_ctest(tests)
+else()
+    message("MSVC Test!")
+    add_subdirectory(tests)
 endif()
 
 # Target 'benchmarks'

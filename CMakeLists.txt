@@ -12,6 +12,10 @@ set(IDE_FOLDER "")
 # Project name
 project(BabylonCpp C CXX)
 
+if (MSVC)
+    enable_testing()
+endif()
+
 # Project modules
 add_subdirectory(codegeneration)
 add_subdirectory(external)

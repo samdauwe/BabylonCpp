@@ -2,8 +2,6 @@
 #define BABYLON_MISC_OBSERVER_H
 
 #include <functional>
-
-#include <babylon/babylon_api.h>
 #include <babylon/misc/event_state.h>
 
 namespace BABYLON {
@@ -12,7 +10,7 @@ namespace BABYLON {
  * @brief Represent an Observer registered to a given Observable object.
  */
 template <class T>
-class BABYLON_SHARED_EXPORT Observer {
+class Observer {
 
 public:
   using CallbackFunc
