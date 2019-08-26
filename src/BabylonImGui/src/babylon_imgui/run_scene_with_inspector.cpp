@@ -125,6 +125,13 @@ private:
     sceneSize.y -= 60;
     return sceneSize;
   }
+  ImVec2 getSceneSizeSmall()
+  {
+    ImVec2 sceneSize = getSceneSize();
+    sceneSize.x /= 3.f;
+    sceneSize.y /= 3.f;
+    return sceneSize;
+  }
 
   void createInspectorIfNeeded()
   {
@@ -183,7 +190,8 @@ private:
     _appContext._sceneWidget->setRenderableScene(scene);
     if (_appContext._inspector)
       _appContext._inspector->setScene(_appContext._sceneWidget->getScene());
-    _appContext._viewState = ViewState::Scene3d;
+    if (_appContext._viewState == ViewState::SampleBrowser)
+      _appContext._viewState = ViewState::Scene3d;
   }
 
   // Saves a screenshot after  few frames (eeturns true when done)
@@ -202,6 +210,7 @@ private:
   void renderSandbox()
   {
     ImGui::Text("Sandbox!");
+    _appContext._sceneWidget->render(getSceneSizeSmall());
     _sandboxCodeEditor.render();
   }
 
