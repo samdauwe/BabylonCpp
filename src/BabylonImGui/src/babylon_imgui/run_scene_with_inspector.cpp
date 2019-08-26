@@ -60,7 +60,10 @@ public:
     _appContext._options = options;
 
     std::function<bool(void)> showGuiLambda = [this]() -> bool {
-      return this->render();
+      bool r = this->render();
+      if (_appContext._options._heartbeatCallback)
+        _appContext._options._heartbeatCallback();
+      return r;
     };
     auto initSceneLambda = [&]() {
       this->initScene();

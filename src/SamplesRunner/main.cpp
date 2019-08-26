@@ -7,9 +7,13 @@
 
 #include "spawn_screenshots.h"
 #include "run_standalone_imgui.h"
+#include "RuntimeCompile/RuntimeCompileWrapper.h"
 
 int main(int argc, char** argv)
 {
+  RuntimeCompileWrapper runtimeCompileWrapper;
+  runtimeCompileWrapper.Init();
+
   BABYLON::System::chdirToExecutableFolder();
 
   bool flagVerbose = false;
@@ -58,6 +62,11 @@ int main(int argc, char** argv)
     options._flagScreenshotOneSampleAndExit = flagScreenshotOneSampleAndExit;
     options._sceneName = sampleName;
     options._appWindowParams.FullScreen = flagFullscreen;
+
+    options._heartbeatCallback = [&runtimeCompileWrapper]() {
+      runtimeCompileWrapper.MainLoop();
+    };
+
     runSceneWithInspector(scene, options);
   }
   return 0;

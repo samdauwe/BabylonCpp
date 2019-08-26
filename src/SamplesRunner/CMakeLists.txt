@@ -47,7 +47,6 @@ target_include_directories(${TARGET}
     ${CMAKE_CURRENT_SOURCE_DIR}/../Extensions/include
     ${CMAKE_CURRENT_BINARY_DIR}/../Extensions/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../Samples/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 
@@ -63,6 +62,8 @@ target_link_libraries(${TARGET}
     ${OPENGL_LIBRARIES}
     BabylonCpp
     Samples
+    RuntimeCompiler
+    RuntimeObjectSystem
 )
 
 # On Linux and other Unix platforms that use dlopen(), link with -ldl
