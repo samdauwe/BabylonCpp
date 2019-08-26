@@ -75,3 +75,8 @@ endif()
 if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
     target_compile_options(ImGuiColorTextEdit PRIVATE -Wno-reorder -Wno-sign-compare -Wno-unused-variable)
 endif()
+
+# RuntimeCompiledCPlusPlus
+set (RuntimeCompiledCPlusPlus_Dir ${CMAKE_CURRENT_SOURCE_DIR}/RuntimeCompiledCPlusPlus/Aurora)
+SET(BUILD_EXAMPLES OFF CACHE BOOL "Build RuntimeCompiledCPlusPlus examples" FORCE)
+add_subdirectory(${RuntimeCompiledCPlusPlus_Dir})
