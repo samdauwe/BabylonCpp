@@ -560,8 +560,7 @@ void Geometry::_updateExtend(Float32Array data)
     data = getVerticesData(VertexBuffer::PositionKind);
   }
 
-  _extend
-    = Tools::ExtractMinAndMax(data, 0, _totalVertices, *boundingBias(), 3);
+  _extend = Tools::ExtractMinAndMax(data, 0, _totalVertices, boundingBias(), 3);
 }
 
 void Geometry::_applyToMesh(Mesh* mesh)
