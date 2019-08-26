@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include <babylon/core/filesystem.h>
+#include <babylon/core/string.h>
 #include <babylon/core/system.h>
 #include <imgui_utils/icons_font_awesome_5.h>
 #include <imgui_utils/imgui_utils.h>
@@ -13,6 +14,16 @@ namespace ImGuiUtils {
 
 std::function<void(void)> guiAllowEdition;
 
+namespace
+{
+  std::string readFileContents_standard_eof(const std::string& filePath)
+  {
+    std::string s = BABYLON::Filesystem::readFileContents(filePath.c_str());
+    s = BABYLON::String::replace(s, "\r\n", "\n");
+    return s;
+  }
+
+}
 
 class OneCodeEditor
 {
@@ -21,7 +32,12 @@ public:
   {
     auto lang = TextEditor::LanguageDefinition::CPlusPlus();
     _textEditor.SetLanguageDefinition(lang);
-    _fileContent_Startup = BABYLON::Filesystem::readFileContents(filePath.c_str());
+    readFile();
+  }
+
+  void readFile()
+  {
+    _fileContent_Startup = readFileContents_standard_eof(_filePath);
     _fileContent_Saved = _fileContent_Startup;
     _textEditor.SetText(_fileContent_Startup);
   }
@@ -34,6 +50,21 @@ public:
     ImGui::Separator();
     renderCommandLine();
     ImGui::Separator();
+    if (_hasModificationConflict)
+    {
+      ImGui::OpenPopup("Edition Conflict!");
+      if (ImGui::BeginPopupModal("Edition Conflict!", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+      {
+        ImGui::Text("This file was concurrently modified externally and edited here!");
+        if (ImGui::Button("Accept external changes"))
+        {
+          readFile();
+          _hasModificationConflict = false;
+        }
+        ImGui::EndPopup();
+      }
+
+    }
     _textEditor.Render("TextEditor");
   }
 
@@ -44,11 +75,15 @@ public:
   TextEditor & getTextEditor() { return _textEditor;  }
 
 private:
+  bool isTextModified()
+  {
+
+  }
   bool canSave()
   {
     if (_textEditor.IsReadOnly())
       return false;
-    return (_textEditor.GetText() != _fileContent_Saved);
+    return wasTextEdited();
   }
   void save()
   {
@@ -121,22 +156,39 @@ private:
       BABYLON::System::openFile(_filePath);
   }
 
+  bool wasTextEdited()
+  {
+    bool wasEdited = true;
+    std::string currentText = _textEditor.GetText();
+    if (currentText == _fileContent_Saved)
+      wasEdited = false;
+
+    // The editor can add a final "EOL" that is not present in the file...
+    currentText.pop_back();
+    if (currentText == _fileContent_Saved)
+      wasEdited = false;
+
+    return wasEdited;
+  }
+
   void checkExternalModifications()
   {
     static int counter = 0;
     counter++;
-    // only check every 2 seconds
-    if (counter % (50 * 2) == 0)
+    // only check every second
+    if (counter % 50 == 0)
     {
-      std::string newContent = BABYLON::Filesystem::readFileContents(_filePath.c_str());
+      std::string newContent = readFileContents_standard_eof(_filePath.c_str());
       bool wasExternallyModified = (newContent != _fileContent_Saved);
-      bool wasInternallyModified = (_fileContent_Saved != _textEditor.GetText());
+      bool wasInternallyModified = wasTextEdited();
       if (wasExternallyModified && (!wasInternallyModified))
       {
         _textEditor.SetText(newContent);
+        _fileContent_Saved = newContent;
       }
       if (wasExternallyModified && wasInternallyModified)
       {
+        _hasModificationConflict = true;
         std::cerr << "File was modified externally and internally!";
       }
     }
@@ -146,6 +198,7 @@ private:
   TextEditor _textEditor;
   std::string _fileContent_Startup;
   std::string _fileContent_Saved;
+  bool _hasModificationConflict = false;
 };
 
 
