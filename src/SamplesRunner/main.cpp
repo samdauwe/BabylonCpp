@@ -7,12 +7,12 @@
 
 #include "spawn_screenshots.h"
 #include "run_standalone_imgui.h"
-#include "RuntimeCompile/RuntimeCompileWrapper.h"
+#include <SamplesRunner/rtc/rtc_manager.h>
 
 int main(int argc, char** argv)
 {
-  RuntimeCompileWrapper runtimeCompileWrapper;
-  runtimeCompileWrapper.Init();
+  BABYLON::rtc::RtcManager runtimeCompiler;
+  runtimeCompiler.Init();
 
   BABYLON::System::chdirToExecutableFolder();
 
@@ -63,8 +63,9 @@ int main(int argc, char** argv)
     options._sceneName = sampleName;
     options._appWindowParams.FullScreen = flagFullscreen;
 
-    options._heartbeatCallback = [&runtimeCompileWrapper]() {
-      runtimeCompileWrapper.MainLoop();
+    options._heartbeatCallback = [&runtimeCompiler]() -> std::shared_ptr<BABYLON::IRenderableScene> {
+      runtimeCompiler.MainLoop();
+      return nullptr;
     };
 
     runSceneWithInspector(scene, options);

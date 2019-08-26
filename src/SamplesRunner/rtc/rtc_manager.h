@@ -10,14 +10,18 @@ int _getche();
 #endif
 
 
-struct IUpdateable;
 struct IRuntimeObjectSystem;
 
-class RuntimeCompileWrapper : public IObjectFactoryListener
+namespace BABYLON {
+namespace rtc {
+
+struct ISceneProducer;
+
+class RtcManager : public IObjectFactoryListener
 {
 public:
-	RuntimeCompileWrapper();
-	virtual ~RuntimeCompileWrapper();
+	RtcManager();
+	virtual ~RtcManager();
 
 	bool Init();
 	void MainLoop();
@@ -36,6 +40,9 @@ private:
 	IRuntimeObjectSystem*	m_pRuntimeObjectSystem;
 
 	// Runtime object
-	IUpdateable* 			m_pUpdateable;
+	ISceneProducer* 			m_pUpdateable;
 	ObjectId	   			m_ObjectId;
 };
+
+} // namespace BABYLON
+} // namespace rtc

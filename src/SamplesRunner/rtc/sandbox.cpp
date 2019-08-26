@@ -1,4 +1,5 @@
-#include "SamplesRunner/RuntimeCompile/RuntimeLink.h"
+#include <SamplesRunner/rtc/suppress_warnings.h>
+#include <SamplesRunner/rtc/link_libraries.h>
 
 #include "SamplesRunner/HelloScene.h"
 
@@ -52,12 +53,13 @@ std::shared_ptr<BABYLON::IRenderableScene> MakeHelloScene2()
 #include <RuntimeObjectSystem/ObjectInterfacePerModule.h>
 
 #include <RuntimeObjectSystem/IObject.h>
-#include "IUpdateable.h"
-#include "InterfaceIds.h"
+#include <SamplesRunner/rtc/iscene_producer.h>
+#include <SamplesRunner/rtc/interface_ids.h>
 #include <iostream>
 
+using namespace BABYLON::rtc;
 
-class RuntimeObject01 : public TInterface<IID_IUPDATEABLE, IUpdateable>
+class Sandbox : public TInterface<IID_RENDERABLESCENE_PRODUCER, ISceneProducer>
 {
 public:
   virtual void Update(float deltaTime)
@@ -68,4 +70,4 @@ public:
   }
 };
 
-REGISTERCLASS(RuntimeObject01);
+REGISTERCLASS(Sandbox);

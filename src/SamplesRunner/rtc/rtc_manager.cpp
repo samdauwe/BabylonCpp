@@ -1,6 +1,7 @@
 // Adapted from RuntimeCompiledCPlusPlus/Aurora/Examples/ConsoleExample/ConsoleGame.cpp
-#include "RuntimeCompileWrapper.h"
-
+#include <SamplesRunner/rtc/suppress_warnings.h>
+#include <SamplesRunner/rtc/rtc_manager.h>
+#include <SamplesRunner/rtc/log_system.h>
 
 #include <RuntimeCompiler/AUArray.h>
 #include <RuntimeCompiler/BuildTool.h>
@@ -10,11 +11,10 @@
 #include <RuntimeObjectSystem/ObjectFactorySystem/ObjectFactorySystem.h>
 #include <RuntimeObjectSystem/RuntimeObjectSystem.h>
 
-#include "StdioLogSystem.h"
 
 #include <RuntimeObjectSystem/IObject.h>
-#include "IUpdateable.h"
-#include "InterfaceIds.h"
+#include <SamplesRunner/rtc/iscene_producer.h>
+#include <SamplesRunner/rtc/interface_ids.h>
 
 #include <iostream>
 #include <sstream>
@@ -29,14 +29,17 @@
 #endif
 using FileSystemUtils::Path;
 
-RuntimeCompileWrapper::RuntimeCompileWrapper()
+namespace BABYLON {
+namespace rtc {
+
+RtcManager::RtcManager()
 	: m_pCompilerLogger(0)
 	, m_pRuntimeObjectSystem(0)
 	, m_pUpdateable(0)
 {
 }
 
-RuntimeCompileWrapper::~RuntimeCompileWrapper()
+RtcManager::~RtcManager()
 {
     if( m_pRuntimeObjectSystem )
     {
@@ -58,11 +61,11 @@ RuntimeCompileWrapper::~RuntimeCompileWrapper()
 }
 
 
-bool RuntimeCompileWrapper::Init()
+bool RtcManager::Init()
 {
 	//Initialise the RuntimeObjectSystem
 	m_pRuntimeObjectSystem = new RuntimeObjectSystem;
-	m_pCompilerLogger = new StdioLogSystem();
+	m_pCompilerLogger = new LogSystem();
 	if( !m_pRuntimeObjectSystem->Initialise(m_pCompilerLogger, 0) )
     {
         m_pRuntimeObjectSystem = 0;
@@ -75,7 +78,7 @@ bool RuntimeCompileWrapper::Init()
   SetLibraryPath();
 
 	// construct first object
-	IObjectConstructor* pCtor = m_pRuntimeObjectSystem->GetObjectFactorySystem()->GetConstructor( "RuntimeObject01" );
+	IObjectConstructor* pCtor = m_pRuntimeObjectSystem->GetObjectFactorySystem()->GetConstructor( "Sandbox" );
 	if( pCtor )
 	{
 		IObject* pObj = pCtor->Construct();
@@ -93,7 +96,7 @@ bool RuntimeCompileWrapper::Init()
 	return true;
 }
 
-void RuntimeCompileWrapper::SetCompileOptions()
+void RtcManager::SetCompileOptions()
 {
 #ifdef _MSC_VER
   m_pRuntimeObjectSystem->SetAdditionalCompileOptions("/std:c++17");
@@ -101,13 +104,13 @@ void RuntimeCompileWrapper::SetCompileOptions()
 }
 
 
-void RuntimeCompileWrapper::SetLibraryPath()
+void RtcManager::SetLibraryPath()
 {
   auto libPath = FileSystemUtils::GetExePath().ParentPath().ParentPath() / "lib";
   m_pRuntimeObjectSystem->AddLibraryDir(libPath.c_str());
 }
 
-void RuntimeCompileWrapper::SetIncludePath()
+void RtcManager::SetIncludePath()
 {
   FileSystemUtils::Path basePath = m_pRuntimeObjectSystem->FindFile(__FILE__);
   FileSystemUtils::Path repoPath = basePath.ParentPath().ParentPath().ParentPath().ParentPath();
@@ -132,7 +135,7 @@ void RuntimeCompileWrapper::SetIncludePath()
 
 
 
-void RuntimeCompileWrapper::OnConstructorsAdded()
+void RtcManager::OnConstructorsAdded()
 {
 	// This could have resulted in a change of object pointer, so release old and get new one.
 	if( m_pUpdateable )
@@ -147,7 +150,7 @@ void RuntimeCompileWrapper::OnConstructorsAdded()
 	}
 }
 
-void RuntimeCompileWrapper::MainLoop()
+void RtcManager::MainLoop()
 {
   static int idx = 0;
   idx++;
@@ -170,3 +173,6 @@ void RuntimeCompileWrapper::MainLoop()
 		m_pUpdateable->Update( deltaTime );
 	}
 }
+
+} // namespace BABYLON
+} // namespace rtc

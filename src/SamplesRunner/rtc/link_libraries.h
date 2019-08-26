@@ -15,7 +15,7 @@
 
 
 #pragma once
-#include "RuntimeObjectSystem/RuntimeLinkLibrary.h"
+#include <RuntimeObjectSystem/RuntimeLinkLibrary.h>
 #define RUNTIME_COMPILER_LINKLIBRARY_ADAPTED(lib) RUNTIME_COMPILER_LINKLIBRARY( LIB_PREFIX ## lib ## LIB_SUFFIX ) 
 #ifdef _WIN32
 RUNTIME_COMPILER_LINKLIBRARY_ADAPTED("glad")

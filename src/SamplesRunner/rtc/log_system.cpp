@@ -15,7 +15,7 @@
 //    misrepresented as being the original software.
 // 3. This notice may not be removed or altered from any source distribution.
 
-#include "StdioLogSystem.h"
+#include <SamplesRunner/rtc/log_system.h>
 
 // Currently we create the file on first real output, and only close it on shutdown
 
@@ -28,28 +28,30 @@
 	#pragma warning( disable : 4996 4800 )
 #endif
 
+namespace BABYLON {
+namespace rtc {
 
-void StdioLogSystem::LogError(const char * format, ...)
+void LogSystem::LogError(const char * format, ...)
 {
 	va_list args;
 	va_start(args, format);
 	LogInternal(format, args);
 }
 
-void StdioLogSystem::LogWarning(const char * format, ...)
+void LogSystem::LogWarning(const char * format, ...)
 {
 	va_list args;
 	va_start(args, format);
 	LogInternal(format, args);
 }
 
-void StdioLogSystem::LogInfo(const char * format, ...)
+void LogSystem::LogInfo(const char * format, ...)
 {
 	va_list args;
 	va_start(args, format);
 	LogInternal(format, args);
 }
-void StdioLogSystem::LogInternal(const char * format, va_list args)
+void LogSystem::LogInternal(const char * format, va_list args)
 {
 	int result = vsnprintf(m_buff, LOGSYSTEM_MAX_BUFFER-1, format, args);
   (void)result;
@@ -61,3 +63,6 @@ void StdioLogSystem::LogInternal(const char * format, va_list args)
 	OutputDebugStringA( m_buff );
 #endif
 }
+
+} // namespace BABYLON
+} // namespace rtc
