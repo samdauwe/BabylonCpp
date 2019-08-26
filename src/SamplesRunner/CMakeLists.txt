@@ -63,9 +63,14 @@ target_link_libraries(${TARGET}
     ${OPENGL_LIBRARIES}
     BabylonCpp
     Samples
-    RuntimeCompiler
-    RuntimeObjectSystem
 )
+
+if (BABYLON_BUILD_SANDBOX)
+    target_compile_definitions(${TARGET} PRIVATE -DBABYLON_BUILD_SANDBOX)
+    target_link_libraries(${TARGET} PRIVATE RuntimeCompiler RuntimeObjectSystem)
+endif()
+
+
 
 # On Linux and other Unix platforms that use dlopen(), link with -ldl
 if(NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")

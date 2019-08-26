@@ -77,8 +77,11 @@ if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" OR "${CMAKE_CXX_COMPILER_ID}" MATC
 endif()
 
 # RuntimeCompiledCPlusPlus
-set (RuntimeCompiledCPlusPlus_Dir ${CMAKE_CURRENT_SOURCE_DIR}/RuntimeCompiledCPlusPlus/Aurora)
-SET(BUILD_EXAMPLES OFF CACHE BOOL "Build RuntimeCompiledCPlusPlus examples" FORCE)
-add_subdirectory(${RuntimeCompiledCPlusPlus_Dir})
-target_include_directories(RuntimeCompiler INTERFACE ${RuntimeCompiledCPlusPlus_Dir})
-target_include_directories(RuntimeObjectSystem INTERFACE ${RuntimeCompiledCPlusPlus_Dir})
+option(BABYLON_BUILD_SANDBOX "Build the interactive sandbox (modify and run the sandbox code interactively without exiting)" ON)
+if (BABYLON_BUILD_SANDBOX)
+    set (RuntimeCompiledCPlusPlus_Dir ${CMAKE_CURRENT_SOURCE_DIR}/RuntimeCompiledCPlusPlus/Aurora)
+    SET(BUILD_EXAMPLES OFF CACHE BOOL "Build RuntimeCompiledCPlusPlus examples" FORCE)
+    add_subdirectory(${RuntimeCompiledCPlusPlus_Dir})
+    target_include_directories(RuntimeCompiler INTERFACE ${RuntimeCompiledCPlusPlus_Dir})
+    target_include_directories(RuntimeObjectSystem INTERFACE ${RuntimeCompiledCPlusPlus_Dir})    
+endif()

@@ -1,3 +1,5 @@
+#ifdef BABYLON_BUILD_SANDBOX
+
 // Adapted from RuntimeCompiledCPlusPlus/Aurora/Examples/ConsoleExample/ConsoleGame.cpp
 #include <SamplesRunner/rtc/suppress_warnings.h>
 #include <SamplesRunner/rtc/rtc_manager.h>
@@ -184,3 +186,5 @@ std::shared_ptr<BABYLON::IRenderableScene> RtcManager::Heartbeat()
 
 } // namespace BABYLON
 } // namespace rtc
+
+#endif // BABYLON_BUILD_SANDBOX

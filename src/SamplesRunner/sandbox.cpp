@@ -1,3 +1,5 @@
+#ifdef BABYLON_BUILD_SANDBOX
+
 // This is the sandbox : you can here enter / modify code during 
 // the execution, and the scene will be updated automatically!
 // You do not need to exit the application!
@@ -63,3 +65,5 @@ REGISTERCLASS(Sandbox);
 std::shared_ptr<BABYLON::IRenderableScene> Sandbox::MakeScene() {
   return std::make_shared<SandboxScene>();
 }
+
+#endif // #ifdef BABYLON_BUILD_SANDBOX

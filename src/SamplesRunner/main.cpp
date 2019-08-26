@@ -7,12 +7,17 @@
 
 #include "spawn_screenshots.h"
 #include "run_standalone_imgui.h"
+
+#ifdef BABYLON_BUILD_SANDBOX
 #include <SamplesRunner/rtc/rtc_manager.h>
+#endif
 
 int main(int argc, char** argv)
 {
+#ifdef BABYLON_BUILD_SANDBOX
   BABYLON::rtc::RtcManager runtimeCompiler;
   runtimeCompiler.Init();
+#endif
 
   BABYLON::System::chdirToExecutableFolder();
 
@@ -63,10 +68,12 @@ int main(int argc, char** argv)
     options._sceneName = sampleName;
     options._appWindowParams.FullScreen = flagFullscreen;
 
+#ifdef BABYLON_BUILD_SANDBOX
     options._heartbeatCallback = [&runtimeCompiler]() -> std::shared_ptr<BABYLON::IRenderableScene> {
       std::shared_ptr<BABYLON::IRenderableScene> newScene = runtimeCompiler.Heartbeat();
       return newScene;
     };
+#endif
 
     runSceneWithInspector(scene, options);
   }
