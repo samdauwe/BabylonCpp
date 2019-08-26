@@ -2795,9 +2795,9 @@ void Scene::_evaluateActiveMeshes()
 
     mesh->_preActivate();
 
-    if (mesh->isVisible && mesh->visibility > 0
+    if (mesh->isVisible && mesh->visibility() > 0
         && ((mesh->alwaysSelectAsActiveMesh
-             || (((mesh->layerMask & _activeCamera->layerMask) != 0)
+             || (((mesh->layerMask() & _activeCamera->layerMask) != 0)
                  && (mesh->alwaysSelectAsActiveMesh
                      || mesh->isInFrustum(_frustumPlanes)))))) {
       _activeMeshes.emplace_back(mesh);
