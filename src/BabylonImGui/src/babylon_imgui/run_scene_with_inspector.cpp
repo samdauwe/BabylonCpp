@@ -2,6 +2,7 @@
 #include <babylon/babylon_imgui/run_scene_with_inspector.h>
 #include <imgui_utils/app_runner/imgui_runner.h>
 #include <babylon/GL/framebuffer_canvas.h>
+#include <babylon/core/filesystem.h>
 
 #include <babylon/core/logging.h>
 #include <babylon/samples/samples_index.h>
@@ -51,7 +52,13 @@ const int INSPECTOR_WIDTH = 400;
 class BabylonInspectorApp {
 public:
 
-  BabylonInspectorApp() {}
+  BabylonInspectorApp() {
+    std::string sandboxPath = 
+      BABYLON::Filesystem::absolutePath(
+          BABYLON::Filesystem::baseDir(__FILE__) 
+        + "../../../../SamplesRunner/sandbox.cpp");
+    _sandboxCodeEditor.setFiles({ sandboxPath });
+  }
   void RunApp(
     std::shared_ptr<BABYLON::IRenderableScene> initialScene,
     const SceneWithInspectorOptions & options
@@ -81,8 +88,9 @@ private:
   enum class ViewState
   {
     Scene3d,
-    CodeEditor,
+    SamplesCodeViewer,
     SampleBrowser,
+    SandboxEditor,
   };
   static std::map<BabylonInspectorApp::ViewState, std::string> ViewStateLabels;
 
@@ -92,8 +100,8 @@ private:
       this->setRenderableScene(scene);
     };
     _appContext._sampleListComponent.OnEditFiles = [&](const std::vector<std::string> & files) {
-      _codeEditor.setFiles(files);
-      _appContext._viewState = ViewState::CodeEditor;
+      _samplesCodeEditor.setFiles(files);
+      _appContext._viewState = ViewState::SamplesCodeViewer;
     };
     _appContext._sampleListComponent.OnLoopSamples = [&](const std::vector<std::string> & samples) {
       _appContext._loopSamples.flagLoop = true;
@@ -150,10 +158,12 @@ private:
 
     if (_appContext._viewState == ViewState::Scene3d)
       _appContext._sceneWidget->render(getSceneSize());
-    if (_appContext._viewState == ViewState::CodeEditor)
-      _codeEditor.render();
+    if (_appContext._viewState == ViewState::SamplesCodeViewer)
+      _samplesCodeEditor.render();
     else if (_appContext._viewState == ViewState::SampleBrowser)
       _appContext._sampleListComponent.render();
+    if (_appContext._viewState == ViewState::SandboxEditor)
+      renderSandbox();
 
 
     ImGui::EndGroup();
@@ -187,6 +197,12 @@ private:
     this->_appContext._sceneWidget->getCanvas()->saveScreenshotJpg((_appContext._options._sceneName + ".jpg").c_str(),
       jpgQuality, imageWidth);
     return true;
+  }
+
+  void renderSandbox()
+  {
+    ImGui::Text("Sandbox!");
+    _sandboxCodeEditor.render();
   }
 
 
@@ -237,14 +253,16 @@ private:
   };
 
   AppContext _appContext;
-  ImGuiUtils::CodeEditor _codeEditor;
+  ImGuiUtils::CodeEditor _samplesCodeEditor = ImGuiUtils::CodeEditor(true); // true <-> showCheckboxReadOnly
+  ImGuiUtils::CodeEditor _sandboxCodeEditor;
 }; // end of class BabylonInspectorApp
 
 
 std::map<BabylonInspectorApp::ViewState, std::string> BabylonInspectorApp::ViewStateLabels = {
 { BabylonInspectorApp::ViewState::Scene3d, ICON_FA_CUBE " 3D Scene"},
-{ BabylonInspectorApp::ViewState::CodeEditor, ICON_FA_EDIT " Code Editor"},
 { BabylonInspectorApp::ViewState::SampleBrowser, ICON_FA_PALETTE " Browse samples"},
+{ BabylonInspectorApp::ViewState::SamplesCodeViewer, ICON_FA_EDIT " Samples Code Viewer"},
+{ BabylonInspectorApp::ViewState::SandboxEditor, ICON_FA_FLASK " Sandbox"},
 };
 
 

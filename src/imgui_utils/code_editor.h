@@ -10,8 +10,7 @@ namespace ImGuiUtils {
   class CodeEditor
   {
   public:
-    CodeEditor(const std::string &filePath);
-    CodeEditor(const std::vector<std::string> &filePaths = {});
+    CodeEditor(bool showCheckboxReadOnly = false);
     ~CodeEditor();
 
     void setFiles(const std::vector<std::string> &filePaths);

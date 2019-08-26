@@ -8,9 +8,6 @@
 // it is needed to enable "Runtime Compilation"
 #include "SamplesRunner/rtc/sandbox_autocompile.h"
 
-
-
-
 // You can edit the code below freely (add includes, modify the scene, etc)
 #include <babylon/cameras/free_camera.h>
 #include <babylon/lights/hemispheric_light.h>
@@ -41,7 +38,7 @@ struct SandboxScene : public BABYLON::IRenderableScene
 
     // Create a built-in "sphere" shape; its constructor takes 5 params: name,
     // subdivs, size, scene
-    auto sphere = Mesh::CreateSphere("sphere1", 16, .5f, scene);
+    auto sphere = Mesh::CreateSphere("sphere1", 16, 1.5f, scene);
 
     // Move the sphere upward 1/2 of its height
     sphere->position().y = 1.f;
@@ -67,3 +64,8 @@ std::shared_ptr<BABYLON::IRenderableScene> Sandbox::MakeScene() {
 }
 
 #endif // #ifdef BABYLON_BUILD_SANDBOX
+
+
+
+
+

@@ -130,7 +130,7 @@ private:
     {
       std::string newContent = BABYLON::Filesystem::readFileContents(_filePath.c_str());
       bool wasExternallyModified = (newContent != _fileContent_Saved);
-      bool wasInternallyModified = (_textEditor.CanUndo());
+      bool wasInternallyModified = (_fileContent_Saved != _textEditor.GetText());
       if (wasExternallyModified && (!wasInternallyModified))
       {
         _textEditor.SetText(newContent);
@@ -153,13 +153,11 @@ private:
 class MultipleCodeEditorImpl
 {
 public:
-  MultipleCodeEditorImpl(const std::string &filePath)
+  MultipleCodeEditorImpl(bool showCheckboxReadOnly) 
+    : _showCheckboxReadOnly(showCheckboxReadOnly)
   {
-    setFiles({ filePath });
-  }
-  MultipleCodeEditorImpl(const std::vector<std::string> &filePaths)
-  {
-    setFiles(filePaths);
+    if (!_showCheckboxReadOnly)
+      _canEdit = true;
   }
 
   void setFiles(const std::vector<std::string> &filePaths)
@@ -187,8 +185,11 @@ public:
 
   void renderAllowEdition()
   {
-    if (ImGui::Checkbox("Allow edition", &_canEdit))
-      updateReadOnly();
+    if (_showCheckboxReadOnly)
+    {
+      if (ImGui::Checkbox("Allow edition", &_canEdit))
+        updateReadOnly();
+    }
   }
 
   void render()
@@ -250,18 +251,14 @@ private:
   OneCodeEditor * _currentEditor = nullptr;
   int _palette = 0;
   bool _canEdit = false;
+  bool _showCheckboxReadOnly;
 };
 
 
 
 
-CodeEditor::CodeEditor(const std::string &filePath)
-  : _pImpl(std::make_unique<MultipleCodeEditorImpl>(filePath))
-{
-}
-
-CodeEditor::CodeEditor(const std::vector<std::string> &filePaths)
-  : _pImpl(std::make_unique<MultipleCodeEditorImpl>(filePaths))
+CodeEditor::CodeEditor(bool showCheckboxReadOnly)
+  : _pImpl(std::make_unique<MultipleCodeEditorImpl>(showCheckboxReadOnly))
 {
 }
 
@@ -285,7 +282,8 @@ void demoCodeEditor()
     "../../../src/imgui_babylon/src/imgui_babylon/sample_list_page.cpp",
     "../../../src/imgui_babylon/include/babylon/imgui_babylon/sample_list_page.h"
   };
-  ImGuiUtils::CodeEditor codeEditor(path);
+  ImGuiUtils::CodeEditor codeEditor(true);
+  codeEditor.setFiles(path);
   auto demoGui = [&]() {
     codeEditor.render();
   };
