@@ -62,7 +62,11 @@ public:
     std::function<bool(void)> showGuiLambda = [this]() -> bool {
       bool r = this->render();
       if (_appContext._options._heartbeatCallback)
-        _appContext._options._heartbeatCallback();
+      {
+        auto newScene = _appContext._options._heartbeatCallback();
+        if (newScene)
+          setRenderableScene(newScene);
+      }
       return r;
     };
     auto initSceneLambda = [&]() {

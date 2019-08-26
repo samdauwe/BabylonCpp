@@ -64,8 +64,8 @@ int main(int argc, char** argv)
     options._appWindowParams.FullScreen = flagFullscreen;
 
     options._heartbeatCallback = [&runtimeCompiler]() -> std::shared_ptr<BABYLON::IRenderableScene> {
-      runtimeCompiler.MainLoop();
-      return nullptr;
+      std::shared_ptr<BABYLON::IRenderableScene> newScene = runtimeCompiler.Heartbeat();
+      return newScene;
     };
 
     runSceneWithInspector(scene, options);

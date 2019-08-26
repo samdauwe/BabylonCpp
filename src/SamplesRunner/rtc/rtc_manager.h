@@ -4,11 +4,8 @@
 #include <RuntimeObjectSystem/IObjectFactorySystem.h>
 #include <RuntimeObjectSystem/ObjectInterface.h>
 #include <RuntimeCompiler/AUArray.h>
-
-#ifndef _WIN32
-int _getche();
-#endif
-
+#include <memory>
+#include <babylon/interfaces/irenderable_scene.h>
 
 struct IRuntimeObjectSystem;
 
@@ -24,7 +21,7 @@ public:
 	virtual ~RtcManager();
 
 	bool Init();
-	void MainLoop();
+	std::shared_ptr<BABYLON::IRenderableScene> Heartbeat();
 
 	// IObjectFactoryListener
   virtual void OnConstructorsAdded();
@@ -36,12 +33,13 @@ private:
   void SetLibraryPath();
 
 	// Runtime Systems
-	ICompilerLogger*		m_pCompilerLogger;
-	IRuntimeObjectSystem*	m_pRuntimeObjectSystem;
+	ICompilerLogger*		_compilerLogger;
+	IRuntimeObjectSystem*	_runtimeObjectSystem;
 
 	// Runtime object
-	ISceneProducer* 			m_pUpdateable;
-	ObjectId	   			m_ObjectId;
+	ISceneProducer* 			_sceneProducer;
+	ObjectId	   			_objectId;
+  std::shared_ptr<BABYLON::IRenderableScene> _lastCompiledScene;
 };
 
 } // namespace BABYLON

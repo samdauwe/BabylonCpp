@@ -20,7 +20,9 @@ namespace BABYLON {
     ImGuiUtils::ImGuiRunner::AppWindowParams _appWindowParams;
     
     // If defined, this function will be called at each frame
-    std::function<void(void)> _heartbeatCallback;
+    // If it returns a new renderable scene, it will be displayed
+    using HeartbeatCallback = std::function<std::shared_ptr<IRenderableScene>(void)>;
+    HeartbeatCallback _heartbeatCallback;
   };
 
   void runSceneWithInspector(

@@ -10,9 +10,8 @@
 #include <RuntimeObjectSystem/IObjectFactorySystem.h>
 #include <RuntimeObjectSystem/ObjectFactorySystem/ObjectFactorySystem.h>
 #include <RuntimeObjectSystem/RuntimeObjectSystem.h>
-
-
 #include <RuntimeObjectSystem/IObject.h>
+
 #include <SamplesRunner/rtc/iscene_producer.h>
 #include <SamplesRunner/rtc/interface_ids.h>
 
@@ -33,63 +32,63 @@ namespace BABYLON {
 namespace rtc {
 
 RtcManager::RtcManager()
-	: m_pCompilerLogger(0)
-	, m_pRuntimeObjectSystem(0)
-	, m_pUpdateable(0)
+	: _compilerLogger(0)
+	, _runtimeObjectSystem(0)
+	, _sceneProducer(0)
 {
 }
 
 RtcManager::~RtcManager()
 {
-    if( m_pRuntimeObjectSystem )
+    if( _runtimeObjectSystem )
     {
         // clean temp object files
-        m_pRuntimeObjectSystem->CleanObjectFiles();
+        _runtimeObjectSystem->CleanObjectFiles();
     }
 
-    if( m_pRuntimeObjectSystem && m_pRuntimeObjectSystem->GetObjectFactorySystem() )
+    if( _runtimeObjectSystem && _runtimeObjectSystem->GetObjectFactorySystem() )
     {
-        m_pRuntimeObjectSystem->GetObjectFactorySystem()->RemoveListener(this);
+        _runtimeObjectSystem->GetObjectFactorySystem()->RemoveListener(this);
 
         // delete object via correct interface
-        IObject* pObj = m_pRuntimeObjectSystem->GetObjectFactorySystem()->GetObject( m_ObjectId );
+        IObject* pObj = _runtimeObjectSystem->GetObjectFactorySystem()->GetObject( _objectId );
         delete pObj;
     }
 
-	delete m_pRuntimeObjectSystem;
-	delete m_pCompilerLogger;
+	delete _runtimeObjectSystem;
+	delete _compilerLogger;
 }
 
 
 bool RtcManager::Init()
 {
 	//Initialise the RuntimeObjectSystem
-	m_pRuntimeObjectSystem = new RuntimeObjectSystem;
-	m_pCompilerLogger = new LogSystem();
-	if( !m_pRuntimeObjectSystem->Initialise(m_pCompilerLogger, 0) )
+	_runtimeObjectSystem = new RuntimeObjectSystem;
+	_compilerLogger = new LogSystem();
+	if( !_runtimeObjectSystem->Initialise(_compilerLogger, 0) )
     {
-        m_pRuntimeObjectSystem = 0;
+        _runtimeObjectSystem = 0;
         return false;
     }
-	m_pRuntimeObjectSystem->GetObjectFactorySystem()->AddListener(this);
+	_runtimeObjectSystem->GetObjectFactorySystem()->AddListener(this);
 
   SetIncludePath();
   SetCompileOptions();
   SetLibraryPath();
 
 	// construct first object
-	IObjectConstructor* pCtor = m_pRuntimeObjectSystem->GetObjectFactorySystem()->GetConstructor( "Sandbox" );
+	IObjectConstructor* pCtor = _runtimeObjectSystem->GetObjectFactorySystem()->GetConstructor( "Sandbox" );
 	if( pCtor )
 	{
 		IObject* pObj = pCtor->Construct();
-		pObj->GetInterface( &m_pUpdateable );
-		if( 0 == m_pUpdateable )
+		pObj->GetInterface( &_sceneProducer );
+		if( 0 == _sceneProducer )
 		{
 			delete pObj;
-			m_pCompilerLogger->LogError("Error - no updateable interface found\n");
+			_compilerLogger->LogError("Error - no updateable interface found\n");
 			return false;
 		}
-		m_ObjectId = pObj->GetObjectId();
+		_objectId = pObj->GetObjectId();
 
 	}
 
@@ -99,7 +98,7 @@ bool RtcManager::Init()
 void RtcManager::SetCompileOptions()
 {
 #ifdef _MSC_VER
-  m_pRuntimeObjectSystem->SetAdditionalCompileOptions("/std:c++17");
+  _runtimeObjectSystem->SetAdditionalCompileOptions("/std:c++17");
 #endif // _MSC_VER
 }
 
@@ -107,30 +106,30 @@ void RtcManager::SetCompileOptions()
 void RtcManager::SetLibraryPath()
 {
   auto libPath = FileSystemUtils::GetExePath().ParentPath().ParentPath() / "lib";
-  m_pRuntimeObjectSystem->AddLibraryDir(libPath.c_str());
+  _runtimeObjectSystem->AddLibraryDir(libPath.c_str());
 }
 
 void RtcManager::SetIncludePath()
 {
-  FileSystemUtils::Path basePath = m_pRuntimeObjectSystem->FindFile(__FILE__);
+  FileSystemUtils::Path basePath = _runtimeObjectSystem->FindFile(__FILE__);
   FileSystemUtils::Path repoPath = basePath.ParentPath().ParentPath().ParentPath().ParentPath();
   FileSystemUtils::Path repoSrcPath = basePath.ParentPath().ParentPath().ParentPath().ParentPath() / "src";
   FileSystemUtils::Path repoExternalPath = basePath.ParentPath().ParentPath().ParentPath().ParentPath() / "external";
-  m_pRuntimeObjectSystem->AddIncludeDir(repoSrcPath.c_str());
-  m_pRuntimeObjectSystem->AddIncludeDir((repoExternalPath / "RuntimeCompiledCPlusPlus/Aurora").c_str());
-  m_pRuntimeObjectSystem->AddIncludeDir((repoExternalPath / "imgui").c_str());
-  m_pRuntimeObjectSystem->AddIncludeDir((repoExternalPath / "json.hpp").c_str());
-  m_pRuntimeObjectSystem->AddIncludeDir((repoExternalPath / "glad/include").c_str());
-  m_pRuntimeObjectSystem->AddIncludeDir((repoSrcPath / "BabylonCpp/include").c_str());
-  m_pRuntimeObjectSystem->AddIncludeDir((repoSrcPath / "BabylonImGui/include").c_str());
-  m_pRuntimeObjectSystem->AddIncludeDir((repoSrcPath / "MaterialsLibrary/include").c_str());
-  m_pRuntimeObjectSystem->AddIncludeDir((repoSrcPath / "ProceduralTexturesLibrary/include").c_str());
-  m_pRuntimeObjectSystem->AddIncludeDir((repoSrcPath / "Loaders/include").c_str());
-  m_pRuntimeObjectSystem->AddIncludeDir((repoSrcPath / "imgui_utils").c_str());
+  _runtimeObjectSystem->AddIncludeDir(repoSrcPath.c_str());
+  _runtimeObjectSystem->AddIncludeDir((repoExternalPath / "RuntimeCompiledCPlusPlus/Aurora").c_str());
+  _runtimeObjectSystem->AddIncludeDir((repoExternalPath / "imgui").c_str());
+  _runtimeObjectSystem->AddIncludeDir((repoExternalPath / "json.hpp").c_str());
+  _runtimeObjectSystem->AddIncludeDir((repoExternalPath / "glad/include").c_str());
+  _runtimeObjectSystem->AddIncludeDir((repoSrcPath / "BabylonCpp/include").c_str());
+  _runtimeObjectSystem->AddIncludeDir((repoSrcPath / "BabylonImGui/include").c_str());
+  _runtimeObjectSystem->AddIncludeDir((repoSrcPath / "MaterialsLibrary/include").c_str());
+  _runtimeObjectSystem->AddIncludeDir((repoSrcPath / "ProceduralTexturesLibrary/include").c_str());
+  _runtimeObjectSystem->AddIncludeDir((repoSrcPath / "Loaders/include").c_str());
+  _runtimeObjectSystem->AddIncludeDir((repoSrcPath / "imgui_utils").c_str());
 
   FileSystemUtils::Path apiPath = 
     FileSystemUtils::GetExePath().ParentPath().ParentPath().ParentPath() / "src/BabylonCpp/include";
-  m_pRuntimeObjectSystem->AddIncludeDir(apiPath.c_str());
+  _runtimeObjectSystem->AddIncludeDir(apiPath.c_str());
 }
 
 
@@ -138,40 +137,49 @@ void RtcManager::SetIncludePath()
 void RtcManager::OnConstructorsAdded()
 {
 	// This could have resulted in a change of object pointer, so release old and get new one.
-	if( m_pUpdateable )
+	if( _sceneProducer )
 	{
-		IObject* pObj = m_pRuntimeObjectSystem->GetObjectFactorySystem()->GetObject( m_ObjectId );
-		pObj->GetInterface( &m_pUpdateable );
-		if( 0 == m_pUpdateable )
+		IObject* pObj = _runtimeObjectSystem->GetObjectFactorySystem()->GetObject( _objectId );
+		pObj->GetInterface( &_sceneProducer );
+    _lastCompiledScene = _sceneProducer->MakeScene();
+		if( 0 == _sceneProducer )
 		{
 			delete pObj;
-			m_pCompilerLogger->LogError( "Error - no updateable interface found\n");
+			_compilerLogger->LogError( "Error - no updateable interface found\n");
 		}
 	}
 }
 
-void RtcManager::MainLoop()
+std::shared_ptr<BABYLON::IRenderableScene> RtcManager::Heartbeat()
 {
   static int idx = 0;
   idx++;
   if (idx % 20 != 0)
-    return;
+    return nullptr;
 
 	//check status of any compile
-	if( m_pRuntimeObjectSystem->GetIsCompiledComplete() )
+	if( _runtimeObjectSystem->GetIsCompiledComplete() )
 	{
 		// load module when compile complete
-		m_pRuntimeObjectSystem->LoadCompiledModule();
+		_runtimeObjectSystem->LoadCompiledModule();
 	}
 
-	if( !m_pRuntimeObjectSystem->GetIsCompiling() )
+	if( !_runtimeObjectSystem->GetIsCompiling() )
 	{
     static int numUpdates = 0;
 		std::cout << "\nMain Loop. Updates every second. Update: " << numUpdates++ << "\n";
 		const float deltaTime = 1.0f;
-		m_pRuntimeObjectSystem->GetFileChangeNotifier()->Update( deltaTime );
-		m_pUpdateable->Update( deltaTime );
+		_runtimeObjectSystem->GetFileChangeNotifier()->Update( deltaTime );
+		_sceneProducer->Update( deltaTime );
 	}
+
+  std::shared_ptr<BABYLON::IRenderableScene> newScene;
+  if (_lastCompiledScene)
+  {
+    newScene = _lastCompiledScene;
+    _lastCompiledScene.reset();
+  }
+  return newScene;
 }
 
 } // namespace BABYLON
