@@ -23,7 +23,11 @@ public:
     virtual void LogInfo(const char * format, ...);
 
 protected:
-	void LogInternal(const char * format, va_list args);
+  enum class MsgType {
+    Error, Warning, Info
+  };
+
+	void LogInternal(MsgType msgType, const char * format, va_list args);
 	char m_buff[LOGSYSTEM_MAX_BUFFER];
 };
 
