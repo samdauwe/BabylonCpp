@@ -69,9 +69,9 @@ int main(int argc, char** argv)
     options._appWindowParams.FullScreen = flagFullscreen;
 
 #ifdef BABYLON_BUILD_SANDBOX
-    options._heartbeatCallback = [&runtimeCompiler]() -> std::shared_ptr<BABYLON::IRenderableScene> {
-      std::shared_ptr<BABYLON::IRenderableScene> newScene = runtimeCompiler.Heartbeat();
-      return newScene;
+    options._sandboxCompilerCallback = [&runtimeCompiler]() {
+      auto compilerStatus = runtimeCompiler.Heartbeat();
+      return compilerStatus;
     };
 #endif
 

@@ -68,11 +68,14 @@ public:
 
     std::function<bool(void)> showGuiLambda = [this]() -> bool {
       bool r = this->render();
-      if (_appContext._options._heartbeatCallback)
+      for (auto f : _appContext._options._heartbeatCallbacks)
+        f();
+      if (_appContext._options._sandboxCompilerCallback)
       {
-        auto newScene = _appContext._options._heartbeatCallback();
-        if (newScene)
-          setRenderableScene(newScene);
+        SandboxCompilerStatus sandboxCompilerStatus = _appContext._options._sandboxCompilerCallback();
+        if (sandboxCompilerStatus._renderableScene)
+          setRenderableScene(sandboxCompilerStatus._renderableScene);
+        _appContext._isCompiling = sandboxCompilerStatus._isCompiling;
       }
       return r;
     };
@@ -90,7 +93,9 @@ private:
     Scene3d,
     SamplesCodeViewer,
     SampleBrowser,
+#ifdef BABYLON_BUILD_SANDBOX
     SandboxEditor,
+#endif
   };
   static std::map<BabylonInspectorApp::ViewState, std::string> ViewStateLabels;
 
@@ -169,9 +174,10 @@ private:
       _samplesCodeEditor.render();
     else if (_appContext._viewState == ViewState::SampleBrowser)
       _appContext._sampleListComponent.render();
+#ifdef BABYLON_BUILD_SANDBOX
     if (_appContext._viewState == ViewState::SandboxEditor)
       renderSandbox();
-
+#endif
 
     ImGui::EndGroup();
 
@@ -209,9 +215,15 @@ private:
 
   void renderSandbox()
   {
+    ImGui::BeginGroup();
     ImGui::Text("Sandbox!");
     _appContext._sceneWidget->render(getSceneSizeSmall());
+    ImGui::EndGroup();
+
+    if (_appContext._isCompiling)
+      ImGui::TextColored(ImVec4(1., 0., 0., 1.), "Compiling");
     _sandboxCodeEditor.render();
+
   }
 
 
@@ -252,6 +264,7 @@ private:
     ViewState _viewState = ViewState::Scene3d;
     int _frameCounter = 0;
     SceneWithInspectorOptions _options;
+    bool _isCompiling = false;
 
     struct
     {
@@ -271,7 +284,9 @@ std::map<BabylonInspectorApp::ViewState, std::string> BabylonInspectorApp::ViewS
 { BabylonInspectorApp::ViewState::Scene3d, ICON_FA_CUBE " 3D Scene"},
 { BabylonInspectorApp::ViewState::SampleBrowser, ICON_FA_PALETTE " Browse samples"},
 { BabylonInspectorApp::ViewState::SamplesCodeViewer, ICON_FA_EDIT " Samples Code Viewer"},
+#ifdef BABYLON_BUILD_SANDBOX
 { BabylonInspectorApp::ViewState::SandboxEditor, ICON_FA_FLASK " Sandbox"},
+#endif
 };
 
 

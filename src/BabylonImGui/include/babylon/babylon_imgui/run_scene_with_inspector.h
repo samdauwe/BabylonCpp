@@ -10,6 +10,12 @@
 
 namespace BABYLON {
 
+  struct SandboxCompilerStatus
+  {
+    std::shared_ptr<IRenderableScene> _renderableScene = nullptr;
+    bool _isCompiling = false;
+  };
+
   struct SceneWithInspectorOptions
   {
     inline SceneWithInspectorOptions() {
@@ -20,9 +26,13 @@ namespace BABYLON {
     ImGuiUtils::ImGuiRunner::AppWindowParams _appWindowParams;
     
     // If defined, this function will be called at each frame
-    // If it returns a new renderable scene, it will be displayed
-    using HeartbeatCallback = std::function<std::shared_ptr<IRenderableScene>(void)>;
-    HeartbeatCallback _heartbeatCallback;
+    // Place your callback here.
+    using HeartbeatCallback = std::function<void(void)>;
+    std::vector<HeartbeatCallback> _heartbeatCallbacks;
+
+    // this callback is used by  the sandbox compiler
+    using SandboxCompilerCallback = std::function<SandboxCompilerStatus(void)>;
+    SandboxCompilerCallback _sandboxCompilerCallback;
   };
 
   void runSceneWithInspector(

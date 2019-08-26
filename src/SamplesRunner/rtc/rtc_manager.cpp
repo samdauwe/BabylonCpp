@@ -154,13 +154,8 @@ void RtcManager::OnConstructorsAdded()
 	}
 }
 
-std::shared_ptr<BABYLON::IRenderableScene> RtcManager::Heartbeat()
+BABYLON::SandboxCompilerStatus RtcManager::Heartbeat()
 {
-  static int idx = 0;
-  idx++;
-  if (idx % 20 != 0)
-    return nullptr;
-
 	//check status of any compile
 	if( _runtimeObjectSystem->GetIsCompiledComplete() )
 	{
@@ -168,22 +163,27 @@ std::shared_ptr<BABYLON::IRenderableScene> RtcManager::Heartbeat()
 		_runtimeObjectSystem->LoadCompiledModule();
 	}
 
-	if( !_runtimeObjectSystem->GetIsCompiling() )
+	if(_runtimeObjectSystem->GetIsCompiling() )
 	{
-    static int numUpdates = 0;
-		std::cout << "\nMain Loop. Updates every second. Update: " << numUpdates++ << "\n";
-		const float deltaTime = 1.0f;
-		_runtimeObjectSystem->GetFileChangeNotifier()->Update( deltaTime );
-		_sceneProducer->Update( deltaTime );
+    BABYLON::SandboxCompilerStatus r;
+    r._isCompiling = true;
+    return r;
 	}
+  else
+  {
+    const float deltaTime = 1.0f;
+    _runtimeObjectSystem->GetFileChangeNotifier()->Update(deltaTime);
+    _sceneProducer->Update(deltaTime);
+  }
 
-  std::shared_ptr<BABYLON::IRenderableScene> newScene;
   if (_lastCompiledScene)
   {
-    newScene = _lastCompiledScene;
+    BABYLON::SandboxCompilerStatus r;
+    r._renderableScene = _lastCompiledScene;
     _lastCompiledScene.reset();
+    return r;
   }
-  return newScene;
+  return BABYLON::SandboxCompilerStatus();
 }
 
 } // namespace BABYLON

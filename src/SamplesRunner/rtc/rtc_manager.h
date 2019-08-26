@@ -6,6 +6,7 @@
 #include <RuntimeCompiler/AUArray.h>
 #include <memory>
 #include <babylon/interfaces/irenderable_scene.h>
+#include <babylon/babylon_imgui/run_scene_with_inspector.h>
 
 struct IRuntimeObjectSystem;
 
@@ -21,7 +22,7 @@ public:
 	virtual ~RtcManager();
 
 	bool Init();
-	std::shared_ptr<BABYLON::IRenderableScene> Heartbeat();
+  BABYLON::SandboxCompilerStatus Heartbeat();
 
 	// IObjectFactoryListener
   virtual void OnConstructorsAdded();
