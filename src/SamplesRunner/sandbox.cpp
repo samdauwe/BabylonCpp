@@ -3,55 +3,97 @@
 // This is the sandbox : you can here enter / modify code during 
 // the execution, and the scene will be updated automatically!
 // You do not need to exit the application!
-
+//
 // Do not remove the include below, 
 // it is needed to enable "Runtime Compilation"
 #include "SamplesRunner/rtc/sandbox_autocompile.h"
 
 // You can edit the code below freely (add includes, modify the scene, etc)
-#include <babylon/cameras/free_camera.h>
+#include <babylon/cameras/arc_rotate_camera.h>
+#include <babylon/core/random.h>
+#include <babylon/engines/scene.h>
 #include <babylon/lights/hemispheric_light.h>
+#include <babylon/materials/standard_material.h>
+#include <babylon/materials/textures/texture.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/morph/morph_target_manager.h>
 
-struct SandboxScene : public BABYLON::IRenderableScene
-{
-  SandboxScene() : IRenderableScene() {}
-  const char* getName() override { return "Hello Scene"; }
+using namespace BABYLON;
 
-  void initializeScene(BABYLON::ICanvas* canvas, BABYLON::Scene* scene) override
+class SandboxScene : public IRenderableScene {
+
+public:
+  SandboxScene(ICanvas* iCanvas = nullptr) : IRenderableScene(iCanvas), _angle{0.f}, _target0{nullptr} {};
+  ~SandboxScene() override = default;
+
+  const char* getName() override
   {
-    using namespace BABYLON;
-    // Create a FreeCamera, and set its position to (x:0, y:5, z:-10)
-    auto camera = FreeCamera::New("camera1", Vector3(0, 5, -10), scene);
-
-    // Target the camera to scene origin
-    camera->setTarget(Vector3::Zero());
-
-    // Attach the camera to the canvas
-    camera->attachControl(canvas, true);
-
-    // Create a basic light, aiming 0,1,0 - meaning, to the sky
-    auto light = HemisphericLight::New("light1", Vector3(0, 1, 0), scene);
-
-    // Default intensity is 1. Let's dim the light a small amount
-    light->intensity = 0.7f;
-
-    // Create a built-in "sphere" shape; its constructor takes 5 params: name,
-    // subdivs, size, scene
-    auto sphere = Mesh::CreateSphere("sphere1", 16, 1.5f, scene);
-
-    // Move the sphere upward 1/2 of its height
-    sphere->position().y = 1.f;
-
-    // Create a built-in "ground" shape.
-    // Params: name, width, depth, subdivs, scene
-    Mesh::CreateGround("ground1", 6, 6, 2, scene);
+    return "Animated Morph Target Scene";
   }
-};
 
+  void initializeScene(ICanvas* canvas, Scene* scene) override
+{
+  // This creates and positions a free camera (non-mesh)
+  auto camera = ArcRotateCamera::New("camera1", 1.14f, 1.13f, 10.f,
+                                     Vector3::Zero(), scene);
 
+  // This targets the camera to scene origin
+  camera->setTarget(Vector3::Zero());
 
+  // This attaches the camera to the canvas
+  camera->attachControl(canvas, true);
 
+  // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
+  auto light = HemisphericLight::New("light1", Vector3(0.f, 1.f, 0.f), scene);
+
+  // Default intensity is 1. Let's dim the light a small amount
+  light->intensity = 0.7f;
+
+  // Our built-in 'sphere' shape. Params: name, subdivs, size, scene
+  auto sphere = Mesh::CreateSphere("sphere1", 16, 2.f, scene, true);
+
+  auto materialSphere            = StandardMaterial::New("mat", scene);
+  materialSphere->diffuseTexture = Texture::New("textures/misc.jpg", scene);
+
+  sphere->material = materialSphere;
+
+  auto sphere2 = Mesh::CreateSphere("sphere2", 16, 2, scene);
+  sphere2->setEnabled(false);
+  sphere2->updateMeshPositions(
+    [this](Float32Array& data) -> void { _scrambleUp(data); });
+
+  auto manager               = MorphTargetManager::New(scene);
+  sphere->morphTargetManager = manager;
+
+  _target0 = MorphTarget::FromMesh(sphere2, "sphere2", 0.25);
+  manager->addTarget(_target0);
+
+  scene->registerBeforeRender([this](Scene*, EventState&) {
+    _target0->influence = std::sin(_angle) * std::sin(_angle);
+    _angle += 0.01f;
+  });
+}  
+
+private:
+  void _scrambleUp(Float32Array& data)
+  {
+  for (size_t index = 0; index < data.size(); ++index) {
+    data[index] += 0.4f * Math::random();
+  }
+}
+
+  void _scrambleDown(Float32Array& data)
+  {
+  for (size_t index = 0; index < data.size(); ++index) {
+    data[index] -= 0.4f * Math::random();
+  }
+}
+
+private:
+  float _angle;
+  MorphTargetPtr _target0;
+
+}; // end of class AnimatedMorphTargetScene
 
 
 
@@ -64,6 +106,9 @@ std::shared_ptr<BABYLON::IRenderableScene> Sandbox::MakeScene() {
 }
 
 #endif // #ifdef BABYLON_BUILD_SANDBOX
+
+
+
 
 
 
