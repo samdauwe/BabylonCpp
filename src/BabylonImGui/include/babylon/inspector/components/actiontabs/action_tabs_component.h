@@ -55,7 +55,6 @@ private:
   std::unique_ptr<PropertyGridTabComponent> _propertyGridTabComponent;
   std::unique_ptr<DebugTabComponent> _debugTabComponent;
   std::unique_ptr<StatisticsTabComponent> _statisticsTabComponent;
-  std::unique_ptr<LogsTabComponent> _logsTabComponent;
   // Observers
   Observer<EntityInfo>::Ptr _onSelectionChangeObserver;
 
