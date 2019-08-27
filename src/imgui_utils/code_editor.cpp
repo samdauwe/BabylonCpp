@@ -75,10 +75,6 @@ public:
   TextEditor & getTextEditor() { return _textEditor;  }
 
 private:
-  bool isTextModified()
-  {
-
-  }
   bool canSave()
   {
     if (_textEditor.IsReadOnly())
@@ -206,7 +202,7 @@ private:
 class MultipleCodeEditorImpl
 {
 public:
-  MultipleCodeEditorImpl(bool showCheckboxReadOnly) 
+  MultipleCodeEditorImpl(bool showCheckboxReadOnly)
     : _showCheckboxReadOnly(showCheckboxReadOnly)
   {
     if (!_showCheckboxReadOnly)
