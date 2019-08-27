@@ -5,7 +5,11 @@
 #define LIB_SUFFIX ".lib"
 #endif
 #else
+#ifndef NDEBUG
+#define LIB_SUFFIX "_d"
+#else
 #define LIB_SUFFIX ""
+#endif
 #endif
 #ifdef _WIN32
 #define LIB_PREFIX ""

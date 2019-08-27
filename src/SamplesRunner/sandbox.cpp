@@ -97,10 +97,9 @@ private:
 
 
 
-
 ////////////////////////////////////////////
 // Do not edit below, these lines enable the Runtime Compilation
-REGISTERCLASS(Sandbox);
+REGISTERCLASS(Sandbox)
 std::shared_ptr<BABYLON::IRenderableScene> Sandbox::MakeScene() {
   return std::make_shared<SandboxScene>();
 }

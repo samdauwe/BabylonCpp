@@ -10,7 +10,7 @@ namespace rtc {
 
 struct ISceneProducer : public IObject
 {
-	virtual void Update( float deltaTime ) {}
+	virtual void Update( float deltaTime ) { (void) deltaTime; }
   virtual std::shared_ptr<BABYLON::IRenderableScene> MakeScene() = 0;
 };
 
