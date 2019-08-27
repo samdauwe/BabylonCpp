@@ -253,7 +253,8 @@ TEST(TestVector3, Divide)
     EXPECT_FLOAT_EQ(c.y, 1.f);
     EXPECT_FLOAT_EQ(c.z, 1.f);
 
-    c /= c;
+    Vector3 cc = c;
+    c /= cc;
     EXPECT_FLOAT_EQ(c.x, 1.f);
     EXPECT_FLOAT_EQ(c.y, 1.f);
     EXPECT_FLOAT_EQ(c.z, 1.f);
