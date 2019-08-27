@@ -104,7 +104,7 @@ void RtcManager::SetCompileOptions()
 #ifdef _MSC_VER
   _runtimeObjectSystem->SetAdditionalCompileOptions("/std:c++17 /DBABYLON_BUILD_SANDBOX");
 #else
-  _runtimeObjectSystem->SetAdditionalCompileOptions("-DBABYLON_BUILD_SANDBOX");
+  _runtimeObjectSystem->SetAdditionalCompileOptions("-std=c++17 -DBABYLON_BUILD_SANDBOX");
 #endif // _MSC_VER
 }
 
