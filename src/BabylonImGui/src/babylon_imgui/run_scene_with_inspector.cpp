@@ -1,5 +1,6 @@
 #include <imgui_utils/icons_font_awesome_5.h>
 #include <babylon/babylon_imgui/run_scene_with_inspector.h>
+#include <babylon/babylon_imgui/babylon_logs_window.h>
 #include <imgui_utils/app_runner/imgui_runner.h>
 #include <babylon/GL/framebuffer_canvas.h>
 #include <babylon/core/filesystem.h>
@@ -77,6 +78,7 @@ public:
           setRenderableScene(sandboxCompilerStatus._renderableScene);
         _appContext._isCompiling = sandboxCompilerStatus._isCompiling;
       }
+
       return r;
     };
     auto initSceneLambda = [&]() {
@@ -162,8 +164,10 @@ private:
 
     ShowTabBarEnum(ViewStateLabels, &_appContext._viewState);
 
-    ImGui::SameLine(0.f, 150.f);
-    if (ImGui::Button(ICON_FA_DOOR_OPEN  "Exit"))
+    ImGui::SameLine(0.f, 80.f);
+    BABYLON::BabylonLogsWindow::instance().render();
+    ImGui::SameLine();
+    if (ImGui::Button(ICON_FA_DOOR_OPEN  " Exit"))
       shallExit = true;
 
     ImGui::Separator();
@@ -215,13 +219,16 @@ private:
 
   void renderSandbox()
   {
+    //ImGui::ShowDemoWindow();
     ImGui::BeginGroup();
     ImGui::Text("Sandbox!");
     _appContext._sceneWidget->render(getSceneSizeSmall());
     ImGui::EndGroup();
 
-    if (_appContext._isCompiling)
+    if (_appContext._isCompiling) {
       ImGui::TextColored(ImVec4(1., 0., 0., 1.), "Compiling");
+      BabylonLogsWindow::instance().setVisible(true);
+    }
     _sandboxCodeEditor.render();
 
   }
