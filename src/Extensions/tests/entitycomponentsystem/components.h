@@ -9,18 +9,16 @@ struct vec3 {
   float x, y, z;
 };
 
-using namespace BABYLON::Extensions::ECS;
-
-struct PositionComponent : Component, vec3 {
+struct PositionComponent : BABYLON::Extensions::ECS::Component, vec3 {
 };
-struct VelocityComponent : Component, vec3 {
+struct VelocityComponent : BABYLON::Extensions::ECS::Component, vec3 {
 };
 
-struct PlayerComponent : Component {
+struct PlayerComponent : BABYLON::Extensions::ECS::Component {
   std::string name;
 };
 
-struct NPCComponent : Component {
+struct NPCComponent : BABYLON::Extensions::ECS::Component {
   std::string name;
 
   enum Type { MOVING = 0, STILL, MAGICAL } type;
