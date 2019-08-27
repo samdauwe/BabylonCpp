@@ -88,6 +88,8 @@ namespace ImGuiAl
       m_ScrollToBottom = true;
     }
     
+    void CopyToClipboard();
+
     void Iterate( IterateFunc iterator, bool apply_filters, void* ud );
     
     int Draw();

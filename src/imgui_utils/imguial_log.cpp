@@ -23,8 +23,12 @@ SOFTWARE.
 */
 
 #include "imguial_log.h"
+#include <imgui_utils/icons_font_awesome_5.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string>
+#include <vector>
+#include <sstream>
 
 ImGuiAl::Log::~Log()
 {
@@ -234,7 +238,14 @@ int ImGuiAl::Log::Draw()
       }
     }
   }
-  
+
+  if (ImGui::Button(ICON_FA_RECYCLE "Clear##3234"))
+    Clear();
+  ImGui::SameLine();
+  if (ImGui::Button(ICON_FA_COPY "Copy##3234"))
+    CopyToClipboard();
+
+  ImGui::ShowDemoWindow();
   if ( ( m_FilterHeaderLabel && ImGui::CollapsingHeader( m_FilterHeaderLabel ) ) || ( m_Flags & kShowFilters ) != 0 )
   {
     ImGui::PushStyleColor( ImGuiCol_Button, m_Colors[ kDebug ][ 1 ].Value );
@@ -386,4 +397,31 @@ size_t ImGuiAl::Log::Peek( size_t pos, void* data, size_t size )
   memcpy( (char*)data + first, m_Buffer, second );
   
   return ( pos + size ) % IMGUIAL_LOG_MAX_BUFFER_SIZE;
+}
+
+
+std::vector<std::string> clipboardLines;
+
+void ImGuiAl::Log::CopyToClipboard()
+{
+  struct IteratorClipboard
+  {
+    static bool Func(Level level, const char* line, void *ud)
+    {
+      (void)level;
+      (void)ud;
+      clipboardLines.push_back(line);
+      return true;
+    }
+  };
+
+  clipboardLines.clear();
+  Iterate(IteratorClipboard::Func, true, this);
+  std::stringstream ss;
+  for (auto s : clipboardLines)
+    ss << s << "\n";
+
+  ImGui::LogToClipboard();
+  ImGui::LogText(ss.str().c_str());
+  ImGui::LogFinish();
 }
