@@ -67,12 +67,12 @@ namespace BABYLON
     }
 
     if (ImGui::Button(ICON_FA_INFO " Logs"))
-      _visible = true;
+      _visible = !_visible;
 
     if (_visible)
     {
-      ImGui::SetNextWindowSize(ImVec2(800, 300), ImGuiCond_Once);
-      ImGui::SetNextWindowPos(ImVec2(30, 60), ImGuiCond_Once);
+      ImGui::SetNextWindowSize(ImVec2(800, 300), ImGuiCond_FirstUseEver);
+      ImGui::SetNextWindowPos(ImVec2(30, 60), ImGuiCond_FirstUseEver);
       ImGui::Begin("Logs", &_visible);
       _logImpl->Draw();
       ImGui::End();
