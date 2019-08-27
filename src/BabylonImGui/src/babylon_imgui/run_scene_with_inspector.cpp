@@ -223,7 +223,8 @@ private:
   {
     //ImGui::ShowDemoWindow();
     ImGui::BeginGroup();
-    ImGui::Text("Sandbox!");
+    ImGui::Text("Sandbox : you can edit the code below!");
+    ImGui::Text("As soon as you save it, the code will be compiled and the 3D scene will be updated");
     _appContext._sceneWidget->render(getSceneSizeSmall());
     ImGui::EndGroup();
 
