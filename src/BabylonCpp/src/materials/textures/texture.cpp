@@ -498,14 +498,14 @@ BaseTexturePtr Texture::Parse(const json& parsedTexture, Scene* scene,
             !generateMipMaps);
         }
         else {
-          auto url = rootUrl + json_util::get_string(parsedTexture, "name");
+          auto url2 = rootUrl + json_util::get_string(parsedTexture, "name");
 
           if (Texture::UseSerializedUrlIfAny
               && json_util::has_valid_key_value(parsedTexture, "url")) {
-            url = json_util::get_string(parsedTexture, "url");
+            url2 = json_util::get_string(parsedTexture, "url");
           }
           texture
-            = Texture::New(url, scene, !generateMipMaps,
+            = Texture::New(url2, scene, !generateMipMaps,
                            json_util::get_bool(parsedTexture, "invertY", true));
         }
 

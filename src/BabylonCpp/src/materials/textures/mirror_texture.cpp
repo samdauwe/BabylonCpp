@@ -52,24 +52,24 @@ MirrorTexture::MirrorTexture(const std::string& iName,
       });
 
   onBeforeRenderObservable.add([this](int*, EventState&) {
-    auto scene = getScene();
+    auto scene_ = getScene();
     Matrix::ReflectionToRef(mirrorPlane, _mirrorMatrix);
-    _savedViewMatrix = scene->getViewMatrix();
+    _savedViewMatrix = scene_->getViewMatrix();
     _mirrorMatrix.multiplyToRef(_savedViewMatrix, _transformMatrix);
-    scene->setTransformMatrix(_transformMatrix, scene->getProjectionMatrix());
-    scene->clipPlane                  = mirrorPlane;
-    scene->getEngine()->cullBackFaces = false;
-    scene->setMirroredCameraPosition(Vector3::TransformCoordinates(
-      scene->activeCamera()->globalPosition(), _mirrorMatrix));
+    scene_->setTransformMatrix(_transformMatrix, scene_->getProjectionMatrix());
+    scene_->clipPlane                  = mirrorPlane;
+    scene_->getEngine()->cullBackFaces = false;
+    scene_->setMirroredCameraPosition(Vector3::TransformCoordinates(
+      scene_->activeCamera()->globalPosition(), _mirrorMatrix));
   });
 
   onAfterRenderObservable.add([this](int*, EventState&) {
-    auto scene = getScene();
-    scene->setTransformMatrix(_savedViewMatrix, scene->getProjectionMatrix());
-    scene->getEngine()->cullBackFaces = true;
-    scene->_mirroredCameraPosition.reset(nullptr);
+    auto scene_ = getScene();
+    scene_->setTransformMatrix(_savedViewMatrix, scene->getProjectionMatrix());
+    scene_->getEngine()->cullBackFaces = true;
+    scene_->_mirroredCameraPosition.reset(nullptr);
 
-    scene->clipPlane = std::nullopt;
+    scene_->clipPlane = std::nullopt;
   });
 }
 

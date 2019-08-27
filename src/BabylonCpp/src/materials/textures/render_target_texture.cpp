@@ -593,8 +593,8 @@ void RenderTargetTexture::unbindFrameBuffer(Engine* engine,
     return;
   }
   engine->unBindFramebuffer(_texture, isCube, [&, faceIndex]() {
-    auto _faceIndex = static_cast<int>(faceIndex);
-    onAfterRenderObservable.notifyObservers(&_faceIndex);
+    auto i_faceIndex = static_cast<int>(faceIndex);
+    onAfterRenderObservable.notifyObservers(&i_faceIndex);
   });
 }
 

@@ -1333,8 +1333,8 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
     _processRendering(
       subMesh, effect, static_cast<int>(fillMode), batch,
       hardwareInstancedRendering,
-      [&](bool isInstance, Matrix world, Material* _effectiveMaterial) {
-        _onBeforeDraw(isInstance, world, _effectiveMaterial);
+      [&](bool isInstance, Matrix world, Material* effectiveMaterial) {
+        _onBeforeDraw(isInstance, world, effectiveMaterial);
       },
       _effectiveMaterial.get());
     engine->setState(true, _effectiveMaterial->zOffset, false, reverse);
@@ -1344,8 +1344,8 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
   _processRendering(
     subMesh, effect, static_cast<int>(fillMode), batch,
     hardwareInstancedRendering,
-    [&](bool isInstance, Matrix world, Material* _effectiveMaterial) {
-      _onBeforeDraw(isInstance, world, _effectiveMaterial);
+    [&](bool isInstance, Matrix world, Material* effectiveMaterial) {
+      _onBeforeDraw(isInstance, world, effectiveMaterial);
     });
 
   // Unbind
