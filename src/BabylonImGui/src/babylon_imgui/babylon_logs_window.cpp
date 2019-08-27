@@ -33,8 +33,6 @@ namespace BABYLON
     // Initialize
     static const char* actions[] =
     {
-      ICON_FA_COPY " Copy",
-      ICON_FA_RECYCLE " Clear",
       NULL
     };
 
