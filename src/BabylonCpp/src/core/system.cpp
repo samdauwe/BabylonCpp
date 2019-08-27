@@ -16,6 +16,8 @@ std::string getExecutablePath()
   char filename[3000];
   GetModuleFileName(NULL, filename, 3000);
   return std::string(filename);
+#elif __APPLE__
+  return "./";
 #else
   char filename[PATH_MAX];
   ssize_t count = readlink("/proc/self/exe", filename, PATH_MAX);

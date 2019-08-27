@@ -4,6 +4,7 @@
 #include <imgui_utils/app_runner/imgui_runner.h>
 #include <babylon/GL/framebuffer_canvas.h>
 #include <babylon/core/filesystem.h>
+#include <babylon/core/system.h>
 
 #include <babylon/core/logging.h>
 #include <babylon/samples/samples_index.h>
@@ -43,6 +44,7 @@ namespace
 
 }
 
+#include <iostream>
 
 namespace BABYLON
 {
@@ -54,10 +56,10 @@ class BabylonInspectorApp {
 public:
 
   BabylonInspectorApp() {
-    std::string sandboxPath = 
-      BABYLON::Filesystem::absolutePath(
-          BABYLON::Filesystem::baseDir(__FILE__) 
-        + "../../../../SamplesRunner/sandbox.cpp");
+    std::string exePath = BABYLON::System::getExecutablePath();
+    std::string exeFolder = BABYLON::Filesystem::baseDir(exePath);
+    std::string sandboxPath = exeFolder + "/../../../src/SamplesRunner/sandbox.cpp";
+    sandboxPath = BABYLON::Filesystem::absolutePath(sandboxPath);
     _sandboxCodeEditor.setFiles({ sandboxPath });
   }
   void RunApp(
