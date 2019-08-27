@@ -16,6 +16,8 @@
 
 #include <SamplesRunner/rtc/iscene_producer.h>
 #include <SamplesRunner/rtc/interface_ids.h>
+#include <babylon/core/system.h>
+#include <babylon/core/filesystem.h>
 
 #include <iostream>
 #include <sstream>
@@ -109,7 +111,10 @@ void RtcManager::SetCompileOptions()
 
 void RtcManager::SetLibraryPath()
 {
-  auto libPath = FileSystemUtils::GetExePath().ParentPath().ParentPath() / "lib";
+  std::string exePath = BABYLON::System::getExecutablePath();
+  std::string exeFolder = BABYLON::Filesystem::baseDir(exePath);
+
+  std::string libPath = BABYLON::Filesystem::absolutePath(exeFolder + "/../lib");
   _runtimeObjectSystem->AddLibraryDir(libPath.c_str());
 }
 
@@ -131,8 +136,9 @@ void RtcManager::SetIncludePath()
   _runtimeObjectSystem->AddIncludeDir((repoSrcPath / "Loaders/include").c_str());
   _runtimeObjectSystem->AddIncludeDir((repoSrcPath / "imgui_utils").c_str());
 
-  FileSystemUtils::Path apiPath = 
-    FileSystemUtils::GetExePath().ParentPath().ParentPath().ParentPath() / "src/BabylonCpp/include";
+  std::string exePath = BABYLON::System::getExecutablePath();
+  std::string exeFolder = BABYLON::Filesystem::baseDir(exePath);
+  std::string apiPath = BABYLON::Filesystem::absolutePath(exeFolder + "/../../src/BabylonCpp/include");
   _runtimeObjectSystem->AddIncludeDir(apiPath.c_str());
 }
 
