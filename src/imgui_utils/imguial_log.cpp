@@ -245,7 +245,6 @@ int ImGuiAl::Log::Draw()
   if (ImGui::Button(ICON_FA_COPY "Copy##3234"))
     CopyToClipboard();
 
-  ImGui::ShowDemoWindow();
   if ( ( m_FilterHeaderLabel && ImGui::CollapsingHeader( m_FilterHeaderLabel ) ) || ( m_Flags & kShowFilters ) != 0 )
   {
     ImGui::PushStyleColor( ImGuiCol_Button, m_Colors[ kDebug ][ 1 ].Value );
