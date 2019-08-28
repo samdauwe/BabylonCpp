@@ -3,7 +3,6 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
-#include <babylon/interfaces/idisposable.h>
 #include <babylon/misc/observable.h>
 #include <babylon/misc/observer.h>
 #include <unordered_map>
@@ -18,7 +17,6 @@ struct EffectCreationOptions;
 class EffectFallbacks;
 class Engine;
 class InternalTexture;
-class IPipelineContext;
 class Matrix;
 class PostProcess;
 class RenderTargetTexture;
@@ -28,7 +26,6 @@ class Vector4;
 using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
 using EffectPtr              = std::shared_ptr<Effect>;
 using InternalTexturePtr     = std::shared_ptr<InternalTexture>;
-using IPipelineContextPtr    = std::shared_ptr<IPipelineContext>;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 namespace GL {
@@ -41,17 +38,11 @@ class IGLUniformLocation;
  * @brief Effect containing vertex and fragment shader that can be executed on
  * an object.
  */
-class BABYLON_SHARED_EXPORT Effect : public IDisposable {
+class BABYLON_SHARED_EXPORT Effect {
 
   friend class Engine;
 
 public:
-  /**
-   * Gets or sets the relative url used to load shaders if using the engine in
-   * non-minified mode
-   */
-  static std::string ShadersRepository;
-
   /**
    * Store of each shader (The can be looked up using effect.key)
    */
@@ -69,7 +60,7 @@ public:
   {
     return std::shared_ptr<Effect>(new Effect(std::forward<Ts>(args)...));
   }
-  ~Effect() override;
+  ~Effect();
 
   /** Properties **/
 
@@ -91,10 +82,10 @@ public:
   Engine* getEngine() const;
 
   /**
-   * @brief The pipeline context for this effect.
-   * @returns the associated pipeline context
+   * @brief The compiled webGL program for the effect
+   * @returns the webGL program.
    */
-  IPipelineContextPtr& getPipelineContext();
+  GL::IGLProgram* getProgram();
 
   /**
    * @brief The set of names of attribute variables for the shader.
@@ -187,9 +178,16 @@ public:
    */
   void _rebuildProgram(
     const std::string& vertexSourceCode, const std::string& fragmentSourceCode,
-    const std::function<void(const IPipelineContextPtr& pipelineContext)>&
-      onCompiled,
+    const std::function<void(GL::IGLProgram* program)>& onCompiled,
     const std::function<void(const std::string& message)>& onError);
+
+  /**
+   * @brief Gets the uniform locations of the the specified variable names
+   * @param names THe names of the variables to lookup.
+   * @returns Array of locations in the same order as variable names.
+   */
+  std::unordered_map<std::string, std::unique_ptr<GL::IGLUniformLocation>>
+  getSpecificUniformLocations(const std::vector<std::string>& names);
 
   /**
    * @brief Prepares the effect
@@ -534,8 +532,7 @@ public:
   /**
    * @brief Release all associated resources.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose();
 
   // Statics
 
@@ -587,8 +584,6 @@ protected:
   Observable<Effect>& get_onBindObservable();
 
 private:
-  int _getSamplerIndex(const std::string& channel);
-  void _checkIsReady();
   void _processShaderConversion(
     const std::string& sourceCode, bool isFragment,
     const std::function<void(const std::string&)>& callback);
@@ -625,8 +620,6 @@ public:
   std::size_t uniqueId;
   /**
    * Observable that will be called when the shader is compiled.
-   * It is recommended to use executeWhenCompile() or to make sure that
-   * scene.isReady() is called to get this observable raised.
    */
   Observable<Effect> onCompileObservable;
   /**
@@ -653,7 +646,7 @@ public:
    * Compiled shader to webGL program.
    * Hidden
    */
-  IPipelineContextPtr _pipelineContext;
+  std::shared_ptr<GL::IGLProgram> _program;
 
 private:
   Observer<Effect>::Ptr _onCompileObserver;
@@ -661,8 +654,7 @@ private:
   Engine* _engine;
   std::unordered_map<std::string, unsigned int> _uniformBuffersNames;
   std::vector<std::string> _uniformsNames;
-  std::vector<std::string> _samplerList;
-  std::unordered_map<std::string, unsigned int> _samplers;
+  std::vector<std::string> _samplers;
   bool _isReady;
   std::string _compilationError;
   std::vector<std::string> _attributesNames;

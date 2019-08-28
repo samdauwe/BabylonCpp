@@ -1656,7 +1656,7 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   auto engine = getScene()->getEngine();
   if (_occlusionQuery) {
     _occlusionDataStorage()->isOcclusionQueryInProgress = false;
-    engine->deleteQuery(_occlusionQuery.get());
+    engine->deleteQuery(_occlusionQuery);
     _occlusionQuery = nullptr;
   }
 
@@ -2096,9 +2096,9 @@ bool AbstractMesh::_checkOcclusionQuery()
   if (isOcclusionQueryInProgress && _occlusionQuery) {
 
     auto isOcclusionQueryAvailable
-      = engine->isQueryResultAvailable(_occlusionQuery.get());
+      = engine->isQueryResultAvailable(_occlusionQuery);
     if (isOcclusionQueryAvailable) {
-      auto occlusionQueryResult = engine->getQueryResult(_occlusionQuery.get());
+      auto occlusionQueryResult = engine->getQueryResult(_occlusionQuery);
 
       dataStorage.isOcclusionQueryInProgress    = false;
       dataStorage.occlusionInternalRetryCounter = 0;
