@@ -194,9 +194,6 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     return;
   }
 
-  // Ensures a consistent color space unpacking of textures cross browser.
-  _gl->pixelStorei(GL::UNPACK_COLORSPACE_CONVERSION_WEBGL, GL::NONE);
-
   _onCanvasFocus = [this]() { onCanvasFocusObservable.notifyObservers(this); };
 
   _onCanvasBlur = [this]() { onCanvasBlurObservable.notifyObservers(this); };
