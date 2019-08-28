@@ -920,7 +920,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
         onCompiled(effect);
       }
 
-      bindSceneUniformBuffer(effect, getScene()->getSceneUniformBuffer().get());
+      bindSceneUniformBuffer(effect, getScene()->getSceneUniformBuffer());
     };
 
     auto join = defines.toString();

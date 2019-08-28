@@ -126,7 +126,7 @@ void InputManager::_processPointerMove(std::optional<PickingInfo>& pickResult,
   auto isMeshPicked
     = (pickResult && pickResult->hit && pickResult->pickedMesh) ? true : false;
   if (isMeshPicked) {
-    scene.setPointerOverMesh(pickResult->pickedMesh);
+    scene.setPointerOverMesh(pickResult->pickedMesh.get());
 
     if (_pointerOverMesh && _pointerOverMesh->actionManager
         && _pointerOverMesh->actionManager->hasPointerTriggers()) {
@@ -553,7 +553,7 @@ void InputManager::attachControl(bool attachUp, bool attachDown,
           // different successive keys pressed without exclusive double click
           // or no double click required
           if (Time::fpTimeSince<long, std::milli>(_previousStartingPointerTime)
-                > Scene::DoubleClickDelay().count()
+                > Scene::DoubleClickDelay.count()
               || btn != _previousButtonPressed) {
             clickInfo.singleClick = true;
             cb(clickInfo, _currentPickResult);
@@ -588,7 +588,7 @@ void InputManager::attachControl(bool attachUp, bool attachDown,
           if (btn == _previousButtonPressed
               && Time::fpTimeSince<long, std::milli>(
                    _previousStartingPointerTime)
-                   < Scene::DoubleClickDelay().count()
+                   < Scene::DoubleClickDelay.count()
               && !_doubleClickOccured) {
             // pointer has not moved for 2 clicks, it's a double click
             if (!clickInfo.hasSwiped() && !_isPointerSwiping()) {
@@ -596,7 +596,7 @@ void InputManager::attachControl(bool attachUp, bool attachDown,
               _doubleClickOccured          = true;
               clickInfo.doubleClick        = true;
               clickInfo.ignore             = false;
-              if (Scene::ExclusiveDoubleClickMode()
+              if (Scene::ExclusiveDoubleClickMode
                   && _previousDelayedSimpleClickTimeout.count() > 0) {
                 // clearTimeout(_previousDelayedSimpleClickTimeout);
               }
@@ -611,7 +611,7 @@ void InputManager::attachControl(bool attachUp, bool attachDown,
               _previousStartingPointerPosition.x = _startingPointerPosition.x;
               _previousStartingPointerPosition.y = _startingPointerPosition.y;
               _previousButtonPressed             = btn;
-              if (Scene::ExclusiveDoubleClickMode()) {
+              if (Scene::ExclusiveDoubleClickMode) {
                 if (_previousDelayedSimpleClickTimeout.count() > 0) {
                   // clearTimeout(_previousDelayedSimpleClickTimeout);
                 }

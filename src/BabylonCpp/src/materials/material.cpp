@@ -447,7 +447,7 @@ void Material::bindView(Effect* effect)
     effect->setMatrix("view", getScene()->getViewMatrix());
   }
   else {
-    bindSceneUniformBuffer(effect, getScene()->getSceneUniformBuffer().get());
+    bindSceneUniformBuffer(effect, getScene()->getSceneUniformBuffer());
   }
 }
 
@@ -457,8 +457,7 @@ void Material::bindViewProjection(const EffectPtr& effect)
     effect->setMatrix("viewProjection", getScene()->getTransformMatrix());
   }
   else {
-    bindSceneUniformBuffer(effect.get(),
-                           getScene()->getSceneUniformBuffer().get());
+    bindSceneUniformBuffer(effect.get(), getScene()->getSceneUniformBuffer());
   }
 }
 
