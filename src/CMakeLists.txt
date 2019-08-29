@@ -36,9 +36,5 @@ endif()
 add_subdirectory(Samples)
 
 #-- Applications --##
-# - Sample Launcher
-add_subdirectory(SampleLauncher)
-# - Studio
-# add_subdirectory(Studio)
-# - Sample Launcher
+# - Sample Runner
 add_subdirectory(SamplesRunner)
