@@ -245,3 +245,5 @@ endif()
 # Copy asset directories
 ## - Fonts
 copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/fonts")
+## - Screenshots
+copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/screenshots")

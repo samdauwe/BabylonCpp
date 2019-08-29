@@ -38,8 +38,13 @@ std::string to_snake_case(const std::string &sPascalCase)
   return ss.str();
 }
 
+#ifdef _WIN32
 const std::string screenshotsFolderCurrent = "../../../assets/screenshots/samples_current/";
 const std::string screenshotsFolderOriginal = "../../../assets/screenshots/samples/";
+#else
+const std::string screenshotsFolderCurrent = "../assets/screenshots/samples_current/";
+const std::string screenshotsFolderOriginal = "../assets/screenshots/samples/";
+#endif
 
 } // end anonymous namespace
 
