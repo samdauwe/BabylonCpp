@@ -4,9 +4,9 @@
 #include <babylon/core/string.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
-#include <imgui_utils/imgui_utils.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_icon_component.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_label_component.h>
+#include <imgui_utils/imgui_utils.h>
 
 namespace BABYLON {
 
@@ -51,10 +51,27 @@ void CameraTreeItemComponent::setActive()
 
 void CameraTreeItemComponent::componentWillMount()
 {
+  const auto& camera      = props.camera;
+  const auto& scene       = camera->getScene();
+  _onActiveCameraObserver = scene->onActiveCameraChanged.add(
+    [this, &camera, &scene](Scene*, EventState&) -> void {
+      // This will deactivate the previous camera when the camera is changed.
+      // Multiple camera's cycle frequently so only do this for single cameras
+      if (state.isActive && scene->activeCameras.size() <= 1) {
+        camera->detachControl(scene->getEngine()->getRenderingCanvas());
+      }
+      state.isActive = scene->activeCamera() == camera;
+    });
 }
 
 void CameraTreeItemComponent::componentWillUnmount()
 {
+  if (_onActiveCameraObserver) {
+    const auto& camera = props.camera;
+    const auto& scene  = camera->getScene();
+
+    scene->onActiveCameraChanged.remove(_onActiveCameraObserver);
+  }
 }
 
 void CameraTreeItemComponent::render()
