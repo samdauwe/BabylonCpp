@@ -2,8 +2,8 @@
 
 #include <babylon/bones/skeleton.h>
 #include <babylon/core/string.h>
-#include <imgui_utils/imgui_utils.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_label_component.h>
+#include <imgui_utils/imgui_utils.h>
 
 namespace BABYLON {
 

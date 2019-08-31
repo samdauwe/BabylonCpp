@@ -1,9 +1,9 @@
 #include <babylon/inspector/components/sceneexplorer/entities/rendering_pipeline_tree_item_component.h>
 
 #include <babylon/core/string.h>
-#include <imgui_utils/imgui_utils.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_label_component.h>
 #include <babylon/postprocesses/renderpipeline/post_process_render_pipeline.h>
+#include <imgui_utils/imgui_utils.h>
 
 namespace BABYLON {
 

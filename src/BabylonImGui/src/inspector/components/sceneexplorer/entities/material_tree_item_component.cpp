@@ -1,9 +1,9 @@
 #include <babylon/inspector/components/sceneexplorer/entities/material_tree_item_component.h>
 
 #include <babylon/core/string.h>
-#include <imgui_utils/imgui_utils.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_label_component.h>
 #include <babylon/materials/material.h>
+#include <imgui_utils/imgui_utils.h>
 
 namespace BABYLON {
 

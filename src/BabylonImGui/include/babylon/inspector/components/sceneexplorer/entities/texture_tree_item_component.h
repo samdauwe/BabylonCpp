@@ -5,8 +5,8 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
-#include <imgui_utils/icons_font_awesome_5.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_specialized_component.h>
+#include <imgui_utils/icons_font_awesome_5.h>
 
 namespace BABYLON {
 
@@ -27,7 +27,7 @@ public:
 
 public:
   TextureTreeItemComponent(const ITextureTreeItemComponentProps& props);
-  virtual ~TextureTreeItemComponent();
+  virtual ~TextureTreeItemComponent() override;
 
   void render() override;
 

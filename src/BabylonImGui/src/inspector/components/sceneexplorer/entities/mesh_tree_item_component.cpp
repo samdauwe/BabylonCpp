@@ -1,10 +1,10 @@
 #include <babylon/inspector/components/sceneexplorer/entities/mesh_tree_item_component.h>
 
 #include <babylon/core/string.h>
-#include <imgui_utils/imgui_utils.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_icon_component.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_label_component.h>
 #include <babylon/meshes/abstract_mesh.h>
+#include <imgui_utils/imgui_utils.h>
 
 namespace BABYLON {
 
