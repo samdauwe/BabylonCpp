@@ -71,7 +71,7 @@ void StatisticsTabComponent::render()
     return;
   }
 
-  const auto engine                 = scene->getEngine();
+  const auto& engine                = scene->getEngine();
   const auto& sceneInstrumentation  = _sceneInstrumentation;
   const auto& engineInstrumentation = _engineInstrumentation;
   const auto& caps                  = engine->getCaps();
@@ -118,32 +118,45 @@ void StatisticsTabComponent::render()
                        / sceneInstrumentation->frameTimeCounter().current()));
     ValueLineComponent::render(
       "Meshes selection",
-      static_cast<float>(sceneInstrumentation->activeMeshesEvaluationTimeCounter().current()),
+      static_cast<float>(
+        sceneInstrumentation->activeMeshesEvaluationTimeCounter().current()),
       std::nullopt, std::nullopt, "ms");
     ValueLineComponent::render(
       "Render targets",
-      static_cast<float>(sceneInstrumentation->renderTargetsRenderTimeCounter().current()),
+      static_cast<float>(
+        sceneInstrumentation->renderTargetsRenderTimeCounter().current()),
       std::nullopt, std::nullopt, "ms");
     ValueLineComponent::render(
-      "Particles", static_cast<float>(sceneInstrumentation->particlesRenderTimeCounter().current()),
+      "Particles",
+      static_cast<float>(
+        sceneInstrumentation->particlesRenderTimeCounter().current()),
       std::nullopt, std::nullopt, "ms");
     ValueLineComponent::render(
-      "Sprites", static_cast<float>(sceneInstrumentation->spritesRenderTimeCounter().current()),
+      "Sprites",
+      static_cast<float>(
+        sceneInstrumentation->spritesRenderTimeCounter().current()),
       std::nullopt, std::nullopt, "ms");
     ValueLineComponent::render(
-      "Animations", static_cast<float>(sceneInstrumentation->animationsTimeCounter().current()),
+      "Animations",
+      static_cast<float>(
+        sceneInstrumentation->animationsTimeCounter().current()),
       std::nullopt, std::nullopt, "ms");
     ValueLineComponent::render(
-      "Physics", static_cast<float>(sceneInstrumentation->physicsTimeCounter().current()),
+      "Physics",
+      static_cast<float>(sceneInstrumentation->physicsTimeCounter().current()),
       std::nullopt, std::nullopt, "ms");
     ValueLineComponent::render(
-      "Render", static_cast<float>(sceneInstrumentation->renderTimeCounter().current()),
+      "Render",
+      static_cast<float>(sceneInstrumentation->renderTimeCounter().current()),
       std::nullopt, std::nullopt, "ms");
     ValueLineComponent::render(
-      "Frame total", static_cast<float>(sceneInstrumentation->frameTimeCounter().current()),
+      "Frame total",
+      static_cast<float>(sceneInstrumentation->frameTimeCounter().current()),
       std::nullopt, std::nullopt, "ms");
     ValueLineComponent::render(
-      "Inter-frame", static_cast<float>(sceneInstrumentation->interFrameTimeCounter().current()),
+      "Inter-frame",
+      static_cast<float>(
+        sceneInstrumentation->interFrameTimeCounter().current()),
       std::nullopt, std::nullopt, "ms");
     ValueLineComponent::render(
       "GPU Frame time",
@@ -180,6 +193,8 @@ void StatisticsTabComponent::render()
     BooleanLineComponent::render("Vertex array object", caps.vertexArrayObject);
     BooleanLineComponent::render("Timer query", caps.timerQuery != nullptr);
     BooleanLineComponent::render("Stencil", engine->isStencilEnable());
+    BooleanLineComponent::render("Parallel shader compilation",
+                                 caps.parallelShaderCompile.has_value());
     ValueLineComponent::render("Max textures units",
                                caps.maxTexturesImageUnits);
     ValueLineComponent::render("Max textures size", caps.maxTextureSize);
