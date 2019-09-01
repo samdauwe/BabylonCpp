@@ -59,10 +59,12 @@ def fileComparisonToStr(fileComparisonDict):
 def main():
     # Versions to compare
     current, previous = "4.0.0", "3.3.0"
+    #current, previous = "4.1.0-alpha.17", "4.0.0"
     # Dictionary mapping from BabylonJs version to relative path
     BabylonJsVersions = {
-        "3.3.0"         : "3.3.0_2018_10_02",
-        "4.0.0"         : "4.0.0_2019_04_30",
+        "3.3.0"          : "3.3.0_2018_10_02",
+        "4.0.0"          : "4.0.0_2019_04_30",
+        "4.1.0-alpha.17" : "4.1.0-alpha.17_2019_08_30",
     }
     # List containing the files to ignore
     whiteList = [
@@ -87,8 +89,6 @@ def main():
         "webXRSessionManager.ts",
         # Debug
         "debugLayer.ts",
-        # Engines
-        "nullEngine.ts",
         # Engines / Extensions
         "engine.webVR.ts",
         # Helpers
@@ -119,6 +119,10 @@ def main():
           "Babylonjs": os.path.join(os.path.expanduser('~'), "Projects",
                                   "Babylon.js-%s" % BabylonJsVersions[version],
                                   "src"),
+          "Babylonjs - Unit Tests": os.path.join(os.path.expanduser('~'),
+                                  "Projects",
+                                  "Babylon.js-%s" % BabylonJsVersions[version],
+                                  "tests", "unit", "babylon"),
           "MaterialsLibrary": os.path.join(os.path.expanduser('~'), "Projects",
                                   "Babylon.js-%s" % BabylonJsVersions[version],
                                   "materialsLibrary", "src"),
