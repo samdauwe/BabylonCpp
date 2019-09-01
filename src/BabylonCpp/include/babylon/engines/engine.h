@@ -65,6 +65,7 @@ using EffectPtr                  = std::shared_ptr<Effect>;
 using IInternalTextureLoaderPtr  = std::shared_ptr<IInternalTextureLoader>;
 using IInternalTextureTrackerPtr = std::shared_ptr<IInternalTextureTracker>;
 using InternalTexturePtr         = std::shared_ptr<InternalTexture>;
+using IPipelineContextPtr        = std::shared_ptr<IPipelineContext>;
 using PassPostProcessPtr         = std::shared_ptr<PassPostProcess>;
 using PostProcessPtr             = std::shared_ptr<PostProcess>;
 using RenderTargetTexturePtr     = std::shared_ptr<RenderTargetTexture>;
@@ -145,6 +146,12 @@ public:
   virtual ~Engine();
 
   /**
+   * @brief Gets a boolean indicating if all created effects are ready
+   * @returns true if all effects are ready
+   */
+  virtual bool areAllEffectsReady() const;
+
+  /**
    * @brief Gets the list of texture formats supported.
    */
   std::vector<std::string>& texturesSupported();
@@ -157,7 +164,7 @@ public:
   /**
    * @brief Gets the current viewport.
    */
-  Viewport* currentViewport() const;
+  std::optional<Viewport>& currentViewport();
 
   /**
    * @brief Gets the default empty texture.
@@ -279,7 +286,7 @@ public:
    * target if any)
    * @returns a number defining the current render width
    */
-  int getRenderWidth(bool useScreen = false) const;
+  virtual int getRenderWidth(bool useScreen = false) const;
 
   /**
    * @brief Gets the current render height.
@@ -287,7 +294,7 @@ public:
    * target if any)
    * @returns a number defining the current render height
    */
-  int getRenderHeight(bool useScreen = false) const;
+  virtual int getRenderHeight(bool useScreen = false) const;
 
   /**
    * @brief Gets the HTML canvas attached with the current webGL context.
@@ -560,8 +567,8 @@ public:
    * @param depth defines if the depth buffer must be cleared
    * @param stencil defines if the stencil buffer must be cleared
    */
-  void clear(const Color4& color, bool backBuffer, bool depth,
-             bool stencil = false);
+  virtual void clear(const Color4& color, bool backBuffer, bool depth,
+                     bool stencil = false);
 
   /**
    * @brief Executes a scissor clear (ie. a clear on a specific portion of the
@@ -589,8 +596,10 @@ public:
    * @param requiredHeight defines the height required for rendering. If not
    * provided the rendering canvas' height is used
    */
-  void setViewport(Viewport& viewport, int requiredWidth = 0,
-                   int requiredHeight = 0);
+  virtual void
+  setViewport(Viewport& viewport,
+              const std::optional<int>& requiredWidth  = std::nullopt,
+              const std::optional<int>& requiredHeight = std::nullopt);
 
   /**
    * @brief Directly set the WebGL Viewport.
@@ -638,14 +647,14 @@ public:
    * @param depthStencilTexture The depth stencil texture to use to render
    * @param lodLevel defines le lod level to bind to the frame buffer
    */
-  void bindFramebuffer(const InternalTexturePtr& texture,
-                       std::optional<unsigned int> faceIndex = std::nullopt,
-                       std::optional<int> requiredWidth      = std::nullopt,
-                       std::optional<int> requiredHeight     = std::nullopt,
-                       std::optional<bool> forceFullscreenViewport
-                       = std::nullopt,
-                       InternalTexture* depthStencilTexture = nullptr,
-                       int lodLevel                         = 0);
+  virtual void
+  bindFramebuffer(const InternalTexturePtr& texture,
+                  std::optional<unsigned int> faceIndex       = std::nullopt,
+                  std::optional<int> requiredWidth            = std::nullopt,
+                  std::optional<int> requiredHeight           = std::nullopt,
+                  std::optional<bool> forceFullscreenViewport = std::nullopt,
+                  InternalTexture* depthStencilTexture        = nullptr,
+                  int lodLevel                                = 0);
 
   /**
    * @brief Unbind the current render target texture from the webGL context.
@@ -655,9 +664,10 @@ public:
    * @param onBeforeUnbind defines a function which will be called before the
    * effective unbind
    */
-  void unBindFramebuffer(const InternalTexturePtr& texture,
-                         bool disableGenerateMipMaps                 = false,
-                         const std::function<void()>& onBeforeUnbind = nullptr);
+  virtual void unBindFramebuffer(const InternalTexturePtr& texture,
+                                 bool disableGenerateMipMaps = false,
+                                 const std::function<void()>& onBeforeUnbind
+                                 = nullptr);
 
   /**
    * @brief Unbind a list of render target textures from the webGL context.
@@ -727,14 +737,14 @@ public:
    * @param data the data for the vertex buffer
    * @returns the new WebGL static buffer
    */
-  GLBufferPtr createVertexBuffer(const Float32Array& vertices);
+  virtual GLBufferPtr createVertexBuffer(const Float32Array& vertices);
 
   /**
    * @brief Creates a dynamic vertex buffer.
    * @param data the data for the dynamic vertex buffer
    * @returns the new WebGL dynamic buffer
    */
-  GLBufferPtr createDynamicVertexBuffer(const Float32Array& vertices);
+  virtual GLBufferPtr createDynamicVertexBuffer(const Float32Array& vertices);
 
   /**
    * @brief Update a dynamic index buffer.
@@ -743,8 +753,9 @@ public:
    * @param offset defines the offset in the target index buffer where update
    * should start
    */
-  void updateDynamicIndexBuffer(const GLBufferPtr& indexBuffer,
-                                const IndicesArray& indices, int offset = 0);
+  virtual void updateDynamicIndexBuffer(const GLBufferPtr& indexBuffer,
+                                        const IndicesArray& indices,
+                                        int offset = 0);
 
   /**
    * @brief Updates a dynamic vertex buffer.
@@ -753,9 +764,10 @@ public:
    * @param byteOffset the byte offset of the data
    * @param byteLength the byte length of the data
    */
-  void updateDynamicVertexBuffer(const GLBufferPtr& vertexBuffer,
-                                 const Float32Array& data, int byteOffset = -1,
-                                 int byteLength = -1);
+  virtual void updateDynamicVertexBuffer(const GLBufferPtr& vertexBuffer,
+                                         const Float32Array& data,
+                                         int byteOffset = -1,
+                                         int byteLength = -1);
 
   /**
    * @brief Creates a new index buffer.
@@ -763,8 +775,8 @@ public:
    * @param updatable defines if the index buffer must be updatable
    * @returns a new webGL buffer
    */
-  GLBufferPtr createIndexBuffer(const IndicesArray& indices,
-                                bool updatable = false);
+  virtual GLBufferPtr createIndexBuffer(const IndicesArray& indices,
+                                        bool updatable = false);
 
   /**
    * @brief Bind a webGL buffer to the webGL context.
@@ -842,7 +854,7 @@ public:
    * @param indexBuffer defines the index buffer to bind
    * @param effect defines the effect associated with the vertex buffers
    */
-  void bindBuffers(
+  virtual void bindBuffers(
     const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers,
     GL::IGLBuffer* indexBuffer, const EffectPtr& effect);
 
@@ -860,7 +872,7 @@ public:
   /**
    * @brief Hidden
    */
-  bool _releaseBuffer(GL::IGLBuffer* buffer);
+  virtual bool _releaseBuffer(GL::IGLBuffer* buffer);
 
   /**
    * @brief Creates a webGL buffer to use with instanciation.
@@ -913,8 +925,8 @@ public:
    * @param instancesCount defines the number of instances to draw (if
    * instanciation is enabled)
    */
-  void draw(bool useTriangles, int indexStart, int indexCount,
-            int instancesCount = 0);
+  virtual void draw(bool useTriangles, int indexStart, int indexCount,
+                    int instancesCount = 0);
 
   /**
    * @brief Draw a list of points.
@@ -946,8 +958,8 @@ public:
    * @param instancesCount defines the number of instances to draw (if
    * instanciation is enabled)
    */
-  void drawElementsType(unsigned int fillMode, int indexStart,
-                        int verticesCount, int instancesCount = 0);
+  virtual void drawElementsType(unsigned int fillMode, int indexStart,
+                                int verticesCount, int instancesCount = 0);
 
   /**
    * @brief Draw a list of unindexed primitives.
@@ -957,8 +969,8 @@ public:
    * @param instancesCount defines the number of instances to draw (if
    * instanciation is enabled)
    */
-  void drawArraysType(unsigned int fillMode, int verticesStart,
-                      int verticesCount, int instancesCount = 0);
+  virtual void drawArraysType(unsigned int fillMode, int verticesStart,
+                              int verticesCount, int instancesCount = 0);
 
   /** Shaders **/
 
@@ -1074,6 +1086,11 @@ public:
     const std::string& defines, GL::IGLRenderingContext* context = nullptr,
     const std::vector<std::string>& transformFeedbackVaryings = {});
 
+  virtual GL::IGLProgramPtr createShaderProgram(
+    const IPipelineContextPtr& pipelineContext, const std::string& vertexCode,
+    const std::string& fragmentCode, const std::string& defines,
+    GL::IGLRenderingContext* context = nullptr);
+
   /**
    * @brief Hidden
    */
@@ -1095,6 +1112,10 @@ public:
   getUniforms(GL::IGLProgram* shaderProgram,
               const std::vector<std::string>& uniformsNames);
 
+  virtual std::unordered_map<std::string, GLUniformLocationPtr>
+  getUniforms(const IPipelineContextPtr& pipelineContext,
+              const std::vector<std::string>& uniformsNames);
+
   /**
    * @brief Gets the lsit of active attributes for a given webGL program.
    * @param shaderProgram defines the webGL program to use
@@ -1104,100 +1125,112 @@ public:
   Int32Array getAttributes(GL::IGLProgram* shaderProgram,
                            const std::vector<std::string>& attributesNames);
 
+  virtual Int32Array
+  getAttributes(const IPipelineContextPtr& pipelineContext,
+                const std::vector<std::string>& attributesNames);
+
   /**
    * @brief Activates an effect, mkaing it the current one (ie. the one used for
    * rendering).
    * @param effect defines the effect to activate
    */
-  void enableEffect(const EffectPtr& effect);
+  virtual void enableEffect(const EffectPtr& effect);
 
   /**
    * @brief Set the value of an uniform to an array of int32.
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of int32 to store
    */
-  void setIntArray(GL::IGLUniformLocation* uniform, const Int32Array& array);
+  virtual void setIntArray(GL::IGLUniformLocation* uniform,
+                           const Int32Array& array);
 
   /**
    * @brief Set the value of an uniform to an array of int32 (stored as vec2).
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of int32 to store
    */
-  void setIntArray2(GL::IGLUniformLocation* uniform, const Int32Array& array);
+  virtual void setIntArray2(GL::IGLUniformLocation* uniform,
+                            const Int32Array& array);
 
   /**
    * @brief Set the value of an uniform to an array of int32 (stored as vec3).
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of int32 to store
    */
-  void setIntArray3(GL::IGLUniformLocation* uniform, const Int32Array& array);
+  virtual void setIntArray3(GL::IGLUniformLocation* uniform,
+                            const Int32Array& array);
 
   /**
    * @brief Set the value of an uniform to an array of int32 (stored as vec4).
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of int32 to store
    */
-  void setIntArray4(GL::IGLUniformLocation* uniform, const Int32Array& array);
+  virtual void setIntArray4(GL::IGLUniformLocation* uniform,
+                            const Int32Array& array);
 
   /**
    * @brief Set the value of an uniform to an array of float32.
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of float32 to store
    */
-  void setFloatArray(GL::IGLUniformLocation* uniform,
-                     const Float32Array& array);
+  virtual void setFloatArray(GL::IGLUniformLocation* uniform,
+                             const Float32Array& array);
 
   /**
    * @brief Set the value of an uniform to an array of float32 (stored as vec2).
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of float32 to store
    */
-  void setFloatArray2(GL::IGLUniformLocation* uniform,
-                      const Float32Array& array);
+  virtual void setFloatArray2(GL::IGLUniformLocation* uniform,
+                              const Float32Array& array);
 
   /**
    * @brief Set the value of an uniform to an array of float32 (stored as vec3).
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of float32 to store
    */
-  void setFloatArray3(GL::IGLUniformLocation* uniform,
-                      const Float32Array& array);
+  virtual void setFloatArray3(GL::IGLUniformLocation* uniform,
+                              const Float32Array& array);
 
   /**
    * @brief Set the value of an uniform to an array of float32 (stored as vec4).
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of float32 to store
    */
-  void setFloatArray4(GL::IGLUniformLocation* uniform,
-                      const Float32Array& array);
+  virtual void setFloatArray4(GL::IGLUniformLocation* uniform,
+                              const Float32Array& array);
 
   /**
    * @brief Set the value of an uniform to an array of number.
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of number to store
    */
-  void setArray(GL::IGLUniformLocation* uniform, const Float32Array& array);
+  virtual void setArray(GL::IGLUniformLocation* uniform,
+                        const Float32Array& array);
 
   /**
    * @brief Set the value of an uniform to an array of number (stored as vec2).
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of number to store
    */
-  void setArray2(GL::IGLUniformLocation* uniform, const Float32Array& array);
+  virtual void setArray2(GL::IGLUniformLocation* uniform,
+                         const Float32Array& array);
 
   /**
    * @brief Set the value of an uniform to an array of number (stored as vec3).
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of number to store
    */
-  void setArray3(GL::IGLUniformLocation* uniform, const Float32Array& array);
+  virtual void setArray3(GL::IGLUniformLocation* uniform,
+                         const Float32Array& array);
 
   /**
    * @brief Set the value of an uniform to an array of number (stored as vec4).
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of number to store
    */
-  void setArray4(GL::IGLUniformLocation* uniform, const Float32Array& array);
+  virtual void setArray4(GL::IGLUniformLocation* uniform,
+                         const Float32Array& array);
 
   /**
    * @brief Set the value of an uniform to an array of float32 (stored as
@@ -1205,45 +1238,45 @@ public:
    * @param uniform defines the webGL uniform location where to store the value
    * @param matrices defines the array of float32 to store
    */
-  void setMatrices(GL::IGLUniformLocation* uniform,
-                   const Float32Array& matrices);
+  virtual void setMatrices(GL::IGLUniformLocation* uniform,
+                           const Float32Array& matrices);
 
   /**
    * @brief Set the value of an uniform to a matrix.
    * @param uniform defines the webGL uniform location where to store the value
    * @param matrix defines the matrix to store
    */
-  void setMatrix(GL::IGLUniformLocation* uniform, const Matrix& matrix);
+  virtual void setMatrix(GL::IGLUniformLocation* uniform, const Matrix& matrix);
 
   /**
    * @brief Set the value of an uniform to a matrix (3x3).
    * @param uniform defines the webGL uniform location where to store the value
    * @param matrix defines the Float32Array representing the 3x3 matrix to store
    */
-  void setMatrix3x3(GL::IGLUniformLocation* uniform,
-                    const Float32Array& matrix);
+  virtual void setMatrix3x3(GL::IGLUniformLocation* uniform,
+                            const Float32Array& matrix);
 
   /**
    * @brief Set the value of an uniform to a matrix (2x2).
    * @param uniform defines the webGL uniform location where to store the value
    * @param matrix defines the Float32Array representing the 2x2 matrix to store
    */
-  void setMatrix2x2(GL::IGLUniformLocation* uniform,
-                    const Float32Array& matrix);
+  virtual void setMatrix2x2(GL::IGLUniformLocation* uniform,
+                            const Float32Array& matrix);
 
   /**
    * @brief Set the value of an uniform to a number (int).
    * @param uniform defines the webGL uniform location where to store the value
    * @param value defines the int number to store
    */
-  void setInt(GL::IGLUniformLocation* uniform, int value);
+  virtual void setInt(GL::IGLUniformLocation* uniform, int value);
 
   /**
    * @brief Set the value of an uniform to a number (float).
    * @param uniform defines the webGL uniform location where to store the value
    * @param value defines the float number to store
    */
-  void setFloat(GL::IGLUniformLocation* uniform, float value);
+  virtual void setFloat(GL::IGLUniformLocation* uniform, float value);
 
   /**
    * @brief Set the value of an uniform to a vec2.
@@ -1251,7 +1284,7 @@ public:
    * @param x defines the 1st component of the value
    * @param y defines the 2nd component of the value
    */
-  void setFloat2(GL::IGLUniformLocation* uniform, float x, float y);
+  virtual void setFloat2(GL::IGLUniformLocation* uniform, float x, float y);
 
   /**
    * @brief Set the value of an uniform to a vec3.
@@ -1260,7 +1293,8 @@ public:
    * @param y defines the 2nd component of the value
    * @param z defines the 3rd component of the value
    */
-  void setFloat3(GL::IGLUniformLocation* uniform, float x, float y, float z);
+  virtual void setFloat3(GL::IGLUniformLocation* uniform, float x, float y,
+                         float z);
 
   /**
    * @brief Set the value of an uniform to a vec3.
@@ -1269,7 +1303,7 @@ public:
    * @param y defines the 2nd component of the value
    * @param z defines the 3rd component of the value
    */
-  void setBool(GL::IGLUniformLocation* uniform, int value);
+  virtual void setBool(GL::IGLUniformLocation* uniform, int value);
 
   /**
    * @brief Set the value of an uniform to a vec4.
@@ -1279,15 +1313,15 @@ public:
    * @param z defines the 3rd component of the value
    * @param w defines the 4th component of the value
    */
-  void setFloat4(GL::IGLUniformLocation* uniform, float x, float y, float z,
-                 float w);
+  virtual void setFloat4(GL::IGLUniformLocation* uniform, float x, float y,
+                         float z, float w);
 
   /**
    * @brief Set the value of an uniform to a Color3.
    * @param uniform defines the webGL uniform location where to store the value
    * @param color3 defines the color to store
    */
-  void setColor3(GL::IGLUniformLocation* uniform, const Color3& color3);
+  virtual void setColor3(GL::IGLUniformLocation* uniform, const Color3& color3);
 
   /**
    * @brief Set the value of an uniform to a Color3 and an alpha value.
@@ -1295,8 +1329,8 @@ public:
    * @param color3 defines the color to store
    * @param alpha defines the alpha component to store
    */
-  void setColor4(GL::IGLUniformLocation* uniform, const Color3& color3,
-                 float alpha);
+  virtual void setColor4(GL::IGLUniformLocation* uniform, const Color3& color3,
+                         float alpha);
 
   /**
    * @brief Sets a Color4 on a uniform variable.
@@ -1315,8 +1349,8 @@ public:
    * @param reverseSide defines if culling must be reversed (CCW instead of CW
    * and CW instead of CCW)
    */
-  void setState(bool culling, float zOffset = 0.f, bool force = false,
-                bool reverseSide = false);
+  virtual void setState(bool culling, float zOffset = 0.f, bool force = false,
+                        bool reverseSide = false);
 
   /**
    * @brief Set the z offset to apply to current rendering.
@@ -1377,7 +1411,7 @@ public:
    * @see
    * http://doc.babylonjs.com/resources/transparency_and_how_meshes_are_rendered
    */
-  void setAlphaMode(unsigned int mode, bool noDepthWriteChange = false);
+  virtual void setAlphaMode(unsigned int mode, bool noDepthWriteChange = false);
 
   /**
    * @brief Gets the current alpha mode.
@@ -1408,7 +1442,7 @@ public:
    * @param bruteForce defines a boolean to force clearing ALL caches (including
    * stencil, detoh and alpha states)
    */
-  void wipeCaches(bool bruteForce = false);
+  virtual void wipeCaches(bool bruteForce = false);
 
   /**
    * @brief Set the compressed texture format to use, based on the formats you
@@ -1436,7 +1470,11 @@ public:
    */
   std::string&
   setTextureFormatToUse(const std::vector<std::string>& formatsAvailable);
-  std::unique_ptr<GL::IGLTexture> _createTexture();
+
+  /**
+   * @brief Hidden
+   */
+  virtual GLTexturePtr _createTexture();
 
   /**
    * @brief Hidden
@@ -1479,9 +1517,9 @@ public:
    * RGBA.  Ignored for compressed textures
    * @returns a InternalTexture for assignment back into BABYLON.Texture
    */
-  InternalTexturePtr createTexture(
+  virtual InternalTexturePtr createTexture(
     const std::string& urlArg, bool noMipmap, bool invertY, Scene* scene,
-    unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
+    unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
     const std::function<void(InternalTexture*, EventState&)>& onLoad = nullptr,
     const std::function<void(const std::string& message,
                              const std::string& exception)>& onError
@@ -1537,12 +1575,12 @@ public:
   /**
    * @brief hidden
    */
-  void _unpackFlipY(bool value);
+  virtual void _unpackFlipY(bool value);
 
   /**
    * @brief hidden
    */
-  int _getUnpackAlignement();
+  virtual int _getUnpackAlignement();
 
   /**
    * @brief Creates a dynamic texture.
@@ -1562,8 +1600,8 @@ public:
    * @param samplingMode defines the required sampling mode
    * @param texture defines the texture to update
    */
-  void updateTextureSamplingMode(unsigned int samplingMode,
-                                 const InternalTexturePtr& texture);
+  virtual void updateTextureSamplingMode(unsigned int samplingMode,
+                                         const InternalTexturePtr& texture);
 
   /**
    * @brief Update the content of a dynamic texture.
@@ -1573,10 +1611,10 @@ public:
    * @param premulAlpha defines if alpha is stored as premultiplied
    * @param format defines the format of the data
    */
-  void updateDynamicTexture(const InternalTexturePtr& texture, ICanvas* canvas,
-                            bool invertY, bool premulAlpha = false,
-                            unsigned int format
-                            = Constants::TEXTUREFORMAT_RGBA);
+  virtual void
+  updateDynamicTexture(const InternalTexturePtr& texture, ICanvas* canvas,
+                       bool invertY, bool premulAlpha = false,
+                       unsigned int format = Constants::TEXTUREFORMAT_RGBA);
 
   /**
    *@brief Updates a depth texture Comparison Mode and Function.
@@ -1615,7 +1653,7 @@ public:
    * @param options defines the options used to create the texture
    * @returns a new render target texture stored in an InternalTexture
    */
-  InternalTexturePtr
+  virtual InternalTexturePtr
   createRenderTargetTexture(const std::variant<ISize, float>& size,
                             const IRenderTargetOptions& options);
 
@@ -1656,33 +1694,33 @@ public:
   /**
    * @brief Hidden
    */
-  void _uploadCompressedDataToTextureDirectly(const InternalTexturePtr& texture,
-                                              unsigned int internalFormat,
-                                              float width, float height,
-                                              const Uint8Array& data,
-                                              unsigned int faceIndex = 0,
-                                              int lod                = 0);
+  virtual void _uploadCompressedDataToTextureDirectly(
+    const InternalTexturePtr& texture, unsigned int internalFormat, float width,
+    float height, const Uint8Array& data, unsigned int faceIndex = 0,
+    int lod = 0);
 
   /**
    * @brief Hidden
    */
-  void _uploadDataToTextureDirectly(const InternalTexturePtr& texture,
-                                    const ArrayBufferView& imageData,
-                                    unsigned int faceIndex = 0, int lod = 0);
+  virtual void _uploadDataToTextureDirectly(const InternalTexturePtr& texture,
+                                            const ArrayBufferView& imageData,
+                                            unsigned int faceIndex = 0,
+                                            int lod                = 0);
 
   /**
    * @brief Hidden
    */
-  void _uploadArrayBufferViewToTexture(const InternalTexturePtr& texture,
-                                       const Uint8Array& imageData,
-                                       unsigned int faceIndex = 0, int lod = 0);
+  virtual void
+  _uploadArrayBufferViewToTexture(const InternalTexturePtr& texture,
+                                  const Uint8Array& imageData,
+                                  unsigned int faceIndex = 0, int lod = 0);
 
   /**
    * @brief Hidden
    */
-  void _uploadImageToTexture(const InternalTexturePtr& texture,
-                             const Image& image, unsigned int faceIndex = 0,
-                             int lod = 0);
+  virtual void _uploadImageToTexture(const InternalTexturePtr& texture,
+                                     const Image& image,
+                                     unsigned int faceIndex = 0, int lod = 0);
 
   /**
    * @brief Creates a new render target cube texture.
@@ -1897,18 +1935,18 @@ public:
   /**
    * @brief Hidden
    */
-  void _releaseTexture(InternalTexture* texture);
+  virtual void _releaseTexture(InternalTexture* texture);
 
   /**
    * @brief Binds an effect to the webGL context.
    * @param effect defines the effect to bind
    */
-  void bindSamplers(Effect& effect);
+  virtual void bindSamplers(Effect& effect);
 
   /**
    * @brief Hidden
    */
-  void _bindTexture(int channel, const InternalTexturePtr& texture);
+  virtual void _bindTexture(int channel, const InternalTexturePtr& texture);
 
   /**
    * @brief Sets a texture to the webGL context from a postprocess.
@@ -1988,7 +2026,7 @@ public:
    * next effect compilation will have to be done completely even if a similar
    * effect was already compiled.
    */
-  void releaseEffects();
+  virtual void releaseEffects();
 
   /**
    * @brief Dispose and release all associated resources.
@@ -2001,13 +2039,13 @@ public:
    * @brief Display the loading screen.
    * @see http://doc.babylonjs.com/how_to/creating_a_custom_loading_screen
    */
-  void displayLoadingUI();
+  virtual void displayLoadingUI();
 
   /**
    * @brief Hide the loading screen.
    * @see http://doc.babylonjs.com/how_to/creating_a_custom_loading_screen
    */
-  void hideLoadingUI();
+  virtual void hideLoadingUI();
 
   /**
    * @brief Gets the current loading screen object.
@@ -2057,7 +2095,7 @@ public:
    * @see
    * https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getError
    */
-  unsigned int getError() const;
+  virtual unsigned int getError() const;
 
   /** FPS **/
 
@@ -2285,10 +2323,10 @@ protected:
   /**
    * @brief Hidden
    */
-  bool _bindTextureDirectly(unsigned int target,
-                            const InternalTexturePtr& texture,
-                            bool forTextureDataUpdate = false,
-                            bool force                = false);
+  virtual bool _bindTextureDirectly(unsigned int target,
+                                    const InternalTexturePtr& texture,
+                                    bool forTextureDataUpdate = false,
+                                    bool force                = false);
 
 private:
   void _prepareWorkingCanvas();
@@ -2309,7 +2347,7 @@ private:
   void _setTextureParameterInteger(unsigned int target, unsigned int parameter,
                                    int value,
                                    const InternalTexturePtr& texture = nullptr);
-  void bindUnboundFramebuffer(GL::IGLFramebuffer* framebuffer);
+  void bindUnboundFramebuffer(const GL::IGLFramebufferPtr& framebuffer);
   void bindIndexBuffer(GL::IGLBuffer* buffer);
   void bindBuffer(GL::IGLBuffer* buffer, int target);
   void _vertexAttribPointer(GL::IGLBuffer* buffer, unsigned int indx, int size,
@@ -2700,7 +2738,7 @@ protected:
   /**
    * Hidden
    */
-  Viewport* _cachedViewport;
+  std::optional<Viewport> _cachedViewport;
 
   /**
    * Hidden
@@ -2730,7 +2768,7 @@ protected:
   /**
    * Hidden
    */
-  GL::IGLFramebuffer* _currentFramebuffer;
+  std::shared_ptr<GL::IGLFramebuffer> _currentFramebuffer;
 
 private:
   // WebVR
@@ -2802,7 +2840,7 @@ private:
   ICanvas* _workingCanvas;
   ICanvasRenderingContext2D* _workingContext;
   PassPostProcessPtr _rescalePostProcess;
-  std::unique_ptr<GL::IGLFramebuffer> _dummyFramebuffer;
+  GL::IGLFramebufferPtr _dummyFramebuffer;
   std::function<void()> _bindedRenderFunction;
   bool _vaoRecordInProgress;
   bool _mustWipeVertexAttributes;

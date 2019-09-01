@@ -91,7 +91,7 @@ public:
                          GLint yoffset, GLint x, GLint y, GLint width,
                          GLint height) override;
   std::unique_ptr<IGLBuffer> createBuffer() override;
-  std::unique_ptr<IGLFramebuffer> createFramebuffer() override;
+  IGLFramebufferPtr createFramebuffer() override;
   IGLProgramPtr createProgram() override;
   std::unique_ptr<IGLQuery> createQuery() override;
   std::unique_ptr<IGLRenderbuffer> createRenderbuffer() override;

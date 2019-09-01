@@ -103,7 +103,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _activeChannel{0}
     , _currentEffect{nullptr}
     , _currentProgram{nullptr}
-    , _cachedViewport{nullptr}
+    , _cachedViewport{std::nullopt}
     , _cachedVertexBuffers{nullptr}
     , _cachedIndexBuffer{nullptr}
     , _cachedEffectForVertexBuffers{nullptr}
@@ -268,7 +268,7 @@ std::string Engine::textureFormatInUse() const
   return _textureFormatInUse;
 }
 
-Viewport* Engine::currentViewport() const
+std::optional<Viewport>& Engine::currentViewport()
 {
   return _cachedViewport;
 }
@@ -326,6 +326,11 @@ void Engine::_rebuildEffects()
   }
 
   Effect::ResetCache();
+}
+
+bool Engine::areAllEffectsReady() const
+{
+  return true;
 }
 
 void Engine::_rebuildBuffers()
@@ -954,33 +959,26 @@ void Engine::_viewport(float x, float y, float width, float height)
   }
 }
 
-void Engine::setViewport(Viewport& viewport, int requiredWidth,
-                         int requiredHeight)
+void Engine::setViewport(Viewport& viewport,
+                         const std::optional<int>& requiredWidth,
+                         const std::optional<int>& requiredHeight)
 {
 
-  if (_renderingCanvas->onlyRenderBoundingClientRect()) {
-    const auto& rec = _renderingCanvas->getBoundingClientRect();
-    _gl->viewport(rec.left, rec.bottom, rec.width, rec.height);
+  auto width  = requiredWidth.value_or(getRenderWidth());
+  auto height = requiredHeight.value_or(getRenderHeight());
+  auto x      = viewport.x;
+  auto y      = viewport.y;
 
-    _cachedViewport = &viewport;
-  }
-  else {
-    auto width  = requiredWidth != 0 ? requiredWidth : getRenderWidth();
-    auto height = requiredHeight != 0 ? requiredHeight : getRenderHeight();
-    auto x      = viewport.x;
-    auto y      = viewport.y;
+  _cachedViewport = viewport;
 
-    _cachedViewport = &viewport;
-
-    _viewport(x * width, y * height, width * viewport.width,
-              height * viewport.height);
-  }
+  _viewport(x * width, y * height, width * viewport.width,
+            height * viewport.height);
 }
 
 Viewport& Engine::setDirectViewport(int x, int y, int width, int height)
 {
   auto currentViewport = _cachedViewport;
-  _cachedViewport      = nullptr;
+  _cachedViewport      = std::nullopt;
 
   _viewport(static_cast<float>(x), static_cast<float>(y),
             static_cast<float>(width), static_cast<float>(height));
@@ -1062,9 +1060,8 @@ void Engine::bindFramebuffer(const InternalTexturePtr& texture,
     unBindFramebuffer(_currentRenderTarget);
   }
   _currentRenderTarget = texture;
-  bindUnboundFramebuffer(texture->_MSAAFramebuffer ?
-                           texture->_MSAAFramebuffer.get() :
-                           texture->_framebuffer.get());
+  bindUnboundFramebuffer(texture->_MSAAFramebuffer ? texture->_MSAAFramebuffer :
+                                                     texture->_framebuffer);
   if (texture->isCube) {
     if (!faceIndex.has_value()) {
       faceIndex = 0u;
@@ -1116,10 +1113,10 @@ void Engine::bindFramebuffer(const InternalTexturePtr& texture,
   wipeCaches();
 }
 
-void Engine::bindUnboundFramebuffer(GL::IGLFramebuffer* framebuffer)
+void Engine::bindUnboundFramebuffer(const GL::IGLFramebufferPtr& framebuffer)
 {
   if (_currentFramebuffer != framebuffer) {
-    _gl->bindFramebuffer(GL::FRAMEBUFFER, framebuffer);
+    _gl->bindFramebuffer(GL::FRAMEBUFFER, framebuffer.get());
     _currentFramebuffer = framebuffer;
   }
 }
@@ -1146,7 +1143,7 @@ void Engine::unBindFramebuffer(const InternalTexturePtr& texture,
   if (onBeforeUnbind) {
     if (texture->_MSAAFramebuffer) {
       // Bind the correct framebuffer
-      bindUnboundFramebuffer(texture->_framebuffer.get());
+      bindUnboundFramebuffer(texture->_framebuffer);
     }
     onBeforeUnbind();
   }
@@ -1215,7 +1212,7 @@ void Engine::unBindMultiColorAttachmentFramebuffer(
   if (onBeforeUnbind) {
     if (textures[0]->_MSAAFramebuffer) {
       // Bind the correct framebuffer
-      bindUnboundFramebuffer(textures[0]->_framebuffer.get());
+      bindUnboundFramebuffer(textures[0]->_framebuffer);
     }
     onBeforeUnbind();
   }
@@ -2102,6 +2099,14 @@ GL::IGLProgramPtr Engine::createShaderProgram(
   return program;
 }
 
+GL::IGLProgramPtr Engine::createShaderProgram(
+  const IPipelineContextPtr& /*pipelineContext*/,
+  const std::string& /*vertexCode*/, const std::string& /*fragmentCode*/,
+  const std::string& /*defines*/, GL::IGLRenderingContext* /*context*/)
+{
+  return nullptr;
+}
+
 GL::IGLProgramPtr Engine::_createShaderProgram(
   const GL::IGLShaderPtr& vertexShader, const GL::IGLShaderPtr& fragmentShader,
   GL::IGLRenderingContext* context,
@@ -2197,6 +2202,13 @@ Engine::getUniforms(GL::IGLProgram* shaderProgram,
   return results;
 }
 
+std::unordered_map<std::string, Engine::GLUniformLocationPtr>
+Engine::getUniforms(const IPipelineContextPtr& /*pipelineContext*/,
+                    const std::vector<std::string>& /*uniformsNames*/)
+{
+  return {};
+}
+
 Int32Array
 Engine::getAttributes(GL::IGLProgram* shaderProgram,
                       const std::vector<std::string>& attributesNames)
@@ -2208,6 +2220,13 @@ Engine::getAttributes(GL::IGLProgram* shaderProgram,
   }
 
   return results;
+}
+
+Int32Array
+Engine::getAttributes(const IPipelineContextPtr& /*pipelineContext*/,
+                      const std::vector<std::string>& /*attributesNames*/)
+{
+  return {};
 }
 
 void Engine::enableEffect(const EffectPtr& effect)
@@ -3520,7 +3539,7 @@ void Engine::setFrameBufferDepthStencilTexture(
 
   auto& depthStencilTexture = renderTarget->depthStencilTexture;
 
-  bindUnboundFramebuffer(internalTexture->_framebuffer.get());
+  bindUnboundFramebuffer(internalTexture->_framebuffer);
   if (depthStencilTexture->isCube) {
     if (depthStencilTexture->_generateStencilBuffer) {
       _gl->framebufferTexture2D(GL::FRAMEBUFFER, GL::DEPTH_STENCIL_ATTACHMENT,
@@ -3632,7 +3651,7 @@ Engine::createRenderTargetTexture(const std::variant<ISize, float>& size,
   // Create the framebuffer
   auto currentFrameBuffer = _currentFramebuffer;
   auto framebuffer        = _gl->createFramebuffer();
-  bindUnboundFramebuffer(framebuffer.get());
+  bindUnboundFramebuffer(framebuffer);
   _gl->framebufferTexture2D(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
                             GL::TEXTURE_2D, texture->_webGLTexture.get(), 0);
 
@@ -3693,7 +3712,7 @@ Engine::createMultipleRenderTarget(ISize size,
   auto& gl = *_gl;
   // Create the framebuffer
   auto framebuffer = gl.createFramebuffer();
-  bindUnboundFramebuffer(framebuffer.get());
+  bindUnboundFramebuffer(framebuffer);
 
   std::vector<InternalTexturePtr> textures;
   std::vector<GL::GLenum> attachments;
@@ -3914,7 +3933,7 @@ Engine::updateRenderTargetTextureSampleCount(const InternalTexturePtr& texture,
     }
 
     texture->_MSAAFramebuffer = std::move(framebuffer);
-    bindUnboundFramebuffer(texture->_MSAAFramebuffer.get());
+    bindUnboundFramebuffer(texture->_MSAAFramebuffer);
 
     auto colorRenderbuffer = _gl->createRenderbuffer();
 
@@ -3935,7 +3954,7 @@ Engine::updateRenderTargetTextureSampleCount(const InternalTexturePtr& texture,
     texture->_MSAARenderBuffer = std::move(colorRenderbuffer);
   }
   else {
-    bindUnboundFramebuffer(texture->_framebuffer.get());
+    bindUnboundFramebuffer(texture->_framebuffer);
   }
 
   texture->samples             = samples;
@@ -3991,7 +4010,7 @@ unsigned int Engine::updateMultipleRenderTargetTextureSampleCount(
       return 0;
     }
 
-    bindUnboundFramebuffer(framebuffer.get());
+    bindUnboundFramebuffer(framebuffer);
 
     auto depthStencilBuffer = _setupFramebufferDepthAttachments(
       textures[0]->_generateStencilBuffer, textures[0]->_generateDepthBuffer,
@@ -4033,7 +4052,7 @@ unsigned int Engine::updateMultipleRenderTargetTextureSampleCount(
     gl.drawBuffers(attachments);
   }
   else {
-    bindUnboundFramebuffer(textures[0]->_framebuffer.get());
+    bindUnboundFramebuffer(textures[0]->_framebuffer);
   }
 
   bindUnboundFramebuffer(nullptr);
@@ -4185,7 +4204,7 @@ InternalTexturePtr Engine::createRenderTargetCubeTexture(
 
   // Create the framebuffer
   auto framebuffer = gl.createFramebuffer();
-  bindUnboundFramebuffer(framebuffer.get());
+  bindUnboundFramebuffer(framebuffer);
 
   texture->_depthStencilBuffer = _setupFramebufferDepthAttachments(
     fullOptions.generateStencilBuffer.value(),
@@ -5045,7 +5064,7 @@ void Engine::_releaseFramebufferObjects(InternalTexture* texture)
 
   if (texture->_MSAAFramebuffer) {
     _gl->deleteFramebuffer(texture->_MSAAFramebuffer.get());
-    texture->_MSAAFramebuffer.reset(nullptr);
+    texture->_MSAAFramebuffer = nullptr;
   }
 
   if (texture->_MSAARenderBuffer) {
@@ -5737,7 +5756,7 @@ Engine::_readTexturePixels(const InternalTexturePtr& texture, int width,
       return ArrayBufferView();
     }
 
-    _dummyFramebuffer = std::move(dummy);
+    _dummyFramebuffer = dummy;
   }
   _gl->bindFramebuffer(GL::FRAMEBUFFER, _dummyFramebuffer.get());
 
@@ -5764,7 +5783,7 @@ Engine::_readTexturePixels(const InternalTexturePtr& texture, int width,
       readType = GL::UNSIGNED_BYTE;
       _gl->readPixels(0, 0, width, height, GL::RGBA, readType,
                       buffer->uint8Array);
-      _gl->bindFramebuffer(GL::FRAMEBUFFER, _currentFramebuffer);
+      _gl->bindFramebuffer(GL::FRAMEBUFFER, _currentFramebuffer.get());
 
     } break;
     default: {
@@ -5775,7 +5794,7 @@ Engine::_readTexturePixels(const InternalTexturePtr& texture, int width,
       readType = GL::FLOAT;
       _gl->readPixels(0, 0, width, height, GL::RGBA, readType,
                       buffer->float32Array);
-      _gl->bindFramebuffer(GL::FRAMEBUFFER, _currentFramebuffer);
+      _gl->bindFramebuffer(GL::FRAMEBUFFER, _currentFramebuffer.get());
     } break;
   }
 

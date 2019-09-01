@@ -507,9 +507,11 @@ enum GLEnums : GLenum {
   MAX_TEXTURE_MAX_ANISOTROPY_EXT = 0x84FF
 }; // end of enum GLEnums
 
+class IGLFramebuffer;
 class IGLProgram;
 class IGLShader;
 class IGLTransformFeedback;
+using IGLFramebufferPtr       = std::shared_ptr<IGLFramebuffer>;
 using IGLProgramPtr           = std::shared_ptr<IGLProgram>;
 using IGLShaderPtr            = std::shared_ptr<IGLShader>;
 using IGLTransformFeedbackPtr = std::shared_ptr<IGLTransformFeedback>;
@@ -1219,7 +1221,7 @@ public:
    * @brief Creates and initializes a IGLFramebuffer object.
    * @return An IGLFramebuffer object.
    */
-  virtual std::unique_ptr<IGLFramebuffer> createFramebuffer() = 0;
+  virtual IGLFramebufferPtr createFramebuffer() = 0;
 
   /**
    * @brief Creates and initializes a IGLProgram object.

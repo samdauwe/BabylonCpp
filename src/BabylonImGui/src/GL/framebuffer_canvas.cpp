@@ -189,5 +189,5 @@ void FramebufferCanvas::saveScreenshotPng(const char* filename)
                  stride_in_bytes);
 }
 
-} // namespace GL
+} // end of namespace GL
 } // end of namespace BABYLON

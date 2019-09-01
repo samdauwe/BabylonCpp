@@ -550,11 +550,11 @@ std::unique_ptr<IGLBuffer> GLRenderingContext::createBuffer()
   return std::make_unique<IGLBuffer>(buffer);
 }
 
-std::unique_ptr<IGLFramebuffer> GLRenderingContext::createFramebuffer()
+IGLFramebufferPtr GLRenderingContext::createFramebuffer()
 {
   GLuint buffer = 0;
   glGenFramebuffers(1, &buffer);
-  return std::make_unique<IGLFramebuffer>(buffer);
+  return std::make_shared<IGLFramebuffer>(buffer);
 }
 
 IGLProgramPtr GLRenderingContext::createProgram()

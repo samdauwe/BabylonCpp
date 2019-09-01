@@ -232,7 +232,7 @@ public:
   ICanvasRenderingContext2D* _workingContext;
   std::shared_ptr<GL::IGLFramebuffer> _framebuffer;
   std::shared_ptr<GL::IGLRenderbuffer> _depthStencilBuffer;
-  std::unique_ptr<GL::IGLFramebuffer> _MSAAFramebuffer;
+  std::shared_ptr<GL::IGLFramebuffer> _MSAAFramebuffer;
   Uint32Array _attachments;
   std::unique_ptr<GL::IGLRenderbuffer> _MSAARenderBuffer;
   unsigned int _cachedCoordinatesMode;
