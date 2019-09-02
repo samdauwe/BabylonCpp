@@ -193,7 +193,7 @@ public:
                              int lod = 0) override;
 
 protected:
-  NullEngine(const NullEngineOptions& options = NullEngineOptions());
+  NullEngine(const NullEngineOptions& options = NullEngineOptions{});
 
 private:
   NullEngineOptions _options;
