@@ -20,6 +20,7 @@ struct BABYLON_SHARED_EXPORT MeshReservedDataStore {
   bool renderNormalVectors     = false;
   bool renderWireframeOver     = false;
   bool normalMaterialHidden    = true;
+  bool isInspectorGrid         = false;
   AbstractMeshPtr gridMesh     = nullptr;
   LinesMeshPtr normalLines     = nullptr;
   MaterialPtr originalMaterial = nullptr;

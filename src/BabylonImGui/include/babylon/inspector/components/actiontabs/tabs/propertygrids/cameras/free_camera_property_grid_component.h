@@ -25,7 +25,7 @@ struct BABYLON_SHARED_EXPORT FreeCameraPropertyGridComponent {
     static auto transformsContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(transformsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("TRANSFORMS")) {
-      Vector3LineComponent::render("Position", camera->position);
+      Vector3LineComponent::render("Position", camera->position());
       transformsContainerOpened = true;
     }
     else {
@@ -35,7 +35,12 @@ struct BABYLON_SHARED_EXPORT FreeCameraPropertyGridComponent {
     static auto controlsContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(controlsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("CONTROLS")) {
-      auto valueChange = FloatLineComponent::render("Speed", camera->speed);
+      auto valueChange = FloatLineComponent::render(
+        "Angular sensitivity", camera->angularSensibility());
+      if (valueChange) {
+        camera->angularSensibility = valueChange.value();
+      }
+      valueChange = FloatLineComponent::render("Speed", camera->speed);
       if (valueChange) {
         camera->speed = valueChange.value();
       }

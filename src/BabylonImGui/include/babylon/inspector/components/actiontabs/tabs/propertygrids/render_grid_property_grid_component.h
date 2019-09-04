@@ -22,18 +22,18 @@ struct BABYLON_SHARED_EXPORT RenderGridPropertyGridComponent {
   {
     const auto& scene
       = UtilityLayerRenderer::DefaultKeepDepthUtilityLayer()->utilityLayerScene;
+    auto& _gridMesh = meshReservedDataStore.gridMesh;
 
-    if (!meshReservedDataStore.gridMesh) {
+    if (!_gridMesh) {
       auto extend = mesh->getScene()->getWorldExtends();
       auto width  = (extend.max.x - extend.min.x) * 5.f;
       auto depth  = (extend.max.z - extend.min.z) * 5.f;
 
-      meshReservedDataStore.gridMesh
-        = Mesh::CreateGround("grid", 1.f, 1.f, 1, scene.get());
-      meshReservedDataStore.gridMesh->scaling().x = std::max(width, depth);
-      meshReservedDataStore.gridMesh->scaling().z
-        = meshReservedDataStore.gridMesh->scaling().x;
-      meshReservedDataStore.gridMesh->isPickable = false;
+      _gridMesh = Mesh::CreateGround("grid", 1.f, 1.f, 1, scene.get());
+      _gridMesh->scaling().x                = std::max(width, depth);
+      _gridMesh->scaling().z                = _gridMesh->scaling().x;
+      meshReservedDataStore.isInspectorGrid = true;
+      _gridMesh->isPickable                 = false;
 
       auto groundMaterial
         = MaterialsLibrary::GridMaterial::New("GridMaterial", scene);
@@ -48,7 +48,7 @@ struct BABYLON_SHARED_EXPORT RenderGridPropertyGridComponent {
       // groundMaterial->opacityTexture =
       // Texture::New("textures/backgroundGround.png", scene);
 
-      meshReservedDataStore.gridMesh->material = groundMaterial;
+      _gridMesh->material = groundMaterial;
 
       meshReservedDataStore.renderGridEnabled = true;
       return;
@@ -56,8 +56,8 @@ struct BABYLON_SHARED_EXPORT RenderGridPropertyGridComponent {
 
     meshReservedDataStore.renderGridEnabled
       = !meshReservedDataStore.renderGridEnabled;
-    meshReservedDataStore.gridMesh->dispose(true, true);
-    meshReservedDataStore.gridMesh = nullptr;
+    _gridMesh->dispose(true, true);
+    _gridMesh = nullptr;
   }
 
   static void render(const MeshPtr& mesh,

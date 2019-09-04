@@ -5,6 +5,9 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Class used to provide lock mechanism.
+ */
 struct BABYLON_SHARED_EXPORT LockObject {
 
   /**
