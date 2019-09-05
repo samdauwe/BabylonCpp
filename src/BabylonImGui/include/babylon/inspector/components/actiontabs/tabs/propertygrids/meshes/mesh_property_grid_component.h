@@ -123,6 +123,12 @@ struct BABYLON_SHARED_EXPORT MeshPropertyGridComponent {
           return "Particle";
         case PhysicsImpostor::HeightmapImpostor:
           return "Heightmap";
+        case PhysicsImpostor::ConvexHullImpostor:
+          return "Convex hull";
+        case PhysicsImpostor::RopeImpostor:
+          return "Rope";
+        case PhysicsImpostor::SoftbodyImpostor:
+          return "Soft body";
       }
     }
 
@@ -173,7 +179,7 @@ struct BABYLON_SHARED_EXPORT MeshPropertyGridComponent {
       }
       if (mesh->rotationQuaternion()) {
         QuaternionLineComponent::render("Rotation",
-                                        mesh->rotationQuaternion().value());
+                                        *mesh->rotationQuaternion());
       }
       Vector3LineComponent::render("Scaling", mesh->scaling());
       transformsOpened = true;
@@ -185,13 +191,15 @@ struct BABYLON_SHARED_EXPORT MeshPropertyGridComponent {
     static auto displayOpened = false;
     ImGui::SetNextTreeNodeOpen(displayOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("DISPLAY")) {
-      auto sliderChange = SliderLineComponent::render(
-        "Visibility", mesh->visibility(), 0.f, 1.f, 0.01f, "%.2f");
-      if (sliderChange) {
-        mesh->visibility = sliderChange.value();
+      if (!mesh->isAnInstance()) {
+        auto sliderChange = SliderLineComponent::render(
+          "Visibility", mesh->visibility(), 0.f, 1.f, 0.01f, "%.2f");
+        if (sliderChange) {
+          mesh->visibility = sliderChange.value();
+        }
       }
-      auto valueChange
-        = FloatLineComponent::render("Alpha index", static_cast<float>(mesh->alphaIndex));
+      auto valueChange = FloatLineComponent::render(
+        "Alpha index", static_cast<float>(mesh->alphaIndex));
       if (valueChange) {
         mesh->alphaIndex = static_cast<int>(valueChange.value());
       }
@@ -276,6 +284,22 @@ struct BABYLON_SHARED_EXPORT MeshPropertyGridComponent {
       ImGui::SetNextTreeNodeOpen(physicsOpened, ImGuiCond_Always);
       if (ImGui::CollapsingHeader("PHYSICS")) {
         if (mesh->physicsImpostor()) {
+          auto valueChange = FloatLineComponent::render(
+            "Mass", mesh->physicsImpostor()->mass());
+          if (valueChange) {
+            mesh->physicsImpostor()->mass = valueChange.value();
+          }
+          valueChange = FloatLineComponent::render(
+            "Friction", mesh->physicsImpostor()->friction());
+          if (valueChange) {
+            mesh->physicsImpostor()->friction = valueChange.value();
+          }
+          valueChange = FloatLineComponent::render(
+            "Restitution", mesh->physicsImpostor()->restitution());
+          if (valueChange) {
+            mesh->physicsImpostor()->restitution = valueChange.value();
+          }
+          TextLineComponent::render("Type", convertPhysicsTypeToString(mesh));
         }
         physicsOpened = true;
       }
@@ -287,7 +311,7 @@ struct BABYLON_SHARED_EXPORT MeshPropertyGridComponent {
     static auto edgeRenderingOpened = false;
     ImGui::SetNextTreeNodeOpen(edgeRenderingOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("EDGE RENDERING")) {
-      auto edgesRendererEnabled = (mesh->edgesRenderer() != nullptr);
+      const auto edgesRendererEnabled = (mesh->edgesRenderer() != nullptr);
       if (CheckBoxLineComponent::render("Enable", edgesRendererEnabled)) {
         if (edgesRendererEnabled) {
           mesh->disableEdgesRendering();
@@ -308,8 +332,8 @@ struct BABYLON_SHARED_EXPORT MeshPropertyGridComponent {
       edgeRenderingOpened = false;
     }
     // --- OUTLINE & OVERLAY ---
-    static auto outlineAndOverlay = false;
-    ImGui::SetNextTreeNodeOpen(outlineAndOverlay, ImGuiCond_Always);
+    static auto outlineAndOverlayOpened = false;
+    ImGui::SetNextTreeNodeOpen(outlineAndOverlayOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("OUTLINE & OVERLAY")) {
       if (CheckBoxLineComponent::render("Render overlay",
                                         mesh->renderOverlay())) {
@@ -321,10 +345,10 @@ struct BABYLON_SHARED_EXPORT MeshPropertyGridComponent {
         mesh->renderOutline = !mesh->renderOutline();
       }
       Color3LineComponent::render("Outline color", mesh->outlineColor);
-      outlineAndOverlay = true;
+      outlineAndOverlayOpened = true;
     }
     else {
-      outlineAndOverlay = false;
+      outlineAndOverlayOpened = false;
     }
     // --- DEBUG ---
     static auto debugOpened = false;
