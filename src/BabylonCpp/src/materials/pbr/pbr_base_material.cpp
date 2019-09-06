@@ -43,6 +43,19 @@ PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
     , transparencyMode{this, &PBRBaseMaterial::get_transparencyMode,
                        &PBRBaseMaterial::set_transparencyMode}
+    , debugMode{this, &PBRBaseMaterial::get_debugMode,
+                &PBRBaseMaterial::set_debugMode}
+    , clearCoat{std::make_shared<PBRClearCoatConfiguration>(
+        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
+    , anisotropy{std::make_shared<PBRAnisotropicConfiguration>(
+        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
+    , brdf{std::make_shared<PBRBRDFConfiguration>(
+        [this]() -> void { _markAllSubMeshesAsMiscDirty(); })}
+    , sheen{std::make_shared<PBRSheenConfiguration>(
+        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
+    , subSurface{std::make_shared<PBRSubSurfaceConfiguration>(
+        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
+    , customShaderNameResolve{nullptr}
     , _directIntensity{1.f}
     , _emissiveIntensity{1.f}
     , _environmentIntensity{1.f}
@@ -104,19 +117,6 @@ PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
     , _imageProcessingConfiguration{std::make_shared<
         ImageProcessingConfiguration>()}
     , _unlit{false}
-    , debugMode{this, &PBRBaseMaterial::get_debugMode,
-                &PBRBaseMaterial::set_debugMode}
-    , clearCoat{std::make_shared<PBRClearCoatConfiguration>(
-        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
-    , anisotropy{std::make_shared<PBRAnisotropicConfiguration>(
-        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
-    , brdf{std::make_shared<PBRBRDFConfiguration>(
-        [this]() -> void { _markAllSubMeshesAsMiscDirty(); })}
-    , sheen{std::make_shared<PBRSheenConfiguration>(
-        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
-    , subSurface{std::make_shared<PBRSubSurfaceConfiguration>(
-        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
-    , customShaderNameResolve{nullptr}
     , _lightingInfos{Vector4(_directIntensity, _emissiveIntensity,
                              _environmentIntensity, _specularIntensity)}
     , _imageProcessingObserver{nullptr}
@@ -181,12 +181,12 @@ void PBRBaseMaterial::_attachImageProcessingConfiguration(
   }
 }
 
-int PBRBaseMaterial::get_debugMode() const
+unsigned int PBRBaseMaterial::get_debugMode() const
 {
   return _debugMode;
 }
 
-void PBRBaseMaterial::set_debugMode(int value)
+void PBRBaseMaterial::set_debugMode(unsigned int value)
 {
   if (_debugMode == value) {
     return;

@@ -35,6 +35,8 @@ using PBRSubSurfaceConfigurationPtr
  */
 class BABYLON_SHARED_EXPORT PBRBaseMaterial : public PushMaterial {
 
+  friend struct PBRMaterialPropertyGridComponent;
+
 public:
   /**
    * PBRMaterialTransparencyMode: No transparency mode, Alpha channel is not
@@ -250,8 +252,8 @@ protected:
    * Defines the material debug mode.
    * It helps seeing only some components of the material while troubleshooting.
    */
-  int get_debugMode() const;
-  void set_debugMode(int value);
+  unsigned int get_debugMode() const;
+  void set_debugMode(unsigned int value);
 
 private:
   EffectPtr _prepareEffect(
@@ -277,6 +279,50 @@ public:
    * The transparency mode of the material.
    */
   Property<PBRBaseMaterial, std::optional<unsigned int>> transparencyMode;
+
+  /**
+   * This is reserved for the inspector.
+   * Defines the material debug mode.
+   * It helps seeing only some components of the material while
+   * troubleshooting.
+   */
+  Property<PBRBaseMaterial, unsigned int> debugMode;
+
+  /**
+   * Defines the clear coat layer parameters for the material.
+   */
+  PBRClearCoatConfigurationPtr clearCoat;
+
+  /**
+   * Defines the anisotropic parameters for the material.
+   */
+  PBRAnisotropicConfigurationPtr anisotropy;
+
+  /**
+   * Defines the BRDF parameters for the material.
+   */
+  PBRBRDFConfigurationPtr brdf;
+
+  /**
+   * Defines the Sheen parameters for the material.
+   */
+  PBRSheenConfigurationPtr sheen;
+
+  /**
+   * Defines the SubSurface parameters for the material.
+   */
+  PBRSubSurfaceConfigurationPtr subSurface;
+
+  /**
+   * Custom callback helping to override the default shader used in the
+   * material.
+   */
+  std::function<std::string(const std::string& shaderName,
+                            const std::vector<std::string>& uniforms,
+                            const std::vector<std::string>& uniformBuffers,
+                            const std::vector<std::string>& samplers,
+                            const PBRMaterialDefines& defines)>
+    customShaderNameResolve;
 
 protected:
   /**
@@ -625,50 +671,6 @@ protected:
    */
   bool _unlit;
 
-  /**
-   * This is reserved for the inspector.
-   * Defines the material debug mode.
-   * It helps seeing only some components of the material while
-   * troubleshooting.
-   */
-  Property<PBRBaseMaterial, int> debugMode;
-
-  /**
-   * Defines the clear coat layer parameters for the material.
-   */
-  PBRClearCoatConfigurationPtr clearCoat;
-
-  /**
-   * Defines the anisotropic parameters for the material.
-   */
-  PBRAnisotropicConfigurationPtr anisotropy;
-
-  /**
-   * Defines the BRDF parameters for the material.
-   */
-  PBRBRDFConfigurationPtr brdf;
-
-  /**
-   * Defines the Sheen parameters for the material.
-   */
-  PBRSheenConfigurationPtr sheen;
-
-  /**
-   * Defines the SubSurface parameters for the material.
-   */
-  PBRSubSurfaceConfigurationPtr subSurface;
-
-  /**
-   * Custom callback helping to override the default shader used in the
-   * material.
-   */
-  std::function<std::string(const std::string& shaderName,
-                            const std::vector<std::string>& uniforms,
-                            const std::vector<std::string>& uniformBuffers,
-                            const std::vector<std::string>& samplers,
-                            const PBRMaterialDefines& defines)>
-    customShaderNameResolve;
-
 private:
   /**
    * This stores the direct, emissive, environment, and specular light
@@ -702,7 +704,7 @@ private:
    * Defines the material debug mode.
    * It helps seeing only some components of the material while troubleshooting.
    */
-  int _debugMode;
+  unsigned int _debugMode;
 
   /**
    * This is reserved for the inspector.
