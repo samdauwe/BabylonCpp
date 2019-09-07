@@ -30,6 +30,8 @@ struct BABYLON_SHARED_EXPORT PBRMetallicRoughnessMaterialPropertyGridComponent {
       TextureLinkLineComponent::render("Base", material, material->baseTexture);
       TextureLinkLineComponent::render("Metallic roughness", material,
                                        material->metallicRoughnessTexture());
+      TextureLinkLineComponent::render("Normal", material,
+                                       material->normalTexture());
       TextureLinkLineComponent::render("Environment", material,
                                        material->environmentTexture());
       TextureLinkLineComponent::render("Emissive", material,
