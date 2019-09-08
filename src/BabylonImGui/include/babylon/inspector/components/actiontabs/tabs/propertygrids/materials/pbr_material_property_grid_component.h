@@ -7,12 +7,14 @@
 #include <babylon/inspector/components/actiontabs/lines/check_box_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/color3_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/texture_link_line_component.h>
+#include <babylon/inspector/components/actiontabs/lines/vector2_line_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/materials/common_material_property_grid_component.h>
 #include <babylon/materials/pbr/pbr_anisotropic_configuration.h>
 #include <babylon/materials/pbr/pbr_brdf_configuration.h>
 #include <babylon/materials/pbr/pbr_clear_coat_configuration.h>
 #include <babylon/materials/pbr/pbr_material.h>
 #include <babylon/materials/pbr/pbr_sheen_configuration.h>
+#include <babylon/materials/pbr/pbr_sub_surface_configuration.h>
 #include <babylon/materials/textures/base_texture.h>
 
 namespace BABYLON {
@@ -182,12 +184,59 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
     static auto clearCoatOpened = false;
     ImGui::SetNextTreeNodeOpen(clearCoatOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("CLEAR COAT")) {
-      if (CheckBoxLineComponent::render("Enabled",
-                                        material->clearCoat->isEnabled())) {
-        material->clearCoat->isEnabled = !material->clearCoat->isEnabled();
+      auto& clearCoat = material->clearCoat;
+      if (CheckBoxLineComponent::render("Enabled", clearCoat->isEnabled())) {
+        clearCoat->isEnabled = !clearCoat->isEnabled();
       }
-      if (material->clearCoat->isEnabled()) {
-        // TODO
+      if (clearCoat->isEnabled()) {
+        // Fragment
+        auto sliderChange = SliderLineComponent::render(
+          "Intensity", clearCoat->intensity, 0.f, 1.f, 0.01f, "%.2f");
+        if (sliderChange) {
+          clearCoat->intensity = sliderChange.value();
+        }
+        sliderChange = SliderLineComponent::render(
+          "Roughness", clearCoat->roughness, 0.f, 1.f, 0.01f, "%.2f");
+        if (sliderChange) {
+          clearCoat->roughness = sliderChange.value();
+        }
+        sliderChange = SliderLineComponent::render(
+          "IOR", clearCoat->indiceOfRefraction(), 0.f, 1.f, 0.01f, "%.2f");
+        if (sliderChange) {
+          clearCoat->indiceOfRefraction = sliderChange.value();
+        }
+        TextureLinkLineComponent::render("Texture", material,
+                                         clearCoat->texture());
+        TextureLinkLineComponent::render("Bump", material,
+                                         clearCoat->bumpTexture());
+        if (clearCoat->bumpTexture()) {
+          sliderChange = SliderLineComponent::render(
+            "Bump strength", clearCoat->bumpTexture()->level, 0.f, 2.f, 0.01f,
+            "%.2f");
+          if (sliderChange) {
+            clearCoat->bumpTexture()->level = sliderChange.value();
+          }
+        }
+        if (CheckBoxLineComponent::render("Tint", clearCoat->isTintEnabled())) {
+          clearCoat->isTintEnabled = !clearCoat->isTintEnabled();
+        }
+        if (clearCoat->isTintEnabled()) {
+          Color3LineComponent::render("Tint Color", clearCoat->tintColor);
+          sliderChange = SliderLineComponent::render(
+            "At Distance", clearCoat->tintColorAtDistance, 0.f, 20.f, 0.1f,
+            "%.1f");
+          if (sliderChange) {
+            clearCoat->tintColorAtDistance = sliderChange.value();
+          }
+          sliderChange = SliderLineComponent::render("Tint Thickness",
+                                                     clearCoat->tintThickness,
+                                                     0.f, 20.f, 0.1f, "%.1f");
+          if (sliderChange) {
+            clearCoat->tintThickness = sliderChange.value();
+          }
+          TextureLinkLineComponent::render("Tint Texture", material,
+                                           clearCoat->tintTexture());
+        }
       }
       clearCoatOpened = true;
     }
@@ -198,12 +247,20 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
     static auto anisotropicOpened = false;
     ImGui::SetNextTreeNodeOpen(anisotropicOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("ANISOTROPIC")) {
-      if (CheckBoxLineComponent::render("Enabled",
-                                        material->anisotropy->isEnabled())) {
-        material->anisotropy->isEnabled = !material->anisotropy->isEnabled();
+      auto& anisotropy = material->anisotropy;
+      if (CheckBoxLineComponent::render("Enabled", anisotropy->isEnabled())) {
+        anisotropy->isEnabled = !anisotropy->isEnabled();
       }
-      if (material->anisotropy->isEnabled()) {
-        // TODO
+      if (anisotropy->isEnabled()) {
+        // Fragment
+        auto sliderChange = SliderLineComponent::render(
+          "Intensity", anisotropy->intensity, 0.f, 1.f, 0.01f, "%.2f");
+        if (sliderChange) {
+          anisotropy->intensity = sliderChange.value();
+        }
+        Vector2LineComponent::render("Direction", anisotropy->direction);
+        TextureLinkLineComponent::render("Texture", material,
+                                         anisotropy->texture());
       }
       anisotropicOpened = true;
     }
@@ -214,12 +271,23 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
     static auto sheenOpened = false;
     ImGui::SetNextTreeNodeOpen(sheenOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("SHEEN")) {
-      if (CheckBoxLineComponent::render("Enabled",
-                                        material->sheen->isEnabled())) {
-        material->sheen->isEnabled = !material->sheen->isEnabled();
+      auto& sheen = material->sheen;
+      if (CheckBoxLineComponent::render("Enabled", sheen->isEnabled())) {
+        sheen->isEnabled = !sheen->isEnabled();
       }
-      if (material->sheen->isEnabled()) {
-        // TODO
+      if (sheen->isEnabled()) {
+        // Fragment
+        if (CheckBoxLineComponent::render("Link to Albedo",
+                                          sheen->linkSheenWithAlbedo())) {
+          sheen->linkSheenWithAlbedo = !sheen->linkSheenWithAlbedo();
+        }
+        auto sliderChange = SliderLineComponent::render(
+          "Intensity", sheen->intensity, 0.f, 1.f, 0.01f, "%.2f");
+        if (sliderChange) {
+          sheen->intensity = sliderChange.value();
+        }
+        Color3LineComponent::render("Color", sheen->color);
+        TextureLinkLineComponent::render("Texture", material, sheen->texture());
       }
       sheenOpened = true;
     }
@@ -230,7 +298,72 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
     static auto subsurfaceOpened = false;
     ImGui::SetNextTreeNodeOpen(subsurfaceOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("SUBSURFACE")) {
-      // TODO
+      auto& subSurface = material->subSurface;
+      TextureLinkLineComponent::render("Thickness", material,
+                                       subSurface->thicknessTexture());
+      auto sliderChange = SliderLineComponent::render(
+        "Min Thickness", subSurface->minimumThickness, 0.f, 10.f, 0.1f, "%.1f");
+      if (sliderChange) {
+        subSurface->minimumThickness = sliderChange.value();
+      }
+      sliderChange = SliderLineComponent::render(
+        "Max Thickness", subSurface->maximumThickness, 0.f, 10.f, 0.1f, "%.1f");
+      if (sliderChange) {
+        subSurface->maximumThickness = sliderChange.value();
+      }
+      if (CheckBoxLineComponent::render(
+            "Mask From Thickness", subSurface->useMaskFromThicknessTexture())) {
+        subSurface->useMaskFromThicknessTexture
+          = !subSurface->useMaskFromThicknessTexture();
+      }
+      Color3LineComponent::render("Tint Color", subSurface->tintColor);
+      if (CheckBoxLineComponent::render("Refraction Enabled",
+                                        subSurface->isRefractionEnabled())) {
+        subSurface->isRefractionEnabled = !subSurface->isRefractionEnabled();
+      }
+      if (subSurface->isRefractionEnabled()) {
+        // Fragment
+        sliderChange = SliderLineComponent::render(
+          "Intensity", subSurface->refractionIntensity, 0.f, 1.f, 0.01f,
+          "%.2f");
+        if (sliderChange) {
+          subSurface->refractionIntensity = sliderChange.value();
+        }
+        sliderChange = SliderLineComponent::render(
+          "Index of Refraction", subSurface->indexOfRefraction, 1.f, 2.f, 0.01f,
+          "%.2f");
+        if (sliderChange) {
+          subSurface->indexOfRefraction = sliderChange.value();
+        }
+        sliderChange = SliderLineComponent::render(
+          "Tint at Distance", subSurface->tintColorAtDistance, 1.f, 10.f, 0.1f,
+          "%.1f");
+        if (sliderChange) {
+          subSurface->tintColorAtDistance = sliderChange.value();
+        }
+        if (CheckBoxLineComponent::render(
+              "Link refraction with transparency",
+              subSurface->linkRefractionWithTransparency())) {
+          subSurface->linkRefractionWithTransparency
+            = !subSurface->linkRefractionWithTransparency();
+        }
+      }
+      Color3LineComponent::render("Tint Color", subSurface->tintColor);
+      if (CheckBoxLineComponent::render("Transluency Enabled",
+                                        subSurface->isTranslucencyEnabled())) {
+        subSurface->isTranslucencyEnabled
+          = !subSurface->isTranslucencyEnabled();
+      }
+      if (subSurface->isTranslucencyEnabled()) {
+        sliderChange = SliderLineComponent::render(
+          "Intensity", subSurface->translucencyIntensity, 0.f, 1.f, 0.01f,
+          "%.2f");
+        if (sliderChange) {
+          subSurface->translucencyIntensity = sliderChange.value();
+        }
+        Color3LineComponent::render("Diffusion Distance",
+                                    subSurface->diffusionDistance);
+      }
       subsurfaceOpened = true;
     }
     else {
