@@ -190,8 +190,7 @@ PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
   stringDef = {
     {"ALPHATESTVALUE", "0.5"}, //
   };
-
-} // namespace BABYLON
+}
 
 PBRMaterialDefines::~PBRMaterialDefines()
 {

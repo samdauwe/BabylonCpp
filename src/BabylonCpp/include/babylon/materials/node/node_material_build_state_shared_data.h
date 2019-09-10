@@ -144,7 +144,7 @@ struct BABYLON_SHARED_EXPORT NodeMaterialBuildStateSharedData {
     std::vector<NodeMaterialConnectionPointPtr> notConnectedNonOptionalInputs;
   } checks;
 
-}; // end of enum class NodeMaterialBuildStateSharedData
+}; // end of struct NodeMaterialBuildStateSharedData
 
 } // end of namespace BABYLON
 
