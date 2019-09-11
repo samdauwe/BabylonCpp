@@ -83,7 +83,7 @@ public:
    * @brief Gets the current class name e.g. "NodeMaterialBlock".
    * @returns the class name
    */
-  const std::string getClassName() const;
+  virtual const std::string getClassName() const;
 
   /**
    * @brief Register a new input. Must be called inside a block constructor.
@@ -326,7 +326,7 @@ protected:
   std::string
   _writeVariable(const NodeMaterialConnectionPointPtr& currentPoint) const;
   std::string _writeFloat(float value) const;
-  virtual void _buildBlock(const NodeMaterialBuildState& state);
+  virtual NodeMaterialBlock& _buildBlock(NodeMaterialBuildState& state);
   void _linkConnectionTypes(size_t inputIndex0, size_t inputIndex1);
   virtual std::string _inputRename(const std::string& name);
   virtual std::string _outputRename(const std::string& name);
