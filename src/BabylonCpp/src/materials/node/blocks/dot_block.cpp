@@ -1,4 +1,4 @@
-﻿#include <babylon/materials/node/blocks/add_block.h>
+#include <babylon/materials/node/blocks/dot_block.h>
 
 #include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
@@ -6,45 +6,44 @@
 
 namespace BABYLON {
 
-AddBlock::AddBlock(const std::string& iName)
+DotBlock::DotBlock(const std::string& iName)
     : NodeMaterialBlock{iName, NodeMaterialBlockTargets::Neutral}
-    , left{this, &AddBlock::get_left}
-    , right{this, &AddBlock::get_right}
-    , output{this, &AddBlock::get_output}
+    , left{this, &DotBlock::get_left}
+    , right{this, &DotBlock::get_right}
+    , output{this, &DotBlock::get_output}
 {
   registerInput("left", NodeMaterialBlockConnectionPointTypes::AutoDetect);
   registerInput("right", NodeMaterialBlockConnectionPointTypes::AutoDetect);
-  registerOutput("output", NodeMaterialBlockConnectionPointTypes::BasedOnInput);
+  registerOutput("output", NodeMaterialBlockConnectionPointTypes::Float);
 
-  _outputs[0]->_typeConnectionSource = _inputs[0];
   _linkConnectionTypes(0, 1);
 }
 
-AddBlock::~AddBlock()
+DotBlock::~DotBlock()
 {
 }
 
-const std::string AddBlock::getClassName() const
+const std::string DotBlock::getClassName() const
 {
-  return "AddBlock";
+  return "DotBlock";
 }
 
-NodeMaterialConnectionPointPtr& AddBlock::get_left()
+NodeMaterialConnectionPointPtr& DotBlock::get_left()
 {
   return _inputs[0];
 }
 
-NodeMaterialConnectionPointPtr& AddBlock::get_right()
+NodeMaterialConnectionPointPtr& DotBlock::get_right()
 {
   return _inputs[1];
 }
 
-NodeMaterialConnectionPointPtr& AddBlock::get_output()
+NodeMaterialConnectionPointPtr& DotBlock::get_output()
 {
   return _outputs[0];
 }
 
-AddBlock& AddBlock::_buildBlock(NodeMaterialBuildState& state)
+DotBlock& DotBlock::_buildBlock(NodeMaterialBuildState& state)
 {
   NodeMaterialBlock::_buildBlock(state);
 
@@ -52,7 +51,7 @@ AddBlock& AddBlock::_buildBlock(NodeMaterialBuildState& state)
 
   state.compilationString
     += _declareOutput(output, state)
-       + String::printf(" = %s + %s;\r\n",
+       + String::printf(" = dot(%s, %s);\r\n",
                         left()->associatedVariableName().c_str(),
                         right()->associatedVariableName().c_str());
 

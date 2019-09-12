@@ -1,4 +1,4 @@
-﻿#include <babylon/materials/node/blocks/add_block.h>
+#include <babylon/materials/node/blocks/divide_block.h>
 
 #include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
@@ -6,11 +6,11 @@
 
 namespace BABYLON {
 
-AddBlock::AddBlock(const std::string& iName)
+DivideBlock::DivideBlock(const std::string& iName)
     : NodeMaterialBlock{iName, NodeMaterialBlockTargets::Neutral}
-    , left{this, &AddBlock::get_left}
-    , right{this, &AddBlock::get_right}
-    , output{this, &AddBlock::get_output}
+    , left{this, &DivideBlock::get_left}
+    , right{this, &DivideBlock::get_right}
+    , output{this, &DivideBlock::get_output}
 {
   registerInput("left", NodeMaterialBlockConnectionPointTypes::AutoDetect);
   registerInput("right", NodeMaterialBlockConnectionPointTypes::AutoDetect);
@@ -20,31 +20,31 @@ AddBlock::AddBlock(const std::string& iName)
   _linkConnectionTypes(0, 1);
 }
 
-AddBlock::~AddBlock()
+DivideBlock::~DivideBlock()
 {
 }
 
-const std::string AddBlock::getClassName() const
+const std::string DivideBlock::getClassName() const
 {
-  return "AddBlock";
+  return "DivideBlock";
 }
 
-NodeMaterialConnectionPointPtr& AddBlock::get_left()
+NodeMaterialConnectionPointPtr& DivideBlock::get_left()
 {
   return _inputs[0];
 }
 
-NodeMaterialConnectionPointPtr& AddBlock::get_right()
+NodeMaterialConnectionPointPtr& DivideBlock::get_right()
 {
   return _inputs[1];
 }
 
-NodeMaterialConnectionPointPtr& AddBlock::get_output()
+NodeMaterialConnectionPointPtr& DivideBlock::get_output()
 {
   return _outputs[0];
 }
 
-AddBlock& AddBlock::_buildBlock(NodeMaterialBuildState& state)
+DivideBlock& DivideBlock::_buildBlock(NodeMaterialBuildState& state)
 {
   NodeMaterialBlock::_buildBlock(state);
 
@@ -52,7 +52,7 @@ AddBlock& AddBlock::_buildBlock(NodeMaterialBuildState& state)
 
   state.compilationString
     += _declareOutput(output, state)
-       + String::printf(" = %s + %s;\r\n",
+       + String::printf(" = %s / %s;\r\n",
                         left()->associatedVariableName().c_str(),
                         right()->associatedVariableName().c_str());
 

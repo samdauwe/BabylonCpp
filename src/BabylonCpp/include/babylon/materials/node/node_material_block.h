@@ -256,13 +256,13 @@ public:
    * @brief Serializes this block in a JSON representation.
    * @returns the serialized block object
    */
-  json serialize() const;
+  virtual json serialize() const;
 
   /**
    * @brief Hidden
    */
-  void _deserialize(const json& serializationObject, Scene* scene,
-                    const std::string& rootUrl);
+  virtual void _deserialize(const json& serializationObject, Scene* scene,
+                            const std::string& rootUrl);
 
 protected:
   /**
