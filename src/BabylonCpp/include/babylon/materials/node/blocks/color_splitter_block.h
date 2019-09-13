@@ -11,7 +11,7 @@ using ColorSplitterBlockPtr = std::shared_ptr<ColorSplitterBlock>;
 
 /**
  * @brief Block used to expand a Color3/4 into 4 outputs (one for each
- * component)
+ * component).
  */
 class BABYLON_SHARED_EXPORT ColorSplitterBlock : public NodeMaterialBlock {
 

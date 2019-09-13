@@ -67,10 +67,10 @@ ColorMergerBlock& ColorMergerBlock::_buildBlock(NodeMaterialBuildState& state)
 {
   NodeMaterialBlock::_buildBlock(state);
 
-  const auto& rInput = r;
-  const auto& gInput = g;
-  const auto& bInput = b;
-  const auto& aInput = a;
+  const auto& rInput = r();
+  const auto& gInput = g();
+  const auto& bInput = b();
+  const auto& aInput = a();
 
   const auto& color4Output = _outputs[0];
   const auto& color3Output = _outputs[1];
@@ -80,19 +80,19 @@ ColorMergerBlock& ColorMergerBlock::_buildBlock(NodeMaterialBuildState& state)
       += _declareOutput(color4Output, state)
          + String::printf(
            " = vec4(%s, %s, %s, %s);\r\n",
-           rInput()->isConnected ? _writeVariable(rInput).c_str() : "0.0",
-           gInput()->isConnected ? _writeVariable(gInput).c_str() : "0.0",
-           bInput()->isConnected ? _writeVariable(bInput).c_str() : "0.0",
-           aInput()->isConnected ? _writeVariable(aInput).c_str() : "0.0");
+           rInput->isConnected ? _writeVariable(rInput).c_str() : "0.0",
+           gInput->isConnected ? _writeVariable(gInput).c_str() : "0.0",
+           bInput->isConnected ? _writeVariable(bInput).c_str() : "0.0",
+           aInput->isConnected ? _writeVariable(aInput).c_str() : "0.0");
   }
   else if (color3Output->hasEndpoints()) {
     state.compilationString
       += _declareOutput(color3Output, state)
          + String::printf(
            " = vec3(%s, %s, %s);\r\n",
-           rInput()->isConnected ? _writeVariable(rInput).c_str() : "0.0",
-           gInput()->isConnected ? _writeVariable(gInput).c_str() : "0.0",
-           bInput()->isConnected ? _writeVariable(bInput).c_str() : "0.0");
+           rInput->isConnected ? _writeVariable(rInput).c_str() : "0.0",
+           gInput->isConnected ? _writeVariable(gInput).c_str() : "0.0",
+           bInput->isConnected ? _writeVariable(bInput).c_str() : "0.0");
   }
 
   return *this;

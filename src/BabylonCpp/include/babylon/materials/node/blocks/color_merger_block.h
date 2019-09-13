@@ -11,7 +11,7 @@ using ColorMergerBlockPtr = std::shared_ptr<ColorMergerBlock>;
 
 /**
  * @brief Block used to create a Color3/4 out of individual inputs (one for each
- * component)
+ * component).
  */
 class BABYLON_SHARED_EXPORT ColorMergerBlock : public NodeMaterialBlock {
 
