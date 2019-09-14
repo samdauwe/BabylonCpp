@@ -702,10 +702,10 @@ void Effect::_prepareEffect()
     _program->__SPECTOR_rebuildProgram
       = [this](const std::string& vertexSourceCode,
                const std::string& fragmentSourceCode,
-               const std::function<void(GL::IGLProgram * program)>& onCompiled,
-               const std::function<void(const std::string& message)>& onError) {
-          _rebuildProgram(vertexSourceCode, fragmentSourceCode, onCompiled,
-                          onError);
+               const std::function<void(GL::IGLProgram * program)>& onCompiled_,
+               const std::function<void(const std::string& message)>& onError_) {
+          _rebuildProgram(vertexSourceCode, fragmentSourceCode, onCompiled_,
+                          onError_);
         };
 
     _program = engine->createShaderProgram(_vertexSourceCode,

@@ -28,6 +28,7 @@ message(STATUS "App ${TARGET}")
 file(GLOB_RECURSE SOURCES_H_CPP
     ${CMAKE_CURRENT_SOURCE_DIR}/*.h
     ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.md
     )
 source_group_by_path_all(${CMAKE_CURRENT_SOURCE_DIR} ${SOURCES_H_CPP})
 
@@ -47,7 +48,6 @@ target_include_directories(${TARGET}
     ${CMAKE_CURRENT_SOURCE_DIR}/../Extensions/include
     ${CMAKE_CURRENT_BINARY_DIR}/../Extensions/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../Samples/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 
@@ -64,6 +64,13 @@ target_link_libraries(${TARGET}
     BabylonCpp
     Samples
 )
+
+if (BABYLON_BUILD_SANDBOX)
+    target_compile_definitions(${TARGET} PRIVATE -DBABYLON_BUILD_SANDBOX)
+    target_link_libraries(${TARGET} PRIVATE RuntimeCompiler RuntimeObjectSystem)
+endif()
+
+
 
 # On Linux and other Unix platforms that use dlopen(), link with -ldl
 if(NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")

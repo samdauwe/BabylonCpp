@@ -8,11 +8,20 @@
 #include "spawn_screenshots.h"
 #include "run_standalone_imgui.h"
 
+#ifdef BABYLON_BUILD_SANDBOX
+#include <SamplesRunner/rtc/rtc_manager.h>
+#endif
+
 int main(int argc, char** argv)
 {
+#ifdef BABYLON_BUILD_SANDBOX
+  BABYLON::rtc::RtcManager runtimeCompiler;
+  runtimeCompiler.Init();
+#endif
+
   BABYLON::System::chdirToExecutableFolder();
 
-  bool flagVerbose = false;
+  bool flagQuiet = false;
   bool flagFullscreen = false;
   bool flagSpawnScreenshots = false;
   bool flagScreenshotOneSampleAndExit = false;
@@ -21,7 +30,7 @@ int main(int argc, char** argv)
   std::string sampleName = "Hello Scene";
   {
     CLI::App arg_cli{ "BabylonCpp samples runner" };
-    arg_cli.add_flag("-v,--verbose", flagVerbose, "Verbose mode");
+    arg_cli.add_flag("-q,--quiet", flagQuiet, "Quiet mode (not verbose)");
     arg_cli.add_option("-s,--sample", sampleName, "Which sample to run");
     arg_cli.add_flag("-l,--list", listSamples, "List samples");
     arg_cli.add_flag("-f,--fullscreen", flagFullscreen, "run in fullscreen");
@@ -31,7 +40,7 @@ int main(int argc, char** argv)
     CLI11_PARSE(arg_cli, argc, argv);
   }
 
-  if (flagVerbose)
+  if (!flagQuiet)
     BABYLON::initConsoleLogger();
 
   if (flagSpawnScreenshots) {
@@ -40,7 +49,7 @@ int main(int argc, char** argv)
   }
 
   if (listSamples) {
-    BABYLON::Samples::SamplesIndex().listSamples(); 
+    BABYLON::Samples::SamplesIndex().listSamples();
     exit(0);
   }
 
@@ -58,6 +67,14 @@ int main(int argc, char** argv)
     options._flagScreenshotOneSampleAndExit = flagScreenshotOneSampleAndExit;
     options._sceneName = sampleName;
     options._appWindowParams.FullScreen = flagFullscreen;
+
+#ifdef BABYLON_BUILD_SANDBOX
+    options._sandboxCompilerCallback = [&runtimeCompiler]() {
+      auto compilerStatus = runtimeCompiler.Heartbeat();
+      return compilerStatus;
+    };
+#endif
+
     runSceneWithInspector(scene, options);
   }
   return 0;

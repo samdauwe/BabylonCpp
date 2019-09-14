@@ -7,6 +7,11 @@
 
 #include "components.h"
 
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wheader-hygiene"
+#elif defined(__GNUC__) || defined(__GNUG__)
+#endif
+
 using namespace BABYLON::Extensions::ECS;
 
 class MovementSystem

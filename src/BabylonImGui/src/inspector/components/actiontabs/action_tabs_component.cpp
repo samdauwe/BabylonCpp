@@ -3,7 +3,6 @@
 #include <imgui.h>
 #include <babylon/core/string.h>
 #include <babylon/inspector/components/actiontabs/tabs/debug_tab_component.h>
-#include <babylon/inspector/components/actiontabs/tabs/logs_tab_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/property_grid_tab_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/statistics_tab_component.h>
 #include <babylon/inspector/components/global_state.h>
@@ -18,7 +17,6 @@ ActionTabsComponent::ActionTabsComponent(
     , _propertyGridTabComponent{nullptr}
     , _debugTabComponent{nullptr}
     , _statisticsTabComponent{nullptr}
-    , _logsTabComponent{nullptr}
     , _onSelectionChangeObserver{nullptr}
 {
   componentWillMount();
@@ -52,9 +50,6 @@ void ActionTabsComponent::componentWillMount()
             = {entity->type, *entity->uniqueId, entity->name};
         }
       });
-
-  // Create logs tab widget
-  _logsTabComponent = std::make_unique<LogsTabComponent>(_paneProps);
 }
 
 void ActionTabsComponent::componentWillUnmount()
@@ -99,18 +94,6 @@ void ActionTabsComponent::render()
       if (ImGui::BeginTabItem(statisticsTabLabel.c_str())) {
         if (ImGui::BeginChild("scrollingArea")) {
           _statisticsTabComponent->render();
-          ImGui::EndChild();
-        }
-        ImGui::EndTabItem();
-      }
-    }
-    // Logs Tab
-    if (_logsTabComponent) {
-      static const auto logsTabLabel
-        = String::concat(faInfoCircle, " ", "Logs");
-      if (ImGui::BeginTabItem(logsTabLabel.c_str())) {
-        if (ImGui::BeginChild("scrollingArea")) {
-          _logsTabComponent->render();
           ImGui::EndChild();
         }
         ImGui::EndTabItem();

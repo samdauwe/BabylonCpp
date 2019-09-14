@@ -151,13 +151,6 @@ void Inspector::imgui_render_and_display() // oldie
 
 void Inspector::render(bool createWindow, int width)
 {
-  // Render main menu bar
-  if (ImGui::BeginMainMenuBar()) 
-  {
-    _fileMenu();
-    _menuHeight = static_cast<int>(ImGui::GetWindowSize().y);
-    ImGui::EndMainMenuBar();
-  }
   // Render inspector
   _renderInspector(createWindow, width);
 }
@@ -183,11 +176,6 @@ void Inspector::imgui_dispose()
 
 void Inspector::_fileMenu()
 {
-  if (!ImGui::BeginMenu("File")) {
-    return;
-  }
-  _doMenuItem(*_actionStore->getAction("exit"), true);
-  ImGui::EndMenu();
 }
 
 void Inspector::_addActions()

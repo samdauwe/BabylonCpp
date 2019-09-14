@@ -89,7 +89,7 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
   particleEmitterType = std::make_unique<BoxParticleEmitter>();
 
   // Update
-  updateFunction = [this](std::vector<Particle*>& _particles) {
+  updateFunction = [this](std::vector<Particle*>& particles) {
     std::optional<ISize> noiseTextureSize = std::nullopt;
     std::optional<Uint8Array> noiseTextureData;
 
@@ -99,7 +99,7 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
     }
 
     for (unsigned int index = 0; index < _particles.size(); ++index) {
-      auto particle          = _particles[index];
+      auto particle          = particles[index];
       auto scaledUpdateSpeed = static_cast<float>(_scaledUpdateSpeed);
       auto previousAge       = particle->age;
       particle->age += scaledUpdateSpeed;

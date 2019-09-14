@@ -39,8 +39,8 @@ set(JSON_HPP_INCLUDE_DIRS
 # imgui library as a standalone *static* library (shared libraries are a portability nightmare)
 set(IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/imgui CACHE INTERNAL "imgui directory")
 file(GLOB IMGUI_MAIN_FILES ${IMGUI_DIR}/*.h ${IMGUI_DIR}/*.cpp)
-file(GLOB IMGUI_BACKEND_FILES 
-    ${IMGUI_DIR}/examples/imgui_impl_glfw*.* 
+file(GLOB IMGUI_BACKEND_FILES
+    ${IMGUI_DIR}/examples/imgui_impl_glfw*.*
     ${IMGUI_DIR}/examples/imgui_impl_opengl*.*)
 set(IMGUI_FILES ${IMGUI_MAIN_FILES} ${IMGUI_BACKEND_FILES})
 source_group_by_path_all(${IMGUI_DIR} ${IMGUI_FILES})
@@ -51,7 +51,7 @@ target_compile_definitions(imgui PUBLIC -DIMGUI_IMPL_OPENGL_LOADER_GLAD)
 
 # glad as a standalone *static* library
 set(GLAD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/glad CACHE INTERNAL "Directory of glad")
-set(GLAD_FILES 
+set(GLAD_FILES
     ${GLAD_DIR}/src/glad.c
     ${GLAD_DIR}/include/glad/glad.h
     ${GLAD_DIR}/include/KHR/khrplatform.h)
@@ -61,7 +61,7 @@ target_include_directories(glad PUBLIC ${GLAD_DIR}/include)
 
 # ImGuiColorTextEdit as a standalone *static* library
 set(IMGUI_EDITOR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ImGuiColorTextEdit)
-set(IMGUI_EDITOR_FILES 
+set(IMGUI_EDITOR_FILES
     ${IMGUI_EDITOR_DIR}/TextEditor.cpp
     ${IMGUI_EDITOR_DIR}/TextEditor.h)
 source_group_by_path_all(${IMGUI_EDITOR_DIR} ${IMGUI_EDITOR_FILES})
@@ -74,4 +74,18 @@ if (MSVC)
 endif()
 if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
     target_compile_options(ImGuiColorTextEdit PRIVATE -Wno-reorder -Wno-sign-compare -Wno-unused-variable)
+endif()
+
+# RuntimeCompiledCPlusPlus
+if (NOT APPLE)
+    option(BABYLON_BUILD_SANDBOX "Build the interactive sandbox (modify and run the sandbox code interactively without exiting)" ON)
+else()
+    option(BABYLON_BUILD_SANDBOX "Build the interactive sandbox (modify and run the sandbox code interactively without exiting)" OFF)
+endif()
+if (BABYLON_BUILD_SANDBOX)
+    set (RuntimeCompiledCPlusPlus_Dir ${CMAKE_CURRENT_SOURCE_DIR}/RuntimeCompiledCPlusPlus/Aurora)
+    SET(BUILD_EXAMPLES OFF CACHE BOOL "Build RuntimeCompiledCPlusPlus examples" FORCE)
+    add_subdirectory(${RuntimeCompiledCPlusPlus_Dir})
+    target_include_directories(RuntimeCompiler INTERFACE ${RuntimeCompiledCPlusPlus_Dir})
+    target_include_directories(RuntimeObjectSystem INTERFACE ${RuntimeCompiledCPlusPlus_Dir})
 endif()

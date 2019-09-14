@@ -13,3 +13,6 @@
 [submodule "external/ImGuiColorTextEdit"]
 	path = external/ImGuiColorTextEdit
 	url = https://github.com/BalazsJako/ImGuiColorTextEdit.git
+[submodule "external/RuntimeCompiledCPlusPlus"]
+	path = external/RuntimeCompiledCPlusPlus
+	url = https://github.com/RuntimeCompiledCPlusPlus/RuntimeCompiledCPlusPlus.git

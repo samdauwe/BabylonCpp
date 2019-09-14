@@ -1,7 +1,10 @@
 #include <imgui_utils/icons_font_awesome_5.h>
 #include <babylon/babylon_imgui/run_scene_with_inspector.h>
+#include <babylon/babylon_imgui/babylon_logs_window.h>
 #include <imgui_utils/app_runner/imgui_runner.h>
 #include <babylon/GL/framebuffer_canvas.h>
+#include <babylon/core/filesystem.h>
+#include <babylon/core/system.h>
 
 #include <babylon/core/logging.h>
 #include <babylon/samples/samples_index.h>
@@ -41,6 +44,7 @@ namespace
 
 }
 
+#include <iostream>
 
 namespace BABYLON
 {
@@ -51,7 +55,13 @@ const int INSPECTOR_WIDTH = 400;
 class BabylonInspectorApp {
 public:
 
-  BabylonInspectorApp() {}
+  BabylonInspectorApp() {
+    std::string exePath = BABYLON::System::getExecutablePath();
+    std::string exeFolder = BABYLON::Filesystem::baseDir(exePath);
+    std::string sandboxPath = exeFolder + "/../../../src/SamplesRunner/sandbox.cpp";
+    sandboxPath = BABYLON::Filesystem::absolutePath(sandboxPath);
+    _sandboxCodeEditor.setFiles({ sandboxPath });
+  }
   void RunApp(
     std::shared_ptr<BABYLON::IRenderableScene> initialScene,
     const SceneWithInspectorOptions & options
@@ -60,7 +70,18 @@ public:
     _appContext._options = options;
 
     std::function<bool(void)> showGuiLambda = [this]() -> bool {
-      return this->render();
+      bool r = this->render();
+      for (auto f : _appContext._options._heartbeatCallbacks)
+        f();
+      if (_appContext._options._sandboxCompilerCallback)
+      {
+        SandboxCompilerStatus sandboxCompilerStatus = _appContext._options._sandboxCompilerCallback();
+        if (sandboxCompilerStatus._renderableScene)
+          setRenderableScene(sandboxCompilerStatus._renderableScene);
+        _appContext._isCompiling = sandboxCompilerStatus._isCompiling;
+      }
+
+      return r;
     };
     auto initSceneLambda = [&]() {
       this->initScene();
@@ -74,8 +95,11 @@ private:
   enum class ViewState
   {
     Scene3d,
-    CodeEditor,
+    SamplesCodeViewer,
     SampleBrowser,
+#ifdef BABYLON_BUILD_SANDBOX
+    SandboxEditor,
+#endif
   };
   static std::map<BabylonInspectorApp::ViewState, std::string> ViewStateLabels;
 
@@ -85,8 +109,8 @@ private:
       this->setRenderableScene(scene);
     };
     _appContext._sampleListComponent.OnEditFiles = [&](const std::vector<std::string> & files) {
-      _codeEditor.setFiles(files);
-      _appContext._viewState = ViewState::CodeEditor;
+      _samplesCodeEditor.setFiles(files);
+      _appContext._viewState = ViewState::SamplesCodeViewer;
     };
     _appContext._sampleListComponent.OnLoopSamples = [&](const std::vector<std::string> & samples) {
       _appContext._loopSamples.flagLoop = true;
@@ -108,6 +132,13 @@ private:
     ImVec2 sceneSize = ImGui::GetIO().DisplaySize;
     sceneSize.x -= INSPECTOR_WIDTH;
     sceneSize.y -= 60;
+    return sceneSize;
+  }
+  ImVec2 getSceneSizeSmall()
+  {
+    ImVec2 sceneSize = getSceneSize();
+    sceneSize.x /= 3.f;
+    sceneSize.y /= 3.f;
     return sceneSize;
   }
 
@@ -135,19 +166,24 @@ private:
 
     ShowTabBarEnum(ViewStateLabels, &_appContext._viewState);
 
-    ImGui::SameLine(0.f, 150.f);
-    if (ImGui::Button(ICON_FA_DOOR_OPEN  "Exit"))
+    ImGui::SameLine(0.f, 80.f);
+    BABYLON::BabylonLogsWindow::instance().render();
+    ImGui::SameLine();
+    if (ImGui::Button(ICON_FA_DOOR_OPEN  " Exit"))
       shallExit = true;
 
     ImGui::Separator();
 
     if (_appContext._viewState == ViewState::Scene3d)
       _appContext._sceneWidget->render(getSceneSize());
-    if (_appContext._viewState == ViewState::CodeEditor)
-      _codeEditor.render();
+    if (_appContext._viewState == ViewState::SamplesCodeViewer)
+      _samplesCodeEditor.render();
     else if (_appContext._viewState == ViewState::SampleBrowser)
       _appContext._sampleListComponent.render();
-
+#ifdef BABYLON_BUILD_SANDBOX
+    if (_appContext._viewState == ViewState::SandboxEditor)
+      renderSandbox();
+#endif
 
     ImGui::EndGroup();
 
@@ -166,7 +202,8 @@ private:
     _appContext._sceneWidget->setRenderableScene(scene);
     if (_appContext._inspector)
       _appContext._inspector->setScene(_appContext._sceneWidget->getScene());
-    _appContext._viewState = ViewState::Scene3d;
+    if (_appContext._viewState == ViewState::SampleBrowser)
+      _appContext._viewState = ViewState::Scene3d;
   }
 
   // Saves a screenshot after  few frames (eeturns true when done)
@@ -180,6 +217,23 @@ private:
     this->_appContext._sceneWidget->getCanvas()->saveScreenshotJpg((_appContext._options._sceneName + ".jpg").c_str(),
       jpgQuality, imageWidth);
     return true;
+  }
+
+  void renderSandbox()
+  {
+    //ImGui::ShowDemoWindow();
+    ImGui::BeginGroup();
+    ImGui::Text("Sandbox : you can edit the code below!");
+    ImGui::Text("As soon as you save it, the code will be compiled and the 3D scene will be updated");
+    _appContext._sceneWidget->render(getSceneSizeSmall());
+    ImGui::EndGroup();
+
+    if (_appContext._isCompiling) {
+      ImGui::TextColored(ImVec4(1., 0., 0., 1.), "Compiling");
+      BabylonLogsWindow::instance().setVisible(true);
+    }
+    _sandboxCodeEditor.render();
+
   }
 
 
@@ -220,6 +274,7 @@ private:
     ViewState _viewState = ViewState::Scene3d;
     int _frameCounter = 0;
     SceneWithInspectorOptions _options;
+    bool _isCompiling = false;
 
     struct
     {
@@ -230,14 +285,18 @@ private:
   };
 
   AppContext _appContext;
-  ImGuiUtils::CodeEditor _codeEditor;
+  ImGuiUtils::CodeEditor _samplesCodeEditor = ImGuiUtils::CodeEditor(true); // true <-> showCheckboxReadOnly
+  ImGuiUtils::CodeEditor _sandboxCodeEditor;
 }; // end of class BabylonInspectorApp
 
 
 std::map<BabylonInspectorApp::ViewState, std::string> BabylonInspectorApp::ViewStateLabels = {
 { BabylonInspectorApp::ViewState::Scene3d, ICON_FA_CUBE " 3D Scene"},
-{ BabylonInspectorApp::ViewState::CodeEditor, ICON_FA_EDIT " Code Editor"},
 { BabylonInspectorApp::ViewState::SampleBrowser, ICON_FA_PALETTE " Browse samples"},
+{ BabylonInspectorApp::ViewState::SamplesCodeViewer, ICON_FA_EDIT " Samples Code Viewer"},
+#ifdef BABYLON_BUILD_SANDBOX
+{ BabylonInspectorApp::ViewState::SandboxEditor, ICON_FA_FLASK " Sandbox"},
+#endif
 };
 
 

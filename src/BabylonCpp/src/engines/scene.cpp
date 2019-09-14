@@ -2675,8 +2675,8 @@ int Scene::removeActionManager(AbstractActionManager* toRemove)
 {
   auto it
     = std::find_if(actionManagers.begin(), actionManagers.end(),
-                   [toRemove](const AbstractActionManagerPtr& actionManager) {
-                     return actionManager.get() == toRemove;
+                   [toRemove](const AbstractActionManagerPtr& actionManager_) {
+                     return actionManager_.get() == toRemove;
                    });
   int index = static_cast<int>(it - actionManagers.begin());
   if (it != actionManagers.end()) {

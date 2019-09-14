@@ -127,7 +127,8 @@ if ( ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") OR ("${CMAKE_CXX_COMPILER_ID}"
   set(CLANG_DISABLED_FLAGS_LEGIT
     # https://stackoverflow.com/questions/13905200/is-it-wise-to-ignore-gcc-clangs-wmissing-braces-warning/13905432
     "-Wno-missing-braces"
-  )
+    "-Wno-unused-command-line-argument"
+    )
 
   # Those flags should be activated later (they denote real issues)
   set(CLANG_DISABLED_FLAGS_DUBIOUS

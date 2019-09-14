@@ -524,19 +524,19 @@ UnpackedBinary GLTFFileLoader::_unpackBinaryV2(BinaryReader& binaryReader) const
   // Look for BIN chunk
   Uint8Array bin;
   while (binaryReader.getPosition() < binaryReader.getLength()) {
-    const auto chunkLength = binaryReader.readUint32();
-    const auto chunkFormat = binaryReader.readUint32();
-    switch (chunkFormat) {
+    const auto chunkLength2 = binaryReader.readUint32();
+    const auto chunkFormat2 = binaryReader.readUint32();
+    switch (chunkFormat2) {
       case ChunkFormat_JSON: {
         throw std::runtime_error("Unexpected JSON chunk");
       }
       case ChunkFormat_BIN: {
-        bin = binaryReader.readUint8Array(chunkLength);
+        bin = binaryReader.readUint8Array(chunkLength2);
         break;
       }
       default: {
         // ignore unrecognized chunkFormat
-        binaryReader.skipBytes(chunkLength);
+        binaryReader.skipBytes(chunkLength2);
         break;
       }
     }
