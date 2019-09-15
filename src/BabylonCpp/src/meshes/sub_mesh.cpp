@@ -10,6 +10,7 @@
 #include <babylon/materials/multi_material.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/standard_material_defines.h>
+#include <babylon/math/functions.h>
 #include <babylon/math/plane.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/geometry.h>
@@ -158,9 +159,9 @@ SubMesh& SubMesh::refreshBoundingInfo(const Float32Array& iData)
     };
   }
   else {
-    extend = Tools::ExtractMinAndMaxIndexed(
-      data, indices, indexStart, indexCount,
-      *_renderingMesh->geometry()->boundingBias());
+    extend
+      = ExtractMinAndMaxIndexed(data, indices, indexStart, indexCount,
+                                *_renderingMesh->geometry()->boundingBias());
   }
 
   if (_boundingInfo) {

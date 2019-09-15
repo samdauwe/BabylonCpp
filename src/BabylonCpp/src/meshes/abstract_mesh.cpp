@@ -21,6 +21,7 @@
 #include <babylon/materials/material_defines.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/math/frustum.h>
+#include <babylon/math/functions.h>
 #include <babylon/math/tmp.h>
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/sub_mesh.h>
@@ -1019,7 +1020,7 @@ void AbstractMesh::_refreshBoundingInfo(const Float32Array& data,
                                         const std::optional<Vector2>& bias)
 {
   if (!data.empty()) {
-    auto extend = Tools::ExtractMinAndMax(data, 0, getTotalVertices(), bias);
+    auto extend = ExtractMinAndMax(data, 0, getTotalVertices(), bias);
     if (_boundingInfo) {
       _boundingInfo->reConstruct(extend.min, extend.max);
     }

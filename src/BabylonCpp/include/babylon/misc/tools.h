@@ -123,37 +123,6 @@ struct BABYLON_SHARED_EXPORT Tools {
    */
   static float ToRadians(float angle);
 
-  /**
-   * @brief Extracts minimum and maximum values from a list of indexed
-   * positions.
-   * @param positions defines the positions to use
-   * @param indices defines the indices to the positions
-   * @param indexStart defines the start index
-   * @param indexCount defines the end index
-   * @param bias defines bias value to add to the result
-   * @return minimum and maximum values
-   */
-  static MinMax ExtractMinAndMaxIndexed(const Float32Array& positions,
-                                        const Uint32Array& indices,
-                                        size_t indexStart, size_t indexCount,
-                                        const std::optional<Vector2>& bias
-                                        = std::nullopt);
-
-  /**
-   * @brief Extracts minimum and maximum values from a list of positions.
-   * @param positions defines the positions to use
-   * @param start defines the start index in the positions array
-   * @param count defines the number of positions to handle
-   * @param bias defines bias value to add to the result
-   * @param stride defines the stride size to use (distance between two
-   * positions in the positions array)
-   * @return minimum and maximum values
-   */
-  static MinMax
-  ExtractMinAndMax(const Float32Array& positions, size_t start, size_t count,
-                   const std::optional<Vector2>& bias = std::nullopt,
-                   std::optional<unsigned int> stride = std::nullopt);
-
   static MinMaxVector2 ExtractMinAndMaxVector2(
     const std::function<std::optional<Vector2>(std::size_t index)>& feeder,
     const std::optional<Vector2>& bias = std::nullopt);

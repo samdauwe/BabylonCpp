@@ -12,6 +12,7 @@
 #include <babylon/loading/scene_loader.h>
 #include <babylon/loading/scene_loader_flags.h>
 #include <babylon/materials/effect.h>
+#include <babylon/math/functions.h>
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
@@ -560,7 +561,7 @@ void Geometry::_updateExtend(Float32Array data)
     data = getVerticesData(VertexBuffer::PositionKind);
   }
 
-  _extend = Tools::ExtractMinAndMax(data, 0, _totalVertices, boundingBias(), 3);
+  _extend = ExtractMinAndMax(data, 0, _totalVertices, boundingBias(), 3);
 }
 
 void Geometry::_applyToMesh(Mesh* mesh)

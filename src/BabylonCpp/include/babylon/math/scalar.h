@@ -307,7 +307,7 @@ inline float LerpAngle(float start, float end, float amount)
 constexpr float InverseLerp(float a, float b, float value)
 {
   auto result = 0.f;
-  if (a != b) {
+  if (!stl_util::almost_equal(a, b)) {
     result = Scalar::Clamp((value - a) / (b - a));
   }
   else {
