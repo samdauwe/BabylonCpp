@@ -23,6 +23,19 @@ using NodeMaterialConnectionPointPtr
 using ReflectionTextureBlockPtr = std::shared_ptr<ReflectionTextureBlock>;
 using TextureBlockPtr           = std::shared_ptr<TextureBlock>;
 
+struct BABYLON_SHARED_EXPORT NodeMaterialCompilationHints {
+  bool needWorldViewMatrix           = false;
+  bool needWorldViewProjectionMatrix = false;
+  bool needAlphaBlending             = false;
+  bool needAlphaTesting              = false;
+}; // end of struct NodeMaterialCompilationHints
+
+struct BABYLON_SHARED_EXPORT NodeMaterialCompilationChecks {
+  bool emitVertex   = false;
+  bool emitFragment = false;
+  std::vector<NodeMaterialConnectionPointPtr> notConnectedNonOptionalInputs;
+}; // end of struct NodeMaterialCompilationChecks
+
 /**
  * @brief Class used to store shared data between 2 NodeMaterialBuildState.
  */
@@ -128,21 +141,12 @@ struct BABYLON_SHARED_EXPORT NodeMaterialBuildStateSharedData {
   /**
    * Gets the compilation hints emitted at compilation time
    */
-  typedef struct hints {
-    bool needWorldViewMatrix           = false;
-    bool needWorldViewProjectionMatrix = false;
-    bool needAlphaBlending             = false;
-    bool needAlphaTesting              = false;
-  } hints;
+  NodeMaterialCompilationHints hints;
 
   /**
    * List of compilation checks
    */
-  struct checks {
-    bool emitVertex   = false;
-    bool emitFragment = false;
-    std::vector<NodeMaterialConnectionPointPtr> notConnectedNonOptionalInputs;
-  } checks;
+  NodeMaterialCompilationChecks checks;
 
 }; // end of struct NodeMaterialBuildStateSharedData
 

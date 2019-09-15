@@ -29,6 +29,18 @@ public:
    */
   const std::string getClassName() const override;
 
+  /**
+   * @brief Serializes this block in a JSON representation.
+   * @returns the serialized block object
+   */
+  json serialize() const override;
+
+  /**
+   * @brief Hidden
+   */
+  void _deserialize(const json& serializationObject, Scene* scene,
+                    const std::string& rootUrl) override;
+
 protected:
   /**
    * @brief Creates a new ClampBlock.
@@ -55,18 +67,6 @@ protected:
    * @brief Hidden
    */
   std::string _dumpPropertiesCode() override;
-
-  /**
-   * @brief Serializes this block in a JSON representation.
-   * @returns the serialized block object
-   */
-  json serialize() const override;
-
-  /**
-   * @brief Hidden
-   */
-  void _deserialize(const json& serializationObject, Scene* scene,
-                    const std::string& rootUrl) override;
 
 public:
   /**

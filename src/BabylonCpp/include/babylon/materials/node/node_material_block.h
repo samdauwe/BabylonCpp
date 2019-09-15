@@ -76,8 +76,8 @@ public:
    * @param nodeMaterial defines the hosting NodeMaterial
    * @param mesh defines the mesh that will be rendered
    */
-  void bind(Effect* effect, const NodeMaterialPtr& nodeMaterial,
-            Mesh* mesh = nullptr);
+  virtual void bind(Effect* effect, const NodeMaterialPtr& nodeMaterial,
+                    Mesh* mesh = nullptr);
 
   /**
    * @brief Gets the current class name e.g. "NodeMaterialBlock".
@@ -223,8 +223,9 @@ public:
    * @param useInstances specifies that instances should be used
    * @returns true if the block is ready
    */
-  bool isReady(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
-               const NodeMaterialDefines& defines, bool useInstances = false);
+  virtual bool isReady(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
+                       const NodeMaterialDefines& defines,
+                       bool useInstances = false);
 
   /**
    * @brief Compile the current node and generate the shader code.

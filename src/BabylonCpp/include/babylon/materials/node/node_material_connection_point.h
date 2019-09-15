@@ -123,7 +123,7 @@ protected:
   /**
    * @brief Get the other side of the connection (if any).
    */
-  NodeMaterialConnectionPoint& get_connectedPoint();
+  std::optional<NodeMaterialConnectionPoint>& get_connectedPoint();
 
   /**
    * @brief Get the block that owns this connection point.
@@ -223,7 +223,8 @@ public:
   /**
    * Get the other side of the connection (if any).
    */
-  ReadOnlyProperty<NodeMaterialConnectionPoint, NodeMaterialConnectionPoint>
+  ReadOnlyProperty<NodeMaterialConnectionPoint,
+                   std::optional<NodeMaterialConnectionPoint>>
     connectedPoint;
 
   /**
