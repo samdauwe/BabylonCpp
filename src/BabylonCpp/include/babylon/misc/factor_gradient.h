@@ -27,7 +27,7 @@ struct BABYLON_SHARED_EXPORT FactorGradient : public IValueGradient {
   std::optional<float> factor2;
 
   /**
-   * Will get a number picked randomly between factor1 and factor2.
+   * @brief Will get a number picked randomly between factor1 and factor2.
    * If factor2 is undefined then factor1 will be used
    * @returns the picked number
    */

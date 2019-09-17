@@ -20,7 +20,7 @@ float FactorGradient::getFactor() const
     return factor1;
   }
 
-  return Scalar::Lerp(factor1, *factor2, Math::random());
+  return factor1 + ((*factor2 - factor1) * Math::random());
 }
 
 bool operator==(const FactorGradient& lhs, const FactorGradient& rhs)

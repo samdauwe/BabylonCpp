@@ -36,6 +36,11 @@ class BABYLON_SHARED_EXPORT PerfCounter {
 
 public:
   /**
+   * Gets or sets a global boolean to turn on and off all the counters
+   */
+  static bool Enabled;
+
+  /**
    * @brief Creates a new counter.
    */
   PerfCounter()
@@ -207,6 +212,9 @@ public:
    */
   void addCount(size_t newCount, bool fetchResult)
   {
+    if (!PerfCounter::Enabled) {
+      return;
+    }
     _current += newCount;
     if (fetchResult) {
       _fetchResult();
@@ -218,6 +226,9 @@ public:
    */
   void beginMonitoring()
   {
+    if (!PerfCounter::Enabled) {
+      return;
+    }
     _startMonitoringTime = Time::highresTimepointNow();
   }
 
@@ -229,6 +240,10 @@ public:
    */
   void endMonitoring(bool newFrame = true)
   {
+    if (!PerfCounter::Enabled) {
+      return;
+    }
+
     if (newFrame) {
       fetchNewFrame();
     }

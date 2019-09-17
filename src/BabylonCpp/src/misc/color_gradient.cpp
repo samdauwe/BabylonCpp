@@ -15,7 +15,7 @@ ColorGradient::~ColorGradient()
 
 void ColorGradient::getColorToRef(Color4& result)
 {
-  if (!color2) {
+  if (!color2.has_value()) {
     result.copyFrom(color1);
     return;
   }
