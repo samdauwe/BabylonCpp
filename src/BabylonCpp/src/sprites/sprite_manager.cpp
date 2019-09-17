@@ -24,7 +24,8 @@ namespace BABYLON {
 SpriteManager::SpriteManager(const std::string& iName,
                              const std::string& imgUrl, unsigned int capacity,
                              const ISize& cellSize, Scene* scene, float epsilon,
-                             unsigned int samplingMode)
+                             unsigned int samplingMode, bool /*fromPacked*/,
+                             const std::string& /*spriteJSON*/)
     : name{iName}
     , fogEnabled{true}
     , onDispose{this, &SpriteManager::set_onDispose}

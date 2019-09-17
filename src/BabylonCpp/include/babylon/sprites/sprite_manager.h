@@ -3,10 +3,10 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/materials/textures/texture_constants.h>
-#include <babylon/sprites/isprite_manager.h>
-#include <babylon/sprites/sprite.h>
 #include <babylon/misc/observable.h>
 #include <babylon/misc/observer.h>
+#include <babylon/sprites/isprite_manager.h>
+#include <babylon/sprites/sprite.h>
 
 namespace BABYLON {
 
@@ -44,7 +44,7 @@ public:
 
     return spriteManager;
   }
-  virtual ~SpriteManager();
+  virtual ~SpriteManager() override;
 
   void addToScene(const SpriteManagerPtr& newSpriteManager);
 
@@ -88,7 +88,8 @@ protected:
                 unsigned int capacity, const ISize& cellSize, Scene* scene,
                 float epsilon = 0.01f,
                 unsigned int samplingMode
-                = TextureConstants::TRILINEAR_SAMPLINGMODE);
+                = TextureConstants::TRILINEAR_SAMPLINGMODE,
+                bool fromPacked = false, const std::string& spriteJSON = "");
 
   /**
    * @brief Sets the callback called when the manager is disposed.
