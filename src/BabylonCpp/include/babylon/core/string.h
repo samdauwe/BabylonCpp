@@ -12,6 +12,10 @@
 #include <babylon/babylon_common.h>
 
 namespace BABYLON {
+
+/**
+ * @brief Helper functions to manipulate strings.
+ */
 namespace String {
 
 /**
@@ -132,11 +136,11 @@ inline std::vector<std::string> escape(const std::vector<std::string>& ss)
 }
 
 /**
- * @brief Checks if a string starts with the other string.
- * @param s. The string to check.
- * @param prefix. The substring to search for.
- * @return A boolean value, whether or not the string starts with the prefix
- * string.
+ * @brief Checks for a matching suffix at the beginning of a string.
+ * @param str Source string
+ * @param prefix prefix to search for in the source string
+ * @returns Boolean indicating whether the prefix was found (true) or not
+ * (false)
  */
 inline bool startsWith(const std::string& s, const std::string& prefix)
 {
@@ -147,11 +151,11 @@ inline bool startsWith(const std::string& s, const std::string& prefix)
 }
 
 /**
- * @brief Checks if a string ends with the other string.
- * @param s. The string to check.
- * @param postfix. The substring to search for.
- * @return A boolean value, whether or not the string ends with the postfix
- * string.
+ * @brief Checks for a matching suffix at the end of a string.
+ * @param str Source string
+ * @param suffix Suffix to search for in the source string
+ * @returns Boolean indicating whether the suffix was found (true) or not
+ * (false)
  */
 inline bool endsWith(const std::string& s, const std::string& postfix)
 {
