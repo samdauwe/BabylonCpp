@@ -2,12 +2,7 @@
 #define BABYLON_MISC_PERF_COUNTER_H
 
 #if _WIN32
-#ifdef min
-#undef min
-#endif
-#ifdef max
-#undef max
-#endif
+#define NOMINMAX
 #endif
 
 #include <babylon/babylon_api.h>
