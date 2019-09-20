@@ -5,6 +5,8 @@
 #define NOMINMAX
 #endif
 
+#include <algorithm>
+
 #include <babylon/babylon_api.h>
 #include <babylon/core/time.h>
 
