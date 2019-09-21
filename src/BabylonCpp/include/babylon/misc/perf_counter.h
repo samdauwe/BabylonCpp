@@ -1,10 +1,6 @@
 #ifndef BABYLON_MISC_PERF_COUNTER_H
 #define BABYLON_MISC_PERF_COUNTER_H
 
-#if _WIN32
-#define NOMINMAX
-#endif
-
 #include <algorithm>
 
 #include <babylon/babylon_api.h>
@@ -35,7 +31,7 @@ public:
   /**
    * Gets or sets a global boolean to turn on and off all the counters
    */
-  static bool Enabled;
+  static inline bool Enabled = true;
 
   /**
    * @brief Creates a new counter.
