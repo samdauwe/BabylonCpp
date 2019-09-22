@@ -178,7 +178,7 @@ public:
    */
   virtual void prepareDefines(AbstractMesh* mesh,
                               const NodeMaterialPtr& nodeMaterial,
-                              const NodeMaterialDefines& defines,
+                              NodeMaterialDefines& defines,
                               bool useInstances = false);
 
   /**

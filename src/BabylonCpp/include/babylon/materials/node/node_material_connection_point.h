@@ -58,7 +58,7 @@ public:
    * @returns the current connection point
    */
   NodeMaterialConnectionPoint&
-  connectTo(const NodeMaterialConnectionPoint& connectionPoint,
+  connectTo(const NodeMaterialConnectionPointPtr& connectionPoint,
             bool ignoreConstraints = false);
 
   /**
