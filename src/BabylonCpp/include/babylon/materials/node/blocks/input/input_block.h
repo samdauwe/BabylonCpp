@@ -1,6 +1,8 @@
 #ifndef BABYLON_MATERIALS_NODE_BLOCKS_INPUT_INPUT_BLOCK_H
 #define BABYLON_MATERIALS_NODE_BLOCKS_INPUT_INPUT_BLOCK_H
 
+#include <functional>
+
 #include <babylon/babylon_api.h>
 #include <babylon/materials/node/blocks/input/animated_input_block_types.h>
 #include <babylon/materials/node/node_material_block.h>
@@ -10,8 +12,10 @@
 namespace BABYLON {
 
 class InputBlock;
+class InputValue;
 class Matrix;
 using InputBlockPtr = std::shared_ptr<InputBlock>;
+using InputValuePtr = std::shared_ptr<InputValue>;
 
 /**
  * @brief Block used to expose an input value.
@@ -106,6 +110,32 @@ protected:
    * @brief Gets the output component.
    */
   NodeMaterialConnectionPointPtr& get_output();
+
+  /**
+   * @brief Gets the value of that point.
+   * Please note that this value will be ignored if valueCallback is defined
+   */
+  InputValuePtr& get_value();
+
+  /**
+   * @brief Sets the value of that point.
+   * Please note that this value will be ignored if valueCallback is defined
+   */
+  void set_value(const InputValuePtr& value);
+
+  /**
+   * @brief Gets a callback used to get the value of that point.
+   * Please note that setting this value will force the connection point to
+   * ignore the value property
+   */
+  std::function<InputValuePtr()>& get_valueCallback();
+
+  /**
+   * @brief Sets a callback used to get the value of that point.
+   * Please note that setting this value will force the connection point to
+   * ignore the value property
+   */
+  void set_valueCallback(const std::function<InputValuePtr()>& value);
 
   /**
    * @brief Gets the associated variable name in the shader.
@@ -228,6 +258,19 @@ public:
   ReadOnlyProperty<InputBlock, NodeMaterialConnectionPointPtr> output;
 
   /**
+   * Gets or sets the value of that point.
+   * Please note that this value will be ignored if valueCallback is defined
+   */
+  Property<InputBlock, InputValuePtr> value;
+
+  /**
+   * Gets or sets a callback used to get the value of that point.
+   * Please note that setting this value will force the connection point to
+   * ignore the value property
+   */
+  Property<InputBlock, std::function<InputValuePtr()>> valueCallback;
+
+  /**
    * Gets or sets the associated variable name in the shader
    */
   Property<InputBlock, std::string> associatedVariableName;
@@ -277,6 +320,8 @@ public:
 private:
   NodeMaterialBlockConnectionPointMode _mode;
   std::string _associatedVariableName;
+  InputValuePtr _storedValue;
+  std::function<InputValuePtr()> _valueCallback;
   NodeMaterialBlockConnectionPointTypes _type;
   AnimatedInputBlockTypes _animationType;
 

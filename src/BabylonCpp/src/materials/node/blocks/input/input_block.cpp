@@ -6,6 +6,7 @@
 #include <babylon/core/string.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/node/blocks/input/input_value.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_build_state_shared_data.h>
 #include <babylon/materials/node/node_material_system_values.h>
@@ -21,6 +22,9 @@ InputBlock::InputBlock(const std::string& iName,
     , visibleInInspector{false}
     , type{this, &InputBlock::get_type}
     , output{this, &InputBlock::get_output}
+    , value{this, &InputBlock::get_value, &InputBlock::set_value}
+    , valueCallback{this, &InputBlock::get_valueCallback,
+                    &InputBlock::set_valueCallback}
     , associatedVariableName{this, &InputBlock::get_associatedVariableName,
                              &InputBlock::set_associatedVariableName}
     , animationType{this, &InputBlock::get_animationType,
@@ -34,6 +38,8 @@ InputBlock::InputBlock(const std::string& iName,
     , systemValue{this, &InputBlock::get_systemValue,
                   &InputBlock::set_systemValue}
     , _mode{NodeMaterialBlockConnectionPointMode::Undefined}
+    , _storedValue{nullptr}
+    , _valueCallback{nullptr}
     , _animationType{AnimatedInputBlockTypes::None}
 {
   _type = type;
@@ -50,58 +56,60 @@ InputBlock::~InputBlock()
 NodeMaterialBlockConnectionPointTypes& InputBlock::get_type()
 {
   if (_type == NodeMaterialBlockConnectionPointTypes::AutoDetect) {
-    if (isUniform() && value != nullptr) {
-      if (!isNaN(value)) {
-        _type = NodeMaterialBlockConnectionPointTypes::Float;
+    if (isUniform() && value() != nullptr) {
+      const auto& valueType = value()->getType();
+      if (valueType.has_value()) {
+        switch (*valueType) {
+          case NodeMaterialBlockConnectionPointTypes::Float:
+            _type = NodeMaterialBlockConnectionPointTypes::Float;
+            return _type;
+          case NodeMaterialBlockConnectionPointTypes::Int:
+            _type = NodeMaterialBlockConnectionPointTypes::Int;
+            return _type;
+          case NodeMaterialBlockConnectionPointTypes::Vector2:
+            _type = NodeMaterialBlockConnectionPointTypes::Vector2;
+            return _type;
+          case NodeMaterialBlockConnectionPointTypes::Vector3:
+            _type = NodeMaterialBlockConnectionPointTypes::Vector3;
+            return _type;
+          case NodeMaterialBlockConnectionPointTypes::Vector4:
+            _type = NodeMaterialBlockConnectionPointTypes::Vector4;
+            return _type;
+          case NodeMaterialBlockConnectionPointTypes::Color3:
+            _type = NodeMaterialBlockConnectionPointTypes::Color3;
+            return _type;
+          case NodeMaterialBlockConnectionPointTypes::Color4:
+            _type = NodeMaterialBlockConnectionPointTypes::Color4;
+            return _type;
+          default:
+            break;
+        }
+      }
+    }
+
+    if (isAttribute()) {
+      if (name == "position" || name == "normal" || name == "tangent") {
+        _type = NodeMaterialBlockConnectionPointTypes::Vector3;
         return _type;
       }
-
-      switch (value.getClassName()) {
-        case "Vector2":
-          _type = NodeMaterialBlockConnectionPointTypes::Vector2;
-          return _type;
-        case "Vector3":
-          _type = NodeMaterialBlockConnectionPointTypes::Vector3;
-          return _type;
-        case "Vector4":
-          _type = NodeMaterialBlockConnectionPointTypes::Vector4;
-          return _type;
-        case "Color3":
-          _type = NodeMaterialBlockConnectionPointTypes::Color3;
-          return _type;
-        case "Color4":
-          _type = NodeMaterialBlockConnectionPointTypes::Color4;
-          return _type;
+      else if (name == "uv" || name == "uv2") {
+        _type = NodeMaterialBlockConnectionPointTypes::Vector2;
+        return _type;
+      }
+      else if (name == "matricesIndices" || name == "matricesWeights"
+               || name == "world0" || name == "world1" || name == "world2"
+               || name == "world3") {
+        _type = NodeMaterialBlockConnectionPointTypes::Vector4;
+        return _type;
+      }
+      else if (name == "color") {
+        _type = NodeMaterialBlockConnectionPointTypes::Color4;
+        return _type;
       }
     }
 
-    if (isAttribute) {
-      switch (name) {
-        case "position":
-        case "normal":
-        case "tangent":
-          _type = NodeMaterialBlockConnectionPointTypes::Vector3;
-          return _type;
-        case "uv":
-        case "uv2":
-          _type = NodeMaterialBlockConnectionPointTypes::Vector2;
-          return _type;
-        case "matricesIndices":
-        case "matricesWeights":
-        case "world0":
-        case "world1":
-        case "world2":
-        case "world3":
-          _type = NodeMaterialBlockConnectionPointTypes::Vector4;
-          return _type;
-        case "color":
-          _type = NodeMaterialBlockConnectionPointTypes::Color4;
-          return _type;
-      }
-    }
-
-    if (isSystemValue) {
-      switch (_systemValue) {
+    if (isSystemValue()) {
+      switch (*_systemValue) {
         case NodeMaterialSystemValues::World:
         case NodeMaterialSystemValues::WorldView:
         case NodeMaterialSystemValues::WorldViewProjection:
@@ -142,6 +150,28 @@ InputBlock& InputBlock::setAsSystemValue(
 {
   systemValue = value;
   return *this;
+}
+
+InputValuePtr& InputBlock::get_value()
+{
+  return _storedValue;
+}
+
+void InputBlock::set_value(const InputValuePtr& value)
+{
+  _storedValue = value;
+  _mode        = NodeMaterialBlockConnectionPointMode::Uniform;
+}
+
+std::function<InputValuePtr()>& InputBlock::get_valueCallback()
+{
+  return _valueCallback;
+}
+
+void InputBlock::set_valueCallback(const std::function<InputValuePtr()>& value)
+{
+  _valueCallback = value;
+  _mode          = NodeMaterialBlockConnectionPointMode::Uniform;
 }
 
 std::string InputBlock::get_associatedVariableName() const
@@ -233,7 +263,7 @@ void InputBlock::animate(Scene* scene)
   switch (_animationType) {
     case AnimatedInputBlockTypes::Time: {
       if (type == NodeMaterialBlockConnectionPointTypes::Float) {
-        value += scene->getAnimationRatio() * 0.01f;
+        value()->get<float>() += scene->getAnimationRatio() * 0.01f;
       }
       break;
     }
@@ -255,25 +285,28 @@ void InputBlock::setDefaultValue()
 {
   switch (type) {
     case NodeMaterialBlockConnectionPointTypes::Float:
-      value = 0.f;
+      value()->get<float>() = 0.f;
+      break;
+    case NodeMaterialBlockConnectionPointTypes::Int:
+      value()->get<int>() = 0;
       break;
     case NodeMaterialBlockConnectionPointTypes::Vector2:
-      value = Vector2::Zero();
+      value()->get<Vector2>() = Vector2::Zero();
       break;
     case NodeMaterialBlockConnectionPointTypes::Vector3:
-      value = Vector3::Zero();
+      value()->get<Vector3>() = Vector3::Zero();
       break;
     case NodeMaterialBlockConnectionPointTypes::Vector4:
-      value = Vector4::Zero();
+      value()->get<Vector4>() = Vector4::Zero();
       break;
     case NodeMaterialBlockConnectionPointTypes::Color3:
-      value = Color3::White();
+      value()->get<Color3>() = Color3::White();
       break;
     case NodeMaterialBlockConnectionPointTypes::Color4:
-      value = Color4(1.f, 1.f, 1.f, 1.f);
+      value()->get<Color4>() = Color4(1.f, 1.f, 1.f, 1.f);
       break;
     case NodeMaterialBlockConnectionPointTypes::Matrix:
-      value = Matrix::Identity();
+      value()->get<Matrix>() = Matrix::Identity();
       break;
     default:
       break;
@@ -282,7 +315,55 @@ void InputBlock::setDefaultValue()
 
 std::string InputBlock::_dumpPropertiesCode()
 {
-  // TODO
+  if (isAttribute()) {
+    return String::printf("%s.setAsAttribute(%s);\r\n",
+                          _codeVariableName.c_str(), name.c_str());
+  }
+  if (isSystemValue()) {
+    // TODO
+  }
+  if (isUniform()) {
+    std::string valueString = "";
+    switch (type) {
+      case NodeMaterialBlockConnectionPointTypes::Float:
+        valueString = std::to_string(value()->get<float>());
+        break;
+      case NodeMaterialBlockConnectionPointTypes::Int:
+        valueString = std::to_string(value()->get<int>());
+        break;
+      case NodeMaterialBlockConnectionPointTypes::Vector2: {
+        const auto& vector2Value = value()->get<Vector2>();
+        valueString
+          = String::printf("Vector2(%f, %f)", vector2Value.x, vector2Value.y);
+      } break;
+      case NodeMaterialBlockConnectionPointTypes::Vector3: {
+        const auto& vector3Value = value()->get<Vector3>();
+        valueString = String::printf("Vector3(%f, %f, %f)", vector3Value.x,
+                                     vector3Value.y, vector3Value.z);
+      } break;
+      case NodeMaterialBlockConnectionPointTypes::Vector4: {
+        const auto& vector4Value = value()->get<Vector4>();
+        valueString
+          = String::printf("Vector4(%f, %f, %f, %f)", vector4Value.x,
+                           vector4Value.y, vector4Value.z, vector4Value.w);
+      } break;
+      case NodeMaterialBlockConnectionPointTypes::Color3: {
+        const auto& color3Value = value()->get<Color3>();
+        valueString = String::printf("Color3(%f, %f, %f)", color3Value.r,
+                                     color3Value.g, color3Value.b);
+      } break;
+      case NodeMaterialBlockConnectionPointTypes::Color4: {
+        const auto& color4Value = value()->get<Color4>();
+        valueString
+          = String::printf("Color4(%f, %f, %f, %f)", color4Value.r,
+                           color4Value.g, color4Value.b, color4Value.a);
+      } break;
+      default:
+        break;
+    }
+    return String::printf("%s.value = %s;\r\n", _codeVariableName.c_str(),
+                          valueString.c_str());
+  }
   return "";
 }
 
@@ -411,8 +492,8 @@ void InputBlock::_transmit(Effect* effect, Scene* scene)
                            scene->activeCamera()->globalPosition());
         break;
       case NodeMaterialSystemValues::FogColor:
-                        effect->setColor3(variableName, scene->fogColor;
-                        break;
+        effect->setColor3(variableName, scene->fogColor);
+        break;
     }
     return;
   }
@@ -425,28 +506,28 @@ void InputBlock::_transmit(Effect* effect, Scene* scene)
 
   switch (type()) {
     case NodeMaterialBlockConnectionPointTypes::Float:
-      effect->setFloat(variableName, value);
+      effect->setFloat(variableName, value->get<float>());
       break;
     case NodeMaterialBlockConnectionPointTypes::Int:
-      effect->setInt(variableName, value);
+      effect->setInt(variableName, value->get<int>());
       break;
     case NodeMaterialBlockConnectionPointTypes::Color3:
-      effect->setColor3(variableName, value);
+      effect->setColor3(variableName, value->get<Color3>());
       break;
     case NodeMaterialBlockConnectionPointTypes::Color4:
-      effect->setDirectColor4(variableName, value);
+      effect->setDirectColor4(variableName, value->get<Color4>());
       break;
     case NodeMaterialBlockConnectionPointTypes::Vector2:
-      effect->setVector2(variableName, value);
+      effect->setVector2(variableName, value->get<Vector2>());
       break;
     case NodeMaterialBlockConnectionPointTypes::Vector3:
-      effect->setVector3(variableName, value);
+      effect->setVector3(variableName, value->get<Vector3>());
       break;
     case NodeMaterialBlockConnectionPointTypes::Vector4:
-      effect->setVector4(variableName, value);
+      effect->setVector4(variableName, value->get<Vector4>());
       break;
     case NodeMaterialBlockConnectionPointTypes::Matrix:
-      effect->setMatrix(variableName, value);
+      effect->setMatrix(variableName, value->get<Matrix>());
       break;
     default:
       break;
