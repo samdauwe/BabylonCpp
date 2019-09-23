@@ -59,7 +59,7 @@ def fileComparisonToStr(fileComparisonDict):
 def main():
     # Versions to compare
     current, previous = "4.0.0", "3.3.0"
-    #current, previous = "4.1.0-alpha.17", "4.0.0"
+    current, previous = "4.1.0-alpha.17", "4.0.0"
     # Dictionary mapping from BabylonJs version to relative path
     BabylonJsVersions = {
         "3.3.0"          : "3.3.0_2018_10_02",
@@ -84,7 +84,9 @@ def main():
         "vrDeviceOrientationFreeCamera.ts", "vrExperienceHelper.ts",
         "vrDeviceOrientationGamepadCamera.ts", "webVRCamera.ts",
         # Cameras / XR
-        "webXRCamera.ts", "webXREnterExitUI.ts", "webXRInput.ts",
+        "webXRCamera.ts", "webXRController.ts", "webXRControllerModelLoader.ts",
+        "webXRControllerPointerSelection.ts", "webXRControllerTeleportation.ts",
+        "webXRDefaultExperience.ts", "webXREnterExitUI.ts", "webXRInput.ts",
         "webXRExperienceHelper.ts", "webXRManagedOutputCanvas.ts",
         "webXRSessionManager.ts",
         # Debug
@@ -98,11 +100,11 @@ def main():
         # Loading
         "loadingScreen.ts",
         # Materials / Textures
-        "htmlElementTexture.ts", "videoTexture.ts",
+        "basisTextureLoader.ts", "htmlElementTexture.ts", "videoTexture.ts",
         # Meshes / Compression
         "dracoCompression.ts",
         # Misc
-        "andOrNotEvaluator.ts", "assetsManager.ts", "decorators.ts",
+        "andOrNotEvaluator.ts", "assetsManager.ts", "basis.ts", "decorators.ts",
         "deepCopier.ts", "deferred.ts", "domManagement.ts", "filesInput.ts",
         "filesInputStore.ts", "logger.ts", "precisionDate.ts", "promise.ts",
         "sceneSerializer.ts", "screenshotTools.ts", "smartArray.ts",
