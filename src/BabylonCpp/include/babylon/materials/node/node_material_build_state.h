@@ -20,6 +20,25 @@ using NodeMaterialBuildStatePtr = std::shared_ptr<NodeMaterialBuildState>;
 using NodeMaterialBuildStateSharedDataPtr
   = std::shared_ptr<NodeMaterialBuildStateSharedData>;
 
+struct BABYLON_SHARED_EXPORT StringsReplacement {
+  std::string search  = "";
+  std::string replace = "";
+}; // end of struct StringsReplacement
+
+struct BABYLON_SHARED_EXPORT EmitCodeFromIncludeOptions {
+  std::vector<StringsReplacement> replaceStrings = {};
+  std::string repeatKey                          = "";
+}; // end of struct _emitCodeFromIncludeOptions
+
+struct BABYLON_SHARED_EXPORT EmitFunctionFromIncludeOptions {
+  std::string repeatKey                          = "";
+  std::optional<bool> removeAttributes           = std::nullopt;
+  std::optional<bool> removeUniforms             = std::nullopt;
+  std::optional<bool> removeVaryings             = std::nullopt;
+  std::optional<bool> removeIfDef                = std::nullopt;
+  std::vector<StringsReplacement> replaceStrings = {};
+}; // end of struct EmitFunctionFromIncludeOptions
+
 /**
  * @brief Class used to store node based material build state.
  */
@@ -62,6 +81,21 @@ public:
    */
   void _emitFunction(const std::string& name, const std::string& code,
                      const std::string& comments);
+
+  /**
+   * @brief Hidden
+   */
+  std::string _emitCodeFromInclude(
+    const std::string& includeName, const std::string& comments,
+    const std::optional<EmitCodeFromIncludeOptions>& options = std::nullopt);
+
+  /**
+   * @brief Hidden
+   */
+  std::string _emitFunctionFromInclude(
+    const std::string& includeName, const std::string& comments,
+    const std::optional<EmitFunctionFromIncludeOptions>& options = std::nullopt,
+    const std::string& storeKey                                  = "");
 
   /**
    * @brief Hidden

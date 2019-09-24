@@ -24,6 +24,7 @@ class NodeMaterialConnectionPoint;
 struct NodeMaterialDefines;
 class NodeMaterialBuildState;
 class Scene;
+using EffectPtr            = std::shared_ptr<Effect>;
 using NodeMaterialPtr      = std::shared_ptr<NodeMaterial>;
 using NodeMaterialBlockPtr = std::shared_ptr<NodeMaterialBlock>;
 using NodeMaterialConnectionPointPtr
@@ -76,8 +77,8 @@ public:
    * @param nodeMaterial defines the hosting NodeMaterial
    * @param mesh defines the mesh that will be rendered
    */
-  virtual void bind(Effect* effect, const NodeMaterialPtr& nodeMaterial,
-                    Mesh* mesh = nullptr);
+  virtual void bind(const EffectPtr& effect,
+                    const NodeMaterialPtr& nodeMaterial, Mesh* mesh = nullptr);
 
   /**
    * @brief Gets the current class name e.g. "NodeMaterialBlock".
