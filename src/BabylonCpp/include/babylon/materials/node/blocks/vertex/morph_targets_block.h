@@ -72,10 +72,10 @@ public:
    * @param defines defines the material defines to update
    */
   void
-  replaceRepeatableContent(const NodeMaterialBuildState& vertexShaderState,
+  replaceRepeatableContent(NodeMaterialBuildState& vertexShaderState,
                            const NodeMaterialBuildState& fragmentShaderState,
                            AbstractMesh* mesh,
-                           const NodeMaterialDefines& defines) override;
+                           NodeMaterialDefines& defines) override;
 
 protected:
   /**
@@ -120,6 +120,11 @@ protected:
   NodeMaterialConnectionPointPtr& get_tangentOutput();
 
   /**
+   * @brief Gets the uv output component.
+   */
+  NodeMaterialConnectionPointPtr& get_uvOutput();
+
+  /**
    * @brief Hidden
    */
   MorphTargetsBlock& _buildBlock(NodeMaterialBuildState& state) override;
@@ -162,6 +167,15 @@ public:
    */
   ReadOnlyProperty<MorphTargetsBlock, NodeMaterialConnectionPointPtr>
     tangentOutput;
+
+  /**
+   * Gets the uv output component
+   */
+  ReadOnlyProperty<MorphTargetsBlock, NodeMaterialConnectionPointPtr> uvOutput;
+
+private:
+  std::string _repeatableContentAnchor;
+  size_t _repeatebleContentGenerated;
 
 }; // end of class MorphTargetsBlock
 

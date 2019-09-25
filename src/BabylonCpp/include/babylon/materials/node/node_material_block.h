@@ -211,10 +211,9 @@ public:
    * @param defines defines the material defines to update
    */
   virtual void
-  replaceRepeatableContent(const NodeMaterialBuildState& vertexShaderState,
+  replaceRepeatableContent(NodeMaterialBuildState& vertexShaderState,
                            const NodeMaterialBuildState& fragmentShaderState,
-                           AbstractMesh* mesh,
-                           const NodeMaterialDefines& defines);
+                           AbstractMesh* mesh, NodeMaterialDefines& defines);
 
   /**
    * @brief Checks if the block is ready.

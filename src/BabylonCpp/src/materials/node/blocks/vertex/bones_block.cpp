@@ -95,7 +95,7 @@ void BonesBlock::autoConfigure(const NodeMaterialPtr& material)
       matricesIndicesInput = InputBlock::New("matricesIndices");
       matricesIndicesInput->setAsAttribute("matricesIndices");
     }
-    matricesIndicesInput->output()->connectTo(matricesIndices);
+    matricesIndicesInput->output()->connectTo(matricesIndices());
   }
   if (!matricesWeights()->isConnected()) {
     auto matricesWeightsInput
@@ -107,7 +107,7 @@ void BonesBlock::autoConfigure(const NodeMaterialPtr& material)
       matricesWeightsInput = InputBlock::New("matricesWeights");
       matricesWeightsInput->setAsAttribute("matricesWeights");
     }
-    matricesWeightsInput->output()->connectTo(matricesWeights);
+    matricesWeightsInput->output()->connectTo(matricesWeights());
   }
   if (!world()->isConnected()) {
     auto worldInput
@@ -120,7 +120,7 @@ void BonesBlock::autoConfigure(const NodeMaterialPtr& material)
       worldInput = InputBlock::New("world");
       worldInput->setAsSystemValue(NodeMaterialSystemValues::World);
     }
-    worldInput->output()->connectTo(world);
+    worldInput->output()->connectTo(world());
   }
 }
 
