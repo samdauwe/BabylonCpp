@@ -11,7 +11,9 @@ namespace BABYLON {
  * @brief Interface used to configure the node material editor.
  */
 struct BABYLON_SHARED_EXPORT INodeMaterialEditorOptions {
-  /** Define the URl to load node editor script */
+  /**
+   * Define the URl to load node editor script
+   */
   std::string editorURL;
 }; // end of struct INodeMaterialEditorOptions
 
