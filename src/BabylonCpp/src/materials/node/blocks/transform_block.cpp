@@ -50,7 +50,7 @@ TransformBlock& TransformBlock::_buildBlock(NodeMaterialBuildState& state)
 
   const auto& output = _outputs[0];
 
-  switch (vector()->connectedPoint().type()) {
+  switch (vector()->connectedPoint()->type()) {
     case NodeMaterialBlockConnectionPointTypes::Vector2:
       state.compilationString
         += _declareOutput(output, state)

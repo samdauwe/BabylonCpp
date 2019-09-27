@@ -1,7 +1,7 @@
 #include <babylon/materials/node/blocks/fresnel_block.h>
 
 #include <babylon/core/string.h>
-#include <babylon/materials/node/input/input_block.h>
+#include <babylon/materials/node/blocks/input/input_block.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
 
@@ -58,17 +58,17 @@ NodeMaterialConnectionPointPtr& FresnelBlock::get_fresnel()
   return _outputs[0];
 }
 
-void FresnelBlock::autoConfigure(const NodeMaterialPtr& material)
+void FresnelBlock::autoConfigure(const NodeMaterialPtr& /*material*/)
 {
   if (!bias()->isConnected()) {
     auto biasInput   = InputBlock::New("bias");
-    biasInput->value = 0.f;
+    biasInput->value = std::make_shared<InputValue>(0.f);
     biasInput->output()->connectTo(bias);
   }
 
   if (!power()->isConnected()) {
     auto powerInput   = InputBlock::New("power");
-    powerInput->value = 1.f;
+    powerInput->value = std::make_shared<InputValue>(1.f);
     powerInput->output()->connectTo(power);
   }
 }
@@ -79,8 +79,9 @@ FresnelBlock& FresnelBlock::_buildBlock(NodeMaterialBuildState& state)
 
   auto comments = String::printf("//%s", name.c_str());
 
-  state._emitFunctionFromInclude("fresnelFunction", comments,
-                                 {.removeIfDef = true});
+  EmitFunctionFromIncludeOptions options;
+  options.removeIfDef = true;
+  state._emitFunctionFromInclude("fresnelFunction", comments, options);
 
   state.compilationString
     += _declareOutput(fresnel, state)

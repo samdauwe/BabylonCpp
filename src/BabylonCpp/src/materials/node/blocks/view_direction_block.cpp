@@ -1,7 +1,7 @@
 #include <babylon/materials/node/blocks/view_direction_block.h>
 
 #include <babylon/core/string.h>
-#include <babylon/materials/node/input/input_block.h>
+#include <babylon/materials/node/blocks/input/input_block.h>
 #include <babylon/materials/node/node_material.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
@@ -50,15 +50,19 @@ NodeMaterialConnectionPointPtr& ViewDirectionBlock::get_output()
 void ViewDirectionBlock::autoConfigure(const NodeMaterialPtr& material)
 {
   if (!cameraPosition()->isConnected()) {
-    auto cameraPositionInput = material->getInputBlockByPredicate(
-      (b) = > b.systemValue == = NodeMaterialSystemValues.CameraPosition);
+    auto cameraPositionInput
+      = material->getInputBlockByPredicate([](const InputBlockPtr& b) -> bool {
+          return b->systemValue().has_value()
+                 && b->systemValue().value()
+                      == NodeMaterialSystemValues::CameraPosition;
+        });
 
     if (!cameraPositionInput) {
       cameraPositionInput = InputBlock::New("cameraPosition");
       cameraPositionInput->setAsSystemValue(
         NodeMaterialSystemValues::CameraPosition);
     }
-    cameraPositionInput.output.connectTo(cameraPosition);
+    cameraPositionInput->output()->connectTo(cameraPosition);
   }
 }
 
@@ -72,10 +76,10 @@ ViewDirectionBlock::_buildBlock(NodeMaterialBuildState& state)
   state.compilationString
     += _declareOutput(output, state)
        + String::printf(" = normalize(%s - %s).xyz);\r\n",
-                        cameraPosition()->associatedVariableName(),
-                        worldPosition()->associatedVariableName())
+                        cameraPosition()->associatedVariableName().c_str(),
+                        worldPosition()->associatedVariableName().c_str());
 
-         return this;
+  return *this;
 }
 
 } // end of namespace BABYLON
