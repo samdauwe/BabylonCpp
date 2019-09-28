@@ -202,14 +202,6 @@ struct BABYLON_SHARED_EXPORT Tools {
     bool useArrayBuffer);
 
   /**
-   * @brief Checks if a given vector is inside a specific range.
-   * @param v defines the vector to test
-   * @param min defines the minimum range
-   * @param max defines the maximum range
-   */
-  static void CheckExtends(Vector3& v, Vector3& min, Vector3& max);
-
-  /**
    * @brief Implementation from
    * http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/2117523#answer-2117523
    * Be aware Math.random() could cause collisions, but:

@@ -795,6 +795,14 @@ public:
                          const Vector3& max, Vector3& result);
 
   /**
+   * @brief Checks if a given vector is inside a specific range.
+   * @param v defines the vector to test
+   * @param min defines the minimum range
+   * @param max defines the maximum range
+   */
+  static void CheckExtends(Vector3& v, Vector3& min, Vector3& max);
+
+  /**
    * @brief Returns a new Vector3 located for "amount" (float) on the Hermite
    * interpolation spline defined by the vectors "value1", "tangent1", "value2",
    * "tangent2".

@@ -4376,8 +4376,8 @@ MinMax Scene::getWorldExtends(
     auto minBox = boundingInfo.boundingBox.minimumWorld;
     auto maxBox = boundingInfo.boundingBox.maximumWorld;
 
-    Tools::CheckExtends(minBox, min, max);
-    Tools::CheckExtends(maxBox, min, max);
+    Vector3::CheckExtends(minBox, min, max);
+    Vector3::CheckExtends(maxBox, min, max);
   }
 
   return {min, max};

@@ -836,6 +836,12 @@ void Vector3::ClampToRef(const Vector3& value, const Vector3& min,
   result.copyFromFloats(x, y, z);
 }
 
+void Vector3::CheckExtends(Vector3& v, Vector3& min, Vector3& max)
+{
+  min.minimizeInPlace(v);
+  max.maximizeInPlace(v);
+}
+
 Vector3 Vector3::Hermite(const Vector3& value1, const Vector3& tangent1,
                          const Vector3& value2, const Vector3& tangent2,
                          float amount)

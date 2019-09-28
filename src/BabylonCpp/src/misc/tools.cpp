@@ -494,12 +494,6 @@ void Tools::ReadFile(
   }
 }
 
-void Tools::CheckExtends(Vector3& v, Vector3& min, Vector3& max)
-{
-  min.minimizeInPlace(v);
-  max.maximizeInPlace(v);
-}
-
 std::string Tools::RandomId()
 {
   // from

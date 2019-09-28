@@ -9,7 +9,6 @@
 #include <babylon/engines/scene.h>
 #include <babylon/events/pointer_event_types.h>
 #include <babylon/meshes/abstract_mesh.h>
-#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 
@@ -246,8 +245,8 @@ void FramingBehavior::zoomOnMeshesHierarchy(
 
   for (auto& mesh : meshes) {
     auto boundingInfo = mesh->getHierarchyBoundingVectors(true);
-    Tools::CheckExtends(boundingInfo.min, min, max);
-    Tools::CheckExtends(boundingInfo.max, min, max);
+    Vector3::CheckExtends(boundingInfo.min, min, max);
+    Vector3::CheckExtends(boundingInfo.max, min, max);
   }
 
   zoomOnBoundingInfo(min, max, focusOnOriginXZ, onAnimationEnd);

@@ -10,7 +10,6 @@
 #include <babylon/lights/light.h>
 #include <babylon/math/matrix.h>
 #include <babylon/meshes/abstract_mesh.h>
-#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 
@@ -625,8 +624,8 @@ MinMax Node::getHierarchyBoundingVectors(
       auto minBox = boundingBox.minimumWorld;
       auto maxBox = boundingBox.maximumWorld;
 
-      Tools::CheckExtends(minBox, min, max);
-      Tools::CheckExtends(maxBox, min, max);
+      Vector3::CheckExtends(minBox, min, max);
+      Vector3::CheckExtends(maxBox, min, max);
     }
   }
 
