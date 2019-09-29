@@ -124,7 +124,18 @@ protected:
    */
   MultiMaterial(const std::string name, Scene* scene);
 
+  /**
+   * @brief Gets the list of Materials used within the multi material.
+   * They need to be ordered according to the submeshes order in the associated
+   * mesh
+   */
   std::vector<MaterialPtr>& get_subMaterials();
+
+  /**
+   * @brief Sets the list of Materials used within the multi material.
+   * They need to be ordered according to the submeshes order in the associated
+   * mesh
+   */
   void set_subMaterials(const std::vector<MaterialPtr>& value);
 
 private:

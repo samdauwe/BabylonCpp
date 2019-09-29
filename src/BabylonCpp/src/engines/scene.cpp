@@ -2853,6 +2853,21 @@ MaterialPtr Scene::getMaterialByID(const std::string& id)
   return (it == materials.end()) ? nullptr : *it;
 }
 
+MaterialPtr Scene::getLastMaterialByID(const std::string& id)
+{
+  if (materials.empty()) {
+    return nullptr;
+  }
+
+  for (size_t index = materials.size() - 1; index-- > 0;) {
+    if (materials[index]->id == id) {
+      return materials[index];
+    }
+  }
+
+  return nullptr;
+}
+
 MaterialPtr Scene::getMaterialByUniqueID(size_t uniqueId)
 {
   auto it = std::find_if(materials.begin(), materials.end(),

@@ -153,8 +153,11 @@ MultiMaterial::ParseMultiMaterial(const json& parsedMultiMaterial, Scene* scene)
        json_util::get_array<json>(parsedMultiMaterial, "materials")) {
 
     if (subMatId.is_string()) {
+      // If the same multimaterial is loaded twice, the 2nd multimaterial needs
+      // to reference the latest material by that id which is why this lookup
+      // should use getLastMaterialByID instead of getMaterialByID
       multiMaterial->subMaterials().emplace_back(
-        scene->getMaterialByID(subMatId.get<std::string>()));
+        scene->getLastMaterialByID(subMatId.get<std::string>()));
     }
     else {
       multiMaterial->subMaterials().emplace_back(nullptr);

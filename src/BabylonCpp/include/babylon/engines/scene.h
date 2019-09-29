@@ -953,6 +953,13 @@ public:
   MaterialPtr getMaterialByID(const std::string& id);
 
   /**
+   * @brief Gets a the last added material using a given id.
+   * @param id defines the material's ID
+   * @return the last material with the given id or null if none found.
+   */
+  MaterialPtr getLastMaterialByID(const std::string& id);
+
+  /**
    * @brief Gets a material using its unique id.
    * @param uniqueId defines the unique id to look for
    * @returns the material or null if not found
