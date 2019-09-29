@@ -136,11 +136,11 @@ ShaderMaterial& ShaderMaterial::setColor3Array(const std::string& iName,
                                                const std::vector<Color3>& value)
 {
   _checkUniform(iName);
-  _colors3Arrays[name].clear();
+  _colors3Arrays[iName] = {};
   for (const auto& color : value) {
     Float32Array arr(3);
     color.toArray(arr, 0);
-    stl_util::concat(_colors3Arrays[name], arr);
+    stl_util::concat(_colors3Arrays[iName], arr);
   }
 
   return *this;
@@ -151,6 +151,20 @@ ShaderMaterial& ShaderMaterial::setColor4(const std::string& iName,
 {
   _checkUniform(iName);
   _colors4[iName] = value;
+
+  return *this;
+}
+
+ShaderMaterial& ShaderMaterial::setColor4Array(const std::string& iName,
+                                               const std::vector<Color4>& value)
+{
+  _checkUniform(iName);
+  _colors4Arrays[iName] = {};
+  for (const auto& color : value) {
+    Float32Array arr(4);
+    color.toArray(arr, 0);
+    stl_util::concat(_colors4Arrays[iName], arr);
+  }
 
   return *this;
 }
@@ -227,6 +241,15 @@ ShaderMaterial& ShaderMaterial::setArray3(const std::string& iName,
   return *this;
 }
 
+ShaderMaterial& ShaderMaterial::setArray4(const std::string& iName,
+                                          const Float32Array& value)
+{
+  _checkUniform(iName);
+  _vectors4Arrays[iName] = value;
+
+  return *this;
+}
+
 bool ShaderMaterial::_checkCache(AbstractMesh* mesh, bool useInstances)
 {
   if (!mesh) {
@@ -267,11 +290,11 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   std::vector<std::string> attribs;
   auto fallbacks = std::make_unique<EffectFallbacks>();
 
-  for (auto& _define : _options.defines) {
+  for (const auto& _define : _options.defines) {
     defines.emplace_back(_define);
   }
 
-  for (auto& _attrib : _options.attributes) {
+  for (const auto& _attrib : _options.attributes) {
     attribs.emplace_back(_attrib);
   }
 
@@ -326,7 +349,7 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   }
 
   // Textures
-  for (auto& item : _textures) {
+  for (const auto& item : _textures) {
     if (!item.second->isReady()) {
       return false;
     }
@@ -383,8 +406,10 @@ void ShaderMaterial::bindOnlyWorldMatrix(Matrix& world)
   }
 
   if (stl_util::contains(_options.uniforms, "worldViewProjection")) {
-    auto transformMatrix = scene->getTransformMatrix();
-    _effect->setMatrix("worldViewProjection", world.multiply(transformMatrix));
+    world.multiplyToRef(scene->getTransformMatrix(),
+                        _cachedWorldViewProjectionMatrix);
+    _effect->setMatrix("worldViewProjection",
+                       world.multiply(_cachedWorldViewProjectionMatrix));
   }
 }
 
@@ -410,84 +435,94 @@ void ShaderMaterial::bind(Matrix& world, Mesh* mesh)
     MaterialHelper::BindBonesParameters(mesh, _effect);
 
     // Texture
-    for (auto& kv : _textures) {
+    for (const auto& kv : _textures) {
       _effect->setTexture(kv.first, kv.second);
     }
 
     // Texture arrays
-    for (auto& kv : _textureArrays) {
+    for (const auto& kv : _textureArrays) {
       _effect->setTextureArray(kv.first, kv.second);
     }
 
     // Int
-    for (auto& kv : _ints) {
+    for (const auto& kv : _ints) {
       _effect->setInt(kv.first, kv.second);
     }
 
     // Float
-    for (auto& kv : _floats) {
+    for (const auto& kv : _floats) {
       _effect->setFloat(kv.first, kv.second);
     }
 
     // Floats
-    for (auto& kv : _floatsArrays) {
+    for (const auto& kv : _floatsArrays) {
       _effect->setArray(kv.first, kv.second);
     }
 
     // Color3
-    for (auto& kv : _colors3) {
+    for (const auto& kv : _colors3) {
       _effect->setColor3(kv.first, kv.second);
     }
 
-    // Color3 array
-    for (auto& kv : _colors3Arrays) {
+    // Color3Array
+    for (const auto& kv : _colors3Arrays) {
       _effect->setArray3(kv.first, kv.second);
     }
 
     // Color4
-    for (auto& kv : _colors4) {
-      Color4& color = kv.second;
+    for (const auto& kv : _colors4) {
+      const Color4& color = kv.second;
       _effect->setFloat4(kv.first, color.r, color.g, color.b, color.a);
     }
 
+    // Color4Array
+    for (const auto& kv : _colors4Arrays) {
+      _effect->setArray4(kv.first, kv.second);
+    }
+
     // Vector2
-    for (auto& kv : _vectors2) {
+    for (const auto& kv : _vectors2) {
       _effect->setVector2(kv.first, kv.second);
     }
 
     // Vector3
-    for (auto& kv : _vectors3) {
+    for (const auto& kv : _vectors3) {
       _effect->setVector3(kv.first, kv.second);
     }
 
     // Vector4
-    for (auto& kv : _vectors4) {
+    for (const auto& kv : _vectors4) {
       _effect->setVector4(kv.first, kv.second);
     }
 
     // Matrix
-    for (auto& kv : _matrices) {
+    for (const auto& kv : _matrices) {
       _effect->setMatrix(kv.first, kv.second);
     }
 
     // Matrix 3x3
-    for (auto& kv : _matrices3x3) {
+    for (const auto& kv : _matrices3x3) {
       _effect->setMatrix3x3(kv.first, kv.second);
     }
 
     // Matrix 2x2
-    for (auto& kv : _matrices2x2) {
+    for (const auto& kv : _matrices2x2) {
       _effect->setMatrix2x2(kv.first, kv.second);
     }
 
     // Vector2Array
-    for (auto& kv : _vectors2Arrays) {
+    for (const auto& kv : _vectors2Arrays) {
       _effect->setArray2(kv.first, kv.second);
     }
 
     // Vector3Array
-    for (auto& kv : _vectors3Arrays) {
+    for (const auto& kv : _vectors3Arrays) {
       _effect->setArray3(kv.first, kv.second);
+    }
+
+    // Vector4Array
+    for (const auto& kv : _vectors4Arrays) {
+      _effect->setArray4(kv.first, kv.second);
     }
   }
 
@@ -498,11 +533,11 @@ std::vector<BaseTexturePtr> ShaderMaterial::getActiveTextures() const
 {
   auto activeTextures = Material::getActiveTextures();
 
-  for (auto& textureItem : _textures) {
+  for (const auto& textureItem : _textures) {
     activeTextures.emplace_back(textureItem.second);
   }
 
-  for (auto& textureArrayItem : _textureArrays) {
+  for (const auto& textureArrayItem : _textureArrays) {
     const auto& array = textureArrayItem.second;
     for (std::size_t index = 0; index < array.size(); ++index) {
       activeTextures.emplace_back(array[index]);
@@ -550,12 +585,12 @@ void ShaderMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
                              bool notBoundToMesh)
 {
   if (forceDisposeTextures) {
-    for (auto& kv : _textures) {
+    for (const auto& kv : _textures) {
       kv.second->dispose();
     }
 
-    for (auto& kv : _textureArrays) {
-      for (auto& textureArray : kv.second) {
+    for (const auto& kv : _textureArrays) {
+      for (const auto& textureArray : kv.second) {
         textureArray->dispose();
       }
     }

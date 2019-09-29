@@ -140,6 +140,15 @@ public:
   ShaderMaterial& setColor4(const std::string& name, const Color4& value);
 
   /**
+   * @brief Set a vec4 array in the shader from a Color4 array.
+   * @param name Define the name of the uniform as defined in the shader
+   * @param value Define the value to give to the uniform
+   * @return the material itself allowing "fluent" like uniform updates
+   */
+  ShaderMaterial& setColor4Array(const std::string& iName,
+                                 const std::vector<Color4>& value);
+
+  /**
    * @brief Set a vec2 in the shader from a Vector2.
    * @param name Define the name of the uniform as defined in the shader
    * @param value Define the value to give to the uniform
@@ -205,6 +214,15 @@ public:
    * @return the material itself allowing "fluent" like uniform updates
    */
   ShaderMaterial& setArray3(const std::string& iName,
+                            const Float32Array& value);
+
+  /**
+   * @brief Set a vec4 array in the shader from a number array.
+   * @param name Define the name of the uniform as defined in the shader
+   * @param value Define the value to give to the uniform
+   * @return the material itself allowing "fluent" like uniform updates
+   */
+  ShaderMaterial& setArray4(const std::string& iName,
                             const Float32Array& value);
 
   /**
@@ -303,13 +321,16 @@ protected:
    * @param scene Define the scene the material belongs to
    * @param shaderPath Defines  the route to the shader code in one of three
    * ways:
-   *     - object - { vertex: "custom", fragment: "custom" }, used with
+   *  * object: { vertex: "custom", fragment: "custom" }, used with
    * Effect.ShadersStore["customVertexShader"] and
    * Effect.ShadersStore["customFragmentShader"]
-   *     - object - { vertexElement: "vertexShaderCode", fragmentElement:
-   * "fragmentShaderCode" }, used with shader code in <script> tags
-   *     - string - "./COMMON_NAME", used with external files
-   * COMMON_NAME.vertex.fx and COMMON_NAME.fragment.fx in index.html folder.
+   *  * object: { vertexElement: "vertexShaderCode", fragmentElement:
+   * "fragmentShaderCode" }, used with shader code in script tags
+   *  * object: { vertexSource: "vertex shader code string", fragmentSource:
+   * "fragment shader code string" } using with strings containing the shaders
+   * code
+   *  * string: "./COMMON_NAME", used with external files COMMON_NAME.vertex.fx
+   * and COMMON_NAME.fragment.fx in index.html folder.
    * @param options Define the options used to create the shader
    */
   ShaderMaterial(const std::string& name, Scene* scene,
@@ -331,6 +352,7 @@ private:
   std::unordered_map<std::string, Color3> _colors3;
   std::unordered_map<std::string, Float32Array> _colors3Arrays;
   std::unordered_map<std::string, Color4> _colors4;
+  std::unordered_map<std::string, Float32Array> _colors4Arrays;
   std::unordered_map<std::string, Vector2> _vectors2;
   std::unordered_map<std::string, Vector3> _vectors3;
   std::unordered_map<std::string, Vector4> _vectors4;
@@ -339,7 +361,9 @@ private:
   std::unordered_map<std::string, Float32Array> _matrices2x2;
   std::unordered_map<std::string, Float32Array> _vectors2Arrays;
   std::unordered_map<std::string, Float32Array> _vectors3Arrays;
+  std::unordered_map<std::string, Float32Array> _vectors4Arrays;
   Matrix _cachedWorldViewMatrix;
+  Matrix _cachedWorldViewProjectionMatrix;
   int _renderId;
 
 }; // end of class ShaderMaterial
