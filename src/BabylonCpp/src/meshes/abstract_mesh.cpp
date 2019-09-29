@@ -139,6 +139,7 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
         {},           // actions
         std::nullopt  // freezeWorldMatrix
       }}
+    , _transformMatrixTexture{nullptr}
     , skeleton{this, &AbstractMesh::get_skeleton, &AbstractMesh::set_skeleton}
     , edgesRenderer{this, &AbstractMesh::get_edgesRenderer}
     , isBlocked{this, &AbstractMesh::get_isBlocked}

@@ -2,8 +2,8 @@
 #define BABYLON_MORPH_MORPH_TARGET_MANAGER_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/morph/morph_target.h>
 #include <babylon/misc/observer.h>
+#include <babylon/morph/morph_target.h>
 
 namespace BABYLON {
 
@@ -104,6 +104,12 @@ protected:
   bool get_supportsTangents() const;
 
   /**
+   * @brief Gets a boolean indicating if this manager supports morphing of
+   * texture coordinates.
+   */
+  bool get_supportsUVs() const;
+
+  /**
    * @brief Gets the number of targets stored in this manager.
    */
   size_t get_numTargets() const;
@@ -123,6 +129,21 @@ protected:
 
 public:
   /**
+   * Gets or sets a boolean indicating if normals must be morphed
+   */
+  bool enableNormalMorphing;
+
+  /**
+   * Gets or sets a boolean indicating if tangents must be morphed
+   */
+  bool enableTangentMorphing;
+
+  /**
+   * Gets or sets a boolean indicating if UV must be morphed
+   */
+  bool enableUVMorphing;
+
+  /**
    * Unique ID of this manager
    */
   ReadOnlyProperty<MorphTargetManager, size_t> uniqueId;
@@ -141,6 +162,12 @@ public:
    * Boolean indicating if this manager supports morphing of tangents
    */
   ReadOnlyProperty<MorphTargetManager, bool> supportsTangents;
+
+  /**
+   * Gets a boolean indicating if this manager supports morphing of texture
+   * coordinates
+   */
+  ReadOnlyProperty<MorphTargetManager, bool> supportsUVs;
 
   /**
    * Number of targets stored in this manager
@@ -166,6 +193,7 @@ private:
   Float32Array _influences;
   bool _supportsNormals;
   bool _supportsTangents;
+  bool _supportsUVs;
   size_t _vertexCount;
   size_t _uniqueId;
   Float32Array _tempInfluences;

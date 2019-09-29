@@ -77,10 +77,12 @@ public:
 
   /**
    * @brief Gets the list of transform matrices to send to shaders inside a
-   * texture (one matrix per bone).
+   * texture (one matrix per bone)
+   * @param mesh defines the mesh to use to get the root matrix (if
+   * needInitialSkinMatrix === true)
    * @returns a raw texture containing the data
    */
-  RawTexturePtr& getTransformMatrixTexture();
+  RawTexturePtr& getTransformMatrixTexture(AbstractMesh* mesh);
 
   /**
    * @brief Gets the current hosting scene.

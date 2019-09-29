@@ -282,7 +282,7 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
 
   if (useInstances) {
     defines.emplace_back("#define INSTANCES");
-    MaterialHelper::PrepareAttributesForInstances(attribs, defines);
+    MaterialHelper::PushAttributesForInstances(attribs);
   }
 
   // Bones

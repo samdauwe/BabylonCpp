@@ -771,7 +771,8 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
       const auto& skeleton = mesh->skeleton();
 
       if (skeleton->isUsingTextureForMatrices) {
-        const auto& boneTexture = skeleton->getTransformMatrixTexture();
+        const auto& boneTexture
+          = skeleton->getTransformMatrixTexture(mesh.get());
 
         if (!boneTexture) {
           return;

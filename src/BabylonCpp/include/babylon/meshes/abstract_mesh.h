@@ -37,6 +37,7 @@ class Material;
 struct MaterialDefines;
 class PickingInfo;
 struct PhysicsParams;
+class RawTexture;
 class RenderingGroup;
 class Skeleton;
 class SolidParticle;
@@ -48,6 +49,7 @@ using IEdgesRendererPtr        = std::shared_ptr<IEdgesRenderer>;
 using LightPtr                 = std::shared_ptr<Light>;
 using MaterialPtr              = std::shared_ptr<Material>;
 using PhysicsImpostorPtr       = std::shared_ptr<PhysicsImpostor>;
+using RawTexturePtr            = std::shared_ptr<RawTexture>;
 using SkeletonPtr              = std::shared_ptr<Skeleton>;
 
 namespace GL {
@@ -1791,6 +1793,9 @@ public:
 
   /** Hidden */
   Float32Array _bonesTransformMatrices;
+
+  /** Hidden */
+  RawTexturePtr _transformMatrixTexture;
 
   /**
    * A skeleton to apply skining transformations

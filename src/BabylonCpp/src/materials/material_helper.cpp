@@ -26,6 +26,8 @@
 
 namespace BABYLON {
 
+std::unique_ptr<MaterialDefines> MaterialHelper::_TmpMorphInfluencers
+  = std::make_unique<MaterialDefines>();
 Color3 MaterialHelper::_tempFogColor = Color3::Black();
 
 void MaterialHelper::BindEyePosition(const EffectPtr& effect, Scene* scene)
@@ -67,9 +69,13 @@ void MaterialHelper::BindTextureMatrix(BaseTexture& texture,
 {
   auto matrix = *texture.getTextureMatrix();
 
-  if (!matrix.isIdentityAs3x2()) {
-    uniformBuffer.updateMatrix(key + "Matrix", matrix);
-  }
+  uniformBuffer.updateMatrix(key + "Matrix", matrix);
+}
+
+bool MaterialHelper::GetFogState(AbstractMesh* mesh, Scene* scene)
+{
+  return (scene->fogEnabled() && mesh->applyFog()
+          && scene->fogMode() != Scene::FOGMODE_NONE);
 }
 
 void MaterialHelper::PrepareDefinesForMisc(AbstractMesh* mesh, Scene* scene,
@@ -81,9 +87,7 @@ void MaterialHelper::PrepareDefinesForMisc(AbstractMesh* mesh, Scene* scene,
   if (defines._areMiscDirty) {
     defines.boolDef["LOGARITHMICDEPTH"] = useLogarithmicDepth;
     defines.boolDef["POINTSIZE"]        = pointsCloud;
-    defines.boolDef["FOG"]
-      = (scene->fogEnabled() && mesh->applyFog()
-         && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled);
+    defines.boolDef["FOG"] = fogEnabled && GetFogState(mesh, scene);
     defines.boolDef["NONUNIFORMSCALING"] = mesh->nonUniformScaling();
     defines.boolDef["ALPHATEST"]         = alphaTest;
   }
@@ -147,6 +151,61 @@ void MaterialHelper::PrepareDefinesForFrameBoundValues(
   }
 }
 
+void MaterialHelper::PrepareDefinesForBones(AbstractMesh* mesh,
+                                            MaterialDefines& defines)
+{
+  if (mesh->useBones() && mesh->computeBonesUsingShaders()
+      && mesh->skeleton()) {
+    defines.intDef["NUM_BONE_INFLUENCERS"] = mesh->numBoneInfluencers();
+
+    const auto materialSupportsBoneTexture
+      = stl_util::contains(defines.boolDef, "BONETEXTURE");
+
+    if (mesh->skeleton()->isUsingTextureForMatrices
+        && materialSupportsBoneTexture) {
+      defines.boolDef["BONETEXTURE"] = true;
+    }
+    else {
+      defines.intDef["BonesPerMesh"]
+        = static_cast<unsigned int>(mesh->skeleton()->bones.size() + 1);
+      if (materialSupportsBoneTexture) {
+        defines.boolDef["BONETEXTURE"] = false;
+      }
+      else {
+        defines.boolDef.erase("BONETEXTURE");
+      }
+    }
+  }
+  else {
+    defines.intDef["NUM_BONE_INFLUENCERS"] = 0;
+    defines.intDef["BonesPerMesh"]         = 0;
+  }
+}
+
+void MaterialHelper::PrepareDefinesForMorphTargets(AbstractMesh* mesh,
+                                                   MaterialDefines& defines)
+{
+  const auto& manager = static_cast<Mesh*>(mesh)->morphTargetManager();
+  if (manager) {
+    defines.boolDef["MORPHTARGETS_UV"]
+      = manager->supportsUVs() && defines["UV1"];
+    defines.boolDef["MORPHTARGETS_TANGENT"]
+      = manager->supportsTangents() && defines["TANGENT"];
+    defines.boolDef["MORPHTARGETS_NORMAL"]
+      = manager->supportsNormals() && defines["NORMAL"];
+    defines.boolDef["MORPHTARGETS"] = (manager->numInfluencers() > 0);
+    defines.intDef["NUM_MORPH_INFLUENCERS"]
+      = static_cast<unsigned int>(manager->numInfluencers());
+  }
+  else {
+    defines.boolDef["MORPHTARGETS_UV"]      = false;
+    defines.boolDef["MORPHTARGETS_TANGENT"] = false;
+    defines.boolDef["MORPHTARGETS_NORMAL"]  = false;
+    defines.boolDef["MORPHTARGETS"]         = false;
+    defines.intDef["NUM_MORPH_INFLUENCERS"] = 0u;
+  }
+}
+
 bool MaterialHelper::PrepareDefinesForAttributes(
   AbstractMesh* mesh, MaterialDefines& defines, bool useVertexColor,
   bool useBones, bool useMorphTargets, bool useVertexAlpha)
@@ -187,46 +246,11 @@ bool MaterialHelper::PrepareDefinesForAttributes(
   }
 
   if (useBones) {
-    if (mesh->useBones() && mesh->computeBonesUsingShaders()
-        && mesh->skeleton()) {
-      defines.intDef["NUM_BONE_INFLUENCERS"] = mesh->numBoneInfluencers();
-
-      const auto materialSupportsBoneTexture = defines["BONETEXTURE"];
-
-      if (mesh->skeleton()->isUsingTextureForMatrices
-          && materialSupportsBoneTexture) {
-        defines.boolDef["BONETEXTURE"] = true;
-      }
-      else {
-        defines.intDef["BonesPerMesh"]
-          = static_cast<unsigned int>((mesh->skeleton()->bones.size() + 1));
-        defines.boolDef["BONETEXTURE"] = false;
-      }
-    }
-    else {
-      defines.intDef["NUM_BONE_INFLUENCERS"] = 0;
-      defines.intDef["BonesPerMesh"]         = 0;
-    }
+    PrepareDefinesForBones(mesh, defines);
   }
 
   if (useMorphTargets) {
-    auto _mesh   = static_cast<Mesh*>(mesh);
-    auto manager = _mesh ? _mesh->morphTargetManager() : nullptr;
-    if (manager) {
-      defines.boolDef["MORPHTARGETS_TANGENT"]
-        = manager->supportsTangents() && defines["TANGENT"];
-      defines.boolDef["MORPHTARGETS_NORMAL"]
-        = manager->supportsNormals() && defines["NORMAL"];
-      defines.boolDef["MORPHTARGETS"] = (manager->numInfluencers() > 0);
-      defines.intDef["NUM_MORPH_INFLUENCERS"]
-        = static_cast<unsigned>(manager->numInfluencers());
-    }
-    else {
-      defines.boolDef["MORPHTARGETS_TANGENT"] = false;
-      defines.boolDef["MORPHTARGETS_NORMAL"]  = false;
-      defines.boolDef["MORPHTARGETS"]         = false;
-      defines.intDef["NUM_MORPH_INFLUENCERS"] = 0;
-    }
+    PrepareDefinesForMorphTargets(mesh, defines);
   }
 
   return true;
@@ -246,6 +270,88 @@ void MaterialHelper::PrepareDefinesForMultiview(Scene* scene,
   }
 }
 
+void MaterialHelper::PrepareDefinesForLight(Scene* scene, AbstractMesh* mesh,
+                                            const LightPtr& light,
+                                            unsigned int lightIndex,
+                                            MaterialDefines& defines,
+                                            bool specularSupported,
+                                            PrepareDefinesForLightsState& state)
+{
+  state.needNormals = true;
+
+  auto lightIndexStr = std::to_string(lightIndex);
+
+  if (!stl_util::contains(defines.boolDef, "LIGHT" + lightIndexStr)) {
+    state.needRebuild = true;
+  }
+
+  defines.boolDef["LIGHT" + lightIndexStr] = true;
+
+  defines.boolDef["SPOTLIGHT" + lightIndexStr]  = false;
+  defines.boolDef["HEMILIGHT" + lightIndexStr]  = false;
+  defines.boolDef["POINTLIGHT" + lightIndexStr] = false;
+  defines.boolDef["DIRLIGHT" + lightIndexStr]   = false;
+
+  light->prepareLightSpecificDefines(defines, lightIndex);
+
+  // FallOff.
+  defines.boolDef["LIGHT_FALLOFF_PHYSICAL" + lightIndexStr] = false;
+  defines.boolDef["LIGHT_FALLOFF_GLTF" + lightIndexStr]     = false;
+  defines.boolDef["LIGHT_FALLOFF_STANDARD" + lightIndexStr] = false;
+
+  switch (light->falloffType) {
+    case Light::FALLOFF_GLTF:
+      defines.boolDef["LIGHT_FALLOFF_GLTF" + lightIndexStr] = true;
+      break;
+    case Light::FALLOFF_PHYSICAL:
+      defines.boolDef["LIGHT_FALLOFF_PHYSICAL" + lightIndexStr] = true;
+      break;
+    case Light::FALLOFF_STANDARD:
+      defines.boolDef["LIGHT_FALLOFF_STANDARD" + lightIndexStr] = true;
+      break;
+  }
+
+  // Specular
+  if (specularSupported && !light->specular.equalsFloats(0.f, 0.f, 0.f)) {
+    state.specularEnabled = true;
+  }
+
+  // Shadows
+  defines.boolDef["SHADOW" + lightIndexStr]              = false;
+  defines.boolDef["SHADOWPCF" + lightIndexStr]           = false;
+  defines.boolDef["SHADOWPCSS" + lightIndexStr]          = false;
+  defines.boolDef["SHADOWPOISSON" + lightIndexStr]       = false;
+  defines.boolDef["SHADOWESM" + lightIndexStr]           = false;
+  defines.boolDef["SHADOWCUBE" + lightIndexStr]          = false;
+  defines.boolDef["SHADOWLOWQUALITY" + lightIndexStr]    = false;
+  defines.boolDef["SHADOWMEDIUMQUALITY" + lightIndexStr] = false;
+
+  if (mesh && mesh->receiveShadows() && scene->shadowsEnabled()
+      && light->shadowEnabled) {
+    const auto& shadowGenerator = light->getShadowGenerator();
+    if (shadowGenerator) {
+      const auto& shadowMap = shadowGenerator->getShadowMap();
+      if (shadowMap) {
+        if (!shadowMap->renderList().empty()) {
+          state.shadowEnabled = true;
+          shadowGenerator->prepareDefines(defines, lightIndex);
+        }
+      }
+    }
+  }
+
+  if (light->lightmapMode() != Light::LIGHTMAP_DEFAULT) {
+    state.lightmapMode                                  = true;
+    defines.boolDef["LIGHTMAPEXCLUDED" + lightIndexStr] = true;
+    defines.boolDef["LIGHTMAPNOSPECULAR" + lightIndexStr]
+      = (light->lightmapMode == Light::LIGHTMAP_SHADOWSONLY);
+  }
+  else {
+    defines.boolDef["LIGHTMAPEXCLUDED" + lightIndexStr]   = false;
+    defines.boolDef["LIGHTMAPNOSPECULAR" + lightIndexStr] = false;
+  }
+}
+
 bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
                                              MaterialDefines& defines,
                                              bool specularSupported,
@@ -256,88 +362,19 @@ bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
     return defines._needNormals;
   }
 
-  auto lightIndex      = 0u;
-  auto needNormals     = false;
-  auto needRebuild     = false;
-  auto lightmapMode    = false;
-  auto shadowEnabled   = false;
-  auto specularEnabled = false;
+  auto lightIndex = 0u;
+  PrepareDefinesForLightsState state{
+    false, // needNormals
+    false, // needRebuild
+    false, // shadowEnabled
+    false, // specularEnabled
+    false  // lightmapMode
+  };
 
   if (scene->lightsEnabled() && !disableLighting) {
-    for (const auto& light : mesh->_lightSources) {
-      needNormals = true;
-
-      auto lightIndexStr = std::to_string(lightIndex);
-
-      if (!stl_util::contains(defines.boolDef, "LIGHT" + lightIndexStr)) {
-        needRebuild = true;
-      }
-
-      defines.boolDef["LIGHT" + lightIndexStr] = true;
-
-      defines.boolDef["SPOTLIGHT" + lightIndexStr]  = false;
-      defines.boolDef["HEMILIGHT" + lightIndexStr]  = false;
-      defines.boolDef["POINTLIGHT" + lightIndexStr] = false;
-      defines.boolDef["DIRLIGHT" + lightIndexStr]   = false;
-
-      light->prepareLightSpecificDefines(defines, lightIndex);
-
-      // FallOff.
-      defines.boolDef["LIGHT_FALLOFF_PHYSICAL" + lightIndexStr] = false;
-      defines.boolDef["LIGHT_FALLOFF_GLTF" + lightIndexStr]     = false;
-      defines.boolDef["LIGHT_FALLOFF_STANDARD" + lightIndexStr] = false;
-
-      switch (light->falloffType) {
-        case Light::FALLOFF_GLTF:
-          defines.boolDef["LIGHT_FALLOFF_GLTF" + lightIndexStr] = true;
-          break;
-        case Light::FALLOFF_PHYSICAL:
-          defines.boolDef["LIGHT_FALLOFF_PHYSICAL" + lightIndexStr] = true;
-          break;
-        case Light::FALLOFF_STANDARD:
-          defines.boolDef["LIGHT_FALLOFF_STANDARD" + lightIndexStr] = true;
-          break;
-      }
-
-      // Specular
-      if (specularSupported && !light->specular.equalsFloats(0.f, 0.f, 0.f)) {
-        specularEnabled = true;
-      }
-
-      // Shadows
-      defines.boolDef["SHADOW" + lightIndexStr]              = false;
-      defines.boolDef["SHADOWPCF" + lightIndexStr]           = false;
-      defines.boolDef["SHADOWPCSS" + lightIndexStr]          = false;
-      defines.boolDef["SHADOWPOISSON" + lightIndexStr]       = false;
-      defines.boolDef["SHADOWESM" + lightIndexStr]           = false;
-      defines.boolDef["SHADOWCUBE" + lightIndexStr]          = false;
-      defines.boolDef["SHADOWLOWQUALITY" + lightIndexStr]    = false;
-      defines.boolDef["SHADOWMEDIUMQUALITY" + lightIndexStr] = false;
-
-      if (mesh && mesh->receiveShadows() && scene->shadowsEnabled()
-          && light->shadowEnabled) {
-        const auto& shadowGenerator = light->getShadowGenerator();
-        if (shadowGenerator) {
-          const auto& shadowMap = shadowGenerator->getShadowMap();
-          if (shadowMap) {
-            if (!shadowMap->renderList().empty()) {
-              shadowEnabled = true;
-              shadowGenerator->prepareDefines(defines, lightIndex);
-            }
-          }
-        }
-      }
-
-      if (light->lightmapMode() != Light::LIGHTMAP_DEFAULT) {
-        lightmapMode                                        = true;
-        defines.boolDef["LIGHTMAPEXCLUDED" + lightIndexStr] = true;
-        defines.boolDef["LIGHTMAPNOSPECULAR" + lightIndexStr]
-          = (light->lightmapMode == Light::LIGHTMAP_SHADOWSONLY);
-      }
-      else {
-        defines.boolDef["LIGHTMAPEXCLUDED" + lightIndexStr]   = false;
-        defines.boolDef["LIGHTMAPNOSPECULAR" + lightIndexStr] = false;
-      }
+    for (const auto& light : mesh->lightSources()) {
+      PrepareDefinesForLight(scene, mesh, light, lightIndex, defines,
+                             specularSupported, state);
 
       ++lightIndex;
       if (lightIndex == maxSimultaneousLights) {
@@ -346,14 +383,13 @@ bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
     }
   }
 
-  defines.boolDef["SPECULARTERM"] = specularEnabled;
-  defines.boolDef["SHADOWS"]      = shadowEnabled;
+  defines.boolDef["SPECULARTERM"] = state.specularEnabled;
+  defines.boolDef["SHADOWS"]      = state.shadowEnabled;
 
   // Resetting all other lights if any
   auto lightIndexStr = std::to_string(lightIndex);
-  for (unsigned int index = lightIndex; index < maxSimultaneousLights;
-       ++index) {
-    auto indexStr = std::to_string(index);
+  for (auto index = lightIndex; index < maxSimultaneousLights; ++index) {
+    const auto indexStr = std::to_string(index);
     if (stl_util::contains(defines.boolDef, "LIGHT" + indexStr)) {
       defines.boolDef["LIGHT" + indexStr]               = false;
       defines.boolDef["HEMILIGHT" + indexStr]           = false;
@@ -374,21 +410,64 @@ bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
   auto caps = scene->getEngine()->getCaps();
 
   if (!stl_util::contains(defines.boolDef, "SHADOWFLOAT")) {
-    needRebuild = true;
+    state.needRebuild = true;
   }
 
   defines.boolDef["SHADOWFLOAT"]
-    = shadowEnabled
+    = state.shadowEnabled
       && ((caps.textureFloatRender && caps.textureFloatLinearFiltering)
           || (caps.textureHalfFloatRender
               && caps.textureHalfFloatLinearFiltering));
-  defines.boolDef["LIGHTMAPEXCLUDED"] = lightmapMode;
+  defines.boolDef["LIGHTMAPEXCLUDED"] = state.lightmapMode;
 
-  if (needRebuild) {
+  if (state.needRebuild) {
     defines.rebuild();
   }
 
-  return needNormals;
+  return state.needNormals;
+}
+
+void MaterialHelper::PrepareUniformsAndSamplersForLight(
+  unsigned int lightIndex, std::vector<std::string>& uniformsList,
+  std::vector<std::string>& samplersList, bool projectedLightTexture)
+{
+
+  std::vector<std::string> uniformBuffersList;
+  PrepareUniformsAndSamplersForLight(lightIndex, uniformsList, samplersList,
+                                     uniformBuffersList, false,
+                                     projectedLightTexture);
+}
+
+void MaterialHelper::PrepareUniformsAndSamplersForLight(
+  unsigned int lightIndex, std::vector<std::string>& uniformsList,
+  std::vector<std::string>& samplersList,
+  std::vector<std::string>& uniformBuffersList, bool hasUniformBuffersList,
+  bool projectedLightTexture)
+{
+  const auto lightIndexStr = std::to_string(lightIndex);
+  stl_util::concat(uniformsList, {
+                                   "vLightData" + lightIndexStr,      //
+                                   "vLightDiffuse" + lightIndexStr,   //
+                                   "vLightSpecular" + lightIndexStr,  //
+                                   "vLightDirection" + lightIndexStr, //
+                                   "vLightFalloff" + lightIndexStr,   //
+                                   "vLightGround" + lightIndexStr,    //
+                                   "lightMatrix" + lightIndexStr,     //
+                                   "shadowsInfo" + lightIndexStr,     //
+                                   "depthValues" + lightIndexStr,     //
+                                 });
+
+  if (hasUniformBuffersList) {
+    uniformBuffersList.emplace_back("Light" + lightIndexStr);
+  }
+
+  samplersList.emplace_back("shadowSampler" + lightIndexStr);
+  samplersList.emplace_back("depthSampler" + lightIndexStr);
+
+  if (projectedLightTexture) {
+    samplersList.emplace_back("projectionLightSampler" + lightIndexStr);
+    uniformsList.emplace_back("textureProjectionMatrix" + lightIndexStr);
+  }
 }
 
 void MaterialHelper::PrepareUniformsAndSamplersList(
@@ -402,36 +481,13 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
        ++lightIndex) {
     const auto lightIndexStr = std::to_string(lightIndex);
 
-    if (!stl_util::contains(defines.boolDef, "LIGHT" + lightIndexStr)) {
+    if (!defines["LIGHT" + lightIndexStr]) {
       break;
     }
-
-    stl_util::concat(uniformsList,
-                     {
-                       "vLightData" + lightIndexStr,      //
-                       "vLightDiffuse" + lightIndexStr,   //
-                       "vLightSpecular" + lightIndexStr,  //
-                       "vLightDirection" + lightIndexStr, //
-                       "vLightFalloff" + lightIndexStr,   //
-                       "vLightGround" + lightIndexStr,    //
-                       "lightMatrix" + lightIndexStr,     //
-                       "shadowsInfo" + lightIndexStr,     //
-                       "depthValues" + lightIndexStr      //
-                     });
-
-    if (uniformBuffersList.empty()) {
-      uniformBuffersList.emplace_back("Light" + lightIndexStr);
-    }
-
-    samplersList.emplace_back("shadowSampler" + lightIndexStr);
-    samplersList.emplace_back("depthSampler" + lightIndexStr);
-
-    if (stl_util::contains(defines.boolDef,
-                           "PROJECTEDLIGHTTEXTURE" + lightIndexStr)
-        && defines["PROJECTEDLIGHTTEXTURE" + lightIndexStr]) {
-      samplersList.emplace_back("projectionLightSampler" + lightIndexStr);
-      uniformsList.emplace_back("textureProjectionMatrix" + lightIndexStr);
-    }
+    PrepareUniformsAndSamplersForLight(
+      lightIndex, uniformsList, samplersList, uniformBuffersList,
+      !uniformBuffersList.empty(),
+      defines["PROJECTEDLIGHTTEXTURE" + lightIndexStr]);
   }
 
   if (stl_util::contains(defines.intDef, "NUM_MORPH_INFLUENCERS")
@@ -456,31 +512,10 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
     if (!defines["LIGHT" + lightIndexStr]) {
       break;
     }
-
-    stl_util::concat(uniformsList,
-                     {
-                       "vLightData" + lightIndexStr,      //
-                       "vLightDiffuse" + lightIndexStr,   //
-                       "vLightSpecular" + lightIndexStr,  //
-                       "vLightDirection" + lightIndexStr, //
-                       "vLightFalloff" + lightIndexStr,   //
-                       "vLightGround" + lightIndexStr,    //
-                       "lightMatrix" + lightIndexStr,     //
-                       "shadowsInfo" + lightIndexStr,     //
-                       "depthValues" + lightIndexStr      //
-                     });
-
-    {
-      uniformBuffersList.emplace_back("Light" + lightIndexStr);
-    }
-
-    samplersList.emplace_back("shadowSampler" + lightIndexStr);
-    samplersList.emplace_back("depthSampler" + lightIndexStr);
-
-    if (defines["PROJECTEDLIGHTTEXTURE" + lightIndexStr]) {
-      samplersList.emplace_back("projectionLightSampler" + lightIndexStr);
-      uniformsList.emplace_back("textureProjectionMatrix" + lightIndexStr);
-    }
+    PrepareUniformsAndSamplersForLight(
+      lightIndex, uniformsList, samplersList, uniformBuffersList,
+      !uniformBuffersList.empty(),
+      defines["PROJECTEDLIGHTTEXTURE" + lightIndexStr]);
   }
 
   if (stl_util::contains(defines.intDef, "NUM_MORPH_INFLUENCERS")
@@ -532,6 +567,14 @@ unsigned int MaterialHelper::HandleFallbacksForShadows(
   return lightFallbackRank++;
 }
 
+void MaterialHelper::PrepareAttributesForMorphTargetsInfluencers(
+  std::vector<std::string>& attribs, AbstractMesh* mesh,
+  unsigned int influencers)
+{
+  _TmpMorphInfluencers->intDef["NUM_MORPH_INFLUENCERS"] = influencers;
+  PrepareAttributesForMorphTargets(attribs, mesh, *_TmpMorphInfluencers);
+}
+
 void MaterialHelper::PrepareAttributesForMorphTargets(
   std::vector<std::string>& attribs, AbstractMesh* mesh,
   MaterialDefines& defines)
@@ -546,6 +589,7 @@ void MaterialHelper::PrepareAttributesForMorphTargets(
     auto manager = _mesh->morphTargetManager();
     auto normal  = manager && manager->supportsNormals() && defines["NORMAL"];
     auto tangent = manager && manager->supportsNormals() && defines["TANGENT"];
+    auto uv      = manager && manager->supportsUVs() && defines["UV1"];
     for (auto index = 0u; index < influencers; ++index) {
       const auto indexStr = std::to_string(index);
       attribs.emplace_back(VertexBuffer::PositionKind + indexStr);
@@ -556,6 +600,11 @@ void MaterialHelper::PrepareAttributesForMorphTargets(
 
       if (tangent) {
         attribs.emplace_back(VertexBuffer::TangentKind + indexStr);
+      }
+
+      if (uv) {
+        attribs.emplace_back(VertexBuffer::UVKind + std::string("_")
+                             + indexStr);
       }
 
       if (attribs.size() > maxAttributesCount) {
@@ -587,22 +636,17 @@ void MaterialHelper::PrepareAttributesForInstances(
   std::vector<std::string>& attribs, MaterialDefines& defines)
 {
   if (defines["INSTANCES"]) {
-    attribs.emplace_back(VertexBuffer::World0Kind);
-    attribs.emplace_back(VertexBuffer::World1Kind);
-    attribs.emplace_back(VertexBuffer::World2Kind);
-    attribs.emplace_back(VertexBuffer::World3Kind);
+    PushAttributesForInstances(attribs);
   }
 }
 
-void MaterialHelper::PrepareAttributesForInstances(
-  std::vector<std::string>& attribs, std::vector<std::string>& defines)
+void MaterialHelper::PushAttributesForInstances(
+  std::vector<std::string>& attribs)
 {
-  if (stl_util::contains(defines, "INSTANCES")) {
-    attribs.emplace_back(VertexBuffer::World0Kind);
-    attribs.emplace_back(VertexBuffer::World1Kind);
-    attribs.emplace_back(VertexBuffer::World2Kind);
-    attribs.emplace_back(VertexBuffer::World3Kind);
-  }
+  attribs.emplace_back(VertexBuffer::World0Kind);
+  attribs.emplace_back(VertexBuffer::World1Kind);
+  attribs.emplace_back(VertexBuffer::World2Kind);
+  attribs.emplace_back(VertexBuffer::World3Kind);
 }
 
 void MaterialHelper::BindLightShadow(Light& light, AbstractMesh& mesh,
@@ -623,40 +667,53 @@ void MaterialHelper::BindLightProperties(Light& light, const EffectPtr& effect,
   light.transferToEffect(effect, std::to_string(lightIndex));
 }
 
+void MaterialHelper::BindLight(const LightPtr& light, unsigned int lightIndex,
+                               Scene* scene, AbstractMesh* mesh,
+                               const EffectPtr& effect, bool useSpecular,
+                               bool usePhysicalLightFalloff,
+                               bool rebuildInParallel)
+{
+  auto iAsString = std::to_string(lightIndex);
+
+  auto scaledIntensity = light->getScaledIntensity();
+  if (!rebuildInParallel) {
+    light->_uniformBuffer->bindToEffect(effect.get(), "Light" + iAsString);
+  }
+
+  MaterialHelper::BindLightProperties(*light, effect, lightIndex);
+
+  light->diffuse.scaleToRef(scaledIntensity, Tmp::Color3Array[0]);
+  light->_uniformBuffer->updateColor4(
+    "vLightDiffuse", Tmp::Color3Array[0],
+    usePhysicalLightFalloff ? light->radius() : light->range, iAsString);
+  if (useSpecular) {
+    light->specular.scaleToRef(scaledIntensity, Tmp::Color3Array[1]);
+    light->_uniformBuffer->updateColor3("vLightSpecular", Tmp::Color3Array[1],
+                                        iAsString);
+  }
+
+  // Shadows
+  if (scene->shadowsEnabled()) {
+    BindLightShadow(*light, *mesh, iAsString, effect);
+  }
+  light->_uniformBuffer->update();
+}
+
 void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh,
                                 const EffectPtr& effect,
                                 MaterialDefines& defines,
                                 unsigned int maxSimultaneousLights,
-                                bool usePhysicalLightFalloff)
+                                bool usePhysicalLightFalloff,
+                                bool rebuildInParallel)
 {
   auto len = std::min(mesh->lightSources().size(),
                       static_cast<size_t>(maxSimultaneousLights));
 
   for (unsigned i = 0u; i < len; ++i) {
 
-    auto& light    = mesh->lightSources()[i];
-    auto iAsString = std::to_string(i);
-
-    auto scaledIntensity = light->getScaledIntensity();
-    light->_uniformBuffer->bindToEffect(effect.get(), "Light" + iAsString);
-
-    MaterialHelper::BindLightProperties(*light, effect, i);
-
-    light->diffuse.scaleToRef(scaledIntensity, Tmp::Color3Array[0]);
-    light->_uniformBuffer->updateColor4(
-      "vLightDiffuse", Tmp::Color3Array[0],
-      usePhysicalLightFalloff ? light->radius() : light->range, iAsString);
-    if (defines["SPECULARTERM"]) {
-      light->specular.scaleToRef(scaledIntensity, Tmp::Color3Array[1]);
-      light->_uniformBuffer->updateColor3("vLightSpecular", Tmp::Color3Array[1],
-                                          iAsString);
-    }
-
-    // Shadows
-    if (scene->shadowsEnabled()) {
-      BindLightShadow(*light, *mesh, iAsString, effect);
-    }
-    light->_uniformBuffer->update();
+    auto& light = mesh->lightSources()[i];
+    BindLight(light, i, scene, mesh, effect, defines["SPECULARTERM"],
+              usePhysicalLightFalloff, rebuildInParallel);
   }
 }
 
@@ -697,7 +754,7 @@ void MaterialHelper::BindBonesParameters(AbstractMesh* mesh,
 
     if (skeleton->isUsingTextureForMatrices
         && effect->getUniformIndex("boneTextureWidth") > -1) {
-      const auto& boneTexture = skeleton->getTransformMatrixTexture();
+      const auto& boneTexture = skeleton->getTransformMatrixTexture(mesh);
       effect->setTexture("boneSampler", boneTexture);
       effect->setFloat("boneTextureWidth",
                        4.f * (skeleton->bones.size() + 1.f));

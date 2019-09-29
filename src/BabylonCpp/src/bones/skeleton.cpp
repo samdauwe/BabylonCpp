@@ -132,8 +132,12 @@ Float32Array& Skeleton::getTransformMatrices(AbstractMesh* mesh)
   return _transformMatrices;
 }
 
-RawTexturePtr& Skeleton::getTransformMatrixTexture()
+RawTexturePtr& Skeleton::getTransformMatrixTexture(AbstractMesh* mesh)
 {
+  if (needInitialSkinMatrix && mesh->_transformMatrixTexture) {
+    return mesh->_transformMatrixTexture;
+  }
+
   return _transformMatrixTexture;
 }
 

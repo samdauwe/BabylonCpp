@@ -4,6 +4,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include <babylon/babylon_api.h>
@@ -23,6 +24,15 @@ class Scene;
 class UniformBuffer;
 using BaseTexturePtr = std::shared_ptr<BaseTexture>;
 using EffectPtr      = std::shared_ptr<Effect>;
+using LightPtr       = std::shared_ptr<Light>;
+
+struct BABYLON_SHARED_EXPORT PrepareDefinesForLightsState {
+  bool needNormals     = false;
+  bool needRebuild     = false;
+  bool shadowEnabled   = false;
+  bool specularEnabled = false;
+  bool lightmapMode    = false;
+}; // end of struct PrepareDefinesForLightsState
 
 /**
  * @brief "Static Class" containing the most commonly used helper while dealing
@@ -65,6 +75,14 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
                                 const std::string& key);
 
   /**
+   * @brief Gets the current status of the fog (should it be enabled?).
+   * @param mesh defines the mesh to evaluate for fog support
+   * @param scene defines the hosting scene
+   * @returns true if fog must be enabled
+   */
+  static bool GetFogState(AbstractMesh* mesh, Scene* scene);
+
+  /**
    * @brief Helper used to prepare the list of defines associated with misc.
    * values for shader compilation
    * @param mesh defines the current mesh
@@ -94,6 +112,22 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
                                                 bool useInstances,
                                                 std::optional<bool> useClipPlane
                                                 = std::nullopt);
+
+  /**
+   * @brief Prepares the defines for bones.
+   * @param mesh The mesh containing the geometry data we will draw
+   * @param defines The defines to update
+   */
+  static void PrepareDefinesForBones(AbstractMesh* mesh,
+                                     MaterialDefines& defines);
+
+  /**
+   * @brief Prepares the defines for morph targets.
+   * @param mesh The mesh containing the geometry data we will draw
+   * @param defines The defines to update
+   */
+  static void PrepareDefinesForMorphTargets(AbstractMesh* mesh,
+                                            MaterialDefines& defines);
 
   /**
    * @brief Prepares the defines used in the shader depending on the attributes
@@ -130,6 +164,26 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * parameter
    * @param scene The scene we are intending to draw
    * @param mesh The mesh the effect is compiling for
+   * @param light The light the effect is compiling for
+   * @param lightIndex The index of the light
+   * @param defines The defines to update
+   * @param specularSupported Specifies whether specular is supported or not
+   * (override lights data)
+   * @param state Defines the current state regarding what is needed (normals,
+   * etc...)
+   */
+  static void PrepareDefinesForLight(Scene* scene, AbstractMesh* mesh,
+                                     const LightPtr& light,
+                                     unsigned int lightIndex,
+                                     MaterialDefines& defines,
+                                     bool specularSupported,
+                                     PrepareDefinesForLightsState& state);
+
+  /**
+   * @brief Prepares the defines related to the light information passed in
+   * parameter.
+   * @param scene The scene we are intending to draw
+   * @param mesh The mesh the effect is compiling for
    * @param defines The defines to update
    * @param specularSupported Specifies whether specular is supported or not
    * (override lights data)
@@ -146,12 +200,37 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
                                       bool disableLighting = false);
 
   /**
+   * @brief Prepares the uniforms and samplers list to be used in the effect
+   * (for a specific light).
+   * @param lightIndex defines the light index
+   * @param uniformsList The uniform list
+   * @param samplersList The sampler list
+   * @param projectedLightTexture defines if projected texture must be used
+   */
+  static void PrepareUniformsAndSamplersForLight(
+    unsigned int lightIndex, std::vector<std::string>& uniformsList,
+    std::vector<std::string>& samplersList, bool projectedLightTexture = false);
+
+  /**
+   * @brief Prepares the uniforms and samplers list to be used in the effect
+   * (for a specific light).
+   * @param lightIndex defines the light index
+   * @param uniformsList The uniform list
+   * @param samplersList The sampler list
+   * @param projectedLightTexture defines if projected texture must be used
+   * @param uniformBuffersList defines an optional list of uniform buffers
+   */
+  static void PrepareUniformsAndSamplersForLight(
+    unsigned int lightIndex, std::vector<std::string>& uniformsList,
+    std::vector<std::string>& samplersList,
+    std::vector<std::string>& uniformBuffersList,
+    bool hasUniformBuffersList = false, bool projectedLightTexture = false);
+
+  /**
    * @brief Prepares the uniforms and samplers list to be used in the effect.
-   * This can automatically remove from the list uniforms that won t be acctive
-   * due to defines being turned off.
    * @param uniformsListOrOptions The uniform names to prepare or an
    * EffectCreationOptions containing the liist and extra information
-   * @param samplersList The samplers list
+   * @param samplersList The sampler list
    * @param defines The defines helping in the list generation
    * @param maxSimultaneousLights The maximum number of simultanous light
    * allowed in the effect
@@ -193,6 +272,18 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * to the effect defines.
    * @param attribs The current list of supported attribs
    * @param mesh The mesh to prepare the morph targets attributes for
+   * @param influencers The number of influencers
+   */
+  static void
+  PrepareAttributesForMorphTargetsInfluencers(std::vector<std::string>& attribs,
+                                              AbstractMesh* mesh,
+                                              unsigned int influencers);
+
+  /**
+   * @brief Prepares the list of attributes required for morph targets according
+   * to the effect defines.
+   * @param attribs The current list of supported attribs
+   * @param mesh The mesh to prepare the morph targets attributes for
    * @param defines The current Defines of the effect
    */
   static void
@@ -214,22 +305,20 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
                                         EffectFallbacks& fallbacks);
 
   /**
-   * @brief Prepares the list of attributes required for instances according to
-   * the effect defines.
+   * @brief Check and prepare the list of attributes required for instances
+   * according to the effect defines.
    * @param attribs The current list of supported attribs
-   * @param defines The current Defines of the effect
+   * @param defines The current MaterialDefines of the effect
    */
   static void PrepareAttributesForInstances(std::vector<std::string>& attribs,
                                             MaterialDefines& defines);
 
   /**
-   * @brief Prepares the list of attributes required for instances according to
-   * the effect defines.
+   * @brief Add the list of attributes required for instances to the attribs
+   * array.
    * @param attribs The current list of supported attribs
-   * @param defines The current Defines of the effect
    */
-  static void PrepareAttributesForInstances(std::vector<std::string>& attribs,
-                                            std::vector<std::string>& defines);
+  static void PushAttributesForInstances(std::vector<std::string>& attribs);
 
   /**
    * @brief Binds the light shadow information to the effect for the given mesh.
@@ -254,6 +343,26 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
   /**
    * @brief Binds the lights information from the scene to the effect for the
    * given mesh.
+   * @param light Light to bind
+   * @param lightIndex Light index
+   * @param scene The scene where the light belongs to
+   * @param mesh The mesh we are binding the information to render
+   * @param effect The effect we are binding the data to
+   * @param useSpecular Defines if specular is supported
+   * @param usePhysicalLightFalloff Specifies whether the light falloff is
+   * defined physically or not
+   * @param rebuildInParallel Specifies whether the shader is rebuilding in
+   * parallel
+   */
+  static void BindLight(const LightPtr& light, unsigned int lightIndex,
+                        Scene* scene, AbstractMesh* mesh,
+                        const EffectPtr& effect, bool useSpecular,
+                        bool usePhysicalLightFalloff = false,
+                        bool rebuildInParallel       = false);
+
+  /**
+   * @brief Binds the lights information from the scene to the effect for the
+   * given mesh.
    * @param scene The scene the lights belongs to
    * @param mesh The mesh we are binding the information to render
    * @param effect The effect we are binding the data to
@@ -262,11 +371,14 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * to the effect
    * @param usePhysicalLightFalloff Specifies whether the light falloff is
    * defined physically or not
+   * @param rebuildInParallel Specifies whether the shader is rebuilding in
+   * parallel
    */
   static void BindLights(Scene* scene, AbstractMesh* mesh,
                          const EffectPtr& effect, MaterialDefines& defines,
                          unsigned int maxSimultaneousLights = 4,
-                         bool usePhysicalLightFalloff       = false);
+                         bool usePhysicalLightFalloff       = false,
+                         bool rebuildInParallel             = false);
 
   /**
    * @brief Binds the fog information from the scene to the effect for the given
@@ -312,6 +424,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    */
   static void BindClipPlane(const EffectPtr& effect, Scene* scene);
 
+  static std::unique_ptr<MaterialDefines> _TmpMorphInfluencers;
   static Color3 _tempFogColor;
 
 }; // end of struct MaterialHelper

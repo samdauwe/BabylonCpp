@@ -10,15 +10,20 @@
 namespace BABYLON {
 
 MorphTargetManager::MorphTargetManager(Scene* scene)
-    : uniqueId{this, &MorphTargetManager::get_uniqueId}
+    : enableNormalMorphing{true}
+    , enableTangentMorphing{true}
+    , enableUVMorphing{true}
+    , uniqueId{this, &MorphTargetManager::get_uniqueId}
     , vertexCount{this, &MorphTargetManager::get_vertexCount}
     , supportsNormals{this, &MorphTargetManager::get_supportsNormals}
     , supportsTangents{this, &MorphTargetManager::get_supportsTangents}
+    , supportsUVs{this, &MorphTargetManager::get_supportsUVs}
     , numTargets{this, &MorphTargetManager::get_numTargets}
     , numInfluencers{this, &MorphTargetManager::get_numInfluencers}
     , influences{this, &MorphTargetManager::get_influences}
     , _supportsNormals{false}
     , _supportsTangents{false}
+    , _supportsUVs{false}
     , _vertexCount{0}
     , _uniqueId{0}
 {
@@ -57,6 +62,11 @@ bool MorphTargetManager::get_supportsNormals() const
 bool MorphTargetManager::get_supportsTangents() const
 {
   return _supportsTangents;
+}
+
+bool MorphTargetManager::get_supportsUVs() const
+{
+  return _supportsUVs && enableUVMorphing;
 }
 
 std::size_t MorphTargetManager::get_numTargets() const
