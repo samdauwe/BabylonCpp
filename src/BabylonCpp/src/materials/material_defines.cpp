@@ -8,6 +8,7 @@ MaterialDefines::MaterialDefines()
     : _isDirty{true}
     , _renderId{-1}
     , _areLightsDirty{true}
+    , _areLightsDisposed{false}
     , _areAttributesDirty{true}
     , _areTexturesDirty{true}
     , _areFresnelDirty{true}
@@ -28,6 +29,7 @@ MaterialDefines::MaterialDefines(const MaterialDefines& other)
     , _isDirty{other._isDirty}
     , _renderId{other._renderId}
     , _areLightsDirty{other._areLightsDirty}
+    , _areLightsDisposed{other._areLightsDisposed}
     , _areAttributesDirty{other._areAttributesDirty}
     , _areTexturesDirty{other._areTexturesDirty}
     , _areFresnelDirty{other._areFresnelDirty}
@@ -48,6 +50,7 @@ MaterialDefines::MaterialDefines(MaterialDefines&& other)
     , _isDirty{std::move(other._isDirty)}
     , _renderId{std::move(other._renderId)}
     , _areLightsDirty{std::move(other._areLightsDirty)}
+    , _areLightsDisposed{std::move(other._areLightsDisposed)}
     , _areAttributesDirty{std::move(other._areAttributesDirty)}
     , _areTexturesDirty{std::move(other._areTexturesDirty)}
     , _areFresnelDirty{std::move(other._areFresnelDirty)}
@@ -70,6 +73,7 @@ MaterialDefines& MaterialDefines::operator=(const MaterialDefines& other)
     _isDirty                 = other._isDirty;
     _renderId                = other._renderId;
     _areLightsDirty          = other._areLightsDirty;
+    _areLightsDisposed       = other._areLightsDisposed;
     _areAttributesDirty      = other._areAttributesDirty;
     _areTexturesDirty        = other._areTexturesDirty;
     _areFresnelDirty         = other._areFresnelDirty;
@@ -94,6 +98,7 @@ MaterialDefines& MaterialDefines::operator=(MaterialDefines&& other)
     _isDirty                 = std::move(other._isDirty);
     _renderId                = std::move(other._renderId);
     _areLightsDirty          = std::move(other._areLightsDirty);
+    _areLightsDisposed       = std::move(other._areLightsDisposed);
     _areAttributesDirty      = std::move(other._areAttributesDirty);
     _areTexturesDirty        = std::move(other._areTexturesDirty);
     _areFresnelDirty         = std::move(other._areFresnelDirty);
@@ -163,6 +168,7 @@ void MaterialDefines::markAsProcessed()
   _areTexturesDirty        = false;
   _areFresnelDirty         = false;
   _areLightsDirty          = false;
+  _areLightsDisposed       = false;
   _areMiscDirty            = false;
   _areImageProcessingDirty = false;
 }
@@ -189,10 +195,11 @@ void MaterialDefines::markAsImageProcessingDirty()
   _isDirty                 = true;
 }
 
-void MaterialDefines::markAsLightDirty()
+void MaterialDefines::markAsLightDirty(bool disposed)
 {
-  _areLightsDirty = true;
-  _isDirty        = true;
+  _areLightsDirty    = true;
+  _areLightsDisposed = _areLightsDisposed || disposed;
+  _isDirty           = true;
 }
 
 void MaterialDefines::markAsAttributesDirty()
@@ -234,6 +241,7 @@ bool MaterialDefines::isEqual(const MaterialDefines& other) const
 
   if ((_isDirty != other._isDirty) || (_renderId != other._renderId)
       || (_areLightsDirty != other._areLightsDirty)
+      || (_areLightsDisposed != other._areLightsDisposed)
       || (_areAttributesDirty != other._areAttributesDirty)
       || (_areTexturesDirty != other._areTexturesDirty)
       || (_areFresnelDirty != other._areFresnelDirty)
@@ -257,6 +265,7 @@ void MaterialDefines::cloneTo(MaterialDefines& other)
   other._isDirty                 = _isDirty;
   other._renderId                = _renderId;
   other._areLightsDirty          = _areLightsDirty;
+  other._areLightsDisposed       = _areLightsDisposed;
   other._areAttributesDirty      = _areAttributesDirty;
   other._areTexturesDirty        = _areTexturesDirty;
   other._areFresnelDirty         = _areFresnelDirty;
@@ -278,6 +287,7 @@ void MaterialDefines::reset()
   _isDirty            = true;
   _renderId           = -1;
   _areLightsDirty     = true;
+  _areLightsDisposed  = false;
   _areAttributesDirty = true;
   _areTexturesDirty   = true;
   _areFresnelDirty    = true;

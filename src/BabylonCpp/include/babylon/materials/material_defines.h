@@ -18,7 +18,7 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   MaterialDefines(MaterialDefines&& other);
   MaterialDefines& operator=(const MaterialDefines& other);
   MaterialDefines& operator=(MaterialDefines&& other);
-  virtual ~MaterialDefines();
+  virtual ~MaterialDefines() override;
 
   bool operator[](const std::string& define) const;
   bool operator==(const MaterialDefines& rhs) const;
@@ -54,9 +54,10 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   void markAsImageProcessingDirty() override;
 
   /**
-   * @brief Marks the material to indicate the lights need to be re-calculated.
+   * @brief Marks the material to indicate the lights need to be re-calculated
+   * @param disposed Defines whether the light is dirty due to dispose or not
    */
-  void markAsLightDirty() override;
+  void markAsLightDirty(bool disposed = false) override;
 
   /**
    * @brief Marks the attribute state as changed.
@@ -120,6 +121,8 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
 
   /** Hidden */
   bool _areLightsDirty;
+  /** Hidden */
+  bool _areLightsDisposed;
   /** Hidden */
   bool _areAttributesDirty;
   /** Hidden */
