@@ -47,7 +47,10 @@ public:
   static std::unique_ptr<FresnelParameters>
   Parse(const json& parsedFresnelParameters);
 
-private:
+protected:
+  /**
+   * @brief Define if the fresnel effect is enable or not.
+   */
   bool get_isEnabled() const;
   void set_isEnabled(bool value);
 
