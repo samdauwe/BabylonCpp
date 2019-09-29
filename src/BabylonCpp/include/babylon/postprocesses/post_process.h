@@ -91,7 +91,7 @@ public:
 
   /**
    * @brief The effect that is created when initializing the post process.
-   * @returns The created effect corrisponding the the postprocess.
+   * @returns The created effect corresponding the the postprocess.
    */
   EffectPtr& getEffect();
 
@@ -185,7 +185,7 @@ public:
   /**
    * @brief Binds all textures and uniforms to the shader, this will be run on
    * every pass.
-   * @returns the effect corrisponding to this post process. Null if not
+   * @returns the effect corresponding to this post process. Null if not
    * compiled or not ready.
    */
   EffectPtr apply();

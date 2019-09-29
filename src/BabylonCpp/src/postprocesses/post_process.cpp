@@ -10,7 +10,6 @@
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/irender_target_options.h>
-#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 
@@ -119,7 +118,7 @@ unsigned int PostProcess::get_samples() const
 
 void PostProcess::set_samples(unsigned int n)
 {
-  _samples = n;
+  _samples = std::min(n, _engine->getCaps().maxMSAASamples);
 
   for (const auto& texture : _textures) {
     if (texture->samples != _samples) {
@@ -314,14 +313,14 @@ PostProcess::activate(const CameraPtr& camera,
       if (!std::holds_alternative<PostProcessOptions>(_options)) {
         desiredWidth
           = engine->needPOTTextures() ?
-              Tools::GetExponentOfTwo(desiredWidth, maxSize, scaleMode) :
+              Engine::GetExponentOfTwo(desiredWidth, maxSize, scaleMode) :
               desiredWidth;
       }
 
       if (!std::holds_alternative<PostProcessOptions>(_options)) {
         desiredHeight
           = engine->needPOTTextures() ?
-              Tools::GetExponentOfTwo(desiredHeight, maxSize, scaleMode) :
+              Engine::GetExponentOfTwo(desiredHeight, maxSize, scaleMode) :
               desiredHeight;
       }
     }

@@ -34,15 +34,13 @@ public:
     return std::shared_ptr<PostProcessRenderPipeline>(
       new PostProcessRenderPipeline(std::forward<Ts>(args)...));
   }
-  virtual ~PostProcessRenderPipeline();
+  virtual ~PostProcessRenderPipeline() override;
 
   /**
    * @brief Gets the class name.
    * @returns "PostProcessRenderPipeline"
    */
   virtual const std::string getClassName() const;
-
-  std::vector<CameraPtr> getCameras() const;
 
   /**
    * @brief Adds an effect to the pipeline.
@@ -111,6 +109,9 @@ protected:
    */
   bool get_isSupported() const;
 
+  /**
+   * @brief Hidden
+   */
   bool _enableMSAAOnFirstPostProcess(unsigned int sampleCount);
 
 public:
@@ -139,7 +140,7 @@ protected:
   /**
    * Hidden
    */
-  std::unordered_map<std::string, CameraPtr> _cameras;
+  std::vector<CameraPtr> _cameras;
 
 private:
   Engine* engine;

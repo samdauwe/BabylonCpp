@@ -9,8 +9,10 @@ namespace BABYLON {
 
 class AbstractMesh;
 class GeometryBufferRenderer;
+class MotionBlurPostProcess;
 using AbstractMeshPtr           = std::shared_ptr<AbstractMesh>;
 using GeometryBufferRendererPtr = std::shared_ptr<GeometryBufferRenderer>;
+using MotionBlurPostProcessPtr  = std::shared_ptr<MotionBlurPostProcess>;
 
 /**
  * @brief The Motion Blur Post Process which blurs an image based on the objects
@@ -33,33 +35,15 @@ using GeometryBufferRendererPtr = std::shared_ptr<GeometryBufferRenderer>;
 class BABYLON_SHARED_EXPORT MotionBlurPostProcess : public PostProcess {
 
 public:
-  /**
-   * @brief Creates a new instance MotionBlurPostProcess
-   * @param name The name of the effect.
-   * @param scene The scene containing the objects to blur according to their
-   * velocity.
-   * @param options The required width/height ratio to downsize to before
-   * computing the render pass.
-   * @param camera The camera to apply the render pass to.
-   * @param samplingMode The sampling mode to be used when computing the pass.
-   * (default: 0)
-   * @param engine The engine which the post process will be applied. (default:
-   * current engine)
-   * @param reusable If the post process can be reused on the same frame.
-   * (default: false)
-   * @param textureType Type of textures used when performing the post process.
-   * (default: 0)
-   * @param blockCompilation If compilation of the shader should not be done in
-   * the constructor. The updateEffect method can be used to compile the shader
-   * at a later time. (default: false)
-   */
-  MotionBlurPostProcess(const std::string& name, Scene* scene,
-                        const std::variant<float, PostProcessOptions>& options,
-                        const CameraPtr& camera, unsigned int samplingMode,
-                        Engine* engine, bool reusable = false,
-                        unsigned int textureType
-                        = Constants::TEXTURETYPE_UNSIGNED_INT,
-                        bool blockCompilation = false);
+  template <typename... Ts>
+  static MotionBlurPostProcessPtr New(Ts&&... args)
+  {
+    auto postProcess = std::shared_ptr<MotionBlurPostProcess>(
+      new MotionBlurPostProcess(std::forward<Ts>(args)...));
+    postProcess->add(postProcess);
+
+    return postProcess;
+  }
   ~MotionBlurPostProcess() override;
 
   /**
@@ -89,6 +73,34 @@ public:
   void dispose(Camera* camera = nullptr) override;
 
 protected:
+  /**
+   * @brief Creates a new instance MotionBlurPostProcess
+   * @param name The name of the effect.
+   * @param scene The scene containing the objects to blur according to their
+   * velocity.
+   * @param options The required width/height ratio to downsize to before
+   * computing the render pass.
+   * @param camera The camera to apply the render pass to.
+   * @param samplingMode The sampling mode to be used when computing the pass.
+   * (default: 0)
+   * @param engine The engine which the post process will be applied. (default:
+   * current engine)
+   * @param reusable If the post process can be reused on the same frame.
+   * (default: false)
+   * @param textureType Type of textures used when performing the post process.
+   * (default: 0)
+   * @param blockCompilation If compilation of the shader should not be done in
+   * the constructor. The updateEffect method can be used to compile the shader
+   * at a later time. (default: false)
+   */
+  MotionBlurPostProcess(const std::string& name, Scene* scene,
+                        const std::variant<float, PostProcessOptions>& options,
+                        const CameraPtr& camera, unsigned int samplingMode,
+                        Engine* engine, bool reusable = false,
+                        unsigned int textureType
+                        = Constants::TEXTURETYPE_UNSIGNED_INT,
+                        bool blockCompilation = false);
+
   /**
    * @brief Gets the number of iterations are used for motion blur quality.
    * Default value is equal to 32.

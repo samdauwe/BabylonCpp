@@ -104,6 +104,9 @@ ImageProcessingPostProcess::get_imageProcessingConfiguration()
 void ImageProcessingPostProcess::set_imageProcessingConfiguration(
   ImageProcessingConfiguration* const& value)
 {
+  // We are almost sure it is applied by post process as
+  // We are in the post process :-)
+  value->applyByPostProcess = true;
   _attachImageProcessingConfiguration(value);
 }
 

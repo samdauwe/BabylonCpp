@@ -66,7 +66,7 @@ protected:
   /**
    * @brief Creates a new instance ConvolutionPostProcess.
    * @param name The name of the effect.
-   * @param kernel Array of 9 values corrisponding to the 3x3 kernel to be
+   * @param kernel Array of 9 values corresponding to the 3x3 kernel to be
    * applied
    * @param options The required width/height ratio to downsize to before
    * computing the render pass.
@@ -90,7 +90,7 @@ protected:
 
 public:
   /**
-   * Array of 9 values corrisponding to the 3x3 kernel to be applied
+   * Array of 9 values corresponding to the 3x3 kernel to be applied
    */
   Float32Array kernel;
 

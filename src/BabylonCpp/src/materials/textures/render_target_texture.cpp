@@ -560,11 +560,11 @@ int RenderTargetTexture::_bestReflectionRenderTargetDimension(
 {
   const int minimum = 128;
   const float x     = renderDimension * scale;
-  const int curved  = Tools::NearestPOT(
+  const int curved  = Engine::NearestPOT(
     static_cast<int>(x + (minimum * minimum / (minimum + x))));
 
   // Ensure we don't exceed the render dimension (while staying POT)
-  return std::min(Tools::FloorPOT(renderDimension), curved);
+  return std::min(Engine::FloorPOT(renderDimension), curved);
 }
 
 void RenderTargetTexture::_bindFrameBuffer(unsigned int faceIndex)

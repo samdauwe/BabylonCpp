@@ -27,16 +27,16 @@
 namespace BABYLON {
 
 SSAO2RenderingPipeline::SSAO2RenderingPipeline(
-  const std::string& name, Scene* scene, float ratio,
+  const std::string& iName, Scene* scene, float ratio,
   const std::vector<CameraPtr>& cameras)
-    : SSAO2RenderingPipeline(name, scene, {ratio, ratio}, cameras)
+    : SSAO2RenderingPipeline(iName, scene, {ratio, ratio}, cameras)
 {
 }
 
 SSAO2RenderingPipeline::SSAO2RenderingPipeline(
-  const std::string& name, Scene* scene, const SSAO2Ratio& iRatio,
+  const std::string& iName, Scene* scene, const SSAO2Ratio& iRatio,
   const std::vector<CameraPtr>& cameras)
-    : PostProcessRenderPipeline(scene->getEngine(), name)
+    : PostProcessRenderPipeline(scene->getEngine(), iName)
     , totalStrength{1.f}
     , maxZ{100.f}
     , minZAspect{0.2f}
@@ -67,8 +67,7 @@ SSAO2RenderingPipeline::SSAO2RenderingPipeline(
     , _firstUpdate{true}
 {
   if (!isSupported()) {
-    BABYLON_LOG_ERROR("SSAO2RenderingPipeline",
-                      "SSAO 2 needs WebGL 2 support.");
+    BABYLON_LOG_ERROR("SSAO2RenderingPipeline", "SSAO 2 needs WebGL 2 support.")
     return;
   }
 

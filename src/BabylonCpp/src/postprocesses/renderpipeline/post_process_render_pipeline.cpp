@@ -34,22 +34,12 @@ std::string PostProcessRenderPipeline::get_name() const
 
 bool PostProcessRenderPipeline::get_isSupported() const
 {
-  for (auto& item : _renderEffects) {
+  for (const auto& item : _renderEffects) {
     if (!item.second->isSupported()) {
       return false;
     }
   }
   return true;
-}
-
-std::vector<CameraPtr> PostProcessRenderPipeline::getCameras() const
-{
-  std::vector<CameraPtr> cameras;
-  cameras.reserve(_cameras.size());
-  for (auto& item : _cameras) {
-    cameras.emplace_back(item.second);
-  }
-  return cameras;
 }
 
 void PostProcessRenderPipeline::addEffect(
@@ -71,7 +61,7 @@ void PostProcessRenderPipeline::_enableEffect(
     return;
   }
 
-  auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
+  auto& _cam = cameras.empty() ? _cameras : cameras;
   renderEffects->_enable(_cam);
 }
 
@@ -82,38 +72,45 @@ void PostProcessRenderPipeline::_disableEffect(
     return;
   }
 
-  auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
+  auto& _cam = cameras.empty() ? _cameras : cameras;
   _renderEffects[renderEffectName]->_disable(_cam);
 }
 
 void PostProcessRenderPipeline::_attachCameras(
   const std::vector<CameraPtr>& cameras, bool unique)
 {
-  auto cams = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
+  auto& cams = cameras.empty() ? _cameras : cameras;
 
   if (cams.empty()) {
     return;
   }
 
   std::vector<CameraPtr> camerasToDelete;
-  for (auto& camera : cams) {
+  for (const auto& camera : cams) {
     const auto& cameraName = camera->name;
 
-    if (stl_util::contains(_cameras, camera->name)) {
-      _cameras[cameraName] = camera;
+    auto it = std::find_if(_cameras.begin(), _cameras.end(),
+                           [&cameraName](const CameraPtr& cameraEntry) {
+                             return cameraName == cameraEntry->name;
+                           });
+    if (it == _cameras.end()) {
+      _cameras.emplace_back(camera);
     }
     else if (unique) {
       camerasToDelete.emplace_back(camera);
     }
   }
 
-  for (auto& camera : camerasToDelete) {
-    auto it = _cameras.find(camera->name);
+  for (const auto& camera : camerasToDelete) {
+    auto it = std::find_if(_cameras.begin(), _cameras.end(),
+                           [&camera](const CameraPtr& cameraEntry) {
+                             return camera->name == cameraEntry->name;
+                           });
     if (it != _cameras.end())
       _cameras.erase(it);
   }
 
-  for (auto& item : _renderEffects) {
+  for (const auto& item : _renderEffects) {
     item.second->_attachCameras(cams);
   }
 }
@@ -121,18 +118,21 @@ void PostProcessRenderPipeline::_attachCameras(
 void PostProcessRenderPipeline::_detachCameras(
   const std::vector<CameraPtr>& cameras)
 {
-  auto cams = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
+  auto cams = cameras.empty() ? _cameras : cameras;
 
   if (cams.empty()) {
     return;
   }
 
-  for (auto& item : _renderEffects) {
+  for (const auto& item : _renderEffects) {
     item.second->_detachCameras(cams);
   }
 
-  for (auto& camera : cams) {
-    auto it = _cameras.find(camera->name);
+  for (const auto& camera : cams) {
+    auto it = std::find_if(_cameras.begin(), _cameras.end(),
+                           [&camera](const CameraPtr& cameraEntry) {
+                             return camera->name == cameraEntry->name;
+                           });
     if (it != _cameras.end()) {
       _cameras.erase(it);
     }
@@ -141,12 +141,12 @@ void PostProcessRenderPipeline::_detachCameras(
 
 void PostProcessRenderPipeline::_update()
 {
-  for (auto& item : _renderEffects) {
+  for (const auto& item : _renderEffects) {
     item.second->_update();
   }
 
-  for (auto& item : _cameras) {
-    const auto& cameraName = item.first;
+  for (const auto& camera : _cameras) {
+    const auto& cameraName = camera->name;
     if (stl_util::contains(_renderEffectsForIsolatedPass, cameraName)) {
       _renderEffectsForIsolatedPass[cameraName]->_update();
     }
@@ -162,14 +162,14 @@ void PostProcessRenderPipeline::_reset()
 bool PostProcessRenderPipeline::_enableMSAAOnFirstPostProcess(
   unsigned int sampleCount)
 {
+  if (engine->webGLVersion() == 1.f) {
+    return false;
+  }
+
   // Set samples of the very first post process to 4 to enable native
   // anti-aliasing in browsers that support webGL 2.0 (See:
   // https://github.com/BabylonJS/Babylon.js/issues/3754)
   auto effectKeys = stl_util::extract_keys(_renderEffects);
-
-  if (engine->webGLVersion() == 1.f) {
-    return false;
-  }
 
   if (!effectKeys.empty()) {
     auto postProcesses = _renderEffects[effectKeys[0]]->getPostProcesses();

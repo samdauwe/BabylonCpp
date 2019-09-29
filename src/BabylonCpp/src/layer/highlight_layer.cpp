@@ -19,7 +19,6 @@
 #include <babylon/meshes/_instances_batch.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
-#include <babylon/misc/tools.h>
 #include <babylon/postprocesses/blur_post_process.h>
 #include <babylon/postprocesses/glow_blur_post_process.h>
 #include <babylon/postprocesses/pass_post_process.h>
@@ -145,10 +144,10 @@ void HighlightLayer::_createTextureAndPostProcesses()
     = static_cast<int>(static_cast<float>(_mainTextureDesiredSize.height)
                        * _options.blurTextureSizeRatio);
   blurTextureWidth = _engine->needPOTTextures() ?
-                       Tools::GetExponentOfTwo(blurTextureWidth, _maxSize) :
+                       Engine::GetExponentOfTwo(blurTextureWidth, _maxSize) :
                        blurTextureWidth;
   blurTextureHeight = _engine->needPOTTextures() ?
-                        Tools::GetExponentOfTwo(blurTextureHeight, _maxSize) :
+                        Engine::GetExponentOfTwo(blurTextureHeight, _maxSize) :
                         blurTextureHeight;
 
   auto textureType = 0u;

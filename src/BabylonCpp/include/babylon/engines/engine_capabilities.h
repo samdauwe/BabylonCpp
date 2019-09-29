@@ -108,6 +108,8 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   bool multiview = false;
   /** Function used to let the system compiles shaders in background */
   std::optional<ParallelShaderCompile> parallelShaderCompile = std::nullopt;
+  /** Max number of texture samples for MSAA */
+  unsigned int maxMSAASamples = 1;
 }; // end of struct EngineCapabilities
 
 } // end of namespace BABYLON

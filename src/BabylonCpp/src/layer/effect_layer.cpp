@@ -18,7 +18,6 @@
 #include <babylon/meshes/_instances_batch.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
-#include <babylon/misc/tools.h>
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/postprocesses/post_process.h>
 
@@ -126,11 +125,11 @@ void EffectLayer::_setMainTextureSize()
 
     _mainTextureDesiredSize.width
       = _engine->needPOTTextures() ?
-          Tools::GetExponentOfTwo(_mainTextureDesiredSize.width, _maxSize) :
+          Engine::GetExponentOfTwo(_mainTextureDesiredSize.width, _maxSize) :
           _mainTextureDesiredSize.width;
     _mainTextureDesiredSize.height
       = _engine->needPOTTextures() ?
-          Tools::GetExponentOfTwo(_mainTextureDesiredSize.height, _maxSize) :
+          Engine::GetExponentOfTwo(_mainTextureDesiredSize.height, _maxSize) :
           _mainTextureDesiredSize.height;
   }
 

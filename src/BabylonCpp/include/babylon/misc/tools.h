@@ -61,37 +61,6 @@ struct BABYLON_SHARED_EXPORT Tools {
   static bool IsExponentOfTwo(size_t value);
 
   /**
-   * @brief Find the next highest power of two.
-   * @param x Number to start search from.
-   * @return Next highest power of two.
-   */
-  static int CeilingPOT(int x);
-
-  /**
-   * @brief Find the next lowest power of two.
-   * @param x Number to start search from.
-   * @return Next lowest power of two.
-   */
-  static int FloorPOT(int x);
-
-  /**
-   * @brief Find the nearest power of two.
-   * @param x Number to start search from.
-   * @return Next nearest power of two.
-   */
-  static int NearestPOT(int x);
-
-  /**
-   * @brief Get the closest exponent of two.
-   * @param value defines the value to approximate
-   * @param max defines the maximum value to return
-   * @param mode defines how to define the closest value
-   * @returns closest exponent of two of the given value
-   */
-  static int GetExponentOfTwo(int value, int max,
-                              unsigned int mode = Constants::SCALEMODE_NEAREST);
-
-  /**
    * @brief Extracts the filename from a path.
    * @param path defines the path to use
    * @returns the filename

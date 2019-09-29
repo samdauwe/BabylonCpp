@@ -13,6 +13,7 @@
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material.h>
+#include <babylon/materials/material_helper.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/meshes/_instances_batch.h>
@@ -134,19 +135,13 @@ bool VolumetricLightScatteringPostProcess::_isReady(SubMesh* subMesh,
   // Instances
   if (useInstances) {
     defines.emplace_back("#define INSTANCES");
-    attribs.emplace_back(VertexBuffer::World0Kind);
-    attribs.emplace_back(VertexBuffer::World1Kind);
-    attribs.emplace_back(VertexBuffer::World2Kind);
-    attribs.emplace_back(VertexBuffer::World3Kind);
+    MaterialHelper::PushAttributesForInstances(attribs);
   }
 
   // Get correct effect
   std::string join = String::join(defines, '\n');
   if (_cachedDefines != join) {
     _cachedDefines = join;
-    std::unordered_map<std::string, std::string> baseName{
-      {"vertexElement", "depth"},
-      {"fragmentElement", "volumetricLightScatteringPass"}};
 
     EffectCreationOptions options;
     options.attributes = std::move(attribs);
@@ -154,10 +149,13 @@ bool VolumetricLightScatteringPostProcess::_isReady(SubMesh* subMesh,
       = {"world", "mBones", "viewProjection", "diffuseMatrix"};
     options.samplers = {"diffuseSampler"};
     options.defines  = std::move(join);
+    options.indexParameters
+      = {{"maxSimultaneousMorphTargets", mesh->numBoneInfluencers()}};
 
     _volumetricLightScatteringPass
       = mesh->getScene()->getEngine()->createEffect(
-        baseName, options, mesh->getScene()->getEngine());
+        "volumetricLightScatteringPass", options,
+        mesh->getScene()->getEngine());
   }
 
   return _volumetricLightScatteringPass->isReady();
@@ -233,6 +231,8 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
     if (_meshExcluded(_mesh)) {
       return;
     }
+
+    mesh->_internalAbstractMeshDataInfo._isActiveIntermediate = false;
 
     auto material = subMesh->getMaterial();
 

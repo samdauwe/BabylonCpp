@@ -15,7 +15,6 @@
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
-#include <babylon/misc/tools.h>
 #include <babylon/postprocesses/blur_post_process.h>
 #include <babylon/postprocesses/post_process_manager.h>
 
@@ -119,10 +118,10 @@ void GlowLayer::_createTextureAndPostProcesses()
   auto blurTextureWidth  = _mainTextureDesiredSize.width;
   auto blurTextureHeight = _mainTextureDesiredSize.height;
   blurTextureWidth       = _engine->needPOTTextures() ?
-                       Tools::GetExponentOfTwo(blurTextureWidth, _maxSize) :
+                       Engine::GetExponentOfTwo(blurTextureWidth, _maxSize) :
                        blurTextureWidth;
   blurTextureHeight = _engine->needPOTTextures() ?
-                        Tools::GetExponentOfTwo(blurTextureHeight, _maxSize) :
+                        Engine::GetExponentOfTwo(blurTextureHeight, _maxSize) :
                         blurTextureHeight;
 
   auto textureType = 0u;

@@ -119,15 +119,39 @@ protected:
 
   /**
    * @brief Gets wether or not the exposure of the overall pipeline should be
-   * automatically adjusted by the HDR post-process
+   * automatically adjusted by the HDR post-process.
    */
   bool get_hdrAutoExposure() const;
 
   /**
    * @brief Sets wether or not the exposure of the overall pipeline should be
-   * automatically adjusted by the HDR post-process
+   * automatically adjusted by the HDR post-process.
    */
   void set_hdrAutoExposure(bool value);
+
+  /**
+   * @brief Gets how much the image is blurred by the movement while using the
+   * motion blur post-process.
+   */
+  float get_motionStrength() const;
+
+  /**
+   * @brief Sets how much the image is blurred by the movement while using the
+   * motion blur post-process.
+   */
+  void set_motionStrength(float strength);
+
+  /**
+   * @brief Gets wether or not the motion blur post-process is object based or
+   * screen based.
+   */
+  bool get_objectBasedMotionBlur() const;
+
+  /**
+   * @brief Sets wether or not the motion blur post-process should be object
+   * based or screen based.
+   */
+  void set_objectBasedMotionBlur(bool value);
 
   bool get_bloomEnabled() const;
   void set_bloomEnabled(bool enabled);
@@ -382,6 +406,10 @@ public:
    */
   float lensFlareDistortionStrength;
   /**
+   * Configures the blur intensity used for for lens flare (halo)
+   */
+  float lensFlareBlurWidth;
+  /**
    * Lens star texture must be used to simulate rays on the flares and is
    * available in the documentation
    */
@@ -404,9 +432,16 @@ public:
   float depthOfFieldBlurWidth;
 
   /**
-   * For motion blur, defines how much the image is blurred by the movement
+   * Gets or sets how much the image is blurred by the movement while using the
+   * motion blur post-process
    */
-  float motionStrength;
+  Property<StandardRenderingPipeline, float> motionStrength;
+
+  /**
+   * Gets or sets wether or not the motion blur post-process is object based or
+   * screen based
+   */
+  Property<StandardRenderingPipeline, bool> objectBasedMotionBlur;
 
   /**
    * List of animations for the pipeline (IAnimatable implementation)
@@ -474,7 +509,10 @@ private:
   float _currentExposure;
   bool _hdrAutoExposure;
   float _hdrCurrentLuminance;
+  float _motionStrength;
+  bool _isObjectBasedMotionBlur;
   unsigned int _floatTextureType;
+  std::vector<CameraPtr> _camerasToBeAttached;
   float _ratio;
   // Getters and setters
   bool _bloomEnabled;

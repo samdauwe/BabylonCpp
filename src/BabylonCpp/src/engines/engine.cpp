@@ -3230,10 +3230,10 @@ InternalTexturePtr Engine::createDynamicTexture(int width, int height,
 
   if (generateMipMaps) {
     width = needPOTTextures() ?
-              Tools::GetExponentOfTwo(width, _caps.maxTextureSize) :
+              Engine::GetExponentOfTwo(width, _caps.maxTextureSize) :
               width;
     height = needPOTTextures() ?
-               Tools::GetExponentOfTwo(height, _caps.maxTextureSize) :
+               Engine::GetExponentOfTwo(height, _caps.maxTextureSize) :
                height;
   }
 
@@ -4431,7 +4431,7 @@ InternalTexturePtr Engine::createCubeTexture(
     _cascadeLoadImgs(
       rootUrl, scene,
       [&](const std::vector<Image>& imgs) {
-        auto width = needPOTTextures() ? Tools::GetExponentOfTwo(
+        auto width = needPOTTextures() ? Engine::GetExponentOfTwo(
                        imgs[0].width, _caps.maxCubemapTextureSize) :
                                          imgs[0].width;
         auto height = width;
@@ -4962,12 +4962,13 @@ void Engine::_prepareWebGLTexture(
   unsigned int samplingMode)
 {
   auto maxTextureSize = getCaps().maxTextureSize;
-  auto potWidth       = std::min(
-    maxTextureSize,
-    needPOTTextures() ? Tools::GetExponentOfTwo(width, maxTextureSize) : width);
-  auto potHeight = std::min(maxTextureSize,
+  auto potWidth       = std::min(maxTextureSize,
+                           needPOTTextures() ?
+                             Engine::GetExponentOfTwo(width, maxTextureSize) :
+                             width);
+  auto potHeight      = std::min(maxTextureSize,
                             needPOTTextures() ?
-                              Tools::GetExponentOfTwo(height, maxTextureSize) :
+                              Engine::GetExponentOfTwo(height, maxTextureSize) :
                               height);
 
   if (!_gl) {
@@ -6299,6 +6300,54 @@ void Engine::_cascadeLoadFiles(
 bool Engine::isSupported()
 {
   return true;
+}
+
+int Engine::CeilingPOT(int x)
+{
+  x--;
+  x |= x >> 1;
+  x |= x >> 2;
+  x |= x >> 4;
+  x |= x >> 8;
+  x |= x >> 16;
+  x++;
+  return x;
+}
+
+int Engine::FloorPOT(int x)
+{
+  x = x | (x >> 1);
+  x = x | (x >> 2);
+  x = x | (x >> 4);
+  x = x | (x >> 8);
+  x = x | (x >> 16);
+  return x - (x >> 1);
+}
+
+int Engine::NearestPOT(int x)
+{
+  auto c = Engine::CeilingPOT(x);
+  auto f = Engine::FloorPOT(x);
+  return (c - x) > (x - f) ? f : c;
+}
+
+int Engine::GetExponentOfTwo(int value, int max, unsigned int mode)
+{
+  int pot;
+
+  switch (mode) {
+    case Constants::SCALEMODE_FLOOR:
+      pot = Engine::FloorPOT(value);
+      break;
+    case Constants::SCALEMODE_NEAREST:
+      pot = Engine::NearestPOT(value);
+      break;
+    case Constants::SCALEMODE_CEILING:
+      pot = Engine::CeilingPOT(value);
+      break;
+  }
+
+  return std::min(pot, max);
 }
 
 } // end of namespace BABYLON

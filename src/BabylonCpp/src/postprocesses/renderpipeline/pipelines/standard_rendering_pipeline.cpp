@@ -22,6 +22,7 @@
 #include <babylon/math/vector4.h>
 #include <babylon/postprocesses/blur_post_process.h>
 #include <babylon/postprocesses/fxaa_post_process.h>
+#include <babylon/postprocesses/motion_blur_post_process.h>
 #include <babylon/postprocesses/post_process.h>
 #include <babylon/postprocesses/renderpipeline/post_process_render_effect.h>
 #include <babylon/postprocesses/renderpipeline/post_process_render_pipeline_manager.h>
@@ -76,11 +77,18 @@ StandardRenderingPipeline::StandardRenderingPipeline(
     , lensFlareGhostDispersal{1.4f}
     , lensFlareHaloWidth{0.7f}
     , lensFlareDistortionStrength{16.f}
+    , lensFlareBlurWidth{512.f}
     , lensStarTexture{nullptr}
     , lensFlareDirtTexture{nullptr}
     , depthOfFieldDistance{10.f}
     , depthOfFieldBlurWidth{64.f}
-    , motionStrength{1.f}
+    , motionStrength{this, &StandardRenderingPipeline::get_motionStrength,
+                     &StandardRenderingPipeline::set_motionStrength}
+    , objectBasedMotionBlur{this,
+                            &StandardRenderingPipeline::
+                              get_objectBasedMotionBlur,
+                            &StandardRenderingPipeline::
+                              set_objectBasedMotionBlur}
     , bloomEnabled{this, &StandardRenderingPipeline::get_bloomEnabled,
                    &StandardRenderingPipeline::set_bloomEnabled}
     , depthOfFieldEnabled{this,
@@ -111,6 +119,8 @@ StandardRenderingPipeline::StandardRenderingPipeline(
     , _currentExposure{1.f}
     , _hdrAutoExposure{false}
     , _hdrCurrentLuminance{1.f}
+    , _motionStrength{1.f}
+    , _isObjectBasedMotionBlur{false}
     , _bloomEnabled{false}
     , _depthOfFieldEnabled{false}
     , _vlsEnabled{false}
@@ -122,9 +132,8 @@ StandardRenderingPipeline::StandardRenderingPipeline(
     , _volumetricLightStepsCount{50.f}
     , _samples{1}
 {
-  for (auto& camera : cameras) {
-    _cameras[camera->name] = camera;
-  }
+  _cameras             = !cameras.empty() ? cameras : scene->cameras;
+  _camerasToBeAttached = _cameras;
 
   // Initialize
   _scene           = scene;
@@ -237,6 +246,37 @@ void StandardRenderingPipeline::set_hdrAutoExposure(bool value)
   }
 }
 
+float StandardRenderingPipeline::get_motionStrength() const
+{
+  return _motionStrength;
+}
+
+void StandardRenderingPipeline::set_motionStrength(float strength)
+{
+  _motionStrength = strength;
+
+  if (_isObjectBasedMotionBlur && motionBlurPostProcess) {
+    std::static_pointer_cast<MotionBlurPostProcess>(motionBlurPostProcess)
+      ->motionStrength
+      = strength;
+  }
+}
+
+bool StandardRenderingPipeline::get_objectBasedMotionBlur() const
+{
+  return _isObjectBasedMotionBlur;
+}
+
+void StandardRenderingPipeline::set_objectBasedMotionBlur(bool value)
+{
+  const auto shouldRebuild = _isObjectBasedMotionBlur != value;
+  _isObjectBasedMotionBlur = value;
+
+  if (shouldRebuild) {
+    _buildPipeline();
+  }
+}
+
 bool StandardRenderingPipeline::get_bloomEnabled() const
 {
   return _bloomEnabled;
@@ -313,7 +353,7 @@ void StandardRenderingPipeline::set_VLSEnabled(bool enabled)
     if (!geometry) {
       BABYLON_LOG_WARN("StandardRenderingPipeline",
                        "Geometry renderer is not supported, cannot create "
-                       "volumetric lights in Standard Rendering Pipeline");
+                       "volumetric lights in Standard Rendering Pipeline")
       return;
     }
   }
@@ -376,9 +416,16 @@ float StandardRenderingPipeline::get_motionBlurSamples() const
 void StandardRenderingPipeline::set_motionBlurSamples(float iSamples)
 {
   if (motionBlurPostProcess) {
-    motionBlurPostProcess->updateEffect(
-      "#define MOTION_BLUR\n#define MAX_MOTION_SAMPLES "
-      + std::to_string(std::round(iSamples * 10.f) / 10.f));
+    if (_isObjectBasedMotionBlur) {
+      std::static_pointer_cast<MotionBlurPostProcess>(motionBlurPostProcess)
+        ->motionBlurSamples
+        = samples;
+    }
+    else {
+      motionBlurPostProcess->updateEffect(
+        "#define MOTION_BLUR\n#define MAX_MOTION_SAMPLES "
+        + std::to_string(std::round(iSamples * 10.f) / 10.f));
+    }
   }
 
   _motionBlurSamples = iSamples;
@@ -402,6 +449,12 @@ void StandardRenderingPipeline::set_samples(unsigned int sampleCount)
 void StandardRenderingPipeline::_buildPipeline()
 {
   auto ratio = _ratio;
+  if (!_cameras.empty()) {
+    _scene->postProcessRenderPipelineManager()->detachCamerasFromRenderPipeline(
+      _name, _cameras);
+    // get back cameras to be used to reattach pipeline
+    _cameras = _camerasToBeAttached;
+  }
   auto scene = _scene;
 
   _disposePostProcesses();
@@ -535,9 +588,8 @@ void StandardRenderingPipeline::_buildPipeline()
   }
 
   if (!_cameras.empty()) {
-    auto cameras = stl_util::extract_values(_cameras);
     _scene->postProcessRenderPipelineManager()->attachCamerasToRenderPipeline(
-      _name, cameras);
+      _name, _cameras);
   }
 
   if (!_enableMSAAOnFirstPostProcess(_samples) && _samples > 1) {
@@ -936,7 +988,7 @@ void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene,
     [&]() -> std::vector<PostProcessPtr> { return {lensFlarePostProcess}; },
     false));
 
-  _createBlurPostProcesses(scene, ratio / 4.f, 2);
+  _createBlurPostProcesses(scene, ratio / 4.f, 2, "lensFlareBlurWidth");
 
   lensFlareComposePostProcess = PostProcess::New(
     "HDRLensFlareCompose", "standard", {"lensStarMatrix"},
@@ -1042,42 +1094,53 @@ void StandardRenderingPipeline::_createDepthOfFieldPostProcess(Scene* scene,
 void StandardRenderingPipeline::_createMotionBlurPostProcess(Scene* scene,
                                                              float ratio)
 {
-  motionBlurPostProcess = PostProcess::New(
-    "HDRMotionBlur", "standard",
-    {"inverseViewProjection", "prevViewProjection", "screenSize", "motionScale",
-     "motionStrength"},
-    {"depthSampler"}, ratio, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
-    scene->getEngine(), false,
-    "#define MOTION_BLUR\n#define MAX_MOTION_SAMPLES "
-      + std::to_string(motionBlurSamples()),
-    Constants::TEXTURETYPE_UNSIGNED_INT);
+  if (_isObjectBasedMotionBlur) {
+    auto mb = MotionBlurPostProcess::New(
+      "HDRMotionBlur", scene, ratio, nullptr,
+      TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
+      Constants::TEXTURETYPE_UNSIGNED_INT);
+    mb->motionStrength    = motionStrength;
+    mb->motionBlurSamples = static_cast<unsigned>(motionBlurSamples);
+    motionBlurPostProcess = mb;
+  }
+  else {
+    motionBlurPostProcess = PostProcess::New(
+      "HDRMotionBlur", "standard",
+      {"inverseViewProjection", "prevViewProjection", "screenSize",
+       "motionScale", "motionStrength"},
+      {"depthSampler"}, ratio, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
+      scene->getEngine(), false,
+      "#define MOTION_BLUR\n#define MAX_MOTION_SAMPLES "
+        + std::to_string(motionBlurSamples()),
+      Constants::TEXTURETYPE_UNSIGNED_INT);
 
-  motionBlurPostProcess->onApply = [&](Effect* effect, EventState&) {
-    auto motionScale        = 0.f;
-    auto prevViewProjection = Matrix::Identity();
-    auto invViewProjection  = Matrix::Identity();
-    auto viewProjection     = Matrix::Identity();
-    auto screenSize         = Vector2::Zero();
+    motionBlurPostProcess->onApply = [&](Effect* effect, EventState&) {
+      auto motionScale        = 0.f;
+      auto prevViewProjection = Matrix::Identity();
+      auto invViewProjection  = Matrix::Identity();
+      auto viewProjection     = Matrix::Identity();
+      auto screenSize         = Vector2::Zero();
 
-    viewProjection
-      = scene->getProjectionMatrix().multiply(scene->getViewMatrix());
+      viewProjection
+        = scene->getProjectionMatrix().multiply(scene->getViewMatrix());
 
-    viewProjection.invertToRef(invViewProjection);
-    effect->setMatrix("inverseViewProjection", invViewProjection);
+      viewProjection.invertToRef(invViewProjection);
+      effect->setMatrix("inverseViewProjection", invViewProjection);
 
-    effect->setMatrix("prevViewProjection", prevViewProjection);
-    prevViewProjection = viewProjection;
+      effect->setMatrix("prevViewProjection", prevViewProjection);
+      prevViewProjection = viewProjection;
 
-    screenSize.x = static_cast<float>(motionBlurPostProcess->width);
-    screenSize.y = static_cast<float>(motionBlurPostProcess->height);
-    effect->setVector2("screenSize", screenSize);
+      screenSize.x = static_cast<float>(motionBlurPostProcess->width);
+      screenSize.y = static_cast<float>(motionBlurPostProcess->height);
+      effect->setVector2("screenSize", screenSize);
 
-    motionScale = scene->getEngine()->getFps() / 60.f;
-    effect->setFloat("motionScale", motionScale);
-    effect->setFloat("motionStrength", motionStrength);
+      motionScale = scene->getEngine()->getFps() / 60.f;
+      effect->setFloat("motionScale", motionScale);
+      effect->setFloat("motionStrength", motionStrength);
 
-    effect->setTexture("depthSampler", _getDepthTexture());
-  };
+      effect->setTexture("depthSampler", _getDepthTexture());
+    };
+  }
 
   addEffect(PostProcessRenderEffect::New(
     scene->getEngine(), "HDRMotionBlur",
@@ -1097,8 +1160,8 @@ TexturePtr StandardRenderingPipeline::_getDepthTexture()
 
 void StandardRenderingPipeline::_disposePostProcesses()
 {
-  for (auto& item : _cameras) {
-    auto camera = item.second.get();
+  for (auto& cameraItem : _cameras) {
+    auto camera = cameraItem.get();
 
     if (originalPostProcess) {
       originalPostProcess->dispose(camera);
@@ -1210,9 +1273,8 @@ void StandardRenderingPipeline::dispose(bool doNotRecurse,
 {
   _disposePostProcesses();
 
-  auto cameras = stl_util::extract_values(_cameras);
   _scene->postProcessRenderPipelineManager()->detachCamerasFromRenderPipeline(
-    _name, cameras);
+    _name, _cameras);
 
   PostProcessRenderPipeline::dispose(doNotRecurse);
 }

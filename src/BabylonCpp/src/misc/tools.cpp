@@ -150,54 +150,6 @@ bool Tools::IsExponentOfTwo(size_t value)
   return count == value;
 }
 
-int Tools::CeilingPOT(int x)
-{
-  x--;
-  x |= x >> 1;
-  x |= x >> 2;
-  x |= x >> 4;
-  x |= x >> 8;
-  x |= x >> 16;
-  x++;
-  return x;
-}
-
-int Tools::FloorPOT(int x)
-{
-  x = x | (x >> 1);
-  x = x | (x >> 2);
-  x = x | (x >> 4);
-  x = x | (x >> 8);
-  x = x | (x >> 16);
-  return x - (x >> 1);
-}
-
-int Tools::NearestPOT(int x)
-{
-  auto c = Tools::CeilingPOT(x);
-  auto f = Tools::FloorPOT(x);
-  return (c - x) > (x - f) ? f : c;
-}
-
-int Tools::GetExponentOfTwo(int value, int max, unsigned int mode)
-{
-  int pot;
-
-  switch (mode) {
-    case Constants::SCALEMODE_FLOOR:
-      pot = Tools::FloorPOT(value);
-      break;
-    case Constants::SCALEMODE_NEAREST:
-      pot = Tools::NearestPOT(value);
-      break;
-    case Constants::SCALEMODE_CEILING:
-      pot = Tools::CeilingPOT(value);
-      break;
-  }
-
-  return std::min(pot, max);
-}
-
 std::string Tools::GetFilename(const std::string& path)
 {
   const auto index = String::lastIndexOf(path, "/");

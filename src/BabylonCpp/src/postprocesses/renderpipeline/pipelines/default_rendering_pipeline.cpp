@@ -100,8 +100,8 @@ DefaultRenderingPipeline::DefaultRenderingPipeline(
     , _prevPrevPostProcess{nullptr}
     , _depthOfFieldSceneObserver{nullptr}
 {
-  _cameras             = cameras;
-  _camerasToBeAttached = stl_util::extract_values(_cameras);
+  _cameras             = stl_util::extract_values(cameras);
+  _camerasToBeAttached = _cameras;
 
   // Initialize
   _scene           = scene ? scene : Engine::LastCreatedScene();
@@ -289,8 +289,8 @@ void DefaultRenderingPipeline::_rebuildBloom()
   bloom = BloomEffect::New("", _scene, bloomScale, _bloomWeight, bloomKernel,
                            _defaultPipelineTextureType, false);
   bloom->threshold = oldBloom->threshold();
-  for (auto& item : _cameras) {
-    oldBloom->disposeEffects(item.second.get());
+  for (const auto& camera : _cameras) {
+    oldBloom->disposeEffects(camera.get());
   }
 }
 
@@ -334,8 +334,8 @@ void DefaultRenderingPipeline::set_depthOfFieldBlurLevel(
   depthOfField->fStop         = oldDof->fStop();
   depthOfField->lensSize      = oldDof->lensSize();
 
-  for (auto& camera : _cameras) {
-    oldDof->disposeEffects(camera.second.get());
+  for (const auto& camera : _cameras) {
+    oldDof->disposeEffects(camera.get());
   }
 
   _buildPipeline();
@@ -485,11 +485,11 @@ void DefaultRenderingPipeline::_buildPipeline()
   _disposePostProcesses();
   if (!_cameras.empty()) {
     _scene->postProcessRenderPipelineManager()->detachCamerasFromRenderPipeline(
-      _name, stl_util::extract_values(_cameras));
+      _name, _cameras);
     // get back cameras to be used to reattach pipeline
     _cameras.clear();
-    for (auto& camera : _camerasToBeAttached) {
-      _cameras[camera->name] = camera;
+    for (const auto& camera : _camerasToBeAttached) {
+      _cameras.emplace_back(camera);
     }
   }
   _reset();
@@ -501,7 +501,7 @@ void DefaultRenderingPipeline::_buildPipeline()
     // Multi camera suport
     if (_cameras.size() > 1) {
       for (const auto& camera : _cameras) {
-        auto depthRenderer = _scene->enableDepthRenderer(camera.second);
+        auto depthRenderer = _scene->enableDepthRenderer(camera);
         depthRenderer->useOnlyInActiveCamera = true;
       }
 #if 0
@@ -520,7 +520,7 @@ void DefaultRenderingPipeline::_buildPipeline()
     else {
       _scene->onAfterRenderTargetsRenderObservable.remove(
         _depthOfFieldSceneObserver);
-      auto depthRenderer         = _scene->enableDepthRenderer(_cameras["0"]);
+      auto depthRenderer = _scene->enableDepthRenderer(_cameras.front());
       depthOfField->depthTexture = depthRenderer->getDepthMap();
     }
 
@@ -595,20 +595,25 @@ void DefaultRenderingPipeline::_buildPipeline()
 
   if (!_cameras.empty()) {
     _scene->postProcessRenderPipelineManager()->attachCamerasToRenderPipeline(
-      _name, stl_util::extract_values(_cameras));
+      _name, _cameras);
+  }
+
+  // In multicamera mode, the scene needs to autoclear in between cameras.
+  if (_scene->activeCameras.size() > 1) {
+    _scene->autoClear = true;
   }
 
   if (!_enableMSAAOnFirstPostProcess(samples) && samples > 1) {
     BABYLON_LOG_WARN("DefaultRenderingPipeline",
                      "MSAA failed to enable, MSAA is only supported in "
-                     "browsers that support webGL >= 2.0");
+                     "browsers that support webGL >= 2.0")
   }
 }
 
 void DefaultRenderingPipeline::_disposePostProcesses(bool disposeNonRecreated)
 {
-  for (auto& item : _cameras) {
-    auto camera = item.second.get();
+  for (const auto& cameraItem : _cameras) {
+    auto camera = cameraItem.get();
 
     if (imageProcessing) {
       imageProcessing->dispose(camera);
@@ -687,7 +692,7 @@ void DefaultRenderingPipeline::dispose(bool /*doNotRecurse*/,
 {
   _disposePostProcesses(true);
   _scene->postProcessRenderPipelineManager()->detachCamerasFromRenderPipeline(
-    _name, stl_util::extract_values(_cameras));
+    _name, _cameras);
   _scene->autoClear = true;
   if (_resizeObserver) {
     _scene->getEngine()->onResizeObservable.remove(_resizeObserver);
