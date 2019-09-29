@@ -323,8 +323,10 @@ void UniformBuffer::updateUniform(const std::string& uniformName,
   if (!_dynamic) {
     // Cache for static uniform buffers
     bool changed = false;
+
     for (size_t i = 0; i < size; ++i) {
-      if (!stl_util::almost_equal(_bufferData[location + i], data[i])) {
+      if (size == 16
+          || !stl_util::almost_equal(_bufferData[location + i], data[i])) {
         changed                   = true;
         _bufferData[location + i] = data[i];
       }
@@ -338,6 +340,18 @@ void UniformBuffer::updateUniform(const std::string& uniformName,
       _bufferData[location + i] = data[i];
     }
   }
+}
+
+bool UniformBuffer::_cacheMatrix(const std::string& name, const Matrix& matrix)
+{
+  const auto flag = matrix.updateFlag;
+  if (stl_util::contains(_valueCache, name) && _valueCache[name] == flag) {
+    return false;
+  }
+
+  _valueCache[name] = flag;
+
+  return true;
 }
 
 void UniformBuffer::_updateMatrix3x3ForUniform(const std::string& name,
@@ -447,7 +461,9 @@ void UniformBuffer::_updateMatrixForEffect(const std::string& name,
 void UniformBuffer::_updateMatrixForUniform(const std::string& name,
                                             const Matrix& mat)
 {
-  updateUniform(name, mat.toArray(), 16);
+  if (_cacheMatrix(name, mat)) {
+    updateUniform(name, mat.toArray(), 16);
+  }
 }
 
 void UniformBuffer::_updateVector3ForEffect(const std::string& name,

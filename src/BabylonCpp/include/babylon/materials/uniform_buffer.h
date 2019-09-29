@@ -235,6 +235,9 @@ private:
    */
   void _fillAlignment(size_t size);
 
+  // Matrix cache
+  bool _cacheMatrix(const std::string& name, const Matrix& matrix);
+
   // Update methods
   void _updateMatrix3x3ForUniform(const std::string& name,
                                   const Float32Array& matrix);
@@ -375,6 +378,9 @@ private:
   bool _needSync;
   bool _noUBO;
   Effect* _currentEffect;
+
+  // Matrix cache
+  std::unordered_map<std::string, int> _valueCache;
 
   // Pool for avoiding memory leaks
   static constexpr unsigned int _MAX_UNIFORM_SIZE = 256;
