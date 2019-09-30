@@ -111,8 +111,8 @@ public:
    * @param keepSubMeshes Specifies if the submeshes should be kept
    * @returns A new Mesh
    */
-  MeshPtr buildMeshGeometry(const std::string& name, Scene* scene,
-                            bool keepSubMeshes);
+  MeshPtr buildMeshGeometry(const std::string& name, Scene* scene = nullptr,
+                            bool keepSubMeshes = false);
 
   /**
    * @brief Build Mesh from CSG taking material and transforms into account.
@@ -122,8 +122,8 @@ public:
    * @param keepSubMeshes Specifies if submeshes should be kept
    * @returns The new Mesh
    */
-  MeshPtr toMesh(const std::string& name, const MaterialPtr& material,
-                 Scene* scene, bool keepSubMeshes = false);
+  MeshPtr toMesh(const std::string& name, const MaterialPtr& material = nullptr,
+                 Scene* scene = nullptr, bool keepSubMeshes = false);
 
 private:
   /**
