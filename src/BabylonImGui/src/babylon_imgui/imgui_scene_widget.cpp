@@ -77,8 +77,8 @@ namespace BABYLON {
     }
 
     ImVec2 canvasSize(
-      static_cast<float>(_framebuffer_canvas->width),
-      static_cast<float>(_framebuffer_canvas->height));
+      static_cast<float>(_framebuffer_canvas->clientWidth),
+      static_cast<float>(_framebuffer_canvas->clientHeight));
 
     _framebuffer_canvas->bind();
     _renderableScene->render();
