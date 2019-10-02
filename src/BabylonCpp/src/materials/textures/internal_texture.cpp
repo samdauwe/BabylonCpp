@@ -71,6 +71,8 @@ InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource,
     , _lodTextureMid{nullptr}
     , _lodTextureLow{nullptr}
     , _isRGBD{false}
+    , _linearSpecularLOD{false}
+    , _irradianceTexture{nullptr}
     , _webGLTexture{nullptr}
     , _references{1}
     , _engine{engine}
@@ -133,14 +135,14 @@ void InternalTexture::_rebuild()
         url, !generateMipMaps, invertY, nullptr, samplingMode,
         [this](InternalTexture*, EventState&) { isReady = true; }, nullptr,
         _buffer, nullptr, format);
-      proxy->_swapAndDie(this);
+      proxy->_swapAndDie(shared_from_this());
     }
       return;
     case InternalTexture::DATASOURCE_RAW: {
       proxy = _engine->createRawTexture(_bufferView, baseWidth, baseHeight,
                                         format, generateMipMaps, invertY,
                                         samplingMode, _compression);
-      proxy->_swapAndDie(this);
+      proxy->_swapAndDie(shared_from_this());
       isReady = true;
     }
       return;
@@ -148,14 +150,14 @@ void InternalTexture::_rebuild()
       proxy = _engine->createRawTexture3D(_bufferView, baseWidth, baseHeight,
                                           baseDepth, format, generateMipMaps,
                                           invertY, samplingMode, _compression);
-      proxy->_swapAndDie(this);
+      proxy->_swapAndDie(shared_from_this());
       isReady = true;
     }
       return;
     case InternalTexture::DATASOURCE_DYNAMIC: {
       proxy = _engine->createDynamicTexture(baseWidth, baseHeight,
                                             generateMipMaps, samplingMode);
-      proxy->_swapAndDie(this);
+      proxy->_swapAndDie(shared_from_this());
       // _engine->updateDynamicTexture(this, _engine->getRenderingCanvas(),
       // invertY, undefined, undefined, true);
 
@@ -179,7 +181,7 @@ void InternalTexture::_rebuild()
         auto size = ISize{width, height};
         proxy     = _engine->createRenderTargetTexture(size, options);
       }
-      proxy->_swapAndDie(this);
+      proxy->_swapAndDie(shared_from_this());
 
       isReady = true;
     }
@@ -195,7 +197,7 @@ void InternalTexture::_rebuild()
       auto size = ISize{width, height};
       // TODO FIXME
       proxy = _engine->createDepthStencilTexture(size, depthTextureOptions);
-      proxy->_swapAndDie(this);
+      proxy->_swapAndDie(shared_from_this());
 
       isReady = true;
     }
@@ -207,14 +209,14 @@ void InternalTexture::_rebuild()
           isReady = true;
         },
         nullptr, format, _extension);
-      proxy->_swapAndDie(this);
+      proxy->_swapAndDie(shared_from_this());
     }
       return;
     case InternalTexture::DATASOURCE_CUBERAW: {
       proxy = _engine->createRawCubeTexture(_bufferViewArray, width, format,
                                             type, generateMipMaps, invertY,
                                             samplingMode, _compression);
-      proxy->_swapAndDie(this);
+      proxy->_swapAndDie(shared_from_this());
       isReady = true;
     }
       return;
@@ -228,7 +230,7 @@ void InternalTexture::_rebuild()
         _lodGenerationScale, _lodGenerationOffset)
         .then(() = > { isReady = true; });
 #endif
-      proxy->_swapAndDie(this);
+      proxy->_swapAndDie(shared_from_this());
     }
       return;
     case InternalTexture::DATASOURCE_CUBEPREFILTERED: {
@@ -236,7 +238,7 @@ void InternalTexture::_rebuild()
         url, nullptr, _lodGenerationScale, _lodGenerationOffset,
         [this, &proxy](const std::optional<CubeTextureData>& /*data*/) {
           if (proxy) {
-            proxy->_swapAndDie(this);
+            proxy->_swapAndDie(shared_from_this());
           }
           isReady = true;
         },
@@ -248,7 +250,7 @@ void InternalTexture::_rebuild()
   }
 }
 
-void InternalTexture::_swapAndDie(InternalTexture* target)
+void InternalTexture::_swapAndDie(const InternalTexturePtr& target)
 {
   target->_webGLTexture = _webGLTexture;
   target->_isRGBD       = _isRGBD;
@@ -282,12 +284,24 @@ void InternalTexture::_swapAndDie(InternalTexture* target)
     target->_lodTextureLow = _lodTextureLow;
   }
 
+  if (_irradianceTexture) {
+    if (target->_irradianceTexture) {
+      target->_irradianceTexture->dispose();
+    }
+    target->_irradianceTexture = _irradianceTexture;
+  }
+
   auto& cache = _engine->getLoadedTexturesCache();
   cache.erase(std::remove_if(cache.begin(), cache.end(),
                              [this](const InternalTexturePtr& internalTexture) {
                                return internalTexture.get() == this;
                              }),
               cache.end());
+
+  auto it = std::find(cache.begin(), cache.end(), target);
+  if (it == cache.end()) {
+    cache.emplace_back(target);
+  }
 }
 
 void InternalTexture::dispose()

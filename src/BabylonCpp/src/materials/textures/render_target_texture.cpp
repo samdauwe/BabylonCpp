@@ -399,6 +399,10 @@ void RenderTargetTexture::resize(const std::variant<ISize, float>& size)
     _texture = scene->getEngine()->createRenderTargetTexture(
       _size, _renderTargetOptions);
   }
+
+  if (onResizeObservable.hasObservers()) {
+    onResizeObservable.notifyObservers(this);
+  }
 }
 
 void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
@@ -544,7 +548,10 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
   onAfterUnbindObservable.notifyObservers(this);
 
   if (scene->activeCamera()) {
-    if (activeCamera && activeCamera != scene->activeCamera()) {
+    // Do not avoid setting uniforms when multiple scenes are active as another
+    // camera may have overwrite these
+    if (scene->getEngine()->scenes.size() > 1
+        || (activeCamera && activeCamera != scene->activeCamera())) {
       scene->setTransformMatrix(
         scene->activeCamera()->getViewMatrix(),
         scene->activeCamera()->getProjectionMatrix(true));
@@ -753,6 +760,13 @@ void RenderTargetTexture::disposeFramebufferObjects()
 
 void RenderTargetTexture::dispose()
 {
+  onResizeObservable.clear();
+  onClearObservable.clear();
+  onAfterRenderObservable.clear();
+  onAfterUnbindObservable.clear();
+  onBeforeBindObservable.clear();
+  onBeforeRenderObservable.clear();
+
   if (_postProcessManager) {
     _postProcessManager->dispose();
     _postProcessManager.reset(nullptr);
@@ -790,6 +804,10 @@ void RenderTargetTexture::dispose()
           return renderTargetTexturePtr.get() == this;
         }),
       camera->customRenderTargets.end());
+  }
+
+  if (depthStencilTexture) {
+    getScene()->getEngine()->_releaseTexture(depthStencilTexture.get());
   }
 
   Texture::dispose();

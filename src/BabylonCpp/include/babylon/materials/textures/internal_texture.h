@@ -15,8 +15,10 @@ struct ArrayBufferView;
 class BaseTexture;
 class Engine;
 class ICanvasRenderingContext2D;
+class InternalTexture;
 class SphericalPolynomial;
 using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
+using InternalTexturePtr     = std::shared_ptr<InternalTexture>;
 using SphericalPolynomialPtr = std::shared_ptr<SphericalPolynomial>;
 
 namespace GL {
@@ -29,7 +31,9 @@ class IGLTexture;
  * @brief Class used to store data associated with WebGL texture data for the
  * engine This class should not be used directly.
  */
-class BABYLON_SHARED_EXPORT InternalTexture : public IInternalTextureTracker {
+class BABYLON_SHARED_EXPORT InternalTexture
+    : public std::enable_shared_from_this<InternalTexture>,
+      public IInternalTextureTracker {
 
 public:
   /**
@@ -133,7 +137,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _swapAndDie(InternalTexture* target);
+  void _swapAndDie(const InternalTexturePtr& target);
 
   /**
    * @brief Dispose the current allocated resources.
@@ -264,6 +268,11 @@ public:
   BaseTexturePtr _lodTextureMid;
   BaseTexturePtr _lodTextureLow;
   bool _isRGBD;
+
+  /** Hidden */
+  bool _linearSpecularLOD;
+  /** Hidden */
+  BaseTexturePtr _irradianceTexture;
 
   std::shared_ptr<GL::IGLTexture> _webGLTexture;
   int _references;

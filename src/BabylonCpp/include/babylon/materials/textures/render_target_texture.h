@@ -472,6 +472,11 @@ public:
                     std::function<void(Engine* engine, EventState&)>>
     onClear;
 
+  /**
+   * An event triggered when the texture is resized.
+   */
+  Observable<RenderTargetTexture> onResizeObservable;
+
   ReadOnlyProperty<RenderTargetTexture, RenderTargetCreationOptions>
     renderTargetOptions;
 

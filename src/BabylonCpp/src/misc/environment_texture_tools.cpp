@@ -17,10 +17,10 @@
 #include <babylon/math/scalar.h>
 #include <babylon/math/spherical_polynomial.h>
 #include <babylon/math/vector3.h>
-#include <babylon/postprocesses/post_process.h>
-#include <babylon/postprocesses/post_process_manager.h>
 #include <babylon/misc/environment_texture_info.h>
 #include <babylon/misc/tools.h>
+#include <babylon/postprocesses/post_process.h>
+#include <babylon/postprocesses/post_process_manager.h>
 
 namespace BABYLON {
 
@@ -319,7 +319,7 @@ void EnvironmentTextureTools::UploadLevels(
   // Release temp RTT.
   if (cubeRtt) {
     engine->_releaseFramebufferObjects(cubeRtt.get());
-    cubeRtt->_swapAndDie(texture.get());
+    cubeRtt->_swapAndDie(texture);
   }
   // Release temp Post Process.
   if (rgbdPostProcess) {

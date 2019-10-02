@@ -35,7 +35,7 @@ public:
     return std::shared_ptr<ProceduralTextureSceneComponent>(
       new ProceduralTextureSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~ProceduralTextureSceneComponent();
+  virtual ~ProceduralTextureSceneComponent() override;
 
   /**
    * @brief Registers the component in a given scene.

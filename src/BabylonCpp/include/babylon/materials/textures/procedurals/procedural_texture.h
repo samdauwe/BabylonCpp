@@ -44,6 +44,12 @@ public:
   void addToScene(const ProceduralTexturePtr& newTexture);
 
   /**
+   * @brief The effect that is created when initializing the post process.
+   * @returns The created effect corresponding the the postprocess.
+   */
+  EffectPtr& getEffect();
+
+  /**
    * @brief Gets texture content (Use this function wisely as reading from a
    * texture can be slow).
    * @returns an ArrayBufferView (Uint8Array or Float32Array)

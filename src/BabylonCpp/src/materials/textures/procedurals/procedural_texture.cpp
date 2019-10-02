@@ -149,6 +149,11 @@ void ProceduralTexture::addToScene(const ProceduralTexturePtr& newTexture)
   getScene()->proceduralTextures.emplace_back(newTexture);
 }
 
+EffectPtr& ProceduralTexture::getEffect()
+{
+  return _effect;
+}
+
 ArrayBufferView& ProceduralTexture::getContent()
 {
   if (_contentData && _currentRefreshId == _contentUpdateId) {

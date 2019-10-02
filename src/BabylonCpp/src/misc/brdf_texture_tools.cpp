@@ -77,7 +77,7 @@ void BRDFTextureTools::_ExpandDefaultBRDFTexture(
         }
 
         // Internal Swap
-        expandedTexture->_swapAndDie(texture.get());
+        expandedTexture->_swapAndDie(texture);
 
         // Ready to get rolling again.
         texture->isReady = true;

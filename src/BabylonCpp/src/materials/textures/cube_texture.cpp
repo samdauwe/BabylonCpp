@@ -205,6 +205,7 @@ void CubeTexture::updateURL(
     getScene()->markAllMaterialsAsDirty(Constants::MATERIAL_TextureDirtyFlag);
   }
 
+  name           = iUrl;
   url            = iUrl;
   delayLoadState = Constants::DELAYLOADSTATE_NOTLOADED;
   _prefiltered   = false;
@@ -261,8 +262,7 @@ void CubeTexture::setReflectionTextureMatrix(Matrix value)
     getScene()->markAllMaterialsAsDirty(
       Constants::MATERIAL_TextureDirtyFlag, [this](Material* mat) -> bool {
         auto activeTextures = mat->getActiveTextures();
-        auto it = std::find_if(activeTextures.begin(),
-                               activeTextures.end(),
+        auto it = std::find_if(activeTextures.begin(), activeTextures.end(),
                                [this](const BaseTexturePtr& baseTexture) {
                                  return baseTexture.get() == this;
                                });
