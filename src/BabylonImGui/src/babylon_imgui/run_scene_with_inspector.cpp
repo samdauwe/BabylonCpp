@@ -1,10 +1,13 @@
 #include <imgui_utils/icons_font_awesome_5.h>
 #include <babylon/babylon_imgui/run_scene_with_inspector.h>
 #include <babylon/babylon_imgui/babylon_logs_window.h>
+#include <babylon/babylon_imgui/i_renderable_scene_with_hud.h>
 #include <imgui_utils/app_runner/imgui_runner.h>
 #include <babylon/GL/framebuffer_canvas.h>
 #include <babylon/core/filesystem.h>
 #include <babylon/core/system.h>
+#include <imgui_utils/app_runner/imgui_runner.h>
+#include <imgui_utils/icons_font_awesome_5.h>
 
 #include <babylon/core/logging.h>
 #include <babylon/samples/samples_index.h>
@@ -225,6 +228,20 @@ private:
     ImGui::Text("Sandbox : you can edit the code below!");
     ImGui::Text("As soon as you save it, the code will be compiled and the 3D scene will be updated");
     _appContext._sceneWidget->render(getSceneSizeSmall());
+
+    // Render IRenderableSceneWithHud->hudGui when available
+    auto asSceneWithHud = dynamic_cast<IRenderableSceneWithHud*>(
+      _appContext._sceneWidget->getRenderableScene());
+    if ( (asSceneWithHud) && (asSceneWithHud->hudGui)) {
+      ImGui::SameLine();
+      if (ImGui::Button("Hud"))
+        ImGui::OpenPopup("Hud");
+      if (ImGui::BeginPopup("Hud")) {
+        asSceneWithHud->hudGui();
+        ImGui::EndPopup();
+      }
+    }
+
     ImGui::EndGroup();
 
     if (_appContext._isCompiling) {

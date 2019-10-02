@@ -4,9 +4,11 @@
 // the execution, and the scene will be updated automatically!
 // You do not need to exit the application!
 // 
-// Do not remove the include below, 
+// Do not remove the includes below, 
 // it is needed to enable "Runtime Compilation"
 #include "SamplesRunner/rtc/sandbox_autocompile.h"
+#include <babylon/babylon_imgui/i_renderable_scene_with_hud.h>
+#include "imgui.h"
 
 // You can edit the code below freely (add includes, modify the scene, etc)
 #include <babylon/cameras/arc_rotate_camera.h>
@@ -17,10 +19,10 @@
 
 using namespace BABYLON;
 
-struct SandboxScene : public IRenderableScene {
+struct SandboxScene : public IRenderableSceneWithHud {
 
-  SandboxScene(ICanvas* iCanvas = nullptr) : IRenderableScene(iCanvas) {}
-  ~SandboxScene() override = default;
+  SandboxScene(ICanvas* iCanvas = nullptr) : IRenderableSceneWithHud(iCanvas) {}
+  ~SandboxScene() = default;
   const char* getName() override { return "Materials Scene"; }
 
   void initializeScene(ICanvas* canvas, Scene* scene) override
@@ -109,6 +111,15 @@ struct SandboxScene : public IRenderableScene {
     sphere6->material = materialSphere6;
 
     plane->material = materialPlane;
+    
+
+    // Here you can create a HUD (Head Up Display) GUI
+    // that enables you to tweak the 3D params
+    hudGui = [=]() { // capture Ptrs by value here, not by reference
+      ImGui::SliderFloat("sphere3->x", & sphere3->position().x,-100., 100.);
+      ImGui::SliderFloat("sphere3->y", & sphere3->position().y, -100., 100.);
+      ImGui::SliderFloat("sphere3->z", & sphere3->position().z, -100., 100.);
+    };
 
   }
 };
@@ -118,17 +129,10 @@ struct SandboxScene : public IRenderableScene {
 ////////////////////////////////////////////
 // Do not edit below, these lines enable the Runtime Compilation
 REGISTERCLASS(Sandbox)
-std::shared_ptr<BABYLON::IRenderableScene> Sandbox::MakeScene() {
+std::shared_ptr<BABYLON::IRenderableSceneWithHud> Sandbox::MakeScene() {
   return std::make_shared<SandboxScene>();
 }
 
 #endif // #ifdef BABYLON_BUILD_SANDBOX
-
-
-
-
-
-
-
 
 
