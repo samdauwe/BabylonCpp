@@ -42,7 +42,7 @@ namespace
     return changed;
   }
 
-}
+} // namespace
 
 #include <iostream>
 
@@ -221,7 +221,6 @@ private:
 
   void renderSandbox()
   {
-    //ImGui::ShowDemoWindow();
     ImGui::BeginGroup();
     ImGui::Text("Sandbox : you can edit the code below!");
     ImGui::Text("As soon as you save it, the code will be compiled and the 3D scene will be updated");
@@ -232,6 +231,9 @@ private:
       ImGui::TextColored(ImVec4(1., 0., 0., 1.), "Compiling");
       BabylonLogsWindow::instance().setVisible(true);
     }
+    if (ImGui::Button(ICON_FA_PLAY " Run"))
+      _sandboxCodeEditor.saveAll();
+
     _sandboxCodeEditor.render();
 
   }
