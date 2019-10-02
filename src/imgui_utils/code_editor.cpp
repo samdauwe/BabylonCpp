@@ -74,17 +74,18 @@ public:
   }
   TextEditor & getTextEditor() { return _textEditor;  }
 
+  void save()
+  {
+    BABYLON::Filesystem::writeFileContents(_filePath.c_str(), _textEditor.GetText());
+    _fileContent_Saved = _textEditor.GetText();
+  }
+
 private:
   bool canSave()
   {
     if (_textEditor.IsReadOnly())
       return false;
     return wasTextEdited();
-  }
-  void save()
-  {
-    BABYLON::Filesystem::writeFileContents(_filePath.c_str(), _textEditor.GetText());
-    _fileContent_Saved = _textEditor.GetText();
   }
   bool canRestore()
   {
@@ -253,6 +254,14 @@ public:
       currentEditor().render();
   }
 
+  void saveAll()
+  {
+    for (auto & editor : _editors)
+    {
+      editor.save();
+    }
+  }
+
 private:
   void renderTabs()
   {
@@ -323,6 +332,11 @@ void CodeEditor::render()
   return _pImpl->render();
 }
 
+
+void CodeEditor::saveAll()
+{
+  _pImpl->saveAll();
+}
 
 void demoCodeEditor()
 {
