@@ -59,8 +59,8 @@ struct BABYLON_SHARED_EXPORT BaseExcludes {
 
 struct BABYLON_SHARED_EXPORT Filter {
 public:
-  Filter(ComponentTypeList requires, ComponentTypeList excludes)
-      : m_requires(requires), m_excludes(excludes)
+  Filter(ComponentTypeList requirements, ComponentTypeList excludes)
+      : m_requires(requirements), m_excludes(excludes)
   {
   }
 
