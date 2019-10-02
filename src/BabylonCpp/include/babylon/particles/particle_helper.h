@@ -2,6 +2,7 @@
 #define BABYLON_PARTICLES_PARTICLE_HELPER_H
 
 #include <memory>
+#include <string>
 #include <variant>
 #include <vector>
 
