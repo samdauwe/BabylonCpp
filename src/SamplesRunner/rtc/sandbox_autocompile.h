@@ -7,5 +7,5 @@
 class Sandbox : public TInterface<BABYLON::rtc::IID_RENDERABLESCENE_PRODUCER, BABYLON::rtc::ISceneProducer>
 {
 public:
-  std::shared_ptr<BABYLON::IRenderableScene> MakeScene() override;
+  std::shared_ptr<BABYLON::IRenderableSceneWithHud> MakeScene() override;
 };

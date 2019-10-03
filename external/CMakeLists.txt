@@ -35,8 +35,27 @@ set(JSON_HPP_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/json.hpp
     CACHE INTERNAL "Include directories of json.hpp")
 
+# glad as a standalone dynamic library
+set(GLAD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/glad CACHE INTERNAL "Directory of glad")
+set(GLAD_FILES
+    ${GLAD_DIR}/src/glad.c
+    ${GLAD_DIR}/include/glad/glad.h
+    ${GLAD_DIR}/include/KHR/khrplatform.h)
+source_group_by_path_all(${GLAD_DIR} ${GLAD_FILES})
+add_library(glad SHARED ${GLAD_FILES})
+target_include_directories(glad PUBLIC ${GLAD_DIR}/include)
+if (WIN32)
+    target_link_libraries(glad PUBLIC opengl32.lib)
+endif()
+get_target_property(library_type glad TYPE)
+if (library_type STREQUAL SHARED_LIBRARY)
+  # If glad is a shared lobrary, define the macro GLAD_API_EXPORT on the command line.
+  target_compile_definitions(glad PRIVATE GLAD_GLAPI_EXPORT)
+  target_compile_definitions(glad PUBLIC GLAD_GLAPI_EXPORT PRIVATE GLAD_GLAPI_EXPORT_BUILD)
+endif()
+
 # imgui (Bloat-free Immediate Mode Graphical User interface for C++ with minimal dependencies).
-# imgui library as a standalone *static* library (shared libraries are a portability nightmare)
+# imgui library as a standalone shared library
 set(IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/imgui CACHE INTERNAL "imgui directory")
 file(GLOB IMGUI_MAIN_FILES ${IMGUI_DIR}/*.h ${IMGUI_DIR}/*.cpp)
 file(GLOB IMGUI_BACKEND_FILES
@@ -44,22 +63,19 @@ file(GLOB IMGUI_BACKEND_FILES
     ${IMGUI_DIR}/examples/imgui_impl_opengl*.*)
 set(IMGUI_FILES ${IMGUI_MAIN_FILES} ${IMGUI_BACKEND_FILES})
 source_group_by_path_all(${IMGUI_DIR} ${IMGUI_FILES})
-add_library(imgui STATIC ${IMGUI_FILES})
+add_library(imgui SHARED ${IMGUI_FILES})
 target_link_libraries(imgui PRIVATE glfw glad)
 target_include_directories(imgui PUBLIC ${IMGUI_DIR} ${IMGUI_DIR}/examples)
 target_compile_definitions(imgui PUBLIC -DIMGUI_IMPL_OPENGL_LOADER_GLAD)
+if (WIN32)
+  get_target_property(library_type imgui TYPE)
+  if (library_type STREQUAL SHARED_LIBRARY)
+    target_compile_definitions(imgui PRIVATE IMGUI_API=__declspec\(dllexport\))
+    target_compile_definitions(imgui INTERFACE IMGUI_API=__declspec\(dllimport\))
+  endif()
+endif(WIN32)
 
-# glad as a standalone *static* library
-set(GLAD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/glad CACHE INTERNAL "Directory of glad")
-set(GLAD_FILES
-    ${GLAD_DIR}/src/glad.c
-    ${GLAD_DIR}/include/glad/glad.h
-    ${GLAD_DIR}/include/KHR/khrplatform.h)
-source_group_by_path_all(${GLAD_DIR} ${GLAD_FILES})
-add_library(glad STATIC ${GLAD_FILES})
-target_include_directories(glad PUBLIC ${GLAD_DIR}/include)
-
-# ImGuiColorTextEdit as a standalone *static* library
+# ImGuiColorTextEdit as a standalone static library
 set(IMGUI_EDITOR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ImGuiColorTextEdit)
 set(IMGUI_EDITOR_FILES
     ${IMGUI_EDITOR_DIR}/TextEditor.cpp

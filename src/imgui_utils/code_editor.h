@@ -15,6 +15,7 @@ namespace ImGuiUtils {
 
     void setFiles(const std::vector<std::string> &filePaths);
     void render();
+    void saveAll();
 
   private:
     std::unique_ptr<MultipleCodeEditorImpl> _pImpl;
