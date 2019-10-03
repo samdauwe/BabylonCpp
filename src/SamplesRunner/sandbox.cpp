@@ -7,7 +7,7 @@
 // Do not remove the includes below, 
 // it is needed to enable "Runtime Compilation"
 #include "SamplesRunner/rtc/sandbox_autocompile.h"
-#include <babylon/babylon_imgui/i_renderable_scene_with_hud.h>
+#include <babylon/interfaces/irenderable_scene_with_hud.h>
 #include "imgui.h"
 
 // You can edit the code below freely (add includes, modify the scene, etc)
@@ -22,7 +22,7 @@ using namespace BABYLON;
 struct SandboxScene : public IRenderableSceneWithHud {
 
   SandboxScene(ICanvas* iCanvas = nullptr) : IRenderableSceneWithHud(iCanvas) {}
-  ~SandboxScene() = default;
+  ~SandboxScene() override = default;
   const char* getName() override { return "Materials Scene"; }
 
   void initializeScene(ICanvas* canvas, Scene* scene) override

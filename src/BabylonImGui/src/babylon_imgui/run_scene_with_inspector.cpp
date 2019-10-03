@@ -1,7 +1,7 @@
 #include <imgui_utils/icons_font_awesome_5.h>
 #include <babylon/babylon_imgui/run_scene_with_inspector.h>
 #include <babylon/babylon_imgui/babylon_logs_window.h>
-#include <babylon/babylon_imgui/i_renderable_scene_with_hud.h>
+#include <babylon/interfaces/irenderable_scene_with_hud.h>
 #include <imgui_utils/app_runner/imgui_runner.h>
 #include <babylon/GL/framebuffer_canvas.h>
 #include <babylon/core/filesystem.h>
@@ -269,7 +269,7 @@ private:
     if (frame_counter > max_frames)
     {
       std::string sampleName = _appContext._loopSamples.samplesToLoop[_appContext._loopSamples.currentIdx];
-      BABYLON_LOG_ERROR("LoopSample", sampleName);
+      BABYLON_LOG_ERROR("LoopSample", sampleName)
       auto scene = samplesIndex.createRenderableScene(sampleName, nullptr);
       this->setRenderableScene(scene);
 
