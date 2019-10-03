@@ -137,11 +137,11 @@ _MeshesSamplesIndex::_MeshesSamplesIndex()
                         return std::make_unique<EdgesRenderScene>(iCanvas); //
                       });                                                   //
   // Extrude Polygon Scene
-  _samples["ExtrudePolygonScene"] = std::make_tuple(
-    true,                                                    //
-    [](ICanvas* iCanvas) {                                   //
-      return std::make_unique<ExtrudePolygonScene>(iCanvas); //
-    });                                                      //
+  _samples["ExtrudePolygonScene"]
+    = std::make_tuple(true,                                      //
+                      [](ICanvas* iCanvas) {                     //
+                        return MakeExtrudePolygonScene(iCanvas); //
+                      });                                        //
   // Extruded Polygon Scene
   _samples["ExtrudedPolygonScene"] = std::make_tuple(
     true,                                                     //

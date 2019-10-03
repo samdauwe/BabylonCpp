@@ -263,6 +263,8 @@ endif()
 target_link_libraries(${TARGET}
     PUBLIC
     PRIVATE
+    imgui
+    imgui_utils
     BabylonCpp
     Extensions
     MaterialsLibrary

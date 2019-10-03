@@ -12,11 +12,44 @@
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/vertex_buffer.h>
 
+// ImGui
+#include <imgui.h>
+
 namespace BABYLON {
 namespace Samples {
 
+/**
+ * @brief Extrude Polygon Scene. Example demonstrating how to use MeshBuilder to
+ * generate geometry from extruded data.
+ * @see https://www.babylonjs-playground.com/#TFLTJJ#0
+ */
+class ExtrudePolygonScene : public IRenderableSceneWithHud {
+
+public:
+  ExtrudePolygonScene(ICanvas* iCanvas);
+  ~ExtrudePolygonScene() override;
+
+  const char* getName() override;
+  void initializeScene(ICanvas* canvas, Scene* scene) override;
+
+private:
+  // Roof
+  MeshPtr _roof, _ceiling;
+  // Front
+  MeshPtr _frontWall, _windowFBL, _windowFBR, _windowFTL, _windowFTR,
+    _windowFTM, _frontDoor;
+  // Back
+  MeshPtr _rearWallnb1, _rearWallnb2, _windowRBL, _windowRBR, _windowRTL,
+    _windowRTR, _windowR1BL, _windowR1TL, _windowR1TR;
+  // Left Side
+  MeshPtr _sideWallnb1, _sideWallnb3, _backDoor;
+  // Right Side
+  MeshPtr _sideWallnb2;
+
+}; // end of class ExtrudePolygonScene
+
 ExtrudePolygonScene::ExtrudePolygonScene(ICanvas* iCanvas)
-    : IRenderableScene(iCanvas)
+    : IRenderableSceneWithHud(iCanvas)
     // Roof
     , _roof{nullptr}
     , _ceiling{nullptr} // Front
@@ -973,45 +1006,61 @@ void ExtrudePolygonScene::initializeScene(ICanvas* canvas, Scene* scene)
   _backDoor->position().z = 8.65f;
   _backDoor->material     = doormat;
 
-  // Events to toggle visibility
-  canvas->addKeyEventListener(EventType::KEY_DOWN, [this](KeyboardEvent&& evt) {
-    switch (evt.keyCode) {
-      case 49: // 1 - Toggle Roof Visibility
-        _roof->isVisible    = !_roof->isVisible;
-        _ceiling->isVisible = !_ceiling->isVisible;
-        break;
-      case 50: // 2 - Toggle Front Visibility
-        _frontWall->isVisible = !_frontWall->isVisible;
-        _windowFBL->isVisible = !_windowFBL->isVisible;
-        _windowFBR->isVisible = !_windowFBR->isVisible;
-        _windowFTL->isVisible = !_windowFTL->isVisible;
-        _windowFTR->isVisible = !_windowFTR->isVisible;
-        _windowFTM->isVisible = !_windowFTM->isVisible;
-        _frontDoor->isVisible = !_frontDoor->isVisible;
-        break;
-      case 51: // 3 - Toggle Back Visibility
-        _rearWallnb1->isVisible = !_rearWallnb1->isVisible;
-        _rearWallnb2->isVisible = !_rearWallnb2->isVisible;
-        _windowRBL->isVisible   = !_windowRBL->isVisible;
-        _windowRBR->isVisible   = !_windowRBR->isVisible;
-        _windowRTL->isVisible   = !_windowRTL->isVisible;
-        _windowRTR->isVisible   = !_windowRTR->isVisible;
-        _windowR1BL->isVisible  = !_windowR1BL->isVisible;
-        _windowR1TL->isVisible  = !_windowR1TL->isVisible;
-        _windowR1TR->isVisible  = !_windowR1TR->isVisible;
-        break;
-      case 52: // 4 - Toggle Left Side Visibility
-        _sideWallnb1->isVisible = !_sideWallnb1->isVisible;
-        _sideWallnb3->isVisible = !_sideWallnb3->isVisible;
-        _backDoor->isVisible    = !_backDoor->isVisible;
-        break;
-      case 53: // 5 - Toggle Right Side Visibility
-        _sideWallnb2->isVisible = !_sideWallnb2->isVisible;
-        break;
-      default:
-        break;
+  hudGui = [=]() {
+    // Checkbox helper
+    const auto renderCheckBox = [](const char* label, bool isSelected) -> bool {
+      bool origValue = isSelected;
+      ImGui::Checkbox(label, &isSelected);
+      return origValue != isSelected;
+    };
+
+    // Header
+    ImGui::TextWrapped("%s", "Toggle Visibility");
+
+    // Toggle Roof Visibility
+    if (renderCheckBox("Roof", _roof->isVisible)) {
+      _roof->isVisible    = !_roof->isVisible;
+      _ceiling->isVisible = !_ceiling->isVisible;
     }
-  });
+    // Toggle Front Visibility
+    if (renderCheckBox("Front", _frontWall->isVisible)) {
+      _frontWall->isVisible = !_frontWall->isVisible;
+      _windowFBL->isVisible = !_windowFBL->isVisible;
+      _windowFBR->isVisible = !_windowFBR->isVisible;
+      _windowFTL->isVisible = !_windowFTL->isVisible;
+      _windowFTR->isVisible = !_windowFTR->isVisible;
+      _windowFTM->isVisible = !_windowFTM->isVisible;
+      _frontDoor->isVisible = !_frontDoor->isVisible;
+    }
+    // Toggle Back Visibility
+    if (renderCheckBox("Back", _rearWallnb1->isVisible)) {
+      _rearWallnb1->isVisible = !_rearWallnb1->isVisible;
+      _rearWallnb2->isVisible = !_rearWallnb2->isVisible;
+      _windowRBL->isVisible   = !_windowRBL->isVisible;
+      _windowRBR->isVisible   = !_windowRBR->isVisible;
+      _windowRTL->isVisible   = !_windowRTL->isVisible;
+      _windowRTR->isVisible   = !_windowRTR->isVisible;
+      _windowR1BL->isVisible  = !_windowR1BL->isVisible;
+      _windowR1TL->isVisible  = !_windowR1TL->isVisible;
+      _windowR1TR->isVisible  = !_windowR1TR->isVisible;
+    }
+    // Toggle Left Side Visibility
+    if (renderCheckBox("Left Side", _sideWallnb1->isVisible)) {
+      _sideWallnb1->isVisible = !_sideWallnb1->isVisible;
+      _sideWallnb3->isVisible = !_sideWallnb3->isVisible;
+      _backDoor->isVisible    = !_backDoor->isVisible;
+    }
+    // Toggle Right Side Visibility
+    if (renderCheckBox("Right Side", _sideWallnb2->isVisible)) {
+      _sideWallnb2->isVisible = !_sideWallnb2->isVisible;
+    }
+  };
+}
+
+std::unique_ptr<IRenderableSceneWithHud>
+MakeExtrudePolygonScene(ICanvas* iCanvas)
+{
+  return std::make_unique<ExtrudePolygonScene>(iCanvas);
 }
 
 } // end of namespace Samples
