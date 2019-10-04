@@ -227,17 +227,17 @@ std::optional<IntersectionInfo> Ray::intersectsTriangle(const Vector3& vertex0,
 
   origin.subtractToRef(vertex0, tvec);
 
-  const auto bu = Vector3::Dot(tvec, pvec) * invdet;
+  const auto bv = Vector3::Dot(tvec, pvec) * invdet;
 
-  if (bu < 0.f || bu > 1.f) {
+  if (bv < 0.f || bv > 1.f) {
     return std::nullopt;
   }
 
   Vector3::CrossToRef(tvec, edge1, qvec);
 
-  const auto bv = Vector3::Dot(direction, qvec) * invdet;
+  const auto bw = Vector3::Dot(direction, qvec) * invdet;
 
-  if (bv < 0.f || bu + bv > 1.f) {
+  if (bw < 0.f || bv + bw > 1.f) {
     return std::nullopt;
   }
 
@@ -247,7 +247,7 @@ std::optional<IntersectionInfo> Ray::intersectsTriangle(const Vector3& vertex0,
     return std::nullopt;
   }
 
-  return IntersectionInfo(bu, bv, distance);
+  return IntersectionInfo(1.f - bv - bw, bv, distance);
 }
 
 std::optional<float> Ray::intersectsPlane(const Plane& plane)
@@ -270,6 +270,38 @@ std::optional<float> Ray::intersectsPlane(const Plane& plane)
     }
 
     return distance;
+  }
+}
+
+std::optional<Vector3> Ray::intersectsAxis(const std::string& axis,
+                                           float offset)
+{
+  if (axis == "y") {
+    const auto t = (origin.y - offset) / direction.y;
+    if (t > 0.f) {
+      return std::nullopt;
+    }
+    return Vector3(origin.x + (direction.x * -t), offset,
+                   origin.z + (direction.z * -t));
+  }
+  if (axis == "x") {
+    const auto t = (origin.x - offset) / direction.x;
+    if (t > 0.f) {
+      return std::nullopt;
+    }
+    return Vector3(offset, origin.y + (direction.y * -t),
+                   origin.z + (direction.z * -t));
+  }
+  if (axis == "z") {
+    const auto t = (origin.z - offset) / direction.z;
+    if (t > 0.f) {
+      return std::nullopt;
+    }
+    return Vector3(origin.x + (direction.x * -t), origin.y + (direction.y * -t),
+                   offset);
+  }
+  else {
+    return std::nullopt;
   }
 }
 
