@@ -43,11 +43,16 @@ DDSTools::GetDDSInfo(const std::variant<std::string, ArrayBuffer>& iArrayBuffer)
     case DDS::FOURCC_D3DFMT_R32G32B32A32F:
       textureType = Constants::TEXTURETYPE_FLOAT;
       break;
-    case DDS::FOURCC_DX10:
+    case DDS::FOURCC_DX10: {
       if (dxgiFormat == DDS::DXGI_FORMAT_R16G16B16A16_FLOAT) {
         textureType = Constants::TEXTURETYPE_HALF_FLOAT;
         break;
       }
+      if (dxgiFormat == DDS::DXGI_FORMAT_R32G32B32A32_FLOAT) {
+        textureType = Constants::TEXTURETYPE_FLOAT;
+        break;
+      }
+    }
   }
 
   return DDSInfo(
@@ -431,6 +436,7 @@ void DDSTools::UploadDDSLevels(
         auto supported = false;
         switch (info.dxgiFormat) {
           case DDS::DXGI_FORMAT_R16G16B16A16_FLOAT:
+          case DDS::DXGI_FORMAT_R32G32B32A32_FLOAT:
             computeFormats = true;
             supported      = true;
             break;

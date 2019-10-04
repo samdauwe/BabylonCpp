@@ -119,6 +119,17 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
         auto g = dataArray[(y * cubeInfo.size * stride) + (x * stride) + 1];
         auto b = dataArray[(y * cubeInfo.size * stride) + (x * stride) + 2];
 
+        // Prevent NaN harmonics with extreme HDRI data.
+        if (isNaN(r)) {
+          r = 0.f;
+        }
+        if (isNaN(g)) {
+          g = 0.f;
+        }
+        if (isNaN(b)) {
+          b = 0.f;
+        }
+
         // Handle Integer types.
         if (cubeInfo.type == Constants::TEXTURETYPE_UNSIGNED_INT) {
           r /= 255.f;
@@ -132,6 +143,13 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
           g = std::pow(Scalar::Clamp(g), Math::ToLinearSpace);
           b = std::pow(Scalar::Clamp(b), Math::ToLinearSpace);
         }
+
+        // Prevent to explode in case of really high dynamic ranges.
+        // sh 3 would not be enough to accurately represent it.
+        const auto max = 4096.f;
+        r              = Scalar::Clamp(r, 0.f, max);
+        g              = Scalar::Clamp(g, 0.f, max);
+        b              = Scalar::Clamp(b, 0.f, max);
 
         Color3 color(r, g, b);
 

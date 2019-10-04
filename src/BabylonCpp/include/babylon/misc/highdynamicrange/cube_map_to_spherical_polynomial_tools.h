@@ -5,6 +5,10 @@
 #include <babylon/misc/highdynamicrange/cube_map_info.h>
 #include <babylon/misc/highdynamicrange/file_face_orientation.h>
 
+#ifndef isNaN
+#define isNaN(a) (a != a)
+#endif
+
 namespace BABYLON {
 
 class BaseTexture;

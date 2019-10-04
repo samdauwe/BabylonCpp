@@ -81,6 +81,7 @@ struct DDS {
   static constexpr int FOURCC_D3DFMT_R16G16B16A16F = 113;
   static constexpr int FOURCC_D3DFMT_R32G32B32A32F = 116;
 
+  static constexpr int DXGI_FORMAT_R32G32B32A32_FLOAT = 2;
   static constexpr int DXGI_FORMAT_R16G16B16A16_FLOAT = 10;
   static constexpr int DXGI_FORMAT_B8G8R8X8_UNORM     = 88;
 
