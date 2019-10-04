@@ -108,6 +108,19 @@ public:
   const Float32Array& getTangents() const;
 
   /**
+   * @brief Affects texture coordinates data to this target.
+   * @param data defines the texture coordinates data to use
+   */
+  void setUVs(const Float32Array& data);
+
+  /**
+   * @brief Gets the texture coordinates data stored in this target.
+   * @returns a FloatArray containing the texture coordinates data (or null if
+   * not present)
+   */
+  const Float32Array& getUVs() const;
+
+  /**
    * @brief Serializes the current target into a Serialization object.
    * @returns the serialized object.
    */
@@ -177,6 +190,12 @@ protected:
    */
   bool get_hasTangents() const;
 
+  /**
+   * @brief Gets a boolean defining if the target contains texture coordinates
+   * data.
+   */
+  bool get_hasUVs() const;
+
 public:
   /**
    * @brief Creates a new MorphTarget.
@@ -213,19 +232,24 @@ public:
   std::string id;
 
   /**
-   * Boolean defining if the target contains position data
+   * Gets a boolean defining if the target contains position data
    */
   ReadOnlyProperty<MorphTarget, bool> hasPositions;
 
   /**
-   * Boolean defining if the target contains normal data
+   * Gets a boolean defining if the target contains normal data
    */
   ReadOnlyProperty<MorphTarget, bool> hasNormals;
 
   /**
-   * Boolean defining if the target contains tangent data
+   * Gets a boolean defining if the target contains tangent data
    */
   ReadOnlyProperty<MorphTarget, bool> hasTangents;
+
+  /**
+   * Gets a boolean defining if the target contains texture coordinates data
+   */
+  ReadOnlyProperty<MorphTarget, bool> hasUVs;
 
 private:
   /**
@@ -237,6 +261,7 @@ private:
   Float32Array _positions;
   Float32Array _normals;
   Float32Array _tangents;
+  Float32Array _uvs;
   float _influence;
   AnimationPropertiesOverride* _animationPropertiesOverride;
 

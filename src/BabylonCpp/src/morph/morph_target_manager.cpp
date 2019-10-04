@@ -56,12 +56,12 @@ size_t MorphTargetManager::get_vertexCount() const
 
 bool MorphTargetManager::get_supportsNormals() const
 {
-  return _supportsNormals;
+  return _supportsNormals && enableNormalMorphing;
 }
 
 bool MorphTargetManager::get_supportsTangents() const
 {
-  return _supportsTangents;
+  return _supportsTangents && enableTangentMorphing;
 }
 
 bool MorphTargetManager::get_supportsUVs() const
@@ -146,6 +146,7 @@ void MorphTargetManager::_syncActiveTargets(bool needUpdate)
   _influences.clear();
   _supportsNormals  = true;
   _supportsTangents = true;
+  _supportsUVs      = true;
   _vertexCount      = 0;
 
   for (auto& target : _targets) {
@@ -159,6 +160,7 @@ void MorphTargetManager::_syncActiveTargets(bool needUpdate)
 
     _supportsNormals  = _supportsNormals && target->hasNormals();
     _supportsTangents = _supportsTangents && target->hasTangents();
+    _supportsUVs      = _supportsUVs && target->hasUVs();
 
     const auto& positions = target->getPositions();
     if (!positions.empty()) {

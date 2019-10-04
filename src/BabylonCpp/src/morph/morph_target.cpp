@@ -16,6 +16,7 @@ MorphTarget::MorphTarget(const std::string& name, float iInfluence,
     , hasPositions{this, &MorphTarget::get_hasPositions}
     , hasNormals{this, &MorphTarget::get_hasNormals}
     , hasTangents{this, &MorphTarget::get_hasTangents}
+    , hasUVs{this, &MorphTarget::get_hasUVs}
     , _name{name}
     , _scene{scene ? scene : Engine::LastCreatedScene()}
     , _influence{-1.f} // -1  means Undefined
@@ -113,6 +114,11 @@ bool MorphTarget::get_hasTangents() const
   return !_tangents.empty();
 }
 
+bool MorphTarget::get_hasUVs() const
+{
+  return !_uvs.empty();
+}
+
 std::vector<AnimationPtr> MorphTarget::getAnimations()
 {
   return animations;
@@ -181,6 +187,22 @@ const Float32Array& MorphTarget::getTangents() const
   return _tangents;
 }
 
+void MorphTarget::setUVs(const Float32Array& data)
+{
+  const auto hadUVs = hasUVs();
+
+  _uvs = data;
+
+  if (hadUVs != hasUVs) {
+    _onDataLayoutChanged.notifyObservers(nullptr);
+  }
+}
+
+const Float32Array& MorphTarget::getUVs() const
+{
+  return _uvs;
+}
+
 json MorphTarget::serialize() const
 {
   return nullptr;
@@ -214,6 +236,10 @@ std::unique_ptr<MorphTarget> MorphTarget::Parse(const json& serializationObject)
       json_util::get_array<float>(serializationObject, "tangents"));
   }
 
+  if (json_util::has_key(serializationObject, "uvs")) {
+    result->setUVs(json_util::get_array<float>(serializationObject, "uvs"));
+  }
+
   // Animations
   if (json_util::has_key(serializationObject, "animations")) {
     for (auto parsedAnimation :
@@ -242,6 +268,10 @@ MorphTargetPtr MorphTarget::FromMesh(const AbstractMeshPtr& mesh,
 
   if (mesh->isVerticesDataPresent(VertexBuffer::TangentKind)) {
     result->setTangents(mesh->getVerticesData(VertexBuffer::TangentKind));
+  }
+
+  if (mesh->isVerticesDataPresent(VertexBuffer::UVKind)) {
+    result->setUVs(mesh->getVerticesData(VertexBuffer::UVKind));
   }
 
   return result;
