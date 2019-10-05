@@ -617,9 +617,9 @@ bool Matrix::equals(const Matrix& value) const
           && stl_util::almost_equal(m[15], om[15]));
 }
 
-bool Matrix::decompose(std::optional<Vector3> scale,
-                       std::optional<Quaternion> rotation,
-                       std::optional<Vector3> translation) const
+bool Matrix::decompose(std::optional<Vector3>& scale,
+                       std::optional<Quaternion>& rotation,
+                       std::optional<Vector3>& translation) const
 {
   if (_isIdentity) {
     if (translation) {
@@ -763,14 +763,16 @@ Matrix Matrix::getRotationMatrix() const
 
 const Matrix& Matrix::getRotationMatrixToRef(Matrix& result) const
 {
-  auto& scale = MathTmp::Vector3Array[0];
-  if (!decompose(scale, std::nullopt, std::nullopt)) {
+  std::optional<Vector3> scale       = MathTmp::Vector3Array[0];
+  std::optional<Quaternion> rotation = std::nullopt;
+  std::optional<Vector3> translation = std::nullopt;
+  if (!decompose(scale, rotation, translation)) {
     Matrix::IdentityToRef(result);
     return *this;
   }
 
   const auto& m = _m;
-  const auto sx = 1.f / scale.x, sy = 1.f / scale.y, sz = 1.f / scale.z;
+  const auto sx = 1.f / scale->x, sy = 1.f / scale->y, sz = 1.f / scale->z;
   Matrix::FromValuesToRef(m[0] * sx, m[1] * sx, m[2] * sx, 0.f,  //
                           m[4] * sy, m[5] * sy, m[6] * sy, 0.f,  //
                           m[8] * sz, m[9] * sz, m[10] * sz, 0.f, //
@@ -1228,23 +1230,24 @@ Matrix Matrix::DecomposeLerp(Matrix& startValue, Matrix& endValue,
 void Matrix::DecomposeLerpToRef(Matrix& startValue, Matrix& endValue,
                                 float gradient, Matrix& result)
 {
-  auto& startScale       = MathTmp::Vector3Array[0];
-  auto& startRotation    = MathTmp::QuaternionArray[0];
-  auto& startTranslation = MathTmp::Vector3Array[1];
+  std::optional<Vector3> startScale       = MathTmp::Vector3Array[0];
+  std::optional<Quaternion> startRotation = MathTmp::QuaternionArray[0];
+  std::optional<Vector3> startTranslation = MathTmp::Vector3Array[1];
   startValue.decompose(startScale, startRotation, startTranslation);
 
-  auto& endScale       = MathTmp::Vector3Array[2];
-  auto& endRotation    = MathTmp::QuaternionArray[1];
-  auto& endTranslation = MathTmp::Vector3Array[3];
+  std::optional<Vector3> endScale       = MathTmp::Vector3Array[2];
+  std::optional<Quaternion> endRotation = MathTmp::QuaternionArray[1];
+  std::optional<Vector3> endTranslation = MathTmp::Vector3Array[3];
   endValue.decompose(endScale, endRotation, endTranslation);
 
   auto& resultScale = MathTmp::Vector3Array[4];
-  Vector3::LerpToRef(startScale, endScale, gradient, resultScale);
+  Vector3::LerpToRef(*startScale, *endScale, gradient, resultScale);
   auto& resultRotation = MathTmp::QuaternionArray[2];
-  Quaternion::SlerpToRef(startRotation, endRotation, gradient, resultRotation);
+  Quaternion::SlerpToRef(*startRotation, *endRotation, gradient,
+                         resultRotation);
 
   auto& resultTranslation = MathTmp::Vector3Array[5];
-  Vector3::LerpToRef(startTranslation, endTranslation, gradient,
+  Vector3::LerpToRef(*startTranslation, *endTranslation, gradient,
                      resultTranslation);
 
   Matrix::ComposeToRef(resultScale, resultRotation, resultTranslation, result);

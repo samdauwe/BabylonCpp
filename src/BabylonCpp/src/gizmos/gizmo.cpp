@@ -99,8 +99,10 @@ void Gizmo::_update()
 
     // Rotation
     if (updateGizmoRotationToMatchAttachedMesh) {
+      std::optional<Vector3> scale       = std::nullopt;
+      std::optional<Vector3> translation = std::nullopt;
       effectiveMesh->getWorldMatrix().decompose(
-        std::nullopt, _rootMesh->rotationQuaternion(), std::nullopt);
+        scale, _rootMesh->rotationQuaternion(), translation);
     }
     else {
       _rootMesh->rotationQuaternion()->set(0.f, 0.f, 0.f, 1.f);

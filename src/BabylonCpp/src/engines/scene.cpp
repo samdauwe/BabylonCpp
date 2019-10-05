@@ -2193,13 +2193,13 @@ AnimationValue Scene::_processLateAnimationBindingsForMatrices(
   float holderTotalWeight, std::vector<RuntimeAnimation*>& holderAnimations,
   Matrix& holderOriginalValue)
 {
-  auto normalizer         = 1.f;
-  auto& finalPosition     = Tmp::Vector3Array[0];
-  auto& finalScaling      = Tmp::Vector3Array[1];
-  auto& finalQuaternion   = Tmp::QuaternionArray[0];
-  auto startIndex         = 0u;
-  auto& originalAnimation = holderAnimations[0];
-  auto& originalValue     = holderOriginalValue;
+  auto normalizer                           = 1.f;
+  std::optional<Vector3> finalPosition      = Tmp::Vector3Array[0];
+  std::optional<Vector3> finalScaling       = Tmp::Vector3Array[1];
+  std::optional<Quaternion> finalQuaternion = Tmp::QuaternionArray[0];
+  auto startIndex                           = 0u;
+  auto& originalAnimation                   = holderAnimations[0];
+  auto& originalValue                       = holderOriginalValue;
 
   auto scale = 1.f;
   if (holderTotalWeight < 1.f) {
@@ -2220,28 +2220,28 @@ AnimationValue Scene::_processLateAnimationBindingsForMatrices(
     }
   }
 
-  finalScaling.scaleInPlace(scale);
-  finalPosition.scaleInPlace(scale);
-  finalQuaternion.scaleInPlace(scale);
+  finalScaling->scaleInPlace(scale);
+  finalPosition->scaleInPlace(scale);
+  finalQuaternion->scaleInPlace(scale);
 
   for (size_t animIndex = startIndex; animIndex < holderAnimations.size();
        ++animIndex) {
-    auto& runtimeAnimation  = holderAnimations[animIndex];
-    auto iScale             = runtimeAnimation->weight / normalizer;
-    auto& currentPosition   = Tmp::Vector3Array[2];
-    auto& currentScaling    = Tmp::Vector3Array[3];
-    auto& currentQuaternion = Tmp::QuaternionArray[1];
+    auto& runtimeAnimation = holderAnimations[animIndex];
+    auto iScale            = runtimeAnimation->weight / normalizer;
+    std::optional<Vector3> currentPosition      = Tmp::Vector3Array[2];
+    std::optional<Vector3> currentScaling       = Tmp::Vector3Array[3];
+    std::optional<Quaternion> currentQuaternion = Tmp::QuaternionArray[1];
 
     (*runtimeAnimation->currentValue())
       .get<Matrix>()
       .decompose(currentScaling, currentQuaternion, currentPosition);
-    currentScaling.scaleAndAddToRef(iScale, finalScaling);
-    currentQuaternion.scaleAndAddToRef(iScale, finalQuaternion);
-    currentPosition.scaleAndAddToRef(iScale, finalPosition);
+    currentScaling->scaleAndAddToRef(iScale, *finalScaling);
+    currentQuaternion->scaleAndAddToRef(iScale, *finalQuaternion);
+    currentPosition->scaleAndAddToRef(iScale, *finalPosition);
   }
 
   auto& workValue = *originalAnimation->_animationState.workValue;
-  Matrix::ComposeToRef(finalScaling, finalQuaternion, finalPosition,
+  Matrix::ComposeToRef(*finalScaling, *finalQuaternion, *finalPosition,
                        workValue.get<Matrix>());
   originalAnimation->_animationState.workValue = workValue;
   return (*originalAnimation->currentValue());

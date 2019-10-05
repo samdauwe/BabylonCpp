@@ -14,7 +14,7 @@ std::array<Matrix, 5> Bone::_tmpMats{{Matrix::Identity(), Matrix::Identity(),
                                       Matrix::Identity(), Matrix::Identity(),
                                       Matrix::Identity()}};
 
-Bone::Bone(const std::string& iName, Skeleton* skeleton, Bone* parentBone,
+Bone::Bone(const std::string& iName, Skeleton* skeleton, Bone* /*parentBone*/,
            const std::optional<Matrix>& localMatrix,
            const std::optional<Matrix>& iRestPose,
            const std::optional<Matrix>& baseMatrix, std::optional<int> index)
@@ -38,14 +38,12 @@ Bone::Bone(const std::string& iName, Skeleton* skeleton, Bone* parentBone,
     , _scaleVector{Vector3::One()}
     , _negateScaleChildren{Vector3::One()}
     , _scalingDeterminant{1.f}
+    , _localScaling{std::nullopt}
+    , _localRotation{std::nullopt}
+    , _localPosition{std::nullopt}
     , _needToDecompose{true}
     , _needToCompose{false}
 {
-  setParent(parentBone, false);
-
-  if (baseMatrix || localMatrix) {
-    _updateDifferenceMatrix();
-  }
 }
 
 Bone::~Bone()
@@ -90,7 +88,7 @@ Bone* Bone::getParent() const
   return _parent;
 }
 
-std::vector<Bone*>& Bone::getChildren()
+std::vector<BonePtr>& Bone::getChildren()
 {
   return children;
 }
@@ -102,13 +100,18 @@ void Bone::setParent(Bone* iParent, bool updateDifferenceMatrix)
   }
 
   if (_parent) {
-    stl_util::erase(_parent->children, this);
+    _parent->children.erase(std::remove_if(_parent->children.begin(),
+                                           _parent->children.end(),
+                                           [this](const BonePtr& bone) {
+                                             return bone.get() == this;
+                                           }),
+                            _parent->children.end());
   }
 
   _parent = iParent;
 
   if (_parent) {
-    _parent->children.emplace_back(this);
+    _parent->children.emplace_back(shared_from_base<Bone>());
   }
 
   if (updateDifferenceMatrix) {
@@ -180,13 +183,13 @@ void Bone::linkTransformNode(const TransformNodePtr& transformNode)
 Vector3& Bone::get_position()
 {
   _decompose();
-  return _localPosition;
+  return *_localPosition;
 }
 
 void Bone::set_position(const Vector3& newPosition)
 {
   _decompose();
-  _localPosition.copyFrom(newPosition);
+  _localPosition->copyFrom(newPosition);
 
   _markAsDirtyAndCompose();
 }
@@ -247,7 +250,7 @@ void Bone::_decompose()
     _localRotation = Quaternion::Zero();
     _localPosition = Vector3::Zero();
   }
-  _localMatrix.decompose(*_localScaling, _localRotation, _localPosition);
+  _localMatrix.decompose(_localScaling, _localRotation, _localPosition);
 }
 
 void Bone::_compose()
@@ -257,7 +260,7 @@ void Bone::_compose()
   }
 
   _needToCompose = false;
-  Matrix::ComposeToRef(*_localScaling, *_localRotation, _localPosition,
+  Matrix::ComposeToRef(*_localScaling, *_localRotation, *_localPosition,
                        _localMatrix);
 }
 
@@ -526,9 +529,7 @@ void Bone::scale(float x, float y, float z, bool scaleChildren)
 void Bone::setScale(const Vector3& scale)
 {
   _decompose();
-  auto localScalingCpy = *_localScaling;
-  localScalingCpy.copyFrom(scale);
-  _localScaling = localScalingCpy;
+  _localScaling->copyFrom(scale);
   _markAsDirtyAndCompose();
 }
 
@@ -890,7 +891,11 @@ void Bone::getRotationQuaternionToRef(Quaternion& result, const Space& space,
     mat.multiplyAtIndex(1, _scalingDeterminant);
     mat.multiplyAtIndex(2, _scalingDeterminant);
 
-    mat.decompose(std::nullopt, result, std::nullopt);
+    std::optional<Vector3> scale       = std::nullopt;
+    std::optional<Quaternion> rotation = result;
+    std::optional<Vector3> translation = std::nullopt;
+    mat.decompose(scale, rotation, translation);
+    result = *rotation;
   }
 }
 

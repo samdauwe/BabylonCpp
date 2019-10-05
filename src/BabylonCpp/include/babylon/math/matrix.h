@@ -313,9 +313,9 @@ public:
    * update
    * @returns true if operation was successful
    */
-  bool decompose(std::optional<Vector3> scale,
-                 std::optional<Quaternion> rotation,
-                 std::optional<Vector3> translation) const;
+  bool decompose(std::optional<Vector3>& scale,
+                 std::optional<Quaternion>& rotation,
+                 std::optional<Vector3>& translation) const;
 
   /**
    * @brief Gets specific row of the matrix.

@@ -2,6 +2,7 @@
 
 #include <imgui.h>
 
+#include <babylon/bones/bone.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/string.h>
@@ -15,12 +16,15 @@
 #include <imgui_utils/imgui_utils.h>
 
 #include <babylon/inspector/components/global_state.h>
+#include <babylon/inspector/components/sceneexplorer/entities/bone_tree_item_component.h>
 #include <babylon/inspector/components/sceneexplorer/entities/camera_tree_item_component.h>
 #include <babylon/inspector/components/sceneexplorer/entities/light_tree_item_component.h>
 #include <babylon/inspector/components/sceneexplorer/entities/material_tree_item_component.h>
 #include <babylon/inspector/components/sceneexplorer/entities/mesh_tree_item_component.h>
 #include <babylon/inspector/components/sceneexplorer/entities/scene_tree_item_component.h>
+#include <babylon/inspector/components/sceneexplorer/entities/skeleton_tree_item_component.h>
 #include <babylon/inspector/components/sceneexplorer/entities/texture_tree_item_component.h>
+#include <babylon/inspector/components/sceneexplorer/entities/transform_node_tree_item_component.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_expandable_header_component.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_root_header_component.h>
 
@@ -58,6 +62,15 @@ void SceneGraphComponent::reinitialize()
   auto& nodesTreeItem   = _sceneGraph.root().addChild(_createTreeItem("Nodes"));
   for (const auto& rootNode : rootNodes) {
     _initializeNodesTreeItem(nodesTreeItem, rootNode);
+  }
+  // Skeletons
+  const auto& skeletons = scene->skeletons;
+  if (!skeletons.empty()) {
+    auto& skeletonItem
+      = _sceneGraph.root().addChild(_createTreeItem("Skeletons"));
+    for (const auto& skeleton : skeletons) {
+      _initializeSkeletonTreeItem(skeletonItem, skeleton);
+    }
   }
   // Materials
   const auto& materials = scene->materials;
@@ -104,7 +117,32 @@ void SceneGraphComponent::_initializeNodesTreeItem(
                                                  _treeItemComparator);
 
   // Create Children
-  for (const auto& child : node->getChildren()) {
+  if (String::contains(node->getClassName(), "Bone")) {
+      const auto bone = std::static_pointer_cast<Bone>(node);
+      for (const auto& child : bone->children) {
+        if (child) {
+          _initializeNodesTreeItem(treeItem, child);
+        }
+      }
+  }
+  else {
+    for (const auto& child : node->getChildren()) {
+      if (child) {
+        _initializeNodesTreeItem(treeItem, child);
+      }
+    }
+  }
+}
+
+void SceneGraphComponent::_initializeSkeletonTreeItem(
+  TreeNode<TreeItem>& parentTreeItem, const SkeletonPtr& skeleton)
+{
+  // Create TreeItem
+  auto& treeItem = parentTreeItem.addChildSorted(
+    _createSkeletonTreeItem(skeleton), _treeItemComparator);
+
+  // Create Children
+  for (const auto& child : skeleton->getChildren()) {
     if (child) {
       _initializeNodesTreeItem(treeItem, child);
     }
@@ -147,7 +185,30 @@ TreeItem SceneGraphComponent::_createNodeTreeItem(const NodePtr& node)
   size_t key = 0;
 
   if (node) {
-    if (String::contains(node->getClassName(), "Bone")) {
+    if (String::contains(node->getClassName(), "Mesh")) {
+      auto mesh = std::static_pointer_cast<Mesh>(node);
+      if (mesh->getTotalVertices() > 0) {
+        IMeshTreeItemComponentProps compProps;
+        compProps.mesh     = std::static_pointer_cast<Mesh>(node);
+        label              = compProps.mesh->name;
+        key                = compProps.mesh->uniqueId;
+        treeItem.component = std::make_shared<MeshTreeItemComponent>(compProps);
+      }
+      else {
+        ITransformNodeTreeItemComponentProps compProps;
+        compProps.transformNode = std::static_pointer_cast<TransformNode>(node);
+        label                   = compProps.transformNode->name;
+        key                     = compProps.transformNode->uniqueId;
+        treeItem.component
+          = std::make_shared<TransformNodeTreeItemComponent>(compProps);
+      }
+    }
+    else if (String::contains(node->getClassName(), "Bone")) {
+      IBoneTreeItemComponentProps compProps;
+      compProps.bone     = std::static_pointer_cast<Bone>(node);
+      label              = compProps.bone->name;
+      key                = compProps.bone->uniqueId;
+      treeItem.component = std::make_shared<BoneTreeItemComponent>(compProps);
     }
     else if (String::contains(node->getClassName(), "Camera")) {
       ICameraTreeItemComponentProps compProps;
@@ -163,20 +224,26 @@ TreeItem SceneGraphComponent::_createNodeTreeItem(const NodePtr& node)
       key                = compProps.light->uniqueId;
       treeItem.component = std::make_shared<LightTreeItemComponent>(compProps);
     }
-    else if (String::contains(node->getClassName(), "Mesh")) {
-      auto mesh = std::static_pointer_cast<Mesh>(node);
-      if (mesh->getTotalVertices() > 0) {
-        IMeshTreeItemComponentProps compProps;
-        compProps.mesh     = std::static_pointer_cast<Mesh>(node);
-        label              = compProps.mesh->name;
-        key                = compProps.mesh->uniqueId;
-        treeItem.component = std::make_shared<MeshTreeItemComponent>(compProps);
-      }
-    }
   }
 
   sprintf(treeItem.label, "%s", label.c_str());
   sprintf(treeItem.key, "%zd", key);
+
+  return treeItem;
+}
+
+TreeItem
+SceneGraphComponent::_createSkeletonTreeItem(const SkeletonPtr& skeleton)
+{
+  TreeItem treeItem;
+
+  if (skeleton) {
+    ISkeletonTreeItemComponentProps compProps;
+    compProps.skeleton = std::static_pointer_cast<Skeleton>(skeleton);
+    sprintf(treeItem.label, "%s", compProps.skeleton->name.c_str());
+    sprintf(treeItem.key, "%zd", compProps.skeleton->uniqueId());
+    treeItem.component = std::make_shared<SkeletonTreeItemComponent>(compProps);
+  }
 
   return treeItem;
 }

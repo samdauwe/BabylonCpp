@@ -919,9 +919,9 @@ void GLTFLoader::_LoadTransform(const INode& node,
     return;
   }
 
-  auto position = Vector3::Zero();
-  auto rotation = Quaternion::Identity();
-  auto scaling  = Vector3::One();
+  std::optional<Vector3> position    = Vector3::Zero();
+  std::optional<Quaternion> rotation = Quaternion::Identity();
+  std::optional<Vector3> scaling     = Vector3::One();
 
   if (!node.matrix.empty()) {
     const auto matrix = Matrix::FromArray(node.matrix);
@@ -939,9 +939,9 @@ void GLTFLoader::_LoadTransform(const INode& node,
     }
   }
 
-  babylonNode->position           = position;
-  babylonNode->rotationQuaternion = rotation;
-  babylonNode->scaling            = scaling;
+  babylonNode->position           = *position;
+  babylonNode->rotationQuaternion = *rotation;
+  babylonNode->scaling            = *scaling;
 }
 
 void GLTFLoader::_loadSkinAsync(const std::string& context, const INode& node,

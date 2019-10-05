@@ -624,9 +624,9 @@ TransformNode& TransformNode::setParent(Node* node)
     return *this;
   }
 
-  auto& quatRotation = Tmp::QuaternionArray[0];
-  auto& newPosition  = Tmp::Vector3Array[0];
-  auto& scale        = Tmp::Vector3Array[1];
+  std::optional<Quaternion> quatRotation = Tmp::QuaternionArray[0];
+  std::optional<Vector3> newPosition     = Tmp::Vector3Array[0];
+  std::optional<Vector3> scale           = Tmp::Vector3Array[1];
 
   if (!node) {
     if (parent()) {
@@ -648,14 +648,14 @@ TransformNode& TransformNode::setParent(Node* node)
   }
 
   if (rotationQuaternion()) {
-    rotationQuaternion()->copyFrom(quatRotation);
+    rotationQuaternion()->copyFrom(*quatRotation);
   }
   else {
-    quatRotation.toEulerAnglesToRef(rotation());
+    quatRotation->toEulerAnglesToRef(rotation());
   }
 
-  scaling().copyFrom(scale);
-  position().copyFrom(newPosition);
+  scaling().copyFrom(*scale);
+  position().copyFrom(*newPosition);
 
   Node::set_parent(node);
   return *this;
@@ -740,11 +740,11 @@ TransformNode& TransformNode::rotateAround(const Vector3& point, Vector3& axis,
     rotation().setAll(0.f);
   }
 
-  auto& tmpVector        = Tmp::Vector3Array[0];
-  auto& finalScale       = Tmp::Vector3Array[1];
-  auto& finalTranslation = Tmp::Vector3Array[2];
+  auto& tmpVector                         = Tmp::Vector3Array[0];
+  std::optional<Vector3> finalScale       = Tmp::Vector3Array[1];
+  std::optional<Vector3> finalTranslation = Tmp::Vector3Array[2];
 
-  auto& finalRotation = Tmp::QuaternionArray[0];
+  std::optional<Quaternion> finalRotation = Tmp::QuaternionArray[0];
 
   auto& translationMatrix    = Tmp::MatrixArray[0]; // T
   auto& translationMatrixInv = Tmp::MatrixArray[1]; // T'
@@ -763,8 +763,8 @@ TransformNode& TransformNode::rotateAround(const Vector3& point, Vector3& axis,
 
   finalMatrix.decompose(finalScale, finalRotation, finalTranslation);
 
-  position().addInPlace(finalTranslation);
-  finalRotation.multiplyToRef(*rotationQuaternion(), *rotationQuaternion());
+  position().addInPlace(*finalTranslation);
+  finalRotation->multiplyToRef(*rotationQuaternion(), *rotationQuaternion());
 
   return *this;
 }
@@ -920,11 +920,12 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
       }
 
       // Extract scaling and translation from parent
-      auto& translation = Tmp::Vector3Array[5];
-      auto& scale       = Tmp::Vector3Array[6];
-      Tmp::MatrixArray[7].decompose(scale, std::nullopt, translation);
-      Matrix::ScalingToRef(scale.x, scale.y, scale.z, Tmp::MatrixArray[7]);
-      Tmp::MatrixArray[7].setTranslation(translation);
+      std::optional<Quaternion> rotation = std::nullopt;
+      std::optional<Vector3> translation = Tmp::Vector3Array[5];
+      std::optional<Vector3> scale       = Tmp::Vector3Array[6];
+      Tmp::MatrixArray[7].decompose(scale, rotation, translation);
+      Matrix::ScalingToRef(scale->x, scale->y, scale->z, Tmp::MatrixArray[7]);
+      Tmp::MatrixArray[7].setTranslation(*translation);
 
       _localMatrix.multiplyToRef(Tmp::MatrixArray[7], _worldMatrix);
     }
@@ -957,8 +958,10 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
 
     if ((billboardMode & TransformNode::BILLBOARDMODE_ALL)
         != TransformNode::BILLBOARDMODE_ALL) {
-      Tmp::MatrixArray[0].decompose(std::nullopt, Tmp::QuaternionArray[0],
-                                    std::nullopt);
+      std::optional<Vector3> scale       = std::nullopt;
+      std::optional<Quaternion> rotation = Tmp::QuaternionArray[0];
+      std::optional<Vector3> translation = std::nullopt;
+      Tmp::MatrixArray[0].decompose(scale, rotation, translation);
       auto& eulerAngles = Tmp::Vector3Array[1];
       Tmp::QuaternionArray[0].toEulerAnglesToRef(eulerAngles);
 

@@ -56,9 +56,16 @@ private:
   void _initializeNodesTreeItem(TreeNode<TreeItem>& parentTreeItem,
                                 const NodePtr& node);
 
+  /**
+   * @brief Initializes the "Skeletons" subtree.
+   */
+  void _initializeSkeletonTreeItem(TreeNode<TreeItem>& parentTreeItem,
+                                   const SkeletonPtr& skeleton);
+
   TreeItem _createTreeItem(const char* label);
   TreeItem _createMaterialTreeItem(const MaterialPtr& material);
   TreeItem _createNodeTreeItem(const NodePtr& node);
+  TreeItem _createSkeletonTreeItem(const SkeletonPtr& skeleton);
   TreeItem _createSceneTreeItem(Scene* scene);
   TreeItem _createTextureTreeItem(const BaseTexturePtr& texture);
 

@@ -38,7 +38,7 @@ struct BABYLON_SHARED_EXPORT BonePropertyGridComponent {
       if (!bone->rotationQuaternion()) {
         Vector3LineComponent::render("Rotation", bone->rotation());
       }
-      if (bone->rotationQuaternion()) {
+      else if (bone->rotationQuaternion()) {
         QuaternionLineComponent::render("Rotation",
                                         *bone->rotationQuaternion());
       }

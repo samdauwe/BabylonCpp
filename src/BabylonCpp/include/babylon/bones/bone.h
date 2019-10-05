@@ -19,11 +19,24 @@ class BABYLON_SHARED_EXPORT Bone : public Node {
 
 public:
   template <typename... Ts>
-  static BonePtr New(Ts&&... args)
+  static BonePtr New(const std::string& iName, Skeleton* skeleton,
+                     Bone* parentBone                         = nullptr,
+                     const std::optional<Matrix>& localMatrix = std::nullopt,
+                     const std::optional<Matrix>& restPose    = std::nullopt,
+                     const std::optional<Matrix>& baseMatrix  = std::nullopt,
+                     std::optional<int> index                 = std::nullopt)
   {
-    auto bone = std::shared_ptr<Bone>(new Bone(std::forward<Ts>(args)...));
+    auto bone = std::shared_ptr<Bone>(new Bone(
+      iName, skeleton, parentBone, localMatrix, restPose, baseMatrix, index));
     bone->addToRootNodes();
     bone->addToSkeleton(bone);
+
+    bone->setParent(parentBone, false);
+
+    if (baseMatrix || localMatrix) {
+      bone->_updateDifferenceMatrix();
+    }
+
     return bone;
   }
   ~Bone() override;
@@ -55,7 +68,7 @@ public:
    * @brief Returns an array containing the root bones.
    * @returns an array containing the root bones
    */
-  std::vector<Bone*>& getChildren();
+  std::vector<BonePtr>& getChildren();
 
   /**
    * @brief Sets the parent bone.
@@ -550,7 +563,7 @@ public:
   /**
    * Gets the list of child bones
    */
-  std::vector<Bone*> children;
+  std::vector<BonePtr> children;
 
   /**
    * Gets or sets bone length
@@ -615,7 +628,7 @@ private:
   Matrix _worldTransform;
   std::optional<Vector3> _localScaling;
   std::optional<Quaternion> _localRotation;
-  Vector3 _localPosition;
+  std::optional<Vector3> _localPosition;
   bool _needToDecompose;
   bool _needToCompose;
   Vector3 _rotationTmp;
