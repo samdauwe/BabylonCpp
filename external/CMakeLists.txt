@@ -1,8 +1,10 @@
 option(BUILD_OGL43 "Build OpenGL 4.3 examples" OFF)
 mark_as_advanced(BUILD_OGL43)
 
+# OpenGL dependency
 set(OpenGL_GL_PREFERENCE GLVND)
 find_package(OpenGL REQUIRED)
+include_directories(${OPENGL_INCLUDE_DIRS})
 
 # Configure build environment
 include(../cmake/BuildEnvironment.cmake)
@@ -44,8 +46,10 @@ set(GLAD_FILES
 source_group_by_path_all(${GLAD_DIR} ${GLAD_FILES})
 add_library(glad SHARED ${GLAD_FILES})
 target_include_directories(glad PUBLIC ${GLAD_DIR}/include)
-if (WIN32)
+if(WIN32)
     target_link_libraries(glad PUBLIC opengl32.lib)
+else()
+    target_link_libraries(glad PUBLIC ${OPENGL_LIBRARIES})
 endif()
 get_target_property(library_type glad TYPE)
 if (library_type STREQUAL SHARED_LIBRARY)
