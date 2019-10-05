@@ -73,7 +73,7 @@ Node::~Node()
 void Node::addToRootNodes()
 {
   if (_addToRootNodes) {
-    _scene->rootNodes.emplace_back(shared_from_this());
+    addToSceneRootNodes();
   }
 }
 

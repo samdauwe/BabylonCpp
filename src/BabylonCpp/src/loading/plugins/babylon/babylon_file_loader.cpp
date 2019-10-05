@@ -776,7 +776,7 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
 
     // Geometries
     if (json_util::has_valid_key_value(parsedData, "geometries")) {
-      const auto geometries = parsedData["geometries"];
+      const auto& geometries = parsedData["geometries"];
       std::vector<GeometryPtr> addedGeometry;
 
       // VertexData
