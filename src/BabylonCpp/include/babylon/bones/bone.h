@@ -22,6 +22,7 @@ public:
   static BonePtr New(Ts&&... args)
   {
     auto bone = std::shared_ptr<Bone>(new Bone(std::forward<Ts>(args)...));
+    bone->addToRootNodes();
     bone->addToSkeleton(bone);
     return bone;
   }

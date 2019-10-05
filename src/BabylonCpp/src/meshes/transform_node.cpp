@@ -81,8 +81,8 @@ TransformNode::~TransformNode()
 
 void TransformNode::addToScene(const TransformNodePtr& transformNode)
 {
+  transformNode->addToRootNodes();
   if (transformNode->_isPure) {
-    transformNode->addToSceneRootNodes();
     transformNode->getScene()->addTransformNode(transformNode);
   }
 }

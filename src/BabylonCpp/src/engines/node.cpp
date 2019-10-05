@@ -58,19 +58,23 @@ Node::Node(const std::string& iName, Scene* scene, bool addToRootNodes)
     , _sceneRootNodesIndex{-1}
     , _animationPropertiesOverride{nullptr}
     , _onDisposeObserver{nullptr}
+    , _addToRootNodes{addToRootNodes}
 {
   state    = "";
   _scene   = scene ? scene : Engine::LastCreatedScene();
   uniqueId = _scene->getUniqueId();
   _initCache();
-
-  if (addToRootNodes) {
-    addToSceneRootNodes();
-  }
 }
 
 Node::~Node()
 {
+}
+
+void Node::addToRootNodes()
+{
+  if (_addToRootNodes) {
+    _scene->rootNodes.emplace_back(shared_from_this());
+  }
 }
 
 Type Node::type() const
@@ -130,7 +134,7 @@ void Node::addToSceneRootNodes()
 {
   if (_sceneRootNodesIndex == -1) {
     _sceneRootNodesIndex = static_cast<int>(_scene->rootNodes.size());
-    _scene->rootNodes.emplace_back(this);
+    _scene->rootNodes.emplace_back(shared_from_this());
   }
 }
 

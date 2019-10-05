@@ -37,7 +37,7 @@ CameraPtr Camera::_createDefaultParsedCamera(const std::string& iName,
 
 Camera::Camera(const std::string& iName, const Vector3& iPosition, Scene* scene,
                bool setActiveOnSceneIfNoneActive)
-    : Node(iName, scene)
+    : Node{iName, scene}
     , _position{Vector3::Zero()}
     , position{this, &Camera::get_position, &Camera::set_position}
     , upVector{Vector3::Up()}
@@ -94,6 +94,7 @@ void Camera::addToScene(const CameraPtr& newCamera)
     getScene()->activeCamera = newCamera;
   }
 
+  newCamera->addToRootNodes();
   getScene()->addCamera(newCamera);
 }
 

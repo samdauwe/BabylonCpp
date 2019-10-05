@@ -40,7 +40,7 @@ namespace BABYLON {
 Vector3 AbstractMesh::_lookAtVectorCache = Vector3(0.f, 0.f, 0.f);
 
 AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
-    : TransformNode(iName, scene, false)
+    : TransformNode{iName, scene, false}
     , cullingStrategy{AbstractMesh::CULLINGSTRATEGY_STANDARD}
     , facetNb{this, &AbstractMesh::get_facetNb}
     , partitioningSubdivisions{this,
@@ -173,6 +173,7 @@ Type AbstractMesh::type() const
 
 void AbstractMesh::addToScene(const AbstractMeshPtr& newMesh)
 {
+  newMesh->addToRootNodes();
   getScene()->addMesh(newMesh);
 }
 

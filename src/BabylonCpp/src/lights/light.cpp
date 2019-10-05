@@ -96,6 +96,7 @@ void Light::setProperty(const std::vector<std::string>& targetPropertyPath,
 void Light::addToScene(const LightPtr& newLight)
 {
   getScene()->addLight(newLight); // Need to add light first to the scene!
+  newLight->addToRootNodes();
   newLight->_buildUniformLayout();
   newLight->_resyncMeshes();
 }

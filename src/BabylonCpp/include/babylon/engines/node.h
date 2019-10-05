@@ -91,6 +91,14 @@ public:
     return std::static_pointer_cast<Derived>(shared_from_this());
   }
 
+  /**
+   * @brief Hidden
+   */
+  void addToRootNodes();
+
+  /**
+   * @brief Returns the type of this node
+   */
   virtual Type type() const override;
 
   /**
