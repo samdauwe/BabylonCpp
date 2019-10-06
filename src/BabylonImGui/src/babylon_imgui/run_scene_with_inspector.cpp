@@ -178,7 +178,7 @@ private:
     ImGui::Separator();
 
     if (_appContext._viewState == ViewState::Scene3d)
-      _appContext._sceneWidget->render(getSceneSize());
+      render3d();
     if (_appContext._viewState == ViewState::SamplesCodeViewer)
       _samplesCodeEditor.render();
     else if (_appContext._viewState == ViewState::SampleBrowser)
@@ -222,26 +222,63 @@ private:
     return true;
   }
 
+  bool ButtonInOverlayWindow(const std::string& label, ImVec2 position, ImVec2 size)
+  {
+    ImGui::SetNextWindowPos(position);
+    ImGui::SetNextWindowSize(size);
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground;
+    std::string id = label + "##ButtonInOverlayWindow";
+    ImGui::Begin(label.c_str(), nullptr, flags);
+    bool clicked = ImGui::Button(label.c_str());
+    ImGui::End();
+    return clicked;
+  }
+
+  void renderHud(ImVec2 cursorScene3dTopLeft, ImVec2 scene3dSize)
+  {
+    auto asSceneWithHud = dynamic_cast<IRenderableSceneWithHud*>(
+      _appContext._sceneWidget->getRenderableScene());
+    if (!asSceneWithHud)
+      return;
+    if (!asSceneWithHud->hudGui)
+      return;
+
+    static bool showHud = false;
+
+    ImVec2 hudButtonPosition(cursorScene3dTopLeft.x + 2.f, cursorScene3dTopLeft.y + 2.f);
+    ImVec2 hudWindowPosition(cursorScene3dTopLeft.x + 2.f, cursorScene3dTopLeft.y + 30.f);
+    ImVec2 hudWindowSize(scene3dSize.x / 2.f, scene3dSize.y / 2.f);
+
+    if (ButtonInOverlayWindow(ICON_FA_COG, hudButtonPosition, ImVec2(30.f, 30.f)))
+      showHud = !showHud;
+
+    if (showHud) {
+      ImGui::SetNextWindowPos(hudWindowPosition, ImGuiCond_Once);
+      ImGui::SetNextWindowSize(hudWindowSize, ImGuiCond_Once);
+      ImGui::SetNextWindowBgAlpha(0.5f);
+      ImGuiWindowFlags flags = 0;
+      ImGui::Begin("HUD (hudGui)", &showHud, flags);
+      asSceneWithHud->hudGui();
+      ImGui::End();
+    }
+  }
+
+  void render3d()
+  {
+    bool isInSandboxMode = (_appContext._viewState == ViewState::SandboxEditor);
+    ImVec2 sceneSize = isInSandboxMode ? getSceneSizeSmall() : getSceneSize();
+    ImVec2 cursorPosBeforeScene3d = ImGui::GetCursorPos();
+    _appContext._sceneWidget->render(sceneSize);
+    renderHud(cursorPosBeforeScene3d, sceneSize);
+  }
+
   void renderSandbox()
   {
+    ImGui::ShowDemoWindow();
     ImGui::BeginGroup();
     ImGui::Text("Sandbox : you can edit the code below!");
     ImGui::Text("As soon as you save it, the code will be compiled and the 3D scene will be updated");
-    _appContext._sceneWidget->render(getSceneSizeSmall());
-
-    // Render IRenderableSceneWithHud->hudGui when available
-    auto asSceneWithHud = dynamic_cast<IRenderableSceneWithHud*>(
-      _appContext._sceneWidget->getRenderableScene());
-    if ( (asSceneWithHud) && (asSceneWithHud->hudGui)) {
-      ImGui::SameLine();
-      if (ImGui::Button("Hud"))
-        ImGui::OpenPopup("Hud");
-      if (ImGui::BeginPopup("Hud")) {
-        asSceneWithHud->hudGui();
-        ImGui::EndPopup();
-      }
-    }
-
+    render3d();
     ImGui::EndGroup();
 
     if (_appContext._isCompiling) {
