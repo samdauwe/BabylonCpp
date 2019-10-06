@@ -2858,7 +2858,7 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
     mesh->morphTargetManager = scene->getMorphTargetManagerById(
       static_cast<unsigned>(morphTargetManagerId));
   }
-
+#if 0
   // Skeleton
   const auto parsedSkeletonId
     = json_util::get_number(parsedMesh, "skeletonId", -1);
@@ -2870,7 +2870,7 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
         = json_util::get_number(parsedMesh, "numBoneInfluencers", 0u);
     }
   }
-
+#endif
   // Animations
   if (json_util::has_valid_key_value(parsedMesh, "animations")) {
     for (const auto& parsedAnimation :
