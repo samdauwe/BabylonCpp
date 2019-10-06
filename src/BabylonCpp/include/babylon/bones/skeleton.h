@@ -77,7 +77,7 @@ public:
 
   /**
    * @brief Gets the list of transform matrices to send to shaders inside a
-   * texture (one matrix per bone)
+   * texture (one matrix per bone).
    * @param mesh defines the mesh to use to get the root matrix (if
    * needInitialSkinMatrix === true)
    * @returns a raw texture containing the data
@@ -253,17 +253,17 @@ protected:
 
   /**
    * @brief Gets a boolean indicating that bone matrices should be stored as a
-   * texture instead of using shader uniforms (default is true). Please note
-   * that this option is not available when needInitialSkinMatrix === true or if
-   * the hardware does not support it
+   * texture instead of using shader uniforms (default is true).
+   * Please note that this option is not available if the hardware does not
+   * support it
    */
   bool get_useTextureToStoreBoneMatrices() const;
 
   /**
    * @brief Sets a boolean indicating that bone matrices should be stored as a
-   * texture instead of using shader uniforms (default is true). Please note
-   * that this option is not available when needInitialSkinMatrix === true or if
-   * the hardware does not support it
+   * texture instead of using shader uniforms (default is true).
+   * Please note that this option is not available if the hardware does not
+   * support it
    */
   void set_useTextureToStoreBoneMatrices(bool value);
 
@@ -341,9 +341,9 @@ public:
 
   /**
    * Gets or sets a boolean indicating that bone matrices should be stored as a
-   * texture instead of using shader uniforms (default is true). Please note
-   * that this option is not available when needInitialSkinMatrix === true or if
-   * the hardware does not support it
+   * texture instead of using shader uniforms (default is true).
+   * Please note that this option is not available if the hardware does not
+   * support it
    */
   Property<Skeleton, bool> useTextureToStoreBoneMatrices;
 

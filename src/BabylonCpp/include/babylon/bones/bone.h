@@ -171,6 +171,11 @@ public:
   Bone& markAsDirty(const std::string& property = "") override;
 
   /**
+   * @brief Hidden
+   */
+  void _markAsDirtyAndCompose();
+
+  /**
    * @brief Copy an animation range from another bone.
    * @param source defines the source bone
    * @param rangeName defines the range name to copy
@@ -505,6 +510,12 @@ protected:
   /** Properties (matches AbstractMesh properties) **/
 
   /**
+   * @brief Gets the node used to drive the bone's transformation.
+   * @returns a transform node or null
+   */
+  TransformNodePtr& getTransformNode();
+
+  /**
    * @brief Gets current position (in local space).
    */
   Vector3& get_position();
@@ -552,7 +563,6 @@ protected:
 private:
   void _decompose();
   void _compose();
-  void _markAsDirtyAndCompose();
   void _markAsDirtyAndDecompose();
   void _rotateWithMatrix(const Matrix& rmat, Space space = Space::LOCAL,
                          AbstractMesh* mesh = nullptr);

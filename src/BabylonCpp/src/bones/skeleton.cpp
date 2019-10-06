@@ -109,8 +109,7 @@ void Skeleton ::set_animationPropertiesOverride(
 
 bool Skeleton::get_isUsingTextureForMatrices() const
 {
-  return useTextureToStoreBoneMatrices && _canUseTextureForBones
-         && !needInitialSkinMatrix;
+  return useTextureToStoreBoneMatrices && _canUseTextureForBones;
 }
 
 size_t Skeleton::get_uniqueId() const
@@ -409,9 +408,31 @@ void Skeleton::prepare()
             bone->_updateDifferenceMatrix(tmpMatrix);
           }
         }
+
+        if (isUsingTextureForMatrices()) {
+          const auto textureWidth = static_cast<int>((bones.size() + 1) * 4);
+          if (!mesh->_transformMatrixTexture
+              || mesh->_transformMatrixTexture->getSize().width
+                   != textureWidth) {
+
+            if (mesh->_transformMatrixTexture) {
+              mesh->_transformMatrixTexture->dispose();
+            }
+
+            mesh->_transformMatrixTexture = RawTexture::CreateRGBATexture(
+              mesh->_bonesTransformMatrices,
+              static_cast<int>((bones.size() + 1) * 4), 1, _scene, false, false,
+              Constants::TEXTURE_NEAREST_SAMPLINGMODE,
+              Constants::TEXTURETYPE_FLOAT);
+          }
+        }
       }
 
       _computeTransformMatrices(mesh->_bonesTransformMatrices, poseMatrix);
+
+      if (isUsingTextureForMatrices && mesh->_transformMatrixTexture) {
+        mesh->_transformMatrixTexture->update(mesh->_bonesTransformMatrices);
+      }
     }
   }
   else {

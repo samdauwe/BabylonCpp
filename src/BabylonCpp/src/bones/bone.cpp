@@ -180,6 +180,11 @@ void Bone::linkTransformNode(const TransformNodePtr& transformNode)
   }
 }
 
+TransformNodePtr& Bone::getTransformNode()
+{
+  return _linkedTransformNode;
+}
+
 Vector3& Bone::get_position()
 {
   _decompose();
@@ -256,6 +261,11 @@ void Bone::_decompose()
 void Bone::_compose()
 {
   if (!_needToCompose) {
+    return;
+  }
+
+  if (!_localScaling) {
+    _needToCompose = false;
     return;
   }
 
