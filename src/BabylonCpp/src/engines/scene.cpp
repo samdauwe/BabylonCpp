@@ -3048,12 +3048,13 @@ bool Scene::removeGeometry(Geometry* geometry)
     index = static_cast<size_t>(it - geometries.begin());
   }
 
+  std::string id = geometry->id;
   if (index != geometries.size() - 1) {
     auto lastGeometry = geometries.back();
     geometries[index] = lastGeometry;
     if (!geometriesById.empty()) {
       geometriesById[lastGeometry->id] = index;
-      geometriesById.erase(geometry->id);
+      geometriesById.erase(id);
     }
   }
 
