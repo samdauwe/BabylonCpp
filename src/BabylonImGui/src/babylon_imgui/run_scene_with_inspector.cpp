@@ -164,11 +164,8 @@ private:
     ImGui::SameLine();
 
     ImGui::BeginGroup();
-    ImGui::Text("%s", _appContext._sceneWidget->getRenderableScene()->getName());
-    ImGui::SameLine(0., 100.);
 
     ShowTabBarEnum(ViewStateLabels, &_appContext._viewState);
-
     ImGui::SameLine(0.f, 80.f);
     BABYLON::BabylonLogsWindow::instance().render();
     ImGui::SameLine();
@@ -178,7 +175,10 @@ private:
     ImGui::Separator();
 
     if (_appContext._viewState == ViewState::Scene3d)
+    {
+      ImGui::Text("%s", _appContext._sceneWidget->getRenderableScene()->getName());
       render3d();
+    }
     if (_appContext._viewState == ViewState::SamplesCodeViewer)
       _samplesCodeEditor.render();
     else if (_appContext._viewState == ViewState::SampleBrowser)
