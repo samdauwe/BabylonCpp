@@ -287,9 +287,13 @@ LensFlareSystemPtr AbstractScene::getLensFlareSystemByID(const std::string& id)
 
 int AbstractScene::removeReflectionProbe(const ReflectionProbePtr& toRemove)
 {
+  if (reflectionProbes.empty()) {
+    return -1;
+  }
+
   auto it
     = std::find(reflectionProbes.begin(), reflectionProbes.end(), toRemove);
-  int index = static_cast<int>(it - reflectionProbes.begin());
+  auto index = static_cast<int>(it - reflectionProbes.begin());
   if (it != reflectionProbes.end()) {
     reflectionProbes.erase(it);
   }
