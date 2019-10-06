@@ -265,8 +265,12 @@ private:
 
   void render3d()
   {
+#ifdef BABYLON_BUILD_SANDBOX
     bool isInSandboxMode = (_appContext._viewState == ViewState::SandboxEditor);
     ImVec2 sceneSize = isInSandboxMode ? getSceneSizeSmall() : getSceneSize();
+#else
+    ImVec2 sceneSize = getSceneSize();
+#endif
     ImVec2 cursorPosBeforeScene3d = ImGui::GetCursorPos();
     _appContext._sceneWidget->render(sceneSize);
     renderHud(cursorPosBeforeScene3d, sceneSize);
