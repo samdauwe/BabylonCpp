@@ -96,6 +96,13 @@ public:
   void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
 
   /**
+   * @brief Checks to see if a texture is used in the material.
+   * @param texture - Base texture to use.
+   * @returns - Boolean specifying if a texture is used in the material.
+   */
+  bool hasTexture(const BaseTexturePtr& texture) const override;
+
+  /**
    * @brief Dispose the material.
    * @param forceDisposeEffect Force disposal of the associated effect.
    * @param forceDisposeTextures Force disposal of the associated textures.

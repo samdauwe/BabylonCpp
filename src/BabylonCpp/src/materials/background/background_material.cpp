@@ -853,10 +853,6 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks,
                                               _maxSimultaneousLights);
 
-    if (defines.intDef["NUM_BONE_INFLUENCERS"] > 0) {
-      fallbacks->addCPUSkinningFallback(0, mesh);
-    }
-
     // Attributes
     std::vector<std::string> attribs{VertexBuffer::PositionKind};
 
@@ -1180,6 +1176,23 @@ void BackgroundMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
   _uniformBuffer->update();
 
   Material::_afterBind(mesh /*, _activeEffect*/);
+}
+
+bool BackgroundMaterial::hasTexture(const BaseTexturePtr& texture) const
+{
+  if (PushMaterial::hasTexture(texture)) {
+    return true;
+  }
+
+  if (_reflectionTexture == texture) {
+    return true;
+  }
+
+  if (_diffuseTexture == texture) {
+    return true;
+  }
+
+  return false;
 }
 
 void BackgroundMaterial::dispose(bool forceDisposeEffect,
