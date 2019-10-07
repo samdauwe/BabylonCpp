@@ -29,56 +29,29 @@ namespace Samples {
 SamplesIndex::SamplesIndex()
 {
   _samplesFailures = {
-  {"ColoredRibbonScene", SampleFailureReason::outOfBoundAccess},
-  {"CurvedHelixMeshesScene", SampleFailureReason::outOfBoundAccess},
-  {"ExtrusionScene", SampleFailureReason::outOfBoundAccess},
-  {"MirrorTextureScene", SampleFailureReason::readAccessViolation},
-
-  // Empty 3d
-  {"BlurModeForMirrorsScene", SampleFailureReason::empty3d},
-  {"BoneRotationInWorldSpaceScene", SampleFailureReason::empty3d},
-  {"BoxShadowScene", SampleFailureReason::empty3d},
-  {"BrickProceduralTextureScene", SampleFailureReason::empty3d},
-  {"BulbSelfShadowScene", SampleFailureReason::empty3d},
-  {"CloudProceduralTextureScene", SampleFailureReason::empty3d},
-  {"ConvolutionPostProcessScene", SampleFailureReason::empty3d},
-  {"CustomRenderTargetsScene", SampleFailureReason::empty3d},
-  {"DawnBringerScene", SampleFailureReason::empty3d},
-  {"FadeInOutScene", SampleFailureReason::empty3d},
-  {"FireProceduralTextureScene", SampleFailureReason::empty3d},
-  {"GrassProceduralTextureScene", SampleFailureReason::empty3d},
-  {"HeatWaveScene", SampleFailureReason::empty3d},
-  {"HighlightLayerScene", SampleFailureReason::empty3d},
-  {"ImportDudeScene", SampleFailureReason::empty3d},
-  {"ImportDummy3Scene", SampleFailureReason::empty3d},
-  {"ImportRabbitScene", SampleFailureReason::empty3d},
-  {"KernelBasedBlurScene", SampleFailureReason::empty3d},
-  {"MarbleProceduralTextureScene", SampleFailureReason::empty3d},
-  {"MirrorsScene", SampleFailureReason::empty3d},
-  {"MultiSampleRenderTargetsScene", SampleFailureReason::empty3d},
-  {"PBRMaterialScene", SampleFailureReason::empty3d},
-  {"PBRMetallicRoughnessMaterialScene", SampleFailureReason::empty3d},
-  {"PBRReflectionScene", SampleFailureReason::empty3d},
-  {"PerlinNoiseProceduralTextureScene", SampleFailureReason::empty3d},
-  {"PortalsScene", SampleFailureReason::empty3d},
-  {"ProceduralTexturesScene", SampleFailureReason::empty3d},
-  {"RealtimeRefractionScene", SampleFailureReason::empty3d},
-  {"RenderTargetTextureScene", SampleFailureReason::empty3d},
-  {"RGBShiftGlitchScene", SampleFailureReason::empty3d},
-  {"RoadProceduralTextureScene", SampleFailureReason::empty3d},
-  {"ShaderMaterialWarpSpeedScene", SampleFailureReason::empty3d},
-  {"ShadowsScene", SampleFailureReason::empty3d},
-  {"SimplePostProcessRenderPipelineScene", SampleFailureReason::empty3d},
-  {"StarfieldProceduralTextureScene", SampleFailureReason::empty3d},
-  {"WaterMaterialScene", SampleFailureReason::empty3d},
-  {"WoodProceduralTextureScene", SampleFailureReason::empty3d},
-
-  {"MorphTargetsScene", SampleFailureReason::incomplete3d},
-  {"PBRMaterialCheckerORMScene", SampleFailureReason::incomplete3d},
-  {"PBRMaterialORMWoodScene", SampleFailureReason::incomplete3d},
-  {"PBRMetallicRoughnessGoldMaterialScene", SampleFailureReason::incomplete3d},
-  {"PBRMetallicRoughnessTextureMaterialScene", SampleFailureReason::incomplete3d},
-
+    {"BlurModeForMirrorsScene", SampleFailureReason::empty3d},
+    {"BoneRotationInWorldSpaceScene", SampleFailureReason::broken},
+    {"BulbSelfShadowScene", SampleFailureReason::empty3d},
+    {"ColoredRibbonScene", SampleFailureReason::outOfBoundAccess},
+    {"CurvedHelixMeshesScene", SampleFailureReason::outOfBoundAccess},
+    {"ExtrusionScene", SampleFailureReason::outOfBoundAccess},
+    {"HighlightLayerScene", SampleFailureReason::incomplete3d},
+    {"ImportDudeScene", SampleFailureReason::broken},
+    {"ImportDummy3Scene", SampleFailureReason::broken},
+    {"ImportRabbitScene", SampleFailureReason::broken},
+    {"KernelBasedBlurScene", SampleFailureReason::empty3d},
+    {"LinesMeshSpiralScene", SampleFailureReason::empty3d},
+    {"MorphTargetsScene", SampleFailureReason::broken},
+    {"MultiSampleRenderTargetsScene", SampleFailureReason::empty3d},
+    {"PBRMaterialCheckerORMScene", SampleFailureReason::broken},
+    {"PBRMaterialScene", SampleFailureReason::broken},
+    {"PBRMetallicRoughnessGoldMaterialScene", SampleFailureReason::broken},
+    {"PBRMetallicRoughnessMaterialScene", SampleFailureReason::outOfBoundAccess},
+    {"PBRMetallicRoughnessTextureMaterialScene", SampleFailureReason::broken},
+    {"PBRReflectionScene", SampleFailureReason::empty3d},
+    {"ShaderMaterialWarpSpeedScene", SampleFailureReason::empty3d},
+    {"SimplePostProcessRenderPipelineScene", SampleFailureReason::empty3d},
+    {"WaterMaterialScene", SampleFailureReason::incomplete3d},
   };
 
   // Initialize the samples index
@@ -325,6 +298,9 @@ std::string SampleFailureReason_Str(SampleFailureReason s)
       break;
     case SampleFailureReason::incomplete3d:
       return "Incomplete 3d (black textures and co)";
+      break;
+    case SampleFailureReason::broken:
+      return "Broken (bad rendering and/or bad behavior)";
       break;
     default:
       throw "Unhandled enum!";
