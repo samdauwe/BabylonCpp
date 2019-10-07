@@ -2172,9 +2172,15 @@ void Scene::_animate()
   const auto& animationTime = _animationTime;
   _animationTimeLast        = now;
 
-  for (const auto& animatable : animatables) {
+  for (size_t index = 0; index < animatables.size(); ++index) {
+
+    const auto& animatable = animatables[index];
+
     if (animatable) {
-      animatable->_animate(std::chrono::milliseconds(animationTime));
+      if (!animatable->_animate(std::chrono::milliseconds(animationTime))
+          && animatable->disposeOnEnd) {
+        index--; // Array was updated
+      }
     }
   }
 

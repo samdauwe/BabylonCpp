@@ -375,6 +375,11 @@ AnimationGroupPtr AnimationGroup::clone(
   return newGroup;
 }
 
+json AnimationGroup::serialize() const
+{
+  return nullptr;
+}
+
 AnimationGroupPtr AnimationGroup::Parse(const json& /*parsedAnimationGroup*/,
                                         Scene* /*scene*/)
 {

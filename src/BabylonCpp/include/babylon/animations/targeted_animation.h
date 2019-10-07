@@ -1,9 +1,13 @@
 #ifndef BABYLON_ANIMATIONS_TARGETED_ANIMATION_H
 #define BABYLON_ANIMATIONS_TARGETED_ANIMATION_H
 
+#include <nlohmann/json_fwd.hpp>
+
 #include <memory>
 
 #include <babylon/babylon_api.h>
+
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -25,6 +29,12 @@ struct BABYLON_SHARED_EXPORT TargetedAnimation {
    * Target to animate
    */
   IAnimatablePtr target = nullptr;
+
+  /**
+   * @brief Serialize the object.
+   * @returns the JSON object representing the current entity
+   */
+  json serialize() const;
 }; // end of struct TargetedAnimation
 
 } // end of namespace BABYLON

@@ -33,7 +33,7 @@ public:
 
 public:
   EasingFunction();
-  virtual ~EasingFunction();
+  virtual ~EasingFunction() override;
 
   /**
    * @brief Sets the easing mode of the current function.
@@ -55,7 +55,7 @@ public:
 
   /**
    * @brief Given an input gradient between 0 and 1, this returns the
-   * corrseponding value of the easing function.
+   * corresponding value of the easing function.
    * @param gradient Defines the value between 0 and 1 we want the easing value
    * for
    * @returns the corresponding value on the curve defined by the easing

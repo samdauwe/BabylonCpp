@@ -38,7 +38,7 @@ public:
 
     return animationGroup;
   }
-  virtual ~AnimationGroup();
+  virtual ~AnimationGroup() override;
 
   void addToScene(const AnimationGroupPtr& newAnimationGroup);
 
@@ -151,6 +151,12 @@ public:
         const std::function<IAnimatablePtr(const IAnimatablePtr& animatible)>&
           targetConverter
         = nullptr);
+
+  /**
+   * @brief Serializes the animationGroup to an object.
+   * @returns Serialized object
+   */
+  json serialize() const;
 
   // Statics
 

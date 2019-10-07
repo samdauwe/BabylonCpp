@@ -276,6 +276,17 @@ void RuntimeAnimation::goToFrame(float frame)
     frame = keys.back().frame;
   }
 
+  // Need to reset animation events
+  auto& events = _events;
+  if (!events.empty()) {
+    for (size_t index = 0; index < events.size(); index++) {
+      if (!events[index].onlyOnce) {
+        // reset events in the future
+        events[index].isDone = events[index].frame < frame;
+      }
+    }
+  }
+
   _currentFrame      = frame;
   auto iCurrentValue = _animation->_interpolate(frame, _animationState);
 
