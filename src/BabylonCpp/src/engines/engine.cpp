@@ -1115,10 +1115,24 @@ void Engine::bindFramebuffer(const InternalTexturePtr& texture,
 
 void Engine::bindUnboundFramebuffer(const GL::IGLFramebufferPtr& framebuffer)
 {
-  if (_currentFramebuffer != framebuffer) {
-    _gl->bindFramebuffer(GL::FRAMEBUFFER, framebuffer.get());
-    _currentFramebuffer = framebuffer;
+  if (_currentFramebuffer == framebuffer)
+    return;
+
+  std::shared_ptr<GL::IGLFramebuffer> realFrameBuffer;
+  if (framebuffer) {
+    realFrameBuffer = framebuffer;
+    auto previousId = _gl->getParameteri(GL::FRAMEBUFFER_BINDING);
+    _previousFrameBuffer = std::make_unique<GL::IGLFramebuffer>(previousId);
   }
+  else {
+    if (_previousFrameBuffer) {
+      realFrameBuffer = std::move(_previousFrameBuffer);
+      _previousFrameBuffer.reset();
+    }
+  }
+
+  _gl->bindFramebuffer(GL::FRAMEBUFFER, realFrameBuffer.get());
+  _currentFramebuffer = framebuffer;
 }
 
 void Engine::unBindFramebuffer(const InternalTexturePtr& texture,
