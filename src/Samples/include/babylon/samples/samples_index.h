@@ -23,7 +23,8 @@ enum class SampleFailureReason {
   vectorIteratorInvalid,
   readAccessViolation,
   empty3d,
-  incomplete3d
+  incomplete3d,
+  broken
 };
 std::string BABYLON_SHARED_EXPORT SampleFailureReason_Str(SampleFailureReason s);
 

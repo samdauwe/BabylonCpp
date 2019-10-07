@@ -2800,6 +2800,9 @@ protected:
    * Hidden
    */
   std::shared_ptr<GL::IGLFramebuffer> _currentFramebuffer;
+  // _previousFrameBuffer : stores the previous frameBuffer 
+  // during calls to bindFrameBuffer(), so that unBindFrameBuffer can restore it
+  std::unique_ptr <GL::IGLFramebuffer> _previousFrameBuffer;
 
 private:
   // WebVR
