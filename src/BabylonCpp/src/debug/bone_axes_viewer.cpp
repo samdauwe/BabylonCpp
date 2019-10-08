@@ -29,6 +29,7 @@ void BoneAxesViewer::update()
     return;
   }
 
+  bone->_markAsDirtyAndCompose();
   bone->getAbsolutePositionToRef(mesh, pos);
   bone->getDirectionToRef(Axis::X(), xaxis, mesh);
   bone->getDirectionToRef(Axis::Y(), yaxis, mesh);
