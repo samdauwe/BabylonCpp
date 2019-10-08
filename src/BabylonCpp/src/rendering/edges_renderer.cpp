@@ -100,7 +100,9 @@ void EdgesRenderer::dispose(bool /*doNotRecurse*/,
 
   _buffers.clear();
 
-  _source->getScene()->getEngine()->_releaseBuffer(_ib.get());
+  if (_ib) {
+    _source->getScene()->getEngine()->_releaseBuffer(_ib.get());
+  }
   _lineShader->dispose();
 }
 

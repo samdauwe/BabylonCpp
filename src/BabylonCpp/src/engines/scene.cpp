@@ -4043,7 +4043,8 @@ void Scene::set_headphone(const std::optional<bool>& value)
   }
 }
 
-DepthRendererPtr Scene::enableDepthRenderer(const CameraPtr& camera)
+DepthRendererPtr Scene::enableDepthRenderer(const CameraPtr& camera,
+                                            bool storeNonLinearDepth)
 {
   auto _camera = camera ? camera : _activeCamera;
   if (!_camera) {
@@ -4059,11 +4060,10 @@ DepthRendererPtr Scene::enableDepthRenderer(const CameraPtr& camera)
       textureType = Constants::TEXTURETYPE_FLOAT;
     }
     else {
-      throw std::runtime_error(
-        "Depth renderer does not support int texture type");
+      textureType = Constants::TEXTURETYPE_UNSIGNED_BYTE;
     }
-    _depthRenderer[_camera->id]
-      = std::make_shared<DepthRenderer>(this, textureType, _camera);
+    _depthRenderer[_camera->id] = std::make_shared<DepthRenderer>(
+      this, textureType, _camera, storeNonLinearDepth);
   }
 
   return _depthRenderer[_camera->id];

@@ -9,24 +9,36 @@
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material.h>
+#include <babylon/materials/material_helper.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/math/color4.h>
 #include <babylon/meshes/_instances_batch.h>
+#include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
+#include <babylon/morph/morph_target_manager.h>
 #include <babylon/rendering/depth_renderer.h>
 #include <babylon/rendering/depth_renderer_scene_component.h>
 
 namespace BABYLON {
 
 DepthRenderer::DepthRenderer(Scene* scene, unsigned int type,
-                             const CameraPtr& camera)
-    : useOnlyInActiveCamera{false}
-    , _scene{scene}
+                             const CameraPtr& camera, bool storeNonLinearDepth)
+    : isPacked{type == Constants::TEXTURETYPE_UNSIGNED_BYTE}
+    , useOnlyInActiveCamera{false}
     , _depthMap{nullptr}
     , _effect{nullptr}
 {
+  _scene               = scene;
+  _storeNonLinearDepth = storeNonLinearDepth;
+  if (isPacked) {
+    _clearColor = Color4(1.f, 1.f, 1.f, 1.f);
+  }
+  else {
+    _clearColor = Color4(1.f, 0.f, 0.f, 1.f);
+  }
+
   // Register the G Buffer component to the scene.
   auto component = std::static_pointer_cast<DepthRendererSceneComponent>(
     scene->_getComponent(SceneComponentConstants::NAME_DEPTHRENDERER));
@@ -39,9 +51,13 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type,
   auto engine = scene->getEngine();
 
   // Render target
+  const auto format = (isPacked || engine->webGLVersion() == 1.f) ?
+                        Constants::TEXTUREFORMAT_RGBA :
+                        Constants::TEXTUREFORMAT_R;
   _depthMap = RenderTargetTexture::New(
     "depthMap", ISize{engine->getRenderWidth(), engine->getRenderHeight()},
-    _scene, false, true, type);
+    _scene, false, true, type, false, TextureConstants::TRILINEAR_SAMPLINGMODE,
+    true, false, false, format);
   _depthMap->wrapU           = TextureConstants::CLAMP_ADDRESSMODE;
   _depthMap->wrapV           = TextureConstants::CLAMP_ADDRESSMODE;
   _depthMap->refreshRate     = 1;
@@ -54,8 +70,8 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type,
   _depthMap->useCameraPostProcesses = false;
 
   // set default depth value to 1.0 (far away)
-  _depthMap->onClearObservable.add([](Engine* _engine, EventState&) {
-    _engine->clear(Color4(1.f, 1.f, 1.f, 1.f), true, true);
+  _depthMap->onClearObservable.add([this](Engine* _engine, EventState&) {
+    _engine->clear(_clearColor, true, true);
   });
 
   // Custom render function
@@ -64,6 +80,8 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type,
     auto scene    = _scene;
     auto engine   = scene->getEngine();
     auto material = subMesh->getMaterial();
+
+    mesh->_internalAbstractMeshDataInfo._isActiveIntermediate = false;
 
     if (!material) {
       return;
@@ -111,6 +129,9 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type,
         _effect->setMatrices(
           "mBones", mesh->skeleton()->getTransformMatrices(mesh.get()));
       }
+
+      // Morph targets
+      MaterialHelper::BindMorphTargetParameters(mesh.get(), _effect);
 
       // Draw
       mesh->_processRendering(subMesh, _effect, Material::TriangleFillMode,
@@ -197,13 +218,37 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
     defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
   }
 
+  // Morph targets
+  auto morphTargetManager
+    = std::static_pointer_cast<Mesh>(mesh)->morphTargetManager();
+  auto numMorphInfluencers = 0ull;
+  if (morphTargetManager) {
+    if (morphTargetManager->numInfluencers > 0) {
+      numMorphInfluencers = morphTargetManager->numInfluencers();
+
+      defines.emplace_back("#define MORPHTARGETS");
+      defines.emplace_back("#define NUM_MORPH_INFLUENCERS "
+                           + std::to_string(numMorphInfluencers));
+
+      MaterialHelper::PrepareAttributesForMorphTargetsInfluencers(
+        attribs, mesh.get(), static_cast<unsigned>(numMorphInfluencers));
+    }
+  }
+
   // Instances
   if (useInstances) {
     defines.emplace_back("#define INSTANCES");
-    attribs.emplace_back(VertexBuffer::World0Kind);
-    attribs.emplace_back(VertexBuffer::World1Kind);
-    attribs.emplace_back(VertexBuffer::World2Kind);
-    attribs.emplace_back(VertexBuffer::World3Kind);
+    MaterialHelper::PushAttributesForInstances(attribs);
+  }
+
+  // None linear depth
+  if (_storeNonLinearDepth) {
+    defines.emplace_back("#define NONLINEARDEPTH");
+  }
+
+  // Float Mode
+  if (isPacked) {
+    defines.emplace_back("#define PACKED");
   }
 
   // Get correct effect
@@ -214,9 +259,12 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
     EffectCreationOptions options;
     options.attributes = std::move(attribs);
     options.uniformsNames
-      = {"world", "mBones", "viewProjection", "diffuseMatrix", "depthValues"};
+      = {"world",         "mBones",      "viewProjection",
+         "diffuseMatrix", "depthValues", "morphTargetInfluences"};
     options.samplers = {"diffuseSampler"};
     options.defines  = std::move(join);
+    options.indexParameters
+      = {{"maxSimultaneousMorphTargets", numMorphInfluencers}};
 
     _effect = _scene->getEngine()->createEffect("depth", options,
                                                 _scene->getEngine());

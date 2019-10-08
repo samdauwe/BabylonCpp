@@ -3,6 +3,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/engines/constants.h>
+#include <babylon/math/color4.h>
 #include <babylon/math/matrix.h>
 
 namespace BABYLON {
@@ -31,9 +32,12 @@ public:
    * Engine.TEXTURETYPE_FLOAT)
    * @param camera The camera to be used to render the depth map (default:
    * scene's active camera)
+   * @param storeNonLinearDepth Defines whether the depth is stored linearly
+   * like in Babylon Shadows or directly like glFragCoord.z
    */
   DepthRenderer(Scene* scene, unsigned int type = Constants::TEXTURETYPE_FLOAT,
-                const CameraPtr& camera = nullptr);
+                const CameraPtr& camera  = nullptr,
+                bool storeNonLinearDepth = false);
   virtual ~DepthRenderer();
 
   /**
@@ -58,6 +62,11 @@ public:
 
 public:
   /**
+   * Get if the depth renderer is using packed depth or not
+   */
+  const bool isPacked;
+
+  /**
    * Specifies that the depth renderer will only be used within
    * the camera it is created for.
    * This can help forcing its rendering during the camera processing.
@@ -68,6 +77,9 @@ private:
   Scene* _scene;
   RenderTargetTexturePtr _depthMap;
   EffectPtr _effect;
+  bool _storeNonLinearDepth;
+  Color4 _clearColor;
+
   std::string _cachedDefines;
   CameraPtr _camera;
 

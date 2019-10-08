@@ -1286,9 +1286,12 @@ public:
    * which can be used for post processing.
    * @param camera The camera to create the depth renderer on (default: scene's
    * active camera)
+   * @param storeNonLinearDepth Defines whether the depth is stored linearly
+   * like in Babylon Shadows or directly like glFragCoord.z
    * @returns the created depth renderer
    */
-  DepthRendererPtr enableDepthRenderer(const CameraPtr& camera = nullptr);
+  DepthRendererPtr enableDepthRenderer(const CameraPtr& camera  = nullptr,
+                                       bool storeNonLinearDepth = false);
 
   /**
    * @brief Disables a depth renderer for a given camera.
