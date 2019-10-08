@@ -120,6 +120,12 @@ public:
   int cellIndex;
 
   /**
+   * Gets or sets the cell reference in the sprite sheet, uses sprite's filename
+   * when added to sprite sheet
+   */
+  std::string cellRef;
+
+  /**
    * Gets or sets a boolean indicating if UV coordinates should be inverted in U
    * axis
    */
