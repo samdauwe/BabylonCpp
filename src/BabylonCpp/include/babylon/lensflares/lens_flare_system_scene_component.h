@@ -41,7 +41,7 @@ public:
     return std::shared_ptr<LensFlareSystemSceneComponent>(
       new LensFlareSystemSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~LensFlareSystemSceneComponent();
+  virtual ~LensFlareSystemSceneComponent() override;
 
   /**
    * @brief Registers the component in a given scene.
@@ -55,7 +55,7 @@ public:
   void rebuild() override;
 
   /**
-   * @brief Adds all the element from the container to the scene.
+   * @brief Adds all the elements from the container to the scene.
    * @param container the container holding the elements
    */
   void addFromContainer(AbstractScene* container);

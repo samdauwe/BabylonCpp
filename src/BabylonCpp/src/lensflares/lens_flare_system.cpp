@@ -288,7 +288,11 @@ bool LensFlareSystem::render()
   engine->bindBuffers(_vertexBuffers, _indexBuffer.get(), _effect);
 
   // Flares
-  for (auto& flare : lensFlares) {
+  for (const auto& flare : lensFlares) {
+    if (flare->texture && !flare->texture->isReady()) {
+      continue;
+    }
+
     engine->setAlphaMode(flare->alphaMode);
 
     auto x = centerX - (distX * flare->position);
@@ -341,7 +345,7 @@ void LensFlareSystem::dispose()
     _indexBuffer = nullptr;
   }
 
-  for (auto& lensFlare : lensFlares) {
+  for (const auto& lensFlare : lensFlares) {
     lensFlare->dispose();
   }
 
@@ -377,7 +381,7 @@ LensFlareSystemPtr LensFlareSystem::Parse(const json& /*parsedLensFlareSystem*/,
   lensFlareSystem->borderLimit
     = Json::GetNumber(parsedLensFlareSystem, "borderLimit", 300);
 
-  for (auto& parsedFlare : Json::GetArray(parsedLensFlareSystem, "flares")) {
+  for (const auto& parsedFlare : Json::GetArray(parsedLensFlareSystem, "flares")) {
     LensFlare::New(
       Json::GetNumber<float>(parsedFlare, "size", 0.f),
       Vector3::FromArray(Json::ToArray<float>(parsedFlare, "position")),
