@@ -18,9 +18,13 @@ PhotoDome::PhotoDome(
     : TransformNode{iName, scene}
     , photoTexture{this, &PhotoDome::get_photoTexture,
                    &PhotoDome::set_photoTexture}
+    , mesh{this, &PhotoDome::get_mesh}
     , fovMultiplier{this, &PhotoDome::get_fovMultiplier,
                     &PhotoDome::set_fovMultiplier}
+    , imageMode{this, &PhotoDome::get_imageMode, &PhotoDome::set_imageMode}
     , _useDirectMapping{false}
+    , _imageMode{PhotoDome::MODE_MONOSCOPIC}
+    , _onBeforeCameraRenderObserver{nullptr}
 {
   // set defaults and manage values
   name = !iName.empty() ? iName : "photoDome";
@@ -109,6 +113,11 @@ void PhotoDome::set_photoTexture(const TexturePtr& value)
   }
 }
 
+MeshPtr& PhotoDome::get_mesh()
+{
+  return _mesh;
+}
+
 float PhotoDome::get_fovMultiplier() const
 {
   return _material->fovMultiplier();
@@ -119,6 +128,47 @@ void PhotoDome::set_fovMultiplier(float value)
   _material->fovMultiplier = value;
 }
 
+unsigned int PhotoDome::get_imageMode() const
+{
+  return _imageMode;
+}
+
+void PhotoDome::set_imageMode(unsigned int value)
+{
+  if (_imageMode == value) {
+    return;
+  }
+
+  _changeImageMode(value);
+}
+
+void PhotoDome::_changeImageMode(unsigned int value)
+{
+  _scene->onBeforeCameraRenderObservable.remove(_onBeforeCameraRenderObserver);
+  _imageMode = value;
+
+  // Default Setup and Reset.
+  _photoTexture->uScale  = 1.f;
+  _photoTexture->vScale  = 1.f;
+  _photoTexture->uOffset = 0.f;
+  _photoTexture->vOffset = 0.f;
+
+  if (value == PhotoDome::MODE_SIDEBYSIDE) {
+    _photoTexture->uScale         = 0.5f;
+    _onBeforeCameraRenderObserver = _scene->onBeforeCameraRenderObservable.add(
+      [this](Camera* camera, EventState & /*es*/) -> void {
+        _photoTexture->uOffset = camera->isRightCamera ? 0.5f : 0.f;
+      });
+  }
+  else if (value == PhotoDome::MODE_TOPBOTTOM) {
+    _photoTexture->vScale         = 0.5f;
+    _onBeforeCameraRenderObserver = _scene->onBeforeCameraRenderObservable.add(
+      [this](Camera* camera, EventState & /*es*/) -> void {
+        _photoTexture->vOffset = camera->isRightCamera ? 0.5f : 0.f;
+      });
+  }
+}
+
 void PhotoDome::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
   _photoTexture->dispose();
@@ -126,6 +176,8 @@ void PhotoDome::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   _material->dispose();
 
   onLoadErrorObservable.clear();
+
+  _scene->onBeforeCameraRenderObservable.remove(_onBeforeCameraRenderObserver);
 
   TransformNode::dispose(doNotRecurse, disposeMaterialAndTextures);
 }

@@ -27,6 +27,20 @@ using TexturePtr            = std::shared_ptr<Texture>;
 class BABYLON_SHARED_EXPORT PhotoDome : public TransformNode {
 
 public:
+  /**
+   * Define the image as a Monoscopic panoramic 360 image.
+   */
+  static constexpr unsigned int MODE_MONOSCOPIC = 0;
+  /**
+   * Define the image as a Stereoscopic TopBottom/OverUnder panoramic 360 image.
+   */
+  static constexpr unsigned int MODE_TOPBOTTOM = 1;
+  /**
+   * Define the image as a Stereoscopic Side by Side panoramic 360 image.
+   */
+  static constexpr unsigned int MODE_SIDEBYSIDE = 2;
+
+public:
   template <typename... Ts>
   static PhotoDomePtr New(Ts&&... args)
   {
@@ -76,6 +90,11 @@ protected:
   void set_photoTexture(const TexturePtr& value);
 
   /**
+   * @brief Gets the mesh used for the skybox.
+   */
+  MeshPtr& get_mesh();
+
+  /**
    * @brief Gets the current fov(field of view) multiplier, 0.0 - 2.0. Defaults
    * to 1.0. Lower values "zoom in" and higher values "zoom out". Also see the
    * options.resolution property.
@@ -89,6 +108,31 @@ protected:
    */
   void set_fovMultiplier(float value);
 
+  /**
+   * @brief Gets the current video mode for the video. It can be:
+   * * PhotoDome.MODE_MONOSCOPIC : Define the image as a Monoscopic panoramic
+   * 360 image.
+   * * PhotoDome.MODE_TOPBOTTOM  : Define the image as a Stereoscopic
+   * TopBottom/OverUnder panoramic 360 image.
+   * * PhotoDome.MODE_SIDEBYSIDE : Define the image as a Stereoscopic Side by
+   * Side panoramic 360 image.
+   */
+  unsigned int get_imageMode() const;
+
+  /**
+   * @brief Sets the current video mode for the video. It can be:
+   * * PhotoDome.MODE_MONOSCOPIC : Define the image as a Monoscopic panoramic
+   * 360 image.
+   * * PhotoDome.MODE_TOPBOTTOM  : Define the image as a Stereoscopic
+   * TopBottom/OverUnder panoramic 360 image.
+   * * PhotoDome.MODE_SIDEBYSIDE : Define the image as a Stereoscopic Side by
+   * Side panoramic 360 image.
+   */
+  void set_imageMode(unsigned int value);
+
+private:
+  void _changeImageMode(unsigned int value);
+
 public:
   /**
    * Gets or sets the texture being displayed on the sphere
@@ -101,11 +145,27 @@ public:
   Observable<std::string> onLoadErrorObservable;
 
   /**
+   * Gets the mesh used for the skybox
+   */
+  ReadOnlyProperty<PhotoDome, MeshPtr> mesh;
+
+  /**
    * The current fov(field of view) multiplier, 0.0 - 2.0. Defaults to 1.0.
    * Lower values "zoom in" and higher values "zoom out". Also see the
    * options.resolution property.
    */
   Property<PhotoDome, float> fovMultiplier;
+
+  /**
+   * Gets or sets the current video mode for the video. It can be:
+   * * PhotoDome.MODE_MONOSCOPIC : Define the image as a Monoscopic panoramic
+   * 360 image.
+   * * PhotoDome.MODE_TOPBOTTOM  : Define the image as a Stereoscopic
+   * TopBottom/OverUnder panoramic 360 image.
+   * * PhotoDome.MODE_SIDEBYSIDE : Define the image as a Stereoscopic Side by
+   * Side panoramic 360 image.
+   */
+  Property<PhotoDome, unsigned int> imageMode;
 
 protected:
   /**
@@ -125,6 +185,8 @@ protected:
 
 private:
   bool _useDirectMapping;
+  unsigned int _imageMode;
+  Observer<Camera>::Ptr _onBeforeCameraRenderObserver;
 
 }; // end of class PhotoDome
 
