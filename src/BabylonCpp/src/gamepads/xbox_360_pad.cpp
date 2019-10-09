@@ -317,16 +317,16 @@ void Xbox360Pad::update()
     buttonY          = browserGamepad->buttons[3].value;
     buttonLB         = browserGamepad->buttons[4].value;
     buttonRB         = browserGamepad->buttons[5].value;
-    leftTrigger      = browserGamepad->axes[2];
-    rightTrigger     = browserGamepad->axes[5];
-    buttonBack       = browserGamepad->buttons[9].value;
-    buttonStart      = browserGamepad->buttons[8].value;
-    buttonLeftStick  = browserGamepad->buttons[6].value;
-    buttonRightStick = browserGamepad->buttons[7].value;
-    dPadUp           = browserGamepad->buttons[11].value;
-    dPadDown         = browserGamepad->buttons[12].value;
-    dPadLeft         = browserGamepad->buttons[13].value;
-    dPadRight        = browserGamepad->buttons[14].value;
+    leftTrigger      = browserGamepad->buttons[6].value;
+    rightTrigger     = browserGamepad->buttons[7].value;
+    buttonBack       = browserGamepad->buttons[8].value;
+    buttonStart      = browserGamepad->buttons[9].value;
+    buttonLeftStick  = browserGamepad->buttons[10].value;
+    buttonRightStick = browserGamepad->buttons[11].value;
+    dPadUp           = browserGamepad->buttons[12].value;
+    dPadDown         = browserGamepad->buttons[13].value;
+    dPadLeft         = browserGamepad->buttons[14].value;
+    dPadRight        = browserGamepad->buttons[15].value;
   }
   else {
     buttonA          = browserGamepad->buttons[0].value;
