@@ -28,8 +28,7 @@ struct BABYLON_SHARED_EXPORT ParticleHelper {
   /**
    * Gets or sets base Assets URL
    */
-  static constexpr const char* BaseAssetsUrl
-    = Constants::PARTICLES_BaseAssetsUrl;
+  static const char* BaseAssetsUrl;
 
   /**
    * @brief Create a default particle system that you can tweak.

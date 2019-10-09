@@ -406,8 +406,7 @@ struct BABYLON_SHARED_EXPORT Constants {
   /**
    * Gets or sets base Assets URL
    */
-  static constexpr const char* PARTICLES_BaseAssetsUrl
-    = "https://assets.babylonjs.com/particles";
+  static const char* PARTICLES_BaseAssetsUrl;
 
   /** Default culling strategy : this is an exclusion test and it's the more
    * accurate. Test order : Is the bounding sphere outside the frustum ? If not,

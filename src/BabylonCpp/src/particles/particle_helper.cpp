@@ -9,7 +9,7 @@
 
 namespace BABYLON {
 
-constexpr const char* ParticleHelper::BaseAssetsUrl;
+const char* ParticleHelper::BaseAssetsUrl = Constants::PARTICLES_BaseAssetsUrl;
 
 IParticleSystem* ParticleHelper::CreateDefault(
   const std::variant<AbstractMeshPtr, Vector3>& emitter, size_t capacity,
