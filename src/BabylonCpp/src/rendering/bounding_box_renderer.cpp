@@ -19,6 +19,7 @@ BoundingBoxRenderer::BoundingBoxRenderer(Scene* iScene)
     , showBackLines{true}
     , _colorShader{nullptr}
     , _indexBuffer{nullptr}
+    , _fillIndexBuffer{nullptr}
 {
   scene = iScene;
   renderList.reserve(32);
@@ -97,6 +98,7 @@ void BoundingBoxRenderer::_prepareResources()
   _vertexBuffers[VertexBuffer::PositionKind] = std::make_shared<VertexBuffer>(
     engine, boxdata->positions, VertexBuffer::PositionKind, false);
   _createIndexBuffer();
+  _fillIndexData = boxdata->indices;
 }
 
 void BoundingBoxRenderer::_createIndexBuffer()
@@ -190,6 +192,10 @@ void BoundingBoxRenderer::renderOcclusionBoundingBox(AbstractMesh* mesh)
   }
 
   auto engine = scene->getEngine();
+  if (!_fillIndexBuffer) {
+    _fillIndexBuffer = engine->createIndexBuffer(_fillIndexData);
+  }
+
   engine->setDepthWrite(false);
   engine->setColorWrite(false);
   _colorShader->_preBind();
@@ -205,14 +211,14 @@ void BoundingBoxRenderer::renderOcclusionBoundingBox(AbstractMesh* mesh)
         .multiply(Matrix::Translation(median.x, median.y, median.z))
         .multiply(boundingBox.getWorldMatrix());
 
-  engine->bindBuffers(_vertexBuffers, _indexBuffer.get(),
+  engine->bindBuffers(_vertexBuffers, _fillIndexBuffer.get(),
                       _colorShader->getEffect());
 
   engine->setDepthFunctionToLess();
   scene->resetCachedMaterial();
   _colorShader->bind(worldMatrix);
 
-  engine->drawElementsType(Material::LineListDrawMode, 0, 24);
+  engine->drawElementsType(Material::TriangleFillMode, 0, 36);
 
   _colorShader->unbind();
   engine->setDepthFunctionToLessOrEqual();
@@ -240,6 +246,11 @@ void BoundingBoxRenderer::dispose()
   }
 
   scene->getEngine()->_releaseBuffer(_indexBuffer.get());
+
+  if (_fillIndexBuffer) {
+    scene->getEngine()->_releaseBuffer(_fillIndexBuffer.get());
+    _fillIndexBuffer = nullptr;
+  }
 }
 
 } // end of namespace BABYLON

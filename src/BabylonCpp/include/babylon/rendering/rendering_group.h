@@ -6,6 +6,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/math/vector3.h>
 
 namespace BABYLON {
 
@@ -158,10 +159,11 @@ private:
    * @param camera The camera to use to preprocess the submeshes to help sorting
    * @param transparent Specifies to activate blending if true
    */
-  static void renderSorted(
-    const std::vector<SubMesh*>& subMeshes,
-    const std::function<bool(const SubMesh* a, const SubMesh* b)>& sortCompareFn,
-    const CameraPtr& camera, bool transparent);
+  static void
+  renderSorted(const std::vector<SubMesh*>& subMeshes,
+               const std::function<bool(const SubMesh* a, const SubMesh* b)>&
+                 sortCompareFn,
+               const CameraPtr& camera, bool transparent);
 
   /**
    * @brief Renders the submeshes in the order they were dispatched (no sort
@@ -224,6 +226,7 @@ public:
     transparentSortCompareFn;
 
 private:
+  static Vector3 _zeroVector;
   Scene* _scene;
   std::vector<SubMesh*> _opaqueSubMeshes;
   std::vector<SubMesh*> _transparentSubMeshes;

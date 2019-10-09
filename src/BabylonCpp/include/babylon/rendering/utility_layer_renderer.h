@@ -10,12 +10,14 @@
 namespace BABYLON {
 
 class AbstractMesh;
+class Camera;
 class HemisphericLight;
 class PickingInfo;
 class PointerInfo;
 class PointerInfoPre;
 class Scene;
 using AbstractMeshPtr     = std::shared_ptr<AbstractMesh>;
+using CameraPtr           = std::shared_ptr<Camera>;
 using HemisphericLightPtr = std::shared_ptr<HemisphericLight>;
 
 /**
@@ -45,7 +47,21 @@ public:
     auto renderer = new UtilityLayerRenderer(std::forward<Ts>(args)...);
     return static_cast<std::shared_ptr<UtilityLayerRenderer>>(renderer);
   }
-  virtual ~UtilityLayerRenderer();
+  virtual ~UtilityLayerRenderer() override;
+
+  /**
+   * @brief Gets the camera that is used to render the utility layer (when not
+   * set, this will be the last active camera).
+   * @returns the camera that is used when rendering the utility layer
+   */
+  CameraPtr& getRenderCamera();
+
+  /**
+   * @brief Sets the camera that should be used when rendering the utility layer
+   * (If set to null the last active camera will be used).
+   * @param cam the camera that should be used when rendering the utility layer
+   */
+  void setRenderCamera(const CameraPtr& cam);
 
   /**
    * @brief Light which used by gizmos to get light shading.
@@ -139,7 +155,8 @@ private:
   std::unordered_map<int, bool> _pointerCaptures;
   std::unordered_map<int, bool> _lastPointerEvents;
   HemisphericLightPtr _sharedGizmoLight;
-  Observer<Scene>::Ptr _afterRenderObserver;
+  CameraPtr _renderCamera;
+  Observer<Camera>::Ptr _afterRenderObserver;
   Observer<Scene>::Ptr _sceneDisposeObserver;
   Observer<PointerInfoPre>::Ptr _originalPointerObserver;
 

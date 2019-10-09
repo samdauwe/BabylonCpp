@@ -56,6 +56,7 @@ UtilityLayerRenderer::UtilityLayerRenderer(Scene* iOriginalScene,
     , handleEvents{iHandleEvents}
     , mainSceneTrackerPredicate{nullptr}
     , _sharedGizmoLight{nullptr}
+    , _renderCamera{nullptr}
     , _afterRenderObserver{nullptr}
     , _sceneDisposeObserver{nullptr}
     , _originalPointerObserver{nullptr}
@@ -238,9 +239,10 @@ UtilityLayerRenderer::UtilityLayerRenderer(Scene* iOriginalScene,
   // Render directly on top of existing scene without clearing
   utilityLayerScene->autoClear = false;
 
-  _afterRenderObserver = originalScene->onAfterRenderObservable.add(
-    [this](Scene* /*scene*/, EventState& /*es*/) {
-      if (shouldRender) {
+  _afterRenderObserver = originalScene->onAfterCameraRenderObservable.add(
+    [this](Camera* camera, EventState& /*es*/) {
+      // Only render when the render camera finishes rendering
+      if (shouldRender && camera == getRenderCamera().get()) {
         render();
       }
     });
@@ -253,6 +255,24 @@ UtilityLayerRenderer::UtilityLayerRenderer(Scene* iOriginalScene,
 
 UtilityLayerRenderer::~UtilityLayerRenderer()
 {
+}
+
+CameraPtr& UtilityLayerRenderer::getRenderCamera()
+{
+  if (_renderCamera) {
+    return _renderCamera;
+  }
+  else if (originalScene->activeCameras.size() > 1) {
+    return originalScene->activeCameras.back();
+  }
+  else {
+    return originalScene->activeCamera;
+  }
+}
+
+void UtilityLayerRenderer::setRenderCamera(const CameraPtr& cam)
+{
+  _renderCamera = cam;
 }
 
 HemisphericLightPtr& UtilityLayerRenderer::_getSharedGizmoLight()
@@ -312,7 +332,7 @@ void UtilityLayerRenderer::dispose(bool /*doNotRecurse*/,
   onPointerOutObservable.clear();
 
   if (_afterRenderObserver) {
-    originalScene->onAfterRenderObservable.remove(_afterRenderObserver);
+    originalScene->onAfterCameraRenderObservable.remove(_afterRenderObserver);
   }
   if (_sceneDisposeObserver) {
     originalScene->onDisposeObservable.remove(_sceneDisposeObserver);
@@ -325,12 +345,8 @@ void UtilityLayerRenderer::dispose(bool /*doNotRecurse*/,
 
 void UtilityLayerRenderer::_updateCamera()
 {
-  if (originalScene->activeCameras.size() > 1) {
-    utilityLayerScene->activeCamera = originalScene->activeCameras.back();
-  }
-  else {
-    utilityLayerScene->activeCamera = originalScene->activeCamera();
-  }
+  utilityLayerScene->cameraToUseForPointers = getRenderCamera();
+  utilityLayerScene->activeCamera           = getRenderCamera();
 }
 
 } // end of namespace BABYLON

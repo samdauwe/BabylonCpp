@@ -16,6 +16,8 @@
 
 namespace BABYLON {
 
+Vector3 RenderingGroup::_zeroVector = Vector3::Zero();
+
 RenderingGroup::RenderingGroup(
   unsigned int iIndex, Scene* scene,
   const std::function<bool(const SubMesh* a, const SubMesh* b)>&
@@ -203,13 +205,12 @@ void RenderingGroup::renderSorted(
   const std::function<bool(const SubMesh* a, const SubMesh* b)>& sortCompareFn,
   const CameraPtr& camera, bool transparent)
 {
-  auto cameraPosition = camera ? camera->globalPosition() : Vector3::Zero();
+  auto cameraPosition
+    = camera ? camera->globalPosition() : RenderingGroup::_zeroVector;
   for (auto& subMesh : subMeshes) {
-    subMesh->_alphaIndex = subMesh->getMesh()->alphaIndex;
-    subMesh->_distanceToCamera
-      = subMesh->getBoundingInfo()
-          ->boundingSphere.centerWorld.subtract(cameraPosition)
-          .length();
+    subMesh->_alphaIndex       = subMesh->getMesh()->alphaIndex;
+    subMesh->_distanceToCamera = Vector3::Distance(
+      subMesh->getBoundingInfo()->boundingSphere.centerWorld, cameraPosition);
   }
 
   auto sortedArray = subMeshes;
@@ -244,7 +245,7 @@ void RenderingGroup::renderUnsorted(const std::vector<SubMesh*>& subMeshes)
 }
 
 bool RenderingGroup::defaultTransparentSortCompare(const SubMesh* a,
-                                                  const SubMesh* b)
+                                                   const SubMesh* b)
 {
   // Alpha index first
   if (a->_alphaIndex > b->_alphaIndex) {

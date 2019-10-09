@@ -10,10 +10,12 @@
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material.h>
+#include <babylon/materials/material_helper.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/meshes/_instances_batch.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
+#include <babylon/morph/morph_target_manager.h>
 
 namespace BABYLON {
 
@@ -103,6 +105,9 @@ void OutlineRenderer::render(SubMesh* subMesh, const _InstancesBatchPtr& batch,
                          mesh->skeleton()->getTransformMatrices(mesh.get()));
   }
 
+  // Morph targets
+  MaterialHelper::BindMorphTargetParameters(mesh.get(), _effect);
+
   mesh->_bind(subMesh, _effect, Material::TriangleFillMode);
 
   // Alpha test
@@ -173,13 +178,27 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
     defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
   }
 
+  // Morph targets
+  auto morphTargetManager
+    = std::static_pointer_cast<Mesh>(mesh)->morphTargetManager();
+  auto numMorphInfluencers = 0ull;
+  if (morphTargetManager) {
+    if (morphTargetManager->numInfluencers() > 0) {
+      numMorphInfluencers = morphTargetManager->numInfluencers();
+
+      defines.emplace_back("#define MORPHTARGETS");
+      defines.emplace_back("#define NUM_MORPH_INFLUENCERS "
+                           + std::to_string(numMorphInfluencers));
+
+      MaterialHelper::PrepareAttributesForMorphTargetsInfluencers(
+        attribs, mesh.get(), static_cast<unsigned int>(numMorphInfluencers));
+    }
+  }
+
   // Instances
   if (useInstances) {
     defines.emplace_back("#define INSTANCES");
-    attribs.emplace_back(VertexBuffer::World0Kind);
-    attribs.emplace_back(VertexBuffer::World1Kind);
-    attribs.emplace_back(VertexBuffer::World2Kind);
-    attribs.emplace_back(VertexBuffer::World3Kind);
+    MaterialHelper::PushAttributesForInstances(attribs);
   }
 
   // Get correct effect
@@ -188,12 +207,14 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
     _cachedDefines = join;
 
     EffectCreationOptions options;
-    options.attributes = std::move(attribs);
-    options.uniformsNames
-      = {"world",  "mBones", "viewProjection",          "diffuseMatrix",
-         "offset", "color",  "logarithmicDepthConstant"};
+    options.attributes    = std::move(attribs);
+    options.uniformsNames = {
+      "world",  "mBones", "viewProjection",           "diffuseMatrix",
+      "offset", "color",  "logarithmicDepthConstant", "morphTargetInfluences"};
     options.samplers = {"diffuseSampler"};
     options.defines  = std::move(join);
+    options.indexParameters
+      = {{"maxSimultaneousMorphTargets", numMorphInfluencers}};
 
     _effect = scene->getEngine()->createEffect("outline", options,
                                                scene->getEngine());

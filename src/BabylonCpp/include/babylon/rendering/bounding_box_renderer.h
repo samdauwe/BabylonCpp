@@ -49,7 +49,7 @@ public:
 
     return renderer;
   }
-  virtual ~BoundingBoxRenderer();
+  virtual ~BoundingBoxRenderer() override;
 
   void addToScene(const BoundingBoxRendererPtr& newBoundingBoxRenderer);
 
@@ -125,6 +125,8 @@ private:
   ShaderMaterialPtr _colorShader;
   std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
   std::unique_ptr<GL::IGLBuffer> _indexBuffer;
+  std::unique_ptr<GL::IGLBuffer> _fillIndexBuffer;
+  IndicesArray _fillIndexData;
 
 }; // end of class BoundingBoxRenderer
 
