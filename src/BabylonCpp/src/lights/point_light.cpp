@@ -157,6 +157,23 @@ void PointLight::transferToEffect(const EffectPtr& /*effect*/,
   );
 }
 
+PointLight& PointLight::transferToNodeMaterialEffect(
+  const EffectPtr& effect, const std::string& lightDataUniformName)
+{
+  if (computeTransformedInformation()) {
+    const auto iTransformedPosition = transformedPosition();
+    effect->setFloat3(lightDataUniformName, iTransformedPosition.x,
+                      iTransformedPosition.y, iTransformedPosition.z);
+  }
+  else {
+    const auto iPosition = position();
+    effect->setFloat3(lightDataUniformName, iPosition.x, iPosition.y,
+                      iPosition.z);
+  }
+
+  return *this;
+}
+
 void PointLight::prepareLightSpecificDefines(MaterialDefines& defines,
                                              unsigned int lightIndex)
 {

@@ -86,6 +86,16 @@ public:
                         const std::string& lightIndex) override;
 
   /**
+   * @brief Sets the passed Effect "effect" with the Light information.
+   * @param effect The effect to update
+   * @param lightDataUniformName The uniform used to store light data (position
+   * or direction)
+   * @returns The light
+   */
+  PointLight& transferToNodeMaterialEffect(
+    const EffectPtr& effect, const std::string& lightDataUniformName) override;
+
+  /**
    * @brief Prepares the list of defines specific to the light type.
    * @param defines the list of defines
    * @param lightIndex defines the index of the light for the effect
