@@ -60,6 +60,16 @@ public:
                         const std::string& lightIndex) override;
 
   /**
+   * @brief Sets the passed Effect "effect" with the Light information.
+   * @param effect The effect to update
+   * @param lightDataUniformName The uniform used to store light data (position
+   * or direction)
+   * @returns The light
+   */
+  DirectionalLight& transferToNodeMaterialEffect(
+    const EffectPtr& effect, const std::string& lightDataUniformName) override;
+
+  /**
    * @brief Gets the minZ used for shadow according to both the scene and the
    * light. Values are fixed on directional lights as it relies on an ortho
    * projection hence the need to convert being -1 and 1 to 0 and 1 doing (depth

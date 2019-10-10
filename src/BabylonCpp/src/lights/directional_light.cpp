@@ -159,17 +159,28 @@ void DirectionalLight::_setDefaultAutoExtendShadowProjectionMatrix(
         }
       }
     }
+  }
 
-    const auto xOffset = _orthoRight - _orthoLeft;
-    const auto yOffset = _orthoTop - _orthoBottom;
+  const auto xOffset = _orthoRight - _orthoLeft;
+  const auto yOffset = _orthoTop - _orthoBottom;
 
-    Matrix::OrthoOffCenterLHToRef(
-      _orthoLeft - xOffset * shadowOrthoScale(),
-      _orthoRight + xOffset * shadowOrthoScale(),
-      _orthoBottom - yOffset * shadowOrthoScale(),
-      _orthoTop + yOffset * shadowOrthoScale(),
-      shadowMinZ() ? *shadowMinZ() : activeCamera->minZ,
-      shadowMaxZ() ? *shadowMaxZ() : activeCamera->maxZ, matrix);
+  if (getScene()->useRightHandedSystem()) {
+    Matrix::OrthoOffCenterRHToRef(_orthoLeft - xOffset * shadowOrthoScale,
+                                  _orthoRight + xOffset * shadowOrthoScale,
+                                  _orthoBottom - yOffset * shadowOrthoScale,
+                                  _orthoTop + yOffset * shadowOrthoScale,
+                                  shadowMinZ().value_or(activeCamera->minZ),
+                                  shadowMaxZ().value_or(activeCamera->maxZ),
+                                  matrix);
+  }
+  else {
+    Matrix::OrthoOffCenterLHToRef(_orthoLeft - xOffset * shadowOrthoScale(),
+                                  _orthoRight + xOffset * shadowOrthoScale(),
+                                  _orthoBottom - yOffset * shadowOrthoScale(),
+                                  _orthoTop + yOffset * shadowOrthoScale(),
+                                  shadowMinZ().value_or(activeCamera->minZ),
+                                  shadowMaxZ().value_or(activeCamera->maxZ),
+                                  matrix);
   }
 }
 
@@ -186,16 +197,58 @@ void DirectionalLight::_buildUniformLayout()
 void DirectionalLight::transferToEffect(const EffectPtr& /*effect*/,
                                         const std::string& lightIndex)
 {
+  const auto& iTransformedDirection = transformedDirection();
   if (computeTransformedInformation()) {
-    _uniformBuffer->updateFloat4("vLightData", transformedDirection().x,
-                                 transformedDirection().y,
-                                 transformedDirection().z, 1, lightIndex);
+    if (getScene()->useRightHandedSystem()) {
+      _uniformBuffer->updateFloat4("vLightData", -iTransformedDirection.x,
+                                   -iTransformedDirection.y,
+                                   -iTransformedDirection.z, 1.f, lightIndex);
+    }
+    else {
+      _uniformBuffer->updateFloat4("vLightData", transformedDirection().x,
+                                   iTransformedDirection.y,
+                                   iTransformedDirection.z, 1, lightIndex);
+    }
     return;
   }
 
   const auto& iDirection = direction();
-  _uniformBuffer->updateFloat4("vLightData", iDirection.x, iDirection.y,
-                               iDirection.z, 1, lightIndex);
+  if (getScene()->useRightHandedSystem()) {
+    _uniformBuffer->updateFloat4("vLightData", -iDirection.x, -iDirection.y,
+                                 -iDirection.z, 1.f, lightIndex);
+  }
+  else {
+    _uniformBuffer->updateFloat4("vLightData", iDirection.x, iDirection.y,
+                                 iDirection.z, 1.f, lightIndex);
+  }
+}
+
+DirectionalLight& DirectionalLight::transferToNodeMaterialEffect(
+  const EffectPtr& effect, const std::string& lightDataUniformName)
+{
+  if (computeTransformedInformation()) {
+    const auto& iTransformedDirection = transformedDirection();
+    if (getScene()->useRightHandedSystem) {
+      effect->setFloat3(lightDataUniformName, -iTransformedDirection.x,
+                        -iTransformedDirection.y, -iTransformedDirection.z);
+    }
+    else {
+      effect->setFloat3(lightDataUniformName, iTransformedDirection.x,
+                        iTransformedDirection.y, iTransformedDirection.z);
+    }
+    return *this;
+  }
+  const auto& iDirection = direction();
+  if (getScene()->useRightHandedSystem()) {
+    effect->setFloat3(lightDataUniformName, -iDirection.x, -iDirection.y,
+                      -iDirection.z);
+  }
+  else {
+    effect->setFloat3(lightDataUniformName, iDirection.x, iDirection.y,
+                      iDirection.z);
+  }
+
+  return *this;
 }
 
 float DirectionalLight::getDepthMinZ(const Camera& /*activeCamera*/) const
