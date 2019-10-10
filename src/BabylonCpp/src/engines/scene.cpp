@@ -2559,7 +2559,7 @@ int Scene::removeLight(Light* toRemove)
   if (it != lights.end()) {
     // Remove from meshes
     for (const auto& mesh : meshes) {
-      mesh->_removeLightSource(toRemove);
+      mesh->_removeLightSource(toRemove, false);
     }
     // Remove from the scene if mesh found
     lights.erase(it);

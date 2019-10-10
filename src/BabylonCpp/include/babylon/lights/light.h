@@ -193,6 +193,18 @@ public:
                                 const std::string& uniformName1);
 
   /**
+   * @brief Sets the passed Effect "effect" with the Light information.
+   * @param effect The effect to update
+   * @param lightDataUniformName The uniform used to store light data (position
+   * or direction)
+   * @returns The light
+   */
+  virtual Light&
+  transferToNodeMaterialEffect(const EffectPtr& effect,
+                               const std::string& lightDataUniformName)
+    = 0;
+
+  /**
    * @brief Specifies if the light will affect the passed mesh.
    * @param mesh The mesh to test against the light
    * @return true the mesh is affected otherwise, false.

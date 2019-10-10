@@ -346,7 +346,7 @@ void Light::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 
   // Remove from meshes
   for (auto& mesh : getScene()->meshes) {
-    mesh->_removeLightSource(this);
+    mesh->_removeLightSource(this, true);
   }
 
   _uniformBuffer->dispose();

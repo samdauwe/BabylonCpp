@@ -641,12 +641,12 @@ void AbstractMesh::_unBindEffect()
   }
 }
 
-void AbstractMesh::_removeLightSource(const LightPtr& light)
+void AbstractMesh::_removeLightSource(const LightPtr& light, bool dispose)
 {
-  return _removeLightSource(light.get());
+  return _removeLightSource(light.get(), dispose);
 }
 
-void AbstractMesh::_removeLightSource(Light* light)
+void AbstractMesh::_removeLightSource(Light* light, bool dispose)
 {
   auto index = std::find_if(
     _lightSources.begin(), _lightSources.end(),
@@ -658,7 +658,7 @@ void AbstractMesh::_removeLightSource(Light* light)
 
   _lightSources.erase(index);
 
-  _markSubMeshesAsLightDirty();
+  _markSubMeshesAsLightDirty(dispose);
 }
 
 void AbstractMesh::_markSubMeshesAsDirty(
@@ -675,10 +675,11 @@ void AbstractMesh::_markSubMeshesAsDirty(
   }
 }
 
-void AbstractMesh::_markSubMeshesAsLightDirty()
+void AbstractMesh::_markSubMeshesAsLightDirty(bool dispose)
 {
-  const auto func
-    = [](MaterialDefines& defines) { defines.markAsLightDirty(); };
+  const auto func = [dispose](MaterialDefines& defines) {
+    defines.markAsLightDirty(dispose);
+  };
   _markSubMeshesAsDirty(func);
 }
 

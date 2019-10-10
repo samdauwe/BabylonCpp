@@ -192,13 +192,13 @@ public:
   /**
    * @brief Hidden
    */
-  void _removeLightSource(const LightPtr& light);
-  void _removeLightSource(Light* light);
+  void _removeLightSource(const LightPtr& light, bool dispose);
+  void _removeLightSource(Light* light, bool dispose);
 
   /**
    * @brief Hidden
    */
-  void _markSubMeshesAsLightDirty();
+  void _markSubMeshesAsLightDirty(bool dispose = false);
 
   /**
    * @brief Hidden
