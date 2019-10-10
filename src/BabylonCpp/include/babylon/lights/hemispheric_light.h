@@ -65,6 +65,16 @@ public:
                         const std::string& lightIndex) override;
 
   /**
+   * @brief Sets the passed Effect "effect" with the Light information.
+   * @param effect The effect to update
+   * @param lightDataUniformName The uniform used to store light data (position
+   * or direction)
+   * @returns The light
+   */
+  HemisphericLight& transferToNodeMaterialEffect(
+    const EffectPtr& effect, const std::string& lightDataUniformName) override;
+
+  /**
    * @brief Computes the world matrix of the node
    * @param force defines if the cache version should be invalidated forcing the
    * world matrix to be created from scratch

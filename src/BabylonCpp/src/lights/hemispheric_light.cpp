@@ -86,6 +86,15 @@ void HemisphericLight::transferToEffect(const EffectPtr& /*effect*/,
                                lightIndex);
 }
 
+HemisphericLight& HemisphericLight::transferToNodeMaterialEffect(
+  const EffectPtr& effect, const std::string& lightDataUniformName)
+{
+  const auto normalizeDirection = Vector3::Normalize(direction);
+  effect->setFloat3(lightDataUniformName, normalizeDirection.x,
+                    normalizeDirection.y, normalizeDirection.z);
+  return *this;
+}
+
 Matrix& HemisphericLight::computeWorldMatrix(bool /*force*/,
                                              bool /*useWasUpdatedFlag*/)
 {
