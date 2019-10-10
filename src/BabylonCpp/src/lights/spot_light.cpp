@@ -300,13 +300,24 @@ void SpotLight::transferToEffect(const EffectPtr& effect,
     normalizeDirection = Vector3::Normalize(direction());
   }
 
-  _uniformBuffer->updateFloat4("vLightDirection",    // Name
-                               normalizeDirection.x, // X
-                               normalizeDirection.y, // Y
-                               normalizeDirection.z, // Z
-                               _cosHalfAngle,        // Value
-                               lightIndex            // Index
-  );
+  if (getScene()->useRightHandedSystem()) {
+    _uniformBuffer->updateFloat4("vLightDirection",     // Name
+                                 -normalizeDirection.x, // X
+                                 -normalizeDirection.y, // Y
+                                 -normalizeDirection.z, // Z
+                                 _cosHalfAngle,         // Value
+                                 lightIndex             // Index
+    );
+  }
+  else {
+    _uniformBuffer->updateFloat4("vLightDirection",    // Name
+                                 normalizeDirection.x, // X
+                                 normalizeDirection.y, // Y
+                                 normalizeDirection.z, // Z
+                                 _cosHalfAngle,        // Value
+                                 lightIndex            // Index
+    );
+  }
 
   _uniformBuffer->updateFloat4("vLightFalloff",      // Name
                                range,                // X
@@ -331,6 +342,31 @@ void SpotLight::transferToEffect(const EffectPtr& effect,
     effect->setTexture("projectionLightSampler" + lightIndex,
                        projectionTexture());
   }
+}
+
+SpotLight&
+SpotLight::transferToNodeMaterialEffect(const EffectPtr& effect,
+                                        const std::string& lightDataUniformName)
+{
+  Vector3 normalizeDirection;
+
+  if (computeTransformedInformation()) {
+    normalizeDirection = Vector3::Normalize(transformedDirection());
+  }
+  else {
+    normalizeDirection = Vector3::Normalize(direction());
+  }
+
+  if (getScene()->useRightHandedSystem()) {
+    effect->setFloat3(lightDataUniformName, -normalizeDirection.x,
+                      -normalizeDirection.y, -normalizeDirection.z);
+  }
+  else {
+    effect->setFloat3(lightDataUniformName, normalizeDirection.x,
+                      normalizeDirection.y, normalizeDirection.z);
+  }
+
+  return *this;
 }
 
 void SpotLight::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)

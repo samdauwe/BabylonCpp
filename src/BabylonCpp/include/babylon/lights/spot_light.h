@@ -61,6 +61,16 @@ public:
                         const std::string& lightIndex) override;
 
   /**
+   * @brief Sets the passed Effect "effect" with the Light information.
+   * @param effect The effect to update
+   * @param lightDataUniformName The uniform used to store light data (position
+   * or direction)
+   * @returns The light
+   */
+  SpotLight& transferToNodeMaterialEffect(
+    const EffectPtr& effect, const std::string& lightDataUniformName) override;
+
+  /**
    * @brief Disposes the light and the associated resources.
    */
   void dispose(bool doNotRecurse               = false,
