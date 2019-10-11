@@ -23,7 +23,7 @@ struct BABYLON_SHARED_EXPORT ISceneSerializableComponent
     : public ISceneComponent {
 
   /**
-   * @brief Adds all the element from the container to the scene.
+   * @brief Adds all the elements from the container to the scene.
    * @param container the container holding the elements
    */
   virtual void addFromContainer(AbstractScene& container) = 0;
