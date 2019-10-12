@@ -1436,10 +1436,12 @@ AbstractMesh& AbstractMesh::_collideForSubMesh(SubMesh* subMesh,
     }
   }
   // Collide
+#if 0
   iCollider._collide(
     subMesh->_trianglePlanes, subMesh->_lastColliderWorldVertices, getIndices(),
     subMesh->indexStart, subMesh->indexStart + subMesh->indexCount,
     subMesh->verticesStart, subMesh->getMaterial() != nullptr);
+#endif
   if (iCollider.collisionFound) {
     iCollider.collidedMesh = shared_from_base<AbstractMesh>();
   }

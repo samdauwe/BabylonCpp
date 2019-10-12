@@ -44,12 +44,12 @@ public:
   /** Hidden */
   void _testTriangle(size_t faceIndex, std::vector<Plane>& trianglePlaneArray,
                      const Vector3& p1, const Vector3& p2, const Vector3& p3,
-                     bool hasMaterial);
+                     bool hasMaterial, const AbstractMeshPtr& hostMesh);
   /** Hidden */
   void _collide(std::vector<Plane>& trianglePlaneArray,
                 const std::vector<Vector3> pts, const IndicesArray& indices,
                 size_t indexStart, size_t indexEnd, unsigned int decal,
-                bool hasMaterial);
+                bool hasMaterial, const AbstractMeshPtr& hostMesh);
   /** Hidden */
   void _getResponse(Vector3& pos, Vector3& vel);
 

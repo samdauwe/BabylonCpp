@@ -185,9 +185,9 @@ std::optional<Vector2> PickingInfo::getTextureCoordinates()
   auto uv1 = Vector2::FromArray(uvs, indices[faceId * 3 + 1] * 2);
   auto uv2 = Vector2::FromArray(uvs, indices[faceId * 3 + 2] * 2);
 
-  uv0 = uv0.scale(1.f - bu - bv);
-  uv1 = uv1.scale(bu);
-  uv2 = uv2.scale(bv);
+  uv0 = uv0.scale(bu);
+  uv1 = uv1.scale(bv);
+  uv2 = uv2.scale(1.f - bu - bv);
 
   return Vector2(uv0.x + uv1.x + uv2.x, uv0.y + uv1.y + uv2.y);
 }

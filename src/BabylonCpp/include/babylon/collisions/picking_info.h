@@ -14,7 +14,7 @@ using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
 using SpritePtr       = std::shared_ptr<Sprite>;
 
 /**
- * Information about the result of picking within a scene
+ * @brief Information about the result of picking within a scene.
  * @see https://doc.babylonjs.com/babylon101/picking_collisions
  */
 class BABYLON_SHARED_EXPORT PickingInfo {
@@ -72,13 +72,13 @@ public:
 
   /**
    * (See getTextureCoordinates) The barycentric U coordinate that is used when
-   * calulating the texture coordinates of the collision.
+   * calculating the texture coordinates of the collision.
    */
   float bu;
 
   /**
    * (See getTextureCoordinates) The barycentric V coordinate that is used when
-   * calulating the texture coordinates of the collision.
+   * calculating the texture coordinates of the collision.
    */
   float bv;
 

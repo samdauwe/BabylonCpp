@@ -177,7 +177,8 @@ bool Collider::_canDoCollision(const Vector3& sphereCenter, float sphereRadius,
 void Collider::_testTriangle(size_t faceIndex,
                              std::vector<Plane>& trianglePlaneArray,
                              const Vector3& p1, const Vector3& p2,
-                             const Vector3& p3, bool hasMaterial)
+                             const Vector3& p3, bool hasMaterial,
+                             const AbstractMeshPtr& hostMesh)
 {
   auto f = 0.f, t0 = 0.f;
   auto embeddedInPlane = false;
@@ -373,6 +374,7 @@ void Collider::_testTriangle(size_t faceIndex,
       }
       _nearestDistance = distToCollision;
       collisionFound   = true;
+      collidedMesh     = hostMesh;
     }
   }
 }
@@ -380,14 +382,15 @@ void Collider::_testTriangle(size_t faceIndex,
 void Collider::_collide(std::vector<Plane>& trianglePlaneArray,
                         const std::vector<Vector3> pts,
                         const IndicesArray& indices, size_t indexStart,
-                        size_t indexEnd, unsigned int decal, bool hasMaterial)
+                        size_t indexEnd, unsigned int decal, bool hasMaterial,
+                        const AbstractMeshPtr& hostMesh)
 {
   for (size_t i = indexStart; i < indexEnd; i += 3) {
     const auto& p1 = pts[indices[i] - decal];
     const auto& p2 = pts[indices[i + 1] - decal];
     const auto& p3 = pts[indices[i + 2] - decal];
 
-    _testTriangle(i, trianglePlaneArray, p3, p2, p1, hasMaterial);
+    _testTriangle(i, trianglePlaneArray, p3, p2, p1, hasMaterial, hostMesh);
   }
 }
 
