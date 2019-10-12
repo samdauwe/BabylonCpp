@@ -179,6 +179,7 @@ StandardMaterial::StandardMaterial(const std::string& iName, Scene* scene)
     , _worldViewProjectionMatrix{Matrix::Zero()}
     , _globalAmbientColor{Color3(0.f, 0.f, 0.f)}
     , _useLogarithmicDepth{false}
+    , _rebuildInParallel{false}
     , _imageProcessingConfiguration{nullptr}
     , _diffuseTexture{nullptr}
     , _ambientTexture{nullptr}
@@ -789,6 +790,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
   // Get correct effect
   if (defines.isDirty()) {
+    const auto lightDisposed = defines._areLightsDisposed;
     defines.markAsProcessed();
 
     // Fallbacks
@@ -978,10 +980,18 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     if (effect) {
       // Use previous effect while new one is compiling
       if (allowShaderHotSwapping && previousEffect && !effect->isReady()) {
-        effect = previousEffect;
+        effect             = previousEffect;
+        _rebuildInParallel = true;
         defines.markAsUnprocessed();
+
+        if (lightDisposed) {
+          // re register in case it takes more than one frame.
+          defines._areLightsDisposed = true;
+          return false;
+        }
       }
       else {
+        _rebuildInParallel = false;
         scene->resetCachedMaterial();
         subMesh->setEffect(effect, definesPtr);
         buildUniformLayout();
@@ -1352,7 +1362,8 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
     // Lights
     if (scene->lightsEnabled() && !_disableLighting) {
       MaterialHelper::BindLights(scene, mesh, effect, defines,
-                                 _maxSimultaneousLights);
+                                 _maxSimultaneousLights, false,
+                                 _rebuildInParallel);
     }
 
     // View
@@ -2091,13 +2102,13 @@ void StandardMaterial::_attachImageProcessingConfiguration(
     return;
   }
 
-  // Detaches observer.
+  // Detaches observer
   if (_imageProcessingConfiguration && _imageProcessingObserver) {
     _imageProcessingConfiguration->onUpdateParameters.remove(
       _imageProcessingObserver);
   }
 
-  // Pick the scene configuration if needed.
+  // Pick the scene configuration if needed
   if (!configuration) {
     _imageProcessingConfiguration
       = getScene()->imageProcessingConfiguration().get();
@@ -2106,7 +2117,7 @@ void StandardMaterial::_attachImageProcessingConfiguration(
     _imageProcessingConfiguration = configuration;
   }
 
-  // Attaches observer.
+  // Attaches observer
   if (_imageProcessingConfiguration) {
     _imageProcessingObserver
       = _imageProcessingConfiguration->onUpdateParameters.add(

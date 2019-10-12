@@ -563,6 +563,11 @@ protected:
   void _markAllSubMeshesAsDirty(const MaterialDefinesCallback& func);
 
   /**
+   * @brief Indicates that we need to re-calculated for all submeshes.
+   */
+  void _markAllSubMeshesAsAllDirty();
+
+  /**
    * @brief Indicates that image processing needs to be re-calculated for all
    * submeshes.
    */
@@ -869,6 +874,7 @@ private:
    */
   bool _cachedDepthWriteState;
 
+  static const MaterialDefinesCallback _AllDirtyCallBack;
   static const MaterialDefinesCallback _ImageProcessingDirtyCallBack;
   static const MaterialDefinesCallback _TextureDirtyCallBack;
   static const MaterialDefinesCallback _FresnelDirtyCallBack;

@@ -74,6 +74,7 @@ StandardMaterialDefines::StandardMaterialDefines() : MaterialDefines{}
     {"MORPHTARGETS", false},                                //
     {"MORPHTARGETS_NORMAL", false},                         //
     {"MORPHTARGETS_TANGENT", false},                        //
+    {"MORPHTARGETS_UV", false},                             //
     {"NONUNIFORMSCALING", false}, // https://playground.babylonjs.com#V6DWIH
     {"PREMULTIPLYALPHA", false},  // https://playground.babylonjs.com#LNVJJ7
 

@@ -613,7 +613,7 @@ public:
   Property<StandardMaterial, float> roughness;
 
   /**
-   * In case of refraction, define the value of the indice of refraction.
+   * In case of refraction, define the value of the index of refraction.
    * @see
    * http://doc.babylonjs.com/how_to/reflect#how-to-obtain-reflections-and-refractions
    */
@@ -773,6 +773,7 @@ protected:
   Matrix _worldViewProjectionMatrix;
   Color3 _globalAmbientColor;
   bool _useLogarithmicDepth;
+  bool _rebuildInParallel;
 
   /**
    * Keep track of the image processing observer to allow dispose and replace.

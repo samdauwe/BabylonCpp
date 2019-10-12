@@ -18,6 +18,8 @@
 
 namespace BABYLON {
 
+const Material::MaterialDefinesCallback Material::_AllDirtyCallBack
+  = [](MaterialDefines& defines) -> void { defines.markAllAsDirty(); };
 const Material::MaterialDefinesCallback Material::_ImageProcessingDirtyCallBack
   = [](MaterialDefines& defines) -> void {
   defines.markAsImageProcessingDirty();
@@ -648,6 +650,11 @@ void Material::_markAllSubMeshesAsDirty(
       func(*subMesh->_materialDefines);
     }
   }
+}
+
+void Material::_markAllSubMeshesAsAllDirty()
+{
+  _markAllSubMeshesAsDirty(Material::_AllDirtyCallBack);
 }
 
 void Material::_markAllSubMeshesAsImageProcessingDirty()
