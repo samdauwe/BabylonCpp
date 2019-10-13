@@ -264,10 +264,11 @@ Vector3 ArcRotateCamera::_getTargetPosition()
 
 Camera& ArcRotateCamera::storeState()
 {
-  _storedAlpha  = alpha;
-  _storedBeta   = beta;
-  _storedRadius = radius;
-  _storedTarget = _getTargetPosition().copy();
+  _storedAlpha              = alpha;
+  _storedBeta               = beta;
+  _storedRadius             = radius;
+  _storedTarget             = _getTargetPosition().copy();
+  _storedTargetScreenOffset = targetScreenOffset.copy();
 
   return Camera::storeState();
 }
@@ -278,10 +279,11 @@ bool ArcRotateCamera::_restoreStateValues()
     return false;
   }
 
-  alpha  = _storedAlpha;
-  beta   = _storedBeta;
-  radius = _storedRadius;
   setTarget(_storedTarget.copy());
+  alpha              = _storedAlpha;
+  beta               = _storedBeta;
+  radius             = _storedRadius;
+  targetScreenOffset = _storedTargetScreenOffset.copy();
 
   inertialAlphaOffset  = 0.f;
   inertialBetaOffset   = 0.f;

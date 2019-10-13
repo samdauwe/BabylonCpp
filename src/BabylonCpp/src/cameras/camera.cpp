@@ -63,7 +63,7 @@ Camera::Camera(const std::string& iName, const Vector3& iPosition, Scene* scene,
     , _isCamera{true}
     , _isLeftCamera{false}
     , isLeftCamera{this, &Camera::get_isLeftCamera}
-    , _isRightCamera{true}
+    , _isRightCamera{false}
     , isRightCamera{this, &Camera::get_isRightCamera}
     , _useMultiviewToSingleView{false}
     , _multiviewTexture{nullptr}

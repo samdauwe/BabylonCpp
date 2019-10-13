@@ -271,7 +271,7 @@ void TargetCamera::_checkInputs()
     }
 
     if (!noRotationConstraint) {
-      auto limit = Math::PI_2 * 0.95f;
+      const auto limit = 1.570796f;
 
       if (rotation->x > limit) {
         rotation->x = limit;

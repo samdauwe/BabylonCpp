@@ -541,6 +541,7 @@ private:
   float _storedBeta;
   float _storedRadius;
   Vector3 _storedTarget;
+  Vector2 _storedTargetScreenOffset;
 
   static bool NodeConstructorAdded;
 

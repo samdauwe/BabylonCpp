@@ -70,17 +70,31 @@ protected:
   DeviceOrientationCamera(const std::string& name, const Vector3& position,
                           Scene* scene);
 
+  /**
+   * @brief Gets a boolean indicating that pointer input must be disabled on
+   * first orientation sensor update (Default: true).
+   */
+  bool get_disablePointerInputWhenUsingDeviceOrientation() const;
+
+  /**
+   * @brief Sets a boolean indicating that pointer input must be disabled on
+   * first orientation sensor update (Default: true).
+   */
+  void set_disablePointerInputWhenUsingDeviceOrientation(bool value);
+
 public:
   /**
-   * Hidden
-   * Disabled pointer input on first orientation sensor update (Default: true)
+   * Gets or sets a boolean indicating that pointer input must be disabled on
+   * first orientation sensor update (Default: true)
    */
-  bool _disablePointerInputWhenUsingDeviceOrientation;
+  Property<DeviceOrientationCamera, bool>
+    disablePointerInputWhenUsingDeviceOrientation;
 
 private:
   std::unique_ptr<Quaternion> _initialQuaternion;
   std::unique_ptr<Quaternion> _quaternionCache;
   std::unique_ptr<Quaternion> _tmpDragQuaternion;
+  bool _disablePointerInputWhenUsingDeviceOrientation;
   float _dragFactor;
 
   static bool NodeConstructorAdded;

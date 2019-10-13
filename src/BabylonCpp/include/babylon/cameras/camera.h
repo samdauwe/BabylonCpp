@@ -636,8 +636,8 @@ public:
   float maxZ;
 
   /**
-   * Define the default inertia of the camera.
-   * This helps giving a smooth feeling to the camera movement.
+   * Define the mode of the camera (Camera.PERSPECTIVE_CAMERA or
+   * Camera.ORTHOGRAPHIC_CAMERA)
    */
   float inertia;
 
@@ -697,12 +697,20 @@ public:
    * used as the input to this camera's render. Eg. display another camera view
    * on a TV in the main scene This is pretty helpfull if you wish to make a
    * camera render to a texture you could reuse somewhere else in the scene.
+   * (Eg. security camera)
+   *
+   * To change the final output target of the camera, camera.outputRenderTarget
+   * should be used instead (eg. webXR renders to a render target corrisponding
+   * to an HMD)
    */
   std::vector<RenderTargetTexturePtr> customRenderTargets;
 
   /**
    * When set, the camera will render to this render target instead of the
    * default canvas
+   *
+   * If the desire is to use the output of a camera as a texture in the scene
+   * consider using camera.customRenderTargets instead
    */
   RenderTargetTexturePtr outputRenderTarget;
 
@@ -744,6 +752,7 @@ public:
   /** Hidden */
   std::vector<AbstractMesh*> _activeMeshes;
 
+  /** Hidden */
   Matrix _computedViewMatrix;
 
   /** Hidden */
