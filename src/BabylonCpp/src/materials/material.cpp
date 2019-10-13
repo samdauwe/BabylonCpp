@@ -14,7 +14,7 @@
 #include <babylon/meshes/instanced_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
-#include <babylon/misc/tools.h>
+#include <babylon/misc/guid.h>
 
 namespace BABYLON {
 
@@ -55,7 +55,7 @@ const Material::MaterialDefinesCallback Material::_RunDirtyCallBacks
 };
 
 Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
-    : id{!iName.empty() ? iName : Tools::RandomId()}
+    : id{!iName.empty() ? iName : GUID::RandomId()}
     , name{iName}
     , checkReadyOnEveryCall{false}
     , checkReadyOnlyOnce{false}

@@ -63,6 +63,7 @@
 #include <babylon/meshes/simplification/simplification_queue.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
+#include <babylon/misc/guid.h>
 #include <babylon/misc/tools.h>
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/particles/particle_system.h>
@@ -294,7 +295,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , _geometryBufferRenderer{nullptr}
     , _pickedDownMesh{nullptr}
     , _pickedUpMesh{nullptr}
-    , _uid{Tools::RandomId()}
+    , _uid{GUID::RandomId()}
     , _blockMaterialDirtyMechanism{false}
     , _tempPickingRay{std::make_unique<Ray>(Ray::Zero())}
     , _cachedRayForTransform{nullptr}

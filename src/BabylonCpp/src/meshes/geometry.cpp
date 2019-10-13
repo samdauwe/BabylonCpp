@@ -18,7 +18,7 @@
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
-#include <babylon/misc/tools.h>
+#include <babylon/misc/guid.h>
 
 namespace BABYLON {
 
@@ -820,7 +820,7 @@ GeometryPtr Geometry::ExtractFromMesh(Mesh* mesh, const std::string& id)
 
 std::string Geometry::RandomId()
 {
-  return Tools::RandomId();
+  return GUID::RandomId();
 }
 
 void Geometry::_ImportGeometry(const json& parsedGeometry, const MeshPtr& mesh)

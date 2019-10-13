@@ -9,8 +9,8 @@
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/math/spherical_polynomial.h>
+#include <babylon/misc/guid.h>
 #include <babylon/misc/highdynamicrange/cube_map_to_spherical_polynomial_tools.h>
-#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 
@@ -56,7 +56,7 @@ BaseTexture::BaseTexture(Scene* scene)
     , _hasAlpha{false}
     , _coordinatesMode{Constants::TEXTURE_EXPLICIT_MODE}
     , _scene{scene ? scene : Engine::LastCreatedScene()}
-    , _uid{Tools::RandomId()}
+    , _uid{GUID::RandomId()}
     , _onDisposeObserver{nullptr}
     , _textureMatrix{Matrix::IdentityReadOnly()}
     , _reflectionTextureMatrix{Matrix::IdentityReadOnly()}
