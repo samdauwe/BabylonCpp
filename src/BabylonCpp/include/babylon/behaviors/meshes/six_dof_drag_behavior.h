@@ -12,10 +12,12 @@
 namespace BABYLON {
 
 class AbstractMesh;
+class Camera;
 class Mesh;
 class PointerInfo;
 class Scene;
 using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+using CameraPtr       = std::shared_ptr<Camera>;
 using MeshPtr         = std::shared_ptr<Mesh>;
 
 /**
@@ -31,7 +33,7 @@ public:
    * ray.
    */
   SixDofDragBehavior();
-  virtual ~SixDofDragBehavior();
+  virtual ~SixDofDragBehavior() override;
 
   /**
    * @brief The name of the behavior.
@@ -46,13 +48,23 @@ public:
   /**
    * @brief Attaches the drag behavior the passed in mesh.
    * @param ownerNode The mesh that will be dragged around once attached
+   * @param predicate Predicate to use for pick filtering
    */
-  void attach(const MeshPtr& ownerNode) override;
+  void attach(const MeshPtr& ownerNode,
+              const std::function<bool(const AbstractMeshPtr& m)>& predicate
+              = nullptr) override;
 
   /**
    * @brief Detaches the behavior from the mesh.
    */
   void detach() override;
+
+protected:
+  /**
+   * @brief In the case of multiplea active cameras, the cameraToUseForPointers
+   * should be used if set instead of active camera.
+   */
+  CameraPtr& get__pointerCamera();
 
 public:
   /**
@@ -103,6 +115,12 @@ private:
   Observer<PointerInfo>::Ptr _pointerObserver;
   bool _moving;
   Quaternion _startingOrientation;
+
+  /**
+   * In the case of multiplea active cameras, the cameraToUseForPointers should
+   * be used if set instead of active camera
+   */
+  ReadOnlyProperty<SixDofDragBehavior, CameraPtr> _pointerCamera;
 
   /**
    * How much faster the object should move when the controller is moving

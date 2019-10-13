@@ -27,7 +27,9 @@ void FadeInOutBehavior::init()
 {
 }
 
-void FadeInOutBehavior::attach(const MeshPtr& ownerNode)
+void FadeInOutBehavior::attach(
+  const MeshPtr& ownerNode,
+  const std::function<bool(const AbstractMeshPtr& m)>& /*predicate*/)
 {
   _ownerNode = ownerNode;
   _setAllVisibility(_ownerNode, 0);

@@ -36,7 +36,7 @@ public:
    */
   PointerDragBehavior(const PointerDragBehaviorOptions& options
                       = PointerDragBehaviorOptions());
-  virtual ~PointerDragBehavior();
+  virtual ~PointerDragBehavior() override;
 
   /**
    * @brief The name of the behavior.
@@ -51,8 +51,11 @@ public:
   /**
    * @brief Attaches the drag behavior the passed in mesh.
    * @param ownerNode The mesh that will be dragged around once attached
+   * @param predicate Predicate to use for pick filtering
    */
-  void attach(const AbstractMeshPtr& ownerNode) override;
+  void attach(const AbstractMeshPtr& ownerNode,
+              const std::function<bool(const AbstractMeshPtr& m)>& predicate
+              = nullptr) override;
 
   /**
    * @brief Force relase the drag action by code.
@@ -93,6 +96,11 @@ private:
                                 const Vector3& dragPlanePosition);
 
 public:
+  /**
+   * Abstract mesh the behavior is set on
+   */
+  AbstractMeshPtr attachedNode;
+
   /**
    * The maximum tolerated angle between the drag plane and dragging pointer
    * rays to trigger pointer events. Set to 0 to allow any angle (default: 0)
@@ -163,6 +171,11 @@ public:
   bool enabled;
 
   /**
+   * If pointer events should start and release the drag (Default: true)
+   */
+  bool startAndReleaseDragOnPointerEvents;
+
+  /**
    * If camera controls should be detached during the drag
    */
   bool detachCameraControls;
@@ -183,7 +196,6 @@ public:
 
 private:
   static int _AnyMouseID;
-  AbstractMeshPtr _attachedNode;
   MeshPtr _dragPlane;
   Scene* _scene;
   Observer<PointerInfo>::Ptr _pointerObserver;

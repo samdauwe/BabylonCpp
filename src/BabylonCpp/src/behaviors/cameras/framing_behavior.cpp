@@ -147,7 +147,9 @@ void FramingBehavior::init()
   // Do nothing
 }
 
-void FramingBehavior::attach(const ArcRotateCameraPtr& camera)
+void FramingBehavior::attach(
+  const ArcRotateCameraPtr& camera,
+  const std::function<bool(const AbstractMeshPtr& m)>& /*predicate*/)
 {
   _attachedCamera = camera;
   auto scene      = _attachedCamera->getScene();

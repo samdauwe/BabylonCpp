@@ -83,7 +83,9 @@ void AttachToBoxBehavior::_lookAtToRef(const Vector3& pos, Quaternion& ref,
   Quaternion::FromRotationMatrixToRef(_lookAtTmpMatrix, ref);
 }
 
-void AttachToBoxBehavior::attach(const MeshPtr& target)
+void AttachToBoxBehavior::attach(
+  const MeshPtr& target,
+  const std::function<bool(const AbstractMeshPtr& m)>& /*predicate*/)
 {
   _target = target;
   _scene  = _target->getScene();

@@ -69,8 +69,11 @@ public:
   /**
    * @brief Attaches the behavior to its arc rotate camera.
    * @param camera Defines the camera to attach the behavior to
+   * @param predicate Predicate to use for pick filtering
    */
-  void attach(const ArcRotateCameraPtr& camera) override;
+  void attach(const ArcRotateCameraPtr& camera,
+              const std::function<bool(const AbstractMeshPtr& m)>& predicate
+              = nullptr) override;
 
   /**
    * @brief Detaches the behavior from its current arc rotate camera.

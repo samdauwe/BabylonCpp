@@ -77,7 +77,9 @@ void BouncingBehavior::init()
   // Do nothing
 }
 
-void BouncingBehavior::attach(const ArcRotateCameraPtr& camera)
+void BouncingBehavior::attach(
+  const ArcRotateCameraPtr& camera,
+  const std::function<bool(const AbstractMeshPtr& m)>& /*predicate*/)
 {
   _attachedCamera = camera;
   _onAfterCheckInputsObserver

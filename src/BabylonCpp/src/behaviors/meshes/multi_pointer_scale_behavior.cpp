@@ -39,7 +39,9 @@ float MultiPointerScaleBehavior::_getCurrentDistance()
     .length();
 }
 
-void MultiPointerScaleBehavior::attach(const MeshPtr& ownerNode)
+void MultiPointerScaleBehavior::attach(
+  const MeshPtr& ownerNode,
+  const std::function<bool(const AbstractMeshPtr& m)>& /*predicate*/)
 {
   _ownerNode = ownerNode;
 

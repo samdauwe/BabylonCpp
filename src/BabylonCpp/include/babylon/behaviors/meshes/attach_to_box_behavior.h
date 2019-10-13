@@ -36,7 +36,7 @@ public:
    * @param ui The transform node that should be attched to the mesh
    */
   AttachToBoxBehavior(const TransformNodePtr& ui);
-  virtual ~AttachToBoxBehavior();
+  virtual ~AttachToBoxBehavior() override;
 
   /**
    * @brief Initializes the behavior.
@@ -46,8 +46,11 @@ public:
   /**
    * @brief Attaches the AttachToBoxBehavior to the passed in mesh
    * @param target The mesh that the specified node will be attached to
+   * @param predicate Predicate to use for pick filtering
    */
-  void attach(const MeshPtr& target) override;
+  void attach(const MeshPtr& target,
+              const std::function<bool(const AbstractMeshPtr& m)>& predicate
+              = nullptr) override;
 
   /**
    * @brief Detaches the behavior from the mesh.

@@ -92,7 +92,9 @@ void AutoRotationBehavior::init()
   // Do nothing
 }
 
-void AutoRotationBehavior::attach(const ArcRotateCameraPtr& camera)
+void AutoRotationBehavior::attach(
+  const ArcRotateCameraPtr& camera,
+  const std::function<bool(const AbstractMeshPtr& m)>& /*predicate*/)
 {
   _attachedCamera = camera;
   auto scene      = _attachedCamera->getScene();

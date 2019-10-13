@@ -1,12 +1,16 @@
 #ifndef BABYLON_BEHAVIORS_BEHAVIOR_H
 #define BABYLON_BEHAVIORS_BEHAVIOR_H
 
+#include <functional>
 #include <memory>
 #include <string>
 
 #include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
 
 /**
  * @brief Interface used to define a behavior.
@@ -27,8 +31,13 @@ struct BABYLON_SHARED_EXPORT Behavior {
   /**
    * @brief Called when the behavior is attached to a target.
    * @param target defines the target where the behavior is attached to
+   * @param predicate Predicate to use for pick filtering
    */
-  virtual void attach(const std::shared_ptr<T>& target) = 0;
+  virtual void
+  attach(const std::shared_ptr<T>& target,
+         const std::function<bool(const AbstractMeshPtr& m)>& predicate
+         = nullptr)
+    = 0;
   /**
    * @brief Called when the behavior is detached from its target.
    */

@@ -25,7 +25,7 @@ public:
    * the mesh to be scaled.
    */
   MultiPointerScaleBehavior();
-  virtual ~MultiPointerScaleBehavior();
+  virtual ~MultiPointerScaleBehavior() override;
 
   /**
    * @brief The name of the behavior.
@@ -40,8 +40,11 @@ public:
   /**
    * @brief Attaches the drag behavior the passed in mesh.
    * @param ownerNode The mesh that will be dragged around once attached
+   * @param predicate Predicate to use for pick filtering
    */
-  void attach(const MeshPtr& ownerNode) override;
+  void attach(const MeshPtr& ownerNode,
+              const std::function<bool(const AbstractMeshPtr& m)>& predicate
+              = nullptr) override;
 
   /**
    * @brief Detaches the behavior from the mesh.

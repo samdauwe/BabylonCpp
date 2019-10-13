@@ -24,6 +24,7 @@ SixDofDragBehavior::SixDofDragBehavior()
     , _virtualDragMesh{nullptr}
     , _pointerObserver{nullptr}
     , _moving{false}
+    , _pointerCamera{this, &SixDofDragBehavior::get__pointerCamera}
     , zDragFactor{3.f}
 {
 }
@@ -41,7 +42,19 @@ void SixDofDragBehavior::init()
 {
 }
 
-void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
+CameraPtr& SixDofDragBehavior::get__pointerCamera()
+{
+  if (_scene->cameraToUseForPointers) {
+    return _scene->cameraToUseForPointers;
+  }
+  else {
+    return _scene->activeCamera;
+  }
+}
+
+void SixDofDragBehavior::attach(
+  const MeshPtr& ownerNode,
+  const std::function<bool(const AbstractMeshPtr& m)>& /*predicate*/)
 {
   _ownerNode = ownerNode;
   _scene     = _ownerNode->getScene();
@@ -75,10 +88,10 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
       if (!dragging && pointerInfo->pickInfo.hit
           && pointerInfo->pickInfo.pickedMesh && pointerInfo->pickInfo.ray
           && pickPredicate(pointerInfo->pickInfo.pickedMesh.get())) {
-        if (_scene->activeCamera()
-            && _scene->activeCamera()->cameraRigMode == Camera::RIG_MODE_NONE) {
+        if (_pointerCamera()
+            && _pointerCamera()->cameraRigMode == Camera::RIG_MODE_NONE) {
           auto ray = *pointerInfo->pickInfo.ray;
-          ray.origin.copyFrom(_scene->activeCamera()->globalPosition);
+          ray.origin.copyFrom(_pointerCamera()->globalPosition);
           pointerInfo->pickInfo.ray = ray;
         }
 
@@ -116,12 +129,12 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
         currentDraggingPointerID = (pointerInfo->pointerEvent).pointerId;
 
         // Detach camera controls
-        if (detachCameraControls && _scene->activeCamera()
-            && !_scene->activeCamera()->leftCamera()) {
-          if (_scene->activeCamera()->inputs.attachedElement) {
-            attachedElement = _scene->activeCamera()->inputs.attachedElement;
-            _scene->activeCamera()->detachControl(
-              _scene->activeCamera()->inputs.attachedElement);
+        if (detachCameraControls && _pointerCamera()
+            && !_pointerCamera()->leftCamera()) {
+          if (_pointerCamera()->inputs.attachedElement) {
+            attachedElement = _pointerCamera()->inputs.attachedElement;
+            _pointerCamera()->detachControl(
+              _pointerCamera()->inputs.attachedElement);
           }
           else {
             attachedElement = nullptr;
@@ -140,9 +153,9 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
         _virtualOriginMesh->removeChild(*_virtualDragMesh);
 
         // Reattach camera controls
-        if (detachCameraControls && attachedElement && _scene->activeCamera()
-            && !_scene->activeCamera()->leftCamera()) {
-          _scene->activeCamera()->attachControl(attachedElement, true);
+        if (detachCameraControls && attachedElement && _pointerCamera()
+            && !_pointerCamera()->leftCamera()) {
+          _pointerCamera()->attachControl(attachedElement, true);
         }
         onDragEndObservable.notifyObservers(nullptr);
       }
@@ -151,10 +164,10 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
       if (currentDraggingPointerID == (pointerInfo->pointerEvent).pointerId
           && dragging && pointerInfo->pickInfo.ray && pickedMesh) {
         auto _zDragFactor = zDragFactor;
-        if (_scene->activeCamera()
-            && _scene->activeCamera()->cameraRigMode == Camera::RIG_MODE_NONE) {
+        if (_pointerCamera()
+            && _pointerCamera()->cameraRigMode == Camera::RIG_MODE_NONE) {
           auto ray = *pointerInfo->pickInfo.ray;
-          ray.origin.copyFrom(_scene->activeCamera()->globalPosition);
+          ray.origin.copyFrom(_pointerCamera()->globalPosition);
           pointerInfo->pickInfo.ray = ray;
           _zDragFactor              = 0.f;
         }
