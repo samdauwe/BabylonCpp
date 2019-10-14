@@ -313,7 +313,9 @@ bool Animatable::_animate(const millisecond_t& delay)
 
       // Dispose all runtime animations
       for (const auto& runtimeAnimation : _runtimeAnimations) {
-        runtimeAnimation->dispose();
+        if (runtimeAnimation) {
+          runtimeAnimation->dispose();
+        }
       }
     }
 

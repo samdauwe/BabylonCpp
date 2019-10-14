@@ -114,6 +114,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _windowIsBackground{false}
     , _webGLVersion{1.f}
     , _colorWrite{true}
+    , _loadingScreen{nullptr}
     , _videoTextureSupported{false}
     , _renderingQueueLaunched{false}
     , _deterministicLockstep{false}
@@ -1120,8 +1121,8 @@ void Engine::bindUnboundFramebuffer(const GL::IGLFramebufferPtr& framebuffer)
 
   std::shared_ptr<GL::IGLFramebuffer> realFrameBuffer;
   if (framebuffer) {
-    realFrameBuffer = framebuffer;
-    auto previousId = _gl->getParameteri(GL::FRAMEBUFFER_BINDING);
+    realFrameBuffer      = framebuffer;
+    auto previousId      = _gl->getParameteri(GL::FRAMEBUFFER_BINDING);
     _previousFrameBuffer = std::make_unique<GL::IGLFramebuffer>(previousId);
   }
   else {

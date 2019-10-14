@@ -58,8 +58,10 @@ MaterialPtr& MultiMaterial::getSubMaterial(unsigned int index)
 std::vector<BaseTexturePtr> MultiMaterial::getActiveTextures() const
 {
   auto activeTextures = Material::getActiveTextures();
-  for (auto& subMaterial : _subMaterials) {
-    stl_util::concat(activeTextures, subMaterial->getActiveTextures());
+  for (const auto& subMaterial : _subMaterials) {
+    if (subMaterial) {
+      stl_util::concat(activeTextures, subMaterial->getActiveTextures());
+    }
   }
   return activeTextures;
 }
@@ -72,7 +74,7 @@ const std::string MultiMaterial::getClassName() const
 bool MultiMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                                       bool useInstances)
 {
-  for (auto& subMaterial : _subMaterials) {
+  for (const auto& subMaterial : _subMaterials) {
     if (subMaterial) {
       if (subMaterial->_storeEffectOnSubMeshes) {
         if (!subMaterial->isReadyForSubMesh(mesh, subMesh, useInstances)) {
@@ -95,7 +97,7 @@ MaterialPtr MultiMaterial::clone(const std::string& iName,
 {
   auto newMultiMaterial = MultiMaterial::New(iName, getScene());
 
-  for (auto& subMaterial : _subMaterials) {
+  for (const auto& subMaterial : _subMaterials) {
     MaterialPtr newSubMaterial = nullptr;
     if (cloneChildren) {
       newSubMaterial = subMaterial->clone(name + "-" + subMaterial->name);
@@ -123,7 +125,7 @@ void MultiMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
   }
 
   if (forceDisposeChildren) {
-    for (auto& subMaterial : subMaterials()) {
+    for (const auto& subMaterial : subMaterials()) {
       if (subMaterial) {
         subMaterial->dispose(forceDisposeEffect, forceDisposeTextures);
       }

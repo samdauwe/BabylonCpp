@@ -1617,6 +1617,32 @@ Mesh& Mesh::_checkDelayState()
 Mesh& Mesh::_queueLoad(Scene* scene)
 {
   scene->_addPendingData(this);
+
+  const auto getBinaryData
+    = String::contains(delayLoadingFile, ".babylonbinarymeshdata");
+
+  Tools::LoadFile(
+    delayLoadingFile,
+    [this](const std::variant<std::string, ArrayBuffer>& data,
+           const std::string & /*responseURL*/) -> void {
+      if (std::holds_alternative<ArrayBuffer>(data)) {
+        // _delayLoadingFunction(data, shared_from_base<Mesh>());
+      }
+      else {
+        _delayLoadingFunction(json::parse(std::get<std::string>(data)),
+                              shared_from_base<Mesh>());
+      }
+
+      for (const auto& instance : instances) {
+        instance->refreshBoundingInfo();
+        instance->_syncSubMeshes();
+      }
+
+      delayLoadState = Constants::DELAYLOADSTATE_LOADED;
+      // scene->_removePendingData(this);
+    },
+    nullptr, /* scene->offlineProvider, */ getBinaryData);
+
   return *this;
 }
 

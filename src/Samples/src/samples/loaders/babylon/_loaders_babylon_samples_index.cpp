@@ -4,6 +4,7 @@
 #include <babylon/samples/loaders/babylon/import_candle_scene.h>
 #include <babylon/samples/loaders/babylon/import_dude_scene.h>
 #include <babylon/samples/loaders/babylon/import_dummy3_scene.h>
+#include <babylon/samples/loaders/babylon/import_hill_valley_scene.h>
 #include <babylon/samples/loaders/babylon/import_meshes_skull_scene.h>
 #include <babylon/samples/loaders/babylon/import_rabbit_scene.h>
 #include <babylon/samples/loaders/babylon/import_suzanne_scene.h>
@@ -39,6 +40,12 @@ _LoadersBabylonSamplesIndex::_LoadersBabylonSamplesIndex()
                       [](ICanvas* iCanvas) {                                 //
                         return std::make_unique<ImportDummy3Scene>(iCanvas); //
                       });                                                    //
+  // Import Hill Valley Scene
+  _samples["ImportHillValleyScene"]
+    = std::make_tuple(true,                                        //
+                      [](ICanvas* iCanvas) {                       //
+                        return MakeImportHillValleyScene(iCanvas); //
+                      });                                          //
   // Import Meshes Skull Scene
   _samples["ImportMeshesSkullScene"] = std::make_tuple(
     true,                                                       //
