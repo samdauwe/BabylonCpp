@@ -381,6 +381,7 @@ std::function<LightPtr()>
 Light::GetConstructorFromName(unsigned int type, const std::string& iName,
                               Scene* scene)
 {
+  // FIXME add light constructors
   auto constructorFunc
     = Node::Construct("Light_Type_" + std::to_string(type), iName, scene);
 
