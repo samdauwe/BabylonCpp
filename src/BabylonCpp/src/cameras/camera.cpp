@@ -5,9 +5,12 @@
 #include <babylon/cameras/arc_follow_camera.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/cameras/camera_inputs_manager.h>
+#include <babylon/cameras/device_orientation_camera.h>
 #include <babylon/cameras/follow_camera.h>
 #include <babylon/cameras/free_camera.h>
+#include <babylon/cameras/gamepad_camera.h>
 #include <babylon/cameras/universal_camera.h>
+#include <babylon/cameras/virtual_joysticks_camera.h>
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
@@ -892,6 +895,19 @@ void Camera::_resizeOrCreateMultiviewTexture(int width, int height)
   }
 }
 
+void Camera::_AddNodeConstructors()
+{
+  ArcFollowCamera::AddNodeConstructor();
+  ArcRotateCamera::AddNodeConstructor();
+  DeviceOrientationCamera::AddNodeConstructor();
+  FollowCamera::AddNodeConstructor();
+  FreeCamera::AddNodeConstructor();
+  GamepadCamera::AddNodeConstructor();
+  TouchCamera::AddNodeConstructor();
+  UniversalCamera::AddNodeConstructor();
+  VirtualJoysticksCamera::AddNodeConstructor();
+}
+
 std::function<CameraPtr()> Camera::GetConstructorFromName(
   const std::string& type, const std::string& iName, Scene* scene,
   float interaxial_distance, bool isStereoscopicSideBySide)
@@ -915,6 +931,8 @@ std::function<CameraPtr()> Camera::GetConstructorFromName(
 
 CameraPtr Camera::Parse(const json& parsedCamera, Scene* scene)
 {
+  _AddNodeConstructors();
+
   auto type      = json_util::get_string(parsedCamera, "type");
   auto construct = Camera::GetConstructorFromName(
     type, json_util::get_string(parsedCamera, "name"), scene,

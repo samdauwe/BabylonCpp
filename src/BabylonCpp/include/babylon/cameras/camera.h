@@ -571,6 +571,7 @@ private:
   void _updateFrustumPlanes();
   virtual void _updateCameraRotationMatrix();
   virtual void _updateWebVRCameraRotationMatrix();
+  static void _AddNodeConstructors();
 
 public:
   /**

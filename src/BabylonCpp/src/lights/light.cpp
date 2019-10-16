@@ -377,11 +377,18 @@ json Light::serialize() const
   return nullptr;
 }
 
+void Light::_AddNodeConstructors()
+{
+  DirectionalLight::AddNodeConstructor();
+  HemisphericLight::AddNodeConstructor();
+  PointLight::AddNodeConstructor();
+  SpotLight::AddNodeConstructor();
+}
+
 std::function<LightPtr()>
 Light::GetConstructorFromName(unsigned int type, const std::string& iName,
                               Scene* scene)
 {
-  // FIXME add light constructors
   auto constructorFunc
     = Node::Construct("Light_Type_" + std::to_string(type), iName, scene);
 
@@ -397,6 +404,8 @@ Light::GetConstructorFromName(unsigned int type, const std::string& iName,
 
 LightPtr Light::Parse(const json& parsedLight, Scene* scene)
 {
+  _AddNodeConstructors();
+
   auto constructor = Light::GetConstructorFromName(
     json_util::get_number<unsigned>(parsedLight, "type"),
     json_util::get_string(parsedLight, "name"), scene);

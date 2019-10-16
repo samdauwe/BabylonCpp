@@ -452,6 +452,11 @@ private:
    */
   float _getPhotometricScale();
 
+  /**
+   * @brief Hidden
+   */
+  static void _AddNodeConstructors();
+
 public:
   /**
    * Diffuse gives the basic color to an object.
