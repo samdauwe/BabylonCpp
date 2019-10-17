@@ -55,7 +55,7 @@ void MaterialHelper::PrepareDefinesForMergedUV(const BaseTexturePtr& texture,
       defines.boolDef["MAINUV1"] = true;
     }
     else {
-      defines.boolDef["MAINUV1"] = true;
+      defines.boolDef["MAINUV2"] = true;
     }
   }
   else {
