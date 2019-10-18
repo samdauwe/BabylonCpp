@@ -55,6 +55,14 @@ public:
   }
 
   /**
+   * @brief Gets the list of observers.
+   */
+  std::vector<typename Observer<T>::Ptr>& observers()
+  {
+    return _observers;
+  }
+
+  /**
    * @brief Create a new Observer with the specified callback.
    * @param callback the callback that will be executed for that Observer
    * @param mask the mask used to filter observers
