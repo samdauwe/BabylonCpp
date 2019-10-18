@@ -9,6 +9,7 @@
 
 namespace BABYLON {
 
+class AbstractScene;
 class Camera;
 class Engine;
 class Layer;
@@ -37,7 +38,7 @@ public:
     return std::shared_ptr<LayerSceneComponent>(
       new LayerSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~LayerSceneComponent();
+  virtual ~LayerSceneComponent() override;
 
   /**
    * @brief Registers the component in a given scene.
@@ -54,6 +55,20 @@ public:
    * @brief Disposes the component and the associated resources.
    */
   void dispose() override;
+
+  /**
+   * @brief Adds all the elements from the container to the scene.
+   * @param container the container holding the elements
+   */
+  void addFromContainer(const AbstractScene& container);
+
+  /**
+   * @brief Removes all the elements in the container from the scene.
+   * @param container contains the elements to remove
+   * @param dispose if the removed element should be disposed (default: false)
+   */
+  void removeFromContainer(const AbstractScene& container,
+                           bool dispose = false);
 
 private:
   void _draw(const std::function<bool(const Layer& layer)>& predicate);

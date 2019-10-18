@@ -14,6 +14,7 @@
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/pbr/pbr_material.h>
 #include <babylon/materials/standard_material.h>
+#include <babylon/materials/textures/raw_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/meshes/_instances_batch.h>
 #include <babylon/meshes/sub_mesh.h>
@@ -27,7 +28,8 @@ EffectLayer::EffectLayer(const std::string& iName, Scene* scene)
     : name{iName}
     , isEnabled{true}
     , camera{this, &EffectLayer::get_camera}
-    , renderingGroupId{this, &EffectLayer::get_renderingGroupId}
+    , renderingGroupId{this, &EffectLayer::get_renderingGroupId,
+                       &EffectLayer::set_renderingGroupId}
     , _mainTexture{nullptr}
     , _maxSize{0}
     , _mainTextureDesiredSize{ISize{0, 0}}
@@ -69,6 +71,11 @@ CameraPtr& EffectLayer::get_camera()
 int EffectLayer::get_renderingGroupId() const
 {
   return _effectLayerOptions.renderingGroupId;
+}
+
+void EffectLayer::set_renderingGroupId(int renderingGroupId)
+{
+  _effectLayerOptions.renderingGroupId = renderingGroupId;
 }
 
 void EffectLayer::_init(const IEffectLayerOptions& options)
@@ -303,6 +310,7 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
   }
 
   // Bones
+  auto fallbacks = std::make_unique<EffectFallbacks>();
   if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
     attribs.emplace_back(VertexBuffer::MatricesIndicesKind);
     attribs.emplace_back(VertexBuffer::MatricesWeightsKind);
@@ -316,6 +324,20 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
       "#define BonesPerMesh "
       + std::to_string(mesh->skeleton() ? (mesh->skeleton()->bones.size() + 1) :
                                           0));
+
+    auto& skeleton = mesh->skeleton();
+    if (skeleton && skeleton->isUsingTextureForMatrices()) {
+      defines.emplace_back("#define BONETEXTURE");
+    }
+    else {
+      defines.emplace_back(
+        "#define BonesPerMesh "
+        + std::to_string(skeleton ? (skeleton->bones.size() + 1) : 0ull));
+    }
+
+    if (mesh->numBoneInfluencers > 0) {
+      fallbacks->addCPUSkinningFallback(0, mesh.get());
+    }
   }
   else {
     defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
@@ -333,8 +355,8 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
                              + std::to_string(morphInfluencers));
         MaterialDefines iDefines;
         iDefines.intDef["NUM_MORPH_INFLUENCERS"] = morphInfluencers;
-        MaterialHelper::PrepareAttributesForMorphTargets(attribs, mesh.get(),
-                                                         iDefines);
+        MaterialHelper::PrepareAttributesForMorphTargetsInfluencers(
+          attribs, mesh.get(), morphInfluencers);
       }
     }
   }
@@ -342,10 +364,7 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
   // Instances
   if (useInstances) {
     defines.emplace_back("#define INSTANCES");
-    attribs.emplace_back(VertexBuffer::World0Kind);
-    attribs.emplace_back(VertexBuffer::World1Kind);
-    attribs.emplace_back(VertexBuffer::World2Kind);
-    attribs.emplace_back(VertexBuffer::World3Kind);
+    MaterialHelper::PushAttributesForInstances(attribs);
   }
 
   _addCustomEffectDefines(defines);
@@ -358,6 +377,7 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
     EffectCreationOptions effectCreationOptions;
     effectCreationOptions.attributes = std::move(attribs);
     effectCreationOptions.defines    = std::move(join);
+    effectCreationOptions.fallbacks  = std::move(fallbacks);
     effectCreationOptions.indexParameters
       = {{"maxSimultaneousMorphTargets", morphInfluencers}};
     effectCreationOptions.uniformsNames = {"world",
@@ -365,12 +385,13 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
                                            "viewProjection",
                                            "glowColor",
                                            "morphTargetInfluences",
+                                           "boneTextureWidth",
                                            "diffuseMatrix",
                                            "emissiveMatrix",
                                            "opacityMatrix",
                                            "opacityIntensity"};
     effectCreationOptions.samplers
-      = {"diffuseSampler", "emissiveSampler", "opacitySampler"};
+      = {"diffuseSampler", "emissiveSampler", "opacitySampler", "boneSampler"};
 
     _effectLayerMapGenerationEffect = _scene->getEngine()->createEffect(
       "glowMapGeneration", effectCreationOptions, _scene->getEngine());
@@ -566,8 +587,23 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
     // Bones
     if (mesh->useBones() && mesh->computeBonesUsingShaders()
         && mesh->skeleton()) {
-      _effectLayerMapGenerationEffect->setMatrices(
-        "mBones", mesh->skeleton()->getTransformMatrices(mesh.get()));
+      auto& skeleton = mesh->skeleton();
+
+      if (skeleton->isUsingTextureForMatrices()) {
+        auto boneTexture = skeleton->getTransformMatrixTexture(mesh.get());
+        if (!boneTexture) {
+          return;
+        }
+
+        _effectLayerMapGenerationEffect->setTexture("boneSampler", boneTexture);
+        _effectLayerMapGenerationEffect->setFloat(
+          "boneTextureWidth",
+          4.f * static_cast<float>(skeleton->bones.size() + 1));
+      }
+      else {
+        _effectLayerMapGenerationEffect->setMatrices(
+          "mBones", skeleton->getTransformMatrices((mesh.get())));
+      }
     }
 
     // Morph targets

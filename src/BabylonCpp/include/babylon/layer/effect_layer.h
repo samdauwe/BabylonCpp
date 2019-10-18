@@ -170,6 +170,11 @@ protected:
   int get_renderingGroupId() const;
 
   /**
+   * @brief Sets the rendering group id the layer should render in.
+   */
+  void set_renderingGroupId(int renderingGroupId);
+
+  /**
    * @brief Create the merge effect. This is the shader use to blit the
    * information back to the main canvas at the end of the scene rendering.
    * @returns The effect containing the shader used to merge the effect on the
@@ -302,9 +307,9 @@ public:
   ReadOnlyProperty<EffectLayer, CameraPtr> camera;
 
   /**
-   * Gets the rendering group id the layer should render in.
+   * Gets or sets the rendering group id the layer should render in.
    */
-  ReadOnlyProperty<EffectLayer, int> renderingGroupId;
+  Property<EffectLayer, int> renderingGroupId;
 
   /**
    * An event triggered when the effect layer has been disposed.

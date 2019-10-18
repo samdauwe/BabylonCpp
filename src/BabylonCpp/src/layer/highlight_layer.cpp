@@ -435,17 +435,23 @@ void HighlightLayer::addMesh(const MeshPtr& mesh, const Color3& color,
     // Lambda required for capture due to Observable this context
     newMesh.observerHighlight
       = mesh->onBeforeBindObservable().add([&](Mesh* mesh, EventState&) {
-          if (!_excludedMeshes.empty()
-              && stl_util::contains(_excludedMeshes, mesh->uniqueId)) {
-            _defaultStencilReference(mesh);
-          }
-          else {
-            mesh->getScene()->getEngine()->setStencilFunctionReference(
-              static_cast<int>(_instanceGlowingMeshStencilReference));
+          if (isEnabled) {
+            if (!_excludedMeshes.empty()
+                && stl_util::contains(_excludedMeshes, mesh->uniqueId)) {
+              _defaultStencilReference(mesh);
+            }
+            else {
+              mesh->getScene()->getEngine()->setStencilFunctionReference(
+                static_cast<int>(_instanceGlowingMeshStencilReference));
+            }
           }
         });
-    newMesh.observerDefault = mesh->onAfterRenderObservable().add(
-      [&](Mesh* mesh, EventState&) { _defaultStencilReference(mesh); });
+    newMesh.observerDefault
+      = mesh->onAfterRenderObservable().add([&](Mesh* mesh, EventState&) {
+          if (isEnabled) {
+            _defaultStencilReference(mesh);
+          }
+        });
     newMesh.glowEmissiveOnly = glowEmissiveOnly;
     _meshes[mesh->uniqueId]  = newMesh;
 

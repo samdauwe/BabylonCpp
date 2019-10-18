@@ -2,6 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
+#include <babylon/engines/abstract_scene.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/layer/layer.h>
@@ -131,6 +132,33 @@ void LayerSceneComponent::_drawRenderTargetForeground(
     return _drawRenderTargetPredicate(
       layer, false, scene->activeCamera()->layerMask, renderTarget);
   });
+}
+
+void LayerSceneComponent::addFromContainer(const AbstractScene& container)
+{
+  if (container.layers.empty()) {
+    return;
+  }
+  for (const auto& layer : container.layers) {
+    scene->layers.emplace_back(layer);
+  }
+}
+
+void LayerSceneComponent::removeFromContainer(const AbstractScene& container,
+                                              bool dispose)
+{
+  if (container.layers.empty()) {
+    return;
+  }
+  for (const auto& layer : container.layers) {
+    const auto index = stl_util::index_of(scene->layers, layer);
+    if (index != -1) {
+      stl_util::splice(scene->layers, index, 1);
+    }
+    if (dispose) {
+      layer->dispose();
+    }
+  }
 }
 
 } // end of namespace BABYLON

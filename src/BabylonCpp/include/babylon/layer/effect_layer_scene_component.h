@@ -40,7 +40,7 @@ public:
     return std::shared_ptr<EffectLayerSceneComponent>(
       new EffectLayerSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~EffectLayerSceneComponent();
+  virtual ~EffectLayerSceneComponent() override;
 
   /**
    * @brief Registers the component in a given scene.
@@ -60,7 +60,7 @@ public:
   void serialize(json& serializationObject) const;
 
   /**
-   * @brief Adds all the element from the container to the scene.
+   * @brief Adds all the elements from the container to the scene.
    * @param container the container holding the elements
    */
   void addFromContainer(AbstractScene* container);
