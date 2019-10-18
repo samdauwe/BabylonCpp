@@ -67,18 +67,23 @@ void TGATools::UploadContent(const InternalTexturePtr& texture,
   switch (header.image_type) {
     case TGATools::_TYPE_RLE_INDEXED:
       use_rle = true;
+      use_pal = true;
+      break;
     case TGATools::_TYPE_INDEXED:
       use_pal = true;
       break;
 
     case TGATools::_TYPE_RLE_RGB:
       use_rle = true;
+      break;
     case TGATools::_TYPE_RGB:
       // use_rgb = true;
       break;
 
     case TGATools::_TYPE_RLE_GREY:
-      use_rle = true;
+      use_rle  = true;
+      use_grey = true;
+      break;
     case TGATools::_TYPE_GREY:
       use_grey = true;
       break;
