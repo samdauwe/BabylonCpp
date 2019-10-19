@@ -97,7 +97,8 @@ void PropertyGridTabComponent::render()
     return;
   }
 
-  if (entity->type == EntityType::FreeCamera) {
+  if (entity->type == EntityType::FreeCamera
+      || entity->type == EntityType::UniversalCamera) {
     auto& freeCamera = _entityCache.freeCamera;
     if (!freeCamera || freeCamera->uniqueId != entityId) {
       freeCamera = std::dynamic_pointer_cast<FreeCamera>(

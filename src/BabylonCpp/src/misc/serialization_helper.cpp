@@ -227,7 +227,8 @@ SerializationHelper::Parse(const std::function<CameraPtr()>& creationFunction,
         = json_util::get_number<float>(source, "maxCameraSpeed", 20.f);
     }
   }
-  else if (cameraClassName == "FreeCamera") {
+  else if (cameraClassName == "FreeCamera"
+           || cameraClassName == "UniversalCamera") {
     /** FreeCamera **/
     auto freeCamera = std::static_pointer_cast<FreeCamera>(camera);
     // applyGravity
