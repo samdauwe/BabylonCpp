@@ -1623,7 +1623,7 @@ Mesh& Mesh::_queueLoad(Scene* scene)
 
   Tools::LoadFile(
     delayLoadingFile,
-    [this](const std::variant<std::string, ArrayBuffer>& data,
+    [this, &scene](const std::variant<std::string, ArrayBuffer>& data,
            const std::string & /*responseURL*/) -> void {
       if (std::holds_alternative<ArrayBuffer>(data)) {
         // _delayLoadingFunction(data, shared_from_base<Mesh>());
@@ -1639,7 +1639,7 @@ Mesh& Mesh::_queueLoad(Scene* scene)
       }
 
       delayLoadState = Constants::DELAYLOADSTATE_LOADED;
-      // scene->_removePendingData(this);
+      scene->_removePendingData(this);
     },
     nullptr, /* scene->offlineProvider, */ getBinaryData);
 

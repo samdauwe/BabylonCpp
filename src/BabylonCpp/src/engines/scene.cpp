@@ -1916,9 +1916,18 @@ void Scene::_addPendingData(const InternalTexturePtr& /*texure*/)
 {
 }
 
+void Scene::_removePendingData(Mesh* /*mesh*/)
+{
+  const auto wasLoading = isLoading();
+
+  if (wasLoading && !isLoading()) {
+    onDataLoadedObservable.notifyObservers(this);
+  }
+}
+
 void Scene::_removePendingData(const InternalTexturePtr& /*texture*/)
 {
-  auto wasLoading = isLoading();
+  const auto wasLoading = isLoading();
 
   if (wasLoading && !isLoading()) {
     onDataLoadedObservable.notifyObservers(this);

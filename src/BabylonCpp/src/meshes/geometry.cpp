@@ -1104,7 +1104,7 @@ GeometryPtr Geometry::Parse(const json& parsedVertexData, Scene* scene,
 
   // Tags.AddTagsTo(geometry, parsedVertexData.tags);
 
-  if (json_util::has_key(parsedVertexData, "delayLoadingFile")) {
+  if (json_util::has_valid_key_value(parsedVertexData, "delayLoadingFile")) {
     geometry->delayLoadState = Constants::DELAYLOADSTATE_NOTLOADED;
     geometry->delayLoadingFile
       = rootUrl + json_util::get_string(parsedVertexData, "delayLoadingFile");

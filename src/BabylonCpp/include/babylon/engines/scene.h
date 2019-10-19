@@ -448,6 +448,11 @@ public:
   /**
    * @brief Hidden
    */
+  void _removePendingData(Mesh* mesh);
+
+  /**
+   * @brief Hidden
+   */
   void _removePendingData(const InternalTexturePtr& texture);
 
   /**
