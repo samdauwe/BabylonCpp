@@ -85,9 +85,14 @@ void PropertyGridTabComponent::render()
         props.scene->getMeshByUniqueID(entityId));
       _reservedDataStore.mesh[mesh->uniqueId] = MeshReservedDataStore{};
     }
-    if (mesh && mesh->getTotalVertices() > 0) {
-      MeshPropertyGridComponent::render(
-        mesh, _reservedDataStore.mesh[mesh->uniqueId]);
+    if (mesh) {
+      if (mesh->getTotalVertices() > 0) {
+        MeshPropertyGridComponent::render(
+          mesh, _reservedDataStore.mesh[mesh->uniqueId]);
+      }
+      else {
+        TransformNodePropertyGridComponent::render(mesh);
+      }
     }
     return;
   }

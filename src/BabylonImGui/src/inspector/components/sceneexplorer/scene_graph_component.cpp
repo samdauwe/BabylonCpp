@@ -118,12 +118,12 @@ void SceneGraphComponent::_initializeNodesTreeItem(
 
   // Create Children
   if (String::contains(node->getClassName(), "Bone")) {
-      const auto bone = std::static_pointer_cast<Bone>(node);
-      for (const auto& child : bone->children) {
-        if (child) {
-          _initializeNodesTreeItem(treeItem, child);
-        }
+    const auto bone = std::static_pointer_cast<Bone>(node);
+    for (const auto& child : bone->children) {
+      if (child) {
+        _initializeNodesTreeItem(treeItem, child);
       }
+    }
   }
   else {
     for (const auto& child : node->getChildren()) {
@@ -187,7 +187,7 @@ TreeItem SceneGraphComponent::_createNodeTreeItem(const NodePtr& node)
   if (node) {
     if (String::contains(node->getClassName(), "Mesh")) {
       auto mesh = std::static_pointer_cast<Mesh>(node);
-      if (mesh->getTotalVertices() > 0) {
+      if (mesh->getTotalVertices() > 0 || !mesh->delayLoadingFile.empty()) {
         IMeshTreeItemComponentProps compProps;
         compProps.mesh     = std::static_pointer_cast<Mesh>(node);
         label              = compProps.mesh->name;
