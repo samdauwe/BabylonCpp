@@ -319,6 +319,7 @@ bool Animatable::_animate(const millisecond_t& delay)
       }
     }
 
+#if 0 // TODO FIXME
     _raiseOnAnimationEnd();
 
     if (disposeOnEnd) {
@@ -327,6 +328,7 @@ bool Animatable::_animate(const millisecond_t& delay)
       onAnimationLoopObservable.clear();
       onAnimationEndObservable.clear();
     }
+#endif
   }
 
   return running;

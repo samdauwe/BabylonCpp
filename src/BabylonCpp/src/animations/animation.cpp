@@ -697,10 +697,10 @@ AnimationPtr Animation::Parse(const json& parsedAnimation)
       case Animation::ANIMATIONTYPE_FLOAT(): {
         auto values = json_util::get_array<float>(key, "values");
         data        = AnimationValue(values[0]);
-        if (values.size() >= 1) {
+        if (values.size() > 1) {
           inTangent = values[1];
         }
-        if (values.size() >= 2) {
+        if (values.size() > 2) {
           outTangent = values[2];
         }
       } break;
