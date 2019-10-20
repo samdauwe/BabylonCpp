@@ -167,13 +167,13 @@ protected:
   /**
    * @brief Gets the animation properties override
    */
-  AnimationPropertiesOverride*& get_animationPropertiesOverride() override;
+  AnimationPropertiesOverridePtr& get_animationPropertiesOverride() override;
 
   /**
    * @brief Sets the animation properties override
    */
   void set_animationPropertiesOverride(
-    AnimationPropertiesOverride* const& value) override;
+    const AnimationPropertiesOverridePtr& value) override;
 
   /**
    * @brief Gets a boolean defining if the target contains position data.
@@ -263,7 +263,7 @@ private:
   Float32Array _tangents;
   Float32Array _uvs;
   float _influence;
-  AnimationPropertiesOverride* _animationPropertiesOverride;
+  AnimationPropertiesOverridePtr _animationPropertiesOverride;
 
 }; // end of class MorphTarget
 

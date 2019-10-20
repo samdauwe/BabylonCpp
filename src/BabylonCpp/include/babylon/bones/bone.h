@@ -558,7 +558,7 @@ protected:
   /**
    * @brief Gets the animation properties override.
    */
-  AnimationPropertiesOverride*& get_animationPropertiesOverride() override;
+  AnimationPropertiesOverridePtr& get_animationPropertiesOverride() override;
 
 private:
   void _decompose();

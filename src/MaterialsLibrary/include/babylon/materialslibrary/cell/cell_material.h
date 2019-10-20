@@ -38,7 +38,7 @@ public:
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances) override;
   void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
-  std::vector<IAnimatablePtr> getAnimatables();
+  std::vector<IAnimatablePtr> getAnimatables() override;
   std::vector<BaseTexturePtr> getActiveTextures() const override;
   bool hasTexture(const BaseTexturePtr& texture) const override;
   virtual void dispose(bool forceDisposeEffect   = false,

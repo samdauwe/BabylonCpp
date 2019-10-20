@@ -237,9 +237,9 @@ std::vector<AnimationPtr> Bone::getAnimations()
   return animations;
 }
 
-AnimationPropertiesOverride*& Bone::get_animationPropertiesOverride()
+AnimationPropertiesOverridePtr& Bone::get_animationPropertiesOverride()
 {
-  return _skeleton->animationPropertiesOverride;
+  return _skeleton->animationPropertiesOverride();
 }
 
 void Bone::_decompose()

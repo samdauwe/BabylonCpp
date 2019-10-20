@@ -1502,7 +1502,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
   _afterBind(mesh, _activeEffect);
 }
 
-std::vector<IAnimatablePtr> PBRBaseMaterial::getAnimatables() const
+std::vector<IAnimatablePtr> PBRBaseMaterial::getAnimatables()
 {
   std::vector<IAnimatablePtr> results;
 

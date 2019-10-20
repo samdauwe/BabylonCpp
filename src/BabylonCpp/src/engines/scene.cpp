@@ -546,13 +546,13 @@ void Scene::set_forceShowBoundingBoxes(bool value)
   }
 }
 
-AnimationPropertiesOverride*& Scene::get_animationPropertiesOverride()
+AnimationPropertiesOverridePtr& Scene::get_animationPropertiesOverride()
 {
   return _animationPropertiesOverride;
 }
 
 void Scene::set_animationPropertiesOverride(
-  AnimationPropertiesOverride* const& value)
+  const AnimationPropertiesOverridePtr& value)
 {
   _animationPropertiesOverride = value;
 }

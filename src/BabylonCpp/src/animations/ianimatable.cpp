@@ -27,19 +27,29 @@ void IAnimatable::set_parent(Node* const& /*parent*/)
 {
 }
 
-AnimationPropertiesOverride*& IAnimatable::get_animationPropertiesOverride()
+AnimationPropertiesOverridePtr& IAnimatable::get_animationPropertiesOverride()
 {
   return _nullAnimationPropertiesOverride;
 }
 
 void IAnimatable::set_animationPropertiesOverride(
-  AnimationPropertiesOverride* const& /*value*/)
+  const AnimationPropertiesOverridePtr& /*value*/)
 {
 }
 
 std::vector<AnimationPtr> IAnimatable::getAnimations()
 {
-  return std::vector<AnimationPtr>();
+  return {};
+}
+
+std::vector<IAnimatablePtr> IAnimatable::getAnimatables()
+{
+  return {};
+}
+
+std::vector<AnimationRangePtr> IAnimatable::getAnimationRanges()
+{
+  return {};
 }
 
 bool IAnimatable::markTargetAsDirty() const

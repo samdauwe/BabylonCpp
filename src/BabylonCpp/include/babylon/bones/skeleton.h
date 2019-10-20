@@ -24,11 +24,12 @@ class IAnimatable;
 class RawTexture;
 class Scene;
 class Skeleton;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
-using IAnimatablePtr  = std::shared_ptr<IAnimatable>;
-using BonePtr         = std::shared_ptr<Bone>;
-using RawTexturePtr   = std::shared_ptr<RawTexture>;
-using SkeletonPtr     = std::shared_ptr<Skeleton>;
+using AbstractMeshPtr   = std::shared_ptr<AbstractMesh>;
+using AnimationRangePtr = std::shared_ptr<AnimationRange>;
+using IAnimatablePtr    = std::shared_ptr<IAnimatable>;
+using BonePtr           = std::shared_ptr<Bone>;
+using RawTexturePtr     = std::shared_ptr<RawTexture>;
+using SkeletonPtr       = std::shared_ptr<Skeleton>;
 
 /**
  * @brief Class used to handle skinning animations.
@@ -127,13 +128,13 @@ public:
    * @param name defines the name of the range to look for
    * @returns the requested animation range or null if not found
    */
-  AnimationRange* getAnimationRange(const std::string& name);
+  AnimationRangePtr getAnimationRange(const std::string& name);
 
   /**
    * @brief Gets the list of all animation ranges defined on this skeleton.
    * @returns an array
    */
-  std::vector<AnimationRange> getAnimationRanges();
+  std::vector<AnimationRangePtr> getAnimationRanges() override;
 
   /**
    * @brief Copy animation range from a source skeleton.
@@ -179,7 +180,7 @@ public:
    * @brief Gets the list of animatables currently running for this skeleton.
    * @returns an array of animatables
    */
-  std::vector<IAnimatablePtr> getAnimatables();
+  std::vector<IAnimatablePtr> getAnimatables() override;
 
   /**
    * @brief Hidden
@@ -270,13 +271,13 @@ protected:
   /**
    * @brief Gets the animation properties override.
    */
-  AnimationPropertiesOverride*& get_animationPropertiesOverride() override;
+  AnimationPropertiesOverridePtr& get_animationPropertiesOverride() override;
 
   /**
    * @brief Sets the animation properties override.
    */
   void set_animationPropertiesOverride(
-    AnimationPropertiesOverride* const& value) override;
+    const AnimationPropertiesOverridePtr& value) override;
 
   /**
    * @brief Gets a boolean indicating that the skeleton effectively stores
@@ -379,12 +380,12 @@ private:
   std::vector<IAnimatablePtr> _animatables;
   Matrix _identity;
   AbstractMesh* _synchronizedWithMesh;
-  std::unordered_map<std::string, AnimationRange> _ranges;
+  std::unordered_map<std::string, AnimationRangePtr> _ranges;
   int _lastAbsoluteTransformsUpdateId;
   bool _canUseTextureForBones;
   size_t _uniqueId;
   bool _useTextureToStoreBoneMatrices;
-  AnimationPropertiesOverride* _animationPropertiesOverride;
+  AnimationPropertiesOverridePtr _animationPropertiesOverride;
 
 }; // end of class Bone
 

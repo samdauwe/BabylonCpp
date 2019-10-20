@@ -9,8 +9,14 @@ namespace BABYLON {
 
 class Animation;
 struct AnimationPropertiesOverride;
+class AnimationRange;
+class IAnimatable;
 class Node;
 using AnimationPtr = std::shared_ptr<Animation>;
+using AnimationPropertiesOverridePtr
+  = std::shared_ptr<AnimationPropertiesOverride>;
+using AnimationRangePtr = std::shared_ptr<AnimationRange>;
+using IAnimatablePtr    = std::shared_ptr<IAnimatable>;
 
 class BABYLON_SHARED_EXPORT IAnimatable {
 
@@ -20,6 +26,8 @@ public:
 
   virtual Type type() const = 0;
   virtual std::vector<AnimationPtr> getAnimations();
+  virtual std::vector<IAnimatablePtr> getAnimatables();
+  virtual std::vector<AnimationRangePtr> getAnimationRanges();
   virtual bool markTargetAsDirty() const;
   virtual IAnimatable& markAsDirty(const std::string& property = "");
   virtual void markAsDirty(unsigned int /*flag*/);
@@ -52,9 +60,9 @@ public:
 protected:
   virtual Node*& get_parent();
   virtual void set_parent(Node* const& parent);
-  virtual AnimationPropertiesOverride*& get_animationPropertiesOverride();
+  virtual AnimationPropertiesOverridePtr& get_animationPropertiesOverride();
   virtual void
-  set_animationPropertiesOverride(AnimationPropertiesOverride* const& value);
+  set_animationPropertiesOverride(const AnimationPropertiesOverridePtr& value);
 
 public:
   /**
@@ -65,7 +73,7 @@ public:
   /**
    * Gets the animation properties override
    */
-  Property<IAnimatable, AnimationPropertiesOverride*>
+  Property<IAnimatable, AnimationPropertiesOverridePtr>
     animationPropertiesOverride;
 
   /**
@@ -77,7 +85,7 @@ private:
   Node* nullNode;
   Matrix _identityMatrix;
   std::optional<Matrix> _nullMatrix;
-  AnimationPropertiesOverride* _nullAnimationPropertiesOverride;
+  AnimationPropertiesOverridePtr _nullAnimationPropertiesOverride;
 
 }; // end of struct IAnimatable
 

@@ -93,7 +93,7 @@ void Skeleton::set_useTextureToStoreBoneMatrices(bool value)
   _markAsDirty();
 }
 
-AnimationPropertiesOverride*& Skeleton::get_animationPropertiesOverride()
+AnimationPropertiesOverridePtr& Skeleton::get_animationPropertiesOverride()
 {
   if (!_animationPropertiesOverride) {
     return _scene->animationPropertiesOverride;
@@ -102,7 +102,7 @@ AnimationPropertiesOverride*& Skeleton::get_animationPropertiesOverride()
 }
 
 void Skeleton ::set_animationPropertiesOverride(
-  AnimationPropertiesOverride* const& value)
+  const AnimationPropertiesOverridePtr& value)
 {
   _animationPropertiesOverride = value;
 }
@@ -187,7 +187,7 @@ void Skeleton::createAnimationRange(const std::string& _name, float from,
 {
   // check name not already in use
   if (!stl_util::contains(_ranges, _name)) {
-    _ranges[_name] = AnimationRange(_name, from, to);
+    _ranges[_name] = std::make_shared<AnimationRange>(_name, from, to);
     for (const auto& bone : bones) {
       if (!bone->animations.empty() && (bone->animations[0] != nullptr)) {
         bone->animations[0]->createRange(_name, from, to);
@@ -206,18 +206,18 @@ void Skeleton::deleteAnimationRange(const std::string& _name, bool deleteFrames)
   _ranges.erase(_name);
 }
 
-AnimationRange* Skeleton::getAnimationRange(const std::string& _name)
+AnimationRangePtr Skeleton::getAnimationRange(const std::string& _name)
 {
   if (!stl_util::contains(_ranges, _name)) {
-    return &_ranges[_name];
+    return _ranges[_name];
   }
 
   return nullptr;
 }
 
-std::vector<AnimationRange> Skeleton::getAnimationRanges()
+std::vector<AnimationRangePtr> Skeleton::getAnimationRanges()
 {
-  std::vector<AnimationRange> animationRanges;
+  std::vector<AnimationRangePtr> animationRanges;
   for (const auto& range : _ranges) {
     animationRanges.emplace_back(range.second);
   }
@@ -272,8 +272,8 @@ bool Skeleton::copyAnimationRange(Skeleton* source, const std::string& _name,
   // was already done
   auto range = source->getAnimationRange(_name);
   if (range) {
-    _ranges[_name] = AnimationRange(_name, range->from + frameOffset,
-                                    range->to + frameOffset);
+    _ranges[_name] = std::make_shared<AnimationRange>(
+      _name, range->from + frameOffset, range->to + frameOffset);
   }
   return ret;
 }

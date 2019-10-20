@@ -1935,13 +1935,13 @@ protected:
   /**
    * @brief Gets the animation properties override.
    */
-  AnimationPropertiesOverride*& get_animationPropertiesOverride() override;
+  AnimationPropertiesOverridePtr& get_animationPropertiesOverride() override;
 
   /**
    * @brief Sets the animation properties override.
    */
   void set_animationPropertiesOverride(
-    AnimationPropertiesOverride* const& value) override;
+    const AnimationPropertiesOverridePtr& value) override;
 
   // Events
   /**
@@ -3410,7 +3410,7 @@ protected:
 
 private:
   // Animations
-  AnimationPropertiesOverride* _animationPropertiesOverride;
+  AnimationPropertiesOverridePtr _animationPropertiesOverride;
   // Events
   std::function<bool(Sprite* sprite)> _spritePredicate;
   Observer<Scene>::Ptr _onDisposeObserver;

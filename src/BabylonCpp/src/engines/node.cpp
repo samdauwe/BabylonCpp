@@ -151,7 +151,7 @@ void Node::removeFromSceneRootNodes()
   }
 }
 
-AnimationPropertiesOverride*& Node::get_animationPropertiesOverride()
+AnimationPropertiesOverridePtr& Node::get_animationPropertiesOverride()
 {
   if (!_animationPropertiesOverride) {
     return _scene->animationPropertiesOverride;
@@ -160,7 +160,7 @@ AnimationPropertiesOverride*& Node::get_animationPropertiesOverride()
 }
 
 void Node::set_animationPropertiesOverride(
-  AnimationPropertiesOverride* const& value)
+  const AnimationPropertiesOverridePtr& value)
 {
   _animationPropertiesOverride = value;
 }

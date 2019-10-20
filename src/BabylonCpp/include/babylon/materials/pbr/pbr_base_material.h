@@ -176,7 +176,7 @@ public:
    * @brief Returns the animatable textures.
    * @returns - Array of animatable textures.
    */
-  std::vector<IAnimatablePtr> getAnimatables() const;
+  std::vector<IAnimatablePtr> getAnimatables() override;
 
   /**
    * @brief Returns an array of the actively used textures.

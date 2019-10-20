@@ -85,7 +85,7 @@ void MorphTarget::set_influence(float iInfluence)
   }
 }
 
-AnimationPropertiesOverride*& MorphTarget::get_animationPropertiesOverride()
+AnimationPropertiesOverridePtr& MorphTarget::get_animationPropertiesOverride()
 {
   if (!_animationPropertiesOverride && _scene) {
     return _scene->animationPropertiesOverride;
@@ -94,7 +94,7 @@ AnimationPropertiesOverride*& MorphTarget::get_animationPropertiesOverride()
 }
 
 void MorphTarget::set_animationPropertiesOverride(
-  AnimationPropertiesOverride* const& value)
+  const AnimationPropertiesOverridePtr& value)
 {
   _animationPropertiesOverride = value;
 }

@@ -360,7 +360,7 @@ public:
    * @brief Gets the list of all animation ranges defined on this node.
    * @returns an array
    */
-  std::vector<AnimationRangePtr> getAnimationRanges();
+  std::vector<AnimationRangePtr> getAnimationRanges() override;
 
   /**
    * @brief Will start the animation sequence.
@@ -445,13 +445,13 @@ protected:
   /**
    * @brief Gets the animation properties override.
    */
-  AnimationPropertiesOverride*& get_animationPropertiesOverride() override;
+  AnimationPropertiesOverridePtr& get_animationPropertiesOverride() override;
 
   /**
    * @brief Sets the animation properties override.
    */
   void set_animationPropertiesOverride(
-    AnimationPropertiesOverride* const& value) override;
+    const AnimationPropertiesOverridePtr& value) override;
 
   /**
    * @brief Sets a callback that will be raised when the node will be disposed.
@@ -571,7 +571,7 @@ private:
   Node* _parentNode;
   std::vector<NodePtr> _children;
   int _sceneRootNodesIndex;
-  AnimationPropertiesOverride* _animationPropertiesOverride;
+  AnimationPropertiesOverridePtr _animationPropertiesOverride;
   Observer<Node>::Ptr _onDisposeObserver;
   bool _addToRootNodes;
 

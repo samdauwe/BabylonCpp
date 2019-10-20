@@ -258,7 +258,7 @@ void RuntimeAnimation::_setValue(const IAnimatablePtr& iTarget,
 
 std::optional<unsigned int> RuntimeAnimation::_getCorrectLoopMode() const
 {
-  if (_target && _target->animationPropertiesOverride) {
+  if (_target && _target->animationPropertiesOverride()) {
     return _target->animationPropertiesOverride()->loopMode;
   }
 

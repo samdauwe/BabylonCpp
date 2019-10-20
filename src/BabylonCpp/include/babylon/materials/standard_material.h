@@ -114,7 +114,7 @@ public:
    * @brief Get the list of animatables in the material.
    * @returns the list of animatables object used in the material
    */
-  std::vector<IAnimatablePtr> getAnimatables();
+  std::vector<IAnimatablePtr> getAnimatables() override;
 
   /**
    * @brief Gets the active textures from the material.

@@ -703,7 +703,7 @@ public:
    * skeleton, if any.
    * @returns an array of IAnimatable
    */
-  std::vector<IAnimatablePtr> getAnimatables();
+  std::vector<IAnimatablePtr> getAnimatables() override;
 
   /**
    * @brief Modifies the mesh geometry according to the passed transformation
