@@ -8,6 +8,7 @@
 #include <babylon/inspector/components/actiontabs/pane_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/materials/texture_reserved_data_store.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/meshes/mesh_reserved_data_store.h>
+#include <babylon/inspector/components/actiontabs/tabs/propertygrids/meshes/skeleton_reserved_data_store.h>
 
 namespace BABYLON {
 
@@ -20,11 +21,13 @@ class FreeCamera;
 class HemisphericLight;
 class Material;
 class Mesh;
+class MultiMaterial;
 class PBRMaterial;
 class PBRMetallicRoughnessMaterial;
 class PBRSpecularGlossinessMaterial;
 class PointLight;
 class ScenePropertyGridComponent;
+class Skeleton;
 class SpotLight;
 class StandardMaterial;
 class TransformNode;
@@ -37,19 +40,22 @@ using FreeCameraPtr         = std::shared_ptr<FreeCamera>;
 using HemisphericLightPtr   = std::shared_ptr<HemisphericLight>;
 using MaterialPtr           = std::shared_ptr<Material>;
 using MeshPtr               = std::shared_ptr<Mesh>;
+using MultiMaterialPtr      = std::shared_ptr<MultiMaterial>;
 using PBRMaterialPtr        = std::shared_ptr<PBRMaterial>;
 using PBRMetallicRoughnessMaterialPtr
   = std::shared_ptr<PBRMetallicRoughnessMaterial>;
 using PBRSpecularGlossinessMaterialPtr
   = std::shared_ptr<PBRSpecularGlossinessMaterial>;
 using PointLightPtr       = std::shared_ptr<PointLight>;
+using SkeletonPtr         = std::shared_ptr<Skeleton>;
 using SpotLightPtr        = std::shared_ptr<SpotLight>;
 using StandardMaterialPtr = std::shared_ptr<StandardMaterial>;
 using TransformNodePtr    = std::shared_ptr<TransformNode>;
 
 struct EntityCache {
   // Bones
-  BonePtr bone = nullptr;
+  BonePtr bone         = nullptr;
+  SkeletonPtr skeleton = nullptr;
   // Cameras
   ArcRotateCameraPtr arcRotateCamera = nullptr;
   FreeCameraPtr freeCamera           = nullptr;
@@ -61,6 +67,7 @@ struct EntityCache {
   // Materials
   BackgroundMaterialPtr backgroundMaterial                       = nullptr;
   MaterialPtr material                                           = nullptr;
+  MultiMaterialPtr multiMaterial                                 = nullptr;
   PBRMaterialPtr pbrMaterial                                     = nullptr;
   PBRMetallicRoughnessMaterialPtr pbrMetallicRoughnessMaterial   = nullptr;
   PBRSpecularGlossinessMaterialPtr pbrSpecularGlossinessMaterial = nullptr;
@@ -73,7 +80,11 @@ struct EntityCache {
 }; // end of struct EntityCache
 
 struct ReservedDataStore {
+  // Bones
+  std::unordered_map<size_t, SkeletonReservedDataStore> skeleton;
+  // Meshes
   std::unordered_map<size_t, MeshReservedDataStore> mesh;
+  // Texture
   std::unordered_map<std::string, TextureReservedDataStore> texture;
 };
 

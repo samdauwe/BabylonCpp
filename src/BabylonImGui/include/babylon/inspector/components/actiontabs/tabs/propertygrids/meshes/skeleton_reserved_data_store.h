@@ -7,13 +7,15 @@
 #include <babylon/babylon_api.h>
 
 namespace BABYLON {
-
+namespace Debug {
 class SkeletonViewer;
 using SkeletonViewerPtr = std::shared_ptr<SkeletonViewer>;
+} // end of namespace Debug
 
 struct BABYLON_SHARED_EXPORT SkeletonReservedDataStore {
-  bool skeletonViewersEnabled = false;
-  std::vector<SkeletonViewerPtr> skeletonViewers;
+  bool skeletonViewersEnabled                           = false;
+  std::vector<Debug::SkeletonViewerPtr> skeletonViewers = {};
+  Debug::SkeletonViewerPtr skeletonViewer               = nullptr;
 }; // end of struct SkeletonReservedDataStore
 
 } // end of namespace BABYLON

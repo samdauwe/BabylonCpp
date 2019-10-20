@@ -2,6 +2,7 @@
 
 #include <imgui.h>
 
+#include <babylon/bones/skeleton.h>
 #include <babylon/engines/scene.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/cameras/arc_rotate_camera_property_grid_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/cameras/free_camera_property_grid_component.h>
@@ -11,6 +12,7 @@
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/lights/spot_light_property_grid_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/materials/background_material_property_grid_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/materials/material_property_grid_component.h>
+#include <babylon/inspector/components/actiontabs/tabs/propertygrids/materials/multi_material_property_grid_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/materials/pbr_material_property_grid_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/materials/pbr_metallic_roughness_material_property_grid_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/materials/pbr_specular_glossiness_material_property_grid_component.h>
@@ -18,6 +20,7 @@
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/materials/texture_property_grid_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/meshes/bone_property_grid_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/meshes/mesh_property_grid_component.h>
+#include <babylon/inspector/components/actiontabs/tabs/propertygrids/meshes/skeleton_property_grid_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/meshes/transform_node_property_grid_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/scene_property_grid_component.h>
 #include <babylon/lights/directional_light.h>
@@ -26,6 +29,7 @@
 #include <babylon/lights/spot_light.h>
 #include <babylon/materials/background/background_material.h>
 #include <babylon/materials/material.h>
+#include <babylon/materials/multi_material.h>
 #include <babylon/materials/pbr/pbr_material.h>
 #include <babylon/materials/pbr/pbr_metallic_roughness_material.h>
 #include <babylon/materials/pbr/pbr_specular_glossiness_material.h>
@@ -68,7 +72,7 @@ void PropertyGridTabComponent::render()
     return;
   }
 
-  auto entityId    = entity->uniqueId ? *entity->uniqueId : 0ull;
+  auto entityId    = entity->uniqueId.value_or(0ull);
   auto& entityName = entity->name;
 
   if (entity->type == EntityType::Scene) {
@@ -182,6 +186,18 @@ void PropertyGridTabComponent::render()
     return;
   }
 
+  if (entity->type == EntityType::MultiMaterial) {
+    auto& multiMaterial = _entityCache.multiMaterial;
+    if (!multiMaterial || multiMaterial->uniqueId != entityId) {
+      multiMaterial = std::dynamic_pointer_cast<MultiMaterial>(
+        props.scene->getMaterialByUniqueID(entityId));
+    }
+    if (multiMaterial) {
+      MultiMaterialPropertyGridComponent::render(multiMaterial);
+    }
+    return;
+  }
+
   if (entity->type == EntityType::StandardMaterial) {
     auto& standardMaterial = _entityCache.standardMaterial;
     if (!standardMaterial || standardMaterial->uniqueId != entityId) {
@@ -278,6 +294,21 @@ void PropertyGridTabComponent::render()
     if (texture) {
       TexturePropertyGridComponent::render(
         texture, _reservedDataStore.texture[texture->name]);
+    }
+    return;
+  }
+
+  if (entity->type == EntityType::Skeleton) {
+    auto& skeleton = _entityCache.skeleton;
+    if (!skeleton || skeleton->uniqueId != entityId) {
+      skeleton = std::dynamic_pointer_cast<Skeleton>(
+        props.scene->getSkeletonByUniqueID(entityId));
+      _reservedDataStore.skeleton[skeleton->uniqueId]
+        = SkeletonReservedDataStore{};
+    }
+    if (skeleton) {
+      SkeletonPropertyGridComponent::render(
+        skeleton, _reservedDataStore.skeleton[skeleton->uniqueId]);
     }
     return;
   }

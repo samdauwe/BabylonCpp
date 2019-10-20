@@ -29,6 +29,7 @@ enum class EntityType {
   BackgroundMaterial,
   Image,
   Material,
+  MultiMaterial,
   PBRMaterial,
   PBRMetallicRoughnessMaterial,
   PBRSpecularGlossinessMaterial,
