@@ -3312,6 +3312,16 @@ SkeletonPtr Scene::getSkeletonById(const std::string& id)
   return (it == skeletons.end()) ? nullptr : *it;
 }
 
+SkeletonPtr Scene::getSkeletonByUniqueID(size_t uniqueId)
+{
+  auto it = std::find_if(skeletons.begin(), skeletons.end(),
+                         [uniqueId](const SkeletonPtr& skeleton) {
+                           return skeleton->uniqueId == uniqueId;
+                         });
+
+  return (it == skeletons.end()) ? nullptr : *it;
+}
+
 SkeletonPtr Scene::getSkeletonByName(const std::string& name)
 {
   auto it = std::find_if(
@@ -3518,7 +3528,7 @@ void Scene::_evaluateActiveMeshes()
 
     mesh->_preActivate();
 
-    if (mesh->isVisible && mesh->visibility > 0
+    if (mesh->isVisible && mesh->visibility() > 0.f
         && (mesh->alwaysSelectAsActiveMesh
             || ((mesh->layerMask & _activeCamera->layerMask) != 0
                 && mesh->isInFrustum(_frustumPlanes)))) {

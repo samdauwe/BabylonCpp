@@ -1191,6 +1191,13 @@ public:
   SkeletonPtr getSkeletonById(const std::string& id);
 
   /**
+   * @brief Gets a skeleton using its unique id.
+   * @param uniqueId defines the unique id to look for
+   * @return the found skeleton or null if not found at all.
+   */
+  SkeletonPtr getSkeletonByUniqueID(size_t uniqueId);
+
+  /**
    * @brief Gets a skeleton using a given name.
    * @param name defines the name to search for
    * @return the found skeleton or null if not found at all.
