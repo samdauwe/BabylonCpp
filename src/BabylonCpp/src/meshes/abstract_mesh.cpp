@@ -591,7 +591,7 @@ void AbstractMesh::_rebuild()
     return;
   }
 
-  for (auto& subMesh : subMeshes) {
+  for (const auto& subMesh : subMeshes) {
     subMesh->_rebuild();
   }
 }
@@ -600,7 +600,7 @@ void AbstractMesh::_resyncLightSources()
 {
   _lightSources.clear();
 
-  for (auto& light : getScene()->lights) {
+  for (const auto& light : getScene()->lights) {
     if (!light->isEnabled()) {
       continue;
     }
@@ -615,10 +615,11 @@ void AbstractMesh::_resyncLightSources()
 
 void AbstractMesh::_resyncLighSource(const LightPtr& light)
 {
-  bool isIn = light && light->isEnabled() && light->canAffectMesh(this);
+  const auto isIn = light && light->isEnabled() && light->canAffectMesh(this);
 
   auto index = std::find(_lightSources.begin(), _lightSources.end(), light);
-  if (index != _lightSources.end()) {
+
+  if (index == _lightSources.end()) {
     if (!isIn) {
       return;
     }
@@ -636,7 +637,7 @@ void AbstractMesh::_resyncLighSource(const LightPtr& light)
 
 void AbstractMesh::_unBindEffect()
 {
-  for (auto& subMesh : subMeshes) {
+  for (const auto& subMesh : subMeshes) {
     subMesh->setEffect(nullptr);
   }
 }
@@ -668,7 +669,7 @@ void AbstractMesh::_markSubMeshesAsDirty(
     return;
   }
 
-  for (auto& subMesh : subMeshes) {
+  for (const auto& subMesh : subMeshes) {
     if (subMesh->_materialDefines) {
       func(*subMesh->_materialDefines);
     }
@@ -1188,7 +1189,7 @@ bool AbstractMesh::intersectsMesh(AbstractMesh& mesh, bool precise,
   }
 
   if (includeDescendants) {
-    for (auto& child : getChildMeshes()) {
+    for (const auto& child : getChildMeshes()) {
       if (child->intersectsMesh(mesh, precise, true)) {
         return true;
       }
@@ -1210,7 +1211,7 @@ bool AbstractMesh::intersectsMesh(SolidParticle& sp, bool precise,
   }
 
   if (includeDescendants) {
-    for (auto& child : getChildMeshes()) {
+    for (const auto& child : getChildMeshes()) {
       if (child->intersectsMesh(sp, precise, true)) {
         return true;
       }
@@ -1603,7 +1604,7 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   _internalAbstractMeshDataInfo._skeleton = nullptr;
 
   // Intersections in progress
-  for (auto& other : _intersectionsInProgress) {
+  for (const auto& other : _intersectionsInProgress) {
     other->_intersectionsInProgress.erase(
       std::remove(other->_intersectionsInProgress.begin(),
                   other->_intersectionsInProgress.end(), this),
@@ -1613,7 +1614,7 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   _intersectionsInProgress.clear();
 
   // Lights
-  for (auto& light : getScene()->lights) {
+  for (const auto& light : getScene()->lights) {
     // Included meshes
     light->includedOnlyMeshes().erase(
       std::remove_if(light->includedOnlyMeshes().begin(),
