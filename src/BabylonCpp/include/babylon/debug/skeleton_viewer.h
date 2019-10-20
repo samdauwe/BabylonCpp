@@ -18,7 +18,9 @@ class Skeleton;
 class Vector3;
 class UtilityLayerRenderer;
 using BonePtr                 = std::shared_ptr<Bone>;
+using AbstractMeshPtr         = std::shared_ptr<AbstractMesh>;
 using LinesMeshPtr            = std::shared_ptr<LinesMesh>;
+using SkeletonPtr             = std::shared_ptr<Skeleton>;
 using UtilityLayerRendererPtr = std::shared_ptr<UtilityLayerRenderer>;
 
 namespace Debug {
@@ -40,8 +42,9 @@ public:
    * @param renderingGroupId defines the rendering group id to use with the
    * viewer
    */
-  SkeletonViewer(Skeleton* skeleton, AbstractMesh* mesh, Scene* scene,
-                 bool autoUpdateBonesMatrices = true, int renderingGroupId = 1);
+  SkeletonViewer(const SkeletonPtr& skeleton, const AbstractMeshPtr& mesh,
+                 Scene* scene, bool autoUpdateBonesMatrices = true,
+                 int renderingGroupId = 1);
   ~SkeletonViewer();
 
   /**
@@ -94,12 +97,12 @@ public:
   /**
    * Defines the skeleton to render
    */
-  Skeleton* skeleton;
+  SkeletonPtr skeleton;
 
   /**
    * Defines the mesh attached to the skeleton
    */
-  AbstractMesh* mesh;
+  AbstractMeshPtr mesh;
 
   /**
    * Defines a boolean indicating if bones matrices must be forced to update

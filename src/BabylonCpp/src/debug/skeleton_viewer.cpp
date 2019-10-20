@@ -13,8 +13,9 @@
 namespace BABYLON {
 namespace Debug {
 
-SkeletonViewer::SkeletonViewer(Skeleton* iSkeleton, AbstractMesh* iMesh,
-                               Scene* iScene, bool iAutoUpdateBonesMatrices,
+SkeletonViewer::SkeletonViewer(const SkeletonPtr& iSkeleton,
+                               const AbstractMeshPtr& iMesh, Scene* iScene,
+                               bool iAutoUpdateBonesMatrices,
                                int iRenderingGroupId)
     : color{Color3::White()}
     , debugMesh{this, &SkeletonViewer::get_debugMesh}
