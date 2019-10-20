@@ -2875,7 +2875,7 @@ MaterialPtr Scene::getLastMaterialByID(const std::string& id)
     return nullptr;
   }
 
-  for (size_t index = materials.size() - 1; index-- > 0;) {
+  for (size_t index = materials.size(); index-- > 0;) {
     if (materials[index]->id == id) {
       return materials[index];
     }
