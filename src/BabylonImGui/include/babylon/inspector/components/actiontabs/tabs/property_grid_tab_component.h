@@ -6,6 +6,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/inspector/components/actiontabs/pane_component.h>
+#include <babylon/inspector/components/actiontabs/tabs/propertygrids/animation_reserved_data_store.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/materials/texture_reserved_data_store.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/meshes/mesh_reserved_data_store.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/meshes/skeleton_reserved_data_store.h>
@@ -80,6 +81,8 @@ struct EntityCache {
 }; // end of struct EntityCache
 
 struct ReservedDataStore {
+  // Animations
+  std::unordered_map<size_t, AnimationReservedDataStore> animation;
   // Bones
   std::unordered_map<size_t, SkeletonReservedDataStore> skeleton;
   // Meshes

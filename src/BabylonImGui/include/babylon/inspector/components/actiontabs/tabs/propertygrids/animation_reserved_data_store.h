@@ -19,6 +19,7 @@ struct BABYLON_SHARED_EXPORT AnimationControl {
 }; // end of struct AnimationControl
 
 struct BABYLON_SHARED_EXPORT AnimationReservedDataStore {
+  bool intialized    = false;
   Scene* scene       = nullptr;
   float currentFrame = 0.f;
   std::vector<AnimationPtr> _animations;

@@ -121,6 +121,11 @@ struct BABYLON_SHARED_EXPORT AnimationGridComponent {
   static void render(const IAnimatablePtr& animatable,
                      AnimationReservedDataStore& animationReservedDataStore)
   {
+    if (!animationReservedDataStore.intialized) {
+      initializeDatastore(animatable, animationReservedDataStore);
+      animationReservedDataStore.intialized = true;
+    }
+
     auto animatablesForTarget
       = animationReservedDataStore.scene->getAllAnimatablesByTarget(animatable);
     animationReservedDataStore._isPlaying = animatablesForTarget.size() > 0;

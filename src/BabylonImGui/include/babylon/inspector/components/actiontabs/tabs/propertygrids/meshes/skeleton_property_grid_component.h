@@ -11,7 +11,9 @@
 #include <babylon/engines/scene.h>
 #include <babylon/inspector/components/actiontabs/lines/check_box_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/text_line_component.h>
+#include <babylon/inspector/components/actiontabs/tabs/propertygrids/animation_grid_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/animation_group_grid_component.h>
+#include <babylon/inspector/components/actiontabs/tabs/propertygrids/animation_reserved_data_store.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/meshes/skeleton_reserved_data_store.h>
 #include <babylon/meshes/abstract_mesh.h>
 
@@ -63,7 +65,8 @@ struct BABYLON_SHARED_EXPORT SkeletonPropertyGridComponent {
   }
 
   static void render(const SkeletonPtr& skeleton,
-                     SkeletonReservedDataStore& skeletonReservedDataStore)
+                     SkeletonReservedDataStore& skeletonReservedDataStore,
+                     AnimationReservedDataStore& animationReservedDataStore)
   {
     // --- GENERAL ---
     static auto generalContainerOpened = true;
@@ -87,6 +90,8 @@ struct BABYLON_SHARED_EXPORT SkeletonPropertyGridComponent {
     else {
       generalContainerOpened = false;
     }
+    // -- Animations --
+    AnimationGridComponent::render(skeleton, animationReservedDataStore);
   }
 
 }; // end of struct SkeletonPropertyGridComponent

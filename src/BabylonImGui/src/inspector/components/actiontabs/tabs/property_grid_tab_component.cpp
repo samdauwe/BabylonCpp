@@ -305,10 +305,14 @@ void PropertyGridTabComponent::render()
         props.scene->getSkeletonByUniqueID(entityId));
       _reservedDataStore.skeleton[skeleton->uniqueId]
         = SkeletonReservedDataStore{};
+      _reservedDataStore.animation[skeleton->uniqueId]
+        = AnimationReservedDataStore{};
+      _reservedDataStore.animation[skeleton->uniqueId].scene = props.scene;
     }
     if (skeleton) {
       SkeletonPropertyGridComponent::render(
-        skeleton, _reservedDataStore.skeleton[skeleton->uniqueId]);
+        skeleton, _reservedDataStore.skeleton[skeleton->uniqueId],
+        _reservedDataStore.animation[skeleton->uniqueId]);
     }
     return;
   }
