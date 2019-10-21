@@ -50,16 +50,26 @@ void ImportHillValleyScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   SceneLoader::Append(
     "scenes/hillvalley/", "HillValley.babylon", scene, [&canvas](Scene* scene) {
-      scene->executeWhenReady([&canvas](Scene* scene, EventState& /*es*/) {
-        if (scene->activeCamera()) {
-          scene->activeCamera()->attachControl(canvas);
+      if (scene->activeCamera()) {
+        scene->activeCamera()->attachControl(canvas);
+
+        auto activeCamera
+          = std::static_pointer_cast<FreeCamera>(scene->activeCamera());
+        if (activeCamera) {
+          activeCamera->keysUp().emplace_back(90);    // Z
+          activeCamera->keysUp().emplace_back(87);    // W
+          activeCamera->keysDown().emplace_back(83);  // S
+          activeCamera->keysLeft().emplace_back(65);  // A
+          activeCamera->keysLeft().emplace_back(81);  // Q
+          activeCamera->keysRight().emplace_back(69); // E
+          activeCamera->keysRight().emplace_back(68); // D
         }
-        scene->collisionsEnabled = false;
-        scene->lightsEnabled     = false;
-        for (const auto& material : scene->materials) {
-          material->checkReadyOnEveryCall = false;
-        }
-      });
+      }
+      scene->collisionsEnabled = false;
+      scene->lightsEnabled     = false;
+      for (const auto& material : scene->materials) {
+        material->checkReadyOnEveryCall = false;
+      }
     });
 }
 
