@@ -11,7 +11,11 @@ struct BABYLON_SHARED_EXPORT ButtonLineComponent {
 
   static bool render(const char* label)
   {
-    return ImGui::Button(label);
+    ImGui::PushID(label);
+    ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth());
+    auto clicked = ImGui::Button(label, ImVec2(-FLT_MIN, 0.0f));
+    ImGui::PopID();
+    return clicked;
   }
 
 }; // end of struct ButtonLineComponent
