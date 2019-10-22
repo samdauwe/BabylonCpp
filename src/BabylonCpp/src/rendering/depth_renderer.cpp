@@ -261,10 +261,10 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
     options.uniformsNames
       = {"world",         "mBones",      "viewProjection",
          "diffuseMatrix", "depthValues", "morphTargetInfluences"};
-    options.samplers = {"diffuseSampler"};
-    options.defines  = std::move(join);
-    options.indexParameters
-      = {{"maxSimultaneousMorphTargets", numMorphInfluencers}};
+    options.samplers        = {"diffuseSampler"};
+    options.defines         = std::move(join);
+    options.indexParameters = {{"maxSimultaneousMorphTargets",
+                                static_cast<unsigned>(numMorphInfluencers)}};
 
     _effect = _scene->getEngine()->createEffect("depth", options,
                                                 _scene->getEngine());

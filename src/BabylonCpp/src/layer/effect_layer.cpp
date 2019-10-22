@@ -73,9 +73,9 @@ int EffectLayer::get_renderingGroupId() const
   return _effectLayerOptions.renderingGroupId;
 }
 
-void EffectLayer::set_renderingGroupId(int renderingGroupId)
+void EffectLayer::set_renderingGroupId(int iRenderingGroupId)
 {
-  _effectLayerOptions.renderingGroupId = renderingGroupId;
+  _effectLayerOptions.renderingGroupId = iRenderingGroupId;
 }
 
 void EffectLayer::_init(const IEffectLayerOptions& options)

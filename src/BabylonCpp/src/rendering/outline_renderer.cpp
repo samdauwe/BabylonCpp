@@ -172,7 +172,7 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
     defines.emplace_back(
       "#define BonesPerMesh "
       + std::to_string(
-        (mesh->skeleton() ? mesh->skeleton()->bones.size() + 1 : 0)));
+          (mesh->skeleton() ? mesh->skeleton()->bones.size() + 1 : 0)));
   }
   else {
     defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
@@ -211,10 +211,10 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
     options.uniformsNames = {
       "world",  "mBones", "viewProjection",           "diffuseMatrix",
       "offset", "color",  "logarithmicDepthConstant", "morphTargetInfluences"};
-    options.samplers = {"diffuseSampler"};
-    options.defines  = std::move(join);
-    options.indexParameters
-      = {{"maxSimultaneousMorphTargets", numMorphInfluencers}};
+    options.samplers        = {"diffuseSampler"};
+    options.defines         = std::move(join);
+    options.indexParameters = {{"maxSimultaneousMorphTargets",
+                                static_cast<unsigned>(numMorphInfluencers)}};
 
     _effect = scene->getEngine()->createEffect("outline", options,
                                                scene->getEngine());

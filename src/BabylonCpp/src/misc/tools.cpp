@@ -15,7 +15,9 @@
 #pragma GCC diagnostic ignored "-Wswitch-default"
 #endif
 #if _MSC_VER && !__INTEL_COMPILER
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
 #pragma warning(push)
 #pragma warning(disable : 4244)
 #endif

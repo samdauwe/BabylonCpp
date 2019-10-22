@@ -920,10 +920,10 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
       }
 
       // Extract scaling and translation from parent
-      std::optional<Quaternion> rotation = std::nullopt;
-      std::optional<Vector3> translation = Tmp::Vector3Array[5];
-      std::optional<Vector3> scale       = Tmp::Vector3Array[6];
-      Tmp::MatrixArray[7].decompose(scale, rotation, translation);
+      std::optional<Quaternion> rotation_ = std::nullopt;
+      std::optional<Vector3> translation  = Tmp::Vector3Array[5];
+      std::optional<Vector3> scale        = Tmp::Vector3Array[6];
+      Tmp::MatrixArray[7].decompose(scale, rotation_, translation);
       Matrix::ScalingToRef(scale->x, scale->y, scale->z, Tmp::MatrixArray[7]);
       Tmp::MatrixArray[7].setTranslation(*translation);
 
@@ -958,10 +958,10 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
 
     if ((billboardMode & TransformNode::BILLBOARDMODE_ALL)
         != TransformNode::BILLBOARDMODE_ALL) {
-      std::optional<Vector3> scale       = std::nullopt;
-      std::optional<Quaternion> rotation = Tmp::QuaternionArray[0];
-      std::optional<Vector3> translation = std::nullopt;
-      Tmp::MatrixArray[0].decompose(scale, rotation, translation);
+      std::optional<Vector3> scale        = std::nullopt;
+      std::optional<Quaternion> rotation_ = Tmp::QuaternionArray[0];
+      std::optional<Vector3> translation  = std::nullopt;
+      Tmp::MatrixArray[0].decompose(scale, rotation_, translation);
       auto& eulerAngles = Tmp::Vector3Array[1];
       Tmp::QuaternionArray[0].toEulerAnglesToRef(eulerAngles);
 

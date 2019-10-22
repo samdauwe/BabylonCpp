@@ -58,8 +58,8 @@ struct BABYLON_SHARED_EXPORT AnimationGridComponent {
     auto& _animations                  = animationReservedDataStore._animations;
     _animations.clear();
     if (!animatables.empty()) {
-      for (const auto& animatable : animatables) {
-        stl_util::concat(_animations, animatable->getAnimations());
+      for (const auto& _animatable : animatables) {
+        stl_util::concat(_animations, _animatable->getAnimations());
       }
 
       // Extract from and to

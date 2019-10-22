@@ -238,9 +238,9 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
     options.samplers        = {"diffuseSampler"};
     options.defines         = std::move(join);
     options.indexParameters = std::move(indexParameters);
-    options.indexParameters
-      = {{"buffersCount", _enablePosition ? 3u : 2u},
-         {"maxSimultaneousMorphTargets", numMorphInfluencers}};
+    options.indexParameters = {{"buffersCount", _enablePosition ? 3u : 2u},
+                               {"maxSimultaneousMorphTargets",
+                                static_cast<unsigned>(numMorphInfluencers)}};
 
     _effect = _scene->getEngine()->createEffect("geometry", options,
                                                 _scene->getEngine());
