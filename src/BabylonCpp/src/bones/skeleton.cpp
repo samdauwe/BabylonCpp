@@ -9,7 +9,7 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/textures/raw_texture.h>
-#include <babylon/math/tmp.h>
+#include <babylon/math/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {
@@ -402,7 +402,7 @@ void Skeleton::prepare()
         // Prepare bones
         for (const auto& bone : bones) {
           if (!bone->getParent()) {
-            auto& tmpMatrix = Tmp::MatrixArray[0];
+            auto& tmpMatrix = TmpVectors::MatrixArray[0];
             auto& matrix    = bone->getBaseMatrix();
             matrix.multiplyToRef(poseMatrix, tmpMatrix);
             bone->_updateDifferenceMatrix(tmpMatrix);

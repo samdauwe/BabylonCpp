@@ -23,7 +23,7 @@
 #include <babylon/materials/multi_material.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/scalar.h>
-#include <babylon/math/tmp.h>
+#include <babylon/math/tmp_vectors.h>
 #include <babylon/math/vector2.h>
 #include <babylon/meshes/_creation_data_storage.h>
 #include <babylon/meshes/_instance_data_storage.h>

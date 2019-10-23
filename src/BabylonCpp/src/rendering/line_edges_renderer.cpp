@@ -2,7 +2,7 @@
 
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
-#include <babylon/math/tmp.h>
+#include <babylon/math/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
 
@@ -29,8 +29,8 @@ void LineEdgesRenderer::_generateEdgesLines()
     return;
   }
 
-  auto& p0 = Tmp::Vector3Array[0];
-  auto& p1 = Tmp::Vector3Array[1];
+  auto& p0 = TmpVectors::Vector3Array[0];
+  auto& p1 = TmpVectors::Vector3Array[1];
   auto len = indices.size() - 1;
   for (uint32_t i = 0, offset = 0; i < len; i += 2, offset += 4) {
     Vector3::FromArrayToRef(positions, 3 * indices[i], p0);

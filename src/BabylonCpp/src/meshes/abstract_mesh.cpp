@@ -22,7 +22,7 @@
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/math/frustum.h>
 #include <babylon/math/functions.h>
-#include <babylon/math/tmp.h>
+#include <babylon/math/tmp_vectors.h>
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
@@ -1064,9 +1064,9 @@ Float32Array AbstractMesh::_getPositionData(bool applySkeleton)
       skeleton()->prepare();
       auto skeletonMatrices = skeleton()->getTransformMatrices(this);
 
-      auto& tempVector  = Tmp::Vector3Array[0];
-      auto& finalMatrix = Tmp::MatrixArray[0];
-      auto& tempMatrix  = Tmp::MatrixArray[1];
+      auto& tempVector  = TmpVectors::Vector3Array[0];
+      auto& finalMatrix = TmpVectors::MatrixArray[0];
+      auto& tempMatrix  = TmpVectors::MatrixArray[1];
 
       auto matWeightIdx = 0u;
       for (unsigned int index = 0; index < data.size();
@@ -1477,8 +1477,8 @@ AbstractMesh& AbstractMesh::_checkCollision(Collider& iCollider)
   }
 
   // Transformation matrix
-  auto& collisionsScalingMatrix   = Tmp::MatrixArray[0];
-  auto& collisionsTransformMatrix = Tmp::MatrixArray[1];
+  auto& collisionsScalingMatrix   = TmpVectors::MatrixArray[0];
+  auto& collisionsTransformMatrix = TmpVectors::MatrixArray[1];
   Matrix::ScalingToRef(1.f / iCollider._radius.x, 1.f / iCollider._radius.y,
                        1.f / iCollider._radius.z, collisionsScalingMatrix);
   worldMatrixFromCache().multiplyToRef(collisionsScalingMatrix,
@@ -1546,8 +1546,8 @@ AbstractMesh::intersects(Ray& ray, bool fastCheck,
   if (intersectInfo) {
     // Get picked point
     auto world        = getWorldMatrix();
-    auto& worldOrigin = Tmp::Vector3Array[0];
-    auto& direction   = Tmp::Vector3Array[1];
+    auto& worldOrigin = TmpVectors::Vector3Array[0];
+    auto& direction   = TmpVectors::Vector3Array[1];
     Vector3::TransformCoordinatesToRef(ray.origin, world, worldOrigin);
     ray.direction.scaleToRef(intersectInfo->distance, direction);
     auto worldDirection = Vector3::TransformNormal(direction, world);
@@ -1940,9 +1940,9 @@ int AbstractMesh::getClosestFacetAtCoordinates(float x, float y, float z,
                                                bool checkFace, bool facing)
 {
   auto world   = getWorldMatrix();
-  auto& invMat = Tmp::MatrixArray[5];
+  auto& invMat = TmpVectors::MatrixArray[5];
   world.invertToRef(invMat);
-  auto& invVect = Tmp::Vector3Array[8];
+  auto& invVect = TmpVectors::Vector3Array[8];
   auto closest  = -1;
   // transform (x,y,z) to coordinates in the mesh local space
   Vector3::TransformCoordinatesFromFloatsToRef(x, y, z, invMat, invVect);
@@ -2067,8 +2067,8 @@ AbstractMesh& AbstractMesh::createNormals(bool updatable)
 AbstractMesh& AbstractMesh::alignWithNormal(Vector3& normal,
                                             const Vector3& upDirection)
 {
-  auto& axisX = Tmp::Vector3Array[0];
-  auto& axisZ = Tmp::Vector3Array[1];
+  auto& axisX = TmpVectors::Vector3Array[0];
+  auto& axisZ = TmpVectors::Vector3Array[1];
   Vector3::CrossToRef(upDirection, normal, axisZ);
   Vector3::CrossToRef(normal, axisZ, axisX);
 

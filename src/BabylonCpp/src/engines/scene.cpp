@@ -55,7 +55,7 @@
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/math/frustum.h>
-#include <babylon/math/tmp.h>
+#include <babylon/math/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/buffer.h>
 #include <babylon/meshes/geometry.h>
@@ -2210,9 +2210,9 @@ AnimationValue Scene::_processLateAnimationBindingsForMatrices(
   Matrix& holderOriginalValue)
 {
   auto normalizer                           = 1.f;
-  std::optional<Vector3> finalPosition      = Tmp::Vector3Array[0];
-  std::optional<Vector3> finalScaling       = Tmp::Vector3Array[1];
-  std::optional<Quaternion> finalQuaternion = Tmp::QuaternionArray[0];
+  std::optional<Vector3> finalPosition      = TmpVectors::Vector3Array[0];
+  std::optional<Vector3> finalScaling       = TmpVectors::Vector3Array[1];
+  std::optional<Quaternion> finalQuaternion = TmpVectors::QuaternionArray[0];
   auto startIndex                           = 0u;
   auto& originalAnimation                   = holderAnimations[0];
   auto& originalValue                       = holderOriginalValue;
@@ -2244,9 +2244,10 @@ AnimationValue Scene::_processLateAnimationBindingsForMatrices(
        ++animIndex) {
     auto& runtimeAnimation = holderAnimations[animIndex];
     auto iScale            = runtimeAnimation->weight / normalizer;
-    std::optional<Vector3> currentPosition      = Tmp::Vector3Array[2];
-    std::optional<Vector3> currentScaling       = Tmp::Vector3Array[3];
-    std::optional<Quaternion> currentQuaternion = Tmp::QuaternionArray[1];
+    std::optional<Vector3> currentPosition = TmpVectors::Vector3Array[2];
+    std::optional<Vector3> currentScaling  = TmpVectors::Vector3Array[3];
+    std::optional<Quaternion> currentQuaternion
+      = TmpVectors::QuaternionArray[1];
 
     (*runtimeAnimation->currentValue())
       .get<Matrix>()
@@ -2395,9 +2396,9 @@ void Scene::setTransformMatrix(Matrix& view, Matrix& projection)
   /*if (_activeCamera && _activeCamera->_alternateCamera) {
     auto& otherCamera = _activeCamera->_alternateCamera;
     otherCamera->getViewMatrix().multiplyToRef(
-      otherCamera->getProjectionMatrix(), Tmp::MatrixArray[0]);
+      otherCamera->getProjectionMatrix(), TmpVectors::MatrixArray[0]);
     // Replace right plane by second camera right plane
-    Frustum::GetRightPlaneToRef(Tmp::MatrixArray[0], _frustumPlanes[3]);
+    Frustum::GetRightPlaneToRef(TmpVectors::MatrixArray[0], _frustumPlanes[3]);
   }*/
 
   if (_sceneUbo->useUbo()) {
@@ -5140,9 +5141,9 @@ void Scene::_updateMultiviewUbo(std::optional<Matrix> viewR,
   }
 
   if (viewR && projectionR) {
-    viewR->multiplyToRef(*projectionR, Tmp::MatrixArray[0]);
+    viewR->multiplyToRef(*projectionR, TmpVectors::MatrixArray[0]);
     Frustum::GetRightPlaneToRef(
-      Tmp::MatrixArray[0],
+      TmpVectors::MatrixArray[0],
       _frustumPlanes[3]); // Replace right plane by second camera right plane
   }
 

@@ -8,7 +8,7 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/math/axis.h>
-#include <babylon/math/tmp.h>
+#include <babylon/math/tmp_vectors.h>
 
 namespace BABYLON {
 
@@ -236,10 +236,10 @@ bool TargetCamera::_decideIfNeedsToMove()
 void TargetCamera::_updatePosition()
 {
   if (parent()) {
-    parent()->getWorldMatrix().invertToRef(Tmp::MatrixArray[0]);
-    Vector3::TransformNormalToRef(*cameraDirection, Tmp::MatrixArray[0],
-                                  Tmp::Vector3Array[0]);
-    position().addInPlace(Tmp::Vector3Array[0]);
+    parent()->getWorldMatrix().invertToRef(TmpVectors::MatrixArray[0]);
+    Vector3::TransformNormalToRef(*cameraDirection, TmpVectors::MatrixArray[0],
+                                  TmpVectors::Vector3Array[0]);
+    position().addInPlace(TmpVectors::Vector3Array[0]);
     return;
   }
   position().addInPlace(*cameraDirection);

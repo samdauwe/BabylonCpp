@@ -1,7 +1,7 @@
 #include <babylon/collisions/picking_info.h>
 
 #include <babylon/math/matrix.h>
-#include <babylon/math/tmp.h>
+#include <babylon/math/tmp_vectors.h>
 #include <babylon/math/vector2.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
@@ -148,13 +148,13 @@ std::optional<Vector3> PickingInfo::getNormal(bool useWorldCoordinates,
     auto wm = pickedMesh->getWorldMatrix();
 
     if (pickedMesh->nonUniformScaling()) {
-      Tmp::MatrixArray[0].copyFrom(wm);
-      wm = Tmp::MatrixArray[0];
+      TmpVectors::MatrixArray[0].copyFrom(wm);
+      wm = TmpVectors::MatrixArray[0];
       wm.setTranslationFromFloats(0.f, 0.f, 0.f);
       wm.invert();
-      wm.transposeToRef(Tmp::MatrixArray[1]);
+      wm.transposeToRef(TmpVectors::MatrixArray[1]);
 
-      wm = Tmp::MatrixArray[1];
+      wm = TmpVectors::MatrixArray[1];
     }
 
     result = Vector3::TransformNormal(result, wm);

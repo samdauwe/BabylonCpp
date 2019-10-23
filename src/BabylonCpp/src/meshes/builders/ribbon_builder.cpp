@@ -1,6 +1,6 @@
 #include <babylon/meshes/builders/ribbon_builder.h>
 
-#include <babylon/math/tmp.h>
+#include <babylon/math/tmp_vectors.h>
 #include <babylon/meshes/_creation_data_storage.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
@@ -25,9 +25,9 @@ MeshPtr RibbonBuilder::CreateRibbon(const std::string& name,
     // only pathArray and sideOrientation parameters are taken into account for
     // positions update
     auto& minimum
-      = Tmp::Vector3Array[0].setAll(std::numeric_limits<float>::max());
+      = TmpVectors::Vector3Array[0].setAll(std::numeric_limits<float>::max());
     auto& maximum
-      = Tmp::Vector3Array[1].setAll(std::numeric_limits<float>::lowest());
+      = TmpVectors::Vector3Array[1].setAll(std::numeric_limits<float>::lowest());
     const auto positionFunction = [&](Float32Array& positions) -> void {
       auto minlg = pathArray[0].size();
       auto& mesh = instance;

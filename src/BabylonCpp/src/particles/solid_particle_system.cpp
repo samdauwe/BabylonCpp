@@ -9,7 +9,7 @@
 #include <babylon/engines/scene.h>
 #include <babylon/math/axis.h>
 #include <babylon/math/color4.h>
-#include <babylon/math/tmp.h>
+#include <babylon/math/tmp_vectors.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
@@ -46,8 +46,8 @@ SolidParticleSystem::SolidParticleSystem(
     , _computeBoundingBox{false}
     , _depthSortParticles{true}
     , _mustUnrotateFixedNormals{false}
-    , _scale{Tmp::Vector3Array[2]}
-    , _translation{Tmp::Vector3Array[3]}
+    , _scale{TmpVectors::Vector3Array[2]}
+    , _translation{TmpVectors::Vector3Array[3]}
     , _needs32Bits{false}
 {
   name       = iName;
@@ -245,9 +245,9 @@ void SolidParticleSystem::_unrotateFixedNormals()
 {
   unsigned int index      = 0;
   unsigned int idx        = 0;
-  auto& tmpNormal         = Tmp::Vector3Array[0];
-  auto& quaternion        = Tmp::QuaternionArray[0];
-  auto& invertedRotMatrix = Tmp::MatrixArray[0];
+  auto& tmpNormal         = TmpVectors::Vector3Array[0];
+  auto& quaternion        = TmpVectors::QuaternionArray[0];
+  auto& invertedRotMatrix = TmpVectors::MatrixArray[0];
   for (const auto& particle : particles) {
     auto& shape = particle->_model->_shape;
 
@@ -308,11 +308,11 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
     _mustUnrotateFixedNormals = true;
   }
 
-  auto& rotMatrix            = Tmp::MatrixArray[0];
-  auto& tmpVertex            = Tmp::Vector3Array[0];
-  auto& tmpRotated           = Tmp::Vector3Array[1];
-  auto& pivotBackTranslation = Tmp::Vector3Array[2];
-  auto& scaledPivot          = Tmp::Vector3Array[3];
+  auto& rotMatrix            = TmpVectors::MatrixArray[0];
+  auto& tmpVertex            = TmpVectors::Vector3Array[0];
+  auto& tmpRotated           = TmpVectors::Vector3Array[1];
+  auto& pivotBackTranslation = TmpVectors::Vector3Array[2];
+  auto& scaledPivot          = TmpVectors::Vector3Array[3];
   copy.getRotationMatrix(rotMatrix);
 
   copy.pivot.multiplyToRef(copy.scaling, scaledPivot);
@@ -496,11 +496,11 @@ void SolidParticleSystem::_rebuildParticle(SolidParticle* particle)
                                         particle->idxInShape);
   }
 
-  auto& rotMatrix            = Tmp::MatrixArray[0];
-  auto& tmpVertex            = Tmp::Vector3Array[0];
-  auto& tmpRotated           = Tmp::Vector3Array[1];
-  auto& pivotBackTranslation = Tmp::Vector3Array[2];
-  auto& scaledPivot          = Tmp::Vector3Array[3];
+  auto& rotMatrix            = TmpVectors::MatrixArray[0];
+  auto& tmpVertex            = TmpVectors::Vector3Array[0];
+  auto& tmpRotated           = TmpVectors::Vector3Array[1];
+  auto& pivotBackTranslation = TmpVectors::Vector3Array[2];
+  auto& scaledPivot          = TmpVectors::Vector3Array[3];
 
   copy.getRotationMatrix(rotMatrix);
 
@@ -559,8 +559,8 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
   // custom beforeUpdate
   beforeUpdateParticles(start, end, update);
 
-  auto& rotMatrix      = Tmp::MatrixArray[0];
-  auto& invertedMatrix = Tmp::MatrixArray[1];
+  auto& rotMatrix      = TmpVectors::MatrixArray[0];
+  auto& invertedMatrix = TmpVectors::MatrixArray[1];
   auto& colors32       = _colors32;
   auto& positions32    = _positions32;
   auto& normals32      = _normals32;
@@ -569,7 +569,7 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
   auto& indices        = _indices;
   auto& fixedNormal32  = _fixedNormal32;
 
-  auto& tempVectors = Tmp::Vector3Array;
+  auto& tempVectors = TmpVectors::Vector3Array;
   auto& camAxisX    = tempVectors[5].copyFromFloats(1.f, 0.f, 0.f);
   auto& camAxisY    = tempVectors[6].copyFromFloats(0.f, 1.f, 0.f);
   auto& camAxisZ    = tempVectors[7].copyFromFloats(0.f, 0.f, 1.f);

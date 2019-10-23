@@ -14,7 +14,7 @@
 #include <babylon/materials/textures/multi_render_target.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/math/scalar.h>
-#include <babylon/math/tmp.h>
+#include <babylon/math/tmp_vectors.h>
 #include <babylon/math/vector4.h>
 #include <babylon/postprocesses/blur_post_process.h>
 #include <babylon/postprocesses/pass_post_process.h>
@@ -401,7 +401,7 @@ void SSAO2RenderingPipeline::_createSSAOCombinePostProcess(float ratio)
 
   _ssaoCombinePostProcess->onApply = [&](Effect* effect, EventState&) {
     const auto& viewport = _scene->activeCamera()->viewport;
-    effect->setVector4("viewport", Tmp::Vector4Array[0].copyFromFloats(
+    effect->setVector4("viewport", TmpVectors::Vector4Array[0].copyFromFloats(
                                      static_cast<float>(viewport.x),
                                      static_cast<float>(viewport.y),
                                      static_cast<float>(viewport.width),

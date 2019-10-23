@@ -7,7 +7,7 @@
 #include <babylon/bones/bone.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/scene.h>
-#include <babylon/math/tmp.h>
+#include <babylon/math/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {
@@ -450,7 +450,7 @@ TransformNode& TransformNode::setAbsolutePosition(
   auto absolutePositionZ = (*iAbsolutePosition).z;
 
   if (parent()) {
-    auto& invertParentWorldMatrix = Tmp::MatrixArray[0];
+    auto& invertParentWorldMatrix = TmpVectors::MatrixArray[0];
     parent()->getWorldMatrix().invertToRef(invertParentWorldMatrix);
     Vector3::TransformCoordinatesFromFloatsToRef(
       absolutePositionX, absolutePositionY, absolutePositionZ,
@@ -474,7 +474,7 @@ TransformNode& TransformNode::setPositionWithLocalVector(const Vector3& vector3)
 Vector3 TransformNode::getPositionExpressedInLocalSpace()
 {
   computeWorldMatrix();
-  auto& invLocalWorldMatrix = Tmp::MatrixArray[0];
+  auto& invLocalWorldMatrix = TmpVectors::MatrixArray[0];
   _localMatrix.invertToRef(invLocalWorldMatrix);
   return Vector3::TransformNormal(position, invLocalWorldMatrix);
 }
@@ -498,12 +498,12 @@ TransformNode& TransformNode::lookAt(const Vector3& targetPoint, float yawCor,
   if (space == Space::WORLD && parent()) {
     if (rotationQuaternion().has_value()) {
       // Get local rotation matrix of the looking object
-      auto& rotationMatrix = Tmp::MatrixArray[0];
+      auto& rotationMatrix = TmpVectors::MatrixArray[0];
       rotationQuaternion()->toRotationMatrix(rotationMatrix);
 
       // Offset rotation by parent's inverted rotation matrix to correct in
       // world space
-      auto& parentRotationMatrix = Tmp::MatrixArray[1];
+      auto& parentRotationMatrix = TmpVectors::MatrixArray[1];
       parent()->getWorldMatrix().getRotationMatrixToRef(parentRotationMatrix);
       parentRotationMatrix.invert();
       rotationMatrix.multiplyToRef(parentRotationMatrix, rotationMatrix);
@@ -511,14 +511,14 @@ TransformNode& TransformNode::lookAt(const Vector3& targetPoint, float yawCor,
     }
     else {
       // Get local rotation matrix of the looking object
-      auto& quaternionRotation = Tmp::QuaternionArray[0];
+      auto& quaternionRotation = TmpVectors::QuaternionArray[0];
       Quaternion::FromEulerVectorToRef(rotation, quaternionRotation);
-      auto& rotationMatrix = Tmp::MatrixArray[0];
+      auto& rotationMatrix = TmpVectors::MatrixArray[0];
       quaternionRotation.toRotationMatrix(rotationMatrix);
 
       // Offset rotation by parent's inverted rotation matrix to correct in
       // world space
-      auto& parentRotationMatrix = Tmp::MatrixArray[1];
+      auto& parentRotationMatrix = TmpVectors::MatrixArray[1];
       parent()->getWorldMatrix().getRotationMatrixToRef(parentRotationMatrix);
       parentRotationMatrix.invert();
       rotationMatrix.multiplyToRef(parentRotationMatrix, rotationMatrix);
@@ -575,7 +575,7 @@ TransformNode& TransformNode::setPivotPoint(Vector3& point, Space space)
   auto wm = getWorldMatrix();
 
   if (space == Space::WORLD) {
-    auto& tmat = Tmp::MatrixArray[0];
+    auto& tmat = TmpVectors::MatrixArray[0];
     wm.invertToRef(tmat);
     point = Vector3::TransformCoordinates(point, tmat);
   }
@@ -624,9 +624,9 @@ TransformNode& TransformNode::setParent(Node* node)
     return *this;
   }
 
-  std::optional<Quaternion> quatRotation = Tmp::QuaternionArray[0];
-  std::optional<Vector3> newPosition     = Tmp::Vector3Array[0];
-  std::optional<Vector3> scale           = Tmp::Vector3Array[1];
+  std::optional<Quaternion> quatRotation = TmpVectors::QuaternionArray[0];
+  std::optional<Vector3> newPosition     = TmpVectors::Vector3Array[0];
+  std::optional<Vector3> scale           = TmpVectors::Vector3Array[1];
 
   if (!node) {
     if (parent()) {
@@ -636,8 +636,8 @@ TransformNode& TransformNode::setParent(Node* node)
     getWorldMatrix().decompose(scale, quatRotation, newPosition);
   }
   else {
-    auto& diffMatrix      = Tmp::MatrixArray[0];
-    auto& invParentMatrix = Tmp::MatrixArray[1];
+    auto& diffMatrix      = TmpVectors::MatrixArray[0];
+    auto& invParentMatrix = TmpVectors::MatrixArray[1];
 
     computeWorldMatrix(true);
     node->computeWorldMatrix(true);
@@ -718,7 +718,7 @@ TransformNode& TransformNode::rotate(Vector3 axis, float amount, Space space)
   }
   else {
     if (parent()) {
-      auto& invertParentWorldMatrix = Tmp::MatrixArray[0];
+      auto& invertParentWorldMatrix = TmpVectors::MatrixArray[0];
       parent()->getWorldMatrix().invertToRef(invertParentWorldMatrix);
       axis = Vector3::TransformNormal(axis, invertParentWorldMatrix);
     }
@@ -740,16 +740,16 @@ TransformNode& TransformNode::rotateAround(const Vector3& point, Vector3& axis,
     rotation().setAll(0.f);
   }
 
-  auto& tmpVector                         = Tmp::Vector3Array[0];
-  std::optional<Vector3> finalScale       = Tmp::Vector3Array[1];
-  std::optional<Vector3> finalTranslation = Tmp::Vector3Array[2];
+  auto& tmpVector                         = TmpVectors::Vector3Array[0];
+  std::optional<Vector3> finalScale       = TmpVectors::Vector3Array[1];
+  std::optional<Vector3> finalTranslation = TmpVectors::Vector3Array[2];
 
-  std::optional<Quaternion> finalRotation = Tmp::QuaternionArray[0];
+  std::optional<Quaternion> finalRotation = TmpVectors::QuaternionArray[0];
 
-  auto& translationMatrix    = Tmp::MatrixArray[0]; // T
-  auto& translationMatrixInv = Tmp::MatrixArray[1]; // T'
-  auto& rotationMatrix       = Tmp::MatrixArray[2]; // R
-  auto& finalMatrix          = Tmp::MatrixArray[3]; // T' x R x T
+  auto& translationMatrix    = TmpVectors::MatrixArray[0]; // T
+  auto& translationMatrixInv = TmpVectors::MatrixArray[1]; // T'
+  auto& rotationMatrix       = TmpVectors::MatrixArray[2]; // R
+  auto& finalMatrix          = TmpVectors::MatrixArray[3]; // T' x R x T
 
   point.subtractToRef(position, tmpVector);
   Matrix::TranslationToRef(tmpVector.x, tmpVector.y, tmpVector.z,
@@ -790,11 +790,11 @@ TransformNode& TransformNode::addRotation(float x, float y, float z)
     rotationQuaternionTmp = *rotationQuaternion();
   }
   else {
-    rotationQuaternionTmp = Tmp::QuaternionArray[1];
+    rotationQuaternionTmp = TmpVectors::QuaternionArray[1];
     Quaternion::RotationYawPitchRollToRef(rotation().y, rotation().x,
                                           rotation().z, rotationQuaternionTmp);
   }
-  auto& accumulation = Tmp::QuaternionArray[0];
+  auto& accumulation = TmpVectors::QuaternionArray[0];
   Quaternion::RotationYawPitchRollToRef(y, x, z, accumulation);
   rotationQuaternionTmp.multiplyInPlace(accumulation);
   if (!rotationQuaternion()) {
@@ -885,16 +885,16 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
 
   // Compose
   if (_usePivotMatrix) {
-    auto& scaleMatrix = Tmp::MatrixArray[1];
+    auto& scaleMatrix = TmpVectors::MatrixArray[1];
     Matrix::ScalingToRef(iScaling.x, iScaling.y, iScaling.z, scaleMatrix);
 
     // Rotation
-    auto& rotationMatrix = Tmp::MatrixArray[0];
+    auto& rotationMatrix = TmpVectors::MatrixArray[0];
     iRotation.toRotationMatrix(rotationMatrix);
 
     // Composing transformations
-    _pivotMatrix.multiplyToRef(scaleMatrix, Tmp::MatrixArray[4]);
-    Tmp::MatrixArray[4].multiplyToRef(rotationMatrix, _localMatrix);
+    _pivotMatrix.multiplyToRef(scaleMatrix, TmpVectors::MatrixArray[4]);
+    TmpVectors::MatrixArray[4].multiplyToRef(rotationMatrix, _localMatrix);
 
     // Post multiply inverse of pivotMatrix
     if (_postMultiplyPivotMatrix) {
@@ -913,27 +913,29 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
     if (useBillboardPath) {
       if (_transformToBoneReferal) {
         iParent->getWorldMatrix().multiplyToRef(
-          _transformToBoneReferal->getWorldMatrix(), Tmp::MatrixArray[7]);
+          _transformToBoneReferal->getWorldMatrix(),
+          TmpVectors::MatrixArray[7]);
       }
       else {
-        Tmp::MatrixArray[7].copyFrom(iParent->getWorldMatrix());
+        TmpVectors::MatrixArray[7].copyFrom(iParent->getWorldMatrix());
       }
 
       // Extract scaling and translation from parent
       std::optional<Quaternion> rotation_ = std::nullopt;
-      std::optional<Vector3> translation  = Tmp::Vector3Array[5];
-      std::optional<Vector3> scale        = Tmp::Vector3Array[6];
-      Tmp::MatrixArray[7].decompose(scale, rotation_, translation);
-      Matrix::ScalingToRef(scale->x, scale->y, scale->z, Tmp::MatrixArray[7]);
-      Tmp::MatrixArray[7].setTranslation(*translation);
+      std::optional<Vector3> translation  = TmpVectors::Vector3Array[5];
+      std::optional<Vector3> scale        = TmpVectors::Vector3Array[6];
+      TmpVectors::MatrixArray[7].decompose(scale, rotation_, translation);
+      Matrix::ScalingToRef(scale->x, scale->y, scale->z,
+                           TmpVectors::MatrixArray[7]);
+      TmpVectors::MatrixArray[7].setTranslation(*translation);
 
-      _localMatrix.multiplyToRef(Tmp::MatrixArray[7], _worldMatrix);
+      _localMatrix.multiplyToRef(TmpVectors::MatrixArray[7], _worldMatrix);
     }
     else {
       if (_transformToBoneReferal) {
         _localMatrix.multiplyToRef(iParent->getWorldMatrix(),
-                                   Tmp::MatrixArray[6]);
-        Tmp::MatrixArray[6].multiplyToRef(
+                                   TmpVectors::MatrixArray[6]);
+        TmpVectors::MatrixArray[6].multiplyToRef(
           _transformToBoneReferal->getWorldMatrix(), _worldMatrix);
       }
       else {
@@ -948,22 +950,22 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
 
   // Billboarding (testing PG:http://www.babylonjs-playground.com/#UJEIL#13)
   if (useBillboardPath && camera) {
-    auto& storedTranslation = Tmp::Vector3Array[0];
+    auto& storedTranslation = TmpVectors::Vector3Array[0];
     _worldMatrix.getTranslationToRef(storedTranslation); // Save translation
 
     // Cancel camera rotation
-    Tmp::MatrixArray[1].copyFrom(camera->getViewMatrix());
-    Tmp::MatrixArray[1].setTranslationFromFloats(0.f, 0.f, 0.f);
-    Tmp::MatrixArray[1].invertToRef(Tmp::MatrixArray[0]);
+    TmpVectors::MatrixArray[1].copyFrom(camera->getViewMatrix());
+    TmpVectors::MatrixArray[1].setTranslationFromFloats(0.f, 0.f, 0.f);
+    TmpVectors::MatrixArray[1].invertToRef(TmpVectors::MatrixArray[0]);
 
     if ((billboardMode & TransformNode::BILLBOARDMODE_ALL)
         != TransformNode::BILLBOARDMODE_ALL) {
       std::optional<Vector3> scale        = std::nullopt;
-      std::optional<Quaternion> rotation_ = Tmp::QuaternionArray[0];
+      std::optional<Quaternion> rotation_ = TmpVectors::QuaternionArray[0];
       std::optional<Vector3> translation  = std::nullopt;
-      Tmp::MatrixArray[0].decompose(scale, rotation_, translation);
-      auto& eulerAngles = Tmp::Vector3Array[1];
-      Tmp::QuaternionArray[0].toEulerAnglesToRef(eulerAngles);
+      TmpVectors::MatrixArray[0].decompose(scale, rotation_, translation);
+      auto& eulerAngles = TmpVectors::Vector3Array[1];
+      TmpVectors::QuaternionArray[0].toEulerAnglesToRef(eulerAngles);
 
       if ((billboardMode & TransformNode::BILLBOARDMODE_X)
           != TransformNode::BILLBOARDMODE_X) {
@@ -981,13 +983,14 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
       }
 
       Matrix::RotationYawPitchRollToRef(eulerAngles.y, eulerAngles.x,
-                                        eulerAngles.z, Tmp::MatrixArray[0]);
+                                        eulerAngles.z,
+                                        TmpVectors::MatrixArray[0]);
     }
     _worldMatrix.setTranslationFromFloats(0.f, 0.f, 0.f);
-    _worldMatrix.multiplyToRef(Tmp::MatrixArray[0], _worldMatrix);
+    _worldMatrix.multiplyToRef(TmpVectors::MatrixArray[0], _worldMatrix);
 
     // Restore translation
-    _worldMatrix.setTranslation(Tmp::Vector3Array[0]);
+    _worldMatrix.setTranslation(TmpVectors::Vector3Array[0]);
   }
 
   // Normal matrix

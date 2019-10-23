@@ -4,7 +4,7 @@
 #include <babylon/bones/bone.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/engines/scene.h>
-#include <babylon/math/tmp.h>
+#include <babylon/math/tmp_vectors.h>
 #include <babylon/meshes/builders/lines_builder.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/lines_mesh.h>
@@ -74,13 +74,13 @@ void SkeletonViewer::_getBonePosition(Vector3& position, const Bone& bone,
                                       const Matrix& meshMat, float x, float y,
                                       float z) const
 {
-  auto& tmat             = Tmp::MatrixArray[0];
+  auto& tmat             = TmpVectors::MatrixArray[0];
   const auto& parentBone = bone.getParent();
   tmat.copyFrom(bone.getLocalMatrix());
 
   if (!stl_util::almost_equal(x, 0.f) || !stl_util::almost_equal(y, 0.f)
       || !stl_util::almost_equal(z, 0.f)) {
-    auto& tmat2 = Tmp::MatrixArray[1];
+    auto& tmat2 = TmpVectors::MatrixArray[1];
     Matrix::IdentityToRef(tmat2);
     tmat2.setTranslationFromFloats(x, y, z);
     tmat2.multiplyToRef(tmat, tmat);

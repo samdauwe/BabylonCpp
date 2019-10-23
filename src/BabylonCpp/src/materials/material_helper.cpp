@@ -18,7 +18,7 @@
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/math/plane.h>
-#include <babylon/math/tmp.h>
+#include <babylon/math/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
@@ -682,14 +682,14 @@ void MaterialHelper::BindLight(const LightPtr& light, unsigned int lightIndex,
 
   MaterialHelper::BindLightProperties(*light, effect, lightIndex);
 
-  light->diffuse.scaleToRef(scaledIntensity, Tmp::Color3Array[0]);
+  light->diffuse.scaleToRef(scaledIntensity, TmpVectors::Color3Array[0]);
   light->_uniformBuffer->updateColor4(
-    "vLightDiffuse", Tmp::Color3Array[0],
+    "vLightDiffuse", TmpVectors::Color3Array[0],
     usePhysicalLightFalloff ? light->radius() : light->range, iAsString);
   if (useSpecular) {
-    light->specular.scaleToRef(scaledIntensity, Tmp::Color3Array[1]);
-    light->_uniformBuffer->updateColor3("vLightSpecular", Tmp::Color3Array[1],
-                                        iAsString);
+    light->specular.scaleToRef(scaledIntensity, TmpVectors::Color3Array[1]);
+    light->_uniformBuffer->updateColor3("vLightSpecular",
+                                        TmpVectors::Color3Array[1], iAsString);
   }
 
   // Shadows

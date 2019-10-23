@@ -6,7 +6,7 @@
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_sphere.h>
 #include <babylon/math/plane.h>
-#include <babylon/math/tmp.h>
+#include <babylon/math/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {
@@ -307,7 +307,7 @@ std::optional<Vector3> Ray::intersectsAxis(const std::string& axis,
 
 PickingInfo Ray::intersectsMesh(AbstractMesh* mesh, bool fastCheck)
 {
-  auto& tm = Tmp::MatrixArray[0];
+  auto& tm = TmpVectors::MatrixArray[0];
 
   mesh->getWorldMatrix().invertToRef(tm);
 
@@ -364,10 +364,10 @@ float Ray::intersectionSegment(const Vector3& sega, const Vector3& segb,
                                float threshold) const
 {
   const auto& o = origin;
-  auto& u       = Tmp::Vector3Array[0];
-  auto& rsegb   = Tmp::Vector3Array[1];
-  auto& v       = Tmp::Vector3Array[2];
-  auto& w       = Tmp::Vector3Array[3];
+  auto& u       = TmpVectors::Vector3Array[0];
+  auto& rsegb   = TmpVectors::Vector3Array[1];
+  auto& v       = TmpVectors::Vector3Array[2];
+  auto& w       = TmpVectors::Vector3Array[3];
 
   segb.subtractToRef(sega, u);
 
@@ -440,12 +440,12 @@ float Ray::intersectionSegment(const Vector3& sega, const Vector3& segb,
   tc = (std::abs(tN) < Ray::smallnum ? 0.f : tN / tD);
 
   // get the difference of the two closest points
-  auto& qtc = Tmp::Vector3Array[4];
+  auto& qtc = TmpVectors::Vector3Array[4];
   v.scaleToRef(tc, qtc);
-  auto& qsc = Tmp::Vector3Array[5];
+  auto& qsc = TmpVectors::Vector3Array[5];
   u.scaleToRef(sc, qsc);
   qsc.addInPlace(w);
-  auto& dP = Tmp::Vector3Array[6];
+  auto& dP = TmpVectors::Vector3Array[6];
   qsc.subtractToRef(qtc, dP); // = S1(sc) - S2(tc)
 
   const auto isIntersected
@@ -523,18 +523,18 @@ void Ray::unprojectRayToRef(float sourceX, float sourceY, float viewportWidth,
                             float viewportHeight, Matrix& world,
                             const Matrix& view, const Matrix& projection)
 {
-  auto& matrix = Tmp::MatrixArray[0];
+  auto& matrix = TmpVectors::MatrixArray[0];
   world.multiplyToRef(view, matrix);
   matrix.multiplyToRef(projection, matrix);
   matrix.invert();
-  auto& nearScreenSource = Tmp::Vector3Array[0];
+  auto& nearScreenSource = TmpVectors::Vector3Array[0];
   nearScreenSource.x     = sourceX / viewportWidth * 2.f - 1.f;
   nearScreenSource.y     = -(sourceY / viewportHeight * 2.f - 1.f);
   nearScreenSource.z     = -1.f;
-  auto& farScreenSource  = Tmp::Vector3Array[1].copyFromFloats(
+  auto& farScreenSource  = TmpVectors::Vector3Array[1].copyFromFloats(
     nearScreenSource.x, nearScreenSource.y, 1.f);
-  auto& nearVec3 = Tmp::Vector3Array[2];
-  auto& farVec3  = Tmp::Vector3Array[3];
+  auto& nearVec3 = TmpVectors::Vector3Array[2];
+  auto& farVec3  = TmpVectors::Vector3Array[3];
   Vector3::_UnprojectFromInvertedMatrixToRef(nearScreenSource, matrix,
                                              nearVec3);
   Vector3::_UnprojectFromInvertedMatrixToRef(farScreenSource, matrix, farVec3);

@@ -1,5 +1,5 @@
-#ifndef BABYLON_MATH_TMP_H
-#define BABYLON_MATH_TMP_H
+#ifndef BABYLON_MATH_TMP_VECTORS_H
+#define BABYLON_MATH_TMP_VECTORS_H
 
 #include <array>
 
@@ -19,7 +19,7 @@ class Vector4;
  * @brief Temporary pre-allocated objects for engine internal use.
  * Hidden
  */
-struct BABYLON_SHARED_EXPORT Tmp {
+struct BABYLON_SHARED_EXPORT TmpVectors {
   static std::array<Color3, 3> Color3Array;
   static std::array<Color4, 3> Color4Array;
   // 3 temp Vector2 at once should be enough
@@ -32,8 +32,8 @@ struct BABYLON_SHARED_EXPORT Tmp {
   static std::array<Quaternion, 2> QuaternionArray;
   // 8 temp Matrices at once should be enough
   static std::array<Matrix, 8> MatrixArray;
-}; // end of struct Tmp
+}; // end of struct TmpVectors
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_MATH_TMP_H
+#endif // end of BABYLON_MATH_TMP_VECTORS_H

@@ -3,7 +3,7 @@
 #include <babylon/core/logging.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/engines/scene.h>
-#include <babylon/math/tmp.h>
+#include <babylon/math/tmp_vectors.h>
 #include <babylon/meshes/geometry.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
@@ -238,9 +238,9 @@ Matrix& InstancedMesh::getWorldMatrix()
       && _currentLOD->_masterMesh != this) {
     const auto& tempMaster   = _currentLOD->_masterMesh;
     _currentLOD->_masterMesh = this;
-    Tmp::MatrixArray[0].copyFrom(_currentLOD->computeWorldMatrix(true));
+    TmpVectors::MatrixArray[0].copyFrom(_currentLOD->computeWorldMatrix(true));
     _currentLOD->_masterMesh = tempMaster;
-    return Tmp::MatrixArray[0];
+    return TmpVectors::MatrixArray[0];
   }
 
   return AbstractMesh::getWorldMatrix();

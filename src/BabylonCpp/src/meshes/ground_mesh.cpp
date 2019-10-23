@@ -5,7 +5,7 @@
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/ray.h>
-#include <babylon/math/tmp.h>
+#include <babylon/math/tmp_vectors.h>
 #include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
@@ -59,9 +59,9 @@ void GroundMesh::optimize(size_t chunksCount, size_t octreeBlocksSize)
 float GroundMesh::getHeightAtCoordinates(float x, float z)
 {
   auto world   = getWorldMatrix();
-  auto& invMat = Tmp::MatrixArray[5];
+  auto& invMat = TmpVectors::MatrixArray[5];
   world.invertToRef(invMat);
-  auto& tmpVect = Tmp::Vector3Array[8];
+  auto& tmpVect = TmpVectors::Vector3Array[8];
   // transform x,z in the mesh local space
   Vector3::TransformCoordinatesFromFloatsToRef(x, 0.f, z, invMat, tmpVect);
   x = tmpVect.x;
@@ -91,9 +91,9 @@ GroundMesh& GroundMesh::getNormalAtCoordinatesToRef(float x, float z,
                                                     Vector3& ref)
 {
   auto world   = getWorldMatrix();
-  auto& tmpMat = Tmp::MatrixArray[5];
+  auto& tmpMat = TmpVectors::MatrixArray[5];
   world.invertToRef(tmpMat);
-  auto& tmpVect = Tmp::Vector3Array[8];
+  auto& tmpVect = TmpVectors::Vector3Array[8];
   // transform x,z in the mesh local space
   Vector3::TransformCoordinatesFromFloatsToRef(x, 0.f, z, tmpMat, tmpVect);
   x = tmpVect.x;
@@ -163,15 +163,15 @@ GroundMesh& GroundMesh::_computeHeightQuads()
     return *this;
   }
 
-  auto& v1    = Tmp::Vector3Array[3];
-  auto& v2    = Tmp::Vector3Array[2];
-  auto& v3    = Tmp::Vector3Array[1];
-  auto& v4    = Tmp::Vector3Array[0];
-  auto& v1v2  = Tmp::Vector3Array[4];
-  auto& v1v3  = Tmp::Vector3Array[5];
-  auto& v1v4  = Tmp::Vector3Array[6];
-  auto& norm1 = Tmp::Vector3Array[7];
-  auto& norm2 = Tmp::Vector3Array[8];
+  auto& v1    = TmpVectors::Vector3Array[3];
+  auto& v2    = TmpVectors::Vector3Array[2];
+  auto& v3    = TmpVectors::Vector3Array[1];
+  auto& v4    = TmpVectors::Vector3Array[0];
+  auto& v1v2  = TmpVectors::Vector3Array[4];
+  auto& v1v3  = TmpVectors::Vector3Array[5];
+  auto& v1v4  = TmpVectors::Vector3Array[6];
+  auto& norm1 = TmpVectors::Vector3Array[7];
+  auto& norm2 = TmpVectors::Vector3Array[8];
   size_t i    = 0;
   size_t j    = 0;
   size_t k    = 0;

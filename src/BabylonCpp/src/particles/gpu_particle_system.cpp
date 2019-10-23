@@ -17,7 +17,7 @@
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 #include <babylon/materials/textures/raw_texture.h>
 #include <babylon/math/scalar.h>
-#include <babylon/math/tmp.h>
+#include <babylon/math/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/buffer.h>
 #include <babylon/meshes/vertex_buffer.h>
@@ -1135,7 +1135,7 @@ void GPUParticleSystem::_createColorGradientTexture()
   }
 
   Uint8Array data(_rawTextureWidth * 4);
-  auto& tmpColor = Tmp::Color4Array[0];
+  auto& tmpColor = TmpVectors::Color4Array[0];
 
   for (unsigned int x = 0; x < _rawTextureWidth; ++x) {
     auto ratio = static_cast<float>(x) / static_cast<float>(_rawTextureWidth);

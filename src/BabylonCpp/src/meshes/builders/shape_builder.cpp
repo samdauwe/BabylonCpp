@@ -1,7 +1,7 @@
 #include <babylon/meshes/builders/shape_builder.h>
 
 #include <babylon/math/path3d.h>
-#include <babylon/math/tmp.h>
+#include <babylon/math/tmp_vectors.h>
 #include <babylon/meshes/_creation_data_storage.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/builders/ribbon_builder.h>
@@ -92,7 +92,7 @@ MeshPtr ShapeBuilder::_ExtrudeShapeGeneric(
         auto rotate = _custom ? _rotateFunction : returnRotation;
         auto scl    = _custom ? _scaleFunction : returnScale;
         auto index  = (_cap == Mesh::NO_CAP || _cap == Mesh::CAP_END) ? 0u : 2u;
-        auto& rotationMatrix = Tmp::MatrixArray[0];
+        auto& rotationMatrix = TmpVectors::MatrixArray[0];
         shapePaths.resize(_curve.size());
 
         for (size_t i = 0ull; i < _curve.size(); ++i) {

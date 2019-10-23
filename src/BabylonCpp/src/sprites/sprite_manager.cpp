@@ -13,7 +13,7 @@
 #include <babylon/materials/textures/texture.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/matrix.h>
-#include <babylon/math/tmp.h>
+#include <babylon/math/tmp_vectors.h>
 #include <babylon/meshes/buffer.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/tools.h>
@@ -258,20 +258,20 @@ SpriteManager::intersects(const Ray ray, const CameraPtr& camera,
   if (currentSprite) {
     PickingInfo result;
 
-    cameraView.invertToRef(Tmp::MatrixArray[0]);
+    cameraView.invertToRef(TmpVectors::MatrixArray[0]);
     result.hit          = true;
     result.pickedSprite = currentSprite;
     result.distance     = distance;
 
     // Get picked point
-    auto& direction = Tmp::Vector3Array[0];
+    auto& direction = TmpVectors::Vector3Array[0];
     direction.copyFrom(ray.direction);
     direction.normalize();
     direction.scaleInPlace(distance);
 
     ray.origin.addToRef(direction, pickedPoint);
     result.pickedPoint
-      = Vector3::TransformCoordinates(pickedPoint, Tmp::MatrixArray[0]);
+      = Vector3::TransformCoordinates(pickedPoint, TmpVectors::MatrixArray[0]);
 
     return result;
   }

@@ -1,7 +1,7 @@
 #include <babylon/particles/particle.h>
 
 #include <babylon/math/scalar.h>
-#include <babylon/math/tmp.h>
+#include <babylon/math/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/particles/particle_system.h>
 #include <babylon/particles/sub_emitter.h>
@@ -253,9 +253,10 @@ void Particle::_inheritParticleInfoToSubEmitter(const SubEmitterPtr& subEmitter)
       = std::get<AbstractMeshPtr>(subEmitter->particleSystem->emitter);
     emitterMesh->position().copyFrom(position);
     if (subEmitter->inheritDirection) {
-      emitterMesh->position().subtractToRef(direction, Tmp::Vector3Array[0]);
+      emitterMesh->position().subtractToRef(direction,
+                                            TmpVectors::Vector3Array[0]);
       // Look at using Y as forward
-      emitterMesh->lookAt(Tmp::Vector3Array[0], 0.f, Math::PI_2);
+      emitterMesh->lookAt(TmpVectors::Vector3Array[0], 0.f, Math::PI_2);
     }
   }
   else if (std::holds_alternative<Vector3>(
@@ -266,9 +267,9 @@ void Particle::_inheritParticleInfoToSubEmitter(const SubEmitterPtr& subEmitter)
   }
   // Set inheritedVelocityOffset to be used when new particles are created
   direction.scaleToRef(subEmitter->inheritedVelocityAmount / 2.f,
-                       Tmp::Vector3Array[0]);
+                       TmpVectors::Vector3Array[0]);
   subEmitter->particleSystem->_inheritedVelocityOffset.copyFrom(
-    Tmp::Vector3Array[0]);
+    TmpVectors::Vector3Array[0]);
 }
 
 void Particle::_inheritParticleInfoToSubEmitters()

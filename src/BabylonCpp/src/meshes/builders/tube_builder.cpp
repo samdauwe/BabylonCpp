@@ -1,6 +1,6 @@
 #include <babylon/meshes/builders/tube_builder.h>
 
-#include <babylon/math/tmp.h>
+#include <babylon/math/tmp_vectors.h>
 #include <babylon/meshes/_creation_data_storage.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/builders/ribbon_builder.h>
@@ -51,7 +51,7 @@ MeshPtr TubeBuilder::CreateTube(const std::string& name, TubeOptions& options,
         auto rad = 0.f;
         Vector3 normal;
         Vector3 rotated;
-        auto& rotationMatrix = Tmp::MatrixArray[0];
+        auto& rotationMatrix = TmpVectors::MatrixArray[0];
         // TODO FIXME
         unsigned int index
           = (_cap == Mesh::NO_CAP || _cap == Mesh::CAP_END) ? 0 : 0;

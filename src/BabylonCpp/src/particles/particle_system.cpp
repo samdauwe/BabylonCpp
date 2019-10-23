@@ -19,7 +19,7 @@
 #include <babylon/materials/textures/raw_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/math/scalar.h>
-#include <babylon/math/tmp.h>
+#include <babylon/math/tmp_vectors.h>
 #include <babylon/meshes/buffer.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
@@ -244,8 +244,8 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
           static_cast<float>(noiseTextureSize->width),
           static_cast<float>(noiseTextureSize->height), *noiseTextureData);
 
-        auto& force       = Tmp::Vector3Array[0];
-        auto& scaledForce = Tmp::Vector3Array[1];
+        auto& force       = TmpVectors::Vector3Array[0];
+        auto& scaledForce = TmpVectors::Vector3Array[1];
 
         force.copyFromFloats((2.f * fetchedColorR - 1.f) * noiseStrength.x,
                              (2.f * fetchedColorG - 1.f) * noiseStrength.y,
@@ -576,7 +576,7 @@ void ParticleSystem::_createRampGradientTexture()
   }
 
   Uint8Array data(static_cast<size_t>(_rawTextureWidth) * 4);
-  auto tmpColor = Tmp::Color3Array[0];
+  auto tmpColor = TmpVectors::Color3Array[0];
 
   for (size_t x = 0; x < static_cast<size_t>(_rawTextureWidth); ++x) {
     auto ratio = static_cast<float>(x) / static_cast<float>(_rawTextureWidth);

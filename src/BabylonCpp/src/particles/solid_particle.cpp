@@ -1,6 +1,6 @@
 #include <babylon/particles/solid_particle.h>
 
-#include <babylon/math/tmp.h>
+#include <babylon/math/tmp_vectors.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/particles/solid_particle_system.h>
 
@@ -84,7 +84,7 @@ void SolidParticle::getRotationMatrix(Matrix& m) const
     quaternion = *rotationQuaternion;
   }
   else {
-    quaternion            = Tmp::QuaternionArray[0];
+    quaternion            = TmpVectors::QuaternionArray[0];
     const auto& _rotation = rotation;
     Quaternion::RotationYawPitchRollToRef(_rotation.y, _rotation.x, _rotation.z,
                                           quaternion);

@@ -8,7 +8,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/dynamic_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
-#include <babylon/math/tmp.h>
+#include <babylon/math/tmp_vectors.h>
 #include <babylon/math/vector4.h>
 #include <babylon/postprocesses/blur_post_process.h>
 #include <babylon/postprocesses/pass_post_process.h>
@@ -218,8 +218,8 @@ void SSAORenderingPipeline::_createSSAOCombinePostProcess(float ratio)
     false);
 
   _ssaoCombinePostProcess->onApply = [&](Effect* effect, EventState&) {
-    effect->setVector4("viewport",
-                       Tmp::Vector4Array[0].copyFromFloats(0.f, 0.f, 1.f, 1.f));
+    effect->setVector4("viewport", TmpVectors::Vector4Array[0].copyFromFloats(
+                                     0.f, 0.f, 1.f, 1.f));
     effect->setTextureFromPostProcess("originalColor",
                                       _originalColorPostProcess.get());
   };

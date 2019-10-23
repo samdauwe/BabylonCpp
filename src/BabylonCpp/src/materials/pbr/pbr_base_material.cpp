@@ -28,7 +28,7 @@
 #include <babylon/materials/textures/refraction_texture.h>
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/math/spherical_polynomial.h>
-#include <babylon/math/tmp.h>
+#include <babylon/math/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/base_sub_mesh.h>
 #include <babylon/meshes/geometry.h>
@@ -1346,9 +1346,9 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
 
       // Colors
       if (defines["METALLICWORKFLOW"]) {
-        Tmp::Color3Array[0].r = !_metallic.has_value() ? 1.f : *_metallic;
-        Tmp::Color3Array[0].g = !_roughness.has_value() ? 1.f : *_roughness;
-        ubo.updateColor4("vReflectivityColor", Tmp::Color3Array[0], 0, "");
+        TmpVectors::Color3Array[0].r = !_metallic.has_value() ? 1.f : *_metallic;
+        TmpVectors::Color3Array[0].g = !_roughness.has_value() ? 1.f : *_roughness;
+        ubo.updateColor4("vReflectivityColor", TmpVectors::Color3Array[0], 0, "");
       }
       else {
         ubo.updateColor4("vReflectivityColor", _reflectivityColor,
