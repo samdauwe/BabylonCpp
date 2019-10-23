@@ -1024,7 +1024,7 @@ void AbstractMesh::_refreshBoundingInfo(const Float32Array& data,
                                         const std::optional<Vector2>& bias)
 {
   if (!data.empty()) {
-    auto extend = ExtractMinAndMax(data, 0, getTotalVertices(), bias);
+    auto extend = extractMinAndMax(data, 0, getTotalVertices(), bias);
     if (_boundingInfo) {
       _boundingInfo->reConstruct(extend.min, extend.max);
     }

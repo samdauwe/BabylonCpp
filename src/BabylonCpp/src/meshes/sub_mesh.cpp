@@ -160,7 +160,7 @@ SubMesh& SubMesh::refreshBoundingInfo(const Float32Array& iData)
   }
   else {
     extend
-      = ExtractMinAndMaxIndexed(data, indices, indexStart, indexCount,
+      = extractMinAndMaxIndexed(data, indices, indexStart, indexCount,
                                 *_renderingMesh->geometry()->boundingBias());
   }
 
@@ -289,7 +289,7 @@ SubMesh::intersects(Ray& ray, const std::vector<Vector3>& positions,
   }
   else {
     // Check if mesh is unindexed
-    if (indices.empty()) {
+    if (indices.empty() && _mesh->_unIndexed) {
       return _intersectUnIndexedTriangles(ray, positions, indices, fastCheck,
                                           trianglePredicate);
     }

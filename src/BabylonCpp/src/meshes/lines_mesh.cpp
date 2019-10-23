@@ -151,7 +151,8 @@ void LinesMesh::_bind(SubMesh* /*subMesh*/, const EffectPtr& /*effect*/,
 
   // Color
   if (!useVertexColor) {
-    _colorShader->setColor4("color", color.toColor4(alpha));
+    color4.set(color.r, color.g, color.b, alpha);
+    _colorShader->setColor4("color", color4);
   }
 
   // Clip planes

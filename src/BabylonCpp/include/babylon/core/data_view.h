@@ -73,6 +73,17 @@ public:
   int16_t getInt16(size_t byteOffset, bool littleEndian = true) const;
 
   /**
+   * @brief Gets a signed 32-bit integer (signed short) at the specified byte
+   * offset from the start of the DataView.
+   * @param byteOffset The offset, in byte, from the start of the view where to
+   * read the data.
+   * @param littleEndian Indicates whether the 32-bit int is stored in little-
+   * or big-endian format. If false or undefined, a big-endian value is read.
+   * @return A signed 32-bit integer number.
+   */
+  int32_t getInt32(size_t byteOffset, bool littleEndian = true) const;
+
+  /**
    * @brief Gets an unsigned 16-bit integer (unsigned short) at the specified
    * byte offset from the start of the DataView.
    * @param byteOffset The offset, in byte, from the start of the view where to

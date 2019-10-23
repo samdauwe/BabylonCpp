@@ -269,6 +269,7 @@ unsigned int VertexBuffer::GetTypeByteLength(unsigned int type)
     case VertexBuffer::UNSIGNED_SHORT:
       return 2;
     case VertexBuffer::INT:
+    case VertexBuffer::UNSIGNED_INT:
     case VertexBuffer::FLOAT:
       return 4;
     default:
@@ -337,7 +338,7 @@ float VertexBuffer::_GetFloatValue(const DataView& dataView, unsigned int type,
     case VertexBuffer::SHORT: {
       auto value = static_cast<float>(dataView.getInt16(byteOffset, true));
       if (normalized) {
-        value = std::max(value / 16383.f, -1.f);
+        value = std::max(value / 32767.f, -1.f);
       }
       return value;
     }
@@ -347,6 +348,12 @@ float VertexBuffer::_GetFloatValue(const DataView& dataView, unsigned int type,
         value = value / 65535.f;
       }
       return value;
+    }
+    case VertexBuffer::INT: {
+      return dataView.getInt32(byteOffset, true);
+    }
+    case VertexBuffer::UNSIGNED_INT: {
+      return dataView.getUint32(byteOffset, true);
     }
     case VertexBuffer::FLOAT: {
       return dataView.getFloat32(byteOffset, true);

@@ -17,7 +17,7 @@ namespace BABYLON {
  * @param bias defines bias value to add to the result
  * @return minimum and maximum values
  */
-inline MinMax ExtractMinAndMaxIndexed(const Float32Array& positions,
+inline MinMax extractMinAndMaxIndexed(const Float32Array& positions,
                                       const Uint32Array& indices,
                                       size_t indexStart, size_t indexCount,
                                       const std::optional<Vector2>& bias
@@ -63,7 +63,7 @@ inline MinMax ExtractMinAndMaxIndexed(const Float32Array& positions,
  * @return minimum and maximum values
  */
 inline MinMax
-ExtractMinAndMax(const Float32Array& positions, size_t start, size_t count,
+extractMinAndMax(const Float32Array& positions, size_t start, size_t count,
                  const std::optional<Vector2>& bias = std::nullopt,
                  std::optional<unsigned int> stride = std::nullopt)
 {

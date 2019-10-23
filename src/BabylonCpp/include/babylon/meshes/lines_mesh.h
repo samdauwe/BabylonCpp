@@ -167,6 +167,7 @@ public:
 private:
   MaterialPtr _colorShaderMaterial;
   ShaderMaterialPtr _colorShader;
+  Color4 color4;
 
 }; // end of class LinesMesh
 
