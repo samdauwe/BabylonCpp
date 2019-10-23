@@ -35,7 +35,7 @@ public:
 
 public:
   /**
-   * Defines the distance where this level should star being displayed
+   * Defines the distance where this level should start being displayed
    */
   float distance;
 
