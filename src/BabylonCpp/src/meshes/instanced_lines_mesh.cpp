@@ -5,7 +5,7 @@
 namespace BABYLON {
 
 InstancedLinesMesh::InstancedLinesMesh(const std::string& iName,
-                                       LinesMesh* iSource)
+                                       const LinesMeshPtr& iSource)
     : InstancedMesh{iName, iSource}
 {
 }

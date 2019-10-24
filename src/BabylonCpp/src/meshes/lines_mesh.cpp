@@ -205,7 +205,7 @@ LinesMeshPtr LinesMesh::clone(const std::string& iName, Node* newParent,
 
 InstancedLinesMeshPtr LinesMesh::createInstance(const std::string& iName)
 {
-  return InstancedLinesMesh::New(iName, this);
+  return InstancedLinesMesh::New(iName, shared_from_base<LinesMesh>());
 }
 
 AbstractMeshPtr

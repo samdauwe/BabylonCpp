@@ -42,7 +42,7 @@ public:
 
   void _resyncLightSources();
   void _resyncLighSource(const LightPtr& light);
-  void _removeLightSource(const LightPtr& light);
+  void _removeLightSource(const LightPtr& light, bool dispose = false);
 
   /**
    * @brief Returns the total number of vertices (integer).
@@ -242,7 +242,7 @@ public:
                bool disposeMaterialAndTextures = false) override;
 
 protected:
-  InstancedMesh(const std::string& name, Mesh* source);
+  InstancedMesh(const std::string& name, const MeshPtr& source);
 
   /**
    * @brief Gets if the source mesh receives shadows.

@@ -1624,7 +1624,7 @@ Mesh& Mesh::_queueLoad(Scene* scene)
   Tools::LoadFile(
     delayLoadingFile,
     [this, &scene](const std::variant<std::string, ArrayBuffer>& data,
-           const std::string & /*responseURL*/) -> void {
+                   const std::string & /*responseURL*/) -> void {
       if (std::holds_alternative<ArrayBuffer>(data)) {
         // _delayLoadingFunction(data, shared_from_base<Mesh>());
       }
@@ -2353,7 +2353,7 @@ void Mesh::forceSharedVertices()
             }
           }
           // add new index pointer to indices array
-          ptr = static_cast<uint32_t>(ptrTmp);
+          ptr = static_cast<int32_t>(ptrTmp);
           indices.emplace_back(ptr);
         }
       }
@@ -2374,7 +2374,7 @@ void Mesh::forceSharedVertices()
 
 InstancedMeshPtr Mesh::createInstance(const std::string& iName)
 {
-  return InstancedMesh::New(iName, this);
+  return InstancedMesh::New(iName, shared_from_base<Mesh>());
 }
 
 Mesh& Mesh::synchronizeInstances()

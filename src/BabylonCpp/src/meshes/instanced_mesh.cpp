@@ -12,14 +12,17 @@
 
 namespace BABYLON {
 
-InstancedMesh::InstancedMesh(const std::string& iName, Mesh* source)
+InstancedMesh::InstancedMesh(const std::string& iName, const MeshPtr& source)
     : AbstractMesh(iName, source->getScene())
     , _indexInSourceMeshInstanceArray{-1}
     , sourceMesh{this, &InstancedMesh::get_sourceMesh}
-    , _sourceMesh{source}
     , _currentLOD{nullptr}
 {
   source->addInstance(this);
+
+  _sourceMesh = source;
+
+  _unIndexed = source->_unIndexed;
 
   position().copyFrom(source->position());
   rotation().copyFrom(source->rotation());
@@ -65,7 +68,8 @@ void InstancedMesh::_resyncLighSource(const LightPtr& /*light*/)
   // Do nothing as all the work will be done by source mesh
 }
 
-void InstancedMesh::_removeLightSource(const LightPtr& /*light*/)
+void InstancedMesh::_removeLightSource(const LightPtr& /*light*/,
+                                       bool /*dispose*/)
 {
   // Do nothing as all the work will be done by source mesh
 }
@@ -109,7 +113,7 @@ void InstancedMesh::set_renderingGroupId(int value)
 
 size_t InstancedMesh::getTotalVertices() const
 {
-  return _sourceMesh->getTotalVertices();
+  return _sourceMesh ? _sourceMesh->getTotalVertices() : 0;
 }
 
 size_t InstancedMesh::getTotalIndices() const
@@ -203,21 +207,27 @@ void InstancedMesh::_preActivate()
 
 bool InstancedMesh::_activate(int renderId, bool intermediateRendering)
 {
-  if (_currentLOD) {
-    _currentLOD->_registerInstanceForRenderId(this, renderId);
+  if (_sourceMesh->subMeshes.empty()) {
+    BABYLON_LOG_WARN(
+      "InstancedMesh",
+      "Instances should only be created for meshes with geometry.")
   }
 
-  if (intermediateRendering) {
-    if (!_currentLOD->_internalAbstractMeshDataInfo._isActiveIntermediate) {
-      _currentLOD->_internalAbstractMeshDataInfo._onlyForInstancesIntermediate
-        = true;
-      return true;
+  if (_currentLOD) {
+    _currentLOD->_registerInstanceForRenderId(this, renderId);
+
+    if (intermediateRendering) {
+      if (!_currentLOD->_internalAbstractMeshDataInfo._isActiveIntermediate) {
+        _currentLOD->_internalAbstractMeshDataInfo._onlyForInstancesIntermediate
+          = true;
+        return true;
+      }
     }
-  }
-  else {
-    if (!_currentLOD->_internalAbstractMeshDataInfo._isActive) {
-      _currentLOD->_internalAbstractMeshDataInfo._onlyForInstances = true;
-      return true;
+    else {
+      if (!_currentLOD->_internalAbstractMeshDataInfo._isActive) {
+        _currentLOD->_internalAbstractMeshDataInfo._onlyForInstances = true;
+        return true;
+      }
     }
   }
   return false;

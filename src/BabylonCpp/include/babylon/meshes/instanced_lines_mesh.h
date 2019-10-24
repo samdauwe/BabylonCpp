@@ -9,6 +9,7 @@ namespace BABYLON {
 class InstancedLinesMesh;
 class LinesMesh;
 using InstancedLinesMeshPtr = std::shared_ptr<InstancedLinesMesh>;
+using LinesMeshPtr          = std::shared_ptr<LinesMesh>;
 
 /**
  * @brief Creates an instance based on a source LinesMesh.
@@ -47,7 +48,7 @@ public:
                                            = false);
 
 protected:
-  InstancedLinesMesh(const std::string& name, LinesMesh* source);
+  InstancedLinesMesh(const std::string& name, const LinesMeshPtr& source);
 
 }; // end of class InstancedLinesMesh
 
