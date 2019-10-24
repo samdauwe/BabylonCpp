@@ -79,6 +79,7 @@ public:
   std::optional<bool> updatable;
   std::optional<bool> hasRings;
   std::optional<bool> enclose;
+  std::optional<unsigned int> cap;
   std::optional<unsigned int> sideOrientation;
   std::optional<Vector4> frontUVs;
   std::optional<Vector4> backUVs;

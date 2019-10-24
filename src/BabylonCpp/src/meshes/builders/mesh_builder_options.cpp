@@ -50,6 +50,7 @@ CylinderOptions::CylinderOptions()
     , updatable{std::nullopt}
     , hasRings{std::nullopt}
     , enclose{std::nullopt}
+    , cap{std::nullopt}
     , sideOrientation{std::nullopt}
     , frontUVs{std::nullopt}
     , backUVs{std::nullopt}

@@ -19,7 +19,7 @@ using MeshPtr = std::shared_ptr<Mesh>;
 struct BABYLON_SHARED_EXPORT CylinderBuilder {
 
   /**
-   * @brief Creates a cylinder or a cone mesh.
+   * @brief Creates a cylinder or a cone mesh
    * * The parameter `height` sets the height size (float) of the cylinder/cone
    * (float, default 2).
    * * The parameter `diameter` sets the diameter of the top and bottom cap at
@@ -35,6 +35,9 @@ struct BABYLON_SHARED_EXPORT CylinderBuilder {
    * independent from each other, so they become different faces.
    * * The parameter `enclose`  (boolean, default false) adds two extra faces
    * per subdivision to a sliced cylinder to close it around its height axis.
+   * * The parameter `cap` sets the way the cylinder is capped. Possible values
+   * : BABYLON.Mesh.NO_CAP, BABYLON.Mesh.CAP_START, BABYLON.Mesh.CAP_END,
+   * BABYLON.Mesh.CAP_ALL (default).
    * * The parameter `arc` (float, default 1) is the ratio (max 1) to apply to
    * the circumference to slice the cylinder.
    * * You can set different colors and different images to each box side by

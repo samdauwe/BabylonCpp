@@ -686,8 +686,12 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
   else {
     for (p = 0; p < pathArray.size(); ++p) {
       for (i = 0; i < minlg + closePathCorr; ++i) {
-        u = (uTotalDistance[p] != 0.f) ? us[p][i % us[p].size()] / uTotalDistance[p] : 0.f;
-        v = (vTotalDistance[i] != 0.f) ? vs[i][p % vs[i].size()] / vTotalDistance[i] : 0.f;
+        u = (uTotalDistance[p] != 0.f) ?
+              us[p][i % us[p].size()] / uTotalDistance[p] :
+              0.f;
+        v = (vTotalDistance[i] != 0.f) ?
+              vs[i][p % vs[i].size()] / vTotalDistance[i] :
+              0.f;
         if (invertUV) {
           stl_util::concat(uvs, {v, u});
         }
@@ -1013,6 +1017,7 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
   const auto subdivisions = options.subdivisions.value_or(1.f);
   const auto hasRings     = options.hasRings.value_or(false);
   const auto enclose      = options.enclose.value_or(false);
+  const auto cap          = options.cap.value_or(Mesh::CAP_ALL);
   const auto arc
     = options.arc.has_value() ?
         ((*options.arc <= 0.f || options.arc > 1.f) ? 1.f : *options.arc) :
@@ -1260,9 +1265,13 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
     }
   };
 
-  // add caps to geometry
-  createCylinderCap(false);
-  createCylinderCap(true);
+  // add caps to geometry based on cap parameter
+  if ((cap == Mesh::CAP_START) || (cap == Mesh::CAP_ALL)) {
+    createCylinderCap(false);
+  }
+  if ((cap == Mesh::CAP_END) || (cap == Mesh::CAP_ALL)) {
+    createCylinderCap(true);
+  }
 
   // Sides
   VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs,
