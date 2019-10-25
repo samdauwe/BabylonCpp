@@ -235,7 +235,7 @@ void InputManager::_processPointerDown(std::optional<PickingInfo>& pickResult,
   auto& scene = *_scene;
   if (pickResult && (*pickResult).hit && (*pickResult).pickedMesh) {
     _pickedDownMesh     = (*pickResult).pickedMesh;
-    auto iActionManager = _pickedDownMesh->actionManager;
+    auto iActionManager = _pickedDownMesh->_getActionManagerForTrigger();
     if (iActionManager) {
       if (iActionManager->hasPickTriggers()) {
         iActionManager->processTrigger(
