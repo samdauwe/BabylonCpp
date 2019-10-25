@@ -96,6 +96,10 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize,
                                          get_contactHardeningLightSizeUVRatio,
                                        &ShadowGenerator::
                                          set_contactHardeningLightSizeUVRatio}
+    , darkness{this, &ShadowGenerator::get_darkness,
+               &ShadowGenerator::set_darkness}
+    , transparencyShadow{this, &ShadowGenerator::get_transparencyShadow,
+                         &ShadowGenerator::set_transparencyShadow}
     , frustumEdgeFalloff{0.f}
     , forceBackFacesOnly{false}
     , _bias{0.00005f}
@@ -416,7 +420,15 @@ unsigned int ShadowGenerator::get_filteringQuality() const
 
 void ShadowGenerator::set_filteringQuality(unsigned int iFilteringQuality)
 {
+  if (_filteringQuality == iFilteringQuality) {
+    return;
+  }
+
   _filteringQuality = iFilteringQuality;
+
+  _disposeBlurPostProcesses();
+  _applyFilterValues();
+  _light->_markMeshesAsLightDirty();
 }
 
 bool ShadowGenerator::get_useContactHardeningShadow() const
@@ -444,9 +456,29 @@ void ShadowGenerator::set_contactHardeningLightSizeUVRatio(
   _contactHardeningLightSizeUVRatio = iContactHardeningLightSizeUVRatio;
 }
 
+float ShadowGenerator::get_darkness() const
+{
+  return _darkness;
+}
+
+void ShadowGenerator::set_darkness(float value)
+{
+  setDarkness(value);
+}
+
 float ShadowGenerator::getDarkness() const
 {
   return _darkness;
+}
+
+bool ShadowGenerator::get_transparencyShadow() const
+{
+  return _transparencyShadow;
+}
+
+void ShadowGenerator::set_transparencyShadow(bool value)
+{
+  setTransparencyShadow(value);
 }
 
 ShadowGenerator& ShadowGenerator::setDarkness(float darkness)
@@ -481,6 +513,11 @@ RenderTargetTexturePtr ShadowGenerator::getShadowMapForRendering()
   }
 
   return _shadowMap;
+}
+
+const std::string ShadowGenerator::getClassName() const
+{
+  return "ShadowGenerator";
 }
 
 ShadowGenerator& ShadowGenerator::addShadowCaster(const AbstractMeshPtr& mesh,
@@ -609,6 +646,13 @@ void ShadowGenerator::_initializeShadowMap()
       engine->clear(clearOne, true, true, false);
     }
   });
+
+  _shadowMap->onResizeObservable.add(
+    [this](RenderTargetTexture* RTT, EventState&) -> void {
+      _mapSize = RTT->getRenderSize();
+      _light->_markMeshesAsLightDirty();
+      recreateShadowMap();
+    });
 }
 
 void ShadowGenerator::_initializeBlurRTTAndPostProcesses()
@@ -810,6 +854,10 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
     if (forceBackFacesOnly) {
       engine->setState(true, 0, false, false);
     }
+
+    // Observables
+    onAfterShadowMapRenderObservable.notifyObservers(_effect.get());
+    onAfterShadowMapRenderMeshObservable.notifyObservers(mesh.get());
   }
   else {
     // Need to reset refresh rate of the shadowMap
@@ -938,6 +986,7 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
   }
 
   // Bones
+  auto fallbacks = std::make_unique<EffectFallbacks>();
   if (mesh->useBones() && mesh->computeBonesUsingShaders()
       && mesh->skeleton()) {
     attribs.emplace_back(VertexBuffer::MatricesIndicesKind);
@@ -949,6 +998,10 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
     const auto skeleton = mesh->skeleton();
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
                          + std::to_string(mesh->numBoneInfluencers()));
+    if (mesh->numBoneInfluencers > 0) {
+      fallbacks->addCPUSkinningFallback(0, mesh.get());
+    }
+
     if (skeleton->isUsingTextureForMatrices()) {
       defines.emplace_back("#define BONETEXTURE");
     }
@@ -973,18 +1026,15 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
                            + std::to_string(morphInfluencers));
       MaterialDefines iDefines;
       iDefines.intDef["NUM_MORPH_INFLUENCERS"] = morphInfluencers;
-      MaterialHelper::PrepareAttributesForMorphTargets(attribs, mesh.get(),
-                                                       iDefines);
+      MaterialHelper::PrepareAttributesForMorphTargetsInfluencers(
+        attribs, mesh.get(), morphInfluencers);
     }
   }
 
   // Instances
   if (useInstances) {
     defines.emplace_back("#define INSTANCES");
-    attribs.emplace_back(VertexBuffer::World0Kind);
-    attribs.emplace_back(VertexBuffer::World1Kind);
-    attribs.emplace_back(VertexBuffer::World2Kind);
-    attribs.emplace_back(VertexBuffer::World3Kind);
+    MaterialHelper::PushAttributesForInstances(attribs);
   }
 
   if (customShaderOptions) {
@@ -1045,6 +1095,7 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
     options.uniformsNames = std::move(uniforms);
     options.samplers      = std::move(samplers);
     options.defines       = std::move(join);
+    options.fallbacks     = std::move(fallbacks);
     options.indexParameters
       = {{"maxSimultaneousMorphTargets", morphInfluencers}};
 
@@ -1296,6 +1347,11 @@ void ShadowGenerator::dispose()
     _light->_shadowGenerator = nullptr;
     _light->_markMeshesAsLightDirty();
   }
+
+  onBeforeShadowMapRenderMeshObservable.clear();
+  onBeforeShadowMapRenderObservable.clear();
+  onAfterShadowMapRenderMeshObservable.clear();
+  onAfterShadowMapRenderObservable.clear();
 }
 
 json ShadowGenerator::serialize() const

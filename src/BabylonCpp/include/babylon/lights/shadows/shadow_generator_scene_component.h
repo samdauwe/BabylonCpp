@@ -39,7 +39,7 @@ public:
     return std::shared_ptr<ShadowGeneratorSceneComponent>(
       new ShadowGeneratorSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~ShadowGeneratorSceneComponent();
+  virtual ~ShadowGeneratorSceneComponent() override;
 
   /**
    * @brief Registers the component in a given scene.
@@ -53,13 +53,13 @@ public:
   void rebuild() override;
 
   /**
-   * @brief Serializes the component data to the specified json object
+   * @brief Serializes the component data to the specified json object.
    * @param serializationObject The object to serialize to
    */
   void serialize(json& serializationObject) override;
 
   /**
-   * @brief Adds all the element from the container to the scene
+   * @brief Adds all the elements from the container to the scene.
    * @param container the container holding the elements
    */
   void addFromContainer(AbstractScene& container) override;
