@@ -19,6 +19,7 @@
 #include <babylon/lights/shadows/shadow_generator.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/material_defines.h>
+#include <babylon/materials/textures/raw_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/math/frustum.h>
 #include <babylon/math/functions.h>
@@ -145,6 +146,7 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , isBlocked{this, &AbstractMesh::get_isBlocked}
     , useBones{this, &AbstractMesh::get_useBones}
     , isAnInstance{this, &AbstractMesh::get_isAnInstance}
+    , hasInstances{this, &AbstractMesh::get_hasInstances}
     , checkCollisions{this, &AbstractMesh::get_checkCollisions,
                       &AbstractMesh::set_checkCollisions}
     , collider{this, &AbstractMesh::get_collider}
@@ -748,9 +750,6 @@ Vector3& AbstractMesh::get_scaling()
 void AbstractMesh::set_scaling(const Vector3& newScaling)
 {
   _scaling = newScaling;
-  if (_physicsImpostor) {
-    _physicsImpostor->forceUpdate();
-  }
 }
 
 AbstractMesh* AbstractMesh::getParent()
@@ -864,44 +863,12 @@ BoundingInfoPtr& AbstractMesh::getBoundingInfo()
   return _boundingInfo;
 }
 
-AbstractMesh& AbstractMesh::normalizeToUnitCube(bool includeDescendants,
-                                                bool ignoreRotation)
+AbstractMesh& AbstractMesh::normalizeToUnitCube(
+  bool includeDescendants, bool ignoreRotation,
+  const std::function<bool(const AbstractMeshPtr& node)>& predicate)
 {
-  std::optional<Vector3> storedRotation              = std::nullopt;
-  std::optional<Quaternion> storedRotationQuaternion = std::nullopt;
-
-  if (ignoreRotation) {
-    if (rotationQuaternion().has_value()) {
-      storedRotationQuaternion = *rotationQuaternion();
-      rotationQuaternion()->copyFromFloats(0.f, 0.f, 0.f, 1.f);
-    } /* else if (rotation()) */
-    {
-      storedRotation = rotation();
-      rotation().copyFromFloats(0.f, 0.f, 0.f);
-    }
-  }
-
-  auto boundingVectors = getHierarchyBoundingVectors(includeDescendants);
-  auto sizeVec         = boundingVectors.max.subtract(boundingVectors.min);
-  auto maxDimension    = stl_util::max(sizeVec.x, sizeVec.y, sizeVec.z);
-
-  if (maxDimension == 0.f) {
-    return *this;
-  }
-
-  auto scale = 1.f / maxDimension;
-
-  scaling().scaleInPlace(scale);
-
-  if (ignoreRotation) {
-    if (rotationQuaternion() && storedRotationQuaternion.has_value()) {
-      rotationQuaternion()->copyFrom(*storedRotationQuaternion);
-    }
-    else if (/*rotation() && */ storedRotation.has_value()) {
-      rotation().copyFrom(*storedRotation);
-    }
-  }
-
+  TransformNode::normalizeToUnitCube(includeDescendants, ignoreRotation,
+                                     predicate);
   return *this;
 }
 
@@ -966,6 +933,11 @@ float AbstractMesh::_getWorldMatrixDeterminant()
 }
 
 bool AbstractMesh::get_isAnInstance() const
+{
+  return false;
+}
+
+bool AbstractMesh::get_hasInstances() const
 {
   return false;
 }
@@ -1414,7 +1386,7 @@ AbstractMesh::createOrUpdateSubmeshesOctree(size_t maxCapacity, size_t maxDepth)
 
 AbstractMesh& AbstractMesh::_collideForSubMesh(SubMesh* subMesh,
                                                const Matrix& transformMatrix,
-                                               Collider& iCollider)
+                                               Collider& /*iCollider*/)
 {
   _generatePointsArray();
 
@@ -1443,9 +1415,6 @@ AbstractMesh& AbstractMesh::_collideForSubMesh(SubMesh* subMesh,
     subMesh->indexStart, subMesh->indexStart + subMesh->indexCount,
     subMesh->verticesStart, subMesh->getMaterial() != nullptr);
 #endif
-  if (iCollider.collisionFound) {
-    iCollider.collidedMesh = shared_from_base<AbstractMesh>();
-  }
   return *this;
 }
 
@@ -1590,6 +1559,14 @@ AbstractMesh& AbstractMesh::releaseSubMeshes()
 
 void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
+  // mesh map release.
+  if (_scene->useMaterialMeshMap) {
+    // remove from material mesh map id needed
+    if (_material && !_material->meshMap.empty()) {
+      _material->meshMap.erase(std::to_string(uniqueId));
+    }
+  }
+
   // Smart Array Retainers.
   getScene()->freeActiveMeshes();
   getScene()->freeRenderingGroups();
@@ -1602,6 +1579,11 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 
   // Skeleton
   _internalAbstractMeshDataInfo._skeleton = nullptr;
+
+  if (_transformMatrixTexture) {
+    _transformMatrixTexture->dispose();
+    _transformMatrixTexture = nullptr;
+  }
 
   // Intersections in progress
   for (const auto& other : _intersectionsInProgress) {

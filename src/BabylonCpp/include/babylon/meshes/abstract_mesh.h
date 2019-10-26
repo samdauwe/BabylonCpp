@@ -125,6 +125,42 @@ public:
     CULLINGSTRATEGY_OPTIMISTIC_INCLUSION_THEN_BSPHERE_ONLY
     = Constants::MESHES_CULLINGSTRATEGY_OPTIMISTIC_INCLUSION_THEN_BSPHERE_ONLY;
 
+  /**
+   * No billboard
+   */
+  static constexpr unsigned int BILLBOARDMODE_NONE
+    = TransformNode::BILLBOARDMODE_NONE;
+
+  /**
+   * Billboard on X axis
+   */
+  static constexpr unsigned int BILLBOARDMODE_X
+    = TransformNode::BILLBOARDMODE_X;
+
+  /**
+   * Billboard on Y axis
+   */
+  static constexpr unsigned int BILLBOARDMODE_Y
+    = TransformNode::BILLBOARDMODE_Y;
+
+  /**
+   * Billboard on Z axis
+   */
+  static constexpr unsigned int BILLBOARDMODE_Z
+    = TransformNode::BILLBOARDMODE_Z;
+
+  /**
+   * Billboard on all axes
+   */
+  static constexpr unsigned int BILLBOARDMODE_ALL
+    = TransformNode::BILLBOARDMODE_ALL;
+
+  /**
+   * Billboard on using position instead of orientation
+   */
+  static constexpr unsigned int BILLBOARDMODE_USE_POSITION
+    = TransformNode::BILLBOARDMODE_USE_POSITION;
+
 public:
   static Vector3 _lookAtVectorCache;
 
@@ -193,6 +229,10 @@ public:
    * @brief Hidden
    */
   void _removeLightSource(const LightPtr& light, bool dispose);
+
+  /**
+   * @brief Hidden
+   */
   void _removeLightSource(Light* light, bool dispose);
 
   /**
@@ -361,7 +401,9 @@ public:
 
   /**
    * @brief Returns the mesh BoundingInfo object or creates a new one and
-   * returns if it was undefined.
+   * returns if it was undefined. Note that it returns a shallow bounding of the
+   * mesh (i.e. it does not include children). To get the full bounding of all
+   * children, call `getHierarchyBoundingVectors` instead.
    * @returns a BoundingInfo
    */
   BoundingInfoPtr& getBoundingInfo();
@@ -370,13 +412,17 @@ public:
    * @brief Uniformly scales the mesh to fit inside of a unit cube (1 X 1 X 1
    * units).
    * @param includeDescendants Use the hierarchy's bounding box instead of the
-   * mesh's bounding box. Default is true
+   * mesh's bounding box. Default is false
    * @param ignoreRotation ignore rotation when computing the scale (ie. object
    * will be axis aligned). Default is false
+   * @param predicate predicate that is passed in to getHierarchyBoundingVectors
+   * when selecting which object should be included when scaling
    * @returns the current mesh
    */
-  AbstractMesh& normalizeToUnitCube(bool includeDescendants = true,
-                                    bool ignoreRotation     = false);
+  AbstractMesh& normalizeToUnitCube(
+    bool includeDescendants = true, bool ignoreRotation = false,
+    const std::function<bool(const AbstractMeshPtr& node)>& predicate
+    = nullptr);
 
   /**
    * @brief Overwrite the current bounding info.
@@ -1278,6 +1324,11 @@ protected:
    */
   virtual bool get_isAnInstance() const;
 
+  /**
+   * @brief Gets a boolean indicating if this mesh has instances.
+   */
+  virtual bool get_hasInstances() const;
+
   /** Collisions **/
 
   /**
@@ -1827,6 +1878,11 @@ public:
    * Gets a boolean indicating if this mesh is an instance or a regular mesh
    */
   ReadOnlyProperty<AbstractMesh, bool> isAnInstance;
+
+  /**
+   * Gets a boolean indicating if this mesh has instances
+   */
+  ReadOnlyProperty<AbstractMesh, bool> hasInstances;
 
   /** Collisions **/
 
