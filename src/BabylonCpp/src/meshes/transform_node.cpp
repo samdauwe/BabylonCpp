@@ -44,6 +44,9 @@ TransformNode::TransformNode(const std::string& iName, Scene* scene,
     , up{this, &TransformNode::get_up}
     , right{this, &TransformNode::get_right}
     , absolutePosition{this, &TransformNode::get_absolutePosition}
+    , absoluteScaling{this, &TransformNode::get_absoluteScaling}
+    , absoluteRotationQuaternion{this,
+                                 &TransformNode::get_absoluteRotationQuaternion}
     , isWorldMatrixFrozen{this, &TransformNode::get_isWorldMatrixFrozen}
     , nonUniformScaling{this, &TransformNode::get_nonUniformScaling}
     , _scaling{Vector3::One()}
@@ -63,12 +66,15 @@ TransformNode::TransformNode(const std::string& iName, Scene* scene,
     , _rotation{Vector3::Zero()}
     , _rotationQuaternion{std::nullopt}
     , _transformToBoneReferal{nullptr}
+    , _isAbsoluteSynced{false}
     , _billboardMode{TransformNode::BILLBOARDMODE_NONE}
     , _preserveParentRotationForBillboard(false)
     , _infiniteDistance{false}
     , _localWorld{Matrix::Zero()}
     , _usePivotMatrix{false}
     , _absolutePosition{Vector3::Zero()}
+    , _absoluteScaling{Vector3::Zero()}
+    , _absoluteRotationQuaternion{Quaternion::Identity()}
     , _pivotMatrix{Matrix::Identity()}
     , _pivotMatrixInverse{nullptr}
     , _nonUniformScaling{false}
@@ -376,6 +382,18 @@ Vector3& TransformNode::get_absolutePosition()
   return _absolutePosition;
 }
 
+Vector3& TransformNode::get_absoluteScaling()
+{
+  _syncAbsoluteScalingAndRotation();
+  return _absoluteScaling;
+}
+
+Quaternion& TransformNode::get_absoluteRotationQuaternion()
+{
+  _syncAbsoluteScalingAndRotation();
+  return _absoluteRotationQuaternion;
+}
+
 TransformNode& TransformNode::setPreTransformMatrix(Matrix& matrix)
 {
   return setPivotMatrix(matrix, false);
@@ -412,11 +430,29 @@ const Matrix& TransformNode::getPivotMatrix() const
   return _pivotMatrix;
 }
 
-TransformNode& TransformNode::freezeWorldMatrix()
+TransformNodePtr TransformNode::instantiateHierarychy(TransformNode* newParent)
 {
-  _isWorldMatrixFrozen
-    = false; // no guarantee world is not already frozen, switch off temporarily
-  computeWorldMatrix(true);
+  auto cloneTransformNode = clone("Clone of " + (!name.empty() ? name : id),
+                                  newParent ? newParent : parent, true);
+
+  for (const auto& child : getChildTransformNodes(true)) {
+    child->instantiateHierarychy(cloneTransformNode.get());
+  }
+
+  return cloneTransformNode;
+}
+
+TransformNode&
+TransformNode::freezeWorldMatrix(const std::optional<Matrix>& newWorldMatrix)
+{
+  if (newWorldMatrix) {
+    _worldMatrix = _worldMatrix;
+  }
+  else {
+    _isWorldMatrixFrozen = false; // no guarantee world is not already frozen,
+                                  // switch off temporarily
+    computeWorldMatrix(true);
+  }
   _isWorldMatrixFrozen = true;
   return *this;
 }
@@ -629,9 +665,6 @@ TransformNode& TransformNode::setParent(Node* node)
   std::optional<Vector3> scale           = TmpVectors::Vector3Array[1];
 
   if (!node) {
-    if (parent()) {
-      parent()->computeWorldMatrix(true);
-    }
     computeWorldMatrix(true);
     getWorldMatrix().decompose(scale, quatRotation, newPosition);
   }
@@ -821,6 +854,33 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
     return _worldMatrix;
   }
 
+  auto& camera = getScene()->activeCamera();
+  const auto useBillboardPosition
+    = (_billboardMode & TransformNode::BILLBOARDMODE_USE_POSITION) != 0;
+  const auto useBillboardPath
+    = _billboardMode != TransformNode::BILLBOARDMODE_NONE
+      && !preserveParentRotationForBillboard;
+
+  // Billboarding based on camera position
+  if (useBillboardPath && camera && useBillboardPosition) {
+    lookAt(camera->position());
+
+    if ((billboardMode & TransformNode::BILLBOARDMODE_X)
+        != TransformNode::BILLBOARDMODE_X) {
+      rotation().x = 0.f;
+    }
+
+    if ((billboardMode & TransformNode::BILLBOARDMODE_Y)
+        != TransformNode::BILLBOARDMODE_Y) {
+      rotation().y = 0.f;
+    }
+
+    if ((billboardMode & TransformNode::BILLBOARDMODE_Z)
+        != TransformNode::BILLBOARDMODE_Z) {
+      rotation().z = 0.f;
+    }
+  }
+
   updateCache();
   auto& cache              = _cache;
   cache.pivotMatrixUpdated = false;
@@ -829,11 +889,8 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
 
   _currentRenderId = currentRenderId;
   _childUpdateId++;
-  _isDirty              = false;
-  auto iParent          = _getEffectiveParent();
-  auto useBillboardPath = _billboardMode != TransformNode::BILLBOARDMODE_NONE
-                          && !preserveParentRotationForBillboard();
-  auto& camera = getScene()->activeCamera();
+  _isDirty     = false;
+  auto iParent = _getEffectiveParent();
 
   // Scaling
   auto& iScaling     = cache.scaling;
@@ -910,6 +967,9 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
 
   // Parent
   if (iParent) {
+    if (force) {
+      iParent->computeWorldMatrix();
+    }
     if (useBillboardPath) {
       if (_transformToBoneReferal) {
         iParent->getWorldMatrix().multiplyToRef(
@@ -948,8 +1008,9 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
     _worldMatrix.copyFrom(_localMatrix);
   }
 
-  // Billboarding (testing PG:http://www.babylonjs-playground.com/#UJEIL#13)
-  if (useBillboardPath && camera) {
+  // Billboarding based on camera orientation
+  // (testing PG:http://www.babylonjs-playground.com/#UJEIL#13)
+  if (useBillboardPath && camera && billboardMode && !useBillboardPosition) {
     auto& storedTranslation = TmpVectors::Vector3Array[0];
     _worldMatrix.getTranslationToRef(storedTranslation); // Save translation
 
@@ -1017,6 +1078,7 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
   // Absolute position
   _absolutePosition.copyFromFloats(_worldMatrix.m()[12], _worldMatrix.m()[13],
                                    _worldMatrix.m()[14]);
+  _isAbsoluteSynced = false;
 
   // Callbacks
   onAfterWorldMatrixUpdateObservable.notifyObservers(this);
@@ -1124,6 +1186,60 @@ void TransformNode::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   }
 
   Node::dispose(doNotRecurse, disposeMaterialAndTextures);
+}
+
+TransformNode& TransformNode::normalizeToUnitCube(
+  bool includeDescendants, bool ignoreRotation,
+  const std::function<bool(const AbstractMeshPtr& node)>& predicate)
+{
+  std::optional<Vector3> storedRotation              = std::nullopt;
+  std::optional<Quaternion> storedRotationQuaternion = std::nullopt;
+
+  if (ignoreRotation) {
+    if (rotationQuaternion()) {
+      storedRotationQuaternion = rotationQuaternion();
+      rotationQuaternion()->copyFromFloats(0.f, 0.f, 0.f, 1.f);
+    }
+    else /* if (rotation()) */ {
+      storedRotation = rotation;
+      rotation().copyFromFloats(0.f, 0.f, 0.f);
+    }
+  }
+
+  auto boundingVectors
+    = getHierarchyBoundingVectors(includeDescendants, predicate);
+  auto sizeVec      = boundingVectors.max.subtract(boundingVectors.min);
+  auto maxDimension = std::max(sizeVec.x, std::max(sizeVec.y, sizeVec.z));
+
+  if (maxDimension == 0.f) {
+    return *this;
+  }
+
+  auto scale = 1.f / maxDimension;
+
+  scaling().scaleInPlace(scale);
+
+  if (ignoreRotation) {
+    if (rotationQuaternion() && storedRotationQuaternion) {
+      rotationQuaternion()->copyFrom(*storedRotationQuaternion);
+    }
+    else if (/*rotation() && */ storedRotation) {
+      rotation().copyFrom(*storedRotation);
+    }
+  }
+
+  return *this;
+}
+
+void TransformNode::_syncAbsoluteScalingAndRotation()
+{
+  if (!_isAbsoluteSynced) {
+    std::optional<Vector3> scale       = _absoluteScaling;
+    std::optional<Quaternion> rotation = _absoluteRotationQuaternion;
+    std::optional<Vector3> translation = std::nullopt;
+    _worldMatrix.decompose(scale, rotation, translation);
+    _isAbsoluteSynced = true;
+  }
 }
 
 } // end of namespace BABYLON

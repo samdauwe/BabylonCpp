@@ -47,6 +47,11 @@ public:
    */
   static constexpr unsigned int BILLBOARDMODE_ALL = 7;
 
+  /**
+   * Object will rotate to face the camera's position instead of orientation
+   */
+  static constexpr unsigned int BILLBOARDMODE_USE_POSITION = 128;
+
 public:
   template <typename... Ts>
   static TransformNodePtr New(Ts&&... args)
@@ -158,10 +163,19 @@ public:
   const Matrix& getPivotMatrix() const;
 
   /**
+   * @brief Instantiate (when possible) or clone that node with its hierarchy.
+   * @param newParent defines the new parent to use for the instance (or clone)
+   * @returns an instance (or a clone) of the current node with its hiearchy
+   */
+  TransformNodePtr instantiateHierarychy(TransformNode* newParent = nullptr);
+
+  /**
    * @brief Prevents the World matrix to be computed any longer.
+   * @param newWorldMatrix defines an optional matrix to use as world matrix
    * @returns the TransformNode.
    */
-  TransformNode& freezeWorldMatrix();
+  TransformNode& freezeWorldMatrix(const std::optional<Matrix>& newWorldMatrix
+                                   = std::nullopt);
 
   /**
    * @brief Allows back the World matrix computation.
@@ -478,6 +492,22 @@ public:
   void dispose(bool doNotRecurse               = false,
                bool disposeMaterialAndTextures = false) override;
 
+  /**
+   * @brief Uniformly scales the mesh to fit inside of a unit cube (1 X 1 X 1
+   * units).
+   * @param includeDescendants Use the hierarchy's bounding box instead of the
+   * mesh's bounding box. Default is false
+   * @param ignoreRotation ignore rotation when computing the scale (ie. object
+   * will be axis aligned). Default is false
+   * @param predicate predicate that is passed in to getHierarchyBoundingVectors
+   * when selecting which object should be included when scaling
+   * @returns the current mesh
+   */
+  TransformNode& normalizeToUnitCube(
+    bool includeDescendants = true, bool ignoreRotation = false,
+    const std::function<bool(const AbstractMeshPtr& node)>& predicate
+    = nullptr);
+
 protected:
   TransformNode(const std::string& name, Scene* scene = nullptr,
                 bool isPure = true);
@@ -603,6 +633,18 @@ protected:
   Vector3& get_absolutePosition();
 
   /**
+   * @brief Returns the current mesh absolute scaling.
+   * @returns a Vector3.
+   */
+  Vector3& get_absoluteScaling();
+
+  /**
+   * @brief Returns the current mesh absolute scaling.
+   * @returns a Vector3.
+   */
+  Quaternion& get_absoluteRotationQuaternion();
+
+  /**
    * @brief True if the World matrix has been frozen.
    * @returns a boolean.
    */
@@ -618,6 +660,9 @@ protected:
    * @brief Hidden
    */
   Node* _getEffectiveParent() const;
+
+private:
+  void _syncAbsoluteScalingAndRotation();
 
 public:
   /**
@@ -722,6 +767,18 @@ public:
   ReadOnlyProperty<TransformNode, Vector3> absolutePosition;
 
   /**
+   * Returns the current mesh absolute scaling.
+   * Returns a Vector3.
+   */
+  ReadOnlyProperty<TransformNode, Vector3> absoluteScaling;
+
+  /**
+   * Returns the current mesh absolute rotation.
+   * Returns a Quaternion.
+   */
+  ReadOnlyProperty<TransformNode, Quaternion> absoluteRotationQuaternion;
+
+  /**
    * True if the World matrix has been frozen.
    */
   ReadOnlyProperty<TransformNode, bool> isWorldMatrixFrozen;
@@ -764,12 +821,15 @@ private:
   Vector3 _rotation;
   std::optional<Quaternion> _rotationQuaternion;
   TransformNode* _transformToBoneReferal;
+  bool _isAbsoluteSynced;
   unsigned int _billboardMode;
   bool _preserveParentRotationForBillboard;
   bool _infiniteDistance;
   Matrix _localWorld;
   bool _usePivotMatrix;
   Vector3 _absolutePosition;
+  Vector3 _absoluteScaling;
+  Quaternion _absoluteRotationQuaternion;
   Matrix _pivotMatrix;
   std::unique_ptr<Matrix> _pivotMatrixInverse;
   bool _nonUniformScaling;
