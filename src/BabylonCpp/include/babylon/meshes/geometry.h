@@ -49,7 +49,7 @@ public:
 
     return geometry;
   }
-  virtual ~Geometry();
+  virtual ~Geometry() override;
 
   /**
    * @brief Adds the geometry to the scene.
