@@ -62,11 +62,21 @@ protected:
    */
   void set_light(const LightPtr& light);
 
+  /**
+   * @brief Gets the material used to render the light gizmo.
+   */
+  StandardMaterialPtr& get_material();
+
 public:
   /**
    * The light that the gizmo is attached to
    */
   Property<LightGizmo, LightPtr> light;
+
+  /**
+   * Gets the material used to render the light gizmo
+   */
+  ReadOnlyProperty<LightGizmo, StandardMaterialPtr> material;
 
 private:
   static float _Scale;

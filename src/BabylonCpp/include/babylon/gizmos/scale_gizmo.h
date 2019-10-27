@@ -76,6 +76,14 @@ public:
    */
   Property<ScaleGizmo, float> snapDistance;
 
+private:
+  AbstractMeshPtr _meshAttached;
+  bool _updateGizmoRotationToMatchAttachedMesh;
+  float _snapDistance;
+  float _scaleRatio;
+  MeshPtr _uniformScalingMesh;
+  MeshPtr _octahedron;
+
 }; // end of class ScaleGizmo
 
 } // end of namespace BABYLON

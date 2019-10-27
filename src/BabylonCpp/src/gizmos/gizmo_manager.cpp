@@ -17,6 +17,8 @@ GizmoManager::GizmoManager(Scene* iScene)
     , boundingBoxDragBehavior{std::make_unique<SixDofDragBehavior>()}
     , attachableMeshes{std::nullopt}
     , usePointerToAttachGizmos{true}
+    , keepDepthUtilityLayer{this, &GizmoManager::get_keepDepthUtilityLayer}
+    , utilityLayer{this, &GizmoManager::get_utilityLayer}
     , positionGizmoEnabled{this, &GizmoManager::get_positionGizmoEnabled,
                            &GizmoManager::set_positionGizmoEnabled}
     , rotationGizmoEnabled{this, &GizmoManager::get_rotationGizmoEnabled,
@@ -115,6 +117,16 @@ void GizmoManager::attachToMesh(const AbstractMeshPtr& mesh)
     //  _attachedMesh.addBehavior(boundingBoxDragBehavior);
   }
   onAttachedToMeshObservable.notifyObservers(mesh.get());
+}
+
+UtilityLayerRendererPtr& GizmoManager::get_keepDepthUtilityLayer()
+{
+  return _defaultKeepDepthUtilityLayer;
+}
+
+UtilityLayerRendererPtr& GizmoManager::get_utilityLayer()
+{
+  return _defaultUtilityLayer;
 }
 
 void GizmoManager::set_positionGizmoEnabled(bool value)
@@ -226,6 +238,7 @@ void GizmoManager::dispose(bool /*doNotRecurse*/,
     gizmos.boundingBoxGizmo = nullptr;
   }
   _defaultKeepDepthUtilityLayer->dispose();
+  _defaultUtilityLayer->dispose();
   boundingBoxDragBehavior->detach();
   onAttachedToMeshObservable.clear();
 }

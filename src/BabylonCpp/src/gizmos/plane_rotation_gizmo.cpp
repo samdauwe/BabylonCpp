@@ -4,6 +4,8 @@
 #include <babylon/behaviors/meshes/pointer_drag_behavior.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/scene.h>
+#include <babylon/gizmos/rotation_gizmo.h>
+#include <babylon/gizmos/scale_gizmo.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/lines_mesh.h>
@@ -15,12 +17,18 @@ namespace BABYLON {
 PlaneRotationGizmo::PlaneRotationGizmo(
   const Vector3& planeNormal, const Color3& color,
   const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer,
-  unsigned int tessellation)
+  unsigned int tessellation, RotationGizmo* parent, bool useEulerRotation)
     : Gizmo{iGizmoLayer}
+    , dragBehavior{nullptr}
     , snapDistance{0.f}
+    , isEnabled{this, &PlaneRotationGizmo::get_isEnabled,
+                &PlaneRotationGizmo::set_isEnabled}
     , _pointerObserver{nullptr}
+    , _isEnabled{true}
+    , _parent{nullptr}
     , _tmpSnapEvent{0.f}
 {
+  _parent = parent;
   // Create Material
   auto coloredMaterial
     = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
@@ -70,7 +78,7 @@ PlaneRotationGizmo::PlaneRotationGizmo(
   dragBehavior->onDragObservable.add([&](DragMoveEvent* event,
                                          EventState& /*es*/) {
     if (attachedMesh()) {
-      if (!attachedMesh()->rotationQuaternion()) {
+      if (!attachedMesh()->rotationQuaternion() || useEulerRotation) {
         attachedMesh()->rotationQuaternion = Quaternion::RotationYawPitchRoll(
           attachedMesh()->rotation().y, attachedMesh()->rotation().x,
           attachedMesh()->rotation().z);
@@ -174,6 +182,12 @@ PlaneRotationGizmo::PlaneRotationGizmo(
                                       *attachedMesh()->rotationQuaternion());
       }
 
+      if (useEulerRotation) {
+        attachedMesh()->rotationQuaternion()->toEulerAnglesToRef(_tmpVector);
+        attachedMesh()->rotationQuaternion = std::nullopt;
+        attachedMesh()->rotation().copyFrom(_tmpVector);
+      }
+
       _lastDragPosition.copyFrom(event->dragPlanePoint);
       if (snapped) {
         _tmpSnapEvent.snapDistance = angle;
@@ -219,6 +233,24 @@ void PlaneRotationGizmo::_attachedMeshChanged(const AbstractMeshPtr& value)
   if (dragBehavior) {
     dragBehavior->enabled = value ? true : false;
   }
+}
+
+void PlaneRotationGizmo::set_isEnabled(bool value)
+{
+  _isEnabled = value;
+  if (!value) {
+    attachedMesh = nullptr;
+  }
+  else {
+    if (_parent) {
+      attachedMesh = _parent->attachedMesh();
+    }
+  }
+}
+
+bool PlaneRotationGizmo::get_isEnabled() const
+{
+  return _isEnabled;
 }
 
 void PlaneRotationGizmo::dispose(bool doNotRecurse,

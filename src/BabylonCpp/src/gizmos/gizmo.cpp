@@ -17,11 +17,12 @@ Gizmo::Gizmo(const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
                                              &Gizmo::
                                                set_updateGizmoRotationToMatchAttachedMesh}
     , updateGizmoPositionToMatchAttachedMesh{true}
+    , updateScale{true}
     , _customMeshSet{false}
-    , _updateScale{true}
     , _interactionsEnabled{true}
     , _scaleRatio{1.f}
     , _updateGizmoRotationToMatchAttachedMesh{true}
+    , _attachedMesh{nullptr}
 {
   _rootMesh = Mesh::New("gizmoRootNode", gizmoLayer->utilityLayerScene.get());
   _rootMesh->rotationQuaternion = Quaternion::Identity();
@@ -109,7 +110,7 @@ void Gizmo::_update()
     }
 
     // Scale
-    if (_updateScale) {
+    if (updateScale) {
       const auto& activeCamera = gizmoLayer->utilityLayerScene->activeCamera();
       const auto& cameraPosition = activeCamera->globalPosition();
       _rootMesh->position().subtractToRef(cameraPosition, _tempVector);
@@ -120,6 +121,9 @@ void Gizmo::_update()
       if (effectiveMesh->_getWorldMatrixDeterminant() < 0.f) {
         _rootMesh->scaling().y *= -1.f;
       }
+    }
+    else {
+      _rootMesh->scaling().setAll(scaleRatio());
     }
   }
 }

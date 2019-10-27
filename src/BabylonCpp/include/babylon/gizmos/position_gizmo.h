@@ -8,6 +8,7 @@
 namespace BABYLON {
 
 class AxisDragGizmo;
+class PlaneDragGizmo;
 class UtilityLayerRenderer;
 using UtilityLayerRendererPtr = std::shared_ptr<UtilityLayerRenderer>;
 
@@ -44,6 +45,19 @@ public:
 protected:
   AbstractMeshPtr& get_attachedMesh() override;
   void set_attachedMesh(const AbstractMeshPtr& mesh) override;
+
+  /**
+   * @brief Gets if the planar drag gizmo is enabled.
+   */
+  bool get_planarGizmoEnabled() const;
+
+  /**
+   * @brief Sets if the planar drag gizmo is enabled.
+   * setting this will enable/disable XY, XZ and YZ planes regardless of
+   * individual gizmo settings.
+   */
+  void set_planarGizmoEnabled(bool value);
+
   void set_updateGizmoRotationToMatchAttachedMesh(bool value) override;
   bool get_updateGizmoRotationToMatchAttachedMesh() const override;
   void set_snapDistance(float value);
@@ -68,6 +82,21 @@ public:
   std::unique_ptr<AxisDragGizmo> zGizmo;
 
   /**
+   * Internal gizmo used for interactions on the yz plane
+   */
+  std::unique_ptr<PlaneDragGizmo> xPlaneGizmo;
+
+  /**
+   * Internal gizmo used for interactions on the xz plane
+   */
+  std::unique_ptr<PlaneDragGizmo> yPlaneGizmo;
+
+  /**
+   * Internal gizmo used for interactions on the xy plane
+   */
+  std::unique_ptr<PlaneDragGizmo> zPlaneGizmo;
+
+  /**
    * Fires an event when any of it's sub gizmos are dragged
    */
   Observable<DragStartOrEndEvent> onDragStartObservable;
@@ -78,10 +107,31 @@ public:
   Observable<DragStartOrEndEvent> onDragEndObservable;
 
   /**
+   * If the planar drag gizmo is enabled
+   * setting this will enable/disable XY, XZ and YZ planes regardless of
+   * individual gizmo settings.
+   */
+  Property<PositionGizmo, bool> planarGizmoEnabled;
+
+  /**
    * Drag distance in babylon units that the gizmo will snap to when dragged
    * (Default: 0)
    */
   Property<PositionGizmo, float> snapDistance;
+
+private:
+  /**
+   * private variables
+   */
+  AbstractMeshPtr _meshAttached;
+  bool _updateGizmoRotationToMatchAttachedMesh;
+  float _snapDistance;
+  float _scaleRatio;
+
+  /**
+   * If set to true, planar drag is enabled
+   */
+  bool _planarGizmoEnabled;
 
 }; // end of class PositionGizmo
 

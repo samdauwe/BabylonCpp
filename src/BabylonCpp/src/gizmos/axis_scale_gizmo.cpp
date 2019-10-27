@@ -3,6 +3,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/behaviors/meshes/pointer_drag_behavior.h>
 #include <babylon/engines/scene.h>
+#include <babylon/gizmos/scale_gizmo.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/abstract_mesh.h>
@@ -15,26 +16,35 @@
 namespace BABYLON {
 
 AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
-                               const UtilityLayerRendererPtr& iGizmoLayer)
+                               const UtilityLayerRendererPtr& iGizmoLayer,
+                               ScaleGizmo* parent)
     : Gizmo{iGizmoLayer}
     , snapDistance{0.f}
     , uniformScaling{false}
+    , isEnabled{this, &AxisScaleGizmo::get_isEnabled,
+                &AxisScaleGizmo::set_isEnabled}
     , _pointerObserver{nullptr}
+    , _isEnabled{true}
+    , _parent{nullptr}
+    , _arrow{nullptr}
+    , _coloredMaterial{nullptr}
+    , _hoverMaterial{nullptr}
     , _currentSnapDragDistance{0.f}
     , _tmpSnapEvent{0.f}
 {
+  _parent = parent;
   // Create Material
   _coloredMaterial
     = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
   _coloredMaterial->diffuseColor  = color;
   _coloredMaterial->specularColor = color.subtract(Color3(0.1f, 0.1f, 0.1f));
 
-  auto hoverMaterial
+  _hoverMaterial
     = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
-  hoverMaterial->diffuseColor = color.add(Color3(0.3f, 0.3f, 0.3f));
+  _hoverMaterial->diffuseColor = color.add(Color3(0.3f, 0.3f, 0.3f));
 
   // Build mesh on root node
-  auto arrow = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
+  _arrow = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
   BoxOptions boxOptions;
   boxOptions.size = 0.4f;
   auto arrowMesh  = BoxBuilder::CreateBox("yPosMesh", boxOptions,
@@ -48,8 +58,8 @@ AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
   auto arrowTail                 = CylinderBuilder::CreateCylinder(
     "cylinder", cylinderOptions, gizmoLayer->utilityLayerScene.get());
   arrowTail->material = _coloredMaterial;
-  arrow->addChild(*arrowMesh);
-  arrow->addChild(*arrowTail);
+  _arrow->addChild(*arrowMesh);
+  _arrow->addChild(*arrowTail);
 
   // Position arrow pointing in its drag axis
   arrowMesh->scaling().scaleInPlace(0.1f);
@@ -58,9 +68,9 @@ AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
   arrowMesh->position().z += 0.3f;
   arrowTail->position().z += 0.275f / 2.f;
   arrowTail->rotation().x = Math::PI_2;
-  arrow->lookAt(_rootMesh->position().add(dragAxis));
-  _rootMesh->addChild(*arrow);
-  arrow->scaling().scaleInPlace(1.f / 3.f);
+  _arrow->lookAt(_rootMesh->position().add(dragAxis));
+  _rootMesh->addChild(*_arrow);
+  _arrow->scaling().scaleInPlace(1.f / 3.f);
 
   // Add drag behavior to handle events when the gizmo is dragged
   PointerDragBehaviorOptions options;
@@ -132,7 +142,7 @@ AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
                           _rootMesh->getChildMeshes().end(), pickedMesh);
       auto isHovered  = (it != _rootMesh->getChildMeshes().end());
 
-      auto material = isHovered ? hoverMaterial : _coloredMaterial;
+      auto material = isHovered ? _hoverMaterial : _coloredMaterial;
       for (auto& m : _rootMesh->getChildMeshes()) {
         m->material    = material;
         auto linesMesh = std::static_pointer_cast<LinesMesh>(m);
@@ -158,11 +168,37 @@ void AxisScaleGizmo::_attachedMeshChanged(const AbstractMeshPtr& value)
   }
 }
 
+void AxisScaleGizmo::set_isEnabled(bool value)
+{
+  _isEnabled = value;
+  if (!value) {
+    attachedMesh = nullptr;
+  }
+  else {
+    if (_parent) {
+      attachedMesh = _parent->attachedMesh();
+    }
+  }
+}
+
+bool AxisScaleGizmo::get_isEnabled() const
+{
+  return _isEnabled;
+}
+
 void AxisScaleGizmo::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
   onSnapObservable.clear();
   gizmoLayer->utilityLayerScene->onPointerObservable.remove(_pointerObserver);
   dragBehavior->detach();
+  if (_arrow) {
+    _arrow->dispose();
+  }
+  for (const auto& matl : {_coloredMaterial, _hoverMaterial}) {
+    if (matl) {
+      matl->dispose();
+    }
+  }
   Gizmo::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 

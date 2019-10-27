@@ -11,6 +11,7 @@
 namespace BABYLON {
 
 class PointerDragBehavior;
+class PositionGizmo;
 class StandardMaterial;
 class TransformNode;
 using StandardMaterialPtr = std::shared_ptr<StandardMaterial>;
@@ -43,7 +44,8 @@ public:
    */
   AxisDragGizmo(const Vector3& dragAxis, const Color3& color = Color3::Gray(),
                 const UtilityLayerRendererPtr& gizmoLayer
-                = UtilityLayerRenderer::DefaultUtilityLayer());
+                = UtilityLayerRenderer::DefaultUtilityLayer(),
+                PositionGizmo* parent = nullptr);
   ~AxisDragGizmo() override;
 
   /**
@@ -54,6 +56,16 @@ public:
 
 protected:
   void _attachedMeshChanged(const AbstractMeshPtr& value) override;
+
+  /**
+   * @brief Gets if the gizmo is enabled.
+   */
+  bool get_isEnabled() const;
+
+  /**
+   * @brief Sets if the gizmo is enabled.
+   */
+  void set_isEnabled(bool value);
 
 public:
   /**
@@ -73,8 +85,19 @@ public:
    */
   Observable<SnapEvent> onSnapObservable;
 
+  /**
+   * If the gizmo is enabled
+   */
+  Property<AxisDragGizmo, bool> isEnabled;
+
 private:
   Observer<PointerInfo>::Ptr _pointerObserver;
+  bool _isEnabled;
+  PositionGizmo* _parent;
+
+  TransformNodePtr _arrow;
+  StandardMaterialPtr _coloredMaterial;
+  StandardMaterialPtr _hoverMaterial;
 
   float _currentSnapDragDistance;
   Vector3 _tmpVector;

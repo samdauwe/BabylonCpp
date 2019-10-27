@@ -46,7 +46,7 @@ public:
    * @param scene the scene to overlay the gizmos on top of
    */
   GizmoManager(Scene* scene);
-  virtual ~GizmoManager();
+  virtual ~GizmoManager() override;
 
   /**
    * @brief Attaches a set of gizmos to the specified mesh.
@@ -62,27 +62,54 @@ public:
 
 protected:
   /**
-   * @brief If the position gizmo is enabled.
+   * @brief Gets the utility layer that the bounding box gizmo belongs to.
+   */
+  UtilityLayerRendererPtr& get_keepDepthUtilityLayer();
+
+  /**
+   * @brief Gets the utility layer that all gizmos besides bounding box belong
+   * to.
+   */
+  UtilityLayerRendererPtr& get_utilityLayer();
+
+  /**
+   * @brief Sets if the position gizmo is enabled.
    */
   void set_positionGizmoEnabled(bool value);
+
+  /**
+   * @brief Gets if the position gizmo is enabled.
+   */
   bool get_positionGizmoEnabled() const;
 
   /**
-   * @brief If the rotation gizmo is enabled.
+   * @brief Sets if the rotation gizmo is enabled.
    */
   void set_rotationGizmoEnabled(bool value);
+
+  /**
+   * @brief Gets if the rotation gizmo is enabled.
+   */
   bool get_rotationGizmoEnabled() const;
 
   /**
-   * @brief If the scale gizmo is enabled.
+   * @brief Sets if the scale gizmo is enabled.
    */
   void set_scaleGizmoEnabled(bool value);
+
+  /**
+   * @brief Gets if the scale gizmo is enabled.
+   */
   bool get_scaleGizmoEnabled() const;
 
   /**
-   * @brief If the boundingBox gizmo is enabled.
+   * @brief Sets if the boundingBox gizmo is enabled.
    */
   void set_boundingBoxGizmoEnabled(bool value);
+
+  /**
+   * @brief Gets if the boundingBox gizmo is enabled.
+   */
   bool get_boundingBoxGizmoEnabled() const;
 
 public:
@@ -120,6 +147,16 @@ public:
    * can be done manually via attachToMesh. (Default: true)
    */
   bool usePointerToAttachGizmos;
+
+  /**
+   * Utility layer that the bounding box gizmo belongs to
+   */
+  ReadOnlyProperty<GizmoManager, UtilityLayerRendererPtr> keepDepthUtilityLayer;
+
+  /**
+   * Utility layer that all gizmos besides bounding box belong to
+   */
+  ReadOnlyProperty<GizmoManager, UtilityLayerRendererPtr> utilityLayer;
 
   /**
    * If the position gizmo is enabled

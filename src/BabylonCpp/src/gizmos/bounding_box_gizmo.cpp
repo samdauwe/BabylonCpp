@@ -46,7 +46,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(
 {
   // Do not update the gizmo's scale so it has a fixed size to the object its
   // attached to
-  _updateScale = false;
+  updateScale = false;
 
   _anchorMesh
     = AbstractMesh::New("anchor", iGizmoLayer->utilityLayerScene.get());

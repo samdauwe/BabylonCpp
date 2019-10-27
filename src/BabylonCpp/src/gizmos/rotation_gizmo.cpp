@@ -9,20 +9,21 @@
 namespace BABYLON {
 
 RotationGizmo::RotationGizmo(const UtilityLayerRendererPtr& iGizmoLayer,
-                             unsigned int tessellation)
+                             unsigned int tessellation, bool useEulerRotation)
     : Gizmo{iGizmoLayer}
     , snapDistance{this, &RotationGizmo::get_snapDistance,
                    &RotationGizmo::set_snapDistance}
+    , _meshAttached{nullptr}
 {
-  xGizmo = std::make_unique<PlaneRotationGizmo>(Vector3(1.f, 0.f, 0.f),
-                                                Color3::Red().scale(0.5f),
-                                                iGizmoLayer, tessellation);
-  yGizmo = std::make_unique<PlaneRotationGizmo>(Vector3(0.f, 1.f, 0.f),
-                                                Color3::Green().scale(0.5f),
-                                                iGizmoLayer, tessellation);
-  zGizmo = std::make_unique<PlaneRotationGizmo>(Vector3(0.f, 0.f, 1.f),
-                                                Color3::Blue().scale(0.5f),
-                                                iGizmoLayer, tessellation);
+  xGizmo = std::make_unique<PlaneRotationGizmo>(
+    Vector3(1.f, 0.f, 0.f), Color3::Red().scale(0.5f), iGizmoLayer,
+    tessellation, this, useEulerRotation);
+  yGizmo = std::make_unique<PlaneRotationGizmo>(
+    Vector3(0.f, 1.f, 0.f), Color3::Green().scale(0.5f), iGizmoLayer,
+    tessellation, this, useEulerRotation);
+  zGizmo = std::make_unique<PlaneRotationGizmo>(
+    Vector3(0.f, 0.f, 1.f), Color3::Blue().scale(0.5f), iGizmoLayer,
+    tessellation, this, useEulerRotation);
 
   // Relay drag events
   for (const auto& gizmo : {xGizmo.get(), yGizmo.get(), zGizmo.get()}) {
@@ -45,15 +46,20 @@ RotationGizmo::~RotationGizmo()
 
 AbstractMeshPtr& RotationGizmo::get_attachedMesh()
 {
-  return xGizmo->attachedMesh;
+  return _meshAttached;
 }
 
 void RotationGizmo::set_attachedMesh(const AbstractMeshPtr& mesh)
 {
-  if (xGizmo) {
-    xGizmo->attachedMesh = mesh;
-    yGizmo->attachedMesh = mesh;
-    zGizmo->attachedMesh = mesh;
+  _meshAttached = mesh;
+
+  for (const auto& gizmo : {xGizmo.get(), yGizmo.get(), zGizmo.get()}) {
+    if (gizmo->isEnabled()) {
+      gizmo->attachedMesh = mesh;
+    }
+    else {
+      gizmo->attachedMesh = nullptr;
+    }
   }
 }
 

@@ -128,17 +128,18 @@ public:
    */
   bool updateGizmoPositionToMatchAttachedMesh;
 
+  /**
+   * When set, the gizmo will always appear the same size no matter where the
+   * camera is (default: true)
+   */
+  bool updateScale;
+
 protected:
   /**
    * If a custom mesh has been set (Default: false)
    */
   bool _customMeshSet;
 
-  /**
-   * When set, the gizmo will always appear the same size no matter where the
-   * camera is (default: false)
-   */
-  bool _updateScale;
   bool _interactionsEnabled;
 
 private:

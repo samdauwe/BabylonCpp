@@ -17,6 +17,7 @@ float LightGizmo::_Scale = 0.007f;
 LightGizmo::LightGizmo(const UtilityLayerRendererPtr& iGizmoLayer)
     : Gizmo{iGizmoLayer}
     , light{this, &LightGizmo::get_light, &LightGizmo::set_light}
+    , material{this, &LightGizmo::get_material}
     , _lightMesh{nullptr}
     , _material{nullptr}
     , cachedForward{Vector3(0.f, 0.f, 1.f)}
@@ -83,6 +84,11 @@ void LightGizmo::set_light(const LightPtr& iLight)
 LightPtr& LightGizmo::get_light()
 {
   return _light;
+}
+
+StandardMaterialPtr& LightGizmo::get_material()
+{
+  return _material;
 }
 
 void LightGizmo::_update()

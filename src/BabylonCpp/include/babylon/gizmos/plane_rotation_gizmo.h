@@ -11,6 +11,7 @@
 namespace BABYLON {
 
 class PointerDragBehavior;
+class RotationGizmo;
 
 /**
  * @brief Single axis scale gizmo.
@@ -26,12 +27,15 @@ public:
    * @param color The color of the gizmo
    * @param tessellation Amount of tessellation to be used when creating
    * rotation circles
+   * @param useEulerRotation Use and update Euler angle instead of quaternion
    */
   PlaneRotationGizmo(const Vector3& planeNormal,
                      const Color3& color = Color3::Gray(),
                      const std::shared_ptr<UtilityLayerRenderer>& gizmoLayer
                      = UtilityLayerRenderer::DefaultUtilityLayer(),
-                     unsigned int tessellation = 32);
+                     unsigned int tessellation = 32,
+                     RotationGizmo* parent     = nullptr,
+                     bool useEulerRotation     = false);
   ~PlaneRotationGizmo() override;
 
   /**
@@ -42,6 +46,16 @@ public:
 
 protected:
   void _attachedMeshChanged(const AbstractMeshPtr& value) override;
+
+  /**
+   * @brief Gets If the gizmo is enabled.
+   */
+  bool get_isEnabled() const;
+
+  /**
+   * @brief Sets if the gizmo is enabled.
+   */
+  void set_isEnabled(bool value);
 
 public:
   /**
@@ -60,8 +74,15 @@ public:
    */
   Observable<SnapEvent> onSnapObservable;
 
+  /**
+   * If the gizmo is enabled
+   */
+  Property<PlaneRotationGizmo, bool> isEnabled;
+
 private:
   Observer<PointerInfo>::Ptr _pointerObserver;
+  bool _isEnabled;
+  RotationGizmo* _parent;
 
   Vector3 _lastDragPosition;
   Matrix _rotationMatrix;

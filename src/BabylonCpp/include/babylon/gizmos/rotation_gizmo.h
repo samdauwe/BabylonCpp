@@ -18,14 +18,15 @@ class BABYLON_SHARED_EXPORT RotationGizmo : public Gizmo {
 
 public:
   /**
-   * @brief Creates a RotationGizmo
+   * @brief Creates a RotationGizmo.
    * @param gizmoLayer The utility layer the gizmo will be added to
    * @param tessellation Amount of tessellation to be used when creating
    * rotation circles
+   * @param useEulerRotation Use and update Euler angle instead of quaternion
    */
   RotationGizmo(const UtilityLayerRendererPtr& gizmoLayer
                 = UtilityLayerRenderer::DefaultUtilityLayer(),
-                unsigned int tessellation = 32);
+                unsigned int tessellation = 32, bool useEulerRotation = false);
   ~RotationGizmo() override;
 
   /**
@@ -85,6 +86,9 @@ public:
    * (Default: 0)
    */
   Property<RotationGizmo, float> snapDistance;
+
+private:
+  AbstractMeshPtr _meshAttached;
 
 }; // end of class RotationGizmo
 
