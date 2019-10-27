@@ -29,7 +29,7 @@ public:
    * @param gizmoLayer The utility layer the gizmo will be added to
    */
   Gizmo(const UtilityLayerRendererPtr& gizmoLayer);
-  virtual ~Gizmo();
+  virtual ~Gizmo() override;
 
   /**
    * @brief Disposes and replaces the current meshes in the gizmo with the
