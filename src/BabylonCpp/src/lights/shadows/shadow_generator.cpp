@@ -481,16 +481,16 @@ void ShadowGenerator::set_transparencyShadow(bool value)
   setTransparencyShadow(value);
 }
 
-ShadowGenerator& ShadowGenerator::setDarkness(float darkness)
+ShadowGenerator& ShadowGenerator::setDarkness(float iDarkness)
 {
-  if (darkness >= 1.f) {
+  if (iDarkness >= 1.f) {
     _darkness = 1.f;
   }
-  else if (darkness <= 0.f) {
+  else if (iDarkness <= 0.f) {
     _darkness = 0.f;
   }
   else {
-    _darkness = darkness;
+    _darkness = iDarkness;
   }
   return *this;
 }

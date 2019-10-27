@@ -350,10 +350,10 @@ float VertexBuffer::_GetFloatValue(const DataView& dataView, unsigned int type,
       return value;
     }
     case VertexBuffer::INT: {
-      return dataView.getInt32(byteOffset, true);
+      return static_cast<float>(dataView.getInt32(byteOffset, true));
     }
     case VertexBuffer::UNSIGNED_INT: {
-      return dataView.getUint32(byteOffset, true);
+      return static_cast<float>(dataView.getUint32(byteOffset, true));
     }
     case VertexBuffer::FLOAT: {
       return dataView.getFloat32(byteOffset, true);

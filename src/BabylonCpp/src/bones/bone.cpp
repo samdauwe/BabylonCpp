@@ -901,11 +901,11 @@ void Bone::getRotationQuaternionToRef(Quaternion& result, const Space& space,
     mat.multiplyAtIndex(1, _scalingDeterminant);
     mat.multiplyAtIndex(2, _scalingDeterminant);
 
-    std::optional<Vector3> scale       = std::nullopt;
-    std::optional<Quaternion> rotation = result;
-    std::optional<Vector3> translation = std::nullopt;
-    mat.decompose(scale, rotation, translation);
-    result = *rotation;
+    std::optional<Vector3> scale        = std::nullopt;
+    std::optional<Quaternion> rotation_ = result;
+    std::optional<Vector3> translation  = std::nullopt;
+    mat.decompose(scale, rotation_, translation);
+    result = *rotation_;
   }
 }
 

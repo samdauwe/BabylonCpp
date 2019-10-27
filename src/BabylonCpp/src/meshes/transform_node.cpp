@@ -433,7 +433,7 @@ const Matrix& TransformNode::getPivotMatrix() const
 TransformNodePtr TransformNode::instantiateHierarychy(TransformNode* newParent)
 {
   auto cloneTransformNode = clone("Clone of " + (!name.empty() ? name : id),
-                                  newParent ? newParent : parent, true);
+                                  newParent ? newParent : parent(), true);
 
   for (const auto& child : getChildTransformNodes(true)) {
     child->instantiateHierarychy(cloneTransformNode.get());
@@ -1234,10 +1234,10 @@ TransformNode& TransformNode::normalizeToUnitCube(
 void TransformNode::_syncAbsoluteScalingAndRotation()
 {
   if (!_isAbsoluteSynced) {
-    std::optional<Vector3> scale       = _absoluteScaling;
-    std::optional<Quaternion> rotation = _absoluteRotationQuaternion;
-    std::optional<Vector3> translation = std::nullopt;
-    _worldMatrix.decompose(scale, rotation, translation);
+    std::optional<Vector3> scale        = _absoluteScaling;
+    std::optional<Quaternion> rotation_ = _absoluteRotationQuaternion;
+    std::optional<Vector3> translation  = std::nullopt;
+    _worldMatrix.decompose(scale, rotation_, translation);
     _isAbsoluteSynced = true;
   }
 }
