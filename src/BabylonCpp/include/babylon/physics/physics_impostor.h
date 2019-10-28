@@ -68,6 +68,10 @@ public:
    */
   static constexpr unsigned int MeshImpostor = 4;
   /**
+   * Capsule-Impostor type (Ammo.js plugin only)
+   */
+  static constexpr unsigned int CapsuleImpostor = 6;
+  /**
    * Cylinder-Imposter type
    */
   static constexpr unsigned int CylinderImpostor = 7;

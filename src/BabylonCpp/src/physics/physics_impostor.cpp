@@ -62,6 +62,12 @@ PhysicsImpostor::PhysicsImpostor(IPhysicsEnabledObject* iObject,
                       "No object was provided. A physics object is obligatory")
     return;
   }
+  if (object->parent() && _options.mass != 0.f) {
+    BABYLON_LOG_WARN("PhysicsImpostor",
+                     "A physics impostor has been created for an object which "
+                     "has a parent. Babylon physics currently works in local "
+                     "space so unexpected issues may occur.")
+  }
 
   // Legacy support for old syntax.
   if (!_scene && object->getScene()) {
