@@ -13,6 +13,7 @@ using json = nlohmann::json;
 namespace BABYLON {
 
 struct MaterialDefines;
+class Scene;
 
 /**
  * @brief Define the code related to the BRDF parameters of the pbr material.
@@ -83,8 +84,10 @@ public:
   /**
    * @brief Parses a BRDF Configuration from a serialized object.
    * @param source - Serialized object.
+   * @param scene Defines the scene we are parsing for
+   * @param rootUrl Defines the rootUrl to load from
    */
-  void parse(const json& source);
+  void parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
   bool get_useEnergyConservation() const;

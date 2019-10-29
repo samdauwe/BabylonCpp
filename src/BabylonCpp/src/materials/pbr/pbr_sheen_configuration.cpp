@@ -226,7 +226,8 @@ json PBRSheenConfiguration::serialize() const
   return nullptr;
 }
 
-void PBRSheenConfiguration::parse(const json& /*source*/)
+void PBRSheenConfiguration::parse(const json& /*source*/, Scene* /*scene*/,
+                                  const std::string& /*rootUrl*/)
 {
 }
 

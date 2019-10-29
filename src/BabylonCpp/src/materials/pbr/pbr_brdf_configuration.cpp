@@ -111,7 +111,8 @@ json PBRBRDFConfiguration::serialize() const
   return nullptr;
 }
 
-void PBRBRDFConfiguration::parse(const json& /*source*/)
+void PBRBRDFConfiguration::parse(const json& /*source*/, Scene* /*scene*/,
+                                 const std::string& /*rootUrl*/)
 {
 }
 

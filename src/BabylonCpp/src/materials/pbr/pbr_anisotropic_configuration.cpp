@@ -217,7 +217,9 @@ json PBRAnisotropicConfiguration::serialize() const
   return nullptr;
 }
 
-void PBRAnisotropicConfiguration::parse(const json& /*source*/)
+void PBRAnisotropicConfiguration::parse(const json& /*source*/,
+                                        Scene* /*scene*/,
+                                        const std::string& /*rootUrl*/)
 {
 }
 

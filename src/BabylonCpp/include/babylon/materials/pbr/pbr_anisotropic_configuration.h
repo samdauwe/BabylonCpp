@@ -146,8 +146,10 @@ public:
   /**
    * @brief Parses a anisotropy Configuration from a serialized object.
    * @param source - Serialized object.
+   * @param scene Defines the scene we are parsing for
+   * @param rootUrl Defines the rootUrl to load from
    */
-  void parse(const json& source);
+  void parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
   bool get_isEnabled() const;
