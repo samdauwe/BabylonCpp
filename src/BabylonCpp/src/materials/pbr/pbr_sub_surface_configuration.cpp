@@ -58,7 +58,7 @@ PBRSubSurfaceConfiguration::PBRSubSurfaceConfiguration(
     , _isScatteringEnabled{false}
     , _thicknessTexture{nullptr}
     , _refractionTexture{nullptr}
-    , _indexOfRefraction{1}
+    , _indexOfRefraction{1.f}
     , _invertRefractionY{false}
     , _linkRefractionWithTransparency{false}
     , _useMaskFromThicknessTexture{false}
@@ -234,6 +234,7 @@ void PBRSubSurfaceConfiguration::prepareDefines(MaterialDefines& defines,
     defines.boolDef["SS_REFRACTIONMAP_3D"]             = false;
     defines.boolDef["SS_GAMMAREFRACTION"]              = false;
     defines.boolDef["SS_RGBDREFRACTION"]               = false;
+    defines.boolDef["SS_LINEARSPECULARREFRACTION"]     = false;
     defines.boolDef["SS_REFRACTIONMAP_OPPOSITEZ"]      = false;
     defines.boolDef["SS_LODINREFRACTIONALPHA"]         = false;
     defines.boolDef["SS_LINKREFRACTIONTOTRANSPARENCY"] = false;
@@ -263,6 +264,8 @@ void PBRSubSurfaceConfiguration::prepareDefines(MaterialDefines& defines,
           defines.boolDef["SS_REFRACTIONMAP_3D"] = refractTexture->isCube;
           defines.boolDef["SS_GAMMAREFRACTION"]  = refractTexture->gammaSpace;
           defines.boolDef["SS_RGBDREFRACTION"]   = refractTexture->isRGBD;
+          defines.boolDef["SS_LINEARSPECULARREFRACTION"]
+            = refractTexture->linearSpecularLOD();
           defines.boolDef["SS_REFRACTIONMAP_OPPOSITEZ"]
             = refractTexture->invertZ;
           defines.boolDef["SS_LODINREFRACTIONALPHA"]
@@ -510,7 +513,8 @@ json PBRSubSurfaceConfiguration::serialize() const
   return nullptr;
 }
 
-void PBRSubSurfaceConfiguration::parse(const json& /*source*/)
+void PBRSubSurfaceConfiguration::parse(const json& /*source*/, Scene* /*scene*/,
+                                       const std::string& /*rootUrl*/)
 {
 }
 

@@ -19,9 +19,8 @@ PBRClearCoatConfiguration::PBRClearCoatConfiguration(
                 &PBRClearCoatConfiguration::set_isEnabled}
     , intensity{1.f}
     , roughness{1.f}
-    , indiceOfRefraction{this,
-                         &PBRClearCoatConfiguration::get_indiceOfRefraction,
-                         &PBRClearCoatConfiguration::set_indiceOfRefraction}
+    , indexOfRefraction{this, &PBRClearCoatConfiguration::get_indexOfRefraction,
+                        &PBRClearCoatConfiguration::set_indexOfRefraction}
     , texture{this, &PBRClearCoatConfiguration::get_texture,
               &PBRClearCoatConfiguration::set_texture}
     , bumpTexture{this, &PBRClearCoatConfiguration::get_bumpTexture,
@@ -34,7 +33,7 @@ PBRClearCoatConfiguration::PBRClearCoatConfiguration(
     , tintTexture{this, &PBRClearCoatConfiguration::get_tintTexture,
                   &PBRClearCoatConfiguration::set_tintTexture}
     , _isEnabled{false}
-    , _indiceOfRefraction{PBRClearCoatConfiguration::_DefaultIndiceOfRefraction}
+    , _indexOfRefraction{PBRClearCoatConfiguration::_DefaultIndexOfRefraction}
     , _texture{nullptr}
     , _bumpTexture{nullptr}
     , _isTintEnabled{false}
@@ -62,18 +61,18 @@ void PBRClearCoatConfiguration::set_isEnabled(bool value)
   _markAllSubMeshesAsTexturesDirty();
 }
 
-float PBRClearCoatConfiguration::get_indiceOfRefraction() const
+float PBRClearCoatConfiguration::get_indexOfRefraction() const
 {
-  return _indiceOfRefraction;
+  return _indexOfRefraction;
 }
 
-void PBRClearCoatConfiguration::set_indiceOfRefraction(float value)
+void PBRClearCoatConfiguration::set_indexOfRefraction(float value)
 {
-  if (stl_util::almost_equal(_indiceOfRefraction, value)) {
+  if (stl_util::almost_equal(_indexOfRefraction, value)) {
     return;
   }
 
-  _indiceOfRefraction = value;
+  _indexOfRefraction = value;
   _markAllSubMeshesAsTexturesDirty();
 }
 
@@ -199,8 +198,8 @@ void PBRClearCoatConfiguration::prepareDefines(MaterialDefines& defines,
         }
 
         defines.boolDef["CLEARCOAT_DEFAULTIOR"] = stl_util::almost_equal(
-          _indiceOfRefraction,
-          PBRClearCoatConfiguration::_DefaultIndiceOfRefraction);
+          _indexOfRefraction,
+          PBRClearCoatConfiguration::_DefaultIndexOfRefraction);
 
         if (_isTintEnabled) {
           defines.boolDef["CLEARCOAT_TINT"] = true;
@@ -277,12 +276,12 @@ void PBRClearCoatConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer,
     uniformBuffer.updateFloat2("vClearCoatParams", intensity, roughness, "");
 
     // Clear Coat Refraction params
-    const auto a = 1.f - _indiceOfRefraction;
-    const auto b = 1.f + _indiceOfRefraction;
+    const auto a = 1.f - _indexOfRefraction;
+    const auto b = 1.f + _indexOfRefraction;
     // Schlicks approx: (ior1 - ior2) / (ior1 + ior2) where ior2 for air is
     // close to vacuum = 1.
     const auto f0  = std::pow((-a / b), 2.f);
-    const auto eta = 1.f / _indiceOfRefraction;
+    const auto eta = 1.f / _indexOfRefraction;
     uniformBuffer.updateFloat4("vClearCoatRefractionParams", f0, eta, a, b, "");
 
     if (_isTintEnabled) {
@@ -441,7 +440,8 @@ json PBRClearCoatConfiguration::serialize() const
   return nullptr;
 }
 
-void PBRClearCoatConfiguration::parse(const json& /*source*/)
+void PBRClearCoatConfiguration::parse(const json& /*source*/, Scene* /*scene*/,
+                                      const std::string& /*rootUrl*/)
 {
 }
 

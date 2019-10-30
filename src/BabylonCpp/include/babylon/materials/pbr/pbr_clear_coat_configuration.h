@@ -157,14 +157,16 @@ public:
   /**
    * @brief Parses a Clear Coat Configuration from a serialized object.
    * @param source - Serialized object.
+   * @param scene Defines the scene we are parsing for
+   * @param rootUrl Defines the rootUrl to load from
    */
-  void parse(const json& source);
+  void parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
   bool get_isEnabled() const;
   void set_isEnabled(bool value);
-  float get_indiceOfRefraction() const;
-  void set_indiceOfRefraction(float value);
+  float get_indexOfRefraction() const;
+  void set_indexOfRefraction(float value);
   BaseTexturePtr& get_texture();
   void set_texture(const BaseTexturePtr& value);
   BaseTexturePtr& get_bumpTexture();
@@ -191,12 +193,12 @@ public:
   float roughness;
 
   /**
-   * Defines the indice of refraction of the clear coat.
+   * Defines the index of refraction of the clear coat.
    * This defaults to 1.5 corresponding to a 0.04 f0 or a 4% reflectance at
    * normal incidence The default fits with a polyurethane material. Changing
    * the default value is more performance intensive.
    */
-  Property<PBRClearCoatConfiguration, float> indiceOfRefraction;
+  Property<PBRClearCoatConfiguration, float> indexOfRefraction;
 
   /**
    * Stores the clear coat values in a texture.
@@ -240,10 +242,10 @@ public:
   Property<PBRClearCoatConfiguration, BaseTexturePtr> tintTexture;
 
 private:
-  static constexpr float _DefaultIndiceOfRefraction = 1.5f;
+  static constexpr float _DefaultIndexOfRefraction = 1.5f;
 
   bool _isEnabled;
-  float _indiceOfRefraction;
+  float _indexOfRefraction;
   BaseTexturePtr _texture;
   BaseTexturePtr _bumpTexture;
   bool _isTintEnabled;

@@ -175,8 +175,10 @@ public:
   /**
    * @brief Parses a Sub Surface Configuration from a serialized object.
    * @param source - Serialized object.
+   * @param scene Defines the scene we are parsing for
+   * @param rootUrl Defines the rootUrl to load from
    */
-  void parse(const json& source);
+  void parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
   bool get_isRefractionEnabled() const;
@@ -253,7 +255,7 @@ public:
   Property<PBRSubSurfaceConfiguration, BaseTexturePtr> refractionTexture;
 
   /**
-   * Defines the indice of refraction used in the material.
+   * Defines the index of refraction used in the material.
    * https://en.wikipedia.org/wiki/List_of_refractive_indices
    */
   Property<PBRSubSurfaceConfiguration, float> indexOfRefraction;

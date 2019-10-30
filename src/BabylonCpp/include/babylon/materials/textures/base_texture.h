@@ -254,6 +254,10 @@ protected:
   void set_lodGenerationOffset(float value);
   float get_lodGenerationScale() const;
   void set_lodGenerationScale(float value);
+  bool get_linearSpecularLOD() const;
+  void set_linearSpecularLOD(bool value);
+  BaseTexturePtr& get_irradianceTexture();
+  void set_irradianceTexture(const BaseTexturePtr& value);
   std::string get_uid() const;
   void
   set_onDispose(const std::function<void(BaseTexture*, EventState&)>& callback);
@@ -404,6 +408,22 @@ public:
    * steps.
    */
   Property<BaseTexture, float> lodGenerationScale;
+
+  /**
+   * With prefiltered texture, defined if the specular generation is based on a
+   * linear ramp. By default we are using a log2 of the linear roughness helping
+   * to keep a better resolution for average roughness values.
+   */
+  Property<BaseTexture, bool> linearSpecularLOD;
+
+  /**
+   * In case a better definition than spherical harmonics is required for the
+   * diffuse part of the environment. You can set the irradiance texture to rely
+   * on a texture instead of the spherical approach. This texture need to have
+   * the same characteristics than its parent (Cube vs 2d, coordinates mode,
+   * Gamma/Linear, RGBD).
+   */
+  Property<BaseTexture, BaseTexturePtr> irradianceTexture;
 
   /**
    * Define if the texture is a render target.

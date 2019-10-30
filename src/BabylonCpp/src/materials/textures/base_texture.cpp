@@ -37,6 +37,10 @@ BaseTexture::BaseTexture(Scene* scene)
                           &BaseTexture::set_lodGenerationOffset}
     , lodGenerationScale{this, &BaseTexture::get_lodGenerationScale,
                          &BaseTexture::set_lodGenerationScale}
+    , linearSpecularLOD{this, &BaseTexture::get_linearSpecularLOD,
+                        &BaseTexture::set_linearSpecularLOD}
+    , irradianceTexture{this, &BaseTexture::get_irradianceTexture,
+                        &BaseTexture::set_irradianceTexture}
     , isRenderTarget{false}
     , uid{this, &BaseTexture::get_uid}
     , onDispose{this, &BaseTexture::set_onDispose}
@@ -192,6 +196,38 @@ void BaseTexture::set_lodGenerationScale(float value)
 {
   if (_texture) {
     _texture->_lodGenerationScale = value;
+  }
+}
+
+bool BaseTexture::get_linearSpecularLOD() const
+{
+  if (_texture) {
+    return _texture->_linearSpecularLOD;
+  }
+
+  return false;
+}
+
+void BaseTexture::set_linearSpecularLOD(bool value)
+{
+  if (_texture) {
+    _texture->_linearSpecularLOD = value;
+  }
+}
+
+BaseTexturePtr& BaseTexture::get_irradianceTexture()
+{
+  if (_texture) {
+    return _texture->_irradianceTexture;
+  }
+
+  return _nullBaseTexture;
+}
+
+void BaseTexture::set_irradianceTexture(const BaseTexturePtr& value)
+{
+  if (_texture) {
+    _texture->_irradianceTexture = value;
   }
 }
 
