@@ -31,16 +31,13 @@ SamplesIndex::SamplesIndex()
   _samplesFailures = {
     {"BlurModeForMirrorsScene", SampleFailureReason::empty3d},
     {"BoneRotationInWorldSpaceScene", SampleFailureReason::broken},
-    {"BulbSelfShadowScene", SampleFailureReason::empty3d},
     {"ColoredRibbonScene", SampleFailureReason::outOfBoundAccess},
-    {"CurvedHelixMeshesScene", SampleFailureReason::outOfBoundAccess},
-    {"ExtrusionScene", SampleFailureReason::outOfBoundAccess},
+    {"CircleCurvesFromBeziersScene", SampleFailureReason::empty3d},
+    {"EdgesRenderScene", SampleFailureReason::outOfBoundAccess},
     {"HighlightLayerScene", SampleFailureReason::incomplete3d},
-    {"ImportDudeScene", SampleFailureReason::broken},
-    {"ImportDummy3Scene", SampleFailureReason::broken},
-    {"ImportRabbitScene", SampleFailureReason::broken},
-    {"KernelBasedBlurScene", SampleFailureReason::empty3d},
+    {"InnerMeshPointsScene", SampleFailureReason::outOfBoundAccess},
     {"LinesMeshSpiralScene", SampleFailureReason::empty3d},
+    {"LorenzAttractorScene", SampleFailureReason::empty3d},
     {"MorphTargetsScene", SampleFailureReason::broken},
     {"MultiSampleRenderTargetsScene", SampleFailureReason::empty3d},
     {"PBRMaterialCheckerORMScene", SampleFailureReason::broken},
@@ -48,10 +45,7 @@ SamplesIndex::SamplesIndex()
     {"PBRMetallicRoughnessGoldMaterialScene", SampleFailureReason::broken},
     {"PBRMetallicRoughnessMaterialScene", SampleFailureReason::outOfBoundAccess},
     {"PBRMetallicRoughnessTextureMaterialScene", SampleFailureReason::broken},
-    {"PBRReflectionScene", SampleFailureReason::empty3d},
     {"ShaderMaterialWarpSpeedScene", SampleFailureReason::empty3d},
-    {"SimplePostProcessRenderPipelineScene", SampleFailureReason::empty3d},
-    {"WaterMaterialScene", SampleFailureReason::incomplete3d},
   };
 
   // Initialize the samples index
