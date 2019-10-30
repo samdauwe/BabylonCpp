@@ -201,9 +201,9 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
           clearCoat->roughness = sliderChange.value();
         }
         sliderChange = SliderLineComponent::render(
-          "IOR", clearCoat->indiceOfRefraction(), 0.f, 1.f, 0.01f, "%.2f");
+          "IOR", clearCoat->indexOfRefraction(), 0.f, 1.f, 0.01f, "%.2f");
         if (sliderChange) {
-          clearCoat->indiceOfRefraction = sliderChange.value();
+          clearCoat->indexOfRefraction = sliderChange.value();
         }
         TextureLinkLineComponent::render("Texture", material,
                                          clearCoat->texture());
