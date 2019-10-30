@@ -550,6 +550,36 @@ public:
 }; // end of class TiledGroundOptions
 
 //------------------------------------------------------------------------------
+// Tiled plane mesh options
+//------------------------------------------------------------------------------
+
+/**
+ * @brief Options used to create a tiled plane mesh.
+ */
+class BABYLON_SHARED_EXPORT TiledPlaneOptions {
+
+public:
+  TiledPlaneOptions();
+  ~TiledPlaneOptions();
+
+public:
+  std::optional<unsigned int> pattern;
+  std::optional<float> tileSize;
+  std::optional<float> tileWidth;
+  std::optional<float> tileHeight;
+  std::optional<float> size;
+  std::optional<float> width;
+  std::optional<float> height;
+  std::optional<unsigned int> alignHorizontal;
+  std::optional<unsigned int> alignVertical;
+  std::optional<bool> updatable;
+  std::optional<unsigned int> sideOrientation;
+  std::optional<Vector4> frontUVs;
+  std::optional<Vector4> backUVs;
+
+}; // end of class TiledPlaneOptions
+
+//------------------------------------------------------------------------------
 // Torus mesh options
 //------------------------------------------------------------------------------
 

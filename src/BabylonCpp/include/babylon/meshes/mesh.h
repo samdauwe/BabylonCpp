@@ -83,23 +83,86 @@ public:
   /**
    * Mesh cap setting : no cap
    */
-  static constexpr unsigned int NO_CAP = 1;
+  static constexpr unsigned int NO_CAP = 0;
 
   /**
    * Mesh cap setting : one cap at the beginning of the mesh
    */
-  static constexpr unsigned int CAP_START = 2;
+  static constexpr unsigned int CAP_START = 1;
 
   /**
    * Mesh cap setting : one cap at the end of the mesh
    */
-  static constexpr unsigned int CAP_END = 3;
+  static constexpr unsigned int CAP_END = 2;
 
   /**
    * Mesh cap setting : two caps, one at the beginning  and one at the end of
    * the mesh
    */
-  static constexpr unsigned int CAP_ALL = 4;
+  static constexpr unsigned int CAP_ALL = 3;
+
+  /**
+   * Mesh pattern setting : no flip or rotate
+   */
+  static constexpr unsigned int NO_FLIP = 0;
+
+  /**
+   * Mesh pattern setting : flip (reflect in y axis) alternate tiles on each row
+   * or column
+   */
+  static constexpr unsigned int FLIP_TILE = 1;
+
+  /**
+   * Mesh pattern setting : rotate (180degs) alternate tiles on each row or
+   * column
+   */
+  static constexpr unsigned int ROTATE_TILE = 2;
+
+  /**
+   * Mesh pattern setting : flip (reflect in y axis) all tiles on alternate rows
+   */
+  static constexpr unsigned int FLIP_ROW = 3;
+
+  /**
+   * Mesh pattern setting : rotate (180degs) all tiles on alternate rows
+   */
+  static constexpr unsigned int ROTATE_ROW = 4;
+
+  /**
+   * Mesh pattern setting : flip and rotate alternate tiles on each row or
+   * column
+   */
+  static constexpr unsigned int FLIP_N_ROTATE_TILE = 5;
+
+  /**
+   * Mesh pattern setting : rotate pattern and rotate
+   */
+  static constexpr unsigned int FLIP_N_ROTATE_ROW = 6;
+
+  /**
+   * Mesh tile positioning : part tiles same on left/right or top/bottom
+   */
+  static constexpr unsigned int CENTER = 0;
+
+  /**
+   * Mesh tile positioning : part tiles on left
+   */
+  static constexpr unsigned int LEFT = 1;
+
+  /**
+   * Mesh tile positioning : part tiles on right
+   */
+  static constexpr unsigned int RIGHT = 2;
+
+  /**
+   * Mesh tile positioning : part tiles on top
+   */
+  static constexpr unsigned int TOP = 3;
+
+  /**
+   * Mesh tile positioning : part tiles on bottom
+   */
+  static constexpr unsigned int BOTTOM = 4;
 
   /**
    * @brief Gets the default side orientation.

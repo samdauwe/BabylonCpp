@@ -489,6 +489,31 @@ TiledGroundOptions::~TiledGroundOptions()
 }
 
 //------------------------------------------------------------------------------
+// Tiled plane mesh options
+//------------------------------------------------------------------------------
+
+TiledPlaneOptions::TiledPlaneOptions()
+    : pattern{std::nullopt}
+    , tileSize{std::nullopt}
+    , tileWidth{std::nullopt}
+    , tileHeight{std::nullopt}
+    , size{std::nullopt}
+    , width{std::nullopt}
+    , height{std::nullopt}
+    , alignHorizontal{std::nullopt}
+    , alignVertical{std::nullopt}
+    , updatable{std::nullopt}
+    , sideOrientation{std::nullopt}
+    , frontUVs{std::nullopt}
+    , backUVs{std::nullopt}
+{
+}
+
+TiledPlaneOptions::~TiledPlaneOptions()
+{
+}
+
+//------------------------------------------------------------------------------
 // Torus mesh options
 //------------------------------------------------------------------------------
 
