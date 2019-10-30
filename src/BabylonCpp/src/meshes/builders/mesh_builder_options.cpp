@@ -470,6 +470,36 @@ SphereOptions::~SphereOptions()
 }
 
 //------------------------------------------------------------------------------
+// Tiled box mesh options
+//------------------------------------------------------------------------------
+
+TiledBoxOptions::TiledBoxOptions()
+    : pattern{std::nullopt}
+    , size{std::nullopt}
+    , width{std::nullopt}
+    , height{std::nullopt}
+    , depth{std::nullopt}
+    , tileSize{std::nullopt}
+    , tileWidth{std::nullopt}
+    , tileHeight{std::nullopt}
+    , alignHorizontal{std::nullopt}
+    , alignVertical{std::nullopt}
+    , faceUV{{Vector4(0.f, 0.f, 1.f, 1.f), Vector4(0.f, 0.f, 1.f, 1.f),
+              Vector4(0.f, 0.f, 1.f, 1.f), Vector4(0.f, 0.f, 1.f, 1.f),
+              Vector4(0.f, 0.f, 1.f, 1.f), Vector4(0.f, 0.f, 1.f, 1.f)}}
+    , faceColors{{Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f),
+                  Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f),
+                  Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f)}}
+    , sideOrientation{std::nullopt}
+    , updatable{std::nullopt}
+{
+}
+
+TiledBoxOptions::~TiledBoxOptions()
+{
+}
+
+//------------------------------------------------------------------------------
 // Tiled ground mesh options
 //------------------------------------------------------------------------------
 

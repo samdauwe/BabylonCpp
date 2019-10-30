@@ -2642,6 +2642,209 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
   return vertexData;
 }
 
+std::unique_ptr<VertexData> VertexData::CreateTiledBox(TiledBoxOptions& options)
+{
+  const auto nbFaces = 6u;
+
+  const auto& faceUV     = options.faceUV;
+  const auto& faceColors = options.faceColors;
+
+  const auto flipTile = options.pattern.value_or(Mesh::NO_FLIP);
+
+  const auto width     = options.width.value_or(options.size.value_or(1.f));
+  const auto height    = options.height.value_or(options.size.value_or(1.f));
+  const auto depth     = options.depth.value_or(options.size.value_or(1.f));
+  const auto tileWidth = options.tileWidth || options.tileSize || 1;
+  const auto tileHeight
+    = options.tileHeight.value_or(options.tileSize.value_or(1.f));
+  const auto alignH = options.alignHorizontal.value_or(0u);
+  const auto alignV = options.alignVertical.value_or(0u);
+
+  const auto sideOrientation
+    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
+
+  const auto halfWidth  = width / 2.f;
+  const auto halfHeight = height / 2.f;
+  const auto halfDepth  = depth / 2.f;
+
+  std::vector<std::unique_ptr<VertexData>> faceVertexData;
+
+  for (auto f = 0; f < 2; ++f) { // front and back
+    TiledPlaneOptions options;
+    options.pattern         = flipTile;
+    options.tileWidth       = tileWidth;
+    options.tileHeight      = tileHeight;
+    options.width           = width;
+    options.height          = height;
+    options.alignVertical   = alignV;
+    options.alignHorizontal = alignH;
+    options.sideOrientation = sideOrientation;
+    faceVertexData.emplace_back(VertexData::CreateTiledPlane(options));
+  }
+
+  for (auto f = 2; f < 4; ++f) { // sides
+    TiledPlaneOptions options;
+    options.pattern         = flipTile;
+    options.tileWidth       = tileWidth;
+    options.tileHeight      = tileHeight;
+    options.width           = depth;
+    options.height          = height;
+    options.alignVertical   = alignV;
+    options.alignHorizontal = alignH;
+    options.sideOrientation = sideOrientation;
+    faceVertexData.emplace_back(VertexData::CreateTiledPlane(options));
+  }
+
+  auto baseAlignV = alignV;
+  if (alignV == Mesh::BOTTOM) {
+    baseAlignV = Mesh::TOP;
+  }
+  else if (alignV == Mesh::TOP) {
+    baseAlignV = Mesh::BOTTOM;
+  }
+
+  for (auto f = 4; f < 6; ++f) { // top and bottom
+    TiledPlaneOptions options;
+    options.pattern         = flipTile;
+    options.tileWidth       = tileWidth;
+    options.tileHeight      = tileHeight;
+    options.width           = width;
+    options.height          = depth;
+    options.alignVertical   = baseAlignV;
+    options.alignHorizontal = alignH;
+    options.sideOrientation = sideOrientation;
+    faceVertexData.emplace_back(VertexData::CreateTiledPlane(options));
+  }
+
+  Float32Array positions;
+  Float32Array normals;
+  Float32Array uvs;
+  Uint32Array indices;
+  Float32Array colors;
+  std::vector<std::vector<Vector3>> facePositions;
+  std::vector<std::vector<Vector3>> faceNormals;
+
+  std::vector<Float32Array> newFaceUV;
+  auto lu = 0ull;
+
+  auto li = 0u;
+
+  for (auto f = 0u; f < nbFaces; ++f) {
+    const auto len = faceVertexData[f]->positions.size();
+    facePositions.emplace_back(std::vector<Vector3>{});
+    faceNormals.emplace_back(std::vector<Vector3>{});
+    for (auto p = 0u; p < len / 3; ++p) {
+      stl_util::concat(facePositions[f],
+                       {Vector3(faceVertexData[f]->positions[3 * p],
+                                faceVertexData[f]->positions[3 * p + 1],
+                                faceVertexData[f]->positions[3 * p + 2])});
+      stl_util::concat(faceNormals[f],
+                       {Vector3(faceVertexData[f]->normals[3 * p],
+                                faceVertexData[f]->normals[3 * p + 1],
+                                faceVertexData[f]->normals[3 * p + 2])});
+    }
+    // uvs
+    lu = faceVertexData[f]->uvs.size();
+    newFaceUV.emplace_back(Float32Array{});
+    for (auto i = 0u; i < lu; i += 2) {
+      stl_util::concat(
+        newFaceUV[f],
+        {faceUV[f].x + (faceUV[f].z - faceUV[f].x) * faceVertexData[f]->uvs[i],
+         faceUV[f].y
+           + (faceUV[f].w - faceUV[f].y) * faceVertexData[f]->uvs[i + 1]});
+    }
+    stl_util::concat(uvs, newFaceUV[f]);
+    for (const auto x : faceVertexData[f]->indices) {
+      indices.emplace_back(x + li);
+    }
+    li += facePositions[f].size();
+    if (!faceColors.empty()) {
+      for (auto c = 0; c < 4; c++) {
+        stl_util::concat(colors, {faceColors[f].r, faceColors[f].g,
+                                  faceColors[f].b, faceColors[f].a});
+      }
+    }
+  }
+
+  Vector3 vec0{0.f, 0.f, halfDepth};
+  const auto mtrx0 = Matrix::RotationY(Math::PI);
+  for (const auto& entry : facePositions[0]) {
+    const auto entryTmp = Vector3::TransformNormal(entry, mtrx0).add(vec0);
+    stl_util::concat(positions, {entryTmp.x, entryTmp.y, entryTmp.z});
+  }
+  for (const auto& entry : faceNormals[0]) {
+    const auto entryTmp = Vector3::TransformNormal(entry, mtrx0);
+    stl_util::concat(normals, {entryTmp.x, entryTmp.y, entryTmp.z});
+  }
+  for (const auto& entry : facePositions[1]) {
+    const auto entryTmp = entry.subtract(vec0);
+    stl_util::concat(positions, {entryTmp.x, entryTmp.y, entryTmp.z});
+  }
+  for (const auto& entry : faceNormals[1]) {
+    stl_util::concat(normals, {entry.x, entry.y, entry.z});
+  }
+
+  Vector3 vec2{halfWidth, 0.f, 0.f};
+  const auto mtrx2 = Matrix::RotationY(-Math::PI_2);
+  for (const auto& entry : facePositions[2]) {
+    const auto entryTmp = Vector3::TransformNormal(entry, mtrx2).add(vec2);
+    stl_util::concat(positions, {entryTmp.x, entryTmp.y, entryTmp.z});
+  }
+  for (const auto& entry : faceNormals[2]) {
+    const auto entryTmp = Vector3::TransformNormal(entry, mtrx2);
+    stl_util::concat(normals, {entryTmp.x, entryTmp.y, entryTmp.z});
+  }
+  const auto mtrx3 = Matrix::RotationY(Math::PI_2);
+  for (const auto& entry : facePositions[3]) {
+    const auto entryTmp = Vector3::TransformNormal(entry, mtrx3).subtract(vec2);
+    stl_util::concat(positions, {entryTmp.x, entryTmp.y, entryTmp.z});
+  }
+  for (const auto& entry : faceNormals[3]) {
+    const auto entryTmp = Vector3::TransformNormal(entry, mtrx3);
+    stl_util::concat(normals, {entryTmp.x, entryTmp.y, entryTmp.z});
+  }
+
+  Vector3 vec4{0.f, halfHeight, 0.f};
+  const auto mtrx4 = Matrix::RotationX(Math::PI_2);
+  for (const auto& entry : facePositions[4]) {
+    const auto entryTmp = Vector3::TransformNormal(entry, mtrx4).add(vec4);
+    stl_util::concat(positions, {entryTmp.x, entryTmp.y, entryTmp.z});
+  }
+  for (const auto& entry : faceNormals[4]) {
+    const auto entryTmp = Vector3::TransformNormal(entry, mtrx4);
+    stl_util::concat(normals, {entryTmp.x, entryTmp.y, entryTmp.z});
+  }
+  const auto mtrx5 = Matrix::RotationX(-Math::PI_2);
+  for (const auto& entry : facePositions[5]) {
+    const auto entryTmp = Vector3::TransformNormal(entry, mtrx5).subtract(vec4);
+    stl_util::concat(positions, {entryTmp.x, entryTmp.y, entryTmp.z});
+  }
+  for (const auto& entry : faceNormals[5]) {
+    const auto entryTmp = Vector3::TransformNormal(entry, mtrx5);
+    stl_util::concat(normals, {entryTmp.x, entryTmp.y, entryTmp.z});
+  }
+
+  // sides
+  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs);
+
+  // Result
+  auto vertexData = std::make_unique<VertexData>();
+
+  vertexData->indices   = std::move(indices);
+  vertexData->positions = std::move(positions);
+  vertexData->normals   = std::move(normals);
+  vertexData->uvs       = std::move(uvs);
+
+  if (!faceColors.empty()) {
+    if (sideOrientation == VertexData::DOUBLESIDE) {
+      stl_util::concat(colors, colors);
+    }
+    vertexData->colors = std::move(colors);
+  }
+
+  return vertexData;
+}
+
 std::unique_ptr<VertexData>
 VertexData::CreateTiledPlane(TiledPlaneOptions& options)
 {

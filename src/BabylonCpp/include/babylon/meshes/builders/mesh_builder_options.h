@@ -528,6 +528,37 @@ public:
 }; // end of class SphereOptions
 
 //------------------------------------------------------------------------------
+// Tiled box mesh options
+//------------------------------------------------------------------------------
+
+/**
+ * @brief Options used to create a tiled plane mesh.
+ */
+class BABYLON_SHARED_EXPORT TiledBoxOptions {
+
+public:
+  TiledBoxOptions();
+  ~TiledBoxOptions();
+
+public:
+  std::optional<unsigned int> pattern;
+  std::optional<float> size;
+  std::optional<float> width;
+  std::optional<float> height;
+  std::optional<float> depth;
+  std::optional<float> tileSize;
+  std::optional<float> tileWidth;
+  std::optional<float> tileHeight;
+  std::optional<unsigned int> alignHorizontal;
+  std::optional<unsigned int> alignVertical;
+  std::array<Vector4, 6> faceUV;
+  std::array<Color4, 6> faceColors;
+  std::optional<unsigned int> sideOrientation;
+  std::optional<bool> updatable;
+
+}; // end of class TiledBoxOptions
+
+//------------------------------------------------------------------------------
 // Tiled ground mesh options
 //------------------------------------------------------------------------------
 
