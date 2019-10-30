@@ -16,7 +16,7 @@ using PBRMaterialPtr = std::shared_ptr<PBRMaterial>;
  *
  * This offers the main features of a standard PBR material.
  * For more information, please refer to the documentation :
- * http://doc.babylonjs.com/extensions/Physically_Based_Rendering
+ * https://doc.babylonjs.com/how_to/physically_based_rendering
  */
 class BABYLON_SHARED_EXPORT PBRMaterial : public PBRBaseMaterial {
 
@@ -506,11 +506,11 @@ protected:
    * Let user defines the brdf lookup texture used for IBL.
    * A default 8bit version is embedded but you could point at :
    * * Default texture:
-   * https://assets.babylonjs.com/environments/correlatedMSBRDF.png
+   * https://assets.babylonjs.com/environments/correlatedMSBRDF_RGBD.png
    * * Default 16bit pixel depth texture:
    * https://assets.babylonjs.com/environments/correlatedMSBRDF.dds
    * * LEGACY Default None correlated
-   * https://assets.babylonjs.com/environments/uncorrelatedBRDF.png
+   * https://assets.babylonjs.com/environments/uncorrelatedBRDF_RGBD.png
    * * LEGACY Default None correlated 16bit pixel depth
    * https://assets.babylonjs.com/environments/uncorrelatedBRDF.dds
    */
@@ -997,11 +997,11 @@ public:
    * Let user defines the brdf lookup texture used for IBL.
    * A default 8bit version is embedded but you could point at :
    * * Default texture:
-   * https://assets.babylonjs.com/environments/correlatedMSBRDF.png
+   * https://assets.babylonjs.com/environments/correlatedMSBRDF_RGBD.png
    * * Default 16bit pixel depth texture:
    * https://assets.babylonjs.com/environments/correlatedMSBRDF.dds
    * * LEGACY Default None correlated
-   * https://assets.babylonjs.com/environments/uncorrelatedBRDF.png
+   * https://assets.babylonjs.com/environments/uncorrelatedBRDF_RGBD.png
    * * LEGACY Default None correlated 16bit pixel depth
    * https://assets.babylonjs.com/environments/uncorrelatedBRDF.dds
    */

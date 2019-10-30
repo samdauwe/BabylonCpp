@@ -62,6 +62,7 @@ PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
     {"LIGHTMAP", false},               //
     {"USELIGHTMAPASSHADOWMAP", false}, //
     {"GAMMALIGHTMAP", false},          //
+    {"RGBDLIGHTMAP", false},           //
 
     {"REFLECTION", false},                                  //
     {"REFLECTIONMAP_3D", false},                            //
@@ -78,12 +79,14 @@ PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
     {"REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED", false}, //
     {"INVERTCUBICMAP", false},                              //
     {"USESPHERICALFROMREFLECTIONMAP", false},               //
+    {"USEIRRADIANCEMAP", false},                            //
     {"SPHERICAL_HARMONICS", false},                         //
     {"USESPHERICALINVERTEX", false},                        //
     {"REFLECTIONMAP_OPPOSITEZ", false},                     //
     {"LODINREFLECTIONALPHA", false},                        //
     {"GAMMAREFLECTION", false},                             //
     {"RGBDREFLECTION", false},                              //
+    {"LINEARSPECULARREFLECTION", false},                    //
     {"RADIANCEOCCLUSION", false},                           //
     {"HORIZONOCCLUSION", false},                            //
 
@@ -96,6 +99,7 @@ PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
     {"MORPHTARGETS", false},         //
     {"MORPHTARGETS_NORMAL", false},  //
     {"MORPHTARGETS_TANGENT", false}, //
+    {"MORPHTARGETS_UV", false},      //
 
     {"IMAGEPROCESSING", false},            //
     {"VIGNETTE", false},                   //
@@ -159,6 +163,7 @@ PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
     {"SS_LODINREFRACTIONALPHA", false},         //
     {"SS_GAMMAREFRACTION", false},              //
     {"SS_RGBDREFRACTION", false},               //
+    {"SS_LINEARSPECULARREFRACTION", false},     //
     {"SS_LINKREFRACTIONTOTRANSPARENCY", false}, //
 
     {"SS_MASK_FROM_THICKNESS_TEXTURE", false}, //

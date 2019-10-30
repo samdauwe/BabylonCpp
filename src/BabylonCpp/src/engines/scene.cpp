@@ -102,6 +102,8 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , clearColor{Color4(0.2f, 0.2f, 0.3f, 1.f)}
     , ambientColor{Color3(0.f, 0.f, 0.f)}
     , environmentBRDFTexture{nullptr}
+    , environmentIntensity{this, &Scene::get_environmentIntensity,
+                           &Scene::set_environmentIntensity}
     , imageProcessingConfiguration{this,
                                    &Scene::get_imageProcessingConfiguration}
     , onDispose{this, &Scene::set_onDispose}
@@ -214,6 +216,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , getCollidingSubMeshCandidates{nullptr}
     , _physicsEngine{nullptr}
     , _environmentTexture{nullptr}
+    , _environmentIntensity{1.f}
     , _animationPropertiesOverride{nullptr}
     , _spritePredicate{nullptr}
     , _onDisposeObserver{nullptr}
@@ -468,6 +471,21 @@ void Scene::set_environmentTexture(const BaseTexturePtr& value)
 
   _environmentTexture = value;
   markAllMaterialsAsDirty(Material::TextureDirtyFlag);
+}
+
+float Scene::get_environmentIntensity() const
+{
+  return _environmentIntensity;
+}
+
+void Scene::set_environmentIntensity(float value)
+{
+  if (stl_util::almost_equal(_environmentIntensity, value)) {
+    return;
+  }
+
+  _environmentIntensity = value;
+  markAllMaterialsAsDirty(Constants::MATERIAL_TextureDirtyFlag);
 }
 
 bool Scene::get_useRightHandedSystem() const

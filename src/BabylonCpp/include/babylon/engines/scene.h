@@ -1887,6 +1887,23 @@ protected:
   void set_environmentTexture(const BaseTexturePtr& value) override;
 
   /**
+   * @brief Intensity of the environment in all pbr material.
+   * This dims or reinforces the IBL lighting overall (reflection and diffuse).
+   * As in the majority of the scene they are the same (exception for multi room
+   * and so on), this is easier to reference from here than from all the
+   * materials.
+   */
+  float get_environmentIntensity() const;
+
+  /**
+   * @brief Intensity of the environment in all pbr material.
+   * This dims or reinforces the IBL lighting overall (reflection and diffuse).
+   * As in the majority of the scene they are the same (exception for multi room
+   * and so on), this is easier to set here than in all the materials.
+   */
+  void set_environmentIntensity(float value);
+
+  /**
    * @brief Default image processing configuration used either in the rendering
    * Forward main pass or through the imageProcessingPostProcess if present.
    * As in the majority of the scene they are the same (exception for multi
@@ -2299,6 +2316,14 @@ public:
    * properties need to be setup according to the type of texture in use.
    */
   BaseTexturePtr environmentBRDFTexture;
+
+  /**
+   * Intensity of the environment in all pbr material.
+   * This dims or reinforces the IBL lighting overall (reflection and diffuse).
+   * As in the majority of the scene they are the same (exception for multi room
+   * and so on), this is easier to set here than in all the materials.
+   */
+  Property<Scene, float> environmentIntensity;
 
   /**
    * Default image processing configuration used either in the rendering
@@ -3405,6 +3430,8 @@ public:
 protected:
   /** Hidden */
   BaseTexturePtr _environmentTexture;
+  /** Hidden */
+  float _environmentIntensity;
   /** Hidden */
   ImageProcessingConfigurationPtr _imageProcessingConfiguration;
 
