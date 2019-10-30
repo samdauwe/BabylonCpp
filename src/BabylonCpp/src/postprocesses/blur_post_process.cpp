@@ -198,7 +198,7 @@ void BlurPostProcess::_updateParameters(
     --varyingCount;
   }
 
-  for (unsigned int i = 0; i < static_cast<unsigned>(varyingCount); ++i) {
+  for (int i = 0; i < varyingCount; ++i) {
     defines << "#define KERNEL_OFFSET" << i << " "
             << _glslFloat(static_cast<float>(offsets[i])) << "\r\n";
     defines << "#define KERNEL_WEIGHT" << i << " "
@@ -206,13 +206,15 @@ void BlurPostProcess::_updateParameters(
   }
 
   unsigned int depCount = 0;
-  for (unsigned int i = static_cast<unsigned>(freeVaryingVec2);
-       i < offsets.size(); ++i) {
-    defines << "#define KERNEL_DEP_OFFSET" << depCount << " "
-            << _glslFloat(static_cast<float>(offsets[i])) << "\r\n";
-    defines << "#define KERNEL_DEP_WEIGHT" << depCount << " "
-            << _glslFloat(static_cast<float>(weights[i])) << "\r\n";
-    ++depCount;
+  if (freeVaryingVec2 >= 0)
+  {
+    for (int i = freeVaryingVec2; i < static_cast<int>(offsets.size()); ++i) {
+      defines << "#define KERNEL_DEP_OFFSET" << depCount << " "
+              << _glslFloat(static_cast<float>(offsets[i])) << "\r\n";
+      defines << "#define KERNEL_DEP_WEIGHT" << depCount << " "
+              << _glslFloat(static_cast<float>(weights[i])) << "\r\n";
+      ++depCount;
+    }
   }
 
   if (packedFloat()) {
