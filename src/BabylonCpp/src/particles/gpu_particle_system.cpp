@@ -22,7 +22,7 @@
 #include <babylon/meshes/buffer.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/color3_gradient.h>
-#include <babylon/misc/tools.h>
+#include <babylon/misc/gradient_helper.h>
 #include <babylon/particles/emittertypes/box_particle_emitter.h>
 #include <babylon/particles/emittertypes/iparticle_emitter_Type.h>
 #include <babylon/particles/particle_system.h>
@@ -1086,7 +1086,7 @@ void GPUParticleSystem::_createFactorGradientTexture(
   for (unsigned int x = 0; x < _rawTextureWidth; x++) {
     auto ratio = static_cast<float>(x) / static_cast<float>(_rawTextureWidth);
 
-    Tools::GetCurrentGradient<FactorGradient>(
+    GradientHelper::GetCurrentGradient<FactorGradient>(
       ratio, factorGradients,
       [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
           float scale) {
@@ -1140,7 +1140,7 @@ void GPUParticleSystem::_createColorGradientTexture()
   for (unsigned int x = 0; x < _rawTextureWidth; ++x) {
     auto ratio = static_cast<float>(x) / static_cast<float>(_rawTextureWidth);
 
-    Tools::GetCurrentGradient<ColorGradient>(
+    GradientHelper::GetCurrentGradient<ColorGradient>(
       ratio, _colorGradients,
       [&](ColorGradient& currentGradient, ColorGradient& nextGradient,
           float scale) {

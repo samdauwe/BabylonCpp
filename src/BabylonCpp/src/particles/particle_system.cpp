@@ -24,7 +24,7 @@
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/color3_gradient.h>
-#include <babylon/misc/tools.h>
+#include <babylon/misc/gradient_helper.h>
 #include <babylon/particles/emittertypes/box_particle_emitter.h>
 #include <babylon/particles/emittertypes/cone_particle_emitter.h>
 #include <babylon/particles/emittertypes/hemispheric_particle_emitter.h>
@@ -118,7 +118,7 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
 
       // Color
       if (!_colorGradients.empty()) {
-        Tools::GetCurrentGradient<ColorGradient>(
+        GradientHelper::GetCurrentGradient<ColorGradient>(
           ratio, _colorGradients,
           [&](ColorGradient& currentGradient, ColorGradient& nextGradient,
               float scale) {
@@ -144,7 +144,7 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
 
       // Angular speed
       if (!_angularSpeedGradients.empty()) {
-        Tools::GetCurrentGradient<FactorGradient>(
+        GradientHelper::GetCurrentGradient<FactorGradient>(
           ratio, _angularSpeedGradients,
           [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
               float scale) {
@@ -165,7 +165,7 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
 
       // Velocity
       if (_velocityGradients.size() > 0) {
-        Tools::GetCurrentGradient<FactorGradient>(
+        GradientHelper::GetCurrentGradient<FactorGradient>(
           ratio, _velocityGradients,
           [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
               float scale) {
@@ -182,7 +182,7 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
 
       // Limit velocity
       if (!_limitVelocityGradients.empty()) {
-        Tools::GetCurrentGradient<FactorGradient>(
+        GradientHelper::GetCurrentGradient<FactorGradient>(
           ratio, _limitVelocityGradients,
           [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
               float scale) {
@@ -206,7 +206,7 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
 
       /// Drag
       if (!_dragGradients.empty()) {
-        Tools::GetCurrentGradient<FactorGradient>(
+        GradientHelper::GetCurrentGradient<FactorGradient>(
           ratio, _dragGradients,
           [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
               float scale) {
@@ -261,7 +261,7 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
 
       // Size
       if (!_sizeGradients.empty()) {
-        Tools::GetCurrentGradient<FactorGradient>(
+        GradientHelper::GetCurrentGradient<FactorGradient>(
           ratio, _sizeGradients,
           [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
               float scale) {
@@ -278,7 +278,7 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
       // Remap data
       if (_useRampGradients) {
         if (!_colorRemapGradients.empty()) {
-          Tools::GetCurrentGradient<FactorGradient>(
+          GradientHelper::GetCurrentGradient<FactorGradient>(
             ratio, _colorRemapGradients,
             [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
                 float scale) {
@@ -293,7 +293,7 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
         }
 
         if (!_alphaRemapGradients.empty()) {
-          Tools::GetCurrentGradient<FactorGradient>(
+          GradientHelper::GetCurrentGradient<FactorGradient>(
             ratio, _alphaRemapGradients,
             [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
                 float scale) {
@@ -581,7 +581,7 @@ void ParticleSystem::_createRampGradientTexture()
   for (size_t x = 0; x < static_cast<size_t>(_rawTextureWidth); ++x) {
     auto ratio = static_cast<float>(x) / static_cast<float>(_rawTextureWidth);
 
-    Tools::GetCurrentGradient<Color3Gradient>(
+    GradientHelper::GetCurrentGradient<Color3Gradient>(
       ratio, _rampGradients,
       [&](Color3Gradient& currentGradient, Color3Gradient& nextGradient,
           float scale) {
@@ -1125,7 +1125,7 @@ void ParticleSystem::_update(int newParticles)
     if (targetStopDuration && !_lifeTimeGradients.empty()) {
       auto ratio
         = static_cast<float>(Scalar::Clamp(_actualFrame / targetStopDuration));
-      Tools::GetCurrentGradient<FactorGradient>(
+      GradientHelper::GetCurrentGradient<FactorGradient>(
         ratio, _lifeTimeGradients,
         [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
             float /*scale*/) {
@@ -1167,7 +1167,7 @@ void ParticleSystem::_update(int newParticles)
     if (!_startSizeGradients.empty() && targetStopDuration) {
       auto ratio = static_cast<float>(_actualFrame)
                    / static_cast<float>(targetStopDuration);
-      Tools::GetCurrentGradient<FactorGradient>(
+      GradientHelper::GetCurrentGradient<FactorGradient>(
         ratio, _startSizeGradients,
         [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
             float scale) {
@@ -1472,7 +1472,7 @@ void ParticleSystem::animate(bool preWarmOnly)
     if (!_emitRateGradients.empty() && targetStopDuration) {
       auto ratio = static_cast<float>(_actualFrame)
                    / static_cast<float>(targetStopDuration);
-      Tools::GetCurrentGradient<FactorGradient>(
+      GradientHelper::GetCurrentGradient<FactorGradient>(
         ratio, _emitRateGradients,
         [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
             float scale) {
@@ -1558,6 +1558,10 @@ void ParticleSystem::rebuild()
 
   if (_vertexBuffer) {
     _vertexBuffer->_rebuild();
+  }
+
+  for (const auto& item : _vertexBuffers) {
+    item.second->_rebuild();
   }
 }
 

@@ -143,7 +143,7 @@ public:
    */
   int shapeId;
   /**
-   * Index of the particle in its shape id (Internal use)
+   * Index of the particle in its shape id
    */
   unsigned int idxInShape;
   /**

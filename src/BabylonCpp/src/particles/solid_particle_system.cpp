@@ -205,18 +205,28 @@ SolidParticleSystem::digest(Mesh* _mesh,
     auto shapeUV = _uvsToShapeUV(facetUV);
 
     // compute the barycenter of the shape
-    for (auto& iShape : shape) {
+    barycenter.copyFromFloats(0.f, 0.f, 0.f);
+    for (const auto& iShape : shape) {
       barycenter.addInPlace(iShape);
     }
     barycenter.scaleInPlace(1.f / static_cast<float>(shape.size()));
 
     // shift the shape from its barycenter to the origin
+    // and compute the BBox required for intersection.
+    Vector3 minimum{std::numeric_limits<float>::max(),
+                    std::numeric_limits<float>::max(),
+                    std::numeric_limits<float>::max()};
+    Vector3 maximum{std::numeric_limits<float>::lowest(),
+                    std::numeric_limits<float>::lowest(),
+                    std::numeric_limits<float>::lowest()};
     for (auto& iShape : shape) {
       iShape.subtractInPlace(barycenter);
+      minimum.minimizeInPlaceFromFloats(iShape.x, iShape.y, iShape.z);
+      maximum.maximizeInPlaceFromFloats(iShape.x, iShape.y, iShape.z);
     }
     BoundingInfo bInfo{Vector3::Zero(), Vector3::Zero()};
     if (_particlesIntersect) {
-      bInfo = BoundingInfo(barycenter, barycenter);
+      bInfo = BoundingInfo(minimum, maximum);
     }
     auto modelShape = std::make_unique<ModelShape>(
       _shapeCounter, shape, size * 3, shapeUV, nullptr, nullptr);
@@ -302,7 +312,9 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
   size_t n = 0;
 
   _resetCopy();
-  auto& copy = *_copy;
+  auto& copy      = *_copy;
+  copy.idx        = idx;
+  copy.idxInShape = idxInShape;
   if (options.positionFunction) { // call to custom
     options.positionFunction(_copy.get(), idx, idxInShape);
     _mustUnrotateFixedNormals = true;
@@ -412,7 +424,7 @@ Float32Array SolidParticleSystem::_uvsToShapeUV(const Float32Array& uvs)
 {
   Float32Array shapeUV;
   if (!uvs.empty()) {
-    for (auto& uv : uvs) {
+    for (const auto& uv : uvs) {
       shapeUV.emplace_back(uv);
     }
   }
@@ -540,7 +552,7 @@ void SolidParticleSystem::_rebuildParticle(SolidParticle* particle)
 
 SolidParticleSystem& SolidParticleSystem::rebuildMesh()
 {
-  for (auto& particle : particles) {
+  for (const auto& particle : particles) {
     _rebuildParticle(particle.get());
   }
   mesh->updateVerticesData(VertexBuffer::PositionKind, _positions32, false,

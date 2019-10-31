@@ -54,7 +54,7 @@ struct SolidParticleSystemMeshBuilderOptions {
  * behavior.
  *
  * Full documentation here :
- * http://doc.babylonjs.com/overviews/Solid_Particle_System
+ * http://doc.babylonjs.com/how_to/Solid_Particle_System
  */
 class BABYLON_SHARED_EXPORT SolidParticleSystem : public IDisposable {
 
@@ -65,7 +65,7 @@ public:
     return std::shared_ptr<SolidParticleSystem>(
       new SolidParticleSystem(std::forward<Ts>(args)...));
   }
-  virtual ~SolidParticleSystem();
+  virtual ~SolidParticleSystem() override;
 
   /**
    * @brief Builds the SPS underlying mesh. Returns a standard Mesh.
@@ -97,7 +97,7 @@ public:
   /**
    * @brief Adds some particles to the SPS from the model shape. Returns the
    * shape id. Please read the doc :
-   * http://doc.babylonjs.com/overviews/Solid_Particle_System#create-an-immutable-sps
+   * http://doc.babylonjs.com/how_to/Solid_Particle_System#create-an-immutable-sps
    * @param mesh is any Mesh object that will be used as a model for the solid
    * particles.
    * @param nb (positive integer) the number of particles to be created from
@@ -143,7 +143,7 @@ public:
   /**
    * @brief Visibilty helper : Recomputes the visible size according to the mesh
    * bounding box doc :
-   * http://doc.babylonjs.com/overviews/Solid_Particle_System#sps-visibility
+   * http://doc.babylonjs.com/how_to/Solid_Particle_System#sps-visibility
    * @returns the SPS.
    */
   SolidParticleSystem& refreshVisibleSize();
@@ -153,37 +153,33 @@ public:
    * underlying mesh bounding box.
    * @param size the size (float) of the visibility box
    * note : this doesn't lock the SPS mesh bounding box.
-   * doc :
-   * http://doc.babylonjs.com/overviews/Solid_Particle_System#sps-visibility
+   * doc : http://doc.babylonjs.com/how_to/Solid_Particle_System#sps-visibility
    */
   void setVisibilityBox(float size);
 
   /**
    * @brief Gets whether the SPS as always visible or not
-   * doc :
-   * http://doc.babylonjs.com/overviews/Solid_Particle_System#sps-visibility
+   * doc : http://doc.babylonjs.com/how_to/Solid_Particle_System#sps-visibility
    */
   bool isAlwaysVisible() const;
 
   /**
    * @brief Sets the SPS as always visible or not
-   * doc :
-   * http://doc.babylonjs.com/overviews/Solid_Particle_System#sps-visibility
+   * doc : http://doc.babylonjs.com/how_to/Solid_Particle_System#sps-visibility
    */
   void setIsAlwaysVisible(bool val);
 
   /**
    * @brief Sets the SPS visibility box as locked or not. This enables/disables
-   * the underlying mesh bounding box updates.
-   * doc :
-   * http://doc.babylonjs.com/overviews/Solid_Particle_System#sps-visibility
+   * the underlying mesh bounding box updates. doc :
+   * http://doc.babylonjs.com/how_to/Solid_Particle_System#sps-visibility
    */
   void setIsVisibilityBoxLocked(bool val);
 
   /**
    * @brief Gets if the SPS visibility box as locked or not. This
    * enables/disables the underlying mesh bounding box updates. doc :
-   * http://doc.babylonjs.com/overviews/Solid_Particle_System#sps-visibility
+   * http://doc.babylonjs.com/how_to/Solid_Particle_System#sps-visibility
    */
   bool isVisibilityBoxLocked() const;
 
@@ -285,7 +281,7 @@ public:
    * @brief This function does nothing. It may be overwritten to set all the
    * particle first values. The SPS doesn't call this function, you may have to
    * call it by your own. doc :
-   * http://doc.babylonjs.com/overviews/Solid_Particle_System#particle-management
+   * http://doc.babylonjs.com/how_to/Solid_Particle_System#particle-management
    */
   virtual void initParticles();
 
@@ -293,7 +289,7 @@ public:
    * @brief This function does nothing. It may be overwritten to recycle a
    * particle. The SPS doesn't call this function, you may have to call it by
    * your own. doc :
-   * http://doc.babylonjs.com/overviews/Solid_Particle_System#particle-management
+   * http://doc.babylonjs.com/how_to/Solid_Particle_System#particle-management
    * @param particle The particle to recycle
    * @returns the recycled particle
    */
@@ -303,8 +299,8 @@ public:
    * @brief Updates a particle : this function should  be overwritten by the
    * user. It is called on each particle by `setParticles()`. This is the place
    * to code each particle behavior. doc :
-   * http://doc.babylonjs.com/overviews/Solid_Particle_System#particle-management
-   * Example : just set a particle position or velocity and recycle conditions
+   * http://doc.babylonjs.com/how_to/Solid_Particle_System#particle-management
+   * @example : just set a particle position or velocity and recycle conditions
    * @param particle The particle to update
    * @returns the updated particle
    */
@@ -318,8 +314,8 @@ public:
    * @param vertex the current index of the current particle
    * @param pt the index of the current vertex in the particle shape
    * doc :
-   * http://doc.babylonjs.com/overviews/Solid_Particle_System#update-each-particle-shape
-   * Example : just set a vertex particle position
+   * http://doc.babylonjs.com/how_to/Solid_Particle_System#update-each-particle-shape
+   * @example : just set a vertex particle position
    * @returns the updated vertex
    */
   virtual Vector3 updateParticleVertex(SolidParticle* particle,
@@ -472,12 +468,11 @@ public:
   /**
    * This array is populated when the SPS is set as 'pickable'.
    * Each key of this array is a `faceId` value that you can get from a
-   * pickResult object.
-   * Each element of this array is an object `{idx: int, faceId: int}`.
-   * `idx` is the picked particle index in the `SPS.particles` array
-   * `faceId` is the picked face index counted within this particle.
+   * pickResult object. Each element of this array is an object `{idx: int,
+   * faceId: int}`. `idx` is the picked particle index in the `SPS.particles`
+   * array `faceId` is the picked face index counted within this particle.
    * Please read :
-   * http://doc.babylonjs.com/overviews/Solid_Particle_System#pickable-particles
+   * http://doc.babylonjs.com/how_to/Solid_Particle_System#pickable-particles
    */
   std::vector<PickedParticle> pickedParticles;
 
