@@ -21,11 +21,28 @@ struct BABYLON_SHARED_EXPORT GradientHelper {
    * @param updateFunc defines the callback function used to get the final value
    * from the selected gradients
    */
+  template <typename T>
   static void GetCurrentGradient(
-    float ratio, const std::vector<IValueGradient>& gradients,
-    const std::function<void(const IValueGradient& current,
-                             const IValueGradient& next, float scale)>&
-      updateFunc);
+    float ratio, const std::vector<T>& gradients,
+    const std::function<void(T& current, T& next, float scale)>& updateFunc)
+  {
+    for (size_t gradientIndex = 0; gradientIndex < gradients.size() - 1;
+         ++gradientIndex) {
+      auto currentGradient = gradients[gradientIndex];
+      auto nextGradient    = gradients[gradientIndex + 1];
+
+      if (ratio >= currentGradient.gradient && ratio <= nextGradient.gradient) {
+        const auto scale = (ratio - currentGradient.gradient)
+                           / (nextGradient.gradient - currentGradient.gradient);
+        updateFunc(currentGradient, nextGradient, scale);
+        return;
+      }
+    }
+
+    // Use last index if over
+    auto lastGradient = gradients.back();
+    updateFunc(lastGradient, lastGradient, 1.f);
+  }
 
 }; // end of struct GradientHelper
 
