@@ -15,6 +15,8 @@
 #include <babylon/meshes/builders/ribbon_builder.h>
 #include <babylon/meshes/builders/shape_builder.h>
 #include <babylon/meshes/builders/sphere_builder.h>
+#include <babylon/meshes/builders/tiled_box_builder.h>
+#include <babylon/meshes/builders/tiled_plane_builder.h>
 #include <babylon/meshes/builders/torus_builder.h>
 #include <babylon/meshes/builders/torus_knot_builder.h>
 #include <babylon/meshes/builders/tube_builder.h>
@@ -25,6 +27,12 @@ MeshPtr MeshBuilder::CreateBox(const std::string& name, BoxOptions& options,
                                Scene* scene)
 {
   return BoxBuilder::CreateBox(name, options, scene);
+}
+
+MeshPtr MeshBuilder::CreateTiledBox(const std::string& name,
+                                    TiledBoxOptions& options, Scene* scene)
+{
+  return TiledBoxBuilder::CreateTiledBox(name, options, scene);
 }
 
 MeshPtr MeshBuilder::CreateSphere(const std::string& name,
@@ -107,6 +115,12 @@ MeshPtr MeshBuilder::CreateLathe(const std::string& name, LatheOptions& options,
                                  Scene* scene)
 {
   return LatheBuilder::CreateLathe(name, options, scene);
+}
+
+MeshPtr MeshBuilder::CreateTiledPlane(const std::string& name,
+                                      TiledPlaneOptions& options, Scene* scene)
+{
+  return TiledPlaneBuilder::CreateTiledPlane(name, options, scene);
 }
 
 MeshPtr MeshBuilder::CreatePlane(const std::string& name, PlaneOptions& options,

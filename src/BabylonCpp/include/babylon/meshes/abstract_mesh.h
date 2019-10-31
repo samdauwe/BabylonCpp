@@ -208,7 +208,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _rebuild();
+  virtual void _rebuild();
 
   /**
    * @brief Hidden

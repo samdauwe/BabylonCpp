@@ -221,6 +221,27 @@ void Mesh::set_isUnIndexed(bool value)
   }
 }
 
+TransformNodePtr Mesh::instantiateHierarychy(TransformNode* newParent)
+{
+  auto instance = createInstance("instance of " + (!name.empty() ? name : id));
+
+  instance->parent   = newParent ? newParent : parent();
+  instance->position = position().copy();
+  instance->scaling  = scaling().copy();
+  if (rotationQuaternion()) {
+    instance->rotationQuaternion = rotationQuaternion()->copy();
+  }
+  else {
+    instance->rotation = rotation().copy();
+  }
+
+  for (const auto& child : getChildTransformNodes(true)) {
+    child->instantiateHierarychy(instance.get());
+  }
+
+  return instance;
+}
+
 const std::string Mesh::getClassName() const
 {
   return "Mesh";
@@ -263,6 +284,11 @@ void Mesh::set_onBeforeDraw(
     onBeforeDrawObservable().remove(_onBeforeDrawObserver);
   }
   _onBeforeDrawObserver = onBeforeDrawObservable().add(callback);
+}
+
+bool Mesh::get_hasInstances() const
+{
+  return instances.size() > 0;
 }
 
 std::string Mesh::toString(bool fullDetails)
@@ -408,8 +434,7 @@ AbstractMesh* Mesh::getLOD(const CameraPtr& camera,
 
   if (_LODLevels.back()->distance > distanceToCamera) {
     if (onLODLevelSelection) {
-      onLODLevelSelection(distanceToCamera, this,
-                          _LODLevels.back()->mesh.get());
+      onLODLevelSelection(distanceToCamera, this, this);
     }
     return this;
   }
@@ -761,8 +786,9 @@ void Mesh::subdivide(size_t count)
   synchronizeInstances();
 }
 
-Mesh* Mesh::setVerticesData(const std::string& kind, const Float32Array& data,
-                            bool updatable, const std::optional<size_t>& stride)
+AbstractMesh* Mesh::setVerticesData(const std::string& kind,
+                                    const Float32Array& data, bool updatable,
+                                    const std::optional<size_t>& stride)
 {
   if (!_geometry) {
     auto vertexData = std::make_unique<VertexData>();
@@ -802,9 +828,9 @@ Mesh& Mesh::setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer)
   return *this;
 }
 
-Mesh* Mesh::updateVerticesData(const std::string& kind,
-                               const Float32Array& data, bool updateExtends,
-                               bool makeItUnique)
+AbstractMesh* Mesh::updateVerticesData(const std::string& kind,
+                                       const Float32Array& data,
+                                       bool updateExtends, bool makeItUnique)
 {
   if (!_geometry) {
     return this;
@@ -859,8 +885,8 @@ Mesh& Mesh::makeGeometryUnique()
   return *this;
 }
 
-Mesh* Mesh::setIndices(const IndicesArray& indices, size_t totalVertices,
-                       bool updatable)
+AbstractMesh* Mesh::setIndices(const IndicesArray& indices,
+                               size_t totalVertices, bool updatable)
 {
   if (!_geometry) {
     auto vertexData     = std::make_unique<VertexData>();
@@ -877,8 +903,9 @@ Mesh* Mesh::setIndices(const IndicesArray& indices, size_t totalVertices,
   return this;
 }
 
-Mesh& Mesh::updateIndices(const IndicesArray& indices,
-                          const std::optional<int>& offset, bool gpuMemoryOnly)
+AbstractMesh& Mesh::updateIndices(const IndicesArray& indices,
+                                  const std::optional<int>& offset,
+                                  bool gpuMemoryOnly)
 {
   if (!_geometry) {
     return *this;
@@ -1173,10 +1200,19 @@ Mesh& Mesh::_processRendering(
   return *this;
 }
 
+void Mesh::_rebuild()
+{
+  if (_instanceDataStorage->instancesBuffer) {
+    // Dispose instance buffer to be recreated in _renderWithInstances when
+    // rendered
+    _instanceDataStorage->instancesBuffer->dispose();
+    _instanceDataStorage->instancesBuffer = nullptr;
+  }
+  AbstractMesh::_rebuild();
+}
+
 void Mesh::_freeze()
 {
-  _instanceDataStorage->isFrozen = true;
-
   if (subMeshes.empty()) {
     return;
   }
@@ -1185,11 +1221,15 @@ void Mesh::_freeze()
   for (unsigned int index = 0; index < subMeshes.size(); ++index) {
     _getInstancesRenderList(index);
   }
+
+  _effectiveMaterial             = nullptr;
+  _instanceDataStorage->isFrozen = true;
 }
 
 void Mesh::_unFreeze()
 {
-  _instanceDataStorage->isFrozen = false;
+  _instanceDataStorage->isFrozen      = false;
+  _instanceDataStorage->previousBatch = nullptr;
 }
 
 Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
@@ -1284,12 +1324,11 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
     if (!sideOrientation.has_value()) {
       sideOrientation
         = static_cast<unsigned>(_effectiveMaterial->sideOrientation);
-      if (_getWorldMatrixDeterminant() < 0.f) {
-        sideOrientation
-          = (sideOrientation == Material::ClockWiseSideOrientation ?
-               Material::CounterClockWiseSideOrientation :
-               Material::ClockWiseSideOrientation);
-      }
+    }
+    if (effectiveMesh._getWorldMatrixDeterminant() < 0.f) {
+      sideOrientation = (sideOrientation == Material::ClockWiseSideOrientation ?
+                           Material::CounterClockWiseSideOrientation :
+                           Material::ClockWiseSideOrientation);
     }
     instanceDataStorage.sideOrientation = *sideOrientation;
   }
@@ -2128,7 +2167,8 @@ Mesh& Mesh::flipFaces(bool flipNormals)
     }
   }
 
-  vertex_data->applyToMesh(*this);
+  vertex_data->applyToMesh(*this,
+                           isVertexBufferUpdatable(VertexBuffer::PositionKind));
   return *this;
 }
 
@@ -2288,7 +2328,8 @@ void Mesh::increaseVertices(size_t numberPerEdge)
     }
 
     vertex_data->indices = std::move(indices);
-    vertex_data->applyToMesh(*this);
+    vertex_data->applyToMesh(
+      *this, isVertexBufferUpdatable(VertexBuffer::PositionKind));
   }
 }
 
@@ -2298,16 +2339,16 @@ void Mesh::forceSharedVertices()
   auto& currentUVs       = vertex_data->uvs;
   auto& currentIndices   = vertex_data->indices;
   auto& currentPositions = vertex_data->positions;
-  auto& currentNormals   = vertex_data->normals;
+  auto& currentColors    = vertex_data->colors;
 
-  if (currentIndices.empty() || currentPositions.empty()
-      || currentNormals.empty() || currentUVs.empty()) {
-    BABYLON_LOG_WARN("Mesh", "VertexData contains null entries")
+  if (currentIndices.empty() || currentPositions.empty()) {
+    BABYLON_LOG_WARN("Mesh", "VertexData contains empty entries")
   }
   else {
     Float32Array positions;
     Uint32Array indices;
     Float32Array uvs;
+    Float32Array colors;
     // lists facet vertex positions (a,b,c) as string "a|b|c"
     std::vector<std::string> pstring;
 
@@ -2348,8 +2389,15 @@ void Mesh::forceSharedVertices()
             for (unsigned k = 0; k < 3; k++) {
               positions.emplace_back(currentPositions[3 * facet[j] + k]);
             }
-            for (unsigned k = 0; k < 2; k++) {
-              uvs.emplace_back(currentUVs[2 * facet[j] + k]);
+            if (!currentColors.empty()) {
+              for (unsigned k = 0; k < 4; k++) {
+                colors.emplace_back(currentColors[4 * facet[j] + k]);
+              }
+            }
+            if (!currentUVs.empty()) {
+              for (unsigned k = 0; k < 2; k++) {
+                uvs.emplace_back(currentUVs[2 * facet[j] + k]);
+              }
             }
           }
           // add new index pointer to indices array
@@ -2366,9 +2414,15 @@ void Mesh::forceSharedVertices()
     vertex_data->positions = std::move(positions);
     vertex_data->indices   = std::move(indices);
     vertex_data->normals   = std::move(normals);
-    vertex_data->uvs       = std::move(uvs);
+    if (!currentUVs.empty()) {
+      vertex_data->uvs = std::move(uvs);
+    }
+    if (!currentColors.empty()) {
+      vertex_data->colors = std::move(colors);
+    }
 
-    vertex_data->applyToMesh(*this);
+    vertex_data->applyToMesh(
+      *this, isVertexBufferUpdatable(VertexBuffer::PositionKind));
   }
 }
 
@@ -2506,6 +2560,12 @@ void Mesh::_syncGeometryWithMorphTargetManager()
         iGeometry->setVerticesData(VertexBuffer::TangentKind + indexStr,
                                    tangents, false, 3);
       }
+
+      const auto& uvs = morphTarget->getUVs();
+      if (!uvs.empty()) {
+        iGeometry->setVerticesData(
+          VertexBuffer::UVKind + std::string("_") + indexStr, uvs, false, 2);
+      }
     }
   }
   else {
@@ -2524,6 +2584,10 @@ void Mesh::_syncGeometryWithMorphTargetManager()
       if (iGeometry->isVerticesDataPresent(VertexBuffer::TangentKind
                                            + indexStr)) {
         iGeometry->removeVerticesData(VertexBuffer::TangentKind + indexStr);
+      }
+      if (iGeometry->isVerticesDataPresent(VertexBuffer::UVKind + indexStr)) {
+        iGeometry->removeVerticesData(VertexBuffer::UVKind + std::string("_")
+                                      + indexStr);
       }
       ++index;
       indexStr = std::to_string(index);
@@ -3588,7 +3652,7 @@ MeshPtr Mesh::MergeMeshes(const std::vector<MeshPtr>& meshes,
       if (meshes[index]) {
         totalVertices += meshes[index]->getTotalVertices();
 
-        if (totalVertices > 65536) {
+        if (totalVertices >= 65536) {
           BABYLON_LOG_WARN("Mesh",
                            "Cannot merge meshes because resulting mesh will "
                            "have more than 65536 vertices. Please use "

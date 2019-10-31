@@ -918,6 +918,714 @@ std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
   return vertexData;
 }
 
+std::unique_ptr<VertexData> VertexData::CreateTiledBox(TiledBoxOptions& options)
+{
+  const auto nbFaces = 6u;
+
+  const auto& faceUV     = options.faceUV;
+  const auto& faceColors = options.faceColors;
+
+  const auto flipTile = options.pattern.value_or(Mesh::NO_FLIP);
+
+  const auto width     = options.width.value_or(options.size.value_or(1.f));
+  const auto height    = options.height.value_or(options.size.value_or(1.f));
+  const auto depth     = options.depth.value_or(options.size.value_or(1.f));
+  const auto tileWidth = options.tileWidth || options.tileSize || 1;
+  const auto tileHeight
+    = options.tileHeight.value_or(options.tileSize.value_or(1.f));
+  const auto alignH = options.alignHorizontal.value_or(0u);
+  const auto alignV = options.alignVertical.value_or(0u);
+
+  const auto sideOrientation
+    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
+
+  const auto halfWidth  = width / 2.f;
+  const auto halfHeight = height / 2.f;
+  const auto halfDepth  = depth / 2.f;
+
+  std::vector<std::unique_ptr<VertexData>> faceVertexData;
+
+  for (auto f = 0; f < 2; ++f) { // front and back
+    TiledPlaneOptions options;
+    options.pattern         = flipTile;
+    options.tileWidth       = tileWidth;
+    options.tileHeight      = tileHeight;
+    options.width           = width;
+    options.height          = height;
+    options.alignVertical   = alignV;
+    options.alignHorizontal = alignH;
+    options.sideOrientation = sideOrientation;
+    faceVertexData.emplace_back(VertexData::CreateTiledPlane(options));
+  }
+
+  for (auto f = 2; f < 4; ++f) { // sides
+    TiledPlaneOptions options;
+    options.pattern         = flipTile;
+    options.tileWidth       = tileWidth;
+    options.tileHeight      = tileHeight;
+    options.width           = depth;
+    options.height          = height;
+    options.alignVertical   = alignV;
+    options.alignHorizontal = alignH;
+    options.sideOrientation = sideOrientation;
+    faceVertexData.emplace_back(VertexData::CreateTiledPlane(options));
+  }
+
+  auto baseAlignV = alignV;
+  if (alignV == Mesh::BOTTOM) {
+    baseAlignV = Mesh::TOP;
+  }
+  else if (alignV == Mesh::TOP) {
+    baseAlignV = Mesh::BOTTOM;
+  }
+
+  for (auto f = 4; f < 6; ++f) { // top and bottom
+    TiledPlaneOptions options;
+    options.pattern         = flipTile;
+    options.tileWidth       = tileWidth;
+    options.tileHeight      = tileHeight;
+    options.width           = width;
+    options.height          = depth;
+    options.alignVertical   = baseAlignV;
+    options.alignHorizontal = alignH;
+    options.sideOrientation = sideOrientation;
+    faceVertexData.emplace_back(VertexData::CreateTiledPlane(options));
+  }
+
+  Float32Array positions;
+  Float32Array normals;
+  Float32Array uvs;
+  Uint32Array indices;
+  Float32Array colors;
+  std::vector<std::vector<Vector3>> facePositions;
+  std::vector<std::vector<Vector3>> faceNormals;
+
+  std::vector<Float32Array> newFaceUV;
+  auto lu = 0ull;
+
+  auto li = 0u;
+
+  for (auto f = 0u; f < nbFaces; ++f) {
+    const auto len = faceVertexData[f]->positions.size();
+    facePositions.emplace_back(std::vector<Vector3>{});
+    faceNormals.emplace_back(std::vector<Vector3>{});
+    for (auto p = 0u; p < len / 3; ++p) {
+      stl_util::concat(facePositions[f],
+                       {Vector3(faceVertexData[f]->positions[3 * p],
+                                faceVertexData[f]->positions[3 * p + 1],
+                                faceVertexData[f]->positions[3 * p + 2])});
+      stl_util::concat(faceNormals[f],
+                       {Vector3(faceVertexData[f]->normals[3 * p],
+                                faceVertexData[f]->normals[3 * p + 1],
+                                faceVertexData[f]->normals[3 * p + 2])});
+    }
+    // uvs
+    lu = faceVertexData[f]->uvs.size();
+    newFaceUV.emplace_back(Float32Array{});
+    for (auto i = 0u; i < lu; i += 2) {
+      stl_util::concat(
+        newFaceUV[f],
+        {faceUV[f].x + (faceUV[f].z - faceUV[f].x) * faceVertexData[f]->uvs[i],
+         faceUV[f].y
+           + (faceUV[f].w - faceUV[f].y) * faceVertexData[f]->uvs[i + 1]});
+    }
+    stl_util::concat(uvs, newFaceUV[f]);
+    for (const auto x : faceVertexData[f]->indices) {
+      indices.emplace_back(x + li);
+    }
+    li += facePositions[f].size();
+    if (!faceColors.empty()) {
+      for (auto c = 0; c < 4; c++) {
+        stl_util::concat(colors, {faceColors[f].r, faceColors[f].g,
+                                  faceColors[f].b, faceColors[f].a});
+      }
+    }
+  }
+
+  Vector3 vec0{0.f, 0.f, halfDepth};
+  const auto mtrx0 = Matrix::RotationY(Math::PI);
+  for (const auto& entry : facePositions[0]) {
+    const auto entryTmp = Vector3::TransformNormal(entry, mtrx0).add(vec0);
+    stl_util::concat(positions, {entryTmp.x, entryTmp.y, entryTmp.z});
+  }
+  for (const auto& entry : faceNormals[0]) {
+    const auto entryTmp = Vector3::TransformNormal(entry, mtrx0);
+    stl_util::concat(normals, {entryTmp.x, entryTmp.y, entryTmp.z});
+  }
+  for (const auto& entry : facePositions[1]) {
+    const auto entryTmp = entry.subtract(vec0);
+    stl_util::concat(positions, {entryTmp.x, entryTmp.y, entryTmp.z});
+  }
+  for (const auto& entry : faceNormals[1]) {
+    stl_util::concat(normals, {entry.x, entry.y, entry.z});
+  }
+
+  Vector3 vec2{halfWidth, 0.f, 0.f};
+  const auto mtrx2 = Matrix::RotationY(-Math::PI_2);
+  for (const auto& entry : facePositions[2]) {
+    const auto entryTmp = Vector3::TransformNormal(entry, mtrx2).add(vec2);
+    stl_util::concat(positions, {entryTmp.x, entryTmp.y, entryTmp.z});
+  }
+  for (const auto& entry : faceNormals[2]) {
+    const auto entryTmp = Vector3::TransformNormal(entry, mtrx2);
+    stl_util::concat(normals, {entryTmp.x, entryTmp.y, entryTmp.z});
+  }
+  const auto mtrx3 = Matrix::RotationY(Math::PI_2);
+  for (const auto& entry : facePositions[3]) {
+    const auto entryTmp = Vector3::TransformNormal(entry, mtrx3).subtract(vec2);
+    stl_util::concat(positions, {entryTmp.x, entryTmp.y, entryTmp.z});
+  }
+  for (const auto& entry : faceNormals[3]) {
+    const auto entryTmp = Vector3::TransformNormal(entry, mtrx3);
+    stl_util::concat(normals, {entryTmp.x, entryTmp.y, entryTmp.z});
+  }
+
+  Vector3 vec4{0.f, halfHeight, 0.f};
+  const auto mtrx4 = Matrix::RotationX(Math::PI_2);
+  for (const auto& entry : facePositions[4]) {
+    const auto entryTmp = Vector3::TransformNormal(entry, mtrx4).add(vec4);
+    stl_util::concat(positions, {entryTmp.x, entryTmp.y, entryTmp.z});
+  }
+  for (const auto& entry : faceNormals[4]) {
+    const auto entryTmp = Vector3::TransformNormal(entry, mtrx4);
+    stl_util::concat(normals, {entryTmp.x, entryTmp.y, entryTmp.z});
+  }
+  const auto mtrx5 = Matrix::RotationX(-Math::PI_2);
+  for (const auto& entry : facePositions[5]) {
+    const auto entryTmp = Vector3::TransformNormal(entry, mtrx5).subtract(vec4);
+    stl_util::concat(positions, {entryTmp.x, entryTmp.y, entryTmp.z});
+  }
+  for (const auto& entry : faceNormals[5]) {
+    const auto entryTmp = Vector3::TransformNormal(entry, mtrx5);
+    stl_util::concat(normals, {entryTmp.x, entryTmp.y, entryTmp.z});
+  }
+
+  // sides
+  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs);
+
+  // Result
+  auto vertexData = std::make_unique<VertexData>();
+
+  vertexData->indices   = std::move(indices);
+  vertexData->positions = std::move(positions);
+  vertexData->normals   = std::move(normals);
+  vertexData->uvs       = std::move(uvs);
+
+  if (!faceColors.empty()) {
+    if (sideOrientation == VertexData::DOUBLESIDE) {
+      stl_util::concat(colors, colors);
+    }
+    vertexData->colors = std::move(colors);
+  }
+
+  return vertexData;
+}
+
+std::unique_ptr<VertexData>
+VertexData::CreateTiledPlane(TiledPlaneOptions& options)
+{
+  const auto flipTile = options.pattern.value_or(Mesh::NO_FLIP);
+  const auto tileWidth
+    = options.tileWidth.value_or(options.tileSize.value_or(1.f));
+  const auto tileHeight
+    = options.tileHeight.value_or(options.tileSize.value_or(1.f));
+  const auto alignH = options.alignHorizontal.value_or(0u);
+  const auto alignV = options.alignVertical.value_or(0u);
+
+  const auto width  = options.width.value_or(options.size.value_or(1.f));
+  const auto tilesX = static_cast<unsigned>(std::floor(width / tileWidth));
+  auto offsetX      = width - tilesX * tileWidth;
+
+  const auto height = options.height.value_or(options.size.value_or(1.f));
+  const auto tilesY = static_cast<unsigned>(std::floor(height / tileHeight));
+  auto offsetY      = height - tilesY * tileHeight;
+
+  const auto halfWidth  = tileWidth * tilesX / 2.f;
+  const auto halfHeight = tileHeight * tilesY / 2.f;
+
+  auto adjustX = 0.f;
+  auto adjustY = 0.f;
+  auto startX  = 0.f;
+  auto startY  = 0.f;
+  auto endX    = 0.f;
+  auto endY    = 0.f;
+
+  // Part Tiles
+  if (offsetX > 0 || offsetY > 0) {
+    startX    = -halfWidth;
+    startY    = -halfHeight;
+    auto endX = halfWidth;
+    auto endY = halfHeight;
+
+    switch (alignH) {
+      case Mesh::CENTER:
+        offsetX /= 2.f;
+        startX -= offsetX;
+        endX += offsetX;
+        break;
+      case Mesh::LEFT:
+        endX += offsetX;
+        adjustX = -offsetX / 2.f;
+        break;
+      case Mesh::RIGHT:
+        startX -= offsetX;
+        adjustX = offsetX / 2.f;
+        break;
+    }
+
+    switch (alignV) {
+      case Mesh::CENTER:
+        offsetY /= 2.f;
+        startY -= offsetY;
+        endY += offsetY;
+        break;
+      case Mesh::BOTTOM:
+        endY += offsetY;
+        adjustY = -offsetY / 2.f;
+        break;
+      case Mesh::TOP:
+        startY -= offsetY;
+        adjustY = offsetY / 2.f;
+        break;
+    }
+  }
+
+  Float32Array positions;
+  Float32Array normals;
+  std::array<Float32Array, 2> uvBase;
+  uvBase[0] = {0.f, 0.f, 1.f, 0.f, 1.f, 1.f, 0.f, 1.f};
+  uvBase[1] = {0.f, 0.f, 1.f, 0.f, 1.f, 1.f, 0.f, 1.f};
+  if (flipTile == Mesh::ROTATE_TILE || flipTile == Mesh::ROTATE_ROW) {
+    uvBase[1] = {1.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f};
+  }
+  if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::FLIP_ROW) {
+    uvBase[1] = {1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 1.f, 1.f};
+  }
+  if (flipTile == Mesh::FLIP_N_ROTATE_TILE
+      || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
+    uvBase[1] = {0.f, 1.f, 1.f, 1.f, 1.f, 0.f, 0.f, 0.f};
+  }
+  Float32Array uvs;
+  Float32Array colors;
+  Uint32Array indices;
+  auto index = 0u;
+  for (auto y = 0u; y < tilesY; ++y) {
+    for (auto x = 0u; x < tilesX; ++x) {
+      stl_util::concat(positions,
+                       {-halfWidth + x * tileWidth + adjustX,
+                        -halfHeight + y * tileHeight + adjustY, 0.f});
+      stl_util::concat(positions,
+                       {-halfWidth + (x + 1) * tileWidth + adjustX,
+                        -halfHeight + y * tileHeight + adjustY, 0.f});
+      stl_util::concat(positions,
+                       {-halfWidth + (x + 1) * tileWidth + adjustX,
+                        -halfHeight + (y + 1) * tileHeight + adjustY, 0.f});
+      stl_util::concat(positions,
+                       {-halfWidth + x * tileWidth + adjustX,
+                        -halfHeight + (y + 1) * tileHeight + adjustY, 0.f});
+      stl_util::concat(indices, {index, index + 1, index + 3, index + 1,
+                                 index + 2, index + 3});
+      if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::ROTATE_TILE
+          || flipTile == Mesh::FLIP_N_ROTATE_TILE) {
+        stl_util::concat(uvs, uvBase[(x % 2 + y % 2) % 2]);
+      }
+      else if (flipTile == Mesh::FLIP_ROW || flipTile == Mesh::ROTATE_ROW
+               || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
+        stl_util::concat(uvs, uvBase[y % 2]);
+      }
+      else {
+        stl_util::concat(uvs, uvBase[0]);
+      }
+      stl_util::concat(colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
+                                1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
+      stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f,
+                                 0.f, 0.f, -1.f});
+      index += 4;
+    }
+  }
+
+  // Part Tiles
+  if (offsetX > 0 || offsetY > 0) {
+
+    const auto partialBottomRow
+      = (offsetY > 0 && (alignV == Mesh::CENTER || alignV == Mesh::TOP));
+    const auto partialTopRow
+      = (offsetY > 0 && (alignV == Mesh::CENTER || alignV == Mesh::BOTTOM));
+    const auto partialLeftCol
+      = (offsetX > 0 && (alignH == Mesh::CENTER || alignH == Mesh::RIGHT));
+    const auto partialRightCol
+      = (offsetX > 0 && (alignH == Mesh::CENTER || alignH == Mesh::LEFT));
+    Float32Array uvPart;
+    auto a = 0.f, b = 0.f, c = 0.f, d = 0.f;
+
+    // corners
+    if (partialBottomRow && partialLeftCol) { // bottom left corner
+      stl_util::concat(positions, {startX + adjustX, startY + adjustY, 0.f});
+      stl_util::concat(positions,
+                       {-halfWidth + adjustX, startY + adjustY, 0.f});
+      stl_util::concat(positions,
+                       {-halfWidth + adjustX, startY + offsetY + adjustY, 0.f});
+      stl_util::concat(positions,
+                       {startX + adjustX, startY + offsetY + adjustY, 0.f});
+      stl_util::concat(indices, {index, index + 1, index + 3, index + 1,
+                                 index + 2, index + 3});
+      index += 4;
+      a      = 1.f - offsetX / tileWidth;
+      b      = 1.f - offsetY / tileHeight;
+      c      = 1.f;
+      d      = 1.f;
+      uvPart = {a, b, c, b, c, d, a, d};
+      if (flipTile == Mesh::ROTATE_ROW) {
+        uvPart = {1.f - a, 1.f - b, 1.f - c, 1.f - b,
+                  1.f - c, 1.f - d, 1.f - a, 1.f - d};
+      }
+      if (flipTile == Mesh::FLIP_ROW) {
+        uvPart = {1.f - a, b, 1.f - c, b, 1.f - c, d, 1.f - a, d};
+      }
+      if (flipTile == Mesh::FLIP_N_ROTATE_ROW) {
+        uvPart = {a, 1.f - b, c, 1.f - b, c, 1.f - d, a, 1.f - d};
+      }
+      stl_util::concat(uvs, uvPart);
+      stl_util::concat(colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
+                                1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
+      stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f,
+                                 0.f, 0.f, -1.f});
+    }
+
+    if (partialBottomRow && partialRightCol) { // bottom right corner
+      stl_util::concat(positions, {halfWidth + adjustX, startY + adjustY, 0.f});
+      stl_util::concat(positions, {endX + adjustX, startY + adjustY, 0.f});
+      stl_util::concat(positions,
+                       {endX + adjustX, startY + offsetY + adjustY, 0.f});
+      stl_util::concat(positions,
+                       {halfWidth + adjustX, startY + offsetY + adjustY, 0.f});
+      stl_util::concat(indices, {index, index + 1, index + 3, index + 1,
+                                 index + 2, index + 3});
+      index += 4;
+      a      = 0.f;
+      b      = 1.f - offsetY / tileHeight;
+      c      = offsetX / tileWidth;
+      d      = 1.f;
+      uvPart = {a, b, c, b, c, d, a, d};
+      if (flipTile == Mesh::ROTATE_ROW
+          || (flipTile == Mesh::ROTATE_TILE && (tilesX % 2) == 0)) {
+        uvPart = {1.f - a, 1.f - b, 1.f - c, 1.f - b,
+                  1.f - c, 1.f - d, 1.f - a, 1.f - d};
+      }
+      if (flipTile == Mesh::FLIP_ROW
+          || (flipTile == Mesh::FLIP_TILE && (tilesX % 2) == 0)) {
+        uvPart = {1.f - a, b, 1.f - c, b, 1.f - c, d, 1.f - a, d};
+      }
+      if (flipTile == Mesh::FLIP_N_ROTATE_ROW
+          || (flipTile == Mesh::FLIP_N_ROTATE_TILE && (tilesX % 2) == 0)) {
+        uvPart = {a, 1.f - b, c, 1.f - b, c, 1.f - d, a, 1.f - d};
+      }
+      stl_util::concat(uvs, uvPart);
+      stl_util::concat(colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
+                                1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
+      stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f,
+                                 0.f, 0.f, -1.f});
+    }
+
+    if (partialTopRow && partialLeftCol) { // top left corner
+      stl_util::concat(positions,
+                       {startX + adjustX, halfHeight + adjustY, 0.f});
+      stl_util::concat(positions,
+                       {-halfWidth + adjustX, halfHeight + adjustY, 0.f});
+      stl_util::concat(positions, {-halfWidth + adjustX, endY + adjustY, 0.f});
+      stl_util::concat(positions, {startX + adjustX, endY + adjustY, 0.f});
+      stl_util::concat(indices, {index, index + 1, index + 3, index + 1,
+                                 index + 2, index + 3});
+      index += 4;
+      a      = 1.f - offsetX / tileWidth;
+      b      = 0.f;
+      c      = 1.f;
+      d      = offsetY / tileHeight;
+      uvPart = {a, b, c, b, c, d, a, d};
+      if ((flipTile == Mesh::ROTATE_ROW && (tilesY % 2) == 1)
+          || (flipTile == Mesh::ROTATE_TILE && (tilesY % 1) == 0)) {
+        uvPart = {1.f - a, 1.f - b, 1.f - c, 1.f - b,
+                  1.f - c, 1.f - d, 1.f - a, 1.f - d};
+      }
+      if ((flipTile == Mesh::FLIP_ROW && (tilesY % 2) == 1)
+          || (flipTile == Mesh::FLIP_TILE && (tilesY % 2) == 0)) {
+        uvPart = {1.f - a, b, 1.f - c, b, 1.f - c, d, 1.f - a, d};
+      }
+      if ((flipTile == Mesh::FLIP_N_ROTATE_ROW && (tilesY % 2) == 1)
+          || (flipTile == Mesh::FLIP_N_ROTATE_TILE && (tilesY % 2) == 0)) {
+        uvPart = {a, 1.f - b, c, 1.f - b, c, 1.f - d, a, 1.f - d};
+      }
+      stl_util::concat(uvs, uvPart);
+      stl_util::concat(colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
+                                1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
+      stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f,
+                                 0.f, 0.f, -1.f});
+    }
+
+    if (partialTopRow && partialRightCol) { // top right corner
+      stl_util::concat(positions,
+                       {halfWidth + adjustX, halfHeight + adjustY, 0.f});
+      stl_util::concat(positions, {endX + adjustX, halfHeight + adjustY, 0.f});
+      stl_util::concat(positions, {endX + adjustX, endY + adjustY, 0.f});
+      stl_util::concat(positions, {halfWidth + adjustX, endY + adjustY, 0.f});
+      stl_util::concat(indices, {index, index + 1, index + 3, index + 1,
+                                 index + 2, index + 3});
+      index += 4;
+      a      = 0.f;
+      b      = 0.f;
+      c      = offsetX / tileWidth;
+      d      = offsetY / tileHeight;
+      uvPart = {a, b, c, b, c, d, a, d};
+      if ((flipTile == Mesh::ROTATE_ROW && (tilesY % 2) == 1)
+          || (flipTile == Mesh::ROTATE_TILE && (tilesY + tilesX) % 2 == 1)) {
+        uvPart = {1.f - a, 1.f - b, 1.f - c, 1.f - b,
+                  1.f - c, 1.f - d, 1.f - a, 1.f - d};
+      }
+      if ((flipTile == Mesh::FLIP_ROW && (tilesY % 2) == 1)
+          || (flipTile == Mesh::FLIP_TILE && (tilesY + tilesX) % 2 == 1)) {
+        uvPart = {1.f - a, b, 1.f - c, b, 1.f - c, d, 1.f - a, d};
+      }
+      if ((flipTile == Mesh::FLIP_N_ROTATE_ROW && (tilesY % 2) == 1)
+          || (flipTile == Mesh::FLIP_N_ROTATE_TILE
+              && (tilesY + tilesX) % 2 == 1)) {
+        uvPart = {a, 1.f - b, c, 1.f - b, c, 1.f - d, a, 1.f - d};
+      }
+      stl_util::concat(uvs, uvPart);
+      stl_util::concat(colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
+                                1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
+      stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f,
+                                 0.f, 0.f, -1.f});
+    }
+
+    // part rows
+    if (partialBottomRow) {
+      std::array<Float32Array, 2> uvBaseBR;
+      a           = 0.f;
+      b           = 1.f - offsetY / tileHeight;
+      c           = 1.f;
+      d           = 1.f;
+      uvBaseBR[0] = {a, b, c, b, c, d, a, d};
+      uvBaseBR[1] = {a, b, c, b, c, d, a, d};
+      if (flipTile == Mesh::ROTATE_TILE || flipTile == Mesh::ROTATE_ROW) {
+        uvBaseBR[1] = {1.f - a, 1.f - b, 1.f - c, 1.f - b,
+                       1.f - c, 1.f - d, 1.f - a, 1.f - d};
+      }
+      if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::FLIP_ROW) {
+        uvBaseBR[1] = {1.f - a, b, 1.f - c, b, 1.f - c, d, 1.f - a, d};
+      }
+      if (flipTile == Mesh::FLIP_N_ROTATE_TILE
+          || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
+        uvBaseBR[1] = {a, 1.f - b, c, 1.f - b, c, 1.f - d, a, 1.f - d};
+      }
+      for (auto x = 0u; x < tilesX; ++x) {
+        stl_util::concat(positions, {-halfWidth + x * tileWidth + adjustX,
+                                     startY + adjustY, 0.f});
+        stl_util::concat(positions, {-halfWidth + (x + 1) * tileWidth + adjustX,
+                                     startY + adjustY, 0.f});
+        stl_util::concat(positions, {-halfWidth + (x + 1) * tileWidth + adjustX,
+                                     startY + offsetY + adjustY, 0.f});
+        stl_util::concat(positions, {-halfWidth + x * tileWidth + adjustX,
+                                     startY + offsetY + adjustY, 0.f});
+        stl_util::concat(indices, {index, index + 1, index + 3, index + 1,
+                                   index + 2, index + 3});
+        index += 4;
+        if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::ROTATE_TILE
+            || flipTile == Mesh::FLIP_N_ROTATE_TILE) {
+          stl_util::concat(uvs, uvBaseBR[(x + 1) % 2]);
+        }
+        else if (flipTile == Mesh::FLIP_ROW || flipTile == Mesh::ROTATE_ROW
+                 || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
+          stl_util::concat(uvs, uvBaseBR[1]);
+        }
+        else {
+          stl_util::concat(uvs, uvBaseBR[0]);
+        }
+        stl_util::concat(colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
+                                  1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
+        stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f,
+                                   -1.f, 0.f, 0.f, -1.f});
+      }
+    }
+
+    if (partialTopRow) {
+      std::array<Float32Array, 2> uvBaseTR;
+      a           = 0;
+      b           = 0;
+      c           = 1;
+      d           = offsetY / tileHeight;
+      uvBaseTR[0] = {a, b, c, b, c, d, a, d};
+      uvBaseTR[1] = {a, b, c, b, c, d, a, d};
+      if (flipTile == Mesh::ROTATE_TILE || flipTile == Mesh::ROTATE_ROW) {
+        uvBaseTR[1] = {1.f - a, 1.f - b, 1.f - c, 1.f - b,
+                       1.f - c, 1.f - d, 1.f - a, 1.f - d};
+      }
+      if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::FLIP_ROW) {
+        uvBaseTR[1] = {1.f - a, b, 1.f - c, b, 1.f - c, d, 1.f - a, d};
+      }
+      if (flipTile == Mesh::FLIP_N_ROTATE_TILE
+          || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
+        uvBaseTR[1] = {a, 1.f - b, c, 1.f - b, c, 1.f - d, a, 1.f - d};
+      }
+      for (auto x = 0u; x < tilesX; ++x) {
+        stl_util::concat(positions, {-halfWidth + x * tileWidth + adjustX,
+                                     endY - offsetY + adjustY, 0.f});
+        stl_util::concat(positions, {-halfWidth + (x + 1) * tileWidth + adjustX,
+                                     endY - offsetY + adjustY, 0.f});
+        stl_util::concat(positions, {-halfWidth + (x + 1) * tileWidth + adjustX,
+                                     endY + adjustY, 0.f});
+        stl_util::concat(positions, {-halfWidth + x * tileWidth + adjustX,
+                                     endY + adjustY, 0.f});
+        stl_util::concat(indices, {index, index + 1, index + 3, index + 1,
+                                   index + 2, index + 3});
+        index += 4;
+        if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::ROTATE_TILE
+            || flipTile == Mesh::FLIP_N_ROTATE_TILE) {
+          stl_util::concat(uvs, uvBaseTR[(x + tilesY) % 2]);
+        }
+        else if (flipTile == Mesh::FLIP_ROW || flipTile == Mesh::ROTATE_ROW
+                 || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
+          stl_util::concat(uvs, uvBaseTR[tilesY % 2]);
+        }
+        else {
+          stl_util::concat(uvs, uvBaseTR[0]);
+        }
+        stl_util::concat(colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
+                                  1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
+        stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f,
+                                   -1.f, 0.f, 0.f, -1.f});
+      }
+    }
+
+    if (partialLeftCol) {
+      std::array<Float32Array, 2> uvBaseLC;
+      a           = 1.f - offsetX / tileWidth;
+      b           = 0.f;
+      c           = 1.f;
+      d           = 1.f;
+      uvBaseLC[0] = {a, b, c, b, c, d, a, d};
+      uvBaseLC[1] = {a, b, c, b, c, d, a, d};
+      if (flipTile == Mesh::ROTATE_TILE || flipTile == Mesh::ROTATE_ROW) {
+        uvBaseLC[1] = {1.f - a, 1.f - b, 1.f - c, 1.f - b,
+                       1.f - c, 1.f - d, 1.f - a, 1.f - d};
+      }
+      if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::FLIP_ROW) {
+        uvBaseLC[1] = {1.f - a, b, 1.f - c, b, 1.f - c, d, 1.f - a, d};
+      }
+      if (flipTile == Mesh::FLIP_N_ROTATE_TILE
+          || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
+        uvBaseLC[1] = {a, 1.f - b, c, 1.f - b, c, 1.f - d, a, 1.f - d};
+      }
+      for (auto y = 0u; y < tilesY; y++) {
+        stl_util::concat(
+          positions,
+          {startX + adjustX, -halfHeight + y * tileHeight + adjustY, 0.f});
+        stl_util::concat(positions,
+                         {startX + offsetX + adjustX,
+                          -halfHeight + y * tileHeight + adjustY, 0.f});
+        stl_util::concat(positions,
+                         {startX + offsetX + adjustX,
+                          -halfHeight + (y + 1) * tileHeight + adjustY, 0.f});
+        stl_util::concat(positions,
+                         {startX + adjustX,
+                          -halfHeight + (y + 1) * tileHeight + adjustY, 0.f});
+        stl_util::concat(indices, {index, index + 1, index + 3, index + 1,
+                                   index + 2, index + 3});
+        index += 4;
+        if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::ROTATE_TILE
+            || flipTile == Mesh::FLIP_N_ROTATE_TILE) {
+          stl_util::concat(uvs, uvBaseLC[(y + 1) % 2]);
+        }
+        else if (flipTile == Mesh::FLIP_ROW || flipTile == Mesh::ROTATE_ROW
+                 || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
+          stl_util::concat(uvs, uvBaseLC[y % 2]);
+        }
+        else {
+          stl_util::concat(uvs, uvBaseLC[0]);
+        }
+        stl_util::concat(colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
+                                  1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
+        stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f,
+                                   -1.f, 0.f, 0.f, -1.f});
+      }
+    }
+
+    if (partialRightCol) {
+      std::array<Float32Array, 2> uvBaseRC;
+      a           = 0.f;
+      b           = 0.f;
+      c           = offsetX / tileHeight;
+      d           = 1.f;
+      uvBaseRC[0] = {a, b, c, b, c, d, a, d};
+      uvBaseRC[1] = {a, b, c, b, c, d, a, d};
+      if (flipTile == Mesh::ROTATE_TILE || flipTile == Mesh::ROTATE_ROW) {
+        uvBaseRC[1] = {1.f - a, 1.f - b, 1 - c,   1.f - b,
+                       1.f - c, 1 - d,   1.f - a, 1.f - d};
+      }
+      if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::FLIP_ROW) {
+        uvBaseRC[1] = {1.f - a, b, 1.f - c, b, 1.f - c, d, 1.f - a, d};
+      }
+      if (flipTile == Mesh::FLIP_N_ROTATE_TILE
+          || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
+        uvBaseRC[1] = {a, 1.f - b, c, 1.f - b, c, 1.f - d, a, 1.f - d};
+      }
+      for (auto y = 0u; y < tilesY; ++y) {
+        stl_util::concat(positions,
+                         {endX - offsetX + adjustX,
+                          -halfHeight + y * tileHeight + adjustY, 0.f});
+        stl_util::concat(
+          positions,
+          {endX + adjustX, -halfHeight + y * tileHeight + adjustY, 0.f});
+        stl_util::concat(
+          positions,
+          {endX + adjustX, -halfHeight + (y + 1) * tileHeight + adjustY, 0.f});
+        stl_util::concat(positions,
+                         {endX - offsetX + adjustX,
+                          -halfHeight + (y + 1) * tileHeight + adjustY, 0.f});
+        stl_util::concat(indices, {index, index + 1, index + 3, index + 1,
+                                   index + 2, index + 3});
+        index += 4;
+        if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::ROTATE_TILE
+            || flipTile == Mesh::FLIP_N_ROTATE_TILE) {
+          stl_util::concat(uvs, uvBaseRC[(y + tilesX) % 2]);
+        }
+        else if (flipTile == Mesh::FLIP_ROW || flipTile == Mesh::ROTATE_ROW
+                 || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
+          stl_util::concat(uvs, uvBaseRC[y % 2]);
+        }
+        else {
+          stl_util::concat(uvs, uvBaseRC[0]);
+        }
+        stl_util::concat(colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
+                                  1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
+        stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f,
+                                   -1.f, 0.f, 0.f, -1.f});
+      }
+    }
+  }
+
+  const auto sideOrientation
+    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
+
+  // sides
+  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs,
+                            options.frontUVs, options.backUVs);
+
+  // Result
+  auto vertexData = std::make_unique<VertexData>();
+
+  vertexData->indices   = std::move(indices);
+  vertexData->positions = std::move(positions);
+  vertexData->normals   = std::move(normals);
+  vertexData->uvs       = std::move(uvs);
+
+  if (sideOrientation == VertexData::DOUBLESIDE) {
+    stl_util::concat(colors, colors);
+  }
+  vertexData->colors = std::move(colors);
+
+  return vertexData;
+}
+
 std::unique_ptr<VertexData> VertexData::CreateSphere(SphereOptions& options)
 {
   const auto segments = options.segments.value_or(32);
@@ -2639,714 +3347,6 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
   if (!faceColors.empty() && flat) {
     vertexData->colors = std::move(colors);
   }
-  return vertexData;
-}
-
-std::unique_ptr<VertexData> VertexData::CreateTiledBox(TiledBoxOptions& options)
-{
-  const auto nbFaces = 6u;
-
-  const auto& faceUV     = options.faceUV;
-  const auto& faceColors = options.faceColors;
-
-  const auto flipTile = options.pattern.value_or(Mesh::NO_FLIP);
-
-  const auto width     = options.width.value_or(options.size.value_or(1.f));
-  const auto height    = options.height.value_or(options.size.value_or(1.f));
-  const auto depth     = options.depth.value_or(options.size.value_or(1.f));
-  const auto tileWidth = options.tileWidth || options.tileSize || 1;
-  const auto tileHeight
-    = options.tileHeight.value_or(options.tileSize.value_or(1.f));
-  const auto alignH = options.alignHorizontal.value_or(0u);
-  const auto alignV = options.alignVertical.value_or(0u);
-
-  const auto sideOrientation
-    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
-
-  const auto halfWidth  = width / 2.f;
-  const auto halfHeight = height / 2.f;
-  const auto halfDepth  = depth / 2.f;
-
-  std::vector<std::unique_ptr<VertexData>> faceVertexData;
-
-  for (auto f = 0; f < 2; ++f) { // front and back
-    TiledPlaneOptions options;
-    options.pattern         = flipTile;
-    options.tileWidth       = tileWidth;
-    options.tileHeight      = tileHeight;
-    options.width           = width;
-    options.height          = height;
-    options.alignVertical   = alignV;
-    options.alignHorizontal = alignH;
-    options.sideOrientation = sideOrientation;
-    faceVertexData.emplace_back(VertexData::CreateTiledPlane(options));
-  }
-
-  for (auto f = 2; f < 4; ++f) { // sides
-    TiledPlaneOptions options;
-    options.pattern         = flipTile;
-    options.tileWidth       = tileWidth;
-    options.tileHeight      = tileHeight;
-    options.width           = depth;
-    options.height          = height;
-    options.alignVertical   = alignV;
-    options.alignHorizontal = alignH;
-    options.sideOrientation = sideOrientation;
-    faceVertexData.emplace_back(VertexData::CreateTiledPlane(options));
-  }
-
-  auto baseAlignV = alignV;
-  if (alignV == Mesh::BOTTOM) {
-    baseAlignV = Mesh::TOP;
-  }
-  else if (alignV == Mesh::TOP) {
-    baseAlignV = Mesh::BOTTOM;
-  }
-
-  for (auto f = 4; f < 6; ++f) { // top and bottom
-    TiledPlaneOptions options;
-    options.pattern         = flipTile;
-    options.tileWidth       = tileWidth;
-    options.tileHeight      = tileHeight;
-    options.width           = width;
-    options.height          = depth;
-    options.alignVertical   = baseAlignV;
-    options.alignHorizontal = alignH;
-    options.sideOrientation = sideOrientation;
-    faceVertexData.emplace_back(VertexData::CreateTiledPlane(options));
-  }
-
-  Float32Array positions;
-  Float32Array normals;
-  Float32Array uvs;
-  Uint32Array indices;
-  Float32Array colors;
-  std::vector<std::vector<Vector3>> facePositions;
-  std::vector<std::vector<Vector3>> faceNormals;
-
-  std::vector<Float32Array> newFaceUV;
-  auto lu = 0ull;
-
-  auto li = 0u;
-
-  for (auto f = 0u; f < nbFaces; ++f) {
-    const auto len = faceVertexData[f]->positions.size();
-    facePositions.emplace_back(std::vector<Vector3>{});
-    faceNormals.emplace_back(std::vector<Vector3>{});
-    for (auto p = 0u; p < len / 3; ++p) {
-      stl_util::concat(facePositions[f],
-                       {Vector3(faceVertexData[f]->positions[3 * p],
-                                faceVertexData[f]->positions[3 * p + 1],
-                                faceVertexData[f]->positions[3 * p + 2])});
-      stl_util::concat(faceNormals[f],
-                       {Vector3(faceVertexData[f]->normals[3 * p],
-                                faceVertexData[f]->normals[3 * p + 1],
-                                faceVertexData[f]->normals[3 * p + 2])});
-    }
-    // uvs
-    lu = faceVertexData[f]->uvs.size();
-    newFaceUV.emplace_back(Float32Array{});
-    for (auto i = 0u; i < lu; i += 2) {
-      stl_util::concat(
-        newFaceUV[f],
-        {faceUV[f].x + (faceUV[f].z - faceUV[f].x) * faceVertexData[f]->uvs[i],
-         faceUV[f].y
-           + (faceUV[f].w - faceUV[f].y) * faceVertexData[f]->uvs[i + 1]});
-    }
-    stl_util::concat(uvs, newFaceUV[f]);
-    for (const auto x : faceVertexData[f]->indices) {
-      indices.emplace_back(x + li);
-    }
-    li += facePositions[f].size();
-    if (!faceColors.empty()) {
-      for (auto c = 0; c < 4; c++) {
-        stl_util::concat(colors, {faceColors[f].r, faceColors[f].g,
-                                  faceColors[f].b, faceColors[f].a});
-      }
-    }
-  }
-
-  Vector3 vec0{0.f, 0.f, halfDepth};
-  const auto mtrx0 = Matrix::RotationY(Math::PI);
-  for (const auto& entry : facePositions[0]) {
-    const auto entryTmp = Vector3::TransformNormal(entry, mtrx0).add(vec0);
-    stl_util::concat(positions, {entryTmp.x, entryTmp.y, entryTmp.z});
-  }
-  for (const auto& entry : faceNormals[0]) {
-    const auto entryTmp = Vector3::TransformNormal(entry, mtrx0);
-    stl_util::concat(normals, {entryTmp.x, entryTmp.y, entryTmp.z});
-  }
-  for (const auto& entry : facePositions[1]) {
-    const auto entryTmp = entry.subtract(vec0);
-    stl_util::concat(positions, {entryTmp.x, entryTmp.y, entryTmp.z});
-  }
-  for (const auto& entry : faceNormals[1]) {
-    stl_util::concat(normals, {entry.x, entry.y, entry.z});
-  }
-
-  Vector3 vec2{halfWidth, 0.f, 0.f};
-  const auto mtrx2 = Matrix::RotationY(-Math::PI_2);
-  for (const auto& entry : facePositions[2]) {
-    const auto entryTmp = Vector3::TransformNormal(entry, mtrx2).add(vec2);
-    stl_util::concat(positions, {entryTmp.x, entryTmp.y, entryTmp.z});
-  }
-  for (const auto& entry : faceNormals[2]) {
-    const auto entryTmp = Vector3::TransformNormal(entry, mtrx2);
-    stl_util::concat(normals, {entryTmp.x, entryTmp.y, entryTmp.z});
-  }
-  const auto mtrx3 = Matrix::RotationY(Math::PI_2);
-  for (const auto& entry : facePositions[3]) {
-    const auto entryTmp = Vector3::TransformNormal(entry, mtrx3).subtract(vec2);
-    stl_util::concat(positions, {entryTmp.x, entryTmp.y, entryTmp.z});
-  }
-  for (const auto& entry : faceNormals[3]) {
-    const auto entryTmp = Vector3::TransformNormal(entry, mtrx3);
-    stl_util::concat(normals, {entryTmp.x, entryTmp.y, entryTmp.z});
-  }
-
-  Vector3 vec4{0.f, halfHeight, 0.f};
-  const auto mtrx4 = Matrix::RotationX(Math::PI_2);
-  for (const auto& entry : facePositions[4]) {
-    const auto entryTmp = Vector3::TransformNormal(entry, mtrx4).add(vec4);
-    stl_util::concat(positions, {entryTmp.x, entryTmp.y, entryTmp.z});
-  }
-  for (const auto& entry : faceNormals[4]) {
-    const auto entryTmp = Vector3::TransformNormal(entry, mtrx4);
-    stl_util::concat(normals, {entryTmp.x, entryTmp.y, entryTmp.z});
-  }
-  const auto mtrx5 = Matrix::RotationX(-Math::PI_2);
-  for (const auto& entry : facePositions[5]) {
-    const auto entryTmp = Vector3::TransformNormal(entry, mtrx5).subtract(vec4);
-    stl_util::concat(positions, {entryTmp.x, entryTmp.y, entryTmp.z});
-  }
-  for (const auto& entry : faceNormals[5]) {
-    const auto entryTmp = Vector3::TransformNormal(entry, mtrx5);
-    stl_util::concat(normals, {entryTmp.x, entryTmp.y, entryTmp.z});
-  }
-
-  // sides
-  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs);
-
-  // Result
-  auto vertexData = std::make_unique<VertexData>();
-
-  vertexData->indices   = std::move(indices);
-  vertexData->positions = std::move(positions);
-  vertexData->normals   = std::move(normals);
-  vertexData->uvs       = std::move(uvs);
-
-  if (!faceColors.empty()) {
-    if (sideOrientation == VertexData::DOUBLESIDE) {
-      stl_util::concat(colors, colors);
-    }
-    vertexData->colors = std::move(colors);
-  }
-
-  return vertexData;
-}
-
-std::unique_ptr<VertexData>
-VertexData::CreateTiledPlane(TiledPlaneOptions& options)
-{
-  const auto flipTile = options.pattern.value_or(Mesh::NO_FLIP);
-  const auto tileWidth
-    = options.tileWidth.value_or(options.tileSize.value_or(1.f));
-  const auto tileHeight
-    = options.tileHeight.value_or(options.tileSize.value_or(1.f));
-  const auto alignH = options.alignHorizontal.value_or(0u);
-  const auto alignV = options.alignVertical.value_or(0u);
-
-  const auto width  = options.width.value_or(options.size.value_or(1.f));
-  const auto tilesX = static_cast<unsigned>(std::floor(width / tileWidth));
-  auto offsetX      = width - tilesX * tileWidth;
-
-  const auto height = options.height.value_or(options.size.value_or(1.f));
-  const auto tilesY = static_cast<unsigned>(std::floor(height / tileHeight));
-  auto offsetY      = height - tilesY * tileHeight;
-
-  const auto halfWidth  = tileWidth * tilesX / 2.f;
-  const auto halfHeight = tileHeight * tilesY / 2.f;
-
-  auto adjustX = 0.f;
-  auto adjustY = 0.f;
-  auto startX  = 0.f;
-  auto startY  = 0.f;
-  auto endX    = 0.f;
-  auto endY    = 0.f;
-
-  // Part Tiles
-  if (offsetX > 0 || offsetY > 0) {
-    startX    = -halfWidth;
-    startY    = -halfHeight;
-    auto endX = halfWidth;
-    auto endY = halfHeight;
-
-    switch (alignH) {
-      case Mesh::CENTER:
-        offsetX /= 2.f;
-        startX -= offsetX;
-        endX += offsetX;
-        break;
-      case Mesh::LEFT:
-        endX += offsetX;
-        adjustX = -offsetX / 2.f;
-        break;
-      case Mesh::RIGHT:
-        startX -= offsetX;
-        adjustX = offsetX / 2.f;
-        break;
-    }
-
-    switch (alignV) {
-      case Mesh::CENTER:
-        offsetY /= 2.f;
-        startY -= offsetY;
-        endY += offsetY;
-        break;
-      case Mesh::BOTTOM:
-        endY += offsetY;
-        adjustY = -offsetY / 2.f;
-        break;
-      case Mesh::TOP:
-        startY -= offsetY;
-        adjustY = offsetY / 2.f;
-        break;
-    }
-  }
-
-  Float32Array positions;
-  Float32Array normals;
-  std::array<Float32Array, 2> uvBase;
-  uvBase[0] = {0.f, 0.f, 1.f, 0.f, 1.f, 1.f, 0.f, 1.f};
-  uvBase[1] = {0.f, 0.f, 1.f, 0.f, 1.f, 1.f, 0.f, 1.f};
-  if (flipTile == Mesh::ROTATE_TILE || flipTile == Mesh::ROTATE_ROW) {
-    uvBase[1] = {1.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f};
-  }
-  if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::FLIP_ROW) {
-    uvBase[1] = {1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 1.f, 1.f};
-  }
-  if (flipTile == Mesh::FLIP_N_ROTATE_TILE
-      || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
-    uvBase[1] = {0.f, 1.f, 1.f, 1.f, 1.f, 0.f, 0.f, 0.f};
-  }
-  Float32Array uvs;
-  Float32Array colors;
-  Uint32Array indices;
-  auto index = 0u;
-  for (auto y = 0u; y < tilesY; ++y) {
-    for (auto x = 0u; x < tilesX; ++x) {
-      stl_util::concat(positions,
-                       {-halfWidth + x * tileWidth + adjustX,
-                        -halfHeight + y * tileHeight + adjustY, 0.f});
-      stl_util::concat(positions,
-                       {-halfWidth + (x + 1) * tileWidth + adjustX,
-                        -halfHeight + y * tileHeight + adjustY, 0.f});
-      stl_util::concat(positions,
-                       {-halfWidth + (x + 1) * tileWidth + adjustX,
-                        -halfHeight + (y + 1) * tileHeight + adjustY, 0.f});
-      stl_util::concat(positions,
-                       {-halfWidth + x * tileWidth + adjustX,
-                        -halfHeight + (y + 1) * tileHeight + adjustY, 0.f});
-      stl_util::concat(indices, {index, index + 1, index + 3, index + 1,
-                                 index + 2, index + 3});
-      if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::ROTATE_TILE
-          || flipTile == Mesh::FLIP_N_ROTATE_TILE) {
-        stl_util::concat(uvs, uvBase[(x % 2 + y % 2) % 2]);
-      }
-      else if (flipTile == Mesh::FLIP_ROW || flipTile == Mesh::ROTATE_ROW
-               || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
-        stl_util::concat(uvs, uvBase[y % 2]);
-      }
-      else {
-        stl_util::concat(uvs, uvBase[0]);
-      }
-      stl_util::concat(colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
-                                1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
-      stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f,
-                                 0.f, 0.f, -1.f});
-      index += 4;
-    }
-  }
-
-  // Part Tiles
-  if (offsetX > 0 || offsetY > 0) {
-
-    const auto partialBottomRow
-      = (offsetY > 0 && (alignV == Mesh::CENTER || alignV == Mesh::TOP));
-    const auto partialTopRow
-      = (offsetY > 0 && (alignV == Mesh::CENTER || alignV == Mesh::BOTTOM));
-    const auto partialLeftCol
-      = (offsetX > 0 && (alignH == Mesh::CENTER || alignH == Mesh::RIGHT));
-    const auto partialRightCol
-      = (offsetX > 0 && (alignH == Mesh::CENTER || alignH == Mesh::LEFT));
-    Float32Array uvPart;
-    auto a = 0.f, b = 0.f, c = 0.f, d = 0.f;
-
-    // corners
-    if (partialBottomRow && partialLeftCol) { // bottom left corner
-      stl_util::concat(positions, {startX + adjustX, startY + adjustY, 0.f});
-      stl_util::concat(positions,
-                       {-halfWidth + adjustX, startY + adjustY, 0.f});
-      stl_util::concat(positions,
-                       {-halfWidth + adjustX, startY + offsetY + adjustY, 0.f});
-      stl_util::concat(positions,
-                       {startX + adjustX, startY + offsetY + adjustY, 0.f});
-      stl_util::concat(indices, {index, index + 1, index + 3, index + 1,
-                                 index + 2, index + 3});
-      index += 4;
-      a      = 1.f - offsetX / tileWidth;
-      b      = 1.f - offsetY / tileHeight;
-      c      = 1.f;
-      d      = 1.f;
-      uvPart = {a, b, c, b, c, d, a, d};
-      if (flipTile == Mesh::ROTATE_ROW) {
-        uvPart = {1.f - a, 1.f - b, 1.f - c, 1.f - b,
-                  1.f - c, 1.f - d, 1.f - a, 1.f - d};
-      }
-      if (flipTile == Mesh::FLIP_ROW) {
-        uvPart = {1.f - a, b, 1.f - c, b, 1.f - c, d, 1.f - a, d};
-      }
-      if (flipTile == Mesh::FLIP_N_ROTATE_ROW) {
-        uvPart = {a, 1.f - b, c, 1.f - b, c, 1.f - d, a, 1.f - d};
-      }
-      stl_util::concat(uvs, uvPart);
-      stl_util::concat(colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
-                                1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
-      stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f,
-                                 0.f, 0.f, -1.f});
-    }
-
-    if (partialBottomRow && partialRightCol) { // bottom right corner
-      stl_util::concat(positions, {halfWidth + adjustX, startY + adjustY, 0.f});
-      stl_util::concat(positions, {endX + adjustX, startY + adjustY, 0.f});
-      stl_util::concat(positions,
-                       {endX + adjustX, startY + offsetY + adjustY, 0.f});
-      stl_util::concat(positions,
-                       {halfWidth + adjustX, startY + offsetY + adjustY, 0.f});
-      stl_util::concat(indices, {index, index + 1, index + 3, index + 1,
-                                 index + 2, index + 3});
-      index += 4;
-      a      = 0.f;
-      b      = 1.f - offsetY / tileHeight;
-      c      = offsetX / tileWidth;
-      d      = 1.f;
-      uvPart = {a, b, c, b, c, d, a, d};
-      if (flipTile == Mesh::ROTATE_ROW
-          || (flipTile == Mesh::ROTATE_TILE && (tilesX % 2) == 0)) {
-        uvPart = {1.f - a, 1.f - b, 1.f - c, 1.f - b,
-                  1.f - c, 1.f - d, 1.f - a, 1.f - d};
-      }
-      if (flipTile == Mesh::FLIP_ROW
-          || (flipTile == Mesh::FLIP_TILE && (tilesX % 2) == 0)) {
-        uvPart = {1.f - a, b, 1.f - c, b, 1.f - c, d, 1.f - a, d};
-      }
-      if (flipTile == Mesh::FLIP_N_ROTATE_ROW
-          || (flipTile == Mesh::FLIP_N_ROTATE_TILE && (tilesX % 2) == 0)) {
-        uvPart = {a, 1.f - b, c, 1.f - b, c, 1.f - d, a, 1.f - d};
-      }
-      stl_util::concat(uvs, uvPart);
-      stl_util::concat(colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
-                                1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
-      stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f,
-                                 0.f, 0.f, -1.f});
-    }
-
-    if (partialTopRow && partialLeftCol) { // top left corner
-      stl_util::concat(positions,
-                       {startX + adjustX, halfHeight + adjustY, 0.f});
-      stl_util::concat(positions,
-                       {-halfWidth + adjustX, halfHeight + adjustY, 0.f});
-      stl_util::concat(positions, {-halfWidth + adjustX, endY + adjustY, 0.f});
-      stl_util::concat(positions, {startX + adjustX, endY + adjustY, 0.f});
-      stl_util::concat(indices, {index, index + 1, index + 3, index + 1,
-                                 index + 2, index + 3});
-      index += 4;
-      a      = 1.f - offsetX / tileWidth;
-      b      = 0.f;
-      c      = 1.f;
-      d      = offsetY / tileHeight;
-      uvPart = {a, b, c, b, c, d, a, d};
-      if ((flipTile == Mesh::ROTATE_ROW && (tilesY % 2) == 1)
-          || (flipTile == Mesh::ROTATE_TILE && (tilesY % 1) == 0)) {
-        uvPart = {1.f - a, 1.f - b, 1.f - c, 1.f - b,
-                  1.f - c, 1.f - d, 1.f - a, 1.f - d};
-      }
-      if ((flipTile == Mesh::FLIP_ROW && (tilesY % 2) == 1)
-          || (flipTile == Mesh::FLIP_TILE && (tilesY % 2) == 0)) {
-        uvPart = {1.f - a, b, 1.f - c, b, 1.f - c, d, 1.f - a, d};
-      }
-      if ((flipTile == Mesh::FLIP_N_ROTATE_ROW && (tilesY % 2) == 1)
-          || (flipTile == Mesh::FLIP_N_ROTATE_TILE && (tilesY % 2) == 0)) {
-        uvPart = {a, 1.f - b, c, 1.f - b, c, 1.f - d, a, 1.f - d};
-      }
-      stl_util::concat(uvs, uvPart);
-      stl_util::concat(colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
-                                1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
-      stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f,
-                                 0.f, 0.f, -1.f});
-    }
-
-    if (partialTopRow && partialRightCol) { // top right corner
-      stl_util::concat(positions,
-                       {halfWidth + adjustX, halfHeight + adjustY, 0.f});
-      stl_util::concat(positions, {endX + adjustX, halfHeight + adjustY, 0.f});
-      stl_util::concat(positions, {endX + adjustX, endY + adjustY, 0.f});
-      stl_util::concat(positions, {halfWidth + adjustX, endY + adjustY, 0.f});
-      stl_util::concat(indices, {index, index + 1, index + 3, index + 1,
-                                 index + 2, index + 3});
-      index += 4;
-      a      = 0.f;
-      b      = 0.f;
-      c      = offsetX / tileWidth;
-      d      = offsetY / tileHeight;
-      uvPart = {a, b, c, b, c, d, a, d};
-      if ((flipTile == Mesh::ROTATE_ROW && (tilesY % 2) == 1)
-          || (flipTile == Mesh::ROTATE_TILE && (tilesY + tilesX) % 2 == 1)) {
-        uvPart = {1.f - a, 1.f - b, 1.f - c, 1.f - b,
-                  1.f - c, 1.f - d, 1.f - a, 1.f - d};
-      }
-      if ((flipTile == Mesh::FLIP_ROW && (tilesY % 2) == 1)
-          || (flipTile == Mesh::FLIP_TILE && (tilesY + tilesX) % 2 == 1)) {
-        uvPart = {1.f - a, b, 1.f - c, b, 1.f - c, d, 1.f - a, d};
-      }
-      if ((flipTile == Mesh::FLIP_N_ROTATE_ROW && (tilesY % 2) == 1)
-          || (flipTile == Mesh::FLIP_N_ROTATE_TILE
-              && (tilesY + tilesX) % 2 == 1)) {
-        uvPart = {a, 1.f - b, c, 1.f - b, c, 1.f - d, a, 1.f - d};
-      }
-      stl_util::concat(uvs, uvPart);
-      stl_util::concat(colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
-                                1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
-      stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f,
-                                 0.f, 0.f, -1.f});
-    }
-
-    // part rows
-    if (partialBottomRow) {
-      std::array<Float32Array, 2> uvBaseBR;
-      a           = 0.f;
-      b           = 1.f - offsetY / tileHeight;
-      c           = 1.f;
-      d           = 1.f;
-      uvBaseBR[0] = {a, b, c, b, c, d, a, d};
-      uvBaseBR[1] = {a, b, c, b, c, d, a, d};
-      if (flipTile == Mesh::ROTATE_TILE || flipTile == Mesh::ROTATE_ROW) {
-        uvBaseBR[1] = {1.f - a, 1.f - b, 1.f - c, 1.f - b,
-                       1.f - c, 1.f - d, 1.f - a, 1.f - d};
-      }
-      if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::FLIP_ROW) {
-        uvBaseBR[1] = {1.f - a, b, 1.f - c, b, 1.f - c, d, 1.f - a, d};
-      }
-      if (flipTile == Mesh::FLIP_N_ROTATE_TILE
-          || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
-        uvBaseBR[1] = {a, 1.f - b, c, 1.f - b, c, 1.f - d, a, 1.f - d};
-      }
-      for (auto x = 0u; x < tilesX; ++x) {
-        stl_util::concat(positions, {-halfWidth + x * tileWidth + adjustX,
-                                     startY + adjustY, 0.f});
-        stl_util::concat(positions, {-halfWidth + (x + 1) * tileWidth + adjustX,
-                                     startY + adjustY, 0.f});
-        stl_util::concat(positions, {-halfWidth + (x + 1) * tileWidth + adjustX,
-                                     startY + offsetY + adjustY, 0.f});
-        stl_util::concat(positions, {-halfWidth + x * tileWidth + adjustX,
-                                     startY + offsetY + adjustY, 0.f});
-        stl_util::concat(indices, {index, index + 1, index + 3, index + 1,
-                                   index + 2, index + 3});
-        index += 4;
-        if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::ROTATE_TILE
-            || flipTile == Mesh::FLIP_N_ROTATE_TILE) {
-          stl_util::concat(uvs, uvBaseBR[(x + 1) % 2]);
-        }
-        else if (flipTile == Mesh::FLIP_ROW || flipTile == Mesh::ROTATE_ROW
-                 || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
-          stl_util::concat(uvs, uvBaseBR[1]);
-        }
-        else {
-          stl_util::concat(uvs, uvBaseBR[0]);
-        }
-        stl_util::concat(colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
-                                  1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
-        stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f,
-                                   -1.f, 0.f, 0.f, -1.f});
-      }
-    }
-
-    if (partialTopRow) {
-      std::array<Float32Array, 2> uvBaseTR;
-      a           = 0;
-      b           = 0;
-      c           = 1;
-      d           = offsetY / tileHeight;
-      uvBaseTR[0] = {a, b, c, b, c, d, a, d};
-      uvBaseTR[1] = {a, b, c, b, c, d, a, d};
-      if (flipTile == Mesh::ROTATE_TILE || flipTile == Mesh::ROTATE_ROW) {
-        uvBaseTR[1] = {1.f - a, 1.f - b, 1.f - c, 1.f - b,
-                       1.f - c, 1.f - d, 1.f - a, 1.f - d};
-      }
-      if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::FLIP_ROW) {
-        uvBaseTR[1] = {1.f - a, b, 1.f - c, b, 1.f - c, d, 1.f - a, d};
-      }
-      if (flipTile == Mesh::FLIP_N_ROTATE_TILE
-          || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
-        uvBaseTR[1] = {a, 1.f - b, c, 1.f - b, c, 1.f - d, a, 1.f - d};
-      }
-      for (auto x = 0u; x < tilesX; ++x) {
-        stl_util::concat(positions, {-halfWidth + x * tileWidth + adjustX,
-                                     endY - offsetY + adjustY, 0.f});
-        stl_util::concat(positions, {-halfWidth + (x + 1) * tileWidth + adjustX,
-                                     endY - offsetY + adjustY, 0.f});
-        stl_util::concat(positions, {-halfWidth + (x + 1) * tileWidth + adjustX,
-                                     endY + adjustY, 0.f});
-        stl_util::concat(positions, {-halfWidth + x * tileWidth + adjustX,
-                                     endY + adjustY, 0.f});
-        stl_util::concat(indices, {index, index + 1, index + 3, index + 1,
-                                   index + 2, index + 3});
-        index += 4;
-        if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::ROTATE_TILE
-            || flipTile == Mesh::FLIP_N_ROTATE_TILE) {
-          stl_util::concat(uvs, uvBaseTR[(x + tilesY) % 2]);
-        }
-        else if (flipTile == Mesh::FLIP_ROW || flipTile == Mesh::ROTATE_ROW
-                 || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
-          stl_util::concat(uvs, uvBaseTR[tilesY % 2]);
-        }
-        else {
-          stl_util::concat(uvs, uvBaseTR[0]);
-        }
-        stl_util::concat(colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
-                                  1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
-        stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f,
-                                   -1.f, 0.f, 0.f, -1.f});
-      }
-    }
-
-    if (partialLeftCol) {
-      std::array<Float32Array, 2> uvBaseLC;
-      a           = 1.f - offsetX / tileWidth;
-      b           = 0.f;
-      c           = 1.f;
-      d           = 1.f;
-      uvBaseLC[0] = {a, b, c, b, c, d, a, d};
-      uvBaseLC[1] = {a, b, c, b, c, d, a, d};
-      if (flipTile == Mesh::ROTATE_TILE || flipTile == Mesh::ROTATE_ROW) {
-        uvBaseLC[1] = {1.f - a, 1.f - b, 1.f - c, 1.f - b,
-                       1.f - c, 1.f - d, 1.f - a, 1.f - d};
-      }
-      if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::FLIP_ROW) {
-        uvBaseLC[1] = {1.f - a, b, 1.f - c, b, 1.f - c, d, 1.f - a, d};
-      }
-      if (flipTile == Mesh::FLIP_N_ROTATE_TILE
-          || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
-        uvBaseLC[1] = {a, 1.f - b, c, 1.f - b, c, 1.f - d, a, 1.f - d};
-      }
-      for (auto y = 0u; y < tilesY; y++) {
-        stl_util::concat(
-          positions,
-          {startX + adjustX, -halfHeight + y * tileHeight + adjustY, 0.f});
-        stl_util::concat(positions,
-                         {startX + offsetX + adjustX,
-                          -halfHeight + y * tileHeight + adjustY, 0.f});
-        stl_util::concat(positions,
-                         {startX + offsetX + adjustX,
-                          -halfHeight + (y + 1) * tileHeight + adjustY, 0.f});
-        stl_util::concat(positions,
-                         {startX + adjustX,
-                          -halfHeight + (y + 1) * tileHeight + adjustY, 0.f});
-        stl_util::concat(indices, {index, index + 1, index + 3, index + 1,
-                                   index + 2, index + 3});
-        index += 4;
-        if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::ROTATE_TILE
-            || flipTile == Mesh::FLIP_N_ROTATE_TILE) {
-          stl_util::concat(uvs, uvBaseLC[(y + 1) % 2]);
-        }
-        else if (flipTile == Mesh::FLIP_ROW || flipTile == Mesh::ROTATE_ROW
-                 || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
-          stl_util::concat(uvs, uvBaseLC[y % 2]);
-        }
-        else {
-          stl_util::concat(uvs, uvBaseLC[0]);
-        }
-        stl_util::concat(colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
-                                  1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
-        stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f,
-                                   -1.f, 0.f, 0.f, -1.f});
-      }
-    }
-
-    if (partialRightCol) {
-      std::array<Float32Array, 2> uvBaseRC;
-      a           = 0.f;
-      b           = 0.f;
-      c           = offsetX / tileHeight;
-      d           = 1.f;
-      uvBaseRC[0] = {a, b, c, b, c, d, a, d};
-      uvBaseRC[1] = {a, b, c, b, c, d, a, d};
-      if (flipTile == Mesh::ROTATE_TILE || flipTile == Mesh::ROTATE_ROW) {
-        uvBaseRC[1] = {1.f - a, 1.f - b, 1 - c,   1.f - b,
-                       1.f - c, 1 - d,   1.f - a, 1.f - d};
-      }
-      if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::FLIP_ROW) {
-        uvBaseRC[1] = {1.f - a, b, 1.f - c, b, 1.f - c, d, 1.f - a, d};
-      }
-      if (flipTile == Mesh::FLIP_N_ROTATE_TILE
-          || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
-        uvBaseRC[1] = {a, 1.f - b, c, 1.f - b, c, 1.f - d, a, 1.f - d};
-      }
-      for (auto y = 0u; y < tilesY; ++y) {
-        stl_util::concat(positions,
-                         {endX - offsetX + adjustX,
-                          -halfHeight + y * tileHeight + adjustY, 0.f});
-        stl_util::concat(
-          positions,
-          {endX + adjustX, -halfHeight + y * tileHeight + adjustY, 0.f});
-        stl_util::concat(
-          positions,
-          {endX + adjustX, -halfHeight + (y + 1) * tileHeight + adjustY, 0.f});
-        stl_util::concat(positions,
-                         {endX - offsetX + adjustX,
-                          -halfHeight + (y + 1) * tileHeight + adjustY, 0.f});
-        stl_util::concat(indices, {index, index + 1, index + 3, index + 1,
-                                   index + 2, index + 3});
-        index += 4;
-        if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::ROTATE_TILE
-            || flipTile == Mesh::FLIP_N_ROTATE_TILE) {
-          stl_util::concat(uvs, uvBaseRC[(y + tilesX) % 2]);
-        }
-        else if (flipTile == Mesh::FLIP_ROW || flipTile == Mesh::ROTATE_ROW
-                 || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
-          stl_util::concat(uvs, uvBaseRC[y % 2]);
-        }
-        else {
-          stl_util::concat(uvs, uvBaseRC[0]);
-        }
-        stl_util::concat(colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
-                                  1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
-        stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f,
-                                   -1.f, 0.f, 0.f, -1.f});
-      }
-    }
-  }
-
-  const auto sideOrientation
-    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
-
-  // sides
-  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs,
-                            options.frontUVs, options.backUVs);
-
-  // Result
-  auto vertexData = std::make_unique<VertexData>();
-
-  vertexData->indices   = std::move(indices);
-  vertexData->positions = std::move(positions);
-  vertexData->normals   = std::move(normals);
-  vertexData->uvs       = std::move(uvs);
-
-  if (sideOrientation == VertexData::DOUBLESIDE) {
-    stl_util::concat(colors, colors);
-  }
-  vertexData->colors = std::move(colors);
-
   return vertexData;
 }
 

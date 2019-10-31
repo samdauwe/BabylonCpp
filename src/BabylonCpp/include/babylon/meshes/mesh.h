@@ -188,6 +188,9 @@ public:
   }
   ~Mesh() override;
 
+  // Methods
+  TransformNodePtr instantiateHierarychy(TransformNode* newParent = nullptr);
+
   /**
    * @brief Gets the class name.
    * @returns the string "Mesh".
@@ -304,6 +307,7 @@ public:
    * @param kind defines which buffer to read from (positions, indices, normals,
    * etc). Possible `kind` values :
    * - VertexBuffer.PositionKind
+   * - VertexBuffer.NormalKind
    * - VertexBuffer.UVKind
    * - VertexBuffer.UV2Kind
    * - VertexBuffer.UV3Kind
@@ -325,6 +329,7 @@ public:
    * @param kind defines which buffer to check (positions, indices, normals,
    * etc). Possible `kind` values :
    * - VertexBuffer.PositionKind
+   * - VertexBuffer.NormalKind
    * - VertexBuffer.UVKind
    * - VertexBuffer.UV2Kind
    * - VertexBuffer.UV3Kind
@@ -367,6 +372,7 @@ public:
    * @param kind defines which buffer to read from (positions, indices, normals,
    * etc). Possible `kind` values :
    * - VertexBuffer.PositionKind
+   * - VertexBuffer.NormalKind
    * - VertexBuffer.UVKind
    * - VertexBuffer.UV2Kind
    * - VertexBuffer.UV3Kind
@@ -491,10 +497,10 @@ public:
    * @param stride defines the data stride size (can be null)
    * @returns the current mesh
    */
-  Mesh* setVerticesData(const std::string& kind, const Float32Array& data,
-                        bool updatable = false,
-                        const std::optional<size_t>& stride
-                        = std::nullopt) override;
+  AbstractMesh*
+  setVerticesData(const std::string& kind, const Float32Array& data,
+                  bool updatable                      = false,
+                  const std::optional<size_t>& stride = std::nullopt) override;
 
   /**
    * @brief Flags an associated vertex buffer as updatable.
@@ -549,9 +555,10 @@ public:
    * associated with the same geometry)
    * @returns the current mesh
    */
-  Mesh* updateVerticesData(const std::string& kind, const Float32Array& data,
-                           bool updateExtends = false,
-                           bool makeItUnique  = false) override;
+  AbstractMesh* updateVerticesData(const std::string& kind,
+                                   const Float32Array& data,
+                                   bool updateExtends = false,
+                                   bool makeItUnique  = false) override;
 
   /**
    * @brief This method updates the vertex positions of an updatable mesh
@@ -583,8 +590,9 @@ public:
    * updatable (default is false)
    * @returns the current mesh
    */
-  Mesh* setIndices(const IndicesArray& indices, size_t totalVertices = 0,
-                   bool updatable = false) override;
+  AbstractMesh* setIndices(const IndicesArray& indices,
+                           size_t totalVertices = 0,
+                           bool updatable       = false) override;
 
   /**
    * @brief Update the current index buffer.
@@ -596,9 +604,9 @@ public:
    * default)
    * @returns the current mesh
    */
-  Mesh& updateIndices(const IndicesArray& indices,
-                      const std::optional<int>& offset = std::nullopt,
-                      bool gpuMemoryOnly               = false) override;
+  AbstractMesh& updateIndices(const IndicesArray& indices,
+                              const std::optional<int>& offset = std::nullopt,
+                              bool gpuMemoryOnly = false) override;
 
   /**
    * @brief Invert the geometry to move from a right handed system to a left
@@ -678,6 +686,11 @@ public:
                                        Material* effectiveMaterial)>
                       onBeforeDraw,
                     Material* effectiveMaterial = nullptr);
+
+  /**
+   * @brief Hidden
+   */
+  void _rebuild() override;
 
   /**
    * @brief Hidden
@@ -1724,6 +1737,11 @@ protected:
    */
   void
   set_onBeforeDraw(const std::function<void(Mesh*, EventState&)>& callback);
+
+  /**
+   * @brief Gets a boolean indicating if this mesh has instances.
+   */
+  bool get_hasInstances() const override;
 
   /**
    * @brief Gets the morph target manager.

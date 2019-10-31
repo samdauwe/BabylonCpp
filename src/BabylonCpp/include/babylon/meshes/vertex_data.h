@@ -208,6 +208,45 @@ public:
   static std::unique_ptr<VertexData> CreateBox(BoxOptions& options);
 
   /**
+   * @brief Creates the VertexData for a tiled box.
+   * @param options an object used to set the following optional parameters for
+   * the box, required but can be empty
+   * * faceTiles sets the pattern, tile size and number of tiles for a face
+   * * faceUV an array of 6 Vector4 elements used to set different images to
+   * each box side
+   * * faceColors an array of 6 Color3 elements used to set different colors to
+   * each box side
+   * * sideOrientation optional and takes the values : Mesh.FRONTSIDE (default),
+   * Mesh.BACKSIDE or Mesh.DOUBLESIDE
+   * @returns the VertexData of the box
+   */
+  static std::unique_ptr<VertexData> CreateTiledBox(TiledBoxOptions& options);
+
+  /**
+   * @brief Creates the VertexData for a tiled plane.
+   * @param options an object used to set the following optional parameters for
+   * the box, required but can be empty
+   * * pattern a limited pattern arrangement depending on the number
+   * * tileSize sets the width, height and depth of the tile to the value of
+   * size, optional default 1
+   * * tileWidth sets the width (x direction) of the tile, overwrites the width
+   * set by size, optional, default size
+   * * tileHeight sets the height (y direction) of the tile, overwrites the
+   * height set by size, optional, default size
+   * * sideOrientation optional and takes the values : Mesh.FRONTSIDE (default),
+   * Mesh.BACKSIDE or Mesh.DOUBLESIDE
+   * * frontUvs only usable when you create a double-sided mesh, used to choose
+   * what parts of the texture image to crop and apply on the front side,
+   * optional, default vector4 (0, 0, 1, 1)
+   * * backUVs only usable when you create a double-sided mesh, used to choose
+   * what parts of the texture image to crop and apply on the back side,
+   * optional, default vector4 (0, 0, 1, 1)
+   * @returns the VertexData of the tiled plane
+   */
+  static std::unique_ptr<VertexData>
+  CreateTiledPlane(TiledPlaneOptions& options);
+
+  /**
    * @brief Creates the VertexData for an ellipsoid, defaults to a sphere.
    * @param options an object used to set the following optional parameters for
    * the box, required but can be empty
@@ -504,65 +543,6 @@ public:
    */
   static std::unique_ptr<VertexData>
   CreatePolyhedron(PolyhedronOptions& options);
-
-  /**
-   * @brief Creates a box mesh.
-   * faceTiles sets the pattern, tile size and number of tiles for a face     *
-   * * You can set different colors and different images to each box side by
-   * using the parameters `faceColors` (an array of 6 Color3 elements) and
-   * `faceUV` (an array of 6 Vector4 elements)
-   * * Please read this tutorial :
-   * https://doc.babylonjs.com/how_to/createbox_per_face_textures_and_colors
-   * * You can also set the mesh side orientation with the values :
-   * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
-   * BABYLON.Mesh.DOUBLESIDE
-   * * If you create a double-sided mesh, you can choose what parts of the
-   * texture image to crop and stick respectively on the front and the back
-   * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
-   * * The mesh can be set to updatable with the boolean parameter `updatable`
-   * (default false) if its internal geometry is supposed to change once created
-   * @param name defines the name of the mesh
-   * @param options defines the options used to create the mesh
-   * @param scene defines the hosting scene
-   * @returns the box mesh
-   */
-  static std::unique_ptr<VertexData> CreateTiledBox(TiledBoxOptions& options);
-
-  /**
-   * @brief Creates a tiled plane mesh.
-   * * The parameter `pattern` will, depending on value, do nothing or
-   * * * flip (reflect about central vertical) alternate tiles across and up
-   * * * flip every tile on alternate rows
-   * * * rotate (180 degs) alternate tiles across and up
-   * * * rotate every tile on alternate rows
-   * * * flip and rotate alternate tiles across and up
-   * * * flip and rotate every tile on alternate rows
-   * * The parameter `tileSize` sets the size (float) of each tile side (default
-   * 1)
-   * * You can set some different tile dimensions by using the parameters
-   * `tileWidth` and `tileHeight` (both by default have the same value of
-   * `tileSize`)
-   * * If you create a double-sided mesh, you can choose what parts of the
-   * texture image to crop and stick respectively on the front and the back
-   * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
-   * * sideOrientation optional and takes the values : Mesh.FRONTSIDE (default),
-   * Mesh.BACKSIDE or Mesh.DOUBLESIDE
-   * * frontUvs only usable when you create a double-sided mesh, used to choose
-   * what parts of the texture image to crop and apply on the front side,
-   * optional, default vector4 (0, 0, 1, 1)
-   * * backUVs only usable when you create a double-sided mesh, used to choose
-   * what parts of the texture image to crop and apply on the back side,
-   * optional, default vector4 (0, 0, 1, 1)
-   * @see https://doc.babylonjs.com/how_to/set_shapes#box
-   * @param name defines the name of the mesh
-   * @param options defines the options used to create the mesh
-   * @param scene defines the hosting scene
-   * @returns the box mesh
-   */
-  static std::unique_ptr<VertexData>
-  CreateTiledPlane(TiledPlaneOptions& options);
 
   // based on
   // http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3D/src/away3d/primitives/TorusKnot.as?spec=svn2473&r=2473

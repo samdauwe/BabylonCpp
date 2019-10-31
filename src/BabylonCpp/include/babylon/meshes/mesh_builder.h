@@ -25,7 +25,9 @@ class PolygonOptions;
 class PolyhedronOptions;
 class RibbonOptions;
 class SphereOptions;
+class TiledBoxOptions;
 class TiledGroundOptions;
+class TiledPlaneOptions;
 class TorusKnotOptions;
 class TorusOptions;
 class TubeOptions;
@@ -64,6 +66,19 @@ public:
    */
   static MeshPtr CreateBox(const std::string& name, BoxOptions& options,
                            Scene* scene);
+
+  /**
+   * @brief Creates a tiled box mesh
+   * * faceTiles sets the pattern, tile size and number of tiles for a face
+   * * The mesh can be set to updatable with the boolean parameter `updatable`
+   * (default false) if its internal geometry is supposed to change once created
+   * @param name defines the name of the mesh
+   * @param options defines the options used to create the mesh
+   * @param scene defines the hosting scene
+   * @returns the tiled box mesh
+   */
+  static MeshPtr CreateTiledBox(const std::string& name,
+                                TiledBoxOptions& options, Scene* scene);
 
   /**
    * @brief Creates a sphere mesh.
@@ -225,6 +240,9 @@ public:
    * independent from each other, so they become different faces.
    * * The parameter `enclose`  (boolean, default false) adds two extra faces
    * per subdivision to a sliced cylinder to close it around its height axis.
+   * * The parameter `cap` sets the way the cylinder is capped. Possible values
+   * : BABYLON.Mesh.NO_CAP, BABYLON.Mesh.CAP_START, BABYLON.Mesh.CAP_END,
+   * BABYLON.Mesh.CAP_ALL (default).
    * * The parameter `arc` (float, default 1) is the ratio (max 1) to apply to
    * the circumference to slice the cylinder.
    * * You can set different colors and different images to each box side by
@@ -556,6 +574,27 @@ public:
    */
   static MeshPtr CreateLathe(const std::string& name, LatheOptions& options,
                              Scene* scene);
+
+  /**
+   * @brief Creates a tiled plane mesh.
+   * * You can set a limited pattern arrangement with the tiles
+   * * You can also set the mesh side orientation with the values :
+   * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
+   * BABYLON.Mesh.DOUBLESIDE
+   * * If you create a double-sided mesh, you can choose what parts of the
+   * texture image to crop and stick respectively on the front and the back
+   * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
+   * https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
+   * * The mesh can be set to updatable with the boolean parameter `updatable`
+   * (default false) if its internal geometry is supposed to change once created
+   * @param name defines the name of the mesh
+   * @param options defines the options used to create the mesh
+   * @param scene defines the hosting scene
+   * @returns the plane mesh
+   * @see https://doc.babylonjs.com/how_to/set_shapes#plane
+   */
+  static MeshPtr CreateTiledPlane(const std::string& name,
+                                  TiledPlaneOptions& options, Scene* scene);
 
   /**
    * @brief Creates a plane mesh
