@@ -20,10 +20,6 @@ RawTexture::RawTexture(const ArrayBufferView& data, int width, int height,
     data.uint8Array, width, height, format, generateMipMaps, iInvertY,
     iSamplingMode, "", iType);
 
-  _texture = scene->getEngine()->createRawTexture(
-    data.uint8Array, width, height, iFormat, generateMipMaps, iInvertY,
-    iSamplingMode);
-
   wrapU = TextureConstants::CLAMP_ADDRESSMODE;
   wrapV = TextureConstants::CLAMP_ADDRESSMODE;
 }

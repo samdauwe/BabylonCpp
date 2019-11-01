@@ -3308,7 +3308,7 @@ SoundPtr Scene::getSoundByName(const std::string& name)
 
 SkeletonPtr Scene::getLastSkeletonByID(const std::string& id)
 {
-  for (size_t index = skeletons.size() - 1;; --index) {
+  for (size_t index = skeletons.size(); index-- > 0;) {
     if (skeletons[index]->id == id) {
       return skeletons[index];
     }
