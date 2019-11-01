@@ -321,13 +321,13 @@ bool RuntimeAnimation::animate(millisecond_t delay, float from, float to,
   }
 
   // Compute ratio
-  auto range = to - from;
+  const auto range = to - from;
   AnimationValue offsetValue;
 
   // Compute ratio which represents the frame delta between from and to
-  auto ratio = (static_cast<float>(delay.count())
-                * (animation.framePerSecond * speedRatio) / 1000.f)
-               + _ratioOffset;
+  const auto ratio = (static_cast<float>(delay.count())
+                      * (animation.framePerSecond * speedRatio) / 1000.f)
+                     + _ratioOffset;
   AnimationValue highLimitValue(0.f);
 
   _previousDelay = delay;
@@ -423,7 +423,7 @@ bool RuntimeAnimation::animate(millisecond_t delay, float from, float to,
   auto iCurrentFrame = 0.f;
 
   // Need to normalize?
-  if (_host && _host->syncRoot) {
+  if (_host && _host->syncRoot()) {
     auto syncRoot            = _host->syncRoot();
     auto hostNormalizedFrame = (syncRoot->masterFrame - syncRoot->fromFrame)
                                / (syncRoot->toFrame - syncRoot->fromFrame);
@@ -436,8 +436,8 @@ bool RuntimeAnimation::animate(millisecond_t delay, float from, float to,
 
   // Reset events if looping
   auto& events = _events;
-  if ((range > 0.f && currentFrame > currentFrame)
-      || (range < 0.f && currentFrame < currentFrame)) {
+  if ((range > 0.f && currentFrame > iCurrentFrame)
+      || (range < 0.f && currentFrame < iCurrentFrame)) {
     _onLoop();
 
     // Need to reset animation events
@@ -450,7 +450,7 @@ bool RuntimeAnimation::animate(millisecond_t delay, float from, float to,
       }
     }
   }
-  _currentFrame = currentFrame;
+  _currentFrame = iCurrentFrame;
   _animationState.repeatCount
     = range == 0.f ? 0 : static_cast<int>(ratio / range) >> 0;
   _animationState.highLimitValue = highLimitValue;
