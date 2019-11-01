@@ -2201,7 +2201,6 @@ void Scene::_animate()
   _animationTimeLast        = now;
 
   for (size_t index = 0; index < animatables.size(); ++index) {
-
     const auto& animatable = animatables[index];
 
     if (animatable) {
@@ -3627,6 +3626,36 @@ void Scene::updateTransformMatrix(bool force)
                      _activeCamera->getProjectionMatrix(force));
 }
 
+void Scene::_bindFrameBuffer()
+{
+  auto activeCamera_ = activeCamera();
+  if (activeCamera_ && activeCamera_->_multiviewTexture) {
+    activeCamera_->_multiviewTexture->_bindFrameBuffer();
+  }
+  else if (activeCamera_ && activeCamera_->outputRenderTarget) {
+    const auto useMultiview
+      = getEngine()->getCaps().multiview && activeCamera_->outputRenderTarget
+        && activeCamera_->outputRenderTarget->getViewCount() > 1;
+    if (useMultiview) {
+      activeCamera_->outputRenderTarget->_bindFrameBuffer();
+    }
+    else {
+      const auto internalTexture
+        = activeCamera_->outputRenderTarget->getInternalTexture();
+      if (internalTexture) {
+        getEngine()->bindFramebuffer(internalTexture);
+      }
+      else {
+        BABYLON_LOG_ERROR("Scene",
+                          "Camera contains invalid customDefaultRenderTarget")
+      }
+    }
+  }
+  else {
+    getEngine()->restoreDefaultFramebuffer(); // Restore back buffer if needed
+  }
+}
+
 void Scene::updateAlternateTransformMatrix(Camera* alternateCamera)
 {
   _setAlternateTransformMatrix(alternateCamera->getViewMatrix(),
@@ -3775,31 +3804,8 @@ void Scene::_checkIntersections()
 {
 }
 
-void Scene::render(bool updateCameras)
+void Scene::animate()
 {
-  if (isDisposed()) {
-    return;
-  }
-
-  ++_frameId;
-
-  // Register components that have been associated lately to the scene.
-  _registerTransientComponents();
-
-  _activeParticles.fetchNewFrame();
-  _totalVertices.fetchNewFrame();
-  _activeIndices.fetchNewFrame();
-  _activeBones.fetchNewFrame();
-  _meshesForIntersections.clear();
-  resetCachedMaterial();
-
-  onBeforeAnimationsObservable.notifyObservers(this);
-
-  // Actions
-  if (actionManager) {
-    actionManager->processTrigger(ActionManager::OnEveryFrameTrigger);
-  }
-
   if (_engine->isDeterministicLockStep()) {
     auto deltaTime
       = (std::max(static_cast<float>(Scene::MinDeltaTime.count()),
@@ -3839,9 +3845,9 @@ void Scene::render(bool updateCameras)
       ++stepsTaken;
       deltaTime -= defaultFrameTime;
 
-    } while (deltaTime > 0 && stepsTaken < internalSteps);
+    } while (deltaTime > 0.f && stepsTaken < internalSteps);
 
-    _timeAccumulator = deltaTime < 0 ? 0 : deltaTime;
+    _timeAccumulator = deltaTime < 0.f ? 0.f : deltaTime;
   }
   else {
     // Animations
@@ -3858,6 +3864,37 @@ void Scene::render(bool updateCameras)
 
     // Physics
     _advancePhysicsEngineStep(deltaTime);
+  }
+}
+
+void Scene::render(bool updateCameras, bool ignoreAnimations)
+{
+  if (isDisposed()) {
+    return;
+  }
+
+  ++_frameId;
+
+  // Register components that have been associated lately to the scene.
+  _registerTransientComponents();
+
+  _activeParticles.fetchNewFrame();
+  _totalVertices.fetchNewFrame();
+  _activeIndices.fetchNewFrame();
+  _activeBones.fetchNewFrame();
+  _meshesForIntersections.clear();
+  resetCachedMaterial();
+
+  onBeforeAnimationsObservable.notifyObservers(this);
+
+  // Actions
+  if (actionManager) {
+    actionManager->processTrigger(ActionManager::OnEveryFrameTrigger);
+  }
+
+  // Animations
+  if (!ignoreAnimations) {
+    animate();
   }
 
   // Before camera update steps
@@ -3931,12 +3968,9 @@ void Scene::render(bool updateCameras)
   }
 
   // Restore back buffer
-  if (!customRenderTargets.empty()) {
-    engine->restoreDefaultFramebuffer();
-  }
-
+  activeCamera = currentActiveCamera;
+  _bindFrameBuffer();
   onAfterRenderTargetsRenderObservable.notifyObservers(this);
-  _activeCamera = currentActiveCamera;
 
   for (const auto& step : _beforeClearStage) {
     step.action();

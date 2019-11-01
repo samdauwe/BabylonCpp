@@ -1285,11 +1285,18 @@ public:
   void updateAlternateTransformMatrix(Camera* alternateCamera);
 
   /**
-   * Render the scene.
+   * @brief Execute all animations (for a frame).
+   */
+  void animate();
+
+  /**
+   * @brief Render the scene.
    * @param updateCameras defines a boolean indicating if cameras must update
    * according to their inputs (true by default)
+   * @param ignoreAnimations defines a boolean indicating if animations should
+   * not be executed (false by default)
    */
-  void render(bool updateCameras = true);
+  void render(bool updateCameras = true, bool ignoreAnimations = false);
 
   /** Rendering **/
 
@@ -1841,6 +1848,7 @@ private:
   void _activeMesh(AbstractMesh* sourceMesh, AbstractMesh* mesh);
   void _renderForCamera(const CameraPtr& camera,
                         const CameraPtr& rigParent = nullptr);
+  void _bindFrameBuffer();
   void _processSubCameras(const CameraPtr& camera);
   void _checkIntersections();
   /** Pointers handling **/
