@@ -6,35 +6,38 @@ namespace BABYLON {
 extern const char* imageProcessingDeclaration;
 
 const char* imageProcessingDeclaration
-  = "#ifdef EXPOSURE\n"
-    "  uniform float exposureLinear;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef CONTRAST\n"
-    "  uniform float contrast;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef VIGNETTE\n"
-    "  uniform vec2 vInverseScreenSize;\n"
-    "  uniform vec4 vignetteSettings1;\n"
-    "  uniform vec4 vignetteSettings2;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef COLORCURVES\n"
-    "  uniform vec4 vCameraColorCurveNegative;\n"
-    "  uniform vec4 vCameraColorCurveNeutral;\n"
-    "  uniform vec4 vCameraColorCurvePositive;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef COLORGRADING\n"
-    "  #ifdef COLORGRADING3D\n"
-    "  uniform highp sampler3D txColorTransform;\n"
-    "  #else\n"
-    "  uniform sampler2D txColorTransform;\n"
-    "  #endif\n"
-    "  uniform vec4 colorTransformSettings;\n"
-    "#endif\n";
+  = R"ShaderCode(
 
+#ifdef EXPOSURE
+	uniform float exposureLinear;
+#endif
+
+#ifdef CONTRAST
+	uniform float contrast;
+#endif
+
+#ifdef VIGNETTE
+	uniform vec2 vInverseScreenSize;
+	uniform vec4 vignetteSettings1;
+	uniform vec4 vignetteSettings2;
+#endif
+
+#ifdef COLORCURVES
+	uniform vec4 vCameraColorCurveNegative;
+	uniform vec4 vCameraColorCurveNeutral;
+	uniform vec4 vCameraColorCurvePositive;
+#endif
+
+#ifdef COLORGRADING
+	#ifdef COLORGRADING3D
+		uniform highp sampler3D txColorTransform;
+	#else
+		uniform sampler2D txColorTransform;
+	#endif
+	uniform vec4 colorTransformSettings;
+#endif
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_IMAGE_PROCESSING_DECLARATION_FX_H
