@@ -88,10 +88,6 @@ private:
     ImGui::Text("Filter");
     if (ImGui::InputText_String("", _query.query))
       changed = true;
-
-    if (ImGui::Checkbox("Include disabled", &_query.includeDisabled))
-      changed = true;
-    ImGui::SameLine();
     if (ImGui::Checkbox("Include failing", &_query.includeFailures))
       changed = true;
     ImGui::SameLine();
@@ -251,8 +247,12 @@ private:
     if (failure)
     {
       ImGui::TextColored(ImVec4(0.9f, 0.4f, 0.3f, 1.f), "Failure: %s",
-        SampleFailureReason_Str(failure.value()).c_str()
+        SampleFailureReason_Str(failure.value().Kind).c_str()
       );
+      if (!failure.value().Info.empty())
+        ImGui::TextColored(
+          ImVec4(0.4f, 0.9f, 0.6f, 1.f), "More details: %s",
+          failure.value().Info.c_str());
     }
     guiOneSampleInfos(sampleName);
     ImGui::EndGroup();
@@ -272,10 +272,6 @@ private:
         if (!BABYLON::String::contains(all, BABYLON::String::toLowerCase(item)))
           doesMatch = false;
     }
-
-    if (!_query.includeDisabled)
-      if (!_samplesIndex.isSampleEnabled(sampleName))
-        doesMatch = false;
 
     if (_query.onlyFailures)
     {
@@ -321,7 +317,6 @@ private:
     std::string query = "";
     bool includeFailures = false;
     bool onlyFailures = false;
-    bool includeDisabled = true;
   } _query;
 
   bool _showOriginalScreenshots = false;

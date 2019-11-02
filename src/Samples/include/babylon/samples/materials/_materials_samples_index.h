@@ -20,7 +20,7 @@ public:
 
 public:
   _MaterialsSamplesIndex();
-  virtual ~_MaterialsSamplesIndex();
+  virtual ~_MaterialsSamplesIndex() = default;
 
 }; // end of class _MaterialsSamplesIndex
 

@@ -20,7 +20,7 @@ public:
 
 public:
   _LoadersGLTFSamplesIndex();
-  virtual ~_LoadersGLTFSamplesIndex();
+  virtual ~_LoadersGLTFSamplesIndex() = default;
 
 }; // end of class _LoadersGLTFSamplesIndex
 

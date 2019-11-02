@@ -40,8 +40,6 @@ def make_sample_name_from_filename(header_file):
     return sample_name
 
 def sample_info(header_file):
-    if "morph_targets_scene.h" in header_file.lower():
-        print("S")
     result = dict()
     result["header_file"] = header_file
     result["source_file"] = find_corresponding_source_file(header_file)

@@ -20,7 +20,7 @@ public:
 
 public:
   _CollisionsAndIntersectionsSamplesIndex();
-  virtual ~_CollisionsAndIntersectionsSamplesIndex();
+  virtual ~_CollisionsAndIntersectionsSamplesIndex() = default;
 
 }; // end of class _CollisionsAndIntersectionsSamplesIndex
 

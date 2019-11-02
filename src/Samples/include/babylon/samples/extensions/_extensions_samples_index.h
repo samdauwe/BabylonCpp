@@ -20,7 +20,7 @@ public:
 
 public:
   _ExtensionsSamplesIndex();
-  virtual ~_ExtensionsSamplesIndex();
+  virtual ~_ExtensionsSamplesIndex() = default;
 
 }; // end of class _ExtensionsSamplesIndex
 

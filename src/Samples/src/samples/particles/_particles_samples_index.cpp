@@ -12,27 +12,17 @@ _ParticlesSamplesIndex::_ParticlesSamplesIndex()
   // -- Particles examples --
 
   // Buildings SPS Scene
-  _samples["BuildingsSPSScene"]
-    = std::make_tuple(true,                                                  //
-                      [](ICanvas* iCanvas) {                                 //
-                        return std::make_unique<BuildingsSPSScene>(iCanvas); //
-                      });                                                    //
+  _samples["BuildingsSPSScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<BuildingsSPSScene>(iCanvas);
+  };
   // Lighted SPS Scene
-  _samples["LightedSPSScene"]
-    = std::make_tuple(false,                                               //
-                      [](ICanvas* iCanvas) {                               //
-                        return std::make_unique<LightedSPSScene>(iCanvas); //
-                      });                                                  //
+  _samples["LightedSPSScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<LightedSPSScene>(iCanvas);
+  };
   // Triangles SPS Scene
-  _samples["TrianglesSPSScene"]
-    = std::make_tuple(false,                                                 //
-                      [](ICanvas* iCanvas) {                                 //
-                        return std::make_unique<TrianglesSPSScene>(iCanvas); //
-                      });                                                    //
-}
-
-_ParticlesSamplesIndex::~_ParticlesSamplesIndex()
-{
+  _samples["TrianglesSPSScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<TrianglesSPSScene>(iCanvas);
+  };
 }
 
 } // end of namespace Samples

@@ -20,7 +20,7 @@ public:
 
 public:
   _CamerasSamplesIndex();
-  virtual ~_CamerasSamplesIndex();
+  virtual ~_CamerasSamplesIndex() = default;
 
 }; // end of class _CamerasSamplesIndex
 

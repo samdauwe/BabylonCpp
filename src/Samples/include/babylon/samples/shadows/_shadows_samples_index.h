@@ -20,7 +20,7 @@ public:
 
 public:
   _ShadowsSamplesIndex();
-  virtual ~_ShadowsSamplesIndex();
+  virtual ~_ShadowsSamplesIndex() = default;
 
 }; // end of class _ShadowsSamplesIndex
 

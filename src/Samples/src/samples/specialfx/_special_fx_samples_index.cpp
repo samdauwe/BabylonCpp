@@ -34,155 +34,105 @@ _SpecialFXSamplesIndex::_SpecialFXSamplesIndex()
   // -- Special FX examples --
 
   // Convolution Post-process Scene
-  _samples["ConvolutionPostProcessScene"] = std::make_tuple(
-    true,                                                            //
-    [](ICanvas* iCanvas) {                                           //
-      return std::make_unique<ConvolutionPostProcessScene>(iCanvas); //
-    });                                                              //
+  _samples["ConvolutionPostProcessScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<ConvolutionPostProcessScene>(iCanvas);
+  };                                                              
   // Dawn Bringer Scene
-  _samples["DawnBringerScene"]
-    = std::make_tuple(true,                                                 //
-                      [](ICanvas* iCanvas) {                                //
-                        return std::make_unique<DawnBringerScene>(iCanvas); //
-                      });                                                   //
+  _samples["DawnBringerScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<DawnBringerScene>(iCanvas);
+  };                                                   
   // Fade In / Out Scene
-  _samples["FadeInOutScene"]
-    = std::make_tuple(true,                                               //
-                      [](ICanvas* iCanvas) {                              //
-                        return std::make_unique<FadeInOutScene>(iCanvas); //
-                      });                                                 //
+  _samples["FadeInOutScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<FadeInOutScene>(iCanvas);
+  };                                                 
   // Environment Scene
-  _samples["EnvironmentScene"]
-    = std::make_tuple(true,                                                 //
-                      [](ICanvas* iCanvas) {                                //
-                        return std::make_unique<EnvironmentScene>(iCanvas); //
-                      });                                                   //
+  _samples["EnvironmentScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<EnvironmentScene>(iCanvas);
+  };                                                   
   // Fireworks with Shader Code Scene
-  _samples["FireworksWithShaderCodeScene"] = std::make_tuple(
-    true,                                                             //
-    [](ICanvas* iCanvas) {                                            //
-      return std::make_unique<FireworksWithShaderCodeScene>(iCanvas); //
-    });                                                               //
+  _samples["FireworksWithShaderCodeScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<FireworksWithShaderCodeScene>(iCanvas);
+  };                                                               
   // Fog Scene
-  _samples["FogScene"]
-    = std::make_tuple(true,                                         //
-                      [](ICanvas* iCanvas) {                        //
-                        return std::make_unique<FogScene>(iCanvas); //
-                      });                                           //
+  _samples["FogScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<FogScene>(iCanvas);
+  };                                           
   // Fresnel Scene
-  _samples["FresnelScene"]
-    = std::make_tuple(true,                                             //
-                      [](ICanvas* iCanvas) {                            //
-                        return std::make_unique<FresnelScene>(iCanvas); //
-                      });                                               //
+  _samples["FresnelScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<FresnelScene>(iCanvas);
+  };                                               
   // Glass Wubble Ball Scene
-  _samples["GlassWubbleBallScene"] = std::make_tuple(
-    true,                                                     //
-    [](ICanvas* iCanvas) {                                    //
-      return std::make_unique<GlassWubbleBallScene>(iCanvas); //
-    });                                                       //
+  _samples["GlassWubbleBallScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<GlassWubbleBallScene>(iCanvas);
+  };                                                       
   // Heat wave Scene
-  _samples["HeatWaveScene"]
-    = std::make_tuple(true,                                              //
-                      [](ICanvas* iCanvas) {                             //
-                        return std::make_unique<HeatWaveScene>(iCanvas); //
-                      });                                                //
+  _samples["HeatWaveScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<HeatWaveScene>(iCanvas);
+  };                                                
   // Highlight Layer Scene
-  _samples["HighlightLayerScene"] = std::make_tuple(
-    true,                                                    //
-    [](ICanvas* iCanvas) {                                   //
-      return std::make_unique<HighlightLayerScene>(iCanvas); //
-    });                                                      //
+  _samples["HighlightLayerScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<HighlightLayerScene>(iCanvas);
+  };                                                      
   // Infinite Loader Scene
-  _samples["InfiniteLoaderScene"] = std::make_tuple(
-    false,                                                   //
-    [](ICanvas* iCanvas) {                                   //
-      return std::make_unique<InfiniteLoaderScene>(iCanvas); //
-    });                                                      //
+  _samples["InfiniteLoaderScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<InfiniteLoaderScene>(iCanvas);
+  };                                                      
   // Kernel Based Blur Scene
-  _samples["KernelBasedBlurScene"] = std::make_tuple(
-    true,                                                     //
-    [](ICanvas* iCanvas) {                                    //
-      return std::make_unique<KernelBasedBlurScene>(iCanvas); //
-    });                                                       //
+  _samples["KernelBasedBlurScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<KernelBasedBlurScene>(iCanvas);
+  };                                                       
   // Lens Flares Scene
-  _samples["LensFlaresScene"]
-    = std::make_tuple(true,                                                //
-                      [](ICanvas* iCanvas) {                               //
-                        return std::make_unique<LensFlaresScene>(iCanvas); //
-                      });                                                  //
+  _samples["LensFlaresScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<LensFlaresScene>(iCanvas);
+  };                                                  
   // Points Cloud Scene
-  _samples["PointsCloudScene"]
-    = std::make_tuple(false,                                                //
-                      [](ICanvas* iCanvas) {                                //
-                        return std::make_unique<PointsCloudScene>(iCanvas); //
-                      });                                                   //
+  _samples["PointsCloudScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<PointsCloudScene>(iCanvas);
+  };                                                   
   // Portals Scene
-  _samples["PortalsScene"]
-    = std::make_tuple(true,                                             //
-                      [](ICanvas* iCanvas) {                            //
-                        return std::make_unique<PortalsScene>(iCanvas); //
-                      });                                               //
+  _samples["PortalsScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<PortalsScene>(iCanvas);
+  };                                               
   // Realtime Reflection Scene
-  _samples["RealtimeReflectionScene"] = std::make_tuple(
-    false,                                                       //
-    [](ICanvas* iCanvas) {                                       //
-      return std::make_unique<RealtimeReflectionScene>(iCanvas); //
-    });                                                          //
+  _samples["RealtimeReflectionScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<RealtimeReflectionScene>(iCanvas);
+  };                                                          
   // Realtime Refraction Scene
-  _samples["RealtimeRefractionScene"] = std::make_tuple(
-    true,                                                        //
-    [](ICanvas* iCanvas) {                                       //
-      return std::make_unique<RealtimeRefractionScene>(iCanvas); //
-    });                                                          //
+  _samples["RealtimeRefractionScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<RealtimeRefractionScene>(iCanvas);
+  };                                                          
   // Refraction And Reflection DDS Scene
-  _samples["RefractionAndReflectionDDSScene"] = std::make_tuple(
-    true,                                                                //
-    [](ICanvas* iCanvas) {                                               //
-      return std::make_unique<RefractionAndReflectionDDSScene>(iCanvas); //
-    });                                                                  //
+  _samples["RefractionAndReflectionDDSScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<RefractionAndReflectionDDSScene>(iCanvas);
+  };                                                                  
   // Refraction And Reflection DDS Scene
-  _samples["RefractionAndReflectionDDSScene"] = std::make_tuple(
-    true,                                                                //
-    [](ICanvas* iCanvas) {                                               //
-      return std::make_unique<RefractionAndReflectionDDSScene>(iCanvas); //
-    });                                                                  //
+  _samples["RefractionAndReflectionDDSScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<RefractionAndReflectionDDSScene>(iCanvas);
+  };                                                                  
   // RGB Shift Glitch Scene
-  _samples["RGBShiftGlitchScene"] = std::make_tuple(
-    true,                                                    //
-    [](ICanvas* iCanvas) {                                   //
-      return std::make_unique<RGBShiftGlitchScene>(iCanvas); //
-    });                                                      //
+  _samples["RGBShiftGlitchScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<RGBShiftGlitchScene>(iCanvas);
+  };                                                      
   // Simple Post Process Render Pipeline Scene
-  _samples["SimplePostProcessRenderPipelineScene"] = std::make_tuple(
-    true,                                                                     //
-    [](ICanvas* iCanvas) {                                                    //
-      return std::make_unique<SimplePostProcessRenderPipelineScene>(iCanvas); //
-    });                                                                       //
+  _samples["SimplePostProcessRenderPipelineScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<SimplePostProcessRenderPipelineScene>(iCanvas);
+  };                                                                       
   // Sprites Scene
-  _samples["SpritesScene"]
-    = std::make_tuple(true,                                             //
-                      [](ICanvas* iCanvas) {                            //
-                        return std::make_unique<SpritesScene>(iCanvas); //
-                      });                                               //
+  _samples["SpritesScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<SpritesScene>(iCanvas);
+  };                                               
   // Wave Of Sprites Scene
-  _samples["WaveOfSpritesScene"]
-    = std::make_tuple(true,                                                   //
-                      [](ICanvas* iCanvas) {                                  //
-                        return std::make_unique<WaveOfSpritesScene>(iCanvas); //
-                      });                                                     //
+  _samples["WaveOfSpritesScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<WaveOfSpritesScene>(iCanvas);
+  };                                                     
   // Waves Scene
-  _samples["WavesScene"]
-    = std::make_tuple(true,                                           //
-                      [](ICanvas* iCanvas) {                          //
-                        return std::make_unique<WavesScene>(iCanvas); //
-                      });                                             //
+  _samples["WavesScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<WavesScene>(iCanvas);
+  };                                             
   // Volumetric Light Scattering Scene
-  _samples["VolumetricLightScatteringScene"] = std::make_tuple(
-    false,                                                              //
-    [](ICanvas* iCanvas) {                                              //
-      return std::make_unique<VolumetricLightScatteringScene>(iCanvas); //
-    });                                                                 //
+  _samples["VolumetricLightScatteringScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<VolumetricLightScatteringScene>(iCanvas);
+  };                                                                 
 }
 
 _SpecialFXSamplesIndex::~_SpecialFXSamplesIndex()

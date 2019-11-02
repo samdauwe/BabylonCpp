@@ -15,32 +15,31 @@ struct SampleInfo {
   std::vector<std::string> Links;
 };
 
-enum class SampleFailureReason {
-  outOfBoundAccess,
+enum class SampleFailureReasonKind {
+  segFault,
   processHung,
-  blankDisplay,
-  invalidComparator,
-  vectorIteratorInvalid,
-  readAccessViolation,
   empty3d,
-  incomplete3d,
-  broken
+  broken3d
 };
-std::string BABYLON_SHARED_EXPORT SampleFailureReason_Str(SampleFailureReason s);
+
+struct SampleFailureReason
+{
+  SampleFailureReasonKind Kind;
+  std::string Info;
+
+  SampleFailureReason(
+    SampleFailureReasonKind kind = SampleFailureReasonKind::segFault, 
+    std::string info = "")
+    : Kind(kind), Info(info) {}
+};
+
+std::string BABYLON_SHARED_EXPORT SampleFailureReason_Str(SampleFailureReasonKind s);
 
 class BABYLON_SHARED_EXPORT SamplesIndex {
 
 public:
   SamplesIndex();
   ~SamplesIndex();
-
-  /**
-   * @brief Returns whether or not the example is enabled.
-   * @param sampleName the name of the sample to check
-   * @return whether or not the example is enabled
-   */
-  bool isSampleEnabled(const std::string& sampleName) const;
-
 
   /**
    * @brief Check if the sample is currently known to fail

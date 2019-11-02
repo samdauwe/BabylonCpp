@@ -20,7 +20,7 @@ public:
 
 public:
   _AnimationsSamplesIndex();
-  virtual ~_AnimationsSamplesIndex();
+  virtual ~_AnimationsSamplesIndex() = default;
 
 }; // end of class _AnimationsSamplesIndex
 

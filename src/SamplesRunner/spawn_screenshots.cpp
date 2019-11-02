@@ -19,7 +19,7 @@ void spawnScreenshots(const std::string & exeName, bool skipFailing)
     BABYLON_LOG_INFO("ScreenshotAllSamples", sample);
     auto does_fail = samplesIndex.doesSampleFail(sample);
     if (does_fail && skipFailing) {
-      BABYLON_LOG_INFO("ScreenshotAllSamples", "Skipping failing ", sample, ": ", SampleFailureReason_Str(does_fail.value()));
+      BABYLON_LOG_INFO("ScreenshotAllSamples", "Skipping failing ", sample, ": ", SampleFailureReason_Str(does_fail.value().Kind));
     }
     else
       _spawnl(P_WAIT, exeName.c_str(), exeName.c_str(), "-s", sample.c_str(), "-p", NULL);

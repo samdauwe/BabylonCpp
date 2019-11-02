@@ -28,25 +28,6 @@ namespace Samples {
 
 SamplesIndex::SamplesIndex()
 {
-  _samplesFailures = {
-    {"BlurModeForMirrorsScene", SampleFailureReason::empty3d},
-    {"ColoredRibbonScene", SampleFailureReason::outOfBoundAccess},
-    {"CircleCurvesFromBeziersScene", SampleFailureReason::empty3d},
-    {"EdgesRenderScene", SampleFailureReason::outOfBoundAccess},
-    {"HighlightLayerScene", SampleFailureReason::incomplete3d},
-    {"InnerMeshPointsScene", SampleFailureReason::outOfBoundAccess},
-    {"LinesMeshSpiralScene", SampleFailureReason::empty3d},
-    {"LorenzAttractorScene", SampleFailureReason::empty3d},
-    {"MorphTargetsScene", SampleFailureReason::broken},
-    {"MultiSampleRenderTargetsScene", SampleFailureReason::empty3d},
-    {"PBRMaterialCheckerORMScene", SampleFailureReason::broken},
-    {"PBRMaterialScene", SampleFailureReason::broken},
-    {"PBRMetallicRoughnessGoldMaterialScene", SampleFailureReason::broken},
-    {"PBRMetallicRoughnessMaterialScene", SampleFailureReason::outOfBoundAccess},
-    {"PBRMetallicRoughnessTextureMaterialScene", SampleFailureReason::broken},
-    {"ShaderMaterialWarpSpeedScene", SampleFailureReason::empty3d},
-  };
-
   // Initialize the samples index
   _samplesIndex = {
     // Animations samples
@@ -88,21 +69,43 @@ SamplesIndex::SamplesIndex()
     // Textures samples
     {_TexturesSamplesIndex::CategoryName(), _TexturesSamplesIndex()},
   };
+
+
+  _samplesFailures = {
+    {"AirplaneModelScene", {SampleFailureReasonKind::segFault}},
+    {"BlurModeForMirrorsScene", {SampleFailureReasonKind::empty3d}},
+    {"CartoonAnimationsScene", {SampleFailureReasonKind::segFault}},
+    {"ColoredRibbonScene", {SampleFailureReasonKind::segFault}},
+    {"CircleCurvesFromBeziersScene", {SampleFailureReasonKind::empty3d}},
+    {"DecalsScene", {SampleFailureReasonKind::segFault}},
+    {"EdgesRenderScene", {SampleFailureReasonKind::segFault}},
+    {"EnvironmentTextureScene", {SampleFailureReasonKind::empty3d}},
+    {"FurMaterialScene", {SampleFailureReasonKind::broken3d, "Black texture"}},
+    {"InfiniteLoaderScene", {SampleFailureReasonKind::segFault}},
+    {"InnerMeshPointsScene", {SampleFailureReasonKind::segFault}},
+    {"IsPointInsideMeshScene", {SampleFailureReasonKind::processHung}},
+    {"LevelOfDetailScene",
+     {SampleFailureReasonKind::segFault, "Segfault when dragging the mouse"}},
+    {"LinesMeshSpiralScene", {SampleFailureReasonKind::empty3d}},
+    {"LorenzAttractorScene", {SampleFailureReasonKind::empty3d}},
+    {"MergedMeshesScene", {SampleFailureReasonKind::segFault}},
+    {"MultiSampleRenderTargetsScene", {SampleFailureReasonKind::empty3d}},
+    {"PointsCloudScene", {SampleFailureReasonKind::empty3d}},
+    {"ProceduralHexPlanetGenerationScene", {SampleFailureReasonKind::segFault}},
+    {"ShaderMaterialWarpSpeedScene", {SampleFailureReasonKind::empty3d}},
+    {"VolumetricLightScatteringScene", {SampleFailureReasonKind::segFault}}
+  };
+
+  // all gltf samples fail under windows, with an empty rendering
+  for (const auto& sampleName : getSampleNamesInCategory(_LoadersGLTFSamplesIndex::CategoryName()))
+  {
+    SampleFailureReason reason{ SampleFailureReasonKind::empty3d, "Empty rendering under windows" };
+    _samplesFailures[sampleName] = reason;
+  }
 }
 
 SamplesIndex::~SamplesIndex()
 {
-}
-
-bool SamplesIndex::isSampleEnabled(const std::string& sampleName) const
-{
-  for (const auto& item : _samplesIndex) {
-    if (stl_util::contains(item.second.samples(), sampleName)) {
-      return std::get<0>(item.second.samples().at(sampleName));
-    }
-  }
-
-  return false;
 }
 
 std::optional<BABYLON::Samples::SampleFailureReason> SamplesIndex::doesSampleFail(const std::string& sampleName) const
@@ -177,10 +180,7 @@ std::vector<std::string> SamplesIndex::getSampleNames() const
   std::vector<std::string> sampleNames;
   for (const auto& samplesCategory : _samplesIndex) {
     for (const auto& element : samplesCategory.second.samples()) {
-      // Check if enabled
-      if (std::get<0>(element.second)) {
-        sampleNames.emplace_back(element.first);
-      }
+      sampleNames.emplace_back(element.first);
     }
   }
 
@@ -227,10 +227,7 @@ SamplesIndex::getSampleNamesInCategory(const std::string& categoryName) const
   if (stl_util::contains(_samplesIndex, categoryName)) {
     const auto& samplesCategory = _samplesIndex.at(categoryName);
     for (const auto& element : samplesCategory.samples()) {
-      // Check if enabled
-      if (std::get<0>(element.second)) {
-        sampleNames.emplace_back(element.first);
-      }
+      sampleNames.emplace_back(element.first);
     }
   }
 
@@ -246,7 +243,7 @@ SamplesIndex::createRenderableScene(const std::string& sampleName,
 {
   for (const auto& item : _samplesIndex) {
     if (stl_util::contains(item.second.samples(), sampleName)) {
-      return std::get<1>(item.second.samples().at(sampleName))(iCanvas);
+      return item.second.samples().at(sampleName)(iCanvas);
     }
   }
 
@@ -264,40 +261,24 @@ void SamplesIndex::listSamples()
     auto samples = getSampleNamesInCategory(category);
     for (const auto & sample : samples) 
     {
-      std::string ko = (!isSampleEnabled(sample)) ? " (KO)" : "";
-      std::cout << sample << ko << "\n";
+      std::cout << sample << "\n";
     }
   }
 }
 
-std::string SampleFailureReason_Str(SampleFailureReason s)
+std::string SampleFailureReason_Str(SampleFailureReasonKind s)
 {
   switch (s) {
-    case SampleFailureReason::blankDisplay:
-      return "Blank display";
+    case SampleFailureReasonKind::segFault:
+      return "Segmentation fault";
       break;
-    case SampleFailureReason::outOfBoundAccess :
-      return "Out of bounds access";
+    case SampleFailureReasonKind::processHung:
+      return "Process hung (infinite loop?)";
       break;
-    case SampleFailureReason::processHung:
-      return "Process hung";
-      break;
-    case SampleFailureReason::invalidComparator:
-      return "Invalid comparator";
-      break;
-    case SampleFailureReason::vectorIteratorInvalid:
-      return "vector iterators in range are from different containers";
-      break;
-    case SampleFailureReason::empty3d:
+    case SampleFailureReasonKind::empty3d:
       return "3D rendering is empty";
       break;
-    case SampleFailureReason::readAccessViolation:
-      return "Read Access Violation";
-      break;
-    case SampleFailureReason::incomplete3d:
-      return "Incomplete 3d (black textures and co)";
-      break;
-    case SampleFailureReason::broken:
+    case SampleFailureReasonKind::broken3d:
       return "Broken (bad rendering and/or bad behavior)";
       break;
     default:
