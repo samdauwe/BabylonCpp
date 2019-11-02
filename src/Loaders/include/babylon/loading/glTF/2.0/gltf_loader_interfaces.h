@@ -1532,7 +1532,7 @@ struct IMeshPrimitive : public IGLTF2::IMeshPrimitive, IArrayItem {
   }; // end of struct IMaterialData
 
   /** @hidden */
-  std::unique_ptr<IMeshPrimitiveData> _instanceData = nullptr;
+  std::shared_ptr<IMeshPrimitiveData> _instanceData = nullptr;
 
   static IMeshPrimitive Parse(const json& parsedMeshPrimitive);
 
