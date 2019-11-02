@@ -1,4 +1,4 @@
-#include <babylon/samples/animations/bone_rotatation_in_world_space_scene.h>
+#include <babylon/samples/animations/bone_rotation_in_world_space_scene.h>
 
 #include <babylon/bones/bone.h>
 #include <babylon/bones/skeleton.h>

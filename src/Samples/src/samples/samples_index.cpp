@@ -30,17 +30,13 @@ SamplesIndex::SamplesIndex()
 {
   _samplesFailures = {
     {"BlurModeForMirrorsScene", SampleFailureReason::empty3d},
-    {"BoneRotationInWorldSpaceScene", SampleFailureReason::broken},
-    {"BulbSelfShadowScene", SampleFailureReason::empty3d},
     {"ColoredRibbonScene", SampleFailureReason::outOfBoundAccess},
-    {"CurvedHelixMeshesScene", SampleFailureReason::outOfBoundAccess},
-    {"ExtrusionScene", SampleFailureReason::outOfBoundAccess},
+    {"CircleCurvesFromBeziersScene", SampleFailureReason::empty3d},
+    {"EdgesRenderScene", SampleFailureReason::outOfBoundAccess},
     {"HighlightLayerScene", SampleFailureReason::incomplete3d},
-    {"ImportDudeScene", SampleFailureReason::broken},
-    {"ImportDummy3Scene", SampleFailureReason::broken},
-    {"ImportRabbitScene", SampleFailureReason::broken},
-    {"KernelBasedBlurScene", SampleFailureReason::empty3d},
+    {"InnerMeshPointsScene", SampleFailureReason::outOfBoundAccess},
     {"LinesMeshSpiralScene", SampleFailureReason::empty3d},
+    {"LorenzAttractorScene", SampleFailureReason::empty3d},
     {"MorphTargetsScene", SampleFailureReason::broken},
     {"MultiSampleRenderTargetsScene", SampleFailureReason::empty3d},
     {"PBRMaterialCheckerORMScene", SampleFailureReason::broken},
@@ -48,10 +44,7 @@ SamplesIndex::SamplesIndex()
     {"PBRMetallicRoughnessGoldMaterialScene", SampleFailureReason::broken},
     {"PBRMetallicRoughnessMaterialScene", SampleFailureReason::outOfBoundAccess},
     {"PBRMetallicRoughnessTextureMaterialScene", SampleFailureReason::broken},
-    {"PBRReflectionScene", SampleFailureReason::empty3d},
     {"ShaderMaterialWarpSpeedScene", SampleFailureReason::empty3d},
-    {"SimplePostProcessRenderPipelineScene", SampleFailureReason::empty3d},
-    {"WaterMaterialScene", SampleFailureReason::incomplete3d},
   };
 
   // Initialize the samples index
@@ -148,17 +141,22 @@ nlohmann::json ReadSampleInfoFile()
     return nlohmann::json();
 }
 
-SampleInfo SamplesIndex::getSampleInfo(const std::string& sampleName) const
+SampleInfo SamplesIndex::getSampleInfo(const std::string& sampleNameMixedCase) const
 {
   static nlohmann::json _samplesInfo = ReadSampleInfoFile();
   static std::map<std::string, SampleInfo> cache;
-  if (cache.find(sampleName) != cache.end())
-    return cache.at(sampleName);
+
+  std::string sampleNameLowerCase;
+  for (auto c : sampleNameMixedCase)
+    sampleNameLowerCase += static_cast<char>(std::tolower(c));
+
+  if (cache.find(sampleNameLowerCase) != cache.end())
+    return cache.at(sampleNameLowerCase);
 
   SampleInfo result;
   for (const auto & element : _samplesInfo)
   {
-    if (element["sample_name"] == sampleName)
+    if (element["sample_name"] == sampleNameLowerCase)
     {
       result.Brief = element["brief"];
       result.HeaderFile = element["header_file"];
@@ -169,7 +167,7 @@ SampleInfo SamplesIndex::getSampleInfo(const std::string& sampleName) const
       }
     }
   }
-  cache[sampleName] = result;
+  cache[sampleNameLowerCase] = result;
   return result;
 }
 

@@ -3,7 +3,7 @@
 #include <babylon/samples/animations/animated_morph_target_scene.h>
 #include <babylon/samples/animations/animations_101_scene.h>
 #include <babylon/samples/animations/animations_scene.h>
-#include <babylon/samples/animations/bone_rotatation_in_world_space_scene.h>
+#include <babylon/samples/animations/bone_rotation_in_world_space_scene.h>
 #include <babylon/samples/animations/bouncing_cube_scene.h>
 #include <babylon/samples/animations/cannon_ball_scene.h>
 #include <babylon/samples/animations/cartoon_animations_scene.h>
@@ -65,11 +65,7 @@ _AnimationsSamplesIndex::_AnimationsSamplesIndex()
                         return std::make_unique<MorphMeshScene>(iCanvas); //
                       });                                                 //
   // Morph Targets Scene
-  _samples["MorphTargetsScene"]
-    = std::make_tuple(true,                                                  //
-                      [](ICanvas* iCanvas) {                                 //
-                        return std::make_unique<MorphTargetsScene>(iCanvas); //
-                      });                                                    //
+  _samples["MorphTargetsScene"] = std::make_tuple(true, MakeMorphTargetsScene);
   // Pick And Play Animation Scene
   _samples["PickAndPlayAnimationScene"] = std::make_tuple(
     false,                                                         //
