@@ -1,7 +1,7 @@
 import os
 import json
 THIS_SCRIPT_DIR = (os.path.dirname(os.path.realpath(__file__)))
-ROOT_DIR = (os.path.realpath(THIS_SCRIPT_DIR + "/.."))
+ROOT_DIR = (os.path.realpath(THIS_SCRIPT_DIR + "/../../.."))
 SAMPLES_INCLUDE_DIR = ROOT_DIR + "/src/Samples/include/babylon/samples"
 SAMPLES_SOURCE_DIR = ROOT_DIR + "/src/Samples/src/samples"
 
@@ -26,7 +26,22 @@ def find_corresponding_source_file(sample_header_file):
             return s
     return "Not found"
 
+def snake_case_to_lowersnakecase(s):
+    items = s.split("_")
+    result = "".join(items)
+    result = result.lower()
+    return result
+
+def make_sample_name_from_filename(header_file):
+    header_file = header_file.replace("\\", "/")
+    header_file = header_file.split("/")[-1]
+    header_file = header_file.replace(".h", "")
+    sample_name = snake_case_to_lowersnakecase(header_file)
+    return sample_name
+
 def sample_info(header_file):
+    if "morph_targets_scene.h" in header_file.lower():
+        print("S")
     result = dict()
     result["header_file"] = header_file
     result["source_file"] = find_corresponding_source_file(header_file)
@@ -34,11 +49,7 @@ def sample_info(header_file):
         lines = f.readlines()
 
     # Find sample name (class or struct name)
-    sample_name = ""
-    for line in lines:
-        if line.startswith("struct ") or line.startswith("class "):
-            sample_name = line.split(" ")[1]
-    result["sample_name"] = sample_name
+    result["sample_name"] = make_sample_name_from_filename(header_file)
 
     # Find brief
     brief = ""
@@ -79,4 +90,5 @@ def write_json_info_file():
         f.write(json.dumps(infos, indent=4))
 
 if __name__ == "__main__":
+    print("running make_samples_info.py")
     write_json_info_file()

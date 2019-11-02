@@ -341,6 +341,17 @@ add_test_without_ctest(tests)
 endif(OPTION_BUILD_TESTS AND EXISTS ${TESTS_PATH})
 
 # ============================================================================ #
+#                       make samples info                                      #
+# ============================================================================ #
+add_custom_command(
+    TARGET Samples
+    PRE_BUILD
+    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/make_samples_info/make_samples_info.py
+    COMMENT "make_samples_info"
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/build/bin
+)
+
+# ============================================================================ #
 #                       Deployment                                             #
 # ============================================================================ #
 
@@ -372,10 +383,3 @@ endif()
 copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/scenes")
 ## - Textures
 copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/textures")
-# - samples_info.json
-add_custom_target(
-        create_samples_info
-        ALL
-        python ${CMAKE_SOURCE_DIR}/codegeneration/make_samples_info.py
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-)
