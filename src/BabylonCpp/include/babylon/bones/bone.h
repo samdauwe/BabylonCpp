@@ -44,6 +44,18 @@ public:
   virtual Type type() const override;
   void addToSkeleton(const BonePtr& newBone);
 
+  /**
+   * @brief Gets a property.
+   */
+  virtual AnimationValue
+  getProperty(const std::vector<std::string>& targetPropertyPath) override;
+
+  /**
+   * @brief Sets a property.
+   */
+  virtual void setProperty(const std::vector<std::string>& targetPropertyPath,
+                           const AnimationValue& value) override;
+
   /** Members **/
 
   /**

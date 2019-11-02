@@ -60,6 +60,36 @@ void Bone::addToSkeleton(const BonePtr& newBone)
   _skeleton->bones.emplace_back(newBone);
 }
 
+AnimationValue
+Bone::getProperty(const std::vector<std::string>& targetPropertyPath)
+{
+  if (targetPropertyPath.size() == 1) {
+    const auto& target = targetPropertyPath[0];
+    if (target == "_matrix") {
+      return _matrix();
+    }
+  }
+
+  return AnimationValue();
+}
+
+void Bone::setProperty(const std::vector<std::string>& targetPropertyPath,
+                       const AnimationValue& value)
+{
+  const auto animationType = value.animationType();
+  if (animationType.has_value()) {
+    if (targetPropertyPath.size() == 1) {
+      const auto& target = targetPropertyPath[0];
+      if (*animationType == Animation::ANIMATIONTYPE_MATRIX()) {
+        auto matrixValue = value.get<Matrix>();
+        if (target == "_matrix") {
+          _matrix = matrixValue;
+        }
+      }
+    }
+  }
+}
+
 // Members
 Matrix& Bone::get__matrix()
 {
