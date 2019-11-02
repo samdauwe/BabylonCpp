@@ -17,58 +17,36 @@ _LightsSamplesIndex::_LightsSamplesIndex()
   // -- Lights examples --
 
   // Directional Light Scene
-  _samples["DirectionalLightScene"] = std::make_tuple(
-    true,                                                      //
-    [](ICanvas* iCanvas) {                                     //
-      return std::make_unique<DirectionalLightScene>(iCanvas); //
-    });                                                        //
+  _samples["DirectionalLightScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<DirectionalLightScene>(iCanvas);
+  };
   // Hemispheric Light Scene
-  _samples["HemisphericLightScene"] = std::make_tuple(
-    true,                                                      //
-    [](ICanvas* iCanvas) {                                     //
-      return std::make_unique<HemisphericLightScene>(iCanvas); //
-    });                                                        //
+  _samples["HemisphericLightScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<HemisphericLightScene>(iCanvas);
+  };
   // Intersecting Lights Colors Scene
-  _samples["IntersectingLightsColorsScene"] = std::make_tuple(
-    true,                                                              //
-    [](ICanvas* iCanvas) {                                             //
-      return std::make_unique<IntersectingLightsColorsScene>(iCanvas); //
-    });                                                                //
+  _samples["IntersectingLightsColorsScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<IntersectingLightsColorsScene>(iCanvas);
+  };
   // Light Projected Texture Scene
-  _samples["LightProjectedTextureScene"] = std::make_tuple(
-    true,                                                           //
-    [](ICanvas* iCanvas) {                                          //
-      return std::make_unique<LightProjectedTextureScene>(iCanvas); //
-    });                                                             //
+  _samples["LightProjectedTextureScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<LightProjectedTextureScene>(iCanvas);
+  };
   // Lights Scene
   _samples["LightsScene"]
-    = std::make_tuple(true,                                            //
-                      [](ICanvas* iCanvas) {                           //
-                        return std::make_unique<LightsScene>(iCanvas); //
-                      });                                              //
+    = [](ICanvas* iCanvas) { return std::make_unique<LightsScene>(iCanvas); };
   // Point light Scene
-  _samples["PointLightScene"]
-    = std::make_tuple(true,                                                //
-                      [](ICanvas* iCanvas) {                               //
-                        return std::make_unique<PointLightScene>(iCanvas); //
-                      });                                                  //
+  _samples["PointLightScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<PointLightScene>(iCanvas);
+  };
   // Simultaneous light Scene
-  _samples["SimultaneousLightsScene"] = std::make_tuple(
-    true,                                                        //
-    [](ICanvas* iCanvas) {                                       //
-      return std::make_unique<SimultaneousLightsScene>(iCanvas); //
-    });                                                          //
+  _samples["SimultaneousLightsScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<SimultaneousLightsScene>(iCanvas);
+  };
   // Spot light Scene
-  _samples["SpotLightScene"]
-    = std::make_tuple(true,                                               //
-                      [](ICanvas* iCanvas) {                              //
-                        return std::make_unique<SpotLightScene>(iCanvas); //
-                      });                                                 //
+  _samples["SpotLightScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<SpotLightScene>(iCanvas);
+  };
 }
-
-_LightsSamplesIndex::~_LightsSamplesIndex()
-{
-}
-
-} // end of namespace Samples
-} // end of namespace BABYLON
+} // namespace Samples
+} // namespace BABYLON

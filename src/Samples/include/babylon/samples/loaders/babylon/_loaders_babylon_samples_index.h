@@ -20,7 +20,7 @@ public:
 
 public:
   _LoadersBabylonSamplesIndex();
-  virtual ~_LoadersBabylonSamplesIndex();
+  virtual ~_LoadersBabylonSamplesIndex() = default;
 
 }; // end of class _LoadersBabylonSamplesIndex
 

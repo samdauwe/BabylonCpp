@@ -12,22 +12,13 @@ _CollisionsAndIntersectionsSamplesIndex::
   // -- Collisions and Intersections examples --
 
   // Collisions Scene
-  _samples["CollisionsScene"]
-    = std::make_tuple(true,                                                //
-                      [](ICanvas* iCanvas) {                               //
-                        return std::make_unique<CollisionsScene>(iCanvas); //
-                      });                                                  //
+  _samples["CollisionsScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<CollisionsScene>(iCanvas);
+  };
   // Intersections Scene
-  _samples["IntersectionsScene"]
-    = std::make_tuple(true,                                                   //
-                      [](ICanvas* iCanvas) {                                  //
-                        return std::make_unique<IntersectionsScene>(iCanvas); //
-                      });                                                     //
-}
-
-_CollisionsAndIntersectionsSamplesIndex::
-  ~_CollisionsAndIntersectionsSamplesIndex()
-{
+  _samples["IntersectionsScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<IntersectionsScene>(iCanvas);
+  };
 }
 
 } // end of namespace Samples

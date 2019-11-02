@@ -14,8 +14,7 @@ using IRenderableScenePtr = std::shared_ptr<IRenderableScene>;
 
 namespace Samples {
 
-using FactoryMethod = std::function<IRenderableScenePtr(ICanvas* iCanvas)>;
-using Sample        = std::tuple<bool, FactoryMethod>;
+using SampleFactoryFunction = std::function<IRenderableScenePtr(ICanvas * iCanvas)>;
 
 class _ISamplesIndex {
 
@@ -27,10 +26,10 @@ public:
    * @brief Returns the list with example.
    * @return the list with example
    */
-  const std::unordered_map<std::string, Sample>& samples() const;
+  const std::unordered_map<std::string, SampleFactoryFunction>& samples() const;
 
 protected:
-  std::unordered_map<std::string, Sample> _samples;
+  std::unordered_map<std::string, SampleFactoryFunction> _samples;
 
 }; // end of struct _SamplesIndex
 

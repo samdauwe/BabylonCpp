@@ -26,122 +26,84 @@ _ExtensionsSamplesIndex::_ExtensionsSamplesIndex()
   // -- Hex planet generation examples --
 
   // Hex Icosphere Scene
-  _samples["HexIcosphereScene"] = std::make_tuple(
-    true,                                                    //
-    [](ICanvas* iCanvas) {                                   //
-      return std::make_unique<HexIcosphereScene>(iCanvas); //
-    });                                                      //
+  _samples["HexIcosphereScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<HexIcosphereScene>(iCanvas);
+  };
   // Procedural Hex Planet Generation Scene
-  _samples["ProceduralHexPlanetGenerationScene"] = std::make_tuple(
-    false,                                                                    //
-    [](ICanvas* iCanvas) {                                                    //
-      return std::make_unique<ProceduralHexPlanetGenerationScene>(iCanvas); //
-    });                                                                       //
+  _samples["ProceduralHexPlanetGenerationScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<ProceduralHexPlanetGenerationScene>(iCanvas);
+  };
 
   // -- Navigation examples--
 
   // Crowd Simulation Scene 01
-  _samples["CrowdSimulationScene01"] = std::make_tuple(
-    true,                                                         //
-    [](ICanvas* iCanvas) {                                        //
-      return std::make_unique<CrowdSimulationScene01>(iCanvas); //
-    });                                                           //
+  _samples["CrowdSimulationScene01"] = [](ICanvas* iCanvas) {
+    return std::make_unique<CrowdSimulationScene01>(iCanvas);
+  };
   // Crowd Simulation Scene 02
-  _samples["CrowdSimulationScene02"] = std::make_tuple(
-    true,                                                         //
-    [](ICanvas* iCanvas) {                                        //
-      return std::make_unique<CrowdSimulationScene02>(iCanvas); //
-    });                                                           //
+  _samples["CrowdSimulationScene02"] = [](ICanvas* iCanvas) {
+    return std::make_unique<CrowdSimulationScene02>(iCanvas);
+  };
   // Crowd Simulation Scene 03
-  _samples["CrowdSimulationScene03"] = std::make_tuple(
-    true,                                                         //
-    [](ICanvas* iCanvas) {                                        //
-      return std::make_unique<CrowdSimulationScene03>(iCanvas); //
-    });                                                           //
+  _samples["CrowdSimulationScene03"] = [](ICanvas* iCanvas) {
+    return std::make_unique<CrowdSimulationScene03>(iCanvas);
+  };
   // Crowd Simulation Scene 04
-  _samples["CrowdSimulationScene04"] = std::make_tuple(
-    true,                                                         //
-    [](ICanvas* iCanvas) {                                        //
-      return std::make_unique<CrowdSimulationScene04>(iCanvas); //
-    });                                                           //
+  _samples["CrowdSimulationScene04"] = [](ICanvas* iCanvas) {
+    return std::make_unique<CrowdSimulationScene04>(iCanvas);
+  };
   // Crowd Simulation Scene 05
-  _samples["CrowdSimulationScene05"] = std::make_tuple(
-    true,                                                         //
-    [](ICanvas* iCanvas) {                                        //
-      return std::make_unique<CrowdSimulationScene05>(iCanvas); //
-    });                                                           //
+  _samples["CrowdSimulationScene05"] = [](ICanvas* iCanvas) {
+    return std::make_unique<CrowdSimulationScene05>(iCanvas);
+  };
   // Crowd Simulation Scene 06
-  _samples["CrowdSimulationScene06"] = std::make_tuple(
-    true,                                                         //
-    [](ICanvas* iCanvas) {                                        //
-      return std::make_unique<CrowdSimulationScene06>(iCanvas); //
-    });                                                           //
+  _samples["CrowdSimulationScene06"] = [](ICanvas* iCanvas) {
+    return std::make_unique<CrowdSimulationScene06>(iCanvas);
+  };
   // Crowd Simulation Scene 07
-  _samples["CrowdSimulationScene07"] = std::make_tuple(
-    true,                                                         //
-    [](ICanvas* iCanvas) {                                        //
-      return std::make_unique<CrowdSimulationScene07>(iCanvas); //
-    });                                                           //
+  _samples["CrowdSimulationScene07"] = [](ICanvas* iCanvas) {
+    return std::make_unique<CrowdSimulationScene07>(iCanvas);
+  };
   // Crowd Simulation Scene 08
-  _samples["CrowdSimulationScene08"] = std::make_tuple(
-    true,                                                         //
-    [](ICanvas* iCanvas) {                                        //
-      return std::make_unique<CrowdSimulationScene08>(iCanvas); //
-    });                                                           //
+  _samples["CrowdSimulationScene08"] = [](ICanvas* iCanvas) {
+    return std::make_unique<CrowdSimulationScene08>(iCanvas);
+  };
   // Crowd Simulation Scene 09
-  _samples["CrowdSimulationScene09"] = std::make_tuple(
-    true,                                                         //
-    [](ICanvas* iCanvas) {                                        //
-      return std::make_unique<CrowdSimulationScene09>(iCanvas); //
-    });                                                           //
+  _samples["CrowdSimulationScene09"] = [](ICanvas* iCanvas) {
+    return std::make_unique<CrowdSimulationScene09>(iCanvas);
+  };
   // Crowd Simulation Scene 10
-  _samples["CrowdSimulationScene10"] = std::make_tuple(
-    true,                                                         //
-    [](ICanvas* iCanvas) {                                        //
-      return std::make_unique<CrowdSimulationScene10>(iCanvas); //
-    });                                                           //
+  _samples["CrowdSimulationScene10"] = [](ICanvas* iCanvas) {
+    return std::make_unique<CrowdSimulationScene10>(iCanvas);
+  };
   // Crowd Simulation Scene 11
-  _samples["CrowdSimulationScene11"] = std::make_tuple(
-    true,                                                         //
-    [](ICanvas* iCanvas) {                                        //
-      return std::make_unique<CrowdSimulationScene11>(iCanvas); //
-    });                                                           //
+  _samples["CrowdSimulationScene11"] = [](ICanvas* iCanvas) {
+    return std::make_unique<CrowdSimulationScene11>(iCanvas);
+  };
 
   // -- Noise generation examples --
   // Perlin Noise Waves Scene
-  _samples["PerlinNoiseWavesScene"] = std::make_tuple(
-    false,                                                       //
-    [](ICanvas* iCanvas) {                                       //
-      return std::make_unique<PerlinNoiseWavesScene>(iCanvas); //
-    });                                                          //
+  _samples["PerlinNoiseWavesScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<PerlinNoiseWavesScene>(iCanvas);
+  };
 
   // -- Polyhedron examples --
 
   // Polyhedra Scene
-  _samples["PolyhedraScene"]
-    = std::make_tuple(true,                                                 //
-                        [](ICanvas* iCanvas) {                                //
-                          return std::make_unique<PolyhedraScene>(iCanvas); //
-                        });                                                   //
+  _samples["PolyhedraScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<PolyhedraScene>(iCanvas);
+  };
 
   // -- Tree generators examples --
 
   // Simple Oak Tree Scene
-  _samples["SimpleOakTreeScene"] = std::make_tuple(
-    false,                                                    //
-    [](ICanvas* iCanvas) {                                    //
-      return std::make_unique<SimpleOakTreeScene>(iCanvas); //
-    });                                                       //
+  _samples["SimpleOakTreeScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<SimpleOakTreeScene>(iCanvas);
+  };
   // Simple Pine Scene
-  _samples["SimplePineScene"] = std::make_tuple(
-    false,                                                 //
-    [](ICanvas* iCanvas) {                                 //
-      return std::make_unique<SimplePineScene>(iCanvas); //
-    });                                                    //
-}
-
-_ExtensionsSamplesIndex::~_ExtensionsSamplesIndex()
-{
+  _samples["SimplePineScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<SimplePineScene>(iCanvas);
+  };
 }
 
 } // end of namespace Samples

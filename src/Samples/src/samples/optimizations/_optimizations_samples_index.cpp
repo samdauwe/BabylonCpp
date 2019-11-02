@@ -15,45 +15,29 @@ _OptimizationsSamplesIndex::_OptimizationsSamplesIndex()
   // -- Optimizations examples --
 
   // Box Instances Scene
-  _samples["BoxInstancesScene"]
-    = std::make_tuple(true,                                                  //
-                      [](ICanvas* iCanvas) {                                 //
-                        return std::make_unique<BoxInstancesScene>(iCanvas); //
-                      });                                                    //
+  _samples["BoxInstancesScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<BoxInstancesScene>(iCanvas);
+  };
   // Building Instances Grid Scene
-  _samples["BuildingInstancesGridScene"] = std::make_tuple(
-    true,                                                           //
-    [](ICanvas* iCanvas) {                                          //
-      return std::make_unique<BuildingInstancesGridScene>(iCanvas); //
-    });                                                             //
+  _samples["BuildingInstancesGridScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<BuildingInstancesGridScene>(iCanvas);
+  };
   // Clip Planes Scene
-  _samples["ClipPlanesScene"]
-    = std::make_tuple(true,                                                //
-                      [](ICanvas* iCanvas) {                               //
-                        return std::make_unique<ClipPlanesScene>(iCanvas); //
-                      });                                                  //
+  _samples["ClipPlanesScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<ClipPlanesScene>(iCanvas);
+  };
   // Cube Chaos Scene
-  _samples["CubeChaosScene"]
-    = std::make_tuple(true,                                               //
-                      [](ICanvas* iCanvas) {                              //
-                        return std::make_unique<CubeChaosScene>(iCanvas); //
-                      });                                                 //
+  _samples["CubeChaosScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<CubeChaosScene>(iCanvas);
+  };
   // Level of detail Scene
-  _samples["LevelOfDetailScene"]
-    = std::make_tuple(false,                                                  //
-                      [](ICanvas* iCanvas) {                                  //
-                        return std::make_unique<LevelOfDetailScene>(iCanvas); //
-                      });                                                     //
+  _samples["LevelOfDetailScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<LevelOfDetailScene>(iCanvas);
+  };
   // Many Box Instances Scene
-  _samples["ManyBoxInstancesScene"] = std::make_tuple(
-    true,                                                      //
-    [](ICanvas* iCanvas) {                                     //
-      return std::make_unique<ManyBoxInstancesScene>(iCanvas); //
-    });                                                        //
-}
-
-_OptimizationsSamplesIndex::~_OptimizationsSamplesIndex()
-{
+  _samples["ManyBoxInstancesScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<ManyBoxInstancesScene>(iCanvas);
+  };
 }
 
 } // end of namespace Samples

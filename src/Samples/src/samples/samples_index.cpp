@@ -94,17 +94,6 @@ SamplesIndex::~SamplesIndex()
 {
 }
 
-bool SamplesIndex::isSampleEnabled(const std::string& sampleName) const
-{
-  for (const auto& item : _samplesIndex) {
-    if (stl_util::contains(item.second.samples(), sampleName)) {
-      return std::get<0>(item.second.samples().at(sampleName));
-    }
-  }
-
-  return false;
-}
-
 std::optional<BABYLON::Samples::SampleFailureReason> SamplesIndex::doesSampleFail(const std::string& sampleName) const
 {
   if (_samplesFailures.find(sampleName) == _samplesFailures.end())
@@ -177,10 +166,7 @@ std::vector<std::string> SamplesIndex::getSampleNames() const
   std::vector<std::string> sampleNames;
   for (const auto& samplesCategory : _samplesIndex) {
     for (const auto& element : samplesCategory.second.samples()) {
-      // Check if enabled
-      if (std::get<0>(element.second)) {
-        sampleNames.emplace_back(element.first);
-      }
+      sampleNames.emplace_back(element.first);
     }
   }
 
@@ -227,10 +213,7 @@ SamplesIndex::getSampleNamesInCategory(const std::string& categoryName) const
   if (stl_util::contains(_samplesIndex, categoryName)) {
     const auto& samplesCategory = _samplesIndex.at(categoryName);
     for (const auto& element : samplesCategory.samples()) {
-      // Check if enabled
-      if (std::get<0>(element.second)) {
-        sampleNames.emplace_back(element.first);
-      }
+      sampleNames.emplace_back(element.first);
     }
   }
 
@@ -246,7 +229,7 @@ SamplesIndex::createRenderableScene(const std::string& sampleName,
 {
   for (const auto& item : _samplesIndex) {
     if (stl_util::contains(item.second.samples(), sampleName)) {
-      return std::get<1>(item.second.samples().at(sampleName))(iCanvas);
+      return item.second.samples().at(sampleName)(iCanvas);
     }
   }
 
@@ -264,8 +247,7 @@ void SamplesIndex::listSamples()
     auto samples = getSampleNamesInCategory(category);
     for (const auto & sample : samples) 
     {
-      std::string ko = (!isSampleEnabled(sample)) ? " (KO)" : "";
-      std::cout << sample << ko << "\n";
+      std::cout << sample << "\n";
     }
   }
 }

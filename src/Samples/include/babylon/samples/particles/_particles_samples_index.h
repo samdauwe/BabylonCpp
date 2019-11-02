@@ -20,7 +20,7 @@ public:
 
 public:
   _ParticlesSamplesIndex();
-  virtual ~_ParticlesSamplesIndex();
+  virtual ~_ParticlesSamplesIndex() = default;
 
 }; // end of class _ParticlesSamplesIndex
 

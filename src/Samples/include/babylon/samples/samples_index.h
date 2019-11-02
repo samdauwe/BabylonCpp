@@ -35,14 +35,6 @@ public:
   ~SamplesIndex();
 
   /**
-   * @brief Returns whether or not the example is enabled.
-   * @param sampleName the name of the sample to check
-   * @return whether or not the example is enabled
-   */
-  bool isSampleEnabled(const std::string& sampleName) const;
-
-
-  /**
    * @brief Check if the sample is currently known to fail
    * @param sampleName the name of the sample to check
    * @ return an optional string describing why it fails

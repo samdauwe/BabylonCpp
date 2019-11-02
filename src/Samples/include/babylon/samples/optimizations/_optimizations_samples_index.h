@@ -20,7 +20,7 @@ public:
 
 public:
   _OptimizationsSamplesIndex();
-  virtual ~_OptimizationsSamplesIndex();
+  virtual ~_OptimizationsSamplesIndex() = default;
 
 }; // end of class _OptimizationsSamplesIndex
 

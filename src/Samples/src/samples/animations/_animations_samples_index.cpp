@@ -23,92 +23,61 @@ _AnimationsSamplesIndex::_AnimationsSamplesIndex()
   // -- Animations examples --
 
   // Animated Morph Target Scene
-  _samples["AnimatedMorphTargetScene"] = std::make_tuple(
-    true,                                                         //
-    [](ICanvas* iCanvas) {                                        //
-      return std::make_unique<AnimatedMorphTargetScene>(iCanvas); //
-    });                                                           //
+  _samples["AnimatedMorphTargetScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<AnimatedMorphTargetScene>(iCanvas);
+  };
   // Animations Scene
-  _samples["AnimationsScene"]
-    = std::make_tuple(true,                                                //
-                      [](ICanvas* iCanvas) {                               //
-                        return std::make_unique<AnimationsScene>(iCanvas); //
-                      });                                                  //
+  _samples["AnimationsScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<AnimationsScene>(iCanvas);
+  };
   // Animations 101 Scene
-  _samples["Animations101Scene"]
-    = std::make_tuple(true,                                                   //
-                      [](ICanvas* iCanvas) {                                  //
-                        return std::make_unique<Animations101Scene>(iCanvas); //
-                      });                                                     //
+  _samples["Animations101Scene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<Animations101Scene>(iCanvas);
+  };
   // Bone Rotation In World Space Scene
-  _samples["BoneRotationInWorldSpaceScene"] = std::make_tuple(
-    true,                                                              //
-    [](ICanvas* iCanvas) {                                             //
-      return std::make_unique<BoneRotationInWorldSpaceScene>(iCanvas); //
-    });                                                                //
+  _samples["BoneRotationInWorldSpaceScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<BoneRotationInWorldSpaceScene>(iCanvas);
+  };
   // Bouncing Cube Scene
-  _samples["BouncingCubeScene"]
-    = std::make_tuple(true,                                                  //
-                      [](ICanvas* iCanvas) {                                 //
-                        return std::make_unique<BouncingCubeScene>(iCanvas); //
-                      });                                                    //
+  _samples["BouncingCubeScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<BouncingCubeScene>(iCanvas);
+  };
   // Cannon Ball Scene
-  _samples["CannonBallScene"]
-    = std::make_tuple(true,                                                //
-                      [](ICanvas* iCanvas) {                               //
-                        return std::make_unique<CannonBallScene>(iCanvas); //
-                      });                                                  //
+  _samples["CannonBallScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<CannonBallScene>(iCanvas);
+  };
   // Morph Mesh Scene
-  _samples["MorphMeshScene"]
-    = std::make_tuple(false,                                              //
-                      [](ICanvas* iCanvas) {                              //
-                        return std::make_unique<MorphMeshScene>(iCanvas); //
-                      });                                                 //
+  _samples["MorphMeshScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<MorphMeshScene>(iCanvas);
+  };
   // Morph Targets Scene
-  _samples["MorphTargetsScene"] = std::make_tuple(true, MakeMorphTargetsScene);
+  _samples["MorphTargetsScene"] = MakeMorphTargetsScene;
   // Pick And Play Animation Scene
-  _samples["PickAndPlayAnimationScene"] = std::make_tuple(
-    false,                                                         //
-    [](ICanvas* iCanvas) {                                         //
-      return std::make_unique<PickAndPlayAnimationScene>(iCanvas); //
-    });                                                            //
+  _samples["PickAndPlayAnimationScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<PickAndPlayAnimationScene>(iCanvas);
+  };
   // Cartoon Animations Scene
-  _samples["CartoonAnimationsScene"] = std::make_tuple(
-    false,                                                      //
-    [](ICanvas* iCanvas) {                                      //
-      return std::make_unique<CartoonAnimationsScene>(iCanvas); //
-    });                                                         //
+  _samples["CartoonAnimationsScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<CartoonAnimationsScene>(iCanvas);
+  };
   // Pump Jack Scene
   _samples["PumpJackScene"]
-    = std::make_tuple(true,                                              //
-                      [](ICanvas* iCanvas) {                             //
-                        return std::make_unique<PumpJackScene>(iCanvas); //
-                      });                                                //
+    = [](ICanvas* iCanvas) { return std::make_unique<PumpJackScene>(iCanvas); };
   // Tube Animation Scene
-  _samples["TubeAnimationScene"]
-    = std::make_tuple(false,                                                  //
-                      [](ICanvas* iCanvas) {                                  //
-                        return std::make_unique<TubeAnimationScene>(iCanvas); //
-                      });                                                     //
+  _samples["TubeAnimationScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<TubeAnimationScene>(iCanvas);
+  };
 
   // -- Easing function examples --
 
   // Easing Functions Scene
-  _samples["EasingFunctionsScene"] = std::make_tuple(
-    true,                                                     //
-    [](ICanvas* iCanvas) {                                    //
-      return std::make_unique<EasingFunctionsScene>(iCanvas); //
-    });                                                       //
+  _samples["EasingFunctionsScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<EasingFunctionsScene>(iCanvas);
+  };
   // Shape Easings Scene
-  _samples["ShapeEasingsScene"]
-    = std::make_tuple(true,                                                  //
-                      [](ICanvas* iCanvas) {                                 //
-                        return std::make_unique<ShapeEasingsScene>(iCanvas); //
-                      });                                                    //
-}
-
-_AnimationsSamplesIndex::~_AnimationsSamplesIndex()
-{
+  _samples["ShapeEasingsScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<ShapeEasingsScene>(iCanvas);
+  };
 }
 
 } // end of namespace Samples

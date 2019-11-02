@@ -12,27 +12,16 @@ _ShadowsSamplesIndex::_ShadowsSamplesIndex()
   // -- Shadows examples --
 
   // Box Shadow Scene
-  _samples["BoxShadowScene"]
-    = std::make_tuple(true,                                               //
-                      [](ICanvas* iCanvas) {                              //
-                        return std::make_unique<BoxShadowScene>(iCanvas); //
-                      });                                                 //
+  _samples["BoxShadowScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<BoxShadowScene>(iCanvas);
+  };
   // Bulf & Self Shadow Scene
-  _samples["BulbSelfShadowScene"] = std::make_tuple(
-    true,                                                    //
-    [](ICanvas* iCanvas) {                                   //
-      return std::make_unique<BulbSelfShadowScene>(iCanvas); //
-    });                                                      //
+  _samples["BulbSelfShadowScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<BulbSelfShadowScene>(iCanvas);
+  };
   // Shadows Scene
   _samples["ShadowsScene"]
-    = std::make_tuple(true,                                             //
-                      [](ICanvas* iCanvas) {                            //
-                        return std::make_unique<ShadowsScene>(iCanvas); //
-                      });                                               //
-}
-
-_ShadowsSamplesIndex::~_ShadowsSamplesIndex()
-{
+    = [](ICanvas* iCanvas) { return std::make_unique<ShadowsScene>(iCanvas); };
 }
 
 } // end of namespace Samples

@@ -17,57 +17,46 @@ _LoadersBabylonSamplesIndex::_LoadersBabylonSamplesIndex()
   // -- Loaders examples --
 
   // Import Babylon JS Logo Scene
-  _samples["ImportBabylonJSLogoScene"] = std::make_tuple(
-    true,                                                         //
-    [](ICanvas* iCanvas) {                                        //
-      return std::make_unique<ImportBabylonJSLogoScene>(iCanvas); //
-    });                                                           //
+  _samples["ImportBabylonJSLogoScene"] =
+    [](ICanvas* iCanvas) {
+    return std::make_unique<ImportBabylonJSLogoScene>(iCanvas);
+  };
   // Import Candle Scene
   _samples["ImportCandleScene"]
-    = std::make_tuple(true,                                                  //
-                      [](ICanvas* iCanvas) {                                 //
-                        return std::make_unique<ImportCandleScene>(iCanvas); //
-                      });                                                    //
+    = [](ICanvas* iCanvas) {
+    return std::make_unique<ImportCandleScene>(iCanvas);
+  };
   // Import Dude Scene
   _samples["ImportDudeScene"]
-    = std::make_tuple(true,                                                //
-                      [](ICanvas* iCanvas) {                               //
-                        return std::make_unique<ImportDudeScene>(iCanvas); //
-                      });                                                  //
+    = [](ICanvas* iCanvas) {
+    return std::make_unique<ImportDudeScene>(iCanvas);
+  };
   // Import Dummy 3 Scene
   _samples["ImportDummy3Scene"]
-    = std::make_tuple(true,                                                  //
-                      [](ICanvas* iCanvas) {                                 //
-                        return std::make_unique<ImportDummy3Scene>(iCanvas); //
-                      });                                                    //
+    = [](ICanvas* iCanvas) {
+    return std::make_unique<ImportDummy3Scene>(iCanvas);
+  };
   // Import Hill Valley Scene
   _samples["ImportHillValleyScene"]
-    = std::make_tuple(true,                                        //
-                      [](ICanvas* iCanvas) {                       //
-                        return MakeImportHillValleyScene(iCanvas); //
-                      });                                          //
+    = [](ICanvas* iCanvas) {
+        return MakeImportHillValleyScene(iCanvas);
+  };
   // Import Meshes Skull Scene
-  _samples["ImportMeshesSkullScene"] = std::make_tuple(
-    true,                                                       //
-    [](ICanvas* iCanvas) {                                      //
-      return std::make_unique<ImportMeshesSkullScene>(iCanvas); //
-    });                                                         //
+  _samples["ImportMeshesSkullScene"] =     
+    [](ICanvas* iCanvas) {
+      return std::make_unique<ImportMeshesSkullScene>(iCanvas);
+    };
   // Import Rabbit Scene
   _samples["ImportRabbitScene"]
-    = std::make_tuple(true,                                                  //
-                      [](ICanvas* iCanvas) {                                 //
-                        return std::make_unique<ImportRabbitScene>(iCanvas); //
-                      });                                                    //
+    = [](ICanvas* iCanvas) {
+    return std::make_unique<ImportRabbitScene>(iCanvas);
+  };
+
   // Import Suzanne Scene
   _samples["ImportSuzanneScene"]
-    = std::make_tuple(true,                                                   //
-                      [](ICanvas* iCanvas) {                                  //
-                        return std::make_unique<ImportSuzanneScene>(iCanvas); //
-                      });                                                     //
-}
-
-_LoadersBabylonSamplesIndex::~_LoadersBabylonSamplesIndex()
-{
+    = [](ICanvas* iCanvas) {
+    return std::make_unique<ImportSuzanneScene>(iCanvas);
+  };
 }
 
 } // end of namespace Samples

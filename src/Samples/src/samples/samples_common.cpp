@@ -3,7 +3,7 @@
 namespace BABYLON {
 namespace Samples {
 
-const std::unordered_map<std::string, Sample>& _ISamplesIndex::samples() const
+const std::unordered_map<std::string, SampleFactoryFunction>& _ISamplesIndex::samples() const
 {
   return _samples;
 }

@@ -20,7 +20,7 @@ public:
 
 public:
   _ProceduralTexturesLibrarySamplesIndex();
-  virtual ~_ProceduralTexturesLibrarySamplesIndex();
+  virtual ~_ProceduralTexturesLibrarySamplesIndex() = default;
 
 }; // end of class _ProceduralTexturesLibrarySamplesIndex
 

@@ -33,149 +33,101 @@ _TexturesSamplesIndex::_TexturesSamplesIndex()
   // -- Textures examples --
 
   // Blur Mode For Mirrors Scene
-  _samples["BlurModeForMirrorsScene"] = std::make_tuple(
-    true,                                                        //
-    [](ICanvas* iCanvas) {                                       //
-      return std::make_unique<BlurModeForMirrorsScene>(iCanvas); //
-    });                                                          //
-  _samples["BumpTextureScene"]
-    = std::make_tuple(true,                                                 //
-                      [](ICanvas* iCanvas) {                                //
-                        return std::make_unique<BumpTextureScene>(iCanvas); //
-                      });                                                   //
+  _samples["BlurModeForMirrorsScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<BlurModeForMirrorsScene>(iCanvas);
+  };
+  _samples["BumpTextureScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<BumpTextureScene>(iCanvas);
+  };
   // Bump Texture Spheres Scene
-  _samples["BumpTextureSpheresScene"] = std::make_tuple(
-    true,                                                        //
-    [](ICanvas* iCanvas) {                                       //
-      return std::make_unique<BumpTextureSpheresScene>(iCanvas); //
-    });                                                          //
+  _samples["BumpTextureSpheresScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<BumpTextureSpheresScene>(iCanvas);
+  };
   // Cube texture different faces scene
-  _samples["CubeTextureDifferentFacesScene"] = std::make_tuple(
-    true,                                                               //
-    [](ICanvas* iCanvas) {                                              //
-      return std::make_unique<CubeTextureDifferentFacesScene>(iCanvas); //
-    });                                                                 //
+  _samples["CubeTextureDifferentFacesScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<CubeTextureDifferentFacesScene>(iCanvas);
+  };
   // Custom Render Targets Scene
-  _samples["CustomRenderTargetsScene"] = std::make_tuple(
-    true,                                                         //
-    [](ICanvas* iCanvas) {                                        //
-      return std::make_unique<CustomRenderTargetsScene>(iCanvas); //
-    });                                                           //
+  _samples["CustomRenderTargetsScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<CustomRenderTargetsScene>(iCanvas);
+  };
   // Cylinder With Texture Scene
-  _samples["CylinderWithTextureScene"] = std::make_tuple(
-    true,                                                         //
-    [](ICanvas* iCanvas) {                                        //
-      return std::make_unique<CylinderWithTextureScene>(iCanvas); //
-    });                                                           //
+  _samples["CylinderWithTextureScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<CylinderWithTextureScene>(iCanvas);
+  };
   // Environment Texture Scene
-  _samples["EnvironmentTextureScene"] = std::make_tuple(
-    false,                                                       //
-    [](ICanvas* iCanvas) {                                       //
-      return std::make_unique<EnvironmentTextureScene>(iCanvas); //
-    });                                                          //
+  _samples["EnvironmentTextureScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<EnvironmentTextureScene>(iCanvas);
+  };
   // Equirectangular Map as Reflection Texture Scene
-  _samples["EquirectangularMapAsReflectionTextureScene"] = std::make_tuple(
-    true,                  //
-    [](ICanvas* iCanvas) { //
-      return std::make_unique<EquirectangularMapAsReflectionTextureScene>(
-        iCanvas); //
-    });           //
+  _samples["EquirectangularMapAsReflectionTextureScene"]
+    = [](ICanvas* iCanvas) {
+        return std::make_unique<EquirectangularMapAsReflectionTextureScene>(
+          iCanvas);
+      };
   // High Dynamic Range (HDR) cube texture scene
-  _samples["HDRCubeTextureScene"] = std::make_tuple(
-    true,                                                    //
-    [](ICanvas* iCanvas) {                                   //
-      return std::make_unique<HDRCubeTextureScene>(iCanvas); //
-    });                                                      //
+  _samples["HDRCubeTextureScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<HDRCubeTextureScene>(iCanvas);
+  };
   // Image Textures Scene
-  _samples["ImageTextureScene"]
-    = std::make_tuple(true,                                                  //
-                      [](ICanvas* iCanvas) {                                 //
-                        return std::make_unique<ImageTextureScene>(iCanvas); //
-                      });                                                    //
+  _samples["ImageTextureScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<ImageTextureScene>(iCanvas);
+  };
   // "Local Cubemaps Scene
-  _samples["LocalCubemapsScene"]
-    = std::make_tuple(true,                                                   //
-                      [](ICanvas* iCanvas) {                                  //
-                        return std::make_unique<LocalCubemapsScene>(iCanvas); //
-                      });                                                     //
+  _samples["LocalCubemapsScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<LocalCubemapsScene>(iCanvas);
+  };
   // Mirror Textures Scene
-  _samples["MirrorTextureScene"]
-    = std::make_tuple(true,                                                   //
-                      [](ICanvas* iCanvas) {                                  //
-                        return std::make_unique<MirrorTextureScene>(iCanvas); //
-                      });                                                     //
+  _samples["MirrorTextureScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<MirrorTextureScene>(iCanvas);
+  };
   // Mirrors Scene
   _samples["MirrorsScene"]
-    = std::make_tuple(true,                                             //
-                      [](ICanvas* iCanvas) {                            //
-                        return std::make_unique<MirrorsScene>(iCanvas); //
-                      });                                               //
+    = [](ICanvas* iCanvas) { return std::make_unique<MirrorsScene>(iCanvas); };
   // Multisample Render Targets Scene
-  _samples["MultiSampleRenderTargetsScene"] = std::make_tuple(
-    true,                                                              //
-    [](ICanvas* iCanvas) {                                             //
-      return std::make_unique<MultiSampleRenderTargetsScene>(iCanvas); //
-    });                                                                //
+  _samples["MultiSampleRenderTargetsScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<MultiSampleRenderTargetsScene>(iCanvas);
+  };
   // Opacity Textur Scene
-  _samples["OpacityTextureScene"] = std::make_tuple(
-    true,                                                    //
-    [](ICanvas* iCanvas) {                                   //
-      return std::make_unique<OpacityTextureScene>(iCanvas); //
-    });                                                      //
+  _samples["OpacityTextureScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<OpacityTextureScene>(iCanvas);
+  };
   // Photo Dome Scene
-  _samples["PhotoDomeScene"]
-    = std::make_tuple(true,                                               //
-                      [](ICanvas* iCanvas) {                              //
-                        return std::make_unique<PhotoDomeScene>(iCanvas); //
-                      });                                                 //
+  _samples["PhotoDomeScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<PhotoDomeScene>(iCanvas);
+  };
   // Procedural Textures Scene
-  _samples["ProceduralTexturesScene"] = std::make_tuple(
-    true,                                                        //
-    [](ICanvas* iCanvas) {                                       //
-      return std::make_unique<ProceduralTexturesScene>(iCanvas); //
-    });                                                          //
+  _samples["ProceduralTexturesScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<ProceduralTexturesScene>(iCanvas);
+  };
   // Render Target Texture Scene
-  _samples["RenderTargetTextureScene"] = std::make_tuple(
-    true,                                                         //
-    [](ICanvas* iCanvas) {                                        //
-      return std::make_unique<RenderTargetTextureScene>(iCanvas); //
-    });                                                           //
+  _samples["RenderTargetTextureScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<RenderTargetTextureScene>(iCanvas);
+  };
   // Reflecting One Face Sprite Texture Scene
-  _samples["ReflectingOneFaceSpriteTextureScene"] = std::make_tuple(
-    true,                                                                    //
-    [](ICanvas* iCanvas) {                                                   //
-      return std::make_unique<ReflectingOneFaceSpriteTextureScene>(iCanvas); //
-    });                                                                      //
+  _samples["ReflectingOneFaceSpriteTextureScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<ReflectingOneFaceSpriteTextureScene>(iCanvas);
+  };
   // Sphere Textures Scene
-  _samples["SphereTexturesScene"] = std::make_tuple(
-    true,                                                    //
-    [](ICanvas* iCanvas) {                                   //
-      return std::make_unique<SphereTexturesScene>(iCanvas); //
-    });                                                      //
+  _samples["SphereTexturesScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<SphereTexturesScene>(iCanvas);
+  };
   // Sphere Transparent Textures Scene
-  _samples["SphereTransparentTexturesScene"] = std::make_tuple(
-    true,                                                               //
-    [](ICanvas* iCanvas) {                                              //
-      return std::make_unique<SphereTransparentTexturesScene>(iCanvas); //
-    });                                                                 //
+  _samples["SphereTransparentTexturesScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<SphereTransparentTexturesScene>(iCanvas);
+  };
   // Spherical Panning Scene
-  _samples["SphericalPanningScene"] = std::make_tuple(
-    true,                                                      //
-    [](ICanvas* iCanvas) {                                     //
-      return std::make_unique<SphericalPanningScene>(iCanvas); //
-    });                                                        //
+  _samples["SphericalPanningScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<SphericalPanningScene>(iCanvas);
+  };
   // Spherical Reflection Texture Scene
-  _samples["SphericalReflectionTextureScene"] = std::make_tuple(
-    true,                                                                //
-    [](ICanvas* iCanvas) {                                               //
-      return std::make_unique<SphericalReflectionTextureScene>(iCanvas); //
-    });                                                                  //
+  _samples["SphericalReflectionTextureScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<SphericalReflectionTextureScene>(iCanvas);
+  };
   // Two Sided Texture Scene
-  _samples["TwoSidedTextureScene"] = std::make_tuple(
-    false,                                                    //
-    [](ICanvas* iCanvas) {                                    //
-      return std::make_unique<TwoSidedTextureScene>(iCanvas); //
-    });                                                       //
+  _samples["TwoSidedTextureScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<TwoSidedTextureScene>(iCanvas);
+  };
 }
 
 _TexturesSamplesIndex::~_TexturesSamplesIndex()

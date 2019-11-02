@@ -20,7 +20,7 @@ public:
 
 public:
   _LightsSamplesIndex();
-  virtual ~_LightsSamplesIndex();
+  virtual ~_LightsSamplesIndex() = default;
 
 }; // end of class _LightsSamplesIndex
 

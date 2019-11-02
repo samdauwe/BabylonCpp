@@ -14,32 +14,19 @@ _CamerasSamplesIndex::_CamerasSamplesIndex()
 
   // Cameras Scene
   _samples["CamerasScene"]
-    = std::make_tuple(true,                                             //
-                      [](ICanvas* iCanvas) {                            //
-                        return std::make_unique<CamerasScene>(iCanvas); //
-                      });                                               //
+    = [](ICanvas* iCanvas) { return std::make_unique<CamerasScene>(iCanvas); };
   // Follow Camera Scene
-  _samples["FollowCameraScene"]
-    = std::make_tuple(true,                                                  //
-                      [](ICanvas* iCanvas) {                                 //
-                        return std::make_unique<FollowCameraScene>(iCanvas); //
-                      });                                                    //
+  _samples["FollowCameraScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<FollowCameraScene>(iCanvas);
+  };
   // Multi-Views Scene
-  _samples["MultiViewsScene"]
-    = std::make_tuple(true,                                                //
-                      [](ICanvas* iCanvas) {                               //
-                        return std::make_unique<MultiViewsScene>(iCanvas); //
-                      });                                                  //
+  _samples["MultiViewsScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<MultiViewsScene>(iCanvas);
+  };
   // Rollercoaster Scene
-  _samples["RollercoasterScene"]
-    = std::make_tuple(true,                                                   //
-                      [](ICanvas* iCanvas) {                                  //
-                        return std::make_unique<RollercoasterScene>(iCanvas); //
-                      });                                                     //
-}
-
-_CamerasSamplesIndex::~_CamerasSamplesIndex()
-{
+  _samples["RollercoasterScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<RollercoasterScene>(iCanvas);
+  };
 }
 
 } // end of namespace Samples
