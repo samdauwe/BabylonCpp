@@ -39,6 +39,11 @@ public:
    */
   static constexpr unsigned int POSE_ENABLED = 3;
 
+  /**
+   * Represents an Dual Shock controller
+   */
+  static constexpr unsigned int DUALSHOCK = 4;
+
 public:
   /**
    * @brief Initializes the gamepad.
