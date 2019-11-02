@@ -30,7 +30,6 @@ SamplesIndex::SamplesIndex()
 {
   _samplesFailures = {
     {"BlurModeForMirrorsScene", SampleFailureReason::empty3d},
-    {"BoneRotationInWorldSpaceScene", SampleFailureReason::broken},
     {"ColoredRibbonScene", SampleFailureReason::outOfBoundAccess},
     {"CircleCurvesFromBeziersScene", SampleFailureReason::empty3d},
     {"EdgesRenderScene", SampleFailureReason::outOfBoundAccess},
