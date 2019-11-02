@@ -121,13 +121,21 @@ struct BABYLON_SHARED_EXPORT Tools {
   static Image ArrayBufferToImage(const ArrayBuffer& buffer,
                                   bool flipVertically = false);
 
+  /**
+   * @brief Converts an string to an image.
+   * @param buffer the string holding the image data
+   * @return the decoded image
+   */
+  static Image StringToImage(const std::string& buffer,
+                             bool flipVertically = false);
+
   static void LoadImageFromUrl(
     std::string url, const std::function<void(const Image& img)>& onLoad,
     const std::function<void(const std::string& message,
                              const std::string& exception)>& onError,
     bool flipVertically = false);
   static void LoadImageFromBuffer(
-    const std::variant<std::string, ArrayBuffer, Image>& input,
+    const std::variant<std::string, ArrayBuffer, Image>& input, bool invertY,
     const std::function<void(const Image& img)>& onLoad,
     const std::function<void(const std::string& message,
                              const std::string& exception)>& onError);
