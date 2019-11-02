@@ -3,7 +3,7 @@
 #include <babylon/samples/animations/animated_morph_target_scene.h>
 #include <babylon/samples/animations/animations_101_scene.h>
 #include <babylon/samples/animations/animations_scene.h>
-#include <babylon/samples/animations/bone_rotatation_in_world_space_scene.h>
+#include <babylon/samples/animations/bone_rotation_in_world_space_scene.h>
 #include <babylon/samples/animations/bouncing_cube_scene.h>
 #include <babylon/samples/animations/cannon_ball_scene.h>
 #include <babylon/samples/animations/cartoon_animations_scene.h>
