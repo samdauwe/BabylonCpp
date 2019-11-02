@@ -65,11 +65,7 @@ _AnimationsSamplesIndex::_AnimationsSamplesIndex()
                         return std::make_unique<MorphMeshScene>(iCanvas); //
                       });                                                 //
   // Morph Targets Scene
-  _samples["MorphTargetsScene"]
-    = std::make_tuple(true,                                                  //
-                      [](ICanvas* iCanvas) {                                 //
-                        return std::make_unique<MorphTargetsScene>(iCanvas); //
-                      });                                                    //
+  _samples["MorphTargetsScene"] = std::make_tuple(true, MakeMorphTargetsScene);
   // Pick And Play Animation Scene
   _samples["PickAndPlayAnimationScene"] = std::make_tuple(
     false,                                                         //

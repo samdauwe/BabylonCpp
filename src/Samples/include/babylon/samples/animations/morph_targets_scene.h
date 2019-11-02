@@ -19,26 +19,7 @@ namespace Samples {
  * @see https://www.babylonjs-playground.com/#2JDN66#7
  * @see https://doc.babylonjs.com/how_to/how_to_use_morphtargets
  */
-class MorphTargetsScene : public IRenderableScene {
-
-public:
-  MorphTargetsScene(ICanvas* iCanvas);
-  ~MorphTargetsScene() override;
-
-  const char* getName() override;
-  void initializeScene(ICanvas* canvas, Scene* scene) override;
-
-private:
-  void _addSpike(const MeshPtr& mesh);
-
-private:
-  MorphTargetPtr _target0;
-  MorphTargetPtr _target1;
-  MorphTargetPtr _target2;
-  MorphTargetPtr _target3;
-
-}; // end of class MorphTargetsScene
-
+std::shared_ptr<IRenderableScene> MakeMorphTargetsScene(ICanvas* iCanvas);
 } // end of namespace Samples
 } // end of namespace BABYLON
 
