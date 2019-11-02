@@ -10,8 +10,7 @@ namespace Samples {
  * @brief Collisions Scene. Scene demonstrating how to handle basic collisions
  * to avoid a camera going through a box.
  * @see https://www.babylonjs-playground.com/#U8MEB0#0
- * @see
- * https://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
+ * @see https://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
  */
 struct CollisionsScene : public IRenderableScene {
 
@@ -28,3 +27,4 @@ struct CollisionsScene : public IRenderableScene {
 
 #endif // end of
        // BABYLON_SAMPLES_COLLISIONS_AND_INTERSECTIONS_COLLISIONS_SCENE_H
+

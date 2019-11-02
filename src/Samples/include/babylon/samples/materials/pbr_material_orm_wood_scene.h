@@ -13,8 +13,7 @@ namespace Samples {
  *   - Green channel for Roughness
  *   - Blue channel for Metallic
  * @see https://www.babylonjs-playground.com/#K4S3GU#58
- * @see
- * https://forum.babylonjs.com/t/how-to-create-a-pbr-from-multiple-images/1433
+ * @see https://forum.babylonjs.com/t/how-to-create-a-pbr-from-multiple-images/1433
  */
 struct PBRMaterialORMWoodScene : public IRenderableScene {
 
