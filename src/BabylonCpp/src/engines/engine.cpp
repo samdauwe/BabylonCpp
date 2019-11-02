@@ -365,13 +365,34 @@ void Engine::_initGLContext()
   _caps.maxVertexAttribs     = _gl->getParameteri(GL::MAX_VERTEX_ATTRIBS);
 
   // Those parameters cannot always be reliably queried
-  // (GlGetError returns INVALID_ENUM under windows 10 (VM with parallels
-  // desktop opengl driver)
-  //_caps.maxVaryingVectors    = _gl->getParameteri(GL::MAX_VARYING_VECTORS);
-  //_caps.maxFragmentUniformVectors
-  //  = _gl->getParameteri(GL::MAX_FRAGMENT_UNIFORM_VECTORS);
-  //_caps.maxVertexUniformVectors
-  //  = _gl->getParameteri(GL::MAX_VERTEX_UNIFORM_VECTORS);
+  // (GlGetError returns INVALID_ENUM under windows 10 (VM with parallels desktop opengl driver)
+  // In case of failure, we set reasonable values
+  _caps.maxVaryingVectors = _gl->getParameteri(GL::MAX_VARYING_VECTORS);
+  if (_caps.maxVaryingVectors == 0)
+  {
+    BABYLON_LOGF_WARN("_initGLContext", "_gl->getParameteri(GL::MAX_VARYING_VECTORS) failed "
+                      "=> using %i as a default...", 16);
+    _caps.maxVaryingVectors = 16;
+  }
+
+  _caps.maxFragmentUniformVectors = _gl->getParameteri(GL::MAX_FRAGMENT_UNIFORM_VECTORS);
+  if (_caps.maxFragmentUniformVectors == 0)
+  {
+    BABYLON_LOGF_WARN("_initGLContext",
+                      "_gl->getParameteri(GL::MAX_FRAGMENT_UNIFORM_VECTORS) failed => "
+                      "using %i as a default...", 256);
+    _caps.maxFragmentUniformVectors = 256;
+  }
+
+  _caps.maxVertexUniformVectors = _gl->getParameteri(GL::MAX_VERTEX_UNIFORM_VECTORS);
+  if (_caps.maxVertexUniformVectors == 0)
+  {
+    BABYLON_LOGF_WARN(
+      "_initGLContext",
+      "_gl->getParameteri(GL::MAX_VERTEX_UNIFORM_VECTORS) failed => "
+      "using %i as a default...", 256);
+    _caps.maxVertexUniformVectors = 256;
+  }
 
   // Infos
   _glVersion  = _gl->getString(GL::VERSION);

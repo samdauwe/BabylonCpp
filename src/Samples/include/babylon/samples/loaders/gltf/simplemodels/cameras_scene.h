@@ -9,8 +9,7 @@ namespace Samples {
 /**
  * @brief Cameras Scene (glTF). A sample with two different camera objects.
  * @see https://doc.babylonjs.com/how_to/load_from_any_file_type
- * @see
- * https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/Cameras
+ * @see https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/Cameras
  */
 struct CamerasGLTFScene : public IRenderableScene {
 
@@ -27,3 +26,4 @@ struct CamerasGLTFScene : public IRenderableScene {
 
 #endif // end of
        // BABYLON_SAMPLES_LOADERS_GLTF_SIMPLE_MODELS_CAMERAS_SCENE_H
+
