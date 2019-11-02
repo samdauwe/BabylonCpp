@@ -113,7 +113,7 @@ IGLTF2::IAccessorSparseValues::Parse(const json& parsedAccessorSparseValues)
   if (json_util::has_valid_key_value(parsedAccessorSparseValues,
                                      "byteOffset")) {
     accessorSparseValues.byteOffset
-      = json_util::get_number<size_t>(parsedAccessorSparseValues, "byteOffset");
+      = json_util::get_number<int>(parsedAccessorSparseValues, "byteOffset");
   }
 
   return accessorSparseValues;
