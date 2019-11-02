@@ -1,6 +1,7 @@
 #ifndef BABYLON_CORE_ARRAY_BUFFER_VIEW_H
 #define BABYLON_CORE_ARRAY_BUFFER_VIEW_H
 
+#include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
 
 namespace BABYLON {
@@ -16,7 +17,7 @@ namespace BABYLON {
  *  - Uint32Array,
  *  - Float32Array,
  */
-struct ArrayBufferView {
+struct BABYLON_SHARED_EXPORT ArrayBufferView {
 
   ArrayBufferView();
   ArrayBufferView(const Int8Array& buffer);
