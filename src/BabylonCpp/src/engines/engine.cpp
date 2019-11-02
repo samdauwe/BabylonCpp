@@ -976,7 +976,7 @@ void Engine::setViewport(Viewport& viewport,
             height * viewport.height);
 }
 
-Viewport& Engine::setDirectViewport(int x, int y, int width, int height)
+Viewport Engine::setDirectViewport(int x, int y, int width, int height)
 {
   auto currentViewport = _cachedViewport;
   _cachedViewport      = std::nullopt;

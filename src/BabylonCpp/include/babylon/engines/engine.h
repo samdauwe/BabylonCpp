@@ -611,7 +611,7 @@ public:
    * call. You can restore this viewport later on to go back to the original
    * state
    */
-  Viewport& setDirectViewport(int x, int y, int width, int height);
+  Viewport setDirectViewport(int x, int y, int width, int height);
 
   /**
    * @brief Begin a new frame.
@@ -2800,9 +2800,9 @@ protected:
    * Hidden
    */
   std::shared_ptr<GL::IGLFramebuffer> _currentFramebuffer;
-  // _previousFrameBuffer : stores the previous frameBuffer 
+  // _previousFrameBuffer : stores the previous frameBuffer
   // during calls to bindFrameBuffer(), so that unBindFrameBuffer can restore it
-  std::unique_ptr <GL::IGLFramebuffer> _previousFrameBuffer;
+  std::unique_ptr<GL::IGLFramebuffer> _previousFrameBuffer;
 
 private:
   // WebVR
