@@ -141,17 +141,22 @@ nlohmann::json ReadSampleInfoFile()
     return nlohmann::json();
 }
 
-SampleInfo SamplesIndex::getSampleInfo(const std::string& sampleName) const
+SampleInfo SamplesIndex::getSampleInfo(const std::string& sampleNameMixedCase) const
 {
   static nlohmann::json _samplesInfo = ReadSampleInfoFile();
   static std::map<std::string, SampleInfo> cache;
-  if (cache.find(sampleName) != cache.end())
-    return cache.at(sampleName);
+
+  std::string sampleNameLowerCase;
+  for (auto c : sampleNameMixedCase)
+    sampleNameLowerCase += static_cast<char>(std::tolower(c));
+
+  if (cache.find(sampleNameLowerCase) != cache.end())
+    return cache.at(sampleNameLowerCase);
 
   SampleInfo result;
   for (const auto & element : _samplesInfo)
   {
-    if (element["sample_name"] == sampleName)
+    if (element["sample_name"] == sampleNameLowerCase)
     {
       result.Brief = element["brief"];
       result.HeaderFile = element["header_file"];
@@ -162,7 +167,7 @@ SampleInfo SamplesIndex::getSampleInfo(const std::string& sampleName) const
       }
     }
   }
-  cache[sampleName] = result;
+  cache[sampleNameLowerCase] = result;
   return result;
 }
 
