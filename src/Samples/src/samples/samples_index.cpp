@@ -29,22 +29,34 @@ namespace Samples {
 SamplesIndex::SamplesIndex()
 {
   _samplesFailures = {
-    {"BlurModeForMirrorsScene", SampleFailureReason::empty3d},
-    {"ColoredRibbonScene", SampleFailureReason::outOfBoundAccess},
-    {"CircleCurvesFromBeziersScene", SampleFailureReason::empty3d},
-    {"EdgesRenderScene", SampleFailureReason::outOfBoundAccess},
-    {"HighlightLayerScene", SampleFailureReason::incomplete3d},
-    {"InnerMeshPointsScene", SampleFailureReason::outOfBoundAccess},
-    {"LinesMeshSpiralScene", SampleFailureReason::empty3d},
-    {"LorenzAttractorScene", SampleFailureReason::empty3d},
-    {"MorphTargetsScene", SampleFailureReason::broken},
-    {"MultiSampleRenderTargetsScene", SampleFailureReason::empty3d},
-    {"PBRMaterialCheckerORMScene", SampleFailureReason::broken},
-    {"PBRMaterialScene", SampleFailureReason::broken},
-    {"PBRMetallicRoughnessGoldMaterialScene", SampleFailureReason::broken},
-    {"PBRMetallicRoughnessMaterialScene", SampleFailureReason::outOfBoundAccess},
-    {"PBRMetallicRoughnessTextureMaterialScene", SampleFailureReason::broken},
-    {"ShaderMaterialWarpSpeedScene", SampleFailureReason::empty3d},
+    {"AirplaneModelScene", { SampleFailureReasonKind::segFault} },
+    {"BlurModeForMirrorsScene", { SampleFailureReasonKind::empty3d} },
+    {"CartoonAnimationsScene", { SampleFailureReasonKind::segFault} },
+    {"ColoredRibbonScene", { SampleFailureReasonKind::segFault} },
+    {"CircleCurvesFromBeziersScene", { SampleFailureReasonKind::empty3d} },
+    {"DecalsScene", { SampleFailureReasonKind::segFault} },
+    {"EdgesRenderScene", { SampleFailureReasonKind::segFault} },
+    {"EnvironmentTextureScene", { SampleFailureReasonKind::empty3d} },
+    {"FurMaterialScene", { SampleFailureReasonKind::broken3d, "Black texture"} },
+    {"HighlightLayerScene", { SampleFailureReasonKind::broken3d, "Rendering much too bright"} },
+    {"InfiniteLoaderScene", { SampleFailureReasonKind::segFault} },
+    {"InnerMeshPointsScene", { SampleFailureReasonKind::segFault} },
+    {"IsPointInsideMeshScene", { SampleFailureReasonKind::processHung} },
+    {"LevelOfDetailScene", {SampleFailureReasonKind::segFault, "Segfault when dragging the mouse"}},
+    {"LinesMeshSpiralScene", { SampleFailureReasonKind::empty3d} },
+    {"LorenzAttractorScene", { SampleFailureReasonKind::empty3d} },
+    {"MergedMeshesScene", { SampleFailureReasonKind::segFault} },
+    {"MorphTargetsScene", { SampleFailureReasonKind::broken3d, "Rendering much too bright"} },
+    {"MultiSampleRenderTargetsScene", { SampleFailureReasonKind::empty3d} },
+    {"PBRMaterialCheckerORMScene", { SampleFailureReasonKind::broken3d, "Rendering much too bright"} },
+    {"PBRMaterialScene", { SampleFailureReasonKind::broken3d, "Rendering much too bright"} },
+    {"PBRMetallicRoughnessGoldMaterialScene", { SampleFailureReasonKind::broken3d, "Rendering much too bright"} },
+    {"PBRMetallicRoughnessMaterialScene", { SampleFailureReasonKind::broken3d, "Rendering much too bright"} },
+    {"PBRMetallicRoughnessTextureMaterialScene", { SampleFailureReasonKind::broken3d, "Rendering much too bright"} },
+    {"PointsCloudScene", { SampleFailureReasonKind::empty3d} },
+    {"ProceduralHexPlanetGenerationScene", { SampleFailureReasonKind::segFault} },
+    {"ShaderMaterialWarpSpeedScene", { SampleFailureReasonKind::empty3d} },
+    {"VolumetricLightScatteringScene", { SampleFailureReasonKind::segFault } }
   };
 
   // Initialize the samples index
@@ -252,34 +264,19 @@ void SamplesIndex::listSamples()
   }
 }
 
-std::string SampleFailureReason_Str(SampleFailureReason s)
+std::string SampleFailureReason_Str(SampleFailureReasonKind s)
 {
   switch (s) {
-    case SampleFailureReason::blankDisplay:
-      return "Blank display";
+    case SampleFailureReasonKind::segFault:
+      return "Segmentation fault";
       break;
-    case SampleFailureReason::outOfBoundAccess :
-      return "Out of bounds access";
+    case SampleFailureReasonKind::processHung:
+      return "Process hung (infinite loop?)";
       break;
-    case SampleFailureReason::processHung:
-      return "Process hung";
-      break;
-    case SampleFailureReason::invalidComparator:
-      return "Invalid comparator";
-      break;
-    case SampleFailureReason::vectorIteratorInvalid:
-      return "vector iterators in range are from different containers";
-      break;
-    case SampleFailureReason::empty3d:
+    case SampleFailureReasonKind::empty3d:
       return "3D rendering is empty";
       break;
-    case SampleFailureReason::readAccessViolation:
-      return "Read Access Violation";
-      break;
-    case SampleFailureReason::incomplete3d:
-      return "Incomplete 3d (black textures and co)";
-      break;
-    case SampleFailureReason::broken:
+    case SampleFailureReasonKind::broken3d:
       return "Broken (bad rendering and/or bad behavior)";
       break;
     default:
