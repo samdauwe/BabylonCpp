@@ -60,238 +60,153 @@ _LoadersGLTFSamplesIndex::_LoadersGLTFSamplesIndex()
   // -- Simple models for testing individual features --
 
   // Animated Morph Cube Scene (glTF)
-  _samples["AnimatedMorphCubeGLTFScene"] = std::make_tuple(
-    true,                                                       //
-    [](ICanvas* iCanvas) {                                      //
-      return std::make_unique<AnimatedMorphCubeScene>(iCanvas); //
-    });                                                         //
+  _samples["AnimatedMorphCubeGLTFScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<AnimatedMorphCubeScene>(iCanvas);
+  };
   // Animated Morph Sphere Scene (glTF)
-  _samples["AnimatedMorphSphereGLTFScene"] = std::make_tuple(
-    true,                                                         //
-    [](ICanvas* iCanvas) {                                        //
-      return std::make_unique<AnimatedMorphSphereScene>(iCanvas); //
-    });                                                           //
+  _samples["AnimatedMorphSphereGLTFScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<AnimatedMorphSphereScene>(iCanvas);
+  };
   // Animated Triangle Scene (glTF)
-  _samples["AnimatedTriangleGLTFScene"] = std::make_tuple(
-    true,                                                      //
-    [](ICanvas* iCanvas) {                                     //
-      return std::make_unique<AnimatedTriangleScene>(iCanvas); //
-    });                                                        //
+  _samples["AnimatedTriangleGLTFScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<AnimatedTriangleScene>(iCanvas);
+  };
   // Cameras Scene (glTF)
-  _samples["CamerasGLTFScene"]
-    = std::make_tuple(true,                                                 //
-                      [](ICanvas* iCanvas) {                                //
-                        return std::make_unique<CamerasGLTFScene>(iCanvas); //
-                      });                                                   //
+  _samples["CamerasGLTFScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<CamerasGLTFScene>(iCanvas);
+  };
   // Interpolation Test Scene (glTF)
-  _samples["InterpolationTestGLTFScene"] = std::make_tuple(
-    false,                                                      //
-    [](ICanvas* iCanvas) {                                      //
-      return std::make_unique<InterpolationTestScene>(iCanvas); //
-    });                                                         //
+  _samples["InterpolationTestGLTFScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<InterpolationTestScene>(iCanvas);
+  };
   // Simple Material Scene (glTF)
-  _samples["SimpleMaterialGLTFScene"] = std::make_tuple(
-    true,                                                        //
-    [](ICanvas* iCanvas) {                                       //
-      return std::make_unique<SimpleMaterialGLTFScene>(iCanvas); //
-    });                                                          //
+  _samples["SimpleMaterialGLTFScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<SimpleMaterialGLTFScene>(iCanvas);
+  };
   // Simple Meshes Scene (glTF)
-  _samples["SimpleMeshesGLTFScene"]
-    = std::make_tuple(true,                                                  //
-                      [](ICanvas* iCanvas) {                                 //
-                        return std::make_unique<SimpleMeshesScene>(iCanvas); //
-                      });                                                    //
+  _samples["SimpleMeshesGLTFScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<SimpleMeshesScene>(iCanvas);
+  };
   // Simple Morph Scene (glTF)
-  _samples["SimpleMorphGLTFScene"]
-    = std::make_tuple(true,                                                 //
-                      [](ICanvas* iCanvas) {                                //
-                        return std::make_unique<SimpleMorphScene>(iCanvas); //
-                      });                                                   //
+  _samples["SimpleMorphGLTFScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<SimpleMorphScene>(iCanvas);
+  };
   // Simple Skin Scene (glTF)
-  _samples["SimpleSkinGLTFScene"]
-    = std::make_tuple(true,                                                //
-                      [](ICanvas* iCanvas) {                               //
-                        return std::make_unique<SimpleSkinScene>(iCanvas); //
-                      });                                                  //
+  _samples["SimpleSkinGLTFScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<SimpleSkinScene>(iCanvas);
+  };
   // Simple Sparse Accessor Scene (glTF)
-  _samples["SimpleSparseAccessorGLTFScene"] = std::make_tuple(
-    true,                                                          //
-    [](ICanvas* iCanvas) {                                         //
-      return std::make_unique<SimpleSparseAccessorScene>(iCanvas); //
-    });                                                            //
+  _samples["SimpleSparseAccessorGLTFScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<SimpleSparseAccessorScene>(iCanvas);
+  };
   // Simple Texture Scene (glTF)
-  _samples["SimpleTextureGLTFScene"]
-    = std::make_tuple(true,                                                   //
-                      [](ICanvas* iCanvas) {                                  //
-                        return std::make_unique<SimpleTextureScene>(iCanvas); //
-                      });                                                     //
+  _samples["SimpleTextureGLTFScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<SimpleTextureScene>(iCanvas);
+  };
   // Triangle Scene (glTF)
   _samples["TriangleGLTFScene"]
-    = std::make_tuple(true,                                              //
-                      [](ICanvas* iCanvas) {                             //
-                        return std::make_unique<TriangleScene>(iCanvas); //
-                      });                                                //
+    = [](ICanvas* iCanvas) { return std::make_unique<TriangleScene>(iCanvas); };
   // Triangle Without Indices Scene (glTF)
-  _samples["TriangleWithoutIndicesGLTFScene"] = std::make_tuple(
-    true,                                                            //
-    [](ICanvas* iCanvas) {                                           //
-      return std::make_unique<TriangleWithoutIndicesScene>(iCanvas); //
-    });                                                              //
+  _samples["TriangleWithoutIndicesGLTFScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<TriangleWithoutIndicesScene>(iCanvas);
+  };
 
   // -- More complex models --
 
   // 2 Cylinder Engine Scene (glTF)
-  _samples["2CylinderEngineGLTFScene"] = std::make_tuple(
-    false,                                                      //
-    [](ICanvas* iCanvas) {                                      //
-      return std::make_unique<TwoCylinderEngineScene>(iCanvas); //
-    });                                                         //
+  _samples["2CylinderEngineGLTFScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<TwoCylinderEngineScene>(iCanvas);
+  };
   // Box Interleaved Scene (glTF)
-  _samples["BoxInterleavedGLTFScene"] = std::make_tuple(
-    true,                                                    //
-    [](ICanvas* iCanvas) {                                   //
-      return std::make_unique<BoxInterleavedScene>(iCanvas); //
-    });                                                      //
+  _samples["BoxInterleavedGLTFScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<BoxInterleavedScene>(iCanvas);
+  };
   // Box Scene (glTF)
   _samples["BoxGLTFScene"]
-    = std::make_tuple(true,                                         //
-                      [](ICanvas* iCanvas) {                        //
-                        return std::make_unique<BoxScene>(iCanvas); //
-                      });                                           //
+    = [](ICanvas* iCanvas) { return std::make_unique<BoxScene>(iCanvas); };
   // Box Textured Non Power Of Two Scene (glTF)
-  _samples["BoxTexturedNonPowerOfTwoGLTFScene"] = std::make_tuple(
-    false,                                                             //
-    [](ICanvas* iCanvas) {                                             //
-      return std::make_unique<BoxTexturedNonPowerOfTwoScene>(iCanvas); //
-    });                                                                //
+  _samples["BoxTexturedNonPowerOfTwoGLTFScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<BoxTexturedNonPowerOfTwoScene>(iCanvas);
+  };
   // Box Textured Scene (glTF)
-  _samples["BoxTexturedGLTFScene"]
-    = std::make_tuple(true,                                                 //
-                      [](ICanvas* iCanvas) {                                //
-                        return std::make_unique<BoxTexturedScene>(iCanvas); //
-                      });                                                   //
+  _samples["BoxTexturedGLTFScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<BoxTexturedScene>(iCanvas);
+  };
   // Box Vertex Colors Scene (glTF)
-  _samples["BoxVertexColorsGLTFScene"] = std::make_tuple(
-    true,                                                     //
-    [](ICanvas* iCanvas) {                                    //
-      return std::make_unique<BoxVertexColorsScene>(iCanvas); //
-    });                                                       //
+  _samples["BoxVertexColorsGLTFScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<BoxVertexColorsScene>(iCanvas);
+  };
   // Duck Scene (glTF)
   _samples["DuckGLTFScene"]
-    = std::make_tuple(true,                                          //
-                      [](ICanvas* iCanvas) {                         //
-                        return std::make_unique<DuckScene>(iCanvas); //
-                      });                                            //
+    = [](ICanvas* iCanvas) { return std::make_unique<DuckScene>(iCanvas); };
   // Reciprocating Saw Scene (glTF)
-  _samples["ReciprocatingSawGLTFScene"] = std::make_tuple(
-    false,                                                     //
-    [](ICanvas* iCanvas) {                                     //
-      return std::make_unique<ReciprocatingSawScene>(iCanvas); //
-    });                                                        //
+  _samples["ReciprocatingSawGLTFScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<ReciprocatingSawScene>(iCanvas);
+  };
 
   // -- PBR models --
 
   // Avocado Scene (glTF)
   _samples["AvocadoGLTFScene"]
-    = std::make_tuple(true,                                             //
-                      [](ICanvas* iCanvas) {                            //
-                        return std::make_unique<AvocadoScene>(iCanvas); //
-                      });                                               //
+    = [](ICanvas* iCanvas) { return std::make_unique<AvocadoScene>(iCanvas); };
   // Barramundi Fish Scene (glTF)
-  _samples["BarramundiFishGLTFScene"] = std::make_tuple(
-    true,                                                    //
-    [](ICanvas* iCanvas) {                                   //
-      return std::make_unique<BarramundiFishScene>(iCanvas); //
-    });                                                      //
+  _samples["BarramundiFishGLTFScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<BarramundiFishScene>(iCanvas);
+  };
   // Boom Box Scene (glTF)
   _samples["BoomBoxGLTFScene"]
-    = std::make_tuple(true,                                             //
-                      [](ICanvas* iCanvas) {                            //
-                        return std::make_unique<BoomBoxScene>(iCanvas); //
-                      });                                               //
+    = [](ICanvas* iCanvas) { return std::make_unique<BoomBoxScene>(iCanvas); };
   // Corset Scene (glTF)
   _samples["CorsetGLTFScene"]
-    = std::make_tuple(true,                                            //
-                      [](ICanvas* iCanvas) {                           //
-                        return std::make_unique<CorsetScene>(iCanvas); //
-                      });                                              //
+    = [](ICanvas* iCanvas) { return std::make_unique<CorsetScene>(iCanvas); };
   // Damaged Helmet Scene (glTF)
-  _samples["DamagedHelmetGLTFScene"]
-    = std::make_tuple(true,                                                   //
-                      [](ICanvas* iCanvas) {                                  //
-                        return std::make_unique<DamagedHelmetScene>(iCanvas); //
-                      });                                                     //
+  _samples["DamagedHelmetGLTFScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<DamagedHelmetScene>(iCanvas);
+  };
   // Flight Helmet Scene (glTF)
-  _samples["FlightHelmetGLTFScene"]
-    = std::make_tuple(true,                                                  //
-                      [](ICanvas* iCanvas) {                                 //
-                        return std::make_unique<FlightHelmetScene>(iCanvas); //
-                      });                                                    //
+  _samples["FlightHelmetGLTFScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<FlightHelmetScene>(iCanvas);
+  };
   // Lantern Scene (glTF)
   _samples["LanternGLTFScene"]
-    = std::make_tuple(true,                                             //
-                      [](ICanvas* iCanvas) {                            //
-                        return std::make_unique<LanternScene>(iCanvas); //
-                      });                                               //
+    = [](ICanvas* iCanvas) { return std::make_unique<LanternScene>(iCanvas); };
   // Water Bottle Scene (glTF)
-  _samples["WaterBottleGLTFScene"]
-    = std::make_tuple(true,                                                 //
-                      [](ICanvas* iCanvas) {                                //
-                        return std::make_unique<WaterBottleScene>(iCanvas); //
-                      });                                                   //
+  _samples["WaterBottleGLTFScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<WaterBottleScene>(iCanvas);
+  };
 
   // -- Further PBR models --
 
   // Animated Cube Scene (glTF)
-  _samples["AnimatedCubeGLTFScene"]
-    = std::make_tuple(true,                                                  //
-                      [](ICanvas* iCanvas) {                                 //
-                        return std::make_unique<AnimatedCubeScene>(iCanvas); //
-                      });                                                    //
+  _samples["AnimatedCubeGLTFScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<AnimatedCubeScene>(iCanvas);
+  };
   // Antique Camera Scene (glTF)
-  _samples["AntiqueCameraGLTFScene"]
-    = std::make_tuple(true,                                                   //
-                      [](ICanvas* iCanvas) {                                  //
-                        return std::make_unique<AntiqueCameraScene>(iCanvas); //
-                      });                                                     //
+  _samples["AntiqueCameraGLTFScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<AntiqueCameraScene>(iCanvas);
+  };
   // Cube Scene (glTF)
   _samples["CubeGLTFScene"]
-    = std::make_tuple(true,                                          //
-                      [](ICanvas* iCanvas) {                         //
-                        return std::make_unique<CubeScene>(iCanvas); //
-                      });                                            //
+    = [](ICanvas* iCanvas) { return std::make_unique<CubeScene>(iCanvas); };
   // Sci Fi Helmet Scene (glTF)
-  _samples["SciFiHelmetGLTFScene"]
-    = std::make_tuple(true,                                                 //
-                      [](ICanvas* iCanvas) {                                //
-                        return std::make_unique<SciFiHelmetScene>(iCanvas); //
-                      });                                                   //
+  _samples["SciFiHelmetGLTFScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<SciFiHelmetScene>(iCanvas);
+  };
   // Suzanne Scene (glTF)
   _samples["SuzanneGLTFScene"]
-    = std::make_tuple(true,                                             //
-                      [](ICanvas* iCanvas) {                            //
-                        return std::make_unique<SuzanneScene>(iCanvas); //
-                      });                                               //
+    = [](ICanvas* iCanvas) { return std::make_unique<SuzanneScene>(iCanvas); };
   // Two Sided Plane Scene (glTF)
-  _samples["TwoSidedPlaneGLTFScene"]
-    = std::make_tuple(true,                                                   //
-                      [](ICanvas* iCanvas) {                                  //
-                        return std::make_unique<TwoSidedPlaneScene>(iCanvas); //
-                      });                                                     //
+  _samples["TwoSidedPlaneGLTFScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<TwoSidedPlaneScene>(iCanvas);
+  };
 
   // -- Feature Test Models --
 
   // Alpha Blend Mode Test Scene (glTF)
-  _samples["AlphaBlendModeTestGLTFScene"] = std::make_tuple(
-    true,                                                        //
-    [](ICanvas* iCanvas) {                                       //
-      return std::make_unique<AlphaBlendModeTestScene>(iCanvas); //
-    });                                                          //
+  _samples["AlphaBlendModeTestGLTFScene"] = [](ICanvas* iCanvas) {
+    return std::make_unique<AlphaBlendModeTestScene>(iCanvas);
+  };
 #endif
-}
-
-_LoadersGLTFSamplesIndex::~_LoadersGLTFSamplesIndex()
-{
 }
 
 } // end of namespace Samples
