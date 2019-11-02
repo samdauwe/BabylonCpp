@@ -28,37 +28,6 @@ namespace Samples {
 
 SamplesIndex::SamplesIndex()
 {
-  _samplesFailures = {
-    {"AirplaneModelScene", { SampleFailureReasonKind::segFault} },
-    {"BlurModeForMirrorsScene", { SampleFailureReasonKind::empty3d} },
-    {"CartoonAnimationsScene", { SampleFailureReasonKind::segFault} },
-    {"ColoredRibbonScene", { SampleFailureReasonKind::segFault} },
-    {"CircleCurvesFromBeziersScene", { SampleFailureReasonKind::empty3d} },
-    {"DecalsScene", { SampleFailureReasonKind::segFault} },
-    {"EdgesRenderScene", { SampleFailureReasonKind::segFault} },
-    {"EnvironmentTextureScene", { SampleFailureReasonKind::empty3d} },
-    {"FurMaterialScene", { SampleFailureReasonKind::broken3d, "Black texture"} },
-    {"HighlightLayerScene", { SampleFailureReasonKind::broken3d, "Rendering much too bright"} },
-    {"InfiniteLoaderScene", { SampleFailureReasonKind::segFault} },
-    {"InnerMeshPointsScene", { SampleFailureReasonKind::segFault} },
-    {"IsPointInsideMeshScene", { SampleFailureReasonKind::processHung} },
-    {"LevelOfDetailScene", {SampleFailureReasonKind::segFault, "Segfault when dragging the mouse"}},
-    {"LinesMeshSpiralScene", { SampleFailureReasonKind::empty3d} },
-    {"LorenzAttractorScene", { SampleFailureReasonKind::empty3d} },
-    {"MergedMeshesScene", { SampleFailureReasonKind::segFault} },
-    {"MorphTargetsScene", { SampleFailureReasonKind::broken3d, "Rendering much too bright"} },
-    {"MultiSampleRenderTargetsScene", { SampleFailureReasonKind::empty3d} },
-    {"PBRMaterialCheckerORMScene", { SampleFailureReasonKind::broken3d, "Rendering much too bright"} },
-    {"PBRMaterialScene", { SampleFailureReasonKind::broken3d, "Rendering much too bright"} },
-    {"PBRMetallicRoughnessGoldMaterialScene", { SampleFailureReasonKind::broken3d, "Rendering much too bright"} },
-    {"PBRMetallicRoughnessMaterialScene", { SampleFailureReasonKind::broken3d, "Rendering much too bright"} },
-    {"PBRMetallicRoughnessTextureMaterialScene", { SampleFailureReasonKind::broken3d, "Rendering much too bright"} },
-    {"PointsCloudScene", { SampleFailureReasonKind::empty3d} },
-    {"ProceduralHexPlanetGenerationScene", { SampleFailureReasonKind::segFault} },
-    {"ShaderMaterialWarpSpeedScene", { SampleFailureReasonKind::empty3d} },
-    {"VolumetricLightScatteringScene", { SampleFailureReasonKind::segFault } }
-  };
-
   // Initialize the samples index
   _samplesIndex = {
     // Animations samples
@@ -100,6 +69,39 @@ SamplesIndex::SamplesIndex()
     // Textures samples
     {_TexturesSamplesIndex::CategoryName(), _TexturesSamplesIndex()},
   };
+
+
+  _samplesFailures = {
+    {"AirplaneModelScene", {SampleFailureReasonKind::segFault}},
+    {"BlurModeForMirrorsScene", {SampleFailureReasonKind::empty3d}},
+    {"CartoonAnimationsScene", {SampleFailureReasonKind::segFault}},
+    {"ColoredRibbonScene", {SampleFailureReasonKind::segFault}},
+    {"CircleCurvesFromBeziersScene", {SampleFailureReasonKind::empty3d}},
+    {"DecalsScene", {SampleFailureReasonKind::segFault}},
+    {"EdgesRenderScene", {SampleFailureReasonKind::segFault}},
+    {"EnvironmentTextureScene", {SampleFailureReasonKind::empty3d}},
+    {"FurMaterialScene", {SampleFailureReasonKind::broken3d, "Black texture"}},
+    {"InfiniteLoaderScene", {SampleFailureReasonKind::segFault}},
+    {"InnerMeshPointsScene", {SampleFailureReasonKind::segFault}},
+    {"IsPointInsideMeshScene", {SampleFailureReasonKind::processHung}},
+    {"LevelOfDetailScene",
+     {SampleFailureReasonKind::segFault, "Segfault when dragging the mouse"}},
+    {"LinesMeshSpiralScene", {SampleFailureReasonKind::empty3d}},
+    {"LorenzAttractorScene", {SampleFailureReasonKind::empty3d}},
+    {"MergedMeshesScene", {SampleFailureReasonKind::segFault}},
+    {"MultiSampleRenderTargetsScene", {SampleFailureReasonKind::empty3d}},
+    {"PointsCloudScene", {SampleFailureReasonKind::empty3d}},
+    {"ProceduralHexPlanetGenerationScene", {SampleFailureReasonKind::segFault}},
+    {"ShaderMaterialWarpSpeedScene", {SampleFailureReasonKind::empty3d}},
+    {"VolumetricLightScatteringScene", {SampleFailureReasonKind::segFault}}
+  };
+
+  // all gltf samples fail under windows, with an empty rendering
+  for (const auto& sampleName : getSampleNamesInCategory(_LoadersGLTFSamplesIndex::CategoryName()))
+  {
+    SampleFailureReason reason{ SampleFailureReasonKind::empty3d, "Empty rendering under windows" };
+    _samplesFailures[sampleName] = reason;
+  }
 }
 
 SamplesIndex::~SamplesIndex()

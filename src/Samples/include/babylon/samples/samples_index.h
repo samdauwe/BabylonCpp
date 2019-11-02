@@ -27,7 +27,9 @@ struct SampleFailureReason
   SampleFailureReasonKind Kind;
   std::string Info;
 
-  SampleFailureReason(SampleFailureReasonKind kind, std::string info = "")
+  SampleFailureReason(
+    SampleFailureReasonKind kind = SampleFailureReasonKind::segFault, 
+    std::string info = "")
     : Kind(kind), Info(info) {}
 };
 
