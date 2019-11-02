@@ -370,7 +370,8 @@ void Engine::_initGLContext()
   _caps.maxVaryingVectors = _gl->getParameteri(GL::MAX_VARYING_VECTORS);
   if (_caps.maxVaryingVectors == 0)
   {
-    BABYLON_LOGF_WARN("_initGLContext", "_gl->getParameteri(GL::MAX_VARYING_VECTORS) failed => using 16 as a default...");
+    BABYLON_LOGF_WARN("_initGLContext", "_gl->getParameteri(GL::MAX_VARYING_VECTORS) failed "
+                      "=> using %i as a default...", 16);
     _caps.maxVaryingVectors = 16;
   }
 
@@ -379,7 +380,7 @@ void Engine::_initGLContext()
   {
     BABYLON_LOGF_WARN("_initGLContext",
                       "_gl->getParameteri(GL::MAX_FRAGMENT_UNIFORM_VECTORS) failed => "
-                      "using 256 as a default...");
+                      "using %i as a default...", 256);
     _caps.maxFragmentUniformVectors = 256;
   }
 
@@ -389,7 +390,7 @@ void Engine::_initGLContext()
     BABYLON_LOGF_WARN(
       "_initGLContext",
       "_gl->getParameteri(GL::MAX_VERTEX_UNIFORM_VECTORS) failed => "
-      "using 256 as a default...");
+      "using %i as a default...", 256);
     _caps.maxVertexUniformVectors = 256;
   }
 
