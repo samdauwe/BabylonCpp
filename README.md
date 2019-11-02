@@ -4,6 +4,8 @@
 
 The goal of BabylonCpp is to fully implement the relevant portions of the excellent Babylon.js 3D framework/engine in C++17, facilitating the creation of lightweight, cross-platform 3D games and applications with native performance.
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/HwvctC80qho" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 # Get the Sources
 
 This repository contains submodules for some of the external dependencies, so when doing a fresh clone you need to clone recursively:
