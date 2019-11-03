@@ -8,13 +8,13 @@
 #include "spawn_screenshots.h"
 #include "run_standalone_imgui.h"
 
-#ifdef BABYLON_BUILD_SANDBOX
+#ifdef BABYLON_BUILD_PLAYGROUND
 #include <SamplesRunner/rtc/rtc_manager.h>
 #endif
 
 int main(int argc, char** argv)
 {
-#ifdef BABYLON_BUILD_SANDBOX
+#ifdef BABYLON_BUILD_PLAYGROUND
   BABYLON::rtc::RtcManager runtimeCompiler;
   runtimeCompiler.Init();
 #endif
@@ -68,8 +68,8 @@ int main(int argc, char** argv)
     options._sceneName = sampleName;
     options._appWindowParams.FullScreen = flagFullscreen;
 
-#ifdef BABYLON_BUILD_SANDBOX
-    options._sandboxCompilerCallback = [&runtimeCompiler]() {
+#ifdef BABYLON_BUILD_PLAYGROUND
+    options._playgroundCompilerCallback = [&runtimeCompiler]() {
       auto compilerStatus = runtimeCompiler.Heartbeat();
       return compilerStatus;
     };

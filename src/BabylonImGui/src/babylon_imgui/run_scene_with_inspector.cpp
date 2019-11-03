@@ -61,9 +61,9 @@ public:
   BabylonInspectorApp() {
     std::string exePath = BABYLON::System::getExecutablePath();
     std::string exeFolder = BABYLON::Filesystem::baseDir(exePath);
-    std::string sandboxPath = exeFolder + "/../../../src/SamplesRunner/sandbox.cpp";
-    sandboxPath = BABYLON::Filesystem::absolutePath(sandboxPath);
-    _sandboxCodeEditor.setFiles({ sandboxPath });
+    std::string playgroundPath = exeFolder + "/../../../src/SamplesRunner/playground.cpp";
+    playgroundPath = BABYLON::Filesystem::absolutePath(playgroundPath);
+    _playgroundCodeEditor.setFiles({ playgroundPath });
   }
   void RunApp(
     std::shared_ptr<BABYLON::IRenderableScene> initialScene,
@@ -76,12 +76,12 @@ public:
       bool r = this->render();
       for (auto f : _appContext._options._heartbeatCallbacks)
         f();
-      if (_appContext._options._sandboxCompilerCallback)
+      if (_appContext._options._playgroundCompilerCallback)
       {
-        SandboxCompilerStatus sandboxCompilerStatus = _appContext._options._sandboxCompilerCallback();
-        if (sandboxCompilerStatus._renderableScene)
-          setRenderableScene(sandboxCompilerStatus._renderableScene);
-        _appContext._isCompiling = sandboxCompilerStatus._isCompiling;
+        PlaygroundCompilerStatus playgroundCompilerStatus = _appContext._options._playgroundCompilerCallback();
+        if (playgroundCompilerStatus._renderableScene)
+          setRenderableScene(playgroundCompilerStatus._renderableScene);
+        _appContext._isCompiling = playgroundCompilerStatus._isCompiling;
       }
 
       return r;
@@ -100,8 +100,8 @@ private:
     Scene3d,
     SamplesCodeViewer,
     SampleBrowser,
-#ifdef BABYLON_BUILD_SANDBOX
-    SandboxEditor,
+#ifdef BABYLON_BUILD_PLAYGROUND
+    PlaygroundEditor,
 #endif
   };
   static std::map<BabylonInspectorApp::ViewState, std::string> ViewStateLabels;
@@ -183,9 +183,9 @@ private:
       _samplesCodeEditor.render();
     else if (_appContext._viewState == ViewState::SampleBrowser)
       _appContext._sampleListComponent.render();
-#ifdef BABYLON_BUILD_SANDBOX
-    if (_appContext._viewState == ViewState::SandboxEditor)
-      renderSandbox();
+#ifdef BABYLON_BUILD_PLAYGROUND
+    if (_appContext._viewState == ViewState::PlaygroundEditor)
+      renderPlayground();
 #endif
 
     ImGui::EndGroup();
@@ -265,9 +265,9 @@ private:
 
   void render3d()
   {
-#ifdef BABYLON_BUILD_SANDBOX
-    bool isInSandboxMode = (_appContext._viewState == ViewState::SandboxEditor);
-    ImVec2 sceneSize = isInSandboxMode ? getSceneSizeSmall() : getSceneSize();
+#ifdef BABYLON_BUILD_PLAYGROUND
+    bool isInPlaygroundMode = (_appContext._viewState == ViewState::PlaygroundEditor);
+    ImVec2 sceneSize = isInPlaygroundMode ? getSceneSizeSmall() : getSceneSize();
 #else
     ImVec2 sceneSize = getSceneSize();
 #endif
@@ -276,10 +276,10 @@ private:
     renderHud(cursorPosBeforeScene3d, sceneSize);
   }
 
-  void renderSandbox()
+  void renderPlayground()
   {
     ImGui::BeginGroup();
-    ImGui::Text("Sandbox : you can edit the code below!");
+    ImGui::Text("Playground : you can edit the code below!");
     ImGui::Text("As soon as you save it, the code will be compiled and the 3D scene will be updated");
     render3d();
     ImGui::EndGroup();
@@ -289,9 +289,9 @@ private:
       BabylonLogsWindow::instance().setVisible(true);
     }
     if (ImGui::Button(ICON_FA_PLAY " Run"))
-      _sandboxCodeEditor.saveAll();
+      _playgroundCodeEditor.saveAll();
 
-    _sandboxCodeEditor.render();
+    _playgroundCodeEditor.render();
 
   }
 
@@ -345,7 +345,7 @@ private:
 
   AppContext _appContext;
   ImGuiUtils::CodeEditor _samplesCodeEditor = ImGuiUtils::CodeEditor(true); // true <-> showCheckboxReadOnly
-  ImGuiUtils::CodeEditor _sandboxCodeEditor;
+  ImGuiUtils::CodeEditor _playgroundCodeEditor;
 }; // end of class BabylonInspectorApp
 
 
@@ -353,8 +353,8 @@ std::map<BabylonInspectorApp::ViewState, std::string> BabylonInspectorApp::ViewS
 { BabylonInspectorApp::ViewState::Scene3d, ICON_FA_CUBE " 3D Scene"},
 { BabylonInspectorApp::ViewState::SampleBrowser, ICON_FA_PALETTE " Browse samples"},
 { BabylonInspectorApp::ViewState::SamplesCodeViewer, ICON_FA_EDIT " Samples Code Viewer"},
-#ifdef BABYLON_BUILD_SANDBOX
-{ BabylonInspectorApp::ViewState::SandboxEditor, ICON_FA_FLASK " Sandbox"},
+#ifdef BABYLON_BUILD_PLAYGROUND
+{ BabylonInspectorApp::ViewState::PlaygroundEditor, ICON_FA_FLASK " Playground"},
 #endif
 };
 
