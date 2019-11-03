@@ -166,7 +166,7 @@ private:
     ImGui::BeginGroup();
 
     ShowTabBarEnum(ViewStateLabels, &_appContext._viewState);
-    ImGui::SameLine(0.f, 80.f);
+    ImGui::SameLine(0., ImGui::GetContentRegionAvailWidth() - 100.f);
     BABYLON::BabylonLogsWindow::instance().render();
     ImGui::SameLine();
     if (ImGui::Button(ICON_FA_DOOR_OPEN  " Exit"))

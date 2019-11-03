@@ -85,41 +85,46 @@ private:
   void render_filter()
   {
     bool changed = false;
-    ImGui::Text("Filter");
-    if (ImGui::InputText_String("", _query.query))
-      changed = true;
-    if (ImGui::Checkbox("Include failing", &_query.includeFailures))
-      changed = true;
-    ImGui::SameLine();
-    if (ImGui::Checkbox("Only failing", &_query.onlyFailures))
+    ImGui::PushItemWidth(200);
+    if (ImGui::InputText_String("Filter", _query.query))
       changed = true;
 
-    if (changed)
-      fillMatchingSamples();
-
-    ImGui::Text("Matching samples : %zi", nbMatchingSamples());
-
-    if (OnLoopSamples)
-    {
-      ImGui::SameLine(ImGui::GetContentRegionAvailWidth() - 150.f);
-      if (ImGui::Button("Loop filtered samples"))
-      {
+    if (OnLoopSamples) {
+      ImGui::SameLine(0.f, 50.f);
+      if (ImGui::Button("Loop filtered samples")) {
         std::vector<std::string> filteredSamples;
-        for (const auto & kv : _matchingSamples)
-        {
+        for (const auto& kv : _matchingSamples) {
           for (auto sampleName : kv.second)
             filteredSamples.push_back(sampleName);
         }
         OnLoopSamples(filteredSamples);
       }
     }
+
+    float rightMargin = 150.f;
+    if (_query.includeFailures)
+      rightMargin = 300.f;
+    ImGui::SameLine(ImGui::GetContentRegionAvailWidth() - rightMargin);
+    if (ImGui::Checkbox("Include failing", &_query.includeFailures))
+      changed = true;
+    if (_query.includeFailures)
+    {
+      ImGui::SameLine();
+      if (ImGui::Checkbox("Only failing", &_query.onlyFailures))
+        changed = true;
+    }
+
+    if (changed)
+      fillMatchingSamples();
+
+    ImGui::Text("Matching samples : %zi", nbMatchingSamples());
   }
 
   void render_list()
   {
-    ImGui::Checkbox("Show original screenshots", &_showOriginalScreenshots);
-    ImGui::SameLine();
-    ImGui::Checkbox("Show current screenshots", &_showCurrentScreenshots);
+    //ImGui::Checkbox("Show original screenshots", &_showOriginalScreenshots);
+    //ImGui::SameLine();
+    //ImGui::Checkbox("Show screenshots", &_showCurrentScreenshots);
 
     enum class CollapseMode
     {
