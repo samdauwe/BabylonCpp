@@ -32,6 +32,7 @@ public:
   {
     auto lang = TextEditor::LanguageDefinition::CPlusPlus();
     _textEditor.SetLanguageDefinition(lang);
+    _textEditor.SetPalette(TextEditor::GetLightPalette());
     readFile();
   }
 

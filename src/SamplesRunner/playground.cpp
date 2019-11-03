@@ -1,11 +1,9 @@
 #ifdef BABYLON_BUILD_PLAYGROUND
 
-// This is the playground : you can here enter / modify code during 
-// the execution, and the scene will be updated automatically!
-// You do not need to exit the application!
-// 
-// Do not remove the includes below, 
-// it is needed to enable "Runtime Compilation"
+// This is the playground : you can here enter / modify code during the execution, 
+// and the scene will be updated automatically!
+
+// Do not remove the includes below, they are needed to enable Runtime Compilation.
 #include "SamplesRunner/rtc/playground_autocompile.h"
 #include <babylon/interfaces/irenderable_scene_with_hud.h>
 #include "imgui.h"
