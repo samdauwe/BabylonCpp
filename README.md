@@ -4,7 +4,7 @@
 
 The goal of BabylonCpp is to fully implement the relevant portions of the excellent Babylon.js 3D framework/engine in C++17, facilitating the creation of lightweight, cross-platform 3D games and applications with native performance.
 
-It includes more than 200 examples, a graphical inspector for all 3D objects, as well as an interactive playground for live coding and experiments.
+It includes more than 200 examples, a graphical inspector for all 3D objects (based on [ImGui](https://github.com/ocornut/imgui)), as well as an interactive playground for live coding and experiments.
 
 [![BabylonCpp](doc/assets/babylon_demo_video.png)](https://youtu.be/McU8_vIEJfQ "BabylonCpp")
 
