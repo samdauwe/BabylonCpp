@@ -102,9 +102,24 @@ bool RtcManager::Init()
 void RtcManager::SetCompileOptions()
 {
 #ifdef _MSC_VER
-  _runtimeObjectSystem->SetAdditionalCompileOptions("/std:c++17 /DBABYLON_BUILD_SANDBOX");
+  _runtimeObjectSystem->SetAdditionalCompileOptions(
+    " /std:c++17"
+    " /DBABYLON_BUILD_SANDBOX"
+    #ifdef NDEBUG
+      " /DNDEBUG"
+      " /MD"
+    #else
+      " /MDd"
+    #endif
+  );
 #else
-  _runtimeObjectSystem->SetAdditionalCompileOptions("-std=c++17 -DBABYLON_BUILD_SANDBOX");
+  _runtimeObjectSystem->SetAdditionalCompileOptions(
+    " -std=c++17"
+    " -DBABYLON_BUILD_SANDBOX"
+    #ifdef NDEBUG
+      " -DNDEBUG"
+    #endif
+  );
 #endif // _MSC_VER
 }
 
