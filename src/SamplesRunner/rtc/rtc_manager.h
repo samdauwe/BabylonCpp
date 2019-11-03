@@ -22,7 +22,7 @@ public:
 	virtual ~RtcManager();
 
 	bool Init();
-  BABYLON::SandboxCompilerStatus Heartbeat();
+  BABYLON::PlaygroundCompilerStatus Heartbeat();
 
 	// IObjectFactoryListener
   virtual void OnConstructorsAdded();

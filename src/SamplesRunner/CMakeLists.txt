@@ -65,8 +65,8 @@ target_link_libraries(${TARGET}
     Samples
 )
 
-if (BABYLON_BUILD_SANDBOX)
-    target_compile_definitions(${TARGET} PRIVATE -DBABYLON_BUILD_SANDBOX)
+if (BABYLON_BUILD_PLAYGROUND)
+    target_compile_definitions(${TARGET} PRIVATE -DBABYLON_BUILD_PLAYGROUND)
     target_link_libraries(${TARGET} PRIVATE RuntimeCompiler RuntimeObjectSystem)
 endif()
 

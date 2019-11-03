@@ -32,6 +32,7 @@ public:
   {
     auto lang = TextEditor::LanguageDefinition::CPlusPlus();
     _textEditor.SetLanguageDefinition(lang);
+    _textEditor.SetPalette(TextEditor::GetLightPalette());
     readFile();
   }
 
@@ -76,8 +77,16 @@ public:
 
   void save()
   {
-    BABYLON::Filesystem::writeFileContents(_filePath.c_str(), _textEditor.GetText());
-    _fileContent_Saved = _textEditor.GetText();
+    std::string text = _textEditor.GetText();
+    // The code editor may add an unwanted additional 
+    // empty line at the end of the text
+    if (!text.empty())
+    {
+      if (text[text.size() - 1] == '\n')
+        text = text.substr(0, text.size() - 1);
+    }
+    BABYLON::Filesystem::writeFileContents(_filePath.c_str(), text);
+    _fileContent_Saved = text;
   }
 
 private:

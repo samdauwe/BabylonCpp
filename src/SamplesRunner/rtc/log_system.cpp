@@ -1,4 +1,4 @@
-#ifdef BABYLON_BUILD_SANDBOX
+#ifdef BABYLON_BUILD_PLAYGROUND
 #include <babylon/core/logging.h>
 #include <SamplesRunner/rtc/log_system.h>
 
@@ -62,4 +62,4 @@ void LogSystem::LogInternal(MsgType msgType, const char * format, va_list args)
 
 } // namespace BABYLON
 } // namespace rtc
-#endif // BABYLON_BUILD_SANDBOX
+#endif // BABYLON_BUILD_PLAYGROUND

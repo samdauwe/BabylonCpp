@@ -159,8 +159,8 @@ target_compile_definitions(${TARGET}
     $<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:${TARGET_UPPER}_STATIC_DEFINE>
 )
 
-if (BABYLON_BUILD_SANDBOX)
-    target_compile_definitions(${TARGET} PRIVATE -DBABYLON_BUILD_SANDBOX)
+if (BABYLON_BUILD_PLAYGROUND)
+    target_compile_definitions(${TARGET} PRIVATE -DBABYLON_BUILD_PLAYGROUND)
 endif()
 
 # Compile options

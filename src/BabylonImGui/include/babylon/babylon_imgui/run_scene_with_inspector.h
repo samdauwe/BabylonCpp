@@ -10,7 +10,7 @@
 
 namespace BABYLON {
 
-  struct SandboxCompilerStatus
+  struct PlaygroundCompilerStatus
   {
     std::shared_ptr<IRenderableScene> _renderableScene = nullptr;
     bool _isCompiling = false;
@@ -30,9 +30,9 @@ namespace BABYLON {
     using HeartbeatCallback = std::function<void(void)>;
     std::vector<HeartbeatCallback> _heartbeatCallbacks;
 
-    // this callback is used by  the sandbox compiler
-    using SandboxCompilerCallback = std::function<SandboxCompilerStatus(void)>;
-    SandboxCompilerCallback _sandboxCompilerCallback;
+    // this callback is used by  the playground compiler
+    using PlaygroundCompilerCallback = std::function<PlaygroundCompilerStatus(void)>;
+    PlaygroundCompilerCallback _playgroundCompilerCallback;
   };
 
   void runSceneWithInspector(

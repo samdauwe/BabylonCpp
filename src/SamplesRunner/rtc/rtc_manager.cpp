@@ -1,4 +1,4 @@
-#ifdef BABYLON_BUILD_SANDBOX
+#ifdef BABYLON_BUILD_PLAYGROUND
 
 // Adapted from RuntimeCompiledCPlusPlus/Aurora/Examples/ConsoleExample/ConsoleGame.cpp
 #include <SamplesRunner/rtc/suppress_warnings.h>
@@ -81,7 +81,7 @@ bool RtcManager::Init()
   SetLibraryPath();
 
 	// construct first object
-	IObjectConstructor* pCtor = _runtimeObjectSystem->GetObjectFactorySystem()->GetConstructor( "Sandbox" );
+	IObjectConstructor* pCtor = _runtimeObjectSystem->GetObjectFactorySystem()->GetConstructor( "Playground" );
 	if( pCtor )
 	{
 		IObject* pObj = pCtor->Construct();
@@ -102,9 +102,24 @@ bool RtcManager::Init()
 void RtcManager::SetCompileOptions()
 {
 #ifdef _MSC_VER
-  _runtimeObjectSystem->SetAdditionalCompileOptions("/std:c++17 /DBABYLON_BUILD_SANDBOX");
+  _runtimeObjectSystem->SetAdditionalCompileOptions(
+    " /std:c++17"
+    " /DBABYLON_BUILD_PLAYGROUND"
+    #ifdef NDEBUG
+      " /DNDEBUG"
+      " /MD"
+    #else
+      " /MDd"
+    #endif
+  );
 #else
-  _runtimeObjectSystem->SetAdditionalCompileOptions("-std=c++17 -DBABYLON_BUILD_SANDBOX");
+  _runtimeObjectSystem->SetAdditionalCompileOptions(
+    " -std=c++17"
+    " -DBABYLON_BUILD_PLAYGROUND"
+    #ifdef NDEBUG
+      " -DNDEBUG"
+    #endif
+  );
 #endif // _MSC_VER
 }
 
@@ -160,7 +175,7 @@ void RtcManager::OnConstructorsAdded()
 	}
 }
 
-BABYLON::SandboxCompilerStatus RtcManager::Heartbeat()
+BABYLON::PlaygroundCompilerStatus RtcManager::Heartbeat()
 {
 	//check status of any compile
 	if( _runtimeObjectSystem->GetIsCompiledComplete() )
@@ -171,7 +186,7 @@ BABYLON::SandboxCompilerStatus RtcManager::Heartbeat()
 
 	if(_runtimeObjectSystem->GetIsCompiling() )
 	{
-    BABYLON::SandboxCompilerStatus r;
+    BABYLON::PlaygroundCompilerStatus r;
     r._isCompiling = true;
     return r;
 	}
@@ -184,15 +199,15 @@ BABYLON::SandboxCompilerStatus RtcManager::Heartbeat()
 
   if (_lastCompiledScene)
   {
-    BABYLON::SandboxCompilerStatus r;
+    BABYLON::PlaygroundCompilerStatus r;
     r._renderableScene = _lastCompiledScene;
     _lastCompiledScene.reset();
     return r;
   }
-  return BABYLON::SandboxCompilerStatus();
+  return BABYLON::PlaygroundCompilerStatus();
 }
 
 } // namespace BABYLON
 } // namespace rtc
 
-#endif // BABYLON_BUILD_SANDBOX
+#endif // BABYLON_BUILD_PLAYGROUND
