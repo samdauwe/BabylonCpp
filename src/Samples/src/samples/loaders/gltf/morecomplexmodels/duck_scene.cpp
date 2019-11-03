@@ -36,10 +36,10 @@ void DuckScene::initializeScene(ICanvas* /*canvas*/, Scene* scene)
       auto camera
         = std::static_pointer_cast<ArcRotateCamera>(scene->activeCamera());
       if (camera) {
-        camera->setTarget(Vector3(-35.f, 80.f, 0.f));
-        camera->alpha  = Math::PI / 1.5f;
-        camera->beta   = Math::PI / 3.5f;
-        camera->radius = 250.f;
+        camera->setTarget(Vector3::Zero());
+        camera->alpha  = -Math::PI / 2.f;
+        camera->beta   = Math::PI / 2.f;
+        camera->radius = 6.f;
       }
     });
 }
