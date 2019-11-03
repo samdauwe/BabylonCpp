@@ -2,7 +2,7 @@
 #                            Configuration options                             #
 # ============================================================================ #
 option(OPTION_BUILD_IMGUI_BABYLON "Build the inspector debugging tool."  ON)
-option(OPTION_BUILD_LOADERS   "Build the loader plugins."            ON)
+option(OPTION_BUILD_LOADERS       "Build the loader plugins."            ON)
 
 # ============================================================================ #
 #                            Sub-projects                                      #
