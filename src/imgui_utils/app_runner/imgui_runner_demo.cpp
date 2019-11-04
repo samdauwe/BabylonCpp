@@ -1,55 +1,80 @@
 #include <imgui_utils/app_runner/imgui_runner.h>
+#include "imgui_internal.h"
+#include <map>
 
 namespace ImGuiUtils
 {
   namespace ImGuiRunner
   {
+    void MyCreateDockLayout(ImGuiID fullDockSpaceId)
+    {
+      ImGuiViewport* viewport = ImGui::GetMainViewport();
+      ImGui::DockBuilderRemoveNode(fullDockSpaceId);              // Clear out existing layout
+      ImGui::DockBuilderAddNode(fullDockSpaceId); // Add empty node
+      ImGui::DockBuilderSetNodeSize(fullDockSpaceId, viewport->Size);
+
+      ImGuiID dock_main_id = fullDockSpaceId; // This variable will track the document node, however we are not using it
+                                           // here as we aren't docking anything into it.
+      ImGuiID dock_id_left   = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.20f, NULL, &dock_main_id);
+      ImGuiID dock_id_right  = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.20f, NULL, &dock_main_id);
+      ImGuiID dock_id_bottom = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, 0.20f, NULL, &dock_main_id);
+
+      ImGuiID dock_id_left_bottom = ImGui::DockBuilderSplitNode(dock_id_left, ImGuiDir_Down, 0.50f, NULL, &dock_id_left);
+
+      ImGui::DockBuilderDockWindow("Left", dock_id_left);
+      ImGui::DockBuilderDockWindow("LeftBottom1", dock_id_left_bottom);
+      ImGui::DockBuilderDockWindow("LeftBottom2", dock_id_left_bottom);
+      ImGui::DockBuilderDockWindow("LeftBottom3", dock_id_left_bottom);
+      ImGui::DockBuilderDockWindow("Main", dock_main_id);
+      ImGui::DockBuilderDockWindow("Right", dock_id_right);
+      ImGui::DockBuilderDockWindow("Bottom", dock_id_bottom);
+      ImGui::DockBuilderFinish(fullDockSpaceId);
+    }
+
+    void DummyWindow(const char* title)
+    {
+      static std::map<std::string, bool> openStatuses;
+      if (openStatuses.find(title) == openStatuses.end())
+        openStatuses[title] = true;
+
+      ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_Once);
+      bool& dummyOpen = openStatuses.at(title);
+      int windowFlags = 0;// ImGuiWindowFlags_NoMove;
+      if (dummyOpen)
+      {
+        ImGui::Begin(title, &dummyOpen, windowFlags);
+        ImGui::Text("%s", title);
+
+        static bool show_demo_window = false;
+        ImGui::Checkbox("Demo Window", &show_demo_window);
+        if (show_demo_window)
+          ImGui::ShowDemoWindow(&show_demo_window);
+
+        if (ImGui::Button("Reset Layout"))
+          ImGuiRunner::ResetDockLayout();
+
+        ImGui::End();
+      }
+    }
     void DemoGui()
     {
-      // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-      static bool show_demo_window = true;
-      static bool show_another_window = false;
-
-      if (show_demo_window)
-        ImGui::ShowDemoWindow(&show_demo_window);
-
-      // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+      std::vector<std::string> titles =
       {
-        static float f = 0.0f;
-        static int counter = 0;
-
-        ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-        ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-        ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-        ImGui::Checkbox("Another Window", &show_another_window);
-
-        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-
-        if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-          counter++;
-        ImGui::SameLine();
-        ImGui::Text("counter = %d", counter);
-
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-        ImGui::End();
-      }
-
-      // 3. Show another simple window.
-      if (show_another_window)
-      {
-        ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-        ImGui::Text("Hello from another window!");
-        if (ImGui::Button("Close Me"))
-          show_another_window = false;
-        ImGui::End();
-      }
+        "Left", 
+        "LeftBottom1", "LeftBottom2", "LeftBottom3",
+        "Right",
+        "Main",
+        "Bottom"
+      };
+      for (const auto & title : titles)
+        DummyWindow((title + "").c_str());
     }
 
     void ShowDemo()
     {
       ImGuiUtils::ImGuiRunner::AppWindowParams params;
-      //params.FullScreen = true;
+      params.DefaultWindowType = DefaultWindowTypeOption::ProvideFullScreenDockSpace;
+      params.InitialDockLayoutFunction = MyCreateDockLayout;
       params.Title = "Hello World";
       ImGuiUtils::ImGuiRunner::RunGui(DemoGui, params);
     }

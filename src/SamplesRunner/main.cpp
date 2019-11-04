@@ -7,6 +7,7 @@
 
 #include "spawn_screenshots.h"
 #include "run_standalone_imgui.h"
+#include "imgui_utils/app_runner/imgui_runner_demo.h"
 
 #ifdef BABYLON_BUILD_PLAYGROUND
 #include <SamplesRunner/rtc/rtc_manager.h>
@@ -20,6 +21,10 @@ int main(int argc, char** argv)
 #endif
 
   BABYLON::System::chdirToExecutableFolder();
+
+  ImGuiUtils::ImGuiRunner::ShowDemo();
+  return 0;
+
 
   bool flagQuiet = false;
   bool flagFullscreen = false;

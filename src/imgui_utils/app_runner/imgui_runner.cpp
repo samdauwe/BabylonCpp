@@ -10,6 +10,7 @@
 #include <imgui_utils/icons_font_awesome_5.h>
 #include <imgui_utils/imgui_utils.h>
 
+
 namespace ImGuiUtils
 {
   namespace ImGuiRunner
@@ -47,6 +48,54 @@ namespace ImGuiUtils
       ImGui::PopFont();
     }
 
+    void ImplProvideFullScreenWindow(const AppWindowParams& appWindowParams)
+    {
+      ImGui::SetNextWindowPos(ImVec2(0, 0));
+      ImVec2 winSize = ImGui::GetIO().DisplaySize;
+      // winSize.y -= 10.f;
+      ImGui::SetNextWindowSize(winSize);
+      ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDecoration
+                                     | ImGuiWindowFlags_NoScrollWithMouse
+                                     | ImGuiWindowFlags_NoBringToFrontOnFocus;
+      if (appWindowParams.ShowMenuBar)
+        windowFlags |= ImGuiWindowFlags_MenuBar;
+      ImGui::Begin("Main window (title bar invisible)", NULL, windowFlags);
+    }
+
+    ImGuiID MainDockSpaceId()
+    {
+      static ImGuiID id = ImGui::GetID("MainDockSpace");
+      return id;
+    }
+
+    void ImplProvideFullScreenDockSpace(const AppWindowParams& appWindowParams)
+    {
+      ImGuiViewport* viewport = ImGui::GetMainViewport();
+      ImGui::SetNextWindowPos(viewport->Pos);
+      ImGui::SetNextWindowSize(viewport->Size);
+      ImGui::SetNextWindowViewport(viewport->ID);
+      ImGui::SetNextWindowBgAlpha(0.0f);
+
+      ImGuiWindowFlags window_flags
+        = ImGuiWindowFlags_NoDocking;
+      window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse
+                      | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+      window_flags
+        |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+      if (appWindowParams.ShowMenuBar)
+        window_flags |= ImGuiWindowFlags_MenuBar;
+
+      ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+      ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+      ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+      static bool p_open = true;
+      ImGui::Begin(appWindowParams.Title.c_str(), &p_open, window_flags);
+      ImGui::PopStyleVar(3);
+
+      ImGuiID dockspace_id = MainDockSpaceId();
+      ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode; // ImGuiDockNodeFlags_PassthruDockspace;
+      ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+    }
 
     void ImGui_Init(GLFWwindow* window)
     {
@@ -79,6 +128,8 @@ namespace ImGuiUtils
       //io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f);
       //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
       //IM_ASSERT(font != NULL);
+
+      ImGui::GetIO().ConfigWindowsResizeFromEdges = true;
     }
 
     void ImGui_Cleanup()
@@ -110,6 +161,15 @@ namespace ImGuiUtils
       ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
+
+    bool gInitialDockLayoutFunction_WasCalled = false;
+
+    void ResetDockLayout()
+    {
+      gInitialDockLayoutFunction_WasCalled = false;
+      remove("imgui.ini");
+    }
+
     void RunGui(
       GuiFunctionWithExit guiFunction,
       AppWindowParams appWindowParams,
@@ -132,6 +192,9 @@ namespace ImGuiUtils
       GlfwRunner::Glad_Init();
       ImGui_Init(window);
 
+      if (appWindowParams.DefaultWindowType == DefaultWindowTypeOption::ProvideFullScreenDockSpace)
+        ImGui::GetIO().ConfigFlags = ImGui::GetIO().ConfigFlags | ImGuiConfigFlags_DockingEnable;
+
       if (appWindowParams.LoadFontAwesome)
         LoadFontAwesome();
 
@@ -148,9 +211,6 @@ namespace ImGuiUtils
 
         ImGui_PrepareNewFrame();
 
-        if (appWindowParams.LoadFontAwesome)
-          pushFontAwesome();
-
         static bool postInited = false;
         if (!postInited)
         {
@@ -159,28 +219,29 @@ namespace ImGuiUtils
           postInited = true;
         }
 
-        if (appWindowParams.ProvideFullScreenWindow)
+
+        if (appWindowParams.DefaultWindowType == DefaultWindowTypeOption::ProvideFullScreenWindow)
+          ImplProvideFullScreenWindow(appWindowParams);
+
+        if (appWindowParams.DefaultWindowType == DefaultWindowTypeOption::ProvideFullScreenDockSpace)
         {
-          ImGui::SetNextWindowPos(ImVec2(0, 0));
-          ImVec2 winSize = ImGui::GetIO().DisplaySize;
-          //winSize.y -= 10.f;
-          ImGui::SetNextWindowSize(winSize);
-          ImGuiWindowFlags windowFlags =
-              ImGuiWindowFlags_NoDecoration 
-            | ImGuiWindowFlags_NoScrollWithMouse 
-            | ImGuiWindowFlags_NoBringToFrontOnFocus;
-          if (appWindowParams.ShowMenuBar)
-            windowFlags |= ImGuiWindowFlags_MenuBar;
-          ImGui::Begin("Main window (title bar invisible)", NULL, windowFlags);
+          if (!gInitialDockLayoutFunction_WasCalled)
+          {
+            if (appWindowParams.InitialDockLayoutFunction)
+              appWindowParams.InitialDockLayoutFunction(MainDockSpaceId());
+            gInitialDockLayoutFunction_WasCalled = true;
+          }
+          ImplProvideFullScreenDockSpace(appWindowParams);
         }
 
+        if (appWindowParams.LoadFontAwesome)
+          pushFontAwesome();
         bool shouldExit = guiFunction();
-
-        if (appWindowParams.ProvideFullScreenWindow)
-          ImGui::End();
-
         if (appWindowParams.LoadFontAwesome)
           popFontAwesome();
+
+        if (appWindowParams.DefaultWindowType != DefaultWindowTypeOption::None)
+          ImGui::End();
 
         ImGui_ImplRender(window, appWindowParams.ClearColor);
 
@@ -207,7 +268,8 @@ namespace ImGuiUtils
       RunGui(guiFunctionWithExit, windowParams, postInitFunction);
     }
 
-  } // namespace ImGuiRunner
-} // namespace imgui_utils
+
+    } // namespace ImGuiRunner
+    } // namespace imgui_utils
 
 

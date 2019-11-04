@@ -90,6 +90,8 @@ public:
       this->initScene();
       this->setRenderableScene(initialScene);
     };
+    _appContext._options._appWindowParams.DefaultWindowType = 
+      ImGuiUtils::ImGuiRunner::DefaultWindowTypeOption::ProvideFullScreenWindow;
     ImGuiUtils::ImGuiRunner::RunGui(showGuiLambda, _appContext._options._appWindowParams, initSceneLambda);
   }
 
