@@ -38,12 +38,12 @@ struct BABYLON_SHARED_EXPORT IGLTFLoaderExtension
   /**
    * @brief Called after the loader state changes to LOADING.
    */
-  virtual void onLoading() = 0;
+  virtual void onLoading();
 
   /**
    * @brief Called after the loader state changes to READY.
    */
-  virtual void onReady() = 0;
+  virtual void onReady();
 
   /**
    * @brief Define this method to modify the default behavior when loading
@@ -53,8 +53,7 @@ struct BABYLON_SHARED_EXPORT IGLTFLoaderExtension
    * @returns A promise that resolves when the load is complete or null if not
    * handled
    */
-  virtual void loadSceneAsync(const std::string& context, const IScene& scene)
-    = 0;
+  virtual void loadSceneAsync(const std::string& context, const IScene& scene);
 
   /**
    * @brief Define this method to modify the default behavior when loading
@@ -68,8 +67,7 @@ struct BABYLON_SHARED_EXPORT IGLTFLoaderExtension
    */
   virtual TransformNodePtr loadNodeAsync(
     const std::string& context, const INode& node,
-    const std::function<void(const TransformNode& babylonMesh)>& assign)
-    = 0;
+    const std::function<void(const TransformNode& babylonMesh)>& assign);
 
   /**
    * @brief Define this method to modify the default behavior when loading
@@ -83,8 +81,7 @@ struct BABYLON_SHARED_EXPORT IGLTFLoaderExtension
    */
   virtual CameraPtr loadCameraAsync(
     const std::string& context, const ICamera& camera,
-    const std::function<void(const Camera& babylonCamera)>& assign)
-    = 0;
+    const std::function<void(const Camera& babylonCamera)>& assign);
 
   /**
    * @brief  Define this method to modify the default behavior when loading
@@ -96,8 +93,7 @@ struct BABYLON_SHARED_EXPORT IGLTFLoaderExtension
    */
   virtual GeometryPtr _loadVertexDataAsync(const std::string& context,
                                            const IMeshPrimitive& primitive,
-                                           const MeshPtr& babylonMesh)
-    = 0;
+                                           const MeshPtr& babylonMesh);
 
   /**
    * @brief  Define this method to modify the default behavior when loading
@@ -113,8 +109,7 @@ struct BABYLON_SHARED_EXPORT IGLTFLoaderExtension
   virtual MaterialPtr _loadMaterialAsync(
     const std::string& context, const IMaterial& material,
     const MeshPtr& babylonMesh, unsigned int babylonDrawMode,
-    const std::function<void(const MaterialPtr& babylonMaterial)>& assign)
-    = 0;
+    const std::function<void(const MaterialPtr& babylonMaterial)>& assign);
 
   /**
    * @brief Define this method to modify the default behavior when creating
@@ -126,8 +121,7 @@ struct BABYLON_SHARED_EXPORT IGLTFLoaderExtension
    */
   virtual MaterialPtr createMaterial(const std::string& context,
                                      const IMaterial& material,
-                                     unsigned int babylonDrawMode)
-    = 0;
+                                     unsigned int babylonDrawMode);
 
   /**
    * @brief Define this method to modify the default behavior when loading
@@ -140,8 +134,7 @@ struct BABYLON_SHARED_EXPORT IGLTFLoaderExtension
    */
   virtual void loadMaterialPropertiesAsync(const std::string& context,
                                            const IMaterial& material,
-                                           const Material& babylonMaterial)
-    = 0;
+                                           const Material& babylonMaterial);
 
   /**
    * @brief Define this method to modify the default behavior when loading
@@ -155,8 +148,7 @@ struct BABYLON_SHARED_EXPORT IGLTFLoaderExtension
    */
   virtual BaseTexturePtr loadTextureInfoAsync(
     const std::string& context, const ITextureInfo& textureInfo,
-    const std::function<void(const BaseTexture& babylonTexture)>& assign)
-    = 0;
+    const std::function<void(const BaseTexture& babylonTexture)>& assign);
 
   /**
    * @brief Define this method to modify the default behavior when loading
@@ -167,8 +159,7 @@ struct BABYLON_SHARED_EXPORT IGLTFLoaderExtension
    * when the load is complete or null if not handled
    */
   virtual AnimationGroupPtr loadAnimationAsync(const std::string& context,
-                                               const IAnimation& animation)
-    = 0;
+                                               const IAnimation& animation);
 
   /**
    * @brief Define this method to modify the default behavior when loading uris.
@@ -178,8 +169,8 @@ struct BABYLON_SHARED_EXPORT IGLTFLoaderExtension
    * complete or null if not handled
    */
   virtual ArrayBufferView _loadUriAsync(const std::string& context,
-                                        const std::string& uri)
-    = 0;
+                                        const std::string& uri);
+
 }; // end of struct IGLTFLoaderExtension
 
 } // end of namespace GLTF2

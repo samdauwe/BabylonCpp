@@ -8,6 +8,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/core/array_buffer_view.h>
 #include <babylon/interfaces/idisposable.h>
 
 using json = nlohmann::json;
