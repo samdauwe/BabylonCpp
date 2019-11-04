@@ -111,16 +111,17 @@ A summary of the development roadmap can be found on [this page](https://github.
 # Dependencies
 
 ## System ##
-* [CMake](https://cmake.org) (> 3.8)
+* [CMake](https://cmake.org) (>= 3.9)
 * [Python](https://www.python.org) (>= 2.7) for the `cmake_build.py` build script
 
 ## Available as git submodules ##
 * [Earcut](https://github.com/mapbox/earcut.hpp.git): A C++ port of earcut.js, a fast, header-only polygon triangulation library.
-* [GLFW](https://github.com/glfw/glfw): Framework for OpenGL application development, used for the examples (Optional).
-* [GLXW](https://github.com/rikusalminen/glxw): OpenGL loader, used for the examples (Optional).
-* [Google Test](https://github.com/google/googletest): Google's framework for writing C++ tests on a variety of platforms, used for the unit tests (Optional).
+* [GLFW](https://github.com/glfw/glfw): Framework for OpenGL application development, used for the examples.
+* [Google Test](https://github.com/google/googletest): Google's framework for writing C++ tests on a variety of platforms, used for the unit tests.
 * [Dear ImGui](https://github.com/ocornut/imgui): Bloat-free Immediate Mode Graphical User interface for C++ with minimal dependencies.
+* [ImGuiColorTextEdit](https://github.com/BalazsJako/ImGuiColorTextEdit):Syntax highlighting text editor for ImGui.
 * [JSON for Modern C++](https://github.com/nlohmann/json)
+* [Runtime Compiled C++](https://github.com/RuntimeCompiledCPlusPlus/RuntimeCompiledCPlusPlus.git): Library that enables to reliably make major changes to your C++ code at runtime and see the results immediately.
 
 ## Supported Compilers ##
 The compiler should implement all the features of the [ISO C++ 2017 standard](https://www.iso.org/standard/68564.html):
