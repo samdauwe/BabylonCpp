@@ -1,12 +1,10 @@
-#ifdef BABYLON_BUILD_SANDBOX
+#ifdef BABYLON_BUILD_PLAYGROUND
 
-// This is the sandbox : you can here enter / modify code during 
-// the execution, and the scene will be updated automatically!
-// You do not need to exit the application!
-// 
-// Do not remove the includes below, 
-// it is needed to enable "Runtime Compilation"
-#include "SamplesRunner/rtc/sandbox_autocompile.h"
+// This is the playground : you can here enter / modify code during the execution, 
+// and the scene will be updated automatically!
+
+// Do not remove the includes below, they are needed to enable Runtime Compilation.
+#include "SamplesRunner/rtc/playground_autocompile.h"
 #include <babylon/interfaces/irenderable_scene_with_hud.h>
 #include "imgui.h"
 
@@ -19,10 +17,10 @@
 
 using namespace BABYLON;
 
-struct SandboxScene : public IRenderableSceneWithHud {
+struct PlaygroundScene : public IRenderableSceneWithHud {
 
-  SandboxScene(ICanvas* iCanvas = nullptr) : IRenderableSceneWithHud(iCanvas) {}
-  ~SandboxScene() override = default;
+  PlaygroundScene(ICanvas* iCanvas = nullptr) : IRenderableSceneWithHud(iCanvas) {}
+  ~PlaygroundScene() override = default;
   const char* getName() override { return "Materials Scene"; }
 
   void initializeScene(ICanvas* canvas, Scene* scene) override
@@ -39,7 +37,7 @@ struct SandboxScene : public IRenderableSceneWithHud {
     // Creation of 6 spheres
     auto sphere1 = Mesh::CreateSphere("Sphere1", 10u, 9.f, scene);
     auto sphere2 = Mesh::CreateSphere("Sphere2", 2u, 9.f, scene);
-    auto sphere3 = Mesh::CreateSphere("Sphere3", 10u, 9.f, scene);
+    auto sphere3 = Mesh::CreateSphere("Sphere3", 10u, 18.f, scene);
     auto sphere4 = Mesh::CreateSphere("Sphere4", 10u, 9.f, scene);
     auto sphere5 = Mesh::CreateSphere("Sphere5", 10u, 9.f, scene);
     auto sphere6 = Mesh::CreateSphere("Sphere6", 10u, 9.f, scene);
@@ -128,11 +126,11 @@ struct SandboxScene : public IRenderableSceneWithHud {
 
 ////////////////////////////////////////////
 // Do not edit below, these lines enable the Runtime Compilation
-REGISTERCLASS(Sandbox)
-std::shared_ptr<BABYLON::IRenderableSceneWithHud> Sandbox::MakeScene() {
-  return std::make_shared<SandboxScene>();
+REGISTERCLASS(Playground)
+std::shared_ptr<BABYLON::IRenderableSceneWithHud> Playground::MakeScene() {
+  return std::make_shared<PlaygroundScene>();
 }
 
-#endif // #ifdef BABYLON_BUILD_SANDBOX
+#endif // #ifdef BABYLON_BUILD_PLAYGROUND
 
 

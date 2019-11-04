@@ -4,7 +4,7 @@
 #include <SamplesRunner/rtc/iscene_producer.h>
 #include <SamplesRunner/rtc/interface_ids.h>
 
-class Sandbox : public TInterface<BABYLON::rtc::IID_RENDERABLESCENE_PRODUCER, BABYLON::rtc::ISceneProducer>
+class Playground : public TInterface<BABYLON::rtc::IID_RENDERABLESCENE_PRODUCER, BABYLON::rtc::ISceneProducer>
 {
 public:
   std::shared_ptr<BABYLON::IRenderableSceneWithHud> MakeScene() override;
