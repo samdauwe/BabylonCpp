@@ -154,12 +154,27 @@ public:
     return std::shared_ptr<GLTFLoader>(
       new GLTFLoader(std::forward<Ts>(args)...));
   }
-  virtual ~GLTFLoader();
+  virtual ~GLTFLoader() override;
 
   /**
    * @brief Gets the loader state.
    */
   GLTFLoaderState& state();
+
+  /**
+   * The glTF object parsed from the JSON.
+   */
+  std::unique_ptr<IGLTF>& gltf();
+
+  /**
+   * The Babylon scene when loading the asset.
+   */
+  Scene* babylonScene();
+
+  /**
+   * The root Babylon mesh when loading the asset.
+   */
+  MeshPtr rootBabylonMesh();
 
   /** Hidden */
   void dispose(bool doNotRecurse               = false,
@@ -201,6 +216,24 @@ public:
     const std::string& context, INode& node,
     const std::function<void(const TransformNodePtr& babylonTransformNode)>&
       assign);
+
+  /**
+   * @brief Define this method to modify the default behavior when loading data
+   * for mesh primitives.
+   * @param context The context when loading the asset
+   * @param name The mesh name when loading the asset
+   * @param node The glTF node when loading the asset
+   * @param mesh The glTF mesh when loading the asset
+   * @param primitive The glTF mesh primitive property
+   * @param assign A function called synchronously after parsing the glTF
+   * properties
+   * @returns A promise that resolves with the loaded mesh when the load is
+   * complete or null if not handled
+   */
+  AbstractMeshPtr _loadMeshPrimitiveAsync(
+    const std::string& context, const std::string& name, INode& node,
+    const IMesh& mesh, IMeshPrimitive& primitive,
+    const std::function<void(const AbstractMeshPtr& babylonMesh)>& assign);
 
   /**
    * @brief Loads a glTF camera.
@@ -410,10 +443,6 @@ private:
     const std::string& context, INode& node, IMesh& mesh,
     const std::function<void(const TransformNodePtr& babylonTransformNode)>&
       assign);
-  AbstractMeshPtr _loadMeshPrimitiveAsync(
-    const std::string& context, const std::string& name, INode& node,
-    const IMesh& mesh, IMeshPrimitive& primitive,
-    const std::function<void(const AbstractMeshPtr& babylonMesh)>& assign);
   GeometryPtr _loadVertexDataAsync(const std::string& context,
                                    IMeshPrimitive& primitive,
                                    const MeshPtr& babylonMesh);
@@ -529,13 +558,6 @@ private:
   std::optional<ArrayBufferView>
   _extensionsLoadUriAsync(const std::string& context, const std::string& uri);
 
-public:
-  /** The glTF object parsed from the JSON. */
-  std::unique_ptr<IGLTF> gltf;
-
-  /** The Babylon scene when loading the asset. */
-  Scene* babylonScene;
-
 private:
   bool _disposed;
   GLTFFileLoader& _parent;
@@ -544,6 +566,8 @@ private:
   std::string _rootUrl;
   std::string _fileName;
   std::string _uniqueRootUrl;
+  std::unique_ptr<IGLTF> _gltf;
+  Scene* _babylonScene;
   MeshPtr _rootBabylonMesh;
   std::unordered_map<unsigned int, MaterialPtr> _defaultBabylonMaterialData;
   std::function<void(const SceneLoaderProgressEvent& event)> _progressCallback;
