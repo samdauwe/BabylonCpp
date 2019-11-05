@@ -1,4 +1,4 @@
-#include "SamplesRunner/HelloScene.h"
+#include "BabylonStudio/HelloScene.h"
 
 #include <babylon/cameras/free_camera.h>
 #include <babylon/lights/hemispheric_light.h>

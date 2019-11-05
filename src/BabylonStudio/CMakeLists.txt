@@ -11,7 +11,7 @@ find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIRS})
 
 # Target name
-set(TARGET SamplesRunner)
+set(TARGET BabylonStudio)
 
 # Project name
 project(${TARGET} C CXX)

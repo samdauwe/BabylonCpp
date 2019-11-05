@@ -31,6 +31,6 @@ endif()
 # - Samples
 add_subdirectory(Samples)
 
-#-- Applications --##
-# - Sample Runner
-add_subdirectory(SamplesRunner)
+#-- Applications
+# - Babylon Studio
+add_subdirectory(BabylonStudio)

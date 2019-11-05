@@ -4,7 +4,7 @@
 // and the scene will be updated automatically!
 
 // Do not remove the includes below, they are needed to enable Runtime Compilation.
-#include "SamplesRunner/rtc/playground_autocompile.h"
+#include "BabylonStudio/rtc/playground_autocompile.h"
 #include <babylon/interfaces/irenderable_scene_with_hud.h>
 #include "imgui.h"
 

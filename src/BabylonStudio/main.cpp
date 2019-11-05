@@ -1,5 +1,5 @@
 #include <babylon/core/system.h>
-#include "SamplesRunner/HelloScene.h"
+#include "BabylonStudio/HelloScene.h"
 #include <babylon/samples/samples_index.h>
 #include <babylon/babylon_imgui/run_scene_with_inspector.h>
 #include <babylon/core/logging/init_console_logger.h>
@@ -10,7 +10,7 @@
 #include "imgui_utils/app_runner/imgui_runner_demo.h"
 
 #ifdef BABYLON_BUILD_PLAYGROUND
-#include <SamplesRunner/rtc/rtc_manager.h>
+#include <BabylonStudio/rtc/rtc_manager.h>
 #endif
 
 int main(int argc, char** argv)

@@ -64,7 +64,7 @@ public:
   BabylonInspectorApp() {
     std::string exePath = BABYLON::System::getExecutablePath();
     std::string exeFolder = BABYLON::Filesystem::baseDir(exePath);
-    std::string playgroundPath = exeFolder + "/../../../src/SamplesRunner/playground.cpp";
+    std::string playgroundPath = exeFolder + "/../../../src/BabylonStudio/playground.cpp";
     playgroundPath = BABYLON::Filesystem::absolutePath(playgroundPath);
     _playgroundCodeEditor.setFiles({ playgroundPath });
     _playgroundCodeEditor.setLightPalette();
