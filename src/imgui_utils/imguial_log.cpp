@@ -239,13 +239,7 @@ int ImGuiAl::Log::Draw()
     }
   }
 
-  if (ImGui::Button(ICON_FA_RECYCLE "Clear##3234"))
-    Clear();
-  ImGui::SameLine();
-  if (ImGui::Button(ICON_FA_COPY "Copy##3234"))
-    CopyToClipboard();
-
-  if ( ( m_FilterHeaderLabel && ImGui::CollapsingHeader( m_FilterHeaderLabel ) ) || ( m_Flags & kShowFilters ) != 0 )
+  if ( ( m_FilterHeaderLabel) || ( m_Flags & kShowFilters ) != 0 )
   {
     ImGui::PushStyleColor( ImGuiCol_Button, m_Colors[ kDebug ][ 1 ].Value );
     ImGui::PushStyleColor( ImGuiCol_ButtonHovered, m_Colors[ kDebug ][ 2 ].Value );
@@ -303,8 +297,18 @@ int ImGuiAl::Log::Draw()
 
     ImGui::SameLine();
     ImGui::Checkbox( m_CumulativeLabel, &m_Cumulative );
-    m_Filter.Draw( m_FilterLabel );
+    ImGui::SameLine();
+    m_Filter.Draw( m_FilterLabel, 100.f );
   }
+
+  ImGui::SameLine();
+  if (ImGui::Button(ICON_FA_RECYCLE "Clear##3234"))
+    Clear();
+  ImGui::SameLine();
+  if (ImGui::Button(ICON_FA_COPY "Copy##3234"))
+    CopyToClipboard();
+
+
 
   // Do I need an unique id in BeginChild?
   char id[ 64 ];

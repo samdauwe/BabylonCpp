@@ -1,6 +1,6 @@
 #pragma once
 #include <RuntimeObjectSystem/IObject.h>
-#include <SamplesRunner/rtc/suppress_warnings.h>
+#include <BabylonStudio/rtc/suppress_warnings.h>
 #include <babylon/interfaces/irenderable_scene_with_hud.h>
 #include <memory>
 

@@ -16,9 +16,12 @@ namespace ImGuiUtils {
     void setFiles(const std::vector<std::string> &filePaths);
     void render();
     void saveAll();
+    bool isEmpty() { return _isEmpty; }
+    void setLightPalette();
 
   private:
     std::unique_ptr<MultipleCodeEditorImpl> _pImpl;
+    bool _isEmpty = true;
   };
 
   // Call this from main() to get a working demo

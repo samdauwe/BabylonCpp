@@ -70,9 +70,12 @@ namespace BABYLON {
     {
       if ( (width != _width) || (height != _height))
       {
-        _width = width;
-        _height = height;
-        resizeFramebuffer();
+        if (!ImGui::IsMouseDragging() && !ImGui::IsAnyMouseDown())
+        {
+          _width  = width;
+          _height = height;
+          resizeFramebuffer();
+        }
       }
     }
 

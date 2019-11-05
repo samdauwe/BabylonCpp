@@ -1,9 +1,9 @@
 #ifdef BABYLON_BUILD_PLAYGROUND
 
 // Adapted from RuntimeCompiledCPlusPlus/Aurora/Examples/ConsoleExample/ConsoleGame.cpp
-#include <SamplesRunner/rtc/suppress_warnings.h>
-#include <SamplesRunner/rtc/rtc_manager.h>
-#include <SamplesRunner/rtc/log_system.h>
+#include <BabylonStudio/rtc/suppress_warnings.h>
+#include <BabylonStudio/rtc/rtc_manager.h>
+#include <BabylonStudio/rtc/log_system.h>
 
 #include <RuntimeCompiler/AUArray.h>
 #include <RuntimeCompiler/BuildTool.h>
@@ -14,8 +14,8 @@
 #include <RuntimeObjectSystem/RuntimeObjectSystem.h>
 #include <RuntimeObjectSystem/IObject.h>
 
-#include <SamplesRunner/rtc/iscene_producer.h>
-#include <SamplesRunner/rtc/interface_ids.h>
+#include <BabylonStudio/rtc/iscene_producer.h>
+#include <BabylonStudio/rtc/interface_ids.h>
 #include <babylon/core/system.h>
 #include <babylon/core/filesystem.h>
 

@@ -11,6 +11,12 @@
 
 namespace BABYLON {
 
+std::unordered_map<std::string, std::string> _ActionTabsComponent_Labels{
+  {"Properties", std::string(ICON_FA_FILE_ALT) + " Properties"},
+  {"Debug", std::string(ICON_FA_BUG) + " Debug"},
+  {"Statistics", std::string(ICON_FA_CHART_BAR) + " Statistics"},
+};
+
 ActionTabsComponent::ActionTabsComponent(
   const IActionTabsComponentProps& iProps)
     : props{iProps}
@@ -62,40 +68,28 @@ void ActionTabsComponent::componentWillUnmount()
 
 void ActionTabsComponent::render()
 {
-  static ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
-  if (ImGui::BeginTabBar("ActionTabs", tab_bar_flags)) {
-    // Properties tab
+  if (ImGui::BeginTabBar("Actions Tabs"))
+  {
+    // Properties
     if (_propertyGridTabComponent) {
-      static const auto propertiesTabLabel
-        = String::concat(faFileAlt, " ", "Properties");
-      if (ImGui::BeginTabItem(propertiesTabLabel.c_str())) {
-        if (ImGui::BeginChild("scrollingArea")) {
-          _propertyGridTabComponent->render();
-          ImGui::EndChild();
-        }
+      if (ImGui::BeginTabItem(_ActionTabsComponent_Labels.at("Properties").c_str())) {
+        _propertyGridTabComponent->render();
         ImGui::EndTabItem();
       }
     }
-    // Debug tab
+
+    // Debug
     if (_debugTabComponent) {
-      static const auto debugTabLabel = String::concat(faBug, " ", "Debug");
-      if (ImGui::BeginTabItem(debugTabLabel.c_str())) {
-        if (ImGui::BeginChild("scrollingArea")) {
-          _debugTabComponent->render();
-          ImGui::EndChild();
-        }
+      if (ImGui::BeginTabItem(_ActionTabsComponent_Labels.at("Debug").c_str())) {
+        _debugTabComponent->render();
         ImGui::EndTabItem();
       }
     }
-    // Statistics tab
+
+    // Statistics
     if (_statisticsTabComponent) {
-      static const auto statisticsTabLabel
-        = String::concat(faChartBar, " ", "Statistics");
-      if (ImGui::BeginTabItem(statisticsTabLabel.c_str())) {
-        if (ImGui::BeginChild("scrollingArea")) {
-          _statisticsTabComponent->render();
-          ImGui::EndChild();
-        }
+      if (ImGui::BeginTabItem(_ActionTabsComponent_Labels.at("Statistics").c_str())) {
+        _statisticsTabComponent->render();
         ImGui::EndTabItem();
       }
     }

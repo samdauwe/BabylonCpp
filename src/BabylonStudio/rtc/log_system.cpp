@@ -1,6 +1,6 @@
 #ifdef BABYLON_BUILD_PLAYGROUND
 #include <babylon/core/logging.h>
-#include <SamplesRunner/rtc/log_system.h>
+#include <BabylonStudio/rtc/log_system.h>
 
 #include <stdarg.h>
 #include <assert.h>

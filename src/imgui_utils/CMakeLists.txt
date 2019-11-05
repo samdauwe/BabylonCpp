@@ -54,3 +54,7 @@ target_link_libraries(${TARGET}
     BabylonCpp
     ImGuiColorTextEdit
 )
+
+if (UNIX AND NOT APPLE)
+    target_link_libraries(${TARGET} PUBLIC X11)
+endif()

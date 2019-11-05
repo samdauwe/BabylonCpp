@@ -32,8 +32,12 @@ public:
   {
     auto lang = TextEditor::LanguageDefinition::CPlusPlus();
     _textEditor.SetLanguageDefinition(lang);
-    _textEditor.SetPalette(TextEditor::GetLightPalette());
     readFile();
+  }
+
+  void setLightPalette()
+  {
+    _textEditor.SetPalette(TextEditor::GetLightPalette());
   }
 
   void readFile()
@@ -47,9 +51,10 @@ public:
   {
     //ImGui::ShowDemoWindow();
     checkExternalModifications();
-    renderStatusLine();
-    ImGui::Separator();
+    renderExternalEdition();
     renderCommandLine();
+    ImGui::Separator();
+    renderStatusLine();
     ImGui::Separator();
     if (_hasModificationConflict)
     {
@@ -144,17 +149,18 @@ private:
 
   void renderStatusLine()
   {
-
     auto cpos = _textEditor.GetCursorPosition();
     bool isTextModified = (_fileContent_Saved != _textEditor.GetText());
-    ImGui::Text("%s", _filePath.c_str());
+    ImGui::TextWrapped("%s", _filePath.c_str());
     ImGui::Text("%6d/%-6d %6d lines | %s | %s | %s ", cpos.mLine + 1, cpos.mColumn + 1, _textEditor.GetTotalLines(),
       isTextModified ? "*" : " ",
       _textEditor.GetLanguageDefinition().mName.c_str(),
       _textEditor.IsOverwrite() ? "Ovr" : "Ins"
       );
+  }
 
-    ImGui::SameLine(0., 100.f);
+  void renderExternalEdition()
+  {
     if (guiAllowEdition)
       guiAllowEdition();
     ImGui::SameLine();
@@ -257,8 +263,8 @@ public:
       return;
 
     renderTabs();
-    ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 200.f);
-    renderPalette();
+    //ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 200.f);
+    // renderPalette();
     if (_currentEditor)
       currentEditor().render();
   }
@@ -269,6 +275,12 @@ public:
     {
       editor.save();
     }
+  }
+
+  void setLightPalette()
+  {
+    for (auto& editor : _editors)
+      editor.setLightPalette();
   }
 
 private:
@@ -332,6 +344,7 @@ CodeEditor::CodeEditor(bool showCheckboxReadOnly)
 void CodeEditor::setFiles(const std::vector<std::string> &filePaths)
 {
   _pImpl->setFiles(filePaths);
+  _isEmpty = false;
 }
 
 CodeEditor::~CodeEditor() = default;
@@ -345,6 +358,11 @@ void CodeEditor::render()
 void CodeEditor::saveAll()
 {
   _pImpl->saveAll();
+}
+
+void CodeEditor::setLightPalette()
+{
+  _pImpl->setLightPalette();
 }
 
 void demoCodeEditor()

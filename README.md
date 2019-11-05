@@ -6,7 +6,7 @@ The goal of BabylonCpp is to fully implement the relevant portions of the excell
 
 It includes more than 200 examples, a graphical inspector for all 3D objects (based on [ImGui](https://github.com/ocornut/imgui)), as well as an interactive playground for live coding and experiments.
 
-[![BabylonCpp](doc/assets/babylon_demo_video.png)](https://youtu.be/McU8_vIEJfQ "BabylonCpp")
+[![BabylonCpp](doc/assets/babylon_demo_video.jpg)](https://www.youtube.com/watch?v=o05_5Wyzv54 "BabylonCpp")
 
 # Get the Sources
 

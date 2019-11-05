@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 #include <babylon/babylon_api.h>
 #include <imgui_utils/icons_font_awesome_5.h>
@@ -25,6 +26,7 @@ struct BABYLON_SHARED_EXPORT IActionTabsComponentProps {
   Scene* scene               = nullptr;
   GlobalStatePtr globalState = nullptr;
 }; // end of struct IActionTabsComponentProps
+
 
 class BABYLON_SHARED_EXPORT ActionTabsComponent {
 

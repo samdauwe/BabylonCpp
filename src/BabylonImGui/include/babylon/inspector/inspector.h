@@ -27,14 +27,13 @@ public:
 
   Scene* scene() const;
   void setScene(Scene* scene);
-  void render(bool createWindow, int width);
+  void render();
 
   // these methods handle the internals of imgui
   // they are not part of the inspector interface
   // when imgui is handled elsewhere
   void imgui_initialize();
   void imgui_LoadFontAwesome();
-  void imgui_render_and_display();
   void imgui_dispose();
 
   // Global function that will be called when a new sample is selected
@@ -48,7 +47,7 @@ private:
   void _doMenuItem(InspectorAction& a, bool enabled);
   void _pushFonts();
   void _popFonts();
-  void _renderInspector(bool createWindow, int width = 400);
+  void _renderInspector();
 
 private:
   GLFWwindow* _glfwWindow;

@@ -24,18 +24,28 @@ namespace ImGuiUtils
 
     inline void EmptyPostInitFunction() {}
 
+    enum class DefaultWindowTypeOption { ProvideFullScreenWindow, ProvideFullScreenDockSpace, NoDefaultWindow };
+
     struct AppWindowParams
     {
       bool FullScreen = false;
+
+      bool WindowedFullScreen = false;
+      int WindowedFullScreen_HeightReduce = 64;
+
       int Width = 1280;
       int Height = 720;
       std::string Title = "My Window";
       GLFWwindow *ParentWindow = nullptr;
       ImVec4 ClearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-      bool ProvideFullScreenWindow = true;
+
+      DefaultWindowTypeOption DefaultWindowType;
+
       bool ShowMenuBar = false;
       bool ConfigWindowsMoveFromTitleBarOnly = true;
       bool LoadFontAwesome = true;
+
+      std::function<void(ImGuiID /* fullDockSpace */)> InitialDockLayoutFunction;
     };
 
     void RunGui(
@@ -49,7 +59,7 @@ namespace ImGuiUtils
       PostInitFunction postInitFunction = EmptyPostInitFunction
     );
 
-
+    void ResetDockLayout();
   }
 }
 

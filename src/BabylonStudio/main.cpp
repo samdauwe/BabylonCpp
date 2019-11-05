@@ -1,5 +1,5 @@
 #include <babylon/core/system.h>
-#include "SamplesRunner/HelloScene.h"
+#include "BabylonStudio/HelloScene.h"
 #include <babylon/samples/samples_index.h>
 #include <babylon/babylon_imgui/run_scene_with_inspector.h>
 #include <babylon/core/logging/init_console_logger.h>
@@ -7,9 +7,10 @@
 
 #include "spawn_screenshots.h"
 #include "run_standalone_imgui.h"
+#include "imgui_utils/app_runner/imgui_runner_demo.h"
 
 #ifdef BABYLON_BUILD_PLAYGROUND
-#include <SamplesRunner/rtc/rtc_manager.h>
+#include <BabylonStudio/rtc/rtc_manager.h>
 #endif
 
 int main(int argc, char** argv)
@@ -21,6 +22,8 @@ int main(int argc, char** argv)
 
   BABYLON::System::chdirToExecutableFolder();
 
+  //ImGuiUtils::ImGuiRunner::ShowDemo(); return 0;
+   
   bool flagQuiet = false;
   bool flagFullscreen = false;
   bool flagSpawnScreenshots = false;
