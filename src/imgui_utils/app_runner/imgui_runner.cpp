@@ -13,17 +13,9 @@
 
 #if defined(__APPLE__)
 
-#import <AppKit/AppKit.h>
-#import <Foundation/Foundation.h>
 std::pair<int, int> MainScreenResolution()
 {
-  NSRect screenRect;
-  NSArray* screenArray        = [NSScreen screens];
-  unsigned indexPrimaryScreen = 0;
-  NSScreen* screen            = [screenArray objectAtIndex:indexPrimaryScreen];
-  screenRect                  = [screen visibleFrame];
-
-  return { screenRect.size.width, screenRect.size.height };
+  return { 1280, 720 };
 }
 
 #elif defined(_WIN32)
@@ -37,8 +29,7 @@ std::pair<int, int> MainScreenResolution()
     (int)GetSystemMetrics(SM_CYSCREEN)
   };
 }
-
-#elif defined(LINUX)
+#elif defined(__linux__)
 
 #include <X11/Xlib.h>
 
