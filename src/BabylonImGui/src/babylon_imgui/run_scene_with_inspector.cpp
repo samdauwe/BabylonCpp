@@ -79,7 +79,7 @@ public:
     _appContext._options = options;
     _appContext._options._appWindowParams.WindowedFullScreen = true;
 
-    std::function<bool(void)> showGuiLambda = [this]() -> bool 
+    std::function<bool(void)> showGuiLambda = [this]() -> bool
     {
       bool r = this->render();
       for (auto f : _appContext._options._heartbeatCallbacks)
@@ -94,14 +94,14 @@ public:
       return r;
     };
 
-    auto initSceneLambda = [&]() 
+    auto initSceneLambda = [&]()
     {
       this->initScene();
       this->setRenderableScene(initialScene);
     };
 
     //_appContext._options._appWindowParams.DefaultWindowType = ImGuiUtils::ImGuiRunner::DefaultWindowTypeOption::ProvideFullScreenWindow;
-    _appContext._options._appWindowParams.InitialDockLayoutFunction = [this](ImGuiID mainDockId) { 
+    _appContext._options._appWindowParams.InitialDockLayoutFunction = [this](ImGuiID mainDockId) {
       CreateDockingLayout_BabylonCpp(mainDockId);
     };
     ImGuiUtils::ImGuiRunner::RunGui(showGuiLambda, _appContext._options._appWindowParams, initSceneLambda);
@@ -154,8 +154,10 @@ private:
       dock_id_left_bottom = ImGui::DockBuilderSplitNode(dock_id_left, ImGuiDir_Down, 0.25f, NULL, &dock_id_left);
 
     ImGui::DockBuilderDockWindow("Inspector", dock_id_left);
-    
+
+#ifdef BABYLON_BUILD_PLAYGROUND
     ImGui::DockBuilderDockWindow(_viewElementsLabels.at(ViewElements::PlaygroundEditor).c_str(), dock_main_id);
+#endif
     ImGui::DockBuilderDockWindow(_viewElementsLabels.at(ViewElements::SamplesCodeViewer).c_str(), dock_main_id);
     ImGui::DockBuilderDockWindow(_viewElementsLabels.at(ViewElements::SampleBrowser).c_str(), dock_id_left);
     ImGui::DockBuilderDockWindow(_viewElementsLabels.at(ViewElements::Scene3d).c_str(), dock_id_right);
@@ -171,14 +173,14 @@ private:
 
   void initScene()
   {
-    _appContext._sampleListComponent.OnNewRenderableScene = [&](std::shared_ptr<IRenderableScene> scene) 
+    _appContext._sampleListComponent.OnNewRenderableScene = [&](std::shared_ptr<IRenderableScene> scene)
     {
       this->setRenderableScene(scene);
 
       // Focus 3d widget when changing scene
       auto winLabel = _viewElementsLabels.at(ViewElements::Scene3d).c_str();
       ImGuiWindow* sceneWindow = ImGui::FindWindowByName(winLabel);
-      ImGui::FocusWindow(sceneWindow);      
+      ImGui::FocusWindow(sceneWindow);
     };
 
     _appContext._sampleListComponent.OnEditFiles = [&](const std::vector<std::string> & files) {
@@ -221,7 +223,7 @@ private:
 
     if (_showInspector)
       _appContext._inspector->render();
-    
+
     if (_showLayout)
       GuiLayout();
 
@@ -272,7 +274,7 @@ private:
 
   void GuiLayout()
   {
-    int windowFlags = 0; 
+    int windowFlags = 0;
 
     if (_layoutMode == LayoutMode::Scene)
     {
