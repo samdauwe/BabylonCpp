@@ -1,6 +1,9 @@
 #include <imgui_utils/app_runner/imgui_runner.h>
 #include "imgui_internal.h"
+
 #include <map>
+#include <vector>
+#include <string>
 
 namespace ImGuiUtils
 {
