@@ -44,7 +44,8 @@ namespace ImGuiUtils
   };
 
   using Filename = std::string;
-  
+
+
   void ImageFromFile(const Filename &filename, ImVec2 size /*= ImVec2(0.f, 0.f)*/)
   {
     static std::map<Filename, ImageFileTexture> cacheImageFileTexture;
@@ -54,8 +55,12 @@ namespace ImGuiUtils
     const ImageFileTexture & texture = cacheImageFileTexture.at(filename);
     if (texture.found)
     {
-      if (size.x == 0.f)
+      if ((size.x == 0.f) && (size.y == 0.f))
         size = ImVec2((float)texture._width, (float)texture._height);
+      else if (size.x == 0.f)
+        size = ImVec2((float)texture._width / (float)texture._height * size.y, size.y);
+      else if (size.y == 0.f)
+        size = ImVec2(size.x, (float)texture._height / (float)texture._width * size.x);
 
       ImGui::Image((void*)(intptr_t)texture._textureId, size);
     }

@@ -29,6 +29,10 @@ namespace ImGuiUtils
     struct AppWindowParams
     {
       bool FullScreen = false;
+
+      bool WindowedFullScreen = false;
+      int WindowedFullScreen_HeightReduce = 64;
+
       int Width = 1280;
       int Height = 720;
       std::string Title = "My Window";

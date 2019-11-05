@@ -19,7 +19,8 @@ namespace BABYLON {
   struct SceneWithInspectorOptions
   {
     inline SceneWithInspectorOptions() {
-      _appWindowParams.Title = "BabylonCpp inspector";
+      _appWindowParams.Title = "BabylonCpp";
+      _appWindowParams.DefaultWindowType = ImGuiUtils::ImGuiRunner::DefaultWindowTypeOption::ProvideFullScreenDockSpace;
     }
     std::string _sceneName = "";
     bool _flagScreenshotOneSampleAndExit = false;

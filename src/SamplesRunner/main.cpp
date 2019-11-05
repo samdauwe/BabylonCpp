@@ -22,10 +22,8 @@ int main(int argc, char** argv)
 
   BABYLON::System::chdirToExecutableFolder();
 
-  ImGuiUtils::ImGuiRunner::ShowDemo();
-  return 0;
-
-
+  //ImGuiUtils::ImGuiRunner::ShowDemo(); return 0;
+   
   bool flagQuiet = false;
   bool flagFullscreen = false;
   bool flagSpawnScreenshots = false;

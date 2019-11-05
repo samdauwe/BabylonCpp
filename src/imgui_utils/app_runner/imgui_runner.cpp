@@ -1,7 +1,6 @@
 // dear imgui: standalone example application for GLFW + OpenGL 3, using programmable pipeline
 // If you are new to dear imgui, see examples/README.txt and documentation at the top of imgui.cpp.
 // (GLFW is a cross-platform general purpose library for handling windows, inputs, OpenGL/Vulkan graphics context creation, etc.)
-
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
@@ -9,6 +8,47 @@
 #include <imgui_utils/app_runner/imgui_runner.h>
 #include <imgui_utils/icons_font_awesome_5.h>
 #include <imgui_utils/imgui_utils.h>
+
+#include <utility>
+
+#if defined(__APPLE__)
+
+#import <AppKit/AppKit.h>
+#import <Foundation/Foundation.h>
+std::pair<int, int> MainScreenResolution()
+{
+  NSRect screenRect;
+  NSArray* screenArray        = [NSScreen screens];
+  unsigned indexPrimaryScreen = 0;
+  NSScreen* screen            = [screenArray objectAtIndex:indexPrimaryScreen];
+  screenRect                  = [screen visibleFrame];
+
+  return { screenRect.size.width, screenRect.size.height };
+}
+
+#elif defined(_WIN32)
+
+#undef APIENTRY
+#include <windows.h>
+std::pair<int, int> MainScreenResolution()
+{
+  return {
+    (int)GetSystemMetrics(SM_CXSCREEN),
+    (int)GetSystemMetrics(SM_CYSCREEN)
+  };
+}
+
+#elif defined(LINUX)
+
+#include <X11/Xlib.h>
+
+std::pair<int, int> MainScreenResolution()
+{
+  Display* d = XOpenDisplay(NULL);
+  Screen* s  = DefaultScreenOfDisplay(d);
+  return { s->width, s->height };
+}
+#endif
 
 
 namespace ImGuiUtils
@@ -187,7 +227,21 @@ namespace ImGuiUtils
         glfwWindowParams.ParentWindow = appWindowParams.ParentWindow;
         glfwWindowParams.Title = appWindowParams.Title;
       }
+
+      if (appWindowParams.WindowedFullScreen)
+      {
+        auto mainScreenSize = MainScreenResolution();
+        mainScreenSize.second -= appWindowParams.WindowedFullScreen_HeightReduce;
+        glfwWindowParams.Width = mainScreenSize.first;
+        glfwWindowParams.Height = mainScreenSize.second;
+      }
+
+
       GLFWwindow* window = GlfwRunner::GLFW_CreateWindow(glfwWindowParams);
+      if (appWindowParams.WindowedFullScreen)
+      {
+        glfwSetWindowPos(window, 0, appWindowParams.WindowedFullScreen_HeightReduce / 2);
+      }
 
       GlfwRunner::Glad_Init();
       ImGui_Init(window);
@@ -234,11 +288,7 @@ namespace ImGuiUtils
           ImplProvideFullScreenDockSpace(appWindowParams);
         }
 
-        if (appWindowParams.LoadFontAwesome)
-          pushFontAwesome();
         bool shouldExit = guiFunction();
-        if (appWindowParams.LoadFontAwesome)
-          popFontAwesome();
 
         if (appWindowParams.DefaultWindowType != DefaultWindowTypeOption::None)
           ImGui::End();

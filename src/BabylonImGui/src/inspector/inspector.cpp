@@ -133,26 +133,9 @@ void Inspector::imgui_LoadFontAwesome()
     ImGui::IconSize, &config, ranges);
 }
 
-void Inspector::imgui_render_and_display() // oldie
+void Inspector::render()
 {
-  // Start the Dear ImGui frame
-  ImGui_ImplOpenGL3_NewFrame();
-  ImGui_ImplGlfw_NewFrame();
-  ImGui::NewFrame();
-  // Push Font
-  _pushFonts();
-  render(true, 400);
-  // Pop font
-  _popFonts();
-  // Rendering
-  ImGui::Render();
-  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-}
-
-void Inspector::render(bool createWindow, int width)
-{
-  // Render inspector
-  _renderInspector(createWindow, width);
+  _renderInspector();
 }
 
 void Inspector::_showFps()
@@ -203,65 +186,18 @@ void Inspector::_popFonts()
   ImGui::PopFont();
 }
 
-void Inspector::_renderInspector(bool createWindow, int width_)
+void Inspector::_renderInspector()
 {
-  if (ImGui::GetIO().DisplaySize.y <= 0) {
-    return;
-  }
-
-  float width;
-  float sz1;
-  float sz2;
-
-  if (createWindow)
-  {
-    // Setup window size
-    auto pos = ImVec2(0.f, static_cast<float>(_menuHeight));
-    auto size = ImGui::GetIO().DisplaySize;
-    size.y -= pos.y;
-
-    ImGui::SetNextWindowPos(pos, ImGuiCond_Always);
-    ImGui::SetNextWindowSize(size, ImGuiCond_Always);
-    ImGui::Begin("INSPECTOR", &_showInspectorWindow,
-      ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize
-      | ImGuiWindowFlags_NoScrollbar
-      | ImGuiWindowFlags_NoScrollWithMouse
-      | ImGuiWindowFlags_NoBringToFrontOnFocus);
-
-    width = ImGui::GetContentRegionMax().x - 4.f;
-    sz1 = ImGui::GetContentRegionMax().y / 2.f;
-    sz2 = ImGui::GetContentRegionMax().y - sz1 - 8.f;
-  }
-  else
-  {
-    width = static_cast<float>(width_);
-    sz1 = ImGui::GetContentRegionMax().y / 2.f;
-    sz2 = ImGui::GetContentRegionMax().y - sz1 - 20.f;
-    ImGui::BeginGroup();
-  }
-
-  _showFps();
-
-  ImGui::Splitter(false, 1.f, &sz1, &sz2, 4, 4, width);
   // Render the scene explorer
-  if (ImGui::BeginChild("SceneExplorer", ImVec2(width, sz1), true)) {
-    if (_sceneExplorerHost) {
-      _sceneExplorerHost->render();
-    }
-  }
-  ImGui::EndChild();
-  // Render the action tabs
-  if (ImGui::BeginChild("ActionTabs", ImVec2(width, sz2), true)) {
-    if (_actionTabsHost) {
-      _actionTabsHost->render();
-    }
-  }
-  ImGui::EndChild();
+  ImGui::Begin("Inspector");
+  if (_sceneExplorerHost)
+    _sceneExplorerHost->render();
 
-  if (createWindow)
-    ImGui::End();
-  else
-    ImGui::EndGroup();
+  // Render the action tabs
+  if (_actionTabsHost)
+    _actionTabsHost->render();
+
+  ImGui::End();
 }
 
 } // end of namespace BABYLON

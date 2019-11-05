@@ -72,9 +72,6 @@ public:
     render_filter();
     ImGui::Separator();
     render_list();
-    ImGui::NewLine();
-    ImGui::Separator();
-    ImGui::NewLine();
   }
 
   SamplesBrowser::CallbackNewRenderableScene OnNewRenderableScene;
@@ -89,8 +86,11 @@ private:
     if (ImGui::InputText_String("Filter", _query.query))
       changed = true;
 
+    ImGui::SameLine();
+    if (ImGui::Checkbox(ICON_FA_WRENCH "Experimental", &_query.onlyFailures))
+      changed = true;
+
     if (OnLoopSamples) {
-      ImGui::SameLine(0.f, 50.f);
       if (ImGui::Button("Loop filtered samples")) {
         std::vector<std::string> filteredSamples;
         for (const auto& kv : _matchingSamples) {
@@ -101,18 +101,6 @@ private:
       }
     }
 
-    float rightMargin = 150.f;
-    if (_query.includeFailures)
-      rightMargin = 300.f;
-    ImGui::SameLine(ImGui::GetContentRegionAvailWidth() - rightMargin);
-    if (ImGui::Checkbox("Include failing", &_query.includeFailures))
-      changed = true;
-    if (_query.includeFailures)
-    {
-      ImGui::SameLine();
-      if (ImGui::Checkbox("Only failing", &_query.onlyFailures))
-        changed = true;
-    }
 
     if (changed)
       fillMatchingSamples();
@@ -122,10 +110,6 @@ private:
 
   void render_list()
   {
-    //ImGui::Checkbox("Show original screenshots", &_showOriginalScreenshots);
-    //ImGui::SameLine();
-    //ImGui::Checkbox("Show screenshots", &_showCurrentScreenshots);
-
     enum class CollapseMode
     {
       None,
@@ -141,7 +125,7 @@ private:
 
 
     ImGui::Separator();
-      
+     
     ImGui::BeginChild("Child1");
     for (const auto & kv : _matchingSamples)
     {
@@ -194,18 +178,6 @@ private:
         OnEditFiles({ sampleInfo.HeaderFile, sampleInfo.SourceFile });
     }
 
-    //std::string btnHeaderString = std::string(ICON_FA_EYE "##") + sampleInfo.HeaderFile;
-    //if (ImGui::Button(btnHeaderString.c_str()))
-    //  BABYLON::System::openFile(sampleInfo.HeaderFile);
-    //ImGui::SameLine();
-    //ImGui::TextDisabled(".h  : %s", repositoryRelativePath(sampleInfo.HeaderFile).c_str());
-
-    //std::string btnSourceString = std::string(ICON_FA_EYE "##") + sampleInfo.SourceFile;
-    //if (ImGui::Button(btnSourceString.c_str()))
-    //  BABYLON::System::openFile(sampleInfo.SourceFile);
-    //ImGui::SameLine();
-    //ImGui::TextDisabled(".cpp: %s", repositoryRelativePath(sampleInfo.SourceFile).c_str());
-
     if (!sampleInfo.Links.empty()) {
       for (auto link : sampleInfo.Links) {
         std::string btnUrlString = std::string(ICON_FA_EXTERNAL_LINK_ALT "##") + link;
@@ -228,7 +200,8 @@ private:
     if (_showCurrentScreenshots)
     {
       ImGui::BeginGroup();
-      ImGuiUtils::ImageFromFile(currentScreenshotFile);
+      ImVec2 imageSize(ImGui::GetWindowWidth() / 3., 0.f);
+      ImGuiUtils::ImageFromFile(currentScreenshotFile, imageSize);
       if (_showOriginalScreenshots && _showCurrentScreenshots)
         ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 0.7f), "Current(c++)");
       ImGui::EndGroup();
@@ -283,9 +256,11 @@ private:
       if (!_samplesIndex.doesSampleFail(sampleName))
         doesMatch = false;
     }
-    else if (!_query.includeFailures)
+    else
+    {
       if (_samplesIndex.doesSampleFail(sampleName))
         doesMatch = false;
+    }
 
     return doesMatch;
   }
@@ -320,7 +295,6 @@ private:
 
   struct {
     std::string query = "";
-    bool includeFailures = false;
     bool onlyFailures = false;
   } _query;
 
