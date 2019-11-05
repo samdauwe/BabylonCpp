@@ -35,7 +35,7 @@ public:
     readFile();
   }
 
-  void OneCodeEditor::setLightPalette()
+  void setLightPalette()
   {
     _textEditor.SetPalette(TextEditor::GetLightPalette());
   }
