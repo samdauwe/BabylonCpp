@@ -77,7 +77,7 @@ public:
   )
   {
     _appContext._options = options;
-    _appContext._options._appWindowParams.WindowedFullScreen = true;
+    //_appContext._options._appWindowParams.WindowedFullScreen = true;
 
     std::function<bool(void)> showGuiLambda = [this]() -> bool
     {
