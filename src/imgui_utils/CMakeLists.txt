@@ -55,6 +55,6 @@ target_link_libraries(${TARGET}
     ImGuiColorTextEdit
 )
 
-if (UNIX)
+if (UNIX AND NOT APPLE)
     target_link_libraries(${TARGET} PUBLIC X11)
 endif()
