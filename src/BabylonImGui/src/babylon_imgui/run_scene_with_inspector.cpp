@@ -153,13 +153,20 @@ private:
     if (_layoutMode == LayoutMode::SceneAndInspector)
       dock_id_left_bottom = ImGui::DockBuilderSplitNode(dock_id_left, ImGuiDir_Down, 0.25f, NULL, &dock_id_left);
 
-    ImGui::DockBuilderDockWindow("Inspector", dock_id_left);
 
 #ifdef BABYLON_BUILD_PLAYGROUND
     ImGui::DockBuilderDockWindow(_viewElementsLabels.at(ViewElements::PlaygroundEditor).c_str(), dock_main_id);
 #endif
     ImGui::DockBuilderDockWindow(_viewElementsLabels.at(ViewElements::SamplesCodeViewer).c_str(), dock_main_id);
-    ImGui::DockBuilderDockWindow(_viewElementsLabels.at(ViewElements::SampleBrowser).c_str(), dock_id_left);
+
+    if (_layoutMode == LayoutMode::Dev) {
+      ImGui::DockBuilderDockWindow("Inspector", dock_main_id);
+      ImGui::DockBuilderDockWindow(_viewElementsLabels.at(ViewElements::SampleBrowser).c_str(), dock_main_id);
+    }
+    else {
+      ImGui::DockBuilderDockWindow("Inspector", dock_id_left);
+      ImGui::DockBuilderDockWindow(_viewElementsLabels.at(ViewElements::SampleBrowser).c_str(), dock_id_left);
+    }
     ImGui::DockBuilderDockWindow(_viewElementsLabels.at(ViewElements::Scene3d).c_str(), dock_id_right);
     ImGui::DockBuilderDockWindow("Logs", dock_id_bottom);
     if (_layoutMode == LayoutMode::Dev)
@@ -322,11 +329,11 @@ private:
       break;
     case LayoutMode::Dev:
       _showScene3d           = true;
-      _showSamplesBrowser    = false;
+      _showSamplesBrowser    = true;
       _showSamplesCodeViewer = true;
       _showPlayground        = true;
       _showLogs              = true;
-      _showInspector         = false;
+      _showInspector         = true;
       _showLayout            = true;
       break;
     default:
