@@ -281,7 +281,7 @@ namespace ImGuiUtils
 
         bool shouldExit = guiFunction();
 
-        if (appWindowParams.DefaultWindowType != DefaultWindowTypeOption::None)
+        if (appWindowParams.DefaultWindowType != DefaultWindowTypeOption::NoDefaultWindow)
           ImGui::End();
 
         ImGui_ImplRender(window, appWindowParams.ClearColor);

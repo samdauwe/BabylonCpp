@@ -24,7 +24,7 @@ namespace ImGuiUtils
 
     inline void EmptyPostInitFunction() {}
 
-    enum class DefaultWindowTypeOption { ProvideFullScreenWindow, ProvideFullScreenDockSpace, None };
+    enum class DefaultWindowTypeOption { ProvideFullScreenWindow, ProvideFullScreenDockSpace, NoDefaultWindow };
 
     struct AppWindowParams
     {
