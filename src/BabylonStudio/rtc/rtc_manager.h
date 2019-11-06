@@ -6,7 +6,7 @@
 #include <RuntimeCompiler/AUArray.h>
 #include <memory>
 #include <babylon/interfaces/irenderable_scene.h>
-#include <babylon/babylon_imgui/run_scene_with_inspector.h>
+#include <babylon/babylon_imgui/babylon_studio.h>
 
 struct IRuntimeObjectSystem;
 

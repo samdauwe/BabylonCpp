@@ -16,9 +16,9 @@ namespace BABYLON {
     bool _isCompiling = false;
   };
 
-  struct SceneWithInspectorOptions
+  struct BabylonStudioOptions
   {
-    inline SceneWithInspectorOptions() {
+    inline BabylonStudioOptions() {
       _appWindowParams.Title = "BabylonCpp";
       _appWindowParams.DefaultWindowType = ImGuiUtils::ImGuiRunner::DefaultWindowTypeOption::ProvideFullScreenDockSpace;
     }
@@ -36,9 +36,9 @@ namespace BABYLON {
     PlaygroundCompilerCallback _playgroundCompilerCallback;
   };
 
-  void runSceneWithInspector(
+  void runBabylonStudio(
     std::shared_ptr<BABYLON::IRenderableScene> scene,
-    SceneWithInspectorOptions options = SceneWithInspectorOptions()
+    BabylonStudioOptions options = BabylonStudioOptions()
   );
 } // end of namespace BABYLON
 

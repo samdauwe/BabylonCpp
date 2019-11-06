@@ -57,34 +57,7 @@ namespace BABYLON
 
   void BabylonLogsWindow::render()
   {
-    ImGui::SetNextWindowSize(ImVec2(800, 300), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowPos(ImVec2(30, 60), ImGuiCond_FirstUseEver);
-    if (_visible)
-    {
-      if (ImGui::Begin("Logs", &_visible))
-        _logImpl->Draw();
-      ImGui::End();
-    }
-  }
-
-  void BabylonLogsWindow::renderToggleButton()
-  {
-    bool popStyle = false;
-    if (_visible) {
-      ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.3f, 0.6f, 1.f));
-      popStyle = true;
-    }
-
-    if (ImGui::Button(ICON_FA_INFO " Logs"))
-      _visible = !_visible;
-
-    if (popStyle)
-      ImGui::PopStyleColor();
-  }
-
-  void BabylonLogsWindow::setVisible(bool visible)
-  {
-    _visible = visible;
+     _logImpl->Draw();
   }
 
   ImGuiAl::Log * BabylonLogsWindow::Impl()

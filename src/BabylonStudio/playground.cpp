@@ -10,10 +10,15 @@
 
 // You can edit the code below freely (add includes, modify the scene, etc)
 #include <babylon/cameras/arc_rotate_camera.h>
-#include <babylon/lights/point_light.h>
-#include <babylon/materials/standard_material.h>
+#include <babylon/engines/scene.h>
+#include <babylon/materials/image_processing_configuration.h>
+#include <babylon/materials/pbr/pbr_material.h>
+#include <babylon/materials/textures/cube_texture.h>
 #include <babylon/materials/textures/texture.h>
+#include <babylon/materials/textures/texture_constants.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/meshes/mesh_builder.h>
 
 using namespace BABYLON;
 
@@ -25,98 +30,96 @@ struct PlaygroundScene : public IRenderableSceneWithHud {
 
   void initializeScene(ICanvas* canvas, Scene* scene) override
   {
-    // Create a light
-    auto light = PointLight::New("Omni", Vector3(-60.f, 60.f, 80.f), scene);
-    light->intensity = 0.98f;
 
-    // Create an Arc Rotate Camera - aimed negative z this time
-    auto camera = ArcRotateCamera::New("Camera", Math::PI / 2, 1.f, 110.f,
-      Vector3::Zero(), scene);
-    camera->attachControl(canvas, true);
+  auto camera = ArcRotateCamera::New("Camera", -Math::PI_4, Math::PI / 2.5f,
+                                     200.f, Vector3::Zero(), scene);
+  camera->attachControl(canvas, true);
+  camera->minZ = 0.1f;
 
-    // Creation of 6 spheres
-    auto sphere1 = Mesh::CreateSphere("Sphere1", 10u, 9.f, scene);
-    auto sphere2 = Mesh::CreateSphere("Sphere2", 2u, 9.f, scene);
-    auto sphere3 = Mesh::CreateSphere("Sphere3", 10u, 18.f, scene);
-    auto sphere4 = Mesh::CreateSphere("Sphere4", 10u, 9.f, scene);
-    auto sphere5 = Mesh::CreateSphere("Sphere5", 10u, 9.f, scene);
-    auto sphere6 = Mesh::CreateSphere("Sphere6", 10u, 9.f, scene);
+  // Environment Texture
+  auto hdrTexture
+    = CubeTexture::CreateFromPrefilteredData("textures/environment.dds", scene);
 
-    // Position the spheres
-    sphere1->position().x = 40.f;
-    sphere2->position().x = 25.f;
-    sphere3->position().x = 10.f;
-    sphere4->position().x = -5.f;
-    sphere5->position().x = -20.f;
-    sphere6->position().x = -35.f;
+  scene->imageProcessingConfiguration()->exposure = 0.6f;
+  scene->imageProcessingConfiguration()->contrast = 1.6f;
 
-    // Creation of a plane
-    auto plane = Mesh::CreatePlane("plane", 120, scene);
-    plane->position().y = -5;
-    plane->rotation().x = Math::PI_2;
+  // Skybox
+  auto hdrSkybox         = Mesh::CreateBox("hdrSkyBox", 1000.f, scene);
+  auto hdrSkyboxMaterial = PBRMaterial::New("skyBox", scene);
+  hdrSkyboxMaterial->backFaceCulling   = false;
+  hdrSkyboxMaterial->reflectionTexture = hdrTexture->clone();
+  hdrSkyboxMaterial->reflectionTexture()->coordinatesMode
+    = TextureConstants::SKYBOX_MODE;
+  hdrSkyboxMaterial->microSurface    = 1.f;
+  hdrSkyboxMaterial->disableLighting = true;
+  hdrSkybox->material                = hdrSkyboxMaterial;
+  hdrSkybox->infiniteDistance        = true;
 
-    // Creation of a material with wireFrame
-    auto materialSphere1 = StandardMaterial::New("texture1", scene);
-    materialSphere1->wireframe = true;
+  // Create meshes
+  auto sphereGlass = Mesh::CreateSphere("sphereGlass", 48, 30.f, scene);
+  sphereGlass->translate(Vector3(1.f, 0.f, 0.f), -60.f);
 
-    // Creation of a red material with alpha
-    auto materialSphere2 = StandardMaterial::New("texture2", scene);
-    materialSphere2->diffuseColor = Color3(1, 0, 0); // Red
-    materialSphere2->alpha = 0.3f;
+  auto sphereMetal = Mesh::CreateSphere("sphereMetal", 48, 30.f, scene);
+  sphereMetal->translate(Vector3(1.f, 0.f, 0.f), 60.f);
 
-    // Creation of a material with an image texture
-    auto materialSphere3 = StandardMaterial::New("texture3", scene);
-    materialSphere3->diffuseTexture = Texture::New("textures/misc.jpg", scene);
+  auto spherePlastic = Mesh::CreateSphere("spherePlastic", 48, 30.f, scene);
+  spherePlastic->translate(Vector3(0.f, 0.f, 1.f), -60.f);
 
-    // Creation of a material with translated texture
-    auto materialSphere4 = StandardMaterial::New("texture4", scene);
-    materialSphere4->diffuseTexture = Texture::New("textures/misc.jpg", scene);
-    auto texture
-      = std::static_pointer_cast<Texture>(materialSphere4->diffuseTexture());
-    texture->vOffset = 0.1f; // Vertical offset of 10%
-    texture->uOffset = 0.4f; // Horizontal offset of 40%
+  BoxOptions woodPlankOptions;
+  woodPlankOptions.width  = 65.f;
+  woodPlankOptions.height = 1.f;
+  woodPlankOptions.depth  = 65.f;
+  auto woodPlank = MeshBuilder::CreateBox("plane", woodPlankOptions, scene);
 
-    // Creation of a material with an alpha texture
-    auto materialSphere5 = StandardMaterial::New("texture5", scene);
-    materialSphere5->diffuseTexture = Texture::New("textures/tree.png", scene);
-    materialSphere5->diffuseTexture()->hasAlpha = true; // Has an alpha
+  // Create materials
+  auto glass                            = PBRMaterial::New("glass", scene);
+  glass->reflectionTexture              = hdrTexture;
+  glass->refractionTexture              = hdrTexture;
+  glass->linkRefractionWithTransparency = true;
+  glass->indexOfRefraction              = 0.52f;
+  glass->alpha                          = 0.f;
+  glass->microSurface                   = 1;
+  glass->reflectivityColor              = Color3(0.2f, 0.2f, 0.2f);
+  glass->albedoColor                    = Color3(0.85f, 0.85f, 0.85f);
+  sphereGlass->material                 = glass;
 
-    // Creation of a material and show all the faces
-    auto materialSphere6 = StandardMaterial::New("texture6", scene);
-    materialSphere6->diffuseTexture = Texture::New("textures/tree.png", scene);
-    materialSphere6->diffuseTexture()->hasAlpha = true; // Have an alpha
-    materialSphere6->backFaceCulling = false; // Show all the faces of the element
+  auto metal               = PBRMaterial::New("metal", scene);
+  metal->reflectionTexture = hdrTexture;
+  metal->microSurface      = 0.96f;
+  metal->reflectivityColor = Color3(0.85f, 0.85f, 0.85f);
+  metal->albedoColor       = Color3(0.01f, 0.01f, 0.01f);
+  sphereMetal->material    = metal;
 
-    // Creation of a repeated textured material
-    auto materialPlane = StandardMaterial::New("texturePlane", scene);
-    materialPlane->backFaceCulling
-      = false; // Always show the front and the back of an element
-    materialPlane->diffuseTexture = Texture::New("textures/grass.jpg", scene);
-    texture = std::static_pointer_cast<Texture>(materialPlane->diffuseTexture());
-    texture->uScale = 5.f; // Repeat 5 times on the Vertical Axes
-    texture->vScale = 5.f; // Repeat 5 times on the Horizontal Axes
-    materialPlane->backFaceCulling
-      = false; // Always show the front and the back of an element
+  auto plastic               = PBRMaterial::New("plastic", scene);
+  plastic->reflectionTexture = hdrTexture;
+  plastic->microSurface      = 0.96f;
+  plastic->albedoColor       = Color3(0.206f, 0.94f, 1.f);
+  plastic->reflectivityColor = Color3(0.003f, 0.003f, 0.003f);
+  spherePlastic->material    = plastic;
 
-    // Apply the materials to meshes
-    sphere1->material = materialSphere1;
-    sphere2->material = materialSphere2;
+  auto wood                  = PBRMaterial::New("wood", scene);
+  wood->reflectionTexture    = hdrTexture;
+  wood->environmentIntensity = 1.f;
+  wood->specularIntensity    = 0.3f;
 
-    sphere3->material = materialSphere3;
-    sphere4->material = materialSphere4;
+  wood->reflectivityTexture = Texture::New("textures/reflectivity.png", scene);
+  wood->useMicroSurfaceFromReflectivityMapAlpha = true;
 
-    sphere5->material = materialSphere5;
-    sphere6->material = materialSphere6;
-
-    plane->material = materialPlane;
-    
-
+  wood->albedoColor   = Color3::White();
+  wood->albedoTexture = Texture::New("textures/albedo.png", scene);
+  woodPlank->material = wood;
+  
+  auto sliderFloatProperty = [](const char * label, auto & v, float min, float max) {
+  	float f = v;
+  	ImGui::SliderFloat(label, &f, min, max);
+  	v = f;
+  };
+  
     // Here you can create a HUD (Head Up Display) GUI
     // that enables you to tweak the 3D params
     hudGui = [=]() { // capture Ptrs by value here, not by reference
-      ImGui::SliderFloat("sphere3->x", & sphere3->position().x,-100., 100.);
-      ImGui::SliderFloat("sphere3->y", & sphere3->position().y, -100., 100.);
-      ImGui::SliderFloat("sphere3->z", & sphere3->position().z, -100., 100.);
+    	sliderFloatProperty("Refraction", glass->indexOfRefraction, 0., 3.);
+    	sliderFloatProperty("MicroSurface", glass->microSurface, 0.f, 1.f);
     };
 
   }

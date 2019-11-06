@@ -11,8 +11,6 @@ class BabylonLogsWindow
 public:
   static BabylonLogsWindow& instance();
   void render();
-  void renderToggleButton();
-  void setVisible(bool visible);
 
   ImGuiAl::Log * Impl();
 private:
@@ -20,7 +18,6 @@ private:
   ~BabylonLogsWindow();
 private:
   std::unique_ptr<ImGuiAl::Log> _logImpl;
-  bool _visible = true;
 };
 
 } // namespace BABYLON
