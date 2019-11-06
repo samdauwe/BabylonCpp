@@ -11,7 +11,7 @@ message(STATUS "Tests ${TARGET}")
 # ============================================================================ #
 
 # Sources
-file(GLOB_RECURSE SRC_FILES *.cpp)
+file(GLOB_RECURSE SRC_FILES *.h *.cpp)
 set(sources
     ${SRC_FILES}
 )
