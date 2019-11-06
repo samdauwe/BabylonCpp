@@ -1,27 +1,13 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "../test_utils.h"
+
 #include <babylon/babylon_stl_util.h>
-#include <babylon/engines/null_engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/meshes/buffer.h>
 #include <babylon/meshes/geometry.h>
 #include <babylon/meshes/vertex_buffer.h>
-
-/**
- * @brief Create a new engine subject before each test.
- */
-std::unique_ptr<BABYLON::Engine> createSubject()
-{
-  using namespace BABYLON;
-  NullEngineOptions options;
-  options.renderHeight          = 256;
-  options.renderWidth           = 256;
-  options.textureSize           = 256;
-  options.deterministicLockstep = false;
-  options.lockstepMaxSteps      = 1;
-  return NullEngine::New(options);
-}
 
 TEST(TestGeometry, TestGetVerticesData_Vec3FloatColor)
 {
