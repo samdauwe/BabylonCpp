@@ -16,7 +16,7 @@ BreakBeforeBinaryOperators: true
 BreakBeforeBraces: Stroustrup
 BreakBeforeTernaryOperators: false
 BreakConstructorInitializersBeforeComma: true
-ColumnLimit: 80
+ColumnLimit: 100
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 ConstructorInitializerIndentWidth: 4
 ContinuationIndentWidth: 2
