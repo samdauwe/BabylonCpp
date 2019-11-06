@@ -12,7 +12,7 @@ namespace impl {
 #ifdef _WIN32
 void spawnScreenshots(const std::string & exeName, bool skipFailing)
 {
-  BABYLON::Samples::SamplesIndex samplesIndex;
+  BABYLON::Samples::SamplesIndex& samplesIndex = Samples::SamplesIndex::Instance();
   auto samples = samplesIndex.getSampleNames();
   for (auto sample : samples)
   {

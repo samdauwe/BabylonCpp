@@ -60,7 +60,7 @@ public:
   using CategoryName = std::string;
   using SampleName = std::string;
 
-  SamplesBrowserImpl()
+  SamplesBrowserImpl() : _samplesIndex(Samples::SamplesIndex::Instance())
   {
     for (const std::string & sample : _samplesIndex.getSampleNames())
       _samplesInfos[sample] = _samplesIndex.getSampleInfo(sample);
@@ -200,7 +200,7 @@ private:
     if (_showCurrentScreenshots)
     {
       ImGui::BeginGroup();
-      ImVec2 imageSize(ImGui::GetWindowWidth() / 3., 0.f);
+      ImVec2 imageSize(ImGui::GetWindowWidth() / 3.f, 0.f);
       ImGuiUtils::ImageFromFile(currentScreenshotFile, imageSize);
       if (_showOriginalScreenshots && _showCurrentScreenshots)
         ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 0.7f), "Current(c++)");
@@ -290,7 +290,7 @@ private:
   }
 
   std::map<SampleName, SampleInfo> _samplesInfos;
-  SamplesIndex _samplesIndex;
+  SamplesIndex & _samplesIndex;
   std::map<CategoryName, std::vector<SampleName>> _matchingSamples;
 
   struct {

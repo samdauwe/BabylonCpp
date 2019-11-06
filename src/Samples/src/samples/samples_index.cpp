@@ -104,9 +104,13 @@ SamplesIndex::SamplesIndex()
   }
 }
 
-SamplesIndex::~SamplesIndex()
+SamplesIndex& SamplesIndex::Instance()
 {
+  static SamplesIndex instance;
+  return instance;
 }
+
+SamplesIndex::~SamplesIndex() = default;
 
 std::optional<BABYLON::Samples::SampleFailureReason> SamplesIndex::doesSampleFail(const std::string& sampleName) const
 {

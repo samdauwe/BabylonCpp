@@ -36,10 +36,11 @@ struct SampleFailureReason
 std::string BABYLON_SHARED_EXPORT SampleFailureReason_Str(SampleFailureReasonKind s);
 
 class BABYLON_SHARED_EXPORT SamplesIndex {
-
-public:
+private:
   SamplesIndex();
-  ~SamplesIndex();
+public:
+  static SamplesIndex & Instance();
+  ~SamplesIndex();;
 
   /**
    * @brief Check if the sample is currently known to fail
