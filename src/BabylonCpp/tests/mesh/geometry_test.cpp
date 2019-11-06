@@ -8,6 +8,9 @@
 #include <babylon/meshes/geometry.h>
 #include <babylon/meshes/vertex_buffer.h>
 
+/**
+ * @brief Create a new engine subject before each test.
+ */
 std::unique_ptr<BABYLON::Engine> createSubject()
 {
   using namespace BABYLON;
@@ -20,7 +23,7 @@ std::unique_ptr<BABYLON::Engine> createSubject()
   return NullEngine::New(options);
 }
 
-TEST(TestGeometry, TestVec3FloatColor)
+TEST(TestGeometry, TestGetVerticesData_Vec3FloatColor)
 {
   using namespace BABYLON;
   // vec3 float color tightly packed
