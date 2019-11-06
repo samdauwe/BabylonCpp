@@ -32,6 +32,7 @@ class Bone;
 class Buffer;
 class Camera;
 class Geometry;
+class IAnimatable;
 class Material;
 class Matrix;
 class Mesh;
@@ -46,6 +47,7 @@ using BonePtr           = std::shared_ptr<Bone>;
 using BufferPtr         = std::shared_ptr<Buffer>;
 using CameraPtr         = std::shared_ptr<Camera>;
 using GeometryPtr       = std::shared_ptr<Geometry>;
+using IAnimatablePtr    = std::shared_ptr<IAnimatable>;
 using MaterialPtr       = std::shared_ptr<Material>;
 using MeshPtr           = std::shared_ptr<Mesh>;
 using MorphTargetPtr    = std::shared_ptr<MorphTarget>;
@@ -257,6 +259,23 @@ public:
    */
   AnimationGroupPtr loadAnimationAsync(const std::string& context,
                                        IAnimation& animation);
+
+  /**
+   * @brief Loads a glTF animation channel.
+   * @param context The context when loading the asset
+   * @param animationContext The context of the animation when loading the asset
+   * @param animation The glTF animation property
+   * @param channel The glTF animation channel property
+   * @param babylonAnimationGroup The babylon animation group property
+   * @param animationTargetOverride The babylon animation channel target
+   * override property. My be null.
+   * @returns A void promise when the channel load is complete
+   */
+  void _loadAnimationChannelAsync(
+    const std::string& context, const std::string& animationContext,
+    IAnimation& animation, const IAnimationChannel& channel,
+    const AnimationGroupPtr& babylonAnimationGroup,
+    const IAnimatablePtr& animationTargetOverride = nullptr);
 
   /**
    * @brief Loads a glTF buffer view.
@@ -472,10 +491,6 @@ private:
                            const Float32Array& inverseBindMatricesData);
   Matrix _getNodeMatrix(const INode& node);
   void _loadAnimationsAsync();
-  void _loadAnimationChannelAsync(
-    const std::string& context, const std::string& animationContext,
-    IAnimation& animation, const IAnimationChannel& channel,
-    const AnimationGroupPtr& babylonAnimationGroup);
   _IAnimationSamplerData _loadAnimationSamplerAsync(const std::string& context,
                                                     IAnimationSampler& sampler);
   ArrayBufferView& _loadBufferAsync(const std::string& context,

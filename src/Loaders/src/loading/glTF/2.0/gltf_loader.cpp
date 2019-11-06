@@ -1,6 +1,7 @@
 #include <babylon/loading/glTF/2.0/gltf_loader.h>
 
 #include <babylon/animations/animation_group.h>
+#include <babylon/animations/ianimatable.h>
 #include <babylon/animations/ianimation_key.h>
 #include <babylon/animations/targeted_animation.h>
 #include <babylon/babylon_stl_util.h>
@@ -997,9 +998,7 @@ void GLTFLoader::_loadSkinAsync(const std::string& context, const INode& node,
   // See
   // https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#skins
   // (second implementation note)
-#if 0
   babylonSkeleton->overrideMesh = _rootBabylonMesh;
-#endif
 
   _loadBones(context, skin, babylonSkeleton);
   assignSkeleton(babylonSkeleton);
@@ -1234,7 +1233,8 @@ AnimationGroupPtr GLTFLoader::loadAnimationAsync(const std::string& context,
 void GLTFLoader::_loadAnimationChannelAsync(
   const std::string& context, const std::string& animationContext,
   IAnimation& animation, const IAnimationChannel& channel,
-  const AnimationGroupPtr& babylonAnimationGroup)
+  const AnimationGroupPtr& babylonAnimationGroup,
+  const IAnimatablePtr& animationTargetOverride)
 {
   if (!channel.target.node.has_value()) {
     return;
@@ -1410,10 +1410,18 @@ void GLTFLoader::_loadAnimationChannelAsync(
       = Animation::New(animationName, targetPath, 1, animationType);
     babylonAnimation->setKeys(keys);
 
-    targetNode->_babylonTransformNode->animations.emplace_back(
-      babylonAnimation);
-    babylonAnimationGroup->addTargetedAnimation(
-      babylonAnimation, targetNode->_babylonTransformNode);
+    if (animationTargetOverride != nullptr
+        && !animationTargetOverride->getAnimations().empty()) {
+      animationTargetOverride->getAnimations().emplace_back(babylonAnimation);
+      babylonAnimationGroup->addTargetedAnimation(babylonAnimation,
+                                                  animationTargetOverride);
+    }
+    else {
+      targetNode->_babylonTransformNode->getAnimations().emplace_back(
+        babylonAnimation);
+      babylonAnimationGroup->addTargetedAnimation(
+        babylonAnimation, targetNode->_babylonTransformNode);
+    }
   }
 }
 
@@ -1509,11 +1517,9 @@ GLTFLoader::_castIndicesTo32bit(const IGLTF2::AccessorComponentType& type,
     case IGLTF2::AccessorComponentType::UNSIGNED_BYTE:
       return stl_util::cast_array_elements<uint32_t, uint8_t>(
         buffer.uint8Array);
-      break;
     case IGLTF2::AccessorComponentType::UNSIGNED_SHORT:
       return stl_util::cast_array_elements<uint32_t, uint16_t>(
         buffer.uint16Array);
-      break;
     default:
       return buffer.uint32Array;
   }
