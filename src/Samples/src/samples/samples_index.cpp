@@ -296,11 +296,5 @@ std::string SampleFailureReason_Str(SampleFailureReasonKind s)
   }
 }
 
-void RegisterSample(const std::string& categoryName, const std::string& sampleName,
-  SampleFactoryFunction fn)
-{
-  SamplesIndex::Instance().RegisterSample(categoryName, sampleName, fn);
-}
-
 } // end of namespace Samples
 } // end of namespace BABYLON

@@ -117,9 +117,24 @@ private:
 
 }; // end of class SamplesIndex
 
-void RegisterSample(const std::string& categoryName, const std::string& sampleName,
-                    SampleFactoryFunction fn);
 
+
+// BABYLON_REGISTER_SAMPLE : registers an example in the Samples Index
+// No need to create a header file, and no need to add it manually to the index
+//
+// This macro uses 3 black magic elements:
+// 1. macro "token pasting" in order to create structure name per sample
+// 2. A Raii structure that will register the sample on creation
+// 3. a global variable of the Raii structure in order to do the actual registration
+#define  BABYLON_REGISTER_SAMPLE(categoryName, sampleClassName)                                    \
+  struct RaiiRegisterer_##sampleClassName {   /* 1. This struct name depends on the sample name */ \
+    RaiiRegisterer_##sampleClassName()        /* 2. inside its constructor, it triggers         */ \
+    {                                         /* the registration                            */    \
+       BABYLON::Samples::SamplesIndex::Instance().RegisterSample(categoryName, #sampleClassName,   \
+                     [](ICanvas* iCanvas) { return std::make_unique<sampleClassName>(iCanvas); }); \
+    }                                                                                              \
+  };                                                                                               \
+  RaiiRegisterer_##sampleClassName gRaiiRegisterer_##sampleClassName; /* 3. global variable */
 
 } // end of namespace Samples
 } // end of namespace BABYLON
