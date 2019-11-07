@@ -69,7 +69,13 @@ SamplesIndex::SamplesIndex()
     // Textures samples
     {_TexturesSamplesIndex::CategoryName(), _TexturesSamplesIndex()},
   };
+}
 
+void SamplesIndex::fillSamplesFailures() const
+{
+  static bool done = false;
+  if (done)
+    return;
 
   _samplesFailures = {
     {"AirplaneModelScene", {SampleFailureReasonKind::segFault}},
@@ -84,8 +90,7 @@ SamplesIndex::SamplesIndex()
     {"InfiniteLoaderScene", {SampleFailureReasonKind::segFault}},
     {"InnerMeshPointsScene", {SampleFailureReasonKind::segFault}},
     {"IsPointInsideMeshScene", {SampleFailureReasonKind::processHung}},
-    {"LevelOfDetailScene",
-     {SampleFailureReasonKind::segFault, "Segfault when dragging the mouse"}},
+    {"LevelOfDetailScene", {SampleFailureReasonKind::segFault, "Segfault when dragging the mouse"}},
     {"LinesMeshSpiralScene", {SampleFailureReasonKind::empty3d}},
     {"LorenzAttractorScene", {SampleFailureReasonKind::empty3d}},
     {"MergedMeshesScene", {SampleFailureReasonKind::segFault}},
@@ -93,23 +98,36 @@ SamplesIndex::SamplesIndex()
     {"PointsCloudScene", {SampleFailureReasonKind::empty3d}},
     {"ProceduralHexPlanetGenerationScene", {SampleFailureReasonKind::segFault}},
     {"ShaderMaterialWarpSpeedScene", {SampleFailureReasonKind::empty3d}},
-    {"VolumetricLightScatteringScene", {SampleFailureReasonKind::segFault}}
-  };
+    {"VolumetricLightScatteringScene", {SampleFailureReasonKind::segFault}}};
 
   // all gltf samples fail under windows, with an empty rendering
-  for (const auto& sampleName : getSampleNamesInCategory(_LoadersGLTFSamplesIndex::CategoryName()))
-  {
-    SampleFailureReason reason{ SampleFailureReasonKind::empty3d, "Empty rendering under windows" };
+  for (const auto& sampleName :
+       getSampleNamesInCategory(_LoadersGLTFSamplesIndex::CategoryName())) {
+    SampleFailureReason reason{SampleFailureReasonKind::empty3d, "Empty rendering under windows"};
     _samplesFailures[sampleName] = reason;
   }
+
+  done = true;
 }
 
-SamplesIndex::~SamplesIndex()
+SamplesIndex& SamplesIndex::Instance()
 {
+  static SamplesIndex instance;
+  return instance;
+}
+
+SamplesIndex::~SamplesIndex() = default;
+
+void SamplesIndex::RegisterSample(const std::string& categoryName, const std::string& sampleName,
+                                  SampleFactoryFunction fn)
+{
+  _samplesIndex[categoryName].addSample(sampleName, fn);
 }
 
 std::optional<BABYLON::Samples::SampleFailureReason> SamplesIndex::doesSampleFail(const std::string& sampleName) const
 {
+  fillSamplesFailures();
+
   if (_samplesFailures.find(sampleName) == _samplesFailures.end())
     return std::nullopt;
   else

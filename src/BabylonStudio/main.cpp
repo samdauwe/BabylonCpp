@@ -52,7 +52,7 @@ int main(int argc, char** argv)
   }
 
   if (listSamples) {
-    BABYLON::Samples::SamplesIndex().listSamples();
+    BABYLON::Samples::SamplesIndex::Instance().listSamples();
     exit(0);
   }
 
@@ -60,7 +60,7 @@ int main(int argc, char** argv)
   if (sampleName == "Hello Scene")
     scene = MakeHelloScene();
   else
-    scene = BABYLON::Samples::SamplesIndex().createRenderableScene(sampleName, nullptr);
+    scene = BABYLON::Samples::SamplesIndex::Instance().createRenderableScene(sampleName, nullptr);
 
   if (flagStandaloneImgui)
     runStandalone_imgui(scene, sampleName, flagFullscreen);

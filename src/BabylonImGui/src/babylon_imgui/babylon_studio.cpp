@@ -291,7 +291,6 @@ private:
 private:
   void handleLoopSamples()
   {
-    static BABYLON::Samples::SamplesIndex samplesIndex;
     if (!_appContext._loopSamples.flagLoop)
       return;
 
@@ -302,7 +301,7 @@ private:
       std::string sampleName
         = _appContext._loopSamples.samplesToLoop[_appContext._loopSamples.currentIdx];
       BABYLON_LOG_ERROR("LoopSample", sampleName)
-      auto scene = samplesIndex.createRenderableScene(sampleName, nullptr);
+      auto scene = Samples::SamplesIndex::Instance().createRenderableScene(sampleName, nullptr);
       this->setRenderableScene(scene);
 
       if (_appContext._loopSamples.currentIdx < _appContext._loopSamples.samplesToLoop.size() - 2)
