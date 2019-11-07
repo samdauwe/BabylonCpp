@@ -1,7 +1,5 @@
 #include <babylon/samples/animations/_animations_samples_index.h>
 
-#include <babylon/samples/animations/bouncing_cube_scene.h>
-#include <babylon/samples/animations/cannon_ball_scene.h>
 #include <babylon/samples/animations/easing/easing_functions_scene.h>
 #include <babylon/samples/animations/easing/shape_easings_scene.h>
 #include <babylon/samples/animations/morph_mesh_scene.h>
@@ -18,14 +16,6 @@ _AnimationsSamplesIndex::_AnimationsSamplesIndex()
 {
   // -- Animations examples --
 
-  // Bouncing Cube Scene
-  _samples["BouncingCubeScene"] = [](ICanvas* iCanvas) {
-    return std::make_unique<BouncingCubeScene>(iCanvas);
-  };
-  // Cannon Ball Scene
-  _samples["CannonBallScene"] = [](ICanvas* iCanvas) {
-    return std::make_unique<CannonBallScene>(iCanvas);
-  };
   // Morph Mesh Scene
   _samples["MorphMeshScene"] = [](ICanvas* iCanvas) {
     return std::make_unique<MorphMeshScene>(iCanvas);

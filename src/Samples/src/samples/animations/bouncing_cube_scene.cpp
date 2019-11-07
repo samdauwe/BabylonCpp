@@ -1,5 +1,6 @@
 #include <babylon/samples/animations/bouncing_cube_scene.h>
 
+#include <babylon/samples/samples_index.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/core/random.h>
 #include <babylon/engines/scene.h>
@@ -178,6 +179,8 @@ void BouncingCubeScene::_movePlatforms()
     ++i;
   }
 }
+
+BABYLON_REGISTER_SAMPLE("Animations", BouncingCubeScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON
