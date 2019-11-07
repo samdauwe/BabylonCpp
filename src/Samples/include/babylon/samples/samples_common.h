@@ -28,6 +28,10 @@ public:
    */
   const std::unordered_map<std::string, SampleFactoryFunction>& samples() const;
 
+  void addSample(const std::string& exampleName, SampleFactoryFunction f) {
+    _samples[exampleName] = f;
+  }
+
 protected:
   std::unordered_map<std::string, SampleFactoryFunction> _samples;
 

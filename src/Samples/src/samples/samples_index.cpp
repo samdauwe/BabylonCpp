@@ -112,6 +112,12 @@ SamplesIndex& SamplesIndex::Instance()
 
 SamplesIndex::~SamplesIndex() = default;
 
+void SamplesIndex::RegisterSample(const std::string& categoryName, const std::string& sampleName,
+                                  SampleFactoryFunction fn)
+{
+  _samplesIndex[categoryName].addSample(sampleName, fn);
+}
+
 std::optional<BABYLON::Samples::SampleFailureReason> SamplesIndex::doesSampleFail(const std::string& sampleName) const
 {
   if (_samplesFailures.find(sampleName) == _samplesFailures.end())
@@ -288,6 +294,12 @@ std::string SampleFailureReason_Str(SampleFailureReasonKind s)
     default:
       throw "Unhandled enum!";
   }
+}
+
+void RegisterSample(const std::string& categoryName, const std::string& sampleName,
+  SampleFactoryFunction fn)
+{
+  SamplesIndex::Instance().RegisterSample(categoryName, sampleName, fn);
 }
 
 } // end of namespace Samples

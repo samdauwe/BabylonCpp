@@ -40,7 +40,12 @@ private:
   SamplesIndex();
 public:
   static SamplesIndex & Instance();
-  ~SamplesIndex();;
+  ~SamplesIndex();
+
+  void RegisterSample(
+    const std::string& categoryName, 
+    const std::string & sampleName,
+    SampleFactoryFunction fn);
 
   /**
    * @brief Check if the sample is currently known to fail
@@ -111,6 +116,10 @@ private:
   std::unordered_map<std::string, SampleFailureReason> _samplesFailures;
 
 }; // end of class SamplesIndex
+
+void RegisterSample(const std::string& categoryName, const std::string& sampleName,
+                    SampleFactoryFunction fn);
+
 
 } // end of namespace Samples
 } // end of namespace BABYLON

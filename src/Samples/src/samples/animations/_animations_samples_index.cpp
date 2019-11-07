@@ -18,14 +18,17 @@
 namespace BABYLON {
 namespace Samples {
 
+
 _AnimationsSamplesIndex::_AnimationsSamplesIndex()
 {
   // -- Animations examples --
 
   // Animated Morph Target Scene
-  _samples["AnimatedMorphTargetScene"] = [](ICanvas* iCanvas) {
-    return std::make_unique<AnimatedMorphTargetScene>(iCanvas);
-  };
+  //_samples["AnimatedMorphTargetScene"] = [](ICanvas* iCanvas) {
+  //  return std::make_unique<AnimatedMorphTargetScene>(iCanvas);
+  //};
+
+
   // Animations Scene
   _samples["AnimationsScene"] = [](ICanvas* iCanvas) {
     return std::make_unique<AnimationsScene>(iCanvas);
