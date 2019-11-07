@@ -38,6 +38,7 @@ std::string BABYLON_SHARED_EXPORT SampleFailureReason_Str(SampleFailureReasonKin
 class BABYLON_SHARED_EXPORT SamplesIndex {
 private:
   SamplesIndex();
+
 public:
   static SamplesIndex & Instance();
   ~SamplesIndex();
@@ -111,9 +112,13 @@ public:
   void listSamples();
 
 private:
+  void fillSamplesFailures() const;
+
   // Contains the mapping from category to samples index
   std::unordered_map<std::string, _ISamplesIndex> _samplesIndex;
-  std::unordered_map<std::string, SampleFailureReason> _samplesFailures;
+
+  // Contains the failing examples.
+  mutable std::unordered_map<std::string, SampleFailureReason> _samplesFailures;
 
 }; // end of class SamplesIndex
 
