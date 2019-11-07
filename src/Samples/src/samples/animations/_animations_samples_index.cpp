@@ -1,6 +1,5 @@
 #include <babylon/samples/animations/_animations_samples_index.h>
 
-#include <babylon/samples/animations/animations_101_scene.h>
 #include <babylon/samples/animations/animations_scene.h>
 #include <babylon/samples/animations/bone_rotation_in_world_space_scene.h>
 #include <babylon/samples/animations/bouncing_cube_scene.h>
@@ -25,10 +24,6 @@ _AnimationsSamplesIndex::_AnimationsSamplesIndex()
   // Animations Scene
   _samples["AnimationsScene"] = [](ICanvas* iCanvas) {
     return std::make_unique<AnimationsScene>(iCanvas);
-  };
-  // Animations 101 Scene
-  _samples["Animations101Scene"] = [](ICanvas* iCanvas) {
-    return std::make_unique<Animations101Scene>(iCanvas);
   };
   // Bone Rotation In World Space Scene
   _samples["BoneRotationInWorldSpaceScene"] = [](ICanvas* iCanvas) {
