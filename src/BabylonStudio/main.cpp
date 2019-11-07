@@ -1,7 +1,7 @@
 #include <babylon/core/system.h>
 #include "BabylonStudio/HelloScene.h"
 #include <babylon/samples/samples_index.h>
-#include <babylon/babylon_imgui/run_scene_with_inspector.h>
+#include <babylon/babylon_imgui/babylon_studio.h>
 #include <babylon/core/logging/init_console_logger.h>
 #include <babylon/utils/CLI11.h>
 
@@ -66,7 +66,7 @@ int main(int argc, char** argv)
     runStandalone_imgui(scene, sampleName, flagFullscreen);
   else
   {
-    BABYLON::SceneWithInspectorOptions options;
+    BABYLON::BabylonStudioOptions options;
     options._flagScreenshotOneSampleAndExit = flagScreenshotOneSampleAndExit;
     options._sceneName = sampleName;
     options._appWindowParams.FullScreen = flagFullscreen;
@@ -78,7 +78,7 @@ int main(int argc, char** argv)
     };
 #endif
 
-    runSceneWithInspector(scene, options);
+    runBabylonStudio(scene, options);
   }
   return 0;
 }

@@ -189,15 +189,12 @@ void Inspector::_popFonts()
 void Inspector::_renderInspector()
 {
   // Render the scene explorer
-  ImGui::Begin("Inspector");
   if (_sceneExplorerHost)
     _sceneExplorerHost->render();
 
   // Render the action tabs
   if (_actionTabsHost)
     _actionTabsHost->render();
-
-  ImGui::End();
 }
 
 } // end of namespace BABYLON
