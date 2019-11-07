@@ -1,6 +1,5 @@
 #include <babylon/samples/animations/_animations_samples_index.h>
 
-#include <babylon/samples/animations/animated_morph_target_scene.h>
 #include <babylon/samples/animations/animations_101_scene.h>
 #include <babylon/samples/animations/animations_scene.h>
 #include <babylon/samples/animations/bone_rotation_in_world_space_scene.h>
@@ -22,12 +21,6 @@ namespace Samples {
 _AnimationsSamplesIndex::_AnimationsSamplesIndex()
 {
   // -- Animations examples --
-
-  // Animated Morph Target Scene
-  //_samples["AnimatedMorphTargetScene"] = [](ICanvas* iCanvas) {
-  //  return std::make_unique<AnimatedMorphTargetScene>(iCanvas);
-  //};
-
 
   // Animations Scene
   _samples["AnimationsScene"] = [](ICanvas* iCanvas) {
