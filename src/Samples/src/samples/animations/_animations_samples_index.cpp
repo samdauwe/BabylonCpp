@@ -1,10 +1,7 @@
 #include <babylon/samples/animations/_animations_samples_index.h>
 
-#include <babylon/samples/animations/animations_scene.h>
-#include <babylon/samples/animations/bone_rotation_in_world_space_scene.h>
 #include <babylon/samples/animations/bouncing_cube_scene.h>
 #include <babylon/samples/animations/cannon_ball_scene.h>
-#include <babylon/samples/animations/cartoon_animations_scene.h>
 #include <babylon/samples/animations/easing/easing_functions_scene.h>
 #include <babylon/samples/animations/easing/shape_easings_scene.h>
 #include <babylon/samples/animations/morph_mesh_scene.h>
@@ -21,14 +18,6 @@ _AnimationsSamplesIndex::_AnimationsSamplesIndex()
 {
   // -- Animations examples --
 
-  // Animations Scene
-  _samples["AnimationsScene"] = [](ICanvas* iCanvas) {
-    return std::make_unique<AnimationsScene>(iCanvas);
-  };
-  // Bone Rotation In World Space Scene
-  _samples["BoneRotationInWorldSpaceScene"] = [](ICanvas* iCanvas) {
-    return std::make_unique<BoneRotationInWorldSpaceScene>(iCanvas);
-  };
   // Bouncing Cube Scene
   _samples["BouncingCubeScene"] = [](ICanvas* iCanvas) {
     return std::make_unique<BouncingCubeScene>(iCanvas);
@@ -46,10 +35,6 @@ _AnimationsSamplesIndex::_AnimationsSamplesIndex()
   // Pick And Play Animation Scene
   _samples["PickAndPlayAnimationScene"] = [](ICanvas* iCanvas) {
     return std::make_unique<PickAndPlayAnimationScene>(iCanvas);
-  };
-  // Cartoon Animations Scene
-  _samples["CartoonAnimationsScene"] = [](ICanvas* iCanvas) {
-    return std::make_unique<CartoonAnimationsScene>(iCanvas);
   };
   // Pump Jack Scene
   _samples["PumpJackScene"]
