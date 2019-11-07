@@ -177,8 +177,8 @@ def register_example_scene(cpp_full_path, sample_category):
 
 
 def make_headerless_sample(filename_no_extension, sample_category):
-    h_full_path = compute_header_full_path(filename_no_extension + ".")
-    cpp_full_path = compute_cpp_full_path(filename_no_extension + ".")
+    h_full_path = compute_header_full_path("/" + filename_no_extension + ".")
+    cpp_full_path = compute_cpp_full_path("/" + filename_no_extension + ".")
     # print(h_full_path)
     # print(cpp_full_path)
     if h_full_path is not None:
@@ -195,6 +195,6 @@ def make_headerless_sample(filename_no_extension, sample_category):
     register_example_scene(cpp_full_path, sample_category)
 
 
-filename_no_extension = "animated_cube_scene"
+filename_no_extension = "cube_scene"
 sample_category = "Loaders - glTF format"
 make_headerless_sample(filename_no_extension, sample_category)
