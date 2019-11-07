@@ -1,10 +1,11 @@
-#include <babylon/samples/loaders/babylon/import_hill_valley_scene.h>
-
 #include <babylon/cameras/camera.h>
 #include <babylon/cameras/free_camera.h>
 #include <babylon/engines/scene.h>
+#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/loading/scene_loader.h>
 #include <babylon/materials/material.h>
+#include <babylon/samples/loaders/babylon/_loaders_babylon_samples_index.h>
+#include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
 namespace Samples {
@@ -15,46 +16,35 @@ namespace Samples {
  */
 struct ImportHillValleyScene : public IRenderableScene {
 
-  ImportHillValleyScene(ICanvas* iCanvas);
-  ~ImportHillValleyScene() override;
+  ImportHillValleyScene(ICanvas* iCanvas) : IRenderableScene(iCanvas)
+  {
+  }
 
-  const char* getName() override;
-  void initializeScene(ICanvas* canvas, Scene* scene) override;
+  ~ImportHillValleyScene() override
+  {
+  }
 
-}; // end of struct ImportHillValleyScene
+  const char* getName() override
+  {
+    return "Import Hill Valley Scene";
+  }
 
-ImportHillValleyScene::ImportHillValleyScene(ICanvas* iCanvas)
-    : IRenderableScene(iCanvas)
-{
-}
+  void initializeScene(ICanvas* canvas, Scene* scene) override
+  {
+    // This creates and positions a free camera (non-mesh)
+    auto camera = FreeCamera::New("camera1", Vector3(0.f, 5.f, -10.f), scene);
 
-ImportHillValleyScene::~ImportHillValleyScene()
-{
-}
+    // This targets the camera to scene origin
+    camera->setTarget(Vector3::Zero());
 
-const char* ImportHillValleyScene::getName()
-{
-  return "Import Hill Valley Scene";
-}
+    // This attaches the camera to the canvas
+    camera->attachControl(canvas, true);
 
-void ImportHillValleyScene::initializeScene(ICanvas* canvas, Scene* scene)
-{
-  // This creates and positions a free camera (non-mesh)
-  auto camera = FreeCamera::New("camera1", Vector3(0.f, 5.f, -10.f), scene);
-
-  // This targets the camera to scene origin
-  camera->setTarget(Vector3::Zero());
-
-  // This attaches the camera to the canvas
-  camera->attachControl(canvas, true);
-
-  SceneLoader::Append(
-    "scenes/hillvalley/", "HillValley.babylon", scene, [&canvas](Scene* scene) {
+    SceneLoader::Append("scenes/hillvalley/", "HillValley.babylon", scene, [&canvas](Scene* scene) {
       if (scene->activeCamera()) {
         scene->activeCamera()->attachControl(canvas);
 
-        auto activeCamera
-          = std::static_pointer_cast<FreeCamera>(scene->activeCamera());
+        auto activeCamera = std::static_pointer_cast<FreeCamera>(scene->activeCamera());
         if (activeCamera) {
           activeCamera->keysUp().emplace_back(90);    // Z
           activeCamera->keysUp().emplace_back(87);    // W
@@ -71,12 +61,11 @@ void ImportHillValleyScene::initializeScene(ICanvas* canvas, Scene* scene)
         material->checkReadyOnEveryCall = false;
       }
     });
-}
+  }
 
-std::unique_ptr<IRenderableScene> MakeImportHillValleyScene(ICanvas* iCanvas)
-{
-  return std::make_unique<ImportHillValleyScene>(iCanvas);
-}
+}; // end of struct ImportHillValleyScene
+
+BABYLON_REGISTER_SAMPLE(_LoadersBabylonSamplesIndex::CategoryName(), ImportHillValleyScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

@@ -18,8 +18,7 @@ public:
     return "Loaders - babylon format";
   }
 
-public:
-  _LoadersBabylonSamplesIndex();
+  _LoadersBabylonSamplesIndex()          = default;
   virtual ~_LoadersBabylonSamplesIndex() = default;
 
 }; // end of class _LoadersBabylonSamplesIndex

@@ -1,37 +1,47 @@
-#include <babylon/samples/loaders/babylon/import_dude_scene.h>
-
 #include <babylon/engines/scene.h>
 #include <babylon/helpers/environment_helper.h>
+#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/loading/scene_loader.h>
+#include <babylon/samples/loaders/babylon/_loaders_babylon_samples_index.h>
+#include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
 namespace Samples {
 
-ImportDudeScene::ImportDudeScene(ICanvas* iCanvas) : IRenderableScene(iCanvas)
-{
-}
+/**
+ * @brief Import Dude Scene.
+ * @see https://www.babylonjs-playground.com/#WLDCUC#2
+ */
+struct ImportDudeScene : public IRenderableScene {
 
-ImportDudeScene::~ImportDudeScene()
-{
-}
+  ImportDudeScene(ICanvas* iCanvas) : IRenderableScene(iCanvas)
+  {
+  }
 
-const char* ImportDudeScene::getName()
-{
-  return "Import Dude Scene";
-}
+  ~ImportDudeScene() override
+  {
+  }
 
-void ImportDudeScene::initializeScene(ICanvas* /*canvas*/, Scene* scene)
-{
-  SceneLoader::ImportMesh(
-    {}, "scenes/Dude/", "Dude.babylon", scene,
-    [scene](const std::vector<AbstractMeshPtr>& /*meshes*/,
-            const std::vector<IParticleSystemPtr>& /*particleSystems*/,
-            const std::vector<SkeletonPtr>& /*skeletons*/,
-            const std::vector<AnimationGroupPtr>& /*animationGroups*/) {
-      scene->createDefaultCameraOrLight(true, true, true);
-      scene->createDefaultEnvironment();
-    });
-}
+  const char* getName() override
+  {
+    return "Import Dude Scene";
+  }
+
+  void initializeScene(ICanvas* /*canvas*/, Scene* scene) override
+  {
+    SceneLoader::ImportMesh({}, "scenes/Dude/", "Dude.babylon", scene,
+                            [scene](const std::vector<AbstractMeshPtr>& /*meshes*/,
+                                    const std::vector<IParticleSystemPtr>& /*particleSystems*/,
+                                    const std::vector<SkeletonPtr>& /*skeletons*/,
+                                    const std::vector<AnimationGroupPtr>& /*animationGroups*/) {
+                              scene->createDefaultCameraOrLight(true, true, true);
+                              scene->createDefaultEnvironment();
+                            });
+  }
+
+}; // end of struct ImportDudeScene
+
+BABYLON_REGISTER_SAMPLE(_LoadersBabylonSamplesIndex::CategoryName(), ImportDudeScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON
