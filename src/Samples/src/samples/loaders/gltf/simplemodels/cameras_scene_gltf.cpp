@@ -16,14 +16,14 @@ namespace Samples {
  * @see https://www.babylonjs-playground.com/#1A3M5C#0
  * @see https://doc.babylonjs.com/babylon101/cameras
  */
-struct CamerasScene : public IRenderableScene {
+struct CamerasSceneGltf : public IRenderableScene {
 
-  CamerasScene(ICanvas* iCanvas) : IRenderableScene(iCanvas)
+  CamerasSceneGltf(ICanvas* iCanvas) : IRenderableScene(iCanvas)
   {
     GLTF2::GLTFFileLoader::RegisterAsSceneLoaderPlugin();
   }
 
-  ~CamerasScene() override
+  ~CamerasSceneGltf() override
   {
   }
 
@@ -54,7 +54,7 @@ struct CamerasScene : public IRenderableScene {
 
 }; // end of struct CamerasScene
 
-BABYLON_REGISTER_SAMPLE(_LoadersGLTFSamplesIndex::CategoryName(), CamerasScene)
+BABYLON_REGISTER_SAMPLE(_LoadersGLTFSamplesIndex::CategoryName(), CamerasSceneGltf)
 
 } // end of namespace Samples
 } // end of namespace BABYLON
