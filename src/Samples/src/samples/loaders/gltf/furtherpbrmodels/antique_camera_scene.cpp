@@ -1,50 +1,59 @@
-#include <babylon/samples/loaders/gltf/furtherpbrmodels/antique_camera_scene.h>
-
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/engines/scene.h>
 #include <babylon/helpers/environment_helper.h>
+#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/loading/glTF/gltf_file_loader.h>
 #include <babylon/loading/scene_loader.h>
+#include <babylon/samples/loaders/gltf/_loaders_gtlf_samples_index.h>
+#include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
 namespace Samples {
 
-AntiqueCameraScene::AntiqueCameraScene(ICanvas* iCanvas)
-    : IRenderableScene(iCanvas)
-{
-  GLTF2::GLTFFileLoader::RegisterAsSceneLoaderPlugin();
-}
+/**
+ * @brief Antique Camera Scene (glTF). Old camera model having various materials.
+ * @see https://doc.babylonjs.com/how_to/load_from_any_file_type
+ * @see https://github.com/KhronosGroup/glTF-Sample-Models/blob/master/2.0/AntiqueCamera
+ */
+struct AntiqueCameraScene : public IRenderableScene {
 
-AntiqueCameraScene::~AntiqueCameraScene()
-{
-}
+  AntiqueCameraScene(ICanvas* iCanvas) : IRenderableScene(iCanvas)
+  {
+    GLTF2::GLTFFileLoader::RegisterAsSceneLoaderPlugin();
+  }
 
-const char* AntiqueCameraScene::getName()
-{
-  return "Antique Camera Scene (glTF)";
-}
+  ~AntiqueCameraScene() override
+  {
+  }
 
-void AntiqueCameraScene::initializeScene(ICanvas* /*canvas*/, Scene* scene)
-{
-  SceneLoader::ImportMesh(
-    {}, "glTF-Sample-Models/2.0/AntiqueCamera/glTF/", "AntiqueCamera.gltf",
-    scene,
-    [scene](const std::vector<AbstractMeshPtr>& /*meshes*/,
-            const std::vector<IParticleSystemPtr>& /*particleSystems*/,
-            const std::vector<SkeletonPtr>& /*skeletons*/,
-            const std::vector<AnimationGroupPtr>& /*animationGroups*/) {
-      scene->createDefaultCameraOrLight(true, true, true);
-      // Set the camera position
-      auto camera
-        = std::static_pointer_cast<ArcRotateCamera>(scene->activeCamera());
-      if (camera) {
-        camera->setTarget(Vector3(0.f, 3.5f, 0.f));
-        camera->alpha  = 0.9f;
-        camera->beta   = 1.f;
-        camera->radius = Math::PI2 * 1.8f;
-      }
-    });
-}
+  const char* getName() override
+  {
+    return "Antique Camera Scene (glTF)";
+  }
+
+  void initializeScene(ICanvas* /*canvas*/, Scene* scene) override
+  {
+    SceneLoader::ImportMesh(
+      {}, "glTF-Sample-Models/2.0/AntiqueCamera/glTF/", "AntiqueCamera.gltf", scene,
+      [scene](const std::vector<AbstractMeshPtr>& /*meshes*/,
+              const std::vector<IParticleSystemPtr>& /*particleSystems*/,
+              const std::vector<SkeletonPtr>& /*skeletons*/,
+              const std::vector<AnimationGroupPtr>& /*animationGroups*/) {
+        scene->createDefaultCameraOrLight(true, true, true);
+        // Set the camera position
+        auto camera = std::static_pointer_cast<ArcRotateCamera>(scene->activeCamera());
+        if (camera) {
+          camera->setTarget(Vector3(0.f, 3.5f, 0.f));
+          camera->alpha  = 0.9f;
+          camera->beta   = 1.f;
+          camera->radius = Math::PI2 * 1.8f;
+        }
+      });
+  }
+
+}; // end of struct AntiqueCameraScene
+
+BABYLON_REGISTER_SAMPLE(_LoadersGLTFSamplesIndex::CategoryName(), AntiqueCameraScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

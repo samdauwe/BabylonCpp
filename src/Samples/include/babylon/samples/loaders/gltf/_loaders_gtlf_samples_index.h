@@ -18,8 +18,7 @@ public:
     return "Loaders - glTF format";
   }
 
-public:
-  _LoadersGLTFSamplesIndex();
+  _LoadersGLTFSamplesIndex()          = default;
   virtual ~_LoadersGLTFSamplesIndex() = default;
 
 }; // end of class _LoadersGLTFSamplesIndex
