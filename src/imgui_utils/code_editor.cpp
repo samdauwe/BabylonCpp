@@ -228,8 +228,10 @@ public:
   void setFiles(const std::vector<std::string> &filePaths)
   {
     _editors.clear();
-    for (auto filePath : filePaths)
-      _editors.push_back(OneCodeEditor(filePath));
+    for (auto filePath : filePaths) {
+      if (!filePath.empty())
+        _editors.push_back(OneCodeEditor(filePath));
+    }
     if (!_editors.empty())
       _currentEditor = &_editors.back();
 
