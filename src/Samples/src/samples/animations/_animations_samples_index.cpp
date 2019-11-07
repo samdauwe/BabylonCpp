@@ -2,8 +2,6 @@
 
 #include <babylon/samples/animations/easing/easing_functions_scene.h>
 #include <babylon/samples/animations/easing/shape_easings_scene.h>
-#include <babylon/samples/animations/pump_jack_scene.h>
-#include <babylon/samples/animations/tube_animation_scene.h>
 
 namespace BABYLON {
 namespace Samples {
@@ -12,14 +10,6 @@ namespace Samples {
 _AnimationsSamplesIndex::_AnimationsSamplesIndex()
 {
   // -- Animations examples --
-
-  // Pump Jack Scene
-  _samples["PumpJackScene"]
-    = [](ICanvas* iCanvas) { return std::make_unique<PumpJackScene>(iCanvas); };
-  // Tube Animation Scene
-  _samples["TubeAnimationScene"] = [](ICanvas* iCanvas) {
-    return std::make_unique<TubeAnimationScene>(iCanvas);
-  };
 
   // -- Easing function examples --
 

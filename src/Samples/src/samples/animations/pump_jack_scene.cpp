@@ -1,5 +1,6 @@
 #include <babylon/samples/animations/pump_jack_scene.h>
 
+#include <babylon/samples/samples_index.h>
 #include <babylon/animations/animation.h>
 #include <babylon/animations/easing/bezier_curve_ease.h>
 #include <babylon/animations/ianimation_key.h>
@@ -356,5 +357,6 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   support7->rotation().z = 0.5f;
 }
 
+BABYLON_REGISTER_SAMPLE("Animations", PumpJackScene)
 } // end of namespace Samples
 } // end of namespace BABYLON
