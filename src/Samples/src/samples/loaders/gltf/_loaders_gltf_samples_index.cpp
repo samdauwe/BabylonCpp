@@ -18,7 +18,6 @@
 #include <babylon/samples/loaders/gltf/simplemodels/triangle_without_indices_scene.h>
 
 // -- More complex models --
-#include <babylon/samples/loaders/gltf/morecomplexmodels/2cylinder_engine_scene.h>
 #include <babylon/samples/loaders/gltf/morecomplexmodels/box_interleaved_scene.h>
 #include <babylon/samples/loaders/gltf/morecomplexmodels/box_scene.h>
 #include <babylon/samples/loaders/gltf/morecomplexmodels/box_textured_non_power_of_two_scene.h>
@@ -112,11 +111,6 @@ _LoadersGLTFSamplesIndex::_LoadersGLTFSamplesIndex()
   };
 
   // -- More complex models --
-
-  // 2 Cylinder Engine Scene (glTF)
-  _samples["2CylinderEngineGLTFScene"] = [](ICanvas* iCanvas) {
-    return std::make_unique<TwoCylinderEngineScene>(iCanvas);
-  };
   // Box Interleaved Scene (glTF)
   _samples["BoxInterleavedGLTFScene"] = [](ICanvas* iCanvas) {
     return std::make_unique<BoxInterleavedScene>(iCanvas);
