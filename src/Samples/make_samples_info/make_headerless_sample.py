@@ -195,6 +195,6 @@ def make_headerless_sample(filename_no_extension, sample_category):
     register_example_scene(cpp_full_path, sample_category)
 
 
-filename_no_extension = "cube_scene"
-sample_category = "Loaders - glTF format"
+filename_no_extension = "pick_and_play_animation"
+sample_category = "Animations"
 make_headerless_sample(filename_no_extension, sample_category)
