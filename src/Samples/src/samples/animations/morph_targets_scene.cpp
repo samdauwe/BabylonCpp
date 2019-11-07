@@ -1,7 +1,6 @@
-#include <babylon/samples/animations/morph_targets_scene.h>
-
 #include "imgui.h"
 
+#include <babylon/samples/samples_index.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/core/random.h>
 #include <babylon/interfaces/irenderable_scene_with_hud.h>
@@ -16,6 +15,16 @@
 namespace BABYLON {
 namespace Samples {
 
+using MeshPtr        = std::shared_ptr<Mesh>;
+using MorphTargetPtr = std::shared_ptr<MorphTarget>;
+
+
+  /**
+ * @brief Morph Targets Scene. Example demonstrating how to morph a mesh between
+ * multiple targets
+ * @see https://www.babylonjs-playground.com/#2JDN66#7
+ * @see https://doc.babylonjs.com/how_to/how_to_use_morphtargets
+ */
   struct MorphTargetsScene : public IRenderableSceneWithHud {
 
   MorphTargetsScene(ICanvas* iCanvas = nullptr) : IRenderableSceneWithHud(iCanvas)
@@ -161,5 +170,6 @@ MakeMorphTargetsScene(ICanvas* iCanvas)
   return std::make_shared<MorphTargetsScene>(iCanvas);
 }
 
+BABYLON_REGISTER_SAMPLE("Animations", MorphTargetsScene)
 } // end of namespace Samples
 } // end of namespace BABYLON

@@ -2,8 +2,6 @@
 
 #include <babylon/samples/animations/easing/easing_functions_scene.h>
 #include <babylon/samples/animations/easing/shape_easings_scene.h>
-#include <babylon/samples/animations/morph_mesh_scene.h>
-#include <babylon/samples/animations/morph_targets_scene.h>
 #include <babylon/samples/animations/pick_and_play_animation.h>
 #include <babylon/samples/animations/pump_jack_scene.h>
 #include <babylon/samples/animations/tube_animation_scene.h>
@@ -16,12 +14,6 @@ _AnimationsSamplesIndex::_AnimationsSamplesIndex()
 {
   // -- Animations examples --
 
-  // Morph Mesh Scene
-  _samples["MorphMeshScene"] = [](ICanvas* iCanvas) {
-    return std::make_unique<MorphMeshScene>(iCanvas);
-  };
-  // Morph Targets Scene
-  _samples["MorphTargetsScene"] = MakeMorphTargetsScene;
   // Pick And Play Animation Scene
   _samples["PickAndPlayAnimationScene"] = [](ICanvas* iCanvas) {
     return std::make_unique<PickAndPlayAnimationScene>(iCanvas);
