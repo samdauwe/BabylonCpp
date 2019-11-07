@@ -1,4 +1,5 @@
 import os
+import os.path
 import json
 THIS_SCRIPT_DIR = (os.path.dirname(os.path.realpath(__file__)))
 ROOT_DIR = (os.path.realpath(THIS_SCRIPT_DIR + "/../../.."))
@@ -19,12 +20,12 @@ HEADERS = all_files_with_extension(SAMPLES_INCLUDE_DIR, ".h")
 SOURCES = all_files_with_extension(SAMPLES_SOURCE_DIR, ".cpp")
 
 
-def find_corresponding_source_file(sample_header_file):
-    src = os.path.basename(sample_header_file)[:-2] + ".cpp"
-    for s in SOURCES:
+def find_corresponding_header_file(cpp_file):
+    src = os.path.basename(cpp_file)[:-4] + ".h"
+    for s in HEADERS:
         if src in s:
             return s
-    return "Not found"
+    return ""
 
 def snake_case_to_lowersnakecase(s):
     items = s.split("_")
@@ -32,22 +33,28 @@ def snake_case_to_lowersnakecase(s):
     result = result.lower()
     return result
 
-def make_sample_name_from_filename(header_file):
-    header_file = header_file.replace("\\", "/")
-    header_file = header_file.split("/")[-1]
-    header_file = header_file.replace(".h", "")
-    sample_name = snake_case_to_lowersnakecase(header_file)
+def make_sample_name_from_filename(source_file):
+    source_file = source_file.replace("\\", "/")
+    source_file = source_file.split("/")[-1]
+    source_file = source_file.replace(".h", "")
+    source_file = source_file.replace(".cpp", "")
+    sample_name = snake_case_to_lowersnakecase(source_file)
     return sample_name
 
-def sample_info(header_file):
+def sample_info(cpp_file):
     result = dict()
+    header_file = find_corresponding_header_file(cpp_file)
     result["header_file"] = header_file
-    result["source_file"] = find_corresponding_source_file(header_file)
-    with open(header_file) as f:
-        lines = f.readlines()
+    result["source_file"] = cpp_file
+    if len(header_file) == 0:
+        with open(cpp_file) as f:
+            lines = f.readlines()
+    else:
+        with open(header_file) as f:
+            lines = f.readlines()
 
     # Find sample name (class or struct name)
-    result["sample_name"] = make_sample_name_from_filename(header_file)
+    result["sample_name"] = make_sample_name_from_filename(cpp_file)
 
     # Find brief
     brief = ""
@@ -78,8 +85,8 @@ def sample_info(header_file):
 
 def make_all_info():
     result = []
-    for header_file in HEADERS:
-        result.append(sample_info(header_file))
+    for cpp_file in SOURCES:
+        result.append(sample_info(cpp_file))
     return result
 
 def write_json_info_file():
