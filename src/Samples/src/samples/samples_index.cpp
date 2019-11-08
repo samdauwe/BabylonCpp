@@ -3,7 +3,6 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/string.h>
 #include <babylon/interfaces/irenderable_scene.h>
-#include <babylon/samples/cameras/_cameras_samples_index.h>
 #include <babylon/samples/collisionsandintersections/_collisions_and_intersections_samples_index.h>
 #include <babylon/samples/extensions/_extensions_samples_index.h>
 #include <babylon/samples/lights/_lights_samples_index.h>
@@ -29,8 +28,6 @@ SamplesIndex::SamplesIndex()
 {
   // Initialize the samples index
   _samplesIndex = {
-    // Cameras samples
-    {_CamerasSamplesIndex::CategoryName(), _CamerasSamplesIndex()},
     // Collisions and Intersections samples
     {_CollisionsAndIntersectionsSamplesIndex::CategoryName(),
      _CollisionsAndIntersectionsSamplesIndex()},
