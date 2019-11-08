@@ -15,10 +15,10 @@ namespace Samples {
  * @see https://www.babylonjs-playground.com/#1A3M5C#0
  * @see https://doc.babylonjs.com/babylon101/cameras
  */
-struct CamerasScene : public IRenderableScene {
+struct CamerasTypesScene : public IRenderableScene {
 
-  CamerasScene(ICanvas* iCanvas) : IRenderableScene(iCanvas)   { }
-  ~CamerasScene() = default;
+  CamerasTypesScene(ICanvas* iCanvas) : IRenderableScene(iCanvas)   { }
+  ~CamerasTypesScene() = default;
   const char* getName() override { return "Cameras Scene"; }
 
   void initializeScene(ICanvas* canvas, Scene* scene) override
@@ -53,6 +53,6 @@ struct CamerasScene : public IRenderableScene {
 }; // end of struct CamerasScene
 
 
-BABYLON_REGISTER_SAMPLE("Cameras", CamerasScene)
+BABYLON_REGISTER_SAMPLE("Cameras", CamerasTypesScene)
 } // end of namespace Samples
 } // end of namespace BABYLON
