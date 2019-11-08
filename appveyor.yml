@@ -56,6 +56,7 @@ clone_script:
 
 before_build:
   - cd C:\projects\babyloncpp
+  - git clean -fx
 
 build_script:
   - python cmake_build.py all
