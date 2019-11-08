@@ -1,5 +1,4 @@
-#include <babylon/samples/extensions/noisegeneration/perlin_noise_waves_scene.h>
-
+#include <babylon/samples/samples_index.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
@@ -9,83 +8,96 @@
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
+#include <babylon/extensions/noisegeneration/perlin_noise.h>
+#include <babylon/interfaces/irenderable_scene.h>
+
 
 namespace BABYLON {
+
 namespace Samples {
 
-PerlinNoiseWavesScene::PerlinNoiseWavesScene(ICanvas* iCanvas)
-    : IRenderableScene(iCanvas)
-    , _ground{nullptr}
-    , _ground2{nullptr}
-    , _perlineNoise{Extensions::PerlinNoise()}
-    , _alpha{0.f}
-{
-}
+class PerlinNoiseWavesScene : public IRenderableScene {
 
-PerlinNoiseWavesScene::~PerlinNoiseWavesScene()
-{
-}
+public:
+  PerlinNoiseWavesScene(ICanvas* iCanvas)
+      : IRenderableScene(iCanvas)
+      , _ground{nullptr}
+      , _ground2{nullptr}
+      , _perlineNoise{Extensions::PerlinNoise()}
+      , _alpha{0.f}
+  {
+  }
 
-const char* PerlinNoiseWavesScene::getName()
-{
-  return "Perlin Noise Waves Scene";
-}
+  ~PerlinNoiseWavesScene()
+  {
+  }
 
-void PerlinNoiseWavesScene::initializeScene(ICanvas* canvas, Scene* scene)
-{
-  // Create a camera
-  auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, 0.7f, 600.f,
-                                     Vector3::Zero(), scene);
+  const char* getName()
+  {
+    return "Perlin Noise Waves Scene";
+  }
 
-  // Attach the camera to the canvas
-  camera->attachControl(canvas, true);
+  void initializeScene(ICanvas* canvas, Scene* scene)
+  {
+    // Create a camera
+    auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, 0.7f, 600.f, Vector3::Zero(), scene);
 
-  // Create a basic light, aiming 0,1,0 - meaning, to the sky
-  auto light = HemisphericLight::New("light1", Vector3(0, 1, 0), scene);
+    // Attach the camera to the canvas
+    camera->attachControl(canvas, true);
 
-  // Default intensity is 1. Let's dim the light a small amount
-  light->intensity = 0.7f;
+    // Create a basic light, aiming 0,1,0 - meaning, to the sky
+    auto light = HemisphericLight::New("light1", Vector3(0, 1, 0), scene);
 
-  // Create ground meshes
-  _ground             = Mesh::CreateGround("ground", 650, 400, 16, scene, true);
-  auto groundMaterial = StandardMaterial::New("gmat", scene);
-  groundMaterial->diffuseColor = Color3::FromInts(255, 140, 0);
-  _ground->material            = groundMaterial;
-  _ground->position().y += 50;
-  _ground2 = Mesh::CreateGround("ground", 650, 400, 16, scene, true);
-  auto ground2Material            = StandardMaterial::New("gmat2", scene);
-  ground2Material->diffuseColor   = Color3::FromInts(255, 140, 0);
-  _ground2->material              = ground2Material;
-  _ground2->material()->wireframe = true;
-  _ground2->position().y          = _ground->position().y;
+    // Default intensity is 1. Let's dim the light a small amount
+    light->intensity = 0.7f;
 
-  // Get positions and indices
-  _positions = _ground->getVerticesData(VertexBuffer::PositionKind);
-  _indices   = _ground->getIndices();
+    // Create ground meshes
+    _ground                      = Mesh::CreateGround("ground", 650, 400, 16, scene, true);
+    auto groundMaterial          = StandardMaterial::New("gmat", scene);
+    groundMaterial->diffuseColor = Color3::FromInts(255, 140, 0);
+    _ground->material            = groundMaterial;
+    _ground->position().y += 50;
+    _ground2                        = Mesh::CreateGround("ground", 650, 400, 16, scene, true);
+    auto ground2Material            = StandardMaterial::New("gmat2", scene);
+    ground2Material->diffuseColor   = Color3::FromInts(255, 140, 0);
+    _ground2->material              = ground2Material;
+    _ground2->material()->wireframe = true;
+    _ground2->position().y          = _ground->position().y;
 
-  // Animations
-  _scene->registerBeforeRender([this](Scene*, EventState&) {
-    _alpha += 0.016f;
-    for (unsigned int i = 0; i < _positions.size(); i += 3) {
-      _positions[i + 1] = 32.f
-                          * static_cast<float>(_perlineNoise.noise(
-                              static_cast<double>(_positions[i] / 0.8f),
-                              static_cast<double>(_alpha * 0.2f),
-                              static_cast<double>(_positions[i + 2] / 0.8f)));
-    }
-    _ground->updateVerticesData(VertexBuffer::PositionKind, _positions, false,
-                                true);
-    _ground2->updateVerticesData(VertexBuffer::PositionKind, _positions, false,
-                                 true);
-    Float32Array normals;
-    VertexData::ComputeNormals(_positions, _indices, normals);
+    // Get positions and indices
+    _positions = _ground->getVerticesData(VertexBuffer::PositionKind);
+    _indices   = _ground->getIndices();
 
-    _ground->updateVerticesData(VertexBuffer::NormalKind, normals, false,
-                                false);
-    _ground2->updateVerticesData(VertexBuffer::NormalKind, normals, false,
-                                 false);
-  });
-}
+    // Animations
+    _scene->registerBeforeRender([this](Scene*, EventState&) {
+      _alpha += 0.016f;
+      for (unsigned int i = 0; i < _positions.size(); i += 3) {
+        _positions[i + 1]
+          = 32.f
+            * static_cast<float>(_perlineNoise.noise(
+              static_cast<double>(_positions[i] / 0.8f), static_cast<double>(_alpha * 0.2f),
+              static_cast<double>(_positions[i + 2] / 0.8f)));
+      }
+      _ground->updateVerticesData(VertexBuffer::PositionKind, _positions, false, true);
+      _ground2->updateVerticesData(VertexBuffer::PositionKind, _positions, false, true);
+      Float32Array normals;
+      VertexData::ComputeNormals(_positions, _indices, normals);
 
+      _ground->updateVerticesData(VertexBuffer::NormalKind, normals, false, false);
+      _ground2->updateVerticesData(VertexBuffer::NormalKind, normals, false, false);
+    });
+  }
+
+private:
+  MeshPtr _ground;
+  MeshPtr _ground2;
+  Float32Array _positions;
+  Uint32Array _indices;
+  Extensions::PerlinNoise _perlineNoise;
+  float _alpha;
+
+}; // end of class WavesScene
+
+BABYLON_REGISTER_SAMPLE("Extensions", PerlinNoiseWavesScene)
 } // end of namespace Samples
 } // end of namespace BABYLON

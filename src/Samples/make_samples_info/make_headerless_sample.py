@@ -1,10 +1,14 @@
 
 import os
+import os.path
+import typing
 
 SAMPLES_DIR = os.path.dirname(os.path.realpath(__file__ +  "/.."))
 SAMPLES_DIR = SAMPLES_DIR.replace("\\", "/")
 H_DIR = SAMPLES_DIR + "/include"
 CPP_DIR = SAMPLES_DIR + "/src"
+H_FILES = []
+CPP_FILES = []
 
 def ToCamelCase(snake_case: str) -> str:
     items  = snake_case.split("_")
@@ -16,7 +20,7 @@ def ToCamelCase(snake_case: str) -> str:
     r = "".join(itemsCamel)
     return r
 
-def files_with_extension(folder, extension) -> [str]:
+def files_with_extension(folder, extension) -> typing.List[str]:
     r = []
     ext_len = len(extension)
     for root, dirs, files in os.walk(folder):
@@ -27,8 +31,21 @@ def files_with_extension(folder, extension) -> [str]:
                 r.append(full_file)
     return r
 
-H_FILES = files_with_extension(H_DIR, ".h")
-CPP_FILES = files_with_extension(CPP_DIR, ".cpp")
+def fill_H_CPP_files():
+    global H_FILES, CPP_FILES
+    H_FILES = files_with_extension(H_DIR, ".h")
+    CPP_FILES = files_with_extension(CPP_DIR, ".cpp")
+
+
+def find_samples_in_category(category_folder):
+    h_files = files_with_extension(H_DIR + "/babylon/samples/" + category_folder, ".h")
+    samples = []
+    for f in h_files:
+        if f.endswith("_index.h"):
+            continue
+        sample = os.path.basename(f).replace(".h", "")
+        samples.append(sample)
+    return samples
 
 def read_file_lines_no_eol(filename):
     with open(filename, "r") as f:
@@ -144,6 +161,7 @@ def move_header_code_to_cpp(header_full_path, cpp_full_path):
     )
     write_file_lines_no_eol(cpp_full_path, lines_cpp_new)
     os.remove(header_full_path)
+    fill_H_CPP_files()
 
 def add_include_samples_index_to_cpp(cpp_full_path):
     lines_cpp = read_file_lines_no_eol(cpp_full_path)
@@ -192,6 +210,15 @@ def make_headerless_sample(filename_no_extension, sample_category):
     register_example_scene(cpp_full_path, sample_category)
 
 
-filename_no_extension = "pick_and_play_animation"
-sample_category = "Animations"
-make_headerless_sample(filename_no_extension, sample_category)
+fill_H_CPP_files()
+
+# filename_no_extension = "rollercoaster_scene"
+# sample_category = "Cameras"
+# make_headerless_sample(filename_no_extension, sample_category)
+
+sample_category = "Extensions"
+samples = find_samples_in_category("extensions")
+# print(samples)
+for sample in samples:
+    print("Processing " + sample)
+    make_headerless_sample(sample, sample_category)
