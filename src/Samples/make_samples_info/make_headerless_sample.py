@@ -199,7 +199,7 @@ def move_method(
     cpp_full_path, 
     method_name, 
     add_spacing = True,
-    add_override = False
+    add_override = False,
     ):
 
     lines = read_file_lines_no_eol(cpp_full_path)
@@ -248,11 +248,14 @@ def move_method(
     # print("\n".join(impl_lines_str))
 
     lines_rewritten = []
+    ClassName = SampleClassName_from_cpp_full_path(cpp_full_path)
     for i in range(len(lines)):
         line = lines[i]
         if i != decl_line_number and (not i in impl_lines_numbers):
             lines_rewritten.append(line)
-        if i == decl_line_number:
+        if i == decl_line_number and len(impl_lines_str) > 0:
+            # remove ClassName::
+            impl_lines_str[0] = impl_lines_str[0].replace(ClassName + "::", "")
             if add_override:
                 impl_lines_str[0] = impl_lines_str[0] + " override"
             if add_spacing:
@@ -295,12 +298,10 @@ def make_headerless_samples_in_category(category_name, category_folder):
 
 fill_H_CPP_files()
 
-category_name = "Ligths"
-category_folder = "lights"
+category_name = "Materials Library"
+category_folder = "materialslibrary"
 
 # filename_no_extension = "directional_light_scene"
 # make_headerless_sample(filename_no_extension, category_name)
 
 make_headerless_samples_in_category(category_name, category_folder)
-
-# 'F:/dvp/OpenSource/BabylonCpp/src/Samples/include/babylon/samples/ligths'

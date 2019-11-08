@@ -1,5 +1,5 @@
-#include <babylon/samples/materialslibrary/simple_material_scene.h>
-
+#include <babylon/samples/samples_index.h>
+#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/cameras/free_camera.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/textures/texture.h>
@@ -10,40 +10,48 @@
 namespace BABYLON {
 namespace Samples {
 
-SimpleMaterialScene::SimpleMaterialScene(ICanvas* iCanvas)
-    : IRenderableScene(iCanvas)
-{
-}
+/**
+  * @brief Scene demonstrating the use of the simple material from the materials
+  * library.
+  */
+struct SimpleMaterialScene : public IRenderableScene {
 
-SimpleMaterialScene::~SimpleMaterialScene()
-{
-}
+  SimpleMaterialScene(ICanvas* iCanvas) : IRenderableScene(iCanvas)
+  {
+  }
 
-const char* SimpleMaterialScene::getName()
-{
-  return "Simple Material Scene";
-}
+  ~SimpleMaterialScene()
+  {
+  }
 
-void SimpleMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
-{
-  auto camera = FreeCamera::New("camera1", Vector3(5.f, 4.f, -47.f), scene);
-  camera->setTarget(Vector3::Zero());
-  camera->attachControl(canvas, true);
+  const char* getName() override
+  {
+    return "Simple Material Scene";
+  }
 
-  auto light = HemisphericLight::New("light", Vector3(0.f, 1.f, 0.f), scene);
-  light->intensity = 1.f;
+  void initializeScene(ICanvas* canvas, Scene* scene) override
+  {
+    auto camera = FreeCamera::New("camera1", Vector3(5.f, 4.f, -47.f), scene);
+    camera->setTarget(Vector3::Zero());
+    camera->attachControl(canvas, true);
 
-  auto ground = Mesh::CreateGroundFromHeightMap(
-    "ground", "textures/heightMap.png", 100, 100, 100, 0, 10, scene, false);
+    auto light       = HemisphericLight::New("light", Vector3(0.f, 1.f, 0.f), scene);
+    light->intensity = 1.f;
 
-  // Create SimpleMaterial
-  auto groundMaterial = MaterialsLibrary::SimpleMaterial::New("ground", scene);
-  groundMaterial->diffuseTexture = Texture::New("textures/ground.jpg", scene);
-  groundMaterial->diffuseTexture()->uScale = 6;
-  groundMaterial->diffuseTexture()->vScale = 6;
-  ground->position().y                     = -2.05f;
-  ground->material                         = groundMaterial;
-}
+    auto ground = Mesh::CreateGroundFromHeightMap("ground", "textures/heightMap.png", 100, 100, 100,
+                                                  0, 10, scene, false);
 
+    // Create SimpleMaterial
+    auto groundMaterial            = MaterialsLibrary::SimpleMaterial::New("ground", scene);
+    groundMaterial->diffuseTexture = Texture::New("textures/ground.jpg", scene);
+    groundMaterial->diffuseTexture()->uScale = 6;
+    groundMaterial->diffuseTexture()->vScale = 6;
+    ground->position().y                     = -2.05f;
+    ground->material                         = groundMaterial;
+  }
+
+}; // end of struct SimpleMaterialScene
+
+BABYLON_REGISTER_SAMPLE("Materials Library", SimpleMaterialScene)
 } // end of namespace Samples
 } // end of namespace BABYLON
