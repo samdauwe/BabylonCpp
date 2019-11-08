@@ -179,11 +179,8 @@ def register_example_scene(cpp_full_path, sample_category):
 def make_headerless_sample(filename_no_extension, sample_category):
     h_full_path = compute_header_full_path("/" + filename_no_extension + ".")
     cpp_full_path = compute_cpp_full_path("/" + filename_no_extension + ".")
-    # print(h_full_path)
-    # print(cpp_full_path)
     if h_full_path is not None:
         h_include_path = compute_header_include_path(h_full_path)
-    # print(h_include_path)
 
     if h_full_path is not None:
         remove_all_includes(h_include_path)
