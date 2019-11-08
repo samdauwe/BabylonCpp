@@ -23,6 +23,8 @@ def ToCamelCase(snake_case: str) -> str:
 def files_with_extension(folder, extension) -> typing.List[str]:
     r = []
     ext_len = len(extension)
+    if not os.path.isdir(folder):
+        print("ouch")
     for root, dirs, files in os.walk(folder):
         for file in files:
             if file[-ext_len:] == extension:
@@ -193,6 +195,73 @@ def register_example_scene(cpp_full_path, sample_category):
     lines_cpp = lines_cpp[:-2] + [register_line] + lines_cpp[-2:]
     write_file_lines_no_eol(cpp_full_path, lines_cpp)
 
+def move_method(
+    cpp_full_path, 
+    method_name, 
+    add_spacing = True,
+    add_override = False
+    ):
+
+    lines = read_file_lines_no_eol(cpp_full_path)
+    def find_decl_lines_number() -> int:
+        def is_decl(line):
+            return " " + method_name + "(" in line
+        for i, line in enumerate(lines):
+            if is_decl(line):
+                return i
+        return None
+
+    def find_impl_lines_number() -> typing.List[int]:
+        def is_impl_start(line):
+            return "::" + method_name + "(" in line
+        def count_open_close(line):
+            count = 0
+            for c in line:
+                if c == "{":
+                    count = count + 1
+                if c == "}":
+                    count = count - 1
+            return count
+        
+        impl_lines = []
+        has_started = False
+        counter_open_close = 0
+        has_found_opening = False
+        for i, line in enumerate(lines):
+            if is_impl_start(line):
+                has_started = True
+            if has_started:
+                impl_lines.append(i)
+                count  = count_open_close(line)
+                if count > 0:
+                    has_found_opening = True
+                counter_open_close = counter_open_close + count
+            if (counter_open_close == 0) and has_started and has_found_opening:
+                break
+        return impl_lines
+
+    decl_line_number = find_decl_lines_number()
+    if decl_line_number is None:
+        return
+    impl_lines_numbers = find_impl_lines_number()
+    impl_lines_str = list(lines[i] for i in impl_lines_numbers)
+    # print("\n".join(impl_lines_str))
+
+    lines_rewritten = []
+    for i in range(len(lines)):
+        line = lines[i]
+        if i != decl_line_number and (not i in impl_lines_numbers):
+            lines_rewritten.append(line)
+        if i == decl_line_number:
+            if add_override:
+                impl_lines_str[0] = impl_lines_str[0] + " override"
+            if add_spacing:
+                impl_lines_str = list(map( lambda s : "  " + s, impl_lines_str ))
+            lines_rewritten = lines_rewritten + impl_lines_str
+
+    write_file_lines_no_eol(cpp_full_path, lines_rewritten)
+    # print("\n".join(lines_rewritten))
+
 
 def make_headerless_sample(filename_no_extension, sample_category):
     h_full_path = compute_header_full_path("/" + filename_no_extension + ".")
@@ -209,16 +278,29 @@ def make_headerless_sample(filename_no_extension, sample_category):
     add_include_samples_index_to_cpp(cpp_full_path)
     register_example_scene(cpp_full_path, sample_category)
 
+    move_method(cpp_full_path, "getName", add_override=True, add_spacing=True)
+    move_method(cpp_full_path, "initializeScene", add_override=True, add_spacing=True)
+
+    ClassName = SampleClassName_from_cpp_full_path(cpp_full_path)
+    move_method(cpp_full_path, ClassName, add_override=False, add_spacing=True)
+    move_method(cpp_full_path, "~" + ClassName, add_override=False, add_spacing=True)
+
+
+def make_headerless_samples_in_category(category_name, category_folder):
+    samples = find_samples_in_category(category_folder)
+    for sample in samples:
+        print("Processing " + sample)
+        make_headerless_sample(sample, category_name)
+
 
 fill_H_CPP_files()
 
-# filename_no_extension = "rollercoaster_scene"
-# sample_category = "Cameras"
-# make_headerless_sample(filename_no_extension, sample_category)
+category_name = "Ligths"
+category_folder = "lights"
 
-sample_category = "Extensions"
-samples = find_samples_in_category("extensions")
-# print(samples)
-for sample in samples:
-    print("Processing " + sample)
-    make_headerless_sample(sample, sample_category)
+# filename_no_extension = "directional_light_scene"
+# make_headerless_sample(filename_no_extension, category_name)
+
+make_headerless_samples_in_category(category_name, category_folder)
+
+# 'F:/dvp/OpenSource/BabylonCpp/src/Samples/include/babylon/samples/ligths'
