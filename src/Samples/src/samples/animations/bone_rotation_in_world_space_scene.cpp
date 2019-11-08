@@ -28,7 +28,7 @@ namespace Samples {
 class BoneRotationInWorldSpaceScene : public IRenderableScene {
 
 public:
-  BoneRotationInWorldSpaceScene::BoneRotationInWorldSpaceScene(ICanvas* iCanvas)
+  BoneRotationInWorldSpaceScene(ICanvas* iCanvas)
       : IRenderableScene(iCanvas), _rotationAxis{Axis::Z()}, _mesh{nullptr}, _skeleton{nullptr}
   {
   }
