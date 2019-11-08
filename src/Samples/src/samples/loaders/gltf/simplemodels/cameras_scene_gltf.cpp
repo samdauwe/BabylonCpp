@@ -12,18 +12,18 @@ namespace BABYLON {
 namespace Samples {
 
 /**
- * @brief Cameras scene demonstrating the types of cameras in babylonjs.
- * @see https://www.babylonjs-playground.com/#1A3M5C#0
- * @see https://doc.babylonjs.com/babylon101/cameras
+ * @brief Cameras Scene (glTF). A sample with two different camera objects.
+ * @see https://doc.babylonjs.com/how_to/load_from_any_file_type
+ * @see https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/Cameras
  */
-struct CamerasScene : public IRenderableScene {
+struct CamerasSceneGltf : public IRenderableScene {
 
-  CamerasScene(ICanvas* iCanvas) : IRenderableScene(iCanvas)
+  CamerasSceneGltf(ICanvas* iCanvas) : IRenderableScene(iCanvas)
   {
     GLTF2::GLTFFileLoader::RegisterAsSceneLoaderPlugin();
   }
 
-  ~CamerasScene() override
+  ~CamerasSceneGltf() override
   {
   }
 
@@ -52,9 +52,9 @@ struct CamerasScene : public IRenderableScene {
                             });
   }
 
-}; // end of struct CamerasScene
+}; // end of struct CamerasSceneGltf
 
-BABYLON_REGISTER_SAMPLE(_LoadersGLTFSamplesIndex::CategoryName(), CamerasScene)
+BABYLON_REGISTER_SAMPLE(_LoadersGLTFSamplesIndex::CategoryName(), CamerasSceneGltf)
 
 } // end of namespace Samples
 } // end of namespace BABYLON
