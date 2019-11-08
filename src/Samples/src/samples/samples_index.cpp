@@ -7,7 +7,6 @@
 #include <babylon/samples/lights/_lights_samples_index.h>
 #include <babylon/samples/loaders/_loaders_samples_index.h>
 #include <babylon/samples/materials/_materials_samples_index.h>
-#include <babylon/samples/materialslibrary/_materials_library_samples_index.h>
 #include <babylon/samples/meshes/_meshes_samples_index.h>
 #include <babylon/samples/optimizations/_optimizations_samples_index.h>
 #include <babylon/samples/particles/_particles_samples_index.h>
@@ -41,9 +40,6 @@ SamplesIndex::SamplesIndex()
 #endif
     // Materials samples
     {_MaterialsSamplesIndex::CategoryName(), _MaterialsSamplesIndex()},
-    // // Materials Library samples
-    {_MaterialsLibrarySamplesIndex::CategoryName(),
-     _MaterialsLibrarySamplesIndex()},
     // Meshes samples
     {_MeshesSamplesIndex::CategoryName(), _MeshesSamplesIndex()},
     // Optimizations samples
