@@ -57,7 +57,7 @@ clone_script:
 before_build:
   - cd C:\projects\babyloncpp
   - git clean -fx
-  - git log - 1
+  - git log -1
   - dir src\Samples\src\samples\Cameras
   - dir src\Samples\src\samples\loaders\gltf\simplemodels
 
