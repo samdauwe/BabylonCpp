@@ -1,5 +1,6 @@
 #include <babylon/samples/animations/cannon_ball_scene.h>
 
+#include <babylon/samples/samples_index.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/engines/scene.h>
 #include <babylon/lights/hemispheric_light.h>
@@ -178,5 +179,6 @@ void CannonBallScene::_flying(float t)
   _ball->position().y = y;
 }
 
+BABYLON_REGISTER_SAMPLE("Animations", CannonBallScene)
 } // end of namespace Samples
 } // end of namespace BABYLON

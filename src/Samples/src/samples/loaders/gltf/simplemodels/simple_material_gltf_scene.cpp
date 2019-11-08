@@ -7,6 +7,29 @@
 #include <babylon/loading/scene_loader.h>
 #include <babylon/samples/loaders/gltf/_loaders_gtlf_samples_index.h>
 #include <babylon/samples/samples_index.h>
+#include <babylon/interfaces/irenderable_scene.h>
+
+
+namespace BABYLON {
+namespace Samples {
+
+
+/**
+  * @brief Scene demonstrating the use of the simple material from the materials
+  * library.
+  */
+struct SimpleMaterialScene : public IRenderableScene {
+
+  SimpleMaterialScene(ICanvas* iCanvas);
+  ~SimpleMaterialScene() override;
+
+  const char* getName() override;
+  void initializeScene(ICanvas* canvas, Scene* scene) override;
+
+}; // end of struct SimpleMaterialScene
+
+} // end of namespace Samples
+} // end of namespace BABYLON
 
 namespace BABYLON {
 namespace Samples {

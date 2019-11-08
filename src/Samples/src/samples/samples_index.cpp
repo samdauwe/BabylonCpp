@@ -3,14 +3,9 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/string.h>
 #include <babylon/interfaces/irenderable_scene.h>
-#include <babylon/samples/animations/_animations_samples_index.h>
-#include <babylon/samples/cameras/_cameras_samples_index.h>
 #include <babylon/samples/collisionsandintersections/_collisions_and_intersections_samples_index.h>
-#include <babylon/samples/extensions/_extensions_samples_index.h>
-#include <babylon/samples/lights/_lights_samples_index.h>
 #include <babylon/samples/loaders/_loaders_samples_index.h>
 #include <babylon/samples/materials/_materials_samples_index.h>
-#include <babylon/samples/materialslibrary/_materials_library_samples_index.h>
 #include <babylon/samples/meshes/_meshes_samples_index.h>
 #include <babylon/samples/optimizations/_optimizations_samples_index.h>
 #include <babylon/samples/particles/_particles_samples_index.h>
@@ -30,17 +25,9 @@ SamplesIndex::SamplesIndex()
 {
   // Initialize the samples index
   _samplesIndex = {
-    // Animations samples
-    {_AnimationsSamplesIndex::CategoryName(), _AnimationsSamplesIndex()},
-    // Cameras samples
-    {_CamerasSamplesIndex::CategoryName(), _CamerasSamplesIndex()},
     // Collisions and Intersections samples
     {_CollisionsAndIntersectionsSamplesIndex::CategoryName(),
      _CollisionsAndIntersectionsSamplesIndex()},
-    // Extensions samples
-    {_ExtensionsSamplesIndex::CategoryName(), _ExtensionsSamplesIndex()},
-    // Lights samples
-    {_LightsSamplesIndex::CategoryName(), _LightsSamplesIndex()},
     // Loaders - babylon format
     {_LoadersBabylonSamplesIndex::CategoryName(),
      _LoadersBabylonSamplesIndex()},
@@ -50,9 +37,6 @@ SamplesIndex::SamplesIndex()
 #endif
     // Materials samples
     {_MaterialsSamplesIndex::CategoryName(), _MaterialsSamplesIndex()},
-    // // Materials Library samples
-    {_MaterialsLibrarySamplesIndex::CategoryName(),
-     _MaterialsLibrarySamplesIndex()},
     // Meshes samples
     {_MeshesSamplesIndex::CategoryName(), _MeshesSamplesIndex()},
     // Optimizations samples

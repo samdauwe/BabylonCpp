@@ -298,6 +298,11 @@ set_target_properties(${TARGET}
                 SOVERSION ${META_VERSION}
 )
 
+if (WIN32)
+    set_target_properties(${TARGET} PROPERTIES LINK_FLAGS "/ignore:4217 /ignore:4286 /ignore:4049")
+endif()
+
+
 # ============================================================================ #
 #                       Setup test environment                                 #
 # ============================================================================ #
