@@ -12,9 +12,9 @@ namespace BABYLON {
 namespace Samples {
 
 /**
- * @brief Cameras scene demonstrating the types of cameras in babylonjs.
- * @see https://www.babylonjs-playground.com/#1A3M5C#0
- * @see https://doc.babylonjs.com/babylon101/cameras
+ * @brief Cameras Scene (glTF). A sample with two different camera objects.
+ * @see https://doc.babylonjs.com/how_to/load_from_any_file_type
+ * @see https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/Cameras
  */
 struct CamerasSceneGltf : public IRenderableScene {
 
