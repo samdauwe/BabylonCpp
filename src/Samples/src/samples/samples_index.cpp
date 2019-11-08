@@ -4,7 +4,6 @@
 #include <babylon/core/string.h>
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/samples/collisionsandintersections/_collisions_and_intersections_samples_index.h>
-#include <babylon/samples/lights/_lights_samples_index.h>
 #include <babylon/samples/loaders/_loaders_samples_index.h>
 #include <babylon/samples/materials/_materials_samples_index.h>
 #include <babylon/samples/meshes/_meshes_samples_index.h>
@@ -29,8 +28,6 @@ SamplesIndex::SamplesIndex()
     // Collisions and Intersections samples
     {_CollisionsAndIntersectionsSamplesIndex::CategoryName(),
      _CollisionsAndIntersectionsSamplesIndex()},
-    // Lights samples
-    {_LightsSamplesIndex::CategoryName(), _LightsSamplesIndex()},
     // Loaders - babylon format
     {_LoadersBabylonSamplesIndex::CategoryName(),
      _LoadersBabylonSamplesIndex()},
