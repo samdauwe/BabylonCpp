@@ -50,7 +50,7 @@ struct CamerasTypesScene : public IRenderableScene {
     freeCamera->attachControl(canvas, true);
   }
 
-}; // end of struct CamerasScene
+}; // end of struct CamerasTypesScene
 
 
 BABYLON_REGISTER_SAMPLE("Cameras", CamerasTypesScene)

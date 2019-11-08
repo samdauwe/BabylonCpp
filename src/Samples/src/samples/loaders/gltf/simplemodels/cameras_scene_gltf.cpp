@@ -52,7 +52,7 @@ struct CamerasSceneGltf : public IRenderableScene {
                             });
   }
 
-}; // end of struct CamerasScene
+}; // end of struct CamerasSceneGltf
 
 BABYLON_REGISTER_SAMPLE(_LoadersGLTFSamplesIndex::CategoryName(), CamerasSceneGltf)
 
