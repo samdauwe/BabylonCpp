@@ -347,12 +347,19 @@ def remove_close_open_namespaces(cpp_full_path):
 namespace BABYLON {
 namespace Samples {
 """
+    what_to_search2 = """} // end of namespace Samples
+} // end of namespace BABYLON
+
+namespace BABYLON {
+namespace Samples {
+"""
     with open(cpp_full_path, "r") as f_i:
         content = f_i.read()
     content = content.replace("\n\n\n\n\n", "\n\n")
     content = content.replace("\n\n\n\n", "\n\n")
     content = content.replace("\n\n\n", "\n\n")
     content = content.replace(what_to_search, "")
+    content = content.replace(what_to_search2, "")
     with open(cpp_full_path, "w") as f_o:
         f_o.write(content)
 
