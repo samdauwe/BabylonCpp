@@ -24,7 +24,6 @@ void SamplesIndex::fillSamplesFailures() const
   _samplesFailures = {
     {"BlurModeForMirrorsScene", {SampleFailureReasonKind::empty3d}},
     {"CartoonAnimationsScene", {SampleFailureReasonKind::segFault}},
-    {"ColoredRibbonScene", {SampleFailureReasonKind::segFault}},
     {"CircleCurvesFromBeziersScene", {SampleFailureReasonKind::empty3d}},
     {"DecalsScene", {SampleFailureReasonKind::segFault}},
     {"EdgesRenderScene", {SampleFailureReasonKind::segFault}},

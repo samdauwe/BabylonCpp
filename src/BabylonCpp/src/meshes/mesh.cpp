@@ -2007,7 +2007,7 @@ Mesh& Mesh::convertToFlatShadedMesh()
   }
 
   // Save previous submeshes
-  auto previousSubmeshes = stl_util::to_raw_ptr_vector(subMeshes);
+  auto previousSubmeshes = subMeshes; //stl_util::to_raw_ptr_vector(subMeshes);
 
   auto indices      = getIndices();
   auto totalIndices = getTotalIndices();
