@@ -40,7 +40,7 @@ void SamplesIndex::fillSamplesFailures() const
     {"PointsCloudScene", {SampleFailureReasonKind::empty3d}},
     {"ProceduralHexPlanetGenerationScene", {SampleFailureReasonKind::segFault}},
     {"ShaderMaterialWarpSpeedScene", {SampleFailureReasonKind::empty3d}},
-    {"VolumetricLightScatteringScene", {SampleFailureReasonKind::segFault}}};
+    {"VolumetricLightScatteringScene", {SampleFailureReasonKind::broken3d, "No scatter, mousedrag->disappear"}}};
 
   done = true;
 }
