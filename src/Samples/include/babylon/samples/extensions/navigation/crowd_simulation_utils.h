@@ -15,12 +15,10 @@ namespace Samples {
 
 struct CrowdSimulationUtils {
 
-  static std::vector<AbstractMeshPtr> createAgentMeshes(Scene* scene,
-                                                        size_t totalNoAgents);
-  static AbstractMeshPtr createWayPointMesh(Scene* scene,
-                                            const Vector2& position);
+  static std::vector<AbstractMeshPtr> createAgentMeshes(Scene* scene, size_t totalNoAgents);
+  static AbstractMeshPtr createWayPointMesh(Scene* scene, const Vector2& position);
 
-}; // end of struct CrowdSimulationScene1
+}; // end of struct CrowdSimulationUtils
 
 } // end of namespace Samples
 } // end of namespace BABYLON

@@ -1,20 +1,18 @@
-#include <babylon/samples/samples_index.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/engines/scene.h>
+#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/mesh_builder.h>
-#include <babylon/interfaces/irenderable_scene.h>
-
+#include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
 namespace Samples {
 
 /**
- * @brief Multi-Views Scene. Example demonstrating how to how to use multi
- * views.
+ * @brief Multi-Views Scene. Example demonstrating how to how to use multi views.
  * @see https://www.babylonjs-playground.com/#E9IRIF
  */
 struct MultiViewsScene : public IRenderableScene {
@@ -23,9 +21,7 @@ struct MultiViewsScene : public IRenderableScene {
   {
   }
 
-  ~MultiViewsScene()
-  {
-  }
+  ~MultiViewsScene() override = default;
 
   const char* getName() override
   {
@@ -112,5 +108,6 @@ struct MultiViewsScene : public IRenderableScene {
 }; // end of struct MultiViewsScene
 
 BABYLON_REGISTER_SAMPLE("Cameras", MultiViewsScene)
+
 } // end of namespace Samples
 } // end of namespace BABYLON

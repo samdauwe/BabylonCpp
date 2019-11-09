@@ -1,16 +1,15 @@
-#include <babylon/samples/samples_index.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
+#include <babylon/extensions/noisegeneration/perlin_noise.h>
 #include <babylon/interfaces/icanvas.h>
+#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
-#include <babylon/extensions/noisegeneration/perlin_noise.h>
-#include <babylon/interfaces/irenderable_scene.h>
-
+#include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
 
@@ -28,16 +27,14 @@ public:
   {
   }
 
-  ~PerlinNoiseWavesScene()
-  {
-  }
+  ~PerlinNoiseWavesScene() override = default;
 
-  const char* getName()
+  const char* getName() override
   {
     return "Perlin Noise Waves Scene";
   }
 
-  void initializeScene(ICanvas* canvas, Scene* scene)
+  void initializeScene(ICanvas* canvas, Scene* scene) override
   {
     // Create a camera
     auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, 0.7f, 600.f, Vector3::Zero(), scene);
@@ -99,5 +96,6 @@ private:
 }; // end of class WavesScene
 
 BABYLON_REGISTER_SAMPLE("Extensions", PerlinNoiseWavesScene)
+
 } // end of namespace Samples
 } // end of namespace BABYLON

@@ -68,29 +68,27 @@ class RuntimeAnimation;
 class SimplificationQueue;
 class SoundTrack;
 class UniformBuffer;
-using AnimatablePtr             = std::shared_ptr<Animatable>;
-using BoundingBoxRendererPtr    = std::shared_ptr<BoundingBoxRenderer>;
-using BonePtr                   = std::shared_ptr<Bone>;
-using EffectPtr                 = std::shared_ptr<Effect>;
-using DepthRendererPtr          = std::shared_ptr<DepthRenderer>;
-using GeometryBufferRendererPtr = std::shared_ptr<GeometryBufferRenderer>;
-using IAnimatablePtr            = std::shared_ptr<IAnimatable>;
-using IPhysicsEnginePtr         = std::shared_ptr<IPhysicsEngine>;
-using ImageProcessingConfigurationPtr
-  = std::shared_ptr<ImageProcessingConfiguration>;
-using InternalTexturePtr = std::shared_ptr<InternalTexture>;
-using ISceneComponentPtr = std::shared_ptr<ISceneComponent>;
-using ISceneSerializableComponentPtr
-  = std::shared_ptr<ISceneSerializableComponent>;
-using ISpriteManagerPtr      = std::shared_ptr<ISpriteManager>;
-using NodePtr                = std::shared_ptr<Node>;
-using MeshPtr                = std::shared_ptr<Mesh>;
-using OutlineRendererPtr     = std::shared_ptr<OutlineRenderer>;
-using PostProcessPtr         = std::shared_ptr<PostProcess>;
-using ProceduralTexturePtr   = std::shared_ptr<ProceduralTexture>;
-using SimplificationQueuePtr = std::shared_ptr<SimplificationQueue>;
-using SoundTrackPtr          = std::shared_ptr<SoundTrack>;
-using SubMeshPtr             = std::shared_ptr<SubMesh>;
+using AnimatablePtr                   = std::shared_ptr<Animatable>;
+using BoundingBoxRendererPtr          = std::shared_ptr<BoundingBoxRenderer>;
+using BonePtr                         = std::shared_ptr<Bone>;
+using EffectPtr                       = std::shared_ptr<Effect>;
+using DepthRendererPtr                = std::shared_ptr<DepthRenderer>;
+using GeometryBufferRendererPtr       = std::shared_ptr<GeometryBufferRenderer>;
+using IAnimatablePtr                  = std::shared_ptr<IAnimatable>;
+using IPhysicsEnginePtr               = std::shared_ptr<IPhysicsEngine>;
+using ImageProcessingConfigurationPtr = std::shared_ptr<ImageProcessingConfiguration>;
+using InternalTexturePtr              = std::shared_ptr<InternalTexture>;
+using ISceneComponentPtr              = std::shared_ptr<ISceneComponent>;
+using ISceneSerializableComponentPtr  = std::shared_ptr<ISceneSerializableComponent>;
+using ISpriteManagerPtr               = std::shared_ptr<ISpriteManager>;
+using NodePtr                         = std::shared_ptr<Node>;
+using MeshPtr                         = std::shared_ptr<Mesh>;
+using OutlineRendererPtr              = std::shared_ptr<OutlineRenderer>;
+using PostProcessPtr                  = std::shared_ptr<PostProcess>;
+using ProceduralTexturePtr            = std::shared_ptr<ProceduralTexture>;
+using SimplificationQueuePtr          = std::shared_ptr<SimplificationQueue>;
+using SoundTrackPtr                   = std::shared_ptr<SoundTrack>;
+using SubMeshPtr                      = std::shared_ptr<SubMesh>;
 
 /**
  * @brief Represents a scene to be rendered by the engine.
@@ -235,15 +233,14 @@ public:
   std::optional<float> getCachedVisibility();
 
   /**
-   * @brief Gets a boolean indicating if the current material / effect /
-   * visibility must be bind again.
+   * @brief Gets a boolean indicating if the current material / effect / visibility must be bind
+   * again.
    * @param material defines the current material
    * @param effect defines the current effect
    * @param visibility defines the current visibility state
    * @returns true if one parameter is not cached
    */
-  bool isCachedMaterialInvalid(Material* material, const EffectPtr& effect,
-                               float visibility = 1.f);
+  bool isCachedMaterialInvalid(Material* material, const EffectPtr& effect, float visibility = 1.f);
 
   /**
    * @brief Gets the bounding box renderer associated with the scene.
@@ -270,8 +267,8 @@ public:
   size_t getTotalVertices() const;
 
   /**
-   * @brief Gets the total number of active indices rendered per frame (You can
-   * deduce the number of rendered triangles by dividing this number by 3).
+   * @brief Gets the total number of active indices rendered per frame (You can deduce the number of
+   * rendered triangles by dividing this number by 3).
    * @returns the total number of active indices rendered per frame
    */
   size_t getActiveIndices() const;
@@ -330,24 +327,21 @@ public:
 
   /**
    * @brief Use this method to simulate a pointer move on a mesh.
-   * The pickResult parameter can be obtained from a scene.pick or
-   * scene.pickWithRay
-   * @param pickResult pickingInfo of the object wished to simulate pointer
-   * event on
-   * @param pointerEventInit pointer event state to be used when simulating the
-   * pointer event (eg. pointer id for multitouch)
+   * The pickResult parameter can be obtained from a scene.pick or scene.pickWithRay
+   * @param pickResult pickingInfo of the object wished to simulate pointer event on
+   * @param pointerEventInit pointer event state to be used when simulating the pointer event (eg.
+   * pointer id for multitouch)
    * @returns the current scene
    */
   Scene& simulatePointerMove(std::optional<PickingInfo>& pickResult);
 
   /**
    * @brief Use this method to simulate a pointer down on a mesh.
-   * The pickResult parameter can be obtained from a scene.pick or
-   * scene.pickWithRay
+   * The pickResult parameter can be obtained from a scene.pick or scene.pickWithRay
    * @param pickResult pickingInfo of the object wished to simulate pointer
    * event on
-   * @param pointerEventInit pointer event state to be used when simulating the
-   * pointer event (eg. pointer id for multitouch)
+   * @param pointerEventInit pointer event state to be used when simulating the pointer event (eg.
+   * pointer id for multitouch)
    * @returns the current scene
    */
   Scene& simulatePointerDown(std::optional<PickingInfo>& pickResult);
@@ -356,19 +350,17 @@ public:
    * @brief Use this method to simulate a pointer up on a mesh.
    * The pickResult parameter can be obtained from a scene.pick or
    * scene.pickWithRay
-   * @param pickResult pickingInfo of the object wished to simulate pointer
-   * event on
-   * @param pointerEventInit pointer event state to be used when simulating the
-   * pointer event (eg. pointer id for multitouch)
+   * @param pickResult pickingInfo of the object wished to simulate pointer event on
+   * @param pointerEventInit pointer event state to be used when simulating the pointer event (eg.
+   * pointer id for multitouch)
    * @returns the current scene
    */
   Scene& simulatePointerUp(std::optional<PickingInfo>& pickResult);
 
   /**
-   * @brief Gets a boolean indicating if the current pointer event is captured
-   * (meaning that the scene has already handled the pointer down)
-   * @param pointerId defines the pointer id to use in a multi-touch scenario (0
-   * by default)
+   * @brief Gets a boolean indicating if the current pointer event is captured (meaning that the
+   * scene has already handled the pointer down)
+   * @param pointerId defines the pointer id to use in a multi-touch scenario (0 by default)
    * @returns true if the pointer was captured
    */
   bool isPointerCaptured(int pointerId = 0);
@@ -379,14 +371,13 @@ public:
   bool _isPointerSwiping() const;
 
   /**
-   * @brief Attach events to the canvas (To handle actionManagers triggers and
-   * raise onPointerMove, onPointerDown and onPointerUp.
+   * @brief Attach events to the canvas (To handle actionManagers triggers and raise onPointerMove,
+   * onPointerDown and onPointerUp.
    * @param attachUp defines if you want to attach events to pointerup
    * @param attachDown defines if you want to attach events to pointerdown
    * @param attachMove defines if you want to attach events to pointermove
    */
-  void attachControl(bool attachUp = true, bool attachDown = true,
-                     bool attachMove = true);
+  void attachControl(bool attachUp = true, bool attachDown = true, bool attachMove = true);
 
   /**
    * @brief Detaches all event handlers.
@@ -394,9 +385,8 @@ public:
   void detachControl();
 
   /**
-   * @brief This function will check if the scene can be rendered (textures are.
-   * loaded, shaders are compiled) Delay loaded resources are not taking in
-   * account.
+   * @brief This function will check if the scene can be rendered (textures are loaded, shaders are
+   * compiled) Delay loaded resources are not taking in account.
    * @return true if all required resources are ready
    */
   bool isReady();
@@ -411,29 +401,25 @@ public:
    * @brief Registers a function to be called before every frame render.
    * @param func defines the function to register
    */
-  void registerBeforeRender(
-    const std::function<void(Scene* scene, EventState& es)>& func);
+  void registerBeforeRender(const std::function<void(Scene* scene, EventState& es)>& func);
 
   /**
    * Unregisters a function called before every frame render
    * @param func defines the function to unregister
    */
-  void unregisterBeforeRender(
-    const std::function<void(Scene* scene, EventState& es)>& func);
+  void unregisterBeforeRender(const std::function<void(Scene* scene, EventState& es)>& func);
 
   /**
    * @brief Registers a function to be called after every frame render.
    * @param func defines the function to register
    */
-  void registerAfterRender(
-    const std::function<void(Scene* scene, EventState& es)>& func);
+  void registerAfterRender(const std::function<void(Scene* scene, EventState& es)>& func);
 
   /**
    * @brief Unregisters a function called after every frame render.
    * @param func defines the function to unregister
    */
-  void unregisterAfterRender(
-    const std::function<void(Scene* scene, EventState& es)>& func);
+  void unregisterAfterRender(const std::function<void(Scene* scene, EventState& es)>& func);
 
   /**
    * @brief Hidden
@@ -465,8 +451,7 @@ public:
    * Registers a function to be executed when the scene is ready
    * @param {Function} func - the function to be executed
    */
-  void executeWhenReady(
-    const std::function<void(Scene* scene, EventState& es)>& func);
+  void executeWhenReady(const std::function<void(Scene* scene, EventState& es)>& func);
 
   /**
    * @brief Hidden
@@ -499,13 +484,13 @@ public:
    * @param onAnimationLoop defines the callback to call when an animation loops
    * @returns the animatable object created for this animation
    */
-  AnimatablePtr beginWeightedAnimation(
-    const IAnimatablePtr& target, float from, float to, float weight = 1.f,
-    bool loop = false, float speedRatio = 1.f,
-    const std::function<void()>& onAnimationEnd                = nullptr,
-    AnimatablePtr animatable                                   = nullptr,
-    const std::function<bool(IAnimatable* target)>& targetMask = nullptr,
-    const std::function<void()>& onAnimationLoop               = nullptr);
+  AnimatablePtr
+  beginWeightedAnimation(const IAnimatablePtr& target, float from, float to, float weight = 1.f,
+                         bool loop = false, float speedRatio = 1.f,
+                         const std::function<void()>& onAnimationEnd                = nullptr,
+                         AnimatablePtr animatable                                   = nullptr,
+                         const std::function<bool(IAnimatable* target)>& targetMask = nullptr,
+                         const std::function<void()>& onAnimationLoop               = nullptr);
 
   /**
    * @brief Will start the animation sequence of a given target.
@@ -527,14 +512,12 @@ public:
    * @param onAnimationLoop defines the callback to call when an animation loops
    * @returns the animatable object created for this animation
    */
-  AnimatablePtr
-  beginAnimation(const IAnimatablePtr& target, float from, float to,
-                 bool loop = false, float speedRatio = 1.f,
-                 const std::function<void()>& onAnimationEnd = nullptr,
-                 AnimatablePtr animatable = nullptr, bool stopCurrent = true,
-                 const std::function<bool(IAnimatable* target)>& targetMask
-                 = nullptr,
-                 const std::function<void()>& onAnimationLoop = nullptr);
+  AnimatablePtr beginAnimation(const IAnimatablePtr& target, float from, float to,
+                               bool loop = false, float speedRatio = 1.f,
+                               const std::function<void()>& onAnimationEnd = nullptr,
+                               AnimatablePtr animatable = nullptr, bool stopCurrent = true,
+                               const std::function<bool(IAnimatable* target)>& targetMask = nullptr,
+                               const std::function<void()>& onAnimationLoop = nullptr);
 
   /**
    * @brief Will start the animation sequence of a given target and its
@@ -560,13 +543,13 @@ public:
    * @param onAnimationLoop defines the callback to call when an animation loops
    * @returns the list of created animatables
    */
-  std::vector<AnimatablePtr> beginHierarchyAnimation(
-    const NodePtr& target, bool directDescendantsOnly, float from, float to,
-    bool loop = false, float speedRatio = 1.f,
-    const std::function<void()>& onAnimationEnd = nullptr,
-    AnimatablePtr animatable = nullptr, bool stopCurrent = true,
-    const std::function<bool(IAnimatable* target)>& targetMask = nullptr,
-    const std::function<void()>& onAnimationLoop               = nullptr);
+  std::vector<AnimatablePtr>
+  beginHierarchyAnimation(const NodePtr& target, bool directDescendantsOnly, float from, float to,
+                          bool loop = false, float speedRatio = 1.f,
+                          const std::function<void()>& onAnimationEnd = nullptr,
+                          AnimatablePtr animatable = nullptr, bool stopCurrent = true,
+                          const std::function<bool(IAnimatable* target)>& targetMask = nullptr,
+                          const std::function<void()>& onAnimationLoop               = nullptr);
 
   /**
    * @brief Begin a new animation on a given node.
@@ -581,12 +564,11 @@ public:
    * @param onAnimationLoop defines the callback to call when an animation loops
    * @returns the list of created animatables
    */
-  AnimatablePtr
-  beginDirectAnimation(const IAnimatablePtr& target,
-                       const std::vector<AnimationPtr>& animations, float from,
-                       float to, bool loop = false, float speedRatio = 1.f,
-                       const std::function<void()>& onAnimationEnd  = nullptr,
-                       const std::function<void()>& onAnimationLoop = nullptr);
+  AnimatablePtr beginDirectAnimation(const IAnimatablePtr& target,
+                                     const std::vector<AnimationPtr>& animations, float from,
+                                     float to, bool loop = false, float speedRatio = 1.f,
+                                     const std::function<void()>& onAnimationEnd  = nullptr,
+                                     const std::function<void()>& onAnimationLoop = nullptr);
 
   /**
    * @brief Begin a new animation on a given node and its hierarchy.
@@ -604,12 +586,12 @@ public:
    * @param onAnimationLoop defines the callback to call when an animation loops
    * @returns the list of animatables created for all nodes
    */
-  std::vector<AnimatablePtr> beginDirectHierarchyAnimation(
-    const NodePtr& target, bool directDescendantsOnly,
-    const std::vector<AnimationPtr>& animations, float from, float to,
-    bool loop = false, float speedRatio = 1.f,
-    const std::function<void()>& onAnimationEnd  = nullptr,
-    const std::function<void()>& onAnimationLoop = nullptr);
+  std::vector<AnimatablePtr>
+  beginDirectHierarchyAnimation(const NodePtr& target, bool directDescendantsOnly,
+                                const std::vector<AnimationPtr>& animations, float from, float to,
+                                bool loop = false, float speedRatio = 1.f,
+                                const std::function<void()>& onAnimationEnd  = nullptr,
+                                const std::function<void()>& onAnimationLoop = nullptr);
 
   /**
    * @brief Gets the animatable associated with a specific target.
@@ -623,8 +605,7 @@ public:
    * @param target defines the target to look animatables for
    * @returns an array of Animatables
    */
-  std::vector<AnimatablePtr>
-  getAllAnimatablesByTarget(const IAnimatablePtr& target);
+  std::vector<AnimatablePtr> getAllAnimatablesByTarget(const IAnimatablePtr& target);
   std::vector<AnimatablePtr> getAllAnimatablesByTarget(IAnimatable* target);
 
   /**
@@ -636,10 +617,8 @@ public:
    * stopped based on its target (all animations will be stopped if both this
    * and animationName are empty)
    */
-  void stopAnimation(const IAnimatablePtr& target,
-                     const std::string& animationName = "",
-                     const std::function<bool(IAnimatable* target)>& targetMask
-                     = nullptr);
+  void stopAnimation(const IAnimatablePtr& target, const std::string& animationName = "",
+                     const std::function<bool(IAnimatable* target)>& targetMask = nullptr);
 
   /**
    * @brief Will stop the animation of the given target.
@@ -651,8 +630,7 @@ public:
    * and animationName are empty)
    */
   void stopAnimation(IAnimatable* target, const std::string& animationName = "",
-                     const std::function<bool(IAnimatable* target)>& targetMask
-                     = nullptr);
+                     const std::function<bool(IAnimatable* target)>& targetMask = nullptr);
 
   /**
    * @brief Stops and removes all animations that have been applied to the
@@ -663,9 +641,8 @@ public:
   /**
    * @brief Hidden
    */
-  void
-  _registerTargetForLateAnimationBinding(RuntimeAnimation* runtimeAnimation,
-                                         const AnimationValue& originalValue);
+  void _registerTargetForLateAnimationBinding(RuntimeAnimation* runtimeAnimation,
+                                              const AnimationValue& originalValue);
 
   /** Matrix **/
 
@@ -899,8 +876,7 @@ public:
    * @brief Adds the given morph target to this scene.
    * @param newMorphTargetManager The morph target to add
    */
-  void
-  addMorphTargetManager(const MorphTargetManagerPtr& newMorphTargetManager);
+  void addMorphTargetManager(const MorphTargetManagerPtr& newMorphTargetManager);
 
   /**
    * @brief Adds the given geometry to this scene.
@@ -926,8 +902,7 @@ public:
    * @param attachControl defines if attachControl must be called for the new
    * active camera (default: true)
    */
-  void switchActiveCamera(const CameraPtr& newCamera,
-                          bool attachControl = true);
+  void switchActiveCamera(const CameraPtr& newCamera, bool attachControl = true);
 
   /**
    * @brief Sets the active camera of the scene using its ID.
@@ -1213,6 +1188,13 @@ public:
   MorphTargetManagerPtr getMorphTargetManagerById(unsigned int id);
 
   /**
+   * @brief Gets a texture using its unique id.
+   * @param uniqueId defines the unique id to look for
+   * @return the found texture or null if not found at all.
+   */
+  BaseTexturePtr getTextureByUniqueID(size_t uniqueId);
+
+  /**
    * @brief Gets a boolean indicating if the given mesh is active.
    * @param mesh defines the mesh to look for
    * @returns true if the mesh is in the active list
@@ -1370,9 +1352,8 @@ public:
    * calculating the world size
    * @returns {{ min: Vector3; max: Vector3 }} min and max vectors
    */
-  MinMax getWorldExtends(
-    const std::function<bool(const AbstractMeshPtr& mesh)>& filterPredicate
-    = nullptr);
+  MinMax getWorldExtends(const std::function<bool(const AbstractMeshPtr& mesh)>& filterPredicate
+                         = nullptr);
 
   /**
    * @brief Creates or updates the octree used to boost selection (picking).
@@ -1397,9 +1378,8 @@ public:
    * by default)
    * @returns a Ray
    */
-  Ray createPickingRay(int x, int y, Matrix& world,
-                       const CameraPtr& camera = nullptr,
-                       bool cameraViewSpace    = false);
+  Ray createPickingRay(int x, int y, Matrix& world, const CameraPtr& camera = nullptr,
+                       bool cameraViewSpace = false);
 
   /**
    * @brief Creates a ray that can be used to pick in the scene.
@@ -1413,9 +1393,8 @@ public:
    * by default)
    * @returns the current scene
    */
-  Scene& createPickingRayToRef(int x, int y, const std::optional<Matrix>& world,
-                               Ray& result, CameraPtr camera,
-                               bool cameraViewSpace = false);
+  Scene& createPickingRayToRef(int x, int y, const std::optional<Matrix>& world, Ray& result,
+                               CameraPtr camera, bool cameraViewSpace = false);
 
   /**
    * @brief Creates a ray that can be used to pick in the scene.
@@ -1424,8 +1403,7 @@ public:
    * @param camera defines the camera to use for the picking
    * @returns a Ray
    */
-  Ray createPickingRayInCameraSpace(int x, int y,
-                                    const CameraPtr& camera = nullptr);
+  Ray createPickingRayInCameraSpace(int x, int y, const CameraPtr& camera = nullptr);
 
   /**
    * @brief Creates a ray that can be used to pick in the scene.
@@ -1435,8 +1413,7 @@ public:
    * @param camera defines the camera to use for the picking
    * @returns the current scene
    */
-  Scene& createPickingRayInCameraSpaceToRef(int x, int y, Ray& result,
-                                            CameraPtr camera = nullptr);
+  Scene& createPickingRayInCameraSpaceToRef(int x, int y, Ray& result, CameraPtr camera = nullptr);
 
   /**
    * @brief Launch a ray to try to pick a mesh in the scene.
@@ -1452,9 +1429,7 @@ public:
    * @returns a PickingInfo
    */
   std::optional<PickingInfo>
-  pick(int x, int y,
-       const std::function<bool(const AbstractMeshPtr& mesh)>& predicate
-       = nullptr,
+  pick(int x, int y, const std::function<bool(const AbstractMeshPtr& mesh)>& predicate = nullptr,
        bool fastCheck = false, const CameraPtr& camera = nullptr);
 
   /**
@@ -1470,8 +1445,7 @@ public:
    * @returns a PickingInfo
    */
   std::optional<PickingInfo>
-  pickSprite(int x, int y,
-             const std::function<bool(Sprite* sprite)>& predicate = nullptr,
+  pickSprite(int x, int y, const std::function<bool(Sprite* sprite)>& predicate = nullptr,
              bool fastCheck = false, const CameraPtr& camera = nullptr);
 
   /**
@@ -1485,10 +1459,9 @@ public:
    * scene.activeCamera will be used
    * @returns a PickingInfo
    */
-  std::optional<PickingInfo>
-  pickSpriteWithRay(const Ray& ray,
-                    const std::function<bool(Sprite* sprite)>& predicate,
-                    bool fastCheck, CameraPtr& camera);
+  std::optional<PickingInfo> pickSpriteWithRay(const Ray& ray,
+                                               const std::function<bool(Sprite* sprite)>& predicate,
+                                               bool fastCheck, CameraPtr& camera);
 
   /**
    * @brief Use the given ray to pick a mesh in the scene.
@@ -1501,9 +1474,8 @@ public:
    */
   std::optional<PickingInfo>
   pickWithRay(const Ray& ray,
-              const std::function<bool(const AbstractMeshPtr& mesh)>& predicate
-              = nullptr,
-              bool fastCheck = false);
+              const std::function<bool(const AbstractMeshPtr& mesh)>& predicate = nullptr,
+              bool fastCheck                                                    = false);
 
   /**
    * @brief Launch a ray to try to pick a mesh in the scene.
@@ -1517,8 +1489,7 @@ public:
    * @returns an array of PickingInfo
    */
   std::vector<std::optional<PickingInfo>>
-  multiPick(int x, int y,
-            const std::function<bool(AbstractMesh* mesh)>& predicate,
+  multiPick(int x, int y, const std::function<bool(AbstractMesh* mesh)>& predicate,
             const CameraPtr& camera = nullptr);
 
   /**
@@ -1530,8 +1501,7 @@ public:
    * @returns an array of PickingInfo
    */
   std::vector<std::optional<PickingInfo>>
-  multiPickWithRay(const Ray& ray,
-                   const std::function<bool(AbstractMesh* mesh)>& predicate);
+  multiPickWithRay(const Ray& ray, const std::function<bool(AbstractMesh* mesh)>& predicate);
 
   /**
    * @brief Force the value of meshUnderPointer.
@@ -1620,9 +1590,8 @@ public:
    * @param attachCameraControls has default false, when true attaches camera
    * controls to the canvas.
    */
-  void createDefaultCamera(bool createArcRotateCamera = false,
-                           bool replace               = false,
-                           bool attachCameraControls  = false);
+  void createDefaultCamera(bool createArcRotateCamera = false, bool replace = false,
+                           bool attachCameraControls = false);
 
   /**
    * @brief Creates a default camera and a default light.
@@ -1635,9 +1604,8 @@ public:
    * @param attachCameraControls has the default false, when true attaches
    * camera controls to the canvas.
    */
-  void createDefaultCameraOrLight(bool createArcRotateCamera = false,
-                                  bool replace               = false,
-                                  bool attachCameraControls  = false);
+  void createDefaultCameraOrLight(bool createArcRotateCamera = false, bool replace = false,
+                                  bool attachCameraControls = false);
 
   /**
    * @brief Creates a new sky box.
@@ -1652,9 +1620,8 @@ public:
    * scene.environmentTexture must match the current skybox texture
    * @returns a new mesh holding the sky box
    */
-  MeshPtr createDefaultSkybox(BaseTexturePtr environmentTexture = nullptr,
-                              bool pbr = false, float scale = 1000.f,
-                              float blur               = 0.f,
+  MeshPtr createDefaultSkybox(BaseTexturePtr environmentTexture = nullptr, bool pbr = false,
+                              float scale = 1000.f, float blur = 0.f,
                               bool setGlobalEnvTexture = true);
 
   /**
@@ -1663,8 +1630,8 @@ public:
    * @param options defines the options you can use to configure the environment
    * @returns the new EnvironmentHelper
    */
-  std::unique_ptr<EnvironmentHelper> createDefaultEnvironment(
-    const std::optional<IEnvironmentHelperOptions>& options = std::nullopt);
+  std::unique_ptr<EnvironmentHelper>
+  createDefaultEnvironment(const std::optional<IEnvironmentHelperOptions>& options = std::nullopt);
 
   /** Tags **/
 
@@ -1715,14 +1682,9 @@ public:
    */
   void setRenderingOrder(
     unsigned int renderingGroupId,
-    const std::function<int(const SubMesh* a, const SubMesh* b)>&
-      opaqueSortCompareFn
-    = nullptr,
-    const std::function<int(const SubMesh* a, const SubMesh* b)>&
-      alphaTestSortCompareFn
-    = nullptr,
-    const std::function<int(const SubMesh* a, const SubMesh* b)>&
-      transparentSortCompareFn
+    const std::function<int(const SubMesh* a, const SubMesh* b)>& opaqueSortCompareFn    = nullptr,
+    const std::function<int(const SubMesh* a, const SubMesh* b)>& alphaTestSortCompareFn = nullptr,
+    const std::function<int(const SubMesh* a, const SubMesh* b)>& transparentSortCompareFn
     = nullptr);
 
   /**
@@ -1736,10 +1698,8 @@ public:
    * @param stencil Automatically clears stencil between groups if true and
    * autoClear is true.
    */
-  void setRenderingAutoClearDepthStencil(unsigned int renderingGroupId,
-                                         bool autoClearDepthStencil,
-                                         bool depth   = true,
-                                         bool stencil = true);
+  void setRenderingAutoClearDepthStencil(unsigned int renderingGroupId, bool autoClearDepthStencil,
+                                         bool depth = true, bool stencil = true);
 
   /**
    * @brief Gets the current auto clear configuration for one rendering group of
@@ -1747,8 +1707,7 @@ public:
    * @param index the rendering group index to get the information for
    * @returns The auto clear setup for the requested rendering group
    */
-  std::optional<IRenderingManagerAutoClearSetup>
-  getAutoClearDepthStencilSetup(size_t index);
+  std::optional<IRenderingManagerAutoClearSetup> getAutoClearDepthStencilSetup(size_t index);
 
   /**
    * @brief Will flag all materials as dirty to trigger new shader compilation.
@@ -1757,25 +1716,22 @@ public:
    * @param predicate If not null, it will be used to specifiy if a material has
    * to be marked as dirty
    */
-  void
-  markAllMaterialsAsDirty(unsigned int flag,
-                          const std::function<bool(Material* mat)>& predicate
-                          = nullptr);
+  void markAllMaterialsAsDirty(unsigned int flag,
+                               const std::function<bool(Material* mat)>& predicate = nullptr);
 
   /**
    * @brief Hidden
    */
-  IFileRequest _loadFile(
-    const std::string& url,
-    const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
-                             const std::string& responseURL)>& onSuccess);
+  IFileRequest
+  _loadFile(const std::string& url,
+            const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
+                                     const std::string& responseURL)>& onSuccess);
 
   /**
    * @brief Hidden
    */
   std::variant<std::string, ArrayBuffer>
-  _loadFileAsync(const std::string& url,
-                 const std::optional<bool>& useDatabase    = std::nullopt,
+  _loadFileAsync(const std::string& url, const std::optional<bool>& useDatabase = std::nullopt,
                  const std::optional<bool>& useArrayBuffer = std::nullopt);
 
   /**
@@ -1799,8 +1755,7 @@ protected:
    * @brief Creates a new Scene.
    * @param engine defines the engine to use to render this scene
    */
-  explicit Scene(Engine* engine,
-                 const std::optional<SceneOptions>& options = std::nullopt);
+  explicit Scene(Engine* engine, const std::optional<SceneOptions>& options = std::nullopt);
 
 private:
   /**
@@ -1812,27 +1767,25 @@ private:
   void _createUbo();
   void _createAlternateUbo();
   // Pointers handling
-  std::optional<PickingInfo> _pickSpriteButKeepRay(
-    const std::optional<PickingInfo>& originalPointerInfo, int x, int y,
-    const std::function<bool(Sprite* sprite)>& predicate = nullptr,
-    bool fastCheck = false, const CameraPtr& camera = nullptr);
+  std::optional<PickingInfo>
+  _pickSpriteButKeepRay(const std::optional<PickingInfo>& originalPointerInfo, int x, int y,
+                        const std::function<bool(Sprite* sprite)>& predicate = nullptr,
+                        bool fastCheck = false, const CameraPtr& camera = nullptr);
   void _setRayOnPointerInfo(PointerInfo& pointerInfo);
-  Scene& _processPointerMove(std::optional<PickingInfo>& pickResult,
-                             const PointerEvent& evt);
+  Scene& _processPointerMove(std::optional<PickingInfo>& pickResult, const PointerEvent& evt);
   bool _checkPrePointerObservable(const std::optional<PickingInfo>& pickResult,
-                                  const PointerEvent& evt,
-                                  PointerEventTypes type);
-  Scene& _processPointerDown(std::optional<PickingInfo>& pickResult,
-                             const PointerEvent& evt);
-  Scene& _processPointerUp(std::optional<PickingInfo>& pickResult,
-                           const PointerEvent& evt, const ClickInfo& clickInfo);
+                                  const PointerEvent& evt, PointerEventTypes type);
+  Scene& _processPointerDown(std::optional<PickingInfo>& pickResult, const PointerEvent& evt);
+  Scene& _processPointerUp(std::optional<PickingInfo>& pickResult, const PointerEvent& evt,
+                           const ClickInfo& clickInfo);
   void _animate();
   /**
    * @brief Hidden
    */
-  AnimationValue _processLateAnimationBindingsForMatrices(
-    float holderTotalWeight, std::vector<RuntimeAnimation*>& holderAnimations,
-    Matrix& holderOriginalValue);
+  AnimationValue
+  _processLateAnimationBindingsForMatrices(float holderTotalWeight,
+                                           std::vector<RuntimeAnimation*>& holderAnimations,
+                                           Matrix& holderOriginalValue);
   /**
    * @brief Hidden
    */
@@ -1846,8 +1799,7 @@ private:
   void _evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh);
   void _evaluateActiveMeshes();
   void _activeMesh(AbstractMesh* sourceMesh, AbstractMesh* mesh);
-  void _renderForCamera(const CameraPtr& camera,
-                        const CameraPtr& rigParent = nullptr);
+  void _renderForCamera(const CameraPtr& camera, const CameraPtr& rigParent = nullptr);
   void _bindFrameBuffer();
   void _processSubCameras(const CameraPtr& camera);
   void _checkIntersections();
@@ -1858,10 +1810,9 @@ private:
   void _onKeyDownEvent(KeyboardEvent&& evt);
   void _onKeyUpEvent(KeyboardEvent&& evt);
   /** Picking **/
-  std::optional<PickingInfo> _internalPick(
-    const std::function<Ray(Matrix& world)>& rayFunction,
-    const std::function<bool(const AbstractMeshPtr& mesh)>& predicate,
-    bool fastCheck);
+  std::optional<PickingInfo>
+  _internalPick(const std::function<Ray(Matrix& world)>& rayFunction,
+                const std::function<bool(const AbstractMeshPtr& mesh)>& predicate, bool fastCheck);
   std::vector<std::optional<PickingInfo>>
   _internalMultiPick(const std::function<Ray(Matrix& world)>& rayFunction,
                      const std::function<bool(AbstractMesh* mesh)>& predicate);
@@ -1871,8 +1822,7 @@ private:
    */
   std::optional<PickingInfo>
   _internalPickSprites(const Ray& ray,
-                       const std::function<bool(Sprite* sprite)>& predicate
-                       = nullptr,
+                       const std::function<bool(Sprite* sprite)>& predicate = nullptr,
                        bool fastCheck = false, CameraPtr camera = nullptr);
   /** Tags **/
   std::vector<std::string> _getByTags();
@@ -1965,39 +1915,33 @@ protected:
   /**
    * @brief Sets the animation properties override.
    */
-  void set_animationPropertiesOverride(
-    const AnimationPropertiesOverridePtr& value) override;
+  void set_animationPropertiesOverride(const AnimationPropertiesOverridePtr& value) override;
 
   // Events
   /**
    * @brief Sets a function to be executed when this scene is disposed.
    */
-  void set_onDispose(
-    const std::function<void(Scene* scene, EventState& es)>& callback);
+  void set_onDispose(const std::function<void(Scene* scene, EventState& es)>& callback);
 
   /**
    * @brief Sets a function to be executed before rendering this scene.
    */
-  void set_beforeRender(
-    const std::function<void(Scene* scene, EventState& es)>& callback);
+  void set_beforeRender(const std::function<void(Scene* scene, EventState& es)>& callback);
 
   /**
    * @brief Sets a function to be executed after rendering this scene.
    */
-  void set_afterRender(
-    const std::function<void(Scene* scene, EventState& es)>& callback);
+  void set_afterRender(const std::function<void(Scene* scene, EventState& es)>& callback);
 
   /**
    * @brief Sets a function to be executed before rendering a camera.
    */
-  void set_beforeCameraRender(
-    const std::function<void(Camera* camera, EventState& es)>& callback);
+  void set_beforeCameraRender(const std::function<void(Camera* camera, EventState& es)>& callback);
 
   /**
    * @brief Sets a function to be executed after rendering a camera.
    */
-  void set_afterCameraRender(
-    const std::function<void(Camera* camera, EventState& es)>& callback);
+  void set_afterCameraRender(const std::function<void(Camera* camera, EventState& es)>& callback);
 
   // Gamepads
 
@@ -2121,8 +2065,7 @@ protected:
    * @see http://doc.babylonjs.com/how_to/how_to_use_postprocessrenderpipeline
    * @see http://doc.babylonjs.com/how_to/using_default_rendering_pipeline
    */
-  std::unique_ptr<PostProcessRenderPipelineManager>&
-  get_postProcessRenderPipelineManager();
+  std::unique_ptr<PostProcessRenderPipelineManager>& get_postProcessRenderPipelineManager();
 
   /**
    * @brief Gets the main sound track played by the scene.
@@ -2343,8 +2286,7 @@ public:
    * No setter as we it is a shared configuration, you can set the values
    * instead.
    */
-  ReadOnlyProperty<Scene, ImageProcessingConfigurationPtr>
-    imageProcessingConfiguration;
+  ReadOnlyProperty<Scene, ImageProcessingConfigurationPtr> imageProcessingConfiguration;
 
   // Events
 
@@ -2356,8 +2298,7 @@ public:
   /**
    * Sets a function to be executed when this scene is disposed
    */
-  WriteOnlyProperty<Scene, std::function<void(Scene* scene, EventState& es)>>
-    onDispose;
+  WriteOnlyProperty<Scene, std::function<void(Scene* scene, EventState& es)>> onDispose;
 
   /**
    * An event triggered before rendering the scene (right after animations and
@@ -2368,8 +2309,7 @@ public:
   /**
    * Sets a function to be executed before rendering this scene
    */
-  WriteOnlyProperty<Scene, std::function<void(Scene* scene, EventState& es)>>
-    beforeRender;
+  WriteOnlyProperty<Scene, std::function<void(Scene* scene, EventState& es)>> beforeRender;
 
   /**
    * An event triggered after rendering the scene
@@ -2379,8 +2319,7 @@ public:
   /**
    * Sets a function to be executed after rendering this scene
    */
-  WriteOnlyProperty<Scene, std::function<void(Scene* scene, EventState& es)>>
-    afterRender;
+  WriteOnlyProperty<Scene, std::function<void(Scene* scene, EventState& es)>> afterRender;
 
   /**
    * An event triggered before animating the scene
@@ -2424,8 +2363,7 @@ public:
   /**
    * Sets a function to be executed before rendering a camera
    */
-  WriteOnlyProperty<Scene, std::function<void(Camera* scene, EventState& es)>>
-    beforeCameraRender;
+  WriteOnlyProperty<Scene, std::function<void(Camera* scene, EventState& es)>> beforeCameraRender;
   /**
    * An event triggered after rendering a camera
    */
@@ -2434,8 +2372,7 @@ public:
   /**
    * Sets a function to be executed after rendering a camera
    */
-  WriteOnlyProperty<Scene, std::function<void(Camera* scene, EventState& es)>>
-    afterCameraRender;
+  WriteOnlyProperty<Scene, std::function<void(Camera* scene, EventState& es)>> afterCameraRender;
 
   /**
    * An event triggered when active meshes evaluation is about to start
@@ -2622,23 +2559,19 @@ public:
   std::function<bool(const AbstractMeshPtr& mesh)> pointerMovePredicate;
 
   /** Deprecated. Use onPointerObservable instead */
-  std::function<void(const PointerEvent& evt,
-                     const std::optional<PickingInfo>& pickInfo,
+  std::function<void(const PointerEvent& evt, const std::optional<PickingInfo>& pickInfo,
                      PointerEventTypes type)>
     onPointerMove;
   /** Deprecated. Use onPointerObservable instead */
-  std::function<void(const PointerEvent& evt,
-                     const std::optional<PickingInfo>& pickInfo,
+  std::function<void(const PointerEvent& evt, const std::optional<PickingInfo>& pickInfo,
                      PointerEventTypes type)>
     onPointerDown;
   /** Deprecated. Use onPointerObservable instead */
-  std::function<void(const PointerEvent& evt,
-                     const std::optional<PickingInfo>& pickInfo,
+  std::function<void(const PointerEvent& evt, const std::optional<PickingInfo>& pickInfo,
                      PointerEventTypes type)>
     onPointerUp;
   /** Deprecated. Use onPointerObservable instead */
-  std::function<void(const PointerEvent& evt,
-                     const std::optional<PickingInfo>& pickInfo)>
+  std::function<void(const PointerEvent& evt, const std::optional<PickingInfo>& pickInfo)>
     onPointerPick;
 
   /**
@@ -2958,8 +2891,7 @@ public:
   bool collisionsEnabled;
 
   /** Hidden */
-  ReadOnlyProperty<Scene, std::unique_ptr<ICollisionCoordinator>>
-    collisionCoordinator;
+  ReadOnlyProperty<Scene, std::unique_ptr<ICollisionCoordinator>> collisionCoordinator;
 
   /**
    * Defines the gravity applied to this scene (used only for collisions)
@@ -3168,8 +3100,7 @@ public:
   /**
    * Gets the depth renderer object.
    */
-  ReadOnlyProperty<Scene, std::unordered_map<std::string, DepthRendererPtr>>
-    depthRenderer;
+  ReadOnlyProperty<Scene, std::unordered_map<std::string, DepthRendererPtr>> depthRenderer;
 
   /**
    * Gets the current geometry buffer associated to the scene
@@ -3408,8 +3339,7 @@ public:
   /**
    * Lambda returning the list of potentially active sub meshes.
    */
-  std::function<std::vector<SubMesh*>(AbstractMesh* mesh)>
-    getActiveSubMeshCandidates;
+  std::function<std::vector<SubMesh*>(AbstractMesh* mesh)> getActiveSubMeshCandidates;
 
   /**
    * Lambda returning the list of potentially intersecting sub meshes.
@@ -3420,8 +3350,7 @@ public:
   /**
    * Lambda returning the list of potentially colliding sub meshes.
    */
-  std::function<std::vector<SubMesh*>(AbstractMesh* mesh,
-                                      const Collider& collider)>
+  std::function<std::vector<SubMesh*>(AbstractMesh* mesh, const Collider& collider)>
     getCollidingSubMeshCandidates;
 
   /**
@@ -3463,18 +3392,16 @@ private:
   std::unique_ptr<GamepadManager> _gamepadManager;
   // Click events
   std::function<void(
-    Observable<PointerInfoPre>& obs1, Observable<PointerInfo>& obs2,
-    const PointerEvent& evt,
-    const std::function<void(const ClickInfo& clickInfo,
-                             std::optional<PickingInfo>& pickResult)>& cb)>
+    Observable<PointerInfoPre>& obs1, Observable<PointerInfo>& obs2, const PointerEvent& evt,
+    const std::function<void(const ClickInfo& clickInfo, std::optional<PickingInfo>& pickResult)>&
+      cb)>
     _initClickEvent;
   std::function<AbstractActionManagerPtr(const AbstractActionManagerPtr& act,
                                          const ClickInfo& clickInfo)>
     _initActionManager;
   std::function<void(
     unsigned int btn, const ClickInfo& clickInfo,
-    const std::function<void(const ClickInfo& clickInfo,
-                             const PointerInfo& pickResult)>& cb)>
+    const std::function<void(const ClickInfo& clickInfo, const PointerInfo& pickResult)>& cb)>
     _delayedSimpleClick;
   milliseconds_t _delayedSimpleClickTimeout;
   milliseconds_t _previousDelayedSimpleClickTimeout;
@@ -3532,8 +3459,7 @@ private:
   // Skeletons
   bool _skeletonsEnabled;
   // Postprocesses
-  std::unique_ptr<PostProcessRenderPipelineManager>
-    _postProcessRenderPipelineManager;
+  std::unique_ptr<PostProcessRenderPipelineManager> _postProcessRenderPipelineManager;
   // Collisions
   /** Hidden */
   std::unique_ptr<ICollisionCoordinator> _collisionCoordinator;

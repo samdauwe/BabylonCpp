@@ -399,10 +399,10 @@ def make_headerless_samples_in_category(category_name, category_folder):
 
 fill_H_CPP_files()
 
-category_name = "Meshes"
-category_folder = "meshes"
+category_name = "Animations"
+category_folder = "animations"
 
-# filename_no_extension = "shader_material_box_scene"
+# filename_no_extension = "directional_light_scene"
 # make_headerless_sample(filename_no_extension, category_name)
 
 make_headerless_samples_in_category(category_name, category_folder)

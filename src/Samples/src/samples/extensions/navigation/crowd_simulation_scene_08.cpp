@@ -1,43 +1,40 @@
-#include <babylon/samples/samples_index.h>
-#include <babylon/samples/extensions/navigation/crowd_simulation_utils.h>
+#include <vector>
+
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/extensions/navigation/crowd_simulation.h>
 #include <babylon/interfaces/icanvas.h>
+#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/mesh.h>
-#include <vector>
-#include <babylon/interfaces/irenderable_scene.h>
-
+#include <babylon/samples/extensions/navigation/crowd_simulation_utils.h>
+#include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
 namespace Samples {
 
 /**
- * @brief The scene class simulates 200 agents. Two groups of agents walk toward
- * each other and intersect. Precision high.
+ * @brief The scene class simulates 200 agents. Two groups of agents walk toward each other and
+ * intersect. Precision high.
  */
 class CrowdSimulationScene08 : public IRenderableScene {
 
 public:
-  CrowdSimulationScene08(ICanvas* iCanvas)
-      : IRenderableScene(iCanvas), _crowdSimulation{nullptr}
+  CrowdSimulationScene08(ICanvas* iCanvas) : IRenderableScene(iCanvas), _crowdSimulation{nullptr}
   {
   }
 
-  ~CrowdSimulationScene08()
-  {
-  }
+  ~CrowdSimulationScene08() override = default;
 
-  const char* getName()
+  const char* getName() override
   {
     return "Crowd Simulation Scene 08";
   }
 
-  void initializeScene(ICanvas* canvas, Scene* scene)
+  void initializeScene(ICanvas* canvas, Scene* scene) override
   {
     // Change the clear color
     scene->clearColor = Color4(0.36f, 0.36f, 0.36f);
@@ -122,5 +119,6 @@ private:
 }; // end of class CrowdSimulationScene08
 
 BABYLON_REGISTER_SAMPLE("Extensions", CrowdSimulationScene08)
+
 } // end of namespace Samples
 } // end of namespace BABYLON

@@ -1,14 +1,13 @@
-#include <babylon/samples/samples_index.h>
 #include <babylon/bones/bone.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/engines/scene.h>
+#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/loading/scene_loader.h>
-#include <babylon/meshes/mesh.h>
-#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/math/vector3.h>
-
+#include <babylon/meshes/mesh.h>
+#include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
 
@@ -33,7 +32,8 @@ public:
   {
   }
 
-  ~BoneRotationInWorldSpaceScene() override {}
+  ~BoneRotationInWorldSpaceScene() override = default;
+
   const char* getName() override
   {
     return "Bone Rotation In World Space Scene";
@@ -72,7 +72,6 @@ public:
       });
   }
 
-
 private:
   Vector3 _rotationAxis;
   AbstractMeshPtr _mesh;
@@ -81,5 +80,6 @@ private:
 }; // end of class AnimationsScene
 
 BABYLON_REGISTER_SAMPLE("Animations", BoneRotationInWorldSpaceScene)
+
 } // end of namespace Samples
 } // end of namespace BABYLON

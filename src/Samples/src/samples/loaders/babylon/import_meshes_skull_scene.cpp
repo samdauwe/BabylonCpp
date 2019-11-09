@@ -4,7 +4,6 @@
 #include <babylon/lights/point_light.h>
 #include <babylon/loading/scene_loader.h>
 #include <babylon/meshes/mesh.h>
-#include <babylon/samples/loaders/babylon/_loaders_babylon_samples_index.h>
 #include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
@@ -24,9 +23,7 @@ public:
   {
   }
 
-  ~ImportMeshesSkullScene() override
-  {
-  }
+  ~ImportMeshesSkullScene() override = default;
 
   const char* getName() override
   {
@@ -66,7 +63,7 @@ private:
 
 }; // end of class ImportMeshesSkullScene
 
-BABYLON_REGISTER_SAMPLE(_LoadersBabylonSamplesIndex::CategoryName(), ImportMeshesSkullScene)
+BABYLON_REGISTER_SAMPLE("Loaders - babylon format", ImportMeshesSkullScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

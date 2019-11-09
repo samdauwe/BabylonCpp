@@ -42,7 +42,7 @@ HashValue Hash(const char* str, int len)
   return value;
 }
 
-HashValue Hash(string_view str)
+HashValue Hash(const std::string& str)
 {
   return Hash(str.data(), static_cast<int>(str.length()));
 }
@@ -55,8 +55,7 @@ HashValue HashCaseInsensitive(const char* str, size_t len)
   size_t count    = 0;
   HashValue value = kHashOffsetBasis;
   while (*str && count < len) {
-    value = (value ^ static_cast<unsigned char>(tolower(*str++)))
-            * kHashPrimeMultiplier;
+    value = (value ^ static_cast<unsigned char>(tolower(*str++))) * kHashPrimeMultiplier;
     ++count;
   }
   return value;

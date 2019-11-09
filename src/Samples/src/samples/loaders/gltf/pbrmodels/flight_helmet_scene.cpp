@@ -4,7 +4,6 @@
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/loading/glTF/gltf_file_loader.h>
 #include <babylon/loading/scene_loader.h>
-#include <babylon/samples/loaders/gltf/_loaders_gtlf_samples_index.h>
 #include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
@@ -22,9 +21,7 @@ struct FlightHelmetScene : public IRenderableScene {
     GLTF2::GLTFFileLoader::RegisterAsSceneLoaderPlugin();
   }
 
-  ~FlightHelmetScene() override
-  {
-  }
+  ~FlightHelmetScene() override = default;
 
   const char* getName() override
   {
@@ -53,7 +50,7 @@ struct FlightHelmetScene : public IRenderableScene {
 
 }; // end of struct FlightHelmetScene
 
-BABYLON_REGISTER_SAMPLE(_LoadersGLTFSamplesIndex::CategoryName(), FlightHelmetScene)
+BABYLON_REGISTER_SAMPLE("Loaders - glTF format", FlightHelmetScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

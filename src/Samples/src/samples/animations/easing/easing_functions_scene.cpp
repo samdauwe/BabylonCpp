@@ -1,15 +1,14 @@
-#include <babylon/samples/samples_index.h>
 #include <babylon/animations/animation.h>
 #include <babylon/animations/easing/bezier_curve_ease.h>
 #include <babylon/animations/easing/circle_ease.h>
 #include <babylon/animations/ianimation_key.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/engines/scene.h>
+#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/mesh.h>
-#include <babylon/interfaces/irenderable_scene.h>
-
+#include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
 namespace Samples {
@@ -26,9 +25,7 @@ struct EasingFunctionsScene : public IRenderableScene {
   {
   }
 
-  ~EasingFunctionsScene()
-  {
-  }
+  ~EasingFunctionsScene() override = default;
 
   const char* getName() override
   {
@@ -139,8 +136,7 @@ struct EasingFunctionsScene : public IRenderableScene {
 
 }; // end of struct EasingFunctionsScene
 
-
-
 BABYLON_REGISTER_SAMPLE("Animations", EasingFunctionsScene)
+
 } // end of namespace Samples
 } // end of namespace BABYLON

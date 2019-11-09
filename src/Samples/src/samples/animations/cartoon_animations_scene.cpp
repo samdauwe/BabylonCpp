@@ -1,16 +1,15 @@
-#include <babylon/samples/samples_index.h>
 #include <babylon/animations/animation.h>
 #include <babylon/animations/ianimation_key.h>
 #include <babylon/cameras/target_camera.h>
 #include <babylon/engines/scene.h>
+#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/directional_light.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/lights/spot_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh_builder.h>
-#include <babylon/interfaces/irenderable_scene.h>
-
+#include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
 namespace Samples {
@@ -25,10 +24,16 @@ namespace Samples {
 struct CartoonAnimationsScene : public IRenderableScene {
 
 public:
-  CartoonAnimationsScene(ICanvas* iCanvas) : IRenderableScene(iCanvas) {}
-  ~CartoonAnimationsScene() = default;
+  CartoonAnimationsScene(ICanvas* iCanvas) : IRenderableScene(iCanvas)
+  {
+  }
 
-  const char* getName() override { return "Cartoon Animations Scene"; }
+  ~CartoonAnimationsScene() override = default;
+
+  const char* getName() override
+  {
+    return "Cartoon Animations Scene";
+  }
 
   void initializeScene(ICanvas* canvas, Scene* scene) override
   {
@@ -238,5 +243,6 @@ public:
 }; // end of struct CartoonAnimationsScene
 
 BABYLON_REGISTER_SAMPLE("Animations", CartoonAnimationsScene)
+
 } // end of namespace Samples
 } // end of namespace BABYLON

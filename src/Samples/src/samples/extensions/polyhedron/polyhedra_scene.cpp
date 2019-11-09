@@ -1,17 +1,16 @@
-#include <babylon/samples/samples_index.h>
+#include <babylon/babylon_common.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/core/random.h>
 #include <babylon/engines/scene.h>
 #include <babylon/extensions/polyhedron/polyhedra.h>
+#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
-#include <babylon/babylon_common.h>
-#include <babylon/interfaces/irenderable_scene.h>
-
+#include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
 
@@ -24,9 +23,7 @@ public:
   {
   }
 
-  ~PolyhedraScene()
-  {
-  }
+  ~PolyhedraScene() override = default;
 
   const char* getName() override
   {
@@ -96,7 +93,7 @@ private:
 
 }; // end of struct PolyhedraScene
 
-
 BABYLON_REGISTER_SAMPLE("Extensions", PolyhedraScene)
+
 } // end of namespace Samples
 } // end of namespace BABYLON

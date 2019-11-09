@@ -1,16 +1,15 @@
-#include <babylon/samples/samples_index.h>
 #include <babylon/cameras/free_camera.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/extensions/hexplanetgeneration/simple_planet.h>
 #include <babylon/interfaces/icanvas.h>
+#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/vertex_data.h>
-#include <babylon/interfaces/irenderable_scene.h>
-
+#include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
 
@@ -19,14 +18,11 @@ namespace Samples {
 class ProceduralHexPlanetGenerationScene : public IRenderableScene {
 
 public:
-  ProceduralHexPlanetGenerationScene(ICanvas* iCanvas)
-      : IRenderableScene(iCanvas)
+  ProceduralHexPlanetGenerationScene(ICanvas* iCanvas) : IRenderableScene(iCanvas)
   {
   }
 
-  ~ProceduralHexPlanetGenerationScene()
-  {
-  }
+  ~ProceduralHexPlanetGenerationScene() override = default;
 
   const char* getName() override
   {
@@ -63,7 +59,7 @@ private:
 
 }; // end of class ProceduralHexPlanetGenerationScene
 
-
 BABYLON_REGISTER_SAMPLE("Extensions", ProceduralHexPlanetGenerationScene)
+
 } // end of namespace Samples
 } // end of namespace BABYLON

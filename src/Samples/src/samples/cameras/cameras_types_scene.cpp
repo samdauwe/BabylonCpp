@@ -1,11 +1,10 @@
-#include <babylon/samples/samples_index.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/cameras/free_camera.h>
 #include <babylon/engines/scene.h>
+#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/meshes/mesh.h>
-#include <babylon/interfaces/irenderable_scene.h>
-
+#include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
 namespace Samples {
@@ -17,9 +16,16 @@ namespace Samples {
  */
 struct CamerasTypesScene : public IRenderableScene {
 
-  CamerasTypesScene(ICanvas* iCanvas) : IRenderableScene(iCanvas)   { }
-  ~CamerasTypesScene() = default;
-  const char* getName() override { return "Cameras Scene"; }
+  CamerasTypesScene(ICanvas* iCanvas) : IRenderableScene(iCanvas)
+  {
+  }
+
+  ~CamerasTypesScene() override = default;
+
+  const char* getName() override
+  {
+    return "Cameras Scene";
+  }
 
   void initializeScene(ICanvas* canvas, Scene* scene) override
   {
@@ -52,7 +58,7 @@ struct CamerasTypesScene : public IRenderableScene {
 
 }; // end of struct CamerasTypesScene
 
-
 BABYLON_REGISTER_SAMPLE("Cameras", CamerasTypesScene)
+
 } // end of namespace Samples
 } // end of namespace BABYLON

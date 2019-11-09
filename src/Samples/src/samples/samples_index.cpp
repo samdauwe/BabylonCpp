@@ -3,8 +3,6 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/string.h>
 #include <babylon/interfaces/irenderable_scene.h>
-#include <babylon/samples/collisionsandintersections/_collisions_and_intersections_samples_index.h>
-#include <babylon/samples/loaders/_loaders_samples_index.h>
 #include <babylon/samples/materials/_materials_samples_index.h>
 #include <babylon/samples/optimizations/_optimizations_samples_index.h>
 #include <babylon/samples/particles/_particles_samples_index.h>
@@ -13,9 +11,9 @@
 #include <babylon/samples/specialfx/_special_fx_samples_index.h>
 #include <babylon/samples/textures/_textures_samples_index.h>
 
-#include <nlohmann/json.hpp>
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <nlohmann/json.hpp>
 
 namespace BABYLON {
 namespace Samples {
@@ -24,16 +22,6 @@ SamplesIndex::SamplesIndex()
 {
   // Initialize the samples index
   _samplesIndex = {
-    // Collisions and Intersections samples
-    {_CollisionsAndIntersectionsSamplesIndex::CategoryName(),
-     _CollisionsAndIntersectionsSamplesIndex()},
-    // Loaders - babylon format
-    {_LoadersBabylonSamplesIndex::CategoryName(),
-     _LoadersBabylonSamplesIndex()},
-#ifdef WITH_LOADERS
-    // Loaders - glTF format
-    {_LoadersGLTFSamplesIndex::CategoryName(), _LoadersGLTFSamplesIndex()},
-#endif
     // Materials samples
     {_MaterialsSamplesIndex::CategoryName(), _MaterialsSamplesIndex()},
     // Optimizations samples
@@ -81,8 +69,7 @@ void SamplesIndex::fillSamplesFailures() const
     {"VolumetricLightScatteringScene", {SampleFailureReasonKind::segFault}}};
 
   // all gltf samples fail under windows, with an empty rendering
-  for (const auto& sampleName :
-       getSampleNamesInCategory(_LoadersGLTFSamplesIndex::CategoryName())) {
+  for (const auto& sampleName : getSampleNamesInCategory("Loaders - glTF format")) {
     SampleFailureReason reason{SampleFailureReasonKind::empty3d, "Empty rendering under windows"};
     _samplesFailures[sampleName] = reason;
   }
@@ -104,7 +91,8 @@ void SamplesIndex::RegisterSample(const std::string& categoryName, const std::st
   _samplesIndex[categoryName].addSample(sampleName, fn);
 }
 
-std::optional<BABYLON::Samples::SampleFailureReason> SamplesIndex::doesSampleFail(const std::string& sampleName) const
+std::optional<BABYLON::Samples::SampleFailureReason>
+SamplesIndex::doesSampleFail(const std::string& sampleName) const
 {
   fillSamplesFailures();
 
@@ -128,12 +116,11 @@ bool SamplesIndex::sampleExists(const std::string& sampleName) const
 nlohmann::json ReadSampleInfoFile()
 {
   std::ifstream is("samples_info.json");
-  if (! is.good())
+  if (!is.good())
     is = std::ifstream("../samples_info.json");
-  if (! is.good())
+  if (!is.good())
     is = std::ifstream("../../samples_info.json");
-  if (is.good())
-  {
+  if (is.good()) {
     nlohmann::json j;
     is >> j;
     return j;
@@ -155,15 +142,12 @@ SampleInfo SamplesIndex::getSampleInfo(const std::string& sampleNameMixedCase) c
     return cache.at(sampleNameLowerCase);
 
   SampleInfo result;
-  for (const auto & element : _samplesInfo)
-  {
-    if (element["sample_name"] == sampleNameLowerCase)
-    {
-      result.Brief = element["brief"];
+  for (const auto& element : _samplesInfo) {
+    if (element["sample_name"] == sampleNameLowerCase) {
+      result.Brief      = element["brief"];
       result.HeaderFile = element["header_file"];
       result.SourceFile = element["source_file"];
-      for (const auto & link : element["links"])
-      {
+      for (const auto& link : element["links"]) {
         result.Links.push_back(link);
       }
     }
@@ -235,9 +219,8 @@ SamplesIndex::getSampleNamesInCategory(const std::string& categoryName) const
   return sampleNames;
 }
 
-IRenderableScenePtr
-SamplesIndex::createRenderableScene(const std::string& sampleName,
-                                    ICanvas* iCanvas) const
+IRenderableScenePtr SamplesIndex::createRenderableScene(const std::string& sampleName,
+                                                        ICanvas* iCanvas) const
 {
   for (const auto& item : _samplesIndex) {
     if (stl_util::contains(item.second.samples(), sampleName)) {
@@ -251,14 +234,14 @@ SamplesIndex::createRenderableScene(const std::string& sampleName,
 void SamplesIndex::listSamples()
 {
   auto categories = getCategoryNames();
-  for (const auto & category : categories)
-  {
-    std::cout << "********************************************" << "\n";
+  for (const auto& category : categories) {
+    std::cout << "********************************************"
+              << "\n";
     std::cout << "Category: " << category << "\n";
-    std::cout << "********************************************" << "\n";
+    std::cout << "********************************************"
+              << "\n";
     auto samples = getSampleNamesInCategory(category);
-    for (const auto & sample : samples) 
-    {
+    for (const auto& sample : samples) {
       std::cout << sample << "\n";
     }
   }
@@ -269,16 +252,12 @@ std::string SampleFailureReason_Str(SampleFailureReasonKind s)
   switch (s) {
     case SampleFailureReasonKind::segFault:
       return "Segmentation fault";
-      break;
     case SampleFailureReasonKind::processHung:
       return "Process hung (infinite loop?)";
-      break;
     case SampleFailureReasonKind::empty3d:
       return "3D rendering is empty";
-      break;
     case SampleFailureReasonKind::broken3d:
       return "Broken (bad rendering and/or bad behavior)";
-      break;
     default:
       throw "Unhandled enum!";
   }
