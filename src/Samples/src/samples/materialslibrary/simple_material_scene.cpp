@@ -1,28 +1,25 @@
-#include <babylon/samples/samples_index.h>
-#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/cameras/free_camera.h>
+#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/materialslibrary/simple/simple_material.h>
 #include <babylon/meshes/ground_mesh.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
 namespace Samples {
 
 /**
-  * @brief Scene demonstrating the use of the simple material from the materials
-  * library.
-  */
+ * @brief Scene demonstrating the use of the simple material from the materials library.
+ */
 struct SimpleMaterialScene : public IRenderableScene {
 
   SimpleMaterialScene(ICanvas* iCanvas) : IRenderableScene(iCanvas)
   {
   }
 
-  ~SimpleMaterialScene()
-  {
-  }
+  ~SimpleMaterialScene() override = default;
 
   const char* getName() override
   {
@@ -53,5 +50,6 @@ struct SimpleMaterialScene : public IRenderableScene {
 }; // end of struct SimpleMaterialScene
 
 BABYLON_REGISTER_SAMPLE("Materials Library", SimpleMaterialScene)
+
 } // end of namespace Samples
 } // end of namespace BABYLON
