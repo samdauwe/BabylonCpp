@@ -26,52 +26,56 @@ class ShaderMaterialCloudsScene : public IRenderableScene {
 public:
   /** Vertex Shader **/
   static constexpr const char* cloudVertexShader
-    = "#ifdef GL_ES\n"
-      "precision highp float;\n"
-      "#endif\n"
-      "\n"
-      "// Attributes\n"
-      "attribute vec3 position;\n"
-      "attribute vec2 uv;\n"
-      "\n"
-      "// Uniforms\n"
-      "uniform mat4 worldViewProjection;\n"
-      "\n"
-      "// Varying\n"
-      "varying vec2 vUV;\n"
-      "\n"
-      "void main(void) {\n"
-      "    gl_Position = worldViewProjection * vec4(position, 1.0);\n"
-      "    vUV = uv;\n"
-      "}\n";
+    = R"ShaderCode(
+#ifdef GL_ES
+precision highp float;
+#endif
+
+// Attributes
+attribute vec3 position;
+attribute vec2 uv;
+
+// Uniforms
+uniform mat4 worldViewProjection;
+
+// Varying
+varying vec2 vUV;
+
+void main(void) {
+    gl_Position = worldViewProjection * vec4(position, 1.0);
+    vUV = uv;
+}
+)ShaderCode";
 
   /** Pixel (Fragment) Shader **/
   static constexpr const char* cloudFragmentShader
-    = "#ifdef GL_ES\n"
-      "precision highp float;\n"
-      "#endif\n"
-      "\n"
-      "// Varying\n"
-      "varying vec2 vUV;\n"
-      "\n"
-      "// Uniforms\n"
-      "uniform vec3 fogColor;\n"
-      "uniform float fogNear;\n"
-      "uniform float fogFar;\n"
-      "\n"
-      "// Samplers\n"
-      "uniform sampler2D textureSampler;\n"
-      "\n"
-      "void main(void) {\n"
-      "  float depth = gl_FragCoord.z / gl_FragCoord.w;\n"
-      "  float fogFactor = smoothstep(fogNear, fogFar, depth);\n"
-      "\n"
-      "  gl_FragColor = texture2D(textureSampler, vUV);\n"
-      "  gl_FragColor.w *= pow(abs(gl_FragCoord.z), 20.0);\n"
-      "  gl_FragColor = mix(gl_FragColor,\n"
-      "                     vec4(fogColor, gl_FragColor.w),\n"
-      "                     fogFactor);\n"
-      "}\n";
+    = R"ShaderCode(
+#ifdef GL_ES
+precision highp float;
+#endif
+
+// Varying
+varying vec2 vUV;
+
+// Uniforms
+uniform vec3 fogColor;
+uniform float fogNear;
+uniform float fogFar;
+
+// Samplers
+uniform sampler2D textureSampler;
+
+void main(void) {
+  float depth = gl_FragCoord.z / gl_FragCoord.w;
+  float fogFactor = smoothstep(fogNear, fogFar, depth);
+
+  gl_FragColor = texture2D(textureSampler, vUV);
+  gl_FragColor.w *= pow(abs(gl_FragCoord.z), 20.0);
+  gl_FragColor = mix(gl_FragColor,
+                     vec4(fogColor, gl_FragColor.w),
+                     fogFactor);
+}
+)ShaderCode";
 
 public:
   ShaderMaterialCloudsScene(ICanvas* iCanvas)

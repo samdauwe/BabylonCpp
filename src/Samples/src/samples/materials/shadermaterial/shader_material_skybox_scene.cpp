@@ -15,51 +15,55 @@ class ShaderMaterialSkyboxScene : public IRenderableScene {
 public:
   /** Vertex Shader **/
   static constexpr const char* gradientVertexShader
-    = "#ifdef GL_ES\n"
-      "precision mediump float;\n"
-      "#endif\n"
-      "\n"
-      "// Attributes\n"
-      "attribute vec3 position;\n"
-      "attribute vec3 normal;\n"
-      "attribute vec2 uv;\n"
-      "\n"
-      "// Uniforms\n"
-      "uniform mat4 worldViewProjection;\n"
-      "\n"
-      "// Varying\n"
-      "varying vec4 vPosition;\n"
-      "varying vec3 vNormal;\n"
-      "\n"
-      "void main(void) {\n"
-      "    vec4 p = vec4(position,1.);\n"
-      "    vPosition = p;\n"
-      "    vNormal = normal;\n"
-      "    gl_Position = worldViewProjection * p;\n"
-      "}\n";
+    = R"ShaderCode(
+#ifdef GL_ES
+precision mediump float;
+#endif
+
+// Attributes
+attribute vec3 position;
+attribute vec3 normal;
+attribute vec2 uv;
+
+// Uniforms
+uniform mat4 worldViewProjection;
+
+// Varying
+varying vec4 vPosition;
+varying vec3 vNormal;
+
+void main(void) {
+    vec4 p = vec4(position,1.);
+    vPosition = p;
+    vNormal = normal;
+    gl_Position = worldViewProjection * p;
+}
+)ShaderCode";
 
   /** Pixel (Fragment) Shader **/
   static constexpr const char* gradientPixelShader
-    = "#ifdef GL_ES\n"
-      "precision mediump float;\n"
-      "#endif\n"
-      "\n"
-      "// Uniforms\n"
-      "uniform float offset;\n"
-      "uniform mat4 worldView;\n"
-      "uniform vec3 topColor;\n"
-      "uniform vec3 bottomColor;\n"
-      "\n"
-      "// Varying\n"
-      "varying vec4 vPosition;\n"
-      "varying vec3 vNormal;\n"
-      "\n"
-      "void main(void)\n"
-      "{\n"
-      "  float h = normalize(vPosition+offset).y;\n"
-      "  gl_FragColor = vec4(mix(bottomColor,topColor,\n"
-      "                          max(pow(max(h,0.0),0.6),0.0)),1.0);\n"
-      "}\n";
+    = R"ShaderCode(
+#ifdef GL_ES
+precision mediump float;
+#endif
+
+// Uniforms
+uniform float offset;
+uniform mat4 worldView;
+uniform vec3 topColor;
+uniform vec3 bottomColor;
+
+// Varying
+varying vec4 vPosition;
+varying vec3 vNormal;
+
+void main(void)
+{
+  float h = normalize(vPosition+offset).y;
+  gl_FragColor = vec4(mix(bottomColor,topColor,
+                          max(pow(max(h,0.0),0.6),0.0)),1.0);
+}
+)ShaderCode";
 
 public:
   ShaderMaterialSkyboxScene(ICanvas* iCanvas) : IRenderableScene(iCanvas), _shaderMaterial{nullptr}

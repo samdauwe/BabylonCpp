@@ -257,13 +257,105 @@ def move_method(
             # remove ClassName::
             impl_lines_str[0] = impl_lines_str[0].replace(ClassName + "::", "")
             if add_override:
-                impl_lines_str[0] = impl_lines_str[0] + " override"
+                if ")" in impl_lines_str[0]:
+                    impl_lines_str[0] = impl_lines_str[0] + " override"
+                else:
+                    impl_lines_str[1] = impl_lines_str[1] + " override"
             if add_spacing:
                 impl_lines_str = list(map( lambda s : "  " + s, impl_lines_str ))
             lines_rewritten = lines_rewritten + impl_lines_str
 
     write_file_lines_no_eol(cpp_full_path, lines_rewritten)
     # print("\n".join(lines_rewritten))
+
+def group_multiline_strings(cpp_full_path):
+    def is_line_multiline_part(line):
+        return line.endswith("\"")
+
+    def unescape_line(line: str):
+        r = line.strip()
+        r = r.replace("\\n\"", "")
+        r = r.replace("\\\"", "\"")
+        r = r.replace("\\\\", "\\")
+        if r.startswith("\""):
+            r = r[1:]
+        if r.endswith("\""):
+            r = r[:-1]
+        return r
+
+    def format_multilines(line_elements):
+        start = "R\"ShaderCode(\n"
+        end   = ")ShaderCode\";"
+
+        separator_if_too_long = (
+              end[:-1] 
+            + "\n// Shader code string too long for msvc, it is splitted / joined here\n"
+            + start)
+        nb_lines_max = 400
+
+        output_lines = []
+
+        first_line = line_elements[0]
+        idx = first_line.index("\"")
+        output_lines.append( first_line[:idx] + start + unescape_line(first_line[idx + 1:]) )
+
+        
+        for i, line in enumerate(line_elements):
+            if i == 0:
+                continue
+            if i == len(line_elements) - 1:
+                if line[-1:] == ";":
+                    line = line[:-1]
+            output_lines.append(unescape_line(line))
+            if (i + 1) % nb_lines_max == 0:
+                output_lines.append(separator_if_too_long)
+
+        output_lines.append(end)
+        # print("\n".join(output_lines))
+        return output_lines
+
+
+    lines = read_file_lines_no_eol(cpp_full_path)
+
+    lines_rewritten = []
+
+    lines_multi_is_started = False
+    lines_multi = []
+    for i, line in enumerate(lines):
+        if lines_multi_is_started:
+            lines_multi.append(line)
+            if not is_line_multiline_part(line):
+                lines_multi_is_started = False
+
+                lines_rewritten = lines_rewritten + format_multilines(lines_multi)
+        else:
+            if is_line_multiline_part(line):
+                lines_multi_is_started = True
+                lines_multi = [ line ]
+            else:
+                lines_rewritten.append(line)
+
+    # print( "\n".join(lines_rewritten) )
+    write_file_lines_no_eol(cpp_full_path, lines_rewritten)
+
+
+def remove_close_open_namespaces(cpp_full_path):
+    what_to_search = """} // end of namespace Samples
+} // end of namespace BABYLON
+
+
+namespace BABYLON {
+namespace Samples {
+"""
+    with open(cpp_full_path, "r") as f_i:
+        content = f_i.read()
+    content = content.replace(what_to_search, "")
+    content = content.replace("\n\n\n\n\n", "\n\n")
+    content = content.replace("\n\n\n\n", "\n\n")
+    content = content.replace("\n\n\n", "\n\n")
+    
+    with open(cpp_full_path, "w") as f_o:
+        f_o.write(content)
 
 
 def make_headerless_sample(filename_no_extension, sample_category):
@@ -288,6 +380,9 @@ def make_headerless_sample(filename_no_extension, sample_category):
     move_method(cpp_full_path, ClassName, add_override=False, add_spacing=True)
     move_method(cpp_full_path, "~" + ClassName, add_override=False, add_spacing=True)
 
+    group_multiline_strings(cpp_full_path)
+    remove_close_open_namespaces(cpp_full_path)
+
 
 def make_headerless_samples_in_category(category_name, category_folder):
     samples = find_samples_in_category(category_folder)
@@ -296,12 +391,21 @@ def make_headerless_samples_in_category(category_name, category_folder):
         make_headerless_sample(sample, category_name)
 
 
+def correct_shader_multilines():
+    cpp_files = files_with_extension(CPP_DIR + "/samples/materials/shadermaterial", ".cpp")
+    for cpp_full_path in cpp_files:
+        print(cpp_full_path)
+        group_multiline_strings(cpp_full_path)
+    # print(cpp_files)
+
 fill_H_CPP_files()
 
-category_name = "Animations"
-category_folder = "animations"
+# category_name = "Shader Material"
+# category_folder = "materials/shadermaterial"
 
-# filename_no_extension = "directional_light_scene"
+# filename_no_extension = "shader_material_box_scene"
 # make_headerless_sample(filename_no_extension, category_name)
 
-make_headerless_samples_in_category(category_name, category_folder)
+# make_headerless_samples_in_category(category_name, category_folder)
+
+correct_shader_multilines()
