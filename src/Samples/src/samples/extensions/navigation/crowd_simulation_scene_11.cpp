@@ -10,8 +10,8 @@
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/mesh.h>
-#include <babylon/samples/extensions/navigation/crowd_simulation_utils.h>
 #include <babylon/samples/samples_index.h>
+#include <babylon/samples/samples_utils.h>
 
 namespace BABYLON {
 namespace Samples {

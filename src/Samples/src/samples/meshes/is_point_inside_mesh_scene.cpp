@@ -6,8 +6,8 @@
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/instanced_mesh.h>
 #include <babylon/meshes/mesh_builder.h>
-#include <babylon/samples/meshes/mesh_utils.h>
 #include <babylon/samples/samples_index.h>
+#include <babylon/samples/samples_utils.h>
 
 namespace BABYLON {
 namespace Samples {
