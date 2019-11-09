@@ -44,8 +44,7 @@ void MaterialHelper::BindEyePosition(const EffectPtr& effect, Scene* scene)
 }
 
 void MaterialHelper::PrepareDefinesForMergedUV(const BaseTexturePtr& texture,
-                                               MaterialDefines& defines,
-                                               const std::string& key)
+                                               MaterialDefines& defines, const std::string& key)
 {
   defines._needUVs     = true;
   defines.boolDef[key] = true;
@@ -63,8 +62,7 @@ void MaterialHelper::PrepareDefinesForMergedUV(const BaseTexturePtr& texture,
   }
 }
 
-void MaterialHelper::BindTextureMatrix(BaseTexture& texture,
-                                       UniformBuffer& uniformBuffer,
+void MaterialHelper::BindTextureMatrix(BaseTexture& texture, UniformBuffer& uniformBuffer,
                                        const std::string& key)
 {
   auto matrix = *texture.getTextureMatrix();
@@ -74,28 +72,26 @@ void MaterialHelper::BindTextureMatrix(BaseTexture& texture,
 
 bool MaterialHelper::GetFogState(AbstractMesh* mesh, Scene* scene)
 {
-  return (scene->fogEnabled() && mesh->applyFog()
-          && scene->fogMode() != Scene::FOGMODE_NONE);
+  return (scene->fogEnabled() && mesh->applyFog() && scene->fogMode() != Scene::FOGMODE_NONE);
 }
 
 void MaterialHelper::PrepareDefinesForMisc(AbstractMesh* mesh, Scene* scene,
-                                           bool useLogarithmicDepth,
-                                           bool pointsCloud, bool fogEnabled,
-                                           bool alphaTest,
+                                           bool useLogarithmicDepth, bool pointsCloud,
+                                           bool fogEnabled, bool alphaTest,
                                            MaterialDefines& defines)
 {
   if (defines._areMiscDirty) {
-    defines.boolDef["LOGARITHMICDEPTH"] = useLogarithmicDepth;
-    defines.boolDef["POINTSIZE"]        = pointsCloud;
-    defines.boolDef["FOG"] = fogEnabled && GetFogState(mesh, scene);
+    defines.boolDef["LOGARITHMICDEPTH"]  = useLogarithmicDepth;
+    defines.boolDef["POINTSIZE"]         = pointsCloud;
+    defines.boolDef["FOG"]               = fogEnabled && GetFogState(mesh, scene);
     defines.boolDef["NONUNIFORMSCALING"] = mesh->nonUniformScaling();
     defines.boolDef["ALPHATEST"]         = alphaTest;
   }
 }
 
-void MaterialHelper::PrepareDefinesForFrameBoundValues(
-  Scene* scene, Engine* engine, MaterialDefines& defines, bool useInstances,
-  std::optional<bool> useClipPlane)
+void MaterialHelper::PrepareDefinesForFrameBoundValues(Scene* scene, Engine* engine,
+                                                       MaterialDefines& defines, bool useInstances,
+                                                       std::optional<bool> useClipPlane)
 {
   auto changed       = false;
   auto useClipPlane1 = false;
@@ -103,18 +99,13 @@ void MaterialHelper::PrepareDefinesForFrameBoundValues(
   auto useClipPlane3 = false;
   auto useClipPlane4 = false;
 
-  useClipPlane1 = useClipPlane == std::nullopt ?
-                    (scene->clipPlane != std::nullopt) :
-                    *useClipPlane;
-  useClipPlane2 = useClipPlane == std::nullopt ?
-                    (scene->clipPlane2 != std::nullopt) :
-                    *useClipPlane;
-  useClipPlane3 = useClipPlane == std::nullopt ?
-                    (scene->clipPlane3 != std::nullopt) :
-                    *useClipPlane;
-  useClipPlane4 = useClipPlane == std::nullopt ?
-                    (scene->clipPlane4 != std::nullopt) :
-                    *useClipPlane;
+  useClipPlane1 = useClipPlane == std::nullopt ? (scene->clipPlane != std::nullopt) : *useClipPlane;
+  useClipPlane2
+    = useClipPlane == std::nullopt ? (scene->clipPlane2 != std::nullopt) : *useClipPlane;
+  useClipPlane3
+    = useClipPlane == std::nullopt ? (scene->clipPlane3 != std::nullopt) : *useClipPlane;
+  useClipPlane4
+    = useClipPlane == std::nullopt ? (scene->clipPlane4 != std::nullopt) : *useClipPlane;
 
   if (defines["CLIPPLANE"] != useClipPlane1) {
     defines.boolDef["CLIPPLANE"] = useClipPlane1;
@@ -151,18 +142,14 @@ void MaterialHelper::PrepareDefinesForFrameBoundValues(
   }
 }
 
-void MaterialHelper::PrepareDefinesForBones(AbstractMesh* mesh,
-                                            MaterialDefines& defines)
+void MaterialHelper::PrepareDefinesForBones(AbstractMesh* mesh, MaterialDefines& defines)
 {
-  if (mesh->useBones() && mesh->computeBonesUsingShaders()
-      && mesh->skeleton()) {
+  if (mesh->useBones() && mesh->computeBonesUsingShaders() && mesh->skeleton()) {
     defines.intDef["NUM_BONE_INFLUENCERS"] = mesh->numBoneInfluencers();
 
-    const auto materialSupportsBoneTexture
-      = stl_util::contains(defines.boolDef, "BONETEXTURE");
+    const auto materialSupportsBoneTexture = stl_util::contains(defines.boolDef, "BONETEXTURE");
 
-    if (mesh->skeleton()->isUsingTextureForMatrices
-        && materialSupportsBoneTexture) {
+    if (mesh->skeleton()->isUsingTextureForMatrices && materialSupportsBoneTexture) {
       defines.boolDef["BONETEXTURE"] = true;
     }
     else {
@@ -182,20 +169,15 @@ void MaterialHelper::PrepareDefinesForBones(AbstractMesh* mesh,
   }
 }
 
-void MaterialHelper::PrepareDefinesForMorphTargets(AbstractMesh* mesh,
-                                                   MaterialDefines& defines)
+void MaterialHelper::PrepareDefinesForMorphTargets(AbstractMesh* mesh, MaterialDefines& defines)
 {
   const auto& manager = static_cast<Mesh*>(mesh)->morphTargetManager();
   if (manager) {
-    defines.boolDef["MORPHTARGETS_UV"]
-      = manager->supportsUVs() && defines["UV1"];
-    defines.boolDef["MORPHTARGETS_TANGENT"]
-      = manager->supportsTangents() && defines["TANGENT"];
-    defines.boolDef["MORPHTARGETS_NORMAL"]
-      = manager->supportsNormals() && defines["NORMAL"];
-    defines.boolDef["MORPHTARGETS"] = (manager->numInfluencers() > 0);
-    defines.intDef["NUM_MORPH_INFLUENCERS"]
-      = static_cast<unsigned int>(manager->numInfluencers());
+    defines.boolDef["MORPHTARGETS_UV"]      = manager->supportsUVs() && defines["UV1"];
+    defines.boolDef["MORPHTARGETS_TANGENT"] = manager->supportsTangents() && defines["TANGENT"];
+    defines.boolDef["MORPHTARGETS_NORMAL"]  = manager->supportsNormals() && defines["NORMAL"];
+    defines.boolDef["MORPHTARGETS"]         = (manager->numInfluencers() > 0);
+    defines.intDef["NUM_MORPH_INFLUENCERS"] = static_cast<unsigned int>(manager->numInfluencers());
   }
   else {
     defines.boolDef["MORPHTARGETS_UV"]      = false;
@@ -206,9 +188,9 @@ void MaterialHelper::PrepareDefinesForMorphTargets(AbstractMesh* mesh,
   }
 }
 
-bool MaterialHelper::PrepareDefinesForAttributes(
-  AbstractMesh* mesh, MaterialDefines& defines, bool useVertexColor,
-  bool useBones, bool useMorphTargets, bool useVertexAlpha)
+bool MaterialHelper::PrepareDefinesForAttributes(AbstractMesh* mesh, MaterialDefines& defines,
+                                                 bool useVertexColor, bool useBones,
+                                                 bool useMorphTargets, bool useVertexAlpha)
 {
   if (!defines._areAttributesDirty && defines._needNormals == defines._normals
       && defines._needUVs == defines._uvs) {
@@ -219,11 +201,9 @@ bool MaterialHelper::PrepareDefinesForAttributes(
   defines._uvs     = defines._needUVs;
 
   defines.boolDef["NORMAL"]
-    = (defines._needNormals
-       && mesh->isVerticesDataPresent(VertexBuffer::NormalKind));
+    = (defines._needNormals && mesh->isVerticesDataPresent(VertexBuffer::NormalKind));
 
-  if (defines._needNormals
-      && mesh->isVerticesDataPresent(VertexBuffer::TangentKind)) {
+  if (defines._needNormals && mesh->isVerticesDataPresent(VertexBuffer::TangentKind)) {
     defines.boolDef["TANGENT"] = true;
   }
 
@@ -238,11 +218,9 @@ bool MaterialHelper::PrepareDefinesForAttributes(
 
   if (useVertexColor) {
     auto hasVertexColors
-      = mesh->useVertexColors()
-        && mesh->isVerticesDataPresent(VertexBuffer::ColorKind);
+      = mesh->useVertexColors() && mesh->isVerticesDataPresent(VertexBuffer::ColorKind);
     defines.boolDef["VERTEXCOLOR"] = hasVertexColors;
-    defines.boolDef["VERTEXALPHA"]
-      = mesh->hasVertexAlpha() && hasVertexColors && useVertexAlpha;
+    defines.boolDef["VERTEXALPHA"] = mesh->hasVertexAlpha() && hasVertexColors && useVertexAlpha;
   }
 
   if (useBones) {
@@ -256,8 +234,7 @@ bool MaterialHelper::PrepareDefinesForAttributes(
   return true;
 }
 
-void MaterialHelper::PrepareDefinesForMultiview(Scene* scene,
-                                                MaterialDefines& defines)
+void MaterialHelper::PrepareDefinesForMultiview(Scene* scene, MaterialDefines& defines)
 {
   if (scene->activeCamera()) {
     const auto previousMultiview = defines["MULTIVIEW"];
@@ -270,10 +247,8 @@ void MaterialHelper::PrepareDefinesForMultiview(Scene* scene,
   }
 }
 
-void MaterialHelper::PrepareDefinesForLight(Scene* scene, AbstractMesh* mesh,
-                                            const LightPtr& light,
-                                            unsigned int lightIndex,
-                                            MaterialDefines& defines,
+void MaterialHelper::PrepareDefinesForLight(Scene* scene, AbstractMesh* mesh, const LightPtr& light,
+                                            unsigned int lightIndex, MaterialDefines& defines,
                                             bool specularSupported,
                                             PrepareDefinesForLightsState& state)
 {
@@ -326,8 +301,7 @@ void MaterialHelper::PrepareDefinesForLight(Scene* scene, AbstractMesh* mesh,
   defines.boolDef["SHADOWLOWQUALITY" + lightIndexStr]    = false;
   defines.boolDef["SHADOWMEDIUMQUALITY" + lightIndexStr] = false;
 
-  if (mesh && mesh->receiveShadows() && scene->shadowsEnabled()
-      && light->shadowEnabled) {
+  if (mesh && mesh->receiveShadows() && scene->shadowsEnabled() && light->shadowEnabled) {
     const auto& shadowGenerator = light->getShadowGenerator();
     if (shadowGenerator) {
       const auto& shadowMap = shadowGenerator->getShadowMap();
@@ -353,8 +327,7 @@ void MaterialHelper::PrepareDefinesForLight(Scene* scene, AbstractMesh* mesh,
 }
 
 bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
-                                             MaterialDefines& defines,
-                                             bool specularSupported,
+                                             MaterialDefines& defines, bool specularSupported,
                                              unsigned int maxSimultaneousLights,
                                              bool disableLighting)
 {
@@ -373,8 +346,7 @@ bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
 
   if (scene->lightsEnabled() && !disableLighting) {
     for (const auto& light : mesh->lightSources()) {
-      PrepareDefinesForLight(scene, mesh, light, lightIndex, defines,
-                             specularSupported, state);
+      PrepareDefinesForLight(scene, mesh, light, lightIndex, defines, specularSupported, state);
 
       ++lightIndex;
       if (lightIndex == maxSimultaneousLights) {
@@ -416,8 +388,7 @@ bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
   defines.boolDef["SHADOWFLOAT"]
     = state.shadowEnabled
       && ((caps.textureFloatRender && caps.textureFloatLinearFiltering)
-          || (caps.textureHalfFloatRender
-              && caps.textureHalfFloatLinearFiltering));
+          || (caps.textureHalfFloatRender && caps.textureHalfFloatLinearFiltering));
   defines.boolDef["LIGHTMAPEXCLUDED"] = state.lightmapMode;
 
   if (state.needRebuild) {
@@ -427,22 +398,21 @@ bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
   return state.needNormals;
 }
 
-void MaterialHelper::PrepareUniformsAndSamplersForLight(
-  unsigned int lightIndex, std::vector<std::string>& uniformsList,
-  std::vector<std::string>& samplersList, bool projectedLightTexture)
+void MaterialHelper::PrepareUniformsAndSamplersForLight(unsigned int lightIndex,
+                                                        std::vector<std::string>& uniformsList,
+                                                        std::vector<std::string>& samplersList,
+                                                        bool projectedLightTexture)
 {
 
   std::vector<std::string> uniformBuffersList;
-  PrepareUniformsAndSamplersForLight(lightIndex, uniformsList, samplersList,
-                                     uniformBuffersList, false,
-                                     projectedLightTexture);
+  PrepareUniformsAndSamplersForLight(lightIndex, uniformsList, samplersList, uniformBuffersList,
+                                     false, projectedLightTexture);
 }
 
 void MaterialHelper::PrepareUniformsAndSamplersForLight(
   unsigned int lightIndex, std::vector<std::string>& uniformsList,
-  std::vector<std::string>& samplersList,
-  std::vector<std::string>& uniformBuffersList, bool hasUniformBuffersList,
-  bool projectedLightTexture)
+  std::vector<std::string>& samplersList, std::vector<std::string>& uniformBuffersList,
+  bool hasUniformBuffersList, bool projectedLightTexture)
 {
   const auto lightIndexStr = std::to_string(lightIndex);
   stl_util::concat(uniformsList, {
@@ -470,24 +440,22 @@ void MaterialHelper::PrepareUniformsAndSamplersForLight(
   }
 }
 
-void MaterialHelper::PrepareUniformsAndSamplersList(
-  std::vector<std::string>& uniformsList,
-  std::vector<std::string>& samplersList, MaterialDefines& defines,
-  unsigned int maxSimultaneousLights)
+void MaterialHelper::PrepareUniformsAndSamplersList(std::vector<std::string>& uniformsList,
+                                                    std::vector<std::string>& samplersList,
+                                                    MaterialDefines& defines,
+                                                    unsigned int maxSimultaneousLights)
 {
   std::vector<std::string> uniformBuffersList;
 
-  for (unsigned int lightIndex = 0; lightIndex < maxSimultaneousLights;
-       ++lightIndex) {
+  for (unsigned int lightIndex = 0; lightIndex < maxSimultaneousLights; ++lightIndex) {
     const auto lightIndexStr = std::to_string(lightIndex);
 
     if (!defines["LIGHT" + lightIndexStr]) {
       break;
     }
-    PrepareUniformsAndSamplersForLight(
-      lightIndex, uniformsList, samplersList, uniformBuffersList,
-      !uniformBuffersList.empty(),
-      defines["PROJECTEDLIGHTTEXTURE" + lightIndexStr]);
+    PrepareUniformsAndSamplersForLight(lightIndex, uniformsList, samplersList, uniformBuffersList,
+                                       !uniformBuffersList.empty(),
+                                       defines["PROJECTEDLIGHTTEXTURE" + lightIndexStr]);
   }
 
   if (stl_util::contains(defines.intDef, "NUM_MORPH_INFLUENCERS")
@@ -496,8 +464,7 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
   }
 }
 
-void MaterialHelper::PrepareUniformsAndSamplersList(
-  EffectCreationOptions& options)
+void MaterialHelper::PrepareUniformsAndSamplersList(EffectCreationOptions& options)
 {
   auto& uniformsList          = options.uniformsNames;
   auto& uniformBuffersList    = options.uniformBuffersNames;
@@ -505,17 +472,15 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
   auto& defines               = *options.materialDefines;
   auto& maxSimultaneousLights = options.maxSimultaneousLights;
 
-  for (unsigned int lightIndex = 0; lightIndex < maxSimultaneousLights;
-       ++lightIndex) {
+  for (unsigned int lightIndex = 0; lightIndex < maxSimultaneousLights; ++lightIndex) {
     const std::string lightIndexStr = std::to_string(lightIndex);
 
     if (!defines["LIGHT" + lightIndexStr]) {
       break;
     }
-    PrepareUniformsAndSamplersForLight(
-      lightIndex, uniformsList, samplersList, uniformBuffersList,
-      !uniformBuffersList.empty(),
-      defines["PROJECTEDLIGHTTEXTURE" + lightIndexStr]);
+    PrepareUniformsAndSamplersForLight(lightIndex, uniformsList, samplersList, uniformBuffersList,
+                                       !uniformBuffersList.empty(),
+                                       defines["PROJECTEDLIGHTTEXTURE" + lightIndexStr]);
   }
 
   if (stl_util::contains(defines.intDef, "NUM_MORPH_INFLUENCERS")
@@ -524,13 +489,13 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
   }
 }
 
-unsigned int MaterialHelper::HandleFallbacksForShadows(
-  MaterialDefines& defines, EffectFallbacks& fallbacks,
-  unsigned int maxSimultaneousLights, unsigned int rank)
+unsigned int MaterialHelper::HandleFallbacksForShadows(MaterialDefines& defines,
+                                                       EffectFallbacks& fallbacks,
+                                                       unsigned int maxSimultaneousLights,
+                                                       unsigned int rank)
 {
   unsigned int lightFallbackRank = 0;
-  for (unsigned int lightIndex = 0; lightIndex < maxSimultaneousLights;
-       ++lightIndex) {
+  for (unsigned int lightIndex = 0; lightIndex < maxSimultaneousLights; ++lightIndex) {
     const std::string lightIndexStr = std::to_string(lightIndex);
 
     if (!stl_util::contains(defines.boolDef, "LIGHT" + lightIndexStr)) {
@@ -567,29 +532,27 @@ unsigned int MaterialHelper::HandleFallbacksForShadows(
   return lightFallbackRank++;
 }
 
-void MaterialHelper::PrepareAttributesForMorphTargetsInfluencers(
-  std::vector<std::string>& attribs, AbstractMesh* mesh,
-  unsigned int influencers)
+void MaterialHelper::PrepareAttributesForMorphTargetsInfluencers(std::vector<std::string>& attribs,
+                                                                 AbstractMesh* mesh,
+                                                                 unsigned int influencers)
 {
   _TmpMorphInfluencers->intDef["NUM_MORPH_INFLUENCERS"] = influencers;
   PrepareAttributesForMorphTargets(attribs, mesh, *_TmpMorphInfluencers);
 }
 
-void MaterialHelper::PrepareAttributesForMorphTargets(
-  std::vector<std::string>& attribs, AbstractMesh* mesh,
-  MaterialDefines& defines)
+void MaterialHelper::PrepareAttributesForMorphTargets(std::vector<std::string>& attribs,
+                                                      AbstractMesh* mesh, MaterialDefines& defines)
 {
   auto influencers = defines.intDef["NUM_MORPH_INFLUENCERS"];
 
   auto engine = Engine::LastCreatedEngine();
   auto _mesh  = static_cast<Mesh*>(mesh);
   if (influencers > 0 && engine && _mesh) {
-    auto maxAttributesCount
-      = static_cast<unsigned>(engine->getCaps().maxVertexAttribs);
-    auto manager = _mesh->morphTargetManager();
-    auto normal  = manager && manager->supportsNormals() && defines["NORMAL"];
-    auto tangent = manager && manager->supportsNormals() && defines["TANGENT"];
-    auto uv      = manager && manager->supportsUVs() && defines["UV1"];
+    auto maxAttributesCount = static_cast<unsigned>(engine->getCaps().maxVertexAttribs);
+    auto manager            = _mesh->morphTargetManager();
+    auto normal             = manager && manager->supportsNormals() && defines["NORMAL"];
+    auto tangent            = manager && manager->supportsNormals() && defines["TANGENT"];
+    auto uv                 = manager && manager->supportsUVs() && defines["UV1"];
     for (auto index = 0u; index < influencers; ++index) {
       const auto indexStr = std::to_string(index);
       attribs.emplace_back(VertexBuffer::PositionKind + indexStr);
@@ -603,22 +566,20 @@ void MaterialHelper::PrepareAttributesForMorphTargets(
       }
 
       if (uv) {
-        attribs.emplace_back(VertexBuffer::UVKind + std::string("_")
-                             + indexStr);
+        attribs.emplace_back(VertexBuffer::UVKind + std::string("_") + indexStr);
       }
 
       if (attribs.size() > maxAttributesCount) {
-        BABYLON_LOGF_ERROR("MaterialHelper",
-                           "Cannot add more vertex attributes for mesh %s",
+        BABYLON_LOGF_ERROR("MaterialHelper", "Cannot add more vertex attributes for mesh %s",
                            mesh->name.c_str())
       }
     }
   }
 }
 
-void MaterialHelper::PrepareAttributesForBones(
-  std::vector<std::string>& attribs, AbstractMesh* mesh,
-  MaterialDefines& defines, EffectFallbacks& fallbacks)
+void MaterialHelper::PrepareAttributesForBones(std::vector<std::string>& attribs,
+                                               AbstractMesh* mesh, MaterialDefines& defines,
+                                               EffectFallbacks& fallbacks)
 {
   if (defines.intDef["NUM_BONE_INFLUENCERS"] > 0) {
     fallbacks.addCPUSkinningFallback(0, mesh);
@@ -632,16 +593,15 @@ void MaterialHelper::PrepareAttributesForBones(
   }
 }
 
-void MaterialHelper::PrepareAttributesForInstances(
-  std::vector<std::string>& attribs, MaterialDefines& defines)
+void MaterialHelper::PrepareAttributesForInstances(std::vector<std::string>& attribs,
+                                                   MaterialDefines& defines)
 {
   if (defines["INSTANCES"]) {
     PushAttributesForInstances(attribs);
   }
 }
 
-void MaterialHelper::PushAttributesForInstances(
-  std::vector<std::string>& attribs)
+void MaterialHelper::PushAttributesForInstances(std::vector<std::string>& attribs)
 {
   attribs.emplace_back(VertexBuffer::World0Kind);
   attribs.emplace_back(VertexBuffer::World1Kind);
@@ -650,8 +610,7 @@ void MaterialHelper::PushAttributesForInstances(
 }
 
 void MaterialHelper::BindLightShadow(Light& light, AbstractMesh& mesh,
-                                     const std::string& lightIndex,
-                                     const EffectPtr& effect)
+                                     const std::string& lightIndex, const EffectPtr& effect)
 {
   if (light.shadowEnabled && mesh.receiveShadows()) {
     auto shadowGenerator = light.getShadowGenerator();
@@ -667,11 +626,9 @@ void MaterialHelper::BindLightProperties(Light& light, const EffectPtr& effect,
   light.transferToEffect(effect, std::to_string(lightIndex));
 }
 
-void MaterialHelper::BindLight(const LightPtr& light, unsigned int lightIndex,
-                               Scene* scene, AbstractMesh* mesh,
-                               const EffectPtr& effect, bool useSpecular,
-                               bool usePhysicalLightFalloff,
-                               bool rebuildInParallel)
+void MaterialHelper::BindLight(const LightPtr& light, unsigned int lightIndex, Scene* scene,
+                               AbstractMesh* mesh, const EffectPtr& effect, bool useSpecular,
+                               bool usePhysicalLightFalloff, bool rebuildInParallel)
 {
   auto iAsString = std::to_string(lightIndex);
 
@@ -683,13 +640,12 @@ void MaterialHelper::BindLight(const LightPtr& light, unsigned int lightIndex,
   MaterialHelper::BindLightProperties(*light, effect, lightIndex);
 
   light->diffuse.scaleToRef(scaledIntensity, TmpVectors::Color3Array[0]);
-  light->_uniformBuffer->updateColor4(
-    "vLightDiffuse", TmpVectors::Color3Array[0],
-    usePhysicalLightFalloff ? light->radius() : light->range, iAsString);
+  light->_uniformBuffer->updateColor4("vLightDiffuse", TmpVectors::Color3Array[0],
+                                      usePhysicalLightFalloff ? light->radius() : light->range,
+                                      iAsString);
   if (useSpecular) {
     light->specular.scaleToRef(scaledIntensity, TmpVectors::Color3Array[1]);
-    light->_uniformBuffer->updateColor3("vLightSpecular",
-                                        TmpVectors::Color3Array[1], iAsString);
+    light->_uniformBuffer->updateColor3("vLightSpecular", TmpVectors::Color3Array[1], iAsString);
   }
 
   // Shadows
@@ -699,32 +655,39 @@ void MaterialHelper::BindLight(const LightPtr& light, unsigned int lightIndex,
   light->_uniformBuffer->update();
 }
 
-void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh,
-                                const EffectPtr& effect,
-                                MaterialDefines& defines,
-                                unsigned int maxSimultaneousLights,
-                                bool usePhysicalLightFalloff,
-                                bool rebuildInParallel)
+void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh, const EffectPtr& effect,
+                                bool defines, unsigned int maxSimultaneousLights,
+                                bool usePhysicalLightFalloff, bool rebuildInParallel)
 {
-  auto len = std::min(mesh->lightSources().size(),
-                      static_cast<size_t>(maxSimultaneousLights));
+  auto len = std::min(mesh->lightSources().size(), static_cast<size_t>(maxSimultaneousLights));
 
   for (unsigned i = 0u; i < len; ++i) {
 
     auto& light = mesh->lightSources()[i];
-    BindLight(light, i, scene, mesh, effect, defines["SPECULARTERM"],
-              usePhysicalLightFalloff, rebuildInParallel);
+    BindLight(light, i, scene, mesh, effect, defines, usePhysicalLightFalloff, rebuildInParallel);
   }
 }
 
-void MaterialHelper::BindFogParameters(Scene* scene, AbstractMesh* mesh,
-                                       const EffectPtr& effect,
+void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh, const EffectPtr& effect,
+                                MaterialDefines& defines, unsigned int maxSimultaneousLights,
+                                bool usePhysicalLightFalloff, bool rebuildInParallel)
+{
+  auto len = std::min(mesh->lightSources().size(), static_cast<size_t>(maxSimultaneousLights));
+
+  for (unsigned i = 0u; i < len; ++i) {
+
+    auto& light = mesh->lightSources()[i];
+    BindLight(light, i, scene, mesh, effect, defines["SPECULARTERM"], usePhysicalLightFalloff,
+              rebuildInParallel);
+  }
+}
+
+void MaterialHelper::BindFogParameters(Scene* scene, AbstractMesh* mesh, const EffectPtr& effect,
                                        bool linearSpace)
 {
-  if (scene->fogEnabled() && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE) {
-    effect->setFloat4("vFogInfos", static_cast<float>(scene->fogMode()),
-                      scene->fogStart, scene->fogEnd, scene->fogDensity);
+  if (scene->fogEnabled() && mesh->applyFog() && scene->fogMode() != Scene::FOGMODE_NONE) {
+    effect->setFloat4("vFogInfos", static_cast<float>(scene->fogMode()), scene->fogStart,
+                      scene->fogEnd, scene->fogDensity);
     // Convert fog color to linear space if used in a linear space computed
     // shader.
     if (linearSpace) {
@@ -737,27 +700,22 @@ void MaterialHelper::BindFogParameters(Scene* scene, AbstractMesh* mesh,
   }
 }
 
-void MaterialHelper::BindBonesParameters(AbstractMesh* mesh,
-                                         const EffectPtr& effect)
+void MaterialHelper::BindBonesParameters(AbstractMesh* mesh, const EffectPtr& effect)
 {
   if (!effect || !mesh) {
     return;
   }
-  if (mesh->computeBonesUsingShaders()
-      && effect->_bonesComputationForcedToCPU) {
+  if (mesh->computeBonesUsingShaders() && effect->_bonesComputationForcedToCPU) {
     mesh->computeBonesUsingShaders = false;
   }
 
-  if (mesh->useBones() && mesh->computeBonesUsingShaders()
-      && mesh->skeleton()) {
+  if (mesh->useBones() && mesh->computeBonesUsingShaders() && mesh->skeleton()) {
     const auto& skeleton = mesh->skeleton();
 
-    if (skeleton->isUsingTextureForMatrices
-        && effect->getUniformIndex("boneTextureWidth") > -1) {
+    if (skeleton->isUsingTextureForMatrices && effect->getUniformIndex("boneTextureWidth") > -1) {
       const auto& boneTexture = skeleton->getTransformMatrixTexture(mesh);
       effect->setTexture("boneSampler", boneTexture);
-      effect->setFloat("boneTextureWidth",
-                       4.f * (skeleton->bones.size() + 1.f));
+      effect->setFloat("boneTextureWidth", 4.f * (skeleton->bones.size() + 1.f));
     }
     else {
       const auto& matrices = skeleton->getTransformMatrices(mesh);
@@ -769,8 +727,7 @@ void MaterialHelper::BindBonesParameters(AbstractMesh* mesh,
   }
 }
 
-void MaterialHelper::BindMorphTargetParameters(AbstractMesh* abstractMesh,
-                                               const EffectPtr& effect)
+void MaterialHelper::BindMorphTargetParameters(AbstractMesh* abstractMesh, const EffectPtr& effect)
 {
   auto mesh = static_cast<Mesh*>(abstractMesh);
   if (mesh) {
@@ -783,13 +740,11 @@ void MaterialHelper::BindMorphTargetParameters(AbstractMesh* abstractMesh,
   }
 }
 
-void MaterialHelper::BindLogDepth(MaterialDefines& defines,
-                                  const EffectPtr& effect, Scene* scene)
+void MaterialHelper::BindLogDepth(MaterialDefines& defines, const EffectPtr& effect, Scene* scene)
 {
   if (defines["LOGARITHMICDEPTH"]) {
-    effect->setFloat(
-      "logarithmicDepthConstant",
-      2.f / (std::log(scene->activeCamera()->maxZ + 1.f) / Math::LN2));
+    effect->setFloat("logarithmicDepthConstant",
+                     2.f / (std::log(scene->activeCamera()->maxZ + 1.f) / Math::LN2));
   }
 }
 
@@ -797,23 +752,23 @@ void MaterialHelper::BindClipPlane(const EffectPtr& effect, Scene* scene)
 {
   if (scene->clipPlane) {
     const auto& clipPlane = *scene->clipPlane;
-    effect->setFloat4("vClipPlane", clipPlane.normal.x, clipPlane.normal.y,
-                      clipPlane.normal.z, clipPlane.d);
+    effect->setFloat4("vClipPlane", clipPlane.normal.x, clipPlane.normal.y, clipPlane.normal.z,
+                      clipPlane.d);
   }
   if (scene->clipPlane2) {
     const auto& clipPlane = *scene->clipPlane2;
-    effect->setFloat4("vClipPlane2", clipPlane.normal.x, clipPlane.normal.y,
-                      clipPlane.normal.z, clipPlane.d);
+    effect->setFloat4("vClipPlane2", clipPlane.normal.x, clipPlane.normal.y, clipPlane.normal.z,
+                      clipPlane.d);
   }
   if (scene->clipPlane3) {
     const auto& clipPlane = *scene->clipPlane3;
-    effect->setFloat4("vClipPlane3", clipPlane.normal.x, clipPlane.normal.y,
-                      clipPlane.normal.z, clipPlane.d);
+    effect->setFloat4("vClipPlane3", clipPlane.normal.x, clipPlane.normal.y, clipPlane.normal.z,
+                      clipPlane.d);
   }
   if (scene->clipPlane4) {
     const auto& clipPlane = *scene->clipPlane4;
-    effect->setFloat4("vClipPlane4", clipPlane.normal.x, clipPlane.normal.y,
-                      clipPlane.normal.z, clipPlane.d);
+    effect->setFloat4("vClipPlane4", clipPlane.normal.x, clipPlane.normal.y, clipPlane.normal.z,
+                      clipPlane.d);
   }
 }
 

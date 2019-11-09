@@ -24,11 +24,10 @@ class NodeMaterialConnectionPoint;
 struct NodeMaterialDefines;
 class NodeMaterialBuildState;
 class Scene;
-using EffectPtr            = std::shared_ptr<Effect>;
-using NodeMaterialPtr      = std::shared_ptr<NodeMaterial>;
-using NodeMaterialBlockPtr = std::shared_ptr<NodeMaterialBlock>;
-using NodeMaterialConnectionPointPtr
-  = std::shared_ptr<NodeMaterialConnectionPoint>;
+using EffectPtr                      = std::shared_ptr<Effect>;
+using NodeMaterialPtr                = std::shared_ptr<NodeMaterial>;
+using NodeMaterialBlockPtr           = std::shared_ptr<NodeMaterialBlock>;
+using NodeMaterialConnectionPointPtr = std::shared_ptr<NodeMaterialConnectionPoint>;
 
 struct NodeMaterialBlockConnectionOptions {
   std::string input{};
@@ -45,8 +44,7 @@ public:
   template <typename... Ts>
   static NodeMaterialBlockPtr New(Ts&&... args)
   {
-    return std::shared_ptr<NodeMaterialBlock>(
-      new NodeMaterialBlock(std::forward<Ts>(args)...));
+    return std::shared_ptr<NodeMaterialBlock>(new NodeMaterialBlock(std::forward<Ts>(args)...));
   }
   virtual ~NodeMaterialBlock();
 
@@ -58,7 +56,7 @@ public:
   NodeMaterialConnectionPointPtr getInputByName(const std::string& name) const;
 
   /**
-   * Find an output by its name.
+   * @brief Find an output by its name.
    * @param name defines the name of the outputto look for
    * @returns the output or null if not found
    */
@@ -71,14 +69,13 @@ public:
   virtual void initialize(NodeMaterialBuildState& state);
 
   /**
-   * @brief Bind data to effect. Will only be called for blocks with isBindable
-   * === true.
+   * @brief Bind data to effect. Will only be called for blocks with isBindable === true.
    * @param effect defines the effect to bind data to
    * @param nodeMaterial defines the hosting NodeMaterial
    * @param mesh defines the mesh that will be rendered
    */
-  virtual void bind(const EffectPtr& effect,
-                    const NodeMaterialPtr& nodeMaterial, Mesh* mesh = nullptr);
+  virtual void bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMaterial,
+                    Mesh* mesh = nullptr);
 
   /**
    * @brief Gets the current class name e.g. "NodeMaterialBlock".
@@ -90,68 +87,62 @@ public:
    * @brief Register a new input. Must be called inside a block constructor.
    * @param name defines the connection point name
    * @param type defines the connection point type
-   * @param isOptional defines a boolean indicating that this input can be
-   * omitted
-   * @param target defines the target to use to limit the connection point (will
-   * be VertexAndFragment by default)
+   * @param isOptional defines a boolean indicating that this input can be omitted
+   * @param target defines the target to use to limit the connection point (will be
+   * VertexAndFragment by default)
    * @returns the current block
    */
-  NodeMaterialBlock& registerInput(
-    const std::string& name, const NodeMaterialBlockConnectionPointTypes& type,
-    bool isOptional                                       = false,
-    const std::optional<NodeMaterialBlockTargets>& target = std::nullopt);
+  NodeMaterialBlock&
+  registerInput(const std::string& name, const NodeMaterialBlockConnectionPointTypes& type,
+                bool isOptional                                       = false,
+                const std::optional<NodeMaterialBlockTargets>& target = std::nullopt);
 
   /**
    * @brief Register a new output. Must be called inside a block constructor.
    * @param name defines the connection point name
    * @param type defines the connection point type
-   * @param target defines the target to use to limit the connection point (will
-   * be VertexAndFragment by default)
+   * @param target defines the target to use to limit the connection point (will be
+   * VertexAndFragment by default)
    * @returns the current block
    */
-  NodeMaterialBlock& registerOutput(
-    const std::string& name, const NodeMaterialBlockConnectionPointTypes& type,
-    const std::optional<NodeMaterialBlockTargets>& target = std::nullopt);
+  NodeMaterialBlock&
+  registerOutput(const std::string& name, const NodeMaterialBlockConnectionPointTypes& type,
+                 const std::optional<NodeMaterialBlockTargets>& target = std::nullopt);
 
   /**
    * @brief Will return the first available input e.g. the first one which is
    * not an uniform or an attribute.
-   * @param forOutput defines an optional connection point to check
-   * compatibility with
+   * @param forOutput defines an optional connection point to check compatibility with
    * @returns the first available input or null
    */
   NodeMaterialConnectionPointPtr
-  getFirstAvailableInput(const NodeMaterialConnectionPointPtr& forOutput
-                         = nullptr);
+  getFirstAvailableInput(const NodeMaterialConnectionPointPtr& forOutput = nullptr);
 
   /**
-   * @brief Will return the first available output e.g. the first one which is
-   * not yet connected and not a varying.
+   * @brief Will return the first available output e.g. the first one which is not yet connected and
+   * not a varying.
    * @param forBlock defines an optional block to check compatibility with
    * @returns the first available input or null
    */
-  NodeMaterialConnectionPointPtr
-  getFirstAvailableOutput(const NodeMaterialBlockPtr& forBlock = nullptr);
+  NodeMaterialConnectionPointPtr getFirstAvailableOutput(const NodeMaterialBlockPtr& forBlock
+                                                         = nullptr);
 
   /**
    * @brief Gets the sibling of the given output.
    * @param current defines the current output
    * @returns the next output in the list or null
    */
-  NodeMaterialConnectionPointPtr
-  getSiblingOutput(const NodeMaterialConnectionPointPtr& current);
+  NodeMaterialConnectionPointPtr getSiblingOutput(const NodeMaterialConnectionPointPtr& current);
 
   /**
    * @brief Connect current block with another block.
    * @param other defines the block to connect with
-   * @param options define the various options to help pick the right
-   * connections
+   * @param options define the various options to help pick the right connections
    * @returns the current block
    */
-  NodeMaterialBlock&
-  connectTo(const NodeMaterialBlockPtr& other,
-            const std::optional<NodeMaterialBlockConnectionOptions>& options
-            = std::nullopt);
+  NodeMaterialBlock& connectTo(const NodeMaterialBlockPtr& other,
+                               const std::optional<NodeMaterialBlockConnectionOptions>& options
+                               = std::nullopt);
 
   /**
    * @brief Add uniforms, samplers and uniform buffers at compilation time.
@@ -159,7 +150,7 @@ public:
    * @param nodeMaterial defines the node material requesting the update
    * @param defines defines the material defines to update
    */
-  virtual void updateUniformsAndSamples(const NodeMaterialBuildState& state,
+  virtual void updateUniformsAndSamples(NodeMaterialBuildState& state,
                                         const NodeMaterialPtr& nodeMaterial,
                                         const NodeMaterialDefines& defines);
 
@@ -177,10 +168,8 @@ public:
    * @param defines defines the material defines to update
    * @param useInstances specifies that instances should be used
    */
-  virtual void prepareDefines(AbstractMesh* mesh,
-                              const NodeMaterialPtr& nodeMaterial,
-                              NodeMaterialDefines& defines,
-                              bool useInstances = false);
+  virtual void prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
+                              NodeMaterialDefines& defines, bool useInstances = false);
 
   /**
    * @brief Initialize defines for shader compilation.
@@ -189,10 +178,8 @@ public:
    * @param defines defines the material defines to be prepared
    * @param useInstances specifies that instances should be used
    */
-  virtual void initializeDefines(AbstractMesh* mesh,
-                                 const NodeMaterialPtr& nodeMaterial,
-                                 const NodeMaterialDefines& defines,
-                                 bool useInstances = false);
+  virtual void initializeDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
+                                 const NodeMaterialDefines& defines, bool useInstances = false);
 
   /**
    * @brief Lets the block try to connect some inputs automatically.
@@ -201,19 +188,15 @@ public:
   virtual void autoConfigure(const NodeMaterialPtr& nodeMaterial);
 
   /**
-   * @brief Function called when a block is declared as repeatable content
-   * generator.
-   * @param vertexShaderState defines the current compilation state for the
-   * vertex shader
-   * @param fragmentShaderState defines the current compilation state for the
-   * fragment shader
+   * @brief Function called when a block is declared as repeatable content generator.
+   * @param vertexShaderState defines the current compilation state for the vertex shader
+   * @param fragmentShaderState defines the current compilation state for the fragment shader
    * @param mesh defines the mesh to be rendered
    * @param defines defines the material defines to update
    */
-  virtual void
-  replaceRepeatableContent(NodeMaterialBuildState& vertexShaderState,
-                           const NodeMaterialBuildState& fragmentShaderState,
-                           AbstractMesh* mesh, NodeMaterialDefines& defines);
+  virtual void replaceRepeatableContent(NodeMaterialBuildState& vertexShaderState,
+                                        const NodeMaterialBuildState& fragmentShaderState,
+                                        AbstractMesh* mesh, NodeMaterialDefines& defines);
 
   /**
    * @brief Checks if the block is ready.
@@ -224,15 +207,12 @@ public:
    * @returns true if the block is ready
    */
   virtual bool isReady(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
-                       const NodeMaterialDefines& defines,
-                       bool useInstances = false);
+                       const NodeMaterialDefines& defines, bool useInstances = false);
 
   /**
    * @brief Compile the current node and generate the shader code.
-   * @param state defines the current compilation state (uniforms, samplers,
-   * current string)
-   * @param activeBlocks defines the list of active blocks (i.e. blocks to
-   * compile)
+   * @param state defines the current compilation state (uniforms, samplers, current string)
+   * @param activeBlocks defines the list of active blocks (i.e. blocks to compile)
    * @returns true if already built
    */
   bool build(const NodeMaterialBuildState& state,
@@ -247,8 +227,7 @@ public:
   /**
    * @brief Clone the current block to a new identical block.
    * @param scene defines the hosting scene
-   * @param rootUrl defines the root URL to use to load textures and relative
-   * dependencies
+   * @param rootUrl defines the root URL to use to load textures and relative dependencies
    * @returns a copy of the current block
    */
   NodeMaterialPtr clone(Scene* scene, const std::string& rootUrl = "");
@@ -270,25 +249,24 @@ protected:
    * @brief Creates a new NodeMaterialBlock.
    * @param name defines the block name
    * @param target defines the target of that block (Vertex by default)
-   * @param isFinalMerger defines a boolean indicating that this block is an end
-   * block (e.g. it is generating a system value). Default is false
-   * @param isInput defines a boolean indicating that this block is an input
-   * (e.g. it sends data to the shader). Default is false
+   * @param isFinalMerger defines a boolean indicating that this block is an end block (e.g. it is
+   * generating a system value). Default is false
+   * @param isInput defines a boolean indicating that this block is an input (e.g. it sends data to
+   * the shader). Default is false
    */
   NodeMaterialBlock(const std::string& name,
-                    NodeMaterialBlockTargets target
-                    = NodeMaterialBlockTargets::Vertex,
+                    NodeMaterialBlockTargets target = NodeMaterialBlockTargets::Vertex,
                     bool isFinalMerger = false, bool isInput = false);
 
   /**
-   * @brief Gets a boolean indicating that this block is an end block (e.g. it
-   * is generating a system value).
+   * @brief Gets a boolean indicating that this block is an end block (e.g. it is generating a
+   * system value).
    */
   bool get_isFinalMerger() const;
 
   /**
-   * @brief Gets a boolean indicating that this block is an input (e.g. it sends
-   * data to the shader).
+   * @brief Gets a boolean indicating that this block is an input (e.g. it sends data to the
+   * shader).
    */
   bool get_isInput() const;
 
@@ -324,8 +302,7 @@ protected:
 
   std::string _declareOutput(const NodeMaterialConnectionPointPtr& output,
                              const NodeMaterialBuildState& state) const;
-  std::string
-  _writeVariable(const NodeMaterialConnectionPointPtr& currentPoint) const;
+  std::string _writeVariable(const NodeMaterialConnectionPointPtr& currentPoint) const;
   std::string _writeFloat(float value) const;
   virtual NodeMaterialBlock& _buildBlock(NodeMaterialBuildState& state);
   void _linkConnectionTypes(size_t inputIndex0, size_t inputIndex1);
@@ -334,8 +311,7 @@ protected:
   virtual std::string _dumpPropertiesCode();
 
 private:
-  void _processBuild(const NodeMaterialBlockPtr& block,
-                     const NodeMaterialBuildState& state,
+  void _processBuild(const NodeMaterialBlockPtr& block, const NodeMaterialBuildState& state,
                      const NodeMaterialConnectionPointPtr& input,
                      const std::vector<NodeMaterialBlockPtr>& activeBlocks);
 
@@ -362,14 +338,13 @@ public:
   size_t uniqueId;
 
   /**
-   * Gets a boolean indicating that this block is an end block (e.g. it is
-   * generating a system value)
+   * Gets a boolean indicating that this block is an end block (e.g. it is generating a system
+   * value)
    */
   ReadOnlyProperty<NodeMaterialBlock, bool> isFinalMerger;
 
   /**
-   * Gets a boolean indicating that this block is an input (e.g. it sends data
-   * to the shader)
+   * Gets a boolean indicating that this block is an input (e.g. it sends data to the shader)
    */
   ReadOnlyProperty<NodeMaterialBlock, bool> isInput;
 
@@ -386,16 +361,12 @@ public:
   /**
    * Gets the list of input points
    */
-  ReadOnlyProperty<NodeMaterialBlock,
-                   std::vector<NodeMaterialConnectionPointPtr>>
-    inputs;
+  ReadOnlyProperty<NodeMaterialBlock, std::vector<NodeMaterialConnectionPointPtr>> inputs;
 
   /**
    * Gets the list of output points
    */
-  ReadOnlyProperty<NodeMaterialBlock,
-                   std::vector<NodeMaterialConnectionPointPtr>>
-    outputs;
+  ReadOnlyProperty<NodeMaterialBlock, std::vector<NodeMaterialConnectionPointPtr>> outputs;
 
 private:
   size_t _buildId;

@@ -16,9 +16,8 @@ enum class NodeMaterialBlockConnectionPointTypes;
 class NodeMaterialBuildState;
 struct NodeMaterialBuildStateSharedData;
 struct ReplaceStrings;
-using NodeMaterialBuildStatePtr = std::shared_ptr<NodeMaterialBuildState>;
-using NodeMaterialBuildStateSharedDataPtr
-  = std::shared_ptr<NodeMaterialBuildStateSharedData>;
+using NodeMaterialBuildStatePtr           = std::shared_ptr<NodeMaterialBuildState>;
+using NodeMaterialBuildStateSharedDataPtr = std::shared_ptr<NodeMaterialBuildStateSharedData>;
 
 struct BABYLON_SHARED_EXPORT StringsReplacement {
   std::string search  = "";
@@ -79,42 +78,39 @@ public:
   /**
    * @brief Hidden
    */
-  void _emitFunction(const std::string& name, const std::string& code,
-                     const std::string& comments);
+  void _emitFunction(const std::string& name, const std::string& code, const std::string& comments);
 
   /**
    * @brief Hidden
    */
-  std::string _emitCodeFromInclude(
-    const std::string& includeName, const std::string& comments,
-    const std::optional<EmitCodeFromIncludeOptions>& options = std::nullopt);
+  std::string _emitCodeFromInclude(const std::string& includeName, const std::string& comments,
+                                   const std::optional<EmitCodeFromIncludeOptions>& options
+                                   = std::nullopt);
 
   /**
    * @brief Hidden
    */
-  std::string _emitFunctionFromInclude(
-    const std::string& includeName, const std::string& comments,
-    const std::optional<EmitFunctionFromIncludeOptions>& options = std::nullopt,
-    const std::string& storeKey                                  = "");
+  std::string _emitFunctionFromInclude(const std::string& includeName, const std::string& comments,
+                                       const std::optional<EmitFunctionFromIncludeOptions>& options
+                                       = std::nullopt,
+                                       const std::string& storeKey = "");
 
   /**
    * @brief Hidden
    */
-  void _registerTempVariable(const std::string& name);
+  bool _registerTempVariable(const std::string& name);
 
   /**
    * @brief Hidden
    */
   bool _emitVaryingFromString(const std::string& name, const std::string& type,
-                              const std::string& define = "",
-                              bool notDefine            = false);
+                              const std::string& define = "", bool notDefine = false);
 
   /**
    * @brief Hidden
    */
   void _emitUniformFromString(const std::string& name, const std::string& type,
-                              const std::string& define = "",
-                              bool notDefine            = false);
+                              const std::string& define = "", bool notDefine = false);
 
 protected:
   /**
@@ -124,8 +120,7 @@ protected:
 
 public:
   /**
-   * Gets or sets a boolean indicating if the current state can emit uniform
-   * buffers
+   * Gets or sets a boolean indicating if the current state can emit uniform buffers
    */
   bool supportUniformBuffers;
   /**
@@ -188,8 +183,7 @@ public:
   std::string compilationString;
 
   /** @hidden */
-  ReadOnlyProperty<NodeMaterialBuildState, std::string>
-    _repeatableContentAnchor;
+  ReadOnlyProperty<NodeMaterialBuildState, std::string> _repeatableContentAnchor;
 
 private:
   size_t _repeatableContentAnchorIndex;
