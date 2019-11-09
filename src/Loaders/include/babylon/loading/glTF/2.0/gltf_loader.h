@@ -9,6 +9,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/core/data_view.h>
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/loading/glTF/2.0/gltf_loader_interfaces.h>
 #include <babylon/loading/glTF/igltf_loader.h>
@@ -76,12 +77,10 @@ struct BABYLON_SHARED_EXPORT ArrayItem {
    * @returns The array item
    */
   template <typename T>
-  static T& Get(const std::string& context, std::vector<T>& array,
-                size_t index = 0)
+  static T& Get(const std::string& context, std::vector<T>& array, size_t index = 0)
   {
     if (array.empty() || index >= array.size()) {
-      throw std::runtime_error(context + ": Failed to find index ("
-                               + std::to_string(index) + ")");
+      throw std::runtime_error(context + ": Failed to find index (" + std::to_string(index) + ")");
     }
 
     return array[index];
@@ -132,9 +131,9 @@ public:
    * @param name The name of the loader extension.
    * @param factory The factory function that creates the loader extension.
    */
-  static void RegisterExtension(
-    const std::string& name,
-    const std::function<IGLTFLoaderExtensionPtr(GLTFLoader& loader)>& factory);
+  static void
+  RegisterExtension(const std::string& name,
+                    const std::function<IGLTFLoaderExtensionPtr(GLTFLoader& loader)>& factory);
 
   /**
    * @brief Unregisters a loader extension.
@@ -145,16 +144,14 @@ public:
 
 private:
   static std::vector<std::string> _ExtensionNames;
-  static std::unordered_map<
-    std::string, std::function<IGLTFLoaderExtensionPtr(GLTFLoader& loader)>>
+  static std::unordered_map<std::string, std::function<IGLTFLoaderExtensionPtr(GLTFLoader& loader)>>
     _ExtensionFactories;
 
 public:
   template <typename... Ts>
   static GLTFLoaderPtr New(Ts&&... args)
   {
-    return std::shared_ptr<GLTFLoader>(
-      new GLTFLoader(std::forward<Ts>(args)...));
+    return std::shared_ptr<GLTFLoader>(new GLTFLoader(std::forward<Ts>(args)...));
   }
   virtual ~GLTFLoader() override;
 
@@ -179,23 +176,21 @@ public:
   MeshPtr rootBabylonMesh();
 
   /** Hidden */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /** Hidden */
-  ImportedMeshes importMeshAsync(
-    const std::vector<std::string>& meshesNames, Scene* scene,
-    const IGLTFLoaderData& data, const std::string& rootUrl,
-    const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress
-    = nullptr,
-    const std::string& fileName = "") override;
+  ImportedMeshes
+  importMeshAsync(const std::vector<std::string>& meshesNames, Scene* scene,
+                  const IGLTFLoaderData& data, const std::string& rootUrl,
+                  const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress
+                  = nullptr,
+                  const std::string& fileName = "") override;
 
   /** Hidden */
-  void loadAsync(
-    Scene* scene, const IGLTFLoaderData& data, const std::string& rootUrl,
-    const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress
-    = nullptr,
-    const std::string& fileName = "") override;
+  void loadAsync(Scene* scene, const IGLTFLoaderData& data, const std::string& rootUrl,
+                 const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress
+                 = nullptr,
+                 const std::string& fileName = "") override;
 
   /**
    * @brief Loads a glTF scene.
@@ -214,10 +209,9 @@ public:
    * @returns A promise that resolves with the loaded Babylon mesh when the load
    * is complete
    */
-  TransformNodePtr loadNodeAsync(
-    const std::string& context, INode& node,
-    const std::function<void(const TransformNodePtr& babylonTransformNode)>&
-      assign);
+  TransformNodePtr
+  loadNodeAsync(const std::string& context, INode& node,
+                const std::function<void(const TransformNodePtr& babylonTransformNode)>& assign);
 
   /**
    * @brief Define this method to modify the default behavior when loading data
@@ -232,10 +226,10 @@ public:
    * @returns A promise that resolves with the loaded mesh when the load is
    * complete or null if not handled
    */
-  AbstractMeshPtr _loadMeshPrimitiveAsync(
-    const std::string& context, const std::string& name, INode& node,
-    const IMesh& mesh, IMeshPrimitive& primitive,
-    const std::function<void(const AbstractMeshPtr& babylonMesh)>& assign);
+  AbstractMeshPtr
+  _loadMeshPrimitiveAsync(const std::string& context, const std::string& name, INode& node,
+                          const IMesh& mesh, IMeshPrimitive& primitive,
+                          const std::function<void(const AbstractMeshPtr& babylonMesh)>& assign);
 
   /**
    * @brief Loads a glTF camera.
@@ -246,9 +240,8 @@ public:
    * @returns A promise that resolves with the loaded Babylon camera when the
    * load is complete
    */
-  CameraPtr loadCameraAsync(
-    const std::string& context, const ICamera& camera,
-    const std::function<void(const CameraPtr& babylonCamera)>& assign);
+  CameraPtr loadCameraAsync(const std::string& context, const ICamera& camera,
+                            const std::function<void(const CameraPtr& babylonCamera)>& assign);
 
   /**
    * @brief Loads a glTF animation.
@@ -257,8 +250,7 @@ public:
    * @returns A promise that resolves with the loaded Babylon animation group
    * when the load is complete
    */
-  AnimationGroupPtr loadAnimationAsync(const std::string& context,
-                                       IAnimation& animation);
+  AnimationGroupPtr loadAnimationAsync(const std::string& context, IAnimation& animation);
 
   /**
    * @brief Loads a glTF animation channel.
@@ -271,11 +263,10 @@ public:
    * override property. My be null.
    * @returns A void promise when the channel load is complete
    */
-  void _loadAnimationChannelAsync(
-    const std::string& context, const std::string& animationContext,
-    IAnimation& animation, const IAnimationChannel& channel,
-    const AnimationGroupPtr& babylonAnimationGroup,
-    const IAnimatablePtr& animationTargetOverride = nullptr);
+  void _loadAnimationChannelAsync(const std::string& context, const std::string& animationContext,
+                                  IAnimation& animation, const IAnimationChannel& channel,
+                                  const AnimationGroupPtr& babylonAnimationGroup,
+                                  const IAnimatablePtr& animationTargetOverride = nullptr);
 
   /**
    * @brief Loads a glTF buffer view.
@@ -284,16 +275,15 @@ public:
    * @returns A promise that resolves with the loaded data when the load is
    * complete
    */
-  ArrayBufferView& loadBufferViewAsync(const std::string& context,
-                                       IBufferView& bufferView);
+  ArrayBufferView& loadBufferViewAsync(const std::string& context, IBufferView& bufferView);
 
   /**
    * @brief Hidden
    */
-  MaterialPtr _loadMaterialAsync(
-    const std::string& context, IMaterial& material, const MeshPtr& babylonMesh,
-    unsigned int babylonDrawMode,
-    const std::function<void(const MaterialPtr& babylonMaterial)>& assign);
+  MaterialPtr
+  _loadMaterialAsync(const std::string& context, IMaterial& material, const MeshPtr& babylonMesh,
+                     unsigned int babylonDrawMode,
+                     const std::function<void(const MaterialPtr& babylonMaterial)>& assign);
 
   /**
    * @brief Creates a Babylon material from a glTF material.
@@ -302,8 +292,7 @@ public:
    * @param babylonDrawMode The draw mode for the Babylon material
    * @returns The Babylon material
    */
-  MaterialPtr createMaterial(const std::string& context,
-                             const IMaterial& material,
+  MaterialPtr createMaterial(const std::string& context, const IMaterial& material,
                              unsigned int babylonDrawMode);
 
   /**
@@ -313,8 +302,7 @@ public:
    * @param babylonMaterial The Babylon material
    * @returns A promise that resolves when the load is complete
    */
-  bool loadMaterialPropertiesAsync(const std::string& context,
-                                   const IMaterial& material,
+  bool loadMaterialPropertiesAsync(const std::string& context, const IMaterial& material,
                                    const MaterialPtr& babylonMaterial);
 
   /**
@@ -325,8 +313,7 @@ public:
    * @param babylonMaterial The Babylon material
    * @returns A promise that resolves when the load is complete
    */
-  void loadMaterialBasePropertiesAsync(const std::string& context,
-                                       const IMaterial& material,
+  void loadMaterialBasePropertiesAsync(const std::string& context, const IMaterial& material,
                                        const MaterialPtr& babylonMaterial);
 
   /**
@@ -337,8 +324,7 @@ public:
    * @param material The glTF material property
    * @param babylonMaterial The Babylon material
    */
-  void loadMaterialAlphaProperties(const std::string& context,
-                                   const IMaterial& material,
+  void loadMaterialAlphaProperties(const std::string& context, const IMaterial& material,
                                    const MaterialPtr& babylonMaterial);
 
   /**
@@ -350,9 +336,9 @@ public:
    * @returns A promise that resolves with the loaded Babylon texture when the
    * load is complete
    */
-  BaseTexturePtr loadTextureInfoAsync(
-    const std::string& context, const IGLTF2::ITextureInfo& textureInfo,
-    const std::function<void(const BaseTexturePtr& babylonTexture)>& assign);
+  BaseTexturePtr
+  loadTextureInfoAsync(const std::string& context, const IGLTF2::ITextureInfo& textureInfo,
+                       const std::function<void(const BaseTexturePtr& babylonTexture)>& assign);
 
   /**
    * @brief Loads a glTF image.
@@ -369,8 +355,7 @@ public:
    * @returns A promise that resolves with the loaded data when the load is
    * complete
    */
-  ArrayBufferView loadUriAsync(const std::string& context,
-                               const std::string& uri);
+  ArrayBufferView loadUriAsync(const std::string& context, const std::string& uri);
 
   /**
    * @brief Adds a JSON pointer to the metadata of the Babylon object at
@@ -378,8 +363,7 @@ public:
    * @param babylonObject the Babylon object with metadata
    * @param pointer the JSON pointer
    */
-  void AddPointerMetadata(const BaseTexturePtr& babylonObject,
-                          const std::string& pointer);
+  void AddPointerMetadata(const BaseTexturePtr& babylonObject, const std::string& pointer);
 
   /**
    * @brief Adds a JSON pointer to the metadata of the Babylon object at
@@ -387,8 +371,7 @@ public:
    * @param babylonObject the Babylon object with metadata
    * @param pointer the JSON pointer
    */
-  void AddPointerMetadata(const TransformNodePtr& babylonObject,
-                          const std::string& pointer);
+  void AddPointerMetadata(const TransformNodePtr& babylonObject, const std::string& pointer);
 
   /**
    * @brief Adds a JSON pointer to the metadata of the Babylon object at
@@ -396,8 +379,7 @@ public:
    * @param babylonObject the Babylon object with metadata
    * @param pointer the JSON pointer
    */
-  void AddPointerMetadata(const MaterialPtr& babylonObject,
-                          const std::string& pointer);
+  void AddPointerMetadata(const MaterialPtr& babylonObject, const std::string& pointer);
 
   /**
    * @brief Adds a JSON pointer to the metadata of the Babylon object at
@@ -405,8 +387,7 @@ public:
    * @param babylonObject the Babylon object with metadata
    * @param pointer the JSON pointer
    */
-  void AddPointerMetadata(const CameraPtr& babylonObject,
-                          const std::string& pointer);
+  void AddPointerMetadata(const CameraPtr& babylonObject, const std::string& pointer);
 
   /**
    * @brief Increments the indentation level and logs a message.
@@ -443,135 +424,110 @@ protected:
 
 private:
   /** Hidden */
-  void _loadAsync(const std::vector<size_t>& nodes,
-                  const std::function<void()>& resultFunc);
+  void _loadAsync(const std::vector<size_t>& nodes, const std::function<void()>& resultFunc);
   void _loadData(const IGLTFLoaderData& data);
   void _setupData();
   void _loadExtensions();
   void _checkExtensions();
   void _setState(const GLTFLoaderState& state);
   INodePtr _createRootNode();
-  void _forEachPrimitive(
-    const INode& node,
-    const std::function<void(const AbstractMeshPtr& babylonMesh)>& callback);
+  void _forEachPrimitive(const INode& node,
+                         const std::function<void(const AbstractMeshPtr& babylonMesh)>& callback);
   std::vector<AbstractMeshPtr> _getMeshes();
   std::vector<SkeletonPtr> _getSkeletons();
   std::vector<AnimationGroupPtr> _getAnimationGroups();
   void _startAnimations();
-  TransformNodePtr _loadMeshAsync(
-    const std::string& context, INode& node, IMesh& mesh,
-    const std::function<void(const TransformNodePtr& babylonTransformNode)>&
-      assign);
-  GeometryPtr _loadVertexDataAsync(const std::string& context,
-                                   IMeshPrimitive& primitive,
+  TransformNodePtr
+  _loadMeshAsync(const std::string& context, INode& node, IMesh& mesh,
+                 const std::function<void(const TransformNodePtr& babylonTransformNode)>& assign);
+  GeometryPtr _loadVertexDataAsync(const std::string& context, IMeshPrimitive& primitive,
                                    const MeshPtr& babylonMesh);
-  void _createMorphTargets(const std::string& context, INode& node,
-                           const IMesh& mesh, const IMeshPrimitive& primitive,
-                           const MeshPtr& babylonMesh);
-  void _loadMorphTargetsAsync(const std::string& context,
-                              const IMeshPrimitive& primitive,
-                              const MeshPtr& babylonMesh,
-                              const GeometryPtr& babylonGeometry);
-  void _loadMorphTargetVertexDataAsync(
-    const std::string& context, const GeometryPtr& babylonGeometry,
-    const std::unordered_map<std::string, size_t>& attributes,
-    const MorphTargetPtr& babylonMorphTarget);
-  static void _LoadTransform(const INode& node,
-                             const TransformNodePtr& babylonNode);
-  void _loadSkinAsync(const std::string& context, const INode& node,
-                      ISkin& skin);
+  void _createMorphTargets(const std::string& context, INode& node, const IMesh& mesh,
+                           const IMeshPrimitive& primitive, const MeshPtr& babylonMesh);
+  void _loadMorphTargetsAsync(const std::string& context, const IMeshPrimitive& primitive,
+                              const MeshPtr& babylonMesh, const GeometryPtr& babylonGeometry);
+  void _loadMorphTargetVertexDataAsync(const std::string& context,
+                                       const GeometryPtr& babylonGeometry,
+                                       const std::unordered_map<std::string, size_t>& attributes,
+                                       const MorphTargetPtr& babylonMorphTarget);
+  static void _LoadTransform(const INode& node, const TransformNodePtr& babylonNode);
+  void _loadSkinAsync(const std::string& context, const INode& node, ISkin& skin);
   void _loadBones(const std::string& context, const ISkin& skin,
                   const SkeletonPtr& babylonSkeleton);
-  BonePtr _loadBone(INode& node, const ISkin& skin,
-                    const SkeletonPtr& babylonSkeleton,
+  BonePtr _loadBone(INode& node, const ISkin& skin, const SkeletonPtr& babylonSkeleton,
                     std::unordered_map<size_t, BonePtr>& babylonBones);
-  Float32Array _loadSkinInverseBindMatricesDataAsync(const std::string& context,
-                                                     const ISkin& skin);
+  Float32Array _loadSkinInverseBindMatricesDataAsync(const std::string& context, const ISkin& skin);
   void _updateBoneMatrices(const SkeletonPtr& babylonSkeleton,
                            const Float32Array& inverseBindMatricesData);
   Matrix _getNodeMatrix(const INode& node);
   void _loadAnimationsAsync();
   _IAnimationSamplerData _loadAnimationSamplerAsync(const std::string& context,
                                                     IAnimationSampler& sampler);
-  ArrayBufferView& _loadBufferAsync(const std::string& context,
-                                    IBuffer& buffer);
+  ArrayBufferView& _loadBufferAsync(const std::string& context, IBuffer& buffer);
+  template <typename T>
+  ArrayBufferView& _loadAccessorAsync(const std::string& context, IAccessor& accessor);
+  Float32Array& _loadFloatAccessorAsync(const std::string& context, IAccessor& accessor);
   IndicesArray& _getConverted32bitIndices(IAccessor& accessor);
   IndicesArray _castIndicesTo32bit(const IGLTF2::AccessorComponentType& type,
                                    const ArrayBufferView& buffer);
-  IndicesArray& _loadIndicesAccessorAsync(const std::string& context,
-                                          IAccessor& accessor);
-  Float32Array& _loadFloatAccessorAsync(const std::string& context,
-                                        IAccessor& accessor);
-  BufferPtr _loadVertexBufferViewAsync(IBufferView& bufferView,
-                                       const std::string& kind);
-  VertexBufferPtr& _loadVertexAccessorAsync(const std::string& context,
-                                            IAccessor& accessor,
+  IndicesArray& _loadIndicesAccessorAsync(const std::string& context, IAccessor& accessor);
+  BufferPtr _loadVertexBufferViewAsync(IBufferView& bufferView, const std::string& kind);
+  VertexBufferPtr& _loadVertexAccessorAsync(const std::string& context, IAccessor& accessor,
                                             const std::string& kind);
   void _loadMaterialMetallicRoughnessPropertiesAsync(
     const std::string& context,
     std::optional<IMaterialPbrMetallicRoughness> properties = std::nullopt,
     const MaterialPtr& babylonMaterial                      = nullptr);
-  MaterialPtr _createDefaultMaterial(const std::string& name,
-                                     unsigned int babylonDrawMode);
-  BaseTexturePtr _loadTextureAsync(
-    const std::string& context, const ITexture& texture,
-    const std::function<void(const BaseTexturePtr& babylonTexture)>& assign);
+  MaterialPtr _createDefaultMaterial(const std::string& name, unsigned int babylonDrawMode);
+  BaseTexturePtr
+  _loadTextureAsync(const std::string& context, const ITexture& texture,
+                    const std::function<void(const BaseTexturePtr& babylonTexture)>& assign);
   _ISamplerData _loadSampler(const std::string& context, ISampler& sampler);
   void _onProgress();
-  static unsigned int
-  _GetTextureWrapMode(const std::string& context,
-                      std::optional<IGLTF2::TextureWrapMode> mode
-                      = std::nullopt);
-  static unsigned int _GetTextureSamplingMode(const std::string& context,
-                                              const ISampler& sampler);
-  static ArrayBufferView _GetTypedArray(
-    const std::string& context, IGLTF2::AccessorComponentType componentType,
-    const ArrayBufferView& bufferView,
-    std::optional<size_t> byteOffset = std::nullopt, size_t length = 0);
-  static unsigned int _GetNumComponents(const std::string& context,
-                                        IGLTF2::AccessorType type);
-  static unsigned int _GetNumComponents(const std::string& context,
-                                        const std::string& type);
+  static unsigned int _GetTextureWrapMode(const std::string& context,
+                                          std::optional<IGLTF2::TextureWrapMode> mode
+                                          = std::nullopt);
+  static unsigned int _GetTextureSamplingMode(const std::string& context, const ISampler& sampler);
+  static ArrayBufferView _GetTypedArray(const std::string& context,
+                                        IGLTF2::AccessorComponentType componentType,
+                                        const ArrayBufferView& bufferView,
+                                        std::optional<size_t> byteOffset = std::nullopt,
+                                        size_t length                    = 0);
+  static unsigned int _GetNumComponents(const std::string& context, IGLTF2::AccessorType type);
+  static unsigned int _GetNumComponents(const std::string& context, const std::string& type);
   static bool _ValidateUri(const std::string& uri);
   static unsigned int _GetDrawMode(const std::string& context,
-                                   std::optional<IGLTF2::MeshPrimitiveMode> mode
-                                   = std::nullopt);
+                                   std::optional<IGLTF2::MeshPrimitiveMode> mode = std::nullopt);
   void _compileMaterialsAsync();
   void _compileShadowGeneratorsAsync();
-  void _forEachExtensions(
-    const std::function<void(const IGLTFLoaderExtension& extension)>& action);
+  void _forEachExtensions(const std::function<void(const IGLTFLoaderExtension& extension)>& action);
   void _extensionsOnLoading();
   void _extensionsOnReady();
-  bool _extensionsLoadSceneAsync(const std::string& context,
-                                 const IScene& scene);
+  bool _extensionsLoadSceneAsync(const std::string& context, const IScene& scene);
   TransformNodePtr _extensionsLoadNodeAsync(
     const std::string& context, const INode& node,
-    const std::function<void(const TransformNodePtr& babylonTransformNode)>&
-      assign);
-  CameraPtr _extensionsLoadCameraAsync(
-    const std::string& context, const ICamera& camera,
-    const std::function<void(const CameraPtr& babylonCamera)>& assign);
+    const std::function<void(const TransformNodePtr& babylonTransformNode)>& assign);
+  CameraPtr
+  _extensionsLoadCameraAsync(const std::string& context, const ICamera& camera,
+                             const std::function<void(const CameraPtr& babylonCamera)>& assign);
   GeometryPtr _extensionsLoadVertexDataAsync(const std::string& context,
                                              const IMeshPrimitive& primitive,
                                              const MeshPtr& babylonMesh);
   MaterialPtr _extensionsLoadMaterialAsync(
-    const std::string& context, const IMaterial& material,
-    const MeshPtr& babylonMesh, unsigned int babylonDrawMode,
+    const std::string& context, const IMaterial& material, const MeshPtr& babylonMesh,
+    unsigned int babylonDrawMode,
     const std::function<void(const MaterialPtr& babylonMaterial)>& assign);
-  MaterialPtr _extensionsCreateMaterial(const std::string& context,
-                                        const IMaterial& material,
+  MaterialPtr _extensionsCreateMaterial(const std::string& context, const IMaterial& material,
                                         unsigned int babylonDrawMode);
-  bool
-  _extensionsLoadMaterialPropertiesAsync(const std::string& context,
-                                         const IMaterial& material,
-                                         const MaterialPtr& babylonMaterial);
+  bool _extensionsLoadMaterialPropertiesAsync(const std::string& context, const IMaterial& material,
+                                              const MaterialPtr& babylonMaterial);
   BaseTexturePtr _extensionsLoadTextureInfoAsync(
     const std::string& context, const IGLTF2::ITextureInfo& textureInfo,
     const std::function<void(const BaseTexturePtr& babylonTexture)>& assign);
   AnimationGroupPtr _extensionsLoadAnimationAsync(const std::string& context,
                                                   const IAnimation& animation);
-  std::optional<ArrayBufferView>
-  _extensionsLoadUriAsync(const std::string& context, const std::string& uri);
+  std::optional<ArrayBufferView> _extensionsLoadUriAsync(const std::string& context,
+                                                         const std::string& uri);
 
 private:
   bool _disposed;
