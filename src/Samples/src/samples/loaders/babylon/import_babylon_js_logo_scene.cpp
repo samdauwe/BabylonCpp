@@ -2,7 +2,6 @@
 #include <babylon/helpers/environment_helper.h>
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/loading/scene_loader.h>
-#include <babylon/samples/loaders/babylon/_loaders_babylon_samples_index.h>
 #include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
@@ -18,9 +17,7 @@ struct ImportBabylonJSLogoScene : public IRenderableScene {
   {
   }
 
-  ~ImportBabylonJSLogoScene() override
-  {
-  }
+  ~ImportBabylonJSLogoScene() override = default;
 
   const char* getName() override
   {
@@ -41,7 +38,7 @@ struct ImportBabylonJSLogoScene : public IRenderableScene {
 
 }; // end of struct ImportBabylonJSLogoScene
 
-BABYLON_REGISTER_SAMPLE(_LoadersBabylonSamplesIndex::CategoryName(), ImportBabylonJSLogoScene)
+BABYLON_REGISTER_SAMPLE("Loaders - babylon format", ImportBabylonJSLogoScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

@@ -5,7 +5,6 @@
 #include <babylon/lights/light.h>
 #include <babylon/loading/glTF/gltf_file_loader.h>
 #include <babylon/loading/scene_loader.h>
-#include <babylon/samples/loaders/gltf/_loaders_gtlf_samples_index.h>
 #include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
@@ -29,9 +28,7 @@ struct AnimatedMorphSphereScene : public IRenderableScene {
     GLTF2::GLTFFileLoader::RegisterAsSceneLoaderPlugin();
   }
 
-  ~AnimatedMorphSphereScene() override
-  {
-  }
+  ~AnimatedMorphSphereScene() override = default;
 
   const char* getName() override
   {
@@ -60,7 +57,7 @@ struct AnimatedMorphSphereScene : public IRenderableScene {
 
 }; // end of struct AnimatedMorphSphereScene
 
-BABYLON_REGISTER_SAMPLE(_LoadersGLTFSamplesIndex::CategoryName(), AnimatedMorphSphereScene)
+BABYLON_REGISTER_SAMPLE("Loaders - glTF format", AnimatedMorphSphereScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

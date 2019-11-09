@@ -4,7 +4,6 @@
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/loading/glTF/gltf_file_loader.h>
 #include <babylon/loading/scene_loader.h>
-#include <babylon/samples/loaders/gltf/_loaders_gtlf_samples_index.h>
 #include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
@@ -22,9 +21,7 @@ struct BoxTexturedScene : public IRenderableScene {
     GLTF2::GLTFFileLoader::RegisterAsSceneLoaderPlugin();
   }
 
-  ~BoxTexturedScene() override
-  {
-  }
+  ~BoxTexturedScene() override = default;
 
   const char* getName() override
   {
@@ -53,7 +50,7 @@ struct BoxTexturedScene : public IRenderableScene {
 
 }; // end of struct BoxTexturedScene
 
-BABYLON_REGISTER_SAMPLE(_LoadersGLTFSamplesIndex::CategoryName(), BoxTexturedScene)
+BABYLON_REGISTER_SAMPLE("Loaders - glTF format", BoxTexturedScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

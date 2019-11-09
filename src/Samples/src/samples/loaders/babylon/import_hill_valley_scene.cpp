@@ -4,7 +4,6 @@
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/loading/scene_loader.h>
 #include <babylon/materials/material.h>
-#include <babylon/samples/loaders/babylon/_loaders_babylon_samples_index.h>
 #include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
@@ -20,9 +19,7 @@ struct ImportHillValleyScene : public IRenderableScene {
   {
   }
 
-  ~ImportHillValleyScene() override
-  {
-  }
+  ~ImportHillValleyScene() override = default;
 
   const char* getName() override
   {
@@ -65,7 +62,7 @@ struct ImportHillValleyScene : public IRenderableScene {
 
 }; // end of struct ImportHillValleyScene
 
-BABYLON_REGISTER_SAMPLE(_LoadersBabylonSamplesIndex::CategoryName(), ImportHillValleyScene)
+BABYLON_REGISTER_SAMPLE("Loaders - babylon format", ImportHillValleyScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

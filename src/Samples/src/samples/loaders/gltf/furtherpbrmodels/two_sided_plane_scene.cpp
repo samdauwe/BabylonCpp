@@ -6,7 +6,6 @@
 #include <babylon/loading/glTF/gltf_file_loader.h>
 #include <babylon/loading/scene_loader.h>
 #include <babylon/meshes/abstract_mesh.h>
-#include <babylon/samples/loaders/gltf/_loaders_gtlf_samples_index.h>
 #include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
@@ -24,9 +23,7 @@ struct TwoSidedPlaneScene : public IRenderableScene {
     GLTF2::GLTFFileLoader::RegisterAsSceneLoaderPlugin();
   }
 
-  ~TwoSidedPlaneScene() override
-  {
-  }
+  ~TwoSidedPlaneScene() override = default;
 
   const char* getName() override
   {
@@ -60,7 +57,7 @@ struct TwoSidedPlaneScene : public IRenderableScene {
 
 }; // end of struct TwoSidedPlaneScene
 
-BABYLON_REGISTER_SAMPLE(_LoadersGLTFSamplesIndex::CategoryName(), TwoSidedPlaneScene)
+BABYLON_REGISTER_SAMPLE("Loaders - glTF format", TwoSidedPlaneScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

@@ -5,7 +5,6 @@
 #include <babylon/lights/light.h>
 #include <babylon/loading/glTF/gltf_file_loader.h>
 #include <babylon/loading/scene_loader.h>
-#include <babylon/samples/loaders/gltf/_loaders_gtlf_samples_index.h>
 #include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
@@ -27,9 +26,7 @@ struct SimpleTextureScene : public IRenderableScene {
     GLTF2::GLTFFileLoader::RegisterAsSceneLoaderPlugin();
   }
 
-  ~SimpleTextureScene() override
-  {
-  }
+  ~SimpleTextureScene() override = default;
 
   const char* getName() override
   {
@@ -58,7 +55,7 @@ struct SimpleTextureScene : public IRenderableScene {
 
 }; // end of struct SimpleTextureScene
 
-BABYLON_REGISTER_SAMPLE(_LoadersGLTFSamplesIndex::CategoryName(), SimpleTextureScene)
+BABYLON_REGISTER_SAMPLE("Loaders - glTF format", SimpleTextureScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

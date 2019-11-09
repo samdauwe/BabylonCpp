@@ -5,7 +5,6 @@
 #include <babylon/lights/light.h>
 #include <babylon/loading/glTF/gltf_file_loader.h>
 #include <babylon/loading/scene_loader.h>
-#include <babylon/samples/loaders/gltf/_loaders_gtlf_samples_index.h>
 #include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
@@ -24,9 +23,7 @@ struct AnimatedTriangleScene : public IRenderableScene {
     GLTF2::GLTFFileLoader::RegisterAsSceneLoaderPlugin();
   }
 
-  ~AnimatedTriangleScene() override
-  {
-  }
+  ~AnimatedTriangleScene() override = default;
 
   const char* getName() override
   {
@@ -55,7 +52,7 @@ struct AnimatedTriangleScene : public IRenderableScene {
 
 }; // end of struct AnimatedTriangleScene
 
-BABYLON_REGISTER_SAMPLE(_LoadersGLTFSamplesIndex::CategoryName(), AnimatedTriangleScene)
+BABYLON_REGISTER_SAMPLE("Loaders - glTF format", AnimatedTriangleScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

@@ -3,7 +3,6 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/string.h>
 #include <babylon/interfaces/irenderable_scene.h>
-#include <babylon/samples/loaders/_loaders_samples_index.h>
 #include <babylon/samples/materials/_materials_samples_index.h>
 #include <babylon/samples/meshes/_meshes_samples_index.h>
 #include <babylon/samples/optimizations/_optimizations_samples_index.h>
@@ -24,12 +23,6 @@ SamplesIndex::SamplesIndex()
 {
   // Initialize the samples index
   _samplesIndex = {
-    // Loaders - babylon format
-    {_LoadersBabylonSamplesIndex::CategoryName(), _LoadersBabylonSamplesIndex()},
-#ifdef WITH_LOADERS
-    // Loaders - glTF format
-    {_LoadersGLTFSamplesIndex::CategoryName(), _LoadersGLTFSamplesIndex()},
-#endif
     // Materials samples
     {_MaterialsSamplesIndex::CategoryName(), _MaterialsSamplesIndex()},
     // Meshes samples
@@ -80,8 +73,7 @@ void SamplesIndex::fillSamplesFailures() const
     {"VolumetricLightScatteringScene", {SampleFailureReasonKind::segFault}}};
 
   // all gltf samples fail under windows, with an empty rendering
-  for (const auto& sampleName :
-       getSampleNamesInCategory(_LoadersGLTFSamplesIndex::CategoryName())) {
+  for (const auto& sampleName : getSampleNamesInCategory("Loaders - glTF format")) {
     SampleFailureReason reason{SampleFailureReasonKind::empty3d, "Empty rendering under windows"};
     _samplesFailures[sampleName] = reason;
   }
@@ -264,16 +256,12 @@ std::string SampleFailureReason_Str(SampleFailureReasonKind s)
   switch (s) {
     case SampleFailureReasonKind::segFault:
       return "Segmentation fault";
-      break;
     case SampleFailureReasonKind::processHung:
       return "Process hung (infinite loop?)";
-      break;
     case SampleFailureReasonKind::empty3d:
       return "3D rendering is empty";
-      break;
     case SampleFailureReasonKind::broken3d:
       return "Broken (bad rendering and/or bad behavior)";
-      break;
     default:
       throw "Unhandled enum!";
   }

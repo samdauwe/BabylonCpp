@@ -5,17 +5,15 @@
 #include <babylon/lights/light.h>
 #include <babylon/loading/glTF/gltf_file_loader.h>
 #include <babylon/loading/scene_loader.h>
-#include <babylon/samples/loaders/gltf/_loaders_gtlf_samples_index.h>
 #include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
 namespace Samples {
 
 /**
- * @brief Triangle Without Indices Scene (glTF). The simplest possible glTF
- * asset: A single scene with a single node and a single mesh with a single
- * mesh.primitive with a single triangle with a single attribute, without
- * indices and without a material.
+ * @brief Triangle Without Indices Scene (glTF). The simplest possible glTF asset: A single scene
+ * with a single node and a single mesh with a single mesh.primitive with a single triangle with a
+ * single attribute, without indices and without a material.
  * @see https://doc.babylonjs.com/how_to/load_from_any_file_type
  * @see https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/TriangleWithoutIndices
  */
@@ -26,9 +24,7 @@ struct TriangleWithoutIndicesScene : public IRenderableScene {
     GLTF2::GLTFFileLoader::RegisterAsSceneLoaderPlugin();
   }
 
-  ~TriangleWithoutIndicesScene() override
-  {
-  }
+  ~TriangleWithoutIndicesScene() override = default;
 
   const char* getName() override
   {
@@ -58,7 +54,7 @@ struct TriangleWithoutIndicesScene : public IRenderableScene {
 
 }; // end of struct TriangleWithoutIndicesScene
 
-BABYLON_REGISTER_SAMPLE(_LoadersGLTFSamplesIndex::CategoryName(), TriangleWithoutIndicesScene)
+BABYLON_REGISTER_SAMPLE("Loaders - glTF format", TriangleWithoutIndicesScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

@@ -5,7 +5,6 @@
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/loading/scene_loader.h>
 #include <babylon/meshes/abstract_mesh.h>
-#include <babylon/samples/loaders/babylon/_loaders_babylon_samples_index.h>
 #include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
@@ -13,7 +12,8 @@ namespace Samples {
 
 /**
  * @brief Import Suzanne Scene.
- * @see https://www.davrous.com/2013/06/17/tutorial-part-3-learning-how-to-write-a-3d-soft-engine-in-c-ts-or-js-loading-meshes-exported-from-blender/
+ * @see
+ * https://www.davrous.com/2013/06/17/tutorial-part-3-learning-how-to-write-a-3d-soft-engine-in-c-ts-or-js-loading-meshes-exported-from-blender/
  * @see http://david.blob.core.windows.net/softengine3d/part6webgl/index.html
  */
 class ImportSuzanneScene : public IRenderableScene {
@@ -23,9 +23,7 @@ public:
   {
   }
 
-  ~ImportSuzanneScene() override
-  {
-  }
+  ~ImportSuzanneScene() override = default;
 
   const char* getName() override
   {
@@ -58,7 +56,7 @@ private:
 
 }; // end of class ImportSuzanneScene
 
-BABYLON_REGISTER_SAMPLE(_LoadersBabylonSamplesIndex::CategoryName(), ImportSuzanneScene)
+BABYLON_REGISTER_SAMPLE("Loaders - babylon format", ImportSuzanneScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON
