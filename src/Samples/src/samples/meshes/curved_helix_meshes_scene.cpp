@@ -1,5 +1,4 @@
-#include <babylon/samples/meshes/curved_helix_meshes_scene.h>
-
+#include <babylon/samples/samples_index.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/engines/scene.h>
@@ -9,81 +8,89 @@
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
+#include <babylon/interfaces/irenderable_scene.h>
 
 namespace BABYLON {
 namespace Samples {
 
-CurvedHelixMeshesScene::CurvedHelixMeshesScene(ICanvas* iCanvas)
-    : IRenderableScene(iCanvas)
-{
-}
+class CurvedHelixMeshesScene : public IRenderableScene {
 
-CurvedHelixMeshesScene::~CurvedHelixMeshesScene()
-{
-}
-
-const char* CurvedHelixMeshesScene::getName()
-{
-  return "Curved Helix Meshes Scene";
-}
-
-void CurvedHelixMeshesScene::initializeScene(ICanvas* canvas, Scene* scene)
-{
-  // Change the scene clear color
-  scene->clearColor = Color4(0.5f, 0.5f, 0.5f);
-
-  // Create a camera
-  auto camera = ArcRotateCamera::New("camera1", 0.f, 0.f, 0.f,
-                                     Vector3(0.f, 0.f, -0.f), scene);
-  camera->setPosition(Vector3(5.f, 5.f, -12.f));
-
-  // Attach the camera to the canvas
-  camera->attachControl(canvas, true);
-
-  // Create a basic light
-  auto light = HemisphericLight::New("light1", Vector3(1.f, 0.5f, 0.f), scene);
-
-  // Default intensity is 1. Let's dim the light a small amount
-  light->intensity = 0.7f;
-
-  // Create a second light
-  auto spot       = SpotLight::New("spot", Vector3(25.f, 15.f, -10.f),
-                             Vector3(-1.f, -0.8f, 1.f), 15.f, 1.f, scene);
-  spot->diffuse   = Color3(1.f, 1.f, 1.f);
-  spot->specular  = Color3(0.f, 0.f, 0.f);
-  spot->intensity = 0.8f;
-
-  // Create a material for the mesh
-  auto mat             = StandardMaterial::New("mat1", scene);
-  mat->alpha           = 1.f;
-  mat->diffuseColor    = Color3(0.5f, 0.5f, 1.f);
-  mat->backFaceCulling = false;
-
-  // Create the curved helix meshes
-  std::vector<Vector3> shape{
-    Vector3(1.f, 1.f, 0.f),    //
-    Vector3(0.2f, 1.3f, 0.f),  //
-    Vector3(0.f, 1.f, 0.f),    //
-    Vector3(-0.2f, 1.3f, 0.f), //
-    Vector3(-1.f, 1.f, 0.f)    //
-  };
-
-  std::vector<Vector3> path;
-  path.reserve(100);
-  for (unsigned int i = 0; i < 100; ++i) {
-    path.emplace_back(Vector3(i / 5.f - 10.f, i / 5.f - 10.f, 0.f));
+public:
+  CurvedHelixMeshesScene(ICanvas* iCanvas)
+      : IRenderableScene(iCanvas)
+  {
+  }
+  ~CurvedHelixMeshesScene()
+  {
   }
 
-  auto pathline   = Mesh::CreateLines("pl", path, scene);
-  pathline->color = Color3::Magenta();
+  const char* getName() override
+  {
+    return "Curved Helix Meshes Scene";
+  }
+  void initializeScene(ICanvas* canvas, Scene* scene) override
+  {
+    // Change the scene clear color
+    scene->clearColor = Color4(0.5f, 0.5f, 0.5f);
+  
+    // Create a camera
+    auto camera = ArcRotateCamera::New("camera1", 0.f, 0.f, 0.f,
+                                       Vector3(0.f, 0.f, -0.f), scene);
+    camera->setPosition(Vector3(5.f, 5.f, -12.f));
+  
+    // Attach the camera to the canvas
+    camera->attachControl(canvas, true);
+  
+    // Create a basic light
+    auto light = HemisphericLight::New("light1", Vector3(1.f, 0.5f, 0.f), scene);
+  
+    // Default intensity is 1. Let's dim the light a small amount
+    light->intensity = 0.7f;
+  
+    // Create a second light
+    auto spot       = SpotLight::New("spot", Vector3(25.f, 15.f, -10.f),
+                               Vector3(-1.f, -0.8f, 1.f), 15.f, 1.f, scene);
+    spot->diffuse   = Color3(1.f, 1.f, 1.f);
+    spot->specular  = Color3(0.f, 0.f, 0.f);
+    spot->intensity = 0.8f;
+  
+    // Create a material for the mesh
+    auto mat             = StandardMaterial::New("mat1", scene);
+    mat->alpha           = 1.f;
+    mat->diffuseColor    = Color3(0.5f, 0.5f, 1.f);
+    mat->backFaceCulling = false;
+  
+    // Create the curved helix meshes
+    std::vector<Vector3> shape{
+      Vector3(1.f, 1.f, 0.f),    //
+      Vector3(0.2f, 1.3f, 0.f),  //
+      Vector3(0.f, 1.f, 0.f),    //
+      Vector3(-0.2f, 1.3f, 0.f), //
+      Vector3(-1.f, 1.f, 0.f)    //
+    };
+  
+    std::vector<Vector3> path;
+    path.reserve(100);
+    for (unsigned int i = 0; i < 100; ++i) {
+      path.emplace_back(Vector3(i / 5.f - 10.f, i / 5.f - 10.f, 0.f));
+    }
+  
+    auto pathline   = Mesh::CreateLines("pl", path, scene);
+    pathline->color = Color3::Magenta();
+  
+    auto extruded      = Mesh::ExtrudeShape("extruded", shape, path, 0.5f,
+                                       Math::PI / 5.f, 0, scene);
+    extruded->material = mat;
+  
+    // Show the axis
+    _showAxis(5.f, scene);
+  }
 
-  auto extruded      = Mesh::ExtrudeShape("extruded", shape, path, 0.5f,
-                                     Math::PI / 5.f, 0, scene);
-  extruded->material = mat;
+private:
+  void _showAxis(float size, Scene* scene);
 
-  // Show the axis
-  _showAxis(5.f, scene);
-}
+}; // end of class CurvedHelixMeshesScene
+
 
 void CurvedHelixMeshesScene::_showAxis(float size, Scene* scene)
 {
@@ -114,5 +121,6 @@ void CurvedHelixMeshesScene::_showAxis(float size, Scene* scene)
   axisZ->color = Color3(0.f, 0.f, 1.f);
 }
 
+BABYLON_REGISTER_SAMPLE("Meshes", CurvedHelixMeshesScene)
 } // end of namespace Samples
 } // end of namespace BABYLON

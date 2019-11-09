@@ -6,7 +6,6 @@
 #include <babylon/samples/collisionsandintersections/_collisions_and_intersections_samples_index.h>
 #include <babylon/samples/loaders/_loaders_samples_index.h>
 #include <babylon/samples/materials/_materials_samples_index.h>
-#include <babylon/samples/meshes/_meshes_samples_index.h>
 #include <babylon/samples/optimizations/_optimizations_samples_index.h>
 #include <babylon/samples/particles/_particles_samples_index.h>
 #include <babylon/samples/proceduraltextureslibrary/_procedural_textures_library_samples_index.h>
@@ -37,8 +36,6 @@ SamplesIndex::SamplesIndex()
 #endif
     // Materials samples
     {_MaterialsSamplesIndex::CategoryName(), _MaterialsSamplesIndex()},
-    // Meshes samples
-    {_MeshesSamplesIndex::CategoryName(), _MeshesSamplesIndex()},
     // Optimizations samples
     {_OptimizationsSamplesIndex::CategoryName(), _OptimizationsSamplesIndex()},
     // Particles samples

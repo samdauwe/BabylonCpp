@@ -1,54 +1,78 @@
-#include <babylon/samples/meshes/cuboid_scene.h>
-
+#include <babylon/samples/samples_index.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/free_camera.h>
 #include <babylon/engines/scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
+#include <babylon/interfaces/irenderable_scene.h>
 
 namespace BABYLON {
 namespace Samples {
 
-CuboidScene::CuboidScene(ICanvas* iCanvas)
-    : IRenderableScene(iCanvas), _cuboid{nullptr}
-{
-}
+/**
+ * @brief Cuboid Scene. Example demonstrating how to creates a 3D rectangle or
+ * cuboid directly without scaling a cube.
+ * @see https://www.babylonjs-playground.com/#K6M44R#48
+ */
+class CuboidScene : public IRenderableScene {
 
-CuboidScene::~CuboidScene()
-{
-}
+public:
+  CuboidScene(ICanvas* iCanvas)
+      : IRenderableScene(iCanvas), _cuboid{nullptr}
+  {
+  }
+  ~CuboidScene()
+  {
+  }
 
-const char* CuboidScene::getName()
-{
-  return "Cuboid Scene";
-}
+  const char* getName() override
+  {
+    return "Cuboid Scene";
+  }
+  void initializeScene(ICanvas* canvas, Scene* scene) override
+  {
+    // Create a FreeCamera, and set its position to (x:0, y:5, z:-10)
+    auto camera = FreeCamera::New("camera1", Vector3(0, 15, -30), scene);
+  
+    // Target the camera to scene origin
+    camera->setTarget(Vector3::Zero());
+  
+    // Attach the camera to the canvas
+    camera->attachControl(canvas, true);
+  
+    // Create a basic light, aiming 0,1,0 - meaning, to the sky
+    auto light = HemisphericLight::New("light1", Vector3(0, 1, 0), scene);
+  
+    // Default intensity is 1. Let's dim the light a small amount
+    light->intensity = 0.7f;
+  
+    // Create a 3D rectangle or cuboid directly without scaling a cube
+    _cuboid = CreateCuboid("rect3", 10, 20, 5, scene);
+  
+    // Animation
+    scene->registerBeforeRender([this](Scene*, EventState&) {
+      _cuboid->rotation().y += 0.008f * getScene()->getAnimationRatio();
+    });
+  }
 
-void CuboidScene::initializeScene(ICanvas* canvas, Scene* scene)
-{
-  // Create a FreeCamera, and set its position to (x:0, y:5, z:-10)
-  auto camera = FreeCamera::New("camera1", Vector3(0, 15, -30), scene);
+  /**
+   * @brief Creates a 3D rectangle or cuboid directly without scaling a cube.
+   * @param name name of the mesh
+   * @param length size in the x-direction
+   * @param width size in the z-direction
+   * @param height size in the y-direction
+   * @param scene scene
+   * @return cuboid
+   */
+  static MeshPtr CreateCuboid(const std::string& name, float length,
+                              float width, float height, Scene* scene);
 
-  // Target the camera to scene origin
-  camera->setTarget(Vector3::Zero());
+private:
+  MeshPtr _cuboid;
 
-  // Attach the camera to the canvas
-  camera->attachControl(canvas, true);
+}; // end of class CuboidScene
 
-  // Create a basic light, aiming 0,1,0 - meaning, to the sky
-  auto light = HemisphericLight::New("light1", Vector3(0, 1, 0), scene);
-
-  // Default intensity is 1. Let's dim the light a small amount
-  light->intensity = 0.7f;
-
-  // Create a 3D rectangle or cuboid directly without scaling a cube
-  _cuboid = CreateCuboid("rect3", 10, 20, 5, scene);
-
-  // Animation
-  scene->registerBeforeRender([this](Scene*, EventState&) {
-    _cuboid->rotation().y += 0.008f * getScene()->getAnimationRatio();
-  });
-}
 
 MeshPtr CuboidScene::CreateCuboid(const std::string& name, float length,
                                   float width, float height, Scene* scene)
@@ -123,5 +147,6 @@ MeshPtr CuboidScene::CreateCuboid(const std::string& name, float length,
   return cuboid;
 }
 
+BABYLON_REGISTER_SAMPLE("Meshes", CuboidScene)
 } // end of namespace Samples
 } // end of namespace BABYLON

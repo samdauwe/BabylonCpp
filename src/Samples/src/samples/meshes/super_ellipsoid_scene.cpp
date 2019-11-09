@@ -1,5 +1,4 @@
-#include <babylon/samples/meshes/super_ellipsoid_scene.h>
-
+#include <babylon/samples/samples_index.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/lights/hemispheric_light.h>
@@ -8,71 +7,85 @@
 #include <babylon/math/scalar.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/vertex_data.h>
+#include <babylon/interfaces/irenderable_scene.h>
 
 namespace BABYLON {
 namespace Samples {
 
-SuperEllipsoidScene::SuperEllipsoidScene(ICanvas* iCanvas)
-    : IRenderableScene(iCanvas)
-{
-}
+class SuperEllipsoidScene : public IRenderableScene {
 
-SuperEllipsoidScene::~SuperEllipsoidScene()
-{
-}
+public:
+  SuperEllipsoidScene(ICanvas* iCanvas)
+      : IRenderableScene(iCanvas)
+  {
+  }
+  ~SuperEllipsoidScene()
+  {
+  }
 
-const char* SuperEllipsoidScene::getName()
-{
-  return "Super Ellipsoid Scene";
-}
+  const char* getName() override
+  {
+    return "Super Ellipsoid Scene";
+  }
+  void initializeScene(ICanvas* canvas, Scene* scene) override
+  {
+    // Create a rotating camera
+    auto camera = ArcRotateCamera::New("Camera", 0.f, Math::PI_2, 12.f,
+                                       Vector3::Zero(), scene);
+    camera->setPosition(Vector3(-5.f, 5.f, 5.f));
+  
+    // Attach it to handle user inputs (keyboard, mouse, touch)
+    camera->attachControl(canvas, false);
+  
+    // Add a light
+    auto light = HemisphericLight::New("hemi", Vector3(0.f, 1.f, 0.f), scene);
+    light->intensity = 0.95f;
+  
+    // Create super ellipsoid and material
+    auto mat              = StandardMaterial::New("mat", scene);
+    mat->diffuseColor     = Color3::Purple();
+    mat->backFaceCulling  = false;
+    auto mat2             = StandardMaterial::New("mat2", scene);
+    mat2->diffuseColor    = Color3::Red();
+    mat2->backFaceCulling = false;
+    auto mat3             = StandardMaterial::New("mat3", scene);
+    mat3->diffuseColor    = Color3::Green();
+    mat3->backFaceCulling = false;
+    auto mat4             = StandardMaterial::New("mat4", scene);
+    mat4->diffuseColor    = Color3::Blue();
+    mat4->backFaceCulling = false;
+    auto mat5             = StandardMaterial::New("mat5", scene);
+    mat5->diffuseColor    = Color3::Yellow();
+    mat5->backFaceCulling = false;
+    auto superello1       = _createSuperEllipsoid(48, 0.2f, 0.2f, 1, 1, 1, scene);
+    superello1->material  = mat2;
+    auto superello2       = _createSuperEllipsoid(48, 0.2f, 0.2f, 1, 1, 1, scene);
+    superello2->position().x += 2.5f;
+    superello2->material              = mat;
+    superello2->material()->wireframe = true;
+    auto superello3 = _createSuperEllipsoid(48, 1.8f, 0.2f, 1, 1, 1, scene);
+    superello3->position().x -= 2.5f;
+    superello3->material = mat3;
+    auto superello4      = _createSuperEllipsoid(48, 1.8f, 0.2f, 1, 1, 1, scene);
+    superello4->position().z += 2.5f;
+    superello4->material              = mat4;
+    superello4->material()->wireframe = true;
+    auto superello5 = _createSuperEllipsoid(48, 0.2f, 2.9f, 1, 1, 1, scene);
+    superello5->position().z -= 2.5f;
+    superello5->material = mat5;
+  }
 
-void SuperEllipsoidScene::initializeScene(ICanvas* canvas, Scene* scene)
-{
-  // Create a rotating camera
-  auto camera = ArcRotateCamera::New("Camera", 0.f, Math::PI_2, 12.f,
-                                     Vector3::Zero(), scene);
-  camera->setPosition(Vector3(-5.f, 5.f, 5.f));
+private:
+  Vector3 _sampleSuperEllipsoid(float phi, float beta, float n1, float n2,
+                                float scaleX, float scaleY, float scaleZ) const;
+  Vector3 _calculateNormal(float phi, float beta, float n1, float n2,
+                           float scaleX, float scaleY, float scaleZ) const;
+  MeshPtr _createSuperEllipsoid(size_t samples, float n1, float n2,
+                                float scalex, float scaley, float scalez,
+                                Scene* scene);
 
-  // Attach it to handle user inputs (keyboard, mouse, touch)
-  camera->attachControl(canvas, false);
+}; // end of class SuperEllipsoidScene
 
-  // Add a light
-  auto light = HemisphericLight::New("hemi", Vector3(0.f, 1.f, 0.f), scene);
-  light->intensity = 0.95f;
-
-  // Create super ellipsoid and material
-  auto mat              = StandardMaterial::New("mat", scene);
-  mat->diffuseColor     = Color3::Purple();
-  mat->backFaceCulling  = false;
-  auto mat2             = StandardMaterial::New("mat2", scene);
-  mat2->diffuseColor    = Color3::Red();
-  mat2->backFaceCulling = false;
-  auto mat3             = StandardMaterial::New("mat3", scene);
-  mat3->diffuseColor    = Color3::Green();
-  mat3->backFaceCulling = false;
-  auto mat4             = StandardMaterial::New("mat4", scene);
-  mat4->diffuseColor    = Color3::Blue();
-  mat4->backFaceCulling = false;
-  auto mat5             = StandardMaterial::New("mat5", scene);
-  mat5->diffuseColor    = Color3::Yellow();
-  mat5->backFaceCulling = false;
-  auto superello1       = _createSuperEllipsoid(48, 0.2f, 0.2f, 1, 1, 1, scene);
-  superello1->material  = mat2;
-  auto superello2       = _createSuperEllipsoid(48, 0.2f, 0.2f, 1, 1, 1, scene);
-  superello2->position().x += 2.5f;
-  superello2->material              = mat;
-  superello2->material()->wireframe = true;
-  auto superello3 = _createSuperEllipsoid(48, 1.8f, 0.2f, 1, 1, 1, scene);
-  superello3->position().x -= 2.5f;
-  superello3->material = mat3;
-  auto superello4      = _createSuperEllipsoid(48, 1.8f, 0.2f, 1, 1, 1, scene);
-  superello4->position().z += 2.5f;
-  superello4->material              = mat4;
-  superello4->material()->wireframe = true;
-  auto superello5 = _createSuperEllipsoid(48, 0.2f, 2.9f, 1, 1, 1, scene);
-  superello5->position().z -= 2.5f;
-  superello5->material = mat5;
-}
 
 Vector3 SuperEllipsoidScene::_sampleSuperEllipsoid(float phi, float beta,
                                                    float n1, float n2,
@@ -178,5 +191,6 @@ MeshPtr SuperEllipsoidScene::_createSuperEllipsoid(size_t samples, float n1,
   return superello;
 }
 
+BABYLON_REGISTER_SAMPLE("Meshes", SuperEllipsoidScene)
 } // end of namespace Samples
 } // end of namespace BABYLON

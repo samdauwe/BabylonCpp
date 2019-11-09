@@ -1,5 +1,4 @@
-#include <babylon/samples/meshes/house_from_floorplan.h>
-
+#include <babylon/samples/samples_index.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/engines/scene.h>
@@ -8,9 +7,147 @@
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/polygonmesh/polygon_mesh_builder.h>
 #include <babylon/meshes/vertex_data.h>
+#include <babylon/interfaces/irenderable_scene.h>
+#include <babylon/math/color4.h>
+#include <babylon/math/vector3.h>
+#include <babylon/math/vector4.h>
 
 namespace BABYLON {
 namespace Samples {
+
+struct Door {
+  float width;
+  float height;
+  float left = 0.f;
+}; // end of struct Door
+
+struct DoorSpace {
+  Door door;
+  float left = 0.f;
+}; // end of struct DoorSpace
+
+struct Window {
+  float width;
+  float height;
+  float left   = 0.f;
+  float bottom = 0.f;
+}; // end of struct Window
+
+struct WindowSpace {
+  Window window;
+  float height;
+  float left = 0.f;
+  float top  = 0.f;
+}; // end of struct WindowSpace
+
+struct Wall {
+  Vector3 corner;
+  std::vector<DoorSpace> doorSpaces;
+  std::vector<WindowSpace> windowSpaces;
+}; // end of struct Wall
+
+struct WallData {
+  Float32Array positions;
+  Uint32Array indices;
+}; // end of struct WallData
+
+struct BuildFromPlanOptions {
+  Vector4 interiorUV   = Vector4(0, 0, 1, 1);
+  Vector4 exteriorUV   = Vector4(0, 0, 1, 1);
+  Color4 interiorColor = Color4(1, 1, 1, 1);
+  Color4 exteriorColor = Color4(1, 1, 1, 1);
+}; // end of struct BuildFromPlanOptions
+
+/**
+ * @brief Build a House from Plans scene. Starting with a polygon as the
+ * footprint, a house is built by giving the footprint thickness (ply),
+ * extruding and adding door and window spaces at given positions.
+ *
+ * Source: https://doc.babylonjs.com/samples/house
+ * @see https://www.babylonjs-playground.com/#4GBWI5#96
+ */
+class HouseFromFloorplanScene : public IRenderableScene {
+
+public:
+  HouseFromFloorplanScene(ICanvas* iCanvas);
+  ~HouseFromFloorplanScene() override;
+
+  const char* HouseFromFloorplanScene::getName() override
+  {
+    return "House from a Floorplan Scene";
+  }
+  void HouseFromFloorplanScene::initializeScene(ICanvas* canvas, Scene* scene) override
+  {
+    // Create a camera
+    auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, Math::PI / 3.f,
+                                       25.f, Vector3(0.f, 0.f, 4.5f), scene);
+    camera->setPosition(Vector3(0, 5, 12));
+    camera->attachControl(canvas, true);
+  
+    // Create a light
+    auto light
+      = HemisphericLight::New("hemiLight", Vector3(5.f, 10.f, 0.f), scene);
+    light->intensity = 0.95f;
+  
+    // Create the house from a floor plan
+    Float32Array baseData{-3.f, -2.f, -1.f, -4.f, 1.f, -4.f, 3.f, -2.f, 5.f,
+                          -2.f, 5.f,  1.f,  2.f,  1.f, 2.f,  3.f, -3.f, 3.f};
+  
+    const auto createCorner = [](float x, float y) { return Vector3(x, 0, y); };
+  
+    std::vector<Vector3> corners;
+    for (size_t b = 0; b < baseData.size() / 2; ++b) {
+      corners.emplace_back(createCorner(baseData[2 * b], baseData[2 * b + 1]));
+    }
+  
+    Door door{1.f, 1.8f, 0.f};
+    DoorSpace doorSpace{door, 1.f};
+  
+    Window window0{1.2f, 2.4f, 0.f, 0.f};
+    Window window1{2.f, 2.4f, 0.f, 0.f};
+  
+    WindowSpace windowSpace02{window0, 0.814f, 0.8f, 0.45f};
+    WindowSpace windowSpace1{window0, 0.4f, 0.4f, 0.45f};
+    WindowSpace windowSpace78{window1, 1.5, 0.6f, 0.45f};
+  
+    std::vector<Wall> walls;
+    for (size_t c = 0; c < corners.size(); ++c) {
+      walls.emplace_back(Wall{corners[c], {}, {}});
+    }
+  
+    walls[0].windowSpaces = {windowSpace02};
+    walls[1].windowSpaces = {windowSpace1};
+    walls[2].windowSpaces = {windowSpace02};
+    walls[7].windowSpaces = {windowSpace78};
+    walls[8].windowSpaces = {windowSpace78};
+  
+    walls[5].doorSpaces = {doorSpace};
+  
+    auto ply    = 0.3f;
+    auto height = 3.2f;
+  
+    BuildFromPlanOptions buildOptions;
+    buildOptions.interiorUV = Vector4(0.167f, 0.f, 1.f, 1.f);
+    buildOptions.exteriorUV = Vector4(0.f, 0.f, 0.16f, 1.f);
+    _house = buildFromPlan(walls, ply, height, buildOptions, scene);
+    _house->position().y -= 4.f;
+  
+    // Animations
+    _scene->registerBeforeRender([this](Scene*, EventState&) {
+      _house->rotation().y += _alpha * getScene()->getAnimationRatio();
+    });
+  }
+
+private:
+  MeshPtr buildFromPlan(std::vector<Wall>& walls, float ply, float height,
+                        BuildFromPlanOptions& options, Scene* scene);
+
+private:
+  float _alpha;
+  MeshPtr _house;
+
+}; // end of class HouseFromFloorplanScene
+
 
 HouseFromFloorplanScene::HouseFromFloorplanScene(ICanvas* iCanvas)
     : IRenderableScene(iCanvas), _alpha{0.01f}, _house{nullptr}
@@ -19,73 +156,6 @@ HouseFromFloorplanScene::HouseFromFloorplanScene(ICanvas* iCanvas)
 
 HouseFromFloorplanScene::~HouseFromFloorplanScene()
 {
-}
-
-const char* HouseFromFloorplanScene::getName()
-{
-  return "House from a Floorplan Scene";
-}
-
-void HouseFromFloorplanScene::initializeScene(ICanvas* canvas, Scene* scene)
-{
-  // Create a camera
-  auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, Math::PI / 3.f,
-                                     25.f, Vector3(0.f, 0.f, 4.5f), scene);
-  camera->setPosition(Vector3(0, 5, 12));
-  camera->attachControl(canvas, true);
-
-  // Create a light
-  auto light
-    = HemisphericLight::New("hemiLight", Vector3(5.f, 10.f, 0.f), scene);
-  light->intensity = 0.95f;
-
-  // Create the house from a floor plan
-  Float32Array baseData{-3.f, -2.f, -1.f, -4.f, 1.f, -4.f, 3.f, -2.f, 5.f,
-                        -2.f, 5.f,  1.f,  2.f,  1.f, 2.f,  3.f, -3.f, 3.f};
-
-  const auto createCorner = [](float x, float y) { return Vector3(x, 0, y); };
-
-  std::vector<Vector3> corners;
-  for (size_t b = 0; b < baseData.size() / 2; ++b) {
-    corners.emplace_back(createCorner(baseData[2 * b], baseData[2 * b + 1]));
-  }
-
-  Door door{1.f, 1.8f, 0.f};
-  DoorSpace doorSpace{door, 1.f};
-
-  Window window0{1.2f, 2.4f, 0.f, 0.f};
-  Window window1{2.f, 2.4f, 0.f, 0.f};
-
-  WindowSpace windowSpace02{window0, 0.814f, 0.8f, 0.45f};
-  WindowSpace windowSpace1{window0, 0.4f, 0.4f, 0.45f};
-  WindowSpace windowSpace78{window1, 1.5, 0.6f, 0.45f};
-
-  std::vector<Wall> walls;
-  for (size_t c = 0; c < corners.size(); ++c) {
-    walls.emplace_back(Wall{corners[c], {}, {}});
-  }
-
-  walls[0].windowSpaces = {windowSpace02};
-  walls[1].windowSpaces = {windowSpace1};
-  walls[2].windowSpaces = {windowSpace02};
-  walls[7].windowSpaces = {windowSpace78};
-  walls[8].windowSpaces = {windowSpace78};
-
-  walls[5].doorSpaces = {doorSpace};
-
-  auto ply    = 0.3f;
-  auto height = 3.2f;
-
-  BuildFromPlanOptions buildOptions;
-  buildOptions.interiorUV = Vector4(0.167f, 0.f, 1.f, 1.f);
-  buildOptions.exteriorUV = Vector4(0.f, 0.f, 0.16f, 1.f);
-  _house = buildFromPlan(walls, ply, height, buildOptions, scene);
-  _house->position().y -= 4.f;
-
-  // Animations
-  _scene->registerBeforeRender([this](Scene*, EventState&) {
-    _house->rotation().y += _alpha * getScene()->getAnimationRatio();
-  });
 }
 
 MeshPtr HouseFromFloorplanScene::buildFromPlan(std::vector<Wall>& walls,
@@ -977,5 +1047,6 @@ MeshPtr HouseFromFloorplanScene::buildFromPlan(std::vector<Wall>& walls,
   return customMesh;
 }
 
+BABYLON_REGISTER_SAMPLE("Meshes", HouseFromFloorplanScene)
 } // end of namespace Samples
 } // end of namespace BABYLON
