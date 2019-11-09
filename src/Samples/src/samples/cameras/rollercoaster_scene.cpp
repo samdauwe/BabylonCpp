@@ -1,17 +1,15 @@
-#include <babylon/samples/samples_index.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/cameras/follow_camera.h>
 #include <babylon/engines/scene.h>
+#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/cube_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/math/curve3.h>
-#include <babylon/meshes/mesh.h>
-#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/math/vector3.h>
-
-
+#include <babylon/meshes/mesh.h>
+#include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
 
@@ -23,18 +21,22 @@ using MeshPtr         = std::shared_ptr<Mesh>;
 namespace Samples {
 
 /**
- * @brief Rollercoaster Scene. Scene demonstrating a follow camera following a
- * moving target.
+ * @brief Rollercoaster Scene. Scene demonstrating a follow camera following a moving target.
  * @see https://www.babylonjs-playground.com/#1HH4OJ#29
  */
 class RollercoasterScene : public IRenderableScene {
 
 public:
-  RollercoasterScene(ICanvas* iCanvas) : IRenderableScene(iCanvas) {}
+  RollercoasterScene(ICanvas* iCanvas) : IRenderableScene(iCanvas)
+  {
+  }
 
-  ~RollercoasterScene() = default;
+  ~RollercoasterScene() override = default;
 
-  const char* getName() override { return "Rollercoaster Scene"; }
+  const char* getName() override
+  {
+    return "Rollercoaster Scene";
+  }
 
   void initializeScene(ICanvas* canvas, Scene* scene) override
   {
@@ -308,7 +310,7 @@ private:
 
 }; // end of class RollercoasterScene
 
-
 BABYLON_REGISTER_SAMPLE("Cameras", RollercoasterScene)
+
 } // end of namespace Samples
 } // end of namespace BABYLON

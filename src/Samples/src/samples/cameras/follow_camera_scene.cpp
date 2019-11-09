@@ -1,7 +1,7 @@
-#include <babylon/samples/samples_index.h>
 #include <babylon/cameras/follow_camera.h>
 #include <babylon/core/random.h>
 #include <babylon/engines/scene.h>
+#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/texture.h>
@@ -9,8 +9,7 @@
 #include <babylon/meshes/instanced_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
-#include <babylon/interfaces/irenderable_scene.h>
-
+#include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
 
@@ -22,8 +21,8 @@ using FollowCameraPtr = std::shared_ptr<FollowCamera>;
 namespace Samples {
 
 /**
- * @brief Follow camera scene. Cameras scene demonstrating a follow camera
- * following a moving target.
+ * @brief Follow camera scene. Cameras scene demonstrating a follow camera following a moving
+ * target.
  * @see https://www.babylonjs-playground.com/#12WBC#84
  */
 class FollowCameraScene : public IRenderableScene {
@@ -34,9 +33,12 @@ public:
   {
   }
 
-  ~FollowCameraScene() {}
+  ~FollowCameraScene() override = default;
 
-  const char* getName() override { return "Follow Camera Scene"; }
+  const char* getName() override
+  {
+    return "Follow Camera Scene";
+  }
 
   void initializeScene(ICanvas* canvas, Scene* scene) override
   {
@@ -134,7 +136,7 @@ private:
 
 }; // end of class FollowCameraScene
 
-
 BABYLON_REGISTER_SAMPLE("Cameras", FollowCameraScene)
+
 } // end of namespace Samples
 } // end of namespace BABYLON
