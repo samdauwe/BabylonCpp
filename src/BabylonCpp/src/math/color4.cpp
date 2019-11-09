@@ -384,8 +384,11 @@ Color4 Color4::FromColor3(const Color3& color3, float alpha)
 
 Color4 Color4::FromArray(const Float32Array& array, unsigned int offset)
 {
-  return Color4(array[offset], array[offset + 1], array[offset + 2],
-                array[offset + 3]);
+  if ((size_t)(offset + 3) < array.size())
+    return Color4(array[offset], array[offset + 1], array[offset + 2],
+                  array[offset + 3]);
+  else
+    return Color4(array[offset], array[offset + 1], array[offset + 2], 1.f);
 }
 
 Color4 Color4::FromInts(int r, int g, int b, int a)
