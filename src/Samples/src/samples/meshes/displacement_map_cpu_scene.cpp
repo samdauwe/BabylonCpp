@@ -17,14 +17,11 @@ namespace Samples {
  */
 struct DisplacementMapCpuScene : public IRenderableScene {
 
-  DisplacementMapCpuScene(ICanvas* iCanvas);
-  ~DisplacementMapCpuScene() override;
+  DisplacementMapCpuScene(ICanvas* iCanvas) : IRenderableScene(iCanvas) {}
+  ~DisplacementMapCpuScene() = default;
+  const char* getName() override { return "Displacement map (CPU) Scene"; }
 
-  const char* DisplacementMapCpuScene::getName() override
-  {
-    return "Displacement map (CPU) Scene";
-  }
-  void DisplacementMapCpuScene::initializeScene(ICanvas* canvas, Scene* scene) override
+  void initializeScene(ICanvas* canvas, Scene* scene) override
   {
     auto camera
       = ArcRotateCamera::New("Camera", 0.f, 0.f, 10.f, Vector3::Zero(), scene);
@@ -58,16 +55,6 @@ struct DisplacementMapCpuScene : public IRenderableScene {
   }
 
 }; // end of struct DisplacementMapCPUScene
-
-
-DisplacementMapCpuScene::DisplacementMapCpuScene(ICanvas* iCanvas)
-    : IRenderableScene(iCanvas)
-{
-}
-
-DisplacementMapCpuScene::~DisplacementMapCpuScene()
-{
-}
 
 BABYLON_REGISTER_SAMPLE("Meshes", DisplacementMapCpuScene)
 } // end of namespace Samples

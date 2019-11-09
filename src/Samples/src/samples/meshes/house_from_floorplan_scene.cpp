@@ -69,14 +69,14 @@ struct BuildFromPlanOptions {
 class HouseFromFloorplanScene : public IRenderableScene {
 
 public:
-  HouseFromFloorplanScene(ICanvas* iCanvas);
-  ~HouseFromFloorplanScene() override;
-
-  const char* HouseFromFloorplanScene::getName() override
+  HouseFromFloorplanScene(ICanvas* iCanvas)
+      : IRenderableScene(iCanvas), _alpha{0.01f}, _house{nullptr}
   {
-    return "House from a Floorplan Scene";
   }
-  void HouseFromFloorplanScene::initializeScene(ICanvas* canvas, Scene* scene) override
+  ~HouseFromFloorplanScene() = default;
+  const char* getName() override { return "House from a Floorplan Scene"; }
+
+  void initializeScene(ICanvas* canvas, Scene* scene) override
   {
     // Create a camera
     auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, Math::PI / 3.f,
@@ -148,15 +148,6 @@ private:
 
 }; // end of class HouseFromFloorplanScene
 
-
-HouseFromFloorplanScene::HouseFromFloorplanScene(ICanvas* iCanvas)
-    : IRenderableScene(iCanvas), _alpha{0.01f}, _house{nullptr}
-{
-}
-
-HouseFromFloorplanScene::~HouseFromFloorplanScene()
-{
-}
 
 MeshPtr HouseFromFloorplanScene::buildFromPlan(std::vector<Wall>& walls,
                                                float ply, float height,
