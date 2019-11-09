@@ -3,7 +3,6 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/string.h>
 #include <babylon/interfaces/irenderable_scene.h>
-#include <babylon/samples/shadows/_shadows_samples_index.h>
 #include <babylon/samples/specialfx/_special_fx_samples_index.h>
 #include <babylon/samples/textures/_textures_samples_index.h>
 
@@ -18,8 +17,6 @@ SamplesIndex::SamplesIndex()
 {
   // Initialize the samples index
   _samplesIndex = {
-    // Shadows samples
-    {_ShadowsSamplesIndex::CategoryName(), _ShadowsSamplesIndex()},
     // Special FX samples
     {_SpecialFXSamplesIndex::CategoryName(), _SpecialFXSamplesIndex()},
     // Textures samples
