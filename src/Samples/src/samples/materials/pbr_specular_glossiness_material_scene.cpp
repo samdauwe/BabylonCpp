@@ -1,49 +1,55 @@
-#include <babylon/samples/materials/pbr_specular_glossiness_material_scene.h>
-
 #include <babylon/cameras/arc_rotate_camera.h>
+#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/materials/pbr/pbr_specular_glossiness_material.h>
 #include <babylon/materials/textures/cube_texture.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
 namespace Samples {
 
-PBRSpecularGlossinessMaterialScene::PBRSpecularGlossinessMaterialScene(
-  ICanvas* iCanvas)
-    : IRenderableScene(iCanvas)
-{
-}
+/**
+ * @brief PBR Specular Glossiness Material Scene. Example demonstrating how to create physically
+ * based rendering specular glossiness materials.
+ * @see https://www.babylonjs-playground.com/#Z1VL3V#5
+ * @see https://doc.babylonjs.com/how_to/physically_based_rendering
+ */
+struct PbrSpecularGlossinessMaterialScene : public IRenderableScene {
 
-PBRSpecularGlossinessMaterialScene::~PBRSpecularGlossinessMaterialScene()
-{
-}
+  PbrSpecularGlossinessMaterialScene(ICanvas* iCanvas) : IRenderableScene(iCanvas)
+  {
+  }
 
-const char* PBRSpecularGlossinessMaterialScene::getName()
-{
-  return "PBR Specular Glossiness Material Scene";
-}
+  ~PbrSpecularGlossinessMaterialScene() override = default;
 
-void PBRSpecularGlossinessMaterialScene::initializeScene(ICanvas* canvas,
-                                                         Scene* scene)
-{
-  auto camera = ArcRotateCamera::New("camera1", 0.f, Math::PI_2, 5.f,
-                                     Vector3::Zero(), scene);
+  const char* getName() override
+  {
+    return "PBR Specular Glossiness Material Scene";
+  }
 
-  camera->lowerRadiusLimit = 2.f;
-  camera->upperRadiusLimit = 10.f;
+  void initializeScene(ICanvas* canvas, Scene* scene) override
+  {
+    auto camera = ArcRotateCamera::New("camera1", 0.f, Math::PI_2, 5.f, Vector3::Zero(), scene);
 
-  camera->attachControl(canvas, true);
+    camera->lowerRadiusLimit = 2.f;
+    camera->upperRadiusLimit = 10.f;
 
-  auto sphere = Mesh::CreateSphere("sphere1", 16, 2.f, scene);
+    camera->attachControl(canvas, true);
 
-  auto pbr                = PBRSpecularGlossinessMaterial::New("pbr", scene);
-  sphere->material        = pbr;
-  pbr->diffuseColor       = Color3(1.f, 0.766f, 0.336f);
-  pbr->specularColor      = Color3(1.f, 0.766f, 0.336f);
-  pbr->glossiness         = 0.4f;
-  pbr->environmentTexture = CubeTexture::CreateFromPrefilteredData(
-    "/textures/environment.dds", scene);
-}
+    auto sphere = Mesh::CreateSphere("sphere1", 16, 2.f, scene);
+
+    auto pbr           = PBRSpecularGlossinessMaterial::New("pbr", scene);
+    sphere->material   = pbr;
+    pbr->diffuseColor  = Color3(1.f, 0.766f, 0.336f);
+    pbr->specularColor = Color3(1.f, 0.766f, 0.336f);
+    pbr->glossiness    = 0.4f;
+    pbr->environmentTexture
+      = CubeTexture::CreateFromPrefilteredData("/textures/environment.dds", scene);
+  }
+
+}; // end of struct PBRSpecularGlossinessMaterialScene
+
+BABYLON_REGISTER_SAMPLE("Materials", PbrSpecularGlossinessMaterialScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON
