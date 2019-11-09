@@ -275,13 +275,13 @@ MeshPtr CSG::CSG::buildMeshGeometry(const std::string& name, Scene* scene,
 
   if (keepSubMeshes) {
     // Sort Polygons, since subMeshes are indices range
-    std::sort(polygons.begin(), polygons.end(),
+    BABYLON::stl_util::sort_js_style(polygons,
               [](const Polygon& a, const Polygon& b) {
                 if (a.shared.meshId == b.shared.meshId) {
-                  return a.shared.subMeshId > b.shared.subMeshId;
+                  return a.shared.subMeshId - b.shared.subMeshId;
                 }
                 else {
-                  return a.shared.meshId > b.shared.meshId;
+                  return a.shared.meshId - b.shared.meshId;
                 }
               });
   }

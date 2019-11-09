@@ -287,7 +287,7 @@ GPUParticleSystem::addColorGradient(float gradient, const Color4& iColor1,
   colorGradient.color1   = iColor1;
   _colorGradients.emplace_back(colorGradient);
 
-  std::sort(_colorGradients.begin(), _colorGradients.end(),
+  BABYLON::stl_util::sort_js_style(_colorGradients,
             [](const ColorGradient& a, const ColorGradient& b) {
               if (a.gradient < b.gradient) {
                 return -1;
@@ -325,7 +325,7 @@ void GPUParticleSystem::_addFactorGradient(
   valueGradient.factor1  = factor;
   factorGradients.emplace_back(valueGradient);
 
-  std::sort(factorGradients.begin(), factorGradients.end(),
+  BABYLON::stl_util::sort_js_style(factorGradients,
             [](const FactorGradient& a, const FactorGradient& b) {
               if (a.gradient < b.gradient) {
                 return -1;

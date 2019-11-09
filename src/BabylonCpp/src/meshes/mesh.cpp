@@ -350,7 +350,7 @@ std::vector<MeshLODLevelPtr>& Mesh::getLODLevels()
 void Mesh::_sortLODLevels()
 {
   auto& _LODLevels = _internalMeshDataInfo->_LODLevels;
-  std::sort(_LODLevels.begin(), _LODLevels.end(),
+  BABYLON::stl_util::sort_js_style(_LODLevels,
             [](const MeshLODLevelPtr& a, const MeshLODLevelPtr& b) {
               if (a->distance < b->distance) {
                 return 1;
@@ -358,7 +358,6 @@ void Mesh::_sortLODLevels()
               if (a->distance > b->distance) {
                 return -1;
               }
-
               return 0;
             });
 }

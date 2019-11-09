@@ -243,7 +243,7 @@ private:
 
       // Doors
       if (!walls[w].doorSpaces.empty()) {
-        std::sort(walls[w].doorSpaces.begin(), walls[w].doorSpaces.end(), compareLeft);
+        BABYLON::stl_util::sort_js_style(walls[w].doorSpaces, compareLeft);
       }
       auto doors = walls[w].doorSpaces.size();
 

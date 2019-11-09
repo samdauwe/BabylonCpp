@@ -362,7 +362,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
           auto sortedArray
             = stl_util::slice(transparentSubMeshes, 0,
                               static_cast<int>(transparentSubMeshes.size()));
-          std::sort(sortedArray.begin(), sortedArray.end(),
+          BABYLON::stl_util::sort_js_style(sortedArray,
                     [](const SubMesh* a, const SubMesh* b) {
                       // Alpha index first
                       if (a->_alphaIndex > b->_alphaIndex) {

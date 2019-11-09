@@ -383,7 +383,7 @@ void ParticleSystem::_addFactorGradient(
   newGradient.factor2  = factor2;
   factorGradients.emplace_back(newGradient);
 
-  std::sort(factorGradients.begin(), factorGradients.end(),
+  BABYLON::stl_util::sort_js_style(factorGradients,
             [](const FactorGradient& a, const FactorGradient& b) {
               if (a.gradient < b.gradient) {
                 return -1;
@@ -612,7 +612,7 @@ IParticleSystem& ParticleSystem::addRampGradient(float gradient,
   rampGradient.color    = color;
   _rampGradients.emplace_back(rampGradient);
 
-  std::sort(_rampGradients.begin(), _rampGradients.end(),
+  BABYLON::stl_util::sort_js_style(_rampGradients,
             [](const Color3Gradient& a, const Color3Gradient& b) {
               if (a.gradient < b.gradient) {
                 return -1;
@@ -656,7 +656,7 @@ ParticleSystem::addColorGradient(float gradient, const Color4& iColor1,
   colorGradient.color2   = iColor2;
   _colorGradients.emplace_back(colorGradient);
 
-  std::sort(_colorGradients.begin(), _colorGradients.end(),
+  BABYLON::stl_util::sort_js_style(_colorGradients,
             [](const ColorGradient& a, const ColorGradient& b) {
               if (a.gradient < b.gradient) {
                 return -1;

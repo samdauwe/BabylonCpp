@@ -709,6 +709,15 @@ inline void remove_if(C& c, const P& p)
   c.erase(std::remove_if(std::begin(c), std::end(c), p), std::end(c));
 }
 
+template <typename Container, typename JsStyleSortFunction>
+void sort_js_style(Container container, JsStyleSortFunction fn)
+{ 
+  auto predicateFunction = [fn](auto a, auto b) {
+    return fn(a, b) < 0;
+  };
+  std::sort(container.begin(), container.end(), predicateFunction);
+}
+
 template <typename C, typename T>
 inline bool push_unique(C& c, T&& elem)
 {

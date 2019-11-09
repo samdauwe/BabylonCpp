@@ -2636,7 +2636,7 @@ void Scene::addLight(const LightPtr& newLight)
 void Scene::sortLightsByPriority()
 {
   if (requireLightSorting) {
-    std::sort(lights.begin(), lights.end(), [](const LightPtr& a, const LightPtr& b) {
+    BABYLON::stl_util::sort_js_style(lights, [](const LightPtr& a, const LightPtr& b) {
       return Light::CompareLightsPriority(a.get(), b.get());
     });
   }

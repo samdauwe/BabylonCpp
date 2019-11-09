@@ -1722,7 +1722,7 @@ AbstractMesh& AbstractMesh::updateFacetData()
   VertexData::ComputeNormals(positions, indices, normals, data.facetParameters);
 
   if (data.facetDepthSort && data.facetDepthSortEnabled) {
-    std::sort(data.depthSortedFacets.begin(), data.depthSortedFacets.end(),
+    BABYLON::stl_util::sort_js_style(data.depthSortedFacets,
               data.facetDepthSortFunction);
     auto l = (data.depthSortedIndices.size() / 3);
     for (size_t f = 0; f < l; f++) {
