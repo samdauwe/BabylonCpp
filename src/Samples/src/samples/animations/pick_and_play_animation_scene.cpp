@@ -1,10 +1,11 @@
-#include <babylon/samples/samples_index.h>
 #include <babylon/animations/animatable.h>
 #include <babylon/animations/animation.h>
 #include <babylon/animations/ianimation_key.h>
+#include <babylon/babylon_common.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/core/string.h>
 #include <babylon/engines/scene.h>
+#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/shadows/shadow_generator.h>
 #include <babylon/lights/spot_light.h>
 #include <babylon/materials/pbr/pbr_metallic_roughness_material.h>
@@ -12,9 +13,7 @@
 #include <babylon/meshes/ground_mesh.h>
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/transform_node.h>
-#include <babylon/babylon_common.h>
-#include <babylon/interfaces/irenderable_scene.h>
-
+#include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
 
@@ -23,9 +22,9 @@ class Animatable;
 class EventState;
 class PBRMetallicRoughnessMaterial;
 class TransformNode;
-using AbstractMeshPtr    = std::shared_ptr<AbstractMesh>;
-using AnimatablePtr    = std::shared_ptr<Animatable>;
-using TransformNodePtr = std::shared_ptr<TransformNode>;
+using AbstractMeshPtr                 = std::shared_ptr<AbstractMesh>;
+using AnimatablePtr                   = std::shared_ptr<Animatable>;
+using TransformNodePtr                = std::shared_ptr<TransformNode>;
 using PBRMetallicRoughnessMaterialPtr = std::shared_ptr<PBRMetallicRoughnessMaterial>;
 
 namespace Samples {
@@ -53,9 +52,7 @@ public:
   {
   }
 
-  ~PickAndPlayAnimationScene()
-  {
-  }
+  ~PickAndPlayAnimationScene() override = default;
 
   const char* getName() override
   {
@@ -235,7 +232,7 @@ private:
 
 }; // end of struct PickAndPlayAnimationScene
 
-
 BABYLON_REGISTER_SAMPLE("Animations", PickAndPlayAnimationScene)
+
 } // end of namespace Samples
 } // end of namespace BABYLON

@@ -1,6 +1,5 @@
 #include "imgui.h"
 
-#include <babylon/samples/samples_index.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/core/random.h>
 #include <babylon/interfaces/irenderable_scene_with_hud.h>
@@ -11,6 +10,7 @@
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 #include <babylon/morph/morph_target_manager.h>
+#include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
 namespace Samples {
@@ -18,19 +18,20 @@ namespace Samples {
 using MeshPtr        = std::shared_ptr<Mesh>;
 using MorphTargetPtr = std::shared_ptr<MorphTarget>;
 
-
-  /**
+/**
  * @brief Morph Targets Scene. Example demonstrating how to morph a mesh between
  * multiple targets
  * @see https://www.babylonjs-playground.com/#2JDN66#7
  * @see https://doc.babylonjs.com/how_to/how_to_use_morphtargets
  */
-  struct MorphTargetsScene : public IRenderableSceneWithHud {
+struct MorphTargetsScene : public IRenderableSceneWithHud {
 
   MorphTargetsScene(ICanvas* iCanvas = nullptr) : IRenderableSceneWithHud(iCanvas)
   {
   }
+
   ~MorphTargetsScene() override = default;
+
   const char* getName() override
   {
     return "Materials Scene";
@@ -39,8 +40,8 @@ using MorphTargetPtr = std::shared_ptr<MorphTarget>;
   void initializeScene(ICanvas* canvas, Scene* scene) override
   {
     // This creates and positions a free camera (non-mesh)
-    auto camera = ArcRotateCamera::New(std::string("camera1"), 1.14f, 1.13f,
-                                       10.f, Vector3::Zero(), scene);
+    auto camera
+      = ArcRotateCamera::New(std::string("camera1"), 1.14f, 1.13f, 10.f, Vector3::Zero(), scene);
 
     // This targets the camera to scene origin
     camera->setTarget(Vector3::Zero());
@@ -112,12 +113,12 @@ using MorphTargetPtr = std::shared_ptr<MorphTarget>;
     _target3->influence = 1.00f;
 
     hudGui = [=]() {
-      auto addSlider = [](const std::string& label, auto& floatProperty,
-                          float min = 0.f, float max = 1.f) {
-        float currentValue = floatProperty;
-        if (ImGui::SliderFloat(label.c_str(), &currentValue, min, max))
-          floatProperty = currentValue;
-      };
+      auto addSlider
+        = [](const std::string& label, auto& floatProperty, float min = 0.f, float max = 1.f) {
+            float currentValue = floatProperty;
+            if (ImGui::SliderFloat(label.c_str(), &currentValue, min, max))
+              floatProperty = currentValue;
+          };
       addSlider("Influence #1", _target0->influence);
       addSlider("Influence #2", _target1->influence);
       addSlider("Influence #3", _target2->influence);
@@ -138,10 +139,9 @@ private:
     auto indices   = mesh->getIndices();
 
     for (size_t index = 0; index < 5; ++index) {
-      auto randomVertexID
-        = static_cast<unsigned int>(mesh->getTotalVertices() * Math::random());
-      auto position = Vector3::FromArray(positions, randomVertexID * 3);
-      auto normal   = Vector3::FromArray(normals, randomVertexID * 3);
+      auto randomVertexID = static_cast<unsigned int>(mesh->getTotalVertices() * Math::random());
+      auto position       = Vector3::FromArray(positions, randomVertexID * 3);
+      auto normal         = Vector3::FromArray(normals, randomVertexID * 3);
 
       position.addInPlace(normal);
 
@@ -149,8 +149,7 @@ private:
     }
 
     VertexData::ComputeNormals(positions, indices, normals);
-    mesh->updateVerticesData(VertexBuffer::PositionKind, positions, false,
-                             false);
+    mesh->updateVerticesData(VertexBuffer::PositionKind, positions, false, false);
     mesh->updateVerticesData(VertexBuffer::NormalKind, normals, false, false);
   }
 
@@ -164,12 +163,12 @@ private:
   MorphTargetPtr _target3;
 };
 
-std::shared_ptr<BABYLON::IRenderableScene>
-MakeMorphTargetsScene(ICanvas* iCanvas)
+std::shared_ptr<BABYLON::IRenderableScene> MakeMorphTargetsScene(ICanvas* iCanvas)
 {
   return std::make_shared<MorphTargetsScene>(iCanvas);
 }
 
 BABYLON_REGISTER_SAMPLE("Animations", MorphTargetsScene)
+
 } // end of namespace Samples
 } // end of namespace BABYLON
