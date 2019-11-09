@@ -25,7 +25,7 @@ void SamplesIndex::fillSamplesFailures() const
     {"BlurModeForMirrorsScene", {SampleFailureReasonKind::empty3d}},
     {"CartoonAnimationsScene", {SampleFailureReasonKind::segFault}},
     {"CircleCurvesFromBeziersScene", {SampleFailureReasonKind::empty3d}},
-    {"DecalsScene", {SampleFailureReasonKind::segFault}},
+    {"DecalsScene", {SampleFailureReasonKind::broken3d, "Texture is black / no decals appear"}},
     {"EdgesRenderScene", {SampleFailureReasonKind::segFault}},
     {"EnvironmentTextureScene", {SampleFailureReasonKind::empty3d}},
     {"FurMaterialScene", {SampleFailureReasonKind::broken3d, "Black texture"}},
