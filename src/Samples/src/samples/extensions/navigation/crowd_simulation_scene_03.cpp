@@ -1,37 +1,33 @@
-#include <babylon/samples/samples_index.h>
-#include <babylon/samples/extensions/navigation/crowd_simulation_utils.h>
+#include <vector>
+
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/extensions/navigation/crowd_simulation.h>
 #include <babylon/interfaces/icanvas.h>
+#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/mesh.h>
-#include <vector>
-#include <babylon/interfaces/irenderable_scene.h>
-
+#include <babylon/samples/extensions/navigation/crowd_simulation_utils.h>
+#include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
 namespace Samples {
 
 /**
- * @brief The scene class simulates 128 agents trying to reach there opposite
- * position. Agents don't know the world where they evolve. So they discover the
- * obstabcle and try to avoid it.
+ * @brief The scene class simulates 128 agents trying to reach there opposite position. Agents don't
+ * know the world where they evolve. So they discover the obstabcle and try to avoid it.
  */
 class CrowdSimulationScene03 : public IRenderableScene {
 
 public:
-  CrowdSimulationScene03(ICanvas* iCanvas)
-      : IRenderableScene(iCanvas), _crowdSimulation{nullptr}
+  CrowdSimulationScene03(ICanvas* iCanvas) : IRenderableScene(iCanvas), _crowdSimulation{nullptr}
   {
   }
 
-  ~CrowdSimulationScene03()
-  {
-  }
+  ~CrowdSimulationScene03() override = default;
 
   const char* getName() override
   {
@@ -118,9 +114,7 @@ private:
 
 }; // end of class CrowdSimulationScene03
 
-
-
-
 BABYLON_REGISTER_SAMPLE("Extensions", CrowdSimulationScene03)
+
 } // end of namespace Samples
 } // end of namespace BABYLON

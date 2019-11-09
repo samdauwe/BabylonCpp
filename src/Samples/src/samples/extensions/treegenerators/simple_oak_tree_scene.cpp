@@ -1,12 +1,11 @@
-#include <babylon/samples/samples_index.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/core/random.h>
 #include <babylon/extensions/treegenerators/quick_tree_generator.h>
+#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/directional_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/mesh.h>
-#include <babylon/interfaces/irenderable_scene.h>
-
+#include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
 namespace Samples {
@@ -17,9 +16,7 @@ struct SimpleOakTreeScene : public IRenderableScene {
   {
   }
 
-  ~SimpleOakTreeScene()
-  {
-  }
+  ~SimpleOakTreeScene() override = default;
 
   const char* getName() override
   {
@@ -55,7 +52,7 @@ struct SimpleOakTreeScene : public IRenderableScene {
 
 }; // end of struct SimpleOakTreeScene
 
-
 BABYLON_REGISTER_SAMPLE("Extensions", SimpleOakTreeScene)
+
 } // end of namespace Samples
 } // end of namespace BABYLON

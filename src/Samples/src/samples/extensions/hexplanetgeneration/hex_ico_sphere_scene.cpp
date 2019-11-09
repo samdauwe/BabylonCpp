@@ -1,4 +1,3 @@
-#include <babylon/samples/samples_index.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/free_camera.h>
 #include <babylon/core/random.h>
@@ -7,12 +6,12 @@
 #include <babylon/extensions/hexplanetgeneration/icosphere.h>
 #include <babylon/extensions/hexplanetgeneration/utils/xor_shift_128.h>
 #include <babylon/interfaces/icanvas.h>
+#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/vertex_data.h>
-#include <babylon/interfaces/irenderable_scene.h>
-
+#include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
 
@@ -25,16 +24,14 @@ public:
   {
   }
 
-  ~HexIcoSphereScene()
-  {
-  }
+  ~HexIcoSphereScene() override = default;
 
-  const char* getName()
+  const char* getName() override
   {
     return "Hex Icosphere Scene";
   }
 
-  void initializeScene(ICanvas* canvas, Scene* scene)
+  void initializeScene(ICanvas* canvas, Scene* scene) override
   {
     // Create a FreeCamera, and set its position to (x:0, y:5, z:-2.8)
     auto camera = FreeCamera::New("camera1", Vector3(0.f, 0.f, -2.8f), scene);
@@ -59,7 +56,6 @@ public:
       _hexIcosphere->rotation().x += (-0.0005f / 4.f) * _scene->getAnimationRatio();
     });
   }
-
 
 private:
   MeshPtr _createHexIcosphere(std::size_t degree, float scale, Scene* scene)
@@ -115,7 +111,7 @@ private:
 
 }; // end of class HexIcosphereScene
 
-
 BABYLON_REGISTER_SAMPLE("Extensions", HexIcoSphereScene)
+
 } // end of namespace Samples
 } // end of namespace BABYLON
