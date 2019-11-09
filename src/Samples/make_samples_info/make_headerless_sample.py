@@ -349,11 +349,10 @@ namespace Samples {
 """
     with open(cpp_full_path, "r") as f_i:
         content = f_i.read()
-    content = content.replace(what_to_search, "")
     content = content.replace("\n\n\n\n\n", "\n\n")
     content = content.replace("\n\n\n\n", "\n\n")
     content = content.replace("\n\n\n", "\n\n")
-    
+    content = content.replace(what_to_search, "")
     with open(cpp_full_path, "w") as f_o:
         f_o.write(content)
 
@@ -380,7 +379,7 @@ def make_headerless_sample(filename_no_extension, sample_category):
     move_method(cpp_full_path, ClassName, add_override=False, add_spacing=True)
     move_method(cpp_full_path, "~" + ClassName, add_override=False, add_spacing=True)
 
-    group_multiline_strings(cpp_full_path)
+    # group_multiline_strings(cpp_full_path)
     remove_close_open_namespaces(cpp_full_path)
 
 
