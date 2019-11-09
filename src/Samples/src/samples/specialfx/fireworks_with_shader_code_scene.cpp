@@ -1,8 +1,7 @@
-#include <babylon/samples/specialfx/fireworks_with_shader_code_scene.h>
-
 #include <babylon/cameras/free_camera.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
+#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/directional_light.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/effect.h>
@@ -11,74 +10,122 @@
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
+#include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
 namespace Samples {
 
-FireworksWithShaderCodeScene::FireworksWithShaderCodeScene(ICanvas* iCanvas)
-    : IRenderableScene(iCanvas), _time{0.f}, _shaderMaterial{nullptr}
-{
-  // Vertex shader
-  Effect::ShadersStore()["customVertexShader"] = customVertexShader;
+/**
+ * @brief Fireworks with Shader Code scene.
+ * @see https://doc.babylonjs.com/samples/writing2
+ */
+class FireworksWithShaderCodeScene : public IRenderableScene {
 
-  // Fragment shader
-  Effect::ShadersStore()["customFragmentShader"] = customFragmentShader;
-}
+public:
+  /** Vertex Shader **/
+  static constexpr const char* customVertexShader
+    = "#ifdef GL_ES\n"
+      "precision highp float;\n"
+      "#endif\n"
+      "\n"
+      "// Attributes\n"
+      "attribute vec3 position;\n"
+      "attribute vec3 normal;\n"
+      "\n"
+      "// Uniforms\n"
+      "uniform mat4 worldViewProjection;\n"
+      "uniform float time;\n"
+      "\n"
+      "void main(void) {\n"
+      "  vec3 p = position;\n"
+      "  vec3 j = vec3(0., -1.0, 0.);\n"
+      "  p = p + normal * log2(1. + time) * 25.0;\n"
+      "  gl_Position = worldViewProjection * vec4(p, 1.0);\n"
+      "}\n";
 
-FireworksWithShaderCodeScene::~FireworksWithShaderCodeScene()
-{
-}
+  /** Pixel (Fragment) Shader **/
+  static constexpr const char* customFragmentShader
+    = "#ifdef GL_ES\n"
+      "precision highp float;\n"
+      "#endif\n"
+      "\n"
+      "uniform float time;\n"
+      "\n"
+      "void main(void) {\n"
+      "  gl_FragColor = vec4(1. -log2(1. + time) / 100.,\n"
+      "                      1. * log2(1. + time), 0.,\n"
+      "                      1. - log2(1. + time / 2.) / log2(1. + 3.95));\n"
+      "}\n";
 
-const char* FireworksWithShaderCodeScene::getName()
-{
-  return "Fireworks with Shader Code Scene";
-}
+public:
+  FireworksWithShaderCodeScene(ICanvas* iCanvas)
+      : IRenderableScene(iCanvas), _time{0.f}, _shaderMaterial{nullptr}
+  {
+    // Vertex shader
+    Effect::ShadersStore()["customVertexShader"] = customVertexShader;
 
-void FireworksWithShaderCodeScene::initializeScene(ICanvas* canvas,
-                                                   Scene* scene)
-{
-  // Create a FreeCamera
-  auto camera = FreeCamera::New("camera1", Vector3(0, 100, -200), scene);
+    // Fragment shader
+    Effect::ShadersStore()["customFragmentShader"] = customFragmentShader;
+  }
 
-  // Target the camera to scene origin
-  camera->setTarget(Vector3::Zero());
+  ~FireworksWithShaderCodeScene() override = default;
 
-  // Attach the camera to the canvas
-  camera->attachControl(canvas, true);
+  const char* getName() override
+  {
+    return "Fireworks with Shader Code Scene";
+  }
 
-  // Create 2 lights
-  DirectionalLight::New("DirectionalLight", Vector3(0, -1, 1), scene);
-  auto light2 = HemisphericLight::New("HemiLight", Vector3(0, 1, 0), scene);
-  light2->intensity = 0.5f;
+  void initializeScene(ICanvas* canvas, Scene* scene) override
+  {
+    // Create a FreeCamera
+    auto camera = FreeCamera::New("camera1", Vector3(0, 100, -200), scene);
 
-  // Create shader material
-  IShaderMaterialOptions shaderMaterialOptions;
-  shaderMaterialOptions.attributes = {"position", "normal", "uv"};
-  shaderMaterialOptions.uniforms
-    = {"world", "worldView", "worldViewProjection", "view", "projection"};
-  shaderMaterialOptions.needAlphaBlending = true;
-  _shaderMaterial
-    = ShaderMaterial::New("shader", scene, "custom", shaderMaterialOptions);
-  _shaderMaterial->backFaceCulling = false;
+    // Target the camera to scene origin
+    camera->setTarget(Vector3::Zero());
 
-  // Create a built-in "sphere" shape
-  SphereOptions sphereOptions;
-  sphereOptions.diameter = 10.f;
-  auto sphere = MeshBuilder::CreateSphere("sphere", sphereOptions, scene);
-  sphere->convertToFlatShadedMesh();
-  sphere->material = _shaderMaterial;
+    // Attach the camera to the canvas
+    camera->attachControl(canvas, true);
 
-  // Animation
-  scene->registerBeforeRender([this](Scene*, EventState&) {
-    if (_time < 8.f) {
-      _shaderMaterial->setFloat("time", _time);
-      _time += 0.05f * getScene()->getAnimationRatio();
-    }
-    else {
-      _time = 0.f;
-    }
-  });
-}
+    // Create 2 lights
+    DirectionalLight::New("DirectionalLight", Vector3(0, -1, 1), scene);
+    auto light2       = HemisphericLight::New("HemiLight", Vector3(0, 1, 0), scene);
+    light2->intensity = 0.5f;
+
+    // Create shader material
+    IShaderMaterialOptions shaderMaterialOptions;
+    shaderMaterialOptions.attributes = {"position", "normal", "uv"};
+    shaderMaterialOptions.uniforms
+      = {"world", "worldView", "worldViewProjection", "view", "projection"};
+    shaderMaterialOptions.needAlphaBlending = true;
+    _shaderMaterial = ShaderMaterial::New("shader", scene, "custom", shaderMaterialOptions);
+    _shaderMaterial->backFaceCulling = false;
+
+    // Create a built-in "sphere" shape
+    SphereOptions sphereOptions;
+    sphereOptions.diameter = 10.f;
+    auto sphere            = MeshBuilder::CreateSphere("sphere", sphereOptions, scene);
+    sphere->convertToFlatShadedMesh();
+    sphere->material = _shaderMaterial;
+
+    // Animation
+    scene->registerBeforeRender([this](Scene*, EventState&) {
+      if (_time < 8.f) {
+        _shaderMaterial->setFloat("time", _time);
+        _time += 0.05f * getScene()->getAnimationRatio();
+      }
+      else {
+        _time = 0.f;
+      }
+    });
+  }
+
+private:
+  float _time;
+  ShaderMaterialPtr _shaderMaterial;
+
+}; // end of class FireworksWithShaderCodeScene
+
+BABYLON_REGISTER_SAMPLE("Special FX", FireworksWithShaderCodeScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

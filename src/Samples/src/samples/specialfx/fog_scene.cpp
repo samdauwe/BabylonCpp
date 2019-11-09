@@ -1,81 +1,96 @@
-#include <babylon/samples/specialfx/fog_scene.h>
-
 #include <babylon/cameras/free_camera.h>
 #include <babylon/engines/scene.h>
+#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
 namespace Samples {
 
-FogScene::FogScene(ICanvas* iCanvas)
-    : IRenderableScene(iCanvas)
-    , _alpha{0.f}
-    , _sphere0{nullptr}
-    , _sphere1{nullptr}
-    , _sphere2{nullptr}
-{
-}
+/**
+ * @brief Fog scene. This example demonstrates how to simulate fog in your scene.
+ * @see https://www.babylonjs-playground.com/#LR6389#0
+ */
+class FogScene : public IRenderableScene {
 
-FogScene::~FogScene()
-{
-}
+public:
+  FogScene(ICanvas* iCanvas)
+      : IRenderableScene(iCanvas)
+      , _alpha{0.f}
+      , _sphere0{nullptr}
+      , _sphere1{nullptr}
+      , _sphere2{nullptr}
+  {
+  }
 
-const char* FogScene::getName()
-{
-  return "Fog Scene";
-}
+  ~FogScene() override = default;
 
-void FogScene::initializeScene(ICanvas* canvas, Scene* scene)
-{
-  // Create a FreeCamera (non-mesh)
-  auto camera = FreeCamera::New("Camera", Vector3(0.f, 0.f, -20.f), scene);
+  const char* getName() override
+  {
+    return "Fog Scene";
+  }
 
-  // Target the camera to scene origin
-  camera->setTarget(Vector3::Zero());
+  void initializeScene(ICanvas* canvas, Scene* scene) override
+  {
+    // Create a FreeCamera (non-mesh)
+    auto camera = FreeCamera::New("Camera", Vector3(0.f, 0.f, -20.f), scene);
 
-  // Attach the camera to the canvas
-  camera->attachControl(canvas, true);
+    // Target the camera to scene origin
+    camera->setTarget(Vector3::Zero());
 
-  // Create a point light
-  PointLight::New("Omni", Vector3(20.f, 100.f, 2.f), scene);
+    // Attach the camera to the canvas
+    camera->attachControl(canvas, true);
 
-  // Create spheres
-  _sphere0 = Mesh::CreateSphere("Sphere0", 16, 3.f, scene);
-  _sphere1 = Mesh::CreateSphere("Sphere1", 16, 3.f, scene);
-  _sphere2 = Mesh::CreateSphere("Sphere2", 16, 3.f, scene);
+    // Create a point light
+    PointLight::New("Omni", Vector3(20.f, 100.f, 2.f), scene);
 
-  // Create materials
-  auto material0          = StandardMaterial::New("mat0", scene);
-  material0->diffuseColor = Color3(1.f, 0.f, 0.f);
-  _sphere0->material      = material0;
-  _sphere0->position      = Vector3(-10.f, 0.f, 0.f);
+    // Create spheres
+    _sphere0 = Mesh::CreateSphere("Sphere0", 16, 3.f, scene);
+    _sphere1 = Mesh::CreateSphere("Sphere1", 16, 3.f, scene);
+    _sphere2 = Mesh::CreateSphere("Sphere2", 16, 3.f, scene);
 
-  auto material1          = StandardMaterial::New("mat1", scene);
-  material1->diffuseColor = Color3(1.f, 1.f, 0.f);
-  _sphere1->material      = material1;
+    // Create materials
+    auto material0          = StandardMaterial::New("mat0", scene);
+    material0->diffuseColor = Color3(1.f, 0.f, 0.f);
+    _sphere0->material      = material0;
+    _sphere0->position      = Vector3(-10.f, 0.f, 0.f);
 
-  auto material2          = StandardMaterial::New("mat2", scene);
-  material2->diffuseColor = Color3(1.f, 0.f, 1.f);
-  _sphere2->material      = material2;
-  _sphere2->position      = Vector3(10.f, 0.f, 0.f);
+    auto material1          = StandardMaterial::New("mat1", scene);
+    material1->diffuseColor = Color3(1.f, 1.f, 0.f);
+    _sphere1->material      = material1;
 
-  _sphere1->convertToFlatShadedMesh();
+    auto material2          = StandardMaterial::New("mat2", scene);
+    material2->diffuseColor = Color3(1.f, 0.f, 1.f);
+    _sphere2->material      = material2;
+    _sphere2->position      = Vector3(10.f, 0.f, 0.f);
 
-  // Fog settings
-  scene->fogMode    = Scene::FOGMODE_EXP;
-  scene->fogDensity = 0.1f;
+    _sphere1->convertToFlatShadedMesh();
 
-  // Animations
-  _scene->registerBeforeRender([this](Scene*, EventState&) {
-    _sphere0->position().z = 4.f * std::cos(_alpha);
-    _sphere1->position().z = 4.f * std::sin(_alpha);
-    _sphere2->position().z = 4.f * std::cos(_alpha);
+    // Fog settings
+    scene->fogMode    = Scene::FOGMODE_EXP;
+    scene->fogDensity = 0.1f;
 
-    _alpha += 0.1f;
-  });
-}
+    // Animations
+    _scene->registerBeforeRender([this](Scene*, EventState&) {
+      _sphere0->position().z = 4.f * std::cos(_alpha);
+      _sphere1->position().z = 4.f * std::sin(_alpha);
+      _sphere2->position().z = 4.f * std::cos(_alpha);
+
+      _alpha += 0.1f;
+    });
+  }
+
+private:
+  float _alpha;
+  MeshPtr _sphere0;
+  MeshPtr _sphere1;
+  MeshPtr _sphere2;
+
+}; // end of class FogScene
+
+BABYLON_REGISTER_SAMPLE("Special FX", FogScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON
