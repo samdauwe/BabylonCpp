@@ -64,7 +64,7 @@ VolumetricLightScatteringPostProcess::VolumetricLightScatteringPostProcess(
   // Configure
   _createPass(scene, ratio);
 
-  onActivate = [&](Camera* iCamera, EventState&) {
+  onActivate = [this](Camera* iCamera, EventState&) {
     if (!isSupported()) {
       dispose(iCamera);
     }
@@ -307,7 +307,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
       mesh->_processRendering(subMesh, _volumetricLightScatteringPass,
                               Material::TriangleFillMode, batch,
                               hardwareInstancedRendering,
-                              [&](bool /*isInstance*/, Matrix world,
+                              [effect](bool /*isInstance*/, Matrix world,
                                   Material* /*effectiveMaterial*/) {
                                 effect->setMatrix("world", world);
                               });
