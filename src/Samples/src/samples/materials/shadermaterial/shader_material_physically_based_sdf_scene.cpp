@@ -19,365 +19,369 @@ class ShaderMaterialPhysicallyBasedSdfScene : public IRenderableScene {
 public:
   /** Vertex Shader **/
   static constexpr const char* customVertexShader
-    = "#ifdef GL_ES\n"
-      "precision highp float;\n"
-      "#endif\n"
-      "\n"
-      "// Attributes\n"
-      "attribute vec3 position;\n"
-      "attribute vec2 uv;\n"
-      "\n"
-      "// Uniforms\n"
-      "uniform mat4 worldViewProjection;\n"
-      "\n"
-      "// Varying\n"
-      "varying vec2 vUV;\n"
-      "\n"
-      "void main(void) {\n"
-      "    gl_Position = worldViewProjection * vec4(position, 1.0);\n"
-      "    vUV = uv;\n"
-      "}\n";
+    = R"ShaderCode(
+#ifdef GL_ES
+precision highp float;
+#endif
+
+// Attributes
+attribute vec3 position;
+attribute vec2 uv;
+
+// Uniforms
+uniform mat4 worldViewProjection;
+
+// Varying
+varying vec2 vUV;
+
+void main(void) {
+    gl_Position = worldViewProjection * vec4(position, 1.0);
+    vUV = uv;
+}
+)ShaderCode";
 
   /** Pixel (Fragment) Shader **/
   // Physically-based SDF ( https://www.shadertoy.com/view/XlKSDR )
   static constexpr const char* customFragmentShader
-    = "#ifdef GL_ES\n"
-      "precision highp float;\n"
-      "#endif\n"
-      "\n"
-      "// Varying\n"
-      "varying vec3 vPosition;\n"
-      "varying vec3 vNormal;\n"
-      "varying vec2 vUV;\n"
-      "\n"
-      "// Uniforms\n"
-      "uniform mat4 worldViewProjection;\n"
-      "uniform float iTime;\n"
-      "uniform float iAspectRatio;\n"
-      "uniform vec2 iResolution;\n"
-      "#define saturate(x) clamp(x, 0.0, 1.0)\n"
-      "#define PI 3.14159265359\n"
-      "\n"
-      "//--------------------------------------------------------------------\n"
-      "// Distance field functions\n"
-      "//--------------------------------------------------------------------\n"
-      "\n"
-      "float sdPlane(in vec3 p) { return p.y; }\n"
-      "\n"
-      "float sdSphere(in vec3 p, float s) { return length(p) - s; }\n"
-      "\n"
-      "float sdTorus(in vec3 p, in vec2 t) {\n"
-      "  return length(vec2(length(p.xz) - t.x, p.y)) - t.y;\n"
-      "}\n"
-      "\n"
-      "vec2 opUnion(vec2 d1, vec2 d2) { return d1.x < d2.x ? d1 : d2; }\n"
-      "\n"
-      "vec2 scene(in vec3 position) {\n"
-      "  vec2 scene =\n"
-      "      opUnion(vec2(sdPlane(position), 1.0),\n"
-      "              vec2(sdSphere(position - vec3(0.0, 0.4, 0.0), 0.4),\n"
-      "                   12.0));\n"
-      "  return scene;\n"
-      "}\n"
-      "\n"
-      "//--------------------------------------------------------------------\n"
-      "// Ray casting\n"
-      "//--------------------------------------------------------------------\n"
-      "\n"
-      "float shadow(in vec3 origin, in vec3 direction) {\n"
-      "  float hit = 1.0;\n"
-      "  float t = 0.02;\n"
-      "\n"
-      "  for (int i = 0; i < 1000; i++) {\n"
-      "    float h = scene(origin + direction * t).x;\n"
-      "    if (h < 0.001)\n"
-      "      return 0.0;\n"
-      "    t += h;\n"
-      "    hit = min(hit, 10.0 * h / t);\n"
-      "    if (t >= 2.5)\n"
-      "      break;\n"
-      "  }\n"
-      "\n"
-      "  return clamp(hit, 0.0, 1.0);\n"
-      "}\n"
-      "\n"
-      "vec2 traceRay(in vec3 origin, in vec3 direction) {\n"
-      "  float material = -1.0;\n"
-      "\n"
-      "  float t = 0.02;\n"
-      "\n"
-      "  for (int i = 0; i < 1000; i++) {\n"
-      "    vec2 hit = scene(origin + direction * t);\n"
-      "    if (hit.x < 0.002 || t > 20.0)\n"
-      "      break;\n"
-      "    t += hit.x;\n"
-      "    material = hit.y;\n"
-      "  }\n"
-      "\n"
-      "  if (t > 20.0) {\n"
-      "    material = -1.0;\n"
-      "  }\n"
-      "\n"
-      "  return vec2(t, material);\n"
-      "}\n"
-      "\n"
-      "vec3 normal(in vec3 position) {\n"
-      "  vec3 epsilon = vec3(0.001, 0.0, 0.0);\n"
-      "  vec3 n =\n"
-      "      vec3(scene(position + epsilon.xyy).x -\n"
-      "           scene(position - epsilon.xyy).x,\n"
-      "           scene(position + epsilon.yxy).x -\n"
-      "           scene(position - epsilon.yxy).x,\n"
-      "           scene(position + epsilon.yyx).x -\n"
-      "           scene(position - epsilon.yyx).x);\n"
-      "  return normalize(n);\n"
-      "}\n"
-      "\n"
-      "//--------------------------------------------------------------------\n"
-      "// BRDF\n"
-      "//--------------------------------------------------------------------\n"
-      "\n"
-      "float pow5(float x) {\n"
-      "  float x2 = x * x;\n"
-      "  return x2 * x2 * x;\n"
-      "}\n"
-      "\n"
-      "float D_GGX(float linearRoughness, float NoH, const vec3 h) {\n"
-      "  // Walter et al. 2007,"
-      "  // 'Microfacet Models for Refraction through Rough Surfaces'\n"
-      "  float oneMinusNoHSquared = 1.0 - NoH * NoH;\n"
-      "  float a = NoH * linearRoughness;\n"
-      "  float k = linearRoughness / (oneMinusNoHSquared + a * a);\n"
-      "  float d = k * k * (1.0 / PI);\n"
-      "  return d;\n"
-      "}\n"
-      "\n"
-      "float V_SmithGGXCorrelated(float linearRoughness,\n"
-      "                           float NoV, float NoL) {\n"
-      "  // Heitz 2014, 'Understanding the Masking-Shadowing Function in\n"
-      "  // Microfacet-Based BRDFs'\n"
-      "  float a2 = linearRoughness * linearRoughness;\n"
-      "  float GGXV = NoL * sqrt((NoV - a2 * NoV) * NoV + a2);\n"
-      "  float GGXL = NoV * sqrt((NoL - a2 * NoL) * NoL + a2);\n"
-      "  return 0.5 / (GGXV + GGXL);\n"
-      "}\n"
-      "\n"
-      "vec3 F_Schlick(const vec3 f0, float VoH) {\n"
-      "  // Schlick 1994,\n"
-      "  // 'An Inexpensive BRDF Model for Physically-Based Rendering'\n"
-      "  return f0 + (vec3(1.0) - f0) * pow5(1.0 - VoH);\n"
-      "}\n"
-      "\n"
-      "float F_Schlick(float f0, float f90, float VoH) {\n"
-      "  return f0 + (f90 - f0) * pow5(1.0 - VoH);\n"
-      "}\n"
-      "\n"
-      "float Fd_Burley(float linearRoughness, float NoV,\n"
-      "                float NoL, float LoH) {\n"
-      "  // Burley 2012, 'Physically-Based Shading at Disney'\n"
-      "  float f90 = 0.5 + 2.0 * linearRoughness * LoH * LoH;\n"
-      "  float lightScatter = F_Schlick(1.0, f90, NoL);\n"
-      "  float viewScatter = F_Schlick(1.0, f90, NoV);\n"
-      "  return lightScatter * viewScatter * (1.0 / PI);\n"
-      "}\n"
-      "\n"
-      "float Fd_Lambert() { return 1.0 / PI; }\n"
-      "\n"
-      "//--------------------------------------------------------------------\n"
-      "// Indirect lighting\n"
-      "//--------------------------------------------------------------------\n"
-      "\n"
-      "vec3 Irradiance_SphericalHarmonics(const vec3 n) {\n"
-      "  // Irradiance from 'Ditch River' IBL\n"
-      "  // (http://www.hdrlabs.com/sibl/archive.html)\n"
-      "  return max(\n"
-      "      vec3(0.754554516862612, 0.748542953903366, 0.790921515418539) +\n"
-      "          vec3(-0.083856548007422,\n"
-      "               0.092533500963210,\n"
-      "               0.322764661032516) *\n"
-      "              (n.y) +\n"
-      "          vec3(0.308152705331738,\n"
-      "               0.366796330467391,\n"
-      "               0.466698181299906) *\n"
-      "              (n.z) +\n"
-      "          vec3(-0.188884931542396,\n"
-      "               -0.277402551592231,\n"
-      "               -0.377844212327557) *\n"
-      "              (n.x),\n"
-      "      0.0);\n"
-      "}\n"
-      "\n"
-      "vec2 PrefilteredDFG_Karis(float roughness, float NoV) {\n"
-      "  // Karis 2014, 'Physically Based Material on Mobile'\n"
-      "  const vec4 c0 = vec4(-1.0, -0.0275, -0.572, 0.022);\n"
-      "  const vec4 c1 = vec4(1.0, 0.0425, 1.040, -0.040);\n"
-      "\n"
-      "  vec4 r = roughness * c0 + c1;\n"
-      "  float a004 = min(r.x * r.x, exp2(-9.28 * NoV)) * r.x + r.y;\n"
-      "\n"
-      "  return vec2(-1.04, 1.04) * a004 + r.zw;\n"
-      "}\n"
-      "\n"
-      "//--------------------------------------------------------------------\n"
-      "// Tone mapping and transfer functions\n"
-      "//--------------------------------------------------------------------\n"
-      "\n"
-      "vec3 Tonemap_ACES(const vec3 x) {\n"
-      "  // Narkowicz 2015, 'ACES Filmic Tone Mapping Curve'\n"
-      "  const float a = 2.51;\n"
-      "  const float b = 0.03;\n"
-      "  const float c = 2.43;\n"
-      "  const float d = 0.59;\n"
-      "  const float e = 0.14;\n"
-      "  return (x * (a * x + b)) / (x * (c * x + d) + e);\n"
-      "}\n"
-      "\n"
-      "vec3 OECF_sRGBFast(const vec3 linear) {\n"
-      "  return pow(linear, vec3(1.0 / 2.2));\n"
-      "}\n"
-      "\n"
-      "//--------------------------------------------------------------------\n"
-      "// Rendering\n"
-      "//--------------------------------------------------------------------\n"
-      "\n"
-      "vec3 render(in vec3 origin, in vec3 direction, out float distance) {\n"
-      "  // Sky gradient\n"
-      "  vec3 color = vec3(0.65, 0.85, 1.0) + direction.y * 0.72;\n"
-      "\n"
-      "  // (distance, material)\n"
-      "  vec2 hit = traceRay(origin, direction);\n"
-      "  distance = hit.x;\n"
-      "  float material = hit.y;\n"
-      "\n"
-      "  // We've hit something in the scene\n"
-      "  if (material > 0.0) {\n"
-      "    vec3 position = origin + distance * direction;\n"
-      "\n"
-      "    vec3 v = normalize(-direction);\n"
-      "    vec3 n = normal(position);\n"
-      "    vec3 l = normalize(vec3(0.6, 0.7, -0.7));\n"
-      "    vec3 h = normalize(v + l);\n"
-      "    vec3 r = normalize(reflect(direction, n));\n"
-      "\n"
-      "    float NoV = abs(dot(n, v)) + 1e-5;\n"
-      "    float NoL = saturate(dot(n, l));\n"
-      "    float NoH = saturate(dot(n, h));\n"
-      "    float LoH = saturate(dot(l, h));\n"
-      "\n"
-      "    vec3 baseColor = vec3(0.0);\n"
-      "    float roughness = 0.0;\n"
-      "    float metallic = 0.0;\n"
-      "\n"
-      "    float intensity = 2.0;\n"
-      "    float indirectIntensity = 0.64;\n"
-      "\n"
-      "    if (material < 4.0) {\n"
-      "      // Checkerboard floor\n"
-      "      float f = mod(floor(6.0 * position.z) + floor(6.0 * position.x),\n"
-      "                    2.0);\n"
-      "      baseColor = 0.4 + f * vec3(0.6);\n"
-      "      roughness = 0.1;\n"
-      "    } else if (material < 16.0) {\n"
-      "      // Metallic objects\n"
-      "      baseColor = vec3(0.3, 0.0, 0.0);\n"
-      "      roughness = 0.2;\n"
-      "    }\n"
-      "\n"
-      "    float linearRoughness = roughness * roughness;\n"
-      "    vec3 diffuseColor = (1.0 - metallic) * baseColor.rgb;\n"
-      "    vec3 f0 = 0.04 * (1.0 - metallic) + baseColor.rgb * metallic;\n"
-      "\n"
-      "    float attenuation = shadow(position, l);\n"
-      "\n"
-      "    // specular BRDF\n"
-      "    float D = D_GGX(linearRoughness, NoH, h);\n"
-      "    float V = V_SmithGGXCorrelated(linearRoughness, NoV, NoL);\n"
-      "    vec3 F = F_Schlick(f0, LoH);\n"
-      "    vec3 Fr = (D * V) * F;\n"
-      "\n"
-      "    // diffuse BRDF\n"
-      "    vec3 Fd = diffuseColor *\n"
-      "                 Fd_Burley(linearRoughness, NoV, NoL, LoH);\n"
-      "\n"
-      "    color = Fd + Fr;\n"
-      "    color *= (intensity * attenuation * NoL) * vec3(0.98, 0.92, 0.89);\n"
-      "\n"
-      "    // diffuse indirect\n"
-      "    vec3 indirectDiffuse =\n"
-      "            Irradiance_SphericalHarmonics(n) * Fd_Lambert();\n"
-      "\n"
-      "    vec2 indirectHit = traceRay(position, r);\n"
-      "    vec3 indirectSpecular = vec3(0.65, 0.85, 1.0) + r.y * 0.72;\n"
-      "    if (indirectHit.y > 0.0) {\n"
-      "      if (indirectHit.y < 4.0) {\n"
-      "        vec3 indirectPosition = position + indirectHit.x * r;\n"
-      "        // Checkerboard floor\n"
-      "        float f = mod(floor(6.0 * indirectPosition.z) +\n"
-      "                          floor(6.0 * indirectPosition.x),\n"
-      "                      2.0);\n"
-      "        indirectSpecular = 0.4 + f * vec3(0.6);\n"
-      "      } else if (indirectHit.y < 16.0) {\n"
-      "        // Metallic objects\n"
-      "        indirectSpecular = vec3(0.3, 0.0, 0.0);\n"
-      "      }\n"
-      "    }\n"
-      "\n"
-      "    // indirect contribution\n"
-      "    vec2 dfg = PrefilteredDFG_Karis(roughness, NoV);\n"
-      "    vec3 specularColor = f0 * dfg.x + dfg.y;\n"
-      "    vec3 ibl = diffuseColor *\n"
-      "        indirectDiffuse + indirectSpecular * specularColor;\n"
-      "\n"
-      "    color += ibl * indirectIntensity;\n"
-      "  }\n"
-      "\n"
-      "  return color;\n"
-      "}\n"
-      "\n"
-      "//--------------------------------------------------------------------\n"
-      "// Setup and execution\n"
-      "//--------------------------------------------------------------------\n"
-      "\n"
-      "mat3 setCamera(in vec3 origin, in vec3 target, float rotation) {\n"
-      "  vec3 forward = normalize(target - origin);\n"
-      "  vec3 orientation = vec3(sin(rotation), cos(rotation), 0.0);\n"
-      "  vec3 left = normalize(cross(forward, orientation));\n"
-      "  vec3 up = normalize(cross(left, forward));\n"
-      "  return mat3(left, up, forward);\n"
-      "}\n"
-      "\n"
-      "void main(void) {\n"
-      "  // Normalized coordinates\n"
-      "  vec2 p = -1.0 + 2.1 * vUV.xy;\n"
-      "  // Aspect ratio\n"
-      "  p.x *= iResolution.x / iResolution.y;\n"
-      "\n"
-      "  // Camera position and 'look at'\n"
-      "  vec3 origin = vec3(0.0, 0.8, 0.0);\n"
-      "  vec3 target = vec3(0.0);\n"
-      "\n"
-      "  origin.x += 1.7 * cos(iTime * 0.2);\n"
-      "  origin.z += 1.7 * sin(iTime * 0.2);\n"
-      "\n"
-      "  mat3 toWorld = setCamera(origin, target, 0.0);\n"
-      "  vec3 direction = toWorld * normalize(vec3(p.xy, 2.0));\n"
-      "\n"
-      "  // Render scene\n"
-      "  float distance;\n"
-      "  vec3 color = render(origin, direction, distance);\n"
-      "\n"
-      "  // Tone mapping\n"
-      "  color = Tonemap_ACES(color);\n"
-      "\n"
-      "  // Exponential distance fog\n"
-      "  color = mix(color, 0.8 * vec3(0.7, 0.8, 1.0),\n"
-      "              1.0 - exp2(-0.011 * distance * distance));\n"
-      "\n"
-      "  // Gamma compression\n"
-      "  color = OECF_sRGBFast(color);\n"
-      "\n"
-      "  gl_FragColor = vec4(color, 1.0);\n"
-      "}\n";
+    = R"ShaderCode(
+#ifdef GL_ES
+precision highp float;
+#endif
+
+// Varying
+varying vec3 vPosition;
+varying vec3 vNormal;
+varying vec2 vUV;
+
+// Uniforms
+uniform mat4 worldViewProjection;
+uniform float iTime;
+uniform float iAspectRatio;
+uniform vec2 iResolution;
+#define saturate(x) clamp(x, 0.0, 1.0)
+#define PI 3.14159265359
+
+//--------------------------------------------------------------------
+// Distance field functions
+//--------------------------------------------------------------------
+
+float sdPlane(in vec3 p) { return p.y; }
+
+float sdSphere(in vec3 p, float s) { return length(p) - s; }
+
+float sdTorus(in vec3 p, in vec2 t) {
+  return length(vec2(length(p.xz) - t.x, p.y)) - t.y;
+}
+
+vec2 opUnion(vec2 d1, vec2 d2) { return d1.x < d2.x ? d1 : d2; }
+
+vec2 scene(in vec3 position) {
+  vec2 scene =
+      opUnion(vec2(sdPlane(position), 1.0),
+              vec2(sdSphere(position - vec3(0.0, 0.4, 0.0), 0.4),
+                   12.0));
+  return scene;
+}
+
+//--------------------------------------------------------------------
+// Ray casting
+//--------------------------------------------------------------------
+
+float shadow(in vec3 origin, in vec3 direction) {
+  float hit = 1.0;
+  float t = 0.02;
+
+  for (int i = 0; i < 1000; i++) {
+    float h = scene(origin + direction * t).x;
+    if (h < 0.001)
+      return 0.0;
+    t += h;
+    hit = min(hit, 10.0 * h / t);
+    if (t >= 2.5)
+      break;
+  }
+
+  return clamp(hit, 0.0, 1.0);
+}
+
+vec2 traceRay(in vec3 origin, in vec3 direction) {
+  float material = -1.0;
+
+  float t = 0.02;
+
+  for (int i = 0; i < 1000; i++) {
+    vec2 hit = scene(origin + direction * t);
+    if (hit.x < 0.002 || t > 20.0)
+      break;
+    t += hit.x;
+    material = hit.y;
+  }
+
+  if (t > 20.0) {
+    material = -1.0;
+  }
+
+  return vec2(t, material);
+}
+
+vec3 normal(in vec3 position) {
+  vec3 epsilon = vec3(0.001, 0.0, 0.0);
+  vec3 n =
+      vec3(scene(position + epsilon.xyy).x -
+           scene(position - epsilon.xyy).x,
+           scene(position + epsilon.yxy).x -
+           scene(position - epsilon.yxy).x,
+           scene(position + epsilon.yyx).x -
+           scene(position - epsilon.yyx).x);
+  return normalize(n);
+}
+
+//--------------------------------------------------------------------
+// BRDF
+//--------------------------------------------------------------------
+
+float pow5(float x) {
+  float x2 = x * x;
+  return x2 * x2 * x;
+}
+
+float D_GGX(float linearRoughness, float NoH, const vec3 h) {
+  // Walter et al. 2007,
+  // 'Microfacet Models for Refraction through Rough Surfaces'
+  float oneMinusNoHSquared = 1.0 - NoH * NoH;
+  float a = NoH * linearRoughness;
+  float k = linearRoughness / (oneMinusNoHSquared + a * a);
+  float d = k * k * (1.0 / PI);
+  return d;
+}
+
+float V_SmithGGXCorrelated(float linearRoughness,
+                           float NoV, float NoL) {
+  // Heitz 2014, 'Understanding the Masking-Shadowing Function in
+  // Microfacet-Based BRDFs'
+  float a2 = linearRoughness * linearRoughness;
+  float GGXV = NoL * sqrt((NoV - a2 * NoV) * NoV + a2);
+  float GGXL = NoV * sqrt((NoL - a2 * NoL) * NoL + a2);
+  return 0.5 / (GGXV + GGXL);
+}
+
+vec3 F_Schlick(const vec3 f0, float VoH) {
+  // Schlick 1994,
+  // 'An Inexpensive BRDF Model for Physically-Based Rendering'
+  return f0 + (vec3(1.0) - f0) * pow5(1.0 - VoH);
+}
+
+float F_Schlick(float f0, float f90, float VoH) {
+  return f0 + (f90 - f0) * pow5(1.0 - VoH);
+}
+
+float Fd_Burley(float linearRoughness, float NoV,
+                float NoL, float LoH) {
+  // Burley 2012, 'Physically-Based Shading at Disney'
+  float f90 = 0.5 + 2.0 * linearRoughness * LoH * LoH;
+  float lightScatter = F_Schlick(1.0, f90, NoL);
+  float viewScatter = F_Schlick(1.0, f90, NoV);
+  return lightScatter * viewScatter * (1.0 / PI);
+}
+
+float Fd_Lambert() { return 1.0 / PI; }
+
+//--------------------------------------------------------------------
+// Indirect lighting
+//--------------------------------------------------------------------
+
+vec3 Irradiance_SphericalHarmonics(const vec3 n) {
+  // Irradiance from 'Ditch River' IBL
+  // (http://www.hdrlabs.com/sibl/archive.html)
+  return max(
+      vec3(0.754554516862612, 0.748542953903366, 0.790921515418539) +
+          vec3(-0.083856548007422,
+               0.092533500963210,
+               0.322764661032516) *
+              (n.y) +
+          vec3(0.308152705331738,
+               0.366796330467391,
+               0.466698181299906) *
+              (n.z) +
+          vec3(-0.188884931542396,
+               -0.277402551592231,
+               -0.377844212327557) *
+              (n.x),
+      0.0);
+}
+
+vec2 PrefilteredDFG_Karis(float roughness, float NoV) {
+  // Karis 2014, 'Physically Based Material on Mobile'
+  const vec4 c0 = vec4(-1.0, -0.0275, -0.572, 0.022);
+  const vec4 c1 = vec4(1.0, 0.0425, 1.040, -0.040);
+
+  vec4 r = roughness * c0 + c1;
+  float a004 = min(r.x * r.x, exp2(-9.28 * NoV)) * r.x + r.y;
+
+  return vec2(-1.04, 1.04) * a004 + r.zw;
+}
+
+//--------------------------------------------------------------------
+// Tone mapping and transfer functions
+//--------------------------------------------------------------------
+
+vec3 Tonemap_ACES(const vec3 x) {
+  // Narkowicz 2015, 'ACES Filmic Tone Mapping Curve'
+  const float a = 2.51;
+  const float b = 0.03;
+  const float c = 2.43;
+  const float d = 0.59;
+  const float e = 0.14;
+  return (x * (a * x + b)) / (x * (c * x + d) + e);
+}
+
+vec3 OECF_sRGBFast(const vec3 linear) {
+  return pow(linear, vec3(1.0 / 2.2));
+}
+
+//--------------------------------------------------------------------
+// Rendering
+//--------------------------------------------------------------------
+
+vec3 render(in vec3 origin, in vec3 direction, out float distance) {
+  // Sky gradient
+  vec3 color = vec3(0.65, 0.85, 1.0) + direction.y * 0.72;
+
+  // (distance, material)
+  vec2 hit = traceRay(origin, direction);
+  distance = hit.x;
+  float material = hit.y;
+
+  // We've hit something in the scene
+  if (material > 0.0) {
+    vec3 position = origin + distance * direction;
+
+    vec3 v = normalize(-direction);
+    vec3 n = normal(position);
+    vec3 l = normalize(vec3(0.6, 0.7, -0.7));
+    vec3 h = normalize(v + l);
+    vec3 r = normalize(reflect(direction, n));
+
+    float NoV = abs(dot(n, v)) + 1e-5;
+    float NoL = saturate(dot(n, l));
+    float NoH = saturate(dot(n, h));
+    float LoH = saturate(dot(l, h));
+
+    vec3 baseColor = vec3(0.0);
+    float roughness = 0.0;
+    float metallic = 0.0;
+
+    float intensity = 2.0;
+    float indirectIntensity = 0.64;
+
+    if (material < 4.0) {
+      // Checkerboard floor
+      float f = mod(floor(6.0 * position.z) + floor(6.0 * position.x),
+                    2.0);
+      baseColor = 0.4 + f * vec3(0.6);
+      roughness = 0.1;
+    } else if (material < 16.0) {
+      // Metallic objects
+      baseColor = vec3(0.3, 0.0, 0.0);
+      roughness = 0.2;
+    }
+
+    float linearRoughness = roughness * roughness;
+    vec3 diffuseColor = (1.0 - metallic) * baseColor.rgb;
+    vec3 f0 = 0.04 * (1.0 - metallic) + baseColor.rgb * metallic;
+
+    float attenuation = shadow(position, l);
+
+    // specular BRDF
+    float D = D_GGX(linearRoughness, NoH, h);
+    float V = V_SmithGGXCorrelated(linearRoughness, NoV, NoL);
+    vec3 F = F_Schlick(f0, LoH);
+    vec3 Fr = (D * V) * F;
+
+    // diffuse BRDF
+    vec3 Fd = diffuseColor *
+                 Fd_Burley(linearRoughness, NoV, NoL, LoH);
+
+    color = Fd + Fr;
+    color *= (intensity * attenuation * NoL) * vec3(0.98, 0.92, 0.89);
+
+    // diffuse indirect
+    vec3 indirectDiffuse =
+            Irradiance_SphericalHarmonics(n) * Fd_Lambert();
+
+    vec2 indirectHit = traceRay(position, r);
+    vec3 indirectSpecular = vec3(0.65, 0.85, 1.0) + r.y * 0.72;
+    if (indirectHit.y > 0.0) {
+      if (indirectHit.y < 4.0) {
+        vec3 indirectPosition = position + indirectHit.x * r;
+        // Checkerboard floor
+        float f = mod(floor(6.0 * indirectPosition.z) +
+                          floor(6.0 * indirectPosition.x),
+                      2.0);
+        indirectSpecular = 0.4 + f * vec3(0.6);
+      } else if (indirectHit.y < 16.0) {
+        // Metallic objects
+        indirectSpecular = vec3(0.3, 0.0, 0.0);
+      }
+    }
+
+    // indirect contribution
+    vec2 dfg = PrefilteredDFG_Karis(roughness, NoV);
+    vec3 specularColor = f0 * dfg.x + dfg.y;
+    vec3 ibl = diffuseColor *
+        indirectDiffuse + indirectSpecular * specularColor;
+
+    color += ibl * indirectIntensity;
+  }
+
+  return color;
+}
+
+//--------------------------------------------------------------------
+// Setup and execution
+//--------------------------------------------------------------------
+
+mat3 setCamera(in vec3 origin, in vec3 target, float rotation) {
+  vec3 forward = normalize(target - origin);
+  vec3 orientation = vec3(sin(rotation), cos(rotation), 0.0);
+  vec3 left = normalize(cross(forward, orientation));
+  vec3 up = normalize(cross(left, forward));
+  return mat3(left, up, forward);
+}
+
+void main(void) {
+  // Normalized coordinates
+  vec2 p = -1.0 + 2.1 * vUV.xy;
+  // Aspect ratio
+  p.x *= iResolution.x / iResolution.y;
+
+  // Camera position and 'look at'
+  vec3 origin = vec3(0.0, 0.8, 0.0);
+  vec3 target = vec3(0.0);
+
+  origin.x += 1.7 * cos(iTime * 0.2);
+  origin.z += 1.7 * sin(iTime * 0.2);
+
+  mat3 toWorld = setCamera(origin, target, 0.0);
+  vec3 direction = toWorld * normalize(vec3(p.xy, 2.0));
+
+  // Render scene
+  float distance;
+  vec3 color = render(origin, direction, distance);
+
+  // Tone mapping
+  color = Tonemap_ACES(color);
+
+  // Exponential distance fog
+  color = mix(color, 0.8 * vec3(0.7, 0.8, 1.0),
+              1.0 - exp2(-0.011 * distance * distance));
+
+  // Gamma compression
+  color = OECF_sRGBFast(color);
+
+  gl_FragColor = vec4(color, 1.0);
+}
+)ShaderCode";
 
 public:
   ShaderMaterialPhysicallyBasedSdfScene(ICanvas* iCanvas)

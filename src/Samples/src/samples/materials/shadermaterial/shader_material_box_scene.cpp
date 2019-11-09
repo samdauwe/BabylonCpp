@@ -17,40 +17,44 @@ public:
   /** Vertex Shader **/
   // source: https://www.shadertoy.com/new
   static constexpr const char* customVertexShader
-    = "#ifdef GL_ES\n"
-      "precision highp float;\n"
-      "#endif\n"
-      "\n"
-      "// Attributes\n"
-      "attribute vec3 position;\n"
-      "attribute vec2 uv;\n"
-      "\n"
-      "// Uniforms\n"
-      "uniform mat4 worldViewProjection;\n"
-      "\n"
-      "// Varying\n"
-      "varying vec2 vUV;\n"
-      "\n"
-      "void main(void) {\n"
-      "    gl_Position = worldViewProjection * vec4(position, 1.0);\n"
-      "    vUV = uv;\n"
-      "}\n";
+    = R"ShaderCode(
+#ifdef GL_ES
+precision highp float;
+#endif
+
+// Attributes
+attribute vec3 position;
+attribute vec2 uv;
+
+// Uniforms
+uniform mat4 worldViewProjection;
+
+// Varying
+varying vec2 vUV;
+
+void main(void) {
+    gl_Position = worldViewProjection * vec4(position, 1.0);
+    vUV = uv;
+}
+)ShaderCode";
 
   /** Pixel (Fragment) Shader **/
   static constexpr const char* customFragmentShader
-    = "#ifdef GL_ES\n"
-      "precision highp float;\n"
-      "#endif\n"
-      "\n"
-      "varying vec2 vUV;\n"
-      "\n"
-      "uniform float time;\n"
-      "\n"
-      "void main(void)\n"
-      "{\n"
-      "  vec2 uv = vUV.xy;\n"
-      "  gl_FragColor  = vec4(uv,0.5+0.5*sin(time),1.0);\n"
-      "}\n";
+    = R"ShaderCode(
+#ifdef GL_ES
+precision highp float;
+#endif
+
+varying vec2 vUV;
+
+uniform float time;
+
+void main(void)
+{
+  vec2 uv = vUV.xy;
+  gl_FragColor  = vec4(uv,0.5+0.5*sin(time),1.0);
+}
+)ShaderCode";
 
 public:
   ShaderMaterialBoxScene(ICanvas* iCanvas)

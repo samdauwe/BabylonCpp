@@ -15,65 +15,69 @@ class ShaderMaterialScene : public IRenderableScene {
 
 public:
   static constexpr const char* customVertexShader
-    = "#ifdef GL_ES\n"
-      "precision highp float;\n"
-      "#endif\n"
-      "\n"
-      "// Attributes\n"
-      "attribute vec3 position;\n"
-      "attribute vec3 normal;\n"
-      "\n"
-      "// Uniforms\n"
-      "uniform mat4 world;\n"
-      "uniform mat4 worldViewProjection;\n"
-      "\n"
-      "varying vec3 vPositionW;\n"
-      "varying vec3 vNormalW;\n"
-      "\n"
-      "void main(void) {\n"
-      "   vec4 outPosition = worldViewProjection * vec4(position, 1.0);\n"
-      "   gl_Position = outPosition;\n"
-      "\n"
-      "   vPositionW = vec3(world * vec4(position, 1.0));\n"
-      "   vNormalW = normalize(vec3(world * vec4(normal, 0.0)));\n"
-      "}\n";
+    = R"ShaderCode(
+#ifdef GL_ES
+precision highp float;
+#endif
+
+// Attributes
+attribute vec3 position;
+attribute vec3 normal;
+
+// Uniforms
+uniform mat4 world;
+uniform mat4 worldViewProjection;
+
+varying vec3 vPositionW;
+varying vec3 vNormalW;
+
+void main(void) {
+   vec4 outPosition = worldViewProjection * vec4(position, 1.0);
+   gl_Position = outPosition;
+
+   vPositionW = vec3(world * vec4(position, 1.0));
+   vNormalW = normalize(vec3(world * vec4(normal, 0.0)));
+}
+)ShaderCode";
 
   static constexpr const char* customFragmentShader
-    = "#ifdef GL_ES\n"
-      "precision highp float;\n"
-      "#endif\n"
-      "\n"
-      "// Lights\n"
-      "varying vec3 vPositionW;\n"
-      "varying vec3 vNormalW;\n"
-      "\n"
-      "// Refs\n"
-      "uniform vec3 cameraPosition;\n"
-      "uniform float time;\n"
-      "\n"
-      "void main(void) {\n"
-      "\n"
-      "   vec3 color = vec3(.0, 1., 1.);\n"
-      "   vec3 viewDirectionW = normalize(cameraPosition + vPositionW);\n"
-      "\n"
-      "   vec3 position = viewDirectionW;\n"
-      "\n"
-      "   float newPos = sin(time)*30.;\n"
-      "   if (position.y > 0.) newPos *= -1.;\n"
-      "\n"
-      "       float t =(position.x+position.y)+sin(position.x*25.)*1.2;\n"
-      "       float b = (position.x+position.y) * sin( .1 /abs(position.y - \n"
-      "                 .060*t)*1.5);\n"
-      "\n"
-      "       for ( float i =0.0; i< 20.0; ++i )\n"
-      "       {\n"
-      "           position.x += sin (( position.y  + i )* 10.)* 1.6+newPos ;\n"
-      "           float  ftmp = abs(1./ position.x / 500.0 );\n"
-      "           b += ftmp;\n"
-      "       }\n"
-      "\n"
-      "       gl_FragColor = vec4(color*b, 1.);\n"
-      "}\n";
+    = R"ShaderCode(
+#ifdef GL_ES
+precision highp float;
+#endif
+
+// Lights
+varying vec3 vPositionW;
+varying vec3 vNormalW;
+
+// Refs
+uniform vec3 cameraPosition;
+uniform float time;
+
+void main(void) {
+
+   vec3 color = vec3(.0, 1., 1.);
+   vec3 viewDirectionW = normalize(cameraPosition + vPositionW);
+
+   vec3 position = viewDirectionW;
+
+   float newPos = sin(time)*30.;
+   if (position.y > 0.) newPos *= -1.;
+
+       float t =(position.x+position.y)+sin(position.x*25.)*1.2;
+       float b = (position.x+position.y) * sin( .1 /abs(position.y - 
+                 .060*t)*1.5);
+
+       for ( float i =0.0; i< 20.0; ++i )
+       {
+           position.x += sin (( position.y  + i )* 10.)* 1.6+newPos ;
+           float  ftmp = abs(1./ position.x / 500.0 );
+           b += ftmp;
+       }
+
+       gl_FragColor = vec4(color*b, 1.);
+}
+)ShaderCode";
 
 public:
   ShaderMaterialScene(ICanvas* iCanvas)

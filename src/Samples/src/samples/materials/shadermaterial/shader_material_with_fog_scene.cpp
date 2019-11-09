@@ -16,76 +16,80 @@ class ShaderMaterialWithFogScene : public IRenderableScene {
 public:
   /** Vertex Shader **/
   static constexpr const char* customVertexShader
-    = "#ifdef GL_ES\n"
-      "precision highp float;\n"
-      "#endif\n"
-      "\n"
-      "// Attributes\n"
-      "attribute vec3 position;\n"
-      "\n"
-      "// Uniforms\n"
-      "uniform mat4 world;\n"
-      "uniform mat4 view;\n"
-      "uniform mat4 viewProjection;\n"
-      "\n"
-      "// Varying\n"
-      " varying float fFogDistance;\n"
-      "\n"
-      "void main(void) {\n"
-      "  vec4 worldPosition = world * vec4(position, 1.0);\n"
-      "  fFogDistance = (view * worldPosition).z;\n"
-      "  gl_Position =  viewProjection * worldPosition;\n"
-      "}\n";
+    = R"ShaderCode(
+#ifdef GL_ES
+precision highp float;
+#endif
+
+// Attributes
+attribute vec3 position;
+
+// Uniforms
+uniform mat4 world;
+uniform mat4 view;
+uniform mat4 viewProjection;
+
+// Varying
+ varying float fFogDistance;
+
+void main(void) {
+  vec4 worldPosition = world * vec4(position, 1.0);
+  fFogDistance = (view * worldPosition).z;
+  gl_Position =  viewProjection * worldPosition;
+}
+)ShaderCode";
 
   /** Pixel (Fragment) Shader **/
   static constexpr const char* customFragmentShader
-    = "#ifdef GL_ES\n"
-      "precision highp float;\n"
-      "#endif\n"
-      "\n"
-      "#define FOGMODE_NONE 0.\n"
-      "#define FOGMODE_EXP 1.\n"
-      "#define FOGMODE_EXP2 2.\n"
-      "#define FOGMODE_LINEAR 3.\n"
-      "#define E 2.71828\n"
-      "\n"
-      "// Uniforms\n"
-      "uniform vec4 vFogInfos;\n"
-      "uniform vec3 vFogColor;\n"
-      "uniform sampler2D textureSampler; \n"
-      "\n"
-      "// Varying\n"
-      "varying float fFogDistance;\n"
-      "\n"
-      "float CalcFogFactor()\n"
-      "{\n"
-      "  float fogCoeff = 1.0;\n"
-      "  float fogStart = vFogInfos.y;\n"
-      "  float fogEnd = vFogInfos.z;\n"
-      "  float fogDensity = vFogInfos.w;\n"
-      "\n"
-      "  if (FOGMODE_LINEAR == vFogInfos.x)\n"
-      "  {\n"
-      "    fogCoeff = (fogEnd - fFogDistance) / (fogEnd - fogStart);\n"
-      "  }\n"
-      "  else if (FOGMODE_EXP == vFogInfos.x)\n"
-      "  {\n"
-      "    fogCoeff = 1.0 / pow(E, fFogDistance * fogDensity);\n"
-      "  }\n"
-      "  else if (FOGMODE_EXP2 == vFogInfos.x)\n"
-      "  {\n"
-      "    fogCoeff = 1.0 / pow(E, fFogDistance * fFogDistance * fogDensity * "
-      "                            fogDensity);\n"
-      "  }\n"
-      "  return clamp(fogCoeff, 0.0, 1.0);\n"
-      "}\n"
-      "\n"
-      "void main(void) {\n"
-      "  float fog = CalcFogFactor();\n"
-      "  vec3 color = vec3(1.0, 0., 1.0);\n"
-      "  color = fog * color + (1.0 - fog) * vFogColor;\n"
-      "  gl_FragColor = vec4(color, 1.);\n"
-      "}\n";
+    = R"ShaderCode(
+#ifdef GL_ES
+precision highp float;
+#endif
+
+#define FOGMODE_NONE 0.
+#define FOGMODE_EXP 1.
+#define FOGMODE_EXP2 2.
+#define FOGMODE_LINEAR 3.
+#define E 2.71828
+
+// Uniforms
+uniform vec4 vFogInfos;
+uniform vec3 vFogColor;
+uniform sampler2D textureSampler; 
+
+// Varying
+varying float fFogDistance;
+
+float CalcFogFactor()
+{
+  float fogCoeff = 1.0;
+  float fogStart = vFogInfos.y;
+  float fogEnd = vFogInfos.z;
+  float fogDensity = vFogInfos.w;
+
+  if (FOGMODE_LINEAR == vFogInfos.x)
+  {
+    fogCoeff = (fogEnd - fFogDistance) / (fogEnd - fogStart);
+  }
+  else if (FOGMODE_EXP == vFogInfos.x)
+  {
+    fogCoeff = 1.0 / pow(E, fFogDistance * fogDensity);
+  }
+  else if (FOGMODE_EXP2 == vFogInfos.x)
+  {
+    fogCoeff = 1.0 / pow(E, fFogDistance * fFogDistance * fogDensity * 
+                            fogDensity);
+  }
+  return clamp(fogCoeff, 0.0, 1.0);
+}
+
+void main(void) {
+  float fog = CalcFogFactor();
+  vec3 color = vec3(1.0, 0., 1.0);
+  color = fog * color + (1.0 - fog) * vFogColor;
+  gl_FragColor = vec4(color, 1.);
+}
+)ShaderCode";
 
 public:
   ShaderMaterialWithFogScene(ICanvas* iCanvas) : IRenderableScene(iCanvas)

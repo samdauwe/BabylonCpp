@@ -20,109 +20,113 @@ class ShaderMaterialWarpSpeedScene : public IRenderableScene {
 public:
   /** Vertex Shader **/
   static constexpr const char* customVertexShader
-    = "#ifdef GL_ES\n"
-      "precision highp float;\n"
-      "#endif\n"
-      "\n"
-      "// Attributes\n"
-      "attribute vec3 position;\n"
-      "attribute vec3 normal;\n"
-      "attribute vec2 uv;\n"
-      "\n"
-      "// Uniforms\n"
-      "uniform mat4 worldViewProjection;\n"
-      "\n"
-      "// Varying\n"
-      "varying vec4 vPosition;\n"
-      "varying vec3 vNormal;\n"
-      "\n"
-      "void main() {\n"
-      "  vec4 p = vec4(position, 1.);\n"
-      "  vPosition = p;\n"
-      "  vNormal = normal;\n"
-      "  gl_Position = worldViewProjection * p;\n"
-      "}\n";
+    = R"ShaderCode(
+#ifdef GL_ES
+precision highp float;
+#endif
+
+// Attributes
+attribute vec3 position;
+attribute vec3 normal;
+attribute vec2 uv;
+
+// Uniforms
+uniform mat4 worldViewProjection;
+
+// Varying
+varying vec4 vPosition;
+varying vec3 vNormal;
+
+void main() {
+  vec4 p = vec4(position, 1.);
+  vPosition = p;
+  vNormal = normal;
+  gl_Position = worldViewProjection * p;
+}
+)ShaderCode";
 
   /** Pixel (Fragment) Shader **/
   // Interstellar ( https://www.shadertoy.com/view/Xdl3D2 )
   static constexpr const char* customFragmentShader
-    = "#ifdef GL_ES\n"
-      "precision highp float;\n"
-      "#endif\n"
-      "\n"
-      "// Varying\n"
-      "varying vec4 vPosition;\n"
-      "varying vec3 vNormal;\n"
-      "\n"
-      "// Uniforms\n"
-      "uniform sampler2D textureSampler;\n"
-      "uniform sampler2D refSampler;\n"
-      "uniform vec3 iResolution;\n"
-      "uniform mat4 worldView;\n"
-      "\n"
-      "const float tau = 6.28318530717958647692;\n"
-      "\n"
-      "// Gamma correction\n"
-      "#define GAMMA (2.2)\n"
-      "\n"
-      "vec3 ToLinear(in vec3 col) {\n"
-      "  // Simulate a monitor, converting colour values into light values\n"
-      "  return pow(col, vec3(GAMMA));\n"
-      "}\n"
-      "\n"
-      "vec3 ToGamma(in vec3 col) {\n"
-      "  // Convert back into colour values, so the correct light will come "
-      "out of the\n"
-      "  // monitor\n"
-      "  return pow(col, vec3(1.0 / GAMMA));\n"
-      "}\n"
-      "\n"
-      "vec4 Noise(in ivec2 x) {\n"
-      "  return texture2D(refSampler, (vec2(x) + 0.5) / 256.0, -100.0);\n"
-      "}\n"
-      "\n"
-      "vec4 Rand(in int x) {\n"
-      "  vec2 uv;\n"
-      "  uv.x = (float(x) + 0.5) / 256.0;\n"
-      "  uv.y = (floor(uv.x) + 0.5) / 256.0;\n"
-      "  return texture2D(refSampler, uv, -100.0);\n"
-      "}\n"
-      "\n"
-      "uniform float time;\n"
-      "\n"
-      "void main(void) {\n"
-      "\n"
-      "  vec3 ray;\n"
-      "  ray.xy = .2 * (vPosition.xy - vec2(.5));\n"
-      "  ray.z = 1.;\n"
-      "\n"
-      "  float offset = time * .5;\n"
-      "  float speed2 = (cos(offset) + 1.0) * 2.0;\n"
-      "  float speed = speed2 + .1;\n"
-      "  offset += sin(offset) * .96;\n"
-      "  offset *= 2.0;\n"
-      "\n"
-      "  vec3 col = vec3(0.);\n"
-      "\n"
-      "  vec3 stp = ray / max(abs(ray.x), abs(ray.y));\n"
-      "\n"
-      "  vec3 pos = 2.0 * stp + .5;\n"
-      "  for (int i = 0; i < 20; i++) {\n"
-      "    float z = Noise(ivec2(pos.xy)).x;\n"
-      "    z = fract(z - offset);\n"
-      "    float d = 50.0 * z - pos.z;\n"
-      "    float w = pow(max(0.0, 1.0 - 8.0 * length(fract(pos.xy) - .5)), "
-      "                  2.0);\n"
-      "    vec3 c = max(vec3(0),\n"
-      "                 vec3(1.0 - abs(d + speed2 * .5) / speed, 1.0 - abs(d) "
-      "                    / speed,\n"
-      "                      1.0 - abs(d - speed2 * .5) / speed));\n"
-      "    col += 1.5 * (1.0 - z) * c * w;\n"
-      "    pos += stp;\n"
-      "  }\n"
-      "\n"
-      "  gl_FragColor = vec4(ToGamma(col), 1.);\n"
-      "}\n";
+    = R"ShaderCode(
+#ifdef GL_ES
+precision highp float;
+#endif
+
+// Varying
+varying vec4 vPosition;
+varying vec3 vNormal;
+
+// Uniforms
+uniform sampler2D textureSampler;
+uniform sampler2D refSampler;
+uniform vec3 iResolution;
+uniform mat4 worldView;
+
+const float tau = 6.28318530717958647692;
+
+// Gamma correction
+#define GAMMA (2.2)
+
+vec3 ToLinear(in vec3 col) {
+  // Simulate a monitor, converting colour values into light values
+  return pow(col, vec3(GAMMA));
+}
+
+vec3 ToGamma(in vec3 col) {
+  // Convert back into colour values, so the correct light will come 
+out of the
+  // monitor
+  return pow(col, vec3(1.0 / GAMMA));
+}
+
+vec4 Noise(in ivec2 x) {
+  return texture2D(refSampler, (vec2(x) + 0.5) / 256.0, -100.0);
+}
+
+vec4 Rand(in int x) {
+  vec2 uv;
+  uv.x = (float(x) + 0.5) / 256.0;
+  uv.y = (floor(uv.x) + 0.5) / 256.0;
+  return texture2D(refSampler, uv, -100.0);
+}
+
+uniform float time;
+
+void main(void) {
+
+  vec3 ray;
+  ray.xy = .2 * (vPosition.xy - vec2(.5));
+  ray.z = 1.;
+
+  float offset = time * .5;
+  float speed2 = (cos(offset) + 1.0) * 2.0;
+  float speed = speed2 + .1;
+  offset += sin(offset) * .96;
+  offset *= 2.0;
+
+  vec3 col = vec3(0.);
+
+  vec3 stp = ray / max(abs(ray.x), abs(ray.y));
+
+  vec3 pos = 2.0 * stp + .5;
+  for (int i = 0; i < 20; i++) {
+    float z = Noise(ivec2(pos.xy)).x;
+    z = fract(z - offset);
+    float d = 50.0 * z - pos.z;
+    float w = pow(max(0.0, 1.0 - 8.0 * length(fract(pos.xy) - .5)), 
+                  2.0);
+    vec3 c = max(vec3(0),
+                 vec3(1.0 - abs(d + speed2 * .5) / speed, 1.0 - abs(d) 
+                    / speed,
+                      1.0 - abs(d - speed2 * .5) / speed));
+    col += 1.5 * (1.0 - z) * c * w;
+    pos += stp;
+  }
+
+  gl_FragColor = vec4(ToGamma(col), 1.);
+}
+)ShaderCode";
 
 public:
   ShaderMaterialWarpSpeedScene(ICanvas* iCanvas)
