@@ -3,7 +3,6 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/string.h>
 #include <babylon/interfaces/irenderable_scene.h>
-#include <babylon/samples/optimizations/_optimizations_samples_index.h>
 #include <babylon/samples/particles/_particles_samples_index.h>
 #include <babylon/samples/proceduraltextureslibrary/_procedural_textures_library_samples_index.h>
 #include <babylon/samples/shadows/_shadows_samples_index.h>
@@ -21,8 +20,6 @@ SamplesIndex::SamplesIndex()
 {
   // Initialize the samples index
   _samplesIndex = {
-    // Optimizations samples
-    {_OptimizationsSamplesIndex::CategoryName(), _OptimizationsSamplesIndex()},
     // Particles samples
     {_ParticlesSamplesIndex::CategoryName(), _ParticlesSamplesIndex()},
     // Procedural Textures Library samples
