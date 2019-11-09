@@ -60,7 +60,7 @@ public:
     // Create the "God Rays" effect (volumetric light scattering)
     auto godrays = VolumetricLightScatteringPostProcess::New(
       "godrays", 1.f, _camera, nullptr, 100, TextureConstants::BILINEAR_SAMPLINGMODE, _engine.get(),
-      false);
+      false, scene);
 
     // By default it uses a billboard to render the sun, just apply the desired
     // texture position and scale
