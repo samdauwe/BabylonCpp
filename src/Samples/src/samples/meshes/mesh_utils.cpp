@@ -65,14 +65,12 @@ MeshPtr MeshUtils::CreateTwelvePointedStar(size_t len, Scene* scene)
     centerX = 0.f;
     centerY = 0.f;
     centerZ = 0.f;
-    vec1.set(
-      dodecahedron.vertices[face[1]][0] - dodecahedron.vertices[face[0]][0],
-      dodecahedron.vertices[face[1]][1] - dodecahedron.vertices[face[0]][1],
-      dodecahedron.vertices[face[1]][2] - dodecahedron.vertices[face[0]][2]);
-    vec2.set(
-      dodecahedron.vertices[face[2]][0] - dodecahedron.vertices[face[1]][0],
-      dodecahedron.vertices[face[2]][1] - dodecahedron.vertices[face[1]][1],
-      dodecahedron.vertices[face[2]][2] - dodecahedron.vertices[face[1]][2]);
+    vec1.set(dodecahedron.vertices[face[1]][0] - dodecahedron.vertices[face[0]][0],
+             dodecahedron.vertices[face[1]][1] - dodecahedron.vertices[face[0]][1],
+             dodecahedron.vertices[face[1]][2] - dodecahedron.vertices[face[0]][2]);
+    vec2.set(dodecahedron.vertices[face[2]][0] - dodecahedron.vertices[face[1]][0],
+             dodecahedron.vertices[face[2]][1] - dodecahedron.vertices[face[1]][1],
+             dodecahedron.vertices[face[2]][2] - dodecahedron.vertices[face[1]][2]);
     auto norm = Vector3::Cross(vec1, vec2).normalize();
     for (size_t v = 0; v < 5; ++v) {
       centerX += dodecahedron.vertices[face[v]][0];
@@ -80,12 +78,10 @@ MeshPtr MeshUtils::CreateTwelvePointedStar(size_t len, Scene* scene)
       centerZ += dodecahedron.vertices[face[v]][2];
     }
     pointIndex = 1 * (nbVertices + f);
-    stl_util::concat(positions, {centerX / 6.f + len * norm.x,
-                                 centerY / 6.f + len * norm.y,
+    stl_util::concat(positions, {centerX / 6.f + len * norm.x, centerY / 6.f + len * norm.y,
                                  centerZ / 6.f + len * norm.z});
     for (size_t v = 0; v < 5; ++v) {
-      stl_util::concat(indices, {face[v], static_cast<unsigned>(pointIndex),
-                                 face[(v + 1) % 5]});
+      stl_util::concat(indices, {face[v], static_cast<unsigned>(pointIndex), face[(v + 1) % 5]});
     }
   }
 

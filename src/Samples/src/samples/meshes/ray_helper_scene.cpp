@@ -1,94 +1,120 @@
-#include <babylon/samples/meshes/ray_helper_scene.h>
-
 #include <babylon/cameras/free_camera.h>
+#include <babylon/debug/ray_helper.h>
 #include <babylon/engines/scene.h>
+#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
+#include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
+
+class Mesh;
+using MeshPtr = std::shared_ptr<Mesh>;
+
 namespace Samples {
 
-RayHelperScene::RayHelperScene(ICanvas* iCanvas)
-    : IRenderableScene(iCanvas)
-    , _box{nullptr}
-    , _boxTarget{nullptr}
-    , _ground{nullptr}
-    , _sphere{nullptr}
-    , _rayHelper{_ray}
-{
-}
+/**
+ * @brief Ray Helper Scene. Example demonstrating how to use the RayHelper class for easily viewing
+ * and attaching a ray to a mesh..
+ * @see http://www.babylonjs-playground.com/#ZHDBJ#35
+ */
+class RayHelperScene : public IRenderableScene {
 
-RayHelperScene::~RayHelperScene()
-{
-}
+public:
+  RayHelperScene(ICanvas* iCanvas)
+      : IRenderableScene(iCanvas)
+      , _box{nullptr}
+      , _boxTarget{nullptr}
+      , _ground{nullptr}
+      , _sphere{nullptr}
+      , _rayHelper{_ray}
+  {
+  }
 
-const char* RayHelperScene::getName()
-{
-  return "Ray Helper Scene";
-}
+  ~RayHelperScene() override = default;
 
-void RayHelperScene::initializeScene(ICanvas* canvas, Scene* scene)
-{
-  auto camera = FreeCamera::New("camera1", Vector3(10.f, 8.f, -5.f), scene);
-  camera->fov = 0.6f;
-  camera->setTarget(Vector3::Zero());
-  camera->attachControl(canvas, false);
+  const char* getName() override
+  {
+    return "Ray Helper Scene";
+  }
 
-  auto light = HemisphericLight::New("light1", Vector3(0.f, 1.f, 0.f), scene);
-  light->intensity = 0.5f;
+  void initializeScene(ICanvas* canvas, Scene* scene) override
+  {
+    auto camera = FreeCamera::New("camera1", Vector3(10.f, 8.f, -5.f), scene);
+    camera->fov = 0.6f;
+    camera->setTarget(Vector3::Zero());
+    camera->attachControl(canvas, false);
 
-  _ground               = Mesh::CreateGround("ground1", 6, 6, 2, scene);
-  _ground->position().y = -0.1f;
-  auto mat              = StandardMaterial::New("mat1", scene);
-  mat->alpha            = 0.2f;
-  _ground->material     = mat;
+    auto light       = HemisphericLight::New("light1", Vector3(0.f, 1.f, 0.f), scene);
+    light->intensity = 0.5f;
 
-  _box               = Mesh::CreateBox("box1", 0.5f, scene);
-  _box->position().x = 0.2f;
-  _box->position().y = 1.f;
+    _ground               = Mesh::CreateGround("ground1", 6, 6, 2, scene);
+    _ground->position().y = -0.1f;
+    auto mat              = StandardMaterial::New("mat1", scene);
+    mat->alpha            = 0.2f;
+    _ground->material     = mat;
 
-  _boxTarget               = Mesh::CreateBox("box2", 1, scene);
-  _boxTarget->position().x = 2.f;
-  _boxTarget->position().z = 2.f;
+    _box               = Mesh::CreateBox("box1", 0.5f, scene);
+    _box->position().x = 0.2f;
+    _box->position().y = 1.f;
 
-  _box->lookAt(_boxTarget->position());
+    _boxTarget               = Mesh::CreateBox("box2", 1, scene);
+    _boxTarget->position().x = 2.f;
+    _boxTarget->position().z = 2.f;
 
-  scene->render();
+    _box->lookAt(_boxTarget->position());
 
-  _rayHelper.attachToMesh(_box);
-  _rayHelper.show(scene);
+    scene->render();
 
-  _box->showBoundingBox       = true;
-  _boxTarget->showBoundingBox = true;
-  _ground->showBoundingBox    = true;
+    _rayHelper.attachToMesh(_box);
+    _rayHelper.show(scene);
 
-  SphereOptions options;
-  options.diameter = 0.15f;
-  _sphere          = MeshBuilder::CreateSphere("sphere", options, scene);
-  _sphere->setEnabled(false);
+    _box->showBoundingBox       = true;
+    _boxTarget->showBoundingBox = true;
+    _ground->showBoundingBox    = true;
 
-  _meshes = {_boxTarget.get(), _ground.get()};
+    SphereOptions options;
+    options.diameter = 0.15f;
+    _sphere          = MeshBuilder::CreateSphere("sphere", options, scene);
+    _sphere->setEnabled(false);
 
-  _scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) {
-    _box->rotation().x += 0.01f;
-    _box->rotation().z += 0.01f;
+    _meshes = {_boxTarget.get(), _ground.get()};
 
-    auto hitInfo = _ray.intersectsMeshes(_meshes);
+    _scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) {
+      _box->rotation().x += 0.01f;
+      _box->rotation().z += 0.01f;
 
-    if (!hitInfo.empty()) {
-      _sphere->setEnabled(true);
-      if (hitInfo[0].pickedPoint.has_value()) {
-        _sphere->position().copyFrom(*hitInfo[0].pickedPoint);
+      auto hitInfo = _ray.intersectsMeshes(_meshes);
+
+      if (!hitInfo.empty()) {
+        _sphere->setEnabled(true);
+        if (hitInfo[0].pickedPoint.has_value()) {
+          _sphere->position().copyFrom(*hitInfo[0].pickedPoint);
+        }
       }
-    }
-    else {
-      _sphere->setEnabled(false);
-    }
-  });
-}
+      else {
+        _sphere->setEnabled(false);
+      }
+    });
+  }
+
+private:
+  // Meshes
+  MeshPtr _box;
+  MeshPtr _boxTarget;
+  MeshPtr _ground;
+  MeshPtr _sphere;
+  std::vector<AbstractMesh*> _meshes;
+  // Ray helper
+  Ray _ray;
+  RayHelper _rayHelper;
+
+}; // end of class RayHelperScene
+
+BABYLON_REGISTER_SAMPLE("Meshes", RayHelperScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON
