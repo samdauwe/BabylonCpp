@@ -19,9 +19,9 @@ limitations under the License.
 
 #include <cstddef>
 #include <stdint.h>
+#include <string>
 
 #include <babylon/babylon_api.h>
-#include <babylon/core/string_view.h>
 
 // String hashing function used by various parts of Lullaby.  It uses the
 // following algorithm:
@@ -39,25 +39,22 @@ constexpr HashValue kHashPrimeMultiplier = 0x000001b3;
 
 BABYLON_SHARED_EXPORT HashValue Hash(const char* str);
 BABYLON_SHARED_EXPORT HashValue Hash(const char* str, int len);
-BABYLON_SHARED_EXPORT HashValue Hash(string_view str);
-BABYLON_SHARED_EXPORT HashValue HashCaseInsensitive(const char* str,
-                                                    size_t len);
+BABYLON_SHARED_EXPORT HashValue Hash(const std::string& str);
+BABYLON_SHARED_EXPORT HashValue HashCaseInsensitive(const char* str, size_t len);
 
 namespace detail {
 
 // Helper function for performing the recursion for the compile time hash.
 template <std::size_t N>
-inline constexpr HashValue ConstHash(const char (&str)[N], int start,
-                                     HashValue hash)
+inline constexpr HashValue ConstHash(const char (&str)[N], int start, HashValue hash)
 {
   // We need to perform the static_cast to uint64_t otherwise MSVC complains
   // about integral constant overflow (warning C4307).
   return (start == N || start == N - 1) ?
            hash :
            ConstHash(str, start + 1,
-                     static_cast<HashValue>(
-                       (hash ^ static_cast<unsigned char>(str[start]))
-                       * static_cast<uint64_t>(kHashPrimeMultiplier)));
+                     static_cast<HashValue>((hash ^ static_cast<unsigned char>(str[start]))
+                                            * static_cast<uint64_t>(kHashPrimeMultiplier)));
 }
 
 } // namespace detail
