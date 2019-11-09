@@ -391,12 +391,21 @@ def make_headerless_samples_in_category(category_name, category_folder):
         make_headerless_sample(sample, category_name)
 
 
+def correct_shader_multilines():
+    cpp_files = files_with_extension(CPP_DIR + "/samples/materials/shadermaterial", ".cpp")
+    for cpp_full_path in cpp_files:
+        print(cpp_full_path)
+        group_multiline_strings(cpp_full_path)
+    # print(cpp_files)
+
 fill_H_CPP_files()
 
-category_name = "Shader Material"
-category_folder = "materials/shadermaterial"
+# category_name = "Shader Material"
+# category_folder = "materials/shadermaterial"
 
-filename_no_extension = "shader_material_box_scene"
+# filename_no_extension = "shader_material_box_scene"
 # make_headerless_sample(filename_no_extension, category_name)
 
-make_headerless_samples_in_category(category_name, category_folder)
+# make_headerless_samples_in_category(category_name, category_folder)
+
+correct_shader_multilines()
