@@ -30,7 +30,6 @@ void SamplesIndex::fillSamplesFailures() const
     {"EdgesRenderScene", {SampleFailureReasonKind::segFault}},
     {"EnvironmentTextureScene", {SampleFailureReasonKind::empty3d}},
     {"FurMaterialScene", {SampleFailureReasonKind::broken3d, "Black texture"}},
-    {"InfiniteLoaderScene", {SampleFailureReasonKind::segFault}},
     {"InnerMeshPointsScene", {SampleFailureReasonKind::segFault}},
     {"IsPointInsideMeshScene", {SampleFailureReasonKind::processHung}},
     {"LevelOfDetailScene", {SampleFailureReasonKind::segFault, "Segfault when dragging the mouse"}},
