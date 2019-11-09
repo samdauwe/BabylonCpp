@@ -15,12 +15,11 @@ public:
   CircleCurvesFromBeziersScene(ICanvas* iCanvas);
   ~CircleCurvesFromBeziersScene() override;
 
-  const char* CircleCurvesFromBeziersScene::getName() override
+  const char* getName() override
   {
     return "Circle Curves From Beziers Scene";
   }
-  void CircleCurvesFromBeziersScene::initializeScene(ICanvas* canvas,
-                                                     Scene* scene) override
+  void initializeScene(ICanvas* canvas, Scene* scene) override
   {
     // Create a camera
     auto camera = ArcRotateCamera::New("Camera", 0.f, Math::PI / 2.f, 50.f,
