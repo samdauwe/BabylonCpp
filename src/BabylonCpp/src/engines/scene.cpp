@@ -102,10 +102,8 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , clearColor{Color4(0.2f, 0.2f, 0.3f, 1.f)}
     , ambientColor{Color3(0.f, 0.f, 0.f)}
     , environmentBRDFTexture{nullptr}
-    , environmentIntensity{this, &Scene::get_environmentIntensity,
-                           &Scene::set_environmentIntensity}
-    , imageProcessingConfiguration{this,
-                                   &Scene::get_imageProcessingConfiguration}
+    , environmentIntensity{this, &Scene::get_environmentIntensity, &Scene::set_environmentIntensity}
+    , imageProcessingConfiguration{this, &Scene::get_imageProcessingConfiguration}
     , onDispose{this, &Scene::set_onDispose}
     , beforeRender{this, &Scene::set_beforeRender}
     , afterRender{this, &Scene::set_afterRender}
@@ -114,10 +112,8 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , pointerDownPredicate{nullptr}
     , pointerUpPredicate{nullptr}
     , pointerMovePredicate{nullptr}
-    , forceWireframe{this, &Scene::get_forceWireframe,
-                     &Scene::set_forceWireframe}
-    , forcePointsCloud{this, &Scene::get_forcePointsCloud,
-                       &Scene::set_forcePointsCloud}
+    , forceWireframe{this, &Scene::get_forceWireframe, &Scene::set_forceWireframe}
+    , forcePointsCloud{this, &Scene::get_forcePointsCloud, &Scene::set_forcePointsCloud}
     , clipPlane{std::nullopt}
     , clipPlane2{std::nullopt}
     , clipPlane3{std::nullopt}
@@ -135,39 +131,32 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , unTranslatedPointer{this, &Scene::get_unTranslatedPointer}
     , cameraToUseForPointers(nullptr)
     , _mirroredCameraPosition{nullptr}
-    , useRightHandedSystem{this, &Scene::get_useRightHandedSystem,
-                           &Scene::set_useRightHandedSystem}
+    , useRightHandedSystem{this, &Scene::get_useRightHandedSystem, &Scene::set_useRightHandedSystem}
     , fogEnabled{this, &Scene::get_fogEnabled, &Scene::set_fogEnabled}
     , fogMode{this, &Scene::get_fogMode, &Scene::set_fogMode}
     , fogColor{Color3(0.2f, 0.2f, 0.3f)}
     , fogDensity{0.1f}
     , fogStart{0.f}
     , fogEnd{1000.f}
-    , shadowsEnabled{this, &Scene::get_shadowsEnabled,
-                     &Scene::set_shadowsEnabled}
+    , shadowsEnabled{this, &Scene::get_shadowsEnabled, &Scene::set_shadowsEnabled}
     , lightsEnabled{this, &Scene::get_lightsEnabled, &Scene::set_lightsEnabled}
     , _activeCamera{nullptr}
     , activeCamera{this, &Scene::get_activeCamera, &Scene::set_activeCamera}
-    , defaultMaterial{this, &Scene::get_defaultMaterial,
-                      &Scene::set_defaultMaterial}
-    , texturesEnabled{this, &Scene::get_texturesEnabled,
-                      &Scene::set_texturesEnabled}
+    , defaultMaterial{this, &Scene::get_defaultMaterial, &Scene::set_defaultMaterial}
+    , texturesEnabled{this, &Scene::get_texturesEnabled, &Scene::set_texturesEnabled}
     , particlesEnabled{true}
     , spritesEnabled{true}
     , _pointerOverSprite{nullptr}
     , _pickedDownSprite{nullptr}
     , _tempSpritePickingRay{std::nullopt}
-    , skeletonsEnabled{this, &Scene::get_skeletonsEnabled,
-                       &Scene::set_skeletonsEnabled}
+    , skeletonsEnabled{this, &Scene::get_skeletonsEnabled, &Scene::set_skeletonsEnabled}
     , lensFlaresEnabled{true}
     , collisionsEnabled{true}
     , collisionCoordinator{this, &Scene::get_collisionCoordinator}
     , gravity{Vector3(0.f, -9.807f, 0.f)}
     , postProcessesEnabled{true}
     , postProcessManager{nullptr}
-    , postProcessRenderPipelineManager{this,
-                                       &Scene::
-                                         get_postProcessRenderPipelineManager}
+    , postProcessRenderPipelineManager{this, &Scene::get_postProcessRenderPipelineManager}
     , renderTargetsEnabled{true}
     , dumpNextRenderTargets{false}
     , useDelayedTextureLoading{false}
@@ -175,16 +164,14 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , actionManager{nullptr}
     , proceduralTexturesEnabled{true}
     , mainSoundTrack{this, &Scene::get_mainSoundTrack}
-    , simplificationQueue{this, &Scene::get_simplificationQueue,
-                          &Scene::set_simplificationQueue}
+    , simplificationQueue{this, &Scene::get_simplificationQueue, &Scene::set_simplificationQueue}
     , animationTimeScale{1}
     , _cachedMaterial{nullptr}
     , _cachedEffect{nullptr}
     , _cachedVisibility{0.f}
     , dispatchAllSubMeshesOfActiveMeshes{false}
     , _forcedViewPosition{nullptr}
-    , _isAlternateRenderingEnabled{this,
-                                   &Scene::get_isAlternateRenderingEnabled}
+    , _isAlternateRenderingEnabled{this, &Scene::get_isAlternateRenderingEnabled}
     , frustumPlanes{this, &Scene::get_frustumPlanes}
     , requireLightSorting{false}
     , useMaterialMeshMap{false}
@@ -198,8 +185,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , pointerX{this, &Scene::get_pointerX, &Scene::set_pointerX}
     , pointerY{this, &Scene::get_pointerY, &Scene::set_pointerY}
     , totalVerticesPerfCounter{this, &Scene::get_totalVerticesPerfCounter}
-    , totalActiveIndicesPerfCounter{this,
-                                    &Scene::get_totalActiveIndicesPerfCounter}
+    , totalActiveIndicesPerfCounter{this, &Scene::get_totalActiveIndicesPerfCounter}
     , activeParticlesPerfCounter{this, &Scene::get_activeParticlesPerfCounter}
     , activeBonesPerfCounter{this, &Scene::get_activeBonesPerfCounter}
     , isLoading{this, &Scene::get_isLoading}
@@ -324,8 +310,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
   // Default Image processing definition.
   // if (ImageProcessingConfiguration)
   {
-    _imageProcessingConfiguration
-      = std::make_shared<ImageProcessingConfiguration>();
+    _imageProcessingConfiguration = std::make_shared<ImageProcessingConfiguration>();
   }
 
   getDeterministicFrameTime = []() -> float {
@@ -364,8 +349,7 @@ void Scene::_addComponent(const ISceneComponentPtr& component)
   _components.emplace_back(component);
   _transientComponents.emplace_back(component);
 
-  auto serializableComponent
-    = std::static_pointer_cast<ISceneSerializableComponent>(component);
+  auto serializableComponent = std::static_pointer_cast<ISceneSerializableComponent>(component);
   if (serializableComponent) {
     _serializableComponents.emplace_back(serializableComponent);
   }
@@ -373,16 +357,14 @@ void Scene::_addComponent(const ISceneComponentPtr& component)
 
 ISceneComponentPtr Scene::_getComponent(const std::string& name) const
 {
-  auto it = std::find_if(_components.begin(), _components.end(),
-                         [&name](const ISceneComponentPtr& component) {
-                           return component->name == name;
-                         });
+  auto it = std::find_if(
+    _components.begin(), _components.end(),
+    [&name](const ISceneComponentPtr& component) { return component->name == name; });
   return (it == _components.end()) ? nullptr : *it;
 }
 
 // Events
-void Scene::set_onDispose(
-  const std::function<void(Scene* scene, EventState& es)>& callback)
+void Scene::set_onDispose(const std::function<void(Scene* scene, EventState& es)>& callback)
 {
   if (_onDisposeObserver) {
     onDisposeObservable.remove(_onDisposeObserver);
@@ -390,8 +372,7 @@ void Scene::set_onDispose(
   _onDisposeObserver = onDisposeObservable.add(callback);
 }
 
-void Scene::set_beforeRender(
-  const std::function<void(Scene* scene, EventState& es)>& callback)
+void Scene::set_beforeRender(const std::function<void(Scene* scene, EventState& es)>& callback)
 {
   if (_onBeforeRenderObserver) {
     onBeforeRenderObservable.remove(_onBeforeRenderObserver);
@@ -401,8 +382,7 @@ void Scene::set_beforeRender(
   }
 }
 
-void Scene::set_afterRender(
-  const std::function<void(Scene* scene, EventState& es)>& callback)
+void Scene::set_afterRender(const std::function<void(Scene* scene, EventState& es)>& callback)
 {
   if (_onAfterRenderObserver) {
     onAfterRenderObservable.remove(_onAfterRenderObserver);
@@ -450,8 +430,8 @@ std::unique_ptr<GamepadManager>& Scene::get_gamepadManager()
 // Pointers
 Vector2& Scene::get_unTranslatedPointer()
 {
-  _unTranslatedPointer = Vector2(static_cast<float>(_unTranslatedPointerX),
-                                 static_cast<float>(_unTranslatedPointerY));
+  _unTranslatedPointer
+    = Vector2(static_cast<float>(_unTranslatedPointerX), static_cast<float>(_unTranslatedPointerY));
 
   return _unTranslatedPointer;
 }
@@ -569,8 +549,7 @@ AnimationPropertiesOverridePtr& Scene::get_animationPropertiesOverride()
   return _animationPropertiesOverride;
 }
 
-void Scene::set_animationPropertiesOverride(
-  const AnimationPropertiesOverridePtr& value)
+void Scene::set_animationPropertiesOverride(const AnimationPropertiesOverridePtr& value)
 {
   _animationPropertiesOverride = value;
 }
@@ -684,20 +663,17 @@ std::unique_ptr<ICollisionCoordinator>& Scene::get_collisionCoordinator()
   return _collisionCoordinator;
 }
 
-std::unique_ptr<PostProcessRenderPipelineManager>&
-Scene::get_postProcessRenderPipelineManager()
+std::unique_ptr<PostProcessRenderPipelineManager>& Scene::get_postProcessRenderPipelineManager()
 {
   if (!_postProcessRenderPipelineManager) {
     // Register the G Buffer component to the scene.
-    auto component = std::static_pointer_cast<
-      PostProcessRenderPipelineManagerSceneComponent>(_getComponent(
-      SceneComponentConstants::NAME_POSTPROCESSRENDERPIPELINEMANAGER));
+    auto component = std::static_pointer_cast<PostProcessRenderPipelineManagerSceneComponent>(
+      _getComponent(SceneComponentConstants::NAME_POSTPROCESSRENDERPIPELINEMANAGER));
     if (!component) {
       component = PostProcessRenderPipelineManagerSceneComponent::New(this);
       _addComponent(component);
     }
-    _postProcessRenderPipelineManager
-      = std::make_unique<PostProcessRenderPipelineManager>();
+    _postProcessRenderPipelineManager = std::make_unique<PostProcessRenderPipelineManager>();
   }
 
   return _postProcessRenderPipelineManager;
@@ -725,7 +701,7 @@ SimplificationQueuePtr& Scene::get_simplificationQueue()
 {
   if (!_simplificationQueue) {
     _simplificationQueue = std::make_shared<SimplificationQueue>();
-    auto component = std::static_pointer_cast<SimplicationQueueSceneComponent>(
+    auto component       = std::static_pointer_cast<SimplicationQueueSceneComponent>(
       _getComponent(SceneComponentConstants::NAME_SIMPLIFICATIONQUEUE));
     if (!component) {
       component = SimplicationQueueSceneComponent::New(this);
@@ -799,9 +775,8 @@ std::vector<AbstractMeshPtr> Scene::getMeshes() const
   std::vector<AbstractMeshPtr> _meshes;
   _meshes.reserve(meshes.size());
 
-  std::for_each(
-    meshes.begin(), meshes.end(),
-    [&_meshes](const AbstractMeshPtr& mesh) { _meshes.emplace_back(mesh); });
+  std::for_each(meshes.begin(), meshes.end(),
+                [&_meshes](const AbstractMeshPtr& mesh) { _meshes.emplace_back(mesh); });
 
   return _meshes;
 }
@@ -854,14 +829,12 @@ void Scene::setDefaultCandidateProviders()
 
   getActiveSubMeshCandidates
     = [this](AbstractMesh* mesh) { return _getDefaultSubMeshCandidates(mesh); };
-  getIntersectingSubMeshCandidates
-    = [this](AbstractMesh* mesh, const Ray& /*localRay*/) {
-        return _getDefaultSubMeshCandidates(mesh);
-      };
-  getCollidingSubMeshCandidates
-    = [this](AbstractMesh* mesh, const Collider& /*collider*/) {
-        return _getDefaultSubMeshCandidates(mesh);
-      };
+  getIntersectingSubMeshCandidates = [this](AbstractMesh* mesh, const Ray& /*localRay*/) {
+    return _getDefaultSubMeshCandidates(mesh);
+  };
+  getCollidingSubMeshCandidates = [this](AbstractMesh* mesh, const Collider& /*collider*/) {
+    return _getDefaultSubMeshCandidates(mesh);
+  };
 }
 
 Material* Scene::getCachedMaterial()
@@ -879,8 +852,7 @@ std::optional<float> Scene::getCachedVisibility()
   return _cachedVisibility;
 }
 
-bool Scene::isCachedMaterialInvalid(Material* material, const EffectPtr& effect,
-                                    float visibility)
+bool Scene::isCachedMaterialInvalid(Material* material, const EffectPtr& effect, float visibility)
 {
   return _cachedEffect != effect || _cachedMaterial != material
          || !stl_util::almost_equal(*_cachedVisibility, visibility);
@@ -1002,16 +974,15 @@ void Scene::_createUbo()
 
 void Scene::_createAlternateUbo()
 {
-  _alternateSceneUbo
-    = std::make_unique<UniformBuffer>(_engine, Float32Array(), true);
+  _alternateSceneUbo = std::make_unique<UniformBuffer>(_engine, Float32Array(), true);
   _alternateSceneUbo->addUniform("viewProjection", 16);
   _alternateSceneUbo->addUniform("view", 16);
 }
 
-std::optional<PickingInfo> Scene::_pickSpriteButKeepRay(
-  const std::optional<PickingInfo>& originalPointerInfo, int x, int y,
-  const std::function<bool(Sprite* sprite)>& predicate, bool fastCheck,
-  const CameraPtr& camera)
+std::optional<PickingInfo>
+Scene::_pickSpriteButKeepRay(const std::optional<PickingInfo>& originalPointerInfo, int x, int y,
+                             const std::function<bool(Sprite* sprite)>& predicate, bool fastCheck,
+                             const CameraPtr& camera)
 {
   auto result = pickSprite(x, y, predicate, fastCheck, camera);
   if (result) {
@@ -1028,14 +999,14 @@ void Scene::_setRayOnPointerInfo(PointerInfo& pointerInfo)
     if (!pointerInfo.pickInfo.ray) {
       auto identityMatrix = Matrix::Identity();
       if (pointerInfo.type == PointerEventTypes::POINTERWHEEL) {
-        pointerInfo.pickInfo.ray = createPickingRay(
-          pointerInfo.mouseWheelEvent.offsetX,
-          pointerInfo.mouseWheelEvent.offsetY, identityMatrix, _activeCamera);
+        pointerInfo.pickInfo.ray
+          = createPickingRay(pointerInfo.mouseWheelEvent.offsetX,
+                             pointerInfo.mouseWheelEvent.offsetY, identityMatrix, _activeCamera);
       }
       else if (pointerInfo.type == PointerEventTypes::POINTERMOVE) {
-        pointerInfo.pickInfo.ray = createPickingRay(
-          pointerInfo.pointerEvent.offsetX, pointerInfo.pointerEvent.offsetY,
-          identityMatrix, _activeCamera);
+        pointerInfo.pickInfo.ray
+          = createPickingRay(pointerInfo.pointerEvent.offsetX, pointerInfo.pointerEvent.offsetY,
+                             identityMatrix, _activeCamera);
       }
     }
   }
@@ -1045,15 +1016,13 @@ Scene& Scene::simulatePointerMove(std::optional<PickingInfo>& pickResult)
 {
   PointerEvent evt("pointermove");
 
-  if (_checkPrePointerObservable(pickResult, evt,
-                                 PointerEventTypes::POINTERMOVE)) {
+  if (_checkPrePointerObservable(pickResult, evt, PointerEventTypes::POINTERMOVE)) {
     return *this;
   }
   return _processPointerMove(pickResult, evt);
 }
 
-Scene& Scene::_processPointerMove(std::optional<PickingInfo>& pickResult,
-                                  const PointerEvent& evt)
+Scene& Scene::_processPointerMove(std::optional<PickingInfo>& pickResult, const PointerEvent& evt)
 {
   auto canvas = _engine->getRenderingCanvas();
 
@@ -1064,8 +1033,7 @@ Scene& Scene::_processPointerMove(std::optional<PickingInfo>& pickResult,
   // Restore pointer
   canvas->style.cursor = defaultCursor;
 
-  auto isMeshPicked
-    = (pickResult && pickResult->hit && pickResult->pickedMesh) ? true : false;
+  auto isMeshPicked = (pickResult && pickResult->hit && pickResult->pickedMesh) ? true : false;
   if (isMeshPicked) {
     setPointerOverMesh(pickResult->pickedMesh.get());
 
@@ -1084,13 +1052,12 @@ Scene& Scene::_processPointerMove(std::optional<PickingInfo>& pickResult,
   }
 
   for (const auto& step : _pointerMoveStage) {
-    pickResult = step.action(_unTranslatedPointerX, _unTranslatedPointerY,
-                             pickResult, isMeshPicked, canvas);
+    pickResult
+      = step.action(_unTranslatedPointerX, _unTranslatedPointerY, pickResult, isMeshPicked, canvas);
   }
 
   if (pickResult) {
-    auto type = (evt.type == EventType::MOUSE_WHEEL
-                 || evt.type == EventType::DOM_MOUSE_SCROLL) ?
+    auto type = (evt.type == EventType::MOUSE_WHEEL || evt.type == EventType::DOM_MOUSE_SCROLL) ?
                   PointerEventTypes::POINTERWHEEL :
                   PointerEventTypes::POINTERMOVE;
 
@@ -1099,14 +1066,12 @@ Scene& Scene::_processPointerMove(std::optional<PickingInfo>& pickResult,
     }
 
     if (onPointerObservable.hasObservers()) {
-      auto iType = evt.type == EventType::MOUSE_WHEEL
-                       || evt.type == EventType::DOM_MOUSE_SCROLL ?
+      auto iType = evt.type == EventType::MOUSE_WHEEL || evt.type == EventType::DOM_MOUSE_SCROLL ?
                      PointerEventTypes::POINTERWHEEL :
                      PointerEventTypes::POINTERMOVE;
 
       if (iType == PointerEventTypes::POINTERWHEEL) {
-        PointerInfo pi(iType, *static_cast<MouseWheelEvent const*>(&evt),
-                       *pickResult);
+        PointerInfo pi(iType, *static_cast<MouseWheelEvent const*>(&evt), *pickResult);
         _setRayOnPointerInfo(pi);
         onPointerObservable.notifyObservers(&pi, static_cast<int>(iType));
       }
@@ -1121,9 +1086,8 @@ Scene& Scene::_processPointerMove(std::optional<PickingInfo>& pickResult,
   return *this;
 }
 
-bool Scene::_checkPrePointerObservable(
-  const std::optional<PickingInfo>& pickResult, const PointerEvent& evt,
-  PointerEventTypes type)
+bool Scene::_checkPrePointerObservable(const std::optional<PickingInfo>& pickResult,
+                                       const PointerEvent& evt, PointerEventTypes type)
 {
   PointerInfoPre pi(type, evt, static_cast<float>(_unTranslatedPointerX),
                     static_cast<float>(_unTranslatedPointerY));
@@ -1143,16 +1107,14 @@ Scene& Scene::simulatePointerDown(std::optional<PickingInfo>& pickResult)
 {
   PointerEvent evt("pointerdown");
 
-  if (_checkPrePointerObservable(pickResult, evt,
-                                 PointerEventTypes::POINTERDOWN)) {
+  if (_checkPrePointerObservable(pickResult, evt, PointerEventTypes::POINTERDOWN)) {
     return *this;
   }
 
   return _processPointerDown(pickResult, evt);
 }
 
-Scene& Scene::_processPointerDown(std::optional<PickingInfo>& pickResult,
-                                  const PointerEvent& evt)
+Scene& Scene::_processPointerDown(std::optional<PickingInfo>& pickResult, const PointerEvent& evt)
 {
   if (pickResult && (*pickResult).hit && (*pickResult).pickedMesh) {
     _pickedDownMesh     = (*pickResult).pickedMesh.get();
@@ -1185,8 +1147,7 @@ Scene& Scene::_processPointerDown(std::optional<PickingInfo>& pickResult,
       }
 #endif
 
-      if (iActionManager->hasSpecificTrigger(
-            ActionManager::OnLongPressTrigger)) {
+      if (iActionManager->hasSpecificTrigger(ActionManager::OnLongPressTrigger)) {
 #if 0
         window.setTimeout(
           (function() {
@@ -1219,8 +1180,7 @@ Scene& Scene::_processPointerDown(std::optional<PickingInfo>& pickResult,
   }
   else {
     for (const auto& step : _pointerDownStage) {
-      pickResult = step.action(_unTranslatedPointerX, _unTranslatedPointerY,
-                               pickResult, evt);
+      pickResult = step.action(_unTranslatedPointerX, _unTranslatedPointerY, pickResult, evt);
     }
   }
 
@@ -1248,16 +1208,14 @@ Scene& Scene::simulatePointerUp(std::optional<PickingInfo>& pickResult)
   clickInfo.singleClick = true;
   clickInfo.ignore      = true;
 
-  if (_checkPrePointerObservable(pickResult, evt,
-                                 PointerEventTypes::POINTERUP)) {
+  if (_checkPrePointerObservable(pickResult, evt, PointerEventTypes::POINTERUP)) {
     return *this;
   }
 
   return _processPointerUp(pickResult, evt, clickInfo);
 }
 
-Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult,
-                                const PointerEvent& evt,
+Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult, const PointerEvent& evt,
                                 const ClickInfo& clickInfo)
 {
   if (pickResult && pickResult && (*pickResult).pickedMesh) {
@@ -1267,8 +1225,7 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult,
       if (onPointerPick) {
         onPointerPick(evt, pickResult);
       }
-      if (clickInfo.singleClick() && !clickInfo.ignore()
-          && onPointerObservable.hasObservers()) {
+      if (clickInfo.singleClick() && !clickInfo.ignore() && onPointerObservable.hasObservers()) {
         auto type = PointerEventTypes::POINTERPICK;
         PointerInfo pi(type, evt, *pickResult);
         _setRayOnPointerInfo(pi);
@@ -1301,15 +1258,13 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult,
   else {
     if (!clickInfo.ignore) {
       for (const auto& step : _pointerUpStage) {
-        pickResult = step.action(_unTranslatedPointerX, _unTranslatedPointerY,
-                                 pickResult, evt);
+        pickResult = step.action(_unTranslatedPointerX, _unTranslatedPointerY, pickResult, evt);
       }
     }
   }
 
   if (_pickedDownMesh && _pickedDownMesh->actionManager
-      && _pickedDownMesh->actionManager->hasSpecificTrigger(
-        ActionManager::OnPickOutTrigger)
+      && _pickedDownMesh->actionManager->hasSpecificTrigger(ActionManager::OnPickOutTrigger)
       && _pickedDownMesh != _pickedUpMesh) {
 #if 0
     _pickedDownMesh->actionManager->processTrigger(
@@ -1357,27 +1312,22 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult,
 
 bool Scene::isPointerCaptured(int pointerId)
 {
-  return stl_util::contains(_pointerCaptures, pointerId)
-         && _pointerCaptures[pointerId];
+  return stl_util::contains(_pointerCaptures, pointerId) && _pointerCaptures[pointerId];
 }
 
 bool Scene::_isPointerSwiping() const
 {
-  return std::abs(_startingPointerPosition.x - _pointerX)
-           > Scene::DragMovementThreshold
-         || std::abs(_startingPointerPosition.y - _pointerY)
-              > Scene::DragMovementThreshold;
+  return std::abs(_startingPointerPosition.x - _pointerX) > Scene::DragMovementThreshold
+         || std::abs(_startingPointerPosition.y - _pointerY) > Scene::DragMovementThreshold;
 }
 
 void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
 {
-  _initActionManager
-    = [this](const AbstractActionManagerPtr& act,
-             const ClickInfo & /*clickInfo*/) -> AbstractActionManagerPtr {
+  _initActionManager = [this](const AbstractActionManagerPtr& act,
+                              const ClickInfo & /*clickInfo*/) -> AbstractActionManagerPtr {
     if (!_meshPickProceed) {
-      auto pickResult
-        = pick(_unTranslatedPointerX, _unTranslatedPointerY,
-               pointerDownPredicate, false, cameraToUseForPointers);
+      auto pickResult = pick(_unTranslatedPointerX, _unTranslatedPointerY, pointerDownPredicate,
+                             false, cameraToUseForPointers);
       if (pickResult) {
         _currentPickResult = *pickResult;
       }
@@ -1397,26 +1347,21 @@ void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
     return act;
   };
 
-  _initClickEvent = [this](Observable<PointerInfoPre>& obs1,
-                           Observable<PointerInfo>& obs2,
+  _initClickEvent = [this](Observable<PointerInfoPre>& obs1, Observable<PointerInfo>& obs2,
                            const PointerEvent& evt,
-                           const std::function<void(
-                             const ClickInfo& clickInfo,
-                             std::optional<PickingInfo>& pickResult)>& cb) {
+                           const std::function<void(const ClickInfo& clickInfo,
+                                                    std::optional<PickingInfo>& pickResult)>& cb) {
     ClickInfo clickInfo;
     _currentPickResult           = std::nullopt;
     AbstractActionManagerPtr act = nullptr;
 
     auto checkPicking
       = obs1.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERPICK))
-        || obs2.hasSpecificMask(
-          static_cast<int>(PointerEventTypes::POINTERPICK))
+        || obs2.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERPICK))
         || obs1.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERTAP))
         || obs2.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERTAP))
-        || obs1.hasSpecificMask(
-          static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))
-        || obs2.hasSpecificMask(
-          static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
+        || obs1.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))
+        || obs2.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
     if (!checkPicking && ActionManager::HasPickTriggers()) {
       act = _initActionManager(act, clickInfo);
       if (act) {
@@ -1432,14 +1377,11 @@ void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
 
         if (!checkSingleClickImmediately) {
           checkSingleClickImmediately
-            = !obs1.hasSpecificMask(
-                static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))
-              && !obs2.hasSpecificMask(
-                static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
+            = !obs1.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))
+              && !obs2.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
 
           if (checkSingleClickImmediately
-              && !ActionManager::HasSpecificTrigger(
-                ActionManager::OnDoublePickTrigger)) {
+              && !ActionManager::HasSpecificTrigger(ActionManager::OnDoublePickTrigger)) {
             act = _initActionManager(act, clickInfo);
             if (act) {
               checkSingleClickImmediately
@@ -1469,25 +1411,20 @@ void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
         }
 
         auto checkDoubleClick
-          = obs1.hasSpecificMask(
-              static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))
-            || obs2.hasSpecificMask(
-              static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
+          = obs1.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))
+            || obs2.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
         if (!checkDoubleClick
-            && ActionManager::HasSpecificTrigger(
-              ActionManager::OnDoublePickTrigger)) {
+            && ActionManager::HasSpecificTrigger(ActionManager::OnDoublePickTrigger)) {
           act = _initActionManager(act, clickInfo);
           if (act) {
-            checkDoubleClick
-              = act->hasSpecificTrigger(ActionManager::OnDoublePickTrigger);
+            checkDoubleClick = act->hasSpecificTrigger(ActionManager::OnDoublePickTrigger);
           }
         }
         if (checkDoubleClick) {
           // two successive keys pressed are equal, double click delay is not
           // over and double click has not just occurred
           if (btn == _previousButtonPressed
-              && Time::fpTimeSince<long, std::milli>(
-                   _previousStartingPointerTime)
+              && Time::fpTimeSince<long, std::milli>(_previousStartingPointerTime)
                    < Scene::DoubleClickDelay.count()
               && !_doubleClickOccured) {
             // pointer has not moved for 2 clicks, it's a double click
@@ -1544,14 +1481,11 @@ void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
            && sprite->actionManager->hasPointerTriggers();
   };
 
-  _onPointerMove
-    = [this](PointerEvent&& evt) { _onPointerMoveEvent(std::move(evt)); };
+  _onPointerMove = [this](PointerEvent&& evt) { _onPointerMoveEvent(std::move(evt)); };
 
-  _onPointerDown
-    = [this](PointerEvent&& evt) { _onPointerDownEvent(std::move(evt)); };
+  _onPointerDown = [this](PointerEvent&& evt) { _onPointerDownEvent(std::move(evt)); };
 
-  _onPointerUp
-    = [this](PointerEvent&& evt) { _onPointerUpEvent(std::move(evt)); };
+  _onPointerUp = [this](PointerEvent&& evt) { _onPointerUpEvent(std::move(evt)); };
 
   _onKeyDown = [this](KeyboardEvent&& evt) { _onKeyDownEvent(std::move(evt)); };
 
@@ -1569,18 +1503,15 @@ void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
   if (attachMove) {
     canvas->addMouseEventListener(EventType::MOUSE_MOVE, _onPointerMove, false);
     // Wheel
-    canvas->addMouseEventListener(EventType::MOUSE_WHEEL, _onPointerMove,
-                                  false);
+    canvas->addMouseEventListener(EventType::MOUSE_WHEEL, _onPointerMove, false);
   }
 
   if (attachDown) {
-    canvas->addMouseEventListener(EventType::MOUSE_BUTTON_DOWN, _onPointerDown,
-                                  false);
+    canvas->addMouseEventListener(EventType::MOUSE_BUTTON_DOWN, _onPointerDown, false);
   }
 
   if (attachUp) {
-    canvas->addMouseEventListener(EventType::MOUSE_BUTTON_UP, _onPointerUp,
-                                  false);
+    canvas->addMouseEventListener(EventType::MOUSE_BUTTON_UP, _onPointerUp, false);
   }
 
   canvas->tabIndex = 1;
@@ -1596,8 +1527,7 @@ void Scene::detachControl()
   }
 
   canvas->removeMouseEventListener(EventType::MOUSE_MOVE, _onPointerMove);
-  canvas->removeMouseEventListener(EventType::MOUSE_BUTTON_DOWN,
-                                   _onPointerDown);
+  canvas->removeMouseEventListener(EventType::MOUSE_BUTTON_DOWN, _onPointerDown);
   canvas->removeMouseEventListener(EventType::MOUSE_BUTTON_UP, _onPointerUp);
 
   if (_onCanvasBlurObserver) {
@@ -1628,11 +1558,11 @@ void Scene::_onPointerMoveEvent(PointerEvent&& evt)
   _updatePointerPosition(evt);
 
   // PreObservable support
-  if (_checkPrePointerObservable(std::nullopt, evt,
-                                 (evt.type == EventType::MOUSE_WHEEL
-                                  || evt.type == EventType::DOM_MOUSE_SCROLL) ?
-                                   PointerEventTypes::POINTERWHEEL :
-                                   PointerEventTypes::POINTERMOVE)) {
+  if (_checkPrePointerObservable(
+        std::nullopt, evt,
+        (evt.type == EventType::MOUSE_WHEEL || evt.type == EventType::DOM_MOUSE_SCROLL) ?
+          PointerEventTypes::POINTERWHEEL :
+          PointerEventTypes::POINTERMOVE)) {
     return;
   }
 
@@ -1642,17 +1572,15 @@ void Scene::_onPointerMoveEvent(PointerEvent&& evt)
 
   if (!pointerMovePredicate) {
     pointerMovePredicate = [this](const AbstractMeshPtr& mesh) -> bool {
-      return mesh->isPickable && mesh->isVisible && mesh->isReady()
-             && mesh->isEnabled()
-             && (mesh->enablePointerMoveEvents
-                 || constantlyUpdateMeshUnderPointer
+      return mesh->isPickable && mesh->isVisible && mesh->isReady() && mesh->isEnabled()
+             && (mesh->enablePointerMoveEvents || constantlyUpdateMeshUnderPointer
                  || mesh->actionManager != nullptr);
     };
   }
 
   // Meshes
-  auto pickResult = pick(_unTranslatedPointerX, _unTranslatedPointerY,
-                         pointerMovePredicate, false, cameraToUseForPointers);
+  auto pickResult = pick(_unTranslatedPointerX, _unTranslatedPointerY, pointerMovePredicate, false,
+                         cameraToUseForPointers);
 
   _processPointerMove(pickResult, evt);
 }
@@ -1671,8 +1599,7 @@ void Scene::_onPointerDownEvent(PointerEvent&& evt)
   }
 
   // PreObservable support
-  if (_checkPrePointerObservable(std::nullopt, evt,
-                                 PointerEventTypes::POINTERDOWN)) {
+  if (_checkPrePointerObservable(std::nullopt, evt, PointerEventTypes::POINTERDOWN)) {
     return;
   }
 
@@ -1687,15 +1614,14 @@ void Scene::_onPointerDownEvent(PointerEvent&& evt)
 
   if (!pointerDownPredicate) {
     pointerDownPredicate = [](const AbstractMeshPtr& mesh) -> bool {
-      return mesh->isPickable && mesh->isVisible && mesh->isReady()
-             && mesh->isEnabled();
+      return mesh->isPickable && mesh->isVisible && mesh->isReady() && mesh->isEnabled();
     };
   }
 
   // Meshes
   _pickedDownMesh = nullptr;
-  auto pickResult = pick(_unTranslatedPointerX, _unTranslatedPointerY,
-                         pointerDownPredicate, false, cameraToUseForPointers);
+  auto pickResult = pick(_unTranslatedPointerX, _unTranslatedPointerY, pointerDownPredicate, false,
+                         cameraToUseForPointers);
 
   _processPointerDown(pickResult, evt);
 }
@@ -1704,7 +1630,7 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
 {
   if (_totalPointersPressed == 0) { // We are attaching the pointer up to
                                     // windows because of a bug in FF
-    return; // So we need to test it the pointer down was pressed before.
+    return;                         // So we need to test it the pointer down was pressed before.
   }
 
   --_totalPointersPressed;
@@ -1714,8 +1640,7 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
   _updatePointerPosition(evt);
   _initClickEvent(
     onPrePointerObservable, onPointerObservable, evt,
-    [this, evt](const ClickInfo& clickInfo,
-                std::optional<PickingInfo>& pickResult) {
+    [this, evt](const ClickInfo& clickInfo, std::optional<PickingInfo>& pickResult) {
       // PreObservable support
       if (onPrePointerObservable.hasObservers()) {
         if (!clickInfo.ignore) {
@@ -1723,24 +1648,22 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
             if (clickInfo.singleClick
                 && onPrePointerObservable.hasSpecificMask(
                   static_cast<int>(PointerEventTypes::POINTERTAP))) {
-              if (_checkPrePointerObservable(std::nullopt, evt,
-                                             PointerEventTypes::POINTERTAP)) {
+              if (_checkPrePointerObservable(std::nullopt, evt, PointerEventTypes::POINTERTAP)) {
                 return;
               }
             }
             if (clickInfo.doubleClick
                 && onPrePointerObservable.hasSpecificMask(
                   static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
-              if (_checkPrePointerObservable(
-                    std::nullopt, evt, PointerEventTypes::POINTERDOUBLETAP)) {
+              if (_checkPrePointerObservable(std::nullopt, evt,
+                                             PointerEventTypes::POINTERDOUBLETAP)) {
                 return;
               }
             }
           }
         }
         else {
-          if (_checkPrePointerObservable(std::nullopt, evt,
-                                         PointerEventTypes::POINTERUP)) {
+          if (_checkPrePointerObservable(std::nullopt, evt, PointerEventTypes::POINTERUP)) {
             return;
           }
         }
@@ -1754,15 +1677,13 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
 
       if (!pointerUpPredicate) {
         pointerUpPredicate = [](const AbstractMeshPtr& mesh) -> bool {
-          return mesh->isPickable && mesh->isVisible && mesh->isReady()
-                 && mesh->isEnabled();
+          return mesh->isPickable && mesh->isVisible && mesh->isReady() && mesh->isEnabled();
         };
       }
 
       // Meshes
       if (!_meshPickProceed
-          && (ActionManager::HasTriggers()
-              || onPointerObservable.hasObservers())) {
+          && (ActionManager::HasTriggers() || onPointerObservable.hasObservers())) {
         _initActionManager(nullptr, clickInfo);
       }
       if (!pickResult) {
@@ -1902,26 +1823,22 @@ void Scene::resetCachedMaterial()
   _cachedVisibility = 0.f;
 }
 
-void Scene::registerBeforeRender(
-  const std::function<void(Scene* scene, EventState& es)>& func)
+void Scene::registerBeforeRender(const std::function<void(Scene* scene, EventState& es)>& func)
 {
   onBeforeRenderObservable.add(func);
 }
 
-void Scene::unregisterBeforeRender(
-  const std::function<void(Scene* scene, EventState& es)>& func)
+void Scene::unregisterBeforeRender(const std::function<void(Scene* scene, EventState& es)>& func)
 {
   onBeforeRenderObservable.removeCallback(func);
 }
 
-void Scene::registerAfterRender(
-  const std::function<void(Scene* scene, EventState& es)>& func)
+void Scene::registerAfterRender(const std::function<void(Scene* scene, EventState& es)>& func)
 {
   onAfterRenderObservable.add(func);
 }
 
-void Scene::unregisterAfterRender(
-  const std::function<void(Scene* scene, EventState& es)>& func)
+void Scene::unregisterAfterRender(const std::function<void(Scene* scene, EventState& es)>& func)
 {
   onAfterRenderObservable.removeCallback(func);
 }
@@ -1961,8 +1878,7 @@ bool Scene::get_isLoading() const
   return _pendingData.size() > 0;
 }
 
-void Scene::executeWhenReady(
-  const std::function<void(Scene* scene, EventState& es)>& func)
+void Scene::executeWhenReady(const std::function<void(Scene* scene, EventState& es)>& func)
 {
   onReadyObservable.add(func);
 
@@ -1989,27 +1905,25 @@ std::vector<AnimationPtr> Scene::getAnimations()
   return std::vector<AnimationPtr>();
 }
 
-AnimatablePtr Scene::beginWeightedAnimation(
-  const IAnimatablePtr& target, float from, float to, float weight, bool loop,
-  float speedRatio, const std::function<void()>& onAnimationEnd,
-  AnimatablePtr animatable,
-  const std::function<bool(IAnimatable* target)>& targetMask,
-  const std::function<void()>& onAnimationLoop)
+AnimatablePtr
+Scene::beginWeightedAnimation(const IAnimatablePtr& target, float from, float to, float weight,
+                              bool loop, float speedRatio,
+                              const std::function<void()>& onAnimationEnd, AnimatablePtr animatable,
+                              const std::function<bool(IAnimatable* target)>& targetMask,
+                              const std::function<void()>& onAnimationLoop)
 {
-  auto returnedAnimatable
-    = beginAnimation(target, from, to, loop, speedRatio, onAnimationEnd,
-                     animatable, false, targetMask, onAnimationLoop);
+  auto returnedAnimatable    = beginAnimation(target, from, to, loop, speedRatio, onAnimationEnd,
+                                           animatable, false, targetMask, onAnimationLoop);
   returnedAnimatable->weight = weight;
 
   return returnedAnimatable;
 }
 
-AnimatablePtr Scene::beginAnimation(
-  const IAnimatablePtr& target, float from, float to, bool loop,
-  float speedRatio, const std::function<void()>& onAnimationEnd,
-  AnimatablePtr animatable, bool stopCurrent,
-  const std::function<bool(IAnimatable* target)>& targetMask,
-  const std::function<void()>& onAnimationLoop)
+AnimatablePtr Scene::beginAnimation(const IAnimatablePtr& target, float from, float to, bool loop,
+                                    float speedRatio, const std::function<void()>& onAnimationEnd,
+                                    AnimatablePtr animatable, bool stopCurrent,
+                                    const std::function<bool(IAnimatable* target)>& targetMask,
+                                    const std::function<void()>& onAnimationLoop)
 {
   if (from > to && speedRatio > 0.f) {
     speedRatio *= -1.f;
@@ -2021,9 +1935,8 @@ AnimatablePtr Scene::beginAnimation(
 
   if (!animatable) {
     std::vector<AnimationPtr> animationList;
-    animatable
-      = Animatable::New(this, target, from, to, loop, speedRatio,
-                        onAnimationEnd, animationList, onAnimationLoop);
+    animatable = Animatable::New(this, target, from, to, loop, speedRatio, onAnimationEnd,
+                                 animationList, onAnimationLoop);
   }
 
   auto shouldRunTargetAnimations = targetMask ? targetMask(target.get()) : true;
@@ -2048,9 +1961,8 @@ AnimatablePtr Scene::beginAnimation(
 
   if (!animatables.empty()) {
     for (const auto& childAnimatable : animatables) {
-      beginAnimation(childAnimatable, from, to, loop, speedRatio,
-                     onAnimationEnd, animatable, stopCurrent, targetMask,
-                     onAnimationLoop);
+      beginAnimation(childAnimatable, from, to, loop, speedRatio, onAnimationEnd, animatable,
+                     stopCurrent, targetMask, onAnimationLoop);
     }
   }
 
@@ -2060,54 +1972,47 @@ AnimatablePtr Scene::beginAnimation(
 }
 
 std::vector<AnimatablePtr> Scene::beginHierarchyAnimation(
-  const NodePtr& target, bool directDescendantsOnly, float from, float to,
-  bool loop, float speedRatio, const std::function<void()>& onAnimationEnd,
-  AnimatablePtr animatable, bool stopCurrent,
-  const std::function<bool(IAnimatable* target)>& targetMask,
+  const NodePtr& target, bool directDescendantsOnly, float from, float to, bool loop,
+  float speedRatio, const std::function<void()>& onAnimationEnd, AnimatablePtr animatable,
+  bool stopCurrent, const std::function<bool(IAnimatable* target)>& targetMask,
   const std::function<void()>& onAnimationLoop)
 {
   auto children = target->getDescendants(directDescendantsOnly);
 
   std::vector<AnimatablePtr> result;
-  result.emplace_back(beginAnimation(target, from, to, loop, speedRatio,
-                                     onAnimationEnd, animatable, stopCurrent,
-                                     targetMask, onAnimationLoop));
+  result.emplace_back(beginAnimation(target, from, to, loop, speedRatio, onAnimationEnd, animatable,
+                                     stopCurrent, targetMask, onAnimationLoop));
   for (const auto& child : children) {
-    result.emplace_back(beginAnimation(child, from, to, loop, speedRatio,
-                                       onAnimationEnd, animatable, stopCurrent,
-                                       targetMask, onAnimationLoop));
+    result.emplace_back(beginAnimation(child, from, to, loop, speedRatio, onAnimationEnd,
+                                       animatable, stopCurrent, targetMask, onAnimationLoop));
   }
 
   return result;
 }
 
-AnimatablePtr
-Scene::beginDirectAnimation(const IAnimatablePtr& target,
-                            const std::vector<AnimationPtr>& _animations,
-                            float from, float to, bool loop, float speedRatio,
-                            const std::function<void()>& onAnimationEnd,
-                            const std::function<void()>& onAnimationLoop)
+AnimatablePtr Scene::beginDirectAnimation(const IAnimatablePtr& target,
+                                          const std::vector<AnimationPtr>& _animations, float from,
+                                          float to, bool loop, float speedRatio,
+                                          const std::function<void()>& onAnimationEnd,
+                                          const std::function<void()>& onAnimationLoop)
 {
-  return Animatable::New(this, target, from, to, loop, speedRatio,
-                         onAnimationEnd, _animations, onAnimationLoop);
+  return Animatable::New(this, target, from, to, loop, speedRatio, onAnimationEnd, _animations,
+                         onAnimationLoop);
 }
 
 std::vector<AnimatablePtr> Scene::beginDirectHierarchyAnimation(
-  const NodePtr& target, bool directDescendantsOnly,
-  const std::vector<AnimationPtr>& iAnimations, float from, float to, bool loop,
-  float speedRatio, const std::function<void()>& onAnimationEnd,
+  const NodePtr& target, bool directDescendantsOnly, const std::vector<AnimationPtr>& iAnimations,
+  float from, float to, bool loop, float speedRatio, const std::function<void()>& onAnimationEnd,
   const std::function<void()>& onAnimationLoop)
 {
   auto children = target->getDescendants(directDescendantsOnly);
 
   std::vector<AnimatablePtr> result;
-  result.emplace_back(beginDirectAnimation(target, iAnimations, from, to, loop,
-                                           speedRatio, onAnimationEnd,
-                                           onAnimationLoop));
+  result.emplace_back(beginDirectAnimation(target, iAnimations, from, to, loop, speedRatio,
+                                           onAnimationEnd, onAnimationLoop));
   for (const auto& child : children) {
-    result.emplace_back(
-      beginDirectAnimation(child, iAnimations, from, static_cast<float>(to),
-                           loop, speedRatio, onAnimationEnd, onAnimationLoop));
+    result.emplace_back(beginDirectAnimation(child, iAnimations, from, static_cast<float>(to), loop,
+                                             speedRatio, onAnimationEnd, onAnimationLoop));
   }
 
   return result;
@@ -2115,15 +2020,13 @@ std::vector<AnimatablePtr> Scene::beginDirectHierarchyAnimation(
 
 AnimatablePtr Scene::getAnimatableByTarget(const IAnimatablePtr& target)
 {
-  auto it = std::find_if(_activeAnimatables.begin(), _activeAnimatables.end(),
-                         [&target](const AnimatablePtr& animatable) {
-                           return animatable->target == target;
-                         });
+  auto it = std::find_if(
+    _activeAnimatables.begin(), _activeAnimatables.end(),
+    [&target](const AnimatablePtr& animatable) { return animatable->target == target; });
   return (it == _activeAnimatables.end()) ? nullptr : *it;
 }
 
-std::vector<AnimatablePtr>
-Scene::getAllAnimatablesByTarget(const IAnimatablePtr& target)
+std::vector<AnimatablePtr> Scene::getAllAnimatablesByTarget(const IAnimatablePtr& target)
 {
   return getAllAnimatablesByTarget(target.get());
 }
@@ -2140,16 +2043,14 @@ std::vector<AnimatablePtr> Scene::getAllAnimatablesByTarget(IAnimatable* target)
   return result;
 }
 
-void Scene::stopAnimation(
-  const IAnimatablePtr& target, const std::string& animationName,
-  const std::function<bool(IAnimatable* target)>& targetMask)
+void Scene::stopAnimation(const IAnimatablePtr& target, const std::string& animationName,
+                          const std::function<bool(IAnimatable* target)>& targetMask)
 {
   return stopAnimation(target.get(), animationName, targetMask);
 }
 
-void Scene::stopAnimation(
-  IAnimatable* target, const std::string& animationName,
-  const std::function<bool(IAnimatable* target)>& targetMask)
+void Scene::stopAnimation(IAnimatable* target, const std::string& animationName,
+                          const std::function<bool(IAnimatable* target)>& targetMask)
 {
   auto animatables = getAllAnimatablesByTarget(target);
 
@@ -2194,8 +2095,7 @@ void Scene::_animate()
   const auto deltaTime
     = useConstantAnimationDeltaTime ?
         16.f :
-        Time::fpTimeSince<size_t, std::milli>(*_animationTimeLast)
-          * animationTimeScale;
+        Time::fpTimeSince<size_t, std::milli>(*_animationTimeLast) * animationTimeScale;
   _animationTime += static_cast<int>(deltaTime);
   const auto& animationTime = _animationTime;
   _animationTimeLast        = now;
@@ -2215,16 +2115,16 @@ void Scene::_animate()
   _processLateAnimationBindings();
 }
 
-void Scene::_registerTargetForLateAnimationBinding(
-  RuntimeAnimation* /*runtimeAnimation*/,
-  const AnimationValue& /*originalValue*/)
+void Scene::_registerTargetForLateAnimationBinding(RuntimeAnimation* /*runtimeAnimation*/,
+                                                   const AnimationValue& /*originalValue*/)
 {
   // TODO Implement
 }
 
-AnimationValue Scene::_processLateAnimationBindingsForMatrices(
-  float holderTotalWeight, std::vector<RuntimeAnimation*>& holderAnimations,
-  Matrix& holderOriginalValue)
+AnimationValue
+Scene::_processLateAnimationBindingsForMatrices(float holderTotalWeight,
+                                                std::vector<RuntimeAnimation*>& holderAnimations,
+                                                Matrix& holderOriginalValue)
 {
   auto normalizer                           = 1.f;
   std::optional<Vector3> finalPosition      = TmpVectors::Vector3Array[0];
@@ -2257,14 +2157,12 @@ AnimationValue Scene::_processLateAnimationBindingsForMatrices(
   finalPosition->scaleInPlace(scale);
   finalQuaternion->scaleInPlace(scale);
 
-  for (size_t animIndex = startIndex; animIndex < holderAnimations.size();
-       ++animIndex) {
-    auto& runtimeAnimation = holderAnimations[animIndex];
-    auto iScale            = runtimeAnimation->weight / normalizer;
-    std::optional<Vector3> currentPosition = TmpVectors::Vector3Array[2];
-    std::optional<Vector3> currentScaling  = TmpVectors::Vector3Array[3];
-    std::optional<Quaternion> currentQuaternion
-      = TmpVectors::QuaternionArray[1];
+  for (size_t animIndex = startIndex; animIndex < holderAnimations.size(); ++animIndex) {
+    auto& runtimeAnimation                      = holderAnimations[animIndex];
+    auto iScale                                 = runtimeAnimation->weight / normalizer;
+    std::optional<Vector3> currentPosition      = TmpVectors::Vector3Array[2];
+    std::optional<Vector3> currentScaling       = TmpVectors::Vector3Array[3];
+    std::optional<Quaternion> currentQuaternion = TmpVectors::QuaternionArray[1];
 
     (*runtimeAnimation->currentValue())
       .get<Matrix>()
@@ -2275,8 +2173,7 @@ AnimationValue Scene::_processLateAnimationBindingsForMatrices(
   }
 
   auto& workValue = *originalAnimation->_animationState.workValue;
-  Matrix::ComposeToRef(*finalScaling, *finalQuaternion, *finalPosition,
-                       workValue.get<Matrix>());
+  Matrix::ComposeToRef(*finalScaling, *finalQuaternion, *finalPosition, workValue.get<Matrix>());
   originalAnimation->_animationState.workValue = workValue;
   return (*originalAnimation->currentValue());
 }
@@ -2289,9 +2186,8 @@ Quaternion Scene::_processLateAnimationBindingsForQuaternions(
   auto& originalValue     = holderOriginalValue;
 
   if (holderAnimations.size() == 1) {
-    Quaternion::SlerpToRef(
-      originalValue, (*originalAnimation->currentValue()).get<Quaternion>(),
-      std::min(1.f, holderTotalWeight), refQuaternion);
+    Quaternion::SlerpToRef(originalValue, (*originalAnimation->currentValue()).get<Quaternion>(),
+                           std::min(1.f, holderTotalWeight), refQuaternion);
     return refQuaternion;
   }
 
@@ -2310,10 +2206,9 @@ Quaternion Scene::_processLateAnimationBindingsForQuaternions(
   }
   else {
     if (holderAnimations.size() == 2) { // Slerp as soon as we can
-      Quaternion::SlerpToRef(
-        (*holderAnimations[0]->currentValue()).get<Quaternion>(),
-        (*holderAnimations[1]->currentValue()).get<Quaternion>(),
-        holderAnimations[1]->weight / holderTotalWeight, refQuaternion);
+      Quaternion::SlerpToRef((*holderAnimations[0]->currentValue()).get<Quaternion>(),
+                             (*holderAnimations[1]->currentValue()).get<Quaternion>(),
+                             holderAnimations[1]->weight / holderTotalWeight, refQuaternion);
       return refQuaternion;
     }
     quaternions.clear();
@@ -2322,8 +2217,7 @@ Quaternion Scene::_processLateAnimationBindingsForQuaternions(
     normalizer = holderTotalWeight;
   }
   for (const auto& runtimeAnimation : holderAnimations) {
-    quaternions.emplace_back(
-      (*runtimeAnimation->currentValue()).get<Quaternion>());
+    quaternions.emplace_back((*runtimeAnimation->currentValue()).get<Quaternion>());
     weights.emplace_back(runtimeAnimation->weight / normalizer);
   }
 
@@ -2334,8 +2228,7 @@ Quaternion Scene::_processLateAnimationBindingsForQuaternions(
   for (size_t index = 0; index < quaternions.size();) {
     if (!cumulativeQuaternion) {
       Quaternion::SlerpToRef(quaternions[index], quaternions[index + 1],
-                             weights[index + 1]
-                               / (weights[index] + weights[index + 1]),
+                             weights[index + 1] / (weights[index] + weights[index + 1]),
                              refQuaternion);
       cumulativeQuaternion = refQuaternion;
       cumulativeAmount     = weights[index] + weights[index + 1];
@@ -2345,8 +2238,7 @@ Quaternion Scene::_processLateAnimationBindingsForQuaternions(
     cumulativeAmount += weights[index];
     auto _cumulativeQuaternion = *cumulativeQuaternion;
     Quaternion::SlerpToRef(*cumulativeQuaternion, quaternions[index],
-                           weights[index] / cumulativeAmount,
-                           _cumulativeQuaternion);
+                           weights[index] / cumulativeAmount, _cumulativeQuaternion);
     cumulativeQuaternion = _cumulativeQuaternion;
     ++index;
   }
@@ -2371,26 +2263,22 @@ Matrix Scene::getViewMatrix()
 
 Matrix& Scene::getProjectionMatrix()
 {
-  return _useAlternateCameraConfiguration ? _alternateProjectionMatrix :
-                                            _projectionMatrix;
+  return _useAlternateCameraConfiguration ? _alternateProjectionMatrix : _projectionMatrix;
 }
 
 const Matrix& Scene::getProjectionMatrix() const
 {
-  return _useAlternateCameraConfiguration ? _alternateProjectionMatrix :
-                                            _projectionMatrix;
+  return _useAlternateCameraConfiguration ? _alternateProjectionMatrix : _projectionMatrix;
 }
 
 Matrix Scene::getTransformMatrix()
 {
-  return _useAlternateCameraConfiguration ? *_alternateTransformMatrix :
-                                            _transformMatrix;
+  return _useAlternateCameraConfiguration ? *_alternateTransformMatrix : _transformMatrix;
 }
 
 void Scene::setTransformMatrix(Matrix& view, Matrix& projection)
 {
-  if (_viewUpdateFlag == view.updateFlag
-      && _projectionUpdateFlag == projection.updateFlag) {
+  if (_viewUpdateFlag == view.updateFlag && _projectionUpdateFlag == projection.updateFlag) {
     return;
   }
 
@@ -2441,16 +2329,14 @@ void Scene::_setAlternateTransformMatrix(Matrix& view, Matrix& projection)
     _alternateTransformMatrix = std::make_unique<Matrix>(Matrix::Zero());
   }
 
-  _alternateViewMatrix.multiplyToRef(_alternateProjectionMatrix,
-                                     *_alternateTransformMatrix);
+  _alternateViewMatrix.multiplyToRef(_alternateProjectionMatrix, *_alternateTransformMatrix);
 
   if (!_alternateSceneUbo) {
     _createAlternateUbo();
   }
 
   if (_alternateSceneUbo->useUbo()) {
-    _alternateSceneUbo->updateMatrix("viewProjection",
-                                     *_alternateTransformMatrix);
+    _alternateSceneUbo->updateMatrix("viewProjection", *_alternateTransformMatrix);
     _alternateSceneUbo->updateMatrix("view", _alternateViewMatrix);
     _alternateSceneUbo->update();
   }
@@ -2458,8 +2344,7 @@ void Scene::_setAlternateTransformMatrix(Matrix& view, Matrix& projection)
 
 UniformBuffer* Scene::getSceneUniformBuffer()
 {
-  return _useAlternateCameraConfiguration ? _alternateSceneUbo.get() :
-                                            _sceneUbo.get();
+  return _useAlternateCameraConfiguration ? _alternateSceneUbo.get() : _sceneUbo.get();
 }
 
 size_t Scene::getUniqueId()
@@ -2491,9 +2376,9 @@ int Scene::removeMesh(const AbstractMeshPtr& toRemove, bool recursive)
 
 int Scene::removeMesh(AbstractMesh* toRemove, bool recursive)
 {
-  auto it = std::find_if(
-    meshes.begin(), meshes.end(),
-    [toRemove](const AbstractMeshPtr& mesh) { return mesh.get() == toRemove; });
+  auto it   = std::find_if(meshes.begin(), meshes.end(), [toRemove](const AbstractMeshPtr& mesh) {
+    return mesh.get() == toRemove;
+  });
   int index = static_cast<int>(it - meshes.begin());
   if (it != meshes.end()) {
     // Remove from the scene if mesh found
@@ -2525,10 +2410,9 @@ int Scene::removeTransformNode(const TransformNodePtr& toRemove)
 
 int Scene::removeTransformNode(TransformNode* toRemove)
 {
-  auto it   = std::find_if(transformNodes.begin(), transformNodes.end(),
-                         [toRemove](const TransformNodePtr& transformNode) {
-                           return transformNode.get() == toRemove;
-                         });
+  auto it = std::find_if(
+    transformNodes.begin(), transformNodes.end(),
+    [toRemove](const TransformNodePtr& transformNode) { return transformNode.get() == toRemove; });
   int index = static_cast<int>(it - transformNodes.begin());
   if (it != transformNodes.end()) {
     // Remove from the scene if found
@@ -2547,10 +2431,9 @@ int Scene::removeSkeleton(const SkeletonPtr& toRemove)
 
 int Scene::removeSkeleton(Skeleton* toRemove)
 {
-  auto it   = std::find_if(skeletons.begin(), skeletons.end(),
-                         [toRemove](const SkeletonPtr& skeleton) {
-                           return skeleton.get() == toRemove;
-                         });
+  auto it
+    = std::find_if(skeletons.begin(), skeletons.end(),
+                   [toRemove](const SkeletonPtr& skeleton) { return skeleton.get() == toRemove; });
   int index = static_cast<int>(it - skeletons.begin());
   if (it != skeletons.end()) {
     // Remove from the scene if found
@@ -2562,8 +2445,7 @@ int Scene::removeSkeleton(Skeleton* toRemove)
 
 int Scene::removeMorphTargetManager(const MorphTargetManagerPtr& toRemove)
 {
-  auto it   = std::find(morphTargetManagers.begin(), morphTargetManagers.end(),
-                      toRemove);
+  auto it   = std::find(morphTargetManagers.begin(), morphTargetManagers.end(), toRemove);
   int index = static_cast<int>(it - morphTargetManagers.begin());
   if (it != morphTargetManagers.end()) {
     // Remove from the scene if found
@@ -2580,9 +2462,8 @@ int Scene::removeLight(const LightPtr& toRemove)
 
 int Scene::removeLight(Light* toRemove)
 {
-  auto it = std::find_if(
-    lights.begin(), lights.end(),
-    [&toRemove](const LightPtr& light) { return light.get() == toRemove; });
+  auto it   = std::find_if(lights.begin(), lights.end(),
+                         [&toRemove](const LightPtr& light) { return light.get() == toRemove; });
   int index = static_cast<int>(it - lights.begin());
   if (it != lights.end()) {
     // Remove from meshes
@@ -2606,18 +2487,17 @@ int Scene::removeCamera(const CameraPtr& toRemove)
 
 int Scene::removeCamera(Camera* toRemove)
 {
-  auto it1 = std::find_if(
-    cameras.begin(), cameras.end(),
-    [&toRemove](const CameraPtr& camera) { return camera.get() == toRemove; });
+  auto it1  = std::find_if(cameras.begin(), cameras.end(), [&toRemove](const CameraPtr& camera) {
+    return camera.get() == toRemove;
+  });
   int index = static_cast<int>(it1 - cameras.begin());
   if (it1 != cameras.end()) {
     // Remove from the scene if camera found
     cameras.erase(it1);
   }
   // Remove from activeCameras
-  auto it2 = std::find_if(
-    activeCameras.begin(), activeCameras.end(),
-    [toRemove](const CameraPtr& camera) { return camera.get() == toRemove; });
+  auto it2 = std::find_if(activeCameras.begin(), activeCameras.end(),
+                          [toRemove](const CameraPtr& camera) { return camera.get() == toRemove; });
   if (it2 != activeCameras.end()) {
     // Remove from the scene if camera found
     activeCameras.erase(it2);
@@ -2662,7 +2542,7 @@ int Scene::removeAnimation(const AnimationPtr& toRemove)
 
 int Scene::removeAnimationGroup(const AnimationGroupPtr& toRemove)
 {
-  auto it = std::find(animationGroups.begin(), animationGroups.end(), toRemove);
+  auto it   = std::find(animationGroups.begin(), animationGroups.end(), toRemove);
   int index = static_cast<int>(it - animationGroups.begin());
   if (it != animationGroups.end()) {
     animationGroups.erase(it);
@@ -2687,10 +2567,9 @@ int Scene::removeMaterial(const MaterialPtr& toRemove)
 
 int Scene::removeMaterial(Material* toRemove)
 {
-  auto it   = std::find_if(materials.begin(), materials.end(),
-                         [toRemove](const MaterialPtr& material) {
-                           return material.get() == toRemove;
-                         });
+  auto it
+    = std::find_if(materials.begin(), materials.end(),
+                   [toRemove](const MaterialPtr& material) { return material.get() == toRemove; });
   int index = static_cast<int>(it - materials.begin());
   if (it != materials.end()) {
     materials.erase(it);
@@ -2707,11 +2586,10 @@ int Scene::removeActionManager(const AbstractActionManagerPtr& toRemove)
 
 int Scene::removeActionManager(AbstractActionManager* toRemove)
 {
-  auto it
-    = std::find_if(actionManagers.begin(), actionManagers.end(),
-                   [toRemove](const AbstractActionManagerPtr& actionManager_) {
-                     return actionManager_.get() == toRemove;
-                   });
+  auto it   = std::find_if(actionManagers.begin(), actionManagers.end(),
+                         [toRemove](const AbstractActionManagerPtr& actionManager_) {
+                           return actionManager_.get() == toRemove;
+                         });
   int index = static_cast<int>(it - actionManagers.begin());
   if (it != actionManagers.end()) {
     actionManagers.erase(it);
@@ -2726,10 +2604,9 @@ int Scene::removeTexture(const BaseTexturePtr& toRemove)
 
 int Scene::removeTexture(BaseTexture* toRemove)
 {
-  auto it   = std::find_if(textures.begin(), textures.end(),
-                         [toRemove](const BaseTexturePtr& texture) {
-                           return texture.get() == toRemove;
-                         });
+  auto it
+    = std::find_if(textures.begin(), textures.end(),
+                   [toRemove](const BaseTexturePtr& texture) { return texture.get() == toRemove; });
   int index = static_cast<int>(it - textures.begin());
   if (it != textures.end()) {
     textures.erase(it);
@@ -2759,10 +2636,9 @@ void Scene::addLight(const LightPtr& newLight)
 void Scene::sortLightsByPriority()
 {
   if (requireLightSorting) {
-    std::sort(lights.begin(), lights.end(),
-              [](const LightPtr& a, const LightPtr& b) {
-                return Light::CompareLightsPriority(a.get(), b.get());
-              });
+    std::sort(lights.begin(), lights.end(), [](const LightPtr& a, const LightPtr& b) {
+      return Light::CompareLightsPriority(a.get(), b.get());
+    });
   }
 }
 
@@ -2803,8 +2679,7 @@ void Scene::addMaterial(const MaterialPtr& newMaterial)
   onNewMaterialAddedObservable.notifyObservers(newMaterial.get());
 }
 
-void Scene::addMorphTargetManager(
-  const MorphTargetManagerPtr& newMorphTargetManager)
+void Scene::addMorphTargetManager(const MorphTargetManagerPtr& newMorphTargetManager)
 {
   morphTargetManagers.emplace_back(newMorphTargetManager);
 }
@@ -2870,19 +2745,17 @@ CameraPtr Scene::setActiveCameraByName(const std::string& name)
 
 AnimationGroupPtr Scene::getAnimationGroupByName(const std::string& name)
 {
-  auto it = std::find_if(animationGroups.begin(), animationGroups.end(),
-                         [&name](const AnimationGroupPtr& animationGroup) {
-                           return animationGroup->name == name;
-                         });
+  auto it = std::find_if(
+    animationGroups.begin(), animationGroups.end(),
+    [&name](const AnimationGroupPtr& animationGroup) { return animationGroup->name == name; });
 
   return (it == animationGroups.end()) ? nullptr : *it;
 }
 
 MaterialPtr Scene::getMaterialByID(const std::string& id)
 {
-  auto it = std::find_if(
-    materials.begin(), materials.end(),
-    [&id](const MaterialPtr& material) { return material->id == id; });
+  auto it = std::find_if(materials.begin(), materials.end(),
+                         [&id](const MaterialPtr& material) { return material->id == id; });
 
   return (it == materials.end()) ? nullptr : *it;
 }
@@ -2904,47 +2777,43 @@ MaterialPtr Scene::getLastMaterialByID(const std::string& id)
 
 MaterialPtr Scene::getMaterialByUniqueID(size_t uniqueId)
 {
-  auto it = std::find_if(materials.begin(), materials.end(),
-                         [uniqueId](const MaterialPtr& material) {
-                           return material->uniqueId == uniqueId;
-                         });
+  auto it
+    = std::find_if(materials.begin(), materials.end(), [uniqueId](const MaterialPtr& material) {
+        return material->uniqueId == uniqueId;
+      });
 
   return (it == materials.end()) ? nullptr : *it;
 }
 
 MaterialPtr Scene::getMaterialByName(const std::string& name)
 {
-  auto it = std::find_if(
-    materials.begin(), materials.end(),
-    [&name](const MaterialPtr& material) { return material->name == name; });
+  auto it = std::find_if(materials.begin(), materials.end(),
+                         [&name](const MaterialPtr& material) { return material->name == name; });
 
   return (it == materials.end()) ? nullptr : *it;
 }
 
 CameraPtr Scene::getCameraByID(const std::string& id)
 {
-  auto it
-    = std::find_if(cameras.begin(), cameras.end(),
-                   [&id](const CameraPtr& camera) { return camera->id == id; });
+  auto it = std::find_if(cameras.begin(), cameras.end(),
+                         [&id](const CameraPtr& camera) { return camera->id == id; });
 
   return (it == cameras.end()) ? nullptr : *it;
 }
 
 CameraPtr Scene::getCameraByUniqueID(size_t uniqueId)
 {
-  auto it = std::find_if(cameras.begin(), cameras.end(),
-                         [uniqueId](const CameraPtr& camera) {
-                           return camera->uniqueId == uniqueId;
-                         });
+  auto it = std::find_if(cameras.begin(), cameras.end(), [uniqueId](const CameraPtr& camera) {
+    return camera->uniqueId == uniqueId;
+  });
 
   return (it == cameras.end()) ? nullptr : *it;
 }
 
 CameraPtr Scene::getCameraByName(const std::string& name)
 {
-  auto it = std::find_if(
-    cameras.begin(), cameras.end(),
-    [&name](const CameraPtr& camera) { return camera->name == name; });
+  auto it = std::find_if(cameras.begin(), cameras.end(),
+                         [&name](const CameraPtr& camera) { return camera->name == name; });
 
   return (it == cameras.end()) ? nullptr : *it;
 }
@@ -2990,37 +2859,33 @@ BonePtr Scene::getBoneByName(const std::string& name)
 
 LightPtr Scene::getLightByName(const std::string& name)
 {
-  auto it = std::find_if(
-    lights.begin(), lights.end(),
-    [&name](const LightPtr& light) { return light->name == name; });
+  auto it = std::find_if(lights.begin(), lights.end(),
+                         [&name](const LightPtr& light) { return light->name == name; });
 
   return (it == lights.end()) ? nullptr : *it;
 }
 
 LightPtr Scene::getLightByID(const std::string& id)
 {
-  auto it
-    = std::find_if(lights.begin(), lights.end(),
-                   [&id](const LightPtr& light) { return light->id == id; });
+  auto it = std::find_if(lights.begin(), lights.end(),
+                         [&id](const LightPtr& light) { return light->id == id; });
 
   return (it == lights.end()) ? nullptr : *it;
 }
 
 LightPtr Scene::getLightByUniqueID(size_t uniqueId)
 {
-  auto it = std::find_if(
-    lights.begin(), lights.end(),
-    [uniqueId](const LightPtr& light) { return light->uniqueId == uniqueId; });
+  auto it = std::find_if(lights.begin(), lights.end(),
+                         [uniqueId](const LightPtr& light) { return light->uniqueId == uniqueId; });
 
   return (it == lights.end()) ? nullptr : *it;
 }
 
 IParticleSystemPtr Scene::getParticleSystemByID(const std::string& id)
 {
-  auto it = std::find_if(particleSystems.begin(), particleSystems.end(),
-                         [&id](const IParticleSystemPtr& particleSystem) {
-                           return particleSystem->id == id;
-                         });
+  auto it = std::find_if(
+    particleSystems.begin(), particleSystems.end(),
+    [&id](const IParticleSystemPtr& particleSystem) { return particleSystem->id == id; });
 
   return (it == particleSystems.end()) ? nullptr : *it;
 }
@@ -3034,9 +2899,8 @@ GeometryPtr Scene::getGeometryByID(const std::string& id)
     }
   }
   else {
-    auto it = std::find_if(
-      geometries.begin(), geometries.end(),
-      [&id](const GeometryPtr& geometry) { return geometry->id == id; });
+    auto it = std::find_if(geometries.begin(), geometries.end(),
+                           [&id](const GeometryPtr& geometry) { return geometry->id == id; });
 
     return (it == geometries.end()) ? nullptr : *it;
   }
@@ -3072,10 +2936,9 @@ bool Scene::removeGeometry(Geometry* geometry)
     index = geometriesById[geometry->id];
   }
   else {
-    auto it = std::find_if(geometries.begin(), geometries.end(),
-                           [geometry](const GeometryPtr& _geometry) {
-                             return _geometry.get() == geometry;
-                           });
+    auto it = std::find_if(
+      geometries.begin(), geometries.end(),
+      [geometry](const GeometryPtr& _geometry) { return _geometry.get() == geometry; });
     if (it == geometries.end()) {
       return false;
     }
@@ -3106,9 +2969,8 @@ std::vector<GeometryPtr>& Scene::getGeometries()
 
 AbstractMeshPtr Scene::getMeshByID(const std::string& id)
 {
-  auto it = std::find_if(
-    meshes.begin(), meshes.end(),
-    [&id](const AbstractMeshPtr& mesh) { return mesh->id == id; });
+  auto it = std::find_if(meshes.begin(), meshes.end(),
+                         [&id](const AbstractMeshPtr& mesh) { return mesh->id == id; });
 
   return (it == meshes.end()) ? nullptr : *it;
 }
@@ -3116,21 +2978,19 @@ AbstractMeshPtr Scene::getMeshByID(const std::string& id)
 std::vector<AbstractMeshPtr> Scene::getMeshesByID(const std::string& id)
 {
   std::vector<AbstractMeshPtr> filteredMeshes;
-  std::for_each(meshes.begin(), meshes.end(),
-                [&filteredMeshes, &id](const AbstractMeshPtr& mesh) {
-                  if (mesh->id == id) {
-                    filteredMeshes.emplace_back(mesh);
-                  }
-                });
+  std::for_each(meshes.begin(), meshes.end(), [&filteredMeshes, &id](const AbstractMeshPtr& mesh) {
+    if (mesh->id == id) {
+      filteredMeshes.emplace_back(mesh);
+    }
+  });
   return filteredMeshes;
 }
 
 TransformNodePtr Scene::getTransformNodeByID(const std::string& id)
 {
-  auto it = std::find_if(transformNodes.begin(), transformNodes.end(),
-                         [&id](const TransformNodePtr& transformNode) {
-                           return transformNode->id == id;
-                         });
+  auto it = std::find_if(
+    transformNodes.begin(), transformNodes.end(),
+    [&id](const TransformNodePtr& transformNode) { return transformNode->id == id; });
 
   return (it == transformNodes.end()) ? nullptr : *it;
 }
@@ -3145,26 +3005,23 @@ TransformNodePtr Scene::getTransformNodeByUniqueID(size_t uniqueId)
   return (it == transformNodes.end()) ? nullptr : *it;
 }
 
-std::vector<TransformNodePtr>
-Scene::getTransformNodesByID(const std::string& id)
+std::vector<TransformNodePtr> Scene::getTransformNodesByID(const std::string& id)
 {
   std::vector<TransformNodePtr> filteredTransformNodes;
-  std::for_each(
-    transformNodes.begin(), transformNodes.end(),
-    [&filteredTransformNodes, &id](const TransformNodePtr& transformNode) {
-      if (transformNode->id == id) {
-        filteredTransformNodes.emplace_back(transformNode);
-      }
-    });
+  std::for_each(transformNodes.begin(), transformNodes.end(),
+                [&filteredTransformNodes, &id](const TransformNodePtr& transformNode) {
+                  if (transformNode->id == id) {
+                    filteredTransformNodes.emplace_back(transformNode);
+                  }
+                });
   return filteredTransformNodes;
 }
 
 AbstractMeshPtr Scene::getMeshByUniqueID(size_t uniqueId)
 {
-  auto it = std::find_if(meshes.begin(), meshes.end(),
-                         [&uniqueId](const AbstractMeshPtr& mesh) {
-                           return mesh->uniqueId == uniqueId;
-                         });
+  auto it = std::find_if(meshes.begin(), meshes.end(), [&uniqueId](const AbstractMeshPtr& mesh) {
+    return mesh->uniqueId == uniqueId;
+  });
 
   return (it == meshes.end()) ? nullptr : *it;
 }
@@ -3266,19 +3123,17 @@ NodePtr Scene::getNodeByName(const std::string& name)
 
 AbstractMeshPtr Scene::getMeshByName(const std::string& name)
 {
-  auto it = std::find_if(
-    meshes.begin(), meshes.end(),
-    [&name](const AbstractMeshPtr& mesh) { return mesh->name == name; });
+  auto it = std::find_if(meshes.begin(), meshes.end(),
+                         [&name](const AbstractMeshPtr& mesh) { return mesh->name == name; });
 
   return (it == meshes.end()) ? nullptr : *it;
 }
 
 TransformNodePtr Scene::getTransformNodeByName(const std::string& name)
 {
-  auto it = std::find_if(transformNodes.begin(), transformNodes.end(),
-                         [&name](const TransformNodePtr& transformNode) {
-                           return transformNode->name == name;
-                         });
+  auto it = std::find_if(
+    transformNodes.begin(), transformNodes.end(),
+    [&name](const TransformNodePtr& transformNode) { return transformNode->name == name; });
 
   return (it == transformNodes.end()) ? nullptr : *it;
 }
@@ -3294,8 +3149,7 @@ SoundPtr Scene::getSoundByName(const std::string& name)
 
   if (!soundTracks.empty()) {
     for (size_t sdIndex = 0; sdIndex < soundTracks.size(); ++sdIndex) {
-      for (index = 0; index < soundTracks[sdIndex]->soundCollection.size();
-           ++index) {
+      for (index = 0; index < soundTracks[sdIndex]->soundCollection.size(); ++index) {
         if (soundTracks[sdIndex]->soundCollection[index]->name == name) {
           return soundTracks[sdIndex]->soundCollection[index];
         }
@@ -3323,49 +3177,54 @@ SkeletonPtr Scene::getLastSkeletonByID(const std::string& id)
 
 SkeletonPtr Scene::getSkeletonById(const std::string& id)
 {
-  auto it = std::find_if(
-    skeletons.begin(), skeletons.end(),
-    [&id](const SkeletonPtr& skeleton) { return skeleton->id == id; });
+  auto it = std::find_if(skeletons.begin(), skeletons.end(),
+                         [&id](const SkeletonPtr& skeleton) { return skeleton->id == id; });
 
   return (it == skeletons.end()) ? nullptr : *it;
 }
 
 SkeletonPtr Scene::getSkeletonByUniqueID(size_t uniqueId)
 {
-  auto it = std::find_if(skeletons.begin(), skeletons.end(),
-                         [uniqueId](const SkeletonPtr& skeleton) {
-                           return skeleton->uniqueId == uniqueId;
-                         });
+  auto it
+    = std::find_if(skeletons.begin(), skeletons.end(), [uniqueId](const SkeletonPtr& skeleton) {
+        return skeleton->uniqueId == uniqueId;
+      });
 
   return (it == skeletons.end()) ? nullptr : *it;
 }
 
 SkeletonPtr Scene::getSkeletonByName(const std::string& name)
 {
-  auto it = std::find_if(
-    skeletons.begin(), skeletons.end(),
-    [&name](const SkeletonPtr& skeleton) { return skeleton->name == name; });
+  auto it = std::find_if(skeletons.begin(), skeletons.end(),
+                         [&name](const SkeletonPtr& skeleton) { return skeleton->name == name; });
 
   return (it == skeletons.end()) ? nullptr : *it;
 }
 
 MorphTargetManagerPtr Scene::getMorphTargetManagerById(unsigned int id)
 {
-  auto it
-    = std::find_if(morphTargetManagers.begin(), morphTargetManagers.end(),
-                   [&id](const MorphTargetManagerPtr& morphTargetManager) {
-                     return morphTargetManager->uniqueId() == id;
-                   });
+  auto it = std::find_if(morphTargetManagers.begin(), morphTargetManagers.end(),
+                         [&id](const MorphTargetManagerPtr& morphTargetManager) {
+                           return morphTargetManager->uniqueId() == id;
+                         });
 
   return (it == morphTargetManagers.end()) ? nullptr : *it;
+}
+
+BaseTexturePtr Scene::getTextureByUniqueID(size_t uniqueId)
+{
+  auto it
+    = std::find_if(textures.begin(), textures.end(), [&uniqueId](const BaseTexturePtr& texture) {
+        return texture->uniqueId == uniqueId;
+      });
+
+  return (it == textures.end()) ? nullptr : *it;
 }
 
 bool Scene::isActiveMesh(const AbstractMeshPtr& mesh)
 {
   return std::find_if(_activeMeshes.begin(), _activeMeshes.end(),
-                      [&mesh](const AbstractMesh* activeMesh) {
-                        return activeMesh == mesh.get();
-                      })
+                      [&mesh](const AbstractMesh* activeMesh) { return activeMesh == mesh.get(); })
          != _activeMeshes.end();
 }
 
@@ -3402,8 +3261,7 @@ void Scene::freeRenderingGroups()
   if (!textures.empty()) {
     for (const auto& texture : textures) {
       if (texture) {
-        auto renderTargetTexture
-          = std::dynamic_pointer_cast<RenderTargetTexture>(texture);
+        auto renderTargetTexture = std::dynamic_pointer_cast<RenderTargetTexture>(texture);
         if (renderTargetTexture && !renderTargetTexture->renderList().empty()) {
           renderTargetTexture->freeRenderingGroups();
         }
@@ -3424,15 +3282,12 @@ void Scene::_evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh)
     auto material = subMesh->getMaterial();
     if (material) {
       // Render targets
-      if (material->hasRenderTargetTextures
-          && material->getRenderTargetTextures) {
-        if (std::find(_processedMaterials.begin(), _processedMaterials.end(),
-                      material)
+      if (material->hasRenderTargetTextures && material->getRenderTargetTextures) {
+        if (std::find(_processedMaterials.begin(), _processedMaterials.end(), material)
             == _processedMaterials.end()) {
           _processedMaterials.emplace_back(material);
           for (const auto& renderTarget : material->getRenderTargetTextures()) {
-            if (std::find(_renderTargets.begin(), _renderTargets.end(),
-                          renderTarget)
+            if (std::find(_renderTargets.begin(), _renderTargets.end(), renderTarget)
                 == _renderTargets.end()) {
               _renderTargets.emplace_back(renderTarget);
             }
@@ -3452,8 +3307,7 @@ bool Scene::_isInIntermediateRendering() const
   return _intermediateRendering;
 }
 
-void Scene::setActiveMeshCandidateProvider(
-  IActiveMeshCandidateProvider* provider)
+void Scene::setActiveMeshCandidateProvider(IActiveMeshCandidateProvider* provider)
 {
   _activeMeshCandidateProvider = provider;
 }
@@ -3470,8 +3324,7 @@ Scene& Scene::freezeActiveMeshes()
   }
 
   if (!_frustumPlanesSet) {
-    setTransformMatrix(_activeCamera->getViewMatrix(),
-                       _activeCamera->getProjectionMatrix());
+    setTransformMatrix(_activeCamera->getViewMatrix(), _activeCamera->getProjectionMatrix());
   }
 
   _evaluateActiveMeshes();
@@ -3528,11 +3381,9 @@ void Scene::_evaluateActiveMeshes()
 
     // Intersections
     if (mesh->actionManager
-        && mesh->actionManager->hasSpecificTriggers2(
-          ActionManager::OnIntersectionEnterTrigger,
-          ActionManager::OnIntersectionExitTrigger)) {
-      if (std::find(_meshesForIntersections.begin(),
-                    _meshesForIntersections.end(), mesh)
+        && mesh->actionManager->hasSpecificTriggers2(ActionManager::OnIntersectionEnterTrigger,
+                                                     ActionManager::OnIntersectionExitTrigger)) {
+      if (std::find(_meshesForIntersections.begin(), _meshesForIntersections.end(), mesh)
           == _meshesForIntersections.end()) {
         _meshesForIntersections.emplace_back(mesh);
       }
@@ -3586,8 +3437,7 @@ void Scene::_evaluateActiveMeshes()
 void Scene::_activeMesh(AbstractMesh* sourceMesh, AbstractMesh* mesh)
 {
   if (_skeletonsEnabled && mesh->skeleton()) {
-    if (std::find(_activeSkeletons.begin(), _activeSkeletons.end(),
-                  mesh->skeleton())
+    if (std::find(_activeSkeletons.begin(), _activeSkeletons.end(), mesh->skeleton())
         == _activeSkeletons.end()) {
       _activeSkeletons.emplace_back(mesh->skeleton());
       mesh->skeleton()->prepare();
@@ -3595,8 +3445,7 @@ void Scene::_activeMesh(AbstractMesh* sourceMesh, AbstractMesh* mesh)
 
     if (!mesh->computeBonesUsingShaders()) {
       if (auto _mesh = static_cast<Mesh*>(mesh)) {
-        if (std::find(_softwareSkinnedMeshes.begin(),
-                      _softwareSkinnedMeshes.end(), _mesh)
+        if (std::find(_softwareSkinnedMeshes.begin(), _softwareSkinnedMeshes.end(), _mesh)
             == _softwareSkinnedMeshes.end()) {
           _softwareSkinnedMeshes.emplace_back(_mesh);
         }
@@ -3633,21 +3482,18 @@ void Scene::_bindFrameBuffer()
     activeCamera_->_multiviewTexture->_bindFrameBuffer();
   }
   else if (activeCamera_ && activeCamera_->outputRenderTarget) {
-    const auto useMultiview
-      = getEngine()->getCaps().multiview && activeCamera_->outputRenderTarget
-        && activeCamera_->outputRenderTarget->getViewCount() > 1;
+    const auto useMultiview = getEngine()->getCaps().multiview && activeCamera_->outputRenderTarget
+                              && activeCamera_->outputRenderTarget->getViewCount() > 1;
     if (useMultiview) {
       activeCamera_->outputRenderTarget->_bindFrameBuffer();
     }
     else {
-      const auto internalTexture
-        = activeCamera_->outputRenderTarget->getInternalTexture();
+      const auto internalTexture = activeCamera_->outputRenderTarget->getInternalTexture();
       if (internalTexture) {
         getEngine()->bindFramebuffer(internalTexture);
       }
       else {
-        BABYLON_LOG_ERROR("Scene",
-                          "Camera contains invalid customDefaultRenderTarget")
+        BABYLON_LOG_ERROR("Scene", "Camera contains invalid customDefaultRenderTarget")
       }
     }
   }
@@ -3662,8 +3508,7 @@ void Scene::updateAlternateTransformMatrix(Camera* alternateCamera)
                                alternateCamera->getProjectionMatrix());
 }
 
-void Scene::_renderForCamera(const CameraPtr& camera,
-                             const CameraPtr& rigParent)
+void Scene::_renderForCamera(const CameraPtr& camera, const CameraPtr& rigParent)
 {
   if (camera && camera->_skipRendering) {
     return;
@@ -3705,13 +3550,11 @@ void Scene::_renderForCamera(const CameraPtr& camera,
   onBeforeRenderTargetsRenderObservable.notifyObservers(this);
 
   if (!camera->customRenderTargets.empty()) {
-    stl_util::concat_with_no_duplicates(_renderTargets,
-                                        camera->customRenderTargets);
+    stl_util::concat_with_no_duplicates(_renderTargets, camera->customRenderTargets);
   }
 
   if (rigParent && !rigParent->customRenderTargets.empty()) {
-    stl_util::concat_with_no_duplicates(_renderTargets,
-                                        rigParent->customRenderTargets);
+    stl_util::concat_with_no_duplicates(_renderTargets, rigParent->customRenderTargets);
   }
 
   // Collects render targets from external components.
@@ -3728,10 +3571,8 @@ void Scene::_renderForCamera(const CameraPtr& camera,
         if (renderTarget->_shouldRender()) {
           ++_renderId;
           bool hasSpecialRenderTargetCamera
-            = renderTarget->activeCamera
-              && renderTarget->activeCamera != _activeCamera;
-          renderTarget->render(hasSpecialRenderTargetCamera,
-                               dumpNextRenderTargets);
+            = renderTarget->activeCamera && renderTarget->activeCamera != _activeCamera;
+          renderTarget->render(hasSpecialRenderTargetCamera, dumpNextRenderTargets);
         }
       }
       Tools::EndPerformanceCounter("Render targets", !_renderTargets.empty());
@@ -3796,8 +3637,7 @@ void Scene::_processSubCameras(const CameraPtr& camera)
   }
 
   _activeCamera = camera;
-  setTransformMatrix(_activeCamera->getViewMatrix(),
-                     _activeCamera->getProjectionMatrix());
+  setTransformMatrix(_activeCamera->getViewMatrix(), _activeCamera->getProjectionMatrix());
 }
 
 void Scene::_checkIntersections()
@@ -3807,12 +3647,11 @@ void Scene::_checkIntersections()
 void Scene::animate()
 {
   if (_engine->isDeterministicLockStep()) {
-    auto deltaTime
-      = (std::max(static_cast<float>(Scene::MinDeltaTime.count()),
-                  std::min(_engine->getDeltaTime() * 1000.f,
-                           static_cast<float>(Scene::MaxDeltaTime.count())))
-         / 1000.f)
-        + _timeAccumulator;
+    auto deltaTime = (std::max(static_cast<float>(Scene::MinDeltaTime.count()),
+                               std::min(_engine->getDeltaTime() * 1000.f,
+                                        static_cast<float>(Scene::MaxDeltaTime.count())))
+                      / 1000.f)
+                     + _timeAccumulator;
 
     auto defaultFPS = (60.f / 1000.f);
 
@@ -3824,9 +3663,8 @@ void Scene::animate()
 
     // compute the amount of fixed steps we should have taken since the last
     // step
-    auto internalSteps = static_cast<unsigned int>(
-      std::floor(deltaTime / (1000.f * defaultFPS)));
-    internalSteps = std::min(internalSteps, maxSubSteps);
+    auto internalSteps = static_cast<unsigned int>(std::floor(deltaTime / (1000.f * defaultFPS)));
+    internalSteps      = std::min(internalSteps, maxSubSteps);
 
     do {
       onBeforeStepObservable.notifyObservers(this);
@@ -3854,10 +3692,9 @@ void Scene::animate()
     const float deltaTime
       = useConstantAnimationDeltaTime ?
           16.f :
-          std::max(
-            Time::fpMillisecondsDuration<float>(Scene::MinDeltaTime),
-            std::min(_engine->getDeltaTime(),
-                     Time::fpMillisecondsDuration<float>(Scene::MaxDeltaTime)));
+          std::max(Time::fpMillisecondsDuration<float>(Scene::MinDeltaTime),
+                   std::min(_engine->getDeltaTime(),
+                            Time::fpMillisecondsDuration<float>(Scene::MaxDeltaTime)));
     _animationRatio = deltaTime * (60.f / 1000.f);
     _animate();
     onAfterAnimationsObservable.notifyObservers(this);
@@ -3934,16 +3771,13 @@ void Scene::render(bool updateCameras, bool ignoreAnimations)
   auto engine              = getEngine();
   auto currentActiveCamera = _activeCamera;
   if (renderTargetsEnabled) {
-    Tools::StartPerformanceCounter("Custom render targets",
-                                   !customRenderTargets.empty());
+    Tools::StartPerformanceCounter("Custom render targets", !customRenderTargets.empty());
     _intermediateRendering = true;
     for (const auto& renderTarget : customRenderTargets) {
       if (renderTarget->_shouldRender()) {
         ++_renderId;
 
-        _activeCamera = renderTarget->activeCamera ?
-                          renderTarget->activeCamera :
-                          _activeCamera;
+        _activeCamera = renderTarget->activeCamera ? renderTarget->activeCamera : _activeCamera;
 
         if (!_activeCamera) {
           BABYLON_LOG_ERROR("Scene", "Active camera not set")
@@ -3956,12 +3790,10 @@ void Scene::render(bool updateCameras, bool ignoreAnimations)
         // Camera
         updateTransformMatrix();
 
-        renderTarget->render(currentActiveCamera != _activeCamera,
-                             dumpNextRenderTargets);
+        renderTarget->render(currentActiveCamera != _activeCamera, dumpNextRenderTargets);
       }
     }
-    Tools::EndPerformanceCounter("Custom render targets",
-                                 !customRenderTargets.empty());
+    Tools::EndPerformanceCounter("Custom render targets", !customRenderTargets.empty());
 
     _intermediateRendering = false;
     ++_renderId;
@@ -3979,13 +3811,11 @@ void Scene::render(bool updateCameras, bool ignoreAnimations)
   // Clear
   if (_engine->getRenderingCanvas()->onlyRenderBoundingClientRect()) {
     const auto& rec = _engine->getRenderingCanvas()->getBoundingClientRect();
-    _engine->scissorClear(rec.left, rec.bottom, rec.width, rec.height,
-                          clearColor);
+    _engine->scissorClear(rec.left, rec.bottom, rec.width, rec.height, clearColor);
   }
   else {
     if (autoClearDepthAndStencil || autoClear) {
-      _engine->clear(clearColor,
-                     autoClear || forceWireframe() || forcePointsCloud(),
+      _engine->clear(clearColor, autoClear || forceWireframe() || forcePointsCloud(),
                      autoClearDepthAndStencil, autoClearDepthAndStencil);
     }
   }
@@ -3997,8 +3827,7 @@ void Scene::render(bool updateCameras, bool ignoreAnimations)
 
   // Multi-cameras?
   if (!activeCameras.empty()) {
-    for (unsigned int cameraIndex = 0; cameraIndex < activeCameras.size();
-         ++cameraIndex) {
+    for (unsigned int cameraIndex = 0; cameraIndex < activeCameras.size(); ++cameraIndex) {
       if (cameraIndex > 0) {
         _engine->clear(true, true);
       }
@@ -4116,15 +3945,13 @@ void Scene::set_headphone(const std::optional<bool>& value)
   }
 }
 
-DepthRendererPtr Scene::enableDepthRenderer(const CameraPtr& camera,
-                                            bool storeNonLinearDepth)
+DepthRendererPtr Scene::enableDepthRenderer(const CameraPtr& camera, bool storeNonLinearDepth)
 {
   auto _camera = camera ? camera : _activeCamera;
   if (!_camera) {
     throw std::runtime_error("No camera available to enable depth renderer");
   }
-  if (!stl_util::contains(_depthRenderer, _camera->id)
-      || !_depthRenderer[_camera->id]) {
+  if (!stl_util::contains(_depthRenderer, _camera->id) || !_depthRenderer[_camera->id]) {
     auto textureType = 0u;
     if (_engine->getCaps().textureHalfFloatRender) {
       textureType = Constants::TEXTURETYPE_HALF_FLOAT;
@@ -4135,8 +3962,8 @@ DepthRendererPtr Scene::enableDepthRenderer(const CameraPtr& camera,
     else {
       textureType = Constants::TEXTURETYPE_UNSIGNED_BYTE;
     }
-    _depthRenderer[_camera->id] = std::make_shared<DepthRenderer>(
-      this, textureType, _camera, storeNonLinearDepth);
+    _depthRenderer[_camera->id]
+      = std::make_shared<DepthRenderer>(this, textureType, _camera, storeNonLinearDepth);
   }
 
   return _depthRenderer[_camera->id];
@@ -4160,8 +3987,7 @@ GeometryBufferRendererPtr& Scene::enableGeometryBufferRenderer(float ratio)
     return _geometryBufferRenderer;
   }
 
-  _geometryBufferRenderer
-    = std::make_shared<GeometryBufferRenderer>(this, ratio);
+  _geometryBufferRenderer = std::make_shared<GeometryBufferRenderer>(this, ratio);
   if (!_geometryBufferRenderer->isSupported()) {
     _geometryBufferRenderer = nullptr;
   }
@@ -4372,9 +4198,8 @@ void Scene::dispose()
   postProcessManager->dispose();
 
   // Remove from engine
-  _engine->scenes.erase(
-    std::remove(_engine->scenes.begin(), _engine->scenes.end(), this),
-    _engine->scenes.end());
+  _engine->scenes.erase(std::remove(_engine->scenes.begin(), _engine->scenes.end(), this),
+                        _engine->scenes.end());
 
   _engine->wipeCaches(true);
   _isDisposed = true;
@@ -4439,14 +4264,12 @@ void Scene::cleanCachedTextureBuffer()
 }
 
 /** Octrees **/
-MinMax Scene::getWorldExtends(
-  const std::function<bool(const AbstractMeshPtr& mesh)>& filterPredicate)
+MinMax
+Scene::getWorldExtends(const std::function<bool(const AbstractMeshPtr& mesh)>& filterPredicate)
 {
-  Vector3 min(std::numeric_limits<float>::max(),
-              std::numeric_limits<float>::max(),
+  Vector3 min(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
               std::numeric_limits<float>::max());
-  Vector3 max(std::numeric_limits<float>::lowest(),
-              std::numeric_limits<float>::lowest(),
+  Vector3 max(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(),
               std::numeric_limits<float>::lowest());
 
   std::vector<AbstractMeshPtr> filteredMeshes;
@@ -4478,8 +4301,7 @@ MinMax Scene::getWorldExtends(
   return {min, max};
 }
 
-Octree<AbstractMesh*>* Scene::createOrUpdateSelectionOctree(size_t maxCapacity,
-                                                            size_t maxDepth)
+Octree<AbstractMesh*>* Scene::createOrUpdateSelectionOctree(size_t maxCapacity, size_t maxDepth)
 {
   auto component = _getComponent(SceneComponentConstants::NAME_OCTREE);
   if (!component) {
@@ -4505,8 +4327,8 @@ Octree<AbstractMesh*>* Scene::createOrUpdateSelectionOctree(size_t maxCapacity,
 }
 
 /** Picking **/
-Ray Scene::createPickingRay(int x, int y, Matrix& world,
-                            const CameraPtr& camera, bool cameraViewSpace)
+Ray Scene::createPickingRay(int x, int y, Matrix& world, const CameraPtr& camera,
+                            bool cameraViewSpace)
 {
   auto result = Ray::Zero();
 
@@ -4515,10 +4337,8 @@ Ray Scene::createPickingRay(int x, int y, Matrix& world,
   return result;
 }
 
-Scene& Scene::createPickingRayToRef(int x, int y,
-                                    const std::optional<Matrix>& world,
-                                    Ray& result, CameraPtr camera,
-                                    bool cameraViewSpace)
+Scene& Scene::createPickingRayToRef(int x, int y, const std::optional<Matrix>& world, Ray& result,
+                                    CameraPtr camera, bool cameraViewSpace)
 {
   auto engine = _engine;
 
@@ -4532,8 +4352,7 @@ Scene& Scene::createPickingRayToRef(int x, int y,
   }
 
   auto& cameraViewport = camera->viewport;
-  auto viewport        = cameraViewport.toGlobal(engine->getRenderWidth(),
-                                          engine->getRenderHeight());
+  auto viewport = cameraViewport.toGlobal(engine->getRenderWidth(), engine->getRenderHeight());
 
   auto identity = Matrix::Identity();
 
@@ -4541,14 +4360,12 @@ Scene& Scene::createPickingRayToRef(int x, int y,
   float _x = static_cast<float>(x);
   _x /= static_cast<float>(_engine->getHardwareScalingLevel() - viewport.x);
   float _y = static_cast<float>(y);
-  _y /= static_cast<float>(
-    _engine->getHardwareScalingLevel()
-    - (_engine->getRenderHeight() - viewport.y - viewport.height));
+  _y /= static_cast<float>(_engine->getHardwareScalingLevel()
+                           - (_engine->getRenderHeight() - viewport.y - viewport.height));
 
   auto _world = world.has_value() ? *world : identity;
-  result.update(_x, _y, static_cast<float>(viewport.width),
-                static_cast<float>(viewport.height), _world,
-                cameraViewSpace ? identity : camera->getViewMatrix(),
+  result.update(_x, _y, static_cast<float>(viewport.width), static_cast<float>(viewport.height),
+                _world, cameraViewSpace ? identity : camera->getViewMatrix(),
                 camera->getProjectionMatrix());
   return *this;
 }
@@ -4562,8 +4379,7 @@ Ray Scene::createPickingRayInCameraSpace(int x, int y, const CameraPtr& camera)
   return result;
 }
 
-Scene& Scene::createPickingRayInCameraSpaceToRef(int x, int y, Ray& result,
-                                                 CameraPtr camera)
+Scene& Scene::createPickingRayInCameraSpaceToRef(int x, int y, Ray& result, CameraPtr camera)
 {
   auto engine = _engine;
 
@@ -4577,27 +4393,24 @@ Scene& Scene::createPickingRayInCameraSpaceToRef(int x, int y, Ray& result,
   }
 
   auto& cameraViewport = camera->viewport;
-  auto viewport        = cameraViewport.toGlobal(engine->getRenderWidth(),
-                                          engine->getRenderHeight());
-  auto identity        = Matrix::Identity();
+  auto viewport = cameraViewport.toGlobal(engine->getRenderWidth(), engine->getRenderHeight());
+  auto identity = Matrix::Identity();
 
   // Moving coordinates to local viewport world
   float _x = static_cast<float>(x);
   _x /= static_cast<float>(_engine->getHardwareScalingLevel() - viewport.x);
   float _y = static_cast<float>(y);
-  _y /= static_cast<float>(
-    _engine->getHardwareScalingLevel()
-    - (_engine->getRenderHeight() - viewport.y - viewport.height));
-  result.update(_x, _y, static_cast<float>(viewport.width),
-                static_cast<float>(viewport.height), identity, identity,
-                camera->getProjectionMatrix());
+  _y /= static_cast<float>(_engine->getHardwareScalingLevel()
+                           - (_engine->getRenderHeight() - viewport.y - viewport.height));
+  result.update(_x, _y, static_cast<float>(viewport.width), static_cast<float>(viewport.height),
+                identity, identity, camera->getProjectionMatrix());
   return *this;
 }
 
-std::optional<PickingInfo> Scene::_internalPick(
-  const std::function<Ray(Matrix& world)>& rayFunction,
-  const std::function<bool(const AbstractMeshPtr& mesh)>& predicate,
-  bool fastCheck)
+std::optional<PickingInfo>
+Scene::_internalPick(const std::function<Ray(Matrix& world)>& rayFunction,
+                     const std::function<bool(const AbstractMeshPtr& mesh)>& predicate,
+                     bool fastCheck)
 {
   std::optional<PickingInfo> pickingInfo = std::nullopt;
 
@@ -4619,8 +4432,7 @@ std::optional<PickingInfo> Scene::_internalPick(
       continue;
     }
 
-    if (!fastCheck && pickingInfo != std::nullopt
-        && result.distance >= (*pickingInfo).distance) {
+    if (!fastCheck && pickingInfo != std::nullopt && result.distance >= (*pickingInfo).distance) {
       continue;
     }
 
@@ -4634,9 +4446,9 @@ std::optional<PickingInfo> Scene::_internalPick(
   return pickingInfo ? pickingInfo : PickingInfo();
 }
 
-std::vector<std::optional<PickingInfo>> Scene::_internalMultiPick(
-  const std::function<Ray(Matrix& world)>& rayFunction,
-  const std::function<bool(AbstractMesh* mesh)>& predicate)
+std::vector<std::optional<PickingInfo>>
+Scene::_internalMultiPick(const std::function<Ray(Matrix& world)>& rayFunction,
+                          const std::function<bool(AbstractMesh* mesh)>& predicate)
 {
   std::vector<std::optional<PickingInfo>> pickingInfos;
 
@@ -4664,9 +4476,9 @@ std::vector<std::optional<PickingInfo>> Scene::_internalMultiPick(
   return pickingInfos;
 }
 
-std::optional<PickingInfo> Scene::_internalPickSprites(
-  const Ray& ray, const std::function<bool(Sprite* sprite)>& predicate,
-  bool fastCheck, CameraPtr camera)
+std::optional<PickingInfo>
+Scene::_internalPickSprites(const Ray& ray, const std::function<bool(Sprite* sprite)>& predicate,
+                            bool fastCheck, CameraPtr camera)
 {
   std::optional<PickingInfo> pickingInfo = std::nullopt;
 
@@ -4683,8 +4495,7 @@ std::optional<PickingInfo> Scene::_internalPickSprites(
         continue;
       }
 
-      auto result
-        = spriteManager->intersects(ray, camera, predicate, fastCheck);
+      auto result = spriteManager->intersects(ray, camera, predicate, fastCheck);
       if (!result || !result->hit) {
         continue;
       }
@@ -4706,8 +4517,7 @@ std::optional<PickingInfo> Scene::_internalPickSprites(
 }
 
 std::optional<PickingInfo>
-Scene::pick(int x, int y,
-            const std::function<bool(const AbstractMeshPtr& mesh)>& predicate,
+Scene::pick(int x, int y, const std::function<bool(const AbstractMeshPtr& mesh)>& predicate,
             bool fastCheck, const CameraPtr& camera)
 {
   auto result = _internalPick(
@@ -4719,17 +4529,15 @@ Scene::pick(int x, int y,
   if (result) {
     auto _result     = *result;
     auto identityMat = Matrix::Identity();
-    _result.ray
-      = createPickingRay(x, y, identityMat, camera ? camera : nullptr);
-    result = _result;
+    _result.ray      = createPickingRay(x, y, identityMat, camera ? camera : nullptr);
+    result           = _result;
   }
   return result;
 }
 
-std::optional<PickingInfo>
-Scene::pickSprite(int x, int y,
-                  const std::function<bool(Sprite* sprite)>& predicate,
-                  bool fastCheck, const CameraPtr& camera)
+std::optional<PickingInfo> Scene::pickSprite(int x, int y,
+                                             const std::function<bool(Sprite* sprite)>& predicate,
+                                             bool fastCheck, const CameraPtr& camera)
 {
   createPickingRayInCameraSpaceToRef(x, y, *_tempPickingRay, camera);
 
@@ -4737,8 +4545,7 @@ Scene::pickSprite(int x, int y,
 }
 
 std::optional<PickingInfo>
-Scene::pickSpriteWithRay(const Ray& ray,
-                         const std::function<bool(Sprite* sprite)>& predicate,
+Scene::pickSpriteWithRay(const Ray& ray, const std::function<bool(Sprite* sprite)>& predicate,
                          bool fastCheck, CameraPtr& camera)
 {
   if (!_tempSpritePickingRay) {
@@ -4754,20 +4561,16 @@ Scene::pickSpriteWithRay(const Ray& ray,
 
   Ray::TransformToRef(ray, camera->getViewMatrix(), *_tempSpritePickingRay);
 
-  return _internalPickSprites(*_tempSpritePickingRay, predicate, fastCheck,
-                              camera);
+  return _internalPickSprites(*_tempSpritePickingRay, predicate, fastCheck, camera);
 }
 
 std::optional<PickingInfo> Scene::pickWithRay(
-  const Ray& ray,
-  const std::function<bool(const AbstractMeshPtr& mesh)>& predicate,
-  bool fastCheck)
+  const Ray& ray, const std::function<bool(const AbstractMeshPtr& mesh)>& predicate, bool fastCheck)
 {
   auto result = _internalPick(
     [this, &ray](Matrix& world) -> Ray {
       if (!_pickWithRayInverseMatrix) {
-        _pickWithRayInverseMatrix
-          = std::make_unique<Matrix>(Matrix::Identity());
+        _pickWithRayInverseMatrix = std::make_unique<Matrix>(Matrix::Identity());
       }
       world.invertToRef(*_pickWithRayInverseMatrix);
 
@@ -4775,8 +4578,7 @@ std::optional<PickingInfo> Scene::pickWithRay(
         _cachedRayForTransform = std::make_unique<Ray>(Ray::Zero());
       }
 
-      Ray::TransformToRef(ray, *_pickWithRayInverseMatrix,
-                          *_cachedRayForTransform);
+      Ray::TransformToRef(ray, *_pickWithRayInverseMatrix, *_cachedRayForTransform);
       return *_cachedRayForTransform;
     },
     predicate, fastCheck);
@@ -4789,25 +4591,21 @@ std::optional<PickingInfo> Scene::pickWithRay(
 }
 
 std::vector<std::optional<PickingInfo>>
-Scene::multiPick(int x, int y,
-                 const std::function<bool(AbstractMesh* mesh)>& predicate,
+Scene::multiPick(int x, int y, const std::function<bool(AbstractMesh* mesh)>& predicate,
                  const CameraPtr& camera)
 {
   return _internalMultiPick(
-    [this, x, y, &camera](Matrix& world) -> Ray {
-      return createPickingRay(x, y, world, camera);
-    },
+    [this, x, y, &camera](Matrix& world) -> Ray { return createPickingRay(x, y, world, camera); },
     predicate);
 }
 
-std::vector<std::optional<PickingInfo>> Scene::multiPickWithRay(
-  const Ray& ray, const std::function<bool(AbstractMesh* mesh)>& predicate)
+std::vector<std::optional<PickingInfo>>
+Scene::multiPickWithRay(const Ray& ray, const std::function<bool(AbstractMesh* mesh)>& predicate)
 {
   return _internalMultiPick(
     [this, &ray](Matrix& world) -> Ray {
       if (!_pickWithRayInverseMatrix) {
-        _pickWithRayInverseMatrix
-          = std::make_unique<Matrix>(Matrix::Identity());
+        _pickWithRayInverseMatrix = std::make_unique<Matrix>(Matrix::Identity());
       }
       world.invertToRef(*_pickWithRayInverseMatrix);
 
@@ -4815,8 +4613,7 @@ std::vector<std::optional<PickingInfo>> Scene::multiPickWithRay(
         _cachedRayForTransform = std::make_unique<Ray>(Ray::Zero());
       }
 
-      Ray::TransformToRef(ray, *_pickWithRayInverseMatrix,
-                          *_cachedRayForTransform);
+      Ray::TransformToRef(ray, *_pickWithRayInverseMatrix, *_cachedRayForTransform);
       return *_cachedRayForTransform;
     },
     predicate);
@@ -4881,8 +4678,7 @@ IPhysicsEnginePtr& Scene::getPhysicsEngine()
   return _physicsEngine;
 }
 
-bool Scene::enablePhysics(const std::optional<Vector3>& iGravity,
-                          IPhysicsEnginePlugin* plugin)
+bool Scene::enablePhysics(const std::optional<Vector3>& iGravity, IPhysicsEnginePlugin* plugin)
 {
   if (_physicsEngine) {
     return true;
@@ -4976,8 +4772,7 @@ void Scene::createDefaultLight(bool replace)
   }
 }
 
-void Scene::createDefaultCamera(bool createArcRotateCamera, bool replace,
-                                bool attachCameraControls)
+void Scene::createDefaultCamera(bool createArcRotateCamera, bool replace, bool attachCameraControls)
 {
   // Dispose existing camera in replace mode.
   if (replace) {
@@ -5001,15 +4796,15 @@ void Scene::createDefaultCamera(bool createArcRotateCamera, bool replace,
       worldCenter.copyFromFloats(0.f, 0.f, 0.f);
     }
     if (createArcRotateCamera) {
-      auto arcRotateCamera = ArcRotateCamera::New(
-        "default camera", -Math::PI_2, Math::PI_2, radius, worldCenter, this);
+      auto arcRotateCamera = ArcRotateCamera::New("default camera", -Math::PI_2, Math::PI_2, radius,
+                                                  worldCenter, this);
       arcRotateCamera->lowerRadiusLimit = radius * 0.01f;
       arcRotateCamera->wheelPrecision   = 100.f / radius;
       camera                            = arcRotateCamera;
     }
     else {
-      auto freeCamera = FreeCamera::New(
-        "default camera", Vector3(worldCenter.x, worldCenter.y, -radius), this);
+      auto freeCamera
+        = FreeCamera::New("default camera", Vector3(worldCenter.x, worldCenter.y, -radius), this);
       freeCamera->setTarget(worldCenter);
       camera = freeCamera;
     }
@@ -5032,13 +4827,11 @@ void Scene::createDefaultCameraOrLight(bool createArcRotateCamera, bool replace,
   createDefaultCamera(createArcRotateCamera, replace, attachCameraControls);
 }
 
-MeshPtr Scene::createDefaultSkybox(BaseTexturePtr iEnvironmentTexture, bool pbr,
-                                   float scale, float blur,
-                                   bool setGlobalEnvTexture)
+MeshPtr Scene::createDefaultSkybox(BaseTexturePtr iEnvironmentTexture, bool pbr, float scale,
+                                   float blur, bool setGlobalEnvTexture)
 {
   if (!environmentTexture()) {
-    BABYLON_LOG_WARN(
-      "Scene", "Can not create default skybox without environment texture.")
+    BABYLON_LOG_WARN("Scene", "Can not create default skybox without environment texture.")
     return nullptr;
   }
 
@@ -5055,8 +4848,7 @@ MeshPtr Scene::createDefaultSkybox(BaseTexturePtr iEnvironmentTexture, bool pbr,
     hdrSkyboxMaterial->backFaceCulling   = false;
     hdrSkyboxMaterial->reflectionTexture = environmentTexture();
     if (hdrSkyboxMaterial->reflectionTexture()) {
-      hdrSkyboxMaterial->reflectionTexture()->coordinatesMode
-        = TextureConstants::SKYBOX_MODE;
+      hdrSkyboxMaterial->reflectionTexture()->coordinatesMode = TextureConstants::SKYBOX_MODE;
     }
     hdrSkyboxMaterial->microSurface     = 1.f - blur;
     hdrSkyboxMaterial->disableLighting  = true;
@@ -5069,8 +4861,7 @@ MeshPtr Scene::createDefaultSkybox(BaseTexturePtr iEnvironmentTexture, bool pbr,
     skyboxMaterial->backFaceCulling   = false;
     skyboxMaterial->reflectionTexture = environmentTexture();
     if (skyboxMaterial->reflectionTexture()) {
-      skyboxMaterial->reflectionTexture()->coordinatesMode
-        = TextureConstants::SKYBOX_MODE;
+      skyboxMaterial->reflectionTexture()->coordinatesMode = TextureConstants::SKYBOX_MODE;
     }
     skyboxMaterial->disableLighting = true;
     hdrSkybox->infiniteDistance     = true;
@@ -5081,8 +4872,8 @@ MeshPtr Scene::createDefaultSkybox(BaseTexturePtr iEnvironmentTexture, bool pbr,
   return hdrSkybox;
 }
 
-std::unique_ptr<EnvironmentHelper> Scene::createDefaultEnvironment(
-  const std::optional<IEnvironmentHelperOptions>& options)
+std::unique_ptr<EnvironmentHelper>
+Scene::createDefaultEnvironment(const std::optional<IEnvironmentHelperOptions>& options)
 {
   return std::make_unique<EnvironmentHelper>(options, this);
 }
@@ -5116,34 +4907,28 @@ std::vector<Material*> Scene::getMaterialByTags()
 
 void Scene::setRenderingOrder(
   unsigned int renderingGroupId,
-  const std::function<int(const SubMesh* a, const SubMesh* b)>&
-    opaqueSortCompareFn,
-  const std::function<int(const SubMesh* a, const SubMesh* b)>&
-    alphaTestSortCompareFn,
-  const std::function<int(const SubMesh* a, const SubMesh* b)>&
-    transparentSortCompareFn)
+  const std::function<int(const SubMesh* a, const SubMesh* b)>& opaqueSortCompareFn,
+  const std::function<int(const SubMesh* a, const SubMesh* b)>& alphaTestSortCompareFn,
+  const std::function<int(const SubMesh* a, const SubMesh* b)>& transparentSortCompareFn)
 {
   _renderingManager->setRenderingOrder(renderingGroupId, opaqueSortCompareFn,
-                                       alphaTestSortCompareFn,
-                                       transparentSortCompareFn);
+                                       alphaTestSortCompareFn, transparentSortCompareFn);
 }
 
 void Scene::setRenderingAutoClearDepthStencil(unsigned int renderingGroupId,
-                                              bool autoClearDepthStencil,
-                                              bool depth, bool stencil)
+                                              bool autoClearDepthStencil, bool depth, bool stencil)
 {
-  _renderingManager->setRenderingAutoClearDepthStencil(
-    renderingGroupId, autoClearDepthStencil, depth, stencil);
+  _renderingManager->setRenderingAutoClearDepthStencil(renderingGroupId, autoClearDepthStencil,
+                                                       depth, stencil);
 }
 
-std::optional<IRenderingManagerAutoClearSetup>
-Scene::getAutoClearDepthStencilSetup(size_t index)
+std::optional<IRenderingManagerAutoClearSetup> Scene::getAutoClearDepthStencilSetup(size_t index)
 {
   return _renderingManager->getAutoClearDepthStencilSetup(index);
 }
 
-void Scene::markAllMaterialsAsDirty(
-  unsigned int flag, const std::function<bool(Material* mat)>& predicate)
+void Scene::markAllMaterialsAsDirty(unsigned int flag,
+                                    const std::function<bool(Material* mat)>& predicate)
 {
   if (_blockMaterialDirtyMechanism) {
     return;
@@ -5161,16 +4946,14 @@ void Scene::markAllMaterialsAsDirty(
 
 IFileRequest
 Scene::_loadFile(const std::string& /*url*/,
-                 const std::function<
-                   void(const std::variant<std::string, ArrayBuffer>& /*data*/,
-                        const std::string&)>& /*onSuccess*/)
+                 const std::function<void(const std::variant<std::string, ArrayBuffer>& /*data*/,
+                                          const std::string&)>& /*onSuccess*/)
 {
   return IFileRequest();
 }
 
 std::variant<std::string, ArrayBuffer>
-Scene::_loadFileAsync(const std::string& /*url*/,
-                      const std::optional<bool>& /*useDatabase*/,
+Scene::_loadFileAsync(const std::string& /*url*/, const std::optional<bool>& /*useDatabase*/,
                       const std::optional<bool>& /*useArrayBuffer*/)
 {
   return ArrayBuffer();
@@ -5178,15 +4961,13 @@ Scene::_loadFileAsync(const std::string& /*url*/,
 
 void Scene::_createMultiviewUbo()
 {
-  _multiviewSceneUbo
-    = std::make_unique<UniformBuffer>(getEngine(), Float32Array(), true);
+  _multiviewSceneUbo = std::make_unique<UniformBuffer>(getEngine(), Float32Array(), true);
   _multiviewSceneUbo->addUniform("viewProjection", 16);
   _multiviewSceneUbo->addUniform("viewProjectionR", 16);
   _multiviewSceneUbo->addUniform("view", 16);
 }
 
-void Scene::_updateMultiviewUbo(std::optional<Matrix> viewR,
-                                std::optional<Matrix> projectionR)
+void Scene::_updateMultiviewUbo(std::optional<Matrix> viewR, std::optional<Matrix> projectionR)
 {
   if (viewR && projectionR) {
     viewR->multiplyToRef(*projectionR, _transformMatrixR);
@@ -5216,12 +4997,10 @@ void Scene::_renderMultiviewToSingleView(const CameraPtr& camera)
 
   // Render to a multiview texture
   camera->_resizeOrCreateMultiviewTexture(
-    (camera->_rigPostProcess && camera->_rigPostProcess
-     && camera->_rigPostProcess->width > 0) ?
+    (camera->_rigPostProcess && camera->_rigPostProcess && camera->_rigPostProcess->width > 0) ?
       camera->_rigPostProcess->width / 2 :
       getEngine()->getRenderWidth(true) / 2,
-    (camera->_rigPostProcess && camera->_rigPostProcess
-     && camera->_rigPostProcess->height > 0) ?
+    (camera->_rigPostProcess && camera->_rigPostProcess && camera->_rigPostProcess->height > 0) ?
       camera->_rigPostProcess->height :
       getEngine()->getRenderHeight(true));
   if (!_multiviewSceneUbo) {

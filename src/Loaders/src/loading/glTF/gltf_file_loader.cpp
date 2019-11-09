@@ -10,15 +10,16 @@
 #include <babylon/loading/glTF/2.0/gltf_loader_interfaces.h>
 #include <babylon/loading/glTF/binary_reader.h>
 #include <babylon/loading/scene_loader.h>
+#include <babylon/materials/material.h>
+#include <babylon/materials/textures/base_texture.h>
 #include <babylon/misc/tools.h>
 
 namespace BABYLON {
 namespace GLTF2 {
 
-const std::string GLTFFileLoader::_logSpaces
-  = "                                ";
-bool GLTFFileLoader::IncrementalLoading     = true;
-bool GLTFFileLoader::HomogeneousCoordinates = false;
+const std::string GLTFFileLoader::_logSpaces = "                                ";
+bool GLTFFileLoader::IncrementalLoading      = true;
+bool GLTFFileLoader::HomogeneousCoordinates  = false;
 
 void GLTFFileLoader::RegisterAsSceneLoaderPlugin()
 {
@@ -47,13 +48,9 @@ GLTFFileLoader::GLTFFileLoader()
     , onError{this, &GLTFFileLoader::set_onError}
     , onDispose{this, &GLTFFileLoader::set_onDispose}
     , onExtensionLoaded{this, &GLTFFileLoader::set_onExtensionLoaded}
-    , loggingEnabled{this, &GLTFFileLoader::get_loggingEnabled,
-                     &GLTFFileLoader::set_loggingEnabled}
-    , capturePerformanceCounters{this,
-                                 &GLTFFileLoader::
-                                   get_capturePerformanceCounters,
-                                 &GLTFFileLoader::
-                                   set_capturePerformanceCounters}
+    , loggingEnabled{this, &GLTFFileLoader::get_loggingEnabled, &GLTFFileLoader::set_loggingEnabled}
+    , capturePerformanceCounters{this, &GLTFFileLoader::get_capturePerformanceCounters,
+                                 &GLTFFileLoader::set_capturePerformanceCounters}
     , validate{false}
     , onValidated{this, &GLTFFileLoader::set_onValidated}
     , _onParsedObserver{nullptr}
@@ -85,17 +82,14 @@ GLTFFileLoader::GLTFFileLoader()
     return String::contains(data, "scene") && String::contains(data, "node");
   };
 
-  preprocessUrlAsync
-    = [](const std::string& url) -> std::string { return url; };
+  preprocessUrlAsync = [](const std::string& url) -> std::string { return url; };
 
   _log = [this](const std::string& message) { _logDisabled(message); };
 
-  _startPerformanceCounter = [this](const std::string& counterName) {
-    _startPerformanceCounterDisabled(counterName);
-  };
-  _endPerformanceCounter = [this](const std::string& counterName) {
-    _endPerformanceCounterDisabled(counterName);
-  };
+  _startPerformanceCounter
+    = [this](const std::string& counterName) { _startPerformanceCounterDisabled(counterName); };
+  _endPerformanceCounter
+    = [this](const std::string& counterName) { _endPerformanceCounterDisabled(counterName); };
 }
 
 GLTFFileLoader::~GLTFFileLoader()
@@ -103,8 +97,7 @@ GLTFFileLoader::~GLTFFileLoader()
 }
 
 void GLTFFileLoader::set_onParsed(
-  const std::function<void(IGLTFLoaderData* loaderData, EventState& es)>&
-    callback)
+  const std::function<void(IGLTFLoaderData* loaderData, EventState& es)>& callback)
 {
   if (_onParsedObserver) {
     onParsedObservable.remove(_onParsedObserver);
@@ -148,8 +141,7 @@ void GLTFFileLoader::set_onCameraLoaded(
   _onCameraLoadedObserver = onCameraLoadedObservable.add(callback);
 }
 
-void GLTFFileLoader::set_onComplete(
-  const std::function<void(void*, EventState& es)>& callback)
+void GLTFFileLoader::set_onComplete(const std::function<void(void*, EventState& es)>& callback)
 {
   if (_onCompleteObserver) {
     onCompleteObservable.remove(_onCompleteObserver);
@@ -166,8 +158,7 @@ void GLTFFileLoader::set_onError(
   _onErrorObserver = onErrorObservable.add(callback);
 }
 
-void GLTFFileLoader::set_onDispose(
-  const std::function<void(void*, EventState& es)>& callback)
+void GLTFFileLoader::set_onDispose(const std::function<void(void*, EventState& es)>& callback)
 {
   if (_onDisposeObserver) {
     onDisposeObservable.remove(_onDisposeObserver);
@@ -176,8 +167,7 @@ void GLTFFileLoader::set_onDispose(
 }
 
 void GLTFFileLoader::set_onExtensionLoaded(
-  const std::function<void(IGLTFLoaderExtension* extension, EventState& es)>&
-    callback)
+  const std::function<void(IGLTFLoaderExtension* extension, EventState& es)>& callback)
 {
   if (_onExtensionLoadedObserver) {
     onExtensionLoadedObservable.remove(_onExtensionLoadedObserver);
@@ -220,26 +210,21 @@ void GLTFFileLoader::set_capturePerformanceCounters(bool value)
   _capturePerformanceCounters = value;
 
   if (_capturePerformanceCounters) {
-    _startPerformanceCounter = [this](const std::string& counterName) {
-      _startPerformanceCounterEnabled(counterName);
-    };
-    _endPerformanceCounter = [this](const std::string& counterName) {
-      _endPerformanceCounterEnabled(counterName);
-    };
+    _startPerformanceCounter
+      = [this](const std::string& counterName) { _startPerformanceCounterEnabled(counterName); };
+    _endPerformanceCounter
+      = [this](const std::string& counterName) { _endPerformanceCounterEnabled(counterName); };
   }
   else {
-    _startPerformanceCounter = [this](const std::string& counterName) {
-      _startPerformanceCounterDisabled(counterName);
-    };
-    _endPerformanceCounter = [this](const std::string& counterName) {
-      _endPerformanceCounterDisabled(counterName);
-    };
+    _startPerformanceCounter
+      = [this](const std::string& counterName) { _startPerformanceCounterDisabled(counterName); };
+    _endPerformanceCounter
+      = [this](const std::string& counterName) { _endPerformanceCounterDisabled(counterName); };
   }
 }
 
 void GLTFFileLoader::set_onValidated(
-  const std::function<void(IGLTFValidationResults* results, EventState& es)>&
-    callback)
+  const std::function<void(IGLTFValidationResults* results, EventState& es)>& callback)
 {
   if (_onValidatedObserver) {
     onValidatedObservable.remove(_onValidatedObserver);
@@ -247,8 +232,7 @@ void GLTFFileLoader::set_onValidated(
   _onValidatedObserver = onValidatedObservable.add(callback);
 }
 
-void GLTFFileLoader::dispose(bool /*doNotRecurse*/,
-                             bool /*disposeMaterialAndTextures*/)
+void GLTFFileLoader::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextures*/)
 {
   if (_loader) {
     _loader->dispose();
@@ -274,16 +258,15 @@ void GLTFFileLoader::_clear()
 }
 
 ImportedMeshes GLTFFileLoader::importMeshAsync(
-  const std::vector<std::string>& meshesNames, Scene* scene,
-  const std::string& data, const std::string& rootUrl,
+  const std::vector<std::string>& meshesNames, Scene* scene, const std::string& data,
+  const std::string& rootUrl,
   const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress,
   const std::string& fileName)
 {
   auto loaderData = _parseAsync(scene, data, rootUrl, fileName);
   _log(String::printf("Loading %s", fileName.c_str()));
   _loader = _getLoader(loaderData);
-  return _loader->importMeshAsync(meshesNames, scene, loaderData, rootUrl,
-                                  onProgress, fileName);
+  return _loader->importMeshAsync(meshesNames, scene, loaderData, rootUrl, onProgress, fileName);
 }
 
 void GLTFFileLoader::loadAsync(
@@ -304,20 +287,33 @@ AssetContainerPtr GLTFFileLoader::loadAssetContainerAsync(
 {
   auto loaderData = _parseAsync(scene, data, rootUrl, fileName);
   _log(String::printf("Loading %s", fileName.c_str()));
-  _loader        = _getLoader(loaderData);
-  auto result    = _loader->importMeshAsync({}, scene, loaderData, rootUrl,
-                                         onProgress, fileName);
+  _loader = _getLoader(loaderData);
+
+  // Get materials/textures when loading to add to container
+  std::vector<MaterialPtr> materials;
+  onMaterialLoadedObservable.add(
+    [&materials, &scene](Material* material, EventState & /*es*/) -> void {
+      materials.emplace_back(scene->getMaterialByUniqueID(material->uniqueId));
+    });
+  std::vector<BaseTexturePtr> textures;
+  onTextureLoadedObservable.add(
+    [&textures, &scene](BaseTexture* texture, EventState & /*es*/) -> void {
+      textures.emplace_back(scene->getTextureByUniqueID(texture->uniqueId));
+    });
+
+  auto result    = _loader->importMeshAsync({}, scene, loaderData, rootUrl, onProgress, fileName);
   auto container = AssetContainer::New(scene);
   stl_util::concat(container->meshes, result.meshes);
   stl_util::concat(container->particleSystems, result.particleSystems);
   stl_util::concat(container->skeletons, result.skeletons);
   stl_util::concat(container->animationGroups, result.animationGroups);
+  stl_util::concat(container->materials, materials);
+  stl_util::concat(container->textures, textures);
   container->removeAllFromScene();
   return container;
 }
 
-std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>
-GLTFFileLoader::createPlugin()
+std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr> GLTFFileLoader::createPlugin()
 {
   return std::make_shared<GLTFFileLoader>();
 }
@@ -331,9 +327,9 @@ void GLTFFileLoader::whenCompleteAsync()
 {
 }
 
-IGLTFLoaderData GLTFFileLoader::_parseAsync(
-  Scene* scene, const std::variant<std::string, ArrayBuffer>& data,
-  const std::string& rootUrl, const std::string& fileName)
+IGLTFLoaderData GLTFFileLoader::_parseAsync(Scene* scene,
+                                            const std::variant<std::string, ArrayBuffer>& data,
+                                            const std::string& rootUrl, const std::string& fileName)
 {
   UnpackedBinary unpacked;
   if (std::holds_alternative<ArrayBuffer>(data)) {
@@ -361,10 +357,8 @@ IGLTFLoaderData GLTFFileLoader::_parseAsync(
   return loaderData;
 }
 
-void GLTFFileLoader::_validateAsync(Scene* /*scene*/,
-                                    const std::string& /*json*/,
-                                    const std::string& /*rootUrl*/,
-                                    const std::string& /*fileName*/)
+void GLTFFileLoader::_validateAsync(Scene* /*scene*/, const std::string& /*json*/,
+                                    const std::string& /*rootUrl*/, const std::string& /*fileName*/)
 {
 }
 
@@ -402,13 +396,11 @@ IGLTFLoaderPtr GLTFFileLoader::_getLoader(const IGLTFLoaderData& loaderData)
                                           0u, // minor
                                         })
         > 0) {
-      throw std::runtime_error("Incompatible minimum version: "
-                               + assetMinVersion);
+      throw std::runtime_error("Incompatible minimum version: " + assetMinVersion);
     }
   }
 
-  std::unordered_map<unsigned int,
-                     std::function<IGLTFLoaderPtr(GLTFFileLoader & parent)>>
+  std::unordered_map<unsigned int, std::function<IGLTFLoaderPtr(GLTFFileLoader & parent)>>
     createLoaders;
   createLoaders[2] = [](GLTFFileLoader& parent) -> IGLTFLoaderPtr {
     return GLTFFileLoader::_CreateGLTF2Loader(parent);
@@ -452,8 +444,7 @@ UnpackedBinary GLTFFileLoader::_unpackBinary(const ArrayBuffer& data)
       break;
     }
     default: {
-      throw std::runtime_error(
-        String::printf("Unsupported version:: %d", version));
+      throw std::runtime_error(String::printf("Unsupported version:: %d", version));
     }
   }
 
@@ -467,9 +458,9 @@ UnpackedBinary GLTFFileLoader::_unpackBinaryV1(BinaryReader& binaryReader) const
 
   const auto length = binaryReader.readUint32();
   if (length != binaryReader.getLength()) {
-    auto errorMessage = String::printf(
-      "Length in header does not match actual data length: %ld != %ld", length,
-      binaryReader.getLength());
+    auto errorMessage
+      = String::printf("Length in header does not match actual data length: %ld != %ld", length,
+                       binaryReader.getLength());
     throw std::runtime_error(errorMessage);
   }
 
@@ -479,19 +470,16 @@ UnpackedBinary GLTFFileLoader::_unpackBinaryV1(BinaryReader& binaryReader) const
   std::string content;
   switch (contentFormat) {
     case ContentFormat_JSON: {
-      content = GLTFFileLoader::_decodeBufferToText(
-        binaryReader.readUint8Array(contentLength));
+      content = GLTFFileLoader::_decodeBufferToText(binaryReader.readUint8Array(contentLength));
       break;
     }
     default: {
-      throw std::runtime_error("Unexpected content format: "
-                               + std::to_string(contentFormat));
+      throw std::runtime_error("Unexpected content format: " + std::to_string(contentFormat));
     }
   }
 
-  const auto bytesRemaining
-    = binaryReader.getLength() - binaryReader.getPosition();
-  const auto body = binaryReader.readUint8Array(bytesRemaining);
+  const auto bytesRemaining = binaryReader.getLength() - binaryReader.getPosition();
+  const auto body           = binaryReader.readUint8Array(bytesRemaining);
 
   return UnpackedBinary{
     content, // json
@@ -506,9 +494,9 @@ UnpackedBinary GLTFFileLoader::_unpackBinaryV2(BinaryReader& binaryReader) const
 
   const auto length = binaryReader.readUint32();
   if (length != binaryReader.getLength()) {
-    auto errorMessage = String::printf(
-      "Length in header does not match actual data length: %ld != %ld", length,
-      binaryReader.getLength());
+    auto errorMessage
+      = String::printf("Length in header does not match actual data length: %ld != %ld", length,
+                       binaryReader.getLength());
     throw std::runtime_error(errorMessage);
   }
 
@@ -518,8 +506,7 @@ UnpackedBinary GLTFFileLoader::_unpackBinaryV2(BinaryReader& binaryReader) const
   if (chunkFormat != ChunkFormat_JSON) {
     throw std::runtime_error("First chunk format is not JSON");
   }
-  const auto json = GLTFFileLoader::_decodeBufferToText(
-    binaryReader.readUint8Array(chunkLength));
+  const auto json = GLTFFileLoader::_decodeBufferToText(binaryReader.readUint8Array(chunkLength));
 
   // Look for BIN chunk
   Uint8Array bin;
@@ -619,25 +606,21 @@ void GLTFFileLoader::_logDisabled(const std::string& /*message*/)
 {
 }
 
-void GLTFFileLoader::_startPerformanceCounterEnabled(
-  const std::string& counterName)
+void GLTFFileLoader::_startPerformanceCounterEnabled(const std::string& counterName)
 {
   Tools::StartPerformanceCounter(counterName);
 }
 
-void GLTFFileLoader::_startPerformanceCounterDisabled(
-  const std::string& /*counterName*/)
+void GLTFFileLoader::_startPerformanceCounterDisabled(const std::string& /*counterName*/)
 {
 }
 
-void GLTFFileLoader::_endPerformanceCounterEnabled(
-  const std::string& counterName)
+void GLTFFileLoader::_endPerformanceCounterEnabled(const std::string& counterName)
 {
   Tools::EndPerformanceCounter(counterName);
 }
 
-void GLTFFileLoader::_endPerformanceCounterDisabled(
-  const std::string& /*counterName*/)
+void GLTFFileLoader::_endPerformanceCounterDisabled(const std::string& /*counterName*/)
 {
 }
 

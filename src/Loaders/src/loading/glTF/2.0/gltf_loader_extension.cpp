@@ -13,8 +13,7 @@ void IGLTFLoaderExtension::onReady()
 {
 }
 
-void IGLTFLoaderExtension::loadSceneAsync(const std::string& /*context*/,
-                                          const IScene& /*scene*/)
+void IGLTFLoaderExtension::loadSceneAsync(const std::string& /*context*/, const IScene& /*scene*/)
 {
 }
 
@@ -32,33 +31,39 @@ CameraPtr IGLTFLoaderExtension::loadCameraAsync(
   return nullptr;
 }
 
-GeometryPtr
-IGLTFLoaderExtension::_loadVertexDataAsync(const std::string& /*context*/,
-                                           const IMeshPrimitive& /*primitive*/,
-                                           const MeshPtr& /*babylonMesh*/)
+GeometryPtr IGLTFLoaderExtension::_loadVertexDataAsync(const std::string& /*context*/,
+                                                       const IMeshPrimitive& /*primitive*/,
+                                                       const MeshPtr& /*babylonMesh*/)
+{
+  return nullptr;
+}
+
+AbstractMeshPtr IGLTFLoaderExtension::_loadMeshPrimitiveAsync(
+  const std::string& /*context*/, const std::string& /*name*/, const INode& /*node*/,
+  const IMesh& /*mesh*/, const IMeshPrimitive& /*primitive*/,
+  const std::function<void(const AbstractMeshPtr& babylonMesh)>& /*assign*/)
 {
   return nullptr;
 }
 
 MaterialPtr IGLTFLoaderExtension::_loadMaterialAsync(
-  const std::string& /*context*/, const IMaterial& /*material*/,
-  const MeshPtr& /*babylonMesh*/, unsigned int /*babylonDrawMode*/,
+  const std::string& /*context*/, const IMaterial& /*material*/, const MeshPtr& /*babylonMesh*/,
+  unsigned int /*babylonDrawMode*/,
   const std::function<void(const MaterialPtr& babylonMaterial)>& /*assign*/)
 {
   return nullptr;
 }
 
-MaterialPtr
-IGLTFLoaderExtension::createMaterial(const std::string& /*context*/,
-                                     const IMaterial& /*material*/,
-                                     unsigned int /*babylonDrawMode*/)
+MaterialPtr IGLTFLoaderExtension::createMaterial(const std::string& /*context*/,
+                                                 const IMaterial& /*material*/,
+                                                 unsigned int /*babylonDrawMode*/)
 {
   return nullptr;
 }
 
-void IGLTFLoaderExtension::loadMaterialPropertiesAsync(
-  const std::string& /*context*/, const IMaterial& /*material*/,
-  const Material& /*babylonMaterial*/)
+void IGLTFLoaderExtension::loadMaterialPropertiesAsync(const std::string& /*context*/,
+                                                       const IMaterial& /*material*/,
+                                                       const Material& /*babylonMaterial*/)
 {
 }
 
@@ -69,16 +74,20 @@ BaseTexturePtr IGLTFLoaderExtension::loadTextureInfoAsync(
   return nullptr;
 }
 
-AnimationGroupPtr
-IGLTFLoaderExtension::loadAnimationAsync(const std::string& /*context*/,
-                                         const IAnimation& /*animation*/)
+AnimationGroupPtr IGLTFLoaderExtension::loadAnimationAsync(const std::string& /*context*/,
+                                                           const IAnimation& /*animation*/)
 {
   return nullptr;
 }
 
-ArrayBufferView
-IGLTFLoaderExtension::_loadUriAsync(const std::string& /*context*/,
-                                    const std::string& /*uri*/)
+void IGLTFLoaderExtension::_loadSkinAsync(const std::string& /*context*/, const INode& /*node*/,
+                                          const ISkin& /*skin*/)
+{
+}
+
+ArrayBufferView IGLTFLoaderExtension::_loadUriAsync(const std::string& /*context*/,
+                                                    const IProperty& /*property*/,
+                                                    const std::string& /*uri*/)
 {
   return ArrayBufferView();
 }
