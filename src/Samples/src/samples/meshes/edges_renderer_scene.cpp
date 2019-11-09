@@ -14,14 +14,11 @@ namespace Samples {
  */
 struct EdgesRendererScene : public IRenderableScene {
 
-  EdgesRendererScene(ICanvas* iCanvas);
-  ~EdgesRendererScene() override;
+  EdgesRendererScene(ICanvas* iCanvas) : IRenderableScene(iCanvas) {}
+  ~EdgesRendererScene() = default;
+  const char* getName() override { return "Edges Render Scene"; }
 
-  const char* EdgesRendererScene::getName() override
-  {
-    return "Edges Render Scene";
-  }
-  void EdgesRendererScene::initializeScene(ICanvas* canvas, Scene* scene) override
+  void initializeScene(ICanvas* canvas, Scene* scene) override
   {
     auto camera = ArcRotateCamera::New("camera1", 0.f, Math::PI / 3.f, 10.f,
                                        Vector3::Zero(), scene);
@@ -42,16 +39,8 @@ struct EdgesRendererScene : public IRenderableScene {
     ground->edgesWidth = 3.f;
   }
 
-}; // end of struct EdgesRenderScene
+}; // end of struct EdgesRendererScene
 
-
-EdgesRendererScene::EdgesRendererScene(ICanvas* iCanvas) : IRenderableScene(iCanvas)
-{
-}
-
-EdgesRendererScene::~EdgesRendererScene()
-{
-}
 
 BABYLON_REGISTER_SAMPLE("Meshes", EdgesRendererScene)
 } // end of namespace Samples
