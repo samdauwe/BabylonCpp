@@ -1,45 +1,51 @@
-#include <babylon/samples/textures/environment_texture_scene.h>
-
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/scene.h>
+#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/textures/cube_texture.h>
+#include <babylon/samples/samples_index.h>
 
 namespace BABYLON {
 namespace Samples {
 
-EnvironmentTextureScene::EnvironmentTextureScene(ICanvas* iCanvas)
-    : IRenderableScene(iCanvas)
-{
-}
+/**
+ * @brief Environment texture scene. Example demonstrating how to create a skybox using and
+ * environment texture.
+ * @see https://www.babylonjs-playground.com/#09R6ZA#3
+ */
+struct EnvironmentTextureScene : public IRenderableScene {
 
-EnvironmentTextureScene::~EnvironmentTextureScene()
-{
-}
+  EnvironmentTextureScene(ICanvas* iCanvas) : IRenderableScene(iCanvas)
+  {
+  }
 
-const char* EnvironmentTextureScene::getName()
-{
-  return "Environment Texture Scene";
-}
+  ~EnvironmentTextureScene() override = default;
 
-void EnvironmentTextureScene::initializeScene(ICanvas* /*canvas*/, Scene* scene)
-{
-  // Create default environment while loading the model
-  scene->createDefaultCameraOrLight(true, true, true);
+  const char* getName() override
+  {
+    return "Environment Texture Scene";
+  }
 
-  // Default camera setup.
-  scene->imageProcessingConfiguration()->exposure           = 1.4f;
-  scene->imageProcessingConfiguration()->contrast           = 1.66f;
-  scene->imageProcessingConfiguration()->toneMappingEnabled = true;
+  void initializeScene(ICanvas* /*canvas*/, Scene* scene) override
+  {
+    // Create default environment while loading the model
+    scene->createDefaultCameraOrLight(true, true, true);
 
-  // Define a general environment textue
-  auto hdrTexture
-    = CubeTexture::CreateFromPrefilteredData("textures/environment.env", scene);
-  hdrTexture->gammaSpace = false;
-  scene->createDefaultSkybox(
-    hdrTexture, true,
-    (scene->activeCamera()->maxZ - scene->activeCamera()->minZ) / 2.f, 0.f);
-}
+    // Default camera setup.
+    scene->imageProcessingConfiguration()->exposure           = 1.4f;
+    scene->imageProcessingConfiguration()->contrast           = 1.66f;
+    scene->imageProcessingConfiguration()->toneMappingEnabled = true;
+
+    // Define a general environment textue
+    auto hdrTexture = CubeTexture::CreateFromPrefilteredData("textures/environment.env", scene);
+    hdrTexture->gammaSpace = false;
+    scene->createDefaultSkybox(
+      hdrTexture, true, (scene->activeCamera()->maxZ - scene->activeCamera()->minZ) / 2.f, 0.f);
+  }
+
+}; // end of struct EnvironmentTextureScene
+
+BABYLON_REGISTER_SAMPLE("Textures", EnvironmentTextureScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

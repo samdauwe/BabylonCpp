@@ -3,7 +3,6 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/string.h>
 #include <babylon/interfaces/irenderable_scene.h>
-#include <babylon/samples/textures/_textures_samples_index.h>
 
 #include <fstream>
 #include <iostream>
@@ -14,11 +13,6 @@ namespace Samples {
 
 SamplesIndex::SamplesIndex()
 {
-  // Initialize the samples index
-  _samplesIndex = {
-    // Textures samples
-    {_TexturesSamplesIndex::CategoryName(), _TexturesSamplesIndex()},
-  };
 }
 
 void SamplesIndex::fillSamplesFailures() const
