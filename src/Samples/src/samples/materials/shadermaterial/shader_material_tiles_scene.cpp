@@ -308,9 +308,8 @@ float snoise(vec2 v) {
 }
 
 // fbm function by
-// 
-https://code.google.com/p/fractalterraingeneration/wiki/
-Fractional_Brownian_Motion
+// https://code.google.com/p/fractalterraingeneration/wiki/
+// Fractional_Brownian_Motion
 float fbm(in vec2 uv) {
   float gain = 0.65;
   float lacunarity = 2.1042;
