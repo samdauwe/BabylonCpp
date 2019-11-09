@@ -123,7 +123,7 @@ before_script:
 
 # Build steps
 script:
-  - make all -j 4
+  - make all -j 4 -k
 
 # Notifications settings
 notifications:
