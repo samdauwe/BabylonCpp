@@ -35,17 +35,14 @@ EnvironmentTextureTools::~EnvironmentTextureTools()
 {
 }
 
-EnvironmentTextureInfoPtr
-EnvironmentTextureTools::GetEnvInfo(const ArrayBuffer& data)
+EnvironmentTextureInfoPtr EnvironmentTextureTools::GetEnvInfo(const ArrayBuffer& data)
 {
   const auto& dataView = data;
   size_t pos           = 0;
 
-  for (unsigned int i = 0; i < EnvironmentTextureTools::_MagicBytes.size();
-       ++i) {
+  for (unsigned int i = 0; i < EnvironmentTextureTools::_MagicBytes.size(); ++i) {
     if (dataView[pos++] != EnvironmentTextureTools::_MagicBytes[i]) {
-      BABYLON_LOG_ERROR("EnvironmentTextureTools",
-                        "Not a babylon environment map")
+      BABYLON_LOG_ERROR("EnvironmentTextureTools", "Not a babylon environment map")
       return nullptr;
     }
   }
@@ -66,18 +63,17 @@ EnvironmentTextureTools::GetEnvInfo(const ArrayBuffer& data)
     manifest->specular->specularDataPosition = pos;
     // Fallback to 0.8 exactly if lodGenerationScale is not defined for backward
     // compatibility.
-    manifest->specular->lodGenerationScale
-      = manifest->specular->lodGenerationScale.has_value() ?
-          *manifest->specular->lodGenerationScale :
-          0.8f;
+    manifest->specular->lodGenerationScale = manifest->specular->lodGenerationScale.has_value() ?
+                                               *manifest->specular->lodGenerationScale :
+                                               0.8f;
   }
 
   return manifest;
 }
 
-void EnvironmentTextureTools::UploadEnvLevels(
-  const InternalTexturePtr& texture, const ArrayBuffer& arrayBuffer,
-  const EnvironmentTextureInfo& info)
+void EnvironmentTextureTools::UploadEnvLevels(const InternalTexturePtr& texture,
+                                              const ArrayBuffer& arrayBuffer,
+                                              const EnvironmentTextureInfo& info)
 {
   if (info.version != 1) {
     throw std::runtime_error("Unsupported babylon environment map version "
@@ -106,24 +102,21 @@ void EnvironmentTextureTools::UploadEnvLevels(
     for (size_t face = 0; face < 6; ++face) {
       auto imageInfo     = specularInfo->mipmaps[i * 6 + face];
       imageData[i][face] = stl_util::to_array<uint8_t>(
-        arrayBuffer, *specularInfo->specularDataPosition + imageInfo.position,
-        imageInfo.length);
+        arrayBuffer, *specularInfo->specularDataPosition + imageInfo.position, imageInfo.length);
     }
   }
 
   return EnvironmentTextureTools::UploadLevels(texture, imageData);
 }
 
-void EnvironmentTextureTools::UploadLevels(
-  const InternalTexturePtr& texture,
-  const std::vector<std::vector<ArrayBuffer>>& imageData)
+void EnvironmentTextureTools::UploadLevels(const InternalTexturePtr& texture,
+                                           const std::vector<std::vector<ArrayBuffer>>& imageData)
 {
   if (!Tools::IsExponentOfTwo(static_cast<size_t>(texture->width))) {
     throw std::runtime_error("Texture size must be a power of two");
   }
 
-  const auto mipmapsCount
-    = static_cast<size_t>(std::round(Scalar::Log2(texture->width)) + 1);
+  const auto mipmapsCount = static_cast<size_t>(std::round(Scalar::Log2(texture->width)) + 1);
 
   // Gets everything ready.
   auto engine                    = texture->getEngine();
@@ -137,8 +130,7 @@ void EnvironmentTextureTools::UploadLevels(
   texture->format          = Constants::TEXTUREFORMAT_RGBA;
   texture->type            = Constants::TEXTURETYPE_UNSIGNED_INT;
   texture->generateMipMaps = true;
-  engine->updateTextureSamplingMode(Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
-                                    texture);
+  engine->updateTextureSamplingMode(Constants::TEXTURE_TRILINEAR_SAMPLINGMODE, texture);
 
   // Add extra process if texture lod is not supported
   if (!caps.textureLOD) {
@@ -152,8 +144,7 @@ void EnvironmentTextureTools::UploadLevels(
     expandTexture = false;
   }
   // If half float available we can uncompress the texture
-  else if (caps.textureHalfFloatRender
-           && caps.textureHalfFloatLinearFiltering) {
+  else if (caps.textureHalfFloatRender && caps.textureHalfFloatLinearFiltering) {
     expandTexture = true;
     texture->type = Constants::TEXTURETYPE_HALF_FLOAT;
   }
@@ -166,10 +157,9 @@ void EnvironmentTextureTools::UploadLevels(
   // Expand the texture if possible
   if (expandTexture) {
     // Simply run through the decode PP
-    rgbdPostProcess
-      = PostProcess::New("rgbdDecode", "rgbdDecode", {}, {}, 1.f, nullptr,
-                         Constants::TEXTURE_TRILINEAR_SAMPLINGMODE, engine,
-                         false, "", texture->type, "", {}, false);
+    rgbdPostProcess = PostProcess::New("rgbdDecode", "rgbdDecode", {}, {}, 1.f, nullptr,
+                                       Constants::TEXTURE_TRILINEAR_SAMPLINGMODE, engine, false, "",
+                                       texture->type, "", {}, false);
 
     texture->_isRGBD = false;
     texture->invertY = false;
@@ -197,25 +187,23 @@ void EnvironmentTextureTools::UploadLevels(
       for (unsigned int i = 0; i < mipSlices; i++) {
         // compute LOD from even spacing in smoothness (matching shader
         // calculation)
-        auto smoothness
-          = static_cast<float>(i) / static_cast<float>(mipSlices - 1);
-        auto roughness = 1.f - smoothness;
+        auto smoothness = static_cast<float>(i) / static_cast<float>(mipSlices - 1);
+        auto roughness  = 1.f - smoothness;
 
         auto minLODIndex = offset; // roughness = 0
-        auto maxLODIndex = (mipmapsCount - 1) * scale
-                           + offset; // roughness = 1 (mipmaps start from 0)
+        auto maxLODIndex
+          = (mipmapsCount - 1) * scale + offset; // roughness = 1 (mipmaps start from 0)
 
         auto lodIndex = minLODIndex + (maxLODIndex - minLODIndex) * roughness;
-        auto mipmapIndex = static_cast<size_t>(
-          std::round(std::min(std::max(lodIndex, 0.f), maxLODIndex)));
+        auto mipmapIndex
+          = static_cast<size_t>(std::round(std::min(std::max(lodIndex, 0.f), maxLODIndex)));
 
-        auto glTextureFromLod = std::make_shared<InternalTexture>(
-          engine, InternalTexture::DATASOURCE_TEMP);
+        auto glTextureFromLod
+          = std::make_shared<InternalTexture>(engine, InternalTexture::DATASOURCE_TEMP);
         glTextureFromLod->isCube          = true;
         glTextureFromLod->invertY         = true;
         glTextureFromLod->generateMipMaps = false;
-        engine->updateTextureSamplingMode(Constants::TEXTURE_LINEAR_LINEAR,
-                                          glTextureFromLod);
+        engine->updateTextureSamplingMode(Constants::TEXTURE_LINEAR_LINEAR, glTextureFromLod);
 
         // Wrap in a base texture for easy binding.
         auto lodTexture          = BaseTexture::New(nullptr);
@@ -238,52 +226,54 @@ void EnvironmentTextureTools::UploadLevels(
     }
   }
 
+  std::vector<std::function<void()>> promises;
   // All mipmaps up to provided number of images
   for (size_t i = 0; i < imageData.size(); ++i) {
     // All faces
     for (unsigned int face = 0; face < 6; ++face) {
-      // Constructs an image element from image data
-      const auto& bytes = imageData[i][face];
-      auto image        = Tools::ArrayBufferToImage(bytes);
+      // Enqueue promise to upload to the texture.
+      const auto promise = [=]() -> void {
+        // Constructs an image element from image data
+        const auto& bytes = imageData[i][face];
+        auto image        = Tools::ArrayBufferToImage(bytes);
 
-      // Upload to the texture.
-      if (expandTexture) {
-        auto tempTexture = engine->createTexture(
-          "", true, true, nullptr, Constants::TEXTURE_NEAREST_SAMPLINGMODE,
-          nullptr,
-          [](const std::string& message, const std::string& /*exception*/) {
-            throw std::runtime_error(message);
-          },
-          image);
+        // Upload to the texture.
+        if (expandTexture) {
+          auto tempTexture = engine->createTexture(
+            "", true, true, nullptr, Constants::TEXTURE_NEAREST_SAMPLINGMODE, nullptr,
+            [](const std::string& message, const std::string& /*exception*/) {
+              throw std::runtime_error(message);
+            },
+            image);
 
-        rgbdPostProcess->getEffect()->executeWhenCompiled(
-          [&](Effect* /*effect*/) {
+          rgbdPostProcess->getEffect()->executeWhenCompiled([&](Effect* /*effect*/) {
             // Uncompress the data to a RTT
             rgbdPostProcess->onApply = [&](Effect* effect, EventState& /*es*/) {
               effect->_bindTexture("textureSampler", tempTexture);
               effect->setFloat2("scale", 1, 1);
             };
 
-            engine->scenes[0]->postProcessManager->directRender(
-              {rgbdPostProcess}, cubeRtt, true, face, static_cast<int>(i));
+            engine->scenes[0]->postProcessManager->directRender({rgbdPostProcess}, cubeRtt, true,
+                                                                face, static_cast<int>(i));
 
             // Cleanup
             engine->restoreDefaultFramebuffer();
             tempTexture->dispose();
           });
-      }
-      else {
-        engine->_uploadImageToTexture(texture, image, face,
-                                      static_cast<int>(i));
+        }
+        else {
+          engine->_uploadImageToTexture(texture, image, face, static_cast<int>(i));
 
-        // Upload the face to the non lod texture support
-        if (generateNonLODTextures) {
-          auto lodTexture = lodTextures[i];
-          if (lodTexture) {
-            engine->_uploadImageToTexture(lodTexture->_texture, image, face, 0);
+          // Upload the face to the non lod texture support
+          if (generateNonLODTextures) {
+            auto lodTexture = lodTextures.at(i);
+            if (lodTexture) {
+              engine->_uploadImageToTexture(lodTexture->_texture, image, face, 0);
+            }
           }
         }
-      }
+      };
+      promises.emplace_back(promise);
     }
   }
 
@@ -315,10 +305,14 @@ void EnvironmentTextureTools::UploadLevels(
   }
 
   // Once all done, finishes the cleanup and return
+  for (const auto& promise : promises) {
+    promise();
+  }
 
   // Release temp RTT.
   if (cubeRtt) {
     engine->_releaseFramebufferObjects(cubeRtt.get());
+    engine->_releaseTexture(texture.get());
     cubeRtt->_swapAndDie(texture);
   }
   // Release temp Post Process.
@@ -339,13 +333,12 @@ void EnvironmentTextureTools::UploadLevels(
   }
 }
 
-void EnvironmentTextureTools::UploadEnvSpherical(
-  const InternalTexturePtr& texture, const EnvironmentTextureInfo& info)
+void EnvironmentTextureTools::UploadEnvSpherical(const InternalTexturePtr& texture,
+                                                 const EnvironmentTextureInfo& info)
 {
   if (info.version != 1) {
     BABYLON_LOGF_WARN("EnvironmentTextureTools",
-                      "Unsupported babylon environment map version \"%u\"",
-                      info.version)
+                      "Unsupported babylon environment map version \"%u\"", info.version)
   }
 
   auto irradianceInfo = info.irradiance;

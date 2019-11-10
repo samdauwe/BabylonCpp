@@ -104,27 +104,25 @@ std::string Tools::fallbackTexture
     "vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/"
     "vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76P//Z";
 
-std::function<std::string(std::string url)> Tools::PreprocessUrl
-  = [](std::string url) {
-      if (String::startsWith(url, "file:")) {
-        url = url.substr(5);
-      }
-      // Check if the file is locally available
-      // - Check in local folder
-      auto absolutePath = Filesystem::absolutePath(url);
-      if (Filesystem::exists(absolutePath)) {
-        return String::concat("file:", absolutePath);
-      }
-      // - Check in assets folder
-      absolutePath = Filesystem::absolutePath("../assets/" + url);
-      if (Filesystem::exists(absolutePath)) {
-        return String::concat("file:", absolutePath);
-      }
-      return url;
-    };
+std::function<std::string(std::string url)> Tools::PreprocessUrl = [](std::string url) {
+  if (String::startsWith(url, "file:")) {
+    url = url.substr(5);
+  }
+  // Check if the file is locally available
+  // - Check in local folder
+  auto absolutePath = Filesystem::absolutePath(url);
+  if (Filesystem::exists(absolutePath)) {
+    return String::concat("file:", absolutePath);
+  }
+  // - Check in assets folder
+  absolutePath = Filesystem::absolutePath("../assets/" + url);
+  if (Filesystem::exists(absolutePath)) {
+    return String::concat("file:", absolutePath);
+  }
+  return url;
+};
 
-void Tools::FetchToRef(int u, int v, int width, int height,
-                       const Uint8Array& pixels, Color4& color)
+void Tools::FetchToRef(int u, int v, int width, int height, const Uint8Array& pixels, Color4& color)
 {
   auto wrappedU = ((std::abs(u) * width) % width);
   auto wrappedV = ((std::abs(v) * height) % height);
@@ -162,8 +160,7 @@ std::string Tools::GetFilename(const std::string& path)
   return path.substr(static_cast<size_t>(index) + 1);
 }
 
-std::string Tools::GetFolderPath(const std::string& uri,
-                                 bool returnUnchangedIfNoSlash)
+std::string Tools::GetFolderPath(const std::string& uri, bool returnUnchangedIfNoSlash)
 {
   const auto index = String::lastIndexOf(uri, "/");
   if (index < 0) {
@@ -190,10 +187,8 @@ MinMaxVector2 Tools::ExtractMinAndMaxVector2(
   const std::function<std::optional<Vector2>(std::size_t index)>& feeder,
   const std::optional<Vector2>& bias)
 {
-  Vector2 minimum(std::numeric_limits<float>::max(),
-                  std::numeric_limits<float>::max());
-  Vector2 maximum(std::numeric_limits<float>::lowest(),
-                  std::numeric_limits<float>::lowest());
+  Vector2 minimum(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+  Vector2 maximum(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
 
   std::size_t i = 0;
   auto cur      = feeder(i++);
@@ -233,8 +228,8 @@ Image Tools::CreateCheckerboardImage(unsigned int size)
     for (unsigned int y = 0; y < size; ++y) {
       float yf              = static_cast<float>(y);
       unsigned int position = (x + size * y) * 4;
-      auto floorX = static_cast<std::uint8_t>(std::floor(xf / (size / 8.f)));
-      auto floorY = static_cast<std::uint8_t>(std::floor(yf / (size / 8.f)));
+      auto floorX           = static_cast<std::uint8_t>(std::floor(xf / (size / 8.f)));
+      auto floorY           = static_cast<std::uint8_t>(std::floor(yf / (size / 8.f)));
 
       if ((floorX + floorY) % 2 == 0) {
         r = g = b = 255;
@@ -267,8 +262,8 @@ Image Tools::CreateNoiseImage(unsigned int size)
 
   std::uint8_t value = 0;
   for (std::size_t i = 0; i < totalPixelsCount; i += 4) {
-    value = static_cast<std::uint8_t>(
-      std::floor((randomNumbers[i] * (0.02f - 0.95f) + 0.95f) * 255.f));
+    value
+      = static_cast<std::uint8_t>(std::floor((randomNumbers[i] * (0.02f - 0.95f) + 0.95f) * 255.f));
     imageData[i]     = value;
     imageData[i + 1] = value;
     imageData[i + 2] = value;
@@ -295,20 +290,18 @@ Image Tools::ArrayBufferToImage(const ArrayBuffer& buffer, bool flipVertically)
     return Image();
   }
 
-  using stbi_ptr
-    = std::unique_ptr<unsigned char, std::function<void(unsigned char*)>>;
+  using stbi_ptr = std::unique_ptr<unsigned char, std::function<void(unsigned char*)>>;
 
   auto bufferSize = static_cast<int>(buffer.size());
   auto w = -1, h = -1, n = -1;
   auto req_comp = STBI_rgb_alpha;
   stbi_set_flip_vertically_on_load(flipVertically);
-  stbi_ptr data(
-    stbi_load_from_memory(buffer.data(), bufferSize, &w, &h, &n, req_comp),
-    [](unsigned char* _data) {
-      if (_data) {
-        stbi_image_free(_data);
-      }
-    });
+  stbi_ptr data(stbi_load_from_memory(buffer.data(), bufferSize, &w, &h, &n, req_comp),
+                [](unsigned char* _data) {
+                  if (_data) {
+                    stbi_image_free(_data);
+                  }
+                });
   stbi_set_flip_vertically_on_load(false);
 
   if (!data) {
@@ -360,9 +353,8 @@ Image Tools::StringToImage(const std::string& uri, bool flipVertically)
     return false;
   };
 
-  const auto DecodeDataURI
-    = [](std::vector<unsigned char>* out, std::string& mime_type,
-         const std::string& in, size_t reqBytes, bool checkSize) -> bool {
+  const auto DecodeDataURI = [](std::vector<unsigned char>* out, std::string& mime_type,
+                                const std::string& in, size_t reqBytes, bool checkSize) -> bool {
     std::string header = "data:application/octet-stream;base64,";
     std::string data;
     if (in.find(header) == 0) {
@@ -373,7 +365,7 @@ Image Tools::StringToImage(const std::string& uri, bool flipVertically)
       header = "data:image/jpeg;base64,";
       if (in.find(header) == 0) {
         mime_type = "image/jpeg";
-        data = Base64::decode(in.substr(header.size())); // cut mime string.
+        data      = Base64::decode(in.substr(header.size())); // cut mime string.
       }
     }
 
@@ -381,7 +373,7 @@ Image Tools::StringToImage(const std::string& uri, bool flipVertically)
       header = "data:image/png;base64,";
       if (in.find(header) == 0) {
         mime_type = "image/png";
-        data = Base64::decode(in.substr(header.size())); // cut mime string.
+        data      = Base64::decode(in.substr(header.size())); // cut mime string.
       }
     }
 
@@ -389,7 +381,7 @@ Image Tools::StringToImage(const std::string& uri, bool flipVertically)
       header = "data:image/bmp;base64,";
       if (in.find(header) == 0) {
         mime_type = "image/bmp";
-        data = Base64::decode(in.substr(header.size())); // cut mime string.
+        data      = Base64::decode(in.substr(header.size())); // cut mime string.
       }
     }
 
@@ -397,7 +389,7 @@ Image Tools::StringToImage(const std::string& uri, bool flipVertically)
       header = "data:image/gif;base64,";
       if (in.find(header) == 0) {
         mime_type = "image/gif";
-        data = Base64::decode(in.substr(header.size())); // cut mime string.
+        data      = Base64::decode(in.substr(header.size())); // cut mime string.
       }
     }
 
@@ -433,9 +425,8 @@ Image Tools::StringToImage(const std::string& uri, bool flipVertically)
     return true;
   };
 
-  const auto LoadImageData
-    = [](Image& image, int req_width, int req_height,
-         const unsigned char* bytes, int size, bool flipVertically) -> bool {
+  const auto LoadImageData = [](Image& image, int req_width, int req_height,
+                                const unsigned char* bytes, int size, bool flipVertically) -> bool {
     int w = 0, h = 0, comp = 0, req_comp = 0;
 
     unsigned char* data = nullptr;
@@ -473,8 +464,7 @@ Image Tools::StringToImage(const std::string& uri, bool flipVertically)
     if (!data)
       data = stbi_load_from_memory(bytes, size, &w, &h, &comp, req_comp);
     if (!data) {
-      BABYLON_LOG_WARN(
-        "Unknown image format. STB cannot decode image data for image")
+      BABYLON_LOG_WARN("Unknown image format. STB cannot decode image data for image")
       return false;
     }
 
@@ -523,8 +513,7 @@ Image Tools::StringToImage(const std::string& uri, bool flipVertically)
     }
   }
 
-  if (LoadImageData(image, 0, 0, &img.at(0), static_cast<int>(img.size()),
-                    flipVertically)) {
+  if (LoadImageData(image, 0, 0, &img.at(0), static_cast<int>(img.size()), flipVertically)) {
     return image;
   }
 
@@ -533,44 +522,53 @@ Image Tools::StringToImage(const std::string& uri, bool flipVertically)
 
 void Tools::LoadImageFromUrl(
   std::string url, const std::function<void(const Image& img)>& onLoad,
-  const std::function<void(const std::string& message,
-                           const std::string& exception)>& onError,
+  const std::function<void(const std::string& message, const std::string& exception)>& onError,
   bool flipVertically)
 {
+    std::cout << "Orig: ----------> " << url << std::endl;
+
   url = Tools::CleanUrl(url);
+
+  std::cout << "Cleaned ----------> " << url << std::endl;
 
   url = Tools::PreprocessUrl(url);
 
+  std::cout << "Preprocessed ----------> " << url << std::endl;
+
   if (String::startsWith(url, "file:")) {
-    using stbi_ptr
-      = std::unique_ptr<unsigned char, std::function<void(unsigned char*)>>;
+    using stbi_ptr = std::unique_ptr<unsigned char, std::function<void(unsigned char*)>>;
 
-    int w = -1, h = -1, n = -1;
-    stbi_set_flip_vertically_on_load(flipVertically);
-    stbi_ptr data(stbi_load(url.substr(5).c_str(), &w, &h, &n, STBI_rgb_alpha),
-                  [](unsigned char* _data) {
-                    if (_data) {
-                      stbi_image_free(_data);
-                    }
-                  });
-    stbi_set_flip_vertically_on_load(false);
+    for (auto req_comp : {STBI_rgb_alpha, STBI_rgb}) {
+      int w = -1, h = -1, n = -1;
+      stbi_set_flip_vertically_on_load(flipVertically);
+      stbi_ptr data(stbi_load(url.substr(5).c_str(), &w, &h, &n, req_comp),
+                    [](unsigned char* _data) {
+                      if (_data) {
+                        stbi_image_free(_data);
+                      }
+                    });
+      stbi_set_flip_vertically_on_load(false);
 
-    if (!data && onError) {
+      if (data) {
+        Image image(data.get(), w * h * n, w, h, n, (req_comp == 3) ? GL::RGB : GL::RGBA);
+        onLoad(image);
+        std::cout << "********* LOADED" << std::endl;
+        return;
+      }
+    }
+
+    if (onError) {
+      std::cout << "-----> " << url;
       onError("Error loading image from file " + url, "");
       return;
     }
-
-    n = STBI_rgb_alpha;
-    Image image(data.get(), w * h * n, w, h, n, (n == 3) ? GL::RGB : GL::RGBA);
-    onLoad(image);
   }
 }
 
 void Tools::LoadImageFromBuffer(
   const std::variant<std::string, ArrayBuffer, Image>& input, bool invertY,
   const std::function<void(const Image& img)>& onLoad,
-  const std::function<void(const std::string& message,
-                           const std::string& exception)>& onError)
+  const std::function<void(const std::string& message, const std::string& exception)>& onError)
 {
   if (!onLoad) {
     return;
@@ -600,10 +598,8 @@ void Tools::LoadFile(
   std::string url,
   const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
                            const std::string& responseURL)>& onSuccess,
-  const std::function<void(const ProgressEvent& event)>& onProgress,
-  bool useArrayBuffer,
-  const std::function<void(const std::string& message,
-                           const std::string& exception)>& onError)
+  const std::function<void(const ProgressEvent& event)>& onProgress, bool useArrayBuffer,
+  const std::function<void(const std::string& message, const std::string& exception)>& onError)
 {
   url = Tools::CleanUrl(url);
 
@@ -624,16 +620,14 @@ void Tools::LoadFile(
   }
 }
 
-void Tools::ReadFile(
-  std::string fileToLoad,
-  const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
-                           const std::string& responseURL)>& callback,
-  const std::function<void(const ProgressEvent& event)>& onProgress,
-  bool useArrayBuffer)
+void Tools::ReadFile(std::string fileToLoad,
+                     const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
+                                              const std::string& responseURL)>& callback,
+                     const std::function<void(const ProgressEvent& event)>& onProgress,
+                     bool useArrayBuffer)
 {
   if (!Filesystem::exists(fileToLoad)) {
-    BABYLON_LOGF_ERROR("Tools", "Error while reading file: %s",
-                       fileToLoad.c_str())
+    BABYLON_LOGF_ERROR("Tools", "Error while reading file: %s", fileToLoad.c_str())
     if (callback) {
       callback("", "");
     }
