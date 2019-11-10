@@ -745,7 +745,7 @@ GeometryPtr GLTFLoader::_loadVertexDataAsync(const std::string& context, IMeshPr
     auto& accessor
       = ArrayItem::Get(String::printf("%s/attributes/%s", context.c_str(), attribute.c_str()),
                        _gltf->accessors, attributes[attribute]);
-    promises.emplace_back([&]() -> void {
+    promises.emplace_back([this, &babylonGeometry, &accessor, kind]() -> void {
       babylonGeometry->setVerticesBuffer(
         _loadVertexAccessorAsync(String::printf("/accessors/%ld", accessor.index), accessor, kind),
         accessor.count);
@@ -1566,7 +1566,7 @@ VertexBufferPtr& GLTFLoader::_loadVertexAccessorAsync(const std::string& context
   else if (accessor.byteOffset
            && static_cast<unsigned int>(*accessor.byteOffset)
                   % VertexBuffer::GetTypeByteLength(
-                    static_cast<unsigned int>(accessor.componentType))
+                      static_cast<unsigned int>(accessor.componentType))
                 != 0) {
     BABYLON_LOG_WARN("GLTFLoader",
                      "Accessor byte offset is not a multiple of component type byte length")
