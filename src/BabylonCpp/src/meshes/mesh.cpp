@@ -83,7 +83,7 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
     , _shouldGenerateFlatShading{false}
     , _originalBuilderSideOrientation{Mesh::DEFAULTSIDE}
     , overrideMaterialSideOrientation{std::nullopt}
-    , source{this, &Mesh::get_source}
+    , _source{this, &Mesh::get_source}
     , isUnIndexed{this, &Mesh::get_isUnIndexed, &Mesh::set_isUnIndexed}
     , _isMesh{this, &Mesh::get__isMesh}
     , hasLODLevels{this, &Mesh::get_hasLODLevels}

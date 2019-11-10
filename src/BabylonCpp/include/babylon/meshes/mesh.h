@@ -1924,7 +1924,7 @@ public:
   /**
    * Gets the source mesh (the one used to clone this one from)
    */
-  ReadOnlyProperty<Mesh, Mesh*> source;
+  ReadOnlyProperty<Mesh, Mesh*> _source;
 
   /**
    * Gets or sets a boolean indicating that this mesh does not use index buffer
