@@ -44,12 +44,6 @@ void SamplesIndex::fillSamplesFailures() const
     {"ShaderMaterialWarpSpeedScene", {SampleFailureReasonKind::empty3d}},
     {"VolumetricLightScatteringScene", {SampleFailureReasonKind::segFault}}};
 
-  // all gltf samples fail under windows, with an empty rendering
-  for (const auto& sampleName : getSampleNamesInCategory("Loaders - glTF format")) {
-    SampleFailureReason reason{SampleFailureReasonKind::empty3d, "Empty rendering under windows"};
-    _samplesFailures[sampleName] = reason;
-  }
-
   done = true;
 }
 
