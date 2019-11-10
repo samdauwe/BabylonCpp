@@ -525,15 +525,9 @@ void Tools::LoadImageFromUrl(
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
   bool flipVertically)
 {
-    std::cout << "Orig: ----------> " << url << std::endl;
-
   url = Tools::CleanUrl(url);
 
-  std::cout << "Cleaned ----------> " << url << std::endl;
-
   url = Tools::PreprocessUrl(url);
-
-  std::cout << "Preprocessed ----------> " << url << std::endl;
 
   if (String::startsWith(url, "file:")) {
     using stbi_ptr = std::unique_ptr<unsigned char, std::function<void(unsigned char*)>>;
@@ -552,13 +546,11 @@ void Tools::LoadImageFromUrl(
       if (data) {
         Image image(data.get(), w * h * n, w, h, n, (req_comp == 3) ? GL::RGB : GL::RGBA);
         onLoad(image);
-        std::cout << "********* LOADED" << std::endl;
         return;
       }
     }
 
     if (onError) {
-      std::cout << "-----> " << url;
       onError("Error loading image from file " + url, "");
       return;
     }
