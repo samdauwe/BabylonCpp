@@ -453,7 +453,7 @@ private:
 
 }; // end of class ShaderMaterialPhysicallyBasedSDFScene
 
-BABYLON_REGISTER_SAMPLE("Shader Materials", ShaderMaterialPhysicallyBasedSdfScene)
+BABYLON_REGISTER_SAMPLE("Shader Material", ShaderMaterialPhysicallyBasedSdfScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

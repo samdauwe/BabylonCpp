@@ -754,7 +754,7 @@ private:
 
 }; // end of class ShaderMaterialMorningCityScene
 
-BABYLON_REGISTER_SAMPLE("Shader Materials", ShaderMaterialMorningCityScene)
+BABYLON_REGISTER_SAMPLE("Shader Material", ShaderMaterialMorningCityScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

@@ -270,7 +270,7 @@ private:
 
 }; // end of class ShaderMaterialMengerSpongeScene
 
-BABYLON_REGISTER_SAMPLE("Shader Materials", ShaderMaterialMengerSpongeScene)
+BABYLON_REGISTER_SAMPLE("Shader Material", ShaderMaterialMengerSpongeScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

@@ -193,7 +193,7 @@ private:
 
 }; // end of class ShaderMaterialWarpSpeedScene
 
-BABYLON_REGISTER_SAMPLE("Shader Materials", ShaderMaterialWarpSpeedScene)
+BABYLON_REGISTER_SAMPLE("Shader Material", ShaderMaterialWarpSpeedScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

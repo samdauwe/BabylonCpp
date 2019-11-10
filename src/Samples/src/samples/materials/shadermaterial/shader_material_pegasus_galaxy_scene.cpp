@@ -385,7 +385,7 @@ private:
 
 }; // end of class ShaderMaterialPegasusGalaxyScene
 
-BABYLON_REGISTER_SAMPLE("Shader Materials", ShaderMaterialPegasusGalaxyScene)
+BABYLON_REGISTER_SAMPLE("Shader Material", ShaderMaterialPegasusGalaxyScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

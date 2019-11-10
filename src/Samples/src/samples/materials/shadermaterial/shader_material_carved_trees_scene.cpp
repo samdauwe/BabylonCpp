@@ -186,7 +186,7 @@ private:
 
 }; // end of class ShaderMaterialCarvedTreesScene
 
-BABYLON_REGISTER_SAMPLE("Shader Materials", ShaderMaterialCarvedTreesScene)
+BABYLON_REGISTER_SAMPLE("Shader Material", ShaderMaterialCarvedTreesScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

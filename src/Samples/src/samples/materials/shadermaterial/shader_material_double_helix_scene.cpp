@@ -223,7 +223,7 @@ private:
 
 }; // end of class ShaderMaterialDoubleHelixScene
 
-BABYLON_REGISTER_SAMPLE("Shader Materials", ShaderMaterialDoubleHelixScene)
+BABYLON_REGISTER_SAMPLE("Shader Material", ShaderMaterialDoubleHelixScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

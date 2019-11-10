@@ -559,7 +559,7 @@ private:
 
 }; // end of class ShaderMaterialOperaIslandScene
 
-BABYLON_REGISTER_SAMPLE("Shader Materials", ShaderMaterialOperaIslandScene)
+BABYLON_REGISTER_SAMPLE("Shader Material", ShaderMaterialOperaIslandScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

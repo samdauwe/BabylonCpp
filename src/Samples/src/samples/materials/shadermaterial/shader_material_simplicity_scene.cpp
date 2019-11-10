@@ -164,7 +164,7 @@ private:
 
 }; // end of class ShaderMaterialSimplicityScene
 
-BABYLON_REGISTER_SAMPLE("Shader Materials", ShaderMaterialSimplicityScene)
+BABYLON_REGISTER_SAMPLE("Shader Material", ShaderMaterialSimplicityScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

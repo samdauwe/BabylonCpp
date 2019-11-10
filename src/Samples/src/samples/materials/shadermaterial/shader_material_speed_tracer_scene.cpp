@@ -477,7 +477,7 @@ private:
 
 }; // end of class ShaderMaterialSpeedTracerScene
 
-BABYLON_REGISTER_SAMPLE("Shader Materials", ShaderMaterialSpeedTracerScene)
+BABYLON_REGISTER_SAMPLE("Shader Material", ShaderMaterialSpeedTracerScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

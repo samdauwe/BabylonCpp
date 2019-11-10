@@ -869,7 +869,7 @@ private:
 
 }; // end of class ShaderMaterialChainsAndGearsScene
 
-BABYLON_REGISTER_SAMPLE("Shader Materials", ShaderMaterialChainsAndGearsScene)
+BABYLON_REGISTER_SAMPLE("Shader Material", ShaderMaterialChainsAndGearsScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

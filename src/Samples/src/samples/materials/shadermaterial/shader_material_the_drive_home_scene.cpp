@@ -510,7 +510,7 @@ private:
 
 }; // end of class ShaderMaterialTheDriveHomeScene
 
-BABYLON_REGISTER_SAMPLE("Shader Materials", ShaderMaterialTheDriveHomeScene)
+BABYLON_REGISTER_SAMPLE("Shader Material", ShaderMaterialTheDriveHomeScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

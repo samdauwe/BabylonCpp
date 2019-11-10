@@ -151,7 +151,7 @@ private:
 
 }; // end of class ShaderMaterialWithFogScene
 
-BABYLON_REGISTER_SAMPLE("Shader Materials", ShaderMaterialWithFogScene)
+BABYLON_REGISTER_SAMPLE("Shader Material", ShaderMaterialWithFogScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

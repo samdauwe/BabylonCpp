@@ -399,7 +399,7 @@ private:
 
 }; // end of class ShaderMaterialSparseGridMarchingScene
 
-BABYLON_REGISTER_SAMPLE("Shader Materials", ShaderMaterialSparseGridMarchingScene)
+BABYLON_REGISTER_SAMPLE("Shader Material", ShaderMaterialSparseGridMarchingScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

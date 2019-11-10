@@ -117,7 +117,7 @@ private:
 
 }; // end of class ShaderMaterialSkyboxScene
 
-BABYLON_REGISTER_SAMPLE("Shader Materials", ShaderMaterialSkyboxScene)
+BABYLON_REGISTER_SAMPLE("Shader Material", ShaderMaterialSkyboxScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

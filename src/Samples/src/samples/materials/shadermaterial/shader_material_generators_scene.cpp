@@ -439,7 +439,7 @@ private:
 
 }; // end of class ShaderMaterialGeneratorsScene
 
-BABYLON_REGISTER_SAMPLE("Shader Materials", ShaderMaterialGeneratorsScene)
+BABYLON_REGISTER_SAMPLE("Shader Material", ShaderMaterialGeneratorsScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

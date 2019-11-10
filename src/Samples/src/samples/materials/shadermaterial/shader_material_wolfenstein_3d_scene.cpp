@@ -809,7 +809,7 @@ private:
 
 }; // end of class ShaderMaterialWolfenstein3DScene
 
-BABYLON_REGISTER_SAMPLE("Shader Materials", ShaderMaterialWolfenstein3dScene)
+BABYLON_REGISTER_SAMPLE("Shader Material", ShaderMaterialWolfenstein3dScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

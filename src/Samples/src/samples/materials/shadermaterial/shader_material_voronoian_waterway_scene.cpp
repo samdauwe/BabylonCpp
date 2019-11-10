@@ -626,7 +626,7 @@ private:
 
 }; // end of class ShaderMaterialVoronoianWaterwayScene
 
-BABYLON_REGISTER_SAMPLE("Shader Materials", ShaderMaterialVoronoianWaterwayScene)
+BABYLON_REGISTER_SAMPLE("Shader Material", ShaderMaterialVoronoianWaterwayScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

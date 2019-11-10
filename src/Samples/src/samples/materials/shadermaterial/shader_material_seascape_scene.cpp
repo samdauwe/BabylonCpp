@@ -346,7 +346,7 @@ private:
 
 }; // end of class ShaderMaterialSeascapeScene
 
-BABYLON_REGISTER_SAMPLE("Shader Materials", ShaderMaterialSeascapeScene)
+BABYLON_REGISTER_SAMPLE("Shader Material", ShaderMaterialSeascapeScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON
