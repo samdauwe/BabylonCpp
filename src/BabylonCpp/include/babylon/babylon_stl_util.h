@@ -156,7 +156,7 @@ template <typename C, typename T>
 std::vector<C> cast_array_elements(const std::vector<T> buffer)
 {
   struct to_result_type {
-    float operator()(T value)
+    C operator()(T value)
     {
       return static_cast<C>(value);
     }
