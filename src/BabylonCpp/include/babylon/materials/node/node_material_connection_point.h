@@ -17,10 +17,9 @@ namespace BABYLON {
 class InputBlock;
 class NodeMaterialBlock;
 class NodeMaterialConnectionPoint;
-using InputBlockPtr        = std::shared_ptr<InputBlock>;
-using NodeMaterialBlockPtr = std::shared_ptr<NodeMaterialBlock>;
-using NodeMaterialConnectionPointPtr
-  = std::shared_ptr<NodeMaterialConnectionPoint>;
+using InputBlockPtr                  = std::shared_ptr<InputBlock>;
+using NodeMaterialBlockPtr           = std::shared_ptr<NodeMaterialBlock>;
+using NodeMaterialConnectionPointPtr = std::shared_ptr<NodeMaterialConnectionPoint>;
 
 /**
  * @brief Defines a connection point for a block.
@@ -53,21 +52,19 @@ public:
   /**
    * @brief Connect this point to another connection point.
    * @param connectionPoint defines the other connection point
-   * @param ignoreConstraints defines if the system will ignore connection type
-   * constraints (default is false)
+   * @param ignoreConstraints defines if the system will ignore connection type constraints (default
+   * is false)
    * @returns the current connection point
    */
-  NodeMaterialConnectionPoint&
-  connectTo(const NodeMaterialConnectionPointPtr& connectionPoint,
-            bool ignoreConstraints = false);
+  NodeMaterialConnectionPoint& connectTo(const NodeMaterialConnectionPointPtr& connectionPoint,
+                                         bool ignoreConstraints = false);
 
   /**
    * @brief Disconnect this point from one of his endpoint.
    * @param endpoint defines the other connection point
    * @returns the current connection point
    */
-  NodeMaterialConnectionPoint&
-  disconnectFrom(const NodeMaterialConnectionPoint& endpoint);
+  NodeMaterialConnectionPoint& disconnectFrom(const NodeMaterialConnectionPoint& endpoint);
 
   /**
    * @brief Serializes this point in a JSON representation.
@@ -81,8 +78,7 @@ protected:
    * @param name defines the connection point name
    * @param ownerBlock defines the block hosting this connection point
    */
-  NodeMaterialConnectionPoint(const std::string& name,
-                              const NodeMaterialBlockPtr& ownerBlock);
+  NodeMaterialConnectionPoint(const std::string& name, const NodeMaterialBlockPtr& ownerBlock);
 
   /**
    * @brief Gets the associated variable name in the shader.
@@ -110,8 +106,7 @@ protected:
   bool get_isConnected() const;
 
   /**
-   * @brief Gets a boolean indicating that the current point is connected to an
-   * input block.
+   * @brief Gets a boolean indicating that the current point is connected to an input block.
    */
   bool get_isConnectedToInputBlock() const;
 
@@ -123,7 +118,7 @@ protected:
   /**
    * @brief Get the other side of the connection (if any).
    */
-  std::optional<NodeMaterialConnectionPoint>& get_connectedPoint();
+  NodeMaterialConnectionPointPtr& get_connectedPoint();
 
   /**
    * @brief Get the block that owns this connection point.
@@ -148,8 +143,7 @@ protected:
   std::vector<NodeMaterialConnectionPointPtr>& get_endpoints();
 
   /**
-   * @brief Gets a boolean indicating if that output point is connected to at
-   * least one input.
+   * @brief Gets a boolean indicating if that output point is connected to at least one input.
    */
   bool get_hasEndpoints() const;
 
@@ -171,16 +165,14 @@ public:
   /**
    * Gets or sets the additional types supported byt this connection point
    */
-  std::vector<NodeMaterialBlockConnectionPointTypes>
-    acceptedConnectionPointTypes;
+  std::vector<NodeMaterialBlockConnectionPointTypes> acceptedConnectionPointTypes;
 
   /**
    * Gets or sets the associated variable name in the shader
    */
   Property<NodeMaterialConnectionPoint, std::string> associatedVariableName;
 
-  Property<NodeMaterialConnectionPoint, NodeMaterialBlockConnectionPointTypes>
-    type;
+  Property<NodeMaterialConnectionPoint, NodeMaterialBlockConnectionPointTypes> type;
 
   /**
    * Gets or sets the connection point name
@@ -193,8 +185,7 @@ public:
   bool isOptional;
 
   /**
-   * Gets or sets a string indicating that this uniform must be defined under a
-   * #ifdef
+   * Gets or sets a string indicating that this uniform must be defined under a #ifdef
    */
   std::string define;
 
@@ -209,52 +200,43 @@ public:
   ReadOnlyProperty<NodeMaterialConnectionPoint, bool> isConnected;
 
   /**
-   * Gets a boolean indicating that the current point is connected to an input
-   * block.
+   * Gets a boolean indicating that the current point is connected to an input block.
    */
   ReadOnlyProperty<NodeMaterialConnectionPoint, bool> isConnectedToInputBlock;
 
   /**
    * Gets a the connected input block (if any).
    */
-  ReadOnlyProperty<NodeMaterialConnectionPoint, InputBlockPtr>
-    connectInputBlock;
+  ReadOnlyProperty<NodeMaterialConnectionPoint, InputBlockPtr> connectInputBlock;
 
   /**
    * Get the other side of the connection (if any).
    */
-  ReadOnlyProperty<NodeMaterialConnectionPoint,
-                   std::optional<NodeMaterialConnectionPoint>>
-    connectedPoint;
+  ReadOnlyProperty<NodeMaterialConnectionPoint, NodeMaterialConnectionPointPtr> connectedPoint;
 
   /**
    * Get the block that owns this connection point.
    */
-  ReadOnlyProperty<NodeMaterialConnectionPoint, NodeMaterialBlock> ownerBlock;
+  ReadOnlyProperty<NodeMaterialConnectionPoint, NodeMaterialBlockPtr> ownerBlock;
 
   /**
-   * Get the block connected on the other side of this connection (if
-   * any).
+   * Get the block connected on the other side of this connection (if any).
    */
   ReadOnlyProperty<NodeMaterialConnectionPoint, NodeMaterialBlock> sourceBlock;
 
   /**
    * Get the block connected on the endpoints of this connection (if any).
    */
-  ReadOnlyProperty<NodeMaterialConnectionPoint,
-                   std::vector<NodeMaterialBlockPtr>>
-    connectedBlocks;
+  ReadOnlyProperty<NodeMaterialConnectionPoint, std::vector<NodeMaterialBlockPtr>> connectedBlocks;
 
   /**
    * Gets the list of connected endpoints.
    */
-  ReadOnlyProperty<NodeMaterialConnectionPoint,
-                   std::vector<NodeMaterialConnectionPointPtr>>
+  ReadOnlyProperty<NodeMaterialConnectionPoint, std::vector<NodeMaterialConnectionPointPtr>>
     endpoints;
 
   /**
-   * Gets a boolean indicating if that output point is connected to at least one
-   * input.
+   * Gets a boolean indicating if that output point is connected to at least one input.
    */
   ReadOnlyProperty<NodeMaterialConnectionPoint, bool> hasEndpoints;
 

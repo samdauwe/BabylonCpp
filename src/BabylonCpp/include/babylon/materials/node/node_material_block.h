@@ -179,7 +179,7 @@ public:
    * @param useInstances specifies that instances should be used
    */
   virtual void initializeDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
-                                 const NodeMaterialDefines& defines, bool useInstances = false);
+                                 NodeMaterialDefines& defines, bool useInstances = false);
 
   /**
    * @brief Lets the block try to connect some inputs automatically.
@@ -283,7 +283,7 @@ protected:
   /**
    * @brief Gets the target of the block.
    */
-  NodeMaterialBlockTargets& get_target();
+  virtual NodeMaterialBlockTargets& get_target();
 
   /**
    * @brief Sets the target of the block.

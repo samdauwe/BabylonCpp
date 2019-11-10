@@ -119,7 +119,7 @@ protected:
   NodeMaterialConnectionPointPtr& get_view();
 
   /**
-   * @brief Gets the rgb input component.
+   * @brief Gets the rgb output component.
    */
   NodeMaterialConnectionPointPtr& get_rgb();
 
@@ -185,7 +185,7 @@ public:
   ReadOnlyProperty<ReflectionTextureBlock, NodeMaterialConnectionPointPtr&> view;
 
   /**
-   * Gets the rgb input component
+   * Gets the rgb output component
    */
   ReadOnlyProperty<ReflectionTextureBlock, NodeMaterialConnectionPointPtr> rgb;
 
