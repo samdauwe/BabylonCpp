@@ -946,29 +946,29 @@ std::unique_ptr<VertexData> VertexData::CreateTiledBox(TiledBoxOptions& options)
   std::vector<std::unique_ptr<VertexData>> faceVertexData;
 
   for (auto f = 0; f < 2; ++f) { // front and back
-    TiledPlaneOptions options;
-    options.pattern         = flipTile;
-    options.tileWidth       = tileWidth;
-    options.tileHeight      = tileHeight;
-    options.width           = width;
-    options.height          = height;
-    options.alignVertical   = alignV;
-    options.alignHorizontal = alignH;
-    options.sideOrientation = sideOrientation;
-    faceVertexData.emplace_back(VertexData::CreateTiledPlane(options));
+    TiledPlaneOptions tiledPlaneOptions;
+    tiledPlaneOptions.pattern         = flipTile;
+    tiledPlaneOptions.tileWidth       = tileWidth;
+    tiledPlaneOptions.tileHeight      = tileHeight;
+    tiledPlaneOptions.width           = width;
+    tiledPlaneOptions.height          = height;
+    tiledPlaneOptions.alignVertical   = alignV;
+    tiledPlaneOptions.alignHorizontal = alignH;
+    tiledPlaneOptions.sideOrientation = sideOrientation;
+    faceVertexData.emplace_back(VertexData::CreateTiledPlane(tiledPlaneOptions));
   }
 
   for (auto f = 2; f < 4; ++f) { // sides
-    TiledPlaneOptions options;
-    options.pattern         = flipTile;
-    options.tileWidth       = tileWidth;
-    options.tileHeight      = tileHeight;
-    options.width           = depth;
-    options.height          = height;
-    options.alignVertical   = alignV;
-    options.alignHorizontal = alignH;
-    options.sideOrientation = sideOrientation;
-    faceVertexData.emplace_back(VertexData::CreateTiledPlane(options));
+    TiledPlaneOptions tiledPlaneOptions;
+    tiledPlaneOptions.pattern         = flipTile;
+    tiledPlaneOptions.tileWidth       = tileWidth;
+    tiledPlaneOptions.tileHeight      = tileHeight;
+    tiledPlaneOptions.width           = depth;
+    tiledPlaneOptions.height          = height;
+    tiledPlaneOptions.alignVertical   = alignV;
+    tiledPlaneOptions.alignHorizontal = alignH;
+    tiledPlaneOptions.sideOrientation = sideOrientation;
+    faceVertexData.emplace_back(VertexData::CreateTiledPlane(tiledPlaneOptions));
   }
 
   auto baseAlignV = alignV;
@@ -980,16 +980,16 @@ std::unique_ptr<VertexData> VertexData::CreateTiledBox(TiledBoxOptions& options)
   }
 
   for (auto f = 4; f < 6; ++f) { // top and bottom
-    TiledPlaneOptions options;
-    options.pattern         = flipTile;
-    options.tileWidth       = tileWidth;
-    options.tileHeight      = tileHeight;
-    options.width           = width;
-    options.height          = depth;
-    options.alignVertical   = baseAlignV;
-    options.alignHorizontal = alignH;
-    options.sideOrientation = sideOrientation;
-    faceVertexData.emplace_back(VertexData::CreateTiledPlane(options));
+    TiledPlaneOptions tiledPlaneOptions;
+    tiledPlaneOptions.pattern         = flipTile;
+    tiledPlaneOptions.tileWidth       = tileWidth;
+    tiledPlaneOptions.tileHeight      = tileHeight;
+    tiledPlaneOptions.width           = width;
+    tiledPlaneOptions.height          = depth;
+    tiledPlaneOptions.alignVertical   = baseAlignV;
+    tiledPlaneOptions.alignHorizontal = alignH;
+    tiledPlaneOptions.sideOrientation = sideOrientation;
+    faceVertexData.emplace_back(VertexData::CreateTiledPlane(tiledPlaneOptions));
   }
 
   Float32Array positions;
@@ -1003,7 +1003,7 @@ std::unique_ptr<VertexData> VertexData::CreateTiledBox(TiledBoxOptions& options)
   std::vector<Float32Array> newFaceUV;
   auto lu = 0ull;
 
-  auto li = 0u;
+  size_t li = 0u;
 
   for (auto f = 0u; f < nbFaces; ++f) {
     const auto len = faceVertexData[f]->positions.size();
@@ -1031,7 +1031,7 @@ std::unique_ptr<VertexData> VertexData::CreateTiledBox(TiledBoxOptions& options)
     }
     stl_util::concat(uvs, newFaceUV[f]);
     for (const auto x : faceVertexData[f]->indices) {
-      indices.emplace_back(x + li);
+      indices.emplace_back(static_cast<unsigned int>(x + li));
     }
     li += facePositions[f].size();
     if (!faceColors.empty()) {
@@ -1154,17 +1154,17 @@ VertexData::CreateTiledPlane(TiledPlaneOptions& options)
   if (offsetX > 0 || offsetY > 0) {
     startX    = -halfWidth;
     startY    = -halfHeight;
-    auto endX = halfWidth;
-    auto endY = halfHeight;
+    auto endX_2 = halfWidth;
+    auto endY_2 = halfHeight;
 
     switch (alignH) {
       case Mesh::CENTER:
         offsetX /= 2.f;
         startX -= offsetX;
-        endX += offsetX;
+        endX_2 += offsetX;
         break;
       case Mesh::LEFT:
-        endX += offsetX;
+        endX_2 += offsetX;
         adjustX = -offsetX / 2.f;
         break;
       case Mesh::RIGHT:
@@ -1177,10 +1177,10 @@ VertexData::CreateTiledPlane(TiledPlaneOptions& options)
       case Mesh::CENTER:
         offsetY /= 2.f;
         startY -= offsetY;
-        endY += offsetY;
+        endY_2 += offsetY;
         break;
       case Mesh::BOTTOM:
-        endY += offsetY;
+        endY_2 += offsetY;
         adjustY = -offsetY / 2.f;
         break;
       case Mesh::TOP:
