@@ -73,7 +73,7 @@ NodeMaterialConnectionPointPtr& LightBlock::get_specularOutput()
 
 void LightBlock::autoConfigure(const NodeMaterialPtr& material)
 {
-  if (!cameraPosition()->isConnected) {
+  if (!cameraPosition()->isConnected()) {
     auto cameraPositionInput
       = material->getInputBlockByPredicate([](const InputBlockPtr& b) -> bool {
           return b->systemValue() == NodeMaterialSystemValues::CameraPosition;
