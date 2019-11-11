@@ -91,8 +91,12 @@ def main():
         "webXRSessionManager.ts",
         # Debug
         "debugLayer.ts",
+        # Engines
+        "nativeEngine.ts",
         # Engines / Extensions
         "engine.webVR.ts",
+        # Engines / Native
+        "nativeShaderProcessor.ts",
         # Helpers
         "videoDome.ts",
         # LibDeclarations
