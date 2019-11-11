@@ -16,8 +16,7 @@ StickValues::StickValues(const StickValues& other) : x{other.x}, y{other.y}
 {
 }
 
-StickValues::StickValues(StickValues&& other)
-    : x{std::move(other.x)}, y{std::move(other.y)}
+StickValues::StickValues(StickValues&& other) : x{std::move(other.x)}, y{std::move(other.y)}
 {
 }
 

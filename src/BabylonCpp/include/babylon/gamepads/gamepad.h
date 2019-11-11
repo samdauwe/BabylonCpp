@@ -55,9 +55,8 @@ public:
    * @param rightStickX The x component of the right joystick
    * @param rightStickY The y component of the right joystick
    */
-  Gamepad(const std::string& id, int index,
-          const IBrowserGamepadPtr& browserGamepad, unsigned int leftStickX = 0,
-          unsigned int leftStickY = 1, unsigned int rightStickX = 2,
+  Gamepad(const std::string& id, int index, const IBrowserGamepadPtr& browserGamepad,
+          unsigned int leftStickX = 0, unsigned int leftStickY = 1, unsigned int rightStickX = 2,
           unsigned int rightStickY = 3);
   virtual ~Gamepad();
 
@@ -65,15 +64,13 @@ public:
    * @brief Callback triggered when the left joystick has changed.
    * @param callback
    */
-  void onleftstickchanged(
-    const std::function<void(const StickValues& values)>& callback);
+  void onleftstickchanged(const std::function<void(const StickValues& values)>& callback);
 
   /**
    * @brief Callback triggered when the right joystick has changed.
    * @param callback
    */
-  void onrightstickchanged(
-    const std::function<void(const StickValues& values)>& callback);
+  void onrightstickchanged(const std::function<void(const StickValues& values)>& callback);
 
   /**
    * @brief Updates the gamepad joystick positions.

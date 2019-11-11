@@ -5,10 +5,9 @@
 
 namespace BABYLON {
 
-Gamepad::Gamepad(const std::string& iId, int iIndex,
-                 const IBrowserGamepadPtr& iBrowserGamepad,
-                 unsigned int leftStickX, unsigned int leftStickY,
-                 unsigned int rightStickX, unsigned int rightStickY)
+Gamepad::Gamepad(const std::string& iId, int iIndex, const IBrowserGamepadPtr& iBrowserGamepad,
+                 unsigned int leftStickX, unsigned int leftStickY, unsigned int rightStickX,
+                 unsigned int rightStickY)
     : id{iId}
     , index{iIndex}
     , browserGamepad{iBrowserGamepad}
@@ -26,12 +25,12 @@ Gamepad::Gamepad(const std::string& iId, int iIndex,
     , _rightStickAxisY{rightStickY}
 {
   if (browserGamepad->axes.size() >= 2) {
-    _leftStick = StickValues(browserGamepad->axes[_leftStickAxisX],
-                             browserGamepad->axes[_leftStickAxisY]);
+    _leftStick
+      = StickValues(browserGamepad->axes[_leftStickAxisX], browserGamepad->axes[_leftStickAxisY]);
   }
   if (browserGamepad->axes.size() >= 4) {
-    _rightStick = StickValues(browserGamepad->axes[_rightStickAxisX],
-                              browserGamepad->axes[_rightStickAxisY]);
+    _rightStick
+      = StickValues(browserGamepad->axes[_rightStickAxisX], browserGamepad->axes[_rightStickAxisY]);
   }
 }
 
@@ -44,14 +43,12 @@ bool Gamepad::get_isConnected() const
   return _isConnected;
 }
 
-void Gamepad::onleftstickchanged(
-  const std::function<void(const StickValues& values)>& callback)
+void Gamepad::onleftstickchanged(const std::function<void(const StickValues& values)>& callback)
 {
   _onleftstickchanged = callback;
 }
 
-void Gamepad::onrightstickchanged(
-  const std::function<void(const StickValues& values)>& callback)
+void Gamepad::onrightstickchanged(const std::function<void(const StickValues& values)>& callback)
 {
   _onrightstickchanged = callback;
 }
@@ -94,13 +91,13 @@ void Gamepad::update()
                                browserGamepad->axes[_leftStickAxisY] * -1.f);
     }
     else {
-      _leftStick = StickValues(browserGamepad->axes[_leftStickAxisX],
-                               browserGamepad->axes[_leftStickAxisY]);
+      _leftStick
+        = StickValues(browserGamepad->axes[_leftStickAxisX], browserGamepad->axes[_leftStickAxisY]);
     }
   }
   if (_rightStick) {
-    _rightStick = StickValues(browserGamepad->axes[_rightStickAxisX],
-                              browserGamepad->axes[_rightStickAxisY]);
+    _rightStick
+      = StickValues(browserGamepad->axes[_rightStickAxisX], browserGamepad->axes[_rightStickAxisY]);
   }
 }
 

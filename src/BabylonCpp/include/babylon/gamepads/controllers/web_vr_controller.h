@@ -13,16 +13,14 @@ namespace BABYLON {
 class Scene;
 
 /**
- * @brief Defines the WebVRController object that represents controllers tracked
- * in 3D space.
+ * @brief Defines the WebVRController object that represents controllers tracked in 3D space.
  */
 class BABYLON_SHARED_EXPORT WebVRController : public PoseEnabledController {
 
 public:
   /**
    * @brief Creates a new WebVRController from a gamepad.
-   * @param vrGamepad the gamepad that the WebVRController should be created
-   * from
+   * @param vrGamepad the gamepad that the WebVRController should be created from
    */
   WebVRController(const IBrowserGamepadPtr& vrGamepad);
   ~WebVRController() override;
@@ -31,13 +29,13 @@ public:
    * @brief Fired when a controller button's state has changed.
    * @param callback the callback containing the button that was modified
    */
-  void setOnButtonStateChange(
-    const std::function<void(int controlledIndex, unsigned int buttonIndex,
-                             const ExtendedGamepadButton& state)>& callback);
+  void
+  setOnButtonStateChange(const std::function<void(int controlledIndex, unsigned int buttonIndex,
+                                                  const ExtendedGamepadButton& state)>& callback);
 
   /**
-   * @brief Updates the state of the controller and mesh based on the current
-   * position and rotation of the controller.
+   * @brief Updates the state of the controller and mesh based on the current position and rotation
+   * of the controller.
    */
   void update() override;
 
@@ -51,9 +49,8 @@ public:
    * @param scene the scene the mesh should be added to
    * @param meshLoaded callback for when the mesh has been loaded
    */
-  virtual void
-  initControllerMesh(Scene* scene,
-                     const std::function<void(AbstractMesh* mesh)>& meshLoaded)
+  virtual void initControllerMesh(Scene* scene,
+                                  const std::function<void(AbstractMesh* mesh)>& meshLoaded)
     = 0;
 
 protected:
@@ -65,8 +62,7 @@ protected:
   /**
    * @brief Function to be called when a button is modified.
    */
-  virtual void _handleButtonChange(unsigned int buttonIdx,
-                                   const ExtendedGamepadButton& state,
+  virtual void _handleButtonChange(unsigned int buttonIdx, const ExtendedGamepadButton& state,
                                    const GamepadButtonChanges& changes)
     = 0;
 
@@ -74,9 +70,8 @@ private:
   void _setButtonValue(std::optional<ExtendedGamepadButton> newState,
                        const std::optional<ExtendedGamepadButton>& currentState,
                        unsigned int buttonIndex);
-  GamepadButtonChanges&
-  _checkChanges(const ExtendedGamepadButton& newState,
-                const ExtendedGamepadButton& currentState);
+  GamepadButtonChanges& _checkChanges(const ExtendedGamepadButton& newState,
+                                      const ExtendedGamepadButton& currentState);
 
 public:
   // Observables
@@ -106,7 +101,7 @@ public:
   Observable<StickValues> onPadValuesChangedObservable;
 
   /**
-   * X and Y axis corrisponding to the controllers joystick
+   * X and Y axis corresponding to the controllers joystick
    */
   StickValues pad;
 

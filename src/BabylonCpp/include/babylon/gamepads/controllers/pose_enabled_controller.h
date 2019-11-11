@@ -15,11 +15,9 @@ using AbstractMeshPtr    = std::shared_ptr<AbstractMesh>;
 using IBrowserGamepadPtr = std::shared_ptr<IBrowserGamepad>;
 
 /**
- * @brief Defines the PoseEnabledController object that contains state of a vr
- * capable controller.
+ * @brief Defines the PoseEnabledController object that contains state of a vr capable controller.
  */
-class BABYLON_SHARED_EXPORT PoseEnabledController : public Gamepad,
-                                                    public PoseControlled {
+class BABYLON_SHARED_EXPORT PoseEnabledController : public Gamepad, public PoseControlled {
 
 public:
   /**
@@ -55,8 +53,7 @@ public:
 public:
   /**
    * @brief Creates a new PoseEnabledController from a gamepad.
-   * @param browserGamepad the gamepad that the PoseEnabledController should be
-   * created from
+   * @param browserGamepad the gamepad that the PoseEnabledController should be created from
    */
   PoseEnabledController(const IBrowserGamepadPtr& browserGamepad);
   ~PoseEnabledController() override;
@@ -67,14 +64,14 @@ public:
   void _disableTrackPosition(const Vector3& fixedPosition);
 
   /**
-   * @brief Updates the state of the pose enbaled controller and mesh based on
-   * the current position and rotation of the controller.
+   * @brief Updates the state of the pose enbaled controller and mesh based on the current position
+   * and rotation of the controller.
    */
   void update() override;
 
   /**
-   * @brief Updates the state of the pose enbaled controller based on the raw
-   * pose data from the device.
+   * @brief Updates the state of the pose enbaled controller based on the raw pose data from the
+   * device.
    * @param poseData raw pose fromthe device
    */
   void updateFromDevice(const DevicePose& poseData) override;
@@ -97,8 +94,7 @@ public:
   virtual void dispose() override;
 
   /**
-   * @brief Gets the ray of the controller in the direction the controller is
-   * pointing.
+   * @brief Gets the ray of the controller in the direction the controller is pointing.
    * @param length the length the resulting ray should be
    * @returns a ray in the direction the controller is pointing
    */
@@ -106,8 +102,7 @@ public:
 
 protected:
   /**
-   * @brief Updates only the pose device and mesh without doing any button event
-   * checking.
+   * @brief Updates only the pose device and mesh without doing any button event checking.
    */
   void _updatePoseAndMesh();
 
@@ -118,6 +113,11 @@ protected:
   AbstractMeshPtr& get_mesh();
 
 public:
+  /**
+   * If the controller is used in a webXR session
+   */
+  bool isXR;
+
   /**
    * The type of controller (Eg. Windows mixed reality)
    */
@@ -160,8 +160,8 @@ protected:
   Vector3 _calculatedPosition;
 
 private:
-  // Represents device position and rotation in room space. Should only be used
-  // to help calculate babylon space values
+  // Represents device position and rotation in room space. Should only be used to help calculate
+  // babylon space values
   Vector3 _deviceRoomPosition;
   Quaternion _deviceRoomRotationQuaternion;
 

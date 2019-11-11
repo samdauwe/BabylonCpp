@@ -14,8 +14,7 @@ class WindowsMotionController;
 using WindowsMotionControllerPtr = std::shared_ptr<WindowsMotionController>;
 
 /**
- * Defines the IMeshInfo object that describes information a webvr controller
- * mesh
+ * @brief Defines the IMeshInfo object that describes information a webvr controller mesh.
  */
 struct BABYLON_SHARED_EXPORT IMeshInfo {
   /**
@@ -29,7 +28,7 @@ struct BABYLON_SHARED_EXPORT IMeshInfo {
 }; // end of struct IMeshInfo
 
 /**
- * Defines the IButtonMeshInfo object that describes a button mesh
+ * @brief Defines the IButtonMeshInfo object that describes a button mesh.
  */
 struct BABYLON_SHARED_EXPORT IButtonMeshInfo : public IMeshInfo {
   /**
@@ -43,7 +42,7 @@ struct BABYLON_SHARED_EXPORT IButtonMeshInfo : public IMeshInfo {
 }; // end of struct IButtonMeshInfo
 
 /**
- * Defines the IAxisMeshInfo object that describes an axis mesh
+ * @brief Defines the IAxisMeshInfo object that describes an axis mesh.
  */
 struct BABYLON_SHARED_EXPORT IAxisMeshInfo : public IMeshInfo {
   /**
@@ -57,8 +56,8 @@ struct BABYLON_SHARED_EXPORT IAxisMeshInfo : public IMeshInfo {
 }; // end of struct IAxisMeshInfo
 
 /**
- * Defines the LoadedMeshInfo object that describes information about the loaded
- * webVR controller mesh
+ * @brief Defines the LoadedMeshInfo object that describes information about the loaded webVR
+ * controller mesh
  */
 struct BABYLON_SHARED_EXPORT LoadedMeshInfo {
   /**
@@ -66,8 +65,7 @@ struct BABYLON_SHARED_EXPORT LoadedMeshInfo {
    */
   AbstractMesh* rootNode = nullptr;
   /**
-   * Node of the mesh corrisponding to the direction the ray should be cast from
-   * the controller
+   * Node of the mesh corresponding to the direction the ray should be cast from the controller
    */
   AbstractMesh* pointingPoseNode = nullptr;
   /**
@@ -85,27 +83,22 @@ struct BABYLON_SHARED_EXPORT LoadedMeshInfo {
  */
 struct WindowsMotionControllerFactory : public _GamePadFactory {
   /**
-   * @brief Returns wether or not the current gamepad can be created for this
-   * type of controller.
-   * @param gamepadInfo Defines the gamepad info as receveid from the controller
-   * APIs.
+   * @brief Returns wether or not the current gamepad can be created for this type of controller.
+   * @param gamepadInfo Defines the gamepad info as receveid from the controller APIs.
    * @returns true if it can be created, otherwise false
    */
   bool canCreate(const IBrowserGamepadPtr& gamepadInfo) const override;
 
   /**
    * @brief Creates a new instance of the Gamepad.
-   * @param gamepadInfo Defines the gamepad info as receveid from the controller
-   * APIs.
+   * @param gamepadInfo Defines the gamepad info as receveid from the controller APIs.
    * @returns the new gamepad instance
    */
-  WebVRControllerPtr
-  create(const IBrowserGamepadPtr& gamepadInfo) const override;
+  WebVRControllerPtr create(const IBrowserGamepadPtr& gamepadInfo) const override;
 }; // end of struct WindowsMotionControllerFactory
 
 /**
- * @brief Defines the WindowsMotionController object that the state of the
- * windows motion controller
+ * @brief Defines the WindowsMotionController object that the state of the windows motion controller
  */
 class BABYLON_SHARED_EXPORT WindowsMotionController : public WebVRController {
 
@@ -183,15 +176,14 @@ public:
   void update() override;
 
   /**
-   * @brief Implements abstract method on WebVRController class, loading
-   * controller meshes and calling this.attachToMesh if successful.
+   * @brief Implements abstract method on WebVRController class, loading controller meshes and
+   * calling this.attachToMesh if successful.
    * @param scene scene in which to add meshes
-   * @param meshLoaded optional callback function that will be called if the
-   * mesh loads successfully.
+   * @param meshLoaded optional callback function that will be called if the mesh loads
+   * successfully.
    */
-  void initControllerMesh(
-    Scene* scene,
-    const std::function<void(AbstractMesh* mesh)>& meshLoaded) override;
+  void initControllerMesh(Scene* scene,
+                          const std::function<void(AbstractMesh* mesh)>& meshLoaded) override;
 
 protected:
   /**
@@ -206,30 +198,25 @@ protected:
    * @param state New state of the button
    * @param changes Which properties on the state changed since last frame
    */
-  void _handleButtonChange(unsigned int buttonIdx,
-                           const ExtendedGamepadButton& state,
+  void _handleButtonChange(unsigned int buttonIdx, const ExtendedGamepadButton& state,
                            const GamepadButtonChanges& changes) override;
 
   /**
-   * @brief Moves the buttons on the controller mesh based on their current
-   * state.
+   * @brief Moves the buttons on the controller mesh based on their current state.
    * @param buttonName the name of the button to move
-   * @param buttonValue the value of the button which determines the buttons new
-   * position
+   * @param buttonValue the value of the button which determines the buttons new position
    */
   void _lerpButtonTransform(const std::string& buttonName, float buttonValue);
 
   /**
    * @brief Moves the axis on the controller mesh based on its current state
    * @param axis the index of the axis
-   * @param axisValue the value of the axis which determines the meshes new
-   * position
+   * @param axisValue the value of the axis which determines the meshes new position
    */
   void _lerpAxisTransform(unsigned int axis, float axisValue);
 
   /**
-   * @brief Gets the ray of the controller in the direction the controller is
-   * pointing.
+   * @brief Gets the ray of the controller in the direction the controller is pointing.
    * @param length the length the resulting ray should be
    * @returns a ray in the direction the controller is pointing
    */
@@ -244,8 +231,7 @@ protected:
   /**
    * @brief Fired when the trigger on this controller is modified.
    */
-  Observable<ExtendedGamepadButton>&
-  get_onTriggerButtonStateChangedObservable();
+  Observable<ExtendedGamepadButton>& get_onTriggerButtonStateChangedObservable();
 
   /**
    * @brief Fired when the menu button on this controller is modified.
@@ -260,14 +246,12 @@ protected:
   /**
    * @brief Fired when the thumbstick button on this controller is modified.
    */
-  Observable<ExtendedGamepadButton>&
-  get_onThumbstickButtonStateChangedObservable();
+  Observable<ExtendedGamepadButton>& get_onThumbstickButtonStateChangedObservable();
 
   /**
    * @brief Fired when the touchpad button on this controller is modified.
    */
-  Observable<ExtendedGamepadButton>&
-  get_onTouchpadButtonStateChangedObservable();
+  Observable<ExtendedGamepadButton>& get_onTouchpadButtonStateChangedObservable();
 
   /**
    * @brief Fired when the touchpad values on this controller are modified.
@@ -278,17 +262,15 @@ private:
   void _updateTrackpad();
 
   /**
-   * @brief Takes a list of meshes (as loaded from the glTF file) and finds the
-   * root node, as well as nodes that can be transformed by button presses and
-   * axes values, based on this._mapping.
+   * @brief Takes a list of meshes (as loaded from the glTF file) and finds the root node, as well
+   * as nodes that can be transformed by button presses and axes values, based on this._mapping.
    *
    * @param scene scene in which the meshes exist
    * @param meshes list of meshes that make up the controller model to process
-   * @return structured view of the given meshes, with mapping of buttons and
-   * axes to meshes that can be transformed.
+   * @return structured view of the given meshes, with mapping of buttons and axes to meshes that
+   * can be transformed.
    */
-  LoadedMeshInfo processModel(Scene* scene,
-                              const std::vector<AbstractMesh*>& meshes);
+  LoadedMeshInfo processModel(Scene* scene, const std::vector<AbstractMesh*>& meshes);
 
   LoadedMeshInfo createMeshInfo(AbstractMesh* rootNode);
 
@@ -310,18 +292,16 @@ private:
   // Semantic button names
   std::vector<std::string> _mappingButtons;
 
-  // A mapping of the button name to glTF model node name
-  // that should be transformed by button value.
+  // A mapping of the button name to glTF model node name that should be transformed by button
+  // value.
   std::unordered_map<std::string, std::string> _mappingButtonMeshNames;
 
-  // This mapping is used to translate from the Motion Controller to Babylon
-  // semantics
+  // This mapping is used to translate from the Motion Controller to Babylon semantics
   std::unordered_map<std::string, std::string> _mappingButtonObservableNames;
 
-  // A mapping of the axis name to glTF model node name
-  // that should be transformed by axis value.
-  // This array mirrors the browserGamepad.axes array, such that
-  // the mesh corresponding to axis 0 is in this array index 0.
+  // A mapping of the axis name to glTF model node name that should be transformed by axis value.
+  // This array mirrors the browserGamepad.axes array, such that the mesh corresponding to axis 0 is
+  // in this array index 0.
   std::vector<std::string> _mappingAxisMeshNames;
   std::string _mappingPointingPoseMeshName;
 

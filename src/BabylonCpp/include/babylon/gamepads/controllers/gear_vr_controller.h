@@ -15,22 +15,18 @@ using GearVRControllerPtr = std::shared_ptr<GearVRController>;
  */
 struct GearVRControllerFactory : public _GamePadFactory {
   /**
-   * @brief Returns wether or not the current gamepad can be created for this
-   * type of controller.
-   * @param gamepadInfo Defines the gamepad info as receveid from the controller
-   * APIs.
+   * @brief Returns wether or not the current gamepad can be created for this type of controller.
+   * @param gamepadInfo Defines the gamepad info as receveid from the controller APIs.
    * @returns true if it can be created, otherwise false
    */
   bool canCreate(const IBrowserGamepadPtr& gamepadInfo) const override;
 
   /**
    * @brief Creates a new instance of the Gamepad.
-   * @param gamepadInfo Defines the gamepad info as receveid from the controller
-   * APIs.
+   * @param gamepadInfo Defines the gamepad info as receveid from the controller APIs.
    * @returns the new gamepad instance
    */
-  WebVRControllerPtr
-  create(const IBrowserGamepadPtr& gamepadInfo) const override;
+  WebVRControllerPtr create(const IBrowserGamepadPtr& gamepadInfo) const override;
 }; // end of struct GearVRControllerFactory
 
 /**
@@ -42,8 +38,7 @@ public:
   /**
    * Base Url for the controller model.
    */
-  static constexpr const char* MODEL_BASE_URL
-    = "https://controllers.babylonjs.com/generic/";
+  static constexpr const char* MODEL_BASE_URL = "https://controllers.babylonjs.com/generic/";
   /**
    * File name for the controller model.
    */
@@ -59,21 +54,19 @@ public:
   template <typename... Ts>
   static GearVRControllerPtr New(Ts&&... args)
   {
-    return std::shared_ptr<GearVRController>(
-      new GearVRController(std::forward<Ts>(args)...));
+    return std::shared_ptr<GearVRController>(new GearVRController(std::forward<Ts>(args)...));
   }
   ~GearVRController() override;
 
   /**
-   * @brief Implements abstract method on WebVRController class, loading
-   * controller meshes and calling this.attachToMesh if successful.
+   * @brief Implements abstract method on WebVRController class, loading controller meshes and
+   * calling this.attachToMesh if successful.
    * @param scene scene in which to add meshes
-   * @param meshLoaded optional callback function that will be called if the
-   * mesh loads successfully.
+   * @param meshLoaded optional callback function that will be called if the mesh loads
+   * successfully.
    */
-  void initControllerMesh(
-    Scene* scene,
-    const std::function<void(AbstractMesh* mesh)>& meshLoaded) override;
+  void initControllerMesh(Scene* scene,
+                          const std::function<void(AbstractMesh* mesh)>& meshLoaded) override;
 
 protected:
   /**
@@ -88,8 +81,7 @@ protected:
    * @param state New state of the button
    * @param changes Which properties on the state changed since last frame
    */
-  void _handleButtonChange(unsigned int buttonIdx,
-                           const ExtendedGamepadButton& state,
+  void _handleButtonChange(unsigned int buttonIdx, const ExtendedGamepadButton& state,
                            const GamepadButtonChanges& changes) override;
 
 private:

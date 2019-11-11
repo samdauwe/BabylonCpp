@@ -16,18 +16,15 @@ const std::string WindowsMotionController::MODEL_RIGHT_FILENAME = "right.glb";
 
 const std::string WindowsMotionController::GAMEPAD_ID_PREFIX
   = "Spatial Controller (Spatial Interaction Source) ";
-const std::string WindowsMotionController::GAMEPAD_ID_PATTERN
-  = "([0-9a-zA-Z]+-[0-9a-zA-Z]+)";
+const std::string WindowsMotionController::GAMEPAD_ID_PATTERN = "([0-9a-zA-Z]+-[0-9a-zA-Z]+)";
 
-bool WindowsMotionControllerFactory::canCreate(
-  const IBrowserGamepadPtr& gamepadInfo) const
+bool WindowsMotionControllerFactory::canCreate(const IBrowserGamepadPtr& gamepadInfo) const
 {
-  return String::startsWith(gamepadInfo->id,
-                            WindowsMotionController::GAMEPAD_ID_PREFIX);
+  return String::startsWith(gamepadInfo->id, WindowsMotionController::GAMEPAD_ID_PREFIX);
 }
 
-WebVRControllerPtr WindowsMotionControllerFactory::create(
-  const IBrowserGamepadPtr& gamepadInfo) const
+WebVRControllerPtr
+WindowsMotionControllerFactory::create(const IBrowserGamepadPtr& gamepadInfo) const
 {
   return WindowsMotionController::New(gamepadInfo);
 }
@@ -86,14 +83,12 @@ WindowsMotionController::get_onTriggerButtonStateChangedObservable()
   return onTriggerStateChangedObservable;
 }
 
-Observable<ExtendedGamepadButton>&
-WindowsMotionController::get_onMenuButtonStateChangedObservable()
+Observable<ExtendedGamepadButton>& WindowsMotionController::get_onMenuButtonStateChangedObservable()
 {
   return onSecondaryButtonStateChangedObservable;
 }
 
-Observable<ExtendedGamepadButton>&
-WindowsMotionController::get_onGripButtonStateChangedObservable()
+Observable<ExtendedGamepadButton>& WindowsMotionController::get_onGripButtonStateChangedObservable()
 {
   return onMainButtonStateChangedObservable;
 }
@@ -110,8 +105,7 @@ WindowsMotionController::get_onTouchpadButtonStateChangedObservable()
   return onTrackpadChangedObservable;
 }
 
-Observable<StickValues>&
-WindowsMotionController::get_onTouchpadValuesChangedObservable()
+Observable<StickValues>& WindowsMotionController::get_onTouchpadValuesChangedObservable()
 {
   return onTrackpadValuesChangedObservable;
 }
@@ -144,9 +138,9 @@ void WindowsMotionController::update()
   }
 }
 
-void WindowsMotionController::_handleButtonChange(
-  unsigned int buttonIdx, const ExtendedGamepadButton& state,
-  const GamepadButtonChanges& /*changes*/)
+void WindowsMotionController::_handleButtonChange(unsigned int buttonIdx,
+                                                  const ExtendedGamepadButton& state,
+                                                  const GamepadButtonChanges& /*changes*/)
 {
   if (buttonIdx < _mappingButtons.size()) {
     return;
@@ -186,8 +180,7 @@ void WindowsMotionController::_handleButtonChange(
   _lerpButtonTransform(buttonName, static_cast<float>(state.value()));
 }
 
-void WindowsMotionController::_lerpButtonTransform(
-  const std::string& buttonName, float buttonValue)
+void WindowsMotionController::_lerpButtonTransform(const std::string& buttonName, float buttonValue)
 {
   // If there is no loaded mesh, there is nothing to transform.
   if (!_loadedMeshInfo) {
@@ -200,8 +193,7 @@ void WindowsMotionController::_lerpButtonTransform(
 
   auto meshInfo = (*_loadedMeshInfo).buttonMeshes.at(buttonName);
   if (!meshInfo || !(*meshInfo).unpressed->rotationQuaternion()
-      || !(*meshInfo).pressed->rotationQuaternion()
-      || !(*meshInfo).value->rotationQuaternion()) {
+      || !(*meshInfo).pressed->rotationQuaternion() || !(*meshInfo).value->rotationQuaternion()) {
     return;
   }
 
@@ -215,8 +207,7 @@ void WindowsMotionController::_lerpButtonTransform(
                      (*meshInfo).value->position());
 }
 
-void WindowsMotionController::_lerpAxisTransform(unsigned int axis,
-                                                 float axisValue)
+void WindowsMotionController::_lerpAxisTransform(unsigned int axis, float axisValue)
 {
   if (!_loadedMeshInfo) {
     return;
@@ -227,8 +218,7 @@ void WindowsMotionController::_lerpAxisTransform(unsigned int axis,
   }
 
   auto meshInfo = (*_loadedMeshInfo).axisMeshes.at(axis);
-  if (!meshInfo || !(*meshInfo).min->rotationQuaternion()
-      || !(*meshInfo).max->rotationQuaternion()
+  if (!meshInfo || !(*meshInfo).min->rotationQuaternion() || !(*meshInfo).max->rotationQuaternion()
       || !(*meshInfo).value->rotationQuaternion()) {
     return;
   }
@@ -246,14 +236,12 @@ void WindowsMotionController::_lerpAxisTransform(unsigned int axis,
 }
 
 void WindowsMotionController::initControllerMesh(
-  Scene* /*scene*/,
-  const std::function<void(AbstractMesh* mesh)>& /*meshLoaded*/)
+  Scene* /*scene*/, const std::function<void(AbstractMesh* mesh)>& /*meshLoaded*/)
 {
 }
 
-LoadedMeshInfo
-WindowsMotionController::processModel(Scene* scene,
-                                      const std::vector<AbstractMesh*>& meshes)
+LoadedMeshInfo WindowsMotionController::processModel(Scene* scene,
+                                                     const std::vector<AbstractMesh*>& meshes)
 {
   LoadedMeshInfo loadedMeshInfo;
 
@@ -281,15 +269,13 @@ WindowsMotionController::processModel(Scene* scene,
     loadedMeshInfo = createMeshInfo(parentMesh.get());
   }
   else {
-    BABYLON_LOG_WARN("WindowsMotionController",
-                     "Could not find root node in model file.")
+    BABYLON_LOG_WARN("WindowsMotionController", "Could not find root node in model file.")
   }
 
   return loadedMeshInfo;
 }
 
-LoadedMeshInfo
-WindowsMotionController::createMeshInfo(AbstractMesh* /*rootNode*/)
+LoadedMeshInfo WindowsMotionController::createMeshInfo(AbstractMesh* /*rootNode*/)
 {
   return LoadedMeshInfo();
 }

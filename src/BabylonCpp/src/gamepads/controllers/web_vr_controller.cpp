@@ -56,17 +56,16 @@ void WebVRController::update()
   }
 }
 
-void WebVRController::_setButtonValue(
-  std::optional<ExtendedGamepadButton> newState,
-  const std::optional<ExtendedGamepadButton>& currentState,
-  unsigned int buttonIndex)
+void WebVRController::_setButtonValue(std::optional<ExtendedGamepadButton> newState,
+                                      const std::optional<ExtendedGamepadButton>& currentState,
+                                      unsigned int buttonIndex)
 {
   if (!newState) {
     newState = ExtendedGamepadButton(0, false, false);
   }
   if (!currentState) {
-    _buttons[buttonIndex] = ExtendedGamepadButton(
-      (*newState).value(), (*newState).touched(), (*newState).pressed());
+    _buttons[buttonIndex]
+      = ExtendedGamepadButton((*newState).value(), (*newState).touched(), (*newState).pressed());
     return;
   }
   _checkChanges(*newState, *currentState);
@@ -80,19 +79,16 @@ void WebVRController::_setButtonValue(
   _buttons[buttonIndex].setPressed((*newState).pressed());
   _buttons[buttonIndex].setTouched((*newState).touched());
   // oculus triggers are never 0, thou not touched.
-  _buttons[buttonIndex].setValue(
-    (*newState).value() < 0.00000001f ? 0 : (*newState).value());
+  _buttons[buttonIndex].setValue((*newState).value() < 0.00000001f ? 0 : (*newState).value());
 }
 
-GamepadButtonChanges&
-WebVRController::_checkChanges(const ExtendedGamepadButton& newState,
-                               const ExtendedGamepadButton& currentState)
+GamepadButtonChanges& WebVRController::_checkChanges(const ExtendedGamepadButton& newState,
+                                                     const ExtendedGamepadButton& currentState)
 {
   _changes.pressChanged = newState.pressed() != currentState.pressed();
   _changes.touchChanged = newState.touched() != currentState.touched();
   _changes.valueChanged = newState.value() != currentState.value();
-  _changes.changed
-    = _changes.pressChanged || _changes.touchChanged || _changes.valueChanged;
+  _changes.changed      = _changes.pressChanged || _changes.touchChanged || _changes.valueChanged;
   return _changes;
 }
 

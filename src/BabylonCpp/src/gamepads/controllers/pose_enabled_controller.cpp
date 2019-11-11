@@ -8,9 +8,9 @@
 
 namespace BABYLON {
 
-PoseEnabledController::PoseEnabledController(
-  const IBrowserGamepadPtr& iBrowserGamepad)
+PoseEnabledController::PoseEnabledController(const IBrowserGamepadPtr& iBrowserGamepad)
     : Gamepad(iBrowserGamepad->id, iBrowserGamepad->index, iBrowserGamepad)
+    , isXR{false}
     , _mesh{nullptr}
     , _deviceToWorld{Matrix::Identity()}
     , _pointingPoseNode{nullptr}
@@ -31,8 +31,7 @@ PoseEnabledController::PoseEnabledController(
   _draggedRoomRotation        = 0.f;
 
   _calculatedPosition = Vector3::Zero();
-  Quaternion::RotationYawPitchRollToRef(Math::PI, 0, 0,
-                                        _leftHandSystemQuaternion);
+  Quaternion::RotationYawPitchRollToRef(Math::PI, 0, 0, _leftHandSystemQuaternion);
 }
 
 PoseEnabledController::~PoseEnabledController()
@@ -49,19 +48,24 @@ void PoseEnabledController::_disableTrackPosition(const Vector3& fixedPosition)
 
 void PoseEnabledController::update()
 {
+  if (isXR) {
+    return;
+  }
   Gamepad::update();
   _updatePoseAndMesh();
 }
 
 void PoseEnabledController::_updatePoseAndMesh()
 {
+  if (isXR) {
+    return;
+  }
   const auto& pose = browserGamepad->pose;
   if (pose) {
     updateFromDevice(*pose);
   }
 
-  Vector3::TransformCoordinatesToRef(_calculatedPosition, _deviceToWorld,
-                                     devicePosition);
+  Vector3::TransformCoordinatesToRef(_calculatedPosition, _deviceToWorld, devicePosition);
   _deviceToWorld.getRotationMatrixToRef(_workingMatrix);
   Quaternion::FromRotationMatrixToRef(_workingMatrix, deviceRotationQuaternion);
   deviceRotationQuaternion.multiplyInPlace(_calculatedRotation);
@@ -76,10 +80,13 @@ void PoseEnabledController::_updatePoseAndMesh()
 
 void PoseEnabledController::updateFromDevice(const DevicePose& poseData)
 {
+  if (isXR) {
+    return;
+  }
   rawPose = poseData;
   if (!poseData.position.empty()) {
-    _deviceRoomPosition.copyFromFloats(
-      poseData.position[0], poseData.position[1], -poseData.position[2]);
+    _deviceRoomPosition.copyFromFloats(poseData.position[0], poseData.position[1],
+                                       -poseData.position[2]);
     if (_mesh && _mesh->getScene()->useRightHandedSystem()) {
       _deviceRoomPosition.z *= -1.f;
     }
@@ -88,10 +95,9 @@ void PoseEnabledController::updateFromDevice(const DevicePose& poseData)
     _calculatedPosition.addInPlace(position);
   }
   auto& pose = rawPose;
-  if (!poseData.orientation.empty() && !pose.orientation.empty()) {
-    _deviceRoomRotationQuaternion.copyFromFloats(
-      pose.orientation[0], pose.orientation[1], -pose.orientation[2],
-      -pose.orientation[3]);
+  if (!poseData.orientation.empty() && !pose.orientation.empty() && pose.orientation.size() == 4) {
+    _deviceRoomRotationQuaternion.copyFromFloats(pose.orientation[0], pose.orientation[1],
+                                                 -pose.orientation[2], -pose.orientation[3]);
     if (_mesh) {
       if (_mesh->getScene()->useRightHandedSystem()) {
         _deviceRoomRotationQuaternion.z *= -1.f;
@@ -104,8 +110,7 @@ void PoseEnabledController::updateFromDevice(const DevicePose& poseData)
     }
 
     // if the camera is set, rotate to the camera's rotation
-    _deviceRoomRotationQuaternion.multiplyToRef(rotationQuaternion,
-                                                _calculatedRotation);
+    _deviceRoomRotationQuaternion.multiplyToRef(rotationQuaternion, _calculatedRotation);
   }
 }
 
@@ -124,17 +129,19 @@ void PoseEnabledController::attachToMesh(const AbstractMeshPtr& iMesh)
 
   // Sync controller mesh and pointing pose node's state with controller, this
   // is done to avoid a frame where position is 0,0,0 when attaching mesh
-  _updatePoseAndMesh();
-  if (_pointingPoseNode) {
-    std::vector<Node*> parents;
-    auto obj = static_cast<Node*>(_pointingPoseNode);
-    while (obj && obj->parent()) {
-      parents.emplace_back(obj->parent());
-      obj = obj->parent();
-    }
-    std::reverse(parents.begin(), parents.end());
-    for (auto& p : parents) {
-      p->computeWorldMatrix(true);
+  if (!isXR) {
+    _updatePoseAndMesh();
+    if (_pointingPoseNode) {
+      std::vector<Node*> parents;
+      auto obj = static_cast<Node*>(_pointingPoseNode);
+      while (obj && obj->parent()) {
+        parents.emplace_back(obj->parent());
+        obj = obj->parent();
+      }
+      std::reverse(parents.begin(), parents.end());
+      for (auto& p : parents) {
+        p->computeWorldMatrix(true);
+      }
     }
   }
 
@@ -170,8 +177,7 @@ Ray PoseEnabledController::getForwardRay(float length)
     return Ray(Vector3::Zero(), Vector3{0.f, 0.f, 1.f}, length);
   }
 
-  auto m = _pointingPoseNode ? _pointingPoseNode->getWorldMatrix() :
-                               mesh()->getWorldMatrix();
+  auto m      = _pointingPoseNode ? _pointingPoseNode->getWorldMatrix() : mesh()->getWorldMatrix();
   auto origin = m.getTranslation();
 
   Vector3 forward{0.f, 0.f, -1.f};

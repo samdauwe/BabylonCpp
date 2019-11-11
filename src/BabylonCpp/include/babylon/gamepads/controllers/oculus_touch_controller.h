@@ -15,22 +15,18 @@ using OculusTouchControllerPtr = std::shared_ptr<OculusTouchController>;
  */
 struct OculusTouchControllerFactory : public _GamePadFactory {
   /**
-   * @brief Returns wether or not the current gamepad can be created for this
-   * type of controller.
-   * @param gamepadInfo Defines the gamepad info as receveid from the controller
-   * APIs.
+   * @brief Returns wether or not the current gamepad can be created for this type of controller.
+   * @param gamepadInfo Defines the gamepad info as receveid from the controller APIs.
    * @returns true if it can be created, otherwise false
    */
   bool canCreate(const IBrowserGamepadPtr& gamepadInfo) const override;
 
   /**
    * @brief Creates a new instance of the Gamepad.
-   * @param gamepadInfo Defines the gamepad info as receveid from the controller
-   * APIs.
+   * @param gamepadInfo Defines the gamepad info as receveid from the controller APIs.
    * @returns the new gamepad instance
    */
-  WebVRControllerPtr
-  create(const IBrowserGamepadPtr& gamepadInfo) const override;
+  WebVRControllerPtr create(const IBrowserGamepadPtr& gamepadInfo) const override;
 }; // end of struct OculusTouchControllerFactory
 
 /**
@@ -42,8 +38,7 @@ public:
   /**
    * Base Url for the controller model.
    */
-  static constexpr const char* MODEL_BASE_URL
-    = "https://controllers.babylonjs.com/oculus/";
+  static constexpr const char* MODEL_BASE_URL = "https://controllers.babylonjs.com/oculus/";
   /**
    * File name for the left controller model.
    */
@@ -52,6 +47,18 @@ public:
    * File name for the right controller model.
    */
   static constexpr const char* MODEL_RIGHT_FILENAME = "right.babylon";
+
+  /**
+   * Base Url for the Quest controller model.
+   */
+  static constexpr const char* QUEST_MODEL_BASE_URL
+    = "https://controllers.babylonjs.com/oculusQuest/";
+
+  /**
+   * @hidden
+   * If the controllers are running on a device that needs the updated Quest controller models
+   */
+  static bool _IsQuest;
 
 public:
   template <typename... Ts>
@@ -63,15 +70,14 @@ public:
   ~OculusTouchController() override;
 
   /**
-   * @brief Implements abstract method on WebVRController class, loading
-   * controller meshes and calling this.attachToMesh if successful.
+   * @brief Implements abstract method on WebVRController class, loading controller meshes and
+   * calling this.attachToMesh if successful.
    * @param scene scene in which to add meshes
-   * @param meshLoaded optional callback function that will be called if the
-   * mesh loads successfully.
+   * @param meshLoaded optional callback function that will be called if the mesh loads
+   * successfully.
    */
-  void initControllerMesh(
-    Scene* scene,
-    const std::function<void(AbstractMesh* mesh)>& meshLoaded) override;
+  void initControllerMesh(Scene* scene,
+                          const std::function<void(AbstractMesh* mesh)>& meshLoaded) override;
 
 protected:
   /**
@@ -101,17 +107,18 @@ protected:
   Observable<ExtendedGamepadButton>& get_onYButtonStateChangedObservable();
 
   /**
-   * @brief Called once for each button that changed state since the last frame.
-   * 0) thumb stick (touch, press, value = pressed (0,1)). value is in
-   * this.leftStick 1) index trigger (touch (?), press (only when value > 0.1),
-   * value 0 to 1) 2) secondary trigger (same) 3) A (right) X (left), touch,
-   * pressed = value 4) B / Y 5) thumb rest
+   * @brief Called once for each button that changed state since the last frame
+   * 0) thumb stick (touch, press, value = pressed (0,1)). value is in this.leftStick
+   * 1) index trigger (touch (?), press (only when value > 0.1), value 0 to 1)
+   * 2) secondary trigger (same)
+   * 3) A (right) X (left), touch, pressed = value
+   * 4) B / Y
+   * 5) thumb rest
    * @param buttonIdx Which button index changed
    * @param state New state of the button
    * @param changes Which properties on the state changed since last frame
    */
-  void _handleButtonChange(unsigned int buttonIdx,
-                           const ExtendedGamepadButton& state,
+  void _handleButtonChange(unsigned int buttonIdx, const ExtendedGamepadButton& state,
                            const GamepadButtonChanges& changes) override;
 
 public:
