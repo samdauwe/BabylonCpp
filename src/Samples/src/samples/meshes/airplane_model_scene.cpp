@@ -43,7 +43,7 @@ public:
     auto light1       = HemisphericLight::New("light1", Vector3(1.f, 0.5f, 0.f), scene);
     light1->intensity = 0.7f;
 
-    auto light2         = HemisphericLight::New("hemi", Vector3(0, 1, 0), scene);
+    auto light2         = HemisphericLight::New("hemi", Vector3(0.f, 1.f, 0.f), scene);
     light2->groundColor = Color3(0.2f, 0.2f, 0.2f);
     light2->intensity   = 0.2f;
 

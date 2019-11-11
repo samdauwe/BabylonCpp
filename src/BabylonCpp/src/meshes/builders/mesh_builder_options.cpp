@@ -11,9 +11,9 @@ BoxOptions::BoxOptions()
     , width{std::nullopt}
     , height{std::nullopt}
     , depth{std::nullopt}
-    , faceUV{{Vector4(0.f, 0.f, 1.f, 1.f), Vector4(0.f, 0.f, 1.f, 1.f),
+    , faceUV{{Vector4(0.f, 0.f, 1.f, 1.f), Vector4(0.f, 0.f, 1.f, 1.f), Vector4(0.f, 0.f, 1.f, 1.f),
               Vector4(0.f, 0.f, 1.f, 1.f), Vector4(0.f, 0.f, 1.f, 1.f),
-              Vector4(0.f, 0.f, 1.f, 1.f), Vector4(0.f, 0.f, 1.f, 1.f)}}
+              Vector4(0.f, 0.f, 1.f, 1.f)}}
     , faceColors{{Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f),
                   Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f),
                   Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f)}}
@@ -43,10 +43,8 @@ CylinderOptions::CylinderOptions()
     , tessellation{std::nullopt}
     , subdivisions{std::nullopt}
     , arc{std::nullopt}
-    , faceColors{Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f),
-                 Color4(1.f, 1.f, 1.f, 1.f)}
-    , faceUV{Vector4(0.f, 0.f, 1.f, 1.f), Vector4(0.f, 0.f, 1.f, 1.f),
-             Vector4(0.f, 0.f, 1.f, 1.f)}
+    , faceColors{}
+    , faceUV{}
     , updatable{std::nullopt}
     , hasRings{std::nullopt}
     , enclose{std::nullopt}
@@ -83,10 +81,7 @@ DashedLinesOptions::~DashedLinesOptions()
 //------------------------------------------------------------------------------
 
 DecalOptions::DecalOptions()
-    : position{std::nullopt}
-    , normal{std::nullopt}
-    , size{std::nullopt}
-    , angle{std::nullopt}
+    : position{std::nullopt}, normal{std::nullopt}, size{std::nullopt}, angle{std::nullopt}
 {
 }
 
@@ -203,9 +198,7 @@ GroundOptions::~GroundOptions()
 //------------------------------------------------------------------------------
 
 HemisphereOptions::HemisphereOptions()
-    : segments{std::nullopt}
-    , diameter{std::nullopt}
-    , sideOrientation{std::nullopt}
+    : segments{std::nullopt}, diameter{std::nullopt}, sideOrientation{std::nullopt}
 {
 }
 
@@ -484,9 +477,9 @@ TiledBoxOptions::TiledBoxOptions()
     , tileHeight{std::nullopt}
     , alignHorizontal{std::nullopt}
     , alignVertical{std::nullopt}
-    , faceUV{{Vector4(0.f, 0.f, 1.f, 1.f), Vector4(0.f, 0.f, 1.f, 1.f),
+    , faceUV{{Vector4(0.f, 0.f, 1.f, 1.f), Vector4(0.f, 0.f, 1.f, 1.f), Vector4(0.f, 0.f, 1.f, 1.f),
               Vector4(0.f, 0.f, 1.f, 1.f), Vector4(0.f, 0.f, 1.f, 1.f),
-              Vector4(0.f, 0.f, 1.f, 1.f), Vector4(0.f, 0.f, 1.f, 1.f)}}
+              Vector4(0.f, 0.f, 1.f, 1.f)}}
     , faceColors{{Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f),
                   Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f),
                   Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f)}}

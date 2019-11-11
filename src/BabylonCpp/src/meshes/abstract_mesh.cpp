@@ -44,8 +44,7 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     : TransformNode{iName, scene, false}
     , cullingStrategy{AbstractMesh::CULLINGSTRATEGY_STANDARD}
     , facetNb{this, &AbstractMesh::get_facetNb}
-    , partitioningSubdivisions{this,
-                               &AbstractMesh::get_partitioningSubdivisions,
+    , partitioningSubdivisions{this, &AbstractMesh::get_partitioningSubdivisions,
                                &AbstractMesh::set_partitioningSubdivisions}
     , partitioningBBoxRatio{this, &AbstractMesh::get_partitioningBBoxRatio,
                             &AbstractMesh::set_partitioningBBoxRatio}
@@ -55,32 +54,23 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
                          &AbstractMesh::set_facetDepthSortFrom}
     , isFacetDataEnabled{this, &AbstractMesh::get_isFacetDataEnabled}
     , onCollide{this, &AbstractMesh::set_onCollide}
-    , onCollisionPositionChange{this,
-                                &AbstractMesh::set_onCollisionPositionChange}
+    , onCollisionPositionChange{this, &AbstractMesh::set_onCollisionPositionChange}
     , definedFacingForward{true} // orientation for POV movement & rotation
     , _occlusionQuery{nullptr}
     , _renderingGroup{nullptr}
     , _occlusionDataStorage{this, &AbstractMesh::get__occlusionDataStorage}
     , occlusionRetryCount{this, &AbstractMesh::get_occlusionRetryCount,
                           &AbstractMesh::set_occlusionRetryCount}
-    , occlusionType{this, &AbstractMesh::get_occlusionType,
-                    &AbstractMesh::set_occlusionType}
-    , occlusionQueryAlgorithmType{this,
-                                  &AbstractMesh::
-                                    get_occlusionQueryAlgorithmType,
-                                  &AbstractMesh::
-                                    set_occlusionQueryAlgorithmType}
-    , isOccluded{this, &AbstractMesh::get_isOccluded,
-                 &AbstractMesh::set_isOccluded}
-    , isOcclusionQueryInProgress{this,
-                                 &AbstractMesh::get_isOcclusionQueryInProgress}
-    , visibility{this, &AbstractMesh::get_visibility,
-                 &AbstractMesh::set_visibility}
+    , occlusionType{this, &AbstractMesh::get_occlusionType, &AbstractMesh::set_occlusionType}
+    , occlusionQueryAlgorithmType{this, &AbstractMesh::get_occlusionQueryAlgorithmType,
+                                  &AbstractMesh::set_occlusionQueryAlgorithmType}
+    , isOccluded{this, &AbstractMesh::get_isOccluded, &AbstractMesh::set_isOccluded}
+    , isOcclusionQueryInProgress{this, &AbstractMesh::get_isOcclusionQueryInProgress}
+    , visibility{this, &AbstractMesh::get_visibility, &AbstractMesh::set_visibility}
     , alphaIndex{std::numeric_limits<int>::max()}
     , isVisible{true}
     , isPickable{true}
-    , showBoundingBox{this, &AbstractMesh::get_showBoundingBox,
-                      &AbstractMesh::set_showBoundingBox}
+    , showBoundingBox{this, &AbstractMesh::get_showBoundingBox, &AbstractMesh::set_showBoundingBox}
     , showSubMeshesBoundingBox{false}
     , isBlocker{false}
     , enablePointerMoveEvents{false}
@@ -88,22 +78,16 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
                        &AbstractMesh::set_renderingGroupId}
     , material{this, &AbstractMesh::get_material, &AbstractMesh::set_material}
     , _savedMaterial{nullptr}
-    , receiveShadows{this, &AbstractMesh::get_receiveShadows,
-                     &AbstractMesh::set_receiveShadows}
-    , renderOutline{this, &AbstractMesh::get_renderOutline,
-                    &AbstractMesh::set_renderOutline}
+    , receiveShadows{this, &AbstractMesh::get_receiveShadows, &AbstractMesh::set_receiveShadows}
+    , renderOutline{this, &AbstractMesh::get_renderOutline, &AbstractMesh::set_renderOutline}
     , outlineColor{Color3::Red()}
     , outlineWidth{0.02f}
-    , renderOverlay{this, &AbstractMesh::get_renderOverlay,
-                    &AbstractMesh::set_renderOverlay}
+    , renderOverlay{this, &AbstractMesh::get_renderOverlay, &AbstractMesh::set_renderOverlay}
     , overlayColor{Color3::Red()}
     , overlayAlpha{0.5f}
-    , hasVertexAlpha{this, &AbstractMesh::get_hasVertexAlpha,
-                     &AbstractMesh::set_hasVertexAlpha}
-    , useVertexColors{this, &AbstractMesh::get_useVertexColors,
-                      &AbstractMesh::set_useVertexColors}
-    , computeBonesUsingShaders{this,
-                               &AbstractMesh::get_computeBonesUsingShaders,
+    , hasVertexAlpha{this, &AbstractMesh::get_hasVertexAlpha, &AbstractMesh::set_hasVertexAlpha}
+    , useVertexColors{this, &AbstractMesh::get_useVertexColors, &AbstractMesh::set_useVertexColors}
+    , computeBonesUsingShaders{this, &AbstractMesh::get_computeBonesUsingShaders,
                                &AbstractMesh::set_computeBonesUsingShaders}
     , numBoneInfluencers{this, &AbstractMesh::get_numBoneInfluencers,
                          &AbstractMesh::set_numBoneInfluencers}
@@ -111,19 +95,15 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , useOctreeForRenderingSelection{true}
     , useOctreeForPicking{true}
     , useOctreeForCollisions{true}
-    , layerMask{this, &AbstractMesh::get_layerMask,
-                &AbstractMesh::set_layerMask}
+    , layerMask{this, &AbstractMesh::get_layerMask, &AbstractMesh::set_layerMask}
     , alwaysSelectAsActiveMesh{false}
     , doNotSyncBoundingInfo{false}
     , actionManager{nullptr}
-    , physicsImpostor{this, &AbstractMesh::get_physicsImpostor,
-                      &AbstractMesh::set_physicsImpostor}
+    , physicsImpostor{this, &AbstractMesh::get_physicsImpostor, &AbstractMesh::set_physicsImpostor}
     , ellipsoid{Vector3(0.5f, 1.f, 0.5f)}
     , ellipsoidOffset{Vector3(0, 0, 0)}
-    , collisionMask{this, &AbstractMesh::get_collisionMask,
-                    &AbstractMesh::set_collisionMask}
-    , collisionGroup{this, &AbstractMesh::get_collisionGroup,
-                     &AbstractMesh::set_collisionGroup}
+    , collisionMask{this, &AbstractMesh::get_collisionMask, &AbstractMesh::set_collisionMask}
+    , collisionGroup{this, &AbstractMesh::get_collisionGroup, &AbstractMesh::set_collisionGroup}
     , edgesWidth{1.f}
     , edgesColor{Color4(1.f, 0.f, 0.f, 1.f)}
     , _edgesRenderer{nullptr}
@@ -147,8 +127,7 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , useBones{this, &AbstractMesh::get_useBones}
     , isAnInstance{this, &AbstractMesh::get_isAnInstance}
     , hasInstances{this, &AbstractMesh::get_hasInstances}
-    , checkCollisions{this, &AbstractMesh::get_checkCollisions,
-                      &AbstractMesh::set_checkCollisions}
+    , checkCollisions{this, &AbstractMesh::get_checkCollisions, &AbstractMesh::set_checkCollisions}
     , collider{this, &AbstractMesh::get_collider}
     , _renderingGroupId{0}
     , _material{nullptr}
@@ -238,8 +217,7 @@ bool AbstractMesh::_updateNonUniformScalingState(bool value)
   return true;
 }
 
-void AbstractMesh::set_onCollide(
-  const std::function<void(AbstractMesh*, EventState&)>& callback)
+void AbstractMesh::set_onCollide(const std::function<void(AbstractMesh*, EventState&)>& callback)
 {
   if (_meshCollisionData._onCollideObserver) {
     onCollideObservable.remove(_meshCollisionData._onCollideObserver);
@@ -458,8 +436,7 @@ float AbstractMesh::get_visibility() const
 
 void AbstractMesh::set_visibility(float value)
 {
-  if (stl_util::almost_equal(_internalAbstractMeshDataInfo._visibility,
-                             value)) {
+  if (stl_util::almost_equal(_internalAbstractMeshDataInfo._visibility, value)) {
     return;
   }
 
@@ -533,8 +510,8 @@ std::string AbstractMesh::toString(bool fullDetails) const
   }
   if (fullDetails) {
     oss << ", billboard mode: ";
-    const std::vector<std::string> billboardModes{
-      "NONE", "X", "Y", "null", "Z", "null", "null", "ALL"};
+    const std::vector<std::string> billboardModes{"NONE", "X",    "Y",    "null",
+                                                  "Z",    "null", "null", "ALL"};
     if (billboardMode < billboardModes.size()) {
       oss << billboardModes[billboardMode];
     }
@@ -543,8 +520,7 @@ std::string AbstractMesh::toString(bool fullDetails) const
     }
     oss << ", freeze wrld mat: "
         << (_isWorldMatrixFrozen
-                || (_waitingData.freezeWorldMatrix.has_value()
-                    && *_waitingData.freezeWorldMatrix) ?
+                || (_waitingData.freezeWorldMatrix.has_value() && *_waitingData.freezeWorldMatrix) ?
               "YES" :
               "NO");
   }
@@ -560,8 +536,9 @@ Node* AbstractMesh::_getEffectiveParent()
   return TransformNode::_getEffectiveParent();
 }
 
-AbstractActionManagerPtr AbstractMesh::_getActionManagerForTrigger(
-  const std::optional<unsigned int>& trigger, bool initialCall)
+AbstractActionManagerPtr
+AbstractMesh::_getActionManagerForTrigger(const std::optional<unsigned int>& trigger,
+                                          bool initialCall)
 {
   if (actionManager && (initialCall || actionManager->isRecursive)) {
     if (trigger) {
@@ -651,9 +628,8 @@ void AbstractMesh::_removeLightSource(const LightPtr& light, bool dispose)
 
 void AbstractMesh::_removeLightSource(Light* light, bool dispose)
 {
-  auto index = std::find_if(
-    _lightSources.begin(), _lightSources.end(),
-    [light](const LightPtr& _light) { return _light.get() == light; });
+  auto index = std::find_if(_lightSources.begin(), _lightSources.end(),
+                            [light](const LightPtr& _light) { return _light.get() == light; });
 
   if (index == _lightSources.end()) {
     return;
@@ -664,8 +640,7 @@ void AbstractMesh::_removeLightSource(Light* light, bool dispose)
   _markSubMeshesAsLightDirty(dispose);
 }
 
-void AbstractMesh::_markSubMeshesAsDirty(
-  const std::function<void(MaterialDefines& defines)>& func)
+void AbstractMesh::_markSubMeshesAsDirty(const std::function<void(MaterialDefines& defines)>& func)
 {
   if (subMeshes.empty()) {
     return;
@@ -680,16 +655,13 @@ void AbstractMesh::_markSubMeshesAsDirty(
 
 void AbstractMesh::_markSubMeshesAsLightDirty(bool dispose)
 {
-  const auto func = [dispose](MaterialDefines& defines) {
-    defines.markAsLightDirty(dispose);
-  };
+  const auto func = [dispose](MaterialDefines& defines) { defines.markAsLightDirty(dispose); };
   _markSubMeshesAsDirty(func);
 }
 
 void AbstractMesh::_markSubMeshesAsAttributesDirty()
 {
-  const auto func
-    = [](MaterialDefines& defines) { defines.markAsAttributesDirty(); };
+  const auto func = [](MaterialDefines& defines) { defines.markAsAttributesDirty(); };
   _markSubMeshesAsDirty(func);
 }
 
@@ -775,14 +747,12 @@ AbstractMesh& AbstractMesh::disableEdgesRendering()
   return *this;
 }
 
-AbstractMesh&
-AbstractMesh::enableEdgesRendering(float epsilon,
-                                   bool checkVerticesInsteadOfIndices)
+AbstractMesh& AbstractMesh::enableEdgesRendering(float epsilon, bool checkVerticesInsteadOfIndices)
 {
   disableEdgesRendering();
 
-  _edgesRenderer = std::make_unique<EdgesRenderer>(
-    shared_from_base<AbstractMesh>(), epsilon, checkVerticesInsteadOfIndices);
+  _edgesRenderer = std::make_unique<EdgesRenderer>(shared_from_base<AbstractMesh>(), epsilon,
+                                                   checkVerticesInsteadOfIndices);
 
   return *this;
 }
@@ -797,8 +767,7 @@ bool AbstractMesh::get_isBlocked() const
   return false;
 }
 
-AbstractMesh* AbstractMesh::getLOD(const CameraPtr& /*camera*/,
-                                   BoundingSphere* /*boundingSphere*/)
+AbstractMesh* AbstractMesh::getLOD(const CameraPtr& /*camera*/, BoundingSphere* /*boundingSphere*/)
 {
   return this;
 }
@@ -808,37 +777,32 @@ size_t AbstractMesh::getTotalVertices() const
   return 0;
 }
 
-Uint32Array AbstractMesh::getIndices(bool /*copyWhenShared*/,
-                                     bool /*forceCopy*/)
+Uint32Array AbstractMesh::getIndices(bool /*copyWhenShared*/, bool /*forceCopy*/)
 {
   return Uint32Array();
 }
 
-Float32Array AbstractMesh::getVerticesData(const std::string& /*kind*/,
-                                           bool /*copyWhenShared*/,
+Float32Array AbstractMesh::getVerticesData(const std::string& /*kind*/, bool /*copyWhenShared*/,
                                            bool /*forceCopy*/)
 {
   return Float32Array();
 }
 
-AbstractMesh*
-AbstractMesh::setVerticesData(const std::string& /*kind*/,
-                              const Float32Array& /*data*/, bool /*updatable*/,
-                              const std::optional<size_t>& /*stride*/)
+AbstractMesh* AbstractMesh::setVerticesData(const std::string& /*kind*/,
+                                            const Float32Array& /*data*/, bool /*updatable*/,
+                                            const std::optional<size_t>& /*stride*/)
 {
   return this;
 }
 
 AbstractMesh* AbstractMesh::updateVerticesData(const std::string& /*kind*/,
-                                               const Float32Array& /*data*/,
-                                               bool /*updateExtends*/,
+                                               const Float32Array& /*data*/, bool /*updateExtends*/,
                                                bool /*makeItUnique*/)
 {
   return this;
 }
 
-AbstractMesh* AbstractMesh::setIndices(const IndicesArray& /*indices*/,
-                                       size_t /*totalVertices*/,
+AbstractMesh* AbstractMesh::setIndices(const IndicesArray& /*indices*/, size_t /*totalVertices*/,
                                        bool /*updatable*/)
 {
   return this;
@@ -863,12 +827,11 @@ BoundingInfoPtr& AbstractMesh::getBoundingInfo()
   return _boundingInfo;
 }
 
-AbstractMesh& AbstractMesh::normalizeToUnitCube(
-  bool includeDescendants, bool ignoreRotation,
-  const std::function<bool(const AbstractMeshPtr& node)>& predicate)
+AbstractMesh&
+AbstractMesh::normalizeToUnitCube(bool includeDescendants, bool ignoreRotation,
+                                  const std::function<bool(const AbstractMeshPtr& node)>& predicate)
 {
-  TransformNode::normalizeToUnitCube(includeDescendants, ignoreRotation,
-                                     predicate);
+  TransformNode::normalizeToUnitCube(includeDescendants, ignoreRotation, predicate);
   return *this;
 }
 
@@ -942,44 +905,38 @@ bool AbstractMesh::get_hasInstances() const
   return false;
 }
 
-AbstractMesh& AbstractMesh::movePOV(float amountRight, float amountUp,
-                                    float amountForward)
+AbstractMesh& AbstractMesh::movePOV(float amountRight, float amountUp, float amountForward)
 {
   position().addInPlace(calcMovePOV(amountRight, amountUp, amountForward));
   return *this;
 }
 
-Vector3 AbstractMesh::calcMovePOV(float amountRight, float amountUp,
-                                  float amountForward)
+Vector3 AbstractMesh::calcMovePOV(float amountRight, float amountUp, float amountForward)
 {
   Matrix rotMatrix;
   auto rotQuaternion = rotationQuaternion() ?
                          *rotationQuaternion() :
-                         Quaternion::RotationYawPitchRoll(
-                           rotation().y, rotation().x, rotation().z);
+                         Quaternion::RotationYawPitchRoll(rotation().y, rotation().x, rotation().z);
   rotQuaternion.toRotationMatrix(rotMatrix);
 
   auto translationDelta = Vector3::Zero();
   auto defForwardMult   = definedFacingForward ? 1.f : -1.f;
-  Vector3::TransformCoordinatesFromFloatsToRef(
-    amountRight * defForwardMult, amountUp, amountForward * defForwardMult,
-    rotMatrix, translationDelta);
+  Vector3::TransformCoordinatesFromFloatsToRef(amountRight * defForwardMult, amountUp,
+                                               amountForward * defForwardMult, rotMatrix,
+                                               translationDelta);
   return translationDelta;
 }
 
-AbstractMesh& AbstractMesh::rotatePOV(float flipBack, float twirlClockwise,
-                                      float tiltRight)
+AbstractMesh& AbstractMesh::rotatePOV(float flipBack, float twirlClockwise, float tiltRight)
 {
   rotation().addInPlace(calcRotatePOV(flipBack, twirlClockwise, tiltRight));
   return *this;
 }
 
-Vector3 AbstractMesh::calcRotatePOV(float flipBack, float twirlClockwise,
-                                    float tiltRight)
+Vector3 AbstractMesh::calcRotatePOV(float flipBack, float twirlClockwise, float tiltRight)
 {
   auto defForwardMult = definedFacingForward ? 1.f : -1.f;
-  return Vector3(flipBack * defForwardMult, twirlClockwise,
-                 tiltRight * defForwardMult);
+  return Vector3(flipBack * defForwardMult, twirlClockwise, tiltRight * defForwardMult);
 }
 
 AbstractMesh& AbstractMesh::refreshBoundingInfo(bool applySkeleton)
@@ -1020,18 +977,14 @@ Float32Array AbstractMesh::_getPositionData(bool applySkeleton)
 
   if (!data.empty() && applySkeleton && skeleton()) {
     _generatePointsArray();
-    auto matricesIndicesData
-      = getVerticesData(VertexBuffer::MatricesIndicesKind);
-    auto matricesWeightsData
-      = getVerticesData(VertexBuffer::MatricesWeightsKind);
+    auto matricesIndicesData = getVerticesData(VertexBuffer::MatricesIndicesKind);
+    auto matricesWeightsData = getVerticesData(VertexBuffer::MatricesWeightsKind);
     if (!matricesWeightsData.empty() && !matricesIndicesData.empty()) {
       auto needExtras = numBoneInfluencers() > 4;
       auto matricesIndicesExtraData
-        = needExtras ? getVerticesData(VertexBuffer::MatricesIndicesExtraKind) :
-                       Float32Array();
+        = needExtras ? getVerticesData(VertexBuffer::MatricesIndicesExtraKind) : Float32Array();
       auto matricesWeightsExtraData
-        = needExtras ? getVerticesData(VertexBuffer::MatricesWeightsExtraKind) :
-                       Float32Array();
+        = needExtras ? getVerticesData(VertexBuffer::MatricesWeightsExtraKind) : Float32Array();
 
       skeleton()->prepare();
       auto skeletonMatrices = skeleton()->getTransformMatrices(this);
@@ -1041,8 +994,7 @@ Float32Array AbstractMesh::_getPositionData(bool applySkeleton)
       auto& tempMatrix  = TmpVectors::MatrixArray[1];
 
       auto matWeightIdx = 0u;
-      for (unsigned int index = 0; index < data.size();
-           index += 3, matWeightIdx += 4) {
+      for (unsigned int index = 0; index < data.size(); index += 3, matWeightIdx += 4) {
         finalMatrix.reset();
 
         auto inf    = 0u;
@@ -1052,8 +1004,7 @@ Float32Array AbstractMesh::_getPositionData(bool applySkeleton)
           if (weight > 0.f) {
             Matrix::FromFloat32ArrayToRefScaled(
               skeletonMatrices,
-              static_cast<unsigned int>(
-                std::floor(matricesIndicesData[matWeightIdx + inf] * 16)),
+              static_cast<unsigned int>(std::floor(matricesIndicesData[matWeightIdx + inf] * 16)),
               weight, tempMatrix);
             finalMatrix.addToSelf(tempMatrix);
           }
@@ -1064,17 +1015,16 @@ Float32Array AbstractMesh::_getPositionData(bool applySkeleton)
             if (weight > 0.f) {
               Matrix::FromFloat32ArrayToRefScaled(
                 skeletonMatrices,
-                static_cast<unsigned int>(std::floor(
-                  matricesIndicesExtraData[matWeightIdx + inf] * 16)),
+                static_cast<unsigned int>(
+                  std::floor(matricesIndicesExtraData[matWeightIdx + inf] * 16)),
                 weight, tempMatrix);
               finalMatrix.addToSelf(tempMatrix);
             }
           }
         }
 
-        Vector3::TransformCoordinatesFromFloatsToRef(
-          data[index], data[index + 1], data[index + 2], finalMatrix,
-          tempVector);
+        Vector3::TransformCoordinatesFromFloatsToRef(data[index], data[index + 1], data[index + 2],
+                                                     finalMatrix, tempVector);
         tempVector.toArray(data, index);
 
         if ((index / 3) < _positions().size()) {
@@ -1094,9 +1044,8 @@ AbstractMesh& AbstractMesh::_updateBoundingInfo()
     _boundingInfo->update(effectiveMesh->worldMatrixFromCache());
   }
   else {
-    _boundingInfo
-      = std::make_unique<BoundingInfo>(absolutePosition(), absolutePosition(),
-                                       effectiveMesh->worldMatrixFromCache());
+    _boundingInfo = std::make_unique<BoundingInfo>(absolutePosition(), absolutePosition(),
+                                                   effectiveMesh->worldMatrixFromCache());
   }
   _updateSubMeshesBoundingInfo(effectiveMesh->worldMatrixFromCache());
   return *this;
@@ -1130,27 +1079,20 @@ void AbstractMesh::_afterComputeWorldMatrix()
 
 AbstractMesh* AbstractMesh::_effectiveMesh()
 {
-  return (skeleton() && skeleton()->overrideMesh) ?
-           skeleton()->overrideMesh.get() :
-           this;
+  return (skeleton() && skeleton()->overrideMesh) ? skeleton()->overrideMesh.get() : this;
 }
 
-bool AbstractMesh::isInFrustum(const std::array<Plane, 6>& frustumPlanes,
-                               unsigned int /*strategy*/)
+bool AbstractMesh::isInFrustum(const std::array<Plane, 6>& frustumPlanes, unsigned int /*strategy*/)
 {
-  return _boundingInfo != nullptr
-         && _boundingInfo->isInFrustum(frustumPlanes, cullingStrategy);
+  return _boundingInfo != nullptr && _boundingInfo->isInFrustum(frustumPlanes, cullingStrategy);
 }
 
-bool AbstractMesh::isCompletelyInFrustum(
-  const std::array<Plane, 6>& frustumPlanes)
+bool AbstractMesh::isCompletelyInFrustum(const std::array<Plane, 6>& frustumPlanes)
 {
-  return _boundingInfo != nullptr
-         && _boundingInfo->isCompletelyInFrustum(frustumPlanes);
+  return _boundingInfo != nullptr && _boundingInfo->isCompletelyInFrustum(frustumPlanes);
 }
 
-bool AbstractMesh::intersectsMesh(AbstractMesh& mesh, bool precise,
-                                  bool includeDescendants)
+bool AbstractMesh::intersectsMesh(AbstractMesh& mesh, bool precise, bool includeDescendants)
 {
   if (!_boundingInfo || !mesh._boundingInfo) {
     return false;
@@ -1171,8 +1113,7 @@ bool AbstractMesh::intersectsMesh(AbstractMesh& mesh, bool precise,
   return false;
 }
 
-bool AbstractMesh::intersectsMesh(SolidParticle& sp, bool precise,
-                                  bool includeDescendants)
+bool AbstractMesh::intersectsMesh(SolidParticle& sp, bool precise, bool includeDescendants)
 {
   if (!_boundingInfo || !sp._boundingInfo) {
     return false;
@@ -1207,8 +1148,7 @@ PhysicsImpostorPtr& AbstractMesh::getPhysicsImpostor()
   return physicsImpostor;
 }
 
-AbstractMesh& AbstractMesh::applyImpulse(const Vector3& force,
-                                         const Vector3& contactPoint)
+AbstractMesh& AbstractMesh::applyImpulse(const Vector3& force, const Vector3& contactPoint)
 {
   if (!_physicsImpostor) {
     return *this;
@@ -1218,10 +1158,8 @@ AbstractMesh& AbstractMesh::applyImpulse(const Vector3& force,
   return *this;
 }
 
-AbstractMesh& AbstractMesh::setPhysicsLinkWith(Mesh* otherMesh,
-                                               const Vector3& pivot1,
-                                               const Vector3& pivot2,
-                                               const PhysicsParams& options)
+AbstractMesh& AbstractMesh::setPhysicsLinkWith(Mesh* otherMesh, const Vector3& pivot1,
+                                               const Vector3& pivot2, const PhysicsParams& options)
 {
   if (!_physicsImpostor || !otherMesh->_physicsImpostor) {
     return *this;
@@ -1231,8 +1169,7 @@ AbstractMesh& AbstractMesh::setPhysicsLinkWith(Mesh* otherMesh,
   jointData.mainPivot      = pivot1;
   jointData.connectedPivot = pivot2;
   jointData.nativeParams   = options;
-  _physicsImpostor->createJoint(otherMesh->physicsImpostor(),
-                                PhysicsJoint::HingeJoint, jointData);
+  _physicsImpostor->createJoint(otherMesh->physicsImpostor(), PhysicsJoint::HingeJoint, jointData);
 
   return *this;
 }
@@ -1274,14 +1211,13 @@ void AbstractMesh::set_physicsImpostor(const PhysicsImpostorPtr& value)
   _physicsImpostor = value;
 
   if (value) {
-    _disposePhysicsObserver
-      = onDisposeObservable.add([this](Node* /*node*/, EventState& /*es*/) {
-          // Physics
-          if (_physicsImpostor) {
-            _physicsImpostor->dispose(/*!doNotRecurse*/);
-            physicsImpostor = nullptr;
-          }
-        });
+    _disposePhysicsObserver = onDisposeObservable.add([this](Node* /*node*/, EventState& /*es*/) {
+      // Physics
+      if (_physicsImpostor) {
+        _physicsImpostor->dispose(/*!doNotRecurse*/);
+        physicsImpostor = nullptr;
+      }
+    });
   }
 }
 
@@ -1312,8 +1248,7 @@ AbstractMesh& AbstractMesh::moveWithCollisions(Vector3& displacement)
 {
   auto globalPosition = getAbsolutePosition();
 
-  globalPosition.addToRef(ellipsoidOffset,
-                          _meshCollisionData._oldPositionForCollisions);
+  globalPosition.addToRef(ellipsoidOffset, _meshCollisionData._oldPositionForCollisions);
   auto& coordinator = getScene()->collisionCoordinator();
 
   if (!_meshCollisionData._collider) {
@@ -1323,26 +1258,22 @@ AbstractMesh& AbstractMesh::moveWithCollisions(Vector3& displacement)
   _meshCollisionData._collider->_radius = ellipsoid;
 
   coordinator->getNewPosition(
-    _meshCollisionData._oldPositionForCollisions, displacement,
-    _meshCollisionData._collider, 3, shared_from_base<AbstractMesh>(),
-    [this](size_t collisionId, Vector3& newPosition,
-           const AbstractMeshPtr& collidedMesh) {
-      _onCollisionPositionChange(static_cast<int>(collisionId), newPosition,
-                                 collidedMesh);
+    _meshCollisionData._oldPositionForCollisions, displacement, _meshCollisionData._collider, 3,
+    shared_from_base<AbstractMesh>(),
+    [this](size_t collisionId, Vector3& newPosition, const AbstractMeshPtr& collidedMesh) {
+      _onCollisionPositionChange(static_cast<int>(collisionId), newPosition, collidedMesh);
     },
     uniqueId);
   return *this;
 }
 
-void AbstractMesh::_onCollisionPositionChange(
-  int /*collisionId*/, Vector3& newPosition,
-  const AbstractMeshPtr& collidedMesh)
+void AbstractMesh::_onCollisionPositionChange(int /*collisionId*/, Vector3& newPosition,
+                                              const AbstractMeshPtr& collidedMesh)
 {
   newPosition.subtractToRef(_meshCollisionData._oldPositionForCollisions,
                             _meshCollisionData._diffPositionForCollisions);
 
-  if (_meshCollisionData._diffPositionForCollisions.length()
-      > Engine::CollisionsEpsilon) {
+  if (_meshCollisionData._diffPositionForCollisions.length() > Engine::CollisionsEpsilon) {
     position().addInPlace(_meshCollisionData._diffPositionForCollisions);
   }
 
@@ -1353,8 +1284,7 @@ void AbstractMesh::_onCollisionPositionChange(
   onCollisionPositionChangeObservable.notifyObservers(&position());
 }
 
-Octree<SubMesh*>*
-AbstractMesh::createOrUpdateSubmeshesOctree(size_t maxCapacity, size_t maxDepth)
+Octree<SubMesh*>* AbstractMesh::createOrUpdateSubmeshesOctree(size_t maxCapacity, size_t maxDepth)
 {
   auto scene     = getScene();
   auto component = scene->_getComponent(SceneComponentConstants::NAME_OCTREE);
@@ -1378,14 +1308,12 @@ AbstractMesh::createOrUpdateSubmeshesOctree(size_t maxCapacity, size_t maxDepth)
   // Update octree
   auto& bbox          = boundingInfo.boundingBox;
   auto rawSubMeshPtrs = stl_util::to_raw_ptr_vector(subMeshes);
-  _submeshesOctree->update(bbox.minimumWorld, bbox.maximumWorld,
-                           rawSubMeshPtrs);
+  _submeshesOctree->update(bbox.minimumWorld, bbox.maximumWorld, rawSubMeshPtrs);
 
   return _submeshesOctree;
 }
 
-AbstractMesh& AbstractMesh::_collideForSubMesh(SubMesh* subMesh,
-                                               const Matrix& transformMatrix,
+AbstractMesh& AbstractMesh::_collideForSubMesh(SubMesh* subMesh, const Matrix& transformMatrix,
                                                Collider& /*iCollider*/)
 {
   _generatePointsArray();
@@ -1397,12 +1325,11 @@ AbstractMesh& AbstractMesh::_collideForSubMesh(SubMesh* subMesh,
   // Transformation
   if (subMesh->_lastColliderWorldVertices.empty()
       || !subMesh->_lastColliderTransformMatrix->equals(transformMatrix)) {
-    subMesh->_lastColliderTransformMatrix
-      = std::make_unique<Matrix>(transformMatrix);
-    subMesh->_lastColliderWorldVertices = {};
-    subMesh->_trianglePlanes            = {};
-    auto start                          = subMesh->verticesStart;
-    auto end = (subMesh->verticesStart + subMesh->verticesCount);
+    subMesh->_lastColliderTransformMatrix = std::make_unique<Matrix>(transformMatrix);
+    subMesh->_lastColliderWorldVertices   = {};
+    subMesh->_trianglePlanes              = {};
+    auto start                            = subMesh->verticesStart;
+    auto end                              = (subMesh->verticesStart + subMesh->verticesCount);
     for (unsigned int i = start; i < end; i++) {
       subMesh->_lastColliderWorldVertices.emplace_back(
         Vector3::TransformCoordinates(_positions()[i], transformMatrix));
@@ -1418,9 +1345,8 @@ AbstractMesh& AbstractMesh::_collideForSubMesh(SubMesh* subMesh,
   return *this;
 }
 
-AbstractMesh&
-AbstractMesh::_processCollisionsForSubMeshes(Collider& iCollider,
-                                             const Matrix& transformMatrix)
+AbstractMesh& AbstractMesh::_processCollisionsForSubMeshes(Collider& iCollider,
+                                                           const Matrix& transformMatrix)
 {
   auto iSubMeshes = _scene->getCollidingSubMeshCandidates(this, iCollider);
   auto len        = iSubMeshes.size();
@@ -1450,8 +1376,7 @@ AbstractMesh& AbstractMesh::_checkCollision(Collider& iCollider)
   auto& collisionsTransformMatrix = TmpVectors::MatrixArray[1];
   Matrix::ScalingToRef(1.f / iCollider._radius.x, 1.f / iCollider._radius.y,
                        1.f / iCollider._radius.z, collisionsScalingMatrix);
-  worldMatrixFromCache().multiplyToRef(collisionsScalingMatrix,
-                                       collisionsTransformMatrix);
+  worldMatrixFromCache().multiplyToRef(collisionsScalingMatrix, collisionsTransformMatrix);
   _processCollisionsForSubMeshes(iCollider, collisionsTransformMatrix);
   return *this;
 }
@@ -1461,9 +1386,8 @@ bool AbstractMesh::_generatePointsArray()
   return false;
 }
 
-PickingInfo
-AbstractMesh::intersects(Ray& ray, bool fastCheck,
-                         const TrianglePickingPredicate& trianglePredicate)
+PickingInfo AbstractMesh::intersects(Ray& ray, bool fastCheck,
+                                     const TrianglePickingPredicate& trianglePredicate)
 {
   PickingInfo pickingInfo;
 
@@ -1473,8 +1397,7 @@ AbstractMesh::intersects(Ray& ray, bool fastCheck,
         0.f;
   const auto& boundingInfo = _boundingInfo;
   if (subMeshes.empty() || !boundingInfo
-      || !ray.intersectsSphere(boundingInfo->boundingSphere,
-                               intersectionThreshold)
+      || !ray.intersectsSphere(boundingInfo->boundingSphere, intersectionThreshold)
       || !ray.intersectsBox(boundingInfo->boundingBox, intersectionThreshold)) {
     return pickingInfo;
   }
@@ -1496,12 +1419,11 @@ AbstractMesh::intersects(Ray& ray, bool fastCheck,
       continue;
     }
 
-    auto currentIntersectInfo = subMesh->intersects(
-      ray, _positions(), getIndices(), fastCheck, trianglePredicate);
+    auto currentIntersectInfo
+      = subMesh->intersects(ray, _positions(), getIndices(), fastCheck, trianglePredicate);
 
     if (currentIntersectInfo) {
-      if (fastCheck || !intersectInfo
-          || currentIntersectInfo->distance < intersectInfo->distance) {
+      if (fastCheck || !intersectInfo || currentIntersectInfo->distance < intersectInfo->distance) {
         intersectInfo            = currentIntersectInfo;
         intersectInfo->subMeshId = index;
 
@@ -1537,8 +1459,7 @@ AbstractMesh::intersects(Ray& ray, bool fastCheck,
   return pickingInfo;
 }
 
-AbstractMesh* AbstractMesh::clone(const std::string& /*name*/,
-                                  Node* /*newParent*/,
+AbstractMesh* AbstractMesh::clone(const std::string& /*name*/, Node* /*newParent*/,
                                   bool /*doNotCloneChildren*/)
 {
   return nullptr;
@@ -1587,10 +1508,9 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 
   // Intersections in progress
   for (const auto& other : _intersectionsInProgress) {
-    other->_intersectionsInProgress.erase(
-      std::remove(other->_intersectionsInProgress.begin(),
-                  other->_intersectionsInProgress.end(), this),
-      other->_intersectionsInProgress.end());
+    other->_intersectionsInProgress.erase(std::remove(other->_intersectionsInProgress.begin(),
+                                                      other->_intersectionsInProgress.end(), this),
+                                          other->_intersectionsInProgress.end());
   }
 
   _intersectionsInProgress.clear();
@@ -1599,21 +1519,18 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   for (const auto& light : getScene()->lights) {
     // Included meshes
     light->includedOnlyMeshes().erase(
-      std::remove_if(light->includedOnlyMeshes().begin(),
-                     light->includedOnlyMeshes().end(),
-                     [this](const AbstractMeshPtr& includedOnlyMesh) {
-                       return includedOnlyMesh.get() == this;
-                     }),
+      std::remove_if(
+        light->includedOnlyMeshes().begin(), light->includedOnlyMeshes().end(),
+        [this](const AbstractMeshPtr& includedOnlyMesh) { return includedOnlyMesh.get() == this; }),
       light->includedOnlyMeshes().end());
 
     // Excluded meshes
-    light->excludedMeshes().erase(
-      std::remove_if(light->excludedMeshes().begin(),
-                     light->excludedMeshes().end(),
-                     [this](const AbstractMeshPtr& excludedMesh) {
-                       return excludedMesh.get() == this;
-                     }),
-      light->excludedMeshes().end());
+    light->excludedMeshes().erase(std::remove_if(light->excludedMeshes().begin(),
+                                                 light->excludedMeshes().end(),
+                                                 [this](const AbstractMeshPtr& excludedMesh) {
+                                                   return excludedMesh.get() == this;
+                                                 }),
+                                  light->excludedMeshes().end());
 
     // Shadow generators
     auto generator = light->getShadowGenerator();
@@ -1621,9 +1538,8 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
       auto shadowMap = generator->getShadowMap();
       if (shadowMap && !shadowMap->renderList().empty()) {
         shadowMap->renderList().erase(
-          std::remove_if(
-            shadowMap->renderList().begin(), shadowMap->renderList().end(),
-            [this](const AbstractMesh* mesh) { return mesh == this; }),
+          std::remove_if(shadowMap->renderList().begin(), shadowMap->renderList().end(),
+                         [this](const AbstractMesh* mesh) { return mesh == this; }),
           shadowMap->renderList().end());
       }
     }
@@ -1636,8 +1552,7 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   }
 
   // SubMeshes
-  if (getClassName() != "InstancedMesh"
-      || getClassName() != "InstancedLinesMesh") {
+  if (getClassName() != "InstancedMesh" || getClassName() != "InstancedLinesMesh") {
     releaseSubMeshes();
   }
 
@@ -1665,8 +1580,7 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 
   if (!doNotRecurse) {
     // Particles
-    for (size_t index = 0; index < getScene()->particleSystems.size();
-         ++index) {
+    for (size_t index = 0; index < getScene()->particleSystems.size(); ++index) {
       auto& emitter = getScene()->particleSystems[index]->emitter;
       if (std::holds_alternative<AbstractMeshPtr>(emitter)
           && (std::get<AbstractMeshPtr>(emitter).get() == this)) {
@@ -1719,12 +1633,10 @@ AbstractMesh& AbstractMesh::_initFacetData()
     = (data.partitioningBBoxRatio != 0.f) ? data.partitioningBBoxRatio : 1.01f;
 
   data.facetNormals.resize(data.facetNb);
-  std::fill(data.facetNormals.begin(), data.facetNormals.end(),
-            Vector3::Zero());
+  std::fill(data.facetNormals.begin(), data.facetNormals.end(), Vector3::Zero());
 
   data.facetPositions.resize(data.facetNb);
-  std::fill(data.facetPositions.begin(), data.facetPositions.end(),
-            Vector3::Zero());
+  std::fill(data.facetPositions.begin(), data.facetPositions.end(), Vector3::Zero());
 
   data.facetDataEnabled = true;
 
@@ -1750,11 +1662,10 @@ AbstractMesh& AbstractMesh::updateFacetData()
       data.depthSortedIndices = Uint32Array(indices);
     }
 
-    data.facetDepthSortFunction
-      = [](const DepthSortedFacet& f1, const DepthSortedFacet& f2) {
-          const auto diff = f2.sqDistance - f1.sqDistance;
-          return (diff < 0.f) ? -1 : (diff > 0.f) ? 1 : 0;
-        };
+    data.facetDepthSortFunction = [](const DepthSortedFacet& f1, const DepthSortedFacet& f2) {
+      const auto diff = f2.sqDistance - f1.sqDistance;
+      return (diff < 0.f) ? -1 : (diff > 0.f) ? 1 : 0;
+    };
     if (!data.facetDepthSortFrom) {
       auto& camera            = getScene()->activeCamera();
       data.facetDepthSortFrom = (camera) ? camera->position : Vector3::Zero();
@@ -1779,19 +1690,15 @@ AbstractMesh& AbstractMesh::updateFacetData()
   data.bbSize.z = (bInfo.maximum().z - bInfo.minimum().z > Math::Epsilon) ?
                     bInfo.maximum().z - bInfo.minimum().z :
                     Math::Epsilon;
-  auto bbSizeMax
-    = (data.bbSize.x > data.bbSize.y) ? data.bbSize.x : data.bbSize.y;
+  auto bbSizeMax  = (data.bbSize.x > data.bbSize.y) ? data.bbSize.x : data.bbSize.y;
   bbSizeMax       = (bbSizeMax > data.bbSize.z) ? bbSizeMax : data.bbSize.z;
   data.subDiv.max = data.partitioningSubdivisions;
   // adjust the number of subdivisions per axis
-  data.subDiv.X = static_cast<unsigned>(
-    std::floor(data.subDiv.max * data.bbSize.x / bbSizeMax));
+  data.subDiv.X = static_cast<unsigned>(std::floor(data.subDiv.max * data.bbSize.x / bbSizeMax));
   // according to each bbox size per axis
-  data.subDiv.Y = static_cast<unsigned>(
-    std::floor(data.subDiv.max * data.bbSize.y / bbSizeMax));
+  data.subDiv.Y = static_cast<unsigned>(std::floor(data.subDiv.max * data.bbSize.y / bbSizeMax));
   // at least one subdivision
-  data.subDiv.Z = static_cast<unsigned>(
-    std::floor(data.subDiv.max * data.bbSize.z / bbSizeMax));
+  data.subDiv.Z = static_cast<unsigned>(std::floor(data.subDiv.max * data.bbSize.z / bbSizeMax));
   data.subDiv.X = data.subDiv.X < 1 ? 1 : data.subDiv.X;
   data.subDiv.Y = data.subDiv.Y < 1 ? 1 : data.subDiv.Y;
   data.subDiv.Z = data.subDiv.Z < 1 ? 1 : data.subDiv.Z;
@@ -1807,8 +1714,8 @@ AbstractMesh& AbstractMesh::updateFacetData()
   if (data.facetDepthSort && data.facetDepthSortEnabled) {
     computeWorldMatrix(true);
     _worldMatrix.invertToRef(data.invertedMatrix);
-    Vector3::TransformCoordinatesToRef(
-      *data.facetDepthSortFrom, data.invertedMatrix, data.facetDepthSortOrigin);
+    Vector3::TransformCoordinatesToRef(*data.facetDepthSortFrom, data.invertedMatrix,
+                                       data.facetDepthSortOrigin);
     data.facetParameters.distanceTo = data.facetDepthSortOrigin;
   }
   data.facetParameters.depthSortedFacets = data.depthSortedFacets;
@@ -1833,27 +1740,33 @@ AbstractMesh& AbstractMesh::updateFacetData()
 std::vector<Vector3>& AbstractMesh::getFacetLocalNormals()
 {
   auto& facetData = _internalAbstractMeshDataInfo._facetData;
+#if 0
   if (facetData.facetNormals.empty()) {
     updateFacetData();
   }
+#endif
   return facetData.facetNormals;
 }
 
 std::vector<Vector3>& AbstractMesh::getFacetLocalPositions()
 {
   auto& facetData = _internalAbstractMeshDataInfo._facetData;
+#if 0
   if (facetData.facetPositions.empty()) {
     updateFacetData();
   }
+#endif
   return facetData.facetPositions;
 }
 
 std::vector<Uint32Array>& AbstractMesh::getFacetLocalPartitioning()
 {
   auto& facetData = _internalAbstractMeshDataInfo._facetData;
+#if 0
   if (facetData.facetPartitioning.empty()) {
     updateFacetData();
   }
+#endif
   return facetData.facetPartitioning;
 }
 
@@ -1891,15 +1804,15 @@ Uint32Array AbstractMesh::getFacetsAtLocalCoordinates(float x, float y, float z)
   const auto& bInfo = *getBoundingInfo();
   auto& data        = _internalAbstractMeshDataInfo._facetData;
 
-  auto ox = static_cast<int>(
-    std::floor((x - bInfo.minimum().x * data.partitioningBBoxRatio)
-               * data.subDiv.X * data.partitioningBBoxRatio / data.bbSize.x));
-  auto oy = static_cast<int>(
-    std::floor((y - bInfo.minimum().y * data.partitioningBBoxRatio)
-               * data.subDiv.Y * data.partitioningBBoxRatio / data.bbSize.y));
-  auto oz = static_cast<int>(
-    std::floor((z - bInfo.minimum().z * data.partitioningBBoxRatio)
-               * data.subDiv.Z * data.partitioningBBoxRatio / data.bbSize.z));
+  auto ox
+    = static_cast<int>(std::floor((x - bInfo.minimum().x * data.partitioningBBoxRatio)
+                                  * data.subDiv.X * data.partitioningBBoxRatio / data.bbSize.x));
+  auto oy
+    = static_cast<int>(std::floor((y - bInfo.minimum().y * data.partitioningBBoxRatio)
+                                  * data.subDiv.Y * data.partitioningBBoxRatio / data.bbSize.y));
+  auto oz
+    = static_cast<int>(std::floor((z - bInfo.minimum().z * data.partitioningBBoxRatio)
+                                  * data.subDiv.Z * data.partitioningBBoxRatio / data.bbSize.z));
 
   if (ox < 0 || oy < 0 || oz < 0) {
     return Uint32Array();
@@ -1912,14 +1825,12 @@ Uint32Array AbstractMesh::getFacetsAtLocalCoordinates(float x, float y, float z)
     return Uint32Array();
   }
 
-  return data.facetPartitioning[_ox + data.subDiv.max * _oy
-                                + data.subDiv.max * data.subDiv.max * _oz];
+  return data
+    .facetPartitioning[_ox + data.subDiv.max * _oy + data.subDiv.max * data.subDiv.max * _oz];
 }
 
-int AbstractMesh::getClosestFacetAtCoordinates(float x, float y, float z,
-                                               Vector3& projected,
-                                               bool projectedSet,
-                                               bool checkFace, bool facing)
+int AbstractMesh::getClosestFacetAtCoordinates(float x, float y, float z, Vector3& projected,
+                                               bool projectedSet, bool checkFace, bool facing)
 {
   auto world   = getWorldMatrix();
   auto& invMat = TmpVectors::MatrixArray[5];
@@ -1928,20 +1839,18 @@ int AbstractMesh::getClosestFacetAtCoordinates(float x, float y, float z,
   auto closest  = -1;
   // transform (x,y,z) to coordinates in the mesh local space
   Vector3::TransformCoordinatesFromFloatsToRef(x, y, z, invMat, invVect);
-  closest = getClosestFacetAtLocalCoordinates(invVect.x, invVect.y, invVect.z,
-                                              projected, checkFace, facing);
+  closest = getClosestFacetAtLocalCoordinates(invVect.x, invVect.y, invVect.z, projected, checkFace,
+                                              facing);
   if (projectedSet) {
     // tranform the local computed projected vector to world coordinates
-    Vector3::TransformCoordinatesFromFloatsToRef(projected.x, projected.y,
-                                                 projected.z, world, projected);
+    Vector3::TransformCoordinatesFromFloatsToRef(projected.x, projected.y, projected.z, world,
+                                                 projected);
   }
   return closest;
 }
 
-int AbstractMesh::getClosestFacetAtLocalCoordinates(float x, float y, float z,
-                                                    Vector3& projected,
-                                                    bool projectedSet,
-                                                    bool checkFace, bool facing)
+int AbstractMesh::getClosestFacetAtLocalCoordinates(float x, float y, float z, Vector3& projected,
+                                                    bool projectedSet, bool checkFace, bool facing)
 {
   auto closest = -1;
   auto tmpx    = 0.f;
@@ -1972,8 +1881,7 @@ int AbstractMesh::getClosestFacetAtLocalCoordinates(float x, float y, float z,
     p0   = facetPositions[fib];
 
     d = (x - p0.x) * norm.x + (y - p0.y) * norm.y + (z - p0.z) * norm.z;
-    if (!checkFace || (checkFace && facing && d >= 0.f)
-        || (checkFace && !facing && d <= 0.f)) {
+    if (!checkFace || (checkFace && facing && d >= 0.f) || (checkFace && !facing && d <= 0.f)) {
       // compute (x,y,z) projection on the facet = (projx, projy, projz)
       d  = norm.x * p0.x + norm.y * p0.y + norm.z * p0.z;
       t0 = -(norm.x * x + norm.y * y + norm.z * z - d)
@@ -2046,8 +1954,7 @@ AbstractMesh& AbstractMesh::createNormals(bool updatable)
   return *this;
 }
 
-AbstractMesh& AbstractMesh::alignWithNormal(Vector3& normal,
-                                            const Vector3& upDirection)
+AbstractMesh& AbstractMesh::alignWithNormal(Vector3& normal, const Vector3& upDirection)
 {
   auto& axisX = TmpVectors::Vector3Array[0];
   auto& axisZ = TmpVectors::Vector3Array[1];
@@ -2056,8 +1963,7 @@ AbstractMesh& AbstractMesh::alignWithNormal(Vector3& normal,
 
   if (rotationQuaternion()) {
     auto rotationQuat = *rotationQuaternion();
-    Quaternion::RotationQuaternionFromAxisToRef(axisX, normal, axisZ,
-                                                rotationQuat);
+    Quaternion::RotationQuaternionFromAxisToRef(axisX, normal, axisZ, rotationQuat);
     rotationQuaternion = rotationQuat;
   }
   else {
@@ -2084,22 +1990,20 @@ bool AbstractMesh::_checkOcclusionQuery()
 
   if (isOcclusionQueryInProgress && _occlusionQuery) {
 
-    auto isOcclusionQueryAvailable
-      = engine->isQueryResultAvailable(_occlusionQuery);
+    auto isOcclusionQueryAvailable = engine->isQueryResultAvailable(_occlusionQuery);
     if (isOcclusionQueryAvailable) {
       auto occlusionQueryResult = engine->getQueryResult(_occlusionQuery);
 
       dataStorage.isOcclusionQueryInProgress    = false;
       dataStorage.occlusionInternalRetryCounter = 0;
-      dataStorage.isOccluded = occlusionQueryResult == 1 ? false : true;
+      dataStorage.isOccluded                    = occlusionQueryResult == 1 ? false : true;
     }
     else {
 
       dataStorage.occlusionInternalRetryCounter++;
 
       if (dataStorage.occlusionRetryCount != -1
-          && dataStorage.occlusionInternalRetryCounter
-               > dataStorage.occlusionRetryCount) {
+          && dataStorage.occlusionInternalRetryCounter > dataStorage.occlusionRetryCount) {
         dataStorage.isOcclusionQueryInProgress    = false;
         dataStorage.occlusionInternalRetryCounter = 0;
 
@@ -2107,8 +2011,7 @@ bool AbstractMesh::_checkOcclusionQuery()
         // isOccluded. (Render in the current render loop) if strict continue
         // the last state of the object.
         dataStorage.isOccluded
-          = dataStorage.occlusionType
-                == AbstractMesh::OCCLUSION_TYPE_OPTIMISTIC ?
+          = dataStorage.occlusionType == AbstractMesh::OCCLUSION_TYPE_OPTIMISTIC ?
               false :
               dataStorage.isOccluded;
       }
@@ -2126,8 +2029,7 @@ bool AbstractMesh::_checkOcclusionQuery()
       _occlusionQuery = engine->createQuery();
     }
 
-    engine->beginOcclusionQuery(dataStorage.occlusionQueryAlgorithmType,
-                                _occlusionQuery);
+    engine->beginOcclusionQuery(dataStorage.occlusionQueryAlgorithmType, _occlusionQuery);
     occlusionBoundingBoxRenderer->renderOcclusionBoundingBox(this);
     engine->endOcclusionQuery(dataStorage.occlusionQueryAlgorithmType);
     dataStorage.isOcclusionQueryInProgress = true;

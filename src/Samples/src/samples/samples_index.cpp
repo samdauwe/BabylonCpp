@@ -22,7 +22,6 @@ void SamplesIndex::fillSamplesFailures() const
     return;
 
   _samplesFailures = {
-    {"AirplaneModelScene", {SampleFailureReasonKind::segFault}},
     {"BlurModeForMirrorsScene", {SampleFailureReasonKind::empty3d}},
     {"CartoonAnimationsScene", {SampleFailureReasonKind::segFault}},
     {"ColoredRibbonScene", {SampleFailureReasonKind::segFault}},
