@@ -544,7 +544,8 @@ void Tools::LoadImageFromUrl(
       stbi_set_flip_vertically_on_load(false);
 
       if (data) {
-        Image image(data.get(), w * h * n, w, h, n, (req_comp == 3) ? GL::RGB : GL::RGBA);
+        Image image(data.get(), w * h * req_comp, w, h, req_comp,
+                    (req_comp == 3) ? GL::RGB : GL::RGBA);
         onLoad(image);
         return;
       }
