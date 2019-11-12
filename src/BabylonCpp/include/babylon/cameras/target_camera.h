@@ -22,8 +22,7 @@ public:
   template <typename... Ts>
   static TargetCameraPtr New(Ts&&... args)
   {
-    auto camera = std::shared_ptr<TargetCamera>(
-      new TargetCamera(std::forward<Ts>(args)...));
+    auto camera = std::shared_ptr<TargetCamera>(new TargetCamera(std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;
@@ -31,6 +30,17 @@ public:
   ~TargetCamera() override;
 
   virtual Type type() const override;
+
+  /**
+   * @brief Gets a property.
+   */
+  virtual AnimationValue getProperty(const std::vector<std::string>& targetPropertyPath) override;
+
+  /**
+   * @brief Sets a property.
+   */
+  virtual void setProperty(const std::vector<std::string>& targetPropertyPath,
+                           const AnimationValue& value) override;
 
   /**
    * @brief Gets the position in front of the camera at a given distance.
@@ -150,8 +160,7 @@ protected:
   TargetCamera(const std::string& name, const Vector3& position, Scene* scene,
                bool setActiveOnSceneIfNoneActive = true);
 
-  void _computeViewMatrix(const Vector3& position, const Vector3& target,
-                          const Vector3& up);
+  void _computeViewMatrix(const Vector3& position, const Vector3& target, const Vector3& up);
 
 private:
   /**

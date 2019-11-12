@@ -67,7 +67,7 @@
 namespace BABYLON {
 
 Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
-           bool doNotCloneChildren, bool clonePhysicsImpostor)
+           bool doNotCloneChildren, bool clonePhysicsImpostor, bool postInitialize)
     : AbstractMesh{iName, scene}
     , onBeforeRenderObservable{this, &Mesh::get_onBeforeDrawObservable}
     , onBeforeBindObservable{this, &Mesh::get_onBeforeBindObservable}
@@ -76,8 +76,7 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
     , onBeforeDraw{this, &Mesh::set_onBeforeDraw}
     , delayLoadState{Constants::DELAYLOADSTATE_NONE}
     , onLODLevelSelection{nullptr}
-    , morphTargetManager{this, &Mesh::get_morphTargetManager,
-                         &Mesh::set_morphTargetManager}
+    , morphTargetManager{this, &Mesh::get_morphTargetManager, &Mesh::set_morphTargetManager}
     , _creationDataStorage{std::make_shared<_CreationDataStorage>()}
     , _geometry{nullptr}
     , _shouldGenerateFlatShading{false}
@@ -96,6 +95,14 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
     , _effectiveMaterial{nullptr}
     , _tessellation{0}
     , _arc{1.f}
+{
+  if (!postInitialize) {
+    _initialize(scene, iParent, source, doNotCloneChildren, clonePhysicsImpostor);
+  }
+}
+
+void Mesh::_initialize(Scene* scene, Node* iParent, Mesh* source, bool doNotCloneChildren,
+                       bool clonePhysicsImpostor)
 {
   _boundingInfo                    = nullptr;
   _instanceDataStorage->batchCache = std::make_shared<_InstancesBatch>();
@@ -181,8 +188,7 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
     Node::set_parent(iParent);
   }
 
-  _instanceDataStorage->hardwareInstancedRendering
-    = getEngine()->getCaps().instancedArrays;
+  _instanceDataStorage->hardwareInstancedRendering = getEngine()->getCaps().instancedArrays;
 }
 
 Mesh::~Mesh()
@@ -277,8 +283,7 @@ Observable<Mesh>& Mesh::get_onBeforeDrawObservable()
   return _internalMeshDataInfo->_onBeforeDrawObservable;
 }
 
-void Mesh::set_onBeforeDraw(
-  const std::function<void(Mesh*, EventState&)>& callback)
+void Mesh::set_onBeforeDraw(const std::function<void(Mesh*, EventState&)>& callback)
 {
   if (_onBeforeDrawObserver) {
     onBeforeDrawObservable().remove(_onBeforeDrawObserver);
@@ -297,8 +302,7 @@ std::string Mesh::toString(bool fullDetails)
   oss << AbstractMesh::toString(fullDetails);
   oss << ", n vertices: " << getTotalVertices();
   oss << ", parent: "
-      << ((!_waitingParentId.empty()) ? _waitingParentId :
-                                        (parent() ? parent()->name : "NONE"));
+      << ((!_waitingParentId.empty()) ? _waitingParentId : (parent() ? parent()->name : "NONE"));
 
   if (!animations.empty()) {
     for (const auto& animation : animations) {
@@ -312,8 +316,7 @@ std::string Mesh::toString(bool fullDetails)
       auto vb = getVerticesData(VertexBuffer::PositionKind);
 
       if (!vb.empty() && !ib.empty()) {
-        oss << ", flat shading: "
-            << (vb.size() / 3 == ib.size() ? "YES" : "NO");
+        oss << ", flat shading: " << (vb.size() / 3 == ib.size() ? "YES" : "NO");
       }
     }
     else {
@@ -351,15 +354,15 @@ void Mesh::_sortLODLevels()
 {
   auto& _LODLevels = _internalMeshDataInfo->_LODLevels;
   BABYLON::stl_util::sort_js_style(_LODLevels,
-            [](const MeshLODLevelPtr& a, const MeshLODLevelPtr& b) {
-              if (a->distance < b->distance) {
-                return 1;
-              }
-              if (a->distance > b->distance) {
-                return -1;
-              }
-              return 0;
-            });
+                                   [](const MeshLODLevelPtr& a, const MeshLODLevelPtr& b) {
+                                     if (a->distance < b->distance) {
+                                       return 1;
+                                     }
+                                     if (a->distance > b->distance) {
+                                       return -1;
+                                     }
+                                     return 0;
+                                   });
 }
 
 Mesh& Mesh::addLODLevel(float distance, const MeshPtr& mesh)
@@ -409,8 +412,7 @@ Mesh& Mesh::removeLODLevel(const MeshPtr& mesh)
   return *this;
 }
 
-AbstractMesh* Mesh::getLOD(const CameraPtr& camera,
-                           BoundingSphere* boundingSphere)
+AbstractMesh* Mesh::getLOD(const CameraPtr& camera, BoundingSphere* boundingSphere)
 {
   auto& _LODLevels = _internalMeshDataInfo->_LODLevels;
   if (_LODLevels.empty()) {
@@ -428,8 +430,7 @@ AbstractMesh* Mesh::getLOD(const CameraPtr& camera,
     bSphere = &boundingInfo->boundingSphere;
   }
 
-  auto distanceToCamera
-    = bSphere->centerWorld.subtract(camera->globalPosition()).length();
+  auto distanceToCamera = bSphere->centerWorld.subtract(camera->globalPosition()).length();
 
   if (_LODLevels.back()->distance > distanceToCamera) {
     if (onLODLevelSelection) {
@@ -476,8 +477,7 @@ size_t Mesh::getTotalVertices() const
   return _geometry->getTotalVertices();
 }
 
-Float32Array Mesh::getVerticesData(const std::string& kind, bool copyWhenShared,
-                                   bool forceCopy)
+Float32Array Mesh::getVerticesData(const std::string& kind, bool copyWhenShared, bool forceCopy)
 {
   if (!_geometry) {
     return Float32Array();
@@ -497,9 +497,8 @@ bool Mesh::isVerticesDataPresent(const std::string& kind) const
 {
   if (!_geometry) {
     if (!_delayInfo.empty()) {
-      return std::find_if(
-               _delayInfo.begin(), _delayInfo.end(),
-               [&](VertexBuffer* item) { return item->getKind() == kind; })
+      return std::find_if(_delayInfo.begin(), _delayInfo.end(),
+                          [&](VertexBuffer* item) { return item->getKind() == kind; })
              != _delayInfo.end();
     }
     return false;
@@ -512,9 +511,8 @@ bool Mesh::isVertexBufferUpdatable(const std::string& kind) const
 {
   if (!_geometry) {
     if (!_delayInfo.empty()) {
-      return std::find_if(
-               _delayInfo.begin(), _delayInfo.end(),
-               [&](VertexBuffer* item) { return item->getKind() == kind; })
+      return std::find_if(_delayInfo.begin(), _delayInfo.end(),
+                          [&](VertexBuffer* item) { return item->getKind() == kind; })
              != _delayInfo.end();
     }
     return false;
@@ -579,8 +577,7 @@ bool Mesh::isReady(bool completeCheck, bool forceInstanceSupport)
   auto engine = getEngine();
   auto scene  = getScene();
   auto hardwareInstancedRendering
-    = forceInstanceSupport
-      || (engine->getCaps().instancedArrays && instances.size() > 0);
+    = forceInstanceSupport || (engine->getCaps().instancedArrays && instances.size() > 0);
 
   computeWorldMatrix();
 
@@ -591,8 +588,8 @@ bool Mesh::isReady(bool completeCheck, bool forceInstanceSupport)
         auto effectiveMaterial = subMesh->getMaterial();
         if (effectiveMaterial) {
           if (effectiveMaterial->_storeEffectOnSubMeshes) {
-            if (!effectiveMaterial->isReadyForSubMesh(
-                  this, subMesh.get(), hardwareInstancedRendering)) {
+            if (!effectiveMaterial->isReadyForSubMesh(this, subMesh.get(),
+                                                      hardwareInstancedRendering)) {
               return false;
             }
           }
@@ -671,28 +668,24 @@ void Mesh::_preActivate()
 void Mesh::_preActivateForIntermediateRendering(int renderId)
 {
   if (_instanceDataStorage->visibleInstances) {
-    _instanceDataStorage->visibleInstances->intermediateDefaultRenderId
-      = renderId;
+    _instanceDataStorage->visibleInstances->intermediateDefaultRenderId = renderId;
   }
 }
 
 Mesh& Mesh::_registerInstanceForRenderId(InstancedMesh* instance, int renderId)
 {
   if (!_instanceDataStorage->visibleInstances) {
-    _instanceDataStorage->visibleInstances
-      = std::make_shared<_VisibleInstances>();
-    _instanceDataStorage->visibleInstances->defaultRenderId     = renderId;
+    _instanceDataStorage->visibleInstances                  = std::make_shared<_VisibleInstances>();
+    _instanceDataStorage->visibleInstances->defaultRenderId = renderId;
     _instanceDataStorage->visibleInstances->selfDefaultRenderId = _renderId;
   }
 
   if (_instanceDataStorage->visibleInstances->meshes.find(renderId)
       == _instanceDataStorage->visibleInstances->meshes.end()) {
-    _instanceDataStorage->visibleInstances->meshes[renderId]
-      = std::vector<InstancedMesh*>();
+    _instanceDataStorage->visibleInstances->meshes[renderId] = std::vector<InstancedMesh*>();
   }
 
-  _instanceDataStorage->visibleInstances->meshes[renderId].emplace_back(
-    instance);
+  _instanceDataStorage->visibleInstances->meshes[renderId].emplace_back(instance);
 
   return *this;
 }
@@ -703,8 +696,7 @@ Mesh& Mesh::refreshBoundingInfo(bool applySkeleton)
     return *this;
   }
 
-  std::optional<Vector2> bias
-    = geometry() ? geometry()->boundingBias() : std::nullopt;
+  std::optional<Vector2> bias = geometry() ? geometry()->boundingBias() : std::nullopt;
   _refreshBoundingInfo(_getPositionData(applySkeleton), bias);
   return *this;
 }
@@ -750,8 +742,7 @@ SubMeshPtr Mesh::_createGlobalSubMesh(bool force)
   }
 
   releaseSubMeshes();
-  return SubMesh::New(0, 0, totalVertices, 0, getTotalIndices(),
-                      shared_from_base<Mesh>());
+  return SubMesh::New(0, 0, totalVertices, 0, getTotalIndices(), shared_from_base<Mesh>());
 }
 
 void Mesh::subdivide(size_t count)
@@ -785,9 +776,8 @@ void Mesh::subdivide(size_t count)
   synchronizeInstances();
 }
 
-AbstractMesh* Mesh::setVerticesData(const std::string& kind,
-                                    const Float32Array& data, bool updatable,
-                                    const std::optional<size_t>& stride)
+AbstractMesh* Mesh::setVerticesData(const std::string& kind, const Float32Array& data,
+                                    bool updatable, const std::optional<size_t>& stride)
 {
   if (!_geometry) {
     auto vertexData = std::make_unique<VertexData>();
@@ -795,8 +785,7 @@ AbstractMesh* Mesh::setVerticesData(const std::string& kind,
 
     auto scene = getScene();
 
-    Geometry::New(Geometry::RandomId(), scene, vertexData.get(), updatable,
-                  this);
+    Geometry::New(Geometry::RandomId(), scene, vertexData.get(), updatable, this);
   }
   else {
     _geometry->setVerticesData(kind, data, updatable, stride);
@@ -827,8 +816,7 @@ Mesh& Mesh::setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer)
   return *this;
 }
 
-AbstractMesh* Mesh::updateVerticesData(const std::string& kind,
-                                       const Float32Array& data,
+AbstractMesh* Mesh::updateVerticesData(const std::string& kind, const Float32Array& data,
                                        bool updateExtends, bool makeItUnique)
 {
   if (!_geometry) {
@@ -845,9 +833,8 @@ AbstractMesh* Mesh::updateVerticesData(const std::string& kind,
   return this;
 }
 
-Mesh& Mesh::updateMeshPositions(
-  std::function<void(Float32Array& positions)> positionFunction,
-  bool computeNormals)
+Mesh& Mesh::updateMeshPositions(std::function<void(Float32Array& positions)> positionFunction,
+                                bool computeNormals)
 {
   auto positions = getVerticesData(VertexBuffer::PositionKind);
   if (positions.empty()) {
@@ -884,8 +871,7 @@ Mesh& Mesh::makeGeometryUnique()
   return *this;
 }
 
-AbstractMesh* Mesh::setIndices(const IndicesArray& indices,
-                               size_t totalVertices, bool updatable)
+AbstractMesh* Mesh::setIndices(const IndicesArray& indices, size_t totalVertices, bool updatable)
 {
   if (!_geometry) {
     auto vertexData     = std::make_unique<VertexData>();
@@ -902,8 +888,7 @@ AbstractMesh* Mesh::setIndices(const IndicesArray& indices,
   return this;
 }
 
-AbstractMesh& Mesh::updateIndices(const IndicesArray& indices,
-                                  const std::optional<int>& offset,
+AbstractMesh& Mesh::updateIndices(const IndicesArray& indices, const std::optional<int>& offset,
                                   bool gpuMemoryOnly)
 {
   if (!_geometry) {
@@ -925,8 +910,7 @@ Mesh& Mesh::toLeftHanded()
   return *this;
 }
 
-void Mesh::_bind(SubMesh* subMesh, const EffectPtr& effect,
-                 unsigned int fillMode)
+void Mesh::_bind(SubMesh* subMesh, const EffectPtr& effect, unsigned int fillMode)
 {
   if (!_geometry) {
     return;
@@ -946,9 +930,8 @@ void Mesh::_bind(SubMesh* subMesh, const EffectPtr& effect,
         indexToBind = nullptr;
         break;
       case Material::WireFrameFillMode: {
-        const auto& linesIndexBuffer
-          = subMesh->_getLinesIndexBuffer(getIndices(), engine);
-        indexToBind = linesIndexBuffer ? linesIndexBuffer.get() : nullptr;
+        const auto& linesIndexBuffer = subMesh->_getLinesIndexBuffer(getIndices(), engine);
+        indexToBind                  = linesIndexBuffer ? linesIndexBuffer.get() : nullptr;
       } break;
       default:
       case Material::TriangleFillMode:
@@ -961,8 +944,7 @@ void Mesh::_bind(SubMesh* subMesh, const EffectPtr& effect,
   _geometry->_bind(effect, indexToBind);
 }
 
-void Mesh::_draw(SubMesh* subMesh, int fillMode, size_t instancesCount,
-                 bool /*alternate*/)
+void Mesh::_draw(SubMesh* subMesh, int fillMode, size_t instancesCount, bool /*alternate*/)
 {
   if (!_geometry || !_geometry->getVertexBuffers().size()
       || (!_unIndexed && !_geometry->getIndexBuffer())) {
@@ -985,8 +967,7 @@ void Mesh::_draw(SubMesh* subMesh, int fillMode, size_t instancesCount,
   }
   else if (_fillMode == Material::WireFrameFillMode) {
     // Triangles as wireframe
-    engine->drawElementsType(_fillMode, 0,
-                             static_cast<int>(subMesh->_linesIndexCount),
+    engine->drawElementsType(_fillMode, 0, static_cast<int>(subMesh->_linesIndexCount),
                              static_cast<int>(instancesCount));
   }
   else {
@@ -996,29 +977,25 @@ void Mesh::_draw(SubMesh* subMesh, int fillMode, size_t instancesCount,
   }
 }
 
-Mesh& Mesh::registerBeforeRender(
-  const std::function<void(Mesh* mesh, EventState&)>& func)
+Mesh& Mesh::registerBeforeRender(const std::function<void(Mesh* mesh, EventState&)>& func)
 {
   onBeforeRenderObservable().add(func);
   return *this;
 }
 
-Mesh& Mesh::unregisterBeforeRender(
-  const std::function<void(Mesh* mesh, EventState&)>& func)
+Mesh& Mesh::unregisterBeforeRender(const std::function<void(Mesh* mesh, EventState&)>& func)
 {
   onBeforeRenderObservable().removeCallback(func);
   return *this;
 }
 
-Mesh& Mesh::registerAfterRender(
-  const std::function<void(Mesh* mesh, EventState&)>& func)
+Mesh& Mesh::registerAfterRender(const std::function<void(Mesh* mesh, EventState&)>& func)
 {
   onAfterRenderObservable().add(func);
   return *this;
 }
 
-Mesh& Mesh::unregisterAfterRender(
-  const std::function<void(Mesh* mesh, EventState&)>& func)
+Mesh& Mesh::unregisterAfterRender(const std::function<void(Mesh* mesh, EventState&)>& func)
 {
   onAfterRenderObservable().removeCallback(func);
   return *this;
@@ -1031,30 +1008,25 @@ _InstancesBatchPtr Mesh::_getInstancesRenderList(size_t subMeshId)
   }
   auto scene                     = getScene();
   auto isInIntermediateRendering = scene->_isInIntermediateRendering();
-  auto onlyForInstances
-    = isInIntermediateRendering ?
-        _internalAbstractMeshDataInfo._onlyForInstancesIntermediate :
-        _internalAbstractMeshDataInfo._onlyForInstances;
-  auto& batchCache       = _instanceDataStorage->batchCache;
-  batchCache->mustReturn = false;
-  batchCache->renderSelf[subMeshId]
-    = !onlyForInstances && isEnabled() && isVisible;
+  auto onlyForInstances          = isInIntermediateRendering ?
+                            _internalAbstractMeshDataInfo._onlyForInstancesIntermediate :
+                            _internalAbstractMeshDataInfo._onlyForInstances;
+  auto& batchCache                        = _instanceDataStorage->batchCache;
+  batchCache->mustReturn                  = false;
+  batchCache->renderSelf[subMeshId]       = !onlyForInstances && isEnabled() && isVisible;
   batchCache->visibleInstances[subMeshId] = std::vector<InstancedMesh*>();
 
   if (_instanceDataStorage->visibleInstances) {
     auto& visibleInstances = _instanceDataStorage->visibleInstances;
     auto currentRenderId   = scene->getRenderId();
-    auto defaultRenderId   = (isInIntermediateRendering ?
-                              visibleInstances->intermediateDefaultRenderId :
-                              visibleInstances->defaultRenderId);
-    batchCache->visibleInstances[subMeshId]
-      = visibleInstances->meshes[currentRenderId];
+    auto defaultRenderId
+      = (isInIntermediateRendering ? visibleInstances->intermediateDefaultRenderId :
+                                     visibleInstances->defaultRenderId);
+    batchCache->visibleInstances[subMeshId] = visibleInstances->meshes[currentRenderId];
 
-    if ((batchCache->visibleInstances.find(subMeshId)
-         == batchCache->visibleInstances.end())
+    if ((batchCache->visibleInstances.find(subMeshId) == batchCache->visibleInstances.end())
         && batchCache->visibleInstances[subMeshId].empty() && defaultRenderId) {
-      batchCache->visibleInstances[subMeshId]
-        = visibleInstances->meshes[defaultRenderId];
+      batchCache->visibleInstances[subMeshId] = visibleInstances->meshes[defaultRenderId];
     }
   }
 
@@ -1064,8 +1036,7 @@ _InstancesBatchPtr Mesh::_getInstancesRenderList(size_t subMeshId)
 
   batchCache->hardwareInstancedRendering[subMeshId]
     = _instanceDataStorage->hardwareInstancedRendering
-      && (batchCache->visibleInstances.find(subMeshId)
-          != batchCache->visibleInstances.end())
+      && (batchCache->visibleInstances.find(subMeshId) != batchCache->visibleInstances.end())
       && (!batchCache->visibleInstances[subMeshId].empty());
   _instanceDataStorage->previousBatch = batchCache;
 
@@ -1073,11 +1044,10 @@ _InstancesBatchPtr Mesh::_getInstancesRenderList(size_t subMeshId)
 }
 
 Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
-                                 const _InstancesBatchPtr& batch,
-                                 const EffectPtr& effect, Engine* engine)
+                                 const _InstancesBatchPtr& batch, const EffectPtr& effect,
+                                 Engine* engine)
 {
-  if (batch->visibleInstances.find(subMesh->_id)
-      == batch->visibleInstances.end()) {
+  if (batch->visibleInstances.find(subMesh->_id) == batch->visibleInstances.end()) {
     return *this;
   }
 
@@ -1098,8 +1068,7 @@ Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
 
   if (instanceStorage->instancesData.empty()
       || currentInstancesBufferSize != instanceStorage->instancesBufferSize) {
-    instanceStorage->instancesData
-      = Float32Array(instanceStorage->instancesBufferSize / 4);
+    instanceStorage->instancesData = Float32Array(instanceStorage->instancesBufferSize / 4);
   }
 
   unsigned int offset         = 0;
@@ -1113,37 +1082,29 @@ Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
   }
 
   if (!visibleInstances.empty()) {
-    for (size_t instanceIndex = 0; instanceIndex < visibleInstances.size();
-         ++instanceIndex) {
+    for (size_t instanceIndex = 0; instanceIndex < visibleInstances.size(); ++instanceIndex) {
       auto instance = visibleInstances[instanceIndex];
-      instance->getWorldMatrix().copyToArray(instanceStorage->instancesData,
-                                             offset);
+      instance->getWorldMatrix().copyToArray(instanceStorage->instancesData, offset);
       offset += 16;
       ++instancesCount;
     }
   }
 
-  if (!instancesBuffer
-      || currentInstancesBufferSize != instanceStorage->instancesBufferSize) {
+  if (!instancesBuffer || currentInstancesBufferSize != instanceStorage->instancesBufferSize) {
     if (instancesBuffer) {
       instancesBuffer->dispose();
     }
 
-    instancesBuffer = std::make_shared<Buffer>(
-      engine, instanceStorage->instancesData, true, 16, false, true);
+    instancesBuffer
+      = std::make_shared<Buffer>(engine, instanceStorage->instancesData, true, 16, false, true);
 
-    setVerticesBuffer(
-      instancesBuffer->createVertexBuffer(VertexBuffer::World0Kind, 0, 4));
-    setVerticesBuffer(
-      instancesBuffer->createVertexBuffer(VertexBuffer::World1Kind, 4, 4));
-    setVerticesBuffer(
-      instancesBuffer->createVertexBuffer(VertexBuffer::World2Kind, 8, 4));
-    setVerticesBuffer(
-      instancesBuffer->createVertexBuffer(VertexBuffer::World3Kind, 12, 4));
+    setVerticesBuffer(instancesBuffer->createVertexBuffer(VertexBuffer::World0Kind, 0, 4));
+    setVerticesBuffer(instancesBuffer->createVertexBuffer(VertexBuffer::World1Kind, 4, 4));
+    setVerticesBuffer(instancesBuffer->createVertexBuffer(VertexBuffer::World2Kind, 8, 4));
+    setVerticesBuffer(instancesBuffer->createVertexBuffer(VertexBuffer::World3Kind, 12, 4));
   }
   else {
-    instancesBuffer->updateDirectly(instanceStorage->instancesData, 0,
-                                    instancesCount);
+    instancesBuffer->updateDirectly(instanceStorage->instancesData, 0, instancesCount);
   }
 
   _bind(subMesh, effect, fillMode);
@@ -1156,10 +1117,9 @@ Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
 }
 
 Mesh& Mesh::_processRendering(
-  SubMesh* subMesh, const EffectPtr& effect, int fillMode,
-  const _InstancesBatchPtr& batch, bool hardwareInstancedRendering,
-  std::function<void(bool isInstance, const Matrix& world,
-                     Material* effectiveMaterial)>
+  SubMesh* subMesh, const EffectPtr& effect, int fillMode, const _InstancesBatchPtr& batch,
+  bool hardwareInstancedRendering,
+  std::function<void(bool isInstance, const Matrix& world, Material* effectiveMaterial)>
     iOnBeforeDraw,
   Material* effectiveMaterial)
 {
@@ -1167,15 +1127,13 @@ Mesh& Mesh::_processRendering(
   auto engine = scene->getEngine();
 
   if (hardwareInstancedRendering) {
-    _renderWithInstances(subMesh, static_cast<unsigned>(fillMode), batch,
-                         effect, engine);
+    _renderWithInstances(subMesh, static_cast<unsigned>(fillMode), batch, effect, engine);
   }
   else {
     if (batch->renderSelf[subMesh->_id]) {
       // Draw
       if (iOnBeforeDraw) {
-        iOnBeforeDraw(false, _effectiveMesh()->getWorldMatrix(),
-                      effectiveMaterial);
+        iOnBeforeDraw(false, _effectiveMesh()->getWorldMatrix(), effectiveMaterial);
       }
 
       _draw(subMesh, fillMode, _instanceDataStorage->overridenInstanceCount);
@@ -1263,10 +1221,9 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
     _internalMeshDataInfo->_onBeforeRenderObservable.notifyObservers(this);
   }
 
-  auto engine = scene.getEngine();
-  auto hardwareInstancedRendering
-    = batch->hardwareInstancedRendering[subMesh->_id];
-  auto& instanceDataStorage = *_instanceDataStorage;
+  auto engine                     = scene.getEngine();
+  auto hardwareInstancedRendering = batch->hardwareInstancedRendering[subMesh->_id];
+  auto& instanceDataStorage       = *_instanceDataStorage;
 
   // Material
   auto iMaterial = subMesh->getMaterial();
@@ -1276,14 +1233,12 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
   }
 
   // Material
-  if (!instanceDataStorage.isFrozen || !_effectiveMaterial
-      || _effectiveMaterial != iMaterial) {
+  if (!instanceDataStorage.isFrozen || !_effectiveMaterial || _effectiveMaterial != iMaterial) {
 
     _effectiveMaterial = iMaterial;
 
     if (_effectiveMaterial->_storeEffectOnSubMeshes) {
-      if (!_effectiveMaterial->isReadyForSubMesh(this, subMesh,
-                                                 hardwareInstancedRendering)) {
+      if (!_effectiveMaterial->isReadyForSubMesh(this, subMesh, hardwareInstancedRendering)) {
         return *this;
       }
     }
@@ -1294,8 +1249,7 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
 
   // Alpha mode
   if (enableAlphaMode) {
-    engine->setAlphaMode(
-      static_cast<unsigned>(_effectiveMaterial->alphaMode()));
+    engine->setAlphaMode(static_cast<unsigned>(_effectiveMaterial->alphaMode()));
   }
 
   for (const auto& step : scene._beforeRenderingMeshStage) {
@@ -1321,8 +1275,7 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
   if (!instanceDataStorage.isFrozen) {
     sideOrientation = overrideMaterialSideOrientation;
     if (!sideOrientation.has_value()) {
-      sideOrientation
-        = static_cast<unsigned>(_effectiveMaterial->sideOrientation);
+      sideOrientation = static_cast<unsigned>(_effectiveMaterial->sideOrientation);
     }
     if (effectiveMesh._getWorldMatrixDeterminant() < 0.f) {
       sideOrientation = (sideOrientation == Material::ClockWiseSideOrientation ?
@@ -1342,10 +1295,10 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
   }
 
   // Bind
-  auto fillMode = scene.forcePointsCloud() ?
-                    Material::PointFillMode :
-                    (scene.forceWireframe() ? Material::WireFrameFillMode :
-                                              _effectiveMaterial->fillMode());
+  auto fillMode
+    = scene.forcePointsCloud() ?
+        Material::PointFillMode :
+        (scene.forceWireframe() ? Material::WireFrameFillMode : _effectiveMaterial->fillMode());
 
   {
     _internalMeshDataInfo->_onBeforeBindObservable.notifyObservers(this);
@@ -1365,12 +1318,10 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
     _effectiveMaterial->bind(_world, this);
   }
 
-  if (!_effectiveMaterial->backFaceCulling()
-      && _effectiveMaterial->separateCullingPass) {
+  if (!_effectiveMaterial->backFaceCulling() && _effectiveMaterial->separateCullingPass) {
     engine->setState(true, _effectiveMaterial->zOffset, false, !reverse);
     _processRendering(
-      subMesh, effect, static_cast<int>(fillMode), batch,
-      hardwareInstancedRendering,
+      subMesh, effect, static_cast<int>(fillMode), batch, hardwareInstancedRendering,
       [&](bool isInstance, Matrix world, Material* effectiveMaterial) {
         _onBeforeDraw(isInstance, world, effectiveMaterial);
       },
@@ -1379,12 +1330,10 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
   }
 
   // Draw
-  _processRendering(
-    subMesh, effect, static_cast<int>(fillMode), batch,
-    hardwareInstancedRendering,
-    [&](bool isInstance, Matrix world, Material* effectiveMaterial) {
-      _onBeforeDraw(isInstance, world, effectiveMaterial);
-    });
+  _processRendering(subMesh, effect, static_cast<int>(fillMode), batch, hardwareInstancedRendering,
+                    [&](bool isInstance, Matrix world, Material* effectiveMaterial) {
+                      _onBeforeDraw(isInstance, world, effectiveMaterial);
+                    });
 
   // Unbind
   _effectiveMaterial->unbind();
@@ -1400,8 +1349,7 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
   return *this;
 }
 
-Mesh& Mesh::_onBeforeDraw(bool isInstance, Matrix& world,
-                          Material* effectiveMaterial)
+Mesh& Mesh::_onBeforeDraw(bool isInstance, Matrix& world, Material* effectiveMaterial)
 {
   if (isInstance && effectiveMaterial) {
     effectiveMaterial->bindOnlyWorldMatrix(world);
@@ -1473,8 +1421,8 @@ void Mesh::normalizeSkinFourWeights()
 
   for (size_t a = 0; a < numWeights; a += 4) {
     // accumulate weights
-    auto t = matricesWeights[a] + matricesWeights[a + 1]
-             + matricesWeights[a + 2] + matricesWeights[a + 3];
+    auto t = matricesWeights[a] + matricesWeights[a + 1] + matricesWeights[a + 2]
+             + matricesWeights[a + 3];
     // check for invalid weight and just set it to 1.
     if (t == 0.f) {
       matricesWeights[a] = 1.f;
@@ -1493,17 +1441,16 @@ void Mesh::normalizeSkinFourWeights()
 
 void Mesh::normalizeSkinWeightsAndExtra()
 {
-  auto matricesWeightsExtra
-    = getVerticesData(VertexBuffer::MatricesWeightsExtraKind);
-  auto matricesWeights = getVerticesData(VertexBuffer::MatricesWeightsKind);
-  auto numWeights      = matricesWeights.size();
+  auto matricesWeightsExtra = getVerticesData(VertexBuffer::MatricesWeightsExtraKind);
+  auto matricesWeights      = getVerticesData(VertexBuffer::MatricesWeightsKind);
+  auto numWeights           = matricesWeights.size();
 
   for (size_t a = 0; a < numWeights; a += 4) {
     // accumulate weights
-    auto t = matricesWeights[a] + matricesWeights[a + 1]
-             + matricesWeights[a + 2] + matricesWeights[a + 3];
-    t += matricesWeightsExtra[a] + matricesWeightsExtra[a + 1]
-         + matricesWeightsExtra[a + 2] + matricesWeightsExtra[a + 3];
+    auto t = matricesWeights[a] + matricesWeights[a + 1] + matricesWeights[a + 2]
+             + matricesWeights[a + 3];
+    t += matricesWeightsExtra[a] + matricesWeightsExtra[a + 1] + matricesWeightsExtra[a + 2]
+         + matricesWeightsExtra[a + 3];
     // check for invalid weight and just set it to 1.
     if (t == 0.f) {
       matricesWeights[a] = 1.f;
@@ -1528,9 +1475,8 @@ void Mesh::normalizeSkinWeightsAndExtra()
 
 SkinningValidationResult Mesh::validateSkinning()
 {
-  auto matricesWeightsExtra
-    = getVerticesData(VertexBuffer::MatricesWeightsExtraKind);
-  auto matricesWeights = getVerticesData(VertexBuffer::MatricesWeightsKind);
+  auto matricesWeightsExtra = getVerticesData(VertexBuffer::MatricesWeightsExtraKind);
+  auto matricesWeights      = getVerticesData(VertexBuffer::MatricesWeightsKind);
   if (matricesWeights.empty() || skeleton() == nullptr) {
     return {
       false,        // skinned
@@ -1585,8 +1531,7 @@ SkinningValidationResult Mesh::validateSkinning()
       auto tolerance = 0.f;
       for (size_t b = 0; b < numInfluences; ++b) {
         if (b < 4) {
-          tolerance += std::abs(matricesWeights[a + b]
-                                - (matricesWeights[a + b] * recip));
+          tolerance += std::abs(matricesWeights[a + b] - (matricesWeights[a + b] * recip));
         }
         else {
           tolerance += std::abs(matricesWeightsExtra[a + b - 4]
@@ -1601,11 +1546,10 @@ SkinningValidationResult Mesh::validateSkinning()
   }
 
   // validate bone indices are in range of the skeleton
-  auto numBones        = skeleton()->bones.size();
-  auto matricesIndices = getVerticesData(VertexBuffer::MatricesIndicesKind);
-  auto matricesIndicesExtra
-    = getVerticesData(VertexBuffer::MatricesIndicesExtraKind);
-  auto numBadBoneIndices = 0u;
+  auto numBones             = skeleton()->bones.size();
+  auto matricesIndices      = getVerticesData(VertexBuffer::MatricesIndicesKind);
+  auto matricesIndicesExtra = getVerticesData(VertexBuffer::MatricesIndicesExtraKind);
+  auto numBadBoneIndices    = 0u;
   for (size_t a = 0; a < numWeights; a++) {
     for (size_t b = 0; b < numInfluences; b++) {
       auto index = b < 4 ? matricesIndices[b] : matricesIndicesExtra[b - 4];
@@ -1618,16 +1562,12 @@ SkinningValidationResult Mesh::validateSkinning()
   // log mesh stats
   std::ostringstream output;
   output << "Number of Weights = " << (numWeights / 4)
-         << "\nMaximum influences = " << maxUsedWeights
-         << "\nMissing Weights = " << missingWeights
-         << "\nNot Sorted = " << numberNotSorted
-         << "\nNot Normalized = " << numberNotNormalized << "\nWeightCounts = ["
-         << usedWeightCounts << "]"
-         << "\nNumber of bones = " << numBones
-         << "\nBad Bone Indices = " << numBadBoneIndices;
+         << "\nMaximum influences = " << maxUsedWeights << "\nMissing Weights = " << missingWeights
+         << "\nNot Sorted = " << numberNotSorted << "\nNot Normalized = " << numberNotNormalized
+         << "\nWeightCounts = [" << usedWeightCounts << "]"
+         << "\nNumber of bones = " << numBones << "\nBad Bone Indices = " << numBadBoneIndices;
 
-  bool isValid = (missingWeights == 0 && numberNotNormalized == 0
-                  && numBadBoneIndices == 0);
+  bool isValid = (missingWeights == 0 && numberNotNormalized == 0 && numBadBoneIndices == 0);
 
   return {
     true,        // skinned
@@ -1656,8 +1596,7 @@ Mesh& Mesh::_queueLoad(Scene* scene)
 {
   scene->_addPendingData(this);
 
-  const auto getBinaryData
-    = String::contains(delayLoadingFile, ".babylonbinarymeshdata");
+  const auto getBinaryData = String::contains(delayLoadingFile, ".babylonbinarymeshdata");
 
   Tools::LoadFile(
     delayLoadingFile,
@@ -1667,8 +1606,7 @@ Mesh& Mesh::_queueLoad(Scene* scene)
         // _delayLoadingFunction(data, shared_from_base<Mesh>());
       }
       else {
-        _delayLoadingFunction(json::parse(std::get<std::string>(data)),
-                              shared_from_base<Mesh>());
+        _delayLoadingFunction(json::parse(std::get<std::string>(data)), shared_from_base<Mesh>());
       }
 
       for (const auto& instance : instances) {
@@ -1684,8 +1622,7 @@ Mesh& Mesh::_queueLoad(Scene* scene)
   return *this;
 }
 
-bool Mesh::isInFrustum(const std::array<Plane, 6>& frustumPlanes,
-                       unsigned int /*strategy*/)
+bool Mesh::isInFrustum(const std::array<Plane, 6>& frustumPlanes, unsigned int /*strategy*/)
 {
   if (delayLoadState == Constants::DELAYLOADSTATE_LOADING) {
     return false;
@@ -1753,8 +1690,7 @@ Mesh& Mesh::bakeTransformIntoVertices(const Matrix& transform)
   Float32Array temp;
   unsigned int index;
   for (index = 0; index < data.size(); index += 3) {
-    Vector3::TransformCoordinates(Vector3::FromArray(data, index), transform)
-      .toArray(temp, index);
+    Vector3::TransformCoordinates(Vector3::FromArray(data, index), transform).toArray(temp, index);
   }
 
   setVerticesData(VertexBuffer::PositionKind, temp,
@@ -1827,11 +1763,10 @@ bool Mesh::_generatePointsArray()
   return false;
 }
 
-MeshPtr Mesh::clone(const std::string& iName, Node* newParent,
-                    bool doNotCloneChildren, bool clonePhysicsImpostor)
+MeshPtr Mesh::clone(const std::string& iName, Node* newParent, bool doNotCloneChildren,
+                    bool clonePhysicsImpostor)
 {
-  return Mesh::New(iName, getScene(), newParent, this, doNotCloneChildren,
-                   clonePhysicsImpostor);
+  return Mesh::New(iName, getScene(), newParent, this, doNotCloneChildren, clonePhysicsImpostor);
 }
 
 void Mesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
@@ -1862,8 +1797,7 @@ void Mesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 
     if (internalDataInfo._source
         && !internalDataInfo._source->_internalMeshDataInfo->meshMap.empty()) {
-      internalDataInfo._source->_internalMeshDataInfo->meshMap.erase(
-        std::to_string(uniqueId));
+      internalDataInfo._source->_internalMeshDataInfo->meshMap.erase(std::to_string(uniqueId));
     }
   }
   else {
@@ -1892,11 +1826,10 @@ void Mesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   AbstractMesh::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 
-Mesh& Mesh::applyDisplacementMap(
-  const std::string& url, float minHeight, float maxHeight,
-  const std::function<void(Mesh* mesh)> onSuccess,
-  const std::optional<Vector2>& uvOffset, const std::optional<Vector2>& uvScale,
-  bool forceUpdate)
+Mesh& Mesh::applyDisplacementMap(const std::string& url, float minHeight, float maxHeight,
+                                 const std::function<void(Mesh* mesh)> onSuccess,
+                                 const std::optional<Vector2>& uvOffset,
+                                 const std::optional<Vector2>& uvScale, bool forceUpdate)
 {
   Tools::LoadImageFromUrl(
     url,
@@ -1904,9 +1837,8 @@ Mesh& Mesh::applyDisplacementMap(
       auto heightMapWidth  = static_cast<unsigned>(img.width);
       auto heightMapHeight = static_cast<unsigned>(img.height);
       // Create VertexData from map data
-      applyDisplacementMapFromBuffer(img.data, heightMapWidth, heightMapHeight,
-                                     minHeight, maxHeight, uvOffset, uvScale,
-                                     forceUpdate);
+      applyDisplacementMapFromBuffer(img.data, heightMapWidth, heightMapHeight, minHeight,
+                                     maxHeight, uvOffset, uvScale, forceUpdate);
       // execute success callback, if set
       if (onSuccess) {
         onSuccess(this);
@@ -1917,11 +1849,10 @@ Mesh& Mesh::applyDisplacementMap(
   return *this;
 }
 
-void Mesh::applyDisplacementMapFromBuffer(
-  const Uint8Array& buffer, unsigned int heightMapWidth,
-  unsigned int heightMapHeight, float minHeight, float maxHeight,
-  const std::optional<Vector2>& iUvOffset,
-  const std::optional<Vector2>& iUvScale, bool forceUpdate)
+void Mesh::applyDisplacementMapFromBuffer(const Uint8Array& buffer, unsigned int heightMapWidth,
+                                          unsigned int heightMapHeight, float minHeight,
+                                          float maxHeight, const std::optional<Vector2>& iUvOffset,
+                                          const std::optional<Vector2>& iUvScale, bool forceUpdate)
 {
   if (!isVerticesDataPresent(VertexBuffer::PositionKind)
       || !isVerticesDataPresent(VertexBuffer::NormalKind)
@@ -1948,11 +1879,9 @@ void Mesh::applyDisplacementMapFromBuffer(
     Vector2::FromArrayToRef(uvs, (index / 3) * 2, uv);
 
     // Compute height
-    auto u = static_cast<unsigned int>(std::abs(uv.x * uvScale.x + uvOffset.x)
-                                       * heightMapWidth)
+    auto u = static_cast<unsigned int>(std::abs(uv.x * uvScale.x + uvOffset.x) * heightMapWidth)
              % heightMapWidth;
-    auto v = static_cast<unsigned int>(std::abs(uv.y * uvScale.y + uvOffset.y)
-                                       * heightMapHeight)
+    auto v = static_cast<unsigned int>(std::abs(uv.y * uvScale.y + uvOffset.y) * heightMapHeight)
              % heightMapHeight;
 
     auto pos = (u + v * heightMapWidth) * 4;
@@ -2007,7 +1936,7 @@ Mesh& Mesh::convertToFlatShadedMesh()
   }
 
   // Save previous submeshes
-  auto previousSubmeshes = subMeshes; //stl_util::to_raw_ptr_vector(subMeshes);
+  auto previousSubmeshes = subMeshes; // stl_util::to_raw_ptr_vector(subMeshes);
 
   auto indices      = getIndices();
   auto totalIndices = getTotalIndices();
@@ -2064,10 +1993,8 @@ Mesh& Mesh::convertToFlatShadedMesh()
   // Updating submeshes
   releaseSubMeshes();
   for (const auto& previousOne : previousSubmeshes) {
-    SubMesh::AddToMesh(previousOne->materialIndex,
-                       static_cast<unsigned>(previousOne->indexStart),
-                       previousOne->indexCount,
-                       static_cast<unsigned>(previousOne->indexStart),
+    SubMesh::AddToMesh(previousOne->materialIndex, static_cast<unsigned>(previousOne->indexStart),
+                       previousOne->indexCount, static_cast<unsigned>(previousOne->indexStart),
                        previousOne->indexCount, shared_from_base<Mesh>());
   }
 
@@ -2135,10 +2062,8 @@ Mesh& Mesh::convertToUnIndexedMesh()
   // Updating submeshes
   releaseSubMeshes();
   for (const auto& previousOne : previousSubmeshes) {
-    SubMesh::AddToMesh(previousOne->materialIndex,
-                       static_cast<unsigned>(previousOne->indexStart),
-                       previousOne->indexCount,
-                       static_cast<unsigned>(previousOne->indexStart),
+    SubMesh::AddToMesh(previousOne->materialIndex, static_cast<unsigned>(previousOne->indexStart),
+                       previousOne->indexCount, static_cast<unsigned>(previousOne->indexStart),
                        previousOne->indexCount, shared_from_base<Mesh>());
   }
 
@@ -2166,8 +2091,7 @@ Mesh& Mesh::flipFaces(bool flipNormals)
     }
   }
 
-  vertex_data->applyToMesh(*this,
-                           isVertexBufferUpdatable(VertexBuffer::PositionKind));
+  vertex_data->applyToMesh(*this, isVertexBufferUpdatable(VertexBuffer::PositionKind));
   return *this;
 }
 
@@ -2179,14 +2103,12 @@ void Mesh::increaseVertices(size_t numberPerEdge)
   auto& positions      = vertex_data->positions;
   auto& normals        = vertex_data->normals;
 
-  if (currentIndices.empty() || positions.empty() || normals.empty()
-      || uvs.empty()) {
+  if (currentIndices.empty() || positions.empty() || normals.empty() || uvs.empty()) {
     BABYLON_LOG_WARN("Mesh", "VertexData contains null entries")
   }
   else {
     auto segments
-      = numberPerEdge
-        + 1; // segments per current facet edge, become sides of new facets
+      = numberPerEdge + 1; // segments per current facet edge, become sides of new facets
     std::vector<Uint32Array> tempIndices;
     for (size_t i = 0; i < segments + 1; ++i) {
       tempIndices[i] = {};
@@ -2228,19 +2150,16 @@ void Mesh::increaseVertices(size_t numberPerEdge)
         if (b >= side[a].size() && a >= side[b].size()) {
           side[a].resize(b + 1);
           deltaPosition.x = (positions[3 * b] - positions[3 * a]) / segments;
-          deltaPosition.y
-            = (positions[3 * b + 1] - positions[3 * a + 1]) / segments;
-          deltaPosition.z
-            = (positions[3 * b + 2] - positions[3 * a + 2]) / segments;
-          deltaNormal.x = (normals[3 * b] - normals[3 * a]) / segments;
-          deltaNormal.y = (normals[3 * b + 1] - normals[3 * a + 1]) / segments;
-          deltaNormal.z = (normals[3 * b + 2] - normals[3 * a + 2]) / segments;
-          deltaUV.x     = (uvs[2 * b] - uvs[2 * a]) / segments;
-          deltaUV.y     = (uvs[2 * b + 1] - uvs[2 * a + 1]) / segments;
+          deltaPosition.y = (positions[3 * b + 1] - positions[3 * a + 1]) / segments;
+          deltaPosition.z = (positions[3 * b + 2] - positions[3 * a + 2]) / segments;
+          deltaNormal.x   = (normals[3 * b] - normals[3 * a]) / segments;
+          deltaNormal.y   = (normals[3 * b + 1] - normals[3 * a + 1]) / segments;
+          deltaNormal.z   = (normals[3 * b + 2] - normals[3 * a + 2]) / segments;
+          deltaUV.x       = (uvs[2 * b] - uvs[2 * a]) / segments;
+          deltaUV.y       = (uvs[2 * b + 1] - uvs[2 * a + 1]) / segments;
           side[a][b].emplace_back(a);
           for (size_t k = 1; k < segments; k++) {
-            side[a][b].emplace_back(
-              static_cast<uint32_t>(positions.size() / 3));
+            side[a][b].emplace_back(static_cast<uint32_t>(positions.size() / 3));
             positions[positionPtr] = positions[3 * a] + k * deltaPosition.x;
             normals[positionPtr++] = normals[3 * a] + k * deltaNormal.x;
             positions[positionPtr] = positions[3 * a + 1] + k * deltaPosition.y;
@@ -2265,70 +2184,49 @@ void Mesh::increaseVertices(size_t numberPerEdge)
       for (size_t k = 2; k < segments; k++) {
         tempIndices[k][0] = side[currentIndices[i]][currentIndices[i + 1]][k];
         tempIndices[k][k] = side[currentIndices[i]][currentIndices[i + 2]][k];
-        deltaPosition.x   = (positions[3 * tempIndices[k][k]]
-                           - positions[3 * tempIndices[k][0]])
-                          / k;
-        deltaPosition.y = (positions[3 * tempIndices[k][k] + 1]
-                           - positions[3 * tempIndices[k][0] + 1])
-                          / k;
-        deltaPosition.z = (positions[3 * tempIndices[k][k] + 2]
-                           - positions[3 * tempIndices[k][0] + 2])
-                          / k;
-        deltaNormal.x
-          = (normals[3 * tempIndices[k][k]] - normals[3 * tempIndices[k][0]])
-            / k;
-        deltaNormal.y = (normals[3 * tempIndices[k][k] + 1]
-                         - normals[3 * tempIndices[k][0] + 1])
-                        / k;
-        deltaNormal.z = (normals[3 * tempIndices[k][k] + 2]
-                         - normals[3 * tempIndices[k][0] + 2])
-                        / k;
-        deltaUV.x
-          = (uvs[2 * tempIndices[k][k]] - uvs[2 * tempIndices[k][0]]) / k;
-        deltaUV.y
-          = (uvs[2 * tempIndices[k][k] + 1] - uvs[2 * tempIndices[k][0] + 1])
-            / k;
+        deltaPosition.x = (positions[3 * tempIndices[k][k]] - positions[3 * tempIndices[k][0]]) / k;
+        deltaPosition.y
+          = (positions[3 * tempIndices[k][k] + 1] - positions[3 * tempIndices[k][0] + 1]) / k;
+        deltaPosition.z
+          = (positions[3 * tempIndices[k][k] + 2] - positions[3 * tempIndices[k][0] + 2]) / k;
+        deltaNormal.x = (normals[3 * tempIndices[k][k]] - normals[3 * tempIndices[k][0]]) / k;
+        deltaNormal.y
+          = (normals[3 * tempIndices[k][k] + 1] - normals[3 * tempIndices[k][0] + 1]) / k;
+        deltaNormal.z
+          = (normals[3 * tempIndices[k][k] + 2] - normals[3 * tempIndices[k][0] + 2]) / k;
+        deltaUV.x = (uvs[2 * tempIndices[k][k]] - uvs[2 * tempIndices[k][0]]) / k;
+        deltaUV.y = (uvs[2 * tempIndices[k][k] + 1] - uvs[2 * tempIndices[k][0] + 1]) / k;
         for (size_t j = 1; j < k; j++) {
-          tempIndices[k][j] = static_cast<unsigned>(positions.size() / 3);
-          positions[positionPtr]
-            = positions[3 * tempIndices[k][0]] + j * deltaPosition.x;
-          normals[positionPtr++]
-            = normals[3 * tempIndices[k][0]] + j * deltaNormal.x;
-          positions[positionPtr]
-            = positions[3 * tempIndices[k][0] + 1] + j * deltaPosition.y;
-          normals[positionPtr++]
-            = normals[3 * tempIndices[k][0] + 1] + j * deltaNormal.y;
-          positions[positionPtr]
-            = positions[3 * tempIndices[k][0] + 2] + j * deltaPosition.z;
-          normals[positionPtr++]
-            = normals[3 * tempIndices[k][0] + 2] + j * deltaNormal.z;
-          uvs[uvPtr++] = uvs[2 * tempIndices[k][0]] + j * deltaUV.x;
-          uvs[uvPtr++] = uvs[2 * tempIndices[k][0] + 1] + j * deltaUV.y;
+          tempIndices[k][j]      = static_cast<unsigned>(positions.size() / 3);
+          positions[positionPtr] = positions[3 * tempIndices[k][0]] + j * deltaPosition.x;
+          normals[positionPtr++] = normals[3 * tempIndices[k][0]] + j * deltaNormal.x;
+          positions[positionPtr] = positions[3 * tempIndices[k][0] + 1] + j * deltaPosition.y;
+          normals[positionPtr++] = normals[3 * tempIndices[k][0] + 1] + j * deltaNormal.y;
+          positions[positionPtr] = positions[3 * tempIndices[k][0] + 2] + j * deltaPosition.z;
+          normals[positionPtr++] = normals[3 * tempIndices[k][0] + 2] + j * deltaNormal.z;
+          uvs[uvPtr++]           = uvs[2 * tempIndices[k][0]] + j * deltaUV.x;
+          uvs[uvPtr++]           = uvs[2 * tempIndices[k][0] + 1] + j * deltaUV.y;
         }
       }
-      tempIndices[segments]
-        = side[currentIndices[i + 1]][currentIndices[i + 2]];
+      tempIndices[segments] = side[currentIndices[i + 1]][currentIndices[i + 2]];
 
       // reform indices
-      stl_util::concat(
-        indices, {tempIndices[0][0], tempIndices[1][0], tempIndices[1][1]});
+      stl_util::concat(indices, {tempIndices[0][0], tempIndices[1][0], tempIndices[1][1]});
       for (size_t k = 1; k < segments; k++) {
         size_t j = 0;
         for (j = 0; j < k; j++) {
-          stl_util::concat(indices, {tempIndices[k][j], tempIndices[k + 1][j],
-                                     tempIndices[k + 1][j + 1]});
           stl_util::concat(indices,
-                           {tempIndices[k][j], tempIndices[k + 1][j + 1],
-                            tempIndices[k][j + 1]});
+                           {tempIndices[k][j], tempIndices[k + 1][j], tempIndices[k + 1][j + 1]});
+          stl_util::concat(indices,
+                           {tempIndices[k][j], tempIndices[k + 1][j + 1], tempIndices[k][j + 1]});
         }
-        stl_util::concat(indices, {tempIndices[k][j], tempIndices[k + 1][j],
-                                   tempIndices[k + 1][j + 1]});
+        stl_util::concat(indices,
+                         {tempIndices[k][j], tempIndices[k + 1][j], tempIndices[k + 1][j + 1]});
       }
     }
 
     vertex_data->indices = std::move(indices);
-    vertex_data->applyToMesh(
-      *this, isVertexBufferUpdatable(VertexBuffer::PositionKind));
+    vertex_data->applyToMesh(*this, isVertexBufferUpdatable(VertexBuffer::PositionKind));
   }
 }
 
@@ -2351,14 +2249,14 @@ void Mesh::forceSharedVertices()
     // lists facet vertex positions (a,b,c) as string "a|b|c"
     std::vector<std::string> pstring;
 
-    auto indexPtr = 0ull; // pointer to next available index value
+    auto indexPtr = 0ull;                     // pointer to next available index value
     std::vector<std::string> uniquePositions; // unique vertex positions
-    auto ptr = 0; // pointer to element in uniquePositions
+    auto ptr = 0;                             // pointer to element in uniquePositions
     IndicesArray facet;
 
     for (size_t i = 0; i < currentIndices.size(); i += 3) {
-      facet = {currentIndices[i], currentIndices[i + 1],
-               currentIndices[i + 2]}; // facet vertex indices
+      facet
+        = {currentIndices[i], currentIndices[i + 1], currentIndices[i + 2]}; // facet vertex indices
       pstring.clear();
       for (unsigned int j = 0; j < 3; j++) {
         pstring[j] = "";
@@ -2367,15 +2265,13 @@ void Mesh::forceSharedVertices()
           if (std::abs(currentPositions[3 * facet[j] + k]) < 0.00000001f) {
             currentPositions[3 * facet[j] + k] = 0;
           }
-          pstring[j]
-            += std::to_string(currentPositions[3 * facet[j] + k]) + "|";
+          pstring[j] += std::to_string(currentPositions[3 * facet[j] + k]) + "|";
         }
         pstring[j] = pstring[j].substr(0, pstring[j].size() - 1);
       }
       // check facet vertices to see that none are repeated
       // do not process any facet that has a repeated vertex, ie is a line
-      if (!(pstring[0] == pstring[1] || pstring[0] == pstring[2]
-            || pstring[1] == pstring[2])) {
+      if (!(pstring[0] == pstring[1] || pstring[0] == pstring[2] || pstring[1] == pstring[2])) {
         // for each facet position check if already listed in uniquePositions
         // if not listed add to uniquePositions and set index pointer
         // if listed use its index in uniquePositions and new index pointer
@@ -2420,8 +2316,7 @@ void Mesh::forceSharedVertices()
       vertex_data->colors = std::move(colors);
     }
 
-    vertex_data->applyToMesh(
-      *this, isVertexBufferUpdatable(VertexBuffer::PositionKind));
+    vertex_data->applyToMesh(*this, isVertexBufferUpdatable(VertexBuffer::PositionKind));
   }
 }
 
@@ -2438,8 +2333,7 @@ Mesh& Mesh::synchronizeInstances()
   return *this;
 }
 
-void Mesh::optimizeIndices(
-  const std::function<void(Mesh* mesh)>& successCallback)
+void Mesh::optimizeIndices(const std::function<void(Mesh* mesh)>& successCallback)
 {
   successCallback(nullptr);
 }
@@ -2473,8 +2367,7 @@ void Mesh::minimizeVertices()
     }
     // check facet vertices to see that none are repeated
     // do not process any facet that has a repeated vertex, ie is a line
-    if (!(_pstring[0] == _pstring[1] || _pstring[0] == _pstring[2]
-          || _pstring[1] == _pstring[2])) {
+    if (!(_pstring[0] == _pstring[1] || _pstring[0] == _pstring[2] || _pstring[1] == _pstring[2])) {
       // for each facet position check if already listed in uniquePositions
       // if not listed add to uniquePositions and set index pointer
       // if listed use its index in uniquePositions and new index pointer
@@ -2533,37 +2426,32 @@ void Mesh::_syncGeometryWithMorphTargetManager()
     }
 
     std::string indexStr;
-    for (unsigned int index = 0; index < iMorphTargetManager->numInfluencers();
-         ++index) {
+    for (unsigned int index = 0; index < iMorphTargetManager->numInfluencers(); ++index) {
       indexStr         = std::to_string(index);
       auto morphTarget = iMorphTargetManager->getActiveTarget(index);
 
       const auto& positions = morphTarget->getPositions();
       if (positions.empty()) {
-        BABYLON_LOG_ERROR("Mesh",
-                          "Invalid morph target. Target must have positions.")
+        BABYLON_LOG_ERROR("Mesh", "Invalid morph target. Target must have positions.")
         return;
       }
 
-      iGeometry->setVerticesData(VertexBuffer::PositionKind + indexStr,
-                                 positions, false, 3);
+      iGeometry->setVerticesData(VertexBuffer::PositionKind + indexStr, positions, false, 3);
 
       const auto& normals = morphTarget->getNormals();
       if (!normals.empty()) {
-        iGeometry->setVerticesData(VertexBuffer::NormalKind + indexStr, normals,
-                                   false, 3);
+        iGeometry->setVerticesData(VertexBuffer::NormalKind + indexStr, normals, false, 3);
       }
 
       const auto& tangents = morphTarget->getTangents();
       if (!tangents.empty()) {
-        iGeometry->setVerticesData(VertexBuffer::TangentKind + indexStr,
-                                   tangents, false, 3);
+        iGeometry->setVerticesData(VertexBuffer::TangentKind + indexStr, tangents, false, 3);
       }
 
       const auto& uvs = morphTarget->getUVs();
       if (!uvs.empty()) {
-        iGeometry->setVerticesData(
-          VertexBuffer::UVKind + std::string("_") + indexStr, uvs, false, 2);
+        iGeometry->setVerticesData(VertexBuffer::UVKind + std::string("_") + indexStr, uvs, false,
+                                   2);
       }
     }
   }
@@ -2572,21 +2460,17 @@ void Mesh::_syncGeometryWithMorphTargetManager()
     auto indexStr      = std::to_string(index);
 
     // Positions
-    while (
-      iGeometry->isVerticesDataPresent(VertexBuffer::PositionKind + indexStr)) {
+    while (iGeometry->isVerticesDataPresent(VertexBuffer::PositionKind + indexStr)) {
       iGeometry->removeVerticesData(VertexBuffer::PositionKind + indexStr);
 
-      if (iGeometry->isVerticesDataPresent(VertexBuffer::NormalKind
-                                           + indexStr)) {
+      if (iGeometry->isVerticesDataPresent(VertexBuffer::NormalKind + indexStr)) {
         iGeometry->removeVerticesData(VertexBuffer::NormalKind + indexStr);
       }
-      if (iGeometry->isVerticesDataPresent(VertexBuffer::TangentKind
-                                           + indexStr)) {
+      if (iGeometry->isVerticesDataPresent(VertexBuffer::TangentKind + indexStr)) {
         iGeometry->removeVerticesData(VertexBuffer::TangentKind + indexStr);
       }
       if (iGeometry->isVerticesDataPresent(VertexBuffer::UVKind + indexStr)) {
-        iGeometry->removeVerticesData(VertexBuffer::UVKind + std::string("_")
-                                      + indexStr);
+        iGeometry->removeVerticesData(VertexBuffer::UVKind + std::string("_") + indexStr);
       }
       ++index;
       indexStr = std::to_string(index);
@@ -2644,35 +2528,32 @@ std::vector<Vector3> Mesh::createInnerPoints(size_t pointsNb)
   auto testPoint         = Vector3::Zero();
 
   for (size_t p = 0; p < pointsNb; ++p) {
-    index = static_cast<unsigned>(
-      std::floor(Scalar::RandomRange(0.f, indices.size() / 3.f)));
-    id0 = indices[3 * index];
-    id1 = indices[3 * index + 1];
-    id2 = indices[3 * index + 2];
-    v0X = positions[3 * id0];
-    v0Y = positions[3 * id0 + 1];
-    v0Z = positions[3 * id0 + 2];
-    v1X = positions[3 * id1];
-    v1Y = positions[3 * id1 + 1];
-    v1Z = positions[3 * id1 + 2];
-    v2X = positions[3 * id2];
-    v2Y = positions[3 * id2 + 1];
-    v2Z = positions[3 * id2 + 2];
+    index = static_cast<unsigned>(std::floor(Scalar::RandomRange(0.f, indices.size() / 3.f)));
+    id0   = indices[3 * index];
+    id1   = indices[3 * index + 1];
+    id2   = indices[3 * index + 2];
+    v0X   = positions[3 * id0];
+    v0Y   = positions[3 * id0 + 1];
+    v0Z   = positions[3 * id0 + 2];
+    v1X   = positions[3 * id1];
+    v1Y   = positions[3 * id1 + 1];
+    v1Z   = positions[3 * id1 + 2];
+    v2X   = positions[3 * id2];
+    v2Y   = positions[3 * id2 + 1];
+    v2Z   = positions[3 * id2 + 2];
     vertex0.set(v0X, v0Y, v0Z);
     vertex1.set(v1X, v1Y, v1Z);
     vertex2.set(v2X, v2Y, v2Z);
     vertex1.subtractToRef(vertex0, vec0);
     vertex2.subtractToRef(vertex1, vec1);
 
-    norm   = getFacetNormal(index).normalize().scale(-1.f);
-    tang   = vec0.copy().normalize();
-    biNorm = Vector3::Cross(norm, tang);
-    angle  = Scalar::RandomRange(0.f, Math::PI2);
-    facetPlaneVec
-      = tang.scale(std::cos(angle)).add(biNorm.scale(std::sin(angle)));
-    angle = Scalar::RandomRange(0.1f, Math::PI);
-    direction
-      = facetPlaneVec.scale(std::cos(angle)).add(norm.scale(std::sin(angle)));
+    norm          = getFacetNormal(index).normalize().scale(-1.f);
+    tang          = vec0.copy().normalize();
+    biNorm        = Vector3::Cross(norm, tang);
+    angle         = Scalar::RandomRange(0.f, Math::PI2);
+    facetPlaneVec = tang.scale(std::cos(angle)).add(biNorm.scale(std::sin(angle)));
+    angle         = Scalar::RandomRange(0.1f, Math::PI);
+    direction     = facetPlaneVec.scale(std::cos(angle)).add(norm.scale(std::sin(angle)));
 
     // form a point inside the facet v0, v1, v2;
     lamda      = Scalar::RandomRange(0.f, 1.f);
@@ -2746,8 +2627,7 @@ bool Mesh::pointIsInside(Vector3 point)
   return pointFound;
 }
 
-MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
-                    const std::string& rootUrl)
+MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene, const std::string& rootUrl)
 {
   MeshPtr mesh = nullptr;
   if (json_util::get_string(parsedMesh, "type") == "GroundMesh") {
@@ -2761,8 +2641,7 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
   // Tags.AddTagsTo(mesh, parsedMesh.tags);
 
   if (json_util::has_valid_key_value(parsedMesh, "position")) {
-    mesh->position
-      = Vector3::FromArray(json_util::get_array<float>(parsedMesh, "position"));
+    mesh->position = Vector3::FromArray(json_util::get_array<float>(parsedMesh, "position"));
   }
 
   if (json_util::has_valid_key_value(parsedMesh, "metadata")) {
@@ -2770,27 +2649,23 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
   }
 
   if (json_util::has_valid_key_value(parsedMesh, "rotationQuaternion")) {
-    mesh->rotationQuaternion = Quaternion::FromArray(
-      json_util::get_array<float>(parsedMesh, "rotationQuaternion"));
+    mesh->rotationQuaternion
+      = Quaternion::FromArray(json_util::get_array<float>(parsedMesh, "rotationQuaternion"));
   }
   else if (json_util::has_valid_key_value(parsedMesh, "rotation")) {
-    mesh->rotation
-      = Vector3::FromArray(json_util::get_array<float>(parsedMesh, "rotation"));
+    mesh->rotation = Vector3::FromArray(json_util::get_array<float>(parsedMesh, "rotation"));
   }
 
   if (json_util::has_valid_key_value(parsedMesh, "scaling")) {
-    mesh->scaling
-      = Vector3::FromArray(json_util::get_array<float>(parsedMesh, "scaling"));
+    mesh->scaling = Vector3::FromArray(json_util::get_array<float>(parsedMesh, "scaling"));
   }
 
   if (json_util::has_valid_key_value(parsedMesh, "localMatrix")) {
-    auto tmpMatrix = Matrix::FromArray(
-      json_util::get_array<float>(parsedMesh, "localMatrix"));
+    auto tmpMatrix = Matrix::FromArray(json_util::get_array<float>(parsedMesh, "localMatrix"));
     mesh->setPreTransformMatrix(tmpMatrix);
   }
   else if (json_util::has_valid_key_value(parsedMesh, "pivotMatrix")) {
-    auto tmpMatrix = Matrix::FromArray(
-      json_util::get_array<float>(parsedMesh, "pivotMatrix"));
+    auto tmpMatrix = Matrix::FromArray(json_util::get_array<float>(parsedMesh, "pivotMatrix"));
     mesh->setPivotMatrix(tmpMatrix);
   }
 
@@ -2798,9 +2673,8 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
   mesh->isVisible        = json_util::get_bool(parsedMesh, "isVisible", true);
   mesh->infiniteDistance = json_util::get_bool(parsedMesh, "infiniteDistance");
 
-  mesh->showBoundingBox = json_util::get_bool(parsedMesh, "showBoundingBox");
-  mesh->showSubMeshesBoundingBox
-    = json_util::get_bool(parsedMesh, "showSubMeshesBoundingBox");
+  mesh->showBoundingBox          = json_util::get_bool(parsedMesh, "showBoundingBox");
+  mesh->showSubMeshesBoundingBox = json_util::get_bool(parsedMesh, "showSubMeshesBoundingBox");
 
   if (json_util::has_valid_key_value(parsedMesh, "applyFog")) {
     mesh->applyFog = json_util::get_bool(parsedMesh, "applyFog", true);
@@ -2811,14 +2685,13 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
   }
 
   if (json_util::has_valid_key_value(parsedMesh, "alphaIndex")) {
-    mesh->alphaIndex = json_util::get_number(parsedMesh, "alphaIndex",
-                                             std::numeric_limits<int>::max());
+    mesh->alphaIndex
+      = json_util::get_number(parsedMesh, "alphaIndex", std::numeric_limits<int>::max());
   }
 
-  mesh->receiveShadows
-    = json_util::get_bool(parsedMesh, "receiveShadows", false);
-  mesh->billboardMode = json_util::get_number(parsedMesh, "billboardMode",
-                                              AbstractMesh::BILLBOARDMODE_NONE);
+  mesh->receiveShadows = json_util::get_bool(parsedMesh, "receiveShadows", false);
+  mesh->billboardMode
+    = json_util::get_number(parsedMesh, "billboardMode", AbstractMesh::BILLBOARDMODE_NONE);
 
   if (json_util::has_valid_key_value(parsedMesh, "visibility")) {
     mesh->visibility = json_util::get_number(parsedMesh, "visibility", 1.f);
@@ -2830,13 +2703,11 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
     mesh->isBlocker = json_util::get_bool(parsedMesh, "isBlocker");
   }
 
-  mesh->_shouldGenerateFlatShading
-    = json_util::get_bool(parsedMesh, "useFlatShading");
+  mesh->_shouldGenerateFlatShading = json_util::get_bool(parsedMesh, "useFlatShading");
 
   // freezeWorldMatrix
   if (json_util::has_valid_key_value(parsedMesh, "freezeWorldMatrix")) {
-    mesh->_waitingData.freezeWorldMatrix
-      = json_util::get_bool(parsedMesh, "freezeWorldMatrix");
+    mesh->_waitingData.freezeWorldMatrix = json_util::get_bool(parsedMesh, "freezeWorldMatrix");
   }
 
   // Parent
@@ -2846,19 +2717,16 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
 
   // Actions
   if (json_util::has_valid_key_value(parsedMesh, "actions")) {
-    mesh->_waitingData.actions
-      = json_util::get_array<json>(parsedMesh, "actions");
+    mesh->_waitingData.actions = json_util::get_array<json>(parsedMesh, "actions");
   }
 
   // Overlay
   if (json_util::has_valid_key_value(parsedMesh, "overlayAlpha")) {
-    mesh->overlayAlpha
-      = json_util::get_number(parsedMesh, "overlayAlpha", 0.5f);
+    mesh->overlayAlpha = json_util::get_number(parsedMesh, "overlayAlpha", 0.5f);
   }
 
   if (json_util::has_valid_key_value(parsedMesh, "overlayColor")) {
-    mesh->overlayColor = Color3::FromArray(
-      json_util::get_array<float>(parsedMesh, "overlayColor"));
+    mesh->overlayColor = Color3::FromArray(json_util::get_array<float>(parsedMesh, "overlayColor"));
   }
 
   if (json_util::has_valid_key_value(parsedMesh, "renderOverlay")) {
@@ -2866,19 +2734,15 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
   }
 
   // Geometry
-  mesh->isUnIndexed = json_util::get_bool(parsedMesh, "isUnIndexed", false);
-  mesh->hasVertexAlpha
-    = json_util::get_bool(parsedMesh, "hasVertexAlpha", false);
+  mesh->isUnIndexed    = json_util::get_bool(parsedMesh, "isUnIndexed", false);
+  mesh->hasVertexAlpha = json_util::get_bool(parsedMesh, "hasVertexAlpha", false);
 
   if (json_util::has_valid_key_value(parsedMesh, "delayLoadingFile")) {
-    mesh->delayLoadState = Constants::DELAYLOADSTATE_NOTLOADED;
-    mesh->delayLoadingFile
-      = rootUrl + json_util::get_string(parsedMesh, "delayLoadingFile");
-    mesh->_boundingInfo = std::make_unique<BoundingInfo>(
-      Vector3::FromArray(
-        json_util::get_array<float>(parsedMesh, "boundingBoxMinimum")),
-      Vector3::FromArray(
-        json_util::get_array<float>(parsedMesh, "boundingBoxMaximum")));
+    mesh->delayLoadState   = Constants::DELAYLOADSTATE_NOTLOADED;
+    mesh->delayLoadingFile = rootUrl + json_util::get_string(parsedMesh, "delayLoadingFile");
+    mesh->_boundingInfo    = std::make_unique<BoundingInfo>(
+      Vector3::FromArray(json_util::get_array<float>(parsedMesh, "boundingBoxMinimum")),
+      Vector3::FromArray(json_util::get_array<float>(parsedMesh, "boundingBoxMaximum")));
 
     if (json_util::has_valid_key_value(parsedMesh, "_binaryInfo")) {
       mesh->_binaryInfo = json_util::get_string(parsedMesh, "_binaryInfo");
@@ -2941,29 +2805,24 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
   }
 
   // Morph targets
-  const auto morphTargetManagerId
-    = json_util::get_number(parsedMesh, "morphTargetManagerId", -1);
+  const auto morphTargetManagerId = json_util::get_number(parsedMesh, "morphTargetManagerId", -1);
   if (morphTargetManagerId > -1) {
-    mesh->morphTargetManager = scene->getMorphTargetManagerById(
-      static_cast<unsigned>(morphTargetManagerId));
+    mesh->morphTargetManager
+      = scene->getMorphTargetManagerById(static_cast<unsigned>(morphTargetManagerId));
   }
 
   // Skeleton
-  const auto parsedSkeletonId
-    = json_util::get_number(parsedMesh, "skeletonId", -1);
+  const auto parsedSkeletonId = json_util::get_number(parsedMesh, "skeletonId", -1);
   if (parsedSkeletonId > -1) {
-    mesh->skeleton
-      = scene->getLastSkeletonByID(std::to_string(parsedSkeletonId));
+    mesh->skeleton = scene->getLastSkeletonByID(std::to_string(parsedSkeletonId));
     if (json_util::has_valid_key_value(parsedMesh, "numBoneInfluencers")) {
-      mesh->numBoneInfluencers
-        = json_util::get_number(parsedMesh, "numBoneInfluencers", 0u);
+      mesh->numBoneInfluencers = json_util::get_number(parsedMesh, "numBoneInfluencers", 0u);
     }
   }
 
   // Animations
   if (json_util::has_valid_key_value(parsedMesh, "animations")) {
-    for (const auto& parsedAnimation :
-         json_util::get_array<json>(parsedMesh, "animations")) {
+    for (const auto& parsedAnimation : json_util::get_array<json>(parsedMesh, "animations")) {
       mesh->animations.emplace_back(Animation::Parse(parsedAnimation));
     }
     Node::ParseAnimationRanges(*mesh, parsedMesh, scene);
@@ -2971,11 +2830,10 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
 
   if (json_util::has_valid_key_value(parsedMesh, "autoAnimate")
       && json_util::get_bool(parsedMesh, "autoAnimate")) {
-    scene->beginAnimation(
-      mesh, json_util::get_number(parsedMesh, "autoAnimateFrom", 0.f),
-      json_util::get_number(parsedMesh, "autoAnimateTo", 0.f),
-      json_util::get_bool(parsedMesh, "autoAnimateLoop", false),
-      json_util::get_number(parsedMesh, "autoAnimateSpeed", 1.f));
+    scene->beginAnimation(mesh, json_util::get_number(parsedMesh, "autoAnimateFrom", 0.f),
+                          json_util::get_number(parsedMesh, "autoAnimateTo", 0.f),
+                          json_util::get_bool(parsedMesh, "autoAnimateLoop", false),
+                          json_util::get_number(parsedMesh, "autoAnimateSpeed", 1.f));
   }
 
   // Layer Mask
@@ -2986,8 +2844,8 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
     }
   }
   else {
-    mesh->layerMask = static_cast<unsigned>(
-      json_util::get_number(parsedMesh, "layerMask", 0x0FFFFFFF));
+    mesh->layerMask
+      = static_cast<unsigned>(json_util::get_number(parsedMesh, "layerMask", 0x0FFFFFFF));
   }
 
   // Physics
@@ -2996,8 +2854,7 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
 
   // Levels
   if (json_util::has_valid_key_value(parsedMesh, "lodMeshIds")) {
-    auto lodMeshIds
-      = json_util::get_array<std::string>(parsedMesh, "lodMeshIds");
+    auto lodMeshIds = json_util::get_array<std::string>(parsedMesh, "lodMeshIds");
     if (!lodMeshIds.empty()) {
       mesh->_waitingData.lods = {
         lodMeshIds,                                              // ids
@@ -3009,10 +2866,8 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
 
   // Instances
   if (json_util::has_valid_key_value(parsedMesh, "instances")) {
-    for (const auto& parsedInstance :
-         json_util::get_array<json>(parsedMesh, "instances")) {
-      auto instance
-        = mesh->createInstance(json_util::get_string(parsedInstance, "name"));
+    for (const auto& parsedInstance : json_util::get_array<json>(parsedMesh, "instances")) {
+      auto instance = mesh->createInstance(json_util::get_string(parsedInstance, "name"));
 
       if (json_util::has_valid_key_value(parsedInstance, "id")
           && !json_util::is_null(parsedMesh["localMatrix"])) {
@@ -3021,45 +2876,39 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
 
       // Tags.AddTagsTo(instance, parsedInstance.tags);
 
-      mesh->position = Vector3::FromArray(
-        json_util::get_array<float>(parsedInstance, "position"));
+      mesh->position = Vector3::FromArray(json_util::get_array<float>(parsedInstance, "position"));
 
       if (json_util::has_valid_key_value(parsedInstance, "parentId")) {
-        instance->_waitingParentId
-          = json_util::get_string(parsedInstance, "parentId");
+        instance->_waitingParentId = json_util::get_string(parsedInstance, "parentId");
       }
 
-      if (json_util::has_valid_key_value(parsedInstance,
-                                         "rotationQuaternion")) {
+      if (json_util::has_valid_key_value(parsedInstance, "rotationQuaternion")) {
         instance->rotationQuaternion = Quaternion::FromArray(
           json_util::get_array<float>(parsedInstance, "rotationQuaternion"));
       }
       else if (json_util::has_valid_key_value(parsedInstance, "rotation")) {
-        instance->rotation = Vector3::FromArray(
-          json_util::get_array<float>(parsedInstance, "rotation"));
+        instance->rotation
+          = Vector3::FromArray(json_util::get_array<float>(parsedInstance, "rotation"));
       }
 
       if (json_util::has_valid_key_value(parsedMesh, "scaling")) {
-        instance->position = Vector3::FromArray(
-          json_util::get_array<float>(parsedInstance, "scaling"));
+        instance->position
+          = Vector3::FromArray(json_util::get_array<float>(parsedInstance, "scaling"));
       }
 
-      instance->checkCollisions
-        = json_util::get_bool(parsedInstance, "checkCollisions");
+      instance->checkCollisions = json_util::get_bool(parsedInstance, "checkCollisions");
 
       if (json_util::has_valid_key_value(parsedMesh, "animations")) {
-        for (const auto& parsedAnimation :
-             json_util::get_array<json>(parsedMesh, "animations")) {
+        for (const auto& parsedAnimation : json_util::get_array<json>(parsedMesh, "animations")) {
           instance->animations.emplace_back(Animation::Parse(parsedAnimation));
         }
         Node::ParseAnimationRanges(*instance, parsedMesh, scene);
 
         if (json_util::has_valid_key_value(parsedMesh, "autoAnimate")) {
-          scene->beginAnimation(
-            instance, json_util::get_number(parsedMesh, "autoAnimateFrom", 0.f),
-            json_util::get_number(parsedMesh, "autoAnimateTo", 0.f),
-            json_util::get_bool(parsedMesh, "autoAnimateLoop"),
-            json_util::get_number<float>(parsedMesh, "autoAnimateSpeed", 1.0));
+          scene->beginAnimation(instance, json_util::get_number(parsedMesh, "autoAnimateFrom", 0.f),
+                                json_util::get_number(parsedMesh, "autoAnimateTo", 0.f),
+                                json_util::get_bool(parsedMesh, "autoAnimateLoop"),
+                                json_util::get_number<float>(parsedMesh, "autoAnimateSpeed", 1.0));
         }
       }
     }
@@ -3070,9 +2919,9 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
 
 // Statics
 MeshPtr Mesh::CreateRibbon(const std::string& iName,
-                           const std::vector<std::vector<Vector3>>& pathArray,
-                           bool closeArray, bool closePath, int offset,
-                           Scene* scene, const std::optional<bool>& updatable,
+                           const std::vector<std::vector<Vector3>>& pathArray, bool closeArray,
+                           bool closePath, int offset, Scene* scene,
+                           const std::optional<bool>& updatable,
                            const std::optional<unsigned int>& sideOrientation,
                            const MeshPtr& instance)
 {
@@ -3088,9 +2937,8 @@ MeshPtr Mesh::CreateRibbon(const std::string& iName,
   return RibbonBuilder::CreateRibbon(iName, options, scene);
 }
 
-MeshPtr Mesh::CreateDisc(const std::string& iName, float radius,
-                         unsigned int tessellation, Scene* scene,
-                         const std::optional<bool>& updatable,
+MeshPtr Mesh::CreateDisc(const std::string& iName, float radius, unsigned int tessellation,
+                         Scene* scene, const std::optional<bool>& updatable,
                          const std::optional<unsigned int>& sideOrientation)
 {
   DiscOptions options;
@@ -3114,9 +2962,8 @@ MeshPtr Mesh::CreateBox(const std::string& iName, float size, Scene* scene,
   return BoxBuilder::CreateBox(iName, options, scene);
 }
 
-MeshPtr Mesh::CreateSphere(const std::string& iName, unsigned int segments,
-                           float diameter, Scene* scene,
-                           const std::optional<bool>& updatable,
+MeshPtr Mesh::CreateSphere(const std::string& iName, unsigned int segments, float diameter,
+                           Scene* scene, const std::optional<bool>& updatable,
                            const std::optional<unsigned int>& sideOrientation)
 {
   SphereOptions options;
@@ -3130,8 +2977,8 @@ MeshPtr Mesh::CreateSphere(const std::string& iName, unsigned int segments,
   return SphereBuilder::CreateSphere(iName, options, scene);
 }
 
-MeshPtr Mesh::CreateHemisphere(const std::string& iName, unsigned int segments,
-                               float diameter, Scene* scene)
+MeshPtr Mesh::CreateHemisphere(const std::string& iName, unsigned int segments, float diameter,
+                               Scene* scene)
 {
   HemisphereOptions options;
   options.segments = segments;
@@ -3141,9 +2988,8 @@ MeshPtr Mesh::CreateHemisphere(const std::string& iName, unsigned int segments,
 }
 
 // Cylinder and cone
-MeshPtr Mesh::CreateCylinder(const std::string& iName, float height,
-                             float diameterTop, float diameterBottom,
-                             unsigned int tessellation,
+MeshPtr Mesh::CreateCylinder(const std::string& iName, float height, float diameterTop,
+                             float diameterBottom, unsigned int tessellation,
                              unsigned int subdivisions, Scene* scene,
                              const std::optional<bool>& updatable,
                              const std::optional<unsigned int>& sideOrientation)
@@ -3161,9 +3007,9 @@ MeshPtr Mesh::CreateCylinder(const std::string& iName, float height,
 }
 
 // Torus
-MeshPtr Mesh::CreateTorus(const std::string& iName, float diameter,
-                          float thickness, unsigned int tessellation,
-                          Scene* scene, const std::optional<bool>& updatable,
+MeshPtr Mesh::CreateTorus(const std::string& iName, float diameter, float thickness,
+                          unsigned int tessellation, Scene* scene,
+                          const std::optional<bool>& updatable,
                           const std::optional<unsigned int>& sideOrientation)
 {
   TorusOptions options;
@@ -3176,12 +3022,10 @@ MeshPtr Mesh::CreateTorus(const std::string& iName, float diameter,
   return TorusBuilder::CreateTorus(iName, options, scene);
 }
 
-MeshPtr
-Mesh::CreateTorusKnot(const std::string& iName, float radius, float tube,
-                      unsigned int radialSegments, unsigned int tubularSegments,
-                      float p, float q, Scene* scene,
-                      const std::optional<bool>& updatable,
-                      const std::optional<unsigned int>& sideOrientation)
+MeshPtr Mesh::CreateTorusKnot(const std::string& iName, float radius, float tube,
+                              unsigned int radialSegments, unsigned int tubularSegments, float p,
+                              float q, Scene* scene, const std::optional<bool>& updatable,
+                              const std::optional<unsigned int>& sideOrientation)
 {
   TorusKnotOptions options;
   options.radius          = radius;
@@ -3196,9 +3040,8 @@ Mesh::CreateTorusKnot(const std::string& iName, float radius, float tube,
   return TorusKnotBuilder::CreateTorusKnot(iName, options, scene);
 }
 
-LinesMeshPtr Mesh::CreateLines(const std::string& iName,
-                               const std::vector<Vector3>& points, Scene* scene,
-                               bool updatable, const LinesMeshPtr& instance)
+LinesMeshPtr Mesh::CreateLines(const std::string& iName, const std::vector<Vector3>& points,
+                               Scene* scene, bool updatable, const LinesMeshPtr& instance)
 {
   LinesOptions options;
   options.points    = points;
@@ -3208,12 +3051,9 @@ LinesMeshPtr Mesh::CreateLines(const std::string& iName,
   return LinesBuilder::CreateLines(iName, options, scene);
 }
 
-LinesMeshPtr Mesh::CreateDashedLines(const std::string& iName,
-                                     std::vector<Vector3>& points,
-                                     float dashSize, float gapSize,
-                                     unsigned int dashNb, Scene* scene,
-                                     bool updatable,
-                                     const LinesMeshPtr& instance)
+LinesMeshPtr Mesh::CreateDashedLines(const std::string& iName, std::vector<Vector3>& points,
+                                     float dashSize, float gapSize, unsigned int dashNb,
+                                     Scene* scene, bool updatable, const LinesMeshPtr& instance)
 {
   DashedLinesOptions options;
   options.points    = points;
@@ -3226,9 +3066,8 @@ LinesMeshPtr Mesh::CreateDashedLines(const std::string& iName,
   return LinesBuilder::CreateDashedLines(iName, options, scene);
 }
 
-MeshPtr Mesh::CreatePolygon(const std::string& iName,
-                            const std::vector<Vector3>& shape, Scene* scene,
-                            const std::vector<std::vector<Vector3>>& holes,
+MeshPtr Mesh::CreatePolygon(const std::string& iName, const std::vector<Vector3>& shape,
+                            Scene* scene, const std::vector<std::vector<Vector3>>& holes,
                             bool updatable, unsigned int sideOrientation)
 {
   PolygonOptions options;
@@ -3240,11 +3079,10 @@ MeshPtr Mesh::CreatePolygon(const std::string& iName,
   return PolygonBuilder::CreatePolygon(iName, options, scene);
 }
 
-MeshPtr Mesh::ExtrudePolygon(const std::string& iName,
-                             const std::vector<Vector3>& shape, float depth,
-                             Scene* scene,
-                             const std::vector<std::vector<Vector3>>& holes,
-                             bool updatable, unsigned int sideOrientation)
+MeshPtr Mesh::ExtrudePolygon(const std::string& iName, const std::vector<Vector3>& shape,
+                             float depth, Scene* scene,
+                             const std::vector<std::vector<Vector3>>& holes, bool updatable,
+                             unsigned int sideOrientation)
 {
   PolygonOptions options;
   options.shape           = shape;
@@ -3256,11 +3094,9 @@ MeshPtr Mesh::ExtrudePolygon(const std::string& iName,
   return PolygonBuilder::ExtrudePolygon(iName, options, scene);
 }
 
-MeshPtr Mesh::ExtrudeShape(const std::string& iName,
-                           const std::vector<Vector3>& shape,
-                           const std::vector<Vector3>& path, float scale,
-                           float iRotation, unsigned int cap, Scene* scene,
-                           const std::optional<bool>& updatable,
+MeshPtr Mesh::ExtrudeShape(const std::string& iName, const std::vector<Vector3>& shape,
+                           const std::vector<Vector3>& path, float scale, float iRotation,
+                           unsigned int cap, Scene* scene, const std::optional<bool>& updatable,
                            const std::optional<unsigned int>& sideOrientation,
                            const MeshPtr& instance)
 {
@@ -3278,12 +3114,10 @@ MeshPtr Mesh::ExtrudeShape(const std::string& iName,
 }
 
 MeshPtr Mesh::ExtrudeShapeCustom(
-  const std::string& iName, const std::vector<Vector3>& shape,
-  const std::vector<Vector3>& path,
+  const std::string& iName, const std::vector<Vector3>& shape, const std::vector<Vector3>& path,
   const std::function<float(float i, float distance)>& scaleFunction,
-  const std::function<float(float i, float distance)>& rotationFunction,
-  bool ribbonCloseArray, bool ribbonClosePath, unsigned int cap, Scene* scene,
-  const std::optional<bool>& updatable,
+  const std::function<float(float i, float distance)>& rotationFunction, bool ribbonCloseArray,
+  bool ribbonClosePath, unsigned int cap, Scene* scene, const std::optional<bool>& updatable,
   const std::optional<unsigned int>& sideOrientation, const MeshPtr& instance)
 {
   ExtrudeShapeCustomOptions options;
@@ -3301,8 +3135,7 @@ MeshPtr Mesh::ExtrudeShapeCustom(
   return ShapeBuilder::ExtrudeShapeCustom(iName, options, scene);
 }
 
-MeshPtr Mesh::CreateLathe(const std::string& iName,
-                          const std::vector<Vector3>& shape, float radius,
+MeshPtr Mesh::CreateLathe(const std::string& iName, const std::vector<Vector3>& shape, float radius,
                           unsigned int tessellation, Scene* scene,
                           const std::optional<bool>& updatable,
                           const std::optional<unsigned int>& sideOrientation)
@@ -3331,9 +3164,9 @@ MeshPtr Mesh::CreatePlane(const std::string& iName, float size, Scene* scene,
   return PlaneBuilder::CreatePlane(iName, options, scene);
 }
 
-MeshPtr Mesh::CreateGround(const std::string& iName, unsigned int width,
-                           unsigned int height, unsigned int subdivisions,
-                           Scene* scene, const std::optional<bool>& updatable)
+MeshPtr Mesh::CreateGround(const std::string& iName, unsigned int width, unsigned int height,
+                           unsigned int subdivisions, Scene* scene,
+                           const std::optional<bool>& updatable)
 {
   GroundOptions options;
   options.subdivisions = subdivisions;
@@ -3344,11 +3177,9 @@ MeshPtr Mesh::CreateGround(const std::string& iName, unsigned int width,
   return GroundBuilder::CreateGround(iName, options, scene);
 }
 
-MeshPtr Mesh::CreateTiledGround(const std::string& iName, float xmin,
-                                float zmin, float xmax, float zmax,
-                                const ISize& subdivisions,
-                                const ISize& precision, Scene* scene,
-                                const std::optional<bool>& updatable)
+MeshPtr Mesh::CreateTiledGround(const std::string& iName, float xmin, float zmin, float xmax,
+                                float zmax, const ISize& subdivisions, const ISize& precision,
+                                Scene* scene, const std::optional<bool>& updatable)
 {
   TiledGroundOptions options;
   options.xmin         = xmin;
@@ -3363,10 +3194,9 @@ MeshPtr Mesh::CreateTiledGround(const std::string& iName, float xmin,
 }
 
 GroundMeshPtr Mesh::CreateGroundFromHeightMap(
-  const std::string& iName, const std::string& url, unsigned int width,
-  unsigned int height, unsigned int subdivisions, unsigned int minHeight,
-  unsigned int maxHeight, Scene* scene, bool updatable,
-  const std::function<void(const GroundMeshPtr& mesh)>& iOnReady,
+  const std::string& iName, const std::string& url, unsigned int width, unsigned int height,
+  unsigned int subdivisions, unsigned int minHeight, unsigned int maxHeight, Scene* scene,
+  bool updatable, const std::function<void(const GroundMeshPtr& mesh)>& iOnReady,
   std::optional<float> alphaFilter)
 {
   GroundFromHeightMapOptions options;
@@ -3382,12 +3212,12 @@ GroundMeshPtr Mesh::CreateGroundFromHeightMap(
   return GroundBuilder::CreateGroundFromHeightMap(iName, url, options, scene);
 }
 
-MeshPtr Mesh::CreateTube(
-  const std::string& iName, const std::vector<Vector3>& path, float radius,
-  unsigned int tessellation,
-  const std::function<float(unsigned int i, float distance)>& radiusFunction,
-  unsigned int cap, Scene* scene, const std::optional<bool>& updatable,
-  const std::optional<unsigned int>& sideOrientation, const MeshPtr& instance)
+MeshPtr Mesh::CreateTube(const std::string& iName, const std::vector<Vector3>& path, float radius,
+                         unsigned int tessellation,
+                         const std::function<float(unsigned int i, float distance)>& radiusFunction,
+                         unsigned int cap, Scene* scene, const std::optional<bool>& updatable,
+                         const std::optional<unsigned int>& sideOrientation,
+                         const MeshPtr& instance)
 {
   TubeOptions options;
   options.path            = path;
@@ -3403,22 +3233,19 @@ MeshPtr Mesh::CreateTube(
   return TubeBuilder::CreateTube(iName, options, scene);
 }
 
-MeshPtr Mesh::CreatePolyhedron(const std::string& iName,
-                               PolyhedronOptions& options, Scene* scene)
+MeshPtr Mesh::CreatePolyhedron(const std::string& iName, PolyhedronOptions& options, Scene* scene)
 {
   return PolyhedronBuilder::CreatePolyhedron(iName, options, scene);
 }
 
-MeshPtr Mesh::CreateIcoSphere(const std::string& iName,
-                              IcoSphereOptions& options, Scene* scene)
+MeshPtr Mesh::CreateIcoSphere(const std::string& iName, IcoSphereOptions& options, Scene* scene)
 {
   return IcoSphereBuilder::CreateIcoSphere(iName, options, scene);
 }
 
-MeshPtr Mesh::CreateDecal(const std::string& iName,
-                          const AbstractMeshPtr& sourceMesh,
-                          const Vector3& iPosition, const Vector3& normal,
-                          const Vector3& size, float angle)
+MeshPtr Mesh::CreateDecal(const std::string& iName, const AbstractMeshPtr& sourceMesh,
+                          const Vector3& iPosition, const Vector3& normal, const Vector3& size,
+                          float angle)
 {
   DecalOptions options;
   options.position = iPosition;
@@ -3526,11 +3353,9 @@ Mesh* Mesh::applySkeleton(const SkeletonPtr& iSkeleton)
 
   bool needExtras = numBoneInfluencers() > 4;
   auto matricesIndicesExtraData
-    = needExtras ? getVerticesData(VertexBuffer::MatricesIndicesExtraKind) :
-                   Float32Array();
+    = needExtras ? getVerticesData(VertexBuffer::MatricesIndicesExtraKind) : Float32Array();
   auto matricesWeightsExtraData
-    = needExtras ? getVerticesData(VertexBuffer::MatricesWeightsExtraKind) :
-                   Float32Array();
+    = needExtras ? getVerticesData(VertexBuffer::MatricesWeightsExtraKind) : Float32Array();
 
   auto skeletonMatrices = iSkeleton->getTransformMatrices(this);
 
@@ -3541,15 +3366,13 @@ Mesh* Mesh::applySkeleton(const SkeletonPtr& iSkeleton)
   unsigned int matWeightIdx = 0;
   unsigned int inf;
   float weight;
-  for (unsigned int index = 0; index < positionsData.size();
-       index += 3, matWeightIdx += 4) {
+  for (unsigned int index = 0; index < positionsData.size(); index += 3, matWeightIdx += 4) {
     for (inf = 0; inf < 4; ++inf) {
       weight = matricesWeightsData[matWeightIdx + inf];
       if (weight > 0.f) {
         Matrix::FromFloat32ArrayToRefScaled(
           skeletonMatrices,
-          static_cast<unsigned int>(
-            std::floor(matricesIndicesData[matWeightIdx + inf] * 16)),
+          static_cast<unsigned int>(std::floor(matricesIndicesData[matWeightIdx + inf] * 16)),
           weight, tempMatrix);
         finalMatrix.addToSelf(tempMatrix);
       }
@@ -3558,25 +3381,22 @@ Mesh* Mesh::applySkeleton(const SkeletonPtr& iSkeleton)
       for (inf = 0; inf < 4; ++inf) {
         weight = matricesWeightsExtraData[matWeightIdx + inf];
         if (weight > 0.f) {
-          Matrix::FromFloat32ArrayToRefScaled(
-            skeletonMatrices,
-            static_cast<unsigned int>(
-              std::floor(matricesIndicesExtraData[matWeightIdx + inf] * 16)),
-            weight, tempMatrix);
+          Matrix::FromFloat32ArrayToRefScaled(skeletonMatrices,
+                                              static_cast<unsigned int>(std::floor(
+                                                matricesIndicesExtraData[matWeightIdx + inf] * 16)),
+                                              weight, tempMatrix);
           finalMatrix.addToSelf(tempMatrix);
         }
       }
     }
 
     Vector3::TransformCoordinatesFromFloatsToRef(
-      internalDataInfo._sourcePositions[index],
-      internalDataInfo._sourcePositions[index + 1],
+      internalDataInfo._sourcePositions[index], internalDataInfo._sourcePositions[index + 1],
       internalDataInfo._sourcePositions[index + 2], finalMatrix, tempVector3);
     tempVector3.toArray(positionsData, index);
 
     Vector3::TransformNormalFromFloatsToRef(
-      internalDataInfo._sourceNormals[index],
-      internalDataInfo._sourceNormals[index + 1],
+      internalDataInfo._sourceNormals[index], internalDataInfo._sourceNormals[index + 1],
       internalDataInfo._sourceNormals[index + 2], finalMatrix, tempVector3);
     tempVector3.toArray(normalsData, index);
 
@@ -3622,8 +3442,7 @@ MinMax Mesh::GetMinMax(const std::vector<AbstractMeshPtr>& meshes)
 
 Vector3 Mesh::Center(const MinMaxDistance& MinMaxVectorAndDistance)
 {
-  return Vector3::Center(MinMaxVectorAndDistance.min,
-                         MinMaxVectorAndDistance.max);
+  return Vector3::Center(MinMaxVectorAndDistance.min, MinMaxVectorAndDistance.max);
 }
 
 Vector3 Mesh::Center(const MinMax& minMaxVector)
@@ -3637,10 +3456,9 @@ Vector3 Mesh::Center(const std::vector<AbstractMeshPtr>& meshes)
   return Vector3::Center(minMaxVector.min, minMaxVector.max);
 }
 
-MeshPtr Mesh::MergeMeshes(const std::vector<MeshPtr>& meshes,
-                          bool disposeSource, bool allow32BitsIndices,
-                          MeshPtr meshSubclass, bool subdivideWithSubMeshes,
-                          bool multiMultiMaterials)
+MeshPtr Mesh::MergeMeshes(const std::vector<MeshPtr>& meshes, bool disposeSource,
+                          bool allow32BitsIndices, MeshPtr meshSubclass,
+                          bool subdivideWithSubMeshes, bool multiMultiMaterials)
 {
   unsigned int index = 0;
   if (!allow32BitsIndices) {
@@ -3696,27 +3514,20 @@ MeshPtr Mesh::MergeMeshes(const std::vector<MeshPtr>& meshes,
       }
 
       if (subdivideWithSubMeshes) {
-        indiceArray.emplace_back(
-          static_cast<uint32_t>(mesh->getTotalIndices()));
+        indiceArray.emplace_back(static_cast<uint32_t>(mesh->getTotalIndices()));
       }
       if (multiMultiMaterials) {
         if (mesh->material()) {
-          auto material
-            = std::static_pointer_cast<MultiMaterial>(mesh->material());
+          auto material = std::static_pointer_cast<MultiMaterial>(mesh->material());
           if (material) {
-            for (matIndex = 0; matIndex < material->subMaterials().size();
-                 matIndex++) {
-              if (stl_util::index_of(materialArray,
-                                     material->subMaterials()[matIndex])
-                  < 0) {
+            for (matIndex = 0; matIndex < material->subMaterials().size(); matIndex++) {
+              if (stl_util::index_of(materialArray, material->subMaterials()[matIndex]) < 0) {
                 materialArray.emplace_back(material->subMaterials()[matIndex]);
               }
             }
             for (subIndex = 0; subIndex < mesh->subMeshes.size(); ++subIndex) {
               const auto materialIndex = stl_util::index_of(
-                materialArray,
-                material
-                  ->subMaterials()[mesh->subMeshes[subIndex]->materialIndex]);
+                materialArray, material->subMaterials()[mesh->subMeshes[subIndex]->materialIndex]);
               materialIndexArray.emplace_back(materialIndex);
               indiceArray.emplace_back(
                 static_cast<uint32_t>(mesh->subMeshes[subIndex]->indexCount));
@@ -3727,8 +3538,7 @@ MeshPtr Mesh::MergeMeshes(const std::vector<MeshPtr>& meshes,
               materialArray.emplace_back(material);
             }
             for (subIndex = 0; subIndex < mesh->subMeshes.size(); ++subIndex) {
-              const auto materialIndex
-                = stl_util::index_of(materialArray, material);
+              const auto materialIndex = stl_util::index_of(materialArray, material);
               materialIndexArray.emplace_back(materialIndex);
               indiceArray.emplace_back(
                 static_cast<uint32_t>(mesh->subMeshes[subIndex]->indexCount));
@@ -3738,8 +3548,7 @@ MeshPtr Mesh::MergeMeshes(const std::vector<MeshPtr>& meshes,
         else {
           for (subIndex = 0; subIndex < mesh->subMeshes.size(); ++subIndex) {
             materialIndexArray.emplace_back(0);
-            indiceArray.emplace_back(
-              static_cast<uint32_t>(mesh->subMeshes[subIndex]->indexCount));
+            indiceArray.emplace_back(static_cast<uint32_t>(mesh->subMeshes[subIndex]->indexCount));
           }
         }
       }
@@ -3782,12 +3591,10 @@ MeshPtr Mesh::MergeMeshes(const std::vector<MeshPtr>& meshes,
   }
 
   if (multiMultiMaterials) {
-    newMultiMaterial
-      = MultiMaterial::New(source->name + "_merged", source->getScene());
+    newMultiMaterial = MultiMaterial::New(source->name + "_merged", source->getScene());
     newMultiMaterial->subMaterials = materialArray;
     for (subIndex = 0; subIndex < meshSubclass->subMeshes.size(); subIndex++) {
-      meshSubclass->subMeshes[subIndex]->materialIndex
-        = materialIndexArray[subIndex];
+      meshSubclass->subMeshes[subIndex]->materialIndex = materialIndexArray[subIndex];
     }
     meshSubclass->material = newMultiMaterial;
   }
@@ -3800,8 +3607,7 @@ MeshPtr Mesh::MergeMeshes(const std::vector<MeshPtr>& meshes,
 
 void Mesh::addInstance(InstancedMesh* instance)
 {
-  instance->_indexInSourceMeshInstanceArray
-    = static_cast<int>(instances.size());
+  instance->_indexInSourceMeshInstanceArray = static_cast<int>(instances.size());
   instances.emplace_back(instance);
 }
 

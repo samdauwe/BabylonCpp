@@ -8,9 +8,8 @@
 
 namespace BABYLON {
 
-Animatable::Animatable(Scene* scene, const IAnimatablePtr& iTarget,
-                       float iFromFrame, float iToFrame, bool iLoopAnimation,
-                       float iSpeedRatio,
+Animatable::Animatable(Scene* scene, const IAnimatablePtr& iTarget, float iFromFrame,
+                       float iToFrame, bool iLoopAnimation, float iSpeedRatio,
                        const std::function<void()>& iOnAnimationEnd,
                        const std::vector<AnimationPtr>& animations,
                        const std::function<void()>& iOnAnimationLoop)
@@ -121,8 +120,7 @@ void Animatable::appendAnimations(const IAnimatablePtr& iTarget,
                                   const std::vector<AnimationPtr>& animations)
 {
   for (const auto& animation : animations) {
-    auto newRuntimeAnimation
-      = RuntimeAnimation::New(iTarget, animation, _scene, this);
+    auto newRuntimeAnimation     = RuntimeAnimation::New(iTarget, animation, _scene, this);
     newRuntimeAnimation->_onLoop = [this]() -> void {
       onAnimationLoopObservable.notifyObservers(this);
       if (onAnimationLoop) {
@@ -134,26 +132,23 @@ void Animatable::appendAnimations(const IAnimatablePtr& iTarget,
   }
 }
 
-AnimationPtr
-Animatable::getAnimationByTargetProperty(const std::string& property) const
+AnimationPtr Animatable::getAnimationByTargetProperty(const std::string& property) const
 {
-  auto it = std::find_if(
-    _runtimeAnimations.begin(), _runtimeAnimations.end(),
-    [&property](const RuntimeAnimationPtr& runtimeAnimation) {
-      return runtimeAnimation->animation()->targetProperty == property;
-    });
+  auto it = std::find_if(_runtimeAnimations.begin(), _runtimeAnimations.end(),
+                         [&property](const RuntimeAnimationPtr& runtimeAnimation) {
+                           return runtimeAnimation->animation()->targetProperty == property;
+                         });
 
   return (it == _runtimeAnimations.end()) ? nullptr : (*it)->animation();
 }
 
-RuntimeAnimationPtr Animatable::getRuntimeAnimationByTargetProperty(
-  const std::string& property) const
+RuntimeAnimationPtr
+Animatable::getRuntimeAnimationByTargetProperty(const std::string& property) const
 {
-  auto it = std::find_if(
-    _runtimeAnimations.begin(), _runtimeAnimations.end(),
-    [&property](const RuntimeAnimationPtr& runtimeAnimation) {
-      return runtimeAnimation->animation()->targetProperty == property;
-    });
+  auto it = std::find_if(_runtimeAnimations.begin(), _runtimeAnimations.end(),
+                         [&property](const RuntimeAnimationPtr& runtimeAnimation) {
+                           return runtimeAnimation->animation()->targetProperty == property;
+                         });
 
   return (it == _runtimeAnimations.end()) ? nullptr : *it;
 }
@@ -189,15 +184,13 @@ void Animatable::goToFrame(float frame)
     auto fps          = _runtimeAnimations[0]->animation()->framePerSecond;
     auto currentFrame = _runtimeAnimations[0]->currentFrame();
     auto adjustTime   = frame - currentFrame;
-    auto delay        = (speedRatio != 0.f) ?
-                   static_cast<float>(adjustTime) * 1000.f
-                     / (static_cast<float>(fps) * speedRatio) :
-                   0.f;
+    auto delay        = (speedRatio != 0.f) ? static_cast<float>(adjustTime) * 1000.f
+                                         / (static_cast<float>(fps) * speedRatio) :
+                                       0.f;
     if (_localDelayOffset == std::nullopt) {
       _localDelayOffset = millisecond_t(0);
     }
-    _localDelayOffset = (*_localDelayOffset)
-                        - std::chrono::milliseconds(static_cast<long>(delay));
+    _localDelayOffset = (*_localDelayOffset) - std::chrono::milliseconds(static_cast<long>(delay));
   }
 
   for (const auto& runtimeAnimations : _runtimeAnimations) {
@@ -227,9 +220,8 @@ void Animatable::_raiseOnAnimationEnd()
   onAnimationEndObservable.notifyObservers(this);
 }
 
-void Animatable::stop(
-  const std::string& animationName,
-  const std::function<bool(IAnimatable* target)>& targetMask)
+void Animatable::stop(const std::string& animationName,
+                      const std::function<bool(IAnimatable* target)>& targetMask)
 {
   if (!animationName.empty() || targetMask) {
     auto idx = stl_util::index_of_ptr(_scene->_activeAnimatables, this);
@@ -292,9 +284,9 @@ bool Animatable::_animate(const millisecond_t& delay)
   auto running = false;
 
   for (const auto& animation : _runtimeAnimations) {
-    auto isRunning = animation->animate(
-      delay - (*_localDelayOffset), static_cast<float>(fromFrame),
-      static_cast<float>(toFrame), loopAnimation, speedRatio(), _weight);
+    auto isRunning
+      = animation->animate(delay - (*_localDelayOffset), static_cast<float>(fromFrame),
+                           static_cast<float>(toFrame), loopAnimation, speedRatio(), _weight);
     running = running || isRunning;
   }
 
@@ -303,18 +295,18 @@ bool Animatable::_animate(const millisecond_t& delay)
   if (!running) {
     if (disposeOnEnd) {
       // Remove from active animatables
-      _scene->_activeAnimatables.erase(
-        std::remove_if(_scene->_activeAnimatables.begin(),
-                       _scene->_activeAnimatables.end(),
-                       [this](const AnimatablePtr& animatable) {
-                         return animatable.get() == this;
-                       }),
-        _scene->_activeAnimatables.end());
+      _scene->_activeAnimatables.erase(std::remove_if(_scene->_activeAnimatables.begin(),
+                                                      _scene->_activeAnimatables.end(),
+                                                      [this](const AnimatablePtr& animatable) {
+                                                        return animatable.get() == this;
+                                                      }),
+                                       _scene->_activeAnimatables.end());
 
       // Dispose all runtime animations
       for (const auto& runtimeAnimation : _runtimeAnimations) {
         if (runtimeAnimation) {
-          runtimeAnimation->dispose();
+          // TODO FIXME
+          // runtimeAnimation->dispose();
         }
       }
     }

@@ -2,6 +2,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include <babylon/animations/animation.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/string.h>
 #include <babylon/core/time.h>
@@ -16,8 +17,8 @@ Matrix TargetCamera::_RigCamTransformMatrix;
 Matrix TargetCamera::_TargetTransformMatrix;
 Vector3 TargetCamera::_TargetFocalPoint;
 
-TargetCamera::TargetCamera(const std::string& iName, const Vector3& iPosition,
-                           Scene* scene, bool setActiveOnSceneIfNoneActive)
+TargetCamera::TargetCamera(const std::string& iName, const Vector3& iPosition, Scene* scene,
+                           bool setActiveOnSceneIfNoneActive)
     : Camera(iName, iPosition, scene, setActiveOnSceneIfNoneActive)
     , cameraDirection{std::make_unique<Vector3>(0.f, 0.f, 0.f)}
     , cameraRotation{std::make_unique<Vector2>(0.f, 0.f)}
@@ -51,6 +52,70 @@ TargetCamera::~TargetCamera()
 Type TargetCamera::type() const
 {
   return Type::TARGETCAMERA;
+}
+
+AnimationValue TargetCamera::getProperty(const std::vector<std::string>& targetPropertyPath)
+{
+  if (targetPropertyPath.size() == 1) {
+    const auto& target = targetPropertyPath[0];
+    if (target == "position") {
+      return position();
+    }
+    if (target == "rotation") {
+      return getRotation();
+    }
+  }
+  else if (targetPropertyPath.size() == 2) {
+    const auto& target = targetPropertyPath[0];
+    const auto& key    = targetPropertyPath[1];
+    // Position
+    if (target == "position") {
+      return IAnimatable::getProperty(key.c_str(), position());
+    }
+    // Rotation
+    if (target == "rotation") {
+      return IAnimatable::getProperty(key.c_str(), getRotation());
+    }
+  }
+
+  return AnimationValue();
+}
+
+void TargetCamera::setProperty(const std::vector<std::string>& targetPropertyPath,
+                               const AnimationValue& value)
+{
+  const auto animationType = value.animationType();
+  if (animationType.has_value()) {
+    if (targetPropertyPath.size() == 1) {
+      const auto& target = targetPropertyPath[0];
+      if (*animationType == Animation::ANIMATIONTYPE_VECTOR3()) {
+        auto vector3Value = value.get<Vector3>();
+        // Position
+        if (target == "position") {
+          position = vector3Value;
+        }
+        // Rotation
+        if (target == "rotation") {
+          setRotation(vector3Value);
+        }
+      }
+    }
+    if (targetPropertyPath.size() == 2) {
+      const auto& target = targetPropertyPath[0];
+      const auto& key    = targetPropertyPath[1];
+      if (*animationType == Animation::ANIMATIONTYPE_FLOAT()) {
+        const auto& floatValue = value.get<float>();
+        // Position
+        if (target == "position") {
+          IAnimatable::setProperty(key.c_str(), position(), floatValue);
+        }
+        // Rotation
+        if (target == "rotation") {
+          IAnimatable::setProperty(key.c_str(), getRotation(), floatValue);
+        }
+      }
+    }
+  }
 }
 
 Vector3 TargetCamera::getFrontPosition(float distance)
@@ -107,11 +172,10 @@ bool TargetCamera::_restoreStateValues()
 void TargetCamera::_initCache()
 {
   Camera::_initCache();
-  _cache.lockedTarget = std::make_unique<Vector3>(
-    std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
-    std::numeric_limits<float>::max());
-  _cache.rotation = Vector3(std::numeric_limits<float>::max(),
-                            std::numeric_limits<float>::max(),
+  _cache.lockedTarget = std::make_unique<Vector3>(std::numeric_limits<float>::max(),
+                                                  std::numeric_limits<float>::max(),
+                                                  std::numeric_limits<float>::max());
+  _cache.rotation = Vector3(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
                             std::numeric_limits<float>::max());
 }
 
@@ -149,12 +213,10 @@ bool TargetCamera::_isSynchronizedViewMatrix()
 
   auto lockedTargetPosition = _getLockedTargetPosition();
 
-  return (_cache.lockedTarget ?
-            _cache.lockedTarget->equals(*lockedTargetPosition) :
-            !lockedTargetPosition)
-         && (rotationQuaternion ?
-               rotationQuaternion->equals(_cache.rotationQuaternion) :
-               _cache.rotation.equals(*rotation));
+  return (_cache.lockedTarget ? _cache.lockedTarget->equals(*lockedTargetPosition) :
+                                !lockedTargetPosition)
+         && (rotationQuaternion ? rotationQuaternion->equals(_cache.rotationQuaternion) :
+                                  _cache.rotation.equals(*rotation));
 }
 
 /** Methods **/
@@ -162,8 +224,7 @@ float TargetCamera::_computeLocalCameraSpeed()
 {
   auto engine = getEngine();
 
-  return speed
-         * std::sqrt((engine->getDeltaTime() / (engine->getFps() * 100.f)));
+  return speed * std::sqrt((engine->getDeltaTime() / (engine->getFps() * 100.f)));
 }
 
 void TargetCamera::setRotation(const Vector3& newRotation)
@@ -228,8 +289,7 @@ Vector3& TargetCamera::getTarget()
 
 bool TargetCamera::_decideIfNeedsToMove()
 {
-  return std::abs(cameraDirection->x) > 0.f
-         || std::abs(cameraDirection->y) > 0.f
+  return std::abs(cameraDirection->x) > 0.f || std::abs(cameraDirection->y) > 0.f
          || std::abs(cameraDirection->z) > 0.f;
 }
 
@@ -247,9 +307,8 @@ void TargetCamera::_updatePosition()
 
 void TargetCamera::_checkInputs()
 {
-  bool needToMove = _decideIfNeedsToMove();
-  bool needToRotate
-    = std::abs(cameraRotation->x) > 0.f || std::abs(cameraRotation->y) > 0.f;
+  bool needToMove   = _decideIfNeedsToMove();
+  bool needToRotate = std::abs(cameraRotation->x) > 0.f || std::abs(cameraRotation->y) > 0.f;
 
   // Move
   if (needToMove) {
@@ -265,8 +324,8 @@ void TargetCamera::_checkInputs()
     if (rotationQuaternion) {
       auto len = rotation->lengthSquared();
       if (len > 0) {
-        Quaternion::RotationYawPitchRollToRef(rotation->y, rotation->x,
-                                              rotation->z, *rotationQuaternion);
+        Quaternion::RotationYawPitchRollToRef(rotation->y, rotation->x, rotation->z,
+                                              *rotationQuaternion);
       }
     }
 
@@ -317,8 +376,7 @@ void TargetCamera::_updateCameraRotationMatrix()
     rotationQuaternion->toRotationMatrix(_cameraRotationMatrix);
   }
   else {
-    Matrix::RotationYawPitchRollToRef(rotation->y, rotation->x, rotation->z,
-                                      _cameraRotationMatrix);
+    Matrix::RotationYawPitchRollToRef(rotation->y, rotation->x, rotation->z, _cameraRotationMatrix);
   }
 }
 
@@ -341,8 +399,7 @@ Matrix TargetCamera::_getViewMatrix()
 
   // Apply the changed rotation to the upVector
   if (rotationQuaternion
-      && !stl_util::almost_equal(_cachedQuaternionRotationZ,
-                                 rotationQuaternion->z)) {
+      && !stl_util::almost_equal(_cachedQuaternionRotationZ, rotationQuaternion->z)) {
     _rotateUpVectorWithCameraRotationMatrix();
     _cachedQuaternionRotationZ = rotationQuaternion->z;
   }
@@ -373,17 +430,14 @@ Matrix TargetCamera::_getViewMatrix()
   return _viewMatrix;
 }
 
-void TargetCamera::_computeViewMatrix(const Vector3& iPosition,
-                                      const Vector3& target, const Vector3& up)
+void TargetCamera::_computeViewMatrix(const Vector3& iPosition, const Vector3& target,
+                                      const Vector3& up)
 {
   if (parent()) {
     auto parentWorldMatrix = parent()->getWorldMatrix();
-    Vector3::TransformCoordinatesToRef(iPosition, parentWorldMatrix,
-                                       _globalPosition);
-    Vector3::TransformCoordinatesToRef(target, parentWorldMatrix,
-                                       _globalCurrentTarget);
-    Vector3::TransformNormalToRef(up, parentWorldMatrix,
-                                  _globalCurrentUpVector);
+    Vector3::TransformCoordinatesToRef(iPosition, parentWorldMatrix, _globalPosition);
+    Vector3::TransformCoordinatesToRef(target, parentWorldMatrix, _globalCurrentTarget);
+    Vector3::TransformNormalToRef(up, parentWorldMatrix, _globalCurrentUpVector);
     _markSyncedWithParent();
   }
   else {
@@ -393,23 +447,21 @@ void TargetCamera::_computeViewMatrix(const Vector3& iPosition,
   }
 
   if (getScene()->useRightHandedSystem()) {
-    Matrix::LookAtRHToRef(_globalPosition, _globalCurrentTarget,
-                          _globalCurrentUpVector, _viewMatrix);
+    Matrix::LookAtRHToRef(_globalPosition, _globalCurrentTarget, _globalCurrentUpVector,
+                          _viewMatrix);
   }
   else {
-    Matrix::LookAtLHToRef(_globalPosition, _globalCurrentTarget,
-                          _globalCurrentUpVector, _viewMatrix);
+    Matrix::LookAtLHToRef(_globalPosition, _globalCurrentTarget, _globalCurrentUpVector,
+                          _viewMatrix);
   }
 }
 
 /** Camera rigs section **/
-CameraPtr TargetCamera::createRigCamera(const std::string& iName,
-                                        int /*cameraIndex*/)
+CameraPtr TargetCamera::createRigCamera(const std::string& iName, int /*cameraIndex*/)
 {
   if (cameraRigMode != Camera::RIG_MODE_NONE) {
     auto rigCamera = TargetCamera::New(iName, position, getScene());
-    if (cameraRigMode == Camera::RIG_MODE_VR
-        || cameraRigMode == Camera::RIG_MODE_WEBVR) {
+    if (cameraRigMode == Camera::RIG_MODE_VR || cameraRigMode == Camera::RIG_MODE_WEBVR) {
       if (!rotationQuaternion) {
         rotationQuaternion = std::make_unique<Quaternion>();
       }
@@ -436,18 +488,12 @@ void TargetCamera::_updateRigCameras()
     case Camera::RIG_MODE_STEREOSCOPIC_OVERUNDER: {
       // provisionnaly using _cameraRigParams.stereoHalfAngle instead of
       // calculations based on _cameraRigParams.interaxialDistance:
-      auto leftSign = (cameraRigMode
-                       == Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED) ?
-                        1.f :
-                        -1.f;
-      auto rightSign = (cameraRigMode
-                        == Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED) ?
-                         -1.f :
-                         1.f;
-      _getRigCamPositionAndTarget(_cameraRigParams.stereoHalfAngle * leftSign,
-                                  *camLeft);
-      _getRigCamPositionAndTarget(_cameraRigParams.stereoHalfAngle * rightSign,
-                                  *camRight);
+      auto leftSign
+        = (cameraRigMode == Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED) ? 1.f : -1.f;
+      auto rightSign
+        = (cameraRigMode == Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED) ? -1.f : 1.f;
+      _getRigCamPositionAndTarget(_cameraRigParams.stereoHalfAngle * leftSign, *camLeft);
+      _getRigCamPositionAndTarget(_cameraRigParams.stereoHalfAngle * rightSign, *camRight);
     } break;
     case Camera::RIG_MODE_VR: {
       if (camLeft->rotationQuaternion) {
@@ -467,29 +513,26 @@ void TargetCamera::_updateRigCameras()
   Camera::_updateRigCameras();
 }
 
-void TargetCamera::_getRigCamPositionAndTarget(float halfSpace,
-                                               TargetCamera& rigCamera)
+void TargetCamera::_getRigCamPositionAndTarget(float halfSpace, TargetCamera& rigCamera)
 {
   const auto target = getTarget();
   target.subtractToRef(position, TargetCamera::_TargetFocalPoint);
 
-  TargetCamera::_TargetFocalPoint.normalize().scaleInPlace(
-    _initialFocalDistance);
+  TargetCamera::_TargetFocalPoint.normalize().scaleInPlace(_initialFocalDistance);
   auto newFocalTarget = TargetCamera::_TargetFocalPoint.addInPlace(position);
 
-  Matrix::TranslationToRef(-newFocalTarget.x, -newFocalTarget.y,
-                           -newFocalTarget.z,
+  Matrix::TranslationToRef(-newFocalTarget.x, -newFocalTarget.y, -newFocalTarget.z,
                            TargetCamera::_TargetTransformMatrix);
-  TargetCamera::_TargetTransformMatrix.multiplyToRef(
-    Matrix::RotationY(halfSpace), TargetCamera::_RigCamTransformMatrix);
+  TargetCamera::_TargetTransformMatrix.multiplyToRef(Matrix::RotationY(halfSpace),
+                                                     TargetCamera::_RigCamTransformMatrix);
   Matrix::TranslationToRef(newFocalTarget.x, newFocalTarget.y, newFocalTarget.z,
                            TargetCamera::_TargetTransformMatrix);
 
-  TargetCamera::_RigCamTransformMatrix.multiplyToRef(
-    TargetCamera::_TargetTransformMatrix, TargetCamera::_RigCamTransformMatrix);
+  TargetCamera::_RigCamTransformMatrix.multiplyToRef(TargetCamera::_TargetTransformMatrix,
+                                                     TargetCamera::_RigCamTransformMatrix);
 
-  Vector3::TransformCoordinatesToRef(
-    position, TargetCamera::_RigCamTransformMatrix, rigCamera.position);
+  Vector3::TransformCoordinatesToRef(position, TargetCamera::_RigCamTransformMatrix,
+                                     rigCamera.position);
   rigCamera.setTarget(newFocalTarget);
 }
 

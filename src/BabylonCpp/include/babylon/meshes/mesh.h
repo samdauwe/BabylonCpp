@@ -170,8 +170,7 @@ public:
    * @returns the default orientation
    */
   static constexpr unsigned int
-  _GetDefaultSideOrientation(const std::optional<unsigned int>& orientation
-                             = std::nullopt)
+  _GetDefaultSideOrientation(const std::optional<unsigned int>& orientation = std::nullopt)
   {
     // works as Mesh.FRONTSIDE is 0
     return orientation.value_or(Mesh::FRONTSIDE);
@@ -179,9 +178,13 @@ public:
 
 public:
   template <typename... Ts>
-  static MeshPtr New(Ts&&... args)
+  static MeshPtr New(const std::string& iName, Scene* scene, Node* iParent = nullptr,
+                     Mesh* source = nullptr, bool doNotCloneChildren = true,
+                     bool clonePhysicsImpostor = true)
   {
-    auto mesh = std::shared_ptr<Mesh>(new Mesh(std::forward<Ts>(args)...));
+    auto mesh = std::shared_ptr<Mesh>(
+      new Mesh(iName, scene, iParent, source, doNotCloneChildren, clonePhysicsImpostor, true));
+    mesh->_initialize(scene, iParent, source, doNotCloneChildren, clonePhysicsImpostor);
     mesh->addToScene(mesh);
 
     return mesh;
@@ -262,8 +265,7 @@ public:
    * the one from this mesh
    * @return This mesh (for chaining)
    */
-  AbstractMesh* getLOD(const CameraPtr& camera,
-                       BoundingSphere* boundingSphere = nullptr) override;
+  AbstractMesh* getLOD(const CameraPtr& camera, BoundingSphere* boundingSphere = nullptr) override;
 
   void setGeometry(Geometry* geometry);
 
@@ -298,9 +300,8 @@ public:
    * @returns a FloatArray or null if the mesh has no geometry or no vertex
    * buffer for this kind.
    */
-  Float32Array getVerticesData(const std::string& kind,
-                               bool copyWhenShared = false,
-                               bool forceCopy      = false) override;
+  Float32Array getVerticesData(const std::string& kind, bool copyWhenShared = false,
+                               bool forceCopy = false) override;
 
   /**
    * @brief Returns the mesh VertexBuffer object from the requested `kind`.
@@ -405,8 +406,7 @@ public:
    * be cloned upon returning it
    * @returns the indices array or an empty array if the mesh has no geometry
    */
-  IndicesArray getIndices(bool copyWhenShared = false,
-                          bool forceCopy      = false) override;
+  IndicesArray getIndices(bool copyWhenShared = false, bool forceCopy = false) override;
 
   /**
    * @brief Determine if the current mesh is ready to be rendered
@@ -417,8 +417,7 @@ public:
    * @returns true if all associated assets are ready (material, textures,
    * shaders)
    */
-  bool isReady(bool completeCheck        = false,
-               bool forceInstanceSupport = false) override;
+  bool isReady(bool completeCheck = false, bool forceInstanceSupport = false) override;
 
   /**
    * @brief This function affects parametric shapes on vertex position update
@@ -497,10 +496,9 @@ public:
    * @param stride defines the data stride size (can be null)
    * @returns the current mesh
    */
-  AbstractMesh*
-  setVerticesData(const std::string& kind, const Float32Array& data,
-                  bool updatable                      = false,
-                  const std::optional<size_t>& stride = std::nullopt) override;
+  AbstractMesh* setVerticesData(const std::string& kind, const Float32Array& data,
+                                bool updatable                      = false,
+                                const std::optional<size_t>& stride = std::nullopt) override;
 
   /**
    * @brief Flags an associated vertex buffer as updatable.
@@ -521,8 +519,7 @@ public:
    * @param updatable defines if the updated vertex buffer must be flagged as
    * updatable
    */
-  void markVerticesDataAsUpdatable(const std::string& kind,
-                                   bool updatable = true);
+  void markVerticesDataAsUpdatable(const std::string& kind, bool updatable = true);
 
   /**
    * @brief Sets the mesh global Vertex Buffer.
@@ -555,10 +552,8 @@ public:
    * associated with the same geometry)
    * @returns the current mesh
    */
-  AbstractMesh* updateVerticesData(const std::string& kind,
-                                   const Float32Array& data,
-                                   bool updateExtends = false,
-                                   bool makeItUnique  = false) override;
+  AbstractMesh* updateVerticesData(const std::string& kind, const Float32Array& data,
+                                   bool updateExtends = false, bool makeItUnique = false) override;
 
   /**
    * @brief This method updates the vertex positions of an updatable mesh
@@ -571,9 +566,8 @@ public:
    * mesh normal recomputation after the vertex position update
    * @returns the current mesh
    */
-  Mesh& updateMeshPositions(
-    std::function<void(Float32Array& positions)> positionFunction,
-    bool computeNormals = true);
+  Mesh& updateMeshPositions(std::function<void(Float32Array& positions)> positionFunction,
+                            bool computeNormals = true);
 
   /**
    * @brief Creates a un-shared specific occurence of the geometry for the mesh.
@@ -590,9 +584,8 @@ public:
    * updatable (default is false)
    * @returns the current mesh
    */
-  AbstractMesh* setIndices(const IndicesArray& indices,
-                           size_t totalVertices = 0,
-                           bool updatable       = false) override;
+  AbstractMesh* setIndices(const IndicesArray& indices, size_t totalVertices = 0,
+                           bool updatable = false) override;
 
   /**
    * @brief Update the current index buffer.
@@ -606,7 +599,7 @@ public:
    */
   AbstractMesh& updateIndices(const IndicesArray& indices,
                               const std::optional<int>& offset = std::nullopt,
-                              bool gpuMemoryOnly = false) override;
+                              bool gpuMemoryOnly               = false) override;
 
   /**
    * @brief Invert the geometry to move from a right handed system to a left
@@ -618,8 +611,7 @@ public:
   /**
    * @brief Hidden
    */
-  virtual void _bind(SubMesh* subMesh, const EffectPtr& effect,
-                     unsigned int fillMode);
+  virtual void _bind(SubMesh* subMesh, const EffectPtr& effect, unsigned int fillMode);
 
   /**
    * @brief Hidden
@@ -633,8 +625,7 @@ public:
    * @param func defines the function to call before rendering this mesh
    * @returns the current mesh
    */
-  Mesh& registerBeforeRender(
-    const std::function<void(Mesh* mesh, EventState& es)>& func);
+  Mesh& registerBeforeRender(const std::function<void(Mesh* mesh, EventState& es)>& func);
 
   /**
    * @brief Disposes a previously registered javascript function called before
@@ -642,8 +633,7 @@ public:
    * @param func defines the function to remove
    * @returns the current mesh
    */
-  Mesh& unregisterBeforeRender(
-    const std::function<void(Mesh* mesh, EventState&)>& func);
+  Mesh& unregisterBeforeRender(const std::function<void(Mesh* mesh, EventState&)>& func);
 
   /**
    * @brief Registers for this mesh a javascript function called just after the
@@ -651,8 +641,7 @@ public:
    * @param func defines the function to call after rendering this mesh
    * @returns the current mesh
    */
-  Mesh&
-  registerAfterRender(const std::function<void(Mesh* mesh, EventState&)>& func);
+  Mesh& registerAfterRender(const std::function<void(Mesh* mesh, EventState&)>& func);
 
   /**
    * @brief Disposes a previously registered javascript function called after
@@ -660,8 +649,7 @@ public:
    * @param func defines the function to remove
    * @returns the current mesh
    */
-  Mesh& unregisterAfterRender(
-    const std::function<void(Mesh* mesh, EventState&)>& func);
+  Mesh& unregisterAfterRender(const std::function<void(Mesh* mesh, EventState&)>& func);
 
   /**
    * @brief Hidden
@@ -672,20 +660,18 @@ public:
    * @brief Hidden
    */
   Mesh& _renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
-                             const _InstancesBatchPtr& batch,
-                             const EffectPtr& effect, Engine* engine);
+                             const _InstancesBatchPtr& batch, const EffectPtr& effect,
+                             Engine* engine);
 
   /**
    * @brief Hidden
    */
-  Mesh&
-  _processRendering(SubMesh* subMesh, const EffectPtr& effect, int fillMode,
-                    const _InstancesBatchPtr& batch,
-                    bool hardwareInstancedRendering,
-                    std::function<void(bool isInstance, const Matrix& world,
-                                       Material* effectiveMaterial)>
-                      onBeforeDraw,
-                    Material* effectiveMaterial = nullptr);
+  Mesh& _processRendering(
+    SubMesh* subMesh, const EffectPtr& effect, int fillMode, const _InstancesBatchPtr& batch,
+    bool hardwareInstancedRendering,
+    std::function<void(bool isInstance, const Matrix& world, Material* effectiveMaterial)>
+      onBeforeDraw,
+    Material* effectiveMaterial = nullptr);
 
   /**
    * @brief Hidden
@@ -763,8 +749,7 @@ public:
    * @param frustumPlanes defines the frustum to test
    * @returns true if the mesh is in the frustum planes
    */
-  bool isInFrustum(const std::array<Plane, 6>& frustumPlanes,
-                   unsigned int strategy = 0) override;
+  bool isInFrustum(const std::array<Plane, 6>& frustumPlanes, unsigned int strategy = 0) override;
 
   /**
    * @brief Sets the mesh material by the material or multiMaterial `id`
@@ -829,8 +814,7 @@ public:
    * `true`)
    * @returns a new mesh
    */
-  MeshPtr clone(const std::string& name, Node* newParent = nullptr,
-                bool doNotCloneChildren   = false,
+  MeshPtr clone(const std::string& name, Node* newParent = nullptr, bool doNotCloneChildren = false,
                 bool clonePhysicsImpostor = true);
 
   /** Dispose **/
@@ -842,8 +826,7 @@ public:
    * @param disposeMaterialAndTextures Set to true to also dispose referenced
    * materials and textures (false by default)
    */
-  virtual void dispose(bool doNotRecurse               = false,
-                       bool disposeMaterialAndTextures = false) override;
+  virtual void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /** Geometric tools **/
 
@@ -866,13 +849,11 @@ public:
    * instance.
    * @returns the Mesh.
    */
-  Mesh&
-  applyDisplacementMap(const std::string& url, float minHeight, float maxHeight,
-                       const std::function<void(Mesh* mesh)> onSuccess
-                       = nullptr,
-                       const std::optional<Vector2>& uvOffset = std::nullopt,
-                       const std::optional<Vector2>& uvScale  = std::nullopt,
-                       bool boolforceUpdate                   = false);
+  Mesh& applyDisplacementMap(const std::string& url, float minHeight, float maxHeight,
+                             const std::function<void(Mesh* mesh)> onSuccess = nullptr,
+                             const std::optional<Vector2>& uvOffset          = std::nullopt,
+                             const std::optional<Vector2>& uvScale           = std::nullopt,
+                             bool boolforceUpdate                            = false);
 
   /**
    * @brief Modifies the mesh geometry according to a displacementMap buffer.
@@ -896,12 +877,12 @@ public:
    * instance.
    * @returns the Mesh.
    */
-  void applyDisplacementMapFromBuffer(
-    const Uint8Array& buffer, unsigned int heightMapWidth,
-    unsigned int heightMapHeight, float minHeight, float maxHeight,
-    const std::optional<Vector2>& uvOffset = std::nullopt,
-    const std::optional<Vector2>& uvScale  = std::nullopt,
-    bool forceUpdate                       = false);
+  void applyDisplacementMapFromBuffer(const Uint8Array& buffer, unsigned int heightMapWidth,
+                                      unsigned int heightMapHeight, float minHeight,
+                                      float maxHeight,
+                                      const std::optional<Vector2>& uvOffset = std::nullopt,
+                                      const std::optional<Vector2>& uvScale  = std::nullopt,
+                                      bool forceUpdate                       = false);
 
   /**
    * @brief Modify the mesh to get a flat shading rendering.
@@ -1036,8 +1017,7 @@ public:
    * with
    * @returns a new Mesh
    */
-  static MeshPtr Parse(const json& parsedMesh, Scene* scene,
-                       const std::string& rootUrl);
+  static MeshPtr Parse(const json& parsedMesh, Scene* scene, const std::string& rootUrl);
 
   /**
    * @brief Creates a ribbon mesh. Please consider using the same method from
@@ -1061,12 +1041,12 @@ public:
    * (http://doc.babylonjs.com/how_to/How_to_dynamically_morph_a_mesh#ribbon)
    * @returns a new Mesh
    */
-  static MeshPtr CreateRibbon(
-    const std::string& name, const std::vector<std::vector<Vector3>>& pathArray,
-    bool closeArray = false, bool closePath = false, int offset = -1,
-    Scene* = nullptr, const std::optional<bool>& updatable = std::nullopt,
-    const std::optional<unsigned int>& sideOrientation = std::nullopt,
-    const MeshPtr& ribbonInstance                      = nullptr);
+  static MeshPtr CreateRibbon(const std::string& name,
+                              const std::vector<std::vector<Vector3>>& pathArray,
+                              bool closeArray = false, bool closePath = false, int offset = -1,
+                              Scene* = nullptr, const std::optional<bool>& updatable = std::nullopt,
+                              const std::optional<unsigned int>& sideOrientation = std::nullopt,
+                              const MeshPtr& ribbonInstance                      = nullptr);
 
   /**
    * @brief Creates a plane polygonal mesh.  By default, this is a disc. Please
@@ -1084,9 +1064,8 @@ public:
    */
   static MeshPtr CreateDisc(const std::string& name, float radius = 0.5f,
                             unsigned int tessellation = 64, Scene* = nullptr,
-                            const std::optional<bool>& updatable = std::nullopt,
-                            const std::optional<unsigned int>& sideOrientation
-                            = std::nullopt);
+                            const std::optional<bool>& updatable               = std::nullopt,
+                            const std::optional<unsigned int>& sideOrientation = std::nullopt);
 
   /**
    * @brief Creates a box mesh. Please consider using the same method from the
@@ -1099,10 +1078,9 @@ public:
    * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @returns a new Mesh
    */
-  static MeshPtr
-  CreateBox(const std::string& name, float size = 1.f, Scene* = nullptr,
-            const std::optional<bool>& updatable               = std::nullopt,
-            const std::optional<unsigned int>& sideOrientation = std::nullopt);
+  static MeshPtr CreateBox(const std::string& name, float size = 1.f, Scene* = nullptr,
+                           const std::optional<bool>& updatable               = std::nullopt,
+                           const std::optional<unsigned int>& sideOrientation = std::nullopt);
 
   /**
    * @brief Creates a sphere mesh. Please consider using the same method from
@@ -1117,10 +1095,10 @@ public:
    * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @returns a new Mesh
    */
-  static MeshPtr CreateSphere(
-    const std::string& name, unsigned int segments = 32, float diameter = 1.f,
-    Scene* = nullptr, const std::optional<bool>& updatable = std::nullopt,
-    const std::optional<unsigned int>& sideOrientation = std::nullopt);
+  static MeshPtr CreateSphere(const std::string& name, unsigned int segments = 32,
+                              float diameter = 1.f, Scene* = nullptr,
+                              const std::optional<bool>& updatable               = std::nullopt,
+                              const std::optional<unsigned int>& sideOrientation = std::nullopt);
 
   /**
    * @brief Creates a hemisphere mesh. Please consider using the same method
@@ -1132,8 +1110,7 @@ public:
    * @param scene defines the hosting scene
    * @returns a new Mesh
    */
-  static MeshPtr CreateHemisphere(const std::string& name,
-                                  unsigned int segments = 32,
+  static MeshPtr CreateHemisphere(const std::string& name, unsigned int segments = 32,
                                   float diameter = 1.f, Scene* = nullptr);
 
   /**
@@ -1155,12 +1132,12 @@ public:
    * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @returns a new Mesh
    */
-  static MeshPtr CreateCylinder(
-    const std::string& name, float height = 2.f, float diameterTop = 1.f,
-    float diameterBottom = 1.f, unsigned int tessellation = 24,
-    unsigned int subdivisions = 1, Scene* = nullptr,
-    const std::optional<bool>& updatable               = std::nullopt,
-    const std::optional<unsigned int>& sideOrientation = std::nullopt);
+  static MeshPtr CreateCylinder(const std::string& name, float height = 2.f,
+                                float diameterTop = 1.f, float diameterBottom = 1.f,
+                                unsigned int tessellation = 24, unsigned int subdivisions = 1,
+                                Scene*                                             = nullptr,
+                                const std::optional<bool>& updatable               = std::nullopt,
+                                const std::optional<unsigned int>& sideOrientation = std::nullopt);
 
   // Torus  (Code from SharpDX.org)
   /**
@@ -1178,13 +1155,10 @@ public:
    * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @returns a new Mesh
    */
-  static MeshPtr CreateTorus(const std::string& name, float diameter = 1.f,
-                             float thickness           = 0.5f,
+  static MeshPtr CreateTorus(const std::string& name, float diameter = 1.f, float thickness = 0.5f,
                              unsigned int tessellation = 16, Scene* = nullptr,
-                             const std::optional<bool>& updatable
-                             = std::nullopt,
-                             const std::optional<unsigned int>& sideOrientation
-                             = std::nullopt);
+                             const std::optional<bool>& updatable               = std::nullopt,
+                             const std::optional<unsigned int>& sideOrientation = std::nullopt);
 
   /**
    * @brief Creates a torus knot mesh. Please consider using the same method
@@ -1206,12 +1180,12 @@ public:
    * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @returns a new Mesh
    */
-  static MeshPtr CreateTorusKnot(
-    const std::string& name, float radius = 2.f, float tube = 0.5f,
-    unsigned int radialSegments = 32, unsigned int tubularSegments = 32,
-    float p = 2.f, float q = 3.f, Scene* = nullptr,
-    const std::optional<bool>& updatable               = std::nullopt,
-    const std::optional<unsigned int>& sideOrientation = std::nullopt);
+  static MeshPtr CreateTorusKnot(const std::string& name, float radius = 2.f, float tube = 0.5f,
+                                 unsigned int radialSegments  = 32,
+                                 unsigned int tubularSegments = 32, float p = 2.f, float q = 3.f,
+                                 Scene*                                             = nullptr,
+                                 const std::optional<bool>& updatable               = std::nullopt,
+                                 const std::optional<unsigned int>& sideOrientation = std::nullopt);
 
   /**
    * @brief Creates a line mesh. Please consider using the same method from the
@@ -1225,9 +1199,8 @@ public:
    * (http://doc.babylonjs.com/how_to/How_to_dynamically_morph_a_mesh#lines-and-dashedlines).
    * @returns a new Mesh
    */
-  static LinesMeshPtr CreateLines(const std::string& name,
-                                  const std::vector<Vector3>& points, Scene*,
-                                  bool updatable                    = false,
+  static LinesMeshPtr CreateLines(const std::string& name, const std::vector<Vector3>& points,
+                                  Scene*, bool updatable = false,
                                   const LinesMeshPtr& linesInstance = nullptr);
 
   /**
@@ -1248,10 +1221,11 @@ public:
    * (http://doc.babylonjs.com/how_to/How_to_dynamically_morph_a_mesh#lines-and-dashedlines)
    * @returns a new Mesh
    */
-  static LinesMeshPtr CreateDashedLines(
-    const std::string& name, std::vector<Vector3>& points, float dashSize = 3.f,
-    float gapSize = 1.f, unsigned int dashNb = 200, Scene* = nullptr,
-    bool updatable = false, const LinesMeshPtr& instance = nullptr);
+  static LinesMeshPtr CreateDashedLines(const std::string& name, std::vector<Vector3>& points,
+                                        float dashSize = 3.f, float gapSize = 1.f,
+                                        unsigned int dashNb = 200, Scene* = nullptr,
+                                        bool updatable               = false,
+                                        const LinesMeshPtr& instance = nullptr);
 
   /**
    * @brief Creates a polygon mesh.Please consider using the same method from
@@ -1268,11 +1242,10 @@ public:
    * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @returns a new Mesh
    */
-  static MeshPtr
-  CreatePolygon(const std::string& name, const std::vector<Vector3>& shape,
-                Scene* scene, const std::vector<std::vector<Vector3>>& holes,
-                bool updatable               = false,
-                unsigned int sideOrientation = Mesh::DEFAULTSIDE);
+  static MeshPtr CreatePolygon(const std::string& name, const std::vector<Vector3>& shape,
+                               Scene* scene, const std::vector<std::vector<Vector3>>& holes,
+                               bool updatable               = false,
+                               unsigned int sideOrientation = Mesh::DEFAULTSIDE);
 
   /**
    * @brief Creates an extruded polygon mesh, with depth in the Y direction.
@@ -1291,10 +1264,11 @@ public:
    * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @returns a new Mesh
    */
-  static MeshPtr ExtrudePolygon(
-    const std::string& name, const std::vector<Vector3>& shape, float depth,
-    Scene* scene, const std::vector<std::vector<Vector3>>& holes,
-    bool updatable = false, unsigned int sideOrientation = Mesh::DEFAULTSIDE);
+  static MeshPtr ExtrudePolygon(const std::string& name, const std::vector<Vector3>& shape,
+                                float depth, Scene* scene,
+                                const std::vector<std::vector<Vector3>>& holes,
+                                bool updatable               = false,
+                                unsigned int sideOrientation = Mesh::DEFAULTSIDE);
 
   /**
    * @brief Creates an extruded shape mesh.
@@ -1324,14 +1298,12 @@ public:
    * (http://doc.babylonjs.com/how_to/How_to_dynamically_morph_a_mesh#extruded-shape)
    * @returns a new Mesh
    */
-  static MeshPtr
-  ExtrudeShape(const std::string& name, const std::vector<Vector3>& shape,
-               const std::vector<Vector3>& path, float scale, float rotation,
-               unsigned int cap, Scene*,
-               const std::optional<bool>& updatable = std::nullopt,
-               const std::optional<unsigned int>& sideOrientation
-               = std::nullopt,
-               const MeshPtr& instance = nullptr);
+  static MeshPtr ExtrudeShape(const std::string& name, const std::vector<Vector3>& shape,
+                              const std::vector<Vector3>& path, float scale, float rotation,
+                              unsigned int cap, Scene*,
+                              const std::optional<bool>& updatable               = std::nullopt,
+                              const std::optional<unsigned int>& sideOrientation = std::nullopt,
+                              const MeshPtr& instance                            = nullptr);
 
   /**
    * @brief Creates an custom extruded shape mesh.
@@ -1366,15 +1338,15 @@ public:
    * (http://doc.babylonjs.com/how_to/how_to_dynamically_morph_a_mesh#extruded-shape)
    * @returns a new Mesh
    */
-  static MeshPtr ExtrudeShapeCustom(
-    const std::string& name, const std::vector<Vector3>& shape,
-    const std::vector<Vector3>& path,
-    const std::function<float(float i, float distance)>& scaleFunction,
-    const std::function<float(float i, float distance)>& rotationFunction,
-    bool ribbonCloseArray, bool ribbonClosePath, unsigned int cap, Scene*,
-    const std::optional<bool>& updatable               = std::nullopt,
-    const std::optional<unsigned int>& sideOrientation = std::nullopt,
-    const MeshPtr& instance                            = nullptr);
+  static MeshPtr
+  ExtrudeShapeCustom(const std::string& name, const std::vector<Vector3>& shape,
+                     const std::vector<Vector3>& path,
+                     const std::function<float(float i, float distance)>& scaleFunction,
+                     const std::function<float(float i, float distance)>& rotationFunction,
+                     bool ribbonCloseArray, bool ribbonClosePath, unsigned int cap, Scene*,
+                     const std::optional<bool>& updatable               = std::nullopt,
+                     const std::optional<unsigned int>& sideOrientation = std::nullopt,
+                     const MeshPtr& instance                            = nullptr);
 
   /**
    * @brief Creates lathe mesh.
@@ -1394,12 +1366,10 @@ public:
    * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @returns a new Mesh
    */
-  static MeshPtr
-  CreateLathe(const std::string& name, const std::vector<Vector3>& shape,
-              float radius, unsigned int tessellation, Scene* = nullptr,
-              const std::optional<bool>& updatable = std::nullopt,
-              const std::optional<unsigned int>& sideOrientation
-              = std::nullopt);
+  static MeshPtr CreateLathe(const std::string& name, const std::vector<Vector3>& shape,
+                             float radius, unsigned int tessellation, Scene* = nullptr,
+                             const std::optional<bool>& updatable               = std::nullopt,
+                             const std::optional<unsigned int>& sideOrientation = std::nullopt);
 
   /**
    * @brief Creates a plane mesh. Please consider using the same method from the
@@ -1413,11 +1383,9 @@ public:
    * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @returns a new Mesh
    */
-  static MeshPtr
-  CreatePlane(const std::string& name, float size, Scene* = nullptr,
-              const std::optional<bool>& updatable = std::nullopt,
-              const std::optional<unsigned int>& sideOrientation
-              = std::nullopt);
+  static MeshPtr CreatePlane(const std::string& name, float size, Scene* = nullptr,
+                             const std::optional<bool>& updatable               = std::nullopt,
+                             const std::optional<unsigned int>& sideOrientation = std::nullopt);
 
   /**
    * @brief Creates a ground mesh.
@@ -1431,10 +1399,9 @@ public:
    * @returns a new Mesh
    */
   static MeshPtr CreateGround(const std::string& name, unsigned int width = 1,
-                              unsigned int height       = 1,
-                              unsigned int subdivisions = 1, Scene* = nullptr,
-                              const std::optional<bool>& updatable
-                              = std::nullopt);
+                              unsigned int height = 1, unsigned int subdivisions = 1,
+                              Scene*                               = nullptr,
+                              const std::optional<bool>& updatable = std::nullopt);
 
   /**
    * @brief Creates a tiled ground mesh.
@@ -1455,11 +1422,10 @@ public:
    * @param updatable defines if the mesh must be flagged as updatable
    * @returns a new Mesh
    */
-  static MeshPtr
-  CreateTiledGround(const std::string& name, float xmin, float zmin, float xmax,
-                    float zmax, const ISize& subdivisions = ISize(1, 1),
-                    const ISize& precision = ISize(1, 1), Scene* = nullptr,
-                    const std::optional<bool>& updatable = std::nullopt);
+  static MeshPtr CreateTiledGround(const std::string& name, float xmin, float zmin, float xmax,
+                                   float zmax, const ISize& subdivisions = ISize(1, 1),
+                                   const ISize& precision = ISize(1, 1), Scene* = nullptr,
+                                   const std::optional<bool>& updatable = std::nullopt);
 
   /**
    * @brief Creates a ground mesh from a height map.
@@ -1480,12 +1446,12 @@ public:
    * this value, defaults 0 (all data visible)
    * @returns a new Mesh
    */
-  static GroundMeshPtr CreateGroundFromHeightMap(
-    const std::string& name, const std::string& url, unsigned int width,
-    unsigned int height, unsigned int subdivisions, unsigned int minHeight,
-    unsigned int maxHeight, Scene*, bool updatable = false,
-    const std::function<void(const GroundMeshPtr& mesh)>& onReady = nullptr,
-    std::optional<float> alphaFilter = std::nullopt);
+  static GroundMeshPtr
+  CreateGroundFromHeightMap(const std::string& name, const std::string& url, unsigned int width,
+                            unsigned int height, unsigned int subdivisions, unsigned int minHeight,
+                            unsigned int maxHeight, Scene*, bool updatable = false,
+                            const std::function<void(const GroundMeshPtr& mesh)>& onReady = nullptr,
+                            std::optional<float> alphaFilter = std::nullopt);
 
   /**
    * @brief Creates a tube mesh.
@@ -1514,15 +1480,14 @@ public:
    * (http://doc.babylonjs.com/how_to/How_to_dynamically_morph_a_mesh#tube)
    * @returns a new Mesh
    */
-  static MeshPtr CreateTube(
-    const std::string& name, const std::vector<Vector3>& path,
-    float radius = 1.f, unsigned int tessellation = 64,
-    const std::function<float(unsigned int i, float distance)>& radiusFunction
-    = nullptr,
-    unsigned int cap = Mesh::NO_CAP, Scene* = nullptr,
-    const std::optional<bool>& updatable               = std::nullopt,
-    const std::optional<unsigned int>& sideOrientation = std::nullopt,
-    const MeshPtr& instance                            = nullptr);
+  static MeshPtr
+  CreateTube(const std::string& name, const std::vector<Vector3>& path, float radius = 1.f,
+             unsigned int tessellation                                                  = 64,
+             const std::function<float(unsigned int i, float distance)>& radiusFunction = nullptr,
+             unsigned int cap = Mesh::NO_CAP, Scene* = nullptr,
+             const std::optional<bool>& updatable               = std::nullopt,
+             const std::optional<unsigned int>& sideOrientation = std::nullopt,
+             const MeshPtr& instance                            = nullptr);
 
   /**
    * @brief Creates a polyhedron mesh.
@@ -1562,8 +1527,7 @@ public:
    * @param scene defines the hosting scene
    * @returns a new Mesh
    */
-  static MeshPtr CreatePolyhedron(const std::string& name,
-                                  PolyhedronOptions& options, Scene*);
+  static MeshPtr CreatePolyhedron(const std::string& name, PolyhedronOptions& options, Scene*);
 
   /**
    * @brief Creates a sphere based upon an icosahedron with 20 triangular faces
@@ -1593,8 +1557,7 @@ public:
    * @returns a new Mesh
    * @see http://doc.babylonjs.com/how_to/polyhedra_shapes#icosphere
    */
-  static MeshPtr CreateIcoSphere(const std::string& name,
-                                 IcoSphereOptions& options, Scene* scene);
+  static MeshPtr CreateIcoSphere(const std::string& name, IcoSphereOptions& options, Scene* scene);
 
   /**
    * @brief Creates a decal mesh.
@@ -1610,10 +1573,9 @@ public:
    * @param angle sets the angle to rotate the decal
    * @returns a new Mesh
    */
-  static MeshPtr CreateDecal(const std::string& name,
-                             const AbstractMeshPtr& sourceMesh,
-                             const Vector3& position, const Vector3& normal,
-                             const Vector3& size, float angle = 0.f);
+  static MeshPtr CreateDecal(const std::string& name, const AbstractMeshPtr& sourceMesh,
+                             const Vector3& position, const Vector3& normal, const Vector3& size,
+                             float angle = 0.f);
 
   /** Skeletons **/
 
@@ -1677,12 +1639,9 @@ public:
    * accept multiple multi materials, ignores subdivideWithSubMeshes.
    * @returns a new mesh
    */
-  static MeshPtr MergeMeshes(const std::vector<MeshPtr>& meshes,
-                             bool disposeSource          = true,
-                             bool allow32BitsIndices     = true,
-                             MeshPtr meshSubclass        = nullptr,
-                             bool subdivideWithSubMeshes = false,
-                             bool multiMultiMaterials    = false);
+  static MeshPtr MergeMeshes(const std::vector<MeshPtr>& meshes, bool disposeSource = true,
+                             bool allow32BitsIndices = true, MeshPtr meshSubclass = nullptr,
+                             bool subdivideWithSubMeshes = false, bool multiMultiMaterials = false);
 
   /**
    * @brief Hidden
@@ -1707,9 +1666,15 @@ protected:
    * @param clonePhysicsImpostor When cloning, include cloning mesh physics
    * impostor, default True.
    */
-  Mesh(const std::string& name, Scene* scene, Node* parent = nullptr,
-       Mesh* source = nullptr, bool doNotCloneChildren = true,
-       bool clonePhysicsImpostor = true);
+  Mesh(const std::string& name, Scene* scene, Node* parent = nullptr, Mesh* source = nullptr,
+       bool doNotCloneChildren = true, bool clonePhysicsImpostor = true,
+       bool postInitialize = false);
+
+  /**
+   * @brief Hidden
+   */
+  void _initialize(Scene* scene, Node* iParent, Mesh* source, bool doNotCloneChildren,
+                   bool clonePhysicsImpostor);
 
   /**
    * @brief An event triggered before rendering the mesh.
@@ -1735,8 +1700,7 @@ protected:
    * @brief Sets a callback to call before drawing the mesh. It is recommended
    * to use onBeforeDrawObservable instead.
    */
-  void
-  set_onBeforeDraw(const std::function<void(Mesh*, EventState&)>& callback);
+  void set_onBeforeDraw(const std::function<void(Mesh*, EventState&)>& callback);
 
   /**
    * @brief Gets a boolean indicating if this mesh has instances.
@@ -1808,8 +1772,7 @@ protected:
 
 private:
   void _sortLODLevels();
-  Mesh& _onBeforeDraw(bool isInstance, Matrix& world,
-                      Material* effectiveMaterial);
+  Mesh& _onBeforeDraw(bool isInstance, Matrix& world, Material* effectiveMaterial);
   // Faster 4 weight version
   void normalizeSkinFourWeights();
   // Handle special case of extra verts.  (in theory gltf can handle 12
@@ -1876,8 +1839,7 @@ public:
    * User defined function used to change how LOD level selection is done
    * @see http://doc.babylonjs.com/how_to/how_to_use_lod
    */
-  std::function<void(float distance, Mesh* mesh, Mesh* selectedLevel)>
-    onLODLevelSelection;
+  std::function<void(float distance, Mesh* mesh, Mesh* selectedLevel)> onLODLevelSelection;
 
   /**
    * Gets or sets the morph target manager
@@ -1903,8 +1865,7 @@ public:
   /**
    * Hidden
    */
-  std::function<void(const json& parsedGeometry, const MeshPtr& mesh)>
-    _delayLoadingFunction;
+  std::function<void(const json& parsedGeometry, const MeshPtr& mesh)> _delayLoadingFunction;
 
   /** Hidden */
   bool _shouldGenerateFlatShading;
