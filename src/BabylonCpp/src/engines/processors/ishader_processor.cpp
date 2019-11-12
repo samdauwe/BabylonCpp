@@ -2,6 +2,10 @@
 
 namespace BABYLON {
 
+IShaderProcessor::~IShaderProcessor()
+{
+}
+
 std::string IShaderProcessor::attributeProcessor(const std::string& /*attribute*/)
 {
   return "";
@@ -41,7 +45,7 @@ std::string IShaderProcessor::preProcessor(const std::string& /*code*/,
   return "";
 }
 
-std::string IShaderProcessor::postProcessor(const std::string& /*code*/,
+std::string IShaderProcessor::postProcessor(std::string /*code*/,
                                             const std::vector<std::string>& /*defines*/,
                                             bool /*isFragment*/)
 {
