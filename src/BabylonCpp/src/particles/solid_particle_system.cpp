@@ -1002,8 +1002,7 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
       }
     }
     if (_depthSort && _depthSortParticles) {
-      std::sort(depthSortedParticles.begin(), depthSortedParticles.end(),
-                _depthSortFunction);
+      BABYLON::stl_util::sort_js_style(depthSortedParticles, _depthSortFunction);
       const auto dspl = depthSortedParticles.size();
       auto sid        = 0ull;
       for (size_t sorted = 0; sorted < dspl; ++sorted) {

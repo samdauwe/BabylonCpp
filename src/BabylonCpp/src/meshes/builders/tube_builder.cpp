@@ -91,6 +91,7 @@ MeshPtr TubeBuilder::CreateTube(const std::string& name, TubeOptions& options,
             circlePaths[1] = circlePaths[2];
             break;
           case Mesh::CAP_END:
+            circlePaths.resize(index + 2);
             circlePaths[index]     = circlePaths[index - 1];
             circlePaths[index + 1] = capPath(
               _tessellation, static_cast<unsigned int>(_path.size() - 1));
@@ -98,6 +99,7 @@ MeshPtr TubeBuilder::CreateTube(const std::string& name, TubeOptions& options,
           case Mesh::CAP_ALL:
             circlePaths[0]         = capPath(_tessellation, 0);
             circlePaths[1]         = circlePaths[2];
+            circlePaths.resize(index + 2);
             circlePaths[index]     = circlePaths[index - 1];
             circlePaths[index + 1] = capPath(
               _tessellation, static_cast<unsigned int>(_path.size() - 1));

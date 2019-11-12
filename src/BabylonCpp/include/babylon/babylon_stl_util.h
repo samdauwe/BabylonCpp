@@ -156,7 +156,7 @@ template <typename C, typename T>
 std::vector<C> cast_array_elements(const std::vector<T> buffer)
 {
   struct to_result_type {
-    float operator()(T value)
+    C operator()(T value)
     {
       return static_cast<C>(value);
     }
@@ -707,6 +707,15 @@ template <typename C, typename P>
 inline void remove_if(C& c, const P& p)
 {
   c.erase(std::remove_if(std::begin(c), std::end(c), p), std::end(c));
+}
+
+template <typename Container, typename JsStyleSortFunction>
+void sort_js_style(Container container, JsStyleSortFunction fn)
+{ 
+  auto predicateFunction = [fn](auto a, auto b) {
+    return fn(a, b) < 0;
+  };
+  std::sort(container.begin(), container.end(), predicateFunction);
 }
 
 template <typename C, typename T>

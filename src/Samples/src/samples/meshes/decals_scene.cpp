@@ -49,10 +49,10 @@ public:
     // import all meshes
     SceneLoader::ImportMesh(
       {"Shcroendiger'scat"}, "/scenes/", "SSAOcat.babylon", scene,
-      [this, &scene, &canvas](const std::vector<AbstractMeshPtr>& newMeshes,
-                              const std::vector<IParticleSystemPtr>& /*newParticleSystems*/,
-                              const std::vector<SkeletonPtr>& /*newSkeletons*/,
-                              const std::vector<AnimationGroupPtr>& /*newAnimationGroups*/) {
+      [this, scene, canvas](const std::vector<AbstractMeshPtr>& newMeshes,
+                            const std::vector<IParticleSystemPtr>& /*newParticleSystems*/,
+                            const std::vector<SkeletonPtr>& /*newSkeletons*/,
+                            const std::vector<AnimationGroupPtr>& /*newAnimationGroups*/) {
         // Set the target of the camera to the first imported mesh
         if (!newMeshes.empty()) {
           auto cat = newMeshes[0];
@@ -66,7 +66,7 @@ public:
           _decalMaterial->diffuseTexture = diffuseTexture;
           _decalMaterial->zOffset        = -2.f;
 
-          _onPointerDown = [this, &scene, &cat](PointerEvent&& evt) -> void {
+          _onPointerDown = [this, scene, cat](PointerEvent&& evt) -> void {
             if (evt.button != MouseButtonType::LEFT) {
               return;
             }
@@ -74,7 +74,7 @@ public:
             // Check if we are under a mesh
             auto pickInfo
               = scene->pick(scene->pointerX, scene->pointerY,
-                            [&cat](const AbstractMeshPtr& mesh) -> bool { return mesh == cat; });
+                            [cat](const AbstractMeshPtr& mesh) -> bool { return mesh == cat; });
             if (pickInfo.has_value() && pickInfo->hit) {
               Vector3 decalSize(10.f, 10.f, 10.f);
 

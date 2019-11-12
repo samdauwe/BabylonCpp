@@ -25,7 +25,7 @@ LinesMesh::LinesMesh(const std::string& iName, Scene* scene, Node* iParent,
     , alpha{1.f}
     , _colorShaderMaterial{nullptr}
 {
-  if (source) {
+  if (_source) {
     color          = iSource->color;
     alpha          = iSource->alpha;
     useVertexColor = iSource->useVertexColor;

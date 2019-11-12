@@ -83,7 +83,7 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
     , _shouldGenerateFlatShading{false}
     , _originalBuilderSideOrientation{Mesh::DEFAULTSIDE}
     , overrideMaterialSideOrientation{std::nullopt}
-    , source{this, &Mesh::get_source}
+    , _source{this, &Mesh::get_source}
     , isUnIndexed{this, &Mesh::get_isUnIndexed, &Mesh::set_isUnIndexed}
     , _isMesh{this, &Mesh::get__isMesh}
     , hasLODLevels{this, &Mesh::get_hasLODLevels}
@@ -350,7 +350,7 @@ std::vector<MeshLODLevelPtr>& Mesh::getLODLevels()
 void Mesh::_sortLODLevels()
 {
   auto& _LODLevels = _internalMeshDataInfo->_LODLevels;
-  std::sort(_LODLevels.begin(), _LODLevels.end(),
+  BABYLON::stl_util::sort_js_style(_LODLevels,
             [](const MeshLODLevelPtr& a, const MeshLODLevelPtr& b) {
               if (a->distance < b->distance) {
                 return 1;
@@ -358,7 +358,6 @@ void Mesh::_sortLODLevels()
               if (a->distance > b->distance) {
                 return -1;
               }
-
               return 0;
             });
 }
@@ -2008,7 +2007,7 @@ Mesh& Mesh::convertToFlatShadedMesh()
   }
 
   // Save previous submeshes
-  auto previousSubmeshes = stl_util::to_raw_ptr_vector(subMeshes);
+  auto previousSubmeshes = subMeshes; //stl_util::to_raw_ptr_vector(subMeshes);
 
   auto indices      = getIndices();
   auto totalIndices = getTotalIndices();

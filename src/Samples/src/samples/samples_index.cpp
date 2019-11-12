@@ -24,13 +24,11 @@ void SamplesIndex::fillSamplesFailures() const
   _samplesFailures = {
     {"BlurModeForMirrorsScene", {SampleFailureReasonKind::empty3d}},
     {"CartoonAnimationsScene", {SampleFailureReasonKind::segFault}},
-    {"ColoredRibbonScene", {SampleFailureReasonKind::segFault}},
     {"CircleCurvesFromBeziersScene", {SampleFailureReasonKind::empty3d}},
-    {"DecalsScene", {SampleFailureReasonKind::segFault}},
+    {"DecalsScene", {SampleFailureReasonKind::broken3d, "Texture is black / no decals appear"}},
     {"EdgesRenderScene", {SampleFailureReasonKind::segFault}},
     {"EnvironmentTextureScene", {SampleFailureReasonKind::empty3d}},
-    {"FurMaterialScene", {SampleFailureReasonKind::broken3d, "Black texture"}},
-    {"InfiniteLoaderScene", {SampleFailureReasonKind::segFault}},
+    {"FurMaterialScene", {SampleFailureReasonKind::segFault}},
     {"InnerMeshPointsScene", {SampleFailureReasonKind::segFault}},
     {"IsPointInsideMeshScene", {SampleFailureReasonKind::processHung}},
     {"LevelOfDetailScene", {SampleFailureReasonKind::segFault, "Segfault when dragging the mouse"}},
@@ -41,7 +39,7 @@ void SamplesIndex::fillSamplesFailures() const
     {"PointsCloudScene", {SampleFailureReasonKind::empty3d}},
     {"ProceduralHexPlanetGenerationScene", {SampleFailureReasonKind::segFault}},
     {"ShaderMaterialWarpSpeedScene", {SampleFailureReasonKind::empty3d}},
-    {"VolumetricLightScatteringScene", {SampleFailureReasonKind::segFault}}};
+    {"VolumetricLightScatteringScene", {SampleFailureReasonKind::broken3d, "No scatter, mousedrag->disappear"}}};
 
   done = true;
 }

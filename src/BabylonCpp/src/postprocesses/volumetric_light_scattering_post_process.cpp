@@ -22,6 +22,12 @@
 
 namespace BABYLON {
 
+namespace 
+{
+  Color4 savedSceneClearColor;
+  Color4 sceneClearColor(0.f, 0.f, 0.f, 1.f);
+}
+
 VolumetricLightScatteringPostProcess::VolumetricLightScatteringPostProcess(
   const std::string& iName, float ratio, const CameraPtr& camera,
   const MeshPtr& iMesh, unsigned int iSamples, unsigned int samplingMode,
@@ -58,7 +64,7 @@ VolumetricLightScatteringPostProcess::VolumetricLightScatteringPostProcess(
   // Configure
   _createPass(scene, ratio);
 
-  onActivate = [&](Camera* iCamera, EventState&) {
+  onActivate = [this](Camera* iCamera, EventState&) {
     if (!isSupported()) {
       dispose(iCamera);
     }
@@ -66,7 +72,7 @@ VolumetricLightScatteringPostProcess::VolumetricLightScatteringPostProcess(
     onActivate = nullptr;
   };
 
-  onApplyObservable.add([&](Effect* effect, EventState&) {
+  onApplyObservable.add([this, scene](Effect* effect, EventState&) {
     _updateMeshScreenCoordinates(scene);
 
     effect->setTexture("lightScatteringSampler", _volumetricLightScatteringRTT);
@@ -226,7 +232,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
   }
 
   // Custom render function for submeshes
-  auto renderSubMesh = [&](SubMesh* subMesh) {
+  auto renderSubMesh = [this](SubMesh* subMesh) {
     auto _mesh = subMesh->getRenderingMesh();
     if (_meshExcluded(_mesh)) {
       return;
@@ -301,7 +307,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
       mesh->_processRendering(subMesh, _volumetricLightScatteringPass,
                               Material::TriangleFillMode, batch,
                               hardwareInstancedRendering,
-                              [&](bool /*isInstance*/, Matrix world,
+                              [effect](bool /*isInstance*/, Matrix world,
                                   Material* /*effectiveMaterial*/) {
                                 effect->setMatrix("world", world);
                               });
@@ -309,20 +315,20 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
   };
 
   // Render target texture callbacks
-  Color4 savedSceneClearColor;
-  Color4 sceneClearColor(0.f, 0.f, 0.f, 1.f);
+  //Color4 savedSceneClearColor;
+  //Color4 sceneClearColor(0.f, 0.f, 0.f, 1.f);
 
   _volumetricLightScatteringRTT->onBeforeRenderObservable.add(
-    [&](int*, EventState&) {
+    [scene](int*, EventState&) {
       savedSceneClearColor = scene->clearColor;
       scene->clearColor    = sceneClearColor;
     });
 
   _volumetricLightScatteringRTT->onAfterRenderObservable.add(
-    [&](int*, EventState&) { scene->clearColor = savedSceneClearColor; });
+    [scene](int*, EventState&) { scene->clearColor = savedSceneClearColor; });
 
   _volumetricLightScatteringRTT->customRenderFunction
-    = [&](const std::vector<SubMesh*>& opaqueSubMeshes,
+    = [scene, engine, renderSubMesh](const std::vector<SubMesh*>& opaqueSubMeshes,
           const std::vector<SubMesh*>& alphaTestSubMeshes,
           const std::vector<SubMesh*>& transparentSubMeshes,
           const std::vector<SubMesh*>& depthOnlySubMeshes,
@@ -362,7 +368,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
           auto sortedArray
             = stl_util::slice(transparentSubMeshes, 0,
                               static_cast<int>(transparentSubMeshes.size()));
-          std::sort(sortedArray.begin(), sortedArray.end(),
+          BABYLON::stl_util::sort_js_style(sortedArray,
                     [](const SubMesh* a, const SubMesh* b) {
                       // Alpha index first
                       if (a->_alphaIndex > b->_alphaIndex) {

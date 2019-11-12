@@ -138,7 +138,7 @@ private:
           ImGui::SetNextItemOpen(false);
         if (collapseMode == CollapseMode::ExpandAll)
           ImGui::SetNextItemOpen(true);
-        if (ImGui::CollapsingHeader(header.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+        if (ImGui::CollapsingHeader(header.c_str())) //ImGuiTreeNodeFlags_DefaultOpen))
         {
           for (const std::string & sample : samples)
           {
