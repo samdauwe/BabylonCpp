@@ -28,7 +28,7 @@ void SamplesIndex::fillSamplesFailures() const
     {"DecalsScene", {SampleFailureReasonKind::broken3d, "Texture is black / no decals appear"}},
     {"EdgesRenderScene", {SampleFailureReasonKind::segFault}},
     {"EnvironmentTextureScene", {SampleFailureReasonKind::empty3d}},
-    {"FurMaterialScene", {SampleFailureReasonKind::broken3d, "Black texture"}},
+    {"FurMaterialScene", {SampleFailureReasonKind::segFault}},
     {"InnerMeshPointsScene", {SampleFailureReasonKind::segFault}},
     {"IsPointInsideMeshScene", {SampleFailureReasonKind::processHung}},
     {"LevelOfDetailScene", {SampleFailureReasonKind::segFault, "Segfault when dragging the mouse"}},
