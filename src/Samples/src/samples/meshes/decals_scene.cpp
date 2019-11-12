@@ -49,10 +49,10 @@ public:
     // import all meshes
     SceneLoader::ImportMesh(
       {"Shcroendiger'scat"}, "/scenes/", "SSAOcat.babylon", scene,
-      [this, &scene, &canvas](const std::vector<AbstractMeshPtr>& newMeshes,
-                              const std::vector<IParticleSystemPtr>& /*newParticleSystems*/,
-                              const std::vector<SkeletonPtr>& /*newSkeletons*/,
-                              const std::vector<AnimationGroupPtr>& /*newAnimationGroups*/) {
+      [this, scene, canvas](const std::vector<AbstractMeshPtr>& newMeshes,
+                            const std::vector<IParticleSystemPtr>& /*newParticleSystems*/,
+                            const std::vector<SkeletonPtr>& /*newSkeletons*/,
+                            const std::vector<AnimationGroupPtr>& /*newAnimationGroups*/) {
         // Set the target of the camera to the first imported mesh
         if (!newMeshes.empty()) {
           auto cat = newMeshes[0];
