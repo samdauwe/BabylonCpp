@@ -22,8 +22,7 @@ FreeCameraTouchInput::~FreeCameraTouchInput()
 {
 }
 
-void FreeCameraTouchInput::attachControl(ICanvas* /*canvas*/,
-                                         bool iNoPreventDefault)
+void FreeCameraTouchInput::attachControl(ICanvas* /*canvas*/, bool iNoPreventDefault)
 {
   noPreventDefault = iNoPreventDefault;
   previousPosition = std::nullopt;
@@ -64,8 +63,7 @@ void FreeCameraTouchInput::attachControl(ICanvas* /*canvas*/,
           evt.preventDefault();
         }
 
-        auto it    = std::find(_pointerPressed.begin(), _pointerPressed.end(),
-                            evt.pointerId);
+        auto it    = std::find(_pointerPressed.begin(), _pointerPressed.end(), evt.pointerId);
         auto index = stl_util::index_of(_pointerPressed, evt.pointerId);
 
         if (index == -1) {
@@ -140,14 +138,12 @@ void FreeCameraTouchInput::checkInputs()
     }
     else {
       auto speed = camera->_computeLocalCameraSpeed();
-      Vector3 direction(0.f, 0.f,
-                        speed * _offsetY.value() / touchMoveSensibility);
+      Vector3 direction(0.f, 0.f, speed * _offsetY.value() / touchMoveSensibility);
 
-      Matrix::RotationYawPitchRollToRef(camera->rotation->y,
-                                        camera->rotation->x, 0,
+      Matrix::RotationYawPitchRollToRef(camera->rotation().y, camera->rotation().x, 0.f,
                                         camera->_cameraRotationMatrix);
-      camera->cameraDirection->addInPlace(Vector3::TransformCoordinates(
-        direction, camera->_cameraRotationMatrix));
+      camera->cameraDirection->addInPlace(
+        Vector3::TransformCoordinates(direction, camera->_cameraRotationMatrix));
     }
   }
 }

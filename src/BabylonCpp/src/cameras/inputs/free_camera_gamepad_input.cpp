@@ -23,8 +23,7 @@ FreeCameraGamepadInput::~FreeCameraGamepadInput()
 {
 }
 
-void FreeCameraGamepadInput::attachControl(ICanvas* /*canvas*/,
-                                           bool /*noPreventDefault*/)
+void FreeCameraGamepadInput::attachControl(ICanvas* /*canvas*/, bool /*noPreventDefault*/)
 {
   auto& manager               = camera->getScene()->gamepadManager();
   _onGamepadConnectedObserver = manager->onGamepadConnectedObservable.add(
@@ -62,15 +61,15 @@ void FreeCameraGamepadInput::checkInputs()
     auto& LSValues    = *gamepad->leftStick();
     auto normalizedLX = LSValues.x / gamepadMoveSensibility;
     auto normalizedLY = LSValues.y / gamepadMoveSensibility;
-    LSValues.x = std::abs(normalizedLX) > 0.005f ? 0.f + normalizedLX : 0.f;
-    LSValues.y = std::abs(normalizedLY) > 0.005f ? 0.f + normalizedLY : 0.f;
+    LSValues.x        = std::abs(normalizedLX) > 0.005f ? 0.f + normalizedLX : 0.f;
+    LSValues.y        = std::abs(normalizedLY) > 0.005f ? 0.f + normalizedLY : 0.f;
 
     auto& RSValues = gamepad->rightStick();
     if (RSValues) {
       auto normalizedRX = RSValues->x / gamepadAngularSensibility;
       auto normalizedRY = RSValues->y / gamepadAngularSensibility;
-      RSValues->x = std::abs(normalizedRX) > 0.001f ? 0.f + normalizedRX : 0.f;
-      RSValues->y = std::abs(normalizedRY) > 0.001f ? 0.f + normalizedRY : 0.f;
+      RSValues->x       = std::abs(normalizedRX) > 0.001f ? 0.f + normalizedRX : 0.f;
+      RSValues->y       = std::abs(normalizedRY) > 0.001f ? 0.f + normalizedRY : 0.f;
     }
     else {
       RSValues = StickValues{
@@ -80,8 +79,8 @@ void FreeCameraGamepadInput::checkInputs()
     }
 
     if (!camera->rotationQuaternion) {
-      Matrix::RotationYawPitchRollToRef(
-        camera->rotation->y, camera->rotation->x, 0.f, _cameraTransform);
+      Matrix::RotationYawPitchRollToRef(camera->rotation().y, camera->rotation().x, 0.f,
+                                        _cameraTransform);
     }
     else {
       camera->rotationQuaternion->toRotationMatrix(_cameraTransform);
@@ -90,8 +89,7 @@ void FreeCameraGamepadInput::checkInputs()
     auto speed = camera->_computeLocalCameraSpeed() * 50.f;
     _vector3.copyFromFloats(LSValues.x * speed, 0.f, -LSValues.y * speed);
 
-    Vector3::TransformCoordinatesToRef(_vector3, _cameraTransform,
-                                       _deltaTransform);
+    Vector3::TransformCoordinatesToRef(_vector3, _cameraTransform, _deltaTransform);
     camera->cameraDirection->addInPlace(_deltaTransform);
     _vector2.copyFromFloats(RSValues->y, RSValues->x);
     camera->cameraRotation->addInPlace(_vector2);

@@ -48,8 +48,8 @@ struct CamerasTypesScene : public IRenderableScene {
 
     // FreeCamera >> You can move around the world with mouse and keyboard
     // (LEFT/RIGHT/UP/DOWN) Parameters : name, position, scene
-    auto freeCamera = FreeCamera::New("FreeCamera", Vector3(0.f, 0.f, 5.f), scene);
-    freeCamera->setRotation(Vector3(0, Math::PI, 0));
+    auto freeCamera      = FreeCamera::New("FreeCamera", Vector3(0.f, 0.f, 5.f), scene);
+    freeCamera->rotation = Vector3(0, Math::PI, 0);
 
     // Attach a camera to the scene and the canvas
     scene->activeCamera = freeCamera;

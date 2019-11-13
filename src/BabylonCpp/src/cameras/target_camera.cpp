@@ -23,7 +23,7 @@ TargetCamera::TargetCamera(const std::string& iName, const Vector3& iPosition, S
     , cameraDirection{std::make_unique<Vector3>(0.f, 0.f, 0.f)}
     , cameraRotation{std::make_unique<Vector2>(0.f, 0.f)}
     , updateUpVectorFromRotation{false}
-    , rotation{std::make_unique<Vector3>(0.f, 0.f, 0.f)}
+    , rotation{this, &TargetCamera::get_rotation, &TargetCamera::set_rotation}
     , rotationQuaternion{nullptr}
     , speed{2.f}
     , noRotationConstraint{false}
@@ -38,6 +38,7 @@ TargetCamera::TargetCamera(const std::string& iName, const Vector3& iPosition, S
     , _transformedReferencePoint{Vector3::Zero()}
     , _globalCurrentTarget{Vector3::Zero()}
     , _globalCurrentUpVector{Vector3::Zero()}
+    , _rotation{std::make_unique<Vector3>(0.f, 0.f, 0.f)}
     , _defaultUp{Vector3::Up()}
     , _cachedRotationZ{0.f}
     , _cachedQuaternionRotationZ{0.f}
@@ -62,7 +63,7 @@ AnimationValue TargetCamera::getProperty(const std::vector<std::string>& targetP
       return position();
     }
     if (target == "rotation") {
-      return getRotation();
+      return rotation();
     }
   }
   else if (targetPropertyPath.size() == 2) {
@@ -74,7 +75,7 @@ AnimationValue TargetCamera::getProperty(const std::vector<std::string>& targetP
     }
     // Rotation
     if (target == "rotation") {
-      return IAnimatable::getProperty(key.c_str(), getRotation());
+      return IAnimatable::getProperty(key.c_str(), rotation());
     }
   }
 
@@ -96,7 +97,7 @@ void TargetCamera::setProperty(const std::vector<std::string>& targetPropertyPat
         }
         // Rotation
         if (target == "rotation") {
-          setRotation(vector3Value);
+          rotation = vector3Value;
         }
       }
     }
@@ -111,7 +112,7 @@ void TargetCamera::setProperty(const std::vector<std::string>& targetPropertyPat
         }
         // Rotation
         if (target == "rotation") {
-          IAnimatable::setProperty(key.c_str(), getRotation(), floatValue);
+          IAnimatable::setProperty(key.c_str(), rotation(), floatValue);
         }
       }
     }
@@ -141,7 +142,7 @@ Vector3* TargetCamera::_getLockedTargetPosition()
 Camera& TargetCamera::storeState()
 {
   _storedPosition = position().copy();
-  _storedRotation = rotation->copy();
+  _storedRotation = rotation().copy();
   if (rotationQuaternion) {
     _storedRotationQuaternion = rotationQuaternion->copy();
   }
@@ -156,7 +157,7 @@ bool TargetCamera::_restoreStateValues()
   }
 
   position = _storedPosition.copy();
-  rotation = std::make_unique<Vector3>(_storedRotation);
+  rotation = _storedRotation.copy();
 
   if (rotationQuaternion) {
     rotationQuaternion = _storedRotationQuaternion.clone();
@@ -198,7 +199,7 @@ void TargetCamera::_updateCache(bool ignoreParentClass)
     }
   }
 
-  _cache.rotation.copyFrom(*rotation);
+  _cache.rotation.copyFrom(rotation());
   if (rotationQuaternion) {
     _cache.rotationQuaternion.copyFrom(*rotationQuaternion);
   }
@@ -216,7 +217,7 @@ bool TargetCamera::_isSynchronizedViewMatrix()
   return (_cache.lockedTarget ? _cache.lockedTarget->equals(*lockedTargetPosition) :
                                 !lockedTargetPosition)
          && (rotationQuaternion ? rotationQuaternion->equals(_cache.rotationQuaternion) :
-                                  _cache.rotation.equals(*rotation));
+                                  _cache.rotation.equals(rotation()));
 }
 
 /** Methods **/
@@ -227,14 +228,14 @@ float TargetCamera::_computeLocalCameraSpeed()
   return speed * std::sqrt((engine->getDeltaTime() / (engine->getFps() * 100.f)));
 }
 
-void TargetCamera::setRotation(const Vector3& newRotation)
+Vector3& TargetCamera::get_rotation()
 {
-  rotation = std::make_unique<Vector3>(newRotation);
+  return *_rotation;
 }
 
-Vector3& TargetCamera::getRotation()
+void TargetCamera::set_rotation(const Vector3& newRotation)
 {
-  return *rotation;
+  _rotation = std::make_unique<Vector3>(newRotation);
 }
 
 /** Target **/
@@ -251,33 +252,33 @@ void TargetCamera::setTarget(const Vector3& target)
   Matrix::LookAtLHToRef(position, target, _defaultUp, _camMatrix);
   _camMatrix.invert();
 
-  rotation->x = std::atan(_camMatrix.m()[6] / _camMatrix.m()[10]);
+  _rotation->x = std::atan(_camMatrix.m()[6] / _camMatrix.m()[10]);
 
   auto vDir = target.subtract(position);
 
   if (vDir.x >= 0.f) {
-    rotation->y = (-std::atan(vDir.z / vDir.x) + Math::PI / 2.f);
+    _rotation->y = (-std::atan(vDir.z / vDir.x) + Math::PI / 2.f);
   }
   else {
-    rotation->y = (-std::atan(vDir.z / vDir.x) - Math::PI / 2.f);
+    _rotation->y = (-std::atan(vDir.z / vDir.x) - Math::PI / 2.f);
   }
 
-  rotation->z = 0.f;
+  _rotation->z = 0.f;
 
-  if (isNan(rotation->x)) {
-    rotation->x = 0.f;
+  if (isNan(_rotation->x)) {
+    _rotation->x = 0.f;
   }
 
-  if (isNan(rotation->y)) {
-    rotation->y = 0.f;
+  if (isNan(_rotation->y)) {
+    _rotation->y = 0.f;
   }
 
-  if (isNan(rotation->z)) {
-    rotation->z = 0.f;
+  if (isNan(_rotation->z)) {
+    _rotation->z = 0.f;
   }
 
   if (rotationQuaternion) {
-    Quaternion::RotationYawPitchRollToRef(rotation->y, rotation->x, rotation->z,
+    Quaternion::RotationYawPitchRollToRef(_rotation->y, _rotation->x, _rotation->z,
                                           *rotationQuaternion);
   }
 }
@@ -317,14 +318,14 @@ void TargetCamera::_checkInputs()
 
   // Rotate
   if (needToRotate) {
-    rotation->x += cameraRotation->x;
-    rotation->y += cameraRotation->y;
+    _rotation->x += cameraRotation->x;
+    _rotation->y += cameraRotation->y;
 
     // Rotate, if quaternion is set and rotation was used
     if (rotationQuaternion) {
-      auto len = rotation->lengthSquared();
+      auto len = _rotation->lengthSquared();
       if (len > 0) {
-        Quaternion::RotationYawPitchRollToRef(rotation->y, rotation->x, rotation->z,
+        Quaternion::RotationYawPitchRollToRef(_rotation->y, _rotation->x, _rotation->z,
                                               *rotationQuaternion);
       }
     }
@@ -332,11 +333,11 @@ void TargetCamera::_checkInputs()
     if (!noRotationConstraint) {
       const auto limit = 1.570796f;
 
-      if (rotation->x > limit) {
-        rotation->x = limit;
+      if (_rotation->x > limit) {
+        _rotation->x = limit;
       }
-      if (rotation->x < -limit) {
-        rotation->x = -limit;
+      if (_rotation->x < -limit) {
+        _rotation->x = -limit;
       }
     }
   }
@@ -376,7 +377,8 @@ void TargetCamera::_updateCameraRotationMatrix()
     rotationQuaternion->toRotationMatrix(_cameraRotationMatrix);
   }
   else {
-    Matrix::RotationYawPitchRollToRef(rotation->y, rotation->x, rotation->z, _cameraRotationMatrix);
+    Matrix::RotationYawPitchRollToRef(_rotation->y, _rotation->x, _rotation->z,
+                                      _cameraRotationMatrix);
   }
 }
 
@@ -403,9 +405,9 @@ Matrix TargetCamera::_getViewMatrix()
     _rotateUpVectorWithCameraRotationMatrix();
     _cachedQuaternionRotationZ = rotationQuaternion->z;
   }
-  else if (!stl_util::almost_equal(_cachedRotationZ, rotation->z)) {
+  else if (!stl_util::almost_equal(_cachedRotationZ, _rotation->z)) {
     _rotateUpVectorWithCameraRotationMatrix();
-    _cachedRotationZ = rotation->z;
+    _cachedRotationZ = _rotation->z;
   }
 
   Vector3::TransformCoordinatesToRef(*_referencePoint, _cameraRotationMatrix,
@@ -420,7 +422,7 @@ Matrix TargetCamera::_getViewMatrix()
       yAxis.rotateByQuaternionToRef(*rotationQuaternion, upVector);
     }
     else {
-      Quaternion::FromEulerVectorToRef(*rotation, _tmpQuaternion);
+      Quaternion::FromEulerVectorToRef(*_rotation, _tmpQuaternion);
       auto yAxis = Axis::Y();
       yAxis.rotateByQuaternionToRef(_tmpQuaternion, upVector);
     }
@@ -501,8 +503,8 @@ void TargetCamera::_updateRigCameras()
         camRight->rotationQuaternion->copyFrom(*rotationQuaternion);
       }
       else {
-        camLeft->rotation->copyFrom(*rotation);
-        camRight->rotation->copyFrom(*rotation);
+        camLeft->rotation().copyFrom(*_rotation);
+        camRight->rotation().copyFrom(*_rotation);
       }
       camLeft->position().copyFrom(position);
       camRight->position().copyFrom(position);

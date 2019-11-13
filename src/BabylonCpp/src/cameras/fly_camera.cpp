@@ -11,8 +11,8 @@
 
 namespace BABYLON {
 
-FlyCamera::FlyCamera(const std::string& iName, const Vector3& iPosition,
-                     Scene* scene, bool setActiveOnSceneIfNoneActive)
+FlyCamera::FlyCamera(const std::string& iName, const Vector3& iPosition, Scene* scene,
+                     bool setActiveOnSceneIfNoneActive)
     : TargetCamera{iName, iPosition, scene, setActiveOnSceneIfNoneActive}
     , ellipsoid{Vector3(1.f, 1.f, 1.f)}
     , ellipsoidOffset{Vector3(0.f, 0.f, 0.f)}
@@ -26,10 +26,8 @@ FlyCamera::FlyCamera(const std::string& iName, const Vector3& iPosition,
     , inputs{nullptr}
     , angularSensibility{this, &FlyCamera::get_angularSensibility,
                          &FlyCamera::set_angularSensibility}
-    , keysForward{this, &FlyCamera::get_keysForward,
-                  &FlyCamera::set_keysForward}
-    , keysBackward{this, &FlyCamera::get_keysBackward,
-                   &FlyCamera::set_keysBackward}
+    , keysForward{this, &FlyCamera::get_keysForward, &FlyCamera::set_keysForward}
+    , keysBackward{this, &FlyCamera::get_keysBackward, &FlyCamera::set_keysBackward}
     , keysUp{this, &FlyCamera::get_keysUp, &FlyCamera::set_keysUp}
     , keysDown{this, &FlyCamera::get_keysDown, &FlyCamera::set_keysDown}
     , keysLeft{this, &FlyCamera::get_keysLeft, &FlyCamera::set_keysLeft}
@@ -37,8 +35,7 @@ FlyCamera::FlyCamera(const std::string& iName, const Vector3& iPosition,
     , onCollide{nullptr}
     , _localDirection{Vector3::Zero()}
     , _transformedDirection{Vector3::Zero()}
-    , collisionMask{this, &FlyCamera::get_collisionMask,
-                    &FlyCamera::set_collisionMask}
+    , collisionMask{this, &FlyCamera::get_collisionMask, &FlyCamera::set_collisionMask}
     , _collider{nullptr}
     , _needMoveForGravity{false}
     , _oldPosition{Vector3::Zero()}
@@ -59,8 +56,7 @@ FlyCamera::~FlyCamera()
 float FlyCamera::get_angularSensibility() const
 {
   if (stl_util::contains(inputs->attached, "mouse")) {
-    auto mouse = std::static_pointer_cast<FlyCameraMouseInput>(
-      inputs->attached["mouse"]);
+    auto mouse = std::static_pointer_cast<FlyCameraMouseInput>(inputs->attached["mouse"]);
     if (mouse) {
       return mouse->angularSensibility;
     }
@@ -72,8 +68,7 @@ float FlyCamera::get_angularSensibility() const
 void FlyCamera::set_angularSensibility(float value)
 {
   if (stl_util::contains(inputs->attached, "mouse")) {
-    auto mouse = std::static_pointer_cast<FlyCameraMouseInput>(
-      inputs->attached["mouse"]);
+    auto mouse = std::static_pointer_cast<FlyCameraMouseInput>(inputs->attached["mouse"]);
     if (mouse) {
       mouse->angularSensibility = value;
     }
@@ -83,8 +78,7 @@ void FlyCamera::set_angularSensibility(float value)
 Int32Array& FlyCamera::get_keysForward()
 {
   if (stl_util::contains(inputs->attached, "keyboard")) {
-    auto keyboard = std::static_pointer_cast<FlyCameraKeyboardInput>(
-      inputs->attached["keyboard"]);
+    auto keyboard = std::static_pointer_cast<FlyCameraKeyboardInput>(inputs->attached["keyboard"]);
     if (keyboard) {
       return keyboard->keysForward;
     }
@@ -96,8 +90,7 @@ Int32Array& FlyCamera::get_keysForward()
 void FlyCamera::set_keysForward(const Int32Array& value)
 {
   if (stl_util::contains(inputs->attached, "keyboard")) {
-    auto keyboard = std::static_pointer_cast<FlyCameraKeyboardInput>(
-      inputs->attached["keyboard"]);
+    auto keyboard = std::static_pointer_cast<FlyCameraKeyboardInput>(inputs->attached["keyboard"]);
     if (keyboard) {
       keyboard->keysForward = value;
     }
@@ -107,8 +100,7 @@ void FlyCamera::set_keysForward(const Int32Array& value)
 Int32Array& FlyCamera::get_keysBackward()
 {
   if (stl_util::contains(inputs->attached, "keyboard")) {
-    auto keyboard = std::static_pointer_cast<FlyCameraKeyboardInput>(
-      inputs->attached["keyboard"]);
+    auto keyboard = std::static_pointer_cast<FlyCameraKeyboardInput>(inputs->attached["keyboard"]);
     if (keyboard) {
       return keyboard->keysBackward;
     }
@@ -120,8 +112,7 @@ Int32Array& FlyCamera::get_keysBackward()
 void FlyCamera::set_keysBackward(const Int32Array& value)
 {
   if (stl_util::contains(inputs->attached, "keyboard")) {
-    auto keyboard = std::static_pointer_cast<FlyCameraKeyboardInput>(
-      inputs->attached["keyboard"]);
+    auto keyboard = std::static_pointer_cast<FlyCameraKeyboardInput>(inputs->attached["keyboard"]);
     if (keyboard) {
       keyboard->keysBackward = value;
     }
@@ -131,8 +122,7 @@ void FlyCamera::set_keysBackward(const Int32Array& value)
 Int32Array& FlyCamera::get_keysUp()
 {
   if (stl_util::contains(inputs->attached, "keyboard")) {
-    auto keyboard = std::static_pointer_cast<FlyCameraKeyboardInput>(
-      inputs->attached["keyboard"]);
+    auto keyboard = std::static_pointer_cast<FlyCameraKeyboardInput>(inputs->attached["keyboard"]);
     if (keyboard) {
       return keyboard->keysUp;
     }
@@ -144,8 +134,7 @@ Int32Array& FlyCamera::get_keysUp()
 void FlyCamera::set_keysUp(const Int32Array& value)
 {
   if (stl_util::contains(inputs->attached, "keyboard")) {
-    auto keyboard = std::static_pointer_cast<FlyCameraKeyboardInput>(
-      inputs->attached["keyboard"]);
+    auto keyboard = std::static_pointer_cast<FlyCameraKeyboardInput>(inputs->attached["keyboard"]);
     if (keyboard) {
       keyboard->keysUp = value;
     }
@@ -155,8 +144,7 @@ void FlyCamera::set_keysUp(const Int32Array& value)
 Int32Array& FlyCamera::get_keysDown()
 {
   if (stl_util::contains(inputs->attached, "keyboard")) {
-    auto keyboard = std::static_pointer_cast<FlyCameraKeyboardInput>(
-      inputs->attached["keyboard"]);
+    auto keyboard = std::static_pointer_cast<FlyCameraKeyboardInput>(inputs->attached["keyboard"]);
     if (keyboard) {
       return keyboard->keysDown;
     }
@@ -168,8 +156,7 @@ Int32Array& FlyCamera::get_keysDown()
 void FlyCamera::set_keysDown(const Int32Array& value)
 {
   if (stl_util::contains(inputs->attached, "keyboard")) {
-    auto keyboard = std::static_pointer_cast<FlyCameraKeyboardInput>(
-      inputs->attached["keyboard"]);
+    auto keyboard = std::static_pointer_cast<FlyCameraKeyboardInput>(inputs->attached["keyboard"]);
     if (keyboard) {
       keyboard->keysDown = value;
     }
@@ -179,8 +166,7 @@ void FlyCamera::set_keysDown(const Int32Array& value)
 Int32Array& FlyCamera::get_keysLeft()
 {
   if (stl_util::contains(inputs->attached, "keyboard")) {
-    auto keyboard = std::static_pointer_cast<FlyCameraKeyboardInput>(
-      inputs->attached["keyboard"]);
+    auto keyboard = std::static_pointer_cast<FlyCameraKeyboardInput>(inputs->attached["keyboard"]);
     if (keyboard) {
       return keyboard->keysLeft;
     }
@@ -192,8 +178,7 @@ Int32Array& FlyCamera::get_keysLeft()
 void FlyCamera::set_keysLeft(const Int32Array& value)
 {
   if (stl_util::contains(inputs->attached, "keyboard")) {
-    auto keyboard = std::static_pointer_cast<FlyCameraKeyboardInput>(
-      inputs->attached["keyboard"]);
+    auto keyboard = std::static_pointer_cast<FlyCameraKeyboardInput>(inputs->attached["keyboard"]);
     if (keyboard) {
       keyboard->keysLeft = value;
     }
@@ -203,8 +188,7 @@ void FlyCamera::set_keysLeft(const Int32Array& value)
 Int32Array& FlyCamera::get_keysRight()
 {
   if (stl_util::contains(inputs->attached, "keyboard")) {
-    auto keyboard = std::static_pointer_cast<FlyCameraKeyboardInput>(
-      inputs->attached["keyboard"]);
+    auto keyboard = std::static_pointer_cast<FlyCameraKeyboardInput>(inputs->attached["keyboard"]);
     if (keyboard) {
       return keyboard->keysRight;
     }
@@ -216,16 +200,14 @@ Int32Array& FlyCamera::get_keysRight()
 void FlyCamera::set_keysRight(const Int32Array& value)
 {
   if (stl_util::contains(inputs->attached, "keyboard")) {
-    auto keyboard = std::static_pointer_cast<FlyCameraKeyboardInput>(
-      inputs->attached["keyboard"]);
+    auto keyboard = std::static_pointer_cast<FlyCameraKeyboardInput>(inputs->attached["keyboard"]);
     if (keyboard) {
       keyboard->keysRight = value;
     }
   }
 }
 
-void FlyCamera::attachControl(ICanvas* element, bool noPreventDefault,
-                              bool /*useCtrlForPanning*/,
+void FlyCamera::attachControl(ICanvas* element, bool noPreventDefault, bool /*useCtrlForPanning*/,
                               MouseButtonType /*panningMouseButton*/)
 {
   inputs->attachElement(element, noPreventDefault);
@@ -253,8 +235,7 @@ void FlyCamera::_collideWithWorld(const Vector3& displacement)
   Vector3 iGlobalPosition;
 
   if (parent) {
-    iGlobalPosition
-      = Vector3::TransformCoordinates(position, parent()->getWorldMatrix());
+    iGlobalPosition = Vector3::TransformCoordinates(position, parent()->getWorldMatrix());
   }
   else {
     iGlobalPosition = position();
@@ -283,19 +264,16 @@ void FlyCamera::_collideWithWorld(const Vector3& displacement)
 
   coordinator->getNewPosition(
     _oldPosition, actualDisplacement, _collider, 3, nullptr,
-    [this](size_t collisionIndex, Vector3& newPosition,
-           const AbstractMeshPtr& collidedMesh) {
+    [this](size_t collisionIndex, Vector3& newPosition, const AbstractMeshPtr& collidedMesh) {
       _onCollisionPositionChange(collisionIndex, newPosition, collidedMesh);
     },
     uniqueId);
 }
 
-void FlyCamera::_onCollisionPositionChange(size_t /*collisionId*/,
-                                           const Vector3& newPosition,
+void FlyCamera::_onCollisionPositionChange(size_t /*collisionId*/, const Vector3& newPosition,
                                            const AbstractMeshPtr& collidedMesh)
 {
-  const auto updatePosition
-    = [this, &collidedMesh](const Vector3& newPos) -> void {
+  const auto updatePosition = [this, &collidedMesh](const Vector3& newPos) -> void {
     _newPosition.copyFrom(newPos);
 
     _newPosition.subtractToRef(_oldPosition, _diffPosition);
@@ -326,8 +304,7 @@ void FlyCamera::_checkInputs()
 bool FlyCamera::_decideIfNeedsToMove()
 {
   return _needMoveForGravity || std::abs(cameraDirection->x) > 0.f
-         || std::abs(cameraDirection->y) > 0.f
-         || std::abs(cameraDirection->z) > 0.f;
+         || std::abs(cameraDirection->y) > 0.f || std::abs(cameraDirection->z) > 0.f;
 }
 
 void FlyCamera::_updatePosition()
@@ -342,20 +319,20 @@ void FlyCamera::_updatePosition()
 
 void FlyCamera::restoreRoll(float rate)
 {
-  auto limit = _trackRoll;  // Target Roll.
-  auto z     = rotation->z; // Current Roll.
-  auto delta = limit - z;   // Difference in Roll.
+  auto limit = _trackRoll;   // Target Roll.
+  auto z     = rotation().z; // Current Roll.
+  auto delta = limit - z;    // Difference in Roll.
 
   auto minRad = 0.001f; // Tenth of a radian is a barely noticable difference.
 
   // If the difference is noticable, restore the Roll.
   if (std::abs(delta) >= minRad) {
     // Change Z rotation towards the target Roll.
-    rotation->z += delta / rate;
+    rotation().z += delta / rate;
 
     // Match when near enough.
-    if (std::abs(limit - rotation->z) <= minRad) {
-      rotation->z = limit;
+    if (std::abs(limit - rotation().z) <= minRad) {
+      rotation().z = limit;
     }
   }
 }

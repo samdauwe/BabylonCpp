@@ -1049,7 +1049,7 @@ GLTFLoader::loadCameraAsync(const std::string& context, const ICamera& camera,
   const auto babylonCamera = FreeCamera::New(
     !camera.name.empty() ? camera.name : String::printf("camera%ld", camera.index), Vector3::Zero(),
     _babylonScene, false);
-  babylonCamera->rotation = std::make_unique<Vector3>(0.f, Math::PI, 0.f);
+  babylonCamera->rotation = Vector3(0.f, Math::PI, 0.f);
 
   switch (camera.type) {
     case IGLTF2::CameraType::PERSPECTIVE: {
@@ -1566,7 +1566,7 @@ VertexBufferPtr& GLTFLoader::_loadVertexAccessorAsync(const std::string& context
   else if (accessor.byteOffset
            && static_cast<unsigned int>(*accessor.byteOffset)
                   % VertexBuffer::GetTypeByteLength(
-                      static_cast<unsigned int>(accessor.componentType))
+                    static_cast<unsigned int>(accessor.componentType))
                 != 0) {
     BABYLON_LOG_WARN("GLTFLoader",
                      "Accessor byte offset is not a multiple of component type byte length")

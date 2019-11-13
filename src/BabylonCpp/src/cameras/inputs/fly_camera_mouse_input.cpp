@@ -9,8 +9,7 @@ namespace BABYLON {
 
 FlyCameraMouseInput::FlyCameraMouseInput(bool iTouchEnabled)
     : touchEnabled{iTouchEnabled}
-    , buttons{{MouseButtonType::LEFT, MouseButtonType::MIDDLE,
-               MouseButtonType::RIGHT}}
+    , buttons{{MouseButtonType::LEFT, MouseButtonType::MIDDLE, MouseButtonType::RIGHT}}
     , buttonsYaw{{-1, 0, 1}}
     , buttonsPitch{{-1, 0, 1}}
     , buttonsRoll{2}
@@ -101,8 +100,7 @@ void FlyCameraMouseInput::_pointerInput(PointerInfo* p, EventState& /*s*/)
 
   // Mouse is moved but an unknown mouse button is pressed.
   if (p->type != PointerEventTypes::POINTERMOVE
-      && (std::find(buttons.begin(), buttons.end(), e.button)
-          == buttons.end())) {
+      && (std::find(buttons.begin(), buttons.end(), e.button) == buttons.end())) {
     return;
   }
 
@@ -196,16 +194,14 @@ void FlyCameraMouseInput::rotateCamera(float offsetX, float offsetY)
   auto y = offsetY / angularSensibility;
 
   // Initialize to current rotation.
-  auto currentRotation
-    = Quaternion::RotationYawPitchRoll(camera->rotation->y, //
-                                       camera->rotation->x, //
-                                       camera->rotation->z  //
-    );
+  auto currentRotation = Quaternion::RotationYawPitchRoll(camera->rotation().y, //
+                                                          camera->rotation().x, //
+                                                          camera->rotation().z  //
+  );
   Quaternion rotationChange;
 
   // Pitch.
-  if (std::find(buttonsPitch.begin(), buttonsPitch.end(), activeButton)
-      != buttonsPitch.end()) {
+  if (std::find(buttonsPitch.begin(), buttonsPitch.end(), activeButton) != buttonsPitch.end()) {
     // Apply change in Radians to vector Angle.
     auto rotationAxis = Axis::X();
     rotationChange    = Quaternion::RotationAxis(rotationAxis, y);
@@ -214,8 +210,7 @@ void FlyCameraMouseInput::rotateCamera(float offsetX, float offsetY)
   }
 
   // Yaw.
-  if (std::find(buttonsYaw.begin(), buttonsYaw.end(), activeButton)
-      != buttonsYaw.end()) {
+  if (std::find(buttonsYaw.begin(), buttonsYaw.end(), activeButton) != buttonsYaw.end()) {
     // Apply change in Radians to vector Angle.
     auto rotationAxis = Axis::Y();
     rotationChange    = Quaternion::RotationAxis(rotationAxis, x);
@@ -223,22 +218,20 @@ void FlyCameraMouseInput::rotateCamera(float offsetX, float offsetY)
     currentRotation.multiplyInPlace(rotationChange);
 
     // Add Roll, if banked turning is enabled, within Roll limit.
-    auto limit = (camera->bankedTurnLimit)
-                 + camera->_trackRoll; // Defaults to 90° plus manual roll.
-    if (camera->bankedTurn && -limit < camera->rotation->z
-        && camera->rotation->z < limit) {
+    auto limit
+      = (camera->bankedTurnLimit) + camera->_trackRoll; // Defaults to 90° plus manual roll.
+    if (camera->bankedTurn && -limit < camera->rotation().z && camera->rotation().z < limit) {
       auto bankingDelta = camera->bankedTurnMultiplier * -x;
       // Apply change in Radians to vector Angle.
       auto _rotationAxis = Axis::Z();
-      rotationChange = Quaternion::RotationAxis(_rotationAxis, bankingDelta);
+      rotationChange     = Quaternion::RotationAxis(_rotationAxis, bankingDelta);
       // Apply Yaw to quaternion.
       currentRotation.multiplyInPlace(rotationChange);
     }
   }
 
   // Roll.
-  if (std::find(buttonsRoll.begin(), buttonsRoll.end(), activeButton)
-      != buttonsRoll.end()) {
+  if (std::find(buttonsRoll.begin(), buttonsRoll.end(), activeButton) != buttonsRoll.end()) {
     // Apply change in Radians to vector Angle.
     auto rotationAxis = Axis::Z();
     rotationChange    = Quaternion::RotationAxis(rotationAxis, -x);
@@ -249,7 +242,7 @@ void FlyCameraMouseInput::rotateCamera(float offsetX, float offsetY)
   }
 
   // Apply rotationQuaternion to Euler camera.rotation.
-  currentRotation.toEulerAnglesToRef(*camera->rotation);
+  currentRotation.toEulerAnglesToRef(camera->rotation());
 }
 
 } // end of namespace BABYLON

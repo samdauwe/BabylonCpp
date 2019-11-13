@@ -15,9 +15,9 @@
 
 namespace BABYLON {
 
-CubeTexturePtr SerializationHelper::Parse(
-  const std::function<CubeTexturePtr()>& creationFunction,
-  const json& /*source*/, Scene* /*scene*/, const std::string& /*rootUrl*/)
+CubeTexturePtr SerializationHelper::Parse(const std::function<CubeTexturePtr()>& creationFunction,
+                                          const json& /*source*/, Scene* /*scene*/,
+                                          const std::string& /*rootUrl*/)
 {
   auto texture = creationFunction();
 
@@ -28,10 +28,9 @@ CubeTexturePtr SerializationHelper::Parse(
   return texture;
 }
 
-TexturePtr
-SerializationHelper::Parse(const std::function<TexturePtr()>& creationFunction,
-                           const json& source, Scene* /*scene*/,
-                           const std::string& /*rootUrl*/)
+TexturePtr SerializationHelper::Parse(const std::function<TexturePtr()>& creationFunction,
+                                      const json& source, Scene* /*scene*/,
+                                      const std::string& /*rootUrl*/)
 {
   auto texture = creationFunction();
 
@@ -41,13 +40,11 @@ SerializationHelper::Parse(const std::function<TexturePtr()>& creationFunction,
 
   // coordinatesIndex
   if (json_util::has_valid_key_value(source, "coordinatesIndex")) {
-    texture->coordinatesIndex
-      = json_util::get_number<unsigned>(source, "coordinatesIndex");
+    texture->coordinatesIndex = json_util::get_number<unsigned>(source, "coordinatesIndex");
   }
   // coordinatesMode
   if (json_util::has_valid_key_value(source, "coordinatesMode")) {
-    texture->coordinatesMode
-      = json_util::get_number<unsigned>(source, "coordinatesMode");
+    texture->coordinatesMode = json_util::get_number<unsigned>(source, "coordinatesMode");
   }
   // hasAlpha
   if (json_util::has_valid_key_value(source, "hasAlpha")) {
@@ -97,10 +94,9 @@ SerializationHelper::Parse(const std::function<TexturePtr()>& creationFunction,
   return texture;
 }
 
-CameraPtr
-SerializationHelper::Parse(const std::function<CameraPtr()>& creationFunction,
-                           const json& source, Scene* /*scene*/,
-                           const std::string& /*rootUrl*/)
+CameraPtr SerializationHelper::Parse(const std::function<CameraPtr()>& creationFunction,
+                                     const json& source, Scene* /*scene*/,
+                                     const std::string& /*rootUrl*/)
 {
   auto camera = creationFunction();
 
@@ -114,8 +110,7 @@ SerializationHelper::Parse(const std::function<CameraPtr()>& creationFunction,
     auto arcRotateCamera = std::static_pointer_cast<ArcRotateCamera>(camera);
     // alpha
     if (json_util::has_valid_key_value(source, "alpha")) {
-      arcRotateCamera->alpha
-        = json_util::get_number<float>(source, "alpha", 0.f);
+      arcRotateCamera->alpha = json_util::get_number<float>(source, "alpha", 0.f);
     }
     // beta
     if (json_util::has_valid_key_value(source, "beta")) {
@@ -123,13 +118,11 @@ SerializationHelper::Parse(const std::function<CameraPtr()>& creationFunction,
     }
     // radius
     if (json_util::has_valid_key_value(source, "radius")) {
-      arcRotateCamera->radius
-        = json_util::get_number<float>(source, "radius", 0.f);
+      arcRotateCamera->radius = json_util::get_number<float>(source, "radius", 0.f);
     }
     // target
     if (json_util::has_valid_key_value(source, "target")) {
-      arcRotateCamera->setTarget(
-        Vector3::FromArray(json_util::get_array<float>(source, "target")));
+      arcRotateCamera->setTarget(Vector3::FromArray(json_util::get_array<float>(source, "target")));
     }
     // inertialAlphaOffset
     if (json_util::has_valid_key_value(source, "inertialAlphaOffset")) {
@@ -188,33 +181,27 @@ SerializationHelper::Parse(const std::function<CameraPtr()>& creationFunction,
     }
     // zoomOnFactor
     if (json_util::has_valid_key_value(source, "zoomOnFactor")) {
-      arcRotateCamera->zoomOnFactor
-        = json_util::get_number<float>(source, "zoomOnFactor", 1.f);
+      arcRotateCamera->zoomOnFactor = json_util::get_number<float>(source, "zoomOnFactor", 1.f);
     }
     // allowUpsideDown
     if (json_util::has_valid_key_value(source, "allowUpsideDown")) {
-      arcRotateCamera->allowUpsideDown
-        = json_util::get_bool(source, "allowUpsideDown", true);
+      arcRotateCamera->allowUpsideDown = json_util::get_bool(source, "allowUpsideDown", true);
     }
   }
-  else if ((cameraClassName == "FollowCamera")
-           || (cameraClassName == "ArcFollowCamera")) {
+  else if ((cameraClassName == "FollowCamera") || (cameraClassName == "ArcFollowCamera")) {
     /** FollowCamera / ArcFollowCamera **/
     auto followCamera = std::static_pointer_cast<FollowCamera>(camera);
     // zoomOnFactor
     if (json_util::has_valid_key_value(source, "radius")) {
-      followCamera->radius
-        = json_util::get_number<float>(source, "radius", 12.f);
+      followCamera->radius = json_util::get_number<float>(source, "radius", 12.f);
     }
     // zoomOnFactor
     if (json_util::has_valid_key_value(source, "rotationOffset")) {
-      followCamera->rotationOffset
-        = json_util::get_number<float>(source, "rotationOffset", 0.f);
+      followCamera->rotationOffset = json_util::get_number<float>(source, "rotationOffset", 0.f);
     }
     // zoomOnFactor
     if (json_util::has_valid_key_value(source, "heightOffset")) {
-      followCamera->heightOffset
-        = json_util::get_number<float>(source, "heightOffset", 4.f);
+      followCamera->heightOffset = json_util::get_number<float>(source, "heightOffset", 4.f);
     }
     // zoomOnFactor
     if (json_util::has_valid_key_value(source, "cameraAcceleration")) {
@@ -223,12 +210,10 @@ SerializationHelper::Parse(const std::function<CameraPtr()>& creationFunction,
     }
     // zoomOnFactor
     if (json_util::has_valid_key_value(source, "maxCameraSpeed")) {
-      followCamera->maxCameraSpeed
-        = json_util::get_number<float>(source, "maxCameraSpeed", 20.f);
+      followCamera->maxCameraSpeed = json_util::get_number<float>(source, "maxCameraSpeed", 20.f);
     }
   }
-  else if (cameraClassName == "FreeCamera"
-           || cameraClassName == "UniversalCamera") {
+  else if (cameraClassName == "FreeCamera" || cameraClassName == "UniversalCamera") {
     /** FreeCamera **/
     auto freeCamera = std::static_pointer_cast<FreeCamera>(camera);
     // applyGravity
@@ -237,18 +222,15 @@ SerializationHelper::Parse(const std::function<CameraPtr()>& creationFunction,
     }
     // cameraRigMode
     if (json_util::has_valid_key_value(source, "cameraRigMode")) {
-      freeCamera->cameraRigMode
-        = json_util::get_number<unsigned>(source, "cameraRigMode");
+      freeCamera->cameraRigMode = json_util::get_number<unsigned>(source, "cameraRigMode");
     }
     // checkCollisions
     if (json_util::has_valid_key_value(source, "checkCollisions")) {
-      freeCamera->checkCollisions
-        = json_util::get_bool(source, "checkCollisions");
+      freeCamera->checkCollisions = json_util::get_bool(source, "checkCollisions");
     }
     // ellipsoid
     if (json_util::has_valid_key_value(source, "ellipsoid")) {
-      freeCamera->ellipsoid
-        = Vector3::FromArray(json_util::get_array<float>(source, "ellipsoid"));
+      freeCamera->ellipsoid = Vector3::FromArray(json_util::get_array<float>(source, "ellipsoid"));
     }
     // fov
     if (json_util::has_valid_key_value(source, "fov")) {
@@ -272,13 +254,11 @@ SerializationHelper::Parse(const std::function<CameraPtr()>& creationFunction,
     }
     // position
     if (json_util::has_valid_key_value(source, "position")) {
-      freeCamera->position
-        = Vector3::FromArray(json_util::get_array<float>(source, "position"));
+      freeCamera->position = Vector3::FromArray(json_util::get_array<float>(source, "position"));
     }
     // rotation
     if (json_util::has_valid_key_value(source, "rotation")) {
-      freeCamera->rotation = std::make_unique<Vector3>(
-        Vector3::FromArray(json_util::get_array<float>(source, "rotation")));
+      freeCamera->rotation = Vector3::FromArray(json_util::get_array<float>(source, "rotation"));
     }
     // speed
     if (json_util::has_valid_key_value(source, "speed")) {
@@ -289,10 +269,9 @@ SerializationHelper::Parse(const std::function<CameraPtr()>& creationFunction,
   return camera;
 }
 
-LightPtr
-SerializationHelper::Parse(const std::function<LightPtr()>& creationFunction,
-                           const json& source, Scene* /*scene*/,
-                           const std::string& /*rootUrl*/)
+LightPtr SerializationHelper::Parse(const std::function<LightPtr()>& creationFunction,
+                                    const json& source, Scene* /*scene*/,
+                                    const std::string& /*rootUrl*/)
 {
   auto light = creationFunction();
 
@@ -306,13 +285,12 @@ SerializationHelper::Parse(const std::function<LightPtr()>& creationFunction,
       auto pointLight = std::static_pointer_cast<PointLight>(light);
       // diffuse
       if (json_util::has_valid_key_value(source, "diffuse")) {
-        pointLight->diffuse
-          = Color3::FromArray(json_util::get_array<float>(source, "diffuse"));
+        pointLight->diffuse = Color3::FromArray(json_util::get_array<float>(source, "diffuse"));
       }
       // direction
       if (json_util::has_valid_key_value(source, "direction")) {
-        pointLight->direction = Vector3::FromArray(
-          json_util::get_array<float>(source, "direction"));
+        pointLight->direction
+          = Vector3::FromArray(json_util::get_array<float>(source, "direction"));
       }
       // id
       if (json_util::has_valid_key_value(source, "id")) {
@@ -324,13 +302,11 @@ SerializationHelper::Parse(const std::function<LightPtr()>& creationFunction,
       }
       // position
       if (json_util::has_valid_key_value(source, "position")) {
-        pointLight->position
-          = Vector3::FromArray(json_util::get_array<float>(source, "position"));
+        pointLight->position = Vector3::FromArray(json_util::get_array<float>(source, "position"));
       }
       // specular
       if (json_util::has_valid_key_value(source, "specular")) {
-        pointLight->specular
-          = Color3::FromArray(json_util::get_array<float>(source, "specular"));
+        pointLight->specular = Color3::FromArray(json_util::get_array<float>(source, "specular"));
       }
     } break;
     case 1: {
@@ -343,8 +319,8 @@ SerializationHelper::Parse(const std::function<LightPtr()>& creationFunction,
       }
       // direction
       if (json_util::has_valid_key_value(source, "direction")) {
-        directionalLight->direction = Vector3::FromArray(
-          json_util::get_array<float>(source, "direction"));
+        directionalLight->direction
+          = Vector3::FromArray(json_util::get_array<float>(source, "direction"));
       }
       // shadowOrthoScale
       if (json_util::has_valid_key_value(source, "shadowOrthoScale")) {
@@ -362,13 +338,11 @@ SerializationHelper::Parse(const std::function<LightPtr()>& creationFunction,
       auto spotLight = std::static_pointer_cast<SpotLight>(light);
       // position
       if (json_util::has_valid_key_value(source, "position")) {
-        spotLight->position
-          = Vector3::FromArray(json_util::get_array<float>(source, "position"));
+        spotLight->position = Vector3::FromArray(json_util::get_array<float>(source, "position"));
       }
       // direction
       if (json_util::has_valid_key_value(source, "direction")) {
-        spotLight->direction = Vector3::FromArray(
-          json_util::get_array<float>(source, "direction"));
+        spotLight->direction = Vector3::FromArray(json_util::get_array<float>(source, "direction"));
       }
       // angle
       if (json_util::has_valid_key_value(source, "angle")) {
@@ -389,18 +363,17 @@ SerializationHelper::Parse(const std::function<LightPtr()>& creationFunction,
       }
       // direction
       if (json_util::has_valid_key_value(source, "direction")) {
-        hemisphericLight->direction = Vector3::FromArray(
-          json_util::get_array<float>(source, "direction"));
+        hemisphericLight->direction
+          = Vector3::FromArray(json_util::get_array<float>(source, "direction"));
       }
       // groundColor
       if (json_util::has_valid_key_value(source, "groundColor")) {
-        hemisphericLight->groundColor = Color3::FromArray(
-          json_util::get_array<float>(source, "groundColor"));
+        hemisphericLight->groundColor
+          = Color3::FromArray(json_util::get_array<float>(source, "groundColor"));
       }
       // intensity
       if (json_util::has_valid_key_value(source, "intensity")) {
-        hemisphericLight->intensity
-          = json_util::get_number<float>(source, "intensity");
+        hemisphericLight->intensity = json_util::get_number<float>(source, "intensity");
       }
       // specular
       if (json_util::has_valid_key_value(source, "specular")) {
@@ -415,9 +388,9 @@ SerializationHelper::Parse(const std::function<LightPtr()>& creationFunction,
   return light;
 }
 
-StandardMaterialPtr SerializationHelper::Parse(
-  const std::function<StandardMaterialPtr()>& creationFunction,
-  const json& source, Scene* scene, const std::string& rootUrl)
+StandardMaterialPtr
+SerializationHelper::Parse(const std::function<StandardMaterialPtr()>& creationFunction,
+                           const json& source, Scene* scene, const std::string& rootUrl)
 {
   auto standardMaterial = creationFunction();
 
@@ -436,18 +409,15 @@ StandardMaterialPtr SerializationHelper::Parse(
   }
   // ambientTexture
   if (json_util::has_valid_key_value(source, "ambientTexture")) {
-    standardMaterial->ambientTexture
-      = Texture::Parse(source["ambientTexture"], scene, rootUrl);
+    standardMaterial->ambientTexture = Texture::Parse(source["ambientTexture"], scene, rootUrl);
   }
   // backFaceCulling
   if (json_util::has_valid_key_value(source, "backFaceCulling")) {
-    standardMaterial->backFaceCulling
-      = json_util::get_bool(source, "backFaceCulling");
+    standardMaterial->backFaceCulling = json_util::get_bool(source, "backFaceCulling");
   }
   // checkReadyOnlyOnce
   if (json_util::has_valid_key_value(source, "checkReadyOnlyOnce")) {
-    standardMaterial->checkReadyOnlyOnce
-      = json_util::get_bool(source, "checkReadyOnlyOnce");
+    standardMaterial->checkReadyOnlyOnce = json_util::get_bool(source, "checkReadyOnlyOnce");
   }
   // diffuse
   if (json_util::has_valid_key_value(source, "diffuse")) {
@@ -456,13 +426,11 @@ StandardMaterialPtr SerializationHelper::Parse(
   }
   // diffuseTexture
   if (json_util::has_valid_key_value(source, "diffuseTexture")) {
-    standardMaterial->diffuseTexture
-      = Texture::Parse(source["diffuseTexture"], scene, rootUrl);
+    standardMaterial->diffuseTexture = Texture::Parse(source["diffuseTexture"], scene, rootUrl);
   }
   // disableLighting
   if (json_util::has_valid_key_value(source, "disableLighting")) {
-    standardMaterial->disableLighting
-      = json_util::get_bool(source, "disableLighting");
+    standardMaterial->disableLighting = json_util::get_bool(source, "disableLighting");
   }
   // emissive
   if (json_util::has_valid_key_value(source, "emissive")) {
@@ -471,12 +439,10 @@ StandardMaterialPtr SerializationHelper::Parse(
   }
   // emissiveTexture
   if (json_util::has_valid_key_value(source, "emissiveTexture")) {
-    standardMaterial->emissiveTexture
-      = Texture::Parse(source["emissiveTexture"], scene, rootUrl);
+    standardMaterial->emissiveTexture = Texture::Parse(source["emissiveTexture"], scene, rootUrl);
   }
   // id
-  if (json_util::has_valid_key_value(source, "id")
-      && !json_util::is_null(source["id"])) {
+  if (json_util::has_valid_key_value(source, "id") && !json_util::is_null(source["id"])) {
     standardMaterial->id = json_util::get_string(source, "id");
   }
   // indexOfRefraction
@@ -486,18 +452,15 @@ StandardMaterialPtr SerializationHelper::Parse(
   }
   // invertNormalMapX
   if (json_util::has_valid_key_value(source, "invertNormalMapX")) {
-    standardMaterial->invertNormalMapX
-      = json_util::get_bool(source, "invertNormalMapX");
+    standardMaterial->invertNormalMapX = json_util::get_bool(source, "invertNormalMapX");
   }
   // invertNormalMapY
   if (json_util::has_valid_key_value(source, "invertNormalMapY")) {
-    standardMaterial->invertNormalMapY
-      = json_util::get_bool(source, "invertNormalMapY");
+    standardMaterial->invertNormalMapY = json_util::get_bool(source, "invertNormalMapY");
   }
   // invertRefractionY
   if (json_util::has_valid_key_value(source, "invertRefractionY")) {
-    standardMaterial->invertRefractionY
-      = json_util::get_bool(source, "invertRefractionY", true);
+    standardMaterial->invertRefractionY = json_util::get_bool(source, "invertRefractionY", true);
   }
   // linkEmissiveWithDiffuse
   if (json_util::has_valid_key_value(source, "linkEmissiveWithDiffuse")) {
@@ -511,8 +474,7 @@ StandardMaterialPtr SerializationHelper::Parse(
   }
   // opacityTexture
   if (json_util::has_valid_key_value(source, "opacityTexture")) {
-    standardMaterial->opacityTexture
-      = Texture::Parse(source["opacityTexture"], scene, rootUrl);
+    standardMaterial->opacityTexture = Texture::Parse(source["opacityTexture"], scene, rootUrl);
   }
   // parallaxScaleBias
   if (json_util::has_valid_key_value(source, "parallaxScaleBias")) {
@@ -526,8 +488,7 @@ StandardMaterialPtr SerializationHelper::Parse(
   }
   // roughness
   if (json_util::has_valid_key_value(source, "roughness")) {
-    standardMaterial->roughness
-      = json_util::get_number<float>(source, "roughness", 0.f);
+    standardMaterial->roughness = json_util::get_number<float>(source, "roughness", 0.f);
   }
   // specular
   if (json_util::has_valid_key_value(source, "specular")) {
@@ -536,13 +497,11 @@ StandardMaterialPtr SerializationHelper::Parse(
   }
   // specularPower
   if (json_util::has_valid_key_value(source, "specularPower")) {
-    standardMaterial->specularPower
-      = json_util::get_number<float>(source, "specularPower", 64.f);
+    standardMaterial->specularPower = json_util::get_number<float>(source, "specularPower", 64.f);
   }
   // specularTexture
   if (json_util::has_valid_key_value(source, "specularTexture")) {
-    standardMaterial->reflectionTexture
-      = Texture::Parse(source["specularTexture"], scene, rootUrl);
+    standardMaterial->reflectionTexture = Texture::Parse(source["specularTexture"], scene, rootUrl);
   }
   // useAlphaFromDiffuseTexture
   if (json_util::has_valid_key_value(source, "useAlphaFromDiffuseTexture")) {
@@ -555,8 +514,7 @@ StandardMaterialPtr SerializationHelper::Parse(
       = json_util::get_bool(source, "useEmissiveAsIllumination");
   }
   // useGlossinessFromSpecularMapAlpha
-  if (json_util::has_valid_key_value(source,
-                                     "useGlossinessFromSpecularMapAlpha")) {
+  if (json_util::has_valid_key_value(source, "useGlossinessFromSpecularMapAlpha")) {
     standardMaterial->useGlossinessFromSpecularMapAlpha
       = json_util::get_bool(source, "useGlossinessFromSpecularMapAlpha");
   }
@@ -571,12 +529,10 @@ StandardMaterialPtr SerializationHelper::Parse(
   }
   // useParallaxOcclusion
   if (json_util::has_valid_key_value(source, "useParallaxOcclusion")) {
-    standardMaterial->useParallaxOcclusion
-      = json_util::get_bool(source, "useParallaxOcclusion");
+    standardMaterial->useParallaxOcclusion = json_util::get_bool(source, "useParallaxOcclusion");
   }
   // useReflectionFresnelFromSpecular
-  if (json_util::has_valid_key_value(source,
-                                     "useReflectionFresnelFromSpecular")) {
+  if (json_util::has_valid_key_value(source, "useReflectionFresnelFromSpecular")) {
     standardMaterial->useReflectionFresnelFromSpecular
       = json_util::get_bool(source, "useReflectionFresnelFromSpecular");
   }
@@ -587,8 +543,7 @@ StandardMaterialPtr SerializationHelper::Parse(
   }
   // useSpecularOverAlpha
   if (json_util::has_valid_key_value(source, "useSpecularOverAlpha")) {
-    standardMaterial->useSpecularOverAlpha
-      = json_util::get_bool(source, "useSpecularOverAlpha");
+    standardMaterial->useSpecularOverAlpha = json_util::get_bool(source, "useSpecularOverAlpha");
   }
   // wireframe
   if (json_util::has_valid_key_value(source, "wireframe")) {

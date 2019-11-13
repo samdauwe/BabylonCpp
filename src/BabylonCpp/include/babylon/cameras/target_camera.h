@@ -11,9 +11,8 @@ class TargetCamera;
 using TargetCameraPtr = std::shared_ptr<TargetCamera>;
 
 /**
- * @brief A target camera takes a mesh or position as a target and continues to
- * look at it while it moves. This is the base of the follow, arc rotate cameras
- * and Free camera
+ * @brief A target camera takes a mesh or position as a target and continues to look at it while it
+ * moves. This is the base of the follow, arc rotate cameras and Free camera
  * @see http://doc.babylonjs.com/features/cameras
  */
 class BABYLON_SHARED_EXPORT TargetCamera : public Camera {
@@ -55,8 +54,7 @@ public:
   Vector3* _getLockedTargetPosition();
 
   /**
-   * @brief Store current camera state of the camera (fov, position, rotation,
-   * etc..)
+   * @brief Store current camera state of the camera (fov, position, rotation, etc..)
    * @returns the camera
    */
   Camera& storeState() override;
@@ -90,10 +88,6 @@ public:
    */
   float _computeLocalCameraSpeed();
 
-  /** Target **/
-  void setRotation(const Vector3& rotation);
-  Vector3& getRotation();
-
   /**
    * @brief Defines the target the camera should look at.
    * @param target Defines the new target as a Vector or a mesh
@@ -101,8 +95,8 @@ public:
   void setTarget(const Vector3& target);
 
   /**
-   * @brief Return the current target position of the camera. This value is
-   * expressed in local space.
+   * @brief Return the current target position of the camera. This value is expressed in local
+   * space.
    * @returns the target position
    */
   Vector3& getTarget();
@@ -147,26 +141,34 @@ public:
 
 protected:
   /**
-   * @brief Instantiates a target camera that takes a meshor position as a
-   * target and continues to look at it while it moves. This is the base of the
-   * follow, arc rotate cameras and Free camera
+   * @brief Instantiates a target camera that takes a meshor position as a target and continues to
+   * look at it while it moves. This is the base of the follow, arc rotate cameras and Free camera
    * @see http://doc.babylonjs.com/features/cameras
    * @param name Defines the name of the camera in the scene
    * @param position Defines the start position of the camera in the scene
    * @param scene Defines the scene the camera belongs to
-   * @param setActiveOnSceneIfNoneActive Defines wheter the camera should be
-   * marked as active if not other active cameras have been defined
+   * @param setActiveOnSceneIfNoneActive Defines wheter the camera should be marked as active if not
+   * other active cameras have been defined
    */
   TargetCamera(const std::string& name, const Vector3& position, Scene* scene,
                bool setActiveOnSceneIfNoneActive = true);
 
   void _computeViewMatrix(const Vector3& position, const Vector3& target, const Vector3& up);
 
+  /**
+   * @brief Get the current rotation of the camera.
+   */
+  Vector3& get_rotation();
+
+  /**
+   * @brief Set the current rotation of the camera.
+   */
+  void set_rotation(const Vector3& value);
+
 private:
   /**
-   * @brief Update the up vector to apply the rotation of the camera (So if you
-   * changed the camera rotation.z this will let you update the up vector as
-   * well)
+   * @brief Update the up vector to apply the rotation of the camera (So if you changed the camera
+   * rotation.z this will let you update the up vector as well)
    * @returns the current camera
    */
   TargetCamera& _rotateUpVectorWithCameraRotationMatrix();
@@ -186,19 +188,17 @@ public:
   std::unique_ptr<Vector2> cameraRotation;
 
   /**
-   * When set, the up vector of the camera will be updated by the rotation of
-   * the camera
+   * When set, the up vector of the camera will be updated by the rotation of the camera
    */
   bool updateUpVectorFromRotation;
 
   /**
    * Define the current rotation of the camera
    */
-  std::unique_ptr<Vector3> rotation;
+  Property<TargetCamera, Vector3> rotation;
 
   /**
-   * Define the current rotation of the camera as a quaternion to prevent Gimbal
-   * lock
+   * Define the current rotation of the camera as a quaternion to prevent Gimbal lock
    */
   std::unique_ptr<Quaternion> rotationQuaternion;
 
@@ -208,8 +208,8 @@ public:
   float speed;
 
   /**
-   * Add cconstraint to the camera to prevent it to move freely in all
-   * directions and around all axis.
+   * Add cconstraint to the camera to prevent it to move freely in all directions and around all
+   * axis.
    */
   bool noRotationConstraint;
 
@@ -267,6 +267,7 @@ private:
   static Matrix _TargetTransformMatrix;
   static Vector3 _TargetFocalPoint;
   Quaternion _tmpQuaternion;
+  std::unique_ptr<Vector3> _rotation;
   Vector3 _defaultUp;
   float _cachedRotationZ;
   float _cachedQuaternionRotationZ;
