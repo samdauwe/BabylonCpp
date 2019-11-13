@@ -15,9 +15,8 @@ namespace BABYLON {
 namespace Samples {
 
 /**
- * @brief Cartoon Animations Scene. Example demonstrating how to combining a
- * number of clips to form a cartoon is to give start times to each animation
- * clip
+ * @brief Cartoon Animations Scene. Example demonstrating how to combining a number of clips to form
+ * a cartoon is to give start times to each animation clip
  * @see https://www.babylonjs-playground.com/#2L26P1#8
  * @see https://doc.babylonjs.com/how_to/sequence#cartoon
  */
@@ -109,6 +108,7 @@ public:
       IAnimationKey(0.f, AnimationValue(0.f)),
       IAnimationKey(9.f * frameRate, AnimationValue(0.f)),
       IAnimationKey(14.f * frameRate, AnimationValue(Math::PI)),
+      IAnimationKey(15.f * frameRate, AnimationValue(Math::PI)),
     };
 
     // Set rotate animation keys
@@ -122,9 +122,9 @@ public:
     // Create movein animation keys
     std::vector<IAnimationKey> moveinKeys{
       IAnimationKey(0.f, AnimationValue(Vector3(0.f, 5.f, -30.f))),
-      IAnimationKey(3.f, AnimationValue(Vector3(0.f, 2.f, -10.f))),
-      IAnimationKey(5.f, AnimationValue(Vector3(0.f, 2.f, -10.f))),
-      IAnimationKey(8.f, AnimationValue(Vector3(-2.f, 2.f, 3.f))),
+      IAnimationKey(3.f * frameRate, AnimationValue(Vector3(0.f, 2.f, -10.f))),
+      IAnimationKey(5.f * frameRate, AnimationValue(Vector3(0.f, 2.f, -10.f))),
+      IAnimationKey(8.f * frameRate, AnimationValue(Vector3(-2.f, 2.f, 3.f))),
     };
 
     // Set movein animation keys
@@ -167,8 +167,7 @@ public:
     scene->beginDirectAnimation(camera, {movein, rotate}, 0.f, 25.f * frameRate, false);
     scene->beginDirectAnimation(hinge, {sweep}, 0.f, 25.f * frameRate, false);
     scene->beginDirectAnimation(spotLights[0], {lightDimmer}, 0.f, 25.f * frameRate, false);
-    scene->beginDirectAnimation(spotLights[1], {lightDimmer /*->clone()*/}, 0, 25.f * frameRate,
-                                false);
+    scene->beginDirectAnimation(spotLights[1], {lightDimmer->clone()}, 0, 25.f * frameRate, false);
 
     /************** Peripherals of Scene ***************/
     GroundOptions groundOptions;

@@ -303,12 +303,15 @@ bool Animatable::_animate(const millisecond_t& delay)
                                        _scene->_activeAnimatables.end());
 
       // Dispose all runtime animations
+#if 0
       for (const auto& runtimeAnimation : _runtimeAnimations) {
         if (runtimeAnimation) {
-          // TODO FIXME
-          // runtimeAnimation->dispose();
+          runtimeAnimation->dispose();
         }
       }
+#else
+      _runtimeAnimations.clear();
+#endif
     }
 
 #if 0 // TODO FIXME

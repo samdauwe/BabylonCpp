@@ -1686,7 +1686,7 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
           && (ActionManager::HasTriggers() || onPointerObservable.hasObservers())) {
         _initActionManager(nullptr, clickInfo);
       }
-      if (!pickResult) {
+      if (!pickResult && _currentPickResult.has_value()) {
         pickResult = *_currentPickResult;
       }
 
