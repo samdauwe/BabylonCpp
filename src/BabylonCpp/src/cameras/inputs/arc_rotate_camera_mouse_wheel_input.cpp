@@ -17,9 +17,7 @@ ArcRotateCameraMouseWheelInput::ArcRotateCameraMouseWheelInput()
 {
 }
 
-ArcRotateCameraMouseWheelInput::~ArcRotateCameraMouseWheelInput()
-{
-}
+ArcRotateCameraMouseWheelInput::~ArcRotateCameraMouseWheelInput() = default;
 
 float ArcRotateCameraMouseWheelInput::computeDeltaFromMouseWheelLegacyEvent(
   const MouseWheelEvent& mouseWheelLegacyEvent, float radius) const

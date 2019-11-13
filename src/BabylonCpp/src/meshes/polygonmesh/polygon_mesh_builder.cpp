@@ -57,9 +57,7 @@ PolygonMeshBuilder::PolygonMeshBuilder(const std::string& name,
   _outlinepoints.add(contours);
 }
 
-PolygonMeshBuilder::~PolygonMeshBuilder()
-{
-}
+PolygonMeshBuilder::~PolygonMeshBuilder() = default;
 
 void PolygonMeshBuilder::_addToepoint(const std::vector<Vector2>& points)
 {

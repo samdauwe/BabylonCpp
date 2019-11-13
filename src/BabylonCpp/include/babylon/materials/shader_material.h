@@ -41,7 +41,7 @@ public:
 
     return material;
   }
-  virtual ~ShaderMaterial() override;
+  virtual ~ShaderMaterial(); // = default
 
   /**
    * @brief Gets the options used to compile the shader.

@@ -32,9 +32,7 @@ Collider::Collider()
 {
 }
 
-Collider::~Collider()
-{
-}
+Collider::~Collider() = default;
 
 bool Collider::IntersectBoxAASphere(const Vector3& boxMin,
                                     const Vector3& boxMax,

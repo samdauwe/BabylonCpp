@@ -29,7 +29,7 @@ public:
 
     return camera;
   }
-  ~GamepadCamera() override;
+  ~GamepadCamera(); // = default
 
   /**
    * @brief Gets the current object class name.

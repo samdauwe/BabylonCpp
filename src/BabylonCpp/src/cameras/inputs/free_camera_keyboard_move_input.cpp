@@ -22,9 +22,7 @@ FreeCameraKeyboardMoveInput::FreeCameraKeyboardMoveInput()
   keysRight.emplace_back(39);
 }
 
-FreeCameraKeyboardMoveInput::~FreeCameraKeyboardMoveInput()
-{
-}
+FreeCameraKeyboardMoveInput::~FreeCameraKeyboardMoveInput() = default;
 
 void FreeCameraKeyboardMoveInput::attachControl(ICanvas* canvas,
                                                 bool noPreventDefault)

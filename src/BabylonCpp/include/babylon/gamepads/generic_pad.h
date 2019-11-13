@@ -21,7 +21,7 @@ public:
    */
   GenericPad(const std::string& id, int index,
              const IBrowserGamepadPtr& browserGamepad);
-  virtual ~GenericPad() override;
+  virtual ~GenericPad(); // = default
 
   /**
    * @brief Callback triggered when a button has been pressed.

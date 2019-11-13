@@ -36,7 +36,7 @@ public:
   ProgressEvent(ProgressEvent&& other);
   ProgressEvent& operator=(const ProgressEvent& other);
   ProgressEvent& operator=(ProgressEvent&& other);
-  ~ProgressEvent();
+  ~ProgressEvent(); // = default
 
 protected:
   /**

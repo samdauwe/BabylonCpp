@@ -11,7 +11,7 @@ class BABYLON_SHARED_EXPORT PostProcessesOptimization
 
 public:
   PostProcessesOptimization(int priority = 0);
-  ~PostProcessesOptimization() override;
+  ~PostProcessesOptimization(); // = default
 
   bool apply(Scene* scene) override;
 

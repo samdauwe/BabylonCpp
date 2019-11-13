@@ -147,9 +147,7 @@ PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
   _environmentBRDFTexture = BRDFTextureTools::GetEnvironmentBRDFTexture(scene);
 }
 
-PBRBaseMaterial::~PBRBaseMaterial()
-{
-}
+PBRBaseMaterial::~PBRBaseMaterial() = default;
 
 void PBRBaseMaterial::_attachImageProcessingConfiguration(
   const ImageProcessingConfigurationPtr& configuration)

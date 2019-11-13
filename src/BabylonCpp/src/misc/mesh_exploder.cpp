@@ -36,9 +36,7 @@ MeshExploder::MeshExploder(const std::vector<MeshPtr>& meshes,
   }
 }
 
-MeshExploder::~MeshExploder()
-{
-}
+MeshExploder::~MeshExploder() = default;
 
 void MeshExploder::_setCenterMesh()
 {

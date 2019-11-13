@@ -25,7 +25,7 @@ public:
   SetValueAction(unsigned int triggerOptions, const IAnimatablePtr& target,
                  const std::string& propertyPath, AnimationValue* value,
                  Condition* condition = nullptr);
-  ~SetValueAction() override;
+  ~SetValueAction(); // = default
 
   /**
    * @brief Hidden

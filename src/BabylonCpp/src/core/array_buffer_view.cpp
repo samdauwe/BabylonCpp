@@ -4,9 +4,7 @@
 
 namespace BABYLON {
 
-ArrayBufferView::ArrayBufferView()
-{
-}
+ArrayBufferView::ArrayBufferView() = default;
 
 ArrayBufferView::ArrayBufferView(const Int8Array& buffer)
     : byteOffset{0}
@@ -68,65 +66,15 @@ ArrayBufferView::ArrayBufferView(const Float32Array& buffer)
 {
 }
 
-ArrayBufferView::ArrayBufferView(const ArrayBufferView& other)
-    : byteOffset{other.byteOffset}
-    , int8Array{other.int8Array}
-    , uint8Array{other.uint8Array}
-    , int16Array{other.int16Array}
-    , uint16Array{other.uint16Array}
-    , int32Array{other.int32Array}
-    , uint32Array{other.uint32Array}
-    , float32Array{other.float32Array}
-{
-}
+ArrayBufferView::ArrayBufferView(const ArrayBufferView& other) = default;
 
-ArrayBufferView::ArrayBufferView(ArrayBufferView&& other)
-    : byteOffset{std::move(other.byteOffset)}
-    , int8Array{std::move(other.int8Array)}
-    , uint8Array{std::move(other.uint8Array)}
-    , int16Array{std::move(other.int16Array)}
-    , uint16Array{std::move(other.uint16Array)}
-    , int32Array{std::move(other.int32Array)}
-    , uint32Array{std::move(other.uint32Array)}
-    , float32Array{std::move(other.float32Array)}
-{
-}
+ArrayBufferView::ArrayBufferView(ArrayBufferView&& other) = default;
 
-ArrayBufferView& ArrayBufferView::operator=(const ArrayBufferView& other)
-{
-  if (&other != this) {
-    byteOffset   = other.byteOffset;
-    int8Array    = other.int8Array;
-    uint8Array   = other.uint8Array;
-    int16Array   = other.int16Array;
-    uint16Array  = other.uint16Array;
-    int32Array   = other.int32Array;
-    uint32Array  = other.uint32Array;
-    float32Array = other.float32Array;
-  }
+ArrayBufferView& ArrayBufferView::operator=(const ArrayBufferView& other) = default;
 
-  return *this;
-}
+ArrayBufferView& ArrayBufferView::operator=(ArrayBufferView&& other) = default;
 
-ArrayBufferView& ArrayBufferView::operator=(ArrayBufferView&& other)
-{
-  if (&other != this) {
-    byteOffset   = std::move(other.byteOffset);
-    int8Array    = std::move(other.int8Array);
-    uint8Array   = std::move(other.uint8Array);
-    int16Array   = std::move(other.int16Array);
-    uint16Array  = std::move(other.uint16Array);
-    int32Array   = std::move(other.int32Array);
-    uint32Array  = std::move(other.uint32Array);
-    float32Array = std::move(other.float32Array);
-  }
-
-  return *this;
-}
-
-ArrayBufferView::~ArrayBufferView()
-{
-}
+ArrayBufferView::~ArrayBufferView() = default;
 
 size_t ArrayBufferView::byteLength() const
 {

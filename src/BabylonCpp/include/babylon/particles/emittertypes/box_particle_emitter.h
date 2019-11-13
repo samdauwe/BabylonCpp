@@ -18,7 +18,7 @@ public:
    * @brief Creates a new instance BoxParticleEmitter.
    */
   BoxParticleEmitter();
-  virtual ~BoxParticleEmitter();
+  virtual ~BoxParticleEmitter(); // = default
 
   /**
    * @brief Called by the particle System when the direction is computed for the

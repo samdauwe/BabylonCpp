@@ -34,7 +34,7 @@ public:
 
     return light;
   }
-  ~SpotLight() override;
+  ~SpotLight(); // = default
 
   Type type() const override;
 

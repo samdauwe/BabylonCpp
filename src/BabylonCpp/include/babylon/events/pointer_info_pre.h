@@ -32,7 +32,7 @@ public:
                  float localX, float localY);
   PointerInfoPre(PointerEventTypes type, const MouseWheelEvent& event,
                  float localX, float localY);
-  ~PointerInfoPre();
+  ~PointerInfoPre(); // = default
 
 public:
   /**

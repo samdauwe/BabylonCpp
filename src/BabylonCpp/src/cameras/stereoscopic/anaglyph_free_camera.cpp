@@ -33,9 +33,7 @@ AnaglyphFreeCamera::AnaglyphFreeCamera(const std::string& iName,
   setCameraRigMode(Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH, rigParams);
 }
 
-AnaglyphFreeCamera::~AnaglyphFreeCamera()
-{
-}
+AnaglyphFreeCamera::~AnaglyphFreeCamera() = default;
 
 const std::string AnaglyphFreeCamera::getClassName() const
 {

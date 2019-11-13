@@ -34,9 +34,7 @@ Gamepad::Gamepad(const std::string& iId, int iIndex, const IBrowserGamepadPtr& i
   }
 }
 
-Gamepad::~Gamepad()
-{
-}
+Gamepad::~Gamepad() = default;
 
 bool Gamepad::get_isConnected() const
 {

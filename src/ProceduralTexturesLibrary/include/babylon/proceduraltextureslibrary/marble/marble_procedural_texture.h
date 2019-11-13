@@ -23,7 +23,7 @@ public:
 
     return texture;
   }
-  ~MarbleProceduralTexture();
+  ~MarbleProceduralTexture(); // = default
 
   void updateShaderUniforms();
 

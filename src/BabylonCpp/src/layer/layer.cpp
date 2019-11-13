@@ -80,9 +80,7 @@ Layer::Layer(const std::string& name, const std::string& imgUrl, Scene* scene,
   }
 }
 
-Layer::~Layer()
-{
-}
+Layer::~Layer() = default;
 
 void Layer::set_onDispose(const LayerCallbackType& callback)
 {

@@ -42,8 +42,6 @@ ChromaticAberrationPostProcess::ChromaticAberrationPostProcess(
   });
 }
 
-ChromaticAberrationPostProcess::~ChromaticAberrationPostProcess()
-{
-}
+ChromaticAberrationPostProcess::~ChromaticAberrationPostProcess() = default;
 
 } // end of namespace BABYLON

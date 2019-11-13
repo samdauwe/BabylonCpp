@@ -36,7 +36,7 @@ public:
                      unsigned int tessellation = 32,
                      RotationGizmo* parent     = nullptr,
                      bool useEulerRotation     = false);
-  ~PlaneRotationGizmo() override;
+  ~PlaneRotationGizmo(); // = default
 
   /**
    * @brief Disposes of the gizmo.

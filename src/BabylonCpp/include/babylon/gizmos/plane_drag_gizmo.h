@@ -49,7 +49,7 @@ public:
                  const UtilityLayerRendererPtr& gizmoLayer
                  = UtilityLayerRenderer::DefaultUtilityLayer(),
                  PositionGizmo* parent = nullptr);
-  ~PlaneDragGizmo() override;
+  ~PlaneDragGizmo(); // = default
 
   /**
    * @brief Disposes of the gizmo.

@@ -26,7 +26,7 @@ class BABYLON_SHARED_EXPORT Polyhedra {
 
 public:
   Polyhedra();
-  ~Polyhedra();
+  ~Polyhedra(); // = default
 
   const std::array<Polyhedron, 126>& models() const;
 

@@ -12,9 +12,7 @@ FreeCameraInputsManager::FreeCameraInputsManager(FreeCamera* iCamera)
 {
 }
 
-FreeCameraInputsManager::~FreeCameraInputsManager()
-{
-}
+FreeCameraInputsManager::~FreeCameraInputsManager() = default;
 
 FreeCameraInputsManager& FreeCameraInputsManager::addKeyboard()
 {

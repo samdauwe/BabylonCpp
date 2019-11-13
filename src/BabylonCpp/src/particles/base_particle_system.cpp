@@ -93,9 +93,7 @@ BaseParticleSystem::BaseParticleSystem(const std::string& iName)
   }
 }
 
-BaseParticleSystem::~BaseParticleSystem()
-{
-}
+BaseParticleSystem::~BaseParticleSystem() = default;
 
 bool BaseParticleSystem::hasEmitter() const
 {

@@ -11,9 +11,7 @@ HardwareScalingOptimization::HardwareScalingOptimization(int iPriority,
 {
 }
 
-HardwareScalingOptimization::~HardwareScalingOptimization()
-{
-}
+HardwareScalingOptimization::~HardwareScalingOptimization() = default;
 
 bool HardwareScalingOptimization::apply(Scene* scene)
 {

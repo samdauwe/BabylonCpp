@@ -28,7 +28,7 @@ public:
 
     return camera;
   }
-  ~StereoscopicFreeCamera() override;
+  ~StereoscopicFreeCamera(); // = default
 
   /**
    * @brief Gets camera class name.

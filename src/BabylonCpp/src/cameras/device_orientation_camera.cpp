@@ -32,9 +32,7 @@ DeviceOrientationCamera::DeviceOrientationCamera(const std::string& iName,
   inputs->addDeviceOrientation();
 }
 
-DeviceOrientationCamera::~DeviceOrientationCamera()
-{
-}
+DeviceOrientationCamera::~DeviceOrientationCamera() = default;
 
 Type DeviceOrientationCamera::type() const
 {

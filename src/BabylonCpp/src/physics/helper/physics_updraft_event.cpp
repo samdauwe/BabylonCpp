@@ -41,9 +41,7 @@ PhysicsUpdraftEvent::PhysicsUpdraftEvent(
   _prepareCylinder();
 }
 
-PhysicsUpdraftEvent::~PhysicsUpdraftEvent()
-{
-}
+PhysicsUpdraftEvent::~PhysicsUpdraftEvent() = default;
 
 PhysicsUpdraftEventData PhysicsUpdraftEvent::getData()
 {

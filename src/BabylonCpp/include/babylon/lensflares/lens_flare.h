@@ -31,7 +31,7 @@ public:
 
     return lensFlare;
   }
-  virtual ~LensFlare();
+  virtual ~LensFlare(); // = default
 
   /**
    * @brief Hidden

@@ -128,9 +128,7 @@ BoneLookController::BoneLookController(
   }
 }
 
-BoneLookController::~BoneLookController()
-{
-}
+BoneLookController::~BoneLookController() = default;
 
 float BoneLookController::get_minYaw() const
 {

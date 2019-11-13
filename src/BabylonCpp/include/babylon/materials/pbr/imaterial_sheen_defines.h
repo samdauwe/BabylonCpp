@@ -12,7 +12,7 @@ namespace BABYLON {
 struct BABYLON_SHARED_EXPORT IMaterialSheenDefines : public MaterialDefines {
 
   IMaterialSheenDefines();
-  ~IMaterialSheenDefines() override;
+  ~IMaterialSheenDefines(); // = default
 
   /**
    * @brief Converts the material define values to a string.

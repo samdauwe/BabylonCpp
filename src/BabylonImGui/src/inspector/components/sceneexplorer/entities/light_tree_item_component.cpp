@@ -35,9 +35,7 @@ LightTreeItemComponent::LightTreeItemComponent(
   }
 }
 
-LightTreeItemComponent::~LightTreeItemComponent()
-{
-}
+LightTreeItemComponent::~LightTreeItemComponent() = default;
 
 void LightTreeItemComponent::switchIsEnabled()
 {

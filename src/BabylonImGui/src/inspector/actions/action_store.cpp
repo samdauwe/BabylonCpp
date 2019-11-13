@@ -4,13 +4,9 @@
 
 namespace BABYLON {
 
-ActionStore::ActionStore()
-{
-}
+ActionStore::ActionStore() =  default;
 
-ActionStore::~ActionStore()
-{
-}
+ActionStore::~ActionStore() = default;
 
 void ActionStore::addAction(const char* id, const char* icon, const char* label,
                             const char* shortcut,

@@ -23,7 +23,7 @@ public:
    * @param vrGamepad the gamepad that the WebVRController should be created from
    */
   WebVRController(const IBrowserGamepadPtr& vrGamepad);
-  ~WebVRController() override;
+  ~WebVRController(); // = default
 
   /**
    * @brief Fired when a controller button's state has changed.

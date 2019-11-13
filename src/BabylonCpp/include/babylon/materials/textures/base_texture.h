@@ -44,7 +44,7 @@ public:
 
     return texture;
   }
-  virtual ~BaseTexture() override;
+  virtual ~BaseTexture(); // = default
 
   template <typename Derived>
   std::shared_ptr<Derived> shared_from_base()

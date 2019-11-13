@@ -28,7 +28,7 @@ public:
 
     return postProcess;
   }
-  virtual ~ChromaticAberrationPostProcess() override;
+  virtual ~ChromaticAberrationPostProcess(); // = default
 
 public:
   /**

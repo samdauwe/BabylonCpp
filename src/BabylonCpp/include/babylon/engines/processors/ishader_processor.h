@@ -12,7 +12,7 @@ namespace BABYLON {
  * @brief Hidden
  */
 struct BABYLON_SHARED_EXPORT IShaderProcessor {
-  virtual ~IShaderProcessor();
+  virtual ~IShaderProcessor(); // = default
   virtual std::string attributeProcessor(const std::string& attribute);
   virtual std::string varyingProcessor(const std::string& varying, bool isFragment);
   virtual std::string uniformProcessor(const std::string& uniform, bool isFragment);

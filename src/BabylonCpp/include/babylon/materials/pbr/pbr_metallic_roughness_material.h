@@ -29,7 +29,7 @@ public:
 
     return material;
   }
-  ~PBRMetallicRoughnessMaterial() override;
+  ~PBRMetallicRoughnessMaterial(); // = default
 
   /**
    * @brief Return the currrent class name of the material.

@@ -13,13 +13,9 @@
 namespace BABYLON {
 namespace Extensions {
 
-Navigation::Navigation()
-{
-}
+Navigation::Navigation() = default;
 
-Navigation::~Navigation()
-{
-}
+Navigation::~Navigation() = default;
 
 GroupedNavigationMesh Navigation::buildNodes(Mesh* mesh)
 {

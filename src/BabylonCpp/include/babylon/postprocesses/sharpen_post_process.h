@@ -26,7 +26,7 @@ public:
 
     return postProcess;
   }
-  virtual ~SharpenPostProcess() override;
+  virtual ~SharpenPostProcess(); // = default
 
 protected:
   /**

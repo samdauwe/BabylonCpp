@@ -30,9 +30,7 @@ SOFTWARE.
 #include <vector>
 #include <sstream>
 
-ImGuiAl::Log::~Log()
-{
-}
+ImGuiAl::Log::~Log() = default;
 
 bool ImGuiAl::Log::Init( unsigned flags, const char** more_actions )
 {

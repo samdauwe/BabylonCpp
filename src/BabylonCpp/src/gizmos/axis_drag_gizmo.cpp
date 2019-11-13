@@ -161,9 +161,7 @@ AxisDragGizmo::AxisDragGizmo(const Vector3& dragAxis, const Color3& color,
                                                _rootMesh->getChildMeshes());
 }
 
-AxisDragGizmo::~AxisDragGizmo()
-{
-}
+AxisDragGizmo::~AxisDragGizmo() = default;
 
 void AxisDragGizmo::_attachedMeshChanged(const AbstractMeshPtr& value)
 {

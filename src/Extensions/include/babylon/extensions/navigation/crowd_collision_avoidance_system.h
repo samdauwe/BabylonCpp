@@ -17,7 +17,7 @@ class BABYLON_SHARED_EXPORT CrowdCollisionAvoidanceSystem
 
 public:
   CrowdCollisionAvoidanceSystem(RVO2::RVOSimulator* sim);
-  ~CrowdCollisionAvoidanceSystem();
+  ~CrowdCollisionAvoidanceSystem(); // = default
 
   void update();
 

@@ -11,9 +11,7 @@ CombineAction::CombineAction(unsigned int iTriggerOptions,
 {
 }
 
-CombineAction::~CombineAction()
-{
-}
+CombineAction::~CombineAction() = default;
 
 void CombineAction::_prepare()
 {

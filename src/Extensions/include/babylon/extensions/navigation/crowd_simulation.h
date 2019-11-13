@@ -21,7 +21,7 @@ class BABYLON_SHARED_EXPORT CrowdSimulation {
 
 public:
   CrowdSimulation();
-  ~CrowdSimulation();
+  ~CrowdSimulation(); // = default
 
   /* Add the necessary systems to the world */
   void initializeWorld();

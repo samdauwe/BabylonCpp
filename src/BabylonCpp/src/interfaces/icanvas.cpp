@@ -18,9 +18,7 @@ ICanvas::ICanvas()
   keyEventListeners.resize(static_cast<unsigned>(EventType::UNKNOWN), {});
 }
 
-ICanvas::~ICanvas()
-{
-}
+ICanvas::~ICanvas() = default;
 
 void ICanvas::addMouseEventListener(
   EventType type, const std::function<void(PointerEvent&& evt)>& listener,

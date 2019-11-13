@@ -33,7 +33,7 @@ public:
   Plane(Plane&& otherPlane);
   Plane& operator=(const Plane& otherPlane);
   Plane& operator=(Plane&& otherPlane);
-  ~Plane();
+  ~Plane(); // = default
   Plane copy() const;
 
   /**

@@ -22,7 +22,7 @@ public:
    * @brief Instatiates the FadeInOutBehavior.
    */
   FadeInOutBehavior();
-  virtual ~FadeInOutBehavior() override;
+  virtual ~FadeInOutBehavior(); // = default
 
   /**
    *  @brief The name of the behavior.

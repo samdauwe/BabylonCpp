@@ -42,9 +42,7 @@ RefractionPostProcess::RefractionPostProcess(
   });
 }
 
-RefractionPostProcess::~RefractionPostProcess()
-{
-}
+RefractionPostProcess::~RefractionPostProcess() = default;
 
 TexturePtr& RefractionPostProcess::get_refractionTexture()
 {

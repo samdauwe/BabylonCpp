@@ -28,7 +28,7 @@ public:
 
     return material;
   }
-  ~GradientMaterial() override;
+  ~GradientMaterial(); // = default
 
   /**
    * Returns wehter or not the grid requires alpha blending.

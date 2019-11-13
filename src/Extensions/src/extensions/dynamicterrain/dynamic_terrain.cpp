@@ -210,9 +210,7 @@ DynamicTerrain::DynamicTerrain(const std::string& iName,
   update(true); // recompute everything once the initial deltas are calculated
 }
 
-DynamicTerrain::~DynamicTerrain()
-{
-}
+DynamicTerrain::~DynamicTerrain() = default;
 
 DynamicTerrain& DynamicTerrain::update(bool force)
 {

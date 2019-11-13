@@ -24,7 +24,7 @@ public:
    */
   LightGizmo(const UtilityLayerRendererPtr& gizmoLayer
              = UtilityLayerRenderer::DefaultUtilityLayer());
-  ~LightGizmo() override;
+  ~LightGizmo(); // = default
 
   /**
    * @brief Disposes of the light gizmo.

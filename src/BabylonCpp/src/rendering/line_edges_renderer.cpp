@@ -16,9 +16,7 @@ LineEdgesRenderer::LineEdgesRenderer(const AbstractMeshPtr& source,
   _generateEdgesLines();
 }
 
-LineEdgesRenderer::~LineEdgesRenderer()
-{
-}
+LineEdgesRenderer::~LineEdgesRenderer() = default;
 
 void LineEdgesRenderer::_generateEdgesLines()
 {

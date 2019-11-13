@@ -31,9 +31,7 @@ PerlinNoiseProceduralTexture::PerlinNoiseProceduralTexture(
   updateShaderUniforms();
 }
 
-PerlinNoiseProceduralTexture::~PerlinNoiseProceduralTexture()
-{
-}
+PerlinNoiseProceduralTexture::~PerlinNoiseProceduralTexture() = default;
 
 void PerlinNoiseProceduralTexture::updateShaderUniforms()
 {

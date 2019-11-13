@@ -52,9 +52,7 @@ LavaMaterial::LavaMaterial(const std::string& iName, Scene* scene)
   Effect::ShadersStore()["lavaPixelShader"] = lavaPixelShader;
 }
 
-LavaMaterial::~LavaMaterial()
-{
-}
+LavaMaterial::~LavaMaterial() = default;
 
 BaseTexturePtr& LavaMaterial::get_diffuseTexture()
 {

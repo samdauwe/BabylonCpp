@@ -95,7 +95,7 @@ public:
    * @param scene The scene the material will be use in.
    */
   PBRBaseMaterial(const std::string& name, Scene* scene);
-  ~PBRBaseMaterial() override;
+  ~PBRBaseMaterial(); // = default
 
   /**
    * @brief Gets the name of the material class.

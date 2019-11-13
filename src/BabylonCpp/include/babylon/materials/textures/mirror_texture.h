@@ -35,7 +35,7 @@ public:
 
     return texture;
   }
-  ~MirrorTexture() override;
+  ~MirrorTexture(); // = default
 
   /**
    * @brief Clone the mirror texture.

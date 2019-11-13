@@ -89,9 +89,7 @@ GizmoManager::GizmoManager(Scene* iScene)
     });
 }
 
-GizmoManager::~GizmoManager()
-{
-}
+GizmoManager::~GizmoManager() = default;
 
 void GizmoManager::attachToMesh(const AbstractMeshPtr& mesh)
 {

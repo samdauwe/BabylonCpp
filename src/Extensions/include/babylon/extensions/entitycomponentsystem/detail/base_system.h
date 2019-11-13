@@ -56,7 +56,7 @@ public:
   BaseSystem(const Filter& filter);
 
   /// Destructor
-  virtual ~BaseSystem() = 0;
+  virtual ~BaseSystem() = 0; // = default
 
   /// \return The Component Filter attached to the System
   const Filter& getFilter() const;

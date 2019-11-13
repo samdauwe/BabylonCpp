@@ -17,9 +17,7 @@ CSG::Node::Node(const std::vector<BABYLON::CSG::Polygon>& polygons)
   }
 }
 
-CSG::Node::~Node()
-{
-}
+CSG::Node::~Node() = default;
 
 std::unique_ptr<CSG::Node> CSG::Node::clone()
 {

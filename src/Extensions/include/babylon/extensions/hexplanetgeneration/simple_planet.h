@@ -45,7 +45,7 @@ class BABYLON_SHARED_EXPORT SimplePlanet {
 public:
   SimplePlanet(float scale, float degree, Scene* scene,
                const std::string& seed);
-  ~SimplePlanet();
+  ~SimplePlanet(); // = default
 
   void initialize();
   Vector2 calculateUVCoord(const Vector3& p) const;

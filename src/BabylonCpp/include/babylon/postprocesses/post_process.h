@@ -55,7 +55,7 @@ public:
 
     return postProcess;
   }
-  virtual ~PostProcess();
+  virtual ~PostProcess(); // = default
 
   void add(const PostProcessPtr& newPostProcess);
 

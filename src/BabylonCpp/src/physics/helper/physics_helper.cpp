@@ -24,9 +24,7 @@ PhysicsHelper::PhysicsHelper(Scene* scene)
   }
 }
 
-PhysicsHelper::~PhysicsHelper()
-{
-}
+PhysicsHelper::~PhysicsHelper() = default;
 
 std::unique_ptr<PhysicsRadialExplosionEvent>
 PhysicsHelper::applyRadialExplosionImpulse(

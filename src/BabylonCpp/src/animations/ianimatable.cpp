@@ -14,9 +14,7 @@ IAnimatable::IAnimatable()
 {
 }
 
-IAnimatable::~IAnimatable()
-{
-}
+IAnimatable::~IAnimatable() = default;
 
 Node*& IAnimatable::get_parent()
 {

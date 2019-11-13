@@ -25,7 +25,7 @@ public:
     return std::shared_ptr<BezierCurveEase>(
       new BezierCurveEase(std::forward<Ts>(args)...));
   }
-  ~BezierCurveEase() override;
+  ~BezierCurveEase(); // = default
 
   /**
    * @brief Hidden

@@ -32,7 +32,7 @@ public:
     return std::shared_ptr<SimplicationQueueSceneComponent>(
       new SimplicationQueueSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~SimplicationQueueSceneComponent();
+  virtual ~SimplicationQueueSceneComponent(); // = default
 
   /**
    * @brief Registers the component in a given scene.

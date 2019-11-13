@@ -13,9 +13,7 @@ PostProcessRenderPipelineManagerSceneComponent::
 }
 
 PostProcessRenderPipelineManagerSceneComponent::
-  ~PostProcessRenderPipelineManagerSceneComponent()
-{
-}
+PostProcessRenderPipelineManagerSceneComponent::~PostProcessRenderPipelineManagerSceneComponent() = default;
 
 void PostProcessRenderPipelineManagerSceneComponent::_register()
 {

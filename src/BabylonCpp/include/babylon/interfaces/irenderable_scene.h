@@ -16,7 +16,7 @@ class BABYLON_SHARED_EXPORT IRenderableScene {
 
 public:
   IRenderableScene(ICanvas* canvas = nullptr); // The canvas can be set later via initialize()
-  virtual ~IRenderableScene();
+  virtual ~IRenderableScene(); // = default
 
   void initialize(ICanvas* canvas = nullptr);
 

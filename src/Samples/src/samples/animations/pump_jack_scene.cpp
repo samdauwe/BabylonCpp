@@ -355,9 +355,7 @@ FunnyEase::FunnyEase(float distanceOfStick, float lengthOfStick)
 {
 }
 
-FunnyEase::~FunnyEase()
-{
-}
+FunnyEase::~FunnyEase() = default;
 
 float FunnyEase::easeInCore(float gradient) const
 {

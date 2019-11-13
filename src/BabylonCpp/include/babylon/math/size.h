@@ -24,7 +24,7 @@ public:
   Size(int width, int height);
   Size(const Size& otherSize);
   Size(Size&& otherSize);
-  ~Size();
+  ~Size(); // = default
   Size& operator=(const Size& otherSize);
   Size& operator=(Size&& otherSize);
   Size copy() const;

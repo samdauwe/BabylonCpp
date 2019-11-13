@@ -80,9 +80,7 @@ operator=(PhysicsRaycastResult&& rhs)
   return *this;
 }
 
-PhysicsRaycastResult::~PhysicsRaycastResult()
-{
-}
+PhysicsRaycastResult::~PhysicsRaycastResult() = default;
 
 bool PhysicsRaycastResult::get_hasHit() const
 {

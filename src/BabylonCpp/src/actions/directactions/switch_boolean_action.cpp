@@ -19,9 +19,7 @@ SwitchBooleanAction::SwitchBooleanAction(unsigned int iTtriggerOptions,
 {
 }
 
-SwitchBooleanAction::~SwitchBooleanAction()
-{
-}
+SwitchBooleanAction::~SwitchBooleanAction() = default;
 
 void SwitchBooleanAction::_prepare()
 {

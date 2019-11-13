@@ -197,9 +197,7 @@ PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
   };
 }
 
-PBRMaterialDefines::~PBRMaterialDefines()
-{
-}
+PBRMaterialDefines::~PBRMaterialDefines() = default;
 
 void PBRMaterialDefines::reset()
 {

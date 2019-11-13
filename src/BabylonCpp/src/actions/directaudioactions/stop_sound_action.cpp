@@ -11,9 +11,7 @@ StopSoundAction::StopSoundAction(unsigned int iTriggerOptions, Sound* sound,
 {
 }
 
-StopSoundAction::~StopSoundAction()
-{
-}
+StopSoundAction::~StopSoundAction() = default;
 
 void StopSoundAction::_prepare()
 {

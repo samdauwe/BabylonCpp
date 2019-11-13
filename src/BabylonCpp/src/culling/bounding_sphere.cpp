@@ -23,61 +23,12 @@ BoundingSphere::BoundingSphere(const Vector3& min, const Vector3& max,
   reConstruct(min, max, worldMatrix);
 }
 
-BoundingSphere::BoundingSphere(const BoundingSphere& other)
-    : center{other.center}
-    , radius{other.radius}
-    , centerWorld{other.centerWorld}
-    , radiusWorld{other.radiusWorld}
-    , minimum{other.minimum}
-    , maximum{other.maximum}
-    , _worldMatrix{other._worldMatrix}
-{
-}
+BoundingSphere::BoundingSphere(const BoundingSphere& other) = default;
+BoundingSphere::BoundingSphere(BoundingSphere&& other) = default;
+BoundingSphere& BoundingSphere::operator=(const BoundingSphere& other) = default;
+BoundingSphere& BoundingSphere::operator=(BoundingSphere&& other) = default;
 
-BoundingSphere::BoundingSphere(BoundingSphere&& other)
-    : center{std::move(other.center)}
-    , radius{std::move(other.radius)}
-    , centerWorld{std::move(other.centerWorld)}
-    , radiusWorld{std::move(other.radiusWorld)}
-    , minimum{std::move(other.minimum)}
-    , maximum{std::move(other.maximum)}
-    , _worldMatrix{std::move(other._worldMatrix)}
-{
-}
-
-BoundingSphere& BoundingSphere::operator=(const BoundingSphere& other)
-{
-  if (&other != this) {
-    center       = other.center;
-    radius       = other.radius;
-    centerWorld  = other.centerWorld;
-    radiusWorld  = other.radiusWorld;
-    minimum      = other.minimum;
-    maximum      = other.maximum;
-    _worldMatrix = other._worldMatrix;
-  }
-
-  return *this;
-}
-
-BoundingSphere& BoundingSphere::operator=(BoundingSphere&& other)
-{
-  if (&other != this) {
-    center       = std::move(other.center);
-    radius       = std::move(other.radius);
-    centerWorld  = std::move(other.centerWorld);
-    radiusWorld  = std::move(other.radiusWorld);
-    minimum      = std::move(other.minimum);
-    maximum      = std::move(other.maximum);
-    _worldMatrix = std::move(other._worldMatrix);
-  }
-
-  return *this;
-}
-
-BoundingSphere::~BoundingSphere()
-{
-}
+BoundingSphere::~BoundingSphere() = default;
 
 void BoundingSphere::reConstruct(const Vector3& min, Vector3 max,
                                  const std::optional<Matrix>& worldMatrix)

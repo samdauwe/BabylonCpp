@@ -9,9 +9,7 @@ PostProcessesOptimization::PostProcessesOptimization(int iPriority)
 {
 }
 
-PostProcessesOptimization::~PostProcessesOptimization()
-{
-}
+PostProcessesOptimization::~PostProcessesOptimization() = default;
 
 bool PostProcessesOptimization::apply(Scene* scene)
 {

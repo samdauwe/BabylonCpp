@@ -57,9 +57,7 @@ GeometryBufferRenderer::GeometryBufferRenderer(Scene* scene, float ratio)
   _createRenderTargets();
 }
 
-GeometryBufferRenderer::~GeometryBufferRenderer()
-{
-}
+GeometryBufferRenderer::~GeometryBufferRenderer() = default;
 
 int GeometryBufferRenderer::getTextureIndex(unsigned int textureType)
 {

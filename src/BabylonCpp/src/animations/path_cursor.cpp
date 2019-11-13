@@ -10,49 +10,15 @@ PathCursor::PathCursor(const Path2& _path) : path{_path}, value{0.f}
 {
 }
 
-PathCursor::PathCursor(const PathCursor& otherPathCursor)
-    : _onchange{otherPathCursor._onchange}
-    , path{otherPathCursor.path}
-    , value{otherPathCursor.value}
-    , animations{otherPathCursor.animations}
-{
-}
+PathCursor::PathCursor(const PathCursor& otherPathCursor) = default;
 
-PathCursor::PathCursor(PathCursor&& otherPathCursor)
-    : _onchange{std::move(otherPathCursor._onchange)}
-    , path{std::move(otherPathCursor.path)}
-    , value{std::move(otherPathCursor.value)}
-    , animations{std::move(otherPathCursor.animations)}
-{
-}
+PathCursor::PathCursor(PathCursor&& otherPathCursor) = default;
 
-PathCursor& PathCursor::operator=(const PathCursor& otherPathCursor)
-{
-  if (&otherPathCursor != this) {
-    _onchange  = otherPathCursor._onchange;
-    path       = otherPathCursor.path;
-    value      = otherPathCursor.value;
-    animations = otherPathCursor.animations;
-  }
+PathCursor& PathCursor::operator=(const PathCursor& otherPathCursor) = default;
 
-  return *this;
-}
+PathCursor& PathCursor::operator=(PathCursor&& otherPathCursor) = default;
 
-PathCursor& PathCursor::operator=(PathCursor&& otherPathCursor)
-{
-  if (&otherPathCursor != this) {
-    _onchange  = std::move(otherPathCursor._onchange);
-    path       = std::move(otherPathCursor.path);
-    value      = std::move(otherPathCursor.value);
-    animations = std::move(otherPathCursor.animations);
-  }
-
-  return *this;
-}
-
-PathCursor::~PathCursor()
-{
-}
+PathCursor::~PathCursor() = default;
 
 Vector3 PathCursor::getPoint() const
 {

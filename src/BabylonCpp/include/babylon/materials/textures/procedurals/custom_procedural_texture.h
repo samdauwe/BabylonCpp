@@ -34,7 +34,7 @@ public:
 
     return texture;
   }
-  ~CustomProceduralTexture() override;
+  ~CustomProceduralTexture(); // = default
 
   /**
    * @brief Is the texture ready to be used ? (rendered at least once)

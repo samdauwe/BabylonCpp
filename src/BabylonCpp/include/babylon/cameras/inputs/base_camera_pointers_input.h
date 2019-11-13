@@ -22,7 +22,7 @@ class BABYLON_SHARED_EXPORT BaseCameraPointersInput
 
 public:
   BaseCameraPointersInput();
-  virtual ~BaseCameraPointersInput();
+  virtual ~BaseCameraPointersInput(); // = default
 
   /**
    * @brief Attach the input controls to a specific dom element to get the input

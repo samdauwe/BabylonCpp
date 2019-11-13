@@ -36,9 +36,7 @@ _DepthCullingState::_DepthCullingState()
   reset();
 }
 
-_DepthCullingState::~_DepthCullingState()
-{
-}
+_DepthCullingState::~_DepthCullingState() = default;
 
 bool _DepthCullingState::get_isDirty() const
 {

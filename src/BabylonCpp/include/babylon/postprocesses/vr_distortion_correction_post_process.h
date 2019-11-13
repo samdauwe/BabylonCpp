@@ -24,7 +24,7 @@ public:
   VRDistortionCorrectionPostProcess(const std::string& name,
                                     const CameraPtr& camera, bool isRightEye,
                                     const VRCameraMetrics& vrMetrics);
-  ~VRDistortionCorrectionPostProcess();
+  ~VRDistortionCorrectionPostProcess(); // = default
 
 private:
   bool _isRightEye;

@@ -58,7 +58,7 @@ public:
     return std::shared_ptr<GenericController>(
       new GenericController(std::forward<Ts>(args)...));
   }
-  ~GenericController() override;
+  ~GenericController(); // = default
 
   /**
    * @brief Implements abstract method on WebVRController class, loading

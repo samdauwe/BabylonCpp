@@ -25,9 +25,7 @@ DaydreamController::DaydreamController(const IBrowserGamepadPtr& vrGamepad)
   controllerType = PoseEnabledControllerType::DAYDREAM;
 }
 
-DaydreamController::~DaydreamController()
-{
-}
+DaydreamController::~DaydreamController() = default;
 
 void DaydreamController::initControllerMesh(
   Scene* scene, const std::function<void(AbstractMesh* mesh)>& meshLoaded)

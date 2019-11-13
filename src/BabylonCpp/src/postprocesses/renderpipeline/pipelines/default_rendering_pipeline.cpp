@@ -169,9 +169,7 @@ DefaultRenderingPipeline::DefaultRenderingPipeline(
       });
 }
 
-DefaultRenderingPipeline::~DefaultRenderingPipeline()
-{
-}
+DefaultRenderingPipeline::~DefaultRenderingPipeline() = default;
 
 void DefaultRenderingPipeline::addToScene(
   const DefaultRenderingPipelinePtr& renderingPipeline)

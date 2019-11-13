@@ -17,9 +17,7 @@ PhysicsRadialExplosionEvent::PhysicsRadialExplosionEvent(
 {
 }
 
-PhysicsRadialExplosionEvent::~PhysicsRadialExplosionEvent()
-{
-}
+PhysicsRadialExplosionEvent::~PhysicsRadialExplosionEvent() = default;
 
 PhysicsRadialExplosionEventData PhysicsRadialExplosionEvent::getData()
 {

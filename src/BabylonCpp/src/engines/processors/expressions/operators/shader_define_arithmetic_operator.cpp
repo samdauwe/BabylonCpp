@@ -59,9 +59,7 @@ ShaderDefineArithmeticOperator::operator=(ShaderDefineArithmeticOperator&& other
   return *this;
 }
 
-ShaderDefineArithmeticOperator::~ShaderDefineArithmeticOperator()
-{
-}
+ShaderDefineArithmeticOperator::~ShaderDefineArithmeticOperator() = default;
 
 bool ShaderDefineArithmeticOperator::isTrue(
   const std::unordered_map<std::string, std::string>& preprocessors) const

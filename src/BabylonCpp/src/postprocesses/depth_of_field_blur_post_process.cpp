@@ -30,8 +30,6 @@ DepthOfFieldBlurPostProcess::DepthOfFieldBlurPostProcess(
   });
 }
 
-DepthOfFieldBlurPostProcess::~DepthOfFieldBlurPostProcess()
-{
-}
+DepthOfFieldBlurPostProcess::~DepthOfFieldBlurPostProcess() = default;
 
 } // end of namespace BABYLON

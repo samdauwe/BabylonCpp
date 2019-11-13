@@ -39,7 +39,7 @@ public:
     return std::shared_ptr<ShadowGeneratorSceneComponent>(
       new ShadowGeneratorSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~ShadowGeneratorSceneComponent() override;
+  virtual ~ShadowGeneratorSceneComponent(); // = default
 
   /**
    * @brief Registers the component in a given scene.

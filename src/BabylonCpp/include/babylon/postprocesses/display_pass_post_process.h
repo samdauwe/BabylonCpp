@@ -29,7 +29,7 @@ public:
   DisplayPassPostProcess(const std::string& name, float ratio,
                          const CameraPtr& camera, unsigned int samplingMode,
                          Engine* engine, bool reusable = false);
-  ~DisplayPassPostProcess();
+  ~DisplayPassPostProcess(); // = default
 
 }; // end of class DisplayPassPostProcess
 

@@ -20,7 +20,7 @@ public:
   LogMessage(LogMessage&& otherLogMessage);
   LogMessage& operator=(const LogMessage& otherLogMessage);
   LogMessage& operator=(LogMessage&& otherLogMessage);
-  ~LogMessage();
+  ~LogMessage(); // = default
 
   friend std::ostream& operator<<(std::ostream& os, const LogMessage& logMsg);
   std::string toString() const;

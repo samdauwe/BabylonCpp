@@ -27,7 +27,7 @@ public:
    * @param polygons A collection of polygons held in the node
    */
   Node(const std::vector<Polygon>& polygons);
-  ~Node();
+  ~Node(); // = default
 
   /**
    * @brief Clones, or makes a deep copy, of the node.

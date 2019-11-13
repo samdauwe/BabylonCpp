@@ -54,9 +54,7 @@ RenderingGroup::RenderingGroup(
   transparentSortCompareFn = iTransparentSortCompareFn;
 }
 
-RenderingGroup::~RenderingGroup()
-{
-}
+RenderingGroup::~RenderingGroup() = default;
 
 void RenderingGroup::set_opaqueSortCompareFn(
   const std::function<bool(const SubMesh* a, const SubMesh* b)>& value)

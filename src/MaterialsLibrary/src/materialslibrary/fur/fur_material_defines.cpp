@@ -31,9 +31,7 @@ FurMaterialDefines::FurMaterialDefines() : MaterialDefines{}
   };
 }
 
-FurMaterialDefines::~FurMaterialDefines()
-{
-}
+FurMaterialDefines::~FurMaterialDefines() = default;
 
 } // end of namespace MaterialsLibrary
 } // end of namespace BABYLON

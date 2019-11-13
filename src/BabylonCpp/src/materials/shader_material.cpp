@@ -36,9 +36,7 @@ ShaderMaterial::ShaderMaterial(const std::string& iName, Scene* scene,
   _options.defines           = options.defines;
 }
 
-ShaderMaterial::~ShaderMaterial()
-{
-}
+ShaderMaterial::~ShaderMaterial() = default;
 
 IShaderMaterialOptions& ShaderMaterial::options()
 {

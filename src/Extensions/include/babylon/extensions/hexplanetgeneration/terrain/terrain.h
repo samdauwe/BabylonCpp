@@ -21,7 +21,7 @@ class BABYLON_SHARED_EXPORT Terrain {
 
 public:
   Terrain(const std::string& seed, float width = 512.f, float height = 512.f);
-  ~Terrain();
+  ~Terrain(); // = default
 
   /**
    * Get the color depending upon the tile from the TerrainColor object.

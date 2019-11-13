@@ -6,9 +6,7 @@ QuadraticEase::QuadraticEase() : EasingFunction{}
 {
 }
 
-QuadraticEase::~QuadraticEase()
-{
-}
+QuadraticEase::~QuadraticEase() = default;
 
 float QuadraticEase::easeInCore(float gradient) const
 {

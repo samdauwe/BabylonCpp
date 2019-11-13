@@ -21,9 +21,7 @@ SceneExplorerComponent::SceneExplorerComponent(
   _sceneGraphComponent  = std::make_unique<SceneGraphComponent>(compProps);
 }
 
-SceneExplorerComponent::~SceneExplorerComponent()
-{
-}
+SceneExplorerComponent::~SceneExplorerComponent() = default;
 
 void SceneExplorerComponent::render()
 {

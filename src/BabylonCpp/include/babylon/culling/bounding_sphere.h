@@ -25,7 +25,7 @@ public:
   BoundingSphere(BoundingSphere&& other);
   BoundingSphere& operator=(const BoundingSphere& other);
   BoundingSphere& operator=(BoundingSphere&& other);
-  ~BoundingSphere();
+  ~BoundingSphere(); // = default
 
   /**
    * @brief Recreates the entire bounding sphere from scratch as if we call the

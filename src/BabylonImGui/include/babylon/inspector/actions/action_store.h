@@ -12,7 +12,7 @@ class ActionStore {
 
 public:
   ActionStore();
-  ~ActionStore();
+  ~ActionStore(); // = default
 
   void addAction(const char* id, const char* icon, const char* label,
                  const char* shortcut, const SA::delegate<void()>& callback);

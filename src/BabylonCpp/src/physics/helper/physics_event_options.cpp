@@ -17,55 +17,17 @@ PhysicsRadialExplosionEventOptions::PhysicsRadialExplosionEventOptions()
 }
 
 PhysicsRadialExplosionEventOptions::PhysicsRadialExplosionEventOptions(
-  const PhysicsRadialExplosionEventOptions& other)
-    : radius{other.radius}
-    , strength{other.strength}
-    , falloff{other.falloff}
-    , sphere{other.sphere}
-    , affectedImpostorsCallback{other.affectedImpostorsCallback}
-{
-}
+  const PhysicsRadialExplosionEventOptions& other) = default;
 
 PhysicsRadialExplosionEventOptions::PhysicsRadialExplosionEventOptions(
-  PhysicsRadialExplosionEventOptions&& other)
-    : radius{std::move(other.radius)}
-    , strength{std::move(other.strength)}
-    , falloff{std::move(other.falloff)}
-    , sphere{std::move(other.sphere)}
-    , affectedImpostorsCallback{std::move(other.affectedImpostorsCallback)}
-{
-}
+  PhysicsRadialExplosionEventOptions&& other) = default;
 
 PhysicsRadialExplosionEventOptions& PhysicsRadialExplosionEventOptions::
-operator=(const PhysicsRadialExplosionEventOptions& other)
-{
-  if (&other != this) {
-    radius                    = other.radius;
-    strength                  = other.strength;
-    falloff                   = other.falloff;
-    sphere                    = other.sphere;
-    affectedImpostorsCallback = other.affectedImpostorsCallback;
-  }
-
-  return *this;
-}
+operator=(const PhysicsRadialExplosionEventOptions& other) = default;
 
 PhysicsRadialExplosionEventOptions& PhysicsRadialExplosionEventOptions::
-operator=(PhysicsRadialExplosionEventOptions&& other)
-{
-  if (&other != this) {
-    radius                    = std::move(other.radius);
-    strength                  = std::move(other.strength);
-    falloff                   = std::move(other.falloff);
-    sphere                    = std::move(other.sphere);
-    affectedImpostorsCallback = std::move(other.affectedImpostorsCallback);
-  }
+operator=(PhysicsRadialExplosionEventOptions&& other) = default;
 
-  return *this;
-}
-
-PhysicsRadialExplosionEventOptions::~PhysicsRadialExplosionEventOptions()
-{
-}
+PhysicsRadialExplosionEventOptions::~PhysicsRadialExplosionEventOptions() = default;
 
 } // end of namespace BABYLON

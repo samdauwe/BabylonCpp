@@ -58,7 +58,7 @@ private:
 
 public:
   GLTFFileLoader();
-  virtual ~GLTFFileLoader() override;
+  virtual ~GLTFFileLoader(); // = default
 
   /**
    * @brief Disposes the loader, releases resources during load, and cancels any

@@ -24,7 +24,7 @@ public:
    */
   PositionGizmo(const UtilityLayerRendererPtr& gizmoLayer
                 = UtilityLayerRenderer::DefaultUtilityLayer());
-  ~PositionGizmo() override;
+  ~PositionGizmo(); // = default
 
   /**
    * @brief Disposes of the gizmo.

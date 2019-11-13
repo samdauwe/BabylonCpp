@@ -50,9 +50,7 @@ Logger & LoggerInstance()
 }
 
 
-Logger::Logger()
-{
-}
+Logger::Logger() = default;
 
 Logger::~Logger()
 {

@@ -10,9 +10,7 @@ Hinge2Joint::Hinge2Joint(const PhysicsJointData& iJointData)
 {
 }
 
-Hinge2Joint::~Hinge2Joint()
-{
-}
+Hinge2Joint::~Hinge2Joint() = default;
 
 void Hinge2Joint::setMotor(float targetSpeed, float maxForce,
                            unsigned int motorIndex)

@@ -24,9 +24,7 @@ ConeParticleEmitter::ConeParticleEmitter(float iRadius, float iAngle,
   radius = iRadius;
 }
 
-ConeParticleEmitter::~ConeParticleEmitter()
-{
-}
+ConeParticleEmitter::~ConeParticleEmitter() = default;
 
 float ConeParticleEmitter::get_radius() const
 {

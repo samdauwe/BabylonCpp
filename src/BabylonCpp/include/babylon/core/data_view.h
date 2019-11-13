@@ -39,7 +39,7 @@ public:
   DataView(DataView&& other);                 // Move constructor
   DataView& operator=(const DataView& other); // Copy assignment operator
   DataView& operator=(DataView&& other);      // Move assignment operator
-  ~DataView();                                // Destructor
+  ~DataView(); // = default
 
   /**
    * @brief Gets a signed 8-bit integer (byte) at the specified byte offset from

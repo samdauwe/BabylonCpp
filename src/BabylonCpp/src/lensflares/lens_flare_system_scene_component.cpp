@@ -14,9 +14,7 @@ LensFlareSystemSceneComponent::LensFlareSystemSceneComponent(Scene* iScene)
   scene                 = iScene;
 }
 
-LensFlareSystemSceneComponent::~LensFlareSystemSceneComponent()
-{
-}
+LensFlareSystemSceneComponent::~LensFlareSystemSceneComponent() = default;
 
 void LensFlareSystemSceneComponent::_register()
 {

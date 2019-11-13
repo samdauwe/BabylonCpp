@@ -18,9 +18,7 @@ FollowCameraMouseWheelInput::FollowCameraMouseWheelInput()
 {
 }
 
-FollowCameraMouseWheelInput::~FollowCameraMouseWheelInput()
-{
-}
+FollowCameraMouseWheelInput::~FollowCameraMouseWheelInput() = default;
 
 void FollowCameraMouseWheelInput::attachControl(ICanvas* canvas,
                                                 bool noPreventDefault)

@@ -33,9 +33,7 @@ AutoRotationBehavior::AutoRotationBehavior()
 {
 }
 
-AutoRotationBehavior::~AutoRotationBehavior()
-{
-}
+AutoRotationBehavior::~AutoRotationBehavior() = default;
 
 const char* AutoRotationBehavior::name() const
 {

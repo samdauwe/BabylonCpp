@@ -28,7 +28,7 @@ public:
 
     return postProcess;
   }
-  virtual ~StereoscopicInterlacePostProcess();
+  virtual ~StereoscopicInterlacePostProcess(); // = default
 
 protected:
   /**

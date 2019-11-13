@@ -33,7 +33,7 @@ public:
 
     return light;
   }
-  ~DirectionalLight() override;
+  ~DirectionalLight(); // = default
 
   Type type() const override;
 

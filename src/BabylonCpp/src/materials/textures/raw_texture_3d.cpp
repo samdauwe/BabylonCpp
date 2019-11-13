@@ -30,9 +30,7 @@ RawTexture3D::RawTexture3D(const ArrayBufferView& data, int width, int height,
   is3D = true;
 }
 
-RawTexture3D::~RawTexture3D()
-{
-}
+RawTexture3D::~RawTexture3D() = default;
 
 void RawTexture3D::update(const ArrayBufferView& data)
 {

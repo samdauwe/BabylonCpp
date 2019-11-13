@@ -32,7 +32,7 @@ public:
   Vertex(Vertex&& otherVertex);
   Vertex& operator=(const Vertex& otherVertex);
   Vertex& operator=(Vertex&& otherVertex);
-  ~Vertex();
+  ~Vertex(); // = default
 
   /**
    * @brief Make a clone, or deep copy, of the vertex.

@@ -31,7 +31,7 @@ public:
 
     return postProcess;
   }
-  ~DepthOfFieldBlurPostProcess();
+  ~DepthOfFieldBlurPostProcess(); // = default
 
 protected:
   /**

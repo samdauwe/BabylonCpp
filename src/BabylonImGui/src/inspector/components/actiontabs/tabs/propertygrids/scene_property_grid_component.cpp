@@ -19,9 +19,7 @@ ScenePropertyGridComponent::ScenePropertyGridComponent(
 {
 }
 
-ScenePropertyGridComponent::~ScenePropertyGridComponent()
-{
-}
+ScenePropertyGridComponent::~ScenePropertyGridComponent() = default;
 
 void ScenePropertyGridComponent::setRenderingModes(bool point, bool wireframe)
 {

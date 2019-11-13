@@ -20,7 +20,7 @@ public:
   ShaderCodeCursor(ShaderCodeCursor&& other);
   ShaderCodeCursor& operator=(const ShaderCodeCursor& other);
   ShaderCodeCursor& operator=(ShaderCodeCursor&& other);
-  ~ShaderCodeCursor();
+  ~ShaderCodeCursor(); // = default
 
 protected:
   std::string get_currentLine() const;

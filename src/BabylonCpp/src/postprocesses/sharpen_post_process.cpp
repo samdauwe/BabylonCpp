@@ -36,8 +36,6 @@ SharpenPostProcess::SharpenPostProcess(
   };
 }
 
-SharpenPostProcess::~SharpenPostProcess()
-{
-}
+SharpenPostProcess::~SharpenPostProcess() = default;
 
 } // end of namespace BABYLON

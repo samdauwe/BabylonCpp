@@ -11,9 +11,7 @@
 namespace BABYLON {
 
 template <class T>
-Octree<T>::Octree()
-{
-}
+Octree<T>::Octree() = default;
 
 template <class T>
 Octree<T>::Octree(
@@ -27,9 +25,7 @@ Octree<T>::Octree(
 }
 
 template <class T>
-Octree<T>::~Octree()
-{
-}
+Octree<T>::~Octree() = default;
 
 template <class T>
 void Octree<T>::update(const Vector3& worldMin, const Vector3& worldMax,

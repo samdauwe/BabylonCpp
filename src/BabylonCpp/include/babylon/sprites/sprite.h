@@ -31,7 +31,7 @@ public:
 
     return sprite;
   }
-  virtual ~Sprite();
+  virtual ~Sprite(); // = default
 
   /**
    * @brief Hidden

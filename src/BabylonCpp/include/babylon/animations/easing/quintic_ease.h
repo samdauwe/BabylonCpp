@@ -25,7 +25,7 @@ public:
     return std::shared_ptr<QuinticEase>(
       new QuinticEase(std::forward<Ts>(args)...));
   }
-  ~QuinticEase() override;
+  ~QuinticEase(); // = default
 
   /**
    * @brief Hidden

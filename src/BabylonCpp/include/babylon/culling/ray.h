@@ -37,7 +37,7 @@ public:
   Ray(Ray&& otherRay);
   Ray& operator=(const Ray& otherRay);
   Ray& operator=(Ray&& otherRay);
-  ~Ray();
+  ~Ray(); // = default
   std::unique_ptr<Ray> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Ray& ray);
 

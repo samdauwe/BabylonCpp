@@ -50,9 +50,7 @@ ShaderCodeCursor& ShaderCodeCursor::operator=(ShaderCodeCursor&& other)
   return *this;
 }
 
-ShaderCodeCursor::~ShaderCodeCursor()
-{
-}
+ShaderCodeCursor::~ShaderCodeCursor() = default;
 
 std::string ShaderCodeCursor::get_currentLine() const
 {

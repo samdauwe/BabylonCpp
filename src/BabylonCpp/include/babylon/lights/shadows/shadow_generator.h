@@ -174,7 +174,7 @@ public:
 
     return shadowGenerator;
   }
-  virtual ~ShadowGenerator() override;
+  virtual ~ShadowGenerator(); // = default
 
   void addToLight(const ShadowGeneratorPtr& shadowGenerator);
 

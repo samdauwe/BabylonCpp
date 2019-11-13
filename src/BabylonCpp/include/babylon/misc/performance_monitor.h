@@ -19,7 +19,7 @@ public:
    * sliding window
    */
   PerformanceMonitor(std::size_t frameSampleSize = 30);
-  ~PerformanceMonitor();
+  ~PerformanceMonitor(); // = default
 
   /**
    * @brief Samples current frame

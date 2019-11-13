@@ -63,7 +63,7 @@ public:
 
     return texture;
   }
-  ~RenderTargetTexture() override;
+  ~RenderTargetTexture(); // = default
 
   /**
    * @brief Creates a depth stencil texture.

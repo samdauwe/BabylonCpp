@@ -136,7 +136,7 @@ public:
                  int outputSize, size_t maxNumMipLevels, size_t numChannels,
                  bool isFloat, float specularPower, float cosinePowerDropPerMip,
                  bool excludeBase, bool fixup);
-  ~PMREMGenerator();
+  ~PMREMGenerator(); // = default
 
   /**
    * Launches the filter process and return the result.

@@ -38,7 +38,7 @@ public:
 
     return animationGroup;
   }
-  virtual ~AnimationGroup() override;
+  virtual ~AnimationGroup(); // = default
 
   void addToScene(const AnimationGroupPtr& newAnimationGroup);
 

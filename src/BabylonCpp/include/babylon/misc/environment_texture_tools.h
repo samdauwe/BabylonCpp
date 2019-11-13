@@ -30,7 +30,7 @@ private:
 
 public:
   EnvironmentTextureTools();
-  ~EnvironmentTextureTools();
+  ~EnvironmentTextureTools(); // = default
 
   /**
    * @brief Gets the environment info from an env file.

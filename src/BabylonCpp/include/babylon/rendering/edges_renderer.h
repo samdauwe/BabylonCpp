@@ -43,7 +43,7 @@ public:
   EdgesRenderer(const AbstractMeshPtr& source, float epsilon = 0.95f,
                 bool checkVerticesInsteadOfIndices = false,
                 bool generateEdgesLines            = true);
-  ~EdgesRenderer() override;
+  ~EdgesRenderer(); // = default
 
   /**
    * @brief Hidden

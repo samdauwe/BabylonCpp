@@ -13,9 +13,7 @@ AbstractActionManager::AbstractActionManager()
 {
 }
 
-AbstractActionManager::~AbstractActionManager()
-{
-}
+AbstractActionManager::~AbstractActionManager() = default;
 
 bool AbstractActionManager::HasTriggers()
 {

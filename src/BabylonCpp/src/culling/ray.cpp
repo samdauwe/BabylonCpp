@@ -65,9 +65,7 @@ Ray& Ray::operator=(Ray&& otherRay)
   return *this;
 }
 
-Ray::~Ray()
-{
-}
+Ray::~Ray() = default;
 
 std::unique_ptr<Ray> Ray::clone() const
 {

@@ -28,7 +28,7 @@ public:
    * @param scaleLines defines a scaling factor for line length (1 by default)
    */
   BoneAxesViewer(Scene* scene, Bone* bone, Mesh* mesh, float scaleLines = 1.f);
-  ~BoneAxesViewer();
+  ~BoneAxesViewer(); // = default
 
   /**
    * @brief Force the viewer to update.

@@ -36,9 +36,7 @@ PhysicsVortexEvent::PhysicsVortexEvent(Scene* scene, const Vector3& origin,
   _prepareCylinder();
 }
 
-PhysicsVortexEvent::~PhysicsVortexEvent()
-{
-}
+PhysicsVortexEvent::~PhysicsVortexEvent() = default;
 
 PhysicsVortexEventData PhysicsVortexEvent::getData()
 {

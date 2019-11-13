@@ -20,7 +20,7 @@ class BABYLON_SHARED_EXPORT BaseSubMesh {
 
 public:
   BaseSubMesh();
-  ~BaseSubMesh();
+  ~BaseSubMesh(); // = default
 
   /**
    * @brief Sets associated effect (effect used to render this submesh).

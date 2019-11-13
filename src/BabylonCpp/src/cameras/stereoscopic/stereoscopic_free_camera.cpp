@@ -43,9 +43,7 @@ StereoscopicFreeCamera::StereoscopicFreeCamera(const std::string& iName,
                    rigParams);
 }
 
-StereoscopicFreeCamera::~StereoscopicFreeCamera()
-{
-}
+StereoscopicFreeCamera::~StereoscopicFreeCamera() = default;
 
 const std::string StereoscopicFreeCamera::getClassName() const
 {

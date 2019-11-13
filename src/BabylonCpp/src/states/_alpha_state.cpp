@@ -18,9 +18,7 @@ _AlphaState::_AlphaState()
   reset();
 }
 
-_AlphaState::~_AlphaState()
-{
-}
+_AlphaState::~_AlphaState() = default;
 
 bool _AlphaState::get_isDirty() const
 {

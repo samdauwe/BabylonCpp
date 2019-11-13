@@ -23,7 +23,7 @@ public:
    */
   SetStateAction(unsigned int triggerOptions, const IAnimatablePtr& target,
                  const std::string& value, Condition* condition = nullptr);
-  ~SetStateAction() override;
+  ~SetStateAction(); // = default
 
   /**
    * @brief Execute the action and store the value on the target state property.

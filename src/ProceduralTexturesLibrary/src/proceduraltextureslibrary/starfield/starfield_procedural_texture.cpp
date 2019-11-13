@@ -60,9 +60,7 @@ StarfieldProceduralTexture::StarfieldProceduralTexture(const std::string& iName,
   updateShaderUniforms();
 }
 
-StarfieldProceduralTexture::~StarfieldProceduralTexture()
-{
-}
+StarfieldProceduralTexture::~StarfieldProceduralTexture() = default;
 
 void StarfieldProceduralTexture::updateShaderUniforms()
 {

@@ -31,9 +31,7 @@ TerrainMaterialDefines::TerrainMaterialDefines() : MaterialDefines{}
   };
 }
 
-TerrainMaterialDefines::~TerrainMaterialDefines()
-{
-}
+TerrainMaterialDefines::~TerrainMaterialDefines() = default;
 
 } // end of namespace MaterialsLibrary
 } // end of namespace BABYLON

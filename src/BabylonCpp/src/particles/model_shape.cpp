@@ -20,8 +20,6 @@ ModelShape::ModelShape(
 {
 }
 
-ModelShape::~ModelShape()
-{
-}
+ModelShape::~ModelShape() = default;
 
 } // end of namespace BABYLON

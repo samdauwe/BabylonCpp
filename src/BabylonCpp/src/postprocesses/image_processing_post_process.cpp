@@ -86,9 +86,7 @@ ImageProcessingPostProcess::ImageProcessingPostProcess(
   };
 }
 
-ImageProcessingPostProcess::~ImageProcessingPostProcess()
-{
-}
+ImageProcessingPostProcess::~ImageProcessingPostProcess() = default;
 
 const std::string ImageProcessingPostProcess::getClassName() const
 {

@@ -31,9 +31,7 @@ MixMaterialDefines::MixMaterialDefines() : MaterialDefines{}
   };
 }
 
-MixMaterialDefines::~MixMaterialDefines()
-{
-}
+MixMaterialDefines::~MixMaterialDefines() = default;
 
 } // end of namespace MaterialsLibrary
 } // end of namespace BABYLON

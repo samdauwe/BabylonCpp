@@ -80,7 +80,7 @@ public:
    * @param jointData The data for the physics joint
    */
   PhysicsJoint(unsigned int jointType, const PhysicsJointData& jointData);
-  ~PhysicsJoint();
+  ~PhysicsJoint(); // = default
 
   /**
    * Execute a function that is physics-plugin specific.

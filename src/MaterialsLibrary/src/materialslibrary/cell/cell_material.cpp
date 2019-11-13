@@ -46,9 +46,7 @@ CellMaterial::CellMaterial(const std::string& iName, Scene* scene)
   Effect::ShadersStore()["cellPixelShader"] = cellPixelShader;
 }
 
-CellMaterial::~CellMaterial()
-{
-}
+CellMaterial::~CellMaterial() = default;
 
 TexturePtr& CellMaterial::get_diffuseTexture()
 {

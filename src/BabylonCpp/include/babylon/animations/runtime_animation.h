@@ -36,7 +36,7 @@ public:
 
     return animation;
   }
-  ~RuntimeAnimation();
+  ~RuntimeAnimation(); // = default
 
   void addToRuntimeAnimations(const RuntimeAnimationPtr& animation);
 

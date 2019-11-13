@@ -30,7 +30,7 @@ public:
   operator=(const EnvironmentTextureSpecularInfoV1& other);
   EnvironmentTextureSpecularInfoV1&
   operator=(EnvironmentTextureSpecularInfoV1&& other);
-  ~EnvironmentTextureSpecularInfoV1();
+  ~EnvironmentTextureSpecularInfoV1(); // = default
 
   /**
    * @brief Creates the specular information from the parsed specular data.

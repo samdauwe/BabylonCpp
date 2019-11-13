@@ -24,7 +24,7 @@ public:
     return std::shared_ptr<DepthOfFieldMergePostProcess>(
       new DepthOfFieldMergePostProcess(std::forward<Ts>(args)...));
   }
-  ~DepthOfFieldMergePostProcess() override;
+  ~DepthOfFieldMergePostProcess(); // = default
 
   /**
    * @brief Updates the effect with the current post process compile time values

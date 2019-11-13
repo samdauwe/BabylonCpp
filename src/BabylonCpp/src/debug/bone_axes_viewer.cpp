@@ -19,9 +19,7 @@ BoneAxesViewer::BoneAxesViewer(Scene* iScene, Bone* iBone, Mesh* iMesh,
 {
 }
 
-BoneAxesViewer::~BoneAxesViewer()
-{
-}
+BoneAxesViewer::~BoneAxesViewer() = default;
 
 void BoneAxesViewer::update()
 {

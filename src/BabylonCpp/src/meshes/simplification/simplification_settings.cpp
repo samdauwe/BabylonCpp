@@ -10,8 +10,6 @@ SimplificationSettings::SimplificationSettings(float _quality, float _distance,
     optimizeMesh = _optimizeMesh;
 }
 
-SimplificationSettings::~SimplificationSettings()
-{
-}
+SimplificationSettings::~SimplificationSettings() = default;
 
 } // end of namespace BABYLON

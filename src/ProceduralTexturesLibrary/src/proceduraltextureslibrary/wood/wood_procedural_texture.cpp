@@ -32,9 +32,7 @@ WoodProceduralTexture::WoodProceduralTexture(const std::string& iName,
   updateShaderUniforms();
 }
 
-WoodProceduralTexture::~WoodProceduralTexture()
-{
-}
+WoodProceduralTexture::~WoodProceduralTexture() = default;
 
 void WoodProceduralTexture::updateShaderUniforms()
 {

@@ -12,8 +12,6 @@ DecimationTriangle::DecimationTriangle(
 {
 }
 
-DecimationTriangle::~DecimationTriangle()
-{
-}
+DecimationTriangle::~DecimationTriangle() = default;
 
 } // end of namespace BABYLON

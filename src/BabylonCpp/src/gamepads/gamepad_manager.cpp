@@ -6,9 +6,7 @@ GamepadManager::GamepadManager(Scene* scene) : _scene{scene}
 {
 }
 
-GamepadManager::~GamepadManager()
-{
-}
+GamepadManager::~GamepadManager() = default;
 
 std::vector<std::shared_ptr<Gamepad>>& GamepadManager::gamepads()
 {

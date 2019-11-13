@@ -11,9 +11,7 @@ PointParticleEmitter::PointParticleEmitter()
 {
 }
 
-PointParticleEmitter::~PointParticleEmitter()
-{
-}
+PointParticleEmitter::~PointParticleEmitter() = default;
 
 void PointParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
                                                   Vector3& directionToUpdate,

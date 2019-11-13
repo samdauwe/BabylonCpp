@@ -27,9 +27,7 @@ FireMaterialDefines::FireMaterialDefines() : MaterialDefines{}
   };
 }
 
-FireMaterialDefines::~FireMaterialDefines()
-{
-}
+FireMaterialDefines::~FireMaterialDefines() = default;
 
 } // end of namespace MaterialsLibrary
 } // end of namespace BABYLON

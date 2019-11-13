@@ -23,7 +23,7 @@ public:
    */
   MeshExploder(const std::vector<MeshPtr>& meshes,
                const MeshPtr& _centerMesh = nullptr);
-  ~MeshExploder();
+  ~MeshExploder(); // = default
 
   /**
    * @brief Get class name.

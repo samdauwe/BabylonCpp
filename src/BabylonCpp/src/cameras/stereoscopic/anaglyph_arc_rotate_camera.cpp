@@ -33,9 +33,7 @@ AnaglyphArcRotateCamera::AnaglyphArcRotateCamera(
   setCameraRigMode(Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH, rigParams);
 }
 
-AnaglyphArcRotateCamera::~AnaglyphArcRotateCamera()
-{
-}
+AnaglyphArcRotateCamera::~AnaglyphArcRotateCamera() = default;
 
 const std::string AnaglyphArcRotateCamera::getClassName() const
 {

@@ -17,9 +17,7 @@ SphereParticleEmitter::SphereParticleEmitter(float iRadius, float iRadiusRange,
 {
 }
 
-SphereParticleEmitter::~SphereParticleEmitter()
-{
-}
+SphereParticleEmitter::~SphereParticleEmitter() = default;
 
 void SphereParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
                                                    Vector3& directionToUpdate,

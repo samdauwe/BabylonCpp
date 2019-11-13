@@ -83,9 +83,7 @@ ReflectionProbe::ReflectionProbe(const std::string& iName, const ISize& size,
     });
 }
 
-ReflectionProbe::~ReflectionProbe()
-{
-}
+ReflectionProbe::~ReflectionProbe() = default;
 
 void ReflectionProbe::addToScene(const ReflectionProbePtr& newReflectionProbe)
 {

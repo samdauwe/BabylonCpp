@@ -24,7 +24,7 @@ public:
   {
     return std::shared_ptr<PowerEase>(new PowerEase(std::forward<Ts>(args)...));
   }
-  ~PowerEase() override;
+  ~PowerEase(); // = default
 
   /**
    * @brief Hidden

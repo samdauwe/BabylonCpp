@@ -60,7 +60,7 @@ struct EmissiveTextureAndColor {
 class BABYLON_SHARED_EXPORT EffectLayer {
 
 public:
-  virtual ~EffectLayer();
+  virtual ~EffectLayer(); // = default
 
   /**
    * @brief Adds an effect layer to the scene.

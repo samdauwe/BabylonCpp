@@ -9,9 +9,7 @@ ParticlesOptimization::ParticlesOptimization(int iPriority)
 {
 }
 
-ParticlesOptimization::~ParticlesOptimization()
-{
-}
+ParticlesOptimization::~ParticlesOptimization() = default;
 
 bool ParticlesOptimization::apply(Scene* scene)
 {

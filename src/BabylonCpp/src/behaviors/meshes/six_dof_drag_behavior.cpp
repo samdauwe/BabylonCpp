@@ -29,9 +29,7 @@ SixDofDragBehavior::SixDofDragBehavior()
 {
 }
 
-SixDofDragBehavior::~SixDofDragBehavior()
-{
-}
+SixDofDragBehavior::~SixDofDragBehavior() = default;
 
 const std::string SixDofDragBehavior::name() const
 {

@@ -19,9 +19,7 @@ EffectLayerSceneComponent::EffectLayerSceneComponent(Scene* iScene)
   _engine               = scene->getEngine();
 }
 
-EffectLayerSceneComponent::~EffectLayerSceneComponent()
-{
-}
+EffectLayerSceneComponent::~EffectLayerSceneComponent() = default;
 
 void EffectLayerSceneComponent::_register()
 {

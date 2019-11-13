@@ -35,9 +35,7 @@ ViveController::ViveController(const IBrowserGamepadPtr& vrGamepad)
   _invertLeftStickY = true;
 }
 
-ViveController::~ViveController()
-{
-}
+ViveController::~ViveController() = default;
 
 void ViveController::initControllerMesh(
   Scene* scene, const std::function<void(AbstractMesh* mesh)>& meshLoaded)

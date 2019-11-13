@@ -28,9 +28,7 @@ PhysicsEngine::PhysicsEngine(const std::optional<Vector3>& iGravity,
   }
 }
 
-PhysicsEngine::~PhysicsEngine()
-{
-}
+PhysicsEngine::~PhysicsEngine() = default;
 
 void PhysicsEngine::setGravity(const Vector3& _gravity)
 {

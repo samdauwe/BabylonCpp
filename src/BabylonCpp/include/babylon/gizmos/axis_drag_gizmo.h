@@ -46,7 +46,7 @@ public:
                 const UtilityLayerRendererPtr& gizmoLayer
                 = UtilityLayerRenderer::DefaultUtilityLayer(),
                 PositionGizmo* parent = nullptr);
-  ~AxisDragGizmo() override;
+  ~AxisDragGizmo(); // = default
 
   /**
    * @brief Disposes of the gizmo.

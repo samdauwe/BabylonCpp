@@ -42,9 +42,7 @@ NormalMaterial::NormalMaterial(const std::string& iName, Scene* scene)
   Effect::ShadersStore()["normalPixelShader"] = normalPixelShader;
 }
 
-NormalMaterial::~NormalMaterial()
-{
-}
+NormalMaterial::~NormalMaterial() = default;
 
 Type NormalMaterial::type() const
 {

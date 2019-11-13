@@ -17,7 +17,7 @@ using MaterialPtr = std::shared_ptr<Material>;
 struct BABYLON_SHARED_EXPORT BabylonFileLoader : public ISceneLoaderPlugin {
 
   BabylonFileLoader();
-  virtual ~BabylonFileLoader() override;
+  virtual ~BabylonFileLoader(); // = default
 
   MaterialPtr parseMaterialById(const std::string& id, const json& parsedData,
                                 Scene* scene, const std::string& rootUrl) const;

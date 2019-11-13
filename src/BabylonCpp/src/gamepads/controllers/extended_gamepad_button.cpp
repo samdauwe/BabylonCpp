@@ -12,9 +12,7 @@ ExtendedGamepadButton::ExtendedGamepadButton(int value, bool touched,
 {
 }
 
-ExtendedGamepadButton::~ExtendedGamepadButton()
-{
-}
+ExtendedGamepadButton::~ExtendedGamepadButton() = default;
 
 void ExtendedGamepadButton::setValue(int value)
 {

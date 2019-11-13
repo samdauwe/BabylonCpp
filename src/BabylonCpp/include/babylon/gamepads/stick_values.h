@@ -23,7 +23,7 @@ struct BABYLON_SHARED_EXPORT StickValues {
   StickValues(StickValues&& other);
   StickValues& operator=(const StickValues& other);
   StickValues& operator=(StickValues&& other);
-  ~StickValues();
+  ~StickValues(); // = default
 
   /**
    * The x component of the control stick

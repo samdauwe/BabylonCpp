@@ -27,7 +27,7 @@ public:
 
     return material;
   }
-  ~PushMaterial() override;
+  ~PushMaterial(); // = default
 
   /**
    * @brief Returns the string "PushMaterial".

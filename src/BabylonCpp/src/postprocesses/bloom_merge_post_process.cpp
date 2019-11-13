@@ -31,8 +31,6 @@ BloomMergePostProcess::BloomMergePostProcess(
   }
 }
 
-BloomMergePostProcess::~BloomMergePostProcess()
-{
-}
+BloomMergePostProcess::~BloomMergePostProcess() = default;
 
 } // end of namespace BABYLON

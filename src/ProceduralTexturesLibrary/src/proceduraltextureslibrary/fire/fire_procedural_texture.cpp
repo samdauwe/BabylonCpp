@@ -42,9 +42,7 @@ FireProceduralTexture::FireProceduralTexture(const std::string& iName,
   updateShaderUniforms();
 }
 
-FireProceduralTexture::~FireProceduralTexture()
-{
-}
+FireProceduralTexture::~FireProceduralTexture() = default;
 
 void FireProceduralTexture::updateShaderUniforms()
 {

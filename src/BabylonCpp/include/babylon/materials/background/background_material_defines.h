@@ -19,7 +19,7 @@ struct BABYLON_SHARED_EXPORT BackgroundMaterialDefines
    * @brief Constructor of the defines.
    */
   BackgroundMaterialDefines();
-  ~BackgroundMaterialDefines() override;
+  ~BackgroundMaterialDefines(); // = default
 
   void reset() override;
 

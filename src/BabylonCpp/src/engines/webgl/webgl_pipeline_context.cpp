@@ -17,9 +17,7 @@ WebGLPipelineContext::WebGLPipelineContext()
 {
 }
 
-WebGLPipelineContext::~WebGLPipelineContext()
-{
-}
+WebGLPipelineContext::~WebGLPipelineContext() = default;
 
 bool WebGLPipelineContext::get_isAsync() const
 {

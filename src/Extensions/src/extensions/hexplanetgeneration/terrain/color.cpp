@@ -13,9 +13,7 @@ Color::Color(float maxHeight)
 {
 }
 
-Color::~Color()
-{
-}
+Color::~Color() = default;
 
 void Color::setupGradient()
 {

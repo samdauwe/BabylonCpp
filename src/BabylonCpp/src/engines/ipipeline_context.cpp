@@ -11,9 +11,7 @@ IPipelineContext::IPipelineContext()
 {
 }
 
-IPipelineContext::~IPipelineContext()
-{
-}
+IPipelineContext::~IPipelineContext() = default;
 
 bool IPipelineContext::get_isAsync() const
 {

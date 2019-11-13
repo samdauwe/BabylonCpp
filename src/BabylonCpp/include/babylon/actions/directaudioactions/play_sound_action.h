@@ -23,7 +23,7 @@ public:
    */
   PlaySoundAction(unsigned int triggerOptions, Sound* sound,
                   Condition* condition = nullptr);
-  ~PlaySoundAction() override;
+  ~PlaySoundAction(); // = default
 
   /**
    * @brief Hidden

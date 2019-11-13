@@ -23,38 +23,14 @@ IRegisteredPlugin::IRegisteredPlugin(
   }
 }
 
-IRegisteredPlugin::IRegisteredPlugin(const IRegisteredPlugin& other)
-    : plugin{other.plugin}, isBinary{other.isBinary}
-{
-}
+IRegisteredPlugin::IRegisteredPlugin(const IRegisteredPlugin& other) = default;
 
-IRegisteredPlugin::IRegisteredPlugin(IRegisteredPlugin&& other)
-    : plugin{std::move(other.plugin)}, isBinary{std::move(other.isBinary)}
-{
-}
+IRegisteredPlugin::IRegisteredPlugin(IRegisteredPlugin&& other) = default;
 
-IRegisteredPlugin& IRegisteredPlugin::operator=(const IRegisteredPlugin& other)
-{
-  if (&other != this) {
-    plugin   = other.plugin;
-    isBinary = other.isBinary;
-  }
+IRegisteredPlugin& IRegisteredPlugin::operator=(const IRegisteredPlugin& other) = default;
 
-  return *this;
-}
+IRegisteredPlugin& IRegisteredPlugin::operator=(IRegisteredPlugin&& other) =  default;
 
-IRegisteredPlugin& IRegisteredPlugin::operator=(IRegisteredPlugin&& other)
-{
-  if (&other != this) {
-    plugin   = std::move(other.plugin);
-    isBinary = std::move(other.isBinary);
-  }
-
-  return *this;
-}
-
-IRegisteredPlugin::~IRegisteredPlugin()
-{
-}
+IRegisteredPlugin::~IRegisteredPlugin() = default;
 
 } // end of namespace BABYLON

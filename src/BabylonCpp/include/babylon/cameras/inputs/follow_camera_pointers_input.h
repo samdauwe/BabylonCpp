@@ -16,7 +16,7 @@ class BABYLON_SHARED_EXPORT FollowCameraPointersInput
 
 public:
   FollowCameraPointersInput();
-  ~FollowCameraPointersInput() override;
+  ~FollowCameraPointersInput(); // = default
 
   /**
    * @brief Gets the class name of the current input.

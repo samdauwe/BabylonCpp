@@ -46,7 +46,7 @@ public:
   Range(Range&& otherRange);                 // Move constructor
   Range& operator=(const Range& otherRange); // Copy assignment operator
   Range& operator=(Range&& otherRange);      // Move assignment operator
-  ~Range();
+  ~Range(); // = default
   friend std::ostream& operator<<(std::ostream& os, const Range& range);
 
   bool contains(float value);
@@ -70,7 +70,7 @@ public:
   ColorInfo(ColorInfo&& other);                 // Move constructor
   ColorInfo& operator=(const ColorInfo& other); // Copy assignment operator
   ColorInfo& operator=(ColorInfo&& other);      // Move assignment operator
-  ~ColorInfo();
+  ~ColorInfo(); // = default
 
   bool hasHueRange() const;
   Range& getHueRange();

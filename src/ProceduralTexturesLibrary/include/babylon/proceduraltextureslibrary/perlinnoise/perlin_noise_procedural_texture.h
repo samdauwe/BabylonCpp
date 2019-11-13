@@ -24,7 +24,7 @@ public:
 
     return texture;
   }
-  ~PerlinNoiseProceduralTexture();
+  ~PerlinNoiseProceduralTexture(); // = default
 
   void updateShaderUniforms();
   void render(bool useCameraPostProcess = false);

@@ -28,7 +28,7 @@ class BABYLON_SHARED_EXPORT CSG {
 public:
   CSG();
   CSG(const CSG& otherCSG);
-  ~CSG();
+  ~CSG(); // = default
 
   /**
    * @brief Convert the Mesh to CSG.

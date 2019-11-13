@@ -19,9 +19,7 @@ GroundMesh::GroundMesh(const std::string& iName, Scene* scene)
 {
 }
 
-GroundMesh::~GroundMesh()
-{
-}
+GroundMesh::~GroundMesh() = default;
 
 const std::string GroundMesh::getClassName() const
 {

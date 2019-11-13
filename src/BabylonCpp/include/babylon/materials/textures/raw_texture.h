@@ -42,7 +42,7 @@ public:
              unsigned int samplingMode
              = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
              unsigned int type = Constants::TEXTURETYPE_UNSIGNED_INT);
-  ~RawTexture();
+  ~RawTexture(); // = default
 
   /**
    * @brief Updates the texture underlying data.

@@ -34,9 +34,7 @@ CameraTreeItemComponent::CameraTreeItemComponent(
   }
 }
 
-CameraTreeItemComponent::~CameraTreeItemComponent()
-{
-}
+CameraTreeItemComponent::~CameraTreeItemComponent() = default;
 
 void CameraTreeItemComponent::setActive()
 {

@@ -16,9 +16,7 @@ MultiMaterial::MultiMaterial(const std::string iName, Scene* scene)
   _storeEffectOnSubMeshes = true;
 }
 
-MultiMaterial::~MultiMaterial()
-{
-}
+MultiMaterial::~MultiMaterial() = default;
 
 std::vector<MaterialPtr>& MultiMaterial::getChildren()
 {

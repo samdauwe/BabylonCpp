@@ -122,9 +122,7 @@ BoneIKController::BoneIKController(
   }
 }
 
-BoneIKController::~BoneIKController()
-{
-}
+BoneIKController::~BoneIKController() = default;
 
 float BoneIKController::get_maxAngle() const
 {

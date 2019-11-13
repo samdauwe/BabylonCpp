@@ -5,9 +5,7 @@
 namespace BABYLON {
 namespace Extensions {
 
-Planet::Planet()
-{
-}
+Planet::Planet() = default;
 
 } // end of namespace Extensions
 } // end of namespace BABYLON

@@ -9,9 +9,7 @@ RenderTargetsOptimization::RenderTargetsOptimization(int iPriority)
 {
 }
 
-RenderTargetsOptimization::~RenderTargetsOptimization()
-{
-}
+RenderTargetsOptimization::~RenderTargetsOptimization() = default;
 
 bool RenderTargetsOptimization::apply(Scene* scene)
 {

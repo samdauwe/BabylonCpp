@@ -37,7 +37,7 @@ public:
 
     return subMesh;
   }
-  virtual ~SubMesh();
+  virtual ~SubMesh(); // = default
 
   void addToMesh(const std::shared_ptr<SubMesh>& newSubMesh);
   bool isGlobal() const;

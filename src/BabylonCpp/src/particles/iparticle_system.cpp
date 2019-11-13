@@ -17,9 +17,7 @@ IParticleSystem::IParticleSystem()
 {
 }
 
-IParticleSystem::~IParticleSystem()
-{
-}
+IParticleSystem::~IParticleSystem() = default;
 
 bool IParticleSystem::hasEmitter() const
 {

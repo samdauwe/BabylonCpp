@@ -65,7 +65,7 @@ public:
    * @param name The name of the particle system
    */
   BaseParticleSystem(const std::string& name);
-  ~BaseParticleSystem() override;
+  ~BaseParticleSystem(); // = default
 
   /**
    * @brief Returns whether or not the particle system has an emitter.

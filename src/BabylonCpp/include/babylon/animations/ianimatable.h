@@ -22,7 +22,7 @@ class BABYLON_SHARED_EXPORT IAnimatable {
 
 public:
   IAnimatable();
-  virtual ~IAnimatable();
+  virtual ~IAnimatable(); // = default
 
   virtual Type type() const = 0;
   virtual std::vector<AnimationPtr> getAnimations();

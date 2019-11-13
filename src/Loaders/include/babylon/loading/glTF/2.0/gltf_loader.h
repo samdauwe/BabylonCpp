@@ -153,7 +153,7 @@ public:
   {
     return std::shared_ptr<GLTFLoader>(new GLTFLoader(std::forward<Ts>(args)...));
   }
-  virtual ~GLTFLoader() override;
+  virtual ~GLTFLoader(); // = default
 
   /**
    * @brief Gets the loader state.

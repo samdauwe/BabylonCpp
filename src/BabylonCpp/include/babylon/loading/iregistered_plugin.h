@@ -27,7 +27,7 @@ struct BABYLON_SHARED_EXPORT IRegisteredPlugin {
   IRegisteredPlugin(IRegisteredPlugin&& other);
   IRegisteredPlugin& operator=(const IRegisteredPlugin& other);
   IRegisteredPlugin& operator=(IRegisteredPlugin&& other);
-  ~IRegisteredPlugin();
+  ~IRegisteredPlugin(); // = default
 
   /**
    * Defines the plugin to use

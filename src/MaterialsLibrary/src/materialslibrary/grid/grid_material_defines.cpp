@@ -12,9 +12,7 @@ GridMaterialDefines::GridMaterialDefines() : MaterialDefines{}
   };
 }
 
-GridMaterialDefines::~GridMaterialDefines()
-{
-}
+GridMaterialDefines::~GridMaterialDefines() = default;
 
 } // end of namespace MaterialsLibrary
 } // end of namespace BABYLON

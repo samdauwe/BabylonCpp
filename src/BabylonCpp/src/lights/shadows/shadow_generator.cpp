@@ -177,9 +177,7 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize,
   _applyFilterValues();
 }
 
-ShadowGenerator::~ShadowGenerator()
-{
-}
+ShadowGenerator::~ShadowGenerator() = default;
 
 void ShadowGenerator::addToLight(const ShadowGeneratorPtr& shadowGenerator)
 {

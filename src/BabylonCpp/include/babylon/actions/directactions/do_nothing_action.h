@@ -22,7 +22,7 @@ public:
   DoNothingAction(unsigned int triggerOptions
                   = Constants::ACTION_NothingTrigger,
                   Condition* condition = nullptr);
-  ~DoNothingAction() override;
+  ~DoNothingAction(); // = default
 
   /**
    * @brief Execute the action and do nothing.

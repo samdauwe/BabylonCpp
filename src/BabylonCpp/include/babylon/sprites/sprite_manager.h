@@ -44,7 +44,7 @@ public:
 
     return spriteManager;
   }
-  virtual ~SpriteManager() override;
+  virtual ~SpriteManager(); // = default
 
   void addToScene(const SpriteManagerPtr& newSpriteManager);
 

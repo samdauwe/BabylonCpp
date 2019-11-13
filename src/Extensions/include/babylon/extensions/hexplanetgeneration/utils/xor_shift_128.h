@@ -9,7 +9,7 @@ namespace Extensions {
 
 struct BABYLON_SHARED_EXPORT XorShift128 : public IRandomFunction {
   XorShift128(size_t x = 0, size_t y = 0, size_t z = 0, size_t w = 0);
-  virtual ~XorShift128();
+  virtual ~XorShift128(); // = default
 
   size_t next() override;
   float unit() override;

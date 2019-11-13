@@ -30,7 +30,7 @@ public:
   BoundingInfo(BoundingInfo&& other);
   BoundingInfo& operator=(const BoundingInfo& other);
   BoundingInfo& operator=(BoundingInfo&& other);
-  virtual ~BoundingInfo();
+  virtual ~BoundingInfo(); // = default
 
   /**
    * @brief Recreates the entire bounding info from scratch as if we call the

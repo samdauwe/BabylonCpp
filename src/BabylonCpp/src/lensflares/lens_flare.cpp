@@ -20,9 +20,7 @@ LensFlare::LensFlare(float iSize, float iPosition, const Color3& iColor,
 {
 }
 
-LensFlare::~LensFlare()
-{
-}
+LensFlare::~LensFlare() = default;
 
 void LensFlare::addToLensFlareSystem(const LensFlarePtr& lensFlare)
 {

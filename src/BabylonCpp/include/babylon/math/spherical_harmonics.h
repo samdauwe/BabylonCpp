@@ -79,7 +79,7 @@ public:
   SphericalHarmonics(SphericalHarmonics&& other);
   SphericalHarmonics& operator=(const SphericalHarmonics& other);
   SphericalHarmonics& operator=(SphericalHarmonics&& other);
-  ~SphericalHarmonics();
+  ~SphericalHarmonics(); // = default
   SphericalHarmonics copy() const;
   std::unique_ptr<SphericalHarmonics> clone() const;
 

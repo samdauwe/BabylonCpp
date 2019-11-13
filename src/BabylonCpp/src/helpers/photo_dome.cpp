@@ -84,9 +84,7 @@ PhotoDome::PhotoDome(
   }
 }
 
-PhotoDome::~PhotoDome()
-{
-}
+PhotoDome::~PhotoDome() = default;
 
 TexturePtr& PhotoDome::get_photoTexture()
 {

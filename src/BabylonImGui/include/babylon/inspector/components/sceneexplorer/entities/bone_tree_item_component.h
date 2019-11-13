@@ -27,7 +27,7 @@ public:
 
 public:
   BoneTreeItemComponent(const IBoneTreeItemComponentProps& props);
-  virtual ~BoneTreeItemComponent() override;
+  virtual ~BoneTreeItemComponent(); // = default
 
   void render() override;
 

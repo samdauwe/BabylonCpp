@@ -59,9 +59,7 @@ FurMaterial::FurMaterial(const std::string& iName, Scene* scene)
   Effect::ShadersStore()["furPixelShader"] = furPixelShader;
 }
 
-FurMaterial::~FurMaterial()
-{
-}
+FurMaterial::~FurMaterial() = default;
 
 BaseTexturePtr& FurMaterial::get_diffuseTexture()
 {

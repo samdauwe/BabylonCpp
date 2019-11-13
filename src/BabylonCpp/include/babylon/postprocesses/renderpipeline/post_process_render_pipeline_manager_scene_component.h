@@ -38,7 +38,7 @@ public:
       new PostProcessRenderPipelineManagerSceneComponent(
         std::forward<Ts>(args)...));
   }
-  virtual ~PostProcessRenderPipelineManagerSceneComponent();
+  virtual ~PostProcessRenderPipelineManagerSceneComponent(); // = default
 
   /**
    * @brief Registers the component in a given scene.

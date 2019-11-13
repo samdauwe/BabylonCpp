@@ -25,7 +25,7 @@ public:
   Angle(Angle&& otherAngle);
   Angle& operator=(const Angle& otherAngle);
   Angle& operator=(Angle&& otherAngle);
-  ~Angle();
+  ~Angle(); // = default
   Angle copy() const;
   std::unique_ptr<Angle> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Angle& angle);

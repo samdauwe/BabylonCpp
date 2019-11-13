@@ -64,9 +64,7 @@ Inspector::Inspector(GLFWwindow* glfwWindow, Scene* scene) // KK remove glfwWind
     = std::make_unique<ActionTabsComponent>(actionTabsComponentProps);
 }
 
-Inspector::~Inspector()
-{
-}
+Inspector::~Inspector() = default;
 
 Scene* Inspector::scene() const
 {

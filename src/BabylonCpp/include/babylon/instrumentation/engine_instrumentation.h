@@ -28,7 +28,7 @@ public:
    * @param engine Defines the engine to instrument
    */
   EngineInstrumentation(Engine* engine);
-  virtual ~EngineInstrumentation();
+  virtual ~EngineInstrumentation(); // = default
 
   /**
    * @brief Dispose and release associated resources.

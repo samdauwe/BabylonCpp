@@ -21,7 +21,7 @@ public:
    * @param optimizeMesh already optimized mesh
    */
   SimplificationSettings(float quality, float distance, bool optimizeMesh);
-  ~SimplificationSettings();
+  ~SimplificationSettings(); // = default
 
 }; // end of class ISimplificationSettings
 

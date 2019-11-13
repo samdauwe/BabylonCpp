@@ -64,9 +64,7 @@ TriPlanarMaterial::TriPlanarMaterial(const std::string& iName, Scene* scene)
   Effect::ShadersStore()["triPlanarPixelShader"] = triPlanarPixelShader;
 }
 
-TriPlanarMaterial::~TriPlanarMaterial()
-{
-}
+TriPlanarMaterial::~TriPlanarMaterial() = default;
 
 BaseTexturePtr& TriPlanarMaterial::get_mixTexture()
 {

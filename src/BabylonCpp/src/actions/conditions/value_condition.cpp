@@ -20,9 +20,7 @@ ValueCondition::ValueCondition(ActionManager* actionManager,
   _property        = _getProperty(propertyPath);
 }
 
-ValueCondition::~ValueCondition()
-{
-}
+ValueCondition::~ValueCondition() = default;
 
 bool ValueCondition::isValid()
 {

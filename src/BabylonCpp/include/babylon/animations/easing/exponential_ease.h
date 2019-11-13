@@ -25,7 +25,7 @@ public:
     return std::shared_ptr<ExponentialEase>(
       new ExponentialEase(std::forward<Ts>(args)...));
   }
-  ~ExponentialEase() override;
+  ~ExponentialEase(); // = default
 
   /**
    * @brief Hidden

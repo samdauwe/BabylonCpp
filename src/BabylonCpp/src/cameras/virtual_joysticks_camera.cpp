@@ -22,9 +22,7 @@ VirtualJoysticksCamera::VirtualJoysticksCamera(const std::string& iName,
   inputs->addVirtualJoystick();
 }
 
-VirtualJoysticksCamera::~VirtualJoysticksCamera()
-{
-}
+VirtualJoysticksCamera::~VirtualJoysticksCamera() = default;
 
 const std::string VirtualJoysticksCamera::getClassName() const
 {

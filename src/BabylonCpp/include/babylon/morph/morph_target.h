@@ -32,7 +32,7 @@ public:
     return std::shared_ptr<MorphTarget>(
       new MorphTarget(std::forward<Ts>(args)...));
   }
-  ~MorphTarget() override;
+  ~MorphTarget(); // = default
 
   Type type() const override;
 

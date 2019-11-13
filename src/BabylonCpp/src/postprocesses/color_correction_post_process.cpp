@@ -25,8 +25,6 @@ ColorCorrectionPostProcess::ColorCorrectionPostProcess(
   };
 }
 
-ColorCorrectionPostProcess::~ColorCorrectionPostProcess()
-{
-}
+ColorCorrectionPostProcess::~ColorCorrectionPostProcess() = default;
 
 } // end of namespace BABYLON

@@ -29,7 +29,7 @@ public:
 
     return material;
   }
-  ~PBRSpecularGlossinessMaterial() override;
+  ~PBRSpecularGlossinessMaterial(); // = default
 
   /**
    * @brief Return the currrent class name of the material.

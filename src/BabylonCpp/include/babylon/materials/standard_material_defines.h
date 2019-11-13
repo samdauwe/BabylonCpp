@@ -12,7 +12,7 @@ struct BABYLON_SHARED_EXPORT StandardMaterialDefines
       public IImageProcessingConfigurationDefines {
 
   StandardMaterialDefines();
-  ~StandardMaterialDefines() override;
+  ~StandardMaterialDefines(); // = default
 
   void setReflectionMode(const std::string& modeToEnable);
 

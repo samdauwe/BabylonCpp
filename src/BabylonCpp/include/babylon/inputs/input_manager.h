@@ -51,7 +51,7 @@ public:
    * @param scene defines the hosting scene
    */
   InputManager(Scene* scene);
-  ~InputManager();
+  ~InputManager(); // = default
 
   /** Pointers handling **/
 

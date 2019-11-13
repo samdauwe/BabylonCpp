@@ -31,7 +31,7 @@ public:
 
     return camera;
   }
-  ~VirtualJoysticksCamera() override;
+  ~VirtualJoysticksCamera(); // = default
 
   /**
    * @brief Gets the current object class name.

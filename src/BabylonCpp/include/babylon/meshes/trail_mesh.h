@@ -24,7 +24,7 @@ public:
 
     return mesh;
   }
-  ~TrailMesh() override;
+  ~TrailMesh(); // = default
 
   /**
    * @brief "TrailMesh"

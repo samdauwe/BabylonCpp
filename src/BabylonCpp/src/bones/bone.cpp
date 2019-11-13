@@ -46,9 +46,7 @@ Bone::Bone(const std::string& iName, Skeleton* skeleton, Bone* /*parentBone*/,
 {
 }
 
-Bone::~Bone()
-{
-}
+Bone::~Bone() = default;
 
 Type Bone::type() const
 {

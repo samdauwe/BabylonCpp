@@ -29,9 +29,7 @@ SimpleMaterialDefines::SimpleMaterialDefines() : MaterialDefines{}
   };
 }
 
-SimpleMaterialDefines::~SimpleMaterialDefines()
-{
-}
+SimpleMaterialDefines::~SimpleMaterialDefines() = default;
 
 } // end of namespace MaterialsLibrary
 } // end of namespace BABYLON

@@ -39,9 +39,7 @@ MarbleProceduralTexture::MarbleProceduralTexture(const std::string& iName,
   updateShaderUniforms();
 }
 
-MarbleProceduralTexture::~MarbleProceduralTexture()
-{
-}
+MarbleProceduralTexture::~MarbleProceduralTexture() = default;
 
 void MarbleProceduralTexture::updateShaderUniforms()
 {

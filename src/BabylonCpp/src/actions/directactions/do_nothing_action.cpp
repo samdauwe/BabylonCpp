@@ -10,9 +10,7 @@ DoNothingAction::DoNothingAction(unsigned int iTtriggerOptions,
 {
 }
 
-DoNothingAction::~DoNothingAction()
-{
-}
+DoNothingAction::~DoNothingAction() = default;
 
 void DoNothingAction::execute(const std::optional<IActionEvent>& /*evt*/)
 {

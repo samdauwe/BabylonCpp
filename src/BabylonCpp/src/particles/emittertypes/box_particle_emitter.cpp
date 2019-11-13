@@ -16,9 +16,7 @@ BoxParticleEmitter::BoxParticleEmitter()
 {
 }
 
-BoxParticleEmitter::~BoxParticleEmitter()
-{
-}
+BoxParticleEmitter::~BoxParticleEmitter() = default;
 
 void BoxParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
                                                 Vector3& directionToUpdate,

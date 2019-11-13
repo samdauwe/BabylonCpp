@@ -13,49 +13,12 @@ FileFaceOrientation::FileFaceOrientation(const std::string& iName,
 {
 }
 
-FileFaceOrientation::FileFaceOrientation(const FileFaceOrientation& other)
-    : name{other.name}
-    , worldAxisForNormal{other.worldAxisForNormal}
-    , worldAxisForFileX{other.worldAxisForFileX}
-    , worldAxisForFileY{other.worldAxisForFileY}
-{
-}
+FileFaceOrientation::FileFaceOrientation(const FileFaceOrientation& other) = default;
+FileFaceOrientation::FileFaceOrientation(FileFaceOrientation&& other) = default;
 
-FileFaceOrientation::FileFaceOrientation(FileFaceOrientation&& other)
-    : name{other.name}
-    , worldAxisForNormal{std::move(other.worldAxisForNormal)}
-    , worldAxisForFileX{std::move(other.worldAxisForFileX)}
-    , worldAxisForFileY{std::move(other.worldAxisForFileY)}
-{
-}
+FileFaceOrientation& FileFaceOrientation::operator=(const FileFaceOrientation& other) = default;
+FileFaceOrientation& FileFaceOrientation::operator=(FileFaceOrientation&& other) = default;
 
-FileFaceOrientation& FileFaceOrientation::
-operator=(const FileFaceOrientation& other)
-{
-  if (&other != this) {
-    name               = other.name;
-    worldAxisForNormal = other.worldAxisForNormal;
-    worldAxisForFileX  = other.worldAxisForFileX;
-    worldAxisForFileY  = other.worldAxisForFileY;
-  }
-
-  return *this;
-}
-
-FileFaceOrientation& FileFaceOrientation::operator=(FileFaceOrientation&& other)
-{
-  if (&other != this) {
-    name               = std::move(other.name);
-    worldAxisForNormal = std::move(other.worldAxisForNormal);
-    worldAxisForFileX  = std::move(other.worldAxisForFileX);
-    worldAxisForFileY  = std::move(other.worldAxisForFileY);
-  }
-
-  return *this;
-}
-
-FileFaceOrientation::~FileFaceOrientation()
-{
-}
+FileFaceOrientation::~FileFaceOrientation() = default;
 
 } // end of namespace BABYLON

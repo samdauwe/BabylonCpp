@@ -89,9 +89,7 @@ RuntimeAnimation::RuntimeAnimation(const IAnimatablePtr& iTarget,
                       _animation->enableBlending;
 }
 
-RuntimeAnimation::~RuntimeAnimation()
-{
-}
+RuntimeAnimation::~RuntimeAnimation() = default;
 
 void RuntimeAnimation::addToRuntimeAnimations(
   const RuntimeAnimationPtr& animation)

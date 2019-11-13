@@ -12,9 +12,7 @@ PerformanceMonitor::PerformanceMonitor(std::size_t frameSampleSize)
 {
 }
 
-PerformanceMonitor::~PerformanceMonitor()
-{
-}
+PerformanceMonitor::~PerformanceMonitor() = default;
 
 void PerformanceMonitor::sampleFrame()
 {

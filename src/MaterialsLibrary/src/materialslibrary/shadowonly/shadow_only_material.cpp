@@ -28,9 +28,7 @@ ShadowOnlyMaterial::ShadowOnlyMaterial(const std::string& iName, Scene* scene)
 {
 }
 
-ShadowOnlyMaterial::~ShadowOnlyMaterial()
-{
-}
+ShadowOnlyMaterial::~ShadowOnlyMaterial() = default;
 
 IShadowLightPtr& ShadowOnlyMaterial::get_activeLight()
 {

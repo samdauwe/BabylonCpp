@@ -27,7 +27,7 @@ public:
   CylinderParticleEmitter(float radius = 1.f, float height = 1.f,
                           float radiusRange         = 1.f,
                           float directionRandomizer = 0.f);
-  virtual ~CylinderParticleEmitter();
+  virtual ~CylinderParticleEmitter(); // = default
 
   /**
    * @brief Called by the particle System when the direction is computed for the

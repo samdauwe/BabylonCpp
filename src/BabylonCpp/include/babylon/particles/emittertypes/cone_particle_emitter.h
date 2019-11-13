@@ -25,7 +25,7 @@ public:
    */
   ConeParticleEmitter(float radius = 1.f, float angle = Math::PI,
                       float directionRandomizer = 0.f);
-  virtual ~ConeParticleEmitter();
+  virtual ~ConeParticleEmitter(); // = default
 
   /**
    * @brief Called by the particle System when the direction is computed for the

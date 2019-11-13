@@ -16,9 +16,7 @@ ParticleSystemSet::ParticleSystemSet()
 {
 }
 
-ParticleSystemSet::~ParticleSystemSet()
-{
-}
+ParticleSystemSet::~ParticleSystemSet() = default;
 
 TransformNodePtr& ParticleSystemSet::get_emitterNode()
 {

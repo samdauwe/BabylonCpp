@@ -65,9 +65,7 @@ void EquiRectangularCubeTexture::loadImage(
 {
 }
 
-EquiRectangularCubeTexture::~EquiRectangularCubeTexture()
-{
-}
+EquiRectangularCubeTexture::~EquiRectangularCubeTexture() = default;
 
 void EquiRectangularCubeTexture::loadTexture()
 {

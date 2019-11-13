@@ -84,9 +84,7 @@ VolumetricLightScatteringPostProcess::VolumetricLightScatteringPostProcess(
   });
 }
 
-VolumetricLightScatteringPostProcess::~VolumetricLightScatteringPostProcess()
-{
-}
+VolumetricLightScatteringPostProcess::~VolumetricLightScatteringPostProcess() = default;
 
 const std::string VolumetricLightScatteringPostProcess::getClassName() const
 {

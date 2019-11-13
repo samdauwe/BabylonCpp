@@ -27,9 +27,7 @@ RayHelper::RayHelper(const Ray& iRay)
 {
 }
 
-RayHelper::~RayHelper()
-{
-}
+RayHelper::~RayHelper() = default;
 
 void RayHelper::show(Scene* scene)
 {

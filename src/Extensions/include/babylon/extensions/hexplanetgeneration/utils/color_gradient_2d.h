@@ -25,7 +25,7 @@ class ColorGradient2D {
 
 public:
   ColorGradient2D(float resolution);
-  ~ColorGradient2D();
+  ~ColorGradient2D(); // = default
 
   void addColorStop(float u, float v, const Color3& color);
   Color3 getColor(float u, float v) const;

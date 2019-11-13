@@ -6,9 +6,7 @@ QuinticEase::QuinticEase() : EasingFunction{}
 {
 }
 
-QuinticEase::~QuinticEase()
-{
-}
+QuinticEase::~QuinticEase() = default;
 
 float QuinticEase::easeInCore(float gradient) const
 {

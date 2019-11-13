@@ -20,9 +20,7 @@ PassCubePostProcess::PassCubePostProcess(const std::string& iName, float ratio,
 {
 }
 
-PassCubePostProcess::~PassCubePostProcess()
-{
-}
+PassCubePostProcess::~PassCubePostProcess() = default;
 
 unsigned int PassCubePostProcess::get_face() const
 {

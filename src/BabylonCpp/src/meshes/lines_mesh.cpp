@@ -60,9 +60,7 @@ LinesMesh::LinesMesh(const std::string& iName, Scene* scene, Node* iParent,
     = ShaderMaterial::New("colorShader", getScene(), "color", options);
 }
 
-LinesMesh::~LinesMesh()
-{
-}
+LinesMesh::~LinesMesh() = default;
 
 void LinesMesh::_addClipPlaneDefine(const std::string& label)
 {

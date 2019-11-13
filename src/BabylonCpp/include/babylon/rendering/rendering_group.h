@@ -55,7 +55,7 @@ public:
                  const std::function<bool(const SubMesh* a, const SubMesh* b)>&
                    transparentSortCompareFn
                  = nullptr);
-  ~RenderingGroup();
+  ~RenderingGroup(); // = default
 
   /**
    * @brief Render all the sub meshes contained in the group.

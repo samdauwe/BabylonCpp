@@ -9,9 +9,7 @@ LensFlaresOptimization::LensFlaresOptimization(int iPriority)
 {
 }
 
-LensFlaresOptimization::~LensFlaresOptimization()
-{
-}
+LensFlaresOptimization::~LensFlaresOptimization() = default;
 
 bool LensFlaresOptimization::apply(Scene* scene)
 {

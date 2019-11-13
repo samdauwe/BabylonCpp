@@ -12,13 +12,9 @@ Matrix3::Matrix3()
 {
 }
 
-Matrix3::Matrix3(const Matrix3& other) : m{other.m}
-{
-}
+Matrix3::Matrix3(const Matrix3& other) = default;
 
-Matrix3::~Matrix3()
-{
-}
+Matrix3::~Matrix3() = default;
 
 Matrix3 Matrix3::operator*(const Matrix3& rkMatrix) const
 {

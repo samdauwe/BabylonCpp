@@ -12,9 +12,7 @@ BackEase::BackEase(float iAmplitude) : EasingFunction{}, amplitude{iAmplitude}
 {
 }
 
-BackEase::~BackEase()
-{
-}
+BackEase::~BackEase() = default;
 
 float BackEase::easeInCore(float gradient) const
 {

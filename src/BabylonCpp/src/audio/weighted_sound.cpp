@@ -46,9 +46,7 @@ WeightedSound::WeightedSound(bool iLoop, const std::vector<SoundPtr>& sounds,
   }
 }
 
-WeightedSound::~WeightedSound()
-{
-}
+WeightedSound::~WeightedSound() = default;
 
 float WeightedSound::get_directionalConeInnerAngle() const
 {

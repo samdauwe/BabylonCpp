@@ -28,7 +28,7 @@ public:
 
     return mesh;
   }
-  ~LinesMesh() override;
+  ~LinesMesh(); // = default
 
   /**
    * @brief Hidden

@@ -149,9 +149,7 @@ SceneInstrumentation::SceneInstrumentation(Scene* iScene)
     });
 }
 
-SceneInstrumentation::~SceneInstrumentation()
-{
-}
+SceneInstrumentation::~SceneInstrumentation() = default;
 
 PerfCounter& SceneInstrumentation::get_activeMeshesEvaluationTimeCounter()
 {

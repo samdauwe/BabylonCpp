@@ -28,7 +28,7 @@ public:
   BoundingBox(BoundingBox&& other);
   BoundingBox& operator=(const BoundingBox& other);
   BoundingBox& operator=(BoundingBox&& other);
-  virtual ~BoundingBox();
+  virtual ~BoundingBox(); // = default
 
   // Methods
 

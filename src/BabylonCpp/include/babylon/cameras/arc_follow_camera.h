@@ -30,7 +30,7 @@ public:
 
     return camera;
   }
-  ~ArcFollowCamera() override;
+  ~ArcFollowCamera(); // = default
 
   virtual Type type() const override;
 

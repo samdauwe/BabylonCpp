@@ -13,9 +13,7 @@ IMaterialBRDFDefines::IMaterialBRDFDefines() : MaterialDefines{}
   };
 }
 
-IMaterialBRDFDefines::~IMaterialBRDFDefines()
-{
-}
+IMaterialBRDFDefines::~IMaterialBRDFDefines() = default;
 
 std::string IMaterialBRDFDefines::toString() const
 {

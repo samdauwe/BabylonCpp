@@ -10,7 +10,7 @@ namespace MaterialsLibrary {
 struct BABYLON_SHARED_EXPORT LavaMaterialDefines : public MaterialDefines {
 
   LavaMaterialDefines();
-  ~LavaMaterialDefines();
+  ~LavaMaterialDefines(); // = default
 
 }; // end of struct LavaMaterialDefines
 

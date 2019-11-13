@@ -12,7 +12,7 @@ class BABYLON_SHARED_EXPORT EffectIncludesShadersStore {
 
 public:
   EffectIncludesShadersStore();
-  ~EffectIncludesShadersStore();
+  ~EffectIncludesShadersStore(); // = default
 
   std::unordered_map<std::string, std::string>& shaders();
   const std::unordered_map<std::string, std::string>& shaders() const;

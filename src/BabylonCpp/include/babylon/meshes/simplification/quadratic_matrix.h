@@ -19,7 +19,7 @@ public:
   QuadraticMatrix(QuadraticMatrix&& other);
   QuadraticMatrix& operator=(const QuadraticMatrix& other);
   QuadraticMatrix& operator=(QuadraticMatrix&& other);
-  ~QuadraticMatrix();
+  ~QuadraticMatrix(); // = default
 
   float det(unsigned int a11, unsigned int a12, unsigned int a13, //
             unsigned int a21, unsigned int a22, int unsigned a23, //

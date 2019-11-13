@@ -25,7 +25,7 @@ public:
   _MeshCollisionData(_MeshCollisionData&& other);
   _MeshCollisionData& operator=(const _MeshCollisionData& other);
   _MeshCollisionData& operator=(_MeshCollisionData&& other);
-  ~_MeshCollisionData();
+  ~_MeshCollisionData(); // = default
 
 public:
   bool _checkCollisions;

@@ -40,9 +40,7 @@ BrickProceduralTexture::BrickProceduralTexture(const std::string& iName,
   updateShaderUniforms();
 }
 
-BrickProceduralTexture::~BrickProceduralTexture()
-{
-}
+BrickProceduralTexture::~BrickProceduralTexture() = default;
 
 void BrickProceduralTexture::updateShaderUniforms()
 {

@@ -13,7 +13,7 @@ struct BABYLON_SHARED_EXPORT IMaterialClearCoatDefines
     : public MaterialDefines {
 
   IMaterialClearCoatDefines();
-  ~IMaterialClearCoatDefines() override;
+  ~IMaterialClearCoatDefines(); // = default
 
   /**
    * @brief Converts the material define values to a string.

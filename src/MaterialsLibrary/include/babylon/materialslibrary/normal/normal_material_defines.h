@@ -10,7 +10,7 @@ namespace MaterialsLibrary {
 struct BABYLON_SHARED_EXPORT NormalMaterialDefines : public MaterialDefines {
 
   NormalMaterialDefines();
-  ~NormalMaterialDefines();
+  ~NormalMaterialDefines(); // = default
 
 }; // end of struct NormalMaterialDefines
 

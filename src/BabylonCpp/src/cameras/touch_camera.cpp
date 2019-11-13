@@ -87,9 +87,7 @@ TouchCamera::TouchCamera::TouchCamera(const std::string& iName,
   _setupInputs();
 }
 
-TouchCamera::~TouchCamera()
-{
-}
+TouchCamera::~TouchCamera() = default;
 
 const std::string TouchCamera::getClassName() const
 {

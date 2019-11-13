@@ -28,7 +28,7 @@ public:
 public:
   AnimationGroupTreeItemComponent(
     const IAnimationGroupTreeItemComponentProps& props);
-  virtual ~AnimationGroupTreeItemComponent() override;
+  virtual ~AnimationGroupTreeItemComponent(); // = default
 
   void render() override;
 

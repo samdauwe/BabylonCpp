@@ -15,7 +15,7 @@ class Rainmap {
 
 public:
   Rainmap(const std::string& seed, float maxRain, float height, float width);
-  ~Rainmap();
+  ~Rainmap(); // = default
 
   void generateRainmap();
   float getRainfall(float u, float v) const;

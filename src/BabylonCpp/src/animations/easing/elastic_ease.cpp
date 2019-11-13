@@ -15,9 +15,7 @@ ElasticEase::ElasticEase(int iOscillations, int iSpringiness)
 {
 }
 
-ElasticEase::~ElasticEase()
-{
-}
+ElasticEase::~ElasticEase() = default;
 
 float ElasticEase::easeInCore(float gradient) const
 {

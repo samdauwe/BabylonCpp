@@ -28,7 +28,7 @@ public:
   MeshLODLevel(MeshLODLevel&& other);
   MeshLODLevel& operator=(const MeshLODLevel& other);
   MeshLODLevel& operator=(MeshLODLevel&& other);
-  ~MeshLODLevel();
+  ~MeshLODLevel(); // = default
 
   bool operator==(const MeshLODLevel& other) const;
   bool operator!=(const MeshLODLevel& other) const;

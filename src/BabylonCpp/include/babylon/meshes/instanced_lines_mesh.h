@@ -26,7 +26,7 @@ public:
 
     return mesh;
   }
-  ~InstancedLinesMesh() override;
+  ~InstancedLinesMesh(); // = default
 
   /**
    * @brief Returns the string "InstancedLinesMesh".

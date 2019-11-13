@@ -139,9 +139,7 @@ BackgroundMaterialDefines::BackgroundMaterialDefines() : MaterialDefines{}
   };
 }
 
-BackgroundMaterialDefines::~BackgroundMaterialDefines()
-{
-}
+BackgroundMaterialDefines::~BackgroundMaterialDefines() = default;
 
 void BackgroundMaterialDefines::reset()
 {

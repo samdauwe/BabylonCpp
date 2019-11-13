@@ -37,7 +37,7 @@ public:
    */
   PBRAnisotropicConfiguration(
     const std::function<void()>& markAllSubMeshesAsTexturesDirty);
-  ~PBRAnisotropicConfiguration();
+  ~PBRAnisotropicConfiguration(); // = default
 
   /**
    * @brief Hidden

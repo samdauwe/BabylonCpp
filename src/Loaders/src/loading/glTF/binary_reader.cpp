@@ -12,9 +12,7 @@ BinaryReader::BinaryReader(const ArrayBuffer& arrayBuffer)
 {
 }
 
-BinaryReader::~BinaryReader()
-{
-}
+BinaryReader::~BinaryReader() = default;
 
 size_t BinaryReader::getPosition() const
 {

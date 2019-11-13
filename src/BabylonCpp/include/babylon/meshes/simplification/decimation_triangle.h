@@ -14,7 +14,7 @@ class BABYLON_SHARED_EXPORT DecimationTriangle {
 
 public:
   DecimationTriangle(const std::vector<DecimationVertex>& vertices);
-  ~DecimationTriangle();
+  ~DecimationTriangle(); // = default
 
 public:
   Vector3 normal;

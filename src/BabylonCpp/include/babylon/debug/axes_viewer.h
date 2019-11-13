@@ -36,7 +36,7 @@ public:
              const std::optional<int>& renderingGroupId = 2,
              TransformNodePtr xAxis = nullptr, TransformNodePtr yAxis = nullptr,
              TransformNodePtr zAxis = nullptr);
-  ~AxesViewer();
+  ~AxesViewer(); // = default
 
   /**
    * @brief Force the viewer to update.

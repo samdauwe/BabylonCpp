@@ -14,9 +14,7 @@ FadeInOutBehavior::FadeInOutBehavior()
 {
 }
 
-FadeInOutBehavior::~FadeInOutBehavior()
-{
-}
+FadeInOutBehavior::~FadeInOutBehavior() = default;
 
 const char* FadeInOutBehavior::name() const
 {

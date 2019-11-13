@@ -24,7 +24,7 @@ public:
    * @see http://doc.babylonjs.com/how_to/customizing_camera_inputs
    */
   FlyCameraMouseInput(bool touchEnabled = true);
-  virtual ~FlyCameraMouseInput();
+  virtual ~FlyCameraMouseInput(); // = default
 
   /**
    * @brief Attach the mouse control to the HTML DOM element.

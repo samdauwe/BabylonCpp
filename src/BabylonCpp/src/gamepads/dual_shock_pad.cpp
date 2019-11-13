@@ -69,9 +69,7 @@ DualShockPad::DualShockPad(const std::string& iId, int iIndex,
   type = Gamepad::DUALSHOCK;
 }
 
-DualShockPad::~DualShockPad()
-{
-}
+DualShockPad::~DualShockPad() = default;
 
 void DualShockPad::onrighttriggerchanged(
   const std::function<void(float value)>& callback)

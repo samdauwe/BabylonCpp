@@ -112,9 +112,7 @@ VertexBuffer::VertexBuffer(
   _instanceDivisor = _instanced ? 1 : 0;
 }
 
-VertexBuffer::~VertexBuffer()
-{
-}
+VertexBuffer::~VertexBuffer() = default;
 
 unsigned int VertexBuffer::get_instanceDivisor() const
 {

@@ -3,13 +3,9 @@
 namespace BABYLON {
 namespace Extensions {
 
-Polyhedra::Polyhedra()
-{
-}
+Polyhedra::Polyhedra() = default;
 
-Polyhedra::~Polyhedra()
-{
-}
+Polyhedra::~Polyhedra() = default;
 
 const std::array<Polyhedron, 126>& Polyhedra::models() const
 {

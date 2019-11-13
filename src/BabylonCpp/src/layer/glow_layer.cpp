@@ -68,9 +68,7 @@ GlowLayer::GlowLayer(const std::string& iName, Scene* scene,
   _init(effectLayerOptions);
 }
 
-GlowLayer::~GlowLayer()
-{
-}
+GlowLayer::~GlowLayer() = default;
 
 void GlowLayer::set_blurKernelSize(float value)
 {

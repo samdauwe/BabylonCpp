@@ -10,9 +10,7 @@ SineEase::SineEase() : EasingFunction{}
 {
 }
 
-SineEase::~SineEase()
-{
-}
+SineEase::~SineEase() = default;
 
 float SineEase::easeInCore(float gradient) const
 {

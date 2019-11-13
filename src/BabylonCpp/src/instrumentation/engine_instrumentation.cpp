@@ -26,9 +26,7 @@ EngineInstrumentation::EngineInstrumentation(Engine* engine)
 {
 }
 
-EngineInstrumentation::~EngineInstrumentation()
-{
-}
+EngineInstrumentation::~EngineInstrumentation() = default;
 
 PerfCounter& EngineInstrumentation::get_gpuFrameTimeCounter()
 {

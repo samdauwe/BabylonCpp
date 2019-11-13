@@ -60,9 +60,7 @@ PBRBaseSimpleMaterial::PBRBaseSimpleMaterial(const std::string& iName,
   _useAmbientInGrayScale     = true;
 }
 
-PBRBaseSimpleMaterial::~PBRBaseSimpleMaterial()
-{
-}
+PBRBaseSimpleMaterial::~PBRBaseSimpleMaterial() = default;
 
 const std::string PBRBaseSimpleMaterial::getClassName() const
 {

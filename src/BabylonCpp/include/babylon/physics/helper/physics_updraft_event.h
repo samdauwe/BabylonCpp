@@ -33,7 +33,7 @@ public:
    */
   PhysicsUpdraftEvent(Scene* scene, const Vector3& origin,
                       const PhysicsUpdraftEventOptions& options);
-  ~PhysicsUpdraftEvent();
+  ~PhysicsUpdraftEvent(); // = default
 
   /**
    * @brief Returns the data related to the updraft event (cylinder).

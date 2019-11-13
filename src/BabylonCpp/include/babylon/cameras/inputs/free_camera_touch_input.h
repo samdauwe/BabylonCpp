@@ -22,7 +22,7 @@ public:
    * @brief Instantiate the input.
    */
   FreeCameraTouchInput();
-  virtual ~FreeCameraTouchInput();
+  virtual ~FreeCameraTouchInput(); // = default
 
   /**
    * @brief Attach the input controls to a specific dom element to get the input

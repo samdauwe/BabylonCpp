@@ -22,9 +22,7 @@ ShadowOnlyMaterialDefines::ShadowOnlyMaterialDefines() : MaterialDefines{}
   };
 }
 
-ShadowOnlyMaterialDefines::~ShadowOnlyMaterialDefines()
-{
-}
+ShadowOnlyMaterialDefines::~ShadowOnlyMaterialDefines() = default;
 
 } // end of namespace MaterialsLibrary
 } // end of namespace BABYLON

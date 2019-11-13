@@ -40,9 +40,7 @@ RotationGizmo::RotationGizmo(const UtilityLayerRendererPtr& iGizmoLayer,
   attachedMesh = nullptr;
 }
 
-RotationGizmo::~RotationGizmo()
-{
-}
+RotationGizmo::~RotationGizmo() = default;
 
 AbstractMeshPtr& RotationGizmo::get_attachedMesh()
 {

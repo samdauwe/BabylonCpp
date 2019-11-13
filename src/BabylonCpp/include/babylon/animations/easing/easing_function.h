@@ -33,7 +33,7 @@ public:
 
 public:
   EasingFunction();
-  virtual ~EasingFunction() override;
+  virtual ~EasingFunction(); // = default
 
   /**
    * @brief Sets the easing mode of the current function.

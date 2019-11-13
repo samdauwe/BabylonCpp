@@ -27,7 +27,7 @@ public:
 
 public:
   TextureTreeItemComponent(const ITextureTreeItemComponentProps& props);
-  virtual ~TextureTreeItemComponent() override;
+  virtual ~TextureTreeItemComponent(); // = default
 
   void render() override;
 

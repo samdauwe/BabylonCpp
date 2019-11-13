@@ -143,9 +143,7 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
   _resyncLightSources();
 }
 
-AbstractMesh::~AbstractMesh()
-{
-}
+AbstractMesh::~AbstractMesh() = default;
 
 Type AbstractMesh::type() const
 {

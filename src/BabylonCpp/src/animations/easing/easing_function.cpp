@@ -11,9 +11,7 @@ EasingFunction::EasingFunction()
 {
 }
 
-EasingFunction::~EasingFunction()
-{
-}
+EasingFunction::~EasingFunction() = default;
 
 void EasingFunction::setEasingMode(unsigned int easingMode)
 {

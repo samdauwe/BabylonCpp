@@ -14,9 +14,7 @@ CustomMaterial::CustomMaterial(const std::string& iName, Scene* scene)
 {
 }
 
-CustomMaterial::~CustomMaterial()
-{
-}
+CustomMaterial::~CustomMaterial() = default;
 
 void CustomMaterial::AttachAfterBind(Mesh* /*mesh*/, Effect* effect)
 {

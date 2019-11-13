@@ -29,7 +29,7 @@ public:
   Arc2(Arc2&& otherArc);
   Arc2& operator=(const Arc2& otherArc);
   Arc2& operator=(Arc2&& otherArc);
-  ~Arc2();
+  ~Arc2(); // = default
   Arc2 copy() const;
   std::unique_ptr<Arc2> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Arc2& arc);

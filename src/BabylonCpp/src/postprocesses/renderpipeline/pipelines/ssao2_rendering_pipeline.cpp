@@ -115,9 +115,7 @@ SSAO2RenderingPipeline::SSAO2RenderingPipeline(
     true));
 }
 
-SSAO2RenderingPipeline::~SSAO2RenderingPipeline()
-{
-}
+SSAO2RenderingPipeline::~SSAO2RenderingPipeline() = default;
 
 void SSAO2RenderingPipeline::addToScene(
   const SSAO2RenderingPipelinePtr& ssao2RenderingPipeline)

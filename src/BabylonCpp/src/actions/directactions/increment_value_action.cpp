@@ -18,9 +18,7 @@ IncrementValueAction::IncrementValueAction(unsigned int iTtriggerOptions,
 {
 }
 
-IncrementValueAction::~IncrementValueAction()
-{
-}
+IncrementValueAction::~IncrementValueAction() = default;
 
 void IncrementValueAction::_prepare()
 {

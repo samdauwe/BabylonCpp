@@ -32,9 +32,7 @@ Gizmo::Gizmo(const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
   attachedMesh = nullptr;
 }
 
-Gizmo::~Gizmo()
-{
-}
+Gizmo::~Gizmo() = default;
 
 void Gizmo::set_scaleRatio(float value)
 {

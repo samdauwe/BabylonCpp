@@ -36,7 +36,7 @@ public:
 
 public:
   MeshTreeItemComponent(const IMeshTreeItemComponentProps& props);
-  virtual ~MeshTreeItemComponent() override;
+  virtual ~MeshTreeItemComponent(); // = default
 
   void showBoundingBox();
   void switchVisibility();

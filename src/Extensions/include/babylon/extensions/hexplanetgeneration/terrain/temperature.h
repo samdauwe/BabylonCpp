@@ -16,7 +16,7 @@ class Temperature {
 public:
   Temperature(const std::string& seed, float minTemp, float maxTemp,
               float distortion, float height, float width);
-  ~Temperature();
+  ~Temperature(); // = default
 
   void setupTemperatureGradient();
   void generateTemperature();

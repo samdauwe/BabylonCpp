@@ -23,7 +23,7 @@ class Inspector {
 
 public:
   Inspector(GLFWwindow* glfwWindow = nullptr, Scene* scene = nullptr);
-  ~Inspector();
+  ~Inspector(); // = default
 
   Scene* scene() const;
   void setScene(Scene* scene);

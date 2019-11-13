@@ -25,13 +25,9 @@ namespace Extensions {
 
 const size_t World::UdefIdx = std::numeric_limits<size_t>::max();
 
-World::World()
-{
-}
+World::World() =  default;
 
-World::~World()
-{
-}
+World::~World() = default;
 
 void World::generatePlanet(Planet*& planet, unsigned long originalSeed,
                            unsigned long seed, size_t icosahedronSubdivision,

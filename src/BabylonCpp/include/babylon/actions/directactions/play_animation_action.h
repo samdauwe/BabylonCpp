@@ -27,7 +27,7 @@ public:
   PlayAnimationAction(unsigned int triggerOptions, const IAnimatablePtr& target,
                       float from, float to, bool loop = false,
                       Condition* condition = nullptr);
-  ~PlayAnimationAction() override;
+  ~PlayAnimationAction(); // = default
 
   /**
    * @brief Hidden

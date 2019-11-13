@@ -18,7 +18,7 @@ class BABYLON_SHARED_EXPORT WebGLDataBuffer
 
 public:
   WebGLDataBuffer(GL::IGLBuffer* resource);
-  virtual ~WebGLDataBuffer();
+  virtual ~WebGLDataBuffer(); // = default
 
   GL::IGLBuffer* underlyingResource() override;
 

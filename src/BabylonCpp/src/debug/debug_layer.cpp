@@ -6,9 +6,7 @@ DebugLayer::DebugLayer(Scene* scene) : _scene{scene}
 {
 }
 
-DebugLayer::~DebugLayer()
-{
-}
+DebugLayer::~DebugLayer() = default;
 
 void DebugLayer::hide()
 {

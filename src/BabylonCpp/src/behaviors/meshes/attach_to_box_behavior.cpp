@@ -25,9 +25,7 @@ AttachToBoxBehavior::AttachToBoxBehavior(const TransformNodePtr& iUi)
   /* Does nothing */
 }
 
-AttachToBoxBehavior::~AttachToBoxBehavior()
-{
-}
+AttachToBoxBehavior::~AttachToBoxBehavior() = default;
 
 void AttachToBoxBehavior::init()
 {

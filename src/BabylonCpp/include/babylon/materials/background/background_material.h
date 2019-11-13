@@ -46,7 +46,7 @@ public:
 
     return material;
   }
-  ~BackgroundMaterial() override;
+  ~BackgroundMaterial(); // = default
 
   /**
    * @brief The entire material has been created in order to prevent overdraw.

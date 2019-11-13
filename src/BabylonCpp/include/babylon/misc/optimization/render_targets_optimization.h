@@ -11,7 +11,7 @@ class BABYLON_SHARED_EXPORT RenderTargetsOptimization
 
 public:
   RenderTargetsOptimization(int priority = 0);
-  ~RenderTargetsOptimization() override;
+  ~RenderTargetsOptimization(); // = default
 
   bool apply(Scene* scene) override;
 

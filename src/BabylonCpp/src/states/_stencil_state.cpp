@@ -32,9 +32,7 @@ _StencilState::_StencilState()
   reset();
 }
 
-_StencilState::~_StencilState()
-{
-}
+_StencilState::~_StencilState() = default;
 
 bool _StencilState::get_isDirty() const
 {

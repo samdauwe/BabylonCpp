@@ -41,8 +41,6 @@ VRDistortionCorrectionPostProcess::VRDistortionCorrectionPostProcess(
   });
 }
 
-VRDistortionCorrectionPostProcess::~VRDistortionCorrectionPostProcess()
-{
-}
+VRDistortionCorrectionPostProcess::~VRDistortionCorrectionPostProcess() = default;
 
 } // end of namespace BABYLON

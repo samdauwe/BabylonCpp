@@ -216,9 +216,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
   BABYLON_LOGF_INFO("Engine", "BabylonCpp engine (v%s) launched", Engine::Version().c_str())
 }
 
-Engine::~Engine()
-{
-}
+Engine::~Engine() = default;
 
 Engine* Engine::LastCreatedEngine()
 {

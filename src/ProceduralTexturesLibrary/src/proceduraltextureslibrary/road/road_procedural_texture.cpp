@@ -29,9 +29,7 @@ RoadProceduralTexture::RoadProceduralTexture(const std::string& iName,
   updateShaderUniforms();
 }
 
-RoadProceduralTexture::~RoadProceduralTexture()
-{
-}
+RoadProceduralTexture::~RoadProceduralTexture() = default;
 
 void RoadProceduralTexture::updateShaderUniforms()
 {

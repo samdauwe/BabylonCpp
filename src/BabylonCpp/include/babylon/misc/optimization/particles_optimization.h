@@ -10,7 +10,7 @@ class BABYLON_SHARED_EXPORT ParticlesOptimization : public SceneOptimization {
 
 public:
   ParticlesOptimization(int priority = 0);
-  ~ParticlesOptimization() override;
+  ~ParticlesOptimization(); // = default
 
   bool apply(Scene* scene) override;
 

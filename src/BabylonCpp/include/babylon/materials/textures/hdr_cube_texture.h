@@ -27,7 +27,7 @@ public:
 
     return texture;
   }
-  ~HDRCubeTexture() override;
+  ~HDRCubeTexture(); // = default
 
   /**
    * @brief Get the current class name of the texture useful for serialization

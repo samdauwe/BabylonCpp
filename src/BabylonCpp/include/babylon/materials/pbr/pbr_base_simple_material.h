@@ -24,7 +24,7 @@ public:
    * @param scene The scene the material will be use in.
    */
   PBRBaseSimpleMaterial(const std::string& name, Scene* scene);
-  ~PBRBaseSimpleMaterial() override;
+  ~PBRBaseSimpleMaterial(); // = default
 
   /**
    * @brief Returns the string "PBRBaseSimpleMaterial".

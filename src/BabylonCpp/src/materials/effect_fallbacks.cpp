@@ -16,53 +16,15 @@ EffectFallbacks::EffectFallbacks()
 {
 }
 
-EffectFallbacks::EffectFallbacks(const EffectFallbacks& other)
-    : _defines{other._defines}
-    , _currentRank{other._currentRank}
-    , _maxRank{other._maxRank}
-    , _mesh{other._mesh}
-    , _meshRank{other._meshRank}
-{
-}
+EffectFallbacks::EffectFallbacks(const EffectFallbacks& other) = default;
 
-EffectFallbacks::EffectFallbacks(EffectFallbacks&& other)
-    : _defines{std::move(other._defines)}
-    , _currentRank{std::move(other._currentRank)}
-    , _maxRank{std::move(other._maxRank)}
-    , _mesh{std::move(other._mesh)}
-    , _meshRank{std::move(other._meshRank)}
-{
-}
+EffectFallbacks::EffectFallbacks(EffectFallbacks&& other) = default;
 
-EffectFallbacks& EffectFallbacks::operator=(const EffectFallbacks& other)
-{
-  if (&other != this) {
-    _defines     = other._defines;
-    _currentRank = other._currentRank;
-    _maxRank     = other._maxRank;
-    _mesh        = other._mesh;
-    _meshRank    = other._meshRank;
-  }
+EffectFallbacks& EffectFallbacks::operator=(const EffectFallbacks& other) = default;
 
-  return *this;
-}
+EffectFallbacks& EffectFallbacks::operator=(EffectFallbacks&& other) = default;
 
-EffectFallbacks& EffectFallbacks::operator=(EffectFallbacks&& other)
-{
-  if (&other != this) {
-    _defines     = std::move(other._defines);
-    _currentRank = std::move(other._currentRank);
-    _maxRank     = std::move(other._maxRank);
-    _mesh        = std::move(other._mesh);
-    _meshRank    = std::move(other._meshRank);
-  }
-
-  return *this;
-}
-
-EffectFallbacks::~EffectFallbacks()
-{
-}
+EffectFallbacks::~EffectFallbacks() = default;
 
 bool EffectFallbacks::operator==(const EffectFallbacks& other) const
 {

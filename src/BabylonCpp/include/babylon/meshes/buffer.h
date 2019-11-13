@@ -54,7 +54,7 @@ public:
          bool postponeInternalCreation = false, bool instanced = false,
          bool useBytes = false);
 
-  virtual ~Buffer();
+  virtual ~Buffer(); // = default
 
   /**
    * @brief Create a new VertexBuffer based on the current buffer.

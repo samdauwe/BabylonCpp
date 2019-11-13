@@ -224,9 +224,7 @@ PlaneRotationGizmo::PlaneRotationGizmo(
     light->includedOnlyMeshes(), _rootMesh->getChildMeshes(false));
 }
 
-PlaneRotationGizmo::~PlaneRotationGizmo()
-{
-}
+PlaneRotationGizmo::~PlaneRotationGizmo() = default;
 
 void PlaneRotationGizmo::_attachedMeshChanged(const AbstractMeshPtr& value)
 {

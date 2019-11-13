@@ -14,49 +14,15 @@ Quaternion::Quaternion(float ix, float iy, float iz, float iw)
 {
 }
 
-Quaternion::Quaternion(const Quaternion& otherQuaternion)
-    : x{otherQuaternion.x}
-    , y{otherQuaternion.y}
-    , z{otherQuaternion.z}
-    , w{otherQuaternion.w}
-{
-}
+Quaternion::Quaternion(const Quaternion& otherQuaternion) = default;
 
-Quaternion::Quaternion(Quaternion&& otherQuaternion)
-    : x{std::move(otherQuaternion.x)}
-    , y{std::move(otherQuaternion.y)}
-    , z{std::move(otherQuaternion.z)}
-    , w{std::move(otherQuaternion.w)}
-{
-}
+Quaternion::Quaternion(Quaternion&& otherQuaternion) = default;
 
-Quaternion& Quaternion::operator=(const Quaternion& otherQuaternion)
-{
-  if (&otherQuaternion != this) {
-    x = otherQuaternion.x;
-    y = otherQuaternion.y;
-    z = otherQuaternion.z;
-    w = otherQuaternion.w;
-  }
+Quaternion& Quaternion::operator=(const Quaternion& otherQuaternion) = default;
 
-  return *this;
-}
+Quaternion& Quaternion::operator=(Quaternion&& otherQuaternion) = default;
 
-Quaternion& Quaternion::operator=(Quaternion&& otherQuaternion)
-{
-  if (&otherQuaternion != this) {
-    x = std::move(otherQuaternion.x);
-    y = std::move(otherQuaternion.y);
-    z = std::move(otherQuaternion.z);
-    w = std::move(otherQuaternion.w);
-  }
-
-  return *this;
-}
-
-Quaternion::~Quaternion()
-{
-}
+Quaternion::~Quaternion() = default;
 
 Quaternion Quaternion::copy() const
 {

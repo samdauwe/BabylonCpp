@@ -8,49 +8,18 @@ namespace BABYLON {
 
 const float CSG::Plane::EPSILON = 1e-5f;
 
-CSG::Plane::Plane()
-{
-}
+CSG::Plane::Plane() = default;
 
 CSG::Plane::Plane(const Vector3& _normal, float _w) : normal{_normal}, w{_w}
 {
 }
 
-BABYLON::CSG::Plane::Plane(const BABYLON::CSG::Plane& otherPlane)
-    : normal{otherPlane.normal}, w{otherPlane.w}
-{
-}
+BABYLON::CSG::Plane::Plane(const BABYLON::CSG::Plane& otherPlane) = default;
+BABYLON::CSG::Plane::Plane(BABYLON::CSG::Plane&& otherPlane) = default;
+BABYLON::CSG::Plane& BABYLON::CSG::Plane::operator=(const BABYLON::CSG::Plane& otherPlane) = default;
+BABYLON::CSG::Plane& BABYLON::CSG::Plane::operator=(BABYLON::CSG::Plane&& otherPlane) = default;
 
-BABYLON::CSG::Plane::Plane(BABYLON::CSG::Plane&& otherPlane)
-    : normal{std::move(otherPlane.normal)}, w{std::move(otherPlane.w)}
-{
-}
-
-BABYLON::CSG::Plane& BABYLON::CSG::Plane::
-operator=(const BABYLON::CSG::Plane& otherPlane)
-{
-  if (&otherPlane != this) {
-    normal = otherPlane.normal;
-    w      = otherPlane.w;
-  }
-
-  return *this;
-}
-
-BABYLON::CSG::Plane& BABYLON::CSG::Plane::
-operator=(BABYLON::CSG::Plane&& otherPlane)
-{
-  if (&otherPlane != this) {
-    normal = std::move(otherPlane.normal);
-    w      = std::move(otherPlane.w);
-  }
-
-  return *this;
-}
-
-CSG::Plane::~Plane()
-{
-}
+CSG::Plane::~Plane() = default;
 
 CSG::Plane CSG::Plane::clone() const
 {

@@ -50,7 +50,7 @@ public:
 
     return outlineRenderer;
   }
-  virtual ~OutlineRenderer();
+  virtual ~OutlineRenderer(); // = default
 
   void addToScene(const OutlineRendererPtr& outlineRenderer);
 

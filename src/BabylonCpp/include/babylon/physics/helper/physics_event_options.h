@@ -34,7 +34,7 @@ public:
   operator=(const PhysicsRadialExplosionEventOptions& other);
   PhysicsRadialExplosionEventOptions&
   operator=(PhysicsRadialExplosionEventOptions&& other);
-  ~PhysicsRadialExplosionEventOptions();
+  ~PhysicsRadialExplosionEventOptions(); // = default
 
 public:
   /**

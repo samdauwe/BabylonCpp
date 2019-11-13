@@ -157,9 +157,7 @@ AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
                                                _rootMesh->getChildMeshes());
 }
 
-AxisScaleGizmo::~AxisScaleGizmo()
-{
-}
+AxisScaleGizmo::~AxisScaleGizmo() = default;
 
 void AxisScaleGizmo::_attachedMeshChanged(const AbstractMeshPtr& value)
 {

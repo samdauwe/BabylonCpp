@@ -46,7 +46,7 @@ public:
 
     return camera;
   }
-  ~ArcRotateCamera() override;
+  ~ArcRotateCamera(); // = default
 
   virtual Type type() const override;
 

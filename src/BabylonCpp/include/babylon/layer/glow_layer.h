@@ -59,7 +59,7 @@ public:
 
     return layer;
   }
-  ~GlowLayer() override;
+  ~GlowLayer(); // = default
 
   /**
    * @brief Get the effect name of the layer.

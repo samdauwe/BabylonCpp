@@ -21,7 +21,7 @@ struct BABYLON_SHARED_EXPORT IAnimationKey {
   IAnimationKey(IAnimationKey&& other);
   IAnimationKey& operator=(const IAnimationKey& other);
   IAnimationKey& operator=(IAnimationKey&& other);
-  ~IAnimationKey();
+  ~IAnimationKey(); // = default
 
   /**
    * Frame of the key frame

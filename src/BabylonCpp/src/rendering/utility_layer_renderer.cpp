@@ -253,9 +253,7 @@ UtilityLayerRenderer::UtilityLayerRenderer(Scene* iOriginalScene,
   _updateCamera();
 }
 
-UtilityLayerRenderer::~UtilityLayerRenderer()
-{
-}
+UtilityLayerRenderer::~UtilityLayerRenderer() = default;
 
 CameraPtr& UtilityLayerRenderer::getRenderCamera()
 {

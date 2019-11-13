@@ -8,9 +8,7 @@ Timer::Timer() : startTimeInMicroSec{0}, endTimeInMicroSec{0}, stopped{false}
   endCount.tv_sec = endCount.tv_usec = 0;
 }
 
-Timer::~Timer()
-{
-}
+Timer::~Timer() = default;
 
 void Timer::start()
 {

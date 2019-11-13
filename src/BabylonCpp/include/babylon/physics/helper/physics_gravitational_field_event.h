@@ -37,7 +37,7 @@ public:
   PhysicsGravitationalFieldEvent(
     PhysicsHelper* physicsHelper, Scene* scene, const Vector3& origin,
     const PhysicsRadialExplosionEventOptions& options);
-  ~PhysicsGravitationalFieldEvent();
+  ~PhysicsGravitationalFieldEvent(); // = default
 
   /**
    * @brief Returns the data related to the gravitational field event (sphere).

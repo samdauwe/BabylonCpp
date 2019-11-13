@@ -16,7 +16,7 @@ struct BABYLON_SHARED_EXPORT BufferPointer {
   BufferPointer();
   BufferPointer(bool active, unsigned int indx, int size, unsigned int type,
                 bool normalized, int stride, int offset, GL::IGLBuffer* buffer);
-  ~BufferPointer();
+  ~BufferPointer(); // = default
 
   bool active;
   unsigned int index;

@@ -17,9 +17,7 @@ HemisphericParticleEmitter::HemisphericParticleEmitter(
 {
 }
 
-HemisphericParticleEmitter::~HemisphericParticleEmitter()
-{
-}
+HemisphericParticleEmitter::~HemisphericParticleEmitter() = default;
 
 void HemisphericParticleEmitter::startDirectionFunction(
   const Matrix& worldMatrix, Vector3& directionToUpdate, Particle* particle)

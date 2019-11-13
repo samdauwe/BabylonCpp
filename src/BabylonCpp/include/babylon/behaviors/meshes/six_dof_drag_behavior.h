@@ -33,7 +33,7 @@ public:
    * ray.
    */
   SixDofDragBehavior();
-  virtual ~SixDofDragBehavior() override;
+  virtual ~SixDofDragBehavior(); // = default
 
   /**
    * @brief The name of the behavior.

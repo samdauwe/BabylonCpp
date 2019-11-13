@@ -15,9 +15,7 @@ ArcRotateCameraGamepadInput::ArcRotateCameraGamepadInput()
 {
 }
 
-ArcRotateCameraGamepadInput::~ArcRotateCameraGamepadInput()
-{
-}
+ArcRotateCameraGamepadInput::~ArcRotateCameraGamepadInput() = default;
 
 void ArcRotateCameraGamepadInput::attachControl(ICanvas* /*canvas*/,
                                                 bool /*noPreventDefault*/)

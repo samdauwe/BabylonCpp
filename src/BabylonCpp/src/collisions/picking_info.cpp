@@ -24,81 +24,15 @@ PickingInfo::PickingInfo()
 {
 }
 
-PickingInfo::PickingInfo(const PickingInfo& other)
-    : _pickingUnavailable{other._pickingUnavailable}
-    , hit{other.hit}
-    , distance{other.distance}
-    , pickedPoint{other.pickedPoint}
-    , pickedMesh{other.pickedMesh}
-    , bu{other.bu}
-    , bv{other.bv}
-    , faceId{other.faceId}
-    , subMeshId{other.subMeshId}
-    , pickedSprite{other.pickedSprite}
-    , originMesh{other.originMesh}
-    , ray{other.ray}
-{
-}
+PickingInfo::PickingInfo(const PickingInfo& other) = default;
 
-PickingInfo::PickingInfo(PickingInfo&& other)
-    : _pickingUnavailable{std::move(other._pickingUnavailable)}
-    , hit{std::move(other.hit)}
-    , distance{std::move(other.distance)}
-    , pickedPoint{std::move(other.pickedPoint)}
-    , pickedMesh{std::move(other.pickedMesh)}
-    , bu{std::move(other.bu)}
-    , bv{std::move(other.bv)}
-    , faceId{std::move(other.faceId)}
-    , subMeshId{std::move(other.subMeshId)}
-    , pickedSprite{std::move(other.pickedSprite)}
-    , originMesh{std::move(other.originMesh)}
-    , ray{std::move(other.ray)}
-{
-}
+PickingInfo::PickingInfo(PickingInfo&& other) = default;
 
-PickingInfo& PickingInfo::operator=(const PickingInfo& other)
-{
-  if (&other != this) {
-    _pickingUnavailable = other._pickingUnavailable;
-    hit                 = other.hit;
-    distance            = other.distance;
-    pickedPoint         = other.pickedPoint;
-    pickedMesh          = other.pickedMesh;
-    bu                  = other.bu;
-    bv                  = other.bv;
-    faceId              = other.faceId;
-    subMeshId           = other.subMeshId;
-    pickedSprite        = other.pickedSprite;
-    originMesh          = other.originMesh;
-    ray                 = other.ray;
-  }
+PickingInfo& PickingInfo::operator=(const PickingInfo& other) = default;
 
-  return *this;
-}
+PickingInfo& PickingInfo::operator=(PickingInfo&& other) = default;
 
-PickingInfo& PickingInfo::operator=(PickingInfo&& other)
-{
-  if (&other != this) {
-    _pickingUnavailable = std::move(other._pickingUnavailable);
-    hit                 = std::move(other.hit);
-    distance            = std::move(other.distance);
-    pickedPoint         = std::move(other.pickedPoint);
-    pickedMesh          = std::move(other.pickedMesh);
-    bu                  = std::move(other.bu);
-    bv                  = std::move(other.bv);
-    faceId              = std::move(other.faceId);
-    subMeshId           = std::move(other.subMeshId);
-    pickedSprite        = std::move(other.pickedSprite);
-    originMesh          = std::move(other.originMesh);
-    ray                 = std::move(other.ray);
-  }
-
-  return *this;
-}
-
-PickingInfo::~PickingInfo()
-{
-}
+PickingInfo::~PickingInfo() = default;
 
 std::optional<Vector3> PickingInfo::getNormal(bool useWorldCoordinates,
                                               bool useVerticesNormals)

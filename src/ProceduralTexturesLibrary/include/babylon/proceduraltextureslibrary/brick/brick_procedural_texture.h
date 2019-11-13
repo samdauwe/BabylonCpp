@@ -23,7 +23,7 @@ public:
 
     return texture;
   }
-  ~BrickProceduralTexture();
+  ~BrickProceduralTexture(); // = default
 
   void updateShaderUniforms();
 

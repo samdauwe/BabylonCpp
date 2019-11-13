@@ -28,7 +28,7 @@ public:
 
     return material;
   }
-  ~NormalMaterial() override;
+  ~NormalMaterial(); // = default
 
   Type type() const override;
 

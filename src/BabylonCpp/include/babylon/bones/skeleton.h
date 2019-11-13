@@ -47,7 +47,7 @@ public:
 
     return skeleton;
   }
-  virtual ~Skeleton() override;
+  virtual ~Skeleton(); // = default
 
   virtual Type type() const override;
 

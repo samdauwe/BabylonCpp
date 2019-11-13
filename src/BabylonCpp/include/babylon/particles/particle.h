@@ -34,7 +34,7 @@ public:
   Particle(Particle&& other);                 // Move constructor
   Particle& operator=(const Particle& other); // Copy assignment operator
   Particle& operator=(Particle&& other);      // Move assignment operator
-  ~Particle();                                // Destructor
+  ~Particle(); // = default
   Particle* clone() const;
 
   /**

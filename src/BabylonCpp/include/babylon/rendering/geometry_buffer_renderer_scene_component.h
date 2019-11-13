@@ -37,7 +37,7 @@ public:
     return std::shared_ptr<GeometryBufferRendererSceneComponent>(
       new GeometryBufferRendererSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~GeometryBufferRendererSceneComponent();
+  virtual ~GeometryBufferRendererSceneComponent(); // = default
 
   /**
    * @brief Registers the component in a given scene.

@@ -20,7 +20,7 @@ public:
    * @param event Defines the related dom event
    */
   ClipboardInfo(unsigned int type, const ClipboardEvent& event);
-  ~ClipboardInfo();
+  ~ClipboardInfo(); // = default
 
   /**
    * @brief Get the clipboard event's type from the keycode.

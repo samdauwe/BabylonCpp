@@ -13,9 +13,7 @@ ArcRotateCameraInputsManager::ArcRotateCameraInputsManager(
 {
 }
 
-ArcRotateCameraInputsManager::~ArcRotateCameraInputsManager()
-{
-}
+ArcRotateCameraInputsManager::~ArcRotateCameraInputsManager() = default;
 
 ArcRotateCameraInputsManager& ArcRotateCameraInputsManager::addMouseWheel()
 {

@@ -21,7 +21,7 @@ struct BABYLON_SHARED_EXPORT ArcRotateCameraInputsManager
    * @param camera Defines the camera the inputs belong to
    */
   ArcRotateCameraInputsManager(ArcRotateCamera* camera);
-  ~ArcRotateCameraInputsManager();
+  ~ArcRotateCameraInputsManager(); // = default
 
   /**
    * @brief Add mouse wheel input support to the input manager.

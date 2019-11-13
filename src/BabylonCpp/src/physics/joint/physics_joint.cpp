@@ -14,9 +14,7 @@ PhysicsJoint::PhysicsJoint(unsigned int iJointType,
 {
 }
 
-PhysicsJoint::~PhysicsJoint()
-{
-}
+PhysicsJoint::~PhysicsJoint() = default;
 
 PhysicsJoint*& PhysicsJoint::get_physicsJoint()
 {

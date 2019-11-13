@@ -32,7 +32,7 @@ public:
   Curve3(Curve3&& otherCurve);
   Curve3& operator=(const Curve3& otherCurve);
   Curve3& operator=(Curve3&& otherCurve);
-  ~Curve3();
+  ~Curve3(); // = default
   Curve3 copy() const;
   std::unique_ptr<Curve3> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Curve3& curve);

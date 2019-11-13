@@ -4,58 +4,22 @@
 
 namespace BABYLON {
 
-Viewport::Viewport()
-{
-}
+Viewport::Viewport() = default;
 
 Viewport::Viewport(float ix, float iy, float iwidth, float iheight)
     : x{ix}, y{iy}, width{iwidth}, height{iheight}
 {
 }
 
-Viewport::Viewport(const Viewport& otherViewport)
-    : x{otherViewport.x}
-    , y{otherViewport.y}
-    , width{otherViewport.width}
-    , height{otherViewport.height}
-{
-}
+Viewport::Viewport(const Viewport& otherViewport) = default;
 
-Viewport::Viewport(Viewport&& otherViewport)
-    : x{std::move(otherViewport.x)}
-    , y{std::move(otherViewport.y)}
-    , width{std::move(otherViewport.width)}
-    , height{std::move(otherViewport.height)}
-{
-}
+Viewport::Viewport(Viewport&& otherViewport) = default;
 
-Viewport& Viewport::operator=(const Viewport& otherViewport)
-{
-  if (&otherViewport != this) {
-    x      = otherViewport.x;
-    y      = otherViewport.y;
-    width  = otherViewport.width;
-    height = otherViewport.height;
-  }
+Viewport& Viewport::operator=(const Viewport& otherViewport) = default;
 
-  return *this;
-}
+Viewport& Viewport::operator=(Viewport&& otherViewport) = default;
 
-Viewport& Viewport::operator=(Viewport&& otherViewport)
-{
-  if (&otherViewport != this) {
-    x      = std::move(otherViewport.x);
-    y      = std::move(otherViewport.y);
-    width  = std::move(otherViewport.width);
-    height = std::move(otherViewport.height);
-  }
-
-  return *this;
-}
-
-Viewport::~Viewport()
-{
-}
+Viewport::~Viewport() = default;
 
 Viewport Viewport::copy() const
 {

@@ -27,7 +27,7 @@ public:
   RotationGizmo(const UtilityLayerRendererPtr& gizmoLayer
                 = UtilityLayerRenderer::DefaultUtilityLayer(),
                 unsigned int tessellation = 32, bool useEulerRotation = false);
-  ~RotationGizmo() override;
+  ~RotationGizmo(); // = default
 
   /**
    * @brief Disposes of the gizmo.

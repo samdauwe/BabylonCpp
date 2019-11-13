@@ -5,13 +5,9 @@
 
 namespace BABYLON {
 
-PostProcessRenderPipelineManager::PostProcessRenderPipelineManager()
-{
-}
+PostProcessRenderPipelineManager::PostProcessRenderPipelineManager() = default;
 
-PostProcessRenderPipelineManager::~PostProcessRenderPipelineManager()
-{
-}
+PostProcessRenderPipelineManager::~PostProcessRenderPipelineManager() = default;
 
 std::vector<PostProcessRenderPipelinePtr>
 PostProcessRenderPipelineManager::supportedPipelines()

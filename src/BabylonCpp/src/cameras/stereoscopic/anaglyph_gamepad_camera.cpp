@@ -34,9 +34,7 @@ AnaglyphGamepadCamera::AnaglyphGamepadCamera(const std::string& iName,
   setCameraRigMode(Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH, rigParams);
 }
 
-AnaglyphGamepadCamera::~AnaglyphGamepadCamera()
-{
-}
+AnaglyphGamepadCamera::~AnaglyphGamepadCamera() = default;
 
 const std::string AnaglyphGamepadCamera::getClassName() const
 {

@@ -13,7 +13,7 @@ struct BABYLON_SHARED_EXPORT CrowdMeshUpdaterSystem
   : ECS::System<ECS::Requires<CrowdAgent, CrowdMesh>> {
 
   CrowdMeshUpdaterSystem();
-  ~CrowdMeshUpdaterSystem();
+  ~CrowdMeshUpdaterSystem(); // = default
 
   void update();
 

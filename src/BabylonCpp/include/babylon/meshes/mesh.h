@@ -189,7 +189,7 @@ public:
 
     return mesh;
   }
-  ~Mesh() override;
+  ~Mesh(); // = default
 
   // Methods
   TransformNodePtr instantiateHierarychy(TransformNode* newParent = nullptr);

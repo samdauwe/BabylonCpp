@@ -37,7 +37,7 @@ public:
     return std::shared_ptr<DepthRendererSceneComponent>(
       new DepthRendererSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~DepthRendererSceneComponent();
+  virtual ~DepthRendererSceneComponent(); // = default
 
   /**
    * @brief Registers the component in a given scene.

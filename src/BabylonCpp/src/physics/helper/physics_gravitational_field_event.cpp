@@ -26,9 +26,7 @@ PhysicsGravitationalFieldEvent::PhysicsGravitationalFieldEvent(
   _options              = eventOptions;
 }
 
-PhysicsGravitationalFieldEvent::~PhysicsGravitationalFieldEvent()
-{
-}
+PhysicsGravitationalFieldEvent::~PhysicsGravitationalFieldEvent() = default;
 
 PhysicsGravitationalFieldEventData PhysicsGravitationalFieldEvent::getData()
 {

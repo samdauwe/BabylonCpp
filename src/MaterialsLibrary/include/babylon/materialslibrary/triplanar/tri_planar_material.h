@@ -34,7 +34,7 @@ public:
 
     return material;
   }
-  ~TriPlanarMaterial() override;
+  ~TriPlanarMaterial(); // = default
 
   bool needAlphaBlending() const override;
   bool needAlphaTesting() const override;

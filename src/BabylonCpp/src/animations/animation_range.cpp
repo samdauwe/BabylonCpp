@@ -11,43 +11,15 @@ AnimationRange::AnimationRange(const std::string& iName, float iFrom, float iTo)
 {
 }
 
-AnimationRange::AnimationRange(const AnimationRange& other)
-    : name{other.name}, from{other.from}, to{other.to}
-{
-}
+AnimationRange::AnimationRange(const AnimationRange& other) = default;
 
-AnimationRange::AnimationRange(AnimationRange&& other)
-    : name{std::move(other.name)}
-    , from{std::move(other.from)}
-    , to{std::move(other.to)}
-{
-}
+AnimationRange::AnimationRange(AnimationRange&& other) = default;
 
-AnimationRange& AnimationRange::operator=(const AnimationRange& other)
-{
-  if (&other != this) {
-    name = other.name;
-    from = other.from;
-    to   = other.to;
-  }
+AnimationRange& AnimationRange::operator=(const AnimationRange& other) = default;
 
-  return *this;
-}
+AnimationRange& AnimationRange::operator=(AnimationRange&& other) = default;
 
-AnimationRange& AnimationRange::operator=(AnimationRange&& other)
-{
-  if (&other != this) {
-    name = std::move(other.name);
-    from = std::move(other.from);
-    to   = std::move(other.to);
-  }
-
-  return *this;
-}
-
-AnimationRange::~AnimationRange()
-{
-}
+AnimationRange::~AnimationRange() = default;
 
 AnimationRange AnimationRange::copy() const
 {

@@ -44,7 +44,7 @@ public:
                 unsigned int idxInShape, SolidParticleSystem* sps,
                 const std::optional<BoundingInfo>& modelBoundingInfo
                 = std::nullopt);
-  ~SolidParticle();
+  ~SolidParticle(); // = default
 
   /**
    * @brief Returns a boolean. True if the particle intersects another particle

@@ -42,9 +42,7 @@ SceneGraphComponent::SceneGraphComponent(const SceneGraphComponentProps& iProps)
   };
 }
 
-SceneGraphComponent::SceneGraphComponent::~SceneGraphComponent()
-{
-}
+SceneGraphComponent::~SceneGraphComponent() = default;
 
 void SceneGraphComponent::reinitialize()
 {

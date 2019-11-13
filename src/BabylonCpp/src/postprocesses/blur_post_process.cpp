@@ -55,9 +55,7 @@ BlurPostProcess::BlurPostProcess(
   });
 }
 
-BlurPostProcess::~BlurPostProcess()
-{
-}
+BlurPostProcess::~BlurPostProcess() = default;
 
 void BlurPostProcess::set_kernel(float v)
 {

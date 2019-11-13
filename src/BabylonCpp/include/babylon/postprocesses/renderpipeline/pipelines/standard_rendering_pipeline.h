@@ -56,7 +56,7 @@ public:
 
     return renderingPipeline;
   }
-  virtual ~StandardRenderingPipeline() override;
+  virtual ~StandardRenderingPipeline(); // = default
 
   void addToScene(const StandardRenderingPipelinePtr& renderingPipeline);
   Type type() const override;

@@ -65,9 +65,7 @@ PointerDragBehavior::PointerDragBehavior(
     = [](const Vector3 & /*targetPosition*/) -> bool { return true; };
 }
 
-PointerDragBehavior::~PointerDragBehavior()
-{
-}
+PointerDragBehavior::~PointerDragBehavior() = default;
 
 const std::string PointerDragBehavior::name() const
 {

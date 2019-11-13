@@ -20,9 +20,7 @@ PostProcessTreeItemComponent::PostProcessTreeItemComponent(
   entityInfo.type = EntityType::PostProcess;
 }
 
-PostProcessTreeItemComponent::~PostProcessTreeItemComponent()
-{
-}
+PostProcessTreeItemComponent::~PostProcessTreeItemComponent() = default;
 
 void PostProcessTreeItemComponent::render()
 {

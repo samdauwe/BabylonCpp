@@ -16,7 +16,7 @@ class Heightmap {
 public:
   Heightmap(const std::string& seed, float maxHeight, float height,
             float width);
-  ~Heightmap();
+  ~Heightmap(); // = default
 
   void generateHeightmap();
   float getHeight(float u, float v) const;

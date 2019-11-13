@@ -11,9 +11,7 @@ GamepadSystemSceneComponent::GamepadSystemSceneComponent(Scene* iScene)
   scene                 = iScene;
 }
 
-GamepadSystemSceneComponent::~GamepadSystemSceneComponent()
-{
-}
+GamepadSystemSceneComponent::~GamepadSystemSceneComponent() = default;
 
 void GamepadSystemSceneComponent::_register()
 {

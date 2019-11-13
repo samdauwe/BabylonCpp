@@ -23,7 +23,7 @@ public:
    * @param _scene BabylonJS scene
    */
   GamepadManager(Scene* scene);
-  ~GamepadManager();
+  ~GamepadManager(); // = default
 
   /**
    * @brief The gamepads in the game pad manager.

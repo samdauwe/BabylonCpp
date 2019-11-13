@@ -53,7 +53,7 @@ public:
 
 public:
   VertexData();
-  ~VertexData();
+  ~VertexData(); // = default
 
   /**
    * @brief Uses the passed data array to set the set the values for the

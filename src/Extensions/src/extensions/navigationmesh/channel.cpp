@@ -3,13 +3,9 @@
 namespace BABYLON {
 namespace Extensions {
 
-Channel::Channel()
-{
-}
+Channel::Channel() =  default;
 
-Channel::~Channel()
-{
-}
+Channel::~Channel() = default;
 
 void Channel::push(const Vector3& p)
 {

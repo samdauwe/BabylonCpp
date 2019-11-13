@@ -95,9 +95,7 @@ ArcRotateCamera::ArcRotateCamera(const std::string& iName, float iAlpha,
   inputs->addKeyboard().addMouseWheel().addPointers();
 }
 
-ArcRotateCamera::~ArcRotateCamera()
-{
-}
+ArcRotateCamera::~ArcRotateCamera() = default;
 
 Type ArcRotateCamera::type() const
 {

@@ -29,7 +29,7 @@ public:
    */
   WeightedSound(bool loop, const std::vector<SoundPtr>& sounds,
                 const Float32Array& weights);
-  ~WeightedSound();
+  ~WeightedSound(); // = default
 
   /**
    * @brief Suspend playback

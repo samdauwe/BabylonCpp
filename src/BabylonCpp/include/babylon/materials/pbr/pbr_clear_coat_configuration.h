@@ -40,7 +40,7 @@ public:
    */
   PBRClearCoatConfiguration(
     const std::function<void()>& markAllSubMeshesAsTexturesDirty);
-  ~PBRClearCoatConfiguration();
+  ~PBRClearCoatConfiguration(); // = default
 
   /**
    * @brief Hidden

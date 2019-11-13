@@ -26,7 +26,7 @@ public:
   PositionNormalVertex(PositionNormalVertex&& other);
   PositionNormalVertex& operator=(const PositionNormalVertex& other);
   PositionNormalVertex& operator=(PositionNormalVertex&& other);
-  ~PositionNormalVertex();
+  ~PositionNormalVertex(); // = default
   PositionNormalVertex copy() const;
 
   /**

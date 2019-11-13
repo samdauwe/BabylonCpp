@@ -42,7 +42,7 @@ public:
                         float ratio, const CameraPtr& camera,
                         unsigned int samplingMode, Engine* engine,
                         bool reusable = false);
-  virtual ~RefractionPostProcess() override;
+  virtual ~RefractionPostProcess(); // = default
 
   /**
    * @brief Disposes of the post process.

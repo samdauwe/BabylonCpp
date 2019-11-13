@@ -11,7 +11,7 @@ class BABYLON_SHARED_EXPORT SceneOptimization {
 
 public:
   SceneOptimization(int priority = 0);
-  virtual ~SceneOptimization();
+  virtual ~SceneOptimization(); // = default
 
   virtual bool apply(Scene* scene);
 

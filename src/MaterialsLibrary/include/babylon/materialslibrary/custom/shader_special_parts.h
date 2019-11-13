@@ -11,7 +11,7 @@ namespace MaterialsLibrary {
 struct BABYLON_SHARED_EXPORT ShaderSpecialParts {
 
   ShaderSpecialParts();
-  ~ShaderSpecialParts();
+  ~ShaderSpecialParts(); // = default
 
   std::string Fragment_Begin;
   std::string Fragment_Definitions;

@@ -50,7 +50,7 @@ public:
                           = std::nullopt,
                           const std::optional<bool>& textureArrayExpected
                           = std::nullopt);
-  ~KhronosTextureContainer();
+  ~KhronosTextureContainer(); // = default
 
   /**
    * @brief Uploads KTX content to a Babylon Texture.

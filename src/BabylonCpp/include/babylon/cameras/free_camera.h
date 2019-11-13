@@ -34,7 +34,7 @@ public:
 
     return camera;
   }
-  ~FreeCamera() override;
+  ~FreeCamera(); // = default
 
   Type type() const override;
 

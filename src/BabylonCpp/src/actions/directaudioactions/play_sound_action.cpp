@@ -11,9 +11,7 @@ PlaySoundAction::PlaySoundAction(unsigned int iTriggerOptions, Sound* sound,
 {
 }
 
-PlaySoundAction::~PlaySoundAction()
-{
-}
+PlaySoundAction::~PlaySoundAction() = default;
 
 void PlaySoundAction::_prepare()
 {

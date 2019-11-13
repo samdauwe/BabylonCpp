@@ -49,7 +49,7 @@ public:
    */
   PBRBRDFConfiguration(
     const std::function<void()>& markAllSubMeshesAsMiscDirty);
-  ~PBRBRDFConfiguration();
+  ~PBRBRDFConfiguration(); // = default
 
   /**
    * @brief Hidden

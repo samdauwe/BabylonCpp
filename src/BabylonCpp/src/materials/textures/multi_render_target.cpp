@@ -88,9 +88,7 @@ MultiRenderTarget::MultiRenderTarget(
   _createInternalTextures();
 }
 
-MultiRenderTarget::~MultiRenderTarget()
-{
-}
+MultiRenderTarget::~MultiRenderTarget() = default;
 
 bool MultiRenderTarget::get_isSupported() const
 {

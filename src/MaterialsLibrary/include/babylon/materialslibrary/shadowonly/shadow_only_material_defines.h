@@ -11,7 +11,7 @@ struct BABYLON_SHARED_EXPORT ShadowOnlyMaterialDefines
     : public MaterialDefines {
 
   ShadowOnlyMaterialDefines();
-  ~ShadowOnlyMaterialDefines();
+  ~ShadowOnlyMaterialDefines(); // = default
 
 }; // end of struct ShadowOnlyMaterialDefines
 

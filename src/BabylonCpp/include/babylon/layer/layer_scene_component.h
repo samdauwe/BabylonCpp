@@ -38,7 +38,7 @@ public:
     return std::shared_ptr<LayerSceneComponent>(
       new LayerSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~LayerSceneComponent() override;
+  virtual ~LayerSceneComponent(); // = default
 
   /**
    * @brief Registers the component in a given scene.

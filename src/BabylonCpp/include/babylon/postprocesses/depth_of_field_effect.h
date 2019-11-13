@@ -40,7 +40,7 @@ public:
     return std::shared_ptr<DepthOfFieldEffect>(
       new DepthOfFieldEffect(std::forward<Ts>(args)...));
   }
-  ~DepthOfFieldEffect();
+  ~DepthOfFieldEffect(); // = default
 
   /**
    * @brief Get the current class name of the current effet.

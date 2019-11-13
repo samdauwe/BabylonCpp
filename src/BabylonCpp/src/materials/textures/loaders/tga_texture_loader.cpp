@@ -8,13 +8,9 @@
 
 namespace BABYLON {
 
-_TGATextureLoader::_TGATextureLoader()
-{
-}
+_TGATextureLoader::_TGATextureLoader() = default;
 
-_TGATextureLoader::~_TGATextureLoader()
-{
-}
+_TGATextureLoader::~_TGATextureLoader() = default;
 
 bool _TGATextureLoader::supportCascades() const
 {

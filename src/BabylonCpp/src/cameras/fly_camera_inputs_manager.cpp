@@ -10,9 +10,7 @@ FlyCameraInputsManager::FlyCameraInputsManager(FlyCamera* iCamera)
 {
 }
 
-FlyCameraInputsManager::~FlyCameraInputsManager()
-{
-}
+FlyCameraInputsManager::~FlyCameraInputsManager() = default;
 
 FlyCameraInputsManager& FlyCameraInputsManager::addKeyboard()
 {

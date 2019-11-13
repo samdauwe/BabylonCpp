@@ -15,9 +15,7 @@ StopAnimationAction::StopAnimationAction(unsigned int iTtriggerOptions,
 {
 }
 
-StopAnimationAction::~StopAnimationAction()
-{
-}
+StopAnimationAction::~StopAnimationAction() = default;
 
 void StopAnimationAction::_prepare()
 {

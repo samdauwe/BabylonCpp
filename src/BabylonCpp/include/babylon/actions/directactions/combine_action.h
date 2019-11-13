@@ -23,7 +23,7 @@ public:
   CombineAction(unsigned int triggerOptions,
                 const std::vector<Action*>& children,
                 Condition* condition = nullptr);
-  ~CombineAction() override;
+  ~CombineAction(); // = default
 
   /**
    * @brief Hidden

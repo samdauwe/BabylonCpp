@@ -23,7 +23,7 @@ public:
 
     return texture;
   }
-  ~WoodProceduralTexture();
+  ~WoodProceduralTexture(); // = default
 
   void updateShaderUniforms();
 

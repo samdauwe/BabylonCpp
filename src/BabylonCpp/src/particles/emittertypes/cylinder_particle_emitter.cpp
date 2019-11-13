@@ -18,9 +18,7 @@ CylinderParticleEmitter::CylinderParticleEmitter(float iRadius, float iHeight,
 {
 }
 
-CylinderParticleEmitter::~CylinderParticleEmitter()
-{
-}
+CylinderParticleEmitter::~CylinderParticleEmitter() = default;
 
 void CylinderParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
                                                      Vector3& directionToUpdate,

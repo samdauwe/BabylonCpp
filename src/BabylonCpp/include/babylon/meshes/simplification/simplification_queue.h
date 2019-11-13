@@ -21,7 +21,7 @@ public:
    * @brief Creates a new queue.
    */
   SimplificationQueue();
-  ~SimplificationQueue();
+  ~SimplificationQueue(); // = default
 
   /**
    * @brief Adds a new simplification task.

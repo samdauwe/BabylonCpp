@@ -27,7 +27,7 @@ public:
 
     return mtm;
   }
-  ~MorphTargetManager();
+  ~MorphTargetManager(); // = default
 
   void addToScene(const MorphTargetManagerPtr& newMorphTargetManager);
 

@@ -30,9 +30,7 @@ PBRSheenConfiguration::PBRSheenConfiguration(
   isEnabled = false;
 }
 
-PBRSheenConfiguration::~PBRSheenConfiguration()
-{
-}
+PBRSheenConfiguration::~PBRSheenConfiguration() = default;
 
 bool PBRSheenConfiguration::get_isEnabled() const
 {

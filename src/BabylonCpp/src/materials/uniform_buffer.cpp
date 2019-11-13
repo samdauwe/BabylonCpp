@@ -109,9 +109,7 @@ UniformBuffer::UniformBuffer(Engine* engine, const Float32Array& data,
   }
 }
 
-UniformBuffer::~UniformBuffer()
-{
-}
+UniformBuffer::~UniformBuffer() = default;
 
 bool UniformBuffer::useUbo() const
 {

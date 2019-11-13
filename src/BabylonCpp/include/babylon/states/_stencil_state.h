@@ -34,7 +34,7 @@ public:
    * Initializes the state.
    */
   _StencilState();
-  ~_StencilState();
+  ~_StencilState(); // = default
 
   void reset();
   void apply(GL::IGLRenderingContext& gl);

@@ -71,9 +71,7 @@ LavaMaterialDefines::LavaMaterialDefines() : MaterialDefines{}
   };
 }
 
-LavaMaterialDefines::~LavaMaterialDefines()
-{
-}
+LavaMaterialDefines::~LavaMaterialDefines() = default;
 
 } // end of namespace MaterialsLibrary
 } // end of namespace BABYLON

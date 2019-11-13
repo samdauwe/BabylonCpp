@@ -30,7 +30,7 @@ public:
    */
   PhysicsRadialExplosionEvent(
     Scene* scene, const PhysicsRadialExplosionEventOptions& options);
-  ~PhysicsRadialExplosionEvent();
+  ~PhysicsRadialExplosionEvent(); // = default
 
   /**
    * @brief Returns the data related to the radial explosion event (sphere).

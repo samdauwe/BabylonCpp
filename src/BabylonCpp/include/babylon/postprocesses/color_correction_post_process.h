@@ -30,7 +30,7 @@ public:
                              const std::string& colorTableUrl, float ratio,
                              const CameraPtr& camera, unsigned int samplingMode,
                              Engine* engine, bool reusable = false);
-  ~ColorCorrectionPostProcess();
+  ~ColorCorrectionPostProcess(); // = default
 
 private:
   TexturePtr _colorTableTexture;

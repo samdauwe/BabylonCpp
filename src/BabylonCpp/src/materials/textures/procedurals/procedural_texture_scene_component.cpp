@@ -12,9 +12,7 @@ ProceduralTextureSceneComponent::ProceduralTextureSceneComponent(Scene* iScene)
   scene                 = iScene;
 }
 
-ProceduralTextureSceneComponent::~ProceduralTextureSceneComponent()
-{
-}
+ProceduralTextureSceneComponent::~ProceduralTextureSceneComponent() = default;
 
 void ProceduralTextureSceneComponent::_register()
 {

@@ -49,9 +49,7 @@ BloomEffect::BloomEffect(const std::string& name, Scene* scene,
   _effects.emplace_back(_merge);
 }
 
-BloomEffect::~BloomEffect()
-{
-}
+BloomEffect::~BloomEffect() = default;
 
 float BloomEffect::get_threshold() const
 {

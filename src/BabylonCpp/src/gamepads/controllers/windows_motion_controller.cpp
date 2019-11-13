@@ -73,9 +73,7 @@ WindowsMotionController::WindowsMotionController(
   controllerType = PoseEnabledControllerType::WINDOWS;
 }
 
-WindowsMotionController::~WindowsMotionController()
-{
-}
+WindowsMotionController::~WindowsMotionController() = default;
 
 Observable<ExtendedGamepadButton>&
 WindowsMotionController::get_onTriggerButtonStateChangedObservable()

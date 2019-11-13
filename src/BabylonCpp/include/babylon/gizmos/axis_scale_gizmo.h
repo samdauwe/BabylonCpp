@@ -31,7 +31,7 @@ public:
                  const UtilityLayerRendererPtr& gizmoLayer
                  = UtilityLayerRenderer::DefaultUtilityLayer(),
                  ScaleGizmo* parent = nullptr);
-  ~AxisScaleGizmo() override;
+  ~AxisScaleGizmo(); // = default
 
   /**
    * @brief Disposes of the gizmo.

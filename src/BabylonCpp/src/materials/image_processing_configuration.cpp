@@ -76,9 +76,7 @@ ImageProcessingConfiguration::ImageProcessingConfiguration()
 {
 }
 
-ImageProcessingConfiguration::~ImageProcessingConfiguration()
-{
-}
+ImageProcessingConfiguration::~ImageProcessingConfiguration() = default;
 
 bool ImageProcessingConfiguration::get_colorCurvesEnabled() const
 {

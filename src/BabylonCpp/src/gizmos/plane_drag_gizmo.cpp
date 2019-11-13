@@ -143,9 +143,7 @@ PlaneDragGizmo::PlaneDragGizmo(const Vector3& dragPlaneNormal,
                    _rootMesh->getChildMeshes(false));
 }
 
-PlaneDragGizmo::~PlaneDragGizmo()
-{
-}
+PlaneDragGizmo::~PlaneDragGizmo() = default;
 
 void PlaneDragGizmo::_attachedMeshChanged(const AbstractMeshPtr& value)
 {

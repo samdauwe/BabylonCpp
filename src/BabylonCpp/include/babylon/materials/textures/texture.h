@@ -44,7 +44,7 @@ public:
 
     return texture;
   }
-  virtual ~Texture() override;
+  virtual ~Texture(); // = default
 
   virtual Type type() const override;
 

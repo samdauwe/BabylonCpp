@@ -12,9 +12,7 @@ GenericPad::GenericPad(const std::string& iId, int iIndex,
   _buttons = Uint32Array(browserGamepad->buttons.size());
 }
 
-GenericPad::~GenericPad()
-{
-}
+GenericPad::~GenericPad() = default;
 
 void GenericPad::onbuttondown(
   const std::function<void(unsigned int buttonPressed)>& callback)

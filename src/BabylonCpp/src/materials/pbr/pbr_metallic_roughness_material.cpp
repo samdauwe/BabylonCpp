@@ -30,9 +30,7 @@ PBRMetallicRoughnessMaterial::PBRMetallicRoughnessMaterial(
   roughness = 1.f;
 }
 
-PBRMetallicRoughnessMaterial::~PBRMetallicRoughnessMaterial()
-{
-}
+PBRMetallicRoughnessMaterial::~PBRMetallicRoughnessMaterial() = default;
 
 const std::string PBRMetallicRoughnessMaterial::getClassName() const
 {

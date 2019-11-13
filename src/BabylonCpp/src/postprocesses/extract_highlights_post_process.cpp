@@ -38,8 +38,6 @@ ExtractHighlightsPostProcess::ExtractHighlightsPostProcess(
   });
 }
 
-ExtractHighlightsPostProcess::~ExtractHighlightsPostProcess()
-{
-}
+ExtractHighlightsPostProcess::~ExtractHighlightsPostProcess() = default;
 
 } // end of namespace BABYLON

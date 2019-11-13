@@ -45,7 +45,7 @@ public:
   SkeletonViewer(const SkeletonPtr& skeleton, const AbstractMeshPtr& mesh,
                  Scene* scene, bool autoUpdateBonesMatrices = true,
                  int renderingGroupId = 1);
-  ~SkeletonViewer();
+  ~SkeletonViewer(); // = default
 
   /**
    * @brief Update the viewer to sync with current skeleton state.

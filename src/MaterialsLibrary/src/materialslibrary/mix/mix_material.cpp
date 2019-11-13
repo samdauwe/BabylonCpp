@@ -64,9 +64,7 @@ MixMaterial::MixMaterial(const std::string& iName, Scene* scene)
   Effect::ShadersStore()["mixPixelShader"] = mixPixelShader;
 }
 
-MixMaterial::~MixMaterial()
-{
-}
+MixMaterial::~MixMaterial() = default;
 
 BaseTexturePtr& MixMaterial::get_mixTexture1()
 {

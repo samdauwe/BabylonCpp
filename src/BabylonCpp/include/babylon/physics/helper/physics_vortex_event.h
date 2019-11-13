@@ -33,7 +33,7 @@ public:
    */
   PhysicsVortexEvent(Scene* scene, const Vector3& origin,
                      const PhysicsVortexEventOptions& options);
-  ~PhysicsVortexEvent();
+  ~PhysicsVortexEvent(); // = default
 
   /**
    * @brief Returns the data related to the vortex event (cylinder).

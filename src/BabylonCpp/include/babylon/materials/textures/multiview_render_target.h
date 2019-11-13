@@ -25,7 +25,7 @@ public:
 
     return texture;
   }
-  ~MultiviewRenderTarget();
+  ~MultiviewRenderTarget(); // = default
 
   /**
    * @brief Binds a frame buffer.

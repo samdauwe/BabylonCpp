@@ -28,7 +28,7 @@ public:
 
     return camera;
   }
-  ~AnaglyphGamepadCamera() override;
+  ~AnaglyphGamepadCamera(); // = default
 
   /**
    * @brief Gets camera class name.

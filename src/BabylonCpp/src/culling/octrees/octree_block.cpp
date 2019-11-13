@@ -46,9 +46,7 @@ OctreeBlock<T>::OctreeBlock(
 }
 
 template <class T>
-OctreeBlock<T>::~OctreeBlock()
-{
-}
+OctreeBlock<T>::~OctreeBlock() = default;
 
 template <class T>
 size_t OctreeBlock<T>::capacity() const

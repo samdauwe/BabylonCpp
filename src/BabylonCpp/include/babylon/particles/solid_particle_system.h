@@ -65,7 +65,7 @@ public:
     return std::shared_ptr<SolidParticleSystem>(
       new SolidParticleSystem(std::forward<Ts>(args)...));
   }
-  virtual ~SolidParticleSystem() override;
+  virtual ~SolidParticleSystem(); // = default
 
   /**
    * @brief Builds the SPS underlying mesh. Returns a standard Mesh.

@@ -26,7 +26,7 @@ public:
   AnimationEvent(AnimationEvent&& other);
   AnimationEvent& operator=(const AnimationEvent& other);
   AnimationEvent& operator=(AnimationEvent&& other);
-  ~AnimationEvent();
+  ~AnimationEvent(); // = default
 
   /**
    * @brief Hidden

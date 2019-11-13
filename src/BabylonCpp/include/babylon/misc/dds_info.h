@@ -24,7 +24,7 @@ public:
   DDSInfo(DDSInfo&& other);
   DDSInfo& operator=(const DDSInfo& other);
   DDSInfo& operator=(DDSInfo&& other);
-  ~DDSInfo();
+  ~DDSInfo(); // = default
 
 public:
   /**

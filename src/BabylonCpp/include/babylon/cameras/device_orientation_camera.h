@@ -30,7 +30,7 @@ public:
 
     return camera;
   }
-  ~DeviceOrientationCamera() override;
+  ~DeviceOrientationCamera(); // = default
 
   virtual Type type() const override;
 

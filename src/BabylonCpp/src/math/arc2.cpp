@@ -97,9 +97,7 @@ Arc2& Arc2::operator=(Arc2&& otherArc)
   return *this;
 }
 
-Arc2::~Arc2()
-{
-}
+Arc2::~Arc2() = default;
 
 Arc2 Arc2::copy() const
 {

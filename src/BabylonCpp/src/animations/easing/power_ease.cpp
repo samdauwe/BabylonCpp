@@ -10,9 +10,7 @@ PowerEase::PowerEase(float IPower) : EasingFunction{}, power{IPower}
 {
 }
 
-PowerEase::~PowerEase()
-{
-}
+PowerEase::~PowerEase() = default;
 
 float PowerEase::easeInCore(float gradient) const
 {

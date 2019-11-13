@@ -31,7 +31,7 @@ public:
 
     return camera;
   }
-  ~UniversalCamera() override;
+  ~UniversalCamera(); // = default
 
   /**
    * @brief Gets the current object class name.

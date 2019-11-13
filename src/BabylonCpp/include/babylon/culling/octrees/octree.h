@@ -37,7 +37,7 @@ public:
   Octree(
     const std::function<void(T& entry, OctreeBlock<T>& block)>& creationFunc,
     std::size_t maxBlockCapacity = 64, std::size_t maxDepth = 2);
-  ~Octree();
+  ~Octree(); // = default
 
   /** Methods **/
 

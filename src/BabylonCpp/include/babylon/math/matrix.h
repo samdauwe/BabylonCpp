@@ -36,7 +36,7 @@ public:
   Matrix(Matrix&& otherMatrix);
   Matrix& operator=(const Matrix& otherMatrix);
   Matrix& operator=(Matrix&& otherMatrix);
-  ~Matrix();
+  ~Matrix(); // = default
   Matrix copy() const;
 
   /**

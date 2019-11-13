@@ -34,7 +34,7 @@ public:
     return std::shared_ptr<PhysicsEngine>(
       new PhysicsEngine(std::forward<Ts>(args)...));
   }
-  virtual ~PhysicsEngine();
+  virtual ~PhysicsEngine(); // = default
 
   /**
    * @brief Sets the gravity vector used by the simulation.

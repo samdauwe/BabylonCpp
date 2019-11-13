@@ -8,9 +8,7 @@ RollingAverage::RollingAverage(std::size_t length)
   reset();
 }
 
-RollingAverage::~RollingAverage()
-{
-}
+RollingAverage::~RollingAverage() = default;
 
 void RollingAverage::add(float v)
 {

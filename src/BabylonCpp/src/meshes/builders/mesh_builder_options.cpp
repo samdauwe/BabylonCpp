@@ -27,9 +27,7 @@ BoxOptions::BoxOptions()
 {
 }
 
-BoxOptions::~BoxOptions()
-{
-}
+BoxOptions::~BoxOptions() = default;
 
 //------------------------------------------------------------------------------
 // Cylinder or cone mesh options
@@ -55,9 +53,7 @@ CylinderOptions::CylinderOptions()
 {
 }
 
-CylinderOptions::~CylinderOptions()
-{
-}
+CylinderOptions::~CylinderOptions() = default;
 
 //------------------------------------------------------------------------------
 // Dashed lines mesh options
@@ -72,9 +68,7 @@ DashedLinesOptions::DashedLinesOptions()
 {
 }
 
-DashedLinesOptions::~DashedLinesOptions()
-{
-}
+DashedLinesOptions::~DashedLinesOptions() = default;
 
 //------------------------------------------------------------------------------
 // Decal mesh options
@@ -85,9 +79,7 @@ DecalOptions::DecalOptions()
 {
 }
 
-DecalOptions::~DecalOptions()
-{
-}
+DecalOptions::~DecalOptions() = default;
 
 //------------------------------------------------------------------------------
 // Disc mesh options
@@ -104,9 +96,7 @@ DiscOptions::DiscOptions()
 {
 }
 
-DiscOptions::~DiscOptions()
-{
-}
+DiscOptions::~DiscOptions()  = default;
 
 //------------------------------------------------------------------------------
 // Extrude shape mesh options
@@ -125,9 +115,7 @@ ExtrudeShapeOptions::ExtrudeShapeOptions()
 {
 }
 
-ExtrudeShapeOptions::~ExtrudeShapeOptions()
-{
-}
+ExtrudeShapeOptions::~ExtrudeShapeOptions() = default;
 
 //------------------------------------------------------------------------------
 // Extrude shape custom mesh options
@@ -148,9 +136,7 @@ ExtrudeShapeCustomOptions::ExtrudeShapeCustomOptions()
 {
 }
 
-ExtrudeShapeCustomOptions::~ExtrudeShapeCustomOptions()
-{
-}
+ExtrudeShapeCustomOptions::~ExtrudeShapeCustomOptions() = default;
 
 //------------------------------------------------------------------------------
 // Ground from height map mesh options
@@ -171,9 +157,7 @@ GroundFromHeightMapOptions::GroundFromHeightMapOptions()
 {
 }
 
-GroundFromHeightMapOptions::~GroundFromHeightMapOptions()
-{
-}
+GroundFromHeightMapOptions::~GroundFromHeightMapOptions() = default;
 
 //------------------------------------------------------------------------------
 // Ground mesh options
@@ -189,9 +173,7 @@ GroundOptions::GroundOptions()
 {
 }
 
-GroundOptions::~GroundOptions()
-{
-}
+GroundOptions::~GroundOptions() = default;
 
 //------------------------------------------------------------------------------
 // Hemisphere mesh options
@@ -202,9 +184,7 @@ HemisphereOptions::HemisphereOptions()
 {
 }
 
-HemisphereOptions::~HemisphereOptions()
-{
-}
+HemisphereOptions::~HemisphereOptions() = default;
 
 //------------------------------------------------------------------------------
 // Icosphere mesh options
@@ -224,9 +204,7 @@ IcoSphereOptions::IcoSphereOptions()
 {
 }
 
-IcoSphereOptions::~IcoSphereOptions()
-{
-}
+IcoSphereOptions::~IcoSphereOptions() = default;
 
 //------------------------------------------------------------------------------
 // Lathe mesh options
@@ -247,9 +225,7 @@ LatheOptions::LatheOptions()
 {
 }
 
-LatheOptions::~LatheOptions()
-{
-}
+LatheOptions::~LatheOptions() = default;
 
 //------------------------------------------------------------------------------
 // Lines mesh options
@@ -260,9 +236,7 @@ LinesOptions::LinesOptions()
 {
 }
 
-LinesOptions::~LinesOptions()
-{
-}
+LinesOptions::~LinesOptions() = default;
 
 //------------------------------------------------------------------------------
 // Line system mesh options
@@ -286,9 +260,7 @@ LineSystemOptions::LineSystemOptions(LinesOptions& linesOptions)
   }
 }
 
-LineSystemOptions::~LineSystemOptions()
-{
-}
+LineSystemOptions::~LineSystemOptions() = default;
 
 //------------------------------------------------------------------------------
 // Plane mesh options
@@ -306,9 +278,7 @@ PlaneOptions::PlaneOptions()
 {
 }
 
-PlaneOptions::~PlaneOptions()
-{
-}
+PlaneOptions::~PlaneOptions() = default;
 
 //------------------------------------------------------------------------------
 // Polyhedron mesh options
@@ -329,9 +299,7 @@ PolyhedronOptions::PolyhedronOptions()
 {
 }
 
-PolyhedronOptions::~PolyhedronOptions()
-{
-}
+PolyhedronOptions::~PolyhedronOptions() = default;
 
 //------------------------------------------------------------------------------
 // Polygon mesh options
@@ -346,9 +314,7 @@ PolygonOptions::PolygonOptions()
 {
 }
 
-PolygonOptions::~PolygonOptions()
-{
-}
+PolygonOptions::~PolygonOptions() = default;
 
 //------------------------------------------------------------------------------
 // Ribbon mesh options
@@ -367,9 +333,7 @@ RibbonOptions::RibbonOptions()
 {
 }
 
-RibbonOptions::~RibbonOptions()
-{
-}
+RibbonOptions::~RibbonOptions() = default;
 
 //------------------------------------------------------------------------------
 // Sphere mesh options
@@ -390,77 +354,15 @@ SphereOptions::SphereOptions()
 {
 }
 
-SphereOptions::SphereOptions(const SphereOptions& other)
-    : segments{other.segments}
-    , diameter{other.diameter}
-    , diameterX{other.diameterX}
-    , diameterY{other.diameterY}
-    , diameterZ{other.diameterZ}
-    , arc{other.arc}
-    , slice{other.slice}
-    , sideOrientation{other.sideOrientation}
-    , frontUVs{other.frontUVs}
-    , backUVs{other.backUVs}
-    , updatable{other.updatable}
-{
-}
+SphereOptions::SphereOptions(const SphereOptions& other) = default;
 
-SphereOptions::SphereOptions(SphereOptions&& other)
-    : segments{std::move(other.segments)}
-    , diameter{std::move(other.diameter)}
-    , diameterX{std::move(other.diameterX)}
-    , diameterY{std::move(other.diameterY)}
-    , diameterZ{std::move(other.diameterZ)}
-    , arc{std::move(other.arc)}
-    , slice{std::move(other.slice)}
-    , sideOrientation{std::move(other.sideOrientation)}
-    , frontUVs{std::move(other.frontUVs)}
-    , backUVs{std::move(other.backUVs)}
-    , updatable{std::move(other.updatable)}
-{
-}
+SphereOptions::SphereOptions(SphereOptions&& other) = default;
 
-SphereOptions& SphereOptions::operator=(const SphereOptions& other)
-{
-  if (&other != this) {
-    segments        = other.segments;
-    diameter        = other.diameter;
-    diameterX       = other.diameterX;
-    diameterY       = other.diameterY;
-    diameterZ       = other.diameterZ;
-    arc             = other.arc;
-    slice           = other.slice;
-    sideOrientation = other.sideOrientation;
-    frontUVs        = other.frontUVs;
-    backUVs         = other.backUVs;
-    updatable       = other.updatable;
-  }
+SphereOptions& SphereOptions::operator=(const SphereOptions& other) = default;
 
-  return *this;
-}
+SphereOptions& SphereOptions::operator=(SphereOptions&& other) = default;
 
-SphereOptions& SphereOptions::operator=(SphereOptions&& other)
-{
-  if (&other != this) {
-    segments        = std::move(other.segments);
-    diameter        = std::move(other.diameter);
-    diameterX       = std::move(other.diameterX);
-    diameterY       = std::move(other.diameterY);
-    diameterZ       = std::move(other.diameterZ);
-    arc             = std::move(other.arc);
-    slice           = std::move(other.slice);
-    sideOrientation = std::move(other.sideOrientation);
-    frontUVs        = std::move(other.frontUVs);
-    backUVs         = std::move(other.backUVs);
-    updatable       = std::move(other.updatable);
-  }
-
-  return *this;
-}
-
-SphereOptions::~SphereOptions()
-{
-}
+SphereOptions::~SphereOptions() = default;
 
 //------------------------------------------------------------------------------
 // Tiled box mesh options
@@ -488,9 +390,7 @@ TiledBoxOptions::TiledBoxOptions()
 {
 }
 
-TiledBoxOptions::~TiledBoxOptions()
-{
-}
+TiledBoxOptions::~TiledBoxOptions() = default;
 
 //------------------------------------------------------------------------------
 // Tiled ground mesh options
@@ -507,9 +407,7 @@ TiledGroundOptions::TiledGroundOptions()
 {
 }
 
-TiledGroundOptions::~TiledGroundOptions()
-{
-}
+TiledGroundOptions::~TiledGroundOptions() = default;
 
 //------------------------------------------------------------------------------
 // Tiled plane mesh options
@@ -532,9 +430,7 @@ TiledPlaneOptions::TiledPlaneOptions()
 {
 }
 
-TiledPlaneOptions::~TiledPlaneOptions()
-{
-}
+TiledPlaneOptions::~TiledPlaneOptions() = default;
 
 //------------------------------------------------------------------------------
 // Torus mesh options
@@ -551,9 +447,7 @@ TorusOptions::TorusOptions()
 {
 }
 
-TorusOptions::~TorusOptions()
-{
-}
+TorusOptions::~TorusOptions() = default;
 
 //------------------------------------------------------------------------------
 // TorusKnot mesh options
@@ -573,9 +467,7 @@ TorusKnotOptions::TorusKnotOptions()
 {
 }
 
-TorusKnotOptions::~TorusKnotOptions()
-{
-}
+TorusKnotOptions::~TorusKnotOptions() = default;
 
 //------------------------------------------------------------------------------
 // Tube mesh options
@@ -596,8 +488,6 @@ TubeOptions::TubeOptions()
 {
 }
 
-TubeOptions::~TubeOptions()
-{
-}
+TubeOptions::~TubeOptions() = default;
 
 } // end of namespace BABYLON

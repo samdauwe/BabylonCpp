@@ -13,9 +13,7 @@ StateCondition::StateCondition(ActionManager* actionManager,
 {
 }
 
-StateCondition::~StateCondition()
-{
-}
+StateCondition::~StateCondition() = default;
 
 bool StateCondition::isValid()
 {

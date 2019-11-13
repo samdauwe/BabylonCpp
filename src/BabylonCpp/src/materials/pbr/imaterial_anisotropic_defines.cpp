@@ -14,9 +14,7 @@ IMaterialAnisotropicDefines::IMaterialAnisotropicDefines() : MaterialDefines{}
   };
 }
 
-IMaterialAnisotropicDefines::~IMaterialAnisotropicDefines()
-{
-}
+IMaterialAnisotropicDefines::~IMaterialAnisotropicDefines() = default;
 
 std::string IMaterialAnisotropicDefines::toString() const
 {

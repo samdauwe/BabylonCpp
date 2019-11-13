@@ -20,7 +20,7 @@ public:
    * @param jointData The data for the Distance-Joint
    */
   DistanceJoint(const DistanceJointData& jointData);
-  ~DistanceJoint();
+  ~DistanceJoint(); // = default
 
   /**
    * @brief Update the predefined distance.

@@ -30,7 +30,7 @@ public:
   ActionEvent(ActionEvent&& other);
   ActionEvent& operator=(const ActionEvent& other);
   ActionEvent& operator=(ActionEvent&& other);
-  ~ActionEvent();
+  ~ActionEvent(); // = default
 
   /**
    * @brief Helper function to auto-create an ActionEvent from a source mesh.

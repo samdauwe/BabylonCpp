@@ -18,7 +18,7 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   MaterialDefines(MaterialDefines&& other);
   MaterialDefines& operator=(const MaterialDefines& other);
   MaterialDefines& operator=(MaterialDefines&& other);
-  virtual ~MaterialDefines() override;
+  virtual ~MaterialDefines(); // = default
 
   bool operator[](const std::string& define) const;
   bool operator==(const MaterialDefines& rhs) const;

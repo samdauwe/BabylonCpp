@@ -34,9 +34,7 @@ RenderingPipelineTreeItemComponent::RenderingPipelineTreeItemComponent(
   }
 }
 
-RenderingPipelineTreeItemComponent::~RenderingPipelineTreeItemComponent()
-{
-}
+RenderingPipelineTreeItemComponent::~RenderingPipelineTreeItemComponent() = default;
 
 void RenderingPipelineTreeItemComponent::render()
 {

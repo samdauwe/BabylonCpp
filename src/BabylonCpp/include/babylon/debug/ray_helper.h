@@ -44,7 +44,7 @@ public:
    * @param ray Defines the ray we are currently tryin to visualize
    */
   RayHelper(const Ray& ray);
-  ~RayHelper();
+  ~RayHelper(); // = default
 
   /**
    * @brief Shows the ray we are willing to debug.

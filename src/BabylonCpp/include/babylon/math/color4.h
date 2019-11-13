@@ -34,7 +34,7 @@ public:
   Color4& operator=(Color3&& otherColor);
   Color4& operator=(const Color4& otherColor);
   Color4& operator=(Color4&& otherColor);
-  ~Color4();
+  ~Color4(); // = default
   Color4 copy() const;
 
   /**

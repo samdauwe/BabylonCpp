@@ -31,7 +31,7 @@ public:
 
     return camera;
   }
-  ~StereoscopicArcRotateCamera() override;
+  ~StereoscopicArcRotateCamera(); // = default
 
   /**
    * @brief Gets camera class name

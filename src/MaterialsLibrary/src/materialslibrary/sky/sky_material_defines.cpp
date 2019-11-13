@@ -17,9 +17,7 @@ SkyMaterialDefines::SkyMaterialDefines() : MaterialDefines{}
   };
 }
 
-SkyMaterialDefines::~SkyMaterialDefines()
-{
-}
+SkyMaterialDefines::~SkyMaterialDefines() = default;
 
 } // end of namespace MaterialsLibrary
 } // end of namespace BABYLON

@@ -16,39 +16,15 @@ Vector2::Vector2(int ix, int iy)
 {
 }
 
-Vector2::Vector2(const Vector2& otherVector)
-    : x{otherVector.x}, y{otherVector.y}
-{
-}
+Vector2::Vector2(const Vector2& otherVector) = default;
 
-Vector2::Vector2(Vector2&& otherVector)
-    : x{std::move(otherVector.x)}, y{std::move(otherVector.y)}
-{
-}
+Vector2::Vector2(Vector2&& otherVector) = default;
 
-Vector2& Vector2::operator=(const Vector2& otherVector)
-{
-  if (&otherVector != this) {
-    x = otherVector.x;
-    y = otherVector.y;
-  }
+Vector2& Vector2::operator=(const Vector2& otherVector) = default;
 
-  return *this;
-}
+Vector2& Vector2::operator=(Vector2&& otherVector) = default;
 
-Vector2& Vector2::operator=(Vector2&& otherVector)
-{
-  if (&otherVector != this) {
-    x = std::move(otherVector.x);
-    y = std::move(otherVector.y);
-  }
-
-  return *this;
-}
-
-Vector2::~Vector2()
-{
-}
+Vector2::~Vector2() = default;
 
 Vector2 Vector2::copy() const
 {

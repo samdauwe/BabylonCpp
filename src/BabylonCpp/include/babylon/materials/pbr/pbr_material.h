@@ -67,7 +67,7 @@ public:
 
     return material;
   }
-  ~PBRMaterial() override;
+  ~PBRMaterial(); // = default
 
   /**
    * @brief Returns the name of this material class.

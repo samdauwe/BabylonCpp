@@ -14,7 +14,7 @@ namespace BABYLON {
 struct BABYLON_SHARED_EXPORT FactorGradient : public IValueGradient {
 
   FactorGradient();
-  ~FactorGradient();
+  ~FactorGradient(); // = default
 
   /**
    * Gets or sets first associated factor

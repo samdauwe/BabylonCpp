@@ -23,9 +23,7 @@ FxaaPostProcess::FxaaPostProcess(const std::string& iName, float ratio,
   });
 }
 
-FxaaPostProcess::~FxaaPostProcess()
-{
-}
+FxaaPostProcess::~FxaaPostProcess() = default;
 
 std::string FxaaPostProcess::_getDefines()
 {

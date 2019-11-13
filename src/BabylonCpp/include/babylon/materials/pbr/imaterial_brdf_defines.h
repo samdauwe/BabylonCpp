@@ -12,7 +12,7 @@ namespace BABYLON {
 struct BABYLON_SHARED_EXPORT IMaterialBRDFDefines : public MaterialDefines {
 
   IMaterialBRDFDefines();
-  ~IMaterialBRDFDefines() override;
+  ~IMaterialBRDFDefines(); // = default
 
   /**
    * @brief Converts the material define values to a string.

@@ -56,7 +56,7 @@ public:
    * @param browserGamepad the gamepad that the PoseEnabledController should be created from
    */
   PoseEnabledController(const IBrowserGamepadPtr& browserGamepad);
-  ~PoseEnabledController() override;
+  ~PoseEnabledController(); // = default
 
   /**
    * Hidden

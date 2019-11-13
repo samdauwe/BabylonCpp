@@ -35,9 +35,7 @@ WaterMaterialDefines::WaterMaterialDefines() : MaterialDefines{}
   };
 }
 
-WaterMaterialDefines::~WaterMaterialDefines()
-{
-}
+WaterMaterialDefines::~WaterMaterialDefines() = default;
 
 } // end of namespace MaterialsLibrary
 } // end of namespace BABYLON

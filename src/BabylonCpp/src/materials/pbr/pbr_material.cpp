@@ -249,9 +249,7 @@ PBRMaterial::PBRMaterial(const std::string& iName, Scene* scene)
   _environmentBRDFTexture = BRDFTextureTools::GetEnvironmentBRDFTexture(scene);
 }
 
-PBRMaterial::~PBRMaterial()
-{
-}
+PBRMaterial::~PBRMaterial() = default;
 
 float PBRMaterial::get_directIntensity() const
 {

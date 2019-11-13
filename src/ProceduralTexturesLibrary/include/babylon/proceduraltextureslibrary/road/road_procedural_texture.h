@@ -23,7 +23,7 @@ public:
 
     return texture;
   }
-  ~RoadProceduralTexture();
+  ~RoadProceduralTexture(); // = default
 
   void updateShaderUniforms();
 

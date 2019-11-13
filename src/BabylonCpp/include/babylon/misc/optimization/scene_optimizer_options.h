@@ -16,7 +16,7 @@ public:
   SceneOptimizerOptions(SceneOptimizerOptions&& other);
   SceneOptimizerOptions& operator=(const SceneOptimizerOptions& other);
   SceneOptimizerOptions& operator=(SceneOptimizerOptions&& other);
-  ~SceneOptimizerOptions();
+  ~SceneOptimizerOptions(); // = default
 
   static SceneOptimizerOptions LowDegradationAllowed(float targetFrameRate
                                                      = 60);

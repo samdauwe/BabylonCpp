@@ -60,7 +60,7 @@ public:
   BoneLookController(AbstractMesh* mesh, Bone* bone, const Vector3& target,
                      const std::optional<BoneLookControllerOptions>& options
                      = std::nullopt);
-  ~BoneLookController();
+  ~BoneLookController(); // = default
 
   /**
    * @brief Update the bone to look at the target.  This should be called before

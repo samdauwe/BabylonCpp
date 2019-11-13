@@ -61,9 +61,7 @@ PositionGizmo::PositionGizmo(const UtilityLayerRendererPtr& iGizmoLayer)
   attachedMesh = nullptr;
 }
 
-PositionGizmo::~PositionGizmo()
-{
-}
+PositionGizmo::~PositionGizmo() = default;
 
 AbstractMeshPtr& PositionGizmo::get_attachedMesh()
 {

@@ -27,7 +27,7 @@ class BABYLON_SHARED_EXPORT ScenePropertyGridComponent {
 
 public:
   ScenePropertyGridComponent(const IScenePropertyGridComponentProps& props);
-  ~ScenePropertyGridComponent();
+  ~ScenePropertyGridComponent(); // = default
 
   void setRenderingModes(bool point, bool wireframe);
   void switchIBL();

@@ -6,9 +6,7 @@
 
 namespace BABYLON {
 
-Path3D::Path3D()
-{
-}
+Path3D::Path3D() = default;
 
 Path3D::Path3D(const std::vector<Vector3>& iPath,
                const std::optional<Vector3>& firstNormal, bool raw)
@@ -20,61 +18,12 @@ Path3D::Path3D(const std::vector<Vector3>& iPath,
   _compute(firstNormal);
 }
 
-Path3D::Path3D(const Path3D& otherPath)
-    : path{otherPath.path}
-    , _curve{otherPath._curve}
-    , _distances{otherPath._distances}
-    , _tangents{otherPath._tangents}
-    , _normals{otherPath._normals}
-    , _binormals{otherPath._binormals}
-    , _raw{otherPath._raw}
-{
-}
+Path3D::Path3D(const Path3D& otherPath) = default;
+Path3D::Path3D(Path3D&& otherPath) = default;
+Path3D& Path3D::operator=(const Path3D& otherPath) = default;
+Path3D& Path3D::operator=(Path3D&& otherPath) = default;
 
-Path3D::Path3D(Path3D&& otherPath)
-    : path{otherPath.path}
-    , _curve{std::move(otherPath._curve)}
-    , _distances{std::move(otherPath._distances)}
-    , _tangents{std::move(otherPath._tangents)}
-    , _normals{std::move(otherPath._normals)}
-    , _binormals{std::move(otherPath._binormals)}
-    , _raw{std::move(otherPath._raw)}
-{
-}
-
-Path3D& Path3D::operator=(const Path3D& otherPath)
-{
-  if (&otherPath != this) {
-    path       = otherPath.path;
-    _curve     = otherPath._curve;
-    _distances = otherPath._distances;
-    _tangents  = otherPath._tangents;
-    _normals   = otherPath._normals;
-    _binormals = otherPath._binormals;
-    _raw       = otherPath._raw;
-  }
-
-  return *this;
-}
-
-Path3D& Path3D::operator=(Path3D&& otherPath)
-{
-  if (&otherPath != this) {
-    path       = std::move(otherPath.path);
-    _curve     = std::move(otherPath._curve);
-    _distances = std::move(otherPath._distances);
-    _tangents  = std::move(otherPath._tangents);
-    _normals   = std::move(otherPath._normals);
-    _binormals = std::move(otherPath._binormals);
-    _raw       = std::move(otherPath._raw);
-  }
-
-  return *this;
-}
-
-Path3D::~Path3D()
-{
-}
+Path3D::~Path3D() = default;
 
 Path3D Path3D::copy() const
 {

@@ -2,12 +2,8 @@
 
 namespace BABYLON {
 
-ImageProcessingConfigurationDefines::ImageProcessingConfigurationDefines()
-{
-}
+ImageProcessingConfigurationDefines::ImageProcessingConfigurationDefines() = default;
 
-ImageProcessingConfigurationDefines::~ImageProcessingConfigurationDefines()
-{
-}
+ImageProcessingConfigurationDefines::~ImageProcessingConfigurationDefines() = default;
 
 } // end of namespace BABYLON

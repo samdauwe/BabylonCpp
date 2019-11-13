@@ -13,9 +13,7 @@ GeometryBufferRendererSceneComponent::GeometryBufferRendererSceneComponent(
   scene                 = iScene;
 }
 
-GeometryBufferRendererSceneComponent::~GeometryBufferRendererSceneComponent()
-{
-}
+GeometryBufferRendererSceneComponent::~GeometryBufferRendererSceneComponent() = default;
 
 void GeometryBufferRendererSceneComponent::_register()
 {

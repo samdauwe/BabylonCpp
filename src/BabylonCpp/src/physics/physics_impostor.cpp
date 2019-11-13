@@ -124,9 +124,7 @@ PhysicsImpostor::PhysicsImpostor(IPhysicsEnabledObject* iObject,
   }
 }
 
-PhysicsImpostor::~PhysicsImpostor()
-{
-}
+PhysicsImpostor::~PhysicsImpostor() = default;
 
 void PhysicsImpostor::_init()
 {

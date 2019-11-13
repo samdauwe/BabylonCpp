@@ -30,8 +30,6 @@ VRMultiviewToSingleviewPostProcess::VRMultiviewToSingleviewPostProcess(
   });
 }
 
-VRMultiviewToSingleviewPostProcess::~VRMultiviewToSingleviewPostProcess()
-{
-}
+VRMultiviewToSingleviewPostProcess::~VRMultiviewToSingleviewPostProcess() = default;
 
 } // end of namespace BABYLON

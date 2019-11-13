@@ -46,9 +46,7 @@ TargetCamera::TargetCamera(const std::string& iName, const Vector3& iPosition, S
   _initCache();
 }
 
-TargetCamera::~TargetCamera()
-{
-}
+TargetCamera::~TargetCamera() = default;
 
 Type TargetCamera::type() const
 {

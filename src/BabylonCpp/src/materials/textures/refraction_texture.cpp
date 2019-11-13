@@ -19,9 +19,7 @@ RefractionTexture::RefractionTexture(const std::string& iName, ISize size,
     [this](int*, EventState&) { getScene()->clipPlane = std::nullopt; });
 }
 
-RefractionTexture::~RefractionTexture()
-{
-}
+RefractionTexture::~RefractionTexture() = default;
 
 std::unique_ptr<RefractionTexture> RefractionTexture::clone()
 {

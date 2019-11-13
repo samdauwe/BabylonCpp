@@ -160,9 +160,7 @@ GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
   _randomTextureSize = maxTextureSize;
 }
 
-GPUParticleSystem::~GPUParticleSystem()
-{
-}
+GPUParticleSystem::~GPUParticleSystem() = default;
 
 Type GPUParticleSystem::type() const
 {

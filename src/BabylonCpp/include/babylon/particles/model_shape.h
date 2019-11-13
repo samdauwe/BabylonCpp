@@ -30,7 +30,7 @@ public:
                              unsigned int s)>& posFunction,
     const std::function<void(SolidParticle* particle, const Vector3& vertex,
                              unsigned int i)>& vtxFunction);
-  ~ModelShape();
+  ~ModelShape(); // = default
 
 public:
   /**

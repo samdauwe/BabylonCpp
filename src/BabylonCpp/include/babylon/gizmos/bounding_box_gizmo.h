@@ -34,7 +34,7 @@ public:
   BoundingBoxGizmo(const Color3& color = Color3::Gray(),
                    const UtilityLayerRendererPtr& gizmoLayer
                    = UtilityLayerRenderer::DefaultUtilityLayer());
-  ~BoundingBoxGizmo() override;
+  ~BoundingBoxGizmo(); // = default
 
   /**
    * @brief Sets the color of the bounding box gizmo.

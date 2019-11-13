@@ -13,7 +13,7 @@ namespace BABYLON {
 struct BABYLON_SHARED_EXPORT PolygonPoints {
 
   PolygonPoints();
-  ~PolygonPoints();
+  ~PolygonPoints(); // = default
 
   std::vector<IndexedVector2> add(const std::vector<Vector2>& originalPoints);
   Bounds computeBounds();

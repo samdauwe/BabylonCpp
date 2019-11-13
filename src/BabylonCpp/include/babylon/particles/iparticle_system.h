@@ -61,7 +61,7 @@ class BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
 
 public:
   IParticleSystem();
-  virtual ~IParticleSystem();
+  virtual ~IParticleSystem(); // = default
 
   /**
    * List of animations used by the particle system.
