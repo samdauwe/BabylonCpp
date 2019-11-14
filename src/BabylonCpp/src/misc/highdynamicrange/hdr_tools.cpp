@@ -19,8 +19,8 @@ float HDRTools::Ldexp(float mantissa, float exponent)
   return mantissa * std::pow(2.f, exponent);
 }
 
-void HDRTools::Rgbe2float(Float32Array& float32array, float red, float green,
-                          float blue, float exponent, size_t index)
+void HDRTools::Rgbe2float(Float32Array& float32array, float red, float green, float blue,
+                          float exponent, size_t index)
 {
   if (exponent > 0.f) { /*nonzero pixel*/
     exponent = Ldexp(1.f, exponent - (128.f + 8.f));
@@ -36,8 +36,7 @@ void HDRTools::Rgbe2float(Float32Array& float32array, float red, float green,
   }
 }
 
-std::string HDRTools::readStringLine(const Uint8Array& uint8array,
-                                     size_t startIndex)
+std::string HDRTools::readStringLine(const Uint8Array& uint8array, size_t startIndex)
 {
   std::ostringstream line;
   std::string character;
@@ -115,25 +114,22 @@ HDRInfo HDRTools::RGBE_ReadHeader(const Uint8Array& uint8array)
   return headerInfo;
 }
 
-CubeMapInfo HDRTools::GetCubeMapTextureData(const Uint8Array& buffer,
-                                            size_t size)
+CubeMapInfo HDRTools::GetCubeMapTextureData(const Uint8Array& buffer, size_t size)
 {
   auto hdrInfo = RGBE_ReadHeader(buffer);
   auto data    = RGBE_ReadPixels_RLE(buffer, hdrInfo);
 
-  return PanoramaToCubeMapTools::ConvertPanoramaToCubemap(data, hdrInfo.width,
-                                                          hdrInfo.height, size);
+  return PanoramaToCubeMapTools::ConvertPanoramaToCubemap(data, hdrInfo.width, hdrInfo.height,
+                                                          size);
 }
 
-Float32Array HDRTools::RGBE_ReadPixels(const Uint8Array& uint8array,
-                                       const HDRInfo& hdrInfo)
+Float32Array HDRTools::RGBE_ReadPixels(const Uint8Array& uint8array, const HDRInfo& hdrInfo)
 {
   // Keep for multi format supports.
   return RGBE_ReadPixels_RLE(uint8array, hdrInfo);
 }
 
-Float32Array HDRTools::RGBE_ReadPixels_RLE(const Uint8Array& uint8array,
-                                           const HDRInfo& hdrInfo)
+Float32Array HDRTools::RGBE_ReadPixels_RLE(const Uint8Array& uint8array, const HDRInfo& hdrInfo)
 {
   auto num_scanlines  = hdrInfo.height;
   auto scanline_width = hdrInfo.width;
@@ -190,8 +186,7 @@ Float32Array HDRTools::RGBE_ReadPixels_RLE(const Uint8Array& uint8array,
           // a non-run
           count = a;
           if ((count == 0) || (count > endIndex - index)) {
-            throw std::runtime_error(
-              "HDR Bad Format, bad scanline data (non-run)");
+            throw std::runtime_error("HDR Bad Format, bad scanline data (non-run)");
           }
 
           scanLineArray[index++] = b;
