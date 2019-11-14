@@ -140,6 +140,7 @@ file(GLOB MESHES_HDR_FILES          ${INCLUDE_PATH}/meshes/*.h
                                     ${INCLUDE_PATH}/meshes/webgl/*.h)
 file(GLOB MISC_HDR_FILES            ${INCLUDE_PATH}/misc/*.h
                                     ${INCLUDE_PATH}/misc/highdynamicrange/*.h
+                                    ${INCLUDE_PATH}/misc/interfaces/*.h
                                     ${INCLUDE_PATH}/misc/optimization/*.h)
 file(GLOB MORPH_HDR_FILES           ${INCLUDE_PATH}/morph/*.h)
 file(GLOB PARTICLES_HDR_FILES       ${INCLUDE_PATH}/particles/*.h
