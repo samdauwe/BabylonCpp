@@ -98,6 +98,8 @@ add_library(${TARGET}
     ${BABYLON_LOADERS_SOURCES}
     ${BABYLON_LOADERS_HEADERS}
 )
+babylon_target_clang_tidy(${TARGET})
+
 
 # Create namespaced alias
 add_library(${META_PROJECT_NAME}::${TARGET} ALIAS ${TARGET})

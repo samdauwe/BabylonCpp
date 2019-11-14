@@ -112,6 +112,7 @@ add_library(${TARGET}
     ${BABYLON_PROCEDURALS_SOURCES}
     ${BABYLON_PROCEDURALS_HEADERS}
 )
+babylon_target_clang_tidy(${TARGET})
 
 # Create namespaced alias
 add_library(${META_PROJECT_NAME}::${TARGET} ALIAS ${TARGET})

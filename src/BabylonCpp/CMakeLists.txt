@@ -364,6 +364,7 @@ add_library(${TARGET}
     ${BABYLON_SOURCES}
     ${BABYLON_HEADERS}
 )
+babylon_target_clang_tidy(${TARGET})
 
 # Create namespaced alias
 add_library(${META_PROJECT_NAME}::${TARGET} ALIAS ${TARGET})
@@ -454,6 +455,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
                      PROPERTY CXX_INCLUDE_WHAT_YOU_USE ${IWYU_PATH})
     endif()
 endif()
+
 
 # ============================================================================ #
 #                       Setup test environment                                 #

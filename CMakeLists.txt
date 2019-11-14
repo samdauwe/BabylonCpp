@@ -14,6 +14,33 @@ if(CCACHE_PROGRAM)
     endif()
 endif()
 
+# use clang-tidy if present
+option(BABYLON_USE_CLANG_TIDY "Use clang-tidy static analysis" OFF)
+if (BABYLON_USE_CLANG_TIDY)
+  find_program(
+    CLANG_TIDY_EXE
+    NAMES "clang-tidy"
+    DOC "Path to clang-tidy executable"
+    )
+  if(NOT CLANG_TIDY_EXE)
+    message(FATAL "clang-tidy not found.")
+  else()
+    message(STATUS "clang-tidy found: ${CLANG_TIDY_EXE}")
+    # set(DO_CLANG_TIDY "${CLANG_TIDY_EXE}" "-checks=*,-clang-analyzer-alpha.*")
+    set(DO_CLANG_TIDY "${CLANG_TIDY_EXE}" "-checks=hicpp-use-equals-default")
+  endif()
+endif()
+
+function(babylon_target_clang_tidy target)
+  if (BABYLON_USE_CLANG_TIDY)
+    set_target_properties(
+      ${target} PROPERTIES
+      CXX_CLANG_TIDY "${DO_CLANG_TIDY}"
+    )
+  endif()
+endfunction()
+
+
 # Generate folders for IDE targets (e.g., VisualStudio solutions)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(IDE_FOLDER "")
