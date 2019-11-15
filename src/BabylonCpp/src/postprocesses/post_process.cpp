@@ -84,9 +84,12 @@ PostProcess::PostProcess(
 
   _indexParameters = indexParameters;
 
-  if (!blockCompilation) {
-    updateEffect(defines);
-  }
+  // The code block below calls a virtual function and thus cannot be called in the ctor
+  // It is instead called inside the named ctor New()
+  //if (!blockCompilation)
+  //  updateEffect(defines);
+  (void)blockCompilation;
+  (void)defines;
 }
 
 PostProcess::~PostProcess() = default;

@@ -53,8 +53,13 @@ public:
                       vertexUrl, indexParameters, blockCompilation));
     postProcess->add(postProcess);
 
+    if (!blockCompilation) {
+      postProcess->updateEffect(defines);
+    }
+
     return postProcess;
   }
+
   virtual ~PostProcess(); // = default
 
   void add(const PostProcessPtr& newPostProcess);
