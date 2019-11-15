@@ -79,7 +79,7 @@ Camera::Camera(const std::string& iName, const Vector3& iPosition, Scene* scene,
     , _setActiveOnSceneIfNoneActive{setActiveOnSceneIfNoneActive}
 {
   position = iPosition;
-  _initCache();
+  // _initCache(); // is done inside addToScene() (cannot call a virtual function in a constructor !)
 }
 
 Camera::~Camera() = default;
@@ -91,6 +91,9 @@ Type Camera::type() const
 
 void Camera::addToScene(const CameraPtr& newCamera)
 {
+  if (! _cache.cache_inited)
+    _initCache();
+
   if (_setActiveOnSceneIfNoneActive && !getScene()->activeCamera()) {
     getScene()->activeCamera = newCamera;
   }

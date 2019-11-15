@@ -264,7 +264,10 @@ Matrix& Node::worldMatrixFromCache()
 
 void Node::_initCache()
 {
+  if (_cache.cache_inited)
+    return;
   _cache.parent = nullptr;
+  _cache.cache_inited = true;
 }
 
 void Node::updateCache(bool force)

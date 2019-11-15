@@ -176,6 +176,8 @@ struct MouseEvent {
 }; // end of struct MouseEvent
 
 struct NodeCache {
+  bool cache_inited = false;
+
   Node* parent = nullptr;
   // AbstractMesh
   Vector3 position;
