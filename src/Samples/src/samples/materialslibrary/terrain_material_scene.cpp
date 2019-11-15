@@ -13,6 +13,7 @@ namespace Samples {
 /**
  * @brief Scene demonstrating the use of the terrain material from the materials library.
  * @see https://www.babylonjs-playground.com/#E6OZX#7
+ * @see https://doc.babylonjs.com/extensions/Terrain
  */
 struct TerrainMaterialScene : public IRenderableScene {
 

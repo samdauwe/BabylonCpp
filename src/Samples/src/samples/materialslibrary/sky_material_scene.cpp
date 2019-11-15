@@ -22,6 +22,7 @@ namespace Samples {
  * - 5: Increase Turbidity
  * - 6: Decrease Turbidity
  * @see https://www.babylonjs-playground.com/#E6OZX#122
+ * @see https://doc.babylonjs.com/extensions/Sky
  */
 class SkyMaterialScene : public IRenderableScene {
 

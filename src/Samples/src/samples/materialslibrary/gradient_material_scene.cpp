@@ -12,6 +12,7 @@ namespace Samples {
 /**
  * @brief Scene demonstrating the use of the gradient material from the materials library.
  * @see https://www.babylonjs-playground.com/#2IFRKC#22
+ * @see https://doc.babylonjs.com/extensions/Gradient
  */
 struct GradientMaterialScene : public IRenderableScene {
 

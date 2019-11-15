@@ -12,6 +12,7 @@ namespace Samples {
 /**
  * @brief Scene demonstrating the use of the lava material from the materials library.
  * @see https://www.babylonjs-playground.com/#1BLVWO#25
+ * @see https://doc.babylonjs.com/extensions/Lava
  */
 struct LavaMaterialScene : public IRenderableScene {
 

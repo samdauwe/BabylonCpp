@@ -11,6 +11,7 @@ namespace Samples {
 /**
  * @brief Scene demonstrating the use of the normal material from the materials library.
  * @see https://www.babylonjs-playground.com/#22VQKB
+ * @see https://doc.babylonjs.com/extensions/Lava
  */
 struct NormalMaterialScene : public IRenderableScene {
 

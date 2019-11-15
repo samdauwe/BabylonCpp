@@ -12,6 +12,7 @@ namespace Samples {
 /**
  * @brief Scene demonstrating the use of the grid material from the materials library.
  * @see https://www.babylonjs-playground.com/#1UFGZH#12
+ * @see https://doc.babylonjs.com/extensions/Grid
  */
 class GridMaterialScene : public IRenderableScene {
 

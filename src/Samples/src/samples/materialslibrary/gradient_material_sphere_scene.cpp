@@ -11,6 +11,7 @@ namespace Samples {
 
 /**
  * @brief Scene demonstrating the use of the gradient material from the materials library.
+ * @see https://doc.babylonjs.com/extensions/Gradient
  */
 class GradientMaterialSphereScene : public IRenderableScene {
 
