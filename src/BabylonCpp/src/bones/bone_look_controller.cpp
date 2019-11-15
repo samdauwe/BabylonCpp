@@ -364,7 +364,6 @@ void BoneLookController::update()
           if (!xzlenSet) {
             xzlen    = std::sqrt(localTarget.x * localTarget.x
                               + localTarget.z * localTarget.z);
-            xzlenSet = true;
           }
 
           float angBtwMax = _getAngleBetween(boneYaw, _maxYaw);
