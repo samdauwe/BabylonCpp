@@ -68,9 +68,9 @@ struct DragStartOrEndEvent {
 }; // end of struct DragStartOrEndEvent
 
 struct Event {
-  EventType type;
-  int charCode;
-  int keyCode;
+  EventType type = EventType::UNKNOWN;
+  int charCode = 0;
+  int keyCode = 0;
 }; // end of struct Event
 
 struct Exception {
@@ -237,12 +237,12 @@ struct PointerEvent : public Event {
   int offsetX   = 0;
   int offsetY   = 0;
   int pointerId = 0;
-  PointerType pointerType;
+  PointerType pointerType = PointerType::UNDEFINED;
   bool altKey   = false;
   bool ctrlKey  = false;
   bool shiftKey = false;
   bool metaKey  = false;
-  MouseButtonType button;
+  MouseButtonType button = MouseButtonType::UNDEFINED;
   int buttons         = 0;
   ICanvas* srcElement = nullptr;
   void preventDefault()
