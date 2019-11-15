@@ -13,6 +13,7 @@ namespace Samples {
  * @brief FireProceduralTextureScene Scene. Example demonstrating how to use fire procedural
  * texture.
  * @see https://www.babylonjs-playground.com/#KM3TC
+ * @see https://doc.babylonjs.com/extensions/FireProceduralTexture
  */
 struct FireProceduralTextureScene : public IRenderableScene {
 

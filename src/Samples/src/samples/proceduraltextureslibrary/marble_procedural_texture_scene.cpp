@@ -13,6 +13,7 @@ namespace Samples {
  * @brief MarbleProceduralTextureScene Scene. Example demonstrating how to use marble procedural
  * texture.
  * @see https://www.babylonjs-playground.com/#HS1SK#4
+ * @see https://doc.babylonjs.com/extensions/MarbleProceduralTexture
  */
 struct MarbleProceduralTextureScene : public IRenderableScene {
 

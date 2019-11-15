@@ -13,6 +13,7 @@ namespace Samples {
  * @brief RoadProceduralTextureScene Scene. Example demonstrating how to use road procedural
  * texture.
  * @see https://www.babylonjs-playground.com/##FBW4N#0
+ * @see https://doc.babylonjs.com/extensions/RoadProceduralTexture
  */
 struct RoadProceduralTextureScene : public IRenderableScene {
 

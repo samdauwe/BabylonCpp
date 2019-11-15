@@ -13,6 +13,7 @@ namespace Samples {
  * @brief WoodProceduralTextureScene Scene. Example demonstrating how to use wood procedural
  * texture.
  * @see https://www.babylonjs-playground.com/#K41IJ
+ * @see https://doc.babylonjs.com/extensions/WoodProceduralTexture
  */
 struct WoodProceduralTextureScene : public IRenderableScene {
 

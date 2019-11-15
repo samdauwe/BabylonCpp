@@ -13,6 +13,7 @@ namespace Samples {
  * @brief BrickProceduralTextureScene Scene. Example demonstrating how to use brick procedural
  * texture.
  * @see https://www.babylonjs-playground.com/#1CL0BO
+ * @see https://doc.babylonjs.com/extensions/BrickProceduralTexture
  */
 struct BrickProceduralTextureScene : public IRenderableScene {
 

@@ -13,6 +13,7 @@ namespace Samples {
  * @brief GrassProceduralTextureScene Scene. Example demonstrating how to use grass procedural
  * texture.
  * @see https://www.babylonjs-playground.com/#KM3TC#1
+ * @see https://doc.babylonjs.com/extensions/GrassProceduralTexture
  */
 struct GrassProceduralTextureScene : public IRenderableScene {
 

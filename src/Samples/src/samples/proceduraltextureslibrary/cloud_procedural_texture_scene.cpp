@@ -13,6 +13,7 @@ namespace Samples {
  * @brief CloudProceduralTextureScene Scene. Example demonstrating how to use cloud procedural
  * texture.
  * @see https://www.babylonjs-playground.com/##NQDNM#0
+ * @see https://doc.babylonjs.com/extensions/CloudProceduralTexture
  */
 struct CloudProceduralTextureScene : public IRenderableScene {
 
