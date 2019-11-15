@@ -13,8 +13,8 @@ namespace ImGuiUtils
 
   struct ImageFileTexture
   {
-    int _width, _height;
-    GLuint _textureId;
+    int _width = 0, _height = 0;
+    GLuint _textureId = 0;
     bool found = true;
 
     ImageFileTexture() = default;
