@@ -12,6 +12,7 @@ namespace BABYLON {
  * @brief Hidden
  */
 struct BABYLON_SHARED_EXPORT ShaderDefineExpression {
+  virtual ~ShaderDefineExpression() = default;
 
   virtual bool isTrue(const std::unordered_map<std::string, std::string>& preprocessors) const;
 
