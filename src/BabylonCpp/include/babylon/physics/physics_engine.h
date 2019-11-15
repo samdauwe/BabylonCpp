@@ -40,7 +40,7 @@ public:
    * @brief Sets the gravity vector used by the simulation.
    * @param gravity defines the gravity vector to use
    */
-  void setGravity(const Vector3& gravity) override;
+  void setGravity(const Vector3& gravity) final;
 
   /**
    * @brief Set the time step of the physics engine.
@@ -49,31 +49,31 @@ public:
    * To speed it up, 1/30
    * @param newTimeStep defines the new timestep to apply to this world.
    */
-  void setTimeStep(float newTimeStep = 1.f / 60.f) override;
+  void setTimeStep(float newTimeStep = 1.f / 60.f) final;
 
   /**
    * @brief Get the time step of the physics engine.
    * @returns the current time step
    */
-  float getTimeStep() const override;
+  float getTimeStep() const final;
 
   /**
    * @brief Release all resources.
    */
-  void dispose() override;
+  void dispose() final;
 
   /**
    * @brief Gets the name of the current physics plugin.
    * @returns the name of the plugin
    */
-  std::string getPhysicsPluginName() const override;
+  std::string getPhysicsPluginName() const final;
 
   /**
    * @brief Adding a new impostor for the impostor tracking.
    * This will be done by the impostor itself.
    * @param impostor the impostor to add
    */
-  void addImpostor(PhysicsImpostor* impostor) override;
+  void addImpostor(PhysicsImpostor* impostor) final;
 
   /**
    * @brief Remove an impostor from the engine.
@@ -81,7 +81,7 @@ public:
    * engine.
    * @param impostor the impostor to remove
    */
-  void removeImpostor(PhysicsImpostor* impostor) override;
+  void removeImpostor(PhysicsImpostor* impostor) final;
 
   /**
    * @brief Add a joint to the physics engine.
@@ -92,7 +92,7 @@ public:
    */
   void addJoint(PhysicsImpostor* mainImpostor,
                 PhysicsImpostor* connectedImpostor,
-                const std::shared_ptr<PhysicsJoint>& joint) override;
+                const std::shared_ptr<PhysicsJoint>& joint) final;
 
   /**
    * @brief Removes a joint from the simulation.
@@ -103,25 +103,25 @@ public:
    */
   void removeJoint(PhysicsImpostor* mainImpostor,
                    PhysicsImpostor* connectedImpostor,
-                   PhysicsJoint* joint) override;
+                   PhysicsJoint* joint) final;
 
   /**
    * @brief Called by the scene. No need to call it.
    * @param delta defines the timespam between frames
    */
-  void _step(float delta) override;
+  void _step(float delta) final;
 
   /**
    * @brief Gets the current plugin used to run the simulation.
    * @returns current plugin
    */
-  IPhysicsEnginePlugin* getPhysicsPlugin() override;
+  IPhysicsEnginePlugin* getPhysicsPlugin() final;
 
   /**
    * @brief Gets the list of physic impostors.
    * @returns an array of PhysicsImpostor
    */
-  std::vector<PhysicsImpostorPtr>& getImpostors() override;
+  std::vector<PhysicsImpostorPtr>& getImpostors() final;
 
   /**
    * @brief Gets the impostor for a physics enabled object.
@@ -129,14 +129,14 @@ public:
    * @returns the PhysicsImpostor or null if not found
    */
   PhysicsImpostor*
-  getImpostorForPhysicsObject(IPhysicsEnabledObject* object) override;
+  getImpostorForPhysicsObject(IPhysicsEnabledObject* object) final;
 
   /**
    * @brief Gets the impostor for a physics body object.
    * @param body defines physics body used by the impostor
    * @returns the PhysicsImpostor or null if not found
    */
-  PhysicsImpostor* getImpostorWithPhysicsBody(IPhysicsBody* body) override;
+  PhysicsImpostor* getImpostorWithPhysicsBody(IPhysicsBody* body) final;
 
   /**
    * @brief Does a raycast in the physics world.
@@ -144,12 +144,12 @@ public:
    * @param to when should the ray end?
    * @returns PhysicsRaycastResult
    */
-  PhysicsRaycastResult raycast(const Vector3& from, const Vector3& to) override;
+  PhysicsRaycastResult raycast(const Vector3& from, const Vector3& to) final;
 
   /**
    * @brief Returns whether or not the engine is initialized.
    */
-  bool isInitialized() const override;
+  bool isInitialized() const final;
 
 protected:
   /**
