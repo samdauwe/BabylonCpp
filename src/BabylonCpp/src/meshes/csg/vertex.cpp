@@ -10,43 +10,11 @@ CSG::Vertex::Vertex(const Vector3& iPos, const Vector3& iNormal,
 {
 }
 
-CSG::Vertex::Vertex(const BABYLON::CSG::Vertex& otherVertex)
-    : pos{otherVertex.pos}, normal{otherVertex.normal}, uv{otherVertex.uv}
-{
-}
-
-CSG::Vertex::Vertex(BABYLON::CSG::Vertex&& otherVertex)
-    : pos{std::move(otherVertex.pos)}
-    , normal{std::move(otherVertex.normal)}
-    , uv{std::move(otherVertex.uv)}
-{
-}
-
-CSG::Vertex& CSG::Vertex::operator=(const BABYLON::CSG::Vertex& otherVertex)
-{
-  if (&otherVertex != this) {
-    pos    = otherVertex.pos;
-    normal = otherVertex.normal;
-    uv     = otherVertex.uv;
-  }
-
-  return *this;
-}
-
-CSG::Vertex& CSG::Vertex::operator=(BABYLON::CSG::Vertex&& otherVertex)
-{
-  if (&otherVertex != this) {
-    pos    = std::move(otherVertex.pos);
-    normal = std::move(otherVertex.normal);
-    uv     = std::move(otherVertex.uv);
-  }
-
-  return *this;
-}
-
-CSG::Vertex::~Vertex()
-{
-}
+CSG::Vertex::Vertex(const BABYLON::CSG::Vertex& otherVertex) = default;
+CSG::Vertex::Vertex(BABYLON::CSG::Vertex&& otherVertex) = default;
+CSG::Vertex& CSG::Vertex::operator=(const BABYLON::CSG::Vertex& otherVertex) = default;
+CSG::Vertex& CSG::Vertex::operator=(BABYLON::CSG::Vertex&& otherVertex) = default;
+CSG::Vertex::~Vertex() = default;
 
 CSG::Vertex CSG::Vertex::clone() const
 {

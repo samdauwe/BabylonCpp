@@ -2,9 +2,7 @@
 
 namespace BABYLON {
 
-IShaderProcessor::~IShaderProcessor()
-{
-}
+IShaderProcessor::~IShaderProcessor() = default;
 
 std::string IShaderProcessor::attributeProcessor(const std::string& /*attribute*/)
 {

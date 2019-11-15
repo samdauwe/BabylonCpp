@@ -27,9 +27,7 @@ Temperature::Temperature(const std::string& seed, float maxTemp, float minTemp,
   _noise = std::make_unique<FastSimplexNoise>(noiseOptions);
 }
 
-Temperature::~Temperature()
-{
-}
+Temperature::~Temperature() = default;
 
 void Temperature::setupTemperatureGradient()
 {

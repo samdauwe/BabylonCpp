@@ -26,9 +26,7 @@ TransformNodeTreeItemComponent::TransformNodeTreeItemComponent(
   }
 }
 
-TransformNodeTreeItemComponent::~TransformNodeTreeItemComponent()
-{
-}
+TransformNodeTreeItemComponent::~TransformNodeTreeItemComponent() = default;
 
 void TransformNodeTreeItemComponent::render()
 {

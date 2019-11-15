@@ -29,7 +29,7 @@ public:
               const PickingInfo& pickInfo);
   PointerInfo(PointerEventTypes type, const MouseWheelEvent& event,
               const PickingInfo& pickInfo);
-  ~PointerInfo();
+  ~PointerInfo(); // = default
 
 public:
   /**

@@ -24,7 +24,7 @@ public:
     unsigned int triggerOptions,
     const std::function<void(const std::optional<IActionEvent>& evt)>& func,
     Condition* condition = nullptr);
-  ~ExecuteCodeAction() override;
+  ~ExecuteCodeAction(); // = default
 
   /**
    * @brief Execute the action and run the attached code.

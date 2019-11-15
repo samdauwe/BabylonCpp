@@ -73,9 +73,7 @@ SolidParticleSystem::SolidParticleSystem(
       };
 }
 
-SolidParticleSystem::~SolidParticleSystem()
-{
-}
+SolidParticleSystem::~SolidParticleSystem() = default;
 
 MeshPtr SolidParticleSystem::buildMesh()
 {

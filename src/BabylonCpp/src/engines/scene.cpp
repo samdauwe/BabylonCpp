@@ -324,9 +324,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
   }
 }
 
-Scene::~Scene()
-{
-}
+Scene::~Scene() = default;
 
 Type Scene::type() const
 {

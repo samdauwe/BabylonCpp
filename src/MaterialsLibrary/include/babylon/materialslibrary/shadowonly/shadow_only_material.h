@@ -17,7 +17,7 @@ class BABYLON_SHARED_EXPORT ShadowOnlyMaterial : public PushMaterial {
 
 public:
   ShadowOnlyMaterial(const std::string& name, Scene* scene);
-  ~ShadowOnlyMaterial() override;
+  ~ShadowOnlyMaterial(); // = default
 
   bool needAlphaBlending() const override;
   bool needAlphaTesting() const override;

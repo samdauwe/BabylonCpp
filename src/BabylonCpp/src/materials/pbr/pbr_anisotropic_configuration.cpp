@@ -27,9 +27,7 @@ PBRAnisotropicConfiguration::PBRAnisotropicConfiguration(
 {
 }
 
-PBRAnisotropicConfiguration::~PBRAnisotropicConfiguration()
-{
-}
+PBRAnisotropicConfiguration::~PBRAnisotropicConfiguration() = default;
 
 bool PBRAnisotropicConfiguration::get_isEnabled() const
 {

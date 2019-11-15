@@ -10,7 +10,7 @@ namespace MaterialsLibrary {
 struct BABYLON_SHARED_EXPORT GridMaterialDefines : public MaterialDefines {
 
   GridMaterialDefines();
-  ~GridMaterialDefines();
+  ~GridMaterialDefines(); // = default
 
 }; // end of struct GridMaterialDefines
 

@@ -16,7 +16,7 @@ class BABYLON_SHARED_EXPORT ExtendedGamepadButton
 public:
   ExtendedGamepadButton();
   ExtendedGamepadButton(int value, bool touched, bool pressed);
-  ~ExtendedGamepadButton();
+  ~ExtendedGamepadButton(); // = default
 
   /**
    * @brief Sets if the button/trigger is currently pressed.

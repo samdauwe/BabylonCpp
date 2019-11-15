@@ -11,9 +11,7 @@ BaseSubMesh::BaseSubMesh()
 {
 }
 
-BaseSubMesh::~BaseSubMesh()
-{
-}
+BaseSubMesh::~BaseSubMesh() = default;
 
 EffectPtr& BaseSubMesh::get_effect()
 {

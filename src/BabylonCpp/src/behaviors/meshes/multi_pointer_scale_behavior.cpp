@@ -19,9 +19,7 @@ MultiPointerScaleBehavior::MultiPointerScaleBehavior()
   _dragBehaviorB->moveAttached = false;
 }
 
-MultiPointerScaleBehavior::~MultiPointerScaleBehavior()
-{
-}
+MultiPointerScaleBehavior::~MultiPointerScaleBehavior() = default;
 
 const std::string MultiPointerScaleBehavior::name() const
 {

@@ -58,9 +58,7 @@ AxesViewer::AxesViewer(Scene* iScene, float iScaleLines,
   update(Vector3(), Vector3::Right(), Vector3::Up(), Vector3::Forward());
 }
 
-AxesViewer::~AxesViewer()
-{
-}
+AxesViewer::~AxesViewer() = default;
 
 TransformNodePtr& AxesViewer::get_xAxis()
 {

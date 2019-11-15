@@ -8,8 +8,6 @@ KeyboardInfoPre::KeyboardInfoPre(unsigned int iType,
 {
 }
 
-KeyboardInfoPre::~KeyboardInfoPre()
-{
-}
+KeyboardInfoPre::~KeyboardInfoPre() = default;
 
 } // end of namespace BABYLON

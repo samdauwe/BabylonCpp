@@ -41,7 +41,7 @@ public:
     return std::shared_ptr<LensFlareSystemSceneComponent>(
       new LensFlareSystemSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~LensFlareSystemSceneComponent() override;
+  virtual ~LensFlareSystemSceneComponent(); // = default
 
   /**
    * @brief Registers the component in a given scene.

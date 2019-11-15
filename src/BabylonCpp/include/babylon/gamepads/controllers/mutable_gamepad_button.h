@@ -19,7 +19,7 @@ public:
   MutableGamepadButton(MutableGamepadButton&& other);
   MutableGamepadButton& operator=(const MutableGamepadButton& other);
   MutableGamepadButton& operator=(MutableGamepadButton&& other);
-  ~MutableGamepadButton();
+  ~MutableGamepadButton(); // = default
   std::string toString() const;
   friend std::ostream&
   operator<<(std::ostream& os,

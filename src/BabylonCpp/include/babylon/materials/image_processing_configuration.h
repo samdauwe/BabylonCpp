@@ -62,7 +62,7 @@ public:
 
 public:
   ImageProcessingConfiguration();
-  ~ImageProcessingConfiguration();
+  ~ImageProcessingConfiguration(); // = default
 
   /**
    * @brief Gets the current class name.

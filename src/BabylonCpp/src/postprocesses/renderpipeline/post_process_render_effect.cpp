@@ -20,9 +20,7 @@ PostProcessRenderEffect::PostProcessRenderEffect(
 {
 }
 
-PostProcessRenderEffect::~PostProcessRenderEffect()
-{
-}
+PostProcessRenderEffect::~PostProcessRenderEffect() = default;
 
 bool PostProcessRenderEffect::get_isSupported() const
 {

@@ -18,7 +18,7 @@ public:
    * @param jointData The joint data for the Hinge-Joint
    */
   HingeJoint(const PhysicsJointData& jointData);
-  ~HingeJoint() override;
+  ~HingeJoint(); // = default
 
   /**
    * @brief Set the motor values.

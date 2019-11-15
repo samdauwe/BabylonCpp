@@ -27,7 +27,7 @@ public:
 
 public:
   SkeletonTreeItemComponent(const ISkeletonTreeItemComponentProps& props);
-  virtual ~SkeletonTreeItemComponent() override;
+  virtual ~SkeletonTreeItemComponent(); // = default
 
   void render() override;
 

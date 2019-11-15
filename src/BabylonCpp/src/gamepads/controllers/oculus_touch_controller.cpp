@@ -35,9 +35,7 @@ OculusTouchController::OculusTouchController(const IBrowserGamepadPtr& vrGamepad
   _defaultModel  = nullptr;
 }
 
-OculusTouchController::~OculusTouchController()
-{
-}
+OculusTouchController::~OculusTouchController() = default;
 
 void OculusTouchController::initControllerMesh(
   Scene* scene, const std::function<void(AbstractMesh* mesh)>& meshLoaded)

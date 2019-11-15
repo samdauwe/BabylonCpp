@@ -24,7 +24,7 @@ public:
 
     return texture;
   }
-  ~FireProceduralTexture();
+  ~FireProceduralTexture(); // = default
 
   void updateShaderUniforms();
 

@@ -33,9 +33,7 @@ PBRBRDFConfiguration::PBRBRDFConfiguration(
 {
 }
 
-PBRBRDFConfiguration::~PBRBRDFConfiguration()
-{
-}
+PBRBRDFConfiguration::~PBRBRDFConfiguration() = default;
 
 bool PBRBRDFConfiguration::get_useEnergyConservation() const
 {

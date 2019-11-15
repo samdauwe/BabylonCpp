@@ -37,7 +37,7 @@ public:
     return std::shared_ptr<OctreeSceneComponent>(
       new OctreeSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~OctreeSceneComponent();
+  virtual ~OctreeSceneComponent(); // = default
 
   /**
    * @brief Registers the component in a given scene.

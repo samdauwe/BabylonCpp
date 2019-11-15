@@ -41,9 +41,7 @@ StereoscopicGamepadCamera::StereoscopicGamepadCamera(
                    rigParams);
 }
 
-StereoscopicGamepadCamera::~StereoscopicGamepadCamera()
-{
-}
+StereoscopicGamepadCamera::~StereoscopicGamepadCamera() = default;
 
 const std::string StereoscopicGamepadCamera::getClassName() const
 {

@@ -24,7 +24,7 @@ public:
 
     return postProcess;
   }
-  ~BlackAndWhitePostProcess();
+  ~BlackAndWhitePostProcess(); // = default
 
 protected:
   /**

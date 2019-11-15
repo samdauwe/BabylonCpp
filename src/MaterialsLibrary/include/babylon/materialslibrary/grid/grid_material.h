@@ -29,7 +29,7 @@ public:
 
     return material;
   }
-  ~GridMaterial() override;
+  ~GridMaterial(); // = default
 
   /**
    * Returns whether or not the grid requires alpha blending.

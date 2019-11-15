@@ -24,7 +24,7 @@ class BABYLON_SHARED_EXPORT CrowdAgent : public ECS::Component {
 public:
   CrowdAgent(RVO2::RVOSimulator* sim,
              const BABYLON::Vector2& position = BABYLON::Vector2::Zero());
-  ~CrowdAgent();
+  ~CrowdAgent(); // = default
 
   size_t id() const;
   const RVO2::Vector2& position() const;

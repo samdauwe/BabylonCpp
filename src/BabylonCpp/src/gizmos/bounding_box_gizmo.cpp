@@ -379,9 +379,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(
   updateBoundingBox();
 }
 
-BoundingBoxGizmo::~BoundingBoxGizmo()
-{
-}
+BoundingBoxGizmo::~BoundingBoxGizmo() = default;
 
 void BoundingBoxGizmo::setColor(const Color3& color)
 {

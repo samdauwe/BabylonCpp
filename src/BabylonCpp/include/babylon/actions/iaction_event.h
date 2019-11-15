@@ -25,7 +25,7 @@ struct BABYLON_SHARED_EXPORT IActionEvent {
   IActionEvent(IActionEvent&& other);
   IActionEvent& operator=(const IActionEvent& other);
   IActionEvent& operator=(IActionEvent&& other);
-  ~IActionEvent();
+  ~IActionEvent(); // = default
 
   /** The mesh that triggered the action */
   AbstractMeshPtr source;

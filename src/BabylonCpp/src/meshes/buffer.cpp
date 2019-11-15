@@ -48,9 +48,7 @@ Buffer::Buffer(Mesh* mesh, const Float32Array& data, bool updatable,
   }
 }
 
-Buffer::~Buffer()
-{
-}
+Buffer::~Buffer() = default;
 
 std::unique_ptr<VertexBuffer>
 Buffer::createVertexBuffer(const std::string& kind, size_t offset, size_t size,

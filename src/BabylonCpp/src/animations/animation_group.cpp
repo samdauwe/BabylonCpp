@@ -33,9 +33,7 @@ AnimationGroup::AnimationGroup(const std::string& iName, Scene* scene)
   uniqueId = _scene->getUniqueId();
 }
 
-AnimationGroup::~AnimationGroup()
-{
-}
+AnimationGroup::~AnimationGroup() = default;
 
 void AnimationGroup::addToScene(const AnimationGroupPtr& newAnimationGroup)
 {

@@ -28,7 +28,7 @@ public:
 
     return material;
   }
-  ~LavaMaterial() override;
+  ~LavaMaterial(); // = default
 
   bool needAlphaBlending() const override;
   bool needAlphaTesting() const override;

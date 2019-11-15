@@ -24,7 +24,7 @@ public:
   {
     return std::shared_ptr<SineEase>(new SineEase(std::forward<Ts>(args)...));
   }
-  ~SineEase() override;
+  ~SineEase(); // = default
 
   /**
    * @brief Hidden

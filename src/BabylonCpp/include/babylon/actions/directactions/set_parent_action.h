@@ -24,7 +24,7 @@ public:
    */
   SetParentAction(unsigned int triggerOptions, const IAnimatablePtr& target,
                   IAnimatable* parent, Condition* condition = nullptr);
-  ~SetParentAction() override;
+  ~SetParentAction(); // = default
 
   /**
    * @brief Hidden

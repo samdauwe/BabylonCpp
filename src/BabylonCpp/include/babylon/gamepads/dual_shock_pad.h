@@ -63,7 +63,7 @@ public:
    */
   DualShockPad(const std::string& id, int index,
                const IBrowserGamepadPtr& gamepad);
-  ~DualShockPad() override;
+  ~DualShockPad(); // = default
 
   /**
    * @brief Defines the callback to call when left trigger is pressed.

@@ -29,7 +29,7 @@ struct BABYLON_SHARED_EXPORT ArrayBufferView {
   ArrayBufferView(ArrayBufferView&& other);
   ArrayBufferView& operator=(const ArrayBufferView& other);
   ArrayBufferView& operator=(ArrayBufferView&& other);
-  ~ArrayBufferView();
+  ~ArrayBufferView(); // = default
 
   size_t byteLength() const;
   operator bool() const;

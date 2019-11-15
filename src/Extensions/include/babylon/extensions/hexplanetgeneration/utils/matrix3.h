@@ -16,7 +16,7 @@ class Matrix3 {
 public:
   Matrix3();
   Matrix3(const Matrix3& other);
-  ~Matrix3();
+  ~Matrix3(); // = default
 
   /**
    * Matrix concatenation using '*'.

@@ -34,9 +34,7 @@ Sprite::Sprite(const std::string& iName, const ISpriteManagerPtr& manager)
 {
 }
 
-Sprite::~Sprite()
-{
-}
+Sprite::~Sprite() = default;
 
 void Sprite::addToSpriteManager(const SpritePtr& newSprite)
 {

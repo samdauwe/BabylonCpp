@@ -24,6 +24,8 @@ set(sources
 add_executable(${TARGET}
     ${sources}
 )
+babylon_target_clang_tidy(${TARGET})
+
 
 # Create namespaced alias
 add_executable(${META_PROJECT_NAME}::${TARGET} ALIAS ${TARGET})

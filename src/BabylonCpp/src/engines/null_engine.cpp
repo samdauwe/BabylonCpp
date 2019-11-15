@@ -79,9 +79,7 @@ NullEngine::NullEngine(const NullEngineOptions& options) : Engine{nullptr}
                     Engine::Version().c_str())
 }
 
-NullEngine::~NullEngine()
-{
-}
+NullEngine::~NullEngine() = default;
 
 Engine::GLBufferPtr
 NullEngine::createVertexBuffer(const Float32Array& /*vertices*/)

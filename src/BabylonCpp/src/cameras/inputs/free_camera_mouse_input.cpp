@@ -23,9 +23,7 @@ FreeCameraMouseInput::FreeCameraMouseInput(bool iTouchEnabled)
 {
 }
 
-FreeCameraMouseInput::~FreeCameraMouseInput()
-{
-}
+FreeCameraMouseInput::~FreeCameraMouseInput() = default;
 
 void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
 {

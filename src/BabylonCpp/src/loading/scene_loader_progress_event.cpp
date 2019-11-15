@@ -61,9 +61,7 @@ operator=(SceneLoaderProgressEvent&& other)
   return *this;
 }
 
-SceneLoaderProgressEvent::~SceneLoaderProgressEvent()
-{
-}
+SceneLoaderProgressEvent::~SceneLoaderProgressEvent() = default;
 
 bool SceneLoaderProgressEvent::get_lengthComputable() const
 {

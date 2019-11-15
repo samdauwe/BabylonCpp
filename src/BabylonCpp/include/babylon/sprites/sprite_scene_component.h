@@ -39,7 +39,7 @@ public:
     return std::shared_ptr<SpriteSceneComponent>(
       new SpriteSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~SpriteSceneComponent();
+  virtual ~SpriteSceneComponent(); // = default
 
   /**
    * @brief Registers the component in a given scene.

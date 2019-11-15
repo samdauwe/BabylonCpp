@@ -42,9 +42,7 @@ SimpleMaterial::SimpleMaterial(const std::string& iName, Scene* scene)
   Effect::ShadersStore()["simplePixelShader"] = simplePixelShader;
 }
 
-SimpleMaterial::~SimpleMaterial()
-{
-}
+SimpleMaterial::~SimpleMaterial() = default;
 
 TexturePtr& SimpleMaterial::get_diffuseTexture()
 {

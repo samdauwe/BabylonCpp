@@ -14,38 +14,12 @@ ISize::ISize(int iWidth, int iHeight) : width{iWidth}, height{iHeight}
 {
 }
 
-ISize::ISize(const ISize& other) : width{other.width}, height{other.height}
-{
-}
+ISize::ISize(const ISize& other) = default;
+ISize::ISize(ISize&& other) = default;
+ISize& ISize::operator=(const ISize& other) = default;
+ISize& ISize::operator=(ISize&& other) = default;
 
-ISize::ISize(ISize&& other)
-    : width{std::move(other.width)}, height{std::move(other.height)}
-{
-}
-
-ISize& ISize::operator=(const ISize& other)
-{
-  if (&other != this) {
-    width  = other.width;
-    height = other.height;
-  }
-
-  return *this;
-}
-
-ISize& ISize::operator=(ISize&& other)
-{
-  if (&other != this) {
-    width  = std::move(other.width);
-    height = std::move(other.height);
-  }
-
-  return *this;
-}
-
-ISize::~ISize()
-{
-}
+ISize::~ISize() = default;
 
 std::ostream& operator<<(std::ostream& os, const ISize& isize)
 {

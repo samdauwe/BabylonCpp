@@ -11,7 +11,7 @@ class BABYLON_SHARED_EXPORT DebugLayer {
 
 public:
   DebugLayer(Scene* scene);
-  ~DebugLayer();
+  ~DebugLayer(); // = default
 
   void hide();
 

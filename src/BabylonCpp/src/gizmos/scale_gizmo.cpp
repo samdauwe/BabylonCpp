@@ -67,9 +67,7 @@ ScaleGizmo::ScaleGizmo(const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
   attachedMesh = nullptr;
 }
 
-ScaleGizmo::~ScaleGizmo()
-{
-}
+ScaleGizmo::~ScaleGizmo() = default;
 
 AbstractMeshPtr& ScaleGizmo::get_attachedMesh()
 {

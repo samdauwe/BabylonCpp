@@ -54,9 +54,7 @@ Light::Light(const std::string& iName, Scene* scene)
 {
 }
 
-Light::~Light()
-{
-}
+Light::~Light() = default;
 
 Type Light::type() const
 {

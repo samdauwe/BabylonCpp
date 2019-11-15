@@ -21,9 +21,7 @@ SimplePlanet::SimplePlanet(float scale, float degree, Scene* scene,
 {
 }
 
-SimplePlanet::~SimplePlanet()
-{
-}
+SimplePlanet::~SimplePlanet() = default;
 
 void SimplePlanet::initialize()
 {

@@ -30,7 +30,7 @@ public:
 
     return material;
   }
-  ~CellMaterial() override;
+  ~CellMaterial(); // = default
 
   bool needAlphaBlending() const override;
   bool needAlphaTesting() const override;

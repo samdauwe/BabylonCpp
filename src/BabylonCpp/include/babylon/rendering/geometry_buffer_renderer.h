@@ -55,7 +55,7 @@ public:
    * @param ratio How big is the buffer related to the main canvas.
    */
   GeometryBufferRenderer(Scene* scene, float ratio = 1.f);
-  virtual ~GeometryBufferRenderer();
+  virtual ~GeometryBufferRenderer(); // = default
 
   /**
    * @brief Returns the index of the given texture type in the G-Buffer textures

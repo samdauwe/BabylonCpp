@@ -12,9 +12,7 @@ CrowdCollisionAvoidanceSystem::CrowdCollisionAvoidanceSystem(
 {
 }
 
-CrowdCollisionAvoidanceSystem::~CrowdCollisionAvoidanceSystem()
-{
-}
+CrowdCollisionAvoidanceSystem::~CrowdCollisionAvoidanceSystem() = default;
 
 void CrowdCollisionAvoidanceSystem::update()
 {

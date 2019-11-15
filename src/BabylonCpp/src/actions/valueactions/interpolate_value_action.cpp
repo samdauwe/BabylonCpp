@@ -29,9 +29,7 @@ InterpolateValueAction::InterpolateValueAction(
 {
 }
 
-InterpolateValueAction::~InterpolateValueAction()
-{
-}
+InterpolateValueAction::~InterpolateValueAction() = default;
 
 void InterpolateValueAction::_prepare()
 {

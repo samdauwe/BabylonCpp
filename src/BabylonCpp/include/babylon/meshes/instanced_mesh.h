@@ -27,7 +27,7 @@ public:
 
     return mesh;
   }
-  ~InstancedMesh() override;
+  ~InstancedMesh(); // = default
 
   void syncSubMeshes(const InstancedMeshPtr& instancedMesh);
 

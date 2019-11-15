@@ -8,53 +8,15 @@ EventState::EventState(int iMmask, bool iSkipNextObservers, any* iTarget,
   initalize(iMmask, iSkipNextObservers, iTarget, iCurrentTarget);
 }
 
-EventState::EventState(const EventState& other)
-    : skipNextObservers{other.skipNextObservers}
-    , mask{other.mask}
-    , target{other.target}
-    , currentTarget{other.currentTarget}
-    , lastReturnValue{other.lastReturnValue}
-{
-}
+EventState::EventState(const EventState& other) = default;
 
-EventState::EventState(EventState&& other)
-    : skipNextObservers{std::move(other.skipNextObservers)}
-    , mask{std::move(other.mask)}
-    , target{std::move(other.target)}
-    , currentTarget{std::move(other.currentTarget)}
-    , lastReturnValue{std::move(other.lastReturnValue)}
-{
-}
+EventState::EventState(EventState&& other) = default;
 
-EventState& EventState::operator=(const EventState& other)
-{
-  if (&other != this) {
-    skipNextObservers = other.skipNextObservers;
-    mask              = other.mask;
-    target            = other.target;
-    currentTarget     = other.currentTarget;
-    lastReturnValue   = other.lastReturnValue;
-  }
+EventState& EventState::operator=(const EventState& other) = default;
 
-  return *this;
-}
+EventState& EventState::operator=(EventState&& other) = default;
 
-EventState& EventState::operator=(EventState&& other)
-{
-  if (&other != this) {
-    skipNextObservers = std::move(other.skipNextObservers);
-    mask              = std::move(other.mask);
-    target            = std::move(other.target);
-    currentTarget     = std::move(other.currentTarget);
-    lastReturnValue   = std::move(other.lastReturnValue);
-  }
-
-  return *this;
-}
-
-EventState::~EventState()
-{
-}
+EventState::~EventState() = default;
 
 EventState& EventState::initalize(int iMmask, bool iSkipNextObservers,
                                   any* iTarget, any* iCurrentTarget)

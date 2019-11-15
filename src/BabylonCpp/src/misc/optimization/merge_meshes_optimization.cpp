@@ -24,9 +24,7 @@ MergeMeshesOptimization::MergeMeshesOptimization(int iPriority)
 {
 }
 
-MergeMeshesOptimization::~MergeMeshesOptimization()
-{
-}
+MergeMeshesOptimization::~MergeMeshesOptimization() = default;
 
 bool MergeMeshesOptimization::_canBeMerged(const AbstractMeshPtr& abstractMesh)
 {

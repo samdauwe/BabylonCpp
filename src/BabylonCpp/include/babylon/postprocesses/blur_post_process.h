@@ -29,7 +29,7 @@ public:
 
     return postProcess;
   }
-  ~BlurPostProcess() override;
+  ~BlurPostProcess(); // = default
 
   /**
    * @brief Updates the effect with the current post process compile time values

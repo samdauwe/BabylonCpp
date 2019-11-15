@@ -86,9 +86,7 @@ LensFlareSystem::LensFlareSystem(const std::string iName,
     "lensFlare", effectCreationOptions, _scene->getEngine());
 }
 
-LensFlareSystem::~LensFlareSystem()
-{
-}
+LensFlareSystem::~LensFlareSystem() = default;
 
 void LensFlareSystem::addToScene(const LensFlareSystemPtr& lensFlareSystem)
 {

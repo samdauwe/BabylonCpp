@@ -14,7 +14,7 @@ class Color {
 
 public:
   Color(float maxHeight);
-  ~Color();
+  ~Color(); // = default
 
   void setupGradient();
   Color3 getColor(float heightNorm, float rainNorm, float tempNorm);

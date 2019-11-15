@@ -72,7 +72,7 @@ public:
   ParticleSystem(const std::string& name, size_t capacity, Scene* scene,
                  const EffectPtr& customEffect = nullptr,
                  bool isAnimationSheetEnabled = false, float epsilon = 0.01f);
-  virtual ~ParticleSystem() override;
+  virtual ~ParticleSystem(); // = default
 
   /**
    * @brief Returns the object type.

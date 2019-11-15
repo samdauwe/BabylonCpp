@@ -63,7 +63,7 @@ namespace ImGuiAl
       Init();
     }
     
-    virtual ~Log();
+    virtual ~Log(); // = default
     
     bool Init( unsigned flags = 0, const char** more_actions = NULL );
     

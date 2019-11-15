@@ -31,7 +31,7 @@ public:
   Condition(Condition&& other);
   Condition& operator=(const Condition& other);
   Condition& operator=(Condition&& other);
-  virtual ~Condition();
+  virtual ~Condition(); // = default
 
   /**
    * @brief Check if the current condition is valid.

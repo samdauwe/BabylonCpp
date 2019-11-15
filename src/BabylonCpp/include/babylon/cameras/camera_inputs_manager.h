@@ -28,7 +28,7 @@ public:
    */
   CameraInputsManager();
   CameraInputsManager(TCamera* iCamera);
-  ~CameraInputsManager();
+  ~CameraInputsManager(); // = default
 
   /**
    * @brief Add an input method to a camera.

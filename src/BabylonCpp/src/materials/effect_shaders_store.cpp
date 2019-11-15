@@ -80,13 +80,9 @@
 
 namespace BABYLON {
 
-EffectShadersStore::EffectShadersStore()
-{
-}
+EffectShadersStore::EffectShadersStore() = default;
 
-EffectShadersStore::~EffectShadersStore()
-{
-}
+EffectShadersStore::~EffectShadersStore() = default;
 
 std::unordered_map<std::string, std::string>& EffectShadersStore::shaders()
 {

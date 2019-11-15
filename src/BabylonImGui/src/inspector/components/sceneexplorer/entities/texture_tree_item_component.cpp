@@ -23,9 +23,7 @@ TextureTreeItemComponent::TextureTreeItemComponent(
   }
 }
 
-TextureTreeItemComponent::~TextureTreeItemComponent()
-{
-}
+TextureTreeItemComponent::~TextureTreeItemComponent() = default;
 
 void TextureTreeItemComponent::render()
 {

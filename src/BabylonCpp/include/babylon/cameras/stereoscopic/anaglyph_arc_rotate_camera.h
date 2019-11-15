@@ -29,7 +29,7 @@ public:
 
     return camera;
   }
-  ~AnaglyphArcRotateCamera() override;
+  ~AnaglyphArcRotateCamera(); // = default
 
   /**
    * @brief Gets camera class name.

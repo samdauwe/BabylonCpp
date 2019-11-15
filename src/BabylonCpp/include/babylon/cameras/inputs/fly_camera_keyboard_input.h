@@ -22,7 +22,7 @@ public:
    * @brief Instantiate the input.
    */
   FlyCameraKeyboardInput();
-  virtual ~FlyCameraKeyboardInput();
+  virtual ~FlyCameraKeyboardInput(); // = default
 
   /**
    * @brief Attach the input controls to a specific dom element to get the input

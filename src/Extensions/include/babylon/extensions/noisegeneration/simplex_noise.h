@@ -85,7 +85,7 @@ public:
 
 public:
   SimplexNoise();
-  ~SimplexNoise();
+  ~SimplexNoise(); // = default
 
   // ---------------------------------------------------------------------------
 

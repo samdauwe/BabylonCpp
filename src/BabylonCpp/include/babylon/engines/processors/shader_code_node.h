@@ -18,7 +18,7 @@ using ShaderCodeNodePtr = std::shared_ptr<ShaderCodeNode>;
  * @brief Hidden
  */
 struct BABYLON_SHARED_EXPORT ShaderCodeNode {
-
+  virtual ~ShaderCodeNode() = default;
   std::string line;
   std::vector<ShaderCodeNodePtr> children;
   std::string additionalDefineKey;

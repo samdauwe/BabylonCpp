@@ -28,7 +28,7 @@ public:
   Viewport(Viewport&& otherViewport);
   Viewport& operator=(const Viewport& otherViewport);
   Viewport& operator=(Viewport&& otherViewport);
-  ~Viewport();
+  ~Viewport(); // = default
   Viewport copy() const;
 
   /**

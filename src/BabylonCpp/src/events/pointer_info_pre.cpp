@@ -22,8 +22,6 @@ PointerInfoPre::PointerInfoPre(PointerEventTypes _type,
 {
 }
 
-PointerInfoPre::~PointerInfoPre()
-{
-}
+PointerInfoPre::~PointerInfoPre() = default;
 
 } // end of namespace BABYLON

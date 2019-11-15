@@ -32,9 +32,7 @@ CloudProceduralTexture::CloudProceduralTexture(const std::string& iName,
   updateShaderUniforms();
 }
 
-CloudProceduralTexture::~CloudProceduralTexture()
-{
-}
+CloudProceduralTexture::~CloudProceduralTexture() = default;
 
 void CloudProceduralTexture::updateShaderUniforms()
 {

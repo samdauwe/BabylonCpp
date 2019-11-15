@@ -34,9 +34,7 @@ AnaglyphUniversalCamera::AnaglyphUniversalCamera(const std::string& iName,
   setCameraRigMode(Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH, rigParams);
 }
 
-AnaglyphUniversalCamera::~AnaglyphUniversalCamera()
-{
-}
+AnaglyphUniversalCamera::~AnaglyphUniversalCamera() = default;
 
 const std::string AnaglyphUniversalCamera::getClassName() const
 {

@@ -22,7 +22,7 @@ public:
    */
   PredicateCondition(ActionManager* actionManager,
                      const std::function<bool()>& predicate);
-  ~PredicateCondition() override;
+  ~PredicateCondition(); // = default
 
   /** Methods **/
 

@@ -13,9 +13,7 @@ BounceEase::BounceEase(int iBounces, float iBounciness)
 {
 }
 
-BounceEase::~BounceEase()
-{
-}
+BounceEase::~BounceEase() = default;
 
 float BounceEase::easeInCore(float gradient) const
 {

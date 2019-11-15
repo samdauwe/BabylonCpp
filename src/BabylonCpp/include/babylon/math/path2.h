@@ -27,7 +27,7 @@ public:
   Path2(Path2&& otherPath);
   Path2& operator=(const Path2& otherPath);
   Path2& operator=(Path2&& otherPath);
-  ~Path2();
+  ~Path2(); // = default
   Path2 copy() const;
   std::unique_ptr<Path2> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Path2& path);

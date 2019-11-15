@@ -117,9 +117,7 @@ DepthOfFieldEffect::DepthOfFieldEffect(Scene* scene,
   _effects.emplace_back(_dofMerge);
 }
 
-DepthOfFieldEffect::~DepthOfFieldEffect()
-{
-}
+DepthOfFieldEffect::~DepthOfFieldEffect() = default;
 
 void DepthOfFieldEffect::set_focalLength(float value)
 {

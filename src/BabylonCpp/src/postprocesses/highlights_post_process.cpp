@@ -14,8 +14,6 @@ HighlightsPostProcess::HighlightsPostProcess(const std::string& iName,
 {
 }
 
-HighlightsPostProcess::~HighlightsPostProcess()
-{
-}
+HighlightsPostProcess::~HighlightsPostProcess() = default;
 
 } // end of namespace BABYLON

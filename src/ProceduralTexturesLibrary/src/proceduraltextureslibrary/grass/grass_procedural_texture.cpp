@@ -38,9 +38,7 @@ GrassProceduralTexture::GrassProceduralTexture(const std::string& iName,
   updateShaderUniforms();
 }
 
-GrassProceduralTexture::~GrassProceduralTexture()
-{
-}
+GrassProceduralTexture::~GrassProceduralTexture() = default;
 
 void GrassProceduralTexture::updateShaderUniforms()
 {

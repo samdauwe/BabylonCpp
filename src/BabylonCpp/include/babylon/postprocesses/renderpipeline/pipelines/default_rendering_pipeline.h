@@ -85,7 +85,7 @@ public:
 
     return renderingPipeline;
   }
-  virtual ~DefaultRenderingPipeline() override;
+  virtual ~DefaultRenderingPipeline(); // = default
 
   void addToScene(const DefaultRenderingPipelinePtr& renderingPipeline);
 

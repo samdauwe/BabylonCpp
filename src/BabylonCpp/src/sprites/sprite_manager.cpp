@@ -129,9 +129,7 @@ SpriteManager::SpriteManager(const std::string& iName,
   }
 }
 
-SpriteManager::~SpriteManager()
-{
-}
+SpriteManager::~SpriteManager() = default;
 
 void SpriteManager::addToScene(const SpriteManagerPtr& newSpriteManager)
 {

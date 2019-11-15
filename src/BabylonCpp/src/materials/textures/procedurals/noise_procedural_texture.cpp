@@ -22,9 +22,7 @@ NoiseProceduralTexture::NoiseProceduralTexture(const std::string& iName,
   _updateShaderUniforms();
 }
 
-NoiseProceduralTexture::~NoiseProceduralTexture()
-{
-}
+NoiseProceduralTexture::~NoiseProceduralTexture() = default;
 
 void NoiseProceduralTexture::_updateShaderUniforms()
 {

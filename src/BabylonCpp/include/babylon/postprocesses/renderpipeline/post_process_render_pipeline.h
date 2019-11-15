@@ -34,7 +34,7 @@ public:
     return std::shared_ptr<PostProcessRenderPipeline>(
       new PostProcessRenderPipeline(std::forward<Ts>(args)...));
   }
-  virtual ~PostProcessRenderPipeline() override;
+  virtual ~PostProcessRenderPipeline(); // = default
 
   /**
    * @brief Gets the class name.

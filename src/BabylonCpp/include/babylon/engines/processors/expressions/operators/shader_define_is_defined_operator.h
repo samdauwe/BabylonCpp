@@ -18,7 +18,7 @@ public:
   ShaderDefineIsDefinedOperator(ShaderDefineIsDefinedOperator&& other);
   ShaderDefineIsDefinedOperator& operator=(const ShaderDefineIsDefinedOperator& other);
   ShaderDefineIsDefinedOperator& operator=(ShaderDefineIsDefinedOperator&& other);
-  virtual ~ShaderDefineIsDefinedOperator();
+  virtual ~ShaderDefineIsDefinedOperator(); // = default
 
   bool isTrue(const std::unordered_map<std::string, std::string>& preprocessors) const override;
 

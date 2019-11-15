@@ -30,7 +30,7 @@ public:
 
     return light;
   }
-  ~PointLight() override;
+  ~PointLight(); // = default
 
   Type type() const override;
 

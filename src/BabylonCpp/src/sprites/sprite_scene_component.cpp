@@ -24,9 +24,7 @@ SpriteSceneComponent::SpriteSceneComponent(Scene* iScene)
   };
 }
 
-SpriteSceneComponent::~SpriteSceneComponent()
-{
-}
+SpriteSceneComponent::~SpriteSceneComponent() = default;
 
 void SpriteSceneComponent::_register()
 {

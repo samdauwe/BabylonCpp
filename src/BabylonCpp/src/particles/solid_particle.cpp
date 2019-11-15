@@ -43,9 +43,7 @@ SolidParticle::SolidParticle(
   }
 }
 
-SolidParticle::~SolidParticle()
-{
-}
+SolidParticle::~SolidParticle() = default;
 
 bool SolidParticle::intersectsMesh(Mesh* target) const
 {

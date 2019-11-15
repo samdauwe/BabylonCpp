@@ -85,9 +85,7 @@ InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource,
   }
 }
 
-InternalTexture::~InternalTexture()
-{
-}
+InternalTexture::~InternalTexture() = default;
 
 Engine* InternalTexture::getEngine()
 {

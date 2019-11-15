@@ -29,9 +29,7 @@ MultiviewRenderTarget::MultiviewRenderTarget(Scene* scene, const ISize& size)
   _texture                     = internalTexture;
 }
 
-MultiviewRenderTarget::~MultiviewRenderTarget()
-{
-}
+MultiviewRenderTarget::~MultiviewRenderTarget() = default;
 
 void MultiviewRenderTarget::_bindFrameBuffer(unsigned int /*faceIndex*/)
 {

@@ -18,8 +18,6 @@ FilterPostProcess::FilterPostProcess(const std::string& iName,
   };
 }
 
-FilterPostProcess::~FilterPostProcess()
-{
-}
+FilterPostProcess::~FilterPostProcess() = default;
 
 } // end of namespace BABYLON

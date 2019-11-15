@@ -39,9 +39,7 @@ PhysicsViewer::PhysicsViewer(Scene* scene)
   _utilityLayer->utilityLayerScene->autoClearDepthAndStencil = true;
 }
 
-PhysicsViewer::~PhysicsViewer()
-{
-}
+PhysicsViewer::~PhysicsViewer() = default;
 
 void PhysicsViewer::_updateDebugMeshes()
 {

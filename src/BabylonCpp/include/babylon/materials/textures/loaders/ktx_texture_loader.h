@@ -11,7 +11,7 @@ namespace BABYLON {
 struct BABYLON_SHARED_EXPORT _KTXTextureLoader : public IInternalTextureLoader {
 
   _KTXTextureLoader();
-  virtual ~_KTXTextureLoader();
+  virtual ~_KTXTextureLoader(); // = default
 
   /**
    * @brief Defines wether the loader supports cascade loading the different

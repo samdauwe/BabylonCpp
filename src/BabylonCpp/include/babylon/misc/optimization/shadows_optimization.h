@@ -10,7 +10,7 @@ class BABYLON_SHARED_EXPORT ShadowsOptimization : public SceneOptimization {
 
 public:
   ShadowsOptimization(int priority = 0);
-  ~ShadowsOptimization() override;
+  ~ShadowsOptimization(); // = default
 
   bool apply(Scene* scene) override;
 

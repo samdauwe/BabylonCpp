@@ -20,7 +20,7 @@ public:
    */
   PointerInfoBase(PointerEventTypes type, const PointerEvent& event);
   PointerInfoBase(PointerEventTypes type, const MouseWheelEvent& event);
-  ~PointerInfoBase();
+  ~PointerInfoBase(); // = default
 
 public:
   /**

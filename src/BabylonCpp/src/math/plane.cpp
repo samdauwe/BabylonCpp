@@ -8,9 +8,7 @@
 
 namespace BABYLON {
 
-Plane::Plane()
-{
-}
+Plane::Plane() = default;
 
 Plane::Plane(Vector3 _normal, float _d) : normal{_normal}, d{_d}
 {
@@ -21,39 +19,15 @@ Plane::Plane(float a, float b, float c, float id)
 {
 }
 
-Plane::Plane(const Plane& otherPlane)
-    : normal{otherPlane.normal}, d{otherPlane.d}
-{
-}
+Plane::Plane(const Plane& otherPlane) = default;
 
-Plane::Plane(Plane&& otherPlane)
-    : normal{std::move(otherPlane.normal)}, d{std::move(otherPlane.d)}
-{
-}
+Plane::Plane(Plane&& otherPlane) = default;
 
-Plane& Plane::operator=(const Plane& otherPlane)
-{
-  if (&otherPlane != this) {
-    normal = otherPlane.normal;
-    d      = otherPlane.d;
-  }
+Plane& Plane::operator=(const Plane& otherPlane) = default;
 
-  return *this;
-}
+Plane& Plane::operator=(Plane&& otherPlane) = default;
 
-Plane& Plane::operator=(Plane&& otherPlane)
-{
-  if (&otherPlane != this) {
-    normal = std::move(otherPlane.normal);
-    d      = std::move(otherPlane.d);
-  }
-
-  return *this;
-}
-
-Plane::~Plane()
-{
-}
+Plane::~Plane() = default;
 
 Plane Plane::copy() const
 {

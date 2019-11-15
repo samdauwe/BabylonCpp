@@ -45,7 +45,7 @@ public:
 
 public:
   World();
-  ~World();
+  ~World(); // = default
 
   void generatePlanet(Planet*& planet, unsigned long originalSeed,
                       unsigned long seed, size_t icosahedronSubdivision,

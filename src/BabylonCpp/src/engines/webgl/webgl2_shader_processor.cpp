@@ -5,9 +5,7 @@
 
 namespace BABYLON {
 
-WebGL2ShaderProcessor::~WebGL2ShaderProcessor()
-{
-}
+WebGL2ShaderProcessor::~WebGL2ShaderProcessor() = default;
 
 std::string WebGL2ShaderProcessor::attributeProcessor(const std::string& attribute)
 {

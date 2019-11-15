@@ -22,7 +22,7 @@ public:
    */
   StateCondition(ActionManager* actionManager, const IAnimatablePtr& target,
                  AnimationValue* value);
-  virtual ~StateCondition() override;
+  virtual ~StateCondition(); // = default
 
   /** Methods **/
 

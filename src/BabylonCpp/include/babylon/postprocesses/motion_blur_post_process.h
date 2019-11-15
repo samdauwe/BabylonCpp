@@ -44,7 +44,7 @@ public:
 
     return postProcess;
   }
-  ~MotionBlurPostProcess() override;
+  ~MotionBlurPostProcess(); // = default
 
   /**
    * @brief Excludes the given skinned mesh from computing bones velocities.

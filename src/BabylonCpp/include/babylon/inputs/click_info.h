@@ -17,7 +17,7 @@ public:
   ClickInfo(ClickInfo&& otherClickInfo);
   ClickInfo& operator=(const ClickInfo& otherClickInfo);
   ClickInfo& operator=(ClickInfo&& otherClickInfo);
-  ~ClickInfo();
+  ~ClickInfo(); // = default
 
 private:
   bool get_singleClick() const;

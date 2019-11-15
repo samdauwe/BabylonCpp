@@ -14,9 +14,7 @@ IMaterialSheenDefines::IMaterialSheenDefines() : MaterialDefines{}
   };
 }
 
-IMaterialSheenDefines::~IMaterialSheenDefines()
-{
-}
+IMaterialSheenDefines::~IMaterialSheenDefines() = default;
 
 std::string IMaterialSheenDefines::toString() const
 {

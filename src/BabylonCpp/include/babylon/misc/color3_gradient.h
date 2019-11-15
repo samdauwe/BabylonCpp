@@ -13,7 +13,7 @@ namespace BABYLON {
 struct BABYLON_SHARED_EXPORT Color3Gradient : public IValueGradient {
 
   Color3Gradient();
-  ~Color3Gradient();
+  ~Color3Gradient(); // = default
 
   /**
    * Gets or sets the associated color

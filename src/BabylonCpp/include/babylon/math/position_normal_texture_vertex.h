@@ -30,7 +30,7 @@ public:
   PositionNormalTextureVertex&
   operator=(const PositionNormalTextureVertex& other);
   PositionNormalTextureVertex& operator=(PositionNormalTextureVertex&& other);
-  ~PositionNormalTextureVertex();
+  ~PositionNormalTextureVertex(); // = default
   PositionNormalTextureVertex copy() const;
 
   /**

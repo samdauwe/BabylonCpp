@@ -24,7 +24,7 @@ public:
   {
     return std::shared_ptr<CubicEase>(new CubicEase(std::forward<Ts>(args)...));
   }
-  ~CubicEase() override;
+  ~CubicEase(); // = default
 
   /**
    * @brief Hidden

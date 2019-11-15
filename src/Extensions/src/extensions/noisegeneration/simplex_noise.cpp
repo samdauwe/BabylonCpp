@@ -161,9 +161,7 @@ SimplexNoise::SimplexNoise()
      156, 180}};
 }
 
-SimplexNoise::~SimplexNoise()
-{
-}
+SimplexNoise::~SimplexNoise() = default;
 
 // ---------------------------------------------------------------------------
 

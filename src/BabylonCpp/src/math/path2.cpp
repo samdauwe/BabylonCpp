@@ -45,9 +45,7 @@ Path2& Path2::operator=(Path2&& otherPath)
   return *this;
 }
 
-Path2::~Path2()
-{
-}
+Path2::~Path2() = default;
 
 Path2 Path2::copy() const
 {

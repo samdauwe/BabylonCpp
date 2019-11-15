@@ -28,7 +28,7 @@ public:
    * @param scene Defines the scene to instrument
    */
   SceneInstrumentation(Scene* scene);
-  virtual ~SceneInstrumentation();
+  virtual ~SceneInstrumentation(); // = default
 
   /**
    * @brief Dispose and release associated resources.

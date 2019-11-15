@@ -130,9 +130,7 @@ Texture::Texture(
   }
 }
 
-Texture::~Texture()
-{
-}
+Texture::~Texture() = default;
 
 Type Texture::type() const
 {

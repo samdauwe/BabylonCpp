@@ -25,7 +25,7 @@ public:
    */
   HemisphericParticleEmitter(float radius = 1.f, float radiusRange = 1.f,
                              float directionRandomizer = 0.f);
-  virtual ~HemisphericParticleEmitter();
+  virtual ~HemisphericParticleEmitter(); // = default
 
   /**
    * @brief Called by the particle System when the direction is computed for the

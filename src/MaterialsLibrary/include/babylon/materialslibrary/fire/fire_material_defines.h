@@ -10,7 +10,7 @@ namespace MaterialsLibrary {
 struct BABYLON_SHARED_EXPORT FireMaterialDefines : public MaterialDefines {
 
   FireMaterialDefines();
-  ~FireMaterialDefines();
+  ~FireMaterialDefines(); // = default
 
 }; // end of struct FireMaterialDefines
 

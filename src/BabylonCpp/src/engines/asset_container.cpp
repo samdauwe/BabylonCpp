@@ -26,9 +26,7 @@ AssetContainer::AssetContainer(Scene* iScene) : AbstractScene{}, scene{iScene}
 {
 }
 
-AssetContainer::~AssetContainer()
-{
-}
+AssetContainer::~AssetContainer() = default;
 
 void AssetContainer::addAllToScene()
 {

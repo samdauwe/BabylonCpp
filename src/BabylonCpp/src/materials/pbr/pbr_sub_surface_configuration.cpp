@@ -66,9 +66,7 @@ PBRSubSurfaceConfiguration::PBRSubSurfaceConfiguration(
 {
 }
 
-PBRSubSurfaceConfiguration::~PBRSubSurfaceConfiguration()
-{
-}
+PBRSubSurfaceConfiguration::~PBRSubSurfaceConfiguration() = default;
 
 bool PBRSubSurfaceConfiguration::get_isRefractionEnabled() const
 {

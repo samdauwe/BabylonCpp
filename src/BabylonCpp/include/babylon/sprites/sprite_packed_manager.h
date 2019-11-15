@@ -26,7 +26,7 @@ public:
 
     return spriteManager;
   }
-  virtual ~SpritePackedManager() override;
+  virtual ~SpritePackedManager(); // = default
 
 protected:
   /**

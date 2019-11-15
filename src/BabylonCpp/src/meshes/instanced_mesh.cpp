@@ -39,9 +39,7 @@ InstancedMesh::InstancedMesh(const std::string& iName, const MeshPtr& source)
   refreshBoundingInfo();
 }
 
-InstancedMesh::~InstancedMesh()
-{
-}
+InstancedMesh::~InstancedMesh() = default;
 
 void InstancedMesh::syncSubMeshes(const InstancedMeshPtr& instancedMesh)
 {

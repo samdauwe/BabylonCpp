@@ -11,7 +11,7 @@ namespace BABYLON {
 struct BABYLON_SHARED_EXPORT _TGATextureLoader : public IInternalTextureLoader {
 
   _TGATextureLoader();
-  virtual ~_TGATextureLoader();
+  virtual ~_TGATextureLoader(); // = default
 
   /**
    * @brief Defines wether the loader supports cascade loading the different

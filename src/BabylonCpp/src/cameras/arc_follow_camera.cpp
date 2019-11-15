@@ -31,9 +31,7 @@ ArcFollowCamera::ArcFollowCamera(const std::string& iName, float iAlpha,
   _follow();
 }
 
-ArcFollowCamera::~ArcFollowCamera()
-{
-}
+ArcFollowCamera::~ArcFollowCamera() = default;
 
 Type ArcFollowCamera::type() const
 {

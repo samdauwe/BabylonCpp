@@ -41,9 +41,7 @@ StereoscopicUniversalCamera::StereoscopicUniversalCamera(
                    rigParams);
 }
 
-StereoscopicUniversalCamera::~StereoscopicUniversalCamera()
-{
-}
+StereoscopicUniversalCamera::~StereoscopicUniversalCamera() = default;
 
 const std::string StereoscopicUniversalCamera::getClassName() const
 {

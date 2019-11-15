@@ -6,8 +6,6 @@ PaneComponent::PaneComponent(const IPaneComponentProps& iProps) : props{iProps}
 {
 }
 
-PaneComponent::~PaneComponent()
-{
-}
+PaneComponent::~PaneComponent() = default;
 
 } // end of namespace BABYLON

@@ -24,7 +24,7 @@ public:
   SwitchBooleanAction(unsigned int triggerOptions, const IAnimatablePtr& target,
                       const std::string& propertyPath,
                       Condition* condition = nullptr);
-  ~SwitchBooleanAction() override;
+  ~SwitchBooleanAction(); // = default
 
   /**
    * @brief Hidden

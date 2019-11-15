@@ -36,7 +36,7 @@ public:
    */
   PointerDragBehavior(const PointerDragBehaviorOptions& options
                       = PointerDragBehaviorOptions());
-  virtual ~PointerDragBehavior() override;
+  virtual ~PointerDragBehavior(); // = default
 
   /**
    * @brief The name of the behavior.

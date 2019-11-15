@@ -16,9 +16,7 @@ AudioSceneComponent::AudioSceneComponent(Scene* iScene)
   scene                 = iScene;
 }
 
-AudioSceneComponent::~AudioSceneComponent()
-{
-}
+AudioSceneComponent::~AudioSceneComponent() = default;
 
 bool AudioSceneComponent::get_audioEnabled() const
 {

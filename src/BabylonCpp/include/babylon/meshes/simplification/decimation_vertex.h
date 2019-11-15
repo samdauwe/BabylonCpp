@@ -14,7 +14,7 @@ class BABYLON_SHARED_EXPORT DecimationVertex {
 
 public:
   DecimationVertex(const Vector3& position, int id);
-  ~DecimationVertex();
+  ~DecimationVertex(); // = default
 
   void updatePosition(const Vector3& newPosition);
 

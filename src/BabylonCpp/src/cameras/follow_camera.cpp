@@ -40,9 +40,7 @@ FollowCamera::FollowCamera(const std::string& iName, const Vector3& iPosition,
   // inputs->addKeyboard().addMouseWheel().addPointers().addVRDeviceOrientation();
 }
 
-FollowCamera::~FollowCamera()
-{
-}
+FollowCamera::~FollowCamera() = default;
 
 Type FollowCamera::type() const
 {

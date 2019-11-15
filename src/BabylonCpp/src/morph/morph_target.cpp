@@ -25,9 +25,7 @@ MorphTarget::MorphTarget(const std::string& name, float iInfluence,
   influence = iInfluence;
 }
 
-MorphTarget::~MorphTarget()
-{
-}
+MorphTarget::~MorphTarget() = default;
 
 Type MorphTarget::type() const
 {

@@ -39,7 +39,7 @@ public:
    */
   PBRSubSurfaceConfiguration(
     const std::function<void()>& markAllSubMeshesAsTexturesDirty);
-  ~PBRSubSurfaceConfiguration();
+  ~PBRSubSurfaceConfiguration(); // = default
 
   /**
    * @brief Hidden

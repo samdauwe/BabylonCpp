@@ -21,7 +21,7 @@ public:
    */
   ScaleGizmo(const std::shared_ptr<UtilityLayerRenderer>& gizmoLayer
              = UtilityLayerRenderer::DefaultUtilityLayer());
-  ~ScaleGizmo() override;
+  ~ScaleGizmo(); // = default
 
   /**
    * @brief Disposes of the gizmo.

@@ -39,7 +39,7 @@ public:
 
     return texture;
   }
-  ~ProceduralTexture() override;
+  ~ProceduralTexture(); // = default
 
   void addToScene(const ProceduralTexturePtr& newTexture);
 

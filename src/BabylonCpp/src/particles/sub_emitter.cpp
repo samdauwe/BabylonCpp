@@ -28,9 +28,7 @@ SubEmitter::SubEmitter(const ParticleSystemPtr& iParticleSystem)
     });
 }
 
-SubEmitter::~SubEmitter()
-{
-}
+SubEmitter::~SubEmitter() = default;
 
 SubEmitterPtr SubEmitter::clone() const
 {

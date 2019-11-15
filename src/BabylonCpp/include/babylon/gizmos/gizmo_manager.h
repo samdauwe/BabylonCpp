@@ -46,7 +46,7 @@ public:
    * @param scene the scene to overlay the gizmos on top of
    */
   GizmoManager(Scene* scene);
-  virtual ~GizmoManager() override;
+  virtual ~GizmoManager(); // = default
 
   /**
    * @brief Attaches a set of gizmos to the specified mesh.

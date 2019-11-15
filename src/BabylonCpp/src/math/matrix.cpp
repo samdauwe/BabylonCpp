@@ -27,49 +27,15 @@ Matrix::Matrix()
   _updateIdentityStatus(false);
 }
 
-Matrix::Matrix(const Matrix& otherMatrix)
-    : updateFlag{otherMatrix.updateFlag}
-    , _isIdentity{otherMatrix._isIdentity}
-    , _isIdentityDirty{otherMatrix._isIdentityDirty}
-    , _m{otherMatrix._m}
-{
-}
+Matrix::Matrix(const Matrix& otherMatrix) = default;
 
-Matrix::Matrix(Matrix&& otherMatrix)
-    : updateFlag{std::move(otherMatrix.updateFlag)}
-    , _isIdentity{std::move(otherMatrix._isIdentity)}
-    , _isIdentityDirty{std::move(otherMatrix._isIdentityDirty)}
-    , _m{std::move(otherMatrix._m)}
-{
-}
+Matrix::Matrix(Matrix&& otherMatrix) = default;
 
-Matrix& Matrix::operator=(const Matrix& otherMatrix)
-{
-  if (&otherMatrix != this) {
-    updateFlag       = otherMatrix.updateFlag;
-    _isIdentity      = otherMatrix._isIdentity;
-    _isIdentityDirty = otherMatrix._isIdentityDirty;
-    _m               = otherMatrix._m;
-  }
+Matrix& Matrix::operator=(const Matrix& otherMatrix) = default;
 
-  return *this;
-}
+Matrix& Matrix::operator=(Matrix&& otherMatrix) = default;
 
-Matrix& Matrix::operator=(Matrix&& otherMatrix)
-{
-  if (&otherMatrix != this) {
-    updateFlag       = std::move(otherMatrix.updateFlag);
-    _isIdentity      = std::move(otherMatrix._isIdentity);
-    _isIdentityDirty = std::move(otherMatrix._isIdentityDirty);
-    _m               = std::move(otherMatrix._m);
-  }
-
-  return *this;
-}
-
-Matrix::~Matrix()
-{
-}
+Matrix::~Matrix() = default;
 
 Matrix Matrix::copy() const
 {

@@ -32,9 +32,7 @@ CameraInputsManager<TCamera>::CameraInputsManager(TCamera* iCamera)
 }
 
 template <class TCamera>
-CameraInputsManager<TCamera>::~CameraInputsManager()
-{
-}
+CameraInputsManager<TCamera>::~CameraInputsManager() = default;
 
 template <class TCamera>
 void CameraInputsManager<TCamera>::add(

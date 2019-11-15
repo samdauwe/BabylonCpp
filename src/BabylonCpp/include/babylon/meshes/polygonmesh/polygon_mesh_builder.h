@@ -33,7 +33,7 @@ public:
                      Scene* scene);
   PolygonMeshBuilder(const std::string& name,
                      const std::vector<Vector2>& contours, Scene* scene);
-  ~PolygonMeshBuilder();
+  ~PolygonMeshBuilder(); // = default
 
   /**
    * @brief Adds a whole within the polygon.

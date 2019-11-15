@@ -28,7 +28,7 @@ public:
 
     return postProcess;
   }
-  virtual ~BloomMergePostProcess() override;
+  virtual ~BloomMergePostProcess(); // = default
 
 protected:
   /**

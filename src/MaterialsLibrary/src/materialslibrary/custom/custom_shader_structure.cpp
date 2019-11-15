@@ -3,13 +3,9 @@
 namespace BABYLON {
 namespace MaterialsLibrary {
 
-CustomShaderStructure::CustomShaderStructure()
-{
-}
+CustomShaderStructure::CustomShaderStructure() =  default;
 
-CustomShaderStructure::~CustomShaderStructure()
-{
-}
+CustomShaderStructure::~CustomShaderStructure() = default;
 
 } // end of namespace MaterialsLibrary
 } // end of namespace BABYLON

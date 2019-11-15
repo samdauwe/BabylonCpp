@@ -80,7 +80,7 @@ public:
 
     return renderingPipeline;
   }
-  virtual ~LensRenderingPipeline() override;
+  virtual ~LensRenderingPipeline(); // = default
 
   void addToScene(const LensRenderingPipelinePtr& lensRenderingPipeline);
 

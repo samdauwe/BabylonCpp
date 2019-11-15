@@ -27,7 +27,7 @@ public:
 
 public:
   PostProcessTreeItemComponent(const IPostProcessTreeItemComponentProps& props);
-  virtual ~PostProcessTreeItemComponent() override;
+  virtual ~PostProcessTreeItemComponent(); // = default
 
   void render() override;
 

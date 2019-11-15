@@ -45,9 +45,7 @@ ColorGradingTexture::ColorGradingTexture(const std::string& iUrl, Scene* scene)
   }
 }
 
-ColorGradingTexture::~ColorGradingTexture()
-{
-}
+ColorGradingTexture::~ColorGradingTexture() = default;
 
 Matrix* ColorGradingTexture::getTextureMatrix()
 {

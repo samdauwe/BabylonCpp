@@ -21,36 +21,11 @@ IntersectionInfo::IntersectionInfo(float _bu, float _bv, float _distance)
 {
 }
 
-IntersectionInfo::IntersectionInfo(const IntersectionInfo& other)
-    : bu{other.bu}
-    , bv{other.bv}
-    , distance{other.distance}
-    , faceId{other.faceId}
-    , subMeshId{other.subMeshId}
-{
-}
+IntersectionInfo::IntersectionInfo(const IntersectionInfo& other) = default;
 
-IntersectionInfo::IntersectionInfo(IntersectionInfo&& other)
-    : bu{std::move(other.bu)}
-    , bv{std::move(other.bv)}
-    , distance{std::move(other.distance)}
-    , faceId{std::move(other.faceId)}
-    , subMeshId{std::move(other.subMeshId)}
-{
-}
+IntersectionInfo::IntersectionInfo(IntersectionInfo&& other) = default;
 
-IntersectionInfo& IntersectionInfo::operator=(const IntersectionInfo& other)
-{
-  if (&other != this) {
-    bu        = other.bu;
-    bv        = other.bv;
-    distance  = other.distance;
-    faceId    = other.faceId;
-    subMeshId = other.subMeshId;
-  }
-
-  return *this;
-}
+IntersectionInfo& IntersectionInfo::operator=(const IntersectionInfo& other) = default;
 
 IntersectionInfo& IntersectionInfo::operator=(IntersectionInfo&& other)
 {
@@ -65,8 +40,6 @@ IntersectionInfo& IntersectionInfo::operator=(IntersectionInfo&& other)
   return *this;
 }
 
-IntersectionInfo::~IntersectionInfo()
-{
-}
+IntersectionInfo::~IntersectionInfo() = default;
 
 } // end of namespace BABYLON

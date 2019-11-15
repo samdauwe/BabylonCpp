@@ -38,7 +38,7 @@ public:
    */
   BoneIKController(AbstractMesh* mesh, Bone* bone,
                    const std::optional<BoneIKControllerOptions>& options);
-  ~BoneIKController();
+  ~BoneIKController(); // = default
 
   /**
    * @brief Force the controller to update the bones.

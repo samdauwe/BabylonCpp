@@ -25,7 +25,7 @@ public:
   SphericalPolynomial(SphericalPolynomial&& other);
   SphericalPolynomial& operator=(const SphericalPolynomial& other);
   SphericalPolynomial& operator=(SphericalPolynomial&& other);
-  ~SphericalPolynomial();
+  ~SphericalPolynomial(); // = default
   SphericalPolynomial copy() const;
   std::unique_ptr<SphericalPolynomial> clone() const;
 

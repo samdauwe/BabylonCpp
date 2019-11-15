@@ -26,43 +26,15 @@ Vector3::Vector3(float ix, float iy, float iz) : x{ix}, y{iy}, z{iz}
 {
 }
 
-Vector3::Vector3(const Vector3& otherVector)
-    : x{otherVector.x}, y{otherVector.y}, z{otherVector.z}
-{
-}
+Vector3::Vector3(const Vector3& otherVector) = default;
 
-Vector3::Vector3(Vector3&& otherVector)
-    : x{std::move(otherVector.x)}
-    , y{std::move(otherVector.y)}
-    , z{std::move(otherVector.z)}
-{
-}
+Vector3::Vector3(Vector3&& otherVector) = default;
 
-Vector3::~Vector3()
-{
-}
+Vector3::~Vector3() = default;
 
-Vector3& Vector3::operator=(const Vector3& otherVector)
-{
-  if (&otherVector != this) {
-    x = otherVector.x;
-    y = otherVector.y;
-    z = otherVector.z;
-  }
+Vector3& Vector3::operator=(const Vector3& otherVector) = default;
 
-  return *this;
-}
-
-Vector3& Vector3::operator=(Vector3&& otherVector)
-{
-  if (&otherVector != this) {
-    x = std::move(otherVector.x);
-    y = std::move(otherVector.y);
-    z = std::move(otherVector.z);
-  }
-
-  return *this;
-}
+Vector3& Vector3::operator=(Vector3&& otherVector) = default;
 
 Vector3 Vector3::copy() const
 {

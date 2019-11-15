@@ -41,7 +41,7 @@ public:
    * @param scene Babylon.js scene
    */
   PhysicsHelper(Scene* scene);
-  ~PhysicsHelper();
+  ~PhysicsHelper(); // = default
 
   /**
    * @brief Applies a radial explosion impulse.

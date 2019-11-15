@@ -12,9 +12,7 @@ CrowdAgent::CrowdAgent(RVO2::RVOSimulator* sim,
   _id = _sim->addAgent(RVO2::Vector2(position.x, position.y));
 }
 
-CrowdAgent::~CrowdAgent()
-{
-}
+CrowdAgent::~CrowdAgent() = default;
 
 size_t CrowdAgent::id() const
 {

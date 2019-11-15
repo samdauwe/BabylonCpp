@@ -54,7 +54,7 @@ public:
 
 public:
   FramingBehavior();
-  virtual ~FramingBehavior() override;
+  virtual ~FramingBehavior(); // = default
 
   /**
    * @brief Gets the name of the behavior.

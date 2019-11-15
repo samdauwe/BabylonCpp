@@ -5,13 +5,9 @@
 namespace BABYLON {
 namespace Extensions {
 
-CrowdMeshUpdaterSystem::CrowdMeshUpdaterSystem()
-{
-}
+CrowdMeshUpdaterSystem::CrowdMeshUpdaterSystem() = default;
 
-CrowdMeshUpdaterSystem::~CrowdMeshUpdaterSystem()
-{
-}
+CrowdMeshUpdaterSystem::~CrowdMeshUpdaterSystem() = default;
 
 void CrowdMeshUpdaterSystem::update()
 {

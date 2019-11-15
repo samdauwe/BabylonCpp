@@ -26,7 +26,7 @@ public:
   EffectFallbacks(EffectFallbacks&& other);
   EffectFallbacks& operator=(const EffectFallbacks& other);
   EffectFallbacks& operator=(EffectFallbacks&& other);
-  ~EffectFallbacks();
+  ~EffectFallbacks(); // = default
 
   bool operator==(const EffectFallbacks& other) const;
   bool operator!=(const EffectFallbacks& other) const;

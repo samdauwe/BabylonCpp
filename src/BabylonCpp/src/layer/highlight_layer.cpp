@@ -93,9 +93,7 @@ HighlightLayer::HighlightLayer(const std::string& iName, Scene* scene,
   _shouldRender = false;
 }
 
-HighlightLayer::~HighlightLayer()
-{
-}
+HighlightLayer::~HighlightLayer() = default;
 
 void HighlightLayer::set_blurHorizontalSize(float value)
 {

@@ -9,9 +9,7 @@ ShadowsOptimization::ShadowsOptimization(int iPriority)
 {
 }
 
-ShadowsOptimization::~ShadowsOptimization()
-{
-}
+ShadowsOptimization::~ShadowsOptimization() = default;
 
 bool ShadowsOptimization::apply(Scene* scene)
 {

@@ -23,7 +23,7 @@ public:
    */
   StopSoundAction(unsigned int triggerOptions, Sound* sound,
                   Condition* condition = nullptr);
-  ~StopSoundAction() override;
+  ~StopSoundAction(); // = default
 
   /**
    * @brief Hidden

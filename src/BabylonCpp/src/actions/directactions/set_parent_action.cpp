@@ -13,9 +13,7 @@ SetParentAction::SetParentAction(unsigned int iTriggerOptions,
 {
 }
 
-SetParentAction::~SetParentAction()
-{
-}
+SetParentAction::~SetParentAction() = default;
 
 void SetParentAction::_prepare()
 {

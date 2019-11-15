@@ -20,7 +20,7 @@ public:
    * @param length The number of samples required to saturate the sliding window
    */
   RollingAverage(size_t length);
-  ~RollingAverage();
+  ~RollingAverage(); // = default
 
   /**
    * @brief Adds a sample to the sample set

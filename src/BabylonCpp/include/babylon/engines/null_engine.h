@@ -21,7 +21,7 @@ public:
       new NullEngine(std::forward<Ts>(args)...));
     return engine;
   }
-  ~NullEngine() override;
+  ~NullEngine(); // = default
 
   /**
    * @see https://doc.babylonjs.com/babylon101/animations#deterministic-lockstep

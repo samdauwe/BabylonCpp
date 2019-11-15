@@ -21,9 +21,7 @@ ActionManager::ActionManager(Scene* scene)
 {
 }
 
-ActionManager::~ActionManager()
-{
-}
+ActionManager::~ActionManager() = default;
 
 void ActionManager::addToScene(const ActionManagerPtr& newActionManager)
 {

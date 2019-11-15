@@ -23,7 +23,7 @@ public:
   VRCameraMetrics(VRCameraMetrics&& other);
   VRCameraMetrics& operator=(const VRCameraMetrics& other);
   VRCameraMetrics& operator=(VRCameraMetrics&& other);
-  ~VRCameraMetrics();
+  ~VRCameraMetrics(); // = default
 
   /**
    * @brief Gets the rendering aspect ratio based on the provided resolutions.

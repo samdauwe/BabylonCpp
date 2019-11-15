@@ -3,13 +3,9 @@
 namespace BABYLON {
 namespace MaterialsLibrary {
 
-ShaderSpecialParts::ShaderSpecialParts()
-{
-}
+ShaderSpecialParts::ShaderSpecialParts() = default;
 
-ShaderSpecialParts::~ShaderSpecialParts()
-{
-}
+ShaderSpecialParts::~ShaderSpecialParts() = default;
 
 } // end of namespace MaterialsLibrary
 } // end of namespace BABYLON

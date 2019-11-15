@@ -27,7 +27,7 @@ class BABYLON_SHARED_EXPORT ParticleSystemSet : public IDisposable {
 
 public:
   ParticleSystemSet();
-  virtual ~ParticleSystemSet();
+  virtual ~ParticleSystemSet(); // = default
 
   /**
    * @brief Creates a new emitter mesh as a sphere.

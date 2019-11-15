@@ -62,9 +62,7 @@ TerrainMaterial::TerrainMaterial(const std::string& iName, Scene* scene)
   Effect::ShadersStore()["terrainPixelShader"] = terrainPixelShader;
 }
 
-TerrainMaterial::~TerrainMaterial()
-{
-}
+TerrainMaterial::~TerrainMaterial() = default;
 
 BaseTexturePtr& TerrainMaterial::get_mixTexture()
 {

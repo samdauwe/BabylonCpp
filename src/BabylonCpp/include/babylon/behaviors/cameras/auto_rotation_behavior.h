@@ -23,7 +23,7 @@ class BABYLON_SHARED_EXPORT AutoRotationBehavior
 
 public:
   AutoRotationBehavior();
-  virtual ~AutoRotationBehavior() override;
+  virtual ~AutoRotationBehavior(); // = default
 
   /**
    * @brief Gets the name of the behavior.

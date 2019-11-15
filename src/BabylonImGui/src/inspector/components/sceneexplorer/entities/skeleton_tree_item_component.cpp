@@ -22,9 +22,7 @@ SkeletonTreeItemComponent::SkeletonTreeItemComponent(
   entityInfo.type     = EntityType::Skeleton;
 }
 
-SkeletonTreeItemComponent::~SkeletonTreeItemComponent()
-{
-}
+SkeletonTreeItemComponent::~SkeletonTreeItemComponent() = default;
 
 void SkeletonTreeItemComponent::render()
 {

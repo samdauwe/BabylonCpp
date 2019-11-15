@@ -18,9 +18,7 @@ ICanvas::ICanvas()
   keyEventListeners.resize(static_cast<unsigned>(EventType::UNKNOWN), {});
 }
 
-ICanvas::~ICanvas()
-{
-}
+ICanvas::~ICanvas() = default;
 
 void ICanvas::addMouseEventListener(
   EventType type, const std::function<void(PointerEvent&& evt)>& listener,
@@ -223,7 +221,7 @@ void ICanvas::onKeyDown(bool ctrlKey, bool altKey, int keyCode,
     evt.ctrlKey = ctrlKey;
     evt.altKey  = altKey;
     evt.keyCode = keyCode;
-    evt.code    = std::move(code);
+    evt.code    = code;
     listener(std::move(evt));
   }
 }
@@ -237,7 +235,7 @@ void ICanvas::onKeyUp(bool ctrlKey, bool altKey, int keyCode, std::string code)
     evt.ctrlKey = ctrlKey;
     evt.altKey  = altKey;
     evt.keyCode = keyCode;
-    evt.code    = std::move(code);
+    evt.code    = code;
     listener(std::move(evt));
   }
 }

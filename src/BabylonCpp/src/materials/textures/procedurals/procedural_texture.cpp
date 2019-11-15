@@ -140,9 +140,7 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
   _createIndexBuffer();
 }
 
-ProceduralTexture::~ProceduralTexture()
-{
-}
+ProceduralTexture::~ProceduralTexture() = default;
 
 void ProceduralTexture::addToScene(const ProceduralTexturePtr& newTexture)
 {

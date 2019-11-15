@@ -18,9 +18,7 @@ SetValueAction::SetValueAction(unsigned int iTtriggerOptions,
 {
 }
 
-SetValueAction::~SetValueAction()
-{
-}
+SetValueAction::~SetValueAction() = default;
 
 void SetValueAction::_prepare()
 {

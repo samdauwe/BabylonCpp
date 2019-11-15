@@ -169,9 +169,7 @@ BackgroundMaterial::BackgroundMaterial(const std::string& iName, Scene* scene)
   };
 }
 
-BackgroundMaterial::~BackgroundMaterial()
-{
-}
+BackgroundMaterial::~BackgroundMaterial() = default;
 
 Color3& BackgroundMaterial::get_primaryColor()
 {

@@ -15,8 +15,6 @@ SpritePackedManager::SpritePackedManager(const std::string& iName,
 {
 }
 
-SpritePackedManager::~SpritePackedManager()
-{
-}
+SpritePackedManager::~SpritePackedManager() = default;
 
 } // end of namespace BABYLON

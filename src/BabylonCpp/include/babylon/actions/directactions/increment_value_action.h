@@ -27,7 +27,7 @@ public:
                        const IAnimatablePtr& target,
                        const std::string& propertyPath, AnimationValue* value,
                        Condition* condition = nullptr);
-  ~IncrementValueAction() override;
+  ~IncrementValueAction(); // = default
 
   /**
    * @brief Hidden

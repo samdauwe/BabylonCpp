@@ -40,9 +40,7 @@ SkeletonViewer::SkeletonViewer(const SkeletonPtr& iSkeleton,
   _renderFunction = [this](Scene*, EventState&) { update(); };
 }
 
-SkeletonViewer::~SkeletonViewer()
-{
-}
+SkeletonViewer::~SkeletonViewer() = default;
 
 LinesMeshPtr& SkeletonViewer::get_debugMesh()
 {

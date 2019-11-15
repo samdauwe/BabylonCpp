@@ -39,9 +39,7 @@ public:
       , _renderWithShadows{false}
   {
   }
-  ~FireMaterialScene()
-  {
-  }
+  ~FireMaterialScene() = default;
 
   const char* getName() override
   {

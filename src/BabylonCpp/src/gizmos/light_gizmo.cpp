@@ -29,9 +29,7 @@ LightGizmo::LightGizmo(const UtilityLayerRendererPtr& iGizmoLayer)
   _material->specularColor = Color3(0.1f, 0.1f, 0.1f);
 }
 
-LightGizmo::~LightGizmo()
-{
-}
+LightGizmo::~LightGizmo() = default;
 
 void LightGizmo::set_light(const LightPtr& iLight)
 {

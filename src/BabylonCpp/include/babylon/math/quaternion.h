@@ -31,7 +31,7 @@ public:
   Quaternion(Quaternion&& otherQuaternion);
   Quaternion& operator=(const Quaternion& otherQuaternion);
   Quaternion& operator=(Quaternion&& otherQuaternion);
-  ~Quaternion();
+  ~Quaternion(); // = default
   Quaternion copy() const;
 
   /**

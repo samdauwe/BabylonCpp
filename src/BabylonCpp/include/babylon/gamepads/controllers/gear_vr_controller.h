@@ -56,7 +56,7 @@ public:
   {
     return std::shared_ptr<GearVRController>(new GearVRController(std::forward<Ts>(args)...));
   }
-  ~GearVRController() override;
+  ~GearVRController(); // = default
 
   /**
    * @brief Implements abstract method on WebVRController class, loading controller meshes and

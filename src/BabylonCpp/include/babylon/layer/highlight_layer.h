@@ -62,7 +62,7 @@ public:
 
     return layer;
   }
-  ~HighlightLayer() override;
+  ~HighlightLayer(); // = default
 
   /**
    * @brief Get the effect name of the layer.

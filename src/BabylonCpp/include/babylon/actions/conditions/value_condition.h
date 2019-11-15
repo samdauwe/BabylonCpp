@@ -85,7 +85,7 @@ public:
   ValueCondition(ActionManager* actionManager, const IAnimatablePtr& target,
                  const std::string& propertyPath, AnimationValue* value,
                  unsigned int operatorType = ValueCondition::IsEqual());
-  virtual ~ValueCondition() override;
+  virtual ~ValueCondition(); // = default
 
   /** Methods **/
 

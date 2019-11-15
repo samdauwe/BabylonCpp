@@ -31,9 +31,7 @@ PointLight::PointLight(const std::string& iName, const Vector3& iPosition,
   position = iPosition;
 }
 
-PointLight::~PointLight()
-{
-}
+PointLight::~PointLight() = default;
 
 Type PointLight::type() const
 {

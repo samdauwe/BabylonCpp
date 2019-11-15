@@ -51,9 +51,7 @@ operator=(MutableGamepadButton&& other)
   return *this;
 }
 
-MutableGamepadButton::~MutableGamepadButton()
-{
-}
+MutableGamepadButton::~MutableGamepadButton() = default;
 
 std::string MutableGamepadButton::toString() const
 {

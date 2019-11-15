@@ -529,9 +529,8 @@ public:
     Effect::ShadersStore()["custom8FragmentShader"] = custom8FragmentShader;
     Effect::ShadersStore()["custom9FragmentShader"] = custom9FragmentShader;
   }
-  ~ShaderMaterialBoxesScene()
-  {
-  }
+  
+  ~ShaderMaterialBoxesScene() = default;
 
   const char* getName() override
   {

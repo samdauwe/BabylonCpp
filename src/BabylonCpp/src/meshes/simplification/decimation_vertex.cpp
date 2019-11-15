@@ -10,9 +10,7 @@ DecimationVertex::DecimationVertex(const Vector3& _position, int _id)
       triangleCount{0}
 {
 }
-DecimationVertex::~DecimationVertex()
-{
-}
+DecimationVertex::~DecimationVertex() = default;
 
 void DecimationVertex::updatePosition(const Vector3& newPosition)
 {

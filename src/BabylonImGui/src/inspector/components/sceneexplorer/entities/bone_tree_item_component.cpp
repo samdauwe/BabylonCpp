@@ -20,9 +20,7 @@ BoneTreeItemComponent::BoneTreeItemComponent(
   entityInfo.type     = EntityType::Bone;
 }
 
-BoneTreeItemComponent::~BoneTreeItemComponent()
-{
-}
+BoneTreeItemComponent::~BoneTreeItemComponent() = default;
 
 void BoneTreeItemComponent::render()
 {

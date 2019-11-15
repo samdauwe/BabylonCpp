@@ -19,7 +19,7 @@ public:
   IntersectionInfo(IntersectionInfo&& other);
   IntersectionInfo& operator=(const IntersectionInfo& other);
   IntersectionInfo& operator=(IntersectionInfo&& other);
-  ~IntersectionInfo();
+  ~IntersectionInfo(); // = default
 
 public:
   std::optional<float> bu;

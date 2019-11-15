@@ -225,9 +225,7 @@ ColorCurves& ColorCurves::operator=(ColorCurves&& other)
   return *this;
 }
 
-ColorCurves::~ColorCurves()
-{
-}
+ColorCurves::~ColorCurves() = default;
 
 float ColorCurves::get_globalHue() const
 {

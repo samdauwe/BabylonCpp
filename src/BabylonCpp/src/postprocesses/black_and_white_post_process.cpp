@@ -16,8 +16,6 @@ BlackAndWhitePostProcess::BlackAndWhitePostProcess(
   });
 }
 
-BlackAndWhitePostProcess::~BlackAndWhitePostProcess()
-{
-}
+BlackAndWhitePostProcess::~BlackAndWhitePostProcess() = default;
 
 } // end of namespace BABYLON

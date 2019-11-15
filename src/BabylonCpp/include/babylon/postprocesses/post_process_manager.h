@@ -34,7 +34,7 @@ public:
    * @param scene The scene that the post process is associated with.
    */
   PostProcessManager(Scene* scene);
-  virtual ~PostProcessManager();
+  virtual ~PostProcessManager(); // = default
 
   /** Methods **/
   /**

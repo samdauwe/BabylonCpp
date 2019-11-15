@@ -61,9 +61,7 @@ CircleOfConfusionPostProcess::CircleOfConfusionPostProcess(
   });
 }
 
-CircleOfConfusionPostProcess::~CircleOfConfusionPostProcess()
-{
-}
+CircleOfConfusionPostProcess::~CircleOfConfusionPostProcess() = default;
 
 void CircleOfConfusionPostProcess::set_depthTexture(
   const RenderTargetTexturePtr& value)

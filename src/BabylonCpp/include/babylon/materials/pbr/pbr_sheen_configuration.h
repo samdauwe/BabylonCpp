@@ -35,7 +35,7 @@ public:
    */
   PBRSheenConfiguration(
     const std::function<void()>& markAllSubMeshesAsTexturesDirty);
-  ~PBRSheenConfiguration();
+  ~PBRSheenConfiguration(); // = default
 
   /**
    * @brief Hidden

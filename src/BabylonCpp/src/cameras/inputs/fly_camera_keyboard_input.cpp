@@ -23,9 +23,7 @@ FlyCameraKeyboardInput::FlyCameraKeyboardInput()
   keysLeft.emplace_back(65);
 }
 
-FlyCameraKeyboardInput::~FlyCameraKeyboardInput()
-{
-}
+FlyCameraKeyboardInput::~FlyCameraKeyboardInput() = default;
 
 void FlyCameraKeyboardInput::attachControl(ICanvas* canvas,
                                            bool noPreventDefault)

@@ -25,7 +25,7 @@ public:
     return std::shared_ptr<BounceEase>(
       new BounceEase(std::forward<Ts>(args)...));
   }
-  ~BounceEase() override;
+  ~BounceEase(); // = default
 
   /**
    * @brief Hidden

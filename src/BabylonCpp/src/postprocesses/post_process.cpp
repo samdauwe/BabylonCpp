@@ -89,9 +89,7 @@ PostProcess::PostProcess(
   }
 }
 
-PostProcess::~PostProcess()
-{
-}
+PostProcess::~PostProcess() = default;
 
 void PostProcess::add(const PostProcessPtr& newPostProcess)
 {

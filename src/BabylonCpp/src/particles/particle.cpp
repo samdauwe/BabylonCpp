@@ -56,156 +56,18 @@ Particle::Particle(ParticleSystem* iParticleSystem)
   updateCellInfoFromSystem();
 }
 
-Particle::Particle(const Particle& other)
-    : id{other.id}
-    , position{other.position}
-    , direction{other.direction}
-    , color{other.color}
-    , colorStep{other.colorStep}
-    , lifeTime{other.lifeTime}
-    , age{other.age}
-    , size{other.size}
-    , scale{other.scale}
-    , angle{other.angle}
-    , angularSpeed{other.angularSpeed}
-    , cellIndex{other.cellIndex}
-    , remapData{other.remapData}
-    , _randomCellOffset{other._randomCellOffset}
-    , _initialDirection{other._initialDirection}
-    , _attachedSubEmitters{other._attachedSubEmitters}
-    , _initialStartSpriteCellID{other._initialStartSpriteCellID}
-    , _initialEndSpriteCellID{other._initialEndSpriteCellID}
-    , _currentColorGradient{other._currentColorGradient}
-    , _currentColor1{other._currentColor1}
-    , _currentColor2{other._currentColor2}
-    , _currentSizeGradient{other._currentSizeGradient}
-    , _currentSize1{other._currentSize1}
-    , _currentSize2{other._currentSize2}
-    , _currentAngularSpeedGradient{other._currentAngularSpeedGradient}
-    , _currentAngularSpeed1{other._currentAngularSpeed1}
-    , _currentAngularSpeed2{other._currentAngularSpeed2}
-    , _currentVelocityGradient{other._currentVelocityGradient}
-    , _currentVelocity1{other._currentVelocity1}
-    , _currentVelocity2{other._currentVelocity2}
-    , _currentLimitVelocityGradient{other._currentLimitVelocityGradient}
-    , _currentLimitVelocity1{other._currentLimitVelocity1}
-    , _currentLimitVelocity2{other._currentLimitVelocity2}
-    , _currentDragGradient{other._currentDragGradient}
-    , _currentDrag1{other._currentDrag1}
-    , _currentDrag2{other._currentDrag2}
-    , _randomNoiseCoordinates1{other._randomNoiseCoordinates1}
-    , _randomNoiseCoordinates2{other._randomNoiseCoordinates2}
-    , particleSystem{other.particleSystem}
-    , _currentFrameCounter{other._currentFrameCounter}
-{
-}
+Particle::Particle(const Particle& other) = default;
 
 Particle::Particle(Particle&& other)
 {
   *this = std::move(other);
 }
 
-Particle& Particle::operator=(const Particle& other)
-{
-  if (&other != this) {
-    id                            = other.id;
-    position                      = other.position;
-    direction                     = other.direction;
-    color                         = other.color;
-    colorStep                     = other.colorStep;
-    lifeTime                      = other.lifeTime;
-    age                           = other.age;
-    size                          = other.size;
-    scale                         = other.scale;
-    angle                         = other.angle;
-    angularSpeed                  = other.angularSpeed;
-    cellIndex                     = other.cellIndex;
-    remapData                     = other.remapData;
-    _randomCellOffset             = other._randomCellOffset;
-    _initialDirection             = other._initialDirection;
-    _attachedSubEmitters          = other._attachedSubEmitters;
-    _initialStartSpriteCellID     = other._initialStartSpriteCellID;
-    _initialEndSpriteCellID       = other._initialEndSpriteCellID;
-    _currentColorGradient         = other._currentColorGradient;
-    _currentColor1                = other._currentColor1;
-    _currentColor2                = other._currentColor2;
-    _currentSizeGradient          = other._currentSizeGradient;
-    _currentSize1                 = other._currentSize1;
-    _currentSize2                 = other._currentSize2;
-    _currentAngularSpeedGradient  = other._currentAngularSpeedGradient;
-    _currentAngularSpeed1         = other._currentAngularSpeed1;
-    _currentAngularSpeed2         = other._currentAngularSpeed2;
-    _currentVelocityGradient      = other._currentVelocityGradient;
-    _currentVelocity1             = other._currentVelocity1;
-    _currentVelocity2             = other._currentVelocity2;
-    _currentLimitVelocityGradient = other._currentLimitVelocityGradient;
-    _currentLimitVelocity1        = other._currentLimitVelocity1;
-    _currentLimitVelocity2        = other._currentLimitVelocity2;
-    _currentDragGradient          = other._currentDragGradient;
-    _currentDrag1                 = other._currentDrag1;
-    _currentDrag2                 = other._currentDrag2;
-    _randomNoiseCoordinates1      = other._randomNoiseCoordinates1;
-    _randomNoiseCoordinates2      = other._randomNoiseCoordinates2;
-    particleSystem                = other.particleSystem;
-    _currentFrameCounter          = other._currentFrameCounter;
-  }
+Particle& Particle::operator=(const Particle& other) = default;
 
-  return *this;
-}
+Particle& Particle::operator=(Particle&& other) = default;
 
-Particle& Particle::operator=(Particle&& other)
-{
-  if (&other != this) {
-    id                        = std::move(other.id);
-    position                  = std::move(other.position);
-    direction                 = std::move(other.direction);
-    color                     = std::move(other.color);
-    colorStep                 = std::move(other.colorStep);
-    lifeTime                  = std::move(other.lifeTime);
-    age                       = std::move(other.age);
-    size                      = std::move(other.size);
-    scale                     = std::move(other.scale);
-    angle                     = std::move(other.angle);
-    angularSpeed              = std::move(other.angularSpeed);
-    cellIndex                 = std::move(other.cellIndex);
-    remapData                 = std::move(other.remapData);
-    _randomCellOffset         = std::move(other._randomCellOffset);
-    _initialDirection         = std::move(other._initialDirection);
-    _attachedSubEmitters      = std::move(other._attachedSubEmitters);
-    _initialStartSpriteCellID = std::move(other._initialStartSpriteCellID);
-    _initialEndSpriteCellID   = std::move(other._initialEndSpriteCellID);
-    _currentColorGradient     = std::move(other._currentColorGradient);
-    _currentColor1            = std::move(other._currentColor1);
-    _currentColor2            = std::move(other._currentColor2);
-    _currentSizeGradient      = std::move(other._currentSizeGradient);
-    _currentSize1             = std::move(other._currentSize1);
-    _currentSize2             = std::move(other._currentSize2);
-    _currentAngularSpeedGradient
-      = std::move(other._currentAngularSpeedGradient);
-    _currentAngularSpeed1    = std::move(other._currentAngularSpeed1);
-    _currentAngularSpeed2    = std::move(other._currentAngularSpeed2);
-    _currentVelocityGradient = std::move(other._currentVelocityGradient);
-    _currentVelocity1        = std::move(other._currentVelocity1);
-    _currentVelocity2        = std::move(other._currentVelocity2);
-    _currentLimitVelocityGradient
-      = std::move(other._currentLimitVelocityGradient);
-    _currentLimitVelocity1   = std::move(other._currentLimitVelocity1);
-    _currentLimitVelocity2   = std::move(other._currentLimitVelocity2);
-    _currentDragGradient     = std::move(other._currentDragGradient);
-    _currentDrag1            = std::move(other._currentDrag1);
-    _currentDrag2            = std::move(other._currentDrag2);
-    _randomNoiseCoordinates1 = std::move(other._randomNoiseCoordinates1);
-    _randomNoiseCoordinates2 = std::move(other._randomNoiseCoordinates2);
-    particleSystem           = std::move(other.particleSystem);
-    _currentFrameCounter     = std::move(other._currentFrameCounter);
-  }
-
-  return *this;
-}
-
-Particle::~Particle()
-{
-}
+Particle::~Particle() = default;
 
 Particle* Particle::clone() const
 {

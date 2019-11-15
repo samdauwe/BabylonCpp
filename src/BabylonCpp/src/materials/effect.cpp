@@ -202,9 +202,7 @@ Effect::Effect(const std::unordered_map<std::string, std::string>& baseName,
   });
 }
 
-Effect::~Effect()
-{
-}
+Effect::~Effect() = default;
 
 Observable<Effect>& Effect::get_onBindObservable()
 {

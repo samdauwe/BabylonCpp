@@ -38,7 +38,7 @@ public:
 
 public:
   BouncingBehavior();
-  virtual ~BouncingBehavior() override;
+  virtual ~BouncingBehavior(); // = default
 
   /**
    * @brief Gets the name of the behavior.

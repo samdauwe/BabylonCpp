@@ -58,7 +58,7 @@ public:
   Gamepad(const std::string& id, int index, const IBrowserGamepadPtr& browserGamepad,
           unsigned int leftStickX = 0, unsigned int leftStickY = 1, unsigned int rightStickX = 2,
           unsigned int rightStickY = 3);
-  virtual ~Gamepad();
+  virtual ~Gamepad(); // = default
 
   /**
    * @brief Callback triggered when the left joystick has changed.

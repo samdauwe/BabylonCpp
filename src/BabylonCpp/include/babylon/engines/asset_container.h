@@ -24,7 +24,7 @@ public:
     return std::shared_ptr<AssetContainer>(
       new AssetContainer(std::forward<Ts>(args)...));
   }
-  ~AssetContainer();
+  ~AssetContainer(); // = default
 
   /**
    * @brief Adds all the assets from the container to the scene.

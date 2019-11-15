@@ -60,7 +60,7 @@ public:
   {
     return std::shared_ptr<Effect>(new Effect(std::forward<Ts>(args)...));
   }
-  ~Effect();
+  ~Effect(); // = default
 
   /** Properties **/
 

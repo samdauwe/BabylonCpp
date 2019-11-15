@@ -24,7 +24,7 @@ public:
   Vector4(Vector4&& otherVector);
   Vector4& operator=(const Vector4& otherVector);
   Vector4& operator=(Vector4&& otherVector);
-  ~Vector4();
+  ~Vector4(); // = default
   Vector4 copy() const;
 
   /**

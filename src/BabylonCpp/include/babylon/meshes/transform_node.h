@@ -62,7 +62,7 @@ public:
 
     return transformNode;
   }
-  ~TransformNode() override;
+  ~TransformNode(); // = default
 
   /**
    * @brief Adds the transform node to the scene.

@@ -18,9 +18,7 @@ CrowdSimulation::CrowdSimulation()
   _simulator->setAgentDefaults(15.0f, 10, 5.0f, 5.0f, 2.0f, 2.0f);
 }
 
-CrowdSimulation::~CrowdSimulation()
-{
-}
+CrowdSimulation::~CrowdSimulation() = default;
 
 void CrowdSimulation::initializeWorld()
 {

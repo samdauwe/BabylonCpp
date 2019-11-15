@@ -29,7 +29,7 @@ public:
 
     return camera;
   }
-  ~StereoscopicGamepadCamera() override;
+  ~StereoscopicGamepadCamera(); // = default
 
   /**
    * @brief Gets camera class name.

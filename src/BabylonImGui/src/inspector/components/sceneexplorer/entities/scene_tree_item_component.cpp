@@ -17,9 +17,7 @@ SceneTreeItemComponent::SceneTreeItemComponent(
   entityInfo.type     = EntityType::Scene;
 }
 
-SceneTreeItemComponent::~SceneTreeItemComponent()
-{
-}
+SceneTreeItemComponent::~SceneTreeItemComponent() = default;
 
 void SceneTreeItemComponent::componentWillMount()
 {

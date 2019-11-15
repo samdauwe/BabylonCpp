@@ -23,7 +23,7 @@ struct BABYLON_SHARED_EXPORT FreeCameraInputsManager
    * @param camera Defines the camera the inputs belong to
    */
   FreeCameraInputsManager(FreeCamera* _camera);
-  ~FreeCameraInputsManager();
+  ~FreeCameraInputsManager(); // = default
 
   /**
    * @brief Add keyboard input support to the input manager.

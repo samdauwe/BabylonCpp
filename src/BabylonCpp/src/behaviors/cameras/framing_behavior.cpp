@@ -53,9 +53,7 @@ FramingBehavior::FramingBehavior()
 {
 }
 
-FramingBehavior::~FramingBehavior()
-{
-}
+FramingBehavior::~FramingBehavior() = default;
 
 const char* FramingBehavior::name() const
 {

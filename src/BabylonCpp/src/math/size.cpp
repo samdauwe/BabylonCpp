@@ -26,9 +26,7 @@ Size::Size(Size&& otherSize) : ISize(otherSize.width, otherSize.height)
   otherSize.height = 0;
 }
 
-Size::~Size()
-{
-}
+Size::~Size() = default;
 
 Size& Size::operator=(const Size& otherSize)
 {

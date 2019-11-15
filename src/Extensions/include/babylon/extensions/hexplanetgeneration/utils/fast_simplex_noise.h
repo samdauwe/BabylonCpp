@@ -24,7 +24,7 @@ namespace Extensions {
 
 struct FastSimplexNoiseOptions {
   FastSimplexNoiseOptions();
-  ~FastSimplexNoiseOptions();
+  ~FastSimplexNoiseOptions(); // = default
 
   // The base amplitude (default: 1.0)
   float amplitude;

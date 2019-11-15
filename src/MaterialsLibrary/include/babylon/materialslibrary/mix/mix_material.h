@@ -30,7 +30,7 @@ public:
 
     return material;
   }
-  ~MixMaterial() override;
+  ~MixMaterial(); // = default
 
   bool needAlphaBlending() const override;
   bool needAlphaTesting() const override;

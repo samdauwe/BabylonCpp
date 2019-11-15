@@ -7,8 +7,6 @@ Reference::Reference(int _vertexId, int _triangleId)
 {
 }
 
-Reference::~Reference()
-{
-}
+Reference::~Reference() = default;
 
 } // end of namespace BABYLON

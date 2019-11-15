@@ -9,9 +9,7 @@ BezierCurveEase::BezierCurveEase(float iX1, float iY1, float iX2, float iY2)
 {
 }
 
-BezierCurveEase::~BezierCurveEase()
-{
-}
+BezierCurveEase::~BezierCurveEase() = default;
 
 float BezierCurveEase::easeInCore(float gradient) const
 {

@@ -34,7 +34,7 @@ class BABYLON_SHARED_EXPORT BoxOptions {
 
 public:
   BoxOptions();
-  ~BoxOptions();
+  ~BoxOptions(); // = default
 
 public:
   std::optional<float> size;
@@ -64,7 +64,7 @@ class BABYLON_SHARED_EXPORT CylinderOptions {
 
 public:
   CylinderOptions();
-  ~CylinderOptions();
+  ~CylinderOptions(); // = default
 
 public:
   std::optional<float> height;
@@ -538,7 +538,7 @@ class BABYLON_SHARED_EXPORT TiledBoxOptions {
 
 public:
   TiledBoxOptions();
-  ~TiledBoxOptions();
+  ~TiledBoxOptions(); // = default
 
 public:
   std::optional<unsigned int> pattern;

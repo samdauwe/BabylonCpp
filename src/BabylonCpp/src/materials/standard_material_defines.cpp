@@ -119,9 +119,7 @@ StandardMaterialDefines::StandardMaterialDefines() : MaterialDefines{}
   };
 }
 
-StandardMaterialDefines::~StandardMaterialDefines()
-{
-}
+StandardMaterialDefines::~StandardMaterialDefines() = default;
 
 void StandardMaterialDefines::setReflectionMode(const std::string& modeToEnable)
 {

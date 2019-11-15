@@ -23,9 +23,7 @@ Heightmap::Heightmap(const std::string& seed, float maxHeight, float height,
   _noise = std::make_unique<FastSimplexNoise>(noiseOptions);
 }
 
-Heightmap::~Heightmap()
-{
-}
+Heightmap::~Heightmap() = default;
 
 void Heightmap::generateHeightmap()
 {

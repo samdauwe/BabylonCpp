@@ -23,7 +23,7 @@ public:
 
     return texture;
   }
-  ~CloudProceduralTexture();
+  ~CloudProceduralTexture(); // = default
 
   void updateShaderUniforms();
 

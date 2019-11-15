@@ -33,7 +33,7 @@ public:
 
     return postProcess;
   }
-  ~ImageProcessingPostProcess() override;
+  ~ImageProcessingPostProcess(); // = default
 
   /**
    * "ImageProcessingPostProcess"

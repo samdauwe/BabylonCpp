@@ -19,45 +19,15 @@ CSG::Polygon::Polygon(const std::vector<Vertex>& iVertices,
   plane = Plane::FromPoints(vertices[0].pos, vertices[1].pos, vertices[2].pos);
 }
 
-CSG::Polygon::Polygon(const BABYLON::CSG::Polygon& otherPolygon)
-    : vertices{otherPolygon.vertices}
-    , shared{otherPolygon.shared}
-    , plane{otherPolygon.plane}
-{
-}
+CSG::Polygon::Polygon(const BABYLON::CSG::Polygon& otherPolygon) = default;
 
-CSG::Polygon::Polygon(BABYLON::CSG::Polygon&& otherPolygon)
-    : vertices{std::move(otherPolygon.vertices)}
-    , shared{std::move(otherPolygon.shared)}
-    , plane{std::move(otherPolygon.plane)}
-{
-}
+CSG::Polygon::Polygon(BABYLON::CSG::Polygon&& otherPolygon) = default;
 
-CSG::Polygon& CSG::Polygon::operator=(const BABYLON::CSG::Polygon& otherPolygon)
-{
-  if (&otherPolygon != this) {
-    vertices = otherPolygon.vertices;
-    shared   = otherPolygon.shared;
-    plane    = otherPolygon.plane;
-  }
+CSG::Polygon& CSG::Polygon::operator=(const BABYLON::CSG::Polygon& otherPolygon) = default;
 
-  return *this;
-}
+CSG::Polygon& CSG::Polygon::operator=(BABYLON::CSG::Polygon&& otherPolygon) = default;
 
-CSG::Polygon& CSG::Polygon::operator=(BABYLON::CSG::Polygon&& otherPolygon)
-{
-  if (&otherPolygon != this) {
-    vertices = std::move(otherPolygon.vertices);
-    shared   = std::move(otherPolygon.shared);
-    plane    = std::move(otherPolygon.plane);
-  }
-
-  return *this;
-}
-
-CSG::Polygon::~Polygon()
-{
-}
+CSG::Polygon::~Polygon() = default;
 
 CSG::Polygon CSG::Polygon::clone() const
 {

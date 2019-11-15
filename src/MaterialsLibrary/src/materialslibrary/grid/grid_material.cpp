@@ -39,9 +39,7 @@ GridMaterial::GridMaterial(const std::string& iName, Scene* scene)
   Effect::ShadersStore()["gridPixelShader"] = gridPixelShader;
 }
 
-GridMaterial::~GridMaterial()
-{
-}
+GridMaterial::~GridMaterial() = default;
 
 bool GridMaterial::needAlphaBlending() const
 {

@@ -27,6 +27,7 @@ add_executable(${TARGET}
 
 # Create namespaced alias
 add_executable(${META_PROJECT_NAME}::${TARGET} ALIAS ${TARGET})
+babylon_target_clang_tidy(${TARGET})
 
 # Project options
 set_target_properties(${TARGET}

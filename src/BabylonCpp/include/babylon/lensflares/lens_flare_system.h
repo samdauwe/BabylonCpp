@@ -63,7 +63,7 @@ public:
 
     return lensFlareSystem;
   }
-  virtual ~LensFlareSystem();
+  virtual ~LensFlareSystem(); // = default
 
   void addToScene(const LensFlareSystemPtr& lensFlareSystem);
 

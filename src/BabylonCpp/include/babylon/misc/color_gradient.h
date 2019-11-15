@@ -14,7 +14,7 @@ class BABYLON_SHARED_EXPORT ColorGradient : public IValueGradient {
 
 public:
   ColorGradient();
-  ~ColorGradient();
+  ~ColorGradient(); // = default
 
   /**
    * @brief Will get a color picked randomly between color1 and color2.

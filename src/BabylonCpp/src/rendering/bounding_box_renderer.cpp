@@ -25,9 +25,7 @@ BoundingBoxRenderer::BoundingBoxRenderer(Scene* iScene)
   renderList.reserve(32);
 }
 
-BoundingBoxRenderer::~BoundingBoxRenderer()
-{
-}
+BoundingBoxRenderer::~BoundingBoxRenderer() = default;
 
 void BoundingBoxRenderer::addToScene(
   const BoundingBoxRendererPtr& newBoundingBoxRenderer)

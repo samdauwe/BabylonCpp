@@ -66,7 +66,7 @@ public:
    */
   Xbox360Pad(const std::string& id, int index,
              const IBrowserGamepadPtr& gamepad, bool xboxOne = false);
-  ~Xbox360Pad() override;
+  ~Xbox360Pad(); // = default
 
   /**
    * @brief Defines the callback to call when left trigger is pressed.

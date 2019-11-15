@@ -25,7 +25,7 @@ public:
    * the mesh to be scaled.
    */
   MultiPointerScaleBehavior();
-  virtual ~MultiPointerScaleBehavior() override;
+  virtual ~MultiPointerScaleBehavior(); // = default
 
   /**
    * @brief The name of the behavior.

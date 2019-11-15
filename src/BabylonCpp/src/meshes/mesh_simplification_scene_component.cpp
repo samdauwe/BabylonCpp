@@ -11,9 +11,7 @@ SimplicationQueueSceneComponent::SimplicationQueueSceneComponent(Scene* iScene)
   scene                 = iScene;
 }
 
-SimplicationQueueSceneComponent::~SimplicationQueueSceneComponent()
-{
-}
+SimplicationQueueSceneComponent::~SimplicationQueueSceneComponent() = default;
 
 void SimplicationQueueSceneComponent::_register()
 {

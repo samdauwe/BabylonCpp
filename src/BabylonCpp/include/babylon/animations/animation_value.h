@@ -65,7 +65,7 @@ public:
   AnimationValue(AnimationValue&& other);
   AnimationValue& operator=(const AnimationValue& other);
   AnimationValue& operator=(AnimationValue&& other);
-  ~AnimationValue();
+  ~AnimationValue(); // = default
 
   AnimationValue subtract(const AnimationValue& fromValue);
   AnimationValue operator-(const AnimationValue& fromValue);

@@ -30,9 +30,7 @@ MorphTargetManager::MorphTargetManager(Scene* scene)
   _scene = scene ? scene : Engine::LastCreatedScene();
 }
 
-MorphTargetManager::~MorphTargetManager()
-{
-}
+MorphTargetManager::~MorphTargetManager() = default;
 
 void MorphTargetManager::addToScene(
   const MorphTargetManagerPtr& newMorphTargetManager)

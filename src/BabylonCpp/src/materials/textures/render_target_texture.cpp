@@ -112,9 +112,7 @@ RenderTargetTexture::RenderTargetTexture(
   }
 }
 
-RenderTargetTexture::~RenderTargetTexture()
-{
-}
+RenderTargetTexture::~RenderTargetTexture() = default;
 
 void RenderTargetTexture::_onRatioRescale()
 {

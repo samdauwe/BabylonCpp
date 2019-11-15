@@ -155,7 +155,7 @@ public:
     actionManager->addToScene(actionManager);
     return actionManager;
   }
-  virtual ~ActionManager() override;
+  virtual ~ActionManager(); // = default
 
   /** Methods **/
 

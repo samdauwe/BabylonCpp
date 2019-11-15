@@ -17,7 +17,7 @@ private:
 
 public:
   CMGBoundinBox();
-  ~CMGBoundinBox();
+  ~CMGBoundinBox(); // = default
 
   void clear();
   void augment(float x, float y, float z);

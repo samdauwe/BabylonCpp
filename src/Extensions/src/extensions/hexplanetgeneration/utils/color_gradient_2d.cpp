@@ -22,9 +22,7 @@ ColorGradient2D::ColorGradient2D(float resolution) : _resolution{resolution}
   }
 }
 
-ColorGradient2D::~ColorGradient2D()
-{
-}
+ColorGradient2D::~ColorGradient2D() = default;
 
 void ColorGradient2D::addColorStop(float u, float v, const Color3& color)
 {

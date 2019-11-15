@@ -92,9 +92,7 @@ GLTFFileLoader::GLTFFileLoader()
     = [this](const std::string& counterName) { _endPerformanceCounterDisabled(counterName); };
 }
 
-GLTFFileLoader::~GLTFFileLoader()
-{
-}
+GLTFFileLoader::~GLTFFileLoader() = default;
 
 void GLTFFileLoader::set_onParsed(
   const std::function<void(IGLTFLoaderData* loaderData, EventState& es)>& callback)

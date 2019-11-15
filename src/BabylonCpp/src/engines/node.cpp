@@ -66,9 +66,7 @@ Node::Node(const std::string& iName, Scene* scene, bool addToRootNodes)
   _initCache();
 }
 
-Node::~Node()
-{
-}
+Node::~Node() = default;
 
 void Node::addToRootNodes()
 {

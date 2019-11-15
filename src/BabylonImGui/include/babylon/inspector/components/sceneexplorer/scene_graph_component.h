@@ -39,7 +39,7 @@ public:
 
 public:
   SceneGraphComponent(const SceneGraphComponentProps& props);
-  ~SceneGraphComponent();
+  ~SceneGraphComponent(); // = default
 
   void reinitialize();
   void render();

@@ -11,9 +11,7 @@ CMGBoundinBox::CMGBoundinBox()
   clear();
 }
 
-CMGBoundinBox::~CMGBoundinBox()
-{
-}
+CMGBoundinBox::~CMGBoundinBox() = default;
 
 void CMGBoundinBox::clear()
 {

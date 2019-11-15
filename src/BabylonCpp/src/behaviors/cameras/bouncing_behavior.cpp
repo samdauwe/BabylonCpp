@@ -26,9 +26,7 @@ BouncingBehavior::BouncingBehavior()
 {
 }
 
-BouncingBehavior::~BouncingBehavior()
-{
-}
+BouncingBehavior::~BouncingBehavior() = default;
 
 const char* BouncingBehavior::name() const
 {

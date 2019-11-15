@@ -37,7 +37,7 @@ public:
 
     return reflectionProbe;
   }
-  virtual ~ReflectionProbe();
+  virtual ~ReflectionProbe(); // = default
 
   void addToScene(const ReflectionProbePtr& newReflectionProbe);
 

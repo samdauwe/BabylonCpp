@@ -25,9 +25,7 @@ WebVRController::WebVRController(const IBrowserGamepadPtr& vrGamepad)
   _buttons = std::vector<ExtendedGamepadButton>(vrGamepad->buttons.size());
 }
 
-WebVRController::~WebVRController()
-{
-}
+WebVRController::~WebVRController() = default;
 
 AbstractMeshPtr& WebVRController::get_defaultModel()
 {

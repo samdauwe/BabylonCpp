@@ -111,9 +111,7 @@ KhronosTextureContainer::KhronosTextureContainer(
   loadType = KhronosTextureContainer::COMPRESSED_2D;
 }
 
-KhronosTextureContainer::~KhronosTextureContainer()
-{
-}
+KhronosTextureContainer::~KhronosTextureContainer() = default;
 
 void KhronosTextureContainer::uploadLevels(const InternalTexturePtr& texture,
                                            bool loadMipmaps)

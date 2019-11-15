@@ -31,7 +31,7 @@ public:
 
     return material;
   }
-  ~FireMaterial() override;
+  ~FireMaterial(); // = default
 
   bool needAlphaBlending() const override;
   bool needAlphaTesting() const override;

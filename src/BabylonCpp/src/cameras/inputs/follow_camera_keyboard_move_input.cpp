@@ -34,9 +34,7 @@ FollowCameraKeyboardMoveInput::FollowCameraKeyboardMoveInput()
   keysRadiusDecr.emplace_back(38);
 }
 
-FollowCameraKeyboardMoveInput::~FollowCameraKeyboardMoveInput()
-{
-}
+FollowCameraKeyboardMoveInput::~FollowCameraKeyboardMoveInput() = default;
 
 void FollowCameraKeyboardMoveInput::attachControl(ICanvas* canvas,
                                                   bool noPreventDefault)

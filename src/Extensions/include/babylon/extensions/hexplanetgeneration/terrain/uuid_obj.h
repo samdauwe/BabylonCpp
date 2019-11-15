@@ -9,7 +9,7 @@ namespace Extensions {
 
 struct UidObj {
   UidObj(size_t id);
-  virtual ~UidObj();
+  virtual ~UidObj(); // = default
 
   virtual bool operator==(const UidObj& other) const;
 

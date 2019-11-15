@@ -32,7 +32,7 @@ public:
     return std::shared_ptr<GamepadSystemSceneComponent>(
       new GamepadSystemSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~GamepadSystemSceneComponent();
+  virtual ~GamepadSystemSceneComponent(); // = default
 
   /**
    * @brief Registers the component in a given scene.

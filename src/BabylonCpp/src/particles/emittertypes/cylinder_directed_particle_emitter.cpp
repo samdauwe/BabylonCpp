@@ -17,9 +17,7 @@ CylinderDirectedParticleEmitter::CylinderDirectedParticleEmitter(
 {
 }
 
-CylinderDirectedParticleEmitter::~CylinderDirectedParticleEmitter()
-{
-}
+CylinderDirectedParticleEmitter::~CylinderDirectedParticleEmitter() = default;
 
 void CylinderDirectedParticleEmitter::startDirectionFunction(
   const Matrix& worldMatrix, Vector3& directionToUpdate, Particle* /*particle*/)

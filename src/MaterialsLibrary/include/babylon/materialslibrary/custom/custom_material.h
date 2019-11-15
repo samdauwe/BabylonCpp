@@ -27,7 +27,7 @@ class BABYLON_SHARED_EXPORT CustomMaterial : public StandardMaterial {
 
 public:
   CustomMaterial(const std::string& name, Scene* scene);
-  ~CustomMaterial();
+  ~CustomMaterial(); // = default
 
   void AttachAfterBind(Mesh* mesh, Effect* effect);
   std::vector<std::string> ReviewUniform(const std::string& name,

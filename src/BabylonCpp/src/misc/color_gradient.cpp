@@ -9,9 +9,7 @@ ColorGradient::ColorGradient() : color2{std::nullopt}
 {
 }
 
-ColorGradient::~ColorGradient()
-{
-}
+ColorGradient::~ColorGradient() = default;
 
 void ColorGradient::getColorToRef(Color4& result)
 {

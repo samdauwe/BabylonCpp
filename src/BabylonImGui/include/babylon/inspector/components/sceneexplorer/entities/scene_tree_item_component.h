@@ -38,7 +38,7 @@ public:
 
 public:
   SceneTreeItemComponent(const ISceneTreeItemComponentProps& props);
-  virtual ~SceneTreeItemComponent() override;
+  virtual ~SceneTreeItemComponent(); // = default
 
   void componentWillMount();
   void componentWillUnmount();

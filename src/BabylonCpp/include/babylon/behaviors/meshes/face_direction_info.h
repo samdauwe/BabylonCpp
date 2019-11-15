@@ -18,7 +18,7 @@ struct BABYLON_SHARED_EXPORT FaceDirectionInfo {
   FaceDirectionInfo(FaceDirectionInfo&& other);
   FaceDirectionInfo& operator=(const FaceDirectionInfo& other);
   FaceDirectionInfo& operator=(FaceDirectionInfo&& other);
-  ~FaceDirectionInfo();
+  ~FaceDirectionInfo(); // = default
   FaceDirectionInfo copy() const;
   std::unique_ptr<FaceDirectionInfo> clone() const;
   friend std::ostream& operator<<(std::ostream& os,

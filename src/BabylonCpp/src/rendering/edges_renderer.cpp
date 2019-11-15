@@ -37,9 +37,7 @@ EdgesRenderer::EdgesRenderer(const AbstractMeshPtr& source, float epsilon,
     [this](Node* /*node*/, EventState& /*es*/) { dispose(); });
 }
 
-EdgesRenderer::~EdgesRenderer()
-{
-}
+EdgesRenderer::~EdgesRenderer() = default;
 
 void EdgesRenderer::_prepareResources()
 {

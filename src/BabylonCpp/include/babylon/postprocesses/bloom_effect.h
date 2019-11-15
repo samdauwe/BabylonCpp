@@ -30,7 +30,7 @@ public:
     return std::shared_ptr<BloomEffect>(
       new BloomEffect(std::forward<Ts>(args)...));
   }
-  virtual ~BloomEffect();
+  virtual ~BloomEffect(); // = default
 
   /**
    * @brief Disposes each of the internal effects for a given camera.

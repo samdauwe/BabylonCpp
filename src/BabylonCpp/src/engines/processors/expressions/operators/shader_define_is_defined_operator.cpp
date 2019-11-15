@@ -47,9 +47,7 @@ ShaderDefineIsDefinedOperator::operator=(ShaderDefineIsDefinedOperator&& other)
   return *this;
 }
 
-ShaderDefineIsDefinedOperator::~ShaderDefineIsDefinedOperator()
-{
-}
+ShaderDefineIsDefinedOperator::~ShaderDefineIsDefinedOperator() = default;
 
 bool ShaderDefineIsDefinedOperator::isTrue(
   const std::unordered_map<std::string, std::string>& preprocessors) const

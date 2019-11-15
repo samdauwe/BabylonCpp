@@ -13,7 +13,7 @@ struct BABYLON_SHARED_EXPORT IMaterialSubSurfaceDefines
     : public MaterialDefines {
 
   IMaterialSubSurfaceDefines();
-  ~IMaterialSubSurfaceDefines() override;
+  ~IMaterialSubSurfaceDefines(); // = default
 
   /**
    * @brief Converts the material define values to a string.

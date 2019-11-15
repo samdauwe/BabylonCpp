@@ -33,7 +33,7 @@ public:
   ColorCurves(ColorCurves&& other);                 // Move constructor
   ColorCurves& operator=(const ColorCurves& other); // Copy assignment operator
   ColorCurves& operator=(ColorCurves&& other);      // Move assignment operator
-  ~ColorCurves();
+  ~ColorCurves(); // = default
 
   /**
    * @brief Returns the class name.

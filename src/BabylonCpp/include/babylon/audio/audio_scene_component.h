@@ -32,7 +32,7 @@ public:
     return std::shared_ptr<AudioSceneComponent>(
       new AudioSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~AudioSceneComponent();
+  virtual ~AudioSceneComponent(); // = default
 
   /**
    * @brief Registers the component in a given scene.

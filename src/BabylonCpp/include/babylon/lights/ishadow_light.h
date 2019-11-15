@@ -19,7 +19,7 @@ class BABYLON_SHARED_EXPORT IShadowLight : public Light {
 
 public:
   IShadowLight(const std::string& name, Scene* scene);
-  virtual ~IShadowLight() override;
+  virtual ~IShadowLight(); // = default
 
   /**
    * The position the shdow will be casted from.

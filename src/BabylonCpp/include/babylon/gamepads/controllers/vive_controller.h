@@ -56,7 +56,7 @@ public:
     return std::shared_ptr<ViveController>(
       new ViveController(std::forward<Ts>(args)...));
   }
-  ~ViveController() override;
+  ~ViveController(); // = default
 
   /**
    * @brief Implements abstract method on WebVRController class, loading

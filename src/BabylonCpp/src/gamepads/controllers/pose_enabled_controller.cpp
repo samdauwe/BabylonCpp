@@ -34,9 +34,7 @@ PoseEnabledController::PoseEnabledController(const IBrowserGamepadPtr& iBrowserG
   Quaternion::RotationYawPitchRollToRef(Math::PI, 0, 0, _leftHandSystemQuaternion);
 }
 
-PoseEnabledController::~PoseEnabledController()
-{
-}
+PoseEnabledController::~PoseEnabledController() = default;
 
 void PoseEnabledController::_disableTrackPosition(const Vector3& fixedPosition)
 {

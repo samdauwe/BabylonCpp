@@ -63,9 +63,7 @@ BoundingInfo& BoundingInfo::operator=(BoundingInfo&& other)
   return *this;
 }
 
-BoundingInfo::~BoundingInfo()
-{
-}
+BoundingInfo::~BoundingInfo() = default;
 
 Vector3& BoundingInfo::get_minimum()
 {

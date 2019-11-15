@@ -19,7 +19,7 @@ public:
    * @brief Initializes the state.
    */
   _AlphaState();
-  ~_AlphaState();
+  ~_AlphaState(); // = default
 
   void setAlphaBlendConstants(float r, float g, float b, float a);
   void setAlphaBlendFunctionParameters(unsigned int value0, unsigned int value1,

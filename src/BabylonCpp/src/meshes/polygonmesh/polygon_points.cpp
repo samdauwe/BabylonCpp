@@ -2,13 +2,9 @@
 
 namespace BABYLON {
 
-PolygonPoints::PolygonPoints()
-{
-}
+PolygonPoints::PolygonPoints() = default;
 
-PolygonPoints::~PolygonPoints()
-{
-}
+PolygonPoints::~PolygonPoints() = default;
 
 std::vector<IndexedVector2>
 PolygonPoints::add(const std::vector<Vector2>& originalPoints)

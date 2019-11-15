@@ -13,9 +13,7 @@ ShadowGeneratorSceneComponent::ShadowGeneratorSceneComponent(Scene* iScene)
   scene                 = iScene;
 }
 
-ShadowGeneratorSceneComponent::~ShadowGeneratorSceneComponent()
-{
-}
+ShadowGeneratorSceneComponent::~ShadowGeneratorSceneComponent() = default;
 
 void ShadowGeneratorSceneComponent::_register()
 {

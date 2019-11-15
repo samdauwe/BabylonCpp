@@ -50,7 +50,7 @@ public:
 
     return material;
   }
-  ~StandardMaterial() override;
+  ~StandardMaterial(); // = default
 
   /**
    * @brief Gets the current class name of the material e.g. "StandardMaterial".

@@ -30,7 +30,7 @@ class BABYLON_SHARED_EXPORT AbstractActionManager : IDisposable {
 
 public:
   AbstractActionManager();
-  virtual ~AbstractActionManager();
+  virtual ~AbstractActionManager(); // = default
 
   /**
    * @brief Releases all associated resources

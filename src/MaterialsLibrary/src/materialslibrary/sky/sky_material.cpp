@@ -41,9 +41,7 @@ SkyMaterial::SkyMaterial(const std::string& iName, Scene* scene)
   Effect::ShadersStore()["skyPixelShader"] = skyPixelShader;
 }
 
-SkyMaterial::~SkyMaterial()
-{
-}
+SkyMaterial::~SkyMaterial() = default;
 
 bool SkyMaterial::needAlphaBlending() const
 {

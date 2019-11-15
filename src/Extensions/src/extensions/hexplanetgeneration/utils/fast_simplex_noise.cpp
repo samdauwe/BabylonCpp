@@ -17,9 +17,7 @@ FastSimplexNoiseOptions::FastSimplexNoiseOptions()
   random = []() -> float { return Math::random(); };
 }
 
-FastSimplexNoiseOptions::~FastSimplexNoiseOptions()
-{
-}
+FastSimplexNoiseOptions::~FastSimplexNoiseOptions() = default;
 
 // -----------------------------------------------------------------------------
 // Constants
@@ -104,9 +102,7 @@ FastSimplexNoise::FastSimplexNoise(const FastSimplexNoiseOptions& options)
   }
 }
 
-FastSimplexNoise::~FastSimplexNoise()
-{
-}
+FastSimplexNoise::~FastSimplexNoise() =  default;
 
 float FastSimplexNoise::cylindrical(float c, const Float32Array& coords) const
 {

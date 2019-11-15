@@ -42,7 +42,7 @@ public:
   PhysicsRaycastResult(PhysicsRaycastResult&& rhs);
   PhysicsRaycastResult& operator=(const PhysicsRaycastResult& rhs);
   PhysicsRaycastResult& operator=(PhysicsRaycastResult&& rhs);
-  ~PhysicsRaycastResult();
+  ~PhysicsRaycastResult(); // = default
 
   /**
    * @brief Sets the hit data (normal & point in world space)

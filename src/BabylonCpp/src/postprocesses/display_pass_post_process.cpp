@@ -13,8 +13,6 @@ DisplayPassPostProcess::DisplayPassPostProcess(const std::string& iName,
 {
 }
 
-DisplayPassPostProcess::~DisplayPassPostProcess()
-{
-}
+DisplayPassPostProcess::~DisplayPassPostProcess() = default;
 
 } // end of namespace BABYLON

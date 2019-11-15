@@ -56,7 +56,7 @@ public:
   UniformBuffer(Engine* engine, const Float32Array& data = Float32Array(),
                 bool dynamic = false);
   UniformBuffer(UniformBuffer& other) = delete;
-  ~UniformBuffer();
+  ~UniformBuffer(); // = default
 
   // Properties
   /**

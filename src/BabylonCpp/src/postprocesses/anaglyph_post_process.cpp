@@ -19,8 +19,6 @@ AnaglyphPostProcess::AnaglyphPostProcess(
   });
 }
 
-AnaglyphPostProcess::~AnaglyphPostProcess()
-{
-}
+AnaglyphPostProcess::~AnaglyphPostProcess() = default;
 
 } // end of namespace BABYLON

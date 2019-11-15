@@ -9,9 +9,7 @@ ExponentialEase::ExponentialEase(int iExponent)
 {
 }
 
-ExponentialEase::~ExponentialEase()
-{
-}
+ExponentialEase::~ExponentialEase() = default;
 
 float ExponentialEase::easeInCore(float gradient) const
 {

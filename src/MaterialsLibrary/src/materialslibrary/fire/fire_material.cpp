@@ -46,9 +46,7 @@ FireMaterial::FireMaterial(const std::string& iName, Scene* scene)
   Effect::ShadersStore()["firePixelShader"] = firePixelShader;
 }
 
-FireMaterial::~FireMaterial()
-{
-}
+FireMaterial::~FireMaterial() = default;
 
 BaseTexturePtr& FireMaterial::get_diffuseTexture()
 {

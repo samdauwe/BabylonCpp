@@ -28,7 +28,7 @@ public:
 
     return material;
   }
-  ~SkyMaterial() override;
+  ~SkyMaterial(); // = default
 
   bool needAlphaBlending() const override;
   bool needAlphaTesting() const override;

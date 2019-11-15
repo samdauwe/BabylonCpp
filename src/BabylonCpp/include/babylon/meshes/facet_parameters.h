@@ -18,7 +18,7 @@ struct DepthSortedFacet {
 struct BABYLON_SHARED_EXPORT FacetParameters {
 
   FacetParameters();
-  ~FacetParameters();
+  ~FacetParameters(); // = default
 
   // Array of facet positions (vector3)
   std::vector<Vector3> facetPositions;

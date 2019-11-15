@@ -10,9 +10,7 @@ FactorGradient::FactorGradient() : factor2{std::nullopt}
 {
 }
 
-FactorGradient::~FactorGradient()
-{
-}
+FactorGradient::~FactorGradient() = default;
 
 float FactorGradient::getFactor() const
 {

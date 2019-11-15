@@ -7,9 +7,7 @@ WebGLDataBuffer::WebGLDataBuffer(GL::IGLBuffer* resource) : DataBuffer{}
   _buffer = resource;
 }
 
-WebGLDataBuffer::~WebGLDataBuffer()
-{
-}
+WebGLDataBuffer::~WebGLDataBuffer() = default;
 
 GL::IGLBuffer* WebGLDataBuffer::underlyingResource()
 {

@@ -18,9 +18,7 @@ FreeCameraTouchInput::FreeCameraTouchInput()
 {
 }
 
-FreeCameraTouchInput::~FreeCameraTouchInput()
-{
-}
+FreeCameraTouchInput::~FreeCameraTouchInput() = default;
 
 void FreeCameraTouchInput::attachControl(ICanvas* /*canvas*/, bool iNoPreventDefault)
 {

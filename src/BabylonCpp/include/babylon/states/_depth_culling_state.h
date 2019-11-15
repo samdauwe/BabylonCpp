@@ -17,7 +17,7 @@ public:
    * @brief Initializes the state.
    */
   _DepthCullingState();
-  ~_DepthCullingState();
+  ~_DepthCullingState(); // = default
 
   void reset();
   void apply(GL::IGLRenderingContext& _gl);

@@ -31,7 +31,7 @@ public:
 
     return camera;
   }
-  ~FollowCamera() override;
+  ~FollowCamera(); // = default
 
   Type type() const override;
 

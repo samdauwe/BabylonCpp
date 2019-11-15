@@ -30,7 +30,7 @@ public:
   operator=(const EnvironmentTextureIrradianceInfoV1& other);
   EnvironmentTextureIrradianceInfoV1&
   operator=(EnvironmentTextureIrradianceInfoV1&& other);
-  ~EnvironmentTextureIrradianceInfoV1();
+  ~EnvironmentTextureIrradianceInfoV1(); // = default
 
   /**
    * @brief Creates the irradiance information from the parsed irradiance data.

@@ -12,7 +12,7 @@ class GLRenderingContext : public BABYLON::GL::IGLRenderingContext {
 
 public:
   GLRenderingContext();
-  ~GLRenderingContext() override;
+  ~GLRenderingContext(); // = default
 
   bool initialize(bool enableGLDebugging = false) override;
   void backupGLState() override;

@@ -33,52 +33,14 @@ IAnimationKey::IAnimationKey(
 {
 }
 
-IAnimationKey::IAnimationKey(const IAnimationKey& other)
-    : frame{other.frame}
-    , value{other.value}
-    , inTangent{other.inTangent}
-    , outTangent{other.outTangent}
-    , interpolation{other.interpolation}
-{
-}
+IAnimationKey::IAnimationKey(const IAnimationKey& other) = default;
 
-IAnimationKey::IAnimationKey(IAnimationKey&& other)
-    : frame{std::move(other.frame)}
-    , value{std::move(other.value)}
-    , inTangent{std::move(other.inTangent)}
-    , outTangent{std::move(other.outTangent)}
-    , interpolation{std::move(other.interpolation)}
-{
-}
+IAnimationKey::IAnimationKey(IAnimationKey&& other) = default;
 
-IAnimationKey& IAnimationKey::operator=(const IAnimationKey& other)
-{
-  if (&other != this) {
-    frame         = other.frame;
-    value         = other.value;
-    inTangent     = other.inTangent;
-    outTangent    = other.outTangent;
-    interpolation = other.interpolation;
-  }
+IAnimationKey& IAnimationKey::operator=(const IAnimationKey& other) = default;
 
-  return *this;
-}
+IAnimationKey& IAnimationKey::operator=(IAnimationKey&& other) = default;
 
-IAnimationKey& IAnimationKey::operator=(IAnimationKey&& other)
-{
-  if (&other != this) {
-    frame         = std::move(other.frame);
-    value         = std::move(other.value);
-    inTangent     = std::move(other.inTangent);
-    outTangent    = std::move(other.outTangent);
-    interpolation = std::move(other.interpolation);
-  }
-
-  return *this;
-}
-
-IAnimationKey::~IAnimationKey()
-{
-}
+IAnimationKey::~IAnimationKey() = default;
 
 } // end of namespace BABYLON

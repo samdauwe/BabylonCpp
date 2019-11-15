@@ -14,9 +14,7 @@ BaseSystem::BaseSystem(const Filter& filter)
 {
 }
 
-BaseSystem::~BaseSystem()
-{
-}
+BaseSystem::~BaseSystem() = default;
 
 const Filter& BaseSystem::getFilter() const
 {

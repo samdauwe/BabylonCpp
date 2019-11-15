@@ -42,9 +42,7 @@ PBRClearCoatConfiguration::PBRClearCoatConfiguration(
 {
 }
 
-PBRClearCoatConfiguration::~PBRClearCoatConfiguration()
-{
-}
+PBRClearCoatConfiguration::~PBRClearCoatConfiguration() = default;
 
 bool PBRClearCoatConfiguration::get_isEnabled() const
 {

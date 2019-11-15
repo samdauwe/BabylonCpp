@@ -30,9 +30,7 @@ BaseCameraPointersInput<TCamera>::BaseCameraPointersInput()
 }
 
 template <class TCamera>
-BaseCameraPointersInput<TCamera>::~BaseCameraPointersInput()
-{
-}
+BaseCameraPointersInput<TCamera>::~BaseCameraPointersInput() = default;
 
 template <class TCamera>
 const std::string BaseCameraPointersInput<TCamera>::getClassName() const

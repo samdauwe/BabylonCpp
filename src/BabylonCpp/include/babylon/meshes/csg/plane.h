@@ -43,7 +43,7 @@ public:
   Plane(Plane&& otherPlane);
   Plane& operator=(const Plane& otherPlane);
   Plane& operator=(Plane&& otherPlane);
-  ~Plane();
+  ~Plane(); // = default
 
   /**
    * @brief Clone, or make a deep copy of the plane.

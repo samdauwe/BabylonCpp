@@ -79,9 +79,7 @@ LogMessage& LogMessage::operator=(LogMessage&& otherLogMessage)
   return *this;
 }
 
-LogMessage::~LogMessage()
-{
-}
+LogMessage::~LogMessage() = default;
 
 std::ostream& operator<<(std::ostream& os, const LogMessage& logMessage)
 {

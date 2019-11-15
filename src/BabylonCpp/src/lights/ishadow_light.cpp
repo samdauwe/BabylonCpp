@@ -12,8 +12,6 @@ IShadowLight::IShadowLight(const std::string& iName, Scene* scene)
 {
 }
 
-IShadowLight::~IShadowLight()
-{
-}
+IShadowLight::~IShadowLight() = default;
 
 } // end of namespace BABYLON

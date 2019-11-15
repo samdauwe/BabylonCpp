@@ -58,9 +58,7 @@ InputManager::InputManager(Scene* scene)
 {
 }
 
-InputManager::~InputManager()
-{
-}
+InputManager::~InputManager() = default;
 
 AbstractMeshPtr& InputManager::get_meshUnderPointer()
 {

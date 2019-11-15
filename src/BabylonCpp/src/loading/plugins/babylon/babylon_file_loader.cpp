@@ -44,9 +44,7 @@ BabylonFileLoader::BabylonFileLoader()
   };
 }
 
-BabylonFileLoader::~BabylonFileLoader()
-{
-}
+BabylonFileLoader::~BabylonFileLoader() = default;
 
 MaterialPtr
 BabylonFileLoader::parseMaterialById(const std::string& id,

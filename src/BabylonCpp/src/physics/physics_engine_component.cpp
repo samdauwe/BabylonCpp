@@ -20,9 +20,7 @@ PhysicsEngineSceneComponent::PhysicsEngineSceneComponent(Scene* iScene)
   };
 }
 
-PhysicsEngineSceneComponent::~PhysicsEngineSceneComponent()
-{
-}
+PhysicsEngineSceneComponent::~PhysicsEngineSceneComponent() = default;
 
 void PhysicsEngineSceneComponent::_register()
 {

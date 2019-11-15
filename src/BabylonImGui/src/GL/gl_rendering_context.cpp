@@ -110,9 +110,7 @@ GLRenderingContext::GLRenderingContext()
   EnumMap["COLOR_ATTACHMENT31"] = COLOR_ATTACHMENT31;
 }
 
-GLRenderingContext::~GLRenderingContext()
-{
-}
+GLRenderingContext::~GLRenderingContext() = default;
 
 std::string GlErrorCodeStr(GLenum error_code)
 {

@@ -7,8 +7,6 @@ KeyboardInfo::KeyboardInfo(unsigned int iType, const KeyboardEvent& iEvent)
 {
 }
 
-KeyboardInfo::~KeyboardInfo()
-{
-}
+KeyboardInfo::~KeyboardInfo() = default;
 
 } // end of namespace BABYLON

@@ -16,7 +16,7 @@ class BABYLON_SHARED_EXPORT ShadowLight : public IShadowLight {
 
 public:
   ShadowLight(const std::string& name, Scene* scene);
-  ~ShadowLight() override;
+  ~ShadowLight(); // = default
 
   /**
    * @brief Gets the transformed position. Position of the light in world space

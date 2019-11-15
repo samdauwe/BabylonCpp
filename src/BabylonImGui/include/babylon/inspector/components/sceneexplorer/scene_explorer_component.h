@@ -21,7 +21,7 @@ class BABYLON_SHARED_EXPORT SceneExplorerComponent {
 
 public:
   SceneExplorerComponent(const ISceneExplorerComponentProps& props);
-  ~SceneExplorerComponent();
+  ~SceneExplorerComponent(); // = default
 
   void render();
 

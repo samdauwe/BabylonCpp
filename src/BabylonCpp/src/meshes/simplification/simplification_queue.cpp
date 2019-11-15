@@ -8,9 +8,7 @@ SimplificationQueue::SimplificationQueue() : running{false}
 {
 }
 
-SimplificationQueue::~SimplificationQueue()
-{
-}
+SimplificationQueue::~SimplificationQueue() = default;
 
 void SimplificationQueue::addTask(const ISimplificationTask& task)
 {

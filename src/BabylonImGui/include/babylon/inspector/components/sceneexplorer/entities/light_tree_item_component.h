@@ -35,7 +35,7 @@ public:
 
 public:
   LightTreeItemComponent(const ILightTreeItemComponentProps& props);
-  virtual ~LightTreeItemComponent();
+  virtual ~LightTreeItemComponent(); // = default
 
   void switchIsEnabled();
   void toggleGizmo();

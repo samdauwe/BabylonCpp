@@ -37,7 +37,7 @@ public:
    * @param scene defines the hosting scene
    */
   PhysicsViewer(Scene* scene);
-  ~PhysicsViewer();
+  ~PhysicsViewer(); // = default
 
   /**
    * @brief Renders a specified physic impostor.

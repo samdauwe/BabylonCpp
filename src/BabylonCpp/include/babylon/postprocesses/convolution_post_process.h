@@ -60,7 +60,7 @@ public:
 
     return postProcess;
   }
-  ~ConvolutionPostProcess();
+  ~ConvolutionPostProcess(); // = default
 
 protected:
   /**

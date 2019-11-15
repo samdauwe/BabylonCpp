@@ -73,9 +73,7 @@ MirrorTexture::MirrorTexture(const std::string& iName,
   });
 }
 
-MirrorTexture::~MirrorTexture()
-{
-}
+MirrorTexture::~MirrorTexture() = default;
 
 void MirrorTexture::set_blurRatio(float value)
 {

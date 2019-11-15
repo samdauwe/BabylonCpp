@@ -13,23 +13,11 @@ namespace BABYLON {
 
 unsigned int CSG::CSG::currentCSGMeshId = 0;
 
-CSG::CSG::CSG()
-{
-}
+CSG::CSG::CSG() = default;
 
-CSG::CSG::CSG(const BABYLON::CSG::CSG& otherCSG)
-    : matrix{otherCSG.matrix}
-    , position{otherCSG.position}
-    , rotation{otherCSG.rotation}
-    , rotationQuaternion{otherCSG.rotationQuaternion}
-    , scaling{otherCSG.scaling}
-    , _polygons{otherCSG._polygons}
-{
-}
+CSG::CSG::CSG(const BABYLON::CSG::CSG& otherCSG) = default;
 
-CSG::CSG::~CSG()
-{
-}
+CSG::CSG::~CSG() = default;
 
 std::unique_ptr<BABYLON::CSG::CSG> CSG::CSG::FromMesh(const MeshPtr& mesh)
 {

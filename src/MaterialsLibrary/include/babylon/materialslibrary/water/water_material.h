@@ -35,7 +35,7 @@ public:
 
     return material;
   }
-  ~WaterMaterial() override;
+  ~WaterMaterial(); // = default
 
   // Methods
   void addToRenderList(const AbstractMeshPtr& node);

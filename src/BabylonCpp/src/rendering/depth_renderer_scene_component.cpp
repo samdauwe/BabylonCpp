@@ -12,9 +12,7 @@ DepthRendererSceneComponent::DepthRendererSceneComponent(Scene* iScene)
   scene                 = iScene;
 }
 
-DepthRendererSceneComponent::~DepthRendererSceneComponent()
-{
-}
+DepthRendererSceneComponent::~DepthRendererSceneComponent() = default;
 
 void DepthRendererSceneComponent::_register()
 {

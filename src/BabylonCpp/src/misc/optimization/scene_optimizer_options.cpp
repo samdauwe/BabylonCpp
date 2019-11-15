@@ -17,47 +17,17 @@ SceneOptimizerOptions::SceneOptimizerOptions(float iTargetFrameRate,
 {
 }
 
-SceneOptimizerOptions::SceneOptimizerOptions(const SceneOptimizerOptions& other)
-    : optimizations{other.optimizations}
-    , targetFrameRate{other.targetFrameRate}
-    , trackerDuration{other.trackerDuration}
-{
-}
+SceneOptimizerOptions::SceneOptimizerOptions(const SceneOptimizerOptions& other) = default;
 
-SceneOptimizerOptions::SceneOptimizerOptions(SceneOptimizerOptions&& other)
-    : optimizations{std::move(other.optimizations)}
-    , targetFrameRate{std::move(other.targetFrameRate)}
-    , trackerDuration{std::move(other.trackerDuration)}
-{
-}
+SceneOptimizerOptions::SceneOptimizerOptions(SceneOptimizerOptions&& other) = default;
 
 SceneOptimizerOptions& SceneOptimizerOptions::
-operator=(const SceneOptimizerOptions& other)
-{
-  if (&other != this) {
-    optimizations   = other.optimizations;
-    targetFrameRate = other.targetFrameRate;
-    trackerDuration = other.trackerDuration;
-  }
-
-  return *this;
-}
+operator=(const SceneOptimizerOptions& other) = default;
 
 SceneOptimizerOptions& SceneOptimizerOptions::
-operator=(SceneOptimizerOptions&& other)
-{
-  if (&other != this) {
-    optimizations   = std::move(other.optimizations);
-    targetFrameRate = std::move(other.targetFrameRate);
-    trackerDuration = std::move(other.trackerDuration);
-  }
+operator=(SceneOptimizerOptions&& other) = default;
 
-  return *this;
-}
-
-SceneOptimizerOptions::~SceneOptimizerOptions()
-{
-}
+SceneOptimizerOptions::~SceneOptimizerOptions() = default;
 
 SceneOptimizerOptions
 SceneOptimizerOptions::LowDegradationAllowed(float targetFrameRate)

@@ -32,7 +32,7 @@ public:
                     Scene* scene,
                     const std::optional<IMultiRenderTargetOptions>& options
                     = std::nullopt);
-  ~MultiRenderTarget() override;
+  ~MultiRenderTarget(); // = default
 
   /**
    * @brief Hidden

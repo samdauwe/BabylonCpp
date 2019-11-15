@@ -40,8 +40,6 @@ TonemapPostProcess::TonemapPostProcess(
   };
 }
 
-TonemapPostProcess::~TonemapPostProcess()
-{
-}
+TonemapPostProcess::~TonemapPostProcess() = default;
 
 } // end of namespace BABYLON

@@ -27,7 +27,7 @@ public:
 
     return postProcess;
   }
-  ~FxaaPostProcess();
+  ~FxaaPostProcess(); // = default
 
 protected:
   FxaaPostProcess(const std::string& _name, float ratio,

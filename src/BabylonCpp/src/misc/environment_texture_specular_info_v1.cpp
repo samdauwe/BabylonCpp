@@ -10,48 +10,18 @@ EnvironmentTextureSpecularInfoV1::EnvironmentTextureSpecularInfoV1()
 }
 
 EnvironmentTextureSpecularInfoV1::EnvironmentTextureSpecularInfoV1(
-  const EnvironmentTextureSpecularInfoV1& other)
-    : specularDataPosition{other.specularDataPosition}
-    , mipmaps{other.mipmaps}
-    , lodGenerationScale{other.lodGenerationScale}
-{
-}
+const EnvironmentTextureSpecularInfoV1& other) = default;
 
 EnvironmentTextureSpecularInfoV1::EnvironmentTextureSpecularInfoV1(
-  EnvironmentTextureSpecularInfoV1&& other)
-    : specularDataPosition{std::move(other.specularDataPosition)}
-    , mipmaps{std::move(other.mipmaps)}
-    , lodGenerationScale{std::move(other.lodGenerationScale)}
-{
-}
+  EnvironmentTextureSpecularInfoV1&& other) = default;
 
 EnvironmentTextureSpecularInfoV1& EnvironmentTextureSpecularInfoV1::
-operator=(const EnvironmentTextureSpecularInfoV1& other)
-{
-  if (&other != this) {
-    specularDataPosition = other.specularDataPosition;
-    mipmaps              = other.mipmaps;
-    lodGenerationScale   = other.lodGenerationScale;
-  }
-
-  return *this;
-}
+operator=(const EnvironmentTextureSpecularInfoV1& other) = default;
 
 EnvironmentTextureSpecularInfoV1& EnvironmentTextureSpecularInfoV1::
-operator=(EnvironmentTextureSpecularInfoV1&& other)
-{
-  if (&other != this) {
-    specularDataPosition = std::move(other.specularDataPosition);
-    mipmaps              = std::move(other.mipmaps);
-    lodGenerationScale   = std::move(other.lodGenerationScale);
-  }
+operator=(EnvironmentTextureSpecularInfoV1&& other) = default;
 
-  return *this;
-}
-
-EnvironmentTextureSpecularInfoV1::~EnvironmentTextureSpecularInfoV1()
-{
-}
+EnvironmentTextureSpecularInfoV1::~EnvironmentTextureSpecularInfoV1() = default;
 
 EnvironmentTextureSpecularInfoV1Ptr
 EnvironmentTextureSpecularInfoV1::Parse(const json& parsedSpecular)

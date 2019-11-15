@@ -15,7 +15,7 @@ class BABYLON_SHARED_EXPORT Channel {
 
 public:
   Channel();
-  ~Channel();
+  ~Channel(); // = default
 
   void push(const Vector3& p);
   void push(const Vector3& p1, const Vector3& p2);

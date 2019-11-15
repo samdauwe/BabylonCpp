@@ -123,9 +123,7 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
   }
 }
 
-Material::~Material()
-{
-}
+Material::~Material() = default;
 
 void Material::set_alpha(float value)
 {

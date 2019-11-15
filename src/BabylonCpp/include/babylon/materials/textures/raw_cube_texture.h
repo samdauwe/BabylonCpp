@@ -35,7 +35,7 @@ struct BABYLON_SHARED_EXPORT RawCubeTexture : public CubeTexture {
                  unsigned int samplingMode
                  = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
                  const std::string& compression = "");
-  ~RawCubeTexture();
+  ~RawCubeTexture(); // = default
 
   /**
    * @brief Updates the raw cube texture.

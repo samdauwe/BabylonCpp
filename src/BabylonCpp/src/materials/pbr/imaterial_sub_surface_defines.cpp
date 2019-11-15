@@ -24,9 +24,7 @@ IMaterialSubSurfaceDefines::IMaterialSubSurfaceDefines() : MaterialDefines{}
   };
 }
 
-IMaterialSubSurfaceDefines::~IMaterialSubSurfaceDefines()
-{
-}
+IMaterialSubSurfaceDefines::~IMaterialSubSurfaceDefines() = default;
 
 std::string IMaterialSubSurfaceDefines::toString() const
 {

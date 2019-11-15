@@ -22,7 +22,7 @@ public:
    * @brief Instantiate the input.
    */
   ArcRotateCameraGamepadInput();
-  virtual ~ArcRotateCameraGamepadInput();
+  virtual ~ArcRotateCameraGamepadInput(); // = default
 
   /**
    * @brief Attach the input controls to a specific dom element to get the input

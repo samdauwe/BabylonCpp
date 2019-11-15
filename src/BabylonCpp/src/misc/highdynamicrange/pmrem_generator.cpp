@@ -126,9 +126,7 @@ PMREMGenerator<ArrayBufferView>::PMREMGenerator(
 }
 
 template <typename ArrayBufferView>
-PMREMGenerator<ArrayBufferView>::~PMREMGenerator()
-{
-}
+PMREMGenerator<ArrayBufferView>::~PMREMGenerator() = default;
 
 template <typename ArrayBufferView>
 std::vector<std::vector<ArrayBufferView>>&

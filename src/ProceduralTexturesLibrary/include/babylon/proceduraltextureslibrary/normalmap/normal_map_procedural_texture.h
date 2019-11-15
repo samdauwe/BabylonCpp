@@ -24,7 +24,7 @@ public:
 
     return texture;
   }
-  ~NormalMapProceduralTexture();
+  ~NormalMapProceduralTexture(); // = default
 
   void updateShaderUniforms();
   void render(bool useCameraPostProcess = false);

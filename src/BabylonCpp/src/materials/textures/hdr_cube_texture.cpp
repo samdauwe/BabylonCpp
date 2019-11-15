@@ -82,9 +82,7 @@ HDRCubeTexture::HDRCubeTexture(
   }
 }
 
-HDRCubeTexture::~HDRCubeTexture()
-{
-}
+HDRCubeTexture::~HDRCubeTexture() = default;
 
 const std::string HDRCubeTexture::getClassName() const
 {

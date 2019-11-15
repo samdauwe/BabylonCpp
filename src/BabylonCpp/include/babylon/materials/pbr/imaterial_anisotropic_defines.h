@@ -13,7 +13,7 @@ struct BABYLON_SHARED_EXPORT IMaterialAnisotropicDefines
     : public MaterialDefines {
 
   IMaterialAnisotropicDefines();
-  ~IMaterialAnisotropicDefines() override;
+  ~IMaterialAnisotropicDefines(); // = default
 
   /**
    * @brief Converts the material define values to a string.

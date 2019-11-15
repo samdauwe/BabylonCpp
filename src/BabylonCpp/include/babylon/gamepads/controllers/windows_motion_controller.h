@@ -132,7 +132,7 @@ public:
     return std::shared_ptr<WindowsMotionController>(
       new WindowsMotionController(std::forward<Ts>(args)...));
   }
-  ~WindowsMotionController() override;
+  ~WindowsMotionController(); // = default
 
   /**
    * Fired when the trigger on this controller is modified.

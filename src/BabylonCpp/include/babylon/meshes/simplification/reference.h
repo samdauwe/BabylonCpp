@@ -12,7 +12,7 @@ class BABYLON_SHARED_EXPORT Reference {
 
 public:
   Reference(int vertexId, int triangleId);
-  ~Reference();
+  ~Reference(); // = default
 
 public:
   int vertexId;

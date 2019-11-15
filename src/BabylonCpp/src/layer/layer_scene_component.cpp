@@ -16,9 +16,7 @@ LayerSceneComponent::LayerSceneComponent(Scene* iScene)
   _engine               = scene->getEngine();
 }
 
-LayerSceneComponent::~LayerSceneComponent()
-{
-}
+LayerSceneComponent::~LayerSceneComponent() = default;
 
 void LayerSceneComponent::_register()
 {

@@ -16,7 +16,7 @@ struct InspectorAction {
   InspectorAction(InspectorAction&& rhs);
   InspectorAction& operator=(const InspectorAction& rhs);
   InspectorAction& operator=(InspectorAction&& rhs);
-  ~InspectorAction();
+  ~InspectorAction(); // = default
 
   static bool FalseConst();
   void invoke();

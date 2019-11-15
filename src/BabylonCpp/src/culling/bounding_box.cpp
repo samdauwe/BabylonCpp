@@ -122,9 +122,7 @@ BoundingBox& BoundingBox::operator=(BoundingBox&& other)
   return *this;
 }
 
-BoundingBox::~BoundingBox()
-{
-}
+BoundingBox::~BoundingBox() = default;
 
 BoundingBox& BoundingBox::scale(float factor)
 {

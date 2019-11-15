@@ -27,7 +27,7 @@ public:
    * @see https://doc.babylonjs.com/how_to/how_to_use_postprocessrenderpipeline
    */
   PostProcessRenderPipelineManager();
-  ~PostProcessRenderPipelineManager();
+  ~PostProcessRenderPipelineManager(); // = default
 
   /**
    * @brief Gets the list of supported render pipelines.

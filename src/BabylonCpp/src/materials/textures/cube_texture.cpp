@@ -150,9 +150,7 @@ CubeTexture::CubeTexture(
   }
 }
 
-CubeTexture::~CubeTexture()
-{
-}
+CubeTexture::~CubeTexture() = default;
 
 void CubeTexture::set_boundingBoxSize(const std::optional<Vector3>& value)
 {

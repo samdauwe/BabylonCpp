@@ -5,9 +5,7 @@
 
 namespace BABYLON {
 
-Curve3::Curve3()
-{
-}
+Curve3::Curve3() = default;
 
 Curve3::Curve3(const std::vector<Vector3>& points) : _length{0.f}
 {
@@ -15,40 +13,12 @@ Curve3::Curve3(const std::vector<Vector3>& points) : _length{0.f}
   _length = computeLength(points);
 }
 
-Curve3::Curve3(const Curve3& otherCurve)
-    : _points{otherCurve._points}, _length{otherCurve._length}
-{
-}
+Curve3::Curve3(const Curve3& otherCurve) = default;
+Curve3::Curve3(Curve3&& otherCurve) = default;
+Curve3& Curve3::operator=(const Curve3& otherCurve) = default;
+Curve3& Curve3::operator=(Curve3&& otherCurve) = default;
 
-Curve3::Curve3(Curve3&& otherCurve)
-    : _points{std::move(otherCurve._points)}
-    , _length{std::move(otherCurve._length)}
-{
-}
-
-Curve3& Curve3::operator=(const Curve3& otherCurve)
-{
-  if (&otherCurve != this) {
-    _points = otherCurve._points;
-    _length = otherCurve._length;
-  }
-
-  return *this;
-}
-
-Curve3& Curve3::operator=(Curve3&& otherCurve)
-{
-  if (&otherCurve != this) {
-    _points = std::move(otherCurve._points);
-    _length = std::move(otherCurve._length);
-  }
-
-  return *this;
-}
-
-Curve3::~Curve3()
-{
-}
+Curve3::~Curve3() = default;
 
 Curve3 Curve3::copy() const
 {

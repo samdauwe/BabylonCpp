@@ -43,7 +43,7 @@ public:
    * @param particleSystem the particle system to be used by the sub emitter
    */
   SubEmitter(const ParticleSystemPtr& particleSystem);
-  ~SubEmitter();
+  ~SubEmitter(); // = default
 
   /**
    * @brief Clones the sub emitter.

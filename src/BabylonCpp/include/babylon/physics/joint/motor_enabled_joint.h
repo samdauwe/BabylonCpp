@@ -21,7 +21,7 @@ public:
    * @param jointData The physica joint data for the joint
    */
   MotorEnabledJoint(unsigned int jointType, const PhysicsJointData& jointData);
-  virtual ~MotorEnabledJoint();
+  virtual ~MotorEnabledJoint(); // = default
 
   /**
    * @brief Set the motor values.

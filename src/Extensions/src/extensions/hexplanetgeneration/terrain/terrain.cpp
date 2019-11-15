@@ -33,9 +33,7 @@ Terrain::Terrain(const std::string& seed, float width, float height)
   _terrainTemperature->generateTemperature();
 }
 
-Terrain::~Terrain()
-{
-}
+Terrain::~Terrain() = default;
 
 Color3 Terrain::getColor(float u, float v) const
 {

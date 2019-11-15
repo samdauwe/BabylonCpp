@@ -39,7 +39,7 @@ public:
    */
   Action(unsigned int triggerOptions, Condition* condition = nullptr);
   Action(const TriggerOptions& triggerOptions, Condition* condition = nullptr);
-  virtual ~Action() override;
+  virtual ~Action(); // = default
 
   /** Methods **/
 

@@ -20,7 +20,7 @@ class BABYLON_SHARED_EXPORT IPipelineContext {
 
 public:
   IPipelineContext();
-  virtual ~IPipelineContext();
+  virtual ~IPipelineContext(); // = default
 
 protected:
   virtual bool get_isAsync() const;

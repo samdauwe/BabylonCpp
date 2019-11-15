@@ -13,9 +13,7 @@ SetStateAction::SetStateAction(unsigned int iTtriggerOptions,
 {
 }
 
-SetStateAction::~SetStateAction()
-{
-}
+SetStateAction::~SetStateAction() = default;
 
 void SetStateAction::execute(const std::optional<IActionEvent>& /*evt*/)
 {

@@ -24,8 +24,6 @@ GrainPostProcess::GrainPostProcess(
   });
 }
 
-GrainPostProcess::~GrainPostProcess()
-{
-}
+GrainPostProcess::~GrainPostProcess() = default;
 
 } // end of namespace BABYLON

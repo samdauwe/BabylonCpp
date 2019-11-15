@@ -10,9 +10,7 @@ XorShift128::XorShift128(size_t x, size_t y, size_t z, size_t w)
   reseed(x, y, z, w);
 }
 
-XorShift128::~XorShift128()
-{
-}
+XorShift128::~XorShift128() = default;
 
 size_t XorShift128::next()
 {

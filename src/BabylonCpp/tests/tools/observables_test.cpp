@@ -10,13 +10,9 @@ struct Mouse {
 
   enum class ClickType : int { LEFT = 0x01, RIGHT = 0x02 };
 
-  Mouse()
-  {
-  }
+  Mouse() = default;
 
-  ~Mouse()
-  {
-  }
+  ~Mouse() = default;
 
   void raiseLeftClick()
   {

@@ -13,45 +13,15 @@ DataView::DataView(const ArrayBuffer& buffer, size_t byteOffset,
 {
 }
 
-DataView::DataView(const DataView& other)
-    : _buffer{other._buffer}
-    , _byteLength{other._byteLength}
-    , _byteOffset{other._byteOffset}
-{
-}
+DataView::DataView(const DataView& other) = default;
 
-DataView::DataView(DataView&& other)
-    : _buffer{std::move(other._buffer)}
-    , _byteLength{std::move(other._byteLength)}
-    , _byteOffset{std::move(other._byteOffset)}
-{
-}
+DataView::DataView(DataView&& other) = default;
 
-DataView& DataView::operator=(const DataView& other)
-{
-  if (&other != this) {
-    _buffer     = other._buffer;
-    _byteLength = other._byteLength;
-    _byteOffset = other._byteOffset;
-  }
+DataView& DataView::operator=(const DataView& other) = default;
 
-  return *this;
-}
+DataView& DataView::operator=(DataView&& other) = default;
 
-DataView& DataView::operator=(DataView&& other)
-{
-  if (&other != this) {
-    _buffer     = std::move(other._buffer);
-    _byteLength = std::move(other._byteLength);
-    _byteOffset = std::move(other._byteOffset);
-  }
-
-  return *this;
-}
-
-DataView::~DataView()
-{
-}
+DataView::~DataView() = default;
 
 int8_t DataView::getInt8(size_t /*byteOffset*/) const
 {

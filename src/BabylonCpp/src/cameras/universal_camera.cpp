@@ -91,9 +91,7 @@ UniversalCamera::UniversalCamera::UniversalCamera(const std::string& iName,
   inputs->addGamepad();
 }
 
-UniversalCamera::~UniversalCamera()
-{
-}
+UniversalCamera::~UniversalCamera() = default;
 
 const std::string UniversalCamera::getClassName() const
 {

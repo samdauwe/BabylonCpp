@@ -14,8 +14,6 @@ PointerInfoBase::PointerInfoBase(PointerEventTypes iType,
 {
 }
 
-PointerInfoBase::~PointerInfoBase()
-{
-}
+PointerInfoBase::~PointerInfoBase() = default;
 
 } // end of namespace BABYLON

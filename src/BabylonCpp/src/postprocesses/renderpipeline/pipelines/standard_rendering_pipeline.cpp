@@ -146,9 +146,7 @@ StandardRenderingPipeline::StandardRenderingPipeline(
                         Constants::TEXTURETYPE_HALF_FLOAT;
 }
 
-StandardRenderingPipeline::~StandardRenderingPipeline()
-{
-}
+StandardRenderingPipeline::~StandardRenderingPipeline() = default;
 
 void StandardRenderingPipeline::addToScene(
   const StandardRenderingPipelinePtr& renderingPipeline)

@@ -38,9 +38,7 @@ MaterialTreeItemComponent::MaterialTreeItemComponent(
   }
 }
 
-MaterialTreeItemComponent::~MaterialTreeItemComponent()
-{
-}
+MaterialTreeItemComponent::~MaterialTreeItemComponent() = default;
 
 void MaterialTreeItemComponent::render()
 {

@@ -143,7 +143,7 @@ public:
     std::unique_ptr<Engine> engine(new Engine(std::forward<Ts>(args)...));
     return engine;
   }
-  virtual ~Engine();
+  virtual ~Engine(); // = default
 
   /**
    * @brief Gets a boolean indicating if all created effects are ready

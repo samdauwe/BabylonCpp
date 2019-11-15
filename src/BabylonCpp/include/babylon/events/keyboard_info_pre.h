@@ -24,7 +24,7 @@ public:
    * @param event Defines the related dom event
    */
   KeyboardInfoPre(unsigned int type, const KeyboardEvent& event);
-  ~KeyboardInfoPre();
+  ~KeyboardInfoPre(); // = default
 
 public:
   /**

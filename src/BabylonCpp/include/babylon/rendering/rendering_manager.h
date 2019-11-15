@@ -52,7 +52,7 @@ public:
    * @param scene Defines the scene the groups belongs to
    */
   RenderingManager(Scene* scene);
-  ~RenderingManager();
+  ~RenderingManager(); // = default
 
   /**
    * @brief Renders the entire managed groups. This is used by the scene or the

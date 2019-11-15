@@ -34,9 +34,7 @@ RenderingManager::RenderingManager(Scene* scene)
   }
 }
 
-RenderingManager::~RenderingManager()
-{
-}
+RenderingManager::~RenderingManager() = default;
 
 void RenderingManager::_clearDepthStencilBuffer(bool depth, bool stencil)
 {

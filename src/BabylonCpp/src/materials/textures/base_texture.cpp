@@ -71,9 +71,7 @@ BaseTexture::BaseTexture(Scene* scene)
 {
 }
 
-BaseTexture::~BaseTexture()
-{
-}
+BaseTexture::~BaseTexture() = default;
 
 Type BaseTexture::type() const
 {

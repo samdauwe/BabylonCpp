@@ -14,49 +14,15 @@ FaceDirectionInfo::FaceDirectionInfo(const Vector3& iDirection,
 {
 }
 
-FaceDirectionInfo::FaceDirectionInfo(const FaceDirectionInfo& other)
-    : direction{other.direction}
-    , rotatedDirection{other.rotatedDirection}
-    , diff{other.diff}
-    , ignore{other.ignore}
-{
-}
+FaceDirectionInfo::FaceDirectionInfo(const FaceDirectionInfo& other) = default;
 
-FaceDirectionInfo::FaceDirectionInfo(FaceDirectionInfo&& other)
-    : direction{std::move(other.direction)}
-    , rotatedDirection{std::move(other.rotatedDirection)}
-    , diff{std::move(other.diff)}
-    , ignore{std::move(other.ignore)}
-{
-}
+FaceDirectionInfo::FaceDirectionInfo(FaceDirectionInfo&& other) = default;
 
-FaceDirectionInfo& FaceDirectionInfo::operator=(const FaceDirectionInfo& other)
-{
-  if (&other != this) {
-    direction        = other.direction;
-    rotatedDirection = other.rotatedDirection;
-    diff             = other.diff;
-    ignore           = other.ignore;
-  }
+FaceDirectionInfo& FaceDirectionInfo::operator=(const FaceDirectionInfo& other) = default;
 
-  return *this;
-}
+FaceDirectionInfo& FaceDirectionInfo::operator=(FaceDirectionInfo&& other) = default;
 
-FaceDirectionInfo& FaceDirectionInfo::operator=(FaceDirectionInfo&& other)
-{
-  if (&other != this) {
-    direction        = std::move(other.direction);
-    rotatedDirection = std::move(other.rotatedDirection);
-    diff             = std::move(other.diff);
-    ignore           = std::move(other.ignore);
-  }
-
-  return *this;
-}
-
-FaceDirectionInfo::~FaceDirectionInfo()
-{
-}
+FaceDirectionInfo::~FaceDirectionInfo() = default;
 
 FaceDirectionInfo FaceDirectionInfo::copy() const
 {

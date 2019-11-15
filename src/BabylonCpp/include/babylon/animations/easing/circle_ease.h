@@ -25,7 +25,7 @@ public:
     return std::shared_ptr<CircleEase>(
       new CircleEase(std::forward<Ts>(args)...));
   }
-  ~CircleEase() override;
+  ~CircleEase(); // = default
 
   /**
    * @brief Hidden

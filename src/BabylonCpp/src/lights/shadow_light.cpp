@@ -17,9 +17,7 @@ ShadowLight::ShadowLight(const std::string& iName, Scene* scene)
 {
 }
 
-ShadowLight::~ShadowLight()
-{
-}
+ShadowLight::~ShadowLight() = default;
 
 Vector3& ShadowLight::get_position()
 {

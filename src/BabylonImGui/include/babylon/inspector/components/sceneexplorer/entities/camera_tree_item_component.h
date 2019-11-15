@@ -34,7 +34,7 @@ public:
 
 public:
   CameraTreeItemComponent(const ICameraTreeItemComponentProps& props);
-  virtual ~CameraTreeItemComponent() override;
+  virtual ~CameraTreeItemComponent(); // = default
 
   void setActive();
   void componentWillMount();

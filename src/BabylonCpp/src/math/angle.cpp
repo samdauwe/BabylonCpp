@@ -8,9 +8,7 @@
 
 namespace BABYLON {
 
-Angle::Angle()
-{
-}
+Angle::Angle() = default;
 
 Angle::Angle(float iradians) : _radians{iradians}
 {
@@ -19,35 +17,15 @@ Angle::Angle(float iradians) : _radians{iradians}
   }
 }
 
-Angle::Angle(const Angle& otherAngle) : _radians{otherAngle._radians}
-{
-}
+Angle::Angle(const Angle& otherAngle) = default;
 
-Angle::Angle(Angle&& otherAngle) : _radians{std::move(otherAngle._radians)}
-{
-}
+Angle::Angle(Angle&& otherAngle) = default;
 
-Angle& Angle::operator=(const Angle& otherAngle)
-{
-  if (&otherAngle != this) {
-    _radians = otherAngle._radians;
-  }
+Angle& Angle::operator=(const Angle& otherAngle) = default;
 
-  return *this;
-}
+Angle& Angle::operator=(Angle&& otherAngle) = default;
 
-Angle& Angle::operator=(Angle&& otherAngle)
-{
-  if (&otherAngle != this) {
-    _radians = std::move(otherAngle._radians);
-  }
-
-  return *this;
-}
-
-Angle::~Angle()
-{
-}
+Angle::~Angle() = default;
 
 Angle Angle::copy() const
 {

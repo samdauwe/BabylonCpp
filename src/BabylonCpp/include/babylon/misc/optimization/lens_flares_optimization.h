@@ -10,7 +10,7 @@ class BABYLON_SHARED_EXPORT LensFlaresOptimization : public SceneOptimization {
 
 public:
   LensFlaresOptimization(int priority = 0);
-  ~LensFlaresOptimization() override;
+  ~LensFlaresOptimization(); // = default
 
   bool apply(Scene* scene) override;
 

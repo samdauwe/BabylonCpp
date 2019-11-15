@@ -37,7 +37,7 @@ public:
                          bool stopOtherAnimations = false,
                          const std::function<void()>& onInterpolationDone
                          = nullptr);
-  ~InterpolateValueAction() override;
+  ~InterpolateValueAction(); // = default
 
   /**
    * @brief Hidden

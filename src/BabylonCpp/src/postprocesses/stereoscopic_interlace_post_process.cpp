@@ -27,8 +27,6 @@ StereoscopicInterlacePostProcess::StereoscopicInterlacePostProcess(
   });
 }
 
-StereoscopicInterlacePostProcess::~StereoscopicInterlacePostProcess()
-{
-}
+StereoscopicInterlacePostProcess::~StereoscopicInterlacePostProcess() = default;
 
 } // end of namespace BABYLON

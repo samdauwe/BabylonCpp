@@ -25,7 +25,7 @@ public:
     return std::shared_ptr<QuadraticEase>(
       new QuadraticEase(std::forward<Ts>(args)...));
   }
-  ~QuadraticEase() override;
+  ~QuadraticEase(); // = default
 
   /**
    * @brief Hidden

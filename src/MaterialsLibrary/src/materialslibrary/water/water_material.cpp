@@ -91,9 +91,7 @@ WaterMaterial::WaterMaterial(const std::string& iName, Scene* scene,
   };
 }
 
-WaterMaterial::~WaterMaterial()
-{
-}
+WaterMaterial::~WaterMaterial() = default;
 
 BaseTexturePtr& WaterMaterial::get_bumpTexture()
 {

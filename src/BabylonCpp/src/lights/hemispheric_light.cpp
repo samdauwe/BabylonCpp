@@ -34,9 +34,7 @@ HemisphericLight::HemisphericLight(const std::string& iName,
 {
 }
 
-HemisphericLight::~HemisphericLight()
-{
-}
+HemisphericLight::~HemisphericLight() = default;
 
 void HemisphericLight::_buildUniformLayout()
 {

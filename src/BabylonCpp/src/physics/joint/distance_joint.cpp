@@ -10,9 +10,7 @@ DistanceJoint::DistanceJoint(const DistanceJointData& iJointData)
 {
 }
 
-DistanceJoint::~DistanceJoint()
-{
-}
+DistanceJoint::~DistanceJoint() = default;
 
 void DistanceJoint::updateDistance(float maxDistance, float minDistance)
 {

@@ -24,9 +24,7 @@ PBRSpecularGlossinessMaterial::PBRSpecularGlossinessMaterial(
   _useMicroSurfaceFromReflectivityMapAlpha = true;
 }
 
-PBRSpecularGlossinessMaterial::~PBRSpecularGlossinessMaterial()
-{
-}
+PBRSpecularGlossinessMaterial::~PBRSpecularGlossinessMaterial() = default;
 
 const std::string PBRSpecularGlossinessMaterial::getClassName() const
 {

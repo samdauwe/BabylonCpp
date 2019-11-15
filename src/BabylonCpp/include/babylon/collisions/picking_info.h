@@ -25,7 +25,7 @@ public:
   PickingInfo(PickingInfo&& other);
   PickingInfo& operator=(const PickingInfo& other);
   PickingInfo& operator=(PickingInfo&& other);
-  ~PickingInfo();
+  ~PickingInfo(); // = default
 
   /**
    * @brief Gets the normal corresponding to the face the pick collided with

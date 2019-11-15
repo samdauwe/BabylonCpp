@@ -12,9 +12,7 @@ ExecuteCodeAction::ExecuteCodeAction(
 {
 }
 
-ExecuteCodeAction::~ExecuteCodeAction()
-{
-}
+ExecuteCodeAction::~ExecuteCodeAction() = default;
 
 void ExecuteCodeAction::execute(const std::optional<IActionEvent>& evt)
 {

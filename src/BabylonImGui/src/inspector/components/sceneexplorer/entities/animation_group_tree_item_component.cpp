@@ -20,9 +20,7 @@ AnimationGroupTreeItemComponent::AnimationGroupTreeItemComponent(
   entityInfo.type = EntityType::Bone;
 }
 
-AnimationGroupTreeItemComponent::~AnimationGroupTreeItemComponent()
-{
-}
+AnimationGroupTreeItemComponent::~AnimationGroupTreeItemComponent() = default;
 
 void AnimationGroupTreeItemComponent::render()
 {

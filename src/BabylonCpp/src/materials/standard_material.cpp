@@ -418,9 +418,7 @@ StandardMaterial::StandardMaterial(const StandardMaterial& other)
   _twoSidedLighting                  = other._twoSidedLighting;
 }
 
-StandardMaterial::~StandardMaterial()
-{
-}
+StandardMaterial::~StandardMaterial() = default;
 
 const std::string StandardMaterial::getClassName() const
 {

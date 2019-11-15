@@ -68,9 +68,7 @@ SpotLight::SpotLight(const std::string& iName, const Vector3& iPosition,
   set_angle(iAngle);
 }
 
-SpotLight::~SpotLight()
-{
-}
+SpotLight::~SpotLight() = default;
 
 Type SpotLight::type() const
 {

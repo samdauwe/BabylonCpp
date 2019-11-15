@@ -70,9 +70,7 @@ NormalMaterialDefines::NormalMaterialDefines() : MaterialDefines{}
   };
 }
 
-NormalMaterialDefines::~NormalMaterialDefines()
-{
-}
+NormalMaterialDefines::~NormalMaterialDefines() = default;
 
 } // end of namespace MaterialsLibrary
 } // end of namespace BABYLON

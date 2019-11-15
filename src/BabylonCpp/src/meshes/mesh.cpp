@@ -191,9 +191,7 @@ void Mesh::_initialize(Scene* scene, Node* iParent, Mesh* source, bool doNotClon
   _instanceDataStorage->hardwareInstancedRendering = getEngine()->getCaps().instancedArrays;
 }
 
-Mesh::~Mesh()
-{
-}
+Mesh::~Mesh() = default;
 
 MorphTargetManagerPtr& Mesh::get_morphTargetManager()
 {

@@ -32,9 +32,7 @@ CellMaterialDefines::CellMaterialDefines() : MaterialDefines{}
   };
 }
 
-CellMaterialDefines::~CellMaterialDefines()
-{
-}
+CellMaterialDefines::~CellMaterialDefines() = default;
 
 } // end of namespace MaterialsLibrary
 } // end of namespace BABYLON

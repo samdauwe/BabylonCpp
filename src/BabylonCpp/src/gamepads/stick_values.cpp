@@ -12,36 +12,14 @@ StickValues::StickValues(float iX, float iY) : x{iX}, y{iY}
 {
 }
 
-StickValues::StickValues(const StickValues& other) : x{other.x}, y{other.y}
-{
-}
+StickValues::StickValues(const StickValues& other) = default;
 
-StickValues::StickValues(StickValues&& other) : x{std::move(other.x)}, y{std::move(other.y)}
-{
-}
+StickValues::StickValues(StickValues&& other) = default;
 
-StickValues& StickValues::operator=(const StickValues& other)
-{
-  if (&other != this) {
-    x = other.x;
-    y = other.y;
-  }
+StickValues& StickValues::operator=(const StickValues& other) = default;
 
-  return *this;
-}
+StickValues& StickValues::operator=(StickValues&& other) = default;
 
-StickValues& StickValues::operator=(StickValues&& other)
-{
-  if (&other != this) {
-    x = std::move(other.x);
-    y = std::move(other.y);
-  }
-
-  return *this;
-}
-
-StickValues::~StickValues()
-{
-}
+StickValues::~StickValues() = default;
 
 } // end of namespace BABYLON

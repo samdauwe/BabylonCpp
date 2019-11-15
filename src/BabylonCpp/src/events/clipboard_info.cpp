@@ -7,9 +7,7 @@ ClipboardInfo::ClipboardInfo(unsigned int iType, const ClipboardEvent& iEvent)
 {
 }
 
-ClipboardInfo::~ClipboardInfo()
-{
-}
+ClipboardInfo::~ClipboardInfo() = default;
 
 int ClipboardInfo::GetTypeFromCharacter(int keyCode)
 {

@@ -63,9 +63,7 @@ ProgressEvent& ProgressEvent::operator=(ProgressEvent&& other)
   return *this;
 }
 
-ProgressEvent::~ProgressEvent()
-{
-}
+ProgressEvent::~ProgressEvent() = default;
 
 std::string ProgressEvent::get_type() const
 {

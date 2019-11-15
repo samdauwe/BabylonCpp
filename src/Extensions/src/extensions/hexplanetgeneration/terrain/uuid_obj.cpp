@@ -7,9 +7,7 @@ UidObj::UidObj(size_t p_id) : id(p_id)
 {
 }
 
-UidObj::~UidObj()
-{
-}
+UidObj::~UidObj() = default;
 
 bool UidObj::operator==(const UidObj& other) const
 {

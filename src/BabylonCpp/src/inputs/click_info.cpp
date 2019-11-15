@@ -68,9 +68,7 @@ ClickInfo& ClickInfo::operator=(ClickInfo&& otherClickInfo)
   return *this;
 }
 
-ClickInfo::~ClickInfo()
-{
-}
+ClickInfo::~ClickInfo() = default;
 
 bool ClickInfo::get_singleClick() const
 {

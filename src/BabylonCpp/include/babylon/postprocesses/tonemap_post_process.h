@@ -33,7 +33,7 @@ public:
                      Engine* engine = nullptr,
                      unsigned int textureFormat
                      = Constants::TEXTURETYPE_UNSIGNED_INT);
-  virtual ~TonemapPostProcess();
+  virtual ~TonemapPostProcess(); // = default
 
 private:
   TonemappingOperator _operator;

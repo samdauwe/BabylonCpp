@@ -14,28 +14,11 @@ Color3::Color3(float red, float green, float blue) : r{red}, g{green}, b{blue}
 {
 }
 
-Color3::Color3(const Color3& otherColor)
-    : r{otherColor.r}, g{otherColor.g}, b{otherColor.b}
-{
-}
+Color3::Color3(const Color3& otherColor) = default;
 
-Color3::Color3(Color3&& otherColor)
-    : r{std::move(otherColor.r)}
-    , g{std::move(otherColor.g)}
-    , b{std::move(otherColor.b)}
-{
-}
+Color3::Color3(Color3&& otherColor) = default;
 
-Color3& Color3::operator=(const Color3& otherColor)
-{
-  if (&otherColor != this) {
-    r = otherColor.r;
-    g = otherColor.g;
-    b = otherColor.b;
-  }
-
-  return *this;
-}
+Color3& Color3::operator=(const Color3& otherColor) = default;
 
 Color3& Color3::operator=(const Color4& otherColor)
 {
@@ -46,20 +29,9 @@ Color3& Color3::operator=(const Color4& otherColor)
   return *this;
 }
 
-Color3& Color3::operator=(Color3&& otherColor)
-{
-  if (&otherColor != this) {
-    r = std::move(otherColor.r);
-    g = std::move(otherColor.g);
-    b = std::move(otherColor.b);
-  }
+Color3& Color3::operator=(Color3&& otherColor) = default;
 
-  return *this;
-}
-
-Color3::~Color3()
-{
-}
+Color3::~Color3() = default;
 
 Color3 Color3::copy() const
 {

@@ -14,8 +14,6 @@ PointerInfo::PointerInfo(PointerEventTypes iType, const MouseWheelEvent& event,
 {
 }
 
-PointerInfo::~PointerInfo()
-{
-}
+PointerInfo::~PointerInfo() = default;
 
 } // end of namespace BABYLON

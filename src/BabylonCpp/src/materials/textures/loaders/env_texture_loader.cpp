@@ -8,13 +8,9 @@
 
 namespace BABYLON {
 
-_ENVTextureLoader::_ENVTextureLoader()
-{
-}
+_ENVTextureLoader::_ENVTextureLoader() = default;
 
-_ENVTextureLoader::~_ENVTextureLoader()
-{
-}
+_ENVTextureLoader::~_ENVTextureLoader() = default;
 
 bool _ENVTextureLoader::supportCascades() const
 {

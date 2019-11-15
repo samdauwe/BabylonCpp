@@ -42,9 +42,7 @@ StereoscopicArcRotateCamera::StereoscopicArcRotateCamera(
                    rigParams);
 }
 
-StereoscopicArcRotateCamera::~StereoscopicArcRotateCamera()
-{
-}
+StereoscopicArcRotateCamera::~StereoscopicArcRotateCamera() = default;
 
 const std::string StereoscopicArcRotateCamera::getClassName() const
 {

@@ -24,7 +24,7 @@ public:
   AnimationRange(AnimationRange&& other);
   AnimationRange& operator=(const AnimationRange& other);
   AnimationRange& operator=(AnimationRange&& other);
-  ~AnimationRange();
+  ~AnimationRange(); // = default
 
   AnimationRange copy() const;
 

@@ -26,7 +26,7 @@ class BABYLON_SHARED_EXPORT Navigation {
 
 public:
   Navigation();
-  ~Navigation();
+  ~Navigation(); // = default
 
   GroupedNavigationMesh buildNodes(Mesh* mesh);
   void setZoneData(const std::string& zone, const GroupedNavigationMesh& data);

@@ -8,9 +8,7 @@ PredicateCondition::PredicateCondition(ActionManager* actionManager,
 {
 }
 
-PredicateCondition::~PredicateCondition()
-{
-}
+PredicateCondition::~PredicateCondition() = default;
 
 bool PredicateCondition::isValid()
 {

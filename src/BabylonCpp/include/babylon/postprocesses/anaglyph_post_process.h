@@ -24,7 +24,7 @@ public:
 
     return postProcess;
   }
-  ~AnaglyphPostProcess();
+  ~AnaglyphPostProcess(); // = default
 
 protected:
   /**

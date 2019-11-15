@@ -21,9 +21,7 @@ PlayAnimationAction::PlayAnimationAction(unsigned int iTtriggerOptions,
 {
 }
 
-PlayAnimationAction::~PlayAnimationAction()
-{
-}
+PlayAnimationAction::~PlayAnimationAction() = default;
 
 void PlayAnimationAction::_prepare()
 {

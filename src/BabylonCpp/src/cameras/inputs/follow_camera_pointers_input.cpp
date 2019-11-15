@@ -25,9 +25,7 @@ FollowCameraPointersInput::FollowCameraPointersInput()
 {
 }
 
-FollowCameraPointersInput::~FollowCameraPointersInput()
-{
-}
+FollowCameraPointersInput::~FollowCameraPointersInput() = default;
 
 const std::string FollowCameraPointersInput::getClassName() const
 {

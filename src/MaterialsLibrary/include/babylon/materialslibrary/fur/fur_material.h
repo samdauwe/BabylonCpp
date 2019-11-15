@@ -35,7 +35,7 @@ public:
 
     return material;
   }
-  ~FurMaterial() override;
+  ~FurMaterial(); // = default
 
   bool needAlphaBlending() const override;
   bool needAlphaTesting() const override;

@@ -18,74 +18,15 @@ SphericalPolynomial::SphericalPolynomial()
 {
 }
 
-SphericalPolynomial::SphericalPolynomial(const SphericalPolynomial& other)
-    : x{other.x}
-    , y{other.y}
-    , z{other.z}
-    , xx{other.xx}
-    , yy{other.yy}
-    , zz{other.zz}
-    , xy{other.xy}
-    , yz{other.yz}
-    , zx{other.zx}
-    , _harmonics{other._harmonics}
-{
-}
+SphericalPolynomial::SphericalPolynomial(const SphericalPolynomial& other) = default;
 
-SphericalPolynomial::SphericalPolynomial(SphericalPolynomial&& other)
-    : x{std::move(other.x)}
-    , y{std::move(other.y)}
-    , z{std::move(other.z)}
-    , xx{std::move(other.xx)}
-    , yy{std::move(other.yy)}
-    , zz{std::move(other.zz)}
-    , xy{std::move(other.xy)}
-    , yz{std::move(other.yz)}
-    , zx{std::move(other.zx)}
-    , _harmonics{std::move(other._harmonics)}
-{
-}
+SphericalPolynomial::SphericalPolynomial(SphericalPolynomial&& other) = default;
 
-SphericalPolynomial& SphericalPolynomial::
-operator=(const SphericalPolynomial& other)
-{
-  if (&other != this) {
-    x          = other.x;
-    y          = other.y;
-    z          = other.z;
-    xx         = other.xx;
-    yy         = other.yy;
-    zz         = other.zz;
-    xy         = other.xy;
-    yz         = other.yz;
-    zx         = other.zx;
-    _harmonics = other._harmonics;
-  }
+SphericalPolynomial& SphericalPolynomial::operator=(const SphericalPolynomial& other) = default;
 
-  return *this;
-}
+SphericalPolynomial& SphericalPolynomial::operator=(SphericalPolynomial&& other) = default;
 
-SphericalPolynomial& SphericalPolynomial::operator=(SphericalPolynomial&& other)
-{
-  if (&other != this) {
-    x          = std::move(other.x);
-    y          = std::move(other.y);
-    z          = std::move(other.z);
-    xx         = std::move(other.xx);
-    yy         = std::move(other.yy);
-    zz         = std::move(other.zz);
-    xy         = std::move(other.xy);
-    yz         = std::move(other.yz);
-    zx         = std::move(other.zx);
-    _harmonics = std::move(other._harmonics);
-  }
-
-  return *this;
-}
-
-SphericalPolynomial::~SphericalPolynomial()
-{
-}
+SphericalPolynomial::~SphericalPolynomial() = default;
 
 SphericalPolynomial SphericalPolynomial::copy() const
 {

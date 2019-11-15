@@ -24,7 +24,7 @@ public:
   VRMultiviewToSingleviewPostProcess(const std::string& name,
                                      const CameraPtr& camera,
                                      float scaleFactor);
-  ~VRMultiviewToSingleviewPostProcess();
+  ~VRMultiviewToSingleviewPostProcess(); // = default
 
 }; // end of class VRDistortionCorrectionPostProcess
 

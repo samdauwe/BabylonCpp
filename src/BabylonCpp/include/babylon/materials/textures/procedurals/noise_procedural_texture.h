@@ -28,7 +28,7 @@ public:
 
     return texture;
   }
-  ~NoiseProceduralTexture() override;
+  ~NoiseProceduralTexture(); // = default
 
   /**
    * @brief Generate the current state of the procedural texture.

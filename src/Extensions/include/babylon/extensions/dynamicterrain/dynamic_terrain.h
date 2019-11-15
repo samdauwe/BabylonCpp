@@ -87,7 +87,7 @@ public:
    */
   DynamicTerrain(const std::string& name, DynamicTerrainOptions& options,
                  Scene* scene);
-  virtual ~DynamicTerrain();
+  virtual ~DynamicTerrain(); // = default
 
   /**
    * @brief Updates the terrain position and shape according to the camera

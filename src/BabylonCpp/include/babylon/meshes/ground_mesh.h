@@ -30,7 +30,7 @@ public:
 
     return mesh;
   }
-  ~GroundMesh() override;
+  ~GroundMesh(); // = default
 
   /**
    * @brief "GroundMesh"

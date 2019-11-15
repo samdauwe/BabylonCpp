@@ -38,7 +38,7 @@ public:
   {
     return std::shared_ptr<Layer>(new Layer(std::forward<Ts>(args)...));
   }
-  virtual ~Layer();
+  virtual ~Layer(); // = default
 
   /**
    * @brief Hidden

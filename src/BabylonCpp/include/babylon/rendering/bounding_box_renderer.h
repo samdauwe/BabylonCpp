@@ -49,7 +49,7 @@ public:
 
     return renderer;
   }
-  virtual ~BoundingBoxRenderer() override;
+  virtual ~BoundingBoxRenderer(); // = default
 
   void addToScene(const BoundingBoxRendererPtr& newBoundingBoxRenderer);
 

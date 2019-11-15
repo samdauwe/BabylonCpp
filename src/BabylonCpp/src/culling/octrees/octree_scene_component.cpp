@@ -30,9 +30,7 @@ OctreeSceneComponent::OctreeSceneComponent(Scene* iScene)
       };
 }
 
-OctreeSceneComponent::~OctreeSceneComponent()
-{
-}
+OctreeSceneComponent::~OctreeSceneComponent() = default;
 
 bool OctreeSceneComponent::get_checksIsEnabled() const
 {

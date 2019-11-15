@@ -23,9 +23,7 @@ Rainmap::Rainmap(const std::string& seed, float maxRain, float height,
   _noise = std::make_unique<FastSimplexNoise>(noiseOptions);
 }
 
-Rainmap::~Rainmap()
-{
-}
+Rainmap::~Rainmap() = default;
 
 void Rainmap::generateRainmap()
 {

@@ -374,7 +374,7 @@ public:
 
     return animation;
   }
-  ~Animation();
+  ~Animation(); // = default
 
   /** Methods **/
 

@@ -14,9 +14,7 @@ SphereDirectedParticleEmitter::SphereDirectedParticleEmitter(
 {
 }
 
-SphereDirectedParticleEmitter::~SphereDirectedParticleEmitter()
-{
-}
+SphereDirectedParticleEmitter::~SphereDirectedParticleEmitter() = default;
 
 void SphereDirectedParticleEmitter::startDirectionFunction(
   const Matrix& worldMatrix, Vector3& directionToUpdate, Particle* /*particle*/)

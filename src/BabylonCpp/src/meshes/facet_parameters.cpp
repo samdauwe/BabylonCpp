@@ -12,8 +12,6 @@ FacetParameters::FacetParameters()
 {
 }
 
-FacetParameters::~FacetParameters()
-{
-}
+FacetParameters::~FacetParameters() = default;
 
 } // end of namespace BABYLON

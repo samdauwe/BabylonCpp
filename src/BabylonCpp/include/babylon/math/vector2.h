@@ -29,7 +29,7 @@ public:
   Vector2(Vector2&& otherVector);
   Vector2& operator=(const Vector2& otherVector);
   Vector2& operator=(Vector2&& otherVector);
-  ~Vector2();
+  ~Vector2(); // = default
   Vector2 copy() const;
 
   /**

@@ -15,9 +15,7 @@ DefaultCollisionCoordinator::DefaultCollisionCoordinator()
 {
 }
 
-DefaultCollisionCoordinator::~DefaultCollisionCoordinator()
-{
-}
+DefaultCollisionCoordinator::~DefaultCollisionCoordinator() = default;
 
 void DefaultCollisionCoordinator::getNewPosition(
   Vector3& position, Vector3& displacement, const ColliderPtr& collider,

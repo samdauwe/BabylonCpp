@@ -81,9 +81,7 @@ TransformNode::TransformNode(const std::string& iName, Scene* scene,
 {
 }
 
-TransformNode::~TransformNode()
-{
-}
+TransformNode::~TransformNode() = default;
 
 void TransformNode::addToScene(const TransformNodePtr& transformNode)
 {

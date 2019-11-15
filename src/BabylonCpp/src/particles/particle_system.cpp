@@ -334,9 +334,7 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
   };
 }
 
-ParticleSystem::~ParticleSystem()
-{
-}
+ParticleSystem::~ParticleSystem() = default;
 
 Type ParticleSystem::type() const
 {

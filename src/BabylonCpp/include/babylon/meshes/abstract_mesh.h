@@ -173,7 +173,7 @@ public:
 
     return mesh;
   }
-  ~AbstractMesh() override;
+  ~AbstractMesh(); // = default
 
   virtual Type type() const override;
   void addToScene(const AbstractMeshPtr& newMesh);

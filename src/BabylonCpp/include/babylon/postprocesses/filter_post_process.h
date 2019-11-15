@@ -31,7 +31,7 @@ public:
                     float ratio, const CameraPtr& camera,
                     unsigned int samplingMode, Engine* engine,
                     bool reusable = false);
-  ~FilterPostProcess();
+  ~FilterPostProcess(); // = default
 
 public:
   /**

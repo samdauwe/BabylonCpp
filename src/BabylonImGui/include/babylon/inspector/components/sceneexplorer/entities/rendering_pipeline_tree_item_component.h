@@ -28,7 +28,7 @@ public:
 public:
   RenderingPipelineTreeItemComponent(
     const IRenderPipelineItemComponentProps& props);
-  virtual ~RenderingPipelineTreeItemComponent() override;
+  virtual ~RenderingPipelineTreeItemComponent(); // = default
 
   void render() override;
 

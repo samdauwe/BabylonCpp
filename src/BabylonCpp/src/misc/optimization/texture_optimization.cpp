@@ -10,9 +10,7 @@ TextureOptimization::TextureOptimization(int iPriority, int iMaximumSize)
 {
 }
 
-TextureOptimization::~TextureOptimization()
-{
-}
+TextureOptimization::~TextureOptimization() = default;
 
 bool TextureOptimization::apply(Scene* scene)
 {

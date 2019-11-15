@@ -147,7 +147,7 @@ public:
     std::unique_ptr<Scene> scene(new Scene(std::forward<Ts>(args)...));
     return scene;
   }
-  virtual ~Scene() override;
+  virtual ~Scene(); // = default
 
   Type type() const override;
 

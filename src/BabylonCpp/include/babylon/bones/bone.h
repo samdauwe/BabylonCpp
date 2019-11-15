@@ -39,7 +39,7 @@ public:
 
     return bone;
   }
-  ~Bone() override;
+  ~Bone(); // = default
 
   virtual Type type() const override;
   void addToSkeleton(const BonePtr& newBone);

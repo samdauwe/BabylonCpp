@@ -11,9 +11,7 @@ MotorEnabledJoint::MotorEnabledJoint(unsigned int iJointType,
 {
 }
 
-MotorEnabledJoint::~MotorEnabledJoint()
-{
-}
+MotorEnabledJoint::~MotorEnabledJoint() = default;
 
 void MotorEnabledJoint::setMotor(float force, float maxForce,
                                  unsigned int motorIndex)

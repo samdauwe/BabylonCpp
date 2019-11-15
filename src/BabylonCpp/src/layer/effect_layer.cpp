@@ -54,9 +54,7 @@ EffectLayer::EffectLayer(const std::string& iName, Scene* scene)
   _generateVertexBuffer();
 }
 
-EffectLayer::~EffectLayer()
-{
-}
+EffectLayer::~EffectLayer() = default;
 
 void EffectLayer::addToScene(const EffectLayerPtr& newEffectLayer)
 {

@@ -11,7 +11,7 @@ class BABYLON_SHARED_EXPORT HardwareScalingOptimization
 
 public:
   HardwareScalingOptimization(int priority = 0, int maximumSize = 2);
-  ~HardwareScalingOptimization() override;
+  ~HardwareScalingOptimization(); // = default
 
   bool apply(Scene* scene) override;
 

@@ -38,6 +38,7 @@ source_group_by_path_all(${CMAKE_CURRENT_SOURCE_DIR} ${SOURCES_H_CPP})
 
 # Build executable
 add_executable(${TARGET} ${SOURCES_H_CPP})
+babylon_target_clang_tidy(${TARGET})
 
 # Include directories
 target_include_directories(${TARGET}

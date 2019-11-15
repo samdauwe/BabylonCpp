@@ -32,7 +32,7 @@ public:
                                   = Vector3{0.f, 1.f, 0.f},
                                   const Vector3& direction2
                                   = Vector3{0.f, 1.f, 0.f});
-  ~CylinderDirectedParticleEmitter() override;
+  ~CylinderDirectedParticleEmitter(); // = default
 
   /**
    * @brief Called by the particle System when the direction is computed for the

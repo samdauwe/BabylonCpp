@@ -18,7 +18,7 @@ public:
   IndexedVector2(IndexedVector2&& other);
   IndexedVector2& operator=(const IndexedVector2& other);
   IndexedVector2& operator=(IndexedVector2&& other);
-  ~IndexedVector2();
+  ~IndexedVector2(); // = default
 
 public:
   /**

@@ -27,7 +27,7 @@ public:
 
     return material;
   }
-  virtual ~MultiMaterial() override;
+  virtual ~MultiMaterial(); // = default
 
   /**
    * @brief Function used to align with Node.getChildren().

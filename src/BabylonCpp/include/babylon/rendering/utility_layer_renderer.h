@@ -47,7 +47,7 @@ public:
     auto renderer = new UtilityLayerRenderer(std::forward<Ts>(args)...);
     return static_cast<std::shared_ptr<UtilityLayerRenderer>>(renderer);
   }
-  virtual ~UtilityLayerRenderer() override;
+  virtual ~UtilityLayerRenderer(); // = default
 
   /**
    * @brief Gets the camera that is used to render the utility layer (when not

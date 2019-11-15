@@ -29,7 +29,7 @@ public:
 
     return camera;
   }
-  ~FlyCamera() override;
+  ~FlyCamera(); // = default
 
   /**
    * @brief Attach a control to the HTML DOM element.

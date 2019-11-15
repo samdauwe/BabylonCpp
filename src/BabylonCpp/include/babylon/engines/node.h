@@ -83,7 +83,7 @@ public:
    */
   Node(const std::string& name, Scene* scene = nullptr,
        bool addToRootNodes = true);
-  virtual ~Node() override;
+  virtual ~Node(); // = default
 
   template <typename Derived>
   std::shared_ptr<Derived> shared_from_base()

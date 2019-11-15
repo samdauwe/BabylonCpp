@@ -28,7 +28,7 @@ public:
    * @param scene The scene the texture will be used in
    */
   ColorGradingTexture(const std::string& url, Scene* scene);
-  ~ColorGradingTexture() override;
+  ~ColorGradingTexture(); // = default
 
   /**
    * @brief Returns the texture matrix used in most of the material.

@@ -25,7 +25,7 @@ public:
 
     return postProcess;
   }
-  ~PassPostProcess();
+  ~PassPostProcess(); // = default
 
 protected:
   /**

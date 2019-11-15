@@ -27,9 +27,7 @@ ArcRotateCameraKeyboardMoveInput::ArcRotateCameraKeyboardMoveInput()
   keysReset.emplace_back(220);
 }
 
-ArcRotateCameraKeyboardMoveInput::~ArcRotateCameraKeyboardMoveInput()
-{
-}
+ArcRotateCameraKeyboardMoveInput::~ArcRotateCameraKeyboardMoveInput() = default;
 
 void ArcRotateCameraKeyboardMoveInput::attachControl(ICanvas* canvas,
                                                      bool noPreventDefault)

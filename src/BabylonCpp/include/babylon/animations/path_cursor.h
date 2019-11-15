@@ -26,7 +26,7 @@ public:
   PathCursor(PathCursor&& otherPathCursor);
   PathCursor& operator=(const PathCursor& otherPathCursor);
   PathCursor& operator=(PathCursor&& otherPathCursor);
-  ~PathCursor();
+  ~PathCursor(); // = default
 
   /**
    * @brief Gets the cursor point on the path.

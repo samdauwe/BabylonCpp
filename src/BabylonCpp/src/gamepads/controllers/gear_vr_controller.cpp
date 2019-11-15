@@ -33,9 +33,7 @@ GearVRController::GearVRController(const IBrowserGamepadPtr& vrGamepad)
   _disableTrackPosition(_calculatedPosition);
 }
 
-GearVRController::~GearVRController()
-{
-}
+GearVRController::~GearVRController() = default;
 
 void GearVRController::initControllerMesh(Scene* scene,
                                           const std::function<void(AbstractMesh* mesh)>& meshLoaded)

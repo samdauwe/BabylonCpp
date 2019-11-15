@@ -33,7 +33,7 @@ public:
     return std::shared_ptr<PhysicsEngineSceneComponent>(
       new PhysicsEngineSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~PhysicsEngineSceneComponent();
+  virtual ~PhysicsEngineSceneComponent(); // = default
 
   /**
    * @brief Registers the component in a given scene.

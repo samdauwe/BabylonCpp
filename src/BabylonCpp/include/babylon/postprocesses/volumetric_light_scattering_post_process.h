@@ -37,7 +37,7 @@ public:
 
     return postProcess;
   }
-  ~VolumetricLightScatteringPostProcess() override;
+  ~VolumetricLightScatteringPostProcess(); // = default
 
   /**
    * @brief Returns the string "VolumetricLightScatteringPostProcess".

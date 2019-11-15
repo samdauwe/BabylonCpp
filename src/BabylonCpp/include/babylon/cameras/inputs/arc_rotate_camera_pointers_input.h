@@ -19,7 +19,7 @@ public:
    * @brief Instantiate the input.
    */
   ArcRotateCameraPointersInput();
-  ~ArcRotateCameraPointersInput() override;
+  ~ArcRotateCameraPointersInput(); // = default
 
   /**
    * @brief Gets the class name of the current intput.

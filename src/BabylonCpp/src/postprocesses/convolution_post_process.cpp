@@ -34,8 +34,6 @@ ConvolutionPostProcess::ConvolutionPostProcess(
   };
 }
 
-ConvolutionPostProcess::~ConvolutionPostProcess()
-{
-}
+ConvolutionPostProcess::~ConvolutionPostProcess() = default;
 
 } // end of namespace BABYLON

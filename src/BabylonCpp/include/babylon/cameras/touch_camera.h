@@ -29,7 +29,7 @@ public:
 
     return camera;
   }
-  ~TouchCamera() override;
+  ~TouchCamera(); // = default
 
   /**
    * @brief Gets the current object class name.

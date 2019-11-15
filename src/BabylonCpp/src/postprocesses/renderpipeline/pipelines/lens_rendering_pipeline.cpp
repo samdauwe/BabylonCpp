@@ -97,9 +97,7 @@ LensRenderingPipeline::LensRenderingPipeline(
   }
 }
 
-LensRenderingPipeline::~LensRenderingPipeline()
-{
-}
+LensRenderingPipeline::~LensRenderingPipeline() = default;
 
 void LensRenderingPipeline::addToScene(
   const LensRenderingPipelinePtr& lensRenderingPipeline)

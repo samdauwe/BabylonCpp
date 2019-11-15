@@ -40,7 +40,7 @@ public:
   Polygon(Polygon&& otherPolygon);
   Polygon& operator=(const Polygon& otherPolygon);
   Polygon& operator=(Polygon&& otherPolygon);
-  ~Polygon();
+  ~Polygon(); // = default
 
   /**
    * @brief Clones, or makes a deep copy, or the polygon.

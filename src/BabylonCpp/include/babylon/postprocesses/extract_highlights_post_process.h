@@ -28,7 +28,7 @@ public:
 
     return postProcess;
   }
-  ~ExtractHighlightsPostProcess();
+  ~ExtractHighlightsPostProcess(); // = default
 
 protected:
   ExtractHighlightsPostProcess(

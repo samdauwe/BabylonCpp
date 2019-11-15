@@ -30,9 +30,7 @@ NormalMapProceduralTexture::NormalMapProceduralTexture(const std::string& iName,
   updateShaderUniforms();
 }
 
-NormalMapProceduralTexture::~NormalMapProceduralTexture()
-{
-}
+NormalMapProceduralTexture::~NormalMapProceduralTexture() = default;
 
 void NormalMapProceduralTexture::updateShaderUniforms()
 {

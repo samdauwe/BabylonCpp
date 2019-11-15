@@ -45,9 +45,7 @@ operator=(PositionNormalVertex&& other)
   return *this;
 }
 
-PositionNormalVertex::~PositionNormalVertex()
-{
-}
+PositionNormalVertex::~PositionNormalVertex() = default;
 
 PositionNormalVertex PositionNormalVertex::copy() const
 {

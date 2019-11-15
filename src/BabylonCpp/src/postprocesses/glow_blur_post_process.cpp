@@ -23,8 +23,6 @@ GlowBlurPostProcess::GlowBlurPostProcess(
   });
 }
 
-GlowBlurPostProcess::~GlowBlurPostProcess()
-{
-}
+GlowBlurPostProcess::~GlowBlurPostProcess() = default;
 
 } // end of namespace BABYLON

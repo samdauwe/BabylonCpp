@@ -13,9 +13,7 @@ IRenderableScene::IRenderableScene(ICanvas* canvas)
 {
 }
 
-IRenderableScene::~IRenderableScene()
-{
-}
+IRenderableScene::~IRenderableScene() = default;
 
 void IRenderableScene::initialize(ICanvas* canvas)
 {

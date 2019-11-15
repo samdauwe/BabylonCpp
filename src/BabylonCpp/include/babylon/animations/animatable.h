@@ -36,7 +36,7 @@ public:
 
     return animatable;
   }
-  ~Animatable();
+  ~Animatable(); // = default
 
   void addToScene(const AnimatablePtr& newAnimatable);
 

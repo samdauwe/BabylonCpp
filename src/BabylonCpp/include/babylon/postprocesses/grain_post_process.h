@@ -25,7 +25,7 @@ public:
 
     return postProcess;
   }
-  ~GrainPostProcess();
+  ~GrainPostProcess(); // = default
 
 protected:
   /**

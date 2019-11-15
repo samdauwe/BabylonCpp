@@ -29,7 +29,7 @@ public:
 
     return light;
   }
-  ~HemisphericLight() override;
+  ~HemisphericLight(); // = default
 
   /**
    * @brief Returns the string "HemisphericLight".

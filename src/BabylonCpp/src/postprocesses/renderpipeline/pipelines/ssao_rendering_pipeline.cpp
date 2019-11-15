@@ -79,9 +79,7 @@ SSAORenderingPipeline::SSAORenderingPipeline(
     true));
 }
 
-SSAORenderingPipeline::~SSAORenderingPipeline()
-{
-}
+SSAORenderingPipeline::~SSAORenderingPipeline() = default;
 
 void SSAORenderingPipeline::addToScene(
   const SSAORenderingPipelinePtr& ssao2RenderingPipeline)

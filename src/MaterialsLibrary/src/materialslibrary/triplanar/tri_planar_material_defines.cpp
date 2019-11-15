@@ -35,9 +35,7 @@ TriPlanarMaterialDefines::TriPlanarMaterialDefines() : MaterialDefines{}
   };
 }
 
-TriPlanarMaterialDefines::~TriPlanarMaterialDefines()
-{
-}
+TriPlanarMaterialDefines::~TriPlanarMaterialDefines() = default;
 
 } // end of namespace MaterialsLibrary
 } // end of namespace BABYLON

@@ -24,61 +24,15 @@ InspectorAction::InspectorAction(const char* iId, const char* iIcon,
 {
 }
 
-InspectorAction::InspectorAction(const InspectorAction& rhs)
-    : id{rhs.id}
-    , icon{rhs.icon}
-    , label{rhs.label}
-    , iconWithLabel{rhs.iconWithLabel}
-    , shortcut{rhs.shortcut}
-    , callback{rhs.callback}
-    , isSelected{rhs.isSelected}
-{
-}
+InspectorAction::InspectorAction(const InspectorAction& rhs) = default;
 
-InspectorAction::InspectorAction(InspectorAction&& rhs)
-    : id{std::move(rhs.id)}
-    , icon{std::move(rhs.icon)}
-    , label{std::move(rhs.label)}
-    , iconWithLabel{std::move(rhs.iconWithLabel)}
-    , shortcut{std::move(rhs.shortcut)}
-    , callback{std::move(rhs.callback)}
-    , isSelected{std::move(rhs.isSelected)}
-{
-}
+InspectorAction::InspectorAction(InspectorAction&& rhs) = default;
 
-InspectorAction& InspectorAction::operator=(const InspectorAction& rhs)
-{
-  if (&rhs != this) {
-    id            = rhs.id;
-    icon          = rhs.icon;
-    label         = rhs.label;
-    iconWithLabel = rhs.iconWithLabel;
-    shortcut      = rhs.shortcut;
-    callback      = rhs.callback;
-    isSelected    = rhs.isSelected;
-  }
+InspectorAction& InspectorAction::operator=(const InspectorAction& rhs) = default;
 
-  return *this;
-}
+InspectorAction& InspectorAction::operator=(InspectorAction&& rhs) = default;
 
-InspectorAction& InspectorAction::operator=(InspectorAction&& rhs)
-{
-  if (&rhs != this) {
-    std::swap(id, rhs.id);
-    std::swap(icon, rhs.icon);
-    std::swap(label, rhs.label);
-    std::swap(iconWithLabel, rhs.iconWithLabel);
-    std::swap(shortcut, rhs.shortcut);
-    std::swap(callback, rhs.callback);
-    std::swap(isSelected, rhs.isSelected);
-  }
-
-  return *this;
-}
-
-InspectorAction::~InspectorAction()
-{
-}
+InspectorAction::~InspectorAction() = default;
 
 bool InspectorAction::FalseConst()
 {

@@ -127,7 +127,7 @@ public:
   static constexpr unsigned int LIGHTTYPEID_HEMISPHERICLIGHT = 3;
 
 public:
-  ~Light() override;
+  ~Light(); // = default
 
   virtual Type type() const override;
   void addToScene(const LightPtr& newLight);

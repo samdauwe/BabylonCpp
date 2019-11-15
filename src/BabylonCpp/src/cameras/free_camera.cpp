@@ -54,9 +54,7 @@ FreeCamera::FreeCamera(const std::string& iName, const Vector3& iPosition,
   inputs->addKeyboard().addMouse();
 }
 
-FreeCamera::~FreeCamera()
-{
-}
+FreeCamera::~FreeCamera() = default;
 
 Type FreeCamera::type() const
 {

@@ -29,9 +29,7 @@ MeshTreeItemComponent::MeshTreeItemComponent(
   }
 }
 
-MeshTreeItemComponent::~MeshTreeItemComponent()
-{
-}
+MeshTreeItemComponent::~MeshTreeItemComponent() = default;
 
 void MeshTreeItemComponent::showBoundingBox()
 {

@@ -16,9 +16,7 @@ PostProcessManager::PostProcessManager(Scene* scene)
 {
 }
 
-PostProcessManager::~PostProcessManager()
-{
-}
+PostProcessManager::~PostProcessManager() = default;
 
 void PostProcessManager::_prepareBuffers()
 {

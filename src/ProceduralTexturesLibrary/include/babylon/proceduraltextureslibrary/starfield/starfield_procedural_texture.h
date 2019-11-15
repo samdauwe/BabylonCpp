@@ -25,7 +25,7 @@ public:
 
     return texture;
   }
-  ~StarfieldProceduralTexture();
+  ~StarfieldProceduralTexture(); // = default
 
   void updateShaderUniforms();
 

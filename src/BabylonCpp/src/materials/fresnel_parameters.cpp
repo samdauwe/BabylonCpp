@@ -66,9 +66,7 @@ FresnelParameters& FresnelParameters::operator=(FresnelParameters&& other)
   return *this;
 }
 
-FresnelParameters::~FresnelParameters()
-{
-}
+FresnelParameters::~FresnelParameters() = default;
 
 bool FresnelParameters::get_isEnabled() const
 {

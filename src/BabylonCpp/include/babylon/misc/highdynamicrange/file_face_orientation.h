@@ -16,7 +16,7 @@ struct BABYLON_SHARED_EXPORT FileFaceOrientation {
   FileFaceOrientation(FileFaceOrientation&& other);
   FileFaceOrientation& operator=(const FileFaceOrientation& other);
   FileFaceOrientation& operator=(FileFaceOrientation&& other);
-  ~FileFaceOrientation();
+  ~FileFaceOrientation(); // = default
 
   std::string name;
   // The world axis corresponding to the normal to the face

@@ -81,74 +81,15 @@ SphericalHarmonics::SphericalHarmonics()
 {
 }
 
-SphericalHarmonics::SphericalHarmonics(const SphericalHarmonics& other)
-    : preScaled{other.preScaled}
-    , l00{other.l00}
-    , l1_1{other.l1_1}
-    , l10{other.l10}
-    , l11{other.l11}
-    , l2_2{other.l2_2}
-    , l2_1{other.l2_1}
-    , l20{other.l20}
-    , l21{other.l21}
-    , l22{other.l22}
-{
-}
+SphericalHarmonics::SphericalHarmonics(const SphericalHarmonics& other) = default;
 
-SphericalHarmonics::SphericalHarmonics(SphericalHarmonics&& other)
-    : preScaled{std::move(other.preScaled)}
-    , l00{std::move(other.l00)}
-    , l1_1{std::move(other.l1_1)}
-    , l10{std::move(other.l10)}
-    , l11{std::move(other.l11)}
-    , l2_2{std::move(other.l2_2)}
-    , l2_1{std::move(other.l2_1)}
-    , l20{std::move(other.l20)}
-    , l21{std::move(other.l21)}
-    , l22{std::move(other.l22)}
-{
-}
+SphericalHarmonics::SphericalHarmonics(SphericalHarmonics&& other) = default;
 
-SphericalHarmonics& SphericalHarmonics::
-operator=(const SphericalHarmonics& other)
-{
-  if (&other != this) {
-    preScaled = other.preScaled;
-    l00       = other.l00;
-    l1_1      = other.l1_1;
-    l10       = other.l10;
-    l11       = other.l11;
-    l2_2      = other.l2_2;
-    l2_1      = other.l2_1;
-    l20       = other.l20;
-    l21       = other.l21;
-    l22       = other.l22;
-  }
+SphericalHarmonics& SphericalHarmonics::operator=(const SphericalHarmonics& other) = default;
 
-  return *this;
-}
+SphericalHarmonics& SphericalHarmonics::operator=(SphericalHarmonics&& other) = default;
 
-SphericalHarmonics& SphericalHarmonics::operator=(SphericalHarmonics&& other)
-{
-  if (&other != this) {
-    preScaled = std::move(other.preScaled);
-    l00       = std::move(other.l00);
-    l1_1      = std::move(other.l1_1);
-    l10       = std::move(other.l10);
-    l11       = std::move(other.l11);
-    l2_2      = std::move(other.l2_2);
-    l2_1      = std::move(other.l2_1);
-    l20       = std::move(other.l20);
-    l21       = std::move(other.l21);
-    l22       = std::move(other.l22);
-  }
-
-  return *this;
-}
-
-SphericalHarmonics::~SphericalHarmonics()
-{
-}
+SphericalHarmonics::~SphericalHarmonics() = default;
 
 SphericalHarmonics SphericalHarmonics::copy() const
 {

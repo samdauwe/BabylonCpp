@@ -23,7 +23,7 @@ public:
    * @brief Instantiate the input.
    */
   ArcRotateCameraKeyboardMoveInput();
-  virtual ~ArcRotateCameraKeyboardMoveInput();
+  virtual ~ArcRotateCameraKeyboardMoveInput(); // = default
 
   /**
    * @brief Attach the input controls to a specific dom element to get the input

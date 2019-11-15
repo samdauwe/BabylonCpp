@@ -64,7 +64,7 @@ public:
   EnvironmentHelper(const std::optional<IEnvironmentHelperOptions>& options,
                     Scene* scene);
 
-  ~EnvironmentHelper();
+  ~EnvironmentHelper(); // = default
 
   /**
    * Updates the background according to the new options.

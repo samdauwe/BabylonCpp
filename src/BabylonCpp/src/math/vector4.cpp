@@ -11,46 +11,15 @@ Vector4::Vector4(float ix, float iy, float iz, float iw)
 {
 }
 
-Vector4::Vector4(const Vector4& otherVector)
-    : x{otherVector.x}, y{otherVector.y}, z{otherVector.z}, w{otherVector.w}
-{
-}
+Vector4::Vector4(const Vector4& otherVector) = default;
 
-Vector4::Vector4(Vector4&& otherVector)
-    : x{std::move(otherVector.x)}
-    , y{std::move(otherVector.y)}
-    , z{std::move(otherVector.z)}
-    , w{std::move(otherVector.w)}
-{
-}
+Vector4::Vector4(Vector4&& otherVector) = default;
 
-Vector4& Vector4::operator=(const Vector4& otherVector)
-{
-  if (&otherVector != this) {
-    x = otherVector.x;
-    y = otherVector.y;
-    z = otherVector.z;
-    w = otherVector.w;
-  }
+Vector4& Vector4::operator=(const Vector4& otherVector) = default;
 
-  return *this;
-}
+Vector4& Vector4::operator=(Vector4&& otherVector) = default;
 
-Vector4& Vector4::operator=(Vector4&& otherVector)
-{
-  if (&otherVector != this) {
-    x = std::move(otherVector.x);
-    y = std::move(otherVector.y);
-    z = std::move(otherVector.z);
-    w = std::move(otherVector.w);
-  }
-
-  return *this;
-}
-
-Vector4::~Vector4()
-{
-}
+Vector4::~Vector4() = default;
 
 Vector4 Vector4::copy() const
 {

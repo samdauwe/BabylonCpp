@@ -24,7 +24,7 @@ public:
   {
     return std::shared_ptr<BackEase>(new BackEase(std::forward<Ts>(args)...));
   }
-  ~BackEase() override;
+  ~BackEase(); // = default
 
   /**
    * @brief Hidden

@@ -44,9 +44,7 @@ DepthOfFieldMergePostProcess::DepthOfFieldMergePostProcess(
   }
 }
 
-DepthOfFieldMergePostProcess::~DepthOfFieldMergePostProcess()
-{
-}
+DepthOfFieldMergePostProcess::~DepthOfFieldMergePostProcess() = default;
 
 void DepthOfFieldMergePostProcess::updateEffect(
   const std::string& defines, const std::vector<std::string>& uniforms,

@@ -73,7 +73,7 @@ public:
 
     return renderingPipeline;
   }
-  virtual ~SSAO2RenderingPipeline() override;
+  virtual ~SSAO2RenderingPipeline(); // = default
 
   void addToScene(const SSAO2RenderingPipelinePtr& ssao2RenderingPipeline);
 

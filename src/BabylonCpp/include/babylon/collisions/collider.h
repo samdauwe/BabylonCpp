@@ -17,7 +17,7 @@ class BABYLON_SHARED_EXPORT Collider {
 
 public:
   Collider();
-  ~Collider();
+  ~Collider(); // = default
 
   /** Statics **/
   static bool IntersectBoxAASphere(const Vector3& boxMin, const Vector3& boxMax,

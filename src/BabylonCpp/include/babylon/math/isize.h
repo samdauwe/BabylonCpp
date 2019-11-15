@@ -19,7 +19,7 @@ struct BABYLON_SHARED_EXPORT ISize {
   ISize(ISize&& other);                 // Move constructor
   ISize& operator=(const ISize& other); // Copy assignment operator
   ISize& operator=(ISize&& other);      // Move assignment operator
-  ~ISize();                             // Destructor
+  ~ISize(); // = default
 
   /** Operator overloading **/
   friend std::ostream& operator<<(std::ostream& os, const ISize& isize);

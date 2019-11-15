@@ -26,7 +26,7 @@ public:
 
     return postProcess;
   }
-  ~PassCubePostProcess();
+  ~PassCubePostProcess(); // = default
 
 protected:
   /**

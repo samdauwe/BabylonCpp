@@ -54,7 +54,7 @@ public:
                     std::optional<size_t> randomTextureSize = std::nullopt,
                     Scene* scene                            = nullptr,
                     bool isAnimationSheetEnabled            = false);
-  virtual ~GPUParticleSystem() override;
+  virtual ~GPUParticleSystem(); // = default
 
   /**
    * @brief Returns the object type.

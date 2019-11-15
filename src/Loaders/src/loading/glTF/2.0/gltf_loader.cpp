@@ -72,9 +72,7 @@ GLTFLoader::GLTFLoader(GLTFFileLoader& parent)
 {
 }
 
-GLTFLoader::~GLTFLoader()
-{
-}
+GLTFLoader::~GLTFLoader() = default;
 
 GLTFLoaderState& GLTFLoader::state()
 {

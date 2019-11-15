@@ -170,7 +170,7 @@ public:
                const std::optional<size_t>& size    = std::nullopt,
                std::optional<unsigned int> type     = std::nullopt,
                bool normalized = false, bool useBytes = false);
-  virtual ~VertexBuffer();
+  virtual ~VertexBuffer(); // = default
 
   /**
    * @brief Deduces the stride given a kind.

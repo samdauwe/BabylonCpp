@@ -24,7 +24,7 @@ public:
   FresnelParameters(FresnelParameters&& other);
   FresnelParameters& operator=(const FresnelParameters& other);
   FresnelParameters& operator=(FresnelParameters&& other);
-  ~FresnelParameters();
+  ~FresnelParameters(); // = default
 
   /**
    * @brief Clones the current fresnel and its values.

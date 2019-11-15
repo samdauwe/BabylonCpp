@@ -19,9 +19,7 @@ RawCubeTexture::RawCubeTexture(Scene* scene,
     compression);
 }
 
-RawCubeTexture::~RawCubeTexture()
-{
-}
+RawCubeTexture::~RawCubeTexture() = default;
 
 void RawCubeTexture::update(const std::vector<ArrayBufferView>& data,
                             unsigned int format, unsigned int type,

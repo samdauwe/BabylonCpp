@@ -34,7 +34,7 @@ public:
 
     return material;
   }
-  ~TerrainMaterial() override;
+  ~TerrainMaterial(); // = default
 
   bool needAlphaBlending() const override;
   bool needAlphaTesting() const override;

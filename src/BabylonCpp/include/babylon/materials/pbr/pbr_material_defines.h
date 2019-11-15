@@ -18,7 +18,7 @@ struct BABYLON_SHARED_EXPORT PBRMaterialDefines
    * @brief Initializes the PBR Material defines.
    */
   PBRMaterialDefines();
-  ~PBRMaterialDefines() override;
+  ~PBRMaterialDefines(); // = default
 
   /**
    * @brief Resets the PBR Material defines.

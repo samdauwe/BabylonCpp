@@ -32,7 +32,7 @@ public:
     return std::shared_ptr<PostProcessRenderEffect>(
       new PostProcessRenderEffect(std::forward<Ts>(args)...));
   }
-  ~PostProcessRenderEffect();
+  ~PostProcessRenderEffect(); // = default
 
   /**
    * @brief Updates the current state of the effect.

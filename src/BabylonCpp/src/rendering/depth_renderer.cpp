@@ -168,9 +168,7 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type,
       };
 }
 
-DepthRenderer::~DepthRenderer()
-{
-}
+DepthRenderer::~DepthRenderer() = default;
 
 bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
 {

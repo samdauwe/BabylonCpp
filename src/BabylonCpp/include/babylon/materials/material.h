@@ -146,7 +146,7 @@ public:
    */
   static constexpr unsigned int AllDirtyFlag = Constants::MATERIAL_AllDirtyFlag;
 
-  virtual ~Material() override;
+  virtual ~Material(); // = default
 
   virtual Type type() const override;
 

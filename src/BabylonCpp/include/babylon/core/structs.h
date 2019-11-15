@@ -68,9 +68,9 @@ struct DragStartOrEndEvent {
 }; // end of struct DragStartOrEndEvent
 
 struct Event {
-  EventType type;
-  int charCode;
-  int keyCode;
+  EventType type = EventType::UNKNOWN;
+  int charCode = 0;
+  int keyCode = 0;
 }; // end of struct Event
 
 struct Exception {
@@ -223,86 +223,13 @@ struct PointerEvent : public Event {
   PointerEvent(const std::string& /*type*/)
   {
   }
-  PointerEvent(const PointerEvent& other)
-      : clientX{other.clientX}
-      , clientY{other.clientY}
-      , movementX{other.movementX}
-      , movementY{other.movementY}
-      , offsetX{other.offsetX}
-      , offsetY{other.offsetY}
-      , pointerId{other.pointerId}
-      , pointerType{other.pointerType}
-      , altKey{other.altKey}
-      , ctrlKey{other.ctrlKey}
-      , shiftKey{other.shiftKey}
-      , metaKey{other.metaKey}
-      , button{other.button}
-      , buttons{other.buttons}
-      , srcElement{other.srcElement}
-  {
-  }
-  PointerEvent(PointerEvent&& other)
-      : clientX{std::move(other.clientX)}
-      , clientY{std::move(other.clientY)}
-      , movementX{std::move(other.movementX)}
-      , movementY{std::move(other.movementY)}
-      , offsetX{std::move(other.offsetX)}
-      , offsetY{std::move(other.offsetY)}
-      , pointerId{std::move(other.pointerId)}
-      , pointerType{std::move(other.pointerType)}
-      , altKey{std::move(other.altKey)}
-      , ctrlKey{std::move(other.ctrlKey)}
-      , shiftKey{std::move(other.shiftKey)}
-      , metaKey{std::move(other.metaKey)}
-      , button{std::move(other.button)}
-      , buttons{std::move(other.buttons)}
-      , srcElement{std::move(other.srcElement)}
-  {
-  }
-  PointerEvent& operator=(const PointerEvent& other)
-  {
-    if (&other != this) {
-      clientX     = other.clientX;
-      clientY     = other.clientY;
-      movementX   = other.movementX;
-      movementY   = other.movementY;
-      offsetX     = other.offsetX;
-      offsetY     = other.offsetY;
-      pointerId   = other.pointerId;
-      pointerType = other.pointerType;
-      altKey      = other.altKey;
-      ctrlKey     = other.ctrlKey;
-      shiftKey    = other.shiftKey;
-      metaKey     = other.metaKey;
-      button      = other.button;
-      buttons     = other.buttons;
-      srcElement  = other.srcElement;
-    }
 
-    return *this;
-  }
-  PointerEvent& operator=(PointerEvent&& other)
-  {
-    if (&other != this) {
-      clientX     = std::move(other.clientX);
-      clientY     = std::move(other.clientY);
-      movementX   = std::move(other.movementX);
-      movementY   = std::move(other.movementY);
-      offsetX     = std::move(other.offsetX);
-      offsetY     = std::move(other.offsetY);
-      pointerId   = std::move(other.pointerId);
-      pointerType = std::move(other.pointerType);
-      altKey      = std::move(other.altKey);
-      ctrlKey     = std::move(other.ctrlKey);
-      shiftKey    = std::move(other.shiftKey);
-      metaKey     = std::move(other.metaKey);
-      button      = std::move(other.button);
-      buttons     = std::move(other.buttons);
-      srcElement  = std::move(other.srcElement);
-    }
+  PointerEvent(const PointerEvent& other) = default;
+  PointerEvent(PointerEvent&& other) = default;
+  
+  PointerEvent& operator=(const PointerEvent& other) = default;
+  PointerEvent& operator=(PointerEvent&& other) = default;
 
-    return *this;
-  }
   int clientX   = 0;
   int clientY   = 0;
   int movementX = 0;
@@ -310,12 +237,12 @@ struct PointerEvent : public Event {
   int offsetX   = 0;
   int offsetY   = 0;
   int pointerId = 0;
-  PointerType pointerType;
+  PointerType pointerType = PointerType::UNDEFINED;
   bool altKey   = false;
   bool ctrlKey  = false;
   bool shiftKey = false;
   bool metaKey  = false;
-  MouseButtonType button;
+  MouseButtonType button = MouseButtonType::UNDEFINED;
   int buttons         = 0;
   ICanvas* srcElement = nullptr;
   void preventDefault()

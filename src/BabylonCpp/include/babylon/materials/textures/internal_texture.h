@@ -101,7 +101,7 @@ public:
   InternalTexture(Engine* engine,
                   unsigned int dataSource = InternalTexture::DATASOURCE_UNKNOWN,
                   bool delayAllocation    = false);
-  ~InternalTexture();
+  ~InternalTexture(); // = default
 
   /**
    * @brief Gets the Engine the texture belongs to.

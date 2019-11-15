@@ -8,37 +8,15 @@ AnimationValue::AnimationValue() : _value{std::nullopt}
 {
 }
 
-AnimationValue::AnimationValue(const AnimationValue& other)
-    : _value{other._value}
-{
-}
+AnimationValue::AnimationValue(const AnimationValue& other) = default;
 
-AnimationValue::AnimationValue(AnimationValue&& other)
-    : _value{std::move(other._value)}
-{
-}
+AnimationValue::AnimationValue(AnimationValue&& other) = default;
 
-AnimationValue& AnimationValue::operator=(const AnimationValue& other)
-{
-  if (&other != this) {
-    _value = other._value;
-  }
+AnimationValue& AnimationValue::operator=(const AnimationValue& other) = default;
 
-  return *this;
-}
+AnimationValue& AnimationValue::operator=(AnimationValue&& other) = default;
 
-AnimationValue& AnimationValue::operator=(AnimationValue&& other)
-{
-  if (&other != this) {
-    _value = std::move(other._value);
-  }
-
-  return *this;
-}
-
-AnimationValue::~AnimationValue()
-{
-}
+AnimationValue::~AnimationValue() = default;
 
 AnimationValue AnimationValue::subtract(const AnimationValue& fromValue)
 {

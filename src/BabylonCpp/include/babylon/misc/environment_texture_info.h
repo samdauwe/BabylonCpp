@@ -22,7 +22,7 @@ public:
   EnvironmentTextureInfo(EnvironmentTextureInfo&& other);
   EnvironmentTextureInfo& operator=(const EnvironmentTextureInfo& other);
   EnvironmentTextureInfo& operator=(EnvironmentTextureInfo&& other);
-  ~EnvironmentTextureInfo();
+  ~EnvironmentTextureInfo(); // = default
 
   /**
    * @brief Creates raw texture data from parsed data.

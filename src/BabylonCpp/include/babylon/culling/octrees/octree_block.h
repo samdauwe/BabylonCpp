@@ -37,7 +37,7 @@ public:
   OctreeBlock(const Vector3& minPoint, const Vector3& maxPoint, size_t capacity,
               size_t depth, size_t maxDepth,
               const std::function<void(T&, OctreeBlock<T>&)>& creationFunc);
-  ~OctreeBlock();
+  ~OctreeBlock(); // = default
 
   /** Properties **/
   /**

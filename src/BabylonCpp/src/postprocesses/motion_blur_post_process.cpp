@@ -70,9 +70,7 @@ MotionBlurPostProcess::MotionBlurPostProcess(
   }
 }
 
-MotionBlurPostProcess::~MotionBlurPostProcess()
-{
-}
+MotionBlurPostProcess::~MotionBlurPostProcess() = default;
 
 unsigned int MotionBlurPostProcess::get_motionBlurSamples() const
 {

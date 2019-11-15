@@ -26,7 +26,7 @@ public:
 
     return postProcess;
   }
-  ~GlowBlurPostProcess();
+  ~GlowBlurPostProcess(); // = default
 
 protected:
   GlowBlurPostProcess(const std::string& name, const Vector2& direction,

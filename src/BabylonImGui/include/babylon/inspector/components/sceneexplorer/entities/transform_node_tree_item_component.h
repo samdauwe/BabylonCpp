@@ -28,7 +28,7 @@ public:
 public:
   TransformNodeTreeItemComponent(
     const ITransformNodeTreeItemComponentProps& props);
-  virtual ~TransformNodeTreeItemComponent() override;
+  virtual ~TransformNodeTreeItemComponent(); // = default
 
   void render() override;
 

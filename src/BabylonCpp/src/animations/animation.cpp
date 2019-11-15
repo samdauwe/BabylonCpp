@@ -183,9 +183,7 @@ Animation::Animation(const std::string& iName,
   enableBlending = iEnableBlending;
 }
 
-Animation::~Animation()
-{
-}
+Animation::~Animation() = default;
 
 std::string Animation::toString(bool fullDetails) const
 {

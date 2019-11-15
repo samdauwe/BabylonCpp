@@ -65,7 +65,7 @@ public:
     return std::shared_ptr<DaydreamController>(
       new DaydreamController(std::forward<Ts>(args)...));
   }
-  ~DaydreamController() override;
+  ~DaydreamController(); // = default
 
   /**
    * @brief Implements abstract method on WebVRController class, loading

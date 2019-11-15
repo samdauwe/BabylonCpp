@@ -82,9 +82,7 @@ Camera::Camera(const std::string& iName, const Vector3& iPosition, Scene* scene,
   _initCache();
 }
 
-Camera::~Camera()
-{
-}
+Camera::~Camera() = default;
 
 Type Camera::type() const
 {

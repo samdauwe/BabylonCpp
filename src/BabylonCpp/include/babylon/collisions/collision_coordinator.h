@@ -18,7 +18,7 @@ class BABYLON_SHARED_EXPORT DefaultCollisionCoordinator
 
 public:
   DefaultCollisionCoordinator();
-  ~DefaultCollisionCoordinator() override;
+  ~DefaultCollisionCoordinator(); // = default
 
   void getNewPosition(
     Vector3& position, Vector3& displacement, const ColliderPtr& collider,

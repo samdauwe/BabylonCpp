@@ -14,7 +14,7 @@ class BABYLON_SHARED_EXPORT ICanvas {
 
 public:
   ICanvas();
-  virtual ~ICanvas();
+  virtual ~ICanvas(); // = default
   virtual ClientRect& getBoundingClientRect()       = 0;
   virtual bool onlyRenderBoundingClientRect() const = 0;
   virtual bool initializeContext3d()                = 0;

@@ -21,7 +21,7 @@ struct BABYLON_SHARED_EXPORT FlyCameraInputsManager
    * @param camera Defines the camera the inputs belong to.
    */
   FlyCameraInputsManager(FlyCamera* camera);
-  ~FlyCameraInputsManager();
+  ~FlyCameraInputsManager(); // = default
 
   /**
    * @brief Add keyboard input support to the input manager.

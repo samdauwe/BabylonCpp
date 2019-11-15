@@ -46,7 +46,7 @@ public:
     Engine* engine = nullptr, bool reusable = false,
     unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
     bool blockCompilation    = false);
-  ~CircleOfConfusionPostProcess();
+  ~CircleOfConfusionPostProcess(); // = default
 
 protected:
   /**

@@ -54,9 +54,7 @@ SubMesh::SubMesh(unsigned int iMaterialIndex, unsigned int iVerticesStart,
   }
 }
 
-SubMesh::~SubMesh()
-{
-}
+SubMesh::~SubMesh() = default;
 
 void SubMesh::addToMesh(const std::shared_ptr<SubMesh>& newSubMesh)
 {

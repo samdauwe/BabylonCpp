@@ -22,7 +22,7 @@ public:
   /**
    * @brief default destructor.
    */
-  ~Timer();
+  ~Timer(); // = default
 
   /**
    * @brief Starts the timer.

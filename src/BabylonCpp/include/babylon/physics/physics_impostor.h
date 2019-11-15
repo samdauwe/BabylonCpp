@@ -103,7 +103,7 @@ public:
 public:
   PhysicsImpostor(IPhysicsEnabledObject* object, unsigned int type,
                   PhysicsImpostorParameters& options, Scene* scene = nullptr);
-  virtual ~PhysicsImpostor();
+  virtual ~PhysicsImpostor(); // = default
 
   /**
    * @brief This function will completly initialize this impostor.

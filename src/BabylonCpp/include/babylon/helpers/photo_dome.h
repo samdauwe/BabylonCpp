@@ -50,7 +50,7 @@ public:
 
     return photoDome;
   }
-  ~PhotoDome() override;
+  ~PhotoDome(); // = default
 
   /**
    * @brief Releases resources associated with this node.

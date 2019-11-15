@@ -67,7 +67,7 @@ public:
     return std::shared_ptr<OculusTouchController>(
       new OculusTouchController(std::forward<Ts>(args)...));
   }
-  ~OculusTouchController() override;
+  ~OculusTouchController(); // = default
 
   /**
    * @brief Implements abstract method on WebVRController class, loading controller meshes and

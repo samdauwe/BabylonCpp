@@ -35,7 +35,7 @@ public:
   Path3D(Path3D&& otherPath);
   Path3D& operator=(const Path3D& otherPath);
   Path3D& operator=(Path3D&& otherPath);
-  ~Path3D();
+  ~Path3D(); // = default
   Path3D copy() const;
   std::unique_ptr<Path3D> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Path3D& path);

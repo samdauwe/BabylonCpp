@@ -123,7 +123,7 @@ public:
   static bool ForceAttachControlToAlwaysPreventDefault;
 
 public:
-  virtual ~Camera() override;
+  virtual ~Camera(); // = default
 
   virtual Type type() const override;
   void addToScene(const CameraPtr& newCamera);

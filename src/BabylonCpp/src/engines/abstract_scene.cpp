@@ -31,9 +31,7 @@ AbstractScene::AbstractScene()
   _addParsers();
 }
 
-AbstractScene::~AbstractScene()
-{
-}
+AbstractScene::~AbstractScene() = default;
 
 void AbstractScene::_addIndividualParsers()
 {

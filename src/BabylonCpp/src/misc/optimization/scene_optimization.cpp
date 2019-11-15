@@ -6,9 +6,7 @@ SceneOptimization::SceneOptimization(int iPriority) : priority{iPriority}
 {
 }
 
-SceneOptimization::~SceneOptimization()
-{
-}
+SceneOptimization::~SceneOptimization() = default;
 
 bool SceneOptimization::apply(Scene* /*scene*/)
 {

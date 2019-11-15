@@ -43,9 +43,7 @@ DirectionalLight::DirectionalLight(const std::string& iName,
   direction = iDirection;
 }
 
-DirectionalLight::~DirectionalLight()
-{
-}
+DirectionalLight::~DirectionalLight() = default;
 
 Type DirectionalLight::type() const
 {

@@ -39,9 +39,7 @@ Animatable::Animatable(Scene* scene, const IAnimatablePtr& iTarget, float iFromF
   _speedRatio = iSpeedRatio;
 }
 
-Animatable::~Animatable()
-{
-}
+Animatable::~Animatable() = default;
 
 void Animatable::addToScene(const AnimatablePtr& newAnimatable)
 {

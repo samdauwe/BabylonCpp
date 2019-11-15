@@ -27,9 +27,7 @@ CustomProceduralTexture::CustomProceduralTexture(const std::string& iName,
   set_refreshRate(1);
 }
 
-CustomProceduralTexture::~CustomProceduralTexture()
-{
-}
+CustomProceduralTexture::~CustomProceduralTexture() = default;
 
 void CustomProceduralTexture::_loadJson(const std::string& jsonUrl)
 {

@@ -21,7 +21,7 @@ struct BABYLON_SHARED_EXPORT FollowCameraInputsManager
    * @param camera Defines the camera the inputs belong to
    */
   FollowCameraInputsManager(FollowCamera* _camera);
-  ~FollowCameraInputsManager();
+  ~FollowCameraInputsManager(); // = default
 
   /**
    * @brief Add keyboard input support to the input manager.

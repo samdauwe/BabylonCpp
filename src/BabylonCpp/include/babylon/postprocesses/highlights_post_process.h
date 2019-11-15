@@ -35,7 +35,7 @@ public:
                         Engine* engine, bool reusable = false,
                         unsigned int textureType
                         = Constants::TEXTURETYPE_UNSIGNED_INT);
-  ~HighlightsPostProcess();
+  ~HighlightsPostProcess(); // = default
 
 }; // end of class HighlightsPostProcess
 

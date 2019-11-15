@@ -38,7 +38,7 @@ public:
   Vector3(float x, float y, float z);
   Vector3(const Vector3& otherVector);
   Vector3(Vector3&& otherVector);
-  ~Vector3();
+  ~Vector3(); // = default
   Vector3& operator=(const Vector3& otherVector);
   Vector3& operator=(Vector3&& otherVector);
   Vector3 copy() const;

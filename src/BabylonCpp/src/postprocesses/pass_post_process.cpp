@@ -13,8 +13,6 @@ PassPostProcess::PassPostProcess(const std::string& iName, float ratio,
 {
 }
 
-PassPostProcess::~PassPostProcess()
-{
-}
+PassPostProcess::~PassPostProcess() = default;
 
 } // end of namespace BABYLON

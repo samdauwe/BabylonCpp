@@ -25,7 +25,7 @@ public:
     return std::shared_ptr<ElasticEase>(
       new ElasticEase(std::forward<Ts>(args)...));
   }
-  ~ElasticEase() override;
+  ~ElasticEase(); // = default
 
   /**
    * @brief Hidden

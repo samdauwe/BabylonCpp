@@ -26,9 +26,7 @@ OutlineRenderer::OutlineRenderer(Scene* iScene) : zOffset{1.f}
   _engine               = scene->getEngine();
 }
 
-OutlineRenderer::~OutlineRenderer()
-{
-}
+OutlineRenderer::~OutlineRenderer() = default;
 
 void OutlineRenderer::addToScene(const OutlineRendererPtr& outlineRenderer)
 {

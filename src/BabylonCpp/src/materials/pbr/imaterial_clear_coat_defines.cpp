@@ -19,9 +19,7 @@ IMaterialClearCoatDefines::IMaterialClearCoatDefines() : MaterialDefines{}
   };
 }
 
-IMaterialClearCoatDefines::~IMaterialClearCoatDefines()
-{
-}
+IMaterialClearCoatDefines::~IMaterialClearCoatDefines() = default;
 
 std::string IMaterialClearCoatDefines::toString() const
 {

@@ -31,7 +31,7 @@ public:
   EventState(EventState&& other);                 // Move constructor
   EventState& operator=(const EventState& other); // Copy assignment operator
   EventState& operator=(EventState&& other);      // Move assignment operator
-  ~EventState();                                  // Destructor
+  ~EventState(); // = default
 
   /**
    * @brief Initialize the current event state.

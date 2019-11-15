@@ -15,9 +15,7 @@ PushMaterial::PushMaterial(const std::string& iName, Scene* scene)
   _storeEffectOnSubMeshes = true;
 }
 
-PushMaterial::~PushMaterial()
-{
-}
+PushMaterial::~PushMaterial() = default;
 
 const std::string PushMaterial::getClassName() const
 {

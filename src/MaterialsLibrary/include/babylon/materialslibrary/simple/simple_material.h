@@ -30,7 +30,7 @@ public:
 
     return material;
   }
-  ~SimpleMaterial() override;
+  ~SimpleMaterial(); // = default
 
   bool needAlphaBlending() const override;
   bool needAlphaTesting() const override;

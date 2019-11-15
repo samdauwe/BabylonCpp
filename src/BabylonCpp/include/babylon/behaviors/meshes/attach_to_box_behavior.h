@@ -36,7 +36,7 @@ public:
    * @param ui The transform node that should be attched to the mesh
    */
   AttachToBoxBehavior(const TransformNodePtr& ui);
-  virtual ~AttachToBoxBehavior() override;
+  virtual ~AttachToBoxBehavior(); // = default
 
   /**
    * @brief Initializes the behavior.

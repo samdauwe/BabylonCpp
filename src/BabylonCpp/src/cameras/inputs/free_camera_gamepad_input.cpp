@@ -19,9 +19,7 @@ FreeCameraGamepadInput::FreeCameraGamepadInput()
 {
 }
 
-FreeCameraGamepadInput::~FreeCameraGamepadInput()
-{
-}
+FreeCameraGamepadInput::~FreeCameraGamepadInput() = default;
 
 void FreeCameraGamepadInput::attachControl(ICanvas* /*canvas*/, bool /*noPreventDefault*/)
 {

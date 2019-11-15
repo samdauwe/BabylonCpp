@@ -24,9 +24,7 @@ GenericController::GenericController(const IBrowserGamepadPtr& vrGamepad)
   _defaultModel = nullptr;
 }
 
-GenericController::~GenericController()
-{
-}
+GenericController::~GenericController() = default;
 
 void GenericController::initControllerMesh(
   Scene* scene, const std::function<void(AbstractMesh* mesh)>& meshLoaded)

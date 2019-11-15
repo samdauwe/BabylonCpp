@@ -24,9 +24,7 @@ RawTexture::RawTexture(const ArrayBufferView& data, int width, int height,
   wrapV = TextureConstants::CLAMP_ADDRESSMODE;
 }
 
-RawTexture::~RawTexture()
-{
-}
+RawTexture::~RawTexture() = default;
 
 void RawTexture::update(const ArrayBufferView& data)
 {

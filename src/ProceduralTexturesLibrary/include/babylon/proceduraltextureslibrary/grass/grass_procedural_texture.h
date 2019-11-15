@@ -23,7 +23,7 @@ public:
 
     return texture;
   }
-  ~GrassProceduralTexture();
+  ~GrassProceduralTexture(); // = default
 
   void updateShaderUniforms();
 

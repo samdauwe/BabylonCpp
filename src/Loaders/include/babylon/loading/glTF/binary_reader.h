@@ -12,7 +12,7 @@ class BABYLON_SHARED_EXPORT BinaryReader {
 
 public:
   BinaryReader(const ArrayBuffer& arrayBuffer);
-  ~BinaryReader();
+  ~BinaryReader(); // = default
 
   size_t getPosition() const;
   size_t getLength() const;

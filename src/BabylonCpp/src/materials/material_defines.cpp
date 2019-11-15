@@ -113,9 +113,7 @@ MaterialDefines& MaterialDefines::operator=(MaterialDefines&& other)
   return *this;
 }
 
-MaterialDefines::~MaterialDefines()
-{
-}
+MaterialDefines::~MaterialDefines() = default;
 
 bool MaterialDefines::operator[](const std::string& define) const
 {

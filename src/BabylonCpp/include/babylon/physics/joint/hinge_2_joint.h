@@ -19,7 +19,7 @@ public:
    * @param jointData The joint data for the Hinge2-Joint
    */
   Hinge2Joint(const PhysicsJointData& jointData);
-  ~Hinge2Joint();
+  ~Hinge2Joint(); // = default
 
   /**
    * @brief Set the motor values.

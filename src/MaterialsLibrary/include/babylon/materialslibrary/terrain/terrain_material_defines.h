@@ -10,7 +10,7 @@ namespace MaterialsLibrary {
 struct BABYLON_SHARED_EXPORT TerrainMaterialDefines : public MaterialDefines {
 
   TerrainMaterialDefines();
-  ~TerrainMaterialDefines();
+  ~TerrainMaterialDefines(); // = default
 
 }; // end of struct TerrainMaterialDefines
 

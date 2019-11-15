@@ -28,7 +28,7 @@ public:
 
 public:
   MaterialTreeItemComponent(const IMaterialTreeItemComponentProps& props);
-  virtual ~MaterialTreeItemComponent() override;
+  virtual ~MaterialTreeItemComponent(); // = default
 
   void render() override;
 

@@ -66,9 +66,7 @@ Geometry::Geometry(const std::string& iId, Scene* scene, VertexData* vertexData,
   }
 }
 
-Geometry::~Geometry()
-{
-}
+Geometry::~Geometry() = default;
 
 void Geometry::addToScene(const GeometryPtr& newGeometry)
 {

@@ -12,9 +12,7 @@ FollowCameraInputsManager::FollowCameraInputsManager(FollowCamera* iCamera)
 {
 }
 
-FollowCameraInputsManager::~FollowCameraInputsManager()
-{
-}
+FollowCameraInputsManager::~FollowCameraInputsManager() = default;
 
 FollowCameraInputsManager& FollowCameraInputsManager::addKeyboard()
 {

@@ -52,9 +52,7 @@ Skeleton::Skeleton(const std::string& iName, const std::string& iId,
     = engineCaps.textureFloat && engineCaps.maxVertexTextureImageUnits > 0;
 }
 
-Skeleton::~Skeleton()
-{
-}
+Skeleton::~Skeleton() = default;
 
 Type Skeleton::type() const
 {

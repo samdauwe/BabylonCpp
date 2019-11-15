@@ -26,7 +26,7 @@ public:
   SceneLoaderProgressEvent(SceneLoaderProgressEvent&& other);
   SceneLoaderProgressEvent& operator=(const SceneLoaderProgressEvent& other);
   SceneLoaderProgressEvent& operator=(SceneLoaderProgressEvent&& other);
-  ~SceneLoaderProgressEvent();
+  ~SceneLoaderProgressEvent(); // = default
 
   /**
    * @brief Creates a new SceneLoaderProgressEvent from a ProgressEvent.

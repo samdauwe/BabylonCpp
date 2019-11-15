@@ -50,9 +50,7 @@ Xbox360Pad::Xbox360Pad(const std::string& iId, int iIndex,
   type = Gamepad::XBOX;
 }
 
-Xbox360Pad::~Xbox360Pad()
-{
-}
+Xbox360Pad::~Xbox360Pad() = default;
 
 void Xbox360Pad::setOnlefttriggerchanged(
   const std::function<void(float value)>& callback)

@@ -41,9 +41,8 @@ GradientMaterial::GradientMaterial(const std::string& iName, Scene* scene)
   Effect::ShadersStore()["gradientPixelShader"] = gradientPixelShader;
 }
 
-GradientMaterial::~GradientMaterial()
-{
-}
+GradientMaterial::~GradientMaterial() = default;
+
 unsigned int GradientMaterial::get_maxSimultaneousLights() const
 {
   return _maxSimultaneousLights;

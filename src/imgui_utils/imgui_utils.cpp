@@ -13,11 +13,11 @@ namespace ImGuiUtils
 
   struct ImageFileTexture
   {
-    int _width, _height;
-    GLuint _textureId;
+    int _width = 0, _height = 0;
+    GLuint _textureId = 0;
     bool found = true;
 
-    ImageFileTexture() {}
+    ImageFileTexture() = default;
     ImageFileTexture(const std::string &filename)
     {
       if (!BABYLON::Filesystem::exists(filename))
@@ -37,14 +37,11 @@ namespace ImGuiUtils
       glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, my_image_data);
       stbi_image_free(my_image_data);
     }
-    ~ImageFileTexture()
-    {
-      //glDeleteTextures(1, &_textureId);
-    }
+    
+    ~ImageFileTexture() = default;
   };
 
   using Filename = std::string;
-
 
   void ImageFromFile(const Filename &filename, ImVec2 size /*= ImVec2(0.f, 0.f)*/)
   {

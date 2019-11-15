@@ -10,9 +10,7 @@ InstancedLinesMesh::InstancedLinesMesh(const std::string& iName,
 {
 }
 
-InstancedLinesMesh::~InstancedLinesMesh()
-{
-}
+InstancedLinesMesh::~InstancedLinesMesh() = default;
 
 const std::string InstancedLinesMesh::getClassName() const
 {

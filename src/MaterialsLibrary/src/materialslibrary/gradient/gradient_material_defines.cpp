@@ -70,9 +70,7 @@ GradientMaterialDefines::GradientMaterialDefines() : MaterialDefines{}
   };
 }
 
-GradientMaterialDefines::~GradientMaterialDefines()
-{
-}
+GradientMaterialDefines::~GradientMaterialDefines() = default;
 
 } // end of namespace MaterialsLibrary
 } // end of namespace BABYLON

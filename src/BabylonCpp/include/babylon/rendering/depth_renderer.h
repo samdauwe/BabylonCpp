@@ -38,7 +38,7 @@ public:
   DepthRenderer(Scene* scene, unsigned int type = Constants::TEXTURETYPE_FLOAT,
                 const CameraPtr& camera  = nullptr,
                 bool storeNonLinearDepth = false);
-  virtual ~DepthRenderer();
+  virtual ~DepthRenderer(); // = default
 
   /**
    * @brief Creates the depth rendering effect and checks if the effect is

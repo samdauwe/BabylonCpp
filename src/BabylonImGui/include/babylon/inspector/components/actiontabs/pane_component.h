@@ -23,7 +23,7 @@ class BABYLON_SHARED_EXPORT PaneComponent {
 
 public:
   PaneComponent(const IPaneComponentProps& props);
-  virtual ~PaneComponent();
+  virtual ~PaneComponent(); // = default
 
   virtual void render() = 0;
 
