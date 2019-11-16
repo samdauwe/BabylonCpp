@@ -463,8 +463,7 @@ DynamicTerrain& DynamicTerrain::updateTerrainSize()
     = _terrainSub;       // the remaining cells at the general current LOD value
   unsigned int nb   = 0; // nb of cells in the current LOD limit interval
   unsigned int next = 0; // next cell index, if it exists
-  unsigned int lod
-    = _LODValue + 1; // lod value in the current LOD limit interval
+  unsigned int lod;  // lod value in the current LOD limit interval
   float tsx = 0.0;   // current sum of cell sizes on x
   float tsz = 0.0;   // current sum of cell sizes on z
   for (unsigned int l = 0; l < _LODLimits.size(); ++l) {
