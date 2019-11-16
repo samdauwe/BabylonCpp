@@ -4,13 +4,13 @@ mark_as_advanced(BUILD_OGL43)
 # OpenGL dependency
 set(OpenGL_GL_PREFERENCE GLVND)
 find_package(OpenGL REQUIRED)
-include_directories(${OPENGL_INCLUDE_DIRS})
+include_directories(SYSTEM ${OPENGL_INCLUDE_DIRS})
 
 # Configure build environment
 include(../cmake/BuildEnvironment.cmake)
 
 # Earcut.hpp (A C++ port of earcut.js, a fast, header-only polygon triangulation library).
-include_directories("earcut.hpp")
+include_directories(SYSTEM "earcut.hpp")
 set(EARCUT_HPP_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/earcut.hpp/include/mapbox
     CACHE INTERNAL "Include directories of Earcut hpp")
@@ -26,10 +26,6 @@ add_subdirectory(glfw)
 
 # GoogleTest (Google's framework for writing C++ tests on a variety of platforms).
 add_subdirectory(googletest)
-set(GTEST_INCLUDE_DIRS
-    ${CMAKE_CURRENT_SOURCE_DIR}/googletest/include
-    CACHE INTERNAL "Include directories of Google Test")
-
 
 # json.hpp (JSON for Modern C++)
 include_directories("json.hpp")
@@ -45,7 +41,7 @@ set(GLAD_FILES
     ${GLAD_DIR}/include/KHR/khrplatform.h)
 source_group_by_path_all(${GLAD_DIR} ${GLAD_FILES})
 add_library(glad SHARED ${GLAD_FILES})
-target_include_directories(glad PUBLIC ${GLAD_DIR}/include)
+target_include_directories(glad PUBLIC SYSTEM ${GLAD_DIR}/include)
 if(WIN32)
     target_link_libraries(glad PUBLIC opengl32.lib)
 else()
@@ -69,7 +65,7 @@ set(IMGUI_FILES ${IMGUI_MAIN_FILES} ${IMGUI_BACKEND_FILES})
 source_group_by_path_all(${IMGUI_DIR} ${IMGUI_FILES})
 add_library(imgui SHARED ${IMGUI_FILES})
 target_link_libraries(imgui PRIVATE glfw glad)
-target_include_directories(imgui PUBLIC ${IMGUI_DIR} ${IMGUI_DIR}/examples)
+target_include_directories(imgui PUBLIC SYSTEM ${IMGUI_DIR} ${IMGUI_DIR}/examples)
 target_compile_definitions(imgui PUBLIC -DIMGUI_IMPL_OPENGL_LOADER_GLAD)
 if (WIN32)
   get_target_property(library_type imgui TYPE)
@@ -86,7 +82,7 @@ set(IMGUI_EDITOR_FILES
     ${IMGUI_EDITOR_DIR}/TextEditor.h)
 source_group_by_path_all(${IMGUI_EDITOR_DIR} ${IMGUI_EDITOR_FILES})
 add_library(ImGuiColorTextEdit STATIC ${IMGUI_EDITOR_FILES})
-target_include_directories(ImGuiColorTextEdit PUBLIC ${IMGUI_EDITOR_DIR} ${IMGUI_EDITOR_DIR}/..)
+target_include_directories(ImGuiColorTextEdit PUBLIC SYSTEM ${IMGUI_EDITOR_DIR} ${IMGUI_EDITOR_DIR}/..)
 target_link_libraries(ImGuiColorTextEdit PUBLIC imgui)
 # Disable ImGuiColorTextEdit specific warnings
 if (MSVC)
@@ -106,6 +102,6 @@ if (BABYLON_BUILD_PLAYGROUND)
     set (RuntimeCompiledCPlusPlus_Dir ${CMAKE_CURRENT_SOURCE_DIR}/RuntimeCompiledCPlusPlus/Aurora)
     SET(BUILD_EXAMPLES OFF CACHE BOOL "Build RuntimeCompiledCPlusPlus examples" FORCE)
     add_subdirectory(${RuntimeCompiledCPlusPlus_Dir})
-    target_include_directories(RuntimeCompiler INTERFACE ${RuntimeCompiledCPlusPlus_Dir})
-    target_include_directories(RuntimeObjectSystem INTERFACE ${RuntimeCompiledCPlusPlus_Dir})
+    target_include_directories(RuntimeCompiler INTERFACE SYSTEM ${RuntimeCompiledCPlusPlus_Dir})
+    target_include_directories(RuntimeObjectSystem INTERFACE SYSTEM ${RuntimeCompiledCPlusPlus_Dir})
 endif()
