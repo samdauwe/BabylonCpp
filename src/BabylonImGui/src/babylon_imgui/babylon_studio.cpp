@@ -214,7 +214,7 @@ private:
       _appContext._inspector->setScene(_appContext._sceneWidget->getScene());
   }
 
-  // Saves a screenshot after  few frames (eeturns true when done)
+  // Saves a screenshot after  few frames (returns true when done)
   bool saveScreenshot()
   {
     _appContext._frameCounter++;
@@ -269,6 +269,7 @@ private:
   {
     ImVec2 sceneSize = ImGui::GetCurrentWindow()->Size;
     sceneSize.y -= 35.f;
+    sceneSize.x = (float)((int)((sceneSize.x) / 4) * 4);
     ImVec2 cursorPosBeforeScene3d = ImGui::GetCursorScreenPos();
     _appContext._sceneWidget->render(sceneSize);
     renderHud(cursorPosBeforeScene3d);
