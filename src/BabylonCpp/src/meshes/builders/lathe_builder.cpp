@@ -29,13 +29,13 @@ MeshPtr LatheBuilder::CreateLathe(const std::string& name,
 
   const auto step = pi2 / tessellation * arc;
   Vector3 rotated;
-  for (float i = 0.f; i <= tessellation - clip; ++i) {
+  for (int i = 0; i <= tessellation - clip; ++i) {
     std::vector<Vector3> path;
     if (cap == Mesh::CAP_START || cap == Mesh::CAP_ALL) {
       path.emplace_back(Vector3(0.f, shape[0].y, 0.f));
-      path.emplace_back(Vector3(std::cos(i * step) * shape[0].x * radius,
+      path.emplace_back(Vector3(std::cos((float)i * step) * shape[0].x * radius,
                                 shape[0].y,
-                                std::sin(i * step) * shape[0].x * radius));
+                                std::sin((float)i * step) * shape[0].x * radius));
     }
     for (std::size_t p = 0; p < shape.size(); ++p) {
       rotated = Vector3(std::cos(i * step) * shape[p].x * radius, shape[p].y,
