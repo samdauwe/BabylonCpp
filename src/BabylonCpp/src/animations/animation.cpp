@@ -141,10 +141,11 @@ AnimatablePtr Animation::CreateMergeAndStartAnimation(
 
 Animatable* Animation::TransitionTo(
   const std::string& /*property*/, const AnimationValue& /*targetValue*/,
-  const AnimationValue& /*host*/, Scene* /*scene*/, float /*frameRate*/,
+  const Node* /*host*/, Scene* /*scene*/, float /*frameRate*/,
   const AnimationPtr& /*transition*/, float /*duration*/,
   const std::function<void()>& /*onAnimationEnd*/)
 {
+  // FIXME? It seems like this code needs to be ported from js
   return nullptr;
 }
 
