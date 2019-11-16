@@ -93,7 +93,7 @@ protected:
   /**
    * @brief Push line into the position, normal and index buffer.
    */
-  virtual void createLine(const Vector3& p0, const Vector3& p1,
+  void createLine(const Vector3& p0, const Vector3& p1,
                           uint32_t offset);
 
   /**
