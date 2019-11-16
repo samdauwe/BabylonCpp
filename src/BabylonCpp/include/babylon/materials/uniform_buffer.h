@@ -100,7 +100,7 @@ public:
    * @param size Data size, or data directly.
    */
   void addUniform(const std::string& name,
-                  const std::variant<size_t, Float32Array>& size);
+                  const std::variant<int, Float32Array>& size);
 
   /**
    * @brief Adds a Matrix 4x4 to the uniform buffer.
