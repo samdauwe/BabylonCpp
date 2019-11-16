@@ -93,6 +93,7 @@ void Camera::addToScene(const CameraPtr& newCamera)
 {
   if (! _cache.cache_inited)
     _initCache();
+  _setupInputs();
 
   if (_setActiveOnSceneIfNoneActive && !getScene()->activeCamera()) {
     getScene()->activeCamera = newCamera;
