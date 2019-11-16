@@ -21,12 +21,11 @@ using SphericalPolynomialPtr = std::shared_ptr<SphericalPolynomial>;
 
 /**
  * @brief Base class of all the textures in babylon.
- * It groups all the common properties the materials, post process, lights...
- * might need in order to make a correct use of the texture.
+ * It groups all the common properties the materials, post process, lights... might need
+ * in order to make a correct use of the texture.
  */
-class BABYLON_SHARED_EXPORT BaseTexture
-    : public std::enable_shared_from_this<BaseTexture>,
-      public IAnimatable {
+class BABYLON_SHARED_EXPORT BaseTexture : public std::enable_shared_from_this<BaseTexture>,
+                                          public IAnimatable {
 public:
   /**
    * Default anisotropic filtering level for the application.
@@ -38,13 +37,12 @@ public:
   template <typename... Ts>
   static BaseTexturePtr New(Ts&&... args)
   {
-    auto texture = std::shared_ptr<BaseTexture>(
-      new BaseTexture(std::forward<Ts>(args)...));
+    auto texture = std::shared_ptr<BaseTexture>(new BaseTexture(std::forward<Ts>(args)...));
     texture->addToScene(texture);
 
     return texture;
   }
-  virtual ~BaseTexture(); // = default
+  virtual ~BaseTexture() override; // = default
 
   template <typename Derived>
   std::shared_ptr<Derived> shared_from_base()
@@ -74,15 +72,13 @@ public:
   Scene* getScene() const;
 
   /**
-   * @brief Get the texture transform matrix used to offset tile the texture for
-   * istance.
+   * @brief Get the texture transform matrix used to offset tile the texture for istance.
    * @returns the transformation matrix
    */
   virtual Matrix* getTextureMatrix();
 
   /**
-   * @brief Get the texture reflection matrix used to rotate/transform the
-   * reflection.
+   * @brief Get the texture reflection matrix used to rotate/transform the reflection.
    * @returns the reflection matrix
    */
   virtual Matrix* getReflectionTextureMatrix();
@@ -94,15 +90,13 @@ public:
   InternalTexturePtr& getInternalTexture();
 
   /**
-   * @brief Get if the texture is ready to be consumed (either it is ready or it
-   * is not blocking)
+   * @brief Get if the texture is ready to be consumed (either it is ready or it is not blocking)
    * @returns true if ready or not blocking
    */
   virtual bool isReadyOrNotBlocking();
 
   /**
-   * @brief Get if the texture is ready to be used (downloaded, converted, mip
-   * mapped...).
+   * @brief Get if the texture is ready to be used (downloaded, converted, mip mapped...).
    * @returns true if fully ready
    */
   virtual bool isReady();
@@ -164,10 +158,8 @@ public:
   /**
    * @brief Hidden
    */
-  InternalTexturePtr _getFromCache(const std::string& url, bool noMipmap,
-                                   unsigned int sampling = 0,
-                                   const std::optional<bool>& invertY
-                                   = std::nullopt);
+  InternalTexturePtr _getFromCache(const std::string& url, bool noMipmap, unsigned int sampling = 0,
+                                   const std::optional<bool>& invertY = std::nullopt);
   /**
    * @brief Hidden
    */
@@ -187,24 +179,19 @@ public:
   std::unique_ptr<BaseTexture> clone() const;
 
   /**
-   * @brief Reads the pixels stored in the webgl texture and returns them as an
-   * ArrayBuffer. This will returns an RGBA array buffer containing either in
-   * values (0-255) or float values (0-1) depending of the underlying buffer
-   * type.
-   * @param faceIndex defines the face of the texture to read (in case of cube
-   * texture)
-   * @param level defines the LOD level of the texture to read (in case of Mip
-   * Maps)
+   * @brief Reads the pixels stored in the webgl texture and returns them as an ArrayBuffer. This
+   * will returns an RGBA array buffer containing either in values (0-255) or float values (0-1)
+   * depending of the underlying buffer type.
+   * @param faceIndex defines the face of the texture to read (in case of cube texture)
+   * @param level defines the LOD level of the texture to read (in case of Mip Maps)
    * @param buffer defines a user defined buffer to fill with data (can be null)
    * @returns The Array buffer containing the pixels data.
    */
   ArrayBufferView readPixels(unsigned int faceIndex = 0, int level = 0,
-                             std::optional<ArrayBufferView> buffer
-                             = std::nullopt);
+                             std::optional<ArrayBufferView> buffer = std::nullopt);
 
   /**
-   * @brief Release and destroy the underlying lower level texture aka
-   * internalTexture.
+   * @brief Release and destroy the underlying lower level texture aka internalTexture.
    */
   void releaseInternalTexture();
 
@@ -214,18 +201,15 @@ public:
   virtual void dispose();
 
   /**
-   * @brief Serialize the texture into a JSON representation that can be parsed
-   * later on.
+   * @brief Serialize the texture into a JSON representation that can be parsed later on.
    * @returns the JSON representation of the texture
    */
   json serialize() const;
 
   /**
-   * @brief Helper function to be called back once a list of texture contains
-   * only ready textures.
+   * @brief Helper function to be called back once a list of texture contains only ready textures.
    * @param textures Define the list of textures to wait for
-   * @param callback Define the callback triggered once the entire list will be
-   * ready
+   * @param callback Define the callback triggered once the entire list will be ready
    */
   static void WhenAllReady(const std::vector<BaseTexture*>& textures,
                            const std::function<void()>& callback);
@@ -248,6 +232,11 @@ protected:
    */
   bool get_isRGBD() const;
 
+  /**
+   * @brief Gets whether or not the texture contains RGBD data.
+   */
+  void set_isRGBD(bool value);
+
   virtual void set_boundingBoxSize(const std::optional<Vector3>& value);
   virtual std::optional<Vector3>& get_boundingBoxSize();
   float get_lodGenerationOffset() const;
@@ -259,8 +248,7 @@ protected:
   BaseTexturePtr& get_irradianceTexture();
   void set_irradianceTexture(const BaseTexturePtr& value);
   std::string get_uid() const;
-  void
-  set_onDispose(const std::function<void(BaseTexture*, EventState&)>& callback);
+  void set_onDispose(const std::function<void(BaseTexture*, EventState&)>& callback);
   virtual bool get_isBlocking() const;
   virtual void set_isBlocking(bool value);
   unsigned int get_textureType() const;
@@ -283,8 +271,8 @@ public:
   std::string name;
 
   /**
-   * Define if the texture is having a usable alpha value (can be use for
-   * transparency or glossiness for instance).
+   * Define if the texture is having a usable alpha value (can be use for transparency or glossiness
+   * for instance).
    */
   Property<BaseTexture, bool> hasAlpha;
 
@@ -353,10 +341,9 @@ public:
   unsigned int wrapR;
 
   /**
-   * With compliant hardware and browser (supporting anisotropic filtering)
-   * this defines the level of anisotropic filtering in the texture.
-   * The higher the better but the slower. This defaults to 4 as it seems to be
-   * the best tradeoff.
+   * With compliant hardware and browser (supporting anisotropic filtering) this defines the level
+   * of anisotropic filtering in the texture. The higher the better but the slower. This defaults to
+   * 4 as it seems to be the best tradeoff.
    */
   unsigned int anisotropicFilteringLevel;
 
@@ -371,16 +358,15 @@ public:
   Property<BaseTexture, bool> is3D;
 
   /**
-   * Define if the texture contains data in gamma space (most of the png/jpg
-   * aside bump). HDR texture are usually stored in linear space. This only
-   * impacts the PBR and Background materials
+   * Define if the texture contains data in gamma space (most of the png/jpg aside bump). HDR
+   * texture are usually stored in linear space. This only impacts the PBR and Background materials
    */
   bool gammaSpace;
 
   /**
-   * Gets whether or not the texture contains RGBD data.
+   * Gets or sets whether or not the texture contains RGBD data.
    */
-  ReadOnlyProperty<BaseTexture, bool> isRGBD;
+  Property<BaseTexture, bool> isRGBD;
 
   /**
    * Is Z inverted in the texture (useful in a cube texture).
@@ -398,30 +384,27 @@ public:
   bool lodLevelInAlpha;
 
   /**
-   * With prefiltered texture, defined the offset used during the prefiltering
-   * steps.
+   * With prefiltered texture, defined the offset used during the prefiltering steps.
    */
   Property<BaseTexture, float> lodGenerationOffset;
 
   /**
-   * With prefiltered texture, defined the scale used during the prefiltering
-   * steps.
+   * With prefiltered texture, defined the scale used during the prefiltering steps.
    */
   Property<BaseTexture, float> lodGenerationScale;
 
   /**
-   * With prefiltered texture, defined if the specular generation is based on a
-   * linear ramp. By default we are using a log2 of the linear roughness helping
-   * to keep a better resolution for average roughness values.
+   * With prefiltered texture, defined if the specular generation is based on a linear ramp. By
+   * default we are using a log2 of the linear roughness helping to keep a better resolution for
+   * average roughness values.
    */
   Property<BaseTexture, bool> linearSpecularLOD;
 
   /**
-   * In case a better definition than spherical harmonics is required for the
-   * diffuse part of the environment. You can set the irradiance texture to rely
-   * on a texture instead of the spherical approach. This texture need to have
-   * the same characteristics than its parent (Cube vs 2d, coordinates mode,
-   * Gamma/Linear, RGBD).
+   * In case a better definition than spherical harmonics is required for the diffuse part of the
+   * environment. You can set the irradiance texture to rely on a texture instead of the spherical
+   * approach. This texture need to have the same characteristics than its parent (Cube vs 2d,
+   * coordinates mode, Gamma/Linear, RGBD).
    */
   Property<BaseTexture, BaseTexturePtr> irradianceTexture;
 
@@ -448,8 +431,7 @@ public:
    * Callback triggered when the texture has been disposed.
    * Kept for back compatibility, you can use the onDisposeObservable instead.
    */
-  WriteOnlyProperty<BaseTexture, std::function<void(BaseTexture*, EventState&)>>
-    onDispose;
+  WriteOnlyProperty<BaseTexture, std::function<void(BaseTexture*, EventState&)>> onDispose;
 
   /**
    * Define the current state of the loading sequence when in delayed load mode.
