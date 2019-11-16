@@ -1150,17 +1150,17 @@ VertexData::CreateTiledPlane(TiledPlaneOptions& options)
   if (offsetX > 0 || offsetY > 0) {
     startX    = -halfWidth;
     startY    = -halfHeight;
-    auto endX_2 = halfWidth;
-    auto endY_2 = halfHeight;
+    endX = halfWidth;
+    endY = halfHeight;
 
     switch (alignH) {
       case Mesh::CENTER:
         offsetX /= 2.f;
         startX -= offsetX;
-        endX_2 += offsetX;
+        endX += offsetX;
         break;
       case Mesh::LEFT:
-        endX_2 += offsetX;
+        endX += offsetX;
         adjustX = -offsetX / 2.f;
         break;
       case Mesh::RIGHT:
@@ -1173,10 +1173,10 @@ VertexData::CreateTiledPlane(TiledPlaneOptions& options)
       case Mesh::CENTER:
         offsetY /= 2.f;
         startY -= offsetY;
-        endY_2 += offsetY;
+        endY += offsetY;
         break;
       case Mesh::BOTTOM:
-        endY_2 += offsetY;
+        endY += offsetY;
         adjustY = -offsetY / 2.f;
         break;
       case Mesh::TOP:
