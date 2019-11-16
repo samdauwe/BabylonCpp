@@ -43,6 +43,7 @@ DepthOfFieldMergePostProcess::DepthOfFieldMergePostProcess(
   // it is instead called inside DepthOfFieldMergePostProcess::New(...)
   // if (!blockCompilation)
     // updateEffect();
+  (void) blockCompilation;
 }
 
 DepthOfFieldMergePostProcess::~DepthOfFieldMergePostProcess() = default;
