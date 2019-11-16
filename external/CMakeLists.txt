@@ -75,13 +75,13 @@ if (WIN32)
   endif()
 endif(WIN32)
 
-# ImGuiColorTextEdit as a standalone static library
+# ImGuiColorTextEdit as a standalone shared library
 set(IMGUI_EDITOR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ImGuiColorTextEdit)
 set(IMGUI_EDITOR_FILES
     ${IMGUI_EDITOR_DIR}/TextEditor.cpp
     ${IMGUI_EDITOR_DIR}/TextEditor.h)
 source_group_by_path_all(${IMGUI_EDITOR_DIR} ${IMGUI_EDITOR_FILES})
-add_library(ImGuiColorTextEdit STATIC ${IMGUI_EDITOR_FILES})
+add_library(ImGuiColorTextEdit SHARED ${IMGUI_EDITOR_FILES})
 target_include_directories(ImGuiColorTextEdit PUBLIC SYSTEM ${IMGUI_EDITOR_DIR} ${IMGUI_EDITOR_DIR}/..)
 target_link_libraries(ImGuiColorTextEdit PUBLIC imgui)
 # Disable ImGuiColorTextEdit specific warnings
