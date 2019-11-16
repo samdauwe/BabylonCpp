@@ -44,7 +44,7 @@ target_include_directories(${TARGET}
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/..
     PRIVATE
-    ${ImGuiColorTextEditFolder}/..
+    ${CMAKE_CURRENT_LIST_DIR}/../../external # For ImGuiColorTextEdit
 )
 
 # Libraries
