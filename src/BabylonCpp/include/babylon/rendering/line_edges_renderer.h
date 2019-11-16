@@ -28,7 +28,7 @@ private:
    * @brief Generate edges for each line in LinesMesh. Every Line should be
    * rendered as edge.
    */
-  void _generateEdgesLines() override;
+  void _generateEdgesLines_specialized();
 
 }; // end of class LineEdgesRenderer
 

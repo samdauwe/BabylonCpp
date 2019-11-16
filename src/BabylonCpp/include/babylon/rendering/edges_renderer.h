@@ -99,7 +99,7 @@ protected:
   /**
    * @brief Generates lines edges from adjacencjes.
    */
-  virtual void _generateEdgesLines();
+  void _generateEdgesLines();
 
 public:
   /**
