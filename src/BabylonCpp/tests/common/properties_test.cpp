@@ -17,7 +17,7 @@ public:
   BABYLON::Property<PrimitiveTypeProperty, T> value;
 
 private:
-  T _value;
+  T _value = {};
 
   T getValue() const
   {
