@@ -182,6 +182,13 @@ private:
   // renders the GUI. Returns true when exit required
   bool render()
   {
+    static bool wasInitialLayoutApplied = false;
+    if (!wasInitialLayoutApplied)
+    {
+      this->_studioLayout.ApplyLayoutMode(LayoutMode::SceneAndBrowser);
+      wasInitialLayoutApplied = true;
+    }
+
     prepareSceneInspector();
     registerRenderFunctions();
 
