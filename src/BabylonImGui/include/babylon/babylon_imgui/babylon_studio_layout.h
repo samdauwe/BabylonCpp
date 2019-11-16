@@ -52,7 +52,7 @@ private:
   };
 
   std::map<DockableWindowId, DockableWindowInfo> _dockableWindowsInfos;
-  LayoutMode _layoutMode;
+  LayoutMode _layoutMode = LayoutMode::SceneAndBrowser;
 };
 
 } // namespace BABYLON

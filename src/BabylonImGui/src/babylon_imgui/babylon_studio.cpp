@@ -32,7 +32,6 @@ public:
     playgroundPath             = BABYLON::Filesystem::absolutePath(playgroundPath);
     _playgroundCodeEditor.setFiles({playgroundPath});
     _playgroundCodeEditor.setLightPalette();
-    _studioLayout.ApplyLayoutMode(LayoutMode::SceneAndBrowser);
   }
 
   void RunApp(std::shared_ptr<BABYLON::IRenderableScene> initialScene,
