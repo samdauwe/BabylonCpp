@@ -74,7 +74,7 @@ TEST(TestProperties, ReadWritePrimitiveProperty)
     a.value = 5;
     EXPECT_EQ(a.value, 5);
     // Get by value is only supported mode
-    int b = a.value;
+    int b = a.value; // NOLINT
     b     = 6;
     EXPECT_EQ(a.value, 5);
     EXPECT_EQ(b, 6);
