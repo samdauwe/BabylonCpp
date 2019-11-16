@@ -1,4 +1,8 @@
 ---
 ---
-Checks:          'hicpp-use-equals-default, -clang-analyzer-security.insecureAPI.rand,-clang-analyzer-security.FloatLoopCounter'
+Checks:          'hicpp-use-equals-default,
+                  -clang-analyzer-optin.performance.Padding,
+                  -clang-analyzer-security.insecureAPI.rand,
+                  -clang-analyzer-security.FloatLoopCounter,
+                  '
 HeaderFilterRegex: './src/*'
