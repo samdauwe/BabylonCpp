@@ -7,12 +7,8 @@ struct E {
   E(int a) : _a{a}
   {
   }
-  E(E&& e) : _a{std::move(e._a)}
-  {
-  }
-  E(E const& e) : _a{e._a}
-  {
-  }
+  E(E&& e) = default;
+  E(E const& e) = default;
   E& operator=(E&&) = delete;
   E& operator=(E const&) = delete;
 
