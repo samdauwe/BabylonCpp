@@ -21,23 +21,23 @@ void SamplesIndex::fillSamplesFailures() const
 
   _samplesFailures = {
     {"BlurModeForMirrorsScene", {SampleFailureReasonKind::empty3d}},
-    {"CartoonAnimationsScene", {SampleFailureReasonKind::segFault}},
-    {"CircleCurvesFromBeziersScene", {SampleFailureReasonKind::empty3d}},
-    {"EdgesRenderScene", {SampleFailureReasonKind::segFault}},
+    {"CircleCurvesFromBeziersScene", {SampleFailureReasonKind::empty3d, "Rendering empty with 50% chance"}},
+    {"EdgesRendererScene", {SampleFailureReasonKind::segFault}},
     {"EnvironmentTextureScene", {SampleFailureReasonKind::empty3d}},
     {"FurMaterialScene", {SampleFailureReasonKind::segFault}},
     {"InnerMeshPointsScene", {SampleFailureReasonKind::segFault}},
     {"IsPointInsideMeshScene", {SampleFailureReasonKind::processHung}},
-    {"LevelOfDetailScene", {SampleFailureReasonKind::segFault, "Segfault when dragging the mouse"}},
+    {"LevelOfDetailScene", {SampleFailureReasonKind::segFault, "Low FPS / Segfault when dragging the mouse"}},
     {"LinesMeshSpiralScene", {SampleFailureReasonKind::empty3d}},
-    {"LorenzAttractorScene", {SampleFailureReasonKind::empty3d}},
+    {"LorenzAttractorScene", {SampleFailureReasonKind::empty3d, "Rendering empty with 50% chance"}},
     {"MergedMeshesScene", {SampleFailureReasonKind::segFault}},
-    {"MorphMeshScene", {SampleFailureReasonKind::segFault}},
     {"MultiSampleRenderTargetsScene", {SampleFailureReasonKind::empty3d}},
     {"PointsCloudScene", {SampleFailureReasonKind::empty3d}},
     {"ProceduralHexPlanetGenerationScene", {SampleFailureReasonKind::segFault}},
+    {"SimpleSkinScene", {SampleFailureReasonKind::segFault}},
     {"ShaderMaterialWarpSpeedScene", {SampleFailureReasonKind::empty3d}},
-    {"VolumetricLightScatteringScene", {SampleFailureReasonKind::broken3d, "No scatter, mousedrag->disappear"}}};
+    {"VolumetricLightScatteringScene", {SampleFailureReasonKind::segFault}}
+  };
 
   done = true;
 }
