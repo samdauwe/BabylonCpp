@@ -86,9 +86,9 @@ protected:
    * @param  p0
    * @param  p1
    */
-  virtual void _checkEdge(size_t faceIndex, int edge,
-                          const std::vector<Vector3>& faceNormals,
-                          const Vector3& p0, const Vector3& p1);
+  void _checkEdge(size_t faceIndex, int edge,
+                  const std::vector<Vector3>& faceNormals,
+                  const Vector3& p0, const Vector3& p1);
 
   /**
    * @brief Push line into the position, normal and index buffer.
