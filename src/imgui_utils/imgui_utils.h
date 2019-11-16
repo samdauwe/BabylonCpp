@@ -44,7 +44,7 @@ inline bool InputText_String(
 {
   size_t buf_size = inOutStr.size() + 1000;
   char *buf = (char *)malloc(buf_size);
-  strcpy(buf, inOutStr.c_str());
+  strncpy(buf, inOutStr.c_str(), buf_size);
   bool changed = ImGui::InputText(label.c_str(), buf, buf_size, flags, callback, user_data);
   inOutStr = std::string(buf);
   free(buf);
