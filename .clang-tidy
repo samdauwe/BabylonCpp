@@ -1,0 +1,3 @@
+---
+---
+Checks:          'hicpp-use-equals-default, -clang-analyzer-security.insecureAPI.rand,-clang-analyzer-security.FloatLoopCounter'
