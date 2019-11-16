@@ -29,6 +29,11 @@ file(GLOB_RECURSE SOURCES_H_CPP
     ${CMAKE_CURRENT_SOURCE_DIR}/*.h
     ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
     )
+set(ImGuiColorTextEditFolder ${CMAKE_CURRENT_SOURCE_DIR}/../../external/ImGuiColorTextEdit)
+set(SOURCES_H_CPP 
+    ${SOURCES_H_CPP} ${ImGuiColorTextEditFolder}/TextEditor.cpp
+    ${SOURCES_H_CPP} ${ImGuiColorTextEditFolder}/TextEditor.h
+    )
 source_group_by_path_all(${CMAKE_CURRENT_SOURCE_DIR} ${SOURCES_H_CPP})
 
 # ============================================================================ #
@@ -53,7 +58,6 @@ target_link_libraries(${TARGET}
     imgui
     ${OPENGL_LIBRARIES}
     BabylonCpp
-    ImGuiColorTextEdit
 )
 
 if (UNIX AND NOT APPLE)
