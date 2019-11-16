@@ -48,6 +48,8 @@ babylon_target_clang_tidy(${TARGET})
 target_include_directories(${TARGET}
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/..
+    PRIVATE
+    ${ImGuiColorTextEditFolder}/..
 )
 
 # Libraries
