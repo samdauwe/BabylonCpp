@@ -43,13 +43,12 @@ public:
   template <typename... Ts>
   static GeometryPtr New(Ts&&... args)
   {
-    auto geometry
-      = std::shared_ptr<Geometry>(new Geometry(std::forward<Ts>(args)...));
+    auto geometry = std::shared_ptr<Geometry>(new Geometry(std::forward<Ts>(args)...));
     geometry->addToScene(geometry);
 
     return geometry;
   }
-  virtual ~Geometry(); // = default
+  virtual ~Geometry() override; // = default
 
   /**
    * @brief Adds the geometry to the scene.
@@ -90,8 +89,7 @@ public:
   /**
    * @brief Affects all geometry data in one call.
    * @param vertexData defines the geometry data
-   * @param updatable defines if the geometry must be flagged as updatable
-   * (false as default)
+   * @param updatable defines if the geometry must be flagged as updatable (false as default)
    */
   void setAllVerticesData(VertexData* vertexData, bool updatable = false);
 
@@ -99,15 +97,13 @@ public:
    * @brief Set specific vertex data.
    * @param kind defines the data kind (Position, normal, etc...)
    * @param data defines the vertex data to use
-   * @param updatable defines if the vertex must be flagged as updatable (false
-   * as default)
-   * @param stride defines the stride to use (0 by default). This value is
-   * deduced from the kind value if not specified
+   * @param updatable defines if the vertex must be flagged as updatable (false as default)
+   * @param stride defines the stride to use (0 by default). This value is deduced from the kind
+   * value if not specified
    */
-  AbstractMesh*
-  setVerticesData(const std::string& kind, const Float32Array& data,
-                  bool updatable                      = false,
-                  const std::optional<size_t>& stride = std::nullopt) override;
+  AbstractMesh* setVerticesData(const std::string& kind, const Float32Array& data,
+                                bool updatable                      = false,
+                                const std::optional<size_t>& stride = std::nullopt) override;
 
   /**
    * @brief Removes a specific vertex data.
@@ -116,29 +112,24 @@ public:
   void removeVerticesData(const std::string& kind);
 
   /**
-   * @brief Affect a vertex buffer to the geometry. the vertexBuffer.getKind()
-   * function is used to determine where to store the data.
+   * @brief Affect a vertex buffer to the geometry. the vertexBuffer.getKind() function is used to
+   * determine where to store the data.
    * @param buffer defines the vertex buffer to use
-   * @param totalVertices defines the total number of vertices for position kind
-   * (could be null)
+   * @param totalVertices defines the total number of vertices for position kind (could be null)
    */
   void setVerticesBuffer(const VertexBufferPtr& buffer,
-                         const std::optional<size_t>& totalVertices
-                         = std::nullopt);
+                         const std::optional<size_t>& totalVertices = std::nullopt);
 
   /**
    * @brief Update a specific vertex buffer.
-   * This function will directly update the underlying DataBuffer according to
-   * the passed numeric array or Float32Array It will do nothing if the buffer
-   * is not updatable
+   * This function will directly update the underlying DataBuffer according to the passed numeric
+   * array or Float32Array It will do nothing if the buffer is not updatable
    * @param kind defines the data kind (Position, normal, etc...)
    * @param data defines the data to use
-   * @param offset defines the offset in the target buffer where to store the
-   * data
+   * @param offset defines the offset in the target buffer where to store the data
    * @param useBytes set to true if the offset is in bytes
    */
-  void updateVerticesDataDirectly(const std::string& kind,
-                                  const Float32Array& data, size_t offset,
+  void updateVerticesDataDirectly(const std::string& kind, const Float32Array& data, size_t offset,
                                   bool useBytes = false);
 
   /**
@@ -146,13 +137,10 @@ public:
    * This function will create a new buffer if the current one is not updatable
    * @param kind defines the data kind (Position, normal, etc...)
    * @param data defines the data to use
-   * @param updateExtends defines if the geometry extends must be recomputed
-   * (false by default)
+   * @param updateExtends defines if the geometry extends must be recomputed (false by default)
    */
-  AbstractMesh* updateVerticesData(const std::string& kind,
-                                   const Float32Array& data,
-                                   bool updateExtends = false,
-                                   bool makeItUnique  = false) override;
+  AbstractMesh* updateVerticesData(const std::string& kind, const Float32Array& data,
+                                   bool updateExtends = false, bool makeItUnique = false) override;
 
   /**
    * @brief Hidden
@@ -166,22 +154,20 @@ public:
   size_t getTotalVertices() const;
 
   /**
-   * @brief Gets a specific vertex data attached to this geometry. Float data is
-   * constructed if the vertex buffer data cannot be returned directly.
+   * @brief Gets a specific vertex data attached to this geometry. Float data is constructed if the
+   * vertex buffer data cannot be returned directly.
    * @param kind defines the data kind (Position, normal, etc...)
-   * @param copyWhenShared defines if the returned array must be cloned upon
-   * returning it if the current geometry is shared between multiple meshes
-   * @param forceCopy defines a boolean indicating that the returned array must
-   * be cloned upon returning it
+   * @param copyWhenShared defines if the returned array must be cloned upon returning it if the
+   * current geometry is shared between multiple meshes
+   * @param forceCopy defines a boolean indicating that the returned array must be cloned upon
+   * returning it
    * @returns a float array containing vertex data
    */
-  Float32Array getVerticesData(const std::string& kind,
-                               bool copyWhenShared = false,
-                               bool forceCopy      = false) override;
+  Float32Array getVerticesData(const std::string& kind, bool copyWhenShared = false,
+                               bool forceCopy = false) override;
 
   /**
-   * @brief Returns a boolean defining if the vertex data for the requested
-   * `kind` is updatable.
+   * @brief Returns a boolean defining if the vertex data for the requested `kind` is updatable.
    * @param kind defines the data kind (Position, normal, etc...)
    * @returns true if the vertex buffer with the specified kind is updatable
    */
@@ -217,25 +203,20 @@ public:
   /**
    * @brief Update index buffer.
    * @param indices defines the indices to store in the index buffer
-   * @param offset defines the offset in the target buffer where to store the
-   * data
-   * @param gpuMemoryOnly defines a boolean indicating that only the GPU memory
-   * must be updated leaving the CPU version of the indices unchanged (false by
-   * default)
+   * @param offset defines the offset in the target buffer where to store the data
+   * @param gpuMemoryOnly defines a boolean indicating that only the GPU memory must be updated
+   * leaving the CPU version of the indices unchanged (false by default)
    */
-  void updateIndices(const IndicesArray& indices, int offset = 0,
-                     bool gpuMemoryOnly = false);
+  void updateIndices(const IndicesArray& indices, int offset = 0, bool gpuMemoryOnly = false);
 
   /**
    * @brief Creates a new index buffer.
    * @param indices defines the indices to store in the index buffer
    * @param totalVertices defines the total number of vertices (could be null)
-   * @param updatable defines if the index buffer must be flagged as updatable
-   * (false by default)
+   * @param updatable defines if the index buffer must be flagged as updatable (false by default)
    */
-  AbstractMesh* setIndices(const IndicesArray& indices,
-                           size_t totalVertices = 0,
-                           bool updatable       = false) override;
+  AbstractMesh* setIndices(const IndicesArray& indices, size_t totalVertices = 0,
+                           bool updatable = false) override;
 
   /**
    * @brief Return the total number of indices.
@@ -245,14 +226,13 @@ public:
 
   /**
    * @brief Gets the index buffer array
-   * @param copyWhenShared defines if the returned array must be cloned upon
-   * returning it if the current geometry is shared between multiple meshes
-   * @param forceCopy defines a boolean indicating that the returned array must
-   * be cloned upon returning it
+   * @param copyWhenShared defines if the returned array must be cloned upon returning it if the
+   * current geometry is shared between multiple meshes
+   * @param forceCopy defines a boolean indicating that the returned array must be cloned upon
+   * returning it
    * @returns the index buffer array
    */
-  IndicesArray getIndices(bool copyWhenShared = false,
-                          bool forceCopy      = false) override;
+  IndicesArray getIndices(bool copyWhenShared = false, bool forceCopy = false) override;
 
   /**
    * @brief Gets the index buffer.
@@ -268,8 +248,8 @@ public:
   /**
    * @brief Release the associated resources for a specific mesh.
    * @param mesh defines the source mesh
-   * @param shouldDispose defines if the geometry must be disposed if there is
-   * no more mesh pointing to it
+   * @param shouldDispose defines if the geometry must be disposed if there is no more mesh pointing
+   * to it
    */
   void releaseForMesh(Mesh* mesh, bool shouldDispose = true);
 
@@ -287,8 +267,7 @@ public:
   void load(Scene* scene, const std::function<void()>& onLoaded = nullptr);
 
   /**
-   * @brief Invert the geometry to move from a right handed system to a left
-   * handed one.
+   * @brief Invert the geometry to move from a right handed system to a left handed one.
    */
   void toLeftHanded();
 
@@ -323,10 +302,8 @@ public:
   GeometryPtr copy(const std::string& id);
 
   /**
-   * @brief Serialize the current geometry info (and not the vertices data) into
-   * a JSON object.
-   * @return a JSON representation of the current geometry data (without the
-   * vertices data)
+   * @brief Serialize the current geometry info (and not the vertices data) into a JSON object.
+   * @return a JSON representation of the current geometry data (without the vertices data)
    */
   json serialize() const;
 
@@ -347,8 +324,8 @@ public:
   static GeometryPtr ExtractFromMesh(Mesh* mesh, const std::string& id);
 
   /**
-   * @brief You should now use Tools.RandomId(), this method is still here for
-   * legacy reasons. Implementation from
+   * @brief You should now use Tools.RandomId(), this method is still here for legacy reasons.
+   * Implementation from
    * http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/2117523#answer-2117523
    * Be aware Math.random() could cause collisions, but:
    * "All but 6 of the 128 bits of the ID are randomly generated, which means
@@ -366,20 +343,16 @@ public:
   /**
    * @brief Hidden
    */
-  static void _CleanMatricesWeights(const json& parsedGeometry,
-                                    const MeshPtr& mesh);
+  static void _CleanMatricesWeights(const json& parsedGeometry, const MeshPtr& mesh);
 
   /**
-   * @brief Create a new geometry from persisted data (Using .babylon file
-   * format).
+   * @brief Create a new geometry from persisted data (Using .babylon file format).
    * @param parsedVertexData defines the persisted data
    * @param scene defines the hosting scene
-   * @param rootUrl defines the root url to use to load assets (like delayed
-   * data)
+   * @param rootUrl defines the root url to use to load assets (like delayed data)
    * @returns the new geometry object
    */
-  static GeometryPtr Parse(const json& parsedVertexData, Scene* scene,
-                           const std::string& rootUrl);
+  static GeometryPtr Parse(const json& parsedVertexData, Scene* scene, const std::string& rootUrl);
 
 protected:
   /**
@@ -390,14 +363,12 @@ protected:
    * @param updatable defines if geometry must be updatable (false by default)
    * @param mesh defines the mesh that will be associated with the geometry
    */
-  Geometry(const std::string& id, Scene* scene,
-           VertexData* vertexData = nullptr, bool updatable = false,
-           Mesh* mesh = nullptr);
+  Geometry(const std::string& id, Scene* scene, VertexData* vertexData = nullptr,
+           bool updatable = false, Mesh* mesh = nullptr);
 
   /**
-   * @brief Gets the Bias Vector to apply on the bounding elements (box/sphere),
-   * the max extend is computed as v += v * bias.x + bias.y, the min is computed
-   * as v -= v * bias.x + bias.y
+   * @brief Gets the Bias Vector to apply on the bounding elements (box/sphere), the max extend is
+   * computed as v += v * bias.x + bias.y, the min is computed as v -= v * bias.x + bias.y
    * @returns The Bias Vector
    */
   std::optional<Vector2>& get_boundingBias();
@@ -440,8 +411,7 @@ public:
   size_t uniqueId;
 
   /**
-   * Gets the delay loading state of the geometry (none by default which means
-   * not delayed)
+   * Gets the delay loading state of the geometry (none by default which means not delayed)
    */
   int delayLoadState;
 
@@ -453,8 +423,7 @@ public:
   /**
    * Callback called when the geometry is updated
    */
-  std::function<void(Geometry* geometry, const std::string& kind)>
-    onGeometryUpdated;
+  std::function<void(Geometry* geometry, const std::string& kind)> onGeometryUpdated;
 
   /** Hidden */
   IndicesArray _indices;
@@ -467,8 +436,7 @@ public:
   /** Hidden */
   std::unique_ptr<BoundingInfo> _boundingInfo;
   /** Hidden */
-  std::function<void(const json& parsedVertexData, Geometry& geometry)>
-    _delayLoadingFunction;
+  std::function<void(const json& parsedVertexData, Geometry& geometry)> _delayLoadingFunction;
   /** Hidden */
   int _softwareSkinningFrameId;
   // Cache
@@ -482,8 +450,7 @@ public:
    */
   Property<Geometry, std::optional<Vector2>> boundingBias;
 
-  std::unordered_map<std::string, std::unique_ptr<GL::IGLVertexArrayObject>>
-    _vertexArrayObjects;
+  std::unordered_map<std::string, std::unique_ptr<GL::IGLVertexArrayObject>> _vertexArrayObjects;
   bool _updatable;
   std::vector<Vector3> centroids;
 
