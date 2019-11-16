@@ -36,9 +36,7 @@ public:
   /**
    * @brief Destructor
    */
-  ~TreeNode()
-  {
-  }
+  ~TreeNode() = default;
 
   /**
    * @brief Returns the unique node identifier.

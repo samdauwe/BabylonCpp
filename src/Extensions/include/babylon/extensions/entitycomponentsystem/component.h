@@ -41,10 +41,7 @@ namespace ECS {
 class BABYLON_SHARED_EXPORT Component {
 
 public:
-  virtual ~Component()
-  {
-  }
-
+  virtual ~Component() = default;
 }; // end of class Component
 
 template <class T,

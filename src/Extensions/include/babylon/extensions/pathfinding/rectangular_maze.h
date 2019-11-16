@@ -72,9 +72,7 @@ struct RectangularMaze {
   {
   }
 
-  ~RectangularMaze()
-  {
-  }
+  ~RectangularMaze() = default;
 
   std::size_t size() const
   {
