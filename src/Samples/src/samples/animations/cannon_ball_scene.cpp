@@ -93,9 +93,9 @@ public:
 
     // Cannon
     auto radius = 3.f;
-    for (float i = 0; i < 20; ++i) {
-      auto x = i - 10.f;
-      auto y = i / 2.f;
+    for (int i = 0; i < 20; ++i) {
+      auto x = (float)i - 10.f;
+      auto y = (float)i / 2.f;
       auto z = 0.f;
       _axis.emplace_back(Vector3(x, y, z));
     }
