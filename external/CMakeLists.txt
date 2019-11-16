@@ -75,15 +75,22 @@ if (WIN32)
   endif()
 endif(WIN32)
 
-# ImGuiColorTextEdit as an "object" library
-set(ImGuiColorTextEditDir ${CMAKE_CURRENT_SOURCE_DIR}/ImGuiColorTextEdit)
-add_library(
-        ImGuiColorTextEdit
-        OBJECT
-        ${ImGuiColorTextEditDir}/TextEditor.cpp
-        ${ImGuiColorTextEditDir}/TextEditor.h
-)
-target_link_libraries(ImGuiColorTextEdit imgui)
+# ImGuiColorTextEdit as a standalone shared library
+set(IMGUI_EDITOR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ImGuiColorTextEdit)
+set(IMGUI_EDITOR_FILES
+        ${IMGUI_EDITOR_DIR}/TextEditor.cpp
+        ${IMGUI_EDITOR_DIR}/TextEditor.h)
+source_group_by_path_all(${IMGUI_EDITOR_DIR} ${IMGUI_EDITOR_FILES})
+add_library(ImGuiColorTextEdit OBJECT ${IMGUI_EDITOR_FILES})
+target_include_directories(ImGuiColorTextEdit PUBLIC SYSTEM ${IMGUI_EDITOR_DIR} ${IMGUI_EDITOR_DIR}/..)
+target_link_libraries(ImGuiColorTextEdit PUBLIC imgui)
+# Disable ImGuiColorTextEdit specific warnings
+if (MSVC)
+    target_compile_options(ImGuiColorTextEdit PRIVATE  /wd4244)
+endif()
+if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
+    target_compile_options(ImGuiColorTextEdit PRIVATE -Wno-reorder -Wno-sign-compare -Wno-unused-variable)
+endif()
 
 # RuntimeCompiledCPlusPlus
 if (NOT APPLE)
