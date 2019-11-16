@@ -83,7 +83,7 @@ private:
         
     _studioLayout.registerGuiRenderFunction(
       DockableWindowId::Logs, 
-      [this]() { BABYLON::BabylonLogsWindow::instance().render(); });
+      []() { BABYLON::BabylonLogsWindow::instance().render(); });
     
     _studioLayout.registerGuiRenderFunction(
       DockableWindowId::Scene3d, 

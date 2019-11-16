@@ -48,7 +48,7 @@ private:
   struct DockableWindowInfo {
     std::string Label;
     bool IsVisible;
-    GuiRenderFunction RenderFunction;
+    GuiRenderFunction RenderFunction = {};
   };
 
   std::map<DockableWindowId, DockableWindowInfo> _dockableWindowsInfos;
