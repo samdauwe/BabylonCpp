@@ -193,7 +193,7 @@ endif()
 # Add -stdlib=libc++ when using Clang if possible
 if(NOT OPTION_NO_AUTO_LIBCPP AND "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   set(CXXFLAGS_BACKUP "${CMAKE_CXX_FLAGS}")
-  set(CMAKE_CXX_FLAGS "-std=c++1y -stdlib=libc++")
+  set(CMAKE_CXX_FLAGS "-std=c++1y -stdlib=libc++ -lc++")
   try_run(ProgramResult
           CompilationSucceeded
           "${CMAKE_CURRENT_BINARY_DIR}"
