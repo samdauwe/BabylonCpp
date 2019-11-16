@@ -3869,7 +3869,7 @@ unsigned int Engine::updateMultipleRenderTargetTextureSampleCount(
       texture->_MSAAFramebuffer    = framebuffer;
       texture->_MSAARenderBuffer   = std::move(colorRenderbuffer);
       texture->samples             = samples;
-      texture->_depthStencilBuffer = depthStencilBuffer;
+      texture->_depthStencilBuffer = std::move(depthStencilBuffer);
       gl.bindRenderbuffer(GL::RENDERBUFFER, nullptr);
       attachments.emplace_back(attachment);
     }
