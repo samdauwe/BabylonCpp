@@ -75,6 +75,16 @@ if (WIN32)
   endif()
 endif(WIN32)
 
+# ImGuiColorTextEdit as an "object" library
+set(ImGuiColorTextEditDir ${CMAKE_CURRENT_SOURCE_DIR}/ImGuiColorTextEdit)
+add_library(
+        ImGuiColorTextEdit
+        OBJECT
+        ${ImGuiColorTextEditDir}/TextEditor.cpp
+        ${ImGuiColorTextEditDir}/TextEditor.h
+)
+target_link_libraries(ImGuiColorTextEdit imgui)
+
 # RuntimeCompiledCPlusPlus
 if (NOT APPLE)
     option(BABYLON_BUILD_PLAYGROUND "Build the interactive playground (modify and run the playground code interactively without exiting)" ON)
