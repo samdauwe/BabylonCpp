@@ -797,7 +797,7 @@ void ParticleSystem::_createVertexBuffers()
     offsets
       = _vertexBuffer->createVertexBuffer(VertexBuffer::OffsetKind, dataOffset,
                                           2, _vertexBufferSize, _useInstancing);
-    dataOffset += 2;
+    // dataOffset += 2;
   }
   _vertexBuffers[VertexBuffer::OffsetKind] = std::move(offsets);
 }
