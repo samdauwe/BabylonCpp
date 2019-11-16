@@ -2,7 +2,7 @@
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/interfaces/irenderable_scene.h>
-#include <babylon/lights/point_light.h>
+#include <babylon/lights/hemispheric_light.h>
 #include <babylon/loading/scene_loader.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/texture.h>
@@ -39,7 +39,7 @@ public:
   void initializeScene(ICanvas* canvas, Scene* scene) override
   {
     // Adding a light
-    auto light = PointLight::New("Hemi", Vector3(0.f, 1.f, 0.f), scene);
+    auto light = HemisphericLight::New("Hemi", Vector3(0.f, 1.f, 0.f), scene);
 
     // Adding an Arc Rotate Camera
     _camera = ArcRotateCamera::New("Camera", -1.85f, 1.2f, 200.f, Vector3::Zero(), scene);
