@@ -815,7 +815,7 @@ public:
   {
     return "Shader Material Chains and Gears Scene";
   }
-  void initializeScene(ICanvas* canvas, Scene* scene)
+  void initializeScene(ICanvas* canvas, Scene* scene) override
   {
     // Create a FreeCamera, and set its position to (x:0, y:0, z:-8)
     auto camera = FreeCamera::New("camera1", Vector3(0.f, 0.f, -8.f), scene);
