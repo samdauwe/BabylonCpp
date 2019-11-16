@@ -11,9 +11,7 @@
 namespace BABYLON {
 namespace Samples {
 
-SamplesIndex::SamplesIndex()
-{
-}
+SamplesIndex::SamplesIndex() = default;
 
 void SamplesIndex::fillSamplesFailures() const
 {
