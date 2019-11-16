@@ -21,36 +21,10 @@ IcoNode::IcoNode(const Vector3& _p, const std::vector<size_t>& _e)
 {
 }
 
-IcoNode::IcoNode(const IcoNode& other) : p{other.p}, e{other.e}, f{other.f}
-{
-}
-
-IcoNode::IcoNode(IcoNode&& other)
-    : p{std::move(other.p)}, e{std::move(other.e)}, f{std::move(other.f)}
-{
-}
-
-IcoNode& IcoNode::operator=(const IcoNode& other)
-{
-  if (&other != this) {
-    p = other.p;
-    e = other.e;
-    f = other.f;
-  }
-
-  return *this;
-}
-
-IcoNode& IcoNode::operator=(IcoNode&& other)
-{
-  if (&other != this) {
-    p = std::move(other.p);
-    e = std::move(other.e);
-    f = std::move(other.f);
-  }
-
-  return *this;
-}
+IcoNode::IcoNode(const IcoNode& other) = default;
+IcoNode::IcoNode(IcoNode&& other) = default;
+IcoNode& IcoNode::operator=(const IcoNode& other) = default;
+IcoNode& IcoNode::operator=(IcoNode&& other) = default;
 
 // -----------------------------------------------------------------------------
 // IcoEdge
