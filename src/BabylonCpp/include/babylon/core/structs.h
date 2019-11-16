@@ -219,16 +219,14 @@ struct PickedParticle {
 }; // end of struct PickedParticle
 
 struct PointerEvent : public Event {
-  PointerEvent()
-  {
-  }
+  PointerEvent() = default;
   PointerEvent(const std::string& /*type*/)
   {
   }
 
   PointerEvent(const PointerEvent& other) = default;
   PointerEvent(PointerEvent&& other) = default;
-  
+
   PointerEvent& operator=(const PointerEvent& other) = default;
   PointerEvent& operator=(PointerEvent&& other) = default;
 
@@ -262,39 +260,12 @@ struct PointerTouch {
 }; // end of struct PointerTouch
 
 struct MouseWheelEvent : public PointerEvent {
-  MouseWheelEvent()
-  {
-  }
-  MouseWheelEvent(const MouseWheelEvent& other)
-      : PointerEvent{other}, wheelDelta{other.wheelDelta}, detail{other.detail}
-  {
-  }
-  MouseWheelEvent(MouseWheelEvent&& other)
-      : PointerEvent{std::move(other)}
-      , wheelDelta{std::move(other.wheelDelta)}
-      , detail{std::move(other.detail)}
-  {
-  }
-  MouseWheelEvent& operator=(const MouseWheelEvent& other)
-  {
-    if (&other != this) {
-      PointerEvent::operator=(other);
-      wheelDelta            = other.wheelDelta;
-      detail                = other.detail;
-    }
+  MouseWheelEvent() = default;
+  MouseWheelEvent(const MouseWheelEvent& other) = default;
+  MouseWheelEvent(MouseWheelEvent&& other) = default;
+  MouseWheelEvent& operator=(const MouseWheelEvent& other) = default;
+  MouseWheelEvent& operator=(MouseWheelEvent&& other) = default;
 
-    return *this;
-  }
-  MouseWheelEvent& operator=(MouseWheelEvent&& other)
-  {
-    if (&other != this) {
-      PointerEvent::operator=(std::move(other));
-      wheelDelta            = std::move(other.wheelDelta);
-      detail                = std::move(other.detail);
-    }
-
-    return *this;
-  }
   float wheelDelta = 0.f;
   float detail = 0.f;
   void preventDefault() const

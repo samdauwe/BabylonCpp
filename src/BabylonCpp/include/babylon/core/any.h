@@ -111,9 +111,7 @@ class some : A {
   //----------------------------------------------------------------------------
 
   struct base {
-    virtual ~base()
-    {
-    }
+    virtual ~base() = default;
     virtual bool is(id) const      = 0;
     virtual base* copy(A&) const   = 0;
     virtual base* move(A&, base*&) = 0;
@@ -250,9 +248,7 @@ class some : A {
   //-----------------------------------------------------------------------------
 
 public:
-  some()
-  {
-  }
+  some() = default;
   ~some()
   {
     if (p)

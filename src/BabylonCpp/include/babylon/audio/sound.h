@@ -24,9 +24,7 @@ public:
   {
     return std::shared_ptr<Sound>(new Sound(std::forward<Ts>(args)...));
   }
-  virtual ~Sound()
-  {
-  }
+  virtual ~Sound() = default;
 
   bool isReady()
   {

@@ -51,77 +51,11 @@ public:
   {
   }
 
-  PerfCounter(const PerfCounter& other)
-      : _startMonitoringTime{other._startMonitoringTime}
-      , _min{other._min}
-      , _max{other._max}
-      , _average{other._average}
-      , _current{other._current}
-      , _totalValueCount{other._totalValueCount}
-      , _totalAccumulated{other._totalAccumulated}
-      , _lastSecAverage{other._lastSecAverage}
-      , _lastSecAccumulated{other._lastSecAccumulated}
-      , _lastSecTime{other._lastSecTime}
-      , _lastSecValueCount{other._lastSecValueCount}
-  {
-  }
-
-  PerfCounter(PerfCounter&& other)
-      : _startMonitoringTime{std::move(other._startMonitoringTime)}
-      , _min{std::move(other._min)}
-      , _max{std::move(other._max)}
-      , _average{std::move(other._average)}
-      , _current{std::move(other._current)}
-      , _totalValueCount{std::move(other._totalValueCount)}
-      , _totalAccumulated{std::move(other._totalAccumulated)}
-      , _lastSecAverage{std::move(other._lastSecAverage)}
-      , _lastSecAccumulated{std::move(other._lastSecAccumulated)}
-      , _lastSecTime{std::move(other._lastSecTime)}
-      , _lastSecValueCount{std::move(other._lastSecValueCount)}
-  {
-  }
-
-  PerfCounter& operator=(const PerfCounter& other)
-  {
-    if (&other != this) {
-      _startMonitoringTime = other._startMonitoringTime;
-      _min                 = other._min;
-      _max                 = other._max;
-      _average             = other._average;
-      _current             = other._current;
-      _totalValueCount     = other._totalValueCount;
-      _totalAccumulated    = other._totalAccumulated;
-      _lastSecAverage      = other._lastSecAverage;
-      _lastSecAccumulated  = other._lastSecAccumulated;
-      _lastSecTime         = other._lastSecTime;
-      _lastSecValueCount   = other._lastSecValueCount;
-    }
-
-    return *this;
-  }
-
-  PerfCounter& operator=(PerfCounter&& other)
-  {
-    if (&other != this) {
-      _startMonitoringTime = std::move(other._startMonitoringTime);
-      _min                 = std::move(other._min);
-      _max                 = std::move(other._max);
-      _average             = std::move(other._average);
-      _current             = std::move(other._current);
-      _totalValueCount     = std::move(other._totalValueCount);
-      _totalAccumulated    = std::move(other._totalAccumulated);
-      _lastSecAverage      = std::move(other._lastSecAverage);
-      _lastSecAccumulated  = std::move(other._lastSecAccumulated);
-      _lastSecTime         = std::move(other._lastSecTime);
-      _lastSecValueCount   = std::move(other._lastSecValueCount);
-    }
-
-    return *this;
-  }
-
-  ~PerfCounter()
-  {
-  }
+  PerfCounter(const PerfCounter& other) = default;
+  PerfCounter(PerfCounter&& other) = default;
+  PerfCounter& operator=(const PerfCounter& other) = default;
+  PerfCounter& operator=(PerfCounter&& other) = default;
+  ~PerfCounter() = default;
 
   /**
    * @brief Returns the smallest value ever.
