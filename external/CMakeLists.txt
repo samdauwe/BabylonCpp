@@ -83,7 +83,6 @@ set(IMGUI_EDITOR_FILES
 source_group_by_path_all(${IMGUI_EDITOR_DIR} ${IMGUI_EDITOR_FILES})
 add_library(ImGuiColorTextEdit OBJECT ${IMGUI_EDITOR_FILES})
 target_include_directories(ImGuiColorTextEdit PUBLIC SYSTEM ${IMGUI_EDITOR_DIR} ${IMGUI_EDITOR_DIR}/..)
-target_link_libraries(ImGuiColorTextEdit PUBLIC imgui)
 # Disable ImGuiColorTextEdit specific warnings
 if (MSVC)
     target_compile_options(ImGuiColorTextEdit PRIVATE  /wd4244)
