@@ -43,7 +43,9 @@ TargetCamera::TargetCamera(const std::string& iName, const Vector3& iPosition, S
     , _cachedRotationZ{0.f}
     , _cachedQuaternionRotationZ{0.f}
 {
-  _initCache();
+  // initCache() is a virtual method and cannot be called during construction
+  // instead, it is called inside Camera::addToScene(), which is called by TargetCamera::New()
+  // _initCache();
 }
 
 TargetCamera::~TargetCamera() = default;
