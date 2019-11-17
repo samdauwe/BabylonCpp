@@ -25,13 +25,12 @@ public:
   template <typename... Ts>
   static UniversalCameraPtr New(Ts&&... args)
   {
-    auto camera = std::shared_ptr<UniversalCamera>(
-      new UniversalCamera(std::forward<Ts>(args)...));
+    auto camera = std::shared_ptr<UniversalCamera>(new UniversalCamera(std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;
   }
-  ~UniversalCamera(); // = default
+  ~UniversalCamera() override; // = default
 
   /**
    * @brief Gets the current object class name.
@@ -50,8 +49,7 @@ protected:
    * @param position Define the start position of the camera in the scene
    * @param scene Define the scene the camera belongs to
    */
-  UniversalCamera(const std::string& name, const Vector3& position,
-                  Scene* scene);
+  UniversalCamera(const std::string& name, const Vector3& position, Scene* scene);
 
   float get_gamepadAngularSensibility() const;
   void set_gamepadAngularSensibility(float value);

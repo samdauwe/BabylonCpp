@@ -37,8 +37,8 @@ using TransformNodePtr         = std::shared_ptr<TransformNode>;
 /**
  * Defines how a node can be built from a string name.
  */
-using NodeConstructor = std::function<NodePtr(
-  const std::string& name, Scene* scene, const std::optional<json>& options)>;
+using NodeConstructor = std::function<NodePtr(const std::string& name, Scene* scene,
+                                              const std::optional<json>& options)>;
 
 /**
  * @brief Node is the basic class for all scene objects (Mesh, Light, Camera.)
@@ -59,8 +59,7 @@ public:
    * @param type defines the type name of the node to construct
    * @param constructorFunc defines the constructor function
    */
-  static void AddNodeConstructor(const std::string& type,
-                                 const NodeConstructor& constructorFunc);
+  static void AddNodeConstructor(const std::string& type, const NodeConstructor& constructorFunc);
 
   /**
    * @brief Returns a node constructor based on type name.
@@ -70,9 +69,9 @@ public:
    * @param options defines optional options to transmit to constructors
    * @returns the new constructor or null
    */
-  static std::function<NodePtr()>
-  Construct(const std::string& type, const std::string& name, Scene* scene,
-            const std::optional<json>& options = std::nullopt);
+  static std::function<NodePtr()> Construct(const std::string& type, const std::string& name,
+                                            Scene* scene,
+                                            const std::optional<json>& options = std::nullopt);
 
 public:
   /**
@@ -81,9 +80,8 @@ public:
    * @param scene the scene this node will be added to
    * @param addToRootNodes the node will be added to scene.rootNodes
    */
-  Node(const std::string& name, Scene* scene = nullptr,
-       bool addToRootNodes = true);
-  virtual ~Node(); // = default
+  Node(const std::string& name, Scene* scene = nullptr, bool addToRootNodes = true);
+  ~Node() override; // = default
 
   template <typename Derived>
   std::shared_ptr<Derived> shared_from_base()
@@ -99,7 +97,7 @@ public:
   /**
    * @brief Returns the type of this node
    */
-  virtual Type type() const override;
+  Type type() const override;
 
   /**
    * @brief Gets a boolean indicating if the node has been disposed.
@@ -134,8 +132,7 @@ public:
    * the scene is still loading
    * @returns the current Node
    */
-  Node& addBehavior(Behavior<Node>* behavior,
-                    bool attachImmediately = false) override;
+  Node& addBehavior(Behavior<Node>* behavior, bool attachImmediately = false) override;
 
   /**
    * @brief Remove an attached behavior.
@@ -157,7 +154,7 @@ public:
    * @brief Returns the latest update of the World matrix
    * @returns a Matrix
    */
-  virtual Matrix& getWorldMatrix() override;
+  Matrix& getWorldMatrix() override;
 
   /**
    * @brief Hidden
@@ -184,9 +181,8 @@ public:
    * @brief Hidden
    */
   virtual AbstractActionManagerPtr
-  _getActionManagerForTrigger(const std::optional<unsigned int>& trigger
-                              = std::nullopt,
-                              bool initialCall = true);
+  _getActionManagerForTrigger(const std::optional<unsigned int>& trigger = std::nullopt,
+                              bool initialCall                           = true);
 
   /**
    * @brief Hidden
@@ -219,8 +215,7 @@ public:
    * lights) has to be done (false by default)
    * @return true if the node is ready
    */
-  virtual bool isReady(bool completeCheck        = false,
-                       bool forceInstanceSupport = false);
+  virtual bool isReady(bool completeCheck = false, bool forceInstanceSupport = false);
 
   /**
    * @brief Is this node enabled?
@@ -263,10 +258,8 @@ public:
    * part of the result, otherwise it will be ignored.
    */
   template <typename T>
-  void _getDescendants(std::vector<std::shared_ptr<T>>& results,
-                       bool directDescendantsOnly = false,
-                       const std::function<bool(const NodePtr& node)>& predicate
-                       = nullptr);
+  void _getDescendants(std::vector<std::shared_ptr<T>>& results, bool directDescendantsOnly = false,
+                       const std::function<bool(const NodePtr& node)>& predicate = nullptr);
 
   /**
    * @brief Will return all nodes that have this node as ascendant.
@@ -279,10 +272,9 @@ public:
    * part of the result, otherwise it will be ignored
    * @return all children nodes of all types
    */
-  std::vector<NodePtr>
-  getDescendants(bool directDescendantsOnly = false,
-                 const std::function<bool(const NodePtr& node)>& predicate
-                 = nullptr);
+  std::vector<NodePtr> getDescendants(bool directDescendantsOnly = false,
+                                      const std::function<bool(const NodePtr& node)>& predicate
+                                      = nullptr);
 
   /**
    * @brief Get all child-meshes of this node.
@@ -296,9 +288,8 @@ public:
    * @returns an array of AbstractMesh
    */
   virtual std::vector<AbstractMeshPtr>
-  getChildMeshes(bool directDescendantsOnly = false,
-                 const std::function<bool(const NodePtr& node)>& predicate
-                 = nullptr);
+  getChildMeshes(bool directDescendantsOnly                                = false,
+                 const std::function<bool(const NodePtr& node)>& predicate = nullptr);
 
   /**
    * @brief Get all direct children of this node.
@@ -311,10 +302,9 @@ public:
    * considered (Default: true)
    * @returns an array of Node
    */
-  std::vector<NodePtr>
-  getChildren(const std::function<bool(const NodePtr& node)>& predicate
-              = nullptr,
-              bool directDescendantsOnly = true);
+  std::vector<NodePtr> getChildren(const std::function<bool(const NodePtr& node)>& predicate
+                                   = nullptr,
+                                   bool directDescendantsOnly = true);
 
   /**
    * @brief Hidden
@@ -324,7 +314,7 @@ public:
   /**
    * @brief Hidden
    */
-  virtual std::vector<AnimationPtr> getAnimations() override;
+  std::vector<AnimationPtr> getAnimations() override;
 
   /**
    * @brief Get an animation by name.
@@ -373,8 +363,7 @@ public:
    * @returns the object created for this animation. If range does not exist, it
    * will return null
    */
-  AnimatablePtr beginAnimation(const std::string& name, bool loop = false,
-                               float speedRatio                     = 1.f,
+  AnimatablePtr beginAnimation(const std::string& name, bool loop = false, float speedRatio = 1.f,
                                std::function<void()> onAnimationEnd = nullptr);
 
   /**
@@ -389,8 +378,7 @@ public:
    * world matrix to be created from scratch
    * @returns the world matrix
    */
-  virtual Matrix& computeWorldMatrix(bool force             = false,
-                                     bool useWasUpdatedFlag = false);
+  virtual Matrix& computeWorldMatrix(bool force = false, bool useWasUpdatedFlag = false);
 
   /**
    * @brief Releases resources associated with this node.
@@ -399,8 +387,7 @@ public:
    * @param disposeMaterialAndTextures Set to true to also dispose referenced
    * materials and textures (false by default)
    */
-  virtual void dispose(bool doNotRecurse               = false,
-                       bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Parse animation range data from a serialization object and store
@@ -409,8 +396,7 @@ public:
    * @param parsedNode defines the serialization object to read data from
    * @param scene defines the hosting scene
    */
-  static void ParseAnimationRanges(Node& node, const json& parsedNode,
-                                   Scene* scene);
+  static void ParseAnimationRanges(Node& node, const json& parsedNode, Scene* scene);
 
   /**
    * @brief Return the minimum and maximum world vectors of the entire hierarchy
@@ -423,9 +409,8 @@ public:
    * @returns the new bounding vectors
    */
   MinMax getHierarchyBoundingVectors(
-    bool includeDescendants = true,
-    const std::function<bool(const AbstractMeshPtr& abstractMesh)>& predicate
-    = nullptr);
+    bool includeDescendants                                                   = true,
+    const std::function<bool(const AbstractMeshPtr& abstractMesh)>& predicate = nullptr);
 
 protected:
   /**
@@ -450,14 +435,12 @@ protected:
   /**
    * @brief Sets the animation properties override.
    */
-  void set_animationPropertiesOverride(
-    const AnimationPropertiesOverridePtr& value) override;
+  void set_animationPropertiesOverride(const AnimationPropertiesOverridePtr& value) override;
 
   /**
    * @brief Sets a callback that will be raised when the node will be disposed.
    */
-  void set_onDispose(
-    const std::function<void(Node* node, EventState& es)>& callback);
+  void set_onDispose(const std::function<void(Node* node, EventState& es)>& callback);
 
   /**
    * @brief Gets the list of attached behaviors.
@@ -550,8 +533,7 @@ public:
   /**
    * Callback that will be raised when the node will be disposed.
    */
-  WriteOnlyProperty<Node, std::function<void(Node* node, EventState& es)>>
-    onDispose;
+  WriteOnlyProperty<Node, std::function<void(Node* node, EventState& es)>> onDispose;
 
   /**
    * List of attached behaviors

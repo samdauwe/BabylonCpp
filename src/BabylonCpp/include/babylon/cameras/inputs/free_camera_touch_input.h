@@ -14,15 +14,14 @@ namespace BABYLON {
  * @brief Manage the touch inputs to control the movement of a free camera.
  * @see http://doc.babylonjs.com/how_to/customizing_camera_inputs
  */
-class BABYLON_SHARED_EXPORT FreeCameraTouchInput
-    : public ICameraInput<FreeCamera> {
+class BABYLON_SHARED_EXPORT FreeCameraTouchInput : public ICameraInput<FreeCamera> {
 
 public:
   /**
    * @brief Instantiate the input.
    */
   FreeCameraTouchInput();
-  virtual ~FreeCameraTouchInput(); // = default
+  ~FreeCameraTouchInput() override; // = default
 
   /**
    * @brief Attach the input controls to a specific dom element to get the input

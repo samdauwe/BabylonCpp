@@ -8,11 +8,9 @@ namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
 class NormalMapProceduralTexture;
-using NormalMapProceduralTexturePtr
-  = std::shared_ptr<NormalMapProceduralTexture>;
+using NormalMapProceduralTexturePtr = std::shared_ptr<NormalMapProceduralTexture>;
 
-class BABYLON_SHARED_EXPORT NormalMapProceduralTexture
-    : public ProceduralTexture {
+class BABYLON_SHARED_EXPORT NormalMapProceduralTexture : public ProceduralTexture {
 
 public:
   template <typename... Ts>
@@ -24,10 +22,10 @@ public:
 
     return texture;
   }
-  ~NormalMapProceduralTexture(); // = default
+  ~NormalMapProceduralTexture() override; // = default
 
   void updateShaderUniforms();
-  void render(bool useCameraPostProcess = false);
+  void render(bool useCameraPostProcess = false) override;
   void resize(const Size& size, bool generateMipMaps = false);
 
   /**
@@ -45,13 +43,12 @@ public:
    * texture information
    * @returns a parsed Normal Map Procedural Texture
    */
-  static std::unique_ptr<NormalMapProceduralTexture>
-  Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
+  static std::unique_ptr<NormalMapProceduralTexture> Parse(const json& parsedTexture, Scene* scene,
+                                                           const std::string& rootUrl);
 
 protected:
-  NormalMapProceduralTexture(const std::string& name, const Size& size,
-                             Scene* scene, Texture* fallbackTexture = nullptr,
-                             bool generateMipMaps = false);
+  NormalMapProceduralTexture(const std::string& name, const Size& size, Scene* scene,
+                             Texture* fallbackTexture = nullptr, bool generateMipMaps = false);
 
   TexturePtr& get_baseTexture();
   void set_baseTexture(const TexturePtr& texture);

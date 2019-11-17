@@ -19,15 +19,14 @@ class BABYLON_SHARED_EXPORT Bone : public Node {
 
 public:
   template <typename... Ts>
-  static BonePtr New(const std::string& iName, Skeleton* skeleton,
-                     Bone* parentBone                         = nullptr,
+  static BonePtr New(const std::string& iName, Skeleton* skeleton, Bone* parentBone = nullptr,
                      const std::optional<Matrix>& localMatrix = std::nullopt,
                      const std::optional<Matrix>& restPose    = std::nullopt,
                      const std::optional<Matrix>& baseMatrix  = std::nullopt,
                      std::optional<int> index                 = std::nullopt)
   {
-    auto bone = std::shared_ptr<Bone>(new Bone(
-      iName, skeleton, parentBone, localMatrix, restPose, baseMatrix, index));
+    auto bone = std::shared_ptr<Bone>(
+      new Bone(iName, skeleton, parentBone, localMatrix, restPose, baseMatrix, index));
     bone->addToRootNodes();
     bone->addToSkeleton(bone);
 
@@ -39,22 +38,21 @@ public:
 
     return bone;
   }
-  ~Bone(); // = default
+  ~Bone() override; // = default
 
-  virtual Type type() const override;
+  Type type() const override;
   void addToSkeleton(const BonePtr& newBone);
 
   /**
    * @brief Gets a property.
    */
-  virtual AnimationValue
-  getProperty(const std::vector<std::string>& targetPropertyPath) override;
+  AnimationValue getProperty(const std::vector<std::string>& targetPropertyPath) override;
 
   /**
    * @brief Sets a property.
    */
-  virtual void setProperty(const std::vector<std::string>& targetPropertyPath,
-                           const AnimationValue& value) override;
+  void setProperty(const std::vector<std::string>& targetPropertyPath,
+                   const AnimationValue& value) override;
 
   /** Members **/
 
@@ -173,9 +171,8 @@ public:
   /**
    * @brief Hidden
    */
-  void _updateDifferenceMatrix(const std::optional<Matrix>& rootMatrix
-                               = std::nullopt,
-                               bool updateChildren = true);
+  void _updateDifferenceMatrix(const std::optional<Matrix>& rootMatrix = std::nullopt,
+                               bool updateChildren                     = true);
 
   /**
    * @brief Flag the bone as dirty (Forcing it to update everything).
@@ -196,10 +193,9 @@ public:
    * @param skelDimensionsRatio defines the scaling ratio
    * @returns true if operation was successful
    */
-  bool copyAnimationRange(Bone* source, const std::string& rangeName,
-                          int frameOffset, bool rescaleAsRequired = false,
-                          const std::optional<Vector3>& skelDimensionsRatio
-                          = std::nullopt);
+  bool copyAnimationRange(Bone* source, const std::string& rangeName, int frameOffset,
+                          bool rescaleAsRequired                            = false,
+                          const std::optional<Vector3>& skelDimensionsRatio = std::nullopt);
 
   /**
    * @brief Translate the bone in local or world space.
@@ -208,8 +204,7 @@ public:
    * @param mesh The mesh that this bone is attached to. This is only used in
    * world space
    */
-  void translate(const Vector3& vec, Space space = Space::LOCAL,
-                 AbstractMesh* mesh = nullptr);
+  void translate(const Vector3& vec, Space space = Space::LOCAL, AbstractMesh* mesh = nullptr);
 
   /**
    * @brief Set the postion of the bone in local or world space.
@@ -226,8 +221,7 @@ public:
    * @param position The position to set the bone
    * @param mesh The mesh that this bone is attached to
    */
-  void setAbsolutePosition(const Vector3& position,
-                           AbstractMesh* mesh = nullptr);
+  void setAbsolutePosition(const Vector3& position, AbstractMesh* mesh = nullptr);
 
   /**
    * @brief Scale the bone on the x, y and z axes (in local space).
@@ -267,8 +261,7 @@ public:
    * @param mesh The mesh that this bone is attached to.  This is only used in
    * world space
    */
-  void setYawPitchRoll(float yaw, float pitch, float roll,
-                       Space space        = Space::LOCAL,
+  void setYawPitchRoll(float yaw, float pitch, float roll, Space space = Space::LOCAL,
                        AbstractMesh* mesh = nullptr);
 
   /**
@@ -331,8 +324,7 @@ public:
    * world space
    * @returns The position of the bone
    */
-  Vector3 getPosition(Space space        = Space::LOCAL,
-                      AbstractMesh* mesh = nullptr) const;
+  Vector3 getPosition(Space space = Space::LOCAL, AbstractMesh* mesh = nullptr) const;
 
   /**
    * @brief Copy the position of the bone to a vector3 in local or world space.
@@ -372,8 +364,7 @@ public:
    * @param mesh The mesh that this bone is attached to
    * @returns The world direction
    */
-  Vector3 getDirection(const Vector3& localAxis,
-                       AbstractMesh* mesh = nullptr) const;
+  Vector3 getDirection(const Vector3& localAxis, AbstractMesh* mesh = nullptr) const;
 
   /**
    * @brief Copy the world direction to a vector3 from an axis that is in the
@@ -393,8 +384,7 @@ public:
    * world space
    * @returns The euler rotation
    */
-  Vector3& getRotation(Space space        = Space::LOCAL,
-                       AbstractMesh* mesh = nullptr);
+  Vector3& getRotation(Space space = Space::LOCAL, AbstractMesh* mesh = nullptr);
 
   /**
    * @brief Copy the euler rotation of the bone to a vector3.  The rotation can
@@ -404,8 +394,7 @@ public:
    * world space
    * @param result The vector3 that the rotation should be copied to
    */
-  void getRotationToRef(Vector3& result, Space space = Space::LOCAL,
-                        AbstractMesh* mesh = nullptr);
+  void getRotationToRef(Vector3& result, Space space = Space::LOCAL, AbstractMesh* mesh = nullptr);
 
   /**
    * @brief Get the quaternion rotation of the bone in either local or world
@@ -415,8 +404,7 @@ public:
    * world space
    * @returns The quaternion rotation
    */
-  Quaternion getRotationQuaternion(Space space        = Space::LOCAL,
-                                   AbstractMesh* mesh = nullptr);
+  Quaternion getRotationQuaternion(Space space = Space::LOCAL, AbstractMesh* mesh = nullptr);
 
   /**
    * @brief Copy the quaternion rotation of the bone to a quaternion.  The
@@ -426,8 +414,7 @@ public:
    * world space
    * @param result The quaternion that the rotation should be copied to
    */
-  void getRotationQuaternionToRef(Quaternion& result,
-                                  const Space& space = Space::LOCAL,
+  void getRotationQuaternionToRef(Quaternion& result, const Space& space = Space::LOCAL,
                                   AbstractMesh* mesh = nullptr);
 
   /**
@@ -437,8 +424,7 @@ public:
    * world space
    * @returns The rotation matrix
    */
-  Matrix getRotationMatrix(Space space        = Space::LOCAL,
-                           AbstractMesh* mesh = nullptr) const;
+  Matrix getRotationMatrix(Space space = Space::LOCAL, AbstractMesh* mesh = nullptr) const;
 
   /**
    * @brief Copy the rotation matrix of the bone to a matrix.  The rotation can
@@ -458,8 +444,7 @@ public:
    * @param mesh The mesh that this bone is attached to
    * @returns The world position
    */
-  Vector3 getAbsolutePositionFromLocal(const Vector3& position,
-                                       AbstractMesh* mesh) const;
+  Vector3 getAbsolutePositionFromLocal(const Vector3& position, AbstractMesh* mesh) const;
 
   /**
    * @brief Get the world position of a point that is in the local space of the
@@ -468,8 +453,7 @@ public:
    * @param mesh The mesh that this bone is attached to
    * @param result The vector3 that the world position should be copied to
    */
-  void getAbsolutePositionFromLocalToRef(const Vector3& position,
-                                         AbstractMesh* mesh,
+  void getAbsolutePositionFromLocalToRef(const Vector3& position, AbstractMesh* mesh,
                                          Vector3& result) const;
 
   /**
@@ -478,8 +462,7 @@ public:
    * @param mesh The mesh that this bone is attached to
    * @returns The local position
    */
-  Vector3 getLocalPositionFromAbsolute(const Vector3& position,
-                                       AbstractMesh* mesh = nullptr) const;
+  Vector3 getLocalPositionFromAbsolute(const Vector3& position, AbstractMesh* mesh = nullptr) const;
 
   /**
    * @brief Get the local position of a point that is in world space and copy it
@@ -488,8 +471,7 @@ public:
    * @param mesh The mesh that this bone is attached to
    * @param result The vector3 that the local position should be copied to
    */
-  void getLocalPositionFromAbsoluteToRef(const Vector3& position,
-                                         AbstractMesh* mesh,
+  void getLocalPositionFromAbsoluteToRef(const Vector3& position, AbstractMesh* mesh,
                                          Vector3& result) const;
 
 protected:
@@ -578,8 +560,7 @@ private:
   void _markAsDirtyAndDecompose();
   void _rotateWithMatrix(const Matrix& rmat, Space space = Space::LOCAL,
                          AbstractMesh* mesh = nullptr);
-  bool _getNegativeRotationToRef(Matrix& rotMatInv,
-                                 AbstractMesh* mesh = nullptr);
+  bool _getNegativeRotationToRef(Matrix& rotMatInv, AbstractMesh* mesh = nullptr);
 
 public:
   /**

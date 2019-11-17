@@ -36,10 +36,10 @@ struct SolidParticleSystemDigestOptions {
 }; // end of struct SolidParticleSystemOptions
 
 struct SolidParticleSystemMeshBuilderOptions {
-  std::function<void(SolidParticle* particle, unsigned int i, unsigned int s)>
-    positionFunction = nullptr;
-  std::function<void(SolidParticle* particle, const Vector3& vertex, size_t i)>
-    vertexFunction = nullptr;
+  std::function<void(SolidParticle* particle, unsigned int i, unsigned int s)> positionFunction
+    = nullptr;
+  std::function<void(SolidParticle* particle, const Vector3& vertex, size_t i)> vertexFunction
+    = nullptr;
 }; // end of struct SolidParticleSystemMeshBuilderOptions
 
 /**
@@ -62,10 +62,9 @@ public:
   template <typename... Ts>
   static SolidParticleSystemPtr New(Ts&&... args)
   {
-    return std::shared_ptr<SolidParticleSystem>(
-      new SolidParticleSystem(std::forward<Ts>(args)...));
+    return std::shared_ptr<SolidParticleSystem>(new SolidParticleSystem(std::forward<Ts>(args)...));
   }
-  virtual ~SolidParticleSystem(); // = default
+  ~SolidParticleSystem() override; // = default
 
   /**
    * @brief Builds the SPS underlying mesh. Returns a standard Mesh.
@@ -91,8 +90,7 @@ public:
    * / number` facets
    * @returns the current SPS
    */
-  SolidParticleSystem& digest(Mesh* mesh,
-                              const SolidParticleSystemDigestOptions& options);
+  SolidParticleSystem& digest(Mesh* mesh, const SolidParticleSystemDigestOptions& options);
 
   /**
    * @brief Adds some particles to the SPS from the model shape. Returns the
@@ -131,14 +129,13 @@ public:
    * the particle computations _(default true)_
    * @returns the SPS.
    */
-  SolidParticleSystem& setParticles(unsigned int start = 0,
-                                    unsigned int end = 0, bool update = true);
+  SolidParticleSystem& setParticles(unsigned int start = 0, unsigned int end = 0,
+                                    bool update = true);
 
   /**
    * @brief Disposes the SPS.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Visibilty helper : Recomputes the visible size according to the mesh
@@ -318,8 +315,7 @@ public:
    * @example : just set a vertex particle position
    * @returns the updated vertex
    */
-  virtual Vector3 updateParticleVertex(SolidParticle* particle,
-                                       const Vector3& vertex, size_t pt);
+  virtual Vector3 updateParticleVertex(SolidParticle* particle, const Vector3& vertex, size_t pt);
 
   /**
    * @brief This will be called before any other treatment by `setParticles()`
@@ -331,8 +327,7 @@ public:
    * iterate, same than the value passed to setParticle()
    * @param update the boolean update value actually passed to setParticles()
    */
-  virtual void beforeUpdateParticles(unsigned int start, unsigned int stop,
-                                     bool update);
+  virtual void beforeUpdateParticles(unsigned int start, unsigned int stop, bool update);
 
   /**
    * @brief This will be called  by `setParticles()` after all the other
@@ -344,8 +339,7 @@ public:
    * iterate, same than the value passed to setParticle()
    * @param update the boolean update value actually passed to setParticles()
    */
-  virtual void afterUpdateParticles(unsigned int start, unsigned int stop,
-                                    bool update);
+  virtual void afterUpdateParticles(unsigned int start, unsigned int stop, bool update);
 
 protected:
   /**
@@ -372,8 +366,7 @@ protected:
    * exactly matches a spherical mesh.
    */
   SolidParticleSystem(const std::string& name, Scene* scene,
-                      const std::optional<SolidParticleSystemOptions>& options
-                      = std::nullopt);
+                      const std::optional<SolidParticleSystemOptions>& options = std::nullopt);
 
 private:
   /**
@@ -390,14 +383,13 @@ private:
   /**
    * @brief Inserts the shape model in the global SPS mesh.
    */
-  SolidParticle*
-  _meshBuilder(unsigned int p, const std::vector<Vector3>& shape,
-               Float32Array& positions, Uint32Array& meshInd,
-               Uint32Array& indices, const Float32Array& meshUV,
-               Float32Array& uvs, const Float32Array& meshCol,
-               Float32Array& colors, const Float32Array& meshNor,
-               Float32Array& normals, unsigned int idx, unsigned int idxInShape,
-               const SolidParticleSystemMeshBuilderOptions& options);
+  SolidParticle* _meshBuilder(unsigned int p, const std::vector<Vector3>& shape,
+                              Float32Array& positions, Uint32Array& meshInd, Uint32Array& indices,
+                              const Float32Array& meshUV, Float32Array& uvs,
+                              const Float32Array& meshCol, Float32Array& colors,
+                              const Float32Array& meshNor, Float32Array& normals, unsigned int idx,
+                              unsigned int idxInShape,
+                              const SolidParticleSystemMeshBuilderOptions& options);
 
   /**
    * @brief Returns a shape array from positions array.
@@ -412,11 +404,9 @@ private:
   /**
    * @brief Adds a new particle object in the particles array.
    */
-  SolidParticle* _addParticle(unsigned int idx, unsigned int idxpos,
-                              unsigned int idxind,
+  SolidParticle* _addParticle(unsigned int idx, unsigned int idxpos, unsigned int idxind,
                               std::unique_ptr<ModelShape>&& model, int shapeId,
-                              unsigned int idxInShape,
-                              const BoundingInfo& bInfo);
+                              unsigned int idxInShape, const BoundingInfo& bInfo);
 
   /**
    * @brief Rebuilds a particle back to its just built status : if needed,
@@ -532,8 +522,7 @@ private:
   Vector3 _scale;
   Vector3 _translation;
   bool _particlesIntersect;
-  std::function<int(const DepthSortedParticle& p1,
-                    const DepthSortedParticle& p2)>
+  std::function<int(const DepthSortedParticle& p1, const DepthSortedParticle& p2)>
     _depthSortFunction;
   bool _needs32Bits;
 

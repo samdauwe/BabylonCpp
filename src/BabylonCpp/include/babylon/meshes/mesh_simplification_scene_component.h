@@ -8,23 +8,20 @@
 namespace BABYLON {
 
 class SimplicationQueueSceneComponent;
-using SimplicationQueueSceneComponentPtr
-  = std::shared_ptr<SimplicationQueueSceneComponent>;
+using SimplicationQueueSceneComponentPtr = std::shared_ptr<SimplicationQueueSceneComponent>;
 
 /**
  * @brief Defines the simplification queue scene component responsible to help
  * scheduling the various simplification task created in a scene.
  */
-class BABYLON_SHARED_EXPORT SimplicationQueueSceneComponent
-    : public ISceneComponent {
+class BABYLON_SHARED_EXPORT SimplicationQueueSceneComponent : public ISceneComponent {
 
 public:
   /**
    * The component name helpfull to identify the component in the list of scene
    * components.
    */
-  static constexpr const char* name
-    = SceneComponentConstants::NAME_SIMPLIFICATIONQUEUE;
+  static constexpr const char* name = SceneComponentConstants::NAME_SIMPLIFICATIONQUEUE;
 
   template <typename... Ts>
   static SimplicationQueueSceneComponentPtr New(Ts&&... args)
@@ -32,7 +29,7 @@ public:
     return std::shared_ptr<SimplicationQueueSceneComponent>(
       new SimplicationQueueSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~SimplicationQueueSceneComponent(); // = default
+  ~SimplicationQueueSceneComponent() override; // = default
 
   /**
    * @brief Registers the component in a given scene.

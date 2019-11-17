@@ -29,13 +29,12 @@ public:
   template <typename... Ts>
   static MirrorTexturePtr New(Ts&&... args)
   {
-    auto texture = std::shared_ptr<MirrorTexture>(
-      new MirrorTexture(std::forward<Ts>(args)...));
+    auto texture = std::shared_ptr<MirrorTexture>(new MirrorTexture(std::forward<Ts>(args)...));
     texture->addToScene(texture);
 
     return texture;
   }
-  ~MirrorTexture(); // = default
+  ~MirrorTexture() override; // = default
 
   /**
    * @brief Clone the mirror texture.
@@ -72,12 +71,11 @@ protected:
    * @param samplingMode
    * @param generateDepthBuffer
    */
-  MirrorTexture(const std::string& name, const std::variant<ISize, float>& size,
-                Scene* scene, bool generateMipMaps = false,
-                unsigned int type = Constants::TEXTURETYPE_UNSIGNED_INT,
-                unsigned int samplingMode
-                = TextureConstants::BILINEAR_SAMPLINGMODE,
-                bool generateDepthBuffer = true);
+  MirrorTexture(const std::string& name, const std::variant<ISize, float>& size, Scene* scene,
+                bool generateMipMaps      = false,
+                unsigned int type         = Constants::TEXTURETYPE_UNSIGNED_INT,
+                unsigned int samplingMode = TextureConstants::BILINEAR_SAMPLINGMODE,
+                bool generateDepthBuffer  = true);
 
   void set_blurRatio(float value);
   float get_blurRatio() const;
@@ -143,8 +141,7 @@ public:
 private:
   Scene* scene;
 
-  Observer<ImageProcessingConfiguration>::Ptr
-    _imageProcessingConfigChangeObserver;
+  Observer<ImageProcessingConfiguration>::Ptr _imageProcessingConfigChangeObserver;
 
   Matrix _transformMatrix;
   Matrix _mirrorMatrix;

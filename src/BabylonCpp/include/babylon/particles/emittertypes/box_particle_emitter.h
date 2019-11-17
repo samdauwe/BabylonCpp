@@ -18,7 +18,7 @@ public:
    * @brief Creates a new instance BoxParticleEmitter.
    */
   BoxParticleEmitter();
-  virtual ~BoxParticleEmitter(); // = default
+  ~BoxParticleEmitter() override; // = default
 
   /**
    * @brief Called by the particle System when the direction is computed for the
@@ -27,8 +27,7 @@ public:
    * @param directionToUpdate is the direction vector to update with the result
    * @param particle is the particle we are computed the direction for
    */
-  void startDirectionFunction(const Matrix& worldMatrix,
-                              Vector3& directionToUpdate,
+  void startDirectionFunction(const Matrix& worldMatrix, Vector3& directionToUpdate,
                               Particle* particle) override;
 
   /**
@@ -38,8 +37,7 @@ public:
    * @param positionToUpdate is the position vector to update with the result
    * @param particle is the particle we are computed the position for
    */
-  void startPositionFunction(const Matrix& worldMatrix,
-                             Vector3& positionToUpdate,
+  void startPositionFunction(const Matrix& worldMatrix, Vector3& positionToUpdate,
                              Particle* particle) override;
 
   /**

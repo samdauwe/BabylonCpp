@@ -26,9 +26,8 @@ public:
   static constexpr const char* faMagic = ICON_FA_MAGIC;
 
 public:
-  RenderingPipelineTreeItemComponent(
-    const IRenderPipelineItemComponentProps& props);
-  virtual ~RenderingPipelineTreeItemComponent(); // = default
+  RenderingPipelineTreeItemComponent(const IRenderPipelineItemComponentProps& props);
+  ~RenderingPipelineTreeItemComponent() override; // = default
 
   void render() override;
 

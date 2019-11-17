@@ -23,13 +23,12 @@ public:
   template <typename... Ts>
   static FlyCameraPtr New(Ts&&... args)
   {
-    auto camera
-      = std::shared_ptr<FlyCamera>(new FlyCamera(std::forward<Ts>(args)...));
+    auto camera = std::shared_ptr<FlyCamera>(new FlyCamera(std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;
   }
-  ~FlyCamera(); // = default
+  ~FlyCamera() override; // = default
 
   /**
    * @brief Attach a control to the HTML DOM element.
@@ -38,10 +37,8 @@ public:
    * should call preventdefault().
    * https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault
    */
-  void attachControl(ICanvas* element, bool noPreventDefault = false,
-                     bool useCtrlForPanning = true,
-                     MouseButtonType panningMouseButton
-                     = MouseButtonType::RIGHT) override;
+  void attachControl(ICanvas* element, bool noPreventDefault = false, bool useCtrlForPanning = true,
+                     MouseButtonType panningMouseButton = MouseButtonType::RIGHT) override;
 
   /**
    * @brief Detach a control from the HTML DOM element.
@@ -80,8 +77,7 @@ public:
   /**
    * @brief Destroy the camera and release the current resources held by it.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Get the current object class name.
@@ -189,9 +185,8 @@ private:
   /**
    * @brief Hidden
    */
-  void
-  _onCollisionPositionChange(size_t collisionId, const Vector3& newPosition,
-                             const AbstractMeshPtr& collidedMesh = nullptr);
+  void _onCollisionPositionChange(size_t collisionId, const Vector3& newPosition,
+                                  const AbstractMeshPtr& collidedMesh = nullptr);
 
 public:
   /**

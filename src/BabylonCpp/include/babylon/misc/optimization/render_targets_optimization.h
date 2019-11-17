@@ -6,12 +6,11 @@
 
 namespace BABYLON {
 
-class BABYLON_SHARED_EXPORT RenderTargetsOptimization
-    : public SceneOptimization {
+class BABYLON_SHARED_EXPORT RenderTargetsOptimization : public SceneOptimization {
 
 public:
   RenderTargetsOptimization(int priority = 0);
-  ~RenderTargetsOptimization(); // = default
+  ~RenderTargetsOptimization() override; // = default
 
   bool apply(Scene* scene) override;
 

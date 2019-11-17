@@ -21,13 +21,12 @@ public:
   template <typename... Ts>
   static PushMaterialPtr New(Ts&&... args)
   {
-    auto material = std::shared_ptr<PushMaterial>(
-      new PushMaterial(std::forward<Ts>(args)...));
+    auto material = std::shared_ptr<PushMaterial>(new PushMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;
   }
-  ~PushMaterial(); // = default
+  ~PushMaterial() override; // = default
 
   /**
    * @brief Returns the string "PushMaterial".
@@ -57,8 +56,7 @@ protected:
   PushMaterial(const std::string& name, Scene* scene);
 
   void _afterBind(Mesh* mesh, const EffectPtr& effect = nullptr);
-  bool _mustRebind(Scene* scene, const EffectPtr& effect,
-                   float visibility = 1.f);
+  bool _mustRebind(Scene* scene, const EffectPtr& effect, float visibility = 1.f);
 
 public:
   /**

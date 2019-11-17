@@ -61,9 +61,8 @@ public:
    * @param index defines its index
    * @param gamepad defines the internal HTML gamepad object
    */
-  DualShockPad(const std::string& id, int index,
-               const IBrowserGamepadPtr& gamepad);
-  ~DualShockPad(); // = default
+  DualShockPad(const std::string& id, int index, const IBrowserGamepadPtr& gamepad);
+  ~DualShockPad() override; // = default
 
   /**
    * @brief Defines the callback to call when left trigger is pressed.
@@ -81,29 +80,25 @@ public:
    * @brief Defines the callback to call when a button is pressed.
    * @param callback defines the callback to use
    */
-  void onbuttondown(
-    const std::function<void(DualShockButton buttonPressed)>& callback);
+  void onbuttondown(const std::function<void(DualShockButton buttonPressed)>& callback);
 
   /**
    * @brief Defines the callback to call when a button is released.
    * @param callback defines the callback to use
    */
-  void onbuttonup(
-    const std::function<void(DualShockButton buttonReleased)>& callback);
+  void onbuttonup(const std::function<void(DualShockButton buttonReleased)>& callback);
 
   /**
    * @brief Defines the callback to call when a pad is pressed.
    * @param callback defines the callback to use
    */
-  void
-  ondpaddown(const std::function<void(DualShockDpad dPadPressed)>& callback);
+  void ondpaddown(const std::function<void(DualShockDpad dPadPressed)>& callback);
 
   /**
    * @brief Defines the callback to call when a pad is released.
    * @param callback defines the callback to use
    */
-  void
-  ondpadup(const std::function<void(DualShockDpad dPadReleased)>& callback);
+  void ondpadup(const std::function<void(DualShockDpad dPadReleased)>& callback);
 
   /**
    * @brief Force the gamepad to synchronize with device values.

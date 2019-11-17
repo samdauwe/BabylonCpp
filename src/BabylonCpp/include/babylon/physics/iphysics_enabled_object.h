@@ -11,10 +11,10 @@ namespace BABYLON {
  * @see https://doc.babylonjs.com/how_to/using_the_physics_engine
  */
 struct BABYLON_SHARED_EXPORT IPhysicsEnabledObject : public AbstractMesh {
-  virtual AbstractMesh* getParent()              = 0;
-  virtual Scene* getScene() const                = 0;
-  virtual bool hasBoundingInfo()                 = 0;
-  virtual const std::string getClassName() const = 0;
+  AbstractMesh* getParent() override              = 0;
+  Scene* getScene() const override                = 0;
+  virtual bool hasBoundingInfo()                  = 0;
+  const std::string getClassName() const override = 0;
 }; // end of struct IPhysicsEnabledObject
 
 } // end of namespace BABYLON

@@ -21,13 +21,12 @@ public:
    */
   ScaleGizmo(const std::shared_ptr<UtilityLayerRenderer>& gizmoLayer
              = UtilityLayerRenderer::DefaultUtilityLayer());
-  ~ScaleGizmo(); // = default
+  ~ScaleGizmo() override; // = default
 
   /**
    * @brief Disposes of the gizmo.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
 protected:
   AbstractMeshPtr& get_attachedMesh() override;

@@ -64,8 +64,8 @@ class BABYLON_SHARED_EXPORT AbstractMesh : public TransformNode,
                                            public IGetSetVerticesData {
 
 public:
-  using TrianglePickingPredicate = std::function<bool(
-    const Vector3& p0, const Vector3& p1, const Vector3& p2, const Ray& ray)>;
+  using TrianglePickingPredicate
+    = std::function<bool(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Ray& ray)>;
 
 public:
   /** No occlusion */
@@ -121,39 +121,33 @@ public:
    * center in the frustum ? If not, apply the Bounding Sphere Only strategy. No
    * Bounding Box is tested here.
    */
-  static constexpr unsigned int
-    CULLINGSTRATEGY_OPTIMISTIC_INCLUSION_THEN_BSPHERE_ONLY
+  static constexpr unsigned int CULLINGSTRATEGY_OPTIMISTIC_INCLUSION_THEN_BSPHERE_ONLY
     = Constants::MESHES_CULLINGSTRATEGY_OPTIMISTIC_INCLUSION_THEN_BSPHERE_ONLY;
 
   /**
    * No billboard
    */
-  static constexpr unsigned int BILLBOARDMODE_NONE
-    = TransformNode::BILLBOARDMODE_NONE;
+  static constexpr unsigned int BILLBOARDMODE_NONE = TransformNode::BILLBOARDMODE_NONE;
 
   /**
    * Billboard on X axis
    */
-  static constexpr unsigned int BILLBOARDMODE_X
-    = TransformNode::BILLBOARDMODE_X;
+  static constexpr unsigned int BILLBOARDMODE_X = TransformNode::BILLBOARDMODE_X;
 
   /**
    * Billboard on Y axis
    */
-  static constexpr unsigned int BILLBOARDMODE_Y
-    = TransformNode::BILLBOARDMODE_Y;
+  static constexpr unsigned int BILLBOARDMODE_Y = TransformNode::BILLBOARDMODE_Y;
 
   /**
    * Billboard on Z axis
    */
-  static constexpr unsigned int BILLBOARDMODE_Z
-    = TransformNode::BILLBOARDMODE_Z;
+  static constexpr unsigned int BILLBOARDMODE_Z = TransformNode::BILLBOARDMODE_Z;
 
   /**
    * Billboard on all axes
    */
-  static constexpr unsigned int BILLBOARDMODE_ALL
-    = TransformNode::BILLBOARDMODE_ALL;
+  static constexpr unsigned int BILLBOARDMODE_ALL = TransformNode::BILLBOARDMODE_ALL;
 
   /**
    * Billboard on using position instead of orientation
@@ -167,15 +161,14 @@ public:
   template <typename... Ts>
   static AbstractMeshPtr New(Ts&&... args)
   {
-    auto mesh = std::shared_ptr<AbstractMesh>(
-      new AbstractMesh(std::forward<Ts>(args)...));
+    auto mesh = std::shared_ptr<AbstractMesh>(new AbstractMesh(std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
     return mesh;
   }
-  ~AbstractMesh(); // = default
+  ~AbstractMesh() override; // = default
 
-  virtual Type type() const override;
+  Type type() const override;
   void addToScene(const AbstractMeshPtr& newMesh);
 
   /**
@@ -200,10 +193,9 @@ public:
   /**
    * @brief Hidden
    */
-  AbstractActionManagerPtr
-  _getActionManagerForTrigger(const std::optional<unsigned int>& trigger
-                              = std::nullopt,
-                              bool initialCall = true) override;
+  AbstractActionManagerPtr _getActionManagerForTrigger(const std::optional<unsigned int>& trigger
+                                                       = std::nullopt,
+                                                       bool initialCall = true) override;
 
   /**
    * @brief Hidden
@@ -282,17 +274,15 @@ public:
    * @returns the currentAbstractMesh
    * @see https://www.babylonjs-playground.com/#19O9TU#0
    */
-  AbstractMesh& enableEdgesRendering(float epsilon = 0.95f,
-                                     bool checkVerticesInsteadOfIndices
-                                     = false);
+  AbstractMesh& enableEdgesRendering(float epsilon                      = 0.95f,
+                                     bool checkVerticesInsteadOfIndices = false);
 
   /**
    * @brief Returns the mesh itself by default. Implemented by child classes.
    * @param camera defines the camera to use to pick the right LOD level
    * @returns the currentAbstractMesh
    */
-  virtual AbstractMesh* getLOD(const CameraPtr& camera,
-                               BoundingSphere* boundingSphere = nullptr);
+  virtual AbstractMesh* getLOD(const CameraPtr& camera, BoundingSphere* boundingSphere = nullptr);
 
   /**
    * @brief Returns 0 by default. Implemented by child classes.
@@ -304,8 +294,7 @@ public:
    * @brief Returns null by default. Implemented by child classes.
    * @returns null
    */
-  virtual Uint32Array getIndices(bool copyWhenShared = false,
-                                 bool forceCopy      = false) override;
+  Uint32Array getIndices(bool copyWhenShared = false, bool forceCopy = false) override;
 
   /**
    * @brief Returns the array of the requested vertex data kind. Implemented by
@@ -313,9 +302,8 @@ public:
    * @param kind defines the vertex data kind to use
    * @returns null
    */
-  virtual Float32Array getVerticesData(const std::string& kind,
-                                       bool copyWhenShared = false,
-                                       bool forceCopy      = false) override;
+  Float32Array getVerticesData(const std::string& kind, bool copyWhenShared = false,
+                               bool forceCopy = false) override;
 
   /**
    * @brief Sets the vertex data of the mesh geometry for the requested `kind`.
@@ -344,10 +332,9 @@ public:
    * null and in this case will be deduced from vertex data kind
    * @returns the current mesh
    */
-  virtual AbstractMesh*
-  setVerticesData(const std::string& kind, const Float32Array& data,
-                  bool updatable                      = false,
-                  const std::optional<size_t>& stride = std::nullopt) override;
+  AbstractMesh* setVerticesData(const std::string& kind, const Float32Array& data,
+                                bool updatable                      = false,
+                                const std::optional<size_t>& stride = std::nullopt) override;
 
   /**
    * @brief Updates the existing vertex data of the mesh geometry for the
@@ -374,10 +361,8 @@ public:
    * data and is set to the mesh
    * @returns the current mesh
    */
-  virtual AbstractMesh* updateVerticesData(const std::string& kind,
-                                           const Float32Array& data,
-                                           bool updateExtends = false,
-                                           bool makeItUnique  = false) override;
+  AbstractMesh* updateVerticesData(const std::string& kind, const Float32Array& data,
+                                   bool updateExtends = false, bool makeItUnique = false) override;
 
   /**
    * @brief Sets the mesh indices,
@@ -388,16 +373,15 @@ public:
    * @param totalVertices Defines the total number of vertices
    * @returns the current mesh
    */
-  virtual AbstractMesh* setIndices(const IndicesArray& indices,
-                                   size_t totalVertices = 0,
-                                   bool updatable       = false) override;
+  AbstractMesh* setIndices(const IndicesArray& indices, size_t totalVertices = 0,
+                           bool updatable = false) override;
 
   /**
    * @brief Gets a boolean indicating if specific vertex data is present.
    * @param kind defines the vertex data kind to use
    * @returns true is data kind is present
    */
-  virtual bool isVerticesDataPresent(const std::string& kind) const override;
+  bool isVerticesDataPresent(const std::string& kind) const override;
 
   /**
    * @brief Returns the mesh BoundingInfo object or creates a new one and
@@ -419,10 +403,9 @@ public:
    * when selecting which object should be included when scaling
    * @returns the current mesh
    */
-  AbstractMesh& normalizeToUnitCube(
-    bool includeDescendants = true, bool ignoreRotation = false,
-    const std::function<bool(const AbstractMeshPtr& node)>& predicate
-    = nullptr);
+  AbstractMesh&
+  normalizeToUnitCube(bool includeDescendants = true, bool ignoreRotation = false,
+                      const std::function<bool(const AbstractMeshPtr& node)>& predicate = nullptr);
 
   /**
    * @brief Overwrite the current bounding info.
@@ -509,8 +492,7 @@ public:
    * @param tiltRight defines the tilt
    * @returns the current mesh
    */
-  AbstractMesh& rotatePOV(float flipBack, float twirlClockwise,
-                          float tiltRight);
+  AbstractMesh& rotatePOV(float flipBack, float twirlClockwise, float tiltRight);
 
   /**
    * @brief Calculate relative rotation change from the point of view of behind
@@ -536,8 +518,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _refreshBoundingInfo(const Float32Array& data,
-                            const std::optional<Vector2>& bias);
+  void _refreshBoundingInfo(const Float32Array& data, const std::optional<Vector2>& bias);
 
   /**
    * @brief Hidden
@@ -561,8 +542,7 @@ public:
    * @param frustumPlanes defines the frustum to test
    * @returns true if the mesh is in the frustum planes
    */
-  bool isInFrustum(const std::array<Plane, 6>& frustumPlanes,
-                   unsigned int strategy = 0) override;
+  bool isInFrustum(const std::array<Plane, 6>& frustumPlanes, unsigned int strategy = 0) override;
 
   /**
    * @brief Returns `true` if the mesh is completely in the frustum defined be
@@ -571,8 +551,7 @@ public:
    * @param frustumPlanes defines the frustum to test
    * @returns true if the mesh is completely in the frustum planes
    */
-  bool
-  isCompletelyInFrustum(const std::array<Plane, 6>& frustumPlanes) override;
+  bool isCompletelyInFrustum(const std::array<Plane, 6>& frustumPlanes) override;
 
   /**
    * @brief True if the mesh intersects another mesh or a SolidParticle object.
@@ -584,8 +563,7 @@ public:
    * parameters intersects with the current mesh or any child meshes
    * @returns true if there is an intersection
    */
-  bool intersectsMesh(AbstractMesh& mesh, bool precise = false,
-                      bool includeDescendants = false);
+  bool intersectsMesh(AbstractMesh& mesh, bool precise = false, bool includeDescendants = false);
 
   /**
    * @brief True if the mesh intersects another mesh or a SolidParticle object.
@@ -597,8 +575,7 @@ public:
    * parameters intersects with the current mesh or any child meshes
    * @returns true if there is an intersection
    */
-  bool intersectsMesh(SolidParticle& sp, bool precise = false,
-                      bool includeDescendants = false);
+  bool intersectsMesh(SolidParticle& sp, bool precise = false, bool includeDescendants = false);
 
   /**
    * @brief Returns true if the passed point (Vector3) is inside the mesh
@@ -635,8 +612,7 @@ public:
    * @returns the current mesh
    * @see https://www.babylonjs-playground.com/#0BS5U0#0
    */
-  AbstractMesh& setPhysicsLinkWith(Mesh* otherMesh, const Vector3& pivot1,
-                                   const Vector3& pivot2,
+  AbstractMesh& setPhysicsLinkWith(Mesh* otherMesh, const Vector3& pivot1, const Vector3& pivot2,
                                    const PhysicsParams& options);
 
   /** Collisions **/
@@ -664,23 +640,20 @@ public:
    * @see https://www.babylonjs-playground.com/#NA4OQ#12
    * @see http://doc.babylonjs.com/how_to/optimizing_your_scene_with_octrees
    */
-  Octree<SubMesh*>* createOrUpdateSubmeshesOctree(size_t maxCapacity = 64,
-                                                  size_t maxDepth    = 2);
+  Octree<SubMesh*>* createOrUpdateSubmeshesOctree(size_t maxCapacity = 64, size_t maxDepth = 2);
 
   /** Collisions **/
 
   /**
    * @brief Hidden
    */
-  AbstractMesh& _collideForSubMesh(SubMesh* subMesh,
-                                   const Matrix& transformMatrix,
+  AbstractMesh& _collideForSubMesh(SubMesh* subMesh, const Matrix& transformMatrix,
                                    Collider& collider);
 
   /**
    * @brief Hidden
    */
-  AbstractMesh& _processCollisionsForSubMeshes(Collider& collider,
-                                               const Matrix& transformMatrix);
+  AbstractMesh& _processCollisionsForSubMeshes(Collider& collider, const Matrix& transformMatrix);
 
   /**
    * @brief Hidden
@@ -704,9 +677,8 @@ public:
    * @returns the picking info
    * @see http://doc.babylonjs.com/babylon101/intersect_collisions_-_mesh
    */
-  virtual PickingInfo
-  intersects(Ray& ray, bool fastCheck = true,
-             const TrianglePickingPredicate& trianglePredicate = nullptr);
+  virtual PickingInfo intersects(Ray& ray, bool fastCheck = true,
+                                 const TrianglePickingPredicate& trianglePredicate = nullptr);
 
   /**
    * @brief Clones the current mesh.
@@ -716,8 +688,7 @@ public:
    * not be cloned (false by default)
    * @returns the new mesh
    */
-  AbstractMesh* clone(const std::string& name, Node* newParent,
-                      bool doNotCloneChildren = true);
+  AbstractMesh* clone(const std::string& name, Node* newParent, bool doNotCloneChildren = true);
 
   /**
    * @brief Disposes all the submeshes of the current meshes.
@@ -732,8 +703,7 @@ public:
    * @param disposeMaterialAndTextures Set to true to also dispose referenced
    * materials and textures (false by default)
    */
-  virtual void dispose(bool doNotRecurse               = false,
-                       bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Adds the passed mesh as a child to the current mesh.
@@ -852,9 +822,9 @@ public:
    * @returns the face index if found (or null instead)
    * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata
    */
-  int getClosestFacetAtCoordinates(float x, float y, float z,
-                                   Vector3& projected, bool projectedSet = true,
-                                   bool checkFace = false, bool facing = true);
+  int getClosestFacetAtCoordinates(float x, float y, float z, Vector3& projected,
+                                   bool projectedSet = true, bool checkFace = false,
+                                   bool facing = true);
 
   /**
    * @brief Returns the closest mesh facet index at (x,y,z) local coordinates,
@@ -873,11 +843,9 @@ public:
    * @returns the face index if found (or null instead)
    * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata
    */
-  int getClosestFacetAtLocalCoordinates(float x, float y, float z,
-                                        Vector3& projected,
-                                        bool projectedSet = true,
-                                        bool checkFace    = false,
-                                        bool facing       = true);
+  int getClosestFacetAtLocalCoordinates(float x, float y, float z, Vector3& projected,
+                                        bool projectedSet = true, bool checkFace = false,
+                                        bool facing = true);
 
   /**
    * @brief Returns the object "parameter" set with all the expected parameters
@@ -905,9 +873,8 @@ public:
    * @returns the current mesh
    */
   virtual AbstractMesh& updateIndices(const IndicesArray& indices,
-                                      const std::optional<int>& offset
-                                      = std::nullopt,
-                                      bool gpuMemoryOnly = false);
+                                      const std::optional<int>& offset = std::nullopt,
+                                      bool gpuMemoryOnly               = false);
 
   /**
    * @brief Creates new normals data for the mesh.
@@ -924,8 +891,7 @@ public:
    * the (0, 1, 0) by default)
    * @returns the current mesh
    */
-  AbstractMesh& alignWithNormal(Vector3& normal,
-                                const Vector3& upDirection = Axis::Y());
+  AbstractMesh& alignWithNormal(Vector3& normal, const Vector3& upDirection = Axis::Y());
 
   /**
    * @brief Hidden
@@ -1031,14 +997,12 @@ protected:
   /**
    * @brief Set a function to call when this mesh collides with another one.
    */
-  void set_onCollide(
-    const std::function<void(AbstractMesh*, EventState&)>& callback);
+  void set_onCollide(const std::function<void(AbstractMesh*, EventState&)>& callback);
 
   /**
    * @brief An event triggered when the collision's position changes.
    */
-  void set_onCollisionPositionChange(
-    const std::function<void(Vector3*, EventState&)>& callback);
+  void set_onCollisionPositionChange(const std::function<void(Vector3*, EventState&)>& callback);
 
   /**
    * @brief Flag to check the progress status of the query.
@@ -1392,15 +1356,13 @@ private:
   /**
    * @brief Hidden
    */
-  void _markSubMeshesAsDirty(
-    const std::function<void(MaterialDefines& defines)>& func);
+  void _markSubMeshesAsDirty(const std::function<void(MaterialDefines& defines)>& func);
 
   /**
    * @brief Hidden
    */
   void _onCollisionPositionChange(int collisionId, Vector3& newPosition,
-                                  const AbstractMeshPtr& collidedMesh
-                                  = nullptr);
+                                  const AbstractMeshPtr& collidedMesh = nullptr);
   // Facet data
 
   /**
@@ -1471,9 +1433,7 @@ public:
   /**
    * The function to call when this mesh collides with another one
    */
-  WriteOnlyProperty<AbstractMesh,
-                    std::function<void(AbstractMesh*, EventState&)>>
-    onCollide;
+  WriteOnlyProperty<AbstractMesh, std::function<void(AbstractMesh*, EventState&)>> onCollide;
 
   /**
    * An event triggered when the collision's position changes
@@ -1508,8 +1468,7 @@ public:
    * Access property
    * Hidden
    */
-  ReadOnlyProperty<AbstractMesh, _OcclusionDataStoragePtr>
-    _occlusionDataStorage;
+  ReadOnlyProperty<AbstractMesh, _OcclusionDataStoragePtr> _occlusionDataStorage;
 
   /**
    * This number indicates the number of allowed retries before stop the

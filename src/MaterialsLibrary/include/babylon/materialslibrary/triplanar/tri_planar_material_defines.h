@@ -10,7 +10,7 @@ namespace MaterialsLibrary {
 struct BABYLON_SHARED_EXPORT TriPlanarMaterialDefines : public MaterialDefines {
 
   TriPlanarMaterialDefines();
-  ~TriPlanarMaterialDefines(); // = default
+  ~TriPlanarMaterialDefines() override; // = default
 
 }; // end of struct TriPlanarMaterialDefines
 

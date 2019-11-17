@@ -53,13 +53,12 @@ public:
   template <typename... Ts>
   static GlowLayerPtr New(Ts&&... args)
   {
-    auto layer
-      = std::shared_ptr<GlowLayer>(new GlowLayer(std::forward<Ts>(args)...));
+    auto layer = std::shared_ptr<GlowLayer>(new GlowLayer(std::forward<Ts>(args)...));
     layer->addToScene(layer);
 
     return layer;
   }
-  ~GlowLayer(); // = default
+  ~GlowLayer() override; // = default
 
   /**
    * @brief Get the effect name of the layer.
@@ -146,8 +145,7 @@ public:
    * @param rootUrl defines the root URL containing the glow layer information
    * @returns a parsed Glow Layer
    */
-  static GlowLayer* Parse(const json& parsedGlowLayer, Scene* scene,
-                          const std::string& rootUrl);
+  static GlowLayer* Parse(const json& parsedGlowLayer, Scene* scene, const std::string& rootUrl);
 
 protected:
   /**
@@ -158,8 +156,7 @@ protected:
    * IGlowLayerOptions for more information)
    */
   GlowLayer(const std::string& name, Scene* scene);
-  GlowLayer(const std::string& name, Scene* scene,
-            const IGlowLayerOptions& options);
+  GlowLayer(const std::string& name, Scene* scene, const IGlowLayerOptions& options);
 
   /**
    * @brief Sets the kernel size of the blur.
@@ -199,8 +196,7 @@ protected:
    * @param material The material used on the mesh
    * @returns true if it can be rendered otherwise false
    */
-  bool _canRenderMesh(const AbstractMeshPtr& mesh,
-                      const MaterialPtr& material) const override;
+  bool _canRenderMesh(const AbstractMeshPtr& mesh, const MaterialPtr& material) const override;
 
   /**
    * @brief Implementation specific of rendering the generating effect on the
@@ -234,15 +230,13 @@ public:
    * Callback used to let the user override the color selection on a per mesh
    * basis
    */
-  std::function<void(const MeshPtr& mesh, SubMesh* subMesh, Material* material,
-                     Color4& result)>
+  std::function<void(const MeshPtr& mesh, SubMesh* subMesh, Material* material, Color4& result)>
     customEmissiveColorSelector;
   /**
    * Callback used to let the user override the texture selection on a per mesh
    * basis
    */
-  std::function<TexturePtr(const MeshPtr& mesh, SubMesh* subMesh,
-                           const MaterialPtr& material)>
+  std::function<TexturePtr(const MeshPtr& mesh, SubMesh* subMesh, const MaterialPtr& material)>
     customEmissiveTextureSelector;
 
   Property<GlowLayer, float> blurKernelSize;

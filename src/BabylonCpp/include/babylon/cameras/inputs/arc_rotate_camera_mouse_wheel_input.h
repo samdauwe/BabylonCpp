@@ -14,15 +14,14 @@ namespace BABYLON {
  * @brief Manage the mouse wheel inputs to control an arc rotate camera.
  * @see http://doc.babylonjs.com/how_to/customizing_camera_inputs
  */
-class BABYLON_SHARED_EXPORT ArcRotateCameraMouseWheelInput
-    : public ICameraInput<ArcRotateCamera> {
+class BABYLON_SHARED_EXPORT ArcRotateCameraMouseWheelInput : public ICameraInput<ArcRotateCamera> {
 
 public:
   /**
    * @brief Instantiate the input.
    */
   ArcRotateCameraMouseWheelInput();
-  virtual ~ArcRotateCameraMouseWheelInput(); // = default
+  ~ArcRotateCameraMouseWheelInput() override; // = default
 
   /**
    * @brief Attach the input controls to a specific dom element to get the input
@@ -60,8 +59,8 @@ public:
   const std::string getSimpleName() const override;
 
 private:
-  float computeDeltaFromMouseWheelLegacyEvent(
-    const MouseWheelEvent& mouseWheelLegacyEvent, float radius) const;
+  float computeDeltaFromMouseWheelLegacyEvent(const MouseWheelEvent& mouseWheelLegacyEvent,
+                                              float radius) const;
 
 public:
   /**

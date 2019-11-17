@@ -189,7 +189,7 @@ public:
 
     return mesh;
   }
-  ~Mesh(); // = default
+  ~Mesh() override; // = default
 
   // Methods
   TransformNodePtr instantiateHierarychy(TransformNode* newParent = nullptr);
@@ -204,7 +204,7 @@ public:
    * @brief Returns the class type.
    * @return the class type.
    */
-  virtual Type type() const override;
+  Type type() const override;
 
   /** Methods **/
 
@@ -826,7 +826,7 @@ public:
    * @param disposeMaterialAndTextures Set to true to also dispose referenced
    * materials and textures (false by default)
    */
-  virtual void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /** Geometric tools **/
 

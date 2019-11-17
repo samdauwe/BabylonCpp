@@ -28,7 +28,7 @@ public:
    * @param scene The scene the texture will be used in
    */
   ColorGradingTexture(const std::string& url, Scene* scene);
-  ~ColorGradingTexture(); // = default
+  ~ColorGradingTexture() override; // = default
 
   /**
    * @brief Returns the texture matrix used in most of the material.
@@ -54,8 +54,8 @@ public:
    * @param rootUrl The root url of the data assets to load
    * @return A color gradind texture
    */
-  static std::unique_ptr<ColorGradingTexture>
-  Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
+  static std::unique_ptr<ColorGradingTexture> Parse(const json& parsedTexture, Scene* scene,
+                                                    const std::string& rootUrl);
 
   /**
    * @brief Serializes the LUT texture to json format.

@@ -56,13 +56,12 @@ public:
   template <typename... Ts>
   static HighlightLayerPtr New(Ts&&... args)
   {
-    auto layer = std::shared_ptr<HighlightLayer>(
-      new HighlightLayer(std::forward<Ts>(args)...));
+    auto layer = std::shared_ptr<HighlightLayer>(new HighlightLayer(std::forward<Ts>(args)...));
     layer->addToScene(layer);
 
     return layer;
   }
-  ~HighlightLayer(); // = default
+  ~HighlightLayer() override; // = default
 
   /**
    * @brief Get the effect name of the layer.
@@ -122,8 +121,7 @@ public:
    * @param color The color of the highlight
    * @param glowEmissiveOnly Extract the glow from the emissive texture
    */
-  void addMesh(const MeshPtr& mesh, const Color3& color,
-               bool glowEmissiveOnly = false);
+  void addMesh(const MeshPtr& mesh, const Color3& color, bool glowEmissiveOnly = false);
 
   /**
    * @brief Remove a mesh from the highlight layer in order to make it stop
@@ -177,8 +175,7 @@ protected:
    * IHighlightLayerOptions for more information)
    */
   HighlightLayer(const std::string& name, Scene* scene);
-  HighlightLayer(const std::string& name, Scene* scene,
-                 const IHighlightLayerOptions& options);
+  HighlightLayer(const std::string& name, Scene* scene, const IHighlightLayerOptions& options);
 
   /**
    * @brief Create the merge effect. This is the shader use to blit the

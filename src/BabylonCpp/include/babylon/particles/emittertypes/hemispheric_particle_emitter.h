@@ -11,8 +11,7 @@ namespace BABYLON {
  * It emits the particles alongside the hemisphere radius. The emission
  * direction might be randomized.
  */
-class BABYLON_SHARED_EXPORT HemisphericParticleEmitter
-    : public IParticleEmitterType {
+class BABYLON_SHARED_EXPORT HemisphericParticleEmitter : public IParticleEmitterType {
 
 public:
   /**
@@ -25,7 +24,7 @@ public:
    */
   HemisphericParticleEmitter(float radius = 1.f, float radiusRange = 1.f,
                              float directionRandomizer = 0.f);
-  virtual ~HemisphericParticleEmitter(); // = default
+  ~HemisphericParticleEmitter() override; // = default
 
   /**
    * @brief Called by the particle System when the direction is computed for the
@@ -34,8 +33,7 @@ public:
    * @param directionToUpdate is the direction vector to update with the result
    * @param particle is the particle we are computed the direction for
    */
-  void startDirectionFunction(const Matrix& worldMatrix,
-                              Vector3& directionToUpdate,
+  void startDirectionFunction(const Matrix& worldMatrix, Vector3& directionToUpdate,
                               Particle* particle) override;
 
   /**
@@ -45,8 +43,7 @@ public:
    * @param positionToUpdate is the position vector to update with the result
    * @param particle is the particle we are computed the position for
    */
-  void startPositionFunction(const Matrix& worldMatrix,
-                             Vector3& positionToUpdate,
+  void startPositionFunction(const Matrix& worldMatrix, Vector3& positionToUpdate,
                              Particle* particle) override;
 
   /**

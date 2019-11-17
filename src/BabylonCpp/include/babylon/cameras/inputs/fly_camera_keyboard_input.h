@@ -14,15 +14,14 @@ class KeyboardInfo;
  * @brief Listen to keyboard events to control the camera.
  * @see http://doc.babylonjs.com/how_to/customizing_camera_inputs
  */
-class BABYLON_SHARED_EXPORT FlyCameraKeyboardInput
-    : public ICameraInput<FlyCamera> {
+class BABYLON_SHARED_EXPORT FlyCameraKeyboardInput : public ICameraInput<FlyCamera> {
 
 public:
   /**
    * @brief Instantiate the input.
    */
   FlyCameraKeyboardInput();
-  virtual ~FlyCameraKeyboardInput(); // = default
+  ~FlyCameraKeyboardInput() override; // = default
 
   /**
    * @brief Attach the input controls to a specific dom element to get the input

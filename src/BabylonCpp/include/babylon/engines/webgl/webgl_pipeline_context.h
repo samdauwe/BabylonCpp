@@ -27,7 +27,7 @@ class BABYLON_SHARED_EXPORT WebGLPipelineContext : public IPipelineContext {
 
 public:
   WebGLPipelineContext();
-  ~WebGLPipelineContext(); // = default
+  ~WebGLPipelineContext() override; // = default
 
   void _handlesSpectorRebuildCallback(
     const std::function<void(const GL::IGLProgramPtr& program)>& onCompiled);

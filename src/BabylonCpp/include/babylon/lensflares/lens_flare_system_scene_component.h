@@ -16,23 +16,20 @@ namespace BABYLON {
 class AbstractScene;
 class Camera;
 class LensFlareSystemSceneComponent;
-using LensFlareSystemSceneComponentPtr
-  = std::shared_ptr<LensFlareSystemSceneComponent>;
+using LensFlareSystemSceneComponentPtr = std::shared_ptr<LensFlareSystemSceneComponent>;
 
 /**
  * @brief Defines the lens flare scene component responsible to manage any lens
  * flares in a given scene.
  */
-class BABYLON_SHARED_EXPORT LensFlareSystemSceneComponent
-    : public ISceneComponent {
+class BABYLON_SHARED_EXPORT LensFlareSystemSceneComponent : public ISceneComponent {
 
 public:
   /**
    * The component name helpfull to identify the component in the list of scene
    * components.
    */
-  static constexpr const char* name
-    = SceneComponentConstants::NAME_LENSFLARESYSTEM;
+  static constexpr const char* name = SceneComponentConstants::NAME_LENSFLARESYSTEM;
 
 public:
   template <typename... Ts>
@@ -41,7 +38,7 @@ public:
     return std::shared_ptr<LensFlareSystemSceneComponent>(
       new LensFlareSystemSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~LensFlareSystemSceneComponent(); // = default
+  ~LensFlareSystemSceneComponent() override; // = default
 
   /**
    * @brief Registers the component in a given scene.

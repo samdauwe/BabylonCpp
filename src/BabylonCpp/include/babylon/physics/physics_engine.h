@@ -31,10 +31,9 @@ public:
   template <typename... Ts>
   static PhysicsEnginePtr New(Ts&&... args)
   {
-    return std::shared_ptr<PhysicsEngine>(
-      new PhysicsEngine(std::forward<Ts>(args)...));
+    return std::shared_ptr<PhysicsEngine>(new PhysicsEngine(std::forward<Ts>(args)...));
   }
-  virtual ~PhysicsEngine(); // = default
+  ~PhysicsEngine() override; // = default
 
   /**
    * @brief Sets the gravity vector used by the simulation.
@@ -90,8 +89,7 @@ public:
    * impostor using this joint
    * @param joint defines the joint that will connect both impostors.
    */
-  void addJoint(PhysicsImpostor* mainImpostor,
-                PhysicsImpostor* connectedImpostor,
+  void addJoint(PhysicsImpostor* mainImpostor, PhysicsImpostor* connectedImpostor,
                 const std::shared_ptr<PhysicsJoint>& joint) final;
 
   /**
@@ -101,8 +99,7 @@ public:
    * one by the joint
    * @param joint defines the joint to remove
    */
-  void removeJoint(PhysicsImpostor* mainImpostor,
-                   PhysicsImpostor* connectedImpostor,
+  void removeJoint(PhysicsImpostor* mainImpostor, PhysicsImpostor* connectedImpostor,
                    PhysicsJoint* joint) final;
 
   /**
@@ -128,8 +125,7 @@ public:
    * @param object defines the object impersonated by the impostor
    * @returns the PhysicsImpostor or null if not found
    */
-  PhysicsImpostor*
-  getImpostorForPhysicsObject(IPhysicsEnabledObject* object) final;
+  PhysicsImpostor* getImpostorForPhysicsObject(IPhysicsEnabledObject* object) final;
 
   /**
    * @brief Gets the impostor for a physics body object.

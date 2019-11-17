@@ -48,56 +48,47 @@ public:
   /**
    * @brief Returns the triangle fill mode.
    */
-  static constexpr unsigned int TriangleFillMode
-    = Constants::MATERIAL_TriangleFillMode;
+  static constexpr unsigned int TriangleFillMode = Constants::MATERIAL_TriangleFillMode;
 
   /**
    * @brief Returns the wireframe mode.
    */
-  static constexpr unsigned int WireFrameFillMode
-    = Constants::MATERIAL_WireFrameFillMode;
+  static constexpr unsigned int WireFrameFillMode = Constants::MATERIAL_WireFrameFillMode;
 
   /**
    * @brief Returns the point fill mode.
    */
-  static constexpr unsigned int PointFillMode
-    = Constants::MATERIAL_PointFillMode;
+  static constexpr unsigned int PointFillMode = Constants::MATERIAL_PointFillMode;
 
   /**
    * @brief Returns the point list draw mode.
    */
-  static constexpr unsigned int PointListDrawMode
-    = Constants::MATERIAL_PointListDrawMode;
+  static constexpr unsigned int PointListDrawMode = Constants::MATERIAL_PointListDrawMode;
 
   /**
    * @brief Returns the line list draw mode.
    */
-  static constexpr unsigned int LineListDrawMode
-    = Constants::MATERIAL_LineListDrawMode;
+  static constexpr unsigned int LineListDrawMode = Constants::MATERIAL_LineListDrawMode;
 
   /**
    * @brief Returns the line loop draw mode.
    */
-  static constexpr unsigned int LineLoopDrawMode
-    = Constants::MATERIAL_LineLoopDrawMode;
+  static constexpr unsigned int LineLoopDrawMode = Constants::MATERIAL_LineLoopDrawMode;
 
   /**
    * @brief Returns the line strip draw mode.
    */
-  static constexpr unsigned int LineStripDrawMode
-    = Constants::MATERIAL_LineStripDrawMode;
+  static constexpr unsigned int LineStripDrawMode = Constants::MATERIAL_LineStripDrawMode;
 
   /**
    * @brief Returns the triangle strip draw mode.
    */
-  static constexpr unsigned int TriangleStripDrawMode
-    = Constants::MATERIAL_TriangleStripDrawMode;
+  static constexpr unsigned int TriangleStripDrawMode = Constants::MATERIAL_TriangleStripDrawMode;
 
   /**
    * @brief Returns the triangle fan draw mode.
    */
-  static constexpr unsigned int TriangleFanDrawMode
-    = Constants::MATERIAL_TriangleFanDrawMode;
+  static constexpr unsigned int TriangleFanDrawMode = Constants::MATERIAL_TriangleFanDrawMode;
 
   /**
    * @brief Returns the clock-wise side orientation.
@@ -114,53 +105,47 @@ public:
   /**
    * The dirty texture flag value
    */
-  static constexpr unsigned int TextureDirtyFlag
-    = Constants::MATERIAL_TextureDirtyFlag;
+  static constexpr unsigned int TextureDirtyFlag = Constants::MATERIAL_TextureDirtyFlag;
 
   /**
    * The dirty light flag value
    */
-  static constexpr unsigned int LightDirtyFlag
-    = Constants::MATERIAL_LightDirtyFlag;
+  static constexpr unsigned int LightDirtyFlag = Constants::MATERIAL_LightDirtyFlag;
 
   /**
    * The dirty fresnel flag value
    */
-  static constexpr unsigned int FresnelDirtyFlag
-    = Constants::MATERIAL_FresnelDirtyFlag;
+  static constexpr unsigned int FresnelDirtyFlag = Constants::MATERIAL_FresnelDirtyFlag;
 
   /**
    * The dirty attribute flag value
    */
-  static constexpr unsigned int AttributesDirtyFlag
-    = Constants::MATERIAL_AttributesDirtyFlag;
+  static constexpr unsigned int AttributesDirtyFlag = Constants::MATERIAL_AttributesDirtyFlag;
 
   /**
    * The dirty misc flag value
    */
-  static constexpr unsigned int MiscDirtyFlag
-    = Constants::MATERIAL_MiscDirtyFlag;
+  static constexpr unsigned int MiscDirtyFlag = Constants::MATERIAL_MiscDirtyFlag;
 
   /**
    * The all dirty flag value
    */
   static constexpr unsigned int AllDirtyFlag = Constants::MATERIAL_AllDirtyFlag;
 
-  virtual ~Material(); // = default
+  ~Material() override; // = default
 
-  virtual Type type() const override;
+  Type type() const override;
 
   /**
    * @brief Gets a property.
    */
-  virtual AnimationValue
-  getProperty(const std::vector<std::string>& targetPropertyPath) override;
+  AnimationValue getProperty(const std::vector<std::string>& targetPropertyPath) override;
 
   /**
    * @brief Sets a property.
    */
-  virtual void setProperty(const std::vector<std::string>& targetPropertyPath,
-                           const AnimationValue& value) override;
+  void setProperty(const std::vector<std::string>& targetPropertyPath,
+                   const AnimationValue& value) override;
 
   /**
    * @param Returns a string representation of the current material.
@@ -320,8 +305,7 @@ public:
    * @param name defines the new name for the duplicated material
    * @returns the cloned material
    */
-  virtual MaterialPtr clone(const std::string& name,
-                            bool cloneChildren = false) const;
+  virtual MaterialPtr clone(const std::string& name, bool cloneChildren = false) const;
 
   /**
    * @brief Gets the meshes bound to the material.
@@ -336,10 +320,9 @@ public:
    * compiled
    * @param options defines the options to configure the compilation
    */
-  void
-  forceCompilation(AbstractMesh* mesh,
-                   const std::function<void(Material* material)>& onCompiled,
-                   std::optional<bool> clipPlane = false);
+  void forceCompilation(AbstractMesh* mesh,
+                        const std::function<void(Material* material)>& onCompiled,
+                        std::optional<bool> clipPlane = false);
 
   /**
    * @brief Marks a define in the material to indicate that it needs to be
@@ -347,7 +330,7 @@ public:
    * @param flag defines a flag used to determine which parts of the material
    * have to be marked as dirty
    */
-  virtual void markAsDirty(unsigned int flag) override;
+  void markAsDirty(unsigned int flag) override;
 
   /**
    * @brief Disposes the material.
@@ -358,9 +341,8 @@ public:
    * @param notBoundToMesh specifies if the material that is being disposed is
    * known to be not bound to any mesh
    */
-  virtual void dispose(bool forceDisposeEffect   = false,
-                       bool forceDisposeTextures = false,
-                       bool notBoundToMesh       = false);
+  virtual void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
+                       bool notBoundToMesh = false);
 
   /**
    * Serializes this material.
@@ -368,10 +350,9 @@ public:
    */
   json serialize() const;
 
-  virtual void
-  trackCreation(const std::function<void(const EffectPtr& effect)>& onCompiled,
-                const std::function<void(const EffectPtr& effect,
-                                         const std::string& errors)>& onError);
+  virtual void trackCreation(
+    const std::function<void(const EffectPtr& effect)>& onCompiled,
+    const std::function<void(const EffectPtr& effect, const std::string& errors)>& onError);
 
   void addMaterialToScene(const MaterialPtr& newMaterial);
   void addMultiMaterialToScene(const MultiMaterialPtr& newMultiMaterial);
@@ -384,8 +365,7 @@ public:
    * @param scene defines the hosting scene
    * @returns a new MultiMaterial
    */
-  static MultiMaterialPtr ParseMultiMaterial(const json& parsedMultiMaterial,
-                                             Scene* scene);
+  static MultiMaterialPtr ParseMultiMaterial(const json& parsedMultiMaterial, Scene* scene);
 
   /**
    * @brief Creates a material from parsed material data.
@@ -394,8 +374,7 @@ public:
    * @param rootUrl defines the root URL to use to load textures
    * @returns a new material
    */
-  static MaterialPtr Parse(const json& parsedMaterial, Scene* scene,
-                           const std::string& rootUrl);
+  static MaterialPtr Parse(const json& parsedMaterial, Scene* scene, const std::string& rootUrl);
 
 protected:
   /**
@@ -436,8 +415,7 @@ protected:
   /**
    * @brief Called during a dispose event.
    */
-  void
-  set_onDispose(const std::function<void(Material*, EventState&)>& callback);
+  void set_onDispose(const std::function<void(Material*, EventState&)>& callback);
 
   /**
    * @brief An event triggered when the material is bound.
@@ -447,8 +425,7 @@ protected:
   /**
    * @brief Called during a bind event.
    */
-  void
-  set_onBind(const std::function<void(AbstractMesh*, EventState&)>& callback);
+  void set_onBind(const std::function<void(AbstractMesh*, EventState&)>& callback);
 
   /**
    * @brief An event triggered when the material is unbound.
@@ -612,8 +589,7 @@ protected:
   void _markAllSubMeshesAsTexturesAndMiscDirty();
 
 private:
-  void releaseVertexArrayObject(const AbstractMeshPtr& mesh,
-                                bool forceDisposeEffect = false);
+  void releaseVertexArrayObject(const AbstractMeshPtr& mesh, bool forceDisposeEffect = false);
 
 public:
   // Events
@@ -706,8 +682,7 @@ public:
   /**
    * Called during a dispose event
    */
-  WriteOnlyProperty<Material, std::function<void(Material*, EventState&)>>
-    onDispose;
+  WriteOnlyProperty<Material, std::function<void(Material*, EventState&)>> onDispose;
 
   /**
    * An event triggered when the material is bound
@@ -717,8 +692,7 @@ public:
   /**
    * Called during a bind event
    */
-  WriteOnlyProperty<Material, std::function<void(AbstractMesh*, EventState&)>>
-    onBind;
+  WriteOnlyProperty<Material, std::function<void(AbstractMesh*, EventState&)>> onBind;
 
   /**
    * An event triggered when the material is unbound

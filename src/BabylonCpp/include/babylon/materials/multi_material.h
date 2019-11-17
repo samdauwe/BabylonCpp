@@ -21,13 +21,12 @@ public:
   template <typename... Ts>
   static MultiMaterialPtr New(Ts&&... args)
   {
-    auto material = std::shared_ptr<MultiMaterial>(
-      new MultiMaterial(std::forward<Ts>(args)...));
+    auto material = std::shared_ptr<MultiMaterial>(new MultiMaterial(std::forward<Ts>(args)...));
     material->addMultiMaterialToScene(material);
 
     return material;
   }
-  virtual ~MultiMaterial(); // = default
+  ~MultiMaterial() override; // = default
 
   /**
    * @brief Function used to align with Node.getChildren().
@@ -78,8 +77,7 @@ public:
    * the parent instance
    * @returns the cloned material
    */
-  MaterialPtr clone(const std::string& _name,
-                    bool cloneChildren = false) const override;
+  MaterialPtr clone(const std::string& _name, bool cloneChildren = false) const override;
 
   /**
    * @brief Serializes the materials into a JSON representation.
@@ -99,8 +97,7 @@ public:
    * associated submaterials (if false, they will not be disposed and can still
    * be use elsewhere in the app)
    */
-  void dispose(bool forceDisposeEffect   = false,
-               bool forceDisposeTextures = false,
+  void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
                bool forceDisposeChildren = false) override;
 
   /**
@@ -109,8 +106,7 @@ public:
    * @param scene defines the hosting scene
    * @returns a new MultiMaterial
    */
-  static MultiMaterialPtr ParseMultiMaterial(const json& parsedMultiMaterial,
-                                             Scene* scene);
+  static MultiMaterialPtr ParseMultiMaterial(const json& parsedMultiMaterial, Scene* scene);
 
 protected:
   /**

@@ -44,13 +44,13 @@ public:
   template <typename... Ts>
   static StandardMaterialPtr New(Ts&&... args)
   {
-    auto material = std::shared_ptr<StandardMaterial>(
-      new StandardMaterial(std::forward<Ts>(args)...));
+    auto material
+      = std::shared_ptr<StandardMaterial>(new StandardMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;
   }
-  ~StandardMaterial(); // = default
+  ~StandardMaterial() override; // = default
 
   /**
    * @brief Gets the current class name of the material e.g. "StandardMaterial".
@@ -136,17 +136,15 @@ public:
    * @param forceDisposeTextures specifies if textures should be forcefully
    * disposed
    */
-  virtual void dispose(bool forceDisposeEffect   = false,
-                       bool forceDisposeTextures = false,
-                       bool notBoundToMesh       = false) override;
+  void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
+               bool notBoundToMesh = false) override;
 
   /**
    * @brief Makes a duplicate of the material, and gives it a new name.
    * @param name defines the new name for the duplicated material
    * @returns the cloned material
    */
-  MaterialPtr clone(const std::string& name,
-                    bool cloneChildren = false) const override;
+  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
 
   /**
    * @brief Serializes this material in a JSON representation.
@@ -162,8 +160,7 @@ public:
    * dependencies
    * @returns a new standard material
    */
-  static StandardMaterialPtr Parse(const json& source, Scene* scene,
-                                   const std::string& rootUrl);
+  static StandardMaterialPtr Parse(const json& source, Scene* scene, const std::string& rootUrl);
 
   /**
    * Are diffuse textures enabled in the application.
@@ -321,8 +318,7 @@ protected:
    *
    * If sets to null, the scene one is in use.
    */
-  void
-  set_imageProcessingConfiguration(ImageProcessingConfiguration* const& value);
+  void set_imageProcessingConfiguration(ImageProcessingConfiguration* const& value);
 
   /**
    * @brief Gets whether the color curves effect is enabled.
@@ -441,8 +437,7 @@ protected:
    * Attaches a new image processing configuration to the Standard Material.
    * @param configuration
    */
-  void _attachImageProcessingConfiguration(
-    ImageProcessingConfiguration* configuration);
+  void _attachImageProcessingConfiguration(ImageProcessingConfiguration* configuration);
 
   bool _shouldUseAlphaFromDiffuseTexture() const;
   bool _checkCache(Scene* scene, AbstractMesh* mesh, bool useInstances = false);
@@ -708,17 +703,15 @@ public:
    * Custom callback helping to override the default shader used in the
    * material.
    */
-  std::function<std::string(
-    const std::string& shaderName, std::vector<std::string>& uniforms,
-    std::vector<std::string>& uniformBuffers,
-    std::vector<std::string>& samplers, StandardMaterialDefines& defines)>
+  std::function<std::string(const std::string& shaderName, std::vector<std::string>& uniforms,
+                            std::vector<std::string>& uniformBuffers,
+                            std::vector<std::string>& samplers, StandardMaterialDefines& defines)>
     customShaderNameResolve;
 
   /**
    * The image processing configuration used either in this material
    */
-  Property<StandardMaterial, ImageProcessingConfiguration*>
-    imageProcessingConfiguration;
+  Property<StandardMaterial, ImageProcessingConfiguration*> imageProcessingConfiguration;
 
   /**
    * Whether the color curves effect is enabled

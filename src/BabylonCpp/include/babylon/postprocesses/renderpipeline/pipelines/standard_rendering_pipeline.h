@@ -36,9 +36,8 @@ using StandardRenderingPipelinePtr = std::shared_ptr<StandardRenderingPipeline>;
  * be kept for backwards compatibility.
  * @see https://doc.babylonjs.com/how_to/using_standard_rendering_pipeline
  */
-class BABYLON_SHARED_EXPORT StandardRenderingPipeline
-    : public PostProcessRenderPipeline,
-      public IAnimatable {
+class BABYLON_SHARED_EXPORT StandardRenderingPipeline : public PostProcessRenderPipeline,
+                                                        public IAnimatable {
 
 public:
   /**
@@ -56,7 +55,7 @@ public:
 
     return renderingPipeline;
   }
-  virtual ~StandardRenderingPipeline(); // = default
+  ~StandardRenderingPipeline() override; // = default
 
   void addToScene(const StandardRenderingPipelinePtr& renderingPipeline);
   Type type() const override;
@@ -71,8 +70,7 @@ public:
   /**
    * @brief Dispose of the pipeline and stop all post processes.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Serialize the rendering pipeline (Used when exporting).
@@ -87,8 +85,8 @@ public:
    * @param rootUrl The URL of the serialized pipeline.
    * @returns An instantiated pipeline from the serialized object.
    */
-  static std::unique_ptr<StandardRenderingPipeline>
-  Parse(const json& source, Scene* scene, const std::string& url);
+  static std::unique_ptr<StandardRenderingPipeline> Parse(const json& source, Scene* scene,
+                                                          const std::string& url);
 
 protected:
   /**

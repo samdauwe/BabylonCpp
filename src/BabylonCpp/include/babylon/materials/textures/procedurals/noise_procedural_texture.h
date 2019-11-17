@@ -28,7 +28,7 @@ public:
 
     return texture;
   }
-  ~NoiseProceduralTexture(); // = default
+  ~NoiseProceduralTexture() override; // = default
 
   /**
    * @brief Generate the current state of the procedural texture.
@@ -48,8 +48,7 @@ public:
    * @param scene defines the current scene
    * @returns a parsed NoiseProceduralTexture
    */
-  static NoiseProceduralTexturePtr Parse(const json& serializationObject,
-                                         Scene* scene);
+  static NoiseProceduralTexturePtr Parse(const json& serializationObject, Scene* scene);
 
 protected:
   /**
@@ -62,10 +61,8 @@ protected:
    * @param generateMipMaps defines if mipmaps must be generated (true by
    * default)
    */
-  NoiseProceduralTexture(const std::string& name, int size = 256,
-                         Scene* scene             = nullptr,
-                         Texture* fallbackTexture = nullptr,
-                         bool generateMipMaps     = false);
+  NoiseProceduralTexture(const std::string& name, int size = 256, Scene* scene = nullptr,
+                         Texture* fallbackTexture = nullptr, bool generateMipMaps = false);
 
   std::string _getDefines() const override;
 

@@ -17,22 +17,19 @@ class BABYLON_SHARED_EXPORT ShadowOnlyMaterial : public PushMaterial {
 
 public:
   ShadowOnlyMaterial(const std::string& name, Scene* scene);
-  ~ShadowOnlyMaterial(); // = default
+  ~ShadowOnlyMaterial() override; // = default
 
   bool needAlphaBlending() const override;
   bool needAlphaTesting() const override;
   BaseTexturePtr getAlphaTestTexture() override;
-  bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
-                         bool useInstances) override;
+  bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool useInstances) override;
   void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
   const std::string getClassName() const override;
-  MaterialPtr clone(const std::string& name,
-                    bool cloneChildren = false) const override;
+  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
   json serialize() const;
 
   /** Statics **/
-  static ShadowOnlyMaterial* Parse(const json& source, Scene* scene,
-                                   const std::string& rootUrl);
+  static ShadowOnlyMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
   IShadowLightPtr& get_activeLight();

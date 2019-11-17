@@ -14,15 +14,14 @@ class KeyboardInfo;
  * @brief Manage the keyboard inputs to control the movement of a free camera.
  * @see http://doc.babylonjs.com/how_to/customizing_camera_inputs
  */
-class BABYLON_SHARED_EXPORT FreeCameraKeyboardMoveInput
-    : public ICameraInput<FreeCamera> {
+class BABYLON_SHARED_EXPORT FreeCameraKeyboardMoveInput : public ICameraInput<FreeCamera> {
 
 public:
   /**
    * @brief Instantiate the input.
    */
   FreeCameraKeyboardMoveInput();
-  virtual ~FreeCameraKeyboardMoveInput(); // = default
+  ~FreeCameraKeyboardMoveInput() override; // = default
 
   /**
    * @brief Attach the input controls to a specific dom element to get the input

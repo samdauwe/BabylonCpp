@@ -168,13 +168,13 @@ public:
   template <typename... Ts>
   static ShadowGeneratorPtr New(Ts&&... args)
   {
-    auto shadowGenerator = std::shared_ptr<ShadowGenerator>(
-      new ShadowGenerator(std::forward<Ts>(args)...));
+    auto shadowGenerator
+      = std::shared_ptr<ShadowGenerator>(new ShadowGenerator(std::forward<Ts>(args)...));
     shadowGenerator->addToLight(shadowGenerator);
 
     return shadowGenerator;
   }
-  virtual ~ShadowGenerator(); // = default
+  ~ShadowGenerator() override; // = default
 
   void addToLight(const ShadowGeneratorPtr& shadowGenerator);
 
@@ -230,8 +230,7 @@ public:
    * added. Default to true
    * @returns the Shadow Generator itself
    */
-  ShadowGenerator& addShadowCaster(const AbstractMeshPtr& mesh,
-                                   bool includeDescendants = true);
+  ShadowGenerator& addShadowCaster(const AbstractMeshPtr& mesh, bool includeDescendants = true);
 
   /**
    * @brief Helper function to remove a mesh and its descendants from the list
@@ -241,8 +240,7 @@ public:
    * removed. Default to true
    * @returns the Shadow Generator itself
    */
-  ShadowGenerator& removeShadowCaster(const AbstractMeshPtr& mesh,
-                                      bool includeDescendants = true);
+  ShadowGenerator& removeShadowCaster(const AbstractMeshPtr& mesh, bool includeDescendants = true);
 
   /**
    * @brief Returns the associated light object.
@@ -257,9 +255,8 @@ public:
    * @param options Sets of optional options forcing the compilation with
    * different modes
    */
-  void forceCompilation(
-    const std::function<void(ShadowGenerator* generator)>& onCompiled,
-    const ShadowGeneratorCompileOptions& options) override;
+  void forceCompilation(const std::function<void(ShadowGenerator* generator)>& onCompiled,
+                        const ShadowGeneratorCompileOptions& options) override;
 
   /**
    * @brief Determine wheter the shadow generator is ready or not (mainly all
@@ -277,8 +274,7 @@ public:
    * @param lightIndex Index of the light in the enabled light list of the
    * material
    */
-  void prepareDefines(MaterialDefines& defines,
-                      unsigned int lightIndex) override;
+  void prepareDefines(MaterialDefines& defines, unsigned int lightIndex) override;
 
   /**
    * @brief Binds the shadow related information inside of an effect
@@ -288,8 +284,7 @@ public:
    * material owning the effect
    * @param effect The effect we are binfing the information for
    */
-  void bindShadowLight(const std::string& lightIndex,
-                       const EffectPtr& effect) override;
+  void bindShadowLight(const std::string& lightIndex, const EffectPtr& effect) override;
 
   /**
    * @brief Gets the transformation matrix used to project the meshes into the
@@ -325,8 +320,7 @@ public:
    * @param scene The scene to create the shadow map for
    * @returns The parsed shadow generator
    */
-  static ShadowGenerator* Parse(const json& parsedShadowGenerator,
-                                Scene* scene);
+  static ShadowGenerator* Parse(const json& parsedShadowGenerator, Scene* scene);
 
 protected:
   /**
@@ -341,8 +335,7 @@ protected:
    * textures but if you need precision (for self shadowing for instance), you
    * can use this option to enforce full float texture.
    */
-  ShadowGenerator(int mapSize, const IShadowLightPtr& light,
-                  bool usefulFloatFirst = false);
+  ShadowGenerator(int mapSize, const IShadowLightPtr& light, bool usefulFloatFirst = false);
   ShadowGenerator(const ISize& mapSize, const IShadowLightPtr& light,
                   bool usefulFloatFirst = false);
 
@@ -556,8 +549,7 @@ protected:
    *
    * Only valid if useContactHardeningShadow is true.
    */
-  void
-  set_contactHardeningLightSizeUVRatio(float contactHardeningLightSizeUVRatio);
+  void set_contactHardeningLightSizeUVRatio(float contactHardeningLightSizeUVRatio);
 
   /**
    * @brief Gets the actual darkness of a shadow.

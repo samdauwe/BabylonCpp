@@ -20,9 +20,8 @@ public:
    * @param target of the condition
    * @param value to compare with target state
    */
-  StateCondition(ActionManager* actionManager, const IAnimatablePtr& target,
-                 AnimationValue* value);
-  virtual ~StateCondition(); // = default
+  StateCondition(ActionManager* actionManager, const IAnimatablePtr& target, AnimationValue* value);
+  ~StateCondition() override; // = default
 
   /** Methods **/
 

@@ -22,8 +22,7 @@ using AnimationPtr       = std::shared_ptr<Animation>;
  * minimum and maximum radius
  * @see http://doc.babylonjs.com/how_to/camera_behaviors#bouncing-behavior
  */
-class BABYLON_SHARED_EXPORT BouncingBehavior
-    : public Behavior<ArcRotateCamera> {
+class BABYLON_SHARED_EXPORT BouncingBehavior : public Behavior<ArcRotateCamera> {
 
 public:
   /**
@@ -38,7 +37,7 @@ public:
 
 public:
   BouncingBehavior();
-  virtual ~BouncingBehavior(); // = default
+  ~BouncingBehavior() override; // = default
 
   /**
    * @brief Gets the name of the behavior.
@@ -56,8 +55,7 @@ public:
    * @param predicate Predicate to use for pick filtering
    */
   void attach(const ArcRotateCameraPtr& camera,
-              const std::function<bool(const AbstractMeshPtr& m)>& predicate
-              = nullptr) override;
+              const std::function<bool(const AbstractMeshPtr& m)>& predicate = nullptr) override;
 
   /**
    * @brief Detaches the behavior from its current arc rotate camera.

@@ -8,8 +8,7 @@
 namespace BABYLON {
 
 class DepthOfFieldBlurPostProcess;
-using DepthOfFieldBlurPostProcessPtr
-  = std::shared_ptr<DepthOfFieldBlurPostProcess>;
+using DepthOfFieldBlurPostProcessPtr = std::shared_ptr<DepthOfFieldBlurPostProcess>;
 
 /**
  * @brief The DepthOfFieldBlurPostProcess applied a blur in a give direction.
@@ -18,8 +17,7 @@ using DepthOfFieldBlurPostProcessPtr
  * than the center pixel. See section 2.6.2
  * http://fileadmin.cs.lth.se/cs/education/edan35/lectures/12dof.pdf
  */
-class BABYLON_SHARED_EXPORT DepthOfFieldBlurPostProcess
-    : public BlurPostProcess {
+class BABYLON_SHARED_EXPORT DepthOfFieldBlurPostProcess : public BlurPostProcess {
 
 public:
   template <typename... Ts>
@@ -31,7 +29,7 @@ public:
 
     return postProcess;
   }
-  ~DepthOfFieldBlurPostProcess(); // = default
+  ~DepthOfFieldBlurPostProcess() override; // = default
 
 protected:
   /**
@@ -59,15 +57,14 @@ protected:
    * the constructor. The updateEffect method can be used to compile the shader
    * at a later time. (default: false)
    */
-  DepthOfFieldBlurPostProcess(
-    const std::string& name, Scene* scene, const Vector2& direction,
-    float kernel, const std::variant<float, PostProcessOptions>& options,
-    const CameraPtr& camera, PostProcess* circleOfConfusion,
-    PostProcess* imageToBlur  = nullptr,
-    unsigned int samplingMode = Constants::TEXTURE_BILINEAR_SAMPLINGMODE,
-    Engine* engine = nullptr, bool reusable = false,
-    unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
-    bool blockCompilation    = false);
+  DepthOfFieldBlurPostProcess(const std::string& name, Scene* scene, const Vector2& direction,
+                              float kernel, const std::variant<float, PostProcessOptions>& options,
+                              const CameraPtr& camera, PostProcess* circleOfConfusion,
+                              PostProcess* imageToBlur  = nullptr,
+                              unsigned int samplingMode = Constants::TEXTURE_BILINEAR_SAMPLINGMODE,
+                              Engine* engine = nullptr, bool reusable = false,
+                              unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
+                              bool blockCompilation    = false);
 
 }; // end of class DepthOfFieldBlurPostProcess
 

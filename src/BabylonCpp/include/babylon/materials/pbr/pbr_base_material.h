@@ -15,16 +15,13 @@ class PBRClearCoatConfiguration;
 struct PBRMaterialDefines;
 class PBRSheenConfiguration;
 class PBRSubSurfaceConfiguration;
-using IAnimatablePtr = std::shared_ptr<IAnimatable>;
-using ImageProcessingConfigurationPtr
-  = std::shared_ptr<ImageProcessingConfiguration>;
-using PBRAnisotropicConfigurationPtr
-  = std::shared_ptr<PBRAnisotropicConfiguration>;
-using PBRBRDFConfigurationPtr      = std::shared_ptr<PBRBRDFConfiguration>;
-using PBRClearCoatConfigurationPtr = std::shared_ptr<PBRClearCoatConfiguration>;
-using PBRSheenConfigurationPtr     = std::shared_ptr<PBRSheenConfiguration>;
-using PBRSubSurfaceConfigurationPtr
-  = std::shared_ptr<PBRSubSurfaceConfiguration>;
+using IAnimatablePtr                  = std::shared_ptr<IAnimatable>;
+using ImageProcessingConfigurationPtr = std::shared_ptr<ImageProcessingConfiguration>;
+using PBRAnisotropicConfigurationPtr  = std::shared_ptr<PBRAnisotropicConfiguration>;
+using PBRBRDFConfigurationPtr         = std::shared_ptr<PBRBRDFConfiguration>;
+using PBRClearCoatConfigurationPtr    = std::shared_ptr<PBRClearCoatConfiguration>;
+using PBRSheenConfigurationPtr        = std::shared_ptr<PBRSheenConfiguration>;
+using PBRSubSurfaceConfigurationPtr   = std::shared_ptr<PBRSubSurfaceConfiguration>;
 
 /**
  * @brief The Physically based material base class of BJS.
@@ -95,7 +92,7 @@ public:
    * @param scene The scene the material will be use in.
    */
   PBRBaseMaterial(const std::string& name, Scene* scene);
-  ~PBRBaseMaterial(); // = default
+  ~PBRBaseMaterial() override; // = default
 
   /**
    * @brief Gets the name of the material class.
@@ -150,8 +147,7 @@ public:
   /**
    * @brief Force shader compilation
    */
-  void forceCompilation(AbstractMesh* mesh,
-                        std::function<void(Material* material)>& onCompiled,
+  void forceCompilation(AbstractMesh* mesh, std::function<void(Material* material)>& onCompiled,
                         bool clipPlane = false);
 
   /**
@@ -196,17 +192,15 @@ public:
    * @param forceDisposeEffect - Forces the disposal of effects.
    * @param forceDisposeTextures - Forces the disposal of all textures.
    */
-  void dispose(bool forceDisposeEffect   = false,
-               bool forceDisposeTextures = false,
-               bool notBoundToMesh       = false) override;
+  void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
+               bool notBoundToMesh = false) override;
 
 protected:
   /**
    * @brief Attaches a new image processing configuration to the PBR Material.
    * @param configuration
    */
-  void _attachImageProcessingConfiguration(
-    const ImageProcessingConfigurationPtr& configuration);
+  void _attachImageProcessingConfiguration(const ImageProcessingConfigurationPtr& configuration);
 
   bool _shouldUseAlphaFromAlbedoTexture() const;
 
@@ -256,13 +250,12 @@ protected:
   void set_debugMode(unsigned int value);
 
 private:
-  EffectPtr _prepareEffect(
-    AbstractMesh* mesh, PBRMaterialDefines& defines,
-    const std::function<void(Effect* effect)>& onCompiled = nullptr,
-    std::function<void(Effect* effect, const std::string& errors)> onError
-    = nullptr,
-    const std::optional<bool>& useInstances = std::nullopt,
-    const std::optional<bool>& useClipPlane = std::nullopt);
+  EffectPtr _prepareEffect(AbstractMesh* mesh, PBRMaterialDefines& defines,
+                           const std::function<void(Effect* effect)>& onCompiled = nullptr,
+                           std::function<void(Effect* effect, const std::string& errors)> onError
+                           = nullptr,
+                           const std::optional<bool>& useInstances = std::nullopt,
+                           const std::optional<bool>& useClipPlane = std::nullopt);
   void _prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& defines,
                        const std::optional<bool>& useInstances = std::nullopt,
                        const std::optional<bool>& useClipPlane = std::nullopt);
@@ -317,8 +310,7 @@ public:
    * Custom callback helping to override the default shader used in the
    * material.
    */
-  std::function<std::string(const std::string& shaderName,
-                            const std::vector<std::string>& uniforms,
+  std::function<std::string(const std::string& shaderName, const std::vector<std::string>& uniforms,
                             const std::vector<std::string>& uniformBuffers,
                             const std::vector<std::string>& samplers,
                             const PBRMaterialDefines& defines)>

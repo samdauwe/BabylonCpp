@@ -21,22 +21,19 @@ public:
   template <typename... Ts>
   static FxaaPostProcessPtr New(Ts&&... args)
   {
-    auto postProcess = std::shared_ptr<FxaaPostProcess>(
-      new FxaaPostProcess(std::forward<Ts>(args)...));
+    auto postProcess
+      = std::shared_ptr<FxaaPostProcess>(new FxaaPostProcess(std::forward<Ts>(args)...));
     postProcess->add(postProcess);
 
     return postProcess;
   }
-  ~FxaaPostProcess(); // = default
+  ~FxaaPostProcess() override; // = default
 
 protected:
-  FxaaPostProcess(const std::string& _name, float ratio,
-                  const CameraPtr& camera = nullptr,
-                  unsigned int samplingMode
-                  = TextureConstants::BILINEAR_SAMPLINGMODE,
+  FxaaPostProcess(const std::string& _name, float ratio, const CameraPtr& camera = nullptr,
+                  unsigned int samplingMode = TextureConstants::BILINEAR_SAMPLINGMODE,
                   Engine* engine = nullptr, bool reusable = false,
-                  unsigned int textureType
-                  = Constants::TEXTURETYPE_UNSIGNED_INT);
+                  unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT);
 
 private:
   std::string _getDefines();

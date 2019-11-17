@@ -22,13 +22,12 @@ public:
   template <typename... Ts>
   static NormalMaterialPtr New(Ts&&... args)
   {
-    auto material = std::shared_ptr<NormalMaterial>(
-      new NormalMaterial(std::forward<Ts>(args)...));
+    auto material = std::shared_ptr<NormalMaterial>(new NormalMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;
   }
-  ~NormalMaterial(); // = default
+  ~NormalMaterial() override; // = default
 
   Type type() const override;
 
@@ -42,16 +41,13 @@ public:
   std::vector<BaseTexturePtr> getActiveTextures() const override;
   bool hasTexture(const BaseTexturePtr& texture) const override;
   const std::string getClassName() const override;
-  virtual void dispose(bool forceDisposeEffect   = false,
-                       bool forceDisposeTextures = false,
-                       bool notBoundToMesh       = false) override;
-  MaterialPtr clone(const std::string& name,
-                    bool cloneChildren = false) const override;
+  void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
+               bool notBoundToMesh = false) override;
+  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
   json serialize() const;
 
   /** Statics **/
-  static NormalMaterial* Parse(const json& source, Scene* scene,
-                               const std::string& rootUrl);
+  static NormalMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
   NormalMaterial(const std::string& name, Scene* scene);

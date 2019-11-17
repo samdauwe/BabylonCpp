@@ -11,8 +11,7 @@ namespace BABYLON {
  * @brief Particle emitter emitting particles from the inside of a cylinder.
  * It emits the particles randomly between two vectors.
  */
-class BABYLON_SHARED_EXPORT CylinderDirectedParticleEmitter
-    : public CylinderParticleEmitter {
+class BABYLON_SHARED_EXPORT CylinderDirectedParticleEmitter : public CylinderParticleEmitter {
 
 public:
   /**
@@ -26,13 +25,10 @@ public:
    * @param direction2 the max limit of the emission direction (up vector by
    * default)
    */
-  CylinderDirectedParticleEmitter(float radius = 1.f, float height = 1.f,
-                                  float radiusRange = 1.f,
-                                  const Vector3& direction1
-                                  = Vector3{0.f, 1.f, 0.f},
-                                  const Vector3& direction2
-                                  = Vector3{0.f, 1.f, 0.f});
-  ~CylinderDirectedParticleEmitter(); // = default
+  CylinderDirectedParticleEmitter(float radius = 1.f, float height = 1.f, float radiusRange = 1.f,
+                                  const Vector3& direction1 = Vector3{0.f, 1.f, 0.f},
+                                  const Vector3& direction2 = Vector3{0.f, 1.f, 0.f});
+  ~CylinderDirectedParticleEmitter() override; // = default
 
   /**
    * @brief Called by the particle System when the direction is computed for the
@@ -41,8 +37,7 @@ public:
    * @param directionToUpdate is the direction vector to update with the result
    * @param particle is the particle we are computed the direction for
    */
-  void startDirectionFunction(const Matrix& worldMatrix,
-                              Vector3& directionToUpdate,
+  void startDirectionFunction(const Matrix& worldMatrix, Vector3& directionToUpdate,
                               Particle* particle) override;
 
   /**

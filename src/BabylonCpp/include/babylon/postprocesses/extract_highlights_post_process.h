@@ -8,8 +8,7 @@
 namespace BABYLON {
 
 class ExtractHighlightsPostProcess;
-using ExtractHighlightsPostProcessPtr
-  = std::shared_ptr<ExtractHighlightsPostProcess>;
+using ExtractHighlightsPostProcessPtr = std::shared_ptr<ExtractHighlightsPostProcess>;
 
 /**
  * @brief The extract highlights post process sets all pixels to black except
@@ -28,16 +27,15 @@ public:
 
     return postProcess;
   }
-  ~ExtractHighlightsPostProcess(); // = default
+  ~ExtractHighlightsPostProcess() override; // = default
 
 protected:
-  ExtractHighlightsPostProcess(
-    const std::string& name,
-    const std::variant<float, PostProcessOptions>& options,
-    const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
-    bool reusable            = false,
-    unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
-    bool blockCompilation    = false);
+  ExtractHighlightsPostProcess(const std::string& name,
+                               const std::variant<float, PostProcessOptions>& options,
+                               const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
+                               bool reusable            = false,
+                               unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
+                               bool blockCompilation    = false);
 
 public:
   /**

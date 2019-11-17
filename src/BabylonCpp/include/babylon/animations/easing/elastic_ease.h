@@ -22,10 +22,9 @@ public:
   template <typename... Ts>
   static ElasticEasePtr New(Ts&&... args)
   {
-    return std::shared_ptr<ElasticEase>(
-      new ElasticEase(std::forward<Ts>(args)...));
+    return std::shared_ptr<ElasticEase>(new ElasticEase(std::forward<Ts>(args)...));
   }
-  ~ElasticEase(); // = default
+  ~ElasticEase() override; // = default
 
   /**
    * @brief Hidden

@@ -40,7 +40,7 @@ public:
     return std::shared_ptr<EffectLayerSceneComponent>(
       new EffectLayerSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~EffectLayerSceneComponent(); // = default
+  ~EffectLayerSceneComponent() override; // = default
 
   /**
    * @brief Registers the component in a given scene.

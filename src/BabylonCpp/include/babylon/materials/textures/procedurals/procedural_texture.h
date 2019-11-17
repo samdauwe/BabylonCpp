@@ -33,13 +33,13 @@ public:
   template <typename... Ts>
   static ProceduralTexturePtr New(Ts&&... args)
   {
-    auto texture = std::shared_ptr<ProceduralTexture>(
-      new ProceduralTexture(std::forward<Ts>(args)...));
+    auto texture
+      = std::shared_ptr<ProceduralTexture>(new ProceduralTexture(std::forward<Ts>(args)...));
     texture->addToScene(texture);
 
     return texture;
   }
-  ~ProceduralTexture(); // = default
+  ~ProceduralTexture() override; // = default
 
   void addToScene(const ProceduralTexturePtr& newTexture);
 
@@ -85,8 +85,7 @@ public:
    * @param fragment This can be set to a path (into the shader store) or to a
    * json object containing a fragmentElement property.
    */
-  void
-  setFragment(const std::unordered_map<std::string, std::string>& fragment);
+  void setFragment(const std::unordered_map<std::string, std::string>& fragment);
 
   /**
    * @brief Set the fragment shader to use in order to render the texture.
@@ -127,8 +126,7 @@ public:
    * @param texture Define the texture to bind to this sampler
    * @return the texture itself allowing "fluent" like uniform updates
    */
-  ProceduralTexture& setTexture(const std::string& name,
-                                const TexturePtr& texture);
+  ProceduralTexture& setTexture(const std::string& name, const TexturePtr& texture);
 
   /**
    * @brief Set a float in the shader.
@@ -232,15 +230,13 @@ protected:
    * @param isCube Define if the texture is a cube texture or not (this will
    * render each faces of the cube)
    */
-  ProceduralTexture(
-    const std::string& name, const Size& size,
-    const std::unordered_map<std::string, std::string>& fragment, Scene* scene,
-    Texture* fallbackTexture = nullptr, bool generateMipMaps = true,
-    bool isCube = false);
   ProceduralTexture(const std::string& name, const Size& size,
-                    const std::string& fragment, Scene* scene,
-                    Texture* fallbackTexture = nullptr,
-                    bool generateMipMaps = true, bool isCube = false);
+                    const std::unordered_map<std::string, std::string>& fragment, Scene* scene,
+                    Texture* fallbackTexture = nullptr, bool generateMipMaps = true,
+                    bool isCube = false);
+  ProceduralTexture(const std::string& name, const Size& size, const std::string& fragment,
+                    Scene* scene, Texture* fallbackTexture = nullptr, bool generateMipMaps = true,
+                    bool isCube = false);
 
   /**
    * @brief Define the refresh rate of the texture or the rendering frequency.

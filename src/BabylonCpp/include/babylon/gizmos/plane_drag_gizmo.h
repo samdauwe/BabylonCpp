@@ -13,7 +13,7 @@ class PositionGizmo;
 class StandardMaterial;
 class TransformNode;
 class UtilityLayerRenderer;
-using PointerDragBehaviorPtr = std::shared_ptr<PointerDragBehavior>;
+using PointerDragBehaviorPtr  = std::shared_ptr<PointerDragBehavior>;
 using StandardMaterialPtr     = std::shared_ptr<StandardMaterial>;
 using TransformNodePtr        = std::shared_ptr<TransformNode>;
 using UtilityLayerRendererPtr = std::shared_ptr<UtilityLayerRenderer>;
@@ -27,14 +27,12 @@ public:
   /**
    * @brief Hidden
    */
-  static TransformNodePtr _CreatePlane(Scene* scene,
-                                       const StandardMaterialPtr& material);
+  static TransformNodePtr _CreatePlane(Scene* scene, const StandardMaterialPtr& material);
 
   /**
    * @brief Hidden
    */
-  static TransformNodePtr _CreateArrowInstance(Scene* scene,
-                                               const TransformNodePtr& arrow);
+  static TransformNodePtr _CreateArrowInstance(Scene* scene, const TransformNodePtr& arrow);
 
 public:
   /**
@@ -44,18 +42,16 @@ public:
    * drag on
    * @param color The color of the gizmo
    */
-  PlaneDragGizmo(const Vector3& dragPlaneNormal,
-                 const Color3& color = Color3::Gray(),
+  PlaneDragGizmo(const Vector3& dragPlaneNormal, const Color3& color = Color3::Gray(),
                  const UtilityLayerRendererPtr& gizmoLayer
                  = UtilityLayerRenderer::DefaultUtilityLayer(),
                  PositionGizmo* parent = nullptr);
-  ~PlaneDragGizmo(); // = default
+  ~PlaneDragGizmo() override; // = default
 
   /**
    * @brief Disposes of the gizmo.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
 protected:
   void _attachedMeshChanged(const AbstractMeshPtr& value) override;

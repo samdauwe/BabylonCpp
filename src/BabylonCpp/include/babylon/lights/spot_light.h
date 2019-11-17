@@ -28,13 +28,12 @@ public:
   template <typename... Ts>
   static SpotLightPtr New(Ts&&... args)
   {
-    auto light
-      = std::shared_ptr<SpotLight>(new SpotLight(std::forward<Ts>(args)...));
+    auto light = std::shared_ptr<SpotLight>(new SpotLight(std::forward<Ts>(args)...));
     light->addToScene(light);
 
     return light;
   }
-  ~SpotLight(); // = default
+  ~SpotLight() override; // = default
 
   Type type() const override;
 
@@ -57,8 +56,7 @@ public:
    * @param lightIndex The index of the light in the effect to update
    * @returns The spot light
    */
-  void transferToEffect(const EffectPtr& effect,
-                        const std::string& lightIndex) override;
+  void transferToEffect(const EffectPtr& effect, const std::string& lightIndex) override;
 
   /**
    * @brief Sets the passed Effect "effect" with the Light information.
@@ -67,22 +65,20 @@ public:
    * or direction)
    * @returns The light
    */
-  SpotLight& transferToNodeMaterialEffect(
-    const EffectPtr& effect, const std::string& lightDataUniformName) override;
+  SpotLight& transferToNodeMaterialEffect(const EffectPtr& effect,
+                                          const std::string& lightDataUniformName) override;
 
   /**
    * @brief Disposes the light and the associated resources.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Prepares the list of defines specific to the light type.
    * @param defines the list of defines
    * @param lightIndex defines the index of the light for the effect
    */
-  void prepareLightSpecificDefines(MaterialDefines& defines,
-                                   unsigned int lightIndex) override;
+  void prepareLightSpecificDefines(MaterialDefines& defines, unsigned int lightIndex) override;
 
 protected:
   /**
@@ -97,9 +93,8 @@ protected:
    * spot
    * @param scene The scene the lights belongs to
    */
-  SpotLight(const std::string& name, const Vector3& position,
-            const Vector3& direction, float angle, float exponent,
-            Scene* scene);
+  SpotLight(const std::string& name, const Vector3& position, const Vector3& direction, float angle,
+            float exponent, Scene* scene);
 
   /**
    * @brief Gets the cone angle of the spot light in Radians.
@@ -198,9 +193,8 @@ protected:
    * angle and and aspect ratio of 1.0.
    * @returns the SpotLight.
    */
-  void _setDefaultShadowProjectionMatrix(
-    Matrix& matrix, const Matrix& viewMatrix,
-    const std::vector<AbstractMesh*>& renderList) override;
+  void _setDefaultShadowProjectionMatrix(Matrix& matrix, const Matrix& viewMatrix,
+                                         const std::vector<AbstractMesh*>& renderList) override;
 
   void _computeProjectionTextureViewLightMatrix();
   void _computeProjectionTextureProjectionLightMatrix();

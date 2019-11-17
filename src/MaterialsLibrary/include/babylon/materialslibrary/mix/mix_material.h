@@ -24,13 +24,12 @@ public:
   template <typename... Ts>
   static MixMaterialPtr New(Ts&&... args)
   {
-    auto material = std::shared_ptr<MixMaterial>(
-      new MixMaterial(std::forward<Ts>(args)...));
+    auto material = std::shared_ptr<MixMaterial>(new MixMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;
   }
-  ~MixMaterial(); // = default
+  ~MixMaterial() override; // = default
 
   bool needAlphaBlending() const override;
   bool needAlphaTesting() const override;
@@ -42,16 +41,13 @@ public:
   std::vector<BaseTexturePtr> getActiveTextures() const override;
   bool hasTexture(const BaseTexturePtr& texture) const override;
   const std::string getClassName() const override;
-  virtual void dispose(bool forceDisposeEffect   = false,
-                       bool forceDisposeTextures = false,
-                       bool notBoundToMesh       = false) override;
-  MaterialPtr clone(const std::string& name,
-                    bool cloneChildren = false) const override;
+  void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
+               bool notBoundToMesh = false) override;
+  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
   json serialize() const;
 
   /** Statics **/
-  static MixMaterial* Parse(const json& source, Scene* scene,
-                            const std::string& rootUrl);
+  static MixMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
   MixMaterial(const std::string& name, Scene* scene);

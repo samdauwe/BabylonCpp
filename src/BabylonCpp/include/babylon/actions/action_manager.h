@@ -34,8 +34,7 @@ public:
    * Nothing
    * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
-  static constexpr unsigned int NothingTrigger
-    = Constants::ACTION_NothingTrigger;
+  static constexpr unsigned int NothingTrigger = Constants::ACTION_NothingTrigger;
 
   /**
    * On pick
@@ -47,78 +46,67 @@ public:
    * On left pick
    * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
-  static constexpr unsigned int OnLeftPickTrigger
-    = Constants::ACTION_OnLeftPickTrigger;
+  static constexpr unsigned int OnLeftPickTrigger = Constants::ACTION_OnLeftPickTrigger;
 
   /**
    * On right pick
    * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
-  static constexpr unsigned int OnRightPickTrigger
-    = Constants::ACTION_OnRightPickTrigger;
+  static constexpr unsigned int OnRightPickTrigger = Constants::ACTION_OnRightPickTrigger;
 
   /**
    * On center pick
    * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
-  static constexpr unsigned int OnCenterPickTrigger
-    = Constants::ACTION_OnCenterPickTrigger;
+  static constexpr unsigned int OnCenterPickTrigger = Constants::ACTION_OnCenterPickTrigger;
 
   /**
    * On pick down
    * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
-  static constexpr unsigned int OnPickDownTrigger
-    = Constants::ACTION_OnPickDownTrigger;
+  static constexpr unsigned int OnPickDownTrigger = Constants::ACTION_OnPickDownTrigger;
 
   /**
    * On double pick
    * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
-  static constexpr unsigned int OnDoublePickTrigger
-    = Constants::ACTION_OnDoublePickTrigger;
+  static constexpr unsigned int OnDoublePickTrigger = Constants::ACTION_OnDoublePickTrigger;
 
   /**
    * On pick up
    * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
-  static constexpr unsigned int OnPickUpTrigger
-    = Constants::ACTION_OnPickUpTrigger;
+  static constexpr unsigned int OnPickUpTrigger = Constants::ACTION_OnPickUpTrigger;
   /**
    * On pick out.
    * This trigger will only be raised if you also declared a OnPickDown
    * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
-  static constexpr unsigned int OnPickOutTrigger
-    = Constants::ACTION_OnPickOutTrigger;
+  static constexpr unsigned int OnPickOutTrigger = Constants::ACTION_OnPickOutTrigger;
 
   /**
    * On long press
    * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
-  static constexpr unsigned int OnLongPressTrigger
-    = Constants::ACTION_OnLongPressTrigger;
+  static constexpr unsigned int OnLongPressTrigger = Constants::ACTION_OnLongPressTrigger;
 
   /**
    * On pointer over
    * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
-  static constexpr unsigned int OnPointerOverTrigger
-    = Constants::ACTION_OnPointerOverTrigger;
+  static constexpr unsigned int OnPointerOverTrigger = Constants::ACTION_OnPointerOverTrigger;
 
   /**
    * On pointer out
    * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
-  static constexpr unsigned int OnPointerOutTrigger
-    = Constants::ACTION_OnPointerOutTrigger;
+  static constexpr unsigned int OnPointerOutTrigger = Constants::ACTION_OnPointerOutTrigger;
 
   /**
    * On every frame
    * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
-  static constexpr unsigned int OnEveryFrameTrigger
-    = Constants::ACTION_OnEveryFrameTrigger;
+  static constexpr unsigned int OnEveryFrameTrigger = Constants::ACTION_OnEveryFrameTrigger;
   /**
    * On intersection enter
    * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
@@ -137,8 +125,7 @@ public:
    * On key down
    * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
-  static constexpr unsigned int OnKeyDownTrigger
-    = Constants::ACTION_OnKeyDownTrigger;
+  static constexpr unsigned int OnKeyDownTrigger = Constants::ACTION_OnKeyDownTrigger;
 
   /**
    * On key up
@@ -150,12 +137,11 @@ public:
   static ActionManagerPtr New(Ts&&... args)
   {
     auto actionManagerRawPtr = new ActionManager(std::forward<Ts>(args)...);
-    auto actionManager
-      = static_cast<std::shared_ptr<ActionManager>>(actionManagerRawPtr);
+    auto actionManager       = static_cast<std::shared_ptr<ActionManager>>(actionManagerRawPtr);
     actionManager->addToScene(actionManager);
     return actionManager;
   }
-  virtual ~ActionManager(); // = default
+  ~ActionManager() override; // = default
 
   /** Methods **/
 
@@ -164,8 +150,7 @@ public:
   /**
    * @brief Releases all associated resources.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Gets hosting scene.
@@ -190,8 +175,7 @@ public:
    * @return a boolean indicating whether one (or more) of the triggers is
    * handled
    */
-  bool hasSpecificTriggers2(unsigned int triggerA,
-                            unsigned int triggerB) const override;
+  bool hasSpecificTriggers2(unsigned int triggerA, unsigned int triggerB) const override;
 
   /**
    * @brief Does this action manager handles actions of a given trigger.
@@ -200,10 +184,10 @@ public:
    * by parameter
    * @return whether the trigger is handled
    */
-  bool hasSpecificTrigger(
-    unsigned int trigger,
-    const std::function<bool(const std::string& parameter)>& parameterPredicate
-    = nullptr) const override;
+  bool
+  hasSpecificTrigger(unsigned int trigger,
+                     const std::function<bool(const std::string& parameter)>& parameterPredicate
+                     = nullptr) const override;
 
   /**
    * @brief Registers an action to this action manager.
@@ -225,8 +209,7 @@ public:
    * @param evt defines the event details to be processed
    */
   void processTrigger(unsigned int trigger,
-                      const std::optional<IActionEvent>& evt
-                      = std::nullopt) override;
+                      const std::optional<IActionEvent>& evt = std::nullopt) override;
 
   /** hidden */
   IAnimatablePtr _getEffectiveTarget(const IAnimatablePtr& target,
@@ -273,8 +256,8 @@ public:
    * @param object defines the hosting mesh
    * @param scene defines the hosting scene
    */
-  static void Parse(const std::vector<json>& parsedActions,
-                    const AbstractMeshPtr& object, Scene* scene);
+  static void Parse(const std::vector<json>& parsedActions, const AbstractMeshPtr& object,
+                    Scene* scene);
 
   /**
    * @brief Get a trigger name by index.

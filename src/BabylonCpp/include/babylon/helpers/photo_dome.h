@@ -44,13 +44,12 @@ public:
   template <typename... Ts>
   static PhotoDomePtr New(Ts&&... args)
   {
-    auto photoDome
-      = std::shared_ptr<PhotoDome>(new PhotoDome(std::forward<Ts>(args)...));
+    auto photoDome = std::shared_ptr<PhotoDome>(new PhotoDome(std::forward<Ts>(args)...));
     photoDome->addToScene(photoDome);
 
     return photoDome;
   }
-  ~PhotoDome(); // = default
+  ~PhotoDome() override; // = default
 
   /**
    * @brief Releases resources associated with this node.
@@ -59,8 +58,7 @@ public:
    * @param disposeMaterialAndTextures Set to true to also dispose referenced
    * materials and textures (false by default)
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
 protected:
   /**
@@ -74,10 +72,8 @@ protected:
    * @param onError defines a callback called when an error occured while
    * loading the texture
    */
-  PhotoDome(std::string name, const std::string& urlOfPhoto,
-            PhotoDomeOptions options, Scene* scene,
-            const std::function<void(const std::string& message)>& onError
-            = nullptr);
+  PhotoDome(std::string name, const std::string& urlOfPhoto, PhotoDomeOptions options, Scene* scene,
+            const std::function<void(const std::string& message)>& onError = nullptr);
 
   /**
    * @brief Gets the texture being displayed on the sphere.

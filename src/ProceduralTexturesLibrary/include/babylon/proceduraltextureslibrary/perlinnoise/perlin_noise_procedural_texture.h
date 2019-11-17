@@ -8,11 +8,9 @@ namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
 class PerlinNoiseProceduralTexture;
-using PerlinNoiseProceduralTexturePtr
-  = std::shared_ptr<PerlinNoiseProceduralTexture>;
+using PerlinNoiseProceduralTexturePtr = std::shared_ptr<PerlinNoiseProceduralTexture>;
 
-class BABYLON_SHARED_EXPORT PerlinNoiseProceduralTexture
-    : public ProceduralTexture {
+class BABYLON_SHARED_EXPORT PerlinNoiseProceduralTexture : public ProceduralTexture {
 
 public:
   template <typename... Ts>
@@ -24,10 +22,10 @@ public:
 
     return texture;
   }
-  ~PerlinNoiseProceduralTexture(); // = default
+  ~PerlinNoiseProceduralTexture() override; // = default
 
   void updateShaderUniforms();
-  void render(bool useCameraPostProcess = false);
+  void render(bool useCameraPostProcess = false) override;
   void resize(const Size& size, bool generateMipMaps = false);
 
   /**
@@ -48,9 +46,8 @@ public:
   static std::unique_ptr<PerlinNoiseProceduralTexture>
   Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
 
-  PerlinNoiseProceduralTexture(const std::string& name, const Size& size,
-                               Scene* scene, Texture* fallbackTexture = nullptr,
-                               bool generateMipMaps = false);
+  PerlinNoiseProceduralTexture(const std::string& name, const Size& size, Scene* scene,
+                               Texture* fallbackTexture = nullptr, bool generateMipMaps = false);
 
 public:
   float time;

@@ -50,25 +50,21 @@ struct LensRenderingPipelineParameters {
  * - depth map (for depth-of-field)
  * - grain texture
  */
-class BABYLON_SHARED_EXPORT LensRenderingPipeline
-    : public PostProcessRenderPipeline {
+class BABYLON_SHARED_EXPORT LensRenderingPipeline : public PostProcessRenderPipeline {
 
 public:
   /**
    * The chromatic aberration PostProcess id in the pipeline
    */
-  static constexpr const char* LensChromaticAberrationEffect
-    = "LensChromaticAberrationEffect";
+  static constexpr const char* LensChromaticAberrationEffect = "LensChromaticAberrationEffect";
   /**
    * The highlights enhancing PostProcess id in the pipeline
    */
-  static constexpr const char* HighlightsEnhancingEffect
-    = "HighlightsEnhancingEffect";
+  static constexpr const char* HighlightsEnhancingEffect = "HighlightsEnhancingEffect";
   /**
    * The depth-of-field PostProcess id in the pipeline
    */
-  static constexpr const char* LensDepthOfFieldEffect
-    = "LensDepthOfFieldEffect";
+  static constexpr const char* LensDepthOfFieldEffect = "LensDepthOfFieldEffect";
 
 public:
   template <typename... Ts>
@@ -80,7 +76,7 @@ public:
 
     return renderingPipeline;
   }
-  virtual ~LensRenderingPipeline(); // = default
+  ~LensRenderingPipeline() override; // = default
 
   void addToScene(const LensRenderingPipelinePtr& lensRenderingPipeline);
 
@@ -202,8 +198,7 @@ public:
    * @param disableDepthRender If the scens depth rendering should be disabled
    * (default: false)
    */
-  void dispose(bool disableDepthRender         = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool disableDepthRender = false, bool disposeMaterialAndTextures = false) override;
 
 protected:
   /**
@@ -246,8 +241,7 @@ protected:
    * @param cameras The array of cameras that the rendering pipeline will be
    * attached to
    */
-  LensRenderingPipeline(const std::string& name,
-                        const LensRenderingPipelineParameters& parameters,
+  LensRenderingPipeline(const std::string& name, const LensRenderingPipelineParameters& parameters,
                         Scene* scene, float ratio = 1.f,
                         const std::vector<CameraPtr>& cameras = {});
 

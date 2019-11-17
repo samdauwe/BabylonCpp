@@ -14,8 +14,7 @@
 
 using namespace BABYLON::Extensions::ECS;
 
-class MovementSystem
-  : public System<Requires<PositionComponent, VelocityComponent>> {
+class MovementSystem : public System<Requires<PositionComponent, VelocityComponent>> {
 public:
   void update()
   {
@@ -31,19 +30,18 @@ public:
   }
 
 private:
-  virtual void onEntityAdded(Entity& /*e*/) override
+  void onEntityAdded(Entity& /*e*/) override
   {
   }
 
-  virtual void onEntityRemoved(Entity& /*e*/) override
+  void onEntityRemoved(Entity& /*e*/) override
   {
   }
 };
 
-class PlayerSystem
-  : public System<Requires<PlayerComponent>, Excludes<NPCComponent>> {
+class PlayerSystem : public System<Requires<PlayerComponent>, Excludes<NPCComponent>> {
 private:
-  virtual void onEntityAdded(Entity& e) override
+  void onEntityAdded(Entity& e) override
   {
     if (e.hasComponent<NPCComponent>()) {
       throw std::logic_error(
@@ -51,7 +49,7 @@ private:
     }
   }
 
-  virtual void onEntityRemoved(Entity& /*e*/) override
+  void onEntityRemoved(Entity& /*e*/) override
   {
   }
 };

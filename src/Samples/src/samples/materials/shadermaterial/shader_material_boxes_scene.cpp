@@ -16,8 +16,7 @@ namespace Samples {
 class ShaderMaterialBoxesScene : public IRenderableScene {
 
 public:
-  static constexpr const char* customVertexShader
-    = R"ShaderCode(
+  static constexpr const char* customVertexShader = R"ShaderCode(
 #ifdef GL_ES
 precision highp float;
 #endif
@@ -44,8 +43,7 @@ void main(void) {
 }
 )ShaderCode";
 
-  static constexpr const char* custom1FragmentShader
-    = R"ShaderCode(
+  static constexpr const char* custom1FragmentShader = R"ShaderCode(
 #ifdef GL_ES
 precision highp float;
 #endif
@@ -101,8 +99,7 @@ void main(void) {
 }
 )ShaderCode";
 
-  static constexpr const char* custom2FragmentShader
-    = R"ShaderCode(
+  static constexpr const char* custom2FragmentShader = R"ShaderCode(
 #ifdef GL_ES
 precision highp float;
 #endif
@@ -124,8 +121,7 @@ void main(void) {
 }
 )ShaderCode";
 
-  static constexpr const char* custom3FragmentShader
-    = R"ShaderCode(
+  static constexpr const char* custom3FragmentShader = R"ShaderCode(
 #ifdef GL_ES
 precision highp float;
 #endif
@@ -154,8 +150,7 @@ void main(void) {
 )ShaderCode";
 
   // Latt1c3 ( https://www.shadertoy.com/view/MlX3RB )
-  static constexpr const char* custom4FragmentShader
-    = R"ShaderCode(
+  static constexpr const char* custom4FragmentShader = R"ShaderCode(
 #ifdef GL_ES
 precision highp float;
 #endif
@@ -236,8 +231,7 @@ void main(void) {
 }
 )ShaderCode";
 
-  static constexpr const char* custom5FragmentShader
-    = R"ShaderCode(
+  static constexpr const char* custom5FragmentShader = R"ShaderCode(
 #ifdef GL_ES
 precision highp float;
 #endif
@@ -281,8 +275,7 @@ void main(void) {
 }
 )ShaderCode";
 
-  static constexpr const char* custom6FragmentShader
-    = R"ShaderCode(
+  static constexpr const char* custom6FragmentShader = R"ShaderCode(
 #ifdef GL_ES
 precision highp float;
 #endif
@@ -325,8 +318,7 @@ void main(void) {
 }
 )ShaderCode";
 
-  static constexpr const char* custom7FragmentShader
-    = R"ShaderCode(
+  static constexpr const char* custom7FragmentShader = R"ShaderCode(
 #ifdef GL_ES
 precision highp float;
 #endif
@@ -362,8 +354,7 @@ void main(void) {
 )ShaderCode";
 
   // Tileable Water Caustic ( https://www.shadertoy.com/view/MdlXz8 )
-  static constexpr const char* custom8FragmentShader
-    = R"ShaderCode(
+  static constexpr const char* custom8FragmentShader = R"ShaderCode(
 #ifdef GL_ES
 precision highp float;
 #endif
@@ -456,8 +447,7 @@ void main(void) {
 )ShaderCode";
 
   // Shiny Circle ( https://www.shadertoy.com/view/ltBXRc )
-  static constexpr const char* custom9FragmentShader
-    = R"ShaderCode(
+  static constexpr const char* custom9FragmentShader = R"ShaderCode(
 #ifdef GL_ES
 precision highp float;
 #endif
@@ -529,8 +519,8 @@ public:
     Effect::ShadersStore()["custom8FragmentShader"] = custom8FragmentShader;
     Effect::ShadersStore()["custom9FragmentShader"] = custom9FragmentShader;
   }
-  
-  ~ShaderMaterialBoxesScene() = default;
+
+  ~ShaderMaterialBoxesScene() override = default;
 
   const char* getName() override
   {

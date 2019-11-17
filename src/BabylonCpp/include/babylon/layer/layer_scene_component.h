@@ -35,10 +35,9 @@ public:
   template <typename... Ts>
   static LayerSceneComponentPtr New(Ts&&... args)
   {
-    return std::shared_ptr<LayerSceneComponent>(
-      new LayerSceneComponent(std::forward<Ts>(args)...));
+    return std::shared_ptr<LayerSceneComponent>(new LayerSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~LayerSceneComponent(); // = default
+  ~LayerSceneComponent() override; // = default
 
   /**
    * @brief Registers the component in a given scene.
@@ -67,8 +66,7 @@ public:
    * @param container contains the elements to remove
    * @param dispose if the removed element should be disposed (default: false)
    */
-  void removeFromContainer(const AbstractScene& container,
-                           bool dispose = false);
+  void removeFromContainer(const AbstractScene& container, bool dispose = false);
 
 private:
   void _draw(const std::function<bool(const Layer& layer)>& predicate);
@@ -76,9 +74,9 @@ private:
                             unsigned int cameraLayerMask) const;
   void _drawCameraBackground(Camera* camera);
   void _drawCameraForeground(Camera* camera);
-  bool _drawRenderTargetPredicate(
-    const Layer& layer, bool isBackground, unsigned int cameraLayerMask,
-    const RenderTargetTexturePtr& renderTargetTexture) const;
+  bool _drawRenderTargetPredicate(const Layer& layer, bool isBackground,
+                                  unsigned int cameraLayerMask,
+                                  const RenderTargetTexturePtr& renderTargetTexture) const;
   void _drawRenderTargetBackground(const RenderTargetTexturePtr& renderTarget);
   void _drawRenderTargetForeground(const RenderTargetTexturePtr& renderTarget);
 

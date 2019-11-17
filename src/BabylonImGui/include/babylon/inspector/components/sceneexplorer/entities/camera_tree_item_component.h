@@ -24,8 +24,7 @@ struct CameraTreeItemComponentState {
   bool isActive = false;
 }; // end of struct CameraTreeItemComponentState
 
-class BABYLON_SHARED_EXPORT CameraTreeItemComponent
-    : public TreeItemSpecializedComponent {
+class BABYLON_SHARED_EXPORT CameraTreeItemComponent : public TreeItemSpecializedComponent {
 
 public:
   /** Font Awesome Icon Unicodes **/
@@ -34,7 +33,7 @@ public:
 
 public:
   CameraTreeItemComponent(const ICameraTreeItemComponentProps& props);
-  virtual ~CameraTreeItemComponent(); // = default
+  ~CameraTreeItemComponent() override; // = default
 
   void setActive();
   void componentWillMount();

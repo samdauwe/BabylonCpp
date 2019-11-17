@@ -33,20 +33,17 @@ class IGLBuffer;
  * like box, sphere, cone or you can write your custom function.
  * Example: https://doc.babylonjs.com/babylon101/particles
  */
-class BABYLON_SHARED_EXPORT ParticleSystem : public BaseParticleSystem,
-                                             public IAnimatable {
+class BABYLON_SHARED_EXPORT ParticleSystem : public BaseParticleSystem, public IAnimatable {
 
 public:
   /**
    * Billboard mode will only apply to Y axis
    */
-  static constexpr unsigned int BILLBOARDMODE_Y
-    = Constants::PARTICLES_BILLBOARDMODE_Y;
+  static constexpr unsigned int BILLBOARDMODE_Y = Constants::PARTICLES_BILLBOARDMODE_Y;
   /**
    * Billboard mode will apply to all axes
    */
-  static constexpr unsigned int BILLBOARDMODE_ALL
-    = Constants::PARTICLES_BILLBOARDMODE_ALL;
+  static constexpr unsigned int BILLBOARDMODE_ALL = Constants::PARTICLES_BILLBOARDMODE_ALL;
   /**
    * Special billboard mode where the particle will be biilboard to the camera
    * but rotated to align with direction
@@ -70,15 +67,15 @@ public:
    * @param epsilon Offset used to render the particles
    */
   ParticleSystem(const std::string& name, size_t capacity, Scene* scene,
-                 const EffectPtr& customEffect = nullptr,
-                 bool isAnimationSheetEnabled = false, float epsilon = 0.01f);
-  virtual ~ParticleSystem(); // = default
+                 const EffectPtr& customEffect = nullptr, bool isAnimationSheetEnabled = false,
+                 float epsilon = 0.01f);
+  ~ParticleSystem() override; // = default
 
   /**
    * @brief Returns the object type.
    * @return the object type
    */
-  virtual Type type() const override;
+  Type type() const override;
 
   /**
    * @brief Adds a new life time gradient.
@@ -90,8 +87,7 @@ public:
    * @returns the current particle system
    */
   IParticleSystem& addLifeTimeGradient(float gradient, float factor,
-                                       const std::optional<float>& factor2
-                                       = std::nullopt) override;
+                                       const std::optional<float>& factor2 = std::nullopt) override;
 
   /**
    * @brief Remove a specific life time gradient.
@@ -109,8 +105,7 @@ public:
    * @returns the current particle system
    */
   IParticleSystem& addSizeGradient(float gradient, float factor,
-                                   const std::optional<float>& factor2
-                                   = std::nullopt) override;
+                                   const std::optional<float>& factor2 = std::nullopt) override;
 
   /**
    * @brief Remove a specific size gradient.
@@ -126,8 +121,7 @@ public:
    * @param max defines the color remap maximal range
    * @returns the current particle system
    */
-  IParticleSystem& addColorRemapGradient(float gradient, float min,
-                                         float max) override;
+  IParticleSystem& addColorRemapGradient(float gradient, float min, float max) override;
 
   /**
    * @brief Remove a specific color remap gradient.
@@ -143,8 +137,7 @@ public:
    * @param max defines the alpha remap maximal range
    * @returns the current particle system
    */
-  IParticleSystem& addAlphaRemapGradient(float gradient, float min,
-                                         float max) override;
+  IParticleSystem& addAlphaRemapGradient(float gradient, float min, float max) override;
 
   /**
    * @brief Remove a specific alpha remap gradient.
@@ -182,8 +175,7 @@ public:
    * @returns the current particle system
    */
   IParticleSystem& addVelocityGradient(float gradient, float factor,
-                                       const std::optional<float>& factor2
-                                       = std::nullopt) override;
+                                       const std::optional<float>& factor2 = std::nullopt) override;
 
   /**
    * @brief Remove a specific velocity gradient.
@@ -221,8 +213,7 @@ public:
    * @returns the current particle system
    */
   IParticleSystem& addDragGradient(float gradient, float factor,
-                                   const std::optional<float>& factor2
-                                   = std::nullopt) override;
+                                   const std::optional<float>& factor2 = std::nullopt) override;
 
   /**
    * @brief Remove a specific drag gradient.
@@ -242,8 +233,7 @@ public:
    * @returns the current particle system
    */
   IParticleSystem& addEmitRateGradient(float gradient, float factor,
-                                       const std::optional<float>& factor2
-                                       = std::nullopt) override;
+                                       const std::optional<float>& factor2 = std::nullopt) override;
 
   /**
    * @brief  Remove a specific emit rate gradient.
@@ -286,8 +276,7 @@ public:
    * @param color defines the color to affect to the specified gradient
    * @returns the current particle system
    */
-  IParticleSystem& addRampGradient(float gradient,
-                                   const Color3& color) override;
+  IParticleSystem& addRampGradient(float gradient, const Color3& color) override;
 
   /**
    * @brief Remove a specific ramp gradient.
@@ -305,8 +294,7 @@ public:
    * @returns this particle system
    */
   IParticleSystem& addColorGradient(float gradient, const Color4& color1,
-                                    const std::optional<Color4>& color2
-                                    = std::nullopt) override;
+                                    const std::optional<Color4>& color2 = std::nullopt) override;
 
   /**
    * @brief Remove a specific color gradient.
@@ -374,8 +362,7 @@ public:
   /**
    * @brief For internal use only.
    */
-  void _appendParticleVertex(unsigned int index, Particle* particle,
-                             int offsetX, int offsetY);
+  void _appendParticleVertex(unsigned int index, Particle* particle, int offsetX, int offsetY);
 
   /**
    * @brief "Recycles" one of the particle by copying it back to the "stock" of
@@ -387,22 +374,19 @@ public:
   /**
    * @brief Hidden
    */
-  static std::vector<std::string>
-  _GetAttributeNamesOrOptions(bool isAnimationSheetEnabled = false,
-                              bool isBillboardBased        = false,
-                              bool useRampGradients        = false);
+  static std::vector<std::string> _GetAttributeNamesOrOptions(bool isAnimationSheetEnabled = false,
+                                                              bool isBillboardBased        = false,
+                                                              bool useRampGradients        = false);
 
   /**
    * @brief Hidden
    */
-  static std::vector<std::string>
-  _GetEffectCreationOptions(bool isAnimationSheetEnabled = false);
+  static std::vector<std::string> _GetEffectCreationOptions(bool isAnimationSheetEnabled = false);
 
   /**
    * @brief For internal use only.
    */
-  void _appendParticleVertexWithAnimation(unsigned int index,
-                                          Particle* particle, int offsetX,
+  void _appendParticleVertexWithAnimation(unsigned int index, Particle* particle, int offsetX,
                                           int offsetY);
 
   /**
@@ -437,8 +421,7 @@ public:
    * @param disposeTexture defines if the particule texture must be disposed as
    * well (true by default)
    */
-  void dispose(bool disposeTexture             = true,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool disposeTexture = true, bool disposeMaterialAndTextures = false) override;
 
   std::vector<AnimationPtr> getAnimations() override;
 
@@ -459,15 +442,13 @@ public:
   /**
    * @brief Hidden
    */
-  static void _Serialize(json& serializationObject,
-                         IParticleSystem* particleSystem);
+  static void _Serialize(json& serializationObject, IParticleSystem* particleSystem);
 
   /**
    * @brief Hidden
    */
-  static ParticleSystem* _Parse(const json& parsedParticleSystem,
-                                IParticleSystem* particleSystem, Scene* scene,
-                                const std::string& url);
+  static ParticleSystem* _Parse(const json& parsedParticleSystem, IParticleSystem* particleSystem,
+                                Scene* scene, const std::string& url);
 
   /**
    * @brief Parses a JSON object to create a particle system.
@@ -484,8 +465,7 @@ protected:
   /**
    * @brief Sets a callback that will be triggered when the system is disposed.
    */
-  void set_onDispose(
-    const std::function<void(ParticleSystem*, EventState&)>& callback);
+  void set_onDispose(const std::function<void(ParticleSystem*, EventState&)>& callback);
 
   /** @brief Gets a boolean indicating that ramp gradients must be used.
    * @see http://doc.babylonjs.com/babylon101/particles#ramp-gradients
@@ -500,13 +480,10 @@ protected:
   void _reset() override;
 
 private:
-  float _fetchR(float u, float v, float width, float height,
-                const Uint8Array& pixels);
-  void _addFactorGradient(std::vector<FactorGradient>& factorGradients,
-                          float gradient, float factor,
-                          const std::optional<float>& factor2 = std::nullopt);
-  void _removeFactorGradient(std::vector<FactorGradient>& factorGradients,
-                             float gradient);
+  float _fetchR(float u, float v, float width, float height, const Uint8Array& pixels);
+  void _addFactorGradient(std::vector<FactorGradient>& factorGradients, float gradient,
+                          float factor, const std::optional<float>& factor2 = std::nullopt);
+  void _removeFactorGradient(std::vector<FactorGradient>& factorGradients, float gradient);
   void _createRampGradientTexture();
   void _resetEffect();
   void _createVertexBuffers();
@@ -542,16 +519,14 @@ public:
    * This function can be defined to specify initial direction for every new
    * particle. It by default use the emitterType defined function
    */
-  std::function<void(const Matrix& worldMatrix, Vector3& directionToUpdate,
-                     Particle* particle)>
+  std::function<void(const Matrix& worldMatrix, Vector3& directionToUpdate, Particle* particle)>
     startDirectionFunction;
 
   /**
    * This function can be defined to specify initial position for every new
    * particle. It by default use the emitterType defined function
    */
-  std::function<void(const Matrix& worldMatrix, Vector3& positionToUpdate,
-                     Particle* particle)>
+  std::function<void(const Matrix& worldMatrix, Vector3& positionToUpdate, Particle* particle)>
     startPositionFunction;
 
   /**
@@ -567,9 +542,7 @@ public:
   /**
    * Sets a callback that will be triggered when the system is disposed
    */
-  WriteOnlyProperty<ParticleSystem,
-                    std::function<void(ParticleSystem*, EventState&)>>
-    onDispose;
+  WriteOnlyProperty<ParticleSystem, std::function<void(ParticleSystem*, EventState&)>> onDispose;
 
   /** Hidden */
   std::optional<FactorGradient> _currentEmitRateGradient;
@@ -641,8 +614,7 @@ private:
   RawTexturePtr _rampGradientsTexture;
   bool _useRampGradients;
 
-  std::function<void(unsigned int offset, Particle* particle)>
-    _appendParticleVertexes;
+  std::function<void(unsigned int offset, Particle* particle)> _appendParticleVertexes;
 
   std::vector<std::vector<ParticleSystem*>> _subEmitters;
   ParticleSystem* _rootParticleSystem;

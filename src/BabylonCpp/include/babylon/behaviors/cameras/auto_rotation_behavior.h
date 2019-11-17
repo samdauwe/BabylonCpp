@@ -18,12 +18,11 @@ using ArcRotateCameraPtr = std::shared_ptr<ArcRotateCamera>;
  * a smooth rotation of an ArcRotateCamera when there is no user interaction.
  * @see http://doc.babylonjs.com/how_to/camera_behaviors#autorotation-behavior
  */
-class BABYLON_SHARED_EXPORT AutoRotationBehavior
-    : public Behavior<ArcRotateCamera> {
+class BABYLON_SHARED_EXPORT AutoRotationBehavior : public Behavior<ArcRotateCamera> {
 
 public:
   AutoRotationBehavior();
-  virtual ~AutoRotationBehavior(); // = default
+  ~AutoRotationBehavior() override; // = default
 
   /**
    * @brief Gets the name of the behavior.
@@ -41,8 +40,7 @@ public:
    * @param predicate Predicate to use for pick filtering
    */
   void attach(const ArcRotateCameraPtr& camera,
-              const std::function<bool(const AbstractMeshPtr& m)>& predicate
-              = nullptr) override;
+              const std::function<bool(const AbstractMeshPtr& m)>& predicate = nullptr) override;
 
   /**
    * @brief Detaches the behavior from its current arc rotate camera.

@@ -23,13 +23,13 @@ public:
   template <typename... Ts>
   static BlurPostProcessPtr New(Ts&&... args)
   {
-    auto postProcess = std::shared_ptr<BlurPostProcess>(
-      new BlurPostProcess(std::forward<Ts>(args)...));
+    auto postProcess
+      = std::shared_ptr<BlurPostProcess>(new BlurPostProcess(std::forward<Ts>(args)...));
     postProcess->add(postProcess);
 
     return postProcess;
   }
-  ~BlurPostProcess(); // = default
+  ~BlurPostProcess() override; // = default
 
   /**
    * @brief Updates the effect with the current post process compile time values
@@ -46,15 +46,12 @@ public:
    * @param onCompiled Called when the shader has been compiled.
    * @param onError Called if there is an error when compiling a shader.
    */
-  void updateEffect(
-    const std::string& defines                                           = "",
-    const std::vector<std::string>& uniforms                             = {},
-    const std::vector<std::string>& samplers                             = {},
-    const std::unordered_map<std::string, unsigned int>& indexParameters = {},
-    const std::function<void(Effect* effect)>& onCompiled = nullptr,
-    const std::function<void(Effect* effect, const std::string& errors)>&
-      onError
-    = nullptr) override;
+  void updateEffect(const std::string& defines = "", const std::vector<std::string>& uniforms = {},
+                    const std::vector<std::string>& samplers                             = {},
+                    const std::unordered_map<std::string, unsigned int>& indexParameters = {},
+                    const std::function<void(Effect* effect)>& onCompiled                = nullptr,
+                    const std::function<void(Effect* effect, const std::string& errors)>& onError
+                    = nullptr) override;
 
 protected:
   /**
@@ -78,22 +75,17 @@ protected:
    * the constructor. The updateEffect method can be used to compile the shader
    * at a later time. (default: false)
    */
-  BlurPostProcess(const std::string& name, const Vector2& direction,
-                  float kernel,
-                  const std::variant<float, PostProcessOptions>& options,
-                  const CameraPtr& camera,
-                  std::optional<unsigned int> samplingMode = std::nullopt,
-                  Engine* engine = nullptr, bool reusable = false,
-                  unsigned int textureType
-                  = Constants::TEXTURETYPE_UNSIGNED_INT,
-                  const std::string& defines = "",
-                  bool blockCompilation      = false);
+  BlurPostProcess(const std::string& name, const Vector2& direction, float kernel,
+                  const std::variant<float, PostProcessOptions>& options, const CameraPtr& camera,
+                  std::optional<unsigned int> samplingMode = std::nullopt, Engine* engine = nullptr,
+                  bool reusable              = false,
+                  unsigned int textureType   = Constants::TEXTURETYPE_UNSIGNED_INT,
+                  const std::string& defines = "", bool blockCompilation = false);
 
-  void _updateParameters(
-    const std::function<void(Effect* effect)>& onCompiled = nullptr,
-    const std::function<void(Effect* effect, const std::string& errors)>&
-      onError
-    = nullptr);
+  void
+  _updateParameters(const std::function<void(Effect* effect)>& onCompiled = nullptr,
+                    const std::function<void(Effect* effect, const std::string& errors)>& onError
+                    = nullptr);
 
   /**
    * @brief Best kernels are odd numbers that when divided by 2, their integer

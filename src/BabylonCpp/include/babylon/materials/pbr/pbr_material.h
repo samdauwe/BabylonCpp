@@ -25,22 +25,19 @@ public:
    * PBRMaterialTransparencyMode: No transparency mode, Alpha channel is not
    * use.
    */
-  static constexpr unsigned int PBRMATERIAL_OPAQUE
-    = PBRBaseMaterial::PBRMATERIAL_OPAQUE;
+  static constexpr unsigned int PBRMATERIAL_OPAQUE = PBRBaseMaterial::PBRMATERIAL_OPAQUE;
 
   /**
    * PBRMaterialTransparencyMode: Alpha Test mode, pixel are discarded below a
    * certain threshold defined by the alpha cutoff value.
    */
-  static constexpr unsigned int PBRMATERIAL_ALPHATEST
-    = PBRBaseMaterial::PBRMATERIAL_ALPHATEST;
+  static constexpr unsigned int PBRMATERIAL_ALPHATEST = PBRBaseMaterial::PBRMATERIAL_ALPHATEST;
 
   /**
    * PBRMaterialTransparencyMode: Pixels are blended (according to the alpha
    * mode) with the already drawn pixels in the current frame buffer.
    */
-  static constexpr unsigned int PBRMATERIAL_ALPHABLEND
-    = PBRBaseMaterial::PBRMATERIAL_ALPHABLEND;
+  static constexpr unsigned int PBRMATERIAL_ALPHABLEND = PBRBaseMaterial::PBRMATERIAL_ALPHABLEND;
 
   /**
    * PBRMaterialTransparencyMode: Pixels are blended (according to the alpha
@@ -61,13 +58,12 @@ public:
   template <typename... Ts>
   static PBRMaterialPtr New(Ts&&... args)
   {
-    auto material = std::shared_ptr<PBRMaterial>(
-      new PBRMaterial(std::forward<Ts>(args)...));
+    auto material = std::shared_ptr<PBRMaterial>(new PBRMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;
   }
-  ~PBRMaterial(); // = default
+  ~PBRMaterial() override; // = default
 
   /**
    * @brief Returns the name of this material class.
@@ -78,8 +74,7 @@ public:
    * @brief Makes a duplicate of the current material.
    * @param name - name to use for the new material.
    */
-  MaterialPtr clone(const std::string& name,
-                    bool cloneChildren = false) const override;
+  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
 
   /**
    * @brief Serializes this PBR Material.
@@ -95,8 +90,7 @@ public:
    * @param rootUrl - url for the scene object
    * @returns - PBRMaterial
    */
-  static PBRMaterial* Parse(const json& source, Scene* scene,
-                            const std::string& rootUrl);
+  static PBRMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
   /**
@@ -566,8 +560,7 @@ protected:
    *
    * If sets to null, the scene one is in use.
    */
-  void set_imageProcessingConfiguration(
-    const ImageProcessingConfigurationPtr& value);
+  void set_imageProcessingConfiguration(const ImageProcessingConfigurationPtr& value);
 
   /**
    * @brief Gets wether the color curves effect is enabled.
@@ -1043,8 +1036,7 @@ public:
    * The image processing configuration used either in this
    * material.
    */
-  Property<PBRMaterial, ImageProcessingConfigurationPtr>
-    imageProcessingConfiguration;
+  Property<PBRMaterial, ImageProcessingConfigurationPtr> imageProcessingConfiguration;
 
   /**
    * Wether the color curves effect is enabled.

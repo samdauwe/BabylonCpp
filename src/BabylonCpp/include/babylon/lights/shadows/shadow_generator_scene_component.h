@@ -13,24 +13,21 @@ namespace BABYLON {
 class AbstractScene;
 class ShadowGeneratorSceneComponent;
 class RenderTargetTexture;
-using ShadowGeneratorSceneComponentPtr
-  = std::shared_ptr<ShadowGeneratorSceneComponent>;
-using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+using ShadowGeneratorSceneComponentPtr = std::shared_ptr<ShadowGeneratorSceneComponent>;
+using RenderTargetTexturePtr           = std::shared_ptr<RenderTargetTexture>;
 
 /**
  * @brief Defines the shadow generator component responsible to manage any
  * shadow generators in a given scene.
  */
-class BABYLON_SHARED_EXPORT ShadowGeneratorSceneComponent
-    : public ISceneSerializableComponent {
+class BABYLON_SHARED_EXPORT ShadowGeneratorSceneComponent : public ISceneSerializableComponent {
 
 public:
   /**
    * The component name helpfull to identify the component in the list of scene
    * components.
    */
-  static constexpr const char* name
-    = SceneComponentConstants::NAME_SHADOWGENERATOR;
+  static constexpr const char* name = SceneComponentConstants::NAME_SHADOWGENERATOR;
 
 public:
   template <typename... Ts>
@@ -39,7 +36,7 @@ public:
     return std::shared_ptr<ShadowGeneratorSceneComponent>(
       new ShadowGeneratorSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~ShadowGeneratorSceneComponent(); // = default
+  ~ShadowGeneratorSceneComponent() override; // = default
 
   /**
    * @brief Registers the component in a given scene.
@@ -69,8 +66,7 @@ public:
    * @param container contains the elements to remove
    * @param dispose if the removed element should be disposed (default: false)
    */
-  void removeFromContainer(AbstractScene& container,
-                           bool dispose = false) override;
+  void removeFromContainer(AbstractScene& container, bool dispose = false) override;
 
   /**
    * @brief Disposes the component and the associated resources.

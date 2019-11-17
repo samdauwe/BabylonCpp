@@ -40,8 +40,7 @@ class BABYLON_SHARED_EXPORT Camera : public Node {
 
 public:
   /** Hidden */
-  static CameraPtr _createDefaultParsedCamera(const std::string& name,
-                                              Scene* scene);
+  static CameraPtr _createDefaultParsedCamera(const std::string& name, Scene* scene);
 
 public:
   /**
@@ -123,9 +122,9 @@ public:
   static bool ForceAttachControlToAlwaysPreventDefault;
 
 public:
-  virtual ~Camera(); // = default
+  ~Camera() override; // = default
 
-  virtual Type type() const override;
+  Type type() const override;
   void addToScene(const CameraPtr& newCamera);
 
   /**
@@ -168,13 +167,12 @@ public:
    * has to be done (false by default)
    * @return true if the camera is ready
    */
-  bool isReady(bool completeCheck        = false,
-               bool forceInstanceSupport = false) override;
+  bool isReady(bool completeCheck = false, bool forceInstanceSupport = false) override;
 
   /**
    * @brief Hidden
    */
-  virtual void _initCache() override;
+  void _initCache() override;
 
   /**
    * @brief Hidden
@@ -205,9 +203,8 @@ public:
    * (https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)
    */
   virtual void attachControl(ICanvas* canvas, bool noPreventDefault = false,
-                             bool useCtrlForPanning = true,
-                             MouseButtonType panningMouseButton
-                             = MouseButtonType::RIGHT);
+                             bool useCtrlForPanning             = true,
+                             MouseButtonType panningMouseButton = MouseButtonType::RIGHT);
 
   /**
    * @brief Detach the current controls from the specified dom element.
@@ -352,9 +349,8 @@ public:
    * camera position
    * @returns the forward ray
    */
-  Ray getForwardRay(float length                           = 100.f,
-                    const std::optional<Matrix>& transform = std::nullopt,
-                    const std::optional<Vector3>& origin   = std::nullopt);
+  Ray getForwardRay(float length = 100.f, const std::optional<Matrix>& transform = std::nullopt,
+                    const std::optional<Vector3>& origin = std::nullopt);
 
   /**
    * @brief Releases resources associated with this node.
@@ -363,8 +359,7 @@ public:
    * @param disposeMaterialAndTextures Set to true to also dispose referenced
    * materials and textures (false by default)
    */
-  virtual void dispose(bool doNotRecurse               = false,
-                       bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Gets the left camera of a rig setup in case of Rigged Camera.
@@ -442,7 +437,7 @@ public:
    * @brief Gets the class name of the camera.
    * @returns the class name
    */
-  virtual const std::string getClassName() const override;
+  const std::string getClassName() const override;
 
   /**
    * @brief Clones the current camera.
@@ -472,8 +467,7 @@ public:
    * @brief Compute the world  matrix of the camera.
    * @returns the camera world matrix
    */
-  Matrix& computeWorldMatrix(bool force             = false,
-                             bool useWasUpdatedFlag = false) override;
+  Matrix& computeWorldMatrix(bool force = false, bool useWasUpdatedFlag = false) override;
 
   /**
    * @brief Ensures the multiview texture of the camera exists and has the
@@ -507,10 +501,10 @@ public:
    * sereo be side b side
    * @returns a factory method to construc the camera
    */
-  static std::function<CameraPtr()>
-  GetConstructorFromName(const std::string& type, const std::string& name,
-                         Scene* scene, float interaxial_distance = 0.f,
-                         bool isStereoscopicSideBySide = true);
+  static std::function<CameraPtr()> GetConstructorFromName(const std::string& type,
+                                                           const std::string& name, Scene* scene,
+                                                           float interaxial_distance     = 0.f,
+                                                           bool isStereoscopicSideBySide = true);
 
   /**
    * @brief Parse a JSON and creates the camera from the parsed information

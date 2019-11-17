@@ -19,7 +19,7 @@ public:
   ShaderDefineArithmeticOperator(ShaderDefineArithmeticOperator&& other);
   ShaderDefineArithmeticOperator& operator=(const ShaderDefineArithmeticOperator& other);
   ShaderDefineArithmeticOperator& operator=(ShaderDefineArithmeticOperator&& other);
-  virtual ~ShaderDefineArithmeticOperator(); // = default
+  ~ShaderDefineArithmeticOperator() override; // = default
 
   bool isTrue(const std::unordered_map<std::string, std::string>& preprocessors) const override;
 

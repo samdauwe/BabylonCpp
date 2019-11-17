@@ -30,7 +30,7 @@ public:
   BoundingInfo(BoundingInfo&& other);
   BoundingInfo& operator=(const BoundingInfo& other);
   BoundingInfo& operator=(BoundingInfo&& other);
-  virtual ~BoundingInfo(); // = default
+  ~BoundingInfo() override; // = default
 
   /**
    * @brief Recreates the entire bounding info from scratch as if we call the
@@ -73,8 +73,7 @@ public:
    * @returns true if the bounding info is in the frustum planes
    */
   bool isInFrustum(const std::array<Plane, 6>& frustumPlanes,
-                   unsigned int strategy
-                   = Constants::MESHES_CULLINGSTRATEGY_STANDARD) override;
+                   unsigned int strategy = Constants::MESHES_CULLINGSTRATEGY_STANDARD) override;
 
   /**
    * @brief Gets the world distance between the min and max points of the
@@ -88,8 +87,7 @@ public:
    * @param frustumPlanes Camera near/planes
    * @returns true if the object is in frustum otherwise false
    */
-  bool
-  isCompletelyInFrustum(const std::array<Plane, 6>& frustumPlanes) override;
+  bool isCompletelyInFrustum(const std::array<Plane, 6>& frustumPlanes) override;
 
   /**
    * @brief Hidden
@@ -122,10 +120,8 @@ protected:
   void set_isLocked(bool value);
 
 private:
-  void computeBoxExtents(const Vector3& axis, const BoundingBox& box,
-                         Extents& result);
-  bool axisOverlap(const Vector3& axis, const BoundingBox& box0,
-                   const BoundingBox& box1);
+  void computeBoxExtents(const Vector3& axis, const BoundingBox& box, Extents& result);
+  bool axisOverlap(const Vector3& axis, const BoundingBox& box0, const BoundingBox& box1);
 
 public:
   /**

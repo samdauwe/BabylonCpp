@@ -24,34 +24,29 @@ public:
   template <typename... Ts>
   static CellMaterialPtr New(Ts&&... args)
   {
-    auto material = std::shared_ptr<CellMaterial>(
-      new CellMaterial(std::forward<Ts>(args)...));
+    auto material = std::shared_ptr<CellMaterial>(new CellMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;
   }
-  ~CellMaterial(); // = default
+  ~CellMaterial() override; // = default
 
   bool needAlphaBlending() const override;
   bool needAlphaTesting() const override;
   BaseTexturePtr getAlphaTestTexture() override;
-  bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
-                         bool useInstances) override;
+  bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool useInstances) override;
   void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
   std::vector<IAnimatablePtr> getAnimatables() override;
   std::vector<BaseTexturePtr> getActiveTextures() const override;
   bool hasTexture(const BaseTexturePtr& texture) const override;
-  virtual void dispose(bool forceDisposeEffect   = false,
-                       bool forceDisposeTextures = false,
-                       bool notBoundToMesh       = false) override;
+  void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
+               bool notBoundToMesh = false) override;
   const std::string getClassName() const override;
-  MaterialPtr clone(const std::string& name,
-                    bool cloneChildren = false) const override;
+  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
   json serialize() const;
 
   /** Statics **/
-  static CellMaterial* Parse(const json& source, Scene* scene,
-                             const std::string& rootUrl);
+  static CellMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
   CellMaterial(const std::string& name, Scene* scene);

@@ -20,13 +20,13 @@ public:
   template <typename... Ts>
   static SpritePackedManagerPtr New(Ts&&... args)
   {
-    auto spriteManager = std::shared_ptr<SpritePackedManager>(
-      new SpritePackedManager(std::forward<Ts>(args)...));
+    auto spriteManager
+      = std::shared_ptr<SpritePackedManager>(new SpritePackedManager(std::forward<Ts>(args)...));
     spriteManager->addToScene(spriteManager);
 
     return spriteManager;
   }
-  virtual ~SpritePackedManager(); // = default
+  ~SpritePackedManager() override; // = default
 
 protected:
   /**
@@ -40,11 +40,9 @@ protected:
    * @param samplingMode defines the smapling mode to use with spritesheet
    * @param fromPacked set to true; do not alter
    */
-  SpritePackedManager(const std::string& name, const std::string& imgUrl,
-                      unsigned int capacity, Scene* scene,
-                      const std::string& spriteJSON = "", float epsilon = 0.01f,
-                      unsigned int samplingMode
-                      = TextureConstants::TRILINEAR_SAMPLINGMODE);
+  SpritePackedManager(const std::string& name, const std::string& imgUrl, unsigned int capacity,
+                      Scene* scene, const std::string& spriteJSON = "", float epsilon = 0.01f,
+                      unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE);
 
 }; // end of class SpritePackedManager
 

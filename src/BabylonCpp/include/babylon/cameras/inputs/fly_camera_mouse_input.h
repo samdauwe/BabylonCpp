@@ -14,8 +14,7 @@ namespace BABYLON {
  * @brief Manage the mouse inputs to control the movement of a free camera.
  * @see http://doc.babylonjs.com/how_to/customizing_camera_inputs
  */
-class BABYLON_SHARED_EXPORT FlyCameraMouseInput
-    : public ICameraInput<FlyCamera> {
+class BABYLON_SHARED_EXPORT FlyCameraMouseInput : public ICameraInput<FlyCamera> {
 
 public:
   /**
@@ -24,7 +23,7 @@ public:
    * @see http://doc.babylonjs.com/how_to/customizing_camera_inputs
    */
   FlyCameraMouseInput(bool touchEnabled = true);
-  virtual ~FlyCameraMouseInput(); // = default
+  ~FlyCameraMouseInput() override; // = default
 
   /**
    * @brief Attach the mouse control to the HTML DOM element.

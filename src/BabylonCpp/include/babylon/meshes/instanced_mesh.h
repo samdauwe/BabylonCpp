@@ -20,14 +20,13 @@ public:
   template <typename... Ts>
   static InstancedMeshPtr New(Ts&&... args)
   {
-    auto mesh = std::shared_ptr<InstancedMesh>(
-      new InstancedMesh(std::forward<Ts>(args)...));
+    auto mesh = std::shared_ptr<InstancedMesh>(new InstancedMesh(std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
     mesh->syncSubMeshes(mesh);
 
     return mesh;
   }
-  ~InstancedMesh(); // = default
+  ~InstancedMesh() override; // = default
 
   void syncSubMeshes(const InstancedMeshPtr& instancedMesh);
 
@@ -62,8 +61,7 @@ public:
    * lights) has to be done (false by default)
    * @return {boolean} is it ready
    */
-  bool isReady(bool completeCheck        = false,
-               bool forceInstanceSupport = false) override;
+  bool isReady(bool completeCheck = false, bool forceInstanceSupport = false) override;
 
   /**
    * @brief Returns an array of integers or a typed array (Int32Array,
@@ -76,9 +74,8 @@ public:
    * @returns a float array or a Float32Array of the requested kind of data :
    * positons, normals, uvs, etc.
    */
-  Float32Array getVerticesData(const std::string& kind,
-                               bool copyWhenShared = false,
-                               bool forceCopy      = false) override;
+  Float32Array getVerticesData(const std::string& kind, bool copyWhenShared = false,
+                               bool forceCopy = false) override;
 
   /**
    * @brief Sets the vertex data of the mesh geometry for the requested `kind`.
@@ -110,10 +107,9 @@ public:
    *
    * @returns The Mesh.
    */
-  AbstractMesh*
-  setVerticesData(const std::string& kind, const Float32Array& data,
-                  bool updatable                      = false,
-                  const std::optional<size_t>& stride = std::nullopt) override;
+  AbstractMesh* setVerticesData(const std::string& kind, const Float32Array& data,
+                                bool updatable                      = false,
+                                const std::optional<size_t>& stride = std::nullopt) override;
 
   /**
    * @brief Updates the existing vertex data of the mesh geometry for the
@@ -143,10 +139,8 @@ public:
    *
    * @returns The Mesh.
    */
-  AbstractMesh* updateVerticesData(const std::string& kind,
-                                   const Float32Array& data,
-                                   bool updateExtends = false,
-                                   bool makeItUnique  = false) override;
+  AbstractMesh* updateVerticesData(const std::string& kind, const Float32Array& data,
+                                   bool updateExtends = false, bool makeItUnique = false) override;
 
   /**
    * @brief Sets the mesh indices.
@@ -158,9 +152,8 @@ public:
    *
    * @returns The Mesh.
    */
-  AbstractMesh* setIndices(const IndicesArray& indices,
-                           size_t totalVertices = 0,
-                           bool updatable       = false) override;
+  AbstractMesh* setIndices(const IndicesArray& indices, size_t totalVertices = 0,
+                           bool updatable = false) override;
 
   /**
    * @brief Returns if the mesh owns the requested kind of data.
@@ -170,8 +163,7 @@ public:
   /**
    * @brief Returns an array of indices (IndicesArray).
    */
-  IndicesArray getIndices(bool copyWhenShared = false,
-                          bool forceCopy      = false) override;
+  IndicesArray getIndices(bool copyWhenShared = false, bool forceCopy = false) override;
 
   /**
    * @brief Hidden
@@ -210,8 +202,7 @@ public:
   /**
    * @brief Returns the current associated LOD AbstractMesh.
    */
-  AbstractMesh* getLOD(const CameraPtr& camera,
-                       BoundingSphere* boundingSphere = nullptr) override;
+  AbstractMesh* getLOD(const CameraPtr& camera, BoundingSphere* boundingSphere = nullptr) override;
 
   /**
    * @brief Hidden
@@ -232,14 +223,12 @@ public:
    * the model children aren't cloned.
    * @returns The clone.
    */
-  InstancedMeshPtr clone(const std::string& name, Node* newParent,
-                         bool doNotCloneChildren = false);
+  InstancedMeshPtr clone(const std::string& name, Node* newParent, bool doNotCloneChildren = false);
 
   /**
    * @brief Disposes the InstancedMesh.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
 protected:
   InstancedMesh(const std::string& name, const MeshPtr& source);

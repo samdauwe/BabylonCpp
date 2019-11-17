@@ -34,7 +34,7 @@ public:
   BoundingBoxGizmo(const Color3& color = Color3::Gray(),
                    const UtilityLayerRendererPtr& gizmoLayer
                    = UtilityLayerRenderer::DefaultUtilityLayer());
-  ~BoundingBoxGizmo(); // = default
+  ~BoundingBoxGizmo() override; // = default
 
   /**
    * @brief Sets the color of the bounding box gizmo.
@@ -68,8 +68,7 @@ public:
   /**
    * @brief Disposes of the gizmo.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Makes a mesh not pickable and wraps the mesh inside of a bounding
@@ -84,8 +83,7 @@ public:
    * @brief CustomMeshes are not supported by this gizmo.
    * @param mesh The mesh to replace the default mesh of the gizmo
    */
-  void setCustomMesh(const MeshPtr& mesh,
-                     bool useGizmoMaterial = false) override;
+  void setCustomMesh(const MeshPtr& mesh, bool useGizmoMaterial = false) override;
 
 protected:
   void _attachedMeshChanged(const AbstractMeshPtr& value) override;
@@ -108,8 +106,7 @@ public:
    * box. When null, all descendants are included. If ignoreChildren is set this
    * will be ignored. (Default: null)
    */
-  std::function<bool(const AbstractMeshPtr& abstractMesh)>
-    includeChildPredicate;
+  std::function<bool(const AbstractMeshPtr& abstractMesh)> includeChildPredicate;
 
   /**
    * The size of the rotation spheres attached to the bounding box (Default:

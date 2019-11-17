@@ -20,21 +20,19 @@ public:
   template <typename... Ts>
   static GlowBlurPostProcessPtr New(Ts&&... args)
   {
-    auto postProcess = std::shared_ptr<GlowBlurPostProcess>(
-      new GlowBlurPostProcess(std::forward<Ts>(args)...));
+    auto postProcess
+      = std::shared_ptr<GlowBlurPostProcess>(new GlowBlurPostProcess(std::forward<Ts>(args)...));
     postProcess->add(postProcess);
 
     return postProcess;
   }
-  ~GlowBlurPostProcess(); // = default
+  ~GlowBlurPostProcess() override; // = default
 
 protected:
-  GlowBlurPostProcess(const std::string& name, const Vector2& direction,
-                      float kernel,
+  GlowBlurPostProcess(const std::string& name, const Vector2& direction, float kernel,
                       const std::variant<float, PostProcessOptions>& options,
                       const CameraPtr& camera,
-                      unsigned int samplingMode
-                      = TextureConstants::BILINEAR_SAMPLINGMODE,
+                      unsigned int samplingMode = TextureConstants::BILINEAR_SAMPLINGMODE,
                       Engine* engine = nullptr, bool reusable = false);
 
 public:

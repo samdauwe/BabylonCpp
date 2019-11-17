@@ -32,13 +32,13 @@ public:
   template <typename... Ts>
   static AnimationGroupPtr New(Ts&&... args)
   {
-    auto animationGroup = std::shared_ptr<AnimationGroup>(
-      new AnimationGroup(std::forward<Ts>(args)...));
+    auto animationGroup
+      = std::shared_ptr<AnimationGroup>(new AnimationGroup(std::forward<Ts>(args)...));
     animationGroup->addToScene(animationGroup);
 
     return animationGroup;
   }
-  virtual ~AnimationGroup(); // = default
+  ~AnimationGroup() override; // = default
 
   void addToScene(const AnimationGroupPtr& newAnimationGroup);
 
@@ -62,7 +62,7 @@ public:
    * @returns the animation group
    */
   AnimationGroup& normalize(const std::optional<int>& beginFrame = std::nullopt,
-                            const std::optional<int>& endFrame = std::nullopt);
+                            const std::optional<int>& endFrame   = std::nullopt);
 
   /**
    * @brief Start all animations on given targets.
@@ -136,8 +136,7 @@ public:
   /**
    * @brief Dispose all associated resources.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Clone the current animation group and returns a copy
@@ -148,8 +147,7 @@ public:
    */
   AnimationGroupPtr
   clone(const std::string& newName,
-        const std::function<IAnimatablePtr(const IAnimatablePtr& animatible)>&
-          targetConverter
+        const std::function<IAnimatablePtr(const IAnimatablePtr& animatible)>& targetConverter
         = nullptr);
 
   /**
@@ -166,8 +164,7 @@ public:
    * @param scene defines the scene that will receive the animationGroup
    * @returns a new AnimationGroup
    */
-  static AnimationGroupPtr Parse(const json& parsedAnimationGroup,
-                                 Scene* scene);
+  static AnimationGroupPtr Parse(const json& parsedAnimationGroup, Scene* scene);
 
   /**
    * @brief Returns the string "AnimationGroup".
@@ -316,8 +313,7 @@ public:
   /**
    * Targeted animations for this animation group.
    */
-  ReadOnlyProperty<AnimationGroup,
-                   std::vector<std::unique_ptr<TargetedAnimation>>>
+  ReadOnlyProperty<AnimationGroup, std::vector<std::unique_ptr<TargetedAnimation>>>
     targetedAnimations;
 
   /**

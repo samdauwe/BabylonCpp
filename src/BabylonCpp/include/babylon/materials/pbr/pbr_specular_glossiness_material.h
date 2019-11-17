@@ -7,8 +7,7 @@
 namespace BABYLON {
 
 class PBRSpecularGlossinessMaterial;
-using PBRSpecularGlossinessMaterialPtr
-  = std::shared_ptr<PBRSpecularGlossinessMaterial>;
+using PBRSpecularGlossinessMaterialPtr = std::shared_ptr<PBRSpecularGlossinessMaterial>;
 
 /**
  * @brief The PBR material of BJS following the metal roughness convention.
@@ -16,8 +15,7 @@ using PBRSpecularGlossinessMaterialPtr
  * This fits to the PBR convention in the GLTF definition:
  * https://github.com/KhronosGroup/glTF/tree/2.0/specification/2.0
  */
-class BABYLON_SHARED_EXPORT PBRSpecularGlossinessMaterial
-    : public PBRBaseSimpleMaterial {
+class BABYLON_SHARED_EXPORT PBRSpecularGlossinessMaterial : public PBRBaseSimpleMaterial {
 
 public:
   template <typename... Ts>
@@ -29,7 +27,7 @@ public:
 
     return material;
   }
-  ~PBRSpecularGlossinessMaterial(); // = default
+  ~PBRSpecularGlossinessMaterial() override; // = default
 
   /**
    * @brief Return the currrent class name of the material.
@@ -40,8 +38,7 @@ public:
    * @brief Makes a duplicate of the current material.
    * @param name - name to use for the new material.
    */
-  MaterialPtr clone(const std::string& name,
-                    bool cloneChildren = false) const override;
+  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
 
   /**
    * @brief Serialize the material to a parsable JSON object.
@@ -125,8 +122,7 @@ public:
    * Specifies both the specular color RGB and the glossiness A of the material
    * per pixels.
    */
-  Property<PBRSpecularGlossinessMaterial, BaseTexturePtr>
-    specularGlossinessTexture;
+  Property<PBRSpecularGlossinessMaterial, BaseTexturePtr> specularGlossinessTexture;
 
 }; // end of class PBRSpecularGlossinessMaterial
 

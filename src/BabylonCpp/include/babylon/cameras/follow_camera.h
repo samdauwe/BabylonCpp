@@ -25,13 +25,12 @@ public:
   template <typename... Ts>
   static FollowCameraPtr New(Ts&&... args)
   {
-    auto camera = std::shared_ptr<FollowCamera>(
-      new FollowCamera(std::forward<Ts>(args)...));
+    auto camera = std::shared_ptr<FollowCamera>(new FollowCamera(std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;
   }
-  ~FollowCamera(); // = default
+  ~FollowCamera() override; // = default
 
   Type type() const override;
 
@@ -42,10 +41,8 @@ public:
    * call preventdefault()
    * (https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)
    */
-  void attachControl(ICanvas* element, bool noPreventDefault = false,
-                     bool useCtrlForPanning = true,
-                     MouseButtonType panningMouseButton
-                     = MouseButtonType::RIGHT) override;
+  void attachControl(ICanvas* element, bool noPreventDefault = false, bool useCtrlForPanning = true,
+                     MouseButtonType panningMouseButton = MouseButtonType::RIGHT) override;
 
   /**
    * @brief Detach the current controls from the camera.

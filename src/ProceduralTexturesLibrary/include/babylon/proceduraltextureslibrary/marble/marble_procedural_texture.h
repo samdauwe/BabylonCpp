@@ -23,7 +23,7 @@ public:
 
     return texture;
   }
-  ~MarbleProceduralTexture(); // = default
+  ~MarbleProceduralTexture() override; // = default
 
   void updateShaderUniforms();
 
@@ -42,13 +42,12 @@ public:
    * information
    * @returns a parsed Marble Procedural Texture
    */
-  static std::unique_ptr<MarbleProceduralTexture>
-  Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
+  static std::unique_ptr<MarbleProceduralTexture> Parse(const json& parsedTexture, Scene* scene,
+                                                        const std::string& rootUrl);
 
 protected:
-  MarbleProceduralTexture(const std::string& name, const Size& size,
-                          Scene* scene, Texture* fallbackTexture = nullptr,
-                          bool generateMipMaps = false);
+  MarbleProceduralTexture(const std::string& name, const Size& size, Scene* scene,
+                          Texture* fallbackTexture = nullptr, bool generateMipMaps = false);
 
   float get_numberOfTilesHeight() const;
   void set_numberOfTilesHeight(float value);

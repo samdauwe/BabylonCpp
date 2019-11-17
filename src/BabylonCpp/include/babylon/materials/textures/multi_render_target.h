@@ -28,11 +28,9 @@ public:
    * @param scene Define the scene the texture belongs to
    * @param options Define the options used to create the multi render target
    */
-  MultiRenderTarget(const std::string& name, Size size, std::size_t count,
-                    Scene* scene,
-                    const std::optional<IMultiRenderTargetOptions>& options
-                    = std::nullopt);
-  ~MultiRenderTarget(); // = default
+  MultiRenderTarget(const std::string& name, Size size, std::size_t count, Scene* scene,
+                    const std::optional<IMultiRenderTargetOptions>& options = std::nullopt);
+  ~MultiRenderTarget() override; // = default
 
   /**
    * @brief Hidden

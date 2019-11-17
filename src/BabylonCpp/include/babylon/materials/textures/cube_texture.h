@@ -20,13 +20,12 @@ public:
   template <typename... Ts>
   static CubeTexturePtr New(Ts&&... args)
   {
-    auto texture = std::shared_ptr<CubeTexture>(
-      new CubeTexture(std::forward<Ts>(args)...));
+    auto texture = std::shared_ptr<CubeTexture>(new CubeTexture(std::forward<Ts>(args)...));
     texture->addToScene(texture);
 
     return texture;
   }
-  ~CubeTexture(); // = default
+  ~CubeTexture() override; // = default
 
   /**
    * @brief Get the current class name of the texture useful for serialization
@@ -43,11 +42,9 @@ public:
    * @param onLoad callback called when the texture is loaded  (defaults to
    * null)
    */
-  void updateURL(
-    const std::string& url, const std::string& forcedExtension = "",
-    const std::function<void(const std::optional<CubeTextureData>& data)>&
-      onLoad
-    = nullptr);
+  void updateURL(const std::string& url, const std::string& forcedExtension = "",
+                 const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad
+                 = nullptr);
 
   /**
    * @brief Delays loading of the cube texture.
@@ -79,8 +76,8 @@ public:
    * @param noMipmap specifies if mip maps are not used
    * @returns a cube texture
    */
-  static CubeTexturePtr CreateFromImages(const std::vector<std::string>& files,
-                                         Scene* scene, bool noMipmap = false);
+  static CubeTexturePtr CreateFromImages(const std::vector<std::string>& files, Scene* scene,
+                                         bool noMipmap = false);
 
   /**
    * @brief Creates and return a texture created from prefilterd data by tools
@@ -93,10 +90,9 @@ public:
    * harmonics from the texture data if necessary
    * @return the prefiltered texture
    */
-  static CubeTexturePtr
-  CreateFromPrefilteredData(const std::string& url, Scene* scene,
-                            const std::string& forcedExtension = "",
-                            bool createPolynomials             = true);
+  static CubeTexturePtr CreateFromPrefilteredData(const std::string& url, Scene* scene,
+                                                  const std::string& forcedExtension = "",
+                                                  bool createPolynomials             = true);
 
   /**
    * @brief Parses text to create a cube texture.
@@ -105,8 +101,7 @@ public:
    * @param rootUrl defines the root url of the cube texture
    * @returns a cube texture
    */
-  static CubeTexturePtr Parse(const json& parsedTexture, Scene* scene,
-                              const std::string& rootUrl);
+  static CubeTexturePtr Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
 
 protected:
   /**
@@ -137,19 +132,15 @@ protected:
    * manages first LOD level used for IBL according to the roughness
    * @return the cube texture
    */
-  CubeTexture(const std::string& rootUrl, Scene* scene,
-              const std::vector<std::string>& extensions = {},
-              bool noMipmap = false, const std::vector<std::string>& files = {},
-              const std::function<
-                void(const std::optional<CubeTextureData>& data)>& onLoad
-              = nullptr,
-              const std::function<void(const std::string& message,
-                                       const std::string& exception)>& onError
-              = nullptr,
-              unsigned int format = Constants::TEXTUREFORMAT_RGBA,
-              bool prefiltered = false, const std::string& forcedExtension = "",
-              bool createPolynomials = false, float lodScale = 0.8f,
-              float lodOffset = 0.f);
+  CubeTexture(
+    const std::string& rootUrl, Scene* scene, const std::vector<std::string>& extensions = {},
+    bool noMipmap = false, const std::vector<std::string>& files = {},
+    const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad = nullptr,
+    const std::function<void(const std::string& message, const std::string& exception)>& onError
+    = nullptr,
+    unsigned int format = Constants::TEXTUREFORMAT_RGBA, bool prefiltered = false,
+    const std::string& forcedExtension = "", bool createPolynomials = false, float lodScale = 0.8f,
+    float lodOffset = 0.f);
 
   /**
    * @brief Gets or sets the size of the bounding box associated with the cube
@@ -222,8 +213,7 @@ public:
   ReadOnlyProperty<CubeTexture, bool> isPrefiltered;
 
 private:
-  std::function<void(const std::optional<CubeTextureData>& data)>
-    _delayedOnLoad;
+  std::function<void(const std::optional<CubeTextureData>& data)> _delayedOnLoad;
   std::optional<Vector3> _boundingBoxSize;
   float _rotationY;
   bool _noMipmap;

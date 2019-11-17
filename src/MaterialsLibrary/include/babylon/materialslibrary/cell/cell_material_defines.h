@@ -10,7 +10,7 @@ namespace MaterialsLibrary {
 struct BABYLON_SHARED_EXPORT CellMaterialDefines : public MaterialDefines {
 
   CellMaterialDefines();
-  ~CellMaterialDefines(); // = default
+  ~CellMaterialDefines() override; // = default
 
 }; // end of struct CellMaterialDefines
 

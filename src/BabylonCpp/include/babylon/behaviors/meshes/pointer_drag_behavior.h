@@ -24,8 +24,7 @@ using NodePtr         = std::shared_ptr<Node>;
  * @brief A behavior that when attached to a mesh will allow the mesh to be
  * dragged around the screen based on pointer events.
  */
-class BABYLON_SHARED_EXPORT PointerDragBehavior
-    : public Behavior<AbstractMesh> {
+class BABYLON_SHARED_EXPORT PointerDragBehavior : public Behavior<AbstractMesh> {
 
 public:
   /**
@@ -34,9 +33,8 @@ public:
    * across. pointerObservableScene can be used to listen to drag events from
    * another scene(eg. if the attached mesh is in an overlay scene).
    */
-  PointerDragBehavior(const PointerDragBehaviorOptions& options
-                      = PointerDragBehaviorOptions());
-  virtual ~PointerDragBehavior(); // = default
+  PointerDragBehavior(const PointerDragBehaviorOptions& options = PointerDragBehaviorOptions());
+  ~PointerDragBehavior() override; // = default
 
   /**
    * @brief The name of the behavior.
@@ -54,8 +52,7 @@ public:
    * @param predicate Predicate to use for pick filtering
    */
   void attach(const AbstractMeshPtr& ownerNode,
-              const std::function<bool(const AbstractMeshPtr& m)>& predicate
-              = nullptr) override;
+              const std::function<bool(const AbstractMeshPtr& m)>& predicate = nullptr) override;
 
   /**
    * @brief Force relase the drag action by code.
@@ -71,7 +68,7 @@ public:
    * @param startPickedPoint picked point of the pointer to be simulated
    * (Default: attached mesh position)
    */
-  void startDrag(int pointerId = PointerDragBehavior::_AnyMouseID,
+  void startDrag(int pointerId                                  = PointerDragBehavior::_AnyMouseID,
                  const std::optional<Ray>& fromRay              = std::nullopt,
                  const std::optional<Vector3>& startPickedPoint = std::nullopt);
 
@@ -81,10 +78,8 @@ public:
   void detach() override;
 
 private:
-  void _startDrag(int pointerId                     = 1,
-                  const std::optional<Ray>& fromRay = std::nullopt,
-                  const std::optional<Vector3>& startPickedPoint
-                  = std::nullopt);
+  void _startDrag(int pointerId = 1, const std::optional<Ray>& fromRay = std::nullopt,
+                  const std::optional<Vector3>& startPickedPoint = std::nullopt);
   void _moveDrag(const Ray& ray);
   std::optional<Vector3> _pickWithRayOnDragPlane(const std::optional<Ray>& ray);
 
@@ -92,8 +87,7 @@ private:
    * @brief Position the drag plane based on the attached mesh position, for
    * single axis rotate the plane along the axis to face the camera.
    */
-  void _updateDragPlanePosition(const Ray& ray,
-                                const Vector3& dragPlanePosition);
+  void _updateDragPlanePosition(const Ray& ray, const Vector3& dragPlanePosition);
 
 public:
   /**

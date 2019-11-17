@@ -19,7 +19,7 @@ public:
 
 public:
   MergeMeshesOptimization(int priority = 0);
-  ~MergeMeshesOptimization(); // = default
+  ~MergeMeshesOptimization() override; // = default
 
   bool apply(Scene* scene) override;
   bool _apply(Scene* scene, bool updateSelectionTree = false);

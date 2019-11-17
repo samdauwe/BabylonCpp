@@ -37,7 +37,7 @@ public:
     return std::shared_ptr<OctreeSceneComponent>(
       new OctreeSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~OctreeSceneComponent(); // = default
+  ~OctreeSceneComponent() override; // = default
 
   /**
    * @brief Registers the component in a given scene.
@@ -63,8 +63,7 @@ public:
    * @param localRay defines the ray in local space
    * @returns the list of intersecting sub meshes
    */
-  std::vector<SubMesh*> getIntersectingSubMeshCandidates(AbstractMesh* mesh,
-                                                         const Ray& localRay);
+  std::vector<SubMesh*> getIntersectingSubMeshCandidates(AbstractMesh* mesh, const Ray& localRay);
 
   /**
    * @brief Return the list of sub meshes colliding with a collider.
@@ -72,8 +71,7 @@ public:
    * @param collider defines the collider to evaluate the collision against
    * @returns the list of colliding sub meshes
    */
-  std::vector<SubMesh*> getCollidingSubMeshCandidates(AbstractMesh* mesh,
-                                                      const Collider& collider);
+  std::vector<SubMesh*> getCollidingSubMeshCandidates(AbstractMesh* mesh, const Collider& collider);
 
   /**
    * @brief Rebuilds the elements related to this component in case of

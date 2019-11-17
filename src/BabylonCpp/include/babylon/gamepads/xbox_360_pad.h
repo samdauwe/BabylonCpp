@@ -64,16 +64,15 @@ public:
    * @param gamepad defines the internal HTML gamepad object
    * @param xboxOne defines if it is a XBox One gamepad
    */
-  Xbox360Pad(const std::string& id, int index,
-             const IBrowserGamepadPtr& gamepad, bool xboxOne = false);
-  ~Xbox360Pad(); // = default
+  Xbox360Pad(const std::string& id, int index, const IBrowserGamepadPtr& gamepad,
+             bool xboxOne = false);
+  ~Xbox360Pad() override; // = default
 
   /**
    * @brief Defines the callback to call when left trigger is pressed.
    * @param callback defines the callback to use
    */
-  void
-  setOnlefttriggerchanged(const std::function<void(float value)>& callback);
+  void setOnlefttriggerchanged(const std::function<void(float value)>& callback);
 
   /**
    * @brief Defines the callback to call when right trigger is pressed.
@@ -85,15 +84,13 @@ public:
    * @brief Defines the callback to call when a button is pressed.
    * @param callback defines the callback to use
    */
-  void onbuttondown(
-    const std::function<void(Xbox360Button buttonPressed)>& callback);
+  void onbuttondown(const std::function<void(Xbox360Button buttonPressed)>& callback);
 
   /**
    * @brief Defines the callback to call when a button is released.
    * @param callback defines the callback to use
    */
-  void
-  onbuttonup(const std::function<void(Xbox360Button buttonReleased)>& callback);
+  void onbuttonup(const std::function<void(Xbox360Button buttonReleased)>& callback);
 
   /**
    * @brief Defines the callback to call when a pad is pressed.

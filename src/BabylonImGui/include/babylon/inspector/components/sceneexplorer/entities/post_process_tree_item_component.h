@@ -18,8 +18,7 @@ struct IPostProcessTreeItemComponentProps {
   std::function<void()> onClick = nullptr;
 }; // end of struct IPostProcessItemComponentProps
 
-class BABYLON_SHARED_EXPORT PostProcessTreeItemComponent
-    : public TreeItemSpecializedComponent {
+class BABYLON_SHARED_EXPORT PostProcessTreeItemComponent : public TreeItemSpecializedComponent {
 
 public:
   /** Font Awesome Icon Unicodes **/
@@ -27,7 +26,7 @@ public:
 
 public:
   PostProcessTreeItemComponent(const IPostProcessTreeItemComponentProps& props);
-  virtual ~PostProcessTreeItemComponent(); // = default
+  ~PostProcessTreeItemComponent() override; // = default
 
   void render() override;
 

@@ -12,7 +12,7 @@ class FramebufferCanvas : public ICanvas {
 
 public:
   FramebufferCanvas();
-  virtual ~FramebufferCanvas() override;
+  ~FramebufferCanvas() override;
   bool onlyRenderBoundingClientRect() const override;
   void initializeFrameBuffer();
 
@@ -26,8 +26,7 @@ public:
 
   unsigned int textureId();
   Uint8Array readPixelsRgb();
-  void saveScreenshotJpg(const char* filename, int quality,
-                         int imageWidth = -1);
+  void saveScreenshotJpg(const char* filename, int quality, int imageWidth = -1);
   void saveScreenshotPng(const char* filename);
 
 private:

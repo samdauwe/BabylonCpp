@@ -23,13 +23,12 @@ public:
   template <typename... Ts>
   static GamepadCameraPtr New(Ts&&... args)
   {
-    auto camera = std::shared_ptr<GamepadCamera>(
-      new GamepadCamera(std::forward<Ts>(args)...));
+    auto camera = std::shared_ptr<GamepadCamera>(new GamepadCamera(std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;
   }
-  ~GamepadCamera(); // = default
+  ~GamepadCamera() override; // = default
 
   /**
    * @brief Gets the current object class name.

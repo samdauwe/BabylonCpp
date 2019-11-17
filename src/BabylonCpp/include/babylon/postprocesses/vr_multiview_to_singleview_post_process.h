@@ -11,8 +11,7 @@ namespace BABYLON {
  * standard textures for scenarios such as webVR This will not be used for webXR
  * as it supports displaying texture arrays directly.
  */
-class BABYLON_SHARED_EXPORT VRMultiviewToSingleviewPostProcess
-    : public PostProcess {
+class BABYLON_SHARED_EXPORT VRMultiviewToSingleviewPostProcess : public PostProcess {
 
 public:
   /**
@@ -21,10 +20,9 @@ public:
    * @param camera camera to be applied to
    * @param scaleFactor scaling factor to the size of the output texture
    */
-  VRMultiviewToSingleviewPostProcess(const std::string& name,
-                                     const CameraPtr& camera,
+  VRMultiviewToSingleviewPostProcess(const std::string& name, const CameraPtr& camera,
                                      float scaleFactor);
-  ~VRMultiviewToSingleviewPostProcess(); // = default
+  ~VRMultiviewToSingleviewPostProcess() override; // = default
 
 }; // end of class VRDistortionCorrectionPostProcess
 

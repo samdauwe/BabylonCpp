@@ -29,16 +29,14 @@ struct SSARatio {
 /**
  * @brief Render pipeline to produce ssao effect.
  */
-class BABYLON_SHARED_EXPORT SSAORenderingPipeline
-    : public PostProcessRenderPipeline {
+class BABYLON_SHARED_EXPORT SSAORenderingPipeline : public PostProcessRenderPipeline {
 
 public:
   /**
    * The PassPostProcess id in the pipeline that contains the original scene
    * color
    */
-  static constexpr const char* SSAOOriginalSceneColorEffect
-    = "SSAOOriginalSceneColorEffect";
+  static constexpr const char* SSAOOriginalSceneColorEffect = "SSAOOriginalSceneColorEffect";
   /**
    * The SSAO PostProcess id in the pipeline
    */
@@ -55,8 +53,7 @@ public:
    * The PostProcess id in the pipeline that combines the SSAO-Blur output with
    * the original scene color (SSAOOriginalSceneColorEffect)
    */
-  static constexpr const char* SSAOCombineRenderEffect
-    = "SSAOCombineRenderEffect";
+  static constexpr const char* SSAOCombineRenderEffect = "SSAOCombineRenderEffect";
 
 public:
   template <typename... Ts>
@@ -68,7 +65,7 @@ public:
 
     return renderingPipeline;
   }
-  virtual ~SSAORenderingPipeline(); // = default
+  ~SSAORenderingPipeline() override; // = default
 
   /** Methods */
   void addToScene(const SSAORenderingPipelinePtr& ssao2RenderingPipeline);
@@ -91,8 +88,7 @@ public:
    * Removes the internal pipeline assets and detatches the pipeline from the
    * scene cameras
    */
-  void dispose(bool disableDepthRender         = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool disableDepthRender = false, bool disposeMaterialAndTextures = false) override;
 
 protected:
   /**
@@ -107,8 +103,7 @@ protected:
    */
   SSAORenderingPipeline(const std::string& name, Scene* scene, float ratio,
                         const std::vector<CameraPtr>& cameras);
-  SSAORenderingPipeline(const std::string& name, Scene* scene,
-                        const SSARatio& ratio,
+  SSAORenderingPipeline(const std::string& name, Scene* scene, const SSARatio& ratio,
                         const std::vector<CameraPtr>& cameras);
 
 private:

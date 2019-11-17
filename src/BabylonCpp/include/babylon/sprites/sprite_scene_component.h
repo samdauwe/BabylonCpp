@@ -39,7 +39,7 @@ public:
     return std::shared_ptr<SpriteSceneComponent>(
       new SpriteSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~SpriteSceneComponent(); // = default
+  ~SpriteSceneComponent() override; // = default
 
   /**
    * @brief Registers the component in a given scene.
@@ -66,19 +66,15 @@ protected:
 
 private:
   std::optional<PickingInfo>
-  _pickSpriteButKeepRay(const std::optional<PickingInfo>& originalPointerInfo,
-                        int x, int y, bool fastCheck = false,
-                        const CameraPtr& camera = nullptr);
-  std::optional<PickingInfo> _pointerMove(int unTranslatedPointerX,
-                                          int unTranslatedPointerY,
-                                          std::optional<PickingInfo> pickResult,
-                                          bool isMeshPicked, ICanvas* canvas);
-  std::optional<PickingInfo> _pointerDown(int unTranslatedPointerX,
-                                          int unTranslatedPointerY,
+  _pickSpriteButKeepRay(const std::optional<PickingInfo>& originalPointerInfo, int x, int y,
+                        bool fastCheck = false, const CameraPtr& camera = nullptr);
+  std::optional<PickingInfo> _pointerMove(int unTranslatedPointerX, int unTranslatedPointerY,
+                                          std::optional<PickingInfo> pickResult, bool isMeshPicked,
+                                          ICanvas* canvas);
+  std::optional<PickingInfo> _pointerDown(int unTranslatedPointerX, int unTranslatedPointerY,
                                           std::optional<PickingInfo> pickResult,
                                           const PointerEvent& evt);
-  std::optional<PickingInfo> _pointerUp(int unTranslatedPointerX,
-                                        int unTranslatedPointerY,
+  std::optional<PickingInfo> _pointerUp(int unTranslatedPointerX, int unTranslatedPointerY,
                                         std::optional<PickingInfo> pickResult,
                                         const PointerEvent& evt);
 

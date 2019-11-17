@@ -28,13 +28,12 @@ public:
    * @param scene Defines the scene to instrument
    */
   SceneInstrumentation(Scene* scene);
-  virtual ~SceneInstrumentation(); // = default
+  ~SceneInstrumentation() override; // = default
 
   /**
    * @brief Dispose and release associated resources.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
 protected:
   // Properties
@@ -209,8 +208,7 @@ public:
   /**
    * Perf counter used for active meshes evaluation time.
    */
-  ReadOnlyProperty<SceneInstrumentation, PerfCounter>
-    activeMeshesEvaluationTimeCounter;
+  ReadOnlyProperty<SceneInstrumentation, PerfCounter> activeMeshesEvaluationTimeCounter;
 
   /**
    * Active meshes evaluation time capture status.
@@ -220,8 +218,7 @@ public:
   /**
    * Perf counter used for render targets render time.
    */
-  ReadOnlyProperty<SceneInstrumentation, PerfCounter>
-    renderTargetsRenderTimeCounter;
+  ReadOnlyProperty<SceneInstrumentation, PerfCounter> renderTargetsRenderTimeCounter;
 
   /**
    * Render targets render time capture status.
@@ -231,8 +228,7 @@ public:
   /**
    * Perf counter used for particles render time.
    */
-  ReadOnlyProperty<SceneInstrumentation, PerfCounter>
-    particlesRenderTimeCounter;
+  ReadOnlyProperty<SceneInstrumentation, PerfCounter> particlesRenderTimeCounter;
 
   /**
    * Particles render time capture status.

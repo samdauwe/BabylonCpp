@@ -16,7 +16,7 @@ class BABYLON_SHARED_EXPORT ShadowLight : public IShadowLight {
 
 public:
   ShadowLight(const std::string& name, Scene* scene);
-  ~ShadowLight(); // = default
+  ~ShadowLight() override; // = default
 
   /**
    * @brief Gets the transformed position. Position of the light in world space
@@ -115,8 +115,7 @@ public:
    * world matrix to be created from scratch
    * @returns the world matrix
    */
-  Matrix& computeWorldMatrix(bool force             = false,
-                             bool useWasUpdatedFlag = false) override;
+  Matrix& computeWorldMatrix(bool force = false, bool useWasUpdatedFlag = false) override;
 
   /**
    * @brief Gets the minZ used for shadow according to both the scene and the
@@ -142,14 +141,12 @@ public:
    * @param renderList The list of mesh to render in the map
    * @returns The current light
    */
-  IShadowLight* setShadowProjectionMatrix(
-    Matrix& matrix, Matrix& viewMatrix,
-    const std::vector<AbstractMesh*>& renderList) override;
+  IShadowLight* setShadowProjectionMatrix(Matrix& matrix, Matrix& viewMatrix,
+                                          const std::vector<AbstractMesh*>& renderList) override;
 
 protected:
-  virtual void _setDefaultShadowProjectionMatrix(
-    Matrix& matrix, const Matrix& viewMatrix,
-    const std::vector<AbstractMesh*>& renderList)
+  virtual void _setDefaultShadowProjectionMatrix(Matrix& matrix, const Matrix& viewMatrix,
+                                                 const std::vector<AbstractMesh*>& renderList)
     = 0;
 
   /**
@@ -209,8 +206,7 @@ public:
    * Callback defining a custom Projection Matrix Builder.
    * This can be used to override the default projection matrix computation.
    */
-  std::function<void(const Matrix& viewMatrix,
-                     const std::vector<AbstractMesh*>& renderList,
+  std::function<void(const Matrix& viewMatrix, const std::vector<AbstractMesh*>& renderList,
                      Matrix& result)>
     customProjectionMatrixBuilder;
 

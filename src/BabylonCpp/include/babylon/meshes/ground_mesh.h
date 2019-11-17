@@ -24,13 +24,12 @@ public:
   template <typename... Ts>
   static GroundMeshPtr New(Ts&&... args)
   {
-    auto mesh
-      = std::shared_ptr<GroundMesh>(new GroundMesh(std::forward<Ts>(args)...));
+    auto mesh = std::shared_ptr<GroundMesh>(new GroundMesh(std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
     return mesh;
   }
-  ~GroundMesh(); // = default
+  ~GroundMesh() override; // = default
 
   /**
    * @brief "GroundMesh"

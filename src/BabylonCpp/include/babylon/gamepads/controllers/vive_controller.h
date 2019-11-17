@@ -29,8 +29,7 @@ struct ViveControllerFactory : public _GamePadFactory {
    * APIs.
    * @returns the new gamepad instance
    */
-  WebVRControllerPtr
-  create(const IBrowserGamepadPtr& gamepadInfo) const override;
+  WebVRControllerPtr create(const IBrowserGamepadPtr& gamepadInfo) const override;
 }; // end of struct ViveControllerFactory
 
 /**
@@ -42,8 +41,7 @@ public:
   /**
    * Base Url for the controller model.
    */
-  static constexpr const char* MODEL_BASE_URL
-    = "https://controllers.babylonjs.com/vive/";
+  static constexpr const char* MODEL_BASE_URL = "https://controllers.babylonjs.com/vive/";
   /**
    * File name for the controller model.
    */
@@ -53,10 +51,9 @@ public:
   template <typename... Ts>
   static ViveControllerPtr New(Ts&&... args)
   {
-    return std::shared_ptr<ViveController>(
-      new ViveController(std::forward<Ts>(args)...));
+    return std::shared_ptr<ViveController>(new ViveController(std::forward<Ts>(args)...));
   }
-  ~ViveController(); // = default
+  ~ViveController() override; // = default
 
   /**
    * @brief Implements abstract method on WebVRController class, loading
@@ -65,9 +62,8 @@ public:
    * @param meshLoaded optional callback function that will be called if the
    * mesh loads successfully.
    */
-  void initControllerMesh(
-    Scene* scene,
-    const std::function<void(AbstractMesh* mesh)>& meshLoaded) override;
+  void initControllerMesh(Scene* scene,
+                          const std::function<void(AbstractMesh* mesh)>& meshLoaded) override;
 
 protected:
   /**
@@ -102,8 +98,7 @@ protected:
    * @param state New state of the button
    * @param changes Which properties on the state changed since last frame
    */
-  void _handleButtonChange(unsigned int buttonIdx,
-                           const ExtendedGamepadButton& state,
+  void _handleButtonChange(unsigned int buttonIdx, const ExtendedGamepadButton& state,
                            const GamepadButtonChanges& changes) override;
 
 public:

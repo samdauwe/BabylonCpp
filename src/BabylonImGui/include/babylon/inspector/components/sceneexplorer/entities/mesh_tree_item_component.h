@@ -24,8 +24,7 @@ struct MeshTreeItemComponentState {
   bool isVisible            = false;
 }; // end of struct MeshTreeItemComponentState
 
-class BABYLON_SHARED_EXPORT MeshTreeItemComponent
-    : public TreeItemSpecializedComponent {
+class BABYLON_SHARED_EXPORT MeshTreeItemComponent : public TreeItemSpecializedComponent {
 
 public:
   /** Font Awesome Icon Unicodes **/
@@ -36,7 +35,7 @@ public:
 
 public:
   MeshTreeItemComponent(const IMeshTreeItemComponentProps& props);
-  virtual ~MeshTreeItemComponent(); // = default
+  ~MeshTreeItemComponent() override; // = default
 
   void showBoundingBox();
   void switchVisibility();

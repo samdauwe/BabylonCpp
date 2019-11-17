@@ -24,15 +24,14 @@ public:
   template <typename... Ts>
   static ArcFollowCameraPtr New(Ts&&... args)
   {
-    auto camera = std::shared_ptr<ArcFollowCamera>(
-      new ArcFollowCamera(std::forward<Ts>(args)...));
+    auto camera = std::shared_ptr<ArcFollowCamera>(new ArcFollowCamera(std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;
   }
-  ~ArcFollowCamera(); // = default
+  ~ArcFollowCamera() override; // = default
 
-  virtual Type type() const override;
+  Type type() const override;
 
   /**
    * @brief Hidden
@@ -58,8 +57,8 @@ protected:
    * @param target Define the target of the camera
    * @param scene Define the scene the camera belongs to
    */
-  ArcFollowCamera(const std::string& name, float alpha, float beta,
-                  float radius, AbstractMesh* target, Scene* scene);
+  ArcFollowCamera(const std::string& name, float alpha, float beta, float radius,
+                  AbstractMesh* target, Scene* scene);
 
 private:
   void _follow();

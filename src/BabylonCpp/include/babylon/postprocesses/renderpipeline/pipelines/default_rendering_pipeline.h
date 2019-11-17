@@ -27,37 +27,33 @@ class ImageProcessingConfiguration;
 class PostProcess;
 class Scene;
 class SharpenPostProcess;
-using BloomEffectPtr = std::shared_ptr<BloomEffect>;
-using ChromaticAberrationPostProcessPtr
-  = std::shared_ptr<ChromaticAberrationPostProcess>;
-using DefaultRenderingPipelinePtr = std::shared_ptr<DefaultRenderingPipeline>;
-using DepthOfFieldEffectPtr       = std::shared_ptr<DepthOfFieldEffect>;
-using FxaaPostProcessPtr          = std::shared_ptr<FxaaPostProcess>;
-using GlowLayerPtr                = std::shared_ptr<GlowLayer>;
-using GrainPostProcessPtr         = std::shared_ptr<GrainPostProcess>;
-using PostProcessPtr              = std::shared_ptr<PostProcess>;
-using SharpenPostProcessPtr       = std::shared_ptr<SharpenPostProcess>;
+using BloomEffectPtr                    = std::shared_ptr<BloomEffect>;
+using ChromaticAberrationPostProcessPtr = std::shared_ptr<ChromaticAberrationPostProcess>;
+using DefaultRenderingPipelinePtr       = std::shared_ptr<DefaultRenderingPipeline>;
+using DepthOfFieldEffectPtr             = std::shared_ptr<DepthOfFieldEffect>;
+using FxaaPostProcessPtr                = std::shared_ptr<FxaaPostProcess>;
+using GlowLayerPtr                      = std::shared_ptr<GlowLayer>;
+using GrainPostProcessPtr               = std::shared_ptr<GrainPostProcess>;
+using PostProcessPtr                    = std::shared_ptr<PostProcess>;
+using SharpenPostProcessPtr             = std::shared_ptr<SharpenPostProcess>;
 
 /**
  * @brief The default rendering pipeline can be added to a scene to apply common
  * post processing effects such as anti-aliasing or depth of field. See
  * https://doc.babylonjs.com/how_to/using_default_rendering_pipeline
  */
-class BABYLON_SHARED_EXPORT DefaultRenderingPipeline
-    : public PostProcessRenderPipeline {
+class BABYLON_SHARED_EXPORT DefaultRenderingPipeline : public PostProcessRenderPipeline {
 
 private:
   /**
    * ID of the sharpen post process,
    */
-  static constexpr const char* SharpenPostProcessId
-    = "SharpenPostProcessEffect";
+  static constexpr const char* SharpenPostProcessId = "SharpenPostProcessEffect";
 
   /**
    * ID of the image processing post process;
    */
-  static constexpr const char* ImageProcessingPostProcessId
-    = "ImageProcessingPostProcessEffect";
+  static constexpr const char* ImageProcessingPostProcessId = "ImageProcessingPostProcessEffect";
 
   /**
    * ID of the Fast Approximate Anti-Aliasing post process;
@@ -85,7 +81,7 @@ public:
 
     return renderingPipeline;
   }
-  virtual ~DefaultRenderingPipeline(); // = default
+  ~DefaultRenderingPipeline() override; // = default
 
   void addToScene(const DefaultRenderingPipelinePtr& renderingPipeline);
 
@@ -120,8 +116,7 @@ public:
   /**
    * @brief Dispose of the pipeline and stop all post processes.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Serialize the rendering pipeline (Used when exporting)
@@ -136,8 +131,8 @@ public:
    * @param rootUrl The URL of the serialized pipeline.
    * @returns An instantiated pipeline from the serialized object.
    */
-  static std::unique_ptr<DefaultRenderingPipeline>
-  Parse(const json& source, Scene* scene, const std::string& rootUrl);
+  static std::unique_ptr<DefaultRenderingPipeline> Parse(const json& source, Scene* scene,
+                                                         const std::string& rootUrl);
 
 protected:
   /**
@@ -151,10 +146,9 @@ protected:
    * @param automaticBuild - if false, you will have to manually call prepare()
    * to update the pipeline (default: true)
    */
-  DefaultRenderingPipeline(
-    const std::string& name = "", bool hdr = true, Scene* scene = nullptr,
-    const std::unordered_map<std::string, CameraPtr>& cameras = {},
-    bool automaticBuild                                       = true);
+  DefaultRenderingPipeline(const std::string& name = "", bool hdr = true, Scene* scene = nullptr,
+                           const std::unordered_map<std::string, CameraPtr>& cameras = {},
+                           bool automaticBuild                                       = true);
 
 private:
   /**
@@ -334,8 +328,7 @@ public:
    * Blur level of the depth of field effect. (Higher blur will effect
    * performance).
    */
-  Property<DefaultRenderingPipeline, DepthOfFieldEffectBlurLevel>
-    depthOfFieldBlurLevel;
+  Property<DefaultRenderingPipeline, DepthOfFieldEffectBlurLevel> depthOfFieldBlurLevel;
 
   /**
    * If the anti aliasing is enabled
@@ -384,8 +377,7 @@ private:
    */
   GlowLayerPtr _glowLayer;
 
-  Observer<ImageProcessingConfiguration>::Ptr
-    _imageProcessingConfigurationObserver;
+  Observer<ImageProcessingConfiguration>::Ptr _imageProcessingConfigurationObserver;
 
   // Values
   bool _sharpenEnabled;

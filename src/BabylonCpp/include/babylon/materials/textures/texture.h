@@ -38,15 +38,14 @@ public:
   template <typename... Ts>
   static TexturePtr New(Ts&&... args)
   {
-    auto texture
-      = std::shared_ptr<Texture>(new Texture(std::forward<Ts>(args)...));
+    auto texture = std::shared_ptr<Texture>(new Texture(std::forward<Ts>(args)...));
     texture->addToScene(texture);
 
     return texture;
   }
-  virtual ~Texture(); // = default
+  ~Texture() override; // = default
 
-  virtual Type type() const override;
+  Type type() const override;
 
   /**
    * @brief Update the url (and optional buffer) of this texture if url was null
@@ -56,11 +55,10 @@ public:
    * @param onLoad callback called when the texture is loaded  (defaults to
    * null)
    */
-  void updateURL(
-    const std::string& iUrl,
-    const std::optional<std::variant<std::string, ArrayBuffer, Image>>& buffer
-    = std::nullopt,
-    const std::function<void(InternalTexture*, EventState&)>& onLoad = nullptr);
+  void updateURL(const std::string& iUrl,
+                 const std::optional<std::variant<std::string, ArrayBuffer, Image>>& buffer
+                 = std::nullopt,
+                 const std::function<void(InternalTexture*, EventState&)>& onLoad = nullptr);
 
   /**
    * @brief Finish the loading sequence of a texture flagged as delayed load.
@@ -116,8 +114,7 @@ public:
    * relative dependencies
    * @returns The parsed texture if successful
    */
-  static BaseTexturePtr Parse(const json& parsedTexture, Scene* scene,
-                              const std::string& rootUrl);
+  static BaseTexturePtr Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
 
   /**
    * @brief Creates a texture from its base 64 representation.
@@ -139,12 +136,10 @@ public:
    * @returns the created texture
    */
   static TexturePtr CreateFromBase64String(
-    const std::string& data, const std::string& name, Scene* scene,
-    bool noMipmap = false, bool invertY = false,
-    unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
+    const std::string& data, const std::string& name, Scene* scene, bool noMipmap = false,
+    bool invertY = false, unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     const std::function<void()>& onLoad = nullptr,
-    const std::function<void(const std::string& message,
-                             const std::string& exception)>& onError
+    const std::function<void(const std::string& message, const std::string& exception)>& onError
     = nullptr,
     unsigned int format = Constants::TEXTUREFORMAT_RGBA);
 
@@ -174,23 +169,20 @@ public:
    */
   static TexturePtr LoadFromDataString(
     const std::string& name,
-    const std::optional<std::variant<std::string, ArrayBuffer, Image>>& buffer,
-    Scene* scene, bool deleteBuffer = false, bool noMipmap = false,
-    bool invertY              = true,
-    unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
+    const std::optional<std::variant<std::string, ArrayBuffer, Image>>& buffer, Scene* scene,
+    bool deleteBuffer = false, bool noMipmap = false, bool invertY = true,
+    unsigned int samplingMode           = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
     const std::function<void()>& onLoad = nullptr,
-    const std::function<void(const std::string& message,
-                             const std::string& exception)>& onError
+    const std::function<void(const std::string& message, const std::string& exception)>& onError
     = nullptr,
     unsigned int format = Constants::TEXTUREFORMAT_RGBA);
 
   /**
    * @brief Hidden
    */
-  static MirrorTexturePtr
-  _CreateMirror(const std::string& name,
-                const std::variant<ISize, float>& renderTargetSize,
-                Scene* scene, bool generateMipMaps);
+  static MirrorTexturePtr _CreateMirror(const std::string& name,
+                                        const std::variant<ISize, float>& renderTargetSize,
+                                        Scene* scene, bool generateMipMaps);
 
 protected:
   /**
@@ -216,17 +208,13 @@ protected:
    * (Engine.TEXTUREFORMAT_RGBA...)
    */
   Texture(
-    const std::string& url, Scene* scene, bool noMipmap = false,
-    bool invertY              = true,
-    unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
+    const std::string& url, Scene* scene, bool noMipmap = false, bool invertY = true,
+    unsigned int samplingMode           = TextureConstants::TRILINEAR_SAMPLINGMODE,
     const std::function<void()>& onLoad = nullptr,
-    const std::function<void(const std::string& message,
-                             const std::string& exception)>& onError
+    const std::function<void(const std::string& message, const std::string& exception)>& onError
     = nullptr,
-    const std::optional<std::variant<std::string, ArrayBuffer, Image>>& buffer
-    = std::nullopt,
-    bool deleteBuffer                         = false,
-    const std::optional<unsigned int>& format = std::nullopt);
+    const std::optional<std::variant<std::string, ArrayBuffer, Image>>& buffer = std::nullopt,
+    bool deleteBuffer = false, const std::optional<unsigned int>& format = std::nullopt);
 
   bool get_noMipmap() const override;
 
@@ -378,8 +366,7 @@ private:
   std::optional<std::variant<std::string, ArrayBuffer, Image>> _buffer;
   bool _deleteBuffer;
   std::function<void(InternalTexture*, EventState&)> _delayedOnLoad;
-  std::function<void(const std::string& message, const std::string& exception)>
-    _delayedOnError;
+  std::function<void(const std::string& message, const std::string& exception)> _delayedOnError;
 
   std::function<void()> _onLoad;
   std::function<void(InternalTexture*, EventState&)> _load;

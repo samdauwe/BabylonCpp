@@ -18,13 +18,13 @@ public:
   template <typename... Ts>
   static AnaglyphPostProcessPtr New(Ts&&... args)
   {
-    auto postProcess = std::shared_ptr<AnaglyphPostProcess>(
-      new AnaglyphPostProcess(std::forward<Ts>(args)...));
+    auto postProcess
+      = std::shared_ptr<AnaglyphPostProcess>(new AnaglyphPostProcess(std::forward<Ts>(args)...));
     postProcess->add(postProcess);
 
     return postProcess;
   }
-  ~AnaglyphPostProcess(); // = default
+  ~AnaglyphPostProcess() override; // = default
 
 protected:
   /**
@@ -40,8 +40,7 @@ protected:
    */
   AnaglyphPostProcess(const std::string& name, float ratio,
                       const std::vector<CameraPtr>& rigCameras,
-                      unsigned int samplingMode
-                      = TextureConstants::NEAREST_SAMPLINGMODE,
+                      unsigned int samplingMode = TextureConstants::NEAREST_SAMPLINGMODE,
                       Engine* engine = nullptr, bool reusable = false);
 
 private:

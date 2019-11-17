@@ -9,8 +9,8 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
-#include <babylon/core/data_view.h>
 #include <babylon/core/array_buffer_view.h>
+#include <babylon/core/data_view.h>
 #include <babylon/loading/glTF/2.0/gltf_loader_interfaces.h>
 #include <babylon/loading/glTF/igltf_loader.h>
 
@@ -153,7 +153,7 @@ public:
   {
     return std::shared_ptr<GLTFLoader>(new GLTFLoader(std::forward<Ts>(args)...));
   }
-  virtual ~GLTFLoader(); // = default
+  ~GLTFLoader() override; // = default
 
   /**
    * @brief Gets the loader state.

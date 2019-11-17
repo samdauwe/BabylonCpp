@@ -14,10 +14,9 @@ namespace BABYLON {
 class BackgroundMaterial;
 class ImageProcessingConfiguration;
 class IShadowLight;
-using BackgroundMaterialPtr = std::shared_ptr<BackgroundMaterial>;
-using ImageProcessingConfigurationPtr
-  = std::shared_ptr<ImageProcessingConfiguration>;
-using IShadowLightPtr = std::shared_ptr<IShadowLight>;
+using BackgroundMaterialPtr           = std::shared_ptr<BackgroundMaterial>;
+using ImageProcessingConfigurationPtr = std::shared_ptr<ImageProcessingConfiguration>;
+using IShadowLightPtr                 = std::shared_ptr<IShadowLight>;
 
 /**
  * @brief Background material used to create an efficient environement around
@@ -40,13 +39,13 @@ public:
   template <typename... Ts>
   static BackgroundMaterialPtr New(Ts&&... args)
   {
-    auto material = std::shared_ptr<BackgroundMaterial>(
-      new BackgroundMaterial(std::forward<Ts>(args)...));
+    auto material
+      = std::shared_ptr<BackgroundMaterial>(new BackgroundMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;
   }
-  ~BackgroundMaterial(); // = default
+  ~BackgroundMaterial() override; // = default
 
   /**
    * @brief The entire material has been created in order to prevent overdraw.
@@ -107,17 +106,15 @@ public:
    * @param forceDisposeEffect Force disposal of the associated effect.
    * @param forceDisposeTextures Force disposal of the associated textures.
    */
-  void dispose(bool forceDisposeEffect   = false,
-               bool forceDisposeTextures = false,
-               bool notBoundToMesh       = false) override;
+  void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
+               bool notBoundToMesh = false) override;
 
   /**
    * @brief Clones the material.
    * @param name The cloned name.
    * @returns The cloned material.
    */
-  MaterialPtr clone(const std::string& name,
-                    bool cloneChildren = false) const override;
+  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
 
   /**
    * @brief Serializes the current material to its JSON representation.
@@ -138,8 +135,8 @@ public:
    * @param rootUrl The root url of the assets the material depends upon
    * @returns the instantiated BackgroundMaterial.
    */
-  static std::unique_ptr<BackgroundMaterial>
-  Parse(const json& source, Scene* scene, const std::string& url);
+  static std::unique_ptr<BackgroundMaterial> Parse(const json& source, Scene* scene,
+                                                   const std::string& url);
 
 protected:
   /**
@@ -153,8 +150,7 @@ protected:
    * @brief Attaches a new image processing configuration to the PBR Material.
    * @param configuration (if null the scene configuration will be use)
    */
-  void _attachImageProcessingConfiguration(
-    const ImageProcessingConfigurationPtr& configuration);
+  void _attachImageProcessingConfiguration(const ImageProcessingConfigurationPtr& configuration);
 
   /**
    * @brief Gets the key light Color (multiply against the environement
@@ -436,8 +432,7 @@ protected:
    *
    * If sets to null, the scene one is in use.
    */
-  void set_imageProcessingConfiguration(
-    const ImageProcessingConfigurationPtr& value);
+  void set_imageProcessingConfiguration(const ImageProcessingConfigurationPtr& value);
 
   /**
    * @brief Gets wether the color curves effect is enabled.
@@ -698,8 +693,7 @@ public:
   /**
    * Gets the image processing configuration used either in this material.
    */
-  Property<BackgroundMaterial, ImageProcessingConfigurationPtr>
-    imageProcessingConfiguration;
+  Property<BackgroundMaterial, ImageProcessingConfigurationPtr> imageProcessingConfiguration;
 
   /**
    * Gets wether the color curves effect is enabled.

@@ -23,7 +23,7 @@ public:
 
     return texture;
   }
-  ~GrassProceduralTexture(); // = default
+  ~GrassProceduralTexture() override; // = default
 
   void updateShaderUniforms();
 
@@ -42,13 +42,12 @@ public:
    * information
    * @returns a parsed Grass Procedural Texture
    */
-  static std::unique_ptr<GrassProceduralTexture>
-  Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
+  static std::unique_ptr<GrassProceduralTexture> Parse(const json& parsedTexture, Scene* scene,
+                                                       const std::string& rootUrl);
 
 protected:
-  GrassProceduralTexture(const std::string& name, const Size& size,
-                         Scene* scene, Texture* fallbackTexture = nullptr,
-                         bool generateMipMaps = false);
+  GrassProceduralTexture(const std::string& name, const Size& size, Scene* scene,
+                         Texture* fallbackTexture = nullptr, bool generateMipMaps = false);
 
   std::vector<Color3>& get_grassColors();
   void set_grassColors(const std::vector<Color3>& value);

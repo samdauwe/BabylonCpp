@@ -24,11 +24,11 @@ public:
 
     return texture;
   }
-  ~FireProceduralTexture(); // = default
+  ~FireProceduralTexture() override; // = default
 
   void updateShaderUniforms();
 
-  void render(bool useCameraPostProcess);
+  void render(bool useCameraPostProcess) override;
   static std::vector<Color3> PurpleFireColors();
   static std::vector<Color3> GreenFireColors();
   static std::vector<Color3> RedFireColors();
@@ -49,13 +49,12 @@ public:
    * information
    * @returns a parsed Fire Procedural Texture
    */
-  static std::unique_ptr<FireProceduralTexture>
-  Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
+  static std::unique_ptr<FireProceduralTexture> Parse(const json& parsedTexture, Scene* scene,
+                                                      const std::string& rootUrl);
 
 protected:
   FireProceduralTexture(const std::string& name, const Size& size, Scene* scene,
-                        Texture* fallbackTexture = nullptr,
-                        bool generateMipMaps     = false);
+                        Texture* fallbackTexture = nullptr, bool generateMipMaps = false);
 
   bool get_autoGenerateTime() const;
   void set_autoGenerateTime(bool value);

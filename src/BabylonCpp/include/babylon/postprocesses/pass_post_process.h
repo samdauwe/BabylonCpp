@@ -19,13 +19,13 @@ public:
   template <typename... Ts>
   static PassPostProcessPtr New(Ts&&... args)
   {
-    auto postProcess = std::shared_ptr<PassPostProcess>(
-      new PassPostProcess(std::forward<Ts>(args)...));
+    auto postProcess
+      = std::shared_ptr<PassPostProcess>(new PassPostProcess(std::forward<Ts>(args)...));
     postProcess->add(postProcess);
 
     return postProcess;
   }
-  ~PassPostProcess(); // = default
+  ~PassPostProcess() override; // = default
 
 protected:
   /**
@@ -47,11 +47,9 @@ protected:
    * at a later time. (default: false)
    */
   PassPostProcess(const std::string& name, float ratio, const CameraPtr& camera,
-                  unsigned int samplingMode = 0, Engine* engine = nullptr,
-                  bool reusable = false,
-                  unsigned int textureType
-                  = Constants::TEXTURETYPE_UNSIGNED_INT,
-                  bool blockCompilation = false);
+                  unsigned int samplingMode = 0, Engine* engine = nullptr, bool reusable = false,
+                  unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
+                  bool blockCompilation    = false);
 
 }; // end of class PassPostProcess
 

@@ -18,13 +18,12 @@ public:
   template <typename... Ts>
   static TrailMeshPtr New(Ts&&... args)
   {
-    auto mesh
-      = std::shared_ptr<TrailMesh>(new TrailMesh(std::forward<Ts>(args)...));
+    auto mesh = std::shared_ptr<TrailMesh>(new TrailMesh(std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
     return mesh;
   }
-  ~TrailMesh(); // = default
+  ~TrailMesh() override; // = default
 
   /**
    * @brief "TrailMesh"
@@ -53,8 +52,7 @@ public:
    * @param newGenerator use new generator object for cloned trail mesh
    * @returns a new mesh
    */
-  TrailMeshPtr clone(const std::string& name             = "",
-                     const AbstractMeshPtr& newGenerator = nullptr);
+  TrailMeshPtr clone(const std::string& name = "", const AbstractMeshPtr& newGenerator = nullptr);
 
   /**
    * @brief Serializes this trail mesh.
@@ -80,9 +78,8 @@ protected:
    * @param length Length of trailing mesh. Default is 60.
    * @param autoStart Automatically start trailing mesh. Default true.
    */
-  TrailMesh(const std::string& name, const AbstractMeshPtr& generator,
-            Scene* scene, float diameter = 1.f, float length = 60.f,
-            bool autoStart = true);
+  TrailMesh(const std::string& name, const AbstractMeshPtr& generator, Scene* scene,
+            float diameter = 1.f, float length = 60.f, bool autoStart = true);
 
 private:
   void _createMesh();

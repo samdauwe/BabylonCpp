@@ -15,7 +15,7 @@ struct BABYLON_SHARED_EXPORT ImageProcessingConfigurationDefines
       public IImageProcessingConfigurationDefines {
 
   ImageProcessingConfigurationDefines();
-  ~ImageProcessingConfigurationDefines(); // = default
+  ~ImageProcessingConfigurationDefines() override; // = default
 
 }; // end of struct ImageProcessingConfigurationDefines
 

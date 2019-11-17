@@ -25,15 +25,12 @@ public:
    * @param textureFormat defines the texture format to use
    * (BABYLON.Engine.TEXTURETYPE_UNSIGNED_INT by default)
    */
-  TonemapPostProcess(const std::string& name,
-                     const TonemappingOperator& operator_,
+  TonemapPostProcess(const std::string& name, const TonemappingOperator& operator_,
                      float exposureAdjustment, const CameraPtr& camera,
-                     unsigned int samplingMode
-                     = Constants::TEXTURE_BILINEAR_SAMPLINGMODE,
-                     Engine* engine = nullptr,
-                     unsigned int textureFormat
-                     = Constants::TEXTURETYPE_UNSIGNED_INT);
-  virtual ~TonemapPostProcess(); // = default
+                     unsigned int samplingMode  = Constants::TEXTURE_BILINEAR_SAMPLINGMODE,
+                     Engine* engine             = nullptr,
+                     unsigned int textureFormat = Constants::TEXTURETYPE_UNSIGNED_INT);
+  ~TonemapPostProcess() override; // = default
 
 private:
   TonemappingOperator _operator;

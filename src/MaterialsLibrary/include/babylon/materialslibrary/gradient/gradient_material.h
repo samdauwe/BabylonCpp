@@ -22,13 +22,13 @@ public:
   template <typename... Ts>
   static GradientMaterialPtr New(Ts&&... args)
   {
-    auto material = std::shared_ptr<GradientMaterial>(
-      new GradientMaterial(std::forward<Ts>(args)...));
+    auto material
+      = std::shared_ptr<GradientMaterial>(new GradientMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;
   }
-  ~GradientMaterial(); // = default
+  ~GradientMaterial() override; // = default
 
   /**
    * Returns wehter or not the grid requires alpha blending.
@@ -41,16 +41,13 @@ public:
   void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
   std::vector<IAnimatablePtr> getAnimatables() override;
   const std::string getClassName() const override;
-  virtual void dispose(bool forceDisposeEffect   = false,
-                       bool forceDisposeTextures = false,
-                       bool notBoundToMesh       = false) override;
-  MaterialPtr clone(const std::string& name,
-                    bool cloneChildren = false) const override;
+  void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
+               bool notBoundToMesh = false) override;
+  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
   json serialize() const;
 
   /** Statics **/
-  static GradientMaterial* Parse(const json& source, Scene* scene,
-                                 const std::string& rootUrl);
+  static GradientMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
   /**

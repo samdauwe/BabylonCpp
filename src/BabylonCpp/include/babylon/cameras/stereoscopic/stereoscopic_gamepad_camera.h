@@ -29,7 +29,7 @@ public:
 
     return camera;
   }
-  ~StereoscopicGamepadCamera(); // = default
+  ~StereoscopicGamepadCamera() override; // = default
 
   /**
    * @brief Gets camera class name.
@@ -48,8 +48,7 @@ protected:
    * @param scene defines the hosting scene
    */
   StereoscopicGamepadCamera(const std::string& name, const Vector3& position,
-                            float interaxialDistance,
-                            bool isStereoscopicSideBySide, Scene* scene);
+                            float interaxialDistance, bool isStereoscopicSideBySide, Scene* scene);
 
 private:
   static bool NodeConstructorAdded;

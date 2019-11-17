@@ -27,11 +27,10 @@ public:
    * @param reusable If the post process can be reused on the same frame.
    * (default: false)
    */
-  FilterPostProcess(const std::string& name, const Matrix& kernelMatrix,
-                    float ratio, const CameraPtr& camera,
-                    unsigned int samplingMode, Engine* engine,
+  FilterPostProcess(const std::string& name, const Matrix& kernelMatrix, float ratio,
+                    const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
                     bool reusable = false);
-  ~FilterPostProcess(); // = default
+  ~FilterPostProcess() override; // = default
 
 public:
   /**

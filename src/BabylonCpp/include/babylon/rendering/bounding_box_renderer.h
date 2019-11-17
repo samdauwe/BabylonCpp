@@ -36,20 +36,19 @@ public:
    * The component name helpfull to identify the component in the list of scene
    * components.
    */
-  static constexpr const char* name
-    = SceneComponentConstants::NAME_BOUNDINGBOXRENDERER;
+  static constexpr const char* name = SceneComponentConstants::NAME_BOUNDINGBOXRENDERER;
 
 public:
   template <typename... Ts>
   static BoundingBoxRendererPtr New(Ts&&... args)
   {
-    auto renderer = std::shared_ptr<BoundingBoxRenderer>(
-      new BoundingBoxRenderer(std::forward<Ts>(args)...));
+    auto renderer
+      = std::shared_ptr<BoundingBoxRenderer>(new BoundingBoxRenderer(std::forward<Ts>(args)...));
     renderer->addToScene(renderer);
 
     return renderer;
   }
-  virtual ~BoundingBoxRenderer(); // = default
+  ~BoundingBoxRenderer() override; // = default
 
   void addToScene(const BoundingBoxRendererPtr& newBoundingBoxRenderer);
 

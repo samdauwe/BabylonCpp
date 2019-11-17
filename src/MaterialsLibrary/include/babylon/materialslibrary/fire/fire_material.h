@@ -25,34 +25,29 @@ public:
   template <typename... Ts>
   static FireMaterialPtr New(Ts&&... args)
   {
-    auto material = std::shared_ptr<FireMaterial>(
-      new FireMaterial(std::forward<Ts>(args)...));
+    auto material = std::shared_ptr<FireMaterial>(new FireMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;
   }
-  ~FireMaterial(); // = default
+  ~FireMaterial() override; // = default
 
   bool needAlphaBlending() const override;
   bool needAlphaTesting() const override;
   BaseTexturePtr getAlphaTestTexture() override;
-  bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
-                         bool useInstances) override;
+  bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool useInstances) override;
   void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
   std::vector<IAnimatablePtr> getAnimatables() override;
   std::vector<BaseTexturePtr> getActiveTextures() const override;
   bool hasTexture(const BaseTexturePtr& texture) const override;
   const std::string getClassName() const override;
-  virtual void dispose(bool forceDisposeEffect   = false,
-                       bool forceDisposeTextures = false,
-                       bool notBoundToMesh       = false) override;
-  MaterialPtr clone(const std::string& name,
-                    bool cloneChildren = false) const override;
+  void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
+               bool notBoundToMesh = false) override;
+  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
   json serialize() const;
 
   /** Statics **/
-  static FireMaterial* Parse(const json& source, Scene* scene,
-                             const std::string& rootUrl);
+  static FireMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
   /**

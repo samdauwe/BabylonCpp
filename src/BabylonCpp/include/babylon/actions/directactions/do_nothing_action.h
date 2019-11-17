@@ -19,10 +19,9 @@ public:
    * @param triggerOptions defines the trigger options
    * @param condition defines the trigger related conditions
    */
-  DoNothingAction(unsigned int triggerOptions
-                  = Constants::ACTION_NothingTrigger,
-                  Condition* condition = nullptr);
-  ~DoNothingAction(); // = default
+  DoNothingAction(unsigned int triggerOptions = Constants::ACTION_NothingTrigger,
+                  Condition* condition        = nullptr);
+  ~DoNothingAction() override; // = default
 
   /**
    * @brief Execute the action and do nothing.

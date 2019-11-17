@@ -54,7 +54,7 @@ public:
 
 public:
   FramingBehavior();
-  virtual ~FramingBehavior(); // = default
+  ~FramingBehavior() override; // = default
 
   /**
    * @brief Gets the name of the behavior.
@@ -72,8 +72,7 @@ public:
    * @param predicate Predicate to use for pick filtering
    */
   void attach(const ArcRotateCameraPtr& camera,
-              const std::function<bool(const AbstractMeshPtr& m)>& predicate
-              = nullptr) override;
+              const std::function<bool(const AbstractMeshPtr& m)>& predicate = nullptr) override;
 
   /**
    * @brief Detaches the behavior from its current arc rotate camera.
@@ -109,8 +108,7 @@ public:
    * animation
    */
   void zoomOnMeshHierarchy(AbstractMesh* mesh, bool focusOnOriginXZ = false,
-                           const std::function<void()>& onAnimationEnd
-                           = nullptr);
+                           const std::function<void()>& onAnimationEnd = nullptr);
 
   /**
    * @brief Targets the given meshes with their children and updates zoom level
@@ -125,10 +123,8 @@ public:
    * @param onAnimationEnd Callback triggered at the end of the framing
    * animation
    */
-  void zoomOnMeshesHierarchy(const std::vector<AbstractMesh*>& meshes,
-                             bool focusOnOriginXZ = false,
-                             const std::function<void()>& onAnimationEnd
-                             = nullptr);
+  void zoomOnMeshesHierarchy(const std::vector<AbstractMesh*>& meshes, bool focusOnOriginXZ = false,
+                             const std::function<void()>& onAnimationEnd = nullptr);
 
   /**
    * @brief Targets the bounding box info defined by its extends and updates
@@ -142,10 +138,9 @@ public:
    * @param onAnimationEnd Callback triggered at the end of the framing
    * animation
    */
-  void
-  zoomOnBoundingInfo(const Vector3& minimumWorld, const Vector3& maximumWorld,
-                     bool focusOnOriginXZ                        = false,
-                     const std::function<void()>& onAnimationEnd = nullptr);
+  void zoomOnBoundingInfo(const Vector3& minimumWorld, const Vector3& maximumWorld,
+                          bool focusOnOriginXZ                        = false,
+                          const std::function<void()>& onAnimationEnd = nullptr);
 
 protected:
   /**
@@ -157,9 +152,8 @@ protected:
    * the camera must be kept in order to fully enclose the mesh in the viewing
    * frustum.
    */
-  float
-  _calculateLowerRadiusFromModelBoundingSphere(const Vector3& minimumWorld,
-                                               const Vector3& maximumWorld);
+  float _calculateLowerRadiusFromModelBoundingSphere(const Vector3& minimumWorld,
+                                                     const Vector3& maximumWorld);
 
 private:
   /**

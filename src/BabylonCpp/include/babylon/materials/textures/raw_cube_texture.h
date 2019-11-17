@@ -28,14 +28,13 @@ struct BABYLON_SHARED_EXPORT RawCubeTexture : public CubeTexture {
    * Texture.NEAREST_SAMPLINGMODE)
    * @param compression defines the compression used (null by default)
    */
-  RawCubeTexture(Scene* scene, const std::vector<ArrayBufferView>& data,
-                 int size, unsigned int format = Constants::TEXTUREFORMAT_RGBA,
+  RawCubeTexture(Scene* scene, const std::vector<ArrayBufferView>& data, int size,
+                 unsigned int format  = Constants::TEXTUREFORMAT_RGBA,
                  unsigned int type    = Constants::TEXTURETYPE_UNSIGNED_INT,
                  bool generateMipMaps = false, bool invertY = false,
-                 unsigned int samplingMode
-                 = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
+                 unsigned int samplingMode      = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
                  const std::string& compression = "");
-  ~RawCubeTexture(); // = default
+  ~RawCubeTexture() override; // = default
 
   /**
    * @brief Updates the raw cube texture.
@@ -47,9 +46,8 @@ struct BABYLON_SHARED_EXPORT RawCubeTexture : public CubeTexture {
    * @param compression defines the compression used (null by default)
    * @param level defines which level of the texture to update
    */
-  void update(const std::vector<ArrayBufferView>& data, unsigned int format,
-              unsigned int type, bool invertY,
-              const std::string& compression = "", unsigned int level = 0);
+  void update(const std::vector<ArrayBufferView>& data, unsigned int format, unsigned int type,
+              bool invertY, const std::string& compression = "", unsigned int level = 0);
 
   /**
    * @brief Clones the raw cube texture.

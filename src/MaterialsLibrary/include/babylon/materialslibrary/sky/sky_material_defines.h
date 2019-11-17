@@ -10,7 +10,7 @@ namespace MaterialsLibrary {
 struct BABYLON_SHARED_EXPORT SkyMaterialDefines : public MaterialDefines {
 
   SkyMaterialDefines();
-  ~SkyMaterialDefines(); // = default
+  ~SkyMaterialDefines() override; // = default
 
 }; // end of struct SkyMaterialDefines
 

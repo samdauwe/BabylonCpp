@@ -22,7 +22,7 @@ public:
    */
   StopAnimationAction(unsigned int triggerOptions, const IAnimatablePtr& target,
                       Condition* condition = nullptr);
-  ~StopAnimationAction(); // = default
+  ~StopAnimationAction() override; // = default
 
   /**
    * @brief Hidden

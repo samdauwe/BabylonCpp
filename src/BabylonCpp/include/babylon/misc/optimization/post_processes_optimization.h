@@ -6,12 +6,11 @@
 
 namespace BABYLON {
 
-class BABYLON_SHARED_EXPORT PostProcessesOptimization
-    : public SceneOptimization {
+class BABYLON_SHARED_EXPORT PostProcessesOptimization : public SceneOptimization {
 
 public:
   PostProcessesOptimization(int priority = 0);
-  ~PostProcessesOptimization(); // = default
+  ~PostProcessesOptimization() override; // = default
 
   bool apply(Scene* scene) override;
 

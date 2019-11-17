@@ -23,7 +23,7 @@ public:
 
     return texture;
   }
-  ~CloudProceduralTexture(); // = default
+  ~CloudProceduralTexture() override; // = default
 
   void updateShaderUniforms();
 
@@ -42,13 +42,12 @@ public:
    * information
    * @returns a parsed Cloud Procedural Texture
    */
-  static std::unique_ptr<CloudProceduralTexture>
-  Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
+  static std::unique_ptr<CloudProceduralTexture> Parse(const json& parsedTexture, Scene* scene,
+                                                       const std::string& rootUrl);
 
 protected:
-  CloudProceduralTexture(const std::string& name, const Size& size,
-                         Scene* scene, Texture* fallbackTexture = nullptr,
-                         bool generateMipMaps = true);
+  CloudProceduralTexture(const std::string& name, const Size& size, Scene* scene,
+                         Texture* fallbackTexture = nullptr, bool generateMipMaps = true);
 
   Color4& get_skyColor();
   void set_skyColor(const Color4& value);

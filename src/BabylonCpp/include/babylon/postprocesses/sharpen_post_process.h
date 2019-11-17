@@ -20,13 +20,13 @@ public:
   template <typename... Ts>
   static SharpenPostProcessPtr New(Ts&&... args)
   {
-    auto postProcess = std::shared_ptr<SharpenPostProcess>(
-      new SharpenPostProcess(std::forward<Ts>(args)...));
+    auto postProcess
+      = std::shared_ptr<SharpenPostProcess>(new SharpenPostProcess(std::forward<Ts>(args)...));
     postProcess->add(postProcess);
 
     return postProcess;
   }
-  virtual ~SharpenPostProcess(); // = default
+  ~SharpenPostProcess() override; // = default
 
 protected:
   /**
@@ -49,11 +49,10 @@ protected:
    */
   SharpenPostProcess(const std::string& name,
                      const std::variant<float, PostProcessOptions>& options,
-                     const CameraPtr& camera, unsigned int samplingMode,
-                     Engine* engine, bool reusable = false,
-                     unsigned int textureType
-                     = Constants::TEXTURETYPE_UNSIGNED_INT,
-                     bool blockCompilation = false);
+                     const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
+                     bool reusable            = false,
+                     unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
+                     bool blockCompilation    = false);
 
 public:
   /**

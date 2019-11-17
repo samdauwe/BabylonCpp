@@ -28,13 +28,12 @@ public:
   template <typename... Ts>
   static FreeCameraPtr New(Ts&&... args)
   {
-    auto camera
-      = std::shared_ptr<FreeCamera>(new FreeCamera(std::forward<Ts>(args)...));
+    auto camera = std::shared_ptr<FreeCamera>(new FreeCamera(std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;
   }
-  ~FreeCamera(); // = default
+  ~FreeCamera() override; // = default
 
   Type type() const override;
 
@@ -45,10 +44,8 @@ public:
    * call preventdefault()
    * (https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)
    */
-  void attachControl(ICanvas* canvas, bool noPreventDefault = false,
-                     bool useCtrlForPanning = true,
-                     MouseButtonType panningMouseButton
-                     = MouseButtonType::RIGHT) override;
+  void attachControl(ICanvas* canvas, bool noPreventDefault = false, bool useCtrlForPanning = true,
+                     MouseButtonType panningMouseButton = MouseButtonType::RIGHT) override;
 
   /**
    * @brief Detach the current controls from the camera.
@@ -80,8 +77,7 @@ public:
   /**
    * @brief Destroy the camera and release the current resources hold by it.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Gets the current object class name.
@@ -95,8 +91,7 @@ private:
   int get_collisionMask() const;
   void set_collisionMask(int mask);
   void _onCollisionPositionChange(size_t collisionId, Vector3& newPosition,
-                                  const AbstractMeshPtr& collidedMesh
-                                  = nullptr);
+                                  const AbstractMeshPtr& collidedMesh = nullptr);
 
 protected:
   /**

@@ -28,13 +28,12 @@ public:
    * @param engine Defines the engine to instrument
    */
   EngineInstrumentation(Engine* engine);
-  virtual ~EngineInstrumentation(); // = default
+  ~EngineInstrumentation() override; // = default
 
   /**
    * @brief Dispose and release associated resources.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
 protected:
   // Properties
@@ -83,8 +82,7 @@ public:
   /**
    * Perf counter used for shader compilation time.
    */
-  ReadOnlyProperty<EngineInstrumentation, PerfCounter>
-    shaderCompilationTimeCounter;
+  ReadOnlyProperty<EngineInstrumentation, PerfCounter> shaderCompilationTimeCounter;
 
   /**
    * Enable or disable the shader compilation time capture.

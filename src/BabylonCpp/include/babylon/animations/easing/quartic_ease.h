@@ -22,10 +22,9 @@ public:
   template <typename... Ts>
   static QuarticEasePtr New(Ts&&... args)
   {
-    return std::shared_ptr<QuarticEase>(
-      new QuarticEase(std::forward<Ts>(args)...));
+    return std::shared_ptr<QuarticEase>(new QuarticEase(std::forward<Ts>(args)...));
   }
-  ~QuarticEase(); // = default
+  ~QuarticEase() override; // = default
 
   /**
    * @brief Hidden

@@ -29,24 +29,22 @@ public:
   template <typename... Ts>
   static MorphTargetPtr New(Ts&&... args)
   {
-    return std::shared_ptr<MorphTarget>(
-      new MorphTarget(std::forward<Ts>(args)...));
+    return std::shared_ptr<MorphTarget>(new MorphTarget(std::forward<Ts>(args)...));
   }
-  ~MorphTarget(); // = default
+  ~MorphTarget() override; // = default
 
   Type type() const override;
 
   /**
    * @brief Gets a property.
    */
-  virtual AnimationValue
-  getProperty(const std::vector<std::string>& targetPropertyPath) override;
+  AnimationValue getProperty(const std::vector<std::string>& targetPropertyPath) override;
 
   /**
    * @brief Sets a property.
    */
-  virtual void setProperty(const std::vector<std::string>& targetPropertyPath,
-                           const AnimationValue& value) override;
+  void setProperty(const std::vector<std::string>& targetPropertyPath,
+                   const AnimationValue& value) override;
 
   /**
    * @brief Gets the animations.
@@ -172,8 +170,7 @@ protected:
   /**
    * @brief Sets the animation properties override
    */
-  void set_animationPropertiesOverride(
-    const AnimationPropertiesOverridePtr& value) override;
+  void set_animationPropertiesOverride(const AnimationPropertiesOverridePtr& value) override;
 
   /**
    * @brief Gets a boolean defining if the target contains position data.
@@ -203,8 +200,7 @@ public:
    * @param influence defines the influence to use
    * @param scene defines the scene the morphtarget belongs to
    */
-  MorphTarget(const std::string& name, float influence = 0.f,
-              Scene* scene = nullptr);
+  MorphTarget(const std::string& name, float influence = 0.f, Scene* scene = nullptr);
 
   /**
    * Gets or sets the list of animations

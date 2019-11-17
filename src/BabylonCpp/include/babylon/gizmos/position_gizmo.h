@@ -24,13 +24,12 @@ public:
    */
   PositionGizmo(const UtilityLayerRendererPtr& gizmoLayer
                 = UtilityLayerRenderer::DefaultUtilityLayer());
-  ~PositionGizmo(); // = default
+  ~PositionGizmo() override; // = default
 
   /**
    * @brief Disposes of the gizmo.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Disposes and replaces the current meshes in the gizmo with the
@@ -39,8 +38,7 @@ public:
    * @param useGizmoMaterial If the gizmo's default material should be used
    * (default: false)
    */
-  void setCustomMesh(const MeshPtr& mesh,
-                     bool useGizmoMaterial = false) override;
+  void setCustomMesh(const MeshPtr& mesh, bool useGizmoMaterial = false) override;
 
 protected:
   AbstractMeshPtr& get_attachedMesh() override;

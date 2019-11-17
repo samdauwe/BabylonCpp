@@ -11,7 +11,7 @@ namespace BABYLON {
 struct BABYLON_SHARED_EXPORT _TGATextureLoader : public IInternalTextureLoader {
 
   _TGATextureLoader();
-  virtual ~_TGATextureLoader(); // = default
+  ~_TGATextureLoader() override; // = default
 
   /**
    * @brief Defines wether the loader supports cascade loading the different
@@ -29,10 +29,8 @@ struct BABYLON_SHARED_EXPORT _TGATextureLoader : public IInternalTextureLoader {
    * @param isBuffer defines whether the texture data are stored as a buffer
    * @returns true if the loader can load the specified file
    */
-  bool canLoad(const std::string& extension,
-               const std::string& textureFormatInUse,
-               const InternalTexturePtr& fallback, bool isBase64,
-               bool isBuffer) override;
+  bool canLoad(const std::string& extension, const std::string& textureFormatInUse,
+               const InternalTexturePtr& fallback, bool isBase64, bool isBuffer) override;
 
   /**
    * @brief Transform the url before loading if required.
@@ -52,9 +50,8 @@ struct BABYLON_SHARED_EXPORT _TGATextureLoader : public IInternalTextureLoader {
    * the engine
    * @returns the fallback texture
    */
-  std::string
-  getFallbackTextureUrl(const std::string& rootUrl,
-                        const std::string& textureFormatInUse) override;
+  std::string getFallbackTextureUrl(const std::string& rootUrl,
+                                    const std::string& textureFormatInUse) override;
 
   /**
    * @brief Uploads the cube texture data to the WebGl Texture. It has alreday
@@ -66,11 +63,10 @@ struct BABYLON_SHARED_EXPORT _TGATextureLoader : public IInternalTextureLoader {
    * @param onError defines the callback to trigger in case of error
    */
   void loadCubeData(
-    const std::variant<std::string, ArrayBuffer>& data,
-    const InternalTexturePtr& texture, bool createPolynomials,
-    const std::function<void(const CubeTextureData& data)>& onLoad,
-    const std::function<void(const std::string& message,
-                             const std::string& exception)>& onError) override;
+    const std::variant<std::string, ArrayBuffer>& data, const InternalTexturePtr& texture,
+    bool createPolynomials, const std::function<void(const CubeTextureData& data)>& onLoad,
+    const std::function<void(const std::string& message, const std::string& exception)>& onError)
+    override;
 
   /**
    * @brief Uploads the cube texture data to the WebGl Texture. It has alreday
@@ -81,12 +77,11 @@ struct BABYLON_SHARED_EXPORT _TGATextureLoader : public IInternalTextureLoader {
    * @param onLoad defines the callback to trigger once the texture is ready
    * @param onError defines the callback to trigger in case of error
    */
-  virtual void loadCubeData(
-    const std::vector<std::variant<std::string, ArrayBuffer>>& data,
-    const InternalTexturePtr& texture, bool createPolynomials,
-    const std::function<void(const CubeTextureData& data)>& onLoad,
-    const std::function<void(const std::string& message,
-                             const std::string& exception)>& onError) override;
+  void loadCubeData(const std::vector<std::variant<std::string, ArrayBuffer>>& data,
+                    const InternalTexturePtr& texture, bool createPolynomials,
+                    const std::function<void(const CubeTextureData& data)>& onLoad,
+                    const std::function<void(const std::string& message,
+                                             const std::string& exception)>& onError) override;
 
   /**
    * @brief Uploads the 2D texture data to the WebGl Texture. It has alreday
@@ -95,11 +90,10 @@ struct BABYLON_SHARED_EXPORT _TGATextureLoader : public IInternalTextureLoader {
    * @param texture defines the BabylonJS internal texture
    * @param callback defines the method to call once ready to upload
    */
-  void loadData(
-    const ArrayBuffer& data, const InternalTexturePtr& texture,
-    const std::function<void(
-      int width, int height, bool loadMipmap, bool isCompressed,
-      const std::function<void()>& done, bool loadFailed)>& callback) override;
+  void loadData(const ArrayBuffer& data, const InternalTexturePtr& texture,
+                const std::function<void(int width, int height, bool loadMipmap, bool isCompressed,
+                                         const std::function<void()>& done, bool loadFailed)>&
+                  callback) override;
 
 }; // end of struct _TGATextureLoader
 

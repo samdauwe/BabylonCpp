@@ -57,13 +57,13 @@ public:
   template <typename... Ts>
   static RenderTargetTexturePtr New(Ts&&... args)
   {
-    auto texture = std::shared_ptr<RenderTargetTexture>(
-      new RenderTargetTexture(std::forward<Ts>(args)...));
+    auto texture
+      = std::shared_ptr<RenderTargetTexture>(new RenderTargetTexture(std::forward<Ts>(args)...));
     texture->addToScene(texture);
 
     return texture;
   }
-  ~RenderTargetTexture(); // = default
+  ~RenderTargetTexture() override; // = default
 
   /**
    * @brief Creates a depth stencil texture.
@@ -76,9 +76,8 @@ public:
    * @param generateStencil Specifies whether or not a stencil should be
    * allocated in the texture
    */
-  void createDepthStencilTexture(int comparisonFunction = 0,
-                                 bool bilinearFiltering = true,
-                                 bool generateStencil   = false);
+  void createDepthStencilTexture(int comparisonFunction = 0, bool bilinearFiltering = true,
+                                 bool generateStencil = false);
 
   void _onRatioRescale();
 
@@ -196,14 +195,9 @@ public:
    */
   void setRenderingOrder(
     unsigned int renderingGroupId,
-    const std::function<int(const SubMesh* a, const SubMesh* b)>&
-      opaqueSortCompareFn
-    = nullptr,
-    const std::function<int(const SubMesh* a, const SubMesh* b)>&
-      alphaTestSortCompareFn
-    = nullptr,
-    const std::function<int(const SubMesh* a, const SubMesh* b)>&
-      transparentSortCompareFn
+    const std::function<int(const SubMesh* a, const SubMesh* b)>& opaqueSortCompareFn    = nullptr,
+    const std::function<int(const SubMesh* a, const SubMesh* b)>& alphaTestSortCompareFn = nullptr,
+    const std::function<int(const SubMesh* a, const SubMesh* b)>& transparentSortCompareFn
     = nullptr);
 
   /**
@@ -213,8 +207,7 @@ public:
    * @param autoClearDepthStencil Automatically clears depth and stencil between
    * groups if true.
    */
-  void setRenderingAutoClearDepthStencil(unsigned int renderingGroupId,
-                                         bool autoClearDepthStencil);
+  void setRenderingAutoClearDepthStencil(unsigned int renderingGroupId, bool autoClearDepthStencil);
 
   /**
    * @brief Clones the texture.
@@ -283,17 +276,12 @@ protected:
    * @param delayAllocation if the texture allocation should be delayed
    * (default: false)
    */
-  RenderTargetTexture(const std::string& name,
-                      const std::variant<ISize, float>& size, Scene* scene,
-                      bool generateMipMaps        = false,
-                      bool doNotChangeAspectRatio = true,
-                      unsigned int type = Constants::TEXTURETYPE_UNSIGNED_INT,
-                      bool isCube       = false,
-                      unsigned int samplingMode
-                      = TextureConstants::TRILINEAR_SAMPLINGMODE,
-                      bool generateDepthBuffer   = true,
-                      bool generateStencilBuffer = false, bool isMulti = false,
-                      unsigned int format  = Constants::TEXTUREFORMAT_RGBA,
+  RenderTargetTexture(const std::string& name, const std::variant<ISize, float>& size, Scene* scene,
+                      bool generateMipMaps = false, bool doNotChangeAspectRatio = true,
+                      unsigned int type = Constants::TEXTURETYPE_UNSIGNED_INT, bool isCube = false,
+                      unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
+                      bool generateDepthBuffer = true, bool generateStencilBuffer = false,
+                      bool isMulti = false, unsigned int format = Constants::TEXTUREFORMAT_RGBA,
                       bool delayAllocation = false);
 
   /**
@@ -310,19 +298,14 @@ protected:
    * https://community.arm.com/graphics/b/blog/posts/reflections-based-on-local-cubemaps-in-unity
    * Example: https://www.babylonjs-playground.com/#RNASML
    */
-  virtual void
-  set_boundingBoxSize(const std::optional<Vector3>& value) override;
-  virtual std::optional<Vector3>& get_boundingBoxSize() override;
+  void set_boundingBoxSize(const std::optional<Vector3>& value) override;
+  std::optional<Vector3>& get_boundingBoxSize() override;
 
   /** Events **/
-  void set_onAfterUnbind(
-    const std::function<void(RenderTargetTexture*, EventState&)>& callback);
-  void set_onBeforeRender(
-    const std::function<void(int* faceIndex, EventState&)>& callback);
-  void set_onAfterRender(
-    const std::function<void(int* faceIndex, EventState&)>& callback);
-  void
-  set_onClear(const std::function<void(Engine* engine, EventState&)>& callback);
+  void set_onAfterUnbind(const std::function<void(RenderTargetTexture*, EventState&)>& callback);
+  void set_onBeforeRender(const std::function<void(int* faceIndex, EventState&)>& callback);
+  void set_onAfterRender(const std::function<void(int* faceIndex, EventState&)>& callback);
+  void set_onClear(const std::function<void(Engine* engine, EventState&)>& callback);
   RenderTargetCreationOptions& get_renderTargetOptions();
 
   virtual unsigned int get_samples() const;
@@ -334,10 +317,8 @@ protected:
 
 private:
   void _processSizeParameter(const std::variant<ISize, float>& size);
-  int _bestReflectionRenderTargetDimension(int renderDimension,
-                                           float scale) const;
-  void renderToTarget(unsigned int faceIndex,
-                      const std::vector<AbstractMesh*>& currentRenderList,
+  int _bestReflectionRenderTargetDimension(int renderDimension, float scale) const;
+  void renderToTarget(unsigned int faceIndex, const std::vector<AbstractMesh*>& currentRenderList,
                       bool useCameraPostProcess, bool dumpForDebug);
 
 public:
@@ -431,8 +412,7 @@ public:
    * This has been kept for backward compatibility and use of
    * onAfterUnbindObservable is recommended.
    */
-  WriteOnlyProperty<RenderTargetTexture,
-                    std::function<void(RenderTargetTexture*, EventState&)>>
+  WriteOnlyProperty<RenderTargetTexture, std::function<void(RenderTargetTexture*, EventState&)>>
     onAfterUnbind;
 
   /**
@@ -445,8 +425,7 @@ public:
    * This has been kept for backward compatibility and use of
    * onAfterRenderObservable is recommended.
    */
-  WriteOnlyProperty<RenderTargetTexture,
-                    std::function<void(int* faceIndex, EventState&)>>
+  WriteOnlyProperty<RenderTargetTexture, std::function<void(int* faceIndex, EventState&)>>
     onBeforeRender;
 
   /**
@@ -454,8 +433,7 @@ public:
    */
   Observable<int> onAfterRenderObservable;
 
-  WriteOnlyProperty<RenderTargetTexture,
-                    std::function<void(int* faceIndex, EventState&)>>
+  WriteOnlyProperty<RenderTargetTexture, std::function<void(int* faceIndex, EventState&)>>
     onAfterRender;
 
   /**
@@ -468,17 +446,14 @@ public:
    * This has been kept for backward compatibility and use of onClearObservable
    * is recommended.
    */
-  WriteOnlyProperty<RenderTargetTexture,
-                    std::function<void(Engine* engine, EventState&)>>
-    onClear;
+  WriteOnlyProperty<RenderTargetTexture, std::function<void(Engine* engine, EventState&)>> onClear;
 
   /**
    * An event triggered when the texture is resized.
    */
   Observable<RenderTargetTexture> onResizeObservable;
 
-  ReadOnlyProperty<RenderTargetTexture, RenderTargetCreationOptions>
-    renderTargetOptions;
+  ReadOnlyProperty<RenderTargetTexture, RenderTargetCreationOptions> renderTargetOptions;
 
   /**
    * Define the number of samples to use in case of MSAA.

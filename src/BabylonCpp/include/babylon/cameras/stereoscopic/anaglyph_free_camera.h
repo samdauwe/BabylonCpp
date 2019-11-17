@@ -22,13 +22,13 @@ public:
   template <typename... Ts>
   static AnaglyphFreeCameraPtr New(Ts&&... args)
   {
-    auto camera = std::shared_ptr<AnaglyphFreeCamera>(
-      new AnaglyphFreeCamera(std::forward<Ts>(args)...));
+    auto camera
+      = std::shared_ptr<AnaglyphFreeCamera>(new AnaglyphFreeCamera(std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;
   }
-  ~AnaglyphFreeCamera(); // = default
+  ~AnaglyphFreeCamera() override; // = default
 
   /**
    * @brief Gets camera class name
@@ -44,8 +44,8 @@ protected:
    * @param interaxialDistance defines distance between each color axis
    * @param scene defines the hosting scene
    */
-  AnaglyphFreeCamera(const std::string& name, const Vector3& position,
-                     float interaxialDistance, Scene* scene);
+  AnaglyphFreeCamera(const std::string& name, const Vector3& position, float interaxialDistance,
+                     Scene* scene);
 
 private:
   static bool NodeConstructorAdded;

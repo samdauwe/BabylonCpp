@@ -26,20 +26,20 @@ public:
 
     return camera;
   }
-  ~TargetCamera(); // = default
+  ~TargetCamera() override; // = default
 
-  virtual Type type() const override;
+  Type type() const override;
 
   /**
    * @brief Gets a property.
    */
-  virtual AnimationValue getProperty(const std::vector<std::string>& targetPropertyPath) override;
+  AnimationValue getProperty(const std::vector<std::string>& targetPropertyPath) override;
 
   /**
    * @brief Sets a property.
    */
-  virtual void setProperty(const std::vector<std::string>& targetPropertyPath,
-                           const AnimationValue& value) override;
+  void setProperty(const std::vector<std::string>& targetPropertyPath,
+                   const AnimationValue& value) override;
 
   /**
    * @brief Gets the position in front of the camera at a given distance.
@@ -137,7 +137,7 @@ public:
    */
   const std::string getClassName() const override;
 
-  virtual json serialize() const override;
+  json serialize() const override;
 
 protected:
   /**

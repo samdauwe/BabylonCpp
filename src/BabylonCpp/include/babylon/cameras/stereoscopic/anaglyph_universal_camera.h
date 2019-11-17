@@ -29,7 +29,7 @@ public:
 
     return camera;
   }
-  ~AnaglyphUniversalCamera(); // = default
+  ~AnaglyphUniversalCamera() override; // = default
 
   /**
    * @brief Gets camera class name.

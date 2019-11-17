@@ -24,13 +24,12 @@ public:
   template <typename... Ts>
   static SimpleMaterialPtr New(Ts&&... args)
   {
-    auto material = std::shared_ptr<SimpleMaterial>(
-      new SimpleMaterial(std::forward<Ts>(args)...));
+    auto material = std::shared_ptr<SimpleMaterial>(new SimpleMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;
   }
-  ~SimpleMaterial(); // = default
+  ~SimpleMaterial() override; // = default
 
   bool needAlphaBlending() const override;
   bool needAlphaTesting() const override;
@@ -42,16 +41,13 @@ public:
   std::vector<BaseTexturePtr> getActiveTextures() const override;
   bool hasTexture(const BaseTexturePtr& texture) const override;
   const std::string getClassName() const override;
-  virtual void dispose(bool forceDisposeEffect   = false,
-                       bool forceDisposeTextures = false,
-                       bool notBoundToMesh       = false) override;
-  MaterialPtr clone(const std::string& name,
-                    bool cloneChildren = false) const override;
+  void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
+               bool notBoundToMesh = false) override;
+  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
   json serialize() const;
 
   /** Statics **/
-  static SimpleMaterial* Parse(const json& source, Scene* scene,
-                               const std::string& rootUrl);
+  static SimpleMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
   SimpleMaterial(const std::string& name, Scene* scene);

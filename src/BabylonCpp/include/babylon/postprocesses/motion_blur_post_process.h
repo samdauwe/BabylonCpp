@@ -95,6 +95,8 @@ protected:
    */
   MotionBlurPostProcess(const std::string& name, Scene* scene,
                         const std::variant<float, PostProcessOptions>& options,
+                        const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
+                        bool reusable            = false,
                         const CameraPtr& camera,
                         unsigned int samplingMode = Constants::TEXTURE_NEAREST_SAMPLINGMODE,
                         Engine* engine = nullptr, bool reusable = false,

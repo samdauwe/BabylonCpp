@@ -19,7 +19,7 @@ public:
    * @param jointData The joint data for the Hinge2-Joint
    */
   Hinge2Joint(const PhysicsJointData& jointData);
-  ~Hinge2Joint(); // = default
+  ~Hinge2Joint() override; // = default
 
   /**
    * @brief Set the motor values.
@@ -29,7 +29,7 @@ public:
    * @param {number} maxForce max force for this motor.
    * @param {motorIndex} the motor's index, 0 or 1.
    */
-  void setMotor(float targetSpeed, float maxForce, unsigned int motorIndex = 0);
+  void setMotor(float targetSpeed, float maxForce, unsigned int motorIndex = 0) override;
 
   /**
    * @brief Set the motor limits.
@@ -39,8 +39,7 @@ public:
    * @param {number} lowerLimit lower limit
    * @param {motorIndex} the motor's index, 0 or 1.
    */
-  void setLimit(float upperLimit, float lowerLimit,
-                unsigned int motorIndex = 0);
+  void setLimit(float upperLimit, float lowerLimit, unsigned int motorIndex = 0) override;
 
 }; // end of class Hinge2Joint
 

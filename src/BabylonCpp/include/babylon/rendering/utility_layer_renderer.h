@@ -47,7 +47,7 @@ public:
     auto renderer = new UtilityLayerRenderer(std::forward<Ts>(args)...);
     return static_cast<std::shared_ptr<UtilityLayerRenderer>>(renderer);
   }
-  virtual ~UtilityLayerRenderer(); // = default
+  ~UtilityLayerRenderer() override; // = default
 
   /**
    * @brief Gets the camera that is used to render the utility layer (when not
@@ -77,8 +77,7 @@ public:
   /**
    * @brief Disposes of the renderer.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
 protected:
   /**
@@ -90,8 +89,7 @@ protected:
   UtilityLayerRenderer(Scene* originalScene, bool handleEvents = true);
 
 private:
-  void _notifyObservers(const PointerInfoPre& prePointerInfo,
-                        const PickingInfo& pickInfo,
+  void _notifyObservers(const PointerInfoPre& prePointerInfo, const PickingInfo& pickInfo,
                         const PointerEvent& pointerEvent);
   void _updateCamera();
 

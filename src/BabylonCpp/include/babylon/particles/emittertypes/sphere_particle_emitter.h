@@ -11,8 +11,7 @@ namespace BABYLON {
  * It emits the particles alongside the sphere radius. The emission direction
  * might be randomized.
  */
-class BABYLON_SHARED_EXPORT SphereParticleEmitter
-    : public IParticleEmitterType {
+class BABYLON_SHARED_EXPORT SphereParticleEmitter : public IParticleEmitterType {
 
 public:
   /**
@@ -25,7 +24,7 @@ public:
    */
   SphereParticleEmitter(float radius = 1.f, float radiusRange = 1.f,
                         float directionRandomizer = 0.f);
-  virtual ~SphereParticleEmitter(); // = default
+  ~SphereParticleEmitter() override; // = default
 
   /**
    * @brief Called by the particle System when the direction is computed for the
@@ -34,9 +33,8 @@ public:
    * @param directionToUpdate is the direction vector to update with the result
    * @param particle is the particle we are computed the direction for
    */
-  virtual void startDirectionFunction(const Matrix& worldMatrix,
-                                      Vector3& directionToUpdate,
-                                      Particle* particle) override;
+  void startDirectionFunction(const Matrix& worldMatrix, Vector3& directionToUpdate,
+                              Particle* particle) override;
 
   /**
    * @brief Called by the particle System when the position is computed for the
@@ -45,15 +43,14 @@ public:
    * @param positionToUpdate is the position vector to update with the result
    * @param particle is the particle we are computed the position for
    */
-  void startPositionFunction(const Matrix& worldMatrix,
-                             Vector3& positionToUpdate,
+  void startPositionFunction(const Matrix& worldMatrix, Vector3& positionToUpdate,
                              Particle* particle) override;
 
   /**
    * @brief Clones the current emitter and returns a copy of it
    * @returns the new emitter
    */
-  virtual std::unique_ptr<IParticleEmitterType> clone() const override;
+  std::unique_ptr<IParticleEmitterType> clone() const override;
 
   /**
    * @brief Called by the GPUParticleSystem to setup the update shader.

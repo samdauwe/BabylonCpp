@@ -19,23 +19,20 @@ public:
    * @param index The index of the generic gamepad
    * @param browserGamepad The browser gamepad
    */
-  GenericPad(const std::string& id, int index,
-             const IBrowserGamepadPtr& browserGamepad);
-  virtual ~GenericPad(); // = default
+  GenericPad(const std::string& id, int index, const IBrowserGamepadPtr& browserGamepad);
+  ~GenericPad() override; // = default
 
   /**
    * @brief Callback triggered when a button has been pressed.
    * @param callback Called when a button has been pressed
    */
-  void
-  onbuttondown(const std::function<void(unsigned int buttonPressed)>& callback);
+  void onbuttondown(const std::function<void(unsigned int buttonPressed)>& callback);
 
   /**
    * @brief Callback triggered when a button has been released.
    * @param callback Called when a button has been released
    */
-  void
-  onbuttonup(const std::function<void(unsigned int buttonPressed)>& callback);
+  void onbuttonup(const std::function<void(unsigned int buttonPressed)>& callback);
 
   /**
    * @brief Updates the generic gamepad.

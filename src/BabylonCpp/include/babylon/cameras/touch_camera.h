@@ -23,13 +23,12 @@ public:
   template <typename... Ts>
   static TouchCameraPtr New(Ts&&... args)
   {
-    auto camera = std::shared_ptr<TouchCamera>(
-      new TouchCamera(std::forward<Ts>(args)...));
+    auto camera = std::shared_ptr<TouchCamera>(new TouchCamera(std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;
   }
-  ~TouchCamera(); // = default
+  ~TouchCamera() override; // = default
 
   /**
    * @brief Gets the current object class name.

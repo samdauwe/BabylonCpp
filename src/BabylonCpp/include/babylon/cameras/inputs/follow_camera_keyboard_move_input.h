@@ -13,15 +13,14 @@ namespace BABYLON {
  * @brief Manage the keyboard inputs to control the movement of a follow camera.
  * @see http://doc.babylonjs.com/how_to/customizing_camera_inputs
  */
-class BABYLON_SHARED_EXPORT FollowCameraKeyboardMoveInput
-    : public ICameraInput<FollowCamera> {
+class BABYLON_SHARED_EXPORT FollowCameraKeyboardMoveInput : public ICameraInput<FollowCamera> {
 
 public:
   /**
    * @brief Instantiate the input.
    */
   FollowCameraKeyboardMoveInput();
-  virtual ~FollowCameraKeyboardMoveInput(); // = default
+  ~FollowCameraKeyboardMoveInput() override; // = default
 
   /**
    * @brief Attach the input controls to a specific dom element to get the input

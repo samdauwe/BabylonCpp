@@ -16,15 +16,14 @@ class Gamepad;
  * @brief Manage the gamepad inputs to control a free camera.
  * @see http://doc.babylonjs.com/how_to/customizing_camera_inputs
  */
-class BABYLON_SHARED_EXPORT FreeCameraGamepadInput
-    : public ICameraInput<FreeCamera> {
+class BABYLON_SHARED_EXPORT FreeCameraGamepadInput : public ICameraInput<FreeCamera> {
 
 public:
   /**
    * @brief Instantiate the input.
    */
   FreeCameraGamepadInput();
-  virtual ~FreeCameraGamepadInput(); // = default
+  ~FreeCameraGamepadInput() override; // = default
 
   /**
    * @brief Attach the input controls to a specific dom element to get the input

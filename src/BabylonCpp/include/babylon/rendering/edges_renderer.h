@@ -41,9 +41,8 @@ public:
    * resources.
    */
   EdgesRenderer(const AbstractMeshPtr& source, float epsilon = 0.95f,
-                bool checkVerticesInsteadOfIndices = false,
-                bool generateEdgesLines            = true);
-  ~EdgesRenderer(); // = default
+                bool checkVerticesInsteadOfIndices = false, bool generateEdgesLines = true);
+  ~EdgesRenderer() override; // = default
 
   /**
    * @brief Hidden
@@ -59,8 +58,7 @@ public:
   /**
    * @brief Releases the required resources for the edges renderer.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Renders the edges of the attached mesh.
@@ -69,13 +67,10 @@ public:
 
 protected:
   void _prepareResources();
-  int _processEdgeForAdjacencies(unsigned int pa, unsigned int pb,
-                                 unsigned int p0, unsigned int p1,
+  int _processEdgeForAdjacencies(unsigned int pa, unsigned int pb, unsigned int p0, unsigned int p1,
                                  unsigned int p2);
-  int _processEdgeForAdjacenciesWithVertices(const Vector3& pa,
-                                             const Vector3& pb,
-                                             const Vector3& p0,
-                                             const Vector3& p1,
+  int _processEdgeForAdjacenciesWithVertices(const Vector3& pa, const Vector3& pb,
+                                             const Vector3& p0, const Vector3& p1,
                                              const Vector3& p2);
 
   /**
@@ -86,15 +81,13 @@ protected:
    * @param  p0
    * @param  p1
    */
-  void _checkEdge(size_t faceIndex, int edge,
-                  const std::vector<Vector3>& faceNormals,
+  void _checkEdge(size_t faceIndex, int edge, const std::vector<Vector3>& faceNormals,
                   const Vector3& p0, const Vector3& p1);
 
   /**
    * @brief Push line into the position, normal and index buffer.
    */
-  void createLine(const Vector3& p0, const Vector3& p1,
-                          uint32_t offset);
+  void createLine(const Vector3& p0, const Vector3& p1, uint32_t offset);
 
   /**
    * @brief Generates lines edges from adjacencjes.

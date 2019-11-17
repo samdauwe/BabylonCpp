@@ -39,14 +39,13 @@ public:
    * the constructor. The updateEffect method can be used to compile the shader
    * at a later time. (default: false)
    */
-  CircleOfConfusionPostProcess(
-    const std::string& name, RenderTargetTexture* depthTexture,
-    const std::variant<float, PostProcessOptions>& options,
-    const CameraPtr& camera, unsigned int samplingMode = 0,
-    Engine* engine = nullptr, bool reusable = false,
-    unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
-    bool blockCompilation    = false);
-  ~CircleOfConfusionPostProcess(); // = default
+  CircleOfConfusionPostProcess(const std::string& name, RenderTargetTexture* depthTexture,
+                               const std::variant<float, PostProcessOptions>& options,
+                               const CameraPtr& camera, unsigned int samplingMode = 0,
+                               Engine* engine = nullptr, bool reusable = false,
+                               unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
+                               bool blockCompilation    = false);
+  ~CircleOfConfusionPostProcess() override; // = default
 
 protected:
   /**
@@ -86,8 +85,7 @@ public:
    * Depth texture to be used to compute the circle of confusion. This must be
    * set here or in the constructor in order for the post process to function.
    */
-  WriteOnlyProperty<CircleOfConfusionPostProcess, RenderTargetTexturePtr>
-    depthTexture;
+  WriteOnlyProperty<CircleOfConfusionPostProcess, RenderTargetTexturePtr> depthTexture;
 
 private:
   RenderTargetTexturePtr _depthTexture;

@@ -27,7 +27,7 @@ class BABYLON_SHARED_EXPORT ParticleSystemSet : public IDisposable {
 
 public:
   ParticleSystemSet();
-  virtual ~ParticleSystemSet(); // = default
+  ~ParticleSystemSet() override; // = default
 
   /**
    * @brief Creates a new emitter mesh as a sphere.
@@ -35,8 +35,8 @@ public:
    * @param renderingGroupId defines the renderingGroupId to use for the sphere
    * @param scene defines the hosting scene
    */
-  void setEmitterAsSphere(const EmitterCreationOptions& options,
-                          unsigned int renderingGroupId, Scene* scene);
+  void setEmitterAsSphere(const EmitterCreationOptions& options, unsigned int renderingGroupId,
+                          Scene* scene);
 
   /**
    * @brief Starts all particle systems of the set.
@@ -48,8 +48,7 @@ public:
   /**
    * @brief Release all associated resources.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Serialize the set into a JSON compatible object.
@@ -64,8 +63,7 @@ public:
    * @param gpu defines if we want GPU particles or CPU particles
    * @returns a new ParticleSystemSet
    */
-  static std::unique_ptr<ParticleSystemSet>
-  Parse(const json& data, Scene* scene, bool gpu = false);
+  static std::unique_ptr<ParticleSystemSet> Parse(const json& data, Scene* scene, bool gpu = false);
 
 protected:
   /**

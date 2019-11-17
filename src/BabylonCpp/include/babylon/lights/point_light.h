@@ -24,13 +24,12 @@ public:
   template <typename... Ts>
   static PointLightPtr New(Ts&&... args)
   {
-    auto light
-      = std::shared_ptr<PointLight>(new PointLight(std::forward<Ts>(args)...));
+    auto light = std::shared_ptr<PointLight>(new PointLight(std::forward<Ts>(args)...));
     light->addToScene(light);
 
     return light;
   }
-  ~PointLight(); // = default
+  ~PointLight() override; // = default
 
   Type type() const override;
 
@@ -82,8 +81,7 @@ public:
    * @param lightIndex The index of the light in the effect to update
    * @returns The point light
    */
-  void transferToEffect(const EffectPtr& effect,
-                        const std::string& lightIndex) override;
+  void transferToEffect(const EffectPtr& effect, const std::string& lightIndex) override;
 
   /**
    * @brief Sets the passed Effect "effect" with the Light information.
@@ -92,16 +90,15 @@ public:
    * or direction)
    * @returns The light
    */
-  PointLight& transferToNodeMaterialEffect(
-    const EffectPtr& effect, const std::string& lightDataUniformName) override;
+  PointLight& transferToNodeMaterialEffect(const EffectPtr& effect,
+                                           const std::string& lightDataUniformName) override;
 
   /**
    * @brief Prepares the list of defines specific to the light type.
    * @param defines the list of defines
    * @param lightIndex defines the index of the light for the effect
    */
-  void prepareLightSpecificDefines(MaterialDefines& defines,
-                                   unsigned int lightIndex) override;
+  void prepareLightSpecificDefines(MaterialDefines& defines, unsigned int lightIndex) override;
 
 protected:
   /**
@@ -127,9 +124,8 @@ protected:
    * - z-near and far equal to the active camera minZ and maxZ.
    * Returns the PointLight.
    */
-  void _setDefaultShadowProjectionMatrix(
-    Matrix& matrix, const Matrix& viewMatrix,
-    const std::vector<AbstractMesh*>& renderList) override;
+  void _setDefaultShadowProjectionMatrix(Matrix& matrix, const Matrix& viewMatrix,
+                                         const std::vector<AbstractMesh*>& renderList) override;
 
   void _buildUniformLayout() override;
 

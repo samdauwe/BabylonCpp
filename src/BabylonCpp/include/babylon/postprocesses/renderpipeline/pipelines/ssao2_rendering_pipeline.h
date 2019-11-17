@@ -34,16 +34,14 @@ struct SSAO2Ratio {
 /**
  * @brief Render pipeline to produce ssao effect.
  */
-class BABYLON_SHARED_EXPORT SSAO2RenderingPipeline
-    : public PostProcessRenderPipeline {
+class BABYLON_SHARED_EXPORT SSAO2RenderingPipeline : public PostProcessRenderPipeline {
 
 public:
   /**
    * The PassPostProcess id in the pipeline that contains the original scene
    * color
    */
-  static constexpr const char* SSAOOriginalSceneColorEffect
-    = "SSAOOriginalSceneColorEffect";
+  static constexpr const char* SSAOOriginalSceneColorEffect = "SSAOOriginalSceneColorEffect";
   /**
    * The SSAO PostProcess id in the pipeline
    */
@@ -60,8 +58,7 @@ public:
    * The PostProcess id in the pipeline that combines the SSAO-Blur output with
    * the original scene color (SSAOOriginalSceneColorEffect)
    */
-  static constexpr const char* SSAOCombineRenderEffect
-    = "SSAOCombineRenderEffect";
+  static constexpr const char* SSAOCombineRenderEffect = "SSAOCombineRenderEffect";
 
 public:
   template <typename... Ts>
@@ -73,7 +70,7 @@ public:
 
     return renderingPipeline;
   }
-  virtual ~SSAO2RenderingPipeline(); // = default
+  ~SSAO2RenderingPipeline() override; // = default
 
   void addToScene(const SSAO2RenderingPipelinePtr& ssao2RenderingPipeline);
 
@@ -113,8 +110,8 @@ public:
    * @param rootUrl The URL of the serialized pipeline.
    * @returns An instantiated pipeline from the serialized object.
    */
-  static std::unique_ptr<SSAO2RenderingPipeline>
-  Parse(const json& source, Scene* scene, const std::string& url);
+  static std::unique_ptr<SSAO2RenderingPipeline> Parse(const json& source, Scene* scene,
+                                                       const std::string& url);
 
 protected:
   /**
@@ -128,8 +125,7 @@ protected:
    */
   SSAO2RenderingPipeline(const std::string& name, Scene* scene, float ratio,
                          const std::vector<CameraPtr>& cameras);
-  SSAO2RenderingPipeline(const std::string& name, Scene* scene,
-                         const SSAO2Ratio& ratio,
+  SSAO2RenderingPipeline(const std::string& name, Scene* scene, const SSAO2Ratio& ratio,
                          const std::vector<CameraPtr>& cameras);
 
 private:

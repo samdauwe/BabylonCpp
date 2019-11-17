@@ -30,9 +30,9 @@ public:
 
     return camera;
   }
-  ~DeviceOrientationCamera(); // = default
+  ~DeviceOrientationCamera() override; // = default
 
-  virtual Type type() const override;
+  Type type() const override;
 
   /**
    * @brief Enabled turning on the y axis when the orientation sensor is active.
@@ -67,8 +67,7 @@ protected:
    * @param position The start position camera
    * @param scene The scene the camera belongs to
    */
-  DeviceOrientationCamera(const std::string& name, const Vector3& position,
-                          Scene* scene);
+  DeviceOrientationCamera(const std::string& name, const Vector3& position, Scene* scene);
 
   /**
    * @brief Gets a boolean indicating that pointer input must be disabled on
@@ -87,8 +86,7 @@ public:
    * Gets or sets a boolean indicating that pointer input must be disabled on
    * first orientation sensor update (Default: true)
    */
-  Property<DeviceOrientationCamera, bool>
-    disablePointerInputWhenUsingDeviceOrientation;
+  Property<DeviceOrientationCamera, bool> disablePointerInputWhenUsingDeviceOrientation;
 
 private:
   std::unique_ptr<Quaternion> _initialQuaternion;

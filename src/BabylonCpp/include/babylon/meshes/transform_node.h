@@ -56,13 +56,13 @@ public:
   template <typename... Ts>
   static TransformNodePtr New(Ts&&... args)
   {
-    auto transformNode = std::shared_ptr<TransformNode>(
-      new TransformNode(std::forward<Ts>(args)...));
+    auto transformNode
+      = std::shared_ptr<TransformNode>(new TransformNode(std::forward<Ts>(args)...));
     transformNode->addToScene(transformNode);
 
     return transformNode;
   }
-  ~TransformNode(); // = default
+  ~TransformNode() override; // = default
 
   /**
    * @brief Adds the transform node to the scene.
@@ -77,14 +77,13 @@ public:
   /**
    * @brief Gets a property.
    */
-  virtual AnimationValue
-  getProperty(const std::vector<std::string>& targetPropertyPath) override;
+  AnimationValue getProperty(const std::vector<std::string>& targetPropertyPath) override;
 
   /**
    * @brief Sets a property.
    */
-  virtual void setProperty(const std::vector<std::string>& targetPropertyPath,
-                           const AnimationValue& value) override;
+  void setProperty(const std::vector<std::string>& targetPropertyPath,
+                   const AnimationValue& value) override;
 
   /**
    * @brief Gets a string identifying the name of the class.
@@ -145,8 +144,7 @@ public:
    * cancel the transformation effect
    * @returns the current TransformNode
    */
-  TransformNode& setPivotMatrix(Matrix matrix,
-                                bool postMultiplyPivotMatrix = true);
+  TransformNode& setPivotMatrix(Matrix matrix, bool postMultiplyPivotMatrix = true);
 
   /**
    * @brief Returns the mesh pivot matrix.
@@ -174,8 +172,7 @@ public:
    * @param newWorldMatrix defines an optional matrix to use as world matrix
    * @returns the TransformNode.
    */
-  TransformNode& freezeWorldMatrix(const std::optional<Matrix>& newWorldMatrix
-                                   = std::nullopt);
+  TransformNode& freezeWorldMatrix(const std::optional<Matrix>& newWorldMatrix = std::nullopt);
 
   /**
    * @brief Allows back the World matrix computation.
@@ -195,8 +192,7 @@ public:
    * @param absolutePosition the absolute position to set
    * @returns the TransformNode.
    */
-  TransformNode&
-  setAbsolutePosition(const std::optional<Vector3>& absolutePosition);
+  TransformNode& setAbsolutePosition(const std::optional<Vector3>& absolutePosition);
 
   /**
    * @brief Sets the mesh position in its local space.
@@ -230,9 +226,8 @@ public:
    * @param space the choosen space of the target
    * @returns the TransformNode.
    */
-  TransformNode& lookAt(const Vector3& targetPoint, float yawCor = 0.f,
-                        float pitchCor = 0.f, float rollCor = 0.f,
-                        Space space = Space::LOCAL);
+  TransformNode& lookAt(const Vector3& targetPoint, float yawCor = 0.f, float pitchCor = 0.f,
+                        float rollCor = 0.f, Space space = Space::LOCAL);
 
   /**
    * @brief Returns a new Vector3 that is the localAxis, expressed in the mesh
@@ -262,8 +257,8 @@ public:
    * @param rollCor optional roll (z-axis) correction in radians
    * @returns this TransformNode
    */
-  TransformNode& setDirection(const Vector3& localAxis, float yawCor = 0.f,
-                              float pitchCor = 0.f, float rollCor = 0.f);
+  TransformNode& setDirection(const Vector3& localAxis, float yawCor = 0.f, float pitchCor = 0.f,
+                              float rollCor = 0.f);
 
   /**
    * @brief Sets a new pivot point to the current node
@@ -360,8 +355,7 @@ public:
    * @param amount the amount to rotate in radians
    * @returns the TransformNode
    */
-  TransformNode& rotateAround(const Vector3& point, Vector3& axis,
-                              float amount);
+  TransformNode& rotateAround(const Vector3& point, Vector3& axis, float amount);
 
   /**
    * @brief Translates the mesh along the axis vector for the passed distance in
@@ -372,8 +366,7 @@ public:
    * @param space Space to rotate in (Default: local)
    * @returns the TransformNode.
    */
-  TransformNode& translate(const Vector3& axis, float distance,
-                           Space space = Space::LOCAL);
+  TransformNode& translate(const Vector3& axis, float distance, Space space = Space::LOCAL);
   /**
    * @brief Adds a rotation step to the mesh current rotation.
    * x, y, z are Euler angles expressed in radians.
@@ -404,8 +397,7 @@ public:
    * world matrix to be created from scratch
    * @returns the world matrix
    */
-  Matrix& computeWorldMatrix(bool force             = false,
-                             bool useWasUpdatedFlag = false) override;
+  Matrix& computeWorldMatrix(bool force = false, bool useWasUpdatedFlag = false) override;
 
   /**
    * @brief If you'd like to be called back after the mesh position, rotation or
@@ -445,8 +437,7 @@ public:
    * @param doNotCloneChildren Do not clone children hierarchy
    * @returns the new transform node
    */
-  TransformNodePtr clone(const std::string& name, Node* newParent,
-                         bool doNotCloneChildren = false);
+  TransformNodePtr clone(const std::string& name, Node* newParent, bool doNotCloneChildren = false);
 
   /**
    * @brief Serializes the objects information.
@@ -478,9 +469,9 @@ public:
    * part of the result, otherwise it will be ignored
    * @returns an array of TransformNode
    */
-  virtual std::vector<TransformNodePtr> getChildTransformNodes(
-    bool directDescendantsOnly                                = false,
-    const std::function<bool(const NodePtr& node)>& predicate = nullptr);
+  virtual std::vector<TransformNodePtr>
+  getChildTransformNodes(bool directDescendantsOnly                                = false,
+                         const std::function<bool(const NodePtr& node)>& predicate = nullptr);
 
   /**
    * @brief Releases resources associated with this transform node.
@@ -489,8 +480,7 @@ public:
    * @param disposeMaterialAndTextures Set to true to also dispose referenced
    * materials and textures (false by default)
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Uniformly scales the mesh to fit inside of a unit cube (1 X 1 X 1
@@ -503,14 +493,12 @@ public:
    * when selecting which object should be included when scaling
    * @returns the current mesh
    */
-  TransformNode& normalizeToUnitCube(
-    bool includeDescendants = true, bool ignoreRotation = false,
-    const std::function<bool(const AbstractMeshPtr& node)>& predicate
-    = nullptr);
+  TransformNode&
+  normalizeToUnitCube(bool includeDescendants = true, bool ignoreRotation = false,
+                      const std::function<bool(const AbstractMeshPtr& node)>& predicate = nullptr);
 
 protected:
-  TransformNode(const std::string& name, Scene* scene = nullptr,
-                bool isPure = true);
+  TransformNode(const std::string& name, Scene* scene = nullptr, bool isPure = true);
 
   virtual void _afterComputeWorldMatrix();
 

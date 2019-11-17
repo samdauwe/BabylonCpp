@@ -22,9 +22,9 @@ public:
    * frame)
    * @param condition defines the trigger related conditions
    */
-  SetParentAction(unsigned int triggerOptions, const IAnimatablePtr& target,
-                  IAnimatable* parent, Condition* condition = nullptr);
-  ~SetParentAction(); // = default
+  SetParentAction(unsigned int triggerOptions, const IAnimatablePtr& target, IAnimatable* parent,
+                  Condition* condition = nullptr);
+  ~SetParentAction() override; // = default
 
   /**
    * @brief Hidden

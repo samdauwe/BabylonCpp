@@ -28,8 +28,7 @@ class IGLVertexArrayObject;
  * the individual particle data
  * @see https://www.babylonjs-playground.com/#PU4WYI#4
  */
-class BABYLON_SHARED_EXPORT GPUParticleSystem : public BaseParticleSystem,
-                                                public IAnimatable {
+class BABYLON_SHARED_EXPORT GPUParticleSystem : public BaseParticleSystem, public IAnimatable {
 
 public:
   /**
@@ -51,16 +50,15 @@ public:
    * animate the particles texture
    */
   GPUParticleSystem(const std::string& name, size_t capacity = 5000,
-                    std::optional<size_t> randomTextureSize = std::nullopt,
-                    Scene* scene                            = nullptr,
-                    bool isAnimationSheetEnabled            = false);
-  virtual ~GPUParticleSystem(); // = default
+                    std::optional<size_t> randomTextureSize = std::nullopt, Scene* scene = nullptr,
+                    bool isAnimationSheetEnabled = false);
+  ~GPUParticleSystem() override; // = default
 
   /**
    * @brief Returns the object type.
    * @return the object type
    */
-  virtual Type type() const override;
+  Type type() const override;
 
   /**
    * @brief Gets the maximum number of particles active at the same time.
@@ -113,8 +111,7 @@ public:
    * @returns the current particle system
    */
   GPUParticleSystem& addColorGradient(float gradient, const Color4& color1,
-                                      const std::optional<Color4>& color2
-                                      = std::nullopt) override;
+                                      const std::optional<Color4>& color2 = std::nullopt) override;
 
   /**
    * @brief Remove a specific color gradient.
@@ -130,8 +127,7 @@ public:
    * @returns the current particle system
    */
   GPUParticleSystem& addSizeGradient(float gradient, float factor,
-                                     const std::optional<float>& factor2
-                                     = std::nullopt) override;
+                                     const std::optional<float>& factor2 = std::nullopt) override;
 
   /**
    * @brief Remove a specific size gradient.
@@ -199,8 +195,7 @@ public:
    * @returns the current particle system
    */
   IParticleSystem& addDragGradient(float gradient, float factor,
-                                   const std::optional<float>& factor2
-                                   = std::nullopt) override;
+                                   const std::optional<float>& factor2 = std::nullopt) override;
 
   /**
    * @brief Remove a specific drag gradient.
@@ -219,8 +214,7 @@ public:
    * @returns the current particle system
    */
   IParticleSystem& addEmitRateGradient(float gradient, float factor,
-                                       const std::optional<float>& factor2
-                                       = std::nullopt) override;
+                                       const std::optional<float>& factor2 = std::nullopt) override;
 
   /**
    * @brief Not supported by GPUParticleSystem.
@@ -256,8 +250,7 @@ public:
    * @param max defines the color remap maximal range
    * @returns the current particle system
    */
-  IParticleSystem& addColorRemapGradient(float gradient, float min,
-                                         float max) override;
+  IParticleSystem& addColorRemapGradient(float gradient, float min, float max) override;
 
   /**
    * @brief Not supported by GPUParticleSystem.
@@ -273,8 +266,7 @@ public:
    * @param max defines the alpha remap maximal range
    * @returns the current particle system
    */
-  IParticleSystem& addAlphaRemapGradient(float gradient, float min,
-                                         float max) override;
+  IParticleSystem& addAlphaRemapGradient(float gradient, float min, float max) override;
 
   /**
    * @brief Not supported by GPUParticleSystem.
@@ -289,15 +281,14 @@ public:
    * @param color defines the color to affect to the specified gradient
    * @returns the current particle system
    */
-  IParticleSystem& addRampGradient(float gradient,
-                                   const Color3& color) override;
+  IParticleSystem& addRampGradient(float gradient, const Color3& color) override;
 
   /**
    * @brief Not supported by GPUParticleSystem.
    * @param gradient defines the gradient to remove
    * @returns the current particle system
    */
-  IParticleSystem& removeRampGradient(float gradient= 0.f) override;
+  IParticleSystem& removeRampGradient(float gradient = 0.f) override;
 
   /**
    * @brief Not supported by GPUParticleSystem
@@ -329,8 +320,7 @@ public:
    * @returns the current particle system
    */
   IParticleSystem& addLifeTimeGradient(float gradient, float factor,
-                                       const std::optional<float>& factor2
-                                       = std::nullopt) override;
+                                       const std::optional<float>& factor2 = std::nullopt) override;
 
   /**
    * @brief Not supported by GPUParticleSystem.
@@ -374,8 +364,7 @@ public:
    * @param disposeTexture defines if the particule texture must be disposed as
    * well (true by default)
    */
-  void dispose(bool disposeTexture             = true,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool disposeTexture = true, bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Clones the particle system.
@@ -401,8 +390,7 @@ public:
    * @returns the parsed GPU particle system
    */
   static IParticleSystem* Parse(const json& parsedParticleSystem, Scene* scene,
-                                const std::string& rootUrl,
-                                bool doNotStart = false);
+                                const std::string& rootUrl, bool doNotStart = false);
 
 protected:
   size_t get_activeParticleCount() const;
@@ -413,33 +401,29 @@ protected:
   /**
    * Hidden
    */
-  BaseParticleSystem&
-  _removeGradientAndTexture(float gradient,
-                            std::vector<ColorGradient>& gradients,
-                            const RawTexturePtr& texture) override;
+  BaseParticleSystem& _removeGradientAndTexture(float gradient,
+                                                std::vector<ColorGradient>& gradients,
+                                                const RawTexturePtr& texture) override;
 
   /**
    * Hidden
    */
-  BaseParticleSystem&
-  _removeGradientAndTexture(float gradient,
-                            std::vector<Color3Gradient>& gradients,
-                            const RawTexturePtr& texture) override;
+  BaseParticleSystem& _removeGradientAndTexture(float gradient,
+                                                std::vector<Color3Gradient>& gradients,
+                                                const RawTexturePtr& texture) override;
 
   /**
    * Hidden
    */
-  BaseParticleSystem&
-  _removeGradientAndTexture(float gradient,
-                            std::vector<FactorGradient>& gradients,
-                            const RawTexturePtr& texture) override;
+  BaseParticleSystem& _removeGradientAndTexture(float gradient,
+                                                std::vector<FactorGradient>& gradients,
+                                                const RawTexturePtr& texture) override;
 
 private:
-  void _addFactorGradient(std::vector<FactorGradient>& factorGradients,
-                          float gradient, float factor);
+  void _addFactorGradient(std::vector<FactorGradient>& factorGradients, float gradient,
+                          float factor);
   std::unique_ptr<GL::IGLVertexArrayObject> _createUpdateVAO(Buffer* source);
-  std::unique_ptr<GL::IGLVertexArrayObject>
-  _createRenderVAO(Buffer* source, Buffer* spriteSource);
+  std::unique_ptr<GL::IGLVertexArrayObject> _createRenderVAO(Buffer* source, Buffer* spriteSource);
   void _initialize(bool force = false);
   RawTexture* _getRawTextureByName(const std::string& textureName);
   void _setRawTextureByName(const std::string& textureName,
