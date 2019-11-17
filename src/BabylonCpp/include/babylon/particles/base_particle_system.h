@@ -369,7 +369,7 @@ protected:
   /**
    * Hidden
    */
-  virtual void _reset();
+  virtual void _reset(); // FIXME: should it be IParticleSystem::reset() (no underscore)?
 
   /**
    * Hidden
