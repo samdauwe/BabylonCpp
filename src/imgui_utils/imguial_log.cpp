@@ -190,7 +190,7 @@ void ImGuiAl::Log::Iterate( IterateFunc iterator, bool apply_filters, void* ud )
     unsigned char meta[ 3 ];
     pos = Peek( pos, meta, 3 );
 
-    Level level = (Level)meta[ 0 ];
+    auto level     = (Level)meta[0];
     size_t length = meta[ 1 ] | meta[ 2 ] << 8;
     pos = Peek( pos, line, length );
     line[ length ] = 0;

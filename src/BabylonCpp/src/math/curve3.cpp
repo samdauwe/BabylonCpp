@@ -109,7 +109,7 @@ Curve3 Curve3::CreateHermiteSpline(const Vector3& p1, const Vector3& t1,
                                    int nbPoints)
 {
   std::vector<Vector3> hermite;
-  const float nbPointsVal = static_cast<float>(nbPoints);
+  const auto nbPointsVal  = static_cast<float>(nbPoints);
   const float step        = 1.f / nbPointsVal;
   for (float i = 0; i <= nbPointsVal; ++i) {
     hermite.emplace_back(Vector3::Hermite(p1, t1, p2, t2, i * step));

@@ -1945,7 +1945,7 @@ Mesh& Mesh::convertToFlatShadedMesh()
 
     for (kindIndex = 0; kindIndex < kinds.size(); ++kindIndex) {
       kind          = kinds[kindIndex];
-      size_t stride = static_cast<size_t>(vbs[kind]->getStrideSize());
+      auto stride   = static_cast<size_t>(vbs[kind]->getStrideSize());
 
       for (unsigned int offset = 0; offset < stride; ++offset) {
         newdata[kind].emplace_back(data[kind][vertexIndex * stride + offset]);
@@ -2027,7 +2027,7 @@ Mesh& Mesh::convertToUnIndexedMesh()
 
     for (kindIndex = 0; kindIndex < kinds.size(); ++kindIndex) {
       kind          = kinds[kindIndex];
-      size_t stride = static_cast<size_t>(vbs[kind]->getStrideSize());
+      auto stride   = static_cast<size_t>(vbs[kind]->getStrideSize());
 
       for (unsigned int offset = 0; offset < stride; ++offset) {
         newdata[kind].emplace_back(data[kind][vertexIndex * stride + offset]);

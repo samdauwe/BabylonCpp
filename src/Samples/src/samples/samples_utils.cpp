@@ -12,7 +12,7 @@ namespace Samples {
 std::vector<AbstractMeshPtr> CrowdSimulationUtils::createAgentMeshes(Scene* scene,
                                                                      size_t totalNoAgents)
 {
-  const float totalNoAgentsf = static_cast<float>(totalNoAgents);
+  const auto totalNoAgentsf = static_cast<float>(totalNoAgents);
   std::vector<AbstractMeshPtr> agentsMesh(totalNoAgents);
 
   for (size_t i = 0; i < totalNoAgents; ++i) {

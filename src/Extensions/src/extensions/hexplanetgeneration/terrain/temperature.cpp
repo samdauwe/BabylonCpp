@@ -67,7 +67,7 @@ void Temperature::generateTemperature()
       float nw = y1 + std::sin(t * Math::PI2) * dy / Math::PI2;
       float c  = _noise->scaled4D(nx, ny, nz, nw);
 
-      const size_t idx = static_cast<size_t>(y * _width + x);
+      const auto idx   = static_cast<size_t>(y * _width + x);
       _data[idx]       = c;
     }
   }
@@ -77,7 +77,7 @@ float Temperature::getTemperature(float u, float v) const
 {
   const float x    = std::floor(u * _width);
   const float y    = std::floor(v * _height);
-  const size_t idx = static_cast<size_t>(y * _width + x);
+  const auto idx   = static_cast<size_t>(y * _width + x);
 
   return _data[idx] + _gradient->getValue(static_cast<size_t>(v));
 }

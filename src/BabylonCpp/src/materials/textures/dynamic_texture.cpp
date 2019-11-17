@@ -124,7 +124,7 @@ void DynamicTexture::drawText(const std::string& text, int x, int y,
   if (y == 0) {
     auto _font = font;
     String::replaceInPlace(_font, "/\\D/g", "");
-    float fontSize = static_cast<float>(std::stoi(_font));
+    auto fontSize  = static_cast<float>(std::stoi(_font));
     y              = static_cast<int>((static_cast<float>(size.height) / 2.f)
                          + (fontSize / 3.65f));
   }

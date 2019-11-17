@@ -4751,8 +4751,8 @@ ArrayBufferView Engine::_convertRGBtoRGBATextureData(const ArrayBufferView& rgbD
     // Convert each pixel.
     for (int x = 0; x < width; ++x) {
       for (int y = 0; y < height; ++y) {
-        size_t index    = static_cast<size_t>((y * width + x) * 3);
-        size_t newIndex = static_cast<size_t>((y * width + x) * 4);
+        auto index    = static_cast<size_t>((y * width + x) * 3);
+        auto newIndex = static_cast<size_t>((y * width + x) * 4);
 
         // Map Old Value to new value.
         rgbaData[newIndex + 0] = rgbData.float32Array[index + 0];
@@ -4770,8 +4770,8 @@ ArrayBufferView Engine::_convertRGBtoRGBATextureData(const ArrayBufferView& rgbD
     // Convert each pixel.
     for (int x = 0; x < width; ++x) {
       for (int y = 0; y < height; ++y) {
-        size_t index    = static_cast<size_t>((y * width + x) * 3);
-        size_t newIndex = static_cast<size_t>((y * width + x) * 4);
+        auto index    = static_cast<size_t>((y * width + x) * 3);
+        auto newIndex = static_cast<size_t>((y * width + x) * 4);
 
         // Map Old Value to new value.
         rgbaData[newIndex + 0] = rgbData.uint32Array[index + 0];
@@ -5264,7 +5264,7 @@ void Engine::unbindAllAttributes()
   if (_mustWipeVertexAttributes) {
     _mustWipeVertexAttributes = false;
 
-    const unsigned int ul = static_cast<unsigned>(_caps.maxVertexAttribs);
+    const auto ul = static_cast<unsigned>(_caps.maxVertexAttribs);
     if (_vertexAttribArraysEnabled.size() < ul) {
       _vertexAttribArraysEnabled.resize(ul);
     }

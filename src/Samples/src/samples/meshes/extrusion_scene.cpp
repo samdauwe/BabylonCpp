@@ -71,7 +71,7 @@ struct ExtrusionScene : public IRenderableScene {
       std::vector<Vector3> path;
       for (unsigned int ti = 0; ti < tessellation; ++ti) {
         // Rotate
-        float _if = static_cast<float>(ti);
+        auto _if = static_cast<float>(ti);
         path.emplace_back(
           Vector3(std::cos(_if * step) * radius, 0.f, std::sin(_if * step) * radius));
       }

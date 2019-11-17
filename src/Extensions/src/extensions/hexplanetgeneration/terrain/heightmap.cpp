@@ -61,7 +61,7 @@ float Heightmap::getHeight(float u, float v) const
 {
   const float x    = std::floor(u * _width);
   const float y    = std::floor(v * _height);
-  const size_t idx = static_cast<size_t>(y * _width + x);
+  const auto idx   = static_cast<size_t>(y * _width + x);
 
   return std::floor(_data[idx]);
 }

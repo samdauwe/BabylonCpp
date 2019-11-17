@@ -143,7 +143,7 @@ inline std::string toIso8601Ms(const system_time_point_t& system_time_point)
   auto ms = std::chrono::duration_cast<milliseconds_t>(
               system_time_point.time_since_epoch())
               .count();
-  std::size_t _ms = static_cast<std::size_t>(ms % 1000);
+  auto _ms = static_cast<std::size_t>(ms % 1000);
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(                                                               \

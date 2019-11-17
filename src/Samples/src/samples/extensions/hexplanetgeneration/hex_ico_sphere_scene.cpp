@@ -71,7 +71,7 @@ private:
 
     // Generate dual polyhedron position and face indices
     for (auto& node : icosahedronMesh.nodes) {
-      unsigned int relativeZeroIndex = static_cast<unsigned int>(positions.size() / 3);
+      auto relativeZeroIndex = static_cast<unsigned int>(positions.size() / 3);
 
       const auto rand = Math::randomList(0.f, 1.f, 2);
       const Color3 color(0.f, rand[0] * 0.5f, rand[1] * 1.f);

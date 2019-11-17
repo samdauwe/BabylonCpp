@@ -19,7 +19,7 @@ std::string GUID::RandomId()
   for (unsigned int i = 0; i < randomId.size(); ++i) {
     const char c = randomId[i];
     if (c == 'x' || c == 'y') {
-      const unsigned int r = static_cast<unsigned int>(randomFloats[i] * 16);
+      const auto r         = static_cast<unsigned int>(randomFloats[i] * 16);
       randomId[i]          = (c == 'x') ? hex[r] : hex[yconv[r]];
     }
   }

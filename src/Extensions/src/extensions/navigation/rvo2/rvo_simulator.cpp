@@ -89,7 +89,7 @@ size_t RVOSimulator::addAgent(const Vector2& position)
     return RVO_ERROR;
   }
 
-  Agent* agent = new Agent(this);
+  auto* agent = new Agent(this);
 
   agent->position_        = position;
   agent->maxNeighbors_    = defaultAgent_->maxNeighbors_;
@@ -112,7 +112,7 @@ size_t RVOSimulator::addAgent(const Vector2& position, float neighborDist,
                               float timeHorizonObst, float radius,
                               float maxSpeed, const Vector2& velocity)
 {
-  Agent* agent = new Agent(this);
+  auto* agent = new Agent(this);
 
   agent->position_        = position;
   agent->maxNeighbors_    = maxNeighbors;
@@ -139,7 +139,7 @@ size_t RVOSimulator::addObstacle(const std::vector<Vector2>& vertices)
   const size_t obstacleNo = obstacles_.size();
 
   for (size_t i = 0; i < vertices.size(); ++i) {
-    Obstacle* obstacle = new Obstacle();
+    auto* obstacle     = new Obstacle();
     obstacle->point_   = vertices[i];
 
     if (i != 0) {

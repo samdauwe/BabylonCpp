@@ -4354,9 +4354,9 @@ Scene& Scene::createPickingRayToRef(int x, int y, const std::optional<Matrix>& w
   auto identity = Matrix::Identity();
 
   // Moving coordinates to local viewport world
-  float _x = static_cast<float>(x);
+  auto _x = static_cast<float>(x);
   _x /= static_cast<float>(_engine->getHardwareScalingLevel() - viewport.x);
-  float _y = static_cast<float>(y);
+  auto _y = static_cast<float>(y);
   _y /= static_cast<float>(_engine->getHardwareScalingLevel()
                            - (_engine->getRenderHeight() - viewport.y - viewport.height));
 
@@ -4394,9 +4394,9 @@ Scene& Scene::createPickingRayInCameraSpaceToRef(int x, int y, Ray& result, Came
   auto identity = Matrix::Identity();
 
   // Moving coordinates to local viewport world
-  float _x = static_cast<float>(x);
+  auto _x = static_cast<float>(x);
   _x /= static_cast<float>(_engine->getHardwareScalingLevel() - viewport.x);
-  float _y = static_cast<float>(y);
+  auto _y = static_cast<float>(y);
   _y /= static_cast<float>(_engine->getHardwareScalingLevel()
                            - (_engine->getRenderHeight() - viewport.y - viewport.height));
   result.update(_x, _y, static_cast<float>(viewport.width), static_cast<float>(viewport.height),

@@ -148,7 +148,7 @@ KdTree::buildObstacleTreeRecursive(const std::vector<Obstacle*>& obstacles)
     return nullptr;
   }
   else {
-    ObstacleTreeNode* const node = new ObstacleTreeNode;
+    auto* const node = new ObstacleTreeNode;
 
     size_t optimalSplit = 0;
     size_t minLeft      = obstacles.size();
@@ -244,7 +244,7 @@ KdTree::buildObstacleTreeRecursive(const std::vector<Obstacle*>& obstacles)
         const Vector2 splitpoint
           = obstacleJ1->point_ + t * (obstacleJ2->point_ - obstacleJ1->point_);
 
-        Obstacle* const newObstacle = new Obstacle();
+        auto* const newObstacle     = new Obstacle();
         newObstacle->point_         = splitpoint;
         newObstacle->prevObstacle_  = obstacleJ1;
         newObstacle->nextObstacle_  = obstacleJ2;

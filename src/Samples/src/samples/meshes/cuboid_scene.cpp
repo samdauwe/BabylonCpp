@@ -89,7 +89,7 @@ public:
       auto side2 = Vector3::Cross(normal, side1);
 
       // Six indices (two triangles) per face.
-      int32_t verticesLength = static_cast<int32_t>(positions.size() / 3);
+      auto verticesLength = static_cast<int32_t>(positions.size() / 3);
       indices.emplace_back(verticesLength);
       indices.emplace_back(verticesLength + 1);
       indices.emplace_back(verticesLength + 2);

@@ -204,7 +204,7 @@ template <typename T, typename... U>
 size_t get_address(std::function<T(U...)> f)
 {
   using fnType       = T(U...);
-  fnType** fnPointer = f.template target<fnType*>();
+  auto** fnPointer   = f.template target<fnType*>();
   return reinterpret_cast<size_t>(*fnPointer);
 }
 

@@ -224,9 +224,9 @@ Image Tools::CreateCheckerboardImage(unsigned int size)
   std::uint8_t b = 0;
 
   for (unsigned int x = 0; x < size; ++x) {
-    float xf = static_cast<float>(x);
+    auto xf = static_cast<float>(x);
     for (unsigned int y = 0; y < size; ++y) {
-      float yf              = static_cast<float>(y);
+      auto yf               = static_cast<float>(y);
       unsigned int position = (x + size * y) * 4;
       auto floorX           = static_cast<std::uint8_t>(std::floor(xf / (size / 8.f)));
       auto floorY           = static_cast<std::uint8_t>(std::floor(yf / (size / 8.f)));

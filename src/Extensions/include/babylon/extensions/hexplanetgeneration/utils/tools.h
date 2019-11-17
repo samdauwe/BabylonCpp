@@ -20,7 +20,7 @@ namespace Extensions {
 template <typename T>
 typename T::iterator getAdvancedIt(T& value, size_t off)
 {
-  typename T::iterator it = value.begin();
+  auto it = value.begin();
   std::advance(it, off);
   return it;
 }

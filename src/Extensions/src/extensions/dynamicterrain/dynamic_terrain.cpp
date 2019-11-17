@@ -516,10 +516,8 @@ float DynamicTerrain::_GetHeightFromMap(float x, float z,
   x = x - std::floor((x - x0) / mapSizeX) * mapSizeX;
   z = z - std::floor((z - z0) / mapSizeZ) * mapSizeZ;
 
-  const unsigned int col1
-    = static_cast<unsigned>(std::floor((x - x0) * mapSubX / mapSizeX));
-  const unsigned int row1
-    = static_cast<unsigned>(std::floor((z - z0) * mapSubZ / mapSizeZ));
+  const auto col1         = static_cast<unsigned>(std::floor((x - x0) * mapSubX / mapSizeX));
+  const auto row1         = static_cast<unsigned>(std::floor((z - z0) * mapSubZ / mapSizeZ));
   const unsigned int col2 = (col1 + 1) % mapSubX;
   const unsigned int row2 = (row1 + 1) % mapSubZ;
   // starting indexes of the positions of 4 vertices defining a quad on the map

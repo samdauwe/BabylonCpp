@@ -84,8 +84,7 @@ private:
     // Advance internal state
     rng.state = oldstate * 6364136223846793005ULL + (rng.inc | 1);
     // Calculate output function (XSH RR), uses old state for max ILP
-    std::uint32_t xorshifted
-      = static_cast<std::uint32_t>(((oldstate >> 18u) ^ oldstate) >> 27u);
+    auto xorshifted   = static_cast<std::uint32_t>(((oldstate >> 18u) ^ oldstate) >> 27u);
     std::uint32_t rot = oldstate >> 59u;
 #ifdef _MSC_VER
 #pragma warning(push)

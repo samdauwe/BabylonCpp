@@ -198,7 +198,7 @@ void BaseCameraPointersInput<TCamera>::attachControl(ICanvas* element,
         ed->y      = evt.clientY;
         auto distX = pointA->x - pointB->x;
         auto distY = pointA->y - pointB->y;
-        float pinchSquaredDistance  = static_cast<float>((distX * distX) + (distY * distY));
+        auto pinchSquaredDistance  = static_cast<float>((distX * distX) + (distY * distY));
         auto multiTouchPanPosition = PointerTouch{
           (pointA->x + pointB->x) / 2, // x
           (pointA->y + pointB->y) / 2, // y

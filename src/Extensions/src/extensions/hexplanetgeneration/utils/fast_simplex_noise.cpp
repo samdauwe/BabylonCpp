@@ -87,7 +87,7 @@ FastSimplexNoise::FastSimplexNoise(const FastSimplexNoiseOptions& options)
   unsigned int n;
   uint8_t q;
   for (int i = 255; i > 0; i--) {
-    uint8_t _i = static_cast<uint8_t>(i);
+    auto _i = static_cast<uint8_t>(i);
     n     = static_cast<unsigned int>(std::floor((i + 1) * Math::random()));
     q     = p[_i];
     p[_i] = p[n];
@@ -158,8 +158,8 @@ float FastSimplexNoise::raw2D(float x, float y) const
 
   // Skew the input space to determine which simplex cell we're in
   float s = (x + y) * 0.5f * (std::sqrt(3.f) - 1.f); // Hairy factor for 2D
-  unsigned int i = static_cast<unsigned int>(std::floor(x + s));
-  unsigned int j = static_cast<unsigned int>(std::floor(y + s));
+  auto i         = static_cast<unsigned int>(std::floor(x + s));
+  auto j         = static_cast<unsigned int>(std::floor(y + s));
   float t        = static_cast<float>(i + j) * G2;
   // Unskew the cell origin back to (x,y) space
   float X0 = static_cast<float>(i) - t;
@@ -233,9 +233,9 @@ float FastSimplexNoise::raw3D(float x, float y, float z) const
 
   // Skew the input space to determine which simplex cell we're in
   float s        = (x + y + z) / 3.f; // Very nice and simple skew factor for 3D
-  unsigned int i = static_cast<unsigned int>(std::floor(x + s));
-  unsigned int j = static_cast<unsigned int>(std::floor(y + s));
-  unsigned int k = static_cast<unsigned int>(std::floor(z + s));
+  auto i         = static_cast<unsigned int>(std::floor(x + s));
+  auto j         = static_cast<unsigned int>(std::floor(y + s));
+  auto k         = static_cast<unsigned int>(std::floor(z + s));
   float t        = static_cast<float>(i + j + k) * G3;
   // Unskew the cell origin back to (x,y,z) space
   float X0 = static_cast<float>(i) - t;
@@ -350,10 +350,10 @@ float FastSimplexNoise::raw4D(float x, float y, float z, float w) const
   // Skew the (x,y,z,w) space to determine which cell of 24 simplices we're in
   float s
     = (x + y + z + w) * (std::sqrt(5.f) - 1.f) / 4.f; // Factor for 4D skewing
-  unsigned int i = static_cast<unsigned int>(std::floor(x + s));
-  unsigned int j = static_cast<unsigned int>(std::floor(y + s));
-  unsigned int k = static_cast<unsigned int>(std::floor(z + s));
-  unsigned int l = static_cast<unsigned int>(std::floor(w + s));
+  auto i = static_cast<unsigned int>(std::floor(x + s));
+  auto j = static_cast<unsigned int>(std::floor(y + s));
+  auto k = static_cast<unsigned int>(std::floor(z + s));
+  auto l = static_cast<unsigned int>(std::floor(w + s));
   // Factor for 4D unskewing
   float t = static_cast<float>(i + j + k + l) * G4;
   // Unskew the cell origin back to (x,y,z,w) space

@@ -698,7 +698,7 @@ void GLRenderingContext::drawArraysInstanced(GLenum mode, GLint first,
 
 void GLRenderingContext::drawBuffers(const std::vector<GLenum>& buffers)
 {
-  GLsizei n = static_cast<GLsizei>(buffers.size());
+  auto n = static_cast<GLsizei>(buffers.size());
   glDrawBuffers(n, &buffers[0]);
 }
 
@@ -925,7 +925,7 @@ std::string GLRenderingContext::getShaderInfoLog(IGLShader* shader)
   }
 
   // The maxLength includes the NULL character
-  GLbitfield logSizei = static_cast<GLbitfield>(logSize);
+  auto logSizei = static_cast<GLbitfield>(logSize);
   std::vector<GLchar> infoLog(logSizei);
   glGetShaderInfoLog(shader->value, logSize, &logSize, &infoLog[0]);
   return std::string(infoLog.begin(), infoLog.end());
@@ -1076,7 +1076,7 @@ void GLRenderingContext::scissor(GLint x, GLint y, GLint width, GLint height)
 void GLRenderingContext::shaderSource(IGLShader* shader,
                                       const std::string& source)
 {
-  GLint length       = static_cast<int>(source.length());
+  auto length        = static_cast<int>(source.length());
   const GLchar* line = source.c_str();
   glShaderSource(shader->value, 1, &line, &length);
 }

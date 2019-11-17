@@ -553,8 +553,7 @@ bool BabylonFileLoader::load(
               (scene->activeCamera()->maxZ - scene->activeCamera()->minZ)
                 / 2.f :
               1000.f;
-        float skyboxBlurLevel
-          = json_util::get_number<float>(parsedData, "skyboxBlurLevel", 0.f);
+        auto skyboxBlurLevel = json_util::get_number<float>(parsedData, "skyboxBlurLevel", 0.f);
         scene->createDefaultSkybox(scene->environmentTexture(), isPBR,
                                    skyboxScale, skyboxBlurLevel);
       }

@@ -163,7 +163,7 @@ private:
   template <typename LAMBDA>
   static RET lambda_stub(void* this_ptr, PARAMS... arg)
   {
-    LAMBDA* p = static_cast<LAMBDA*>(this_ptr);
+    auto* p = static_cast<LAMBDA*>(this_ptr);
     return (p->operator())(arg...);
   } // lambda_stub
 
