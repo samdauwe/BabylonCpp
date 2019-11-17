@@ -54,7 +54,7 @@ std::vector<typename Graph::NodeId> AStarSearch(Graph& graph,
                                                 typename Graph::Node& start,
                                                 typename Graph::Node& goal)
 {
-  typedef typename Graph::NodeId NodeId;
+  using NodeId = typename Graph::NodeId;
   std::vector<NodeId> path;
   PriorityQueue<NodeId, double> frontier;
   frontier.put(start.id, 0);

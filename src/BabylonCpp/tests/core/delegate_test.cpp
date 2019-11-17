@@ -44,7 +44,7 @@ struct A {
 
 }; // end of struct
 
-typedef SA::delegate<void()> ServiceDelegate;
+using ServiceDelegate = SA::delegate<void()>;
 class Service {
 public:
   void registerDelegate(ServiceDelegate& d)
@@ -59,7 +59,7 @@ public:
 private:
   ServiceDelegate* mD;
 };
-typedef SA::delegate<void(int)> ServiceDelegate2;
+using ServiceDelegate2 = SA::delegate<void(int)>;
 class Service2 {
 public:
   void registerDelegate(ServiceDelegate2& d)

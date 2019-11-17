@@ -60,7 +60,7 @@ struct PCG {
     std::uint64_t inc   = seed();
   };
   pcg32_random_t rng;
-  typedef std::uint32_t result_type;
+  using result_type = std::uint32_t;
 
   constexpr result_type operator()()
   {

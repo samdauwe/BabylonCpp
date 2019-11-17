@@ -55,9 +55,9 @@ namespace ImGuiAl
     {
       kShowFilters = 1 << 0
     };
-    
-    typedef bool ( *IterateFunc )( Level level, const char* line, void *ud );
-    
+
+    using IterateFunc = bool (*)(Level, const char*, void*);
+
     inline Log()
     {
       Init();

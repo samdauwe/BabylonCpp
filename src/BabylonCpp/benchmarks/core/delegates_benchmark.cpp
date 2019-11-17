@@ -5,8 +5,8 @@
 
 #include <babylon/core/delegates/delegate.h>
 
-typedef uint64_t ns;
-typedef uint32_t rep;
+using ns  = uint64_t;
+using rep = uint32_t;
 
 class Benchmark {
 

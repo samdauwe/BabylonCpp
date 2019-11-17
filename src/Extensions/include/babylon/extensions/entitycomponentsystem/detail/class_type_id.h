@@ -37,7 +37,7 @@ namespace Extensions {
 namespace ECS {
 namespace detail {
 
-typedef std::size_t TypeId;
+using TypeId = std::size_t;
 
 template <typename TBase>
 class ClassTypeId {
