@@ -125,7 +125,7 @@ void ConeParticleEmitter::applyToShader(Effect* effect)
   effect->setFloat("directionRandomizer", directionRandomizer);
 }
 
-const std::string ConeParticleEmitter::getEffectDefines() const
+std::string ConeParticleEmitter::getEffectDefines() const
 {
   std::string defines = "#define CONEEMITTER";
 
@@ -136,7 +136,7 @@ const std::string ConeParticleEmitter::getEffectDefines() const
   return defines;
 }
 
-const std::string ConeParticleEmitter::getClassName() const
+std::string ConeParticleEmitter::getClassName() const
 {
   return "ConeParticleEmitter";
 }

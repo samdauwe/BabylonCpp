@@ -437,7 +437,7 @@ public:
    * @brief Gets the class name of the camera.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Clones the current camera.

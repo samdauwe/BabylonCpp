@@ -180,7 +180,7 @@ public:
    * @brief Returns the string "AbstractMesh".
    * @returns "AbstractMesh"
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Gets a string representation of the current mesh.

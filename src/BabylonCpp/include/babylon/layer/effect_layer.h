@@ -72,7 +72,7 @@ public:
    * @brief Get the effect name of the layer.
    * @return The effect name
    */
-  virtual const std::string getEffectName() const = 0;
+  virtual std::string getEffectName() const = 0;
 
   /**
    * @brief Checks for the readiness of the element composing the layer.
@@ -139,7 +139,7 @@ public:
    * @brief Gets the class name of the effect layer.
    * @returns the string with the class name of the effect layer
    */
-  virtual const std::string getClassName() const;
+  virtual std::string getClassName() const;
 
   /**
    * @brief Creates an effect layer from parsed effect layer data.

@@ -109,7 +109,7 @@ bool LinesMesh::isReady(bool /*completeCheck*/, bool /*forceInstanceSupport*/)
   return Mesh::isReady();
 }
 
-const std::string LinesMesh::getClassName() const
+std::string LinesMesh::getClassName() const
 {
   return "LinesMesh";
 }

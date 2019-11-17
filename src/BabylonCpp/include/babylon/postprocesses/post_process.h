@@ -78,7 +78,7 @@ public:
    * @brief Gets a string idenfifying the name of the class.
    * @returns "PostProcess" string
    */
-  virtual const std::string getClassName() const;
+  virtual std::string getClassName() const;
 
   /**
    * @brief Gets the engine which this post process belongs to.

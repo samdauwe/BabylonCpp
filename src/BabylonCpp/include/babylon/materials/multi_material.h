@@ -57,7 +57,7 @@ public:
    * Mainly use in serialization.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Checks if the material is ready to render the requested sub mesh.

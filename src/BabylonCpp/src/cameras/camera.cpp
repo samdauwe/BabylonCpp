@@ -142,7 +142,7 @@ bool Camera::restoreState()
   return false;
 }
 
-const std::string Camera::getClassName() const
+std::string Camera::getClassName() const
 {
   return "Camera";
 }

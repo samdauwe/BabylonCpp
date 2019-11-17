@@ -159,7 +159,7 @@ public:
    * @param Gets the class name of the material.
    * @returns a string with the class name of the material
    */
-  virtual const std::string getClassName() const;
+  virtual std::string getClassName() const;
 
   /**
    * @brief Specifies if updates for the material been locked.

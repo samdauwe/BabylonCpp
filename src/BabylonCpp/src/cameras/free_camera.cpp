@@ -304,7 +304,7 @@ void FreeCamera::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   TargetCamera::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 
-const std::string FreeCamera::getClassName() const
+std::string FreeCamera::getClassName() const
 {
   return "FreeCamera";
 }

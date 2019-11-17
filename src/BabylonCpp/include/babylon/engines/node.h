@@ -109,7 +109,7 @@ public:
    * @brief Gets a string idenfifying the name of the class.
    * @returns "Node" string
    */
-  virtual const std::string getClassName() const;
+  virtual std::string getClassName() const;
 
   /**
    * @brief Gets the engine of the node

@@ -33,7 +33,7 @@ public:
    * or dynamic coding.
    * @returns "HDRCubeTexture"
    */
-  const std::string getClassName() const;
+  std::string getClassName() const;
 
   HDRCubeTexturePtr clone() const;
 

@@ -57,12 +57,12 @@ void BoxParticleEmitter::applyToShader(Effect* effect)
   effect->setVector3("maxEmitBox", maxEmitBox);
 }
 
-const std::string BoxParticleEmitter::getEffectDefines() const
+std::string BoxParticleEmitter::getEffectDefines() const
 {
   return "#define BOXEMITTER";
 }
 
-const std::string BoxParticleEmitter::getClassName() const
+std::string BoxParticleEmitter::getClassName() const
 {
   return "BoxParticleEmitter";
 }

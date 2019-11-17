@@ -49,7 +49,7 @@ public:
   std::vector<IAnimatablePtr> getAnimatables() override;
   std::vector<BaseTexturePtr> getActiveTextures() const override;
   bool hasTexture(const BaseTexturePtr& texture) const override;
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
   void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
                bool notBoundToMesh = false) override;
   MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;

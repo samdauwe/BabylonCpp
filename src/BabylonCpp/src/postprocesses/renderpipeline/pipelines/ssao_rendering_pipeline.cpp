@@ -98,7 +98,7 @@ Scene* SSAORenderingPipeline::scene() const
   return _scene;
 }
 
-const std::string SSAORenderingPipeline::getClassName() const
+std::string SSAORenderingPipeline::getClassName() const
 {
   return "SSAORenderingPipeline";
 }

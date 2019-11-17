@@ -90,7 +90,7 @@ Color4& Color4::addInPlace(const Color4& right)
   return *this;
 }
 
-const Float32Array Color4::asArray() const
+Float32Array Color4::asArray() const
 {
   Float32Array result;
   toArray(result, 0);
@@ -189,7 +189,7 @@ Color4 Color4::multiply(const Color4& color) const
   return Color4(r * color.r, g * color.g, b * color.b, a * color.a);
 }
 
-const Color4 Color4::multiplyToRef(const Color4& color, Color4& result) const
+Color4 Color4::multiplyToRef(const Color4& color, Color4& result) const
 {
   result.r = r * color.r;
   result.g = g * color.g;

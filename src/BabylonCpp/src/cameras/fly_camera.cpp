@@ -341,7 +341,7 @@ void FlyCamera::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   TargetCamera::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 
-const std::string FlyCamera::getClassName() const
+std::string FlyCamera::getClassName() const
 {
   return "FlyCamera";
 }

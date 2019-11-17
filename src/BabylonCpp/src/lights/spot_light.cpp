@@ -75,7 +75,7 @@ Type SpotLight::type() const
   return Type::SPOTLIGHT;
 }
 
-const std::string SpotLight::getClassName() const
+std::string SpotLight::getClassName() const
 {
   return "SpotLight";
 }

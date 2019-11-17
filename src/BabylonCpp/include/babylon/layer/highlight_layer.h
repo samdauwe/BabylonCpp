@@ -67,7 +67,7 @@ public:
    * @brief Get the effect name of the layer.
    * @return The effect name
    */
-  const std::string getEffectName() const override;
+  std::string getEffectName() const override;
 
   /**
    * @brief Returns wether or nood the layer needs stencil enabled during the
@@ -147,7 +147,7 @@ public:
    * @brief Gets the class name of the effect layer.
    * @returns the string with the class name of the effect layer
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Serializes this Highlight layer.

@@ -96,7 +96,7 @@ public:
    * or dynamic coding.
    * @returns "PBRSheenConfiguration"
    */
-  const std::string getClassName() const;
+  std::string getClassName() const;
 
   /**
    * @brief Add fallbacks to the effect fallbacks list.

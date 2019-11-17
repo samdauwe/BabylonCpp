@@ -35,7 +35,7 @@ AnaglyphArcRotateCamera::AnaglyphArcRotateCamera(
 
 AnaglyphArcRotateCamera::~AnaglyphArcRotateCamera() = default;
 
-const std::string AnaglyphArcRotateCamera::getClassName() const
+std::string AnaglyphArcRotateCamera::getClassName() const
 {
   return "AnaglyphArcRotateCamera";
 }

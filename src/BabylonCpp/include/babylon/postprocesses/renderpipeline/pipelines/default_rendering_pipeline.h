@@ -94,7 +94,7 @@ public:
    * @brief Get the class name.
    * @returns "DefaultRenderingPipeline"
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Force the compilation of the entire pipeline.

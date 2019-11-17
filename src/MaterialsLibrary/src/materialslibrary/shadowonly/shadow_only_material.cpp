@@ -244,7 +244,7 @@ json ShadowOnlyMaterial::serialize() const
   return nullptr;
 }
 
-const std::string ShadowOnlyMaterial::getClassName() const
+std::string ShadowOnlyMaterial::getClassName() const
 {
   return "ShadowOnlyMaterial";
 }

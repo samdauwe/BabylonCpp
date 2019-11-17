@@ -198,7 +198,7 @@ public:
    * @brief Gets the class name.
    * @returns the string "Mesh".
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Returns the class type.

@@ -144,7 +144,7 @@ Float32Array EquiRectangularCubeTexture::getFloat32ArrayFromArrayBuffer(
   return floatImageData;
 }
 
-const std::string EquiRectangularCubeTexture::getClassName() const
+std::string EquiRectangularCubeTexture::getClassName() const
 {
   return "EquiRectangularCubeTexture";
 }

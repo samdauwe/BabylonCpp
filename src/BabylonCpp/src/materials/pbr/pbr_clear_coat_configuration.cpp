@@ -375,7 +375,7 @@ void PBRClearCoatConfiguration::dispose(bool forceDisposeTextures)
   }
 }
 
-const std::string PBRClearCoatConfiguration::getClassName() const
+std::string PBRClearCoatConfiguration::getClassName() const
 {
   return "PBRClearCoatConfiguration";
 }

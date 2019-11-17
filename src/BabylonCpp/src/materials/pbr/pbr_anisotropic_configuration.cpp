@@ -164,7 +164,7 @@ void PBRAnisotropicConfiguration::dispose(bool forceDisposeTextures)
   }
 }
 
-const std::string PBRAnisotropicConfiguration::getClassName() const
+std::string PBRAnisotropicConfiguration::getClassName() const
 {
   return "PBRAnisotropicConfiguration";
 }

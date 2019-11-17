@@ -14,7 +14,7 @@ struct BABYLON_SHARED_EXPORT IPhysicsEnabledObject : public AbstractMesh {
   AbstractMesh* getParent() override              = 0;
   Scene* getScene() const override                = 0;
   virtual bool hasBoundingInfo()                  = 0;
-  const std::string getClassName() const override = 0;
+  std::string getClassName() const override = 0;
 }; // end of struct IPhysicsEnabledObject
 
 } // end of namespace BABYLON

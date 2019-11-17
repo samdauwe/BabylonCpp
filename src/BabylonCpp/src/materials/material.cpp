@@ -332,7 +332,7 @@ std::string Material::toString(bool fullDetails) const
   return oss.str();
 }
 
-const std::string Material::getClassName() const
+std::string Material::getClassName() const
 {
   return "Material";
 }

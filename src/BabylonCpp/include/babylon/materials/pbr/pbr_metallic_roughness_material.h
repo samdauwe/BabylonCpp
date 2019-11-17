@@ -32,7 +32,7 @@ public:
   /**
    * @brief Return the currrent class name of the material.
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Gets a property.

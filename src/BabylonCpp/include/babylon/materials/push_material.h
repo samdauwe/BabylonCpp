@@ -31,7 +31,7 @@ public:
   /**
    * @brief Returns the string "PushMaterial".
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   Type type() const override;
 

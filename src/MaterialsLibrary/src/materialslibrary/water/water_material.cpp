@@ -696,7 +696,7 @@ json WaterMaterial::serialize() const
   return nullptr;
 }
 
-const std::string WaterMaterial::getClassName() const
+std::string WaterMaterial::getClassName() const
 {
   return "WaterMaterial";
 }

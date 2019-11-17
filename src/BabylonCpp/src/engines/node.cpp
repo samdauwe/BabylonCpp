@@ -173,7 +173,7 @@ void Node::set_animationPropertiesOverride(
   _animationPropertiesOverride = value;
 }
 
-const std::string Node::getClassName() const
+std::string Node::getClassName() const
 {
   return "Node";
 }

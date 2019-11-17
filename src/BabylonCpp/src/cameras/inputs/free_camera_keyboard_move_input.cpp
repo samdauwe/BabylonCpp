@@ -138,7 +138,7 @@ void FreeCameraKeyboardMoveInput::checkInputs()
   }
 }
 
-const std::string FreeCameraKeyboardMoveInput::getClassName() const
+std::string FreeCameraKeyboardMoveInput::getClassName() const
 {
   return "FreeCameraKeyboardMoveInput";
 }
@@ -148,7 +148,7 @@ void FreeCameraKeyboardMoveInput::_onLostFocus()
   _keys.clear();
 }
 
-const std::string FreeCameraKeyboardMoveInput::getSimpleName() const
+std::string FreeCameraKeyboardMoveInput::getSimpleName() const
 {
   return "keyboard";
 }

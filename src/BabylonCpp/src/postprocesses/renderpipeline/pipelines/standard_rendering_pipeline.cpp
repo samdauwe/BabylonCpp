@@ -1260,7 +1260,7 @@ void StandardRenderingPipeline::_disposePostProcesses()
   blurVPostProcesses.clear();
 }
 
-const std::string StandardRenderingPipeline::getClassName() const
+std::string StandardRenderingPipeline::getClassName() const
 {
   return "StandardRenderingPipeline";
 }

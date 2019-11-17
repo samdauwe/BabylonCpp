@@ -148,7 +148,7 @@ public:
    * @brief Returns the string "Light".
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Converts the light information to a readable string for debug

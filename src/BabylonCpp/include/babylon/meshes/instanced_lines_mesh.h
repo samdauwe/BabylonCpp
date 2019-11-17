@@ -31,7 +31,7 @@ public:
   /**
    * @brief Returns the string "InstancedLinesMesh".
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Enables the edge rendering mode on the mesh.

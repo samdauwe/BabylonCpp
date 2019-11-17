@@ -478,7 +478,7 @@ json FurMaterial::serialize() const
   return nullptr;
 }
 
-const std::string FurMaterial::getClassName() const
+std::string FurMaterial::getClassName() const
 {
   return "FurMaterial";
 }

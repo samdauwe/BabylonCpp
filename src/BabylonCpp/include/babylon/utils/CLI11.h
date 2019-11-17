@@ -3201,13 +3201,22 @@ class Option : public OptionBase<Option> {
     callback_t get_callback() const { return callback_; }
 
     /// Get the long names
-    const std::vector<std::string> get_lnames() const { return lnames_; }
+    std::vector<std::string> get_lnames() const
+    {
+      return lnames_;
+    }
 
     /// Get the short names
-    const std::vector<std::string> get_snames() const { return snames_; }
+    std::vector<std::string> get_snames() const
+    {
+      return snames_;
+    }
 
     /// get the flag names with specified default values
-    const std::vector<std::string> get_fnames() const { return fnames_; }
+    std::vector<std::string> get_fnames() const
+    {
+      return fnames_;
+    }
 
     /// The number of times the option expects to be included
     int get_expected() const { return expected_; }

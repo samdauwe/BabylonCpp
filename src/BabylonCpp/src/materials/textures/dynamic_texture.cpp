@@ -46,7 +46,7 @@ DynamicTexture::DynamicTexture(const std::string& iName,
 
 DynamicTexture::~DynamicTexture() = default;
 
-const std::string DynamicTexture::getClassName() const
+std::string DynamicTexture::getClassName() const
 {
   return "DynamicTexture";
 }

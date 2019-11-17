@@ -38,7 +38,7 @@ public:
    * "ImageProcessingPostProcess"
    * @returns "ImageProcessingPostProcess"
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   void dispose(Camera* camera = nullptr) override;
 

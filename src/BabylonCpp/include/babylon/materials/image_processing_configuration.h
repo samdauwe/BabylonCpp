@@ -68,7 +68,7 @@ public:
    * @brief Gets the current class name.
    * @return "ImageProcessingConfiguration"
    */
-  const std::string getClassName() const;
+  std::string getClassName() const;
 
   /**
    * @brief Prepare the list of uniforms associated with the Image Processing

@@ -50,7 +50,7 @@ Type DirectionalLight::type() const
   return Type::DIRECTIONALLIGHT;
 }
 
-const std::string DirectionalLight::getClassName() const
+std::string DirectionalLight::getClassName() const
 {
   return "DirectionalLight";
 }

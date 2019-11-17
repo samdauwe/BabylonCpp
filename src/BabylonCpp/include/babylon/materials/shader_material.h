@@ -53,7 +53,7 @@ public:
    * Mainly use in serialization.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   Type type() const override;
 

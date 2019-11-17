@@ -417,7 +417,7 @@ json LavaMaterial::serialize() const
   return nullptr;
 }
 
-const std::string LavaMaterial::getClassName() const
+std::string LavaMaterial::getClassName() const
 {
   return "LavaMaterial";
 }

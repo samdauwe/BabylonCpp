@@ -38,7 +38,7 @@ public:
   /**
    * @brief The name of the behavior.
    */
-  const std::string name() const;
+  std::string name() const;
 
   /**
    * @brief Initializes the behavior.

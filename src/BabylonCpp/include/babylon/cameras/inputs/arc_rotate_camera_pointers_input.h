@@ -25,7 +25,7 @@ public:
    * @brief Gets the class name of the current intput.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Called on pointer POINTERMOVE event if only a single touch is

@@ -97,7 +97,7 @@ public:
   /**
    * @brief Gets the name of the material class.
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Returns true if alpha blending should be disabled.

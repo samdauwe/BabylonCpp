@@ -34,7 +34,7 @@ public:
    * @brief Gets camera class name
    * @returns AnaglyphFreeCamera
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
 protected:
   /**

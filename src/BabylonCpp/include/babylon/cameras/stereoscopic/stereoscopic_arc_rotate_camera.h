@@ -35,7 +35,7 @@ public:
    * @brief Gets camera class name
    * @returns StereoscopicArcRotateCamera
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
 protected:
   /**

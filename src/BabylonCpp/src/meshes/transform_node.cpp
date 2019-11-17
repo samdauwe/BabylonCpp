@@ -176,7 +176,7 @@ void TransformNode::setProperty(
   }
 }
 
-const std::string TransformNode::getClassName() const
+std::string TransformNode::getClassName() const
 {
   return "TransformNode";
 }

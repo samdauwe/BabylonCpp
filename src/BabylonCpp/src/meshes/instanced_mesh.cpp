@@ -46,7 +46,7 @@ void InstancedMesh::syncSubMeshes(const InstancedMeshPtr& instancedMesh)
   instancedMesh->_syncSubMeshes();
 }
 
-const std::string InstancedMesh::getClassName() const
+std::string InstancedMesh::getClassName() const
 {
   return "InstancedMesh";
 }

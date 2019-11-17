@@ -199,7 +199,7 @@ Vector2 PostProcess::texelSize()
   return _texelSize;
 }
 
-const std::string PostProcess::getClassName() const
+std::string PostProcess::getClassName() const
 {
   return "PostProcess";
 }

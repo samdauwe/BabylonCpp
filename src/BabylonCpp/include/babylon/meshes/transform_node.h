@@ -89,7 +89,7 @@ public:
    * @brief Gets a string identifying the name of the class.
    * @returns "TransformNode" string
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Copies the parameter passed Matrix into the mesh Pose matrix.

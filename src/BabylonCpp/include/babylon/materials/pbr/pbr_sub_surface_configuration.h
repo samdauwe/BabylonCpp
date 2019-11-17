@@ -129,7 +129,7 @@ public:
    * or dynamic coding.
    * @returns "PBRSubSurfaceConfiguration"
    */
-  const std::string getClassName() const;
+  std::string getClassName() const;
 
   /**
    * @brief Add fallbacks to the effect fallbacks list.

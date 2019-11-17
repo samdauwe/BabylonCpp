@@ -35,7 +35,7 @@ AnaglyphFreeCamera::AnaglyphFreeCamera(const std::string& iName,
 
 AnaglyphFreeCamera::~AnaglyphFreeCamera() = default;
 
-const std::string AnaglyphFreeCamera::getClassName() const
+std::string AnaglyphFreeCamera::getClassName() const
 {
   return "AnaglyphFreeCamera";
 }

@@ -47,12 +47,12 @@ void CylinderDirectedParticleEmitter::applyToShader(Effect* effect)
   effect->setVector3("direction2", direction2);
 }
 
-const std::string CylinderDirectedParticleEmitter::getEffectDefines() const
+std::string CylinderDirectedParticleEmitter::getEffectDefines() const
 {
   return "#define CYLINDEREMITTER\n#define DIRECTEDCYLINDEREMITTER";
 }
 
-const std::string CylinderDirectedParticleEmitter::getClassName() const
+std::string CylinderDirectedParticleEmitter::getClassName() const
 {
   return "CylinderDirectedParticleEmitter";
 }

@@ -220,7 +220,7 @@ public:
    * @brief Gets the class name of that object.
    * @returns "ShadowGenerator"
    */
-  const std::string getClassName() const;
+  std::string getClassName() const;
 
   /**
    * @brief Helper function to add a mesh and its descendants to the list of

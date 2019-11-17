@@ -68,7 +68,7 @@ public:
   /**
    * @brief Returns the name of this material class.
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Makes a duplicate of the current material.

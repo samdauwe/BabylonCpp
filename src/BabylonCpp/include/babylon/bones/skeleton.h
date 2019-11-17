@@ -56,7 +56,7 @@ public:
    * @brief Gets the current object class name.
    * @return the class name
    */
-  const std::string getClassName() const;
+  std::string getClassName() const;
 
   /**
    * @brief Returns an array containing the root bones.

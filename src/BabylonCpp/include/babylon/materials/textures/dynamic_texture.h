@@ -40,7 +40,7 @@ public:
    * or dynamic coding.
    * @returns "DynamicTexture"
    */
-  const std::string getClassName() const;
+  std::string getClassName() const;
 
   /**
    * @brief Scales the texture.

@@ -32,7 +32,7 @@ public:
    * or dynamic coding.
    * @returns "CubeTexture"
    */
-  const std::string getClassName() const;
+  std::string getClassName() const;
 
   /**
    * @brief Update the url (and optional buffer) of this texture if url was null

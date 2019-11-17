@@ -39,7 +39,7 @@ public:
    * @brief Returns the class name.
    * @returns The class name
    */
-  const std::string getClassName() const;
+  std::string getClassName() const;
 
   /**
    * @brief Clones the current color curve instance.

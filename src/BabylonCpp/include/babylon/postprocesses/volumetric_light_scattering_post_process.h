@@ -42,7 +42,7 @@ public:
    * @brief Returns the string "VolumetricLightScatteringPostProcess".
    * @returns "VolumetricLightScatteringPostProcess"
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Sets the new light position for light scattering effect.

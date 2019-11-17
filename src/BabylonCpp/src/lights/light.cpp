@@ -103,7 +103,7 @@ LightPtr Light::_this() const
   return (it != lights.end()) ? (*it) : nullptr;
 }
 
-const std::string Light::getClassName() const
+std::string Light::getClassName() const
 {
   return "Light";
 }

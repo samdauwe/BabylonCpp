@@ -538,7 +538,7 @@ void TargetCamera::_getRigCamPositionAndTarget(float halfSpace, TargetCamera& ri
   rigCamera.setTarget(newFocalTarget);
 }
 
-const std::string TargetCamera::getClassName() const
+std::string TargetCamera::getClassName() const
 {
   return "TargetCamera";
 }

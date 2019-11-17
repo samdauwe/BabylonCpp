@@ -420,7 +420,7 @@ StandardMaterial::StandardMaterial(const StandardMaterial& other)
 
 StandardMaterial::~StandardMaterial() = default;
 
-const std::string StandardMaterial::getClassName() const
+std::string StandardMaterial::getClassName() const
 {
   return "StandardMaterial";
 }

@@ -403,7 +403,7 @@ void ColorCurves::set_shadowsExposure(float value)
   _dirty           = true;
 }
 
-const std::string ColorCurves::getClassName() const
+std::string ColorCurves::getClassName() const
 {
   return "ColorCurves";
 }

@@ -450,7 +450,7 @@ void PBRSubSurfaceConfiguration::dispose(bool forceDisposeTextures)
   }
 }
 
-const std::string PBRSubSurfaceConfiguration::getClassName() const
+std::string PBRSubSurfaceConfiguration::getClassName() const
 {
   return "PBRSubSurfaceConfiguration";
 }

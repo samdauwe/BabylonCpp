@@ -41,7 +41,7 @@ public:
   bool hasTexture(const BaseTexturePtr& texture) const override;
   void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
                bool notBoundToMesh = false) override;
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
   MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
   json serialize() const;
 

@@ -29,7 +29,7 @@ public:
   /**
    * @brief Returns the string "PBRBaseSimpleMaterial".
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
 public:
   /**

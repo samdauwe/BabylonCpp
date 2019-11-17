@@ -37,7 +37,7 @@ public:
   /**
    * @brief Returns the string "LineMesh".
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Hidden

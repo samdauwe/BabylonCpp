@@ -45,7 +45,7 @@ public:
    * This helps avoiding instanceof at run time.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Checks and applies the current values of the inputs to the camera.

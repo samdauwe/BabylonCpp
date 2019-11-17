@@ -42,7 +42,7 @@ public:
    * @brief Returns the class name of the object.
    * It is mostly used internally for serialization purposes.
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
 protected:
   /**

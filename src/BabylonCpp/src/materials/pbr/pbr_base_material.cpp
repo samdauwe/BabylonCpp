@@ -205,7 +205,7 @@ bool PBRBaseMaterial::get_hasRenderTargetTextures() const
   return subSurface->hasRenderTargetTextures();
 }
 
-const std::string PBRBaseMaterial::getClassName() const
+std::string PBRBaseMaterial::getClassName() const
 {
   return "PBRBaseMaterial";
 }

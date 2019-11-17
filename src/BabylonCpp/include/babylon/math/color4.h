@@ -70,7 +70,7 @@ public:
    * blue, alpha values.
    * @returns the new array
    */
-  const Float32Array asArray() const;
+  Float32Array asArray() const;
 
   /**
    * @brief Stores from the starting index in the given array the Color4
@@ -174,7 +174,7 @@ public:
    * @param result The Color4 (RGBA) to fill the result in
    * @returns The result Color4.
    */
-  const Color4 multiplyToRef(const Color4& color, Color4& result) const;
+  Color4 multiplyToRef(const Color4& color, Color4& result) const;
 
   /**
    * @brief Creates a string with the Color4 current values.

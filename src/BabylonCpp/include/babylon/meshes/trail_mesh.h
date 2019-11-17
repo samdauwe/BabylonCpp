@@ -29,7 +29,7 @@ public:
    * @brief "TrailMesh"
    * @returns "TrailMesh"
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Start trailing mesh.

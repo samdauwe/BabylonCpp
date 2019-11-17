@@ -38,7 +38,7 @@ public:
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances = false) override;
   void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
   void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
                bool notBoundToMesh = false) override;
   MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;

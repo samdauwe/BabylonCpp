@@ -364,7 +364,7 @@ void CellMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
   PushMaterial::dispose(forceDisposeEffect, forceDisposeTextures);
 }
 
-const std::string CellMaterial::getClassName() const
+std::string CellMaterial::getClassName() const
 {
   return "CellMaterial";
 }

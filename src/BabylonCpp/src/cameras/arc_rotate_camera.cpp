@@ -730,7 +730,7 @@ void ArcRotateCamera::dispose(bool doNotRecurse,
   TargetCamera::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 
-const std::string ArcRotateCamera::getClassName() const
+std::string ArcRotateCamera::getClassName() const
 {
   return "ArcRotateCamera";
 }

@@ -126,7 +126,7 @@ public:
    * @brief Gets the class name of the material
    * @returns "BackgroundMaterial"
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Parse a JSON input to create back a background material.

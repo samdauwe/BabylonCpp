@@ -646,7 +646,7 @@ json MixMaterial::serialize() const
   return nullptr;
 }
 
-const std::string MixMaterial::getClassName() const
+std::string MixMaterial::getClassName() const
 {
   return "MixMaterial";
 }

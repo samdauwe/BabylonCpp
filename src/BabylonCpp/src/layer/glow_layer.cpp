@@ -93,7 +93,7 @@ float GlowLayer::get_intensity() const
   return _intensity;
 }
 
-const std::string GlowLayer::getEffectName() const
+std::string GlowLayer::getEffectName() const
 {
   return GlowLayer::EffectName;
 }
@@ -382,7 +382,7 @@ void GlowLayer::_disposeMesh(Mesh* mesh)
   removeExcludedMesh(mesh);
 }
 
-const std::string GlowLayer::getClassName() const
+std::string GlowLayer::getClassName() const
 {
   return "GlowLayer";
 }

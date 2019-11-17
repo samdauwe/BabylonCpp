@@ -170,12 +170,12 @@ void FreeCameraMouseInput::checkInputs()
 {
 }
 
-const std::string FreeCameraMouseInput::getClassName() const
+std::string FreeCameraMouseInput::getClassName() const
 {
   return "FreeCameraMouseInput";
 }
 
-const std::string FreeCameraMouseInput::getSimpleName() const
+std::string FreeCameraMouseInput::getSimpleName() const
 {
   return "mouse";
 }

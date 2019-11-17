@@ -84,7 +84,7 @@ public:
    * @brief Get the class name.
    * @returns "LensRenderingPipeline"
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   // public methods (self explanatory)
 

@@ -52,13 +52,13 @@ public:
    * @brief Gets the class name of the current intput.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Get the friendly name associated with the input class.
    * @returns the input friendly name
    */
-  const std::string getSimpleName() const override;
+  std::string getSimpleName() const override;
 
 public:
   /**

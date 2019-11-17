@@ -43,7 +43,7 @@ IShaderMaterialOptions& ShaderMaterial::options()
   return _options;
 }
 
-const std::string ShaderMaterial::getClassName() const
+std::string ShaderMaterial::getClassName() const
 {
   return "ShaderMaterial";
 }

@@ -1227,7 +1227,7 @@ json BackgroundMaterial::serialize() const
   return nullptr;
 }
 
-const std::string BackgroundMaterial::getClassName() const
+std::string BackgroundMaterial::getClassName() const
 {
   return "BackgroundMaterial";
 }

@@ -93,7 +93,7 @@ UniversalCamera::UniversalCamera::UniversalCamera(const std::string& iName,
 
 UniversalCamera::~UniversalCamera() = default;
 
-const std::string UniversalCamera::getClassName() const
+std::string UniversalCamera::getClassName() const
 {
   return "UniversalCamera";
 }

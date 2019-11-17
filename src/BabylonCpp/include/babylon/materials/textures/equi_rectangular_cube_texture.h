@@ -33,7 +33,7 @@ public:
    * or dynamic coding.
    * @returns "EquiRectangularCubeTexture"
    */
-  const std::string getClassName() const;
+  std::string getClassName() const;
 
   /**
    * @brief Create a clone of the current EquiRectangularCubeTexture and return

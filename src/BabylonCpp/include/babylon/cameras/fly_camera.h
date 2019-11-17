@@ -83,7 +83,7 @@ public:
    * @brief Get the current object class name.
    * @returns the class name.
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
 protected:
   /**

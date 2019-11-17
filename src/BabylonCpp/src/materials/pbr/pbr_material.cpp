@@ -1263,7 +1263,7 @@ void PBRMaterial::set_cameraColorCurves(const ColorCurvesPtr& value)
   _imageProcessingConfiguration->colorCurves = value;
 }
 
-const std::string PBRMaterial::getClassName() const
+std::string PBRMaterial::getClassName() const
 {
   return "PBRMaterial";
 }

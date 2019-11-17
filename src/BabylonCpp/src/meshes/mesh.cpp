@@ -246,7 +246,7 @@ TransformNodePtr Mesh::instantiateHierarychy(TransformNode* newParent)
   return instance;
 }
 
-const std::string Mesh::getClassName() const
+std::string Mesh::getClassName() const
 {
   return "Mesh";
 }

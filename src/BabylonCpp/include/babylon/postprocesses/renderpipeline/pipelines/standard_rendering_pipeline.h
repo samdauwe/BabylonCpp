@@ -65,7 +65,7 @@ public:
    * @brief Get the class name.
    * @returns "StandardRenderingPipeline"
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Dispose of the pipeline and stop all post processes.

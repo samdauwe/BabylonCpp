@@ -81,12 +81,12 @@ void ArcRotateCameraGamepadInput::checkInputs()
   }
 }
 
-const std::string ArcRotateCameraGamepadInput::getClassName() const
+std::string ArcRotateCameraGamepadInput::getClassName() const
 {
   return "ArcRotateCameraGamepadInput";
 }
 
-const std::string ArcRotateCameraGamepadInput::getSimpleName() const
+std::string ArcRotateCameraGamepadInput::getSimpleName() const
 {
   return "gamepad";
 }

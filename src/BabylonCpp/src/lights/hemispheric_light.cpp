@@ -47,7 +47,7 @@ void HemisphericLight::_buildUniformLayout()
   _uniformBuffer->create();
 }
 
-const std::string HemisphericLight::getClassName() const
+std::string HemisphericLight::getClassName() const
 {
   return "HemisphericLight";
 }

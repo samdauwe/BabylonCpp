@@ -33,48 +33,46 @@ ReflectionProbe::ReflectionProbe(const std::string& iName, const ISize& size,
                                           Constants::TEXTURETYPE_UNSIGNED_INT,
                                true);
 
-  _renderTargetTexture->onBeforeRenderObservable.add(
-    [this](int* faceIndex, EventState&) {
-      switch (*faceIndex) {
-        case 0:
-          _add.copyFromFloats(1.f, 0.f, 0.f);
-          break;
-        case 1:
-          _add.copyFromFloats(-1.f, 0.f, 0.f);
-          break;
-        case 2:
-          _add.copyFromFloats(0.f, _invertYAxis ? 1.f : -1.f, 0.f);
-          break;
-        case 3:
-          _add.copyFromFloats(0.f, _invertYAxis ? -1.f : 1.f, 0.f);
-          break;
-        case 4:
-          _add.copyFromFloats(0.f, 0.f, 1.f);
-          break;
-        case 5:
-          _add.copyFromFloats(0.f, 0.f, -1.f);
-          break;
-        default:
-          break;
-      }
+  _renderTargetTexture->onBeforeRenderObservable.add([this](const int* faceIndex, EventState&) {
+    switch (*faceIndex) {
+      case 0:
+        _add.copyFromFloats(1.f, 0.f, 0.f);
+        break;
+      case 1:
+        _add.copyFromFloats(-1.f, 0.f, 0.f);
+        break;
+      case 2:
+        _add.copyFromFloats(0.f, _invertYAxis ? 1.f : -1.f, 0.f);
+        break;
+      case 3:
+        _add.copyFromFloats(0.f, _invertYAxis ? -1.f : 1.f, 0.f);
+        break;
+      case 4:
+        _add.copyFromFloats(0.f, 0.f, 1.f);
+        break;
+      case 5:
+        _add.copyFromFloats(0.f, 0.f, -1.f);
+        break;
+      default:
+        break;
+    }
 
-      if (_attachedMesh) {
-        position.copyFrom(_attachedMesh->getAbsolutePosition());
-      }
+    if (_attachedMesh) {
+      position.copyFrom(_attachedMesh->getAbsolutePosition());
+    }
 
-      position.addToRef(_add, _target);
+    position.addToRef(_add, _target);
 
-      Matrix::LookAtLHToRef(position, _target, Vector3::Up(), _viewMatrix);
+    Matrix::LookAtLHToRef(position, _target, Vector3::Up(), _viewMatrix);
 
-      if (_scene->activeCamera()) {
-        _projectionMatrix = Matrix::PerspectiveFovLH(
-          Math::PI_2, 1.f, _scene->activeCamera()->minZ,
-          _scene->activeCamera()->maxZ);
-        _scene->setTransformMatrix(_viewMatrix, _projectionMatrix);
-      }
+    if (_scene->activeCamera()) {
+      _projectionMatrix = Matrix::PerspectiveFovLH(Math::PI_2, 1.f, _scene->activeCamera()->minZ,
+                                                   _scene->activeCamera()->maxZ);
+      _scene->setTransformMatrix(_viewMatrix, _projectionMatrix);
+    }
 
-      _scene->_forcedViewPosition = std::make_unique<Vector3>(position);
-    });
+    _scene->_forcedViewPosition = std::make_unique<Vector3>(position);
+  });
 
   _renderTargetTexture->onAfterUnbindObservable.add(
     [this](RenderTargetTexture*, EventState&) {

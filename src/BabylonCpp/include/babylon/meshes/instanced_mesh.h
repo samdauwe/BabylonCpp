@@ -33,7 +33,7 @@ public:
   /**
    * @brief Returns the string "InstancedMesh"
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   Type type() const override;
 

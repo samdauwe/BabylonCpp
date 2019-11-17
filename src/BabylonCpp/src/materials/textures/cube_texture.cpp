@@ -190,7 +190,7 @@ bool CubeTexture::get_isPrefiltered() const
   return _prefiltered;
 }
 
-const std::string CubeTexture::getClassName() const
+std::string CubeTexture::getClassName() const
 {
   return "CubeTexture";
 }

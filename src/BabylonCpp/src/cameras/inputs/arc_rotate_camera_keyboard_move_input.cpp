@@ -170,12 +170,12 @@ void ArcRotateCameraKeyboardMoveInput::checkInputs()
   }
 }
 
-const std::string ArcRotateCameraKeyboardMoveInput::getClassName() const
+std::string ArcRotateCameraKeyboardMoveInput::getClassName() const
 {
   return "ArcRotateCameraKeyboardMoveInput";
 }
 
-const std::string ArcRotateCameraKeyboardMoveInput::getSimpleName() const
+std::string ArcRotateCameraKeyboardMoveInput::getSimpleName() const
 {
   return "keyboard";
 }

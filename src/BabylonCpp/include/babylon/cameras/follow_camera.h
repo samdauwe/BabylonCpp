@@ -60,7 +60,7 @@ public:
    * @brief Gets the camera class name.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   json serialize() const override;
 

@@ -64,7 +64,7 @@ public:
    * @brief Get the effect name of the layer.
    * @return The effect name
    */
-  const std::string getEffectName() const override;
+  std::string getEffectName() const override;
 
   /**
    * @brief Checks for the readiness of the element composing the layer.
@@ -130,7 +130,7 @@ public:
    * @brief Gets the class name of the effect layer.
    * @returns the string with the class name of the effect layer
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Serializes this glow layer.

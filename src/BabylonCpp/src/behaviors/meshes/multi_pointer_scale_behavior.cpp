@@ -21,7 +21,7 @@ MultiPointerScaleBehavior::MultiPointerScaleBehavior()
 
 MultiPointerScaleBehavior::~MultiPointerScaleBehavior() = default;
 
-const std::string MultiPointerScaleBehavior::name() const
+std::string MultiPointerScaleBehavior::name() const
 {
   return "MultiPointerScale";
 }

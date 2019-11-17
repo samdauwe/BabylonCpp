@@ -33,13 +33,13 @@ template <class TCamera>
 BaseCameraPointersInput<TCamera>::~BaseCameraPointersInput() = default;
 
 template <class TCamera>
-const std::string BaseCameraPointersInput<TCamera>::getClassName() const
+std::string BaseCameraPointersInput<TCamera>::getClassName() const
 {
   return "BaseCameraPointersInput";
 }
 
 template <class TCamera>
-const std::string BaseCameraPointersInput<TCamera>::getSimpleName() const
+std::string BaseCameraPointersInput<TCamera>::getSimpleName() const
 {
   return "pointers";
 }

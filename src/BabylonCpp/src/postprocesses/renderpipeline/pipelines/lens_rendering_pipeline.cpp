@@ -111,7 +111,7 @@ void LensRenderingPipeline::addToScene(
   }
 }
 
-const std::string LensRenderingPipeline::getClassName() const
+std::string LensRenderingPipeline::getClassName() const
 {
   return "LensRenderingPipeline";
 }

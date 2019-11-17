@@ -34,7 +34,7 @@ public:
    * @brief Returns the string "HemisphericLight".
    * @return The class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   Type type() const override;
 

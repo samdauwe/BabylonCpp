@@ -154,7 +154,7 @@ public:
    * @brief Gets the class name
    * @returns the string "SubMesh".
    */
-  const std::string getClassName() const;
+  std::string getClassName() const;
 
   /** Statics **/
 

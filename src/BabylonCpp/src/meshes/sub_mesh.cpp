@@ -477,7 +477,7 @@ void SubMesh::dispose()
     _mesh->subMeshes.end());
 }
 
-const std::string SubMesh::getClassName() const
+std::string SubMesh::getClassName() const
 {
   return "SubMesh";
 }

@@ -26,7 +26,7 @@ PBRSpecularGlossinessMaterial::PBRSpecularGlossinessMaterial(
 
 PBRSpecularGlossinessMaterial::~PBRSpecularGlossinessMaterial() = default;
 
-const std::string PBRSpecularGlossinessMaterial::getClassName() const
+std::string PBRSpecularGlossinessMaterial::getClassName() const
 {
   return "PBRSpecularGlossinessMaterial";
 }

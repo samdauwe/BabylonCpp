@@ -41,7 +41,7 @@ public:
    * @brief Returns the string "SpotLight".
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Returns the integer 2.

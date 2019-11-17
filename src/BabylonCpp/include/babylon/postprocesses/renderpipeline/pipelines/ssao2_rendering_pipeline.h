@@ -83,7 +83,7 @@ public:
    * @brief Get the class name.
    * @returns "SSAO2RenderingPipeline"
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /** Methods */
   static bool IsSupported();

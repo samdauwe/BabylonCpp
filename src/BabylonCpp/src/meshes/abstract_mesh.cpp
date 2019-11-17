@@ -491,7 +491,7 @@ std::vector<LightPtr>& AbstractMesh::get_lightSources()
   return _lightSources;
 }
 
-const std::string AbstractMesh::getClassName() const
+std::string AbstractMesh::getClassName() const
 {
   return "AbstractMesh";
 }

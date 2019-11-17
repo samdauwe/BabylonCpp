@@ -242,7 +242,7 @@ std::string BaseTexture::toString() const
   return name;
 }
 
-const std::string BaseTexture::getClassName() const
+std::string BaseTexture::getClassName() const
 {
   return "BaseTexture";
 }

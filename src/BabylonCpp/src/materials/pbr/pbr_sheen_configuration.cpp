@@ -178,7 +178,7 @@ void PBRSheenConfiguration::dispose(bool forceDisposeTextures)
   }
 }
 
-const std::string PBRSheenConfiguration::getClassName() const
+std::string PBRSheenConfiguration::getClassName() const
 {
   return "PBRSheenConfiguration";
 }

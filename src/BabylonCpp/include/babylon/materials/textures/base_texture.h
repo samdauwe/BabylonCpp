@@ -63,7 +63,7 @@ public:
    * @brief Get the class name of the texture.
    * @returns "BaseTexture"
    */
-  const std::string getClassName() const;
+  std::string getClassName() const;
 
   /**
    * @brief Get the scene the texture belongs to.

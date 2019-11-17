@@ -45,7 +45,7 @@ StereoscopicFreeCamera::StereoscopicFreeCamera(const std::string& iName,
 
 StereoscopicFreeCamera::~StereoscopicFreeCamera() = default;
 
-const std::string StereoscopicFreeCamera::getClassName() const
+std::string StereoscopicFreeCamera::getClassName() const
 {
   return "StereoscopicFreeCamera";
 }

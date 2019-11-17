@@ -537,7 +537,7 @@ json TriPlanarMaterial::serialize() const
   return nullptr;
 }
 
-const std::string TriPlanarMaterial::getClassName() const
+std::string TriPlanarMaterial::getClassName() const
 {
   return "TriPlanarMaterial";
 }

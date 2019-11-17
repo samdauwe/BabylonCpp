@@ -147,7 +147,7 @@ void FollowCamera::_checkLimits()
   }
 }
 
-const std::string FollowCamera::getClassName() const
+std::string FollowCamera::getClassName() const
 {
   return "FollowCamera";
 }

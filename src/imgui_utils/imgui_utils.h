@@ -456,7 +456,7 @@ struct FrameTimeHistogram {
     lastdT = deltaT_;
   }
 
-  void PlotRefreshLines(float total_ = 0.0f, float* pValues_ = nullptr)
+  void PlotRefreshLines(float total_ = 0.0f, const float* pValues_ = nullptr)
   {
     ImDrawList* draw        = ImGui::GetWindowDrawList();
     const ImGuiStyle& style = ImGui::GetStyle();

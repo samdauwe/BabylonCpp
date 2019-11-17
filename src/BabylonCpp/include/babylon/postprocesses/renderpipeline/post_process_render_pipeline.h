@@ -40,7 +40,7 @@ public:
    * @brief Gets the class name.
    * @returns "PostProcessRenderPipeline"
    */
-  virtual const std::string getClassName() const;
+  virtual std::string getClassName() const;
 
   /**
    * @brief Adds an effect to the pipeline.

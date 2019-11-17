@@ -67,7 +67,7 @@ public:
    * or dynamic coding.
    * @returns "PBRClearCoatConfiguration"
    */
-  const std::string getClassName() const;
+  std::string getClassName() const;
 
   /**
    * @brief Makes a duplicate of the current configuration into another one.

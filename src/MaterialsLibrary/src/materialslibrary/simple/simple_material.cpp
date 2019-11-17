@@ -359,7 +359,7 @@ json SimpleMaterial::serialize() const
   return nullptr;
 }
 
-const std::string SimpleMaterial::getClassName() const
+std::string SimpleMaterial::getClassName() const
 {
   return "SimpleMaterial";
 }

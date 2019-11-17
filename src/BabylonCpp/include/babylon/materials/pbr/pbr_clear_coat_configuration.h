@@ -111,7 +111,7 @@ public:
    * or dynamic coding.
    * @returns "PBRClearCoatConfiguration"
    */
-  const std::string getClassName() const;
+  std::string getClassName() const;
 
   /**
    * @briefAdd fallbacks to the effect fallbacks list.
