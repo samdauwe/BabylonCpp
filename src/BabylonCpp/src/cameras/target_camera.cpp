@@ -71,11 +71,11 @@ AnimationValue TargetCamera::getProperty(const std::vector<std::string>& targetP
     const auto& key    = targetPropertyPath[1];
     // Position
     if (target == "position") {
-      return IAnimatable::getProperty(key.c_str(), position());
+      return IAnimatable::getProperty(key, position());
     }
     // Rotation
     if (target == "rotation") {
-      return IAnimatable::getProperty(key.c_str(), rotation());
+      return IAnimatable::getProperty(key, rotation());
     }
   }
 
@@ -108,11 +108,11 @@ void TargetCamera::setProperty(const std::vector<std::string>& targetPropertyPat
         const auto& floatValue = value.get<float>();
         // Position
         if (target == "position") {
-          IAnimatable::setProperty(key.c_str(), position(), floatValue);
+          IAnimatable::setProperty(key, position(), floatValue);
         }
         // Rotation
         if (target == "rotation") {
-          IAnimatable::setProperty(key.c_str(), rotation(), floatValue);
+          IAnimatable::setProperty(key, rotation(), floatValue);
         }
       }
     }

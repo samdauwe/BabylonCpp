@@ -133,7 +133,7 @@ const std::string ConeParticleEmitter::getEffectDefines() const
     defines += "\n#define CONEEMITTERSPAWNPOINT";
   }
 
-  return defines.c_str();
+  return defines;
 }
 
 const std::string ConeParticleEmitter::getClassName() const

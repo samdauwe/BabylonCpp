@@ -161,11 +161,7 @@ void ShadowLight::_initCache()
 
 bool ShadowLight::_isSynchronized()
 {
-  if (!_cache.position.equals(position)) {
-    return false;
-  }
-
-  return true;
+  return _cache.position.equals(position);
 }
 
 Matrix& ShadowLight::computeWorldMatrix(bool force, bool /*useWasUpdatedFlag*/)

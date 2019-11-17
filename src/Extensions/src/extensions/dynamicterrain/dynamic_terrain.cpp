@@ -88,9 +88,9 @@ DynamicTerrain::DynamicTerrain(const std::string& iName,
   _terrainCamera = options.camera ? options.camera : scene->activeCamera;
 
   // initialize the map arrays if not passed as parameters
-  _datamap  = !_mapData.empty() ? true : false;
-  _uvmap    = !_mapUVs.empty() ? true : false;
-  _colormap = !_mapColors.empty() ? true : false;
+  _datamap  = !_mapData.empty();
+  _uvmap    = !_mapUVs.empty();
+  _colormap = !_mapColors.empty();
   _mapData  = _datamap ? _mapData : Float32Array(_terrainIdx * _terrainIdx * 3);
   _mapUVs   = _uvmap ? _mapUVs : Float32Array(_terrainIdx * _terrainIdx * 2);
   if (_datamap) {
@@ -216,7 +216,7 @@ DynamicTerrain& DynamicTerrain::update(bool force)
 {
   _needsUpdate  = false;
   _updateLOD    = false;
-  _updateForced = (force) ? true : false;
+  _updateForced = (force);
   _deltaX       = _terrainHalfSizeX + _terrain->position().x
             - _terrainCamera->globalPosition().x;
   _deltaZ = _terrainHalfSizeZ + _terrain->position().z

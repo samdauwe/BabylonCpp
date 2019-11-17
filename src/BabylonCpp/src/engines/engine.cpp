@@ -120,7 +120,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _deterministicLockstep{false}
     , _lockstepMaxSteps{4}
     , _contextWasLost{false}
-    , _doNotHandleContextLost{options.doNotHandleContextLost ? true : false}
+    , _doNotHandleContextLost{options.doNotHandleContextLost}
     , _performanceMonitor{std::make_unique<PerformanceMonitor>()}
     , _fps{60.f}
     , _deltaTime{0.f}
@@ -194,7 +194,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
   _hardwareScalingLevel = options.adaptToDeviceRatio ? 1 : 1;
   resize();
 
-  _isStencilEnable = options.stencil ? true : false;
+  _isStencilEnable = options.stencil;
   _initGLContext();
 
   // if (!Engine.audioEngine) {
@@ -415,7 +415,7 @@ void Engine::_initGLContext()
   _caps.textureFloat
     = (_webGLVersion > 1.f) || stl_util::contains(extensions, "GL_ARB_texture_float");
   _caps.textureFloatLinearFiltering = _caps.textureFloat;
-  _caps.textureFloatRender = _caps.textureFloat && _canRenderToFloatFramebuffer() ? true : false;
+  _caps.textureFloatRender          = _caps.textureFloat && _canRenderToFloatFramebuffer();
 
   _caps.textureHalfFloat                = (_webGLVersion > 1.f);
   _caps.textureHalfFloatLinearFiltering = (_webGLVersion > 1.f);
@@ -3016,7 +3016,7 @@ void Engine::updateRawTexture(const InternalTexturePtr& texture, const Uint8Arra
   auto internalFormat = _getInternalFormat(format);
   auto textureType    = _getWebGLTextureType(type);
   _bindTextureDirectly(GL::TEXTURE_2D, texture, true);
-  _unpackFlipY(invertY ? true : false);
+  _unpackFlipY(invertY);
 
   if (!_doNotHandleContextLost) {
     texture->_bufferView  = data;
@@ -3461,8 +3461,8 @@ InternalTexturePtr Engine::createRenderTargetTexture(const std::variant<ISize, f
     height           = static_cast<int>(textureSize);
   }
 
-  auto filters = _getSamplingParameters(fullOptions.samplingMode.value(),
-                                        fullOptions.generateMipMaps.value() ? true : false);
+  auto filters
+    = _getSamplingParameters(fullOptions.samplingMode.value(), fullOptions.generateMipMaps.value());
 
   if (fullOptions.type.value() == Constants::TEXTURETYPE_FLOAT && !_caps.textureFloat) {
     fullOptions.type = Constants::TEXTURETYPE_UNSIGNED_INT;
@@ -3490,7 +3490,7 @@ InternalTexturePtr Engine::createRenderTargetTexture(const std::variant<ISize, f
                             texture->_webGLTexture.get(), 0);
 
   texture->_depthStencilBuffer
-    = _setupFramebufferDepthAttachments(fullOptions.generateStencilBuffer.value() ? true : false,
+    = _setupFramebufferDepthAttachments(fullOptions.generateStencilBuffer.value(),
                                         fullOptions.generateDepthBuffer.value(), width, height);
 
   if (fullOptions.generateMipMaps.value()) {
@@ -3509,12 +3509,12 @@ InternalTexturePtr Engine::createRenderTargetTexture(const std::variant<ISize, f
   texture->height                 = height;
   texture->isReady                = true;
   texture->samples                = 1;
-  texture->generateMipMaps        = fullOptions.generateMipMaps.value() ? true : false;
+  texture->generateMipMaps        = fullOptions.generateMipMaps.value();
   texture->samplingMode           = fullOptions.samplingMode.value();
   texture->type                   = fullOptions.type.value();
   texture->format                 = fullOptions.format.value();
   texture->_generateDepthBuffer   = fullOptions.generateDepthBuffer.value();
-  texture->_generateStencilBuffer = fullOptions.generateStencilBuffer.value() ? true : false;
+  texture->_generateStencilBuffer = fullOptions.generateStencilBuffer.value();
 
   // resetTextureCache();
 
@@ -4304,7 +4304,7 @@ void Engine::updateRawCubeTexture(const InternalTexturePtr& texture,
   }
 
   _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, texture, true);
-  _unpackFlipY(invertY ? true : false);
+  _unpackFlipY(invertY);
 
   if (texture->width % 4 != 0) {
     gl.pixelStorei(GL::UNPACK_ALIGNMENT, 1);
@@ -4552,7 +4552,7 @@ void Engine::updateRawTexture3D(const InternalTexturePtr& texture, const ArrayBu
 
   _bindTextureDirectly(GL::TEXTURE_3D, texture, true);
 
-  _unpackFlipY(invertY ? true : false);
+  _unpackFlipY(invertY);
 
   if (!_doNotHandleContextLost) {
     texture->_bufferView  = _data;
@@ -4724,7 +4724,7 @@ void Engine::_prepareWebGLTexture(
 
   _bindTextureDirectly(GL::TEXTURE_2D, texture, true);
 
-  _unpackFlipY(invertY ? true : false);
+  _unpackFlipY(static_cast<bool>(invertY));
 
   texture->baseWidth  = width;
   texture->baseHeight = height;

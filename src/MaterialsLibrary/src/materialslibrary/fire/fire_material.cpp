@@ -142,7 +142,7 @@ bool FireMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     }
   }
 
-  _defines.boolDef["ALPHATEST"] = _opacityTexture ? true : false;
+  _defines.boolDef["ALPHATEST"] = static_cast<bool>(_opacityTexture);
 
   // Misc.
   if (defines._areMiscDirty) {
@@ -154,8 +154,7 @@ bool FireMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
   }
 
   // Values that need to be evaluated on every frame
-  MaterialHelper::PrepareDefinesForFrameBoundValues(
-    scene, engine, defines, useInstances ? true : false);
+  MaterialHelper::PrepareDefinesForFrameBoundValues(scene, engine, defines, useInstances);
 
   // Attribs
   MaterialHelper::PrepareDefinesForAttributes(mesh, defines, false, true);

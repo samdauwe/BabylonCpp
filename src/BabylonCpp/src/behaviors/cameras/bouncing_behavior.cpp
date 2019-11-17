@@ -120,11 +120,9 @@ bool BouncingBehavior::_isRadiusAtLimit(float radiusLimit) const
     return false;
   }
 
-  if (stl_util::almost_equal(_attachedCamera->radius, radiusLimit)
-      && !_radiusIsAnimating) {
-    return true;
-  }
-  return false;
+  return stl_util::almost_equal(_attachedCamera->radius, radiusLimit)
+
+         && !_radiusIsAnimating;
 }
 
 void BouncingBehavior::_applyBoundRadiusAnimation(float radiusDelta)

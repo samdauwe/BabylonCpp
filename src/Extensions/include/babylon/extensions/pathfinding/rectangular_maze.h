@@ -250,16 +250,16 @@ struct RectangularMaze {
       cell(r, c).visited = true;
       // Check if the adjacent cells are valid for moving to
       std::vector<char> check{};
-      if (c > 0 && cell(r, c - 1).visited == false) {
+      if (c > 0 && !cell(r, c - 1).visited) {
         check.emplace_back('L');
       }
-      if (r > 0 && cell(r - 1, c).visited == false) {
+      if (r > 0 && !cell(r - 1, c).visited) {
         check.emplace_back('U');
       }
-      if (c < _columns - 1 && cell(r, c + 1).visited == false) {
+      if (c < _columns - 1 && !cell(r, c + 1).visited) {
         check.emplace_back('R');
       }
-      if (r < _rows - 1 && cell(r + 1, c).visited == false) {
+      if (r < _rows - 1 && !cell(r + 1, c).visited) {
         check.emplace_back('D');
       }
 

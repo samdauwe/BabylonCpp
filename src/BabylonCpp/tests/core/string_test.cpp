@@ -242,7 +242,7 @@ TEST(TestString, regexReplace)
       "#extension.+(GL_OES_standard_derivatives|GL_EXT_shader_texture_lod|GL_"
       "EXT_frag_depth).+enable"};
     const std::string r{String::regexReplace(s, regex, "")};
-    const std::string e{""};
+    const std::string e;
     EXPECT_EQ(r, e);
   }
 

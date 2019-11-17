@@ -308,7 +308,7 @@ void HighlightLayer::_internalRender(const EffectPtr& effect)
 bool HighlightLayer::shouldRender() const
 {
   if (EffectLayer::shouldRender()) {
-    return !_meshes.empty() ? true : false;
+    return !_meshes.empty();
   }
 
   return false;

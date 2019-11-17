@@ -50,12 +50,7 @@ void CMGBoundinBox::clampMax(float x, float y, float z)
 
 bool CMGBoundinBox::empty() const
 {
-  if ((min.x > max.y) || (min.y > max.y) || (min.z > max.y)) {
-    return true;
-  }
-  else {
-    return false;
-  }
+  return (min.x > max.y) || (min.y > max.y) || (min.z > max.y);
 }
 
 } // end of namespace BABYLON

@@ -24,9 +24,8 @@ MeshPtr ShapeBuilder::ExtrudeShape(const std::string& name,
   const auto invertUV  = options.invertUV.value_or(false);
 
   return ShapeBuilder::_ExtrudeShapeGeneric(
-    name, shape, path, scale, rotation, nullptr, nullptr, false, false, cap,
-    false, scene, updatable.has_value() ? true : false, sideOrientation,
-    instance, invertUV, options.frontUVs, options.backUVs);
+    name, shape, path, scale, rotation, nullptr, nullptr, false, false, cap, false, scene,
+    updatable.has_value(), sideOrientation, instance, invertUV, options.frontUVs, options.backUVs);
 }
 
 MeshPtr ShapeBuilder::ExtrudeShapeCustom(const std::string& name,
@@ -52,10 +51,9 @@ MeshPtr ShapeBuilder::ExtrudeShapeCustom(const std::string& name,
   const auto& instance = options.instance;
   const auto invertUV  = options.invertUV.value_or(false);
   return ShapeBuilder::_ExtrudeShapeGeneric(
-    name, shape, path, std::nullopt, std::nullopt, scaleFunction,
-    rotationFunction, ribbonCloseArray, ribbonClosePath, cap, true, scene,
-    updatable.has_value() ? true : false, sideOrientation, instance, invertUV,
-    options.frontUVs, options.backUVs);
+    name, shape, path, std::nullopt, std::nullopt, scaleFunction, rotationFunction,
+    ribbonCloseArray, ribbonClosePath, cap, true, scene, updatable.has_value(), sideOrientation,
+    instance, invertUV, options.frontUVs, options.backUVs);
 }
 
 MeshPtr ShapeBuilder::_ExtrudeShapeGeneric(

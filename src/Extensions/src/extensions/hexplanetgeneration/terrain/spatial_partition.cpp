@@ -23,7 +23,7 @@ bool SpatialPartition::intersectRay(const Ray& ray)
   if (Tools::intersectRayWithSphere(ray, boundingSphere)) {
     for (auto& partition : partitions) {
       auto intersection = partition.intersectRay(ray);
-      if (intersection != false) {
+      if (intersection) {
         return true;
       }
     }

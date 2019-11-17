@@ -103,8 +103,7 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     }
   }
 
-  MaterialHelper::PrepareDefinesForFrameBoundValues(
-    scene, engine, defines, useInstances ? true : false);
+  MaterialHelper::PrepareDefinesForFrameBoundValues(scene, engine, defines, useInstances);
 
   MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(),
                                         fogEnabled(),

@@ -566,11 +566,7 @@ bool ShaderMaterial::hasTexture(const BaseTexturePtr& texture) const
       const std::pair<std::string, std::vector<BaseTexturePtr>>& textures) {
       return stl_util::contains(textures.second, texture);
     });
-  if (it2 != _textureArrays.end()) {
-    return true;
-  }
-
-  return false;
+  return it2 != _textureArrays.end();
 }
 
 MaterialPtr ShaderMaterial::clone(const std::string& iName,

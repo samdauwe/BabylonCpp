@@ -1993,7 +1993,7 @@ bool AbstractMesh::_checkOcclusionQuery()
 
       dataStorage.isOcclusionQueryInProgress    = false;
       dataStorage.occlusionInternalRetryCounter = 0;
-      dataStorage.isOccluded                    = occlusionQueryResult == 1 ? false : true;
+      dataStorage.isOccluded                    = occlusionQueryResult != 1;
     }
     else {
 

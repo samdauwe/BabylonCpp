@@ -113,11 +113,11 @@ TransformNode::getProperty(const std::vector<std::string>& targetPropertyPath)
     const auto& key    = targetPropertyPath[1];
     // Rotation
     if (target == "rotation") {
-      return IAnimatable::getProperty(key.c_str(), rotation());
+      return IAnimatable::getProperty(key, rotation());
     }
     // Scaling
     if (target == "scaling") {
-      return IAnimatable::getProperty(key.c_str(), scaling());
+      return IAnimatable::getProperty(key, scaling());
     }
   }
 
@@ -161,15 +161,15 @@ void TransformNode::setProperty(
         const auto& floatValue = value.get<float>();
         // Position
         if (target == "position") {
-          IAnimatable::setProperty(key.c_str(), position(), floatValue);
+          IAnimatable::setProperty(key, position(), floatValue);
         }
         // Rotation
         if (target == "rotation") {
-          IAnimatable::setProperty(key.c_str(), rotation(), floatValue);
+          IAnimatable::setProperty(key, rotation(), floatValue);
         }
         // Scaling
         if (target == "scaling") {
-          IAnimatable::setProperty(key.c_str(), scaling(), floatValue);
+          IAnimatable::setProperty(key, scaling(), floatValue);
         }
       }
     }

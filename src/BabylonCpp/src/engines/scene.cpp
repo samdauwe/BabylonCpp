@@ -1030,7 +1030,7 @@ Scene& Scene::_processPointerMove(std::optional<PickingInfo>& pickResult, const 
   // Restore pointer
   canvas->style.cursor = defaultCursor;
 
-  auto isMeshPicked = (pickResult && pickResult->hit && pickResult->pickedMesh) ? true : false;
+  auto isMeshPicked = pickResult && pickResult->hit && pickResult->pickedMesh;
   if (isMeshPicked) {
     setPointerOverMesh(pickResult->pickedMesh.get());
 
@@ -1092,12 +1092,7 @@ bool Scene::_checkPrePointerObservable(const std::optional<PickingInfo>& pickRes
     pi.ray = (*pickResult).ray;
   }
   onPrePointerObservable.notifyObservers(&pi, static_cast<int>(type));
-  if (pi.skipOnPointerObservable) {
-    return true;
-  }
-  else {
-    return false;
-  }
+  return pi.skipOnPointerObservable;
 }
 
 Scene& Scene::simulatePointerDown(std::optional<PickingInfo>& pickResult)

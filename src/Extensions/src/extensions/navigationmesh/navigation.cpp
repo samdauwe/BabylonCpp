@@ -153,12 +153,9 @@ bool Navigation::_isVectorInPolygon(const Vector3& vector,
     polygonVertices.emplace_back(point);
   }
 
-  if (vector.y < highestPoint + 0.5f && vector.y > lowestPoint - 0.5f
-      && _isPointInPoly(polygonVertices, vector)) {
-    return true;
-  }
+  return vector.y < highestPoint + 0.5f && vector.y > lowestPoint - 0.5f
 
-  return false;
+         && _isPointInPoly(polygonVertices, vector);
 }
 
 void Navigation::_computeCentroids(Geometry* geometry)

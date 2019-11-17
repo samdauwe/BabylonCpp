@@ -136,11 +136,7 @@ void PBRAnisotropicConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer,
 bool PBRAnisotropicConfiguration::hasTexture(
   const BaseTexturePtr& iTexture) const
 {
-  if (_texture == iTexture) {
-    return true;
-  }
-
-  return false;
+  return _texture == iTexture;
 }
 
 void PBRAnisotropicConfiguration::getActiveTextures(

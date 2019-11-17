@@ -150,8 +150,7 @@ bool SimpleMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     scene, mesh, defines, false, _maxSimultaneousLights, _disableLighting);
 
   // Values that need to be evaluated on every frame
-  MaterialHelper::PrepareDefinesForFrameBoundValues(
-    scene, engine, defines, useInstances ? true : false);
+  MaterialHelper::PrepareDefinesForFrameBoundValues(scene, engine, defines, useInstances);
 
   // Attribs
   MaterialHelper::PrepareDefinesForAttributes(mesh, defines, true, true);

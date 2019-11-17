@@ -293,8 +293,7 @@ bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     }
   }
 
-  MaterialHelper::PrepareDefinesForFrameBoundValues(
-    scene, engine, defines, useInstances ? true : false);
+  MaterialHelper::PrepareDefinesForFrameBoundValues(scene, engine, defines, useInstances);
 
   MaterialHelper::PrepareDefinesForMisc(mesh, scene, _useLogarithmicDepth,
                                         pointsCloud(), fogEnabled(),

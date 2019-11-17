@@ -188,7 +188,7 @@ private:
     // only check every second
     if (counter % 50 == 0)
     {
-      std::string newContent = readFileContents_standard_eof(_filePath.c_str());
+      std::string newContent     = readFileContents_standard_eof(_filePath);
       bool wasExternallyModified = (newContent != _fileContent_Saved);
       bool wasInternallyModified = wasTextEdited();
       if (wasExternallyModified && (!wasInternallyModified))

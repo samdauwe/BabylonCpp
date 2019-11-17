@@ -138,8 +138,8 @@ Effect::Effect(const std::unordered_map<std::string, std::string>& baseName,
     }
   }
 
-  std::string vertexSource   = "";
-  std::string fragmentSource = "";
+  std::string vertexSource;
+  std::string fragmentSource;
 
   if (stl_util::contains(baseName, "vertexElement")) {
     vertexSource = baseName.at("vertexElement");
@@ -1239,13 +1239,11 @@ void Effect::RegisterShader(const std::string& name,
                             const std::optional<std::string>& vertexShader)
 {
   if (pixelShader.has_value()) {
-    Effect::ShadersStore()[String::concat(name, "PixelShader")]
-      = (*pixelShader).c_str();
+    Effect::ShadersStore()[String::concat(name, "PixelShader")] = *pixelShader;
   }
 
   if (vertexShader) {
-    Effect::ShadersStore()[String::concat(name, "VertexShader")]
-      = (*vertexShader).c_str();
+    Effect::ShadersStore()[String::concat(name, "VertexShader")] = *vertexShader;
   }
 }
 

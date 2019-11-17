@@ -122,12 +122,7 @@ unsigned int VertexBuffer::get_instanceDivisor() const
 void VertexBuffer::set_instanceDivisor(unsigned int value)
 {
   _instanceDivisor = value;
-  if (value == 0) {
-    _instanced = false;
-  }
-  else {
-    _instanced = true;
-  }
+  _instanced       = value != 0;
 }
 
 void VertexBuffer::_rebuild()

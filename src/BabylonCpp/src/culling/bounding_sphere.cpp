@@ -108,11 +108,7 @@ bool BoundingSphere::isCenterInFrustum(
 bool BoundingSphere::intersectsPoint(const Vector3& point)
 {
   const auto squareDistance = Vector3::DistanceSquared(centerWorld, point);
-  if (radiusWorld * radiusWorld < squareDistance) {
-    return false;
-  }
-
-  return true;
+  return radiusWorld * radiusWorld >= squareDistance;
 }
 
 bool BoundingSphere::Intersects(const BoundingSphere& sphere0,
@@ -122,11 +118,7 @@ bool BoundingSphere::Intersects(const BoundingSphere& sphere0,
     = Vector3::DistanceSquared(sphere0.centerWorld, sphere1.centerWorld);
   const auto radiusSum = sphere0.radiusWorld + sphere1.radiusWorld;
 
-  if (radiusSum * radiusSum < squareDistance) {
-    return false;
-  }
-
-  return true;
+  return radiusSum * radiusSum >= squareDistance;
 }
 
 } // end of namespace BABYLON

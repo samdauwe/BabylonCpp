@@ -523,11 +523,7 @@ bool NullEngine::_releaseBuffer(GL::IGLBuffer* buffer)
 {
   --buffer->references;
 
-  if (buffer->references == 0) {
-    return true;
-  }
-
-  return false;
+  return buffer->references == 0;
 }
 
 void NullEngine::releaseEffects()

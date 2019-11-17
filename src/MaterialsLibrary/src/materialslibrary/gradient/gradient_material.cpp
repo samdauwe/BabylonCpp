@@ -98,8 +98,7 @@ bool GradientMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
   auto engine = scene->getEngine();
 
-  MaterialHelper::PrepareDefinesForFrameBoundValues(
-    scene, engine, defines, useInstances ? true : false);
+  MaterialHelper::PrepareDefinesForFrameBoundValues(scene, engine, defines, useInstances);
 
   MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(),
                                         fogEnabled(),

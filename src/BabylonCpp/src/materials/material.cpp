@@ -706,7 +706,7 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/,
   // Remove from scene
   scene.removeMaterial(this);
 
-  if (notBoundToMesh != true) {
+  if (!notBoundToMesh) {
     // Remove from meshes
     if (meshMap.empty()) {
       for (const auto& meshItem : meshMap) {

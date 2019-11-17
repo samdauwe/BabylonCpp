@@ -126,7 +126,7 @@ bool Matrix::isIdentityAs3x2()
 
 float Matrix::determinant() const
 {
-  if (_isIdentity == true) {
+  if (_isIdentity) {
     return 1;
   }
 
@@ -244,7 +244,7 @@ Matrix& Matrix::invertToRef(Matrix& other)
 #if BABYLONCPP_OPTION_ENABLE_SIMD == true
   simdMatrix.invertToRefSIMD(other);
 #else
-  if (_isIdentity == true) {
+  if (_isIdentity) {
     Matrix::IdentityToRef(other);
     return *this;
   }

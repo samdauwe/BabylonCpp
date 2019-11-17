@@ -75,7 +75,7 @@ RenderTargetTexture::RenderTargetTexture(
   _resizeObserver
     = scene->getEngine()->onResizeObservable.add([](Engine*, EventState&) {});
 
-  _generateMipMaps        = generateMipMaps ? true : false;
+  _generateMipMaps        = generateMipMaps;
   _doNotChangeAspectRatio = doNotChangeAspectRatio;
 
   // Rendering groups

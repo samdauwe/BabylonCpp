@@ -3492,13 +3492,12 @@ void VertexData::ComputeNormals(const Float32Array& positions,
   std::optional<Vector3> distanceTo = std::nullopt;
   std::vector<DepthSortedFacet> depthSortedFacets;
   if (options) {
-    computeFacetNormals   = (!options->facetNormals.empty()) ? true : false;
-    computeFacetPositions = (!options->facetPositions.empty()) ? true : false;
-    computeFacetPartitioning
-      = (!options->facetPartitioning.empty()) ? true : false;
-    faceNormalSign   = (options->useRightHandedSystem == true) ? -1.f : 1.f;
+    computeFacetNormals      = !options->facetNormals.empty();
+    computeFacetPositions    = !options->facetPositions.empty();
+    computeFacetPartitioning = !options->facetPartitioning.empty();
+    faceNormalSign           = (options->useRightHandedSystem) ? -1.f : 1.f;
     ratio            = options->ratio ? *options->ratio : 0.f;
-    computeDepthSort = (options->depthSort) ? true : false;
+    computeDepthSort         = (options->depthSort);
     distanceTo       = options->distanceTo;
     if (computeDepthSort) {
       if (!distanceTo.has_value()) {

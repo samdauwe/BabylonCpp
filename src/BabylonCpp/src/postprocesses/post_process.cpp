@@ -73,7 +73,7 @@ PostProcess::PostProcess(const std::string& iName, const std::string& fragmentUr
   }
 
   renderTargetSamplingMode = samplingMode;
-  _reusable                = reusable || false;
+  _reusable                = reusable;
   _textureType             = textureType;
 
   _samplers.insert(_samplers.end(), samplers.begin(), samplers.end());

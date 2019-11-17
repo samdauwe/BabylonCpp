@@ -358,7 +358,7 @@ bool Node::isReady(bool /*completeCheck*/, bool /*forceInstanceSupport*/)
 
 bool Node::isEnabled(bool checkAncestors)
 {
-  if (checkAncestors == false) {
+  if (!checkAncestors) {
     return _isEnabled;
   }
 

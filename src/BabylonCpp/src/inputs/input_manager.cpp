@@ -121,8 +121,7 @@ void InputManager::_processPointerMove(std::optional<PickingInfo>& pickResult,
   // Restore pointer
   canvas->style.cursor = scene.defaultCursor;
 
-  auto isMeshPicked
-    = (pickResult && pickResult->hit && pickResult->pickedMesh) ? true : false;
+  auto isMeshPicked = pickResult && pickResult->hit && pickResult->pickedMesh;
   if (isMeshPicked) {
     scene.setPointerOverMesh(pickResult->pickedMesh.get());
 
@@ -196,12 +195,7 @@ bool InputManager::_checkPrePointerObservable(
     pi.ray = (*pickResult).ray;
   }
   scene.onPrePointerObservable.notifyObservers(&pi, static_cast<int>(type));
-  if (pi.skipOnPointerObservable) {
-    return true;
-  }
-  else {
-    return false;
-  }
+  return pi.skipOnPointerObservable;
 }
 
 void InputManager::simulatePointerMove(std::optional<PickingInfo>& pickResult)

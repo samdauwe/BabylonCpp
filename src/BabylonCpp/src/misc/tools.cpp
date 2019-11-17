@@ -346,11 +346,7 @@ Image Tools::StringToImage(const std::string& uri, bool flipVertically)
     }
 
     header = "data:application/gltf-buffer;base64,";
-    if (in.find(header) == 0) {
-      return true;
-    }
-
-    return false;
+    return in.find(header) == 0;
   };
 
   const auto DecodeDataURI = [](std::vector<unsigned char>* out, std::string& mime_type,
