@@ -359,7 +359,7 @@ void Engine::_initGLContext()
     BABYLON_LOGF_WARN("_initGLContext",
                       "_gl->getParameteri(GL::MAX_VARYING_VECTORS) failed "
                       "=> using %i as a default...",
-                      16);
+                      16)
     _caps.maxVaryingVectors = 16;
   }
 
@@ -368,7 +368,7 @@ void Engine::_initGLContext()
     BABYLON_LOGF_WARN("_initGLContext",
                       "_gl->getParameteri(GL::MAX_FRAGMENT_UNIFORM_VECTORS) failed => "
                       "using %i as a default...",
-                      256);
+                      256)
     _caps.maxFragmentUniformVectors = 256;
   }
 
@@ -377,7 +377,7 @@ void Engine::_initGLContext()
     BABYLON_LOGF_WARN("_initGLContext",
                       "_gl->getParameteri(GL::MAX_VERTEX_UNIFORM_VECTORS) failed => "
                       "using %i as a default...",
-                      256);
+                      256)
     _caps.maxVertexUniformVectors = 256;
   }
 
@@ -2614,8 +2614,8 @@ std::string& Engine::setTextureFormatToUse(const std::vector<std::string>& forma
       }
     }
   }
-  // actively set format to nothing, to allow this to be called more than once
-  // and possibly fail the 2nd time
+  // actively set format to nothing, to allow this to be called more than once and possibly fail the
+  // 2nd time
   _textureFormatInUse.clear();
   return _textureFormatInUse;
 }
@@ -2772,16 +2772,13 @@ InternalTexturePtr Engine::createTexture(
   const std::optional<std::variant<std::string, ArrayBuffer, Image>>& buffer,
   const InternalTexturePtr& fallback, const std::optional<unsigned int>& format)
 {
-  // assign a new string, so that the original is still available in case of
-  // fallback
+  // assign a new string, so that the original is still available in case of fallback
   auto url      = urlArg;
   auto fromData = url.substr(0, 5) == "data:";
   auto fromBlob = url.substr(0, 5) == "blob:";
   auto isBase64 = fromData && String::contains(url, "base64");
 
-  auto texture = fallback ?
-                   fallback :
-                   std::make_shared<InternalTexture>(this, InternalTexture::DATASOURCE_URL);
+  auto texture = fallback ? fallback : InternalTexture::New(this, InternalTexture::DATASOURCE_URL);
 
   // establish the file extension, if possible
   auto lastDotTmp = String::lastIndexOf(url, ".");
@@ -2881,8 +2878,8 @@ InternalTexturePtr Engine::createTexture(
   else {
     auto onload = [&](const Image& img) {
       if (fromBlob && !_doNotHandleContextLost) {
-        // We need to store the image if we need to rebuild the texture
-        // in case of a webgl context lost
+        // We need to store the image if we need to rebuild the texture in case of a webgl context
+        // lost
         texture->_buffer = img;
       }
 
@@ -2921,9 +2918,8 @@ InternalTexturePtr Engine::createTexture(
             return false;
           }
           else {
-            // Using shaders when possible to rescale because canvas.drawImage
-            // is lossy
-            auto source = std::make_shared<InternalTexture>(this, InternalTexture::DATASOURCE_TEMP);
+            // Using shaders when possible to rescale because canvas.drawImage is lossy
+            auto source = InternalTexture::New(this, InternalTexture::DATASOURCE_TEMP);
             _bindTextureDirectly(GL::TEXTURE_2D, source);
             _gl->texImage2D(GL::TEXTURE_2D, 0, static_cast<int>(internalFormat), img.width,
                             img.height, 0, GL::RGBA, GL::UNSIGNED_BYTE, &img.data);
@@ -3060,12 +3056,12 @@ InternalTexturePtr Engine::createRawTexture(const Uint8Array& data, int width, i
                                             unsigned int samplingMode,
                                             const std::string& compression, unsigned int type)
 {
-  auto texture        = std::make_shared<InternalTexture>(this, InternalTexture::DATASOURCE_RAW);
-  texture->baseWidth  = width;
-  texture->baseHeight = height;
-  texture->width      = width;
-  texture->height     = height;
-  texture->format     = format;
+  auto texture             = InternalTexture::New(this, InternalTexture::DATASOURCE_RAW);
+  texture->baseWidth       = width;
+  texture->baseHeight      = height;
+  texture->width           = width;
+  texture->height          = height;
+  texture->format          = format;
   texture->generateMipMaps = generateMipMaps;
   texture->samplingMode    = samplingMode;
   texture->invertY         = invertY;
@@ -3121,8 +3117,8 @@ int Engine::_getUnpackAlignement()
 InternalTexturePtr Engine::createDynamicTexture(int width, int height, bool generateMipMaps,
                                                 unsigned int samplingMode)
 {
-  auto texture       = std::make_shared<InternalTexture>(this, InternalTexture::DATASOURCE_DYNAMIC);
-  texture->baseWidth = width;
+  auto texture        = InternalTexture::New(this, InternalTexture::DATASOURCE_DYNAMIC);
+  texture->baseWidth  = width;
   texture->baseHeight = height;
 
   if (generateMipMaps) {
@@ -3292,8 +3288,7 @@ InternalTexturePtr Engine::createDepthStencilTexture(const std::variant<int, ISi
 InternalTexturePtr Engine::_createDepthStencilTexture(const std::variant<int, ISize>& size,
                                                       const DepthTextureCreationOptions& options)
 {
-  auto internalTexture
-    = std::make_shared<InternalTexture>(this, InternalTexture::DATASOURCE_DEPTHTEXTURE);
+  auto internalTexture = InternalTexture::New(this, InternalTexture::DATASOURCE_DEPTHTEXTURE);
 
   if (!_caps.depthTextureExtension) {
     BABYLON_LOG_ERROR("Engine", "Depth texture is not supported by your browser or hardware.")
@@ -3345,8 +3340,7 @@ InternalTexturePtr Engine::_createDepthStencilTexture(const std::variant<int, IS
 InternalTexturePtr
 Engine::_createDepthStencilCubeTexture(int size, const DepthTextureCreationOptions& options)
 {
-  auto internalTexture
-    = std::make_shared<InternalTexture>(this, InternalTexture::DATASOURCE_UNKNOWN);
+  auto internalTexture    = InternalTexture::New(this, InternalTexture::DATASOURCE_UNKNOWN);
   internalTexture->isCube = true;
 
   if (webGLVersion() == 1.f) {
@@ -3455,7 +3449,7 @@ InternalTexturePtr Engine::createRenderTargetTexture(const std::variant<ISize, f
     fullOptions.samplingMode = Constants::TEXTURE_NEAREST_SAMPLINGMODE;
   }
 
-  auto texture = std::make_shared<InternalTexture>(this, InternalTexture::DATASOURCE_RENDERTARGET);
+  auto texture = InternalTexture::New(this, InternalTexture::DATASOURCE_RENDERTARGET);
   _bindTextureDirectly(GL::TEXTURE_2D, texture, true);
 
   int width = 0, height = 0;
@@ -3571,8 +3565,7 @@ Engine::createMultipleRenderTarget(ISize size, const IMultiRenderTargetOptions& 
       samplingMode = Constants::TEXTURE_NEAREST_SAMPLINGMODE;
     }
     else if (type == Constants::TEXTURETYPE_HALF_FLOAT && !_caps.textureHalfFloatLinearFiltering) {
-      // if floating point linear (HALF_FLOAT) then force to
-      // NEAREST_SAMPLINGMODE
+      // if floating point linear (HALF_FLOAT) then force to NEAREST_SAMPLINGMODE
       samplingMode = Constants::TEXTURE_NEAREST_SAMPLINGMODE;
     }
 
@@ -3584,8 +3577,7 @@ Engine::createMultipleRenderTarget(ISize size, const IMultiRenderTargetOptions& 
                        "to TEXTURETYPE_UNSIGNED_BYTE type")
     }
 
-    auto texture
-      = std::make_shared<InternalTexture>(this, InternalTexture::DATASOURCE_MULTIRENDERTARGET);
+    auto texture = InternalTexture::New(this, InternalTexture::DATASOURCE_MULTIRENDERTARGET);
     auto attachment
       = gl[webGLVersion() > 1 ? "COLOR_ATTACHMENT" + iStr : "COLOR_ATTACHMENT" + iStr + "_WEBGL"];
     textures.emplace_back(texture);
@@ -3627,13 +3619,12 @@ Engine::createMultipleRenderTarget(ISize size, const IMultiRenderTargetOptions& 
     texture->_generateStencilBuffer = generateStencilBuffer;
     texture->_attachments           = attachments;
 
-    _internalTexturesCache.emplace_back(texture.get());
+    _internalTexturesCache.emplace_back(texture);
   }
 
   if (generateDepthTexture && _caps.depthTextureExtension) {
     // Depth texture
-    auto depthTexture
-      = std::make_shared<InternalTexture>(this, InternalTexture::DATASOURCE_MULTIRENDERTARGET);
+    auto depthTexture = InternalTexture::New(this, InternalTexture::DATASOURCE_MULTIRENDERTARGET);
 
     gl.activeTexture(GL::TEXTURE0);
     gl.bindTexture(GL::TEXTURE_2D, depthTexture->_webGLTexture.get());
@@ -3983,7 +3974,7 @@ InternalTexturePtr Engine::createRenderTargetCubeTexture(const ISize& size,
   }
   auto& gl = *_gl;
 
-  auto texture = std::make_shared<InternalTexture>(this, InternalTexture::DATASOURCE_RENDERTARGET);
+  auto texture = InternalTexture::New(this, InternalTexture::DATASOURCE_RENDERTARGET);
   _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, texture, true);
 
   auto filters = Engine::_getSamplingParameters(fullOptions.samplingMode.value(),
@@ -4097,8 +4088,7 @@ InternalTexturePtr Engine::createPrefilteredCubeTexture(
       int mipmapIndex
         = static_cast<int>(std::round(std::min(std::max(lodIndex, 0.f), maxLODIndex)));
 
-      auto glTextureFromLod
-        = std::make_shared<InternalTexture>(this, InternalTexture::DATASOURCE_TEMP);
+      auto glTextureFromLod    = InternalTexture::New(this, InternalTexture::DATASOURCE_TEMP);
       glTextureFromLod->type   = texture->type;
       glTextureFromLod->format = texture->format;
       glTextureFromLod->width  = static_cast<int>(
@@ -4159,9 +4149,7 @@ InternalTexturePtr Engine::createCubeTexture(
 {
   auto& gl = *_gl;
 
-  auto texture = fallback ?
-                   fallback :
-                   std::make_shared<InternalTexture>(this, InternalTexture::DATASOURCE_CUBE);
+  auto texture = fallback ? fallback : InternalTexture::New(this, InternalTexture::DATASOURCE_CUBE);
   texture->isCube               = true;
   texture->url                  = rootUrl;
   texture->generateMipMaps      = !noMipmap;
@@ -4376,7 +4364,7 @@ InternalTexturePtr Engine::createRawCubeTexture(const std::vector<ArrayBufferVie
                                                 const std::string& compression)
 {
   auto& gl        = *_gl;
-  auto texture    = std::make_shared<InternalTexture>(this, InternalTexture::DATASOURCE_CUBERAW);
+  auto texture    = InternalTexture::New(this, InternalTexture::DATASOURCE_CUBERAW);
   texture->isCube = true;
   texture->format = format;
   texture->type   = type;
@@ -4384,7 +4372,7 @@ InternalTexturePtr Engine::createRawCubeTexture(const std::vector<ArrayBufferVie
     texture->_bufferViewArray = data;
   }
 
-  auto textureType    = _getWebGLTextureType(type);
+  auto textureType = _getWebGLTextureType(type);
 
   /*
   // code from src/Engines/Extensions/engine.rawTexture.ts
@@ -4604,15 +4592,15 @@ InternalTexturePtr Engine::createRawTexture3D(const ArrayBufferView& data, int w
                                               const std::string& compression,
                                               unsigned int textureType)
 {
-  auto texture        = std::make_shared<InternalTexture>(this, InternalTexture::DATASOURCE_RAW3D);
-  texture->baseWidth  = width;
-  texture->baseHeight = height;
-  texture->baseDepth  = depth;
-  texture->width      = width;
-  texture->height     = height;
-  texture->depth      = depth;
-  texture->format     = format;
-  texture->type       = textureType;
+  auto texture             = InternalTexture::New(this, InternalTexture::DATASOURCE_RAW3D);
+  texture->baseWidth       = width;
+  texture->baseHeight      = height;
+  texture->baseDepth       = depth;
+  texture->width           = width;
+  texture->height          = height;
+  texture->depth           = depth;
+  texture->format          = format;
+  texture->type            = textureType;
   texture->generateMipMaps = generateMipMaps;
   texture->samplingMode    = samplingMode;
   texture->is3D            = true;
@@ -4650,10 +4638,9 @@ InternalTexturePtr Engine::createMultiviewRenderTargetTexture(int width, int hei
     return nullptr;
   }
 
-  auto internalTexture
-    = std::make_shared<InternalTexture>(this, InternalTexture::DATASOURCE_UNKNOWN, true);
-  internalTexture->width        = width;
-  internalTexture->height       = height;
+  auto internalTexture    = InternalTexture::New(this, InternalTexture::DATASOURCE_UNKNOWN, true);
+  internalTexture->width  = width;
+  internalTexture->height = height;
   internalTexture->_framebuffer = gl.createFramebuffer();
 
   internalTexture->_colorTextureArray = gl.createTexture();
@@ -5702,9 +5689,11 @@ GL::GLenum
 Engine::_getRGBABufferInternalSizedFormat(unsigned int type,
                                           const std::optional<unsigned int>& format) const
 {
+  const auto _format = format.value_or(0);
+
   if (_webGLVersion == 1.f) {
     if (format) {
-      switch (*format) {
+      switch (_format) {
         case Constants::TEXTUREFORMAT_ALPHA:
           return GL::ALPHA;
         case Constants::TEXTUREFORMAT_LUMINANCE:
@@ -5718,7 +5707,7 @@ Engine::_getRGBABufferInternalSizedFormat(unsigned int type,
 
   switch (type) {
     case Constants::TEXTURETYPE_BYTE:
-      switch (*format) {
+      switch (_format) {
         case Constants::TEXTUREFORMAT_RED:
           return GL::R8_SNORM;
         case Constants::TEXTUREFORMAT_RG:
@@ -5737,7 +5726,7 @@ Engine::_getRGBABufferInternalSizedFormat(unsigned int type,
           return GL::RGBA8_SNORM;
       }
     case Constants::TEXTURETYPE_UNSIGNED_BYTE:
-      switch (*format) {
+      switch (_format) {
         case Constants::TEXTUREFORMAT_RED:
           return GL::R8;
         case Constants::TEXTUREFORMAT_RG:
@@ -5759,7 +5748,7 @@ Engine::_getRGBABufferInternalSizedFormat(unsigned int type,
           return GL::RGBA8;
       }
     case Constants::TEXTURETYPE_SHORT:
-      switch (*format) {
+      switch (_format) {
         case Constants::TEXTUREFORMAT_RED_INTEGER:
           return GL::R16I;
         case Constants::TEXTUREFORMAT_RG_INTEGER:
@@ -5772,7 +5761,7 @@ Engine::_getRGBABufferInternalSizedFormat(unsigned int type,
           return GL::RGBA16I;
       }
     case Constants::TEXTURETYPE_UNSIGNED_SHORT:
-      switch (*format) {
+      switch (_format) {
         case Constants::TEXTUREFORMAT_RED_INTEGER:
           return GL::R16UI;
         case Constants::TEXTUREFORMAT_RG_INTEGER:
@@ -5785,7 +5774,7 @@ Engine::_getRGBABufferInternalSizedFormat(unsigned int type,
           return GL::RGBA16UI;
       }
     case Constants::TEXTURETYPE_INT:
-      switch (*format) {
+      switch (_format) {
         case Constants::TEXTUREFORMAT_RED_INTEGER:
           return GL::R32I;
         case Constants::TEXTUREFORMAT_RG_INTEGER:
@@ -5799,7 +5788,7 @@ Engine::_getRGBABufferInternalSizedFormat(unsigned int type,
       }
     case Constants::TEXTURETYPE_UNSIGNED_INTEGER: // Refers to
                                                   // UNSIGNED_INT
-      switch (*format) {
+      switch (_format) {
         case Constants::TEXTUREFORMAT_RED_INTEGER:
           return GL::R32UI;
         case Constants::TEXTUREFORMAT_RG_INTEGER:
@@ -5812,7 +5801,7 @@ Engine::_getRGBABufferInternalSizedFormat(unsigned int type,
           return GL::RGBA32UI;
       }
     case Constants::TEXTURETYPE_FLOAT:
-      switch (*format) {
+      switch (_format) {
         case Constants::TEXTUREFORMAT_RED:
           return GL::R32F; // By default. Other possibility is R16F.
         case Constants::TEXTUREFORMAT_RG:
@@ -5826,7 +5815,7 @@ Engine::_getRGBABufferInternalSizedFormat(unsigned int type,
           return GL::RGBA32F;
       }
     case Constants::TEXTURETYPE_HALF_FLOAT:
-      switch (*format) {
+      switch (_format) {
         case Constants::TEXTUREFORMAT_RED:
           return GL::R16F;
         case Constants::TEXTUREFORMAT_RG:
@@ -5850,7 +5839,7 @@ Engine::_getRGBABufferInternalSizedFormat(unsigned int type,
     case Constants::TEXTURETYPE_UNSIGNED_SHORT_5_5_5_1:
       return GL::RGB5_A1;
     case Constants::TEXTURETYPE_UNSIGNED_INT_2_10_10_10_REV:
-      switch (*format) {
+      switch (_format) {
         case Constants::TEXTUREFORMAT_RGBA:
           return GL::RGB10_A2; // By default. Other possibility is RGB5_A1.
         case Constants::TEXTUREFORMAT_RGBA_INTEGER:

@@ -194,10 +194,9 @@ void EnvironmentTextureTools::UploadLevels(const InternalTexturePtr& texture,
         auto mipmapIndex
           = static_cast<size_t>(std::round(std::min(std::max(lodIndex, 0.f), maxLODIndex)));
 
-        auto glTextureFromLod
-          = std::make_shared<InternalTexture>(engine, InternalTexture::DATASOURCE_TEMP);
-        glTextureFromLod->isCube          = true;
-        glTextureFromLod->invertY         = true;
+        auto glTextureFromLod     = InternalTexture::New(engine, InternalTexture::DATASOURCE_TEMP);
+        glTextureFromLod->isCube  = true;
+        glTextureFromLod->invertY = true;
         glTextureFromLod->generateMipMaps = false;
         engine->updateTextureSamplingMode(Constants::TEXTURE_LINEAR_LINEAR, glTextureFromLod);
 

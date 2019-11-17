@@ -75,31 +75,28 @@ NullEngine::NullEngine(const NullEngineOptions& options) : Engine{nullptr}
   _caps.vertexArrayObject     = false;
   _caps.instancedArrays       = false;
 
-  BABYLON_LOGF_INFO("Engine", "Babylon.js v%s - Null engine",
-                    Engine::Version().c_str())
+  BABYLON_LOGF_INFO("Engine", "Babylon.js v%s - Null engine", Engine::Version().c_str())
 }
 
 NullEngine::~NullEngine() = default;
 
-Engine::GLBufferPtr
-NullEngine::createVertexBuffer(const Float32Array& /*vertices*/)
+Engine::GLBufferPtr NullEngine::createVertexBuffer(const Float32Array& /*vertices*/)
 {
   auto buffer        = std::make_unique<GL::IGLBuffer>(0);
   buffer->references = 1;
   return buffer;
 }
 
-Engine::GLBufferPtr
-NullEngine::createIndexBuffer(const IndicesArray& /*indices*/,
-                              bool /*updatable*/)
+Engine::GLBufferPtr NullEngine::createIndexBuffer(const IndicesArray& /*indices*/,
+                                                  bool /*updatable*/)
 {
   auto buffer        = std::make_unique<GL::IGLBuffer>(0);
   buffer->references = 1;
   return buffer;
 }
 
-void NullEngine::clear(const Color4& /*color*/, bool /*backBuffer*/,
-                       bool /*depth*/, bool /*stencil*/)
+void NullEngine::clear(const Color4& /*color*/, bool /*backBuffer*/, bool /*depth*/,
+                       bool /*stencil*/)
 {
 }
 
@@ -121,18 +118,18 @@ int NullEngine::getRenderHeight(bool useScreen) const
   return _options.renderHeight;
 }
 
-void NullEngine::setViewport(Viewport& viewport,
-                             const std::optional<int>& /*requiredWidth*/,
+void NullEngine::setViewport(Viewport& viewport, const std::optional<int>& /*requiredWidth*/,
                              const std::optional<int>& /*requiredHeight*/
 )
 {
   _cachedViewport = viewport;
 }
 
-GL::IGLProgramPtr NullEngine::createShaderProgram(
-  const IPipelineContextPtr& /*pipelineContext*/,
-  const std::string& /*vertexCode*/, const std::string& /*fragmentCode*/,
-  const std::string& /*defines*/, GL::IGLRenderingContext* /*context*/)
+GL::IGLProgramPtr NullEngine::createShaderProgram(const IPipelineContextPtr& /*pipelineContext*/,
+                                                  const std::string& /*vertexCode*/,
+                                                  const std::string& /*fragmentCode*/,
+                                                  const std::string& /*defines*/,
+                                                  GL::IGLRenderingContext* /*context*/)
 {
   auto program                      = std::make_shared<GL::IGLProgram>(0);
   program->__SPECTOR_rebuildProgram = nullptr;
@@ -146,9 +143,8 @@ NullEngine::getUniforms(const IPipelineContextPtr& /*pipelineContext*/,
   return {};
 }
 
-Int32Array
-NullEngine::getAttributes(const IPipelineContextPtr& /*pipelineContext*/,
-                          const std::vector<std::string>& /*attributesNames*/)
+Int32Array NullEngine::getAttributes(const IPipelineContextPtr& /*pipelineContext*/,
+                                     const std::vector<std::string>& /*attributesNames*/)
 {
   return {};
 }
@@ -170,88 +166,71 @@ void NullEngine::enableEffect(const EffectPtr& effect)
   }
 }
 
-void NullEngine::setState(bool /*culling*/, float /*zOffset*/, bool /*force*/,
-                          bool /*reverseSide*/)
+void NullEngine::setState(bool /*culling*/, float /*zOffset*/, bool /*force*/, bool /*reverseSide*/)
 {
 }
 
-void NullEngine::setIntArray(GL::IGLUniformLocation* /*uniform*/,
-                             const Int32Array& /*array*/)
+void NullEngine::setIntArray(GL::IGLUniformLocation* /*uniform*/, const Int32Array& /*array*/)
 {
 }
 
-void NullEngine::setIntArray2(GL::IGLUniformLocation* /*uniform*/,
-                              const Int32Array& /*array*/)
+void NullEngine::setIntArray2(GL::IGLUniformLocation* /*uniform*/, const Int32Array& /*array*/)
 {
 }
 
-void NullEngine::setIntArray3(GL::IGLUniformLocation* /*uniform*/,
-                              const Int32Array& /*array*/)
+void NullEngine::setIntArray3(GL::IGLUniformLocation* /*uniform*/, const Int32Array& /*array*/)
 {
 }
 
-void NullEngine::setIntArray4(GL::IGLUniformLocation* /*uniform*/,
-                              const Int32Array& /*array*/)
+void NullEngine::setIntArray4(GL::IGLUniformLocation* /*uniform*/, const Int32Array& /*array*/)
 {
 }
 
-void NullEngine::setFloatArray(GL::IGLUniformLocation* /*uniform*/,
-                               const Float32Array& /*array*/)
+void NullEngine::setFloatArray(GL::IGLUniformLocation* /*uniform*/, const Float32Array& /*array*/)
 {
 }
 
-void NullEngine::setFloatArray2(GL::IGLUniformLocation* /*uniform*/,
-                                const Float32Array& /*array*/)
+void NullEngine::setFloatArray2(GL::IGLUniformLocation* /*uniform*/, const Float32Array& /*array*/)
 {
 }
 
-void NullEngine::setFloatArray3(GL::IGLUniformLocation* /*uniform*/,
-                                const Float32Array& /*array*/)
+void NullEngine::setFloatArray3(GL::IGLUniformLocation* /*uniform*/, const Float32Array& /*array*/)
 {
 }
 
-void NullEngine::setFloatArray4(GL::IGLUniformLocation* /*uniform*/,
-                                const Float32Array& /*array*/)
+void NullEngine::setFloatArray4(GL::IGLUniformLocation* /*uniform*/, const Float32Array& /*array*/)
 {
 }
 
-void NullEngine::setArray(GL::IGLUniformLocation* /*uniform*/,
-                          const Float32Array& /*array*/)
+void NullEngine::setArray(GL::IGLUniformLocation* /*uniform*/, const Float32Array& /*array*/)
 {
 }
 
-void NullEngine::setArray2(GL::IGLUniformLocation* /*uniform*/,
-                           const Float32Array& /*array*/)
+void NullEngine::setArray2(GL::IGLUniformLocation* /*uniform*/, const Float32Array& /*array*/)
 {
 }
 
-void NullEngine::setArray3(GL::IGLUniformLocation* /*uniform*/,
-                           const Float32Array& /*array*/)
+void NullEngine::setArray3(GL::IGLUniformLocation* /*uniform*/, const Float32Array& /*array*/)
 {
 }
 
-void NullEngine::setArray4(GL::IGLUniformLocation* /*uniform*/,
-                           const Float32Array& /*array*/)
+void NullEngine::setArray4(GL::IGLUniformLocation* /*uniform*/, const Float32Array& /*array*/)
 {
 }
 
-void NullEngine::setMatrices(GL::IGLUniformLocation* /*uniform*/,
-                             const Float32Array& /*matrices*/)
+void NullEngine::setMatrices(GL::IGLUniformLocation* /*uniform*/, const Float32Array& /*matrices*/)
 {
 }
 
-void NullEngine::setMatrix(GL::IGLUniformLocation* /*uniform*/,
-                           const Matrix& /*matrix*/)
+void NullEngine::setMatrix(GL::IGLUniformLocation* /*uniform*/, const Matrix& /*matrix*/)
 {
 }
 
-void NullEngine::setMatrix3x3(GL::IGLUniformLocation* /*uniform*/,
-                              const Float32Array& /*matrix*/)
+void NullEngine::setMatrix3x3(GL::IGLUniformLocation* /*uniform*/, const Float32Array& /*matrix*/)
 {
 }
 
-void NullEngine::setMatrix2x2(GL::IGLUniformLocation* /*uniform*/,
-                              const Float32Array& /*matrix*/)
+void NullEngine::setMatrix2x2(GL::IGLUniformLocation* /*uniform*/, const Float32Array& /*matrix*/)
 {
 }
 
@@ -263,13 +242,12 @@ void NullEngine::setFloat(GL::IGLUniformLocation* /*uniform*/, float /*value*/)
 {
 }
 
-void NullEngine::setFloat2(GL::IGLUniformLocation* /*uniform*/, float /*x*/,
-                           float /*y*/)
+void NullEngine::setFloat2(GL::IGLUniformLocation* /*uniform*/, float /*x*/, float /*y*/)
 {
 }
 
-void NullEngine::setFloat3(GL::IGLUniformLocation* /*uniform*/, float /*x*/,
-                           float /*y*/, float /*z*/)
+void NullEngine::setFloat3(GL::IGLUniformLocation* /*uniform*/, float /*x*/, float /*y*/,
+                           float /*z*/)
 {
 }
 
@@ -277,18 +255,17 @@ void NullEngine::setBool(GL::IGLUniformLocation* /*uniform*/, int /*value*/)
 {
 }
 
-void NullEngine::setFloat4(GL::IGLUniformLocation* /*uniform*/, float /*x*/,
-                           float /*y*/, float /*z*/, float /*w*/)
+void NullEngine::setFloat4(GL::IGLUniformLocation* /*uniform*/, float /*x*/, float /*y*/,
+                           float /*z*/, float /*w*/)
 {
 }
 
-void NullEngine::setColor3(GL::IGLUniformLocation* /*uniform*/,
-                           const Color3& /*color3*/)
+void NullEngine::setColor3(GL::IGLUniformLocation* /*uniform*/, const Color3& /*color3*/)
 {
 }
 
-void NullEngine::setColor4(GL::IGLUniformLocation* /*uniform*/,
-                           const Color3& /*color3*/, float /*alpha*/)
+void NullEngine::setColor4(GL::IGLUniformLocation* /*uniform*/, const Color3& /*color3*/,
+                           float /*alpha*/)
 {
 }
 
@@ -333,8 +310,8 @@ void NullEngine::wipeCaches(bool bruteForce)
   _cachedEffectForVertexBuffers = nullptr;
 }
 
-void NullEngine::draw(bool /*useTriangles*/, int /*indexStart*/,
-                      int /*indexCount*/, int /*instancesCount*/)
+void NullEngine::draw(bool /*useTriangles*/, int /*indexStart*/, int /*indexCount*/,
+                      int /*instancesCount*/)
 {
 }
 
@@ -343,9 +320,8 @@ void NullEngine::drawElementsType(unsigned int /*fillMode*/, int /*indexStart*/,
 {
 }
 
-void NullEngine::drawArraysType(unsigned int /*fillMode*/,
-                                int /*verticesStart*/, int /*verticesCount*/,
-                                int /*instancesCount*/)
+void NullEngine::drawArraysType(unsigned int /*fillMode*/, int /*verticesStart*/,
+                                int /*verticesCount*/, int /*instancesCount*/)
 {
 }
 
@@ -360,17 +336,12 @@ void NullEngine::_releaseTexture(InternalTexture* /*texture*/)
 
 InternalTexturePtr NullEngine::createTexture(
   const std::string& urlArg, bool noMipmap, bool invertY, Scene* /*scene*/,
-  unsigned int samplingMode,
-  const std::function<void(InternalTexture*, EventState&)>& onLoad,
-  const std::function<void(const std::string& message,
-                           const std::string& exception)>& /*onError*/,
-  const std::optional<
-    std::variant<std::string, ArrayBuffer, Image>>& /*buffer*/,
-  const InternalTexturePtr& /*fallBack*/,
-  const std::optional<unsigned int>& format)
+  unsigned int samplingMode, const std::function<void(InternalTexture*, EventState&)>& onLoad,
+  const std::function<void(const std::string& message, const std::string& exception)>& /*onError*/,
+  const std::optional<std::variant<std::string, ArrayBuffer, Image>>& /*buffer*/,
+  const InternalTexturePtr& /*fallBack*/, const std::optional<unsigned int>& format)
 {
-  auto texture
-    = std::make_shared<InternalTexture>(this, InternalTexture::DATASOURCE_URL);
+  auto texture    = InternalTexture::New(this, InternalTexture::DATASOURCE_URL);
   const auto& url = urlArg;
 
   texture->url             = url;
@@ -397,27 +368,22 @@ InternalTexturePtr NullEngine::createTexture(
   return texture;
 }
 
-InternalTexturePtr
-NullEngine::createRenderTargetTexture(const std::variant<ISize, float>& size,
-                                      const IRenderTargetOptions& options)
+InternalTexturePtr NullEngine::createRenderTargetTexture(const std::variant<ISize, float>& size,
+                                                         const IRenderTargetOptions& options)
 {
   RenderTargetCreationOptions fullOptions;
 
   {
-    fullOptions.generateMipMaps = options.generateMipMaps;
-    fullOptions.generateDepthBuffer
-      = options.generateDepthBuffer.value_or(true);
+    fullOptions.generateMipMaps     = options.generateMipMaps;
+    fullOptions.generateDepthBuffer = options.generateDepthBuffer.value_or(true);
     fullOptions.generateStencilBuffer
-      = fullOptions.generateDepthBuffer.value()
-        && options.generateStencilBuffer.value_or(false);
-    fullOptions.type
-      = options.type.value_or(Constants::TEXTURETYPE_UNSIGNED_INT);
-    fullOptions.samplingMode = options.samplingMode.value_or(
-      Constants::TEXTURE_TRILINEAR_SAMPLINGMODE);
+      = fullOptions.generateDepthBuffer.value() && options.generateStencilBuffer.value_or(false);
+    fullOptions.type = options.type.value_or(Constants::TEXTURETYPE_UNSIGNED_INT);
+    fullOptions.samplingMode
+      = options.samplingMode.value_or(Constants::TEXTURE_TRILINEAR_SAMPLINGMODE);
   }
 
-  auto texture = std::make_shared<InternalTexture>(
-    this, InternalTexture::DATASOURCE_RENDERTARGET);
+  auto texture = InternalTexture::New(this, InternalTexture::DATASOURCE_RENDERTARGET);
 
   int width = 0, height = 0;
   if (std::holds_alternative<ISize>(size)) {
@@ -431,20 +397,19 @@ NullEngine::createRenderTargetTexture(const std::variant<ISize, float>& size,
     height           = static_cast<int>(textureSize);
   }
 
-  texture->_depthStencilBuffer  = std::make_shared<GL::IGLRenderbuffer>(0);
-  texture->_framebuffer         = std::make_shared<GL::IGLFramebuffer>(0);
-  texture->baseWidth            = width;
-  texture->baseHeight           = height;
-  texture->width                = width;
-  texture->height               = height;
-  texture->isReady              = true;
-  texture->samples              = 1;
-  texture->generateMipMaps      = fullOptions.generateMipMaps.value_or(false);
-  texture->samplingMode         = *fullOptions.samplingMode;
-  texture->type                 = *fullOptions.type;
-  texture->_generateDepthBuffer = *fullOptions.generateDepthBuffer;
-  texture->_generateStencilBuffer
-    = fullOptions.generateStencilBuffer.value_or(false);
+  texture->_depthStencilBuffer    = std::make_shared<GL::IGLRenderbuffer>(0);
+  texture->_framebuffer           = std::make_shared<GL::IGLFramebuffer>(0);
+  texture->baseWidth              = width;
+  texture->baseHeight             = height;
+  texture->width                  = width;
+  texture->height                 = height;
+  texture->isReady                = true;
+  texture->samples                = 1;
+  texture->generateMipMaps        = fullOptions.generateMipMaps.value_or(false);
+  texture->samplingMode           = *fullOptions.samplingMode;
+  texture->type                   = *fullOptions.type;
+  texture->_generateDepthBuffer   = *fullOptions.generateDepthBuffer;
+  texture->_generateStencilBuffer = fullOptions.generateStencilBuffer.value_or(false);
 
   _internalTexturesCache.emplace_back(texture);
 
@@ -462,15 +427,14 @@ void NullEngine::bindFramebuffer(const InternalTexturePtr& texture,
                                  std::optional<int> requiredWidth,
                                  std::optional<int> requiredHeight,
                                  std::optional<bool> forceFullscreenViewport,
-                                 InternalTexture* /*depthStencilTexture*/,
-                                 int /*lodLevel*/)
+                                 InternalTexture* /*depthStencilTexture*/, int /*lodLevel*/)
 {
   if (_currentRenderTarget) {
     unBindFramebuffer(_currentRenderTarget);
   }
   _currentRenderTarget = texture;
-  _currentFramebuffer  = texture->_MSAAFramebuffer ? texture->_MSAAFramebuffer :
-                                                    texture->_framebuffer;
+  _currentFramebuffer
+    = texture->_MSAAFramebuffer ? texture->_MSAAFramebuffer : texture->_framebuffer;
   if (_cachedViewport && !forceFullscreenViewport) {
     setViewport(*_cachedViewport, requiredWidth, requiredHeight);
   }
@@ -491,8 +455,7 @@ void NullEngine::unBindFramebuffer(const InternalTexturePtr& texture,
   _currentFramebuffer = nullptr;
 }
 
-Engine::GLBufferPtr
-NullEngine::createDynamicVertexBuffer(const Float32Array& /*vertices*/)
+Engine::GLBufferPtr NullEngine::createDynamicVertexBuffer(const Float32Array& /*vertices*/)
 {
   auto buffer        = std::make_unique<GL::IGLBuffer>(0);
   buffer->references = 1;
@@ -500,9 +463,8 @@ NullEngine::createDynamicVertexBuffer(const Float32Array& /*vertices*/)
   return buffer;
 }
 
-void NullEngine::updateDynamicTexture(const InternalTexturePtr& /*texture*/,
-                                      ICanvas* /*canvas*/, bool /*invertY*/,
-                                      bool /*premulAlpha*/,
+void NullEngine::updateDynamicTexture(const InternalTexturePtr& /*texture*/, ICanvas* /*canvas*/,
+                                      bool /*invertY*/, bool /*premulAlpha*/,
                                       unsigned int /*format*/)
 {
 }
@@ -527,22 +489,18 @@ void NullEngine::_unpackFlipY(bool /*value*/)
 }
 
 void NullEngine::updateDynamicIndexBuffer(const GLBufferPtr& /*indexBuffer*/,
-                                          const IndicesArray& /*indices*/,
-                                          int /*offset*/)
+                                          const IndicesArray& /*indices*/, int /*offset*/)
 {
 }
 
 void NullEngine::updateDynamicVertexBuffer(const GLBufferPtr& /*vertexBuffer*/,
-                                           const Float32Array& /*data*/,
-                                           int /*byteOffset*/,
+                                           const Float32Array& /*data*/, int /*byteOffset*/,
                                            int /*byteLength*/)
 {
 }
 
-bool NullEngine::_bindTextureDirectly(unsigned int /*target*/,
-                                      const InternalTexturePtr& texture,
-                                      bool /*forTextureDataUpdate*/,
-                                      bool /*force*/)
+bool NullEngine::_bindTextureDirectly(unsigned int /*target*/, const InternalTexturePtr& texture,
+                                      bool /*forTextureDataUpdate*/, bool /*force*/)
 {
   if (stl_util::contains(_boundTexturesCache, _activeChannel)
       && _boundTexturesCache[_activeChannel] != texture) {
@@ -584,28 +542,29 @@ void NullEngine::hideLoadingUI()
 {
 }
 
-void NullEngine::_uploadCompressedDataToTextureDirectly(
-  const InternalTexturePtr& /*texture*/, unsigned int /*internalFormat*/,
-  float /*width*/, float /*height*/, const Uint8Array& /*data*/,
-  unsigned int /*faceIndex*/, int /*lod*/)
+void NullEngine::_uploadCompressedDataToTextureDirectly(const InternalTexturePtr& /*texture*/,
+                                                        unsigned int /*internalFormat*/,
+                                                        float /*width*/, float /*height*/,
+                                                        const Uint8Array& /*data*/,
+                                                        unsigned int /*faceIndex*/, int /*lod*/)
 {
 }
 
-void NullEngine::_uploadDataToTextureDirectly(
-  const InternalTexturePtr& /*texture*/, const ArrayBufferView& /*imageData*/,
-  unsigned int /*faceIndex*/, int /*lod*/)
+void NullEngine::_uploadDataToTextureDirectly(const InternalTexturePtr& /*texture*/,
+                                              const ArrayBufferView& /*imageData*/,
+                                              unsigned int /*faceIndex*/, int /*lod*/)
 {
 }
 
-void NullEngine::_uploadArrayBufferViewToTexture(
-  const InternalTexturePtr& /*texture*/, const Uint8Array& /*imageData*/,
-  unsigned int /*faceIndex*/, int /*lod*/)
+void NullEngine::_uploadArrayBufferViewToTexture(const InternalTexturePtr& /*texture*/,
+                                                 const Uint8Array& /*imageData*/,
+                                                 unsigned int /*faceIndex*/, int /*lod*/)
 {
 }
 
 void NullEngine::_uploadImageToTexture(const InternalTexturePtr& /*texture*/,
-                                       const Image& /*image*/,
-                                       unsigned int /*faceIndex*/, int /*lod*/)
+                                       const Image& /*image*/, unsigned int /*faceIndex*/,
+                                       int /*lod*/)
 {
 }
 

@@ -28,12 +28,11 @@ class IGLTexture;
 } // namespace GL
 
 /**
- * @brief Class used to store data associated with WebGL texture data for the
- * engine This class should not be used directly.
+ * @brief Class used to store data associated with WebGL texture data for the engine This class
+ * should not be used directly.
  */
-class BABYLON_SHARED_EXPORT InternalTexture
-    : public std::enable_shared_from_this<InternalTexture>,
-      public IInternalTextureTracker {
+class BABYLON_SHARED_EXPORT InternalTexture : public std::enable_shared_from_this<InternalTexture>,
+                                              public IInternalTextureTracker {
 
 public:
   /**
@@ -91,16 +90,13 @@ public:
   static constexpr unsigned int DATASOURCE_CUBERAW_RGBD = 12;
 
 public:
-  /**
-   * @brief Creates a new InternalTexture.
-   * @param engine defines the engine to use
-   * @param dataSource defines the type of data that will be used
-   * @param delayAllocation if the texture allocation should be delayed
-   * (default: false)
-   */
-  InternalTexture(Engine* engine,
-                  unsigned int dataSource = InternalTexture::DATASOURCE_UNKNOWN,
-                  bool delayAllocation    = false);
+  template <typename... Ts>
+  static InternalTexturePtr New(Ts&&... args)
+  {
+    auto texture = std::shared_ptr<InternalTexture>(new InternalTexture(std::forward<Ts>(args)...));
+
+    return texture;
+  }
   ~InternalTexture(); // = default
 
   /**
@@ -116,8 +112,7 @@ public:
   unsigned int dataSource() const;
 
   /**
-   * @brief Increments the number of references (ie. the number of Texture that
-   * point to it).
+   * @brief Increments the number of references (ie. the number of Texture that point to it).
    */
   void incrementReferences();
 
@@ -143,6 +138,16 @@ public:
    * @brief Dispose the current allocated resources.
    */
   void dispose();
+
+protected:
+  /**
+   * @brief Creates a new InternalTexture.
+   * @param engine defines the engine to use
+   * @param dataSource defines the type of data that will be used
+   * @param delayAllocation if the texture allocation should be delayed (default: false)
+   */
+  InternalTexture(Engine* engine, unsigned int dataSource = InternalTexture::DATASOURCE_UNKNOWN,
+                  bool delayAllocation = false);
 
 public:
   /**
@@ -202,18 +207,18 @@ public:
    */
   int depth;
   /**
-   * Gets the initial width of the texture (It could be rescaled if the current
-   * system does not support non power of two textures)
+   * Gets the initial width of the texture (It could be rescaled if the current system does not
+   * support non power of two textures)
    */
   int baseWidth;
   /**
-   * Gets the initial height of the texture (It could be rescaled if the current
-   * system does not support non power of two textures)
+   * Gets the initial height of the texture (It could be rescaled if the current system does not
+   * support non power of two textures)
    */
   int baseHeight;
   /**
-   * Gets the initial depth of the texture (It could be rescaled if the current
-   * system does not support non power of two textures)
+   * Gets the initial depth of the texture (It could be rescaled if the current system does not
+   * support non power of two textures)
    */
   int baseDepth;
   /**
@@ -259,11 +264,9 @@ public:
   /** Hidden */
   std::unique_ptr<GL::IGLTexture> _depthStencilTextureArray;
 
-  // The following three fields helps sharing generated fixed LODs for texture
-  // filtering
-  // In environment not supporting the textureLOD extension like EDGE. They are
-  // for internal use only.
-  // They are at the level of the gl texture to benefit from the cache.
+  // The following three fields helps sharing generated fixed LODs for texture filtering
+  // In environment not supporting the textureLOD extension like EDGE. They are for internal use
+  // only. They are at the level of the gl texture to benefit from the cache.
   BaseTexturePtr _lodTextureHigh;
   BaseTexturePtr _lodTextureMid;
   BaseTexturePtr _lodTextureLow;
