@@ -724,7 +724,7 @@ template <typename C, typename T>
 inline bool push_unique(C& c, T&& elem)
 {
   if (!contains(c, elem)) {
-    c.push_back(std::move(elem));
+    c.push_back(std::forward<T>(elem));
     return true;
   }
   return false;
