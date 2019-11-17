@@ -31,6 +31,7 @@ void SamplesIndex::fillSamplesFailures() const
     {"LinesMeshSpiralScene", {SampleFailureReasonKind::empty3d}},
     {"LorenzAttractorScene", {SampleFailureReasonKind::empty3d, "Rendering empty with 50% chance"}},
     {"MergedMeshesScene", {SampleFailureReasonKind::segFault}},
+    {"MotionBlurPostProcessScene", {SampleFailureReasonKind::empty3d}},
     {"MultiSampleRenderTargetsScene", {SampleFailureReasonKind::empty3d}},
     {"PointsCloudScene", {SampleFailureReasonKind::empty3d}},
     {"ProceduralHexPlanetGenerationScene", {SampleFailureReasonKind::segFault}},
