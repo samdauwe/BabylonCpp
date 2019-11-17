@@ -175,7 +175,9 @@ void BabylonStudioLayout::ApplyLayoutMode(LayoutMode mode)
       setVisible(DockableWindowId::Inspector, false);
       setVisible(DockableWindowId::SampleBrowser, true);
       setVisible(DockableWindowId::SamplesCodeViewer, false);
+#ifdef BABYLON_BUILD_PLAYGROUND
       setVisible(DockableWindowId::PlaygroundEditor, false);
+#endif
       setVisible(DockableWindowId::Logs, false);
       break;
 
