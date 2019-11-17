@@ -447,10 +447,8 @@ void Effect::_processShaderConversion(
       std::make_pair("gl_FragColor", "glFragColor"),             //
       std::make_pair("gl_FragData", "glFragData"),
       std::make_pair(
-        "void\\s+?main\\s*\\(", //
-        String::concat(
-          (hasDrawBuffersExtension ? "" : "out vec4 glFragColor;\n"),
-          "void main(")),
+        R"(void\s+?main\s*\()", //
+        String::concat((hasDrawBuffersExtension ? "" : "out vec4 glFragColor;\n"), "void main(")),
 
     };
     for (const auto& fragmentMapping : fragmentMappings) {
@@ -466,8 +464,7 @@ void Effect::_processIncludes(
   const std::string& sourceCode,
   const std::function<void(const std::string&)>& callback)
 {
-  const std::regex regex("#include<(.+)>(\\((.*)\\))*(\\[(.*)\\])*",
-                         std::regex::optimize);
+  const std::regex regex(R"(#include<(.+)>(\((.*)\))*(\[(.*)\])*)", std::regex::optimize);
   auto lines = String::split(sourceCode, '\n');
 
   std::ostringstream returnValue;
@@ -535,8 +532,7 @@ void Effect::_processIncludes(
                     }
                     return m.str(0);
                   };
-                  const std::regex iRegex{"light\\{X\\}.(\\w*)",
-                                          std::regex::optimize};
+                  const std::regex iRegex{R"(light\{X\}.(\w*))", std::regex::optimize};
                   sourceIncludeContent = String::regexReplace(
                     sourceIncludeContent, iRegex, iCallback);
                 }
@@ -556,8 +552,7 @@ void Effect::_processIncludes(
               }
               return m.str(0);
             };
-            const std::regex iRegex{"light\\{X\\}.(\\w*)",
-                                    std::regex::optimize};
+            const std::regex iRegex{R"(light\{X\}.(\w*))", std::regex::optimize};
             includeContent
               = String::regexReplace(includeContent, iRegex, iCallback);
           }

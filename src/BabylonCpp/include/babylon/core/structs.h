@@ -97,7 +97,7 @@ struct GestureEvent {
 }; // end of struct GestureEvent
 
 struct Image {
-  Image() : width(0), height(0), mode(0)
+  Image()
   {
   }
   Image(unsigned char* buffer, int bufferLength, int iWidth, int iHeight,

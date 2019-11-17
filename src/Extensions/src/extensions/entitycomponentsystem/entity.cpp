@@ -7,7 +7,7 @@ namespace BABYLON {
 namespace Extensions {
 namespace ECS {
 
-Entity::Entity() : m_world(nullptr)
+Entity::Entity()
 {
 }
 

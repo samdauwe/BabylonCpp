@@ -195,8 +195,7 @@ TEST(TestString, regexMatch)
 {
   using namespace BABYLON;
 
-  const std::regex re("#include<(.+)>(\\((.*)\\))*(\\[(.*)\\])*",
-                        std::regex::optimize);
+  const std::regex re(R"(#include<(.+)>(\((.*)\))*(\[(.*)\])*)", std::regex::optimize);
 
   {
     const std::string s{"#include<helperFunctions>"};
@@ -345,7 +344,7 @@ TEST(TestString, regexReplaceWithCallback)
     const std::string s{
       "notShadowLevel = computeShadowWithESMCube(light{X}.vLightData.xyz, "
       "shadowSampler{X}, light{X}.shadowsInfo.x, light{X}.shadowsInfo.z);"};
-    const std::regex regex{"light\\{X\\}.(\\w*)", std::regex::optimize};
+    const std::regex regex{R"(light\{X\}.(\w*))", std::regex::optimize};
     const std::string r{String::regexReplace(s, regex, callback)};
     const std::string e{
       "notShadowLevel = computeShadowWithESMCube(vLightData{X}.xyz, "

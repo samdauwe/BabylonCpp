@@ -217,7 +217,7 @@ private:
   /// The world that this Entity belongs to. This is guarenteed
   /// to not be null, as long as this entity is not null.
   /// \see isNull() To determine if the entity is null or not.
-  World* m_world;
+  World* m_world{nullptr};
 
 }; // end of class Entity
 

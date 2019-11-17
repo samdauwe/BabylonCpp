@@ -55,7 +55,7 @@ public:
    * \brief      Constructs and initializes a two-dimensional vector instance
    *             to (0.0, 0.0).
    */
-  inline Vector2() : x_(0.0f), y_(0.0f)
+  inline Vector2()
   {
   }
 
@@ -252,8 +252,8 @@ public:
   }
 
 private:
-  float x_;
-  float y_;
+  float x_{0.0f};
+  float y_{0.0f};
 
 }; // end of class Vector2
 

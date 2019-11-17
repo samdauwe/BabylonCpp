@@ -40,7 +40,7 @@ std::string WebGL2ShaderProcessor::postProcessor(std::string code,
     code = String::regexReplace(code, "gl_FragColor", "glFragColor");
     code = String::regexReplace(code, "gl_FragData", "glFragData");
     code = String::regexReplace(
-      code, "void\\s+?main\\s*\\(",
+      code, R"(void\s+?main\s*\()",
       String::printf("%s%s", (hasDrawBuffersExtension ? "" : "out vec4 glFragColor;\n"),
                      "void main("));
   }

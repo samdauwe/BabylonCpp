@@ -44,8 +44,7 @@ namespace BABYLON {
 namespace Extensions {
 namespace RVO2 {
 
-RVOSimulator::RVOSimulator()
-    : defaultAgent_(NULL), globalTime_(0.0f), kdTree_(NULL), timeStep_(0.0f)
+RVOSimulator::RVOSimulator() : defaultAgent_(NULL), kdTree_(NULL)
 {
   kdTree_ = new KdTree(this);
 }

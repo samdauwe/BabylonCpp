@@ -580,10 +580,10 @@ public:
 private:
   std::vector<Agent*> agents_;
   Agent* defaultAgent_;
-  float globalTime_;
+  float globalTime_{0.0f};
   KdTree* kdTree_;
   std::vector<Obstacle*> obstacles_;
-  float timeStep_;
+  float timeStep_{0.0f};
 
   friend class Agent;
   friend class KdTree;
