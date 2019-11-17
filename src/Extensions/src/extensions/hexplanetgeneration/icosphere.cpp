@@ -57,15 +57,8 @@ IcoFace& IcoFace::operator=(IcoFace&& other) = default;
 // IcosahedronMesh
 // -----------------------------------------------------------------------------
 
-IcosahedronMesh::IcosahedronMesh()
-{
-}
-
-IcosahedronMesh::IcosahedronMesh(const IcosahedronMesh& other)
-    : nodes{other.nodes}, edges{other.edges}, faces{other.faces}
-{
-}
-
+IcosahedronMesh::IcosahedronMesh() = default;
+IcosahedronMesh::IcosahedronMesh(const IcosahedronMesh& other) = default;
 IcosahedronMesh::IcosahedronMesh(IcosahedronMesh&& other) = default;
 IcosahedronMesh& IcosahedronMesh::operator=(const IcosahedronMesh& other) = default;
 IcosahedronMesh& IcosahedronMesh::operator=(IcosahedronMesh&& other) = default;
