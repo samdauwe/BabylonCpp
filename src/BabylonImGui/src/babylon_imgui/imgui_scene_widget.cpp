@@ -107,10 +107,15 @@ namespace BABYLON {
 
     if (ImGui::IsItemHovered())
     {
+      // @see https://github.com/ocornut/imgui/issues/2486
+      ImVec2 windowMin = ImGui::GetWindowContentRegionMin();
+      windowMin.x += ImGui::GetWindowPos().x;
+      windowMin.y += ImGui::GetWindowPos().y;
+
       static ImVec2 lastMousePos(0., 0.);
       ImVec2 mousePos = ImGui::GetMousePos();
-      int xpos = static_cast<int>(mousePos.x);
-      int ypos = static_cast<int>(mousePos.y);
+      int xpos = static_cast<int>(mousePos.x - windowMin.x);
+      int ypos = static_cast<int>(mousePos.y - windowMin.y);
       if (distVec2(mousePos, lastMousePos) > 0.1f)
       {
         _framebuffer_canvas->onMouseMove(ctrlKey, shiftKey, xpos, ypos);
