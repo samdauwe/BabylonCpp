@@ -33,7 +33,7 @@ public:
   }
   ~MorphTarget() override; // = default
 
-  Type type() const override;
+  [[nodiscard]] Type type() const override;
 
   /**
    * @brief Gets a property.
@@ -67,7 +67,7 @@ public:
    * @brief Gets the position data stored in this target.
    * @returns a FloatArray containing the position data (or null if not present)
    */
-  const Float32Array& getPositions() const;
+  [[nodiscard]] const Float32Array& getPositions() const;
 
   /**
    * @brief Affects normal data to this target.
@@ -85,7 +85,7 @@ public:
    * @brief Gets the normal data stored in this target.
    * @returns a FloatArray containing the normal data (or null if not present)
    */
-  const Float32Array& getNormals() const;
+  [[nodiscard]] const Float32Array& getNormals() const;
 
   /**
    * @brief Affects tangent data to this target.
@@ -103,7 +103,7 @@ public:
    * @brief Gets the tangent data stored in this target.
    * @returns a FloatArray containing the tangent data (or null if not present)
    */
-  const Float32Array& getTangents() const;
+  [[nodiscard]] const Float32Array& getTangents() const;
 
   /**
    * @brief Affects texture coordinates data to this target.
@@ -116,19 +116,19 @@ public:
    * @returns a FloatArray containing the texture coordinates data (or null if
    * not present)
    */
-  const Float32Array& getUVs() const;
+  [[nodiscard]] const Float32Array& getUVs() const;
 
   /**
    * @brief Serializes the current target into a Serialization object.
    * @returns the serialized object.
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Returns the string "MorphTarget".
    * @returns "MorphTarget"
    */
-  std::string getClassName() const;
+  [[nodiscard]] std::string getClassName() const;
 
   // Statics
 
@@ -154,7 +154,7 @@ protected:
    * @brief Gets the influence of this target (ie. its weight in the overall
    * morphing).
    */
-  float get_influence() const;
+  [[nodiscard]] float get_influence() const;
 
   /**
    * @brief Sets the influence of this target (ie. its weight in the overall
@@ -175,23 +175,23 @@ protected:
   /**
    * @brief Gets a boolean defining if the target contains position data.
    */
-  bool get_hasPositions() const;
+  [[nodiscard]] bool get_hasPositions() const;
 
   /**
    * @brief Gets a boolean defining if the target contains normal data.
    */
-  bool get_hasNormals() const;
+  [[nodiscard]] bool get_hasNormals() const;
 
   /**
    * @brief Gets a boolean defining if the target contains tangent data.
    */
-  bool get_hasTangents() const;
+  [[nodiscard]] bool get_hasTangents() const;
 
   /**
    * @brief Gets a boolean defining if the target contains texture coordinates
    * data.
    */
-  bool get_hasUVs() const;
+  [[nodiscard]] bool get_hasUVs() const;
 
 public:
   /**

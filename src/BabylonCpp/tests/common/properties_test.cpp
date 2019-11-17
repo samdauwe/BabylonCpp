@@ -8,8 +8,7 @@ class PrimitiveTypeProperty {
 
 public:
   PrimitiveTypeProperty()
-      : value{this, &PrimitiveTypeProperty::getValue,
-              &PrimitiveTypeProperty::setValue}
+      : value{this, &PrimitiveTypeProperty::getValue, &PrimitiveTypeProperty::setValue}
   {
   }
 
@@ -19,7 +18,7 @@ public:
 private:
   T _value = {};
 
-  T getValue() const
+  [[nodiscard]] T getValue() const
   {
     return _value;
   }
@@ -36,8 +35,7 @@ class ClassTypeProperty {
 public:
   ClassTypeProperty()
       : readOnly{this, &ClassTypeProperty::getValue}
-      , readWrite{this, &ClassTypeProperty::getValue,
-                  &ClassTypeProperty::setValue}
+      , readWrite{this, &ClassTypeProperty::getValue, &ClassTypeProperty::setValue}
   {
   }
 

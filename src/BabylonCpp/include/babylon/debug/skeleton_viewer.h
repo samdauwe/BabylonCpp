@@ -42,9 +42,8 @@ public:
    * @param renderingGroupId defines the rendering group id to use with the
    * viewer
    */
-  SkeletonViewer(const SkeletonPtr& skeleton, const AbstractMeshPtr& mesh,
-                 Scene* scene, bool autoUpdateBonesMatrices = true,
-                 int renderingGroupId = 1);
+  SkeletonViewer(const SkeletonPtr& skeleton, const AbstractMeshPtr& mesh, Scene* scene,
+                 bool autoUpdateBonesMatrices = true, int renderingGroupId = 1);
   ~SkeletonViewer(); // = default
 
   /**
@@ -71,17 +70,14 @@ protected:
   /**
    * @brief Gets a boolean indicating if the viewer is enabled.
    */
-  bool get_isEnabled() const;
+  [[nodiscard]] bool get_isEnabled() const;
 
 private:
-  void _getBonePosition(Vector3& position, const Bone& bone,
-                        const Matrix& meshMat, float x = 0.f, float y = 0.f,
-                        float z = 0.f) const;
-  void _getLinesForBonesWithLength(const std::vector<BonePtr>& bones,
-                                   const Matrix& meshMat);
+  void _getBonePosition(Vector3& position, const Bone& bone, const Matrix& meshMat, float x = 0.f,
+                        float y = 0.f, float z = 0.f) const;
+  void _getLinesForBonesWithLength(const std::vector<BonePtr>& bones, const Matrix& meshMat);
   void _resizeDebugLines(size_t bonesSize);
-  void _getLinesForBonesNoLength(const std::vector<BonePtr>& bones,
-                                 const Matrix& meshMat);
+  void _getLinesForBonesNoLength(const std::vector<BonePtr>& bones, const Matrix& meshMat);
 
 public:
   /**

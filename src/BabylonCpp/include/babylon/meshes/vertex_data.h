@@ -71,8 +71,7 @@ public:
    * update the vertexData
    * @returns the VertexData
    */
-  VertexData& applyToMesh(Mesh& mesh,
-                          const std::optional<bool>& updatable = std::nullopt);
+  VertexData& applyToMesh(Mesh& mesh, const std::optional<bool>& updatable = std::nullopt);
 
   /**
    * @brief Associates the vertexData to the passed Geometry.
@@ -119,7 +118,7 @@ public:
    * @brief Serializes the VertexData.
    * @returns a serialized object
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /** Statics **/
 
@@ -132,9 +131,8 @@ public:
    * default false
    * @returns the object VertexData associated to the passed mesh
    */
-  static std::unique_ptr<VertexData>
-  ExtractFromMesh(Mesh* mesh, bool copyWhenShared = false,
-                  bool forceCopy = false);
+  static std::unique_ptr<VertexData> ExtractFromMesh(Mesh* mesh, bool copyWhenShared = false,
+                                                     bool forceCopy = false);
 
   /**
    * @brief Extracts the vertexData from the geometry.
@@ -145,9 +143,8 @@ public:
    * default false
    * @returns the object VertexData associated to the passed mesh
    */
-  static std::unique_ptr<VertexData>
-  ExtractFromGeometry(Geometry* geometry, bool copyWhenShared,
-                      bool forceCopy = false);
+  static std::unique_ptr<VertexData> ExtractFromGeometry(Geometry* geometry, bool copyWhenShared,
+                                                         bool forceCopy = false);
 
   /**
    * @brief Creates the VertexData for a Ribbon.
@@ -243,8 +240,7 @@ public:
    * optional, default vector4 (0, 0, 1, 1)
    * @returns the VertexData of the tiled plane
    */
-  static std::unique_ptr<VertexData>
-  CreateTiledPlane(TiledPlaneOptions& options);
+  static std::unique_ptr<VertexData> CreateTiledPlane(TiledPlaneOptions& options);
 
   /**
    * @brief Creates the VertexData for an ellipsoid, defaults to a sphere.
@@ -344,8 +340,7 @@ public:
    * of successive Color4, one per line point
    * @returns the VertexData of the LineSystem
    */
-  static std::unique_ptr<VertexData>
-  CreateLineSystem(LineSystemOptions& options);
+  static std::unique_ptr<VertexData> CreateLineSystem(LineSystemOptions& options);
 
   /**
    * @brief Create the VertexData for a DashedLines.
@@ -359,8 +354,7 @@ public:
    *  - dashNb the intended total number of dashes, optional, default 200
    * @returns the VertexData for the DashedLines
    */
-  static std::unique_ptr<VertexData>
-  CreateDashedLines(DashedLinesOptions& options);
+  static std::unique_ptr<VertexData> CreateDashedLines(DashedLinesOptions& options);
 
   /**
    * @brief Creates the VertexData for a Ground.
@@ -390,8 +384,7 @@ public:
    * default {w: 2, h: 2}
    * @returns the VertexData of the TiledGround
    */
-  static std::unique_ptr<VertexData>
-  CreateTiledGround(TiledGroundOptions& options);
+  static std::unique_ptr<VertexData> CreateTiledGround(TiledGroundOptions& options);
 
   /**
    * @brief Creates the VertexData of the Ground designed from a heightmap
@@ -411,8 +404,7 @@ public:
    * defaults 0 (all data visible)
    * @returns the VertexData of the Ground designed from a heightmap
    */
-  static std::unique_ptr<VertexData>
-  CreateGroundFromHeightMap(GroundFromHeightMapOptions& options);
+  static std::unique_ptr<VertexData> CreateGroundFromHeightMap(GroundFromHeightMapOptions& options);
 
   /**
    * @brief Creates the VertexData for a Plane.
@@ -475,11 +467,10 @@ public:
    * optional, default vector4 (0, 0, 1, 1)
    * @returns the VertexData of the Polygon
    */
-  static std::unique_ptr<VertexData>
-  CreatePolygon(Mesh* polygon, unsigned int sideOrientation,
-                const std::vector<Vector4>& fUV,
-                const std::vector<Color4>& fColors, Vector4& frontUVs,
-                Vector4& backUVs);
+  static std::unique_ptr<VertexData> CreatePolygon(Mesh* polygon, unsigned int sideOrientation,
+                                                   const std::vector<Vector4>& fUV,
+                                                   const std::vector<Color4>& fColors,
+                                                   Vector4& frontUVs, Vector4& backUVs);
 
   /**
    * @brief Creates the VertexData of the IcoSphere.
@@ -541,8 +532,7 @@ public:
    * optional, default vector4 (0, 0, 1, 1)
    * @returns the VertexData of the Polyhedron
    */
-  static std::unique_ptr<VertexData>
-  CreatePolyhedron(PolyhedronOptions& options);
+  static std::unique_ptr<VertexData> CreatePolyhedron(PolyhedronOptions& options);
 
   // based on
   // http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3D/src/away3d/primitives/TorusKnot.as?spec=svn2473&r=2473
@@ -600,10 +590,9 @@ public:
    * * depthSortedFacets : optional array of depthSortedFacets to store the
    * facet distances from the reference location
    */
-  static void ComputeNormals(const Float32Array& positions,
-                             const Uint32Array& indices, Float32Array& normals,
-                             std::optional<FacetParameters> options
-                             = std::nullopt);
+  static void ComputeNormals(const Float32Array& positions, const Uint32Array& indices,
+                             Float32Array& normals,
+                             std::optional<FacetParameters> options = std::nullopt);
 
   /**
    * @brief Applies VertexData created from the imported parameters to the
@@ -611,8 +600,7 @@ public:
    * @param parsedVertexData the parsed data from an imported file
    * @param geometry the geometry to apply the VertexData to
    */
-  static void ImportVertexData(const json& parsedVertexData,
-                               Geometry& geometry);
+  static void ImportVertexData(const json& parsedVertexData, Geometry& geometry);
 
   /**
    * @brief Hidden
@@ -624,24 +612,22 @@ public:
    * @param frontUVs
    * @param backUVs
    */
-  static void
-  _ComputeSides(std::optional<uint32_t> sideOrientation,
-                Float32Array& positions, Uint32Array& indices,
-                Float32Array& normals, Float32Array& uvs,
-                const std::optional<Vector4>& frontUVs = std::nullopt,
-                const std::optional<Vector4>& backUVs  = std::nullopt);
+  static void _ComputeSides(std::optional<uint32_t> sideOrientation, Float32Array& positions,
+                            Uint32Array& indices, Float32Array& normals, Float32Array& uvs,
+                            const std::optional<Vector4>& frontUVs = std::nullopt,
+                            const std::optional<Vector4>& backUVs  = std::nullopt);
 
 private:
   VertexData& _applyTo(IGetSetVerticesData& meshOrGeometry,
                        const std::optional<bool>& updatable = std::nullopt);
-  VertexData& _update(IGetSetVerticesData* meshOrGeometry,
-                      bool updateExtends = false, bool makeItUnique = false);
-  Float32Array _mergeElement(const Float32Array& source,
-                             const Float32Array& other) const;
+  VertexData& _update(IGetSetVerticesData* meshOrGeometry, bool updateExtends = false,
+                      bool makeItUnique = false);
+  [[nodiscard]] Float32Array _mergeElement(const Float32Array& source,
+                                           const Float32Array& other) const;
   void _validate();
-  static std::unique_ptr<VertexData>
-  _ExtractFrom(IGetSetVerticesData* meshOrGeometry, bool copyWhenShared = false,
-               bool forceCopy = false);
+  static std::unique_ptr<VertexData> _ExtractFrom(IGetSetVerticesData* meshOrGeometry,
+                                                  bool copyWhenShared = false,
+                                                  bool forceCopy      = false);
 
 public:
   /**

@@ -34,7 +34,7 @@ struct BABYLON_SHARED_EXPORT TargetedAnimation {
    * @brief Serialize the object.
    * @returns the JSON object representing the current entity
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 }; // end of struct TargetedAnimation
 
 } // end of namespace BABYLON

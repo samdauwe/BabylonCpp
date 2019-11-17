@@ -17,7 +17,7 @@ struct BABYLON_SHARED_EXPORT _DDSTextureLoader : public IInternalTextureLoader {
    * @brief Defines wether the loader supports cascade loading the different
    * faces.
    */
-  bool supportCascades() const override;
+  [[nodiscard]] bool supportCascades() const override;
 
   /**
    * @brief This returns if the loader support the current file information.

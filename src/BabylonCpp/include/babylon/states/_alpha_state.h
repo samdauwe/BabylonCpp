@@ -23,15 +23,14 @@ public:
 
   void setAlphaBlendConstants(float r, float g, float b, float a);
   void setAlphaBlendFunctionParameters(unsigned int value0, unsigned int value1,
-                                       unsigned int value2,
-                                       unsigned int value3);
+                                       unsigned int value2, unsigned int value3);
   void setAlphaEquationParameters(unsigned int rgb, unsigned int alpha);
   void reset();
   void apply(GL::IGLRenderingContext& gl);
 
 protected:
-  bool get_isDirty() const;
-  bool get_alphaBlend() const;
+  [[nodiscard]] bool get_isDirty() const;
+  [[nodiscard]] bool get_alphaBlend() const;
   void set_alphaBlend(bool value);
 
 public:

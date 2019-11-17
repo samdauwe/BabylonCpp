@@ -38,7 +38,7 @@ public:
   Ray& operator=(const Ray& otherRay);
   Ray& operator=(Ray&& otherRay);
   ~Ray(); // = default
-  std::unique_ptr<Ray> clone() const;
+  [[nodiscard]] std::unique_ptr<Ray> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Ray& ray);
 
   /** Methods **/
@@ -50,8 +50,8 @@ public:
    * direction
    * @returns if the box was hit
    */
-  bool intersectsBoxMinMax(const Vector3& minimum, const Vector3& maximum,
-                           float intersectionTreshold = 0.f) const;
+  [[nodiscard]] bool intersectsBoxMinMax(const Vector3& minimum, const Vector3& maximum,
+                                         float intersectionTreshold = 0.f) const;
 
   /**
    * @brief Checks if the ray intersects a box.
@@ -60,16 +60,15 @@ public:
    * all direction
    * @returns if the box was hit
    */
-  bool intersectsBox(const BoundingBox& box,
-                     float intersectionTreshold = 0.f) const;
+  [[nodiscard]] bool intersectsBox(const BoundingBox& box, float intersectionTreshold = 0.f) const;
 
   /**
    * @brief If the ray hits a sphere.
    * @param sphere the bounding sphere to check
    * @returns true if it hits the sphere
    */
-  bool intersectsSphere(const BoundingSphere& sphere,
-                        float intersectionTreshold = 0.f) const;
+  [[nodiscard]] bool intersectsSphere(const BoundingSphere& sphere,
+                                      float intersectionTreshold = 0.f) const;
 
   /**
    * @brief If the ray hits a triange.
@@ -78,8 +77,7 @@ public:
    * @param vertex2 triangle vertex
    * @returns intersection information if hit
    */
-  std::optional<IntersectionInfo> intersectsTriangle(const Vector3& vertex0,
-                                                     const Vector3& vertex1,
+  std::optional<IntersectionInfo> intersectsTriangle(const Vector3& vertex0, const Vector3& vertex1,
                                                      const Vector3& vertex2);
 
   /**
@@ -97,8 +95,7 @@ public:
    * @returns a vector containing the coordinates where 'axis' is equal to zero
    * (else offset), or null if there is no intercept.
    */
-  std::optional<Vector3> intersectsAxis(const std::string& axis,
-                                        float offset = 0.f);
+  std::optional<Vector3> intersectsAxis(const std::string& axis, float offset = 0.f);
 
   /**
    * @brief Checks if ray intersects a mesh.
@@ -124,8 +121,7 @@ public:
    * @param results array to store result in
    * @returns Array of picking infos
    */
-  std::vector<PickingInfo> intersectsMeshes(std::vector<AbstractMesh*>& meshes,
-                                            bool fastCheck,
+  std::vector<PickingInfo> intersectsMeshes(std::vector<AbstractMesh*>& meshes, bool fastCheck,
                                             std::vector<PickingInfo>& results);
 
   /**
@@ -141,8 +137,8 @@ public:
    * @return the distance from the ray origin to the intersection point if
    * there's intersection, or -1 if there's no intersection
    */
-  float intersectionSegment(const Vector3& sega, const Vector3& segb,
-                            float threshold) const;
+  [[nodiscard]] float intersectionSegment(const Vector3& sega, const Vector3& segb,
+                                          float threshold) const;
 
   /**
    * @brief Update the ray from viewport position.
@@ -155,8 +151,8 @@ public:
    * @param projection projection matrix
    * @returns this ray updated
    */
-  Ray& update(float x, float y, float viewportWidth, float viewportHeight,
-              Matrix& world, Matrix& view, Matrix& projection);
+  Ray& update(float x, float y, float viewportWidth, float viewportHeight, Matrix& world,
+              Matrix& view, Matrix& projection);
 
   /**
    * @brief Unproject a ray from screen space to object space.
@@ -169,9 +165,8 @@ public:
    * @param view defines the view matrix to use
    * @param projection defines the projection matrix to use
    */
-  void unprojectRayToRef(float sourceX, float sourceY, float viewportWidth,
-                         float viewportHeight, Matrix& world,
-                         const Matrix& view, const Matrix& projection);
+  void unprojectRayToRef(float sourceX, float sourceY, float viewportWidth, float viewportHeight,
+                         Matrix& world, const Matrix& view, const Matrix& projection);
 
   /** Statics **/
   /**
@@ -191,9 +186,8 @@ public:
    * @param projection projection matrix
    * @returns new ray
    */
-  static Ray CreateNew(float x, float y, float viewportWidth,
-                       float viewportHeight, Matrix& world, Matrix& view,
-                       Matrix& projection);
+  static Ray CreateNew(float x, float y, float viewportWidth, float viewportHeight, Matrix& world,
+                       Matrix& view, Matrix& projection);
 
   /**
    * @brief Function will create a new transformed ray starting from origin and
@@ -225,8 +219,7 @@ public:
   static void TransformToRef(const Ray& ray, const Matrix& matrix, Ray& result);
 
 private:
-  static int _comparePickingInfo(const PickingInfo& pickingInfoA,
-                                 const PickingInfo& pickingInfoB);
+  static int _comparePickingInfo(const PickingInfo& pickingInfoA, const PickingInfo& pickingInfoB);
 
 public:
   /**

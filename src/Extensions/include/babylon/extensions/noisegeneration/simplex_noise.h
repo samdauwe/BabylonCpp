@@ -1,8 +1,8 @@
 #ifndef BABYLON_EXTENSIONS_NOISE_GENERATION_SIMPLEX_NOISE_H
 #define BABYLON_EXTENSIONS_NOISE_GENERATION_SIMPLEX_NOISE_H
 
-#include <cmath>
 #include <array>
+#include <cmath>
 #include <functional>
 
 #include <babylon/babylon_api.h>
@@ -200,8 +200,7 @@ public:
   /**
    * @brief Returns the curl of a 2D simplex noise fractal brownian motion sum.
    */
-  Vector2 curlNoise(const Vector2& v, uint8_t octaves, float lacunarity,
-                    float gain);
+  Vector2 curlNoise(const Vector2& v, uint8_t octaves, float lacunarity, float gain);
 
   /**
    * @brief Returns the curl of a 3D simplex noise.
@@ -217,8 +216,7 @@ public:
    * @brief Returns the curl approximation of a 3D simplex noise fractal
    * brownian motion sum.
    */
-  Vector3 curlNoise(const Vector3& v, uint8_t octaves, float lacunarity,
-                    float gain);
+  Vector3 curlNoise(const Vector3& v, uint8_t octaves, float lacunarity, float gain);
 
   // ---------------------------------------------------------------------------
 
@@ -226,16 +224,14 @@ public:
    * @brief Returns the curl of a custom 2D potential using finite difference
    * approximation.
    */
-  Vector2 curl(const Vector2& v,
-               const std::function<float(const Vector2&)>& potential,
+  Vector2 curl(const Vector2& v, const std::function<float(const Vector2&)>& potential,
                float delta = 1e-4f);
 
   /**
    * @brief Returns the curl of a custom 3D potential using finite difference
    * approximation.
    */
-  Vector3 curl(const Vector3& v,
-               const std::function<Vector3(const Vector3&)>& potential,
+  Vector3 curl(const Vector3& v, const std::function<Vector3(const Vector3&)>& potential,
                float delta = 1e-4f);
 
   // ---------------------------------------------------------------------------
@@ -260,26 +256,22 @@ public:
   /**
    * @brief Returns a 1D simplex noise fractal brownian motion sum.
    */
-  float fBm(float x, uint8_t octaves = 4, float lacunarity = 2.0f,
-            float gain = 0.5f);
+  float fBm(float x, uint8_t octaves = 4, float lacunarity = 2.0f, float gain = 0.5f);
 
   /**
    * @brief Returns a 2D simplex noise fractal brownian motion sum.
    */
-  float fBm(const Vector2& v, uint8_t octaves = 4, float lacunarity = 2.0f,
-            float gain = 0.5f);
+  float fBm(const Vector2& v, uint8_t octaves = 4, float lacunarity = 2.0f, float gain = 0.5f);
 
   /**
    * @brief Returns a 3D simplex noise fractal brownian motion sum.
    */
-  float fBm(const Vector3& v, uint8_t octaves = 4, float lacunarity = 2.0f,
-            float gain = 0.5f);
+  float fBm(const Vector3& v, uint8_t octaves = 4, float lacunarity = 2.0f, float gain = 0.5f);
 
   /**
    * @brief Returns a 4D simplex noise fractal brownian motion sum.
    */
-  float fBm(const Vector4& v, uint8_t octaves = 4, float lacunarity = 2.0f,
-            float gain = 0.5f);
+  float fBm(const Vector4& v, uint8_t octaves = 4, float lacunarity = 2.0f, float gain = 0.5f);
 
   // ---------------------------------------------------------------------------
 
@@ -287,29 +279,25 @@ public:
    * @brief Returns a 1D simplex noise fractal brownian motion sum with
    * analytical derivatives.
    */
-  Vector2 dfBm(float x, uint8_t octaves = 4, float lacunarity = 2.0f,
-               float gain = 0.5f);
+  Vector2 dfBm(float x, uint8_t octaves = 4, float lacunarity = 2.0f, float gain = 0.5f);
 
   /**
    * @brief Returns a 2D simplex noise fractal brownian motion sum with
    * analytical derivatives.
    */
-  Vector3 dfBm(const Vector2& v, uint8_t octaves = 4, float lacunarity = 2.0f,
-               float gain = 0.5f);
+  Vector3 dfBm(const Vector2& v, uint8_t octaves = 4, float lacunarity = 2.0f, float gain = 0.5f);
 
   /**
    * @brief Returns a 3D simplex noise fractal brownian motion sum with
    * analytical derivatives.
    */
-  Vector4 dfBm(const Vector3& v, uint8_t octaves = 4, float lacunarity = 2.0f,
-               float gain = 0.5f);
+  Vector4 dfBm(const Vector3& v, uint8_t octaves = 4, float lacunarity = 2.0f, float gain = 0.5f);
 
   /**
    * @brief Returns a 4D simplex noise fractal brownian motion sum with
    * analytical derivatives.
    */
-  vec5 dfBm(const Vector4& v, uint8_t octaves = 4, float lacunarity = 2.0f,
-            float gain = 0.5f);
+  vec5 dfBm(const Vector4& v, uint8_t octaves = 4, float lacunarity = 2.0f, float gain = 0.5f);
 
   // ---------------------------------------------------------------------------
 
@@ -320,8 +308,7 @@ public:
   }
 
   template <typename T>
-  float ridgedMF_t(const T& input, float ridgeOffset, uint8_t octaves,
-                   float lacunarity, float gain)
+  float ridgedMF_t(const T& input, float ridgeOffset, uint8_t octaves, float lacunarity, float gain)
   {
     float sum  = 0.f;
     float freq = 1.f;
@@ -341,29 +328,26 @@ public:
   /**
    * @brief Returns a 1D simplex ridged multi-fractal noise sum.
    */
-  float ridgedMF(float x, float ridgeOffset = 1.0f, uint8_t octaves = 4,
-                 float lacunarity = 2.0f, float gain = 0.5f);
+  float ridgedMF(float x, float ridgeOffset = 1.0f, uint8_t octaves = 4, float lacunarity = 2.0f,
+                 float gain = 0.5f);
 
   /**
    * @brief Returns a 2D simplex ridged multi-fractal noise sum.
    */
-  float ridgedMF(const Vector2& v, float ridgeOffset = 1.0f,
-                 uint8_t octaves = 4, float lacunarity = 2.0f,
-                 float gain = 0.5f);
+  float ridgedMF(const Vector2& v, float ridgeOffset = 1.0f, uint8_t octaves = 4,
+                 float lacunarity = 2.0f, float gain = 0.5f);
 
   /**
    * @brief Returns a 3D simplex ridged multi-fractal noise sum.
    */
-  float ridgedMF(const Vector3& v, float ridgeOffset = 1.0f,
-                 uint8_t octaves = 4, float lacunarity = 2.0f,
-                 float gain = 0.5f);
+  float ridgedMF(const Vector3& v, float ridgeOffset = 1.0f, uint8_t octaves = 4,
+                 float lacunarity = 2.0f, float gain = 0.5f);
 
   /**
    * @brief Returns a 4D simplex ridged multi-fractal noise sum.
    */
-  float ridgedMF(const Vector4& v, float ridgeOffset = 1.0f,
-                 uint8_t octaves = 4, float lacunarity = 2.0f,
-                 float gain = 0.5f);
+  float ridgedMF(const Vector4& v, float ridgeOffset = 1.0f, uint8_t octaves = 4,
+                 float lacunarity = 2.0f, float gain = 0.5f);
 
   // ---------------------------------------------------------------------------
 
@@ -371,15 +355,13 @@ public:
    * @brief Returns the 2D simplex noise fractal brownian motion sum variation
    * by Iñigo Quilez.
    */
-  float iqfBm(const Vector2& v, uint8_t octaves = 4, float lacunarity = 2.0f,
-              float gain = 0.5f);
+  float iqfBm(const Vector2& v, uint8_t octaves = 4, float lacunarity = 2.0f, float gain = 0.5f);
 
   /**
    * @brief Returns the 2D simplex noise fractal brownian motion sum variation
    * by Iñigo Quilez.
    */
-  float iqfBm(const Vector3& v, uint8_t octaves = 4, float lacunarity = 2.0f,
-              float gain = 0.5f);
+  float iqfBm(const Vector3& v, uint8_t octaves = 4, float lacunarity = 2.0f, float gain = 0.5f);
 
   // ---------------------------------------------------------------------------
 
@@ -401,10 +383,10 @@ private:
    * the noise values need to be scaled and offset to [0,1], like this:
    * float SLnoise = (SimplexNoise1234::noise(x,y,z) + 1.0) * 0.5;
    */
-  float grad(int hash, float x) const;
-  float grad(int hash, float x, float y) const;
-  float grad(int hash, float x, float y, float z) const;
-  float grad(int hash, float x, float y, float z, float t) const;
+  [[nodiscard]] float grad(int hash, float x) const;
+  [[nodiscard]] float grad(int hash, float x, float y) const;
+  [[nodiscard]] float grad(int hash, float x, float y, float z) const;
+  [[nodiscard]] float grad(int hash, float x, float y, float z, float t) const;
 
   /*
    * Helper functions to compute gradients in 1D to 4D
@@ -420,11 +402,9 @@ private:
    * gradients-dot-residualvectors in 2D and 3D.
    */
   void gradrot2(int hash, float sin_t, float cos_t, float* gx, float* gy);
-  void gradrot3(int hash, float sin_t, float cos_t, float* gx, float* gy,
-                float* gz);
-  float graddotp2(float gx, float gy, float x, float y) const;
-  float graddotp3(float gx, float gy, float gz, float x, float y,
-                  float z) const;
+  void gradrot3(int hash, float sin_t, float cos_t, float* gx, float* gy, float* gz);
+  [[nodiscard]] float graddotp2(float gx, float gy, float x, float y) const;
+  [[nodiscard]] float graddotp3(float gx, float gy, float gz, float x, float y, float z) const;
 
 private:
   /*

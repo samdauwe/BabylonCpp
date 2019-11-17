@@ -50,17 +50,18 @@ public:
    * @brief Gets the class name of the current intput.
    * @returns the class name
    */
-  std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
   /**
    * @brief Get the friendly name associated with the input class.
    * @returns the input friendly name
    */
-  std::string getSimpleName() const override;
+  [[nodiscard]] std::string getSimpleName() const override;
 
 private:
-  float computeDeltaFromMouseWheelLegacyEvent(const MouseWheelEvent& mouseWheelLegacyEvent,
-                                              float radius) const;
+  [[nodiscard]] float
+  computeDeltaFromMouseWheelLegacyEvent(const MouseWheelEvent& mouseWheelLegacyEvent,
+                                        float radius) const;
 
 public:
   /**

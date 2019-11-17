@@ -49,11 +49,11 @@ public:
    * @brief Clone, or make a deep copy of the plane.
    * @returns a new Plane
    */
-  Plane clone() const;
+  [[nodiscard]] Plane clone() const;
 
-  std::unique_ptr<Plane> cloneToNewObject() const;
+  [[nodiscard]] std::unique_ptr<Plane> cloneToNewObject() const;
   friend std::ostream& operator<<(std::ostream& os, const Plane& plane);
-  std::string toString() const;
+  [[nodiscard]] std::string toString() const;
 
   /**
    * @brief Flip the face of the plane.
@@ -75,8 +75,8 @@ public:
    * @param back Will contain the polygons begind the plane
    */
   void splitPolygon(const Polygon& polygon, std::vector<Polygon>& coplanarFront,
-                    std::vector<Polygon>& coplanarBack,
-                    std::vector<Polygon>& front, std::vector<Polygon>& back);
+                    std::vector<Polygon>& coplanarBack, std::vector<Polygon>& front,
+                    std::vector<Polygon>& back);
 
   /**
    * @brief Construct a plane from three points.
@@ -84,8 +84,7 @@ public:
    * @param b Point b
    * @param c Point c
    */
-  static std::pair<bool, Plane> FromPoints(const Vector3& a, const Vector3& b,
-                                           const Vector3& c);
+  static std::pair<bool, Plane> FromPoints(const Vector3& a, const Vector3& b, const Vector3& c);
 
 public:
   Vector3 normal;

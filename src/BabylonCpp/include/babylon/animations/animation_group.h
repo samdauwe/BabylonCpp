@@ -154,7 +154,7 @@ public:
    * @brief Serializes the animationGroup to an object.
    * @returns Serialized object
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   // Statics
 
@@ -170,7 +170,7 @@ public:
    * @brief Returns the string "AnimationGroup".
    * @returns "AnimationGroup"
    */
-  std::string getClassName() const;
+  [[nodiscard]] std::string getClassName() const;
 
   /**
    * @brief Creates a detailled string about the object
@@ -178,7 +178,7 @@ public:
    * levels of logging within scene loading
    * @returns a string representing the object
    */
-  std::string toString(bool fullDetails = false) const;
+  [[nodiscard]] std::string toString(bool fullDetails = false) const;
 
 protected:
   /**
@@ -194,27 +194,27 @@ private:
   /**
    * @brief Gets the first frame.
    */
-  float get_from() const;
+  [[nodiscard]] float get_from() const;
 
   /**
    * @brief Gets the last frame.
    */
-  float get_to() const;
+  [[nodiscard]] float get_to() const;
 
   /**
    * @brief Define if the animations are started.
    */
-  bool get_isStarted() const;
+  [[nodiscard]] bool get_isStarted() const;
 
   /**
    * @brief Gets a value indicating that the current group is playing.
    */
-  bool get_isPlaying() const;
+  [[nodiscard]] bool get_isPlaying() const;
 
   /**
    * @brief Gets the speed ratio to use for all animations.
    */
-  float get_speedRatio() const;
+  [[nodiscard]] float get_speedRatio() const;
 
   /**
    * @brief Sets the speed ratio to use for all animations.
@@ -224,7 +224,7 @@ private:
   /**
    * @brief Gets if all animations should loop or not.
    */
-  bool get_loopAnimation() const;
+  [[nodiscard]] bool get_loopAnimation() const;
 
   /**
    * @brief Sets if all animations should loop or not.

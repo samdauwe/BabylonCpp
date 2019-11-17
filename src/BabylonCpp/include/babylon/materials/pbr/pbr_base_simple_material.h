@@ -29,7 +29,7 @@ public:
   /**
    * @brief Returns the string "PBRBaseSimpleMaterial".
    */
-  std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
 public:
   /**
@@ -109,18 +109,18 @@ protected:
    * Specifies wether or not the alpha value of the albedo texture should be
    * used.
    */
-  bool _shouldUseAlphaFromAlbedoTexture() const;
+  [[nodiscard]] bool _shouldUseAlphaFromAlbedoTexture() const;
 
   /**
    * Number of Simultaneous lights allowed on the material.
    */
-  unsigned int get_maxSimultaneousLights() const;
+  [[nodiscard]] unsigned int get_maxSimultaneousLights() const;
   void set_maxSimultaneousLights(unsigned int value);
 
   /**
    * If sets to true, disables all the lights affecting the material.
    */
-  bool get_disableLighting() const;
+  [[nodiscard]] bool get_disableLighting() const;
   void set_disableLighting(bool value);
 
   /**
@@ -133,13 +133,13 @@ protected:
   /**
    * If sets to true, x component of normal map value will invert (x = 1.0 - x).
    */
-  bool get_invertNormalMapX() const;
+  [[nodiscard]] bool get_invertNormalMapX() const;
   void set_invertNormalMapX(bool value);
 
   /**
    * If sets to true, y component of normal map value will invert (y = 1.0 - y).
    */
-  bool get_invertNormalMapY() const;
+  [[nodiscard]] bool get_invertNormalMapY() const;
   void set_invertNormalMapY(bool value);
 
   /**
@@ -163,7 +163,7 @@ protected:
   /**
    * Occlusion Channel Strenght.
    */
-  float get_occlusionStrength() const;
+  [[nodiscard]] float get_occlusionStrength() const;
   void set_occlusionStrength(float value);
 
   /**
@@ -175,13 +175,13 @@ protected:
   /**
    * Defines the alpha limits in alpha test mode.
    */
-  float get_alphaCutOff() const;
+  [[nodiscard]] float get_alphaCutOff() const;
   void set_alphaCutOff(float value);
 
   /**
    * @brief Gets the current double sided mode.
    */
-  bool get_doubleSided() const;
+  [[nodiscard]] bool get_doubleSided() const;
 
   /**
    * @brief If sets to true and backfaceCulling is false, normals will be
@@ -199,7 +199,7 @@ protected:
    * If true, the light map contains occlusion information instead of lighting
    * info.
    */
-  bool get_useLightmapAsShadowmap() const;
+  [[nodiscard]] bool get_useLightmapAsShadowmap() const;
   void set_useLightmapAsShadowmap(bool value);
 
 }; // end of class PBRBaseSimpleMaterial

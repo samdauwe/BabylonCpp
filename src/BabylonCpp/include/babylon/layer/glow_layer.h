@@ -64,7 +64,7 @@ public:
    * @brief Get the effect name of the layer.
    * @return The effect name
    */
-  std::string getEffectName() const override;
+  [[nodiscard]] std::string getEffectName() const override;
 
   /**
    * @brief Checks for the readiness of the element composing the layer.
@@ -81,7 +81,7 @@ public:
    * @brief Returns wether or nood the layer needs stencil enabled during the
    * mesh rendering.
    */
-  bool needStencil() const override;
+  [[nodiscard]] bool needStencil() const override;
 
   /**
    * @brief Add a mesh in the exclusion list to prevent it to impact or being
@@ -130,13 +130,13 @@ public:
    * @brief Gets the class name of the effect layer.
    * @returns the string with the class name of the effect layer
    */
-  std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
   /**
    * @brief Serializes this glow layer.
    * @returns a serialized glow layer object
    */
-  json serialize() const override;
+  [[nodiscard]] json serialize() const override;
 
   /**
    * @brief Creates a Glow Layer from parsed glow layer data.
@@ -166,7 +166,7 @@ protected:
   /**
    * @brief Gets the kernel size of the blur.
    */
-  float get_blurKernelSize() const;
+  [[nodiscard]] float get_blurKernelSize() const;
 
   /**
    * @brief Sets the glow intensity.
@@ -176,7 +176,7 @@ protected:
   /**
    * @brief Gets the glow intensity.
    */
-  float get_intensity() const;
+  [[nodiscard]] float get_intensity() const;
 
   /**
    * @brief Create the merge effect. This is the shader use to blit the
@@ -196,7 +196,8 @@ protected:
    * @param material The material used on the mesh
    * @returns true if it can be rendered otherwise false
    */
-  bool _canRenderMesh(const AbstractMeshPtr& mesh, const MaterialPtr& material) const override;
+  [[nodiscard]] bool _canRenderMesh(const AbstractMeshPtr& mesh,
+                                    const MaterialPtr& material) const override;
 
   /**
    * @brief Implementation specific of rendering the generating effect on the

@@ -16,7 +16,7 @@ class BABYLON_SHARED_EXPORT IRenderableScene {
 
 public:
   IRenderableScene(ICanvas* canvas = nullptr); // The canvas can be set later via initialize()
-  virtual ~IRenderableScene(); // = default
+  virtual ~IRenderableScene();                 // = default
 
   void initialize(ICanvas* canvas = nullptr);
 
@@ -24,8 +24,8 @@ public:
   virtual const char* getName()                               = 0;
   virtual void initializeScene(ICanvas* canvas, Scene* scene) = 0;
 
-  Scene* getScene() const;
-  Engine* getEngine() const;
+  [[nodiscard]] Scene* getScene() const;
+  [[nodiscard]] Engine* getEngine() const;
 
 protected:
   std::function<void()> _renderFunction;

@@ -19,9 +19,8 @@ struct BABYLON_SHARED_EXPORT NavigationPolygon {
 
   bool operator==(const NavigationPolygon& rhs) const
   {
-    return (id == rhs.id) && (vertexIds == rhs.vertexIds)
-           && (centroid == rhs.centroid) && (normal == rhs.normal)
-           && (neighbours == rhs.neighbours) && (portals == rhs.portals)
+    return (id == rhs.id) && (vertexIds == rhs.vertexIds) && (centroid == rhs.centroid)
+           && (normal == rhs.normal) && (neighbours == rhs.neighbours) && (portals == rhs.portals)
            && (hasGroup == rhs.hasGroup) && (group == rhs.group);
   }
 }; // end of struct NavigationPolygon
@@ -41,9 +40,8 @@ struct BABYLON_SHARED_EXPORT NavigationGroup {
 
   bool operator==(const NavigationGroup& rhs) const
   {
-    return (id == rhs.id) && (neighbours == rhs.neighbours)
-           && (vertexIds == rhs.vertexIds) && (centroid == rhs.centroid)
-           && (portals == rhs.portals);
+    return (id == rhs.id) && (neighbours == rhs.neighbours) && (vertexIds == rhs.vertexIds)
+           && (centroid == rhs.centroid) && (portals == rhs.portals);
   }
 }; // end of struct NavigationGroup
 
@@ -69,7 +67,7 @@ struct NavigationGroupGraph {
     return groups[groupId];
   }
 
-  std::size_t size() const
+  [[nodiscard]] std::size_t size() const
   {
     return groups.size();
   }
@@ -79,7 +77,7 @@ struct NavigationGroupGraph {
     return groups.begin();
   }
 
-  const_iterator begin() const
+  [[nodiscard]] const_iterator begin() const
   {
     return groups.begin();
   }
@@ -89,31 +87,30 @@ struct NavigationGroupGraph {
     return groups.end();
   }
 
-  const_iterator end() const
+  [[nodiscard]] const_iterator end() const
   {
     return groups.end();
   }
 
-  const NavigationGroup& group(const std::size_t groupId) const
+  [[nodiscard]] const NavigationGroup& group(const std::size_t groupId) const
   {
     return groups[groupId];
   }
 
-  float cost(const std::size_t /*groupId1*/,
-             const NavigationGroup& group2) const
+  [[nodiscard]] float cost(const std::size_t /*groupId1*/, const NavigationGroup& group2) const
   {
     return group(group2.id).cost;
   }
 
-  float heuristicCostEstimate(const NavigationGroup& group1,
-                              const NavigationGroup& group2) const
+  [[nodiscard]] float heuristicCostEstimate(const NavigationGroup& group1,
+                                            const NavigationGroup& group2) const
   {
     auto pos1 = group(group1.id).centroid;
     auto pos2 = group(group2.id).centroid;
     return Vector3::DistanceSquared(pos1, pos2);
   }
 
-  std::vector<NavigationGroup> neighbors(const std::size_t groupId) const
+  [[nodiscard]] std::vector<NavigationGroup> neighbors(const std::size_t groupId) const
   {
     std::vector<NavigationGroup> ret;
     auto& group = groups[groupId];

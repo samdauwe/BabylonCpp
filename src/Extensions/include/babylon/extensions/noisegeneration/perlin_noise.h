@@ -54,7 +54,7 @@ public:
    * @param x X value.
    * @return 1D Perlin noise value.
    */
-  double noise(double x) const;
+  [[nodiscard]] double noise(double x) const;
 
   /**
    * @brief Returns 2D Perlin noise value.
@@ -62,7 +62,7 @@ public:
    * @param y Y value.
    * @return 2D Perlin noise value.
    */
-  double noise(double x, double y) const;
+  [[nodiscard]] double noise(double x, double y) const;
 
   /**
    * @brief Returns 3D Perlin noise value.
@@ -71,7 +71,7 @@ public:
    * @param z Z value.
    * @return 3D Perlin noise value
    */
-  double noise(double x, double y, double z) const;
+  [[nodiscard]] double noise(double x, double y, double z) const;
 
 private:
   // The permutation vector
@@ -84,17 +84,17 @@ class PerlinNoiseOctave {
 public:
   PerlinNoiseOctave(int octaves, uint32_t seed = 0);
 
-  double noise(double x) const
+  [[nodiscard]] double noise(double x) const
   {
     return noise(x, 0, 0);
   }
 
-  double noise(double x, double y) const
+  [[nodiscard]] double noise(double x, double y) const
   {
     return noise(x, y, 0);
   }
 
-  double noise(double x, double y, double z) const;
+  [[nodiscard]] double noise(double x, double y, double z) const;
 
 private:
   PerlinNoise _perlinNoise;

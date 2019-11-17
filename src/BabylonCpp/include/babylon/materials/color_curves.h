@@ -33,26 +33,26 @@ public:
   ColorCurves(ColorCurves&& other);                 // Move constructor
   ColorCurves& operator=(const ColorCurves& other); // Copy assignment operator
   ColorCurves& operator=(ColorCurves&& other);      // Move assignment operator
-  ~ColorCurves(); // = default
+  ~ColorCurves();                                   // = default
 
   /**
    * @brief Returns the class name.
    * @returns The class name
    */
-  std::string getClassName() const;
+  [[nodiscard]] std::string getClassName() const;
 
   /**
    * @brief Clones the current color curve instance.
    * @return The cloned curves
    */
-  std::unique_ptr<ColorCurves> clone() const;
+  [[nodiscard]] std::unique_ptr<ColorCurves> clone() const;
 
   /**
    * @brief Serializes the current color curve instance to a json
    * representation.
    * @return a JSON representation
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Binds the color curves to the shader.
@@ -62,11 +62,10 @@ public:
    * @param neutralUniform The neutral uniform shader parameter
    * @param negativeUniform The negative uniform shader parameter
    */
-  static void
-  Bind(ColorCurves& colorCurves, Effect* effect,
-       const std::string& positiveUniform = "vCameraColorCurvePositive",
-       const std::string& neutralUniform  = "vCameraColorCurveNeutral",
-       const std::string& negativeUniform = "vCameraColorCurveNegative");
+  static void Bind(ColorCurves& colorCurves, Effect* effect,
+                   const std::string& positiveUniform = "vCameraColorCurvePositive",
+                   const std::string& neutralUniform  = "vCameraColorCurveNeutral",
+                   const std::string& negativeUniform = "vCameraColorCurveNegative");
 
   /**
    * @brief Prepare the list of uniforms associated with the ColorCurves
@@ -84,8 +83,8 @@ public:
    * @param exposure The exposure.
    * @param result The result data container.
    */
-  void getColorGradingDataToRef(float hue, float density, float saturation,
-                                float exposure, Color4& result);
+  void getColorGradingDataToRef(float hue, float density, float saturation, float exposure,
+                                Color4& result);
   /**
    * @brief Takes an input slider value and returns an adjusted value that
    * provides extra control near the centre.
@@ -102,8 +101,7 @@ public:
    * @param brightness The brightness (B) input.
    * @result An RGBA color represented as Vector4.
    */
-  static void fromHSBToRef(float hue, float saturation, float brightness,
-                           Color4& result);
+  static void fromHSBToRef(float hue, float saturation, float brightness, Color4& result);
 
   /**
    * @brief Returns a value clamped between min and max
@@ -127,7 +125,7 @@ protected:
    * The hue value is a standard HSB hue in the range [0,360] where 0=red,
    * 120=green and 240=blue. The default value is 30 degrees (orange).
    */
-  float get_globalHue() const;
+  [[nodiscard]] float get_globalHue() const;
 
   /**
    * @brief Sets the global Hue value.
@@ -142,7 +140,7 @@ protected:
    * has no effect and +100 means the color filter has maximum effect.
    * Values less than zero provide a filter of opposite hue.
    */
-  float get_globalDensity() const;
+  [[nodiscard]] float get_globalDensity() const;
 
   /**
    * @brief Sets the global Density value.
@@ -158,7 +156,7 @@ protected:
    * value of 0.0 makes no adjustment, positive values increase saturation and
    * negative values decrease saturation.
    */
-  float get_globalSaturation() const;
+  [[nodiscard]] float get_globalSaturation() const;
 
   /**
    * @brief Sets the global Saturation value.
@@ -174,7 +172,7 @@ protected:
    * value of 0.0 makes no adjustment, positive values increase exposure and
    * negative values decrease exposure.
    */
-  float get_globalExposure() const;
+  [[nodiscard]] float get_globalExposure() const;
 
   /**
    * @brief Sets the global Exposure value.
@@ -189,7 +187,7 @@ protected:
    * The hue value is a standard HSB hue in the range [0,360] where 0=red,
    * 120=green and 240=blue. The default value is 30 degrees (orange).
    */
-  float get_highlightsHue() const;
+  [[nodiscard]] float get_highlightsHue() const;
 
   /**
    * @brief Sets the highlights Hue value.
@@ -204,7 +202,7 @@ protected:
    * has no effect and +100 means the color filter has maximum effect.
    * Values less than zero provide a filter of opposite hue.
    */
-  float get_highlightsDensity() const;
+  [[nodiscard]] float get_highlightsDensity() const;
 
   /**
    * @brief Sets the highlights Density value.
@@ -220,7 +218,7 @@ protected:
    * value of 0.0 makes no adjustment, positive values increase saturation and
    * negative values decrease saturation.
    */
-  float get_highlightsSaturation() const;
+  [[nodiscard]] float get_highlightsSaturation() const;
 
   /**
    * @brief Sets the highlights Saturation value.
@@ -236,7 +234,7 @@ protected:
    * value of 0.0 makes no adjustment, positive values increase exposure and
    * negative values decrease exposure.
    */
-  float get_highlightsExposure() const;
+  [[nodiscard]] float get_highlightsExposure() const;
 
   /**
    * @brief Sets the highlights Exposure value.
@@ -251,7 +249,7 @@ protected:
    * The hue value is a standard HSB hue in the range [0,360] where 0=red,
    * 120=green and 240=blue. The default value is 30 degrees (orange).
    */
-  float get_midtonesHue() const;
+  [[nodiscard]] float get_midtonesHue() const;
 
   /**
    * @brief Sets the midtones Hue value.
@@ -266,7 +264,7 @@ protected:
    * has no effect and +100 means the color filter has maximum effect.
    * Values less than zero provide a filter of opposite hue.
    */
-  float get_midtonesDensity() const;
+  [[nodiscard]] float get_midtonesDensity() const;
 
   /**
    * @brief Sets the midtones Density value.
@@ -282,7 +280,7 @@ protected:
    * value of 0.0 makes no adjustment, positive values increase saturation and
    * negative values decrease saturation.
    */
-  float get_midtonesSaturation() const;
+  [[nodiscard]] float get_midtonesSaturation() const;
 
   /**
    * @brief Sets the midtones Saturation value.
@@ -298,7 +296,7 @@ protected:
    * value of 0.0 makes no adjustment, positive values increase exposure and
    * negative values decrease exposure.
    */
-  float get_midtonesExposure() const;
+  [[nodiscard]] float get_midtonesExposure() const;
 
   /**
    * @brief Sets the midtones Exposure value.
@@ -313,7 +311,7 @@ protected:
    * The hue value is a standard HSB hue in the range [0,360] where 0=red,
    * 120=green and 240=blue. The default value is 30 degrees (orange).
    */
-  float get_shadowsHue() const;
+  [[nodiscard]] float get_shadowsHue() const;
 
   /**
    * @brief Sets the shadows Hue value.
@@ -328,7 +326,7 @@ protected:
    * has no effect and +100 means the color filter has maximum effect.
    * Values less than zero provide a filter of opposite hue.
    */
-  float get_shadowsDensity() const;
+  [[nodiscard]] float get_shadowsDensity() const;
 
   /**
    * @brief Sets the shadows Density value.
@@ -344,7 +342,7 @@ protected:
    * value of 0.0 makes no adjustment, positive values increase saturation and
    * negative values decrease saturation.
    */
-  float get_shadowsSaturation() const;
+  [[nodiscard]] float get_shadowsSaturation() const;
 
   /**
    * @brief Sets the shadows Saturation value.
@@ -360,7 +358,7 @@ protected:
    * value of 0.0 makes no adjustment, positive values increase exposure and
    * negative values decrease exposure.
    */
-  float get_shadowsExposure() const;
+  [[nodiscard]] float get_shadowsExposure() const;
 
   /**
    * @brief Sets the shadows Exposure value.

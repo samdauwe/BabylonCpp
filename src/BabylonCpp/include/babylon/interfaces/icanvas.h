@@ -15,36 +15,29 @@ class BABYLON_SHARED_EXPORT ICanvas {
 public:
   ICanvas();
   virtual ~ICanvas(); // = default
-  virtual ClientRect& getBoundingClientRect()       = 0;
-  virtual bool onlyRenderBoundingClientRect() const = 0;
-  virtual bool initializeContext3d()                = 0;
-  virtual ICanvasRenderingContext2D* getContext2d() = 0;
-  virtual GL::IGLRenderingContext* getContext3d(const EngineOptions& options)
-    = 0;
+  virtual ClientRect& getBoundingClientRect()                                 = 0;
+  [[nodiscard]] virtual bool onlyRenderBoundingClientRect() const             = 0;
+  virtual bool initializeContext3d()                                          = 0;
+  virtual ICanvasRenderingContext2D* getContext2d()                           = 0;
+  virtual GL::IGLRenderingContext* getContext3d(const EngineOptions& options) = 0;
   // Event listeners
-  void
-  addMouseEventListener(EventType type,
-                        const std::function<void(PointerEvent&& evt)>& listener,
-                        bool useCapture = false);
-  void
-  addKeyEventListener(EventType type,
-                      const std::function<void(KeyboardEvent&& evt)>& listener,
-                      bool useCapture = false);
-  void removeMouseEventListener(
-    EventType type, const std::function<void(PointerEvent&& evt)>& listener);
-  void removeKeyEventListener(
-    EventType type, const std::function<void(KeyboardEvent&& evt)>& listener);
+  void addMouseEventListener(EventType type,
+                             const std::function<void(PointerEvent&& evt)>& listener,
+                             bool useCapture = false);
+  void addKeyEventListener(EventType type, const std::function<void(KeyboardEvent&& evt)>& listener,
+                           bool useCapture = false);
+  void removeMouseEventListener(EventType type,
+                                const std::function<void(PointerEvent&& evt)>& listener);
+  void removeKeyEventListener(EventType type,
+                              const std::function<void(KeyboardEvent&& evt)>& listener);
 
   void setFrameSize(int width, int height);
   void onError(int errorId, const char* errorDesc);
   // User unput handling
-  void onMouseButtonDown(bool ctrlKey, bool shiftKey, int mouseX, int mouseY,
-                         MouseButtonType btn);
-  void onMouseButtonUp(bool ctrlKey, bool shiftKey, int mouseX, int mouseY,
-                       MouseButtonType btn);
+  void onMouseButtonDown(bool ctrlKey, bool shiftKey, int mouseX, int mouseY, MouseButtonType btn);
+  void onMouseButtonUp(bool ctrlKey, bool shiftKey, int mouseX, int mouseY, MouseButtonType btn);
   void onMouseMove(bool ctrlKey, bool shiftKey, int mouseX, int mouseY);
-  void onMouseWheel(bool ctrlKey, bool shiftKey, int mouseX, int mouseY,
-                    float wheelDelta);
+  void onMouseWheel(bool ctrlKey, bool shiftKey, int mouseX, int mouseY, float wheelDelta);
   void onKeyDown(bool ctrlKey, bool altKey, int keyCode, std::string code);
   void onKeyUp(bool ctrlKey, bool altKey, int keyCode, std::string code);
 
@@ -67,10 +60,8 @@ public:
 
 protected:
   std::unique_ptr<GL::IGLRenderingContext> _renderingContext;
-  std::vector<std::vector<std::function<void(PointerEvent&& evt)>>>
-    mouseEventListeners;
-  std::vector<std::vector<std::function<void(KeyboardEvent&& evt)>>>
-    keyEventListeners;
+  std::vector<std::vector<std::function<void(PointerEvent&& evt)>>> mouseEventListeners;
+  std::vector<std::vector<std::function<void(KeyboardEvent&& evt)>>> keyEventListeners;
 
 protected:
   bool _initialized;

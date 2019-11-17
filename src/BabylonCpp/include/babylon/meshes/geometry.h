@@ -79,7 +79,7 @@ public:
    * @brief Defines if the geometry is ready to use.
    * @returns true if the geometry is ready to be used
    */
-  bool isReady() const;
+  [[nodiscard]] bool isReady() const;
 
   /**
    * @brief Hidden
@@ -151,7 +151,7 @@ public:
    * @brief Gets total number of vertices.
    * @returns the total number of vertices
    */
-  size_t getTotalVertices() const;
+  [[nodiscard]] size_t getTotalVertices() const;
 
   /**
    * @brief Gets a specific vertex data attached to this geometry. Float data is constructed if the
@@ -171,7 +171,7 @@ public:
    * @param kind defines the data kind (Position, normal, etc...)
    * @returns true if the vertex buffer with the specified kind is updatable
    */
-  bool isVertexBufferUpdatable(const std::string& kind) const;
+  [[nodiscard]] bool isVertexBufferUpdatable(const std::string& kind) const;
 
   /**
    * @brief Gets a specific vertex buffer.
@@ -192,7 +192,7 @@ public:
    * @param kind defines the data kind (Position, normal, etc...)
    * @returns true if data is present
    */
-  bool isVerticesDataPresent(const std::string& kind) const override;
+  [[nodiscard]] bool isVerticesDataPresent(const std::string& kind) const override;
 
   /**
    * @brief Gets a list of all attached data kinds (Position, normal, etc...).
@@ -287,7 +287,7 @@ public:
    * @brief Gets a value indicating if the geometry is disposed.
    * @returns true if the geometry was disposed
    */
-  bool isDisposed() const;
+  [[nodiscard]] bool isDisposed() const;
 
   /**
    * @brief Free all associated resources.
@@ -305,13 +305,13 @@ public:
    * @brief Serialize the current geometry info (and not the vertices data) into a JSON object.
    * @return a JSON representation of the current geometry data (without the vertices data)
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Serialize all vertices data into a JSON oject.
    * @returns a JSON representation of the current geometry data
    */
-  json serializeVerticeData() const;
+  [[nodiscard]] json serializeVerticeData() const;
 
   /** Statics **/
 
@@ -388,7 +388,7 @@ protected:
   /**
    * @brief Gets a value indicating that the geometry should not be serialized.
    */
-  bool get_doNotSerialize() const;
+  [[nodiscard]] bool get_doNotSerialize() const;
 
 private:
   void _updateBoundingInfo(bool updateExtends, const Float32Array& data);

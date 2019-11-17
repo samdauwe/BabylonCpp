@@ -24,16 +24,13 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT AnimationValue {
 
 public:
-  using AnimationValueType =
-        std::variant<bool, int, float, std::string, Size, Color3, Color4, Vector2,
-                   Vector3, Quaternion, Matrix, Float32Array>;
+  using AnimationValueType = std::variant<bool, int, float, std::string, Size, Color3, Color4,
+                                          Vector2, Vector3, Quaternion, Matrix, Float32Array>;
 
 public:
   AnimationValue();
 
-  template <typename T,
-            typename
-            = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+  template <typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
   AnimationValue(T value)
   {
     if (!isNan(value)) {
@@ -41,9 +38,7 @@ public:
     }
   }
 
-  template <typename T,
-            typename
-            = typename std::enable_if<!std::is_arithmetic<T>::value, T>::type>
+  template <typename T, typename = typename std::enable_if<!std::is_arithmetic<T>::value, T>::type>
   AnimationValue(const T& value)
   {
     _value = value;
@@ -56,7 +51,7 @@ public:
   }
 
   template <typename T>
-  const T& get() const
+  [[nodiscard]] const T& get() const
   {
     return std::get<T>(_value.value());
   }
@@ -71,14 +66,14 @@ public:
   AnimationValue operator-(const AnimationValue& fromValue);
   AnimationValue operator!();
   AnimationValue operator[](const std::string& property);
-  AnimationValue copy() const;
+  [[nodiscard]] AnimationValue copy() const;
 
   operator bool() const
   {
     return _value.has_value();
   }
 
-  std::optional<unsigned int> animationType() const;
+  [[nodiscard]] std::optional<unsigned int> animationType() const;
 
 private:
   std::optional<AnimationValueType> _value;

@@ -17,12 +17,9 @@ template <typename T>
 class TreeNode {
 
 public:
-  using node_iterator =
-    typename std::vector<std::unique_ptr<TreeNode<T>>>::iterator;
-  using const_node_iterator =
-    typename std::vector<std::unique_ptr<TreeNode<T>>>::const_iterator;
-  using size_type =
-    typename std::vector<std::unique_ptr<TreeNode<T>>>::size_type;
+  using node_iterator       = typename std::vector<std::unique_ptr<TreeNode<T>>>::iterator;
+  using const_node_iterator = typename std::vector<std::unique_ptr<TreeNode<T>>>::const_iterator;
+  using size_type           = typename std::vector<std::unique_ptr<TreeNode<T>>>::size_type;
 
 public:
   /**
@@ -42,7 +39,7 @@ public:
    * @brief Returns the unique node identifier.
    * @return The unique node identifier.
    */
-  size_type id() const
+  [[nodiscard]] size_type id() const
   {
     return _id;
   }
@@ -60,7 +57,7 @@ public:
    * @brief Returns the data object stored in the node.
    * @return The data object stored in the node.
    */
-  const T& data() const
+  [[nodiscard]] const T& data() const
   {
     return _data;
   }
@@ -78,7 +75,7 @@ public:
    * @brief Returns whether or not this node is the root node.
    * @return true if this node is the root node, false otherwise.
    */
-  bool isRoot() const
+  [[nodiscard]] bool isRoot() const
   {
     return _parent == nullptr;
   }
@@ -87,7 +84,7 @@ public:
    * @brief Returns the number of child nodes.
    * @return The number of child nodes.
    */
-  size_type arity() const
+  [[nodiscard]] size_type arity() const
   {
     return _children.size();
   }
@@ -96,7 +93,7 @@ public:
    * @brief Returns whether or not this node is a leaf node.
    * @return true if this node is a leaf node, false otherwise.
    */
-  bool isLeaf() const
+  [[nodiscard]] bool isLeaf() const
   {
     return _children.empty();
   }
@@ -114,7 +111,7 @@ public:
    * @brief Returns a pointer to the parent node.
    * @return A pointer to the parent node.
    */
-  const TreeNode<T>* parent() const
+  [[nodiscard]] const TreeNode<T>* parent() const
   {
     return _parent;
   }
@@ -126,7 +123,7 @@ public:
     return _children.begin();
   }
 
-  const_node_iterator child_begin() const
+  [[nodiscard]] const_node_iterator child_begin() const
   {
     return _children.begin();
   }
@@ -136,7 +133,7 @@ public:
     return _children.end();
   }
 
-  const_node_iterator child_end() const
+  [[nodiscard]] const_node_iterator child_end() const
   {
     return _children.end();
   }
@@ -145,7 +142,7 @@ public:
    * @brief Returns a pointer to the first child.
    * @return A pointer to the first child.
    */
-  TreeNode<T>* firstChild() const
+  [[nodiscard]] TreeNode<T>* firstChild() const
   {
     return _children.front().get();
   }
@@ -154,7 +151,7 @@ public:
    * @brief Returns a pointer to the last child.
    * @return A pointer to the last child.
    */
-  TreeNode<T>* lastChild() const
+  [[nodiscard]] TreeNode<T>* lastChild() const
   {
     return _children.back().get();
   }
@@ -187,18 +184,15 @@ public:
    * sorted vector.
    * @return Reference to the created node.
    */
-  TreeNode<T>&
-  addChildSorted(T data,
-                 const std::function<bool(const T& a, const T& b)>& comparator)
+  TreeNode<T>& addChildSorted(T data, const std::function<bool(const T& a, const T& b)>& comparator)
   {
     auto node     = std::make_unique<TreeNode<T>>(data);
     node->_parent = this;
-    auto pos      = std::find_if(
-      _children.begin(), _children.end(),
-      [&node, &comparator](const std::unique_ptr<TreeNode<T>>& treeNode) {
-        return comparator(node->data(), treeNode->data());
-      });
-    auto it = _children.insert(pos, std::move(node));
+    auto pos      = std::find_if(_children.begin(), _children.end(),
+                            [&node, &comparator](const std::unique_ptr<TreeNode<T>>& treeNode) {
+                              return comparator(node->data(), treeNode->data());
+                            });
+    auto it       = _children.insert(pos, std::move(node));
     return *(*it);
   }
 
@@ -207,7 +201,7 @@ public:
    * the root node of the tree.
    * @return The node level.
    */
-  unsigned int depth() const
+  [[nodiscard]] unsigned int depth() const
   {
     if (isRoot()) {
       return 0;
@@ -291,7 +285,7 @@ public:
    * @brief Returns a const reference to the root node.
    * @return A const reference to the root node.
    */
-  const TreeNode<T>& root() const
+  [[nodiscard]] const TreeNode<T>& root() const
   {
     return *_root;
   }
@@ -309,7 +303,7 @@ public:
    * @brief Returns the root const pointer.
    * @return The root const pointer.
    */
-  const std::unique_ptr<TreeNode<T>>& rootPtr() const
+  [[nodiscard]] const std::unique_ptr<TreeNode<T>>& rootPtr() const
   {
     return _root;
   }
@@ -320,9 +314,8 @@ public:
    * @param node the node to visit
    * @param visitor callback lambda
    */
-  static void
-  recursive_visit(TreeNode<T>& node,
-                  const std::function<void(TreeNode<T>& node)>& visitor)
+  static void recursive_visit(TreeNode<T>& node,
+                              const std::function<void(TreeNode<T>& node)>& visitor)
   {
     if (node.isLeaf()) {
       visitor(node);
@@ -339,7 +332,7 @@ public:
    * @brief Returns an interator to the top level node.
    * @return An interator to the root node.
    */
-  iterator begin() const
+  [[nodiscard]] iterator begin() const
   {
     const auto& rootOfTree = _root.get();
     return iterator(rootOfTree, rootOfTree);
@@ -349,7 +342,7 @@ public:
    * @brief Returns an interator to the end of the tree.
    * @return An interator to end of the tree (= nullptr node).
    */
-  iterator end() const
+  [[nodiscard]] iterator end() const
   {
     const auto& rootOfTree = _root.get();
     return iterator(nullptr, rootOfTree);
@@ -359,7 +352,7 @@ public:
    * @brief Returns a const interator to the top level node.
    * @return A const interator to the root node.
    */
-  const_iterator cbegin() const
+  [[nodiscard]] const_iterator cbegin() const
   {
     return begin();
   }
@@ -368,7 +361,7 @@ public:
    * @brief Returns a const interator to the end of the tree.
    * @return A const interator to end of the tree (= nullptr node).
    */
-  const_iterator cend() const
+  [[nodiscard]] const_iterator cend() const
   {
     return end();
   }
@@ -377,7 +370,7 @@ public:
    * @brief Returns the number of nodes (including the root node) in the tree.
    * @return Number of nodes (including the root node) in the tree.
    */
-  size_t size() const
+  [[nodiscard]] size_t size() const
   {
     auto distance = std::distance(begin(), end());
     return (distance >= 0) ? static_cast<size_t>(distance) : 0ull;
@@ -421,8 +414,7 @@ public:
  * iterators, so we pick the lighter iterator approach (manually backtracking).
  */
 template <typename T>
-class Tree<T>::iterator
-    : public std::iterator<std::bidirectional_iterator_tag, T> {
+class Tree<T>::iterator : public std::iterator<std::bidirectional_iterator_tag, T> {
 
 public:
   /**
@@ -430,8 +422,7 @@ public:
    * @param nodePtr pointer to the node
    * @param root pointer to root
    */
-  iterator(const TreeNode<T>* nodePtr, const TreeNode<T>* root)
-      : _nodePtr{nodePtr}, _root{root}
+  iterator(const TreeNode<T>* nodePtr, const TreeNode<T>* root) : _nodePtr{nodePtr}, _root{root}
   {
   }
 
@@ -544,8 +535,8 @@ std::size_t TreeNode<T>::uid = 0;
 
 // For debugging
 template <typename T>
-std::basic_iostream<char>::basic_ostream&
-operator<<(std::basic_iostream<char>::basic_ostream& out, const Tree<T>& tree)
+std::basic_iostream<char>::basic_ostream& operator<<(std::basic_iostream<char>::basic_ostream& out,
+                                                     const Tree<T>& tree)
 {
   using node_t = std::unique_ptr<TreeNode<T>>;
   std::vector<char> depth;
@@ -563,18 +554,17 @@ operator<<(std::basic_iostream<char>::basic_ostream& out, const Tree<T>& tree)
 
   const auto pop = [&]() { depth[di -= 4] = 0; };
 
-  const std::function<void(const node_t& tree)> print
-    = [&](const node_t& tree) {
-        out << "(" << tree->data() << ")\n";
-        const auto& children = tree->children();
-        for (const auto& child : children) {
-          const std::string depthString(depth.begin(), depth.end());
-          out << depthString.c_str() << " └─-";
-          push(' ');
-          print(child);
-          pop();
-        }
-      };
+  const std::function<void(const node_t& tree)> print = [&](const node_t& tree) {
+    out << "(" << tree->data() << ")\n";
+    const auto& children = tree->children();
+    for (const auto& child : children) {
+      const std::string depthString(depth.begin(), depth.end());
+      out << depthString.c_str() << " └─-";
+      push(' ');
+      print(child);
+      pop();
+    }
+  };
 
   print(tree.rootPtr());
 

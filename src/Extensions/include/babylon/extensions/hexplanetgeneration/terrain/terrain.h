@@ -1,8 +1,8 @@
 #ifndef BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_TERRAIN_TERRAIN_H
 #define BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_TERRAIN_TERRAIN_H
 
-#include <string>
 #include <memory>
+#include <string>
 
 #include <babylon/babylon_api.h>
 
@@ -26,12 +26,12 @@ public:
   /**
    * Get the color depending upon the tile from the TerrainColor object.
    */
-  Color3 getColor(float u, float v) const;
+  [[nodiscard]] Color3 getColor(float u, float v) const;
 
   /**
    * Get height depending upon the tile, from the TerrainHeightmap object
    */
-  Color3 getHeight(float u, float v) const;
+  [[nodiscard]] Color3 getHeight(float u, float v) const;
 
 private:
   std::string _seed;

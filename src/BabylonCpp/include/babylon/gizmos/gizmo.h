@@ -54,7 +54,7 @@ protected:
   /**
    * @brief Sets the ratio for the scale of the gizmo (Default: 1).
    */
-  virtual float get_scaleRatio() const;
+  [[nodiscard]] virtual float get_scaleRatio() const;
 
   /**
    * @brief Gets the mesh that the gizmo will be attached to. (eg. on a drag
@@ -78,7 +78,7 @@ protected:
    * @brief Gets if set the gizmo's position will be updated to match the
    * attached mesh each frame (Default: true).
    */
-  virtual bool get_updateGizmoRotationToMatchAttachedMesh() const;
+  [[nodiscard]] virtual bool get_updateGizmoRotationToMatchAttachedMesh() const;
 
   /**
    * @brief Hidden

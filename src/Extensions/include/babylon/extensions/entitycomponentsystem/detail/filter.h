@@ -64,7 +64,7 @@ public:
   {
   }
 
-  bool doesPassFilter(const ComponentTypeList& typeList) const;
+  [[nodiscard]] bool doesPassFilter(const ComponentTypeList& typeList) const;
 
 private:
   ComponentTypeList m_requires;
@@ -81,8 +81,7 @@ template <class T, class... Args>
 static ComponentTypeList types(detail::TypeList<T, Args...> /*typeList*/)
 {
   static_assert(std::is_base_of<Component, T>::value, "Invalid component");
-  return ComponentTypeList().set(ComponentTypeId<T>())
-         | types(detail::TypeList<Args...>());
+  return ComponentTypeList().set(ComponentTypeId<T>()) | types(detail::TypeList<Args...>());
 }
 
 template <class RequireList, class ExcludeList>

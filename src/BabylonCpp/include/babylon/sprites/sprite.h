@@ -25,8 +25,7 @@ public:
   template <typename... Ts>
   static SpritePtr New(Ts&&... args)
   {
-    auto sprite
-      = std::shared_ptr<Sprite>(new Sprite(std::forward<Ts>(args)...));
+    auto sprite = std::shared_ptr<Sprite>(new Sprite(std::forward<Ts>(args)...));
     sprite->addToSpriteManager(sprite);
 
     return sprite;
@@ -76,7 +75,7 @@ private:
   /**
    * @brief Gets the sprite size.
    */
-  float get_size() const;
+  [[nodiscard]] float get_size() const;
 
   /**
    * @brief Sets the sprite size.

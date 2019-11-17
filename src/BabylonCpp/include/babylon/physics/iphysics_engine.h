@@ -44,7 +44,7 @@ struct BABYLON_SHARED_EXPORT IPhysicsEngine {
    * @brief Get the time step of the physics engine.
    * @returns the current time step
    */
-  virtual float getTimeStep() const = 0;
+  [[nodiscard]] virtual float getTimeStep() const = 0;
 
   /**
    * @brief Release all resources
@@ -55,7 +55,7 @@ struct BABYLON_SHARED_EXPORT IPhysicsEngine {
    * @brief Gets the name of the current physics plugin
    * @returns the name of the plugin
    */
-  virtual std::string getPhysicsPluginName() const = 0;
+  [[nodiscard]] virtual std::string getPhysicsPluginName() const = 0;
 
   /**
    * @brief Adding a new impostor for the impostor tracking.
@@ -79,8 +79,7 @@ struct BABYLON_SHARED_EXPORT IPhysicsEngine {
    * impostor using this joint
    * @param joint defines the joint that will connect both impostors.
    */
-  virtual void addJoint(PhysicsImpostor* mainImpostor,
-                        PhysicsImpostor* connectedImpostor,
+  virtual void addJoint(PhysicsImpostor* mainImpostor, PhysicsImpostor* connectedImpostor,
                         const std::shared_ptr<PhysicsJoint>& joint)
     = 0;
 
@@ -91,8 +90,7 @@ struct BABYLON_SHARED_EXPORT IPhysicsEngine {
    * one by the joint
    * @param joint defines the joint to remove
    */
-  virtual void removeJoint(PhysicsImpostor* mainImpostor,
-                           PhysicsImpostor* connectedImpostor,
+  virtual void removeJoint(PhysicsImpostor* mainImpostor, PhysicsImpostor* connectedImpostor,
                            PhysicsJoint* joint)
     = 0;
 
@@ -113,9 +111,7 @@ struct BABYLON_SHARED_EXPORT IPhysicsEngine {
    * @param object defines the object impersonated by the impostor
    * @returns the PhysicsImpostor or null if not found
    */
-  virtual PhysicsImpostor*
-  getImpostorForPhysicsObject(IPhysicsEnabledObject* object)
-    = 0;
+  virtual PhysicsImpostor* getImpostorForPhysicsObject(IPhysicsEnabledObject* object) = 0;
 
   /**
    * @brief Gets the impostor for a physics body object
@@ -130,8 +126,7 @@ struct BABYLON_SHARED_EXPORT IPhysicsEngine {
    * @param to when should the ray end?
    * @returns PhysicsRaycastResult
    */
-  virtual PhysicsRaycastResult raycast(const Vector3& from, const Vector3& to)
-    = 0;
+  virtual PhysicsRaycastResult raycast(const Vector3& from, const Vector3& to) = 0;
 
   /**
    * @brief Called by the scene. No need to call it.
@@ -142,7 +137,7 @@ struct BABYLON_SHARED_EXPORT IPhysicsEngine {
   /**
    * @brief Returns whether or not the engine is initialized.
    */
-  virtual bool isInitialized() const = 0;
+  [[nodiscard]] virtual bool isInitialized() const = 0;
 
 }; // end of struct IPhysicsEngine
 

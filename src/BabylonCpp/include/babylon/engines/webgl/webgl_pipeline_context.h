@@ -33,8 +33,8 @@ public:
     const std::function<void(const GL::IGLProgramPtr& program)>& onCompiled);
 
 protected:
-  bool get_isAsync() const override;
-  bool get_isReady() const override;
+  [[nodiscard]] bool get_isAsync() const override;
+  [[nodiscard]] bool get_isReady() const override;
 
 public:
   Engine* engine;

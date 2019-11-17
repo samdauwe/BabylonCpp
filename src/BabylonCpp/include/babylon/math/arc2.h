@@ -23,15 +23,14 @@ public:
    * @param midPoint Defines the midlle point of the arc
    * @param endPoint Defines the end point of the arc
    */
-  Arc2(const Vector2& startPoint, const Vector2& midPoint,
-       const Vector2& endPoint);
+  Arc2(const Vector2& startPoint, const Vector2& midPoint, const Vector2& endPoint);
   Arc2(const Arc2& otherArc);
   Arc2(Arc2&& otherArc);
   Arc2& operator=(const Arc2& otherArc);
   Arc2& operator=(Arc2&& otherArc);
   ~Arc2(); // = default
-  Arc2 copy() const;
-  std::unique_ptr<Arc2> clone() const;
+  [[nodiscard]] Arc2 copy() const;
+  [[nodiscard]] std::unique_ptr<Arc2> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Arc2& arc);
   friend bool operator==(const Arc2& lhs, const Arc2& rhs);
   friend bool operator!=(const Arc2& lhs, const Arc2& rhs);

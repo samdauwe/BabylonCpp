@@ -19,14 +19,15 @@ public:
   ShadowOnlyMaterial(const std::string& name, Scene* scene);
   ~ShadowOnlyMaterial() override; // = default
 
-  bool needAlphaBlending() const override;
-  bool needAlphaTesting() const override;
+  [[nodiscard]] bool needAlphaBlending() const override;
+  [[nodiscard]] bool needAlphaTesting() const override;
   BaseTexturePtr getAlphaTestTexture() override;
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool useInstances) override;
   void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
-  std::string getClassName() const override;
-  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
-  json serialize() const;
+  [[nodiscard]] std::string getClassName() const override;
+  [[nodiscard]] MaterialPtr clone(const std::string& name,
+                                  bool cloneChildren = false) const override;
+  [[nodiscard]] json serialize() const;
 
   /** Statics **/
   static ShadowOnlyMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);

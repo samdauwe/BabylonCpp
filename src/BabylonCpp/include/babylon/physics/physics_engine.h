@@ -54,7 +54,7 @@ public:
    * @brief Get the time step of the physics engine.
    * @returns the current time step
    */
-  float getTimeStep() const final;
+  [[nodiscard]] float getTimeStep() const final;
 
   /**
    * @brief Release all resources.
@@ -65,7 +65,7 @@ public:
    * @brief Gets the name of the current physics plugin.
    * @returns the name of the plugin
    */
-  std::string getPhysicsPluginName() const final;
+  [[nodiscard]] std::string getPhysicsPluginName() const final;
 
   /**
    * @brief Adding a new impostor for the impostor tracking.
@@ -145,7 +145,7 @@ public:
   /**
    * @brief Returns whether or not the engine is initialized.
    */
-  bool isInitialized() const final;
+  [[nodiscard]] bool isInitialized() const final;
 
 protected:
   /**

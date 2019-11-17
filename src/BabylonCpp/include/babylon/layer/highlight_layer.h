@@ -67,13 +67,13 @@ public:
    * @brief Get the effect name of the layer.
    * @return The effect name
    */
-  std::string getEffectName() const override;
+  [[nodiscard]] std::string getEffectName() const override;
 
   /**
    * @brief Returns wether or nood the layer needs stencil enabled during the
    * mesh rendering.
    */
-  bool needStencil() const override;
+  [[nodiscard]] bool needStencil() const override;
 
   /**
    * @brief Checks for the readiness of the element composing the layer.
@@ -90,7 +90,7 @@ public:
    * @brief Returns true if the layer contains information to display, otherwise
    * false.
    */
-  bool shouldRender() const override;
+  [[nodiscard]] bool shouldRender() const override;
 
   /**
    * @brief Add a mesh in the exclusion list to prevent it to impact or being
@@ -147,13 +147,13 @@ public:
    * @brief Gets the class name of the effect layer.
    * @returns the string with the class name of the effect layer
    */
-  std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
   /**
    * @brief Serializes this Highlight layer.
    * @returns a serialized Highlight layer object
    */
-  json serialize() const override;
+  [[nodiscard]] json serialize() const override;
 
   /**
    * @brief Creates a Highlight layer from parsed Highlight layer data.
@@ -224,12 +224,12 @@ private:
   /**
    * @brief Gets the horizontal size of the blur.
    */
-  float get_blurHorizontalSize() const;
+  [[nodiscard]] float get_blurHorizontalSize() const;
 
   /**
    * @brief Gets the vertical size of the blur.
    */
-  float get_blurVerticalSize() const;
+  [[nodiscard]] float get_blurVerticalSize() const;
 
   /**
    * @brief Force the stencil to the normal expected value for none glowing

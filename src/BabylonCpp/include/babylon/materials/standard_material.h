@@ -57,21 +57,21 @@ public:
    * Mainly use in serialization.
    * @returns the class name
    */
-  std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
-  Type type() const override;
+  [[nodiscard]] Type type() const override;
 
   /**
    * @brief Specifies if the material will require alpha blending.
    * @returns a boolean specifying if alpha blending is needed
    */
-  bool needAlphaBlending() const override;
+  [[nodiscard]] bool needAlphaBlending() const override;
 
   /**
    * @brief Specifies if this material should be rendered in alpha test mode.
    * @returns a boolean specifying if an alpha test is needed.
    */
-  bool needAlphaTesting() const override;
+  [[nodiscard]] bool needAlphaTesting() const override;
 
   /**
    * @brief Get the texture used for alpha test purpose.
@@ -120,14 +120,14 @@ public:
    * @brief Gets the active textures from the material.
    * @returns an array of textures
    */
-  std::vector<BaseTexturePtr> getActiveTextures() const override;
+  [[nodiscard]] std::vector<BaseTexturePtr> getActiveTextures() const override;
 
   /**
    * @brief Specifies if the material uses a texture.
    * @param texture defines the texture to check against the material
    * @returns a boolean specifying if the material uses the texture
    */
-  bool hasTexture(const BaseTexturePtr& texture) const override;
+  [[nodiscard]] bool hasTexture(const BaseTexturePtr& texture) const override;
 
   /**
    * @brief Disposes the material.
@@ -144,13 +144,14 @@ public:
    * @param name defines the new name for the duplicated material
    * @returns the cloned material
    */
-  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
+  [[nodiscard]] MaterialPtr clone(const std::string& name,
+                                  bool cloneChildren = false) const override;
 
   /**
    * @brief Serializes this material in a JSON representation.
    * @returns the serialized material object
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Creates a standard material from parsed material data.
@@ -259,27 +260,27 @@ protected:
   BaseTexturePtr& get_refractionTexture();
   void set_refractionTexture(const BaseTexturePtr& value);
 
-  bool get_useAlphaFromDiffuseTexture() const;
+  [[nodiscard]] bool get_useAlphaFromDiffuseTexture() const;
   void set_useAlphaFromDiffuseTexture(bool value);
-  bool get_useEmissiveAsIllumination() const;
+  [[nodiscard]] bool get_useEmissiveAsIllumination() const;
   void set_useEmissiveAsIllumination(bool value);
-  bool get_linkEmissiveWithDiffuse() const;
+  [[nodiscard]] bool get_linkEmissiveWithDiffuse() const;
   void set_linkEmissiveWithDiffuse(bool value);
-  bool get_useSpecularOverAlpha() const;
+  [[nodiscard]] bool get_useSpecularOverAlpha() const;
   void set_useSpecularOverAlpha(bool value);
-  bool get_useReflectionOverAlpha() const;
+  [[nodiscard]] bool get_useReflectionOverAlpha() const;
   void set_useReflectionOverAlpha(bool value);
-  bool get_disableLighting() const;
+  [[nodiscard]] bool get_disableLighting() const;
   void set_disableLighting(bool value);
-  bool get_useObjectSpaceNormalMap() const;
+  [[nodiscard]] bool get_useObjectSpaceNormalMap() const;
   void set_useObjectSpaceNormalMap(bool value);
-  bool get_useParallax() const;
+  [[nodiscard]] bool get_useParallax() const;
   void set_useParallax(bool value);
-  bool get_useParallaxOcclusion() const;
+  [[nodiscard]] bool get_useParallaxOcclusion() const;
   void set_useParallaxOcclusion(bool value);
-  float get_roughness() const;
+  [[nodiscard]] float get_roughness() const;
   void set_roughness(float value);
-  bool get_useLightmapAsShadowmap() const;
+  [[nodiscard]] bool get_useLightmapAsShadowmap() const;
   void set_useLightmapAsShadowmap(bool value);
 
   // Fresnel
@@ -293,17 +294,17 @@ protected:
   void set_refractionFresnelParameters(const FresnelParametersPtr& value);
   FresnelParametersPtr& get_emissiveFresnelParameters();
   void set_emissiveFresnelParameters(const FresnelParametersPtr& value);
-  bool get_useReflectionFresnelFromSpecular() const;
+  [[nodiscard]] bool get_useReflectionFresnelFromSpecular() const;
   void set_useReflectionFresnelFromSpecular(bool value);
-  bool get_useGlossinessFromSpecularMapAlpha() const;
+  [[nodiscard]] bool get_useGlossinessFromSpecularMapAlpha() const;
   void set_useGlossinessFromSpecularMapAlpha(bool value);
-  unsigned int get_maxSimultaneousLights() const;
+  [[nodiscard]] unsigned int get_maxSimultaneousLights() const;
   void set_maxSimultaneousLights(unsigned int value);
-  bool get_invertNormalMapX() const;
+  [[nodiscard]] bool get_invertNormalMapX() const;
   void set_invertNormalMapX(bool value);
-  bool get_invertNormalMapY() const;
+  [[nodiscard]] bool get_invertNormalMapY() const;
   void set_invertNormalMapY(bool value);
-  bool get_twoSidedLighting() const;
+  [[nodiscard]] bool get_twoSidedLighting() const;
   void set_twoSidedLighting(bool value);
 
   /**
@@ -323,7 +324,7 @@ protected:
   /**
    * @brief Gets whether the color curves effect is enabled.
    */
-  bool get_cameraColorCurvesEnabled() const;
+  [[nodiscard]] bool get_cameraColorCurvesEnabled() const;
 
   /**
    * @brief Sets whether the color curves effect is enabled.
@@ -333,7 +334,7 @@ protected:
   /**
    * @brief Gets wether the color grading effect is enabled.
    */
-  bool get_cameraColorGradingEnabled() const;
+  [[nodiscard]] bool get_cameraColorGradingEnabled() const;
 
   /**
    * @brief Gets wether the color grading effect is enabled.
@@ -343,7 +344,7 @@ protected:
   /**
    * @brief Gets wether tonemapping is enabled or not.
    */
-  bool get_cameraToneMappingEnabled() const;
+  [[nodiscard]] bool get_cameraToneMappingEnabled() const;
 
   /**
    * @brief Sets wether tonemapping is enabled or not
@@ -356,7 +357,7 @@ protected:
    * without full screen post process.
    * This corresponds to a photographic exposure.
    */
-  float get_cameraExposure() const;
+  [[nodiscard]] float get_cameraExposure() const;
 
   /**
    * @brief The camera exposure used on this material.
@@ -369,7 +370,7 @@ protected:
   /**
    * @brief Gets The camera contrast used on this material.
    */
-  float get_cameraContrast() const;
+  [[nodiscard]] float get_cameraContrast() const;
 
   /**
    * @brief Sets The camera contrast used on this material.
@@ -420,12 +421,12 @@ protected:
    * @brief Gets a boolean indicating that current material needs to register
    * RTT.
    */
-  bool get_hasRenderTargetTextures() const override;
+  [[nodiscard]] bool get_hasRenderTargetTextures() const override;
 
   /**
    * @brief Gets the logarithmic depth setting.
    */
-  bool get_useLogarithmicDepth() const override;
+  [[nodiscard]] bool get_useLogarithmicDepth() const override;
 
   /**
    * @brief Sets the logarithmic depth setting.
@@ -439,7 +440,7 @@ protected:
    */
   void _attachImageProcessingConfiguration(ImageProcessingConfiguration* configuration);
 
-  bool _shouldUseAlphaFromDiffuseTexture() const;
+  [[nodiscard]] bool _shouldUseAlphaFromDiffuseTexture() const;
   bool _checkCache(Scene* scene, AbstractMesh* mesh, bool useInstances = false);
 
 public:

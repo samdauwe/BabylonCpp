@@ -35,7 +35,7 @@ public:
    * @brief Serialize the StateCondition into a JSON compatible object.
    * @returns serialization object
    */
-  json serialize() const override;
+  [[nodiscard]] json serialize() const override;
 
 public:
   /**

@@ -33,8 +33,8 @@ public:
   Curve3& operator=(const Curve3& otherCurve);
   Curve3& operator=(Curve3&& otherCurve);
   ~Curve3(); // = default
-  Curve3 copy() const;
-  std::unique_ptr<Curve3> clone() const;
+  [[nodiscard]] Curve3 copy() const;
+  [[nodiscard]] std::unique_ptr<Curve3> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Curve3& curve);
 
   /**
@@ -45,7 +45,7 @@ public:
   /**
    * @returns the computed length (float) of the curve.
    */
-  float length() const;
+  [[nodiscard]] float length() const;
 
   /**
    * @brief Returns a new instance of Curve3 object : var curve =
@@ -68,8 +68,8 @@ public:
    * @param nbPoints (integer) the wanted number of points in the curve
    * @returns the created Curve3
    */
-  static Curve3 CreateQuadraticBezier(const Vector3& v0, const Vector3& v1,
-                                      const Vector3& v2, int nbPoints);
+  static Curve3 CreateQuadraticBezier(const Vector3& v0, const Vector3& v1, const Vector3& v2,
+                                      int nbPoints);
 
   /**
    * @brief Returns a Curve3 object along a Cubic Bezier curve :
@@ -81,9 +81,8 @@ public:
    * @param nbPoints (integer) the wanted number of points in the curve
    * @returns the created Curve3
    */
-  static Curve3 CreateCubicBezier(const Vector3& v0, const Vector3& v1,
-                                  const Vector3& v2, const Vector3& v3,
-                                  int nbPoints);
+  static Curve3 CreateCubicBezier(const Vector3& v0, const Vector3& v1, const Vector3& v2,
+                                  const Vector3& v3, int nbPoints);
 
   /**
    * @brief Returns a Curve3 object along a Hermite Spline curve :
@@ -95,9 +94,8 @@ public:
    * @param nbPoints (integer) the wanted number of points in the curve
    * @returns the created Curve3
    */
-  static Curve3 CreateHermiteSpline(const Vector3& p1, const Vector3& t1,
-                                    const Vector3& p2, const Vector3& t2,
-                                    int nbPoints);
+  static Curve3 CreateHermiteSpline(const Vector3& p1, const Vector3& t1, const Vector3& p2,
+                                    const Vector3& t2, int nbPoints);
 
   /**
    * @brief Returns a Curve3 object along a CatmullRom Spline curve :
@@ -109,8 +107,8 @@ public:
    * closed loop from the points
    * @returns the created Curve3
    */
-  static Curve3 CreateCatmullRomSpline(const std::vector<Vector3>& points,
-                                       size_t nbPoints, bool closed = false);
+  static Curve3 CreateCatmullRomSpline(const std::vector<Vector3>& points, size_t nbPoints,
+                                       bool closed = false);
 
 private:
   float computeLength(const std::vector<Vector3>& path);

@@ -101,7 +101,7 @@ protected:
    * @param idealKernel Ideal blur kernel.
    * @return Nearest best kernel.
    */
-  float _nearestBestKernel(float idealKernel) const;
+  [[nodiscard]] float _nearestBestKernel(float idealKernel) const;
 
   /**
    * @brief Calculates the value of a Gaussian distribution with sigma 3 at a
@@ -109,7 +109,7 @@ protected:
    * @param x The point on the Gaussian distribution to sample.
    * @return the value of the Gaussian function at x.
    */
-  float _gaussianWeight(float x) const;
+  [[nodiscard]] float _gaussianWeight(float x) const;
 
   /**
    * @brief Generates a string that can be used as a floating point number in
@@ -119,7 +119,7 @@ protected:
    * (excluding trailing 0s).
    * @return GLSL float string.
    */
-  std::string _glslFloat(float x, unsigned int decimalFigures = 8) const;
+  [[nodiscard]] std::string _glslFloat(float x, unsigned int decimalFigures = 8) const;
 
 private:
   /**
@@ -130,7 +130,7 @@ private:
   /**
    * @brief Gets the length in pixels of the blur sample region.
    */
-  float get_kernel() const;
+  [[nodiscard]] float get_kernel() const;
 
   /**
    * @brief Sets whether or not the blur needs to unpack/repack floats.
@@ -140,7 +140,7 @@ private:
   /**
    * @brief Gets whether or not the blur is unpacking/repacking floats.
    */
-  bool get_packedFloat() const;
+  [[nodiscard]] bool get_packedFloat() const;
 
 public:
   /**

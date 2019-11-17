@@ -32,11 +32,11 @@ protected:
   AbstractMeshPtr& get_attachedMesh() override;
   void set_attachedMesh(const AbstractMeshPtr& mesh) override;
   void set_updateGizmoRotationToMatchAttachedMesh(bool value) override;
-  bool get_updateGizmoRotationToMatchAttachedMesh() const override;
+  [[nodiscard]] bool get_updateGizmoRotationToMatchAttachedMesh() const override;
   void set_snapDistance(float value);
-  float get_snapDistance() const;
+  [[nodiscard]] float get_snapDistance() const;
   void set_scaleRatio(float value) override;
-  float get_scaleRatio() const override;
+  [[nodiscard]] float get_scaleRatio() const override;
 
 public:
   /**

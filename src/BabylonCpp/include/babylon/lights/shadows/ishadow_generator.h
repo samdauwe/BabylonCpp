@@ -63,8 +63,7 @@ struct BABYLON_SHARED_EXPORT IShadowGenerator {
    * @param lightIndex Index of the light in the enabled light list of the
    * material
    */
-  virtual void prepareDefines(MaterialDefines& defines, unsigned int lightIndex)
-    = 0;
+  virtual void prepareDefines(MaterialDefines& defines, unsigned int lightIndex) = 0;
 
   /**
    * @brief Binds the shadow related information inside of an effect
@@ -75,9 +74,7 @@ struct BABYLON_SHARED_EXPORT IShadowGenerator {
    * material owning the effect
    * @param effect The effect we are binfing the information for
    */
-  virtual void bindShadowLight(const std::string& lightIndex,
-                               const EffectPtr& effect)
-    = 0;
+  virtual void bindShadowLight(const std::string& lightIndex, const EffectPtr& effect) = 0;
 
   /**
    * @brief Gets the transformation matrix used to project the meshes into the
@@ -101,16 +98,15 @@ struct BABYLON_SHARED_EXPORT IShadowGenerator {
    * @param options Sets of optional options forcing the compilation with
    * different modes
    */
-  virtual void forceCompilation(
-    const std::function<void(ShadowGenerator* generator)>& onCompiled,
-    const ShadowGeneratorCompileOptions& options)
+  virtual void forceCompilation(const std::function<void(ShadowGenerator* generator)>& onCompiled,
+                                const ShadowGeneratorCompileOptions& options)
     = 0;
 
   /**
    * @brief Serializes the shadow generator setup to a json object.
    * @returns The serialized JSON object
    */
-  virtual json serialize() const = 0;
+  [[nodiscard]] virtual json serialize() const = 0;
 
   /**
    * @brief Disposes the Shadow map and related Textures and effects.

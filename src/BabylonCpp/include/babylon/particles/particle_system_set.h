@@ -54,7 +54,7 @@ public:
    * @brief Serialize the set into a JSON compatible object.
    * @returns a JSON compatible representation of the set
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Parse a new ParticleSystemSet from a serialized source.

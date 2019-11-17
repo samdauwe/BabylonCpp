@@ -20,7 +20,8 @@ public:
   ShaderDefineIsDefinedOperator& operator=(ShaderDefineIsDefinedOperator&& other);
   ~ShaderDefineIsDefinedOperator() override; // = default
 
-  bool isTrue(const std::unordered_map<std::string, std::string>& preprocessors) const override;
+  [[nodiscard]] bool
+  isTrue(const std::unordered_map<std::string, std::string>& preprocessors) const override;
 
 public:
   std::string define;

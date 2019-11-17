@@ -25,24 +25,24 @@ public:
   /**
    * @see https://doc.babylonjs.com/babylon101/animations#deterministic-lockstep
    */
-  bool isDeterministicLockStep() const;
+  [[nodiscard]] bool isDeterministicLockStep() const;
 
   /**
    * @see https://doc.babylonjs.com/babylon101/animations#deterministic-lockstep
    */
-  bool getLockstepMaxSteps() const;
+  [[nodiscard]] bool getLockstepMaxSteps() const;
 
   /**
    * @brief Sets hardware scaling, used to save performance if needed.
    * @see https://doc.babylonjs.com/how_to/how_to_use_sceneoptimizer
    */
-  float getHardwareScalingLevel() const;
+  [[nodiscard]] float getHardwareScalingLevel() const;
 
   GLBufferPtr createVertexBuffer(const Float32Array& vertices) override;
   GLBufferPtr createIndexBuffer(const IndicesArray& indices, bool updatable = false) override;
   void clear(const Color4& color, bool backBuffer, bool depth, bool stencil = false) override;
-  int getRenderWidth(bool useScreen = false) const override;
-  int getRenderHeight(bool useScreen = false) const override;
+  [[nodiscard]] int getRenderWidth(bool useScreen = false) const override;
+  [[nodiscard]] int getRenderHeight(bool useScreen = false) const override;
   void setViewport(Viewport& viewport, const std::optional<int>& requiredWidth = std::nullopt,
                    const std::optional<int>& requiredHeight = std::nullopt) override;
   GL::IGLProgramPtr createShaderProgram(const IPipelineContextPtr& pipelineContext,
@@ -118,8 +118,8 @@ public:
   void updateDynamicTexture(const InternalTexturePtr& texture, ICanvas* canvas, bool invertY,
                             bool premulAlpha    = false,
                             unsigned int format = Constants::TEXTUREFORMAT_RGBA) override;
-  bool areAllEffectsReady() const override;
-  unsigned int getError() const override;
+  [[nodiscard]] bool areAllEffectsReady() const override;
+  [[nodiscard]] unsigned int getError() const override;
   int _getUnpackAlignement() override;
   void _unpackFlipY(bool value) override;
   void updateDynamicIndexBuffer(const GLBufferPtr& indexBuffer, const IndicesArray& indices,

@@ -53,21 +53,21 @@ public:
    * Mainly use in serialization.
    * @returns the class name
    */
-  std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
-  Type type() const override;
+  [[nodiscard]] Type type() const override;
 
   /**
    * @brief Specifies if the material will require alpha blending.
    * @returns a boolean specifying if alpha blending is needed
    */
-  bool needAlphaBlending() const override;
+  [[nodiscard]] bool needAlphaBlending() const override;
 
   /**
    * @brief Specifies if this material should be rendered in alpha test mode
    * @returns a boolean specifying if an alpha test is needed.
    */
-  bool needAlphaTesting() const override;
+  [[nodiscard]] bool needAlphaTesting() const override;
 
   /**
    * @brief Set a texture in the shader.
@@ -252,21 +252,22 @@ public:
    * @brief Gets the active textures from the material.
    * @returns an array of textures
    */
-  std::vector<BaseTexturePtr> getActiveTextures() const override;
+  [[nodiscard]] std::vector<BaseTexturePtr> getActiveTextures() const override;
 
   /**
    * @brief Specifies if the material uses a texture.
    * @param texture defines the texture to check against the material
    * @returns a boolean specifying if the material uses the texture
    */
-  bool hasTexture(const BaseTexturePtr& texture) const override;
+  [[nodiscard]] bool hasTexture(const BaseTexturePtr& texture) const override;
 
   /**
    * @brief Makes a duplicate of the material, and gives it a new name.
    * @param name defines the new name for the duplicated material
    * @returns the cloned material
    */
-  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
+  [[nodiscard]] MaterialPtr clone(const std::string& name,
+                                  bool cloneChildren = false) const override;
 
   /**
    * @brief Disposes the material.
@@ -284,7 +285,7 @@ public:
    * @brief Serializes this material in a JSON representation.
    * @returns the serialized material object
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Creates a shader material from parsed shader material data.

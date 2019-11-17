@@ -22,7 +22,7 @@ struct _GamePadFactory {
    * APIs.
    * @returns true if it can be created, otherwise false
    */
-  virtual bool canCreate(const IBrowserGamepadPtr& /*gamepadInfo*/) const
+  [[nodiscard]] virtual bool canCreate(const IBrowserGamepadPtr& /*gamepadInfo*/) const
   {
     return false;
   }
@@ -33,8 +33,7 @@ struct _GamePadFactory {
    * APIs.
    * @returns the new gamepad instance
    */
-  virtual WebVRControllerPtr
-  create(const IBrowserGamepadPtr& /*gamepadInfo*/) const
+  [[nodiscard]] virtual WebVRControllerPtr create(const IBrowserGamepadPtr& /*gamepadInfo*/) const
   {
     return nullptr;
   }

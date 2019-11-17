@@ -28,7 +28,7 @@ public:
   Polyhedra();
   ~Polyhedra(); // = default
 
-  const std::array<Polyhedron, 126>& models() const;
+  [[nodiscard]] const std::array<Polyhedron, 126>& models() const;
 
 private:
   /* Platonic Solids */

@@ -47,8 +47,7 @@ public:
    * @brief Instantiate a new istance of clear coat configuration.
    * @param markAllSubMeshesAsMiscDirty Callback to flag the material to dirty
    */
-  PBRBRDFConfiguration(
-    const std::function<void()>& markAllSubMeshesAsMiscDirty);
+  PBRBRDFConfiguration(const std::function<void()>& markAllSubMeshesAsMiscDirty);
   ~PBRBRDFConfiguration(); // = default
 
   /**
@@ -67,7 +66,7 @@ public:
    * or dynamic coding.
    * @returns "PBRClearCoatConfiguration"
    */
-  std::string getClassName() const;
+  [[nodiscard]] std::string getClassName() const;
 
   /**
    * @brief Makes a duplicate of the current configuration into another one.
@@ -79,7 +78,7 @@ public:
    * @brief Serializes this BRDF configuration.
    * @returns - An object with the serialized config.
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Parses a BRDF Configuration from a serialized object.
@@ -90,11 +89,11 @@ public:
   void parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
-  bool get_useEnergyConservation() const;
+  [[nodiscard]] bool get_useEnergyConservation() const;
   void set_useEnergyConservation(bool value);
-  bool get_useSmithVisibilityHeightCorrelated() const;
+  [[nodiscard]] bool get_useSmithVisibilityHeightCorrelated() const;
   void set_useSmithVisibilityHeightCorrelated(bool value);
-  bool get_useSphericalHarmonics() const;
+  [[nodiscard]] bool get_useSphericalHarmonics() const;
   void set_useSphericalHarmonics(bool value);
 
 public:

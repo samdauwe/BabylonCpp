@@ -49,32 +49,32 @@ public:
    * @brief Gets the class name of the current input.
    * @returns the class name
    */
-  std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
   /**
    * @brief Get the friendly name associated with the input class.
    * @returns the input friendly name
    */
-  std::string getSimpleName() const override;
+  [[nodiscard]] std::string getSimpleName() const override;
 
 private:
   /**
    * @brief Check if the pressed modifier keys (Alt/Ctrl/Shift) match those
    * configured to allow modification of the heightOffset value.
    */
-  bool _modifierHeightOffset() const;
+  [[nodiscard]] bool _modifierHeightOffset() const;
 
   /**
    * @brief Check if the pressed modifier keys (Alt/Ctrl/Shift) match those
    * configured to allow modification of the rotationOffset value.
    */
-  bool _modifierRotationOffset() const;
+  [[nodiscard]] bool _modifierRotationOffset() const;
 
   /**
    * @brief Check if the pressed modifier keys (Alt/Ctrl/Shift) match those
    * configured to allow modification of the radius value.
    */
-  bool _modifierRadius() const;
+  [[nodiscard]] bool _modifierRadius() const;
 
 public:
   /**

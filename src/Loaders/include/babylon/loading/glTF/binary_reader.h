@@ -14,8 +14,8 @@ public:
   BinaryReader(const ArrayBuffer& arrayBuffer);
   ~BinaryReader(); // = default
 
-  size_t getPosition() const;
-  size_t getLength() const;
+  [[nodiscard]] size_t getPosition() const;
+  [[nodiscard]] size_t getLength() const;
   uint32_t readUint32();
   Uint8Array readUint8Array(size_t length);
   void skipBytes(size_t length);

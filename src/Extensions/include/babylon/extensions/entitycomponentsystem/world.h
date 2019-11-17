@@ -57,8 +57,7 @@ private:
   /// thus systems of the same type can not be stored
   /// in the same World object.
   using SystemArray
-    = std::unordered_map<detail::TypeId,
-                         std::unique_ptr<detail::BaseSystem, SystemDeleter>>;
+    = std::unordered_map<detail::TypeId, std::unique_ptr<detail::BaseSystem, SystemDeleter>>;
 
 public:
   /// Describes an array of Entities
@@ -91,7 +90,7 @@ public:
   /// Determines whether a type of system is attached to a world
   /// \tparam TSystem The type of system you wish to check
   template <typename TSystem>
-  bool doesSystemExist() const;
+  [[nodiscard]] bool doesSystemExist() const;
 
   /// Determines if a specific system belongs to this world
   /// \tparam TSystem The type of system you wish to check
@@ -100,7 +99,7 @@ public:
   /// doesSystemExist<TSystem>() cannot check whether the system
   /// object belongs to the same world as this.
   template <typename TSystem>
-  bool doesSystemExist(const TSystem& system) const;
+  [[nodiscard]] bool doesSystemExist(const TSystem& system) const;
 
   /// Removes all the systems from the world
   void removeAllSystems();
@@ -146,14 +145,14 @@ public:
   /// Determines if the Entity is activated
   /// \param entity The Entity you wish to check
   /// \return true if entity is activated
-  bool isActivated(const Entity& entity) const;
+  [[nodiscard]] bool isActivated(const Entity& entity) const;
 
   /// Determines if an Entity is valid.
   /// \note If the entity is valid it may have components attached to it.
   /// If the entity is not valid and a component is attempted to be attached
   /// to the entity, there will be a run-time error (an assertion).
   /// \return true if the Entity is valid within the World
-  bool isValid(const Entity& entity) const;
+  [[nodiscard]] bool isValid(const Entity& entity) const;
 
   /// Refreshes the World
   void refresh();
@@ -169,10 +168,10 @@ public:
 
   /// \return The amount of entities that are alive (attached to the world)
   /// \note This count includes the deactivated entities
-  std::size_t getEntityCount() const;
+  [[nodiscard]] std::size_t getEntityCount() const;
 
   /// \return All the entities within the world
-  const EntityArray& getEntities() const;
+  [[nodiscard]] const EntityArray& getEntities() const;
 
   /// \return The entity with the associated index
   /// \note This will cause an assertion if it does not exist
@@ -277,7 +276,7 @@ private:
 
   void addSystem(detail::BaseSystem& system, detail::TypeId systemTypeId);
   void removeSystem(detail::TypeId systemTypeId);
-  bool doesSystemExist(detail::TypeId systemTypeId) const;
+  [[nodiscard]] bool doesSystemExist(detail::TypeId systemTypeId) const;
 
   // to access components
   friend class Entity;
@@ -309,7 +308,7 @@ bool World::doesSystemExist() const
 }
 
 template <class TSystem>
-bool World::doesSystemExist(const TSystem& system) const
+[[nodiscard]] bool World::doesSystemExist(const TSystem& system) const
 {
   static_assert(std::is_base_of<detail::BaseSystem, TSystem>(),
                 "Template argument does not inherit from BaseSystem");

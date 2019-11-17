@@ -53,8 +53,7 @@ public:
    * @param data Define the data contained in the buffer
    * @param dynamic Define if the buffer is updatable
    */
-  UniformBuffer(Engine* engine, const Float32Array& data = Float32Array(),
-                bool dynamic = false);
+  UniformBuffer(Engine* engine, const Float32Array& data = Float32Array(), bool dynamic = false);
   UniformBuffer(UniformBuffer& other) = delete;
   ~UniformBuffer(); // = default
 
@@ -63,13 +62,13 @@ public:
    * @brief Indicates if the buffer is using the WebGL2 UBO implementation,
    * or just falling back on setUniformXXX calls.
    */
-  bool useUbo() const;
+  [[nodiscard]] bool useUbo() const;
 
   /**
    * @brief Indicates if the WebGL underlying uniform buffer is in sync
    * with the javascript cache data.
    */
-  bool isSync() const;
+  [[nodiscard]] bool isSync() const;
 
   /**
    * @brief Indicates if the WebGL underlying uniform buffer is dynamic.
@@ -77,7 +76,7 @@ public:
    * update the underlying WebGL uniform buffer to the GPU.
    * @returns if Dynamic, otherwise false
    */
-  bool isDynamic() const;
+  [[nodiscard]] bool isDynamic() const;
 
   /**
    * @brief The data cache on JS side.
@@ -99,8 +98,7 @@ public:
    * shader.
    * @param size Data size, or data directly.
    */
-  void addUniform(const std::string& name,
-                  const std::variant<int, Float32Array>& size);
+  void addUniform(const std::string& name, const std::variant<int, Float32Array>& size);
 
   /**
    * @brief Adds a Matrix 4x4 to the uniform buffer.
@@ -194,8 +192,7 @@ public:
    * @param data Define the flattened data
    * @param size Define the size of the data.
    */
-  void updateUniform(const std::string& uniformName, const Float32Array& data,
-                     size_t size);
+  void updateUniform(const std::string& uniformName, const Float32Array& data, size_t size);
 
   /**
    * @brief Sets a sampler uniform on the effect.
@@ -211,8 +208,7 @@ public:
    * block in the shader.
    * @param data Define the flattened data
    */
-  void updateUniformDirectly(const std::string& uniformName,
-                             const Float32Array& data);
+  void updateUniformDirectly(const std::string& uniformName, const Float32Array& data);
 
   /**
    * @brief Binds this uniform buffer to an effect.
@@ -239,27 +235,21 @@ private:
   bool _cacheMatrix(const std::string& name, const Matrix& matrix);
 
   // Update methods
-  void _updateMatrix3x3ForUniform(const std::string& name,
-                                  const Float32Array& matrix);
-  void _updateMatrix3x3ForEffect(const std::string& name,
-                                 const Float32Array& matrix);
-  void _updateMatrix2x2ForEffect(const std::string& name,
-                                 const Float32Array& matrix);
-  void _updateMatrix2x2ForUniform(const std::string& name,
-                                  const Float32Array& matrix);
+  void _updateMatrix3x3ForUniform(const std::string& name, const Float32Array& matrix);
+  void _updateMatrix3x3ForEffect(const std::string& name, const Float32Array& matrix);
+  void _updateMatrix2x2ForEffect(const std::string& name, const Float32Array& matrix);
+  void _updateMatrix2x2ForUniform(const std::string& name, const Float32Array& matrix);
   void _updateFloatForEffect(const std::string& name, float x);
   void _updateFloatForUniform(const std::string& name, float x);
   void _updateFloat2ForEffect(const std::string& name, float x, float y,
                               const std::string& suffix = "");
   void _updateFloat2ForUniform(const std::string& name, float x, float y);
-  void _updateFloat3ForEffect(const std::string& name, float x, float y,
-                              float z, const std::string& suffix = "");
-  void _updateFloat3ForUniform(const std::string& name, float x, float y,
-                               float z);
-  void _updateFloat4ForEffect(const std::string& name, float x, float y,
-                              float z, float w, const std::string& suffix = "");
-  void _updateFloat4ForUniform(const std::string& name, float x, float y,
-                               float z, float w);
+  void _updateFloat3ForEffect(const std::string& name, float x, float y, float z,
+                              const std::string& suffix = "");
+  void _updateFloat3ForUniform(const std::string& name, float x, float y, float z);
+  void _updateFloat4ForEffect(const std::string& name, float x, float y, float z, float w,
+                              const std::string& suffix = "");
+  void _updateFloat4ForUniform(const std::string& name, float x, float y, float z, float w);
   void _updateMatrixForEffect(const std::string& name, const Matrix& mat);
   void _updateMatrixForUniform(const std::string& name, const Matrix& mat);
   void _updateVector3ForEffect(const std::string& name, const Vector3& vector);
@@ -269,10 +259,9 @@ private:
   void _updateColor3ForEffect(const std::string& name, const Color3& color,
                               const std::string& suffix = "");
   void _updateColor3ForUniform(const std::string& name, const Color3& color);
-  void _updateColor4ForEffect(const std::string& name, const Color3& color,
-                              float alpha, const std::string& suffix = "");
-  void _updateColor4ForUniform(const std::string& name, const Color3& color,
-                               float alpha);
+  void _updateColor4ForEffect(const std::string& name, const Color3& color, float alpha,
+                              const std::string& suffix = "");
+  void _updateColor4ForUniform(const std::string& name, const Color3& color, float alpha);
 
 public:
   /**
@@ -280,16 +269,14 @@ public:
    * This is dynamic to allow compat with webgl 1 and 2.
    * You will need to pass the name of the uniform as well as the value.
    */
-  std::function<void(const std::string& name, const Float32Array& matrix)>
-    updateMatrix3x3;
+  std::function<void(const std::string& name, const Float32Array& matrix)> updateMatrix3x3;
 
   /**
    * Lambda to Update a 2x2 Matrix in a uniform buffer.
    * This is dynamic to allow compat with webgl 1 and 2.
    * You will need to pass the name of the uniform as well as the value.
    */
-  std::function<void(const std::string& name, const Float32Array& matrix)>
-    updateMatrix2x2;
+  std::function<void(const std::string& name, const Float32Array& matrix)> updateMatrix2x2;
 
   /**
    * Lambda to Update a single float in a uniform buffer.
@@ -303,8 +290,7 @@ public:
    * This is dynamic to allow compat with webgl 1 and 2.
    * You will need to pass the name of the uniform as well as the value.
    */
-  std::function<void(const std::string& name, float x, float y,
-                     const std::string& suffix)>
+  std::function<void(const std::string& name, float x, float y, const std::string& suffix)>
     updateFloat2;
 
   /**
@@ -312,8 +298,7 @@ public:
    * This is dynamic to allow compat with webgl 1 and 2.
    * You will need to pass the name of the uniform as well as the value.
    */
-  std::function<void(const std::string& name, float x, float y, float z,
-                     const std::string& suffix)>
+  std::function<void(const std::string& name, float x, float y, float z, const std::string& suffix)>
     updateFloat3;
 
   /**
@@ -321,8 +306,8 @@ public:
    * This is dynamic to allow compat with webgl 1 and 2.
    * You will need to pass the name of the uniform as well as the value.
    */
-  std::function<void(const std::string& name, float x, float y, float z,
-                     float w, const std::string& suffix)>
+  std::function<void(const std::string& name, float x, float y, float z, float w,
+                     const std::string& suffix)>
     updateFloat4;
 
   /**
@@ -337,24 +322,21 @@ public:
    * This is dynamic to allow compat with webgl 1 and 2.
    * You will need to pass the name of the uniform as well as the value.
    */
-  std::function<void(const std::string& name, const Vector3& vector)>
-    updateVector3;
+  std::function<void(const std::string& name, const Vector3& vector)> updateVector3;
 
   /**
    * Lambda to Update vec4 of float from a Vector in a uniform buffer.
    * This is dynamic to allow compat with webgl 1 and 2.
    * You will need to pass the name of the uniform as well as the value.
    */
-  std::function<void(const std::string& name, const Vector4& vector)>
-    updateVector4;
+  std::function<void(const std::string& name, const Vector4& vector)> updateVector4;
 
   /**
    * Lambda to Update vec3 of float from a Color in a uniform buffer.
    * This is dynamic to allow compat with webgl 1 and 2.
    * You will need to pass the name of the uniform as well as the value.
    */
-  std::function<void(const std::string& name, const Color3& color,
-                     const std::string& suffix)>
+  std::function<void(const std::string& name, const Color3& color, const std::string& suffix)>
     updateColor3;
 
   /**

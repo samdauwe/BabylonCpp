@@ -32,18 +32,19 @@ public:
   /**
    * @brief Return the currrent class name of the material.
    */
-  std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
   /**
    * @brief Makes a duplicate of the current material.
    * @param name - name to use for the new material.
    */
-  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
+  [[nodiscard]] MaterialPtr clone(const std::string& name,
+                                  bool cloneChildren = false) const override;
 
   /**
    * @brief Serialize the material to a parsable JSON object.
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Parses a JSON object correponding to the serialize function.
@@ -84,7 +85,7 @@ protected:
    * @brief Specifies the glossiness of the material. This indicates "how sharp
    * is the reflection".
    */
-  float get_glossiness() const;
+  [[nodiscard]] float get_glossiness() const;
   void set_glossiness(float value);
 
   /**

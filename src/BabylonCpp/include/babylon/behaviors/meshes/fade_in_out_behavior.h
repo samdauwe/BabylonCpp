@@ -27,7 +27,7 @@ public:
   /**
    *  @brief The name of the behavior.
    */
-  const char* name() const;
+  [[nodiscard]] const char* name() const;
 
   /**
    * @brief Initializes the behavior.

@@ -30,13 +30,13 @@ public:
    * @brief Clones the current fresnel and its values.
    * @returns a clone fresnel configuration
    */
-  std::unique_ptr<FresnelParameters> clone() const;
+  [[nodiscard]] std::unique_ptr<FresnelParameters> clone() const;
 
   /**
    * @brief Serializes the current fresnel parameters to a JSON representation.
    * @return the JSON serialization
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Parse a JSON object and deserialize it to a new Fresnel parameter
@@ -44,14 +44,13 @@ public:
    * @param parsedFresnelParameters Define the JSON representation
    * @returns the parsed parameters
    */
-  static std::unique_ptr<FresnelParameters>
-  Parse(const json& parsedFresnelParameters);
+  static std::unique_ptr<FresnelParameters> Parse(const json& parsedFresnelParameters);
 
 protected:
   /**
    * @brief Define if the fresnel effect is enable or not.
    */
-  bool get_isEnabled() const;
+  [[nodiscard]] bool get_isEnabled() const;
   void set_isEnabled(bool value);
 
 public:

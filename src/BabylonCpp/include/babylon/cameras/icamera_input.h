@@ -31,13 +31,13 @@ struct BABYLON_SHARED_EXPORT ICameraInput {
    * @brief Gets the class name of the current intput.
    * @returns the class name
    */
-  virtual std::string getClassName() const = 0;
+  [[nodiscard]] virtual std::string getClassName() const = 0;
 
   /**
    * @brief Get the friendly name associated with the input class.
    * @returns the input friendly name
    */
-  virtual std::string getSimpleName() const = 0;
+  [[nodiscard]] virtual std::string getSimpleName() const = 0;
 
   /**
    * @brief Attach the input controls to a specific dom element to get the input
@@ -47,8 +47,7 @@ struct BABYLON_SHARED_EXPORT ICameraInput {
    * call preventdefault()
    * (https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)
    */
-  virtual void attachControl(ICanvas* canvas, bool noPreventDefault = false)
-    = 0;
+  virtual void attachControl(ICanvas* canvas, bool noPreventDefault = false) = 0;
 
   /**
    * @brief Detach the current controls from the specified dom element.

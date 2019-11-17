@@ -158,7 +158,7 @@ public:
    * @brief Gets whether the SPS as always visible or not
    * doc : http://doc.babylonjs.com/how_to/Solid_Particle_System#sps-visibility
    */
-  bool isAlwaysVisible() const;
+  [[nodiscard]] bool isAlwaysVisible() const;
 
   /**
    * @brief Sets the SPS as always visible or not
@@ -178,7 +178,7 @@ public:
    * enables/disables the underlying mesh bounding box updates. doc :
    * http://doc.babylonjs.com/how_to/Solid_Particle_System#sps-visibility
    */
-  bool isVisibilityBoxLocked() const;
+  [[nodiscard]] bool isVisibilityBoxLocked() const;
 
   /**
    * @brief Tells to `setParticles()` to compute the particle rotations or not.
@@ -231,7 +231,7 @@ public:
    * Note : the particle rotations aren't stored values, so setting
    * `computeParticleRotation` to false will prevents the particle to rotate.
    */
-  bool computeParticleRotation() const;
+  [[nodiscard]] bool computeParticleRotation() const;
 
   /**
    * @brief Gets if `setParticles()` computes the particle colors or not.
@@ -239,7 +239,7 @@ public:
    * Note : the particle colors are stored values, so setting
    * `computeParticleColor` to false will keep yet the last colors set.
    */
-  bool computeParticleColor() const;
+  [[nodiscard]] bool computeParticleColor() const;
 
   /**
    * @brief Gets if `setParticles()` computes the particle textures or not.
@@ -247,7 +247,7 @@ public:
    * Note : the particle textures are stored values, so setting
    * `computeParticleTexture` to false will keep yet the last colors set.
    */
-  bool computeParticleTexture() const;
+  [[nodiscard]] bool computeParticleTexture() const;
 
   /**
    * @brief Gets if `setParticles()` calls the vertex function for each vertex
@@ -255,20 +255,20 @@ public:
    * it's set to false. Note : the particle custom vertex positions aren't
    * stored values.
    */
-  bool computeParticleVertex() const;
+  [[nodiscard]] bool computeParticleVertex() const;
 
   /**
    * @brief Gets if `setParticles()` computes or not the mesh bounding box when
    * computing the particle positions.
    */
-  bool computeBoundingBox() const;
+  [[nodiscard]] bool computeBoundingBox() const;
 
   /**
    * @brief Gets if `setParticles()` sorts or not the distance between each
    * particle and the camera. Skipped when `enableDepthSort` is set to `false`
    * (default) at construction time. Default : `true`
    */
-  bool depthSortParticles() const;
+  [[nodiscard]] bool depthSortParticles() const;
 
   // =======================================================================
   // Particle behavior logic

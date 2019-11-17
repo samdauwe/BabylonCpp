@@ -27,7 +27,7 @@ public:
   /**
    * @brief Gets the name of the behavior.
    */
-  const char* name() const;
+  [[nodiscard]] const char* name() const;
 
   /**
    * @brief Initializes the behavior.
@@ -56,7 +56,7 @@ private:
   /**
    * @brief Gets the flag that indicates if user zooming should stop animation.
    */
-  bool get_zoomStopsAnimation() const;
+  [[nodiscard]] bool get_zoomStopsAnimation() const;
 
   /**
    * @brief Sets the default speed at which the camera rotates around the model.
@@ -66,7 +66,7 @@ private:
   /**
    * @brief Gets the default speed at which the camera rotates around the model.
    */
-  float get_idleRotationSpeed() const;
+  [[nodiscard]] float get_idleRotationSpeed() const;
 
   /**
    * @brief Sets the time (in milliseconds) to wait after user interaction
@@ -78,7 +78,7 @@ private:
    * @brief Gets the time (milliseconds) to wait after user interaction before
    * the camera starts rotating.
    */
-  float get_idleRotationWaitTime() const;
+  [[nodiscard]] float get_idleRotationWaitTime() const;
 
   /**
    * @brief Sets the time (milliseconds) to take to spin up to the full idle
@@ -90,19 +90,19 @@ private:
    * @brief Gets the time (milliseconds) to take to spin up to the full idle
    * rotation speed.
    */
-  float get_idleRotationSpinupTime() const;
+  [[nodiscard]] float get_idleRotationSpinupTime() const;
 
   /**
    * @brief Gets a value indicating if the camera is currently rotating because
    * of this behavior.
    */
-  bool get_rotationInProgress() const;
+  [[nodiscard]] bool get_rotationInProgress() const;
 
   /**
    * @brief Returns true if user is scrolling.
    * @return true if user is scrolling.
    */
-  bool _userIsZooming() const;
+  [[nodiscard]] bool _userIsZooming() const;
 
   bool _shouldAnimationStopForInteraction();
 

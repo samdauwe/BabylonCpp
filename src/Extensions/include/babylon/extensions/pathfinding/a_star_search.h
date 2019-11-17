@@ -14,11 +14,9 @@ namespace Extensions {
 template <typename T, typename priority_t>
 struct PriorityQueue {
   typedef std::pair<priority_t, T> PQElement;
-  std::priority_queue<PQElement, std::vector<PQElement>,
-                      std::greater<PQElement>>
-    elements;
+  std::priority_queue<PQElement, std::vector<PQElement>, std::greater<PQElement>> elements;
 
-  inline bool empty() const
+  [[nodiscard]] inline bool empty() const
   {
     return elements.empty();
   }
@@ -50,8 +48,7 @@ struct AStarNode {
 }; // end of struct
 
 template <typename Graph>
-std::vector<typename Graph::NodeId> AStarSearch(Graph& graph,
-                                                typename Graph::Node& start,
+std::vector<typename Graph::NodeId> AStarSearch(Graph& graph, typename Graph::Node& start,
                                                 typename Graph::Node& goal)
 {
   using NodeId = typename Graph::NodeId;
@@ -84,8 +81,7 @@ std::vector<typename Graph::NodeId> AStarSearch(Graph& graph,
 
     for (auto&& next : graph.neighbors(current)) {
       // The distance from start to a neighbor
-      const auto tentative_gScore
-        = aStarNodes[current].gScore + graph.cost(current, next);
+      const auto tentative_gScore = aStarNodes[current].gScore + graph.cost(current, next);
       if (!aStarNodes.count(next.id)) {
         aStarNodes[next.id] = AStarNode<NodeId>{0, 0.0, 0.0, false};
       }
@@ -94,8 +90,7 @@ std::vector<typename Graph::NodeId> AStarSearch(Graph& graph,
         neighbor.visited  = true;
         neighbor.cameFrom = current;
         neighbor.gScore   = tentative_gScore;
-        neighbor.fScore
-          = tentative_gScore + graph.heuristicCostEstimate(next, goal);
+        neighbor.fScore   = tentative_gScore + graph.heuristicCostEstimate(next, goal);
         frontier.put(next.id, neighbor.fScore);
       }
     }

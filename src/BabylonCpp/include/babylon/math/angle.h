@@ -26,8 +26,8 @@ public:
   Angle& operator=(const Angle& otherAngle);
   Angle& operator=(Angle&& otherAngle);
   ~Angle(); // = default
-  Angle copy() const;
-  std::unique_ptr<Angle> clone() const;
+  [[nodiscard]] Angle copy() const;
+  [[nodiscard]] std::unique_ptr<Angle> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Angle& angle);
   friend bool operator==(const Angle& lhs, const Angle& rhs);
   friend bool operator!=(const Angle& lhs, const Angle& rhs);
@@ -36,13 +36,13 @@ public:
    * @brief Get value in degrees.
    * @returns the Angle value in degrees (float)
    */
-  float degrees() const;
+  [[nodiscard]] float degrees() const;
 
   /**
    * @brief Get value in radians.
    * @returns the Angle value in radians (float)
    */
-  float radians() const;
+  [[nodiscard]] float radians() const;
 
   /** Statics **/
 

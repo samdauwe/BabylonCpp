@@ -95,7 +95,7 @@ public:
    * @param max defines the max vector to use
    * @returns true if there is an intersection
    */
-  bool intersectsMinMax(const Vector3& min, const Vector3& max) const;
+  [[nodiscard]] bool intersectsMinMax(const Vector3& min, const Vector3& max) const;
 
   /** Statics **/
   /**

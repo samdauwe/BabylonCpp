@@ -156,7 +156,7 @@ public:
    * @brief Gets hosting scene.
    * @returns the hosting scene
    */
-  Scene* getScene() const;
+  [[nodiscard]] Scene* getScene() const;
 
   /**
    * @brief Does this action manager handles actions of any of the given
@@ -165,7 +165,7 @@ public:
    * @return a boolean indicating whether one (or more) of the triggers is
    * handled
    */
-  bool hasSpecificTriggers(const Uint32Array& triggers) const override;
+  [[nodiscard]] bool hasSpecificTriggers(const Uint32Array& triggers) const override;
 
   /**
    * @brief Does this action manager handles actions of any of the given
@@ -175,7 +175,8 @@ public:
    * @return a boolean indicating whether one (or more) of the triggers is
    * handled
    */
-  bool hasSpecificTriggers2(unsigned int triggerA, unsigned int triggerB) const override;
+  [[nodiscard]] bool hasSpecificTriggers2(unsigned int triggerA,
+                                          unsigned int triggerB) const override;
 
   /**
    * @brief Does this action manager handles actions of a given trigger.
@@ -212,18 +213,18 @@ public:
                       const std::optional<IActionEvent>& evt = std::nullopt) override;
 
   /** hidden */
-  IAnimatablePtr _getEffectiveTarget(const IAnimatablePtr& target,
-                                     const std::string& propertyPath) const;
+  [[nodiscard]] IAnimatablePtr _getEffectiveTarget(const IAnimatablePtr& target,
+                                                   const std::string& propertyPath) const;
 
   /** hidden */
-  std::string _getProperty(const std::string& propertyPath) const;
+  [[nodiscard]] std::string _getProperty(const std::string& propertyPath) const;
 
   /**
    * @brief Serialize this manager to a JSON object.
    * @param name defines the property name to store this manager
    * @returns a JSON representation of this manager
    */
-  json serialize(const std::string& name) const override;
+  [[nodiscard]] json serialize(const std::string& name) const override;
 
   // Statics
 
@@ -277,13 +278,13 @@ protected:
    * @brief Does this action manager has pointer triggers.
    * @return {boolean} whether or not it has pointer triggers
    */
-  bool get_hasPointerTriggers() const override;
+  [[nodiscard]] bool get_hasPointerTriggers() const override;
 
   /**
    * @brief Does this action manager has pick triggers.
    * @return {boolean} whether or not it has pick triggers
    */
-  bool get_hasPickTriggers() const override;
+  [[nodiscard]] bool get_hasPickTriggers() const override;
 
 private:
   Scene* _scene;

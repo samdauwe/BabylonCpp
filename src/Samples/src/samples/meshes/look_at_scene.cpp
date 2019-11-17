@@ -114,7 +114,7 @@ private:
   /**
    * @brief Better random function.
    */
-  float _rnd(float min, float max) const
+  [[nodiscard]] float _rnd(float min, float max) const
   {
     return std::floor(Math::random() * (max - min + 1.f) + min);
   }

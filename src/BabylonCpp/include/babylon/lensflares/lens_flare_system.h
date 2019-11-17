@@ -50,15 +50,14 @@ class IGLBuffer;
  */
 class BABYLON_SHARED_EXPORT LensFlareSystem {
 
-  using LensFlareEmitterType
-    = std::variant<CameraPtr, IShadowLightPtr, MeshPtr>;
+  using LensFlareEmitterType = std::variant<CameraPtr, IShadowLightPtr, MeshPtr>;
 
 public:
   template <typename... Ts>
   static LensFlareSystemPtr New(Ts&&... args)
   {
-    auto lensFlareSystem = std::shared_ptr<LensFlareSystem>(
-      new LensFlareSystem(std::forward<Ts>(args)...));
+    auto lensFlareSystem
+      = std::shared_ptr<LensFlareSystem>(new LensFlareSystem(std::forward<Ts>(args)...));
     lensFlareSystem->addToScene(lensFlareSystem);
 
     return lensFlareSystem;
@@ -121,7 +120,7 @@ public:
    * @brief Serialize the current Lens Flare System into a JSON representation.
    * @returns the serialized JSON
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   // Statics
 
@@ -133,8 +132,8 @@ public:
    * load relative dependencies such as textures
    * @returns the parsed system
    */
-  static LensFlareSystemPtr Parse(const json& parsedLensFlareSystem,
-                                  Scene* scene, const std::string& rootUrl);
+  static LensFlareSystemPtr Parse(const json& parsedLensFlareSystem, Scene* scene,
+                                  const std::string& rootUrl);
 
 protected:
   /**
@@ -148,11 +147,10 @@ protected:
    * be a camera, a light or a mesh).
    * @param scene Define the scene the lens flare system belongs to
    */
-  LensFlareSystem(const std::string name, const LensFlareEmitterType& emitter,
-                  Scene* scene);
+  LensFlareSystem(const std::string name, const LensFlareEmitterType& emitter, Scene* scene);
 
 private:
-  bool get_isEnabled() const;
+  [[nodiscard]] bool get_isEnabled() const;
   void set_isEnabled(bool value);
 
 public:

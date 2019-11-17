@@ -249,13 +249,12 @@ public:
   /**
    * @brief Hidden Internal use.
    */
-  static AnimationPtr
-  _PrepareAnimation(const std::string& name, const std::string& targetProperty,
-                    size_t framePerSecond, float totalFrame,
-                    const AnimationValue& from, const AnimationValue& to,
-                    unsigned int loopMode
-                    = Animation::ANIMATIONLOOPMODE_CYCLE(),
-                    const IEasingFunctionPtr& easingFunction = nullptr);
+  static AnimationPtr _PrepareAnimation(const std::string& name, const std::string& targetProperty,
+                                        size_t framePerSecond, float totalFrame,
+                                        const AnimationValue& from, const AnimationValue& to,
+                                        unsigned int loopMode
+                                        = Animation::ANIMATIONLOOPMODE_CYCLE(),
+                                        const IEasingFunctionPtr& easingFunction = nullptr);
 
   /**
    * @brief Sets up an animation.
@@ -265,10 +264,9 @@ public:
    * @param easingFunction The easing function used in the animation
    * @returns The created animation
    */
-  static AnimationPtr
-  CreateAnimation(const std::string& property, int animationType,
-                  std::size_t framePerSecond,
-                  const IEasingFunctionPtr& easingFunction = nullptr);
+  static AnimationPtr CreateAnimation(const std::string& property, int animationType,
+                                      std::size_t framePerSecond,
+                                      const IEasingFunctionPtr& easingFunction = nullptr);
 
   /**
    * @brief Create and start an animation on a node.
@@ -286,13 +284,13 @@ public:
    * @param onAnimationEnd defines the callback to call when animation end
    * @returns the animatable created for this animation
    */
-  static AnimatablePtr CreateAndStartAnimation(
-    const std::string& name, const NodePtr& node,
-    const std::string& targetProperty, size_t framePerSecond, float totalFrame,
-    const AnimationValue& from, const AnimationValue& to,
-    unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE(),
-    const IEasingFunctionPtr& easingFunction    = nullptr,
-    const std::function<void()>& onAnimationEnd = nullptr);
+  static AnimatablePtr
+  CreateAndStartAnimation(const std::string& name, const NodePtr& node,
+                          const std::string& targetProperty, size_t framePerSecond,
+                          float totalFrame, const AnimationValue& from, const AnimationValue& to,
+                          unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE(),
+                          const IEasingFunctionPtr& easingFunction    = nullptr,
+                          const std::function<void()>& onAnimationEnd = nullptr);
 
   /**
    * @brief Create and start an animation on a node and its descendants.
@@ -315,13 +313,14 @@ public:
    * @returns the list of animatables created for all nodes
    * Example https://www.babylonjs-playground.com/#MH0VLI
    */
-  static std::vector<AnimatablePtr> CreateAndStartHierarchyAnimation(
-    const std::string& name, const NodePtr& node, bool directDescendantsOnly,
-    const std::string& targetProperty, size_t framePerSecond, float totalFrame,
-    const AnimationValue& from, const AnimationValue& to,
-    unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE(),
-    const IEasingFunctionPtr& easingFunction    = nullptr,
-    const std::function<void()>& onAnimationEnd = nullptr);
+  static std::vector<AnimatablePtr>
+  CreateAndStartHierarchyAnimation(const std::string& name, const NodePtr& node,
+                                   bool directDescendantsOnly, const std::string& targetProperty,
+                                   size_t framePerSecond, float totalFrame,
+                                   const AnimationValue& from, const AnimationValue& to,
+                                   unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE(),
+                                   const IEasingFunctionPtr& easingFunction    = nullptr,
+                                   const std::function<void()>& onAnimationEnd = nullptr);
 
   /**
    * @brief Creates a new animation, merges it with the existing animations and
@@ -340,10 +339,9 @@ public:
    * @returns Nullable animation
    */
   static AnimatablePtr CreateMergeAndStartAnimation(
-    const std::string& name, const NodePtr& node,
-    const std::string& targetProperty, size_t framePerSecond, float totalFrame,
-    const AnimationValue& from, const AnimationValue& to,
-    unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE(),
+    const std::string& name, const NodePtr& node, const std::string& targetProperty,
+    size_t framePerSecond, float totalFrame, const AnimationValue& from, const AnimationValue& to,
+    unsigned int loopMode                       = Animation::ANIMATIONLOOPMODE_CYCLE(),
     const IEasingFunctionPtr& easingFunction    = nullptr,
     const std::function<void()>& onAnimationEnd = nullptr);
 
@@ -359,18 +357,16 @@ public:
    * @param onAnimationEnd Callback trigger at the end of the animation
    * @returns Nullable animation
    */
-  static Animatable*
-  TransitionTo(const std::string& property, const AnimationValue& targetValue,
-               const Node* host, Scene* scene, float frameRate,
-               const AnimationPtr& transition, float duration,
-               const std::function<void()>& onAnimationEnd = nullptr);
+  static Animatable* TransitionTo(const std::string& property, const AnimationValue& targetValue,
+                                  const Node* host, Scene* scene, float frameRate,
+                                  const AnimationPtr& transition, float duration,
+                                  const std::function<void()>& onAnimationEnd = nullptr);
 
 public:
   template <typename... Ts>
   static AnimationPtr New(Ts&&... args)
   {
-    auto animation
-      = std::shared_ptr<Animation>(new Animation(std::forward<Ts>(args)...));
+    auto animation = std::shared_ptr<Animation>(new Animation(std::forward<Ts>(args)...));
 
     return animation;
   }
@@ -384,7 +380,7 @@ public:
    * loading
    * @returns String form of the animation
    */
-  std::string toString(bool fullDetails = false) const;
+  [[nodiscard]] std::string toString(bool fullDetails = false) const;
 
   /**
    * @param Add an event to this animation.
@@ -434,7 +430,7 @@ public:
   AnimationRange& getRange(const std::string& name);
 
   void reset();
-  bool isStopped() const;
+  [[nodiscard]] bool isStopped() const;
 
   /**
    * @brief Gets the key frames from the animation.
@@ -446,7 +442,7 @@ public:
    * @brief Gets the highest frame rate of the animation.
    * @returns Highest frame rate of the animation
    */
-  float getHighestFrame() const;
+  [[nodiscard]] float getHighestFrame() const;
 
   /**
    * @brief Gets the easing function of the animation.
@@ -467,8 +463,8 @@ public:
    * @param gradient Scalar amount to interpolate
    * @returns Interpolated scalar value
    */
-  float floatInterpolateFunction(float startValue, float endValue,
-                                 float gradient) const;
+  [[nodiscard]] float floatInterpolateFunction(float startValue, float endValue,
+                                               float gradient) const;
 
   /**
    * @brief Interpolates a scalar cubically.
@@ -479,9 +475,9 @@ public:
    * @param gradient Scalar amount to interpolate
    * @returns Interpolated scalar value
    */
-  float floatInterpolateFunctionWithTangents(float startValue, float outTangent,
-                                             float endValue, float inTangent,
-                                             float gradient) const;
+  [[nodiscard]] float floatInterpolateFunctionWithTangents(float startValue, float outTangent,
+                                                           float endValue, float inTangent,
+                                                           float gradient) const;
 
   /**
    * @brief Interpolates a quaternion using a spherical linear interpolation.
@@ -490,9 +486,9 @@ public:
    * @param gradient Scalar amount to interpolate
    * @returns Interpolated quaternion value
    */
-  Quaternion quaternionInterpolateFunction(const Quaternion& startValue,
-                                           const Quaternion& endValue,
-                                           float gradient) const;
+  [[nodiscard]] Quaternion quaternionInterpolateFunction(const Quaternion& startValue,
+                                                         const Quaternion& endValue,
+                                                         float gradient) const;
 
   /**
    * @brief Interpolates a quaternion cubically.
@@ -503,10 +499,11 @@ public:
    * @param gradient Scalar amount to interpolate
    * @returns Interpolated quaternion value
    */
-  Quaternion quaternionInterpolateFunctionWithTangents(
-    const Quaternion& startValue, const Quaternion& outTangent,
-    const Quaternion& endValue, const Quaternion& inTangent,
-    float gradient) const;
+  [[nodiscard]] Quaternion quaternionInterpolateFunctionWithTangents(const Quaternion& startValue,
+                                                                     const Quaternion& outTangent,
+                                                                     const Quaternion& endValue,
+                                                                     const Quaternion& inTangent,
+                                                                     float gradient) const;
 
   /**
    * @brief Interpolates a Vector3 linearly.
@@ -515,9 +512,8 @@ public:
    * @param gradient Scalar amount to interpolate
    * @returns Interpolated scalar value
    */
-  Vector3 vector3InterpolateFunction(const Vector3& startValue,
-                                     const Vector3& endValue,
-                                     float gradient) const;
+  [[nodiscard]] Vector3 vector3InterpolateFunction(const Vector3& startValue,
+                                                   const Vector3& endValue, float gradient) const;
 
   /**
    * @brief Interpolates a Vector3 cubically.
@@ -528,11 +524,11 @@ public:
    * @param gradient Scalar amount to interpolate
    * @returns InterpolatedVector3 value
    */
-  Vector3 vector3InterpolateFunctionWithTangents(const Vector3& startValue,
-                                                 const Vector3& outTangent,
-                                                 const Vector3& endValue,
-                                                 const Vector3& inTangent,
-                                                 float gradient) const;
+  [[nodiscard]] Vector3 vector3InterpolateFunctionWithTangents(const Vector3& startValue,
+                                                               const Vector3& outTangent,
+                                                               const Vector3& endValue,
+                                                               const Vector3& inTangent,
+                                                               float gradient) const;
 
   /**
    * @brief Interpolates a Vector2 linearly.
@@ -541,9 +537,8 @@ public:
    * @param gradient Scalar amount to interpolate
    * @returns Interpolated Vector2 value
    */
-  Vector2 vector2InterpolateFunction(const Vector2& startValue,
-                                     const Vector2& endValue,
-                                     float gradient) const;
+  [[nodiscard]] Vector2 vector2InterpolateFunction(const Vector2& startValue,
+                                                   const Vector2& endValue, float gradient) const;
 
   /**
    * @brief Interpolates a Vector2 cubically.
@@ -554,11 +549,11 @@ public:
    * @param gradient Scalar amount to interpolate
    * @returns Interpolated Vector2 value
    */
-  Vector2 vector2InterpolateFunctionWithTangents(const Vector2& startValue,
-                                                 const Vector2& outTangent,
-                                                 const Vector2& endValue,
-                                                 const Vector2& inTangent,
-                                                 float gradient) const;
+  [[nodiscard]] Vector2 vector2InterpolateFunctionWithTangents(const Vector2& startValue,
+                                                               const Vector2& outTangent,
+                                                               const Vector2& endValue,
+                                                               const Vector2& inTangent,
+                                                               float gradient) const;
 
   /**
    * @brief Interpolates a size linearly.
@@ -567,8 +562,8 @@ public:
    * @param gradient Scalar amount to interpolate
    * @returns Interpolated Size value
    */
-  Size sizeInterpolateFunction(const Size& startValue, const Size& endValue,
-                               float gradient) const;
+  [[nodiscard]] Size sizeInterpolateFunction(const Size& startValue, const Size& endValue,
+                                             float gradient) const;
 
   /**
    * @brief Interpolates a Color3 linearly.
@@ -577,14 +572,13 @@ public:
    * @param gradient Scalar amount to interpolate
    * @returns Interpolated Color3 value
    */
-  Color3 color3InterpolateFunction(const Color3& startValue,
-                                   const Color3& endValue,
-                                   float gradient) const;
+  [[nodiscard]] Color3 color3InterpolateFunction(const Color3& startValue, const Color3& endValue,
+                                                 float gradient) const;
 
   /**
    * @brief Hidden Internal use only.
    */
-  AnimationValue _getKeyValue(const AnimationValue& value) const;
+  [[nodiscard]] AnimationValue _getKeyValue(const AnimationValue& value) const;
 
   /**
    * @brief Hidden Internal use only.
@@ -598,8 +592,7 @@ public:
    * @param gradient defines the gradient between both matrices
    * @returns the interpolated matrix
    */
-  Matrix matrixInterpolateFunction(Matrix& startValue, Matrix& endValue,
-                                   float gradient) const;
+  Matrix matrixInterpolateFunction(Matrix& startValue, Matrix& endValue, float gradient) const;
 
   /**
    * @brief Defines the function to use to interpolate matrices.
@@ -610,14 +603,14 @@ public:
    * interpolation
    * @returns the interpolated matrix
    */
-  Matrix matrixInterpolateFunction(Matrix& startValue, Matrix& endValue,
-                                   float gradient, Matrix& result) const;
+  Matrix matrixInterpolateFunction(Matrix& startValue, Matrix& endValue, float gradient,
+                                   Matrix& result) const;
 
   /**
    * @brief Makes a copy of the animation.
    * @returns Cloned animation
    */
-  AnimationPtr clone() const;
+  [[nodiscard]] AnimationPtr clone() const;
 
   /**
    * @brief Sets the key frames of the animation.
@@ -629,7 +622,7 @@ public:
    * @brief Serializes the animation to an object.
    * @returns Serialized object
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Parses an animation object and creates an animation.
@@ -643,8 +636,7 @@ public:
    * @param source Source containing the animations
    * @param destination Target to store the animations
    */
-  static void AppendSerializedAnimations(IAnimatable* source,
-                                         json& destination);
+  static void AppendSerializedAnimations(IAnimatable* source, json& destination);
 
 protected:
   /**
@@ -656,16 +648,15 @@ protected:
    * @param loopMode The loop mode of the animation
    * @param enableBlending Specifies if blending should be enabled
    */
-  Animation(const std::string& name, const std::string& targetProperty,
-            size_t framePerSecond, int dataType,
-            unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE(),
-            bool enableBlending   = false);
+  Animation(const std::string& name, const std::string& targetProperty, size_t framePerSecond,
+            int dataType, unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE(),
+            bool enableBlending = false);
 
 private:
   /**
    * @brief Specifies if any of the runtime animations are currently running.
    */
-  bool get_hasRunningRuntimeAnimations() const;
+  [[nodiscard]] bool get_hasRunningRuntimeAnimations() const;
 
 private:
   /**

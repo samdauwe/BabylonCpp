@@ -27,21 +27,19 @@ public:
                               const Vector2& uv       = Vector2::Zero());
   PositionNormalTextureVertex(const PositionNormalTextureVertex& other);
   PositionNormalTextureVertex(PositionNormalTextureVertex&& other);
-  PositionNormalTextureVertex&
-  operator=(const PositionNormalTextureVertex& other);
+  PositionNormalTextureVertex& operator=(const PositionNormalTextureVertex& other);
   PositionNormalTextureVertex& operator=(PositionNormalTextureVertex&& other);
   ~PositionNormalTextureVertex(); // = default
-  PositionNormalTextureVertex copy() const;
+  [[nodiscard]] PositionNormalTextureVertex copy() const;
 
   /**
    * @brief Clones the PositionNormalTextureVertex.
    * @returns the cloned PositionNormalTextureVertex
    */
-  std::unique_ptr<PositionNormalTextureVertex> clone() const;
+  [[nodiscard]] std::unique_ptr<PositionNormalTextureVertex> clone() const;
 
-  friend std::ostream&
-  operator<<(std::ostream& os,
-             const PositionNormalTextureVertex& positionNormalTextureVertex);
+  friend std::ostream& operator<<(std::ostream& os,
+                                  const PositionNormalTextureVertex& positionNormalTextureVertex);
 
 public:
   /**
@@ -61,9 +59,8 @@ public:
 
 }; // end of class PositionNormalTextureVertex
 
-std::ostream&
-operator<<(std::ostream& os,
-           const PositionNormalTextureVertex& positionNormalTextureVertex);
+std::ostream& operator<<(std::ostream& os,
+                         const PositionNormalTextureVertex& positionNormalTextureVertex);
 
 } // namespace BABYLON
 

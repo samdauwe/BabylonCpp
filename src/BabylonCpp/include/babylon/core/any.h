@@ -57,8 +57,7 @@ public:
 #pragma GCC diagnostic ignored "-Wplacement-new="
 #endif
 #endif
-    return fits<D>() ? new (space) D{std::forward<V>(v)} :
-                       new D{std::forward<V>(v)};
+    return fits<D>() ? new (space) D{std::forward<V>(v)} : new D{std::forward<V>(v)};
 #if !defined(__clang__)
 #if __GNUC__ > 5
 #pragma GCC diagnostic pop
@@ -111,11 +110,11 @@ class some : A {
   //----------------------------------------------------------------------------
 
   struct base {
-    virtual ~base() = default;
-    virtual bool is(id) const      = 0;
-    virtual base* copy(A&) const   = 0;
-    virtual base* move(A&, base*&) = 0;
-    virtual void free(A&)          = 0;
+    virtual ~base()                         = default;
+    [[nodiscard]] virtual bool is(id) const = 0;
+    virtual base* copy(A&) const            = 0;
+    virtual base* move(A&, base*&)          = 0;
+    virtual void free(A&)                   = 0;
   }* p = nullptr;
 
   //----------------------------------------------------------------------------
@@ -128,12 +127,12 @@ class some : A {
     {
       return std::get<0>(*this);
     }
-    T const& get() const&
+    [[nodiscard]] T const& get() const&
     {
       return std::get<0>(*this);
     }
 
-    bool is(id i) const override
+    [[nodiscard]] bool is(id i) const override
     {
       return i == type_id<T>();
     }
@@ -163,7 +162,7 @@ class some : A {
   }
 
   template <typename T>
-  T const& stat() const
+  [[nodiscard]] T const& stat() const
   {
     return static_cast<data<T> const*>(p)->get();
   }
@@ -175,7 +174,7 @@ class some : A {
   }
 
   template <typename T>
-  T const& dyn() const
+  [[nodiscard]] T const& dyn() const
   {
     return dynamic_cast<data<T> const&>(*p).get();
   }
@@ -295,13 +294,13 @@ public:
     }
   }
 
-  bool empty() const
+  [[nodiscard]] bool empty() const
   {
     return p;
   }
 
   template <typename T>
-  bool is() const
+  [[nodiscard]] bool is() const
   {
     return p ? p->is(type_id<T>()) : false;
   }
@@ -317,7 +316,7 @@ public:
     return stat<T>();
   }
   template <typename T>
-  T const& _() const&
+  [[nodiscard]] T const& _() const&
   {
     return stat<T>();
   }
@@ -333,7 +332,7 @@ public:
     return dyn<T>();
   }
   template <typename T>
-  T const& cast() const&
+  [[nodiscard]] T const& cast() const&
   {
     return dyn<T>();
   }

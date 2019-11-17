@@ -48,7 +48,7 @@ public:
   }
   ~Skeleton() override; // = default
 
-  Type type() const override;
+  [[nodiscard]] Type type() const override;
 
   void addToScene(const SkeletonPtr& newSkeleton);
 
@@ -56,13 +56,13 @@ public:
    * @brief Gets the current object class name.
    * @return the class name
    */
-  std::string getClassName() const;
+  [[nodiscard]] std::string getClassName() const;
 
   /**
    * @brief Returns an array containing the root bones.
    * @returns an array containing the root bones
    */
-  std::vector<BonePtr> getChildren() const;
+  [[nodiscard]] std::vector<BonePtr> getChildren() const;
 
   /** Members **/
 
@@ -190,7 +190,8 @@ public:
    * @param id defines the id of the new skeleton
    * @returns the new skeleton
    */
-  std::unique_ptr<Skeleton> clone(const std::string& name, const std::string& id) const;
+  [[nodiscard]] std::unique_ptr<Skeleton> clone(const std::string& name,
+                                                const std::string& id) const;
 
   /**
    * @brief Enable animation blending for this skeleton.
@@ -208,7 +209,7 @@ public:
    * @brief Serialize the skeleton in a JSON object.
    * @returns a JSON object
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   // Statics
 
@@ -231,7 +232,7 @@ public:
    * @brief Gets the root pose matrix.
    * @returns a matrix
    */
-  Matrix* getPoseMatrix() const;
+  [[nodiscard]] Matrix* getPoseMatrix() const;
 
   /**
    * @brief Sorts bones per internal index.
@@ -253,7 +254,7 @@ protected:
    * Please note that this option is not available if the hardware does not
    * support it
    */
-  bool get_useTextureToStoreBoneMatrices() const;
+  [[nodiscard]] bool get_useTextureToStoreBoneMatrices() const;
 
   /**
    * @brief Sets a boolean indicating that bone matrices should be stored as a
@@ -277,12 +278,12 @@ protected:
    * @brief Gets a boolean indicating that the skeleton effectively stores
    * matrices into a texture.
    */
-  bool get_isUsingTextureForMatrices() const;
+  [[nodiscard]] bool get_isUsingTextureForMatrices() const;
 
   /**
    * @brief Gets the unique ID of this skeleton.
    */
-  size_t get_uniqueId() const;
+  [[nodiscard]] size_t get_uniqueId() const;
 
 private:
   float _getHighestAnimationFrame();

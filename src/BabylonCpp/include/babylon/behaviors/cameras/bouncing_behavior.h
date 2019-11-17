@@ -42,7 +42,7 @@ public:
   /**
    * @brief Gets the name of the behavior.
    */
-  const char* name() const;
+  [[nodiscard]] const char* name() const;
 
   /**
    * @brief Initializes the behavior.
@@ -80,7 +80,7 @@ private:
    * @brief Gets a value indicating if the lowerRadiusTransitionRange and
    * upperRadiusTransitionRange are defined automatically.
    */
-  bool get_autoTransitionRange() const;
+  [[nodiscard]] bool get_autoTransitionRange() const;
 
   /**
    * @brief Sets a value indicating if the lowerRadiusTransitionRange and
@@ -96,7 +96,7 @@ private:
    * @param radiusLimit The limit to check against.
    * @return Bool to indicate if at limit.
    */
-  bool _isRadiusAtLimit(float radiusLimit) const;
+  [[nodiscard]] bool _isRadiusAtLimit(float radiusLimit) const;
 
   /**
    * @brief Applies an animation to the radius of the camera, extending by the

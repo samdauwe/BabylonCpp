@@ -32,12 +32,11 @@ struct BABYLON_SHARED_EXPORT GamepadButtonChanges {
    */
   bool valueChanged;
 
-  std::string toString() const
+  [[nodiscard]] std::string toString() const
   {
     std::ostringstream oss;
     oss << "{\"Changed\":" << changed << ",\"PressChanged\":" << pressChanged
-        << ",\"TouchChanged\":" << touchChanged
-        << ",\"ValueChanged\":" << valueChanged << "}";
+        << ",\"TouchChanged\":" << touchChanged << ",\"ValueChanged\":" << valueChanged << "}";
     return oss.str();
   }
 }; // end of struct GamepadButtonChanges

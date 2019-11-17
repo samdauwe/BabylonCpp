@@ -31,9 +31,9 @@ public:
   /**
    * @brief Returns the string "PushMaterial".
    */
-  std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
-  Type type() const override;
+  [[nodiscard]] Type type() const override;
 
   EffectPtr& getEffect();
   bool isReady(AbstractMesh* mesh, bool useInstances) override;

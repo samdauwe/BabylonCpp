@@ -52,15 +52,15 @@ public:
   }
 
   PerfCounter(const PerfCounter& other) = default;
-  PerfCounter(PerfCounter&& other) = default;
+  PerfCounter(PerfCounter&& other)      = default;
   PerfCounter& operator=(const PerfCounter& other) = default;
   PerfCounter& operator=(PerfCounter&& other) = default;
-  ~PerfCounter() = default;
+  ~PerfCounter()                              = default;
 
   /**
    * @brief Returns the smallest value ever.
    */
-  size_t min() const
+  [[nodiscard]] size_t min() const
   {
     return _min;
   }
@@ -68,7 +68,7 @@ public:
   /**
    * @brief eturns the biggest value ever.
    */
-  size_t max() const
+  [[nodiscard]] size_t max() const
   {
     return _max;
   }
@@ -76,7 +76,7 @@ public:
   /**
    * @brief Returns the average value since the performance counter is running.
    */
-  double average() const
+  [[nodiscard]] double average() const
   {
     return _average;
   }
@@ -85,7 +85,7 @@ public:
    * @brief Returns the average value of the last second the counter was
    * monitored.
    */
-  double lastSecAverage() const
+  [[nodiscard]] double lastSecAverage() const
   {
     return _lastSecAverage;
   }
@@ -93,7 +93,7 @@ public:
   /**
    * @brief Returns the current value.
    */
-  size_t current() const
+  [[nodiscard]] size_t current() const
   {
     return _current;
   }
@@ -101,7 +101,7 @@ public:
   /**
    * @brief Gets the accumulated total.
    */
-  size_t total() const
+  [[nodiscard]] size_t total() const
   {
     return _totalAccumulated;
   }
@@ -109,7 +109,7 @@ public:
   /**
    * @brief Gets the total value count.
    */
-  size_t count() const
+  [[nodiscard]] size_t count() const
   {
     return _totalValueCount;
   }
@@ -176,8 +176,7 @@ public:
     }
 
     auto currentTime = Time::highresTimepointNow();
-    _current
-      = Time::fpTimeDiff<size_t, std::milli>(_startMonitoringTime, currentTime);
+    _current         = Time::fpTimeDiff<size_t, std::milli>(_startMonitoringTime, currentTime);
 
     if (newFrame) {
       _fetchResult();
@@ -193,14 +192,13 @@ private:
     // Min/Max update
     _min     = std::min(_min, _current);
     _max     = std::max(_max, _current);
-    _average = static_cast<double>(_totalAccumulated)
-               / static_cast<double>(_totalValueCount);
+    _average = static_cast<double>(_totalAccumulated) / static_cast<double>(_totalValueCount);
 
     // Reset last sec?
     auto now = Time::highresTimepointNow();
     if (Time::fpTimeDiff<double, std::milli>(_lastSecTime, now) > 1000.0) {
-      _lastSecAverage = static_cast<double>(_lastSecAccumulated)
-                        / static_cast<double>(_lastSecValueCount);
+      _lastSecAverage
+        = static_cast<double>(_lastSecAccumulated) / static_cast<double>(_lastSecValueCount);
       _lastSecTime        = now;
       _lastSecAccumulated = 0;
       _lastSecValueCount  = 0;

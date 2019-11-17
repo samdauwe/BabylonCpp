@@ -52,7 +52,7 @@ protected:
                       unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
                       bool blockCompilation    = false);
 
-  unsigned int get_face() const;
+  [[nodiscard]] unsigned int get_face() const;
   void set_face(unsigned int value);
 
 public:

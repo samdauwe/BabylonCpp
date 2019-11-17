@@ -58,13 +58,13 @@ public:
    * @brief Returns the object type.
    * @return the object type
    */
-  Type type() const override;
+  [[nodiscard]] Type type() const override;
 
   /**
    * @brief Gets the maximum number of particles active at the same time.
    * @returns The max number of active particles.
    */
-  size_t getCapacity() const override;
+  [[nodiscard]] size_t getCapacity() const override;
 
   /**
    * @brief Is this system ready to be used/rendered.
@@ -77,7 +77,7 @@ public:
    * after stop is called).
    * @returns True if it has been started, otherwise false.
    */
-  bool isStarted() const override;
+  [[nodiscard]] bool isStarted() const override;
 
   /**
    * @brief Starts the particle system and begins to emit
@@ -100,7 +100,7 @@ public:
    * @brief Returns the string "GPUParticleSystem".
    * @returns a string containing the class name
    */
-  const char* getClassName() const;
+  [[nodiscard]] const char* getClassName() const;
 
   /**
    * @brief Adds a new color gradient.
@@ -301,7 +301,7 @@ public:
    * Gets a boolean indicating that ramp gradients must be used
    * @see http://doc.babylonjs.com/babylon101/particles#ramp-gradients
    */
-  bool get_useRampGradients() const override;
+  [[nodiscard]] bool get_useRampGradients() const override;
 
   /**
    * @brief Not supported by GPUParticleSystem.
@@ -378,7 +378,7 @@ public:
    * @brief Serializes the particle system to a JSON object.
    * @returns the JSON object
    */
-  json serialize() const override;
+  [[nodiscard]] json serialize() const override;
 
   /**
    * @brief Parses a JSON object to create a GPU particle system.
@@ -393,7 +393,7 @@ public:
                                 const std::string& rootUrl, bool doNotStart = false);
 
 protected:
-  size_t get_activeParticleCount() const;
+  [[nodiscard]] size_t get_activeParticleCount() const;
   void set_activeParticleCount(size_t value);
 
   void _reset() override;

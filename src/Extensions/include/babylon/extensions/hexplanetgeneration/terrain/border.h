@@ -15,12 +15,12 @@ struct Border : public UidObj {
   Border(size_t p_id, size_t cornerCount, size_t borderCount, size_t tileCount);
 
   Corner& oppositeCorner(const Corner& corner);
-  const Corner& oppositeCorner(const Corner& corner) const;
+  [[nodiscard]] const Corner& oppositeCorner(const Corner& corner) const;
   Tile& oppositeTile(const Tile& tile);
-  const Tile& oppositeTile(const Tile& tile) const;
-  float length() const;
-  bool isLandBoundary() const;
-  std::string toString() const;
+  [[nodiscard]] const Tile& oppositeTile(const Tile& tile) const;
+  [[nodiscard]] float length() const;
+  [[nodiscard]] bool isLandBoundary() const;
+  [[nodiscard]] std::string toString() const;
 
   std::vector<Corner*> corners;
   std::vector<Border*> borders;

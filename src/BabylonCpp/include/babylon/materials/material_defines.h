@@ -28,7 +28,7 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   /**
    * @brief Specifies if the material needs to be re-calculated.
    */
-  bool isDirty() const override;
+  [[nodiscard]] bool isDirty() const override;
 
   /**
    * @brief Marks the material to indicate that it has been re-calculated.
@@ -89,7 +89,7 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
    * @returns - Boolean indicating if the material defines are equal (true) or
    * not (false).
    */
-  bool isEqual(const MaterialDefines& other) const override;
+  [[nodiscard]] bool isEqual(const MaterialDefines& other) const override;
 
   /**
    * @brief Clones this instance's defines to another instance.
@@ -106,7 +106,7 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
    * @brief Converts the material define values to a string.
    * @returns String of material define information.
    */
-  std::string toString() const override;
+  [[nodiscard]] std::string toString() const override;
 
   // Properties
   std::unordered_map<std::string, bool> boolDef;

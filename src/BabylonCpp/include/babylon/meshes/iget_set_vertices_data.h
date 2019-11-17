@@ -19,7 +19,7 @@ struct BABYLON_SHARED_EXPORT IGetSetVerticesData {
    * @param kind defines the vertex data kind to use
    * @returns true is data kind is present
    */
-  virtual bool isVerticesDataPresent(const std::string& kind) const = 0;
+  [[nodiscard]] virtual bool isVerticesDataPresent(const std::string& kind) const = 0;
 
   /**
    * @brief Gets a specific vertex data attached to this geometry. Float data is
@@ -31,9 +31,8 @@ struct BABYLON_SHARED_EXPORT IGetSetVerticesData {
    * be cloned upon returning it
    * @returns a float array containing vertex data
    */
-  virtual Float32Array getVerticesData(const std::string& kind,
-                                       bool copyWhenShared = false,
-                                       bool forceCopy      = false)
+  virtual Float32Array getVerticesData(const std::string& kind, bool copyWhenShared = false,
+                                       bool forceCopy = false)
     = 0;
   /**
    * @brief Returns an array of integers or a typed array (Int32Array,
@@ -45,9 +44,7 @@ struct BABYLON_SHARED_EXPORT IGetSetVerticesData {
    * be cloned upon returning it
    * @returns the indices array or an empty array if the mesh has no geometry
    */
-  virtual IndicesArray getIndices(bool copyWhenShared = false,
-                                  bool forceCopy      = false)
-    = 0;
+  virtual IndicesArray getIndices(bool copyWhenShared = false, bool forceCopy = false) = 0;
 
   /**
    * @brief Set specific vertex data.
@@ -58,10 +55,9 @@ struct BABYLON_SHARED_EXPORT IGetSetVerticesData {
    * @param stride defines the stride to use (0 by default). This value is
    * deduced from the kind value if not specified
    */
-  virtual AbstractMesh*
-  setVerticesData(const std::string& kind, const Float32Array& data,
-                  bool updatable                      = false,
-                  const std::optional<size_t>& stride = std::nullopt)
+  virtual AbstractMesh* setVerticesData(const std::string& kind, const Float32Array& data,
+                                        bool updatable                      = false,
+                                        const std::optional<size_t>& stride = std::nullopt)
     = 0;
 
   /**
@@ -87,9 +83,8 @@ struct BABYLON_SHARED_EXPORT IGetSetVerticesData {
    * be cloned to make the change only for this mesh (and not all meshes
    * associated with the same geometry)
    */
-  virtual AbstractMesh*
-  updateVerticesData(const std::string& kind, const Float32Array& data,
-                     bool updateExtends = false, bool makeItUnique = false)
+  virtual AbstractMesh* updateVerticesData(const std::string& kind, const Float32Array& data,
+                                           bool updateExtends = false, bool makeItUnique = false)
     = 0;
 
   /**
@@ -99,9 +94,8 @@ struct BABYLON_SHARED_EXPORT IGetSetVerticesData {
    * @param updatable defines if the index buffer must be flagged as updatable
    * (false by default)
    */
-  virtual AbstractMesh* setIndices(const IndicesArray& indices,
-                                   size_t totalVertices = 0,
-                                   bool updatable       = false)
+  virtual AbstractMesh* setIndices(const IndicesArray& indices, size_t totalVertices = 0,
+                                   bool updatable = false)
     = 0;
 }; // end of struct IGetSetVerticesData
 

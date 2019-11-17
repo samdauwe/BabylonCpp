@@ -88,13 +88,13 @@ public:
   /**
    * @brief Gets active scene.
    */
-  Scene* scene() const;
+  [[nodiscard]] Scene* scene() const;
 
   /**
    * @brief Get the class name.
    * @returns "DefaultRenderingPipeline"
    */
-  std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
   /**
    * @brief Force the compilation of the entire pipeline.
@@ -122,7 +122,7 @@ public:
    * @brief Serialize the rendering pipeline (Used when exporting)
    * @returns the serialized object
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Parse the serialized pipeline
@@ -155,44 +155,44 @@ private:
    * @brief Enable or disable the sharpen process from the pipeline.
    */
   void set_sharpenEnabled(bool enabled);
-  bool get_sharpenEnabled() const;
+  [[nodiscard]] bool get_sharpenEnabled() const;
 
   /**
    * @brief Specifies the size of the bloom blur kernel, relative to the final
    * output size.
    */
   void set_bloomKernel(float value);
-  float get_bloomKernel() const;
+  [[nodiscard]] float get_bloomKernel() const;
 
   /**
    * @brief The strength of the bloom.
    */
   void set_bloomWeight(float value);
-  float get_bloomWeight() const;
+  [[nodiscard]] float get_bloomWeight() const;
 
   /**
    * @brief The threshold of the bloom.
    */
   void set_bloomThreshold(float value);
-  float get_bloomThreshold() const;
+  [[nodiscard]] float get_bloomThreshold() const;
 
   /**
    * @brief The scale of the bloom, lower value will provide better performance.
    */
   void set_bloomScale(float value);
-  float get_bloomScale() const;
+  [[nodiscard]] float get_bloomScale() const;
 
   /**
    * @brief Enable or disable the bloom from the pipeline.
    */
   void set_bloomEnabled(bool enabled);
-  bool get_bloomEnabled() const;
+  [[nodiscard]] bool get_bloomEnabled() const;
 
   /**
    * @brief If the depth of field is enabled.
    */
   void set_depthOfFieldEnabled(bool enabled);
-  bool get_depthOfFieldEnabled() const;
+  [[nodiscard]] bool get_depthOfFieldEnabled() const;
 
   /**
    * @brief Blur level of the depth of field effect. (Higher blur will effect
@@ -205,27 +205,27 @@ private:
    * @brief If the anti aliasing is enabled.
    */
   void set_fxaaEnabled(bool enabled);
-  bool get_fxaaEnabled() const;
+  [[nodiscard]] bool get_fxaaEnabled() const;
 
   /**
    * @brief MSAA sample count, setting this to 4 will provide 4x anti aliasing.
    * (default: 1)
    */
   void set_samples(unsigned int sampleCount);
-  unsigned int get_samples() const;
+  [[nodiscard]] unsigned int get_samples() const;
 
   /**
    * @brief If image processing is enabled.
    */
   void set_imageProcessingEnabled(bool enabled);
-  bool get_imageProcessingEnabled() const;
+  [[nodiscard]] bool get_imageProcessingEnabled() const;
 
   /**
    * @brief If glow layer is enabled. (Adds a glow effect to emmissive
    * materials)
    */
   void set_glowLayerEnabled(bool enabled);
-  bool get_glowLayerEnabled() const;
+  [[nodiscard]] bool get_glowLayerEnabled() const;
 
   /**
    * @brief Gets the glow layer (or null if not defined).
@@ -236,13 +236,13 @@ private:
    * @brief Enable or disable the chromaticAberration process from the pipeline.
    */
   void set_chromaticAberrationEnabled(bool enabled);
-  bool get_chromaticAberrationEnabled() const;
+  [[nodiscard]] bool get_chromaticAberrationEnabled() const;
 
   /**
    * @brief Enable or disable the grain process from the pipeline.
    */
   void set_grainEnabled(bool enabled);
-  bool get_grainEnabled() const;
+  [[nodiscard]] bool get_grainEnabled() const;
 
   void _rebuildBloom();
   void _setAutoClearAndTextureSharing(const PostProcessPtr& postProcess,

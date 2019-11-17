@@ -25,7 +25,7 @@ public:
   Inspector(GLFWwindow* glfwWindow = nullptr, Scene* scene = nullptr);
   ~Inspector(); // = default
 
-  Scene* scene() const;
+  [[nodiscard]] Scene* scene() const;
   void setScene(Scene* scene);
   void render();
 
@@ -38,7 +38,7 @@ public:
 
   // Global function that will be called when a new sample is selected
   // (This function is set from SampleLauncher/src/main.cpp)
-  static std::function<void(const std::string &)> OnSampleChanged;
+  static std::function<void(const std::string&)> OnSampleChanged;
 
 private:
   void _showFps();

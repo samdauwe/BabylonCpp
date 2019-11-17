@@ -40,7 +40,7 @@ public:
    * @brief Gets the class name.
    * @returns "PostProcessRenderPipeline"
    */
-  virtual std::string getClassName() const;
+  [[nodiscard]] virtual std::string getClassName() const;
 
   /**
    * @brief Adds an effect to the pipeline.
@@ -99,12 +99,12 @@ protected:
   /**
    * @brief Gets pipeline name.
    */
-  std::string get_name() const;
+  [[nodiscard]] std::string get_name() const;
 
   /**
    * @brief If all the render effects in the pipeline are supported.
    */
-  bool get_isSupported() const;
+  [[nodiscard]] bool get_isSupported() const;
 
   /**
    * @brief Hidden

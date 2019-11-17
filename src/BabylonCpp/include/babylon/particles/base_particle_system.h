@@ -69,13 +69,13 @@ public:
    * @brief Returns whether or not the particle system has an emitter.
    * @return Whether or not the particle system has an emitter
    */
-  bool hasEmitter() const override;
+  [[nodiscard]] bool hasEmitter() const override;
 
   /**
    * @brief Get hosting scene.
    * @returns the scene
    */
-  Scene* getScene() const override;
+  [[nodiscard]] Scene* getScene() const override;
 
   /**
    * @brief Gets the current list of drag gradients.
@@ -286,7 +286,7 @@ protected:
    * @brief Gets whether an animation sprite sheet is enabled or not on the
    * particle system.
    */
-  bool get_isAnimationSheetEnabled() const override;
+  [[nodiscard]] bool get_isAnimationSheetEnabled() const override;
 
   /**
    * @brief Sets whether an animation sprite sheet is enabled or not on the
@@ -297,7 +297,7 @@ protected:
   /**
    * @brief Hidden
    */
-  bool _hasTargetStopDurationDependantGradient() const;
+  [[nodiscard]] bool _hasTargetStopDurationDependantGradient() const;
 
   /**
    * @brief Random direction of each particle after it has been emitted, between
@@ -337,7 +337,7 @@ protected:
    * @brief Gets or sets a boolean indicating if the particles must be rendered
    * as billboard or aligned with the direction.
    */
-  bool get_isBillboardBased() const override;
+  [[nodiscard]] bool get_isBillboardBased() const override;
 
   /**
    * @brief Sets a boolean indicating if the particles must be rendered as

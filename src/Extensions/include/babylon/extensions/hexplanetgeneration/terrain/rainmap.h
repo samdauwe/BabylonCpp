@@ -18,8 +18,8 @@ public:
   ~Rainmap(); // = default
 
   void generateRainmap();
-  float getRainfall(float u, float v) const;
-  float getRainfallNormalized(float u, float v) const;
+  [[nodiscard]] float getRainfall(float u, float v) const;
+  [[nodiscard]] float getRainfallNormalized(float u, float v) const;
 
 private:
   std::unique_ptr<FastSimplexNoise> _noise;

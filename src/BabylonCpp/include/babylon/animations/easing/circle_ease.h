@@ -29,7 +29,7 @@ public:
   /**
    * @brief Hidden
    */
-  float easeInCore(float gradient) const override;
+  [[nodiscard]] float easeInCore(float gradient) const override;
 
 protected:
   CircleEase();

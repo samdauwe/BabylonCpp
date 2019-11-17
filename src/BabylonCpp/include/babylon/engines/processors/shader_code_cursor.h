@@ -23,8 +23,8 @@ public:
   ~ShaderCodeCursor(); // = default
 
 protected:
-  std::string get_currentLine() const;
-  bool get_canRead() const;
+  [[nodiscard]] std::string get_currentLine() const;
+  [[nodiscard]] bool get_canRead() const;
   void set_lines(const std::vector<std::string>& value);
 
 public:

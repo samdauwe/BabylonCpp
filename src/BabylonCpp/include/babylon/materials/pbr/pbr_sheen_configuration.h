@@ -33,8 +33,7 @@ public:
    * @param markAllSubMeshesAsTexturesDirty Callback to flag the material to
    * dirty
    */
-  PBRSheenConfiguration(
-    const std::function<void()>& markAllSubMeshesAsTexturesDirty);
+  PBRSheenConfiguration(const std::function<void()>& markAllSubMeshesAsTexturesDirty);
   ~PBRSheenConfiguration(); // = default
 
   /**
@@ -63,15 +62,14 @@ public:
    * @param scene defines the scene the material belongs to.
    * @param isFrozen defines wether the material is frozen or not.
    */
-  void bindForSubMesh(UniformBuffer& uniformBuffer, Scene* scene,
-                      bool isFrozen);
+  void bindForSubMesh(UniformBuffer& uniformBuffer, Scene* scene, bool isFrozen);
 
   /**
    * @brief Checks to see if a texture is used in the material.
    * @param texture - Base texture to use.
    * @returns - Boolean specifying if a texture is used in the material.
    */
-  bool hasTexture(const BaseTexturePtr& texture) const;
+  [[nodiscard]] bool hasTexture(const BaseTexturePtr& texture) const;
 
   /**
    * @brief Returns an array of the actively used textures.
@@ -96,7 +94,7 @@ public:
    * or dynamic coding.
    * @returns "PBRSheenConfiguration"
    */
-  std::string getClassName() const;
+  [[nodiscard]] std::string getClassName() const;
 
   /**
    * @brief Add fallbacks to the effect fallbacks list.
@@ -105,8 +103,7 @@ public:
    * @param currentRank defines the current fallback rank.
    * @returns the new fallback rank.
    */
-  static unsigned int AddFallbacks(const MaterialDefines& defines,
-                                   EffectFallbacks& fallbacks,
+  static unsigned int AddFallbacks(const MaterialDefines& defines, EffectFallbacks& fallbacks,
                                    unsigned int currentRank);
 
   /**
@@ -137,7 +134,7 @@ public:
    * @brief Serializes this BRDF configuration.
    * @returns - An object with the serialized config.
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Parses a sheen Configuration from a serialized object.
@@ -148,9 +145,9 @@ public:
   void parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
-  bool get_isEnabled() const;
+  [[nodiscard]] bool get_isEnabled() const;
   void set_isEnabled(bool value);
-  bool get_linkSheenWithAlbedo() const;
+  [[nodiscard]] bool get_linkSheenWithAlbedo() const;
   void set_linkSheenWithAlbedo(bool value);
   BaseTexturePtr& get_texture();
   void set_texture(const BaseTexturePtr& value);

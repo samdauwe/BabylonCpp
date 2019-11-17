@@ -49,13 +49,13 @@ public:
    * @brief Clones the sub emitter.
    * @returns the cloned sub emitter
    */
-  SubEmitterPtr clone() const;
+  [[nodiscard]] SubEmitterPtr clone() const;
 
   /**
    * @brief Serialize current object to a JSON object.
    * @returns the serialized object
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Creates a new SubEmitter from a serialized JSON version.
@@ -64,8 +64,7 @@ public:
    * @param rootUrl defines the rootUrl for data loading
    * @returns a new SubEmitter
    */
-  static SubEmitterPtr Parse(const json& parsedLight, Scene* scene,
-                             const std::string& rootUrl);
+  static SubEmitterPtr Parse(const json& parsedLight, Scene* scene, const std::string& rootUrl);
 
   /**
    * @brief Release associated resources.

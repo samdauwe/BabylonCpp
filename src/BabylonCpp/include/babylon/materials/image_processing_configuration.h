@@ -68,7 +68,7 @@ public:
    * @brief Gets the current class name.
    * @return "ImageProcessingConfiguration"
    */
-  std::string getClassName() const;
+  [[nodiscard]] std::string getClassName() const;
 
   /**
    * @brief Prepare the list of uniforms associated with the Image Processing
@@ -76,9 +76,8 @@ public:
    * @param uniforms The list of uniforms used in the effect
    * @param defines the list of defines currently in use
    */
-  static void
-  PrepareUniforms(std::vector<std::string>& uniforms,
-                  const IImageProcessingConfigurationDefines& defines);
+  static void PrepareUniforms(std::vector<std::string>& uniforms,
+                              const IImageProcessingConfigurationDefines& defines);
 
   /**
    * @brief Prepare the list of samplers associated with the Image Processing
@@ -86,9 +85,8 @@ public:
    * @param samplersList The list of uniforms used in the effect
    * @param defines the list of defines currently in use
    */
-  static void
-  PrepareSamplers(std::vector<std::string>& samplersList,
-                  const IImageProcessingConfigurationDefines& defines);
+  static void PrepareSamplers(std::vector<std::string>& samplersList,
+                              const IImageProcessingConfigurationDefines& defines);
 
   /**
    * @brief Prepare the list of defines associated to the shader.
@@ -96,14 +94,13 @@ public:
    * @param forPostProcess Define if we are currently in post process mode or
    * not
    */
-  void prepareDefines(IImageProcessingConfigurationDefines& defines,
-                      bool forPostProcess = false);
+  void prepareDefines(IImageProcessingConfigurationDefines& defines, bool forPostProcess = false);
 
   /**
    * @brief Returns true if all the image processing information are ready.
    * @returns True if ready, otherwise, false
    */
-  bool isReady() const;
+  [[nodiscard]] bool isReady() const;
 
   /**
    * @brief Binds the image processing to the shader.
@@ -123,7 +120,7 @@ public:
    * representation.
    * @return a JSON representation
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Parses the image processing from a json representation.
@@ -136,7 +133,7 @@ protected:
   /**
    * @brief Gets wether the color curves effect is enabled.
    */
-  bool get_colorCurvesEnabled() const;
+  [[nodiscard]] bool get_colorCurvesEnabled() const;
 
   /**
    * @brief Sets wether the color curves effect is enabled.
@@ -159,7 +156,7 @@ protected:
   /**
    * @brief Gets wether the color grading effect is enabled.
    */
-  bool get_colorGradingEnabled() const;
+  [[nodiscard]] bool get_colorGradingEnabled() const;
 
   /**
    * @brief Sets wether the color grading effect is enabled.
@@ -170,7 +167,7 @@ protected:
    * @brief Gets wether the color grading effect is using a green depth for the
    * 3d Texture.
    */
-  bool get_colorGradingWithGreenDepth() const;
+  [[nodiscard]] bool get_colorGradingWithGreenDepth() const;
 
   /**
    * @brief Sets wether the color grading effect is using a green depth for the
@@ -181,7 +178,7 @@ protected:
   /**
    * @brief Gets wether the color grading texture contains BGR values.
    */
-  bool get_colorGradingBGR() const;
+  [[nodiscard]] bool get_colorGradingBGR() const;
 
   /**
    * @brief Sets wether the color grading texture contains BGR values.
@@ -191,7 +188,7 @@ protected:
   /**
    * @brief Gets the Exposure used in the effect.
    */
-  float get_exposure() const;
+  [[nodiscard]] float get_exposure() const;
 
   /**
    * @brief Sets the Exposure used in the effect.
@@ -201,7 +198,7 @@ protected:
   /**
    * @brief Gets wether the tone mapping effect is enabled.
    */
-  bool get_toneMappingEnabled() const;
+  [[nodiscard]] bool get_toneMappingEnabled() const;
 
   /**
    * @brief Sets wether the tone mapping effect is enabled.
@@ -211,7 +208,7 @@ protected:
   /**
    *  @brief Gets the type of tone mapping effect.
    */
-  unsigned int get_toneMappingType() const;
+  [[nodiscard]] unsigned int get_toneMappingType() const;
 
   /**
    *  @brief Sets the type of tone mapping effect used in BabylonJS.
@@ -221,7 +218,7 @@ protected:
   /**
    * @brief Gets the contrast used in the effect.
    */
-  float get_contrast() const;
+  [[nodiscard]] float get_contrast() const;
 
   /**
    * @brief Sets the contrast used in the effect.
@@ -231,7 +228,7 @@ protected:
   /**
    * @brief Gets the vignette blend mode allowing different kind of effect.
    */
-  unsigned int get_vignetteBlendMode() const;
+  [[nodiscard]] unsigned int get_vignetteBlendMode() const;
 
   /**
    * @brief Sets the vignette blend mode allowing different kind of effect.
@@ -241,7 +238,7 @@ protected:
   /**
    * @brief Gets wether the vignette effect is enabled.
    */
-  bool get_vignetteEnabled() const;
+  [[nodiscard]] bool get_vignetteEnabled() const;
 
   /**
    * @brief Sets wether the vignette effect is enabled.
@@ -252,7 +249,7 @@ protected:
    * @brief Gets wether the image processing is applied through a post process
    * or not.
    */
-  bool get_applyByPostProcess() const;
+  [[nodiscard]] bool get_applyByPostProcess() const;
 
   /**
    * @brief Sets wether the image processing is applied through a post process
@@ -263,7 +260,7 @@ protected:
   /**
    * @brief Gets wether the image processing is enabled or not.
    */
-  bool get_isEnabled() const;
+  [[nodiscard]] bool get_isEnabled() const;
   /**
    * @brief Sets wether the image processing is enabled or not.
    */

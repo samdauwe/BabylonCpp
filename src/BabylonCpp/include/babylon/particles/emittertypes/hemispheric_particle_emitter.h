@@ -50,7 +50,7 @@ public:
    * @brief Clones the current emitter and returns a copy of it.
    * @returns the new emitter
    */
-  std::unique_ptr<IParticleEmitterType> clone() const override;
+  [[nodiscard]] std::unique_ptr<IParticleEmitterType> clone() const override;
 
   /**
    * @brief Called by the GPUParticleSystem to setup the update shader.
@@ -62,19 +62,19 @@ public:
    * @brief Returns a string to use to update the GPU particles update shader.
    * @returns a string containng the defines string
    */
-  std::string getEffectDefines() const override;
+  [[nodiscard]] std::string getEffectDefines() const override;
 
   /**
    * @brief Returns the string "HemisphericParticleEmitter".
    * @returns a string containing the class name
    */
-  std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
   /**
    * @brief Serializes the particle system to a JSON object.
    * @returns the JSON object
    */
-  json serialize() const override;
+  [[nodiscard]] json serialize() const override;
 
   /**
    * @brief Parse properties from a JSON object.

@@ -224,13 +224,13 @@ protected:
   /**
    * @brief Defines if the loader logging is enabled.
    */
-  bool get_loggingEnabled() const;
+  [[nodiscard]] bool get_loggingEnabled() const;
   void set_loggingEnabled(bool value);
 
   /**
    * @brief Defines if the loader should capture performance counters.
    */
-  bool get_capturePerformanceCounters() const;
+  [[nodiscard]] bool get_capturePerformanceCounters() const;
   void set_capturePerformanceCounters(bool value);
 
   /**

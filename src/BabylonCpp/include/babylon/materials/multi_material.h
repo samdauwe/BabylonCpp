@@ -37,7 +37,7 @@ public:
   /**
    * @brief Hidden
    */
-  Type type() const override;
+  [[nodiscard]] Type type() const override;
 
   /**
    * @brief Get one of the submaterial by its index in the submaterials array.
@@ -50,14 +50,14 @@ public:
    * @brief Get the list of active textures for the whole sub materials list.
    * @returns All the textures that will be used during the rendering
    */
-  std::vector<BaseTexturePtr> getActiveTextures() const override;
+  [[nodiscard]] std::vector<BaseTexturePtr> getActiveTextures() const override;
 
   /**
    * @brief Gets the current class name of the material e.g. "MultiMaterial"
    * Mainly use in serialization.
    * @returns the class name
    */
-  std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
   /**
    * @brief Checks if the material is ready to render the requested sub mesh.
@@ -77,13 +77,14 @@ public:
    * the parent instance
    * @returns the cloned material
    */
-  MaterialPtr clone(const std::string& _name, bool cloneChildren = false) const override;
+  [[nodiscard]] MaterialPtr clone(const std::string& _name,
+                                  bool cloneChildren = false) const override;
 
   /**
    * @brief Serializes the materials into a JSON representation.
    * @returns the JSON representation
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Dispose the material and release its associated resources.

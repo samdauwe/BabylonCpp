@@ -63,28 +63,26 @@ public:
   EntityComponentStorage& operator=(const EntityComponentStorage&) = delete;
   EntityComponentStorage& operator=(EntityComponentStorage&&) = delete;
 
-  void addComponent(Entity& entity, Component* component,
-                    TypeId componentTypeId);
+  void addComponent(Entity& entity, Component* component, TypeId componentTypeId);
 
   void removeComponent(Entity& entity, TypeId componentTypeId);
 
   void removeAllComponents(Entity& entity);
 
-  Component& getComponent(const Entity& entity, TypeId componentTypeId) const;
+  [[nodiscard]] Component& getComponent(const Entity& entity, TypeId componentTypeId) const;
 
-  ComponentTypeList getComponentTypeList(const Entity& entity) const;
+  [[nodiscard]] ComponentTypeList getComponentTypeList(const Entity& entity) const;
 
-  ComponentArray getComponents(const Entity& entity) const;
+  [[nodiscard]] ComponentArray getComponents(const Entity& entity) const;
 
-  bool hasComponent(const Entity& entity, TypeId componentTypeId) const;
+  [[nodiscard]] bool hasComponent(const Entity& entity, TypeId componentTypeId) const;
 
   void resize(std::size_t entityAmount);
 
   void clear();
 
 private:
-  typedef std::array<std::unique_ptr<Component>, MAX_AMOUNT_OF_COMPONENTS>
-    ImplComponentArray;
+  typedef std::array<std::unique_ptr<Component>, MAX_AMOUNT_OF_COMPONENTS> ImplComponentArray;
 
   /// \brief A data structure to describe the components
   /// within an entity
@@ -97,8 +95,7 @@ private:
     // http://stackoverflow.com/questions/8560994/stdmake-shared-stdunique-ptr-and-move-constructors
     // I think it's due to ComponentTypeList (may have to update boost)
     EntityComponents(EntityComponents&& e)
-        : components(std::move(e.components))
-        , componentTypeList(std::move(e.componentTypeList))
+        : components(std::move(e.components)), componentTypeList(std::move(e.componentTypeList))
     {
     }
 
@@ -118,7 +115,7 @@ private:
   std::vector<EntityComponents> m_componentEntries;
 
   ImplComponentArray& getComponentsImpl(const Entity& e);
-  const ImplComponentArray& getComponentsImpl(const Entity& e) const;
+  [[nodiscard]] const ImplComponentArray& getComponentsImpl(const Entity& e) const;
 
 }; // end of class EntityComponentStorage
 

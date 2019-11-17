@@ -27,8 +27,7 @@ public:
    * @param weights Array of number values for selection weights; length must
    * equal sounds, values will be normalized to 1
    */
-  WeightedSound(bool loop, const std::vector<SoundPtr>& sounds,
-                const Float32Array& weights);
+  WeightedSound(bool loop, const std::vector<SoundPtr>& sounds, const Float32Array& weights);
   ~WeightedSound(); // = default
 
   /**
@@ -52,7 +51,7 @@ protected:
    * @brief Gets the size of cone in degrees for a directional sound in which
    * there will be no attenuation.
    */
-  float get_directionalConeInnerAngle() const;
+  [[nodiscard]] float get_directionalConeInnerAngle() const;
 
   /**
    * @brief Sets the size of cone in degress for a directional sound in which
@@ -65,7 +64,7 @@ protected:
    * which there will be no sound. Listener angles between innerAngle and
    * outerAngle will falloff linearly.
    */
-  float get_directionalConeOuterAngle() const;
+  [[nodiscard]] float get_directionalConeOuterAngle() const;
 
   /**
    * @brief Sets the size of cone in degrees for a directional sound outside of
@@ -77,7 +76,7 @@ protected:
   /**
    * @brief Gets the playback volume.
    */
-  unsigned int get_volume() const;
+  [[nodiscard]] unsigned int get_volume() const;
 
   /**
    * @brief Sets the playback volume.

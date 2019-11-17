@@ -27,7 +27,7 @@ struct A {
   {
     return *x * *x;
   }
-  int squareConst(int x) const
+  [[nodiscard]] int squareConst(int x) const
   {
     return x * x;
   }
@@ -103,45 +103,38 @@ TEST(TestDelegate, MemberFunctionCalls)
   // Call with 1 parameter, returning int
   {
     auto d = SA::delegate<int(int)>::create<A, &A::square>(&a);
-    static_assert(std::is_same<SA::delegate<int(int)>, decltype(d)>::value,
-                  "!");
+    static_assert(std::is_same<SA::delegate<int(int)>, decltype(d)>::value, "!");
     EXPECT_EQ(25, d(5));
   }
   // Call with 1 parameter (pointer), returning int
   {
     auto d = SA::delegate<int(int*)>::create<A, &A::squareStar>(&a);
-    static_assert(std::is_same<SA::delegate<int(int*)>, decltype(d)>::value,
-                  "!");
+    static_assert(std::is_same<SA::delegate<int(int*)>, decltype(d)>::value, "!");
     int in = 5;
     EXPECT_EQ(25, d(&in));
   }
   // Call const function with 1 parameter, returning int
   {
     auto d = SA::delegate<int(int)>::create<A, &A::squareConst>(&a);
-    static_assert(std::is_same<SA::delegate<int(int)>, decltype(d)>::value,
-                  "!");
+    static_assert(std::is_same<SA::delegate<int(int)>, decltype(d)>::value, "!");
     EXPECT_EQ(25, d(5));
   }
   // Call static function with 1 parameter, returning int
   {
     auto d = SA::delegate<int(int)>::create<&A::staticSquareConst>();
-    static_assert(std::is_same<SA::delegate<int(int)>, decltype(d)>::value,
-                  "!");
+    static_assert(std::is_same<SA::delegate<int(int)>, decltype(d)>::value, "!");
     EXPECT_EQ(25, d(5));
   }
   // Call with 2 parameter, returning int
   {
     auto d = SA::delegate<int(int, int)>::create<A, &A::add>(&a);
-    static_assert(std::is_same<SA::delegate<int(int, int)>, decltype(d)>::value,
-                  "!");
+    static_assert(std::is_same<SA::delegate<int(int, int)>, decltype(d)>::value, "!");
     EXPECT_EQ(9, d(4, 5));
   }
   // Call with multiple parameters
   {
-    auto d
-      = SA::delegate<int(int, int, char)>::create<A, &A::addOrMultiply>(&a);
-    static_assert(
-      std::is_same<SA::delegate<int(int, int, char)>, decltype(d)>::value, "!");
+    auto d = SA::delegate<int(int, int, char)>::create<A, &A::addOrMultiply>(&a);
+    static_assert(std::is_same<SA::delegate<int(int, int, char)>, decltype(d)>::value, "!");
     EXPECT_EQ(9, d(5, 4, 'a'));
     EXPECT_EQ(20, d(5, 4, 'm'));
   }
@@ -158,8 +151,7 @@ TEST(TestDelegate, LambdaCalls)
   // Call with 2 parameter, returning int
   {
     auto d = SA::delegate<int(int, int)>([](int a, int b) { return a + b; });
-    static_assert(std::is_same<SA::delegate<int(int, int)>, decltype(d)>::value,
-                  "!");
+    static_assert(std::is_same<SA::delegate<int(int, int)>, decltype(d)>::value, "!");
     EXPECT_EQ(9, d(4, 5));
   }
   // Call lamba using decltype
@@ -214,8 +206,7 @@ TEST(TestDelegate, CompareCopiedDelegates)
   }
   // Call with multiple parameters
   {
-    auto d
-      = SA::delegate<int(int, int, char)>::create<A, &A::addOrMultiply>(&a);
+    auto d  = SA::delegate<int(int, int, char)>::create<A, &A::addOrMultiply>(&a);
     auto d2 = d;
     EXPECT_EQ(d, d2);
   }

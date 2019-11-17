@@ -28,8 +28,8 @@ public:
   Path2& operator=(const Path2& otherPath);
   Path2& operator=(Path2&& otherPath);
   ~Path2(); // = default
-  Path2 copy() const;
-  std::unique_ptr<Path2> clone() const;
+  [[nodiscard]] Path2 copy() const;
+  [[nodiscard]] std::unique_ptr<Path2> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Path2& path);
 
   /**
@@ -66,7 +66,7 @@ public:
    * path.
    * @returns the Path2 total length (float).
    */
-  float length() const;
+  [[nodiscard]] float length() const;
 
   /**
    * @brief Gets the points which construct the path
@@ -78,7 +78,7 @@ public:
    * @brief Gets the points which construct the path
    * @returns the Path2 internal array of points.
    */
-  const std::vector<Vector2>& getPoints() const;
+  [[nodiscard]] const std::vector<Vector2>& getPoints() const;
 
   /**
    * @brief Retreives the point at the distance aways from the starting point.
@@ -87,7 +87,7 @@ public:
    * @returns a new Vector2 located at a percentage of the Path2 total length on
    * this path.
    */
-  Vector2 getPointAtLengthPosition(float normalizedLengthPosition) const;
+  [[nodiscard]] Vector2 getPointAtLengthPosition(float normalizedLengthPosition) const;
 
   /** Statics **/
 

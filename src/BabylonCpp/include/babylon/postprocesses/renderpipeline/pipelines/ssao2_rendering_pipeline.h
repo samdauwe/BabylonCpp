@@ -77,13 +77,13 @@ public:
   /**
    * @brief Gets active scene.
    */
-  Scene* scene() const;
+  [[nodiscard]] Scene* scene() const;
 
   /**
    * @brief Get the class name.
    * @returns "SSAO2RenderingPipeline"
    */
-  std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
   /** Methods */
   static bool IsSupported();
@@ -101,7 +101,7 @@ public:
    * @brief Serialize the rendering pipeline (Used when exporting).
    * @returns the serialized object
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Parse the serialized pipeline.
@@ -130,11 +130,11 @@ protected:
 
 private:
   void set_samples(unsigned int n);
-  unsigned int get_samples() const;
+  [[nodiscard]] unsigned int get_samples() const;
   void set_textureSamples(unsigned int n);
-  unsigned int get_textureSamples() const;
+  [[nodiscard]] unsigned int get_textureSamples() const;
   void set_expensiveBlur(bool b);
-  bool get_expensiveBlur() const;
+  [[nodiscard]] bool get_expensiveBlur() const;
   void _createBlurPostProcess(float ssaoRatio, float blurRatio);
   // Van der Corput radical inverse
   float _radicalInverse_VdC(uint32_t i);

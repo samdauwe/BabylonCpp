@@ -37,8 +37,8 @@ public:
   void setAgentMaxSpeed(size_t agentId, float speed);
 
   /* Obstacle management functions */
-  void addObstacleByBoundingBox(const AbstractMeshPtr& mesh,
-                                const Vector3& position, bool isVisible = true);
+  void addObstacleByBoundingBox(const AbstractMeshPtr& mesh, const Vector3& position,
+                                bool isVisible = true);
 
   /* Process the obstacles so that they are accounted for in the simulation. */
   void processObstacles();
@@ -51,7 +51,7 @@ public:
   void setPrecision(unsigned int precision);
 
   /* Return whether or not the simulation is running. */
-  bool isRunning() const;
+  [[nodiscard]] bool isRunning() const;
 
   /* Updates the simulation */
   void update();

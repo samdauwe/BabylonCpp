@@ -35,8 +35,7 @@ public:
    * @param markAllSubMeshesAsTexturesDirty Callback to flag the material to
    * dirty
    */
-  PBRAnisotropicConfiguration(
-    const std::function<void()>& markAllSubMeshesAsTexturesDirty);
+  PBRAnisotropicConfiguration(const std::function<void()>& markAllSubMeshesAsTexturesDirty);
   ~PBRAnisotropicConfiguration(); // = default
 
   /**
@@ -58,8 +57,7 @@ public:
    * @param mesh the mesh we are preparing the defines for.
    * @param scene defines the scene the material belongs to.
    */
-  void prepareDefines(MaterialDefines& defines, AbstractMesh& mesh,
-                      Scene* scene);
+  void prepareDefines(MaterialDefines& defines, AbstractMesh& mesh, Scene* scene);
 
   /**
    * @brief Binds the material data.
@@ -67,15 +65,14 @@ public:
    * @param scene defines the scene the material belongs to.
    * @param isFrozen defines wether the material is frozen or not.
    */
-  void bindForSubMesh(UniformBuffer& uniformBuffer, Scene* scene,
-                      bool isFrozen);
+  void bindForSubMesh(UniformBuffer& uniformBuffer, Scene* scene, bool isFrozen);
 
   /**
    * @brief Checks to see if a texture is used in the material.
    * @param texture - Base texture to use.
    * @returns - Boolean specifying if a texture is used in the material.
    */
-  bool hasTexture(const BaseTexturePtr& texture) const;
+  [[nodiscard]] bool hasTexture(const BaseTexturePtr& texture) const;
 
   /**
    * @brief Returns an array of the actively used textures.
@@ -100,7 +97,7 @@ public:
    * or dynamic coding.
    * @returns "PBRAnisotropicConfiguration"
    */
-  std::string getClassName() const;
+  [[nodiscard]] std::string getClassName() const;
 
   /**
    * @brief Add fallbacks to the effect fallbacks list.
@@ -109,8 +106,7 @@ public:
    * @param currentRank defines the current fallback rank.
    * @returns the new fallback rank.
    */
-  static unsigned int AddFallbacks(const MaterialDefines& defines,
-                                   EffectFallbacks& fallbacks,
+  static unsigned int AddFallbacks(const MaterialDefines& defines, EffectFallbacks& fallbacks,
                                    unsigned int currentRank);
 
   /**
@@ -141,7 +137,7 @@ public:
    * @brief Serializes this anisotropy configuration.
    * @returns - An object with the serialized config.
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Parses a anisotropy Configuration from a serialized object.
@@ -152,7 +148,7 @@ public:
   void parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
-  bool get_isEnabled() const;
+  [[nodiscard]] bool get_isEnabled() const;
   void set_isEnabled(bool value);
   BaseTexturePtr& get_texture();
   void set_texture(const BaseTexturePtr& value);

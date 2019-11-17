@@ -97,30 +97,30 @@ public:
   /**
    * @brief Gets the name of the material class.
    */
-  std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
   /**
    * @brief Returns true if alpha blending should be disabled.
    */
-  bool _disableAlphaBlending() const;
+  [[nodiscard]] bool _disableAlphaBlending() const;
 
   /**
    * @brief Specifies whether or not this material should be rendered in alpha
    * blend mode.
    */
-  bool needAlphaBlending() const override;
+  [[nodiscard]] bool needAlphaBlending() const override;
 
   /**
    * @brief Specifies if the mesh will require alpha blending.
    * @param mesh - BJS mesh.
    */
-  bool needAlphaBlendingForMesh(const AbstractMesh& mesh) const override;
+  [[nodiscard]] bool needAlphaBlendingForMesh(const AbstractMesh& mesh) const override;
 
   /**
    * @brief Specifies whether or not this material should be rendered in alpha
    * test mode.
    */
-  bool needAlphaTesting() const override;
+  [[nodiscard]] bool needAlphaTesting() const override;
 
   /**
    * @brief Gets the texture used for the alpha test.
@@ -142,7 +142,7 @@ public:
    * @returns boolean specifiying if the material uses metallic roughness
    * workflow.
    */
-  bool isMetallicWorkflow() const;
+  [[nodiscard]] bool isMetallicWorkflow() const;
 
   /**
    * @brief Force shader compilation
@@ -178,14 +178,14 @@ public:
    * @brief Returns an array of the actively used textures.
    * @returns - Array of BaseTextures
    */
-  std::vector<BaseTexturePtr> getActiveTextures() const override;
+  [[nodiscard]] std::vector<BaseTexturePtr> getActiveTextures() const override;
 
   /**
    * @brief Checks to see if a texture is used in the material.
    * @param texture - Base texture to use.
    * @returns - Boolean specifying if a texture is used in the material.
    */
-  bool hasTexture(const BaseTexturePtr& texture) const override;
+  [[nodiscard]] bool hasTexture(const BaseTexturePtr& texture) const override;
 
   /**
    * @brief Disposes the resources of the material.
@@ -202,19 +202,19 @@ protected:
    */
   void _attachImageProcessingConfiguration(const ImageProcessingConfigurationPtr& configuration);
 
-  bool _shouldUseAlphaFromAlbedoTexture() const;
+  [[nodiscard]] bool _shouldUseAlphaFromAlbedoTexture() const;
 
   /**
    * @brief Gets a boolean indicating that current material needs to register
    * RTT.
    */
-  bool get_hasRenderTargetTextures() const override;
+  [[nodiscard]] bool get_hasRenderTargetTextures() const override;
 
   /**
    * @brief Enabled the use of logarithmic depth buffers, which is good for wide
    * depth buffers.
    */
-  bool get_useLogarithmicDepth() const override;
+  [[nodiscard]] bool get_useLogarithmicDepth() const override;
 
   /**
    * @brief Enabled the use of logarithmic depth buffers, which is good for wide
@@ -246,7 +246,7 @@ protected:
    * Defines the material debug mode.
    * It helps seeing only some components of the material while troubleshooting.
    */
-  unsigned int get_debugMode() const;
+  [[nodiscard]] unsigned int get_debugMode() const;
   void set_debugMode(unsigned int value);
 
 private:
@@ -265,7 +265,7 @@ private:
    * @returns - Reflection texture if present.  Otherwise, returns the
    * environment texture.
    */
-  BaseTexturePtr _getReflectionTexture() const;
+  [[nodiscard]] BaseTexturePtr _getReflectionTexture() const;
 
 public:
   /**

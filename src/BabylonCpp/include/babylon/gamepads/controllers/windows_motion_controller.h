@@ -87,14 +87,14 @@ struct WindowsMotionControllerFactory : public _GamePadFactory {
    * @param gamepadInfo Defines the gamepad info as receveid from the controller APIs.
    * @returns true if it can be created, otherwise false
    */
-  bool canCreate(const IBrowserGamepadPtr& gamepadInfo) const override;
+  [[nodiscard]] bool canCreate(const IBrowserGamepadPtr& gamepadInfo) const override;
 
   /**
    * @brief Creates a new instance of the Gamepad.
    * @param gamepadInfo Defines the gamepad info as receveid from the controller APIs.
    * @returns the new gamepad instance
    */
-  WebVRControllerPtr create(const IBrowserGamepadPtr& gamepadInfo) const override;
+  [[nodiscard]] WebVRControllerPtr create(const IBrowserGamepadPtr& gamepadInfo) const override;
 }; // end of struct WindowsMotionControllerFactory
 
 /**

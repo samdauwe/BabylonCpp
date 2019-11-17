@@ -30,8 +30,8 @@ public:
   template <typename... Ts>
   static RuntimeAnimationPtr New(Ts&&... args)
   {
-    auto animation = std::shared_ptr<RuntimeAnimation>(
-      new RuntimeAnimation(std::forward<Ts>(args)...));
+    auto animation
+      = std::shared_ptr<RuntimeAnimation>(new RuntimeAnimation(std::forward<Ts>(args)...));
     animation->addToRuntimeAnimations(animation);
 
     return animation;
@@ -56,7 +56,7 @@ public:
    * @brief Specifies if the runtime animation is stopped.
    * @returns Boolean specifying if the runtime animation is stopped
    */
-  bool isStopped() const;
+  [[nodiscard]] bool isStopped() const;
 
   /**
    * @brief Disposes of the runtime animation.
@@ -74,7 +74,7 @@ public:
    * @brief Gets the loop pmode of the runtime animation
    * @returns Loop Mode
    */
-  std::optional<unsigned int> _getCorrectLoopMode() const;
+  [[nodiscard]] std::optional<unsigned int> _getCorrectLoopMode() const;
 
   /**
    * @brief Move the current animation to a given frame.
@@ -99,8 +99,8 @@ public:
    * @param onLoop optional callback called when animation loops
    * @returns a boolean indicating if the animation is running
    */
-  bool animate(millisecond_t delay, float from, float to, bool loop,
-               float speedRatio, float weight = -1.f);
+  bool animate(millisecond_t delay, float from, float to, bool loop, float speedRatio,
+               float weight = -1.f);
 
 protected:
   /**
@@ -110,18 +110,18 @@ protected:
    * @param scene defines the hosting scene
    * @param host defines the initiating Animatable
    */
-  RuntimeAnimation(const IAnimatablePtr& target, const AnimationPtr& animation,
-                   Scene* scene, Animatable* host);
+  RuntimeAnimation(const IAnimatablePtr& target, const AnimationPtr& animation, Scene* scene,
+                   Animatable* host);
 
   /**
    * @brief Gets the current frame of the runtime animation.
    */
-  float get_currentFrame() const;
+  [[nodiscard]] float get_currentFrame() const;
 
   /**
    * @brief Gets the weight of the runtime animation.
    */
-  float get_weight() const;
+  [[nodiscard]] float get_weight() const;
 
   /**
    * @brief Gets the current value of the runtime animation.
@@ -131,7 +131,7 @@ protected:
   /**
    * @brief Gets the target path of the runtime animation.
    */
-  std::string get_targetPath() const;
+  [[nodiscard]] std::string get_targetPath() const;
 
   /**
    * @brief Gets the actual target of the runtime animation.
@@ -141,10 +141,8 @@ protected:
 private:
   void _preparePath(const IAnimatablePtr& target, unsigned int targetIndex = 0);
   void _getOriginalValues(unsigned int targetIndex = 0);
-  void _setValue(const IAnimatablePtr& target,
-                 const IAnimatablePtr& destination,
-                 const AnimationValue& currentValue, float weight,
-                 unsigned int targetIndex = 0);
+  void _setValue(const IAnimatablePtr& target, const IAnimatablePtr& destination,
+                 const AnimationValue& currentValue, float weight, unsigned int targetIndex = 0);
 
 public:
   /**
@@ -165,8 +163,7 @@ public:
   /**
    * Current value of the runtime animation
    */
-  ReadOnlyProperty<RuntimeAnimation, std::optional<AnimationValue>>
-    currentValue;
+  ReadOnlyProperty<RuntimeAnimation, std::optional<AnimationValue>> currentValue;
 
   /**
    * Target path of the runtime animation

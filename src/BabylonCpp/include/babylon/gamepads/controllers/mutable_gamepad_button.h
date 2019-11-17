@@ -20,18 +20,15 @@ public:
   MutableGamepadButton& operator=(const MutableGamepadButton& other);
   MutableGamepadButton& operator=(MutableGamepadButton&& other);
   ~MutableGamepadButton(); // = default
-  std::string toString() const;
-  friend std::ostream&
-  operator<<(std::ostream& os,
-             const MutableGamepadButton& mutableGamepadButton);
-  friend bool operator==(const MutableGamepadButton& lhs,
-                         const MutableGamepadButton& rhs);
-  friend bool operator!=(const MutableGamepadButton& lhs,
-                         const MutableGamepadButton& rhs);
+  [[nodiscard]] std::string toString() const;
+  friend std::ostream& operator<<(std::ostream& os,
+                                  const MutableGamepadButton& mutableGamepadButton);
+  friend bool operator==(const MutableGamepadButton& lhs, const MutableGamepadButton& rhs);
+  friend bool operator!=(const MutableGamepadButton& lhs, const MutableGamepadButton& rhs);
 
-  int value() const;
-  bool touched() const;
-  bool pressed() const;
+  [[nodiscard]] int value() const;
+  [[nodiscard]] bool touched() const;
+  [[nodiscard]] bool pressed() const;
 
 protected:
   /**
@@ -49,12 +46,9 @@ protected:
 
 }; // end of class MutableGamepadButton
 
-std::ostream& operator<<(std::ostream& os,
-                         const MutableGamepadButton& mutableGamepadButton);
-bool operator==(const MutableGamepadButton& lhs,
-                const MutableGamepadButton& rhs);
-bool operator!=(const MutableGamepadButton& lhs,
-                const MutableGamepadButton& rhs);
+std::ostream& operator<<(std::ostream& os, const MutableGamepadButton& mutableGamepadButton);
+bool operator==(const MutableGamepadButton& lhs, const MutableGamepadButton& rhs);
+bool operator!=(const MutableGamepadButton& lhs, const MutableGamepadButton& rhs);
 
 } // end of namespace BABYLON
 

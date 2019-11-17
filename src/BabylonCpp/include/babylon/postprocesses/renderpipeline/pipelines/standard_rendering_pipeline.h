@@ -58,14 +58,14 @@ public:
   ~StandardRenderingPipeline() override; // = default
 
   void addToScene(const StandardRenderingPipelinePtr& renderingPipeline);
-  Type type() const override;
+  [[nodiscard]] Type type() const override;
   float operator[](const std::string& key) const;
 
   /**
    * @brief Get the class name.
    * @returns "StandardRenderingPipeline"
    */
-  std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
   /**
    * @brief Dispose of the pipeline and stop all post processes.
@@ -76,7 +76,7 @@ public:
    * @brief Serialize the rendering pipeline (Used when exporting).
    * @returns the serialized object
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Parse the serialized pipeline.
@@ -108,7 +108,7 @@ protected:
   /**
    * @brief Gets the overall exposure used by the pipeline.
    */
-  float get_exposure() const;
+  [[nodiscard]] float get_exposure() const;
 
   /**
    * @brief Sets the overall exposure used by the pipeline.
@@ -119,7 +119,7 @@ protected:
    * @brief Gets wether or not the exposure of the overall pipeline should be
    * automatically adjusted by the HDR post-process.
    */
-  bool get_hdrAutoExposure() const;
+  [[nodiscard]] bool get_hdrAutoExposure() const;
 
   /**
    * @brief Sets wether or not the exposure of the overall pipeline should be
@@ -131,7 +131,7 @@ protected:
    * @brief Gets how much the image is blurred by the movement while using the
    * motion blur post-process.
    */
-  float get_motionStrength() const;
+  [[nodiscard]] float get_motionStrength() const;
 
   /**
    * @brief Sets how much the image is blurred by the movement while using the
@@ -143,7 +143,7 @@ protected:
    * @brief Gets wether or not the motion blur post-process is object based or
    * screen based.
    */
-  bool get_objectBasedMotionBlur() const;
+  [[nodiscard]] bool get_objectBasedMotionBlur() const;
 
   /**
    * @brief Sets wether or not the motion blur post-process should be object
@@ -151,25 +151,25 @@ protected:
    */
   void set_objectBasedMotionBlur(bool value);
 
-  bool get_bloomEnabled() const;
+  [[nodiscard]] bool get_bloomEnabled() const;
   void set_bloomEnabled(bool enabled);
-  bool get_depthOfFieldEnabled() const;
+  [[nodiscard]] bool get_depthOfFieldEnabled() const;
   void set_depthOfFieldEnabled(bool enabled);
-  bool get_lensFlareEnabled() const;
+  [[nodiscard]] bool get_lensFlareEnabled() const;
   void set_lensFlareEnabled(bool enabled);
-  bool get_HDREnabled() const;
+  [[nodiscard]] bool get_HDREnabled() const;
   void set_HDREnabled(bool enabled);
-  bool get_VLSEnabled() const;
+  [[nodiscard]] bool get_VLSEnabled() const;
   void set_VLSEnabled(bool enabled);
-  bool get_motionBlurEnabled() const;
+  [[nodiscard]] bool get_motionBlurEnabled() const;
   void set_motionBlurEnabled(bool enabled);
-  bool get_fxaaEnabled() const;
+  [[nodiscard]] bool get_fxaaEnabled() const;
   void set_fxaaEnabled(bool enabled);
-  float get_volumetricLightStepsCount() const;
+  [[nodiscard]] float get_volumetricLightStepsCount() const;
   void set_volumetricLightStepsCount(float count);
-  float get_motionBlurSamples() const;
+  [[nodiscard]] float get_motionBlurSamples() const;
   void set_motionBlurSamples(float samples);
-  unsigned int get_samples() const;
+  [[nodiscard]] unsigned int get_samples() const;
   void set_samples(unsigned int sampleCount);
 
 private:

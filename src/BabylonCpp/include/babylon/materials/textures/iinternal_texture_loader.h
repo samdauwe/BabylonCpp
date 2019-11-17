@@ -33,7 +33,7 @@ struct BABYLON_SHARED_EXPORT IInternalTextureLoader {
    * @brief Defines wether the loader supports cascade loading the different
    * faces.
    */
-  virtual bool supportCascades() const = 0;
+  [[nodiscard]] virtual bool supportCascades() const = 0;
 
   /**
    * @brief This returns if the loader support the current file information.
@@ -45,9 +45,8 @@ struct BABYLON_SHARED_EXPORT IInternalTextureLoader {
    * @param isBuffer defines whether the texture data are stored as a buffer
    * @returns true if the loader can load the specified file
    */
-  virtual bool
-  canLoad(const std::string& extension, const std::string& textureFormatInUse,
-          const InternalTexturePtr& fallback, bool isBase64, bool isBuffer)
+  virtual bool canLoad(const std::string& extension, const std::string& textureFormatInUse,
+                       const InternalTexturePtr& fallback, bool isBase64, bool isBuffer)
     = 0;
 
   /**
@@ -69,9 +68,8 @@ struct BABYLON_SHARED_EXPORT IInternalTextureLoader {
    * the engine
    * @returns the fallback texture
    */
-  virtual std::string
-  getFallbackTextureUrl(const std::string& rootUrl,
-                        const std::string& textureFormatInUse)
+  virtual std::string getFallbackTextureUrl(const std::string& rootUrl,
+                                            const std::string& textureFormatInUse)
     = 0;
 
   /**
@@ -83,12 +81,10 @@ struct BABYLON_SHARED_EXPORT IInternalTextureLoader {
    * @param onLoad defines the callback to trigger once the texture is ready
    * @param onError defines the callback to trigger in case of error
    */
-  virtual void
-  loadCubeData(const std::variant<std::string, ArrayBuffer>& img,
-               const InternalTexturePtr& texture, bool createPolynomials,
-               const std::function<void(const CubeTextureData& data)>& onLoad,
-               const std::function<void(const std::string& message,
-                                        const std::string& exception)>& onError)
+  virtual void loadCubeData(
+    const std::variant<std::string, ArrayBuffer>& img, const InternalTexturePtr& texture,
+    bool createPolynomials, const std::function<void(const CubeTextureData& data)>& onLoad,
+    const std::function<void(const std::string& message, const std::string& exception)>& onError)
     = 0;
 
   /**
@@ -100,12 +96,11 @@ struct BABYLON_SHARED_EXPORT IInternalTextureLoader {
    * @param onLoad defines the callback to trigger once the texture is ready
    * @param onError defines the callback to trigger in case of error
    */
-  virtual void
-  loadCubeData(const std::vector<std::variant<std::string, ArrayBuffer>>& imgs,
-               const InternalTexturePtr& texture, bool createPolynomials,
-               const std::function<void(const CubeTextureData& datas)>& onLoad,
-               const std::function<void(const std::string& message,
-                                        const std::string& exception)>& onError)
+  virtual void loadCubeData(
+    const std::vector<std::variant<std::string, ArrayBuffer>>& imgs,
+    const InternalTexturePtr& texture, bool createPolynomials,
+    const std::function<void(const CubeTextureData& datas)>& onLoad,
+    const std::function<void(const std::string& message, const std::string& exception)>& onError)
     = 0;
 
   /**
@@ -117,9 +112,8 @@ struct BABYLON_SHARED_EXPORT IInternalTextureLoader {
    */
   virtual void
   loadData(const ArrayBuffer& data, const InternalTexturePtr& texture,
-           const std::function<void(
-             int width, int height, bool loadMipmap, bool isCompressed,
-             const std::function<void()>& done, bool loadFailed)>& callback)
+           const std::function<void(int width, int height, bool loadMipmap, bool isCompressed,
+                                    const std::function<void()>& done, bool loadFailed)>& callback)
     = 0;
 
 }; // end of struct IInternalTextureLoader

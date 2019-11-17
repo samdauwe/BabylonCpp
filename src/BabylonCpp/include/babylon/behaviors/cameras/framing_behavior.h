@@ -59,7 +59,7 @@ public:
   /**
    * @brief Gets the name of the behavior.
    */
-  const char* name() const;
+  [[nodiscard]] const char* name() const;
 
   /**
    * @brief Initializes the behavior.
@@ -164,7 +164,7 @@ private:
   /**
    * @brief Gets current mode used by the behavior.
    */
-  unsigned int get_mode() const;
+  [[nodiscard]] unsigned int get_mode() const;
 
   /**
    * @brief Sets the scale applied to the radius (1 by default)
@@ -174,7 +174,7 @@ private:
   /**
    * @brief Gets the scale applied to the radius
    */
-  float get_radiusScale() const;
+  [[nodiscard]] float get_radiusScale() const;
 
   /**
    * @brief Sets the scale to apply on Y axis to position camera focus. 0.5 by
@@ -186,7 +186,7 @@ private:
    * @brief Gets the scale to apply on Y axis to position camera focus. 0.5 by
    * default which means the center of the bounding box.
    */
-  float get_positionScale() const;
+  [[nodiscard]] float get_positionScale() const;
 
   /**
    * @brief Sets the angle above/below the horizontal plane to return to when
@@ -198,7 +198,7 @@ private:
    * @brief Gets the angle above/below the horizontal plane to return to when
    * the return to default elevation idle behaviour is triggered, in radians.
    */
-  float get_defaultElevation() const;
+  [[nodiscard]] float get_defaultElevation() const;
 
   /**
    * @brief Sets the time (in milliseconds) taken to return to the default beta
@@ -212,7 +212,7 @@ private:
    * position.
    * Negative value indicates camera should not return to default.
    */
-  float get_elevationReturnTime() const;
+  [[nodiscard]] float get_elevationReturnTime() const;
 
   /**
    * @brief Sets the delay (in milliseconds) taken before the camera returns to
@@ -224,7 +224,7 @@ private:
    * @brief Gets the delay (in milliseconds) taken before the camera returns to
    * the default beta position.
    */
-  float get_elevationReturnWaitTime() const;
+  [[nodiscard]] float get_elevationReturnWaitTime() const;
 
   /**
    * @brief Sets the flag that indicates if user zooming should stop animation.
@@ -234,7 +234,7 @@ private:
   /**
    * @brief Gets the flag that indicates if user zooming should stop animation.
    */
-  bool get_zoomStopsAnimation() const;
+  [[nodiscard]] bool get_zoomStopsAnimation() const;
 
   /**
    * Sets the transition time when framing the mesh, in milliseconds
@@ -244,7 +244,7 @@ private:
   /**
    * @brief Gets the transition time when framing the mesh, in milliseconds
    */
-  float get_framingTime() const;
+  [[nodiscard]] float get_framingTime() const;
 
   /**
    * @brief Keeps the camera above the ground plane. If the user pulls the
@@ -257,7 +257,7 @@ private:
    * @brief Returns the frustum slope based on the canvas ratio and camera FOV
    * @returns The frustum slope represented as a Vector2 with X and Y slopes
    */
-  Vector2 _getFrustumSlope() const;
+  [[nodiscard]] Vector2 _getFrustumSlope() const;
 
   /**
    * @brief Removes all animation locks. Allows new animations to be added to
@@ -281,7 +281,7 @@ private:
   /**
    * @brief Gets a value indicating if the user is moving the camera
    */
-  bool isUserIsMoving() const;
+  [[nodiscard]] bool isUserIsMoving() const;
 
 public:
   /**

@@ -31,19 +31,20 @@ public:
   }
   ~CellMaterial() override; // = default
 
-  bool needAlphaBlending() const override;
-  bool needAlphaTesting() const override;
+  [[nodiscard]] bool needAlphaBlending() const override;
+  [[nodiscard]] bool needAlphaTesting() const override;
   BaseTexturePtr getAlphaTestTexture() override;
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool useInstances) override;
   void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
   std::vector<IAnimatablePtr> getAnimatables() override;
-  std::vector<BaseTexturePtr> getActiveTextures() const override;
-  bool hasTexture(const BaseTexturePtr& texture) const override;
+  [[nodiscard]] std::vector<BaseTexturePtr> getActiveTextures() const override;
+  [[nodiscard]] bool hasTexture(const BaseTexturePtr& texture) const override;
   void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
                bool notBoundToMesh = false) override;
-  std::string getClassName() const override;
-  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
-  json serialize() const;
+  [[nodiscard]] std::string getClassName() const override;
+  [[nodiscard]] MaterialPtr clone(const std::string& name,
+                                  bool cloneChildren = false) const override;
+  [[nodiscard]] json serialize() const;
 
   /** Statics **/
   static CellMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);
@@ -53,11 +54,11 @@ protected:
 
   TexturePtr& get_diffuseTexture();
   void set_diffuseTexture(const TexturePtr& value);
-  bool get_computeHighLevel() const;
+  [[nodiscard]] bool get_computeHighLevel() const;
   void set_computeHighLevel(bool value);
-  bool get_disableLighting() const;
+  [[nodiscard]] bool get_disableLighting() const;
   void set_disableLighting(bool value);
-  unsigned int get_maxSimultaneousLights() const;
+  [[nodiscard]] unsigned int get_maxSimultaneousLights() const;
   void set_maxSimultaneousLights(unsigned int value);
 
 public:

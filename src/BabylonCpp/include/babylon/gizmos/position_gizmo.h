@@ -47,7 +47,7 @@ protected:
   /**
    * @brief Gets if the planar drag gizmo is enabled.
    */
-  bool get_planarGizmoEnabled() const;
+  [[nodiscard]] bool get_planarGizmoEnabled() const;
 
   /**
    * @brief Sets if the planar drag gizmo is enabled.
@@ -57,11 +57,11 @@ protected:
   void set_planarGizmoEnabled(bool value);
 
   void set_updateGizmoRotationToMatchAttachedMesh(bool value) override;
-  bool get_updateGizmoRotationToMatchAttachedMesh() const override;
+  [[nodiscard]] bool get_updateGizmoRotationToMatchAttachedMesh() const override;
   void set_snapDistance(float value);
-  float get_snapDistance() const;
+  [[nodiscard]] float get_snapDistance() const;
   void set_scaleRatio(float value) override;
-  float get_scaleRatio() const override;
+  [[nodiscard]] float get_scaleRatio() const override;
 
 public:
   /**

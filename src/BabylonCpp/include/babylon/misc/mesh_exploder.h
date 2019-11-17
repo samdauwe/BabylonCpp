@@ -21,21 +21,20 @@ public:
    * @param meshes The meshes to explode.
    * @param centerMesh The mesh to be center of explosion.
    */
-  MeshExploder(const std::vector<MeshPtr>& meshes,
-               const MeshPtr& _centerMesh = nullptr);
+  MeshExploder(const std::vector<MeshPtr>& meshes, const MeshPtr& _centerMesh = nullptr);
   ~MeshExploder(); // = default
 
   /**
    * @brief Get class name.
    * @returns "MeshExploder"
    */
-  std::string getClassName() const;
+  [[nodiscard]] std::string getClassName() const;
 
   /**
    * @brief "Exploded meshes"
    * @returns Array of meshes with the centerMesh at index 0.
    */
-  std::vector<MeshPtr> getMeshes() const;
+  [[nodiscard]] std::vector<MeshPtr> getMeshes() const;
 
   /**
    * @brief Explodes meshes giving a specific direction.

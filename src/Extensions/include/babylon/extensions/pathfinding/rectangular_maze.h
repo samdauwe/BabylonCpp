@@ -66,20 +66,18 @@ struct RectangularMaze {
   std::vector<NodeId> _path;
 
   RectangularMaze(size_t rows, size_t columns)
-      : _rows{rows}
-      , _columns{columns}
-      , _cells{std::vector<Cell>(rows * columns, Cell())}
+      : _rows{rows}, _columns{columns}, _cells{std::vector<Cell>(rows * columns, Cell())}
   {
   }
 
   ~RectangularMaze() = default;
 
-  std::size_t size() const
+  [[nodiscard]] std::size_t size() const
   {
     return _cells.size();
   }
 
-  Location location(const std::size_t cellId) const
+  [[nodiscard]] Location location(const std::size_t cellId) const
   {
     const size_t row = cellId / _columns;
     const size_t col = cellId - (row * _columns);
@@ -101,7 +99,7 @@ struct RectangularMaze {
     return _cells[cellId];
   }
 
-  const Cell& cell(const std::size_t cellId) const
+  [[nodiscard]] const Cell& cell(const std::size_t cellId) const
   {
     return _cells[cellId];
   }
@@ -111,12 +109,12 @@ struct RectangularMaze {
     return _cells[(row * _columns) + col];
   }
 
-  const Cell& cell(const std::size_t row, const std::size_t col) const
+  [[nodiscard]] const Cell& cell(const std::size_t row, const std::size_t col) const
   {
     return _cells[(row * _columns) + col];
   }
 
-  std::size_t cellId(const Location& location) const
+  [[nodiscard]] std::size_t cellId(const Location& location) const
   {
     return (std::get<0>(location) * _columns) + std::get<1>(location);
   }
@@ -126,7 +124,7 @@ struct RectangularMaze {
     return cellId(location) < _cells.size();
   }
 
-  std::vector<Cell> neighbors(const std::size_t _cellId) const
+  [[nodiscard]] std::vector<Cell> neighbors(const std::size_t _cellId) const
   {
     std::vector<Cell> neighborsNodes;
     std::size_t row, col;
@@ -155,7 +153,7 @@ struct RectangularMaze {
     return neighborsNodes;
   }
 
-  double cost(const std::size_t& /*cell1Id*/, const Cell& cell2) const
+  [[nodiscard]] double cost(const std::size_t& /*cell1Id*/, const Cell& cell2) const
   {
     return cell2.cost;
   }
@@ -168,7 +166,7 @@ struct RectangularMaze {
     cell(cellId(location)).cost = cost;
   }
 
-  double heuristicCostEstimate(const Cell& cell1, const Cell& cell2) const
+  [[nodiscard]] double heuristicCostEstimate(const Cell& cell1, const Cell& cell2) const
   {
     std::size_t x1, y1, x2, y2;
     std::tie(x1, y1) = location(cell1.id);
@@ -266,8 +264,7 @@ struct RectangularMaze {
       if (!check.empty()) { // If there is a valid cell to move to.
         // Mark the walls between cells as open if we move
         history.emplace(Location{r, c});
-        const auto moveDirection
-          = check[Math::distribution(pcg, std::size_t(0), check.size())];
+        const auto moveDirection = check[Math::distribution(pcg, std::size_t(0), check.size())];
         switch (moveDirection) {
           case 'L':
             cell(r, c).leftOpen = true;
@@ -316,8 +313,7 @@ struct RectangularMaze {
     }
     // Map locations to cell ids
     const std::size_t startCellId = isValid(start) ? cellId(start) : 0;
-    const std::size_t goalCellId
-      = isValid(goal) ? cellId(goal) : _cells.size() - 1;
+    const std::size_t goalCellId  = isValid(goal) ? cellId(goal) : _cells.size() - 1;
     // Find path in maze
     _path = AStarSearch(*this, cell(startCellId), cell(goalCellId));
     // Convert to path of locations
@@ -336,9 +332,8 @@ struct RectangularMaze {
 }; // end of struct RectangularMaze
 
 // For debugging
-std::basic_iostream<char>::basic_ostream&
-operator<<(std::basic_iostream<char>::basic_ostream& out,
-           const RectangularMaze& maze)
+std::basic_iostream<char>::basic_ostream& operator<<(std::basic_iostream<char>::basic_ostream& out,
+                                                     const RectangularMaze& maze)
 {
   const auto numRows = maze._rows;
   const auto numCols = maze._columns;
@@ -346,8 +341,8 @@ operator<<(std::basic_iostream<char>::basic_ostream& out,
   const auto renderRows = numRows * 2 + 1;
   const auto renderCols = numCols * 2 + 1;
 
-  std::vector<std::vector<WallType>> cells(
-    renderRows, std::vector<WallType>(renderCols, WallType::Empty));
+  std::vector<std::vector<WallType>> cells(renderRows,
+                                           std::vector<WallType>(renderCols, WallType::Empty));
 
   // Walls
   for (std::size_t row = 0; row < numRows; ++row) {
@@ -415,14 +410,10 @@ operator<<(std::basic_iostream<char>::basic_ostream& out,
   // Walls
   for (std::size_t row = 0; row < renderRows; row += 2) {
     for (std::size_t col = 0; col < renderCols; col += 2) {
-      const auto up
-        = (row == 0) ? false : cells[row - 1][col] != WallType::Empty;
-      const auto left
-        = (col == 0) ? false : cells[row][col - 1] != WallType::Empty;
-      const auto right
-        = (col == numCols * 2) ? false : cells[row][col + 1] != WallType::Empty;
-      const auto down
-        = (row == numRows * 2) ? false : cells[row + 1][col] != WallType::Empty;
+      const auto up    = (row == 0) ? false : cells[row - 1][col] != WallType::Empty;
+      const auto left  = (col == 0) ? false : cells[row][col - 1] != WallType::Empty;
+      const auto right = (col == numCols * 2) ? false : cells[row][col + 1] != WallType::Empty;
+      const auto down  = (row == numRows * 2) ? false : cells[row + 1][col] != WallType::Empty;
 
       if (up && right && down && left) {
         cells[row][col] = WallType::FourWay;

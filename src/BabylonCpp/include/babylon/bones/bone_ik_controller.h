@@ -49,7 +49,7 @@ protected:
   /**
    * @brief Gets maximum allowed angle.
    */
-  float get_maxAngle() const;
+  [[nodiscard]] float get_maxAngle() const;
 
   /**
    * @brief Sets maximum allowed angle.

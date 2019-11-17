@@ -18,7 +18,7 @@ public:
   FunnyEase(float distanceOfStick, float lengthOfStick);
   ~FunnyEase() override;
 
-  float easeInCore(float gradient) const override;
+  [[nodiscard]] float easeInCore(float gradient) const override;
 
 private:
   float _distanceOfStick;

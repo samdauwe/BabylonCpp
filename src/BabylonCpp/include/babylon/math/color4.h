@@ -24,8 +24,7 @@ public:
    * @param b defines the blue component (between 0 and 1, default is 0)
    * @param a defines the alpha component (between 0 and 1, default is 1)
    */
-  Color4(float red = 0.f, float green = 0.f, float blue = 0.f,
-         float alpha = 1.f);
+  Color4(float red = 0.f, float green = 0.f, float blue = 0.f, float alpha = 1.f);
   Color4(const Color3& otherColor);
   Color4(const Color4& otherColor);
   Color4(Color3&& otherColor);
@@ -35,26 +34,26 @@ public:
   Color4& operator=(const Color4& otherColor);
   Color4& operator=(Color4&& otherColor);
   ~Color4(); // = default
-  Color4 copy() const;
+  [[nodiscard]] Color4 copy() const;
 
   /**
    * @brief Creates a new Color4 copied from the current one.
    * @returns a new Color4 object
    */
-  std::unique_ptr<Color4> clone() const;
+  [[nodiscard]] std::unique_ptr<Color4> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Color4& color);
 
   /**
    * Returns the string "Color4".
    * @returns "Color4"
    */
-  const char* getClassName() const;
+  [[nodiscard]] const char* getClassName() const;
 
   /**
    * @brief Compute the Color4 hash code.
    * @returns an unique number that can be used to hash Color4 objects
    */
-  int getHashCode() const;
+  [[nodiscard]] int getHashCode() const;
 
   /** Operators **/
 
@@ -70,7 +69,7 @@ public:
    * blue, alpha values.
    * @returns the new array
    */
-  Float32Array asArray() const;
+  [[nodiscard]] Float32Array asArray() const;
 
   /**
    * @brief Stores from the starting index in the given array the Color4
@@ -87,7 +86,7 @@ public:
    * @param otherColor defines the second operand
    * @returns true if the rgba values are equal to the given ones
    */
-  bool equals(const Color4& otherColor) const;
+  [[nodiscard]] bool equals(const Color4& otherColor) const;
 
   /**
    * @brief Creates a new Color4 set with the added values of the current Color4
@@ -95,7 +94,7 @@ public:
    * @param right defines the second operand
    * @returns a new Color4 object
    */
-  Color4 add(const Color4& right) const;
+  [[nodiscard]] Color4 add(const Color4& right) const;
 
   /**
    * @brief Creates a new Color4 set with the subtracted values of the given one
@@ -103,7 +102,7 @@ public:
    * @param right defines the second operand
    * @returns a new Color4 object
    */
-  Color4 subtract(const Color4& right) const;
+  [[nodiscard]] Color4 subtract(const Color4& right) const;
 
   /**
    * @brief Subtracts the given ones from the current Color4 values and stores
@@ -120,7 +119,7 @@ public:
    * @param scale defines the scaling factor to apply
    * @returns a new Color4 object
    */
-  Color4 scale(float iscale) const;
+  [[nodiscard]] Color4 scale(float iscale) const;
 
   /**
    * @brief Multiplies the current Color4 values by scale and stores the result
@@ -157,15 +156,14 @@ public:
    * @param result defines color to store the result into.
    * @returns the cuurent Color4
    */
-  const Color4& clampToRef(Color4& result, float min = 0.f,
-                           float max = 1.f) const;
+  const Color4& clampToRef(Color4& result, float min = 0.f, float max = 1.f) const;
 
   /**
    * @brief Multipy an Color4 value by another and return a new Color4 object.
    * @param color defines the Color4 value to multiply by
    * @returns a new Color4 object
    */
-  Color4 multiply(const Color4& color) const;
+  [[nodiscard]] Color4 multiply(const Color4& color) const;
 
   /**
    * @brief Multipy an RGBA Color4 value by another and push the result in a
@@ -180,7 +178,7 @@ public:
    * @brief Creates a string with the Color4 current values.
    * @returns the string representation of the Color4 object
    */
-  std::string toString() const;
+  [[nodiscard]] std::string toString() const;
 
   /**
    * @brief Copies the given Color4 values into the current one.
@@ -214,14 +212,14 @@ public:
    * @returns a string containing the hexadecimal representation of the Color4
    * object
    */
-  std::string toHexString() const;
+  [[nodiscard]] std::string toHexString() const;
 
   /**
    * @brief Computes a new Color4 converted from the current one to linear
    * space.
    * @returns a new Color4 object
    */
-  Color4 toLinearSpace() const;
+  [[nodiscard]] Color4 toLinearSpace() const;
 
   /**
    * @brief Converts the Color4 values to linear space and stores the result in
@@ -236,7 +234,7 @@ public:
    * @brief Computes a new Color4 converted from the current one to gamma space.
    * @returns a new Color4 object
    */
-  Color4 toGammaSpace() const;
+  [[nodiscard]] Color4 toGammaSpace() const;
 
   /**
    * @brief Converts the Color4 values to gamma space and stores the result in
@@ -285,8 +283,7 @@ public:
    * @param amount defines the gradient factor
    * @param result defines the Color4 object where to store data
    */
-  static void LerpToRef(const Color4& left, const Color4& right, float amount,
-                        Color4& result);
+  static void LerpToRef(const Color4& left, const Color4& right, float amount, Color4& result);
 
   /**
    * @brief Creates a new Color4 from a Color3 and an alpha value.

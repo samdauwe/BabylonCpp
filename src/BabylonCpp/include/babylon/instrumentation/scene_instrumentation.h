@@ -45,7 +45,7 @@ protected:
   /**
    * @brief Gets the active meshes evaluation time capture status.
    */
-  bool get_captureActiveMeshesEvaluationTime() const;
+  [[nodiscard]] bool get_captureActiveMeshesEvaluationTime() const;
 
   /**
    * @brief Enable or disable the active meshes evaluation time capture.
@@ -60,7 +60,7 @@ protected:
   /**
    * @brief Gets the render targets render time capture status.
    */
-  bool get_captureRenderTargetsRenderTime() const;
+  [[nodiscard]] bool get_captureRenderTargetsRenderTime() const;
 
   /**
    * @brief Enable or disable the render targets render time capture.
@@ -75,7 +75,7 @@ protected:
   /**
    * @brief Gets the particles render time capture status.
    */
-  bool get_captureParticlesRenderTime() const;
+  [[nodiscard]] bool get_captureParticlesRenderTime() const;
 
   /**
    * @brief Enable or disable the particles render time capture.
@@ -90,7 +90,7 @@ protected:
   /**
    * @brief Gets the sprites render time capture status.
    */
-  bool get_captureSpritesRenderTime() const;
+  [[nodiscard]] bool get_captureSpritesRenderTime() const;
 
   /**
    * @brief Enable or disable the sprites render time capture.
@@ -105,7 +105,7 @@ protected:
   /**
    * @brief Gets the physics time capture status.
    */
-  bool get_capturePhysicsTime() const;
+  [[nodiscard]] bool get_capturePhysicsTime() const;
 
   /**
    * @brief Enable or disable the physics time capture.
@@ -120,7 +120,7 @@ protected:
   /**
    * @brief Gets the animations time capture status.
    */
-  bool get_captureAnimationsTime() const;
+  [[nodiscard]] bool get_captureAnimationsTime() const;
 
   /**
    * @brief Enable or disable the animations time capture.
@@ -135,7 +135,7 @@ protected:
   /**
    * @brief Gets the frame time capture status.
    */
-  bool get_captureFrameTime() const;
+  [[nodiscard]] bool get_captureFrameTime() const;
 
   /**
    * @brief Enable or disable the frame time capture.
@@ -150,7 +150,7 @@ protected:
   /**
    * @brief Gets the inter-frames time capture status.
    */
-  bool get_captureInterFrameTime() const;
+  [[nodiscard]] bool get_captureInterFrameTime() const;
 
   /**
    * @brief Enable or disable the inter-frames time capture.
@@ -165,7 +165,7 @@ protected:
   /**
    * @brief Gets the render time capture status.
    */
-  bool get_captureRenderTime() const;
+  [[nodiscard]] bool get_captureRenderTime() const;
 
   /**
    * @brief Enable or disable the render time capture.
@@ -180,7 +180,7 @@ protected:
   /**
    * @brief Gets the camera render time capture status.
    */
-  bool get_captureCameraRenderTime() const;
+  [[nodiscard]] bool get_captureCameraRenderTime() const;
 
   /**
    * @brief Enable or disable the camera render time capture.

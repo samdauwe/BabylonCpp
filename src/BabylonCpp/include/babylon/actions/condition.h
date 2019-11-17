@@ -47,20 +47,19 @@ public:
   /**
    * @brief Internal only.
    */
-  IAnimatablePtr _getEffectiveTarget(const IAnimatablePtr& target,
-                                     const std::string& propertyPath);
+  IAnimatablePtr _getEffectiveTarget(const IAnimatablePtr& target, const std::string& propertyPath);
 
   /**
    * @brief Serialize placeholder for child classes.
    * @returns the serialized object
    */
-  virtual json serialize() const;
+  [[nodiscard]] virtual json serialize() const;
 
 protected:
   /**
    * @brief Internal only.
    */
-  json _serialize(const json& serializedCondition) const;
+  [[nodiscard]] json _serialize(const json& serializedCondition) const;
 
 public:
   /**

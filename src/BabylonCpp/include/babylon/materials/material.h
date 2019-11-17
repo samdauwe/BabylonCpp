@@ -134,7 +134,7 @@ public:
 
   ~Material() override; // = default
 
-  Type type() const override;
+  [[nodiscard]] Type type() const override;
 
   /**
    * @brief Gets a property.
@@ -153,18 +153,18 @@ public:
    * desired
    * @returns a string with material information
    */
-  std::string toString(bool fullDetails = false) const;
+  [[nodiscard]] std::string toString(bool fullDetails = false) const;
 
   /**
    * @param Gets the class name of the material.
    * @returns a string with the class name of the material
    */
-  virtual std::string getClassName() const;
+  [[nodiscard]] virtual std::string getClassName() const;
 
   /**
    * @brief Specifies if updates for the material been locked.
    */
-  bool isFrozen() const;
+  [[nodiscard]] bool isFrozen() const;
 
   /**
    * @brief Locks updates for the material.
@@ -204,26 +204,26 @@ public:
    * @brief Returns the current scene.
    * @returns a Scene
    */
-  Scene* getScene() const;
+  [[nodiscard]] Scene* getScene() const;
 
   /**
    * @brief Specifies if the material will require alpha blending.
    * @returns a boolean specifying if alpha blending is needed
    */
-  virtual bool needAlphaBlending() const;
+  [[nodiscard]] virtual bool needAlphaBlending() const;
 
   /**
    * @brief Specifies if the mesh will require alpha blending.
    * @param mesh defines the mesh to check
    * @returns a boolean specifying if alpha blending is needed for the mesh
    */
-  virtual bool needAlphaBlendingForMesh(const AbstractMesh& mesh) const;
+  [[nodiscard]] virtual bool needAlphaBlendingForMesh(const AbstractMesh& mesh) const;
 
   /**
    * @brief Specifies if this material should be rendered in alpha test mode.
    * @returns a boolean specifying if an alpha test is needed.
    */
-  virtual bool needAlphaTesting() const;
+  [[nodiscard]] virtual bool needAlphaTesting() const;
 
   /**
    * @brief Gets the texture used for the alpha test.
@@ -291,21 +291,22 @@ public:
    * @brief Gets the active textures from the material.
    * @returns an array of textures
    */
-  virtual std::vector<BaseTexturePtr> getActiveTextures() const;
+  [[nodiscard]] virtual std::vector<BaseTexturePtr> getActiveTextures() const;
 
   /**
    * @brief Specifies if the material uses a texture.
    * @param texture defines the texture to check against the material
    * @returns a boolean specifying if the material uses the texture
    */
-  virtual bool hasTexture(const BaseTexturePtr& texture) const;
+  [[nodiscard]] virtual bool hasTexture(const BaseTexturePtr& texture) const;
 
   /**
    * @brief akes a duplicate of the material, and gives it a new name.
    * @param name defines the new name for the duplicated material
    * @returns the cloned material
    */
-  virtual MaterialPtr clone(const std::string& name, bool cloneChildren = false) const;
+  [[nodiscard]] virtual MaterialPtr clone(const std::string& name,
+                                          bool cloneChildren = false) const;
 
   /**
    * @brief Gets the meshes bound to the material.
@@ -348,7 +349,7 @@ public:
    * Serializes this material.
    * @returns the serialized material object
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   virtual void trackCreation(
     const std::function<void(const EffectPtr& effect)>& onCompiled,
@@ -394,7 +395,7 @@ protected:
   /**
    * @brief Gets the alpha value of the material.
    */
-  float get_alpha() const;
+  [[nodiscard]] float get_alpha() const;
 
   /**
    * @brief Sets the back-face culling state.
@@ -404,13 +405,13 @@ protected:
   /**
    * @brief Gets the back-face culling state.
    */
-  bool get_backFaceCulling() const;
+  [[nodiscard]] bool get_backFaceCulling() const;
 
   /**
    * @brief Gets a boolean indicating that current material needs to register
    * RTT.
    */
-  virtual bool get_hasRenderTargetTextures() const;
+  [[nodiscard]] virtual bool get_hasRenderTargetTextures() const;
 
   /**
    * @brief Called during a dispose event.
@@ -455,7 +456,7 @@ protected:
   /**
    * @brief Gets the value of the alpha mode.
    */
-  unsigned int get_alphaMode() const;
+  [[nodiscard]] unsigned int get_alphaMode() const;
 
   /**
    * @brief Sets the need depth pre-pass value.
@@ -465,7 +466,7 @@ protected:
   /**
    * @brief Gets the depth pre-pass value.
    */
-  bool get_needDepthPrePass() const;
+  [[nodiscard]] bool get_needDepthPrePass() const;
 
   /**
    * @brief Sets the state for enabling fog.
@@ -475,7 +476,7 @@ protected:
   /**
    * @brief Gets the value of the fog enabled state.
    */
-  bool get_fogEnabled() const;
+  [[nodiscard]] bool get_fogEnabled() const;
 
   /**
    * @brief Sets the state of wireframe mode.
@@ -485,7 +486,7 @@ protected:
   /**
    * @brief Gets a value specifying if wireframe mode is enabled.
    */
-  bool get_wireframe() const;
+  [[nodiscard]] bool get_wireframe() const;
 
   /**
    * @brief Sets the state of point cloud mode.
@@ -495,7 +496,7 @@ protected:
   /**
    * @brief Gets the value specifying if point clouds are enabled.
    */
-  bool get_pointsCloud() const;
+  [[nodiscard]] bool get_pointsCloud() const;
 
   /**
    * @brief Sets the material fill mode.
@@ -505,12 +506,12 @@ protected:
   /**
    * @brief Gets the material fill mode.
    */
-  unsigned int get_fillMode() const;
+  [[nodiscard]] unsigned int get_fillMode() const;
 
   /**
    * @brief Gets the logarithmic depth setting.
    */
-  virtual bool get_useLogarithmicDepth() const;
+  [[nodiscard]] virtual bool get_useLogarithmicDepth() const;
 
   /**
    * @brief Sets the logarithmic depth setting.

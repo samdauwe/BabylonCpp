@@ -15,7 +15,7 @@ public:
   ~EffectIncludesShadersStore(); // = default
 
   std::unordered_map<std::string, std::string>& shaders();
-  const std::unordered_map<std::string, std::string>& shaders() const;
+  [[nodiscard]] const std::unordered_map<std::string, std::string>& shaders() const;
 
 private:
   static std::unordered_map<std::string, std::string> _shaders;

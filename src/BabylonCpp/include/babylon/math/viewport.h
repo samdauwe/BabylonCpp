@@ -29,13 +29,13 @@ public:
   Viewport& operator=(const Viewport& otherViewport);
   Viewport& operator=(Viewport&& otherViewport);
   ~Viewport(); // = default
-  Viewport copy() const;
+  [[nodiscard]] Viewport copy() const;
 
   /**
    * @brief Returns a new Viewport copied from the current one.
    * @returns a new Viewport
    */
-  std::unique_ptr<Viewport> clone() const;
+  [[nodiscard]] std::unique_ptr<Viewport> clone() const;
 
   friend std::ostream& operator<<(std::ostream& os, const Viewport& viewport);
 
@@ -48,7 +48,7 @@ public:
    * @param renderHeight defines the rendering height
    * @returns a new Viewport
    */
-  Viewport toGlobal(int renderWidth, int renderHeight) const;
+  [[nodiscard]] Viewport toGlobal(int renderWidth, int renderHeight) const;
 
   /**
    * @brief Stores absolute viewport value into a target viewport (from 0->

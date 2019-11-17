@@ -32,7 +32,7 @@ public:
   /**
    * @brief Return the currrent class name of the material.
    */
-  std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
   /**
    * @brief Gets a property.
@@ -49,12 +49,13 @@ public:
    * @brief Makes a duplicate of the current material.
    * @param name - name to use for the new material.
    */
-  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
+  [[nodiscard]] MaterialPtr clone(const std::string& name,
+                                  bool cloneChildren = false) const override;
 
   /**
    * @brief Serialize the material to a parsable JSON object.
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Parses a JSON object correponding to the serialize function.
@@ -93,14 +94,14 @@ protected:
    * @brief Specifies the metallic scalar value of the material.
    * Can also be used to scale the metalness values of the metallic texture.
    */
-  float get_metallic() const;
+  [[nodiscard]] float get_metallic() const;
   void set_metallic(float value);
 
   /**
    * @brief Specifies the roughness scalar value of the material.
    * Can also be used to scale the roughness values of the metallic texture.
    */
-  float get_roughness() const;
+  [[nodiscard]] float get_roughness() const;
   void set_roughness(float value);
 
   /**

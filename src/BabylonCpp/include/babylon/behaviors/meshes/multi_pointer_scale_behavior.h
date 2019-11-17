@@ -30,7 +30,7 @@ public:
   /**
    * @brief The name of the behavior.
    */
-  std::string name() const;
+  [[nodiscard]] std::string name() const;
 
   /**
    * @brief Initializes the behavior.

@@ -30,31 +30,31 @@ public:
   Vector2& operator=(const Vector2& otherVector);
   Vector2& operator=(Vector2&& otherVector);
   ~Vector2(); // = default
-  Vector2 copy() const;
+  [[nodiscard]] Vector2 copy() const;
 
   /**
    * @brief Gets a new Vector2 copied from the Vector2.
    * @returns a new Vector2
    */
-  std::unique_ptr<Vector2> clone() const;
+  [[nodiscard]] std::unique_ptr<Vector2> clone() const;
 
   /**
    * @brief Gets a string with the Vector2 coordinates.
    * @returns a string with the Vector2 coordinates
    */
-  std::string toString() const;
+  [[nodiscard]] std::string toString() const;
 
   /**
    * @brief Gets class name.
    * @returns the string "Vector2"
    */
-  const char* getClassName() const;
+  [[nodiscard]] const char* getClassName() const;
 
   /**
    * @brief Gets current vector hash code.
    * @returns the Vector2 hash code as a number
    */
-  size_t getHashCode() const;
+  [[nodiscard]] size_t getHashCode() const;
 
   /** Operators **/
 
@@ -71,7 +71,7 @@ public:
    * @brief Copy the current vector to an array.
    * @returns a new array with 2 elements: the Vector2 coordinates.
    */
-  Float32Array asArray() const;
+  [[nodiscard]] Float32Array asArray() const;
 
   /**
    * @brief Sets the Vector2 coordinates with the given Vector2 coordinates.
@@ -102,7 +102,7 @@ public:
    * @returns a new Vector2 set with the addition of the current Vector2 and the
    * given one coordinates.
    */
-  Vector2 add(const Vector2& otherVector) const;
+  [[nodiscard]] Vector2 add(const Vector2& otherVector) const;
 
   /**
    * @brief Sets the "result" coordinates with the addition of the current
@@ -126,7 +126,7 @@ public:
    * @param otherVector defines the other vector
    * @returns a new Vector2
    */
-  Vector2 addVector3(const Vector3& otherVector) const;
+  [[nodiscard]] Vector2 addVector3(const Vector3& otherVector) const;
 
   /**
    * @brief Gets a new Vector2 set with the subtracted coordinates of the given
@@ -134,15 +134,14 @@ public:
    * @param otherVector defines the other vector
    * @returns a new Vector2
    */
-  Vector2 subtract(const Vector2& otherVector) const;
+  [[nodiscard]] Vector2 subtract(const Vector2& otherVector) const;
 
   /**
    * @brief Sets the "result" coordinates with the subtraction of the passed
    * one. from the current Vector2 coordinates.
    * @returns The Vector2.
    */
-  const Vector2& subtractToRef(const Vector2& otherVector,
-                               Vector2& result) const;
+  const Vector2& subtractToRef(const Vector2& otherVector, Vector2& result) const;
 
   /**
    * @brief Sets the "result" coordinates with the subtraction of the given one
@@ -167,7 +166,7 @@ public:
    * @param otherVector defines the other vector
    * @returns a new Vector2
    */
-  Vector2 multiply(const Vector2& otherVector) const;
+  [[nodiscard]] Vector2 multiply(const Vector2& otherVector) const;
 
   /**
    * @brief Sets "result" coordinates with the multiplication of the current
@@ -176,8 +175,7 @@ public:
    * @param result defines the target vector
    * @returns the unmodified current Vector2
    */
-  const Vector2& multiplyToRef(const Vector2& otherVector,
-                               Vector2& result) const;
+  const Vector2& multiplyToRef(const Vector2& otherVector, Vector2& result) const;
 
   /**
    * @brief Gets a new Vector2 set with the Vector2 coordinates multiplied by
@@ -186,7 +184,7 @@ public:
    * @param y defines the second coordinate
    * @returns a new Vector2
    */
-  Vector2 multiplyByFloats(float x, float y) const;
+  [[nodiscard]] Vector2 multiplyByFloats(float x, float y) const;
 
   /**
    * @brief Returns a new Vector2 set with the Vector2 coordinates divided by
@@ -194,7 +192,7 @@ public:
    * @param otherVector defines the other vector
    * @returns a new Vector2
    */
-  Vector2 divide(const Vector2& otherVector) const;
+  [[nodiscard]] Vector2 divide(const Vector2& otherVector) const;
 
   /**
    * @brief Sets the "result" coordinates with the Vector2 divided by the given
@@ -216,7 +214,7 @@ public:
    * @brief Gets a new Vector2 with current Vector2 negated coordinates.
    * @returns a new Vector2
    */
-  Vector2 negate() const;
+  [[nodiscard]] Vector2 negate() const;
 
   /**
    * @brief Multiply the Vector2 coordinates by scale.
@@ -230,7 +228,7 @@ public:
    * @param scale defines the scaling factor
    * @returns a new Vector2
    */
-  Vector2 scale(float scaleVal) const;
+  [[nodiscard]] Vector2 scale(float scaleVal) const;
 
   /**
    * @brief Scale the current Vector2 values by a factor to a given Vector2.
@@ -255,7 +253,7 @@ public:
    * @returns true if the given vector coordinates strictly equal the current
    * Vector2 ones
    */
-  bool equals(const Vector2& otherVector) const;
+  [[nodiscard]] bool equals(const Vector2& otherVector) const;
 
   /**
    * @brief Gets a boolean if two vectors are equals (using an epsilon value).
@@ -264,20 +262,20 @@ public:
    * @returns true if the given vector coordinates are close to the current ones
    * by a distance of epsilon.
    */
-  bool equalsWithEpsilon(const Vector2& otherVector,
-                         float epsilon = Math::Epsilon) const;
+  [[nodiscard]] bool equalsWithEpsilon(const Vector2& otherVector,
+                                       float epsilon = Math::Epsilon) const;
 
   /**
    * @brief Gets a new Vector2 from current Vector2 floored values.
    * @returns a new Vector2
    */
-  Vector2 floor() const;
+  [[nodiscard]] Vector2 floor() const;
 
   /**
    * @brief  Gets a new Vector2 from current Vector2 floored values.
    * @returns a new Vector2
    */
-  Vector2 fract() const;
+  [[nodiscard]] Vector2 fract() const;
 
   /** Operator overloading **/
   friend std::ostream& operator<<(std::ostream& os, const Vector2& vector);
@@ -311,13 +309,13 @@ public:
    * @brief Gets the length of the vector.
    * @returns the vector length (float)
    */
-  float length() const;
+  [[nodiscard]] float length() const;
 
   /**
    * @brief Gets the vector squared length.
    * @returns the vector squared length (float)
    */
-  float lengthSquared() const;
+  [[nodiscard]] float lengthSquared() const;
 
   /** Methods **/
 
@@ -356,8 +354,7 @@ public:
    * @param offset defines the offset in the data source
    * @param result defines the target vector
    */
-  static void FromArrayToRef(const Float32Array& array, unsigned int offset,
-                             Vector2& result);
+  static void FromArrayToRef(const Float32Array& array, unsigned int offset, Vector2& result);
 
   /**
    * @brief Gets a new Vector2 located for "amount" (float) on the CatmullRom
@@ -369,9 +366,8 @@ public:
    * @param amount defines the interpolation factor
    * @returns a new Vector2
    */
-  static Vector2 CatmullRom(const Vector2& value1, const Vector2& value2,
-                            const Vector2& value3, const Vector2& value4,
-                            float amount);
+  static Vector2 CatmullRom(const Vector2& value1, const Vector2& value2, const Vector2& value3,
+                            const Vector2& value4, float amount);
 
   /**
    * @brief Returns a new Vector2 set with same the coordinates than "value"
@@ -385,8 +381,7 @@ public:
    * @param max defines the upper limit
    * @returns a new Vector2
    */
-  static Vector2 Clamp(const Vector2& value, const Vector2& min,
-                       const Vector2& max);
+  static Vector2 Clamp(const Vector2& value, const Vector2& min, const Vector2& max);
 
   /**
    * @brief Returns a new Vector2 located for "amount" (float) on the Hermite
@@ -398,9 +393,8 @@ public:
    * @param amount defines the interpolation factor
    * @returns a new Vector2
    */
-  static Vector2 Hermite(const Vector2& value1, const Vector2& tangent1,
-                         const Vector2& value2, const Vector2& tangent2,
-                         float amount);
+  static Vector2 Hermite(const Vector2& value1, const Vector2& tangent1, const Vector2& value2,
+                         const Vector2& tangent2, float amount);
 
   /**
    * @brief Returns a new Vector2 located for "amount" (float) on the linear
@@ -461,8 +455,7 @@ public:
    * @param transformation defines the matrix to apply
    * @param result defines the target vector
    */
-  static void TransformToRef(const Vector2& vector,
-                             const Matrix& transformation, Vector2& result);
+  static void TransformToRef(const Vector2& vector, const Matrix& transformation, Vector2& result);
 
   /**
    * @brief Determines if a given vector is included in a triangle.
@@ -473,8 +466,8 @@ public:
    * @returns true if the point "p" is in the triangle defined by the vertors
    * "p0", "p1", "p2"
    */
-  static bool PointInTriangle(const Vector2& p, const Vector2& p0,
-                              const Vector2& p1, const Vector2& p2);
+  static bool PointInTriangle(const Vector2& p, const Vector2& p0, const Vector2& p1,
+                              const Vector2& p2);
 
   /**
    * @brief Gets the distance between the vectors "value1" and "value2"

@@ -130,9 +130,9 @@ public:
    * \param      velocity        The default initial two-dimensional linear
    *                             velocity of a new agent (optional).
    */
-  RVOSimulator(float timeStep, float neighborDist, size_t maxNeighbors,
-               float timeHorizon, float timeHorizonObst, float radius,
-               float maxSpeed, const Vector2& velocity = Vector2());
+  RVOSimulator(float timeStep, float neighborDist, size_t maxNeighbors, float timeHorizon,
+               float timeHorizonObst, float radius, float maxSpeed,
+               const Vector2& velocity = Vector2());
 
   /**
    * \brief      Destroys this simulator instance.
@@ -190,9 +190,8 @@ public:
    *                             of this agent (optional).
    * \return     The number of the agent.
    */
-  size_t addAgent(const Vector2& position, float neighborDist,
-                  size_t maxNeighbors, float timeHorizon, float timeHorizonObst,
-                  float radius, float maxSpeed,
+  size_t addAgent(const Vector2& position, float neighborDist, size_t maxNeighbors,
+                  float timeHorizon, float timeHorizonObst, float radius, float maxSpeed,
                   const Vector2& velocity = Vector2());
 
   /**
@@ -223,7 +222,7 @@ public:
    *                             retrieved.
    * \return     The number of the neighboring agent.
    */
-  size_t getAgentAgentNeighbor(size_t agentNo, size_t neighborNo) const;
+  [[nodiscard]] size_t getAgentAgentNeighbor(size_t agentNo, size_t neighborNo) const;
 
   /**
    * \brief      Returns the maximum neighbor count of a specified agent.
@@ -231,7 +230,7 @@ public:
    *                             neighbor count is to be retrieved.
    * \return     The present maximum neighbor count of the agent.
    */
-  size_t getAgentMaxNeighbors(size_t agentNo) const;
+  [[nodiscard]] size_t getAgentMaxNeighbors(size_t agentNo) const;
 
   /**
    * \brief      Returns the maximum speed of a specified agent.
@@ -239,7 +238,7 @@ public:
    *                             is to be retrieved.
    * \return     The present maximum speed of the agent.
    */
-  float getAgentMaxSpeed(size_t agentNo) const;
+  [[nodiscard]] float getAgentMaxSpeed(size_t agentNo) const;
 
   /**
    * \brief      Returns the maximum neighbor distance of a specified
@@ -248,7 +247,7 @@ public:
    *                             neighbor distance is to be retrieved.
    * \return     The present maximum neighbor distance of the agent.
    */
-  float getAgentNeighborDist(size_t agentNo) const;
+  [[nodiscard]] float getAgentNeighborDist(size_t agentNo) const;
 
   /**
    * \brief      Returns the count of agent neighbors taken into account to
@@ -258,7 +257,7 @@ public:
    * \return     The count of agent neighbors taken into account to compute
    *             the current velocity for the specified agent.
    */
-  size_t getAgentNumAgentNeighbors(size_t agentNo) const;
+  [[nodiscard]] size_t getAgentNumAgentNeighbors(size_t agentNo) const;
 
   /**
    * \brief      Returns the count of obstacle neighbors taken into account
@@ -268,7 +267,7 @@ public:
    * \return     The count of obstacle neighbors taken into account to
    *             compute the current velocity for the specified agent.
    */
-  size_t getAgentNumObstacleNeighbors(size_t agentNo) const;
+  [[nodiscard]] size_t getAgentNumObstacleNeighbors(size_t agentNo) const;
 
   /**
    * \brief      Returns the count of ORCA constraints used to compute
@@ -278,7 +277,7 @@ public:
    * \return     The count of ORCA constraints used to compute the current
    *             velocity for the specified agent.
    */
-  size_t getAgentNumORCALines(size_t agentNo) const;
+  [[nodiscard]] size_t getAgentNumORCALines(size_t agentNo) const;
 
   /**
    * \brief      Returns the specified obstacle neighbor of the specified
@@ -290,7 +289,7 @@ public:
    * \return     The number of the first vertex of the neighboring obstacle
    *             edge.
    */
-  size_t getAgentObstacleNeighbor(size_t agentNo, size_t neighborNo) const;
+  [[nodiscard]] size_t getAgentObstacleNeighbor(size_t agentNo, size_t neighborNo) const;
 
   /**
    * \brief      Returns the specified ORCA constraint of the specified
@@ -304,7 +303,7 @@ public:
    *             permissible velocities with respect to the specified
    *             ORCA constraint.
    */
-  const Line& getAgentORCALine(size_t agentNo, size_t lineNo) const;
+  [[nodiscard]] const Line& getAgentORCALine(size_t agentNo, size_t lineNo) const;
 
   /**
    * \brief      Returns the two-dimensional position of a specified
@@ -314,7 +313,7 @@ public:
    * \return     The present two-dimensional position of the (center of the)
    *             agent.
    */
-  const Vector2& getAgentPosition(size_t agentNo) const;
+  [[nodiscard]] const Vector2& getAgentPosition(size_t agentNo) const;
 
   /**
    * \brief      Returns the two-dimensional preferred velocity of a
@@ -324,7 +323,7 @@ public:
    *                             retrieved.
    * \return     The present two-dimensional preferred velocity of the agent.
    */
-  const Vector2& getAgentPrefVelocity(size_t agentNo) const;
+  [[nodiscard]] const Vector2& getAgentPrefVelocity(size_t agentNo) const;
 
   /**
    * \brief      Returns the radius of a specified agent.
@@ -332,7 +331,7 @@ public:
    *                             be retrieved.
    * \return     The present radius of the agent.
    */
-  float getAgentRadius(size_t agentNo) const;
+  [[nodiscard]] float getAgentRadius(size_t agentNo) const;
 
   /**
    * \brief      Returns the time horizon of a specified agent.
@@ -340,7 +339,7 @@ public:
    *                             is to be retrieved.
    * \return     The present time horizon of the agent.
    */
-  float getAgentTimeHorizon(size_t agentNo) const;
+  [[nodiscard]] float getAgentTimeHorizon(size_t agentNo) const;
 
   /**
    * \brief      Returns the time horizon with respect to obstacles of a
@@ -351,7 +350,7 @@ public:
    * \return     The present time horizon with respect to obstacles of the
    *             agent.
    */
-  float getAgentTimeHorizonObst(size_t agentNo) const;
+  [[nodiscard]] float getAgentTimeHorizonObst(size_t agentNo) const;
 
   /**
    * \brief      Returns the two-dimensional linear velocity of a
@@ -361,25 +360,25 @@ public:
    *                             retrieved.
    * \return     The present two-dimensional linear velocity of the agent.
    */
-  const Vector2& getAgentVelocity(size_t agentNo) const;
+  [[nodiscard]] const Vector2& getAgentVelocity(size_t agentNo) const;
 
   /**
    * \brief      Returns the global time of the simulation.
    * \return     The present global time of the simulation (zero initially).
    */
-  float getGlobalTime() const;
+  [[nodiscard]] float getGlobalTime() const;
 
   /**
    * \brief      Returns the count of agents in the simulation.
    * \return     The count of agents in the simulation.
    */
-  size_t getNumAgents() const;
+  [[nodiscard]] size_t getNumAgents() const;
 
   /**
    * \brief      Returns the count of obstacle vertices in the simulation.
    * \return     The count of obstacle vertices in the simulation.
    */
-  size_t getNumObstacleVertices() const;
+  [[nodiscard]] size_t getNumObstacleVertices() const;
 
   /**
    * \brief      Returns the two-dimensional position of a specified obstacle
@@ -389,7 +388,7 @@ public:
    * \return     The two-dimensional position of the specified obstacle
    *             vertex.
    */
-  const Vector2& getObstacleVertex(size_t vertexNo) const;
+  [[nodiscard]] const Vector2& getObstacleVertex(size_t vertexNo) const;
 
   /**
    * \brief      Returns the number of the obstacle vertex succeeding the
@@ -399,7 +398,7 @@ public:
    * \return     The number of the obstacle vertex succeeding the specified
    *             obstacle vertex in its polygon.
    */
-  size_t getNextObstacleVertexNo(size_t vertexNo) const;
+  [[nodiscard]] size_t getNextObstacleVertexNo(size_t vertexNo) const;
 
   /**
    * \brief      Returns the number of the obstacle vertex preceding the
@@ -409,13 +408,13 @@ public:
    * \return     The number of the obstacle vertex preceding the specified
    *             obstacle vertex in its polygon.
    */
-  size_t getPrevObstacleVertexNo(size_t vertexNo) const;
+  [[nodiscard]] size_t getPrevObstacleVertexNo(size_t vertexNo) const;
 
   /**
    * \brief      Returns the time step of the simulation.
    * \return     The present time step of the simulation.
    */
-  float getTimeStep() const;
+  [[nodiscard]] float getTimeStep() const;
 
   /**
    * \brief      Processes the obstacles that have been added so that they
@@ -438,8 +437,8 @@ public:
    *             visible. Returns true when the obstacles have not been
    *             processed.
    */
-  bool queryVisibility(const Vector2& point1, const Vector2& point2,
-                       float radius = 0.0f) const;
+  [[nodiscard]] bool queryVisibility(const Vector2& point1, const Vector2& point2,
+                                     float radius = 0.0f) const;
 
   /**
    * \brief      Sets the default properties for any new agent that is
@@ -480,9 +479,9 @@ public:
    * \param      velocity        The default initial two-dimensional linear
    *                             velocity of a new agent (optional).
    */
-  void setAgentDefaults(float neighborDist, size_t maxNeighbors,
-                        float timeHorizon, float timeHorizonObst, float radius,
-                        float maxSpeed, const Vector2& velocity = Vector2());
+  void setAgentDefaults(float neighborDist, size_t maxNeighbors, float timeHorizon,
+                        float timeHorizonObst, float radius, float maxSpeed,
+                        const Vector2& velocity = Vector2());
 
   /**
    * \brief      Sets the maximum neighbor count of a specified agent.

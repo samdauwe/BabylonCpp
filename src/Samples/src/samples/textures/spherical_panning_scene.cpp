@@ -225,7 +225,7 @@ private:
    * @param v
    * @return
    */
-  bool _isNewForwardVectorTooCloseToSingularity(const Vector3& v) const
+  [[nodiscard]] bool _isNewForwardVectorTooCloseToSingularity(const Vector3& v) const
   {
     static const auto TOO_CLOSE_TO_UP_THRESHOLD = 0.99f;
     return std::abs(Vector3::Dot(v, Vector3::Up())) > TOO_CLOSE_TO_UP_THRESHOLD;

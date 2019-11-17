@@ -31,7 +31,7 @@ struct BABYLON_SHARED_EXPORT ArrayBufferView {
   ArrayBufferView& operator=(ArrayBufferView&& other);
   ~ArrayBufferView(); // = default
 
-  size_t byteLength() const;
+  [[nodiscard]] size_t byteLength() const;
   operator bool() const;
 
   size_t byteOffset;

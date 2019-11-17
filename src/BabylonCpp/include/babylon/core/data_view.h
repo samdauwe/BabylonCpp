@@ -39,7 +39,7 @@ public:
   DataView(DataView&& other);                 // Move constructor
   DataView& operator=(const DataView& other); // Copy assignment operator
   DataView& operator=(DataView&& other);      // Move assignment operator
-  ~DataView(); // = default
+  ~DataView();                                // = default
 
   /**
    * @brief Gets a signed 8-bit integer (byte) at the specified byte offset from
@@ -49,7 +49,7 @@ public:
    * @param littleEndian
    * @return A signed 8-bit integer number.
    */
-  int8_t getInt8(size_t byteOffset) const;
+  [[nodiscard]] int8_t getInt8(size_t byteOffset) const;
 
   /**
    * @brief Gets an unsigned 8-bit integer (unsigned byte) at the specified byte
@@ -59,7 +59,7 @@ public:
    * @param littleEndian
    * @return An unsigned 8-bit integer number.
    */
-  uint8_t getUint8(size_t byteOffset) const;
+  [[nodiscard]] uint8_t getUint8(size_t byteOffset) const;
 
   /**
    * @brief Gets a signed 16-bit integer (short) at the specified byte offset
@@ -70,7 +70,7 @@ public:
    * or big-endian format. If false or undefined, a big-endian value is read.
    * @return A signed 16-bit integer number.
    */
-  int16_t getInt16(size_t byteOffset, bool littleEndian = true) const;
+  [[nodiscard]] int16_t getInt16(size_t byteOffset, bool littleEndian = true) const;
 
   /**
    * @brief Gets a signed 32-bit integer (signed short) at the specified byte
@@ -81,7 +81,7 @@ public:
    * or big-endian format. If false or undefined, a big-endian value is read.
    * @return A signed 32-bit integer number.
    */
-  int32_t getInt32(size_t byteOffset, bool littleEndian = true) const;
+  [[nodiscard]] int32_t getInt32(size_t byteOffset, bool littleEndian = true) const;
 
   /**
    * @brief Gets an unsigned 16-bit integer (unsigned short) at the specified
@@ -92,7 +92,7 @@ public:
    * or big-endian format. If false or undefined, a big-endian value is read.
    * @return An unsigned 16-bit integer number.
    */
-  uint16_t getUint16(size_t byteOffset, bool littleEndian = true) const;
+  [[nodiscard]] uint16_t getUint16(size_t byteOffset, bool littleEndian = true) const;
 
   /**
    * @brief Gets an unsigned 32-bit integer (unsigned short) at the specified
@@ -103,7 +103,7 @@ public:
    * or big-endian format. If false or undefined, a big-endian value is read.
    * @return An unsigned 32-bit integer number.
    */
-  uint32_t getUint32(size_t byteOffset, bool littleEndian = true) const;
+  [[nodiscard]] uint32_t getUint32(size_t byteOffset, bool littleEndian = true) const;
 
   /**
    * @brief Gets a signed 32-bit float (float) at the specified byte offset from
@@ -114,7 +114,7 @@ public:
    * or big-endian format. If false or undefined, a big-endian value is read.
    * @return A signed 32-bit float number.
    */
-  float getFloat32(size_t byteOffset, bool littleEndian = true) const;
+  [[nodiscard]] float getFloat32(size_t byteOffset, bool littleEndian = true) const;
 
   /**
    * @brief Revert the endianness of a value.

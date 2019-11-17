@@ -59,13 +59,13 @@ public:
   virtual ~BaseSystem() = 0; // = default
 
   /// \return The Component Filter attached to the System
-  const Filter& getFilter() const;
+  [[nodiscard]] const Filter& getFilter() const;
 
   /// \return The World attached to the System
-  World& getWorld() const;
+  [[nodiscard]] World& getWorld() const;
 
   /// \return All the entities that are within the System
-  const std::vector<Entity>& getEntities() const;
+  [[nodiscard]] const std::vector<Entity>& getEntities() const;
 
 private:
   /// Initializes the system, when a world is successfully attached to it.

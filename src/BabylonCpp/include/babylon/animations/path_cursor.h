@@ -32,7 +32,7 @@ public:
    * @brief Gets the cursor point on the path.
    * @returns A point on the path cursor at the cursor location
    */
-  Vector3 getPoint() const;
+  [[nodiscard]] Vector3 getPoint() const;
 
   /**
    * @brief Moves the cursor ahead by the step amount.

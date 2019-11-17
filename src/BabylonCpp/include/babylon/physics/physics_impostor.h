@@ -118,7 +118,7 @@ public:
    * @brief Should a new body be generated.
    * @returns boolean specifying if body initialization is required
    */
-  bool isBodyInitRequired() const;
+  [[nodiscard]] bool isBodyInitRequired() const;
 
   /**
    * @brief Sets the updated scaling.
@@ -154,7 +154,7 @@ public:
    * @param paramName The object parameter name
    * @returns The object parameter
    */
-  float getParam(const std::string& paramName) const;
+  [[nodiscard]] float getParam(const std::string& paramName) const;
 
   /**
    * @brief Sets a specific parameter in the options given to the physics
@@ -201,8 +201,8 @@ public:
    * physics body object.
    * @param func The function to execute with the physics plugin native code
    */
-  void executeNativeFunction(
-    const std::function<void(Mesh* world, IPhysicsBody* physicsBody)>& func);
+  void
+  executeNativeFunction(const std::function<void(Mesh* world, IPhysicsBody* physicsBody)>& func);
 
   /**
    * @brief Register a function that will be executed before the physics world
@@ -210,8 +210,7 @@ public:
    * @param func The function to execute before the physics world is stepped
    * forward
    */
-  void registerBeforePhysicsStep(
-    const std::function<void(PhysicsImpostor* impostor)>& func);
+  void registerBeforePhysicsStep(const std::function<void(PhysicsImpostor* impostor)>& func);
 
   /**
    * @brief Unregister a function that will be executed before the physics world
@@ -219,22 +218,19 @@ public:
    * @param func The function to execute before the physics world is stepped
    * forward
    */
-  void unregisterBeforePhysicsStep(
-    const std::function<void(PhysicsImpostor* impostor)>& func);
+  void unregisterBeforePhysicsStep(const std::function<void(PhysicsImpostor* impostor)>& func);
 
   /**
    * @brief Register a function that will be executed after the physics step.
    * @param func The function to execute after physics step
    */
-  void registerAfterPhysicsStep(
-    const std::function<void(PhysicsImpostor* impostor)>& func);
+  void registerAfterPhysicsStep(const std::function<void(PhysicsImpostor* impostor)>& func);
 
   /**
    * @brief Unregisters a function that will be executed after the physics step.
    * @param func The function to execute after physics step
    */
-  void unregisterAfterPhysicsStep(
-    const std::function<void(PhysicsImpostor* impostor)>& func);
+  void unregisterAfterPhysicsStep(const std::function<void(PhysicsImpostor* impostor)>& func);
 
   /**
    * @brief Register a function that will be executed when this impostor
@@ -279,8 +275,7 @@ public:
    * @param contactPoint The contact point for the force
    * @returns The physics imposter
    */
-  PhysicsImpostor& applyForce(const Vector3& force,
-                              const Vector3& contactPoint);
+  PhysicsImpostor& applyForce(const Vector3& force, const Vector3& contactPoint);
 
   /**
    * @brief Apply an impulse.
@@ -288,8 +283,7 @@ public:
    * @param contactPoint The contact point for the impulse force
    * @returns The physics imposter
    */
-  PhysicsImpostor& applyImpulse(const Vector3& force,
-                                const Vector3& contactPoint);
+  PhysicsImpostor& applyImpulse(const Vector3& force, const Vector3& contactPoint);
 
   /**
    * @brief A help function to create a joint.
@@ -298,8 +292,7 @@ public:
    * @param jointData The data for the joint
    * @returns The physics imposter
    */
-  PhysicsImpostor& createJoint(const PhysicsImpostorPtr& otherImpostor,
-                               unsigned int jointType,
+  PhysicsImpostor& createJoint(const PhysicsImpostorPtr& otherImpostor, unsigned int jointType,
                                const PhysicsJointData& jointData);
 
   /**
@@ -322,9 +315,8 @@ public:
    * impostor and anchor are ignored; default false
    * @returns impostor the soft imposter
    */
-  PhysicsImpostor& addAnchor(const PhysicsImpostorPtr& otherImpostor, int width,
-                             int height, float influence,
-                             bool noCollisionBetweenLinkedBodies);
+  PhysicsImpostor& addAnchor(const PhysicsImpostorPtr& otherImpostor, int width, int height,
+                             float influence, bool noCollisionBetweenLinkedBodies);
 
   /**
    * @brief Add a hook to a rope impostor.
@@ -336,8 +328,7 @@ public:
    * impostor and anchor are ignored; default false
    * @returns impostor the rope imposter
    */
-  PhysicsImpostor& addHook(const PhysicsImpostorPtr& otherImpostor,
-                           float length, float influence,
+  PhysicsImpostor& addHook(const PhysicsImpostorPtr& otherImpostor, float length, float influence,
                            bool noCollisionBetweenLinkedBodies);
 
   /**
@@ -388,7 +379,7 @@ public:
    * @brief Gets the radius of the physics imposter.
    * @returns Radius of the physics imposter
    */
-  float getRadius() const;
+  [[nodiscard]] float getRadius() const;
 
   /**
    * @brief Sync a bone with this impostor.
@@ -428,12 +419,12 @@ private:
   /**
    * @brief Specifies if the physics imposter is disposed.
    */
-  bool get_isDisposed() const;
+  [[nodiscard]] bool get_isDisposed() const;
 
   /**
    * @brief Gets the mass of the physics imposter.
    */
-  float get_mass() const;
+  [[nodiscard]] float get_mass() const;
 
   /**
    * @brief Sets the mass of the physics imposter.
@@ -443,7 +434,7 @@ private:
   /**
    * @brief Gets the coefficient of friction.
    */
-  float get_friction() const;
+  [[nodiscard]] float get_friction() const;
 
   /**
    * @brief Sets the coefficient of friction.
@@ -453,7 +444,7 @@ private:
   /**
    * @brief Gets the coefficient of restitution.
    */
-  float get_restitution() const;
+  [[nodiscard]] float get_restitution() const;
 
   /**
    * @brief Sets the coefficient of restitution.
@@ -464,7 +455,7 @@ private:
    * @brief Gets the pressure of a soft body; only supported by the
    * AmmoJSPlugin.
    */
-  float get_pressure() const;
+  [[nodiscard]] float get_pressure() const;
 
   /**
    * @brief Sets the pressure of a soft body; only supported by the
@@ -476,7 +467,7 @@ private:
    * @brief Gets the stiffness of a soft body; only supported by the
    * AmmoJSPlugin.
    */
-  float get_stiffness() const;
+  [[nodiscard]] float get_stiffness() const;
 
   /**
    * @brief Sets the stiffness of a soft body; only supported by the
@@ -488,7 +479,7 @@ private:
    * @brief Gets the velocityIterations of a soft body; only supported by the
    * AmmoJSPlugin.
    */
-  size_t get_velocityIterations() const;
+  [[nodiscard]] size_t get_velocityIterations() const;
 
   /**
    * @brief Sets the velocityIterations of a soft body; only supported by the
@@ -500,7 +491,7 @@ private:
    * @brief Gets the positionIterations of a soft body; only supported by the
    * AmmoJSPlugin.
    */
-  size_t get_positionIterations() const;
+  [[nodiscard]] size_t get_positionIterations() const;
 
   /**
    * @brief Sets the positionIterations of a soft body; only supported by the
@@ -629,10 +620,8 @@ private:
   // The native cannon/oimo/energy physics body object.
   IPhysicsBody* _physicsBody;
   bool _bodyUpdateRequired;
-  std::vector<std::function<void(PhysicsImpostor* impostor)>>
-    _onBeforePhysicsStepCallbacks;
-  std::vector<std::function<void(PhysicsImpostor* imposter)>>
-    _onAfterPhysicsStepCallbacks;
+  std::vector<std::function<void(PhysicsImpostor* impostor)>> _onBeforePhysicsStepCallbacks;
+  std::vector<std::function<void(PhysicsImpostor* imposter)>> _onAfterPhysicsStepCallbacks;
   Vector3 _deltaPosition;
   std::unique_ptr<Quaternion> _deltaRotation;
   std::unique_ptr<Quaternion> _deltaRotationConjugated;

@@ -58,8 +58,7 @@ public:
    * * adjustRoll: used to make an adjustment to the roll of the bone
    **/
   BoneLookController(AbstractMesh* mesh, Bone* bone, const Vector3& target,
-                     const std::optional<BoneLookControllerOptions>& options
-                     = std::nullopt);
+                     const std::optional<BoneLookControllerOptions>& options = std::nullopt);
   ~BoneLookController(); // = default
 
   /**
@@ -72,7 +71,7 @@ protected:
   /**
    * @brief Gets the minimum yaw angle that the bone can look to.
    */
-  float get_minYaw() const;
+  [[nodiscard]] float get_minYaw() const;
 
   /**
    * @brief Sets the minimum yaw angle that the bone can look to.
@@ -82,7 +81,7 @@ protected:
   /**
    * @brief Gets the maximum yaw angle that the bone can look to.
    */
-  float get_maxYaw() const;
+  [[nodiscard]] float get_maxYaw() const;
 
   /**
    * @brief Sets the maximum yaw angle that the bone can look to.
@@ -92,7 +91,7 @@ protected:
   /**
    * @brief Gets the minimum pitch angle that the bone can look to.
    */
-  float get_minPitch() const;
+  [[nodiscard]] float get_minPitch() const;
 
   /**
    * @brief Sets the minimum pitch angle that the bone can look to.
@@ -102,7 +101,7 @@ protected:
   /**
    * @brief Gets the maximum pitch angle that the bone can look to.
    */
-  float get_maxPitch() const;
+  [[nodiscard]] float get_maxPitch() const;
 
   /**
    * @brief Sets the maximum pitch angle that the bone can look to.
@@ -110,9 +109,9 @@ protected:
   void set_maxPitch(float value);
 
 private:
-  float _getAngleDiff(float ang1, float ang2) const;
-  float _getAngleBetween(float ang1, float ang2) const;
-  bool _isAngleBetween(float ang, float ang1, float ang2) const;
+  [[nodiscard]] float _getAngleDiff(float ang1, float ang2) const;
+  [[nodiscard]] float _getAngleBetween(float ang1, float ang2) const;
+  [[nodiscard]] bool _isAngleBetween(float ang, float ang1, float ang2) const;
 
 public:
   /**

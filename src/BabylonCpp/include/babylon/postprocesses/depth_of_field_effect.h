@@ -16,29 +16,24 @@ class DepthOfFieldMergePostProcess;
 class PassPostProcess;
 class RenderTargetTexture;
 class Scene;
-using CircleOfConfusionPostProcessPtr
-  = std::shared_ptr<CircleOfConfusionPostProcess>;
-using DepthOfFieldBlurPostProcessPtr
-  = std::shared_ptr<DepthOfFieldBlurPostProcess>;
-using DepthOfFieldEffectPtr = std::shared_ptr<DepthOfFieldEffect>;
-using DepthOfFieldMergePostProcessPtr
-  = std::shared_ptr<DepthOfFieldMergePostProcess>;
-using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
-using PassPostProcessPtr     = std::shared_ptr<PassPostProcess>;
+using CircleOfConfusionPostProcessPtr = std::shared_ptr<CircleOfConfusionPostProcess>;
+using DepthOfFieldBlurPostProcessPtr  = std::shared_ptr<DepthOfFieldBlurPostProcess>;
+using DepthOfFieldEffectPtr           = std::shared_ptr<DepthOfFieldEffect>;
+using DepthOfFieldMergePostProcessPtr = std::shared_ptr<DepthOfFieldMergePostProcess>;
+using RenderTargetTexturePtr          = std::shared_ptr<RenderTargetTexture>;
+using PassPostProcessPtr              = std::shared_ptr<PassPostProcess>;
 
 /**
  * @brief The depth of field effect applies a blur to objects that are closer or
  * further from where the camera is focusing.
  */
-class BABYLON_SHARED_EXPORT DepthOfFieldEffect
-    : public PostProcessRenderEffect {
+class BABYLON_SHARED_EXPORT DepthOfFieldEffect : public PostProcessRenderEffect {
 
 public:
   template <typename... Ts>
   static DepthOfFieldEffectPtr New(Ts&&... args)
   {
-    return std::shared_ptr<DepthOfFieldEffect>(
-      new DepthOfFieldEffect(std::forward<Ts>(args)...));
+    return std::shared_ptr<DepthOfFieldEffect>(new DepthOfFieldEffect(std::forward<Ts>(args)...));
   }
   ~DepthOfFieldEffect(); // = default
 
@@ -46,7 +41,7 @@ public:
    * @brief Get the current class name of the current effet.
    * @returns "DepthOfFieldEffect"
    */
-  std::string getClassName() const;
+  [[nodiscard]] std::string getClassName() const;
 
   /**
    * @brief Disposes each of the internal effects for a given camera.
@@ -64,7 +59,7 @@ public:
    * @returns if all the contained post processes are ready.
    * Hidden
    */
-  bool _isReady() const;
+  [[nodiscard]] bool _isReady() const;
 
 protected:
   /**
@@ -80,31 +75,29 @@ protected:
    * at a later time. (default: false)
    */
   DepthOfFieldEffect(Scene* scene, RenderTargetTexture* depthTexture,
-                     DepthOfFieldEffectBlurLevel blurLevel
-                     = DepthOfFieldEffectBlurLevel::Low,
-                     unsigned int pipelineTextureType = 0,
-                     bool blockCompilation            = false);
+                     DepthOfFieldEffectBlurLevel blurLevel = DepthOfFieldEffectBlurLevel::Low,
+                     unsigned int pipelineTextureType = 0, bool blockCompilation = false);
 
   /**
    * @brief The focal the length of the camera used in the effect in scene
    * units/1000 (eg. millimeter).
    */
   void set_focalLength(float value);
-  float get_focalLength() const;
+  [[nodiscard]] float get_focalLength() const;
 
   /**
    * @brief F-Stop of the effect's camera. The diameter of the resulting
    * aperture can be computed by lensSize/fStop. (default: 1.4).
    */
   void set_fStop(float value);
-  float get_fStop() const;
+  [[nodiscard]] float get_fStop() const;
 
   /**
    * @brief Distance away from the camera to focus on in scene units/1000 (eg.
    * millimeter). (default: 2000).
    */
   void set_focusDistance(float value);
-  float get_focusDistance() const;
+  [[nodiscard]] float get_focusDistance() const;
 
   /**
    * @brief Max lens size in scene units/1000 (eg. millimeter). Standard cameras
@@ -112,7 +105,7 @@ protected:
    * computed by lensSize/fStop.
    */
   void set_lensSize(float value);
-  float get_lensSize() const;
+  [[nodiscard]] float get_lensSize() const;
 
   /**
    * @brief Depth texture to be used to compute the circle of confusion. This

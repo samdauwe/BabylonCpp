@@ -23,8 +23,8 @@ struct BABYLON_SHARED_EXPORT BabylonFileLoader : public ISceneLoaderPlugin {
                                 const std::string& rootUrl) const;
   bool isDescendantOf(const json& mesh, const std::vector<std::string>& names,
                       std::vector<std::string>& hierarchyIds) const;
-  std::string logOperation(const std::string& operation) const;
-  std::string logOperation(const std::string& operation, const json& producer) const;
+  [[nodiscard]] std::string logOperation(const std::string& operation) const;
+  [[nodiscard]] std::string logOperation(const std::string& operation, const json& producer) const;
   void loadDetailLevels(Scene* scene, const AbstractMeshPtr& mesh) const;
 
   bool importMesh(

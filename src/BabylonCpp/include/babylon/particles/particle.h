@@ -34,8 +34,8 @@ public:
   Particle(Particle&& other);                 // Move constructor
   Particle& operator=(const Particle& other); // Copy assignment operator
   Particle& operator=(Particle&& other);      // Move assignment operator
-  ~Particle(); // = default
-  Particle* clone() const;
+  ~Particle();                                // = default
+  [[nodiscard]] Particle* clone() const;
 
   /**
    * @brief Defines how the sprite cell index is updated for the particle.

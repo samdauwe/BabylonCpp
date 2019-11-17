@@ -34,9 +34,8 @@ public:
    * @param useBytes set to true if the stride in in bytes (optional)
    */
   Buffer(Engine* engine, const Float32Array& data, bool updatable,
-         std::optional<size_t> stride  = std::nullopt,
-         bool postponeInternalCreation = false, bool instanced = false,
-         bool useBytes = false);
+         std::optional<size_t> stride = std::nullopt, bool postponeInternalCreation = false,
+         bool instanced = false, bool useBytes = false);
 
   /**
    * @brief Constructor
@@ -50,9 +49,8 @@ public:
    * @param useBytes set to true if the stride in in bytes (optional)
    */
   Buffer(Mesh* mesh, const Float32Array& data, bool updatable,
-         std::optional<size_t> stride  = std::nullopt,
-         bool postponeInternalCreation = false, bool instanced = false,
-         bool useBytes = false);
+         std::optional<size_t> stride = std::nullopt, bool postponeInternalCreation = false,
+         bool instanced = false, bool useBytes = false);
 
   virtual ~Buffer(); // = default
 
@@ -68,11 +66,11 @@ public:
    * @param useBytes defines if the offset and stride are in bytes
    * @returns the new vertex buffer
    */
-  std::unique_ptr<VertexBuffer>
-  createVertexBuffer(const std::string& kind, size_t offset, size_t size,
-                     std::optional<size_t> stride  = std::nullopt,
-                     std::optional<bool> instanced = std::nullopt,
-                     bool useBytes                 = false);
+  std::unique_ptr<VertexBuffer> createVertexBuffer(const std::string& kind, size_t offset,
+                                                   size_t size,
+                                                   std::optional<size_t> stride  = std::nullopt,
+                                                   std::optional<bool> instanced = std::nullopt,
+                                                   bool useBytes                 = false);
 
   // Properties
 
@@ -80,7 +78,7 @@ public:
    * @brief Gets a boolean indicating if the Buffer is updatable?
    * @returns true if the buffer is updatable
    */
-  bool isUpdatable() const;
+  [[nodiscard]] bool isUpdatable() const;
 
   /**
    * @brief Gets current buffer's data
@@ -100,7 +98,7 @@ public:
    * DEPRECATED. Use byteStride instead.
    * @returns the stride in float32 units
    */
-  size_t getStrideSize() const;
+  [[nodiscard]] size_t getStrideSize() const;
 
   // Methods
 
@@ -130,9 +128,8 @@ public:
    * @param useBytes set to true if the offset is in bytes
    */
   GL::IGLBuffer* updateDirectly(const Float32Array& data, size_t offset,
-                                const std::optional<size_t>& vertexCount
-                                = std::nullopt,
-                                bool useBytes = false);
+                                const std::optional<size_t>& vertexCount = std::nullopt,
+                                bool useBytes                            = false);
 
   /**
    * @brief Release all resources

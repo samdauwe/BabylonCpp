@@ -21,7 +21,7 @@ struct ViveControllerFactory : public _GamePadFactory {
    * APIs.
    * @returns true if it can be created, otherwise false
    */
-  bool canCreate(const IBrowserGamepadPtr& gamepadInfo) const override;
+  [[nodiscard]] bool canCreate(const IBrowserGamepadPtr& gamepadInfo) const override;
 
   /**
    * @brief Creates a new instance of the Gamepad.
@@ -29,7 +29,7 @@ struct ViveControllerFactory : public _GamePadFactory {
    * APIs.
    * @returns the new gamepad instance
    */
-  WebVRControllerPtr create(const IBrowserGamepadPtr& gamepadInfo) const override;
+  [[nodiscard]] WebVRControllerPtr create(const IBrowserGamepadPtr& gamepadInfo) const override;
 }; // end of struct ViveControllerFactory
 
 /**

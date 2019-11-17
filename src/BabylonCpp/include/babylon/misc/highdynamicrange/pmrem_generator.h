@@ -132,10 +132,9 @@ public:
    * or not
    * @param fixup Specifies wether to apply the edge fixup algorythm or not
    */
-  PMREMGenerator(const std::vector<ArrayBufferView>& input, int inputSize,
-                 int outputSize, size_t maxNumMipLevels, size_t numChannels,
-                 bool isFloat, float specularPower, float cosinePowerDropPerMip,
-                 bool excludeBase, bool fixup);
+  PMREMGenerator(const std::vector<ArrayBufferView>& input, int inputSize, int outputSize,
+                 size_t maxNumMipLevels, size_t numChannels, bool isFloat, float specularPower,
+                 float cosinePowerDropPerMip, bool excludeBase, bool fixup);
   ~PMREMGenerator(); // = default
 
   /**
@@ -180,7 +179,7 @@ private:
   // FilterExtends
   // It allow to optimize the texel to access base on the specular power.
   //----------------------------------------------------------------------------
-  float getBaseFilterAngle(float cosinePower) const;
+  [[nodiscard]] float getBaseFilterAngle(float cosinePower) const;
 
   //----------------------------------------------------------------------------
   // Builds the following lookup tables prior to filtering:
@@ -210,8 +209,8 @@ private:
   //  this routine can be used to generate a normalizer cube map
   //----------------------------------------------------------------------------
   // SL BEGIN
-  Vector4 texelCoordToVect(unsigned int faceIdx, float u, float v, size_t size,
-                           bool fixup) const;
+  [[nodiscard]] Vector4 texelCoordToVect(unsigned int faceIdx, float u, float v, size_t size,
+                                         bool fixup) const;
 
   //----------------------------------------------------------------------------
   // Convert 3D vector to cubemap face texel coordinates and face idx
@@ -267,7 +266,7 @@ private:
   // Note this method return U and V in range from 0 to size-1
   // SL END
   // Store the information in vector3 for convenience (faceindex, u, v)
-  Vector4 vectToTexelCoord(float x, float y, float z, size_t size) const;
+  [[nodiscard]] Vector4 vectToTexelCoord(float x, float y, float z, size_t size) const;
 
   //----------------------------------------------------------------------------
   // Original code from Ignacio CastaÒo
@@ -276,16 +275,14 @@ private:
   // cube face and return the area of the projection of that portion on the
   // surface of the sphere.
   //----------------------------------------------------------------------------
-  float areaElement(float x, float y) const;
+  [[nodiscard]] float areaElement(float x, float y) const;
 
-  float texelCoordSolidAngle(unsigned int faceIdx, float u, float v,
-                             size_t size) const;
+  [[nodiscard]] float texelCoordSolidAngle(unsigned int faceIdx, float u, float v,
+                                           size_t size) const;
 
-  void filterCubeSurfaces(const std::vector<ArrayBufferView>& srcCubeMap,
-                          float srcSize,
-                          std::vector<ArrayBufferView>& dstCubeMap,
-                          size_t dstSize, float filterConeAngle,
-                          float specularPower);
+  void filterCubeSurfaces(const std::vector<ArrayBufferView>& srcCubeMap, float srcSize,
+                          std::vector<ArrayBufferView>& dstCubeMap, size_t dstSize,
+                          float filterConeAngle, float specularPower);
 
   //----------------------------------------------------------------------------
   // Clear filter extents for the 6 cube map faces
@@ -302,21 +299,18 @@ private:
   // cone.
   //
   //----------------------------------------------------------------------------
-  void
-  determineFilterExtents(const Vector4& centerTapDir, size_t srcSize,
-                         size_t bboxSize,
-                         std::array<CMGBoundinBox, 6>& filterExtents) const;
+  void determineFilterExtents(const Vector4& centerTapDir, size_t srcSize, size_t bboxSize,
+                              std::array<CMGBoundinBox, 6>& filterExtents) const;
 
   //----------------------------------------------------------------------------
   // ProcessFilterExtents
   //  Process bounding box in each cube face
   //
   //----------------------------------------------------------------------------
-  Vector4
-  processFilterExtents(const Vector4& centerTapDir, float dotProdThresh,
-                       const std::array<CMGBoundinBox, 6>& filterExtents,
-                       const std::vector<ArrayBufferView>& srcCubeMap,
-                       size_t srcSize, size_t specularPower) const;
+  Vector4 processFilterExtents(const Vector4& centerTapDir, float dotProdThresh,
+                               const std::array<CMGBoundinBox, 6>& filterExtents,
+                               const std::vector<ArrayBufferView>& srcCubeMap, size_t srcSize,
+                               size_t specularPower) const;
 
   //----------------------------------------------------------------------------
   // Fixup cube edges
@@ -324,8 +318,7 @@ private:
   // average texels on cube map faces across the edges
   // WARP/BENT Method Only.
   //----------------------------------------------------------------------------
-  void fixupCubeEdges(std::vector<ArrayBufferView>& cubeMap,
-                      size_t cubeMapSize);
+  void fixupCubeEdges(std::vector<ArrayBufferView>& cubeMap, size_t cubeMapSize);
 
 public:
   std::vector<ArrayBufferView> input;

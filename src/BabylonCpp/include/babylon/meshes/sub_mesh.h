@@ -39,7 +39,7 @@ public:
   ~SubMesh() override; // = default
 
   void addToMesh(const std::shared_ptr<SubMesh>& newSubMesh);
-  bool isGlobal() const;
+  [[nodiscard]] bool isGlobal() const;
 
   /**
    * @brief Returns the submesh BoudingInfo object.
@@ -154,7 +154,7 @@ public:
    * @brief Gets the class name
    * @returns the string "SubMesh".
    */
-  std::string getClassName() const;
+  [[nodiscard]] std::string getClassName() const;
 
   /** Statics **/
 

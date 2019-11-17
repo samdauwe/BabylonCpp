@@ -37,29 +37,29 @@ public:
   Matrix& operator=(const Matrix& otherMatrix);
   Matrix& operator=(Matrix&& otherMatrix);
   ~Matrix(); // = default
-  Matrix copy() const;
+  [[nodiscard]] Matrix copy() const;
 
   /**
    * @brief Clone the current matrix.
    * @returns a new matrix from the current matrix
    */
-  std::unique_ptr<Matrix> clone() const;
+  [[nodiscard]] std::unique_ptr<Matrix> clone() const;
 
   /**
    * @brief Returns the name of the current matrix class.
    * @returns the string "Matrix"
    */
-  const char* getClassName() const;
+  [[nodiscard]] const char* getClassName() const;
 
   /**
    * @brief Returns the Matrix hash code.
    */
-  int getHashCode() const;
+  [[nodiscard]] int getHashCode() const;
 
   /**
    * @brief Gets the internal data of the matrix.
    */
-  const std::array<float, 16>& m() const;
+  [[nodiscard]] const std::array<float, 16>& m() const;
 
   /**
    * @brief Mark matrix as updated.
@@ -85,7 +85,7 @@ public:
    * @brief Gets the determinant of the matrix.
    * @returns the matrix determinant
    */
-  float determinant() const;
+  [[nodiscard]] float determinant() const;
 
   /** Methods **/
 
@@ -93,13 +93,13 @@ public:
    * @brief Returns the matrix as a Float32Array.
    * @returns the matrix underlying array
    */
-  Float32Array toArray() const;
+  [[nodiscard]] Float32Array toArray() const;
 
   /**
    * @brief Returns the matrix as a Float32Array.
    * @returns the matrix underlying array.
    */
-  Float32Array asArray() const;
+  [[nodiscard]] Float32Array asArray() const;
 
   /**
    * @brief Inverts the current matrix in place.
@@ -113,7 +113,7 @@ public:
    */
   Matrix& reset();
 
-  Matrix subtract(const Matrix& other) const;
+  [[nodiscard]] Matrix subtract(const Matrix& other) const;
 
   const Matrix& subtractFromRef(const Matrix& other, Matrix& result) const;
 
@@ -202,7 +202,7 @@ public:
    * @brief Gets the translation value of the current matrix.
    * @returns a new Vector3 as the extracted translation from the matrix
    */
-  Vector3 getTranslation() const;
+  [[nodiscard]] Vector3 getTranslation() const;
 
   /**
    * @brief Fill a Vector3 with the extracted translation from the matrix.
@@ -248,8 +248,7 @@ public:
    * values
    * @returns the current matrix
    */
-  const Matrix& copyToArray(std::array<float, 16>& array,
-                            unsigned int offset = 0) const;
+  const Matrix& copyToArray(std::array<float, 16>& array, unsigned int offset = 0) const;
 
   /**
    * @brief Populates the given array from the starting index with the current
@@ -279,8 +278,7 @@ public:
    * values
    * @returns the current matrix
    */
-  const Matrix& multiplyToArray(const Matrix& other,
-                                std::array<float, 16>& result,
+  const Matrix& multiplyToArray(const Matrix& other, std::array<float, 16>& result,
                                 unsigned int offset) const;
 
   /**
@@ -301,7 +299,7 @@ public:
    * @returns true is the current matrix and the given one values are strictly
    * equal
    */
-  bool equals(const Matrix& value) const;
+  [[nodiscard]] bool equals(const Matrix& value) const;
 
   /**
    * @brief Decomposes the current Matrix into a translation, rotation and
@@ -313,8 +311,7 @@ public:
    * update
    * @returns true if operation was successful
    */
-  bool decompose(std::optional<Vector3>& scale,
-                 std::optional<Quaternion>& rotation,
+  bool decompose(std::optional<Vector3>& scale, std::optional<Quaternion>& rotation,
                  std::optional<Vector3>& translation) const;
 
   /**
@@ -322,7 +319,7 @@ public:
    * @param index defines the number of the row to get
    * @returns the index-th row of the current matrix as a new Vector4
    */
-  std::optional<Vector4> getRow(unsigned int index) const;
+  [[nodiscard]] std::optional<Vector4> getRow(unsigned int index) const;
 
   /**
    * @brief Sets the index-th row of the current matrix to the vector4 values.
@@ -336,7 +333,7 @@ public:
    * @brief Compute the transpose of the matrix.
    * @returns the new transposed matrix
    */
-  Matrix transpose() const;
+  [[nodiscard]] Matrix transpose() const;
 
   /**
    * @brief Compute the transpose of the matrix and store it in a given matrix.
@@ -355,8 +352,7 @@ public:
    * @param w defines the w component to set
    * @returns the updated current matrix
    */
-  Matrix& setRowFromFloats(unsigned int index, float x, float y, float z,
-                           float w);
+  Matrix& setRowFromFloats(unsigned int index, float x, float y, float z, float w);
 
   /**
    * @brief Compute a new matrix set with the current matrix values multiplied
@@ -396,7 +392,7 @@ public:
    * @returns a new matrix sets to the extracted rotation matrix from the
    * current one
    */
-  Matrix getRotationMatrix() const;
+  [[nodiscard]] Matrix getRotationMatrix() const;
 
   /**
    * @brief Extracts the rotation matrix from the current one and sets it as the
@@ -445,8 +441,7 @@ public:
    * @param offset defines an offset in the source array
    * @param result defines the target matrix
    */
-  static void FromArrayToRef(const Float32Array& array, unsigned int offset,
-                             Matrix& result);
+  static void FromArrayToRef(const Float32Array& array, unsigned int offset, Matrix& result);
 
   /**
    * @brief Stores an array into a matrix after having multiplied each component
@@ -456,9 +451,8 @@ public:
    * @param scale defines the scaling factor
    * @param result defines the target matrix
    */
-  static void FromFloat32ArrayToRefScaled(const Float32Array& array,
-                                          unsigned int offset, float scale,
-                                          Matrix& result);
+  static void FromFloat32ArrayToRefScaled(const Float32Array& array, unsigned int offset,
+                                          float scale, Matrix& result);
 
   /**
    * @brief Gets an identity matrix that must not be updated.
@@ -485,13 +479,12 @@ public:
    * @param initialM44 defines 4th value of 4th row
    * @param result defines the target matrix
    */
-  static void
-  FromValuesToRef(float initialM11, float initialM12, float initialM13,
-                  float initialM14, float initialM21, float initialM22,
-                  float initialM23, float initialM24, float initialM31,
-                  float initialM32, float initialM33, float initialM34,
-                  float initialM41, float initialM42, float initialM43,
-                  float initialM44, Matrix& result);
+  static void FromValuesToRef(float initialM11, float initialM12, float initialM13,
+                              float initialM14, float initialM21, float initialM22,
+                              float initialM23, float initialM24, float initialM31,
+                              float initialM32, float initialM33, float initialM34,
+                              float initialM41, float initialM42, float initialM43,
+                              float initialM44, Matrix& result);
 
   /**
    * @brief Creates new matrix from a list of values (16).
@@ -513,12 +506,10 @@ public:
    * @param initialM44 defines 4th value of 4th row
    * @returns the new matrix
    */
-  static Matrix FromValues(float initialM11, float initialM12, float initialM13,
-                           float initialM14, float initialM21, float initialM22,
-                           float initialM23, float initialM24, float initialM31,
-                           float initialM32, float initialM33, float initialM34,
-                           float initialM41, float initialM42, float initialM43,
-                           float initialM44);
+  static Matrix FromValues(float initialM11, float initialM12, float initialM13, float initialM14,
+                           float initialM21, float initialM22, float initialM23, float initialM24,
+                           float initialM31, float initialM32, float initialM33, float initialM34,
+                           float initialM41, float initialM42, float initialM43, float initialM44);
 
   /**
    * @brief Creates a new matrix composed by merging scale (vector3), rotation
@@ -639,8 +630,7 @@ public:
    * @param to defines the vector to align to
    * @param result defines the target matrix
    */
-  static void RotationAlignToRef(const Vector3& from, const Vector3& to,
-                                 Matrix& result);
+  static void RotationAlignToRef(const Vector3& from, const Vector3& to, Matrix& result);
 
   /**
    * @brief Creates a rotation matrix.
@@ -658,8 +648,7 @@ public:
    * @param roll defines the roll angle in radians (X axis)
    * @param result defines the target matrix
    */
-  static void RotationYawPitchRollToRef(float yaw, float pitch, float roll,
-                                        Matrix& result);
+  static void RotationYawPitchRollToRef(float yaw, float pitch, float roll, Matrix& result);
 
   /**
    * @brief Creates a scaling matrix.
@@ -706,8 +695,7 @@ public:
    * @param gradient defines the gradient factor
    * @returns the new matrix
    */
-  static Matrix Lerp(const Matrix& startValue, const Matrix& endValue,
-                     float gradient);
+  static Matrix Lerp(const Matrix& startValue, const Matrix& endValue, float gradient);
 
   /**
    * @brief Set the given matrix "result" as the interpolated values for
@@ -718,8 +706,8 @@ public:
    * @param gradient defines the gradient factor
    * @param result defines the Matrix object where to store data
    */
-  static void LerpToRef(const Matrix& startValue, const Matrix& endValue,
-                        float gradient, Matrix& result);
+  static void LerpToRef(const Matrix& startValue, const Matrix& endValue, float gradient,
+                        Matrix& result);
 
   /**
    * @brief Builds a new matrix whose values are computed by:
@@ -733,8 +721,7 @@ public:
    * @param gradient defines the gradient between the two matrices
    * @returns the new matrix
    */
-  static Matrix DecomposeLerp(Matrix& startValue, Matrix& endValue,
-                              float gradient);
+  static Matrix DecomposeLerp(Matrix& startValue, Matrix& endValue, float gradient);
 
   /**
    * @brief Update a matrix to values which are computed by:
@@ -749,8 +736,8 @@ public:
    * @param gradient defines the gradient between the two matrices
    * @param result defines the target matrix
    */
-  static void DecomposeLerpToRef(Matrix& startValue, Matrix& endValue,
-                                 float gradient, Matrix& result);
+  static void DecomposeLerpToRef(Matrix& startValue, Matrix& endValue, float gradient,
+                                 Matrix& result);
 
   /**
    * @brief Gets a new rotation matrix used to rotate an entity so as it looks
@@ -761,8 +748,7 @@ public:
    * @param up defines the up vector for the entity
    * @returns the new matrix
    */
-  static Matrix LookAtLH(const Vector3& eye, Vector3& target,
-                         const Vector3& up);
+  static Matrix LookAtLH(const Vector3& eye, Vector3& target, const Vector3& up);
 
   /**
    * @brief Sets the given "result" Matrix to a rotation matrix used to rotate
@@ -774,8 +760,8 @@ public:
    * @param up defines the up vector for the entity
    * @param result defines the target matrix
    */
-  static void LookAtLHToRef(const Vector3& eye, const Vector3& target,
-                            const Vector3& up, Matrix& result);
+  static void LookAtLHToRef(const Vector3& eye, const Vector3& target, const Vector3& up,
+                            Matrix& result);
 
   /**
    * @brief Gets a new rotation matrix used to rotate an entity so as it looks
@@ -786,8 +772,7 @@ public:
    * @param up defines the up vector for the entity
    * @returns the new matrix
    */
-  static Matrix LookAtRH(const Vector3& eye, Vector3& target,
-                         const Vector3& up);
+  static Matrix LookAtRH(const Vector3& eye, Vector3& target, const Vector3& up);
 
   /**
    * @brief Sets the given "result" Matrix to a rotation matrix used to rotate
@@ -799,8 +784,8 @@ public:
    * @param up defines the up vector for the entity
    * @param result defines the target matrix
    */
-  static void LookAtRHToRef(const Vector3& eye, const Vector3& target,
-                            const Vector3& up, Matrix& result);
+  static void LookAtRHToRef(const Vector3& eye, const Vector3& target, const Vector3& up,
+                            Matrix& result);
 
   /**
    * @brief Create a left-handed orthographic projection matrix.
@@ -820,8 +805,7 @@ public:
    * @param zfar defines the far clip plane
    * @param result defines the target matrix
    */
-  static void OrthoLHToRef(float width, float height, float znear, float zfar,
-                           Matrix& result);
+  static void OrthoLHToRef(float width, float height, float znear, float zfar, Matrix& result);
 
   /**
    * @brief Create a left-handed orthographic projection matrix.
@@ -833,8 +817,8 @@ public:
    * @param zfar defines the far clip plane
    * @returns a new matrix as a left-handed orthographic projection matrix
    */
-  static Matrix OrthoOffCenterLH(float left, float right, float bottom,
-                                 float top, float znear, float zfar);
+  static Matrix OrthoOffCenterLH(float left, float right, float bottom, float top, float znear,
+                                 float zfar);
 
   /**
    * @brief Stores a left-handed orthographic projection into a given matrix.
@@ -846,9 +830,8 @@ public:
    * @param zfar defines the far clip plane
    * @param result defines the target matrix
    */
-  static void OrthoOffCenterLHToRef(float left, float right, float bottom,
-                                    float top, float znear, float zfar,
-                                    Matrix& result);
+  static void OrthoOffCenterLHToRef(float left, float right, float bottom, float top, float znear,
+                                    float zfar, Matrix& result);
 
   /**
    * @brief Creates a right-handed orthographic projection matrix.
@@ -860,8 +843,8 @@ public:
    * @param zfar defines the far clip plane
    * @returns a new matrix as a right-handed orthographic projection matrix
    */
-  static Matrix OrthoOffCenterRH(float left, float right, float bottom,
-                                 float top, float znear, float zfar);
+  static Matrix OrthoOffCenterRH(float left, float right, float bottom, float top, float znear,
+                                 float zfar);
 
   /**
    * @brief Stores a right-handed orthographic projection into a given matrix.
@@ -873,9 +856,8 @@ public:
    * @param zfar defines the far clip plane
    * @param result defines the target matrix
    */
-  static void OrthoOffCenterRHToRef(float left, float right, float bottom,
-                                    float top, float znear, float zfar,
-                                    Matrix& result);
+  static void OrthoOffCenterRHToRef(float left, float right, float bottom, float top, float znear,
+                                    float zfar, Matrix& result);
 
   /**
    * @brief Creates a left-handed perspective projection matrix.
@@ -885,8 +867,7 @@ public:
    * @param zfar defines the far clip plane
    * @returns a new matrix as a left-handed perspective projection matrix
    */
-  static Matrix PerspectiveLH(float width, float height, float znear,
-                              float zfar);
+  static Matrix PerspectiveLH(float width, float height, float znear, float zfar);
 
   /**
    * @brief Creates a left-handed perspective projection matrix.
@@ -896,8 +877,7 @@ public:
    * @param zfar defines the far clip plane
    * @returns a new matrix as a left-handed perspective projection matrix
    */
-  static Matrix PerspectiveFovLH(float fov, float aspect, float znear,
-                                 float zfar);
+  static Matrix PerspectiveFovLH(float fov, float aspect, float znear, float zfar);
 
   /**
    * @brief Stores a left-handed perspective projection into a given matrix.
@@ -909,9 +889,8 @@ public:
    * @param isVerticalFovFixed defines it the fov is vertically fixed (default)
    * or horizontally
    */
-  static void PerspectiveFovLHToRef(float fov, float aspect, float znear,
-                                    float zfar, Matrix& result,
-                                    bool isVerticalFovFixed = true);
+  static void PerspectiveFovLHToRef(float fov, float aspect, float znear, float zfar,
+                                    Matrix& result, bool isVerticalFovFixed = true);
 
   /**
    * @brief Creates a right-handed perspective projection matrix.
@@ -921,8 +900,7 @@ public:
    * @param zfar defines the far clip plane
    * @returns a new matrix as a right-handed perspective projection matrix
    */
-  static Matrix PerspectiveFovRH(float fov, float aspect, float znear,
-                                 float zfar);
+  static Matrix PerspectiveFovRH(float fov, float aspect, float znear, float zfar);
 
   /**
    * @brief Stores a right-handed perspective projection into a given matrix.
@@ -934,9 +912,8 @@ public:
    * @param isVerticalFovFixed defines it the fov is vertically fixed (default)
    * or horizontally
    */
-  static void PerspectiveFovRHToRef(float fov, float aspect, float znear,
-                                    float zfar, Matrix& result,
-                                    bool isVerticalFovFixed = true);
+  static void PerspectiveFovRHToRef(float fov, float aspect, float znear, float zfar,
+                                    Matrix& result, bool isVerticalFovFixed = true);
 
   /**
    * @brief Stores a perspective projection for WebVR info a given matrix.
@@ -947,8 +924,7 @@ public:
    * @param rightHanded defines if the matrix must be in right-handed mode
    * (false by default)
    */
-  static void PerspectiveFovWebVRToRef(const VRFov& fov, float znear,
-                                       float zfar, Matrix& result,
+  static void PerspectiveFovWebVRToRef(const VRFov& fov, float znear, float zfar, Matrix& result,
                                        bool rightHanded = true);
 
   /**
@@ -961,9 +937,8 @@ public:
    * @param zmax defines the far clip plane
    * @returns the transformation matrix
    */
-  static Matrix GetFinalMatrix(const Viewport& viewport, Matrix& world,
-                               Matrix& view, Matrix& projection, float zmin,
-                               float zmax);
+  static Matrix GetFinalMatrix(const Viewport& viewport, Matrix& world, Matrix& view,
+                               Matrix& projection, float zmin, float zmax);
 
   /**
    * @brief Extracts a 2x2 matrix from a given matrix and store the result in a
@@ -1019,8 +994,8 @@ public:
    * @param zaxis defines the value of the 3rd axis
    * @param result defines the target matrix
    */
-  static void FromXYZAxesToRef(const Vector3& xaxis, const Vector3& yaxis,
-                               const Vector3& zaxis, Matrix& result);
+  static void FromXYZAxesToRef(const Vector3& xaxis, const Vector3& yaxis, const Vector3& zaxis,
+                               Matrix& result);
 
   /**
    * @brief Creates a rotation matrix from a quaternion and stores it in a
@@ -1033,8 +1008,7 @@ public:
 private:
   /** @hidden */
   void _updateIdentityStatus(bool isIdentity, bool isIdentityDirty = false,
-                             bool isIdentity3x2      = false,
-                             bool isIdentity3x2Dirty = true);
+                             bool isIdentity3x2 = false, bool isIdentity3x2Dirty = true);
 
 public:
   /**

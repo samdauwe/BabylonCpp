@@ -84,7 +84,7 @@ public:
    * @brief Get the class name.
    * @returns "LensRenderingPipeline"
    */
-  std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
   // public methods (self explanatory)
 
@@ -255,67 +255,67 @@ protected:
   /**
    * @brief Gets or sets the edge blur
    */
-  float get_edgeBlur() const;
+  [[nodiscard]] float get_edgeBlur() const;
   void set_edgeBlur(float value);
 
   /**
    * @brief Gets or sets the grain amount
    */
-  float get_grainAmount() const;
+  [[nodiscard]] float get_grainAmount() const;
   void set_grainAmount(float value);
 
   /**
    * @brief Gets or sets the chromatic aberration amount
    */
-  float get_chromaticAberration() const;
+  [[nodiscard]] float get_chromaticAberration() const;
   void set_chromaticAberration(float value);
 
   /**
    * @brief Gets or sets the depth of field aperture
    */
-  float get_dofAperture() const;
+  [[nodiscard]] float get_dofAperture() const;
   void set_dofAperture(float value);
 
   /**
    * @brief Gets or sets the edge distortion
    */
-  float get_edgeDistortion() const;
+  [[nodiscard]] float get_edgeDistortion() const;
   void set_edgeDistortion(float value);
 
   /**
    * @brief Gets or sets the depth of field distortion
    */
-  float get_dofDistortion() const;
+  [[nodiscard]] float get_dofDistortion() const;
   void set_dofDistortion(float value);
 
   /**
    * @brief Gets or sets the darken out of focus amount
    */
-  float get_darkenOutOfFocus() const;
+  [[nodiscard]] float get_darkenOutOfFocus() const;
   void set_darkenOutOfFocus(float value);
 
   /**
    * @brief Gets or sets a boolean indicating if blur noise is enabled
    */
-  bool get_blurNoise() const;
+  [[nodiscard]] bool get_blurNoise() const;
   void set_blurNoise(bool value);
 
   /**
    * @brief Gets or sets a boolean indicating if pentagon bokeh is enabled
    */
-  bool get_pentagonBokeh() const;
+  [[nodiscard]] bool get_pentagonBokeh() const;
   void set_pentagonBokeh(bool value);
 
   /**
    * @brief Gets or sets the highlight grain amount
    */
-  float get_highlightsGain() const;
+  [[nodiscard]] float get_highlightsGain() const;
   void set_highlightsGain(float value);
 
   /**
    * @brief Gets or sets the highlight threshold
    */
-  float get_highlightsThreshold() const;
+  [[nodiscard]] float get_highlightsThreshold() const;
   void set_highlightsThreshold(float value);
 
 private:

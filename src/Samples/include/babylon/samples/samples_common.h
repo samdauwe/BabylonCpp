@@ -1,9 +1,9 @@
 #ifndef BABYLON_SAMPLES_SAMPLES_COMMON_H
 #define BABYLON_SAMPLES_SAMPLES_COMMON_H
 
-#include <string>
 #include <functional>
 #include <memory>
+#include <string>
 #include <unordered_map>
 
 namespace BABYLON {
@@ -14,21 +14,22 @@ using IRenderableScenePtr = std::shared_ptr<IRenderableScene>;
 
 namespace Samples {
 
-using SampleFactoryFunction = std::function<IRenderableScenePtr(ICanvas * iCanvas)>;
+using SampleFactoryFunction = std::function<IRenderableScenePtr(ICanvas* iCanvas)>;
 
 class _ISamplesIndex {
 
 public:
-  _ISamplesIndex() = default;
+  _ISamplesIndex()  = default;
   ~_ISamplesIndex() = default;
 
   /**
    * @brief Returns the list with example.
    * @return the list with example
    */
-  const std::unordered_map<std::string, SampleFactoryFunction>& samples() const;
+  [[nodiscard]] const std::unordered_map<std::string, SampleFactoryFunction>& samples() const;
 
-  void addSample(const std::string& exampleName, SampleFactoryFunction f) {
+  void addSample(const std::string& exampleName, SampleFactoryFunction f)
+  {
     _samples[exampleName] = f;
   }
 
