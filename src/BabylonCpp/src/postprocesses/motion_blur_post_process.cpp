@@ -10,11 +10,11 @@
 
 namespace BABYLON {
 
-MotionBlurPostProcess::MotionBlurPostProcess(
-  const std::string& iName, Scene* scene,
-  const std::variant<float, PostProcessOptions>& options,
-  const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
-  bool reusable, unsigned int textureType, bool blockCompilation)
+MotionBlurPostProcess::MotionBlurPostProcess(const std::string& iName, Scene* scene,
+                                             const std::variant<float, PostProcessOptions>& options,
+                                             const CameraPtr& camera, unsigned int samplingMode,
+                                             Engine* engine, bool reusable,
+                                             unsigned int textureType, bool blockCompilation)
     : PostProcess{iName,
                   "motionBlur",
                   {"motionStrength", "motionScale", "screenSize"},
@@ -48,22 +48,23 @@ MotionBlurPostProcess::MotionBlurPostProcess(
     // Geometry buffer renderer is supported.
     _geometryBufferRenderer->enableVelocity = true;
 
-    onApply = [&](Effect* effect, EventState & /*es*/) -> void {
-      effect->setVector2("screenSize", Vector2(static_cast<float>(width),
-                                               static_cast<float>(height)));
+    onApply = [this, &scene](Effect* effect, EventState & /*es*/) -> void {
+      effect->setVector2("screenSize",
+                         Vector2(static_cast<float>(width), static_cast<float>(height)));
 
       effect->setFloat("motionScale", scene->getAnimationRatio());
       effect->setFloat("motionStrength", motionStrength);
 
       if (_geometryBufferRenderer) {
-        const auto velocityIndex = _geometryBufferRenderer->getTextureIndex(
-          GeometryBufferRenderer::VELOCITY_TEXTURE_TYPE);
+        const auto velocityIndex
+          = _geometryBufferRenderer->getTextureIndex(GeometryBufferRenderer::VELOCITY_TEXTURE_TYPE);
         if (velocityIndex > 0) {
-          const auto& textures
-            = _geometryBufferRenderer->getGBuffer()->textures();
-          const auto& texture
-            = textures.at(static_cast<unsigned>(velocityIndex));
-          effect->setTexture("velocitySampler", texture);
+          const auto& textures      = _geometryBufferRenderer->getGBuffer()->textures();
+          const auto _velocityIndex = static_cast<unsigned>(velocityIndex);
+          if (_velocityIndex < textures.size()) {
+            const auto& texture = textures.at(_velocityIndex);
+            effect->setTexture("velocitySampler", texture);
+          }
         }
       }
     };
@@ -82,29 +83,23 @@ void MotionBlurPostProcess::set_motionBlurSamples(unsigned int iSamples)
   _motionBlurSamples = iSamples;
 
   if (_geometryBufferRenderer) {
-    updateEffect("#define GEOMETRY_SUPPORTED\n#define SAMPLES "
-                 + std::to_string(iSamples));
+    updateEffect("#define GEOMETRY_SUPPORTED\n#define SAMPLES " + std::to_string(iSamples));
   }
 }
 
-void MotionBlurPostProcess::excludeSkinnedMesh(
-  const AbstractMeshPtr& skinnedMesh)
+void MotionBlurPostProcess::excludeSkinnedMesh(const AbstractMeshPtr& skinnedMesh)
 {
   if (_geometryBufferRenderer && skinnedMesh->skeleton()) {
-    _geometryBufferRenderer->excludedSkinnedMeshesFromVelocity.emplace_back(
-      skinnedMesh);
+    _geometryBufferRenderer->excludedSkinnedMeshesFromVelocity.emplace_back(skinnedMesh);
   }
 }
 
-void MotionBlurPostProcess::removeExcludedSkinnedMesh(
-  const AbstractMeshPtr& skinnedMesh)
+void MotionBlurPostProcess::removeExcludedSkinnedMesh(const AbstractMeshPtr& skinnedMesh)
 {
   if (_geometryBufferRenderer && skinnedMesh->skeleton()) {
     _geometryBufferRenderer->excludedSkinnedMeshesFromVelocity.erase(
-      std::remove(
-        _geometryBufferRenderer->excludedSkinnedMeshesFromVelocity.begin(),
-        _geometryBufferRenderer->excludedSkinnedMeshesFromVelocity.end(),
-        skinnedMesh),
+      std::remove(_geometryBufferRenderer->excludedSkinnedMeshesFromVelocity.begin(),
+                  _geometryBufferRenderer->excludedSkinnedMeshesFromVelocity.end(), skinnedMesh),
       _geometryBufferRenderer->excludedSkinnedMeshesFromVelocity.end());
   }
 }

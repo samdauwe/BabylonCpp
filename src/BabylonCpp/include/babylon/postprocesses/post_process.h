@@ -27,35 +27,27 @@ using InternalTexturePtr = std::shared_ptr<InternalTexture>;
 using PostProcessPtr     = std::shared_ptr<PostProcess>;
 
 /**
- * @brief PostProcess can be used to apply a shader to a texture after it has
- * been rendered See https://doc.babylonjs.com/how_to/how_to_use_postprocesses
+ * @brief PostProcess can be used to apply a shader to a texture after it has been rendered See
+ * https://doc.babylonjs.com/how_to/how_to_use_postprocesses
  */
 class BABYLON_SHARED_EXPORT PostProcess {
 
 public:
   static PostProcessPtr
   New(const std::string& name, const std::string& fragmentUrl,
-      const std::vector<std::string>& parameters,
-      const std::vector<std::string>& samplers,
-      const std::variant<float, PostProcessOptions>& options,
-      const CameraPtr& camera,
-      unsigned int samplingMode = Constants::TEXTURE_NEAREST_SAMPLINGMODE,
-      Engine* engine = nullptr, bool reusable = false,
-      const std::string& defines   = "",
+      const std::vector<std::string>& parameters, const std::vector<std::string>& samplers,
+      const std::variant<float, PostProcessOptions>& options, const CameraPtr& camera,
+      unsigned int samplingMode = Constants::TEXTURE_NEAREST_SAMPLINGMODE, Engine* engine = nullptr,
+      bool reusable = false, const std::string& defines = "",
       unsigned int textureType     = Constants::TEXTURETYPE_UNSIGNED_INT,
       const std::string& vertexUrl = "postprocess",
       const std::unordered_map<std::string, unsigned int>& indexParameters = {},
-      bool blockCompilation = false)
+      bool blockCompilation                                                = false)
   {
-    auto postProcess = std::shared_ptr<PostProcess>(
-      new PostProcess(name, fragmentUrl, parameters, samplers, options, camera,
-                      samplingMode, engine, reusable, defines, textureType,
-                      vertexUrl, indexParameters, blockCompilation));
+    auto postProcess = std::shared_ptr<PostProcess>(new PostProcess(
+      name, fragmentUrl, parameters, samplers, options, camera, samplingMode, engine, reusable,
+      defines, textureType, vertexUrl, indexParameters, blockCompilation));
     postProcess->add(postProcess);
-
-    if (!blockCompilation) {
-      postProcess->updateEffect(defines);
-    }
 
     return postProcess;
   }
@@ -78,7 +70,7 @@ public:
 
   /**
    * @brief Gets the texel size of the postprocess.
-   * See https://en.wikipedia.org/wiki/Texel_(graphics)
+   * @see https://en.wikipedia.org/wiki/Texel_(graphics)
    */
   Vector2 texelSize();
 
@@ -101,8 +93,8 @@ public:
   EffectPtr& getEffect();
 
   /**
-   * @brief To avoid multiple redundant textures for multiple post process, the
-   * output the output texture for this post process can be shared with another.
+   * @brief To avoid multiple redundant textures for multiple post process, the output the output
+   * texture for this post process can be shared with another.
    * @param postProcess The post process to share the output with.
    * @returns This post process.
    */
@@ -116,55 +108,48 @@ public:
   void useOwnOutput();
 
   /**
-   * @brief Updates the effect with the current post process compile time values
-   * and recompiles the shader.
-   * @param defines Define statements that should be added at the beginning of
-   * the shader. (default: null)
+   * @brief Updates the effect with the current post process compile time values and recompiles the
+   * shader.
+   * @param defines Define statements that should be added at the beginning of the shader. (default:
+   * null)
    * @param uniforms Set of uniform variables that will be passed to the shader.
    * (default: null)
-   * @param samplers Set of Texture2D variables that will be passed to the
-   * shader. (default: null)
-   * @param indexParameters The index parameters to be used for babylons include
-   * syntax "#include<kernelBlurVaryingDeclaration>[0..varyingCount]". (default:
-   * undefined) See usage in babylon.blurPostProcess.ts and kernelBlur.vertex.fx
+   * @param samplers Set of Texture2D variables that will be passed to the shader. (default: null)
+   * @param indexParameters The index parameters to be used for babylons include syntax
+   * "#include<kernelBlurVaryingDeclaration>[0..varyingCount]". (default: undefined) See usage in
+   * babylon.blurPostProcess.ts and kernelBlur.vertex.fx
    * @param onCompiled Called when the shader has been compiled.
    * @param onError Called if there is an error when compiling a shader.
    */
-  virtual void updateEffect(
-    const std::string& defines                                           = "",
-    const std::vector<std::string>& uniforms                             = {},
-    const std::vector<std::string>& samplers                             = {},
-    const std::unordered_map<std::string, unsigned int>& indexParameters = {},
-    const std::function<void(Effect* effect)>& onCompiled = nullptr,
-    const std::function<void(Effect* effect, const std::string& errors)>&
-      onError
-    = nullptr);
+  virtual void
+  updateEffect(const std::string& defines = "", const std::vector<std::string>& uniforms = {},
+               const std::vector<std::string>& samplers                             = {},
+               const std::unordered_map<std::string, unsigned int>& indexParameters = {},
+               const std::function<void(Effect* effect)>& onCompiled                = nullptr,
+               const std::function<void(Effect* effect, const std::string& errors)>& onError
+               = nullptr);
 
   /**
-   * @brief The post process is reusable if it can be used multiple times within
-   * one frame.
+   * @brief The post process is reusable if it can be used multiple times within one frame.
    * @returns If the post process is reusable
    */
   bool isReusable() const;
 
   /**
-   * @brief Invalidate frameBuffer to hint the postprocess to create a depth
-   * buffer
+   * @brief Invalidate frameBuffer to hint the postprocess to create a depth buffer
    */
   void markTextureDirty();
 
   /**
-   * @brief Activates the post process by intializing the textures to be used
-   * when executed. Notifies onActivateObservable. When this post process is
-   * used in a pipeline, this is call will bind the input texture of this post
-   * process to the output of the previous.
-   * @param camera The camera that will be used in the post process. This camera
-   * will be used when calling onActivateObservable.
-   * @param sourceTexture The source texture to be inspected to get the width
-   * and height if not specified in the post process constructor. (default:
-   * null)
-   * @param forceDepthStencil If true, a depth and stencil buffer will be
-   * generated. (default: false)
+   * @brief Activates the post process by intializing the textures to be used when executed.
+   * Notifies onActivateObservable. When this post process is used in a pipeline, this is call will
+   * bind the input texture of this post process to the output of the previous.
+   * @param camera The camera that will be used in the post process. This camera will be used when
+   * calling onActivateObservable.
+   * @param sourceTexture The source texture to be inspected to get the width and height if not
+   * specified in the post process constructor. (default: null)
+   * @param forceDepthStencil If true, a depth and stencil buffer will be generated. (default:
+   * false)
    * @returns The target texture that was bound to be written to.
    */
   InternalTexturePtr activate(const CameraPtr& camera,
@@ -188,10 +173,8 @@ public:
   bool isReady() const;
 
   /**
-   * @brief Binds all textures and uniforms to the shader, this will be run on
-   * every pass.
-   * @returns the effect corresponding to this post process. Null if not
-   * compiled or not ready.
+   * @brief Binds all textures and uniforms to the shader, this will be run on every pass.
+   * @returns the effect corresponding to this post process. Null if not compiled or not ready.
    */
   EffectPtr apply();
 
@@ -208,45 +191,34 @@ protected:
    * @brief Creates a new instance PostProcess.
    * @param name The name of the PostProcess.
    * @param fragmentUrl The url of the fragment shader to be used.
-   * @param parameters Array of the names of uniform non-sampler2D variables
-   * that will be passed to the shader.
-   * @param samplers Array of the names of uniform sampler2D variables that
-   * will be passed to the shader.
-   * @param options The required width/height ratio to downsize to before
-   * computing the render pass. (Use 1.0 for full size)
+   * @param parameters Array of the names of uniform non-sampler2D variables that will be passed to
+   * the shader.
+   * @param samplers Array of the names of uniform sampler2D variables that will be passed to the
+   * shader.
+   * @param options The required width/height ratio to downsize to before computing the render pass.
+   * (Use 1.0 for full size)
    * @param camera The camera to apply the render pass to.
-   * @param samplingMode The sampling mode to be used when computing the pass.
-   * (default: 0)
-   * @param engine The engine which the post process will be applied.
-   * (default: current engine)
-   * @param reusable If the post process can be reused on the same frame.
-   * (default: false)
-   * @param defines String of defines that will be set when running the
-   * fragment shader. (default: null)
-   * @param textureType Type of textures used when performing the post
-   * process. (default: 0)
-   * @param vertexUrl The url of the vertex shader to be used. (default:
-   * "postprocess")
-   * @param indexParameters The index parameters to be used for babylons
-   * include syntax "#include<kernelBlurVaryingDeclaration>[0..varyingCount]".
-   * (default: undefined) See usage in babylon.blurPostProcess.ts and
-   * kernelBlur.vertex.fx
-   * @param blockCompilation If the shader should not be compiled imediatly.
-   * (default: false)
+   * @param samplingMode The sampling mode to be used when computing the pass. (default: 0)
+   * @param engine The engine which the post process will be applied. (default: current engine)
+   * @param reusable If the post process can be reused on the same frame. (default: false)
+   * @param defines String of defines that will be set when running the fragment shader. (default:
+   * null)
+   * @param textureType Type of textures used when performing the post process. (default: 0)
+   * @param vertexUrl The url of the vertex shader to be used. (default: "postprocess")
+   * @param indexParameters The index parameters to be used for babylons include syntax
+   * "#include<kernelBlurVaryingDeclaration>[0..varyingCount]". (default: undefined) See usage in
+   * babylon.blurPostProcess.ts and kernelBlur.vertex.fx
+   * @param blockCompilation If the shader should not be compiled imediatly. (default: false)
    */
-  PostProcess(
-    const std::string& name, const std::string& fragmentUrl,
-    const std::vector<std::string>& parameters,
-    const std::vector<std::string>& samplers,
-    const std::variant<float, PostProcessOptions>& options,
-    const CameraPtr& camera,
-    unsigned int samplingMode = TextureConstants::NEAREST_SAMPLINGMODE,
-    Engine* engine = nullptr, bool reusable = false,
-    const std::string& defines   = "",
-    unsigned int textureType     = Constants::TEXTURETYPE_UNSIGNED_INT,
-    const std::string& vertexUrl = "postprocess",
-    const std::unordered_map<std::string, unsigned int>& indexParameters = {},
-    bool blockCompilation = false);
+  PostProcess(const std::string& name, const std::string& fragmentUrl,
+              const std::vector<std::string>& parameters, const std::vector<std::string>& samplers,
+              const std::variant<float, PostProcessOptions>& options, const CameraPtr& camera,
+              unsigned int samplingMode = TextureConstants::NEAREST_SAMPLINGMODE,
+              Engine* engine = nullptr, bool reusable = false, const std::string& defines = "",
+              unsigned int textureType     = Constants::TEXTURETYPE_UNSIGNED_INT,
+              const std::string& vertexUrl = "postprocess",
+              const std::unordered_map<std::string, unsigned int>& indexParameters = {},
+              bool blockCompilation                                                = false);
 
   /**
    * @brief Gets the number of sample textures (default: 1)
@@ -263,38 +235,34 @@ protected:
   /**
    * @brief A function that is added to the onActivateObservable.
    */
-  void set_onActivate(
-    const std::function<void(Camera* camera, EventState&)>& callback);
+  void set_onActivate(const std::function<void(Camera* camera, EventState&)>& callback);
 
   /**
    * @brief A function that is added to the onSizeChangedObservable.
    */
-  void set_onSizeChanged(
-    const std::function<void(PostProcess* postProcess, EventState&)>& callback);
+  void
+  set_onSizeChanged(const std::function<void(PostProcess* postProcess, EventState&)>& callback);
 
   /**
    * @brief A function that is added to the onApplyObservable.
    */
-  void
-  set_onApply(const std::function<void(Effect* effect, EventState&)>& callback);
+  void set_onApply(const std::function<void(Effect* effect, EventState&)>& callback);
 
   /**
    * @brief A function that is added to the onBeforeRenderObservable.
    */
-  void set_onBeforeRender(
-    const std::function<void(Effect* effect, EventState&)>& callback);
+  void set_onBeforeRender(const std::function<void(Effect* effect, EventState&)>& callback);
 
   /**
    * @brief A function that is added to the onAfterRenderObservable.
    */
-  void set_onAfterRender(
-    const std::function<void(Effect* effect, EventState&)>& callback);
+  void set_onAfterRender(const std::function<void(Effect* effect, EventState&)>& callback);
 
   /**
-   * @brief The input texture for this post process and the output texture of
-   * the previous post process. When added to a pipeline the previous post
-   * process will render it's output into this texture and this texture will be
-   * used as textureSampler in the fragment shader of this post process.
+   * @brief The input texture for this post process and the output texture of the previous post
+   * process. When added to a pipeline the previous post process will render it's output into this
+   * texture and this texture will be used as textureSampler in the fragment shader of this post
+   * process.
    */
   InternalTexturePtr& get_inputTexture();
   void set_inputTexture(const InternalTexturePtr& value);
@@ -340,14 +308,12 @@ public:
 
   /**
    * If the buffer needs to be cleared before applying the post process.
-   * (default: true) Should be set to false if shader will overwrite all
-   * previous pixels.
+   * (default: true) Should be set to false if shader will overwrite all previous pixels.
    */
   bool autoClear;
 
   /**
-   * Type of alpha mode to use when performing the post process (default:
-   * Engine.ALPHA_DISABLE)
+   * Type of alpha mode to use when performing the post process (default: Engine.ALPHA_DISABLE)
    */
   unsigned int alphaMode;
 
@@ -409,49 +375,38 @@ public:
   /**
    * A function that is added to the onActivateObservable.
    */
-  WriteOnlyProperty<PostProcess,
-                    const std::function<void(Camera* camera, EventState&)>>
-    onActivate;
+  WriteOnlyProperty<PostProcess, const std::function<void(Camera* camera, EventState&)>> onActivate;
 
   /**
    * A function that is added to the onSizeChangedObservable.
    */
-  WriteOnlyProperty<PostProcess,
-                    std::function<void(PostProcess* postProcess, EventState&)>>
+  WriteOnlyProperty<PostProcess, std::function<void(PostProcess* postProcess, EventState&)>>
     onSizeChanged;
 
   /**
    * A function that is added to the onApplyObservable.
    */
-  WriteOnlyProperty<PostProcess,
-                    std::function<void(Effect* effect, EventState&)>>
-    onApply;
+  WriteOnlyProperty<PostProcess, std::function<void(Effect* effect, EventState&)>> onApply;
 
   /**
    * A function that is added to the onBeforeRenderObservable.
    */
-  WriteOnlyProperty<PostProcess,
-                    std::function<void(Effect* effect, EventState&)>>
-    onBeforeRender;
+  WriteOnlyProperty<PostProcess, std::function<void(Effect* effect, EventState&)>> onBeforeRender;
 
   /**
    * A function that is added to the onAfterRenderObservable.
    */
-  WriteOnlyProperty<PostProcess,
-                    std::function<void(Effect* effect, EventState&)>>
-    onAfterRender;
+  WriteOnlyProperty<PostProcess, std::function<void(Effect* effect, EventState&)>> onAfterRender;
 
   /**
-   * The input texture for this post process and the output texture of
-   * the previous post process. When added to a pipeline the previous post
-   * process will render it's output into this texture and this texture will be
-   * used as textureSampler in the fragment shader of this post process.
+   * The input texture for this post process and the output texture of the previous post process.
+   * When added to a pipeline the previous post process will render it's output into this texture
+   * and this texture will be used as textureSampler in the fragment shader of this post process.
    */
   Property<PostProcess, InternalTexturePtr> inputTexture;
 
   /**
-   * Modify the scale of the post process to be the same as the viewport
-   * (default: false)
+   * Modify the scale of the post process to be the same as the viewport (default: false)
    */
   bool adaptScaleToCurrentViewport;
 
@@ -515,6 +470,8 @@ private:
   PostProcessPtr _shareOutputWithPostProcess;
   Vector2 _texelSize;
   InternalTexturePtr _forcedOutputTexture;
+  bool _blockCompilation;
+  std::string _defines;
   // Events
   Observer<Camera>::Ptr _onActivateObserver;
   Observer<PostProcess>::Ptr _onSizeChangedObserver;

@@ -13,16 +13,15 @@
 
 namespace BABYLON {
 
-PostProcess::PostProcess(
-  const std::string& iName, const std::string& fragmentUrl,
-  const std::vector<std::string>& parameters,
-  const std::vector<std::string>& samplers,
-  const std::variant<float, PostProcessOptions>& options,
-  const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
-  bool reusable, const std::string& defines, unsigned int textureType,
-  const std::string& vertexUrl,
-  const std::unordered_map<std::string, unsigned int>& indexParameters,
-  bool blockCompilation)
+PostProcess::PostProcess(const std::string& iName, const std::string& fragmentUrl,
+                         const std::vector<std::string>& parameters,
+                         const std::vector<std::string>& samplers,
+                         const std::variant<float, PostProcessOptions>& options,
+                         const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
+                         bool reusable, const std::string& defines, unsigned int textureType,
+                         const std::string& vertexUrl,
+                         const std::unordered_map<std::string, unsigned int>& indexParameters,
+                         bool blockCompilation)
     : name{iName}
     , width{-1}
     , height{-1}
@@ -39,8 +38,7 @@ PostProcess::PostProcess(
     , onApply{this, &PostProcess::set_onApply}
     , onBeforeRender{this, &PostProcess::set_onBeforeRender}
     , onAfterRender{this, &PostProcess::set_onAfterRender}
-    , inputTexture{this, &PostProcess::get_inputTexture,
-                   &PostProcess::set_inputTexture}
+    , inputTexture{this, &PostProcess::get_inputTexture, &PostProcess::set_inputTexture}
     , adaptScaleToCurrentViewport{false}
     , _currentRenderTextureInd{0}
     , _samples{1}
@@ -51,12 +49,14 @@ PostProcess::PostProcess(
     , _options{options}
     , _reusable{false}
     , _fragmentUrl{fragmentUrl}
-    , _vertexUrl{vertexUrl}
+    , _vertexUrl{!vertexUrl.empty() ? vertexUrl : "postprocess"}
     , _parameters{parameters}
     , _scaleRatio{Vector2(1.f, 1.f)}
     , _shareOutputWithPostProcess{nullptr}
     , _texelSize{Vector2::Zero()}
     , _forcedOutputTexture{nullptr}
+    , _blockCompilation{blockCompilation}
+    , _defines{defines}
     , _onActivateObserver{nullptr}
     , _onSizeChangedObserver{nullptr}
     , _onApplyObserver{nullptr}
@@ -83,13 +83,6 @@ PostProcess::PostProcess(
   _parameters.emplace_back("scale");
 
   _indexParameters = indexParameters;
-
-  // The code block below calls a virtual function and thus cannot be called in the ctor
-  // It is instead called inside the named ctor New()
-  //if (!blockCompilation)
-  //  updateEffect(defines);
-  (void)blockCompilation;
-  (void)defines;
 }
 
 PostProcess::~PostProcess() = default;
@@ -104,6 +97,10 @@ void PostProcess::add(const PostProcessPtr& newPostProcess)
   }
   else if (_engine) {
     _engine->postProcesses.emplace_back(newPostProcess);
+  }
+
+  if (!newPostProcess->_blockCompilation) {
+    updateEffect(newPostProcess->_defines);
   }
 }
 
@@ -128,8 +125,7 @@ void PostProcess::set_samples(unsigned int n)
   }
 }
 
-void PostProcess::set_onActivate(
-  const std::function<void(Camera* camera, EventState&)>& callback)
+void PostProcess::set_onActivate(const std::function<void(Camera* camera, EventState&)>& callback)
 {
   if (_onActivateObserver) {
     onActivateObservable.remove(_onActivateObserver);
@@ -148,8 +144,7 @@ void PostProcess::set_onSizeChanged(
   _onSizeChangedObserver = onSizeChangedObservable.add(callback);
 }
 
-void PostProcess::set_onApply(
-  const std::function<void(Effect* effect, EventState&)>& callback)
+void PostProcess::set_onApply(const std::function<void(Effect* effect, EventState&)>& callback)
 {
   if (_onApplyObserver) {
     onApplyObservable.remove(_onApplyObserver);
@@ -243,21 +238,19 @@ void PostProcess::updateEffect(
   const std::function<void(Effect* effect)>& onCompiled,
   const std::function<void(Effect* effect, const std::string& errors)>& onError)
 {
-  std::unordered_map<std::string, std::string> baseName{
-    {"vertex", _vertexUrl}, {"fragment", _fragmentUrl}};
+  std::unordered_map<std::string, std::string> baseName{{"vertex", _vertexUrl},
+                                                        {"fragment", _fragmentUrl}};
 
   EffectCreationOptions options;
-  options.attributes    = {"position"};
-  options.uniformsNames = !uniforms.empty() ? uniforms : _parameters;
-  options.samplers      = !samplers.empty() ? samplers : _samplers;
-  options.defines       = !defines.empty() ? defines : "";
-  options.onCompiled    = onCompiled;
-  options.onError       = onError;
-  options.indexParameters
-    = !indexParameters.empty() ? indexParameters : _indexParameters;
+  options.attributes      = {"position"};
+  options.uniformsNames   = !uniforms.empty() ? uniforms : _parameters;
+  options.samplers        = !samplers.empty() ? samplers : _samplers;
+  options.defines         = !defines.empty() ? defines : "";
+  options.onCompiled      = onCompiled;
+  options.onError         = onError;
+  options.indexParameters = !indexParameters.empty() ? indexParameters : _indexParameters;
 
-  _effect = _engine->createEffect(baseName, options,
-                                  _scene ? _scene->getEngine() : _engine);
+  _effect = _engine->createEffect(baseName, options, _scene ? _scene->getEngine() : _engine);
 }
 
 bool PostProcess::isReusable() const
@@ -270,10 +263,9 @@ void PostProcess::markTextureDirty()
   width = -1;
 }
 
-InternalTexturePtr
-PostProcess::activate(const CameraPtr& camera,
-                      const InternalTexturePtr& sourceTexture,
-                      bool forceDepthStencil)
+InternalTexturePtr PostProcess::activate(const CameraPtr& camera,
+                                         const InternalTexturePtr& sourceTexture,
+                                         bool forceDepthStencil)
 {
   auto pCamera = camera ? camera : _camera;
 
@@ -282,13 +274,12 @@ PostProcess::activate(const CameraPtr& camera,
   const int maxSize = engine->getCaps().maxTextureSize;
 
   const int requiredWidth = static_cast<int>(
-    static_cast<float>(sourceTexture ? sourceTexture->width :
-                                       _engine->getRenderingCanvas()->width)
+    static_cast<float>(sourceTexture ? sourceTexture->width : _engine->getRenderingCanvas()->width)
     * _renderRatio);
-  const int requiredHeight = static_cast<int>(
-    static_cast<float>(sourceTexture ? sourceTexture->height :
-                                       _engine->getRenderingCanvas()->height)
-    * _renderRatio);
+  const int requiredHeight
+    = static_cast<int>(static_cast<float>(sourceTexture ? sourceTexture->height :
+                                                          _engine->getRenderingCanvas()->height)
+                       * _renderRatio);
 
   int desiredWidth = std::holds_alternative<PostProcessOptions>(_options) ?
                        std::get<PostProcessOptions>(_options).width :
@@ -303,26 +294,22 @@ PostProcess::activate(const CameraPtr& camera,
       auto currentViewport = engine->currentViewport();
 
       if (currentViewport) {
-        desiredWidth = static_cast<int>(desiredWidth * currentViewport->width);
-        desiredHeight
-          = static_cast<int>(desiredHeight * currentViewport->height);
+        desiredWidth  = static_cast<int>(desiredWidth * currentViewport->width);
+        desiredHeight = static_cast<int>(desiredHeight * currentViewport->height);
       }
     }
 
-    if (renderTargetSamplingMode != Constants::TEXTURE_TRILINEAR_SAMPLINGMODE
-        || alwaysForcePOT) {
+    if (renderTargetSamplingMode != Constants::TEXTURE_TRILINEAR_SAMPLINGMODE || alwaysForcePOT) {
       if (!std::holds_alternative<PostProcessOptions>(_options)) {
-        desiredWidth
-          = engine->needPOTTextures() ?
-              Engine::GetExponentOfTwo(desiredWidth, maxSize, scaleMode) :
-              desiredWidth;
+        desiredWidth = engine->needPOTTextures() ?
+                         Engine::GetExponentOfTwo(desiredWidth, maxSize, scaleMode) :
+                         desiredWidth;
       }
 
       if (!std::holds_alternative<PostProcessOptions>(_options)) {
-        desiredHeight
-          = engine->needPOTTextures() ?
-              Engine::GetExponentOfTwo(desiredHeight, maxSize, scaleMode) :
-              desiredHeight;
+        desiredHeight = engine->needPOTTextures() ?
+                          Engine::GetExponentOfTwo(desiredHeight, maxSize, scaleMode) :
+                          desiredHeight;
       }
     }
 
@@ -340,21 +327,17 @@ PostProcess::activate(const CameraPtr& camera,
       IRenderTargetOptions textureOptions;
       textureOptions.generateMipMaps = false;
       textureOptions.generateDepthBuffer
-        = forceDepthStencil
-          || (stl_util::index_of_raw_ptr(pCamera->_postProcesses, this) == 0);
+        = forceDepthStencil || (stl_util::index_of_raw_ptr(pCamera->_postProcesses, this) == 0);
       textureOptions.generateStencilBuffer
-        = (forceDepthStencil
-           || (stl_util::index_of_raw_ptr(pCamera->_postProcesses, this) == 0))
+        = (forceDepthStencil || (stl_util::index_of_raw_ptr(pCamera->_postProcesses, this) == 0))
           && _engine->isStencilEnable();
       textureOptions.samplingMode = renderTargetSamplingMode;
       textureOptions.type         = _textureType;
 
-      _textures.emplace_back(
-        _engine->createRenderTargetTexture(textureSize, textureOptions));
+      _textures.emplace_back(_engine->createRenderTargetTexture(textureSize, textureOptions));
 
       if (_reusable) {
-        _textures.emplace_back(
-          _engine->createRenderTargetTexture(textureSize, textureOptions));
+        _textures.emplace_back(_engine->createRenderTargetTexture(textureSize, textureOptions));
       }
 
       _texelSize.copyFromFloats(1.f / width, 1.f / height);
@@ -385,24 +368,22 @@ PostProcess::activate(const CameraPtr& camera,
   // Bind the input of this post process to be used as the output of the
   // previous post process.
   if (enablePixelPerfectMode) {
-    _scaleRatio.copyFromFloats(
-      static_cast<float>(requiredWidth) / static_cast<float>(desiredWidth),
-      static_cast<float>(requiredHeight) / static_cast<float>(desiredHeight));
-    _engine->bindFramebuffer(target, 0u, requiredWidth, requiredHeight,
-                             forceFullscreenViewport);
+    _scaleRatio.copyFromFloats(static_cast<float>(requiredWidth) / static_cast<float>(desiredWidth),
+                               static_cast<float>(requiredHeight)
+                                 / static_cast<float>(desiredHeight));
+    _engine->bindFramebuffer(target, 0u, requiredWidth, requiredHeight, forceFullscreenViewport);
   }
   else {
     _scaleRatio.copyFromFloats(1.f, 1.f);
-    _engine->bindFramebuffer(target, 0u, std::nullopt, std::nullopt,
-                             forceFullscreenViewport);
+    _engine->bindFramebuffer(target, 0u, std::nullopt, std::nullopt, forceFullscreenViewport);
   }
 
   onActivateObservable.notifyObservers(camera.get());
 
   // Clear
   if (autoClear && alphaMode == Constants::ALPHA_DISABLE) {
-    _engine->clear(clearColor ? *clearColor : scene->clearColor,
-                   scene->_allowPostProcessClearColor, true, true);
+    _engine->clear(clearColor ? *clearColor : scene->clearColor, scene->_allowPostProcessClearColor,
+                   true, true);
   }
 
   if (_reusable) {
@@ -453,8 +434,8 @@ EffectPtr PostProcess::apply()
   _engine->setAlphaMode(alphaMode);
   if (alphaConstants) {
     const auto& _alphaConstants = *alphaConstants;
-    getEngine()->setAlphaConstants(_alphaConstants.r, _alphaConstants.g,
-                                   _alphaConstants.b, _alphaConstants.a);
+    getEngine()->setAlphaConstants(_alphaConstants.r, _alphaConstants.g, _alphaConstants.b,
+                                   _alphaConstants.a);
   }
 
   // Bind the output texture of the preivous post process as the input to this
@@ -500,21 +481,20 @@ void PostProcess::dispose(Camera* camera)
   _disposeTextures();
 
   if (_scene) {
-    _scene->postProcesses.erase(
-      std::remove_if(_scene->postProcesses.begin(), _scene->postProcesses.end(),
-                     [this](const PostProcessPtr& postprocess) {
-                       return postprocess.get() == this;
-                     }),
-      _scene->postProcesses.end());
+    _scene->postProcesses.erase(std::remove_if(_scene->postProcesses.begin(),
+                                               _scene->postProcesses.end(),
+                                               [this](const PostProcessPtr& postprocess) {
+                                                 return postprocess.get() == this;
+                                               }),
+                                _scene->postProcesses.end());
   }
   else {
-    _engine->postProcesses.erase(
-      std::remove_if(_engine->postProcesses.begin(),
-                     _engine->postProcesses.end(),
-                     [this](const PostProcessPtr& postprocess) {
-                       return postprocess.get() == this;
-                     }),
-      _engine->postProcesses.end());
+    _engine->postProcesses.erase(std::remove_if(_engine->postProcesses.begin(),
+                                                _engine->postProcesses.end(),
+                                                [this](const PostProcessPtr& postprocess) {
+                                                  return postprocess.get() == this;
+                                                }),
+                                 _engine->postProcesses.end());
   }
 
   if (!pCamera) {
