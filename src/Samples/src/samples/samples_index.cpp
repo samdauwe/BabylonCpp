@@ -25,6 +25,7 @@ void SamplesIndex::fillSamplesFailures() const
     {"EdgesRendererScene", {SampleFailureReasonKind::segFault}},
     {"EnvironmentTextureScene", {SampleFailureReasonKind::empty3d}},
     {"FurMaterialScene", {SampleFailureReasonKind::segFault}},
+    {"ImportBabylonJSLogoScene", {SampleFailureReasonKind::segFault, "Bug in PostProcess / empty textures"}},
     {"InnerMeshPointsScene", {SampleFailureReasonKind::segFault}},
     {"IsPointInsideMeshScene", {SampleFailureReasonKind::processHung}},
     {"LevelOfDetailScene", {SampleFailureReasonKind::segFault, "Low FPS / Segfault when dragging the mouse"}},
