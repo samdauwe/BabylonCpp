@@ -1,8 +1,42 @@
 ---
 ---
-Checks:          'hicpp-use-equals-default,
+Checks:          '
+                 bugprone*,
+                 clang-analyzer-core*,
+                 modernize*,
+
+                  clang-diagnostic-error,
+
+                  hicpp-use-equals-default,
+
+                  readability-const-return-type,
+                  readability-named-parameter,
+                  readability-container-size-empty,
+                  readability-inconsistent-declaration-parameter-name,
+
+                  misc-definitions-in-headers,
+                  misc-misplaced-const,
+                  misc-new-delete-overloads,
+                  misc-non-copyable-objects,
+                  misc-redundant-expression,
+                  misc-unused-using-decls,
+
+
+                  -cppcoreguidelines-avoid-magic-numbers,
+                  -cppcoreguidelines-macro-usage,
+                  -cppcoreguidelines-non-private-member-variables-in-classes,
+
                   -clang-analyzer-optin.performance.Padding,
                   -clang-analyzer-security.insecureAPI.rand,
                   -clang-analyzer-security.FloatLoopCounter,
+
+                  -modernize-use-trailing-return-type,
+                  -modernize-use-nodiscard,
+                  -modernize-avoid-c-arrays,
+
+
                   '
+CheckOptions:
+  - key:          cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor
+    value:        1
 HeaderFilterRegex: './src/*'
