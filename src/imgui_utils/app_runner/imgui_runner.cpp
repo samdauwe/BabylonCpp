@@ -311,6 +311,4 @@ namespace ImGuiUtils
 
 
     } // namespace ImGuiRunner
-    } // namespace imgui_utils
-
-
+    } // namespace ImGuiUtils

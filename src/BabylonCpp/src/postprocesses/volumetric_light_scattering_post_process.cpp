@@ -26,7 +26,7 @@ namespace
 {
   Color4 savedSceneClearColor;
   Color4 sceneClearColor(0.f, 0.f, 0.f, 1.f);
-}
+  } // namespace
 
 VolumetricLightScatteringPostProcess::VolumetricLightScatteringPostProcess(
   const std::string& iName, float ratio, const CameraPtr& camera,

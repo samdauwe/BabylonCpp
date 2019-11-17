@@ -350,7 +350,7 @@ inline void pushFront(std::string& s1, const std::string& s2)
 namespace {
 const std::string defaultChars
   = "abcdefghijklmnaoqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-}
+} // namespace
 
 inline std::string randomString(std::size_t len                 = 64,
                                 const std::string& allowedChars = defaultChars)

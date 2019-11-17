@@ -23,7 +23,7 @@ namespace
     return s;
   }
 
-}
+  } // namespace
 
 class OneCodeEditor
 {

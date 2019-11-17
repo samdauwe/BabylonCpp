@@ -10,7 +10,7 @@ namespace Extensions {
 
 namespace RVO2 {
 class RVOSimulator;
-}
+} // namespace RVO2
 
 class BABYLON_SHARED_EXPORT CrowdCollisionAvoidanceSystem
     : public ECS::System<ECS::Requires<CrowdAgent>> {

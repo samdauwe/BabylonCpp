@@ -170,4 +170,4 @@ Color4 Tools::ocv(unsigned int val)
 }
 
 } // end of namespace Extensions
-} // end of namespace babylon
+} // namespace BABYLON

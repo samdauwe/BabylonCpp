@@ -60,7 +60,7 @@ namespace ImGuiUtils
     );
 
     void ResetDockLayout();
-  }
-}
+    } // namespace ImGuiRunner
+    } // namespace ImGuiUtils
 
 #endif // #ifdef IMGUI_UTILS_IMGUI_RUNNER_H

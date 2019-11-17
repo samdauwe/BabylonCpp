@@ -67,4 +67,4 @@ namespace ImGuiUtils
     }
   }
 
-}
+  } // namespace ImGuiUtils

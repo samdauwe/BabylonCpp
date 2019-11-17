@@ -30,10 +30,6 @@ namespace ImGuiUtils
 
     void Glad_Init();
 
-  } // namespace Glfw_Helpers
+    } // namespace GlfwRunner
 
-
-} // namespace imgui_utilss
-
-
-
+    } // namespace ImGuiUtils

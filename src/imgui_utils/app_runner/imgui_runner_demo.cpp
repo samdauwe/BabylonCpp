@@ -85,5 +85,5 @@ namespace ImGuiUtils
       params.Title = "Hello World";
       ImGuiUtils::ImGuiRunner::RunGui(DemoGui, params);
     }
-  }
-}
+    } // namespace ImGuiRunner
+    } // namespace ImGuiUtils

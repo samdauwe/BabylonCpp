@@ -12,7 +12,7 @@ namespace Extensions {
 
 namespace RVO2 {
 class RVOSimulator;
-}
+} // namespace RVO2
 
 /**
  * @brief Represents a crowd simulation.

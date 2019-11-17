@@ -562,4 +562,4 @@ namespace ImGuiUtils
       return false;
     }
   }
-}
+  } // namespace ImGuiUtils

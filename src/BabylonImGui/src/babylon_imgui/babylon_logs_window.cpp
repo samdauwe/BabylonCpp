@@ -62,4 +62,4 @@ namespace BABYLON
     return _logImpl.get();
   }
 
-}
+  } // namespace BABYLON

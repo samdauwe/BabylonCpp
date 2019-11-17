@@ -14,7 +14,7 @@ struct CrowdRoadmapVertex;
 
 namespace RVO2 {
 class RVOSimulator;
-}
+} // namespace RVO2
 
 /**
  * @brief A component used to describe the agent properties of an entity.

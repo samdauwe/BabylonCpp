@@ -121,4 +121,4 @@ namespace ImGuiAl
     const char*     m_FilterHeaderLabel;
     const char*     m_FilterLabel;
   };
-}
+  } // namespace ImGuiAl
