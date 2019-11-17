@@ -4,7 +4,7 @@
 
 namespace BABYLON {
 
-PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
+PBRMaterialDefines::PBRMaterialDefines()
 {
   boolDef = {
     {"PBR", true}, //

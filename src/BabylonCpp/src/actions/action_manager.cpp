@@ -15,9 +15,7 @@
 
 namespace BABYLON {
 
-ActionManager::ActionManager(Scene* scene)
-    : AbstractActionManager{}
-    , _scene{scene ? scene : Engine::LastCreatedScene()}
+ActionManager::ActionManager(Scene* scene) : _scene{scene ? scene : Engine::LastCreatedScene()}
 {
 }
 

@@ -27,14 +27,10 @@ Light::Light(const std::string& iName, Scene* scene)
     , intensityMode{this, &Light::get_intensityMode, &Light::set_intensityMode}
     , radius{this, &Light::get_radius, &Light::set_radius}
     , shadowEnabled{this, &Light::get_shadowEnabled, &Light::set_shadowEnabled}
-    , renderPriority{this, &Light::get_renderPriority,
-                     &Light::set_renderPriority}
-    , includedOnlyMeshes{this, &Light::get_includedOnlyMeshes,
-                         &Light::set_includedOnlyMeshes}
-    , excludedMeshes{this, &Light::get_excludedMeshes,
-                     &Light::set_excludedMeshes}
-    , excludeWithLayerMask{this, &Light::get_excludeWithLayerMask,
-                           &Light::set_excludeWithLayerMask}
+    , renderPriority{this, &Light::get_renderPriority, &Light::set_renderPriority}
+    , includedOnlyMeshes{this, &Light::get_includedOnlyMeshes, &Light::set_includedOnlyMeshes}
+    , excludedMeshes{this, &Light::get_excludedMeshes, &Light::set_excludedMeshes}
+    , excludeWithLayerMask{this, &Light::get_excludeWithLayerMask, &Light::set_excludeWithLayerMask}
     , includeOnlyWithLayerMask{this, &Light::get_includeOnlyWithLayerMask,
                                &Light::set_includeOnlyWithLayerMask}
     , lightmapMode{this, &Light::get_lightmapMode, &Light::set_lightmapMode}
@@ -46,8 +42,6 @@ Light::Light(const std::string& iName, Scene* scene)
     , _radius{0.00001f}
     , _renderPriority{0}
     , _shadowEnabled{true}
-    , _includedOnlyMeshes{}
-    , _excludedMeshes{}
     , _includeOnlyWithLayerMask{0}
     , _excludeWithLayerMask{0}
     , _lightmapMode{0}

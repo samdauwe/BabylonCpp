@@ -2,7 +2,7 @@
 
 namespace BABYLON {
 
-QuarticEase::QuarticEase() : EasingFunction{}
+QuarticEase::QuarticEase()
 {
 }
 

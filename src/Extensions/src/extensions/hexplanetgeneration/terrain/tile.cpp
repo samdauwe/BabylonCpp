@@ -11,23 +11,17 @@
 namespace BABYLON {
 namespace Extensions {
 
-Tile::Tile(size_t p_id, const Vector3& p_position, size_t cornerCount,
-           size_t borderCount, size_t tileCount)
+Tile::Tile(size_t p_id, const Vector3& p_position, size_t cornerCount, size_t borderCount,
+           size_t tileCount)
     : UidObj{p_id}
     , position{p_position}
     , boundingSphere{Vector3::Zero(), Vector3::Zero()}
-    , normal{}
-    , averagePosition{}
     , area{0}
     , elevation{0}
-    , corners{}
-    , borders{}
-    , tiles{}
     , plate{nullptr}
     , temperature{0}
     , moisture{0}
-    , biome{}
-    , plateMovement()
+
 {
   corners.resize(cornerCount);
   borders.resize(borderCount);

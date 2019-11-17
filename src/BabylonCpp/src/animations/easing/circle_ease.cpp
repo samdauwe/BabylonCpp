@@ -6,7 +6,7 @@
 
 namespace BABYLON {
 
-CircleEase::CircleEase() : EasingFunction{}
+CircleEase::CircleEase()
 {
 }
 

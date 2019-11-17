@@ -3,7 +3,7 @@
 namespace BABYLON {
 namespace Extensions {
 
-Whorl::Whorl() : center{}, strength{0.f}, radius{0.f}
+Whorl::Whorl() : strength{0.f}, radius{0.f}
 {
 }
 

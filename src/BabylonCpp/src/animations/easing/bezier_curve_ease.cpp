@@ -5,7 +5,7 @@
 namespace BABYLON {
 
 BezierCurveEase::BezierCurveEase(float iX1, float iY1, float iX2, float iY2)
-    : EasingFunction{}, x1{iX1}, y1{iY1}, x2{iX2}, y2{iY2}
+    : x1{iX1}, y1{iY1}, x2{iX2}, y2{iY2}
 {
 }
 

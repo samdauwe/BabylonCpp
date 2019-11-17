@@ -3,7 +3,7 @@
 namespace BABYLON {
 namespace MaterialsLibrary {
 
-MixMaterialDefines::MixMaterialDefines() : MaterialDefines{}
+MixMaterialDefines::MixMaterialDefines()
 {
   boolDef = {
     {"DIFFUSE", false},      //

@@ -4,7 +4,7 @@
 
 namespace BABYLON {
 
-IMaterialClearCoatDefines::IMaterialClearCoatDefines() : MaterialDefines{}
+IMaterialClearCoatDefines::IMaterialClearCoatDefines()
 {
   boolDef = {
     {"CLEARCOAT", false},                      //

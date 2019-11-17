@@ -8,7 +8,7 @@
 
 namespace BABYLON {
 
-BackEase::BackEase(float iAmplitude) : EasingFunction{}, amplitude{iAmplitude}
+BackEase::BackEase(float iAmplitude) : amplitude{iAmplitude}
 {
 }
 

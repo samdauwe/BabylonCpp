@@ -351,7 +351,7 @@ namespace BABYLON {
 namespace Samples {
 
 FunnyEase::FunnyEase(float distanceOfStick, float lengthOfStick)
-    : EasingFunction{}, _distanceOfStick{distanceOfStick}, _lengthOfStick{lengthOfStick}
+    : _distanceOfStick{distanceOfStick}, _lengthOfStick{lengthOfStick}
 {
 }
 

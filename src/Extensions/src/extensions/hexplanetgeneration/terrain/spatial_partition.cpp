@@ -6,8 +6,7 @@
 namespace BABYLON {
 namespace Extensions {
 
-SpatialPartition::SpatialPartition()
-    : boundingSphere{Vector3::Zero(), Vector3::Zero()}, partitions{}, tiles{}
+SpatialPartition::SpatialPartition() : boundingSphere{Vector3::Zero(), Vector3::Zero()}
 {
 }
 

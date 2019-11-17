@@ -6,7 +6,7 @@
 
 namespace BABYLON {
 
-SineEase::SineEase() : EasingFunction{}
+SineEase::SineEase()
 {
 }
 

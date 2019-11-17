@@ -2,7 +2,7 @@
 
 namespace BABYLON {
 
-QuadraticEase::QuadraticEase() : EasingFunction{}
+QuadraticEase::QuadraticEase()
 {
 }
 

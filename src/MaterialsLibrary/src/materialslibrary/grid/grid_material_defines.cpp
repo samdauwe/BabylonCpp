@@ -3,7 +3,7 @@
 namespace BABYLON {
 namespace MaterialsLibrary {
 
-GridMaterialDefines::GridMaterialDefines() : MaterialDefines{}
+GridMaterialDefines::GridMaterialDefines()
 {
   boolDef = {
     {"TRANSPARENT", false},     //

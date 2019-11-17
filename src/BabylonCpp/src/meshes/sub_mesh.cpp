@@ -22,12 +22,10 @@
 
 namespace BABYLON {
 
-SubMesh::SubMesh(unsigned int iMaterialIndex, unsigned int iVerticesStart,
-                 size_t iVerticesCount, unsigned int iIndexStart,
-                 size_t iIndexCount, const AbstractMeshPtr& mesh,
+SubMesh::SubMesh(unsigned int iMaterialIndex, unsigned int iVerticesStart, size_t iVerticesCount,
+                 unsigned int iIndexStart, size_t iIndexCount, const AbstractMeshPtr& mesh,
                  const MeshPtr& renderingMesh, bool iCreateBoundingBox)
-    : BaseSubMesh{}
-    , materialIndex{iMaterialIndex}
+    : materialIndex{iMaterialIndex}
     , verticesStart{iVerticesStart}
     , verticesCount{iVerticesCount}
     , indexStart{iIndexStart}

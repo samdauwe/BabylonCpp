@@ -2,7 +2,7 @@
 
 namespace BABYLON {
 
-BackgroundMaterialDefines::BackgroundMaterialDefines() : MaterialDefines{}
+BackgroundMaterialDefines::BackgroundMaterialDefines()
 {
   boolDef = {
     /**

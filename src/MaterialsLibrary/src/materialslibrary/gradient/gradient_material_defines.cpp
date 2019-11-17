@@ -3,7 +3,7 @@
 namespace BABYLON {
 namespace MaterialsLibrary {
 
-GradientMaterialDefines::GradientMaterialDefines() : MaterialDefines{}
+GradientMaterialDefines::GradientMaterialDefines()
 {
   boolDef = {
     {"DIFFUSE", false},        //

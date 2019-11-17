@@ -2,7 +2,7 @@
 
 namespace BABYLON {
 
-WebGLDataBuffer::WebGLDataBuffer(GL::IGLBuffer* resource) : DataBuffer{}
+WebGLDataBuffer::WebGLDataBuffer(GL::IGLBuffer* resource)
 {
   _buffer = resource;
 }

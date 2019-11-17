@@ -3,7 +3,7 @@
 namespace BABYLON {
 namespace MaterialsLibrary {
 
-TriPlanarMaterialDefines::TriPlanarMaterialDefines() : MaterialDefines{}
+TriPlanarMaterialDefines::TriPlanarMaterialDefines()
 {
   boolDef = {
     {"DIFFUSEX", false}, //

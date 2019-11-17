@@ -4,8 +4,7 @@
 
 namespace BABYLON {
 
-ExponentialEase::ExponentialEase(int iExponent)
-    : EasingFunction{}, exponent{static_cast<float>(iExponent)}
+ExponentialEase::ExponentialEase(int iExponent) : exponent{static_cast<float>(iExponent)}
 {
 }
 

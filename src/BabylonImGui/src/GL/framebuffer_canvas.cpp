@@ -10,7 +10,7 @@
 namespace BABYLON {
 namespace GL {
 
-FramebufferCanvas::FramebufferCanvas() : ICanvas{}
+FramebufferCanvas::FramebufferCanvas()
 {
   _renderingContext = std::make_unique<GL::GLRenderingContext>();
   _renderingContext->initialize();

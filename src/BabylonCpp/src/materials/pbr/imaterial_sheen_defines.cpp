@@ -4,7 +4,7 @@
 
 namespace BABYLON {
 
-IMaterialSheenDefines::IMaterialSheenDefines() : MaterialDefines{}
+IMaterialSheenDefines::IMaterialSheenDefines()
 {
   boolDef = {
     {"SHEEN", false},                 //

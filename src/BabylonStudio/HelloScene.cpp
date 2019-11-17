@@ -7,7 +7,9 @@
 // This files demonstrates how to create a very simple renderable scene
 struct HelloScene : public BABYLON::IRenderableScene
 {
-  HelloScene() : IRenderableScene() {}
+  HelloScene()
+  {
+  }
   const char* getName() override { return "Hello Scene"; }
 
   void initializeScene(BABYLON::ICanvas* canvas, BABYLON::Scene* scene) override

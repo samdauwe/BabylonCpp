@@ -6,30 +6,26 @@
 namespace BABYLON {
 
 ShaderDefineArithmeticOperator::ShaderDefineArithmeticOperator()
-    : ShaderDefineExpression{}, define{""}, operand{""}, testValue{""}
+    : define{""}, operand{""}, testValue{""}
 {
 }
 
 ShaderDefineArithmeticOperator::ShaderDefineArithmeticOperator(const std::string& iDefine,
                                                                const std::string& iOperand,
                                                                const std::string& iTestValue)
-    : ShaderDefineExpression{}, define{iDefine}, operand{iOperand}, testValue{iTestValue}
+    : define{iDefine}, operand{iOperand}, testValue{iTestValue}
 {
 }
 
 ShaderDefineArithmeticOperator::ShaderDefineArithmeticOperator(
   const ShaderDefineArithmeticOperator& other)
-    : ShaderDefineExpression{}
-    , define{other.define}
-    , operand{other.operand}
-    , testValue{other.testValue}
+    : define{other.define}, operand{other.operand}, testValue{other.testValue}
 {
 }
 
 ShaderDefineArithmeticOperator::ShaderDefineArithmeticOperator(
   ShaderDefineArithmeticOperator&& other)
-    : ShaderDefineExpression{}
-    , define{std::move(other.define)}
+    : define{std::move(other.define)}
     , operand{std::move(other.operand)}
     , testValue{std::move(other.testValue)}
 {

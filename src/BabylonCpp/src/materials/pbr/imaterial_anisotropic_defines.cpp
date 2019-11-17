@@ -4,7 +4,7 @@
 
 namespace BABYLON {
 
-IMaterialAnisotropicDefines::IMaterialAnisotropicDefines() : MaterialDefines{}
+IMaterialAnisotropicDefines::IMaterialAnisotropicDefines()
 {
   boolDef = {
     {"ANISOTROPIC", false},                 //

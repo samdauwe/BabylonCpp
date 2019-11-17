@@ -6,7 +6,7 @@
 
 namespace BABYLON {
 
-PowerEase::PowerEase(float IPower) : EasingFunction{}, power{IPower}
+PowerEase::PowerEase(float IPower) : power{IPower}
 {
 }
 
