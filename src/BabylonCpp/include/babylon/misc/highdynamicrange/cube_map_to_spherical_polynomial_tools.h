@@ -6,7 +6,7 @@
 #include <babylon/misc/highdynamicrange/file_face_orientation.h>
 
 #ifndef isNaN
-#define isNaN(a) (a != a)
+#define isNaN(a) ((a) != (a))
 #endif
 
 namespace BABYLON {

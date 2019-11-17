@@ -57,21 +57,21 @@ long countNonNull(const Container& c)
 }
 
 // Gross, I know, but oh well.
-#define activateAndTest(w, e)                                                  \
-  {                                                                            \
-    e.activate();                                                              \
-    EXPECT_FALSE(e.isActivated());                                             \
-    w.refresh();                                                               \
-    EXPECT_TRUE(e.isActivated());                                              \
+#define activateAndTest(w, e)                                                                      \
+  {                                                                                                \
+    (e).activate();                                                                                \
+    EXPECT_FALSE((e).isActivated());                                                               \
+    (w).refresh();                                                                                 \
+    EXPECT_TRUE((e).isActivated());                                                                \
   }
 
-#define deactivateAndTest(w, e)                                                \
-  {                                                                            \
-    EXPECT_TRUE(e.isActivated());                                              \
-    e.deactivate();                                                            \
-    EXPECT_TRUE(e.isActivated());                                              \
-    w.refresh();                                                               \
-    EXPECT_FALSE(e.isActivated());                                             \
+#define deactivateAndTest(w, e)                                                                    \
+  {                                                                                                \
+    EXPECT_TRUE((e).isActivated());                                                                \
+    (e).deactivate();                                                                              \
+    EXPECT_TRUE((e).isActivated());                                                                \
+    (w).refresh();                                                                                 \
+    EXPECT_FALSE((e).isActivated());                                                               \
   }
 
 /// Valid/invalid for one unique entity
