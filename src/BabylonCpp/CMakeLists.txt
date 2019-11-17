@@ -422,6 +422,8 @@ target_include_directories(${TARGET}
     PRIVATE SYSTEM
     ${EARCUT_HPP_INCLUDE_DIRS}
     ${JSON_HPP_INCLUDE_DIRS}
+    PUBLIC SYSTEM
+    ${STB_IMAGE_INCLUDE_DIR}
 )
 
 # Compile definitions

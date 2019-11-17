@@ -3,9 +3,9 @@
 #include <glad/glad.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <babylon/utils/stb_image_write.h>
+#include <stb_image/stb_image_write.h>
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
-#include <babylon/utils/stb_image_resize.h>
+#include <stb_image//stb_image_resize.h>
 
 namespace BABYLON {
 namespace GL {

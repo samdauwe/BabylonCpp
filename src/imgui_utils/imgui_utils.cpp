@@ -4,7 +4,7 @@
 
 // Use stb_image.h to load a PNG from disk and turn it into raw RGBA pixel data:
 #define STB_IMAGE_IMPLEMENTATION
-#include <babylon/utils/stb_image.h>
+#include <stb_image/stb_image.h>
 #include <babylon/core/filesystem.h>
 
 
