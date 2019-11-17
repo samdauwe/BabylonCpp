@@ -189,9 +189,9 @@ typedef unsigned short stbir_uint16;
 typedef unsigned int   stbir_uint32;
 #else
 #include <stdint.h>
-typedef uint8_t  stbir_uint8;
-typedef uint16_t stbir_uint16;
-typedef uint32_t stbir_uint32;
+typedef uint8_t  stbir_uint8; // NOLINT
+typedef uint16_t stbir_uint16; // NOLINT
+typedef uint32_t stbir_uint32; // NOLINT
 #endif
 
 #ifndef STBIRDEF
@@ -471,8 +471,8 @@ static unsigned char stbir__type_size[] = {
 };
 
 // Kernel function centered at 0
-typedef float (stbir__kernel_fn)(float x, float scale);
-typedef float (stbir__support_fn)(float scale);
+typedef float (stbir__kernel_fn)(float x, float scale); // NOLINT
+typedef float (stbir__support_fn)(float scale); // NOLINT
 
 typedef struct
 {
