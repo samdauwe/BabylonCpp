@@ -51,7 +51,6 @@ Inspector::Inspector(GLFWwindow* glfwWindow, Scene* scene) // KK remove glfwWind
     : _glfwWindow{glfwWindow}
     , _scene{scene}
     , _actionStore{std::make_unique<ActionStore>()}
-    , _showInspectorWindow{true}
     , _globalState{GlobalState::New()}
     , _sceneExplorerHost{nullptr}
     , _actionTabsHost{nullptr}

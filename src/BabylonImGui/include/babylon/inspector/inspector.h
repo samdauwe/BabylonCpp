@@ -54,9 +54,6 @@ private:
   Scene* _scene;
   // Actions
   std::unique_ptr<ActionStore> _actionStore;
-  // GUI
-  bool _showInspectorWindow;
-  int _menuHeight;
   // The global state
   GlobalStatePtr _globalState;
   // Widgets

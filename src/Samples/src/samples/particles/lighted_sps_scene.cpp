@@ -23,7 +23,6 @@ public:
       : IRenderableScene(iCanvas)
       , _time{0.f}
       , _nb{static_cast<size_t>(std::pow(65, 3))}
-      , _fact{100}
       , _pl{nullptr}
   {
   }
@@ -95,8 +94,7 @@ private:
 
 private:
   float _time;
-  size_t _nb;   // nb of triangles
-  size_t _fact; // cube size
+  size_t _nb; // nb of triangles
   PointLightPtr _pl;
   SolidParticleSystemPtr _sps;
 

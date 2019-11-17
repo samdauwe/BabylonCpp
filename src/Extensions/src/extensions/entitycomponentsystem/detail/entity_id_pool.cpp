@@ -7,8 +7,7 @@ namespace Extensions {
 namespace ECS {
 namespace detail {
 
-EntityIdPool::EntityIdPool(std::size_t poolSize)
-    : m_defaultPoolSize(poolSize), m_nextId(0), m_counts(poolSize)
+EntityIdPool::EntityIdPool(std::size_t poolSize) : m_nextId(0), m_counts(poolSize)
 {
 }
 

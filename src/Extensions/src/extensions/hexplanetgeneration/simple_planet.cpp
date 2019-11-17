@@ -11,13 +11,8 @@
 namespace BABYLON {
 namespace Extensions {
 
-SimplePlanet::SimplePlanet(float scale, float degree, Scene* scene,
-                           const std::string& seed)
-    : _degree{degree}
-    , _scale{scale}
-    , _scene{scene}
-    , _seed{seed}
-    , _renderDeformedMesh{true}
+SimplePlanet::SimplePlanet(float scale, float degree, Scene* scene, const std::string& seed)
+    : _degree{degree}, _scale{scale}, _scene{scene}, _seed{seed}
 {
 }
 
@@ -25,10 +20,10 @@ SimplePlanet::~SimplePlanet() = default;
 
 void SimplePlanet::initialize()
 {
-  _planet.mesh     = Mesh::New("planet", _scene);
-  _terrain         = std::make_unique<Terrain>(_seed);
-  _icosahedronMesh = Icosphere::generateIcosahedronMesh(
-    static_cast<size_t>(_degree), _scale, _random);
+  _planet.mesh = Mesh::New("planet", _scene);
+  _terrain     = std::make_unique<Terrain>(_seed);
+  _icosahedronMesh
+    = Icosphere::generateIcosahedronMesh(static_cast<size_t>(_degree), _scale, _random);
 }
 
 Vector2 SimplePlanet::calculateUVCoord(const Vector3& p) const
@@ -38,9 +33,8 @@ Vector2 SimplePlanet::calculateUVCoord(const Vector3& p) const
   const float lon = std::atan2(p.z, p.x);
 
   float x = lon / Math::PI;
-  float y = (5.f / 4.f)
-            * std::log(std::tan((Math::PI / 4.f) + (2.f * lat / 5.f)))
-            / 2.2523234430803587f;
+  float y
+    = (5.f / 4.f) * std::log(std::tan((Math::PI / 4.f) + (2.f * lat / 5.f))) / 2.2523234430803587f;
   if (y < -1.f) {
     y = 1.f;
   }
@@ -97,9 +91,8 @@ void SimplePlanet::render()
 
     // Get all the centroids of the faces adjacent to this vertex
     for (size_t f = 0; f < numFaces; ++f) {
-      auto& centroid
-        = _icosahedronMesh.faces[_icosahedronMesh.nodes[n].f[f]].centroid;
-      auto uv = calculateUVCoord(centroid);
+      auto& centroid = _icosahedronMesh.faces[_icosahedronMesh.nodes[n].f[f]].centroid;
+      auto uv        = calculateUVCoord(centroid);
 
       auto height = (_terrain->getHeight(uv.x, uv.y) * 2.f) - 1.f;
       auto normal = centroid.copy().normalize();

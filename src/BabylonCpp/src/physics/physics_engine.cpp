@@ -121,7 +121,7 @@ void PhysicsEngine::removeJoint(PhysicsImpostor* mainImpostor,
   }
 }
 
-void PhysicsEngine::_step(float delta)
+void PhysicsEngine::_step(float /*delta*/)
 {
   // check if any mesh has no body / requires an update
   for (auto& impostor : _impostors) {
@@ -130,6 +130,7 @@ void PhysicsEngine::_step(float delta)
     }
   }
 
+#if 0
   if (delta > 0.1f) {
     delta = 0.1f;
   }
@@ -137,8 +138,8 @@ void PhysicsEngine::_step(float delta)
     delta = 1.f / 60.f;
   }
 
-  // TODO FIXME
-  // _physicsPlugin->executeStep(delta, _impostors);
+  _physicsPlugin->executeStep(delta, _impostors);
+#endif
 }
 
 IPhysicsEnginePlugin* PhysicsEngine::getPhysicsPlugin()

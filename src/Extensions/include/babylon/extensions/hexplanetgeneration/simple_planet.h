@@ -43,8 +43,7 @@ struct PlanetData {
 class BABYLON_SHARED_EXPORT SimplePlanet {
 
 public:
-  SimplePlanet(float scale, float degree, Scene* scene,
-               const std::string& seed);
+  SimplePlanet(float scale, float degree, Scene* scene, const std::string& seed);
   ~SimplePlanet(); // = default
 
   void initialize();
@@ -64,8 +63,6 @@ private:
   IcosahedronMesh _icosahedronMesh;
   PlanetData _planet;
   std::unique_ptr<Terrain> _terrain;
-  // Deform mesh based on heightmap values
-  bool _renderDeformedMesh;
 
 }; // end of class SimplePlanet
 

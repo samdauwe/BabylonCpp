@@ -86,9 +86,6 @@ public:
   void clear();
 
 private:
-  /// The default pool size
-  std::size_t m_defaultPoolSize;
-
   /// The next ID to be used (if there is no IDs in the freelist)
   Entity::Id::int_type m_nextId;
 

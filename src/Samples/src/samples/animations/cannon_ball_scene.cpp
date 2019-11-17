@@ -21,8 +21,7 @@ using PointLightPtr      = std::shared_ptr<PointLight>;
 namespace Samples {
 
 /**
- * @brief Cannon Ball Scene. Scene demonstrating ball physics on a firing
- * cannon.
+ * @brief Cannon Ball Scene. Scene demonstrating ball physics on a firing cannon.
  * @see https://www.babylonjs-playground.com/#25OQ8V#13
  */
 class CannonBallScene : public IRenderableScene {
@@ -40,7 +39,6 @@ public:
       , _dt{1.f / 60.f}
       , _t{0.f}
       , _doBugglingAnimation{false}
-      , _start{0.f}
       , _startBuggling{1.f} // seconds after initial start
       , _startFiring{2.f}   // idem
       , _startBall{2.2f}    // idem
@@ -94,8 +92,8 @@ public:
     // Cannon
     auto radius = 3.f;
     for (int i = 0; i < 20; ++i) {
-      auto x = (float)i - 10.f;
-      auto y = (float)i / 2.f;
+      auto x = static_cast<float>(i) - 10.f;
+      auto y = static_cast<float>(i) / 2.f;
       auto z = 0.f;
       _axis.emplace_back(Vector3(x, y, z));
     }
@@ -176,7 +174,6 @@ private:
   bool _doBugglingAnimation;
 
   // Sequences
-  float _start;
   float _startBuggling; // seconds after initial start
   float _startFiring;   // idem
   float _startBall;     // idem

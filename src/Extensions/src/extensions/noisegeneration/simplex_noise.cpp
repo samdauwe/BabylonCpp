@@ -1282,7 +1282,7 @@ float SimplexNoise::flowNoise(const Vector2& v, float angle)
   float t0 = 0.5f - x0 * x0 - y0 * y0;
   float t20, t40;
   if (t0 < 0.0f)
-    t40 = t20 = t0 = n0 = gx0 = gy0 = 0.0f; /* No influence */
+    n0 = 0.0f; /* No influence */
   else {
     gradrot2(perm[ii + perm[jj]], sin_t, cos_t, &gx0, &gy0);
     t20 = t0 * t0;
@@ -1293,7 +1293,7 @@ float SimplexNoise::flowNoise(const Vector2& v, float angle)
   float t1 = 0.5f - x1 * x1 - y1 * y1;
   float t21, t41;
   if (t1 < 0.0f)
-    t21 = t41 = t1 = n1 = gx1 = gy1 = 0.0f; /* No influence */
+    n1 = 0.0f; /* No influence */
   else {
     gradrot2(perm[ii + i1 + perm[jj + j1]], sin_t, cos_t, &gx1, &gy1);
     t21 = t1 * t1;
@@ -1304,7 +1304,7 @@ float SimplexNoise::flowNoise(const Vector2& v, float angle)
   float t2 = 0.5f - x2 * x2 - y2 * y2;
   float t22, t42;
   if (t2 < 0.0f)
-    t42 = t22 = t2 = n2 = gx2 = gy2 = 0.0f; /* No influence */
+    n2 = 0.0f; /* No influence */
   else {
     gradrot2(perm[ii + 1 + perm[jj + 1]], sin_t, cos_t, &gx2, &gy2);
     t22 = t2 * t2;
