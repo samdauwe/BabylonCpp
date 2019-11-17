@@ -17,6 +17,7 @@ def compare_image(image_file1, image_file2) -> (float, np.array):
     imageB = cv2.imread(image_file2)
     grayA = cv2.cvtColor(imageA, cv2.COLOR_BGR2GRAY)
     grayB = cv2.cvtColor(imageB, cv2.COLOR_BGR2GRAY)
+    grayB = cv2.resize(grayB, (grayA.shape[1], grayA.shape[0]) )
 
     # compute the Structural Similarity Index (SSIM) between the two
     # images, ensuring that the difference image is returned
@@ -44,10 +45,11 @@ def do_compare():
     os.mkdir(UPDATE_IMAGES_FOLDER)
 
     for image_file in new_images_files:
+        print("processing {}".format(image_file))
         new_image_fullpath = NEW_IMAGES_FOLDER + "/" + image_file
         shall_update = False
         if image_file in current_images_files:
-            current_image_fullpath = CURRENT_IMAGES_FOLDER + "/" + image_file            
+            current_image_fullpath = CURRENT_IMAGES_FOLDER + "/" + image_file
             score, diff = compare_image(current_image_fullpath, new_image_fullpath)
             print("{} : score {}".format(new_image_fullpath, score))
             if score < 0.7:

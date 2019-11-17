@@ -162,7 +162,7 @@ void UniformBuffer::_fillAlignment(size_t size)
 }
 
 void UniformBuffer::addUniform(const std::string& name,
-                               const std::variant<size_t, Float32Array>& size)
+                               const std::variant<int, Float32Array>& size)
 {
   if (_noUBO) {
     return;
@@ -182,7 +182,7 @@ void UniformBuffer::addUniform(const std::string& name,
     _size = data.size();
   }
   else {
-    _size = std::get<size_t>(size);
+    _size = static_cast<size_t>(std::get<int>(size));
 
     // Fill with zeros
     data = Float32Array(_size, 0.f);
@@ -310,7 +310,7 @@ void UniformBuffer::updateUniform(const std::string& uniformName,
                         "Cannot add an uniform after UBO has been created.")
       return;
     }
-    addUniform(uniformName, size);
+    addUniform(uniformName, (int)size);
     location = _uniformLocations[uniformName];
   }
 

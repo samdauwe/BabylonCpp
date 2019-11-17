@@ -18,7 +18,7 @@ struct BABYLON_SHARED_EXPORT XorShift128 : public IRandomFunction {
   size_t integerExclusive(size_t min, size_t max) override;
   float real(float min, float max) override;
   float realInclusive(float min, float max) override;
-  void reseed(size_t x, size_t y, size_t z, size_t w) override;
+  void reseed(size_t x, size_t y, size_t z, size_t w) final;
 
   size_t x_;
   size_t y_;

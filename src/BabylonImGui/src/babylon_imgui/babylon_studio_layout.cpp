@@ -133,12 +133,6 @@ void BabylonStudioLayout::PrepareLayout(ImGuiID fullDockSpaceId)
   ImGuiID dock_id_left = DoSplit(&dock_main_id, ImGuiDir_Left, 0.30f);
   ImGuiID dock_id_right = DoSplit(&dock_main_id, ImGuiDir_Right, 0.45f);
 
-  ImGuiID dock_id_bottom_left = 0, dock_id_left_bottom = 0;
-  if (_layoutMode == LayoutMode::Dev)
-    dock_id_bottom_left = DoSplit(&dock_id_bottom, ImGuiDir_Left, 0.20f);
-  if (_layoutMode == LayoutMode::SceneAndBrowser)
-    dock_id_left_bottom = DoSplit(&dock_id_left, ImGuiDir_Down, 0.25f);
-
 #ifdef BABYLON_BUILD_PLAYGROUND
   DoDock(DockableWindowId::PlaygroundEditor, dock_main_id);
 #endif
@@ -181,7 +175,9 @@ void BabylonStudioLayout::ApplyLayoutMode(LayoutMode mode)
       setVisible(DockableWindowId::Inspector, false);
       setVisible(DockableWindowId::SampleBrowser, true);
       setVisible(DockableWindowId::SamplesCodeViewer, false);
+#ifdef BABYLON_BUILD_PLAYGROUND
       setVisible(DockableWindowId::PlaygroundEditor, false);
+#endif
       setVisible(DockableWindowId::Logs, false);
       break;
 

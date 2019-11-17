@@ -17,18 +17,18 @@ class Node;
 struct Bounds {
   Vector2 min;
   Vector2 max;
-  float width;
-  float height;
+  float width = 0.f;
+  float height = 0.f;
 }; // end of struct Bounds
 
 struct VRMetrics {
-  float aspectRatioFov;
-  float aspectRatio;
+  float aspectRatioFov = 0.f;
+  float aspectRatio = 0.f;
 }; // end of struct VRMetrics
 
 struct CameraRigParams {
-  float interaxialDistance;
-  float stereoHalfAngle;
+  float interaxialDistance = 0.f;
+  float stereoHalfAngle = 0.f;
   Matrix vrHMatrix;
   Matrix vrWorkMatrix;
   bool vrPreViewMatrixSet = false;
@@ -38,33 +38,33 @@ struct CameraRigParams {
 }; // end of struct CameraRigParams
 
 struct ClientRect {
-  int bottom;
-  int height;
-  int left;
-  int right;
-  int top;
-  int width;
+  int bottom = 0;
+  int height = 0;
+  int left = 0;
+  int right = 0;
+  int top = 0;
+  int width = 0;
 }; // end of struct CameraRigParams
 
 struct ClipboardEvent {
 }; // end of struct ClipboardEvent
 
 struct DeviceOrientationEvent {
-  float gamma;
-  float beta;
+  float gamma = 0.f;
+  float beta = 0.f;
 }; // end of struct DeviceOrientationEvent
 
 struct DragMoveEvent {
   Vector3 delta;
   Vector3 dragPlanePoint;
   Vector3 dragPlaneNormal;
-  float dragDistance;
-  int pointerId;
+  float dragDistance = 0.f;
+  int pointerId = 0;
 }; // end of struct DragMoveEvent
 
 struct DragStartOrEndEvent {
   Vector3 dragPlanePoint;
-  int pointerId;
+  int pointerId = 0;
 }; // end of struct DragStartOrEndEvent
 
 struct Event {
@@ -79,15 +79,15 @@ struct Exception {
 }; // end of struct Exception
 
 struct Extents {
-  float min;
-  float max;
+  float min = 0.f;
+  float max = 0.f;
 }; // end of struct Extents
 
 struct FocusEvent {
 }; // end of struct FocusEvent
 
 struct GestureEvent {
-  float scale;
+  float scale = 0.f;
   void stopPropagation()
   {
   }
@@ -123,9 +123,9 @@ struct Image {
     return data.size() > 0 && width > 0 && height > 0 && depth > 0;
   }
   ArrayBuffer data;
-  int width, height;
-  int depth;
-  unsigned int mode;
+  int width = 0, height = 0;
+  int depth = 0;
+  unsigned int mode = 0;
 }; // end of struct Image
 
 struct KeyboardEvent : public Event {
@@ -140,13 +140,13 @@ struct KeyboardEvent : public Event {
 }; // end of struct KeyboardEvent
 
 struct LowestRoot {
-  float root;
-  bool found;
+  float root = 0.f;
+  bool found = false;
 }; // end of struct LowestRoot
 
 struct MinMagFilter {
-  int mag;
-  int min;
+  int mag = 0;
+  int min = 0;
 }; // end of struct MinMagFilter
 
 struct MinMax {
@@ -166,16 +166,18 @@ struct MinMaxVector2 {
 }; // end of struct MinMaxVector2
 
 struct MouseEvent {
-  int clientX;
-  int clientY;
-  int movementX;
-  int movementY;
+  int clientX = 0;
+  int clientY = 0;
+  int movementX = 0;
+  int movementY = 0;
   void preventDefault()
   {
   }
 }; // end of struct MouseEvent
 
 struct NodeCache {
+  bool cache_inited = false;
+
   Node* parent = nullptr;
   // AbstractMesh
   Vector3 position;
@@ -217,16 +219,14 @@ struct PickedParticle {
 }; // end of struct PickedParticle
 
 struct PointerEvent : public Event {
-  PointerEvent()
-  {
-  }
+  PointerEvent() = default;
   PointerEvent(const std::string& /*type*/)
   {
   }
 
   PointerEvent(const PointerEvent& other) = default;
   PointerEvent(PointerEvent&& other) = default;
-  
+
   PointerEvent& operator=(const PointerEvent& other) = default;
   PointerEvent& operator=(PointerEvent&& other) = default;
 
@@ -260,41 +260,14 @@ struct PointerTouch {
 }; // end of struct PointerTouch
 
 struct MouseWheelEvent : public PointerEvent {
-  MouseWheelEvent()
-  {
-  }
-  MouseWheelEvent(const MouseWheelEvent& other)
-      : PointerEvent{other}, wheelDelta{other.wheelDelta}, detail{other.detail}
-  {
-  }
-  MouseWheelEvent(MouseWheelEvent&& other)
-      : PointerEvent{std::move(other)}
-      , wheelDelta{std::move(other.wheelDelta)}
-      , detail{std::move(other.detail)}
-  {
-  }
-  MouseWheelEvent& operator=(const MouseWheelEvent& other)
-  {
-    if (&other != this) {
-      PointerEvent::operator=(other);
-      wheelDelta            = other.wheelDelta;
-      detail                = other.detail;
-    }
+  MouseWheelEvent() = default;
+  MouseWheelEvent(const MouseWheelEvent& other) = default;
+  MouseWheelEvent(MouseWheelEvent&& other) = default;
+  MouseWheelEvent& operator=(const MouseWheelEvent& other) = default;
+  MouseWheelEvent& operator=(MouseWheelEvent&& other) = default;
 
-    return *this;
-  }
-  MouseWheelEvent& operator=(MouseWheelEvent&& other)
-  {
-    if (&other != this) {
-      PointerEvent::operator=(std::move(other));
-      wheelDelta            = std::move(other.wheelDelta);
-      detail                = std::move(other.detail);
-    }
-
-    return *this;
-  }
-  float wheelDelta;
-  float detail;
+  float wheelDelta = 0.f;
+  float detail = 0.f;
   void preventDefault() const
   {
   }
@@ -308,33 +281,33 @@ struct Polyhedron {
 }; // end of struct Polyhedron
 
 struct PositionCoord {
-  int x;
-  int y;
+  int x = 0;
+  int y = 0;
 }; // end of struct PositionCoord
 
 struct PostProcessOptions {
-  int width;
-  int height;
+  int width = 0;
+  int height = 0;
 }; // end of struct PostProcessOptions
 
 struct RootResult {
-  bool found;
-  double root;
+  bool found = false;
+  double root = 0.;
 }; // end of struct RootResult
 
 struct SamplingParameters {
-  int min;
-  int mag;
+  int min = 0;
+  int mag = 0;
 }; // end of struct SamplingParameters
 
 struct SizeF {
-  float width;
-  float height;
+  float width = 0.f;
+  float height = 0.f;
 }; // end of struct SizeF
 
 struct SolidParticleOptions {
-  bool updatable;
-  bool isPickable;
+  bool updatable = false;
+  bool isPickable = false;
 }; // end of struct SolidParticleOptions
 
 struct Style {
@@ -342,19 +315,19 @@ struct Style {
 }; // end of struct cursor
 
 struct SubdivisionsPerAxis {
-  unsigned int max;
-  unsigned int X;
-  unsigned int Y;
-  unsigned int Z;
+  unsigned int max = 0;
+  unsigned int X = 0;
+  unsigned int Y = 0;
+  unsigned int Z = 0;
 }; // end of struct SubdivisionsPerAxis
 
 struct SnapEvent {
-  float snapDistance;
+  float snapDistance = 0.f;
 }; // end of struct SnapEvent
 
 struct TriggerOptions {
   std::string parameter;
-  unsigned int trigger;
+  unsigned int trigger = 0;
 }; // end of struct TriggerOptions
 
 } // end of namespace BABYLON

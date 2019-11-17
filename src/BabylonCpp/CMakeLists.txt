@@ -409,8 +409,6 @@ set_target_properties(${TARGET}
 # Include directories
 target_include_directories(${TARGET}
     PRIVATE
-    ${EARCUT_HPP_INCLUDE_DIRS}
-    ${JSON_HPP_INCLUDE_DIRS}
     ${CMAKE_CURRENT_BINARY_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     PUBLIC
@@ -420,8 +418,10 @@ target_include_directories(${TARGET}
 )
 
 # Libraries
-target_link_libraries(${TARGET}
-    PRIVATE
+target_include_directories(${TARGET}
+    PRIVATE SYSTEM
+    ${EARCUT_HPP_INCLUDE_DIRS}
+    ${JSON_HPP_INCLUDE_DIRS}
 )
 
 # Compile definitions

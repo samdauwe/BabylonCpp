@@ -42,7 +42,7 @@ Layer::Layer(const std::string& name, const std::string& imgUrl, Scene* scene,
   }
   _scene->layers.emplace_back(shared_from_this());
 
-  auto engine = scene->getEngine();
+  auto engine = _scene->getEngine();
 
   // VBO
   const Float32Array vertices{

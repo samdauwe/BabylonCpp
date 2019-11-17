@@ -1868,7 +1868,6 @@ int AbstractMesh::getClosestFacetAtLocalCoordinates(float x, float y, float z, V
   }
   // Get the closest facet to (x, y, z)
   auto shortest    = std::numeric_limits<float>::max(); // init distance vars
-  auto tmpDistance = shortest;
   auto fib         = 0ull; // current facet in the block
   Vector3 norm;            // current facet normal
   Vector3 p0;              // current facet barycenter position
@@ -1892,7 +1891,7 @@ int AbstractMesh::getClosestFacetAtLocalCoordinates(float x, float y, float z, V
       tmpy = projy - y;
       tmpz = projz - z;
       // compute length between (x, y, z) and its projection on the facet
-      tmpDistance = tmpx * tmpx + tmpy * tmpy + tmpz * tmpz;
+      float tmpDistance = tmpx * tmpx + tmpy * tmpy + tmpz * tmpz;
       // just keep the closest facet to (x, y, z)
       if (tmpDistance < shortest) {
         shortest = tmpDistance;

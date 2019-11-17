@@ -32,7 +32,6 @@ public:
     playgroundPath             = BABYLON::Filesystem::absolutePath(playgroundPath);
     _playgroundCodeEditor.setFiles({playgroundPath});
     _playgroundCodeEditor.setLightPalette();
-    _studioLayout.ApplyLayoutMode(LayoutMode::SceneAndBrowser);
   }
 
   void RunApp(std::shared_ptr<BABYLON::IRenderableScene> initialScene,
@@ -84,7 +83,7 @@ private:
         
     _studioLayout.registerGuiRenderFunction(
       DockableWindowId::Logs, 
-      [this]() { BABYLON::BabylonLogsWindow::instance().render(); });
+      []() { BABYLON::BabylonLogsWindow::instance().render(); });
     
     _studioLayout.registerGuiRenderFunction(
       DockableWindowId::Scene3d, 
@@ -183,6 +182,13 @@ private:
   // renders the GUI. Returns true when exit required
   bool render()
   {
+    static bool wasInitialLayoutApplied = false;
+    if (!wasInitialLayoutApplied)
+    {
+      this->_studioLayout.ApplyLayoutMode(LayoutMode::SceneAndBrowser);
+      wasInitialLayoutApplied = true;
+    }
+
     prepareSceneInspector();
     registerRenderFunctions();
 
@@ -208,7 +214,7 @@ private:
       _appContext._inspector->setScene(_appContext._sceneWidget->getScene());
   }
 
-  // Saves a screenshot after  few frames (eeturns true when done)
+  // Saves a screenshot after  few frames (returns true when done)
   bool saveScreenshot()
   {
     _appContext._frameCounter++;
@@ -263,6 +269,7 @@ private:
   {
     ImVec2 sceneSize = ImGui::GetCurrentWindow()->Size;
     sceneSize.y -= 35.f;
+    sceneSize.x = (float)((int)((sceneSize.x) / 4) * 4);
     ImVec2 cursorPosBeforeScene3d = ImGui::GetCursorScreenPos();
     _appContext._sceneWidget->render(sceneSize);
     renderHud(cursorPosBeforeScene3d);

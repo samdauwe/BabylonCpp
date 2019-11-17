@@ -22,9 +22,7 @@ public:
   {
   }
 
-  ~Gradient()
-  {
-  }
+  ~Gradient() = default;
 
   void addStop(float stop, const T& value)
   {

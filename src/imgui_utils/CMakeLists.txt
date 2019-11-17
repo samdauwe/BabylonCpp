@@ -36,14 +36,13 @@ source_group_by_path_all(${CMAKE_CURRENT_SOURCE_DIR} ${SOURCES_H_CPP})
 # ============================================================================ #
 
 # Build executable
-add_library(${TARGET} STATIC ${SOURCES_H_CPP})
+add_library(${TARGET} STATIC ${SOURCES_H_CPP} $<TARGET_OBJECTS:ImGuiColorTextEdit>)
 babylon_target_clang_tidy(${TARGET})
 
 # Include directories
-target_include_directories(${TARGET}
-    PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/..
-)
+target_include_directories(${TARGET} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
+# include ImGuiColorTextEdit
+target_include_directories(${TARGET} PRIVATE SYSTEM ${CMAKE_CURRENT_LIST_DIR}/../../external)
 
 # Libraries
 target_link_libraries(${TARGET}
@@ -53,7 +52,6 @@ target_link_libraries(${TARGET}
     imgui
     ${OPENGL_LIBRARIES}
     BabylonCpp
-    ImGuiColorTextEdit
 )
 
 if (UNIX AND NOT APPLE)

@@ -84,7 +84,9 @@ TouchCamera::TouchCamera::TouchCamera(const std::string& iName,
 {
   inputs->addTouch();
 
-  _setupInputs();
+  // _setupInputs is a virtual method and cannot be called in the constructor
+  // -> it is called inside Camera::addToScene(), which is called by TouchCamera::New
+  // _setupInputs();
 }
 
 TouchCamera::~TouchCamera() = default;

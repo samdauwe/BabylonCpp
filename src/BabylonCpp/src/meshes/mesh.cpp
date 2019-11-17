@@ -2516,8 +2516,6 @@ std::vector<Vector3> Mesh::createInnerPoints(size_t pointsNb)
   auto angle         = 0.f;
   auto facetPlaneVec = Vector3::Zero();
 
-  auto gap      = 0.f;
-  auto distance = 0.f;
   Ray ray(Vector3::Zero(), Axis::X());
   PickingInfo pickInfo;
   auto facetPoint        = Vector3::Zero();
@@ -2558,15 +2556,13 @@ std::vector<Vector3> Mesh::createInnerPoints(size_t pointsNb)
     mu         = Scalar::RandomRange(0.f, 1.f);
     facetPoint = vertex0.add(vec0.scale(lamda)).add(vec1.scale(lamda * mu));
 
-    gap           = 0.f;
-    distance      = 0.f;
     ray.origin    = facetPoint;
     ray.direction = direction;
     ray.length    = diameter;
     pickInfo      = ray.intersectsMesh(this);
     if (pickInfo.hit) {
-      distance = pickInfo.pickedPoint->subtract(facetPoint).length();
-      gap      = Scalar::RandomRange(0.f, 1.f) * distance;
+      float distance = pickInfo.pickedPoint->subtract(facetPoint).length();
+      float gap      = Scalar::RandomRange(0.f, 1.f) * distance;
       point    = facetPoint.add(direction.scale(gap));
     }
     else {

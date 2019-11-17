@@ -477,6 +477,7 @@ protected:
 
 private:
   void removeFromSceneRootNodes();
+  void initCacheImpl(); // non virtual implementation of initCache for this base class
 
 public:
   /**

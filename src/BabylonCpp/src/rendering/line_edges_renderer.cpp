@@ -13,12 +13,12 @@ LineEdgesRenderer::LineEdgesRenderer(const AbstractMeshPtr& source,
                                      bool checkVerticesInsteadOfIndices)
     : EdgesRenderer{source, epsilon, checkVerticesInsteadOfIndices, false}
 {
-  _generateEdgesLines();
+  _generateEdgesLines_specialized();
 }
 
 LineEdgesRenderer::~LineEdgesRenderer() = default;
 
-void LineEdgesRenderer::_generateEdgesLines()
+void LineEdgesRenderer::_generateEdgesLines_specialized()
 {
   auto positions = _source->getVerticesData(VertexBuffer::PositionKind);
   auto indices   = _source->getIndices();

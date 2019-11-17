@@ -48,11 +48,11 @@ private:
   struct DockableWindowInfo {
     std::string Label;
     bool IsVisible;
-    GuiRenderFunction RenderFunction;
+    GuiRenderFunction RenderFunction = {};
   };
 
   std::map<DockableWindowId, DockableWindowInfo> _dockableWindowsInfos;
-  LayoutMode _layoutMode;
+  LayoutMode _layoutMode = LayoutMode::SceneAndBrowser;
 };
 
 } // namespace BABYLON

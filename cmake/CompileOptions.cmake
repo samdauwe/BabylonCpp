@@ -193,7 +193,9 @@ endif()
 # Add -stdlib=libc++ when using Clang if possible
 if(NOT OPTION_NO_AUTO_LIBCPP AND "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   set(CXXFLAGS_BACKUP "${CMAKE_CXX_FLAGS}")
+  set(CMAKE_EXE_LINKER_FLAGS_BACKUP "${CMAKE_EXE_LINKER_FLAGS}")
   set(CMAKE_CXX_FLAGS "-std=c++1y -stdlib=libc++")
+  set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} "-lstdc++")
   try_run(ProgramResult
           CompilationSucceeded
           "${CMAKE_CURRENT_BINARY_DIR}"
@@ -205,9 +207,11 @@ if(NOT OPTION_NO_AUTO_LIBCPP AND "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     message(STATUS "Automatically added '-stdlib=libc++' flag "
                    "(OPTION_NO_AUTO_LIBCPP not defined)")
     set(EXTRA_FLAGS "${EXTRA_FLAGS} -stdlib=libc++")
+    set(EXTRA_LINKER_FLAGS "-lstdc++")
   endif()
   # Restore CXX flags
   set(CMAKE_CXX_FLAGS "${CXXFLAGS_BACKUP}")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS_BACKUP}")
 endif()
 
 # Allow unused private fields when using clang
@@ -267,6 +271,15 @@ if(NOT CMAKE_CXX_FLAGS_RELEASE)
 endif()
 if(NOT CMAKE_CXX_FLAGS_RELWITHDEBINFO)
   set(CMAKE_CXX_FLAGS_RELWITHDEBINFO    "-O2 -g")
+endif()
+
+if (EXTRA_LINKER_FLAGS)
+  if(NOT CMAKE_EXE_LINKER_FLAGS)
+    set(CMAKE_EXE_LINKER_FLAGS "${EXTRA_LINKER_FLAGS}")
+  endif()
+  if(NOT CMAKE_SHARED_LINKER_FLAGS)
+    set(CMAKE_SHARED_LINKER_FLAGS "${EXTRA_LINKER_FLAGS}")
+  endif()
 endif()
 
 # Set build default build type to RelWithDebInfo if not set

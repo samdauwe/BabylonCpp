@@ -85,7 +85,7 @@ MeshPtr PolygonMeshBuilder::build(bool updatable, float depth)
 {
   auto result = Mesh::New(_name, _scene);
 
-  const auto vertexData = buildVertexData(depth);
+  const auto vertexData = buildVertexData(depth); // NOLINT (this leads to a clang-tidy warning in external earcut.hpp)
 
   result->setVerticesData(VertexBuffer::PositionKind, vertexData->positions,
                           updatable);
@@ -117,7 +117,7 @@ std::unique_ptr<VertexData> PolygonMeshBuilder::buildVertexData(float depth)
   std::vector<std::vector<Point2D>> polygon;
   // Earcut.hpp has no 'holes' argument, adding the holes to the input array
   addHoles(_epoints, _eholes, polygon);
-  auto res = mapbox::earcut<uint32_t>(polygon);
+  auto res = mapbox::earcut<uint32_t>(polygon); // NOLINT (this leads to a clang-tidy warning in external earcut.hpp)
 
   Uint32Array indices;
   for (auto r : res) {

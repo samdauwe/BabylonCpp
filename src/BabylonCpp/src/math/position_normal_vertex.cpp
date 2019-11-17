@@ -13,38 +13,10 @@ PositionNormalVertex::PositionNormalVertex(const Vector3& positionVal,
 {
 }
 
-PositionNormalVertex::PositionNormalVertex(const PositionNormalVertex& other)
-    : position{other.position}, normal{other.normal}
-{
-}
-
-PositionNormalVertex::PositionNormalVertex(PositionNormalVertex&& other)
-    : position{std::move(other.position)}, normal{std::move(other.normal)}
-{
-}
-
-PositionNormalVertex& PositionNormalVertex::
-operator=(const PositionNormalVertex& other)
-{
-  if (&other != this) {
-    position = other.position;
-    normal   = other.normal;
-  }
-
-  return *this;
-}
-
-PositionNormalVertex& PositionNormalVertex::
-operator=(PositionNormalVertex&& other)
-{
-  if (&other != this) {
-    position = std::move(other.position);
-    normal   = std::move(other.normal);
-  }
-
-  return *this;
-}
-
+PositionNormalVertex::PositionNormalVertex(const PositionNormalVertex& other) = default;
+PositionNormalVertex::PositionNormalVertex(PositionNormalVertex&& other) = default;
+PositionNormalVertex& PositionNormalVertex::operator=(const PositionNormalVertex& other) = default;
+PositionNormalVertex& PositionNormalVertex::operator=(PositionNormalVertex&& other) = default;
 PositionNormalVertex::~PositionNormalVertex() = default;
 
 PositionNormalVertex PositionNormalVertex::copy() const

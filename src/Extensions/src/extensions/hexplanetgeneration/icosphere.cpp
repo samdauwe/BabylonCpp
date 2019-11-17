@@ -21,36 +21,10 @@ IcoNode::IcoNode(const Vector3& _p, const std::vector<size_t>& _e)
 {
 }
 
-IcoNode::IcoNode(const IcoNode& other) : p{other.p}, e{other.e}, f{other.f}
-{
-}
-
-IcoNode::IcoNode(IcoNode&& other)
-    : p{std::move(other.p)}, e{std::move(other.e)}, f{std::move(other.f)}
-{
-}
-
-IcoNode& IcoNode::operator=(const IcoNode& other)
-{
-  if (&other != this) {
-    p = other.p;
-    e = other.e;
-    f = other.f;
-  }
-
-  return *this;
-}
-
-IcoNode& IcoNode::operator=(IcoNode&& other)
-{
-  if (&other != this) {
-    p = std::move(other.p);
-    e = std::move(other.e);
-    f = std::move(other.f);
-  }
-
-  return *this;
-}
+IcoNode::IcoNode(const IcoNode& other) = default;
+IcoNode::IcoNode(IcoNode&& other) = default;
+IcoNode& IcoNode::operator=(const IcoNode& other) = default;
+IcoNode& IcoNode::operator=(IcoNode&& other) = default;
 
 // -----------------------------------------------------------------------------
 // IcoEdge
@@ -60,45 +34,10 @@ IcoEdge::IcoEdge(const std::vector<size_t>& _n) : n{_n}
 {
 }
 
-IcoEdge::IcoEdge(const IcoEdge& other)
-    : n{other.n}
-    , f{other.f}
-    , subdivided_n{other.subdivided_n}
-    , subdivided_e{other.subdivided_e}
-{
-}
-
-IcoEdge::IcoEdge(IcoEdge&& other)
-    : n{std::move(other.n)}
-    , f{std::move(other.f)}
-    , subdivided_n{std::move(other.subdivided_n)}
-    , subdivided_e{std::move(other.subdivided_e)}
-{
-}
-
-IcoEdge& IcoEdge::operator=(const IcoEdge& other)
-{
-  if (&other != this) {
-    n            = other.n;
-    f            = other.f;
-    subdivided_n = other.subdivided_n;
-    subdivided_e = other.subdivided_e;
-  }
-
-  return *this;
-}
-
-IcoEdge& IcoEdge::operator=(IcoEdge&& other)
-{
-  if (&other != this) {
-    n            = std::move(other.n);
-    f            = std::move(other.f);
-    subdivided_n = std::move(other.subdivided_n);
-    subdivided_e = std::move(other.subdivided_e);
-  }
-
-  return *this;
-}
+IcoEdge::IcoEdge(const IcoEdge& other) = default;
+IcoEdge::IcoEdge(IcoEdge&& other) = default;
+IcoEdge& IcoEdge::operator=(const IcoEdge& other) = default;
+IcoEdge& IcoEdge::operator=(IcoEdge&& other) = default;
 
 // -----------------------------------------------------------------------------
 // IcoFace
@@ -109,91 +48,20 @@ IcoFace::IcoFace(const std::vector<size_t>& _n, const std::vector<size_t>& _e)
 {
 }
 
-IcoFace::IcoFace(const IcoFace& other)
-    : n{other.n}
-    , e{other.e}
-    , centroid{other.centroid}
-    , boundingSphere{other.boundingSphere}
-    , children{other.children}
-{
-}
-
-IcoFace::IcoFace(IcoFace&& other)
-    : n{std::move(other.n)}
-    , e{std::move(other.e)}
-    , centroid{std::move(other.centroid)}
-    , boundingSphere{std::move(other.boundingSphere)}
-    , children{std::move(other.children)}
-{
-}
-
-IcoFace& IcoFace::operator=(const IcoFace& other)
-{
-  if (&other != this) {
-    n              = other.n;
-    e              = other.e;
-    centroid       = other.centroid;
-    boundingSphere = other.boundingSphere;
-    children       = other.children;
-  }
-
-  return *this;
-}
-
-IcoFace& IcoFace::operator=(IcoFace&& other)
-{
-  if (&other != this) {
-    n              = std::move(other.n);
-    e              = std::move(other.e);
-    centroid       = std::move(other.centroid);
-    boundingSphere = std::move(other.boundingSphere);
-    children       = std::move(other.children);
-  }
-
-  return *this;
-}
+IcoFace::IcoFace(const IcoFace& other) = default;
+IcoFace::IcoFace(IcoFace&& other) = default;
+IcoFace& IcoFace::operator=(const IcoFace& other) = default;
+IcoFace& IcoFace::operator=(IcoFace&& other) = default;
 
 // -----------------------------------------------------------------------------
 // IcosahedronMesh
 // -----------------------------------------------------------------------------
 
-IcosahedronMesh::IcosahedronMesh()
-{
-}
-
-IcosahedronMesh::IcosahedronMesh(const IcosahedronMesh& other)
-    : nodes{other.nodes}, edges{other.edges}, faces{other.faces}
-{
-}
-
-IcosahedronMesh::IcosahedronMesh(IcosahedronMesh&& other)
-    : nodes{std::move(other.nodes)}
-    , edges{std::move(other.edges)}
-    , faces{std::move(other.faces)}
-{
-}
-
-IcosahedronMesh& IcosahedronMesh::operator=(const IcosahedronMesh& other)
-{
-  if (&other != this) {
-    nodes = other.nodes;
-    edges = other.edges;
-    faces = other.faces;
-  }
-
-  return *this;
-}
-
-IcosahedronMesh& IcosahedronMesh::operator=(IcosahedronMesh&& other)
-{
-  if (&other != this) {
-    nodes = std::move(other.nodes);
-    edges = std::move(other.edges);
-    faces = std::move(other.faces);
-  }
-
-  return *this;
-}
+IcosahedronMesh::IcosahedronMesh() = default;
+IcosahedronMesh::IcosahedronMesh(const IcosahedronMesh& other) = default;
+IcosahedronMesh::IcosahedronMesh(IcosahedronMesh&& other) = default;
+IcosahedronMesh& IcosahedronMesh::operator=(const IcosahedronMesh& other) = default;
+IcosahedronMesh& IcosahedronMesh::operator=(IcosahedronMesh&& other) = default;
 
 // -----------------------------------------------------------------------------
 // Icosphere

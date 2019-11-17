@@ -45,9 +45,7 @@ public:
   {
   }
 
-  ~Observer()
-  {
-  }
+  ~Observer() = default;
 
   operator bool() const
   {

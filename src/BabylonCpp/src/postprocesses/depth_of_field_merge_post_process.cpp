@@ -39,9 +39,11 @@ DepthOfFieldMergePostProcess::DepthOfFieldMergePostProcess(
         blurSteps[index].get());
   });
 
-  if (!blockCompilation) {
-    updateEffect();
-  }
+  // updateEffect() is a virtual method, and thus cannot be called in the constructor
+  // it is instead called inside DepthOfFieldMergePostProcess::New(...)
+  // if (!blockCompilation)
+    // updateEffect();
+  (void) blockCompilation;
 }
 
 DepthOfFieldMergePostProcess::~DepthOfFieldMergePostProcess() = default;

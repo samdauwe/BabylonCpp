@@ -59,9 +59,9 @@ struct WaveOfSpritesScene : public IRenderableScene {
       instance->color      = Color4(0.f, f + 1.2f, f + 2.f, 1.f);
     };
 
-    for (float x = 0.f; x < countf; ++x) {
-      for (float z = 0.f; z < countf; ++z) {
-        makeSprite(x, z);
+    for (auto x = 0ul; x < count; ++x) {
+      for (auto z = 0ul; z < count; ++z) {
+        makeSprite((float)x, (float)z);
       }
     }
   }

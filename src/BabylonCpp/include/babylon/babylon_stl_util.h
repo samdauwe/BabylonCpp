@@ -15,7 +15,9 @@ namespace stl_util {
 
 // Determines if the given floating point number arg is a not-a-number (NaN)
 // value.
-#define isNan(a) (a != a)
+#ifndef isNan
+#define isNan(a) ((a) != (a))
+#endif
 
 // -- Implementation of make_unique function in C++11 --
 template <typename T, typename... Args>

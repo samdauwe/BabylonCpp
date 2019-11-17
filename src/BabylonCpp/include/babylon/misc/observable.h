@@ -50,9 +50,7 @@ public:
 
   Observable& operator=(const Observable&) = delete;
 
-  virtual ~Observable()
-  {
-  }
+  virtual ~Observable() = default;
 
   /**
    * @brief Gets the list of observers.

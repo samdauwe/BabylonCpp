@@ -361,7 +361,7 @@ public:
    */
   static Animatable*
   TransitionTo(const std::string& property, const AnimationValue& targetValue,
-               const AnimationValue& host, Scene* scene, float frameRate,
+               const Node* host, Scene* scene, float frameRate,
                const AnimationPtr& transition, float duration,
                const std::function<void()>& onAnimationEnd = nullptr);
 

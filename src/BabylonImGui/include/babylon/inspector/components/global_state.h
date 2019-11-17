@@ -21,14 +21,10 @@ public:
     return std::shared_ptr<GlobalState>(
       new GlobalState(std::forward<Ts>(args)...));
   }
-  ~GlobalState()
-  {
-  }
+  ~GlobalState() = default;
 
 protected:
-  GlobalState()
-  {
-  }
+  GlobalState() = default;
 
 public:
   Observable<EntityInfo> onSelectionChangedObservable;

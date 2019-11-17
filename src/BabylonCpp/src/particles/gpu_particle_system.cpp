@@ -85,7 +85,7 @@ GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
   _currentActiveCount      = 0;
   _isAnimationSheetEnabled = iIsAnimationSheetEnabled;
 
-  scene->particleSystems.emplace_back(this);
+  _scene->particleSystems.emplace_back(this);
 
   _updateEffectOptions->attributes = {"position",
                                       "age",
@@ -623,7 +623,7 @@ GPUParticleSystem::_createUpdateVAO(Buffer* source)
     offset += 3;
     updateVertexBuffers["noiseCoordinates2"] = source->createVertexBuffer(
       VertexBuffer::NoiseCoordinates2Kind, offset, 3);
-    offset += 3;
+    // offset += 3;
   }
 
   auto vao = _engine->recordVertexArrayObject(updateVertexBuffers, nullptr,
@@ -698,7 +698,7 @@ GPUParticleSystem::_createRenderVAO(Buffer* source, Buffer* spriteSource)
     renderVertexBuffers["noiseCoordinates2"]
       = source->createVertexBuffer(VertexBuffer::NoiseCoordinates2Kind, offset,
                                    3, _attributesStrideSize, true);
-    offset += 3;
+    // offset += 3;
   }
 
   renderVertexBuffers["offset"]

@@ -121,13 +121,8 @@ public:
   }
 
 public:
-  Stage()
-  {
-  }
-
-  ~Stage()
-  {
-  }
+  Stage() = default;
+  ~Stage() = default;
 
   std::vector<Step<T>> splice(std::vector<Step<T>>& v, int index, int howmany,
                               const std::vector<Step<T>>& itemsToAdd)

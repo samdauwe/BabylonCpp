@@ -27,7 +27,7 @@ if (BABYLON_USE_CLANG_TIDY)
   else()
     message(STATUS "clang-tidy found: ${CLANG_TIDY_EXE}")
     # set(DO_CLANG_TIDY "${CLANG_TIDY_EXE}" "-checks=*,-clang-analyzer-alpha.*")
-    set(DO_CLANG_TIDY "${CLANG_TIDY_EXE}" "-checks=hicpp-use-equals-default")
+    set(DO_CLANG_TIDY "${CLANG_TIDY_EXE}")
   endif()
 endif()
 

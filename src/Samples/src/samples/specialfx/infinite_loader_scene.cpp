@@ -22,9 +22,7 @@ struct Ring {
   {
   }
 
-  Ring(const Ring& other) : center{other.center}, tubes{other.tubes}, angle{other.angle}
-  {
-  }
+  Ring(const Ring& other) = default;
 
   void addTube(const std::vector<Vector3>& points)
   {

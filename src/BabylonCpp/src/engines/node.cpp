@@ -32,7 +32,9 @@ std::function<NodePtr()> Node::Construct(const std::string& type,
   auto& constructorFunc = _NodeConstructors[type];
 
   return [name, scene, options, constructorFunc]() {
-    return constructorFunc(name, scene, options);
+    auto r = constructorFunc(name, scene, options);
+    r->_initCache();
+    return r;
   };
 }
 
@@ -63,7 +65,15 @@ Node::Node(const std::string& iName, Scene* scene, bool addToRootNodes)
   state    = "";
   _scene   = scene ? scene : Engine::LastCreatedScene();
   uniqueId = _scene->getUniqueId();
-  _initCache();
+
+  // We cannot call the virtual function _initCache() in the constructor
+  // instead :
+  // - we here call the base implementation (initCacheImpl()) which is not virtual
+  // - Node::Construct() also calls _initCache()
+  // - All the classes derived from Camera will call _initCache()
+  //   via Camera::addToScene(), which is called by their named constructor "New()"
+  //_initCache();
+  initCacheImpl();
 }
 
 Node::~Node() = default;
@@ -264,8 +274,17 @@ Matrix& Node::worldMatrixFromCache()
 
 void Node::_initCache()
 {
-  _cache.parent = nullptr;
+  initCacheImpl();
 }
+
+void Node::initCacheImpl()
+{
+  if (_cache.cache_inited)
+    return;
+  _cache.parent = nullptr;
+  _cache.cache_inited = true;
+}
+
 
 void Node::updateCache(bool force)
 {

@@ -3866,7 +3866,7 @@ unsigned int Engine::updateMultipleRenderTargetTextureSampleCount(
       gl.framebufferRenderbuffer(GL::FRAMEBUFFER, attachment, GL::RENDERBUFFER,
                                  colorRenderbuffer.get());
 
-      texture->_MSAAFramebuffer    = std::move(framebuffer);
+      texture->_MSAAFramebuffer    = framebuffer;
       texture->_MSAARenderBuffer   = std::move(colorRenderbuffer);
       texture->samples             = samples;
       texture->_depthStencilBuffer = std::move(depthStencilBuffer);
@@ -4385,11 +4385,16 @@ InternalTexturePtr Engine::createRawCubeTexture(const std::vector<ArrayBufferVie
   }
 
   auto textureType    = _getWebGLTextureType(type);
+
+  /*
+  // code from src/Engines/Extensions/engine.rawTexture.ts
+  // however those variables are never used
   auto internalFormat = _getInternalFormat(format);
 
   if (internalFormat == GL::RGB) {
     internalFormat = GL::RGBA;
   }
+  */
 
   // Mipmap generation needs a sized internal format that is both
   // color-renderable and texture-filterable

@@ -46,7 +46,7 @@ EffectLayer::EffectLayer(const std::string& iName, Scene* scene)
     _scene->_addComponent(component);
   }
 
-  _engine  = scene->getEngine();
+  _engine  = _scene->getEngine();
   _maxSize = _engine->getCaps().maxTextureSize;
 
   // Generate Buffers

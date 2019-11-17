@@ -21,10 +21,12 @@ PhysicsEngine::PhysicsEngine(const std::optional<Vector3>& iGravity,
     _initialized = true;
   }
   else {
-    BABYLON_LOGF_ERROR(
-      "PhysicsEngine",
-      "Physics Engine %s cannot be found. Please make sure it is included.",
-      _physicsPlugin->name.c_str())
+    if (_physicsPlugin) {
+      BABYLON_LOGF_ERROR(
+          "PhysicsEngine",
+          "Physics Engine %s cannot be found. Please make sure it is included.",
+          _physicsPlugin->name.c_str());
+    }
   }
 }
 

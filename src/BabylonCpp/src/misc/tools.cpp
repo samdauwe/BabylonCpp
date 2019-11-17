@@ -464,7 +464,7 @@ Image Tools::StringToImage(const std::string& uri, bool flipVertically)
     if (!data)
       data = stbi_load_from_memory(bytes, size, &w, &h, &comp, req_comp);
     if (!data) {
-      BABYLON_LOG_WARN("Unknown image format. STB cannot decode image data for image")
+      BABYLON_LOG_WARN("StringToImage", "Unknown image format. STB cannot decode image data for image")
       return false;
     }
 
@@ -472,14 +472,14 @@ Image Tools::StringToImage(const std::string& uri, bool flipVertically)
 
     if ((w < 1) || (h < 1)) {
       stbi_image_free(data);
-      BABYLON_LOG_ERROR("Invalid image data for image")
+      BABYLON_LOG_ERROR("StringToImage", "Invalid image data for image")
       return false;
     }
 
     if (req_width > 0) {
       if (req_width != w) {
         stbi_image_free(data);
-        BABYLON_LOG_ERROR("Image width mismatch for image")
+        BABYLON_LOG_ERROR("StringToImage", "Image width mismatch for image")
         return false;
       }
     }
@@ -487,7 +487,7 @@ Image Tools::StringToImage(const std::string& uri, bool flipVertically)
     if (req_height > 0) {
       if (req_height != h) {
         stbi_image_free(data);
-        BABYLON_LOG_ERROR("Image height mismatch. for image")
+        BABYLON_LOG_ERROR("StringToImage", "Image height mismatch. for image")
         return false;
       }
     }
