@@ -97,9 +97,8 @@ struct GestureEvent {
 }; // end of struct GestureEvent
 
 struct Image {
-  Image()
-  {
-  }
+  Image() = default;
+
   Image(unsigned char* buffer, int bufferLength, int iWidth, int iHeight, int iDepth,
         unsigned int iMode)
       : data(buffer, buffer + bufferLength)
@@ -115,7 +114,7 @@ struct Image {
   }
   [[nodiscard]] bool valid() const
   {
-    return data.size() > 0 && width > 0 && height > 0 && depth > 0;
+    return !data.empty() && width > 0 && height > 0 && depth > 0;
   }
   ArrayBuffer data;
   int width = 0, height = 0;
