@@ -63,8 +63,8 @@ void BABYLON::CSG::Plane::splitPolygon(
   // four classes.
   int polygonType = 0;
   Int32Array types;
-  for (unsigned int i = 0; i < polygon.vertices.size(); ++i) {
-    const float t = Vector3::Dot(normal, polygon.vertices[i].pos) - w;
+  for (const auto& vertice : polygon.vertices) {
+    const float t = Vector3::Dot(normal, vertice.pos) - w;
     int type
       = (t < -Plane::EPSILON) ? BACK : (t > Plane::EPSILON) ? FRONT : COPLANAR;
     polygonType |= type;

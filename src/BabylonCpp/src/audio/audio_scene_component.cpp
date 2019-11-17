@@ -86,13 +86,13 @@ void AudioSceneComponent::disableAudio()
 {
   _audioEnabled = false;
 
-  for (size_t i = 0; i < scene->mainSoundTrack()->soundCollection.size(); ++i) {
-    scene->mainSoundTrack()->soundCollection[i]->pause();
+  for (auto& sound : scene->mainSoundTrack()->soundCollection) {
+    sound->pause();
   }
   if (!scene->soundTracks.empty()) {
     for (auto& soundTrack : scene->soundTracks) {
-      for (size_t j = 0; j < soundTrack->soundCollection.size(); ++j) {
-        soundTrack->soundCollection[j]->pause();
+      for (auto& sound : soundTrack->soundCollection) {
+        sound->pause();
       }
     }
   }
@@ -102,16 +102,16 @@ void AudioSceneComponent::enableAudio()
 {
   _audioEnabled = true;
 
-  for (size_t i = 0; i < scene->mainSoundTrack()->soundCollection.size(); ++i) {
-    if (scene->mainSoundTrack()->soundCollection[i]->isPaused) {
-      scene->mainSoundTrack()->soundCollection[i]->play();
+  for (auto& sound : scene->mainSoundTrack()->soundCollection) {
+    if (sound->isPaused) {
+      sound->play();
     }
   }
   if (!scene->soundTracks.empty()) {
     for (auto& soundTrack : scene->soundTracks) {
-      for (size_t j = 0; j < soundTrack->soundCollection.size(); ++j) {
-        if (soundTrack->soundCollection[j]->isPaused) {
-          soundTrack->soundCollection[j]->play();
+      for (auto& sound : soundTrack->soundCollection) {
+        if (sound->isPaused) {
+          sound->play();
         }
       }
     }

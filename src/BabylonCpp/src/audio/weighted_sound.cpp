@@ -36,8 +36,8 @@ WeightedSound::WeightedSound(bool iLoop, const std::vector<SoundPtr>& sounds,
     weightSum += weight;
   }
   float invWeightSum = weightSum > 0.f ? 1.f / weightSum : 0.f;
-  for (size_t i = 0; i < _weights.size(); ++i) {
-    _weights[i] *= invWeightSum;
+  for (float& _weight : _weights) {
+    _weight *= invWeightSum;
   }
   _sounds = sounds;
   for (const auto& sound : _sounds) {

@@ -89,9 +89,8 @@ private:
     _crowdSimulation->setTimeStep(0.3f);
 
     // Create agents
-    for (size_t agentNo = 0; agentNo < _agentMeshes.size(); ++agentNo) {
-      auto agentMesh = _agentMeshes[agentNo];
-      auto agentId   = _crowdSimulation->addAgent(agentMesh);
+    for (auto agentMesh : _agentMeshes) {
+      auto agentId = _crowdSimulation->addAgent(agentMesh);
       _crowdSimulation->setAgentGoal(agentId,
                                      Vector2(-agentMesh->position().x, -agentMesh->position().z));
       _crowdSimulation->setAgentMaxSpeed(agentId, 1.f);

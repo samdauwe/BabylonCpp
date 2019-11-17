@@ -83,9 +83,7 @@ public:
     Float32Array uvs;
 
     // Create each face in turn.
-    for (unsigned int index = 0; index < normalsSource.size(); ++index) {
-      auto& normal = normalsSource[index];
-
+    for (auto& normal : normalsSource) {
       // Get two vectors perpendicular to the face normal and to each other.
       Vector3 side1(normal.y, normal.z, normal.x);
       auto side2 = Vector3::Cross(normal, side1);

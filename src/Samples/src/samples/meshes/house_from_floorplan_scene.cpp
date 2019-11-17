@@ -115,8 +115,8 @@ public:
     WindowSpace windowSpace78{window1, 1.5, 0.6f, 0.45f};
 
     std::vector<Wall> walls;
-    for (size_t c = 0; c < corners.size(); ++c) {
-      walls.emplace_back(Wall{corners[c], {}, {}});
+    for (auto& corner : corners) {
+      walls.emplace_back(Wall{corner, {}, {}});
     }
 
     walls[0].windowSpaces = {windowSpace02};
@@ -290,8 +290,8 @@ private:
         holes.emplace_back(holeData);
       }
 
-      for (size_t h = 0; h < holes.size(); ++h) {
-        polygonTriangulation.addHole(holes[h]);
+      for (const auto& hole : holes) {
+        polygonTriangulation.addHole(hole);
       }
 
       // WallBuilder produces wall vertex positions array and indices using the

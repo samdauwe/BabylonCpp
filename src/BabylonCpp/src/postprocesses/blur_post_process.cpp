@@ -124,8 +124,8 @@ void BlurPostProcess::_updateParameters(
   }
 
   // Normalize weights
-  for (unsigned int i = 0; i < weights.size(); ++i) {
-    weights[i] /= totalWeight;
+  for (float& weight : weights) {
+    weight /= totalWeight;
   }
 
   // Optimize: combine samples to take advantage of hardware linear sampling

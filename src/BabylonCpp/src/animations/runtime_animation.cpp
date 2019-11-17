@@ -277,10 +277,10 @@ void RuntimeAnimation::goToFrame(float frame)
   // Need to reset animation events
   auto& events = _events;
   if (!events.empty()) {
-    for (size_t index = 0; index < events.size(); index++) {
-      if (!events[index].onlyOnce) {
+    for (auto& event : events) {
+      if (!event.onlyOnce) {
         // reset events in the future
-        events[index].isDone = events[index].frame < frame;
+        event.isDone = event.frame < frame;
       }
     }
   }

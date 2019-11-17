@@ -1872,8 +1872,8 @@ int AbstractMesh::getClosestFacetAtLocalCoordinates(float x, float y, float z, V
   Vector3 norm;            // current facet normal
   Vector3 p0;              // current facet barycenter position
   // loop on all the facets in the current partitioning block
-  for (size_t idx = 0; idx < facetsInBlock.size(); ++idx) {
-    fib  = facetsInBlock[idx];
+  for (unsigned int idx : facetsInBlock) {
+    fib  = idx;
     norm = facetNormals[fib];
     p0   = facetPositions[fib];
 

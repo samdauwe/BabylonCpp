@@ -37,9 +37,8 @@ MeshPtr LatheBuilder::CreateLathe(const std::string& name,
                                 shape[0].y,
                                 std::sin((float)i * step) * shape[0].x * radius));
     }
-    for (std::size_t p = 0; p < shape.size(); ++p) {
-      rotated = Vector3(std::cos(i * step) * shape[p].x * radius, shape[p].y,
-                        std::sin(i * step) * shape[p].x * radius);
+    for (auto& p : shape) {
+      rotated = Vector3(std::cos(i * step) * p.x * radius, p.y, std::sin(i * step) * p.x * radius);
       path.emplace_back(rotated);
     }
     if (cap == Mesh::CAP_END || cap == Mesh::CAP_ALL) {

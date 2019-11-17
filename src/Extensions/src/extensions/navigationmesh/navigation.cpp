@@ -450,9 +450,8 @@ GroupedNavigationMesh Navigation::_groupNavMesh(NavigationMesh& navigationMesh)
 {
   GroupedNavigationMesh groupedNavMesh;
 
-  for (size_t i = 0; i < navigationMesh.vertices.size(); ++i) {
-    float v                    = navigationMesh.vertices[i];
-    navigationMesh.vertices[i] = _roundNumber(v, 2);
+  for (float& vertice : navigationMesh.vertices) {
+    vertice = _roundNumber(vertice, 2);
   }
 
   groupedNavMesh.vertices = navigationMesh.vertices;

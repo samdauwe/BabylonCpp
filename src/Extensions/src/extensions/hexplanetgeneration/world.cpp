@@ -263,8 +263,8 @@ void World::generatePlanetTectonicPlates(Topology& topology, size_t plateCount, 
   while (plates.size() < plateCount && failedCount < 10000) {
     auto& corner = topology.corners[random.integerExclusive(0, topology.corners.size())];
     bool adjacentToExistingPlate = false;
-    for (size_t i = 0; i < corner.tiles.size(); ++i) {
-      if (corner.tiles[i]->plate) {
+    for (auto& tile : corner.tiles) {
+      if (tile->plate) {
         adjacentToExistingPlate = true;
         failedCount += 1;
         break;
@@ -286,15 +286,15 @@ void World::generatePlanetTectonicPlates(Topology& topology, size_t plateCount, 
     auto pplate = &plates.back();
     auto& plate = plates.back();
 
-    for (size_t i = 0; i < corner.tiles.size(); ++i) {
-      corner.tiles[i]->plate = &plate;
-      plate.tiles.emplace_back(corner.tiles[i]);
+    for (auto& tile : corner.tiles) {
+      tile->plate = &plate;
+      plate.tiles.emplace_back(tile);
     }
 
-    for (size_t i = 0; i < corner.tiles.size(); ++i) {
-      auto& tile = *corner.tiles[i];
-      for (size_t j = 0; j < tile.tiles.size(); ++j) {
-        auto& adjacentTile = *tile.tiles[j];
+    for (auto& i : corner.tiles) {
+      auto& tile = *i;
+      for (auto& j : tile.tiles) {
+        auto& adjacentTile = *j;
         if (!adjacentTile.plate) {
           plateless.emplace_back(Plateless{&adjacentTile, pplate});
         }
@@ -313,9 +313,9 @@ void World::generatePlanetTectonicPlates(Topology& topology, size_t plateCount, 
     if (!tile.plate) {
       tile.plate = &plate;
       plate.tiles.emplace_back(ptile);
-      for (size_t j = 0; j < tile.tiles.size(); ++j) {
-        if (!tile.tiles[j]->plate) {
-          plateless.emplace_back(Plateless{tile.tiles[j], &plate});
+      for (auto& tile2 : tile.tiles) {
+        if (!tile2->plate) {
+          plateless.emplace_back(Plateless{tile2, &plate});
         }
       }
     }
@@ -327,8 +327,8 @@ void World::generatePlanetTectonicPlates(Topology& topology, size_t plateCount, 
 void World::calculateCornerDistancesToPlateRoot(std::vector<Plate>& plates)
 {
   std::vector<DistanceCorner> distanceCornerQueue;
-  for (size_t i = 0; i < plates.size(); ++i) {
-    auto& corner               = *plates[i].root;
+  for (auto& plate : plates) {
+    auto& corner               = *plate.root;
     corner.distanceToPlateRoot = 0;
     for (size_t j = 0; j < corner.corners.size(); ++j) {
       distanceCornerQueue.emplace_back(
@@ -732,8 +732,8 @@ void World::calculateTileAverageElevations(std::vector<Tile>& tiles)
 {
   for (auto& tile : tiles) {
     float elevation = 0;
-    for (size_t j = 0; j < tile.corners.size(); ++j) {
-      elevation += tile.corners[j]->elevation;
+    for (auto& corner : tile.corners) {
+      elevation += corner->elevation;
     }
     tile.elevation = elevation / tile.corners.size();
   }

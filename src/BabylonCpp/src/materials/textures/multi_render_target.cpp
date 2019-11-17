@@ -147,9 +147,9 @@ void MultiRenderTarget::_createInternalTextures()
 void MultiRenderTarget::_createTextures()
 {
   _textures.clear();
-  for (size_t i = 0; i < _internalTextures.size(); ++i) {
+  for (const auto& internalTexture : _internalTextures) {
     auto texture      = Texture::New("", getScene());
-    texture->_texture = _internalTextures[i];
+    texture->_texture = internalTexture;
     _textures.emplace_back(texture);
   }
 

@@ -35,8 +35,7 @@ MeshPtr RibbonBuilder::CreateRibbon(const std::string& name,
       auto ns
         = (mesh->_originalBuilderSideOrientation == Mesh::DOUBLESIDE) ? 2u : 1u;
       for (auto si = 1ull; si <= ns; ++si) {
-        for (auto p = 0ull; p < pathArray.size(); ++p) {
-          const auto& path = pathArray[p];
+        for (const auto& path : pathArray) {
           const auto l     = path.size();
           minlg            = (minlg < l) ? minlg : l;
           for (auto j = 0u; j < minlg; ++j) {

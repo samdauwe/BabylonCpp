@@ -537,8 +537,8 @@ std::vector<BaseTexturePtr> ShaderMaterial::getActiveTextures() const
 
   for (const auto& textureArrayItem : _textureArrays) {
     const auto& array = textureArrayItem.second;
-    for (std::size_t index = 0; index < array.size(); ++index) {
-      activeTextures.emplace_back(array[index]);
+    for (const auto& index : array) {
+      activeTextures.emplace_back(index);
     }
   }
 

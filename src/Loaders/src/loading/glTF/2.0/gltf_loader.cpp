@@ -1461,8 +1461,8 @@ ArrayBufferView& GLTFLoader::_loadAccessorAsync(const std::string& context, IAcc
                                      numComponents * sparse.count)
             .float32Array;
       size_t valuesIndex = 0;
-      for (size_t indicesIndex = 0; indicesIndex < indices.size(); ++indicesIndex) {
-        auto dataIndex = indices[indicesIndex] * numComponents;
+      for (unsigned int indice : indices) {
+        auto dataIndex = indice * numComponents;
         for (size_t componentIndex = 0; componentIndex < numComponents; componentIndex++) {
           data[dataIndex++] = values[valuesIndex++];
         }

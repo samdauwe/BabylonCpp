@@ -908,8 +908,8 @@ void Geometry::_ImportGeometry(const json& parsedGeometry, const MeshPtr& mesh)
         = json_util::get_array<float>(parsedGeometry, "matricesIndices");
       Float32Array floatIndices;
 
-      for (size_t i = 0; i < matricesIndices.size(); ++i) {
-        auto matricesIndex = static_cast<int>(matricesIndices[i]);
+      for (float matricesIndice : matricesIndices) {
+        auto matricesIndex = static_cast<int>(matricesIndice);
 
         floatIndices.emplace_back(
           static_cast<float>(matricesIndex & 0x000000FF));
@@ -929,8 +929,8 @@ void Geometry::_ImportGeometry(const json& parsedGeometry, const MeshPtr& mesh)
         = json_util::get_array<float>(parsedGeometry, "matricesIndicesExtra");
       Float32Array floatIndices;
 
-      for (size_t i = 0; i < matricesIndicesExtra.size(); ++i) {
-        auto matricesIndexExtra = static_cast<int>(matricesIndicesExtra[i]);
+      for (float i : matricesIndicesExtra) {
+        auto matricesIndexExtra = static_cast<int>(i);
 
         floatIndices.emplace_back(
           static_cast<float>(matricesIndexExtra & 0x000000FF));

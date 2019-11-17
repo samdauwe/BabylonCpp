@@ -84,15 +84,15 @@ public:
 private:
   void _scrambleUp(Float32Array& data)
   {
-    for (size_t index = 0; index < data.size(); ++index) {
-      data[index] += 0.4f * Math::random();
+    for (float& value : data) {
+      value += 0.4f * Math::random();
     }
   }
 
   void _scrambleDown(Float32Array& data)
   {
-    for (size_t index = 0; index < data.size(); ++index) {
-      data[index] -= 0.4f * Math::random();
+    for (float& value : data) {
+      value -= 0.4f * Math::random();
     }
   }
 

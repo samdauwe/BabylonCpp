@@ -1734,9 +1734,9 @@ void ParticleSystem::dispose(bool disposeTexture,
   _removeFromRoot();
 
   if (!_subEmitters.empty()) {
-    for (size_t index = 0; index < _subEmitters.size(); ++index) {
-      for (auto& subEmitter : _subEmitters[index]) {
-        subEmitter->dispose();
+    for (auto& subEmitter1 : _subEmitters) {
+      for (auto& subEmitter2 : subEmitter1) {
+        subEmitter2->dispose();
       }
     }
 

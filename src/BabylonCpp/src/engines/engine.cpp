@@ -1194,8 +1194,7 @@ void Engine::unBindMultiColorAttachmentFramebuffer(const std::vector<InternalTex
     gl.drawBuffers(attachments);
   }
 
-  for (size_t i = 0; i < textures.size(); i++) {
-    auto& texture = textures[i];
+  for (const auto& texture : textures) {
     if (texture->generateMipMaps && !disableGenerateMipMaps && !texture->isCube) {
       _bindTextureDirectly(GL::TEXTURE_2D, texture);
       gl.generateMipmap(GL::TEXTURE_2D);
@@ -1772,13 +1771,11 @@ void Engine::updateAndBindInstancesBuffer(
   }
 
   int stride = 0;
-  for (unsigned int i = 0; i < offsetLocations.size(); ++i) {
-    stride += offsetLocations[i].attributeSize * 4;
+  for (const auto& offsetLocation : offsetLocations) {
+    stride += offsetLocation.attributeSize * 4;
   }
 
-  for (size_t i = 0; i < offsetLocations.size(); ++i) {
-    const InstancingAttributeInfo& ai = offsetLocations[i];
-
+  for (const auto& ai : offsetLocations) {
     if (ai.index > _vertexAttribArraysEnabled.size()) {
       _gl->enableVertexAttribArray(ai.index);
       _vertexAttribArraysEnabled.resize(ai.index + 1);
@@ -2606,10 +2603,10 @@ void Engine::wipeCaches(bool bruteForce)
 
 std::string& Engine::setTextureFormatToUse(const std::vector<std::string>& formatsAvailable)
 {
-  for (size_t i = 0; i < _texturesSupported.size(); ++i) {
+  for (const auto& textureSupported1 : _texturesSupported) {
     for (const auto& formatAvailable : formatsAvailable) {
-      if (_texturesSupported[i] == String::toLowerCase(formatAvailable)) {
-        _textureFormatInUse = _texturesSupported[i];
+      if (textureSupported1 == String::toLowerCase(formatAvailable)) {
+        _textureFormatInUse = textureSupported1;
         return _textureFormatInUse;
       }
     }

@@ -212,9 +212,7 @@ MeshPtr DecalBuilder::CreateDecal(const std::string& name,
     }
 
     // Add UVs and get back to world
-    for (std::size_t vIndex = 0; vIndex < faceVertices.size(); ++vIndex) {
-      auto& vertex = faceVertices[vIndex];
-
+    for (auto& vertex : faceVertices) {
       vertexData->indices.emplace_back(currentVertexDataIndex);
       vertex.position.toArray(vertexData->positions,
                               currentVertexDataIndex * 3);

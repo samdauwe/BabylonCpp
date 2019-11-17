@@ -3146,10 +3146,10 @@ SoundPtr Scene::getSoundByName(const std::string& name)
   }
 
   if (!soundTracks.empty()) {
-    for (size_t sdIndex = 0; sdIndex < soundTracks.size(); ++sdIndex) {
-      for (index = 0; index < soundTracks[sdIndex]->soundCollection.size(); ++index) {
-        if (soundTracks[sdIndex]->soundCollection[index]->name == name) {
-          return soundTracks[sdIndex]->soundCollection[index];
+    for (auto& soundTrack : soundTracks) {
+      for (index = 0; index < soundTrack->soundCollection.size(); ++index) {
+        if (soundTrack->soundCollection[index]->name == name) {
+          return soundTrack->soundCollection[index];
         }
       }
     }
