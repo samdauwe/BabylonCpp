@@ -14,7 +14,7 @@ namespace Filesystem {
 inline std::string absolutePath(const std::string& path)
 {
   char tmp[PATH_MAX];
-  if (realpath(path.c_str(), tmp) == NULL) {
+  if (realpath(path.c_str(), tmp) == nullptr) {
     return "";
   }
   return std::string(tmp);
@@ -28,7 +28,7 @@ inline bool createDirectory(const std::string& path)
 inline std::string getcwd()
 {
   char path[PATH_MAX];
-  if (::getcwd(path, PATH_MAX) == NULL) {
+  if (::getcwd(path, PATH_MAX) == nullptr) {
     return "";
   }
   return std::string(path);

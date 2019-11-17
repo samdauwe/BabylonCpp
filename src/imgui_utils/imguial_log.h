@@ -64,9 +64,9 @@ namespace ImGuiAl
     }
     
     virtual ~Log(); // = default
-    
-    bool Init( unsigned flags = 0, const char** more_actions = NULL );
-    
+
+    bool Init(unsigned flags = 0, const char** more_actions = nullptr);
+
     void SetColor( Level level, float r, float g, float b );
     void SetLabel( Level level, const char* label );
     void SetCumulativeLabel( const char* label );

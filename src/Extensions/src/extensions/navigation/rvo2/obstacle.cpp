@@ -37,7 +37,7 @@ namespace BABYLON {
 namespace Extensions {
 namespace RVO2 {
 
-Obstacle::Obstacle() : nextObstacle_(NULL), prevObstacle_(NULL)
+Obstacle::Obstacle() : nextObstacle_(nullptr), prevObstacle_(nullptr)
 {
 }
 

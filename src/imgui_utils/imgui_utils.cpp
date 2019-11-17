@@ -26,7 +26,7 @@ namespace ImGuiUtils
         return;
       }
 
-      unsigned char* my_image_data = stbi_load(filename.c_str(), &_width, &_height, NULL, 4);
+      unsigned char* my_image_data = stbi_load(filename.c_str(), &_width, &_height, nullptr, 4);
 
       // Turn the RGBA pixel data into an OpenGL texture:
       glGenTextures(1, &_textureId);

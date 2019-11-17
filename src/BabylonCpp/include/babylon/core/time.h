@@ -186,7 +186,7 @@ inline std::time_t utcTime()
 #pragma warning(                                                               \
   disable : 4996) // 'localtime': This function or variable may be unsafe.
 #endif
-  std::time_t now = std::time(NULL);
+  std::time_t now = std::time(nullptr);
 
   std::tm tm_local(*std::localtime(&now));
   std::time_t t_local = std::mktime(&tm_local);

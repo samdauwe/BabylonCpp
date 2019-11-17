@@ -59,8 +59,7 @@ public:
     if (_hasModificationConflict)
     {
       ImGui::OpenPopup("Edition Conflict!");
-      if (ImGui::BeginPopupModal("Edition Conflict!", NULL, ImGuiWindowFlags_AlwaysAutoResize))
-      {
+      if (ImGui::BeginPopupModal("Edition Conflict!", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         ImGui::Text("This file was concurrently modified externally and edited here!");
         if (ImGui::Button("Accept external changes"))
         {
@@ -69,7 +68,6 @@ public:
         }
         ImGui::EndPopup();
       }
-
     }
     _textEditor.Render("TextEditor");
   }

@@ -31,10 +31,7 @@ namespace BABYLON
 
     _logImpl = std::make_unique<ImGuiAl::Log>();
     // Initialize
-    static const char* actions[] =
-    {
-      NULL
-    };
+    static const char* actions[] = {nullptr};
 
     _logImpl->Init(ImGuiAl::Log::kShowFilters, actions);
     _logImpl->SetLabel(ImGuiAl::Log::kDebug, ICON_FA_BUG " Debug");

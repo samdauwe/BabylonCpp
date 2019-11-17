@@ -322,11 +322,10 @@ Color4 Color4::FromHexString(const std::string& hex)
     return Color4(0, 0, 0, 0);
   }
 
-  return Color4::FromInts(
-    static_cast<int>(strtol(hex.substr(1, 2).c_str(), NULL, 16)),
-    static_cast<int>(strtol(hex.substr(3, 2).c_str(), NULL, 16)),
-    static_cast<int>(strtol(hex.substr(5, 2).c_str(), NULL, 16)),
-    static_cast<int>(strtol(hex.substr(7, 2).c_str(), NULL, 16)));
+  return Color4::FromInts(static_cast<int>(strtol(hex.substr(1, 2).c_str(), nullptr, 16)),
+                          static_cast<int>(strtol(hex.substr(3, 2).c_str(), nullptr, 16)),
+                          static_cast<int>(strtol(hex.substr(5, 2).c_str(), nullptr, 16)),
+                          static_cast<int>(strtol(hex.substr(7, 2).c_str(), nullptr, 16)));
 }
 
 Color4 Color4::Lerp(const Color4& left, const Color4& right, float amount)

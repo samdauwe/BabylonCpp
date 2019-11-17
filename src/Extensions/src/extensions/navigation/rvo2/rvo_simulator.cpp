@@ -44,16 +44,15 @@ namespace BABYLON {
 namespace Extensions {
 namespace RVO2 {
 
-RVOSimulator::RVOSimulator() : defaultAgent_(NULL), kdTree_(NULL)
+RVOSimulator::RVOSimulator() : defaultAgent_(nullptr), kdTree_(nullptr)
 {
   kdTree_ = new KdTree(this);
 }
 
-RVOSimulator::RVOSimulator(float timeStep, float neighborDist,
-                           size_t maxNeighbors, float timeHorizon,
-                           float timeHorizonObst, float radius, float maxSpeed,
+RVOSimulator::RVOSimulator(float timeStep, float neighborDist, size_t maxNeighbors,
+                           float timeHorizon, float timeHorizonObst, float radius, float maxSpeed,
                            const Vector2& velocity)
-    : defaultAgent_(NULL), globalTime_(0.0f), kdTree_(NULL), timeStep_(timeStep)
+    : defaultAgent_(nullptr), globalTime_(0.0f), kdTree_(nullptr), timeStep_(timeStep)
 {
   kdTree_       = new KdTree(this);
   defaultAgent_ = new Agent(this);
@@ -69,7 +68,7 @@ RVOSimulator::RVOSimulator(float timeStep, float neighborDist,
 
 RVOSimulator::~RVOSimulator()
 {
-  if (defaultAgent_ != NULL) {
+  if (defaultAgent_ != nullptr) {
     delete defaultAgent_;
   }
 
@@ -86,7 +85,7 @@ RVOSimulator::~RVOSimulator()
 
 size_t RVOSimulator::addAgent(const Vector2& position)
 {
-  if (defaultAgent_ == NULL) {
+  if (defaultAgent_ == nullptr) {
     return RVO_ERROR;
   }
 
@@ -324,7 +323,7 @@ void RVOSimulator::setAgentDefaults(float neighborDist, size_t maxNeighbors,
                                     float radius, float maxSpeed,
                                     const Vector2& velocity)
 {
-  if (defaultAgent_ == NULL) {
+  if (defaultAgent_ == nullptr) {
     defaultAgent_ = new Agent(this);
   }
 

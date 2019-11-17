@@ -90,7 +90,7 @@ namespace ImGuiUtils
                                      | ImGuiWindowFlags_NoBringToFrontOnFocus;
       if (appWindowParams.ShowMenuBar)
         windowFlags |= ImGuiWindowFlags_MenuBar;
-      ImGui::Begin("Main window (title bar invisible)", NULL, windowFlags);
+      ImGui::Begin("Main window (title bar invisible)", nullptr, windowFlags);
     }
 
     ImGuiID MainDockSpaceId()

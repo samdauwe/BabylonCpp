@@ -34,13 +34,9 @@ static ImVec4 yellow         = ImColor(1.00f, 1.00f, 0.00f, 1.0f); // #FFFF00
  * @brief Same as ImGui original InputText, but works with an in/out std::string
  * @return color "color-bot"
  */
-inline bool InputText_String(
-  const std::string &label, 
-  std::string & inOutStr,
-  ImGuiInputTextFlags flags = 0,
-  ImGuiInputTextCallback callback = NULL, 
-  void* user_data = NULL
-  )
+inline bool InputText_String(const std::string& label, std::string& inOutStr,
+                             ImGuiInputTextFlags flags       = 0,
+                             ImGuiInputTextCallback callback = nullptr, void* user_data = nullptr)
 {
   size_t buf_size = inOutStr.size() + 1000;
   char *buf = (char *)malloc(buf_size);
