@@ -95,14 +95,11 @@ protected:
    */
   MotionBlurPostProcess(const std::string& name, Scene* scene,
                         const std::variant<float, PostProcessOptions>& options,
-                        const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
-                        bool reusable            = false,
                         const CameraPtr& camera,
                         unsigned int samplingMode = Constants::TEXTURE_NEAREST_SAMPLINGMODE,
                         Engine* engine = nullptr, bool reusable = false,
                         unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
                         bool blockCompilation    = false);
-
   /**
    * @brief Gets the number of iterations are used for motion blur quality.
    * Default value is equal to 32.
