@@ -16,7 +16,7 @@
 #include <babylon/math/vector3.h>
 
 #ifndef isNan
-#define isNan(a) (a != a)
+#define isNan(a) ((a) != (a))
 #endif
 
 namespace BABYLON {
