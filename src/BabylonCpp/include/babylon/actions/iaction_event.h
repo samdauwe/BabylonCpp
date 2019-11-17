@@ -32,9 +32,9 @@ struct BABYLON_SHARED_EXPORT IActionEvent {
   /** The sprite that triggered the action */
   SpritePtr sprite;
   /** The X mouse cursor position at the time of the event */
-  int pointerX;
+  int pointerX = 0;
   /** The Y mouse cursor position at the time of the event */
-  int pointerY;
+  int pointerY = 0;
   /** The mesh that is currently pointed at (can be null) */
   AbstractMeshPtr meshUnderPointer;
   /** The original (browser) event that triggered the ActionEvent */
