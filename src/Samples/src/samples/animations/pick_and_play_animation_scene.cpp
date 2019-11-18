@@ -14,6 +14,7 @@
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/transform_node.h>
 #include <babylon/samples/samples_index.h>
+#include <babylon/core/logging.h>
 
 namespace BABYLON {
 
@@ -201,7 +202,8 @@ public:
             std::static_pointer_cast<Mesh>(mesh)->material = _mat1;
           }
           _pickedMesh->material = _mat2;
-          _animatableColor->restart();
+          if (_animatableColor)
+            _animatableColor->restart();
           return;
         }
       }
