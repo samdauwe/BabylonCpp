@@ -112,7 +112,7 @@ def main():
         "customAnimationFrameRequester.ts", "decorators.ts", "deepCopier.ts",
         "deferred.ts", "domManagement.ts", "filesInput.ts",
         "filesInputStore.ts", "instantiationTools.ts", "logger.ts",
-        "precisionDate.ts", "promise.ts", "retryStrategy.ts",
+        "loadFileError.ts", "precisionDate.ts", "promise.ts", "retryStrategy.ts",
         "sceneSerializer.ts", "screenshotTools.ts", "smartArray.ts",
         "stringDictionary.ts", "tags.ts", "typeStore.ts", "videoRecorder.ts",
         "virtualJoystick.ts", "webRequest.ts", "workerPool.ts",
