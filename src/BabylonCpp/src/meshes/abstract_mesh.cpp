@@ -1466,7 +1466,8 @@ AbstractMesh* AbstractMesh::clone(const std::string& /*name*/, Node* /*newParent
 AbstractMesh& AbstractMesh::releaseSubMeshes()
 {
   if (!subMeshes.empty()) {
-    for (const auto& subMesh : subMeshes) {
+    auto subMeshesCopy = subMeshes; // copy because subMesh->dispose can erase from subMeshes
+    for (const auto& subMesh : subMeshesCopy) {
       subMesh->dispose();
     }
   }
