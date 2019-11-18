@@ -448,7 +448,8 @@ EffectPtr PostProcess::apply()
     source = _forcedOutputTexture;
   }
   else {
-    source = inputTexture();
+    if (!_textures.empty())
+      source = inputTexture();
   }
   _effect->_bindTexture("textureSampler", source);
 
