@@ -1516,29 +1516,17 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   // Lights
   for (const auto& light : getScene()->lights) {
     // Included meshes
-    light->includedOnlyMeshes().erase(
-      std::remove_if(
-        light->includedOnlyMeshes().begin(), light->includedOnlyMeshes().end(),
-        [this](const AbstractMeshPtr& includedOnlyMesh) { return includedOnlyMesh.get() == this; }),
-      light->includedOnlyMeshes().end());
+    stl_util::remove_vector_elements_equal_sharedptr_wrapped(light->includedOnlyMeshes, this); // Checked
 
     // Excluded meshes
-    light->excludedMeshes().erase(std::remove_if(light->excludedMeshes().begin(),
-                                                 light->excludedMeshes().end(),
-                                                 [this](const AbstractMeshPtr& excludedMesh) {
-                                                   return excludedMesh.get() == this;
-                                                 }),
-                                  light->excludedMeshes().end());
+    stl_util::remove_vector_elements_equal_sharedptr_wrapped(light->excludedMeshes, this); // Checked
 
     // Shadow generators
     auto generator = light->getShadowGenerator();
     if (generator) {
       auto shadowMap = generator->getShadowMap();
       if (shadowMap && !shadowMap->renderList().empty()) {
-        shadowMap->renderList().erase(
-          std::remove_if(shadowMap->renderList().begin(), shadowMap->renderList().end(),
-                         [this](const AbstractMesh* mesh) { return mesh == this; }),
-          shadowMap->renderList().end());
+        stl_util::remove_vector_elements_equal_ptr_wrapped(shadowMap->renderList, this);
       }
     }
   }

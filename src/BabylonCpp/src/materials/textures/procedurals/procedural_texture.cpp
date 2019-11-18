@@ -572,13 +572,7 @@ void ProceduralTexture::dispose()
     return;
   }
 
-  scene->proceduralTextures.erase(
-    std::remove_if(scene->proceduralTextures.begin(),
-                   scene->proceduralTextures.end(),
-                   [this](const ProceduralTexturePtr& proceduralTexture) {
-                     return proceduralTexture.get() == this;
-                   }),
-    scene->proceduralTextures.end());
+  stl_util::remove_vector_elements_equal_sharedptr(scene->proceduralTextures, this);
 
   auto& vertexBuffer = _vertexBuffers[VertexBuffer::PositionKind];
   if (vertexBuffer) {

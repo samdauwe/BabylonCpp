@@ -549,13 +549,7 @@ void UniformBuffer::dispose()
     return;
   }
 
-  _engine->_uniformBuffers.erase(
-    std::remove_if(_engine->_uniformBuffers.begin(),
-                   _engine->_uniformBuffers.end(),
-                   [this](const UniformBuffer* uniformBuffer) {
-                     return uniformBuffer == this;
-                   }),
-    _engine->_uniformBuffers.end());
+  stl_util::remove_vector_elements_equal_ptr(_engine->_uniformBuffers, this);
 
   if (!_buffer) {
     return;

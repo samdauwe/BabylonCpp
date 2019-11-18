@@ -1,5 +1,6 @@
 #include <babylon/lensflares/lens_flare.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
 #include <babylon/lensflares/lens_flare_system.h>
@@ -42,12 +43,7 @@ void LensFlare::dispose()
   }
 
   // Remove from scene
-  _system->lensFlares.erase(
-    std::remove_if(_system->lensFlares.begin(), _system->lensFlares.end(),
-                   [this](const LensFlarePtr& lensFlare) {
-                     return lensFlare.get() == this;
-                   }),
-    _system->lensFlares.end());
+  stl_util::remove_vector_elements_equal_sharedptr(_system->lensFlares, this);
 }
 
 } // end of namespace BABYLON

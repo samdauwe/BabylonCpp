@@ -1,5 +1,6 @@
 #include <babylon/materials/textures/internal_texture.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/engines/constants.h>
 #include <babylon/engines/depth_texture_creation_options.h>
@@ -290,11 +291,7 @@ void InternalTexture::_swapAndDie(const InternalTexturePtr& target)
   }
 
   auto& cache = _engine->getLoadedTexturesCache();
-  cache.erase(std::remove_if(cache.begin(), cache.end(),
-                             [this](const InternalTexturePtr& internalTexture) {
-                               return internalTexture.get() == this;
-                             }),
-              cache.end());
+  stl_util::remove_vector_elements_equal_sharedptr(cache, this);
 
   auto it = std::find(cache.begin(), cache.end(), target);
   if (it == cache.end()) {

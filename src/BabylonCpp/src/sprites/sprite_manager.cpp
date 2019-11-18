@@ -1,5 +1,6 @@
 #include <babylon/sprites/sprite_manager.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/collisions/picking_info.h>
 #include <babylon/culling/ray.h>
@@ -381,12 +382,7 @@ void SpriteManager::dispose(bool /*doNotRecurse*/,
   }
 
   // Remove from scene
-  _scene->spriteManagers.erase(
-    std::remove_if(_scene->spriteManagers.begin(), _scene->spriteManagers.end(),
-                   [this](const ISpriteManagerPtr& spriteManager) {
-                     return spriteManager.get() == this;
-                   }),
-    _scene->spriteManagers.end());
+  stl_util::remove_vector_elements_equal_sharedptr(_scene->spriteManagers, this);
 
   // Callback
   onDisposeObservable.notifyObservers(this);

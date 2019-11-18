@@ -131,12 +131,7 @@ void MultiMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
   }
 
   // Remove from scene
-  scene->multiMaterials.erase(
-    std::remove_if(scene->multiMaterials.begin(), scene->multiMaterials.end(),
-                   [this](const MultiMaterialPtr& multiMaterial) {
-                     return multiMaterial.get() == this;
-                   }),
-    scene->multiMaterials.end());
+  stl_util::remove_vector_elements_equal_sharedptr(scene->multiMaterials, this);
 
   Material::dispose(forceDisposeEffect, forceDisposeTextures);
 }

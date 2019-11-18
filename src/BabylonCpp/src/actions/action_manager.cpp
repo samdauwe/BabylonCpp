@@ -3,6 +3,7 @@
 #include <nlohmann/json.hpp>
 #include <numeric>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/actions/action.h>
 #include <babylon/actions/action_event.h>
 #include <babylon/babylon_stl_util.h>
@@ -35,12 +36,7 @@ void ActionManager::dispose(bool /*doNotRecurse*/,
       --ActionManager::Triggers[action->trigger];
     }
   }
-  _scene->actionManagers.erase(
-    std::remove_if(_scene->actionManagers.begin(), _scene->actionManagers.end(),
-                   [this](const AbstractActionManagerPtr& actionManager) {
-                     return actionManager.get() == this;
-                   }),
-    _scene->actionManagers.end());
+  stl_util::remove_vector_elements_equal_sharedptr(_scene->actionManagers, this);
 }
 
 Scene* ActionManager::getScene() const

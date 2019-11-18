@@ -2,6 +2,7 @@
 
 #include <cmath>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/math/color4.h>
 #include <babylon/sprites/sprite_manager.h>
@@ -113,12 +114,7 @@ void Sprite::_animate(float deltaTime)
 void Sprite::dispose()
 {
   // Remove from scene
-  _manager->sprites.erase(std::remove_if(_manager->sprites.begin(),
-                                         _manager->sprites.end(),
-                                         [this](const SpritePtr& sprite) {
-                                           return sprite.get() == this;
-                                         }),
-                          _manager->sprites.end());
+  stl_util::remove_vector_elements_equal_sharedptr(_manager->sprites, this);
 }
 
 } // end of namespace BABYLON

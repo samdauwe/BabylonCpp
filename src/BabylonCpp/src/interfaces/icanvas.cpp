@@ -83,15 +83,11 @@ void ICanvas::removeMouseEventListener(
 {
   auto& listeners = mouseEventListeners[static_cast<unsigned>(type)];
   // Remove from listeners
-  listeners.erase(
-    std::remove_if(
-      listeners.begin(), listeners.end(),
-      [&listener](
-        const std::function<void(PointerEvent && evt)>& mouseEventListener) {
-        return stl_util::get_address(listener)
-               == stl_util::get_address(mouseEventListener);
-      }),
-    listeners.end());
+  stl_util::erase_remove_if(listeners, 
+    [&listener](const std::function<void(PointerEvent && evt)>& mouseEventListener) {
+      return stl_util::get_address(listener) == stl_util::get_address(mouseEventListener);
+    }
+  );
 }
 
 void ICanvas::removeKeyEventListener(
@@ -99,15 +95,11 @@ void ICanvas::removeKeyEventListener(
 {
   auto& listeners = keyEventListeners[static_cast<unsigned>(type)];
   // Remove from listeners
-  listeners.erase(
-    std::remove_if(
-      listeners.begin(), listeners.end(),
-      [&listener](
-        const std::function<void(KeyboardEvent && evt)>& keyEventListener) {
-        return stl_util::get_address(listener)
-               == stl_util::get_address(keyEventListener);
-      }),
-    listeners.end());
+  stl_util::erase_remove_if(listeners, 
+    [&listener](const std::function<void(KeyboardEvent && evt)>& keyEventListener) {
+      return stl_util::get_address(listener) == stl_util::get_address(keyEventListener);
+    }
+  );
 }
 
 void ICanvas::setFrameSize(int w, int h)

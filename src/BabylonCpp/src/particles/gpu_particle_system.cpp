@@ -1423,13 +1423,7 @@ void GPUParticleSystem::dispose(bool disposeTexture,
                                 bool /*disposeMaterialAndTextures*/)
 {
   // Remove from scene
-  _scene->particleSystems.erase(
-    std::remove_if(_scene->particleSystems.begin(),
-                   _scene->particleSystems.end(),
-                   [this](const IParticleSystemPtr& particleSystem) {
-                     return particleSystem.get() == this;
-                   }),
-    _scene->particleSystems.end());
+  stl_util::remove_vector_elements_equal_sharedptr(_scene->particleSystems, this);
 
   _releaseBuffers();
   _releaseVAOs();

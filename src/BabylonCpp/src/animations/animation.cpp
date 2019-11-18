@@ -1,5 +1,6 @@
 #include <babylon/animations/animation.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/animations/_ianimation_state.h>
 #include <babylon/animations/animatable.h>
 #include <babylon/animations/easing/ieasing_function.h>
@@ -224,12 +225,10 @@ void Animation::addEvent(const AnimationEvent& event)
 
 void Animation::removeEvents(float frame)
 {
-  _events.erase(std::remove_if(_events.begin(), _events.end(),
-                               [frame](const AnimationEvent& event) {
-                                 return stl_util::almost_equal(event.frame,
-                                                               frame);
-                               }),
-                _events.end());
+  stl_util::erase_remove_if(
+    _events,
+    [frame](const AnimationEvent& event) { return stl_util::almost_equal(event.frame, frame); }
+  );
 }
 
 std::vector<AnimationEvent>& Animation::getEvents()
@@ -252,11 +251,10 @@ void Animation::deleteRange(const std::string& iName, bool deleteFrames)
       const auto& from = _ranges[iName].from;
       const auto& to   = _ranges[iName].to;
 
-      _keys.erase(std::remove_if(_keys.begin(), _keys.end(),
-                                 [from, to](const IAnimationKey& key) {
-                                   return key.frame >= from && key.frame <= to;
-                                 }),
-                  _keys.end());
+      stl_util::erase_remove_if(
+        _keys,
+        [from, to](const IAnimationKey& key) { return key.frame >= from && key.frame <= to; }
+      );
     }
     _ranges.erase(iName);
   }

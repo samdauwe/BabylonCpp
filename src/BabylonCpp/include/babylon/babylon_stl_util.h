@@ -673,17 +673,67 @@ inline std::vector<T> splice(std::vector<T>& v, int index = 0, int howmany = 0,
   }
 }
 
+//////////////////////////////////////////
+//      erase_remove helpers            //
+//////////////////////////////////////////
 template <typename T>
 inline void remove(std::vector<T>& vec, size_t pos)
 {
   vec.erase(vec.begin() + pos);
 }
 
-template <typename C, typename P>
-inline void remove_if(C& c, const P& p)
+template <typename Container, typename Predicate>
+inline void erase_remove_if(Container& c, Predicate p)
 {
   c.erase(std::remove_if(std::begin(c), std::end(c), p), std::end(c));
 }
+
+template <typename T>
+inline void remove_vector_elements_equal(std::vector<T>& vec, const T& val)
+{
+  erase_remove_if(vec, [](auto v) { return v == val; });
+}
+
+template <typename BaseClass, typename DerivedClass>
+inline void remove_vector_elements_equal_ptr(std::vector<BaseClass*>& vec,
+                                             const DerivedClass* const pointer_to_remove)
+{
+  erase_remove_if(vec, 
+    [pointer_to_remove](const BaseClass* const v) { return v == pointer_to_remove; }
+  );
+}
+
+template <typename BaseClass, typename DerivedClass>
+inline void remove_vector_elements_equal_sharedptr(std::vector<std::shared_ptr<BaseClass>>& vec,
+                                                   const DerivedClass* const pointer_to_remove)
+{
+  erase_remove_if(
+    vec,
+    [pointer_to_remove](const std::shared_ptr<BaseClass>& v) { return v.get() == pointer_to_remove; }
+  );
+}
+
+template <typename T, typename SharePtrVectorWrapper>
+inline void remove_vector_elements_equal_sharedptr_wrapped(
+  SharePtrVectorWrapper& wrapped_vector,
+  const T* const pointer_to_remove)
+{
+  auto& vec = static_cast<std::vector<std::shared_ptr<T>>&>(wrapped_vector);
+  remove_vector_elements_equal_sharedptr(vec, pointer_to_remove);
+}
+
+template <typename T, typename SharePtrVectorWrapper>
+inline void remove_vector_elements_equal_ptr_wrapped(SharePtrVectorWrapper& wrapped_vector,
+                                                     const T* const pointer_to_remove)
+{
+  auto& vec = static_cast<std::vector<T *>&>(wrapped_vector);
+  remove_vector_elements_equal_ptr(vec, pointer_to_remove);
+}
+//////////////////////////////////////////
+//  end of erase_remove helpers         //
+//////////////////////////////////////////
+
+
 
 template <typename Container, typename JsStyleSortFunction>
 void sort_js_style(Container container, JsStyleSortFunction fn)

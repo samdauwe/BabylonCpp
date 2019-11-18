@@ -350,13 +350,7 @@ void LensFlareSystem::dispose()
   lensFlares.clear();
 
   // Remove from scene
-  _scene->lensFlareSystems.erase(
-    std::remove_if(_scene->lensFlareSystems.begin(),
-                   _scene->lensFlareSystems.end(),
-                   [this](const LensFlareSystemPtr& fensFlareSystem) {
-                     return fensFlareSystem.get() == this;
-                   }),
-    _scene->lensFlareSystems.end());
+  stl_util::remove_vector_elements_equal_sharedptr(_scene->lensFlareSystems, this);
 }
 
 LensFlareSystemPtr LensFlareSystem::Parse(const json& /*parsedLensFlareSystem*/,

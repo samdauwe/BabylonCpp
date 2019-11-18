@@ -293,13 +293,7 @@ bool Animatable::_animate(const millisecond_t& delay)
   if (!running) {
     if (disposeOnEnd) {
       // Remove from active animatables
-      _scene->_activeAnimatables.erase(std::remove_if(_scene->_activeAnimatables.begin(),
-                                                      _scene->_activeAnimatables.end(),
-                                                      [this](const AnimatablePtr& animatable) {
-                                                        return animatable.get() == this;
-                                                      }),
-                                       _scene->_activeAnimatables.end());
-
+      stl_util::remove_vector_elements_equal_sharedptr(_scene->_activeAnimatables, this);
       // Dispose all runtime animations
 #if 0
       for (const auto& runtimeAnimation : _runtimeAnimations) {
