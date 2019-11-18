@@ -24,8 +24,7 @@ using VolumetricLightScatteringPostProcessPtr
  *
  * Inspired by http://http.developer.nvidia.com/GPUGems3/gpugems3_ch13.html
  */
-class BABYLON_SHARED_EXPORT VolumetricLightScatteringPostProcess
-    : public PostProcess {
+class BABYLON_SHARED_EXPORT VolumetricLightScatteringPostProcess : public PostProcess {
 
 public:
   template <typename... Ts>
@@ -37,13 +36,13 @@ public:
 
     return postProcess;
   }
-  ~VolumetricLightScatteringPostProcess(); // = default
+  ~VolumetricLightScatteringPostProcess() override; // = default
 
   /**
    * @brief Returns the string "VolumetricLightScatteringPostProcess".
    * @returns "VolumetricLightScatteringPostProcess"
    */
-  const std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
   /**
    * @brief Sets the new light position for light scattering effect.
@@ -96,9 +95,8 @@ protected:
    * components. If "camera" is null a "scene" must be provided
    */
   VolumetricLightScatteringPostProcess(
-    const std::string& name, float ratio, const CameraPtr& camera,
-    const MeshPtr& mesh, unsigned int samples = 100,
-    unsigned int samplingMode = TextureConstants::BILINEAR_SAMPLINGMODE,
+    const std::string& name, float ratio, const CameraPtr& camera, const MeshPtr& mesh,
+    unsigned int samples = 100, unsigned int samplingMode = TextureConstants::BILINEAR_SAMPLINGMODE,
     Engine* engine = nullptr, bool reusable = false, Scene* scene = nullptr);
 
 private:

@@ -45,11 +45,11 @@ public:
   /**
    * @brief Clones, or makes a deep copy, or the polygon.
    */
-  Polygon clone() const;
+  [[nodiscard]] Polygon clone() const;
 
-  std::unique_ptr<Polygon> cloneToNewObject() const;
+  [[nodiscard]] std::unique_ptr<Polygon> cloneToNewObject() const;
   friend std::ostream& operator<<(std::ostream& os, const Polygon& polygon);
-  std::string toString() const;
+  [[nodiscard]] std::string toString() const;
 
   /**
    * @brief Flips the faces of the polygon.

@@ -23,7 +23,7 @@ public:
 
     return texture;
   }
-  ~RoadProceduralTexture(); // = default
+  ~RoadProceduralTexture() override; // = default
 
   void updateShaderUniforms();
 
@@ -42,13 +42,12 @@ public:
    * information
    * @returns a parsed Road Procedural Texture
    */
-  static std::unique_ptr<RoadProceduralTexture>
-  Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
+  static std::unique_ptr<RoadProceduralTexture> Parse(const json& parsedTexture, Scene* scene,
+                                                      const std::string& rootUrl);
 
 protected:
   RoadProceduralTexture(const std::string& name, const Size& size, Scene* scene,
-                        Texture* fallbackTexture = nullptr,
-                        bool generateMipMaps     = false);
+                        Texture* fallbackTexture = nullptr, bool generateMipMaps = false);
 
   Color3& get_roadColor();
   void set_roadColor(const Color3& value);

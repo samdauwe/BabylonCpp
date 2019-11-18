@@ -14,10 +14,9 @@ namespace BABYLON {
 class BackgroundMaterial;
 class ImageProcessingConfiguration;
 class IShadowLight;
-using BackgroundMaterialPtr = std::shared_ptr<BackgroundMaterial>;
-using ImageProcessingConfigurationPtr
-  = std::shared_ptr<ImageProcessingConfiguration>;
-using IShadowLightPtr = std::shared_ptr<IShadowLight>;
+using BackgroundMaterialPtr           = std::shared_ptr<BackgroundMaterial>;
+using ImageProcessingConfigurationPtr = std::shared_ptr<ImageProcessingConfiguration>;
+using IShadowLightPtr                 = std::shared_ptr<IShadowLight>;
 
 /**
  * @brief Background material used to create an efficient environement around
@@ -40,25 +39,25 @@ public:
   template <typename... Ts>
   static BackgroundMaterialPtr New(Ts&&... args)
   {
-    auto material = std::shared_ptr<BackgroundMaterial>(
-      new BackgroundMaterial(std::forward<Ts>(args)...));
+    auto material
+      = std::shared_ptr<BackgroundMaterial>(new BackgroundMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;
   }
-  ~BackgroundMaterial(); // = default
+  ~BackgroundMaterial() override; // = default
 
   /**
    * @brief The entire material has been created in order to prevent overdraw.
    * @returns false
    */
-  bool needAlphaTesting() const override;
+  [[nodiscard]] bool needAlphaTesting() const override;
 
   /**
    * @brief The entire material has been created in order to prevent overdraw.
    * @returns true if blending is enable
    */
-  bool needAlphaBlending() const override;
+  [[nodiscard]] bool needAlphaBlending() const override;
 
   /**
    * @brief Checks wether the material is ready to be rendered for a given mesh.
@@ -100,36 +99,35 @@ public:
    * @param texture - Base texture to use.
    * @returns - Boolean specifying if a texture is used in the material.
    */
-  bool hasTexture(const BaseTexturePtr& texture) const override;
+  [[nodiscard]] bool hasTexture(const BaseTexturePtr& texture) const override;
 
   /**
    * @brief Dispose the material.
    * @param forceDisposeEffect Force disposal of the associated effect.
    * @param forceDisposeTextures Force disposal of the associated textures.
    */
-  void dispose(bool forceDisposeEffect   = false,
-               bool forceDisposeTextures = false,
-               bool notBoundToMesh       = false) override;
+  void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
+               bool notBoundToMesh = false) override;
 
   /**
    * @brief Clones the material.
    * @param name The cloned name.
    * @returns The cloned material.
    */
-  MaterialPtr clone(const std::string& name,
-                    bool cloneChildren = false) const override;
+  [[nodiscard]] MaterialPtr clone(const std::string& name,
+                                  bool cloneChildren = false) const override;
 
   /**
    * @brief Serializes the current material to its JSON representation.
    * @returns The JSON representation.
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Gets the class name of the material
    * @returns "BackgroundMaterial"
    */
-  const std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
   /**
    * @brief Parse a JSON input to create back a background material.
@@ -138,8 +136,8 @@ public:
    * @param rootUrl The root url of the assets the material depends upon
    * @returns the instantiated BackgroundMaterial.
    */
-  static std::unique_ptr<BackgroundMaterial>
-  Parse(const json& source, Scene* scene, const std::string& url);
+  static std::unique_ptr<BackgroundMaterial> Parse(const json& source, Scene* scene,
+                                                   const std::string& url);
 
 protected:
   /**
@@ -153,8 +151,7 @@ protected:
    * @brief Attaches a new image processing configuration to the PBR Material.
    * @param configuration (if null the scene configuration will be use)
    */
-  void _attachImageProcessingConfiguration(
-    const ImageProcessingConfigurationPtr& configuration);
+  void _attachImageProcessingConfiguration(const ImageProcessingConfigurationPtr& configuration);
 
   /**
    * @brief Gets the key light Color (multiply against the environement
@@ -195,7 +192,7 @@ protected:
    * order to help scaling the colors. The color opposite to the primary color
    * is used at the level chosen to define what the black area would look.
    */
-  float get_primaryColorShadowLevel() const;
+  [[nodiscard]] float get_primaryColorShadowLevel() const;
 
   /**
    * @brief Sets the level of the shadows (dark area of the reflection map) in
@@ -209,7 +206,7 @@ protected:
    * map) in order to help scaling the colors. The primary color is used at the
    * level chosen to define what the white area would look.
    */
-  float get_primaryColorHighlightLevel() const;
+  [[nodiscard]] float get_primaryColorHighlightLevel() const;
 
   /**
    *  @brief Sets the level of the highliights (highlight area of the reflection
@@ -238,7 +235,7 @@ protected:
    * Can be use to reuse an existing HDR Texture and target a specific LOD to
    * prevent authoring the texture twice.
    */
-  float get_reflectionBlur() const;
+  [[nodiscard]] float get_reflectionBlur() const;
 
   /**
    *  @brief Sets the reflection Texture level of blur.
@@ -278,7 +275,7 @@ protected:
    * @brief Helps adjusting the shadow to a softer level if required.
    * 0 means black shadows and 1 means no shadows.
    */
-  float get_shadowLevel() const;
+  [[nodiscard]] float get_shadowLevel() const;
 
   /**
    * @brief Helps adjusting the shadow to a softer level if required.
@@ -305,7 +302,7 @@ protected:
    * box at grazing angle. This helps ensuring a nice transition when the camera
    * goes under the ground.
    */
-  bool get_opacityFresnel() const;
+  [[nodiscard]] bool get_opacityFresnel() const;
 
   /**
    * @brief This helps specifying that the material is falling off to the sky
@@ -319,7 +316,7 @@ protected:
    * to the reflection texture at grazing angle. This helps adding a mirror
    * texture on the ground.
    */
-  bool get_reflectionFresnel() const;
+  [[nodiscard]] bool get_reflectionFresnel() const;
 
   /**
    * @brief This helps specifying that the material is falling off from diffuse
@@ -333,7 +330,7 @@ protected:
    * from the sceneCenter. This helps adding a nice falloff effect to the
    * reflection if used as a mirror for instance.
    */
-  float get_reflectionFalloffDistance() const;
+  [[nodiscard]] float get_reflectionFalloffDistance() const;
 
   /**
    * @brief This helps specifying the falloff radius off the reflection texture
@@ -346,7 +343,7 @@ protected:
    * @brief Gets the weight of the reflection against the background in case of
    * reflection Fresnel.
    */
-  float get_reflectionAmount() const;
+  [[nodiscard]] float get_reflectionAmount() const;
 
   /**
    * @brief Sets the weight of the reflection against the background in case of
@@ -357,7 +354,7 @@ protected:
   /**
    * @brief Gets the weight of the reflection at grazing angle.
    */
-  float get_reflectionReflectance0() const;
+  [[nodiscard]] float get_reflectionReflectance0() const;
 
   /**
    * @brief Sets the weight of the reflection at grazing angle.
@@ -367,7 +364,7 @@ protected:
   /**
    * @brief Gets the weight of the reflection at a perpendicular point of view.
    */
-  float get_reflectionReflectance90() const;
+  [[nodiscard]] float get_reflectionReflectance90() const;
 
   /**
    * @brief Sets the weight of the reflection at a perpendicular point of view.
@@ -383,7 +380,7 @@ protected:
   /**
    * @brief Helps to directly use the maps channels instead of their level.
    */
-  bool get_useRGBColor() const;
+  [[nodiscard]] bool get_useRGBColor() const;
 
   /**
    * @brief Helps to directly use the maps channels instead of their level.
@@ -394,7 +391,7 @@ protected:
    * @brief This helps reducing the banding effect that could occur on the
    * background.
    */
-  bool get_enableNoise() const;
+  [[nodiscard]] bool get_enableNoise() const;
 
   /**
    * @brief This helps reducing the banding effect that could occur on the
@@ -406,7 +403,7 @@ protected:
    * @brief Gets the current fov(field of view) multiplier.
    * @return The current fov(field of view) multiplier.
    */
-  float get_fovMultiplier() const;
+  [[nodiscard]] float get_fovMultiplier() const;
 
   /**
    * @brief Sets the reflection reflectance fresnel values according to the
@@ -417,7 +414,7 @@ protected:
   /**
    * @brief Gets the number of Simultaneous lights allowed on the material.
    */
-  unsigned int get_maxSimultaneousLights() const;
+  [[nodiscard]] unsigned int get_maxSimultaneousLights() const;
 
   /**
    * @brief Sets the number of Simultaneous lights allowed on the material.
@@ -436,13 +433,12 @@ protected:
    *
    * If sets to null, the scene one is in use.
    */
-  void set_imageProcessingConfiguration(
-    const ImageProcessingConfigurationPtr& value);
+  void set_imageProcessingConfiguration(const ImageProcessingConfigurationPtr& value);
 
   /**
    * @brief Gets wether the color curves effect is enabled.
    */
-  bool get_cameraColorCurvesEnabled() const;
+  [[nodiscard]] bool get_cameraColorCurvesEnabled() const;
 
   /**
    * @brief Sets wether the color curves effect is enabled.
@@ -452,7 +448,7 @@ protected:
   /**
    * @brief Gets wether the color grading effect is enabled.
    */
-  bool get_cameraColorGradingEnabled() const;
+  [[nodiscard]] bool get_cameraColorGradingEnabled() const;
 
   /**
    * @brief Gets wether the color grading effect is enabled.
@@ -462,7 +458,7 @@ protected:
   /**
    * @brief Gets wether tonemapping is enabled or not.
    */
-  bool get_cameraToneMappingEnabled() const;
+  [[nodiscard]] bool get_cameraToneMappingEnabled() const;
 
   /**
    * @brief Sets wether tonemapping is enabled or not
@@ -475,7 +471,7 @@ protected:
    * without full screen post process. This corresponds to a photographic
    * exposure.
    */
-  float get_cameraExposure() const;
+  [[nodiscard]] float get_cameraExposure() const;
 
   /**
    * @brief The camera exposure used on this material.
@@ -488,7 +484,7 @@ protected:
   /**
    * @brief Gets The camera contrast used on this material.
    */
-  float get_cameraContrast() const;
+  [[nodiscard]] float get_cameraContrast() const;
 
   /**
    * @brief Sets The camera contrast used on this material.
@@ -535,7 +531,7 @@ protected:
    * @brief Gets a boolean indicating that current material needs to register
    * RTT.
    */
-  bool get_hasRenderTargetTextures() const override;
+  [[nodiscard]] bool get_hasRenderTargetTextures() const override;
 
 private:
   /**
@@ -698,8 +694,7 @@ public:
   /**
    * Gets the image processing configuration used either in this material.
    */
-  Property<BackgroundMaterial, ImageProcessingConfigurationPtr>
-    imageProcessingConfiguration;
+  Property<BackgroundMaterial, ImageProcessingConfigurationPtr> imageProcessingConfiguration;
 
   /**
    * Gets wether the color curves effect is enabled.

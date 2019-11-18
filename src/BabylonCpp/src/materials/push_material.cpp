@@ -17,7 +17,7 @@ PushMaterial::PushMaterial(const std::string& iName, Scene* scene)
 
 PushMaterial::~PushMaterial() = default;
 
-const std::string PushMaterial::getClassName() const
+std::string PushMaterial::getClassName() const
 {
   return "PushMaterial";
 }

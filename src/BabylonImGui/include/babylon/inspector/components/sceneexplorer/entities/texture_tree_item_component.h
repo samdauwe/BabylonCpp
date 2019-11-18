@@ -18,8 +18,7 @@ struct ITextureTreeItemComponentProps {
   std::function<void()> onClick = nullptr;
 }; // end of struct ITextureTreeItemComponentProps
 
-class BABYLON_SHARED_EXPORT TextureTreeItemComponent
-    : public TreeItemSpecializedComponent {
+class BABYLON_SHARED_EXPORT TextureTreeItemComponent : public TreeItemSpecializedComponent {
 
 public:
   /** Font Awesome Icon Unicodes **/
@@ -27,7 +26,7 @@ public:
 
 public:
   TextureTreeItemComponent(const ITextureTreeItemComponentProps& props);
-  virtual ~TextureTreeItemComponent(); // = default
+  ~TextureTreeItemComponent() override; // = default
 
   void render() override;
 

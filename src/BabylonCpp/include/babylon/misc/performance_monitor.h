@@ -37,36 +37,36 @@ public:
    * @brief Returns the average frame time in milliseconds over the sliding
    * window (or the subset of frames sampled so far)
    */
-  float averageFrameTime() const;
+  [[nodiscard]] float averageFrameTime() const;
 
   /**
    * @brief Returns the variance frame time in milliseconds over the sliding
    * window (or the subset of frames sampled so far)
    */
-  float averageFrameTimeVariance() const;
+  [[nodiscard]] float averageFrameTimeVariance() const;
 
   /**
    * @brief Returns the frame time of the most recent frame
    */
-  float instantaneousFrameTime() const;
+  [[nodiscard]] float instantaneousFrameTime() const;
 
   /**
    * @brief Returns the average framerate in frames per second over the sliding
    * window (or the subset of frames sampled so far)
    */
-  float averageFPS() const;
+  [[nodiscard]] float averageFPS() const;
 
   /**
    * @brief Returns the average framerate in frames per second using the most
    * recent frame time
    */
-  float instantaneousFPS() const;
+  [[nodiscard]] float instantaneousFPS() const;
 
   /**
    * @brief Returns true if enough samples have been taken to completely fill
    * the sliding window
    */
-  bool isSaturated() const;
+  [[nodiscard]] bool isSaturated() const;
 
   /**
    * @brief Enables contributions to the sliding window sample set
@@ -82,7 +82,7 @@ public:
   /**
    * @brief Returns true if sampling is enabled
    */
-  bool isEnabled() const;
+  [[nodiscard]] bool isEnabled() const;
 
   /**
    * @brief Resets performance monitor

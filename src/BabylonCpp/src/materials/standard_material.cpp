@@ -420,7 +420,7 @@ StandardMaterial::StandardMaterial(const StandardMaterial& other)
 
 StandardMaterial::~StandardMaterial() = default;
 
-const std::string StandardMaterial::getClassName() const
+std::string StandardMaterial::getClassName() const
 {
   return "StandardMaterial";
 }
@@ -611,7 +611,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
           }
 
           defines.boolDef["USE_LOCAL_REFLECTIONMAP_CUBIC"]
-            = _reflectionTexture->boundingBoxSize() ? true : false;
+            = static_cast<bool>(_reflectionTexture->boundingBoxSize());
         }
       }
       else {

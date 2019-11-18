@@ -27,13 +27,13 @@ public:
   ~Size(); // = default
   Size& operator=(const Size& otherSize);
   Size& operator=(Size&& otherSize);
-  Size copy() const;
+  [[nodiscard]] Size copy() const;
 
   /**
    * @brief Clones the size.
    * @returns a new Size copied from the given one.
    */
-  std::unique_ptr<Size> clone() const;
+  [[nodiscard]] std::unique_ptr<Size> clone() const;
 
   friend std::ostream& operator<<(std::ostream& os, const Size& size);
 
@@ -41,19 +41,19 @@ public:
    * @brief Returns a string with the Size width and height.
    * @returns a string with the Size width and height
    */
-  std::string toString() const;
+  [[nodiscard]] std::string toString() const;
 
   /**
    * @brief "Size"
    * @returns the string "Size"
    */
-  const char* getClassName() const;
+  [[nodiscard]] const char* getClassName() const;
 
   /**
    * @brief Returns the Size hash code.
    * @returns a hash code for a unique width and height
    */
-  int getHashCode() const;
+  [[nodiscard]] int getHashCode() const;
 
   /**
    * @brief Updates the current size from the given one.
@@ -84,7 +84,7 @@ public:
    * @returns a new Size set with the multiplication result of the current Size
    * and the given floats.
    */
-  Size multiplyByFloats(float w, float h) const;
+  [[nodiscard]] Size multiplyByFloats(float w, float h) const;
 
   /**
    * @brief True if the current Size and the given one width and height are
@@ -98,7 +98,7 @@ public:
   /**
    * @brief Returns the surface of the Size : width * height (float).
    */
-  int surface() const;
+  [[nodiscard]] int surface() const;
 
   /**
    * @brief Create a new size of zero.
@@ -112,7 +112,7 @@ public:
    * @returns a new Size set as the addition result of the current Size and the
    * given one.
    */
-  Size add(const Size& otherSize) const;
+  [[nodiscard]] Size add(const Size& otherSize) const;
 
   /**
    *@brief Subtracts the width and height of two.
@@ -120,9 +120,9 @@ public:
    * @returns a new Size set as the subtraction result of  the given one from
    *the current Size.
    */
-  Size subtract(const Size& otherSize) const;
+  [[nodiscard]] Size subtract(const Size& otherSize) const;
 
-  Size scale(float scale) const;
+  [[nodiscard]] Size scale(float scale) const;
 
   /**
    * @brief Creates a new Size set at the linear interpolation "amount" between

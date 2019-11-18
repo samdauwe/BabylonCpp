@@ -29,24 +29,22 @@ public:
   template <typename... Ts>
   static MorphTargetPtr New(Ts&&... args)
   {
-    return std::shared_ptr<MorphTarget>(
-      new MorphTarget(std::forward<Ts>(args)...));
+    return std::shared_ptr<MorphTarget>(new MorphTarget(std::forward<Ts>(args)...));
   }
-  ~MorphTarget(); // = default
+  ~MorphTarget() override; // = default
 
-  Type type() const override;
+  [[nodiscard]] Type type() const override;
 
   /**
    * @brief Gets a property.
    */
-  virtual AnimationValue
-  getProperty(const std::vector<std::string>& targetPropertyPath) override;
+  AnimationValue getProperty(const std::vector<std::string>& targetPropertyPath) override;
 
   /**
    * @brief Sets a property.
    */
-  virtual void setProperty(const std::vector<std::string>& targetPropertyPath,
-                           const AnimationValue& value) override;
+  void setProperty(const std::vector<std::string>& targetPropertyPath,
+                   const AnimationValue& value) override;
 
   /**
    * @brief Gets the animations.
@@ -69,7 +67,7 @@ public:
    * @brief Gets the position data stored in this target.
    * @returns a FloatArray containing the position data (or null if not present)
    */
-  const Float32Array& getPositions() const;
+  [[nodiscard]] const Float32Array& getPositions() const;
 
   /**
    * @brief Affects normal data to this target.
@@ -87,7 +85,7 @@ public:
    * @brief Gets the normal data stored in this target.
    * @returns a FloatArray containing the normal data (or null if not present)
    */
-  const Float32Array& getNormals() const;
+  [[nodiscard]] const Float32Array& getNormals() const;
 
   /**
    * @brief Affects tangent data to this target.
@@ -105,7 +103,7 @@ public:
    * @brief Gets the tangent data stored in this target.
    * @returns a FloatArray containing the tangent data (or null if not present)
    */
-  const Float32Array& getTangents() const;
+  [[nodiscard]] const Float32Array& getTangents() const;
 
   /**
    * @brief Affects texture coordinates data to this target.
@@ -118,19 +116,19 @@ public:
    * @returns a FloatArray containing the texture coordinates data (or null if
    * not present)
    */
-  const Float32Array& getUVs() const;
+  [[nodiscard]] const Float32Array& getUVs() const;
 
   /**
    * @brief Serializes the current target into a Serialization object.
    * @returns the serialized object.
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Returns the string "MorphTarget".
    * @returns "MorphTarget"
    */
-  std::string getClassName() const;
+  [[nodiscard]] std::string getClassName() const;
 
   // Statics
 
@@ -156,7 +154,7 @@ protected:
    * @brief Gets the influence of this target (ie. its weight in the overall
    * morphing).
    */
-  float get_influence() const;
+  [[nodiscard]] float get_influence() const;
 
   /**
    * @brief Sets the influence of this target (ie. its weight in the overall
@@ -172,29 +170,28 @@ protected:
   /**
    * @brief Sets the animation properties override
    */
-  void set_animationPropertiesOverride(
-    const AnimationPropertiesOverridePtr& value) override;
+  void set_animationPropertiesOverride(const AnimationPropertiesOverridePtr& value) override;
 
   /**
    * @brief Gets a boolean defining if the target contains position data.
    */
-  bool get_hasPositions() const;
+  [[nodiscard]] bool get_hasPositions() const;
 
   /**
    * @brief Gets a boolean defining if the target contains normal data.
    */
-  bool get_hasNormals() const;
+  [[nodiscard]] bool get_hasNormals() const;
 
   /**
    * @brief Gets a boolean defining if the target contains tangent data.
    */
-  bool get_hasTangents() const;
+  [[nodiscard]] bool get_hasTangents() const;
 
   /**
    * @brief Gets a boolean defining if the target contains texture coordinates
    * data.
    */
-  bool get_hasUVs() const;
+  [[nodiscard]] bool get_hasUVs() const;
 
 public:
   /**
@@ -203,8 +200,7 @@ public:
    * @param influence defines the influence to use
    * @param scene defines the scene the morphtarget belongs to
    */
-  MorphTarget(const std::string& name, float influence = 0.f,
-              Scene* scene = nullptr);
+  MorphTarget(const std::string& name, float influence = 0.f, Scene* scene = nullptr);
 
   /**
    * Gets or sets the list of animations

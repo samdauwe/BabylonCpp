@@ -21,10 +21,9 @@ public:
   template <typename... Ts>
   static AssetContainerPtr New(Ts&&... args)
   {
-    return std::shared_ptr<AssetContainer>(
-      new AssetContainer(std::forward<Ts>(args)...));
+    return std::shared_ptr<AssetContainer>(new AssetContainer(std::forward<Ts>(args)...));
   }
-  ~AssetContainer(); // = default
+  ~AssetContainer() override; // = default
 
   /**
    * @brief Adds all the assets from the container to the scene.

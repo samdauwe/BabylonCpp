@@ -14,13 +14,12 @@ class FastSimplexNoise;
 class Heightmap {
 
 public:
-  Heightmap(const std::string& seed, float maxHeight, float height,
-            float width);
+  Heightmap(const std::string& seed, float maxHeight, float height, float width);
   ~Heightmap(); // = default
 
   void generateHeightmap();
-  float getHeight(float u, float v) const;
-  float getHeightNormalized(float u, float v) const;
+  [[nodiscard]] float getHeight(float u, float v) const;
+  [[nodiscard]] float getHeightNormalized(float u, float v) const;
 
 private:
   std::unique_ptr<FastSimplexNoise> _noise;

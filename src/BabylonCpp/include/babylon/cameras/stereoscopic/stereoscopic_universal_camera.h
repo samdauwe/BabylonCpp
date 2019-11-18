@@ -7,16 +7,14 @@
 namespace BABYLON {
 
 class StereoscopicUniversalCamera;
-using StereoscopicUniversalCameraPtr
-  = std::shared_ptr<StereoscopicUniversalCamera>;
+using StereoscopicUniversalCameraPtr = std::shared_ptr<StereoscopicUniversalCamera>;
 
 /**
  * @brief Camera used to simulate stereoscopic rendering (based on
  * UniversalCamera).
  * @see http://doc.babylonjs.com/features/cameras
  */
-class BABYLON_SHARED_EXPORT StereoscopicUniversalCamera
-    : public UniversalCamera {
+class BABYLON_SHARED_EXPORT StereoscopicUniversalCamera : public UniversalCamera {
 
 public:
   static void AddNodeConstructor();
@@ -31,13 +29,13 @@ public:
 
     return camera;
   }
-  ~StereoscopicUniversalCamera(); // = default
+  ~StereoscopicUniversalCamera() override; // = default
 
   /**
    * @brief Gets camera class name.
    * @returns StereoscopicUniversalCamera
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
 protected:
   /**
@@ -50,8 +48,8 @@ protected:
    * @param scene defines the hosting scene
    */
   StereoscopicUniversalCamera(const std::string& name, const Vector3& position,
-                              float interaxialDistance,
-                              bool isStereoscopicSideBySide, Scene* scene);
+                              float interaxialDistance, bool isStereoscopicSideBySide,
+                              Scene* scene);
 
 private:
   static bool NodeConstructorAdded;

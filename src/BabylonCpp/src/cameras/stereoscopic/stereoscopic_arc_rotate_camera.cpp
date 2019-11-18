@@ -44,7 +44,7 @@ StereoscopicArcRotateCamera::StereoscopicArcRotateCamera(
 
 StereoscopicArcRotateCamera::~StereoscopicArcRotateCamera() = default;
 
-const std::string StereoscopicArcRotateCamera::getClassName() const
+std::string StereoscopicArcRotateCamera::getClassName() const
 {
   return "StereoscopicArcRotateCamera";
 }

@@ -23,11 +23,10 @@ public:
    * @param value defines the value value we should increment the property by
    * @param condition defines the trigger related conditions
    */
-  IncrementValueAction(unsigned int triggerOptions,
-                       const IAnimatablePtr& target,
+  IncrementValueAction(unsigned int triggerOptions, const IAnimatablePtr& target,
                        const std::string& propertyPath, AnimationValue* value,
                        Condition* condition = nullptr);
-  ~IncrementValueAction(); // = default
+  ~IncrementValueAction() override; // = default
 
   /**
    * @brief Hidden

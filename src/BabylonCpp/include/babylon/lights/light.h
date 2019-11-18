@@ -127,29 +127,28 @@ public:
   static constexpr unsigned int LIGHTTYPEID_HEMISPHERICLIGHT = 3;
 
 public:
-  ~Light(); // = default
+  ~Light() override; // = default
 
-  virtual Type type() const override;
+  Type type() const override;
   void addToScene(const LightPtr& newLight);
   LightPtr _this() const;
 
   /**
    * @brief Gets a property.
    */
-  virtual AnimationValue
-  getProperty(const std::vector<std::string>& targetPropertyPath) override;
+  AnimationValue getProperty(const std::vector<std::string>& targetPropertyPath) override;
 
   /**
    * @brief Sets a property.
    */
-  virtual void setProperty(const std::vector<std::string>& targetPropertyPath,
-                           const AnimationValue& value) override;
+  void setProperty(const std::vector<std::string>& targetPropertyPath,
+                   const AnimationValue& value) override;
 
   /**
    * @brief Returns the string "Light".
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Converts the light information to a readable string for debug
@@ -184,12 +183,9 @@ public:
    * @param lightIndex The index of the light in the effect to update
    * @returns The light
    */
-  virtual void transferToEffect(const EffectPtr& effect,
-                                const std::string& lightIndex)
-    = 0;
+  virtual void transferToEffect(const EffectPtr& effect, const std::string& lightIndex) = 0;
 
-  virtual void transferToEffect(const EffectPtr& effect,
-                                const std::string& uniformName0,
+  virtual void transferToEffect(const EffectPtr& effect, const std::string& uniformName0,
                                 const std::string& uniformName1);
 
   /**
@@ -199,9 +195,8 @@ public:
    * or direction)
    * @returns The light
    */
-  virtual Light&
-  transferToNodeMaterialEffect(const EffectPtr& effect,
-                               const std::string& lightDataUniformName)
+  virtual Light& transferToNodeMaterialEffect(const EffectPtr& effect,
+                                              const std::string& lightDataUniformName)
     = 0;
 
   /**
@@ -218,8 +213,7 @@ public:
    * @param disposeMaterialAndTextures Set to true to also dispose referenced
    * materials and textures (false by default)
    */
-  virtual void dispose(bool doNotRecurse               = false,
-                       bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Returns the light type ID (integer).
@@ -265,9 +259,7 @@ public:
    * @param defines the list of defines
    * @param lightIndex defines the index of the light for the effect
    */
-  virtual void prepareLightSpecificDefines(MaterialDefines& defines,
-                                           unsigned int lightIndex)
-    = 0;
+  virtual void prepareLightSpecificDefines(MaterialDefines& defines, unsigned int lightIndex) = 0;
 
   /**
    * @brief Sort function to order lights for rendering.
@@ -287,9 +279,8 @@ public:
    * @param scene The scene the new light will belong to
    * @returns the constructor function
    */
-  static std::function<LightPtr()>
-  GetConstructorFromName(unsigned int type, const std::string& name,
-                         Scene* scene);
+  static std::function<LightPtr()> GetConstructorFromName(unsigned int type,
+                                                          const std::string& name, Scene* scene);
 
   /**
    * @brief Parses the passed "parsedLight" and returns a new instanced Light

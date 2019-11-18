@@ -192,7 +192,7 @@ std::string Animation::toString(bool fullDetails) const
   oss << "Name: " << name << ", property: " << targetProperty;
   if (dataType >= 0
       && static_cast<unsigned int>(dataType) <= ANIMATIONTYPE_BOOL()) {
-    size_t _dataType = static_cast<size_t>(dataType);
+    auto _dataType = static_cast<size_t>(dataType);
     oss << ", datatype: "
         << std::vector<std::string>{"Float",  "Vector3", "Quaternion",
                                     "Matrix", "Color3",  "Vector2",
@@ -408,8 +408,7 @@ AnimationValue Animation::_interpolate(float currentFrame,
     }
   }
 
-  for (size_t key = static_cast<size_t>(startKeyIndex); key < keys.size();
-       ++key) {
+  for (auto key = static_cast<size_t>(startKeyIndex); key < keys.size(); ++key) {
     const auto& endKey = keys[key + 1];
 
     if (endKey.frame >= currentFrame) {

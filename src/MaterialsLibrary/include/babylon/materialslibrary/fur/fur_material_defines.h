@@ -10,7 +10,7 @@ namespace MaterialsLibrary {
 struct BABYLON_SHARED_EXPORT FurMaterialDefines : public MaterialDefines {
 
   FurMaterialDefines();
-  ~FurMaterialDefines(); // = default
+  ~FurMaterialDefines() override; // = default
 
 }; // end of struct FurMaterialDefines
 

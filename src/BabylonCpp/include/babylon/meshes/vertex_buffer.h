@@ -79,13 +79,11 @@ public:
   /**
    * Additional matrix indices (for bones)
    */
-  static constexpr const char* MatricesIndicesExtraKind
-    = "matricesIndicesExtra";
+  static constexpr const char* MatricesIndicesExtraKind = "matricesIndicesExtra";
   /**
    * Additional matrix weights (for bones)
    */
-  static constexpr const char* MatricesWeightsExtraKind
-    = "matricesWeightsExtra";
+  static constexpr const char* MatricesWeightsExtraKind = "matricesWeightsExtra";
 
   static constexpr const char* World0Kind            = "world0";
   static constexpr const char* World1Kind            = "world1";
@@ -162,14 +160,13 @@ public:
    */
   VertexBuffer(Engine* engine, const std::variant<Float32Array, Buffer*> data,
                const std::string& kind, bool updatable,
-               const std::optional<bool>& postponeInternalCreation
-               = std::nullopt,
-               std::optional<size_t> stride         = std::nullopt,
-               const std::optional<bool>& instanced = std::nullopt,
-               const std::optional<size_t>& offset  = std::nullopt,
-               const std::optional<size_t>& size    = std::nullopt,
-               std::optional<unsigned int> type     = std::nullopt,
-               bool normalized = false, bool useBytes = false);
+               const std::optional<bool>& postponeInternalCreation = std::nullopt,
+               std::optional<size_t> stride                        = std::nullopt,
+               const std::optional<bool>& instanced                = std::nullopt,
+               const std::optional<size_t>& offset                 = std::nullopt,
+               const std::optional<size_t>& size                   = std::nullopt,
+               std::optional<unsigned int> type = std::nullopt, bool normalized = false,
+               bool useBytes = false);
   virtual ~VertexBuffer(); // = default
 
   /**
@@ -190,13 +187,13 @@ public:
    * @brief Returns the kind of the VertexBuffer.
    * @returns a string
    */
-  const std::string& getKind() const;
+  [[nodiscard]] const std::string& getKind() const;
 
   /**
    * @brief Gets a boolean indicating if the VertexBuffer is updatable?
    * @returns true if the buffer is updatable
    */
-  bool isUpdatable() const;
+  [[nodiscard]] bool isUpdatable() const;
 
   /**
    * @brief Gets current buffer's data.
@@ -216,33 +213,33 @@ public:
    * DEPRECATED. Use byteStride instead.
    * @returns the stride in float32 units
    */
-  size_t getStrideSize() const;
+  [[nodiscard]] size_t getStrideSize() const;
 
   /**
    * @brief Returns the offset as a multiple of the type byte length.
    * DEPRECATED. Use byteOffset instead.
    * @returns the offset in bytes
    */
-  size_t getOffset() const;
+  [[nodiscard]] size_t getOffset() const;
 
   /**
    * @brief Returns the number of components per vertex attribute (integer).
    * @returns the size in float
    */
-  size_t getSize() const;
+  [[nodiscard]] size_t getSize() const;
 
   /**
    * @brief Gets a boolean indicating is the internal buffer of the VertexBuffer
    * is instanced.
    * @returns true if this buffer is instanced
    */
-  bool getIsInstanced() const;
+  [[nodiscard]] bool getIsInstanced() const;
 
   /**
    * @brief Returns the instancing divisor, zero for non-instanced (integer).
    * @returns a number
    */
-  unsigned int getInstanceDivisor() const;
+  [[nodiscard]] unsigned int getInstanceDivisor() const;
 
   /** Methods **/
 
@@ -274,8 +271,7 @@ public:
    * @param offset the new offset
    * @param useBytes set to true if the offset is in bytes
    */
-  GL::IGLBuffer* updateDirectly(const Float32Array& data, size_t offset,
-                                bool useBytes = false);
+  GL::IGLBuffer* updateDirectly(const Float32Array& data, size_t offset, bool useBytes = false);
 
   /**
    * @brief Disposes the VertexBuffer and the underlying WebGLBuffer.
@@ -287,8 +283,7 @@ public:
    * @param count the number of values to enumerate
    * @param callback the callback function called for each value
    */
-  void forEach(size_t count,
-               const std::function<void(float value, size_t index)>& callback);
+  void forEach(size_t count, const std::function<void(float value, size_t index)>& callback);
 
   /**
    * @brief Gets the byte length of the given type.
@@ -308,11 +303,10 @@ public:
    * @param normalized whether the data is normalized
    * @param callback the callback function called for each value
    */
-  static void
-  ForEach(const Float32Array& data, size_t byteOffset, size_t byteStride,
-          size_t componentCount, unsigned int componentType, size_t count,
-          bool normalized,
-          const std::function<void(float value, size_t index)>& callback);
+  static void ForEach(const Float32Array& data, size_t byteOffset, size_t byteStride,
+                      size_t componentCount, unsigned int componentType, size_t count,
+                      bool normalized,
+                      const std::function<void(float value, size_t index)>& callback);
 
   /**
    * @brief Enumerates each value of the given parameters as numbers.
@@ -325,27 +319,26 @@ public:
    * @param normalized whether the data is normalized
    * @param callback the callback function called for each value
    */
-  static void
-  ForEach(const std::variant<ArrayBuffer, DataView>& data, size_t byteOffset,
-          size_t byteStride, size_t componentCount, unsigned int componentType,
-          size_t count, bool normalized,
-          const std::function<void(float value, size_t index)>& callback);
+  static void ForEach(const std::variant<ArrayBuffer, DataView>& data, size_t byteOffset,
+                      size_t byteStride, size_t componentCount, unsigned int componentType,
+                      size_t count, bool normalized,
+                      const std::function<void(float value, size_t index)>& callback);
 
 private:
   /**
    * @brief Gets the instance divisor when in instanced mode
    */
-  unsigned int get_instanceDivisor() const;
+  [[nodiscard]] unsigned int get_instanceDivisor() const;
 
   /**
    * @brief Sets the instance divisor when in instanced mode
    */
   void set_instanceDivisor(unsigned int value);
 
-  Buffer* _getBuffer() const;
+  [[nodiscard]] Buffer* _getBuffer() const;
 
-  static float _GetFloatValue(const DataView& dataView, unsigned int type,
-                              size_t byteOffset, bool normalized);
+  static float _GetFloatValue(const DataView& dataView, unsigned int type, size_t byteOffset,
+                              bool normalized);
 
 public:
   /**

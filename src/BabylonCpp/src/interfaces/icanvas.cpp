@@ -135,7 +135,7 @@ void ICanvas::onError(int errorId, const char* errorDesc)
 void ICanvas::onMouseButtonDown(bool ctrlKey, bool shiftKey, int iMouseX,
                                 int iMouseY, MouseButtonType btn)
 {
-  const unsigned int type = static_cast<unsigned>(EventType::MOUSE_BUTTON_DOWN);
+  const auto type = static_cast<unsigned>(EventType::MOUSE_BUTTON_DOWN);
   for (auto& listener : mouseEventListeners[type]) {
     PointerEvent evt;
     evt.clientX    = iMouseX;
@@ -155,7 +155,7 @@ void ICanvas::onMouseButtonDown(bool ctrlKey, bool shiftKey, int iMouseX,
 void ICanvas::onMouseButtonUp(bool ctrlKey, bool shiftKey, int iMouseX,
                               int iMouseY, MouseButtonType btn)
 {
-  const unsigned int type = static_cast<unsigned>(EventType::MOUSE_BUTTON_UP);
+  const auto type = static_cast<unsigned>(EventType::MOUSE_BUTTON_UP);
   for (auto& listener : mouseEventListeners[type]) {
     PointerEvent evt;
     evt.clientX    = iMouseX;
@@ -174,7 +174,7 @@ void ICanvas::onMouseButtonUp(bool ctrlKey, bool shiftKey, int iMouseX,
 
 void ICanvas::onMouseMove(bool ctrlKey, bool shiftKey, int iMouseX, int iMouseY)
 {
-  const unsigned int type = static_cast<unsigned>(EventType::MOUSE_MOVE);
+  const auto type = static_cast<unsigned>(EventType::MOUSE_MOVE);
   for (auto& listener : mouseEventListeners[type]) {
     PointerEvent evt;
     evt.clientX    = iMouseX;
@@ -193,7 +193,7 @@ void ICanvas::onMouseMove(bool ctrlKey, bool shiftKey, int iMouseX, int iMouseY)
 void ICanvas::onMouseWheel(bool ctrlKey, bool shiftKey, int iMouseX,
                            int iMouseY, float wheelDelta)
 {
-  const unsigned int type = static_cast<unsigned>(EventType::MOUSE_WHEEL);
+  const auto type = static_cast<unsigned>(EventType::MOUSE_WHEEL);
   for (auto& listener : mouseEventListeners[type]) {
     MouseWheelEvent evt;
     evt.clientX    = iMouseX;
@@ -214,7 +214,7 @@ void ICanvas::onMouseWheel(bool ctrlKey, bool shiftKey, int iMouseX,
 void ICanvas::onKeyDown(bool ctrlKey, bool altKey, int keyCode,
                         std::string code)
 {
-  const unsigned int type = static_cast<unsigned>(EventType::KEY_DOWN);
+  const auto type = static_cast<unsigned>(EventType::KEY_DOWN);
   for (auto& listener : keyEventListeners[type]) {
     KeyboardEvent evt;
     evt.type    = EventType::KEY_DOWN;
@@ -228,7 +228,7 @@ void ICanvas::onKeyDown(bool ctrlKey, bool altKey, int keyCode,
 
 void ICanvas::onKeyUp(bool ctrlKey, bool altKey, int keyCode, std::string code)
 {
-  const unsigned int type = static_cast<unsigned>(EventType::KEY_UP);
+  const auto type = static_cast<unsigned>(EventType::KEY_UP);
   for (auto& listener : keyEventListeners[type]) {
     KeyboardEvent evt;
     evt.type    = EventType::KEY_UP;

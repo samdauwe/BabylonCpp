@@ -62,7 +62,7 @@ PBRBaseSimpleMaterial::PBRBaseSimpleMaterial(const std::string& iName,
 
 PBRBaseSimpleMaterial::~PBRBaseSimpleMaterial() = default;
 
-const std::string PBRBaseSimpleMaterial::getClassName() const
+std::string PBRBaseSimpleMaterial::getClassName() const
 {
   return "PBRBaseSimpleMaterial";
 }

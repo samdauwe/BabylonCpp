@@ -29,13 +29,13 @@ public:
 
     return camera;
   }
-  ~AnaglyphUniversalCamera(); // = default
+  ~AnaglyphUniversalCamera() override; // = default
 
   /**
    * @brief Gets camera class name.
    * @returns AnaglyphUniversalCamera
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
 protected:
   /**

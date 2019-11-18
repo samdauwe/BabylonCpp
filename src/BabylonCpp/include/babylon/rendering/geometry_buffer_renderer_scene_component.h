@@ -19,16 +19,14 @@ using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
  * @brief Defines the Geometry Buffer scene component responsible to manage a
  * G-Buffer useful in several rendering techniques.
  */
-class BABYLON_SHARED_EXPORT GeometryBufferRendererSceneComponent
-    : public ISceneComponent {
+class BABYLON_SHARED_EXPORT GeometryBufferRendererSceneComponent : public ISceneComponent {
 
 public:
   /**
    * The component name helpful to identify the component in the list of scene
    * components.
    */
-  static constexpr const char* name
-    = SceneComponentConstants::NAME_GEOMETRYBUFFERRENDERER;
+  static constexpr const char* name = SceneComponentConstants::NAME_GEOMETRYBUFFERRENDERER;
 
 public:
   template <typename... Ts>
@@ -37,7 +35,7 @@ public:
     return std::shared_ptr<GeometryBufferRendererSceneComponent>(
       new GeometryBufferRendererSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~GeometryBufferRendererSceneComponent(); // = default
+  ~GeometryBufferRendererSceneComponent() override; // = default
 
   /**
    * @brief Registers the component in a given scene.

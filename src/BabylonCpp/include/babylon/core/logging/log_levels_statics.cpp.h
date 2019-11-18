@@ -23,4 +23,4 @@ namespace BABYLON {
        std::make_pair(LogLevels::LEVEL_INFO, "INFO"),
        std::make_pair(LogLevels::LEVEL_DEBUG, "DEBUG"),
        std::make_pair(LogLevels::LEVEL_TRACE, "TRACE") };
-}
+  } // namespace BABYLON

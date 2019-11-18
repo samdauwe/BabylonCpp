@@ -24,9 +24,8 @@ MeshPtr ShapeBuilder::ExtrudeShape(const std::string& name,
   const auto invertUV  = options.invertUV.value_or(false);
 
   return ShapeBuilder::_ExtrudeShapeGeneric(
-    name, shape, path, scale, rotation, nullptr, nullptr, false, false, cap,
-    false, scene, updatable.has_value() ? true : false, sideOrientation,
-    instance, invertUV, options.frontUVs, options.backUVs);
+    name, shape, path, scale, rotation, nullptr, nullptr, false, false, cap, false, scene,
+    updatable.has_value(), sideOrientation, instance, invertUV, options.frontUVs, options.backUVs);
 }
 
 MeshPtr ShapeBuilder::ExtrudeShapeCustom(const std::string& name,
@@ -52,10 +51,9 @@ MeshPtr ShapeBuilder::ExtrudeShapeCustom(const std::string& name,
   const auto& instance = options.instance;
   const auto invertUV  = options.invertUV.value_or(false);
   return ShapeBuilder::_ExtrudeShapeGeneric(
-    name, shape, path, std::nullopt, std::nullopt, scaleFunction,
-    rotationFunction, ribbonCloseArray, ribbonClosePath, cap, true, scene,
-    updatable.has_value() ? true : false, sideOrientation, instance, invertUV,
-    options.frontUVs, options.backUVs);
+    name, shape, path, std::nullopt, std::nullopt, scaleFunction, rotationFunction,
+    ribbonCloseArray, ribbonClosePath, cap, true, scene, updatable.has_value(), sideOrientation,
+    instance, invertUV, options.frontUVs, options.backUVs);
 }
 
 MeshPtr ShapeBuilder::_ExtrudeShapeGeneric(
@@ -99,11 +97,10 @@ MeshPtr ShapeBuilder::_ExtrudeShapeGeneric(
           std::vector<Vector3> shapePath;
           auto angleStep  = rotate(static_cast<float>(i), distances[i]);
           auto scaleRatio = scl(static_cast<float>(i), distances[i]);
-          for (auto p = 0ull; p < _shape.size(); ++p) {
+          for (const auto& p : _shape) {
             Matrix::RotationAxisToRef(tangents[i], angle, rotationMatrix);
-            auto planed  = ((tangents[i].scale(_shape[p].z))
-                             .add(normals[i].scale(_shape[p].x))
-                             .add(binormals[i].scale(_shape[p].y)));
+            auto planed
+              = ((tangents[i].scale(p.z)).add(normals[i].scale(p.x)).add(binormals[i].scale(p.y)));
             auto rotated = Vector3::Zero();
             Vector3::TransformCoordinatesToRef(planed, rotationMatrix, rotated);
             rotated.scaleInPlace(scaleRatio).addInPlace(_curve[i]);
@@ -117,8 +114,8 @@ MeshPtr ShapeBuilder::_ExtrudeShapeGeneric(
         const auto capPath = [&](const std::vector<Vector3>& shapePath) {
           std::vector<Vector3> pointCap;
           auto barycenter = Vector3::Zero();
-          for (size_t i = 0ull; i < shapePath.size(); ++i) {
-            barycenter.addInPlace(shapePath[i]);
+          for (const auto& pt3d : shapePath) {
+            barycenter.addInPlace(pt3d);
           }
           barycenter.scaleInPlace(1.f / static_cast<float>(shapePath.size()));
           for (size_t i = 0ull; i < shapePath.size(); ++i) {

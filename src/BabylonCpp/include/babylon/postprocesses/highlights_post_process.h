@@ -30,12 +30,10 @@ public:
    * @param textureType Type of texture for the post process (default:
    * Engine.TEXTURETYPE_UNSIGNED_INT)
    */
-  HighlightsPostProcess(const std::string& name, float ratio,
-                        const CameraPtr& camera, unsigned int samplingMode,
-                        Engine* engine, bool reusable = false,
-                        unsigned int textureType
-                        = Constants::TEXTURETYPE_UNSIGNED_INT);
-  ~HighlightsPostProcess(); // = default
+  HighlightsPostProcess(const std::string& name, float ratio, const CameraPtr& camera,
+                        unsigned int samplingMode, Engine* engine, bool reusable = false,
+                        unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT);
+  ~HighlightsPostProcess() override; // = default
 
 }; // end of class HighlightsPostProcess
 

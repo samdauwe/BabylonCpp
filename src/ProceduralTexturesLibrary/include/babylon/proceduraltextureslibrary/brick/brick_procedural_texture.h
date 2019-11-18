@@ -23,7 +23,7 @@ public:
 
     return texture;
   }
-  ~BrickProceduralTexture(); // = default
+  ~BrickProceduralTexture() override; // = default
 
   void updateShaderUniforms();
 
@@ -42,13 +42,12 @@ public:
    * information
    * @returns a parsed Brick Procedural Texture
    */
-  static std::unique_ptr<BrickProceduralTexture>
-  Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
+  static std::unique_ptr<BrickProceduralTexture> Parse(const json& parsedTexture, Scene* scene,
+                                                       const std::string& rootUrl);
 
 protected:
-  BrickProceduralTexture(const std::string& name, const Size& size,
-                         Scene* scene, Texture* fallbackTexture = nullptr,
-                         bool generateMipMaps = true);
+  BrickProceduralTexture(const std::string& name, const Size& size, Scene* scene,
+                         Texture* fallbackTexture = nullptr, bool generateMipMaps = true);
 
   float get_numberOfBricksHeight() const;
   void set_numberOfBricksHeight(float value);

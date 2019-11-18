@@ -28,7 +28,7 @@ public:
 
     return postProcess;
   }
-  virtual ~BloomMergePostProcess(); // = default
+  ~BloomMergePostProcess() override; // = default
 
 protected:
   /**
@@ -53,15 +53,13 @@ protected:
    * the constructor. The updateEffect method can be used to compile the shader
    * at a later time. (default: false)
    */
-  BloomMergePostProcess(const std::string& name,
-                        const PostProcessPtr& originalFromInput,
+  BloomMergePostProcess(const std::string& name, const PostProcessPtr& originalFromInput,
                         const PostProcessPtr& blurred, float weight,
                         const std::variant<float, PostProcessOptions>& options,
-                        const CameraPtr& camera, unsigned int samplingMode,
-                        Engine* engine, bool reusable = false,
-                        unsigned int textureType
-                        = Constants::TEXTURETYPE_UNSIGNED_INT,
-                        bool blockCompilation = false);
+                        const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
+                        bool reusable            = false,
+                        unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
+                        bool blockCompilation    = false);
 
 public:
   PostProcessPtr originalFromInput;

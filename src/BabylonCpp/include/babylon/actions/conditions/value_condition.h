@@ -85,7 +85,7 @@ public:
   ValueCondition(ActionManager* actionManager, const IAnimatablePtr& target,
                  const std::string& propertyPath, AnimationValue* value,
                  unsigned int operatorType = ValueCondition::IsEqual());
-  virtual ~ValueCondition(); // = default
+  ~ValueCondition() override; // = default
 
   /** Methods **/
 
@@ -100,7 +100,7 @@ public:
    * @brief Serialize the ValueCondition into a JSON compatible object.
    * @returns serialization object
    */
-  json serialize() const override;
+  [[nodiscard]] json serialize() const override;
 
   /** Statics **/
 

@@ -195,8 +195,7 @@ TEST(TestString, regexMatch)
 {
   using namespace BABYLON;
 
-  const std::regex re("#include<(.+)>(\\((.*)\\))*(\\[(.*)\\])*",
-                        std::regex::optimize);
+  const std::regex re(R"(#include<(.+)>(\((.*)\))*(\[(.*)\])*)", std::regex::optimize);
 
   {
     const std::string s{"#include<helperFunctions>"};
@@ -243,7 +242,7 @@ TEST(TestString, regexReplace)
       "#extension.+(GL_OES_standard_derivatives|GL_EXT_shader_texture_lod|GL_"
       "EXT_frag_depth).+enable"};
     const std::string r{String::regexReplace(s, regex, "")};
-    const std::string e{""};
+    const std::string e;
     EXPECT_EQ(r, e);
   }
 
@@ -345,7 +344,7 @@ TEST(TestString, regexReplaceWithCallback)
     const std::string s{
       "notShadowLevel = computeShadowWithESMCube(light{X}.vLightData.xyz, "
       "shadowSampler{X}, light{X}.shadowsInfo.x, light{X}.shadowsInfo.z);"};
-    const std::regex regex{"light\\{X\\}.(\\w*)", std::regex::optimize};
+    const std::regex regex{R"(light\{X\}.(\w*))", std::regex::optimize};
     const std::string r{String::regexReplace(s, regex, callback)};
     const std::string e{
       "notShadowLevel = computeShadowWithESMCube(vLightData{X}.xyz, "

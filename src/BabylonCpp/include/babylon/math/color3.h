@@ -32,31 +32,31 @@ public:
   Color3& operator=(const Color3& otherColor); // Copy assignment operator
   Color3& operator=(const Color4& otherColor); // Copy assignment operator
   Color3& operator=(Color3&& otherColor);      // Move assignment operator
-  ~Color3(); // = default
-  Color3 copy() const;
+  ~Color3();                                   // = default
+  [[nodiscard]] Color3 copy() const;
 
   /**
    * @brief Copy the current object.
    * @returns a new Color3 copied the current one
    */
-  std::unique_ptr<Color3> clone() const;
+  [[nodiscard]] std::unique_ptr<Color3> clone() const;
 
   /**
    * @brief Creates a string with the Color3 current values.
    * @returns the string representation of the Color3 object
    */
-  std::string toString() const;
+  [[nodiscard]] std::string toString() const;
 
   /**
    * @brief Returns the string "Color3".
    */
-  const char* getClassName() const;
+  [[nodiscard]] const char* getClassName() const;
 
   /**
    * @brief Compute the Color3 hash code.
    * @returns an unique number that can be used to hash Color3 objects
    */
-  int getHashCode() const;
+  [[nodiscard]] int getHashCode() const;
 
   /** Operators **/
 
@@ -77,20 +77,20 @@ public:
    * is 1)
    * @returns a new Color4 object
    */
-  Color4 toColor4(float alpha = 1.f) const;
+  [[nodiscard]] Color4 toColor4(float alpha = 1.f) const;
 
   /**
    * @brief Returns a new array populated with 3 numeric elements : red, green
    * and blue values.
    * @returns the new array
    */
-  Float32Array asArray() const;
+  [[nodiscard]] Float32Array asArray() const;
 
   /**
    * @brief Returns the luminance value.
    * @returns a float value
    */
-  float toLuminance() const;
+  [[nodiscard]] float toLuminance() const;
 
   /**
    * @brief Multiply each Color3 rgb values by the given Color3 rgb values in a
@@ -98,7 +98,7 @@ public:
    * @param otherColor defines the second operand
    * @returns the new Color3 object
    */
-  Color3 multiply(const Color3& otherColor) const;
+  [[nodiscard]] Color3 multiply(const Color3& otherColor) const;
 
   /**
    * @brief Multiply the rgb values of the Color3 and the given Color3 and
@@ -114,7 +114,7 @@ public:
    * @param otherColor defines the second operand
    * @returns true if the rgb values are equal to the given ones
    */
-  bool equals(const Color3& otherColor) const;
+  [[nodiscard]] bool equals(const Color3& otherColor) const;
 
   /**
    * @brief Determines equality between the current Color3 object and a set of
@@ -124,14 +124,14 @@ public:
    * @param b defines the blue component to check
    * @returns true if the rgb values are equal to the given ones
    */
-  bool equalsFloats(float red, float green, float blue) const;
+  [[nodiscard]] bool equalsFloats(float red, float green, float blue) const;
 
   /**
    * @brief Multiplies in place each rgb value by scale.
    * @param scale defines the scaling factor
    * @returns the updated Color3.
    */
-  Color3 scale(float iscale) const;
+  [[nodiscard]] Color3 scale(float iscale) const;
 
   /**
    * @brief Multiplies the rgb values by scale and stores the result into
@@ -159,8 +159,7 @@ public:
    * @param max defines maximum clamping value (default is 1)
    * @returns the original Color3
    */
-  const Color3& clampToRef(Color3& result, float min = 0.f,
-                           float max = 1.f) const;
+  const Color3& clampToRef(Color3& result, float min = 0.f, float max = 1.f) const;
 
   /**
    * @brief Creates a new Color3 set with the added values of the current Color3
@@ -168,7 +167,7 @@ public:
    * @param otherColor defines the second operand
    * @returns the new Color3
    */
-  Color3 add(const Color3& otherColor) const;
+  [[nodiscard]] Color3 add(const Color3& otherColor) const;
 
   /**
    * @brief Stores the result of the addition of the current Color3 and given
@@ -185,7 +184,7 @@ public:
    * @param otherColor defines the second operand
    * @returns the new Color3
    */
-  Color3 subtract(const Color3& otherColor) const;
+  [[nodiscard]] Color3 subtract(const Color3& otherColor) const;
 
   /**
    * @brief Stores the result of the subtraction of given one from the current
@@ -226,7 +225,7 @@ public:
    * @returns a string containing the hexadecimal representation of the Color3
    * object
    */
-  std::string toHexString() const;
+  [[nodiscard]] std::string toHexString() const;
 
   /**
    * @brief Computes a new Color3 converted from the current one to linear
@@ -319,8 +318,7 @@ public:
    * @param amount defines the gradient factor
    * @param result defines the Color3 object where to store the result
    */
-  static void LerpToRef(const Color3& left, const Color3& right, float amount,
-                        Color3& result);
+  static void LerpToRef(const Color3& left, const Color3& right, float amount, Color3& result);
 
   /**
    * @brief Returns a Color3 value containing a red color.

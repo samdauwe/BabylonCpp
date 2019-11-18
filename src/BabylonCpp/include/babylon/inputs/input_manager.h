@@ -80,7 +80,7 @@ public:
   /**
    * @brief Hidden
    */
-  bool _isPointerSwiping() const;
+  [[nodiscard]] bool _isPointerSwiping() const;
 
   /**
    * @brief Use this method to simulate a pointer up on a mesh.
@@ -93,8 +93,7 @@ public:
    * @param doubleTap indicates that the pointer up event should be considered
    * as part of a double click (false by default)
    */
-  void simulatePointerUp(std::optional<PickingInfo>& pickResult,
-                         bool doubleTap = false);
+  void simulatePointerUp(std::optional<PickingInfo>& pickResult, bool doubleTap = false);
 
   /**
    * @brief Gets a boolean indicating if the current pointer event is captured
@@ -112,8 +111,7 @@ public:
    * @param attachDown defines if you want to attach events to pointerdown
    * @param attachMove defines if you want to attach events to pointermove
    */
-  void attachControl(bool attachUp = true, bool attachDown = true,
-                     bool attachMove = true);
+  void attachControl(bool attachUp = true, bool attachDown = true, bool attachMove = true);
 
   /**
    * @brief Detaches all event handlers.
@@ -147,7 +145,7 @@ protected:
   /**
    * @brief Gets or sets the current on-screen X position of the pointer.
    */
-  int get_pointerX() const;
+  [[nodiscard]] int get_pointerX() const;
 
   /**
    * @brief Sets the current on-screen X position of the pointer.
@@ -157,7 +155,7 @@ protected:
   /**
    * @brief Gets the current on-screen Y position of the pointer.
    */
-  int get_pointerY() const;
+  [[nodiscard]] int get_pointerY() const;
 
   /**
    * @brief Sets the current on-screen Y position of the pointer
@@ -166,17 +164,14 @@ protected:
 
 private:
   void _updatePointerPosition(const PointerEvent evt);
-  void _processPointerMove(std::optional<PickingInfo>& pickResult,
-                           const PointerEvent& evt);
+  void _processPointerMove(std::optional<PickingInfo>& pickResult, const PointerEvent& evt);
   // Pointers handling
   void _setRayOnPointerInfo(PointerInfo& pointerInfo);
   bool _checkPrePointerObservable(const std::optional<PickingInfo>& pickResult,
-                                  const PointerEvent& evt,
-                                  PointerEventTypes type);
-  void _processPointerDown(std::optional<PickingInfo>& pickResult,
-                           const PointerEvent& evt);
-  void _processPointerUp(std::optional<PickingInfo>& pickResult,
-                         const PointerEvent& evt, const ClickInfo& clickInfo);
+                                  const PointerEvent& evt, PointerEventTypes type);
+  void _processPointerDown(std::optional<PickingInfo>& pickResult, const PointerEvent& evt);
+  void _processPointerUp(std::optional<PickingInfo>& pickResult, const PointerEvent& evt,
+                         const ClickInfo& clickInfo);
 
 public:
   /**
@@ -208,18 +203,15 @@ private:
   std::function<void(PointerEvent&& evt)> _onPointerUp;
 
   std::function<void(
-    Observable<PointerInfoPre>& obs1, Observable<PointerInfo>& obs2,
-    const PointerEvent& evt,
-    const std::function<void(const ClickInfo& clickInfo,
-                             std::optional<PickingInfo> pickResult)>& cb)>
+    Observable<PointerInfoPre>& obs1, Observable<PointerInfo>& obs2, const PointerEvent& evt,
+    const std::function<void(const ClickInfo& clickInfo, std::optional<PickingInfo> pickResult)>&
+      cb)>
     _initClickEvent;
-  std::function<AbstractActionManagerPtr(AbstractActionManagerPtr act,
-                                         const ClickInfo& clickInfo)>
+  std::function<AbstractActionManagerPtr(AbstractActionManagerPtr act, const ClickInfo& clickInfo)>
     _initActionManager;
   std::function<void(MouseButtonType btn, ClickInfo& clickInfo,
-                     const std::function<void(
-                       const ClickInfo& clickInfo,
-                       const std::optional<PickingInfo>& pickResult)>& cb)>
+                     const std::function<void(const ClickInfo& clickInfo,
+                                              const std::optional<PickingInfo>& pickResult)>& cb)>
     _delayedSimpleClick;
   milliseconds_t _delayedSimpleClickTimeout;
   milliseconds_t _previousDelayedSimpleClickTimeout;

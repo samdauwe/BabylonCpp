@@ -14,7 +14,8 @@ struct BABYLON_SHARED_EXPORT ShaderDefineAndOperator : public ShaderDefineExpres
   ShaderDefineExpression leftOperand;
   ShaderDefineExpression rightOperand;
 
-  bool isTrue(const std::unordered_map<std::string, std::string>& preprocessors) const override;
+  [[nodiscard]] bool
+  isTrue(const std::unordered_map<std::string, std::string>& preprocessors) const override;
 
 }; // end of struct ShaderDefineAndOperator
 

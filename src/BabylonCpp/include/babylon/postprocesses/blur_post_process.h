@@ -23,13 +23,13 @@ public:
   template <typename... Ts>
   static BlurPostProcessPtr New(Ts&&... args)
   {
-    auto postProcess = std::shared_ptr<BlurPostProcess>(
-      new BlurPostProcess(std::forward<Ts>(args)...));
+    auto postProcess
+      = std::shared_ptr<BlurPostProcess>(new BlurPostProcess(std::forward<Ts>(args)...));
     postProcess->add(postProcess);
 
     return postProcess;
   }
-  ~BlurPostProcess(); // = default
+  ~BlurPostProcess() override; // = default
 
   /**
    * @brief Updates the effect with the current post process compile time values
@@ -46,15 +46,12 @@ public:
    * @param onCompiled Called when the shader has been compiled.
    * @param onError Called if there is an error when compiling a shader.
    */
-  void updateEffect(
-    const std::string& defines                                           = "",
-    const std::vector<std::string>& uniforms                             = {},
-    const std::vector<std::string>& samplers                             = {},
-    const std::unordered_map<std::string, unsigned int>& indexParameters = {},
-    const std::function<void(Effect* effect)>& onCompiled = nullptr,
-    const std::function<void(Effect* effect, const std::string& errors)>&
-      onError
-    = nullptr) override;
+  void updateEffect(const std::string& defines = "", const std::vector<std::string>& uniforms = {},
+                    const std::vector<std::string>& samplers                             = {},
+                    const std::unordered_map<std::string, unsigned int>& indexParameters = {},
+                    const std::function<void(Effect* effect)>& onCompiled                = nullptr,
+                    const std::function<void(Effect* effect, const std::string& errors)>& onError
+                    = nullptr) override;
 
 protected:
   /**
@@ -78,22 +75,17 @@ protected:
    * the constructor. The updateEffect method can be used to compile the shader
    * at a later time. (default: false)
    */
-  BlurPostProcess(const std::string& name, const Vector2& direction,
-                  float kernel,
-                  const std::variant<float, PostProcessOptions>& options,
-                  const CameraPtr& camera,
-                  std::optional<unsigned int> samplingMode = std::nullopt,
-                  Engine* engine = nullptr, bool reusable = false,
-                  unsigned int textureType
-                  = Constants::TEXTURETYPE_UNSIGNED_INT,
-                  const std::string& defines = "",
-                  bool blockCompilation      = false);
+  BlurPostProcess(const std::string& name, const Vector2& direction, float kernel,
+                  const std::variant<float, PostProcessOptions>& options, const CameraPtr& camera,
+                  std::optional<unsigned int> samplingMode = std::nullopt, Engine* engine = nullptr,
+                  bool reusable              = false,
+                  unsigned int textureType   = Constants::TEXTURETYPE_UNSIGNED_INT,
+                  const std::string& defines = "", bool blockCompilation = false);
 
-  void _updateParameters(
-    const std::function<void(Effect* effect)>& onCompiled = nullptr,
-    const std::function<void(Effect* effect, const std::string& errors)>&
-      onError
-    = nullptr);
+  void
+  _updateParameters(const std::function<void(Effect* effect)>& onCompiled = nullptr,
+                    const std::function<void(Effect* effect, const std::string& errors)>& onError
+                    = nullptr);
 
   /**
    * @brief Best kernels are odd numbers that when divided by 2, their integer
@@ -109,7 +101,7 @@ protected:
    * @param idealKernel Ideal blur kernel.
    * @return Nearest best kernel.
    */
-  float _nearestBestKernel(float idealKernel) const;
+  [[nodiscard]] float _nearestBestKernel(float idealKernel) const;
 
   /**
    * @brief Calculates the value of a Gaussian distribution with sigma 3 at a
@@ -117,7 +109,7 @@ protected:
    * @param x The point on the Gaussian distribution to sample.
    * @return the value of the Gaussian function at x.
    */
-  float _gaussianWeight(float x) const;
+  [[nodiscard]] float _gaussianWeight(float x) const;
 
   /**
    * @brief Generates a string that can be used as a floating point number in
@@ -127,7 +119,7 @@ protected:
    * (excluding trailing 0s).
    * @return GLSL float string.
    */
-  std::string _glslFloat(float x, unsigned int decimalFigures = 8) const;
+  [[nodiscard]] std::string _glslFloat(float x, unsigned int decimalFigures = 8) const;
 
 private:
   /**
@@ -138,7 +130,7 @@ private:
   /**
    * @brief Gets the length in pixels of the blur sample region.
    */
-  float get_kernel() const;
+  [[nodiscard]] float get_kernel() const;
 
   /**
    * @brief Sets whether or not the blur needs to unpack/repack floats.
@@ -148,7 +140,7 @@ private:
   /**
    * @brief Gets whether or not the blur is unpacking/repacking floats.
    */
-  bool get_packedFloat() const;
+  [[nodiscard]] bool get_packedFloat() const;
 
 public:
   /**

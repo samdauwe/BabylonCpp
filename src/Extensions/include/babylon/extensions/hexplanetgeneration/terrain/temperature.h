@@ -14,14 +14,14 @@ class FastSimplexNoise;
 class Temperature {
 
 public:
-  Temperature(const std::string& seed, float minTemp, float maxTemp,
-              float distortion, float height, float width);
+  Temperature(const std::string& seed, float minTemp, float maxTemp, float distortion, float height,
+              float width);
   ~Temperature(); // = default
 
   void setupTemperatureGradient();
   void generateTemperature();
-  float getTemperature(float u, float v) const;
-  float getTemperatureNormalized(float u, float v) const;
+  [[nodiscard]] float getTemperature(float u, float v) const;
+  [[nodiscard]] float getTemperatureNormalized(float u, float v) const;
 
 private:
   std::unique_ptr<FastSimplexNoise> _noise;

@@ -26,14 +26,12 @@ public:
   /**
    * @brief Hidden
    */
-  static TransformNodePtr _CreateArrow(Scene* scene,
-                                       const StandardMaterialPtr& material);
+  static TransformNodePtr _CreateArrow(Scene* scene, const StandardMaterialPtr& material);
 
   /**
    * @brief Hidden
    */
-  static TransformNodePtr _CreateArrowInstance(Scene* scene,
-                                               const TransformNodePtr& arrow);
+  static TransformNodePtr _CreateArrowInstance(Scene* scene, const TransformNodePtr& arrow);
 
 public:
   /**
@@ -46,13 +44,12 @@ public:
                 const UtilityLayerRendererPtr& gizmoLayer
                 = UtilityLayerRenderer::DefaultUtilityLayer(),
                 PositionGizmo* parent = nullptr);
-  ~AxisDragGizmo(); // = default
+  ~AxisDragGizmo() override; // = default
 
   /**
    * @brief Disposes of the gizmo.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
 protected:
   void _attachedMeshChanged(const AbstractMeshPtr& value) override;
@@ -60,7 +57,7 @@ protected:
   /**
    * @brief Gets if the gizmo is enabled.
    */
-  bool get_isEnabled() const;
+  [[nodiscard]] bool get_isEnabled() const;
 
   /**
    * @brief Sets if the gizmo is enabled.

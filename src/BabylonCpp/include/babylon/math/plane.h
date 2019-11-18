@@ -34,29 +34,29 @@ public:
   Plane& operator=(const Plane& otherPlane);
   Plane& operator=(Plane&& otherPlane);
   ~Plane(); // = default
-  Plane copy() const;
+  [[nodiscard]] Plane copy() const;
 
   /**
    * @returns a new plane copied from the current Plane.
    */
-  std::unique_ptr<Plane> clone() const;
+  [[nodiscard]] std::unique_ptr<Plane> clone() const;
 
   friend std::ostream& operator<<(std::ostream& os, const Plane& plane);
 
   /**
    * @returns the string "Plane".
    */
-  const char* getClassName() const;
+  [[nodiscard]] const char* getClassName() const;
 
   /**
    * @returns the Plane hash code.
    */
-  size_t getHashCode() const;
+  [[nodiscard]] size_t getHashCode() const;
 
   /**
    * @returns the plane coordinates as a new array of 4 elements [a, b, c, d].
    */
-  std::array<float, 4> asArray() const;
+  [[nodiscard]] std::array<float, 4> asArray() const;
 
   /** Methods **/
 
@@ -72,7 +72,7 @@ public:
    * @returns a new Plane as the result of the transformation of the current
    * Plane by the given matrix.
    */
-  Plane transform(const Matrix& transformation) const;
+  [[nodiscard]] Plane transform(const Matrix& transformation) const;
 
   /**
    * @brief Calculate the dot product between the point and the plane normal
@@ -80,7 +80,7 @@ public:
    * @returns the dot product (float) of the point coordinates and the plane
    * normal.
    */
-  float dotCoordinate(const Vector3& point) const;
+  [[nodiscard]] float dotCoordinate(const Vector3& point) const;
 
   /**
    * @brief Updates the current Plane from the plane defined by the three given
@@ -90,8 +90,7 @@ public:
    * @param point3 one of the points used to contruct the plane
    * @returns the updated Plane.
    */
-  Plane& copyFromPoints(const Vector3& point1, const Vector3& point2,
-                        const Vector3& point3);
+  Plane& copyFromPoints(const Vector3& point1, const Vector3& point2, const Vector3& point3);
 
   /**
    * @brief Checks if the plane is facing a given direction
@@ -101,14 +100,14 @@ public:
    * @returns True is the vector "direction"  is the same side than the plane
    * normal.
    */
-  bool isFrontFacingTo(const Vector3& direction, float epsilon) const;
+  [[nodiscard]] bool isFrontFacingTo(const Vector3& direction, float epsilon) const;
 
   /**
    * @brief Calculates the distance to a point
    * @param point point to calculate distance to
    * @returns the signed distance (float) from the given point to the Plane.
    */
-  float signedDistanceTo(const Vector3& point) const;
+  [[nodiscard]] float signedDistanceTo(const Vector3& point) const;
 
   /** Statics **/
 
@@ -126,8 +125,7 @@ public:
    * @param point3 point used to create the plane
    * @returns a new Plane defined by the three given points.
    */
-  static Plane FromPoints(const Vector3& point1, const Vector3& point2,
-                          const Vector3& point3);
+  static Plane FromPoints(const Vector3& point1, const Vector3& point2, const Vector3& point3);
 
   /**
    * @brief Creates a plane from an origin point and a normal

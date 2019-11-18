@@ -1924,7 +1924,7 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
       c = (isTop) ? faceColors[surfaceNb - 1] : faceColors[0];
     }
     // cap center
-    uint32_t vbase = static_cast<uint32_t>(positions.size() / 3);
+    auto vbase     = static_cast<uint32_t>(positions.size() / 3);
     float offset   = isTop ? height / 2.f : -height / 2.f;
     Vector3 center(0.f, offset, 0.f);
     stl_util::concat(positions, {center.x, center.y, center.z});
@@ -2258,7 +2258,7 @@ VertexData::CreateTiledGround(TiledGroundOptions& options)
   auto applyTile
     = [&](float xTileMin, float zTileMin, float xTileMax, float zTileMax) {
         // Indices
-        uint32_t base      = static_cast<unsigned>(positions.size() / 3);
+        auto base          = static_cast<unsigned>(positions.size() / 3);
         uint32_t rowLength = precision_w + 1;
         for (row = 0; row < precision_h; ++row) {
           for (col = 0; col < precision_w; ++col) {
@@ -3492,13 +3492,12 @@ void VertexData::ComputeNormals(const Float32Array& positions,
   std::optional<Vector3> distanceTo = std::nullopt;
   std::vector<DepthSortedFacet> depthSortedFacets;
   if (options) {
-    computeFacetNormals   = (!options->facetNormals.empty()) ? true : false;
-    computeFacetPositions = (!options->facetPositions.empty()) ? true : false;
-    computeFacetPartitioning
-      = (!options->facetPartitioning.empty()) ? true : false;
-    faceNormalSign   = (options->useRightHandedSystem == true) ? -1.f : 1.f;
+    computeFacetNormals      = !options->facetNormals.empty();
+    computeFacetPositions    = !options->facetPositions.empty();
+    computeFacetPartitioning = !options->facetPartitioning.empty();
+    faceNormalSign           = (options->useRightHandedSystem) ? -1.f : 1.f;
     ratio            = options->ratio ? *options->ratio : 0.f;
-    computeDepthSort = (options->depthSort) ? true : false;
+    computeDepthSort         = (options->depthSort);
     distanceTo       = options->distanceTo;
     if (computeDepthSort) {
       if (!distanceTo.has_value()) {
@@ -3733,7 +3732,7 @@ void VertexData::_ComputeSides(std::optional<uint32_t> sideOrientation,
     case VertexData::DOUBLESIDE:
       // positions
       size_t lp  = positions.size();
-      uint32_t l = static_cast<unsigned>(lp / 3);
+      auto l     = static_cast<unsigned>(lp / 3);
       if (positions.size() < 2 * lp) {
         positions.resize(2 * lp);
       }

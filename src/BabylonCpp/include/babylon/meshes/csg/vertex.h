@@ -38,10 +38,10 @@ public:
    * @brief Make a clone, or deep copy, of the vertex.
    * @returns A new Vertex
    */
-  Vertex clone() const;
-  std::unique_ptr<Vertex> cloneToNewObject() const;
+  [[nodiscard]] Vertex clone() const;
+  [[nodiscard]] std::unique_ptr<Vertex> cloneToNewObject() const;
   friend std::ostream& operator<<(std::ostream& os, const Vertex& vertex);
-  std::string toString() const;
+  [[nodiscard]] std::string toString() const;
 
   /**
    * @brief Invert all orientation-specific data (e.g. vertex normal). Called

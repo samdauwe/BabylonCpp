@@ -6,9 +6,8 @@
 namespace BABYLON {
 namespace Extensions {
 
-Plate::Plate(const Color3& p_color, const Vector3& p_driftAxis,
-             float p_driftRate, float p_spinRate, float p_elevation,
-             bool p_oceanic, Corner& p_root)
+Plate::Plate(const Color3& p_color, const Vector3& p_driftAxis, float p_driftRate, float p_spinRate,
+             float p_elevation, bool p_oceanic, Corner& p_root)
     : color{p_color}
     , driftAxis{p_driftAxis}
     , driftRate{p_driftRate}
@@ -16,9 +15,6 @@ Plate::Plate(const Color3& p_color, const Vector3& p_driftAxis,
     , elevation{p_elevation}
     , oceanic{p_oceanic}
     , root{&p_root}
-    , tiles{}
-    , boundaryCorners{}
-    , boundaryBorders{}
     , area{0}
     , circumference{0}
 {

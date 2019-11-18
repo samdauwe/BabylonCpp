@@ -24,7 +24,7 @@ VirtualJoysticksCamera::VirtualJoysticksCamera(const std::string& iName,
 
 VirtualJoysticksCamera::~VirtualJoysticksCamera() = default;
 
-const std::string VirtualJoysticksCamera::getClassName() const
+std::string VirtualJoysticksCamera::getClassName() const
 {
   return "VirtualJoysticksCamera";
 }

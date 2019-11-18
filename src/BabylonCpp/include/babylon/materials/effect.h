@@ -67,19 +67,19 @@ public:
   /**
    * Unique key for this effect
    */
-  std::string key() const;
+  [[nodiscard]] std::string key() const;
 
   /**
    * @brief If the effect has been compiled and prepared.
    * @returns if the effect is compiled and prepared.
    */
-  bool isReady() const;
+  [[nodiscard]] bool isReady() const;
 
   /**
    * @brief The engine the effect was initialized with.
    * @returns the engine.
    */
-  Engine* getEngine() const;
+  [[nodiscard]] Engine* getEngine() const;
 
   /**
    * @brief The compiled webGL program for the effect
@@ -151,16 +151,14 @@ public:
   /**
    * @brief Hidden
    */
-  void
-  _loadVertexShader(const std::string& vertex,
-                    const std::function<void(const std::string&)>& callback);
+  void _loadVertexShader(const std::string& vertex,
+                         const std::function<void(const std::string&)>& callback);
 
   /**
    * @brief Hidden
    */
-  void
-  _loadFragmentShader(const std::string& fragment,
-                      const std::function<void(const std::string&)>& callback);
+  void _loadFragmentShader(const std::string& fragment,
+                           const std::function<void(const std::string&)>& callback);
 
   /**
    * @brief Hidden
@@ -176,10 +174,9 @@ public:
    * @param onError Callback called on error.
    * Hidden
    */
-  void _rebuildProgram(
-    const std::string& vertexSourceCode, const std::string& fragmentSourceCode,
-    const std::function<void(GL::IGLProgram* program)>& onCompiled,
-    const std::function<void(const std::string& message)>& onError);
+  void _rebuildProgram(const std::string& vertexSourceCode, const std::string& fragmentSourceCode,
+                       const std::function<void(GL::IGLProgram* program)>& onCompiled,
+                       const std::function<void(const std::string& message)>& onError);
 
   /**
    * @brief Gets the uniform locations of the the specified variable names
@@ -199,7 +196,7 @@ public:
    * @brief Checks if the effect is supported. (Must be called after
    * compilation)
    */
-  bool isSupported() const;
+  [[nodiscard]] bool isSupported() const;
 
   /**
    * @brief Binds a texture to the engine to be used as output of the shader.
@@ -207,8 +204,7 @@ public:
    * @param texture Texture to bind.
    * Hidden
    */
-  void _bindTexture(const std::string& channel,
-                    const InternalTexturePtr& texture);
+  void _bindTexture(const std::string& channel, const InternalTexturePtr& texture);
 
   /**
    * @brief Sets a texture on the engine to be used in the shader.
@@ -223,16 +219,14 @@ public:
    * @param channel Name of the sampler variable.
    * @param texture Texture to set.
    */
-  void setDepthStencilTexture(const std::string& channel,
-                              const RenderTargetTexturePtr& texture);
+  void setDepthStencilTexture(const std::string& channel, const RenderTargetTexturePtr& texture);
 
   /**
    * @brief Sets an array of textures on the engine to be used in the shader.
    * @param channel Name of the variable.
    * @param textures Textures to set.
    */
-  void setTextureArray(const std::string& channel,
-                       const std::vector<BaseTexturePtr>& textures);
+  void setTextureArray(const std::string& channel, const std::vector<BaseTexturePtr>& textures);
 
   /**
    * @brief Sets a texture to be the input of the specified post process. (To
@@ -240,8 +234,7 @@ public:
    * @param channel Name of the sampler variable.
    * @param postProcess Post process to get the input texture from.
    */
-  void setTextureFromPostProcess(const std::string& channel,
-                                 PostProcess* postProcess);
+  void setTextureFromPostProcess(const std::string& channel, PostProcess* postProcess);
 
   /**
    * @brief (Warning! setTextureFromPostProcessOutput may be desired instead)
@@ -251,14 +244,12 @@ public:
    * @param channel Name of the sampler variable.
    * @param postProcess Post process to get the output texture from.
    */
-  void setTextureFromPostProcessOutput(const std::string& channel,
-                                       PostProcess* postProcess);
+  void setTextureFromPostProcessOutput(const std::string& channel, PostProcess* postProcess);
 
   bool _cacheMatrix(const std::string& uniformName, const Matrix& matrix);
   bool _cacheFloat2(const std::string& uniformName, float x, float y);
   bool _cacheFloat3(const std::string& uniformName, float x, float y, float z);
-  bool _cacheFloat4(const std::string& uniformName, float x, float y, float z,
-                    float w);
+  bool _cacheFloat4(const std::string& uniformName, float x, float y, float z, float w);
 
   /**
    * @brief Binds a buffer to a uniform.
@@ -325,8 +316,7 @@ public:
    * @param array array to be set.
    * @returns this effect.
    */
-  Effect& setFloatArray(const std::string& uniformName,
-                        const Float32Array& array);
+  Effect& setFloatArray(const std::string& uniformName, const Float32Array& array);
 
   /**
    * @brief Sets an float array 2 on a uniform variable. (Array is specified as
@@ -335,8 +325,7 @@ public:
    * @param array array to be set.
    * @returns this effect.
    */
-  Effect& setFloatArray2(const std::string& uniformName,
-                         const Float32Array& array);
+  Effect& setFloatArray2(const std::string& uniformName, const Float32Array& array);
 
   /**
    * @brief Sets an float array 3 on a uniform variable. (Array is specified as
@@ -346,8 +335,7 @@ public:
    * @param array array to be set.
    * @returns this effect.
    */
-  Effect& setFloatArray3(const std::string& uniformName,
-                         const Float32Array& array);
+  Effect& setFloatArray3(const std::string& uniformName, const Float32Array& array);
 
   /**
    * @brief Sets an float array 4 on a uniform variable. (Array is specified as
@@ -357,8 +345,7 @@ public:
    * @param array array to be set.
    * @returns this effect.
    */
-  Effect& setFloatArray4(const std::string& uniformName,
-                         const Float32Array& array);
+  Effect& setFloatArray4(const std::string& uniformName, const Float32Array& array);
 
   /**
    * @brief Sets an array on a uniform variable.
@@ -419,8 +406,7 @@ public:
    * @param matrix matrix to be set.
    * @returns this effect.
    */
-  Effect& setMatrix3x3(const std::string& uniformName,
-                       const Float32Array& matrix);
+  Effect& setMatrix3x3(const std::string& uniformName, const Float32Array& matrix);
 
   /**
    * @brief Sets a 2x2 matrix on a uniform variable. (Speicified as [1,2,3,4]
@@ -429,8 +415,7 @@ public:
    * @param matrix matrix to be set.
    * @returns this effect.
    */
-  Effect& setMatrix2x2(const std::string& uniformName,
-                       const Float32Array& matrix);
+  Effect& setMatrix2x2(const std::string& uniformName, const Float32Array& matrix);
 
   /**
    * @brief Sets a float on a uniform variable.
@@ -500,8 +485,7 @@ public:
    * @param w Fourth float in float4.
    * @returns this effect.
    */
-  Effect& setFloat4(const std::string& uniformName, float x, float y, float z,
-                    float w);
+  Effect& setFloat4(const std::string& uniformName, float x, float y, float z, float w);
 
   /**
    * @brief Sets a Color3 on a uniform variable.
@@ -518,8 +502,7 @@ public:
    * @param alpha Alpha value to be set.
    * @returns this effect.
    */
-  Effect& setColor4(const std::string& uniformName, const Color3& color3,
-                    float alpha);
+  Effect& setColor4(const std::string& uniformName, const Color3& color3, float alpha);
 
   /**
    * @brief Sets a Color4 on a uniform variable.
@@ -542,10 +525,9 @@ public:
    * @param pixelShader optional pixel shader content
    * @param vertexShader optional vertex shader content
    */
-  static void
-  RegisterShader(const std::string& name,
-                 const std::optional<std::string>& pixelShader  = std::nullopt,
-                 const std::optional<std::string>& vertexShader = std::nullopt);
+  static void RegisterShader(const std::string& name,
+                             const std::optional<std::string>& pixelShader  = std::nullopt,
+                             const std::optional<std::string>& vertexShader = std::nullopt);
 
   /**
    * @brief Resets the cache of effects.
@@ -573,8 +555,7 @@ protected:
    * @param indexParameters Parameters to be used with Babylons include syntax
    * to iterate over an array (eg. {lights: 10})
    */
-  Effect(const std::string& baseName, EffectCreationOptions& options,
-         Engine* engine);
+  Effect(const std::string& baseName, EffectCreationOptions& options, Engine* engine);
   Effect(const std::unordered_map<std::string, std::string>& baseName,
          EffectCreationOptions& options, Engine* engine);
 
@@ -584,12 +565,10 @@ protected:
   Observable<Effect>& get_onBindObservable();
 
 private:
-  void _processShaderConversion(
-    const std::string& sourceCode, bool isFragment,
-    const std::function<void(const std::string&)>& callback);
-  void
-  _processIncludes(const std::string& sourceCode,
-                   const std::function<void(const std::string&)>& callback);
+  void _processShaderConversion(const std::string& sourceCode, bool isFragment,
+                                const std::function<void(const std::string&)>& callback);
+  void _processIncludes(const std::string& sourceCode,
+                        const std::function<void(const std::string&)>& callback);
   std::string _processPrecision(std::string source);
 
 public:
@@ -659,8 +638,7 @@ private:
   std::string _compilationError;
   std::vector<std::string> _attributesNames;
   Int32Array _attributes;
-  std::unordered_map<std::string, std::unique_ptr<GL::IGLUniformLocation>>
-    _uniforms;
+  std::unordered_map<std::string, std::unique_ptr<GL::IGLUniformLocation>> _uniforms;
   std::unordered_map<std::string, unsigned int> _indexParameters;
   std::unique_ptr<EffectFallbacks> _fallbacks;
   std::string _vertexSourceCode;

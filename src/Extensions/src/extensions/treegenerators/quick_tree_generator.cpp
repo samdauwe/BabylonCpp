@@ -76,8 +76,7 @@ MeshPtr QuickTreeGenerator::CreateTree(float sizeBranch, float sizeTrunk,
     auto ry = randomNumber(_min, _max);
     auto rz = randomNumber(_min, _max);
 
-    for (unsigned int index = 0; index < sizes[v].size(); ++index) {
-      size_t i = sizes[v][index];
+    for (unsigned long i : sizes[v]) {
       positions[i] += rx;
       positions[i + 1] += ry;
       positions[i + 2] += rz;

@@ -47,7 +47,7 @@ public:
   ~SimplePlanet(); // = default
 
   void initialize();
-  Vector2 calculateUVCoord(const Vector3& p) const;
+  [[nodiscard]] Vector2 calculateUVCoord(const Vector3& p) const;
   void revolve();
   void pickTile(unsigned int faceId);
   void render();

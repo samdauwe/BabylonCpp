@@ -18,17 +18,15 @@ struct IAnimationGroupTreeItemComponentProps {
   std::function<void()> onClick    = nullptr;
 }; // end of struct IAnimationGroupTreeItemComponentProps
 
-class BABYLON_SHARED_EXPORT AnimationGroupTreeItemComponent
-    : public TreeItemSpecializedComponent {
+class BABYLON_SHARED_EXPORT AnimationGroupTreeItemComponent : public TreeItemSpecializedComponent {
 
 public:
   /** Font Awesome Icon Unicodes **/
   static constexpr const char* faFilm = ICON_FA_FILM;
 
 public:
-  AnimationGroupTreeItemComponent(
-    const IAnimationGroupTreeItemComponentProps& props);
-  virtual ~AnimationGroupTreeItemComponent(); // = default
+  AnimationGroupTreeItemComponent(const IAnimationGroupTreeItemComponentProps& props);
+  ~AnimationGroupTreeItemComponent() override; // = default
 
   void render() override;
 

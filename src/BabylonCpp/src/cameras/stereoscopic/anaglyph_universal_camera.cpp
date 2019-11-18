@@ -36,7 +36,7 @@ AnaglyphUniversalCamera::AnaglyphUniversalCamera(const std::string& iName,
 
 AnaglyphUniversalCamera::~AnaglyphUniversalCamera() = default;
 
-const std::string AnaglyphUniversalCamera::getClassName() const
+std::string AnaglyphUniversalCamera::getClassName() const
 {
   return "AnaglyphUniversalCamera";
 }

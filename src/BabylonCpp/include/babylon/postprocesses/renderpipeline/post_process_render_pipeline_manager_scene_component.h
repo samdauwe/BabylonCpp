@@ -35,10 +35,9 @@ public:
   static PostProcessRenderPipelineManagerSceneComponentPtr New(Ts&&... args)
   {
     return std::shared_ptr<PostProcessRenderPipelineManagerSceneComponent>(
-      new PostProcessRenderPipelineManagerSceneComponent(
-        std::forward<Ts>(args)...));
+      new PostProcessRenderPipelineManagerSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~PostProcessRenderPipelineManagerSceneComponent(); // = default
+  ~PostProcessRenderPipelineManagerSceneComponent() override; // = default
 
   /**
    * @brief Registers the component in a given scene.

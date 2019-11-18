@@ -13,11 +13,9 @@ struct ImageProcessingConfigurationDefines;
 class ImageProcessingConfiguration;
 class RawTexture;
 class Scene;
-using ImageProcessingConfigurationPtr
-  = std::shared_ptr<ImageProcessingConfiguration>;
-using ImageProcessingConfigurationDefinesPtr
-  = std::shared_ptr<ImageProcessingConfigurationDefines>;
-using RawTexturePtr = std::shared_ptr<RawTexture>;
+using ImageProcessingConfigurationPtr        = std::shared_ptr<ImageProcessingConfiguration>;
+using ImageProcessingConfigurationDefinesPtr = std::shared_ptr<ImageProcessingConfigurationDefines>;
+using RawTexturePtr                          = std::shared_ptr<RawTexture>;
 
 /**
  * @brief This represents the base class for particle system in Babylon.
@@ -65,19 +63,19 @@ public:
    * @param name The name of the particle system
    */
   BaseParticleSystem(const std::string& name);
-  ~BaseParticleSystem(); // = default
+  ~BaseParticleSystem() override; // = default
 
   /**
    * @brief Returns whether or not the particle system has an emitter.
    * @return Whether or not the particle system has an emitter
    */
-  bool hasEmitter() const override;
+  [[nodiscard]] bool hasEmitter() const override;
 
   /**
    * @brief Get hosting scene.
    * @returns the scene
    */
-  Scene* getScene() const override;
+  [[nodiscard]] Scene* getScene() const override;
 
   /**
    * @brief Gets the current list of drag gradients.
@@ -173,9 +171,8 @@ public:
    * direction2 from within the box
    * @returns the emitter
    */
-  PointParticleEmitterPtr
-  createPointEmitter(const Vector3& direction1,
-                     const Vector3& direction2) override;
+  PointParticleEmitterPtr createPointEmitter(const Vector3& direction1,
+                                             const Vector3& direction2) override;
 
   /**
    * @brief Creates a Hemisphere Emitter for the particle system (emits along
@@ -185,9 +182,8 @@ public:
    * Only, 1 Entire Radius
    * @returns the emitter
    */
-  HemisphericParticleEmitterPtr createHemisphericEmitter(float radius = 1.f,
-                                                         float radiusRange
-                                                         = 1.f) override;
+  HemisphericParticleEmitterPtr createHemisphericEmitter(float radius      = 1.f,
+                                                         float radiusRange = 1.f) override;
 
   /**
    * @brief Creates a Sphere Emitter for the particle system (emits along the
@@ -197,8 +193,8 @@ public:
    * Only, 1 Entire Radius
    * @returns the emitter
    */
-  SphereParticleEmitterPtr
-  createSphereEmitter(float radius = 1.f, float radiusRange = 1.f) override;
+  SphereParticleEmitterPtr createSphereEmitter(float radius      = 1.f,
+                                               float radiusRange = 1.f) override;
 
   /**
    * @brief Creates a Directed Sphere Emitter for the particle system (emits
@@ -210,9 +206,10 @@ public:
    * direction2 from within the sphere
    * @returns the emitter
    */
-  SphereDirectedParticleEmitterPtr createDirectedSphereEmitter(
-    float radius = 1.f, const Vector3& direction1 = Vector3(0.f, 1.f, 0.f),
-    const Vector3& direction2 = Vector3(0.f, 1.f, 0.f)) override;
+  SphereDirectedParticleEmitterPtr
+  createDirectedSphereEmitter(float radius              = 1.f,
+                              const Vector3& direction1 = Vector3(0.f, 1.f, 0.f),
+                              const Vector3& direction2 = Vector3(0.f, 1.f, 0.f)) override;
 
   /**
    * @brief Creates a Cylinder Emitter for the particle system (emits from the
@@ -225,10 +222,9 @@ public:
    * [0-1]
    * @returns the emitter
    */
-  CylinderParticleEmitterPtr
-  createCylinderEmitter(float radius = 1.f, float height = 1.f,
-                        float radiusRange         = 1.f,
-                        float directionRandomizer = 0.f) override;
+  CylinderParticleEmitterPtr createCylinderEmitter(float radius = 1.f, float height = 1.f,
+                                                   float radiusRange         = 1.f,
+                                                   float directionRandomizer = 0.f) override;
 
   /**
    * @brief Creates a Cone Emitter for the particle system (emits from the cone
@@ -237,8 +233,7 @@ public:
    * @param angle The base angle of the cone
    * @returns the emitter
    */
-  ConeParticleEmitterPtr createConeEmitter(float radius = 1.f,
-                                           float angle  = Math::PI_4) override;
+  ConeParticleEmitterPtr createConeEmitter(float radius = 1.f, float angle = Math::PI_4) override;
 
   /**
    * @brief Creates a Directed Cylinder Emitter for the particle system (emits
@@ -253,10 +248,10 @@ public:
    * direction2 from within the cylinder
    * @returns the emitter
    */
-  CylinderDirectedParticleEmitterPtr createDirectedCylinderEmitter(
-    float radius = 1.f, float height = 1.f, float radiusRange = 1.f,
-    const Vector3& direction1 = Vector3(0.f, 1.f, 0.f),
-    const Vector3& direction2 = Vector3(0.f, 1.f, 0.f)) override;
+  CylinderDirectedParticleEmitterPtr
+  createDirectedCylinderEmitter(float radius = 1.f, float height = 1.f, float radiusRange = 1.f,
+                                const Vector3& direction1 = Vector3(0.f, 1.f, 0.f),
+                                const Vector3& direction2 = Vector3(0.f, 1.f, 0.f)) override;
 
   /**
    * @brief Creates a Box Emitter for the particle system. (emits between
@@ -272,8 +267,7 @@ public:
    * minEmitBox and maxEmitBox
    * @returns the emitter
    */
-  BoxParticleEmitterPtr createBoxEmitter(const Vector3& direction1,
-                                         const Vector3& direction2,
+  BoxParticleEmitterPtr createBoxEmitter(const Vector3& direction1, const Vector3& direction2,
                                          const Vector3& minEmitBox,
                                          const Vector3& maxEmitBox) override;
 
@@ -292,7 +286,7 @@ protected:
    * @brief Gets whether an animation sprite sheet is enabled or not on the
    * particle system.
    */
-  bool get_isAnimationSheetEnabled() const override;
+  [[nodiscard]] bool get_isAnimationSheetEnabled() const override;
 
   /**
    * @brief Sets whether an animation sprite sheet is enabled or not on the
@@ -303,7 +297,7 @@ protected:
   /**
    * @brief Hidden
    */
-  bool _hasTargetStopDurationDependantGradient() const;
+  [[nodiscard]] bool _hasTargetStopDurationDependantGradient() const;
 
   /**
    * @brief Random direction of each particle after it has been emitted, between
@@ -343,7 +337,7 @@ protected:
    * @brief Gets or sets a boolean indicating if the particles must be rendered
    * as billboard or aligned with the direction.
    */
-  bool get_isBillboardBased() const override;
+  [[nodiscard]] bool get_isBillboardBased() const override;
 
   /**
    * @brief Sets a boolean indicating if the particles must be rendered as
@@ -363,45 +357,40 @@ protected:
    *
    * If sets to null, the scene one is in use.
    */
-  void set_imageProcessingConfiguration(
-    const ImageProcessingConfigurationPtr& value);
+  void set_imageProcessingConfiguration(const ImageProcessingConfigurationPtr& value);
 
   /**
    * @brief Attaches a new image processing configuration to the Standard
    * Material.
    * @param configuration
    */
-  void _attachImageProcessingConfiguration(
-    const ImageProcessingConfigurationPtr& configuration);
+  void _attachImageProcessingConfiguration(const ImageProcessingConfigurationPtr& configuration);
 
   /**
    * Hidden
    */
-  virtual void _reset();
+  virtual void _reset(); // FIXME: should it be IParticleSystem::reset() (no underscore)?
 
   /**
    * Hidden
    */
-  virtual BaseParticleSystem&
-  _removeGradientAndTexture(float gradient,
-                            std::vector<ColorGradient>& gradients,
-                            const RawTexturePtr& texture);
+  virtual BaseParticleSystem& _removeGradientAndTexture(float gradient,
+                                                        std::vector<ColorGradient>& gradients,
+                                                        const RawTexturePtr& texture);
 
   /**
    * Hidden
    */
-  virtual BaseParticleSystem&
-  _removeGradientAndTexture(float gradient,
-                            std::vector<Color3Gradient>& gradients,
-                            const RawTexturePtr& texture);
+  virtual BaseParticleSystem& _removeGradientAndTexture(float gradient,
+                                                        std::vector<Color3Gradient>& gradients,
+                                                        const RawTexturePtr& texture);
 
   /**
    * Hidden
    */
-  virtual BaseParticleSystem&
-  _removeGradientAndTexture(float gradient,
-                            std::vector<FactorGradient>& gradients,
-                            const RawTexturePtr& texture);
+  virtual BaseParticleSystem& _removeGradientAndTexture(float gradient,
+                                                        std::vector<FactorGradient>& gradients,
+                                                        const RawTexturePtr& texture);
 
 public:
   /**

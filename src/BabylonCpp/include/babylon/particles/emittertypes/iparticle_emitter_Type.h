@@ -31,8 +31,7 @@ struct BABYLON_SHARED_EXPORT IParticleEmitterType {
    * @param directionToUpdate is the direction vector to update with the result
    * @param particle is the particle we are computed the direction for
    */
-  virtual void startDirectionFunction(const Matrix& worldMatrix,
-                                      Vector3& directionToUpdate,
+  virtual void startDirectionFunction(const Matrix& worldMatrix, Vector3& directionToUpdate,
                                       Particle* particle)
     = 0;
 
@@ -43,8 +42,7 @@ struct BABYLON_SHARED_EXPORT IParticleEmitterType {
    * @param positionToUpdate is the position vector to update with the result
    * @param particle is the particle we are computed the position for
    */
-  virtual void startPositionFunction(const Matrix& worldMatrix,
-                                     Vector3& positionToUpdate,
+  virtual void startPositionFunction(const Matrix& worldMatrix, Vector3& positionToUpdate,
                                      Particle* particle)
     = 0;
 
@@ -52,7 +50,7 @@ struct BABYLON_SHARED_EXPORT IParticleEmitterType {
    * @brief Clones the current emitter and returns a copy of it.
    * @returns the new emitter
    */
-  virtual std::unique_ptr<IParticleEmitterType> clone() const = 0;
+  [[nodiscard]] virtual std::unique_ptr<IParticleEmitterType> clone() const = 0;
 
   /**
    * @brief Called by the GPUParticleSystem to setup the update shader.
@@ -64,19 +62,19 @@ struct BABYLON_SHARED_EXPORT IParticleEmitterType {
    * @brief Returns a string to use to update the GPU particles update shader.
    * @returns a string containng the defines string
    */
-  virtual const std::string getEffectDefines() const = 0;
+  [[nodiscard]] virtual std::string getEffectDefines() const = 0;
 
   /**
    * @brief Returns the string "SphereDirectedParticleEmitter".
    * @returns a string containing the class name
    */
-  virtual const std::string getClassName() const = 0;
+  [[nodiscard]] virtual std::string getClassName() const = 0;
 
   /**
    * @brief Serializes the particle system to a JSON object.
    * @returns the JSON object
    */
-  virtual json serialize() const = 0;
+  [[nodiscard]] virtual json serialize() const = 0;
 
   /**
    * @brief Parse properties from a JSON object.

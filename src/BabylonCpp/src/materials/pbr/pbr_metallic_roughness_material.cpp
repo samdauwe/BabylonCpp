@@ -32,7 +32,7 @@ PBRMetallicRoughnessMaterial::PBRMetallicRoughnessMaterial(
 
 PBRMetallicRoughnessMaterial::~PBRMetallicRoughnessMaterial() = default;
 
-const std::string PBRMetallicRoughnessMaterial::getClassName() const
+std::string PBRMetallicRoughnessMaterial::getClassName() const
 {
   return "PBRMetallicRoughnessMaterial";
 }

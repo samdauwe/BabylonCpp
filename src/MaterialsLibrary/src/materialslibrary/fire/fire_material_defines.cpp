@@ -3,7 +3,7 @@
 namespace BABYLON {
 namespace MaterialsLibrary {
 
-FireMaterialDefines::FireMaterialDefines() : MaterialDefines{}
+FireMaterialDefines::FireMaterialDefines()
 {
   boolDef = {
     {"DIFFUSE", false},      //

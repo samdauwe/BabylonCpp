@@ -42,7 +42,7 @@ public:
 
     return texture;
   }
-  virtual ~BaseTexture() override; // = default
+  ~BaseTexture() override; // = default
 
   template <typename Derived>
   std::shared_ptr<Derived> shared_from_base()
@@ -50,7 +50,7 @@ public:
     return std::static_pointer_cast<Derived>(shared_from_this());
   }
 
-  virtual Type type() const override;
+  Type type() const override;
   void addToScene(const BaseTexturePtr& newTexture);
 
   /**
@@ -63,7 +63,7 @@ public:
    * @brief Get the class name of the texture.
    * @returns "BaseTexture"
    */
-  const std::string getClassName() const;
+  std::string getClassName() const;
 
   /**
    * @brief Get the scene the texture belongs to.

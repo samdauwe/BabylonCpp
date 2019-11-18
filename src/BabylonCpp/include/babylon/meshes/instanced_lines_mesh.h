@@ -20,18 +20,18 @@ public:
   template <typename... Ts>
   static InstancedLinesMeshPtr New(Ts&&... args)
   {
-    auto mesh = std::shared_ptr<InstancedLinesMesh>(
-      new InstancedLinesMesh(std::forward<Ts>(args)...));
+    auto mesh
+      = std::shared_ptr<InstancedLinesMesh>(new InstancedLinesMesh(std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
     return mesh;
   }
-  ~InstancedLinesMesh(); // = default
+  ~InstancedLinesMesh() override; // = default
 
   /**
    * @brief Returns the string "InstancedLinesMesh".
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Enables the edge rendering mode on the mesh.
@@ -43,9 +43,8 @@ public:
    * @returns the current InstancedLinesMesh
    * @see https://www.babylonjs-playground.com/#19O9TU#0
    */
-  InstancedLinesMesh& enableEdgesRendering(float epsilon = 0.95f,
-                                           bool checkVerticesInsteadOfIndices
-                                           = false);
+  InstancedLinesMesh& enableEdgesRendering(float epsilon                      = 0.95f,
+                                           bool checkVerticesInsteadOfIndices = false);
 
 protected:
   InstancedLinesMesh(const std::string& name, const LinesMeshPtr& source);

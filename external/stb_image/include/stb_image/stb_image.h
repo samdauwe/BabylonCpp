@@ -333,8 +333,8 @@ enum
 };
 
 #include <stdlib.h>
-typedef unsigned char stbi_uc;
-typedef unsigned short stbi_us;
+typedef unsigned char stbi_uc; // NOLINT
+typedef unsigned short stbi_us; // NOLINT
 
 #ifdef __cplusplus
 extern "C" {
@@ -570,10 +570,10 @@ typedef unsigned int   stbi__uint32;
 typedef   signed int   stbi__int32;
 #else
 #include <stdint.h>
-typedef uint16_t stbi__uint16;
-typedef int16_t  stbi__int16;
-typedef uint32_t stbi__uint32;
-typedef int32_t  stbi__int32;
+typedef uint16_t stbi__uint16; // NOLINT
+typedef int16_t  stbi__int16; // NOLINT
+typedef uint32_t stbi__uint32; // NOLINT
+typedef int32_t  stbi__int32; // NOLINT
 #endif
 
 // should produce compiler error if size is wrong
@@ -687,7 +687,7 @@ static int stbi__sse2_available(void)
 #define STBI_SIMD_ALIGN(type, name) type name __attribute__((aligned(16)))
 
 #if !defined(STBI_NO_JPEG) && defined(STBI_SSE2)
-static int stbi__sse2_available(void)
+static int stbi__sse2_available(void) // NOLINT
 {
    // If we're even attempting to compile this on GCC/Clang, that means
    // -msse2 is on, which means the compiler is allowed to use SSE2
@@ -3223,7 +3223,7 @@ static int stbi__decode_jpeg_image(stbi__jpeg *j)
 // static jfif-centered resampling (across block boundaries)
 
 typedef stbi_uc *(*resample_row_func)(stbi_uc *out, stbi_uc *in0, stbi_uc *in1,
-                                    int w, int hs);
+                                    int w, int hs);  // NOLINT
 
 #define stbi__div4(x) ((stbi_uc) ((x) >> 2))
 

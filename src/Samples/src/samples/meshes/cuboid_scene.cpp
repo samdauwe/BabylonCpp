@@ -83,15 +83,13 @@ public:
     Float32Array uvs;
 
     // Create each face in turn.
-    for (unsigned int index = 0; index < normalsSource.size(); ++index) {
-      auto& normal = normalsSource[index];
-
+    for (auto& normal : normalsSource) {
       // Get two vectors perpendicular to the face normal and to each other.
       Vector3 side1(normal.y, normal.z, normal.x);
       auto side2 = Vector3::Cross(normal, side1);
 
       // Six indices (two triangles) per face.
-      int32_t verticesLength = static_cast<int32_t>(positions.size() / 3);
+      auto verticesLength = static_cast<int32_t>(positions.size() / 3);
       indices.emplace_back(verticesLength);
       indices.emplace_back(verticesLength + 1);
       indices.emplace_back(verticesLength + 2);

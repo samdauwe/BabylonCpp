@@ -35,13 +35,12 @@ public:
   template <typename... Ts>
   static ShaderMaterialPtr New(Ts&&... args)
   {
-    auto material = std::shared_ptr<ShaderMaterial>(
-      new ShaderMaterial(std::forward<Ts>(args)...));
+    auto material = std::shared_ptr<ShaderMaterial>(new ShaderMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;
   }
-  virtual ~ShaderMaterial(); // = default
+  ~ShaderMaterial() override; // = default
 
   /**
    * @brief Gets the options used to compile the shader.
@@ -54,21 +53,21 @@ public:
    * Mainly use in serialization.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
-  Type type() const override;
+  [[nodiscard]] Type type() const override;
 
   /**
    * @brief Specifies if the material will require alpha blending.
    * @returns a boolean specifying if alpha blending is needed
    */
-  bool needAlphaBlending() const override;
+  [[nodiscard]] bool needAlphaBlending() const override;
 
   /**
    * @brief Specifies if this material should be rendered in alpha test mode
    * @returns a boolean specifying if an alpha test is needed.
    */
-  bool needAlphaTesting() const override;
+  [[nodiscard]] bool needAlphaTesting() const override;
 
   /**
    * @brief Set a texture in the shader.
@@ -77,8 +76,7 @@ public:
    * @param texture Define the texture to bind to this sampler
    * @return the material itself allowing "fluent" like uniform updates
    */
-  ShaderMaterial& setTexture(const std::string& name,
-                             const TexturePtr& texture);
+  ShaderMaterial& setTexture(const std::string& name, const TexturePtr& texture);
 
   /**
    * @brief Set a texture array in the shader.
@@ -128,8 +126,7 @@ public:
    * @param value Define the value to give to the uniform
    * @return the material itself allowing "fluent" like uniform updates
    */
-  ShaderMaterial& setColor3Array(const std::string& iName,
-                                 const std::vector<Color3>& value);
+  ShaderMaterial& setColor3Array(const std::string& iName, const std::vector<Color3>& value);
 
   /**
    * @brief Set a vec4 in the shader from a Color4.
@@ -145,8 +142,7 @@ public:
    * @param value Define the value to give to the uniform
    * @return the material itself allowing "fluent" like uniform updates
    */
-  ShaderMaterial& setColor4Array(const std::string& iName,
-                                 const std::vector<Color4>& value);
+  ShaderMaterial& setColor4Array(const std::string& iName, const std::vector<Color4>& value);
 
   /**
    * @brief Set a vec2 in the shader from a Vector2.
@@ -186,8 +182,7 @@ public:
    * @param value Define the value to give to the uniform
    * @return the material itself allowing "fluent" like uniform updates
    */
-  ShaderMaterial& setMatrix3x3(const std::string& name,
-                               const Float32Array& value);
+  ShaderMaterial& setMatrix3x3(const std::string& name, const Float32Array& value);
 
   /**
    * @brief Set a mat2 in the shader from a Float32Array.
@@ -195,8 +190,7 @@ public:
    * @param value Define the value to give to the uniform
    * @return the material itself allowing "fluent" like uniform updates
    */
-  ShaderMaterial& setMatrix2x2(const std::string& name,
-                               const Float32Array& value);
+  ShaderMaterial& setMatrix2x2(const std::string& name, const Float32Array& value);
 
   /**
    * @brief Set a vec2 array in the shader from a number array.
@@ -204,8 +198,7 @@ public:
    * @param value Define the value to give to the uniform
    * @return the material itself allowing "fluent" like uniform updates
    */
-  ShaderMaterial& setArray2(const std::string& iName,
-                            const Float32Array& value);
+  ShaderMaterial& setArray2(const std::string& iName, const Float32Array& value);
 
   /**
    * @brief Set a vec3 array in the shader from a number array.
@@ -213,8 +206,7 @@ public:
    * @param value Define the value to give to the uniform
    * @return the material itself allowing "fluent" like uniform updates
    */
-  ShaderMaterial& setArray3(const std::string& iName,
-                            const Float32Array& value);
+  ShaderMaterial& setArray3(const std::string& iName, const Float32Array& value);
 
   /**
    * @brief Set a vec4 array in the shader from a number array.
@@ -222,8 +214,7 @@ public:
    * @param value Define the value to give to the uniform
    * @return the material itself allowing "fluent" like uniform updates
    */
-  ShaderMaterial& setArray4(const std::string& iName,
-                            const Float32Array& value);
+  ShaderMaterial& setArray4(const std::string& iName, const Float32Array& value);
 
   /**
    * @brief Specifies that the submesh is ready to be used.
@@ -242,8 +233,7 @@ public:
    * instances
    * @returns true if ready, otherwise false
    */
-  bool isReady(AbstractMesh* mesh = nullptr,
-               bool useInstances  = false) override;
+  bool isReady(AbstractMesh* mesh = nullptr, bool useInstances = false) override;
 
   /**
    * @brief Binds the world matrix to the material.
@@ -262,22 +252,22 @@ public:
    * @brief Gets the active textures from the material.
    * @returns an array of textures
    */
-  std::vector<BaseTexturePtr> getActiveTextures() const override;
+  [[nodiscard]] std::vector<BaseTexturePtr> getActiveTextures() const override;
 
   /**
    * @brief Specifies if the material uses a texture.
    * @param texture defines the texture to check against the material
    * @returns a boolean specifying if the material uses the texture
    */
-  bool hasTexture(const BaseTexturePtr& texture) const override;
+  [[nodiscard]] bool hasTexture(const BaseTexturePtr& texture) const override;
 
   /**
    * @brief Makes a duplicate of the material, and gives it a new name.
    * @param name defines the new name for the duplicated material
    * @returns the cloned material
    */
-  MaterialPtr clone(const std::string& name,
-                    bool cloneChildren = false) const override;
+  [[nodiscard]] MaterialPtr clone(const std::string& name,
+                                  bool cloneChildren = false) const override;
 
   /**
    * @brief Disposes the material.
@@ -288,15 +278,14 @@ public:
    * @param notBoundToMesh specifies if the material that is being disposed is
    * known to be not bound to any mesh
    */
-  virtual void dispose(bool forceDisposeEffect   = false,
-                       bool forceDisposeTextures = false,
-                       bool notBoundToMesh       = false) override;
+  void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
+               bool notBoundToMesh = false) override;
 
   /**
    * @brief Serializes this material in a JSON representation.
    * @returns the serialized material object
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Creates a shader material from parsed shader material data.
@@ -333,8 +322,7 @@ protected:
    * and COMMON_NAME.fragment.fx in index.html folder.
    * @param options Define the options used to create the shader
    */
-  ShaderMaterial(const std::string& name, Scene* scene,
-                 const std::string& shaderPath,
+  ShaderMaterial(const std::string& name, Scene* scene, const std::string& shaderPath,
                  const IShaderMaterialOptions& options);
 
 private:

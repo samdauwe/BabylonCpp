@@ -30,8 +30,7 @@ public:
   template <typename... Ts>
   static AnimatablePtr New(Ts&&... args)
   {
-    auto animatable
-      = std::shared_ptr<Animatable>(new Animatable(std::forward<Ts>(args)...));
+    auto animatable = std::shared_ptr<Animatable>(new Animatable(std::forward<Ts>(args)...));
     animatable->addToScene(animatable);
 
     return animatable;
@@ -62,22 +61,21 @@ public:
    * @param target defines the target of the animations
    * @param animations defines the new animations to add
    */
-  void appendAnimations(const IAnimatablePtr& target,
-                        const std::vector<AnimationPtr>& animations);
+  void appendAnimations(const IAnimatablePtr& target, const std::vector<AnimationPtr>& animations);
 
   /**
    * @brief Gets the source animation for a specific property.
    * @param property defines the propertyu to look for
    * @returns null or the source animation for the given property
    */
-  AnimationPtr getAnimationByTargetProperty(const std::string& property) const;
+  [[nodiscard]] AnimationPtr getAnimationByTargetProperty(const std::string& property) const;
 
   /**
    * @brief Gets the runtime animation for a specific property.
    * @param property defines the propertyu to look for
    * @returns null or the runtime animation for the given property
    */
-  RuntimeAnimationPtr
+  [[nodiscard]] RuntimeAnimationPtr
   getRuntimeAnimationByTargetProperty(const std::string& property) const;
 
   /**
@@ -122,9 +120,8 @@ public:
    * stopped based on its target (all animations will be stopped if both this
    * and animationName are empty)
    */
-  void stop(const std::string& animationName = "",
-            const std::function<bool(IAnimatable* target)>& targetMask
-            = nullptr);
+  void stop(const std::string& animationName                           = "",
+            const std::function<bool(IAnimatable* target)>& targetMask = nullptr);
 
   /**
    * @brief Hidden
@@ -147,8 +144,7 @@ protected:
    * @param onAnimationLoop defines a callback to call when animation loops
    */
   Animatable(Scene* scene, const IAnimatablePtr& target, float fromFrame = 0.f,
-             float toFrame = 100.f, bool loopAnimation = false,
-             float speedRatio                             = 1.f,
+             float toFrame = 100.f, bool loopAnimation = false, float speedRatio = 1.f,
              const std::function<void()>& onAnimationEnd  = nullptr,
              const std::vector<AnimationPtr>& animations  = {},
              const std::function<void()>& onAnimationLoop = nullptr);
@@ -164,12 +160,12 @@ private:
    * @brief Gets the current frame of the first RuntimeAnimation.
    * Used to synchronize Animatables
    */
-  float get_masterFrame() const;
+  [[nodiscard]] float get_masterFrame() const;
 
   /**
    * @brief Gets the animatable weight (-1.0 by default meaning not weighted).
    */
-  float get_weight() const;
+  [[nodiscard]] float get_weight() const;
 
   /**
    * @brief Sets the animatable weight (-1.0 by default meaning not weighted).
@@ -179,7 +175,7 @@ private:
   /**
    * @brief Gets the speed ratio to apply to the animatable (1.0 by default).
    */
-  float get_speedRatio() const;
+  [[nodiscard]] float get_speedRatio() const;
 
   /**
    * @brief Sets the speed ratio to apply to the animatable (1.0 by default).

@@ -10,7 +10,7 @@ namespace MaterialsLibrary {
 struct BABYLON_SHARED_EXPORT WaterMaterialDefines : public MaterialDefines {
 
   WaterMaterialDefines();
-  ~WaterMaterialDefines(); // = default
+  ~WaterMaterialDefines() override; // = default
 
 }; // end of struct WaterMaterialDefines
 

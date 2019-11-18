@@ -30,7 +30,7 @@ TrailMesh::TrailMesh(const std::string& iName, const AbstractMeshPtr& generator,
 
 TrailMesh::~TrailMesh() = default;
 
-const std::string TrailMesh::getClassName() const
+std::string TrailMesh::getClassName() const
 {
   return "TrailMesh";
 }

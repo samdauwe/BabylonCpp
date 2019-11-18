@@ -32,8 +32,7 @@ public:
    * @param yAxis defines the node hierarchy used to render the y-axis
    * @param zAxis defines the node hierarchy used to render the z-axis
    */
-  AxesViewer(Scene* scene, float scaleLines = 1.f,
-             const std::optional<int>& renderingGroupId = 2,
+  AxesViewer(Scene* scene, float scaleLines = 1.f, const std::optional<int>& renderingGroupId = 2,
              TransformNodePtr xAxis = nullptr, TransformNodePtr yAxis = nullptr,
              TransformNodePtr zAxis = nullptr);
   ~AxesViewer(); // = default
@@ -45,14 +44,14 @@ public:
    * @param yaxis defines the y axis of the viewer
    * @param zaxis defines the z axis of the viewer
    */
-  void update(const Vector3& position, const Vector3& xaxis,
-              const Vector3& yaxis, const Vector3& zaxis);
+  void update(const Vector3& position, const Vector3& xaxis, const Vector3& yaxis,
+              const Vector3& zaxis);
 
   /**
    * @brief Creates an instance of this axes viewer.
    * @returns a new axes viewer with instanced meshes
    */
-  std::unique_ptr<AxesViewer> createInstance() const;
+  [[nodiscard]] std::unique_ptr<AxesViewer> createInstance() const;
 
   /**
    * @brief Releases resources.

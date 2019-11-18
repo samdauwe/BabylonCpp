@@ -13,12 +13,11 @@ class IGLBuffer;
 /**
  * @brief Hidden
  */
-class BABYLON_SHARED_EXPORT WebGLDataBuffer
-    : public DataBuffer<GL::IGLBuffer*> {
+class BABYLON_SHARED_EXPORT WebGLDataBuffer : public DataBuffer<GL::IGLBuffer*> {
 
 public:
   WebGLDataBuffer(GL::IGLBuffer* resource);
-  virtual ~WebGLDataBuffer(); // = default
+  ~WebGLDataBuffer() override; // = default
 
   GL::IGLBuffer* underlyingResource() override;
 

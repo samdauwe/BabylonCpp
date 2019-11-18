@@ -30,14 +30,12 @@ class BABYLON_SHARED_EXPORT AbstractActionManager : IDisposable {
 
 public:
   AbstractActionManager();
-  virtual ~AbstractActionManager(); // = default
+  ~AbstractActionManager() override; // = default
 
   /**
    * @brief Releases all associated resources
    */
-  virtual void dispose(bool doNotRecurse               = false,
-                       bool disposeMaterialAndTextures = false)
-    = 0;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override = 0;
 
   /**
    * @brief Process a specific trigger.
@@ -45,8 +43,7 @@ public:
    * @param evt defines the event details to be processed
    */
   virtual void processTrigger(unsigned int trigger,
-                              const std::optional<IActionEvent>& evt
-                              = std::nullopt)
+                              const std::optional<IActionEvent>& evt = std::nullopt)
     = 0;
 
   /**
@@ -56,7 +53,7 @@ public:
    * @return a boolean indicating whether one (or more) of the triggers is
    * handled
    */
-  virtual bool hasSpecificTriggers(const Uint32Array& triggers) const = 0;
+  [[nodiscard]] virtual bool hasSpecificTriggers(const Uint32Array& triggers) const = 0;
 
   /**
    * @brief Does this action manager handles actions of any of the given
@@ -66,8 +63,8 @@ public:
    * @return a boolean indicating whether one (or more) of the triggers is
    * handled
    */
-  virtual bool hasSpecificTriggers2(unsigned int triggerA,
-                                    unsigned int triggerB) const = 0;
+  [[nodiscard]] virtual bool hasSpecificTriggers2(unsigned int triggerA,
+                                                  unsigned int triggerB) const = 0;
 
   /**
    * @brief Does this action manager handles actions of a given trigger.
@@ -76,17 +73,17 @@ public:
    * by parameter
    * @return whether the trigger is handled
    */
-  virtual bool hasSpecificTrigger(
-    unsigned int trigger,
-    const std::function<bool(const std::string& parameter)>& parameterPredicate
-    = nullptr) const = 0;
+  virtual bool
+  hasSpecificTrigger(unsigned int trigger,
+                     const std::function<bool(const std::string& parameter)>& parameterPredicate
+                     = nullptr) const = 0;
 
   /**
    * @brief Serialize this manager to a JSON object.
    * @param name defines the property name to store this manager
    * @returns a JSON representation of this manager
    */
-  virtual json serialize(const std::string& name) const = 0;
+  [[nodiscard]] virtual json serialize(const std::string& name) const = 0;
 
   /**
    * @brief Registers an action to this action manager.
@@ -125,12 +122,12 @@ protected:
   /**
    * @brief Does this action manager has pointer triggers.
    */
-  virtual bool get_hasPointerTriggers() const = 0;
+  [[nodiscard]] virtual bool get_hasPointerTriggers() const = 0;
 
   /**
    * @brief Does this action manager has pick triggers.
    */
-  virtual bool get_hasPickTriggers() const = 0;
+  [[nodiscard]] virtual bool get_hasPickTriggers() const = 0;
 
 public:
   /** Gets the list of active triggers */

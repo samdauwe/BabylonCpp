@@ -6,8 +6,7 @@
 namespace BABYLON {
 namespace Extensions {
 
-SpatialPartition::SpatialPartition()
-    : boundingSphere{Vector3::Zero(), Vector3::Zero()}, partitions{}, tiles{}
+SpatialPartition::SpatialPartition() : boundingSphere{Vector3::Zero(), Vector3::Zero()}
 {
 }
 
@@ -24,7 +23,7 @@ bool SpatialPartition::intersectRay(const Ray& ray)
   if (Tools::intersectRayWithSphere(ray, boundingSphere)) {
     for (auto& partition : partitions) {
       auto intersection = partition.intersectRay(ray);
-      if (intersection != false) {
+      if (intersection) {
         return true;
       }
     }

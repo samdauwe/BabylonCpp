@@ -62,7 +62,7 @@ public:
    * @param frustumPlanes defines the frustum planes to test
    * @returns true if there is an intersection
    */
-  bool isInFrustum(const std::array<Plane, 6>& frustumPlanes) const;
+  [[nodiscard]] bool isInFrustum(const std::array<Plane, 6>& frustumPlanes) const;
 
   /**
    * @brief Tests if the bounding sphere center is in between the frustum
@@ -70,7 +70,7 @@ public:
    * @param frustumPlanes defines the frustum planes to test
    * @returns true if the sphere center is in between the frustum planes
    */
-  bool isCenterInFrustum(const std::array<Plane, 6>& frustumPlanes) const;
+  [[nodiscard]] bool isCenterInFrustum(const std::array<Plane, 6>& frustumPlanes) const;
 
   /**
    * @brief Tests if a point is inside the bounding sphere.
@@ -86,8 +86,7 @@ public:
    * @param sphere1 sphere 1
    * @returns true if the speres intersect
    */
-  static bool Intersects(const BoundingSphere& sphere0,
-                         const BoundingSphere& sphere1);
+  static bool Intersects(const BoundingSphere& sphere0, const BoundingSphere& sphere1);
 
 public:
   /**

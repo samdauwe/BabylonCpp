@@ -72,12 +72,12 @@ void FlyCameraMouseInput::checkInputs()
 {
 }
 
-const std::string FlyCameraMouseInput::getClassName() const
+std::string FlyCameraMouseInput::getClassName() const
 {
   return "FlyCameraMouseInput";
 }
 
-const std::string FlyCameraMouseInput::getSimpleName() const
+std::string FlyCameraMouseInput::getSimpleName() const
 {
   return "mouse";
 }

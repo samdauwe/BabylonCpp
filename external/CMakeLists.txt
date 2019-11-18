@@ -75,7 +75,7 @@ if (WIN32)
   endif()
 endif(WIN32)
 
-# ImGuiColorTextEdit as a standalone shared library
+# ImGuiColorTextEdit as a standalone object library
 set(IMGUI_EDITOR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ImGuiColorTextEdit)
 set(IMGUI_EDITOR_FILES
         ${IMGUI_EDITOR_DIR}/TextEditor.cpp
@@ -90,6 +90,10 @@ endif()
 if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
     target_compile_options(ImGuiColorTextEdit PRIVATE -Wno-reorder -Wno-sign-compare -Wno-unused-variable)
 endif()
+
+# stb_image includes
+set(STB_IMAGE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/stb_image/include
+    CACHE INTERNAL "Include directories of stb_image")
 
 # RuntimeCompiledCPlusPlus
 if (NOT APPLE)

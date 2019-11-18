@@ -110,7 +110,7 @@ void FlyCameraKeyboardInput::detachControl(ICanvas* /*canvas*/)
   _keys.clear();
 }
 
-const std::string FlyCameraKeyboardInput::getClassName() const
+std::string FlyCameraKeyboardInput::getClassName() const
 {
   return "FlyCameraKeyboardInput";
 }
@@ -120,7 +120,7 @@ void FlyCameraKeyboardInput::_onLostFocus(const FocusEvent& /*e*/)
   _keys.clear();
 }
 
-const std::string FlyCameraKeyboardInput::getSimpleName() const
+std::string FlyCameraKeyboardInput::getSimpleName() const
 {
   return "keyboard";
 }

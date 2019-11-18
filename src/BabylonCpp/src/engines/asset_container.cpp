@@ -22,7 +22,7 @@
 
 namespace BABYLON {
 
-AssetContainer::AssetContainer(Scene* iScene) : AbstractScene{}, scene{iScene}
+AssetContainer::AssetContainer(Scene* iScene) : scene{iScene}
 {
 }
 

@@ -10,7 +10,7 @@ class BABYLON_SHARED_EXPORT TextureOptimization : public SceneOptimization {
 
 public:
   TextureOptimization(int priority = 0, int maximumSize = 1024);
-  ~TextureOptimization(); // = default
+  ~TextureOptimization() override; // = default
 
   bool apply(Scene* scene) override;
 

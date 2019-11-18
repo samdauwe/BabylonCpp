@@ -24,12 +24,12 @@ public:
   {
     return std::shared_ptr<CubicEase>(new CubicEase(std::forward<Ts>(args)...));
   }
-  ~CubicEase(); // = default
+  ~CubicEase() override; // = default
 
   /**
    * @brief Hidden
    */
-  float easeInCore(float gradient) const override;
+  [[nodiscard]] float easeInCore(float gradient) const override;
 
 protected:
   CubicEase();

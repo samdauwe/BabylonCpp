@@ -55,13 +55,13 @@ private:
    */
   Obstacle();
 
-  bool isConvex_;
+  bool isConvex_{false};
   Obstacle* nextObstacle_;
   Vector2 point_;
   Obstacle* prevObstacle_;
   Vector2 unitDir_;
 
-  size_t id_;
+  size_t id_{0};
 
   friend class Agent;
   friend class KdTree;

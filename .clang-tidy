@@ -1,8 +1,40 @@
 ---
 ---
-Checks:          'hicpp-use-equals-default,
-                  -clang-analyzer-optin.performance.Padding,
-                  -clang-analyzer-security.insecureAPI.rand,
-                  -clang-analyzer-security.FloatLoopCounter,
-                  '
+Checks:         '
+                clang-analyzer-core*,
+                clang-diagnostic-error,
+                bugprone*,
+                modernize*,
+                readability*,
+                misc*,
+
+                hicpp-use-equals-default,
+
+                -clang-analyzer-optin.performance.Padding,
+                -clang-analyzer-security.insecureAPI.rand,
+                -clang-analyzer-security.FloatLoopCounter,
+
+                -modernize-use-trailing-return-type,
+                -modernize-use-nodiscard,
+                -modernize-avoid-c-arrays,
+                -modernize-pass-by-value,
+
+                -readability-magic-numbers,
+                -readability-uppercase-literal-suffix,
+                -readability-braces-around-statements,
+                -readability-implicit-bool-conversion,
+                -readability-convert-member-functions-to-static,
+                -readability-isolate-declaration,
+                -readability-named-parameter,
+
+                -misc-non-private-member-variables-in-classes,
+                -misc-definitions-in-headers,
+
+                -cppcoreguidelines-avoid-magic-numbers,
+                -cppcoreguidelines-macro-usage,
+                -cppcoreguidelines-non-private-member-variables-in-classes,
+                '
+CheckOptions:
+  - key:          cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor
+    value:        1
 HeaderFilterRegex: './src/*'

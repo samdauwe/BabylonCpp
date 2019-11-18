@@ -24,10 +24,9 @@ public:
    * play
    * @param condition defines the trigger related conditions
    */
-  PlayAnimationAction(unsigned int triggerOptions, const IAnimatablePtr& target,
-                      float from, float to, bool loop = false,
-                      Condition* condition = nullptr);
-  ~PlayAnimationAction(); // = default
+  PlayAnimationAction(unsigned int triggerOptions, const IAnimatablePtr& target, float from,
+                      float to, bool loop = false, Condition* condition = nullptr);
+  ~PlayAnimationAction() override; // = default
 
   /**
    * @brief Hidden

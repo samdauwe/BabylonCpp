@@ -30,8 +30,8 @@ public:
    * HTTP, this only represent the content itself, not headers and other
    * overhead. It defaults to 0.
    */
-  ProgressEvent(const std::string& type, bool lengthComputable = false,
-                size_t loaded = 0, size_t total = 0);
+  ProgressEvent(const std::string& type, bool lengthComputable = false, size_t loaded = 0,
+                size_t total = 0);
   ProgressEvent(const ProgressEvent& other);
   ProgressEvent(ProgressEvent&& other);
   ProgressEvent& operator=(const ProgressEvent& other);
@@ -42,27 +42,27 @@ protected:
   /**
    * @brief Gets the name of the type of the ProgressEvent.
    */
-  std::string get_type() const;
+  [[nodiscard]] std::string get_type() const;
 
   /**
    * @brief Gets the boolean flag indicating if the total work to be done, and
    * the amount of work already done, by the underlying process is calculable.
    * In other words, it tells if the progress is measurable or not.
    */
-  bool get_lengthComputable() const;
+  [[nodiscard]] bool get_lengthComputable() const;
 
   /**
    * @brief Gets the amount of work already performed by the underlying process.
    * The ratio of work done can be calculated with the property and
    * ProgressEvent.total.
    */
-  size_t get_loaded() const;
+  [[nodiscard]] size_t get_loaded() const;
 
   /**
    * @brief Gets the total amount of work that the underlying process is in the
    * progress of performing.
    */
-  size_t get_total() const;
+  [[nodiscard]] size_t get_total() const;
 
 public:
   /**

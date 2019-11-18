@@ -32,7 +32,7 @@
 #ifndef ANAX_TEST_CASE_BUILD
 
 #include <cassert>
-#define ANAX_ASSERT(condition, failMessage) assert((condition) && failMessage)
+#define ANAX_ASSERT(condition, failMessage) assert((condition) && (failMessage))
 
 #else
 

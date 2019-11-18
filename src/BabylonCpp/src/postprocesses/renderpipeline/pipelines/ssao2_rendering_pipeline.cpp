@@ -134,7 +134,7 @@ Scene* SSAO2RenderingPipeline::scene() const
   return _scene;
 }
 
-const std::string SSAO2RenderingPipeline::getClassName() const
+std::string SSAO2RenderingPipeline::getClassName() const
 {
   return "SSAO2RenderingPipeline";
 }

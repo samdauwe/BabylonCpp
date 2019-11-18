@@ -8,15 +8,13 @@
 namespace BABYLON {
 
 class ChromaticAberrationPostProcess;
-using ChromaticAberrationPostProcessPtr
-  = std::shared_ptr<ChromaticAberrationPostProcess>;
+using ChromaticAberrationPostProcessPtr = std::shared_ptr<ChromaticAberrationPostProcess>;
 
 /**
  * @brief The ChromaticAberrationPostProcess separates the rgb channels in an
  * image to produce chromatic distortion around the edges of the screen
  */
-class BABYLON_SHARED_EXPORT ChromaticAberrationPostProcess
-    : public PostProcess {
+class BABYLON_SHARED_EXPORT ChromaticAberrationPostProcess : public PostProcess {
 
 public:
   template <typename... Ts>
@@ -28,7 +26,7 @@ public:
 
     return postProcess;
   }
-  virtual ~ChromaticAberrationPostProcess(); // = default
+  ~ChromaticAberrationPostProcess() override; // = default
 
 public:
   /**
@@ -75,13 +73,12 @@ protected:
    * the constructor. The updateEffect method can be used to compile the shader
    * at a later time. (default: false)
    */
-  ChromaticAberrationPostProcess(
-    const std::string& name, int screenWidth, int screenHeight,
-    const std::variant<float, PostProcessOptions>& options,
-    const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
-    bool reusable            = false,
-    unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
-    bool blockCompilation    = false);
+  ChromaticAberrationPostProcess(const std::string& name, int screenWidth, int screenHeight,
+                                 const std::variant<float, PostProcessOptions>& options,
+                                 const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
+                                 bool reusable            = false,
+                                 unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
+                                 bool blockCompilation    = false);
 
 private:
   float screenWidth;

@@ -22,15 +22,14 @@ public:
   template <typename... Ts>
   static QuinticEasePtr New(Ts&&... args)
   {
-    return std::shared_ptr<QuinticEase>(
-      new QuinticEase(std::forward<Ts>(args)...));
+    return std::shared_ptr<QuinticEase>(new QuinticEase(std::forward<Ts>(args)...));
   }
-  ~QuinticEase(); // = default
+  ~QuinticEase() override; // = default
 
   /**
    * @brief Hidden
    */
-  float easeInCore(float gradient) const override;
+  [[nodiscard]] float easeInCore(float gradient) const override;
 
 protected:
   QuinticEase();

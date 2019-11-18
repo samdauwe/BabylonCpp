@@ -28,16 +28,15 @@ public:
    * @param raw (optional, default false) : boolean, if true the returned Path3D
    * isn't normalized. Useful to depict path acceleration or speed.
    */
-  Path3D(const std::vector<Vector3>& path,
-         const std::optional<Vector3>& firstNormal = std::nullopt,
-         bool raw                                  = false);
+  Path3D(const std::vector<Vector3>& path, const std::optional<Vector3>& firstNormal = std::nullopt,
+         bool raw = false);
   Path3D(const Path3D& otherPath);
   Path3D(Path3D&& otherPath);
   Path3D& operator=(const Path3D& otherPath);
   Path3D& operator=(Path3D&& otherPath);
   ~Path3D(); // = default
-  Path3D copy() const;
-  std::unique_ptr<Path3D> clone() const;
+  [[nodiscard]] Path3D copy() const;
+  [[nodiscard]] std::unique_ptr<Path3D> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Path3D& path);
 
   /**

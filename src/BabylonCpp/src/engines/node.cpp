@@ -173,7 +173,7 @@ void Node::set_animationPropertiesOverride(
   _animationPropertiesOverride = value;
 }
 
-const std::string Node::getClassName() const
+std::string Node::getClassName() const
 {
   return "Node";
 }
@@ -358,7 +358,7 @@ bool Node::isReady(bool /*completeCheck*/, bool /*forceInstanceSupport*/)
 
 bool Node::isEnabled(bool checkAncestors)
 {
-  if (checkAncestors == false) {
+  if (!checkAncestors) {
     return _isEnabled;
   }
 

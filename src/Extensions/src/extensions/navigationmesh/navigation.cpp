@@ -153,12 +153,9 @@ bool Navigation::_isVectorInPolygon(const Vector3& vector,
     polygonVertices.emplace_back(point);
   }
 
-  if (vector.y < highestPoint + 0.5f && vector.y > lowestPoint - 0.5f
-      && _isPointInPoly(polygonVertices, vector)) {
-    return true;
-  }
+  return vector.y < highestPoint + 0.5f && vector.y > lowestPoint - 0.5f
 
-  return false;
+         && _isPointInPoly(polygonVertices, vector);
 }
 
 void Navigation::_computeCentroids(Geometry* geometry)
@@ -450,9 +447,8 @@ GroupedNavigationMesh Navigation::_groupNavMesh(NavigationMesh& navigationMesh)
 {
   GroupedNavigationMesh groupedNavMesh;
 
-  for (size_t i = 0; i < navigationMesh.vertices.size(); ++i) {
-    float v                    = navigationMesh.vertices[i];
-    navigationMesh.vertices[i] = _roundNumber(v, 2);
+  for (float& vertice : navigationMesh.vertices) {
+    vertice = _roundNumber(vertice, 2);
   }
 
   groupedNavMesh.vertices = navigationMesh.vertices;

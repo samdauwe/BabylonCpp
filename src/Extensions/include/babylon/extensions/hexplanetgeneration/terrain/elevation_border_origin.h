@@ -12,8 +12,7 @@ struct Corner;
 struct Plate;
 
 struct ElevationBorderOrigin {
-  typedef std::function<float(float, float, float, float, float, float)>
-    CalculateElevationFunc;
+  using CalculateElevationFunc = std::function<float(float, float, float, float, float, float)>;
 
   ElevationBorderOrigin();
   ElevationBorderOrigin(Corner* p_corner, float p_pressure, float p_shear,

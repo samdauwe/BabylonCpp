@@ -56,7 +56,7 @@ public:
    * @param browserGamepad the gamepad that the PoseEnabledController should be created from
    */
   PoseEnabledController(const IBrowserGamepadPtr& browserGamepad);
-  ~PoseEnabledController(); // = default
+  ~PoseEnabledController() override; // = default
 
   /**
    * Hidden
@@ -91,7 +91,7 @@ public:
   /**
    * @brief Disposes of the controller.
    */
-  virtual void dispose() override;
+  void dispose() override;
 
   /**
    * @brief Gets the ray of the controller in the direction the controller is pointing.

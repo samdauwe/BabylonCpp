@@ -19,7 +19,7 @@ class BABYLON_SHARED_EXPORT IShadowLight : public Light {
 
 public:
   IShadowLight(const std::string& name, Scene* scene);
-  virtual ~IShadowLight(); // = default
+  ~IShadowLight() override; // = default
 
   /**
    * The position the shdow will be casted from.
@@ -55,7 +55,7 @@ public:
    * Gets the scene the light belongs to.
    * @returns The scene
    */
-  virtual Scene* getScene() const override = 0;
+  Scene* getScene() const override = 0;
 
   /**
    * @brief Sets the shadow projection matrix in parameter to the generated
@@ -65,9 +65,8 @@ public:
    * @param renderList The list of mesh to render in the map
    * @returns The current light
    */
-  virtual IShadowLight*
-  setShadowProjectionMatrix(Matrix& matrix, Matrix& viewMatrix,
-                            const std::vector<AbstractMesh*>& renderList)
+  virtual IShadowLight* setShadowProjectionMatrix(Matrix& matrix, Matrix& viewMatrix,
+                                                  const std::vector<AbstractMesh*>& renderList)
     = 0;
 
   /**

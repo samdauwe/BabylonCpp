@@ -26,10 +26,9 @@ public:
    * @param reusable If the post process can be reused on the same frame.
    * (default: false)
    */
-  DisplayPassPostProcess(const std::string& name, float ratio,
-                         const CameraPtr& camera, unsigned int samplingMode,
-                         Engine* engine, bool reusable = false);
-  ~DisplayPassPostProcess(); // = default
+  DisplayPassPostProcess(const std::string& name, float ratio, const CameraPtr& camera,
+                         unsigned int samplingMode, Engine* engine, bool reusable = false);
+  ~DisplayPassPostProcess() override; // = default
 
 }; // end of class DisplayPassPostProcess
 

@@ -28,12 +28,12 @@ public:
   ~ColorGradient2D(); // = default
 
   void addColorStop(float u, float v, const Color3& color);
-  Color3 getColor(float u, float v) const;
+  [[nodiscard]] Color3 getColor(float u, float v) const;
   void calculate();
-  bool isConcentricWithColorStop(const NearestNeighbors& neighbors) const;
-  bool onUEdge(const NearestNeighbors& neighbors) const;
-  bool onVEdge(const NearestNeighbors& neighbors) const;
-  NearestNeighbors getNearestNeighbors(float u, float v) const;
+  [[nodiscard]] bool isConcentricWithColorStop(const NearestNeighbors& neighbors) const;
+  [[nodiscard]] bool onUEdge(const NearestNeighbors& neighbors) const;
+  [[nodiscard]] bool onVEdge(const NearestNeighbors& neighbors) const;
+  [[nodiscard]] NearestNeighbors getNearestNeighbors(float u, float v) const;
 
 private:
   std::vector<ColorStop> _colorStops;

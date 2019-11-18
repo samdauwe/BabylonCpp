@@ -32,31 +32,31 @@ public:
   Quaternion& operator=(const Quaternion& otherQuaternion);
   Quaternion& operator=(Quaternion&& otherQuaternion);
   ~Quaternion(); // = default
-  Quaternion copy() const;
+  [[nodiscard]] Quaternion copy() const;
 
   /**
    * @brief Clone the current quaternion.
    * @returns a new quaternion copied from the current one
    */
-  std::unique_ptr<Quaternion> clone() const;
+  [[nodiscard]] std::unique_ptr<Quaternion> clone() const;
 
   /**
    * @brief Gets a string representation for the current quaternion.
    * @returns a string with the Quaternion coordinates
    */
-  std::string toString() const;
+  [[nodiscard]] std::string toString() const;
 
   /**
    * @brief Gets the class name of the quaternion.
    * @returns the string "Quaternion"
    */
-  const char* getClassName() const;
+  [[nodiscard]] const char* getClassName() const;
 
   /**
    * @brief Gets a hash code for this quaternion.
    * @returns the quaternion hash code
    */
-  int getHashCode() const;
+  [[nodiscard]] int getHashCode() const;
 
   /** Methods **/
 
@@ -65,7 +65,7 @@ public:
    * @returns a new array populated with 4 elements from the quaternion
    * coordinates
    */
-  Float32Array asArray() const;
+  [[nodiscard]] Float32Array asArray() const;
 
   /**
    * @brief Check if two quaternions are equals.
@@ -73,7 +73,7 @@ public:
    * @return true if the current quaternion and the given one coordinates are
    * strictly equals
    */
-  bool equals(const Quaternion& otherQuaternion) const;
+  [[nodiscard]] bool equals(const Quaternion& otherQuaternion) const;
 
   /**
    * @brief Copy a quaternion to the current one.
@@ -108,7 +108,7 @@ public:
    * @returns a new quaternion as the addition result of the given one and the
    * current quaternion
    */
-  Quaternion add(const Quaternion& other) const;
+  [[nodiscard]] Quaternion add(const Quaternion& other) const;
 
   /**
    * @brief Add a quaternion to the current one.
@@ -123,7 +123,7 @@ public:
    * @returns a new quaternion as the subtraction result of the given one from
    * the current one
    */
-  Quaternion subtract(const Quaternion& other) const;
+  [[nodiscard]] Quaternion subtract(const Quaternion& other) const;
 
   /**
    * @brief Multiplies the current quaternion by a scale factor.
@@ -131,7 +131,7 @@ public:
    * @returns a new quaternion set by multiplying the current quaternion
    * coordinates by the float "scale"
    */
-  Quaternion scale(float value) const;
+  [[nodiscard]] Quaternion scale(float value) const;
 
   /**
    * @brief Scale the current quaternion values by a factor and stores the
@@ -164,7 +164,7 @@ public:
    * @returns a new quaternion set as the multiplication result of the current
    * one with the given one "q1".
    */
-  Quaternion multiply(const Quaternion& q1) const;
+  [[nodiscard]] Quaternion multiply(const Quaternion& q1) const;
 
   /**
    * @brief Sets the given "result" as the the multiplication result of the
@@ -173,8 +173,7 @@ public:
    * @param result defines the target quaternion
    * @returns the current quaternion
    */
-  const Quaternion& multiplyToRef(const Quaternion& q1,
-                                  Quaternion& result) const;
+  const Quaternion& multiplyToRef(const Quaternion& q1, Quaternion& result) const;
 
   /**
    * @brief Updates the current quaternion with the multiplication of itself
@@ -202,13 +201,13 @@ public:
    * @brief Conjugates in place (1-q) the current quaternion.
    * @returns a new quaternion
    */
-  Quaternion conjugate() const;
+  [[nodiscard]] Quaternion conjugate() const;
 
   /**
    * @brief Gets length of current quaternion.
    * @returns the quaternion length (float)
    */
-  float length() const;
+  [[nodiscard]] float length() const;
 
   /**
    * @brief Normalize in place the current quaternion.
@@ -222,7 +221,7 @@ public:
    * @param order is a reserved parameter and is ignore for now
    * @returns a new Vector3 containing the Euler angles
    */
-  Vector3 toEulerAngles(const std::string& order = "YZX") const;
+  [[nodiscard]] Vector3 toEulerAngles(const std::string& order = "YZX") const;
 
   /**
    * @brief Sets the given vector3 "result" with the Euler angles translated
@@ -231,8 +230,7 @@ public:
    * @param order is a reserved parameter and is ignore for now
    * @returns the current unchanged quaternion
    */
-  const Quaternion& toEulerAnglesToRef(Vector3& result,
-                                       const std::string& order = "YZX") const;
+  const Quaternion& toEulerAnglesToRef(Vector3& result, const std::string& order = "YZX") const;
 
   /**
    * @brief Updates the given rotation matrix with the current quaternion
@@ -251,8 +249,7 @@ public:
   Quaternion& fromRotationMatrix(const Matrix& matrix);
 
   /** Operator overloading **/
-  friend std::ostream& operator<<(std::ostream& os,
-                                  const Quaternion& quaternion);
+  friend std::ostream& operator<<(std::ostream& os, const Quaternion& quaternion);
   Quaternion operator+(const Quaternion& other) const;
   Quaternion operator-(const Quaternion& other) const;
   Quaternion operator*(float value) const;
@@ -345,8 +342,7 @@ public:
    * @param result defines the target quaternion
    * @returns the target quaternion
    */
-  static Quaternion RotationAxisToRef(Vector3& axis, float angle,
-                                      Quaternion& result);
+  static Quaternion RotationAxisToRef(Vector3& axis, float angle, Quaternion& result);
 
   /**
    * @brief Creates a new quaternion from data stored into an array.
@@ -354,8 +350,7 @@ public:
    * @param offset defines the offset in the source array where the data starts
    * @returns a new quaternion
    */
-  static Quaternion FromArray(const Float32Array& array,
-                              unsigned int offset = 0);
+  static Quaternion FromArray(const Float32Array& array, unsigned int offset = 0);
 
   /**
    * @brief Create a quaternion from Euler rotation angles.
@@ -374,8 +369,7 @@ public:
    * @param result the quaternion to store the result
    * @returns the updated quaternion
    */
-  static Quaternion FromEulerAnglesToRef(float x, float y, float z,
-                                         Quaternion& result);
+  static Quaternion FromEulerAnglesToRef(float x, float y, float z, Quaternion& result);
 
   /**
    * @brief Create a quaternion from Euler rotation vector.
@@ -390,8 +384,7 @@ public:
    * @param result the quaternion to store the result
    * @returns the updated quaternion
    */
-  static Quaternion FromEulerVectorToRef(const Vector3& vec,
-                                         Quaternion& result);
+  static Quaternion FromEulerVectorToRef(const Vector3& vec, Quaternion& result);
 
   /**
    * @brief Creates a new quaternion from the given Euler float angles (y, x,
@@ -411,8 +404,7 @@ public:
    * @param roll defines the rotation around Z axis
    * @param result defines the target quaternion
    */
-  static void RotationYawPitchRollToRef(float yaw, float pitch, float roll,
-                                        Quaternion& result);
+  static void RotationYawPitchRollToRef(float yaw, float pitch, float roll, Quaternion& result);
 
   /**
    * @brief Creates a new quaternion from the given Euler float angles expressed
@@ -422,8 +414,7 @@ public:
    * @param gamma defines the rotation around third axis
    * @returns the new quaternion
    */
-  static Quaternion RotationAlphaBetaGamma(float alpha, float beta,
-                                           float gamma);
+  static Quaternion RotationAlphaBetaGamma(float alpha, float beta, float gamma);
 
   /**
    * @brief Creates a new quaternion from the given Euler float angles expressed
@@ -433,8 +424,7 @@ public:
    * @param gamma defines the rotation around third axis
    * @param result defines the target quaternion
    */
-  static void RotationAlphaBetaGammaToRef(float alpha, float beta, float gamma,
-                                          Quaternion& result);
+  static void RotationAlphaBetaGammaToRef(float alpha, float beta, float gamma, Quaternion& result);
 
   /**
    * @brief Creates a new quaternion containing the rotation value to reach the
@@ -445,8 +435,7 @@ public:
    * @param axis3 defines the third axis
    * @returns the new quaternion
    */
-  static Quaternion RotationQuaternionFromAxis(Vector3& axis1, Vector3& axis2,
-                                               Vector3& axis3);
+  static Quaternion RotationQuaternionFromAxis(Vector3& axis1, Vector3& axis2, Vector3& axis3);
 
   /**
    * @brief Creates a rotation value to reach the target (axis1, axis2, axis3)
@@ -457,8 +446,8 @@ public:
    * @param axis3 defines the third axis
    * @param ref defines the target quaternion
    */
-  static void RotationQuaternionFromAxisToRef(Vector3& axis1, Vector3& axis2,
-                                              Vector3& axis3, Quaternion& ref);
+  static void RotationQuaternionFromAxisToRef(Vector3& axis1, Vector3& axis2, Vector3& axis3,
+                                              Quaternion& ref);
 
   /**
    * @brief Interpolates between two quaternions.
@@ -467,8 +456,7 @@ public:
    * @param amount defines the gradient to use
    * @returns the new interpolated quaternion
    */
-  static Quaternion Slerp(const Quaternion& left, const Quaternion& right,
-                          float amount);
+  static Quaternion Slerp(const Quaternion& left, const Quaternion& right, float amount);
 
   /**
    * @brief Interpolates between two quaternions and stores it into a target
@@ -478,8 +466,8 @@ public:
    * @param amount defines the gradient to use
    * @param result defines the target quaternion
    */
-  static void SlerpToRef(const Quaternion& left, const Quaternion& right,
-                         float amount, Quaternion& result);
+  static void SlerpToRef(const Quaternion& left, const Quaternion& right, float amount,
+                         Quaternion& result);
 
   /**
    * @brief Interpolate between two quaternions using Hermite interpolation.
@@ -490,10 +478,8 @@ public:
    * @param amount defines the target quaternion
    * @returns the new interpolated quaternion
    */
-  static Quaternion Hermite(const Quaternion& value1,
-                            const Quaternion& tangent1,
-                            const Quaternion& value2,
-                            const Quaternion& tangent2, float amount);
+  static Quaternion Hermite(const Quaternion& value1, const Quaternion& tangent1,
+                            const Quaternion& value2, const Quaternion& tangent2, float amount);
 
 public:
   /**

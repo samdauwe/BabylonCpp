@@ -34,7 +34,7 @@ public:
 
     return texture;
   }
-  ~CustomProceduralTexture(); // = default
+  ~CustomProceduralTexture() override; // = default
 
   /**
    * @brief Is the texture ready to be used ? (rendered at least once)
@@ -78,8 +78,7 @@ protected:
    * to create the custom texture
    * @param generateMipMaps Define if the texture should creates mip maps or not
    */
-  CustomProceduralTexture(const std::string& name,
-                          const std::string& texturePath, int size,
+  CustomProceduralTexture(const std::string& name, const std::string& texturePath, int size,
                           Scene* scene, Texture* fallbackTexture = nullptr,
                           bool generateMipMaps = false);
 

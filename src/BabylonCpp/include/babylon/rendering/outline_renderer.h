@@ -37,20 +37,19 @@ public:
   /**
    *The name of the component. Each component must have a unique name.
    */
-  static constexpr const char* name
-    = SceneComponentConstants::NAME_OUTLINERENDERER;
+  static constexpr const char* name = SceneComponentConstants::NAME_OUTLINERENDERER;
 
 public:
   template <typename... Ts>
   static OutlineRendererPtr New(Ts&&... args)
   {
-    auto outlineRenderer = std::shared_ptr<OutlineRenderer>(
-      new OutlineRenderer(std::forward<Ts>(args)...));
+    auto outlineRenderer
+      = std::shared_ptr<OutlineRenderer>(new OutlineRenderer(std::forward<Ts>(args)...));
     outlineRenderer->addToScene(outlineRenderer);
 
     return outlineRenderer;
   }
-  virtual ~OutlineRenderer(); // = default
+  ~OutlineRenderer() override; // = default
 
   void addToScene(const OutlineRendererPtr& outlineRenderer);
 
@@ -77,8 +76,7 @@ public:
    * @param useOverlay Defines if the rendering is for the overlay or the
    * outline
    */
-  void render(SubMesh* subMesh, const _InstancesBatchPtr& batch,
-              bool useOverlay = false);
+  void render(SubMesh* subMesh, const _InstancesBatchPtr& batch, bool useOverlay = false);
 
   /**
    * @brief Returns whether or not the outline renderer is ready for a given
@@ -100,10 +98,8 @@ protected:
   OutlineRenderer(Scene* scene);
 
 private:
-  void _beforeRenderingMesh(AbstractMesh* mesh, SubMesh* subMesh,
-                            const _InstancesBatchPtr& batch);
-  void _afterRenderingMesh(AbstractMesh* mesh, SubMesh* subMesh,
-                           const _InstancesBatchPtr& batch);
+  void _beforeRenderingMesh(AbstractMesh* mesh, SubMesh* subMesh, const _InstancesBatchPtr& batch);
+  void _afterRenderingMesh(AbstractMesh* mesh, SubMesh* subMesh, const _InstancesBatchPtr& batch);
 
 public:
   /**

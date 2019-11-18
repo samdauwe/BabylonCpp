@@ -34,13 +34,13 @@ public:
     return std::shared_ptr<PostProcessRenderPipeline>(
       new PostProcessRenderPipeline(std::forward<Ts>(args)...));
   }
-  virtual ~PostProcessRenderPipeline(); // = default
+  ~PostProcessRenderPipeline() override; // = default
 
   /**
    * @brief Gets the class name.
    * @returns "PostProcessRenderPipeline"
    */
-  virtual const std::string getClassName() const;
+  [[nodiscard]] virtual std::string getClassName() const;
 
   /**
    * @brief Adds an effect to the pipeline.
@@ -56,14 +56,12 @@ public:
   /**
    * @brief Hidden
    */
-  void _enableEffect(const std::string& renderEffectName,
-                     const std::vector<CameraPtr>& cameras);
+  void _enableEffect(const std::string& renderEffectName, const std::vector<CameraPtr>& cameras);
 
   /**
    * @brief Hidden
    */
-  void _disableEffect(const std::string& renderEffectName,
-                      const std::vector<CameraPtr>& cameras);
+  void _disableEffect(const std::string& renderEffectName, const std::vector<CameraPtr>& cameras);
 
   /**
    * @brief Hidden
@@ -88,8 +86,7 @@ public:
   /**
    * @brief Disposes of the pipeline.
    */
-  virtual void dispose(bool doNotRecurse               = false,
-                       bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
 protected:
   /**
@@ -102,12 +99,12 @@ protected:
   /**
    * @brief Gets pipeline name.
    */
-  std::string get_name() const;
+  [[nodiscard]] std::string get_name() const;
 
   /**
    * @brief If all the render effects in the pipeline are supported.
    */
-  bool get_isSupported() const;
+  [[nodiscard]] bool get_isSupported() const;
 
   /**
    * @brief Hidden
@@ -145,8 +142,7 @@ protected:
 private:
   Engine* engine;
   std::unordered_map<std::string, PostProcessRenderEffectPtr> _renderEffects;
-  std::unordered_map<std::string, PostProcessRenderEffectPtr>
-    _renderEffectsForIsolatedPass;
+  std::unordered_map<std::string, PostProcessRenderEffectPtr> _renderEffectsForIsolatedPass;
 
 }; // end of class PostProcessRenderPipeline
 

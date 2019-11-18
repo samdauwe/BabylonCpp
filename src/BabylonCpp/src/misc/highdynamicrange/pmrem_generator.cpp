@@ -314,7 +314,7 @@ Vector4 PMREMGenerator<ArrayBufferView>::texelCoordToVect(unsigned int faceIdx,
   if (_fixup && size > 1) {
     // Code from Nvtt :
     // http://code.google.com/p/nvidia-texture-tools/source/browse/trunk/src/nvtt/CubeSurface.cpp
-    float sizef = static_cast<float>(size);
+    auto sizef  = static_cast<float>(size);
     float a     = std::pow(sizef, 2.f) / std::pow(sizef - 1.f, 3.f);
     nvcU        = a * std::pow(nvcU, 3.f) + nvcU;
     nvcV        = a * std::pow(nvcV, 3.f) + nvcV;
@@ -548,7 +548,7 @@ void PMREMGenerator<ArrayBufferView>::determineFilterExtents(
   // get face idx, and u, v info from center tap dir
   Vector3 result
     = vectToTexelCoord(centerTapDir.x, centerTapDir.y, centerTapDir.z, srcSize);
-  unsigned int faceIdx = static_cast<unsigned>(result.x);
+  auto faceIdx         = static_cast<unsigned>(result.x);
   float u              = result.y;
   float v              = result.z;
 
@@ -721,9 +721,8 @@ Vector4 PMREMGenerator<ArrayBufferView>::processFilterExtents(
       float uEnd   = filterExtents[iFaceIdx].max.x;
       float vEnd   = filterExtents[iFaceIdx].max.y;
 
-      size_t startIndexNormCubeMap
-        = static_cast<size_t>(4.f * ((vStart * faceWidth) + uStart));
-      size_t startIndexSrcCubeMap
+      auto startIndexNormCubeMap = static_cast<size_t>(4.f * ((vStart * faceWidth) + uStart));
+      auto startIndexSrcCubeMap
         = static_cast<size_t>(numChannels * ((vStart * faceWidth) + uStart));
 
       // note that <= is used to ensure filter extents always encompass at least

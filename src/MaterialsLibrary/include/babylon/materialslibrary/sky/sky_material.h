@@ -22,32 +22,29 @@ public:
   template <typename... Ts>
   static SkyMaterialPtr New(Ts&&... args)
   {
-    auto material = std::shared_ptr<SkyMaterial>(
-      new SkyMaterial(std::forward<Ts>(args)...));
+    auto material = std::shared_ptr<SkyMaterial>(new SkyMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;
   }
-  ~SkyMaterial(); // = default
+  ~SkyMaterial() override; // = default
 
-  bool needAlphaBlending() const override;
-  bool needAlphaTesting() const override;
+  [[nodiscard]] bool needAlphaBlending() const override;
+  [[nodiscard]] bool needAlphaTesting() const override;
   BaseTexturePtr getAlphaTestTexture() override;
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances = false) override;
   void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
   std::vector<IAnimatablePtr> getAnimatables() override;
-  const std::string getClassName() const override;
-  virtual void dispose(bool forceDisposeEffect   = false,
-                       bool forceDisposeTextures = false,
-                       bool notBoundToMesh       = false) override;
-  MaterialPtr clone(const std::string& name,
-                    bool cloneChildren = false) const override;
-  json serialize() const;
+  [[nodiscard]] std::string getClassName() const override;
+  void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
+               bool notBoundToMesh = false) override;
+  [[nodiscard]] MaterialPtr clone(const std::string& name,
+                                  bool cloneChildren = false) const override;
+  [[nodiscard]] json serialize() const;
 
   /** Statics **/
-  static SkyMaterial* Parse(const json& source, Scene* scene,
-                            const std::string& rootUrl);
+  static SkyMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
   SkyMaterial(const std::string& name, Scene* scene);

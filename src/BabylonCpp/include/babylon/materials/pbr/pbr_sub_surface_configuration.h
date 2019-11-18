@@ -37,8 +37,7 @@ public:
    * @param markAllSubMeshesAsTexturesDirty Callback to flag the material to
    * dirty
    */
-  PBRSubSurfaceConfiguration(
-    const std::function<void()>& markAllSubMeshesAsTexturesDirty);
+  PBRSubSurfaceConfiguration(const std::function<void()>& markAllSubMeshesAsTexturesDirty);
   ~PBRSubSurfaceConfiguration(); // = default
 
   /**
@@ -70,8 +69,8 @@ public:
    * @param lodBasedMicrosurface defines wether the material relies on lod based
    * microsurface or not.
    */
-  void bindForSubMesh(UniformBuffer& uniformBuffer, Scene* scene,
-                      Engine* engine, bool isFrozen, bool lodBasedMicrosurface);
+  void bindForSubMesh(UniformBuffer& uniformBuffer, Scene* scene, Engine* engine, bool isFrozen,
+                      bool lodBasedMicrosurface);
 
   /**
    * @brief Unbinds the material from the mesh.
@@ -83,28 +82,27 @@ public:
   /**
    * @brief Returns true if alpha blending should be disabled.
    */
-  bool disableAlphaBlending() const;
+  [[nodiscard]] bool disableAlphaBlending() const;
 
   /**
    * @brief Fills the list of render target textures.
    * @param renderTargets the list of render targets to update
    */
-  void
-  fillRenderTargetTextures(std::vector<RenderTargetTexturePtr>& renderTargets);
+  void fillRenderTargetTextures(std::vector<RenderTargetTexturePtr>& renderTargets);
 
   /**
    * @brief Checks to see if a texture is used in the material.
    * @param texture - Base texture to use.
    * @returns - Boolean specifying if a texture is used in the material.
    */
-  bool hasTexture(const BaseTexturePtr& texture) const;
+  [[nodiscard]] bool hasTexture(const BaseTexturePtr& texture) const;
 
   /**
    * @brief Gets a boolean indicating that current material needs to register
    * RTT.
    * @returns true if this uses a render target otherwise false.
    */
-  bool hasRenderTargetTextures() const;
+  [[nodiscard]] bool hasRenderTargetTextures() const;
 
   /**
    * @brief Returns an array of the actively used textures.
@@ -129,7 +127,7 @@ public:
    * or dynamic coding.
    * @returns "PBRSubSurfaceConfiguration"
    */
-  const std::string getClassName() const;
+  [[nodiscard]] std::string getClassName() const;
 
   /**
    * @brief Add fallbacks to the effect fallbacks list.
@@ -138,8 +136,7 @@ public:
    * @param currentRank defines the current fallback rank.
    * @returns the new fallback rank.
    */
-  static unsigned int AddFallbacks(const MaterialDefines& defines,
-                                   EffectFallbacks& fallbacks,
+  static unsigned int AddFallbacks(const MaterialDefines& defines, EffectFallbacks& fallbacks,
                                    unsigned int currentRank);
 
   /**
@@ -170,7 +167,7 @@ public:
    * @brief Serializes this Sub Surface configuration.
    * @returns - An object with the serialized config.
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Parses a Sub Surface Configuration from a serialized object.
@@ -181,21 +178,21 @@ public:
   void parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
-  bool get_isRefractionEnabled() const;
+  [[nodiscard]] bool get_isRefractionEnabled() const;
   void set_isRefractionEnabled(bool value);
-  bool get_isTranslucencyEnabled() const;
+  [[nodiscard]] bool get_isTranslucencyEnabled() const;
   void set_isTranslucencyEnabled(bool value);
   BaseTexturePtr& get_thicknessTexture();
   void set_thicknessTexture(const BaseTexturePtr& value);
   BaseTexturePtr& get_refractionTexture();
   void set_refractionTexture(const BaseTexturePtr& value);
-  float get_indexOfRefraction() const;
+  [[nodiscard]] float get_indexOfRefraction() const;
   void set_indexOfRefraction(float value);
-  bool get_invertRefractionY() const;
+  [[nodiscard]] bool get_invertRefractionY() const;
   void set_invertRefractionY(bool value);
-  bool get_linkRefractionWithTransparency() const;
+  [[nodiscard]] bool get_linkRefractionWithTransparency() const;
   void set_linkRefractionWithTransparency(bool value);
-  bool get_useMaskFromThicknessTexture() const;
+  [[nodiscard]] bool get_useMaskFromThicknessTexture() const;
   void set_useMaskFromThicknessTexture(bool value);
 
 private:

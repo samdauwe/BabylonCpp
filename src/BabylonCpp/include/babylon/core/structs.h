@@ -17,18 +17,18 @@ class Node;
 struct Bounds {
   Vector2 min;
   Vector2 max;
-  float width = 0.f;
+  float width  = 0.f;
   float height = 0.f;
 }; // end of struct Bounds
 
 struct VRMetrics {
   float aspectRatioFov = 0.f;
-  float aspectRatio = 0.f;
+  float aspectRatio    = 0.f;
 }; // end of struct VRMetrics
 
 struct CameraRigParams {
   float interaxialDistance = 0.f;
-  float stereoHalfAngle = 0.f;
+  float stereoHalfAngle    = 0.f;
   Matrix vrHMatrix;
   Matrix vrWorkMatrix;
   bool vrPreViewMatrixSet = false;
@@ -40,10 +40,10 @@ struct CameraRigParams {
 struct ClientRect {
   int bottom = 0;
   int height = 0;
-  int left = 0;
-  int right = 0;
-  int top = 0;
-  int width = 0;
+  int left   = 0;
+  int right  = 0;
+  int top    = 0;
+  int width  = 0;
 }; // end of struct CameraRigParams
 
 struct ClipboardEvent {
@@ -51,7 +51,7 @@ struct ClipboardEvent {
 
 struct DeviceOrientationEvent {
   float gamma = 0.f;
-  float beta = 0.f;
+  float beta  = 0.f;
 }; // end of struct DeviceOrientationEvent
 
 struct DragMoveEvent {
@@ -59,7 +59,7 @@ struct DragMoveEvent {
   Vector3 dragPlanePoint;
   Vector3 dragPlaneNormal;
   float dragDistance = 0.f;
-  int pointerId = 0;
+  int pointerId      = 0;
 }; // end of struct DragMoveEvent
 
 struct DragStartOrEndEvent {
@@ -69,8 +69,8 @@ struct DragStartOrEndEvent {
 
 struct Event {
   EventType type = EventType::UNKNOWN;
-  int charCode = 0;
-  int keyCode = 0;
+  int charCode   = 0;
+  int keyCode    = 0;
 }; // end of struct Event
 
 struct Exception {
@@ -97,11 +97,10 @@ struct GestureEvent {
 }; // end of struct GestureEvent
 
 struct Image {
-  Image() : width(0), height(0), mode(0)
-  {
-  }
-  Image(unsigned char* buffer, int bufferLength, int iWidth, int iHeight,
-        int iDepth, unsigned int iMode)
+  Image() = default;
+
+  Image(unsigned char* buffer, int bufferLength, int iWidth, int iHeight, int iDepth,
+        unsigned int iMode)
       : data(buffer, buffer + bufferLength)
       , width{iWidth}
       , height{iHeight}
@@ -109,22 +108,17 @@ struct Image {
       , mode{iMode}
   {
   }
-  Image(ArrayBuffer iData, int iWidth, int iHeight, int iDepth,
-        unsigned int iMode)
-      : data(std::move(iData))
-      , width{iWidth}
-      , height{iHeight}
-      , depth{iDepth}
-      , mode{iMode}
+  Image(ArrayBuffer iData, int iWidth, int iHeight, int iDepth, unsigned int iMode)
+      : data(std::move(iData)), width{iWidth}, height{iHeight}, depth{iDepth}, mode{iMode}
   {
   }
-  bool valid() const
+  [[nodiscard]] bool valid() const
   {
-    return data.size() > 0 && width > 0 && height > 0 && depth > 0;
+    return !data.empty() && width > 0 && height > 0 && depth > 0;
   }
   ArrayBuffer data;
   int width = 0, height = 0;
-  int depth = 0;
+  int depth         = 0;
   unsigned int mode = 0;
 }; // end of struct Image
 
@@ -166,8 +160,8 @@ struct MinMaxVector2 {
 }; // end of struct MinMaxVector2
 
 struct MouseEvent {
-  int clientX = 0;
-  int clientY = 0;
+  int clientX   = 0;
+  int clientY   = 0;
   int movementX = 0;
   int movementY = 0;
   void preventDefault()
@@ -225,26 +219,26 @@ struct PointerEvent : public Event {
   }
 
   PointerEvent(const PointerEvent& other) = default;
-  PointerEvent(PointerEvent&& other) = default;
+  PointerEvent(PointerEvent&& other)      = default;
 
   PointerEvent& operator=(const PointerEvent& other) = default;
   PointerEvent& operator=(PointerEvent&& other) = default;
 
-  int clientX   = 0;
-  int clientY   = 0;
-  int movementX = 0;
-  int movementY = 0;
-  int offsetX   = 0;
-  int offsetY   = 0;
-  int pointerId = 0;
+  int clientX             = 0;
+  int clientY             = 0;
+  int movementX           = 0;
+  int movementY           = 0;
+  int offsetX             = 0;
+  int offsetY             = 0;
+  int pointerId           = 0;
   PointerType pointerType = PointerType::UNDEFINED;
-  bool altKey   = false;
-  bool ctrlKey  = false;
-  bool shiftKey = false;
-  bool metaKey  = false;
-  MouseButtonType button = MouseButtonType::UNDEFINED;
-  int buttons         = 0;
-  ICanvas* srcElement = nullptr;
+  bool altKey             = false;
+  bool ctrlKey            = false;
+  bool shiftKey           = false;
+  bool metaKey            = false;
+  MouseButtonType button  = MouseButtonType::UNDEFINED;
+  int buttons             = 0;
+  ICanvas* srcElement     = nullptr;
   void preventDefault()
   {
   }
@@ -260,14 +254,14 @@ struct PointerTouch {
 }; // end of struct PointerTouch
 
 struct MouseWheelEvent : public PointerEvent {
-  MouseWheelEvent() = default;
+  MouseWheelEvent()                             = default;
   MouseWheelEvent(const MouseWheelEvent& other) = default;
-  MouseWheelEvent(MouseWheelEvent&& other) = default;
+  MouseWheelEvent(MouseWheelEvent&& other)      = default;
   MouseWheelEvent& operator=(const MouseWheelEvent& other) = default;
   MouseWheelEvent& operator=(MouseWheelEvent&& other) = default;
 
   float wheelDelta = 0.f;
-  float detail = 0.f;
+  float detail     = 0.f;
   void preventDefault() const
   {
   }
@@ -286,12 +280,12 @@ struct PositionCoord {
 }; // end of struct PositionCoord
 
 struct PostProcessOptions {
-  int width = 0;
+  int width  = 0;
   int height = 0;
 }; // end of struct PostProcessOptions
 
 struct RootResult {
-  bool found = false;
+  bool found  = false;
   double root = 0.;
 }; // end of struct RootResult
 
@@ -301,12 +295,12 @@ struct SamplingParameters {
 }; // end of struct SamplingParameters
 
 struct SizeF {
-  float width = 0.f;
+  float width  = 0.f;
   float height = 0.f;
 }; // end of struct SizeF
 
 struct SolidParticleOptions {
-  bool updatable = false;
+  bool updatable  = false;
   bool isPickable = false;
 }; // end of struct SolidParticleOptions
 
@@ -316,9 +310,9 @@ struct Style {
 
 struct SubdivisionsPerAxis {
   unsigned int max = 0;
-  unsigned int X = 0;
-  unsigned int Y = 0;
-  unsigned int Z = 0;
+  unsigned int X   = 0;
+  unsigned int Y   = 0;
+  unsigned int Z   = 0;
 }; // end of struct SubdivisionsPerAxis
 
 struct SnapEvent {

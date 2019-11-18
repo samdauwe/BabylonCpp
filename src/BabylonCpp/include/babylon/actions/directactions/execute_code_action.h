@@ -20,11 +20,10 @@ public:
    * @param func defines the callback function to run
    * @param condition defines the trigger related conditions
    */
-  ExecuteCodeAction(
-    unsigned int triggerOptions,
-    const std::function<void(const std::optional<IActionEvent>& evt)>& func,
-    Condition* condition = nullptr);
-  ~ExecuteCodeAction(); // = default
+  ExecuteCodeAction(unsigned int triggerOptions,
+                    const std::function<void(const std::optional<IActionEvent>& evt)>& func,
+                    Condition* condition = nullptr);
+  ~ExecuteCodeAction() override; // = default
 
   /**
    * @brief Execute the action and run the attached code.

@@ -26,7 +26,7 @@ namespace
 {
   Color4 savedSceneClearColor;
   Color4 sceneClearColor(0.f, 0.f, 0.f, 1.f);
-}
+  } // namespace
 
 VolumetricLightScatteringPostProcess::VolumetricLightScatteringPostProcess(
   const std::string& iName, float ratio, const CameraPtr& camera,
@@ -86,7 +86,7 @@ VolumetricLightScatteringPostProcess::VolumetricLightScatteringPostProcess(
 
 VolumetricLightScatteringPostProcess::~VolumetricLightScatteringPostProcess() = default;
 
-const std::string VolumetricLightScatteringPostProcess::getClassName() const
+std::string VolumetricLightScatteringPostProcess::getClassName() const
 {
   return "VolumetricLightScatteringPostProcess";
 }
@@ -196,12 +196,9 @@ RenderTargetTexturePtr& VolumetricLightScatteringPostProcess::getPass()
 bool VolumetricLightScatteringPostProcess::_meshExcluded(
   const AbstractMeshPtr& mesh_)
 {
-  if (!excludedMeshes.empty()
-      && (stl_util::index_of(excludedMeshes, mesh_) != -1)) {
-    return true;
-  }
+  return !excludedMeshes.empty()
 
-  return false;
+         && (stl_util::index_of(excludedMeshes, mesh_) != -1);
 }
 
 void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
@@ -258,9 +255,8 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
     }
 
     bool hardwareInstancedRendering
-      = (engine_->getCaps().instancedArrays != false)
-        && (batch->visibleInstances.find(subMesh->_id)
-            != batch->visibleInstances.end());
+      = (engine_->getCaps().instancedArrays)
+        && (batch->visibleInstances.find(subMesh->_id) != batch->visibleInstances.end());
 
     if (_isReady(subMesh, hardwareInstancedRendering)) {
       auto effect = _volumetricLightScatteringPass;

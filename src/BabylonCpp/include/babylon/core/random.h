@@ -60,7 +60,7 @@ struct PCG {
     std::uint64_t inc   = seed();
   };
   pcg32_random_t rng;
-  typedef std::uint32_t result_type;
+  using result_type = std::uint32_t;
 
   constexpr result_type operator()()
   {
@@ -84,8 +84,7 @@ private:
     // Advance internal state
     rng.state = oldstate * 6364136223846793005ULL + (rng.inc | 1);
     // Calculate output function (XSH RR), uses old state for max ILP
-    std::uint32_t xorshifted
-      = static_cast<std::uint32_t>(((oldstate >> 18u) ^ oldstate) >> 27u);
+    auto xorshifted   = static_cast<std::uint32_t>(((oldstate >> 18u) ^ oldstate) >> 27u);
     std::uint32_t rot = oldstate >> 59u;
 #ifdef _MSC_VER
 #pragma warning(push)

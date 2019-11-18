@@ -106,7 +106,7 @@ public:
     materials[1]        = mat2;
 
     for (unsigned int c = 1; c <= nbRings; ++c) {
-      float cf = static_cast<float>(c);
+      auto cf = static_cast<float>(c);
       std::vector<Range> ranges{{Math::PI / 4.f, 3.f * Math::PI / 4.f},
                                 {5.f * Math::PI / 4.f, 7.f * Math::PI / 4.f}};
       Ring ring  = createRing(30 * c, w + 1.5f * cf, ranges);

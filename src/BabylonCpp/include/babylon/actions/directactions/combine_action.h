@@ -20,10 +20,9 @@ public:
    * @param children defines the list of aggregated animations to run
    * @param condition defines the trigger related conditions
    */
-  CombineAction(unsigned int triggerOptions,
-                const std::vector<Action*>& children,
+  CombineAction(unsigned int triggerOptions, const std::vector<Action*>& children,
                 Condition* condition = nullptr);
-  ~CombineAction(); // = default
+  ~CombineAction() override; // = default
 
   /**
    * @brief Hidden

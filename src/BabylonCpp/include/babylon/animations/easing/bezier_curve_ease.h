@@ -22,15 +22,14 @@ public:
   template <typename... Ts>
   static BezierCurveEasePtr New(Ts&&... args)
   {
-    return std::shared_ptr<BezierCurveEase>(
-      new BezierCurveEase(std::forward<Ts>(args)...));
+    return std::shared_ptr<BezierCurveEase>(new BezierCurveEase(std::forward<Ts>(args)...));
   }
-  ~BezierCurveEase(); // = default
+  ~BezierCurveEase() override; // = default
 
   /**
    * @brief Hidden
    */
-  float easeInCore(float gradient) const override;
+  [[nodiscard]] float easeInCore(float gradient) const override;
 
 protected:
   /**
@@ -41,8 +40,7 @@ protected:
    * @param x2 Defines the x component of the end tangent in the bezier curve
    * @param y2 Defines the y component of the end tangent in the bezier curve
    */
-  BezierCurveEase(float x1 = 0.f, float y1 = 0.f, float x2 = 1.f,
-                  float y2 = 1.f);
+  BezierCurveEase(float x1 = 0.f, float y1 = 0.f, float x2 = 1.f, float y2 = 1.f);
 
 public:
   /**

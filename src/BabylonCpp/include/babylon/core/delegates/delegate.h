@@ -30,7 +30,7 @@ class delegate<RET(PARAMS...)> final : private delegate_base<RET(PARAMS...)> {
 public:
   delegate() = default;
 
-  bool isNull() const
+  [[nodiscard]] bool isNull() const
   {
     return invocation.stub == nullptr;
   }
@@ -126,15 +126,13 @@ public:
   } // operator()
 
 private:
-  delegate(void* anObject,
-           typename delegate_base<RET(PARAMS...)>::stub_type aStub)
+  delegate(void* anObject, typename delegate_base<RET(PARAMS...)>::stub_type aStub)
   {
     invocation.object = anObject;
     invocation.stub   = aStub;
   } // delegate
 
-  void assign(void* anObject,
-              typename delegate_base<RET(PARAMS...)>::stub_type aStub)
+  void assign(void* anObject, typename delegate_base<RET(PARAMS...)>::stub_type aStub)
   {
     this->invocation.object = anObject;
     this->invocation.stub   = aStub;
@@ -163,7 +161,7 @@ private:
   template <typename LAMBDA>
   static RET lambda_stub(void* this_ptr, PARAMS... arg)
   {
-    LAMBDA* p = static_cast<LAMBDA*>(this_ptr);
+    auto* p = static_cast<LAMBDA*>(this_ptr);
     return (p->operator())(arg...);
   } // lambda_stub
 

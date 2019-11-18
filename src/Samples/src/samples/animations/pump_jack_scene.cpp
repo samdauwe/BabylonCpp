@@ -18,7 +18,7 @@ public:
   FunnyEase(float distanceOfStick, float lengthOfStick);
   ~FunnyEase() override;
 
-  float easeInCore(float gradient) const override;
+  [[nodiscard]] float easeInCore(float gradient) const override;
 
 private:
   float _distanceOfStick;
@@ -351,7 +351,7 @@ namespace BABYLON {
 namespace Samples {
 
 FunnyEase::FunnyEase(float distanceOfStick, float lengthOfStick)
-    : EasingFunction{}, _distanceOfStick{distanceOfStick}, _lengthOfStick{lengthOfStick}
+    : _distanceOfStick{distanceOfStick}, _lengthOfStick{lengthOfStick}
 {
 }
 

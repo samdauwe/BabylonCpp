@@ -23,8 +23,8 @@ public:
   virtual ~IPipelineContext(); // = default
 
 protected:
-  virtual bool get_isAsync() const;
-  virtual bool get_isReady() const;
+  [[nodiscard]] virtual bool get_isAsync() const;
+  [[nodiscard]] virtual bool get_isReady() const;
 
 public:
   /**
@@ -42,8 +42,8 @@ public:
   /**
    * Hidden
    */
-  std::function<void(const std::function<void(const IPipelineContextPtr&
-                                                pipelineContext)>& onCompiled)>
+  std::function<void(
+    const std::function<void(const IPipelineContextPtr& pipelineContext)>& onCompiled)>
     _handlesSpectorRebuildCallback;
 
 private:

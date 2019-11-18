@@ -64,7 +64,7 @@ std::vector<BaseTexturePtr> MultiMaterial::getActiveTextures() const
   return activeTextures;
 }
 
-const std::string MultiMaterial::getClassName() const
+std::string MultiMaterial::getClassName() const
 {
   return "MultiMaterial";
 }

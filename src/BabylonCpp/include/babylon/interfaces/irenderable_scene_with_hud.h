@@ -11,7 +11,7 @@ class BABYLON_SHARED_EXPORT IRenderableSceneWithHud : public IRenderableScene {
 
 public:
   IRenderableSceneWithHud(ICanvas* iCanvas = nullptr);
-  virtual ~IRenderableSceneWithHud() = default;
+  ~IRenderableSceneWithHud() override = default;
 
   std::function<void(void)> hudGui = {};
 };

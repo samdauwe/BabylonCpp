@@ -19,8 +19,7 @@ public:
    * @param action The event to perform when triggered
    * @param onlyOnce Specifies if the event should be triggered only once
    */
-  AnimationEvent(float frame,
-                 const std::function<void(float currentFrame)>& action,
+  AnimationEvent(float frame, const std::function<void(float currentFrame)>& action,
                  bool onlyOnce = false);
   AnimationEvent(const AnimationEvent& other);
   AnimationEvent(AnimationEvent&& other);
@@ -31,7 +30,7 @@ public:
   /**
    * @brief Hidden
    */
-  AnimationEvent _clone() const;
+  [[nodiscard]] AnimationEvent _clone() const;
 
 public:
   /**

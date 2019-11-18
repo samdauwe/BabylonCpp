@@ -41,7 +41,7 @@ public:
    * @brief Clones, or makes a deep copy, of the CSG.
    * @returns A new CSG
    */
-  CSGPtr clone() const;
+  [[nodiscard]] CSGPtr clone() const;
 
   /**
    * @brief Unions this CSG with another CSG.

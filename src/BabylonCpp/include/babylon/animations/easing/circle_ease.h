@@ -22,15 +22,14 @@ public:
   template <typename... Ts>
   static CircleEasePtr New(Ts&&... args)
   {
-    return std::shared_ptr<CircleEase>(
-      new CircleEase(std::forward<Ts>(args)...));
+    return std::shared_ptr<CircleEase>(new CircleEase(std::forward<Ts>(args)...));
   }
-  ~CircleEase(); // = default
+  ~CircleEase() override; // = default
 
   /**
    * @brief Hidden
    */
-  float easeInCore(float gradient) const override;
+  [[nodiscard]] float easeInCore(float gradient) const override;
 
 protected:
   CircleEase();

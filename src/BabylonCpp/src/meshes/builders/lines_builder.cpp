@@ -52,7 +52,7 @@ LinesMeshPtr LinesBuilder::CreateLineSystem(const std::string& name,
   }
 
   // line system creation
-  auto useVertexColor = (!colors.empty()) ? true : false;
+  auto useVertexColor = !colors.empty();
   auto lineSystem
     = LinesMesh::New(name, scene, nullptr, nullptr, true, useVertexColor,
                      options.useVertexAlpha.value_or(true));

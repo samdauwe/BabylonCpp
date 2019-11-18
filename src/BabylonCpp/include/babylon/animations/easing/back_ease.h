@@ -24,12 +24,12 @@ public:
   {
     return std::shared_ptr<BackEase>(new BackEase(std::forward<Ts>(args)...));
   }
-  ~BackEase(); // = default
+  ~BackEase() override; // = default
 
   /**
    * @brief Hidden
    */
-  float easeInCore(float gradient) const override;
+  [[nodiscard]] float easeInCore(float gradient) const override;
 
 protected:
   /**

@@ -22,24 +22,22 @@ public:
   template <typename... Ts>
   static LinesMeshPtr New(Ts&&... args)
   {
-    auto mesh
-      = std::shared_ptr<LinesMesh>(new LinesMesh(std::forward<Ts>(args)...));
+    auto mesh = std::shared_ptr<LinesMesh>(new LinesMesh(std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
     return mesh;
   }
-  ~LinesMesh(); // = default
+  ~LinesMesh() override; // = default
 
   /**
    * @brief Hidden
    */
-  bool isReady(bool completeCheck        = false,
-               bool forceInstanceSupport = false) override;
+  bool isReady(bool completeCheck = false, bool forceInstanceSupport = false) override;
 
   /**
    * @brief Returns the string "LineMesh".
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Hidden
@@ -49,8 +47,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _bind(SubMesh* subMesh, const EffectPtr& effect,
-             unsigned int fillMode) override;
+  void _bind(SubMesh* subMesh, const EffectPtr& effect, unsigned int fillMode) override;
 
   /**
    * @brief Hidden
@@ -59,15 +56,13 @@ public:
              bool alternate = false) override;
 
   PickingInfo intersects(Ray& ray, bool fastCheck = true,
-                         const TrianglePickingPredicate& trianglePredicate
-                         = nullptr) override;
+                         const TrianglePickingPredicate& trianglePredicate = nullptr) override;
 
   /**
    * @brief Disposes of the line mesh.
    * @param doNotRecurse If children should be disposed
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Returns a new LineMesh object cloned from the current one.
@@ -93,9 +88,8 @@ public:
    * @returns the currentAbstractMesh
    * @see https://www.babylonjs-playground.com/#19O9TU#0
    */
-  static AbstractMeshPtr
-  enableEdgesRendering(const AbstractMeshPtr& source, float epsilon = 0.95f,
-                       bool checkVerticesInsteadOfIndices = false);
+  static AbstractMeshPtr enableEdgesRendering(const AbstractMeshPtr& source, float epsilon = 0.95f,
+                                              bool checkVerticesInsteadOfIndices = false);
 
 protected:
   /**

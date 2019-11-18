@@ -50,25 +50,21 @@ struct LensRenderingPipelineParameters {
  * - depth map (for depth-of-field)
  * - grain texture
  */
-class BABYLON_SHARED_EXPORT LensRenderingPipeline
-    : public PostProcessRenderPipeline {
+class BABYLON_SHARED_EXPORT LensRenderingPipeline : public PostProcessRenderPipeline {
 
 public:
   /**
    * The chromatic aberration PostProcess id in the pipeline
    */
-  static constexpr const char* LensChromaticAberrationEffect
-    = "LensChromaticAberrationEffect";
+  static constexpr const char* LensChromaticAberrationEffect = "LensChromaticAberrationEffect";
   /**
    * The highlights enhancing PostProcess id in the pipeline
    */
-  static constexpr const char* HighlightsEnhancingEffect
-    = "HighlightsEnhancingEffect";
+  static constexpr const char* HighlightsEnhancingEffect = "HighlightsEnhancingEffect";
   /**
    * The depth-of-field PostProcess id in the pipeline
    */
-  static constexpr const char* LensDepthOfFieldEffect
-    = "LensDepthOfFieldEffect";
+  static constexpr const char* LensDepthOfFieldEffect = "LensDepthOfFieldEffect";
 
 public:
   template <typename... Ts>
@@ -80,7 +76,7 @@ public:
 
     return renderingPipeline;
   }
-  virtual ~LensRenderingPipeline(); // = default
+  ~LensRenderingPipeline() override; // = default
 
   void addToScene(const LensRenderingPipelinePtr& lensRenderingPipeline);
 
@@ -88,7 +84,7 @@ public:
    * @brief Get the class name.
    * @returns "LensRenderingPipeline"
    */
-  const std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
   // public methods (self explanatory)
 
@@ -202,8 +198,7 @@ public:
    * @param disableDepthRender If the scens depth rendering should be disabled
    * (default: false)
    */
-  void dispose(bool disableDepthRender         = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool disableDepthRender = false, bool disposeMaterialAndTextures = false) override;
 
 protected:
   /**
@@ -246,8 +241,7 @@ protected:
    * @param cameras The array of cameras that the rendering pipeline will be
    * attached to
    */
-  LensRenderingPipeline(const std::string& name,
-                        const LensRenderingPipelineParameters& parameters,
+  LensRenderingPipeline(const std::string& name, const LensRenderingPipelineParameters& parameters,
                         Scene* scene, float ratio = 1.f,
                         const std::vector<CameraPtr>& cameras = {});
 
@@ -261,67 +255,67 @@ protected:
   /**
    * @brief Gets or sets the edge blur
    */
-  float get_edgeBlur() const;
+  [[nodiscard]] float get_edgeBlur() const;
   void set_edgeBlur(float value);
 
   /**
    * @brief Gets or sets the grain amount
    */
-  float get_grainAmount() const;
+  [[nodiscard]] float get_grainAmount() const;
   void set_grainAmount(float value);
 
   /**
    * @brief Gets or sets the chromatic aberration amount
    */
-  float get_chromaticAberration() const;
+  [[nodiscard]] float get_chromaticAberration() const;
   void set_chromaticAberration(float value);
 
   /**
    * @brief Gets or sets the depth of field aperture
    */
-  float get_dofAperture() const;
+  [[nodiscard]] float get_dofAperture() const;
   void set_dofAperture(float value);
 
   /**
    * @brief Gets or sets the edge distortion
    */
-  float get_edgeDistortion() const;
+  [[nodiscard]] float get_edgeDistortion() const;
   void set_edgeDistortion(float value);
 
   /**
    * @brief Gets or sets the depth of field distortion
    */
-  float get_dofDistortion() const;
+  [[nodiscard]] float get_dofDistortion() const;
   void set_dofDistortion(float value);
 
   /**
    * @brief Gets or sets the darken out of focus amount
    */
-  float get_darkenOutOfFocus() const;
+  [[nodiscard]] float get_darkenOutOfFocus() const;
   void set_darkenOutOfFocus(float value);
 
   /**
    * @brief Gets or sets a boolean indicating if blur noise is enabled
    */
-  bool get_blurNoise() const;
+  [[nodiscard]] bool get_blurNoise() const;
   void set_blurNoise(bool value);
 
   /**
    * @brief Gets or sets a boolean indicating if pentagon bokeh is enabled
    */
-  bool get_pentagonBokeh() const;
+  [[nodiscard]] bool get_pentagonBokeh() const;
   void set_pentagonBokeh(bool value);
 
   /**
    * @brief Gets or sets the highlight grain amount
    */
-  float get_highlightsGain() const;
+  [[nodiscard]] float get_highlightsGain() const;
   void set_highlightsGain(float value);
 
   /**
    * @brief Gets or sets the highlight threshold
    */
-  float get_highlightsThreshold() const;
+  [[nodiscard]] float get_highlightsThreshold() const;
   void set_highlightsThreshold(float value);
 
 private:

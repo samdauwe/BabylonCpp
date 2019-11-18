@@ -193,7 +193,7 @@ json GridMaterial::serialize() const
   return nullptr;
 }
 
-const std::string GridMaterial::getClassName() const
+std::string GridMaterial::getClassName() const
 {
   return "GridMaterial";
 }

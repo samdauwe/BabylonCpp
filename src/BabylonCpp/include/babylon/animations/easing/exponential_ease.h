@@ -22,15 +22,14 @@ public:
   template <typename... Ts>
   static ExponentialEasePtr New(Ts&&... args)
   {
-    return std::shared_ptr<ExponentialEase>(
-      new ExponentialEase(std::forward<Ts>(args)...));
+    return std::shared_ptr<ExponentialEase>(new ExponentialEase(std::forward<Ts>(args)...));
   }
-  ~ExponentialEase(); // = default
+  ~ExponentialEase() override; // = default
 
   /**
    * @brief Hidden
    */
-  float easeInCore(float gradient) const override;
+  [[nodiscard]] float easeInCore(float gradient) const override;
 
 protected:
   /**

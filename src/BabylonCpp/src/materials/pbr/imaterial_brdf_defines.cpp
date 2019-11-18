@@ -4,7 +4,7 @@
 
 namespace BABYLON {
 
-IMaterialBRDFDefines::IMaterialBRDFDefines() : MaterialDefines{}
+IMaterialBRDFDefines::IMaterialBRDFDefines()
 {
   boolDef = {
     {"BRDF_V_HEIGHT_CORRELATED", false},    //

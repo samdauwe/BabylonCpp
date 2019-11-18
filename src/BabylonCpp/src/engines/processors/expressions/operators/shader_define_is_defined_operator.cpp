@@ -4,19 +4,18 @@
 
 namespace BABYLON {
 
-ShaderDefineIsDefinedOperator::ShaderDefineIsDefinedOperator()
-    : ShaderDefineExpression{}, define{""}, _not{false}
+ShaderDefineIsDefinedOperator::ShaderDefineIsDefinedOperator() : define{""}, _not{false}
 {
 }
 
 ShaderDefineIsDefinedOperator::ShaderDefineIsDefinedOperator(const std::string& iDefine, bool iNot)
-    : ShaderDefineExpression{}, define{iDefine}, _not{iNot}
+    : define{iDefine}, _not{iNot}
 {
 }
 
 ShaderDefineIsDefinedOperator::ShaderDefineIsDefinedOperator(
   const ShaderDefineIsDefinedOperator& other)
-    : ShaderDefineExpression{}, define{other.define}, _not{other._not}
+    : define{other.define}, _not{other._not}
 {
 }
 

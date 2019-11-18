@@ -10,7 +10,7 @@ namespace BABYLON {
  * @brief Hidden
  */
 struct BABYLON_SHARED_EXPORT WebGL2ShaderProcessor : public IShaderProcessor {
-  virtual ~WebGL2ShaderProcessor(); // = default
+  ~WebGL2ShaderProcessor() override; // = default
   std::string attributeProcessor(const std::string& attribute) override;
   std::string varyingProcessor(const std::string& varying, bool isFragment) override;
   std::string postProcessor(std::string code, const std::vector<std::string>& defines,

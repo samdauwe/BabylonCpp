@@ -7,11 +7,10 @@
 namespace BABYLON {
 namespace MaterialsLibrary {
 
-struct BABYLON_SHARED_EXPORT ShadowOnlyMaterialDefines
-    : public MaterialDefines {
+struct BABYLON_SHARED_EXPORT ShadowOnlyMaterialDefines : public MaterialDefines {
 
   ShadowOnlyMaterialDefines();
-  ~ShadowOnlyMaterialDefines(); // = default
+  ~ShadowOnlyMaterialDefines() override; // = default
 
 }; // end of struct ShadowOnlyMaterialDefines
 

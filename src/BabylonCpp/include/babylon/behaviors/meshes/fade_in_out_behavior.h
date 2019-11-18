@@ -22,12 +22,12 @@ public:
    * @brief Instatiates the FadeInOutBehavior.
    */
   FadeInOutBehavior();
-  virtual ~FadeInOutBehavior(); // = default
+  ~FadeInOutBehavior() override; // = default
 
   /**
    *  @brief The name of the behavior.
    */
-  const char* name() const;
+  [[nodiscard]] const char* name() const;
 
   /**
    * @brief Initializes the behavior.
@@ -40,8 +40,7 @@ public:
    * @param predicate Predicate to use for pick filtering
    */
   void attach(const MeshPtr& ownerNode,
-              const std::function<bool(const AbstractMeshPtr& m)>& predicate
-              = nullptr) override;
+              const std::function<bool(const AbstractMeshPtr& m)>& predicate = nullptr) override;
 
   /**
    * @brief Detaches the behavior from the mesh.

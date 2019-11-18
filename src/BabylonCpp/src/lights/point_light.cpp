@@ -63,7 +63,7 @@ void PointLight::set_direction(const Vector3& value)
   }
 }
 
-const std::string PointLight::getClassName() const
+std::string PointLight::getClassName() const
 {
   return "PointLight";
 }

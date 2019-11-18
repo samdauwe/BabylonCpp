@@ -65,8 +65,7 @@ public:
   static const std::array<Vector3Callback, 9> SH3ylmBasisTrigonometricTerms;
 
   // Wrap the full compute
-  static const std::function<float(unsigned int lm, const Vector3& direction)>
-    applySH3;
+  static const std::function<float(unsigned int lm, const Vector3& direction)> applySH3;
 
   // Derived from the integration of the a kernel convolution to SH.
   // Great explanation here:
@@ -80,8 +79,8 @@ public:
   SphericalHarmonics& operator=(const SphericalHarmonics& other);
   SphericalHarmonics& operator=(SphericalHarmonics&& other);
   ~SphericalHarmonics(); // = default
-  SphericalHarmonics copy() const;
-  std::unique_ptr<SphericalHarmonics> clone() const;
+  [[nodiscard]] SphericalHarmonics copy() const;
+  [[nodiscard]] std::unique_ptr<SphericalHarmonics> clone() const;
 
   /**
    * @brief Adds a light to the spherical harmonics.
@@ -89,8 +88,7 @@ public:
    * @param color the color of the light
    * @param deltaSolidAngle the delta solid angle of the light
    */
-  void addLight(const Vector3& direction, const Color3& color,
-                float deltaSolidAngle);
+  void addLight(const Vector3& direction, const Color3& color, float deltaSolidAngle);
 
   /**
    * @brief Scales the spherical harmonics by the given amount.
@@ -149,8 +147,7 @@ public:
    * @param polynomial the spherical polynomial
    * @returns the spherical harmonics
    */
-  static SphericalHarmonics
-  FromPolynomial(const SphericalPolynomial& polynomial);
+  static SphericalHarmonics FromPolynomial(const SphericalPolynomial& polynomial);
 
 public:
   /**

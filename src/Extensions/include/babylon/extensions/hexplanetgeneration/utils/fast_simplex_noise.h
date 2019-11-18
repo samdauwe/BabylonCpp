@@ -67,15 +67,13 @@ public:
   }
 
   // dot2D calculation
-  static constexpr float dot3D(const std::array<float, 3>& g, float x, float y,
-                               float z)
+  static constexpr float dot3D(const std::array<float, 3>& g, float x, float y, float z)
   {
     return g[0] * x + g[1] * y + g[2] * z;
   }
 
   // dot2D calculation
-  static constexpr float dot4D(const std::array<float, 4>& g, float x, float y,
-                               float z, float w)
+  static constexpr float dot4D(const std::array<float, 4>& g, float x, float y, float z, float w)
   {
     return g[0] * x + g[1] * y + g[2] * z + g[3] * w;
   }
@@ -88,76 +86,76 @@ public:
    * Get a scaled noise value for a 2D or 3D point at coords on the surface of a
    * cylinder with circumference.
    */
-  float cylindrical(float c, const Float32Array& coords) const;
+  [[nodiscard]] float cylindrical(float c, const Float32Array& coords) const;
 
   /**
    * Get a noise value between min and max for a point (x,y) on the surface of a
    * cylinder with circumference c.
    */
-  float cylindrical2D(float c, float x, float y) const;
+  [[nodiscard]] float cylindrical2D(float c, float x, float y) const;
 
   /**
    * Get a noise value between min and max for a point (x, y, z) on the surface
    * of a cylinder with circumference c.
    */
-  float cylindrical3D(float c, float x, float y, float z) const;
+  [[nodiscard]] float cylindrical3D(float c, float x, float y, float z) const;
 
   /**
    * Get a noise value [-1, 1] at a 2D, 3D, or 4D point at coords.
    */
-  float raw(const Float32Array& coords) const;
+  [[nodiscard]] float raw(const Float32Array& coords) const;
 
   /**
    * Get a noise value [-1, 1] at the 2D coordinate (x,y).
    */
-  float raw2D(float x, float y) const;
+  [[nodiscard]] float raw2D(float x, float y) const;
 
   /**
    * Get a noise value [-1, 1] at the 3D coordinate (x,y,z).
    */
-  float raw3D(float x, float y, float z) const;
+  [[nodiscard]] float raw3D(float x, float y, float z) const;
 
   /**
    * Get a noise value [-1, 1] at the 4D coordinate (x,y,z,w).
    */
-  float raw4D(float x, float y, float z, float w) const;
+  [[nodiscard]] float raw4D(float x, float y, float z, float w) const;
 
   /**
    * Get a scaled noise value (using options) at a 2D, 3D, or 4D point at
    * coords.
    */
-  float scaled(const Float32Array& coords) const;
+  [[nodiscard]] float scaled(const Float32Array& coords) const;
 
   /**
    * Specific scaled() call for a 2D point at (x, y).
    */
-  float scaled2D(float x, float y) const;
+  [[nodiscard]] float scaled2D(float x, float y) const;
 
   /**
    * Specific scaled() call for a 3D point at (x, y, z).
    */
-  float scaled3D(float x, float y, float z) const;
+  [[nodiscard]] float scaled3D(float x, float y, float z) const;
 
   /**
    * Specific scaled() call for a 4D point at (x, y, z, w).
    */
-  float scaled4D(float x, float y, float z, float w) const;
+  [[nodiscard]] float scaled4D(float x, float y, float z, float w) const;
 
   /**
    * Get a scaled noise value (using options) at a 2D or 3D point at coords on
    * the surface of a sphere with circumference.
    */
-  float spherical(float c, const Float32Array& coords) const;
+  [[nodiscard]] float spherical(float c, const Float32Array& coords) const;
 
   /**
    * Specific spherical() call for a 2D point at (x, y).
    */
-  float spherical2D(float c, float x, float y) const;
+  [[nodiscard]] float spherical2D(float c, float x, float y) const;
 
   /**
    * Specific spherical() call for a 3D point at (x, y, z).
    */
-  float spherical3D(float c, float x, float y, float z) const;
+  [[nodiscard]] float spherical3D(float c, float x, float y, float z) const;
 
 private:
   // The base amplitude

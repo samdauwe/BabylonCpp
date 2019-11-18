@@ -23,33 +23,30 @@ public:
   template <typename... Ts>
   static GridMaterialPtr New(Ts&&... args)
   {
-    auto material = std::shared_ptr<GridMaterial>(
-      new GridMaterial(std::forward<Ts>(args)...));
+    auto material = std::shared_ptr<GridMaterial>(new GridMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;
   }
-  ~GridMaterial(); // = default
+  ~GridMaterial() override; // = default
 
   /**
    * Returns whether or not the grid requires alpha blending.
    */
-  bool needAlphaBlending() const override;
-  bool needAlphaBlendingForMesh(const AbstractMesh& mesh) const override;
+  [[nodiscard]] bool needAlphaBlending() const override;
+  [[nodiscard]] bool needAlphaBlendingForMesh(const AbstractMesh& mesh) const override;
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances = false) override;
   void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
-  const std::string getClassName() const override;
-  virtual void dispose(bool forceDisposeEffect   = false,
-                       bool forceDisposeTextures = false,
-                       bool notBoundToMesh       = false) override;
-  MaterialPtr clone(const std::string& name,
-                    bool cloneChildren = false) const override;
-  json serialize() const;
+  [[nodiscard]] std::string getClassName() const override;
+  void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
+               bool notBoundToMesh = false) override;
+  [[nodiscard]] MaterialPtr clone(const std::string& name,
+                                  bool cloneChildren = false) const override;
+  [[nodiscard]] json serialize() const;
 
   /** Statics **/
-  static GridMaterial* Parse(const json& source, Scene* scene,
-                             const std::string& rootUrl);
+  static GridMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
   /**

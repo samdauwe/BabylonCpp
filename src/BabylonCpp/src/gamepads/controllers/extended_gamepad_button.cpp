@@ -2,7 +2,7 @@
 
 namespace BABYLON {
 
-ExtendedGamepadButton::ExtendedGamepadButton() : MutableGamepadButton()
+ExtendedGamepadButton::ExtendedGamepadButton()
 {
 }
 

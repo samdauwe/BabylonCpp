@@ -24,34 +24,31 @@ public:
   template <typename... Ts>
   static MixMaterialPtr New(Ts&&... args)
   {
-    auto material = std::shared_ptr<MixMaterial>(
-      new MixMaterial(std::forward<Ts>(args)...));
+    auto material = std::shared_ptr<MixMaterial>(new MixMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;
   }
-  ~MixMaterial(); // = default
+  ~MixMaterial() override; // = default
 
-  bool needAlphaBlending() const override;
-  bool needAlphaTesting() const override;
+  [[nodiscard]] bool needAlphaBlending() const override;
+  [[nodiscard]] bool needAlphaTesting() const override;
   BaseTexturePtr getAlphaTestTexture() override;
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances = false) override;
   void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
   std::vector<IAnimatablePtr> getAnimatables() override;
-  std::vector<BaseTexturePtr> getActiveTextures() const override;
-  bool hasTexture(const BaseTexturePtr& texture) const override;
-  const std::string getClassName() const override;
-  virtual void dispose(bool forceDisposeEffect   = false,
-                       bool forceDisposeTextures = false,
-                       bool notBoundToMesh       = false) override;
-  MaterialPtr clone(const std::string& name,
-                    bool cloneChildren = false) const override;
-  json serialize() const;
+  [[nodiscard]] std::vector<BaseTexturePtr> getActiveTextures() const override;
+  [[nodiscard]] bool hasTexture(const BaseTexturePtr& texture) const override;
+  [[nodiscard]] std::string getClassName() const override;
+  void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
+               bool notBoundToMesh = false) override;
+  [[nodiscard]] MaterialPtr clone(const std::string& name,
+                                  bool cloneChildren = false) const override;
+  [[nodiscard]] json serialize() const;
 
   /** Statics **/
-  static MixMaterial* Parse(const json& source, Scene* scene,
-                            const std::string& rootUrl);
+  static MixMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
   MixMaterial(const std::string& name, Scene* scene);
@@ -76,9 +73,9 @@ protected:
   void set_diffuseTexture7(const TexturePtr& value);
   TexturePtr& get_diffuseTexture8();
   void set_diffuseTexture8(const TexturePtr& value);
-  bool get_disableLighting() const;
+  [[nodiscard]] bool get_disableLighting() const;
   void set_disableLighting(bool value);
-  unsigned int get_maxSimultaneousLights() const;
+  [[nodiscard]] unsigned int get_maxSimultaneousLights() const;
   void set_maxSimultaneousLights(unsigned int value);
 
 public:

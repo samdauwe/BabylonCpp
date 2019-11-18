@@ -67,19 +67,18 @@ public:
    * @param from The from point on world space
    * @param to The to point on world space
    */
-  void reset(const Vector3& from = Vector3::Zero(),
-             const Vector3& to   = Vector3::Zero());
+  void reset(const Vector3& from = Vector3::Zero(), const Vector3& to = Vector3::Zero());
 
 protected:
   /**
    * @brief Gets if there was a hit
    */
-  bool get_hasHit() const;
+  [[nodiscard]] bool get_hasHit() const;
 
   /**
    * @brief Gets the distance from the hit
    */
-  float get_hitDistance() const;
+  [[nodiscard]] float get_hitDistance() const;
 
   /**
    * @brief Gets the hit normal/direction in the world

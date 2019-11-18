@@ -32,13 +32,13 @@ public:
   template <typename... Ts>
   static AnimationGroupPtr New(Ts&&... args)
   {
-    auto animationGroup = std::shared_ptr<AnimationGroup>(
-      new AnimationGroup(std::forward<Ts>(args)...));
+    auto animationGroup
+      = std::shared_ptr<AnimationGroup>(new AnimationGroup(std::forward<Ts>(args)...));
     animationGroup->addToScene(animationGroup);
 
     return animationGroup;
   }
-  virtual ~AnimationGroup(); // = default
+  ~AnimationGroup() override; // = default
 
   void addToScene(const AnimationGroupPtr& newAnimationGroup);
 
@@ -62,7 +62,7 @@ public:
    * @returns the animation group
    */
   AnimationGroup& normalize(const std::optional<int>& beginFrame = std::nullopt,
-                            const std::optional<int>& endFrame = std::nullopt);
+                            const std::optional<int>& endFrame   = std::nullopt);
 
   /**
    * @brief Start all animations on given targets.
@@ -136,8 +136,7 @@ public:
   /**
    * @brief Dispose all associated resources.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Clone the current animation group and returns a copy
@@ -148,15 +147,14 @@ public:
    */
   AnimationGroupPtr
   clone(const std::string& newName,
-        const std::function<IAnimatablePtr(const IAnimatablePtr& animatible)>&
-          targetConverter
+        const std::function<IAnimatablePtr(const IAnimatablePtr& animatible)>& targetConverter
         = nullptr);
 
   /**
    * @brief Serializes the animationGroup to an object.
    * @returns Serialized object
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   // Statics
 
@@ -166,14 +164,13 @@ public:
    * @param scene defines the scene that will receive the animationGroup
    * @returns a new AnimationGroup
    */
-  static AnimationGroupPtr Parse(const json& parsedAnimationGroup,
-                                 Scene* scene);
+  static AnimationGroupPtr Parse(const json& parsedAnimationGroup, Scene* scene);
 
   /**
    * @brief Returns the string "AnimationGroup".
    * @returns "AnimationGroup"
    */
-  std::string getClassName() const;
+  [[nodiscard]] std::string getClassName() const;
 
   /**
    * @brief Creates a detailled string about the object
@@ -181,7 +178,7 @@ public:
    * levels of logging within scene loading
    * @returns a string representing the object
    */
-  std::string toString(bool fullDetails = false) const;
+  [[nodiscard]] std::string toString(bool fullDetails = false) const;
 
 protected:
   /**
@@ -197,27 +194,27 @@ private:
   /**
    * @brief Gets the first frame.
    */
-  float get_from() const;
+  [[nodiscard]] float get_from() const;
 
   /**
    * @brief Gets the last frame.
    */
-  float get_to() const;
+  [[nodiscard]] float get_to() const;
 
   /**
    * @brief Define if the animations are started.
    */
-  bool get_isStarted() const;
+  [[nodiscard]] bool get_isStarted() const;
 
   /**
    * @brief Gets a value indicating that the current group is playing.
    */
-  bool get_isPlaying() const;
+  [[nodiscard]] bool get_isPlaying() const;
 
   /**
    * @brief Gets the speed ratio to use for all animations.
    */
-  float get_speedRatio() const;
+  [[nodiscard]] float get_speedRatio() const;
 
   /**
    * @brief Sets the speed ratio to use for all animations.
@@ -227,7 +224,7 @@ private:
   /**
    * @brief Gets if all animations should loop or not.
    */
-  bool get_loopAnimation() const;
+  [[nodiscard]] bool get_loopAnimation() const;
 
   /**
    * @brief Sets if all animations should loop or not.
@@ -316,8 +313,7 @@ public:
   /**
    * Targeted animations for this animation group.
    */
-  ReadOnlyProperty<AnimationGroup,
-                   std::vector<std::unique_ptr<TargetedAnimation>>>
+  ReadOnlyProperty<AnimationGroup, std::vector<std::unique_ptr<TargetedAnimation>>>
     targetedAnimations;
 
   /**

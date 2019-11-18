@@ -7,12 +7,11 @@
 
 namespace BABYLON {
 
-struct BABYLON_SHARED_EXPORT StandardMaterialDefines
-    : public MaterialDefines,
-      public IImageProcessingConfigurationDefines {
+struct BABYLON_SHARED_EXPORT StandardMaterialDefines : public MaterialDefines,
+                                                       public IImageProcessingConfigurationDefines {
 
   StandardMaterialDefines();
-  ~StandardMaterialDefines(); // = default
+  ~StandardMaterialDefines() override; // = default
 
   void setReflectionMode(const std::string& modeToEnable);
 
@@ -20,7 +19,7 @@ struct BABYLON_SHARED_EXPORT StandardMaterialDefines
    * @brief Converts the material define values to a string.
    * @returns - String of material define information.
    */
-  virtual std::string toString() const override;
+  [[nodiscard]] std::string toString() const override;
 
 }; // end of struct StandardMaterialDefines
 

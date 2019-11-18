@@ -40,15 +40,14 @@ public:
   template <typename... Ts>
   static ArcRotateCameraPtr New(Ts&&... args)
   {
-    auto camera = std::shared_ptr<ArcRotateCamera>(
-      new ArcRotateCamera(std::forward<Ts>(args)...));
+    auto camera = std::shared_ptr<ArcRotateCamera>(new ArcRotateCamera(std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;
   }
-  ~ArcRotateCamera(); // = default
+  ~ArcRotateCamera() override; // = default
 
-  virtual Type type() const override;
+  Type type() const override;
 
   /**
    * @brief Sets the Y-up to camera up-vector rotation matrix, and the up-vector
@@ -95,10 +94,8 @@ public:
    * @param panningMouseButton Defines whether panning is allowed through mouse
    * click button
    */
-  void attachControl(ICanvas* canvas, bool noPreventDefault = false,
-                     bool useCtrlForPanning = true,
-                     MouseButtonType panningMouseButton
-                     = MouseButtonType::RIGHT) override;
+  void attachControl(ICanvas* canvas, bool noPreventDefault = false, bool useCtrlForPanning = true,
+                     MouseButtonType panningMouseButton = MouseButtonType::RIGHT) override;
 
   /**
    * @brief Detach the current controls from the camera.
@@ -151,8 +148,7 @@ public:
    * zooming on the mesh (this can happen if the mesh is big and the maxradius
    * pretty small for instance)
    */
-  void zoomOn(const std::vector<AbstractMeshPtr> meshes,
-              bool doNotUpdateMaxZ = false);
+  void zoomOn(const std::vector<AbstractMeshPtr> meshes, bool doNotUpdateMaxZ = false);
 
   /**
    * @brief Focus on a mesh or a bounding box. This adapts the target and
@@ -164,8 +160,7 @@ public:
    * zooming on the mesh (this can happen if the mesh is big and the maxradius
    * pretty small for instance)
    */
-  void focusOn(const MinMaxDistance& meshesOrMinMaxVectorAndDistance,
-               bool doNotUpdateMaxZ = false);
+  void focusOn(const MinMaxDistance& meshesOrMinMaxVectorAndDistance, bool doNotUpdateMaxZ = false);
 
   /**
    * @brief Hidden
@@ -180,14 +175,13 @@ public:
   /**
    * @brief Destroy the camera and release the current resources hold by it.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Gets the current object class name.
    * @return the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   json serialize() const override;
 
@@ -203,15 +197,14 @@ protected:
    * @param setActiveOnSceneIfNoneActive Defines wheter the camera should be
    * marked as active if not other active cameras have been defined
    */
-  ArcRotateCamera(const std::string& name, float alpha, float beta,
-                  float radius, const std::optional<Vector3>& target,
-                  Scene* scene, bool setActiveOnSceneIfNoneActive = true);
+  ArcRotateCamera(const std::string& name, float alpha, float beta, float radius,
+                  const std::optional<Vector3>& target, Scene* scene,
+                  bool setActiveOnSceneIfNoneActive = true);
 
   Vector3 _getTargetPosition();
   void _checkLimits();
   void _onCollisionPositionChange(size_t collisionId, Vector3& newPosition,
-                                  const AbstractMeshPtr& collidedMesh
-                                  = nullptr);
+                                  const AbstractMeshPtr& collidedMesh = nullptr);
 
   /**
    * @brief Defines the target point of the camera.
@@ -448,8 +441,7 @@ public:
    * Gets the bouncing behavior of the camera if it has been enabled.
    * @see http://doc.babylonjs.com/how_to/camera_behaviors#bouncing-behavior
    */
-  ReadOnlyProperty<ArcRotateCamera, std::unique_ptr<BouncingBehavior>>
-    bouncingBehavior;
+  ReadOnlyProperty<ArcRotateCamera, std::unique_ptr<BouncingBehavior>> bouncingBehavior;
 
   /**
    * Defines if the bouncing behavior of the camera is enabled on the camera.
@@ -461,8 +453,7 @@ public:
    * Gets the framing behavior of the camera if it has been enabled.
    * @see http://doc.babylonjs.com/how_to/camera_behaviors#framing-behavior
    */
-  ReadOnlyProperty<ArcRotateCamera, std::unique_ptr<FramingBehavior>>
-    framingBehavior;
+  ReadOnlyProperty<ArcRotateCamera, std::unique_ptr<FramingBehavior>> framingBehavior;
 
   /**
    * Defines if the framing behavior of the camera is enabled on the camera.
@@ -474,8 +465,7 @@ public:
    * Gets the auto rotation behavior of the camera if it has been enabled.
    * @see http://doc.babylonjs.com/how_to/camera_behaviors#autorotation-behavior
    */
-  ReadOnlyProperty<ArcRotateCamera, std::unique_ptr<AutoRotationBehavior>>
-    autoRotationBehavior;
+  ReadOnlyProperty<ArcRotateCamera, std::unique_ptr<AutoRotationBehavior>> autoRotationBehavior;
 
   /**
    * Defines if the auto rotation behavior of the camera is enabled on the

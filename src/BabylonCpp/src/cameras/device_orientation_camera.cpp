@@ -56,7 +56,7 @@ void DeviceOrientationCamera::enableHorizontalDragging(float dragFactor)
   _dragFactor = dragFactor;
 }
 
-const std::string DeviceOrientationCamera::getClassName() const
+std::string DeviceOrientationCamera::getClassName() const
 {
   return "DeviceOrientationCamera";
 }

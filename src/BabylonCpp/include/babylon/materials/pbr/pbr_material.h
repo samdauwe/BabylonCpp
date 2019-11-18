@@ -25,22 +25,19 @@ public:
    * PBRMaterialTransparencyMode: No transparency mode, Alpha channel is not
    * use.
    */
-  static constexpr unsigned int PBRMATERIAL_OPAQUE
-    = PBRBaseMaterial::PBRMATERIAL_OPAQUE;
+  static constexpr unsigned int PBRMATERIAL_OPAQUE = PBRBaseMaterial::PBRMATERIAL_OPAQUE;
 
   /**
    * PBRMaterialTransparencyMode: Alpha Test mode, pixel are discarded below a
    * certain threshold defined by the alpha cutoff value.
    */
-  static constexpr unsigned int PBRMATERIAL_ALPHATEST
-    = PBRBaseMaterial::PBRMATERIAL_ALPHATEST;
+  static constexpr unsigned int PBRMATERIAL_ALPHATEST = PBRBaseMaterial::PBRMATERIAL_ALPHATEST;
 
   /**
    * PBRMaterialTransparencyMode: Pixels are blended (according to the alpha
    * mode) with the already drawn pixels in the current frame buffer.
    */
-  static constexpr unsigned int PBRMATERIAL_ALPHABLEND
-    = PBRBaseMaterial::PBRMATERIAL_ALPHABLEND;
+  static constexpr unsigned int PBRMATERIAL_ALPHABLEND = PBRBaseMaterial::PBRMATERIAL_ALPHABLEND;
 
   /**
    * PBRMaterialTransparencyMode: Pixels are blended (according to the alpha
@@ -61,31 +58,30 @@ public:
   template <typename... Ts>
   static PBRMaterialPtr New(Ts&&... args)
   {
-    auto material = std::shared_ptr<PBRMaterial>(
-      new PBRMaterial(std::forward<Ts>(args)...));
+    auto material = std::shared_ptr<PBRMaterial>(new PBRMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;
   }
-  ~PBRMaterial(); // = default
+  ~PBRMaterial() override; // = default
 
   /**
    * @brief Returns the name of this material class.
    */
-  const std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
   /**
    * @brief Makes a duplicate of the current material.
    * @param name - name to use for the new material.
    */
-  MaterialPtr clone(const std::string& name,
-                    bool cloneChildren = false) const override;
+  [[nodiscard]] MaterialPtr clone(const std::string& name,
+                                  bool cloneChildren = false) const override;
 
   /**
    * @brief Serializes this PBR Material.
    * @returns - An object with the serialized material.
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   // Statics
   /**
@@ -95,8 +91,7 @@ public:
    * @param rootUrl - url for the scene object
    * @returns - PBRMaterial
    */
-  static PBRMaterial* Parse(const json& source, Scene* scene,
-                            const std::string& rootUrl);
+  static PBRMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
   /**
@@ -112,7 +107,7 @@ protected:
    * scene.
    * This impacts both the direct diffuse and specular highlights.
    */
-  float get_directIntensity() const;
+  [[nodiscard]] float get_directIntensity() const;
   void set_directIntensity(float value);
 
   /**
@@ -120,7 +115,7 @@ protected:
    * This helps controlling the emissive effect without modifying the emissive
    * color.
    */
-  float get_emissiveIntensity() const;
+  [[nodiscard]] float get_emissiveIntensity() const;
   void set_emissiveIntensity(float value);
 
   /**
@@ -129,7 +124,7 @@ protected:
    * either through harmonics for rough material or through the refelction for
    * shiny ones.
    */
-  float get_environmentIntensity() const;
+  [[nodiscard]] float get_environmentIntensity() const;
   void set_environmentIntensity(float value);
 
   /**
@@ -138,13 +133,13 @@ protected:
    * four lights of the scene. Those highlights may not be needed in full
    * environment lighting.
    */
-  float get_specularIntensity() const;
+  [[nodiscard]] float get_specularIntensity() const;
   void set_specularIntensity(float value);
 
   /**
    * Debug Control allowing disabling the bump map on this material.
    */
-  bool get_disableBumpMap() const;
+  [[nodiscard]] bool get_disableBumpMap() const;
   void set_disableBumpMap(bool value);
 
   /**
@@ -162,14 +157,14 @@ protected:
   /**
    * AKA Occlusion Texture Intensity in other nomenclature.
    */
-  float get_ambientTextureStrength() const;
+  [[nodiscard]] float get_ambientTextureStrength() const;
   void set_ambientTextureStrength(float value);
 
   /**
    * Defines how much the AO map is occluding the analytical lights (point
    * spot...). 1 means it completely occludes it 0 mean it has no impact
    */
-  unsigned int get_ambientTextureImpactOnAnalyticalLights() const;
+  [[nodiscard]] unsigned int get_ambientTextureImpactOnAnalyticalLights() const;
   void set_ambientTextureImpactOnAnalyticalLights(unsigned int value);
 
   /**
@@ -275,20 +270,20 @@ protected:
   /**
    * AKA Glossiness in other nomenclature.
    */
-  float get_microSurface() const;
+  [[nodiscard]] float get_microSurface() const;
   void set_microSurface(float value);
 
   /**
    * source material index of refraction (IOR)' / 'destination material IOR.
    */
-  float get_indexOfRefraction() const;
+  [[nodiscard]] float get_indexOfRefraction() const;
   void set_indexOfRefraction(float value);
 
   /**
    * Controls if refraction needs to be inverted on Y. This could be useful for
    * procedural texture.
    */
-  bool get_invertRefractionY() const;
+  [[nodiscard]] bool get_invertRefractionY() const;
   void set_invertRefractionY(bool value);
 
   /**
@@ -297,34 +292,34 @@ protected:
    * Materials half opaque for instance using refraction could benefit from this
    * control.
    */
-  bool get_linkRefractionWithTransparency() const;
+  [[nodiscard]] bool get_linkRefractionWithTransparency() const;
   void set_linkRefractionWithTransparency(bool value);
 
   /**
    * If true, the light map contains occlusion information instead of lighting
    * info.
    */
-  bool get_useLightmapAsShadowmap() const;
+  [[nodiscard]] bool get_useLightmapAsShadowmap() const;
   void set_useLightmapAsShadowmap(bool value);
 
   /**
    * Specifies that the alpha is coming form the albedo channel alpha channel
    * for alpha blending.
    */
-  bool get_useAlphaFromAlbedoTexture() const;
+  [[nodiscard]] bool get_useAlphaFromAlbedoTexture() const;
   void set_useAlphaFromAlbedoTexture(bool value);
 
   /**
    * Enforces alpha test in opaque or blend mode in order to improve the
    * performances of some situations.
    */
-  bool get_forceAlphaTest() const;
+  [[nodiscard]] bool get_forceAlphaTest() const;
   void set_forceAlphaTest(bool value);
 
   /**
    * Defines the alpha limits in alpha test mode.
    */
-  float get_alphaCutOff() const;
+  [[nodiscard]] float get_alphaCutOff() const;
   void set_alphaCutOff(float value);
 
   /**
@@ -332,49 +327,49 @@ protected:
    * transparent surface (only the most limunous ones). A car glass is a good
    * exemple of that. When sun reflects on it you can not see what is behind.
    */
-  bool get_useSpecularOverAlpha() const;
+  [[nodiscard]] bool get_useSpecularOverAlpha() const;
   void set_useSpecularOverAlpha(bool value);
 
   /**
    * Specifies if the reflectivity texture contains the glossiness information
    * in its alpha channel.
    */
-  bool get_useMicroSurfaceFromReflectivityMapAlpha() const;
+  [[nodiscard]] bool get_useMicroSurfaceFromReflectivityMapAlpha() const;
   void set_useMicroSurfaceFromReflectivityMapAlpha(bool value);
 
   /**
    * Specifies if the metallic texture contains the roughness information in its
    * alpha channel.
    */
-  bool get_useRoughnessFromMetallicTextureAlpha() const;
+  [[nodiscard]] bool get_useRoughnessFromMetallicTextureAlpha() const;
   void set_useRoughnessFromMetallicTextureAlpha(bool value);
 
   /**
    * Specifies if the metallic texture contains the roughness information in its
    * green channel.
    */
-  bool get_useRoughnessFromMetallicTextureGreen() const;
+  [[nodiscard]] bool get_useRoughnessFromMetallicTextureGreen() const;
   void set_useRoughnessFromMetallicTextureGreen(bool value);
 
   /**
    * Specifies if the metallic texture contains the metallness information in
    * its blue channel.
    */
-  bool get_useMetallnessFromMetallicTextureBlue() const;
+  [[nodiscard]] bool get_useMetallnessFromMetallicTextureBlue() const;
   void set_useMetallnessFromMetallicTextureBlue(bool value);
 
   /**
    * Specifies if the metallic texture contains the ambient occlusion
    * information in its red channel.
    */
-  bool get_useAmbientOcclusionFromMetallicTextureRed() const;
+  [[nodiscard]] bool get_useAmbientOcclusionFromMetallicTextureRed() const;
   void set_useAmbientOcclusionFromMetallicTextureRed(bool value);
 
   /**
    * Specifies if the ambient texture contains the ambient occlusion information
    * in its red channel only.
    */
-  bool get_useAmbientInGrayScale() const;
+  [[nodiscard]] bool get_useAmbientInGrayScale() const;
   void set_useAmbientInGrayScale(bool value);
 
   /**
@@ -382,7 +377,7 @@ protected:
    * in its alpha channel,
    * The material will try to infer what glossiness each pixel should be.
    */
-  bool get_useAutoMicroSurfaceFromReflectivityMap() const;
+  [[nodiscard]] bool get_useAutoMicroSurfaceFromReflectivityMap() const;
   void set_useAutoMicroSurfaceFromReflectivityMap(bool value);
 
   /**
@@ -391,7 +386,7 @@ protected:
    * squared root algorythm. This parameter can help you switch back to the BJS
    * mode in order to create scenes using both materials.
    */
-  bool get_usePhysicalLightFalloff() const;
+  [[nodiscard]] bool get_usePhysicalLightFalloff() const;
 
   /**
    * @brief BJS is using an harcoded light falloff based on a manually sets up
@@ -405,7 +400,7 @@ protected:
    * @brief In order to support the falloff compatibility with gltf, a special
    * mode has been added to reproduce the gltf light falloff.
    */
-  bool get_useGLTFLightFalloff() const;
+  [[nodiscard]] bool get_useGLTFLightFalloff() const;
 
   /**
    * @brief In order to support the falloff compatibility with gltf, a special
@@ -419,69 +414,69 @@ protected:
    * A car glass is a good exemple of that. When the street lights reflects on
    * it you can not see what is behind.
    */
-  bool get_useRadianceOverAlpha() const;
+  [[nodiscard]] bool get_useRadianceOverAlpha() const;
   void set_useRadianceOverAlpha(bool value);
 
   /**
    * Allows using an object space normal map (instead of tangent space).
    */
-  bool get_useObjectSpaceNormalMap() const;
+  [[nodiscard]] bool get_useObjectSpaceNormalMap() const;
   void set_useObjectSpaceNormalMap(bool value);
 
   /**
    * Allows using the bump map in parallax mode.
    */
-  bool get_useParallax() const;
+  [[nodiscard]] bool get_useParallax() const;
   void set_useParallax(bool value);
 
   /**
    * Allows using the bump map in parallax occlusion mode.
    */
-  bool get_useParallaxOcclusion() const;
+  [[nodiscard]] bool get_useParallaxOcclusion() const;
   void set_useParallaxOcclusion(bool value);
 
   /**
    * Controls the scale bias of the parallax mode.
    */
-  float get_parallaxScaleBias() const;
+  [[nodiscard]] float get_parallaxScaleBias() const;
   void set_parallaxScaleBias(float value);
 
   /**
    * If sets to true, disables all the lights affecting the material.
    */
-  bool get_disableLighting() const;
+  [[nodiscard]] bool get_disableLighting() const;
   void set_disableLighting(bool value);
 
   /**
    * Force the shader to compute irradiance in the fragment shader in order to
    * take bump in account.
    */
-  bool get_forceIrradianceInFragment() const;
+  [[nodiscard]] bool get_forceIrradianceInFragment() const;
   void set_forceIrradianceInFragment(bool value);
 
   /**
    * Number of Simultaneous lights allowed on the material.
    */
-  unsigned int get_maxSimultaneousLights() const;
+  [[nodiscard]] unsigned int get_maxSimultaneousLights() const;
   void set_maxSimultaneousLights(unsigned int value);
 
   /**
    * If sets to true, x component of normal map value will invert (x = 1.0 - x).
    */
-  bool get_invertNormalMapX() const;
+  [[nodiscard]] bool get_invertNormalMapX() const;
   void set_invertNormalMapX(bool value);
 
   /**
    * If sets to true, y component of normal map value will invert (y = 1.0 - y).
    */
-  bool get_invertNormalMapY() const;
+  [[nodiscard]] bool get_invertNormalMapY() const;
   void set_invertNormalMapY(bool value);
 
   /**
    * If sets to true and backfaceCulling is false, normals will be flipped on
    * the backside.
    */
-  bool get_twoSidedLighting() const;
+  [[nodiscard]] bool get_twoSidedLighting() const;
   void set_twoSidedLighting(bool value);
 
   /**
@@ -490,7 +485,7 @@ protected:
    * And/Or occlude the blended part. (alpha is converted to gamma to compute
    * the fresnel)
    */
-  bool get_useAlphaFresnel() const;
+  [[nodiscard]] bool get_useAlphaFresnel() const;
   void set_useAlphaFresnel(bool value);
 
   /**
@@ -499,7 +494,7 @@ protected:
    * And/Or occlude the blended part. (alpha stays linear to compute the
    * fresnel)
    */
-  bool get_useLinearAlphaFresnel() const;
+  [[nodiscard]] bool get_useLinearAlphaFresnel() const;
   void set_useLinearAlphaFresnel(bool value);
 
   /**
@@ -520,7 +515,7 @@ protected:
   /**
    * Force normal to face away from face.
    */
-  bool get_forceNormalForward() const;
+  [[nodiscard]] bool get_forceNormalForward() const;
   void set_forceNormalForward(bool value);
 
   /**
@@ -528,7 +523,7 @@ protected:
    * It will both interacts on the Geometry for analytical and IBL lighting.
    * It also prefilter the roughness map based on the bump values.
    */
-  bool get_enableSpecularAntiAliasing() const;
+  [[nodiscard]] bool get_enableSpecularAntiAliasing() const;
   void set_enableSpecularAntiAliasing(bool value);
 
   /**
@@ -536,7 +531,7 @@ protected:
    * maps to look shiny when the normal
    * makes the reflect vector face the model (under horizon).
    */
-  bool get_useHorizonOcclusion() const;
+  [[nodiscard]] bool get_useHorizonOcclusion() const;
   void set_useHorizonOcclusion(bool value);
 
   /**
@@ -545,13 +540,13 @@ protected:
    * too much the area relying on ambient texture to define their ambient
    * occlusion.
    */
-  bool get_useRadianceOcclusion() const;
+  [[nodiscard]] bool get_useRadianceOcclusion() const;
   void set_useRadianceOcclusion(bool value);
 
   /**
    * If set to true, no lighting calculations will be applied.
    */
-  bool get_unlit() const;
+  [[nodiscard]] bool get_unlit() const;
   void set_unlit(bool value);
 
   /**
@@ -566,13 +561,12 @@ protected:
    *
    * If sets to null, the scene one is in use.
    */
-  void set_imageProcessingConfiguration(
-    const ImageProcessingConfigurationPtr& value);
+  void set_imageProcessingConfiguration(const ImageProcessingConfigurationPtr& value);
 
   /**
    * @brief Gets wether the color curves effect is enabled.
    */
-  bool get_cameraColorCurvesEnabled() const;
+  [[nodiscard]] bool get_cameraColorCurvesEnabled() const;
 
   /**
    * @brief Sets wether the color curves effect is enabled.
@@ -582,7 +576,7 @@ protected:
   /**
    * @brief Gets wether the color grading effect is enabled.
    */
-  bool get_cameraColorGradingEnabled() const;
+  [[nodiscard]] bool get_cameraColorGradingEnabled() const;
 
   /**
    * @brief Gets wether the color grading effect is enabled.
@@ -592,7 +586,7 @@ protected:
   /**
    * @brief Gets wether tonemapping is enabled or not.
    */
-  bool get_cameraToneMappingEnabled() const;
+  [[nodiscard]] bool get_cameraToneMappingEnabled() const;
 
   /**
    * Sets wether tonemapping is enabled or not
@@ -605,7 +599,7 @@ protected:
    * without full screen post process.
    * This corresponds to a photographic exposure.
    */
-  float get_cameraExposure() const;
+  [[nodiscard]] float get_cameraExposure() const;
 
   /**
    * @brief The camera exposure used on this material.
@@ -618,7 +612,7 @@ protected:
   /**
    * @brief Gets The camera contrast used on this material.
    */
-  float get_cameraContrast() const;
+  [[nodiscard]] float get_cameraContrast() const;
 
   /**
    * @brief Sets The camera contrast used on this material.
@@ -1043,8 +1037,7 @@ public:
    * The image processing configuration used either in this
    * material.
    */
-  Property<PBRMaterial, ImageProcessingConfigurationPtr>
-    imageProcessingConfiguration;
+  Property<PBRMaterial, ImageProcessingConfigurationPtr> imageProcessingConfiguration;
 
   /**
    * Wether the color curves effect is enabled.

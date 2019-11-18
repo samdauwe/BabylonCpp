@@ -12,13 +12,13 @@ namespace BABYLON {
 struct BABYLON_SHARED_EXPORT IMaterialSheenDefines : public MaterialDefines {
 
   IMaterialSheenDefines();
-  ~IMaterialSheenDefines(); // = default
+  ~IMaterialSheenDefines() override; // = default
 
   /**
    * @brief Converts the material define values to a string.
    * @returns - String of material define information.
    */
-  virtual std::string toString() const override;
+  [[nodiscard]] std::string toString() const override;
 
 }; // end of struct IMaterialSheenDefines
 

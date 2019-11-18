@@ -36,8 +36,8 @@ EnvironmentTextureInfoPtr EnvironmentTextureTools::GetEnvInfo(const ArrayBuffer&
   const auto& dataView = data;
   size_t pos           = 0;
 
-  for (unsigned int i = 0; i < EnvironmentTextureTools::_MagicBytes.size(); ++i) {
-    if (dataView[pos++] != EnvironmentTextureTools::_MagicBytes[i]) {
+  for (unsigned char magicByte : EnvironmentTextureTools::_MagicBytes) {
+    if (dataView[pos++] != magicByte) {
       BABYLON_LOG_ERROR("EnvironmentTextureTools", "Not a babylon environment map")
       return nullptr;
     }

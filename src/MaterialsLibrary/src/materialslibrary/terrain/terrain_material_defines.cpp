@@ -3,7 +3,7 @@
 namespace BABYLON {
 namespace MaterialsLibrary {
 
-TerrainMaterialDefines::TerrainMaterialDefines() : MaterialDefines{}
+TerrainMaterialDefines::TerrainMaterialDefines()
 {
   boolDef = {
     {"DIFFUSE", false},      //

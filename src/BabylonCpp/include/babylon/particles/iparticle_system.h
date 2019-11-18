@@ -34,22 +34,19 @@ class SphereDirectedParticleEmitter;
 class SphereParticleEmitter;
 class Scene;
 class Texture;
-using AbstractMeshPtr        = std::shared_ptr<AbstractMesh>;
-using AnimationPtr           = std::shared_ptr<Animation>;
-using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
-using BoxParticleEmitterPtr  = std::shared_ptr<BoxParticleEmitter>;
-using ConeParticleEmitterPtr = std::shared_ptr<ConeParticleEmitter>;
-using CylinderDirectedParticleEmitterPtr
-  = std::shared_ptr<CylinderDirectedParticleEmitter>;
-using CylinderParticleEmitterPtr = std::shared_ptr<CylinderParticleEmitter>;
-using HemisphericParticleEmitterPtr
-  = std::shared_ptr<HemisphericParticleEmitter>;
-using PointParticleEmitterPtr = std::shared_ptr<PointParticleEmitter>;
-using ProceduralTexturePtr    = std::shared_ptr<ProceduralTexture>;
-using SphereDirectedParticleEmitterPtr
-  = std::shared_ptr<SphereDirectedParticleEmitter>;
-using SphereParticleEmitterPtr = std::shared_ptr<SphereParticleEmitter>;
-using TexturePtr               = std::shared_ptr<Texture>;
+using AbstractMeshPtr                    = std::shared_ptr<AbstractMesh>;
+using AnimationPtr                       = std::shared_ptr<Animation>;
+using BaseTexturePtr                     = std::shared_ptr<BaseTexture>;
+using BoxParticleEmitterPtr              = std::shared_ptr<BoxParticleEmitter>;
+using ConeParticleEmitterPtr             = std::shared_ptr<ConeParticleEmitter>;
+using CylinderDirectedParticleEmitterPtr = std::shared_ptr<CylinderDirectedParticleEmitter>;
+using CylinderParticleEmitterPtr         = std::shared_ptr<CylinderParticleEmitter>;
+using HemisphericParticleEmitterPtr      = std::shared_ptr<HemisphericParticleEmitter>;
+using PointParticleEmitterPtr            = std::shared_ptr<PointParticleEmitter>;
+using ProceduralTexturePtr               = std::shared_ptr<ProceduralTexture>;
+using SphereDirectedParticleEmitterPtr   = std::shared_ptr<SphereDirectedParticleEmitter>;
+using SphereParticleEmitterPtr           = std::shared_ptr<SphereParticleEmitter>;
+using TexturePtr                         = std::shared_ptr<Texture>;
 
 /**
  * @brief Interface representing a particle system in Babylon.js.
@@ -61,7 +58,7 @@ class BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
 
 public:
   IParticleSystem();
-  virtual ~IParticleSystem(); // = default
+  ~IParticleSystem() override; // = default
 
   /**
    * List of animations used by the particle system.
@@ -355,20 +352,20 @@ public:
    * @brief Returns whether or not the particle system has an emitter.
    * @return Whether or not the particle system has an emitter
    */
-  virtual bool hasEmitter() const = 0;
+  [[nodiscard]] virtual bool hasEmitter() const = 0;
 
   /**
    * @brief Gets the maximum number of particles active at the same time.
    * @returns The max number of active particles.
    */
-  virtual size_t getCapacity() const = 0;
+  [[nodiscard]] virtual size_t getCapacity() const = 0;
 
   /**
    * @brief Gets if the system has been started. (Note: this will still be true
    * after stop is called).
    * @returns True if it has been started, otherwise false.
    */
-  virtual bool isStarted() const = 0;
+  [[nodiscard]] virtual bool isStarted() const = 0;
 
   /**
    * @brief Animates the particle system for this frame.
@@ -390,9 +387,7 @@ public:
    * @param disposeTexture defines if the particule texture must be disposed as
    * well (true by default)
    */
-  virtual void dispose(bool doNotRecurse               = false,
-                       bool disposeMaterialAndTextures = false)
-    = 0;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override = 0;
 
   /**
    * @brief Clones the particle system.
@@ -406,7 +401,7 @@ public:
    * @brief Serializes the particle system to a JSON object.
    * @returns the JSON object
    */
-  virtual json serialize() const = 0;
+  [[nodiscard]] virtual json serialize() const = 0;
 
   /**
    * @brief Rebuild the particle system.
@@ -444,9 +439,8 @@ public:
    * color2]) with main color to pick the final color from
    * @returns the current particle system
    */
-  virtual IParticleSystem&
-  addColorGradient(float gradient, const Color4& color1,
-                   const std::optional<Color4>& color2 = std::nullopt)
+  virtual IParticleSystem& addColorGradient(float gradient, const Color4& color1,
+                                            const std::optional<Color4>& color2 = std::nullopt)
     = 0;
 
   /**
@@ -465,8 +459,7 @@ public:
    * @returns the current particle system
    */
   virtual IParticleSystem& addSizeGradient(float gradient, float factor,
-                                           const std::optional<float>& factor2
-                                           = std::nullopt)
+                                           const std::optional<float>& factor2 = std::nullopt)
     = 0;
 
   /**
@@ -499,9 +492,9 @@ public:
    * ([factor, factor2]) with main value to pick the final value from
    * @returns the current particle system
    */
-  virtual IParticleSystem&
-  addAngularSpeedGradient(float gradient, float factor,
-                          const std::optional<float>& factor2 = std::nullopt)
+  virtual IParticleSystem& addAngularSpeedGradient(float gradient, float factor,
+                                                   const std::optional<float>& factor2
+                                                   = std::nullopt)
     = 0;
 
   /**
@@ -527,9 +520,8 @@ public:
    * ([factor, factor2]) with main value to pick the final value from
    * @returns the current particle system
    */
-  virtual IParticleSystem&
-  addVelocityGradient(float gradient, float factor,
-                      const std::optional<float>& factor2 = std::nullopt)
+  virtual IParticleSystem& addVelocityGradient(float gradient, float factor,
+                                               const std::optional<float>& factor2 = std::nullopt)
     = 0;
 
   /**
@@ -556,9 +548,9 @@ public:
    * ([factor, factor2]) with main value to pick the final value from
    * @returns the current particle system
    */
-  virtual IParticleSystem&
-  addLimitVelocityGradient(float gradient, float factor,
-                           const std::optional<float>& factor2 = std::nullopt)
+  virtual IParticleSystem& addLimitVelocityGradient(float gradient, float factor,
+                                                    const std::optional<float>& factor2
+                                                    = std::nullopt)
     = 0;
 
   /**
@@ -577,8 +569,7 @@ public:
    * @returns the current particle system
    */
   virtual IParticleSystem& addDragGradient(float gradient, float factor,
-                                           const std::optional<float>& factor2
-                                           = std::nullopt)
+                                           const std::optional<float>& factor2 = std::nullopt)
     = 0;
 
   /**
@@ -604,9 +595,8 @@ public:
    * ([factor, factor2]) with main value to pick the final value from
    * @returns the current particle system
    */
-  virtual IParticleSystem&
-  addEmitRateGradient(float gradient, float factor,
-                      const std::optional<float>& factor2 = std::nullopt)
+  virtual IParticleSystem& addEmitRateGradient(float gradient, float factor,
+                                               const std::optional<float>& factor2 = std::nullopt)
     = 0;
 
   /**
@@ -633,9 +623,8 @@ public:
    * ([factor, factor2]) with main value to pick the final value from
    * @returns the current particle system
    */
-  virtual IParticleSystem&
-  addStartSizeGradient(float gradient, float factor,
-                       const std::optional<float>& factor2 = std::nullopt)
+  virtual IParticleSystem& addStartSizeGradient(float gradient, float factor,
+                                                const std::optional<float>& factor2 = std::nullopt)
     = 0;
 
   /**
@@ -662,9 +651,8 @@ public:
    * ([factor, factor2]) with main value to pick the final value from
    * @returns the current particle system
    */
-  virtual IParticleSystem&
-  addLifeTimeGradient(float gradient, float factor,
-                      const std::optional<float>& factor2 = std::nullopt)
+  virtual IParticleSystem& addLifeTimeGradient(float gradient, float factor,
+                                               const std::optional<float>& factor2 = std::nullopt)
     = 0;
 
   /**
@@ -695,8 +683,7 @@ public:
    * @param color defines the color to affect to the specified gradient
    * @returns the current particle system
    */
-  virtual IParticleSystem& addRampGradient(float gradient, const Color3& color)
-    = 0;
+  virtual IParticleSystem& addRampGradient(float gradient, const Color3& color) = 0;
 
   /**
    * @brief Removes a ramp gradient used to remap particle colors.
@@ -725,9 +712,7 @@ public:
    * @param max defines the color remap maximal range
    * @returns the current particle system
    */
-  virtual IParticleSystem& addColorRemapGradient(float gradient, float min,
-                                                 float max)
-    = 0;
+  virtual IParticleSystem& addColorRemapGradient(float gradient, float min, float max) = 0;
 
   /**
    * @brief Removes a color remap gradient.
@@ -751,9 +736,7 @@ public:
    * @param max defines the alpha remap maximal range
    * @returns the current particle system
    */
-  virtual IParticleSystem& addAlphaRemapGradient(float gradient, float min,
-                                                 float max)
-    = 0;
+  virtual IParticleSystem& addAlphaRemapGradient(float gradient, float min, float max) = 0;
 
   /**
    * @brief Removes a alpha remap gradient.
@@ -791,8 +774,8 @@ public:
    * Only, 1 Entire Radius
    * @returns the emitter
    */
-  virtual HemisphericParticleEmitterPtr
-  createHemisphericEmitter(float radius = 1.f, float radiusRange = 1.f)
+  virtual HemisphericParticleEmitterPtr createHemisphericEmitter(float radius      = 1.f,
+                                                                 float radiusRange = 1.f)
     = 0;
 
   /**
@@ -803,8 +786,7 @@ public:
    * Only, 1 Entire Radius
    * @returns the emitter
    */
-  virtual SphereParticleEmitterPtr createSphereEmitter(float radius      = 1.f,
-                                                       float radiusRange = 1.f)
+  virtual SphereParticleEmitterPtr createSphereEmitter(float radius = 1.f, float radiusRange = 1.f)
     = 0;
 
   /**
@@ -817,9 +799,10 @@ public:
    * direction2 from within the sphere
    * @returns the emitter
    */
-  virtual SphereDirectedParticleEmitterPtr createDirectedSphereEmitter(
-    float radius = 1.f, const Vector3& direction1 = Vector3(0.f, 1.f, 0.f),
-    const Vector3& direction2 = Vector3(0.f, 1.f, 0.f))
+  virtual SphereDirectedParticleEmitterPtr
+  createDirectedSphereEmitter(float radius              = 1.f,
+                              const Vector3& direction1 = Vector3(0.f, 1.f, 0.f),
+                              const Vector3& direction2 = Vector3(0.f, 1.f, 0.f))
     = 0;
 
   /**
@@ -833,10 +816,9 @@ public:
    * [0-1]
    * @returns the emitter
    */
-  virtual CylinderParticleEmitterPtr
-  createCylinderEmitter(float radius = 1.f, float height = 1.f,
-                        float radiusRange         = 1.f,
-                        float directionRandomizer = 0.f)
+  virtual CylinderParticleEmitterPtr createCylinderEmitter(float radius = 1.f, float height = 1.f,
+                                                           float radiusRange         = 1.f,
+                                                           float directionRandomizer = 0.f)
     = 0;
 
   /**
@@ -852,10 +834,10 @@ public:
    * direction2 from within the cylinder
    * @returns the emitter
    */
-  virtual CylinderDirectedParticleEmitterPtr createDirectedCylinderEmitter(
-    float radius = 1.f, float height = 1.f, float radiusRange = 1.f,
-    const Vector3& direction1 = Vector3(0.f, 1.f, 0.f),
-    const Vector3& direction2 = Vector3(0.f, 1.f, 0.f))
+  virtual CylinderDirectedParticleEmitterPtr
+  createDirectedCylinderEmitter(float radius = 1.f, float height = 1.f, float radiusRange = 1.f,
+                                const Vector3& direction1 = Vector3(0.f, 1.f, 0.f),
+                                const Vector3& direction2 = Vector3(0.f, 1.f, 0.f))
     = 0;
 
   /**
@@ -865,8 +847,7 @@ public:
    * @param angle The base angle of the cone
    * @returns the emitter
    */
-  virtual ConeParticleEmitterPtr createConeEmitter(float radius = 1.f,
-                                                   float angle  = Math::PI_4)
+  virtual ConeParticleEmitterPtr createConeEmitter(float radius = 1.f, float angle = Math::PI_4)
     = 0;
 
   /**
@@ -884,21 +865,21 @@ public:
    * @returns the emitter
    */
   virtual BoxParticleEmitterPtr
-  createBoxEmitter(const Vector3& direction1, const Vector3& direction2,
-                   const Vector3& minEmitBox, const Vector3& maxEmitBox)
+  createBoxEmitter(const Vector3& direction1, const Vector3& direction2, const Vector3& minEmitBox,
+                   const Vector3& maxEmitBox)
     = 0;
   /**
    * @brief Get hosting scene.
    * @returns the scene
    */
-  virtual Scene* getScene() const = 0;
+  [[nodiscard]] virtual Scene* getScene() const = 0;
 
 protected:
   /**
    * @brief Gets or sets a boolean indicating if the particles must be rendered
    * as billboard or aligned with the direction.
    */
-  virtual bool get_isBillboardBased() const = 0;
+  [[nodiscard]] virtual bool get_isBillboardBased() const = 0;
 
   /**
    * @brief Sets a boolean indicating if the particles must be rendered as
@@ -910,7 +891,7 @@ protected:
    * @brief Gets whether an animation sprite sheet is enabled or not on the
    * particle system.
    */
-  virtual bool get_isAnimationSheetEnabled() const = 0;
+  [[nodiscard]] virtual bool get_isAnimationSheetEnabled() const = 0;
 
   /**
    * @brief Sets whether an animation sprite sheet is enabled or not on the
@@ -933,7 +914,7 @@ protected:
    * Gets a boolean indicating that ramp gradients must be used
    * @see http://doc.babylonjs.com/babylon101/particles#ramp-gradients
    */
-  virtual bool get_useRampGradients() const = 0;
+  [[nodiscard]] virtual bool get_useRampGradients() const = 0;
 
   /**
    * Not supported by GPUParticleSystem

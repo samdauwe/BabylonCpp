@@ -181,12 +181,12 @@ void FollowCameraKeyboardMoveInput::checkInputs()
   }
 }
 
-const std::string FollowCameraKeyboardMoveInput::getClassName() const
+std::string FollowCameraKeyboardMoveInput::getClassName() const
 {
   return "FollowCameraKeyboardMoveInput";
 }
 
-const std::string FollowCameraKeyboardMoveInput::getSimpleName() const
+std::string FollowCameraKeyboardMoveInput::getSimpleName() const
 {
   return "keyboard";
 }

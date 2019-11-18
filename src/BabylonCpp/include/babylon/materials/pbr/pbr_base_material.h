@@ -15,16 +15,13 @@ class PBRClearCoatConfiguration;
 struct PBRMaterialDefines;
 class PBRSheenConfiguration;
 class PBRSubSurfaceConfiguration;
-using IAnimatablePtr = std::shared_ptr<IAnimatable>;
-using ImageProcessingConfigurationPtr
-  = std::shared_ptr<ImageProcessingConfiguration>;
-using PBRAnisotropicConfigurationPtr
-  = std::shared_ptr<PBRAnisotropicConfiguration>;
-using PBRBRDFConfigurationPtr      = std::shared_ptr<PBRBRDFConfiguration>;
-using PBRClearCoatConfigurationPtr = std::shared_ptr<PBRClearCoatConfiguration>;
-using PBRSheenConfigurationPtr     = std::shared_ptr<PBRSheenConfiguration>;
-using PBRSubSurfaceConfigurationPtr
-  = std::shared_ptr<PBRSubSurfaceConfiguration>;
+using IAnimatablePtr                  = std::shared_ptr<IAnimatable>;
+using ImageProcessingConfigurationPtr = std::shared_ptr<ImageProcessingConfiguration>;
+using PBRAnisotropicConfigurationPtr  = std::shared_ptr<PBRAnisotropicConfiguration>;
+using PBRBRDFConfigurationPtr         = std::shared_ptr<PBRBRDFConfiguration>;
+using PBRClearCoatConfigurationPtr    = std::shared_ptr<PBRClearCoatConfiguration>;
+using PBRSheenConfigurationPtr        = std::shared_ptr<PBRSheenConfiguration>;
+using PBRSubSurfaceConfigurationPtr   = std::shared_ptr<PBRSubSurfaceConfiguration>;
 
 /**
  * @brief The Physically based material base class of BJS.
@@ -95,35 +92,35 @@ public:
    * @param scene The scene the material will be use in.
    */
   PBRBaseMaterial(const std::string& name, Scene* scene);
-  ~PBRBaseMaterial(); // = default
+  ~PBRBaseMaterial() override; // = default
 
   /**
    * @brief Gets the name of the material class.
    */
-  const std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
   /**
    * @brief Returns true if alpha blending should be disabled.
    */
-  bool _disableAlphaBlending() const;
+  [[nodiscard]] bool _disableAlphaBlending() const;
 
   /**
    * @brief Specifies whether or not this material should be rendered in alpha
    * blend mode.
    */
-  bool needAlphaBlending() const override;
+  [[nodiscard]] bool needAlphaBlending() const override;
 
   /**
    * @brief Specifies if the mesh will require alpha blending.
    * @param mesh - BJS mesh.
    */
-  bool needAlphaBlendingForMesh(const AbstractMesh& mesh) const override;
+  [[nodiscard]] bool needAlphaBlendingForMesh(const AbstractMesh& mesh) const override;
 
   /**
    * @brief Specifies whether or not this material should be rendered in alpha
    * test mode.
    */
-  bool needAlphaTesting() const override;
+  [[nodiscard]] bool needAlphaTesting() const override;
 
   /**
    * @brief Gets the texture used for the alpha test.
@@ -145,13 +142,12 @@ public:
    * @returns boolean specifiying if the material uses metallic roughness
    * workflow.
    */
-  bool isMetallicWorkflow() const;
+  [[nodiscard]] bool isMetallicWorkflow() const;
 
   /**
    * @brief Force shader compilation
    */
-  void forceCompilation(AbstractMesh* mesh,
-                        std::function<void(Material* material)>& onCompiled,
+  void forceCompilation(AbstractMesh* mesh, std::function<void(Material* material)>& onCompiled,
                         bool clipPlane = false);
 
   /**
@@ -182,45 +178,43 @@ public:
    * @brief Returns an array of the actively used textures.
    * @returns - Array of BaseTextures
    */
-  std::vector<BaseTexturePtr> getActiveTextures() const override;
+  [[nodiscard]] std::vector<BaseTexturePtr> getActiveTextures() const override;
 
   /**
    * @brief Checks to see if a texture is used in the material.
    * @param texture - Base texture to use.
    * @returns - Boolean specifying if a texture is used in the material.
    */
-  bool hasTexture(const BaseTexturePtr& texture) const override;
+  [[nodiscard]] bool hasTexture(const BaseTexturePtr& texture) const override;
 
   /**
    * @brief Disposes the resources of the material.
    * @param forceDisposeEffect - Forces the disposal of effects.
    * @param forceDisposeTextures - Forces the disposal of all textures.
    */
-  void dispose(bool forceDisposeEffect   = false,
-               bool forceDisposeTextures = false,
-               bool notBoundToMesh       = false) override;
+  void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
+               bool notBoundToMesh = false) override;
 
 protected:
   /**
    * @brief Attaches a new image processing configuration to the PBR Material.
    * @param configuration
    */
-  void _attachImageProcessingConfiguration(
-    const ImageProcessingConfigurationPtr& configuration);
+  void _attachImageProcessingConfiguration(const ImageProcessingConfigurationPtr& configuration);
 
-  bool _shouldUseAlphaFromAlbedoTexture() const;
+  [[nodiscard]] bool _shouldUseAlphaFromAlbedoTexture() const;
 
   /**
    * @brief Gets a boolean indicating that current material needs to register
    * RTT.
    */
-  bool get_hasRenderTargetTextures() const override;
+  [[nodiscard]] bool get_hasRenderTargetTextures() const override;
 
   /**
    * @brief Enabled the use of logarithmic depth buffers, which is good for wide
    * depth buffers.
    */
-  bool get_useLogarithmicDepth() const override;
+  [[nodiscard]] bool get_useLogarithmicDepth() const override;
 
   /**
    * @brief Enabled the use of logarithmic depth buffers, which is good for wide
@@ -252,17 +246,16 @@ protected:
    * Defines the material debug mode.
    * It helps seeing only some components of the material while troubleshooting.
    */
-  unsigned int get_debugMode() const;
+  [[nodiscard]] unsigned int get_debugMode() const;
   void set_debugMode(unsigned int value);
 
 private:
-  EffectPtr _prepareEffect(
-    AbstractMesh* mesh, PBRMaterialDefines& defines,
-    const std::function<void(Effect* effect)>& onCompiled = nullptr,
-    std::function<void(Effect* effect, const std::string& errors)> onError
-    = nullptr,
-    const std::optional<bool>& useInstances = std::nullopt,
-    const std::optional<bool>& useClipPlane = std::nullopt);
+  EffectPtr _prepareEffect(AbstractMesh* mesh, PBRMaterialDefines& defines,
+                           const std::function<void(Effect* effect)>& onCompiled = nullptr,
+                           std::function<void(Effect* effect, const std::string& errors)> onError
+                           = nullptr,
+                           const std::optional<bool>& useInstances = std::nullopt,
+                           const std::optional<bool>& useClipPlane = std::nullopt);
   void _prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& defines,
                        const std::optional<bool>& useInstances = std::nullopt,
                        const std::optional<bool>& useClipPlane = std::nullopt);
@@ -272,7 +265,7 @@ private:
    * @returns - Reflection texture if present.  Otherwise, returns the
    * environment texture.
    */
-  BaseTexturePtr _getReflectionTexture() const;
+  [[nodiscard]] BaseTexturePtr _getReflectionTexture() const;
 
 public:
   /**
@@ -317,8 +310,7 @@ public:
    * Custom callback helping to override the default shader used in the
    * material.
    */
-  std::function<std::string(const std::string& shaderName,
-                            const std::vector<std::string>& uniforms,
+  std::function<std::string(const std::string& shaderName, const std::vector<std::string>& uniforms,
                             const std::vector<std::string>& uniformBuffers,
                             const std::vector<std::string>& samplers,
                             const PBRMaterialDefines& defines)>

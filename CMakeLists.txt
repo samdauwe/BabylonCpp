@@ -19,6 +19,7 @@ option(BABYLON_USE_CLANG_TIDY "Use clang-tidy static analysis" OFF)
 if (BABYLON_USE_CLANG_TIDY)
   find_program(
     CLANG_TIDY_EXE
+    HINTS ~/bin/clang/bin/
     NAMES "clang-tidy"
     DOC "Path to clang-tidy executable"
     )

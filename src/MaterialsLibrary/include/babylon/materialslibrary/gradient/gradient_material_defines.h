@@ -10,7 +10,7 @@ namespace MaterialsLibrary {
 struct BABYLON_SHARED_EXPORT GradientMaterialDefines : public MaterialDefines {
 
   GradientMaterialDefines();
-  ~GradientMaterialDefines(); // = default
+  ~GradientMaterialDefines() override; // = default
 
 }; // end of struct GradientMaterialDefines
 

@@ -11,24 +11,21 @@ namespace BABYLON {
 
 class DepthRendererSceneComponent;
 class RenderTargetTexture;
-using DepthRendererSceneComponentPtr
-  = std::shared_ptr<DepthRendererSceneComponent>;
-using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+using DepthRendererSceneComponentPtr = std::shared_ptr<DepthRendererSceneComponent>;
+using RenderTargetTexturePtr         = std::shared_ptr<RenderTargetTexture>;
 
 /**
  * @brief Defines the Depth Renderer scene component responsible to manage a
  * depth buffer useful in several rendering techniques.
  */
-class BABYLON_SHARED_EXPORT DepthRendererSceneComponent
-    : public ISceneComponent {
+class BABYLON_SHARED_EXPORT DepthRendererSceneComponent : public ISceneComponent {
 
 public:
   /**
    * The component name helpfull to identify the component in the list of scene
    * components.
    */
-  static constexpr const char* name
-    = SceneComponentConstants::NAME_DEPTHRENDERER;
+  static constexpr const char* name = SceneComponentConstants::NAME_DEPTHRENDERER;
 
 public:
   template <typename... Ts>
@@ -37,7 +34,7 @@ public:
     return std::shared_ptr<DepthRendererSceneComponent>(
       new DepthRendererSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~DepthRendererSceneComponent(); // = default
+  ~DepthRendererSceneComponent() override; // = default
 
   /**
    * @brief Registers the component in a given scene.
@@ -64,8 +61,7 @@ protected:
 
 private:
   void _gatherRenderTargets(std::vector<RenderTargetTexturePtr>& renderTargets);
-  void _gatherActiveCameraRenderTargets(
-    std::vector<RenderTargetTexturePtr>& renderTargets);
+  void _gatherActiveCameraRenderTargets(std::vector<RenderTargetTexturePtr>& renderTargets);
 
 }; // end of class DepthRendererSceneComponent
 

@@ -30,14 +30,12 @@ public:
    * @param onInterpolationDone defines a callback raised once the interpolation
    * animation has been done
    */
-  InterpolateValueAction(unsigned int triggerOptions,
-                         const IAnimatablePtr& target,
+  InterpolateValueAction(unsigned int triggerOptions, const IAnimatablePtr& target,
                          const std::string& propertyPath, AnimationValue* value,
                          int duration = 1000, Condition* condition = nullptr,
-                         bool stopOtherAnimations = false,
-                         const std::function<void()>& onInterpolationDone
-                         = nullptr);
-  ~InterpolateValueAction(); // = default
+                         bool stopOtherAnimations                         = false,
+                         const std::function<void()>& onInterpolationDone = nullptr);
+  ~InterpolateValueAction() override; // = default
 
   /**
    * @brief Hidden

@@ -34,9 +34,8 @@ public:
    * @param creationFunc defines a callback to call when an element is added to
    * the block
    */
-  OctreeBlock(const Vector3& minPoint, const Vector3& maxPoint, size_t capacity,
-              size_t depth, size_t maxDepth,
-              const std::function<void(T&, OctreeBlock<T>&)>& creationFunc);
+  OctreeBlock(const Vector3& minPoint, const Vector3& maxPoint, size_t capacity, size_t depth,
+              size_t maxDepth, const std::function<void(T&, OctreeBlock<T>&)>& creationFunc);
   ~OctreeBlock(); // = default
 
   /** Properties **/
@@ -44,7 +43,7 @@ public:
    * @brief Gets the maximum capacity of this block (if capacity is reached the
    * block will be split into sub blocks).
    */
-  size_t capacity() const;
+  [[nodiscard]] size_t capacity() const;
 
   /**
    * @brief Gets the minimum vector (in world space) of the block's bounding
@@ -87,8 +86,8 @@ public:
    * @param allowDuplicate defines if the selection array can contains
    * duplicated entries
    */
-  void select(const std::array<Plane, 6>& frustumPlanes,
-              std::vector<T>& selection, bool allowDuplicate = true);
+  void select(const std::array<Plane, 6>& frustumPlanes, std::vector<T>& selection,
+              bool allowDuplicate = true);
 
   /**
    * @brief Test if the current block intersect with the given bounding sphere
@@ -100,8 +99,8 @@ public:
    * @param allowDuplicate defines if the selection array can contains
    * duplicated entries
    */
-  void intersects(const Vector3& sphereCenter, float sphereRadius,
-                  std::vector<T>& selection, bool allowDuplicate = true);
+  void intersects(const Vector3& sphereCenter, float sphereRadius, std::vector<T>& selection,
+                  bool allowDuplicate = true);
 
   /**
    * @brief Test if the current block intersect with the given ray and if yes,
@@ -121,12 +120,10 @@ public:
   /**
    * @brief Hidden
    */
-  static void
-  _CreateBlocks(const Vector3& worldMin, const Vector3& worldMax,
-                std::vector<T>& entries, size_t maxBlockCapacity,
-                size_t currentDepth, size_t maxDepth,
-                IOctreeContainer<T>& target,
-                const std::function<void(T&, OctreeBlock<T>&)>& creationFunc);
+  static void _CreateBlocks(const Vector3& worldMin, const Vector3& worldMax,
+                            std::vector<T>& entries, size_t maxBlockCapacity, size_t currentDepth,
+                            size_t maxDepth, IOctreeContainer<T>& target,
+                            const std::function<void(T&, OctreeBlock<T>&)>& creationFunc);
 
 public:
   /**

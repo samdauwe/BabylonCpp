@@ -38,13 +38,13 @@ public:
   template <typename... Ts>
   static SpriteManagerPtr New(Ts&&... args)
   {
-    auto spriteManager = std::shared_ptr<SpriteManager>(
-      new SpriteManager(std::forward<Ts>(args)...));
+    auto spriteManager
+      = std::shared_ptr<SpriteManager>(new SpriteManager(std::forward<Ts>(args)...));
     spriteManager->addToScene(spriteManager);
 
     return spriteManager;
   }
-  virtual ~SpriteManager(); // = default
+  ~SpriteManager() override; // = default
 
   void addToScene(const SpriteManagerPtr& newSpriteManager);
 
@@ -57,10 +57,9 @@ public:
    * potential sprite is will be used and not the closer)
    * @returns null if no hit or a PickingInfo
    */
-  std::optional<PickingInfo>
-  intersects(const Ray ray, const CameraPtr& camera,
-             std::function<bool(Sprite* sprite)> predicate,
-             bool fastCheck) override;
+  std::optional<PickingInfo> intersects(const Ray ray, const CameraPtr& camera,
+                                        std::function<bool(Sprite* sprite)> predicate,
+                                        bool fastCheck) override;
 
   /**
    * @brief Render all child sprites.
@@ -70,8 +69,7 @@ public:
   /**
    * @brief Release associated resources.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
 protected:
   /**
@@ -84,18 +82,15 @@ protected:
    * @param epsilon defines the epsilon value to align texture (0.01 by default)
    * @param samplingMode defines the smapling mode to use with spritesheet
    */
-  SpriteManager(const std::string& name, const std::string& imgUrl,
-                unsigned int capacity, const ISize& cellSize, Scene* scene,
-                float epsilon = 0.01f,
-                unsigned int samplingMode
-                = TextureConstants::TRILINEAR_SAMPLINGMODE,
+  SpriteManager(const std::string& name, const std::string& imgUrl, unsigned int capacity,
+                const ISize& cellSize, Scene* scene, float epsilon = 0.01f,
+                unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
                 bool fromPacked = false, const std::string& spriteJSON = "");
 
   /**
    * @brief Sets the callback called when the manager is disposed.
    */
-  void set_onDispose(
-    const std::function<void(SpriteManager*, EventState&)>& callback);
+  void set_onDispose(const std::function<void(SpriteManager*, EventState&)>& callback);
 
   /**
    * @brief Gets the spritesheet texture.
@@ -108,8 +103,8 @@ protected:
   void set_texture(const TexturePtr& value);
 
 private:
-  void _appendSpriteVertex(size_t index, const Sprite& sprite, int offsetX,
-                           int offsetY, int rowSize);
+  void _appendSpriteVertex(size_t index, const Sprite& sprite, int offsetX, int offsetY,
+                           int rowSize);
 
 public:
   /**
@@ -141,9 +136,7 @@ public:
   /**
    * Callback called when the manager is disposed
    */
-  WriteOnlyProperty<SpriteManager,
-                    std::function<void(SpriteManager*, EventState&)>>
-    onDispose;
+  WriteOnlyProperty<SpriteManager, std::function<void(SpriteManager*, EventState&)>> onDispose;
 
   /**
    * Gets or sets the spritesheet texture

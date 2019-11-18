@@ -20,9 +20,8 @@ public:
    * @param predicate defines the predicate function used to validate the
    * condition
    */
-  PredicateCondition(ActionManager* actionManager,
-                     const std::function<bool()>& predicate);
-  ~PredicateCondition(); // = default
+  PredicateCondition(ActionManager* actionManager, const std::function<bool()>& predicate);
+  ~PredicateCondition() override; // = default
 
   /** Methods **/
 

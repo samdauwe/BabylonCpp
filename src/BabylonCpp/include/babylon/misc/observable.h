@@ -25,9 +25,8 @@ template <class T>
 class Observable {
 
 public:
-  using CallbackFunc
-    = std::function<void(T* eventData, EventState& eventState)>;
-  using SPtr = std::shared_ptr<Observable<T>>;
+  using CallbackFunc = std::function<void(T* eventData, EventState& eventState)>;
+  using SPtr         = std::shared_ptr<Observable<T>>;
 
 public:
   /**
@@ -42,8 +41,7 @@ public:
    * @param onObserverAdded defines a callback to call when a new observer is
    * added
    */
-  Observable(const std::function<void(typename Observer<T>::Ptr& observer)>&
-               onObserverAdded)
+  Observable(const std::function<void(typename Observer<T>::Ptr& observer)>& onObserverAdded)
       : _eventState{0}, _onObserverAdded{onObserverAdded}
   {
   }
@@ -81,7 +79,7 @@ public:
       return nullptr;
     }
 
-    auto observer = std::make_shared<Observer<T>>(callback, mask, scope);
+    auto observer                  = std::make_shared<Observer<T>>(callback, mask, scope);
     observer->unregisterOnNextCall = unregisterOnFirstCall;
 
     if (insertFirst) {
@@ -111,16 +109,14 @@ public:
    * after the next notification
    * @returns the new observer created for the callback
    */
-  typename Observer<T>::Ptr add(CallbackFunc&& callback, int mask = -1,
-                                bool insertFirst = false, any* scope = nullptr,
-                                bool unregisterOnFirstCall = false)
+  typename Observer<T>::Ptr add(CallbackFunc&& callback, int mask = -1, bool insertFirst = false,
+                                any* scope = nullptr, bool unregisterOnFirstCall = false)
   {
     if (!callback) {
       return nullptr;
     }
 
-    auto observer
-      = std::make_shared<Observer<T>>(std::move(callback), mask, scope);
+    auto observer = std::make_shared<Observer<T>>(std::move(callback), mask, scope);
     observer->unregisterOnNextCall = unregisterOnFirstCall;
 
     if (insertFirst) {
@@ -159,10 +155,9 @@ public:
       return false;
     }
 
-    auto it = std::find_if(_observers.begin(), _observers.end(),
-                           [observer](const typename Observer<T>::Ptr& obs) {
-                             return obs == observer;
-                           });
+    auto it
+      = std::find_if(_observers.begin(), _observers.end(),
+                     [observer](const typename Observer<T>::Ptr& obs) { return obs == observer; });
 
     if (it != _observers.end()) {
       _deferUnregister(*it);
@@ -182,10 +177,8 @@ public:
   {
     auto it = std::find_if(_observers.begin(), _observers.end(),
                            [callback](const typename Observer<T>::Ptr& obs) {
-                             auto ptr1
-                               = obs->callback.template target<CallbackFunc>();
-                             auto ptr2
-                               = callback.template target<CallbackFunc>();
+                             auto ptr1 = obs->callback.template target<CallbackFunc>();
+                             auto ptr2 = callback.template target<CallbackFunc>();
                              return ptr1 < ptr2;
                            });
 
@@ -258,8 +251,8 @@ public:
    * @returns false if the complete observer chain was not processed (because
    * one observer set the skipNextObservers to true)
    */
-  bool notifyObservers(T* eventData = nullptr, int mask = -1,
-                       any* target = nullptr, any* currentTarget = nullptr)
+  bool notifyObservers(T* eventData = nullptr, int mask = -1, any* target = nullptr,
+                       any* currentTarget = nullptr)
   {
     if (_observers.empty()) {
       return true;
@@ -297,8 +290,7 @@ public:
    * @param eventData defines the data to be sent to each callback
    * @param mask is used to filter observers defaults to -1
    */
-  void notifyObserver(typename Observer<T>::Ptr& observer,
-                      T* eventData = nullptr, int mask = -1)
+  void notifyObserver(typename Observer<T>::Ptr& observer, T* eventData = nullptr, int mask = -1)
   {
     auto& state             = _eventState;
     state.mask              = mask;
@@ -312,7 +304,7 @@ public:
    * observer.
    * @returns true is the Observable has at least one Observer registered
    */
-  bool hasObservers() const
+  [[nodiscard]] bool hasObservers() const
   {
     return !_observers.empty();
   }
@@ -330,7 +322,7 @@ public:
    * @brief Clone the current observable.
    * @returns a new observable
    */
-  std::shared_ptr<Observable<T>> clone() const
+  [[nodiscard]] std::shared_ptr<Observable<T>> clone() const
   {
     Observable<T>::SPtr result = std::make_shared<Observable<T>>();
 

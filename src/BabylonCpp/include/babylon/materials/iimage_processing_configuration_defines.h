@@ -28,15 +28,15 @@ struct BABYLON_SHARED_EXPORT IImageProcessingConfigurationDefines {
   bool SAMPLER3DBGRMAP            = false;
   bool IMAGEPROCESSINGPOSTPROCESS = false;
 
-  friend std::ostream& operator<<(std::ostream& os,
-                                  const IImageProcessingConfigurationDefines&
-                                    imageProcessingConfigurationDefines);
+  friend std::ostream&
+  operator<<(std::ostream& os,
+             const IImageProcessingConfigurationDefines& imageProcessingConfigurationDefines);
 
   /**
    * @brief Converts the material define values to a string.
    * @returns String of material define information.
    */
-  std::string convertToString() const;
+  [[nodiscard]] std::string convertToString() const;
 
 }; // end of struct IImageProcessingConfigurationDefines
 

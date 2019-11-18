@@ -21,7 +21,7 @@ public:
    */
   LineEdgesRenderer(const AbstractMeshPtr& source, float epsilon = 0.95f,
                     bool checkVerticesInsteadOfIndices = false);
-  ~LineEdgesRenderer(); // = default
+  ~LineEdgesRenderer() override; // = default
 
 private:
   /**

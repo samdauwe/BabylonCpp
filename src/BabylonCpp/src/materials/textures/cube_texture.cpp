@@ -18,7 +18,7 @@ CubeTexturePtr
 CubeTexture::CreateFromImages(const std::vector<std::string>& iFiles,
                               Scene* scene, bool iNoMipmap)
 {
-  std::string rootUrlKey = "";
+  std::string rootUrlKey;
 
   for (const auto& url : iFiles) {
     rootUrlKey += url;
@@ -190,7 +190,7 @@ bool CubeTexture::get_isPrefiltered() const
   return _prefiltered;
 }
 
-const std::string CubeTexture::getClassName() const
+std::string CubeTexture::getClassName() const
 {
   return "CubeTexture";
 }

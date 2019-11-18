@@ -21,10 +21,7 @@ bool _KTXTextureLoader::canLoad(const std::string& /*extension*/,
                                 const InternalTexturePtr& fallback,
                                 bool isBase64, bool isBuffer)
 {
-  if (!textureFormatInUse.empty() && !isBase64 && !fallback && !isBuffer) {
-    return true;
-  }
-  return false;
+  return !textureFormatInUse.empty() && !isBase64 && !fallback && !isBuffer;
 }
 
 std::string

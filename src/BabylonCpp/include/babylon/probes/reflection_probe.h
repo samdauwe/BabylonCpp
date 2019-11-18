@@ -31,8 +31,8 @@ public:
   template <typename... Ts>
   static ReflectionProbePtr New(Ts&&... args)
   {
-    auto reflectionProbe = std::shared_ptr<ReflectionProbe>(
-      new ReflectionProbe(std::forward<Ts>(args)...));
+    auto reflectionProbe
+      = std::shared_ptr<ReflectionProbe>(new ReflectionProbe(std::forward<Ts>(args)...));
     reflectionProbe->addToScene(reflectionProbe);
 
     return reflectionProbe;
@@ -45,7 +45,7 @@ public:
    * @brief Gets the hosting scene.
    * @returns a Scene
    */
-  Scene* getScene() const;
+  [[nodiscard]] Scene* getScene() const;
 
   /**
    * @brief Gets the internal CubeTexture used to render to.
@@ -66,8 +66,7 @@ public:
    * @param autoClearDepthStencil Automatically clears depth and stencil between
    * groups if true.
    */
-  void setRenderingAutoClearDepthStencil(unsigned int renderingGroupId,
-                                         bool autoClearDepthStencil);
+  void setRenderingAutoClearDepthStencil(unsigned int renderingGroupId, bool autoClearDepthStencil);
 
   /**
    * @brief Clean all associated resources
@@ -87,7 +86,7 @@ public:
    * @brief Get the class name of the relfection probe.
    * @returns "ReflectionProbe"
    */
-  std::string getClassName() const;
+  [[nodiscard]] std::string getClassName() const;
 
   /**
    * @brief Serialize the reflection probe to a JSON representation we can
@@ -107,8 +106,8 @@ public:
    * relative dependencies
    * @returns The parsed reflection probe if successful
    */
-  static ReflectionProbePtr Parse(const json& parsedReflectionProbe,
-                                  Scene* scene, const std::string& rootUrl);
+  static ReflectionProbePtr Parse(const json& parsedReflectionProbe, Scene* scene,
+                                  const std::string& rootUrl);
 
 protected:
   /**
@@ -125,9 +124,9 @@ protected:
                   bool generateMipMaps = true, bool useFloat = false);
 
 private:
-  unsigned int get_samples() const;
+  [[nodiscard]] unsigned int get_samples() const;
   void set_samples(unsigned int value);
-  int get_refreshRate() const;
+  [[nodiscard]] int get_refreshRate() const;
   void set_refreshRate(int value);
   std::vector<AbstractMesh*>& get_renderList();
 

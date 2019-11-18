@@ -89,12 +89,12 @@ void FollowCameraMouseWheelInput::checkInputs()
 {
 }
 
-const std::string FollowCameraMouseWheelInput::getClassName() const
+std::string FollowCameraMouseWheelInput::getClassName() const
 {
   return "ArcRotateCameraMouseWheelInput";
 }
 
-const std::string FollowCameraMouseWheelInput::getSimpleName() const
+std::string FollowCameraMouseWheelInput::getSimpleName() const
 {
   return "mousewheel";
 }

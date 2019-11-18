@@ -17,7 +17,7 @@ struct BABYLON_SHARED_EXPORT ShaderCodeTestNode : public ShaderCodeNode {
 
   ShaderDefineExpression testExpression;
 
-  virtual bool
+  [[nodiscard]] bool
   isValid(const std::unordered_map<std::string, std::string>& preprocessors) const override;
 
 }; // end of struct ShaderCodeTestNode

@@ -60,9 +60,8 @@ struct HeightMapOptions {
   float offsetZ = 0.f;
   // An optional callback function, called once the map is computed. It's passed
   // the computed map.
-  std::function<void(const Float32Array& map, unsigned int subX,
-                     unsigned int subZ)>
-    onReady = nullptr;
+  std::function<void(const Float32Array& map, unsigned int subX, unsigned int subZ)> onReady
+    = nullptr;
 }; // end of struct HeightMapOptions
 
 /**
@@ -85,8 +84,7 @@ public:
    * @param options
    * @param scene
    */
-  DynamicTerrain(const std::string& name, DynamicTerrainOptions& options,
-                 Scene* scene);
+  DynamicTerrain(const std::string& name, DynamicTerrainOptions& options, Scene* scene);
   virtual ~DynamicTerrain(); // = default
 
   /**
@@ -113,7 +111,7 @@ public:
    * "normal" is updated with the normal vector value at the coordinates (x, z).
    * @returns The altitude (float) at the coordinates (x, z) of the passed map.
    */
-  float getHeightFromMap(float x, float z, const Vector3& normal) const;
+  [[nodiscard]] float getHeightFromMap(float x, float z, const Vector3& normal) const;
 
   /**
    * @brief Returns the altitude (float) at the coordinates (x, z) of the passed
@@ -127,9 +125,8 @@ public:
    * "normal" is updated with the normal vector value at the coordinates (x, z).
    * @returns The altitude (float) at the coordinates (x, z) of the passed map.
    */
-  static float GetHeightFromMap(float x, float z, const Float32Array& mapData,
-                                unsigned int mapSubX, unsigned int mapSubZ,
-                                const Vector3& normal = Vector3::Zero());
+  static float GetHeightFromMap(float x, float z, const Float32Array& mapData, unsigned int mapSubX,
+                                unsigned int mapSubZ, const Vector3& normal = Vector3::Zero());
 
   /**
    * @brief Computes the height and optionnally the normal at the coordinates
@@ -137,19 +134,16 @@ public:
    * @returns The altitude at the coordinates (x, z) of the map.
    */
   static float _GetHeightFromMap(float x, float z, const Float32Array& mapData,
-                                 unsigned int mapSubX, unsigned int mapSubZ,
-                                 float mapSizeX, float mapSizeZ,
-                                 const Vector3& normal = Vector3::Zero());
+                                 unsigned int mapSubX, unsigned int mapSubZ, float mapSizeX,
+                                 float mapSizeZ, const Vector3& normal = Vector3::Zero());
 
   /**
    * @brief Computes all the normals from the terrain data map  and stores them
    * in the passed Float32Array reference.
    * This passed array must have the same size than the mapData array.
    */
-  static void ComputeNormalsFromMapToRef(const Float32Array& mapData,
-                                         unsigned int mapSubX,
-                                         unsigned int mapSubZ,
-                                         Float32Array& normals);
+  static void ComputeNormalsFromMapToRef(const Float32Array& mapData, unsigned int mapSubX,
+                                         unsigned int mapSubZ, Float32Array& normals);
 
   /**
    * @brief Computes all the map normals from the current terrain data map and
@@ -185,8 +179,7 @@ public:
    * image.
    */
   static Float32Array CreateMapFromHeightMap(const std::string& heightmapURL,
-                                             const HeightMapOptions& options,
-                                             Scene* scene);
+                                             const HeightMapOptions& options, Scene* scene);
 
   /**
    * @brief Updates the passed array or Float32Array with a data map computed
@@ -208,8 +201,8 @@ public:
    * image.
    */
   static void CreateMapFromHeightMapToRef(const std::string& heightmapURL,
-                                          const HeightMapOptions& options,
-                                          Float32Array& data, Scene* scene);
+                                          const HeightMapOptions& options, Float32Array& data,
+                                          Scene* scene);
 
   /**
    * @brief Updates the passed arrays with UVs values to fit the whole map
@@ -237,7 +230,7 @@ public:
   /**
    * If the terrain must be recomputed every frame.
    */
-  bool refreshEveryFrame() const;
+  [[nodiscard]] bool refreshEveryFrame() const;
   void setRefreshEveryFrame(bool val);
 
   /**
@@ -256,7 +249,7 @@ public:
    * updated.
    * Integer greater or equal to 1.
    */
-  unsigned int subToleranceX() const;
+  [[nodiscard]] unsigned int subToleranceX() const;
   void setSubToleranceX(unsigned int val);
 
   /**
@@ -264,14 +257,14 @@ public:
    * updated.
    * Integer greater or equal to 1. Default 1.
    */
-  unsigned int subToleranceZ() const;
+  [[nodiscard]] unsigned int subToleranceZ() const;
   void setSubToleranceZ(unsigned int val);
 
   /**
    * Initial LOD factor value.
    * Integer greater or equal to 1. Default 1.
    */
-  unsigned int initialLOD() const;
+  [[nodiscard]] unsigned int initialLOD() const;
   void setInitialLOD(unsigned int val);
 
   /**
@@ -280,45 +273,45 @@ public:
    * cameraLODCorrection.
    * Integer greater or equal to 1. Default 1.
    */
-  unsigned int LODValue() const;
+  [[nodiscard]] unsigned int LODValue() const;
 
   /**
    * Camera LOD correction : the factor to add to the initial LOD according to
    * the camera position, movement, etc.
    * Positive integer (default 0)
    */
-  unsigned int cameraLODCorrection() const;
+  [[nodiscard]] unsigned int cameraLODCorrection() const;
   void setCameraLODCorrection(unsigned int val);
 
   /**
    * Average map and terrain subdivision size on X axis.
    * Returns a float.
    */
-  float averageSubSizeX() const;
+  [[nodiscard]] float averageSubSizeX() const;
 
   /**
    * Average map and terrain subdivision size on Z axis.
    * Returns a float.
    */
-  float averageSubSizeZ() const;
+  [[nodiscard]] float averageSubSizeZ() const;
 
   /**
    * Current terrain size on the X axis.
    * Returns a float.
    */
-  float terrainSizeX() const;
+  [[nodiscard]] float terrainSizeX() const;
 
   /**
    * Current terrain half size on the X axis.
    * Returns a float.
    */
-  float terrainHalfSizeX() const;
+  [[nodiscard]] float terrainHalfSizeX() const;
 
   /**
    * Current terrain size on the Z axis.
    * Returns a float.
    */
-  float terrainSizeZ() const;
+  [[nodiscard]] float terrainSizeZ() const;
 
   /**
    * Current terrain half size on the Z axis.
@@ -330,20 +323,20 @@ public:
    * Current position of terrain center in its local space.
    * Returns a Vector3.
    */
-  const Vector3& centerLocal() const;
+  [[nodiscard]] const Vector3& centerLocal() const;
 
   /**
    * Current position of terrain center in the World space.
    * Returns a Vector3.
    */
-  const Vector3& centerWorld() const;
+  [[nodiscard]] const Vector3& centerWorld() const;
 
   /**
    * The array of the limit values to change the LOD factor.
    * Returns an array of integers or an empty array.
    * This array is always sorted in the descending order once set.
    */
-  const Uint32Array& LODLimits() const;
+  [[nodiscard]] const Uint32Array& LODLimits() const;
   void LODLimits(Uint32Array ar);
 
   /**
@@ -352,21 +345,21 @@ public:
    * This property can be set only if a mapData array was passed at construction
    * time.
    */
-  const Float32Array& mapData() const;
+  [[nodiscard]] const Float32Array& mapData() const;
   void setMapData(const Float32Array& val);
 
   /**
    * The number of points on the map width.
    * Positive Integer.
    */
-  unsigned int mapSubX() const;
+  [[nodiscard]] unsigned int mapSubX() const;
   void setMapSubX(unsigned int val);
 
   /**
    * The number of points on the map height .
    * Positive Integer.
    */
-  unsigned int mapSubZ() const;
+  [[nodiscard]] unsigned int mapSubZ() const;
   void setMapSubZ(unsigned int val);
 
   /**
@@ -375,7 +368,7 @@ public:
    * This property can be set only if a mapColors array was passed at
    * construction time.
    */
-  const Float32Array& mapColors() const;
+  [[nodiscard]] const Float32Array& mapColors() const;
   void setMapColors(const Float32Array& val);
 
   /**
@@ -384,7 +377,7 @@ public:
    * This property can be set only if a mapUVs array was passed at construction
    * time.
    */
-  const Float32Array& mapUVs() const;
+  [[nodiscard]] const Float32Array& mapUVs() const;
   void setMapUVs(const Float32Array& val);
 
   /**
@@ -392,7 +385,7 @@ public:
    * A flat array of successive floats as normal vector coordinates (x, y, z) on
    * each map point.
    */
-  const Float32Array& mapNormals() const;
+  [[nodiscard]] const Float32Array& mapNormals() const;
   void setMapNormals(const Float32Array& val);
 
   /**
@@ -400,7 +393,7 @@ public:
    * false).
    * By default, all the map normals are pre-computed on terrain creation.
    */
-  bool computeNormals() const;
+  [[nodiscard]] bool computeNormals() const;
   void setComputeNormals(bool val);
 
   /**
@@ -408,13 +401,13 @@ public:
    * update ?
    * Default false.
    */
-  bool useCustomVertexFunction() const;
+  [[nodiscard]] bool useCustomVertexFunction() const;
   void useCustomVertexFunction(bool val);
 
   /**
    * @brief Is the terrain always directly selected for rendering ?
    */
-  bool isAlwaysVisible() const;
+  [[nodiscard]] bool isAlwaysVisible() const;
   void setIsAlwaysVisible(bool val);
 
   /**
@@ -422,7 +415,7 @@ public:
    * automatically precomputed once ?
    * Default false.
    */
-  bool precomputeNormalsFromMap() const;
+  [[nodiscard]] bool precomputeNormalsFromMap() const;
   void setPrecomputeNormalsFromMap(bool val);
 
   // User custom functions.
@@ -437,8 +430,7 @@ public:
    * This function is called only if the property useCustomVertexFunction is set
    * to true.
    */
-  virtual void updateVertex(DynamicTerrainVertex& vertex, unsigned int i,
-                            unsigned j);
+  virtual void updateVertex(DynamicTerrainVertex& vertex, unsigned int i, unsigned j);
 
   /**
    * @brief Custom function called each frame and passed the terrain camera

@@ -36,13 +36,11 @@ public:
    * @param type define the format of the data (int, float...
    * Engine.TEXTURETYPE_xxx)
    */
-  RawTexture(const ArrayBufferView& data, int width, int height,
-             unsigned int format, Scene* scene, bool generateMipMaps = true,
-             bool invertY = false,
-             unsigned int samplingMode
-             = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
-             unsigned int type = Constants::TEXTURETYPE_UNSIGNED_INT);
-  ~RawTexture(); // = default
+  RawTexture(const ArrayBufferView& data, int width, int height, unsigned int format, Scene* scene,
+             bool generateMipMaps = true, bool invertY = false,
+             unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
+             unsigned int type         = Constants::TEXTURETYPE_UNSIGNED_INT);
+  ~RawTexture() override; // = default
 
   /**
    * @brief Updates the texture underlying data.
@@ -64,10 +62,10 @@ public:
    * (Texture.xxx_SAMPLINGMODE)
    * @returns the luminance texture
    */
-  static std::unique_ptr<RawTexture> CreateLuminanceTexture(
-    const ArrayBufferView& data, int width, int height, Scene* scene,
-    bool generateMipMaps = true, bool invertY = false,
-    unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE);
+  static std::unique_ptr<RawTexture>
+  CreateLuminanceTexture(const ArrayBufferView& data, int width, int height, Scene* scene,
+                         bool generateMipMaps = true, bool invertY = false,
+                         unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE);
 
   /**
    * @brief Creates a luminance alpha texture from some data.
@@ -84,9 +82,8 @@ public:
    * @returns the luminance alpha texture
    */
   static std::unique_ptr<RawTexture> CreateLuminanceAlphaTexture(
-    const ArrayBufferView& data, int width, int height, Scene* scene,
-    bool generateMipMaps = true, bool invertY = false,
-    unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE);
+    const ArrayBufferView& data, int width, int height, Scene* scene, bool generateMipMaps = true,
+    bool invertY = false, unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE);
 
   /**
    * @brief Creates an alpha texture from some data.
@@ -102,10 +99,10 @@ public:
    * (Texture.xxx_SAMPLINGMODE)
    * @returns the alpha texture
    */
-  static std::unique_ptr<RawTexture> CreateAlphaTexture(
-    const ArrayBufferView& data, int width, int height, Scene* scene,
-    bool generateMipMaps = true, bool invertY = false,
-    unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE);
+  static std::unique_ptr<RawTexture>
+  CreateAlphaTexture(const ArrayBufferView& data, int width, int height, Scene* scene,
+                     bool generateMipMaps = true, bool invertY = false,
+                     unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE);
 
   /**
    * @brief Creates a RGB texture from some data.
@@ -123,11 +120,11 @@ public:
    * Engine.TEXTURETYPE_xxx)
    * @returns the RGB alpha texture
    */
-  static std::unique_ptr<RawTexture> CreateRGBTexture(
-    const ArrayBufferView& data, int width, int height, Scene* scene,
-    bool generateMipMaps = true, bool invertY = false,
-    unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
-    unsigned int type         = Constants::TEXTURETYPE_UNSIGNED_INT);
+  static std::unique_ptr<RawTexture>
+  CreateRGBTexture(const ArrayBufferView& data, int width, int height, Scene* scene,
+                   bool generateMipMaps = true, bool invertY = false,
+                   unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
+                   unsigned int type         = Constants::TEXTURETYPE_UNSIGNED_INT);
 
   /**
    * @brief Creates a RGBA texture from some data.
@@ -145,11 +142,11 @@ public:
    * Engine.TEXTURETYPE_xxx)
    * @returns the RGBA texture
    */
-  static std::unique_ptr<RawTexture> CreateRGBATexture(
-    const ArrayBufferView& data, int width, int height, Scene* scene,
-    bool generateMipMaps = true, bool invertY = false,
-    unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
-    unsigned int type         = Constants::TEXTURETYPE_UNSIGNED_INT);
+  static std::unique_ptr<RawTexture>
+  CreateRGBATexture(const ArrayBufferView& data, int width, int height, Scene* scene,
+                    bool generateMipMaps = true, bool invertY = false,
+                    unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
+                    unsigned int type         = Constants::TEXTURETYPE_UNSIGNED_INT);
 
   /**
    * @brief Creates a R texture from some data.
@@ -167,11 +164,11 @@ public:
    * Engine.TEXTURETYPE_xxx)
    * @returns the R texture
    */
-  static std::unique_ptr<RawTexture> CreateRTexture(
-    const ArrayBufferView& data, int width, int height, Scene* scene,
-    bool generateMipMaps = true, bool invertY = false,
-    unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
-    unsigned int type         = Constants::TEXTURETYPE_FLOAT);
+  static std::unique_ptr<RawTexture>
+  CreateRTexture(const ArrayBufferView& data, int width, int height, Scene* scene,
+                 bool generateMipMaps = true, bool invertY = false,
+                 unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
+                 unsigned int type         = Constants::TEXTURETYPE_FLOAT);
 
 public:
   /**

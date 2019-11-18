@@ -19,8 +19,7 @@ struct IMaterialTreeItemComponentProps {
   std::function<void()> onClick = nullptr;
 }; // end of struct IMaterialTreeItemComponentProps
 
-class BABYLON_SHARED_EXPORT MaterialTreeItemComponent
-    : public TreeItemSpecializedComponent {
+class BABYLON_SHARED_EXPORT MaterialTreeItemComponent : public TreeItemSpecializedComponent {
 
 public:
   /** Font Awesome Icon Unicodes **/
@@ -28,7 +27,7 @@ public:
 
 public:
   MaterialTreeItemComponent(const IMaterialTreeItemComponentProps& props);
-  virtual ~MaterialTreeItemComponent(); // = default
+  ~MaterialTreeItemComponent() override; // = default
 
   void render() override;
 

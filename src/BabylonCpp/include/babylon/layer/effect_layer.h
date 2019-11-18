@@ -72,7 +72,7 @@ public:
    * @brief Get the effect name of the layer.
    * @return The effect name
    */
-  virtual const std::string getEffectName() const = 0;
+  [[nodiscard]] virtual std::string getEffectName() const = 0;
 
   /**
    * @brief Checks for the readiness of the element composing the layer.
@@ -89,7 +89,7 @@ public:
    * @returns true if the effect requires stencil during the main canvas render
    * pass.
    */
-  virtual bool needStencil() const = 0;
+  [[nodiscard]] virtual bool needStencil() const = 0;
 
   /**
    * @brief Free any resources and references associated to a mesh.
@@ -102,7 +102,7 @@ public:
    * @brief Serializes this layer (Glow or Highlight for example).
    * @returns a serialized layer object
    */
-  virtual json serialize() const = 0;
+  [[nodiscard]] virtual json serialize() const = 0;
 
   /**
    * @brief Renders the glowing part of the scene by blending the blurred
@@ -122,7 +122,7 @@ public:
    * false.
    * @returns true if the glow layer should be rendered
    */
-  virtual bool shouldRender() const;
+  [[nodiscard]] virtual bool shouldRender() const;
 
   /**
    * @brief Rebuild the required buffers.
@@ -139,7 +139,7 @@ public:
    * @brief Gets the class name of the effect layer.
    * @returns the string with the class name of the effect layer
    */
-  virtual const std::string getClassName() const;
+  [[nodiscard]] virtual std::string getClassName() const;
 
   /**
    * @brief Creates an effect layer from parsed effect layer data.
@@ -167,7 +167,7 @@ protected:
   /**
    * @brief Gets the rendering group id the layer should render in.
    */
-  int get_renderingGroupId() const;
+  [[nodiscard]] int get_renderingGroupId() const;
 
   /**
    * @brief Sets the rendering group id the layer should render in.
@@ -199,8 +199,7 @@ protected:
    * @brief Sets the required values for both the emissive texture and and the
    * main color.
    */
-  virtual void _setEmissiveTextureAndColor(const MeshPtr& mesh,
-                                           SubMesh* subMesh,
+  virtual void _setEmissiveTextureAndColor(const MeshPtr& mesh, SubMesh* subMesh,
                                            const MaterialPtr& material)
     = 0;
 
@@ -231,8 +230,7 @@ protected:
    * glow
    * @return true if ready otherwise, false
    */
-  bool _isReady(SubMesh* subMesh, bool useInstances,
-                const BaseTexturePtr& emissiveTexture);
+  bool _isReady(SubMesh* subMesh, bool useInstances, const BaseTexturePtr& emissiveTexture);
 
   /**
    * @brief Returns true if the mesh should render, otherwise false.
@@ -247,14 +245,14 @@ protected:
    * @param material The material used on the mesh
    * @returns true if it can be rendered otherwise false
    */
-  virtual bool _canRenderMesh(const AbstractMeshPtr& mesh,
-                              const MaterialPtr& material) const;
+  [[nodiscard]] virtual bool _canRenderMesh(const AbstractMeshPtr& mesh,
+                                            const MaterialPtr& material) const;
 
   /**
    * @brief Returns true if the mesh should render, otherwise false.
    * @returns true if it should render otherwise false
    */
-  virtual bool _shouldRenderEmissiveTextureForMesh() const;
+  [[nodiscard]] virtual bool _shouldRenderEmissiveTextureForMesh() const;
 
   /**
    * @brief Renders the submesh passed in parameter to the generation map.

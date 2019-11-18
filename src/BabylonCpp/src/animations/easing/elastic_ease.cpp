@@ -9,9 +9,7 @@
 namespace BABYLON {
 
 ElasticEase::ElasticEase(int iOscillations, int iSpringiness)
-    : EasingFunction{}
-    , oscillations{static_cast<float>(iOscillations)}
-    , springiness{static_cast<float>(iSpringiness)}
+    : oscillations{static_cast<float>(iOscillations)}, springiness{static_cast<float>(iSpringiness)}
 {
 }
 

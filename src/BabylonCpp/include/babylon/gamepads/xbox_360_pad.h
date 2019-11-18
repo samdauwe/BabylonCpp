@@ -64,16 +64,15 @@ public:
    * @param gamepad defines the internal HTML gamepad object
    * @param xboxOne defines if it is a XBox One gamepad
    */
-  Xbox360Pad(const std::string& id, int index,
-             const IBrowserGamepadPtr& gamepad, bool xboxOne = false);
-  ~Xbox360Pad(); // = default
+  Xbox360Pad(const std::string& id, int index, const IBrowserGamepadPtr& gamepad,
+             bool xboxOne = false);
+  ~Xbox360Pad() override; // = default
 
   /**
    * @brief Defines the callback to call when left trigger is pressed.
    * @param callback defines the callback to use
    */
-  void
-  setOnlefttriggerchanged(const std::function<void(float value)>& callback);
+  void setOnlefttriggerchanged(const std::function<void(float value)>& callback);
 
   /**
    * @brief Defines the callback to call when right trigger is pressed.
@@ -85,15 +84,13 @@ public:
    * @brief Defines the callback to call when a button is pressed.
    * @param callback defines the callback to use
    */
-  void onbuttondown(
-    const std::function<void(Xbox360Button buttonPressed)>& callback);
+  void onbuttondown(const std::function<void(Xbox360Button buttonPressed)>& callback);
 
   /**
    * @brief Defines the callback to call when a button is released.
    * @param callback defines the callback to use
    */
-  void
-  onbuttonup(const std::function<void(Xbox360Button buttonReleased)>& callback);
+  void onbuttonup(const std::function<void(Xbox360Button buttonReleased)>& callback);
 
   /**
    * @brief Defines the callback to call when a pad is pressed.
@@ -121,7 +118,7 @@ protected:
   /**
    * @brief Gets the left trigger value.
    */
-  float get_leftTrigger() const;
+  [[nodiscard]] float get_leftTrigger() const;
 
   /**
    * @brief Sets the left trigger value.
@@ -131,7 +128,7 @@ protected:
   /**
    * @brief Gets the right trigger value.
    */
-  float get_rightTrigger() const;
+  [[nodiscard]] float get_rightTrigger() const;
 
   /**
    * @brief Sets the right trigger value.
@@ -141,7 +138,7 @@ protected:
   /**
    * @brief Gets the value of the `A` button.
    */
-  unsigned int get_buttonA() const;
+  [[nodiscard]] unsigned int get_buttonA() const;
 
   /**
    * @brief Sets the value of the `A` button.
@@ -151,7 +148,7 @@ protected:
   /**
    * @brief Gets the value of the `B` button.
    */
-  unsigned int get_buttonB() const;
+  [[nodiscard]] unsigned int get_buttonB() const;
 
   /**
    * @brief Sets the value of the `B` button.
@@ -161,7 +158,7 @@ protected:
   /**
    * @brief Gets the value of the `X` button.
    */
-  unsigned int get_buttonX() const;
+  [[nodiscard]] unsigned int get_buttonX() const;
 
   /**
    * @brief Sets the value of the `X` button.
@@ -171,7 +168,7 @@ protected:
   /**
    * @brief Gets the value of the `Y` button.
    */
-  unsigned int get_buttonY() const;
+  [[nodiscard]] unsigned int get_buttonY() const;
 
   /**
    * @brief Sets the value of the `Y` button.
@@ -181,7 +178,7 @@ protected:
   /**
    * @brief Gets the value of the `Start` button.
    */
-  unsigned int get_buttonStart() const;
+  [[nodiscard]] unsigned int get_buttonStart() const;
 
   /**
    * @brief Sets the value of the `Start` button.
@@ -191,7 +188,7 @@ protected:
   /**
    * @brief Gets the value of the `Back` button.
    */
-  unsigned int get_buttonBack() const;
+  [[nodiscard]] unsigned int get_buttonBack() const;
 
   /**
    * @brief Sets the value of the `Back` button.
@@ -201,7 +198,7 @@ protected:
   /**
    * @brief Gets the value of the `Left` button.
    */
-  unsigned int get_buttonLB() const;
+  [[nodiscard]] unsigned int get_buttonLB() const;
 
   /**
    * @brief Sets the value of the `Left` button.
@@ -211,7 +208,7 @@ protected:
   /**
    * @brief Gets the value of the `Right` button.
    */
-  unsigned int get_buttonRB() const;
+  [[nodiscard]] unsigned int get_buttonRB() const;
 
   /**
    * @brief Sets the value of the `Right` button.
@@ -221,7 +218,7 @@ protected:
   /**
    * @brief Gets the value of the Left joystick.
    */
-  unsigned int get_buttonLeftStick() const;
+  [[nodiscard]] unsigned int get_buttonLeftStick() const;
 
   /**
    * @brief Sets the value of the Left joystick.
@@ -231,7 +228,7 @@ protected:
   /**
    * @brief Gets the value of the Right joystick.
    */
-  unsigned int get_buttonRightStick() const;
+  [[nodiscard]] unsigned int get_buttonRightStick() const;
 
   /**
    * @brief Sets the value of the Right joystick.
@@ -241,7 +238,7 @@ protected:
   /**
    * @brief Gets the value of D-pad up.
    */
-  unsigned int get_dPadUp() const;
+  [[nodiscard]] unsigned int get_dPadUp() const;
 
   /**
    * @brief  Sets the value of D-pad up.
@@ -251,7 +248,7 @@ protected:
   /**
    * @brief Gets the value of D-pad down.
    */
-  unsigned int get_dPadDown() const;
+  [[nodiscard]] unsigned int get_dPadDown() const;
 
   /**
    * @brief Sets the value of D-pad down.
@@ -261,7 +258,7 @@ protected:
   /**
    * @brief Gets the value of D-pad left.
    */
-  unsigned int get_dPadLeft() const;
+  [[nodiscard]] unsigned int get_dPadLeft() const;
 
   /**
    * @brief Sets the value of D-pad left.
@@ -271,7 +268,7 @@ protected:
   /**
    * @brief Gets the value of D-pad right.
    */
-  unsigned int get_dPadRight() const;
+  [[nodiscard]] unsigned int get_dPadRight() const;
 
   /**
    * @brief Sets the value of D-pad right.

@@ -141,8 +141,7 @@ private:
    */
   void buildObstacleTree();
 
-  ObstacleTreeNode*
-  buildObstacleTreeRecursive(const std::vector<Obstacle*>& obstacles);
+  ObstacleTreeNode* buildObstacleTreeRecursive(const std::vector<Obstacle*>& obstacles);
 
   /**
    * \brief      Computes the agent neighbors of the specified agent.
@@ -169,8 +168,7 @@ private:
 
   void queryAgentTreeRecursive(Agent* agent, float& rangeSq, size_t node) const;
 
-  void queryObstacleTreeRecursive(Agent* agent, float rangeSq,
-                                  const ObstacleTreeNode* node) const;
+  void queryObstacleTreeRecursive(Agent* agent, float rangeSq, const ObstacleTreeNode* node) const;
 
   /**
    * \brief      Queries the visibility between two points within a
@@ -184,11 +182,9 @@ private:
    * \return     True if q1 and q2 are mutually visible within the radius;
    *             false otherwise.
    */
-  bool queryVisibility(const Vector2& q1, const Vector2& q2,
-                       float radius) const;
+  [[nodiscard]] bool queryVisibility(const Vector2& q1, const Vector2& q2, float radius) const;
 
-  bool queryVisibilityRecursive(const Vector2& q1, const Vector2& q2,
-                                float radius,
+  bool queryVisibilityRecursive(const Vector2& q1, const Vector2& q2, float radius,
                                 const ObstacleTreeNode* node) const;
 
   std::vector<Agent*> agents_;

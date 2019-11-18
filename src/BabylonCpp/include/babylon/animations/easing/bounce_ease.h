@@ -22,15 +22,14 @@ public:
   template <typename... Ts>
   static BounceEasePtr New(Ts&&... args)
   {
-    return std::shared_ptr<BounceEase>(
-      new BounceEase(std::forward<Ts>(args)...));
+    return std::shared_ptr<BounceEase>(new BounceEase(std::forward<Ts>(args)...));
   }
-  ~BounceEase(); // = default
+  ~BounceEase() override; // = default
 
   /**
    * @brief Hidden
    */
-  float easeInCore(float gradient) const override;
+  [[nodiscard]] float easeInCore(float gradient) const override;
 
 protected:
   /**

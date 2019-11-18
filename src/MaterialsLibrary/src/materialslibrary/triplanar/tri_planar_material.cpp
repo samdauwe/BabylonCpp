@@ -275,8 +275,7 @@ bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     scene, mesh, defines, false, _maxSimultaneousLights, _disableLighting);
 
   // Values that need to be evaluated on every frame
-  MaterialHelper::PrepareDefinesForFrameBoundValues(
-    scene, engine, defines, useInstances ? true : false);
+  MaterialHelper::PrepareDefinesForFrameBoundValues(scene, engine, defines, useInstances);
 
   // Attribs
   MaterialHelper::PrepareDefinesForAttributes(mesh, defines, true, true);
@@ -538,7 +537,7 @@ json TriPlanarMaterial::serialize() const
   return nullptr;
 }
 
-const std::string TriPlanarMaterial::getClassName() const
+std::string TriPlanarMaterial::getClassName() const
 {
   return "TriPlanarMaterial";
 }

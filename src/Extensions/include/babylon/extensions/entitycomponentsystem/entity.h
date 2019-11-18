@@ -99,7 +99,7 @@ public:
     }
 
     /// \return The value of the ID, as an integer
-    inline int_type value() const
+    [[nodiscard]] inline int_type value() const
     {
       return (counter << ANAX_ENTITY_ID_COUNTER_BIT_COUNT) | index;
     }
@@ -112,7 +112,7 @@ public:
 
     /// Determines if the ID is null
     /// \return true if the ID is null
-    bool isNull() const
+    [[nodiscard]] bool isNull() const
     {
       return value() == 0;
     }
@@ -140,18 +140,18 @@ public:
   ///       as checking if an Entity is valid may/may not
   ///       impact your performance.
   /// \return true if this Entity is valid, false otherwise
-  bool isValid() const;
+  [[nodiscard]] bool isValid() const;
 
   /// \return The Entity's ID
-  const Id& getId() const;
+  [[nodiscard]] const Id& getId() const;
 
   /// \return The World that the Entity belongs to.
   /// \note This function will fail if the Entity is null.
   /// \see isNull() To check whether the Entity is null.
-  World& getWorld() const;
+  [[nodiscard]] World& getWorld() const;
 
   /// \return true if this Entity is activated
-  bool isActivated() const;
+  [[nodiscard]] bool isActivated() const;
 
   /// Activates this Entity
   void activate();
@@ -187,14 +187,14 @@ public:
   /// \tparam The type of component you wish to check for
   /// \return true if this Entity contains a component
   template <typename T>
-  bool hasComponent() const;
+  [[nodiscard]] bool hasComponent() const;
 
   /// \return All the components the Entity has
-  ComponentArray getComponents() const;
+  [[nodiscard]] ComponentArray getComponents() const;
 
   /// \return A component type list, which resembles the components
   /// this entity has attached to it
-  detail::ComponentTypeList getComponentTypeList() const;
+  [[nodiscard]] detail::ComponentTypeList getComponentTypeList() const;
 
   /// Comparison operator
   bool operator==(const Entity& entity) const;
@@ -208,8 +208,8 @@ private:
   // so I may call them from templated public interfaces
   void addComponent(Component* component, detail::TypeId componentTypeId);
   void removeComponent(detail::TypeId componentTypeId);
-  Component& getComponent(detail::TypeId componentTypeId) const;
-  bool hasComponent(detail::TypeId componentTypeId) const;
+  [[nodiscard]] Component& getComponent(detail::TypeId componentTypeId) const;
+  [[nodiscard]] bool hasComponent(detail::TypeId componentTypeId) const;
 
   /// The ID of the Entity
   Id m_id;
@@ -217,15 +217,14 @@ private:
   /// The world that this Entity belongs to. This is guarenteed
   /// to not be null, as long as this entity is not null.
   /// \see isNull() To determine if the entity is null or not.
-  World* m_world;
+  World* m_world{nullptr};
 
 }; // end of class Entity
 
 template <typename T, typename... Args>
 T& Entity::addComponent(Args&&... args)
 {
-  static_assert(std::is_base_of<Component, T>(),
-                "T is not a component, cannot add T to entity");
+  static_assert(std::is_base_of<Component, T>(), "T is not a component, cannot add T to entity");
   // TODO: align components by type
   auto component = new T{std::forward<Args>(args)...};
   addComponent(component, ComponentTypeId<T>());

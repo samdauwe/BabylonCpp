@@ -20,9 +20,7 @@ using IAnimatablePtr = std::shared_ptr<IAnimatable>;
  * @brief The action to be carried out following a trigger.
  * @see http://doc.babylonjs.com/how_to/how_to_use_actions#available-actions
  */
-class BABYLON_SHARED_EXPORT Action
-    : public std::enable_shared_from_this<Action>,
-      public IAction {
+class BABYLON_SHARED_EXPORT Action : public std::enable_shared_from_this<Action>, public IAction {
 
 public:
   template <typename... Ts>
@@ -39,14 +37,14 @@ public:
    */
   Action(unsigned int triggerOptions, Condition* condition = nullptr);
   Action(const TriggerOptions& triggerOptions, Condition* condition = nullptr);
-  virtual ~Action(); // = default
+  ~Action() override; // = default
 
   /** Methods **/
 
   /**
    * @brief Internal only.
    */
-  virtual void _prepare() override;
+  void _prepare() override;
 
   /**
    * @brief Gets the trigger parameters.
@@ -86,15 +84,14 @@ public:
   /**
    * @brief Internal only.
    */
-  IAnimatablePtr _getEffectiveTarget(const IAnimatablePtr& target,
-                                     const std::string& propertyPath);
+  IAnimatablePtr _getEffectiveTarget(const IAnimatablePtr& target, const std::string& propertyPath);
 
   /**
    * @brief Serialize placeholder for child classes.
    * @param parent of child
    * @returns the serialized object
    */
-  virtual json serialize(json& parent) const override;
+  json serialize(json& parent) const override;
 
   /** Statics **/
 

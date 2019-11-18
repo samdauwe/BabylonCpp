@@ -29,10 +29,8 @@ public:
    * @param contours Path of the polygon
    * @param scene scene to add to when creating the mesh
    */
-  PolygonMeshBuilder(const std::string& name, const Path2& contours,
-                     Scene* scene);
-  PolygonMeshBuilder(const std::string& name,
-                     const std::vector<Vector2>& contours, Scene* scene);
+  PolygonMeshBuilder(const std::string& name, const Path2& contours, Scene* scene);
+  PolygonMeshBuilder(const std::string& name, const std::vector<Vector2>& contours, Scene* scene);
   ~PolygonMeshBuilder(); // = default
 
   /**
@@ -60,7 +58,7 @@ public:
   std::pair<Float32Array, Uint32Array> buildWall(const Vector3& wall0Corner,
                                                  const Vector3& wall1Corner);
   PolygonPoints& points();
-  const PolygonPoints& points() const;
+  [[nodiscard]] const PolygonPoints& points() const;
 
 private:
   void _addToepoint(const std::vector<Vector2>& points);
@@ -76,11 +74,10 @@ private:
    * @param depth depth of the polygon
    * @param flip flip of the polygon
    */
-  void addSide(Float32Array& positions, Float32Array& normals,
-               Float32Array& uvs, Uint32Array& indices, const Bounds& bounds,
-               const PolygonPoints& points, float depth, bool flip);
-  void addHoles(const std::vector<Point2D>& epoints,
-                const Uint32Array& holeIndices,
+  void addSide(Float32Array& positions, Float32Array& normals, Float32Array& uvs,
+               Uint32Array& indices, const Bounds& bounds, const PolygonPoints& points, float depth,
+               bool flip);
+  void addHoles(const std::vector<Point2D>& epoints, const Uint32Array& holeIndices,
                 std::vector<std::vector<Point2D>>& polygon);
 
 private:

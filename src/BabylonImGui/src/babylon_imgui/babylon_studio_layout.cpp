@@ -107,7 +107,7 @@ void BabylonStudioLayout::DoDock(DockableWindowId id, ImGuiID dockId)
 ImGuiID BabylonStudioLayout::DoSplit(ImGuiID* io_dockToSplit, ImGuiDir_ splitDirection, float ratio)
 {
   ImGuiID new_dock
-    = ImGui::DockBuilderSplitNode(*io_dockToSplit, splitDirection, ratio, NULL, io_dockToSplit);
+    = ImGui::DockBuilderSplitNode(*io_dockToSplit, splitDirection, ratio, nullptr, io_dockToSplit);
   return new_dock;
 }
 

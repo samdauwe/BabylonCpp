@@ -94,7 +94,7 @@ void PBRBRDFConfiguration::prepareDefines(MaterialDefines& defines)
   defines.boolDef["SPHERICAL_HARMONICS"] = _useSphericalHarmonics;
 }
 
-const std::string PBRBRDFConfiguration::getClassName() const
+std::string PBRBRDFConfiguration::getClassName() const
 {
   return "PBRBRDFConfiguration";
 }

@@ -8,8 +8,7 @@
 namespace BABYLON {
 
 class EquiRectangularCubeTexture;
-using EquiRectangularCubeTexturePtr
-  = std::shared_ptr<EquiRectangularCubeTexture>;
+using EquiRectangularCubeTexturePtr = std::shared_ptr<EquiRectangularCubeTexture>;
 
 /**
  * @brief This represents a texture coming from an equirectangular image
@@ -27,14 +26,14 @@ public:
 
     return texture;
   }
-  ~EquiRectangularCubeTexture(); // = default
+  ~EquiRectangularCubeTexture() override; // = default
 
   /**
    * @brief Get the current class name of the texture useful for serialization
    * or dynamic coding.
    * @returns "EquiRectangularCubeTexture"
    */
-  const std::string getClassName() const;
+  std::string getClassName() const;
 
   /**
    * @brief Create a clone of the current EquiRectangularCubeTexture and return
@@ -61,8 +60,7 @@ protected:
   EquiRectangularCubeTexture(
     const std::string& url, Scene* scene, size_t size, bool noMipmap = false,
     bool gammaSpace = true, const std::function<void()>& onLoad = nullptr,
-    const std::function<void(const std::string& message,
-                             const std::string& exception)>& onError
+    const std::function<void(const std::string& message, const std::string& exception)>& onError
     = nullptr);
 
 private:
@@ -70,10 +68,9 @@ private:
    * @brief Load the image data, by putting the image on a canvas and extracting
    * its buffer.
    */
-  void
-  loadImage(const std::function<void()>& loadTextureCallback,
-            const std::function<void(const std::string& message,
-                                     const std::string& exception)>& onError);
+  void loadImage(
+    const std::function<void()>& loadTextureCallback,
+    const std::function<void(const std::string& message, const std::string& exception)>& onError);
 
   /**
    * @brief Convert the image buffer into a cubemap and create a CubeTexture.
@@ -108,8 +105,7 @@ private:
 
   bool _noMipmap;
   std::function<void()> _onLoad;
-  std::function<void(const std::string& message, const std::string& exception)>
-    _onError;
+  std::function<void(const std::string& message, const std::string& exception)> _onError;
 
   /**
    * The size of the cubemap.

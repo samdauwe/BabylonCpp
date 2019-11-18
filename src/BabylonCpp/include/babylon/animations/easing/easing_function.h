@@ -33,7 +33,7 @@ public:
 
 public:
   EasingFunction();
-  virtual ~EasingFunction(); // = default
+  ~EasingFunction() override; // = default
 
   /**
    * @brief Sets the easing mode of the current function.
@@ -46,12 +46,12 @@ public:
    * @brief Gets the current easing mode.
    * @returns the easing mode
    */
-  unsigned int getEasingMode() const;
+  [[nodiscard]] unsigned int getEasingMode() const;
 
   /**
    * @brief Hidden
    */
-  virtual float easeInCore(float gradient) const = 0;
+  [[nodiscard]] virtual float easeInCore(float gradient) const = 0;
 
   /**
    * @brief Given an input gradient between 0 and 1, this returns the

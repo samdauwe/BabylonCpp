@@ -34,16 +34,14 @@ struct SSAO2Ratio {
 /**
  * @brief Render pipeline to produce ssao effect.
  */
-class BABYLON_SHARED_EXPORT SSAO2RenderingPipeline
-    : public PostProcessRenderPipeline {
+class BABYLON_SHARED_EXPORT SSAO2RenderingPipeline : public PostProcessRenderPipeline {
 
 public:
   /**
    * The PassPostProcess id in the pipeline that contains the original scene
    * color
    */
-  static constexpr const char* SSAOOriginalSceneColorEffect
-    = "SSAOOriginalSceneColorEffect";
+  static constexpr const char* SSAOOriginalSceneColorEffect = "SSAOOriginalSceneColorEffect";
   /**
    * The SSAO PostProcess id in the pipeline
    */
@@ -60,8 +58,7 @@ public:
    * The PostProcess id in the pipeline that combines the SSAO-Blur output with
    * the original scene color (SSAOOriginalSceneColorEffect)
    */
-  static constexpr const char* SSAOCombineRenderEffect
-    = "SSAOCombineRenderEffect";
+  static constexpr const char* SSAOCombineRenderEffect = "SSAOCombineRenderEffect";
 
 public:
   template <typename... Ts>
@@ -73,20 +70,20 @@ public:
 
     return renderingPipeline;
   }
-  virtual ~SSAO2RenderingPipeline(); // = default
+  ~SSAO2RenderingPipeline() override; // = default
 
   void addToScene(const SSAO2RenderingPipelinePtr& ssao2RenderingPipeline);
 
   /**
    * @brief Gets active scene.
    */
-  Scene* scene() const;
+  [[nodiscard]] Scene* scene() const;
 
   /**
    * @brief Get the class name.
    * @returns "SSAO2RenderingPipeline"
    */
-  const std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
   /** Methods */
   static bool IsSupported();
@@ -104,7 +101,7 @@ public:
    * @brief Serialize the rendering pipeline (Used when exporting).
    * @returns the serialized object
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Parse the serialized pipeline.
@@ -113,8 +110,8 @@ public:
    * @param rootUrl The URL of the serialized pipeline.
    * @returns An instantiated pipeline from the serialized object.
    */
-  static std::unique_ptr<SSAO2RenderingPipeline>
-  Parse(const json& source, Scene* scene, const std::string& url);
+  static std::unique_ptr<SSAO2RenderingPipeline> Parse(const json& source, Scene* scene,
+                                                       const std::string& url);
 
 protected:
   /**
@@ -128,17 +125,16 @@ protected:
    */
   SSAO2RenderingPipeline(const std::string& name, Scene* scene, float ratio,
                          const std::vector<CameraPtr>& cameras);
-  SSAO2RenderingPipeline(const std::string& name, Scene* scene,
-                         const SSAO2Ratio& ratio,
+  SSAO2RenderingPipeline(const std::string& name, Scene* scene, const SSAO2Ratio& ratio,
                          const std::vector<CameraPtr>& cameras);
 
 private:
   void set_samples(unsigned int n);
-  unsigned int get_samples() const;
+  [[nodiscard]] unsigned int get_samples() const;
   void set_textureSamples(unsigned int n);
-  unsigned int get_textureSamples() const;
+  [[nodiscard]] unsigned int get_textureSamples() const;
   void set_expensiveBlur(bool b);
-  bool get_expensiveBlur() const;
+  [[nodiscard]] bool get_expensiveBlur() const;
   void _createBlurPostProcess(float ssaoRatio, float blurRatio);
   // Van der Corput radical inverse
   float _radicalInverse_VdC(uint32_t i);

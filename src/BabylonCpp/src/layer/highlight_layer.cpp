@@ -115,7 +115,7 @@ float HighlightLayer::get_blurVerticalSize() const
   return _verticalBlurPostprocess->kernel;
 }
 
-const std::string HighlightLayer::getEffectName() const
+std::string HighlightLayer::getEffectName() const
 {
   return HighlightLayer::EffectName;
 }
@@ -308,7 +308,7 @@ void HighlightLayer::_internalRender(const EffectPtr& effect)
 bool HighlightLayer::shouldRender() const
 {
   if (EffectLayer::shouldRender()) {
-    return !_meshes.empty() ? true : false;
+    return !_meshes.empty();
   }
 
   return false;
@@ -539,7 +539,7 @@ void HighlightLayer::dispose()
   EffectLayer::dispose();
 }
 
-const std::string HighlightLayer::getClassName() const
+std::string HighlightLayer::getClassName() const
 {
   return "HighlightLayer";
 }

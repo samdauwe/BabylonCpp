@@ -36,7 +36,7 @@ AnaglyphGamepadCamera::AnaglyphGamepadCamera(const std::string& iName,
 
 AnaglyphGamepadCamera::~AnaglyphGamepadCamera() = default;
 
-const std::string AnaglyphGamepadCamera::getClassName() const
+std::string AnaglyphGamepadCamera::getClassName() const
 {
   return "AnaglyphGamepadCamera";
 }

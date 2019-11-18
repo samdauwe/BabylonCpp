@@ -453,10 +453,7 @@ void EffectLayer::render()
 
 bool EffectLayer::hasMesh(AbstractMesh* mesh) const
 {
-  if (renderingGroupId() == -1 || mesh->renderingGroupId == renderingGroupId) {
-    return true;
-  }
-  return false;
+  return renderingGroupId() == -1 || mesh->renderingGroupId == renderingGroupId;
 }
 
 bool EffectLayer::shouldRender() const
@@ -696,7 +693,7 @@ void EffectLayer::dispose()
   onSizeChangedObservable.clear();
 }
 
-const std::string EffectLayer::getClassName() const
+std::string EffectLayer::getClassName() const
 {
   return "EffectLayer";
 }

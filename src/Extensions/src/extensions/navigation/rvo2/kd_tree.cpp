@@ -40,7 +40,7 @@ namespace BABYLON {
 namespace Extensions {
 namespace RVO2 {
 
-KdTree::KdTree(RVOSimulator* sim) : obstacleTree_(NULL), sim_(sim)
+KdTree::KdTree(RVOSimulator* sim) : obstacleTree_(nullptr), sim_(sim)
 {
 }
 
@@ -145,10 +145,10 @@ KdTree::ObstacleTreeNode*
 KdTree::buildObstacleTreeRecursive(const std::vector<Obstacle*>& obstacles)
 {
   if (obstacles.empty()) {
-    return NULL;
+    return nullptr;
   }
   else {
-    ObstacleTreeNode* const node = new ObstacleTreeNode;
+    auto* const node = new ObstacleTreeNode;
 
     size_t optimalSplit = 0;
     size_t minLeft      = obstacles.size();
@@ -244,7 +244,7 @@ KdTree::buildObstacleTreeRecursive(const std::vector<Obstacle*>& obstacles)
         const Vector2 splitpoint
           = obstacleJ1->point_ + t * (obstacleJ2->point_ - obstacleJ1->point_);
 
-        Obstacle* const newObstacle = new Obstacle();
+        auto* const newObstacle     = new Obstacle();
         newObstacle->point_         = splitpoint;
         newObstacle->prevObstacle_  = obstacleJ1;
         newObstacle->nextObstacle_  = obstacleJ2;
@@ -288,7 +288,7 @@ void KdTree::computeObstacleNeighbors(Agent* agent, float rangeSq) const
 
 void KdTree::deleteObstacleTree(ObstacleTreeNode* node)
 {
-  if (node != NULL) {
+  if (node != nullptr) {
     deleteObstacleTree(node->left);
     deleteObstacleTree(node->right);
     delete node;
@@ -354,7 +354,7 @@ void KdTree::queryAgentTreeRecursive(Agent* agent, float& rangeSq,
 void KdTree::queryObstacleTreeRecursive(Agent* agent, float rangeSq,
                                         const ObstacleTreeNode* node) const
 {
-  if (node == NULL) {
+  if (node == nullptr) {
     return;
   }
   else {
@@ -396,7 +396,7 @@ bool KdTree::queryVisibilityRecursive(const Vector2& q1, const Vector2& q2,
                                       float radius,
                                       const ObstacleTreeNode* node) const
 {
-  if (node == NULL) {
+  if (node == nullptr) {
     return true;
   }
   else {

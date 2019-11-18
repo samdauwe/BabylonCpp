@@ -10,8 +10,7 @@ namespace BABYLON {
 /**
  * @brief VRDistortionCorrectionPostProcess used for mobile VR.
  */
-class BABYLON_SHARED_EXPORT VRDistortionCorrectionPostProcess
-    : public PostProcess {
+class BABYLON_SHARED_EXPORT VRDistortionCorrectionPostProcess : public PostProcess {
 
 public:
   /**
@@ -21,10 +20,9 @@ public:
    * @param isRightEye If this is for the right eye distortion
    * @param vrMetrics All the required metrics for the VR camera
    */
-  VRDistortionCorrectionPostProcess(const std::string& name,
-                                    const CameraPtr& camera, bool isRightEye,
-                                    const VRCameraMetrics& vrMetrics);
-  ~VRDistortionCorrectionPostProcess(); // = default
+  VRDistortionCorrectionPostProcess(const std::string& name, const CameraPtr& camera,
+                                    bool isRightEye, const VRCameraMetrics& vrMetrics);
+  ~VRDistortionCorrectionPostProcess() override; // = default
 
 private:
   bool _isRightEye;

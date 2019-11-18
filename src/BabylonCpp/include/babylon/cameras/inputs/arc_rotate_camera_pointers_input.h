@@ -19,20 +19,19 @@ public:
    * @brief Instantiate the input.
    */
   ArcRotateCameraPointersInput();
-  ~ArcRotateCameraPointersInput(); // = default
+  ~ArcRotateCameraPointersInput() override; // = default
 
   /**
    * @brief Gets the class name of the current intput.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
   /**
    * @brief Called on pointer POINTERMOVE event if only a single touch is
    * active. Override this method to provide functionality.
    */
-  void onTouch(const std::optional<PointerTouch>& point, int offsetX,
-               int offsetY) override;
+  void onTouch(const std::optional<PointerTouch>& point, int offsetX, int offsetY) override;
 
   /**
    * @brief Called on pointer POINTERDOUBLETAP event.
@@ -44,12 +43,11 @@ public:
    * @brief Called on pointer POINTERMOVE event if multiple touches are active.
    * Override this method to provide functionality.
    */
-  void onMultiTouch(
-    const std::optional<PointerTouch>& pointA,
-    const std::optional<PointerTouch>& pointB,
-    float previousPinchSquaredDistance, float pinchSquaredDistance,
-    const std::optional<PointerTouch>& previousMultiTouchPanPosition,
-    const std::optional<PointerTouch>& multiTouchPanPosition) override;
+  void onMultiTouch(const std::optional<PointerTouch>& pointA,
+                    const std::optional<PointerTouch>& pointB, float previousPinchSquaredDistance,
+                    float pinchSquaredDistance,
+                    const std::optional<PointerTouch>& previousMultiTouchPanPosition,
+                    const std::optional<PointerTouch>& multiTouchPanPosition) override;
 
   /**
    * @brief Called each time a new POINTERDOWN event occurs. Ie, for each button

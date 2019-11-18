@@ -23,8 +23,8 @@ public:
   void apply(GL::IGLRenderingContext& _gl);
 
 protected:
-  bool get_isDirty() const;
-  float get_zOffset() const;
+  [[nodiscard]] bool get_isDirty() const;
+  [[nodiscard]] float get_zOffset() const;
   void set_zOffset(float value);
   std::optional<int>& get_cullFace();
   void set_cullFace(const std::optional<int>& value);
@@ -32,9 +32,9 @@ protected:
   void set_cull(const std::optional<bool>& value);
   std::optional<int>& get_depthFunc();
   void set_depthFunc(const std::optional<int>& value);
-  bool get_depthMask() const;
+  [[nodiscard]] bool get_depthMask() const;
   void set_depthMask(bool value);
-  bool get_depthTest() const;
+  [[nodiscard]] bool get_depthTest() const;
   void set_depthTest(bool value);
   std::optional<unsigned int>& get_frontFace();
   void set_frontFace(const std::optional<unsigned int>& value);

@@ -28,20 +28,19 @@ public:
   template <typename... Ts>
   static DynamicTexturePtr New(Ts&&... args)
   {
-    auto texture = std::shared_ptr<DynamicTexture>(
-      new DynamicTexture(std::forward<Ts>(args)...));
+    auto texture = std::shared_ptr<DynamicTexture>(new DynamicTexture(std::forward<Ts>(args)...));
     texture->addToScene(texture);
 
     return texture;
   }
-  ~DynamicTexture(); // = default
+  ~DynamicTexture() override; // = default
 
   /**
    * @brief Get the current class name of the texture useful for serialization
    * or dynamic coding.
    * @returns "DynamicTexture"
    */
-  const std::string getClassName() const;
+  std::string getClassName() const;
 
   /**
    * @brief Scales the texture.
@@ -93,8 +92,8 @@ public:
    * true)
    */
   void drawText(const std::string& text, int x, int y, const std::string& font,
-                const std::string& color, const std::string& clearColor,
-                bool invertY = true, bool update = true);
+                const std::string& color, const std::string& clearColor, bool invertY = true,
+                bool update = true);
 
   /**
    * @brief Clones the texture.
@@ -128,11 +127,10 @@ protected:
    * @param format defines the texture format to use (default is
    * Engine.TEXTUREFORMAT_RGBA)
    */
-  DynamicTexture(const std::string& name, const DynamicTextureOptions& options,
-                 Scene* scene, bool generateMipMaps,
-                 unsigned int samplingMode
-                 = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
-                 unsigned int format = Constants::TEXTUREFORMAT_RGBA);
+  DynamicTexture(const std::string& name, const DynamicTextureOptions& options, Scene* scene,
+                 bool generateMipMaps,
+                 unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
+                 unsigned int format       = Constants::TEXTUREFORMAT_RGBA);
 
   /**
    * @brief Gets the current state of canRescale.

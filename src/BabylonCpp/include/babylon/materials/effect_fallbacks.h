@@ -55,7 +55,7 @@ public:
   /**
    * @brief Checks to see if more fallbacks are still availible.
    */
-  bool isMoreFallbacks() const;
+  [[nodiscard]] bool isMoreFallbacks() const;
 
   /**
    * @brief Removes the defines that shoould be removed when falling back.

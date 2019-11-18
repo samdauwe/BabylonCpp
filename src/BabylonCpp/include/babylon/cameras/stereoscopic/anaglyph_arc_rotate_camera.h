@@ -29,13 +29,13 @@ public:
 
     return camera;
   }
-  ~AnaglyphArcRotateCamera(); // = default
+  ~AnaglyphArcRotateCamera() override; // = default
 
   /**
    * @brief Gets camera class name.
    * @returns AnaglyphArcRotateCamera
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
 protected:
   /**
@@ -48,9 +48,8 @@ protected:
    * @param interaxialDistance defines distance between each color axis
    * @param scene defines the hosting scene
    */
-  AnaglyphArcRotateCamera(const std::string& name, float alpha, float beta,
-                          float radius, const Vector3& target,
-                          float interaxialDistance, Scene* scene);
+  AnaglyphArcRotateCamera(const std::string& name, float alpha, float beta, float radius,
+                          const Vector3& target, float interaxialDistance, Scene* scene);
 
 private:
   static bool NodeConstructorAdded;

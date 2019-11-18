@@ -60,7 +60,7 @@ public:
 
     return postProcess;
   }
-  ~ConvolutionPostProcess(); // = default
+  ~ConvolutionPostProcess() override; // = default
 
 protected:
   /**
@@ -80,13 +80,11 @@ protected:
    * @param textureType Type of textures used when performing the post process.
    * (default: 0)
    */
-  ConvolutionPostProcess(const std::string& name, const Float32Array& kernel,
-                         float ratio, const CameraPtr& camera,
-                         unsigned int samplingMode
-                         = TextureConstants::NEAREST_SAMPLINGMODE,
+  ConvolutionPostProcess(const std::string& name, const Float32Array& kernel, float ratio,
+                         const CameraPtr& camera,
+                         unsigned int samplingMode = TextureConstants::NEAREST_SAMPLINGMODE,
                          Engine* engine = nullptr, bool reusable = false,
-                         unsigned int textureType
-                         = Constants::TEXTURETYPE_UNSIGNED_INT);
+                         unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT);
 
 public:
   /**

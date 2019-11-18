@@ -18,17 +18,15 @@ struct ITransformNodeTreeItemComponentProps {
   std::function<void()> onClick  = nullptr;
 }; // end of struct ITransformNodeTreeItemComponentProps
 
-class BABYLON_SHARED_EXPORT TransformNodeTreeItemComponent
-    : public TreeItemSpecializedComponent {
+class BABYLON_SHARED_EXPORT TransformNodeTreeItemComponent : public TreeItemSpecializedComponent {
 
 public:
   /** Font Awesome Icon Unicodes **/
   static constexpr const char* faCodeBranch = ICON_FA_CODE_BRANCH;
 
 public:
-  TransformNodeTreeItemComponent(
-    const ITransformNodeTreeItemComponentProps& props);
-  virtual ~TransformNodeTreeItemComponent(); // = default
+  TransformNodeTreeItemComponent(const ITransformNodeTreeItemComponentProps& props);
+  ~TransformNodeTreeItemComponent() override; // = default
 
   void render() override;
 

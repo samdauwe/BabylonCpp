@@ -7,16 +7,14 @@
 namespace BABYLON {
 
 class StereoscopicArcRotateCamera;
-using StereoscopicArcRotateCameraPtr
-  = std::shared_ptr<StereoscopicArcRotateCamera>;
+using StereoscopicArcRotateCameraPtr = std::shared_ptr<StereoscopicArcRotateCamera>;
 
 /**
  * @brief Camera used to simulate stereoscopic rendering (based on
  * ArcRotateCamera).
  * @see http://doc.babylonjs.com/features/cameras
  */
-class BABYLON_SHARED_EXPORT StereoscopicArcRotateCamera
-    : public ArcRotateCamera {
+class BABYLON_SHARED_EXPORT StereoscopicArcRotateCamera : public ArcRotateCamera {
 
 public:
   static void AddNodeConstructor();
@@ -31,13 +29,13 @@ public:
 
     return camera;
   }
-  ~StereoscopicArcRotateCamera(); // = default
+  ~StereoscopicArcRotateCamera() override; // = default
 
   /**
    * @brief Gets camera class name
    * @returns StereoscopicArcRotateCamera
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
 protected:
   /**
@@ -52,9 +50,8 @@ protected:
    * side or over under
    * @param scene defines the hosting scene
    */
-  StereoscopicArcRotateCamera(const std::string& name, float alpha, float beta,
-                              float radius, const Vector3& target,
-                              float interaxialDistance,
+  StereoscopicArcRotateCamera(const std::string& name, float alpha, float beta, float radius,
+                              const Vector3& target, float interaxialDistance,
                               bool isStereoscopicSideBySide, Scene* scene);
 
 private:

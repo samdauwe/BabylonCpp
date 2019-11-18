@@ -11,8 +11,7 @@ namespace BABYLON {
  * It emits the particles alongside the hemisphere radius. The emission
  * direction might be randomized.
  */
-class BABYLON_SHARED_EXPORT HemisphericParticleEmitter
-    : public IParticleEmitterType {
+class BABYLON_SHARED_EXPORT HemisphericParticleEmitter : public IParticleEmitterType {
 
 public:
   /**
@@ -25,7 +24,7 @@ public:
    */
   HemisphericParticleEmitter(float radius = 1.f, float radiusRange = 1.f,
                              float directionRandomizer = 0.f);
-  virtual ~HemisphericParticleEmitter(); // = default
+  ~HemisphericParticleEmitter() override; // = default
 
   /**
    * @brief Called by the particle System when the direction is computed for the
@@ -34,8 +33,7 @@ public:
    * @param directionToUpdate is the direction vector to update with the result
    * @param particle is the particle we are computed the direction for
    */
-  void startDirectionFunction(const Matrix& worldMatrix,
-                              Vector3& directionToUpdate,
+  void startDirectionFunction(const Matrix& worldMatrix, Vector3& directionToUpdate,
                               Particle* particle) override;
 
   /**
@@ -45,15 +43,14 @@ public:
    * @param positionToUpdate is the position vector to update with the result
    * @param particle is the particle we are computed the position for
    */
-  void startPositionFunction(const Matrix& worldMatrix,
-                             Vector3& positionToUpdate,
+  void startPositionFunction(const Matrix& worldMatrix, Vector3& positionToUpdate,
                              Particle* particle) override;
 
   /**
    * @brief Clones the current emitter and returns a copy of it.
    * @returns the new emitter
    */
-  std::unique_ptr<IParticleEmitterType> clone() const override;
+  [[nodiscard]] std::unique_ptr<IParticleEmitterType> clone() const override;
 
   /**
    * @brief Called by the GPUParticleSystem to setup the update shader.
@@ -65,19 +62,19 @@ public:
    * @brief Returns a string to use to update the GPU particles update shader.
    * @returns a string containng the defines string
    */
-  const std::string getEffectDefines() const override;
+  [[nodiscard]] std::string getEffectDefines() const override;
 
   /**
    * @brief Returns the string "HemisphericParticleEmitter".
    * @returns a string containing the class name
    */
-  const std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
   /**
    * @brief Serializes the particle system to a JSON object.
    * @returns the JSON object
    */
-  json serialize() const override;
+  [[nodiscard]] json serialize() const override;
 
   /**
    * @brief Parse properties from a JSON object.

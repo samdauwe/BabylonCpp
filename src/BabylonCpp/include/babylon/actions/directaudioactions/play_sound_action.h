@@ -21,9 +21,8 @@ public:
    * @param sound defines the sound to play
    * @param condition defines the trigger related conditions
    */
-  PlaySoundAction(unsigned int triggerOptions, Sound* sound,
-                  Condition* condition = nullptr);
-  ~PlaySoundAction(); // = default
+  PlaySoundAction(unsigned int triggerOptions, Sound* sound, Condition* condition = nullptr);
+  ~PlaySoundAction() override; // = default
 
   /**
    * @brief Hidden

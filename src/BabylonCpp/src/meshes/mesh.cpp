@@ -246,7 +246,7 @@ TransformNodePtr Mesh::instantiateHierarychy(TransformNode* newParent)
   return instance;
 }
 
-const std::string Mesh::getClassName() const
+std::string Mesh::getClassName() const
 {
   return "Mesh";
 }
@@ -1080,8 +1080,7 @@ Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
   }
 
   if (!visibleInstances.empty()) {
-    for (size_t instanceIndex = 0; instanceIndex < visibleInstances.size(); ++instanceIndex) {
-      auto instance = visibleInstances[instanceIndex];
+    for (auto instance : visibleInstances) {
       instance->getWorldMatrix().copyToArray(instanceStorage->instancesData, offset);
       offset += 16;
       ++instancesCount;
@@ -1916,7 +1915,7 @@ Mesh& Mesh::convertToFlatShadedMesh()
   std::unordered_map<std::string, Float32Array> newdata;
   bool updatableNormals  = false;
   unsigned int kindIndex = 0;
-  std::string kind       = "";
+  std::string kind;
   for (kindIndex = 0; kindIndex < kinds.size(); ++kindIndex) {
     kind              = kinds[kindIndex];
     auto vertexBuffer = getVertexBuffer(kind);
@@ -1946,7 +1945,7 @@ Mesh& Mesh::convertToFlatShadedMesh()
 
     for (kindIndex = 0; kindIndex < kinds.size(); ++kindIndex) {
       kind          = kinds[kindIndex];
-      size_t stride = static_cast<size_t>(vbs[kind]->getStrideSize());
+      auto stride   = static_cast<size_t>(vbs[kind]->getStrideSize());
 
       for (unsigned int offset = 0; offset < stride; ++offset) {
         newdata[kind].emplace_back(data[kind][vertexIndex * stride + offset]);
@@ -2007,7 +2006,7 @@ Mesh& Mesh::convertToUnIndexedMesh()
   std::map<std::string, Float32Array> data;
   std::map<std::string, Float32Array> newdata;
   unsigned int kindIndex = 0;
-  std::string kind       = "";
+  std::string kind;
   for (kindIndex = 0; kindIndex < kinds.size(); ++kindIndex) {
     kind          = kinds[kindIndex];
     vbs[kind]     = getVertexBuffer(kind);
@@ -2028,7 +2027,7 @@ Mesh& Mesh::convertToUnIndexedMesh()
 
     for (kindIndex = 0; kindIndex < kinds.size(); ++kindIndex) {
       kind          = kinds[kindIndex];
-      size_t stride = static_cast<size_t>(vbs[kind]->getStrideSize());
+      auto stride   = static_cast<size_t>(vbs[kind]->getStrideSize());
 
       for (unsigned int offset = 0; offset < stride; ++offset) {
         newdata[kind].emplace_back(data[kind][vertexIndex * stride + offset]);

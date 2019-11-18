@@ -18,8 +18,7 @@ struct ISkeletonTreeItemComponentProps {
   std::function<void()> onClick = nullptr;
 }; // end of struct ISkeletonTreeItemComponentProps
 
-class BABYLON_SHARED_EXPORT SkeletonTreeItemComponent
-    : public TreeItemSpecializedComponent {
+class BABYLON_SHARED_EXPORT SkeletonTreeItemComponent : public TreeItemSpecializedComponent {
 
 public:
   /** Font Awesome Icon Unicodes **/
@@ -27,7 +26,7 @@ public:
 
 public:
   SkeletonTreeItemComponent(const ISkeletonTreeItemComponentProps& props);
-  virtual ~SkeletonTreeItemComponent(); // = default
+  ~SkeletonTreeItemComponent() override; // = default
 
   void render() override;
 

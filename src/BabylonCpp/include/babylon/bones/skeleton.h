@@ -41,15 +41,14 @@ public:
   template <typename... Ts>
   static SkeletonPtr New(Ts&&... args)
   {
-    auto skeleton
-      = std::shared_ptr<Skeleton>(new Skeleton(std::forward<Ts>(args)...));
+    auto skeleton = std::shared_ptr<Skeleton>(new Skeleton(std::forward<Ts>(args)...));
     skeleton->addToScene(skeleton);
 
     return skeleton;
   }
-  virtual ~Skeleton(); // = default
+  ~Skeleton() override; // = default
 
-  virtual Type type() const override;
+  [[nodiscard]] Type type() const override;
 
   void addToScene(const SkeletonPtr& newSkeleton);
 
@@ -57,13 +56,13 @@ public:
    * @brief Gets the current object class name.
    * @return the class name
    */
-  const std::string getClassName() const;
+  [[nodiscard]] std::string getClassName() const;
 
   /**
    * @brief Returns an array containing the root bones.
    * @returns an array containing the root bones
    */
-  std::vector<BonePtr> getChildren() const;
+  [[nodiscard]] std::vector<BonePtr> getChildren() const;
 
   /** Members **/
 
@@ -162,10 +161,8 @@ public:
    * animation will end
    * @returns a new animatable
    */
-  Animatable* beginAnimation(const std::string& name, bool loop = false,
-                             float speedRatio = 1.f,
-                             const std::function<void()>& onAnimationEnd
-                             = nullptr);
+  Animatable* beginAnimation(const std::string& name, bool loop = false, float speedRatio = 1.f,
+                             const std::function<void()>& onAnimationEnd = nullptr);
 
   void _markAsDirty();
   void _registerMeshWithPoseMatrix(AbstractMesh* mesh);
@@ -193,8 +190,8 @@ public:
    * @param id defines the id of the new skeleton
    * @returns the new skeleton
    */
-  std::unique_ptr<Skeleton> clone(const std::string& name,
-                                  const std::string& id) const;
+  [[nodiscard]] std::unique_ptr<Skeleton> clone(const std::string& name,
+                                                const std::string& id) const;
 
   /**
    * @brief Enable animation blending for this skeleton.
@@ -206,14 +203,13 @@ public:
   /**
    * @brief Releases all resources associated with the current skeleton.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Serialize the skeleton in a JSON object.
    * @returns a JSON object
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   // Statics
 
@@ -236,7 +232,7 @@ public:
    * @brief Gets the root pose matrix.
    * @returns a matrix
    */
-  Matrix* getPoseMatrix() const;
+  [[nodiscard]] Matrix* getPoseMatrix() const;
 
   /**
    * @brief Sorts bones per internal index.
@@ -258,7 +254,7 @@ protected:
    * Please note that this option is not available if the hardware does not
    * support it
    */
-  bool get_useTextureToStoreBoneMatrices() const;
+  [[nodiscard]] bool get_useTextureToStoreBoneMatrices() const;
 
   /**
    * @brief Sets a boolean indicating that bone matrices should be stored as a
@@ -276,27 +272,24 @@ protected:
   /**
    * @brief Sets the animation properties override.
    */
-  void set_animationPropertiesOverride(
-    const AnimationPropertiesOverridePtr& value) override;
+  void set_animationPropertiesOverride(const AnimationPropertiesOverridePtr& value) override;
 
   /**
    * @brief Gets a boolean indicating that the skeleton effectively stores
    * matrices into a texture.
    */
-  bool get_isUsingTextureForMatrices() const;
+  [[nodiscard]] bool get_isUsingTextureForMatrices() const;
 
   /**
    * @brief Gets the unique ID of this skeleton.
    */
-  size_t get_uniqueId() const;
+  [[nodiscard]] size_t get_uniqueId() const;
 
 private:
   float _getHighestAnimationFrame();
   void _computeTransformMatrices(Float32Array& targetMatrix,
-                                 const std::optional<Matrix>& initialSkinMatrix
-                                 = std::nullopt);
-  void _sortBones(unsigned int index, std::vector<BonePtr>& bones,
-                  std::vector<bool>& visited);
+                                 const std::optional<Matrix>& initialSkinMatrix = std::nullopt);
+  void _sortBones(unsigned int index, std::vector<BonePtr>& bones, std::vector<bool>& visited);
 
 public:
   /**

@@ -67,7 +67,7 @@ PointerDragBehavior::PointerDragBehavior(
 
 PointerDragBehavior::~PointerDragBehavior() = default;
 
-const std::string PointerDragBehavior::name() const
+std::string PointerDragBehavior::name() const
 {
   return "PointerDrag";
 }

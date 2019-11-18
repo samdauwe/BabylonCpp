@@ -59,7 +59,7 @@ bool ImGuiAl::Log::Init( unsigned flags, const char** more_actions )
   m_Labels[ kWarn ]   = "Warn";
   m_Labels[ kError ]  = "Error";
   m_CumulativeLabel   = "Cumulative";
-  m_FilterHeaderLabel = NULL;
+  m_FilterHeaderLabel = nullptr;
   m_FilterLabel       = "Filter (inc,-exc)";
 
   return true;
@@ -190,7 +190,7 @@ void ImGuiAl::Log::Iterate( IterateFunc iterator, bool apply_filters, void* ud )
     unsigned char meta[ 3 ];
     pos = Peek( pos, meta, 3 );
 
-    Level level = (Level)meta[ 0 ];
+    auto level     = (Level)meta[0];
     size_t length = meta[ 1 ] | meta[ 2 ] << 8;
     pos = Peek( pos, line, length );
     line[ length ] = 0;
@@ -223,8 +223,7 @@ int ImGuiAl::Log::Draw()
 
   if (m_MoreActions != nullptr)
   {
-    for (int i = 0; m_MoreActions[i] != NULL; i++)
-    {
+    for (int i = 0; m_MoreActions[i] != nullptr; i++) {
       if (i != 0)
       {
         ImGui::SameLine();

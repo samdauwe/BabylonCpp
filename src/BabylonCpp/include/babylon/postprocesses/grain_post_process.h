@@ -19,13 +19,13 @@ public:
   template <typename... Ts>
   static GrainPostProcessPtr New(Ts&&... args)
   {
-    auto postProcess = std::shared_ptr<GrainPostProcess>(
-      new GrainPostProcess(std::forward<Ts>(args)...));
+    auto postProcess
+      = std::shared_ptr<GrainPostProcess>(new GrainPostProcess(std::forward<Ts>(args)...));
     postProcess->add(postProcess);
 
     return postProcess;
   }
-  ~GrainPostProcess(); // = default
+  ~GrainPostProcess() override; // = default
 
 protected:
   /**
@@ -46,13 +46,11 @@ protected:
    * the constructor. The updateEffect method can be used to compile the shader
    * at a later time. (default: false)
    */
-  GrainPostProcess(const std::string& name,
-                   const std::variant<float, PostProcessOptions>& options,
-                   const CameraPtr& camera, unsigned int samplingMode,
-                   Engine* engine, bool reusable = false,
-                   unsigned int textureType
-                   = Constants::TEXTURETYPE_UNSIGNED_INT,
-                   bool blockCompilation = false);
+  GrainPostProcess(const std::string& name, const std::variant<float, PostProcessOptions>& options,
+                   const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
+                   bool reusable            = false,
+                   unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
+                   bool blockCompilation    = false);
 
 public:
   /**

@@ -190,7 +190,7 @@ private:
   {
 
     const auto makeWing = [=](const MeshPtr& mesh, float radius, float fuselageXer, bool invertY) {
-      auto yMultiplier      = invertY == true ? -1.f : 1.f;
+      auto yMultiplier      = invertY ? -1.f : 1.f;
       auto frontBaseVtop    = frontBaseV;
       auto frontBaseVbottom = 0.f - frontBaseV;
       auto backBaseVtop     = backBaseV;

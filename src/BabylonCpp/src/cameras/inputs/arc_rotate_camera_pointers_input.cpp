@@ -25,7 +25,7 @@ ArcRotateCameraPointersInput::ArcRotateCameraPointersInput()
 
 ArcRotateCameraPointersInput::~ArcRotateCameraPointersInput() = default;
 
-const std::string ArcRotateCameraPointersInput::getClassName() const
+std::string ArcRotateCameraPointersInput::getClassName() const
 {
   return "ArcRotateCameraPointersInput";
 }

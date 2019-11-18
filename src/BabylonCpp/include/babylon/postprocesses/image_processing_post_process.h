@@ -12,9 +12,8 @@ class BaseTexture;
 class ColorCurves;
 class ImageProcessingConfiguration;
 class ImageProcessingPostProcess;
-using BaseTexturePtr = std::shared_ptr<BaseTexture>;
-using ImageProcessingPostProcessPtr
-  = std::shared_ptr<ImageProcessingPostProcess>;
+using BaseTexturePtr                = std::shared_ptr<BaseTexture>;
+using ImageProcessingPostProcessPtr = std::shared_ptr<ImageProcessingPostProcess>;
 
 /**
  * @brief ImageProcessingPostProcess
@@ -33,22 +32,21 @@ public:
 
     return postProcess;
   }
-  ~ImageProcessingPostProcess(); // = default
+  ~ImageProcessingPostProcess() override; // = default
 
   /**
    * "ImageProcessingPostProcess"
    * @returns "ImageProcessingPostProcess"
    */
-  const std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
   void dispose(Camera* camera = nullptr) override;
 
 protected:
-  ImageProcessingPostProcess(
-    const std::string& name, float renderRatio, const CameraPtr& camera,
-    unsigned int samplingMode, Engine* engine, bool reusable = false,
-    unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
-    ImageProcessingConfiguration* imageProcessingConfiguration = nullptr);
+  ImageProcessingPostProcess(const std::string& name, float renderRatio, const CameraPtr& camera,
+                             unsigned int samplingMode, Engine* engine, bool reusable = false,
+                             unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
+                             ImageProcessingConfiguration* imageProcessingConfiguration = nullptr);
 
   /**
    * @brief Gets the image processing configuration used either in this
@@ -62,8 +60,7 @@ protected:
    *
    * If sets to null, the scene one is in use.
    */
-  void
-  set_imageProcessingConfiguration(ImageProcessingConfiguration* const& value);
+  void set_imageProcessingConfiguration(ImageProcessingConfiguration* const& value);
 
   /**
    * @brief Gets Color curves setup used in the effect if colorCurvesEnabled is
@@ -80,7 +77,7 @@ protected:
   /**
    * @brief Gets wether the color curves effect is enabled.
    */
-  bool get_colorCurvesEnabled() const;
+  [[nodiscard]] bool get_colorCurvesEnabled() const;
 
   /**
    * Sets wether the color curves effect is enabled.
@@ -102,7 +99,7 @@ protected:
   /**
    * @brief Gets wether the color grading effect is enabled.
    */
-  bool get_colorGradingEnabled() const;
+  [[nodiscard]] bool get_colorGradingEnabled() const;
 
   /**
    * @brief Gets wether the color grading effect is enabled.
@@ -112,7 +109,7 @@ protected:
   /**
    * @brief Gets exposure used in the effect.
    */
-  float get_exposure() const;
+  [[nodiscard]] float get_exposure() const;
 
   /**
    * @brief Sets exposure used in the effect.
@@ -122,7 +119,7 @@ protected:
   /**
    * @brief Gets wether tonemapping is enabled or not.
    */
-  bool get_toneMappingEnabled() const;
+  [[nodiscard]] bool get_toneMappingEnabled() const;
 
   /**
    * @brief Sets wether tonemapping is enabled or not
@@ -132,7 +129,7 @@ protected:
   /**
    * @brief Gets the type of tone mapping effect.
    */
-  unsigned int get_toneMappingType() const;
+  [[nodiscard]] unsigned int get_toneMappingType() const;
 
   /**
    * @brief Sets the type of tone mapping effect.
@@ -142,7 +139,7 @@ protected:
   /**
    * @brief Gets contrast used in the effect.
    */
-  float get_contrast() const;
+  [[nodiscard]] float get_contrast() const;
 
   /**
    * @brief Sets contrast used in the effect.
@@ -152,7 +149,7 @@ protected:
   /**
    * @brief Gets Vignette stretch size.
    */
-  float get_vignetteStretch() const;
+  [[nodiscard]] float get_vignetteStretch() const;
 
   /**
    * @brief Sets Vignette stretch size.
@@ -162,7 +159,7 @@ protected:
   /**
    * @brief Gets Vignette centre X Offset.
    */
-  float get_vignetteCentreX() const;
+  [[nodiscard]] float get_vignetteCentreX() const;
 
   /**
    * @brief Sets Vignette centre X Offset.
@@ -172,7 +169,7 @@ protected:
   /**
    * @brief Gets Vignette centre Y Offset.
    */
-  float get_vignetteCentreY() const;
+  [[nodiscard]] float get_vignetteCentreY() const;
 
   /**
    * @brief Sets Vignette centre Y Offset.
@@ -182,7 +179,7 @@ protected:
   /**
    * @brief Gets Vignette weight or intensity of the vignette effect.
    */
-  float get_vignetteWeight() const;
+  [[nodiscard]] float get_vignetteWeight() const;
 
   /**
    * @brief Sets Vignette weight or intensity of the vignette effect.
@@ -204,7 +201,7 @@ protected:
   /**
    * @brief Gets Camera field of view used by the Vignette effect.
    */
-  float get_vignetteCameraFov() const;
+  [[nodiscard]] float get_vignetteCameraFov() const;
 
   /**
    * @brief Sets Camera field of view used by the Vignette effect.
@@ -214,7 +211,7 @@ protected:
   /**
    * @brief Gets the vignette blend mode allowing different kind of effect.
    */
-  unsigned int get_vignetteBlendMode() const;
+  [[nodiscard]] unsigned int get_vignetteBlendMode() const;
 
   /**
    * @brief Sets the vignette blend mode allowing different kind of effect.
@@ -224,7 +221,7 @@ protected:
   /**
    * @brief Gets wether the vignette effect is enabled.
    */
-  bool get_vignetteEnabled() const;
+  [[nodiscard]] bool get_vignetteEnabled() const;
 
   /**
    * @brief Sets wether the vignette effect is enabled.
@@ -234,7 +231,7 @@ protected:
   /**
    * @brief Gets wether the input of the processing is in Gamma or Linear Space.
    */
-  bool get_fromLinearSpace() const;
+  [[nodiscard]] bool get_fromLinearSpace() const;
 
   /**
    * @brief Sets wether the input of the processing is in Gamma or Linear Space.
@@ -245,8 +242,8 @@ protected:
    * @brief Attaches a new image processing configuration to the PBR Material.
    * @param configuration
    */
-  void _attachImageProcessingConfiguration(
-    ImageProcessingConfiguration* configuration, bool doNotBuild = false);
+  void _attachImageProcessingConfiguration(ImageProcessingConfiguration* configuration,
+                                           bool doNotBuild = false);
 
   void _updateParameters();
 
@@ -254,15 +251,13 @@ public:
   /**
    * Image processing configuration used either in this material.
    */
-  Property<ImageProcessingPostProcess, ImageProcessingConfiguration*>
-    imageProcessingConfiguration;
+  Property<ImageProcessingPostProcess, ImageProcessingConfiguration*> imageProcessingConfiguration;
 
   /**
    * Color curves setup used in the effect if colorCurvesEnabled is set to true
    * .
    */
-  Property<ImageProcessingPostProcess, std::shared_ptr<ColorCurves>>
-    colorCurves;
+  Property<ImageProcessingPostProcess, std::shared_ptr<ColorCurves>> colorCurves;
 
   /**
    * Wether the color curves effect is enabled.

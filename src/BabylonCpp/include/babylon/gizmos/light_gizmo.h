@@ -24,13 +24,12 @@ public:
    */
   LightGizmo(const UtilityLayerRendererPtr& gizmoLayer
              = UtilityLayerRenderer::DefaultUtilityLayer());
-  ~LightGizmo(); // = default
+  ~LightGizmo() override; // = default
 
   /**
    * @brief Disposes of the light gizmo.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
 protected:
   /**

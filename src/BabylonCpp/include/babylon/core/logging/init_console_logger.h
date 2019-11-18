@@ -6,4 +6,4 @@ namespace BABYLON
   * @brief Initializes the logging on the console
   */
   void BABYLON_SHARED_EXPORT initConsoleLogger();
-}
+  } // namespace BABYLON

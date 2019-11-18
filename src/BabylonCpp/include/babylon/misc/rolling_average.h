@@ -35,14 +35,14 @@ public:
    * and 1 for the value before that
    * @return Value previously recorded with add() or null if outside of range
    */
-  float history(size_t i) const;
+  [[nodiscard]] float history(size_t i) const;
 
   /**
    * @brief Returns true if enough samples have been taken to completely fill
    * the sliding window
    * @return true if sample-set saturated
    */
-  bool isSaturated() const;
+  [[nodiscard]] bool isSaturated() const;
 
   /**
    * @brief Resets the rolling average (equivalent to 0 samples taken so far)
@@ -56,7 +56,7 @@ protected:
    * and i is -3, then 2 will be returned.
    * @return Wrapped position in sample range
    */
-  std::size_t _wrapPosition(std::size_t i) const;
+  [[nodiscard]] std::size_t _wrapPosition(std::size_t i) const;
 
 public:
   /**

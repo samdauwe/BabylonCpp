@@ -75,7 +75,7 @@ Type SpotLight::type() const
   return Type::SPOTLIGHT;
 }
 
-const std::string SpotLight::getClassName() const
+std::string SpotLight::getClassName() const
 {
   return "SpotLight";
 }
@@ -382,7 +382,7 @@ void SpotLight::prepareLightSpecificDefines(MaterialDefines& defines,
 
   defines.boolDef["SPOTLIGHT" + lightIndexStr] = true;
   defines.boolDef["PROJECTEDLIGHTTEXTURE" + lightIndexStr]
-    = projectionTexture() && projectionTexture()->isReady() ? true : false;
+    = projectionTexture() && projectionTexture()->isReady();
 }
 
 } // end of namespace BABYLON

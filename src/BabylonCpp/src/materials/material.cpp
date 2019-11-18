@@ -332,7 +332,7 @@ std::string Material::toString(bool fullDetails) const
   return oss.str();
 }
 
-const std::string Material::getClassName() const
+std::string Material::getClassName() const
 {
   return "Material";
 }
@@ -706,7 +706,7 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/,
   // Remove from scene
   scene.removeMaterial(this);
 
-  if (notBoundToMesh != true) {
+  if (!notBoundToMesh) {
     // Remove from meshes
     if (meshMap.empty()) {
       for (const auto& meshItem : meshMap) {

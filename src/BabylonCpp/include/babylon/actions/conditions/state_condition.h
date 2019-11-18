@@ -20,9 +20,8 @@ public:
    * @param target of the condition
    * @param value to compare with target state
    */
-  StateCondition(ActionManager* actionManager, const IAnimatablePtr& target,
-                 AnimationValue* value);
-  virtual ~StateCondition(); // = default
+  StateCondition(ActionManager* actionManager, const IAnimatablePtr& target, AnimationValue* value);
+  ~StateCondition() override; // = default
 
   /** Methods **/
 
@@ -36,7 +35,7 @@ public:
    * @brief Serialize the StateCondition into a JSON compatible object.
    * @returns serialization object
    */
-  json serialize() const override;
+  [[nodiscard]] json serialize() const override;
 
 public:
   /**

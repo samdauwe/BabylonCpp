@@ -8,14 +8,8 @@
 namespace BABYLON {
 namespace Extensions {
 
-Border::Border(size_t p_id, size_t cornerCount, size_t borderCount,
-               size_t tileCount)
-    : UidObj{p_id}
-    , corners{}
-    , borders{}
-    , tiles{}
-    , midpoint{}
-    , betweenPlates{false}
+Border::Border(size_t p_id, size_t cornerCount, size_t borderCount, size_t tileCount)
+    : UidObj{p_id}, betweenPlates{false}
 {
   corners.resize(cornerCount);
   borders.resize(borderCount);

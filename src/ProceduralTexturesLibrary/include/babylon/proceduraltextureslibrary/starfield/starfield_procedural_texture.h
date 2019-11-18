@@ -9,11 +9,9 @@ namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
 class StarfieldProceduralTexture;
-using StarfieldProceduralTexturePtr
-  = std::shared_ptr<StarfieldProceduralTexture>;
+using StarfieldProceduralTexturePtr = std::shared_ptr<StarfieldProceduralTexture>;
 
-class BABYLON_SHARED_EXPORT StarfieldProceduralTexture
-    : public ProceduralTexture {
+class BABYLON_SHARED_EXPORT StarfieldProceduralTexture : public ProceduralTexture {
 
 public:
   template <typename... Ts>
@@ -25,7 +23,7 @@ public:
 
     return texture;
   }
-  ~StarfieldProceduralTexture(); // = default
+  ~StarfieldProceduralTexture() override; // = default
 
   void updateShaderUniforms();
 
@@ -44,13 +42,12 @@ public:
    * texture information
    * @returns a parsed Starfield Procedural Texture
    */
-  static std::unique_ptr<StarfieldProceduralTexture>
-  Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
+  static std::unique_ptr<StarfieldProceduralTexture> Parse(const json& parsedTexture, Scene* scene,
+                                                           const std::string& rootUrl);
 
 protected:
-  StarfieldProceduralTexture(const std::string& name, const Size& size,
-                             Scene* scene, Texture* fallbackTexture = nullptr,
-                             bool generateMipMaps = false);
+  StarfieldProceduralTexture(const std::string& name, const Size& size, Scene* scene,
+                             Texture* fallbackTexture = nullptr, bool generateMipMaps = false);
 
   float get_time() const;
   void set_time(float value);

@@ -14,7 +14,7 @@ struct CrowdRoadmapVertex;
 
 namespace RVO2 {
 class RVOSimulator;
-}
+} // namespace RVO2
 
 /**
  * @brief A component used to describe the agent properties of an entity.
@@ -22,22 +22,21 @@ class RVOSimulator;
 class BABYLON_SHARED_EXPORT CrowdAgent : public ECS::Component {
 
 public:
-  CrowdAgent(RVO2::RVOSimulator* sim,
-             const BABYLON::Vector2& position = BABYLON::Vector2::Zero());
-  ~CrowdAgent(); // = default
+  CrowdAgent(RVO2::RVOSimulator* sim, const BABYLON::Vector2& position = BABYLON::Vector2::Zero());
+  ~CrowdAgent() override; // = default
 
-  size_t id() const;
-  const RVO2::Vector2& position() const;
+  [[nodiscard]] size_t id() const;
+  [[nodiscard]] const RVO2::Vector2& position() const;
   void setRadius(float radius);
-  const RVO2::Vector2& goal() const;
+  [[nodiscard]] const RVO2::Vector2& goal() const;
   void setGoal(const BABYLON::Vector2& goal);
-  float radius() const;
-  const RVO2::Vector2& getAgentPrefVelocity() const;
+  [[nodiscard]] float radius() const;
+  [[nodiscard]] const RVO2::Vector2& getAgentPrefVelocity() const;
   void setAgentPrefVelocity(const BABYLON::Vector2& goalVector);
   void setAgentPrefVelocity(const RVO2::Vector2& goalVector);
-  bool hasRoadMap() const;
+  [[nodiscard]] bool hasRoadMap() const;
   std::vector<CrowdRoadmapVertex>& roadmap();
-  const std::vector<CrowdRoadmapVertex>& roadmap() const;
+  [[nodiscard]] const std::vector<CrowdRoadmapVertex>& roadmap() const;
   void addWayPoint(const BABYLON::Vector2& wayPoint);
   void setAgentMaxNeighbors(size_t neighborsMax);
   void setAgentNeighborDist(float neighborDist);
@@ -45,7 +44,7 @@ public:
   void setAgentTimeHorizonObst(float timeHorizonObst);
 
   /* Checks if the agent has reached the pre-defined goal. */
-  bool reachedGoal() const;
+  [[nodiscard]] bool reachedGoal() const;
 
 private:
   size_t _id;

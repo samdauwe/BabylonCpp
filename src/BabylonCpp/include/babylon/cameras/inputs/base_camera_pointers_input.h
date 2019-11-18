@@ -17,12 +17,11 @@ namespace BABYLON {
  * src/Cameras/Inputs/followCameraPointersInput.ts for example usage.
  */
 template <class TCamera>
-class BABYLON_SHARED_EXPORT BaseCameraPointersInput
-    : public ICameraInput<TCamera> {
+class BABYLON_SHARED_EXPORT BaseCameraPointersInput : public ICameraInput<TCamera> {
 
 public:
   BaseCameraPointersInput();
-  virtual ~BaseCameraPointersInput(); // = default
+  ~BaseCameraPointersInput() override; // = default
 
   /**
    * @brief Attach the input controls to a specific dom element to get the input
@@ -51,13 +50,13 @@ public:
    * @brief Gets the class name of the current input.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
   /**
    * @brief Get the friendly name associated with the input class.
    * @returns the input friendly name
    */
-  const std::string getSimpleName() const override;
+  [[nodiscard]] std::string getSimpleName() const override;
 
 protected:
   /**
@@ -70,19 +69,17 @@ protected:
    * @brief Called on pointer POINTERMOVE event if only a single touch is
    * active. Override this method to provide functionality.
    */
-  virtual void onTouch(const std::optional<PointerTouch>& point, int offsetX,
-                       int offsetY);
+  virtual void onTouch(const std::optional<PointerTouch>& point, int offsetX, int offsetY);
 
   /**
    * @brief Called on pointer POINTERMOVE event if multiple touches are active.
    * Override this method to provide functionality.
    */
-  virtual void
-  onMultiTouch(const std::optional<PointerTouch>& pointA,
-               const std::optional<PointerTouch>& pointB,
-               float previousPinchSquaredDistance, float pinchSquaredDistance,
-               const std::optional<PointerTouch>& previousMultiTouchPanPosition,
-               const std::optional<PointerTouch>& multiTouchPanPosition);
+  virtual void onMultiTouch(const std::optional<PointerTouch>& pointA,
+                            const std::optional<PointerTouch>& pointB,
+                            float previousPinchSquaredDistance, float pinchSquaredDistance,
+                            const std::optional<PointerTouch>& previousMultiTouchPanPosition,
+                            const std::optional<PointerTouch>& multiTouchPanPosition);
 
   /**
    * @brief Called on JS contextmenu event.

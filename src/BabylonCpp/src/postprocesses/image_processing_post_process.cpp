@@ -88,7 +88,7 @@ ImageProcessingPostProcess::ImageProcessingPostProcess(
 
 ImageProcessingPostProcess::~ImageProcessingPostProcess() = default;
 
-const std::string ImageProcessingPostProcess::getClassName() const
+std::string ImageProcessingPostProcess::getClassName() const
 {
   return "ImageProcessingPostProcess";
 }
@@ -341,7 +341,7 @@ void ImageProcessingPostProcess::_updateParameters()
   _defines.FROMLINEARSPACE = _fromLinearSpace;
   _imageProcessingConfiguration->prepareDefines(_defines, true);
 
-  std::string defines = "";
+  std::string defines;
   if (_defines.IMAGEPROCESSING) {
     defines += "#define IMAGEPROCESSING;\r\n";
   }

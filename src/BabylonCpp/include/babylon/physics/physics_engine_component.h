@@ -8,23 +8,20 @@
 namespace BABYLON {
 
 class PhysicsEngineSceneComponent;
-using PhysicsEngineSceneComponentPtr
-  = std::shared_ptr<PhysicsEngineSceneComponent>;
+using PhysicsEngineSceneComponentPtr = std::shared_ptr<PhysicsEngineSceneComponent>;
 
 /**
  * @brief Defines the physics engine scene component responsible to manage a
  * physics engine.
  */
-class BABYLON_SHARED_EXPORT PhysicsEngineSceneComponent
-    : public ISceneComponent {
+class BABYLON_SHARED_EXPORT PhysicsEngineSceneComponent : public ISceneComponent {
 
 public:
   /**
    * The component name helpful to identify the component in the list of scene
    * components.
    */
-  static constexpr const char* name
-    = SceneComponentConstants::NAME_PHYSICSENGINE;
+  static constexpr const char* name = SceneComponentConstants::NAME_PHYSICSENGINE;
 
 public:
   template <typename... Ts>
@@ -33,7 +30,7 @@ public:
     return std::shared_ptr<PhysicsEngineSceneComponent>(
       new PhysicsEngineSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~PhysicsEngineSceneComponent(); // = default
+  ~PhysicsEngineSceneComponent() override; // = default
 
   /**
    * @brief Registers the component in a given scene.

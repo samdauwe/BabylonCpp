@@ -27,17 +27,16 @@ public:
   PositionNormalVertex& operator=(const PositionNormalVertex& other);
   PositionNormalVertex& operator=(PositionNormalVertex&& other);
   ~PositionNormalVertex(); // = default
-  PositionNormalVertex copy() const;
+  [[nodiscard]] PositionNormalVertex copy() const;
 
   /**
    * @brief Clones the PositionNormalVertex.
    * @returns the cloned PositionNormalVertex
    */
-  std::unique_ptr<PositionNormalVertex> clone() const;
+  [[nodiscard]] std::unique_ptr<PositionNormalVertex> clone() const;
 
-  friend std::ostream&
-  operator<<(std::ostream& os,
-             const PositionNormalVertex& positionNormalVertex);
+  friend std::ostream& operator<<(std::ostream& os,
+                                  const PositionNormalVertex& positionNormalVertex);
 
 public:
   /**
@@ -52,8 +51,7 @@ public:
 
 }; // end of class PositionNormalVertex
 
-std::ostream& operator<<(std::ostream& os,
-                         const PositionNormalVertex& positionNormalVertex);
+std::ostream& operator<<(std::ostream& os, const PositionNormalVertex& positionNormalVertex);
 
 } // end of namespace BABYLON
 

@@ -29,45 +29,39 @@ public:
   template <typename... Ts>
   static FurMaterialPtr New(Ts&&... args)
   {
-    auto material = std::shared_ptr<FurMaterial>(
-      new FurMaterial(std::forward<Ts>(args)...));
+    auto material = std::shared_ptr<FurMaterial>(new FurMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;
   }
-  ~FurMaterial(); // = default
+  ~FurMaterial() override; // = default
 
-  bool needAlphaBlending() const override;
-  bool needAlphaTesting() const override;
+  [[nodiscard]] bool needAlphaBlending() const override;
+  [[nodiscard]] bool needAlphaTesting() const override;
   BaseTexturePtr getAlphaTestTexture() override;
   void updateFur();
-  bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
-                         bool useInstances) override;
+  bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool useInstances) override;
   void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
   std::vector<IAnimatablePtr> getAnimatables() override;
-  std::vector<BaseTexturePtr> getActiveTextures() const override;
-  bool hasTexture(const BaseTexturePtr& texture) const override;
-  const std::string getClassName() const override;
-  virtual void dispose(bool forceDisposeEffect   = false,
-                       bool forceDisposeTextures = false,
-                       bool notBoundToMesh       = false) override;
-  MaterialPtr clone(const std::string& name,
-                    bool cloneChildren = false) const override;
-  json serialize() const;
+  [[nodiscard]] std::vector<BaseTexturePtr> getActiveTextures() const override;
+  [[nodiscard]] bool hasTexture(const BaseTexturePtr& texture) const override;
+  [[nodiscard]] std::string getClassName() const override;
+  void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
+               bool notBoundToMesh = false) override;
+  [[nodiscard]] MaterialPtr clone(const std::string& name,
+                                  bool cloneChildren = false) const override;
+  [[nodiscard]] json serialize() const;
 
   /** Statics **/
-  static FurMaterial* Parse(const json& source, Scene* scene,
-                            const std::string& rootUrl);
-  static DynamicTexturePtr GenerateTexture(const std::string& name,
-                                           Scene* scene);
+  static FurMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);
+  static DynamicTexturePtr GenerateTexture(const std::string& name, Scene* scene);
 
   /**
    * Creates and returns an array of meshes used as shells for the Fur Material
    * that can be disposed later in your code
    * The quality is in interval [0, 100]
    */
-  static std::vector<Mesh*> FurifyMesh(const MeshPtr& sourceMesh,
-                                       float quality);
+  static std::vector<Mesh*> FurifyMesh(const MeshPtr& sourceMesh, float quality);
 
 protected:
   /**
@@ -82,11 +76,11 @@ protected:
   void set_diffuseTexture(const BaseTexturePtr& value);
   BaseTexturePtr& get_heightTexture();
   void set_heightTexture(const BaseTexturePtr& value);
-  bool get_disableLighting() const;
+  [[nodiscard]] bool get_disableLighting() const;
   void set_disableLighting(bool value);
-  unsigned int get_maxSimultaneousLights() const;
+  [[nodiscard]] unsigned int get_maxSimultaneousLights() const;
   void set_maxSimultaneousLights(unsigned int value);
-  float get_furTime() const;
+  [[nodiscard]] float get_furTime() const;
   void set_furTime(float newFurTime);
 
 public:

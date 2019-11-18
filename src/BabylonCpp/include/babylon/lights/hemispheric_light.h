@@ -23,19 +23,18 @@ public:
   template <typename... Ts>
   static HemisphericLightPtr New(Ts&&... args)
   {
-    auto light = std::shared_ptr<HemisphericLight>(
-      new HemisphericLight(std::forward<Ts>(args)...));
+    auto light = std::shared_ptr<HemisphericLight>(new HemisphericLight(std::forward<Ts>(args)...));
     light->addToScene(light);
 
     return light;
   }
-  ~HemisphericLight(); // = default
+  ~HemisphericLight() override; // = default
 
   /**
    * @brief Returns the string "HemisphericLight".
    * @return The class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   Type type() const override;
 
@@ -61,8 +60,7 @@ public:
    * @param lightIndex The index of the light in the effect to update
    * @returns The hemispheric light
    */
-  void transferToEffect(const EffectPtr& effect,
-                        const std::string& lightIndex) override;
+  void transferToEffect(const EffectPtr& effect, const std::string& lightIndex) override;
 
   /**
    * @brief Sets the passed Effect "effect" with the Light information.
@@ -71,8 +69,8 @@ public:
    * or direction)
    * @returns The light
    */
-  HemisphericLight& transferToNodeMaterialEffect(
-    const EffectPtr& effect, const std::string& lightDataUniformName) override;
+  HemisphericLight& transferToNodeMaterialEffect(const EffectPtr& effect,
+                                                 const std::string& lightDataUniformName) override;
 
   /**
    * @brief Computes the world matrix of the node
@@ -81,8 +79,7 @@ public:
    * @param useWasUpdatedFlag defines a reserved property
    * @returns the world matrix
    */
-  Matrix& computeWorldMatrix(bool force             = false,
-                             bool useWasUpdatedFlag = false) override;
+  Matrix& computeWorldMatrix(bool force = false, bool useWasUpdatedFlag = false) override;
 
   /**
    * @brief Returns the integer 3.
@@ -95,8 +92,7 @@ public:
    * @param defines the list of defines
    * @param lightIndex defines the index of the light for the effect
    */
-  void prepareLightSpecificDefines(MaterialDefines& defines,
-                                   unsigned int lightIndex) override;
+  void prepareLightSpecificDefines(MaterialDefines& defines, unsigned int lightIndex) override;
 
 protected:
   /**
@@ -110,8 +106,7 @@ protected:
    * @param scene The scene the light belongs to
    */
   HemisphericLight(const std::string& name, Scene* scene);
-  HemisphericLight(const std::string& name, const Vector3& direction,
-                   Scene* scene);
+  HemisphericLight(const std::string& name, const Vector3& direction, Scene* scene);
 
   void _buildUniformLayout() override;
 

@@ -5,8 +5,8 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
-#include <imgui_utils/icons_font_awesome_5.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_specialized_component.h>
+#include <imgui_utils/icons_font_awesome_5.h>
 
 namespace BABYLON {
 
@@ -24,8 +24,7 @@ struct LigtTreeItemComponentState {
   bool isGizmoEnabled = false;
 }; // end of struct CameraTreeItemComponentState
 
-class BABYLON_SHARED_EXPORT LightTreeItemComponent
-    : public TreeItemSpecializedComponent {
+class BABYLON_SHARED_EXPORT LightTreeItemComponent : public TreeItemSpecializedComponent {
 
 public:
   /** Font Awesome Icon Unicodes **/
@@ -35,7 +34,7 @@ public:
 
 public:
   LightTreeItemComponent(const ILightTreeItemComponentProps& props);
-  virtual ~LightTreeItemComponent(); // = default
+  ~LightTreeItemComponent() override; // = default
 
   void switchIsEnabled();
   void toggleGizmo();

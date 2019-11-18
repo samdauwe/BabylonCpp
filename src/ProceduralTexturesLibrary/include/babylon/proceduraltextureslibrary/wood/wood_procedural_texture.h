@@ -23,7 +23,7 @@ public:
 
     return texture;
   }
-  ~WoodProceduralTexture(); // = default
+  ~WoodProceduralTexture() override; // = default
 
   void updateShaderUniforms();
 
@@ -42,13 +42,12 @@ public:
    * information
    * @returns a parsed Wood Procedural Texture
    */
-  static std::unique_ptr<WoodProceduralTexture>
-  Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
+  static std::unique_ptr<WoodProceduralTexture> Parse(const json& parsedTexture, Scene* scene,
+                                                      const std::string& rootUrl);
 
 protected:
   WoodProceduralTexture(const std::string& name, const Size& size, Scene* scene,
-                        Texture* fallbackTexture = nullptr,
-                        bool generateMipMaps     = false);
+                        Texture* fallbackTexture = nullptr, bool generateMipMaps = false);
 
   float get_ampScale() const;
   void set_ampScale(float value);

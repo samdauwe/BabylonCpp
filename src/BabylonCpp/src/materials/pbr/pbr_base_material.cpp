@@ -205,7 +205,7 @@ bool PBRBaseMaterial::get_hasRenderTargetTextures() const
   return subSurface->hasRenderTargetTextures();
 }
 
-const std::string PBRBaseMaterial::getClassName() const
+std::string PBRBaseMaterial::getClassName() const
 {
   return "PBRBaseMaterial";
 }
@@ -457,13 +457,11 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
 bool PBRBaseMaterial::isMetallicWorkflow() const
 {
-  if ((_metallic.has_value() && _metallic.value() != 0.f)
-      || (_roughness.has_value() && _roughness.value() != 0.f)
-      || _metallicTexture) {
-    return true;
-  }
+  return (_metallic.has_value() && _metallic.value() != 0.f)
 
-  return false;
+         || (_roughness.has_value() && _roughness.value() != 0.f)
+
+         || _metallicTexture;
 }
 
 EffectPtr PBRBaseMaterial::_prepareEffect(
@@ -835,7 +833,7 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
           case TextureConstants::INVCUBIC_MODE:
             defines.boolDef["REFLECTIONMAP_CUBIC"] = true;
             defines.boolDef["USE_LOCAL_REFLECTIONMAP_CUBIC"]
-              = reflectionTexture->boundingBoxSize() ? true : false;
+              = static_cast<bool>(reflectionTexture->boundingBoxSize());
             break;
         }
 
@@ -1057,8 +1055,7 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
 
   // Values that need to be evaluated on every frame
   MaterialHelper::PrepareDefinesForFrameBoundValues(
-    scene, engine, defines,
-    (useInstances.has_value() && (*useInstances)) ? true : false, useClipPlane);
+    scene, engine, defines, useInstances.has_value() && (*useInstances), useClipPlane);
 
   // Attribs
   MaterialHelper::PrepareDefinesForAttributes(

@@ -146,12 +146,12 @@ void FreeCameraTouchInput::checkInputs()
   }
 }
 
-const std::string FreeCameraTouchInput::getClassName() const
+std::string FreeCameraTouchInput::getClassName() const
 {
   return "FreeCameraTouchInput";
 }
 
-const std::string FreeCameraTouchInput::getSimpleName() const
+std::string FreeCameraTouchInput::getSimpleName() const
 {
   return "touch";
 }

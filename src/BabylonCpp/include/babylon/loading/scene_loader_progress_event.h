@@ -20,8 +20,7 @@ public:
    * @param loaded defines the loaded data length
    * @param total defines the data length to load
    */
-  SceneLoaderProgressEvent(bool lengthComputable = false, size_t loaded = 0,
-                           size_t total = 0);
+  SceneLoaderProgressEvent(bool lengthComputable = false, size_t loaded = 0, size_t total = 0);
   SceneLoaderProgressEvent(const SceneLoaderProgressEvent& other);
   SceneLoaderProgressEvent(SceneLoaderProgressEvent&& other);
   SceneLoaderProgressEvent& operator=(const SceneLoaderProgressEvent& other);
@@ -41,20 +40,20 @@ protected:
    * the amount of work already done, by the underlying process is calculable.
    * In other words, it tells if the progress is measurable or not.
    */
-  bool get_lengthComputable() const;
+  [[nodiscard]] bool get_lengthComputable() const;
 
   /**
    * @brief Gets the amount of work already performed by the underlying process.
    * The ratio of work done can be calculated with the property and
    * SceneLoaderProgressEvent.total.
    */
-  size_t get_loaded() const;
+  [[nodiscard]] size_t get_loaded() const;
 
   /**
    * @brief Gets the total amount of work that the underlying process is in the
    * progress of performing.
    */
-  size_t get_total() const;
+  [[nodiscard]] size_t get_total() const;
 
 public:
   /**

@@ -33,12 +33,12 @@ public:
    * ray.
    */
   SixDofDragBehavior();
-  virtual ~SixDofDragBehavior(); // = default
+  ~SixDofDragBehavior() override; // = default
 
   /**
    * @brief The name of the behavior.
    */
-  const std::string name() const;
+  [[nodiscard]] std::string name() const;
 
   /**
    * @brief Initializes the behavior.
@@ -51,8 +51,7 @@ public:
    * @param predicate Predicate to use for pick filtering
    */
   void attach(const MeshPtr& ownerNode,
-              const std::function<bool(const AbstractMeshPtr& m)>& predicate
-              = nullptr) override;
+              const std::function<bool(const AbstractMeshPtr& m)>& predicate = nullptr) override;
 
   /**
    * @brief Detaches the behavior from the mesh.

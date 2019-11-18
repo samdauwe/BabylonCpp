@@ -10,14 +10,14 @@ namespace Extensions {
 
 namespace RVO2 {
 class RVOSimulator;
-}
+} // namespace RVO2
 
 class BABYLON_SHARED_EXPORT CrowdCollisionAvoidanceSystem
-  : public ECS::System<ECS::Requires<CrowdAgent>> {
+    : public ECS::System<ECS::Requires<CrowdAgent>> {
 
 public:
   CrowdCollisionAvoidanceSystem(RVO2::RVOSimulator* sim);
-  ~CrowdCollisionAvoidanceSystem(); // = default
+  ~CrowdCollisionAvoidanceSystem() override; // = default
 
   void update();
 

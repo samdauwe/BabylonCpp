@@ -1,11 +1,11 @@
 #ifndef BABYLON_MATERIALS_LIBRARY_CUSTOM_CUSTOM_MATERIAL_H
 #define BABYLON_MATERIALS_LIBRARY_CUSTOM_CUSTOM_MATERIAL_H
 
-#include <unordered_map>
 #include <babylon/babylon_api.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materialslibrary/custom/shader_special_parts.h>
 #include <babylon/math/vector4.h>
+#include <unordered_map>
 
 namespace BABYLON {
 
@@ -27,16 +27,13 @@ class BABYLON_SHARED_EXPORT CustomMaterial : public StandardMaterial {
 
 public:
   CustomMaterial(const std::string& name, Scene* scene);
-  ~CustomMaterial(); // = default
+  ~CustomMaterial() override; // = default
 
   void AttachAfterBind(Mesh* mesh, Effect* effect);
-  std::vector<std::string> ReviewUniform(const std::string& name,
-                                         std::vector<std::string> arr);
-  std::string Builder(const std::string& shaderName,
-                      const std::vector<std::string>& uniforms,
+  std::vector<std::string> ReviewUniform(const std::string& name, std::vector<std::string> arr);
+  std::string Builder(const std::string& shaderName, const std::vector<std::string>& uniforms,
                       const std::vector<std::string>& uniformBuffers,
-                      const std::vector<std::string>& samplers,
-                      StandardMaterialDefines& defines);
+                      const std::vector<std::string>& samplers, StandardMaterialDefines& defines);
   CustomMaterial& AddUniform(const std::string& name, const std::string& kind,
                              const std::optional<UniformInstance>& param);
   CustomMaterial& Fragment_Begin(const std::string& shaderPart);

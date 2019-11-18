@@ -18,18 +18,17 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   MaterialDefines(MaterialDefines&& other);
   MaterialDefines& operator=(const MaterialDefines& other);
   MaterialDefines& operator=(MaterialDefines&& other);
-  virtual ~MaterialDefines(); // = default
+  ~MaterialDefines() override; // = default
 
   bool operator[](const std::string& define) const;
   bool operator==(const MaterialDefines& rhs) const;
   bool operator!=(const MaterialDefines& rhs) const;
-  friend std::ostream& operator<<(std::ostream& os,
-                                  const MaterialDefines& materialDefines);
+  friend std::ostream& operator<<(std::ostream& os, const MaterialDefines& materialDefines);
 
   /**
    * @brief Specifies if the material needs to be re-calculated.
    */
-  bool isDirty() const override;
+  [[nodiscard]] bool isDirty() const override;
 
   /**
    * @brief Marks the material to indicate that it has been re-calculated.
@@ -82,7 +81,7 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   /**
    * @brief Rebuilds the material defines.
    */
-  virtual void rebuild() override;
+  void rebuild() override;
 
   /**
    * @brief Specifies if two material defines are equal.
@@ -90,24 +89,24 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
    * @returns - Boolean indicating if the material defines are equal (true) or
    * not (false).
    */
-  virtual bool isEqual(const MaterialDefines& other) const override;
+  [[nodiscard]] bool isEqual(const MaterialDefines& other) const override;
 
   /**
    * @brief Clones this instance's defines to another instance.
    * @param other - material defines to clone values to.
    */
-  virtual void cloneTo(MaterialDefines& other) override;
+  void cloneTo(MaterialDefines& other) override;
 
   /**
    * @brief Resets the material define values.
    */
-  virtual void reset() override;
+  void reset() override;
 
   /**
    * @brief Converts the material define values to a string.
    * @returns String of material define information.
    */
-  virtual std::string toString() const override;
+  [[nodiscard]] std::string toString() const override;
 
   // Properties
   std::unordered_map<std::string, bool> boolDef;

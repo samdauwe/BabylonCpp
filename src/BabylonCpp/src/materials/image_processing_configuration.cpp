@@ -279,7 +279,7 @@ void ImageProcessingConfiguration::_updateParameters()
   onUpdateParameters.notifyObservers(this);
 }
 
-const std::string ImageProcessingConfiguration::getClassName() const
+std::string ImageProcessingConfiguration::getClassName() const
 {
   return "ImageProcessingConfiguration";
 }

@@ -47,12 +47,12 @@ void PointParticleEmitter::applyToShader(Effect* effect)
   effect->setVector3("direction2", direction2);
 }
 
-const std::string PointParticleEmitter::getEffectDefines() const
+std::string PointParticleEmitter::getEffectDefines() const
 {
   return "#define POINTEMITTER";
 }
 
-const std::string PointParticleEmitter::getClassName() const
+std::string PointParticleEmitter::getClassName() const
 {
   return "PointParticleEmitter";
 }

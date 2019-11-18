@@ -74,8 +74,8 @@ public:
   }
 
 private:
-  Vector3 _sampleSuperEllipsoid(float phi, float beta, float n1, float n2, float scaleX,
-                                float scaleY, float scaleZ) const
+  [[nodiscard]] Vector3 _sampleSuperEllipsoid(float phi, float beta, float n1, float n2,
+                                              float scaleX, float scaleY, float scaleZ) const
   {
     Vector3 vertex;
     float cosPhi  = std::cos(phi);
@@ -90,8 +90,8 @@ private:
     return vertex;
   }
 
-  Vector3 _calculateNormal(float phi, float beta, float n1, float n2, float scaleX, float scaleY,
-                           float scaleZ) const
+  [[nodiscard]] Vector3 _calculateNormal(float phi, float beta, float n1, float n2, float scaleX,
+                                         float scaleY, float scaleZ) const
   {
     Vector3 normal;
     float cosPhi  = std::cos(phi);

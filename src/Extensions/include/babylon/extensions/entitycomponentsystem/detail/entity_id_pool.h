@@ -68,14 +68,14 @@ public:
 
   /// \param The index you wish to access the Entity::Id at
   /// \return An Entity::Id at index
-  Entity::Id get(std::size_t index) const;
+  [[nodiscard]] Entity::Id get(std::size_t index) const;
 
   /// Determines if an Entity ID is valid
   /// \return true if the ID is valid
-  bool isValid(Entity::Id id) const;
+  [[nodiscard]] bool isValid(Entity::Id id) const;
 
   /// \return The amount of entities that this pool can store
-  std::size_t getSize() const;
+  [[nodiscard]] std::size_t getSize() const;
 
   /// Resizes the pool
   /// \param amount The amount you wish to resize

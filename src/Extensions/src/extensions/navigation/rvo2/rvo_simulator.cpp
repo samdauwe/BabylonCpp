@@ -44,17 +44,15 @@ namespace BABYLON {
 namespace Extensions {
 namespace RVO2 {
 
-RVOSimulator::RVOSimulator()
-    : defaultAgent_(NULL), globalTime_(0.0f), kdTree_(NULL), timeStep_(0.0f)
+RVOSimulator::RVOSimulator() : defaultAgent_(nullptr), kdTree_(nullptr)
 {
   kdTree_ = new KdTree(this);
 }
 
-RVOSimulator::RVOSimulator(float timeStep, float neighborDist,
-                           size_t maxNeighbors, float timeHorizon,
-                           float timeHorizonObst, float radius, float maxSpeed,
+RVOSimulator::RVOSimulator(float timeStep, float neighborDist, size_t maxNeighbors,
+                           float timeHorizon, float timeHorizonObst, float radius, float maxSpeed,
                            const Vector2& velocity)
-    : defaultAgent_(NULL), globalTime_(0.0f), kdTree_(NULL), timeStep_(timeStep)
+    : defaultAgent_(nullptr), globalTime_(0.0f), kdTree_(nullptr), timeStep_(timeStep)
 {
   kdTree_       = new KdTree(this);
   defaultAgent_ = new Agent(this);
@@ -70,16 +68,16 @@ RVOSimulator::RVOSimulator(float timeStep, float neighborDist,
 
 RVOSimulator::~RVOSimulator()
 {
-  if (defaultAgent_ != NULL) {
+  if (defaultAgent_ != nullptr) {
     delete defaultAgent_;
   }
 
-  for (size_t i = 0; i < agents_.size(); ++i) {
-    delete agents_[i];
+  for (auto& agent : agents_) {
+    delete agent;
   }
 
-  for (size_t i = 0; i < obstacles_.size(); ++i) {
-    delete obstacles_[i];
+  for (auto& obstacle : obstacles_) {
+    delete obstacle;
   }
 
   delete kdTree_;
@@ -87,11 +85,11 @@ RVOSimulator::~RVOSimulator()
 
 size_t RVOSimulator::addAgent(const Vector2& position)
 {
-  if (defaultAgent_ == NULL) {
+  if (defaultAgent_ == nullptr) {
     return RVO_ERROR;
   }
 
-  Agent* agent = new Agent(this);
+  auto* agent = new Agent(this);
 
   agent->position_        = position;
   agent->maxNeighbors_    = defaultAgent_->maxNeighbors_;
@@ -114,7 +112,7 @@ size_t RVOSimulator::addAgent(const Vector2& position, float neighborDist,
                               float timeHorizonObst, float radius,
                               float maxSpeed, const Vector2& velocity)
 {
-  Agent* agent = new Agent(this);
+  auto* agent = new Agent(this);
 
   agent->position_        = position;
   agent->maxNeighbors_    = maxNeighbors;
@@ -141,7 +139,7 @@ size_t RVOSimulator::addObstacle(const std::vector<Vector2>& vertices)
   const size_t obstacleNo = obstacles_.size();
 
   for (size_t i = 0; i < vertices.size(); ++i) {
-    Obstacle* obstacle = new Obstacle();
+    auto* obstacle     = new Obstacle();
     obstacle->point_   = vertices[i];
 
     if (i != 0) {
@@ -182,16 +180,16 @@ void RVOSimulator::doStep()
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-  for (int i = 0; i < static_cast<int>(agents_.size()); ++i) {
-    agents_[i]->computeNeighbors();
-    agents_[i]->computeNewVelocity();
+  for (auto& agent : agents_) {
+    agent->computeNeighbors();
+    agent->computeNewVelocity();
   }
 
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-  for (int i = 0; i < static_cast<int>(agents_.size()); ++i) {
-    agents_[i]->update();
+  for (auto& agent : agents_) {
+    agent->update();
   }
 
   globalTime_ += timeStep_;
@@ -325,7 +323,7 @@ void RVOSimulator::setAgentDefaults(float neighborDist, size_t maxNeighbors,
                                     float radius, float maxSpeed,
                                     const Vector2& velocity)
 {
-  if (defaultAgent_ == NULL) {
+  if (defaultAgent_ == nullptr) {
     defaultAgent_ = new Agent(this);
   }
 

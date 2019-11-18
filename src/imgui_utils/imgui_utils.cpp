@@ -4,7 +4,7 @@
 
 // Use stb_image.h to load a PNG from disk and turn it into raw RGBA pixel data:
 #define STB_IMAGE_IMPLEMENTATION
-#include <babylon/utils/stb_image.h>
+#include <stb_image/stb_image.h>
 #include <babylon/core/filesystem.h>
 
 
@@ -26,7 +26,7 @@ namespace ImGuiUtils
         return;
       }
 
-      unsigned char* my_image_data = stbi_load(filename.c_str(), &_width, &_height, NULL, 4);
+      unsigned char* my_image_data = stbi_load(filename.c_str(), &_width, &_height, nullptr, 4);
 
       // Turn the RGBA pixel data into an OpenGL texture:
       glGenTextures(1, &_textureId);
@@ -67,4 +67,4 @@ namespace ImGuiUtils
     }
   }
 
-}
+  } // namespace ImGuiUtils

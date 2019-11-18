@@ -276,11 +276,7 @@ bool RenderingGroup::frontToBackSortCompare(SubMesh* a, SubMesh* b)
   if (a->_distanceToCamera < b->_distanceToCamera) {
     return false;
   }
-  if (a->_distanceToCamera > b->_distanceToCamera) {
-    return true;
-  }
-
-  return false;
+  return a->_distanceToCamera > b->_distanceToCamera;
 }
 
 void RenderingGroup::prepare()

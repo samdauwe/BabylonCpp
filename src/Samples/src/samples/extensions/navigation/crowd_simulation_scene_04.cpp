@@ -1,3 +1,5 @@
+#include <memory>
+
 #include <vector>
 
 #include <babylon/cameras/arc_rotate_camera.h>
@@ -89,13 +91,12 @@ private:
     _agentMeshes = CrowdSimulationUtils::createAgentMeshes(scene, 128);
 
     // Create new crowd simulation
-    _crowdSimulation.reset(new Extensions::CrowdSimulation());
+    _crowdSimulation = std::make_unique<Extensions::CrowdSimulation>();
     _crowdSimulation->setTimeStep(0.3f);
 
     // Create agents
-    for (size_t agentNo = 0; agentNo < _agentMeshes.size(); ++agentNo) {
-      auto agentMesh = _agentMeshes[agentNo];
-      auto agentId   = _crowdSimulation->addAgent(agentMesh);
+    for (auto agentMesh : _agentMeshes) {
+      auto agentId = _crowdSimulation->addAgent(agentMesh);
       _crowdSimulation->setAgentGoal(agentId,
                                      Vector2(-agentMesh->position().x, -agentMesh->position().z));
       _crowdSimulation->setAgentMaxSpeed(agentId, 1.f);

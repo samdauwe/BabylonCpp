@@ -202,12 +202,7 @@ void ScenePropertyGridComponent::render()
   if (_dummy.has_value()) {
     static auto physicsContainerOpened = false;
     ImGui::SetNextTreeNodeOpen(physicsContainerOpened, ImGuiCond_Always);
-    if (ImGui::CollapsingHeader("PHYSICS")) {
-      physicsContainerOpened = true;
-    }
-    else {
-      physicsContainerOpened = false;
-    }
+    physicsContainerOpened = ImGui::CollapsingHeader("PHYSICS");
   }
   // --- COLLISIONS ---
   static auto collisionsContainerOpened = true;

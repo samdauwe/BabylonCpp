@@ -28,13 +28,13 @@ public:
 
     return camera;
   }
-  ~AnaglyphGamepadCamera(); // = default
+  ~AnaglyphGamepadCamera() override; // = default
 
   /**
    * @brief Gets camera class name.
    * @returns AnaglyphGamepadCamera
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
 protected:
   /**
@@ -44,8 +44,8 @@ protected:
    * @param interaxialDistance defines distance between each color axis
    * @param scene defines the hosting scene
    */
-  AnaglyphGamepadCamera(const std::string& name, const Vector3& position,
-                        float interaxialDistance, Scene* scene);
+  AnaglyphGamepadCamera(const std::string& name, const Vector3& position, float interaxialDistance,
+                        Scene* scene);
 
 private:
   static bool NodeConstructorAdded;

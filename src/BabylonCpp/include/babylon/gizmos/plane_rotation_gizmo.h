@@ -29,20 +29,17 @@ public:
    * rotation circles
    * @param useEulerRotation Use and update Euler angle instead of quaternion
    */
-  PlaneRotationGizmo(const Vector3& planeNormal,
-                     const Color3& color = Color3::Gray(),
+  PlaneRotationGizmo(const Vector3& planeNormal, const Color3& color = Color3::Gray(),
                      const std::shared_ptr<UtilityLayerRenderer>& gizmoLayer
                      = UtilityLayerRenderer::DefaultUtilityLayer(),
-                     unsigned int tessellation = 32,
-                     RotationGizmo* parent     = nullptr,
-                     bool useEulerRotation     = false);
-  ~PlaneRotationGizmo(); // = default
+                     unsigned int tessellation = 32, RotationGizmo* parent = nullptr,
+                     bool useEulerRotation = false);
+  ~PlaneRotationGizmo() override; // = default
 
   /**
    * @brief Disposes of the gizmo.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
 protected:
   void _attachedMeshChanged(const AbstractMeshPtr& value) override;
@@ -50,7 +47,7 @@ protected:
   /**
    * @brief Gets If the gizmo is enabled.
    */
-  bool get_isEnabled() const;
+  [[nodiscard]] bool get_isEnabled() const;
 
   /**
    * @brief Sets if the gizmo is enabled.

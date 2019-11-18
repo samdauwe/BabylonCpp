@@ -21,9 +21,8 @@ public:
    * @param sound defines the sound to stop
    * @param condition defines the trigger related conditions
    */
-  StopSoundAction(unsigned int triggerOptions, Sound* sound,
-                  Condition* condition = nullptr);
-  ~StopSoundAction(); // = default
+  StopSoundAction(unsigned int triggerOptions, Sound* sound, Condition* condition = nullptr);
+  ~StopSoundAction() override; // = default
 
   /**
    * @brief Hidden

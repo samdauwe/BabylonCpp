@@ -38,8 +38,7 @@ public:
    * @param markAllSubMeshesAsTexturesDirty Callback to flag the material to
    * dirty
    */
-  PBRClearCoatConfiguration(
-    const std::function<void()>& markAllSubMeshesAsTexturesDirty);
+  PBRClearCoatConfiguration(const std::function<void()>& markAllSubMeshesAsTexturesDirty);
   ~PBRClearCoatConfiguration(); // = default
 
   /**
@@ -55,8 +54,8 @@ public:
    * @param disableBumpMap defines wether the material disables bump or not.
    * @returns - boolean indicating that the submesh is ready or not.
    */
-  bool isReadyForSubMesh(const MaterialDefines& defines, Scene* scene,
-                         Engine* engine, bool disableBumpMap) const;
+  bool isReadyForSubMesh(const MaterialDefines& defines, Scene* scene, Engine* engine,
+                         bool disableBumpMap) const;
 
   /**
    * @brief Checks to see if a texture is used in the material.
@@ -77,16 +76,16 @@ public:
    * @param invertNormalMapY If sets to true, y component of normal map value
    * will be inverted (y = 1.0 - y).
    */
-  void bindForSubMesh(UniformBuffer& uniformBuffer, Scene* scene,
-                      Engine* engine, bool disableBumpMap, bool isFrozen,
-                      bool invertNormalMapX, bool invertNormalMapY);
+  void bindForSubMesh(UniformBuffer& uniformBuffer, Scene* scene, Engine* engine,
+                      bool disableBumpMap, bool isFrozen, bool invertNormalMapX,
+                      bool invertNormalMapY);
 
   /**
    * @brief Checks to see if a texture is used in the material.
    * @param texture - Base texture to use.
    * @returns - Boolean specifying if a texture is used in the material.
    */
-  bool hasTexture(const BaseTexturePtr& texture) const;
+  [[nodiscard]] bool hasTexture(const BaseTexturePtr& texture) const;
 
   /**
    * @brief Returns an array of the actively used textures.
@@ -111,7 +110,7 @@ public:
    * or dynamic coding.
    * @returns "PBRClearCoatConfiguration"
    */
-  const std::string getClassName() const;
+  [[nodiscard]] std::string getClassName() const;
 
   /**
    * @briefAdd fallbacks to the effect fallbacks list.
@@ -121,8 +120,7 @@ public:
    * @returns the new fallback rank.
    */
   static unsigned int AddFallbacks(const IMaterialClearCoatDefines& defines,
-                                   EffectFallbacks& fallbacks,
-                                   unsigned int currentRank);
+                                   EffectFallbacks& fallbacks, unsigned int currentRank);
 
   /**
    * @brief Add the required uniforms to the current list.
@@ -152,7 +150,7 @@ public:
    * @brief Serializes this clear coat configuration.
    * @returns - An object with the serialized config.
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Parses a Clear Coat Configuration from a serialized object.
@@ -163,15 +161,15 @@ public:
   void parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
-  bool get_isEnabled() const;
+  [[nodiscard]] bool get_isEnabled() const;
   void set_isEnabled(bool value);
-  float get_indexOfRefraction() const;
+  [[nodiscard]] float get_indexOfRefraction() const;
   void set_indexOfRefraction(float value);
   BaseTexturePtr& get_texture();
   void set_texture(const BaseTexturePtr& value);
   BaseTexturePtr& get_bumpTexture();
   void set_bumpTexture(const BaseTexturePtr& value);
-  bool get_isTintEnabled() const;
+  [[nodiscard]] bool get_isTintEnabled() const;
   void set_isTintEnabled(bool value);
   BaseTexturePtr& get_tintTexture();
   void set_tintTexture(const BaseTexturePtr& value);

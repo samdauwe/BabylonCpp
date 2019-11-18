@@ -43,7 +43,7 @@ IShaderMaterialOptions& ShaderMaterial::options()
   return _options;
 }
 
-const std::string ShaderMaterial::getClassName() const
+std::string ShaderMaterial::getClassName() const
 {
   return "ShaderMaterial";
 }
@@ -537,8 +537,8 @@ std::vector<BaseTexturePtr> ShaderMaterial::getActiveTextures() const
 
   for (const auto& textureArrayItem : _textureArrays) {
     const auto& array = textureArrayItem.second;
-    for (std::size_t index = 0; index < array.size(); ++index) {
-      activeTextures.emplace_back(array[index]);
+    for (const auto& index : array) {
+      activeTextures.emplace_back(index);
     }
   }
 
@@ -566,11 +566,7 @@ bool ShaderMaterial::hasTexture(const BaseTexturePtr& texture) const
       const std::pair<std::string, std::vector<BaseTexturePtr>>& textures) {
       return stl_util::contains(textures.second, texture);
     });
-  if (it2 != _textureArrays.end()) {
-    return true;
-  }
-
-  return false;
+  return it2 != _textureArrays.end();
 }
 
 MaterialPtr ShaderMaterial::clone(const std::string& iName,

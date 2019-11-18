@@ -48,56 +48,47 @@ public:
   /**
    * @brief Returns the triangle fill mode.
    */
-  static constexpr unsigned int TriangleFillMode
-    = Constants::MATERIAL_TriangleFillMode;
+  static constexpr unsigned int TriangleFillMode = Constants::MATERIAL_TriangleFillMode;
 
   /**
    * @brief Returns the wireframe mode.
    */
-  static constexpr unsigned int WireFrameFillMode
-    = Constants::MATERIAL_WireFrameFillMode;
+  static constexpr unsigned int WireFrameFillMode = Constants::MATERIAL_WireFrameFillMode;
 
   /**
    * @brief Returns the point fill mode.
    */
-  static constexpr unsigned int PointFillMode
-    = Constants::MATERIAL_PointFillMode;
+  static constexpr unsigned int PointFillMode = Constants::MATERIAL_PointFillMode;
 
   /**
    * @brief Returns the point list draw mode.
    */
-  static constexpr unsigned int PointListDrawMode
-    = Constants::MATERIAL_PointListDrawMode;
+  static constexpr unsigned int PointListDrawMode = Constants::MATERIAL_PointListDrawMode;
 
   /**
    * @brief Returns the line list draw mode.
    */
-  static constexpr unsigned int LineListDrawMode
-    = Constants::MATERIAL_LineListDrawMode;
+  static constexpr unsigned int LineListDrawMode = Constants::MATERIAL_LineListDrawMode;
 
   /**
    * @brief Returns the line loop draw mode.
    */
-  static constexpr unsigned int LineLoopDrawMode
-    = Constants::MATERIAL_LineLoopDrawMode;
+  static constexpr unsigned int LineLoopDrawMode = Constants::MATERIAL_LineLoopDrawMode;
 
   /**
    * @brief Returns the line strip draw mode.
    */
-  static constexpr unsigned int LineStripDrawMode
-    = Constants::MATERIAL_LineStripDrawMode;
+  static constexpr unsigned int LineStripDrawMode = Constants::MATERIAL_LineStripDrawMode;
 
   /**
    * @brief Returns the triangle strip draw mode.
    */
-  static constexpr unsigned int TriangleStripDrawMode
-    = Constants::MATERIAL_TriangleStripDrawMode;
+  static constexpr unsigned int TriangleStripDrawMode = Constants::MATERIAL_TriangleStripDrawMode;
 
   /**
    * @brief Returns the triangle fan draw mode.
    */
-  static constexpr unsigned int TriangleFanDrawMode
-    = Constants::MATERIAL_TriangleFanDrawMode;
+  static constexpr unsigned int TriangleFanDrawMode = Constants::MATERIAL_TriangleFanDrawMode;
 
   /**
    * @brief Returns the clock-wise side orientation.
@@ -114,53 +105,47 @@ public:
   /**
    * The dirty texture flag value
    */
-  static constexpr unsigned int TextureDirtyFlag
-    = Constants::MATERIAL_TextureDirtyFlag;
+  static constexpr unsigned int TextureDirtyFlag = Constants::MATERIAL_TextureDirtyFlag;
 
   /**
    * The dirty light flag value
    */
-  static constexpr unsigned int LightDirtyFlag
-    = Constants::MATERIAL_LightDirtyFlag;
+  static constexpr unsigned int LightDirtyFlag = Constants::MATERIAL_LightDirtyFlag;
 
   /**
    * The dirty fresnel flag value
    */
-  static constexpr unsigned int FresnelDirtyFlag
-    = Constants::MATERIAL_FresnelDirtyFlag;
+  static constexpr unsigned int FresnelDirtyFlag = Constants::MATERIAL_FresnelDirtyFlag;
 
   /**
    * The dirty attribute flag value
    */
-  static constexpr unsigned int AttributesDirtyFlag
-    = Constants::MATERIAL_AttributesDirtyFlag;
+  static constexpr unsigned int AttributesDirtyFlag = Constants::MATERIAL_AttributesDirtyFlag;
 
   /**
    * The dirty misc flag value
    */
-  static constexpr unsigned int MiscDirtyFlag
-    = Constants::MATERIAL_MiscDirtyFlag;
+  static constexpr unsigned int MiscDirtyFlag = Constants::MATERIAL_MiscDirtyFlag;
 
   /**
    * The all dirty flag value
    */
   static constexpr unsigned int AllDirtyFlag = Constants::MATERIAL_AllDirtyFlag;
 
-  virtual ~Material(); // = default
+  ~Material() override; // = default
 
-  virtual Type type() const override;
+  [[nodiscard]] Type type() const override;
 
   /**
    * @brief Gets a property.
    */
-  virtual AnimationValue
-  getProperty(const std::vector<std::string>& targetPropertyPath) override;
+  AnimationValue getProperty(const std::vector<std::string>& targetPropertyPath) override;
 
   /**
    * @brief Sets a property.
    */
-  virtual void setProperty(const std::vector<std::string>& targetPropertyPath,
-                           const AnimationValue& value) override;
+  void setProperty(const std::vector<std::string>& targetPropertyPath,
+                   const AnimationValue& value) override;
 
   /**
    * @param Returns a string representation of the current material.
@@ -168,18 +153,18 @@ public:
    * desired
    * @returns a string with material information
    */
-  std::string toString(bool fullDetails = false) const;
+  [[nodiscard]] std::string toString(bool fullDetails = false) const;
 
   /**
    * @param Gets the class name of the material.
    * @returns a string with the class name of the material
    */
-  virtual const std::string getClassName() const;
+  [[nodiscard]] virtual std::string getClassName() const;
 
   /**
    * @brief Specifies if updates for the material been locked.
    */
-  bool isFrozen() const;
+  [[nodiscard]] bool isFrozen() const;
 
   /**
    * @brief Locks updates for the material.
@@ -219,26 +204,26 @@ public:
    * @brief Returns the current scene.
    * @returns a Scene
    */
-  Scene* getScene() const;
+  [[nodiscard]] Scene* getScene() const;
 
   /**
    * @brief Specifies if the material will require alpha blending.
    * @returns a boolean specifying if alpha blending is needed
    */
-  virtual bool needAlphaBlending() const;
+  [[nodiscard]] virtual bool needAlphaBlending() const;
 
   /**
    * @brief Specifies if the mesh will require alpha blending.
    * @param mesh defines the mesh to check
    * @returns a boolean specifying if alpha blending is needed for the mesh
    */
-  virtual bool needAlphaBlendingForMesh(const AbstractMesh& mesh) const;
+  [[nodiscard]] virtual bool needAlphaBlendingForMesh(const AbstractMesh& mesh) const;
 
   /**
    * @brief Specifies if this material should be rendered in alpha test mode.
    * @returns a boolean specifying if an alpha test is needed.
    */
-  virtual bool needAlphaTesting() const;
+  [[nodiscard]] virtual bool needAlphaTesting() const;
 
   /**
    * @brief Gets the texture used for the alpha test.
@@ -306,22 +291,22 @@ public:
    * @brief Gets the active textures from the material.
    * @returns an array of textures
    */
-  virtual std::vector<BaseTexturePtr> getActiveTextures() const;
+  [[nodiscard]] virtual std::vector<BaseTexturePtr> getActiveTextures() const;
 
   /**
    * @brief Specifies if the material uses a texture.
    * @param texture defines the texture to check against the material
    * @returns a boolean specifying if the material uses the texture
    */
-  virtual bool hasTexture(const BaseTexturePtr& texture) const;
+  [[nodiscard]] virtual bool hasTexture(const BaseTexturePtr& texture) const;
 
   /**
    * @brief akes a duplicate of the material, and gives it a new name.
    * @param name defines the new name for the duplicated material
    * @returns the cloned material
    */
-  virtual MaterialPtr clone(const std::string& name,
-                            bool cloneChildren = false) const;
+  [[nodiscard]] virtual MaterialPtr clone(const std::string& name,
+                                          bool cloneChildren = false) const;
 
   /**
    * @brief Gets the meshes bound to the material.
@@ -336,10 +321,9 @@ public:
    * compiled
    * @param options defines the options to configure the compilation
    */
-  void
-  forceCompilation(AbstractMesh* mesh,
-                   const std::function<void(Material* material)>& onCompiled,
-                   std::optional<bool> clipPlane = false);
+  void forceCompilation(AbstractMesh* mesh,
+                        const std::function<void(Material* material)>& onCompiled,
+                        std::optional<bool> clipPlane = false);
 
   /**
    * @brief Marks a define in the material to indicate that it needs to be
@@ -347,7 +331,7 @@ public:
    * @param flag defines a flag used to determine which parts of the material
    * have to be marked as dirty
    */
-  virtual void markAsDirty(unsigned int flag) override;
+  void markAsDirty(unsigned int flag) override;
 
   /**
    * @brief Disposes the material.
@@ -358,20 +342,18 @@ public:
    * @param notBoundToMesh specifies if the material that is being disposed is
    * known to be not bound to any mesh
    */
-  virtual void dispose(bool forceDisposeEffect   = false,
-                       bool forceDisposeTextures = false,
-                       bool notBoundToMesh       = false);
+  virtual void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
+                       bool notBoundToMesh = false);
 
   /**
    * Serializes this material.
    * @returns the serialized material object
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
-  virtual void
-  trackCreation(const std::function<void(const EffectPtr& effect)>& onCompiled,
-                const std::function<void(const EffectPtr& effect,
-                                         const std::string& errors)>& onError);
+  virtual void trackCreation(
+    const std::function<void(const EffectPtr& effect)>& onCompiled,
+    const std::function<void(const EffectPtr& effect, const std::string& errors)>& onError);
 
   void addMaterialToScene(const MaterialPtr& newMaterial);
   void addMultiMaterialToScene(const MultiMaterialPtr& newMultiMaterial);
@@ -384,8 +366,7 @@ public:
    * @param scene defines the hosting scene
    * @returns a new MultiMaterial
    */
-  static MultiMaterialPtr ParseMultiMaterial(const json& parsedMultiMaterial,
-                                             Scene* scene);
+  static MultiMaterialPtr ParseMultiMaterial(const json& parsedMultiMaterial, Scene* scene);
 
   /**
    * @brief Creates a material from parsed material data.
@@ -394,8 +375,7 @@ public:
    * @param rootUrl defines the root URL to use to load textures
    * @returns a new material
    */
-  static MaterialPtr Parse(const json& parsedMaterial, Scene* scene,
-                           const std::string& rootUrl);
+  static MaterialPtr Parse(const json& parsedMaterial, Scene* scene, const std::string& rootUrl);
 
 protected:
   /**
@@ -415,7 +395,7 @@ protected:
   /**
    * @brief Gets the alpha value of the material.
    */
-  float get_alpha() const;
+  [[nodiscard]] float get_alpha() const;
 
   /**
    * @brief Sets the back-face culling state.
@@ -425,19 +405,18 @@ protected:
   /**
    * @brief Gets the back-face culling state.
    */
-  bool get_backFaceCulling() const;
+  [[nodiscard]] bool get_backFaceCulling() const;
 
   /**
    * @brief Gets a boolean indicating that current material needs to register
    * RTT.
    */
-  virtual bool get_hasRenderTargetTextures() const;
+  [[nodiscard]] virtual bool get_hasRenderTargetTextures() const;
 
   /**
    * @brief Called during a dispose event.
    */
-  void
-  set_onDispose(const std::function<void(Material*, EventState&)>& callback);
+  void set_onDispose(const std::function<void(Material*, EventState&)>& callback);
 
   /**
    * @brief An event triggered when the material is bound.
@@ -447,8 +426,7 @@ protected:
   /**
    * @brief Called during a bind event.
    */
-  void
-  set_onBind(const std::function<void(AbstractMesh*, EventState&)>& callback);
+  void set_onBind(const std::function<void(AbstractMesh*, EventState&)>& callback);
 
   /**
    * @brief An event triggered when the material is unbound.
@@ -478,7 +456,7 @@ protected:
   /**
    * @brief Gets the value of the alpha mode.
    */
-  unsigned int get_alphaMode() const;
+  [[nodiscard]] unsigned int get_alphaMode() const;
 
   /**
    * @brief Sets the need depth pre-pass value.
@@ -488,7 +466,7 @@ protected:
   /**
    * @brief Gets the depth pre-pass value.
    */
-  bool get_needDepthPrePass() const;
+  [[nodiscard]] bool get_needDepthPrePass() const;
 
   /**
    * @brief Sets the state for enabling fog.
@@ -498,7 +476,7 @@ protected:
   /**
    * @brief Gets the value of the fog enabled state.
    */
-  bool get_fogEnabled() const;
+  [[nodiscard]] bool get_fogEnabled() const;
 
   /**
    * @brief Sets the state of wireframe mode.
@@ -508,7 +486,7 @@ protected:
   /**
    * @brief Gets a value specifying if wireframe mode is enabled.
    */
-  bool get_wireframe() const;
+  [[nodiscard]] bool get_wireframe() const;
 
   /**
    * @brief Sets the state of point cloud mode.
@@ -518,7 +496,7 @@ protected:
   /**
    * @brief Gets the value specifying if point clouds are enabled.
    */
-  bool get_pointsCloud() const;
+  [[nodiscard]] bool get_pointsCloud() const;
 
   /**
    * @brief Sets the material fill mode.
@@ -528,12 +506,12 @@ protected:
   /**
    * @brief Gets the material fill mode.
    */
-  unsigned int get_fillMode() const;
+  [[nodiscard]] unsigned int get_fillMode() const;
 
   /**
    * @brief Gets the logarithmic depth setting.
    */
-  virtual bool get_useLogarithmicDepth() const;
+  [[nodiscard]] virtual bool get_useLogarithmicDepth() const;
 
   /**
    * @brief Sets the logarithmic depth setting.
@@ -612,8 +590,7 @@ protected:
   void _markAllSubMeshesAsTexturesAndMiscDirty();
 
 private:
-  void releaseVertexArrayObject(const AbstractMeshPtr& mesh,
-                                bool forceDisposeEffect = false);
+  void releaseVertexArrayObject(const AbstractMeshPtr& mesh, bool forceDisposeEffect = false);
 
 public:
   // Events
@@ -706,8 +683,7 @@ public:
   /**
    * Called during a dispose event
    */
-  WriteOnlyProperty<Material, std::function<void(Material*, EventState&)>>
-    onDispose;
+  WriteOnlyProperty<Material, std::function<void(Material*, EventState&)>> onDispose;
 
   /**
    * An event triggered when the material is bound
@@ -717,8 +693,7 @@ public:
   /**
    * Called during a bind event
    */
-  WriteOnlyProperty<Material, std::function<void(AbstractMesh*, EventState&)>>
-    onBind;
+  WriteOnlyProperty<Material, std::function<void(AbstractMesh*, EventState&)>> onBind;
 
   /**
    * An event triggered when the material is unbound

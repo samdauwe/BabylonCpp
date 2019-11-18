@@ -21,8 +21,8 @@ public:
   template <typename... Ts>
   static MorphTargetManagerPtr New(Ts&&... args)
   {
-    auto mtm = std::shared_ptr<MorphTargetManager>(
-      new MorphTargetManager(std::forward<Ts>(args)...));
+    auto mtm
+      = std::shared_ptr<MorphTargetManager>(new MorphTargetManager(std::forward<Ts>(args)...));
     mtm->addToScene(mtm);
 
     return mtm;
@@ -71,8 +71,7 @@ public:
   void synchronize();
 
   // Statics
-  static MorphTargetManagerPtr Parse(const json& serializationObject,
-                                     Scene* scene);
+  static MorphTargetManagerPtr Parse(const json& serializationObject, Scene* scene);
 
 protected:
   /**
@@ -84,41 +83,41 @@ protected:
   /**
    * @brief Gets the unique ID of this manager.
    */
-  size_t get_uniqueId() const;
+  [[nodiscard]] size_t get_uniqueId() const;
 
   /**
    * @brief Gets the number of vertices handled by this manager.
    */
-  size_t get_vertexCount() const;
+  [[nodiscard]] size_t get_vertexCount() const;
 
   /**
    * @brief Gets a boolean indicating if this manager supports morphing of
    * normals.
    */
-  bool get_supportsNormals() const;
+  [[nodiscard]] bool get_supportsNormals() const;
 
   /**
    * @brief Gets a boolean indicating if this manager supports morphing of
    * tangents.
    */
-  bool get_supportsTangents() const;
+  [[nodiscard]] bool get_supportsTangents() const;
 
   /**
    * @brief Gets a boolean indicating if this manager supports morphing of
    * texture coordinates.
    */
-  bool get_supportsUVs() const;
+  [[nodiscard]] bool get_supportsUVs() const;
 
   /**
    * @brief Gets the number of targets stored in this manager.
    */
-  size_t get_numTargets() const;
+  [[nodiscard]] size_t get_numTargets() const;
 
   /**
    * @brief Gets the number of influencers (ie. the number of targets with
    * influences > 0)
    */
-  size_t get_numInfluencers() const;
+  [[nodiscard]] size_t get_numInfluencers() const;
 
   /**
    * @brief Gets the list of influences (one per target).

@@ -8,15 +8,13 @@
 namespace BABYLON {
 
 class GamepadSystemSceneComponent;
-using GamepadSystemSceneComponentPtr
-  = std::shared_ptr<GamepadSystemSceneComponent>;
+using GamepadSystemSceneComponentPtr = std::shared_ptr<GamepadSystemSceneComponent>;
 
 /**
  * @brief Defines the gamepad scene component responsible to manage gamepads in
  * a given scene.
  */
-class BABYLON_SHARED_EXPORT GamepadSystemSceneComponent
-    : public ISceneComponent {
+class BABYLON_SHARED_EXPORT GamepadSystemSceneComponent : public ISceneComponent {
 
 public:
   /**
@@ -32,7 +30,7 @@ public:
     return std::shared_ptr<GamepadSystemSceneComponent>(
       new GamepadSystemSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~GamepadSystemSceneComponent(); // = default
+  ~GamepadSystemSceneComponent() override; // = default
 
   /**
    * @brief Registers the component in a given scene.

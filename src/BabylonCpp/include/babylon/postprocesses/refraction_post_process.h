@@ -36,13 +36,11 @@ public:
    * @param reusable If the post process can be reused on the same frame.
    * (default: false)
    */
-  RefractionPostProcess(const std::string& name,
-                        const std::string& refractionTextureUrl,
-                        const Color3& color, float depth, int colorLevel,
-                        float ratio, const CameraPtr& camera,
-                        unsigned int samplingMode, Engine* engine,
+  RefractionPostProcess(const std::string& name, const std::string& refractionTextureUrl,
+                        const Color3& color, float depth, int colorLevel, float ratio,
+                        const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
                         bool reusable = false);
-  virtual ~RefractionPostProcess(); // = default
+  ~RefractionPostProcess() override; // = default
 
   /**
    * @brief Disposes of the post process.

@@ -3,7 +3,7 @@
 namespace BABYLON {
 namespace MaterialsLibrary {
 
-ShadowOnlyMaterialDefines::ShadowOnlyMaterialDefines() : MaterialDefines{}
+ShadowOnlyMaterialDefines::ShadowOnlyMaterialDefines()
 {
   boolDef = {
     {"CLIPPLANE", false},  //

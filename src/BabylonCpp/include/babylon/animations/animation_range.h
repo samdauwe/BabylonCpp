@@ -26,13 +26,13 @@ public:
   AnimationRange& operator=(AnimationRange&& other);
   ~AnimationRange(); // = default
 
-  AnimationRange copy() const;
+  [[nodiscard]] AnimationRange copy() const;
 
   /**
    * @brief Makes a copy of the animation range.
    * @returns A copy of the animation range
    */
-  AnimationRange clone() const;
+  [[nodiscard]] AnimationRange clone() const;
 
 public:
   /** The name of the animation range **/

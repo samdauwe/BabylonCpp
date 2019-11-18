@@ -491,7 +491,7 @@ std::vector<LightPtr>& AbstractMesh::get_lightSources()
   return _lightSources;
 }
 
-const std::string AbstractMesh::getClassName() const
+std::string AbstractMesh::getClassName() const
 {
   return "AbstractMesh";
 }
@@ -1872,8 +1872,8 @@ int AbstractMesh::getClosestFacetAtLocalCoordinates(float x, float y, float z, V
   Vector3 norm;            // current facet normal
   Vector3 p0;              // current facet barycenter position
   // loop on all the facets in the current partitioning block
-  for (size_t idx = 0; idx < facetsInBlock.size(); ++idx) {
-    fib  = facetsInBlock[idx];
+  for (unsigned int idx : facetsInBlock) {
+    fib  = idx;
     norm = facetNormals[fib];
     p0   = facetPositions[fib];
 
@@ -1993,7 +1993,7 @@ bool AbstractMesh::_checkOcclusionQuery()
 
       dataStorage.isOcclusionQueryInProgress    = false;
       dataStorage.occlusionInternalRetryCounter = 0;
-      dataStorage.isOccluded                    = occlusionQueryResult == 1 ? false : true;
+      dataStorage.isOccluded                    = occlusionQueryResult != 1;
     }
     else {
 

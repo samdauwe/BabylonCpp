@@ -15,8 +15,7 @@ using AudioSceneComponentPtr = std::shared_ptr<AudioSceneComponent>;
  * @brief Defines the sound scene component responsible to manage any sounds in
  * a given scene.
  */
-class BABYLON_SHARED_EXPORT AudioSceneComponent
-    : public ISceneSerializableComponent {
+class BABYLON_SHARED_EXPORT AudioSceneComponent : public ISceneSerializableComponent {
 
 public:
   /**
@@ -29,10 +28,9 @@ public:
   template <typename... Ts>
   static AudioSceneComponentPtr New(Ts&&... args)
   {
-    return std::shared_ptr<AudioSceneComponent>(
-      new AudioSceneComponent(std::forward<Ts>(args)...));
+    return std::shared_ptr<AudioSceneComponent>(new AudioSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~AudioSceneComponent(); // = default
+  ~AudioSceneComponent() override; // = default
 
   /**
    * @brief Registers the component in a given scene.
@@ -61,8 +59,7 @@ public:
    * @brief Removes all the elements in the container from the scene.
    * @param container contains the elements to remove
    */
-  void removeFromContainer(AbstractScene& container,
-                           bool dispose = false) override;
+  void removeFromContainer(AbstractScene& container, bool dispose = false) override;
 
   /**
    * @brief Disposes the component and the associated resources.

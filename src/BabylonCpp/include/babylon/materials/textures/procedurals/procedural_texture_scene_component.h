@@ -10,23 +10,20 @@
 namespace BABYLON {
 
 class ProceduralTextureSceneComponent;
-using ProceduralTextureSceneComponentPtr
-  = std::shared_ptr<ProceduralTextureSceneComponent>;
+using ProceduralTextureSceneComponentPtr = std::shared_ptr<ProceduralTextureSceneComponent>;
 
 /**
  * @brief Defines the Procedural Texture scene component responsible to manage
  * any Procedural Texture in a given scene.
  */
-class BABYLON_SHARED_EXPORT ProceduralTextureSceneComponent
-    : public ISceneComponent {
+class BABYLON_SHARED_EXPORT ProceduralTextureSceneComponent : public ISceneComponent {
 
 public:
   /**
    * The component name helpfull to identify the component in the list of scene
    * components.
    */
-  static constexpr const char* name
-    = SceneComponentConstants::NAME_PROCEDURALTEXTURE;
+  static constexpr const char* name = SceneComponentConstants::NAME_PROCEDURALTEXTURE;
 
 public:
   template <typename... Ts>
@@ -35,7 +32,7 @@ public:
     return std::shared_ptr<ProceduralTextureSceneComponent>(
       new ProceduralTextureSceneComponent(std::forward<Ts>(args)...));
   }
-  virtual ~ProceduralTextureSceneComponent(); // = default
+  ~ProceduralTextureSceneComponent() override; // = default
 
   /**
    * @brief Registers the component in a given scene.

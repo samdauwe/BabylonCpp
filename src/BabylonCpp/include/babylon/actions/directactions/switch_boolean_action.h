@@ -22,9 +22,8 @@ public:
    * @param condition defines the trigger related conditions
    */
   SwitchBooleanAction(unsigned int triggerOptions, const IAnimatablePtr& target,
-                      const std::string& propertyPath,
-                      Condition* condition = nullptr);
-  ~SwitchBooleanAction(); // = default
+                      const std::string& propertyPath, Condition* condition = nullptr);
+  ~SwitchBooleanAction() override; // = default
 
   /**
    * @brief Hidden

@@ -7,9 +7,7 @@
 namespace BABYLON {
 
 BounceEase::BounceEase(int iBounces, float iBounciness)
-    : EasingFunction{}
-    , bounces{static_cast<float>(iBounces)}
-    , bounciness{iBounciness}
+    : bounces{static_cast<float>(iBounces)}, bounciness{iBounciness}
 {
 }
 

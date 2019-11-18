@@ -162,7 +162,7 @@ AxisScaleGizmo::~AxisScaleGizmo() = default;
 void AxisScaleGizmo::_attachedMeshChanged(const AbstractMeshPtr& value)
 {
   if (dragBehavior) {
-    dragBehavior->enabled = value ? true : false;
+    dragBehavior->enabled = static_cast<bool>(value);
   }
 }
 

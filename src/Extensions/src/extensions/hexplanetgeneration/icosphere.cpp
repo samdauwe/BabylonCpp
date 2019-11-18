@@ -551,10 +551,7 @@ bool Icosphere::distortMesh(IcosahedronMesh& mesh, size_t degree,
       v3.normalize();
       auto v4 = (newNode1.p - oldNode1.p);
       v4.normalize();
-      if (Vector3::Dot(v0, v3) < 0.2f || Vector3::Dot(v0, v4) < 0.2f) {
-        return false;
-      }
-      return true;
+      return !(Vector3::Dot(v0, v3) < 0.2f || Vector3::Dot(v0, v4) < 0.2f);
     });
 
   for (size_t i = 0; i < degree; i++) {

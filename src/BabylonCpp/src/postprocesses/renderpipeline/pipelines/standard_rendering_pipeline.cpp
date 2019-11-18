@@ -812,8 +812,7 @@ void StandardRenderingPipeline::_createLuminancePostProcesses(
   Scene* scene, unsigned int textureType)
 {
   // Create luminance
-  float size = static_cast<float>(
-    std::pow(3, StandardRenderingPipeline::LuminanceSteps));
+  auto size            = static_cast<float>(std::pow(3, StandardRenderingPipeline::LuminanceSteps));
   luminancePostProcess = PostProcess::New(
     "HDRLuminance", "standard", {"lumOffsets"}, {}, size, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
@@ -845,7 +844,7 @@ void StandardRenderingPipeline::_createLuminancePostProcesses(
   // Create down sample luminance
   for (unsigned int i = StandardRenderingPipeline::LuminanceSteps; i-- > 0;) {
     const std::string iStr = std::to_string(i);
-    float iSize            = static_cast<float>(std::pow(3, i));
+    auto iSize             = static_cast<float>(std::pow(3, i));
 
     std::string defines = "#define LUMINANCE_DOWN_SAMPLE\n";
     if (i == 0) {
@@ -1261,7 +1260,7 @@ void StandardRenderingPipeline::_disposePostProcesses()
   blurVPostProcesses.clear();
 }
 
-const std::string StandardRenderingPipeline::getClassName() const
+std::string StandardRenderingPipeline::getClassName() const
 {
   return "StandardRenderingPipeline";
 }

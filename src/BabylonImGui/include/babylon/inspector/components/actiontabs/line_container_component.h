@@ -13,12 +13,7 @@ struct BABYLON_SHARED_EXPORT LineContainerComponent {
   static bool render(const char* title, bool& closed)
   {
     ImGui::SetNextTreeNodeOpen(!closed, ImGuiCond_Always);
-    if (ImGui::CollapsingHeader(title)) {
-      closed = false;
-    }
-    else {
-      closed = true;
-    }
+    closed = !ImGui::CollapsingHeader(title);
     return !closed;
   }
 

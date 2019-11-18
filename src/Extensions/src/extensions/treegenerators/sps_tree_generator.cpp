@@ -22,7 +22,7 @@ MeshPtr SPSTreeGenerator::CreateTree(
   if (!(boughs == 1 || boughs == 2)) {
     boughs = 1;
   }
-  float _boughs = static_cast<float>(boughs);
+  auto _boughs = static_cast<float>(boughs);
 
   // Create base tree
   auto _base
@@ -46,10 +46,8 @@ MeshPtr SPSTreeGenerator::CreateTree(
   auto _leaves_SPS = SolidParticleSystem::New("leaveSPS", scene, spsOptions);
 
   // Function to position leaves on base tree
-  auto _set_leaves = [&](SolidParticle* particle, unsigned int /*i*/,
-                         unsigned int s) {
-    unsigned int _a
-      = static_cast<unsigned>(std::floor(s / (2.f * leavesOnBranch)));
+  auto _set_leaves = [&](SolidParticle* particle, unsigned int /*i*/, unsigned int s) {
+    auto _a = static_cast<unsigned>(std::floor(s / (2.f * leavesOnBranch)));
     if (boughs == 1) {
       ++_a;
     }
@@ -60,7 +58,7 @@ MeshPtr SPSTreeGenerator::CreateTree(
     unsigned int _j = s % (2 * leavesOnBranch);
     float _g        = (_j * _leaf_gap + 3 * _leaf_gap / 2.f) / _branch_length;
 
-    size_t _upper = static_cast<size_t>(std::ceil(trunkSlices * _g));
+    auto _upper = static_cast<size_t>(std::ceil(trunkSlices * _g));
     if (_upper > _base.paths[_a].size() - 1) {
       _upper = _base.paths[_a].size() - 1;
     }

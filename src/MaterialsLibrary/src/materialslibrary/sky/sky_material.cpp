@@ -241,7 +241,7 @@ json SkyMaterial::serialize() const
   return nullptr;
 }
 
-const std::string SkyMaterial::getClassName() const
+std::string SkyMaterial::getClassName() const
 {
   return "SkyMaterial";
 }

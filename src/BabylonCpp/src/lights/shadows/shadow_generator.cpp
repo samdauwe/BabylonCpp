@@ -513,7 +513,7 @@ RenderTargetTexturePtr ShadowGenerator::getShadowMapForRendering()
   return _shadowMap;
 }
 
-const std::string ShadowGenerator::getClassName() const
+std::string ShadowGenerator::getClassName() const
 {
   return "ShadowGenerator";
 }
@@ -594,7 +594,7 @@ void ShadowGenerator::_initializeShadowMap()
   _shadowMap->ignoreCameraViewport = true;
 
   // Record Face Index before render.
-  _shadowMap->onBeforeRenderObservable.add([this](int* faceIndex, EventState&) {
+  _shadowMap->onBeforeRenderObservable.add([this](const int* faceIndex, EventState&) {
     _currentFaceIndex = static_cast<unsigned int>(*faceIndex);
     if (_filter == ShadowGenerator::FILTER_PCF()) {
       _scene->getEngine()->setColorWrite(false);

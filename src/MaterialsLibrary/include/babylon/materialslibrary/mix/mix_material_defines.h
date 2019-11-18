@@ -10,7 +10,7 @@ namespace MaterialsLibrary {
 struct BABYLON_SHARED_EXPORT MixMaterialDefines : public MaterialDefines {
 
   MixMaterialDefines();
-  ~MixMaterialDefines(); // = default
+  ~MixMaterialDefines() override; // = default
 
 }; // end of struct MixMaterialDefines
 

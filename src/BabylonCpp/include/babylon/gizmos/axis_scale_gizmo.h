@@ -31,13 +31,12 @@ public:
                  const UtilityLayerRendererPtr& gizmoLayer
                  = UtilityLayerRenderer::DefaultUtilityLayer(),
                  ScaleGizmo* parent = nullptr);
-  ~AxisScaleGizmo(); // = default
+  ~AxisScaleGizmo() override; // = default
 
   /**
    * @brief Disposes of the gizmo.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Disposes and replaces the current meshes in the gizmo with the
@@ -46,8 +45,7 @@ public:
    * @param useGizmoMaterial If the gizmo's default material should be used
    * (default: false)
    */
-  void setCustomMesh(const MeshPtr& mesh,
-                     bool useGizmoMaterial = false) override;
+  void setCustomMesh(const MeshPtr& mesh, bool useGizmoMaterial = false) override;
 
 protected:
   void _attachedMeshChanged(const AbstractMeshPtr& value) override;
@@ -55,7 +53,7 @@ protected:
   /**
    * @brief Gets if the gizmo is enabled.
    */
-  bool get_isEnabled() const;
+  [[nodiscard]] bool get_isEnabled() const;
 
   /**
    * @brief Sets if the gizmo is enabled.

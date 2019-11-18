@@ -36,7 +36,7 @@ public:
    * @param ui The transform node that should be attched to the mesh
    */
   AttachToBoxBehavior(const TransformNodePtr& ui);
-  virtual ~AttachToBoxBehavior(); // = default
+  ~AttachToBoxBehavior() override; // = default
 
   /**
    * @brief Initializes the behavior.
@@ -49,8 +49,7 @@ public:
    * @param predicate Predicate to use for pick filtering
    */
   void attach(const MeshPtr& target,
-              const std::function<bool(const AbstractMeshPtr& m)>& predicate
-              = nullptr) override;
+              const std::function<bool(const AbstractMeshPtr& m)>& predicate = nullptr) override;
 
   /**
    * @brief Detaches the behavior from the mesh.
@@ -59,8 +58,7 @@ public:
 
 private:
   FaceDirectionInfo _closestFace(const Vector3& targetDirection);
-  void _lookAtToRef(const Vector3& pos, Quaternion& ref,
-                    const Vector3 up = Vector3(0.f, 1.f, 0.f));
+  void _lookAtToRef(const Vector3& pos, Quaternion& ref, const Vector3 up = Vector3(0.f, 1.f, 0.f));
 
 public:
   /**

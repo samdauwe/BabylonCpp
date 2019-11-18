@@ -27,13 +27,12 @@ public:
   template <typename... Ts>
   static DirectionalLightPtr New(Ts&&... args)
   {
-    auto light = std::shared_ptr<DirectionalLight>(
-      new DirectionalLight(std::forward<Ts>(args)...));
+    auto light = std::shared_ptr<DirectionalLight>(new DirectionalLight(std::forward<Ts>(args)...));
     light->addToScene(light);
 
     return light;
   }
-  ~DirectionalLight(); // = default
+  ~DirectionalLight() override; // = default
 
   Type type() const override;
 
@@ -41,7 +40,7 @@ public:
    * @brief Returns the string "DirectionalLight".
    * @return The class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Returns the integer 1.
@@ -56,8 +55,7 @@ public:
    * @param lightIndex The index of the light in the effect to update
    * @returns The directional light
    */
-  void transferToEffect(const EffectPtr& effect,
-                        const std::string& lightIndex) override;
+  void transferToEffect(const EffectPtr& effect, const std::string& lightIndex) override;
 
   /**
    * @brief Sets the passed Effect "effect" with the Light information.
@@ -66,8 +64,8 @@ public:
    * or direction)
    * @returns The light
    */
-  DirectionalLight& transferToNodeMaterialEffect(
-    const EffectPtr& effect, const std::string& lightDataUniformName) override;
+  DirectionalLight& transferToNodeMaterialEffect(const EffectPtr& effect,
+                                                 const std::string& lightDataUniformName) override;
 
   /**
    * @brief Gets the minZ used for shadow according to both the scene and the
@@ -94,8 +92,7 @@ public:
    * @param defines the list of defines
    * @param lightIndex defines the index of the light for the effect
    */
-  void prepareLightSpecificDefines(MaterialDefines& defines,
-                                   unsigned int lightIndex) override;
+  void prepareLightSpecificDefines(MaterialDefines& defines, unsigned int lightIndex) override;
 
 protected:
   /**
@@ -107,17 +104,15 @@ protected:
    * @param direction The direction of the light
    * @param scene The scene the light belongs to
    */
-  DirectionalLight(const std::string& name, const Vector3& direction,
-                   Scene* scene);
+  DirectionalLight(const std::string& name, const Vector3& direction, Scene* scene);
 
   /**
    * @brief Sets the passed matrix "matrix" as projection matrix for the shadows
    * cast by the light according to the passed view matrix.
    * @returns The DirectionalLight Shadow projection matrix.
    */
-  void _setDefaultShadowProjectionMatrix(
-    Matrix& matrix, const Matrix& viewMatrix,
-    const std::vector<AbstractMesh*>& renderList) override;
+  void _setDefaultShadowProjectionMatrix(Matrix& matrix, const Matrix& viewMatrix,
+                                         const std::vector<AbstractMesh*>& renderList) override;
 
   /**
    * @brief Sets the passed matrix "matrix" as fixed frustum projection matrix
@@ -131,9 +126,8 @@ protected:
    * the shadows cast by the light according to the passed view matrix.
    * @returns The DirectionalLight Shadow projection matrix.
    */
-  void _setDefaultAutoExtendShadowProjectionMatrix(
-    Matrix& matrix, const Matrix& viewMatrix,
-    const std::vector<AbstractMesh*>& renderList);
+  void _setDefaultAutoExtendShadowProjectionMatrix(Matrix& matrix, const Matrix& viewMatrix,
+                                                   const std::vector<AbstractMesh*>& renderList);
 
   void _buildUniformLayout() override;
 

@@ -36,11 +36,7 @@ BabylonFileLoader::BabylonFileLoader()
   extensions    = ".babylon";
   canDirectLoad = [](const std::string& data) {
     // We consider that the producer string is filled
-    if (String::endsWith(data, "babylon")) {
-      return true;
-    }
-
-    return false;
+    return String::endsWith(data, "babylon");
   };
 }
 
@@ -123,7 +119,7 @@ void BabylonFileLoader::loadDetailLevels(Scene* scene,
           if (culling > 0.f) {
             mastermesh->addLODLevel(culling, nullptr);
           }
-          if (wasenabled == true) {
+          if (wasenabled) {
             mastermesh->setEnabled(true);
           }
         }
@@ -553,8 +549,7 @@ bool BabylonFileLoader::load(
               (scene->activeCamera()->maxZ - scene->activeCamera()->minZ)
                 / 2.f :
               1000.f;
-        float skyboxBlurLevel
-          = json_util::get_number<float>(parsedData, "skyboxBlurLevel", 0.f);
+        auto skyboxBlurLevel = json_util::get_number<float>(parsedData, "skyboxBlurLevel", 0.f);
         scene->createDefaultSkybox(scene->environmentTexture(), isPBR,
                                    skyboxScale, skyboxBlurLevel);
       }
@@ -662,7 +657,7 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
           scene->environmentTexture = cubeTexture;
         }
       }
-      if (json_util::get_bool(parsedData, "createDefaultSkybox") == true) {
+      if (json_util::get_bool(parsedData, "createDefaultSkybox")) {
         const auto skyboxScale
           = (scene->activeCamera() != nullptr) ?
               (scene->activeCamera()->maxZ - scene->activeCamera()->minZ)

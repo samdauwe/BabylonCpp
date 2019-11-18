@@ -11,22 +11,18 @@ namespace BABYLON {
  */
 struct BABYLON_SHARED_EXPORT FaceDirectionInfo {
 
-  FaceDirectionInfo(const Vector3& direction,
-                    const Vector3& rotatedDirection = Vector3(),
+  FaceDirectionInfo(const Vector3& direction, const Vector3& rotatedDirection = Vector3(),
                     float diff = 0.f, bool ignore = false);
   FaceDirectionInfo(const FaceDirectionInfo& other);
   FaceDirectionInfo(FaceDirectionInfo&& other);
   FaceDirectionInfo& operator=(const FaceDirectionInfo& other);
   FaceDirectionInfo& operator=(FaceDirectionInfo&& other);
   ~FaceDirectionInfo(); // = default
-  FaceDirectionInfo copy() const;
-  std::unique_ptr<FaceDirectionInfo> clone() const;
-  friend std::ostream& operator<<(std::ostream& os,
-                                  const FaceDirectionInfo& arc);
-  friend bool operator==(const FaceDirectionInfo& lhs,
-                         const FaceDirectionInfo& rhs);
-  friend bool operator!=(const FaceDirectionInfo& lhs,
-                         const FaceDirectionInfo& rhs);
+  [[nodiscard]] FaceDirectionInfo copy() const;
+  [[nodiscard]] std::unique_ptr<FaceDirectionInfo> clone() const;
+  friend std::ostream& operator<<(std::ostream& os, const FaceDirectionInfo& arc);
+  friend bool operator==(const FaceDirectionInfo& lhs, const FaceDirectionInfo& rhs);
+  friend bool operator!=(const FaceDirectionInfo& lhs, const FaceDirectionInfo& rhs);
 
   Vector3 direction;
   Vector3 rotatedDirection;
@@ -35,8 +31,7 @@ struct BABYLON_SHARED_EXPORT FaceDirectionInfo {
 
 }; // end of struct FaceDirectionInfo
 
-std::ostream& operator<<(std::ostream& os,
-                         const FaceDirectionInfo& faceDirectionInfo);
+std::ostream& operator<<(std::ostream& os, const FaceDirectionInfo& faceDirectionInfo);
 bool operator==(const FaceDirectionInfo& lhs, const FaceDirectionInfo& rhs);
 bool operator!=(const FaceDirectionInfo& lhs, const FaceDirectionInfo& rhs);
 

@@ -86,7 +86,7 @@ public:
     // Loops : cosinus and sinus
     std::vector<Vector3> loops;
     size_t nbpt = 200;
-    float nbptf = static_cast<float>(nbpt);
+    auto nbptf  = static_cast<float>(nbpt);
     float pi6   = Math::PI * 6.f;
     for (float lp = 0; lp < nbpt; ++lp) {
       x = lp - nbptf / 2.f + (nbptf / 5.f - lp / 8.f) * std::cos(pi6 * lp / nbptf);

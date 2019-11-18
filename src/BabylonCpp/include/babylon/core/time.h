@@ -143,7 +143,7 @@ inline std::string toIso8601Ms(const system_time_point_t& system_time_point)
   auto ms = std::chrono::duration_cast<milliseconds_t>(
               system_time_point.time_since_epoch())
               .count();
-  std::size_t _ms = static_cast<std::size_t>(ms % 1000);
+  auto _ms = static_cast<std::size_t>(ms % 1000);
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(                                                               \
@@ -186,7 +186,7 @@ inline std::time_t utcTime()
 #pragma warning(                                                               \
   disable : 4996) // 'localtime': This function or variable may be unsafe.
 #endif
-  std::time_t now = std::time(NULL);
+  std::time_t now = std::time(nullptr);
 
   std::tm tm_local(*std::localtime(&now));
   std::time_t t_local = std::mktime(&tm_local);

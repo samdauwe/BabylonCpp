@@ -55,7 +55,7 @@ public:
    * \brief      Constructs and initializes a two-dimensional vector instance
    *             to (0.0, 0.0).
    */
-  inline Vector2() : x_(0.0f), y_(0.0f)
+  inline Vector2()
   {
   }
 
@@ -75,7 +75,7 @@ public:
    * \brief      Returns the x-coordinate of this two-dimensional vector.
    * \return     The x-coordinate of the two-dimensional vector.
    */
-  inline float x() const
+  [[nodiscard]] inline float x() const
   {
     return x_;
   }
@@ -84,7 +84,7 @@ public:
    * \brief      Returns the y-coordinate of this two-dimensional vector.
    * \return     The y-coordinate of the two-dimensional vector.
    */
-  inline float y() const
+  [[nodiscard]] inline float y() const
   {
     return y_;
   }
@@ -252,8 +252,8 @@ public:
   }
 
 private:
-  float x_;
-  float y_;
+  float x_{0.0f};
+  float y_{0.0f};
 
 }; // end of class Vector2
 

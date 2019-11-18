@@ -32,8 +32,8 @@ void ColorGradient2D::addColorStop(float u, float v, const Color3& color)
 
 Color3 ColorGradient2D::getColor(float u, float v) const
 {
-  const size_t x = static_cast<size_t>(std::floor(u * (_resolution - 1.f)));
-  const size_t y = static_cast<size_t>(std::floor(v * (_resolution - 1.f)));
+  const auto x = static_cast<size_t>(std::floor(u * (_resolution - 1.f)));
+  const auto y = static_cast<size_t>(std::floor(v * (_resolution - 1.f)));
 
   return _gradient[y][x];
 }

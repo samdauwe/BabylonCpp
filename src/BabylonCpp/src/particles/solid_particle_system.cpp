@@ -18,6 +18,8 @@
 #include <babylon/particles/depth_sorted_particle.h>
 #include <babylon/particles/model_shape.h>
 
+#include <memory>
+
 namespace BABYLON {
 
 SolidParticleSystem::SolidParticleSystem(
@@ -1057,8 +1059,8 @@ SolidParticleSystem& SolidParticleSystem::refreshVisibleSize()
 void SolidParticleSystem::setVisibilityBox(float size)
 {
   auto vis = size / 2.f;
-  mesh->_boundingInfo.reset(
-    new BoundingInfo(Vector3(-vis, -vis, -vis), Vector3(vis, vis, vis)));
+  mesh->_boundingInfo
+    = std::make_shared<BoundingInfo>(Vector3(-vis, -vis, -vis), Vector3(vis, vis, vis));
 }
 
 bool SolidParticleSystem::isAlwaysVisible() const

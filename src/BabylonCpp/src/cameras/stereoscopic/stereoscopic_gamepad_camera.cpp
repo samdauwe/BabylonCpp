@@ -43,7 +43,7 @@ StereoscopicGamepadCamera::StereoscopicGamepadCamera(
 
 StereoscopicGamepadCamera::~StereoscopicGamepadCamera() = default;
 
-const std::string StereoscopicGamepadCamera::getClassName() const
+std::string StereoscopicGamepadCamera::getClassName() const
 {
   return "StereoscopicGamepadCamera";
 }

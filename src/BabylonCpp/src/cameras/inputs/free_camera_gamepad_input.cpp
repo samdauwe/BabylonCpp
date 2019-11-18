@@ -94,12 +94,12 @@ void FreeCameraGamepadInput::checkInputs()
   }
 }
 
-const std::string FreeCameraGamepadInput::getClassName() const
+std::string FreeCameraGamepadInput::getClassName() const
 {
   return "FreeCameraGamepadInput";
 }
 
-const std::string FreeCameraGamepadInput::getSimpleName() const
+std::string FreeCameraGamepadInput::getSimpleName() const
 {
   return "gamepad";
 }

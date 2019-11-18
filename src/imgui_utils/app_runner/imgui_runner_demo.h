@@ -5,5 +5,5 @@ namespace ImGuiUtils
     // This will run a standalone demonstration of the runner
     // Simply call this function from main()
     void ShowDemo();
-  }
-}
+    } // namespace ImGuiRunner
+    } // namespace ImGuiUtils

@@ -103,11 +103,8 @@ MorphTargetPtr MorphTargetManager::getTarget(std::size_t index)
 void MorphTargetManager::addTarget(const MorphTargetPtr& target)
 {
   _targets.emplace_back(target);
-  _targetInfluenceChangedObservers.emplace_back(
-    _targets.back()->onInfluenceChanged.add(
-      [this](bool* needUpdate, EventState&) {
-        _syncActiveTargets(*needUpdate);
-      }));
+  _targetInfluenceChangedObservers.emplace_back(_targets.back()->onInfluenceChanged.add(
+    [this](const bool* needUpdate, EventState&) { _syncActiveTargets(*needUpdate); }));
   _targetDataLayoutChangedObservers.emplace_back(
     _targets.back()->_onDataLayoutChanged.add(
       [this](void*, EventState&) { _syncActiveTargets(true); }));

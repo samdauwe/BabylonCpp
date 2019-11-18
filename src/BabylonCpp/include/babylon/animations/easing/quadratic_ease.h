@@ -22,15 +22,14 @@ public:
   template <typename... Ts>
   static QuadraticEasePtr New(Ts&&... args)
   {
-    return std::shared_ptr<QuadraticEase>(
-      new QuadraticEase(std::forward<Ts>(args)...));
+    return std::shared_ptr<QuadraticEase>(new QuadraticEase(std::forward<Ts>(args)...));
   }
-  ~QuadraticEase(); // = default
+  ~QuadraticEase() override; // = default
 
   /**
    * @brief Hidden
    */
-  float easeInCore(float gradient) const override;
+  [[nodiscard]] float easeInCore(float gradient) const override;
 
 protected:
   QuadraticEase();

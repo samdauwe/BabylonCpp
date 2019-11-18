@@ -21,20 +21,19 @@ public:
   template <typename... Ts>
   static HDRCubeTexturePtr New(Ts&&... args)
   {
-    auto texture = std::shared_ptr<HDRCubeTexture>(
-      new HDRCubeTexture(std::forward<Ts>(args)...));
+    auto texture = std::shared_ptr<HDRCubeTexture>(new HDRCubeTexture(std::forward<Ts>(args)...));
     texture->addToScene(texture);
 
     return texture;
   }
-  ~HDRCubeTexture(); // = default
+  ~HDRCubeTexture() override; // = default
 
   /**
    * @brief Get the current class name of the texture useful for serialization
    * or dynamic coding.
    * @returns "HDRCubeTexture"
    */
-  const std::string getClassName() const;
+  std::string getClassName() const;
 
   HDRCubeTexturePtr clone() const;
 
@@ -64,8 +63,7 @@ public:
    * dependencies
    * @returns the newly created texture after parsing
    */
-  static HDRCubeTexture* Parse(const json& parsedTexture, Scene* scene,
-                               const std::string& rootUrl);
+  static HDRCubeTexture* Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
 
   json serialize() const;
 
@@ -87,10 +85,9 @@ protected:
    */
   HDRCubeTexture(
     const std::string& url, Scene* scene, size_t size, bool noMipmap = false,
-    bool generateHarmonics = true, bool gammaSpace = false,
-    bool reserved = false, const std::function<void()>& onLoad = nullptr,
-    const std::function<void(const std::string& message,
-                             const std::string& exception)>& onError
+    bool generateHarmonics = true, bool gammaSpace = false, bool reserved = false,
+    const std::function<void()>& onLoad = nullptr,
+    const std::function<void(const std::string& message, const std::string& exception)>& onError
     = nullptr);
 
   /**
@@ -166,8 +163,7 @@ private:
   Matrix _textureMatrix;
   size_t _size;
   std::function<void()> _onLoad;
-  std::function<void(const std::string& message, const std::string& exception)>
-    _onError;
+  std::function<void(const std::string& message, const std::string& exception)> _onError;
   std::optional<Vector3> _boundingBoxSize;
 
 }; // end of class HDRCubeTexture

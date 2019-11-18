@@ -27,7 +27,7 @@ public:
    */
   RefractionTexture(const std::string& name, ISize size, Scene* scene,
                     bool generateMipMaps = false);
-  ~RefractionTexture(); // = default
+  ~RefractionTexture() override; // = default
 
   /**
    * @brief Clone the refraction texture.

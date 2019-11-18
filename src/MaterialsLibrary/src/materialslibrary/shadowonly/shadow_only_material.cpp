@@ -103,8 +103,7 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     }
   }
 
-  MaterialHelper::PrepareDefinesForFrameBoundValues(
-    scene, engine, defines, useInstances ? true : false);
+  MaterialHelper::PrepareDefinesForFrameBoundValues(scene, engine, defines, useInstances);
 
   MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(),
                                         fogEnabled(),
@@ -245,7 +244,7 @@ json ShadowOnlyMaterial::serialize() const
   return nullptr;
 }
 
-const std::string ShadowOnlyMaterial::getClassName() const
+std::string ShadowOnlyMaterial::getClassName() const
 {
   return "ShadowOnlyMaterial";
 }

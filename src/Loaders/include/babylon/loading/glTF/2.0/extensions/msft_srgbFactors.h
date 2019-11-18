@@ -17,13 +17,10 @@ public:
   MSFT_sRGBFactors(const IGLTFLoaderPtr& loader);
   ~MSFT_sRGBFactors() override = default;
 
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
-  virtual void
-  loadMaterialPropertiesAsync(const std::string& context,
-                              const IMaterial& material,
-                              const Material& babylonMaterial) override;
+  void loadMaterialPropertiesAsync(const std::string& context, const IMaterial& material,
+                                   const Material& babylonMaterial) override;
 
 public:
   IGLTFLoaderPtr _loader;

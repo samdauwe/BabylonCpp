@@ -26,7 +26,7 @@ GamepadCamera::GamepadCamera::GamepadCamera(const std::string& iName,
 
 GamepadCamera::~GamepadCamera() = default;
 
-const std::string GamepadCamera::getClassName() const
+std::string GamepadCamera::getClassName() const
 {
   return "GamepadCamera";
 }

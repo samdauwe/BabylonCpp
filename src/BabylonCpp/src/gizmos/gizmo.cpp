@@ -52,7 +52,7 @@ AbstractMeshPtr& Gizmo::get_attachedMesh()
 void Gizmo::set_attachedMesh(const AbstractMeshPtr& value)
 {
   _attachedMesh = value;
-  _rootMesh->setEnabled(value ? true : false);
+  _rootMesh->setEnabled(static_cast<bool>(value));
   _attachedMeshChanged(value);
 }
 

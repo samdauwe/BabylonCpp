@@ -96,8 +96,7 @@ milliseconds_t Scene::DoubleClickDelay    = std::chrono::milliseconds(300);
 bool Scene::ExclusiveDoubleClickMode      = false;
 
 Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
-    : AbstractScene{}
-    , autoClear{true}
+    : autoClear{true}
     , autoClearDepthAndStencil{true}
     , clearColor{Color4(0.2f, 0.2f, 0.3f, 1.f)}
     , ambientColor{Color3(0.f, 0.f, 0.f)}
@@ -1031,7 +1030,7 @@ Scene& Scene::_processPointerMove(std::optional<PickingInfo>& pickResult, const 
   // Restore pointer
   canvas->style.cursor = defaultCursor;
 
-  auto isMeshPicked = (pickResult && pickResult->hit && pickResult->pickedMesh) ? true : false;
+  auto isMeshPicked = pickResult && pickResult->hit && pickResult->pickedMesh;
   if (isMeshPicked) {
     setPointerOverMesh(pickResult->pickedMesh.get());
 
@@ -1093,12 +1092,7 @@ bool Scene::_checkPrePointerObservable(const std::optional<PickingInfo>& pickRes
     pi.ray = (*pickResult).ray;
   }
   onPrePointerObservable.notifyObservers(&pi, static_cast<int>(type));
-  if (pi.skipOnPointerObservable) {
-    return true;
-  }
-  else {
-    return false;
-  }
+  return pi.skipOnPointerObservable;
 }
 
 Scene& Scene::simulatePointerDown(std::optional<PickingInfo>& pickResult)
@@ -2077,7 +2071,10 @@ void Scene::_animate()
     return;
   }
 
-  const auto& animatables = _activeAnimatables;
+  // Animatable::_animate can remove elements from _activeAnimatables
+  // we need to make a copy of it in order to iterate on a vector that 
+  // will not be modified during the loop!
+  const auto animatables = _activeAnimatables; 
   if (animatables.empty()) {
     return;
   }
@@ -2098,13 +2095,13 @@ void Scene::_animate()
   const auto& animationTime = _animationTime;
   _animationTimeLast        = now;
 
-  for (size_t index = 0; index < animatables.size(); ++index) {
-    const auto& animatable = animatables[index];
-
+  for (const auto& animatable : animatables) {
     if (animatable) {
       if (!animatable->_animate(std::chrono::milliseconds(animationTime))
           && animatable->disposeOnEnd) {
-        index--; // Array was updated
+            // The animation removed itself from _activeAnimatables
+            // during the call to _animate()
+            ;
       }
     }
   }
@@ -3146,10 +3143,10 @@ SoundPtr Scene::getSoundByName(const std::string& name)
   }
 
   if (!soundTracks.empty()) {
-    for (size_t sdIndex = 0; sdIndex < soundTracks.size(); ++sdIndex) {
-      for (index = 0; index < soundTracks[sdIndex]->soundCollection.size(); ++index) {
-        if (soundTracks[sdIndex]->soundCollection[index]->name == name) {
-          return soundTracks[sdIndex]->soundCollection[index];
+    for (auto& soundTrack : soundTracks) {
+      for (index = 0; index < soundTrack->soundCollection.size(); ++index) {
+        if (soundTrack->soundCollection[index]->name == name) {
+          return soundTrack->soundCollection[index];
         }
       }
     }
@@ -4355,9 +4352,9 @@ Scene& Scene::createPickingRayToRef(int x, int y, const std::optional<Matrix>& w
   auto identity = Matrix::Identity();
 
   // Moving coordinates to local viewport world
-  float _x = static_cast<float>(x);
+  auto _x = static_cast<float>(x);
   _x /= static_cast<float>(_engine->getHardwareScalingLevel() - viewport.x);
-  float _y = static_cast<float>(y);
+  auto _y = static_cast<float>(y);
   _y /= static_cast<float>(_engine->getHardwareScalingLevel()
                            - (_engine->getRenderHeight() - viewport.y - viewport.height));
 
@@ -4395,9 +4392,9 @@ Scene& Scene::createPickingRayInCameraSpaceToRef(int x, int y, Ray& result, Came
   auto identity = Matrix::Identity();
 
   // Moving coordinates to local viewport world
-  float _x = static_cast<float>(x);
+  auto _x = static_cast<float>(x);
   _x /= static_cast<float>(_engine->getHardwareScalingLevel() - viewport.x);
-  float _y = static_cast<float>(y);
+  auto _y = static_cast<float>(y);
   _y /= static_cast<float>(_engine->getHardwareScalingLevel()
                            - (_engine->getRenderHeight() - viewport.y - viewport.height));
   result.update(_x, _y, static_cast<float>(viewport.width), static_cast<float>(viewport.height),

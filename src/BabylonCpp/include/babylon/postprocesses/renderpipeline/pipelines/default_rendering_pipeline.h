@@ -27,37 +27,33 @@ class ImageProcessingConfiguration;
 class PostProcess;
 class Scene;
 class SharpenPostProcess;
-using BloomEffectPtr = std::shared_ptr<BloomEffect>;
-using ChromaticAberrationPostProcessPtr
-  = std::shared_ptr<ChromaticAberrationPostProcess>;
-using DefaultRenderingPipelinePtr = std::shared_ptr<DefaultRenderingPipeline>;
-using DepthOfFieldEffectPtr       = std::shared_ptr<DepthOfFieldEffect>;
-using FxaaPostProcessPtr          = std::shared_ptr<FxaaPostProcess>;
-using GlowLayerPtr                = std::shared_ptr<GlowLayer>;
-using GrainPostProcessPtr         = std::shared_ptr<GrainPostProcess>;
-using PostProcessPtr              = std::shared_ptr<PostProcess>;
-using SharpenPostProcessPtr       = std::shared_ptr<SharpenPostProcess>;
+using BloomEffectPtr                    = std::shared_ptr<BloomEffect>;
+using ChromaticAberrationPostProcessPtr = std::shared_ptr<ChromaticAberrationPostProcess>;
+using DefaultRenderingPipelinePtr       = std::shared_ptr<DefaultRenderingPipeline>;
+using DepthOfFieldEffectPtr             = std::shared_ptr<DepthOfFieldEffect>;
+using FxaaPostProcessPtr                = std::shared_ptr<FxaaPostProcess>;
+using GlowLayerPtr                      = std::shared_ptr<GlowLayer>;
+using GrainPostProcessPtr               = std::shared_ptr<GrainPostProcess>;
+using PostProcessPtr                    = std::shared_ptr<PostProcess>;
+using SharpenPostProcessPtr             = std::shared_ptr<SharpenPostProcess>;
 
 /**
  * @brief The default rendering pipeline can be added to a scene to apply common
  * post processing effects such as anti-aliasing or depth of field. See
  * https://doc.babylonjs.com/how_to/using_default_rendering_pipeline
  */
-class BABYLON_SHARED_EXPORT DefaultRenderingPipeline
-    : public PostProcessRenderPipeline {
+class BABYLON_SHARED_EXPORT DefaultRenderingPipeline : public PostProcessRenderPipeline {
 
 private:
   /**
    * ID of the sharpen post process,
    */
-  static constexpr const char* SharpenPostProcessId
-    = "SharpenPostProcessEffect";
+  static constexpr const char* SharpenPostProcessId = "SharpenPostProcessEffect";
 
   /**
    * ID of the image processing post process;
    */
-  static constexpr const char* ImageProcessingPostProcessId
-    = "ImageProcessingPostProcessEffect";
+  static constexpr const char* ImageProcessingPostProcessId = "ImageProcessingPostProcessEffect";
 
   /**
    * ID of the Fast Approximate Anti-Aliasing post process;
@@ -85,20 +81,20 @@ public:
 
     return renderingPipeline;
   }
-  virtual ~DefaultRenderingPipeline(); // = default
+  ~DefaultRenderingPipeline() override; // = default
 
   void addToScene(const DefaultRenderingPipelinePtr& renderingPipeline);
 
   /**
    * @brief Gets active scene.
    */
-  Scene* scene() const;
+  [[nodiscard]] Scene* scene() const;
 
   /**
    * @brief Get the class name.
    * @returns "DefaultRenderingPipeline"
    */
-  const std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
   /**
    * @brief Force the compilation of the entire pipeline.
@@ -120,14 +116,13 @@ public:
   /**
    * @brief Dispose of the pipeline and stop all post processes.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Serialize the rendering pipeline (Used when exporting)
    * @returns the serialized object
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Parse the serialized pipeline
@@ -136,8 +131,8 @@ public:
    * @param rootUrl The URL of the serialized pipeline.
    * @returns An instantiated pipeline from the serialized object.
    */
-  static std::unique_ptr<DefaultRenderingPipeline>
-  Parse(const json& source, Scene* scene, const std::string& rootUrl);
+  static std::unique_ptr<DefaultRenderingPipeline> Parse(const json& source, Scene* scene,
+                                                         const std::string& rootUrl);
 
 protected:
   /**
@@ -151,54 +146,53 @@ protected:
    * @param automaticBuild - if false, you will have to manually call prepare()
    * to update the pipeline (default: true)
    */
-  DefaultRenderingPipeline(
-    const std::string& name = "", bool hdr = true, Scene* scene = nullptr,
-    const std::unordered_map<std::string, CameraPtr>& cameras = {},
-    bool automaticBuild                                       = true);
+  DefaultRenderingPipeline(const std::string& name = "", bool hdr = true, Scene* scene = nullptr,
+                           const std::unordered_map<std::string, CameraPtr>& cameras = {},
+                           bool automaticBuild                                       = true);
 
 private:
   /**
    * @brief Enable or disable the sharpen process from the pipeline.
    */
   void set_sharpenEnabled(bool enabled);
-  bool get_sharpenEnabled() const;
+  [[nodiscard]] bool get_sharpenEnabled() const;
 
   /**
    * @brief Specifies the size of the bloom blur kernel, relative to the final
    * output size.
    */
   void set_bloomKernel(float value);
-  float get_bloomKernel() const;
+  [[nodiscard]] float get_bloomKernel() const;
 
   /**
    * @brief The strength of the bloom.
    */
   void set_bloomWeight(float value);
-  float get_bloomWeight() const;
+  [[nodiscard]] float get_bloomWeight() const;
 
   /**
    * @brief The threshold of the bloom.
    */
   void set_bloomThreshold(float value);
-  float get_bloomThreshold() const;
+  [[nodiscard]] float get_bloomThreshold() const;
 
   /**
    * @brief The scale of the bloom, lower value will provide better performance.
    */
   void set_bloomScale(float value);
-  float get_bloomScale() const;
+  [[nodiscard]] float get_bloomScale() const;
 
   /**
    * @brief Enable or disable the bloom from the pipeline.
    */
   void set_bloomEnabled(bool enabled);
-  bool get_bloomEnabled() const;
+  [[nodiscard]] bool get_bloomEnabled() const;
 
   /**
    * @brief If the depth of field is enabled.
    */
   void set_depthOfFieldEnabled(bool enabled);
-  bool get_depthOfFieldEnabled() const;
+  [[nodiscard]] bool get_depthOfFieldEnabled() const;
 
   /**
    * @brief Blur level of the depth of field effect. (Higher blur will effect
@@ -211,27 +205,27 @@ private:
    * @brief If the anti aliasing is enabled.
    */
   void set_fxaaEnabled(bool enabled);
-  bool get_fxaaEnabled() const;
+  [[nodiscard]] bool get_fxaaEnabled() const;
 
   /**
    * @brief MSAA sample count, setting this to 4 will provide 4x anti aliasing.
    * (default: 1)
    */
   void set_samples(unsigned int sampleCount);
-  unsigned int get_samples() const;
+  [[nodiscard]] unsigned int get_samples() const;
 
   /**
    * @brief If image processing is enabled.
    */
   void set_imageProcessingEnabled(bool enabled);
-  bool get_imageProcessingEnabled() const;
+  [[nodiscard]] bool get_imageProcessingEnabled() const;
 
   /**
    * @brief If glow layer is enabled. (Adds a glow effect to emmissive
    * materials)
    */
   void set_glowLayerEnabled(bool enabled);
-  bool get_glowLayerEnabled() const;
+  [[nodiscard]] bool get_glowLayerEnabled() const;
 
   /**
    * @brief Gets the glow layer (or null if not defined).
@@ -242,13 +236,13 @@ private:
    * @brief Enable or disable the chromaticAberration process from the pipeline.
    */
   void set_chromaticAberrationEnabled(bool enabled);
-  bool get_chromaticAberrationEnabled() const;
+  [[nodiscard]] bool get_chromaticAberrationEnabled() const;
 
   /**
    * @brief Enable or disable the grain process from the pipeline.
    */
   void set_grainEnabled(bool enabled);
-  bool get_grainEnabled() const;
+  [[nodiscard]] bool get_grainEnabled() const;
 
   void _rebuildBloom();
   void _setAutoClearAndTextureSharing(const PostProcessPtr& postProcess,
@@ -334,8 +328,7 @@ public:
    * Blur level of the depth of field effect. (Higher blur will effect
    * performance).
    */
-  Property<DefaultRenderingPipeline, DepthOfFieldEffectBlurLevel>
-    depthOfFieldBlurLevel;
+  Property<DefaultRenderingPipeline, DepthOfFieldEffectBlurLevel> depthOfFieldBlurLevel;
 
   /**
    * If the anti aliasing is enabled
@@ -384,8 +377,7 @@ private:
    */
   GlowLayerPtr _glowLayer;
 
-  Observer<ImageProcessingConfiguration>::Ptr
-    _imageProcessingConfigurationObserver;
+  Observer<ImageProcessingConfiguration>::Ptr _imageProcessingConfigurationObserver;
 
   // Values
   bool _sharpenEnabled;

@@ -24,13 +24,12 @@ public:
    */
   PositionGizmo(const UtilityLayerRendererPtr& gizmoLayer
                 = UtilityLayerRenderer::DefaultUtilityLayer());
-  ~PositionGizmo(); // = default
+  ~PositionGizmo() override; // = default
 
   /**
    * @brief Disposes of the gizmo.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Disposes and replaces the current meshes in the gizmo with the
@@ -39,8 +38,7 @@ public:
    * @param useGizmoMaterial If the gizmo's default material should be used
    * (default: false)
    */
-  void setCustomMesh(const MeshPtr& mesh,
-                     bool useGizmoMaterial = false) override;
+  void setCustomMesh(const MeshPtr& mesh, bool useGizmoMaterial = false) override;
 
 protected:
   AbstractMeshPtr& get_attachedMesh() override;
@@ -49,7 +47,7 @@ protected:
   /**
    * @brief Gets if the planar drag gizmo is enabled.
    */
-  bool get_planarGizmoEnabled() const;
+  [[nodiscard]] bool get_planarGizmoEnabled() const;
 
   /**
    * @brief Sets if the planar drag gizmo is enabled.
@@ -59,11 +57,11 @@ protected:
   void set_planarGizmoEnabled(bool value);
 
   void set_updateGizmoRotationToMatchAttachedMesh(bool value) override;
-  bool get_updateGizmoRotationToMatchAttachedMesh() const override;
+  [[nodiscard]] bool get_updateGizmoRotationToMatchAttachedMesh() const override;
   void set_snapDistance(float value);
-  float get_snapDistance() const;
+  [[nodiscard]] float get_snapDistance() const;
   void set_scaleRatio(float value) override;
-  float get_scaleRatio() const override;
+  [[nodiscard]] float get_scaleRatio() const override;
 
 public:
   /**

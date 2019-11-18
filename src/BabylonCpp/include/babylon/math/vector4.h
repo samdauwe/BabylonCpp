@@ -25,31 +25,31 @@ public:
   Vector4& operator=(const Vector4& otherVector);
   Vector4& operator=(Vector4&& otherVector);
   ~Vector4(); // = default
-  Vector4 copy() const;
+  [[nodiscard]] Vector4 copy() const;
 
   /**
    * @brief Returns a new Vector4 copied from the current one.
    * @returns the new cloned vector
    */
-  std::unique_ptr<Vector4> clone() const;
+  [[nodiscard]] std::unique_ptr<Vector4> clone() const;
 
   /**
    * @brief Returns the string with the Vector4 coordinates.
    * @returns a string containing all the vector values
    */
-  std::string toString() const;
+  [[nodiscard]] std::string toString() const;
 
   /**
    * @brief Returns the string "Vector4".
    * @returns "Vector4"
    */
-  const char* getClassName() const;
+  [[nodiscard]] const char* getClassName() const;
 
   /**
    * @brief Returns the Vector4 hash code.
    * @returns a unique hash code
    */
-  size_t getHashCode() const;
+  [[nodiscard]] size_t getHashCode() const;
 
   /** Operators **/
 
@@ -58,7 +58,7 @@ public:
    * coordinates.
    * @returns the resulting array
    */
-  Float32Array asArray() const;
+  [[nodiscard]] Float32Array asArray() const;
 
   /**
    * @brief Populates the given array from the given index with the Vector4
@@ -82,7 +82,7 @@ public:
    * @param otherVector the vector to add
    * @returns the resulting vector
    */
-  Vector4 add(const Vector4& otherVector) const;
+  [[nodiscard]] Vector4 add(const Vector4& otherVector) const;
 
   /**
    * @brief Updates the given vector "result" with the result of the addition of
@@ -106,7 +106,7 @@ public:
    * @param otherVector the vector to add
    * @returns the new vector with the result
    */
-  Vector4 subtract(const Vector4& otherVector) const;
+  [[nodiscard]] Vector4 subtract(const Vector4& otherVector) const;
 
   /**
    * @brief Sets the given vector "result" with the result of the subtraction of
@@ -115,8 +115,7 @@ public:
    * @param result the vector to store the result
    * @returns the current Vector4.
    */
-  const Vector4& subtractToRef(const Vector4& otherVector,
-                               Vector4& result) const;
+  const Vector4& subtractToRef(const Vector4& otherVector, Vector4& result) const;
 
   /**
    * @brief Returns a new Vector4 set with the result of the subtraction of the
@@ -127,7 +126,7 @@ public:
    * @param w value to subtract
    * @returns new vector containing the result
    */
-  Vector4 subtractFromFloats(float ix, float iy, float iz, float iw) const;
+  [[nodiscard]] Vector4 subtractFromFloats(float ix, float iy, float iz, float iw) const;
 
   /**
    * @brief Sets the given vector "result" set with the result of the
@@ -147,7 +146,7 @@ public:
    * coordinates.
    * @returns a new vector with the negated values
    */
-  Vector4 negate() const;
+  [[nodiscard]] Vector4 negate() const;
 
   /**
    * @brief Multiplies the current Vector4 coordinates by scale (float).
@@ -162,7 +161,7 @@ public:
    * @param scale the number to scale with
    * @returns a new vector with the result
    */
-  Vector4 scale(float iscale) const;
+  [[nodiscard]] Vector4 scale(float iscale) const;
 
   /**
    * @brief Sets the given vector "result" with the current Vector4 coordinates
@@ -188,7 +187,7 @@ public:
    * @param otherVector the vector to compare against
    * @returns true if they are equal
    */
-  bool equals(const Vector4& otherVector) const;
+  [[nodiscard]] bool equals(const Vector4& otherVector) const;
 
   /**
    * @brief Boolean : True if the current Vector4 coordinates are each beneath
@@ -197,8 +196,8 @@ public:
    * @param epsilon (Default: very small number)
    * @returns true if they are equal
    */
-  bool equalsWithEpsilon(const Vector4& otherVector,
-                         float epsilon = Math::Epsilon) const;
+  [[nodiscard]] bool equalsWithEpsilon(const Vector4& otherVector,
+                                       float epsilon = Math::Epsilon) const;
 
   /**
    * @brief Boolean : True if the given floats are strictly equal to the current
@@ -209,7 +208,7 @@ public:
    * @param w w value to compare against
    * @returns true if equal
    */
-  bool equalsToFloats(float x, float y, float z, float w) const;
+  [[nodiscard]] bool equalsToFloats(float x, float y, float z, float w) const;
 
   /**
    * @brief Multiplies in place the current Vector4 by the given one.
@@ -225,7 +224,7 @@ public:
    * @param otherVector vector to multiple with
    * @returns resulting new vector
    */
-  Vector4 multiply(const Vector4& otherVector) const;
+  [[nodiscard]] Vector4 multiply(const Vector4& otherVector) const;
 
   /**
    * @brief Updates the given vector "result" with the multiplication result of
@@ -235,8 +234,7 @@ public:
    * @param result vector to store the result
    * @returns the current Vector4.
    */
-  const Vector4& multiplyToRef(const Vector4& otherVector,
-                               Vector4& result) const;
+  const Vector4& multiplyToRef(const Vector4& otherVector, Vector4& result) const;
 
   /**
    * @brief Returns a new Vector4 set with the multiplication result of the
@@ -247,7 +245,7 @@ public:
    * @param w w value multiply with
    * @returns resulting new vector
    */
-  Vector4 multiplyByFloats(float x, float y, float z, float w) const;
+  [[nodiscard]] Vector4 multiplyByFloats(float x, float y, float z, float w) const;
 
   /**
    * @brief Returns a new Vector4 set with the division result of the current
@@ -255,7 +253,7 @@ public:
    * @param otherVector vector to devide with
    * @returns resulting new vector
    */
-  Vector4 divide(const Vector4& otherVector) const;
+  [[nodiscard]] Vector4 divide(const Vector4& otherVector) const;
 
   /**
    *@brief Updates the given vector "result" with the division result of the
@@ -293,13 +291,13 @@ public:
    * @brief Gets a new Vector4 from current Vector4 floored values.
    * @returns a new Vector4
    */
-  Vector4 floor() const;
+  [[nodiscard]] Vector4 floor() const;
 
   /**
    * @brief Gets a new Vector4 from current Vector3 floored values.
    * @returns a new Vector4
    */
-  Vector4 fract() const;
+  [[nodiscard]] Vector4 fract() const;
 
   /** Operator overloading **/
   friend std::ostream& operator<<(std::ostream& os, const Vector4& vector);
@@ -322,13 +320,13 @@ public:
    * @brief Returns the Vector4 length (float).
    * @returns the length
    */
-  float length() const;
+  [[nodiscard]] float length() const;
 
   /**
    * @brief Returns the Vector4 squared length (float).
    * @returns the length squared
    */
-  float lengthSquared() const;
+  [[nodiscard]] float lengthSquared() const;
 
   /** Methods **/
 
@@ -342,7 +340,7 @@ public:
    * @brief Returns a new Vector3 from the Vector4 (x, y, z) coordinates.
    * @returns this converted to a new vector3
    */
-  Vector3 toVector3() const;
+  [[nodiscard]] Vector3 toVector3() const;
 
   /**
    * @brief Updates the current Vector4 with the given one coordinates.
@@ -396,8 +394,7 @@ public:
    * @param offset the offset into the array to start at
    * @param result the vector to store the result in
    */
-  static void FromArrayToRef(const Float32Array& array, unsigned int offset,
-                             Vector4& result);
+  static void FromArrayToRef(const Float32Array& array, unsigned int offset, Vector4& result);
 
   /**
    * @brief Updates the given vector "result" coordinates from the given floats.
@@ -407,8 +404,7 @@ public:
    * @param w float to set from
    * @param result the vector to the floats in
    */
-  static void FromFloatsToRef(float x, float y, float z, float w,
-                              Vector4& result);
+  static void FromFloatsToRef(float x, float y, float z, float w, Vector4& result);
 
   /**
    * @brief Returns a new Vector4 set to (0.0, 0.0, 0.0, 0.0)
@@ -490,8 +486,7 @@ public:
    * @param transformation the transformation matrix to apply
    * @returns the new vector
    */
-  static Vector4 TransformNormal(const Vector4& vector,
-                                 const Matrix& transformation);
+  static Vector4 TransformNormal(const Vector4& vector, const Matrix& transformation);
 
   /**
    * @brief Sets the given vector "result" with the result of the normal
@@ -501,8 +496,7 @@ public:
    * @param transformation the transformation matrix to apply
    * @param result the vector to store the result in
    */
-  static void TransformNormalToRef(const Vector4& vector,
-                                   const Matrix& transformation,
+  static void TransformNormalToRef(const Vector4& vector, const Matrix& transformation,
                                    Vector4& result);
 
   /**
@@ -517,8 +511,7 @@ public:
    * @param result the vector to store the results in
    */
   static void TransformNormalFromFloatsToRef(float x, float y, float z, float w,
-                                             const Matrix& transformation,
-                                             Vector4& result);
+                                             const Matrix& transformation, Vector4& result);
 
   /**
    * @brief Creates a new Vector4 from a Vector3.

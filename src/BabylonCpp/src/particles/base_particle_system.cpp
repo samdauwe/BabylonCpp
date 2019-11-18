@@ -313,7 +313,7 @@ void BaseParticleSystem::_attachImageProcessingConfiguration(
   }
 }
 
-void BaseParticleSystem::_reset()
+void BaseParticleSystem::_reset() // FIXME: should it be IParticleSystem::reset() (no underscore)?
 {
 }
 

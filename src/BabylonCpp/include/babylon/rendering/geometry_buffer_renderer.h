@@ -79,7 +79,7 @@ public:
    * @brief Gets the current underlying G Buffer.
    * @returns the buffer
    */
-  MultiRenderTargetPtr getGBuffer() const;
+  [[nodiscard]] MultiRenderTargetPtr getGBuffer() const;
 
   /**
    * @brief Disposes the renderer and frees up associated resources.
@@ -96,13 +96,13 @@ protected:
    * @brief Gets wether or not G buffer are supported by the running hardware.
    * This requires draw buffer supports
    */
-  bool get_isSupported() const;
+  [[nodiscard]] bool get_isSupported() const;
 
   /**
    * @brief Gets a boolean indicating if objects positions are enabled for the G
    * buffer.
    */
-  bool get_enablePosition() const;
+  [[nodiscard]] bool get_enablePosition() const;
 
   /**
    * @brief Sets whether or not objects positions are enabled for the G buffer.
@@ -113,7 +113,7 @@ protected:
    * @brief Gets a boolean indicating if objects velocities are enabled for the
    * G buffer.
    */
-  bool get_enableVelocity() const;
+  [[nodiscard]] bool get_enableVelocity() const;
 
   /**
    * @brief Sets wether or not objects velocities are enabled for the G buffer.
@@ -129,13 +129,13 @@ protected:
    * @brief Gets the ratio used by the buffer during its creation.
    * How big is the buffer related to the main canvas.
    */
-  float get_ratio() const;
+  [[nodiscard]] float get_ratio() const;
 
   /**
    * @brief Gets the number of samples used to render the buffer (anti
    * aliasing).
    */
-  unsigned int get_samples() const;
+  [[nodiscard]] unsigned int get_samples() const;
 
   /**
    * @brief Sets the number of samples used to render the buffer (anti
@@ -156,8 +156,7 @@ private:
    * @brief _Copies the bones transformation matrices into the target array and
    * returns the target's reference.
    */
-  Float32Array& _copyBonesTransformationMatrices(const Float32Array& source,
-                                                 Float32Array& target);
+  Float32Array& _copyBonesTransformationMatrices(const Float32Array& source, Float32Array& target);
 
 public:
   /**
@@ -166,8 +165,7 @@ public:
    * set to "true"
    * @hidden
    */
-  std::unordered_map<size_t, ISavedTransformationMatrix>
-    _previousTransformationMatrices;
+  std::unordered_map<size_t, ISavedTransformationMatrix> _previousTransformationMatrices;
 
   /**
    * Dictionary used to store the previous bones transformation matrices of each

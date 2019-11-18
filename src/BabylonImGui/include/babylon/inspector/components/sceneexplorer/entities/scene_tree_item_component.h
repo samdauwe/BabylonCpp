@@ -23,8 +23,7 @@ struct SceneTreeItemComponentState {
   unsigned int gizmoMode = 0;
 }; // end of struct SceneTreeItemComponentState
 
-class BABYLON_SHARED_EXPORT SceneTreeItemComponent
-    : public TreeItemSpecializedComponent {
+class BABYLON_SHARED_EXPORT SceneTreeItemComponent : public TreeItemSpecializedComponent {
 
 public:
   /** Font Awesome Icon Unicodes **/
@@ -38,7 +37,7 @@ public:
 
 public:
   SceneTreeItemComponent(const ISceneTreeItemComponentProps& props);
-  virtual ~SceneTreeItemComponent(); // = default
+  ~SceneTreeItemComponent() override; // = default
 
   void componentWillMount();
   void componentWillUnmount();

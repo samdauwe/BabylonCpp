@@ -28,7 +28,7 @@ public:
   BoundingBox(BoundingBox&& other);
   BoundingBox& operator=(const BoundingBox& other);
   BoundingBox& operator=(BoundingBox&& other);
-  virtual ~BoundingBox(); // = default
+  ~BoundingBox() override; // = default
 
   // Methods
 
@@ -65,16 +65,14 @@ public:
    * @param frustumPlanes defines the frustum planes to test
    * @returns true if there is an intersection
    */
-  bool isInFrustum(const std::array<Plane, 6>& frustumPlanes,
-                   unsigned int strategy = 0) override;
+  bool isInFrustum(const std::array<Plane, 6>& frustumPlanes, unsigned int strategy = 0) override;
 
   /**
    * @brief Tests if the bounding box is entirely inside the frustum planes.
    * @param frustumPlanes defines the frustum planes to test
    * @returns true if there is an inclusion
    */
-  bool
-  isCompletelyInFrustum(const std::array<Plane, 6>& frustumPlanes) override;
+  bool isCompletelyInFrustum(const std::array<Plane, 6>& frustumPlanes) override;
 
   /**
    * @brief Tests if a point is inside the bounding box.
@@ -97,7 +95,7 @@ public:
    * @param max defines the max vector to use
    * @returns true if there is an intersection
    */
-  bool intersectsMinMax(const Vector3& min, const Vector3& max) const;
+  [[nodiscard]] bool intersectsMinMax(const Vector3& min, const Vector3& max) const;
 
   /** Statics **/
   /**
@@ -128,9 +126,8 @@ public:
    * @param frustumPlanes defines the frustum planes to test
    * @return true if there is an inclusion
    */
-  static bool
-  IsCompletelyInFrustum(const std::array<Vector3, 8>& boundingVectors,
-                        const std::array<Plane, 6>& frustumPlanes);
+  static bool IsCompletelyInFrustum(const std::array<Vector3, 8>& boundingVectors,
+                                    const std::array<Plane, 6>& frustumPlanes);
 
   /**
    * @brief Tests if a bounding box defined with 8 vectors intersects frustum

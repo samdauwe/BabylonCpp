@@ -24,7 +24,7 @@ public:
 
     return postProcess;
   }
-  ~BlackAndWhitePostProcess(); // = default
+  ~BlackAndWhitePostProcess() override; // = default
 
 protected:
   /**
@@ -42,9 +42,8 @@ protected:
    * @param reusable If the post process can be reused on the same frame.
    * (default: false)
    */
-  BlackAndWhitePostProcess(const std::string& name, float ratio,
-                           const CameraPtr& camera, unsigned int samplingMode,
-                           Engine* engine, bool reusable = false);
+  BlackAndWhitePostProcess(const std::string& name, float ratio, const CameraPtr& camera,
+                           unsigned int samplingMode, Engine* engine, bool reusable = false);
 
 public:
   /**

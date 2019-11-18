@@ -100,12 +100,11 @@ protected:
                         Engine* engine = nullptr, bool reusable = false,
                         unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
                         bool blockCompilation    = false);
-
   /**
    * @brief Gets the number of iterations are used for motion blur quality.
    * Default value is equal to 32.
    */
-  unsigned int get_motionBlurSamples() const;
+  [[nodiscard]] unsigned int get_motionBlurSamples() const;
 
   /**
    * @brief Sets the number of iterations to be used for motion blur quality.

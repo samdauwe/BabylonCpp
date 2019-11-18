@@ -7,8 +7,7 @@
 namespace BABYLON {
 
 class PBRMetallicRoughnessMaterial;
-using PBRMetallicRoughnessMaterialPtr
-  = std::shared_ptr<PBRMetallicRoughnessMaterial>;
+using PBRMetallicRoughnessMaterialPtr = std::shared_ptr<PBRMetallicRoughnessMaterial>;
 
 /**
  * @brief The PBR material of BJS following the metal roughness convention.
@@ -16,8 +15,7 @@ using PBRMetallicRoughnessMaterialPtr
  * This fits to the PBR convention in the GLTF definition:
  * https://github.com/KhronosGroup/glTF/tree/2.0/specification/2.0
  */
-class BABYLON_SHARED_EXPORT PBRMetallicRoughnessMaterial
-    : public PBRBaseSimpleMaterial {
+class BABYLON_SHARED_EXPORT PBRMetallicRoughnessMaterial : public PBRBaseSimpleMaterial {
 
 public:
   template <typename... Ts>
@@ -29,36 +27,35 @@ public:
 
     return material;
   }
-  ~PBRMetallicRoughnessMaterial(); // = default
+  ~PBRMetallicRoughnessMaterial() override; // = default
 
   /**
    * @brief Return the currrent class name of the material.
    */
-  const std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
   /**
    * @brief Gets a property.
    */
-  virtual AnimationValue
-  getProperty(const std::vector<std::string>& targetPropertyPath) override;
+  AnimationValue getProperty(const std::vector<std::string>& targetPropertyPath) override;
 
   /**
    * @brief Sets a property.
    */
-  virtual void setProperty(const std::vector<std::string>& targetPropertyPath,
-                           const AnimationValue& value) override;
+  void setProperty(const std::vector<std::string>& targetPropertyPath,
+                   const AnimationValue& value) override;
 
   /**
    * @brief Makes a duplicate of the current material.
    * @param name - name to use for the new material.
    */
-  MaterialPtr clone(const std::string& name,
-                    bool cloneChildren = false) const override;
+  [[nodiscard]] MaterialPtr clone(const std::string& name,
+                                  bool cloneChildren = false) const override;
 
   /**
    * @brief Serialize the material to a parsable JSON object.
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Parses a JSON object correponding to the serialize function.
@@ -97,14 +94,14 @@ protected:
    * @brief Specifies the metallic scalar value of the material.
    * Can also be used to scale the metalness values of the metallic texture.
    */
-  float get_metallic() const;
+  [[nodiscard]] float get_metallic() const;
   void set_metallic(float value);
 
   /**
    * @brief Specifies the roughness scalar value of the material.
    * Can also be used to scale the roughness values of the metallic texture.
    */
-  float get_roughness() const;
+  [[nodiscard]] float get_roughness() const;
   void set_roughness(float value);
 
   /**
@@ -146,8 +143,7 @@ public:
    * Texture containing both the metallic value in the B channel and the
    * roughness value in the G channel to keep better precision.
    */
-  Property<PBRMetallicRoughnessMaterial, BaseTexturePtr>
-    metallicRoughnessTexture;
+  Property<PBRMetallicRoughnessMaterial, BaseTexturePtr> metallicRoughnessTexture;
 
 }; // end of class PBRMetallicRoughnessMaterial
 

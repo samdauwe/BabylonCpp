@@ -64,7 +64,7 @@ void Skeleton::addToScene(const SkeletonPtr& newSkeleton)
   _scene->skeletons.emplace_back(newSkeleton);
 }
 
-const std::string Skeleton::getClassName() const
+std::string Skeleton::getClassName() const
 {
   return "Skeleton";
 }

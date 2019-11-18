@@ -3201,13 +3201,22 @@ class Option : public OptionBase<Option> {
     callback_t get_callback() const { return callback_; }
 
     /// Get the long names
-    const std::vector<std::string> get_lnames() const { return lnames_; }
+    std::vector<std::string> get_lnames() const
+    {
+      return lnames_;
+    }
 
     /// Get the short names
-    const std::vector<std::string> get_snames() const { return snames_; }
+    std::vector<std::string> get_snames() const
+    {
+      return snames_;
+    }
 
     /// get the flag names with specified default values
-    const std::vector<std::string> get_fnames() const { return fnames_; }
+    std::vector<std::string> get_fnames() const
+    {
+      return fnames_;
+    }
 
     /// The number of times the option expects to be included
     int get_expected() const { return expected_; }
@@ -5731,19 +5740,19 @@ class App {
         for(App_p &sub : subcommands_) {
             if(sub->disabled_)
                 continue;
-            if(sub->name_.empty() && sub->required_ == false) {
-                if(sub->count_all() == 0) {
-                    if(require_option_min_ > 0 && require_option_min_ <= used_options) {
-                        continue;
-                        // if we have met the requirement and there is nothing in this option group skip checking
-                        // requirements
-                    }
-                    if(require_option_max_ > 0 && used_options >= require_option_min_) {
-                        continue;
-                        // if we have met the requirement and there is nothing in this option group skip checking
-                        // requirements
-                    }
+            if (sub->name_.empty() && !sub->required_) {
+              if (sub->count_all() == 0) {
+                if (require_option_min_ > 0 && require_option_min_ <= used_options) {
+                  continue;
+                  // if we have met the requirement and there is nothing in this option group skip
+                  // checking requirements
                 }
+                if (require_option_max_ > 0 && used_options >= require_option_min_) {
+                  continue;
+                  // if we have met the requirement and there is nothing in this option group skip
+                  // checking requirements
+                }
+              }
             }
             if(sub->count() > 0 || sub->name_.empty()) {
                 sub->_process_requirements();

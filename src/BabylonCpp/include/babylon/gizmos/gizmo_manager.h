@@ -46,7 +46,7 @@ public:
    * @param scene the scene to overlay the gizmos on top of
    */
   GizmoManager(Scene* scene);
-  virtual ~GizmoManager(); // = default
+  ~GizmoManager() override; // = default
 
   /**
    * @brief Attaches a set of gizmos to the specified mesh.
@@ -57,8 +57,7 @@ public:
   /**
    * @brief Disposes of the gizmo manager.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
 protected:
   /**
@@ -80,7 +79,7 @@ protected:
   /**
    * @brief Gets if the position gizmo is enabled.
    */
-  bool get_positionGizmoEnabled() const;
+  [[nodiscard]] bool get_positionGizmoEnabled() const;
 
   /**
    * @brief Sets if the rotation gizmo is enabled.
@@ -90,7 +89,7 @@ protected:
   /**
    * @brief Gets if the rotation gizmo is enabled.
    */
-  bool get_rotationGizmoEnabled() const;
+  [[nodiscard]] bool get_rotationGizmoEnabled() const;
 
   /**
    * @brief Sets if the scale gizmo is enabled.
@@ -100,7 +99,7 @@ protected:
   /**
    * @brief Gets if the scale gizmo is enabled.
    */
-  bool get_scaleGizmoEnabled() const;
+  [[nodiscard]] bool get_scaleGizmoEnabled() const;
 
   /**
    * @brief Sets if the boundingBox gizmo is enabled.
@@ -110,7 +109,7 @@ protected:
   /**
    * @brief Gets if the boundingBox gizmo is enabled.
    */
-  bool get_boundingBoxGizmoEnabled() const;
+  [[nodiscard]] bool get_boundingBoxGizmoEnabled() const;
 
 public:
   /**

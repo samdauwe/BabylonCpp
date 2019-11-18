@@ -41,8 +41,6 @@ CylinderOptions::CylinderOptions()
     , tessellation{std::nullopt}
     , subdivisions{std::nullopt}
     , arc{std::nullopt}
-    , faceColors{}
-    , faceUV{}
     , updatable{std::nullopt}
     , hasRings{std::nullopt}
     , enclose{std::nullopt}
@@ -131,7 +129,6 @@ ExtrudeShapeCustomOptions::ExtrudeShapeCustomOptions()
     , sideOrientation{std::nullopt}
     , frontUVs{std::nullopt}
     , backUVs{std::nullopt}
-    , instance{}
     , invertUV{std::nullopt}
 {
 }

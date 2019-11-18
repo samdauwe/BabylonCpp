@@ -101,7 +101,7 @@ void Bone::set__matrix(const Matrix& value)
   _needToDecompose = true;
 }
 
-const std::string Bone::getClassName() const
+std::string Bone::getClassName() const
 {
   return "Bone";
 }

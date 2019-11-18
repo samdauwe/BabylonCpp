@@ -36,7 +36,7 @@ struct BABYLON_SHARED_EXPORT IAction {
    * @brief Gets the trigger parameters
    * @returns the trigger parameters
    */
-  virtual std::string getTriggerParameter() const = 0;
+  [[nodiscard]] virtual std::string getTriggerParameter() const = 0;
 
   /**
    * @brief Internal only - executes current action event.

@@ -251,8 +251,7 @@ bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     scene, mesh, defines, false, _maxSimultaneousLights, _disableLighting);
 
   // Values that need to be evaluated on every frame
-  MaterialHelper::PrepareDefinesForFrameBoundValues(
-    scene, engine, defines, useInstances ? true : false);
+  MaterialHelper::PrepareDefinesForFrameBoundValues(scene, engine, defines, useInstances);
 
   // Attribs
   MaterialHelper::PrepareDefinesForAttributes(mesh, defines, true, true);
@@ -550,7 +549,7 @@ json TerrainMaterial::serialize() const
   return nullptr;
 }
 
-const std::string TerrainMaterial::getClassName() const
+std::string TerrainMaterial::getClassName() const
 {
   return "TerrainMaterial";
 }

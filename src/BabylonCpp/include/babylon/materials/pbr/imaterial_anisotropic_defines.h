@@ -9,17 +9,16 @@ namespace BABYLON {
 /**
  * @brief Hidden
  */
-struct BABYLON_SHARED_EXPORT IMaterialAnisotropicDefines
-    : public MaterialDefines {
+struct BABYLON_SHARED_EXPORT IMaterialAnisotropicDefines : public MaterialDefines {
 
   IMaterialAnisotropicDefines();
-  ~IMaterialAnisotropicDefines(); // = default
+  ~IMaterialAnisotropicDefines() override; // = default
 
   /**
    * @brief Converts the material define values to a string.
    * @returns - String of material define information.
    */
-  virtual std::string toString() const override;
+  [[nodiscard]] std::string toString() const override;
 
 }; // end of struct IMaterialAnisotropicDefines
 

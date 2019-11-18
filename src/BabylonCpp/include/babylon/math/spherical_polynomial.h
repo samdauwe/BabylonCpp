@@ -26,8 +26,8 @@ public:
   SphericalPolynomial& operator=(const SphericalPolynomial& other);
   SphericalPolynomial& operator=(SphericalPolynomial&& other);
   ~SphericalPolynomial(); // = default
-  SphericalPolynomial copy() const;
-  std::unique_ptr<SphericalPolynomial> clone() const;
+  [[nodiscard]] SphericalPolynomial copy() const;
+  [[nodiscard]] std::unique_ptr<SphericalPolynomial> clone() const;
 
   /**
    * @brief Gets the spherical harmonics used to create the polynomials.

@@ -408,12 +408,9 @@ bool PBRSubSurfaceConfiguration::hasTexture(const BaseTexturePtr& texture) const
 
 bool PBRSubSurfaceConfiguration::hasRenderTargetTextures() const
 {
-  if (MaterialFlags::RefractionTextureEnabled() && _refractionTexture
-      && _refractionTexture->isRenderTarget) {
-    return true;
-  }
+  return MaterialFlags::RefractionTextureEnabled() && _refractionTexture
 
-  return false;
+         && _refractionTexture->isRenderTarget;
 }
 
 void PBRSubSurfaceConfiguration::getActiveTextures(
@@ -453,7 +450,7 @@ void PBRSubSurfaceConfiguration::dispose(bool forceDisposeTextures)
   }
 }
 
-const std::string PBRSubSurfaceConfiguration::getClassName() const
+std::string PBRSubSurfaceConfiguration::getClassName() const
 {
   return "PBRSubSurfaceConfiguration";
 }

@@ -20,7 +20,7 @@ PostProcessRenderPipeline::PostProcessRenderPipeline(Engine* iEngine,
 
 PostProcessRenderPipeline::~PostProcessRenderPipeline() = default;
 
-const std::string PostProcessRenderPipeline::getClassName() const
+std::string PostProcessRenderPipeline::getClassName() const
 {
   return "PostProcessRenderPipeline";
 }

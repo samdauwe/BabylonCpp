@@ -29,7 +29,7 @@ public:
    * @param gizmoLayer The utility layer the gizmo will be added to
    */
   Gizmo(const UtilityLayerRendererPtr& gizmoLayer);
-  virtual ~Gizmo(); // = default
+  ~Gizmo() override; // = default
 
   /**
    * @brief Disposes and replaces the current meshes in the gizmo with the
@@ -38,14 +38,12 @@ public:
    * @param useGizmoMaterial If the gizmo's default material should be used
    * (default: false)
    */
-  virtual void setCustomMesh(const MeshPtr& mesh,
-                             bool useGizmoMaterial = false);
+  virtual void setCustomMesh(const MeshPtr& mesh, bool useGizmoMaterial = false);
 
   /**
    * @brief Disposes of the gizmo.
    */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
 protected:
   /**
@@ -56,7 +54,7 @@ protected:
   /**
    * @brief Sets the ratio for the scale of the gizmo (Default: 1).
    */
-  virtual float get_scaleRatio() const;
+  [[nodiscard]] virtual float get_scaleRatio() const;
 
   /**
    * @brief Gets the mesh that the gizmo will be attached to. (eg. on a drag
@@ -80,7 +78,7 @@ protected:
    * @brief Gets if set the gizmo's position will be updated to match the
    * attached mesh each frame (Default: true).
    */
-  virtual bool get_updateGizmoRotationToMatchAttachedMesh() const;
+  [[nodiscard]] virtual bool get_updateGizmoRotationToMatchAttachedMesh() const;
 
   /**
    * @brief Hidden

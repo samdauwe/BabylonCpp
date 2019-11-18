@@ -31,7 +31,7 @@ struct BABYLON_SHARED_EXPORT FactorGradient : public IValueGradient {
    * If factor2 is undefined then factor1 will be used
    * @returns the picked number
    */
-  float getFactor() const;
+  [[nodiscard]] float getFactor() const;
 
 }; // end of struct FactorGradient
 

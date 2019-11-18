@@ -11,11 +11,10 @@ class BloomMergePostProcess;
 class BlurPostProcess;
 class ExtractHighlightsPostProcess;
 class Scene;
-using BloomEffectPtr           = std::shared_ptr<BloomEffect>;
-using BloomMergePostProcessPtr = std::shared_ptr<BloomMergePostProcess>;
-using BlurPostProcessPtr       = std::shared_ptr<BlurPostProcess>;
-using ExtractHighlightsPostProcessPtr
-  = std::shared_ptr<ExtractHighlightsPostProcess>;
+using BloomEffectPtr                  = std::shared_ptr<BloomEffect>;
+using BloomMergePostProcessPtr        = std::shared_ptr<BloomMergePostProcess>;
+using BlurPostProcessPtr              = std::shared_ptr<BlurPostProcess>;
+using ExtractHighlightsPostProcessPtr = std::shared_ptr<ExtractHighlightsPostProcess>;
 
 /**
  * @brief The bloom effect spreads bright areas of an image to simulate
@@ -27,8 +26,7 @@ public:
   template <typename... Ts>
   static BloomEffectPtr New(Ts&&... args)
   {
-    return std::shared_ptr<BloomEffect>(
-      new BloomEffect(std::forward<Ts>(args)...));
+    return std::shared_ptr<BloomEffect>(new BloomEffect(std::forward<Ts>(args)...));
   }
   virtual ~BloomEffect(); // = default
 
@@ -48,7 +46,7 @@ public:
    * @returns if all the contained post processes are ready.
    * Hidden
    */
-  bool _isReady() const;
+  [[nodiscard]] bool _isReady() const;
 
 protected:
   /**
@@ -65,16 +63,15 @@ protected:
    * the constructor. The updateEffect method can be used to compile the shader
    * at a later time. (default: false)
    */
-  BloomEffect(const std::string& name, Scene* scene, float bloomScale,
-              float bloomWeight, float bloomKernel,
-              unsigned int pipelineTextureType = 0,
-              bool blockCompilation            = false);
+  BloomEffect(const std::string& name, Scene* scene, float bloomScale, float bloomWeight,
+              float bloomKernel, unsigned int pipelineTextureType = 0,
+              bool blockCompilation = false);
 
   /**
    * @brief Gets the luminance threshold to find bright areas of the image to
    * bloom.
    */
-  float get_threshold() const;
+  [[nodiscard]] float get_threshold() const;
 
   /**
    * @brief Sets the luminance threshold to find bright areas of the image to
@@ -85,7 +82,7 @@ protected:
   /**
    * @brief The strength of the bloom.
    */
-  float get_weight() const;
+  [[nodiscard]] float get_weight() const;
 
   /**
    * @brief The strength of the bloom.
@@ -96,7 +93,7 @@ protected:
    * @brief Specifies the size of the bloom blur kernel, relative to the final
    * output size.
    */
-  float get_kernel() const;
+  [[nodiscard]] float get_kernel() const;
 
   /**
    * @brief Specifies the size of the bloom blur kernel, relative to the final

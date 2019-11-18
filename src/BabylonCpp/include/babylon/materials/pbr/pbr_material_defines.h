@@ -10,15 +10,14 @@ namespace BABYLON {
 /**
  * @brief Manages the defines for the PBR Material.
  */
-struct BABYLON_SHARED_EXPORT PBRMaterialDefines
-    : public MaterialDefines,
-      public IImageProcessingConfigurationDefines {
+struct BABYLON_SHARED_EXPORT PBRMaterialDefines : public MaterialDefines,
+                                                  public IImageProcessingConfigurationDefines {
 
   /**
    * @brief Initializes the PBR Material defines.
    */
   PBRMaterialDefines();
-  ~PBRMaterialDefines(); // = default
+  ~PBRMaterialDefines() override; // = default
 
   /**
    * @brief Resets the PBR Material defines.
@@ -29,7 +28,7 @@ struct BABYLON_SHARED_EXPORT PBRMaterialDefines
    * @brief Converts the material define values to a string.
    * @returns - String of material define information.
    */
-  virtual std::string toString() const override;
+  [[nodiscard]] std::string toString() const override;
 
 }; // end of struct PBRMaterialDefines
 

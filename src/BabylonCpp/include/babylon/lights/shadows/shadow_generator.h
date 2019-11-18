@@ -168,13 +168,13 @@ public:
   template <typename... Ts>
   static ShadowGeneratorPtr New(Ts&&... args)
   {
-    auto shadowGenerator = std::shared_ptr<ShadowGenerator>(
-      new ShadowGenerator(std::forward<Ts>(args)...));
+    auto shadowGenerator
+      = std::shared_ptr<ShadowGenerator>(new ShadowGenerator(std::forward<Ts>(args)...));
     shadowGenerator->addToLight(shadowGenerator);
 
     return shadowGenerator;
   }
-  virtual ~ShadowGenerator(); // = default
+  ~ShadowGenerator() override; // = default
 
   void addToLight(const ShadowGeneratorPtr& shadowGenerator);
 
@@ -183,7 +183,7 @@ public:
    * actual darkness of a shadow. 0 means strongest and 1 would means no shadow.
    * @returns the darkness.
    */
-  float getDarkness() const;
+  [[nodiscard]] float getDarkness() const;
 
   /**
    * @brief Sets the darkness value (float). This can only decrease the actual
@@ -220,7 +220,7 @@ public:
    * @brief Gets the class name of that object.
    * @returns "ShadowGenerator"
    */
-  const std::string getClassName() const;
+  [[nodiscard]] std::string getClassName() const;
 
   /**
    * @brief Helper function to add a mesh and its descendants to the list of
@@ -230,8 +230,7 @@ public:
    * added. Default to true
    * @returns the Shadow Generator itself
    */
-  ShadowGenerator& addShadowCaster(const AbstractMeshPtr& mesh,
-                                   bool includeDescendants = true);
+  ShadowGenerator& addShadowCaster(const AbstractMeshPtr& mesh, bool includeDescendants = true);
 
   /**
    * @brief Helper function to remove a mesh and its descendants from the list
@@ -241,8 +240,7 @@ public:
    * removed. Default to true
    * @returns the Shadow Generator itself
    */
-  ShadowGenerator& removeShadowCaster(const AbstractMeshPtr& mesh,
-                                      bool includeDescendants = true);
+  ShadowGenerator& removeShadowCaster(const AbstractMeshPtr& mesh, bool includeDescendants = true);
 
   /**
    * @brief Returns the associated light object.
@@ -257,9 +255,8 @@ public:
    * @param options Sets of optional options forcing the compilation with
    * different modes
    */
-  void forceCompilation(
-    const std::function<void(ShadowGenerator* generator)>& onCompiled,
-    const ShadowGeneratorCompileOptions& options) override;
+  void forceCompilation(const std::function<void(ShadowGenerator* generator)>& onCompiled,
+                        const ShadowGeneratorCompileOptions& options) override;
 
   /**
    * @brief Determine wheter the shadow generator is ready or not (mainly all
@@ -277,8 +274,7 @@ public:
    * @param lightIndex Index of the light in the enabled light list of the
    * material
    */
-  void prepareDefines(MaterialDefines& defines,
-                      unsigned int lightIndex) override;
+  void prepareDefines(MaterialDefines& defines, unsigned int lightIndex) override;
 
   /**
    * @brief Binds the shadow related information inside of an effect
@@ -288,8 +284,7 @@ public:
    * material owning the effect
    * @param effect The effect we are binfing the information for
    */
-  void bindShadowLight(const std::string& lightIndex,
-                       const EffectPtr& effect) override;
+  void bindShadowLight(const std::string& lightIndex, const EffectPtr& effect) override;
 
   /**
    * @brief Gets the transformation matrix used to project the meshes into the
@@ -316,7 +311,7 @@ public:
    * @brief Serializes the shadow generator setup to a json object.
    * @returns The serialized JSON object
    */
-  json serialize() const override;
+  [[nodiscard]] json serialize() const override;
 
   /**
    * @brief Parses a serialized ShadowGenerator and returns a new
@@ -325,8 +320,7 @@ public:
    * @param scene The scene to create the shadow map for
    * @returns The parsed shadow generator
    */
-  static ShadowGenerator* Parse(const json& parsedShadowGenerator,
-                                Scene* scene);
+  static ShadowGenerator* Parse(const json& parsedShadowGenerator, Scene* scene);
 
 protected:
   /**
@@ -341,8 +335,7 @@ protected:
    * textures but if you need precision (for self shadowing for instance), you
    * can use this option to enforce full float texture.
    */
-  ShadowGenerator(int mapSize, const IShadowLightPtr& light,
-                  bool usefulFloatFirst = false);
+  ShadowGenerator(int mapSize, const IShadowLightPtr& light, bool usefulFloatFirst = false);
   ShadowGenerator(const ISize& mapSize, const IShadowLightPtr& light,
                   bool usefulFloatFirst = false);
 
@@ -350,7 +343,7 @@ protected:
    * @brief Gets the bias: offset applied on the depth preventing acnea (in
    * light direction).
    */
-  float get_bias() const;
+  [[nodiscard]] float get_bias() const;
 
   /**
    * @brief Sets the bias: offset applied on the depth preventing acnea (in
@@ -363,7 +356,7 @@ protected:
    * (along side the normal direction and proportinal to the light/normal
    * angle).
    */
-  float get_normalBias() const;
+  [[nodiscard]] float get_normalBias() const;
 
   /**
    * @brief Sets the normalBias: offset applied on the depth preventing acnea
@@ -376,7 +369,7 @@ protected:
    * @brief Gets the blur box offset: offset applied during the blur pass.
    * Only useful if useKernelBlur = false
    */
-  int get_blurBoxOffset() const;
+  [[nodiscard]] int get_blurBoxOffset() const;
 
   /**
    * @brief Sets the blur box offset: offset applied during the blur pass.
@@ -388,7 +381,7 @@ protected:
    * @brief Gets the blur scale: scale of the blurred texture compared to the
    * main shadow map. 2 means half of the size.
    */
-  float get_blurScale() const;
+  [[nodiscard]] float get_blurScale() const;
 
   /**
    * @brief Sets the blur scale: scale of the blurred texture compared to the
@@ -400,7 +393,7 @@ protected:
    * @brief Gets the blur kernel: kernel size of the blur pass.
    * Only useful if useKernelBlur = true
    */
-  float get_blurKernel() const;
+  [[nodiscard]] float get_blurKernel() const;
 
   /**
    * @brief Sets the blur kernel: kernel size of the blur pass.
@@ -412,7 +405,7 @@ protected:
    * @brief Gets whether the blur pass is a kernel blur (if true) or box blur.
    * Only useful in filtered mode (useBlurExponentialShadowMap...)
    */
-  bool get_useKernelBlur() const;
+  [[nodiscard]] bool get_useKernelBlur() const;
 
   /**
    * @brief Sets whether the blur pass is a kernel blur (if true) or box blur.
@@ -423,7 +416,7 @@ protected:
   /**
    * @brief Gets the depth scale used in ESM mode.
    */
-  float get_depthScale() const;
+  [[nodiscard]] float get_depthScale() const;
 
   /**
    * @brief Sets the depth scale used in ESM mode.
@@ -436,7 +429,7 @@ protected:
    * The returned value is a number equal to one of the available mode defined
    * in ShadowMap.FILTER_x like _FILTER_NONE
    */
-  unsigned int get_filter() const;
+  [[nodiscard]] unsigned int get_filter() const;
 
   /**
    * @brief Sets the current mode of the shadow generator (normal, PCF, ESM...).
@@ -448,7 +441,7 @@ protected:
   /**
    * @brief Gets if the current filter is set to Poisson Sampling.
    */
-  bool get_usePoissonSampling() const;
+  [[nodiscard]] bool get_usePoissonSampling() const;
 
   /**
    * @brief Sets the current filter to Poisson Sampling.
@@ -458,7 +451,7 @@ protected:
   /**
    * @brief Gets if the current filter is set to ESM.
    */
-  bool get_useExponentialShadowMap() const;
+  [[nodiscard]] bool get_useExponentialShadowMap() const;
 
   /**
    * @brief Sets the current filter is to ESM.
@@ -468,7 +461,7 @@ protected:
   /**
    * @brief Gets if the current filter is set to filtered ESM.
    */
-  bool get_useBlurExponentialShadowMap() const;
+  [[nodiscard]] bool get_useBlurExponentialShadowMap() const;
 
   /**
    * @brief Gets if the current filter is set to filtered  ESM.
@@ -479,7 +472,7 @@ protected:
    * @brief Gets if the current filter is set to "close ESM" (using the inverse
    * of the exponential to prevent steep falloff artifacts).
    */
-  bool get_useCloseExponentialShadowMap() const;
+  [[nodiscard]] bool get_useCloseExponentialShadowMap() const;
 
   /**
    * @brief Sets the current filter to "close ESM" (using the inverse of the
@@ -491,7 +484,7 @@ protected:
    * @brief Gets if the current filter is set to filtered "close ESM" (using the
    * inverse of the exponential to prevent steep falloff artifacts).
    */
-  bool get_useBlurCloseExponentialShadowMap() const;
+  [[nodiscard]] bool get_useBlurCloseExponentialShadowMap() const;
 
   /**
    * @brief Sets the current filter to filtered "close ESM" (using the inverse
@@ -503,7 +496,7 @@ protected:
    * @brief Gets if the current filter is set to "PCF" (percentage closer
    * filtering).
    */
-  bool get_usePercentageCloserFiltering() const;
+  [[nodiscard]] bool get_usePercentageCloserFiltering() const;
 
   /**
    * @brief Sets the current filter to "PCF" (percentage closer filtering).
@@ -515,7 +508,7 @@ protected:
    * Only valid if usePercentageCloserFiltering or usePercentageCloserFiltering
    * is true.
    */
-  unsigned int get_filteringQuality() const;
+  [[nodiscard]] unsigned int get_filteringQuality() const;
 
   /**
    * @brief Sets the PCF or PCSS Quality.
@@ -527,7 +520,7 @@ protected:
   /**
    * @brief Gets if the current filter is set to "PCSS" (contact hardening).
    */
-  bool get_useContactHardeningShadow() const;
+  [[nodiscard]] bool get_useContactHardeningShadow() const;
 
   /**
    * @brief Sets the current filter to "PCSS" (contact hardening).
@@ -544,7 +537,7 @@ protected:
    *
    * Only valid if useContactHardeningShadow is true.
    */
-  float get_contactHardeningLightSizeUVRatio() const;
+  [[nodiscard]] float get_contactHardeningLightSizeUVRatio() const;
 
   /**
    * @brief Sets the Light Size (in shadow map uv unit) used in PCSS to
@@ -556,13 +549,12 @@ protected:
    *
    * Only valid if useContactHardeningShadow is true.
    */
-  void
-  set_contactHardeningLightSizeUVRatio(float contactHardeningLightSizeUVRatio);
+  void set_contactHardeningLightSizeUVRatio(float contactHardeningLightSizeUVRatio);
 
   /**
    * @brief Gets the actual darkness of a shadow.
    */
-  float get_darkness() const;
+  [[nodiscard]] float get_darkness() const;
 
   /**
    * @brief Sets the actual darkness of a shadow.
@@ -572,7 +564,7 @@ protected:
   /**
    * @brief Gets the ability to have transparent shadow.
    */
-  bool get_transparencyShadow() const;
+  [[nodiscard]] bool get_transparencyShadow() const;
 
   /**
    * @brief Sets the ability to have transparent shadow.

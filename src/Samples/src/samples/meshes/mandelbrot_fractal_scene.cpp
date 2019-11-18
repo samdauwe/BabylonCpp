@@ -54,9 +54,9 @@ public:
     float xmin = -2.f, xmax = 1.f;
     float ymin = -1.5f, ymax = 1.5f;
     unsigned int xr = 200, yr = 200, maxIt = 256;
-    float xrf    = static_cast<float>(xr);
-    float yrf    = static_cast<float>(yr);
-    float maxItf = static_cast<float>(maxIt);
+    auto xrf     = static_cast<float>(xr);
+    auto yrf     = static_cast<float>(yr);
+    auto maxItf  = static_cast<float>(maxIt);
     float i      = 0.f;
     float x = 0.f, y = 0.f;
     float zx = 0.f, zx0 = 0.f, zy = 0.f, zx2 = 0.f, zy2 = 0.f;

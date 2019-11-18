@@ -31,13 +31,11 @@ public:
    * @param textureType defines the texture Type
    * (Engine.TEXTURETYPE_UNSIGNED_INT, Engine.TEXTURETYPE_FLOAT...)
    */
-  RawTexture3D(const ArrayBufferView& data, int width, int height, int depth,
-               unsigned int format, Scene* scene, bool generateMipMaps = true,
-               bool invertY = false,
-               unsigned int samplingMode
-               = TextureConstants::TRILINEAR_SAMPLINGMODE,
-               unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT);
-  ~RawTexture3D(); // = default
+  RawTexture3D(const ArrayBufferView& data, int width, int height, int depth, unsigned int format,
+               Scene* scene, bool generateMipMaps = true, bool invertY = false,
+               unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
+               unsigned int textureType  = Constants::TEXTURETYPE_UNSIGNED_INT);
+  ~RawTexture3D() override; // = default
 
   /**
    * @brief Update the texture with new data.

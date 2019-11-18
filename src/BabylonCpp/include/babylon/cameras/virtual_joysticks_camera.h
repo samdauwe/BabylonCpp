@@ -31,13 +31,13 @@ public:
 
     return camera;
   }
-  ~VirtualJoysticksCamera(); // = default
+  ~VirtualJoysticksCamera() override; // = default
 
   /**
    * @brief Gets the current object class name.
    * @return the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
 protected:
   /**
@@ -50,8 +50,7 @@ protected:
    * @param position Define the start position of the camera in the scene
    * @param scene Define the scene the camera belongs to
    */
-  VirtualJoysticksCamera(const std::string& name, const Vector3& position,
-                         Scene* scene);
+  VirtualJoysticksCamera(const std::string& name, const Vector3& position, Scene* scene);
 
 private:
   static bool NodeConstructorAdded;

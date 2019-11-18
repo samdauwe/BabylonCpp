@@ -5,7 +5,7 @@
 
 namespace BABYLON {
 
-StandardMaterialDefines::StandardMaterialDefines() : MaterialDefines{}
+StandardMaterialDefines::StandardMaterialDefines()
 {
   boolDef = {
     {"MAINUV1", false},                                     //

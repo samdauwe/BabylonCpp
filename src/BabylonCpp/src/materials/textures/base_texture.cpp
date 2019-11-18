@@ -242,7 +242,7 @@ std::string BaseTexture::toString() const
   return name;
 }
 
-const std::string BaseTexture::getClassName() const
+std::string BaseTexture::getClassName() const
 {
   return "BaseTexture";
 }
@@ -370,8 +370,7 @@ InternalTexturePtr BaseTexture::_getFromCache(const std::string& url, bool iNoMi
   auto& texturesCache = _scene->getEngine()->getLoadedTexturesCache();
   for (auto& texturesCacheEntry : texturesCache) {
     if (!invertY.has_value() || *invertY == texturesCacheEntry->invertY) {
-      if ((texturesCacheEntry->url.compare(url) == 0)
-          && texturesCacheEntry->generateMipMaps != iNoMipmap) {
+      if ((texturesCacheEntry->url == url) && texturesCacheEntry->generateMipMaps != iNoMipmap) {
         if (!sampling || sampling == texturesCacheEntry->samplingMode) {
           texturesCacheEntry->incrementReferences();
           return texturesCacheEntry;

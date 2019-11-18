@@ -19,12 +19,7 @@ struct BABYLON_SHARED_EXPORT AnimationGroupGridComponent {
     // --- CONTROLS ---
     static auto controlsOpened = true;
     ImGui::SetNextTreeNodeOpen(controlsOpened, ImGuiCond_Always);
-    if (ImGui::CollapsingHeader("CONTROLS")) {
-      controlsOpened = true;
-    }
-    else {
-      controlsOpened = false;
-    }
+    controlsOpened = ImGui::CollapsingHeader("CONTROLS");
   }
 
 }; // end of struct AnimationGroupGridComponent

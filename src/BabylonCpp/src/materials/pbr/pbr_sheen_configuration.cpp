@@ -150,11 +150,7 @@ void PBRSheenConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer,
 
 bool PBRSheenConfiguration::hasTexture(const BaseTexturePtr& iTexture) const
 {
-  if (_texture == iTexture) {
-    return true;
-  }
-
-  return false;
+  return _texture == iTexture;
 }
 
 void PBRSheenConfiguration::getActiveTextures(
@@ -182,7 +178,7 @@ void PBRSheenConfiguration::dispose(bool forceDisposeTextures)
   }
 }
 
-const std::string PBRSheenConfiguration::getClassName() const
+std::string PBRSheenConfiguration::getClassName() const
 {
   return "PBRSheenConfiguration";
 }

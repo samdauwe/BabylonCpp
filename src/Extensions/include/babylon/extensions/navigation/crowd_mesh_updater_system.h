@@ -10,10 +10,10 @@ namespace BABYLON {
 namespace Extensions {
 
 struct BABYLON_SHARED_EXPORT CrowdMeshUpdaterSystem
-  : ECS::System<ECS::Requires<CrowdAgent, CrowdMesh>> {
+    : ECS::System<ECS::Requires<CrowdAgent, CrowdMesh>> {
 
   CrowdMeshUpdaterSystem();
-  ~CrowdMeshUpdaterSystem(); // = default
+  ~CrowdMeshUpdaterSystem() override; // = default
 
   void update();
 

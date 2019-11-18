@@ -87,15 +87,14 @@ protected:
    * @param singleInstance False if this post process can be run on multiple
    * cameras. (default: true)
    */
-  PostProcessRenderEffect(
-    Engine* engine, const std::string& name,
-    const std::function<std::vector<PostProcessPtr>()>& getPostProcesses,
-    bool singleInstance = true);
+  PostProcessRenderEffect(Engine* engine, const std::string& name,
+                          const std::function<std::vector<PostProcessPtr>()>& getPostProcesses,
+                          bool singleInstance = true);
 
   /**
    * @brief Checks if all the post processes in the effect are supported.
    */
-  bool get_isSupported() const;
+  [[nodiscard]] bool get_isSupported() const;
 
 public:
   /**

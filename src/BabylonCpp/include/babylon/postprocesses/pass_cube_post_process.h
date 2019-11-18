@@ -20,13 +20,13 @@ public:
   template <typename... Ts>
   static PassCubePostProcessPtr New(Ts&&... args)
   {
-    auto postProcess = std::shared_ptr<PassCubePostProcess>(
-      new PassCubePostProcess(std::forward<Ts>(args)...));
+    auto postProcess
+      = std::shared_ptr<PassCubePostProcess>(new PassCubePostProcess(std::forward<Ts>(args)...));
     postProcess->add(postProcess);
 
     return postProcess;
   }
-  ~PassCubePostProcess(); // = default
+  ~PassCubePostProcess() override; // = default
 
 protected:
   /**
@@ -47,14 +47,12 @@ protected:
    * the constructor. The updateEffect method can be used to compile the shader
    * at a later time. (default: false)
    */
-  PassCubePostProcess(const std::string& name, float ratio,
-                      const CameraPtr& camera, unsigned int samplingMode,
-                      Engine* engine, bool reusable = false,
-                      unsigned int textureType
-                      = Constants::TEXTURETYPE_UNSIGNED_INT,
-                      bool blockCompilation = false);
+  PassCubePostProcess(const std::string& name, float ratio, const CameraPtr& camera,
+                      unsigned int samplingMode, Engine* engine, bool reusable = false,
+                      unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
+                      bool blockCompilation    = false);
 
-  unsigned int get_face() const;
+  [[nodiscard]] unsigned int get_face() const;
   void set_face(unsigned int value);
 
 public:

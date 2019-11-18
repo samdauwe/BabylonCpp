@@ -28,13 +28,13 @@ public:
 
     return camera;
   }
-  ~StereoscopicFreeCamera(); // = default
+  ~StereoscopicFreeCamera() override; // = default
 
   /**
    * @brief Gets camera class name.
    * @returns StereoscopicFreeCamera
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
 protected:
   /**
@@ -46,8 +46,7 @@ protected:
    * side or over under
    * @param scene defines the hosting scene
    */
-  StereoscopicFreeCamera(const std::string& name, const Vector3& position,
-                         float interaxialDistance,
+  StereoscopicFreeCamera(const std::string& name, const Vector3& position, float interaxialDistance,
                          bool isStereoscopicSideBySide, Scene* scene);
 
 private:

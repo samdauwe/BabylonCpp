@@ -3,7 +3,7 @@
 namespace BABYLON {
 namespace MaterialsLibrary {
 
-WaterMaterialDefines::WaterMaterialDefines() : MaterialDefines{}
+WaterMaterialDefines::WaterMaterialDefines()
 {
   boolDef = {
     {"BUMP", false},                  //

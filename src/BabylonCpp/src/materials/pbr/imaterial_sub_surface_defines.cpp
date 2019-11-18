@@ -4,7 +4,7 @@
 
 namespace BABYLON {
 
-IMaterialSubSurfaceDefines::IMaterialSubSurfaceDefines() : MaterialDefines{}
+IMaterialSubSurfaceDefines::IMaterialSubSurfaceDefines()
 {
   boolDef = {
     {"SUBSURFACE", false},                          //

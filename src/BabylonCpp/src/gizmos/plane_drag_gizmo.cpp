@@ -147,7 +147,7 @@ PlaneDragGizmo::~PlaneDragGizmo() = default;
 
 void PlaneDragGizmo::_attachedMeshChanged(const AbstractMeshPtr& value)
 {
-  dragBehavior->enabled = value ? true : false;
+  dragBehavior->enabled = static_cast<bool>(value);
 }
 
 void PlaneDragGizmo::set_isEnabled(bool value)

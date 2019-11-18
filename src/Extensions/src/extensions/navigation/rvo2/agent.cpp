@@ -73,9 +73,9 @@ void Agent::computeNewVelocity()
   const float invTimeHorizonObst = 1.0f / timeHorizonObst_;
 
   /* Create obstacle ORCA lines. */
-  for (size_t i = 0; i < obstacleNeighbors_.size(); ++i) {
+  for (auto& obstacleNeighbor : obstacleNeighbors_) {
 
-    const Obstacle* obstacle1 = obstacleNeighbors_[i].second;
+    const Obstacle* obstacle1 = obstacleNeighbor.second;
     const Obstacle* obstacle2 = obstacle1->nextObstacle_;
 
     const Vector2 relativePosition1 = obstacle1->point_ - position_;
@@ -87,13 +87,11 @@ void Agent::computeNewVelocity()
      */
     bool alreadyCovered = false;
 
-    for (size_t j = 0; j < orcaLines_.size(); ++j) {
-      if (det(invTimeHorizonObst * relativePosition1 - orcaLines_[j].point,
-              orcaLines_[j].direction)
+    for (auto& orcaLine : orcaLines_) {
+      if (det(invTimeHorizonObst * relativePosition1 - orcaLine.point, orcaLine.direction)
               - invTimeHorizonObst * radius_
             >= -RVO_EPSILON
-          && det(invTimeHorizonObst * relativePosition2 - orcaLines_[j].point,
-                 orcaLines_[j].direction)
+          && det(invTimeHorizonObst * relativePosition2 - orcaLine.point, orcaLine.direction)
                  - invTimeHorizonObst * radius_
                >= -RVO_EPSILON) {
         alreadyCovered = true;
@@ -357,8 +355,8 @@ void Agent::computeNewVelocity()
   const float invTimeHorizon = 1.0f / timeHorizon_;
 
   /* Create agent ORCA lines. */
-  for (size_t i = 0; i < agentNeighbors_.size(); ++i) {
-    const Agent* const other = agentNeighbors_[i].second;
+  for (auto& agentNeighbor : agentNeighbors_) {
+    const Agent* const other = agentNeighbor.second;
 
     const Vector2 relativePosition = other->position_ - position_;
     const Vector2 relativeVelocity = velocity_ - other->velocity_;

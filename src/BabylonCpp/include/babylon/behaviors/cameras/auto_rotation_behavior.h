@@ -18,17 +18,16 @@ using ArcRotateCameraPtr = std::shared_ptr<ArcRotateCamera>;
  * a smooth rotation of an ArcRotateCamera when there is no user interaction.
  * @see http://doc.babylonjs.com/how_to/camera_behaviors#autorotation-behavior
  */
-class BABYLON_SHARED_EXPORT AutoRotationBehavior
-    : public Behavior<ArcRotateCamera> {
+class BABYLON_SHARED_EXPORT AutoRotationBehavior : public Behavior<ArcRotateCamera> {
 
 public:
   AutoRotationBehavior();
-  virtual ~AutoRotationBehavior(); // = default
+  ~AutoRotationBehavior() override; // = default
 
   /**
    * @brief Gets the name of the behavior.
    */
-  const char* name() const;
+  [[nodiscard]] const char* name() const;
 
   /**
    * @brief Initializes the behavior.
@@ -41,8 +40,7 @@ public:
    * @param predicate Predicate to use for pick filtering
    */
   void attach(const ArcRotateCameraPtr& camera,
-              const std::function<bool(const AbstractMeshPtr& m)>& predicate
-              = nullptr) override;
+              const std::function<bool(const AbstractMeshPtr& m)>& predicate = nullptr) override;
 
   /**
    * @brief Detaches the behavior from its current arc rotate camera.
@@ -58,7 +56,7 @@ private:
   /**
    * @brief Gets the flag that indicates if user zooming should stop animation.
    */
-  bool get_zoomStopsAnimation() const;
+  [[nodiscard]] bool get_zoomStopsAnimation() const;
 
   /**
    * @brief Sets the default speed at which the camera rotates around the model.
@@ -68,7 +66,7 @@ private:
   /**
    * @brief Gets the default speed at which the camera rotates around the model.
    */
-  float get_idleRotationSpeed() const;
+  [[nodiscard]] float get_idleRotationSpeed() const;
 
   /**
    * @brief Sets the time (in milliseconds) to wait after user interaction
@@ -80,7 +78,7 @@ private:
    * @brief Gets the time (milliseconds) to wait after user interaction before
    * the camera starts rotating.
    */
-  float get_idleRotationWaitTime() const;
+  [[nodiscard]] float get_idleRotationWaitTime() const;
 
   /**
    * @brief Sets the time (milliseconds) to take to spin up to the full idle
@@ -92,19 +90,19 @@ private:
    * @brief Gets the time (milliseconds) to take to spin up to the full idle
    * rotation speed.
    */
-  float get_idleRotationSpinupTime() const;
+  [[nodiscard]] float get_idleRotationSpinupTime() const;
 
   /**
    * @brief Gets a value indicating if the camera is currently rotating because
    * of this behavior.
    */
-  bool get_rotationInProgress() const;
+  [[nodiscard]] bool get_rotationInProgress() const;
 
   /**
    * @brief Returns true if user is scrolling.
    * @return true if user is scrolling.
    */
-  bool _userIsZooming() const;
+  [[nodiscard]] bool _userIsZooming() const;
 
   bool _shouldAnimationStopForInteraction();
 

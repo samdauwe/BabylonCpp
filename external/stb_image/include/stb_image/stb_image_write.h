@@ -188,7 +188,7 @@ STBIWDEF int stbiw_convert_wchar_to_utf8(char *buffer, size_t bufferlen, const w
 #endif
 #endif
 
-typedef void stbi_write_func(void *context, void *data, int size);
+typedef void stbi_write_func(void *context, void *data, int size); // NOLINT
 
 STBIWDEF int stbi_write_png_to_func(stbi_write_func *func, void *context, int w, int h, int comp, const void  *data, int stride_in_bytes);
 STBIWDEF int stbi_write_bmp_to_func(stbi_write_func *func, void *context, int w, int h, int comp, const void  *data);
@@ -345,8 +345,8 @@ static void stbi__end_write_file(stbi__write_context *s)
 
 #endif // !STBI_WRITE_NO_STDIO
 
-typedef unsigned int stbiw_uint32;
-typedef int stb_image_write_test[sizeof(stbiw_uint32)==4 ? 1 : -1];
+typedef unsigned int stbiw_uint32; // NOLINT
+typedef int stb_image_write_test[sizeof(stbiw_uint32)==4 ? 1 : -1]; // NOLINT
 
 static void stbiw__writefv(stbi__write_context *s, const char *fmt, va_list v)
 {

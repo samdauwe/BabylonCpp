@@ -55,18 +55,18 @@ namespace ImGuiAl
     {
       kShowFilters = 1 << 0
     };
-    
-    typedef bool ( *IterateFunc )( Level level, const char* line, void *ud );
-    
+
+    using IterateFunc = bool (*)(Level, const char*, void*);
+
     inline Log()
     {
       Init();
     }
     
     virtual ~Log(); // = default
-    
-    bool Init( unsigned flags = 0, const char** more_actions = NULL );
-    
+
+    bool Init(unsigned flags = 0, const char** more_actions = nullptr);
+
     void SetColor( Level level, float r, float g, float b );
     void SetLabel( Level level, const char* label );
     void SetCumulativeLabel( const char* label );
@@ -121,4 +121,4 @@ namespace ImGuiAl
     const char*     m_FilterHeaderLabel;
     const char*     m_FilterLabel;
   };
-}
+  } // namespace ImGuiAl

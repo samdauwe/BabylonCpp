@@ -13,27 +13,23 @@ namespace BABYLON {
 /**
  * @brief Hidden
  */
-class BABYLON_SHARED_EXPORT DefaultCollisionCoordinator
-    : public ICollisionCoordinator {
+class BABYLON_SHARED_EXPORT DefaultCollisionCoordinator : public ICollisionCoordinator {
 
 public:
   DefaultCollisionCoordinator();
-  ~DefaultCollisionCoordinator(); // = default
+  ~DefaultCollisionCoordinator() override; // = default
 
-  void getNewPosition(
-    Vector3& position, Vector3& displacement, const ColliderPtr& collider,
-    unsigned int maximumRetry, const AbstractMeshPtr& excludedMesh,
-    const std::function<void(size_t collisionIndex, Vector3& newPosition,
-                             const AbstractMeshPtr& collidedMesh)>&
-      onNewPosition,
-    size_t collisionIndex) override;
+  void getNewPosition(Vector3& position, Vector3& displacement, const ColliderPtr& collider,
+                      unsigned int maximumRetry, const AbstractMeshPtr& excludedMesh,
+                      const std::function<void(size_t collisionIndex, Vector3& newPosition,
+                                               const AbstractMeshPtr& collidedMesh)>& onNewPosition,
+                      size_t collisionIndex) override;
   ColliderPtr createCollider() override;
   void init(Scene* scene) override;
 
 private:
-  void _collideWithWorld(Vector3& position, Vector3& velocity,
-                         const ColliderPtr& collider, unsigned int maximumRetry,
-                         Vector3& finalPosition,
+  void _collideWithWorld(Vector3& position, Vector3& velocity, const ColliderPtr& collider,
+                         unsigned int maximumRetry, Vector3& finalPosition,
                          const AbstractMeshPtr& excludedMesh = nullptr);
 
 private:

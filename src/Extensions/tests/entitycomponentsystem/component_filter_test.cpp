@@ -49,7 +49,7 @@ ComponentTypeList createTypeList()
   Assigner<Types...>()(temp);
   return temp;
 }
-}
+} // namespace
 
 // All possible test cases:
 // ========================

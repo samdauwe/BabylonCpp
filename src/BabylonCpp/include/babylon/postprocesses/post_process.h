@@ -60,7 +60,7 @@ public:
    * @brief Returns the fragment url or shader name used in the post process.
    * @returns the fragment url or name in the shader store.
    */
-  std::string getEffectName() const;
+  [[nodiscard]] std::string getEffectName() const;
 
   /**
    * @brief Gets the camera which post process is applied to.
@@ -78,7 +78,7 @@ public:
    * @brief Gets a string idenfifying the name of the class.
    * @returns "PostProcess" string
    */
-  virtual const std::string getClassName() const;
+  [[nodiscard]] virtual std::string getClassName() const;
 
   /**
    * @brief Gets the engine which this post process belongs to.
@@ -133,7 +133,7 @@ public:
    * @brief The post process is reusable if it can be used multiple times within one frame.
    * @returns If the post process is reusable
    */
-  bool isReusable() const;
+  [[nodiscard]] bool isReusable() const;
 
   /**
    * @brief Invalidate frameBuffer to hint the postprocess to create a depth buffer
@@ -159,18 +159,18 @@ public:
   /**
    * @brief If the post process is supported.
    */
-  bool isSupported() const;
+  [[nodiscard]] bool isSupported() const;
 
   /**
    * @brief The aspect ratio of the output texture.
    */
-  float aspectRatio() const;
+  [[nodiscard]] float aspectRatio() const;
 
   /**
    * @brief Get a value indicating if the post-process is ready to be used
    * @returns true if the post-process is ready (shader is compiled)
    */
-  bool isReady() const;
+  [[nodiscard]] bool isReady() const;
 
   /**
    * @brief Binds all textures and uniforms to the shader, this will be run on every pass.
@@ -223,7 +223,7 @@ protected:
   /**
    * @brief Gets the number of sample textures (default: 1)
    */
-  unsigned int get_samples() const;
+  [[nodiscard]] unsigned int get_samples() const;
 
   /**
    * @brief Sets the number of sample textures (default: 1)

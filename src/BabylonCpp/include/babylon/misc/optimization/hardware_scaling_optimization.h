@@ -6,12 +6,11 @@
 
 namespace BABYLON {
 
-class BABYLON_SHARED_EXPORT HardwareScalingOptimization
-    : public SceneOptimization {
+class BABYLON_SHARED_EXPORT HardwareScalingOptimization : public SceneOptimization {
 
 public:
   HardwareScalingOptimization(int priority = 0, int maximumSize = 2);
-  ~HardwareScalingOptimization(); // = default
+  ~HardwareScalingOptimization() override; // = default
 
   bool apply(Scene* scene) override;
 

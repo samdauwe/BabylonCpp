@@ -1,3 +1,5 @@
+#include <memory>
+
 #include <vector>
 
 #include <babylon/cameras/arc_rotate_camera.h>
@@ -89,7 +91,7 @@ private:
     _agentMeshes = CrowdSimulationUtils::createAgentMeshes(scene, 196);
 
     // Create new crowd simulation
-    _crowdSimulation.reset(new Extensions::CrowdSimulation());
+    _crowdSimulation = std::make_unique<Extensions::CrowdSimulation>();
     _crowdSimulation->setTimeStep(0.3f);
 
     // Create agents
