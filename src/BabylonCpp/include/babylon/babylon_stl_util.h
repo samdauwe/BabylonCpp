@@ -691,7 +691,7 @@ inline void erase_remove_if(Container& c, Predicate p)
 template <typename T>
 inline void remove_vector_elements_equal(std::vector<T>& vec, const T& val)
 {
-  erase_remove_if(vec, [](auto v) { return v == val; });
+  erase_remove_if(vec, [&val](auto v) { return v == val; });
 }
 
 template <typename BaseClass, typename DerivedClass>
