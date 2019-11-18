@@ -44,7 +44,7 @@ public:
                      const Vector3& p2, const Vector3& p3, bool hasMaterial,
                      const AbstractMeshPtr& hostMesh);
   /** Hidden */
-  void _collide(std::vector<Plane>& trianglePlaneArray, const std::vector<Vector3> pts,
+  void _collide(std::vector<Plane>& trianglePlaneArray, const std::vector<Vector3>& pts,
                 const IndicesArray& indices, size_t indexStart, size_t indexEnd, unsigned int decal,
                 bool hasMaterial, const AbstractMeshPtr& hostMesh);
   /** Hidden */

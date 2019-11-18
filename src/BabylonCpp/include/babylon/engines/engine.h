@@ -790,7 +790,7 @@ public:
    * @param blockName defines the block name
    * @param index defines the index where to bind the block
    */
-  void bindUniformBlock(GL::IGLProgram* shaderProgram, const std::string blockName,
+  void bindUniformBlock(GL::IGLProgram* shaderProgram, const std::string& blockName,
                         unsigned int index);
 
   /**
@@ -1770,7 +1770,7 @@ public:
    * @param compression defines the compression used (null by default)
    * @returns the cube texture as an InternalTexture
    */
-  InternalTexturePtr createRawCubeTexture(const std::vector<ArrayBufferView> data, int size,
+  InternalTexturePtr createRawCubeTexture(const std::vector<ArrayBufferView>& data, int size,
                                           unsigned int format, unsigned int type,
                                           bool generateMipMaps, bool invertY,
                                           unsigned int samplingMode,

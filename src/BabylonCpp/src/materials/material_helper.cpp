@@ -530,11 +530,7 @@ unsigned int MaterialHelper::HandleFallbacksForShadows(MaterialDefines& defines,
     }
   }
 
-  // FIXME: warning: Value stored to 'lightFallbackRank' is never read [clang-analyzer-deadcode.DeadStores]
-  // The ++ result is not used in the return !
-  // This is probably a bug inside BabylonJs: src/Materials/materialHelper.ts
-  // (The js code has the same problem)
-  return lightFallbackRank++;
+  return lightFallbackRank;
 }
 
 void MaterialHelper::PrepareAttributesForMorphTargetsInfluencers(std::vector<std::string>& attribs,

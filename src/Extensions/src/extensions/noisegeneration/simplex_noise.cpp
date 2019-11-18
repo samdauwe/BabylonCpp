@@ -1075,8 +1075,7 @@ SimplexNoise::vec5 SimplexNoise::dnoise(const Vector4& v)
   float z4 = z0 - 1.0f + 4.0f * G4;
   float w4 = w0 - 1.0f + 4.0f * G4;
 
-  // Wrap the integer indices at 256, to avoid indexing perm[] out of
-  // bounds
+  // Wrap the integer indices at 256, to avoid indexing perm[] out of bounds
   unsigned int ii = i & 0xff;
   unsigned int jj = j & 0xff;
   unsigned int kk = k & 0xff;

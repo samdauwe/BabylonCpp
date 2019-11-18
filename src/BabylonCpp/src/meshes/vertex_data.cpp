@@ -3532,8 +3532,6 @@ void VertexData::ComputeNormals(const Float32Array& positions,
 
   if (computeFacetPartitioning && options && (*options).bbSize) {
     const auto& bbSize = *options->bbSize;
-    float bbSizeMax    = (bbSize.x > bbSize.y) ? bbSize.x : bbSize.y;
-    bbSizeMax          = (bbSizeMax > bbSize.z) ? bbSizeMax : bbSize.z;
     xSubRatio          = options->subDiv.X * ratio / bbSize.x;
     ySubRatio          = options->subDiv.Y * ratio / bbSize.y;
     zSubRatio          = options->subDiv.Z * ratio / bbSize.z;

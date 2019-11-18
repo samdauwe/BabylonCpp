@@ -283,6 +283,10 @@ void SceneLoader::RegisterPlugin(
     asyncedPlugin = std::get<ISceneLoaderPluginAsyncPtr>(plugin);
   }
 
+  if (!syncedPlugin && !asyncedPlugin) {
+    return;
+  }
+
   auto extensions = syncedPlugin ? syncedPlugin->extensions : asyncedPlugin->extensions;
   if (std::holds_alternative<std::string>(extensions)) {
     auto extension = std::get<std::string>(extensions);

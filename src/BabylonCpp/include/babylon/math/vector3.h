@@ -423,7 +423,7 @@ public:
   Vector3& operator/=(const Vector3& otherVector);
   bool operator==(const Vector3& otherVector) const;
   bool operator!=(const Vector3& otherVector) const;
-  const float& operator[](const unsigned int index) const;
+  const float& operator[](unsigned int index) const;
 
   /** Properties **/
 

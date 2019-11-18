@@ -51,22 +51,8 @@ IParticleSystem* ParticleHelper::CreateDefault(
 }
 
 ParticleSystemSet* ParticleHelper::CreateAsync(const std::string& /*type*/,
-                                               Scene* scene, bool gpu)
+                                               Scene* /*scene*/, bool /*gpu*/)
 {
-  if (!scene) {
-    scene = Engine::LastCreatedScene();
-  }
-
-  if (gpu && !GPUParticleSystem::IsSupported()) {
-    BABYLON_LOG_ERROR("ParticleSystemSet",
-                      "Particle system with GPU is not supported.")
-    return nullptr;
-  }
-
-  // const auto url = String::concat(ParticleHelper::BaseAssetsUrl, "/systems/",
-  // type, ".json");
-  // Tools::LoadFile(url, [](const std::string&, const std::string&) {},
-  // nullptr, false);
   return nullptr;
 }
 

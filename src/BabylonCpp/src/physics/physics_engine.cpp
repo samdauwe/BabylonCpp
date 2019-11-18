@@ -22,10 +22,9 @@ PhysicsEngine::PhysicsEngine(const std::optional<Vector3>& iGravity,
   }
   else {
     if (_physicsPlugin) {
-      BABYLON_LOGF_ERROR(
-          "PhysicsEngine",
-          "Physics Engine %s cannot be found. Please make sure it is included.",
-          _physicsPlugin->name.c_str());
+      BABYLON_LOGF_ERROR("PhysicsEngine",
+                         "Physics Engine %s cannot be found. Please make sure it is included.",
+                         _physicsPlugin->name.c_str())
     }
   }
 }
@@ -73,18 +72,16 @@ void PhysicsEngine::addImpostor(PhysicsImpostor* impostor)
 
 void PhysicsEngine::removeImpostor(PhysicsImpostor* impostor)
 {
-  auto it = std::find_if(_impostors.begin(), _impostors.end(),
-                         [&impostor](const PhysicsImpostorPtr& _imposter) {
-                           return _imposter.get() == impostor;
-                         });
+  auto it = std::find_if(
+    _impostors.begin(), _impostors.end(),
+    [&impostor](const PhysicsImpostorPtr& _imposter) { return _imposter.get() == impostor; });
   if (it != _impostors.end()) {
     _impostors.erase(it);
     getPhysicsPlugin()->removePhysicsBody(*impostor);
   }
 }
 
-void PhysicsEngine::addJoint(PhysicsImpostor* mainImpostor,
-                             PhysicsImpostor* connectedImpostor,
+void PhysicsEngine::addJoint(PhysicsImpostor* mainImpostor, PhysicsImpostor* connectedImpostor,
                              const std::shared_ptr<PhysicsJoint>& joint)
 {
   auto impostorJoint               = std::make_shared<PhysicsImpostorJoint>();
@@ -97,24 +94,21 @@ void PhysicsEngine::addJoint(PhysicsImpostor* mainImpostor,
   _physicsPlugin->generateJoint(impostorJoint.get());
 }
 
-void PhysicsEngine::removeJoint(PhysicsImpostor* mainImpostor,
-                                PhysicsImpostor* connectedImpostor,
+void PhysicsEngine::removeJoint(PhysicsImpostor* mainImpostor, PhysicsImpostor* connectedImpostor,
                                 PhysicsJoint* joint)
 {
   std::vector<PhysicsImpostorJointPtr> matchingJoints(_joints.size());
 
   auto it = std::copy_if(
     _joints.begin(), _joints.end(), matchingJoints.begin(),
-    [&connectedImpostor, &joint,
-     &mainImpostor](const PhysicsImpostorJointPtr& impostorJoint) {
+    [&connectedImpostor, &joint, &mainImpostor](const PhysicsImpostorJointPtr& impostorJoint) {
       return (impostorJoint->connectedImpostor == connectedImpostor
               && impostorJoint->joint.get() == joint
               && impostorJoint->mainImpostor == mainImpostor);
     });
 
   // shrink container to new size
-  matchingJoints.resize(
-    static_cast<size_t>(std::distance(matchingJoints.begin(), it)));
+  matchingJoints.resize(static_cast<size_t>(std::distance(matchingJoints.begin(), it)));
 
   if (!matchingJoints.empty()) {
     _physicsPlugin->removeJoint(matchingJoints[0].get());
@@ -152,22 +146,19 @@ std::vector<PhysicsImpostorPtr>& PhysicsEngine::getImpostors()
   return _impostors;
 }
 
-PhysicsImpostor*
-PhysicsEngine::getImpostorForPhysicsObject(IPhysicsEnabledObject* object)
+PhysicsImpostor* PhysicsEngine::getImpostorForPhysicsObject(IPhysicsEnabledObject* object)
 {
-  auto it = std::find_if(_impostors.begin(), _impostors.end(),
-                         [&object](const PhysicsImpostorPtr& impostor) {
-                           return impostor->object == object;
-                         });
+  auto it = std::find_if(
+    _impostors.begin(), _impostors.end(),
+    [&object](const PhysicsImpostorPtr& impostor) { return impostor->object == object; });
   return (it == _impostors.end()) ? nullptr : (*it).get();
 }
 
 PhysicsImpostor* PhysicsEngine::getImpostorWithPhysicsBody(IPhysicsBody* body)
 {
-  auto it = std::find_if(_impostors.begin(), _impostors.end(),
-                         [&body](const PhysicsImpostorPtr& impostor) {
-                           return impostor->physicsBody() == body;
-                         });
+  auto it = std::find_if(
+    _impostors.begin(), _impostors.end(),
+    [&body](const PhysicsImpostorPtr& impostor) { return impostor->physicsBody() == body; });
   return (it == _impostors.end()) ? nullptr : (*it).get();
 }
 
@@ -176,8 +167,7 @@ bool PhysicsEngine::isInitialized() const
   return _initialized;
 }
 
-PhysicsRaycastResult PhysicsEngine::raycast(const Vector3& from,
-                                            const Vector3& to)
+PhysicsRaycastResult PhysicsEngine::raycast(const Vector3& from, const Vector3& to)
 {
   return _physicsPlugin->raycast(from, to);
 }

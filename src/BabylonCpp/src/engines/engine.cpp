@@ -1445,7 +1445,7 @@ void Engine::bindUniformBufferBase(GL::IGLBuffer* buffer, unsigned int location)
   _gl->bindBufferBase(GL::UNIFORM_BUFFER, location, buffer);
 }
 
-void Engine::bindUniformBlock(GL::IGLProgram* shaderProgram, const std::string blockName,
+void Engine::bindUniformBlock(GL::IGLProgram* shaderProgram, const std::string& blockName,
                               unsigned int index)
 {
   auto uniformLocation = _gl->getUniformBlockIndex(shaderProgram, blockName);
@@ -4354,7 +4354,7 @@ void Engine::updateRawCubeTexture(const InternalTexturePtr& texture,
   texture->isReady = true;
 }
 
-InternalTexturePtr Engine::createRawCubeTexture(const std::vector<ArrayBufferView> data, int size,
+InternalTexturePtr Engine::createRawCubeTexture(const std::vector<ArrayBufferView>& data, int size,
                                                 unsigned int format, unsigned int type,
                                                 bool generateMipMaps, bool invertY,
                                                 unsigned int samplingMode,
