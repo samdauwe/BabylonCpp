@@ -358,6 +358,9 @@ SubMesh::_intersectTriangles(Ray& ray, const std::vector<Vector3>& positions,
                              const IndicesArray& indices, bool fastCheck,
                              const TrianglePickingPredicate& trianglePredicate)
 {
+  if (positions.empty())
+    return std::nullopt;
+
   std::optional<IntersectionInfo> intersectInfo = std::nullopt;
 
   // Triangles test
