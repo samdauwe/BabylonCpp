@@ -2071,7 +2071,10 @@ void Scene::_animate()
     return;
   }
 
-  const auto& animatables = _activeAnimatables;
+  // Animatable::_animate can remove elements from _activeAnimatables
+  // we need to make a copy of it in order to iterate on a vector that 
+  // will not be modified during the loop!
+  const auto animatables = _activeAnimatables; 
   if (animatables.empty()) {
     return;
   }
@@ -2092,13 +2095,13 @@ void Scene::_animate()
   const auto& animationTime = _animationTime;
   _animationTimeLast        = now;
 
-  for (size_t index = 0; index < animatables.size(); ++index) {
-    const auto& animatable = animatables[index];
-
+  for (const auto& animatable : animatables) {
     if (animatable) {
       if (!animatable->_animate(std::chrono::milliseconds(animationTime))
           && animatable->disposeOnEnd) {
-        index--; // Array was updated
+            // The animation removed itself from _activeAnimatables
+            // during the call to _animate()
+            ;
       }
     }
   }
