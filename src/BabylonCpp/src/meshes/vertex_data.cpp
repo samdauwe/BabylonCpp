@@ -719,11 +719,13 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
       // if end of one of two consecutive paths reached, go to next existing
       // path
       ++p;
+      if (p == lg.size())
+        continue; // this is not in the js code, but is a probable js code bug
       if (p == lg.size() - 1) {
         // last path of pathArray reached <=> closeArray == true
         shft = idx[0] - idx[p];
         l1   = lg[p] - 1;
-        l2   = lg[0] - 1;
+        l2   = lg[0] - 1; 
       }
       else {
         shft = idx[p + 1] - idx[p];
