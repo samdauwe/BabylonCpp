@@ -1515,7 +1515,8 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   _intersectionsInProgress.clear();
 
   // Lights
-  for (const auto& light : getScene()->lights) {
+  auto lightsCopy = getScene()->lights;
+  for (const auto& light : lightsCopy) {
     // Included meshes
     stl_util::remove_vector_elements_equal_sharedptr_wrapped(light->includedOnlyMeshes, this); // Checked
 
