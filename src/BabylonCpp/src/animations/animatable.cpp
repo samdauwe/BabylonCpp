@@ -295,15 +295,14 @@ bool Animatable::_animate(const millisecond_t& delay)
       // Remove from active animatables
       stl_util::remove_vector_elements_equal_sharedptr(_scene->_activeAnimatables, this);
       // Dispose all runtime animations
-#if 0
-      for (const auto& runtimeAnimation : _runtimeAnimations) {
+      auto _runtimeAnimationsCopy = _runtimeAnimations; // copy because runtimeAnimation->dispose
+                                                        // can erase from _runtimeAnimations
+      for (const auto& runtimeAnimation : _runtimeAnimationsCopy) {
         if (runtimeAnimation) {
           runtimeAnimation->dispose();
         }
       }
-#else
       _runtimeAnimations.clear();
-#endif
     }
 
 #if 0 // TODO FIXME
