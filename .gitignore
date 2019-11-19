@@ -63,6 +63,8 @@ src/InspectorV1
 .idea/
 cmake-build-debug/
 cmake-build-release/
+cmake-build-relwithdebinfo/
+cmake-build-minsizerel/
 
 # cquery
 .cquery_cache
