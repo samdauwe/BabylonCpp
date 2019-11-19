@@ -676,12 +676,7 @@ void DefaultRenderingPipeline::addCamera(Camera* camera)
 
 void DefaultRenderingPipeline::removeCamera(Camera* camera)
 {
-  _camerasToBeAttached.erase(std::remove_if(_camerasToBeAttached.begin(),
-                                            _camerasToBeAttached.end(),
-                                            [camera](const CameraPtr& _camera) {
-                                              return _camera.get() == camera;
-                                            }),
-                             _camerasToBeAttached.end());
+  stl_util::remove_vector_elements_equal_sharedptr(_camerasToBeAttached, camera);
   _buildPipeline();
 }
 

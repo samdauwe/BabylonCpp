@@ -326,14 +326,7 @@ void AnimationGroup::dispose(bool /*doNotRecurse*/,
 {
   _targetedAnimations.clear();
   _animatables.clear();
-
-  _scene->animationGroups.erase(
-    std::remove_if(_scene->animationGroups.begin(),
-                   _scene->animationGroups.end(),
-                   [this](const AnimationGroupPtr& animationGroup) {
-                     return animationGroup.get() == this;
-                   }),
-    _scene->animationGroups.end());
+  stl_util::remove_vector_elements_equal_sharedptr(_scene->animationGroups, this);
 
   onAnimationEndObservable.clear();
   onAnimationGroupEndObservable.clear();

@@ -105,12 +105,7 @@ void Node::set_parent(Node* const& iParent)
 
   // Remove self from list of children of parent
   if (_parentNode && !_parentNode->_children.empty()) {
-    _parentNode->_children.erase(std::remove_if(_parentNode->_children.begin(),
-                                                _parentNode->_children.end(),
-                                                [this](const NodePtr& node) {
-                                                  return node.get() == this;
-                                                }),
-                                 _parentNode->_children.end());
+    stl_util::remove_vector_elements_equal_sharedptr(_parentNode->_children, this);
 
     if (!iParent && !_isDisposed) {
       addToSceneRootNodes();

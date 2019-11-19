@@ -401,13 +401,11 @@ void ParticleSystem::_removeFactorGradient(
     return;
   }
 
-  factorGradients.erase(
-    std::remove_if(factorGradients.begin(), factorGradients.end(),
-                   [&gradient](const FactorGradient& factorGradient) {
-                     return stl_util::almost_equal(factorGradient.gradient,
-                                                   gradient);
-                   }),
-    factorGradients.end());
+  stl_util::erase_remove_if(factorGradients,
+    [&gradient](const FactorGradient& factorGradient) {
+      return stl_util::almost_equal(factorGradient.gradient, gradient);
+    }
+  );
 }
 
 IParticleSystem&
@@ -675,13 +673,11 @@ IParticleSystem& ParticleSystem::removeColorGradient(float gradient)
     return *this;
   }
 
-  _colorGradients.erase(
-    std::remove_if(_colorGradients.begin(), _colorGradients.end(),
-                   [&gradient](const ColorGradient& colorGradient) {
-                     return stl_util::almost_equal(colorGradient.gradient,
-                                                   gradient);
-                   }),
-    _colorGradients.end());
+  stl_util::erase_remove_if(_colorGradients,
+    [&gradient](const ColorGradient& colorGradient) {
+      return stl_util::almost_equal(colorGradient.gradient, gradient);
+    }
+  );
 
   return *this;
 }
@@ -1750,13 +1746,9 @@ void ParticleSystem::dispose(bool disposeTexture,
   }
 
   // Remove from scene
-  _scene->particleSystems.erase(
-    std::remove_if(_scene->particleSystems.begin(),
-                   _scene->particleSystems.end(),
-                   [this](const IParticleSystemPtr& particleSystem) {
-                     return particleSystem.get() == this;
-                   }),
-    _scene->particleSystems.end());
+  stl_util::erase_remove_if(_scene->particleSystems,
+    [this](const IParticleSystemPtr& particleSystem) { return particleSystem.get() == this; }
+    );
 
   _scene->_activeParticleSystems.clear();
 

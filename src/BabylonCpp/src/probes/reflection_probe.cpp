@@ -1,5 +1,6 @@
 #include <babylon/probes/reflection_probe.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json_util.h>
 #include <babylon/engines/constants.h>
@@ -138,13 +139,7 @@ void ReflectionProbe::setRenderingAutoClearDepthStencil(
 void ReflectionProbe::dispose()
 {
   // Remove from the scene if found
-  _scene->reflectionProbes.erase(
-    std::remove_if(_scene->reflectionProbes.begin(),
-                   _scene->reflectionProbes.end(),
-                   [this](const ReflectionProbePtr& reflectionProbe) {
-                     return reflectionProbe.get() == this;
-                   }),
-    _scene->reflectionProbes.end());
+  stl_util::remove_vector_elements_equal_sharedptr(_scene->reflectionProbes, this);
 
   if (_renderTargetTexture) {
     _renderTargetTexture->dispose();

@@ -676,12 +676,7 @@ void EffectLayer::dispose()
   _disposeTextureAndPostProcesses();
 
   // Remove from scene
-  _scene->effectLayers.erase(
-    std::remove_if(_scene->effectLayers.begin(), _scene->effectLayers.end(),
-                   [this](const EffectLayerPtr& effectLayer) {
-                     return effectLayer.get() == this;
-                   }),
-    _scene->effectLayers.end());
+  stl_util::remove_vector_elements_equal_sharedptr(_scene->effectLayers, this);
 
   // Callback
   onDisposeObservable.notifyObservers(this);

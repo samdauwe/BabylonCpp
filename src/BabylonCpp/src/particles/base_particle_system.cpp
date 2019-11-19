@@ -325,12 +325,11 @@ BaseParticleSystem& BaseParticleSystem::_removeGradientAndTexture(
     return *this;
   }
 
-  gradients.erase(std::remove_if(gradients.begin(), gradients.end(),
-                                 [gradient](const ColorGradient& gradientItem) {
-                                   return stl_util::almost_equal(
-                                     gradientItem.gradient, gradient);
-                                 }),
-                  gradients.end());
+  stl_util::erase_remove_if(gradients,
+    [gradient](const ColorGradient& gradientItem) {
+      return stl_util::almost_equal(gradientItem.gradient, gradient);
+    }
+  );
 
   if (texture) {
     texture->dispose();
@@ -347,13 +346,11 @@ BaseParticleSystem& BaseParticleSystem::_removeGradientAndTexture(
     return *this;
   }
 
-  gradients.erase(
-    std::remove_if(gradients.begin(), gradients.end(),
-                   [gradient](const Color3Gradient& gradientItem) {
-                     return stl_util::almost_equal(gradientItem.gradient,
-                                                   gradient);
-                   }),
-    gradients.end());
+  stl_util::erase_remove_if(gradients,
+    [gradient](const Color3Gradient& gradientItem) {
+      return stl_util::almost_equal(gradientItem.gradient, gradient);
+    }
+  );
 
   if (texture) {
     texture->dispose();
@@ -370,13 +367,12 @@ BaseParticleSystem& BaseParticleSystem::_removeGradientAndTexture(
     return *this;
   }
 
-  gradients.erase(
-    std::remove_if(gradients.begin(), gradients.end(),
-                   [gradient](const FactorGradient& gradientItem) {
-                     return stl_util::almost_equal(gradientItem.gradient,
-                                                   gradient);
-                   }),
-    gradients.end());
+  stl_util::erase_remove_if(
+    gradients,
+    [gradient](const FactorGradient& gradientItem) {
+      return stl_util::almost_equal(gradientItem.gradient, gradient);
+    }
+  );
 
   if (texture) {
     texture->dispose();

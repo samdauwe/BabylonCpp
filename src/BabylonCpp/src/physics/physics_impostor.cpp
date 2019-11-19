@@ -424,15 +424,13 @@ void PhysicsImpostor::unregisterBeforePhysicsStep(
 {
   using Function = std::function<void(PhysicsImpostor * impostor)>;
 
-  _onBeforePhysicsStepCallbacks.erase(
-    std::remove_if(_onBeforePhysicsStepCallbacks.begin(),
-                   _onBeforePhysicsStepCallbacks.end(),
-                   [&func](const Function& f) {
-                     auto ptr1 = func.template target<Function>();
-                     auto ptr2 = f.template target<Function>();
-                     return ptr1 < ptr2;
-                   }),
-    _onBeforePhysicsStepCallbacks.end());
+  stl_util::erase_remove_if(_onBeforePhysicsStepCallbacks, 
+    [&func](const Function& f) {
+      auto ptr1 = func.template target<Function>();
+      auto ptr2 = f.template target<Function>();
+      return ptr1 < ptr2;
+    }
+  );
 }
 
 void PhysicsImpostor::registerAfterPhysicsStep(
@@ -446,15 +444,13 @@ void PhysicsImpostor::unregisterAfterPhysicsStep(
 {
   using Function = std::function<void(PhysicsImpostor * impostor)>;
 
-  _onAfterPhysicsStepCallbacks.erase(
-    std::remove_if(_onAfterPhysicsStepCallbacks.begin(),
-                   _onAfterPhysicsStepCallbacks.end(),
-                   [&func](const Function& f) {
-                     auto ptr1 = func.template target<Function>();
-                     auto ptr2 = f.template target<Function>();
-                     return ptr1 < ptr2;
-                   }),
-    _onAfterPhysicsStepCallbacks.end());
+  stl_util::erase_remove_if(_onAfterPhysicsStepCallbacks,
+    [&func](const Function& f) {
+      auto ptr1 = func.template target<Function>();
+      auto ptr2 = f.template target<Function>();
+      return ptr1 < ptr2;
+    }
+  );
 }
 
 void PhysicsImpostor::registerOnPhysicsCollide()

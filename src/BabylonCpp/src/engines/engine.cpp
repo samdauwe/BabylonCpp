@@ -4818,12 +4818,7 @@ void Engine::_releaseTexture(InternalTexture* texture)
   // Unbind channels
   unbindAllTextures();
 
-  _internalTexturesCache.erase(std::remove_if(_internalTexturesCache.begin(),
-                                              _internalTexturesCache.end(),
-                                              [&texture](const InternalTexturePtr& _texture) {
-                                                return _texture.get() == texture;
-                                              }),
-                               _internalTexturesCache.end());
+  stl_util::remove_vector_elements_equal_sharedptr(_internalTexturesCache, texture);
 
   // Integrated fixed lod samplers.
   if (texture->_lodTextureHigh) {

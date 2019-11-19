@@ -76,10 +76,9 @@ bool PostProcessManager::_prepareFrame(
     = !iPostProcesses.empty() ? iPostProcesses : camera->_postProcesses;
 
   // Filter out all null elements
-  postProcesses.erase(
-    std::remove_if(postProcesses.begin(), postProcesses.end(),
-                   [](const PostProcessPtr& pp) { return pp == nullptr; }),
-    postProcesses.end());
+  stl_util::erase_remove_if(postProcesses,
+    [](const PostProcessPtr& pp) { return pp == nullptr; }
+  );
 
   if (postProcesses.empty() || !_scene->postProcessesEnabled) {
     return false;
@@ -147,10 +146,9 @@ void PostProcessManager::_finalizeFrame(
     = _postProcesses.empty() ? camera->_postProcesses : _postProcesses;
 
   // Filter out all null elements
-  postProcesses.erase(
-    std::remove_if(postProcesses.begin(), postProcesses.end(),
-                   [](const PostProcessPtr& pp) { return pp == nullptr; }),
-    postProcesses.end());
+  stl_util::erase_remove_if(postProcesses,
+    [](const PostProcessPtr& pp) { return pp == nullptr; }
+  );
 
   if (postProcesses.empty() || !_scene->postProcessesEnabled) {
     return;

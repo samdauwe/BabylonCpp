@@ -2,6 +2,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
@@ -525,10 +526,7 @@ void BaseTexture::dispose()
   _scene->stopAnimation(this);
 
   // Remove from scene
-  _scene->textures.erase(
-    std::remove_if(_scene->textures.begin(), _scene->textures.end(),
-                   [this](const BaseTexturePtr& baseTexture) { return baseTexture.get() == this; }),
-    _scene->textures.end());
+  stl_util::remove_vector_elements_equal_sharedptr(_scene->textures, this);
 
   _scene->onTextureRemovedObservable.notifyObservers(this);
 

@@ -358,6 +358,9 @@ SubMesh::_intersectTriangles(Ray& ray, const std::vector<Vector3>& positions,
                              const IndicesArray& indices, bool fastCheck,
                              const TrianglePickingPredicate& trianglePredicate)
 {
+  if (positions.empty())
+    return std::nullopt;
+
   std::optional<IntersectionInfo> intersectInfo = std::nullopt;
 
   // Triangles test
@@ -469,12 +472,7 @@ void SubMesh::dispose()
   }
 
   // Remove from mesh
-  _mesh->subMeshes.erase(
-    std::remove_if(_mesh->subMeshes.begin(), _mesh->subMeshes.end(),
-                   [this](const std::shared_ptr<SubMesh>& subMesh) {
-                     return subMesh.get() == this;
-                   }),
-    _mesh->subMeshes.end());
+  stl_util::remove_vector_elements_equal_sharedptr(_mesh->subMeshes, this);
 }
 
 std::string SubMesh::getClassName() const

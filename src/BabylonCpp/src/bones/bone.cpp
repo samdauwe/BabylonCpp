@@ -128,12 +128,7 @@ void Bone::setParent(Bone* iParent, bool updateDifferenceMatrix)
   }
 
   if (_parent) {
-    _parent->children.erase(std::remove_if(_parent->children.begin(),
-                                           _parent->children.end(),
-                                           [this](const BonePtr& bone) {
-                                             return bone.get() == this;
-                                           }),
-                            _parent->children.end());
+    stl_util::remove_vector_elements_equal_sharedptr(_parent->children, this);
   }
 
   _parent = iParent;

@@ -203,10 +203,7 @@ void Layer::dispose()
 
   // Remove from scene
   auto& layers = _scene->layers;
-  layers.erase(std::remove_if(
-                 layers.begin(), layers.end(),
-                 [this](const LayerPtr& layer) { return layer.get() == this; }),
-               layers.end());
+  stl_util::remove_vector_elements_equal_sharedptr(layers, this);
 
   // Callback
   onDisposeObservable.notifyObservers(this);

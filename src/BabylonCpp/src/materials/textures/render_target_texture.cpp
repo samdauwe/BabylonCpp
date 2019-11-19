@@ -786,22 +786,10 @@ void RenderTargetTexture::dispose()
     return;
   }
 
-  scene->customRenderTargets.erase(
-    std::remove_if(
-      scene->customRenderTargets.begin(), scene->customRenderTargets.end(),
-      [this](const RenderTargetTexturePtr& renderTargetTexturePtr) {
-        return renderTargetTexturePtr.get() == this;
-      }),
-    scene->customRenderTargets.end());
+  stl_util::remove_vector_elements_equal_sharedptr(scene->customRenderTargets, this);
 
   for (const auto& camera : scene->cameras) {
-    camera->customRenderTargets.erase(
-      std::remove_if(
-        camera->customRenderTargets.begin(), camera->customRenderTargets.end(),
-        [this](const RenderTargetTexturePtr& renderTargetTexturePtr) {
-          return renderTargetTexturePtr.get() == this;
-        }),
-      camera->customRenderTargets.end());
+    stl_util::remove_vector_elements_equal_sharedptr(camera->customRenderTargets, this);
   }
 
   if (depthStencilTexture) {

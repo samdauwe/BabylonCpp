@@ -173,13 +173,7 @@ bool RuntimeAnimation::isStopped() const
 
 void RuntimeAnimation::dispose()
 {
-  auto& runtimeAnimations = _animation->runtimeAnimations();
-  runtimeAnimations.erase(
-    std::remove_if(runtimeAnimations.begin(), runtimeAnimations.end(),
-                   [this](const RuntimeAnimationPtr& runtimeAnimation) {
-                     return runtimeAnimation.get() == this;
-                   }),
-    runtimeAnimations.end());
+  stl_util::remove_vector_elements_equal_sharedptr(_animation->runtimeAnimations(), this);
 }
 
 void RuntimeAnimation::setValue(const AnimationValue& iCurrentValue,
