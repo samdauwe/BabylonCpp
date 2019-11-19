@@ -216,7 +216,10 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
   BABYLON_LOGF_INFO("Engine", "BabylonCpp engine (v%s) launched", Engine::Version().c_str())
 }
 
-Engine::~Engine() = default;
+Engine::~Engine()
+{
+  stl_util::remove_vector_elements_equal(Engine::Instances, this);
+}
 
 Engine* Engine::LastCreatedEngine()
 {
