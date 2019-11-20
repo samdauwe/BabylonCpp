@@ -93,6 +93,7 @@ def processShaderFile(shaderPath, outputDir, definePath="BABYLON_SHADERS",
     # process first line
     output += "extern const char* %s;%s%s" % (varName, eol, eol)
     output += "const char* %s%s  = " % (varName, eol)
+    output += "R\"ShaderCode(%s%s" % (eol, eol)
     if lines[0] == "precision highp float;":
         output += "\"%s\\n\"%s" % ("#ifdef GL_ES", eol)
         output += "    \"%s\\n\"%s" % (lines[0], eol)
@@ -101,24 +102,21 @@ def processShaderFile(shaderPath, outputDir, definePath="BABYLON_SHADERS",
         output += "%s%s" % ("BABYLONCPP_GLSL_VERSION_3", eol)
     else:
         if len(lines) > 1:
-            output += "\"%s\\n\"%s" % (lines[0], eol)
+            output += "%s%s" % (lines[0], eol)
         else:
             output += "\"%s\\n\";%s" % (lines[0], eol)
     # process remainder of the shader file
     if len(lines) > 1:
         for i in range(1, len(lines)-1):
-            lines[i] = lines[i].replace('\"', "\\\"")
-            lines[i] = lines[i].replace('\t', " " * 2)
-            while lines[i].startswith(" " * 4):
-                lines[i] = lines[i].replace(" " * 4, " " * 2)
             if lines[i] == "precision highp float;":
                 output += "    \"%s\\n\"%s" % ("#ifdef GL_ES", eol)
                 output += "    \"%s\\n\"%s" % (lines[i], eol)
                 output += "    \"%s\\n\"%s" % ("#endif", eol)
             else:
-                output += "    \"%s\\n\"%s" % (lines[i], eol)
-        output += "    \"%s\\n\";%s" % (lines[-1], eol)
-    output += "%s} // end of namespace BABYLON%s%s" % (eol, eol, eol)
+                output += "%s%s" % (lines[i], eol)
+        output += "%s%s%s" % (lines[-1], eol, eol)
+        output += ")ShaderCode\";%s" % eol
+    output += "} // end of namespace BABYLON%s%s" % (eol, eol)
     output += "#endif // end of %s%s" % (defineName, eol)
     # write header file content to file
     outputFileLocation = os.path.join(outputDir, outputFileName)
@@ -315,9 +313,9 @@ def generateShadersStores(inputDir, outputDir):
     # - process shader files
     indent = ' ' * 6
     tic = time.time()
-    for shaderFileName, shaderPath in shaderFiles.items():
-        processShaderFile(shaderPath, shadersOutputDir)
-        print("%s|-Processed shader file: %s" % (indent, shaderFileName))
+    #for shaderFileName, shaderPath in shaderFiles.items():
+    #    processShaderFile(shaderPath, shadersOutputDir)
+    #    print("%s|-Processed shader file: %s" % (indent, shaderFileName))
     toc = time.time()
     print("Processed %d shader files in %ss" % (dlc, (toc - tic)))
     # - generate the shader store
@@ -334,8 +332,9 @@ def generateShadersStores(inputDir, outputDir):
     shaderFiles = sortDictionaryByKey(shaderFiles)
     tic = time.time()
     for shaderFileName, shaderPath in shaderFiles.items():
-        processShaderFile(shaderPath, shadersOutputDir, "BABYLON_SHADERS", True)
-        print("%s|-Processed shader incude file: %s" % (indent, shaderFileName))
+        if 'imageProcessingDeclaration' in shaderFileName:
+            processShaderFile(shaderPath, shadersOutputDir, "BABYLON_SHADERS", True)
+            print("%s|-Processed shader incude file: %s" % (indent, shaderFileName))
     toc = time.time()
     print("Processed %d shader include files in %ss" % (slc, (toc - tic)))
     # generate the includes shader store
