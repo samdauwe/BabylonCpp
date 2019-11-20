@@ -169,10 +169,8 @@ def generateShadersStore(shaderFiles, outputDir,
         output += "#include <babylon/shaders/%s>%s" % ("%s.h" % \
                                         shaderFilename.replace(".", "_"), eol)
     output += "%snamespace BABYLON {%s%s" % (eol, eol, eol)
-    output += "EffectShadersStore::EffectShadersStore()%s" % eol
-    output += "{%s}%s%s" % (eol, eol, eol)
-    output += "EffectShadersStore::~EffectShadersStore()%s" % eol
-    output += "{%s}%s%s" % (eol, eol, eol)
+    output += "EffectShadersStore::EffectShadersStore() = default;%s%s" % (eol, eol)
+    output += "EffectShadersStore::~EffectShadersStore() = default;%s%s" % (eol, eol)
     output += "std::unordered_map<std::string, std::string>& "
     output += "EffectShadersStore::shaders()%s" % eol
     output += "{%s  return _shaders;%s}%s%s" % (eol, eol, eol, eol)
@@ -181,16 +179,16 @@ def generateShadersStore(shaderFiles, outputDir,
     output += "{%s  return _shaders;%s}%s%s" % (eol, eol, eol, eol)
     # create shader name to shared source mapping
     output += "std::unordered_map<std::string, std::string> "
-    output += "EffectShadersStore::_shaders%s" % eol
+    output += "EffectShadersStore::_shaders = {%s" % eol
     shaderMapping = ""
     for shaderName in shaderNames:
         if len(shaderName) * 2 + 10 > 80:
-            shaderMapping += "     {\"%s\",%s" % (shaderName, eol)
-            shaderMapping += "      %s},%s" % (shaderName, eol)
+            shaderMapping += "  {\"%s\",%s" % (shaderName, eol)
+            shaderMapping += "   %s},%s" % (shaderName, eol)
         else:
-            shaderMapping += "     {\"%s\", %s},%s" % \
+            shaderMapping += "  {\"%s\", %s},%s" % \
                                                 (shaderName, shaderName, eol)
-    output += "  = {%s};%s%s" % (shaderMapping[5:-2], eol, eol)
+    output += "  {%s};%s%s" % (shaderMapping[3:-2], eol, eol)
     output += "} // end of namespace BABYLON%s" % eol
     # write output to file
     outputFileLocation = os.path.join(outputDir, outputFileName)
@@ -246,10 +244,8 @@ def generateIncludesShadersStore(shaderFiles, outputDir,
         output += "#include <babylon/shaders/shadersinclude/%s>%s" % ("%s.h" % \
                                         shaderFilename.replace(".", "_"), eol)
     output += "%snamespace BABYLON {%s%s" % (eol, eol, eol)
-    output += "EffectIncludesShadersStore::EffectIncludesShadersStore()%s" % eol
-    output += "{%s}%s%s" % (eol, eol, eol)
-    output += "EffectIncludesShadersStore::~EffectIncludesShadersStore()%s" % eol
-    output += "{%s}%s%s" % (eol, eol, eol)
+    output += "EffectIncludesShadersStore::EffectIncludesShadersStore() = default;%s%s" % (eol, eol)
+    output += "EffectIncludesShadersStore::~EffectIncludesShadersStore() = default;%s%s" % (eol, eol)
     output += "std::unordered_map<std::string, std::string>&%s" % eol
     output += "EffectIncludesShadersStore::shaders()%s" % eol
     output += "{%s  return _shaders;%s}%s%s" % (eol, eol, eol, eol)
@@ -258,10 +254,11 @@ def generateIncludesShadersStore(shaderFiles, outputDir,
     output += "{%s  return _shaders;%s}%s%s" % (eol, eol, eol, eol)
     # create shader include name to shared source mapping
     output += "std::unordered_map<std::string, std::string>%s" % eol
-    output += "EffectIncludesShadersStore::_shaders = {%s" % eol
+    output += "  EffectIncludesShadersStore::_shaders%s" % eol
+    output += "  = {"
     for shaderName in shaderNames:
-        output += "{\"%s\", %s},%s   " % (shaderName, shaderName, eol)
-    output = "%s%s};%s%s" % (output[:-5], eol, eol, eol)
+        output += "{\"%s\", %s},%s     " % (shaderName, shaderName, eol)
+    output = "%s};%s%s" % (output[:-7], eol, eol)
     output += "} // end of namespace BABYLON%s" % eol
     # write output to file
     outputFileLocation = os.path.join(outputDir, outputFileName)
