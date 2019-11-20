@@ -72,8 +72,7 @@ def processShaderFile(shaderPath, outputDir, definePath="BABYLON_SHADERS",
     if "shadowonly" in outputDir:
         shaderVarName = shaderVarName.replace("shadowonly", "shadowOnly")
     shaderFilename = prepareFilename(shaderVarName)
-    lines = [line.rstrip('\n').rstrip('\r').decode("utf-8-sig") \
-                                                for line in open(shaderPath)]
+    lines = [line.rstrip('\n').rstrip('\r') for line in open(shaderPath, "r", encoding="utf-8-sig")]
     # generate header file content
     outputFileName = "%s.h" % shaderFilename.replace(".", "_")
     defineName = "%s_%s" % (definePath,
@@ -88,6 +87,8 @@ def processShaderFile(shaderPath, outputDir, definePath="BABYLON_SHADERS",
     eol = '\n'
     output = "#ifndef %s%s" % (defineName, eol)
     output += "#define %s%s%s" % (defineName, eol, eol)
+    if lines[0] == "#version 300 es":
+        output += "%s%s%s" % ("#include <babylon/shaders/shadersinclude/glsl_version_3.h>", eol, eol)
     output += "namespace BABYLON {%s%s" % (eol, eol)
     # process first line
     output += "extern const char* %s;%s%s" % (varName, eol, eol)
@@ -96,22 +97,28 @@ def processShaderFile(shaderPath, outputDir, definePath="BABYLON_SHADERS",
         output += "\"%s\\n\"%s" % ("#ifdef GL_ES", eol)
         output += "    \"%s\\n\"%s" % (lines[0], eol)
         output += "    \"%s\\n\"%s" % ("#endif", eol)
+    elif lines[0] == "#version 300 es":
+        output += "%s%s" % ("BABYLONCPP_GLSL_VERSION_3", eol)
     else:
-        output += "\"%s\\n\"%s" % (lines[0], eol)
-    # process remainder of the shader file
-    for i in range(1, len(lines)-1):
-        lines[i] = lines[i].replace('\"', "\\\"")
-        lines[i] = lines[i].replace('\t', " " * 2)
-        while lines[i].startswith(" " * 4):
-            lines[i] = lines[i].replace(" " * 4, " " * 2)
-        if lines[i] == "precision highp float;":
-            output += "    \"%s\\n\"%s" % ("#ifdef GL_ES", eol)
-            output += "    \"%s\\n\"%s" % (lines[i], eol)
-            output += "    \"%s\\n\"%s" % ("#endif", eol)
+        if len(lines) > 1:
+            output += "\"%s\\n\"%s" % (lines[0], eol)
         else:
-            output += "    \"%s\\n\"%s" % (lines[i], eol)
-    output += "    \"%s\\n\";%s%s" % (lines[-1], eol, eol)
-    output += "} // end of namespace BABYLON%s%s" % (eol, eol)
+            output += "\"%s\\n\";%s" % (lines[0], eol)
+    # process remainder of the shader file
+    if len(lines) > 1:
+        for i in range(1, len(lines)-1):
+            lines[i] = lines[i].replace('\"', "\\\"")
+            lines[i] = lines[i].replace('\t', " " * 2)
+            while lines[i].startswith(" " * 4):
+                lines[i] = lines[i].replace(" " * 4, " " * 2)
+            if lines[i] == "precision highp float;":
+                output += "    \"%s\\n\"%s" % ("#ifdef GL_ES", eol)
+                output += "    \"%s\\n\"%s" % (lines[i], eol)
+                output += "    \"%s\\n\"%s" % ("#endif", eol)
+            else:
+                output += "    \"%s\\n\"%s" % (lines[i], eol)
+        output += "    \"%s\\n\";%s" % (lines[-1], eol)
+    output += "%s} // end of namespace BABYLON%s%s" % (eol, eol, eol)
     output += "#endif // end of %s%s" % (defineName, eol)
     # write header file content to file
     outputFileLocation = os.path.join(outputDir, outputFileName)
@@ -137,14 +144,12 @@ def generateShadersStore(shaderFiles, outputDir,
     output += "class BABYLON_SHARED_EXPORT EffectShadersStore {%s%s" % (eol,eol)
     output += "public:%s" % eol
     output += "  EffectShadersStore();%s" % eol
-    output += "  ~EffectShadersStore();%s%s" % (eol,eol)
-    output += "  std::unordered_map<std::string, std::string>& "
-    output += "shaders();%s" % eol
-    output += "  const std::unordered_map<std::string, std::string>& shaders() "
+    output += "  ~EffectShadersStore(); // = default%s%s" % (eol,eol)
+    output += "  std::unordered_map<std::string, std::string>& shaders();%s" % eol
+    output += "  [[nodiscard]] const std::unordered_map<std::string, std::string>& shaders() "
     output += "const;%s%s" % (eol, eol)
     output += "private:%s" % eol
-    output += "  static std::unordered_map<std::string, std::string> _shaders;"
-    output += "%s%s" % (eol,eol)
+    output += "  static std::unordered_map<std::string, std::string> _shaders;%s%s" % (eol,eol)
     output += "}; // end of class EffectShadersStore%s%s" % (eol, eol)
     output += "} // end of namespace BABYLON%s%s#endif " % (eol, eol)
     output += "// end of BABYLON_MATERIALS_EFFECT_SHADERS_STORE_H%s" % eol
@@ -214,10 +219,10 @@ def generateIncludesShadersStore(shaderFiles, outputDir,
     output += "%s%s" % (eol,eol)
     output += "public:%s" % eol
     output += "  EffectIncludesShadersStore();%s" % eol
-    output += "  ~EffectIncludesShadersStore();%s%s" % (eol,eol)
+    output += "  ~EffectIncludesShadersStore(); // = default%s%s" % (eol,eol)
     output += "  std::unordered_map<std::string, std::string>& "
     output += "shaders();%s" % eol
-    output += "  const std::unordered_map<std::string, std::string>& shaders() "
+    output += "  [[nodiscard]] const std::unordered_map<std::string, std::string>& shaders() "
     output += "const;%s%s" % (eol, eol)
     output += "private:%s" % eol
     output += "  static std::unordered_map<std::string, std::string> _shaders;"
@@ -307,7 +312,7 @@ def generateShadersStores(inputDir, outputDir):
                                    "materials")
     shaderFiles = getFilesnamesInDir(shadersInputDir)
     dlc = len(shaderFiles)
-    print "Found %d standard shaders" % dlc
+    print("Found %d standard shaders" % dlc)
     # - sort shader files by filename
     shaderFiles = sortDictionaryByKey(shaderFiles)
     # - process shader files
@@ -315,30 +320,30 @@ def generateShadersStores(inputDir, outputDir):
     tic = time.time()
     for shaderFileName, shaderPath in shaderFiles.items():
         processShaderFile(shaderPath, shadersOutputDir)
-        print "%s|-Processed shader file: %s" % (indent, shaderFileName)
+        print("%s|-Processed shader file: %s" % (indent, shaderFileName))
     toc = time.time()
-    print "Processed %d shader files in %ss" % (dlc, (toc - tic))
+    print("Processed %d shader files in %ss" % (dlc, (toc - tic)))
     # - generate the shader store
     generateShadersStore(shaderFiles, shadersStoreDir)
-    print "Generated shader store"
+    print("Generated shader store")
     ### process the includes shader files ###
     shadersInputDir = os.path.join(shadersInputDir, "ShadersInclude")
     shadersOutputDir = os.path.join(shadersOutputDir, "shadersinclude")
     createDir(shadersOutputDir)
     shaderFiles = getFilesnamesInDir(shadersInputDir)
     slc = len(shaderFiles)
-    print "Found %d standard shaders includes" % slc
+    print("Found %d standard shaders includes" % slc)
     # - sort shader files by filename
     shaderFiles = sortDictionaryByKey(shaderFiles)
     tic = time.time()
     for shaderFileName, shaderPath in shaderFiles.items():
         processShaderFile(shaderPath, shadersOutputDir, "BABYLON_SHADERS", True)
-        print "%s|-Processed shader incude file: %s" % (indent, shaderFileName)
+        print("%s|-Processed shader incude file: %s" % (indent, shaderFileName))
     toc = time.time()
-    print "Processed %d shader include files in %ss" % (slc, (toc - tic))
+    print("Processed %d shader include files in %ss" % (slc, (toc - tic)))
     # generate the includes shader store
     generateIncludesShadersStore(shaderFiles, shadersStoreDir)
-    print "Generated shader include store"
+    print("Generated shader include store")
 
 def generateProceduralTexturesShaderHeaders(inputDir, outputDir):
     """
@@ -363,7 +368,7 @@ def generateProceduralTexturesShaderHeaders(inputDir, outputDir):
                 shaderOutputFiles[shaderFileName] = \
                             os.path.join(proceduralTexturesOuputDir, shaderName)
             ptlc += len(proceduralTextures)
-    print "Found %d shaders in procedural textures library" % ptlc
+    print("Found %d shaders in procedural textures library" % ptlc)
     # - process shader files
     indent = ' ' * 6
     tic = time.time()
@@ -372,9 +377,9 @@ def generateProceduralTexturesShaderHeaders(inputDir, outputDir):
                                 shaderOutputFiles[shaderFileName]).upper())
         processShaderFile(shaderInputPath, shaderOutputFiles[shaderFileName],
                           definePath)
-        print "%s|-Processed shader file: %s" % (indent, shaderFileName)
+        print("%s|-Processed shader file: %s" % (indent, shaderFileName))
     toc = time.time()
-    print "Processed %d shader files in %ss" % (ptlc, (toc - tic))
+    print("Processed %d shader files in %ss" % (ptlc, (toc - tic)))
 
 def generateMaterialsLibraryShaderHeaders(inputDir, outputDir):
     """
@@ -399,7 +404,7 @@ def generateMaterialsLibraryShaderHeaders(inputDir, outputDir):
                 shaderOutputFiles[shaderFileName] = \
                             os.path.join(materialsLibraryOuputDir, shaderName)
             mlc += len(materials)
-    print "Found %d shaders in materials library" % mlc
+    print("Found %d shaders in materials library" % mlc)
     # - process shader files
     indent = ' ' * 6
     tic = time.time()
@@ -409,9 +414,9 @@ def generateMaterialsLibraryShaderHeaders(inputDir, outputDir):
                                 shaderOutputFiles[shaderFileName]).upper())
             processShaderFile(shaderInputPath,
                               shaderOutputFiles[shaderFileName], definePath)
-            print "%s|-Processed shader file: %s" % (indent, shaderFileName)
+            print("%s|-Processed shader file: %s" % (indent, shaderFileName))
     toc = time.time()
-    print "Processed %d shader files in %ss" % (mlc, (toc - tic))
+    print("Processed %d shader files in %ss" % (mlc, (toc - tic)))
 
 if __name__ == "__main__":
     from optparse import OptionParser
@@ -461,5 +466,5 @@ if __name__ == "__main__":
 
     # generate the shader store
     generateShadersStores(inputDir, outputDir)
-    generateProceduralTexturesShaderHeaders(inputDir, outputDir)
-    generateMaterialsLibraryShaderHeaders(inputDir, outputDir)
+    #generateProceduralTexturesShaderHeaders(inputDir, outputDir)
+    #generateMaterialsLibraryShaderHeaders(inputDir, outputDir)
