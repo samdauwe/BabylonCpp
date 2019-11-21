@@ -6,19 +6,22 @@ namespace BABYLON {
 extern const char* ssaoCombinePixelShader;
 
 const char* ssaoCombinePixelShader
-  = "uniform sampler2D textureSampler;\n"
-    "uniform sampler2D originalColor;\n"
-    "uniform vec4 viewport;\n"
-    "\n"
-    "varying vec2 vUV;\n"
-    "\n"
-    "void main(void) {\n"
-    "  vec4 ssaoColor = texture2D(textureSampler, viewport.xy + vUV * viewport.zw);\n"
-    "  vec4 sceneColor = texture2D(originalColor, vUV);\n"
-    "\n"
-    "  gl_FragColor = sceneColor * ssaoColor;\n"
-    "}\n";
+  = R"ShaderCode(
 
+uniform sampler2D textureSampler;
+uniform sampler2D originalColor;
+uniform vec4 viewport;
+
+varying vec2 vUV;
+
+void main(void) {
+    vec4 ssaoColor = texture2D(textureSampler, viewport.xy + vUV * viewport.zw);
+    vec4 sceneColor = texture2D(originalColor, vUV);
+
+    gl_FragColor = sceneColor * ssaoColor;
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SSAO_COMBINE_FRAGMENT_FX_H

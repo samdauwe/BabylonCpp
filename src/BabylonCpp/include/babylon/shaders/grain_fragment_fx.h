@@ -6,32 +6,35 @@ namespace BABYLON {
 extern const char* grainPixelShader;
 
 const char* grainPixelShader
-  = "#include<helperFunctions>\n"
-    "\n"
-    "// samplers\n"
-    "uniform sampler2D textureSampler;  // original color\n"
-    "\n"
-    "// uniforms\n"
-    "uniform float intensity;\n"
-    "uniform float animatedSeed;\n"
-    "\n"
-    "// varyings\n"
-    "varying vec2 vUV;\n"
-    "\n"
-    "void main(void)\n"
-    "{\n"
-    "  gl_FragColor = texture2D(textureSampler, vUV);\n"
-    "  vec2 seed = vUV*(animatedSeed);\n"
-    "  float grain = dither(seed, intensity);\n"
-    "\n"
-    "  // Add less grain when luminance is high or low\n"
-    "  float lum = getLuminance(gl_FragColor.rgb);\n"
-    "  float grainAmount = (cos(-PI + (lum*PI*2.))+1.)/2.;\n"
-    "  gl_FragColor.rgb += grain * grainAmount;\n"
-    "\n"
-    "  gl_FragColor.rgb = max(gl_FragColor.rgb, 0.0);\n"
-    "}\n";
+  = R"ShaderCode(
 
+#include<helperFunctions>
+
+// samplers
+uniform sampler2D textureSampler;    // original color
+
+// uniforms
+uniform float intensity;
+uniform float animatedSeed;
+
+// varyings
+varying vec2 vUV;
+
+void main(void)
+{
+    gl_FragColor = texture2D(textureSampler, vUV);
+    vec2 seed = vUV*(animatedSeed);
+    float grain = dither(seed, intensity);
+
+    // Add less grain when luminance is high or low
+    float lum = getLuminance(gl_FragColor.rgb);
+    float grainAmount = (cos(-PI + (lum*PI*2.))+1.)/2.;
+    gl_FragColor.rgb += grain * grainAmount;
+
+    gl_FragColor.rgb = max(gl_FragColor.rgb, 0.0);
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_GRAIN_FRAGMENT_FX_H

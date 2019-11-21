@@ -6,16 +6,19 @@ namespace BABYLON {
 extern const char* displayPassPixelShader;
 
 const char* displayPassPixelShader
-  = "// Samplers\n"
-    "varying vec2 vUV;\n"
-    "uniform sampler2D textureSampler;\n"
-    "uniform sampler2D passSampler;\n"
-    "\n"
-    "void main(void)\n"
-    "{\n"
-    "  gl_FragColor = texture2D(passSampler, vUV);\n"
-    "}\n";
+  = R"ShaderCode(
 
+// Samplers
+varying vec2 vUV;
+uniform sampler2D textureSampler;
+uniform sampler2D passSampler;
+
+void main(void)
+{
+    gl_FragColor = texture2D(passSampler, vUV);
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_DISPLAY_PASS_FRAGMENT_FX_H

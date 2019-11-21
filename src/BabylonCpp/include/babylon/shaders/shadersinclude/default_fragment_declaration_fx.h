@@ -6,97 +6,100 @@ namespace BABYLON {
 extern const char* defaultFragmentDeclaration;
 
 const char* defaultFragmentDeclaration
-  = "uniform vec4 vDiffuseColor;\n"
-    "#ifdef SPECULARTERM\n"
-    "uniform vec4 vSpecularColor;\n"
-    "#endif\n"
-    "uniform vec3 vEmissiveColor;\n"
-    "\n"
-    "uniform float visibility;\n"
-    "\n"
-    "// Samplers\n"
-    "#ifdef DIFFUSE\n"
-    "uniform vec2 vDiffuseInfos;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef AMBIENT\n"
-    "uniform vec2 vAmbientInfos;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef OPACITY  \n"
-    "uniform vec2 vOpacityInfos;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef EMISSIVE\n"
-    "uniform vec2 vEmissiveInfos;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef LIGHTMAP\n"
-    "uniform vec2 vLightmapInfos;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef BUMP\n"
-    "uniform vec3 vBumpInfos;\n"
-    "uniform vec2 vTangentSpaceParams;\n"
-    "#endif\n"
-    "\n"
-    "#if defined(REFLECTIONMAP_SPHERICAL) || defined(REFLECTIONMAP_PROJECTION) || defined(REFRACTION)\n"
-    "uniform mat4 view;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef REFRACTION\n"
-    "uniform vec4 vRefractionInfos;\n"
-    "\n"
-    "#ifndef REFRACTIONMAP_3D\n"
-    "uniform mat4 refractionMatrix;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef REFRACTIONFRESNEL\n"
-    "uniform vec4 refractionLeftColor;\n"
-    "uniform vec4 refractionRightColor;\n"
-    "#endif\n"
-    "#endif\n"
-    "\n"
-    "#if defined(SPECULAR) && defined(SPECULARTERM)\n"
-    "uniform vec2 vSpecularInfos;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef DIFFUSEFRESNEL\n"
-    "uniform vec4 diffuseLeftColor;\n"
-    "uniform vec4 diffuseRightColor;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef OPACITYFRESNEL\n"
-    "uniform vec4 opacityParts;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef EMISSIVEFRESNEL\n"
-    "uniform vec4 emissiveLeftColor;\n"
-    "uniform vec4 emissiveRightColor;\n"
-    "#endif\n"
-    "\n"
-    "// Reflection\n"
-    "#ifdef REFLECTION\n"
-    "uniform vec2 vReflectionInfos;\n"
-    "\n"
-    "  #if defined(REFLECTIONMAP_PLANAR) || defined(REFLECTIONMAP_CUBIC) || defined(REFLECTIONMAP_PROJECTION) || defined(REFLECTIONMAP_EQUIRECTANGULAR) || defined(REFLECTIONMAP_SPHERICAL) || defined(REFLECTIONMAP_SKYBOX)\n"
-    "  uniform mat4 reflectionMatrix;\n"
-    "  #endif\n"
-    "\n"
-    "  #ifndef REFLECTIONMAP_SKYBOX\n"
-    "  #if defined(USE_LOCAL_REFLECTIONMAP_CUBIC) && defined(REFLECTIONMAP_CUBIC)\n"
-    "  uniform vec3 vReflectionPosition;\n"
-    "  uniform vec3 vReflectionSize; \n"
-    "  #endif\n"
-    "  #endif\n"
-    "\n"
-    "  #ifdef REFLECTIONFRESNEL\n"
-    "  uniform vec4 reflectionLeftColor;\n"
-    "  uniform vec4 reflectionRightColor;\n"
-    "  #endif\n"
-    "\n"
-    "#endif\n";
+  = R"ShaderCode(
 
+uniform vec4 vDiffuseColor;
+#ifdef SPECULARTERM
+uniform vec4 vSpecularColor;
+#endif
+uniform vec3 vEmissiveColor;
+
+uniform float visibility;
+
+// Samplers
+#ifdef DIFFUSE
+uniform vec2 vDiffuseInfos;
+#endif
+
+#ifdef AMBIENT
+uniform vec2 vAmbientInfos;
+#endif
+
+#ifdef OPACITY
+uniform vec2 vOpacityInfos;
+#endif
+
+#ifdef EMISSIVE
+uniform vec2 vEmissiveInfos;
+#endif
+
+#ifdef LIGHTMAP
+uniform vec2 vLightmapInfos;
+#endif
+
+#ifdef BUMP
+uniform vec3 vBumpInfos;
+uniform vec2 vTangentSpaceParams;
+#endif
+
+#if defined(REFLECTIONMAP_SPHERICAL) || defined(REFLECTIONMAP_PROJECTION) || defined(REFRACTION)
+uniform mat4 view;
+#endif
+
+#ifdef REFRACTION
+uniform vec4 vRefractionInfos;
+
+#ifndef REFRACTIONMAP_3D
+uniform mat4 refractionMatrix;
+#endif
+
+#ifdef REFRACTIONFRESNEL
+uniform vec4 refractionLeftColor;
+uniform vec4 refractionRightColor;
+#endif
+#endif
+
+#if defined(SPECULAR) && defined(SPECULARTERM)
+uniform vec2 vSpecularInfos;
+#endif
+
+#ifdef DIFFUSEFRESNEL
+uniform vec4 diffuseLeftColor;
+uniform vec4 diffuseRightColor;
+#endif
+
+#ifdef OPACITYFRESNEL
+uniform vec4 opacityParts;
+#endif
+
+#ifdef EMISSIVEFRESNEL
+uniform vec4 emissiveLeftColor;
+uniform vec4 emissiveRightColor;
+#endif
+
+// Reflection
+#ifdef REFLECTION
+uniform vec2 vReflectionInfos;
+
+    #if defined(REFLECTIONMAP_PLANAR) || defined(REFLECTIONMAP_CUBIC) || defined(REFLECTIONMAP_PROJECTION) || defined(REFLECTIONMAP_EQUIRECTANGULAR) || defined(REFLECTIONMAP_SPHERICAL) || defined(REFLECTIONMAP_SKYBOX)
+    uniform mat4 reflectionMatrix;
+    #endif
+
+    #ifndef REFLECTIONMAP_SKYBOX
+        #if defined(USE_LOCAL_REFLECTIONMAP_CUBIC) && defined(REFLECTIONMAP_CUBIC)
+            uniform vec3 vReflectionPosition;
+            uniform vec3 vReflectionSize;
+        #endif
+    #endif
+
+    #ifdef REFLECTIONFRESNEL
+    uniform vec4 reflectionLeftColor;
+    uniform vec4 reflectionRightColor;
+    #endif
+
+#endif
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_DEFAULT_FRAGMENT_DECLARATION_FX_H

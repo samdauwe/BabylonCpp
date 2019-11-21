@@ -6,11 +6,14 @@ namespace BABYLON {
 extern const char* logDepthDeclaration;
 
 const char* logDepthDeclaration
-  = "#ifdef LOGARITHMICDEPTH\n"
-    "  uniform float logarithmicDepthConstant;\n"
-    "  varying float vFragmentDepth;\n"
-    "#endif\n";
+  = R"ShaderCode(
 
+#ifdef LOGARITHMICDEPTH
+    uniform float logarithmicDepthConstant;
+    varying float vFragmentDepth;
+#endif
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_LOG_DEPTH_DECLARATION_FX_H

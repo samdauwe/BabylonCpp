@@ -6,166 +6,169 @@ namespace BABYLON {
 extern const char* pbrDebug;
 
 const char* pbrDebug
-  = "#if  DEBUGMODE > 0\n"
-    "  if (vClipSpacePosition.x / vClipSpacePosition.w < vDebugMode.x) {\n"
-    "  return;\n"
-    "  }\n"
-    "// Geometry\n"
-    "  #if   DEBUGMODE == 1\n"
-    "  gl_FragColor.rgb = vPositionW.rgb;\n"
-    "  #define DEBUGMODE_NORMALIZE\n"
-    "  #elif DEBUGMODE == 2 && defined(NORMAL)\n"
-    "  gl_FragColor.rgb = vNormalW.rgb;\n"
-    "  #define DEBUGMODE_NORMALIZE\n"
-    "  #elif DEBUGMODE == 3 && (defined(BUMP) || defined(PARALLAX) || defined(ANISOTROPIC))\n"
-    "  // Tangents\n"
-    "  gl_FragColor.rgb = TBN[0];\n"
-    "  #define DEBUGMODE_NORMALIZE\n"
-    "  #elif DEBUGMODE == 4 && (defined(BUMP) || defined(PARALLAX) || defined(ANISOTROPIC))\n"
-    "  // BiTangents\n"
-    "  gl_FragColor.rgb = TBN[1];\n"
-    "  #define DEBUGMODE_NORMALIZE\n"
-    "  #elif DEBUGMODE == 5\n"
-    "  // Bump Normals\n"
-    "  gl_FragColor.rgb = normalW;\n"
-    "  #define DEBUGMODE_NORMALIZE\n"
-    "  #elif DEBUGMODE == 6 && defined(MAINUV1)\n"
-    "  gl_FragColor.rgb = vec3(vMainUV1, 0.0);\n"
-    "  #elif DEBUGMODE == 7 && defined(MAINUV2)\n"
-    "  gl_FragColor.rgb = vec3(vMainUV2, 0.0);\n"
-    "  #elif DEBUGMODE == 8 && defined(CLEARCOAT) && defined(CLEARCOAT_BUMP)\n"
-    "  // ClearCoat Tangents\n"
-    "  gl_FragColor.rgb = TBNClearCoat[0];\n"
-    "  #define DEBUGMODE_NORMALIZE\n"
-    "  #elif DEBUGMODE == 9 && defined(CLEARCOAT) && defined(CLEARCOAT_BUMP)\n"
-    "  // ClearCoat BiTangents\n"
-    "  gl_FragColor.rgb = TBNClearCoat[1];\n"
-    "  #define DEBUGMODE_NORMALIZE\n"
-    "  #elif DEBUGMODE == 10 && defined(CLEARCOAT)\n"
-    "  // ClearCoat Bump Normals\n"
-    "  gl_FragColor.rgb = clearCoatNormalW;\n"
-    "  #define DEBUGMODE_NORMALIZE\n"
-    "  #elif DEBUGMODE == 11 && defined(ANISOTROPIC)\n"
-    "  gl_FragColor.rgb = anisotropicNormal;\n"
-    "  #define DEBUGMODE_NORMALIZE\n"
-    "  #elif DEBUGMODE == 12 && defined(ANISOTROPIC)\n"
-    "  gl_FragColor.rgb = anisotropicTangent;\n"
-    "  #define DEBUGMODE_NORMALIZE\n"
-    "  #elif DEBUGMODE == 13 && defined(ANISOTROPIC)\n"
-    "  gl_FragColor.rgb = anisotropicBitangent;\n"
-    "  #define DEBUGMODE_NORMALIZE\n"
-    "// Maps\n"
-    "  #elif DEBUGMODE == 20 && defined(ALBEDO)\n"
-    "  gl_FragColor.rgb = albedoTexture.rgb;\n"
-    "  #elif DEBUGMODE == 21 && defined(AMBIENT)\n"
-    "  gl_FragColor.rgb = ambientOcclusionColorMap.rgb;\n"
-    "  #elif DEBUGMODE == 22 && defined(OPACITY)\n"
-    "  gl_FragColor.rgb = opacityMap.rgb;\n"
-    "  #elif DEBUGMODE == 23 && defined(EMISSIVE)\n"
-    "  gl_FragColor.rgb = emissiveColorTex.rgb;\n"
-    "  #define DEBUGMODE_GAMMA\n"
-    "  #elif DEBUGMODE == 24 && defined(LIGHTMAP)\n"
-    "  gl_FragColor.rgb = lightmapColor.rgb;\n"
-    "  #define DEBUGMODE_GAMMA\n"
-    "  #elif DEBUGMODE == 25 && defined(REFLECTIVITY) && defined(METALLICWORKFLOW)\n"
-    "  gl_FragColor.rgb = surfaceMetallicColorMap.rgb;\n"
-    "  #elif DEBUGMODE == 26 && defined(REFLECTIVITY) && !defined(METALLICWORKFLOW)\n"
-    "  gl_FragColor.rgb = surfaceReflectivityColorMap.rgb;\n"
-    "  #define DEBUGMODE_GAMMA\n"
-    "  #elif DEBUGMODE == 27 && defined(CLEARCOAT) && defined(CLEARCOAT_TEXTURE)\n"
-    "  gl_FragColor.rgb = vec3(clearCoatMapData.rg, 0.0);\n"
-    "  #elif DEBUGMODE == 28 && defined(CLEARCOAT) && defined(CLEARCOAT_TINT) && defined(CLEARCOAT_TINT_TEXTURE)\n"
-    "  gl_FragColor.rgb = clearCoatTintMapData.rgb;\n"
-    "  #elif DEBUGMODE == 29 && defined(SHEEN) && defined(SHEEN_TEXTURE)\n"
-    "  gl_FragColor.rgb = sheenMapData.rgb;\n"
-    "  #elif DEBUGMODE == 30 && defined(ANISOTROPIC) && defined(ANISOTROPIC_TEXTURE)\n"
-    "  gl_FragColor.rgb = anisotropyMapData.rgb;\n"
-    "  #elif DEBUGMODE == 31 && defined(SUBSURFACE) && defined(SS_THICKNESSANDMASK_TEXTURE)\n"
-    "  gl_FragColor.rgb = thicknessMap.rgb;\n"
-    "// Env\n"
-    "  #elif DEBUGMODE == 40 && defined(SS_REFRACTION)\n"
-    "  // Base color.\n"
-    "  gl_FragColor.rgb = environmentRefraction.rgb;\n"
-    "  #define DEBUGMODE_GAMMA\n"
-    "  #elif DEBUGMODE == 41 && defined(REFLECTION)\n"
-    "  gl_FragColor.rgb = environmentRadiance.rgb;\n"
-    "  #define DEBUGMODE_GAMMA\n"
-    "  #elif DEBUGMODE == 42 && defined(CLEARCOAT) && defined(REFLECTION)\n"
-    "  gl_FragColor.rgb = environmentClearCoatRadiance;\n"
-    "  #define DEBUGMODE_GAMMA\n"
-    "// Lighting\n"
-    "  #elif DEBUGMODE == 50\n"
-    "  gl_FragColor.rgb = diffuseBase.rgb;\n"
-    "  #define DEBUGMODE_GAMMA\n"
-    "  #elif DEBUGMODE == 51 && defined(SPECULARTERM)\n"
-    "  gl_FragColor.rgb = specularBase.rgb;\n"
-    "  #define DEBUGMODE_GAMMA\n"
-    "  #elif DEBUGMODE == 52 && defined(CLEARCOAT)\n"
-    "  gl_FragColor.rgb = clearCoatBase.rgb;\n"
-    "  #define DEBUGMODE_GAMMA\n"
-    "  #elif DEBUGMODE == 53 && defined(SHEEN)\n"
-    "  gl_FragColor.rgb = sheenBase.rgb;\n"
-    "  #define DEBUGMODE_GAMMA\n"
-    "  #elif DEBUGMODE == 54 && defined(REFLECTION)\n"
-    "  gl_FragColor.rgb = environmentIrradiance.rgb;\n"
-    "  #define DEBUGMODE_GAMMA\n"
-    "// Lighting Params\n"
-    "  #elif DEBUGMODE == 60\n"
-    "  gl_FragColor.rgb = surfaceAlbedo.rgb;\n"
-    "  #define DEBUGMODE_GAMMA\n"
-    "  #elif DEBUGMODE == 61\n"
-    "  gl_FragColor.rgb = specularEnvironmentR0;\n"
-    "  #define DEBUGMODE_GAMMA\n"
-    "  #elif DEBUGMODE == 62\n"
-    "  gl_FragColor.rgb = vec3(roughness);\n"
-    "  #elif DEBUGMODE == 63\n"
-    "  gl_FragColor.rgb = vec3(alphaG);\n"
-    "  #elif DEBUGMODE == 64\n"
-    "  gl_FragColor.rgb = vec3(NdotV);\n"
-    "  #elif DEBUGMODE == 65 && defined(CLEARCOAT) && defined(CLEARCOAT_TINT)\n"
-    "  gl_FragColor.rgb = clearCoatColor.rgb;\n"
-    "  #define DEBUGMODE_GAMMA\n"
-    "  #elif DEBUGMODE == 66 && defined(CLEARCOAT)\n"
-    "  gl_FragColor.rgb = vec3(clearCoatRoughness);\n"
-    "  #elif DEBUGMODE == 67 && defined(CLEARCOAT)\n"
-    "  gl_FragColor.rgb = vec3(clearCoatNdotV);\n"
-    "  #elif DEBUGMODE == 68 && defined(SUBSURFACE) && defined(SS_TRANSLUCENCY)\n"
-    "  gl_FragColor.rgb = transmittance;\n"
-    "  #elif DEBUGMODE == 69 && defined(SUBSURFACE) && defined(SS_REFRACTION)\n"
-    "  gl_FragColor.rgb = refractionTransmittance;\n"
-    "// Misc\n"
-    "  #elif DEBUGMODE == 70 && defined(RADIANCEOCCLUSION)\n"
-    "  gl_FragColor.rgb = vec3(seo);\n"
-    "  #elif DEBUGMODE == 71 && defined(HORIZONOCCLUSION)\n"
-    "  gl_FragColor.rgb = vec3(eho);\n"
-    "  #elif DEBUGMODE == 72 && defined(MS_BRDF_ENERGY_CONSERVATION)\n"
-    "  gl_FragColor.rgb = vec3(energyConservationFactor);\n"
-    "  #elif DEBUGMODE == 73 && defined(ENVIRONMENTBRDF) && !defined(REFLECTIONMAP_SKYBOX)\n"
-    "  gl_FragColor.rgb = specularEnvironmentReflectance;\n"
-    "  #define DEBUGMODE_GAMMA\n"
-    "  #elif DEBUGMODE == 74 && defined(CLEARCOAT) && defined(ENVIRONMENTBRDF) && !defined(REFLECTIONMAP_SKYBOX)\n"
-    "  gl_FragColor.rgb = clearCoatEnvironmentReflectance;\n"
-    "  #define DEBUGMODE_GAMMA\n"
-    "  #elif DEBUGMODE == 75 && defined(SHEEN) && defined(REFLECTION)\n"
-    "  gl_FragColor.rgb = sheenEnvironmentReflectance;\n"
-    "  #define DEBUGMODE_GAMMA\n"
-    "  #elif DEBUGMODE == 76 && defined(ALPHABLEND)\n"
-    "  gl_FragColor.rgb = vec3(luminanceOverAlpha);\n"
-    "  #elif DEBUGMODE == 77\n"
-    "  gl_FragColor.rgb = vec3(alpha);\n"
-    "  #endif\n"
-    "\n"
-    "  gl_FragColor.rgb *= vDebugMode.y;\n"
-    "  #ifdef DEBUGMODE_NORMALIZE\n"
-    "  gl_FragColor.rgb = normalize(gl_FragColor.rgb) * 0.5 + 0.5;\n"
-    "  #endif\n"
-    "  #ifdef DEBUGMODE_GAMMA\n"
-    "  gl_FragColor.rgb = toGammaSpace(gl_FragColor.rgb);\n"
-    "  #endif\n"
-    "\n"
-    "  gl_FragColor.a = 1.0;\n"
-    "#endif\n";
+  = R"ShaderCode(
 
+#if  DEBUGMODE > 0
+    if (vClipSpacePosition.x / vClipSpacePosition.w < vDebugMode.x) {
+        return;
+    }
+// Geometry
+    #if   DEBUGMODE == 1
+        gl_FragColor.rgb = vPositionW.rgb;
+        #define DEBUGMODE_NORMALIZE
+    #elif DEBUGMODE == 2 && defined(NORMAL)
+        gl_FragColor.rgb = vNormalW.rgb;
+        #define DEBUGMODE_NORMALIZE
+    #elif DEBUGMODE == 3 && (defined(BUMP) || defined(PARALLAX) || defined(ANISOTROPIC))
+        // Tangents
+        gl_FragColor.rgb = TBN[0];
+        #define DEBUGMODE_NORMALIZE
+    #elif DEBUGMODE == 4 && (defined(BUMP) || defined(PARALLAX) || defined(ANISOTROPIC))
+        // BiTangents
+        gl_FragColor.rgb = TBN[1];
+        #define DEBUGMODE_NORMALIZE
+    #elif DEBUGMODE == 5
+        // Bump Normals
+        gl_FragColor.rgb = normalW;
+        #define DEBUGMODE_NORMALIZE
+    #elif DEBUGMODE == 6 && defined(MAINUV1)
+        gl_FragColor.rgb = vec3(vMainUV1, 0.0);
+    #elif DEBUGMODE == 7 && defined(MAINUV2)
+        gl_FragColor.rgb = vec3(vMainUV2, 0.0);
+    #elif DEBUGMODE == 8 && defined(CLEARCOAT) && defined(CLEARCOAT_BUMP)
+        // ClearCoat Tangents
+        gl_FragColor.rgb = TBNClearCoat[0];
+        #define DEBUGMODE_NORMALIZE
+    #elif DEBUGMODE == 9 && defined(CLEARCOAT) && defined(CLEARCOAT_BUMP)
+        // ClearCoat BiTangents
+        gl_FragColor.rgb = TBNClearCoat[1];
+        #define DEBUGMODE_NORMALIZE
+    #elif DEBUGMODE == 10 && defined(CLEARCOAT)
+        // ClearCoat Bump Normals
+        gl_FragColor.rgb = clearCoatNormalW;
+        #define DEBUGMODE_NORMALIZE
+    #elif DEBUGMODE == 11 && defined(ANISOTROPIC)
+        gl_FragColor.rgb = anisotropicNormal;
+        #define DEBUGMODE_NORMALIZE
+    #elif DEBUGMODE == 12 && defined(ANISOTROPIC)
+        gl_FragColor.rgb = anisotropicTangent;
+        #define DEBUGMODE_NORMALIZE
+    #elif DEBUGMODE == 13 && defined(ANISOTROPIC)
+        gl_FragColor.rgb = anisotropicBitangent;
+        #define DEBUGMODE_NORMALIZE
+// Maps
+    #elif DEBUGMODE == 20 && defined(ALBEDO)
+        gl_FragColor.rgb = albedoTexture.rgb;
+    #elif DEBUGMODE == 21 && defined(AMBIENT)
+        gl_FragColor.rgb = ambientOcclusionColorMap.rgb;
+    #elif DEBUGMODE == 22 && defined(OPACITY)
+        gl_FragColor.rgb = opacityMap.rgb;
+    #elif DEBUGMODE == 23 && defined(EMISSIVE)
+        gl_FragColor.rgb = emissiveColorTex.rgb;
+        #define DEBUGMODE_GAMMA
+    #elif DEBUGMODE == 24 && defined(LIGHTMAP)
+        gl_FragColor.rgb = lightmapColor.rgb;
+        #define DEBUGMODE_GAMMA
+    #elif DEBUGMODE == 25 && defined(REFLECTIVITY) && defined(METALLICWORKFLOW)
+        gl_FragColor.rgb = surfaceMetallicColorMap.rgb;
+    #elif DEBUGMODE == 26 && defined(REFLECTIVITY) && !defined(METALLICWORKFLOW)
+        gl_FragColor.rgb = surfaceReflectivityColorMap.rgb;
+        #define DEBUGMODE_GAMMA
+    #elif DEBUGMODE == 27 && defined(CLEARCOAT) && defined(CLEARCOAT_TEXTURE)
+        gl_FragColor.rgb = vec3(clearCoatMapData.rg, 0.0);
+    #elif DEBUGMODE == 28 && defined(CLEARCOAT) && defined(CLEARCOAT_TINT) && defined(CLEARCOAT_TINT_TEXTURE)
+        gl_FragColor.rgb = clearCoatTintMapData.rgb;
+    #elif DEBUGMODE == 29 && defined(SHEEN) && defined(SHEEN_TEXTURE)
+        gl_FragColor.rgb = sheenMapData.rgb;
+    #elif DEBUGMODE == 30 && defined(ANISOTROPIC) && defined(ANISOTROPIC_TEXTURE)
+        gl_FragColor.rgb = anisotropyMapData.rgb;
+    #elif DEBUGMODE == 31 && defined(SUBSURFACE) && defined(SS_THICKNESSANDMASK_TEXTURE)
+        gl_FragColor.rgb = thicknessMap.rgb;
+// Env
+    #elif DEBUGMODE == 40 && defined(SS_REFRACTION)
+        // Base color.
+        gl_FragColor.rgb = environmentRefraction.rgb;
+        #define DEBUGMODE_GAMMA
+    #elif DEBUGMODE == 41 && defined(REFLECTION)
+        gl_FragColor.rgb = environmentRadiance.rgb;
+        #define DEBUGMODE_GAMMA
+    #elif DEBUGMODE == 42 && defined(CLEARCOAT) && defined(REFLECTION)
+        gl_FragColor.rgb = environmentClearCoatRadiance;
+        #define DEBUGMODE_GAMMA
+// Lighting
+    #elif DEBUGMODE == 50
+        gl_FragColor.rgb = diffuseBase.rgb;
+        #define DEBUGMODE_GAMMA
+    #elif DEBUGMODE == 51 && defined(SPECULARTERM)
+        gl_FragColor.rgb = specularBase.rgb;
+        #define DEBUGMODE_GAMMA
+    #elif DEBUGMODE == 52 && defined(CLEARCOAT)
+        gl_FragColor.rgb = clearCoatBase.rgb;
+        #define DEBUGMODE_GAMMA
+    #elif DEBUGMODE == 53 && defined(SHEEN)
+        gl_FragColor.rgb = sheenBase.rgb;
+        #define DEBUGMODE_GAMMA
+    #elif DEBUGMODE == 54 && defined(REFLECTION)
+        gl_FragColor.rgb = environmentIrradiance.rgb;
+        #define DEBUGMODE_GAMMA
+// Lighting Params
+    #elif DEBUGMODE == 60
+        gl_FragColor.rgb = surfaceAlbedo.rgb;
+        #define DEBUGMODE_GAMMA
+    #elif DEBUGMODE == 61
+        gl_FragColor.rgb = specularEnvironmentR0;
+        #define DEBUGMODE_GAMMA
+    #elif DEBUGMODE == 62
+        gl_FragColor.rgb = vec3(roughness);
+    #elif DEBUGMODE == 63
+        gl_FragColor.rgb = vec3(alphaG);
+    #elif DEBUGMODE == 64
+        gl_FragColor.rgb = vec3(NdotV);
+    #elif DEBUGMODE == 65 && defined(CLEARCOAT) && defined(CLEARCOAT_TINT)
+        gl_FragColor.rgb = clearCoatColor.rgb;
+        #define DEBUGMODE_GAMMA
+    #elif DEBUGMODE == 66 && defined(CLEARCOAT)
+        gl_FragColor.rgb = vec3(clearCoatRoughness);
+    #elif DEBUGMODE == 67 && defined(CLEARCOAT)
+        gl_FragColor.rgb = vec3(clearCoatNdotV);
+    #elif DEBUGMODE == 68 && defined(SUBSURFACE) && defined(SS_TRANSLUCENCY)
+        gl_FragColor.rgb = transmittance;
+    #elif DEBUGMODE == 69 && defined(SUBSURFACE) && defined(SS_REFRACTION)
+        gl_FragColor.rgb = refractionTransmittance;
+// Misc
+    #elif DEBUGMODE == 70 && defined(RADIANCEOCCLUSION)
+        gl_FragColor.rgb = vec3(seo);
+    #elif DEBUGMODE == 71 && defined(HORIZONOCCLUSION)
+        gl_FragColor.rgb = vec3(eho);
+    #elif DEBUGMODE == 72 && defined(MS_BRDF_ENERGY_CONSERVATION)
+        gl_FragColor.rgb = vec3(energyConservationFactor);
+    #elif DEBUGMODE == 73 && defined(ENVIRONMENTBRDF) && !defined(REFLECTIONMAP_SKYBOX)
+        gl_FragColor.rgb = specularEnvironmentReflectance;
+        #define DEBUGMODE_GAMMA
+    #elif DEBUGMODE == 74 && defined(CLEARCOAT) && defined(ENVIRONMENTBRDF) && !defined(REFLECTIONMAP_SKYBOX)
+        gl_FragColor.rgb = clearCoatEnvironmentReflectance;
+        #define DEBUGMODE_GAMMA
+    #elif DEBUGMODE == 75 && defined(SHEEN) && defined(REFLECTION)
+        gl_FragColor.rgb = sheenEnvironmentReflectance;
+        #define DEBUGMODE_GAMMA
+    #elif DEBUGMODE == 76 && defined(ALPHABLEND)
+        gl_FragColor.rgb = vec3(luminanceOverAlpha);
+    #elif DEBUGMODE == 77
+        gl_FragColor.rgb = vec3(alpha);
+    #endif
+
+    gl_FragColor.rgb *= vDebugMode.y;
+    #ifdef DEBUGMODE_NORMALIZE
+        gl_FragColor.rgb = normalize(gl_FragColor.rgb) * 0.5 + 0.5;
+    #endif
+    #ifdef DEBUGMODE_GAMMA
+        gl_FragColor.rgb = toGammaSpace(gl_FragColor.rgb);
+    #endif
+
+    gl_FragColor.a = 1.0;
+#endif
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_PBR_DEBUG_FX_H

@@ -6,15 +6,18 @@ namespace BABYLON {
 extern const char* instances300Declaration;
 
 const char* instances300Declaration
-  = "#ifdef INSTANCES\n"
-    "  in vec4 world0;\n"
-    "  in vec4 world1;\n"
-    "  in vec4 world2;\n"
-    "  in vec4 world3;\n"
-    "#else\n"
-    "  uniform mat4 world;\n"
-    "#endif\n";
+  = R"ShaderCode(
 
+#ifdef INSTANCES
+    in vec4 world0;
+    in vec4 world1;
+    in vec4 world2;
+    in vec4 world3;
+#else
+    uniform mat4 world;
+#endif
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_INSTANCES300_DECLARATION_FX_H

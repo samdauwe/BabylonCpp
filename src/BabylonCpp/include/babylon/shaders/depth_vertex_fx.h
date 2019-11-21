@@ -6,49 +6,52 @@ namespace BABYLON {
 extern const char* depthVertexShader;
 
 const char* depthVertexShader
-  = "// Attribute\n"
-    "attribute vec3 position;\n"
-    "#include<bonesDeclaration>\n"
-    "\n"
-    "// Uniform\n"
-    "#include<instancesDeclaration>\n"
-    "\n"
-    "uniform mat4 viewProjection;\n"
-    "uniform vec2 depthValues;\n"
-    "\n"
-    "#if defined(ALPHATEST) || defined(NEED_UV)\n"
-    "varying vec2 vUV;\n"
-    "uniform mat4 diffuseMatrix;\n"
-    "#ifdef UV1\n"
-    "attribute vec2 uv;\n"
-    "#endif\n"
-    "#ifdef UV2\n"
-    "attribute vec2 uv2;\n"
-    "#endif\n"
-    "#endif\n"
-    "\n"
-    "varying float vDepthMetric;\n"
-    "\n"
-    "void main(void)\n"
-    "{\n"
-    "#include<instancesVertex>\n"
-    "\n"
-    "#include<bonesVertex>\n"
-    "\n"
-    "  gl_Position = viewProjection * finalWorld * vec4(position, 1.0);\n"
-    "  \n"
-    "  vDepthMetric = ((gl_Position.z + depthValues.x) / (depthValues.y));\n"
-    "\n"
-    "#if defined(ALPHATEST) || defined(BASIC_RENDER)\n"
-    "#ifdef UV1\n"
-    "  vUV = vec2(diffuseMatrix * vec4(uv, 1.0, 0.0));\n"
-    "#endif\n"
-    "#ifdef UV2\n"
-    "  vUV = vec2(diffuseMatrix * vec4(uv2, 1.0, 0.0));\n"
-    "#endif\n"
-    "#endif\n"
-    "}\n";
+  = R"ShaderCode(
 
+// Attribute
+attribute vec3 position;
+#include<bonesDeclaration>
+
+// Uniform
+#include<instancesDeclaration>
+
+uniform mat4 viewProjection;
+uniform vec2 depthValues;
+
+#if defined(ALPHATEST) || defined(NEED_UV)
+varying vec2 vUV;
+uniform mat4 diffuseMatrix;
+#ifdef UV1
+attribute vec2 uv;
+#endif
+#ifdef UV2
+attribute vec2 uv2;
+#endif
+#endif
+
+varying float vDepthMetric;
+
+void main(void)
+{
+#include<instancesVertex>
+
+#include<bonesVertex>
+
+    gl_Position = viewProjection * finalWorld * vec4(position, 1.0);
+
+    vDepthMetric = ((gl_Position.z + depthValues.x) / (depthValues.y));
+
+#if defined(ALPHATEST) || defined(BASIC_RENDER)
+#ifdef UV1
+    vUV = vec2(diffuseMatrix * vec4(uv, 1.0, 0.0));
+#endif
+#ifdef UV2
+    vUV = vec2(diffuseMatrix * vec4(uv2, 1.0, 0.0));
+#endif
+#endif
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_DEPTH_VERTEX_FX_H

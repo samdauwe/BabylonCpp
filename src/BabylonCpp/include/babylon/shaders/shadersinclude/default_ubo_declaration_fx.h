@@ -6,55 +6,58 @@ namespace BABYLON {
 extern const char* defaultUboDeclaration;
 
 const char* defaultUboDeclaration
-  = "layout(std140, column_major) uniform;\n"
-    "\n"
-    "uniform Material\n"
-    "{\n"
-    "  vec4 diffuseLeftColor;\n"
-    "  vec4 diffuseRightColor;\n"
-    "  vec4 opacityParts;\n"
-    "  vec4 reflectionLeftColor;\n"
-    "  vec4 reflectionRightColor;\n"
-    "  vec4 refractionLeftColor;\n"
-    "  vec4 refractionRightColor;\n"
-    "  vec4 emissiveLeftColor; \n"
-    "  vec4 emissiveRightColor;\n"
-    "  vec2 vDiffuseInfos;\n"
-    "  vec2 vAmbientInfos;\n"
-    "  vec2 vOpacityInfos;\n"
-    "  vec2 vReflectionInfos;\n"
-    "  vec3 vReflectionPosition;\n"
-    "  vec3 vReflectionSize;\n"
-    "  vec2 vEmissiveInfos;\n"
-    "  vec2 vLightmapInfos;\n"
-    "  vec2 vSpecularInfos;\n"
-    "  vec3 vBumpInfos;\n"
-    "  mat4 diffuseMatrix;\n"
-    "  mat4 ambientMatrix;\n"
-    "  mat4 opacityMatrix;\n"
-    "  mat4 reflectionMatrix;\n"
-    "  mat4 emissiveMatrix;\n"
-    "  mat4 lightmapMatrix;\n"
-    "  mat4 specularMatrix;\n"
-    "  mat4 bumpMatrix; \n"
-    "  vec2 vTangentSpaceParams;\n"
-    "  float pointSize;\n"
-    "  mat4 refractionMatrix;\n"
-    "  vec4 vRefractionInfos;\n"
-    "  vec4 vSpecularColor;\n"
-    "  vec3 vEmissiveColor;\n"
-    "  float visibility;\n"
-    "  vec4 vDiffuseColor;\n"
-    "};\n"
-    "\n"
-    "uniform Scene {\n"
-    "  mat4 viewProjection;\n"
-    "#ifdef MULTIVIEW\n"
-    "  mat4 viewProjectionR;\n"
-    "#endif \n"
-    "  mat4 view;\n"
-    "};\n";
+  = R"ShaderCode(
 
+layout(std140, column_major) uniform;
+
+uniform Material
+{
+    vec4 diffuseLeftColor;
+    vec4 diffuseRightColor;
+    vec4 opacityParts;
+    vec4 reflectionLeftColor;
+    vec4 reflectionRightColor;
+    vec4 refractionLeftColor;
+    vec4 refractionRightColor;
+    vec4 emissiveLeftColor;
+    vec4 emissiveRightColor;
+    vec2 vDiffuseInfos;
+    vec2 vAmbientInfos;
+    vec2 vOpacityInfos;
+    vec2 vReflectionInfos;
+    vec3 vReflectionPosition;
+    vec3 vReflectionSize;
+    vec2 vEmissiveInfos;
+    vec2 vLightmapInfos;
+    vec2 vSpecularInfos;
+    vec3 vBumpInfos;
+    mat4 diffuseMatrix;
+    mat4 ambientMatrix;
+    mat4 opacityMatrix;
+    mat4 reflectionMatrix;
+    mat4 emissiveMatrix;
+    mat4 lightmapMatrix;
+    mat4 specularMatrix;
+    mat4 bumpMatrix;
+    vec2 vTangentSpaceParams;
+    float pointSize;
+    mat4 refractionMatrix;
+    vec4 vRefractionInfos;
+    vec4 vSpecularColor;
+    vec3 vEmissiveColor;
+    float visibility;
+    vec4 vDiffuseColor;
+};
+
+uniform Scene {
+    mat4 viewProjection;
+#ifdef MULTIVIEW
+    mat4 viewProjectionR;
+#endif
+    mat4 view;
+};
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_DEFAULT_UBO_DECLARATION_FX_H

@@ -6,8 +6,11 @@ namespace BABYLON {
 extern const char* kernelBlurVaryingDeclaration;
 
 const char* kernelBlurVaryingDeclaration
-  = "varying vec2 sampleCoord{X};\n";
+  = R"ShaderCode(
 
+varying vec2 sampleCoord{X};
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_KERNEL_BLUR_VARYING_DECLARATION_FX_H

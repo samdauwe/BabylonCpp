@@ -6,24 +6,27 @@ namespace BABYLON {
 extern const char* layerPixelShader;
 
 const char* layerPixelShader
-  = "// Samplers\n"
-    "varying vec2 vUV;\n"
-    "uniform sampler2D textureSampler;\n"
-    "\n"
-    "// Color\n"
-    "uniform vec4 color;\n"
-    "\n"
-    "void main(void) {\n"
-    "  vec4 baseColor = texture2D(textureSampler, vUV);\n"
-    "\n"
-    "#ifdef ALPHATEST\n"
-    "  if (baseColor.a < 0.4)\n"
-    "  discard;\n"
-    "#endif\n"
-    "\n"
-    "  gl_FragColor = baseColor * color;\n"
-    "}\n";
+  = R"ShaderCode(
 
+// Samplers
+varying vec2 vUV;
+uniform sampler2D textureSampler;
+
+// Color
+uniform vec4 color;
+
+void main(void) {
+    vec4 baseColor = texture2D(textureSampler, vUV);
+
+#ifdef ALPHATEST
+    if (baseColor.a < 0.4)
+        discard;
+#endif
+
+    gl_FragColor = baseColor * color;
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_LAYER_FRAGMENT_FX_H

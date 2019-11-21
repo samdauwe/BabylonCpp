@@ -6,420 +6,423 @@ namespace BABYLON {
 extern const char* pbrVertexShader;
 
 const char* pbrVertexShader
-  = "#ifdef GL_ES\n"
-    "precision highp float;\n"
-    "#endif\n"
-    "\n"
-    "#include<__decl__pbrVertex>\n"
-    "\n"
-    "#define CUSTOM_VERTEX_BEGIN\n"
-    "\n"
-    "// Attributes\n"
-    "attribute vec3 position;\n"
-    "#ifdef NORMAL\n"
-    "attribute vec3 normal;\n"
-    "#endif\n"
-    "#ifdef TANGENT\n"
-    "attribute vec4 tangent;\n"
-    "#endif\n"
-    "#ifdef UV1\n"
-    "attribute vec2 uv;\n"
-    "#endif\n"
-    "#ifdef UV2\n"
-    "attribute vec2 uv2;\n"
-    "#endif\n"
-    "#ifdef MAINUV1\n"
-    "varying vec2 vMainUV1;\n"
-    "#endif\n"
-    "#ifdef MAINUV2\n"
-    "varying vec2 vMainUV2; \n"
-    "#endif \n"
-    "#ifdef VERTEXCOLOR\n"
-    "attribute vec4 color;\n"
-    "#endif\n"
-    "\n"
-    "#include<helperFunctions>\n"
-    "#include<bonesDeclaration>\n"
-    "\n"
-    "// Uniforms\n"
-    "#include<instancesDeclaration>\n"
-    "\n"
-    "#if defined(ALBEDO) && ALBEDODIRECTUV == 0\n"
-    "varying vec2 vAlbedoUV;\n"
-    "#endif\n"
-    "\n"
-    "#if defined(AMBIENT) && AMBIENTDIRECTUV == 0\n"
-    "varying vec2 vAmbientUV;\n"
-    "#endif\n"
-    "\n"
-    "#if defined(OPACITY) && OPACITYDIRECTUV == 0\n"
-    "varying vec2 vOpacityUV;\n"
-    "#endif\n"
-    "\n"
-    "#if defined(EMISSIVE) && EMISSIVEDIRECTUV == 0\n"
-    "varying vec2 vEmissiveUV;\n"
-    "#endif\n"
-    "\n"
-    "#if defined(LIGHTMAP) && LIGHTMAPDIRECTUV == 0\n"
-    "varying vec2 vLightmapUV;\n"
-    "#endif\n"
-    "\n"
-    "#if defined(REFLECTIVITY) && REFLECTIVITYDIRECTUV == 0\n"
-    "varying vec2 vReflectivityUV;\n"
-    "#endif\n"
-    "\n"
-    "#if defined(MICROSURFACEMAP) && MICROSURFACEMAPDIRECTUV == 0\n"
-    "varying vec2 vMicroSurfaceSamplerUV;\n"
-    "#endif\n"
-    "\n"
-    "#if defined(BUMP) && BUMPDIRECTUV == 0\n"
-    "varying vec2 vBumpUV;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef CLEARCOAT\n"
-    "  #if defined(CLEARCOAT_TEXTURE) && CLEARCOAT_TEXTUREDIRECTUV == 0 \n"
-    "  varying vec2 vClearCoatUV;\n"
-    "  #endif\n"
-    "\n"
-    "  #if defined(CLEARCOAT_BUMP) && CLEARCOAT_BUMPDIRECTUV == 0 \n"
-    "  varying vec2 vClearCoatBumpUV;\n"
-    "  #endif\n"
-    "\n"
-    "  #if defined(CLEARCOAT_TINT_TEXTURE) && CLEARCOAT_TINT_TEXTUREDIRECTUV == 0 \n"
-    "  varying vec2 vClearCoatTintUV;\n"
-    "  #endif\n"
-    "#endif\n"
-    "\n"
-    "#ifdef SHEEN\n"
-    "  #if defined(SHEEN_TEXTURE) && SHEEN_TEXTUREDIRECTUV == 0 \n"
-    "  varying vec2 vSheenUV;\n"
-    "  #endif\n"
-    "#endif\n"
-    "\n"
-    "#ifdef ANISOTROPIC\n"
-    "  #if defined(ANISOTROPIC_TEXTURE) && ANISOTROPIC_TEXTUREDIRECTUV == 0 \n"
-    "  varying vec2 vAnisotropyUV;\n"
-    "  #endif\n"
-    "#endif\n"
-    "\n"
-    "#ifdef SUBSURFACE\n"
-    "  #if defined(SS_THICKNESSANDMASK_TEXTURE) && SS_THICKNESSANDMASK_TEXTUREDIRECTUV == 0 \n"
-    "  varying vec2 vThicknessUV;\n"
-    "  #endif\n"
-    "#endif\n"
-    "\n"
-    "// Output\n"
-    "varying vec3 vPositionW;\n"
-    "#if DEBUGMODE > 0\n"
-    "  varying vec4 vClipSpacePosition;\n"
-    "#endif\n"
-    "#ifdef NORMAL\n"
-    "  varying vec3 vNormalW;\n"
-    "  #if defined(USESPHERICALFROMREFLECTIONMAP) && defined(USESPHERICALINVERTEX)\n"
-    "  varying vec3 vEnvironmentIrradiance;\n"
-    "  \n"
-    "  #include<harmonicsFunctions>\n"
-    "  #endif\n"
-    "#endif\n"
-    "\n"
-    "#ifdef VERTEXCOLOR\n"
-    "varying vec4 vColor;\n"
-    "#endif\n"
-    "\n"
-    "#include<bumpVertexDeclaration>\n"
-    "#include<clipPlaneVertexDeclaration>\n"
-    "#include<fogVertexDeclaration>\n"
-    "#include<__decl__lightFragment>[0..maxSimultaneousLights]\n"
-    "\n"
-    "#include<morphTargetsVertexGlobalDeclaration>\n"
-    "#include<morphTargetsVertexDeclaration>[0..maxSimultaneousMorphTargets]\n"
-    "\n"
-    "#ifdef REFLECTIONMAP_SKYBOX\n"
-    "varying vec3 vPositionUVW;\n"
-    "#endif\n"
-    "\n"
-    "#if defined(REFLECTIONMAP_EQUIRECTANGULAR_FIXED) || defined(REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED)\n"
-    "varying vec3 vDirectionW;\n"
-    "#endif\n"
-    "\n"
-    "#include<logDepthDeclaration>\n"
-    "#define CUSTOM_VERTEX_DEFINITIONS\n"
-    "\n"
-    "void main(void) {\n"
-    "\n"
-    "  #define CUSTOM_VERTEX_MAIN_BEGIN\n"
-    "\n"
-    "  vec3 positionUpdated = position;\n"
-    "#ifdef NORMAL\n"
-    "  vec3 normalUpdated = normal;\n"
-    "#endif\n"
-    "#ifdef TANGENT\n"
-    "  vec4 tangentUpdated = tangent;\n"
-    "#endif\n"
-    "\n"
-    "#include<morphTargetsVertex>[0..maxSimultaneousMorphTargets]\n"
-    "\n"
-    "#ifdef REFLECTIONMAP_SKYBOX\n"
-    "  #ifdef REFLECTIONMAP_SKYBOX_TRANSFORMED\n"
-    "  vPositionUVW = (reflectionMatrix * vec4(positionUpdated, 1.0)).xyz;\n"
-    "  #else\n"
-    "  vPositionUVW = positionUpdated;\n"
-    "  #endif\n"
-    "#endif \n"
-    "\n"
-    "#define CUSTOM_VERTEX_UPDATE_POSITION\n"
-    "\n"
-    "#define CUSTOM_VERTEX_UPDATE_NORMAL\n"
-    "\n"
-    "#include<instancesVertex>\n"
-    "#include<bonesVertex>\n"
-    "\n"
-    "#ifdef MULTIVIEW\n"
-    "  if (gl_ViewID_OVR == 0u) {\n"
-    "  gl_Position = viewProjection * finalWorld * vec4(positionUpdated, 1.0);\n"
-    "  } else {\n"
-    "  gl_Position = viewProjectionR * finalWorld * vec4(positionUpdated, 1.0);\n"
-    "  }\n"
-    "#else\n"
-    "  gl_Position = viewProjection * finalWorld * vec4(positionUpdated, 1.0);\n"
-    "#endif\n"
-    "\n"
-    "#if DEBUGMODE > 0\n"
-    "  vClipSpacePosition = gl_Position;\n"
-    "#endif\n"
-    "\n"
-    "  vec4 worldPos = finalWorld * vec4(positionUpdated, 1.0);\n"
-    "  vPositionW = vec3(worldPos);\n"
-    "\n"
-    "#ifdef NORMAL\n"
-    "  mat3 normalWorld = mat3(finalWorld);\n"
-    "\n"
-    "  #ifdef NONUNIFORMSCALING\n"
-    "  normalWorld = transposeMat3(inverseMat3(normalWorld));\n"
-    "  #endif\n"
-    "\n"
-    "  vNormalW = normalize(normalWorld * normalUpdated);\n"
-    "\n"
-    "  #if defined(USESPHERICALFROMREFLECTIONMAP) && defined(USESPHERICALINVERTEX)\n"
-    "  vec3 reflectionVector = vec3(reflectionMatrix * vec4(vNormalW, 0)).xyz;\n"
-    "  #ifdef REFLECTIONMAP_OPPOSITEZ\n"
-    "  reflectionVector.z *= -1.0;\n"
-    "  #endif\n"
-    "  vEnvironmentIrradiance = computeEnvironmentIrradiance(reflectionVector);\n"
-    "  #endif\n"
-    "#endif\n"
-    "\n"
-    "#if defined(REFLECTIONMAP_EQUIRECTANGULAR_FIXED) || defined(REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED)\n"
-    "  vDirectionW = normalize(vec3(finalWorld * vec4(positionUpdated, 0.0)));\n"
-    "#endif\n"
-    "\n"
-    "  // Texture coordinates\n"
-    "#ifndef UV1\n"
-    "  vec2 uv = vec2(0., 0.);\n"
-    "#endif\n"
-    "#ifndef UV2\n"
-    "  vec2 uv2 = vec2(0., 0.);\n"
-    "#endif\n"
-    "\n"
-    "#ifdef MAINUV1\n"
-    "  vMainUV1 = uv;\n"
-    "#endif \n"
-    "\n"
-    "#ifdef MAINUV2\n"
-    "  vMainUV2 = uv2;\n"
-    "#endif \n"
-    "\n"
-    "#if defined(ALBEDO) && ALBEDODIRECTUV == 0 \n"
-    "  if (vAlbedoInfos.x == 0.)\n"
-    "  {\n"
-    "  vAlbedoUV = vec2(albedoMatrix * vec4(uv, 1.0, 0.0));\n"
-    "  }\n"
-    "  else\n"
-    "  {\n"
-    "  vAlbedoUV = vec2(albedoMatrix * vec4(uv2, 1.0, 0.0));\n"
-    "  }\n"
-    "#endif\n"
-    "\n"
-    "#if defined(AMBIENT) && AMBIENTDIRECTUV == 0 \n"
-    "  if (vAmbientInfos.x == 0.)\n"
-    "  {\n"
-    "  vAmbientUV = vec2(ambientMatrix * vec4(uv, 1.0, 0.0));\n"
-    "  }\n"
-    "  else\n"
-    "  {\n"
-    "  vAmbientUV = vec2(ambientMatrix * vec4(uv2, 1.0, 0.0));\n"
-    "  }\n"
-    "#endif\n"
-    "\n"
-    "#if defined(OPACITY) && OPACITYDIRECTUV == 0 \n"
-    "  if (vOpacityInfos.x == 0.)\n"
-    "  {\n"
-    "  vOpacityUV = vec2(opacityMatrix * vec4(uv, 1.0, 0.0));\n"
-    "  }\n"
-    "  else\n"
-    "  {\n"
-    "  vOpacityUV = vec2(opacityMatrix * vec4(uv2, 1.0, 0.0));\n"
-    "  }\n"
-    "#endif\n"
-    "\n"
-    "#if defined(EMISSIVE) && EMISSIVEDIRECTUV == 0 \n"
-    "  if (vEmissiveInfos.x == 0.)\n"
-    "  {\n"
-    "  vEmissiveUV = vec2(emissiveMatrix * vec4(uv, 1.0, 0.0));\n"
-    "  }\n"
-    "  else\n"
-    "  {\n"
-    "  vEmissiveUV = vec2(emissiveMatrix * vec4(uv2, 1.0, 0.0));\n"
-    "  }\n"
-    "#endif\n"
-    "\n"
-    "#if defined(LIGHTMAP) && LIGHTMAPDIRECTUV == 0 \n"
-    "  if (vLightmapInfos.x == 0.)\n"
-    "  {\n"
-    "  vLightmapUV = vec2(lightmapMatrix * vec4(uv, 1.0, 0.0));\n"
-    "  }\n"
-    "  else\n"
-    "  {\n"
-    "  vLightmapUV = vec2(lightmapMatrix * vec4(uv2, 1.0, 0.0));\n"
-    "  }\n"
-    "#endif\n"
-    "\n"
-    "#if defined(REFLECTIVITY) && REFLECTIVITYDIRECTUV == 0 \n"
-    "  if (vReflectivityInfos.x == 0.)\n"
-    "  {\n"
-    "  vReflectivityUV = vec2(reflectivityMatrix * vec4(uv, 1.0, 0.0));\n"
-    "  }\n"
-    "  else\n"
-    "  {\n"
-    "  vReflectivityUV = vec2(reflectivityMatrix * vec4(uv2, 1.0, 0.0));\n"
-    "  }\n"
-    "#endif\n"
-    "\n"
-    "#if defined(MICROSURFACEMAP) && MICROSURFACEMAPDIRECTUV == 0 \n"
-    "  if (vMicroSurfaceSamplerInfos.x == 0.)\n"
-    "  {\n"
-    "  vMicroSurfaceSamplerUV = vec2(microSurfaceSamplerMatrix * vec4(uv, 1.0, 0.0));\n"
-    "  }\n"
-    "  else\n"
-    "  {\n"
-    "  vMicroSurfaceSamplerUV = vec2(microSurfaceSamplerMatrix * vec4(uv2, 1.0, 0.0));\n"
-    "  }\n"
-    "#endif\n"
-    "\n"
-    "#if defined(BUMP) && BUMPDIRECTUV == 0 \n"
-    "  if (vBumpInfos.x == 0.)\n"
-    "  {\n"
-    "  vBumpUV = vec2(bumpMatrix * vec4(uv, 1.0, 0.0));\n"
-    "  }\n"
-    "  else\n"
-    "  {\n"
-    "  vBumpUV = vec2(bumpMatrix * vec4(uv2, 1.0, 0.0));\n"
-    "  }\n"
-    "#endif\n"
-    "\n"
-    "#ifdef CLEARCOAT\n"
-    "  #if defined(CLEARCOAT_TEXTURE) && CLEARCOAT_TEXTUREDIRECTUV == 0 \n"
-    "  if (vClearCoatInfos.x == 0.)\n"
-    "  {\n"
-    "  vClearCoatUV = vec2(clearCoatMatrix * vec4(uv, 1.0, 0.0));\n"
-    "  }\n"
-    "  else\n"
-    "  {\n"
-    "  vClearCoatUV = vec2(clearCoatMatrix * vec4(uv2, 1.0, 0.0));\n"
-    "  }\n"
-    "  #endif\n"
-    "\n"
-    "  #if defined(CLEARCOAT_BUMP) && CLEARCOAT_BUMPDIRECTUV == 0 \n"
-    "  if (vClearCoatBumpInfos.x == 0.)\n"
-    "  {\n"
-    "  vClearCoatBumpUV = vec2(clearCoatBumpMatrix * vec4(uv, 1.0, 0.0));\n"
-    "  }\n"
-    "  else\n"
-    "  {\n"
-    "  vClearCoatBumpUV = vec2(clearCoatBumpMatrix * vec4(uv2, 1.0, 0.0));\n"
-    "  }\n"
-    "  #endif\n"
-    "\n"
-    "  #if defined(CLEARCOAT_TINT_TEXTURE) && CLEARCOAT_TINT_TEXTUREDIRECTUV == 0 \n"
-    "  if (vClearCoatTintInfos.x == 0.)\n"
-    "  {\n"
-    "  vClearCoatTintUV = vec2(clearCoatTintMatrix * vec4(uv, 1.0, 0.0));\n"
-    "  }\n"
-    "  else\n"
-    "  {\n"
-    "  vClearCoatTintUV = vec2(clearCoatTintMatrix * vec4(uv2, 1.0, 0.0));\n"
-    "  }\n"
-    "  #endif\n"
-    "#endif\n"
-    "\n"
-    "#ifdef SHEEN\n"
-    "  #if defined(SHEEN_TEXTURE) && SHEEN_TEXTUREDIRECTUV == 0 \n"
-    "  if (vSheenInfos.x == 0.)\n"
-    "  {\n"
-    "  vSheenUV = vec2(sheenMatrix * vec4(uv, 1.0, 0.0));\n"
-    "  }\n"
-    "  else\n"
-    "  {\n"
-    "  vSheenUV = vec2(sheenMatrix * vec4(uv2, 1.0, 0.0));\n"
-    "  }\n"
-    "  #endif\n"
-    "#endif\n"
-    "\n"
-    "#ifdef ANISOTROPIC\n"
-    "  #if defined(ANISOTROPIC_TEXTURE) && ANISOTROPIC_TEXTUREDIRECTUV == 0 \n"
-    "  if (vAnisotropyInfos.x == 0.)\n"
-    "  {\n"
-    "  vAnisotropyUV = vec2(anisotropyMatrix * vec4(uv, 1.0, 0.0));\n"
-    "  }\n"
-    "  else\n"
-    "  {\n"
-    "  vAnisotropyUV = vec2(anisotropyMatrix * vec4(uv2, 1.0, 0.0));\n"
-    "  }\n"
-    "  #endif\n"
-    "#endif\n"
-    "\n"
-    "#ifdef SUBSURFACE\n"
-    "  #if defined(SS_THICKNESSANDMASK_TEXTURE) && SS_THICKNESSANDMASK_TEXTUREDIRECTUV == 0 \n"
-    "  if (vThicknessInfos.x == 0.)\n"
-    "  {\n"
-    "  vThicknessUV = vec2(thicknessMatrix * vec4(uv, 1.0, 0.0));\n"
-    "  }\n"
-    "  else\n"
-    "  {\n"
-    "  vThicknessUV = vec2(thicknessMatrix * vec4(uv2, 1.0, 0.0));\n"
-    "  }\n"
-    "  #endif\n"
-    "#endif\n"
-    "\n"
-    "  // TBN\n"
-    "#include<bumpVertex>\n"
-    "\n"
-    "  // Clip plane\n"
-    "#include<clipPlaneVertex>\n"
-    "\n"
-    "  // Fog\n"
-    "#include<fogVertex>\n"
-    "\n"
-    "  // Shadows\n"
-    "#include<shadowsVertex>[0..maxSimultaneousLights]\n"
-    "\n"
-    "  // Vertex color\n"
-    "#ifdef VERTEXCOLOR\n"
-    "  vColor = color;\n"
-    "#endif\n"
-    "\n"
-    "  // Point size\n"
-    "#ifdef POINTSIZE\n"
-    "  gl_PointSize = pointSize;\n"
-    "#endif\n"
-    "\n"
-    "  // Log. depth\n"
-    "#include<logDepthVertex>\n"
-    "\n"
-    "#define CUSTOM_VERTEX_MAIN_END\n"
-    "\n"
-    "}\n";
+  = R"ShaderCode(
 
+#ifdef GL_ES
+  precision highp float;
+#endif
+
+#include<__decl__pbrVertex>
+
+#define CUSTOM_VERTEX_BEGIN
+
+// Attributes
+attribute vec3 position;
+#ifdef NORMAL
+attribute vec3 normal;
+#endif
+#ifdef TANGENT
+attribute vec4 tangent;
+#endif
+#ifdef UV1
+attribute vec2 uv;
+#endif
+#ifdef UV2
+attribute vec2 uv2;
+#endif
+#ifdef MAINUV1
+varying vec2 vMainUV1;
+#endif
+#ifdef MAINUV2
+varying vec2 vMainUV2;
+#endif
+#ifdef VERTEXCOLOR
+attribute vec4 color;
+#endif
+
+#include<helperFunctions>
+#include<bonesDeclaration>
+
+// Uniforms
+#include<instancesDeclaration>
+
+#if defined(ALBEDO) && ALBEDODIRECTUV == 0
+varying vec2 vAlbedoUV;
+#endif
+
+#if defined(AMBIENT) && AMBIENTDIRECTUV == 0
+varying vec2 vAmbientUV;
+#endif
+
+#if defined(OPACITY) && OPACITYDIRECTUV == 0
+varying vec2 vOpacityUV;
+#endif
+
+#if defined(EMISSIVE) && EMISSIVEDIRECTUV == 0
+varying vec2 vEmissiveUV;
+#endif
+
+#if defined(LIGHTMAP) && LIGHTMAPDIRECTUV == 0
+varying vec2 vLightmapUV;
+#endif
+
+#if defined(REFLECTIVITY) && REFLECTIVITYDIRECTUV == 0
+varying vec2 vReflectivityUV;
+#endif
+
+#if defined(MICROSURFACEMAP) && MICROSURFACEMAPDIRECTUV == 0
+varying vec2 vMicroSurfaceSamplerUV;
+#endif
+
+#if defined(BUMP) && BUMPDIRECTUV == 0
+varying vec2 vBumpUV;
+#endif
+
+#ifdef CLEARCOAT
+    #if defined(CLEARCOAT_TEXTURE) && CLEARCOAT_TEXTUREDIRECTUV == 0
+        varying vec2 vClearCoatUV;
+    #endif
+
+    #if defined(CLEARCOAT_BUMP) && CLEARCOAT_BUMPDIRECTUV == 0
+        varying vec2 vClearCoatBumpUV;
+    #endif
+
+    #if defined(CLEARCOAT_TINT_TEXTURE) && CLEARCOAT_TINT_TEXTUREDIRECTUV == 0
+        varying vec2 vClearCoatTintUV;
+    #endif
+#endif
+
+#ifdef SHEEN
+    #if defined(SHEEN_TEXTURE) && SHEEN_TEXTUREDIRECTUV == 0
+        varying vec2 vSheenUV;
+    #endif
+#endif
+
+#ifdef ANISOTROPIC
+    #if defined(ANISOTROPIC_TEXTURE) && ANISOTROPIC_TEXTUREDIRECTUV == 0
+        varying vec2 vAnisotropyUV;
+    #endif
+#endif
+
+#ifdef SUBSURFACE
+    #if defined(SS_THICKNESSANDMASK_TEXTURE) && SS_THICKNESSANDMASK_TEXTUREDIRECTUV == 0
+        varying vec2 vThicknessUV;
+    #endif
+#endif
+
+// Output
+varying vec3 vPositionW;
+#if DEBUGMODE > 0
+    varying vec4 vClipSpacePosition;
+#endif
+#ifdef NORMAL
+    varying vec3 vNormalW;
+    #if defined(USESPHERICALFROMREFLECTIONMAP) && defined(USESPHERICALINVERTEX)
+        varying vec3 vEnvironmentIrradiance;
+
+        #include<harmonicsFunctions>
+    #endif
+#endif
+
+#ifdef VERTEXCOLOR
+varying vec4 vColor;
+#endif
+
+#include<bumpVertexDeclaration>
+#include<clipPlaneVertexDeclaration>
+#include<fogVertexDeclaration>
+#include<__decl__lightFragment>[0..maxSimultaneousLights]
+
+#include<morphTargetsVertexGlobalDeclaration>
+#include<morphTargetsVertexDeclaration>[0..maxSimultaneousMorphTargets]
+
+#ifdef REFLECTIONMAP_SKYBOX
+varying vec3 vPositionUVW;
+#endif
+
+#if defined(REFLECTIONMAP_EQUIRECTANGULAR_FIXED) || defined(REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED)
+varying vec3 vDirectionW;
+#endif
+
+#include<logDepthDeclaration>
+#define CUSTOM_VERTEX_DEFINITIONS
+
+void main(void) {
+
+    #define CUSTOM_VERTEX_MAIN_BEGIN
+
+    vec3 positionUpdated = position;
+#ifdef NORMAL
+    vec3 normalUpdated = normal;
+#endif
+#ifdef TANGENT
+    vec4 tangentUpdated = tangent;
+#endif
+
+#include<morphTargetsVertex>[0..maxSimultaneousMorphTargets]
+
+#ifdef REFLECTIONMAP_SKYBOX
+    #ifdef REFLECTIONMAP_SKYBOX_TRANSFORMED
+        vPositionUVW = (reflectionMatrix * vec4(positionUpdated, 1.0)).xyz;
+    #else
+        vPositionUVW = positionUpdated;
+    #endif
+#endif
+
+#define CUSTOM_VERTEX_UPDATE_POSITION
+
+#define CUSTOM_VERTEX_UPDATE_NORMAL
+
+#include<instancesVertex>
+#include<bonesVertex>
+
+#ifdef MULTIVIEW
+    if (gl_ViewID_OVR == 0u) {
+        gl_Position = viewProjection * finalWorld * vec4(positionUpdated, 1.0);
+    } else {
+        gl_Position = viewProjectionR * finalWorld * vec4(positionUpdated, 1.0);
+    }
+#else
+    gl_Position = viewProjection * finalWorld * vec4(positionUpdated, 1.0);
+#endif
+
+#if DEBUGMODE > 0
+    vClipSpacePosition = gl_Position;
+#endif
+
+    vec4 worldPos = finalWorld * vec4(positionUpdated, 1.0);
+    vPositionW = vec3(worldPos);
+
+#ifdef NORMAL
+    mat3 normalWorld = mat3(finalWorld);
+
+    #ifdef NONUNIFORMSCALING
+        normalWorld = transposeMat3(inverseMat3(normalWorld));
+    #endif
+
+    vNormalW = normalize(normalWorld * normalUpdated);
+
+    #if defined(USESPHERICALFROMREFLECTIONMAP) && defined(USESPHERICALINVERTEX)
+        vec3 reflectionVector = vec3(reflectionMatrix * vec4(vNormalW, 0)).xyz;
+        #ifdef REFLECTIONMAP_OPPOSITEZ
+            reflectionVector.z *= -1.0;
+        #endif
+        vEnvironmentIrradiance = computeEnvironmentIrradiance(reflectionVector);
+    #endif
+#endif
+
+#if defined(REFLECTIONMAP_EQUIRECTANGULAR_FIXED) || defined(REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED)
+    vDirectionW = normalize(vec3(finalWorld * vec4(positionUpdated, 0.0)));
+#endif
+
+    // Texture coordinates
+#ifndef UV1
+    vec2 uv = vec2(0., 0.);
+#endif
+#ifndef UV2
+    vec2 uv2 = vec2(0., 0.);
+#endif
+
+#ifdef MAINUV1
+    vMainUV1 = uv;
+#endif
+
+#ifdef MAINUV2
+    vMainUV2 = uv2;
+#endif
+
+#if defined(ALBEDO) && ALBEDODIRECTUV == 0
+    if (vAlbedoInfos.x == 0.)
+    {
+        vAlbedoUV = vec2(albedoMatrix * vec4(uv, 1.0, 0.0));
+    }
+    else
+    {
+        vAlbedoUV = vec2(albedoMatrix * vec4(uv2, 1.0, 0.0));
+    }
+#endif
+
+#if defined(AMBIENT) && AMBIENTDIRECTUV == 0
+    if (vAmbientInfos.x == 0.)
+    {
+        vAmbientUV = vec2(ambientMatrix * vec4(uv, 1.0, 0.0));
+    }
+    else
+    {
+        vAmbientUV = vec2(ambientMatrix * vec4(uv2, 1.0, 0.0));
+    }
+#endif
+
+#if defined(OPACITY) && OPACITYDIRECTUV == 0
+    if (vOpacityInfos.x == 0.)
+    {
+        vOpacityUV = vec2(opacityMatrix * vec4(uv, 1.0, 0.0));
+    }
+    else
+    {
+        vOpacityUV = vec2(opacityMatrix * vec4(uv2, 1.0, 0.0));
+    }
+#endif
+
+#if defined(EMISSIVE) && EMISSIVEDIRECTUV == 0
+    if (vEmissiveInfos.x == 0.)
+    {
+        vEmissiveUV = vec2(emissiveMatrix * vec4(uv, 1.0, 0.0));
+    }
+    else
+    {
+        vEmissiveUV = vec2(emissiveMatrix * vec4(uv2, 1.0, 0.0));
+    }
+#endif
+
+#if defined(LIGHTMAP) && LIGHTMAPDIRECTUV == 0
+    if (vLightmapInfos.x == 0.)
+    {
+        vLightmapUV = vec2(lightmapMatrix * vec4(uv, 1.0, 0.0));
+    }
+    else
+    {
+        vLightmapUV = vec2(lightmapMatrix * vec4(uv2, 1.0, 0.0));
+    }
+#endif
+
+#if defined(REFLECTIVITY) && REFLECTIVITYDIRECTUV == 0
+    if (vReflectivityInfos.x == 0.)
+    {
+        vReflectivityUV = vec2(reflectivityMatrix * vec4(uv, 1.0, 0.0));
+    }
+    else
+    {
+        vReflectivityUV = vec2(reflectivityMatrix * vec4(uv2, 1.0, 0.0));
+    }
+#endif
+
+#if defined(MICROSURFACEMAP) && MICROSURFACEMAPDIRECTUV == 0
+    if (vMicroSurfaceSamplerInfos.x == 0.)
+    {
+        vMicroSurfaceSamplerUV = vec2(microSurfaceSamplerMatrix * vec4(uv, 1.0, 0.0));
+    }
+    else
+    {
+        vMicroSurfaceSamplerUV = vec2(microSurfaceSamplerMatrix * vec4(uv2, 1.0, 0.0));
+    }
+#endif
+
+#if defined(BUMP) && BUMPDIRECTUV == 0
+    if (vBumpInfos.x == 0.)
+    {
+        vBumpUV = vec2(bumpMatrix * vec4(uv, 1.0, 0.0));
+    }
+    else
+    {
+        vBumpUV = vec2(bumpMatrix * vec4(uv2, 1.0, 0.0));
+    }
+#endif
+
+#ifdef CLEARCOAT
+    #if defined(CLEARCOAT_TEXTURE) && CLEARCOAT_TEXTUREDIRECTUV == 0
+        if (vClearCoatInfos.x == 0.)
+        {
+            vClearCoatUV = vec2(clearCoatMatrix * vec4(uv, 1.0, 0.0));
+        }
+        else
+        {
+            vClearCoatUV = vec2(clearCoatMatrix * vec4(uv2, 1.0, 0.0));
+        }
+    #endif
+
+    #if defined(CLEARCOAT_BUMP) && CLEARCOAT_BUMPDIRECTUV == 0
+        if (vClearCoatBumpInfos.x == 0.)
+        {
+            vClearCoatBumpUV = vec2(clearCoatBumpMatrix * vec4(uv, 1.0, 0.0));
+        }
+        else
+        {
+            vClearCoatBumpUV = vec2(clearCoatBumpMatrix * vec4(uv2, 1.0, 0.0));
+        }
+    #endif
+
+    #if defined(CLEARCOAT_TINT_TEXTURE) && CLEARCOAT_TINT_TEXTUREDIRECTUV == 0
+        if (vClearCoatTintInfos.x == 0.)
+        {
+            vClearCoatTintUV = vec2(clearCoatTintMatrix * vec4(uv, 1.0, 0.0));
+        }
+        else
+        {
+            vClearCoatTintUV = vec2(clearCoatTintMatrix * vec4(uv2, 1.0, 0.0));
+        }
+    #endif
+#endif
+
+#ifdef SHEEN
+    #if defined(SHEEN_TEXTURE) && SHEEN_TEXTUREDIRECTUV == 0
+        if (vSheenInfos.x == 0.)
+        {
+            vSheenUV = vec2(sheenMatrix * vec4(uv, 1.0, 0.0));
+        }
+        else
+        {
+            vSheenUV = vec2(sheenMatrix * vec4(uv2, 1.0, 0.0));
+        }
+    #endif
+#endif
+
+#ifdef ANISOTROPIC
+    #if defined(ANISOTROPIC_TEXTURE) && ANISOTROPIC_TEXTUREDIRECTUV == 0
+        if (vAnisotropyInfos.x == 0.)
+        {
+            vAnisotropyUV = vec2(anisotropyMatrix * vec4(uv, 1.0, 0.0));
+        }
+        else
+        {
+            vAnisotropyUV = vec2(anisotropyMatrix * vec4(uv2, 1.0, 0.0));
+        }
+    #endif
+#endif
+
+#ifdef SUBSURFACE
+    #if defined(SS_THICKNESSANDMASK_TEXTURE) && SS_THICKNESSANDMASK_TEXTUREDIRECTUV == 0
+        if (vThicknessInfos.x == 0.)
+        {
+            vThicknessUV = vec2(thicknessMatrix * vec4(uv, 1.0, 0.0));
+        }
+        else
+        {
+            vThicknessUV = vec2(thicknessMatrix * vec4(uv2, 1.0, 0.0));
+        }
+    #endif
+#endif
+
+    // TBN
+#include<bumpVertex>
+
+    // Clip plane
+#include<clipPlaneVertex>
+
+    // Fog
+#include<fogVertex>
+
+    // Shadows
+#include<shadowsVertex>[0..maxSimultaneousLights]
+
+    // Vertex color
+#ifdef VERTEXCOLOR
+    vColor = color;
+#endif
+
+    // Point size
+#ifdef POINTSIZE
+    gl_PointSize = pointSize;
+#endif
+
+    // Log. depth
+#include<logDepthVertex>
+
+#define CUSTOM_VERTEX_MAIN_END
+
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_PBR_VERTEX_FX_H

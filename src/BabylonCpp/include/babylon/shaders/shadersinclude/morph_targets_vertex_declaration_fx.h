@@ -6,18 +6,21 @@ namespace BABYLON {
 extern const char* morphTargetsVertexDeclaration;
 
 const char* morphTargetsVertexDeclaration
-  = "#ifdef MORPHTARGETS\n"
-    "  attribute vec3 position{X};\n"
-    "\n"
-    "  #ifdef MORPHTARGETS_NORMAL\n"
-    "  attribute vec3 normal{X};\n"
-    "  #endif\n"
-    "\n"
-    "  #ifdef MORPHTARGETS_TANGENT\n"
-    "  attribute vec3 tangent{X};\n"
-    "  #endif\n"
-    "#endif\n";
+  = R"ShaderCode(
 
+#ifdef MORPHTARGETS
+    attribute vec3 position{X};
+
+    #ifdef MORPHTARGETS_NORMAL
+    attribute vec3 normal{X};
+    #endif
+
+    #ifdef MORPHTARGETS_TANGENT
+    attribute vec3 tangent{X};
+    #endif
+#endif
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_MORPH_TARGETS_VERTEX_DECLARATION_FX_H

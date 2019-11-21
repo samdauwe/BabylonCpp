@@ -6,17 +6,20 @@ namespace BABYLON {
 extern const char* rgbdEncodePixelShader;
 
 const char* rgbdEncodePixelShader
-  = "// Samplers\n"
-    "varying vec2 vUV;\n"
-    "uniform sampler2D textureSampler;\n"
-    "\n"
-    "#include<helperFunctions>\n"
-    "\n"
-    "void main(void) \n"
-    "{\n"
-    "  gl_FragColor = toRGBD(texture2D(textureSampler, vUV).rgb);\n"
-    "}\n";
+  = R"ShaderCode(
 
+// Samplers
+varying vec2 vUV;
+uniform sampler2D textureSampler;
+
+#include<helperFunctions>
+
+void main(void)
+{
+    gl_FragColor = toRGBD(texture2D(textureSampler, vUV).rgb);
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_RGBD_ENCODE_FRAGMENT_FX_H

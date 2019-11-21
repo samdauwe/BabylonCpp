@@ -6,58 +6,61 @@ namespace BABYLON {
 extern const char* spritesVertexShader;
 
 const char* spritesVertexShader
-  = "// Attributes\n"
-    "attribute vec4 position;\n"
-    "attribute vec4 options;\n"
-    "attribute vec4 cellInfo;\n"
-    "attribute vec4 color;\n"
-    "\n"
-    "// Uniforms\n"
-    "uniform vec2 textureInfos;\n"
-    "uniform mat4 view;\n"
-    "uniform mat4 projection;\n"
-    "\n"
-    "// Output\n"
-    "varying vec2 vUV;\n"
-    "varying vec4 vColor;\n"
-    "\n"
-    "#include<fogVertexDeclaration>\n"
-    "\n"
-    "void main(void) {  \n"
-    "  vec3 viewPos = (view * vec4(position.xyz, 1.0)).xyz; \n"
-    "  vec2 cornerPos;\n"
-    "  \n"
-    "  float angle = position.w;\n"
-    "  vec2 size = vec2(options.x, options.y);\n"
-    "  vec2 offset = options.zw;\n"
-    "  vec2 uvScale = textureInfos.xy;\n"
-    "\n"
-    "  cornerPos = vec2(offset.x - 0.5, offset.y  - 0.5) * size;\n"
-    "\n"
-    "  // Rotate\n"
-    "  vec3 rotatedCorner;\n"
-    "  rotatedCorner.x = cornerPos.x * cos(angle) - cornerPos.y * sin(angle);\n"
-    "  rotatedCorner.y = cornerPos.x * sin(angle) + cornerPos.y * cos(angle);\n"
-    "  rotatedCorner.z = 0.;\n"
-    "\n"
-    "  // Position\n"
-    "  viewPos += rotatedCorner;\n"
-    "  gl_Position = projection * vec4(viewPos, 1.0);   \n"
-    "\n"
-    "  // Color\n"
-    "  vColor = color;\n"
-    "  \n"
-    "  // Texture\n"
-    "  vec2 uvOffset = vec2(abs(offset.x - cellInfo.x), 1.0 - abs(offset.y - cellInfo.y));\n"
-    "\n"
-    "  vUV = (uvOffset + cellInfo.zw) * uvScale;\n"
-    "\n"
-    "  // Fog\n"
-    "#ifdef FOG\n"
-    "  vFogDistance = viewPos;\n"
-    "#endif\n"
-    "}\n";
+  = R"ShaderCode(
 
+// Attributes
+attribute vec4 position;
+attribute vec4 options;
+attribute vec4 cellInfo;
+attribute vec4 color;
+
+// Uniforms
+uniform vec2 textureInfos;
+uniform mat4 view;
+uniform mat4 projection;
+
+// Output
+varying vec2 vUV;
+varying vec4 vColor;
+
+#include<fogVertexDeclaration>
+
+void main(void) {
+    vec3 viewPos = (view * vec4(position.xyz, 1.0)).xyz;
+    vec2 cornerPos;
+
+    float angle = position.w;
+    vec2 size = vec2(options.x, options.y);
+    vec2 offset = options.zw;
+    vec2 uvScale = textureInfos.xy;
+
+    cornerPos = vec2(offset.x - 0.5, offset.y  - 0.5) * size;
+
+    // Rotate
+    vec3 rotatedCorner;
+    rotatedCorner.x = cornerPos.x * cos(angle) - cornerPos.y * sin(angle);
+    rotatedCorner.y = cornerPos.x * sin(angle) + cornerPos.y * cos(angle);
+    rotatedCorner.z = 0.;
+
+    // Position
+    viewPos += rotatedCorner;
+    gl_Position = projection * vec4(viewPos, 1.0);
+
+    // Color
+    vColor = color;
+
+    // Texture
+    vec2 uvOffset = vec2(abs(offset.x - cellInfo.x), 1.0 - abs(offset.y - cellInfo.y));
+
+    vUV = (uvOffset + cellInfo.zw) * uvScale;
+
+    // Fog
+#ifdef FOG
+    vFogDistance = viewPos;
+#endif
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SPRITES_VERTEX_FX_H

@@ -6,90 +6,93 @@ namespace BABYLON {
 extern const char* harmonicsFunctions;
 
 const char* harmonicsFunctions
-  = "#ifdef USESPHERICALFROMREFLECTIONMAP\n"
-    "  #ifdef SPHERICAL_HARMONICS\n"
-    "  uniform vec3 vSphericalL00;\n"
-    "  uniform vec3 vSphericalL1_1;\n"
-    "  uniform vec3 vSphericalL10;\n"
-    "  uniform vec3 vSphericalL11;\n"
-    "  uniform vec3 vSphericalL2_2;\n"
-    "  uniform vec3 vSphericalL2_1;\n"
-    "  uniform vec3 vSphericalL20;\n"
-    "  uniform vec3 vSphericalL21;\n"
-    "  uniform vec3 vSphericalL22;\n"
-    "\n"
-    "  // Please note the the coefficient have been prescaled.\n"
-    "  //\n"
-    "  // This uses the theory from both Sloan and Ramamoothi:\n"
-    "  //   https://www.ppsloan.org/publications/SHJCGT.pdf\n"
-    "  //   http://www-graphics.stanford.edu/papers/envmap/\n"
-    "  // The only difference is the integration of the reconstruction coefficients direcly\n"
-    "  // into the vectors as well as the 1 / pi multiplication to simulate a lambertian diffuse.\n"
-    "  vec3 computeEnvironmentIrradiance(vec3 normal) {\n"
-    "  return vSphericalL00\n"
-    "\n"
-    "  + vSphericalL1_1 * (normal.y)\n"
-    "  + vSphericalL10 * (normal.z)\n"
-    "  + vSphericalL11 * (normal.x)\n"
-    "\n"
-    "  + vSphericalL2_2 * (normal.y * normal.x)\n"
-    "  + vSphericalL2_1 * (normal.y * normal.z)\n"
-    "  + vSphericalL20 * ((3.0 * normal.z * normal.z) - 1.0)\n"
-    "  + vSphericalL21 * (normal.z * normal.x)\n"
-    "  + vSphericalL22 * (normal.x * normal.x - (normal.y * normal.y));\n"
-    "  }\n"
-    "  #else\n"
-    "  uniform vec3 vSphericalX;\n"
-    "  uniform vec3 vSphericalY;\n"
-    "  uniform vec3 vSphericalZ;\n"
-    "  uniform vec3 vSphericalXX_ZZ;\n"
-    "  uniform vec3 vSphericalYY_ZZ;\n"
-    "  uniform vec3 vSphericalZZ;\n"
-    "  uniform vec3 vSphericalXY;\n"
-    "  uniform vec3 vSphericalYZ;\n"
-    "  uniform vec3 vSphericalZX;\n"
-    "\n"
-    "  // By Matthew Jones.\n"
-    "  vec3 computeEnvironmentIrradiance(vec3 normal) {\n"
-    "  // Fast method for evaluating a fixed spherical harmonics function on the sphere (e.g. irradiance or radiance).\n"
-    "  // Cost: 24 scalar operations on modern GPU \"scalar\" shader core, or 8 multiply-adds of 3D vectors:\n"
-    "  // \"Function Cost 24  24x mad\"\n"
-    "\n"
-    "  // Note: the lower operation count compared to other methods (e.g. Sloan) is by further\n"
-    "  // taking advantage of the input 'normal' being normalised, which affords some further algebraic simplification.\n"
-    "  // Namely, the SH coefficients are first converted to spherical polynomial (SP) basis, then \n"
-    "  // a substitution is performed using Z^2 = (1 - X^2 - Y^2).\n"
-    "\n"
-    "  // As with other methods for evaluation spherical harmonic, the input 'normal' is assumed to be normalised (or near normalised).\n"
-    "  // This isn't as critical as it is with other calculations (e.g. specular highlight), but the result will be slightly incorrect nonetheless.\n"
-    "  float Nx = normal.x;\n"
-    "  float Ny = normal.y;\n"
-    "  float Nz = normal.z;\n"
-    "\n"
-    "  vec3 C1 = vSphericalZZ.rgb;\n"
-    "  vec3 Cx = vSphericalX.rgb;\n"
-    "  vec3 Cy = vSphericalY.rgb;\n"
-    "  vec3 Cz = vSphericalZ.rgb;\n"
-    "  vec3 Cxx_zz = vSphericalXX_ZZ.rgb;\n"
-    "  vec3 Cyy_zz = vSphericalYY_ZZ.rgb;\n"
-    "  vec3 Cxy = vSphericalXY.rgb;\n"
-    "  vec3 Cyz = vSphericalYZ.rgb;\n"
-    "  vec3 Czx = vSphericalZX.rgb;\n"
-    "\n"
-    "  vec3 a1 = Cyy_zz * Ny + Cy;\n"
-    "  vec3 a2 = Cyz * Nz + a1;\n"
-    "  vec3 b1 = Czx * Nz + Cx;\n"
-    "  vec3 b2 = Cxy * Ny + b1;\n"
-    "  vec3 b3 = Cxx_zz * Nx + b2;\n"
-    "  vec3 t1 = Cz  * Nz + C1;\n"
-    "  vec3 t2 = a2  * Ny + t1;\n"
-    "  vec3 t3 = b3  * Nx + t2;\n"
-    "\n"
-    "  return t3;\n"
-    "  }\n"
-    "  #endif\n"
-    "#endif\n";
+  = R"ShaderCode(
 
+#ifdef USESPHERICALFROMREFLECTIONMAP
+    #ifdef SPHERICAL_HARMONICS
+        uniform vec3 vSphericalL00;
+        uniform vec3 vSphericalL1_1;
+        uniform vec3 vSphericalL10;
+        uniform vec3 vSphericalL11;
+        uniform vec3 vSphericalL2_2;
+        uniform vec3 vSphericalL2_1;
+        uniform vec3 vSphericalL20;
+        uniform vec3 vSphericalL21;
+        uniform vec3 vSphericalL22;
+
+        // Please note the the coefficient have been prescaled.
+        //
+        // This uses the theory from both Sloan and Ramamoothi:
+        //   https://www.ppsloan.org/publications/SHJCGT.pdf
+        //   http://www-graphics.stanford.edu/papers/envmap/
+        // The only difference is the integration of the reconstruction coefficients direcly
+        // into the vectors as well as the 1 / pi multiplication to simulate a lambertian diffuse.
+        vec3 computeEnvironmentIrradiance(vec3 normal) {
+            return vSphericalL00
+
+                + vSphericalL1_1 * (normal.y)
+                + vSphericalL10 * (normal.z)
+                + vSphericalL11 * (normal.x)
+
+                + vSphericalL2_2 * (normal.y * normal.x)
+                + vSphericalL2_1 * (normal.y * normal.z)
+                + vSphericalL20 * ((3.0 * normal.z * normal.z) - 1.0)
+                + vSphericalL21 * (normal.z * normal.x)
+                + vSphericalL22 * (normal.x * normal.x - (normal.y * normal.y));
+        }
+    #else
+        uniform vec3 vSphericalX;
+        uniform vec3 vSphericalY;
+        uniform vec3 vSphericalZ;
+        uniform vec3 vSphericalXX_ZZ;
+        uniform vec3 vSphericalYY_ZZ;
+        uniform vec3 vSphericalZZ;
+        uniform vec3 vSphericalXY;
+        uniform vec3 vSphericalYZ;
+        uniform vec3 vSphericalZX;
+
+        // By Matthew Jones.
+        vec3 computeEnvironmentIrradiance(vec3 normal) {
+            // Fast method for evaluating a fixed spherical harmonics function on the sphere (e.g. irradiance or radiance).
+            // Cost: 24 scalar operations on modern GPU "scalar" shader core, or 8 multiply-adds of 3D vectors:
+            // "Function Cost 24    24x mad"
+
+            // Note: the lower operation count compared to other methods (e.g. Sloan) is by further
+            // taking advantage of the input 'normal' being normalised, which affords some further algebraic simplification.
+            // Namely, the SH coefficients are first converted to spherical polynomial (SP) basis, then
+            // a substitution is performed using Z^2 = (1 - X^2 - Y^2).
+
+            // As with other methods for evaluation spherical harmonic, the input 'normal' is assumed to be normalised (or near normalised).
+            // This isn't as critical as it is with other calculations (e.g. specular highlight), but the result will be slightly incorrect nonetheless.
+            float Nx = normal.x;
+            float Ny = normal.y;
+            float Nz = normal.z;
+
+            vec3 C1 = vSphericalZZ.rgb;
+            vec3 Cx = vSphericalX.rgb;
+            vec3 Cy = vSphericalY.rgb;
+            vec3 Cz = vSphericalZ.rgb;
+            vec3 Cxx_zz = vSphericalXX_ZZ.rgb;
+            vec3 Cyy_zz = vSphericalYY_ZZ.rgb;
+            vec3 Cxy = vSphericalXY.rgb;
+            vec3 Cyz = vSphericalYZ.rgb;
+            vec3 Czx = vSphericalZX.rgb;
+
+            vec3 a1 = Cyy_zz * Ny + Cy;
+            vec3 a2 = Cyz * Nz + a1;
+            vec3 b1 = Czx * Nz + Cx;
+            vec3 b2 = Cxy * Ny + b1;
+            vec3 b3 = Cxx_zz * Nx + b2;
+            vec3 t1 = Cz  * Nz + C1;
+            vec3 t2 = a2  * Ny + t1;
+            vec3 t3 = b3  * Nx + t2;
+
+            return t3;
+        }
+    #endif
+#endif
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_HARMONICS_FUNCTIONS_FX_H

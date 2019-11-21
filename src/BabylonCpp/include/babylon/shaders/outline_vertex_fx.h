@@ -6,51 +6,54 @@ namespace BABYLON {
 extern const char* outlineVertexShader;
 
 const char* outlineVertexShader
-  = "// Attribute\n"
-    "attribute vec3 position;\n"
-    "attribute vec3 normal;\n"
-    "\n"
-    "#include<bonesDeclaration>\n"
-    "\n"
-    "// Uniform\n"
-    "uniform float offset;\n"
-    "\n"
-    "#include<instancesDeclaration>\n"
-    "\n"
-    "uniform mat4 viewProjection;\n"
-    "\n"
-    "#ifdef ALPHATEST\n"
-    "varying vec2 vUV;\n"
-    "uniform mat4 diffuseMatrix;\n"
-    "#ifdef UV1\n"
-    "attribute vec2 uv;\n"
-    "#endif\n"
-    "#ifdef UV2\n"
-    "attribute vec2 uv2;\n"
-    "#endif\n"
-    "#endif\n"
-    "#include<logDepthDeclaration>\n"
-    "\n"
-    "void main(void)\n"
-    "{\n"
-    "  vec3 offsetPosition = position + normal * offset;\n"
-    "\n"
-    "#include<instancesVertex>\n"
-    "#include<bonesVertex>\n"
-    "\n"
-    "  gl_Position = viewProjection * finalWorld * vec4(offsetPosition, 1.0);\n"
-    "\n"
-    "#ifdef ALPHATEST\n"
-    "#ifdef UV1\n"
-    "  vUV = vec2(diffuseMatrix * vec4(uv, 1.0, 0.0));\n"
-    "#endif\n"
-    "#ifdef UV2\n"
-    "  vUV = vec2(diffuseMatrix * vec4(uv2, 1.0, 0.0));\n"
-    "#endif\n"
-    "#endif\n"
-    "#include<logDepthVertex>\n"
-    "}\n";
+  = R"ShaderCode(
 
+// Attribute
+attribute vec3 position;
+attribute vec3 normal;
+
+#include<bonesDeclaration>
+
+// Uniform
+uniform float offset;
+
+#include<instancesDeclaration>
+
+uniform mat4 viewProjection;
+
+#ifdef ALPHATEST
+varying vec2 vUV;
+uniform mat4 diffuseMatrix;
+#ifdef UV1
+attribute vec2 uv;
+#endif
+#ifdef UV2
+attribute vec2 uv2;
+#endif
+#endif
+#include<logDepthDeclaration>
+
+void main(void)
+{
+    vec3 offsetPosition = position + normal * offset;
+
+#include<instancesVertex>
+#include<bonesVertex>
+
+    gl_Position = viewProjection * finalWorld * vec4(offsetPosition, 1.0);
+
+#ifdef ALPHATEST
+#ifdef UV1
+    vUV = vec2(diffuseMatrix * vec4(uv, 1.0, 0.0));
+#endif
+#ifdef UV2
+    vUV = vec2(diffuseMatrix * vec4(uv2, 1.0, 0.0));
+#endif
+#endif
+#include<logDepthVertex>
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_OUTLINE_VERTEX_FX_H

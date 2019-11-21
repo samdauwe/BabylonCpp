@@ -6,255 +6,258 @@ namespace BABYLON {
 extern const char* fxaaPixelShader;
 
 const char* fxaaPixelShader
-  = "uniform sampler2D textureSampler;\n"
-    "uniform vec2 texelSize;\n"
-    "\n"
-    "varying vec2 vUV;\n"
-    "varying vec2 sampleCoordS;\n"
-    "varying vec2 sampleCoordE;\n"
-    "varying vec2 sampleCoordN;\n"
-    "varying vec2 sampleCoordW;\n"
-    "varying vec2 sampleCoordNW;\n"
-    "varying vec2 sampleCoordSE;\n"
-    "varying vec2 sampleCoordNE;\n"
-    "varying vec2 sampleCoordSW;\n"
-    "\n"
-    "const float fxaaQualitySubpix = 1.0;\n"
-    "const float fxaaQualityEdgeThreshold = 0.166;\n"
-    "const float fxaaQualityEdgeThresholdMin = 0.0833;\n"
-    "const vec3 kLumaCoefficients = vec3(0.2126, 0.7152, 0.0722);\n"
-    "\n"
-    "#define FxaaLuma(rgba) dot(rgba.rgb, kLumaCoefficients)\n"
-    "\n"
-    "void main(){\n"
-    "  vec2 posM;\n"
-    "\n"
-    "  posM.x = vUV.x;\n"
-    "  posM.y = vUV.y;\n"
-    "\n"
-    "  vec4 rgbyM = texture2D(textureSampler, vUV, 0.0);\n"
-    "  float lumaM = FxaaLuma(rgbyM);\n"
-    "  float lumaS = FxaaLuma(texture2D(textureSampler, sampleCoordS, 0.0));\n"
-    "  float lumaE = FxaaLuma(texture2D(textureSampler, sampleCoordE, 0.0));\n"
-    "  float lumaN = FxaaLuma(texture2D(textureSampler, sampleCoordN, 0.0));\n"
-    "  float lumaW = FxaaLuma(texture2D(textureSampler, sampleCoordW, 0.0));\n"
-    "  float maxSM = max(lumaS, lumaM);\n"
-    "  float minSM = min(lumaS, lumaM);\n"
-    "  float maxESM = max(lumaE, maxSM);\n"
-    "  float minESM = min(lumaE, minSM);\n"
-    "  float maxWN = max(lumaN, lumaW);\n"
-    "  float minWN = min(lumaN, lumaW);\n"
-    "  float rangeMax = max(maxWN, maxESM);\n"
-    "  float rangeMin = min(minWN, minESM);\n"
-    "  float rangeMaxScaled = rangeMax * fxaaQualityEdgeThreshold;\n"
-    "  float range = rangeMax - rangeMin;\n"
-    "  float rangeMaxClamped = max(fxaaQualityEdgeThresholdMin, rangeMaxScaled);\n"
-    "\n"
-    "#ifndef MALI\n"
-    "  if(range < rangeMaxClamped) \n"
-    "  {\n"
-    "  gl_FragColor = rgbyM;\n"
-    "  return;\n"
-    "  }\n"
-    "#endif\n"
-    "\n"
-    "  float lumaNW = FxaaLuma(texture2D(textureSampler, sampleCoordNW, 0.0));\n"
-    "  float lumaSE = FxaaLuma(texture2D(textureSampler, sampleCoordSE, 0.0));\n"
-    "  float lumaNE = FxaaLuma(texture2D(textureSampler, sampleCoordNE, 0.0));\n"
-    "  float lumaSW = FxaaLuma(texture2D(textureSampler, sampleCoordSW, 0.0));\n"
-    "  float lumaNS = lumaN + lumaS;\n"
-    "  float lumaWE = lumaW + lumaE;\n"
-    "  float subpixRcpRange = 1.0 / range;\n"
-    "  float subpixNSWE = lumaNS + lumaWE;\n"
-    "  float edgeHorz1 = (-2.0 * lumaM) + lumaNS;\n"
-    "  float edgeVert1 = (-2.0 * lumaM) + lumaWE;\n"
-    "  float lumaNESE = lumaNE + lumaSE;\n"
-    "  float lumaNWNE = lumaNW + lumaNE;\n"
-    "  float edgeHorz2 = (-2.0 * lumaE) + lumaNESE;\n"
-    "  float edgeVert2 = (-2.0 * lumaN) + lumaNWNE;\n"
-    "  float lumaNWSW = lumaNW + lumaSW;\n"
-    "  float lumaSWSE = lumaSW + lumaSE;\n"
-    "  float edgeHorz4 = (abs(edgeHorz1) * 2.0) + abs(edgeHorz2);\n"
-    "  float edgeVert4 = (abs(edgeVert1) * 2.0) + abs(edgeVert2);\n"
-    "  float edgeHorz3 = (-2.0 * lumaW) + lumaNWSW;\n"
-    "  float edgeVert3 = (-2.0 * lumaS) + lumaSWSE;\n"
-    "  float edgeHorz = abs(edgeHorz3) + edgeHorz4;\n"
-    "  float edgeVert = abs(edgeVert3) + edgeVert4;\n"
-    "  float subpixNWSWNESE = lumaNWSW + lumaNESE;\n"
-    "  float lengthSign = texelSize.x;\n"
-    "  bool horzSpan = edgeHorz >= edgeVert;\n"
-    "  float subpixA = subpixNSWE * 2.0 + subpixNWSWNESE;\n"
-    "\n"
-    "  if (!horzSpan)\n"
-    "  {\n"
-    "  lumaN = lumaW;\n"
-    "  }\n"
-    "\n"
-    "  if (!horzSpan) \n"
-    "  {\n"
-    "  lumaS = lumaE;\n"
-    "  }\n"
-    "\n"
-    "  if (horzSpan) \n"
-    "  {\n"
-    "  lengthSign = texelSize.y;\n"
-    "  }\n"
-    "\n"
-    "  float subpixB = (subpixA * (1.0 / 12.0)) - lumaM;\n"
-    "  float gradientN = lumaN - lumaM;\n"
-    "  float gradientS = lumaS - lumaM;\n"
-    "  float lumaNN = lumaN + lumaM;\n"
-    "  float lumaSS = lumaS + lumaM;\n"
-    "  bool pairN = abs(gradientN) >= abs(gradientS);\n"
-    "  float gradient = max(abs(gradientN), abs(gradientS));\n"
-    "\n"
-    "  if (pairN)\n"
-    "  {\n"
-    "  lengthSign = -lengthSign;\n"
-    "  }\n"
-    "\n"
-    "  float subpixC = clamp(abs(subpixB) * subpixRcpRange, 0.0, 1.0);\n"
-    "  vec2 posB;\n"
-    "\n"
-    "  posB.x = posM.x;\n"
-    "  posB.y = posM.y;\n"
-    "\n"
-    "  vec2 offNP;\n"
-    "\n"
-    "  offNP.x = (!horzSpan) ? 0.0 : texelSize.x;\n"
-    "  offNP.y = (horzSpan) ? 0.0 : texelSize.y;\n"
-    "\n"
-    "  if (!horzSpan) \n"
-    "  {\n"
-    "  posB.x += lengthSign * 0.5;\n"
-    "  }\n"
-    "\n"
-    "  if (horzSpan)\n"
-    "  {\n"
-    "  posB.y += lengthSign * 0.5;\n"
-    "  }\n"
-    "\n"
-    "  vec2 posN;\n"
-    "\n"
-    "  posN.x = posB.x - offNP.x * 1.5;\n"
-    "  posN.y = posB.y - offNP.y * 1.5;\n"
-    "\n"
-    "  vec2 posP;\n"
-    "\n"
-    "  posP.x = posB.x + offNP.x * 1.5;\n"
-    "  posP.y = posB.y + offNP.y * 1.5;\n"
-    "\n"
-    "  float subpixD = ((-2.0) * subpixC) + 3.0;\n"
-    "  float lumaEndN = FxaaLuma(texture2D(textureSampler, posN, 0.0));\n"
-    "  float subpixE = subpixC * subpixC;\n"
-    "  float lumaEndP = FxaaLuma(texture2D(textureSampler, posP, 0.0));\n"
-    "\n"
-    "  if (!pairN) \n"
-    "  {\n"
-    "  lumaNN = lumaSS;\n"
-    "  }\n"
-    "\n"
-    "  float gradientScaled = gradient * 1.0 / 4.0;\n"
-    "  float lumaMM = lumaM - lumaNN * 0.5;\n"
-    "  float subpixF = subpixD * subpixE;\n"
-    "  bool lumaMLTZero = lumaMM < 0.0;\n"
-    "\n"
-    "  lumaEndN -= lumaNN * 0.5;\n"
-    "  lumaEndP -= lumaNN * 0.5;\n"
-    "\n"
-    "  bool doneN = abs(lumaEndN) >= gradientScaled;\n"
-    "  bool doneP = abs(lumaEndP) >= gradientScaled;\n"
-    "\n"
-    "  if (!doneN) \n"
-    "  {\n"
-    "  posN.x -= offNP.x * 3.0;\n"
-    "  }\n"
-    "\n"
-    "  if (!doneN) \n"
-    "  {\n"
-    "  posN.y -= offNP.y * 3.0;\n"
-    "  }\n"
-    "\n"
-    "  bool doneNP = (!doneN) || (!doneP);\n"
-    "\n"
-    "  if (!doneP) \n"
-    "  {\n"
-    "  posP.x += offNP.x * 3.0;\n"
-    "  }\n"
-    "\n"
-    "  if (!doneP)\n"
-    "  {\n"
-    "  posP.y += offNP.y * 3.0;\n"
-    "  }\n"
-    "\n"
-    "  if (doneNP)\n"
-    "  {\n"
-    "  if (!doneN) lumaEndN = FxaaLuma(texture2D(textureSampler, posN.xy, 0.0));\n"
-    "  if (!doneP) lumaEndP = FxaaLuma(texture2D(textureSampler, posP.xy, 0.0));\n"
-    "  if (!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;\n"
-    "  if (!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;\n"
-    "  \n"
-    "  doneN = abs(lumaEndN) >= gradientScaled;\n"
-    "  doneP = abs(lumaEndP) >= gradientScaled;\n"
-    "  \n"
-    "  if (!doneN) posN.x -= offNP.x * 12.0;\n"
-    "  if (!doneN) posN.y -= offNP.y * 12.0;\n"
-    "  \n"
-    "  doneNP = (!doneN) || (!doneP);\n"
-    "  \n"
-    "  if (!doneP) posP.x += offNP.x * 12.0;\n"
-    "  if (!doneP) posP.y += offNP.y * 12.0;\n"
-    "  }\n"
-    "\n"
-    "  float dstN = posM.x - posN.x;\n"
-    "  float dstP = posP.x - posM.x;\n"
-    "\n"
-    "  if (!horzSpan)\n"
-    "  {\n"
-    "  dstN = posM.y - posN.y;\n"
-    "  }\n"
-    "  if (!horzSpan) \n"
-    "  {\n"
-    "  dstP = posP.y - posM.y;\n"
-    "  }\n"
-    "\n"
-    "  bool goodSpanN = (lumaEndN < 0.0) != lumaMLTZero;\n"
-    "  float spanLength = (dstP + dstN);\n"
-    "  bool goodSpanP = (lumaEndP < 0.0) != lumaMLTZero;\n"
-    "  float spanLengthRcp = 1.0 / spanLength;\n"
-    "  bool directionN = dstN < dstP;\n"
-    "  float dst = min(dstN, dstP);\n"
-    "  bool goodSpan = directionN ? goodSpanN : goodSpanP;\n"
-    "  float subpixG = subpixF * subpixF;\n"
-    "  float pixelOffset = (dst * (-spanLengthRcp)) + 0.5;\n"
-    "  float subpixH = subpixG * fxaaQualitySubpix;\n"
-    "  float pixelOffsetGood = goodSpan ? pixelOffset : 0.0;\n"
-    "  float pixelOffsetSubpix = max(pixelOffsetGood, subpixH);\n"
-    "\n"
-    "  if (!horzSpan)\n"
-    "  {\n"
-    "  posM.x += pixelOffsetSubpix * lengthSign;\n"
-    "  }\n"
-    "\n"
-    "  if (horzSpan)\n"
-    "  {\n"
-    "  posM.y += pixelOffsetSubpix * lengthSign;\n"
-    "  }\n"
-    "\n"
-    "#ifdef MALI\n"
-    "  if(range < rangeMaxClamped) \n"
-    "  {\n"
-    "  gl_FragColor = rgbyM;\n"
-    "  }\n"
-    "  else\n"
-    "  {\n"
-    "  gl_FragColor = texture2D(textureSampler, posM, 0.0);\n"
-    "  }\n"
-    "#else\n"
-    "  gl_FragColor = texture2D(textureSampler, posM, 0.0);\n"
-    "#endif\n"
-    "}\n";
+  = R"ShaderCode(
 
+uniform sampler2D textureSampler;
+uniform vec2 texelSize;
+
+varying vec2 vUV;
+varying vec2 sampleCoordS;
+varying vec2 sampleCoordE;
+varying vec2 sampleCoordN;
+varying vec2 sampleCoordW;
+varying vec2 sampleCoordNW;
+varying vec2 sampleCoordSE;
+varying vec2 sampleCoordNE;
+varying vec2 sampleCoordSW;
+
+const float fxaaQualitySubpix = 1.0;
+const float fxaaQualityEdgeThreshold = 0.166;
+const float fxaaQualityEdgeThresholdMin = 0.0833;
+const vec3 kLumaCoefficients = vec3(0.2126, 0.7152, 0.0722);
+
+#define FxaaLuma(rgba) dot(rgba.rgb, kLumaCoefficients)
+
+void main(){
+    vec2 posM;
+
+    posM.x = vUV.x;
+    posM.y = vUV.y;
+
+    vec4 rgbyM = texture2D(textureSampler, vUV, 0.0);
+    float lumaM = FxaaLuma(rgbyM);
+    float lumaS = FxaaLuma(texture2D(textureSampler, sampleCoordS, 0.0));
+    float lumaE = FxaaLuma(texture2D(textureSampler, sampleCoordE, 0.0));
+    float lumaN = FxaaLuma(texture2D(textureSampler, sampleCoordN, 0.0));
+    float lumaW = FxaaLuma(texture2D(textureSampler, sampleCoordW, 0.0));
+    float maxSM = max(lumaS, lumaM);
+    float minSM = min(lumaS, lumaM);
+    float maxESM = max(lumaE, maxSM);
+    float minESM = min(lumaE, minSM);
+    float maxWN = max(lumaN, lumaW);
+    float minWN = min(lumaN, lumaW);
+    float rangeMax = max(maxWN, maxESM);
+    float rangeMin = min(minWN, minESM);
+    float rangeMaxScaled = rangeMax * fxaaQualityEdgeThreshold;
+    float range = rangeMax - rangeMin;
+    float rangeMaxClamped = max(fxaaQualityEdgeThresholdMin, rangeMaxScaled);
+
+#ifndef MALI
+    if(range < rangeMaxClamped)
+    {
+        gl_FragColor = rgbyM;
+        return;
+    }
+#endif
+
+    float lumaNW = FxaaLuma(texture2D(textureSampler, sampleCoordNW, 0.0));
+    float lumaSE = FxaaLuma(texture2D(textureSampler, sampleCoordSE, 0.0));
+    float lumaNE = FxaaLuma(texture2D(textureSampler, sampleCoordNE, 0.0));
+    float lumaSW = FxaaLuma(texture2D(textureSampler, sampleCoordSW, 0.0));
+    float lumaNS = lumaN + lumaS;
+    float lumaWE = lumaW + lumaE;
+    float subpixRcpRange = 1.0 / range;
+    float subpixNSWE = lumaNS + lumaWE;
+    float edgeHorz1 = (-2.0 * lumaM) + lumaNS;
+    float edgeVert1 = (-2.0 * lumaM) + lumaWE;
+    float lumaNESE = lumaNE + lumaSE;
+    float lumaNWNE = lumaNW + lumaNE;
+    float edgeHorz2 = (-2.0 * lumaE) + lumaNESE;
+    float edgeVert2 = (-2.0 * lumaN) + lumaNWNE;
+    float lumaNWSW = lumaNW + lumaSW;
+    float lumaSWSE = lumaSW + lumaSE;
+    float edgeHorz4 = (abs(edgeHorz1) * 2.0) + abs(edgeHorz2);
+    float edgeVert4 = (abs(edgeVert1) * 2.0) + abs(edgeVert2);
+    float edgeHorz3 = (-2.0 * lumaW) + lumaNWSW;
+    float edgeVert3 = (-2.0 * lumaS) + lumaSWSE;
+    float edgeHorz = abs(edgeHorz3) + edgeHorz4;
+    float edgeVert = abs(edgeVert3) + edgeVert4;
+    float subpixNWSWNESE = lumaNWSW + lumaNESE;
+    float lengthSign = texelSize.x;
+    bool horzSpan = edgeHorz >= edgeVert;
+    float subpixA = subpixNSWE * 2.0 + subpixNWSWNESE;
+
+    if (!horzSpan)
+    {
+        lumaN = lumaW;
+    }
+
+    if (!horzSpan)
+    {
+        lumaS = lumaE;
+    }
+
+    if (horzSpan)
+    {
+        lengthSign = texelSize.y;
+    }
+
+    float subpixB = (subpixA * (1.0 / 12.0)) - lumaM;
+    float gradientN = lumaN - lumaM;
+    float gradientS = lumaS - lumaM;
+    float lumaNN = lumaN + lumaM;
+    float lumaSS = lumaS + lumaM;
+    bool pairN = abs(gradientN) >= abs(gradientS);
+    float gradient = max(abs(gradientN), abs(gradientS));
+
+    if (pairN)
+    {
+        lengthSign = -lengthSign;
+    }
+
+    float subpixC = clamp(abs(subpixB) * subpixRcpRange, 0.0, 1.0);
+    vec2 posB;
+
+    posB.x = posM.x;
+    posB.y = posM.y;
+
+    vec2 offNP;
+
+    offNP.x = (!horzSpan) ? 0.0 : texelSize.x;
+    offNP.y = (horzSpan) ? 0.0 : texelSize.y;
+
+    if (!horzSpan)
+    {
+        posB.x += lengthSign * 0.5;
+    }
+
+    if (horzSpan)
+    {
+        posB.y += lengthSign * 0.5;
+    }
+
+    vec2 posN;
+
+    posN.x = posB.x - offNP.x * 1.5;
+    posN.y = posB.y - offNP.y * 1.5;
+
+    vec2 posP;
+
+    posP.x = posB.x + offNP.x * 1.5;
+    posP.y = posB.y + offNP.y * 1.5;
+
+    float subpixD = ((-2.0) * subpixC) + 3.0;
+    float lumaEndN = FxaaLuma(texture2D(textureSampler, posN, 0.0));
+    float subpixE = subpixC * subpixC;
+    float lumaEndP = FxaaLuma(texture2D(textureSampler, posP, 0.0));
+
+    if (!pairN)
+    {
+        lumaNN = lumaSS;
+    }
+
+    float gradientScaled = gradient * 1.0 / 4.0;
+    float lumaMM = lumaM - lumaNN * 0.5;
+    float subpixF = subpixD * subpixE;
+    bool lumaMLTZero = lumaMM < 0.0;
+
+    lumaEndN -= lumaNN * 0.5;
+    lumaEndP -= lumaNN * 0.5;
+
+    bool doneN = abs(lumaEndN) >= gradientScaled;
+    bool doneP = abs(lumaEndP) >= gradientScaled;
+
+    if (!doneN)
+    {
+        posN.x -= offNP.x * 3.0;
+    }
+
+    if (!doneN)
+    {
+        posN.y -= offNP.y * 3.0;
+    }
+
+    bool doneNP = (!doneN) || (!doneP);
+
+    if (!doneP)
+    {
+        posP.x += offNP.x * 3.0;
+    }
+
+    if (!doneP)
+    {
+        posP.y += offNP.y * 3.0;
+    }
+
+    if (doneNP)
+    {
+        if (!doneN) lumaEndN = FxaaLuma(texture2D(textureSampler, posN.xy, 0.0));
+        if (!doneP) lumaEndP = FxaaLuma(texture2D(textureSampler, posP.xy, 0.0));
+        if (!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;
+        if (!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;
+
+        doneN = abs(lumaEndN) >= gradientScaled;
+        doneP = abs(lumaEndP) >= gradientScaled;
+
+        if (!doneN) posN.x -= offNP.x * 12.0;
+        if (!doneN) posN.y -= offNP.y * 12.0;
+
+        doneNP = (!doneN) || (!doneP);
+
+        if (!doneP) posP.x += offNP.x * 12.0;
+        if (!doneP) posP.y += offNP.y * 12.0;
+    }
+
+    float dstN = posM.x - posN.x;
+    float dstP = posP.x - posM.x;
+
+    if (!horzSpan)
+    {
+        dstN = posM.y - posN.y;
+    }
+    if (!horzSpan)
+    {
+        dstP = posP.y - posM.y;
+    }
+
+    bool goodSpanN = (lumaEndN < 0.0) != lumaMLTZero;
+    float spanLength = (dstP + dstN);
+    bool goodSpanP = (lumaEndP < 0.0) != lumaMLTZero;
+    float spanLengthRcp = 1.0 / spanLength;
+    bool directionN = dstN < dstP;
+    float dst = min(dstN, dstP);
+    bool goodSpan = directionN ? goodSpanN : goodSpanP;
+    float subpixG = subpixF * subpixF;
+    float pixelOffset = (dst * (-spanLengthRcp)) + 0.5;
+    float subpixH = subpixG * fxaaQualitySubpix;
+    float pixelOffsetGood = goodSpan ? pixelOffset : 0.0;
+    float pixelOffsetSubpix = max(pixelOffsetGood, subpixH);
+
+    if (!horzSpan)
+    {
+        posM.x += pixelOffsetSubpix * lengthSign;
+    }
+
+    if (horzSpan)
+    {
+        posM.y += pixelOffsetSubpix * lengthSign;
+    }
+
+#ifdef MALI
+    if(range < rangeMaxClamped)
+    {
+        gl_FragColor = rgbyM;
+    }
+    else
+    {
+        gl_FragColor = texture2D(textureSampler, posM, 0.0);
+    }
+#else
+    gl_FragColor = texture2D(textureSampler, posM, 0.0);
+#endif
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_FXAA_FRAGMENT_FX_H

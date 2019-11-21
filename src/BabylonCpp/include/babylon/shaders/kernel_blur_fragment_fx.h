@@ -6,85 +6,88 @@ namespace BABYLON {
 extern const char* kernelBlurPixelShader;
 
 const char* kernelBlurPixelShader
-  = "// Parameters\n"
-    "uniform sampler2D textureSampler;\n"
-    "uniform vec2 delta;\n"
-    "\n"
-    "// Varying\n"
-    "varying vec2 sampleCenter;\n"
-    "\n"
-    "#ifdef DOF\n"
-    "  uniform sampler2D circleOfConfusionSampler;\n"
-    "\n"
-    "  uniform vec2 cameraMinMaxZ;\n"
-    "\n"
-    "  float sampleDistance(const in vec2 offset) {\n"
-    "  float depth = texture2D(circleOfConfusionSampler, offset).g; // depth value from DepthRenderer: 0 to 1 \n"
-    "  return cameraMinMaxZ.x + (cameraMinMaxZ.y - cameraMinMaxZ.x)*depth; // actual distance from the lens \n"
-    "  }\n"
-    "  float sampleCoC(const in vec2 offset) {\n"
-    "  float coc = texture2D(circleOfConfusionSampler, offset).r; \n"
-    "  return coc; // actual distance from the lens \n"
-    "  }\n"
-    "#endif\n"
-    "\n"
-    "#include<kernelBlurVaryingDeclaration>[0..varyingCount]\n"
-    "\n"
-    "#ifdef PACKEDFLOAT\n"
-    "  vec4 pack(float depth)\n"
-    "  {\n"
-    "  const vec4 bit_shift = vec4(255.0 * 255.0 * 255.0, 255.0 * 255.0, 255.0, 1.0);\n"
-    "  const vec4 bit_mask = vec4(0.0, 1.0 / 255.0, 1.0 / 255.0, 1.0 / 255.0);\n"
-    "\n"
-    "  vec4 res = fract(depth * bit_shift);\n"
-    "  res -= res.xxyz * bit_mask;\n"
-    "\n"
-    "  return res;\n"
-    "  }\n"
-    "\n"
-    "  float unpack(vec4 color)\n"
-    "  {\n"
-    "  const vec4 bit_shift = vec4(1.0 / (255.0 * 255.0 * 255.0), 1.0 / (255.0 * 255.0), 1.0 / 255.0, 1.0);\n"
-    "  return dot(color, bit_shift);\n"
-    "  }\n"
-    "#endif\n"
-    "\n"
-    "void main(void)\n"
-    "{\n"
-    "  float computedWeight = 0.0;\n"
-    "\n"
-    "  #ifdef PACKEDFLOAT  \n"
-    "  float blend = 0.;\n"
-    "  #else\n"
-    "  vec4 blend = vec4(0.);\n"
-    "  #endif\n"
-    "\n"
-    "  #ifdef DOF\n"
-    "  float sumOfWeights = CENTER_WEIGHT; // Since not all values are blended, keep track of sum to devide result by at the end to get an average (start at center weight as center pixel is added by default)\n"
-    "  float factor = 0.0;\n"
-    "\n"
-    "  // Add center pixel to the blur by default\n"
-    "  #ifdef PACKEDFLOAT\n"
-    "  blend += unpack(texture2D(textureSampler, sampleCenter)) * CENTER_WEIGHT;\n"
-    "  #else\n"
-    "  blend += texture2D(textureSampler, sampleCenter) * CENTER_WEIGHT;\n"
-    "  #endif\n"
-    "  #endif\n"
-    "\n"
-    "  #include<kernelBlurFragment>[0..varyingCount]\n"
-    "  #include<kernelBlurFragment2>[0..depCount]\n"
-    "\n"
-    "  #ifdef PACKEDFLOAT\n"
-    "  gl_FragColor = pack(blend);\n"
-    "  #else\n"
-    "  gl_FragColor = blend;\n"
-    "  #endif\n"
-    "\n"
-    "  #ifdef DOF\n"
-    "  gl_FragColor /= sumOfWeights;\n"
-    "  #endif\n"
-    "}\n";
+  = R"ShaderCode(
 
+// Parameters
+uniform sampler2D textureSampler;
+uniform vec2 delta;
+
+// Varying
+varying vec2 sampleCenter;
+
+#ifdef DOF
+    uniform sampler2D circleOfConfusionSampler;
+
+    uniform vec2 cameraMinMaxZ;
+
+    float sampleDistance(const in vec2 offset) {
+        float depth = texture2D(circleOfConfusionSampler, offset).g; // depth value from DepthRenderer: 0 to 1
+        return cameraMinMaxZ.x + (cameraMinMaxZ.y - cameraMinMaxZ.x)*depth; // actual distance from the lens
+    }
+    float sampleCoC(const in vec2 offset) {
+        float coc = texture2D(circleOfConfusionSampler, offset).r;
+        return coc; // actual distance from the lens
+    }
+#endif
+
+#include<kernelBlurVaryingDeclaration>[0..varyingCount]
+
+#ifdef PACKEDFLOAT
+    vec4 pack(float depth)
+    {
+        const vec4 bit_shift = vec4(255.0 * 255.0 * 255.0, 255.0 * 255.0, 255.0, 1.0);
+        const vec4 bit_mask = vec4(0.0, 1.0 / 255.0, 1.0 / 255.0, 1.0 / 255.0);
+
+        vec4 res = fract(depth * bit_shift);
+        res -= res.xxyz * bit_mask;
+
+        return res;
+    }
+
+    float unpack(vec4 color)
+    {
+        const vec4 bit_shift = vec4(1.0 / (255.0 * 255.0 * 255.0), 1.0 / (255.0 * 255.0), 1.0 / 255.0, 1.0);
+        return dot(color, bit_shift);
+    }
+#endif
+
+void main(void)
+{
+    float computedWeight = 0.0;
+
+    #ifdef PACKEDFLOAT
+        float blend = 0.;
+    #else
+        vec4 blend = vec4(0.);
+    #endif
+
+    #ifdef DOF
+        float sumOfWeights = CENTER_WEIGHT; // Since not all values are blended, keep track of sum to devide result by at the end to get an average (start at center weight as center pixel is added by default)
+        float factor = 0.0;
+
+        // Add center pixel to the blur by default
+        #ifdef PACKEDFLOAT
+            blend += unpack(texture2D(textureSampler, sampleCenter)) * CENTER_WEIGHT;
+        #else
+            blend += texture2D(textureSampler, sampleCenter) * CENTER_WEIGHT;
+        #endif
+    #endif
+
+    #include<kernelBlurFragment>[0..varyingCount]
+    #include<kernelBlurFragment2>[0..depCount]
+
+    #ifdef PACKEDFLOAT
+        gl_FragColor = pack(blend);
+    #else
+        gl_FragColor = blend;
+    #endif
+
+    #ifdef DOF
+        gl_FragColor /= sumOfWeights;
+    #endif
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_KERNEL_BLUR_FRAGMENT_FX_H

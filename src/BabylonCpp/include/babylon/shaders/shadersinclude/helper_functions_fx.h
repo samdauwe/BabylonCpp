@@ -6,113 +6,116 @@ namespace BABYLON {
 extern const char* helperFunctions;
 
 const char* helperFunctions
-  = "const float PI = 3.1415926535897932384626433832795;\n"
-    "\n"
-    "const float LinearEncodePowerApprox = 2.2;\n"
-    "const float GammaEncodePowerApprox = 1.0 / LinearEncodePowerApprox;\n"
-    "const vec3 LuminanceEncodeApprox = vec3(0.2126, 0.7152, 0.0722);\n"
-    "\n"
-    "const float Epsilon = 0.0000001;\n"
-    "\n"
-    "#define saturate(x)         clamp(x, 0.0, 1.0)\n"
-    "\n"
-    "#define absEps(x)           abs(x) + Epsilon\n"
-    "#define maxEps(x)           max(x, Epsilon)\n"
-    "#define saturateEps(x)      clamp(x, Epsilon, 1.0)\n"
-    "\n"
-    "mat3 transposeMat3(mat3 inMatrix) {\n"
-    "  vec3 i0 = inMatrix[0];\n"
-    "  vec3 i1 = inMatrix[1];\n"
-    "  vec3 i2 = inMatrix[2];\n"
-    "\n"
-    "  mat3 outMatrix = mat3(\n"
-    "  vec3(i0.x, i1.x, i2.x),\n"
-    "  vec3(i0.y, i1.y, i2.y),\n"
-    "  vec3(i0.z, i1.z, i2.z)\n"
-    "  );\n"
-    "\n"
-    "  return outMatrix;\n"
-    "}\n"
-    "\n"
-    "// https://github.com/glslify/glsl-inverse/blob/master/index.glsl\n"
-    "mat3 inverseMat3(mat3 inMatrix) {\n"
-    "  float a00 = inMatrix[0][0], a01 = inMatrix[0][1], a02 = inMatrix[0][2];\n"
-    "  float a10 = inMatrix[1][0], a11 = inMatrix[1][1], a12 = inMatrix[1][2];\n"
-    "  float a20 = inMatrix[2][0], a21 = inMatrix[2][1], a22 = inMatrix[2][2];\n"
-    "\n"
-    "  float b01 = a22 * a11 - a12 * a21;\n"
-    "  float b11 = -a22 * a10 + a12 * a20;\n"
-    "  float b21 = a21 * a10 - a11 * a20;\n"
-    "\n"
-    "  float det = a00 * b01 + a01 * b11 + a02 * b21;\n"
-    "\n"
-    "  return mat3(b01, (-a22 * a01 + a02 * a21), (a12 * a01 - a02 * a11),\n"
-    "  b11, (a22 * a00 - a02 * a20), (-a12 * a00 + a02 * a10),\n"
-    "  b21, (-a21 * a00 + a01 * a20), (a11 * a00 - a01 * a10)) / det;\n"
-    "}\n"
-    "\n"
-    "vec3 toLinearSpace(vec3 color)\n"
-    "{\n"
-    "  return pow(color, vec3(LinearEncodePowerApprox));\n"
-    "}\n"
-    "\n"
-    "vec3 toGammaSpace(vec3 color)\n"
-    "{\n"
-    "  return pow(color, vec3(GammaEncodePowerApprox));\n"
-    "}\n"
-    "\n"
-    "float square(float value)\n"
-    "{\n"
-    "  return value * value;\n"
-    "}\n"
-    "\n"
-    "float pow5(float value) {\n"
-    "  float sq = value * value;\n"
-    "  return sq * sq * value;\n"
-    "}\n"
-    "\n"
-    "float getLuminance(vec3 color)\n"
-    "{\n"
-    "  return clamp(dot(color, LuminanceEncodeApprox), 0., 1.);\n"
-    "}\n"
-    "\n"
-    "// https://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl\n"
-    "float getRand(vec2 seed) {\n"
-    "  return fract(sin(dot(seed.xy ,vec2(12.9898,78.233))) * 43758.5453);\n"
-    "}\n"
-    "\n"
-    "float dither(vec2 seed, float varianceAmount) {\n"
-    "  float rand = getRand(seed);\n"
-    "  float dither = mix(-varianceAmount/255.0, varianceAmount/255.0, rand);\n"
-    "  \n"
-    "  return dither;\n"
-    "}\n"
-    "\n"
-    "// Check if configurable value is needed.\n"
-    "const float rgbdMaxRange = 255.0;\n"
-    "\n"
-    "vec4 toRGBD(vec3 color) {\n"
-    "  float maxRGB = maxEps(max(color.r, max(color.g, color.b)));\n"
-    "  float D    = max(rgbdMaxRange / maxRGB, 1.);\n"
-    "  D      = clamp(floor(D) / 255.0, 0., 1.);\n"
-    "  // vec3 rgb = color.rgb * (D * (255.0 / rgbdMaxRange));\n"
-    "  vec3 rgb = color.rgb * D;\n"
-    "  \n"
-    "  // Helps with png quantization.\n"
-    "  rgb = toGammaSpace(rgb);\n"
-    "\n"
-    "  return vec4(rgb, D); \n"
-    "}\n"
-    "\n"
-    "vec3 fromRGBD(vec4 rgbd) {\n"
-    "  // Helps with png quantization.\n"
-    "  rgbd.rgb = toLinearSpace(rgbd.rgb);\n"
-    "\n"
-    "  // return rgbd.rgb * ((rgbdMaxRange / 255.0) / rgbd.a);\n"
-    "\n"
-    "  return rgbd.rgb / rgbd.a;\n"
-    "}\n";
+  = R"ShaderCode(
 
+const float PI = 3.1415926535897932384626433832795;
+
+const float LinearEncodePowerApprox = 2.2;
+const float GammaEncodePowerApprox = 1.0 / LinearEncodePowerApprox;
+const vec3 LuminanceEncodeApprox = vec3(0.2126, 0.7152, 0.0722);
+
+const float Epsilon = 0.0000001;
+
+#define saturate(x)         clamp(x, 0.0, 1.0)
+
+#define absEps(x)           abs(x) + Epsilon
+#define maxEps(x)           max(x, Epsilon)
+#define saturateEps(x)      clamp(x, Epsilon, 1.0)
+
+mat3 transposeMat3(mat3 inMatrix) {
+    vec3 i0 = inMatrix[0];
+    vec3 i1 = inMatrix[1];
+    vec3 i2 = inMatrix[2];
+
+    mat3 outMatrix = mat3(
+        vec3(i0.x, i1.x, i2.x),
+        vec3(i0.y, i1.y, i2.y),
+        vec3(i0.z, i1.z, i2.z)
+        );
+
+    return outMatrix;
+}
+
+// https://github.com/glslify/glsl-inverse/blob/master/index.glsl
+mat3 inverseMat3(mat3 inMatrix) {
+    float a00 = inMatrix[0][0], a01 = inMatrix[0][1], a02 = inMatrix[0][2];
+      float a10 = inMatrix[1][0], a11 = inMatrix[1][1], a12 = inMatrix[1][2];
+      float a20 = inMatrix[2][0], a21 = inMatrix[2][1], a22 = inMatrix[2][2];
+
+      float b01 = a22 * a11 - a12 * a21;
+      float b11 = -a22 * a10 + a12 * a20;
+      float b21 = a21 * a10 - a11 * a20;
+
+      float det = a00 * b01 + a01 * b11 + a02 * b21;
+
+      return mat3(b01, (-a22 * a01 + a02 * a21), (a12 * a01 - a02 * a11),
+              b11, (a22 * a00 - a02 * a20), (-a12 * a00 + a02 * a10),
+              b21, (-a21 * a00 + a01 * a20), (a11 * a00 - a01 * a10)) / det;
+}
+
+vec3 toLinearSpace(vec3 color)
+{
+    return pow(color, vec3(LinearEncodePowerApprox));
+}
+
+vec3 toGammaSpace(vec3 color)
+{
+    return pow(color, vec3(GammaEncodePowerApprox));
+}
+
+float square(float value)
+{
+    return value * value;
+}
+
+float pow5(float value) {
+    float sq = value * value;
+    return sq * sq * value;
+}
+
+float getLuminance(vec3 color)
+{
+    return clamp(dot(color, LuminanceEncodeApprox), 0., 1.);
+}
+
+// https://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl
+float getRand(vec2 seed) {
+    return fract(sin(dot(seed.xy ,vec2(12.9898,78.233))) * 43758.5453);
+}
+
+float dither(vec2 seed, float varianceAmount) {
+    float rand = getRand(seed);
+    float dither = mix(-varianceAmount/255.0, varianceAmount/255.0, rand);
+
+    return dither;
+}
+
+// Check if configurable value is needed.
+const float rgbdMaxRange = 255.0;
+
+vec4 toRGBD(vec3 color) {
+    float maxRGB = maxEps(max(color.r, max(color.g, color.b)));
+    float D      = max(rgbdMaxRange / maxRGB, 1.);
+    D            = clamp(floor(D) / 255.0, 0., 1.);
+    // vec3 rgb = color.rgb * (D * (255.0 / rgbdMaxRange));
+    vec3 rgb = color.rgb * D;
+
+    // Helps with png quantization.
+    rgb = toGammaSpace(rgb);
+
+    return vec4(rgb, D);
+}
+
+vec3 fromRGBD(vec4 rgbd) {
+    // Helps with png quantization.
+    rgbd.rgb = toLinearSpace(rgbd.rgb);
+
+    // return rgbd.rgb * ((rgbdMaxRange / 255.0) / rgbd.a);
+
+    return rgbd.rgb / rgbd.a;
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_HELPER_FUNCTIONS_FX_H

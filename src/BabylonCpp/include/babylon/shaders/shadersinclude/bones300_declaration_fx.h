@@ -6,37 +6,40 @@ namespace BABYLON {
 extern const char* bones300Declaration;
 
 const char* bones300Declaration
-  = "#if NUM_BONE_INFLUENCERS > 0\n"
-    "  #ifdef BONETEXTURE\n"
-    "  uniform sampler2D boneSampler;\n"
-    "  #else\n"
-    "  uniform mat4 mBones[BonesPerMesh];\n"
-    "  #endif  \n"
-    "\n"
-    "  in vec4 matricesIndices;\n"
-    "  in vec4 matricesWeights;\n"
-    "  #if NUM_BONE_INFLUENCERS > 4\n"
-    "  in vec4 matricesIndicesExtra;\n"
-    "  in vec4 matricesWeightsExtra;\n"
-    "  #endif\n"
-    "\n"
-    "  #ifdef BONETEXTURE\n"
-    "  mat4 readMatrixFromRawSampler(sampler2D smp, float index)\n"
-    "  {\n"
-    "  mat4 result;\n"
-    "  float offset = index  * 4.0;  \n"
-    "  float dx = 1.0 / boneTextureWidth;\n"
-    "\n"
-    "  result[0] = texture(smp, vec2(dx * (offset + 0.5), 0.));\n"
-    "  result[1] = texture(smp, vec2(dx * (offset + 1.5), 0.));\n"
-    "  result[2] = texture(smp, vec2(dx * (offset + 2.5), 0.));\n"
-    "  result[3] = texture(smp, vec2(dx * (offset + 3.5), 0.));\n"
-    "\n"
-    "  return result;\n"
-    "  }\n"
-    "  #endif\n"
-    "#endif\n";
+  = R"ShaderCode(
 
+#if NUM_BONE_INFLUENCERS > 0
+    #ifdef BONETEXTURE
+        uniform sampler2D boneSampler;
+    #else
+        uniform mat4 mBones[BonesPerMesh];
+    #endif
+
+        in vec4 matricesIndices;
+        in vec4 matricesWeights;
+        #if NUM_BONE_INFLUENCERS > 4
+            in vec4 matricesIndicesExtra;
+            in vec4 matricesWeightsExtra;
+        #endif
+
+    #ifdef BONETEXTURE
+        mat4 readMatrixFromRawSampler(sampler2D smp, float index)
+        {
+            mat4 result;
+            float offset = index  * 4.0;
+            float dx = 1.0 / boneTextureWidth;
+
+            result[0] = texture(smp, vec2(dx * (offset + 0.5), 0.));
+            result[1] = texture(smp, vec2(dx * (offset + 1.5), 0.));
+            result[2] = texture(smp, vec2(dx * (offset + 2.5), 0.));
+            result[3] = texture(smp, vec2(dx * (offset + 3.5), 0.));
+
+            return result;
+        }
+    #endif
+#endif
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_BONES300_DECLARATION_FX_H

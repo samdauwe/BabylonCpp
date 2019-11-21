@@ -6,67 +6,70 @@ namespace BABYLON {
 extern const char* glowMapGenerationPixelShader;
 
 const char* glowMapGenerationPixelShader
-  = "#ifdef DIFFUSE\n"
-    "varying vec2 vUVDiffuse;\n"
-    "uniform sampler2D diffuseSampler;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef OPACITY\n"
-    "varying vec2 vUVOpacity;\n"
-    "uniform sampler2D opacitySampler;\n"
-    "uniform float opacityIntensity;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef EMISSIVE\n"
-    "varying vec2 vUVEmissive;\n"
-    "uniform sampler2D emissiveSampler;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef VERTEXALPHA\n"
-    "  varying vec4 vColor;\n"
-    "#endif\n"
-    "\n"
-    "uniform vec4 glowColor;\n"
-    "\n"
-    "void main(void)\n"
-    "{\n"
-    "\n"
-    "vec4 finalColor = glowColor;\n"
-    "\n"
-    "// _____________________________ Alpha Information _______________________________\n"
-    "#ifdef DIFFUSE\n"
-    "  vec4 albedoTexture = texture2D(diffuseSampler, vUVDiffuse);\n"
-    "  finalColor.a *= albedoTexture.a;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef OPACITY\n"
-    "  vec4 opacityMap = texture2D(opacitySampler, vUVOpacity);\n"
-    "\n"
-    "  #ifdef OPACITYRGB\n"
-    "  finalColor.a *= getLuminance(opacityMap.rgb);\n"
-    "  #else\n"
-    "  finalColor.a *= opacityMap.a;\n"
-    "  #endif\n"
-    "\n"
-    "  finalColor.a *= opacityIntensity;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef VERTEXALPHA\n"
-    "  finalColor.a *= vColor.a;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef ALPHATEST\n"
-    "  if (finalColor.a < ALPHATESTVALUE)\n"
-    "  discard;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef EMISSIVE\n"
-    "  gl_FragColor = texture2D(emissiveSampler, vUVEmissive) * finalColor;\n"
-    "#else\n"
-    "  gl_FragColor = finalColor;\n"
-    "#endif\n"
-    "}\n";
+  = R"ShaderCode(
 
+#ifdef DIFFUSE
+varying vec2 vUVDiffuse;
+uniform sampler2D diffuseSampler;
+#endif
+
+#ifdef OPACITY
+varying vec2 vUVOpacity;
+uniform sampler2D opacitySampler;
+uniform float opacityIntensity;
+#endif
+
+#ifdef EMISSIVE
+varying vec2 vUVEmissive;
+uniform sampler2D emissiveSampler;
+#endif
+
+#ifdef VERTEXALPHA
+    varying vec4 vColor;
+#endif
+
+uniform vec4 glowColor;
+
+void main(void)
+{
+
+vec4 finalColor = glowColor;
+
+// _____________________________ Alpha Information _______________________________
+#ifdef DIFFUSE
+    vec4 albedoTexture = texture2D(diffuseSampler, vUVDiffuse);
+    finalColor.a *= albedoTexture.a;
+#endif
+
+#ifdef OPACITY
+    vec4 opacityMap = texture2D(opacitySampler, vUVOpacity);
+
+    #ifdef OPACITYRGB
+        finalColor.a *= getLuminance(opacityMap.rgb);
+    #else
+        finalColor.a *= opacityMap.a;
+    #endif
+
+    finalColor.a *= opacityIntensity;
+#endif
+
+#ifdef VERTEXALPHA
+    finalColor.a *= vColor.a;
+#endif
+
+#ifdef ALPHATEST
+    if (finalColor.a < ALPHATESTVALUE)
+        discard;
+#endif
+
+#ifdef EMISSIVE
+    gl_FragColor = texture2D(emissiveSampler, vUVEmissive) * finalColor;
+#else
+    gl_FragColor = finalColor;
+#endif
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_GLOW_MAP_GENERATION_FRAGMENT_FX_H

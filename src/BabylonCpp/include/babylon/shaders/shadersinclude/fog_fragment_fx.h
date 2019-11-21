@@ -6,11 +6,14 @@ namespace BABYLON {
 extern const char* fogFragment;
 
 const char* fogFragment
-  = "#ifdef FOG\n"
-    "  float fog = CalcFogFactor();\n"
-    "  color.rgb = fog * color.rgb + (1.0 - fog) * vFogColor;\n"
-    "#endif\n";
+  = R"ShaderCode(
 
+#ifdef FOG
+    float fog = CalcFogFactor();
+    color.rgb = fog * color.rgb + (1.0 - fog) * vFogColor;
+#endif
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_FOG_FRAGMENT_FX_H

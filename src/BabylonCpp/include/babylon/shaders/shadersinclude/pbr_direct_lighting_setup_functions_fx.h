@@ -6,83 +6,86 @@ namespace BABYLON {
 extern const char* pbrDirectLightingSetupFunctions;
 
 const char* pbrDirectLightingSetupFunctions
-  = "// Pre Light Computing\n"
-    "struct preLightingInfo\n"
-    "{\n"
-    "  // Pre Falloff Info\n"
-    "  vec3 lightOffset;\n"
-    "  float lightDistanceSquared;\n"
-    "  float lightDistance;\n"
-    "\n"
-    "  // Falloff Info\n"
-    "  float attenuation;\n"
-    "\n"
-    "  // Lighting Info\n"
-    "  vec3 L;\n"
-    "  vec3 H;\n"
-    "  float NdotV;\n"
-    "  float NdotLUnclamped;\n"
-    "  float NdotL;\n"
-    "  float VdotH;\n"
-    "  float roughness;\n"
-    "};\n"
-    "\n"
-    "preLightingInfo computePointAndSpotPreLightingInfo(vec4 lightData, vec3 V, vec3 N) {\n"
-    "  preLightingInfo result;\n"
-    "\n"
-    "  // Attenuation data.\n"
-    "  result.lightOffset = lightData.xyz - vPositionW;\n"
-    "  result.lightDistanceSquared = dot(result.lightOffset, result.lightOffset);\n"
-    "\n"
-    "  // Roughness.\n"
-    "  result.lightDistance = sqrt(result.lightDistanceSquared);\n"
-    "\n"
-    "  // Geometry Data.\n"
-    "  result.L = normalize(result.lightOffset);\n"
-    "  result.H = normalize(V + result.L);\n"
-    "  result.VdotH = saturate(dot(V, result.H));\n"
-    "\n"
-    "  result.NdotLUnclamped = dot(N, result.L);\n"
-    "  result.NdotL = saturateEps(result.NdotLUnclamped);\n"
-    "\n"
-    "  return result;\n"
-    "}\n"
-    "\n"
-    "preLightingInfo computeDirectionalPreLightingInfo(vec4 lightData, vec3 V, vec3 N) {\n"
-    "  preLightingInfo result;\n"
-    "\n"
-    "  // Roughness\n"
-    "  result.lightDistance = length(-lightData.xyz);\n"
-    "\n"
-    "  // Geometry Data.\n"
-    "  result.L = normalize(-lightData.xyz);\n"
-    "  result.H = normalize(V + result.L);\n"
-    "  result.VdotH = saturate(dot(V, result.H));\n"
-    "\n"
-    "  result.NdotLUnclamped = dot(N, result.L);\n"
-    "  result.NdotL = saturateEps(result.NdotLUnclamped);\n"
-    "\n"
-    "  return result;\n"
-    "}\n"
-    "\n"
-    "preLightingInfo computeHemisphericPreLightingInfo(vec4 lightData, vec3 V, vec3 N) {\n"
-    "  preLightingInfo result;\n"
-    "\n"
-    "  // Geometry Data.\n"
-    "  // Half Lambert for Hemispherix lighting.\n"
-    "  result.NdotL = dot(N, lightData.xyz) * 0.5 + 0.5;\n"
-    "  result.NdotL = saturateEps(result.NdotL);\n"
-    "  result.NdotLUnclamped = result.NdotL;\n"
-    "\n"
-    "  #ifdef SPECULARTERM\n"
-    "  result.L = normalize(lightData.xyz);\n"
-    "  result.H = normalize(V + result.L);\n"
-    "  result.VdotH = saturate(dot(V, result.H));\n"
-    "  #endif\n"
-    "\n"
-    "  return result;\n"
-    "}\n";
+  = R"ShaderCode(
 
+// Pre Light Computing
+struct preLightingInfo
+{
+    // Pre Falloff Info
+    vec3 lightOffset;
+    float lightDistanceSquared;
+    float lightDistance;
+
+    // Falloff Info
+    float attenuation;
+
+    // Lighting Info
+    vec3 L;
+    vec3 H;
+    float NdotV;
+    float NdotLUnclamped;
+    float NdotL;
+    float VdotH;
+    float roughness;
+};
+
+preLightingInfo computePointAndSpotPreLightingInfo(vec4 lightData, vec3 V, vec3 N) {
+    preLightingInfo result;
+
+    // Attenuation data.
+    result.lightOffset = lightData.xyz - vPositionW;
+    result.lightDistanceSquared = dot(result.lightOffset, result.lightOffset);
+
+    // Roughness.
+    result.lightDistance = sqrt(result.lightDistanceSquared);
+
+    // Geometry Data.
+    result.L = normalize(result.lightOffset);
+    result.H = normalize(V + result.L);
+    result.VdotH = saturate(dot(V, result.H));
+
+    result.NdotLUnclamped = dot(N, result.L);
+    result.NdotL = saturateEps(result.NdotLUnclamped);
+
+    return result;
+}
+
+preLightingInfo computeDirectionalPreLightingInfo(vec4 lightData, vec3 V, vec3 N) {
+    preLightingInfo result;
+
+    // Roughness
+    result.lightDistance = length(-lightData.xyz);
+
+    // Geometry Data.
+    result.L = normalize(-lightData.xyz);
+    result.H = normalize(V + result.L);
+    result.VdotH = saturate(dot(V, result.H));
+
+    result.NdotLUnclamped = dot(N, result.L);
+    result.NdotL = saturateEps(result.NdotLUnclamped);
+
+    return result;
+}
+
+preLightingInfo computeHemisphericPreLightingInfo(vec4 lightData, vec3 V, vec3 N) {
+    preLightingInfo result;
+
+    // Geometry Data.
+    // Half Lambert for Hemispherix lighting.
+    result.NdotL = dot(N, lightData.xyz) * 0.5 + 0.5;
+    result.NdotL = saturateEps(result.NdotL);
+    result.NdotLUnclamped = result.NdotL;
+
+    #ifdef SPECULARTERM
+        result.L = normalize(lightData.xyz);
+        result.H = normalize(V + result.L);
+        result.VdotH = saturate(dot(V, result.H));
+    #endif
+
+    return result;
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_PBR_DIRECT_LIGHTING_SETUP_FUNCTIONS_FX_H

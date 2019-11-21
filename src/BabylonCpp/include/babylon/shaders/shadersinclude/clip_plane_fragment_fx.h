@@ -6,34 +6,37 @@ namespace BABYLON {
 extern const char* clipPlaneFragment;
 
 const char* clipPlaneFragment
-  = "#ifdef CLIPPLANE\n"
-    "  if (fClipDistance > 0.0)\n"
-    "  {\n"
-    "  discard;\n"
-    "  }\n"
-    "#endif\n"
-    "\n"
-    "#ifdef CLIPPLANE2\n"
-    "  if (fClipDistance2 > 0.0)\n"
-    "  {\n"
-    "  discard;\n"
-    "  }\n"
-    "#endif\n"
-    "\n"
-    "#ifdef CLIPPLANE3\n"
-    "  if (fClipDistance3 > 0.0)\n"
-    "  {\n"
-    "  discard;\n"
-    "  }\n"
-    "#endif\n"
-    "\n"
-    "#ifdef CLIPPLANE4\n"
-    "  if (fClipDistance4 > 0.0)\n"
-    "  {\n"
-    "  discard;\n"
-    "  }\n"
-    "#endif\n";
+  = R"ShaderCode(
 
+#ifdef CLIPPLANE
+    if (fClipDistance > 0.0)
+    {
+        discard;
+    }
+#endif
+
+#ifdef CLIPPLANE2
+    if (fClipDistance2 > 0.0)
+    {
+        discard;
+    }
+#endif
+
+#ifdef CLIPPLANE3
+    if (fClipDistance3 > 0.0)
+    {
+        discard;
+    }
+#endif
+
+#ifdef CLIPPLANE4
+    if (fClipDistance4 > 0.0)
+    {
+        discard;
+    }
+#endif
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_CLIP_PLANE_FRAGMENT_FX_H

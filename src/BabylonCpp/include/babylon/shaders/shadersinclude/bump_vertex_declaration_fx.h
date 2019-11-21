@@ -6,12 +6,15 @@ namespace BABYLON {
 extern const char* bumpVertexDeclaration;
 
 const char* bumpVertexDeclaration
-  = "#if defined(BUMP) || defined(PARALLAX) || defined(CLEARCOAT_BUMP)\n"
-    "  #if defined(TANGENT) && defined(NORMAL) \n"
-    "  varying mat3 vTBN;\n"
-    "  #endif\n"
-    "#endif\n";
+  = R"ShaderCode(
 
+#if defined(BUMP) || defined(PARALLAX) || defined(CLEARCOAT_BUMP)
+    #if defined(TANGENT) && defined(NORMAL)
+        varying mat3 vTBN;
+    #endif
+#endif
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_BUMP_VERTEX_DECLARATION_FX_H

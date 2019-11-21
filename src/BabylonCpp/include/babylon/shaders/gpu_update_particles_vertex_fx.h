@@ -1,430 +1,435 @@
 ﻿#ifndef BABYLON_SHADERS_GPU_UPDATE_PARTICLES_VERTEX_FX_H
 #define BABYLON_SHADERS_GPU_UPDATE_PARTICLES_VERTEX_FX_H
 
+#include <babylon/shaders/shadersinclude/glsl_version_3.h>
+
 namespace BABYLON {
 
 extern const char* gpuUpdateParticlesVertexShader;
 
 const char* gpuUpdateParticlesVertexShader
-  = BABYLONCPP_GLSL_VERSION_3
-    "\n"
-    "#define PI 3.14159\n"
-    "\n"
-    "uniform float currentCount;\n"
-    "uniform float timeDelta;\n"
-    "uniform float stopFactor;\n"
-    "uniform mat4 emitterWM;\n"
-    "uniform vec2 lifeTime;\n"
-    "uniform vec2 emitPower;\n"
-    "uniform vec2 sizeRange;\n"
-    "uniform vec4 scaleRange;\n"
-    "\n"
-    "#ifndef COLORGRADIENTS\n"
-    "uniform vec4 color1;\n"
-    "uniform vec4 color2;\n"
-    "#endif\n"
-    "uniform vec3 gravity;\n"
-    "uniform sampler2D randomSampler;\n"
-    "uniform sampler2D randomSampler2;\n"
-    "uniform vec4 angleRange;\n"
-    "\n"
-    "#ifdef BOXEMITTER\n"
-    "uniform vec3 direction1;\n"
-    "uniform vec3 direction2;\n"
-    "uniform vec3 minEmitBox;\n"
-    "uniform vec3 maxEmitBox;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef POINTEMITTER\n"
-    "uniform vec3 direction1;\n"
-    "uniform vec3 direction2;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef HEMISPHERICEMITTER\n"
-    "uniform float radius;\n"
-    "uniform float radiusRange;\n"
-    "uniform float directionRandomizer;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef SPHEREEMITTER\n"
-    "uniform float radius;\n"
-    "uniform float radiusRange;\n"
-    "#ifdef DIRECTEDSPHEREEMITTER\n"
-    "  uniform vec3 direction1;\n"
-    "  uniform vec3 direction2;\n"
-    "#else\n"
-    "  uniform float directionRandomizer;\n"
-    "#endif\n"
-    "#endif\n"
-    "\n"
-    "#ifdef CYLINDEREMITTER\n"
-    "uniform float radius;\n"
-    "uniform float height;\n"
-    "uniform float radiusRange;\n"
-    "#ifdef DIRECTEDCYLINDEREMITTER\n"
-    "  uniform vec3 direction1;\n"
-    "  uniform vec3 direction2;\n"
-    "#else\n"
-    "  uniform float directionRandomizer;\n"
-    "#endif\n"
-    "#endif\n"
-    "\n"
-    "#ifdef CONEEMITTER\n"
-    "uniform vec2 radius;\n"
-    "uniform float coneAngle;\n"
-    "uniform vec2 height;\n"
-    "uniform float directionRandomizer;\n"
-    "#endif\n"
-    "\n"
-    "// Particles state\n"
-    "in vec3 position;\n"
-    "in float age;\n"
-    "in float life;\n"
-    "in vec4 seed;\n"
-    "in vec3 size;\n"
-    "#ifndef COLORGRADIENTS\n"
-    "in vec4 color;\n"
-    "#endif\n"
-    "in vec3 direction;\n"
-    "#ifndef BILLBOARD\n"
-    "in vec3 initialDirection;\n"
-    "#endif\n"
-    "#ifdef ANGULARSPEEDGRADIENTS\n"
-    "in float angle;\n"
-    "#else\n"
-    "in vec2 angle;\n"
-    "#endif\n"
-    "#ifdef ANIMATESHEET\n"
-    "in float cellIndex;\n"
-    "#ifdef ANIMATESHEETRANDOMSTART\n"
-    "in float cellStartOffset;\n"
-    "#endif\n"
-    "#endif\n"
-    "#ifdef NOISE\n"
-    "in vec3 noiseCoordinates1;\n"
-    "in vec3 noiseCoordinates2;\n"
-    "#endif\n"
-    "\n"
-    "// Output\n"
-    "out vec3 outPosition;\n"
-    "out float outAge;\n"
-    "out float outLife;\n"
-    "out vec4 outSeed;\n"
-    "out vec3 outSize;\n"
-    "#ifndef COLORGRADIENTS\n"
-    "out vec4 outColor;\n"
-    "#endif\n"
-    "out vec3 outDirection;\n"
-    "#ifndef BILLBOARD\n"
-    "out vec3 outInitialDirection;\n"
-    "#endif\n"
-    "#ifdef ANGULARSPEEDGRADIENTS\n"
-    "out float outAngle;\n"
-    "#else\n"
-    "out vec2 outAngle;\n"
-    "#endif\n"
-    "#ifdef ANIMATESHEET\n"
-    "out float outCellIndex;\n"
-    "#ifdef ANIMATESHEETRANDOMSTART\n"
-    "out float outCellStartOffset;\n"
-    "#endif\n"
-    "#endif\n"
-    "#ifdef NOISE\n"
-    "out vec3 outNoiseCoordinates1;\n"
-    "out vec3 outNoiseCoordinates2;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef SIZEGRADIENTS\n"
-    "uniform sampler2D sizeGradientSampler;\n"
-    "#endif \n"
-    "\n"
-    "#ifdef ANGULARSPEEDGRADIENTS\n"
-    "uniform sampler2D angularSpeedGradientSampler;\n"
-    "#endif \n"
-    "\n"
-    "#ifdef VELOCITYGRADIENTS\n"
-    "uniform sampler2D velocityGradientSampler;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef LIMITVELOCITYGRADIENTS\n"
-    "uniform sampler2D limitVelocityGradientSampler;\n"
-    "uniform float limitVelocityDamping;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef DRAGGRADIENTS\n"
-    "uniform sampler2D dragGradientSampler;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef NOISE\n"
-    "uniform vec3 noiseStrength;\n"
-    "uniform sampler2D noiseSampler;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef ANIMATESHEET\n"
-    "uniform vec3 cellInfos;\n"
-    "#endif\n"
-    "\n"
-    "\n"
-    "vec3 getRandomVec3(float offset) {\n"
-    "  return texture(randomSampler2, vec2(float(gl_VertexID) * offset / currentCount, 0)).rgb;\n"
-    "}\n"
-    "\n"
-    "vec4 getRandomVec4(float offset) {\n"
-    "  return texture(randomSampler, vec2(float(gl_VertexID) * offset / currentCount, 0));\n"
-    "}\n"
-    "\n"
-    "void main() {\n"
-    "  float newAge = age + timeDelta;    \n"
-    "\n"
-    "  // If particle is dead and system is not stopped, spawn as new particle\n"
-    "  if (newAge >= life && stopFactor != 0.) {\n"
-    "  vec3 position;\n"
-    "  vec3 direction;\n"
-    "\n"
-    "  // Let's get some random values\n"
-    "  vec4 randoms = getRandomVec4(seed.x);\n"
-    "\n"
-    "  // Age and life\n"
-    "  outLife = lifeTime.x + (lifeTime.y - lifeTime.x) * randoms.r;\n"
-    "  outAge = mod(newAge, outLife);\n"
-    "\n"
-    "  // Seed\n"
-    "  outSeed = seed;\n"
-    "\n"
-    "  // Size\n"
-    "#ifdef SIZEGRADIENTS    \n"
-    "  outSize.x = texture(sizeGradientSampler, vec2(0, 0)).r;\n"
-    "#else\n"
-    "  outSize.x = sizeRange.x + (sizeRange.y - sizeRange.x) * randoms.g;\n"
-    "#endif\n"
-    "  outSize.y = scaleRange.x + (scaleRange.y - scaleRange.x) * randoms.b;\n"
-    "  outSize.z = scaleRange.z + (scaleRange.w - scaleRange.z) * randoms.a; \n"
-    "\n"
-    "#ifndef COLORGRADIENTS\n"
-    "  // Color\n"
-    "  outColor = color1 + (color2 - color1) * randoms.b;\n"
-    "#endif\n"
-    "\n"
-    "  // Angular speed\n"
-    "#ifndef ANGULARSPEEDGRADIENTS    \n"
-    "  outAngle.y = angleRange.x + (angleRange.y - angleRange.x) * randoms.a;\n"
-    "  outAngle.x = angleRange.z + (angleRange.w - angleRange.z) * randoms.r;\n"
-    "#else\n"
-    "  outAngle = angleRange.z + (angleRange.w - angleRange.z) * randoms.r;\n"
-    "#endif        \n"
-    "\n"
-    "  // Position / Direction (based on emitter type)\n"
-    "#ifdef POINTEMITTER\n"
-    "  vec3 randoms2 = getRandomVec3(seed.y);\n"
-    "  vec3 randoms3 = getRandomVec3(seed.z);\n"
-    "\n"
-    "  position = vec3(0, 0, 0);\n"
-    "\n"
-    "  direction = direction1 + (direction2 - direction1) * randoms3;\n"
-    "#elif defined(BOXEMITTER)\n"
-    "  vec3 randoms2 = getRandomVec3(seed.y);\n"
-    "  vec3 randoms3 = getRandomVec3(seed.z);\n"
-    "\n"
-    "  position = minEmitBox + (maxEmitBox - minEmitBox) * randoms2;\n"
-    "\n"
-    "  direction = direction1 + (direction2 - direction1) * randoms3;  \n"
-    "#elif defined(HEMISPHERICEMITTER)\n"
-    "  vec3 randoms2 = getRandomVec3(seed.y);\n"
-    "  vec3 randoms3 = getRandomVec3(seed.z);\n"
-    "\n"
-    "  // Position on the sphere surface\n"
-    "  float phi = 2.0 * PI * randoms2.x;\n"
-    "  float theta = acos(2.0 * randoms2.y - 1.0);\n"
-    "  float randX = cos(phi) * sin(theta);\n"
-    "  float randY = cos(theta);\n"
-    "  float randZ = sin(phi) * sin(theta);\n"
-    "\n"
-    "  position = (radius - (radius * radiusRange * randoms2.z)) * vec3(randX, abs(randY), randZ);\n"
-    "  direction = position + directionRandomizer * randoms3;  \n"
-    "#elif defined(SPHEREEMITTER)\n"
-    "  vec3 randoms2 = getRandomVec3(seed.y);\n"
-    "  vec3 randoms3 = getRandomVec3(seed.z);\n"
-    "\n"
-    "  // Position on the sphere surface\n"
-    "  float phi = 2.0 * PI * randoms2.x;\n"
-    "  float theta = acos(2.0 * randoms2.y - 1.0);\n"
-    "  float randX = cos(phi) * sin(theta);\n"
-    "  float randY = cos(theta);\n"
-    "  float randZ = sin(phi) * sin(theta);\n"
-    "\n"
-    "  position = (radius - (radius * radiusRange * randoms2.z)) * vec3(randX, randY, randZ);\n"
-    "\n"
-    "  #ifdef DIRECTEDSPHEREEMITTER\n"
-    "  direction = direction1 + (direction2 - direction1) * randoms3;\n"
-    "  #else\n"
-    "  // Direction\n"
-    "  direction = position + directionRandomizer * randoms3;\n"
-    "  #endif\n"
-    "#elif defined(CYLINDEREMITTER)\n"
-    "  vec3 randoms2 = getRandomVec3(seed.y);\n"
-    "  vec3 randoms3 = getRandomVec3(seed.z);\n"
-    "\n"
-    "  // Position on the cylinder\n"
-    "  float yPos = (randoms2.x - 0.5)*height;\n"
-    "  float angle = randoms2.y * PI * 2.;\n"
-    "  float inverseRadiusRangeSquared = ((1.-radiusRange) * (1.-radiusRange));\n"
-    "  float positionRadius = radius*sqrt(inverseRadiusRangeSquared + (randoms2.z * (1.-inverseRadiusRangeSquared)));\n"
-    "  float xPos = positionRadius * cos(angle);\n"
-    "  float zPos = positionRadius * sin(angle);\n"
-    "  position = vec3(xPos, yPos, zPos);\n"
-    "\n"
-    "  #ifdef DIRECTEDCYLINDEREMITTER\n"
-    "  direction = direction1 + (direction2 - direction1) * randoms3;\n"
-    "  #else\n"
-    "  // Direction\n"
-    "  angle = angle + ((randoms3.x-0.5) * PI);\n"
-    "  direction = vec3(cos(angle), randoms3.y-0.5, sin(angle));\n"
-    "  direction = normalize(direction);\n"
-    "  #endif\n"
-    "#elif defined(CONEEMITTER)\n"
-    "  vec3 randoms2 = getRandomVec3(seed.y);\n"
-    "\n"
-    "  float s = 2.0 * PI * randoms2.x;\n"
-    "\n"
-    "  #ifdef CONEEMITTERSPAWNPOINT\n"
-    "  float h = 0.00001;\n"
-    "  #else\n"
-    "  float h = randoms2.y * height.y;\n"
-    "  \n"
-    "  // Better distribution in a cone at normal angles.\n"
-    "  h = 1. - h * h;  \n"
-    "  #endif\n"
-    "\n"
-    "  float lRadius = radius.x - radius.x * randoms2.z * radius.y;\n"
-    "  lRadius = lRadius * h;\n"
-    "\n"
-    "  float randX = lRadius * sin(s);\n"
-    "  float randZ = lRadius * cos(s);\n"
-    "  float randY = h  * height.x;\n"
-    "\n"
-    "  position = vec3(randX, randY, randZ); \n"
-    "\n"
-    "  // Direction\n"
-    "  if (abs(cos(coneAngle)) == 1.0) {\n"
-    "  direction = vec3(0., 1.0, 0.);\n"
-    "  } else {\n"
-    "  vec3 randoms3 = getRandomVec3(seed.z);\n"
-    "  direction = position + directionRandomizer * randoms3;\n"
-    "  }\n"
-    "#else    \n"
-    "  // Create the particle at origin\n"
-    "  position = vec3(0., 0., 0.);\n"
-    "\n"
-    "  // Spread in all directions\n"
-    "  direction = 2.0 * (getRandomVec3(seed.w) - vec3(0.5, 0.5, 0.5));\n"
-    "#endif\n"
-    "\n"
-    "  float power = emitPower.x + (emitPower.y - emitPower.x) * randoms.a;\n"
-    "\n"
-    "  outPosition = (emitterWM * vec4(position, 1.)).xyz;\n"
-    "  vec3 initial = (emitterWM * vec4(direction, 0.)).xyz;\n"
-    "  outDirection = initial * power;\n"
-    "#ifndef BILLBOARD        \n"
-    "  outInitialDirection = initial;\n"
-    "#endif\n"
-    "#ifdef ANIMATESHEET      \n"
-    "  outCellIndex = cellInfos.x;\n"
-    "\n"
-    "#ifdef ANIMATESHEETRANDOMSTART\n"
-    "  outCellStartOffset = randoms.a * outLife;\n"
-    "#endif    \n"
-    "#endif\n"
-    "\n"
-    "#ifdef NOISE\n"
-    "  outNoiseCoordinates1 = noiseCoordinates1;\n"
-    "  outNoiseCoordinates2 = noiseCoordinates2;\n"
-    "#endif\n"
-    "\n"
-    "  } else {\n"
-    "  float directionScale = timeDelta;\n"
-    "  outAge = newAge;\n"
-    "  float ageGradient = newAge / life;\n"
-    "\n"
-    "#ifdef VELOCITYGRADIENTS\n"
-    "  directionScale *= texture(velocityGradientSampler, vec2(ageGradient, 0)).r;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef DRAGGRADIENTS\n"
-    "  directionScale *= 1.0 - texture(dragGradientSampler, vec2(ageGradient, 0)).r;\n"
-    "#endif\n"
-    "\n"
-    "  outPosition = position + direction * directionScale;\n"
-    "  \n"
-    "  outLife = life;\n"
-    "  outSeed = seed;\n"
-    "#ifndef COLORGRADIENTS    \n"
-    "  outColor = color;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef SIZEGRADIENTS\n"
-    "  outSize.x = texture(sizeGradientSampler, vec2(ageGradient, 0)).r;\n"
-    "  outSize.yz = size.yz;\n"
-    "#else\n"
-    "  outSize = size;\n"
-    "#endif \n"
-    "\n"
-    "#ifndef BILLBOARD    \n"
-    "  outInitialDirection = initialDirection;\n"
-    "#endif\n"
-    "\n"
-    "  vec3 updatedDirection = direction + gravity * timeDelta;\n"
-    "\n"
-    "#ifdef LIMITVELOCITYGRADIENTS\n"
-    "  float limitVelocity = texture(limitVelocityGradientSampler, vec2(ageGradient, 0)).r;\n"
-    "\n"
-    "  float currentVelocity = length(updatedDirection);\n"
-    "\n"
-    "  if (currentVelocity > limitVelocity) {\n"
-    "  updatedDirection = updatedDirection * limitVelocityDamping;\n"
-    "  }\n"
-    "#endif\n"
-    "\n"
-    "  outDirection = updatedDirection;\n"
-    "\n"
-    "#ifdef NOISE\n"
-    "  vec3 localPosition = outPosition - emitterWM[3].xyz;\n"
-    "\n"
-    "  float fetchedR = texture(noiseSampler, vec2(noiseCoordinates1.x, noiseCoordinates1.y) * vec2(0.5) + vec2(0.5)).r;\n"
-    "  float fetchedG = texture(noiseSampler, vec2(noiseCoordinates1.z, noiseCoordinates2.x) * vec2(0.5) + vec2(0.5)).r;\n"
-    "  float fetchedB = texture(noiseSampler, vec2(noiseCoordinates2.y, noiseCoordinates2.z) * vec2(0.5) + vec2(0.5)).r;\n"
-    "\n"
-    "  vec3 force = vec3(2. * fetchedR - 1., 2. * fetchedG - 1., 2. * fetchedB - 1.) * noiseStrength;\n"
-    "\n"
-    "  outDirection = outDirection + force * timeDelta;\n"
-    "\n"
-    "  outNoiseCoordinates1 = noiseCoordinates1;\n"
-    "  outNoiseCoordinates2 = noiseCoordinates2;\n"
-    "\n"
-    "#endif    \n"
-    "\n"
-    "#ifdef ANGULARSPEEDGRADIENTS\n"
-    "  float angularSpeed = texture(angularSpeedGradientSampler, vec2(ageGradient, 0)).r;\n"
-    "  outAngle = angle + angularSpeed * timeDelta;\n"
-    "#else\n"
-    "  outAngle = vec2(angle.x + angle.y * timeDelta, angle.y);\n"
-    "#endif\n"
-    "\n"
-    "#ifdef ANIMATESHEET      \n"
-    "  float offsetAge = outAge;\n"
-    "  float dist = cellInfos.y - cellInfos.x;\n"
-    "\n"
-    "#ifdef ANIMATESHEETRANDOMSTART\n"
-    "  outCellStartOffset = cellStartOffset;\n"
-    "  offsetAge += cellStartOffset;\n"
-    "#endif    \n"
-    "\n"
-    "  float ratio = clamp(mod(offsetAge * cellInfos.z, life) / life, 0., 1.0);\n"
-    "\n"
-    "  outCellIndex = float(int(cellInfos.x + ratio * dist));\n"
-    "#endif\n"
-    "  }\n"
-    "}\n";
+  = R"ShaderCode(
 
+BABYLONCPP_GLSL_VERSION_3
+
+#define PI 3.14159
+
+uniform float currentCount;
+uniform float timeDelta;
+uniform float stopFactor;
+uniform mat4 emitterWM;
+uniform vec2 lifeTime;
+uniform vec2 emitPower;
+uniform vec2 sizeRange;
+uniform vec4 scaleRange;
+
+#ifndef COLORGRADIENTS
+uniform vec4 color1;
+uniform vec4 color2;
+#endif
+uniform vec3 gravity;
+uniform sampler2D randomSampler;
+uniform sampler2D randomSampler2;
+uniform vec4 angleRange;
+
+#ifdef BOXEMITTER
+uniform vec3 direction1;
+uniform vec3 direction2;
+uniform vec3 minEmitBox;
+uniform vec3 maxEmitBox;
+#endif
+
+#ifdef POINTEMITTER
+uniform vec3 direction1;
+uniform vec3 direction2;
+#endif
+
+#ifdef HEMISPHERICEMITTER
+uniform float radius;
+uniform float radiusRange;
+uniform float directionRandomizer;
+#endif
+
+#ifdef SPHEREEMITTER
+uniform float radius;
+uniform float radiusRange;
+#ifdef DIRECTEDSPHEREEMITTER
+  uniform vec3 direction1;
+  uniform vec3 direction2;
+#else
+  uniform float directionRandomizer;
+#endif
+#endif
+
+#ifdef CYLINDEREMITTER
+uniform float radius;
+uniform float height;
+uniform float radiusRange;
+#ifdef DIRECTEDCYLINDEREMITTER
+  uniform vec3 direction1;
+  uniform vec3 direction2;
+#else
+  uniform float directionRandomizer;
+#endif
+#endif
+
+#ifdef CONEEMITTER
+uniform vec2 radius;
+uniform float coneAngle;
+uniform vec2 height;
+uniform float directionRandomizer;
+#endif
+
+// Particles state
+in vec3 position;
+in float age;
+in float life;
+in vec4 seed;
+in vec3 size;
+#ifndef COLORGRADIENTS
+in vec4 color;
+#endif
+in vec3 direction;
+#ifndef BILLBOARD
+in vec3 initialDirection;
+#endif
+#ifdef ANGULARSPEEDGRADIENTS
+in float angle;
+#else
+in vec2 angle;
+#endif
+#ifdef ANIMATESHEET
+in float cellIndex;
+#ifdef ANIMATESHEETRANDOMSTART
+in float cellStartOffset;
+#endif
+#endif
+#ifdef NOISE
+in vec3 noiseCoordinates1;
+in vec3 noiseCoordinates2;
+#endif
+
+// Output
+out vec3 outPosition;
+out float outAge;
+out float outLife;
+out vec4 outSeed;
+out vec3 outSize;
+#ifndef COLORGRADIENTS
+out vec4 outColor;
+#endif
+out vec3 outDirection;
+#ifndef BILLBOARD
+out vec3 outInitialDirection;
+#endif
+#ifdef ANGULARSPEEDGRADIENTS
+out float outAngle;
+#else
+out vec2 outAngle;
+#endif
+#ifdef ANIMATESHEET
+out float outCellIndex;
+#ifdef ANIMATESHEETRANDOMSTART
+out float outCellStartOffset;
+#endif
+#endif
+#ifdef NOISE
+out vec3 outNoiseCoordinates1;
+out vec3 outNoiseCoordinates2;
+#endif
+
+#ifdef SIZEGRADIENTS
+uniform sampler2D sizeGradientSampler;
+#endif
+
+#ifdef ANGULARSPEEDGRADIENTS
+uniform sampler2D angularSpeedGradientSampler;
+#endif
+
+#ifdef VELOCITYGRADIENTS
+uniform sampler2D velocityGradientSampler;
+#endif
+
+#ifdef LIMITVELOCITYGRADIENTS
+uniform sampler2D limitVelocityGradientSampler;
+uniform float limitVelocityDamping;
+#endif
+
+#ifdef DRAGGRADIENTS
+uniform sampler2D dragGradientSampler;
+#endif
+
+#ifdef NOISE
+uniform vec3 noiseStrength;
+uniform sampler2D noiseSampler;
+#endif
+
+#ifdef ANIMATESHEET
+uniform vec3 cellInfos;
+#endif
+
+
+vec3 getRandomVec3(float offset) {
+  return texture(randomSampler2, vec2(float(gl_VertexID) * offset / currentCount, 0)).rgb;
+}
+
+vec4 getRandomVec4(float offset) {
+  return texture(randomSampler, vec2(float(gl_VertexID) * offset / currentCount, 0));
+}
+
+void main() {
+  float newAge = age + timeDelta;
+
+  // If particle is dead and system is not stopped, spawn as new particle
+  if (newAge >= life && stopFactor != 0.) {
+    vec3 position;
+    vec3 direction;
+
+    // Let's get some random values
+    vec4 randoms = getRandomVec4(seed.x);
+
+    // Age and life
+    outLife = lifeTime.x + (lifeTime.y - lifeTime.x) * randoms.r;
+    outAge = mod(newAge, outLife);
+
+    // Seed
+    outSeed = seed;
+
+    // Size
+#ifdef SIZEGRADIENTS
+    outSize.x = texture(sizeGradientSampler, vec2(0, 0)).r;
+#else
+    outSize.x = sizeRange.x + (sizeRange.y - sizeRange.x) * randoms.g;
+#endif
+    outSize.y = scaleRange.x + (scaleRange.y - scaleRange.x) * randoms.b;
+    outSize.z = scaleRange.z + (scaleRange.w - scaleRange.z) * randoms.a;
+
+#ifndef COLORGRADIENTS
+    // Color
+    outColor = color1 + (color2 - color1) * randoms.b;
+#endif
+
+    // Angular speed
+#ifndef ANGULARSPEEDGRADIENTS
+    outAngle.y = angleRange.x + (angleRange.y - angleRange.x) * randoms.a;
+    outAngle.x = angleRange.z + (angleRange.w - angleRange.z) * randoms.r;
+#else
+    outAngle = angleRange.z + (angleRange.w - angleRange.z) * randoms.r;
+#endif
+
+    // Position / Direction (based on emitter type)
+#ifdef POINTEMITTER
+    vec3 randoms2 = getRandomVec3(seed.y);
+    vec3 randoms3 = getRandomVec3(seed.z);
+
+    position = vec3(0, 0, 0);
+
+    direction = direction1 + (direction2 - direction1) * randoms3;
+#elif defined(BOXEMITTER)
+    vec3 randoms2 = getRandomVec3(seed.y);
+    vec3 randoms3 = getRandomVec3(seed.z);
+
+    position = minEmitBox + (maxEmitBox - minEmitBox) * randoms2;
+
+    direction = direction1 + (direction2 - direction1) * randoms3;
+#elif defined(HEMISPHERICEMITTER)
+    vec3 randoms2 = getRandomVec3(seed.y);
+    vec3 randoms3 = getRandomVec3(seed.z);
+
+    // Position on the sphere surface
+    float phi = 2.0 * PI * randoms2.x;
+    float theta = acos(2.0 * randoms2.y - 1.0);
+    float randX = cos(phi) * sin(theta);
+    float randY = cos(theta);
+    float randZ = sin(phi) * sin(theta);
+
+    position = (radius - (radius * radiusRange * randoms2.z)) * vec3(randX, abs(randY), randZ);
+    direction = position + directionRandomizer * randoms3;
+#elif defined(SPHEREEMITTER)
+    vec3 randoms2 = getRandomVec3(seed.y);
+    vec3 randoms3 = getRandomVec3(seed.z);
+
+    // Position on the sphere surface
+    float phi = 2.0 * PI * randoms2.x;
+    float theta = acos(2.0 * randoms2.y - 1.0);
+    float randX = cos(phi) * sin(theta);
+    float randY = cos(theta);
+    float randZ = sin(phi) * sin(theta);
+
+    position = (radius - (radius * radiusRange * randoms2.z)) * vec3(randX, randY, randZ);
+
+    #ifdef DIRECTEDSPHEREEMITTER
+      direction = direction1 + (direction2 - direction1) * randoms3;
+    #else
+      // Direction
+      direction = position + directionRandomizer * randoms3;
+    #endif
+#elif defined(CYLINDEREMITTER)
+    vec3 randoms2 = getRandomVec3(seed.y);
+    vec3 randoms3 = getRandomVec3(seed.z);
+
+    // Position on the cylinder
+    float yPos = (randoms2.x - 0.5)*height;
+    float angle = randoms2.y * PI * 2.;
+    float inverseRadiusRangeSquared = ((1.-radiusRange) * (1.-radiusRange));
+    float positionRadius = radius*sqrt(inverseRadiusRangeSquared + (randoms2.z * (1.-inverseRadiusRangeSquared)));
+    float xPos = positionRadius * cos(angle);
+    float zPos = positionRadius * sin(angle);
+    position = vec3(xPos, yPos, zPos);
+
+    #ifdef DIRECTEDCYLINDEREMITTER
+      direction = direction1 + (direction2 - direction1) * randoms3;
+    #else
+      // Direction
+      angle = angle + ((randoms3.x-0.5) * PI);
+      direction = vec3(cos(angle), randoms3.y-0.5, sin(angle));
+      direction = normalize(direction);
+    #endif
+#elif defined(CONEEMITTER)
+    vec3 randoms2 = getRandomVec3(seed.y);
+
+    float s = 2.0 * PI * randoms2.x;
+
+    #ifdef CONEEMITTERSPAWNPOINT
+        float h = 0.00001;
+    #else
+        float h = randoms2.y * height.y;
+
+        // Better distribution in a cone at normal angles.
+        h = 1. - h * h;
+    #endif
+
+    float lRadius = radius.x - radius.x * randoms2.z * radius.y;
+    lRadius = lRadius * h;
+
+    float randX = lRadius * sin(s);
+    float randZ = lRadius * cos(s);
+    float randY = h  * height.x;
+
+    position = vec3(randX, randY, randZ);
+
+    // Direction
+    if (abs(cos(coneAngle)) == 1.0) {
+        direction = vec3(0., 1.0, 0.);
+    } else {
+        vec3 randoms3 = getRandomVec3(seed.z);
+        direction = position + directionRandomizer * randoms3;
+    }
+#else
+    // Create the particle at origin
+    position = vec3(0., 0., 0.);
+
+    // Spread in all directions
+    direction = 2.0 * (getRandomVec3(seed.w) - vec3(0.5, 0.5, 0.5));
+#endif
+
+    float power = emitPower.x + (emitPower.y - emitPower.x) * randoms.a;
+
+    outPosition = (emitterWM * vec4(position, 1.)).xyz;
+    vec3 initial = (emitterWM * vec4(direction, 0.)).xyz;
+    outDirection = initial * power;
+#ifndef BILLBOARD
+    outInitialDirection = initial;
+#endif
+#ifdef ANIMATESHEET
+    outCellIndex = cellInfos.x;
+
+#ifdef ANIMATESHEETRANDOMSTART
+    outCellStartOffset = randoms.a * outLife;
+#endif
+#endif
+
+#ifdef NOISE
+    outNoiseCoordinates1 = noiseCoordinates1;
+    outNoiseCoordinates2 = noiseCoordinates2;
+#endif
+
+  } else {
+    float directionScale = timeDelta;
+    outAge = newAge;
+    float ageGradient = newAge / life;
+
+#ifdef VELOCITYGRADIENTS
+    directionScale *= texture(velocityGradientSampler, vec2(ageGradient, 0)).r;
+#endif
+
+#ifdef DRAGGRADIENTS
+    directionScale *= 1.0 - texture(dragGradientSampler, vec2(ageGradient, 0)).r;
+#endif
+
+    outPosition = position + direction * directionScale;
+
+    outLife = life;
+    outSeed = seed;
+#ifndef COLORGRADIENTS
+    outColor = color;
+#endif
+
+#ifdef SIZEGRADIENTS
+    outSize.x = texture(sizeGradientSampler, vec2(ageGradient, 0)).r;
+    outSize.yz = size.yz;
+#else
+    outSize = size;
+#endif
+
+#ifndef BILLBOARD
+    outInitialDirection = initialDirection;
+#endif
+
+    vec3 updatedDirection = direction + gravity * timeDelta;
+
+#ifdef LIMITVELOCITYGRADIENTS
+    float limitVelocity = texture(limitVelocityGradientSampler, vec2(ageGradient, 0)).r;
+
+    float currentVelocity = length(updatedDirection);
+
+    if (currentVelocity > limitVelocity) {
+        updatedDirection = updatedDirection * limitVelocityDamping;
+    }
+#endif
+
+    outDirection = updatedDirection;
+
+#ifdef NOISE
+    vec3 localPosition = outPosition - emitterWM[3].xyz;
+
+    float fetchedR = texture(noiseSampler, vec2(noiseCoordinates1.x, noiseCoordinates1.y) * vec2(0.5) + vec2(0.5)).r;
+    float fetchedG = texture(noiseSampler, vec2(noiseCoordinates1.z, noiseCoordinates2.x) * vec2(0.5) + vec2(0.5)).r;
+    float fetchedB = texture(noiseSampler, vec2(noiseCoordinates2.y, noiseCoordinates2.z) * vec2(0.5) + vec2(0.5)).r;
+
+    vec3 force = vec3(2. * fetchedR - 1., 2. * fetchedG - 1., 2. * fetchedB - 1.) * noiseStrength;
+
+    outDirection = outDirection + force * timeDelta;
+
+    outNoiseCoordinates1 = noiseCoordinates1;
+    outNoiseCoordinates2 = noiseCoordinates2;
+
+#endif
+
+#ifdef ANGULARSPEEDGRADIENTS
+    float angularSpeed = texture(angularSpeedGradientSampler, vec2(ageGradient, 0)).r;
+    outAngle = angle + angularSpeed * timeDelta;
+#else
+    outAngle = vec2(angle.x + angle.y * timeDelta, angle.y);
+#endif
+
+#ifdef ANIMATESHEET
+    float offsetAge = outAge;
+    float dist = cellInfos.y - cellInfos.x;
+
+#ifdef ANIMATESHEETRANDOMSTART
+    outCellStartOffset = cellStartOffset;
+    offsetAge += cellStartOffset;
+#endif
+
+    float ratio = clamp(mod(offsetAge * cellInfos.z, life) / life, 0., 1.0);
+
+    outCellIndex = float(int(cellInfos.x + ratio * dist));
+#endif
+  }
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_GPU_UPDATE_PARTICLES_VERTEX_FX_H

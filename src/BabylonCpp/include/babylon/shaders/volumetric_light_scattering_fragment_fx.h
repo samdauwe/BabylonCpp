@@ -6,38 +6,41 @@ namespace BABYLON {
 extern const char* volumetricLightScatteringPixelShader;
 
 const char* volumetricLightScatteringPixelShader
-  = "uniform sampler2D textureSampler;\n"
-    "uniform sampler2D lightScatteringSampler;\n"
-    "\n"
-    "uniform float decay;\n"
-    "uniform float exposure;\n"
-    "uniform float weight;\n"
-    "uniform float density;\n"
-    "uniform vec2 meshPositionOnScreen;\n"
-    "\n"
-    "varying vec2 vUV;\n"
-    "\n"
-    "void main(void) {\n"
-    "  vec2 tc = vUV;\n"
-    "  vec2 deltaTexCoord = (tc - meshPositionOnScreen.xy);\n"
-    "  deltaTexCoord *= 1.0 / float(NUM_SAMPLES) * density;\n"
-    "\n"
-    "  float illuminationDecay = 1.0;\n"
-    "\n"
-    "  vec4 color = texture2D(lightScatteringSampler, tc) * 0.4;\n"
-    "\n"
-    "  for(int i=0; i < NUM_SAMPLES; i++) {\n"
-    "  tc -= deltaTexCoord;\n"
-    "  vec4 dataSample = texture2D(lightScatteringSampler, tc) * 0.4;\n"
-    "  dataSample *= illuminationDecay * weight;\n"
-    "  color += dataSample;\n"
-    "  illuminationDecay *= decay;\n"
-    "  }\n"
-    "\n"
-    "  vec4 realColor = texture2D(textureSampler, vUV);\n"
-    "  gl_FragColor = ((vec4((vec3(color.r, color.g, color.b) * exposure), 1)) + (realColor * (1.5 - 0.4)));\n"
-    "}\n";
+  = R"ShaderCode(
 
+uniform sampler2D textureSampler;
+uniform sampler2D lightScatteringSampler;
+
+uniform float decay;
+uniform float exposure;
+uniform float weight;
+uniform float density;
+uniform vec2 meshPositionOnScreen;
+
+varying vec2 vUV;
+
+void main(void) {
+    vec2 tc = vUV;
+    vec2 deltaTexCoord = (tc - meshPositionOnScreen.xy);
+    deltaTexCoord *= 1.0 / float(NUM_SAMPLES) * density;
+
+    float illuminationDecay = 1.0;
+
+    vec4 color = texture2D(lightScatteringSampler, tc) * 0.4;
+
+    for(int i=0; i < NUM_SAMPLES; i++) {
+        tc -= deltaTexCoord;
+        vec4 dataSample = texture2D(lightScatteringSampler, tc) * 0.4;
+        dataSample *= illuminationDecay * weight;
+        color += dataSample;
+        illuminationDecay *= decay;
+    }
+
+    vec4 realColor = texture2D(textureSampler, vUV);
+    gl_FragColor = ((vec4((vec3(color.r, color.g, color.b) * exposure), 1)) + (realColor * (1.5 - 0.4)));
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_VOLUMETRIC_LIGHT_SCATTERING_FRAGMENT_FX_H

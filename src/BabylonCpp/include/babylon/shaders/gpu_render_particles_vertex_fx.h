@@ -8,164 +8,167 @@ namespace BABYLON {
 extern const char* gpuRenderParticlesVertexShader;
 
 const char* gpuRenderParticlesVertexShader
-  = BABYLONCPP_GLSL_VERSION_3
-    "\n"
-    "\n"
-    "uniform mat4 view;\n"
-    "uniform mat4 projection;\n"
-    "uniform vec2 translationPivot;\n"
-    "uniform vec3 worldOffset;\n"
-    "\n"
-    "// Particles state\n"
-    "in vec3 position;\n"
-    "in float age;\n"
-    "in float life;\n"
-    "in vec3 size;\n"
-    "#ifndef BILLBOARD\n"
-    "in vec3 initialDirection;\n"
-    "#endif\n"
-    "#ifdef BILLBOARDSTRETCHED\n"
-    "in vec3 direction;\n"
-    "#endif\n"
-    "in float angle;\n"
-    "#ifdef ANIMATESHEET\n"
-    "in float cellIndex;\n"
-    "#endif\n"
-    "in vec2 offset;\n"
-    "in vec2 uv;\n"
-    "\n"
-    "out vec2 vUV;\n"
-    "out vec4 vColor;\n"
-    "\n"
-    "#if defined(CLIPPLANE) || defined(CLIPPLANE2) || defined(CLIPPLANE3) || defined(CLIPPLANE4)\n"
-    "uniform mat4 invView;\n"
-    "#endif\n"
-    "\n"
-    "#include<clipPlaneVertexDeclaration2>\n"
-    "\n"
-    "#ifdef COLORGRADIENTS\n"
-    "uniform sampler2D colorGradientSampler;\n"
-    "#else\n"
-    "uniform vec4 colorDead;\n"
-    "in vec4 color;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef ANIMATESHEET\n"
-    "uniform vec3 sheetInfos;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef BILLBOARD\n"
-    "  uniform vec3 eyePosition;  \n"
-    "#endif\n"
-    "  \n"
-    "vec3 rotate(vec3 yaxis, vec3 rotatedCorner) {\n"
-    "  vec3 xaxis = normalize(cross(vec3(0., 1.0, 0.), yaxis));\n"
-    "  vec3 zaxis = normalize(cross(yaxis, xaxis));\n"
-    "\n"
-    "  vec3 row0 = vec3(xaxis.x, xaxis.y, xaxis.z);\n"
-    "  vec3 row1 = vec3(yaxis.x, yaxis.y, yaxis.z);\n"
-    "  vec3 row2 = vec3(zaxis.x, zaxis.y, zaxis.z);\n"
-    "\n"
-    "  mat3 rotMatrix =  mat3(row0, row1, row2);\n"
-    "\n"
-    "  vec3 alignedCorner = rotMatrix * rotatedCorner;\n"
-    "\n"
-    "  return (position + worldOffset) + alignedCorner;\n"
-    "}\n"
-    "\n"
-    "#ifdef BILLBOARDSTRETCHED\n"
-    "vec3 rotateAlign(vec3 toCamera, vec3 rotatedCorner) {\n"
-    "  vec3 normalizedToCamera = normalize(toCamera);\n"
-    "  vec3 normalizedCrossDirToCamera = normalize(cross(normalize(direction), normalizedToCamera));\n"
-    "  vec3 crossProduct = normalize(cross(normalizedToCamera, normalizedCrossDirToCamera));\n"
-    "\n"
-    "  vec3 row0 = vec3(normalizedCrossDirToCamera.x, normalizedCrossDirToCamera.y, normalizedCrossDirToCamera.z);\n"
-    "  vec3 row1 = vec3(crossProduct.x, crossProduct.y, crossProduct.z);\n"
-    "  vec3 row2 = vec3(normalizedToCamera.x, normalizedToCamera.y, normalizedToCamera.z);\n"
-    "\n"
-    "  mat3 rotMatrix =  mat3(row0, row1, row2);\n"
-    "\n"
-    "  vec3 alignedCorner = rotMatrix * rotatedCorner;\n"
-    "  return (position + worldOffset) + alignedCorner; \n"
-    "}\n"
-    "#endif\n"
-    "\n"
-    "void main() {\n"
-    "\n"
-    "  #ifdef ANIMATESHEET\n"
-    "  float rowOffset = floor(cellIndex / sheetInfos.z);\n"
-    "  float columnOffset = cellIndex - rowOffset * sheetInfos.z;\n"
-    "\n"
-    "  vec2 uvScale = sheetInfos.xy;\n"
-    "  vec2 uvOffset = vec2(uv.x , 1.0 - uv.y);\n"
-    "  vUV = (uvOffset + vec2(columnOffset, rowOffset)) * uvScale;\n"
-    "  #else  \n"
-    "   vUV = uv;\n"
-    "  #endif\n"
-    "  float ratio = age / life;\n"
-    "#ifdef COLORGRADIENTS\n"
-    "  vColor = texture(colorGradientSampler, vec2(ratio, 0));\n"
-    "#else\n"
-    "  vColor = color * vec4(1.0 - ratio) + colorDead * vec4(ratio);\n"
-    "#endif\n"
-    "  \n"
-    "  vec2 cornerPos = (offset - translationPivot) * size.yz * size.x + translationPivot;\n"
-    "\n"
-    "#ifdef BILLBOARD\n"
-    "  vec4 rotatedCorner;\n"
-    "  rotatedCorner.w = 0.;\n"
-    "\n"
-    "  #ifdef BILLBOARDY  \n"
-    "  rotatedCorner.x = cornerPos.x * cos(angle) - cornerPos.y * sin(angle);\n"
-    "  rotatedCorner.z = cornerPos.x * sin(angle) + cornerPos.y * cos(angle);\n"
-    "  rotatedCorner.y = 0.;\n"
-    "\n"
-    "  vec3 yaxis = (position + worldOffset) - eyePosition;\n"
-    "  yaxis.y = 0.;\n"
-    "  vec3 worldPos = rotate(normalize(yaxis), rotatedCorner.xyz);\n"
-    "\n"
-    "  vec4 viewPosition = (view * vec4(worldPos, 1.0)); \n"
-    "  #elif defined(BILLBOARDSTRETCHED)\n"
-    "  rotatedCorner.x = cornerPos.x * cos(angle) - cornerPos.y * sin(angle);\n"
-    "  rotatedCorner.y = cornerPos.x * sin(angle) + cornerPos.y * cos(angle);\n"
-    "  rotatedCorner.z = 0.;\n"
-    "\n"
-    "  vec3 toCamera = (position + worldOffset) - eyePosition;  \n"
-    "  vec3 worldPos = rotateAlign(toCamera, rotatedCorner.xyz);\n"
-    "  \n"
-    "  vec4 viewPosition = (view * vec4(worldPos, 1.0));   \n"
-    "  #else\n"
-    "  // Rotate\n"
-    "  rotatedCorner.x = cornerPos.x * cos(angle) - cornerPos.y * sin(angle);\n"
-    "  rotatedCorner.y = cornerPos.x * sin(angle) + cornerPos.y * cos(angle);\n"
-    "  rotatedCorner.z = 0.;\n"
-    "\n"
-    "  // Expand position\n"
-    "  vec4 viewPosition = view * vec4((position + worldOffset), 1.0) + rotatedCorner;\n"
-    "  #endif\n"
-    "\n"
-    "#else\n"
-    "  // Rotate\n"
-    "  vec3 rotatedCorner;\n"
-    "  rotatedCorner.x = cornerPos.x * cos(angle) - cornerPos.y * sin(angle);\n"
-    "  rotatedCorner.y = 0.;\n"
-    "  rotatedCorner.z = cornerPos.x * sin(angle) + cornerPos.y * cos(angle);\n"
-    "\n"
-    "  vec3 yaxis = normalize(initialDirection);\n"
-    "  vec3 worldPos = rotate(yaxis, rotatedCorner);\n"
-    "\n"
-    "  // Expand position\n"
-    "  vec4 viewPosition = view * vec4(worldPos, 1.0);  \n"
-    "#endif\n"
-    "  gl_Position = projection * viewPosition;\n"
-    "\n"
-    "  // Clip plane\n"
-    "#if defined(CLIPPLANE) || defined(CLIPPLANE2) || defined(CLIPPLANE3) || defined(CLIPPLANE4)\n"
-    "  vec4 worldPos = invView * viewPosition;\n"
-    "#endif  \n"
-    "  #include<clipPlaneVertex>\n"
-    "}\n";
+  = R"ShaderCode(
 
+BABYLONCPP_GLSL_VERSION_3
+
+
+uniform mat4 view;
+uniform mat4 projection;
+uniform vec2 translationPivot;
+uniform vec3 worldOffset;
+
+// Particles state
+in vec3 position;
+in float age;
+in float life;
+in vec3 size;
+#ifndef BILLBOARD
+in vec3 initialDirection;
+#endif
+#ifdef BILLBOARDSTRETCHED
+in vec3 direction;
+#endif
+in float angle;
+#ifdef ANIMATESHEET
+in float cellIndex;
+#endif
+in vec2 offset;
+in vec2 uv;
+
+out vec2 vUV;
+out vec4 vColor;
+
+#if defined(CLIPPLANE) || defined(CLIPPLANE2) || defined(CLIPPLANE3) || defined(CLIPPLANE4)
+uniform mat4 invView;
+#endif
+
+#include<clipPlaneVertexDeclaration2>
+
+#ifdef COLORGRADIENTS
+uniform sampler2D colorGradientSampler;
+#else
+uniform vec4 colorDead;
+in vec4 color;
+#endif
+
+#ifdef ANIMATESHEET
+uniform vec3 sheetInfos;
+#endif
+
+#ifdef BILLBOARD
+    uniform vec3 eyePosition;
+#endif
+
+vec3 rotate(vec3 yaxis, vec3 rotatedCorner) {
+    vec3 xaxis = normalize(cross(vec3(0., 1.0, 0.), yaxis));
+    vec3 zaxis = normalize(cross(yaxis, xaxis));
+
+    vec3 row0 = vec3(xaxis.x, xaxis.y, xaxis.z);
+    vec3 row1 = vec3(yaxis.x, yaxis.y, yaxis.z);
+    vec3 row2 = vec3(zaxis.x, zaxis.y, zaxis.z);
+
+    mat3 rotMatrix =  mat3(row0, row1, row2);
+
+    vec3 alignedCorner = rotMatrix * rotatedCorner;
+
+    return (position + worldOffset) + alignedCorner;
+}
+
+#ifdef BILLBOARDSTRETCHED
+vec3 rotateAlign(vec3 toCamera, vec3 rotatedCorner) {
+    vec3 normalizedToCamera = normalize(toCamera);
+    vec3 normalizedCrossDirToCamera = normalize(cross(normalize(direction), normalizedToCamera));
+    vec3 crossProduct = normalize(cross(normalizedToCamera, normalizedCrossDirToCamera));
+
+    vec3 row0 = vec3(normalizedCrossDirToCamera.x, normalizedCrossDirToCamera.y, normalizedCrossDirToCamera.z);
+    vec3 row1 = vec3(crossProduct.x, crossProduct.y, crossProduct.z);
+    vec3 row2 = vec3(normalizedToCamera.x, normalizedToCamera.y, normalizedToCamera.z);
+
+    mat3 rotMatrix =  mat3(row0, row1, row2);
+
+    vec3 alignedCorner = rotMatrix * rotatedCorner;
+    return (position + worldOffset) + alignedCorner;
+}
+#endif
+
+void main() {
+
+    #ifdef ANIMATESHEET
+        float rowOffset = floor(cellIndex / sheetInfos.z);
+        float columnOffset = cellIndex - rowOffset * sheetInfos.z;
+
+        vec2 uvScale = sheetInfos.xy;
+        vec2 uvOffset = vec2(uv.x , 1.0 - uv.y);
+        vUV = (uvOffset + vec2(columnOffset, rowOffset)) * uvScale;
+    #else
+       vUV = uv;
+    #endif
+  float ratio = age / life;
+#ifdef COLORGRADIENTS
+    vColor = texture(colorGradientSampler, vec2(ratio, 0));
+#else
+    vColor = color * vec4(1.0 - ratio) + colorDead * vec4(ratio);
+#endif
+
+  vec2 cornerPos = (offset - translationPivot) * size.yz * size.x + translationPivot;
+
+#ifdef BILLBOARD
+    vec4 rotatedCorner;
+    rotatedCorner.w = 0.;
+
+    #ifdef BILLBOARDY
+        rotatedCorner.x = cornerPos.x * cos(angle) - cornerPos.y * sin(angle);
+        rotatedCorner.z = cornerPos.x * sin(angle) + cornerPos.y * cos(angle);
+        rotatedCorner.y = 0.;
+
+        vec3 yaxis = (position + worldOffset) - eyePosition;
+        yaxis.y = 0.;
+        vec3 worldPos = rotate(normalize(yaxis), rotatedCorner.xyz);
+
+        vec4 viewPosition = (view * vec4(worldPos, 1.0));
+    #elif defined(BILLBOARDSTRETCHED)
+        rotatedCorner.x = cornerPos.x * cos(angle) - cornerPos.y * sin(angle);
+        rotatedCorner.y = cornerPos.x * sin(angle) + cornerPos.y * cos(angle);
+        rotatedCorner.z = 0.;
+
+        vec3 toCamera = (position + worldOffset) - eyePosition;
+        vec3 worldPos = rotateAlign(toCamera, rotatedCorner.xyz);
+
+        vec4 viewPosition = (view * vec4(worldPos, 1.0));
+    #else
+        // Rotate
+        rotatedCorner.x = cornerPos.x * cos(angle) - cornerPos.y * sin(angle);
+        rotatedCorner.y = cornerPos.x * sin(angle) + cornerPos.y * cos(angle);
+        rotatedCorner.z = 0.;
+
+        // Expand position
+        vec4 viewPosition = view * vec4((position + worldOffset), 1.0) + rotatedCorner;
+    #endif
+
+#else
+  // Rotate
+    vec3 rotatedCorner;
+    rotatedCorner.x = cornerPos.x * cos(angle) - cornerPos.y * sin(angle);
+    rotatedCorner.y = 0.;
+    rotatedCorner.z = cornerPos.x * sin(angle) + cornerPos.y * cos(angle);
+
+    vec3 yaxis = normalize(initialDirection);
+    vec3 worldPos = rotate(yaxis, rotatedCorner);
+
+  // Expand position
+  vec4 viewPosition = view * vec4(worldPos, 1.0);
+#endif
+    gl_Position = projection * viewPosition;
+
+    // Clip plane
+#if defined(CLIPPLANE) || defined(CLIPPLANE2) || defined(CLIPPLANE3) || defined(CLIPPLANE4)
+    vec4 worldPos = invView * viewPosition;
+#endif
+    #include<clipPlaneVertex>
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_GPU_RENDER_PARTICLES_VERTEX_FX_H

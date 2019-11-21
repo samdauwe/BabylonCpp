@@ -6,80 +6,83 @@ namespace BABYLON {
 extern const char* pbrUboDeclaration;
 
 const char* pbrUboDeclaration
-  = "layout(std140, column_major) uniform;\n"
-    "\n"
-    "uniform Material\n"
-    "{\n"
-    "  uniform vec2 vAlbedoInfos;\n"
-    "  uniform vec4 vAmbientInfos;\n"
-    "  uniform vec2 vOpacityInfos;\n"
-    "  uniform vec2 vEmissiveInfos;\n"
-    "  uniform vec2 vLightmapInfos;\n"
-    "  uniform vec3 vReflectivityInfos;\n"
-    "  uniform vec2 vMicroSurfaceSamplerInfos;\n"
-    "  uniform vec2 vReflectionInfos;\n"
-    "  uniform vec3 vReflectionPosition;\n"
-    "  uniform vec3 vReflectionSize;\n"
-    "  uniform vec3 vBumpInfos;\n"
-    "  uniform mat4 albedoMatrix;\n"
-    "  uniform mat4 ambientMatrix;\n"
-    "  uniform mat4 opacityMatrix;\n"
-    "  uniform mat4 emissiveMatrix;\n"
-    "  uniform mat4 lightmapMatrix;\n"
-    "  uniform mat4 reflectivityMatrix;\n"
-    "  uniform mat4 microSurfaceSamplerMatrix;\n"
-    "  uniform mat4 bumpMatrix;\n"
-    "  uniform vec2 vTangentSpaceParams;\n"
-    "  uniform mat4 reflectionMatrix;\n"
-    "  uniform vec3 vReflectionColor;\n"
-    "  uniform vec4 vAlbedoColor;\n"
-    "  uniform vec4 vLightingIntensity;\n"
-    "  uniform vec3 vReflectionMicrosurfaceInfos;\n"
-    "  uniform float pointSize;\n"
-    "  uniform vec4 vReflectivityColor;\n"
-    "  uniform vec3 vEmissiveColor;\n"
-    "\n"
-    "  uniform float visibility;\n"
-    "\n"
-    "  uniform vec2 vClearCoatParams;\n"
-    "  uniform vec4 vClearCoatRefractionParams;\n"
-    "  uniform vec2 vClearCoatInfos;\n"
-    "  uniform mat4 clearCoatMatrix;\n"
-    "  uniform vec2 vClearCoatBumpInfos;\n"
-    "  uniform vec2 vClearCoatTangentSpaceParams;\n"
-    "  uniform mat4 clearCoatBumpMatrix;\n"
-    "  uniform vec4 vClearCoatTintParams;\n"
-    "  uniform float clearCoatColorAtDistance;\n"
-    "  uniform vec2 vClearCoatTintInfos;\n"
-    "  uniform mat4 clearCoatTintMatrix;\n"
-    "\n"
-    "  uniform vec3 vAnisotropy;\n"
-    "  uniform vec2 vAnisotropyInfos;\n"
-    "  uniform mat4 anisotropyMatrix;\n"
-    "\n"
-    "  uniform vec4 vSheenColor;\n"
-    "  uniform vec2 vSheenInfos;\n"
-    "  uniform mat4 sheenMatrix;\n"
-    "\n"
-    "  uniform vec3 vRefractionMicrosurfaceInfos;\n"
-    "  uniform vec4 vRefractionInfos;\n"
-    "  uniform mat4 refractionMatrix;\n"
-    "  uniform vec2 vThicknessInfos;\n"
-    "  uniform mat4 thicknessMatrix;\n"
-    "  uniform vec2 vThicknessParam;\n"
-    "  uniform vec3 vDiffusionDistance;\n"
-    "  uniform vec4 vTintColor;\n"
-    "  uniform vec3 vSubSurfaceIntensity;\n"
-    "};\n"
-    "\n"
-    "uniform Scene {\n"
-    "  mat4 viewProjection;\n"
-    "#ifdef MULTIVIEW\n"
-    "  mat4 viewProjectionR;\n"
-    "#endif \n"
-    "  mat4 view;\n"
-    "};\n";
+  = R"ShaderCode(
 
+layout(std140, column_major) uniform;
+
+uniform Material
+{
+    uniform vec2 vAlbedoInfos;
+    uniform vec4 vAmbientInfos;
+    uniform vec2 vOpacityInfos;
+    uniform vec2 vEmissiveInfos;
+    uniform vec2 vLightmapInfos;
+    uniform vec3 vReflectivityInfos;
+    uniform vec2 vMicroSurfaceSamplerInfos;
+    uniform vec2 vReflectionInfos;
+    uniform vec3 vReflectionPosition;
+    uniform vec3 vReflectionSize;
+    uniform vec3 vBumpInfos;
+    uniform mat4 albedoMatrix;
+    uniform mat4 ambientMatrix;
+    uniform mat4 opacityMatrix;
+    uniform mat4 emissiveMatrix;
+    uniform mat4 lightmapMatrix;
+    uniform mat4 reflectivityMatrix;
+    uniform mat4 microSurfaceSamplerMatrix;
+    uniform mat4 bumpMatrix;
+    uniform vec2 vTangentSpaceParams;
+    uniform mat4 reflectionMatrix;
+    uniform vec3 vReflectionColor;
+    uniform vec4 vAlbedoColor;
+    uniform vec4 vLightingIntensity;
+    uniform vec3 vReflectionMicrosurfaceInfos;
+    uniform float pointSize;
+    uniform vec4 vReflectivityColor;
+    uniform vec3 vEmissiveColor;
+
+    uniform float visibility;
+
+    uniform vec2 vClearCoatParams;
+    uniform vec4 vClearCoatRefractionParams;
+    uniform vec2 vClearCoatInfos;
+    uniform mat4 clearCoatMatrix;
+    uniform vec2 vClearCoatBumpInfos;
+    uniform vec2 vClearCoatTangentSpaceParams;
+    uniform mat4 clearCoatBumpMatrix;
+    uniform vec4 vClearCoatTintParams;
+    uniform float clearCoatColorAtDistance;
+    uniform vec2 vClearCoatTintInfos;
+    uniform mat4 clearCoatTintMatrix;
+
+    uniform vec3 vAnisotropy;
+    uniform vec2 vAnisotropyInfos;
+    uniform mat4 anisotropyMatrix;
+
+    uniform vec4 vSheenColor;
+    uniform vec2 vSheenInfos;
+    uniform mat4 sheenMatrix;
+
+    uniform vec3 vRefractionMicrosurfaceInfos;
+    uniform vec4 vRefractionInfos;
+    uniform mat4 refractionMatrix;
+    uniform vec2 vThicknessInfos;
+    uniform mat4 thicknessMatrix;
+    uniform vec2 vThicknessParam;
+    uniform vec3 vDiffusionDistance;
+    uniform vec4 vTintColor;
+    uniform vec3 vSubSurfaceIntensity;
+};
+
+uniform Scene {
+    mat4 viewProjection;
+#ifdef MULTIVIEW
+    mat4 viewProjectionR;
+#endif
+    mat4 view;
+};
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_PBR_UBO_DECLARATION_FX_H

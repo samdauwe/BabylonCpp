@@ -6,137 +6,140 @@ namespace BABYLON {
 extern const char* bumpFragmentFunctions;
 
 const char* bumpFragmentFunctions
-  = "#if defined(BUMP) || defined(CLEARCOAT_BUMP) || defined(ANISOTROPIC)\n"
-    "  #if defined(TANGENT) && defined(NORMAL) \n"
-    "  varying mat3 vTBN;\n"
-    "  #endif\n"
-    "\n"
-    "  #ifdef OBJECTSPACE_NORMALMAP\n"
-    "  uniform mat4 normalMatrix;\n"
-    "  #endif\n"
-    "\n"
-    "  vec3 perturbNormal(mat3 cotangentFrame, vec2 uv, sampler2D textureSampler, float scale)\n"
-    "  {\n"
-    "  vec3 map = texture2D(textureSampler, uv).xyz;\n"
-    "  map = map * 2.0 - 1.0;\n"
-    "\n"
-    "  #ifdef NORMALXYSCALE\n"
-    "  map = normalize(map * vec3(scale, scale, 1.0));\n"
-    "  #endif\n"
-    "\n"
-    "  return normalize(cotangentFrame * map);\n"
-    "  }\n"
-    "\n"
-    "  // Thanks to http://www.thetenthplanet.de/archives/1180\n"
-    "  mat3 cotangent_frame(vec3 normal, vec3 p, vec2 uv, vec2 tangentSpaceParams)\n"
-    "  {\n"
-    "  // flip the uv for the backface\n"
-    "  uv = gl_FrontFacing ? uv : -uv;\n"
-    "\n"
-    "  // get edge vectors of the pixel triangle\n"
-    "  vec3 dp1 = dFdx(p);\n"
-    "  vec3 dp2 = dFdy(p);\n"
-    "  vec2 duv1 = dFdx(uv);\n"
-    "  vec2 duv2 = dFdy(uv);\n"
-    "\n"
-    "  // solve the linear system\n"
-    "  vec3 dp2perp = cross(dp2, normal);\n"
-    "  vec3 dp1perp = cross(normal, dp1);\n"
-    "  vec3 tangent = dp2perp * duv1.x + dp1perp * duv2.x;\n"
-    "  vec3 bitangent = dp2perp * duv1.y + dp1perp * duv2.y;\n"
-    "\n"
-    "  // invert the tangent/bitangent if requested\n"
-    "  tangent *= tangentSpaceParams.x;\n"
-    "  bitangent *= tangentSpaceParams.y;\n"
-    "\n"
-    "  // construct a scale-invariant frame\n"
-    "  float invmax = inversesqrt(max(dot(tangent, tangent), dot(bitangent, bitangent)));\n"
-    "  return mat3(tangent * invmax, bitangent * invmax, normal);\n"
-    "  }\n"
-    "#endif\n"
-    "\n"
-    "#ifdef BUMP\n"
-    "  #if BUMPDIRECTUV == 1\n"
-    "  #define vBumpUV vMainUV1\n"
-    "  #elif BUMPDIRECTUV == 2\n"
-    "  #define vBumpUV vMainUV2\n"
-    "  #else\n"
-    "  varying vec2 vBumpUV;\n"
-    "  #endif\n"
-    "  uniform sampler2D bumpSampler;\n"
-    "\n"
-    "  vec3 perturbNormal(mat3 cotangentFrame, vec2 uv)\n"
-    "  {\n"
-    "  return perturbNormal(cotangentFrame, uv, bumpSampler, vBumpInfos.y);\n"
-    "  }\n"
-    "\n"
-    "  // Thanks to http://www.thetenthplanet.de/archives/1180\n"
-    "  mat3 cotangent_frame(vec3 normal, vec3 p, vec2 uv)\n"
-    "  {\n"
-    "  return cotangent_frame(normal, p, uv, vTangentSpaceParams);\n"
-    "  }\n"
-    "#endif\n"
-    "\n"
-    "#if defined(BUMP) && defined(PARALLAX)\n"
-    "  const float minSamples = 4.;\n"
-    "  const float maxSamples = 15.;\n"
-    "  const int iMaxSamples = 15;\n"
-    "\n"
-    "  // http://www.gamedev.net/page/resources/_/technical/graphics-programming-and-theory/a-closer-look-at-parallax-occlusion-mapping-r3262\n"
-    "  vec2 parallaxOcclusion(vec3 vViewDirCoT, vec3 vNormalCoT, vec2 texCoord, float parallaxScale) {\n"
-    "\n"
-    "  float parallaxLimit = length(vViewDirCoT.xy) / vViewDirCoT.z;\n"
-    "  parallaxLimit *= parallaxScale;\n"
-    "  vec2 vOffsetDir = normalize(vViewDirCoT.xy);\n"
-    "  vec2 vMaxOffset = vOffsetDir * parallaxLimit;\n"
-    "  float numSamples = maxSamples + (dot(vViewDirCoT, vNormalCoT) * (minSamples - maxSamples));\n"
-    "  float stepSize = 1.0 / numSamples;\n"
-    "\n"
-    "  // Initialize the starting view ray height and the texture offsets.\n"
-    "  float currRayHeight = 1.0;\n"
-    "  vec2 vCurrOffset = vec2(0, 0);\n"
-    "  vec2 vLastOffset = vec2(0, 0);\n"
-    "\n"
-    "  float lastSampledHeight = 1.0;\n"
-    "  float currSampledHeight = 1.0;\n"
-    "\n"
-    "  for (int i = 0; i < iMaxSamples; i++)\n"
-    "  {\n"
-    "  currSampledHeight = texture2D(bumpSampler, vBumpUV + vCurrOffset).w;\n"
-    "\n"
-    "  // Test if the view ray has intersected the surface.\n"
-    "  if (currSampledHeight > currRayHeight)\n"
-    "  {\n"
-    "  float delta1 = currSampledHeight - currRayHeight;\n"
-    "  float delta2 = (currRayHeight + stepSize) - lastSampledHeight;\n"
-    "  float ratio = delta1 / (delta1 + delta2);\n"
-    "  vCurrOffset = (ratio)* vLastOffset + (1.0 - ratio) * vCurrOffset;\n"
-    "\n"
-    "  // Force the exit of the loop\n"
-    "  break;\n"
-    "  }\n"
-    "  else\n"
-    "  {\n"
-    "  currRayHeight -= stepSize;\n"
-    "  vLastOffset = vCurrOffset;\n"
-    "  vCurrOffset += stepSize * vMaxOffset;\n"
-    "\n"
-    "  lastSampledHeight = currSampledHeight;\n"
-    "  }\n"
-    "  }\n"
-    "\n"
-    "  return vCurrOffset;\n"
-    "  }\n"
-    "\n"
-    "  vec2 parallaxOffset(vec3 viewDir, float heightScale)\n"
-    "  {\n"
-    "  // calculate amount of offset for Parallax Mapping With Offset Limiting\n"
-    "  float height = texture2D(bumpSampler, vBumpUV).w;\n"
-    "  vec2 texCoordOffset = heightScale * viewDir.xy * height;\n"
-    "  return -texCoordOffset;\n"
-    "  }\n"
-    "#endif\n";
+  = R"ShaderCode(
 
+#if defined(BUMP) || defined(CLEARCOAT_BUMP) || defined(ANISOTROPIC)
+    #if defined(TANGENT) && defined(NORMAL)
+        varying mat3 vTBN;
+    #endif
+
+    #ifdef OBJECTSPACE_NORMALMAP
+        uniform mat4 normalMatrix;
+    #endif
+
+    vec3 perturbNormal(mat3 cotangentFrame, vec2 uv, sampler2D textureSampler, float scale)
+    {
+        vec3 map = texture2D(textureSampler, uv).xyz;
+        map = map * 2.0 - 1.0;
+
+        #ifdef NORMALXYSCALE
+            map = normalize(map * vec3(scale, scale, 1.0));
+        #endif
+
+        return normalize(cotangentFrame * map);
+    }
+
+    // Thanks to http://www.thetenthplanet.de/archives/1180
+    mat3 cotangent_frame(vec3 normal, vec3 p, vec2 uv, vec2 tangentSpaceParams)
+    {
+        // flip the uv for the backface
+        uv = gl_FrontFacing ? uv : -uv;
+
+        // get edge vectors of the pixel triangle
+        vec3 dp1 = dFdx(p);
+        vec3 dp2 = dFdy(p);
+        vec2 duv1 = dFdx(uv);
+        vec2 duv2 = dFdy(uv);
+
+        // solve the linear system
+        vec3 dp2perp = cross(dp2, normal);
+        vec3 dp1perp = cross(normal, dp1);
+        vec3 tangent = dp2perp * duv1.x + dp1perp * duv2.x;
+        vec3 bitangent = dp2perp * duv1.y + dp1perp * duv2.y;
+
+        // invert the tangent/bitangent if requested
+        tangent *= tangentSpaceParams.x;
+        bitangent *= tangentSpaceParams.y;
+
+        // construct a scale-invariant frame
+        float invmax = inversesqrt(max(dot(tangent, tangent), dot(bitangent, bitangent)));
+        return mat3(tangent * invmax, bitangent * invmax, normal);
+    }
+#endif
+
+#ifdef BUMP
+    #if BUMPDIRECTUV == 1
+        #define vBumpUV vMainUV1
+    #elif BUMPDIRECTUV == 2
+        #define vBumpUV vMainUV2
+    #else
+        varying vec2 vBumpUV;
+    #endif
+    uniform sampler2D bumpSampler;
+
+    vec3 perturbNormal(mat3 cotangentFrame, vec2 uv)
+    {
+        return perturbNormal(cotangentFrame, uv, bumpSampler, vBumpInfos.y);
+    }
+
+    // Thanks to http://www.thetenthplanet.de/archives/1180
+    mat3 cotangent_frame(vec3 normal, vec3 p, vec2 uv)
+    {
+        return cotangent_frame(normal, p, uv, vTangentSpaceParams);
+    }
+#endif
+
+#if defined(BUMP) && defined(PARALLAX)
+    const float minSamples = 4.;
+    const float maxSamples = 15.;
+    const int iMaxSamples = 15;
+
+    // http://www.gamedev.net/page/resources/_/technical/graphics-programming-and-theory/a-closer-look-at-parallax-occlusion-mapping-r3262
+    vec2 parallaxOcclusion(vec3 vViewDirCoT, vec3 vNormalCoT, vec2 texCoord, float parallaxScale) {
+
+        float parallaxLimit = length(vViewDirCoT.xy) / vViewDirCoT.z;
+        parallaxLimit *= parallaxScale;
+        vec2 vOffsetDir = normalize(vViewDirCoT.xy);
+        vec2 vMaxOffset = vOffsetDir * parallaxLimit;
+        float numSamples = maxSamples + (dot(vViewDirCoT, vNormalCoT) * (minSamples - maxSamples));
+        float stepSize = 1.0 / numSamples;
+
+        // Initialize the starting view ray height and the texture offsets.
+        float currRayHeight = 1.0;
+        vec2 vCurrOffset = vec2(0, 0);
+        vec2 vLastOffset = vec2(0, 0);
+
+        float lastSampledHeight = 1.0;
+        float currSampledHeight = 1.0;
+
+        for (int i = 0; i < iMaxSamples; i++)
+        {
+            currSampledHeight = texture2D(bumpSampler, vBumpUV + vCurrOffset).w;
+
+            // Test if the view ray has intersected the surface.
+            if (currSampledHeight > currRayHeight)
+            {
+                float delta1 = currSampledHeight - currRayHeight;
+                float delta2 = (currRayHeight + stepSize) - lastSampledHeight;
+                float ratio = delta1 / (delta1 + delta2);
+                vCurrOffset = (ratio)* vLastOffset + (1.0 - ratio) * vCurrOffset;
+
+                // Force the exit of the loop
+                break;
+            }
+            else
+            {
+                currRayHeight -= stepSize;
+                vLastOffset = vCurrOffset;
+                vCurrOffset += stepSize * vMaxOffset;
+
+                lastSampledHeight = currSampledHeight;
+            }
+        }
+
+        return vCurrOffset;
+    }
+
+    vec2 parallaxOffset(vec3 viewDir, float heightScale)
+    {
+        // calculate amount of offset for Parallax Mapping With Offset Limiting
+        float height = texture2D(bumpSampler, vBumpUV).w;
+        vec2 texCoordOffset = heightScale * viewDir.xy * height;
+        return -texCoordOffset;
+    }
+#endif
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_BUMP_FRAGMENT_FUNCTIONS_FX_H

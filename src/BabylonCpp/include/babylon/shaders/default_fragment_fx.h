@@ -6,459 +6,462 @@ namespace BABYLON {
 extern const char* defaultPixelShader;
 
 const char* defaultPixelShader
-  = "#include<__decl__defaultFragment>\n"
-    "\n"
-    "#if defined(BUMP) || !defined(NORMAL)\n"
-    "#extension GL_OES_standard_derivatives : enable\n"
-    "#endif\n"
-    "\n"
-    "#define CUSTOM_FRAGMENT_BEGIN\n"
-    "\n"
-    "#ifdef LOGARITHMICDEPTH\n"
-    "#extension GL_EXT_frag_depth : enable\n"
-    "#endif\n"
-    "\n"
-    "// Constants\n"
-    "#define RECIPROCAL_PI2 0.15915494\n"
-    "\n"
-    "uniform vec3 vEyePosition;\n"
-    "uniform vec3 vAmbientColor;\n"
-    "\n"
-    "// Input\n"
-    "varying vec3 vPositionW;\n"
-    "\n"
-    "#ifdef NORMAL\n"
-    "varying vec3 vNormalW;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef VERTEXCOLOR\n"
-    "varying vec4 vColor;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef MAINUV1\n"
-    "  varying vec2 vMainUV1;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef MAINUV2\n"
-    "  varying vec2 vMainUV2;\n"
-    "#endif\n"
-    "\n"
-    "// Helper functions\n"
-    "#include<helperFunctions>\n"
-    "\n"
-    "// Lights\n"
-    "#include<__decl__lightFragment>[0..maxSimultaneousLights]\n"
-    "\n"
-    "#include<lightsFragmentFunctions>\n"
-    "#include<shadowsFragmentFunctions>\n"
-    "\n"
-    "// Samplers\n"
-    "#ifdef DIFFUSE\n"
-    "  #if DIFFUSEDIRECTUV == 1\n"
-    "  #define vDiffuseUV vMainUV1\n"
-    "  #elif DIFFUSEDIRECTUV == 2\n"
-    "  #define vDiffuseUV vMainUV2\n"
-    "  #else\n"
-    "  varying vec2 vDiffuseUV;\n"
-    "  #endif\n"
-    "  uniform sampler2D diffuseSampler;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef AMBIENT\n"
-    "  #if AMBIENTDIRECTUV == 1\n"
-    "  #define vAmbientUV vMainUV1\n"
-    "  #elif AMBIENTDIRECTUV == 2\n"
-    "  #define vAmbientUV vMainUV2\n"
-    "  #else\n"
-    "  varying vec2 vAmbientUV;\n"
-    "  #endif\n"
-    "  uniform sampler2D ambientSampler;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef OPACITY  \n"
-    "  #if OPACITYDIRECTUV == 1\n"
-    "  #define vOpacityUV vMainUV1\n"
-    "  #elif OPACITYDIRECTUV == 2\n"
-    "  #define vOpacityUV vMainUV2\n"
-    "  #else\n"
-    "  varying vec2 vOpacityUV;\n"
-    "  #endif\n"
-    "  uniform sampler2D opacitySampler;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef EMISSIVE\n"
-    "  #if EMISSIVEDIRECTUV == 1\n"
-    "  #define vEmissiveUV vMainUV1\n"
-    "  #elif EMISSIVEDIRECTUV == 2\n"
-    "  #define vEmissiveUV vMainUV2\n"
-    "  #else\n"
-    "  varying vec2 vEmissiveUV;\n"
-    "  #endif\n"
-    "  uniform sampler2D emissiveSampler;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef LIGHTMAP\n"
-    "  #if LIGHTMAPDIRECTUV == 1\n"
-    "  #define vLightmapUV vMainUV1\n"
-    "  #elif LIGHTMAPDIRECTUV == 2\n"
-    "  #define vLightmapUV vMainUV2\n"
-    "  #else\n"
-    "  varying vec2 vLightmapUV;\n"
-    "  #endif\n"
-    "  uniform sampler2D lightmapSampler;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef REFRACTION\n"
-    "\n"
-    "#ifdef REFRACTIONMAP_3D\n"
-    "uniform samplerCube refractionCubeSampler;\n"
-    "#else\n"
-    "uniform sampler2D refraction2DSampler;\n"
-    "#endif\n"
-    "\n"
-    "#endif\n"
-    "\n"
-    "#if defined(SPECULAR) && defined(SPECULARTERM)\n"
-    "  #if SPECULARDIRECTUV == 1\n"
-    "  #define vSpecularUV vMainUV1\n"
-    "  #elif SPECULARDIRECTUV == 2\n"
-    "  #define vSpecularUV vMainUV2\n"
-    "  #else\n"
-    "  varying vec2 vSpecularUV;\n"
-    "  #endif\n"
-    "  uniform sampler2D specularSampler;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef ALPHATEST\n"
-    "  uniform float alphaCutOff;\n"
-    "#endif\n"
-    "\n"
-    "// Fresnel\n"
-    "#include<fresnelFunction>\n"
-    "\n"
-    "// Reflection\n"
-    "#ifdef REFLECTION\n"
-    "#ifdef REFLECTIONMAP_3D\n"
-    "uniform samplerCube reflectionCubeSampler;\n"
-    "#else\n"
-    "uniform sampler2D reflection2DSampler;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef REFLECTIONMAP_SKYBOX\n"
-    "varying vec3 vPositionUVW;\n"
-    "#else\n"
-    "#if defined(REFLECTIONMAP_EQUIRECTANGULAR_FIXED) || defined(REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED)\n"
-    "varying vec3 vDirectionW;\n"
-    "#endif\n"
-    "\n"
-    "#endif\n"
-    "\n"
-    "#include<reflectionFunction>\n"
-    "\n"
-    "#endif\n"
-    "\n"
-    "#include<imageProcessingDeclaration>\n"
-    "\n"
-    "#include<imageProcessingFunctions>\n"
-    "\n"
-    "#include<bumpFragmentFunctions>\n"
-    "#include<clipPlaneFragmentDeclaration>\n"
-    "#include<logDepthDeclaration>\n"
-    "#include<fogFragmentDeclaration>\n"
-    "\n"
-    "#define CUSTOM_FRAGMENT_DEFINITIONS\n"
-    "\n"
-    "void main(void) {\n"
-    "\n"
-    "#define CUSTOM_FRAGMENT_MAIN_BEGIN\n"
-    "\n"
-    "#include<clipPlaneFragment>\n"
-    "\n"
-    "\n"
-    "\n"
-    "  vec3 viewDirectionW = normalize(vEyePosition - vPositionW);\n"
-    "\n"
-    "  // Base color\n"
-    "  vec4 baseColor = vec4(1., 1., 1., 1.);\n"
-    "  vec3 diffuseColor = vDiffuseColor.rgb;\n"
-    "  \n"
-    "  \n"
-    "\n"
-    "  // Alpha\n"
-    "  float alpha = vDiffuseColor.a;\n"
-    "\n"
-    "  // Bump\n"
-    "#ifdef NORMAL\n"
-    "  vec3 normalW = normalize(vNormalW);\n"
-    "#else\n"
-    "  vec3 normalW = normalize(-cross(dFdx(vPositionW), dFdy(vPositionW)));\n"
-    "#endif\n"
-    "\n"
-    "#include<bumpFragment>\n"
-    "\n"
-    "#ifdef TWOSIDEDLIGHTING\n"
-    "  normalW = gl_FrontFacing ? normalW : -normalW;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef DIFFUSE\n"
-    "  baseColor = texture2D(diffuseSampler, vDiffuseUV + uvOffset);\n"
-    "\n"
-    "  #ifdef ALPHATEST\n"
-    "  if (baseColor.a < alphaCutOff)\n"
-    "  discard;\n"
-    "  #endif\n"
-    "\n"
-    "  #ifdef ALPHAFROMDIFFUSE\n"
-    "  alpha *= baseColor.a;\n"
-    "  #endif\n"
-    "  \n"
-    "  #define CUSTOM_FRAGMENT_UPDATE_ALPHA\n"
-    "\n"
-    "  baseColor.rgb *= vDiffuseInfos.y;\n"
-    "#endif\n"
-    "\n"
-    "\n"
-    "\n"
-    "#include<depthPrePass>\n"
-    "\n"
-    "#ifdef VERTEXCOLOR\n"
-    "  baseColor.rgb *= vColor.rgb;\n"
-    "#endif\n"
-    "\n"
-    "#define CUSTOM_FRAGMENT_UPDATE_DIFFUSE\n"
-    "\n"
-    "  // Ambient color\n"
-    "  vec3 baseAmbientColor = vec3(1., 1., 1.);\n"
-    "\n"
-    "#ifdef AMBIENT\n"
-    "  baseAmbientColor = texture2D(ambientSampler, vAmbientUV + uvOffset).rgb * vAmbientInfos.y;\n"
-    "#endif\n"
-    "\n"
-    "#define CUSTOM_FRAGMENT_BEFORE_LIGHTS\n"
-    "\n"
-    "  // Specular map\n"
-    "#ifdef SPECULARTERM\n"
-    "  float glossiness = vSpecularColor.a;\n"
-    "  vec3 specularColor = vSpecularColor.rgb;\n"
-    "\n"
-    "#ifdef SPECULAR\n"
-    "  vec4 specularMapColor = texture2D(specularSampler, vSpecularUV + uvOffset);\n"
-    "  specularColor = specularMapColor.rgb;\n"
-    "#ifdef GLOSSINESS\n"
-    "  glossiness = glossiness * specularMapColor.a;\n"
-    "#endif\n"
-    "#endif\n"
-    "#else\n"
-    "  float glossiness = 0.;\n"
-    "#endif\n"
-    "\n"
-    "  // Lighting\n"
-    "  vec3 diffuseBase = vec3(0., 0., 0.);\n"
-    "  lightingInfo info;\n"
-    "#ifdef SPECULARTERM\n"
-    "  vec3 specularBase = vec3(0., 0., 0.);\n"
-    "#endif\n"
-    "  float shadow = 1.;\n"
-    "\n"
-    "#ifdef LIGHTMAP\n"
-    "  vec3 lightmapColor = texture2D(lightmapSampler, vLightmapUV + uvOffset).rgb * vLightmapInfos.y;\n"
-    "#endif\n"
-    "\n"
-    "#include<lightFragment>[0..maxSimultaneousLights]\n"
-    "\n"
-    "  // Refraction\n"
-    "  vec3 refractionColor = vec3(0., 0., 0.);\n"
-    "\n"
-    "#ifdef REFRACTION\n"
-    "  vec3 refractionVector = normalize(refract(-viewDirectionW, normalW, vRefractionInfos.y));\n"
-    "  #ifdef REFRACTIONMAP_3D\n"
-    "  refractionVector.y = refractionVector.y * vRefractionInfos.w;\n"
-    "\n"
-    "  if (dot(refractionVector, viewDirectionW) < 1.0) {\n"
-    "  refractionColor = textureCube(refractionCubeSampler, refractionVector).rgb;\n"
-    "  }\n"
-    "  #else\n"
-    "  vec3 vRefractionUVW = vec3(refractionMatrix * (view * vec4(vPositionW + refractionVector * vRefractionInfos.z, 1.0)));\n"
-    "\n"
-    "  vec2 refractionCoords = vRefractionUVW.xy / vRefractionUVW.z;\n"
-    "\n"
-    "  refractionCoords.y = 1.0 - refractionCoords.y;\n"
-    "  \n"
-    "  refractionColor = texture2D(refraction2DSampler, refractionCoords).rgb;\n"
-    "  #endif\n"
-    "  #ifdef IS_REFRACTION_LINEAR\n"
-    "  refractionColor = toGammaSpace(refractionColor);\n"
-    "  #endif\n"
-    "  refractionColor *= vRefractionInfos.x;\n"
-    "#endif\n"
-    "\n"
-    "// Reflection\n"
-    "vec3 reflectionColor = vec3(0., 0., 0.);\n"
-    "\n"
-    "#ifdef REFLECTION\n"
-    "  vec3 vReflectionUVW = computeReflectionCoords(vec4(vPositionW, 1.0), normalW);\n"
-    "\n"
-    "  #ifdef REFLECTIONMAP_3D\n"
-    "  #ifdef ROUGHNESS\n"
-    "  float bias = vReflectionInfos.y;\n"
-    "\n"
-    "  #ifdef SPECULARTERM\n"
-    "  #ifdef SPECULAR\n"
-    "  #ifdef GLOSSINESS\n"
-    "  bias *= (1.0 - specularMapColor.a);\n"
-    "  #endif\n"
-    "  #endif\n"
-    "  #endif\n"
-    "\n"
-    "  reflectionColor = textureCube(reflectionCubeSampler, vReflectionUVW, bias).rgb;\n"
-    "  #else\n"
-    "  reflectionColor = textureCube(reflectionCubeSampler, vReflectionUVW).rgb;\n"
-    "  #endif\n"
-    "  #else\n"
-    "  vec2 coords = vReflectionUVW.xy;\n"
-    "\n"
-    "  #ifdef REFLECTIONMAP_PROJECTION\n"
-    "  coords /= vReflectionUVW.z;\n"
-    "  #endif\n"
-    "\n"
-    "  coords.y = 1.0 - coords.y;\n"
-    "  reflectionColor = texture2D(reflection2DSampler, coords).rgb;\n"
-    "  #endif\n"
-    "  #ifdef IS_REFLECTION_LINEAR\n"
-    "  reflectionColor = toGammaSpace(reflectionColor);\n"
-    "  #endif\n"
-    "  reflectionColor *= vReflectionInfos.x;\n"
-    "  #ifdef REFLECTIONFRESNEL\n"
-    "  float reflectionFresnelTerm = computeFresnelTerm(viewDirectionW, normalW, reflectionRightColor.a, reflectionLeftColor.a);\n"
-    "\n"
-    "  #ifdef REFLECTIONFRESNELFROMSPECULAR\n"
-    "  #ifdef SPECULARTERM\n"
-    "  reflectionColor *= specularColor.rgb * (1.0 - reflectionFresnelTerm) + reflectionFresnelTerm * reflectionRightColor.rgb;\n"
-    "  #else\n"
-    "  reflectionColor *= reflectionLeftColor.rgb * (1.0 - reflectionFresnelTerm) + reflectionFresnelTerm * reflectionRightColor.rgb;\n"
-    "  #endif\n"
-    "  #else\n"
-    "  reflectionColor *= reflectionLeftColor.rgb * (1.0 - reflectionFresnelTerm) + reflectionFresnelTerm * reflectionRightColor.rgb;\n"
-    "  #endif\n"
-    "  #endif\n"
-    "#endif\n"
-    "\n"
-    "#ifdef REFRACTIONFRESNEL\n"
-    "  float refractionFresnelTerm = computeFresnelTerm(viewDirectionW, normalW, refractionRightColor.a, refractionLeftColor.a);\n"
-    "\n"
-    "  refractionColor *= refractionLeftColor.rgb * (1.0 - refractionFresnelTerm) + refractionFresnelTerm * refractionRightColor.rgb;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef OPACITY\n"
-    "  vec4 opacityMap = texture2D(opacitySampler, vOpacityUV + uvOffset);\n"
-    "\n"
-    "#ifdef OPACITYRGB\n"
-    "  opacityMap.rgb = opacityMap.rgb * vec3(0.3, 0.59, 0.11);\n"
-    "  alpha *= (opacityMap.x + opacityMap.y + opacityMap.z)* vOpacityInfos.y;\n"
-    "#else\n"
-    "  alpha *= opacityMap.a * vOpacityInfos.y;\n"
-    "#endif\n"
-    "\n"
-    "#endif\n"
-    "\n"
-    "#ifdef VERTEXALPHA\n"
-    "  alpha *= vColor.a;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef OPACITYFRESNEL\n"
-    "  float opacityFresnelTerm = computeFresnelTerm(viewDirectionW, normalW, opacityParts.z, opacityParts.w);\n"
-    "\n"
-    "  alpha += opacityParts.x * (1.0 - opacityFresnelTerm) + opacityFresnelTerm * opacityParts.y;\n"
-    "#endif\n"
-    "\n"
-    "  // Emissive\n"
-    "  vec3 emissiveColor = vEmissiveColor;\n"
-    "#ifdef EMISSIVE\n"
-    "  emissiveColor += texture2D(emissiveSampler, vEmissiveUV + uvOffset).rgb * vEmissiveInfos.y;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef EMISSIVEFRESNEL\n"
-    "  float emissiveFresnelTerm = computeFresnelTerm(viewDirectionW, normalW, emissiveRightColor.a, emissiveLeftColor.a);\n"
-    "\n"
-    "  emissiveColor *= emissiveLeftColor.rgb * (1.0 - emissiveFresnelTerm) + emissiveFresnelTerm * emissiveRightColor.rgb;\n"
-    "#endif\n"
-    "\n"
-    "  // Fresnel\n"
-    "#ifdef DIFFUSEFRESNEL\n"
-    "  float diffuseFresnelTerm = computeFresnelTerm(viewDirectionW, normalW, diffuseRightColor.a, diffuseLeftColor.a);\n"
-    "\n"
-    "  diffuseBase *= diffuseLeftColor.rgb * (1.0 - diffuseFresnelTerm) + diffuseFresnelTerm * diffuseRightColor.rgb;\n"
-    "#endif\n"
-    "\n"
-    "  // Composition\n"
-    "#ifdef EMISSIVEASILLUMINATION\n"
-    "  vec3 finalDiffuse = clamp(diffuseBase * diffuseColor + vAmbientColor, 0.0, 1.0) * baseColor.rgb;\n"
-    "#else\n"
-    "#ifdef LINKEMISSIVEWITHDIFFUSE\n"
-    "  vec3 finalDiffuse = clamp((diffuseBase + emissiveColor) * diffuseColor + vAmbientColor, 0.0, 1.0) * baseColor.rgb;\n"
-    "#else\n"
-    "  vec3 finalDiffuse = clamp(diffuseBase * diffuseColor + emissiveColor + vAmbientColor, 0.0, 1.0) * baseColor.rgb;\n"
-    "#endif\n"
-    "#endif\n"
-    "\n"
-    "#ifdef SPECULARTERM\n"
-    "  vec3 finalSpecular = specularBase * specularColor;\n"
-    "  #ifdef SPECULAROVERALPHA\n"
-    "  alpha = clamp(alpha + dot(finalSpecular, vec3(0.3, 0.59, 0.11)), 0., 1.);\n"
-    "  #endif\n"
-    "#else\n"
-    "  vec3 finalSpecular = vec3(0.0);\n"
-    "#endif\n"
-    "\n"
-    "#ifdef REFLECTIONOVERALPHA\n"
-    "  alpha = clamp(alpha + dot(reflectionColor, vec3(0.3, 0.59, 0.11)), 0., 1.);\n"
-    "#endif\n"
-    "\n"
-    "  // Composition\n"
-    "#ifdef EMISSIVEASILLUMINATION\n"
-    "  vec4 color = vec4(clamp(finalDiffuse * baseAmbientColor + finalSpecular + reflectionColor + emissiveColor + refractionColor, 0.0, 1.0), alpha);\n"
-    "#else\n"
-    "  vec4 color = vec4(finalDiffuse * baseAmbientColor + finalSpecular + reflectionColor + refractionColor, alpha);\n"
-    "#endif\n"
-    "\n"
-    "//Old lightmap calculation method\n"
-    "#ifdef LIGHTMAP\n"
-    "  #ifndef LIGHTMAPEXCLUDED\n"
-    "  #ifdef USELIGHTMAPASSHADOWMAP\n"
-    "  color.rgb *= lightmapColor;\n"
-    "  #else\n"
-    "  color.rgb += lightmapColor;\n"
-    "  #endif\n"
-    "  #endif\n"
-    "#endif\n"
-    "\n"
-    "#define CUSTOM_FRAGMENT_BEFORE_FOG\n"
-    "color.rgb = max(color.rgb, 0.);\n"
-    "#include<logDepthFragment>\n"
-    "#include<fogFragment>\n"
-    "\n"
-    "// Apply image processing if relevant. As this applies in linear space, \n"
-    "// We first move from gamma to linear.\n"
-    "#ifdef IMAGEPROCESSINGPOSTPROCESS\n"
-    "  color.rgb = toLinearSpace(color.rgb);\n"
-    "#else\n"
-    "  #ifdef IMAGEPROCESSING\n"
-    "  color.rgb = toLinearSpace(color.rgb);\n"
-    "  color = applyImageProcessing(color);\n"
-    "  #endif\n"
-    "#endif\n"
-    "\n"
-    "  color.a *= visibility;\n"
-    "\n"
-    "#ifdef PREMULTIPLYALPHA\n"
-    "  // Convert to associative (premultiplied) format if needed.\n"
-    "  color.rgb *= color.a;\n"
-    "#endif\n"
-    "\n"
-    "#define CUSTOM_FRAGMENT_BEFORE_FRAGCOLOR\n"
-    "  gl_FragColor = color;\n"
-    "}\n";
+  = R"ShaderCode(
 
+#include<__decl__defaultFragment>
+
+#if defined(BUMP) || !defined(NORMAL)
+#extension GL_OES_standard_derivatives : enable
+#endif
+
+#define CUSTOM_FRAGMENT_BEGIN
+
+#ifdef LOGARITHMICDEPTH
+#extension GL_EXT_frag_depth : enable
+#endif
+
+// Constants
+#define RECIPROCAL_PI2 0.15915494
+
+uniform vec3 vEyePosition;
+uniform vec3 vAmbientColor;
+
+// Input
+varying vec3 vPositionW;
+
+#ifdef NORMAL
+varying vec3 vNormalW;
+#endif
+
+#ifdef VERTEXCOLOR
+varying vec4 vColor;
+#endif
+
+#ifdef MAINUV1
+    varying vec2 vMainUV1;
+#endif
+
+#ifdef MAINUV2
+    varying vec2 vMainUV2;
+#endif
+
+// Helper functions
+#include<helperFunctions>
+
+// Lights
+#include<__decl__lightFragment>[0..maxSimultaneousLights]
+
+#include<lightsFragmentFunctions>
+#include<shadowsFragmentFunctions>
+
+// Samplers
+#ifdef DIFFUSE
+    #if DIFFUSEDIRECTUV == 1
+        #define vDiffuseUV vMainUV1
+    #elif DIFFUSEDIRECTUV == 2
+        #define vDiffuseUV vMainUV2
+    #else
+        varying vec2 vDiffuseUV;
+    #endif
+    uniform sampler2D diffuseSampler;
+#endif
+
+#ifdef AMBIENT
+    #if AMBIENTDIRECTUV == 1
+        #define vAmbientUV vMainUV1
+    #elif AMBIENTDIRECTUV == 2
+        #define vAmbientUV vMainUV2
+    #else
+        varying vec2 vAmbientUV;
+    #endif
+    uniform sampler2D ambientSampler;
+#endif
+
+#ifdef OPACITY
+    #if OPACITYDIRECTUV == 1
+        #define vOpacityUV vMainUV1
+    #elif OPACITYDIRECTUV == 2
+        #define vOpacityUV vMainUV2
+    #else
+        varying vec2 vOpacityUV;
+    #endif
+    uniform sampler2D opacitySampler;
+#endif
+
+#ifdef EMISSIVE
+    #if EMISSIVEDIRECTUV == 1
+        #define vEmissiveUV vMainUV1
+    #elif EMISSIVEDIRECTUV == 2
+        #define vEmissiveUV vMainUV2
+    #else
+        varying vec2 vEmissiveUV;
+    #endif
+    uniform sampler2D emissiveSampler;
+#endif
+
+#ifdef LIGHTMAP
+    #if LIGHTMAPDIRECTUV == 1
+        #define vLightmapUV vMainUV1
+    #elif LIGHTMAPDIRECTUV == 2
+        #define vLightmapUV vMainUV2
+    #else
+        varying vec2 vLightmapUV;
+    #endif
+    uniform sampler2D lightmapSampler;
+#endif
+
+#ifdef REFRACTION
+
+#ifdef REFRACTIONMAP_3D
+uniform samplerCube refractionCubeSampler;
+#else
+uniform sampler2D refraction2DSampler;
+#endif
+
+#endif
+
+#if defined(SPECULAR) && defined(SPECULARTERM)
+    #if SPECULARDIRECTUV == 1
+        #define vSpecularUV vMainUV1
+    #elif SPECULARDIRECTUV == 2
+        #define vSpecularUV vMainUV2
+    #else
+        varying vec2 vSpecularUV;
+    #endif
+    uniform sampler2D specularSampler;
+#endif
+
+#ifdef ALPHATEST
+    uniform float alphaCutOff;
+#endif
+
+// Fresnel
+#include<fresnelFunction>
+
+// Reflection
+#ifdef REFLECTION
+#ifdef REFLECTIONMAP_3D
+uniform samplerCube reflectionCubeSampler;
+#else
+uniform sampler2D reflection2DSampler;
+#endif
+
+#ifdef REFLECTIONMAP_SKYBOX
+varying vec3 vPositionUVW;
+#else
+#if defined(REFLECTIONMAP_EQUIRECTANGULAR_FIXED) || defined(REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED)
+varying vec3 vDirectionW;
+#endif
+
+#endif
+
+#include<reflectionFunction>
+
+#endif
+
+#include<imageProcessingDeclaration>
+
+#include<imageProcessingFunctions>
+
+#include<bumpFragmentFunctions>
+#include<clipPlaneFragmentDeclaration>
+#include<logDepthDeclaration>
+#include<fogFragmentDeclaration>
+
+#define CUSTOM_FRAGMENT_DEFINITIONS
+
+void main(void) {
+
+#define CUSTOM_FRAGMENT_MAIN_BEGIN
+
+#include<clipPlaneFragment>
+
+
+
+    vec3 viewDirectionW = normalize(vEyePosition - vPositionW);
+
+    // Base color
+    vec4 baseColor = vec4(1., 1., 1., 1.);
+    vec3 diffuseColor = vDiffuseColor.rgb;
+
+
+
+    // Alpha
+    float alpha = vDiffuseColor.a;
+
+    // Bump
+#ifdef NORMAL
+    vec3 normalW = normalize(vNormalW);
+#else
+    vec3 normalW = normalize(-cross(dFdx(vPositionW), dFdy(vPositionW)));
+#endif
+
+#include<bumpFragment>
+
+#ifdef TWOSIDEDLIGHTING
+    normalW = gl_FrontFacing ? normalW : -normalW;
+#endif
+
+#ifdef DIFFUSE
+    baseColor = texture2D(diffuseSampler, vDiffuseUV + uvOffset);
+
+    #ifdef ALPHATEST
+        if (baseColor.a < alphaCutOff)
+            discard;
+    #endif
+
+    #ifdef ALPHAFROMDIFFUSE
+        alpha *= baseColor.a;
+    #endif
+
+    #define CUSTOM_FRAGMENT_UPDATE_ALPHA
+
+    baseColor.rgb *= vDiffuseInfos.y;
+#endif
+
+
+
+#include<depthPrePass>
+
+#ifdef VERTEXCOLOR
+    baseColor.rgb *= vColor.rgb;
+#endif
+
+#define CUSTOM_FRAGMENT_UPDATE_DIFFUSE
+
+    // Ambient color
+    vec3 baseAmbientColor = vec3(1., 1., 1.);
+
+#ifdef AMBIENT
+    baseAmbientColor = texture2D(ambientSampler, vAmbientUV + uvOffset).rgb * vAmbientInfos.y;
+#endif
+
+#define CUSTOM_FRAGMENT_BEFORE_LIGHTS
+
+    // Specular map
+#ifdef SPECULARTERM
+    float glossiness = vSpecularColor.a;
+    vec3 specularColor = vSpecularColor.rgb;
+
+#ifdef SPECULAR
+    vec4 specularMapColor = texture2D(specularSampler, vSpecularUV + uvOffset);
+    specularColor = specularMapColor.rgb;
+#ifdef GLOSSINESS
+    glossiness = glossiness * specularMapColor.a;
+#endif
+#endif
+#else
+    float glossiness = 0.;
+#endif
+
+    // Lighting
+    vec3 diffuseBase = vec3(0., 0., 0.);
+    lightingInfo info;
+#ifdef SPECULARTERM
+    vec3 specularBase = vec3(0., 0., 0.);
+#endif
+    float shadow = 1.;
+
+#ifdef LIGHTMAP
+    vec3 lightmapColor = texture2D(lightmapSampler, vLightmapUV + uvOffset).rgb * vLightmapInfos.y;
+#endif
+
+#include<lightFragment>[0..maxSimultaneousLights]
+
+    // Refraction
+    vec3 refractionColor = vec3(0., 0., 0.);
+
+#ifdef REFRACTION
+    vec3 refractionVector = normalize(refract(-viewDirectionW, normalW, vRefractionInfos.y));
+    #ifdef REFRACTIONMAP_3D
+        refractionVector.y = refractionVector.y * vRefractionInfos.w;
+
+        if (dot(refractionVector, viewDirectionW) < 1.0) {
+            refractionColor = textureCube(refractionCubeSampler, refractionVector).rgb;
+        }
+    #else
+        vec3 vRefractionUVW = vec3(refractionMatrix * (view * vec4(vPositionW + refractionVector * vRefractionInfos.z, 1.0)));
+
+        vec2 refractionCoords = vRefractionUVW.xy / vRefractionUVW.z;
+
+        refractionCoords.y = 1.0 - refractionCoords.y;
+
+        refractionColor = texture2D(refraction2DSampler, refractionCoords).rgb;
+    #endif
+    #ifdef IS_REFRACTION_LINEAR
+        refractionColor = toGammaSpace(refractionColor);
+    #endif
+    refractionColor *= vRefractionInfos.x;
+#endif
+
+// Reflection
+vec3 reflectionColor = vec3(0., 0., 0.);
+
+#ifdef REFLECTION
+    vec3 vReflectionUVW = computeReflectionCoords(vec4(vPositionW, 1.0), normalW);
+
+    #ifdef REFLECTIONMAP_3D
+        #ifdef ROUGHNESS
+            float bias = vReflectionInfos.y;
+
+            #ifdef SPECULARTERM
+                #ifdef SPECULAR
+                    #ifdef GLOSSINESS
+                        bias *= (1.0 - specularMapColor.a);
+                    #endif
+                #endif
+            #endif
+
+            reflectionColor = textureCube(reflectionCubeSampler, vReflectionUVW, bias).rgb;
+        #else
+            reflectionColor = textureCube(reflectionCubeSampler, vReflectionUVW).rgb;
+        #endif
+    #else
+        vec2 coords = vReflectionUVW.xy;
+
+        #ifdef REFLECTIONMAP_PROJECTION
+            coords /= vReflectionUVW.z;
+        #endif
+
+        coords.y = 1.0 - coords.y;
+        reflectionColor = texture2D(reflection2DSampler, coords).rgb;
+    #endif
+    #ifdef IS_REFLECTION_LINEAR
+        reflectionColor = toGammaSpace(reflectionColor);
+    #endif
+    reflectionColor *= vReflectionInfos.x;
+    #ifdef REFLECTIONFRESNEL
+        float reflectionFresnelTerm = computeFresnelTerm(viewDirectionW, normalW, reflectionRightColor.a, reflectionLeftColor.a);
+
+        #ifdef REFLECTIONFRESNELFROMSPECULAR
+            #ifdef SPECULARTERM
+                reflectionColor *= specularColor.rgb * (1.0 - reflectionFresnelTerm) + reflectionFresnelTerm * reflectionRightColor.rgb;
+            #else
+                reflectionColor *= reflectionLeftColor.rgb * (1.0 - reflectionFresnelTerm) + reflectionFresnelTerm * reflectionRightColor.rgb;
+            #endif
+        #else
+            reflectionColor *= reflectionLeftColor.rgb * (1.0 - reflectionFresnelTerm) + reflectionFresnelTerm * reflectionRightColor.rgb;
+        #endif
+    #endif
+#endif
+
+#ifdef REFRACTIONFRESNEL
+    float refractionFresnelTerm = computeFresnelTerm(viewDirectionW, normalW, refractionRightColor.a, refractionLeftColor.a);
+
+    refractionColor *= refractionLeftColor.rgb * (1.0 - refractionFresnelTerm) + refractionFresnelTerm * refractionRightColor.rgb;
+#endif
+
+#ifdef OPACITY
+    vec4 opacityMap = texture2D(opacitySampler, vOpacityUV + uvOffset);
+
+#ifdef OPACITYRGB
+    opacityMap.rgb = opacityMap.rgb * vec3(0.3, 0.59, 0.11);
+    alpha *= (opacityMap.x + opacityMap.y + opacityMap.z)* vOpacityInfos.y;
+#else
+    alpha *= opacityMap.a * vOpacityInfos.y;
+#endif
+
+#endif
+
+#ifdef VERTEXALPHA
+    alpha *= vColor.a;
+#endif
+
+#ifdef OPACITYFRESNEL
+    float opacityFresnelTerm = computeFresnelTerm(viewDirectionW, normalW, opacityParts.z, opacityParts.w);
+
+    alpha += opacityParts.x * (1.0 - opacityFresnelTerm) + opacityFresnelTerm * opacityParts.y;
+#endif
+
+    // Emissive
+    vec3 emissiveColor = vEmissiveColor;
+#ifdef EMISSIVE
+    emissiveColor += texture2D(emissiveSampler, vEmissiveUV + uvOffset).rgb * vEmissiveInfos.y;
+#endif
+
+#ifdef EMISSIVEFRESNEL
+    float emissiveFresnelTerm = computeFresnelTerm(viewDirectionW, normalW, emissiveRightColor.a, emissiveLeftColor.a);
+
+    emissiveColor *= emissiveLeftColor.rgb * (1.0 - emissiveFresnelTerm) + emissiveFresnelTerm * emissiveRightColor.rgb;
+#endif
+
+    // Fresnel
+#ifdef DIFFUSEFRESNEL
+    float diffuseFresnelTerm = computeFresnelTerm(viewDirectionW, normalW, diffuseRightColor.a, diffuseLeftColor.a);
+
+    diffuseBase *= diffuseLeftColor.rgb * (1.0 - diffuseFresnelTerm) + diffuseFresnelTerm * diffuseRightColor.rgb;
+#endif
+
+    // Composition
+#ifdef EMISSIVEASILLUMINATION
+    vec3 finalDiffuse = clamp(diffuseBase * diffuseColor + vAmbientColor, 0.0, 1.0) * baseColor.rgb;
+#else
+#ifdef LINKEMISSIVEWITHDIFFUSE
+    vec3 finalDiffuse = clamp((diffuseBase + emissiveColor) * diffuseColor + vAmbientColor, 0.0, 1.0) * baseColor.rgb;
+#else
+    vec3 finalDiffuse = clamp(diffuseBase * diffuseColor + emissiveColor + vAmbientColor, 0.0, 1.0) * baseColor.rgb;
+#endif
+#endif
+
+#ifdef SPECULARTERM
+    vec3 finalSpecular = specularBase * specularColor;
+    #ifdef SPECULAROVERALPHA
+        alpha = clamp(alpha + dot(finalSpecular, vec3(0.3, 0.59, 0.11)), 0., 1.);
+    #endif
+#else
+    vec3 finalSpecular = vec3(0.0);
+#endif
+
+#ifdef REFLECTIONOVERALPHA
+    alpha = clamp(alpha + dot(reflectionColor, vec3(0.3, 0.59, 0.11)), 0., 1.);
+#endif
+
+    // Composition
+#ifdef EMISSIVEASILLUMINATION
+    vec4 color = vec4(clamp(finalDiffuse * baseAmbientColor + finalSpecular + reflectionColor + emissiveColor + refractionColor, 0.0, 1.0), alpha);
+#else
+    vec4 color = vec4(finalDiffuse * baseAmbientColor + finalSpecular + reflectionColor + refractionColor, alpha);
+#endif
+
+//Old lightmap calculation method
+#ifdef LIGHTMAP
+    #ifndef LIGHTMAPEXCLUDED
+        #ifdef USELIGHTMAPASSHADOWMAP
+            color.rgb *= lightmapColor;
+        #else
+            color.rgb += lightmapColor;
+        #endif
+    #endif
+#endif
+
+#define CUSTOM_FRAGMENT_BEFORE_FOG
+color.rgb = max(color.rgb, 0.);
+#include<logDepthFragment>
+#include<fogFragment>
+
+// Apply image processing if relevant. As this applies in linear space,
+// We first move from gamma to linear.
+#ifdef IMAGEPROCESSINGPOSTPROCESS
+    color.rgb = toLinearSpace(color.rgb);
+#else
+    #ifdef IMAGEPROCESSING
+        color.rgb = toLinearSpace(color.rgb);
+        color = applyImageProcessing(color);
+    #endif
+#endif
+
+    color.a *= visibility;
+
+#ifdef PREMULTIPLYALPHA
+    // Convert to associative (premultiplied) format if needed.
+    color.rgb *= color.a;
+#endif
+
+#define CUSTOM_FRAGMENT_BEFORE_FRAGCOLOR
+    gl_FragColor = color;
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_DEFAULT_FRAGMENT_FX_H

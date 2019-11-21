@@ -6,34 +6,37 @@ namespace BABYLON {
 extern const char* passCubePixelShader;
 
 const char* passCubePixelShader
-  = "// Samplers\n"
-    "varying vec2 vUV;\n"
-    "uniform samplerCube textureSampler;\n"
-    "\n"
-    "void main(void) \n"
-    "{\n"
-    "  vec2 uv = vUV * 2.0 - 1.0;\n"
-    "\n"
-    "#ifdef POSITIVEX\n"
-    "  gl_FragColor = textureCube(textureSampler, vec3(1.001, uv.y, uv.x));\n"
-    "#endif\n"
-    "#ifdef NEGATIVEX\n"
-    "  gl_FragColor = textureCube(textureSampler, vec3(-1.001, uv.y, uv.x));\n"
-    "#endif\n"
-    "#ifdef POSITIVEY\n"
-    "  gl_FragColor = textureCube(textureSampler, vec3(uv.y, 1.001, uv.x));\n"
-    "#endif\n"
-    "#ifdef NEGATIVEY\n"
-    "  gl_FragColor = textureCube(textureSampler, vec3(uv.y, -1.001, uv.x));\n"
-    "#endif\n"
-    "#ifdef POSITIVEZ\n"
-    "  gl_FragColor = textureCube(textureSampler, vec3(uv, 1.001));\n"
-    "#endif\n"
-    "#ifdef NEGATIVEZ\n"
-    "  gl_FragColor = textureCube(textureSampler, vec3(uv, -1.001));\n"
-    "#endif\n"
-    "}\n";
+  = R"ShaderCode(
 
+// Samplers
+varying vec2 vUV;
+uniform samplerCube textureSampler;
+
+void main(void)
+{
+    vec2 uv = vUV * 2.0 - 1.0;
+
+#ifdef POSITIVEX
+    gl_FragColor = textureCube(textureSampler, vec3(1.001, uv.y, uv.x));
+#endif
+#ifdef NEGATIVEX
+    gl_FragColor = textureCube(textureSampler, vec3(-1.001, uv.y, uv.x));
+#endif
+#ifdef POSITIVEY
+    gl_FragColor = textureCube(textureSampler, vec3(uv.y, 1.001, uv.x));
+#endif
+#ifdef NEGATIVEY
+    gl_FragColor = textureCube(textureSampler, vec3(uv.y, -1.001, uv.x));
+#endif
+#ifdef POSITIVEZ
+    gl_FragColor = textureCube(textureSampler, vec3(uv, 1.001));
+#endif
+#ifdef NEGATIVEZ
+    gl_FragColor = textureCube(textureSampler, vec3(uv, -1.001));
+#endif
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_PASS_CUBE_FRAGMENT_FX_H

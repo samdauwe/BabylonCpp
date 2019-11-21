@@ -6,96 +6,99 @@ namespace BABYLON {
 extern const char* pbrDirectLightingFalloffFunctions;
 
 const char* pbrDirectLightingFalloffFunctions
-  = "float computeDistanceLightFalloff_Standard(vec3 lightOffset, float range)\n"
-    "{\n"
-    "  return max(0., 1.0 - length(lightOffset) / range);\n"
-    "}\n"
-    "\n"
-    "float computeDistanceLightFalloff_Physical(float lightDistanceSquared)\n"
-    "{\n"
-    "  return 1.0 / maxEps(lightDistanceSquared);\n"
-    "}\n"
-    "\n"
-    "float computeDistanceLightFalloff_GLTF(float lightDistanceSquared, float inverseSquaredRange)\n"
-    "{\n"
-    "  float lightDistanceFalloff = 1.0 / maxEps(lightDistanceSquared);\n"
-    "\n"
-    "  float factor = lightDistanceSquared * inverseSquaredRange;\n"
-    "  float attenuation = saturate(1.0 - factor * factor);\n"
-    "  attenuation *= attenuation;\n"
-    "\n"
-    "  // Smooth attenuation of the falloff defined by the range.\n"
-    "  lightDistanceFalloff *= attenuation;\n"
-    "  \n"
-    "  return lightDistanceFalloff;\n"
-    "}\n"
-    "\n"
-    "float computeDistanceLightFalloff(vec3 lightOffset, float lightDistanceSquared, float range, float inverseSquaredRange)\n"
-    "{\n"
-    "  #ifdef USEPHYSICALLIGHTFALLOFF\n"
-    "  return computeDistanceLightFalloff_Physical(lightDistanceSquared);\n"
-    "  #elif defined(USEGLTFLIGHTFALLOFF)\n"
-    "  return computeDistanceLightFalloff_GLTF(lightDistanceSquared, inverseSquaredRange);\n"
-    "  #else\n"
-    "  return computeDistanceLightFalloff_Standard(lightOffset, range);\n"
-    "  #endif\n"
-    "}\n"
-    "\n"
-    "float computeDirectionalLightFalloff_Standard(vec3 lightDirection, vec3 directionToLightCenterW, float cosHalfAngle, float exponent)\n"
-    "{\n"
-    "  float falloff = 0.0;\n"
-    "\n"
-    "  float cosAngle = maxEps(dot(-lightDirection, directionToLightCenterW));\n"
-    "  if (cosAngle >= cosHalfAngle)\n"
-    "  {\n"
-    "  falloff = max(0., pow(cosAngle, exponent));\n"
-    "  }\n"
-    "  \n"
-    "  return falloff;\n"
-    "}\n"
-    "\n"
-    "float computeDirectionalLightFalloff_Physical(vec3 lightDirection, vec3 directionToLightCenterW, float cosHalfAngle)\n"
-    "{\n"
-    "  const float kMinusLog2ConeAngleIntensityRatio = 6.64385618977; // -log2(0.01)\n"
-    "\n"
-    "  // Calculate a Spherical Gaussian (von Mises-Fisher distribution, not angle-based Gaussian) such that the peak is in the light direction,\n"
-    "  // and the value at the nominal cone angle is 1% of the peak. Because we want the distribution to decay from unity (100%)\n"
-    "  // at the peak direction (dot product = 1) down to 1% at the nominal cone cutoff (dot product = cosAngle) \n"
-    "  // the falloff rate expressed in terms of the base-two dot product is therefore -log2(ConeAngleIntensityRatio) / (1.0 - cosAngle).\n"
-    "  // Note that the distribution is unnormalised in that peak density is unity, rather than the total energy is unity.\n"
-    "  float concentrationKappa = kMinusLog2ConeAngleIntensityRatio / (1.0 - cosHalfAngle);\n"
-    "\n"
-    "  // Evaluate spherical gaussian for light directional falloff for spot light type (note: spot directional falloff; \n"
-    "  // not directional light type)\n"
-    "  vec4 lightDirectionSpreadSG = vec4(-lightDirection * concentrationKappa, -concentrationKappa);\n"
-    "  float falloff = exp2(dot(vec4(directionToLightCenterW, 1.0), lightDirectionSpreadSG));\n"
-    "  return falloff;\n"
-    "}\n"
-    "\n"
-    "float computeDirectionalLightFalloff_GLTF(vec3 lightDirection, vec3 directionToLightCenterW, float lightAngleScale, float lightAngleOffset)\n"
-    "{\n"
-    "  // On the CPU\n"
-    "  // float lightAngleScale = 1.0 f / max (0.001f, ( cosInner - cosOuter ));\n"
-    "  // float lightAngleOffset = -cosOuter * angleScale;\n"
-    "\n"
-    "  float cd = dot(-lightDirection, directionToLightCenterW);\n"
-    "  float falloff = saturate(cd * lightAngleScale + lightAngleOffset);\n"
-    "  // smooth the transition\n"
-    "  falloff *= falloff;\n"
-    "  return falloff;\n"
-    "}\n"
-    "\n"
-    "float computeDirectionalLightFalloff(vec3 lightDirection, vec3 directionToLightCenterW, float cosHalfAngle, float exponent, float lightAngleScale, float lightAngleOffset)\n"
-    "{\n"
-    "  #ifdef USEPHYSICALLIGHTFALLOFF\n"
-    "  return computeDirectionalLightFalloff_Physical(lightDirection, directionToLightCenterW, cosHalfAngle);\n"
-    "  #elif defined(USEGLTFLIGHTFALLOFF)\n"
-    "  return computeDirectionalLightFalloff_GLTF(lightDirection, directionToLightCenterW, lightAngleScale, lightAngleOffset);\n"
-    "  #else\n"
-    "  return computeDirectionalLightFalloff_Standard(lightDirection, directionToLightCenterW, cosHalfAngle, exponent);\n"
-    "  #endif\n"
-    "}\n";
+  = R"ShaderCode(
 
+float computeDistanceLightFalloff_Standard(vec3 lightOffset, float range)
+{
+    return max(0., 1.0 - length(lightOffset) / range);
+}
+
+float computeDistanceLightFalloff_Physical(float lightDistanceSquared)
+{
+    return 1.0 / maxEps(lightDistanceSquared);
+}
+
+float computeDistanceLightFalloff_GLTF(float lightDistanceSquared, float inverseSquaredRange)
+{
+    float lightDistanceFalloff = 1.0 / maxEps(lightDistanceSquared);
+
+    float factor = lightDistanceSquared * inverseSquaredRange;
+    float attenuation = saturate(1.0 - factor * factor);
+    attenuation *= attenuation;
+
+    // Smooth attenuation of the falloff defined by the range.
+    lightDistanceFalloff *= attenuation;
+
+    return lightDistanceFalloff;
+}
+
+float computeDistanceLightFalloff(vec3 lightOffset, float lightDistanceSquared, float range, float inverseSquaredRange)
+{
+    #ifdef USEPHYSICALLIGHTFALLOFF
+        return computeDistanceLightFalloff_Physical(lightDistanceSquared);
+    #elif defined(USEGLTFLIGHTFALLOFF)
+        return computeDistanceLightFalloff_GLTF(lightDistanceSquared, inverseSquaredRange);
+    #else
+        return computeDistanceLightFalloff_Standard(lightOffset, range);
+    #endif
+}
+
+float computeDirectionalLightFalloff_Standard(vec3 lightDirection, vec3 directionToLightCenterW, float cosHalfAngle, float exponent)
+{
+    float falloff = 0.0;
+
+    float cosAngle = maxEps(dot(-lightDirection, directionToLightCenterW));
+    if (cosAngle >= cosHalfAngle)
+    {
+        falloff = max(0., pow(cosAngle, exponent));
+    }
+
+    return falloff;
+}
+
+float computeDirectionalLightFalloff_Physical(vec3 lightDirection, vec3 directionToLightCenterW, float cosHalfAngle)
+{
+    const float kMinusLog2ConeAngleIntensityRatio = 6.64385618977; // -log2(0.01)
+
+    // Calculate a Spherical Gaussian (von Mises-Fisher distribution, not angle-based Gaussian) such that the peak is in the light direction,
+    // and the value at the nominal cone angle is 1% of the peak. Because we want the distribution to decay from unity (100%)
+    // at the peak direction (dot product = 1) down to 1% at the nominal cone cutoff (dot product = cosAngle)
+    // the falloff rate expressed in terms of the base-two dot product is therefore -log2(ConeAngleIntensityRatio) / (1.0 - cosAngle).
+    // Note that the distribution is unnormalised in that peak density is unity, rather than the total energy is unity.
+    float concentrationKappa = kMinusLog2ConeAngleIntensityRatio / (1.0 - cosHalfAngle);
+
+    // Evaluate spherical gaussian for light directional falloff for spot light type (note: spot directional falloff;
+    // not directional light type)
+    vec4 lightDirectionSpreadSG = vec4(-lightDirection * concentrationKappa, -concentrationKappa);
+    float falloff = exp2(dot(vec4(directionToLightCenterW, 1.0), lightDirectionSpreadSG));
+    return falloff;
+}
+
+float computeDirectionalLightFalloff_GLTF(vec3 lightDirection, vec3 directionToLightCenterW, float lightAngleScale, float lightAngleOffset)
+{
+    // On the CPU
+    // float lightAngleScale = 1.0 f / max (0.001f, ( cosInner - cosOuter ));
+    // float lightAngleOffset = -cosOuter * angleScale;
+
+    float cd = dot(-lightDirection, directionToLightCenterW);
+    float falloff = saturate(cd * lightAngleScale + lightAngleOffset);
+    // smooth the transition
+    falloff *= falloff;
+    return falloff;
+}
+
+float computeDirectionalLightFalloff(vec3 lightDirection, vec3 directionToLightCenterW, float cosHalfAngle, float exponent, float lightAngleScale, float lightAngleOffset)
+{
+    #ifdef USEPHYSICALLIGHTFALLOFF
+        return computeDirectionalLightFalloff_Physical(lightDirection, directionToLightCenterW, cosHalfAngle);
+    #elif defined(USEGLTFLIGHTFALLOFF)
+        return computeDirectionalLightFalloff_GLTF(lightDirection, directionToLightCenterW, lightAngleScale, lightAngleOffset);
+    #else
+        return computeDirectionalLightFalloff_Standard(lightDirection, directionToLightCenterW, cosHalfAngle, exponent);
+    #endif
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_PBR_DIRECT_LIGHTING_FALLOFF_FUNCTIONS_FX_H

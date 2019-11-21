@@ -6,134 +6,137 @@ namespace BABYLON {
 extern const char* pbrFragmentDeclaration;
 
 const char* pbrFragmentDeclaration
-  = "uniform vec3 vReflectionColor;\n"
-    "uniform vec4 vAlbedoColor;\n"
-    "\n"
-    "// CUSTOM CONTROLS\n"
-    "uniform vec4 vLightingIntensity;\n"
-    "\n"
-    "uniform vec4 vReflectivityColor;\n"
-    "uniform vec3 vEmissiveColor;\n"
-    "\n"
-    "uniform float visibility;\n"
-    "\n"
-    "// Samplers\n"
-    "#ifdef ALBEDO\n"
-    "uniform vec2 vAlbedoInfos;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef AMBIENT\n"
-    "uniform vec4 vAmbientInfos;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef BUMP\n"
-    "uniform vec3 vBumpInfos;\n"
-    "uniform vec2 vTangentSpaceParams;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef OPACITY\n"
-    "uniform vec2 vOpacityInfos;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef EMISSIVE\n"
-    "uniform vec2 vEmissiveInfos;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef LIGHTMAP\n"
-    "uniform vec2 vLightmapInfos;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef REFLECTIVITY\n"
-    "uniform vec3 vReflectivityInfos;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef MICROSURFACEMAP\n"
-    "uniform vec2 vMicroSurfaceSamplerInfos;\n"
-    "#endif\n"
-    "\n"
-    "// Refraction Reflection\n"
-    "#if defined(REFLECTIONMAP_SPHERICAL) || defined(REFLECTIONMAP_PROJECTION) || defined(SS_REFRACTION)\n"
-    "uniform mat4 view;\n"
-    "#endif\n"
-    "\n"
-    "// Reflection\n"
-    "#ifdef REFLECTION\n"
-    "  uniform vec2 vReflectionInfos;\n"
-    "  uniform mat4 reflectionMatrix;\n"
-    "  uniform vec3 vReflectionMicrosurfaceInfos;\n"
-    "\n"
-    "  #if defined(USE_LOCAL_REFLECTIONMAP_CUBIC) && defined(REFLECTIONMAP_CUBIC)\n"
-    "  uniform vec3 vReflectionPosition;\n"
-    "  uniform vec3 vReflectionSize; \n"
-    "  #endif\n"
-    "#endif\n"
-    "\n"
-    "// Clear Coat\n"
-    "#ifdef CLEARCOAT\n"
-    "  uniform vec2 vClearCoatParams;\n"
-    "  uniform vec4 vClearCoatRefractionParams;\n"
-    "\n"
-    "  #ifdef CLEARCOAT_TEXTURE\n"
-    "  uniform vec2 vClearCoatInfos;\n"
-    "  uniform mat4 clearCoatMatrix;\n"
-    "  #endif\n"
-    "\n"
-    "  #ifdef CLEARCOAT_BUMP\n"
-    "  uniform vec2 vClearCoatBumpInfos;\n"
-    "  uniform vec2 vClearCoatTangentSpaceParams;\n"
-    "  uniform mat4 clearCoatBumpMatrix;\n"
-    "  #endif\n"
-    "\n"
-    "  #ifdef CLEARCOAT_TINT\n"
-    "  uniform vec4 vClearCoatTintParams;\n"
-    "  uniform float clearCoatColorAtDistance;\n"
-    "\n"
-    "  #ifdef CLEARCOAT_TINT_TEXTURE\n"
-    "  uniform vec2 vClearCoatTintInfos;\n"
-    "  uniform mat4 clearCoatTintMatrix;\n"
-    "  #endif\n"
-    "  #endif\n"
-    "#endif\n"
-    "\n"
-    "// Anisotropy\n"
-    "#ifdef ANISOTROPIC\n"
-    "  uniform vec3 vAnisotropy;\n"
-    "\n"
-    "  #ifdef ANISOTROPIC_TEXTURE\n"
-    "  uniform vec2 vAnisotropyInfos;\n"
-    "  uniform mat4 anisotropyMatrix;\n"
-    "  #endif\n"
-    "#endif\n"
-    "\n"
-    "// Sheen\n"
-    "#ifdef SHEEN\n"
-    "  uniform vec4 vSheenColor;\n"
-    "\n"
-    "  #ifdef SHEEN_TEXTURE\n"
-    "  uniform vec2 vSheenInfos;\n"
-    "  uniform mat4 sheenMatrix;\n"
-    "  #endif\n"
-    "#endif\n"
-    "\n"
-    "// SubSurface\n"
-    "#ifdef SUBSURFACE\n"
-    "  #ifdef SS_REFRACTION\n"
-    "  uniform vec3 vRefractionMicrosurfaceInfos;\n"
-    "  uniform vec4 vRefractionInfos;\n"
-    "  uniform mat4 refractionMatrix;\n"
-    "  #endif\n"
-    "\n"
-    "  #ifdef SS_THICKNESSANDMASK_TEXTURE\n"
-    "  uniform vec2 vThicknessInfos;\n"
-    "  uniform mat4 thicknessMatrix;;\n"
-    "  #endif\n"
-    "\n"
-    "  uniform vec2 vThicknessParam;\n"
-    "  uniform vec3 vDiffusionDistance;\n"
-    "  uniform vec4 vTintColor;\n"
-    "  uniform vec3 vSubSurfaceIntensity;\n"
-    "#endif\n";
+  = R"ShaderCode(
 
+uniform vec3 vReflectionColor;
+uniform vec4 vAlbedoColor;
+
+// CUSTOM CONTROLS
+uniform vec4 vLightingIntensity;
+
+uniform vec4 vReflectivityColor;
+uniform vec3 vEmissiveColor;
+
+uniform float visibility;
+
+// Samplers
+#ifdef ALBEDO
+uniform vec2 vAlbedoInfos;
+#endif
+
+#ifdef AMBIENT
+uniform vec4 vAmbientInfos;
+#endif
+
+#ifdef BUMP
+uniform vec3 vBumpInfos;
+uniform vec2 vTangentSpaceParams;
+#endif
+
+#ifdef OPACITY
+uniform vec2 vOpacityInfos;
+#endif
+
+#ifdef EMISSIVE
+uniform vec2 vEmissiveInfos;
+#endif
+
+#ifdef LIGHTMAP
+uniform vec2 vLightmapInfos;
+#endif
+
+#ifdef REFLECTIVITY
+uniform vec3 vReflectivityInfos;
+#endif
+
+#ifdef MICROSURFACEMAP
+uniform vec2 vMicroSurfaceSamplerInfos;
+#endif
+
+// Refraction Reflection
+#if defined(REFLECTIONMAP_SPHERICAL) || defined(REFLECTIONMAP_PROJECTION) || defined(SS_REFRACTION)
+uniform mat4 view;
+#endif
+
+// Reflection
+#ifdef REFLECTION
+    uniform vec2 vReflectionInfos;
+    uniform mat4 reflectionMatrix;
+    uniform vec3 vReflectionMicrosurfaceInfos;
+
+    #if defined(USE_LOCAL_REFLECTIONMAP_CUBIC) && defined(REFLECTIONMAP_CUBIC)
+        uniform vec3 vReflectionPosition;
+        uniform vec3 vReflectionSize;
+    #endif
+#endif
+
+// Clear Coat
+#ifdef CLEARCOAT
+    uniform vec2 vClearCoatParams;
+    uniform vec4 vClearCoatRefractionParams;
+
+    #ifdef CLEARCOAT_TEXTURE
+        uniform vec2 vClearCoatInfos;
+        uniform mat4 clearCoatMatrix;
+    #endif
+
+    #ifdef CLEARCOAT_BUMP
+        uniform vec2 vClearCoatBumpInfos;
+        uniform vec2 vClearCoatTangentSpaceParams;
+        uniform mat4 clearCoatBumpMatrix;
+    #endif
+
+    #ifdef CLEARCOAT_TINT
+        uniform vec4 vClearCoatTintParams;
+        uniform float clearCoatColorAtDistance;
+
+        #ifdef CLEARCOAT_TINT_TEXTURE
+            uniform vec2 vClearCoatTintInfos;
+            uniform mat4 clearCoatTintMatrix;
+        #endif
+    #endif
+#endif
+
+// Anisotropy
+#ifdef ANISOTROPIC
+    uniform vec3 vAnisotropy;
+
+    #ifdef ANISOTROPIC_TEXTURE
+        uniform vec2 vAnisotropyInfos;
+        uniform mat4 anisotropyMatrix;
+    #endif
+#endif
+
+// Sheen
+#ifdef SHEEN
+    uniform vec4 vSheenColor;
+
+    #ifdef SHEEN_TEXTURE
+        uniform vec2 vSheenInfos;
+        uniform mat4 sheenMatrix;
+    #endif
+#endif
+
+// SubSurface
+#ifdef SUBSURFACE
+    #ifdef SS_REFRACTION
+        uniform vec3 vRefractionMicrosurfaceInfos;
+        uniform vec4 vRefractionInfos;
+        uniform mat4 refractionMatrix;
+    #endif
+
+    #ifdef SS_THICKNESSANDMASK_TEXTURE
+        uniform vec2 vThicknessInfos;
+        uniform mat4 thicknessMatrix;;
+    #endif
+
+    uniform vec2 vThicknessParam;
+    uniform vec3 vDiffusionDistance;
+    uniform vec4 vTintColor;
+    uniform vec3 vSubSurfaceIntensity;
+#endif
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_PBR_FRAGMENT_DECLARATION_FX_H

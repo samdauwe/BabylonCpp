@@ -6,96 +6,99 @@ namespace BABYLON {
 extern const char* shadowMapVertexShader;
 
 const char* shadowMapVertexShader
-  = "// Attribute\n"
-    "attribute vec3 position;\n"
-    "\n"
-    "#ifdef NORMAL\n"
-    "  attribute vec3 normal;\n"
-    "  uniform vec3 lightData;\n"
-    "#endif\n"
-    "\n"
-    "#include<bonesDeclaration>\n"
-    "\n"
-    "#include<morphTargetsVertexGlobalDeclaration>\n"
-    "#include<morphTargetsVertexDeclaration>[0..maxSimultaneousMorphTargets]\n"
-    "\n"
-    "// Uniforms\n"
-    "#include<instancesDeclaration>\n"
-    "#include<helperFunctions>\n"
-    "\n"
-    "uniform mat4 viewProjection;\n"
-    "uniform vec3 biasAndScale;\n"
-    "uniform vec2 depthValues;\n"
-    "\n"
-    "varying float vDepthMetric;\n"
-    "\n"
-    "#ifdef ALPHATEST\n"
-    "varying vec2 vUV;\n"
-    "uniform mat4 diffuseMatrix;\n"
-    "#ifdef UV1\n"
-    "attribute vec2 uv;\n"
-    "#endif\n"
-    "#ifdef UV2\n"
-    "attribute vec2 uv2;\n"
-    "#endif\n"
-    "#endif\n"
-    "\n"
-    "void main(void)\n"
-    "{\n"
-    "vec3 positionUpdated = position;\n"
-    "\n"
-    "#include<morphTargetsVertex>[0..maxSimultaneousMorphTargets]\n"
-    "\n"
-    "#include<instancesVertex>\n"
-    "#include<bonesVertex>\n"
-    "\n"
-    "vec4 worldPos = finalWorld * vec4(positionUpdated, 1.0);\n"
-    "\n"
-    "// Normal inset Bias.\n"
-    "#ifdef NORMAL\n"
-    "  mat3 normalWorld = mat3(finalWorld);\n"
-    "\n"
-    "  #ifdef NONUNIFORMSCALING\n"
-    "  normalWorld = transposeMat3(inverseMat3(normalWorld));\n"
-    "  #endif\n"
-    "\n"
-    "  vec3 worldNor = normalize(normalWorld * normal);\n"
-    "\n"
-    "  #ifdef DIRECTIONINLIGHTDATA\n"
-    "  vec3 worldLightDir = normalize(-lightData.xyz);\n"
-    "  #else\n"
-    "  vec3 directionToLight = lightData.xyz - worldPos.xyz;\n"
-    "  vec3 worldLightDir = normalize(directionToLight);\n"
-    "  #endif\n"
-    "\n"
-    "  float ndl = dot(worldNor, worldLightDir);\n"
-    "  float sinNL = sqrt(1.0 - ndl * ndl);\n"
-    "  float normalBias = biasAndScale.y * sinNL;\n"
-    "\n"
-    "  worldPos.xyz -= worldNor * normalBias;\n"
-    "#endif\n"
-    "\n"
-    "// Projection.\n"
-    "gl_Position = viewProjection * worldPos;\n"
-    "\n"
-    "#ifdef DEPTHTEXTURE\n"
-    "  // Depth texture Linear bias.\n"
-    "  gl_Position.z += biasAndScale.x * gl_Position.w;\n"
-    "#endif\n"
-    "\n"
-    "  // Color Texture Linear bias.\n"
-    "  vDepthMetric = ((gl_Position.z + depthValues.x) / (depthValues.y)) + biasAndScale.x;\n"
-    "\n"
-    "#ifdef ALPHATEST\n"
-    "  #ifdef UV1\n"
-    "  vUV = vec2(diffuseMatrix * vec4(uv, 1.0, 0.0));\n"
-    "  #endif\n"
-    "  #ifdef UV2\n"
-    "  vUV = vec2(diffuseMatrix * vec4(uv2, 1.0, 0.0));\n"
-    "  #endif\n"
-    "#endif\n"
-    "}\n";
+  = R"ShaderCode(
 
+// Attribute
+attribute vec3 position;
+
+#ifdef NORMAL
+    attribute vec3 normal;
+    uniform vec3 lightData;
+#endif
+
+#include<bonesDeclaration>
+
+#include<morphTargetsVertexGlobalDeclaration>
+#include<morphTargetsVertexDeclaration>[0..maxSimultaneousMorphTargets]
+
+// Uniforms
+#include<instancesDeclaration>
+#include<helperFunctions>
+
+uniform mat4 viewProjection;
+uniform vec3 biasAndScale;
+uniform vec2 depthValues;
+
+varying float vDepthMetric;
+
+#ifdef ALPHATEST
+varying vec2 vUV;
+uniform mat4 diffuseMatrix;
+#ifdef UV1
+attribute vec2 uv;
+#endif
+#ifdef UV2
+attribute vec2 uv2;
+#endif
+#endif
+
+void main(void)
+{
+vec3 positionUpdated = position;
+
+#include<morphTargetsVertex>[0..maxSimultaneousMorphTargets]
+
+#include<instancesVertex>
+#include<bonesVertex>
+
+vec4 worldPos = finalWorld * vec4(positionUpdated, 1.0);
+
+// Normal inset Bias.
+#ifdef NORMAL
+    mat3 normalWorld = mat3(finalWorld);
+
+    #ifdef NONUNIFORMSCALING
+        normalWorld = transposeMat3(inverseMat3(normalWorld));
+    #endif
+
+    vec3 worldNor = normalize(normalWorld * normal);
+
+    #ifdef DIRECTIONINLIGHTDATA
+        vec3 worldLightDir = normalize(-lightData.xyz);
+    #else
+        vec3 directionToLight = lightData.xyz - worldPos.xyz;
+        vec3 worldLightDir = normalize(directionToLight);
+    #endif
+
+    float ndl = dot(worldNor, worldLightDir);
+    float sinNL = sqrt(1.0 - ndl * ndl);
+    float normalBias = biasAndScale.y * sinNL;
+
+    worldPos.xyz -= worldNor * normalBias;
+#endif
+
+// Projection.
+gl_Position = viewProjection * worldPos;
+
+#ifdef DEPTHTEXTURE
+    // Depth texture Linear bias.
+    gl_Position.z += biasAndScale.x * gl_Position.w;
+#endif
+
+    // Color Texture Linear bias.
+    vDepthMetric = ((gl_Position.z + depthValues.x) / (depthValues.y)) + biasAndScale.x;
+
+#ifdef ALPHATEST
+    #ifdef UV1
+        vUV = vec2(diffuseMatrix * vec4(uv, 1.0, 0.0));
+    #endif
+    #ifdef UV2
+        vUV = vec2(diffuseMatrix * vec4(uv2, 1.0, 0.0));
+    #endif
+#endif
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADOW_MAP_VERTEX_FX_H

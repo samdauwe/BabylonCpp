@@ -6,97 +6,100 @@ namespace BABYLON {
 extern const char* glowMapGenerationVertexShader;
 
 const char* glowMapGenerationVertexShader
-  = "// Attribute\n"
-    "attribute vec3 position;\n"
-    "\n"
-    "#include<bonesDeclaration>\n"
-    "\n"
-    "#include<morphTargetsVertexGlobalDeclaration>\n"
-    "#include<morphTargetsVertexDeclaration>[0..maxSimultaneousMorphTargets]\n"
-    "\n"
-    "// Uniforms\n"
-    "#include<instancesDeclaration>\n"
-    "\n"
-    "uniform mat4 viewProjection;\n"
-    "\n"
-    "varying vec4 vPosition;\n"
-    "\n"
-    "#ifdef UV1\n"
-    "attribute vec2 uv;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef UV2\n"
-    "attribute vec2 uv2;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef DIFFUSE\n"
-    "  varying vec2 vUVDiffuse;\n"
-    "  uniform mat4 diffuseMatrix;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef OPACITY\n"
-    "  varying vec2 vUVOpacity;\n"
-    "  uniform mat4 opacityMatrix;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef EMISSIVE\n"
-    "  varying vec2 vUVEmissive;\n"
-    "  uniform mat4 emissiveMatrix;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef VERTEXALPHA\n"
-    "  attribute vec4 color;\n"
-    "  varying vec4 vColor;\n"
-    "#endif\n"
-    "\n"
-    "void main(void)\n"
-    "{\n"
-    "  vec3 positionUpdated = position;\n"
-    "\n"
-    "#include<morphTargetsVertex>[0..maxSimultaneousMorphTargets]\n"
-    "#include<instancesVertex>\n"
-    "#include<bonesVertex>\n"
-    "\n"
-    "#ifdef CUBEMAP\n"
-    "  vPosition = finalWorld * vec4(positionUpdated, 1.0);\n"
-    "  gl_Position = viewProjection * finalWorld * vec4(position, 1.0);\n"
-    "#else\n"
-    "  vPosition = viewProjection * finalWorld * vec4(positionUpdated, 1.0);\n"
-    "  gl_Position = vPosition;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef DIFFUSE\n"
-    "  #ifdef DIFFUSEUV1\n"
-    "  vUVDiffuse = vec2(diffuseMatrix * vec4(uv, 1.0, 0.0));\n"
-    "  #endif\n"
-    "  #ifdef DIFFUSEUV2\n"
-    "  vUVDiffuse = vec2(diffuseMatrix * vec4(uv2, 1.0, 0.0));\n"
-    "  #endif\n"
-    "#endif\n"
-    "\n"
-    "#ifdef OPACITY\n"
-    "  #ifdef OPACITYUV1\n"
-    "  vUVOpacity = vec2(opacityMatrix * vec4(uv, 1.0, 0.0));\n"
-    "  #endif\n"
-    "  #ifdef OPACITYUV2\n"
-    "  vUVOpacity = vec2(opacityMatrix * vec4(uv2, 1.0, 0.0));\n"
-    "  #endif\n"
-    "#endif\n"
-    "\n"
-    "#ifdef EMISSIVE\n"
-    "  #ifdef EMISSIVEUV1\n"
-    "  vUVEmissive = vec2(emissiveMatrix * vec4(uv, 1.0, 0.0));\n"
-    "  #endif\n"
-    "  #ifdef EMISSIVEUV2\n"
-    "  vUVEmissive = vec2(emissiveMatrix * vec4(uv2, 1.0, 0.0));\n"
-    "  #endif\n"
-    "#endif\n"
-    "\n"
-    "#ifdef VERTEXALPHA\n"
-    "  vColor = color;\n"
-    "#endif\n"
-    "}\n";
+  = R"ShaderCode(
 
+// Attribute
+attribute vec3 position;
+
+#include<bonesDeclaration>
+
+#include<morphTargetsVertexGlobalDeclaration>
+#include<morphTargetsVertexDeclaration>[0..maxSimultaneousMorphTargets]
+
+// Uniforms
+#include<instancesDeclaration>
+
+uniform mat4 viewProjection;
+
+varying vec4 vPosition;
+
+#ifdef UV1
+attribute vec2 uv;
+#endif
+
+#ifdef UV2
+attribute vec2 uv2;
+#endif
+
+#ifdef DIFFUSE
+    varying vec2 vUVDiffuse;
+    uniform mat4 diffuseMatrix;
+#endif
+
+#ifdef OPACITY
+    varying vec2 vUVOpacity;
+    uniform mat4 opacityMatrix;
+#endif
+
+#ifdef EMISSIVE
+    varying vec2 vUVEmissive;
+    uniform mat4 emissiveMatrix;
+#endif
+
+#ifdef VERTEXALPHA
+    attribute vec4 color;
+    varying vec4 vColor;
+#endif
+
+void main(void)
+{
+    vec3 positionUpdated = position;
+
+#include<morphTargetsVertex>[0..maxSimultaneousMorphTargets]
+#include<instancesVertex>
+#include<bonesVertex>
+
+#ifdef CUBEMAP
+    vPosition = finalWorld * vec4(positionUpdated, 1.0);
+    gl_Position = viewProjection * finalWorld * vec4(position, 1.0);
+#else
+    vPosition = viewProjection * finalWorld * vec4(positionUpdated, 1.0);
+    gl_Position = vPosition;
+#endif
+
+#ifdef DIFFUSE
+    #ifdef DIFFUSEUV1
+        vUVDiffuse = vec2(diffuseMatrix * vec4(uv, 1.0, 0.0));
+    #endif
+    #ifdef DIFFUSEUV2
+        vUVDiffuse = vec2(diffuseMatrix * vec4(uv2, 1.0, 0.0));
+    #endif
+#endif
+
+#ifdef OPACITY
+    #ifdef OPACITYUV1
+        vUVOpacity = vec2(opacityMatrix * vec4(uv, 1.0, 0.0));
+    #endif
+    #ifdef OPACITYUV2
+        vUVOpacity = vec2(opacityMatrix * vec4(uv2, 1.0, 0.0));
+    #endif
+#endif
+
+#ifdef EMISSIVE
+    #ifdef EMISSIVEUV1
+        vUVEmissive = vec2(emissiveMatrix * vec4(uv, 1.0, 0.0));
+    #endif
+    #ifdef EMISSIVEUV2
+        vUVEmissive = vec2(emissiveMatrix * vec4(uv2, 1.0, 0.0));
+    #endif
+#endif
+
+#ifdef VERTEXALPHA
+    vColor = color;
+#endif
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_GLOW_MAP_GENERATION_VERTEX_FX_H

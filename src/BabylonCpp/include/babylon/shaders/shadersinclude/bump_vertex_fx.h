@@ -6,15 +6,18 @@ namespace BABYLON {
 extern const char* bumpVertex;
 
 const char* bumpVertex
-  = "#if defined(BUMP) || defined(PARALLAX) || defined(CLEARCOAT_BUMP)\n"
-    "  #if defined(TANGENT) && defined(NORMAL)\n"
-    "  vec3 tbnNormal = normalize(normalUpdated);\n"
-    "  vec3 tbnTangent = normalize(tangentUpdated.xyz);\n"
-    "  vec3 tbnBitangent = cross(tbnNormal, tbnTangent) * tangentUpdated.w;\n"
-    "  vTBN = mat3(finalWorld) * mat3(tbnTangent, tbnBitangent, tbnNormal);\n"
-    "  #endif\n"
-    "#endif\n";
+  = R"ShaderCode(
 
+#if defined(BUMP) || defined(PARALLAX) || defined(CLEARCOAT_BUMP)
+    #if defined(TANGENT) && defined(NORMAL)
+        vec3 tbnNormal = normalize(normalUpdated);
+        vec3 tbnTangent = normalize(tangentUpdated.xyz);
+        vec3 tbnBitangent = cross(tbnNormal, tbnTangent) * tangentUpdated.w;
+        vTBN = mat3(finalWorld) * mat3(tbnTangent, tbnBitangent, tbnNormal);
+    #endif
+#endif
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_BUMP_VERTEX_FX_H

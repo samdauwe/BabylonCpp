@@ -6,157 +6,160 @@ namespace BABYLON {
 extern const char* backgroundVertexShader;
 
 const char* backgroundVertexShader
-  = "#ifdef GL_ES\n"
-    "precision highp float;\n"
-    "#endif\n"
-    "\n"
-    "#include<__decl__backgroundVertex>\n"
-    "\n"
-    "#include<helperFunctions>\n"
-    "\n"
-    "// Attributes\n"
-    "attribute vec3 position;\n"
-    "#ifdef NORMAL\n"
-    "attribute vec3 normal;\n"
-    "#endif\n"
-    "\n"
-    "#include<bonesDeclaration>\n"
-    "\n"
-    "// Uniforms\n"
-    "#include<instancesDeclaration>\n"
-    "\n"
-    "// Output\n"
-    "varying vec3 vPositionW;\n"
-    "#ifdef NORMAL\n"
-    "varying vec3 vNormalW;\n"
-    "#endif\n"
-    "#ifdef UV1\n"
-    "attribute vec2 uv;\n"
-    "#endif\n"
-    "#ifdef UV2\n"
-    "attribute vec2 uv2;\n"
-    "#endif\n"
-    "#ifdef MAINUV1\n"
-    "varying vec2 vMainUV1;\n"
-    "#endif\n"
-    "#ifdef MAINUV2\n"
-    "varying vec2 vMainUV2; \n"
-    "#endif\n"
-    "\n"
-    "#if defined(DIFFUSE) && DIFFUSEDIRECTUV == 0\n"
-    "varying vec2 vDiffuseUV;\n"
-    "#endif\n"
-    "\n"
-    "#include<clipPlaneVertexDeclaration>\n"
-    "\n"
-    "#include<fogVertexDeclaration>\n"
-    "#include<__decl__lightFragment>[0..maxSimultaneousLights]\n"
-    "\n"
-    "#ifdef REFLECTIONMAP_SKYBOX\n"
-    "varying vec3 vPositionUVW;\n"
-    "#endif\n"
-    "\n"
-    "#if defined(REFLECTIONMAP_EQUIRECTANGULAR_FIXED) || defined(REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED)\n"
-    "varying vec3 vDirectionW;\n"
-    "#endif\n"
-    "\n"
-    "void main(void) {\n"
-    "\n"
-    "#ifdef REFLECTIONMAP_SKYBOX\n"
-    "  #ifdef REFLECTIONMAP_SKYBOX_TRANSFORMED\n"
-    "  vPositionUVW = (reflectionMatrix * vec4(position, 1.0)).xyz;\n"
-    "  #else\n"
-    "  vPositionUVW = position;\n"
-    "  #endif\n"
-    "#endif \n"
-    "\n"
-    "#include<instancesVertex>\n"
-    "#include<bonesVertex>\n"
-    "\n"
-    "#ifdef MULTIVIEW\n"
-    "  if (gl_ViewID_OVR == 0u) {\n"
-    "  gl_Position = viewProjection * finalWorld * vec4(position, 1.0);\n"
-    "  } else {\n"
-    "  gl_Position = viewProjectionR * finalWorld * vec4(position, 1.0);\n"
-    "  }\n"
-    "#else\n"
-    "  gl_Position = viewProjection * finalWorld * vec4(position, 1.0);\n"
-    "#endif\n"
-    "\n"
-    "  vec4 worldPos = finalWorld * vec4(position, 1.0);\n"
-    "  vPositionW = vec3(worldPos);\n"
-    "\n"
-    "#ifdef NORMAL\n"
-    "  mat3 normalWorld = mat3(finalWorld);\n"
-    "\n"
-    "  #ifdef NONUNIFORMSCALING\n"
-    "  normalWorld = transposeMat3(inverseMat3(normalWorld));\n"
-    "  #endif\n"
-    "\n"
-    "  vNormalW = normalize(normalWorld * normal);\n"
-    "#endif\n"
-    "\n"
-    "#if defined(REFLECTIONMAP_EQUIRECTANGULAR_FIXED) || defined(REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED)\n"
-    "  vDirectionW = normalize(vec3(finalWorld * vec4(position, 0.0)));\n"
-    "\n"
-    "\n"
-    "  #ifdef EQUIRECTANGULAR_RELFECTION_FOV\n"
-    "  mat3 screenToWorld = inverseMat3(mat3(finalWorld * viewProjection));\n"
-    "  vec3 segment = mix(vDirectionW, screenToWorld * vec3(0.0,0.0, 1.0), abs(fFovMultiplier - 1.0));\n"
-    "  if (fFovMultiplier <= 1.0) {\n"
-    "  vDirectionW = normalize(segment);\n"
-    "  } else {\n"
-    "  vDirectionW = normalize(vDirectionW + (vDirectionW - segment));\n"
-    "  }\n"
-    "  #endif\n"
-    "#endif\n"
-    "\n"
-    "#ifndef UV1\n"
-    "  vec2 uv = vec2(0., 0.);\n"
-    "#endif\n"
-    "#ifndef UV2\n"
-    "  vec2 uv2 = vec2(0., 0.);\n"
-    "#endif\n"
-    "\n"
-    "#ifdef MAINUV1\n"
-    "  vMainUV1 = uv;\n"
-    "#endif \n"
-    "\n"
-    "#ifdef MAINUV2\n"
-    "  vMainUV2 = uv2;\n"
-    "#endif\n"
-    "\n"
-    "#if defined(DIFFUSE) && DIFFUSEDIRECTUV == 0 \n"
-    "  if (vDiffuseInfos.x == 0.)\n"
-    "  {\n"
-    "  vDiffuseUV = vec2(diffuseMatrix * vec4(uv, 1.0, 0.0));\n"
-    "  }\n"
-    "  else\n"
-    "  {\n"
-    "  vDiffuseUV = vec2(diffuseMatrix * vec4(uv2, 1.0, 0.0));\n"
-    "  }\n"
-    "#endif\n"
-    "\n"
-    "  // Clip plane\n"
-    "#include<clipPlaneVertex>\n"
-    "\n"
-    "  // Fog\n"
-    "#include<fogVertex>\n"
-    "\n"
-    "  // Shadows\n"
-    "#include<shadowsVertex>[0..maxSimultaneousLights]\n"
-    "\n"
-    "  // Vertex color\n"
-    "#ifdef VERTEXCOLOR\n"
-    "  vColor = color;\n"
-    "#endif\n"
-    "\n"
-    "  // Point size\n"
-    "#ifdef POINTSIZE\n"
-    "  gl_PointSize = pointSize;\n"
-    "#endif\n"
-    "}\n";
+  = R"ShaderCode(
 
+#ifdef GL_ES
+  precision highp float;
+#endif
+
+#include<__decl__backgroundVertex>
+
+#include<helperFunctions>
+
+// Attributes
+attribute vec3 position;
+#ifdef NORMAL
+attribute vec3 normal;
+#endif
+
+#include<bonesDeclaration>
+
+// Uniforms
+#include<instancesDeclaration>
+
+// Output
+varying vec3 vPositionW;
+#ifdef NORMAL
+varying vec3 vNormalW;
+#endif
+#ifdef UV1
+attribute vec2 uv;
+#endif
+#ifdef UV2
+attribute vec2 uv2;
+#endif
+#ifdef MAINUV1
+varying vec2 vMainUV1;
+#endif
+#ifdef MAINUV2
+varying vec2 vMainUV2;
+#endif
+
+#if defined(DIFFUSE) && DIFFUSEDIRECTUV == 0
+varying vec2 vDiffuseUV;
+#endif
+
+#include<clipPlaneVertexDeclaration>
+
+#include<fogVertexDeclaration>
+#include<__decl__lightFragment>[0..maxSimultaneousLights]
+
+#ifdef REFLECTIONMAP_SKYBOX
+varying vec3 vPositionUVW;
+#endif
+
+#if defined(REFLECTIONMAP_EQUIRECTANGULAR_FIXED) || defined(REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED)
+varying vec3 vDirectionW;
+#endif
+
+void main(void) {
+
+#ifdef REFLECTIONMAP_SKYBOX
+    #ifdef REFLECTIONMAP_SKYBOX_TRANSFORMED
+        vPositionUVW = (reflectionMatrix * vec4(position, 1.0)).xyz;
+    #else
+        vPositionUVW = position;
+    #endif
+#endif
+
+#include<instancesVertex>
+#include<bonesVertex>
+
+#ifdef MULTIVIEW
+    if (gl_ViewID_OVR == 0u) {
+        gl_Position = viewProjection * finalWorld * vec4(position, 1.0);
+    } else {
+        gl_Position = viewProjectionR * finalWorld * vec4(position, 1.0);
+    }
+#else
+    gl_Position = viewProjection * finalWorld * vec4(position, 1.0);
+#endif
+
+    vec4 worldPos = finalWorld * vec4(position, 1.0);
+    vPositionW = vec3(worldPos);
+
+#ifdef NORMAL
+    mat3 normalWorld = mat3(finalWorld);
+
+    #ifdef NONUNIFORMSCALING
+        normalWorld = transposeMat3(inverseMat3(normalWorld));
+    #endif
+
+    vNormalW = normalize(normalWorld * normal);
+#endif
+
+#if defined(REFLECTIONMAP_EQUIRECTANGULAR_FIXED) || defined(REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED)
+    vDirectionW = normalize(vec3(finalWorld * vec4(position, 0.0)));
+
+
+    #ifdef EQUIRECTANGULAR_RELFECTION_FOV
+        mat3 screenToWorld = inverseMat3(mat3(finalWorld * viewProjection));
+        vec3 segment = mix(vDirectionW, screenToWorld * vec3(0.0,0.0, 1.0), abs(fFovMultiplier - 1.0));
+        if (fFovMultiplier <= 1.0) {
+            vDirectionW = normalize(segment);
+        } else {
+            vDirectionW = normalize(vDirectionW + (vDirectionW - segment));
+        }
+    #endif
+#endif
+
+#ifndef UV1
+    vec2 uv = vec2(0., 0.);
+#endif
+#ifndef UV2
+    vec2 uv2 = vec2(0., 0.);
+#endif
+
+#ifdef MAINUV1
+    vMainUV1 = uv;
+#endif
+
+#ifdef MAINUV2
+    vMainUV2 = uv2;
+#endif
+
+#if defined(DIFFUSE) && DIFFUSEDIRECTUV == 0
+    if (vDiffuseInfos.x == 0.)
+    {
+        vDiffuseUV = vec2(diffuseMatrix * vec4(uv, 1.0, 0.0));
+    }
+    else
+    {
+        vDiffuseUV = vec2(diffuseMatrix * vec4(uv2, 1.0, 0.0));
+    }
+#endif
+
+    // Clip plane
+#include<clipPlaneVertex>
+
+    // Fog
+#include<fogVertex>
+
+    // Shadows
+#include<shadowsVertex>[0..maxSimultaneousLights]
+
+    // Vertex color
+#ifdef VERTEXCOLOR
+    vColor = color;
+#endif
+
+    // Point size
+#ifdef POINTSIZE
+    gl_PointSize = pointSize;
+#endif
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_BACKGROUND_VERTEX_FX_H
