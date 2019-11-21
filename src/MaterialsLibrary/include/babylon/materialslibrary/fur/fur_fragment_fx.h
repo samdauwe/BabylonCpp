@@ -6,142 +6,145 @@ namespace BABYLON {
 extern const char* furPixelShader;
 
 const char* furPixelShader
-  = "#ifdef GL_ES\n"
-    "precision highp float;\n"
-    "#endif\n"
-    "\n"
-    "// Constants\n"
-    "uniform vec3 vEyePosition;\n"
-    "uniform vec4 vDiffuseColor;\n"
-    "\n"
-    "// Input\n"
-    "uniform vec4 furColor;\n"
-    "uniform float furLength;\n"
-    "varying vec3 vPositionW;\n"
-    "varying float vfur_length;\n"
-    "\n"
-    "#ifdef NORMAL\n"
-    "varying vec3 vNormalW;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef VERTEXCOLOR\n"
-    "varying vec4 vColor;\n"
-    "#endif\n"
-    "\n"
-    "// Helper functions\n"
-    "#include<helperFunctions>\n"
-    "\n"
-    "// Lights\n"
-    "#include<__decl__lightFragment>[0..maxSimultaneousLights]\n"
-    "\n"
-    "// Samplers\n"
-    "#ifdef DIFFUSE\n"
-    "varying vec2 vDiffuseUV;\n"
-    "uniform sampler2D diffuseSampler;\n"
-    "uniform vec2 vDiffuseInfos;\n"
-    "#endif\n"
-    "\n"
-    "// Fur uniforms\n"
-    "#ifdef HIGHLEVEL\n"
-    "uniform float furOffset;\n"
-    "uniform float furOcclusion;\n"
-    "uniform sampler2D furTexture;\n"
-    "\n"
-    "varying vec2 vFurUV;\n"
-    "#endif\n"
-    "\n"
-    "#include<lightsFragmentFunctions>\n"
-    "#include<shadowsFragmentFunctions>\n"
-    "#include<fogFragmentDeclaration>\n"
-    "#include<clipPlaneFragmentDeclaration>\n"
-    "\n"
-    "float Rand(vec3 rv) {\n"
-    "  float x = dot(rv, vec3(12.9898,78.233, 24.65487));\n"
-    "  return fract(sin(x) * 43758.5453);\n"
-    "}\n"
-    "\n"
-    "void main(void) {\n"
-    "  // Clip plane\n"
-    "  #include<clipPlaneFragment>\n"
-    "  \n"
-    "  vec3 viewDirectionW = normalize(vEyePosition - vPositionW);\n"
-    "\n"
-    "  // Base color\n"
-    "  vec4 baseColor = furColor;\n"
-    "  vec3 diffuseColor = vDiffuseColor.rgb;\n"
-    "\n"
-    "  // Alpha\n"
-    "  float alpha = vDiffuseColor.a;\n"
-    "\n"
-    "#ifdef DIFFUSE\n"
-    "  baseColor *= texture2D(diffuseSampler, vDiffuseUV);\n"
-    "  \n"
-    "#ifdef ALPHATEST\n"
-    "  if (baseColor.a < 0.4)\n"
-    "  discard;\n"
-    "#endif\n"
-    "\n"
-    "#include<depthPrePass>\n"
-    "\n"
-    "  baseColor.rgb *= vDiffuseInfos.y;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef VERTEXCOLOR\n"
-    "  baseColor.rgb *= vColor.rgb;\n"
-    "#endif\n"
-    "\n"
-    "  // Bump\n"
-    "#ifdef NORMAL\n"
-    "  vec3 normalW = normalize(vNormalW);\n"
-    "#else\n"
-    "  vec3 normalW = vec3(1.0, 1.0, 1.0);\n"
-    "#endif\n"
-    "\n"
-    "  #ifdef HIGHLEVEL\n"
-    "  // Fur\n"
-    "  vec4 furTextureColor = texture2D(furTexture, vec2(vFurUV.x, vFurUV.y));\n"
-    "  \n"
-    "  if (furTextureColor.a <= 0.0 || furTextureColor.g < furOffset) {\n"
-    "  discard;\n"
-    "  }\n"
-    "  \n"
-    "  float occlusion = mix(0.0, furTextureColor.b * 1.2, furOffset);\n"
-    "  \n"
-    "  baseColor = vec4(baseColor.xyz * max(occlusion, furOcclusion), 1.1 - furOffset);\n"
-    "  #endif\n"
-    "\n"
-    "  // Lighting\n"
-    "  vec3 diffuseBase = vec3(0., 0., 0.);\n"
-    "  lightingInfo info;\n"
-    "\n"
-    "  float shadow = 1.;\n"
-    "  float glossiness = 0.;\n"
-    "\n"
-    "#ifdef SPECULARTERM\n"
-    "  vec3 specularBase = vec3(0., 0., 0.);\n"
-    "#endif\n"
-    "\n"
-    "  #include<lightFragment>[0..maxSimultaneousLights]\n"
-    "\n"
-    "#ifdef VERTEXALPHA\n"
-    "  alpha *= vColor.a;\n"
-    "#endif\n"
-    "\n"
-    "  vec3 finalDiffuse = clamp(diffuseBase.rgb * baseColor.rgb, 0.0, 1.0);\n"
-    "\n"
-    "  // Composition\n"
-    "  #ifdef HIGHLEVEL\n"
-    "  vec4 color = vec4(finalDiffuse, alpha);\n"
-    "  #else\n"
-    "  float r = vfur_length / furLength * 0.5;\n"
-    "  vec4 color = vec4(finalDiffuse * (0.5 + r), alpha);\n"
-    "  #endif\n"
-    "  \n"
-    "#include<fogFragment>\n"
-    "\n"
-    "  gl_FragColor = color;\n"
-    "}\n";
+  = R"ShaderCode(
 
+#ifdef GL_ES
+  precision highp float;
+#endif
+
+// Constants
+uniform vec3 vEyePosition;
+uniform vec4 vDiffuseColor;
+
+// Input
+uniform vec4 furColor;
+uniform float furLength;
+varying vec3 vPositionW;
+varying float vfur_length;
+
+#ifdef NORMAL
+varying vec3 vNormalW;
+#endif
+
+#ifdef VERTEXCOLOR
+varying vec4 vColor;
+#endif
+
+// Helper functions
+#include<helperFunctions>
+
+// Lights
+#include<__decl__lightFragment>[0..maxSimultaneousLights]
+
+// Samplers
+#ifdef DIFFUSE
+varying vec2 vDiffuseUV;
+uniform sampler2D diffuseSampler;
+uniform vec2 vDiffuseInfos;
+#endif
+
+// Fur uniforms
+#ifdef HIGHLEVEL
+uniform float furOffset;
+uniform float furOcclusion;
+uniform sampler2D furTexture;
+
+varying vec2 vFurUV;
+#endif
+
+#include<lightsFragmentFunctions>
+#include<shadowsFragmentFunctions>
+#include<fogFragmentDeclaration>
+#include<clipPlaneFragmentDeclaration>
+
+float Rand(vec3 rv) {
+    float x = dot(rv, vec3(12.9898,78.233, 24.65487));
+    return fract(sin(x) * 43758.5453);
+}
+
+void main(void) {
+    // Clip plane
+    #include<clipPlaneFragment>
+
+    vec3 viewDirectionW = normalize(vEyePosition - vPositionW);
+
+    // Base color
+    vec4 baseColor = furColor;
+    vec3 diffuseColor = vDiffuseColor.rgb;
+
+    // Alpha
+    float alpha = vDiffuseColor.a;
+
+#ifdef DIFFUSE
+    baseColor *= texture2D(diffuseSampler, vDiffuseUV);
+
+#ifdef ALPHATEST
+    if (baseColor.a < 0.4)
+        discard;
+#endif
+
+#include<depthPrePass>
+
+    baseColor.rgb *= vDiffuseInfos.y;
+#endif
+
+#ifdef VERTEXCOLOR
+    baseColor.rgb *= vColor.rgb;
+#endif
+
+    // Bump
+#ifdef NORMAL
+    vec3 normalW = normalize(vNormalW);
+#else
+    vec3 normalW = vec3(1.0, 1.0, 1.0);
+#endif
+
+    #ifdef HIGHLEVEL
+    // Fur
+    vec4 furTextureColor = texture2D(furTexture, vec2(vFurUV.x, vFurUV.y));
+
+    if (furTextureColor.a <= 0.0 || furTextureColor.g < furOffset) {
+        discard;
+    }
+
+    float occlusion = mix(0.0, furTextureColor.b * 1.2, furOffset);
+
+    baseColor = vec4(baseColor.xyz * max(occlusion, furOcclusion), 1.1 - furOffset);
+    #endif
+
+    // Lighting
+    vec3 diffuseBase = vec3(0., 0., 0.);
+    lightingInfo info;
+
+    float shadow = 1.;
+    float glossiness = 0.;
+
+#ifdef SPECULARTERM
+    vec3 specularBase = vec3(0., 0., 0.);
+#endif
+
+    #include<lightFragment>[0..maxSimultaneousLights]
+
+#ifdef VERTEXALPHA
+    alpha *= vColor.a;
+#endif
+
+    vec3 finalDiffuse = clamp(diffuseBase.rgb * baseColor.rgb, 0.0, 1.0);
+
+    // Composition
+    #ifdef HIGHLEVEL
+    vec4 color = vec4(finalDiffuse, alpha);
+    #else
+    float r = vfur_length / furLength * 0.5;
+    vec4 color = vec4(finalDiffuse * (0.5 + r), alpha);
+    #endif
+
+#include<fogFragment>
+
+    gl_FragColor = color;
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_MATERIALS_LIBRARY_FUR_FUR_FRAGMENT_FX_H

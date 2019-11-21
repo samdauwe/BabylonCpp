@@ -6,110 +6,96 @@ namespace BABYLON {
 extern const char* gradientVertexShader;
 
 const char* gradientVertexShader
-  = "#ifdef GL_ES\n"
-    "precision highp float;\n"
-    "#endif\n"
-    "\n"
-    "\n"
-    "// Attributes\n"
-    "attribute vec3 position;\n"
-    "#ifdef NORMAL\n"
-    "attribute vec3 normal;\n"
-    "#endif\n"
-    "#ifdef UV1\n"
-    "attribute vec2 uv;\n"
-    "#endif\n"
-    "#ifdef UV2\n"
-    "attribute vec2 uv2;\n"
-    "#endif\n"
-    "#ifdef VERTEXCOLOR\n"
-    "attribute vec4 color;\n"
-    "#endif\n"
-    "#include<bonesDeclaration>\n"
-    "\n"
-    "// Uniforms\n"
-    "#include<instancesDeclaration>\n"
-    "\n"
-    "uniform mat4 view;\n"
-    "uniform mat4 viewProjection;\n"
-    "\n"
-    "#ifdef DIFFUSE\n"
-    "varying vec2 vDiffuseUV;\n"
-    "uniform mat4 diffuseMatrix;\n"
-    "uniform vec2 vDiffuseInfos;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef POINTSIZE\n"
-    "uniform float pointSize;\n"
-    "#endif\n"
-    "\n"
-    "// Output\n"
-    "varying vec3 vPositionW;\n"
-    "varying vec3 vPosition;\n"
-    "#ifdef NORMAL\n"
-    "varying vec3 vNormalW;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef VERTEXCOLOR\n"
-    "varying vec4 vColor;\n"
-    "#endif\n"
-    "\n"
-    "#include<clipPlaneVertexDeclaration>\n"
-    "\n"
-    "#include<fogVertexDeclaration>\n"
-    "#include<__decl__lightFragment>[0..maxSimultaneousLights]\n"
-    "\n"
-    "void main(void) {\n"
-    "#include<instancesVertex>\n"
-    "#include<bonesVertex> \n"
-    "\n"
-    "  gl_Position = viewProjection * finalWorld * vec4(position, 1.0);\n"
-    "\n"
-    "  vec4 worldPos = finalWorld * vec4(position, 1.0);\n"
-    "  vPositionW = vec3(worldPos);\n"
-    "  vPosition = position;\n"
-    "\n"
-    "#ifdef NORMAL\n"
-    "  vNormalW = normalize(vec3(finalWorld * vec4(normal, 0.0)));\n"
-    "#endif\n"
-    "\n"
-    "  // Texture coordinates\n"
-    "#ifndef UV1\n"
-    "  vec2 uv = vec2(0., 0.);\n"
-    "#endif\n"
-    "#ifndef UV2\n"
-    "  vec2 uv2 = vec2(0., 0.);\n"
-    "#endif\n"
-    "\n"
-    "#ifdef DIFFUSE\n"
-    "  if (vDiffuseInfos.x == 0.)\n"
-    "  {\n"
-    "  vDiffuseUV = vec2(diffuseMatrix * vec4(uv, 1.0, 0.0));\n"
-    "  }\n"
-    "  else\n"
-    "  {\n"
-    "  vDiffuseUV = vec2(diffuseMatrix * vec4(uv2, 1.0, 0.0));\n"
-    "  }\n"
-    "#endif\n"
-    "\n"
-    "  // Clip plane\n"
-    "#include<clipPlaneVertex>\n"
-    "\n"
-    "  // Fog\n"
-    "#include<fogVertex>\n"
-    "#include<shadowsVertex>[0..maxSimultaneousLights]\n"
-    "\n"
-    "  // Vertex color\n"
-    "#ifdef VERTEXCOLOR\n"
-    "  vColor = color;\n"
-    "#endif\n"
-    "\n"
-    "  // Point size\n"
-    "#ifdef POINTSIZE\n"
-    "  gl_PointSize = pointSize;\n"
-    "#endif\n"
-    "}\n";
+  = R"ShaderCode(
 
+#ifdef GL_ES
+  precision highp float;
+#endif
+
+
+// Attributes
+attribute vec3 position;
+#ifdef NORMAL
+attribute vec3 normal;
+#endif
+#ifdef UV1
+attribute vec2 uv;
+#endif
+#ifdef UV2
+attribute vec2 uv2;
+#endif
+#ifdef VERTEXCOLOR
+attribute vec4 color;
+#endif
+#include<bonesDeclaration>
+
+// Uniforms
+#include<instancesDeclaration>
+
+uniform mat4 view;
+uniform mat4 viewProjection;
+
+#ifdef POINTSIZE
+uniform float pointSize;
+#endif
+
+// Output
+varying vec3 vPositionW;
+varying vec3 vPosition;
+#ifdef NORMAL
+varying vec3 vNormalW;
+#endif
+
+#ifdef VERTEXCOLOR
+varying vec4 vColor;
+#endif
+
+#include<clipPlaneVertexDeclaration>
+
+#include<fogVertexDeclaration>
+#include<__decl__lightFragment>[0..maxSimultaneousLights]
+
+void main(void) {
+#include<instancesVertex>
+#include<bonesVertex>
+
+    gl_Position = viewProjection * finalWorld * vec4(position, 1.0);
+
+    vec4 worldPos = finalWorld * vec4(position, 1.0);
+    vPositionW = vec3(worldPos);
+    vPosition = position;
+
+#ifdef NORMAL
+    vNormalW = normalize(vec3(finalWorld * vec4(normal, 0.0)));
+#endif
+
+    // Texture coordinates
+#ifndef UV1
+    vec2 uv = vec2(0., 0.);
+#endif
+#ifndef UV2
+    vec2 uv2 = vec2(0., 0.);
+#endif
+
+    // Clip plane
+#include<clipPlaneVertex>
+
+    // Fog
+#include<fogVertex>
+#include<shadowsVertex>[0..maxSimultaneousLights]
+
+    // Vertex color
+#ifdef VERTEXCOLOR
+    vColor = color;
+#endif
+
+    // Point size
+#ifdef POINTSIZE
+    gl_PointSize = pointSize;
+#endif
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_MATERIALS_LIBRARY_GRADIENT_GRADIENT_VERTEX_FX_H

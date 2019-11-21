@@ -6,158 +6,161 @@ namespace BABYLON {
 extern const char* cellPixelShader;
 
 const char* cellPixelShader
-  = "#ifdef GL_ES\n"
-    "precision highp float;\n"
-    "#endif\n"
-    "\n"
-    "// Constants\n"
-    "uniform vec3 vEyePosition;\n"
-    "uniform vec4 vDiffuseColor;\n"
-    "\n"
-    "// Input\n"
-    "varying vec3 vPositionW;\n"
-    "\n"
-    "#ifdef NORMAL\n"
-    "varying vec3 vNormalW;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef VERTEXCOLOR\n"
-    "varying vec4 vColor;\n"
-    "#endif\n"
-    "\n"
-    "// Helper functions\n"
-    "#include<helperFunctions>\n"
-    "\n"
-    "// Lights\n"
-    "#include<__decl__lightFragment>[0..maxSimultaneousLights]\n"
-    "\n"
-    "#include<lightsFragmentFunctions>\n"
-    "#include<shadowsFragmentFunctions>\n"
-    "\n"
-    "// Samplers\n"
-    "#ifdef DIFFUSE\n"
-    "varying vec2 vDiffuseUV;\n"
-    "uniform sampler2D diffuseSampler;\n"
-    "uniform vec2 vDiffuseInfos;\n"
-    "#endif\n"
-    "\n"
-    "#include<clipPlaneFragmentDeclaration>\n"
-    "\n"
-    "// Fog\n"
-    "#include<fogFragmentDeclaration>\n"
-    "\n"
-    "// Custom\n"
-    "vec3 computeCustomDiffuseLighting(lightingInfo info, vec3 diffuseBase, float shadow)\n"
-    "{\n"
-    "  diffuseBase = info.diffuse * shadow;\n"
-    "\n"
-    "#ifdef CELLBASIC\n"
-    "  float level = 1.0;\n"
-    "  if (info.ndl < 0.5)\n"
-    "  level = 0.5;\n"
-    "  \n"
-    "  diffuseBase.rgb * vec3(level, level, level);\n"
-    "#else\n"
-    "  float ToonThresholds[4];\n"
-    "  ToonThresholds[0] = 0.95;\n"
-    "  ToonThresholds[1] = 0.5;\n"
-    "  ToonThresholds[2] = 0.2;\n"
-    "  ToonThresholds[3] = 0.03;\n"
-    "\n"
-    "  float ToonBrightnessLevels[5];\n"
-    "  ToonBrightnessLevels[0] = 1.0;\n"
-    "  ToonBrightnessLevels[1] = 0.8;\n"
-    "  ToonBrightnessLevels[2] = 0.6;\n"
-    "  ToonBrightnessLevels[3] = 0.35;\n"
-    "  ToonBrightnessLevels[4] = 0.2;\n"
-    "\n"
-    "  if (info.ndl > ToonThresholds[0])\n"
-    "  {\n"
-    "  diffuseBase.rgb *= ToonBrightnessLevels[0];\n"
-    "  }\n"
-    "  else if (info.ndl > ToonThresholds[1])\n"
-    "  {\n"
-    "  diffuseBase.rgb *= ToonBrightnessLevels[1];\n"
-    "  }\n"
-    "  else if (info.ndl > ToonThresholds[2])\n"
-    "  {\n"
-    "  diffuseBase.rgb *= ToonBrightnessLevels[2];\n"
-    "  }\n"
-    "  else if (info.ndl > ToonThresholds[3])\n"
-    "  {\n"
-    "  diffuseBase.rgb *= ToonBrightnessLevels[3];\n"
-    "  }\n"
-    "  else\n"
-    "  {\n"
-    "  diffuseBase.rgb *= ToonBrightnessLevels[4];\n"
-    "  }\n"
-    "#endif\n"
-    "\n"
-    "  return max(diffuseBase, vec3(0.2));\n"
-    "}\n"
-    "\n"
-    "void main(void)\n"
-    "{\n"
-    "#include<clipPlaneFragment>\n"
-    "\n"
-    "  vec3 viewDirectionW = normalize(vEyePosition - vPositionW);\n"
-    "\n"
-    "  // Base color\n"
-    "  vec4 baseColor = vec4(1., 1., 1., 1.);\n"
-    "  vec3 diffuseColor = vDiffuseColor.rgb;\n"
-    "\n"
-    "  // Alpha\n"
-    "  float alpha = vDiffuseColor.a;\n"
-    "\n"
-    "#ifdef DIFFUSE\n"
-    "  baseColor = texture2D(diffuseSampler, vDiffuseUV);\n"
-    "\n"
-    "#ifdef ALPHATEST\n"
-    "  if (baseColor.a < 0.4)\n"
-    "  discard;\n"
-    "#endif\n"
-    "\n"
-    "#include<depthPrePass>\n"
-    "\n"
-    "  baseColor.rgb *= vDiffuseInfos.y;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef VERTEXCOLOR\n"
-    "  baseColor.rgb *= vColor.rgb;\n"
-    "#endif\n"
-    "\n"
-    "  // Normal\n"
-    "#ifdef NORMAL\n"
-    "  vec3 normalW = normalize(vNormalW);\n"
-    "#else\n"
-    "  vec3 normalW = vec3(1.0, 1.0, 1.0);\n"
-    "#endif\n"
-    "\n"
-    "  // Lighting\n"
-    "  lightingInfo info;\n"
-    "  vec3 diffuseBase = vec3(0., 0., 0.);\n"
-    "  float shadow = 1.;\n"
-    "  float glossiness = 0.;\n"
-    "\n"
-    "#ifdef SPECULARTERM\n"
-    "  vec3 specularBase = vec3(0., 0., 0.);\n"
-    "#endif    \n"
-    "#include<lightFragment>[0..maxSimultaneousLights]\n"
-    "\n"
-    "#ifdef VERTEXALPHA\n"
-    "  alpha *= vColor.a;\n"
-    "#endif\n"
-    "\n"
-    "  vec3 finalDiffuse = clamp(diffuseBase * diffuseColor, 0.0, 1.0) * baseColor.rgb;\n"
-    "\n"
-    "  // Composition\n"
-    "  vec4 color = vec4(finalDiffuse, alpha);\n"
-    "\n"
-    "#include<fogFragment>\n"
-    "\n"
-    "  gl_FragColor = color;\n"
-    "}\n";
+  = R"ShaderCode(
 
+#ifdef GL_ES
+  precision highp float;
+#endif
+
+// Constants
+uniform vec3 vEyePosition;
+uniform vec4 vDiffuseColor;
+
+// Input
+varying vec3 vPositionW;
+
+#ifdef NORMAL
+varying vec3 vNormalW;
+#endif
+
+#ifdef VERTEXCOLOR
+varying vec4 vColor;
+#endif
+
+// Helper functions
+#include<helperFunctions>
+
+// Lights
+#include<__decl__lightFragment>[0..maxSimultaneousLights]
+
+#include<lightsFragmentFunctions>
+#include<shadowsFragmentFunctions>
+
+// Samplers
+#ifdef DIFFUSE
+varying vec2 vDiffuseUV;
+uniform sampler2D diffuseSampler;
+uniform vec2 vDiffuseInfos;
+#endif
+
+#include<clipPlaneFragmentDeclaration>
+
+// Fog
+#include<fogFragmentDeclaration>
+
+// Custom
+vec3 computeCustomDiffuseLighting(lightingInfo info, vec3 diffuseBase, float shadow)
+{
+    diffuseBase = info.diffuse * shadow;
+
+#ifdef CELLBASIC
+    float level = 1.0;
+    if (info.ndl < 0.5)
+        level = 0.5;
+
+    diffuseBase.rgb * vec3(level, level, level);
+#else
+    float ToonThresholds[4];
+    ToonThresholds[0] = 0.95;
+    ToonThresholds[1] = 0.5;
+    ToonThresholds[2] = 0.2;
+    ToonThresholds[3] = 0.03;
+
+    float ToonBrightnessLevels[5];
+    ToonBrightnessLevels[0] = 1.0;
+    ToonBrightnessLevels[1] = 0.8;
+    ToonBrightnessLevels[2] = 0.6;
+    ToonBrightnessLevels[3] = 0.35;
+    ToonBrightnessLevels[4] = 0.2;
+
+    if (info.ndl > ToonThresholds[0])
+    {
+        diffuseBase.rgb *= ToonBrightnessLevels[0];
+    }
+    else if (info.ndl > ToonThresholds[1])
+    {
+        diffuseBase.rgb *= ToonBrightnessLevels[1];
+    }
+    else if (info.ndl > ToonThresholds[2])
+    {
+        diffuseBase.rgb *= ToonBrightnessLevels[2];
+    }
+    else if (info.ndl > ToonThresholds[3])
+    {
+        diffuseBase.rgb *= ToonBrightnessLevels[3];
+    }
+    else
+    {
+        diffuseBase.rgb *= ToonBrightnessLevels[4];
+    }
+#endif
+
+    return max(diffuseBase, vec3(0.2));
+}
+
+void main(void)
+{
+#include<clipPlaneFragment>
+
+    vec3 viewDirectionW = normalize(vEyePosition - vPositionW);
+
+    // Base color
+    vec4 baseColor = vec4(1., 1., 1., 1.);
+    vec3 diffuseColor = vDiffuseColor.rgb;
+
+    // Alpha
+    float alpha = vDiffuseColor.a;
+
+#ifdef DIFFUSE
+    baseColor = texture2D(diffuseSampler, vDiffuseUV);
+
+#ifdef ALPHATEST
+    if (baseColor.a < 0.4)
+        discard;
+#endif
+
+#include<depthPrePass>
+
+    baseColor.rgb *= vDiffuseInfos.y;
+#endif
+
+#ifdef VERTEXCOLOR
+    baseColor.rgb *= vColor.rgb;
+#endif
+
+    // Normal
+#ifdef NORMAL
+    vec3 normalW = normalize(vNormalW);
+#else
+    vec3 normalW = vec3(1.0, 1.0, 1.0);
+#endif
+
+    // Lighting
+    lightingInfo info;
+    vec3 diffuseBase = vec3(0., 0., 0.);
+    float shadow = 1.;
+    float glossiness = 0.;
+
+#ifdef SPECULARTERM
+    vec3 specularBase = vec3(0., 0., 0.);
+#endif
+#include<lightFragment>[0..maxSimultaneousLights]
+
+#ifdef VERTEXALPHA
+    alpha *= vColor.a;
+#endif
+
+    vec3 finalDiffuse = clamp(diffuseBase * diffuseColor, 0.0, 1.0) * baseColor.rgb;
+
+    // Composition
+    vec4 color = vec4(finalDiffuse, alpha);
+
+#include<fogFragment>
+
+    gl_FragColor = color;
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_MATERIALS_LIBRARY_CELL_CELL_FRAGMENT_FX_H

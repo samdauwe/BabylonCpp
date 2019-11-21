@@ -6,129 +6,132 @@ namespace BABYLON {
 extern const char* triPlanarVertexShader;
 
 const char* triPlanarVertexShader
-  = "#ifdef GL_ES\n"
-    "precision highp float;\n"
-    "#endif\n"
-    "\n"
-    "// Attributes\n"
-    "attribute vec3 position;\n"
-    "#ifdef NORMAL\n"
-    "attribute vec3 normal;\n"
-    "#endif\n"
-    "#ifdef VERTEXCOLOR\n"
-    "attribute vec4 color;\n"
-    "#endif\n"
-    "\n"
-    "#include<bonesDeclaration>\n"
-    "\n"
-    "// Uniforms\n"
-    "#include<instancesDeclaration>\n"
-    "\n"
-    "uniform mat4 view;\n"
-    "uniform mat4 viewProjection;\n"
-    "\n"
-    "#ifdef DIFFUSEX\n"
-    "varying vec2 vTextureUVX;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef DIFFUSEY\n"
-    "varying vec2 vTextureUVY;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef DIFFUSEZ\n"
-    "varying vec2 vTextureUVZ;\n"
-    "#endif\n"
-    "\n"
-    "uniform float tileSize;\n"
-    "\n"
-    "#ifdef POINTSIZE\n"
-    "uniform float pointSize;\n"
-    "#endif\n"
-    "\n"
-    "// Output\n"
-    "varying vec3 vPositionW;\n"
-    "#ifdef NORMAL\n"
-    "varying mat3 tangentSpace;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef VERTEXCOLOR\n"
-    "varying vec4 vColor;\n"
-    "#endif\n"
-    "\n"
-    "#include<clipPlaneVertexDeclaration>\n"
-    "\n"
-    "#include<fogVertexDeclaration>\n"
-    "#include<__decl__lightFragment>[0..maxSimultaneousLights]\n"
-    "\n"
-    "void main(void)\n"
-    "{\n"
-    "\n"
-    "  #include<instancesVertex>\n"
-    "  #include<bonesVertex>\n"
-    "  \n"
-    "  gl_Position = viewProjection * finalWorld * vec4(position, 1.0);\n"
-    "\n"
-    "  vec4 worldPos = finalWorld * vec4(position, 1.0);\n"
-    "  vPositionW = vec3(worldPos);\n"
-    "\n"
-    "#ifdef DIFFUSEX\n"
-    "  vTextureUVX = worldPos.zy / tileSize;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef DIFFUSEY\n"
-    "  vTextureUVY = worldPos.xz / tileSize;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef DIFFUSEZ\n"
-    "  vTextureUVZ = worldPos.xy / tileSize;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef NORMAL\n"
-    "  // Compute tangent space (used for normal mapping + tri planar color mapping)\n"
-    "  vec3 xtan = vec3(0,0,1);//tangent space for the X aligned plane\n"
-    "   vec3 xbin = vec3(0,1,0);\n"
-    "   \n"
-    "   vec3 ytan = vec3(1,0,0);//tangent space for the Y aligned plane\n"
-    "   vec3 ybin = vec3(0,0,1);\n"
-    "   \n"
-    "   vec3 ztan = vec3(1,0,0);//tangent space for the Z aligned plane\n"
-    "   vec3 zbin = vec3(0,1,0);\n"
-    "   \n"
-    "  vec3 normalizedNormal = normalize(normal);\n"
-    "   normalizedNormal *= normalizedNormal;\n"
-    "\n"
-    "  vec3 worldBinormal = normalize(xbin * normalizedNormal.x + ybin * normalizedNormal.y + zbin * normalizedNormal.z);\n"
-    "   vec3 worldTangent = normalize(xtan * normalizedNormal.x + ytan * normalizedNormal.y + ztan * normalizedNormal.z);\n"
-    "   \n"
-    "  worldTangent = (world * vec4(worldTangent, 1.0)).xyz;\n"
-    "  worldBinormal = (world * vec4(worldBinormal, 1.0)).xyz;\n"
-    "  vec3 worldNormal = normalize(cross(worldTangent, worldBinormal));\n"
-    "\n"
-    "  tangentSpace[0] = worldTangent;\n"
-    "  tangentSpace[1] = worldBinormal;\n"
-    "  tangentSpace[2] = worldNormal;\n"
-    "#endif\n"
-    "\n"
-    "  // Clip plane\n"
-    "  #include<clipPlaneVertex>\n"
-    "\n"
-    "  // Fog\n"
-    "  #include<fogVertex>\n"
-    "\n"
-    "  // Shadows\n"
-    "  #include<shadowsVertex>[0..maxSimultaneousLights]\n"
-    "\n"
-    "  // Vertex color\n"
-    "#ifdef VERTEXCOLOR\n"
-    "  vColor = color;\n"
-    "#endif\n"
-    "\n"
-    "  // Point size\n"
-    "#ifdef POINTSIZE\n"
-    "  gl_PointSize = pointSize;\n"
-    "#endif\n"
-    "}\n";
+  = R"ShaderCode(
 
+#ifdef GL_ES
+  precision highp float;
+#endif
+
+// Attributes
+attribute vec3 position;
+#ifdef NORMAL
+attribute vec3 normal;
+#endif
+#ifdef VERTEXCOLOR
+attribute vec4 color;
+#endif
+
+#include<bonesDeclaration>
+
+// Uniforms
+#include<instancesDeclaration>
+
+uniform mat4 view;
+uniform mat4 viewProjection;
+
+#ifdef DIFFUSEX
+varying vec2 vTextureUVX;
+#endif
+
+#ifdef DIFFUSEY
+varying vec2 vTextureUVY;
+#endif
+
+#ifdef DIFFUSEZ
+varying vec2 vTextureUVZ;
+#endif
+
+uniform float tileSize;
+
+#ifdef POINTSIZE
+uniform float pointSize;
+#endif
+
+// Output
+varying vec3 vPositionW;
+#ifdef NORMAL
+varying mat3 tangentSpace;
+#endif
+
+#ifdef VERTEXCOLOR
+varying vec4 vColor;
+#endif
+
+#include<clipPlaneVertexDeclaration>
+
+#include<fogVertexDeclaration>
+#include<__decl__lightFragment>[0..maxSimultaneousLights]
+
+void main(void)
+{
+
+    #include<instancesVertex>
+    #include<bonesVertex>
+
+    gl_Position = viewProjection * finalWorld * vec4(position, 1.0);
+
+    vec4 worldPos = finalWorld * vec4(position, 1.0);
+    vPositionW = vec3(worldPos);
+
+#ifdef DIFFUSEX
+    vTextureUVX = worldPos.zy / tileSize;
+#endif
+
+#ifdef DIFFUSEY
+    vTextureUVY = worldPos.xz / tileSize;
+#endif
+
+#ifdef DIFFUSEZ
+    vTextureUVZ = worldPos.xy / tileSize;
+#endif
+
+#ifdef NORMAL
+    // Compute tangent space (used for normal mapping + tri planar color mapping)
+    vec3 xtan = vec3(0,0,1);//tangent space for the X aligned plane
+       vec3 xbin = vec3(0,1,0);
+
+       vec3 ytan = vec3(1,0,0);//tangent space for the Y aligned plane
+       vec3 ybin = vec3(0,0,1);
+
+       vec3 ztan = vec3(1,0,0);//tangent space for the Z aligned plane
+       vec3 zbin = vec3(0,1,0);
+
+    vec3 normalizedNormal = normalize(normal);
+       normalizedNormal *= normalizedNormal;
+
+    vec3 worldBinormal = normalize(xbin * normalizedNormal.x + ybin * normalizedNormal.y + zbin * normalizedNormal.z);
+       vec3 worldTangent = normalize(xtan * normalizedNormal.x + ytan * normalizedNormal.y + ztan * normalizedNormal.z);
+
+    worldTangent = (world * vec4(worldTangent, 1.0)).xyz;
+    worldBinormal = (world * vec4(worldBinormal, 1.0)).xyz;
+    vec3 worldNormal = normalize(cross(worldTangent, worldBinormal));
+
+    tangentSpace[0] = worldTangent;
+    tangentSpace[1] = worldBinormal;
+    tangentSpace[2] = worldNormal;
+#endif
+
+    // Clip plane
+    #include<clipPlaneVertex>
+
+    // Fog
+    #include<fogVertex>
+
+    // Shadows
+    #include<shadowsVertex>[0..maxSimultaneousLights]
+
+    // Vertex color
+#ifdef VERTEXCOLOR
+    vColor = color;
+#endif
+
+    // Point size
+#ifdef POINTSIZE
+    gl_PointSize = pointSize;
+#endif
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_MATERIALS_LIBRARY_TRIPLANAR_TRI_PLANAR_VERTEX_FX_H

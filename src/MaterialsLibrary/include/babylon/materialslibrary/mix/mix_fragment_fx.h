@@ -6,176 +6,179 @@ namespace BABYLON {
 extern const char* mixPixelShader;
 
 const char* mixPixelShader
-  = "#ifdef GL_ES\n"
-    "precision highp float;\n"
-    "#endif\n"
-    "\n"
-    "// Constants\n"
-    "uniform vec3 vEyePosition;\n"
-    "uniform vec4 vDiffuseColor;\n"
-    "\n"
-    "#ifdef SPECULARTERM\n"
-    "uniform vec4 vSpecularColor;\n"
-    "#endif\n"
-    "\n"
-    "// Input\n"
-    "varying vec3 vPositionW;\n"
-    "\n"
-    "#ifdef NORMAL\n"
-    "varying vec3 vNormalW;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef VERTEXCOLOR\n"
-    "varying vec4 vColor;\n"
-    "#endif\n"
-    "\n"
-    "// Helper functions\n"
-    "#include<helperFunctions>\n"
-    "\n"
-    "// Lights\n"
-    "#include<__decl__lightFragment>[0..maxSimultaneousLights]\n"
-    "\n"
-    "// Samplers\n"
-    "#ifdef DIFFUSE\n"
-    "varying vec2 vTextureUV;\n"
-    "uniform sampler2D mixMap1Sampler;\n"
-    "uniform vec2 vTextureInfos;\n"
-    "\n"
-    "#ifdef MIXMAP2\n"
-    "uniform sampler2D mixMap2Sampler;\n"
-    "#endif\n"
-    "\n"
-    "uniform sampler2D diffuse1Sampler;\n"
-    "uniform sampler2D diffuse2Sampler;\n"
-    "uniform sampler2D diffuse3Sampler;\n"
-    "uniform sampler2D diffuse4Sampler;\n"
-    "\n"
-    "uniform vec2 diffuse1Infos;\n"
-    "uniform vec2 diffuse2Infos;\n"
-    "uniform vec2 diffuse3Infos;\n"
-    "uniform vec2 diffuse4Infos;\n"
-    "\n"
-    "#ifdef MIXMAP2\n"
-    "uniform sampler2D diffuse5Sampler;\n"
-    "uniform sampler2D diffuse6Sampler;\n"
-    "uniform sampler2D diffuse7Sampler;\n"
-    "uniform sampler2D diffuse8Sampler;\n"
-    "\n"
-    "uniform vec2 diffuse5Infos;\n"
-    "uniform vec2 diffuse6Infos;\n"
-    "uniform vec2 diffuse7Infos;\n"
-    "uniform vec2 diffuse8Infos;\n"
-    "#endif\n"
-    "\n"
-    "#endif\n"
-    "\n"
-    "// Shadows\n"
-    "#include<lightsFragmentFunctions>\n"
-    "#include<shadowsFragmentFunctions>\n"
-    "#include<clipPlaneFragmentDeclaration>\n"
-    "\n"
-    "// Fog\n"
-    "#include<fogFragmentDeclaration>\n"
-    "\n"
-    "void main(void) {\n"
-    "  // Clip plane\n"
-    "  #include<clipPlaneFragment>\n"
-    "\n"
-    "  vec3 viewDirectionW = normalize(vEyePosition - vPositionW);\n"
-    "\n"
-    "  // Base color\n"
-    "  vec4 finalMixColor = vec4(1., 1., 1., 1.);\n"
-    "  vec3 diffuseColor = vDiffuseColor.rgb;\n"
-    "\n"
-    "#ifdef MIXMAP2\n"
-    "  vec4 mixColor2 = vec4(1., 1., 1., 1.);\n"
-    "#endif\n"
-    "  \n"
-    "#ifdef SPECULARTERM\n"
-    "  float glossiness = vSpecularColor.a;\n"
-    "  vec3 specularColor = vSpecularColor.rgb;\n"
-    "#else\n"
-    "  float glossiness = 0.;\n"
-    "#endif\n"
-    "\n"
-    "  // Alpha\n"
-    "  float alpha = vDiffuseColor.a;\n"
-    "  \n"
-    "  // Normal\n"
-    "#ifdef NORMAL\n"
-    "  vec3 normalW = normalize(vNormalW);\n"
-    "#else\n"
-    "  vec3 normalW = vec3(1.0, 1.0, 1.0);\n"
-    "#endif\n"
-    "\n"
-    "#ifdef DIFFUSE\n"
-    "  vec4 mixColor = texture2D(mixMap1Sampler, vTextureUV);\n"
-    "\n"
-    "#include<depthPrePass>\n"
-    "\n"
-    "  mixColor.rgb *= vTextureInfos.y;\n"
-    "  \n"
-    "  vec4 diffuse1Color = texture2D(diffuse1Sampler, vTextureUV * diffuse1Infos);\n"
-    "  vec4 diffuse2Color = texture2D(diffuse2Sampler, vTextureUV * diffuse2Infos);\n"
-    "  vec4 diffuse3Color = texture2D(diffuse3Sampler, vTextureUV * diffuse3Infos);\n"
-    "  vec4 diffuse4Color = texture2D(diffuse4Sampler, vTextureUV * diffuse4Infos);\n"
-    "  \n"
-    "  diffuse1Color.rgb *= mixColor.r;\n"
-    "   diffuse2Color.rgb = mix(diffuse1Color.rgb, diffuse2Color.rgb, mixColor.g);\n"
-    "   diffuse3Color.rgb = mix(diffuse2Color.rgb, diffuse3Color.rgb, mixColor.b);\n"
-    "  finalMixColor.rgb = mix(diffuse3Color.rgb, diffuse4Color.rgb, 1.0 - mixColor.a);\n"
-    "\n"
-    "#ifdef MIXMAP2\n"
-    "  mixColor = texture2D(mixMap2Sampler, vTextureUV);\n"
-    "  mixColor.rgb *= vTextureInfos.y;\n"
-    "\n"
-    "  vec4 diffuse5Color = texture2D(diffuse5Sampler, vTextureUV * diffuse5Infos);\n"
-    "  vec4 diffuse6Color = texture2D(diffuse6Sampler, vTextureUV * diffuse6Infos);\n"
-    "  vec4 diffuse7Color = texture2D(diffuse7Sampler, vTextureUV * diffuse7Infos);\n"
-    "  vec4 diffuse8Color = texture2D(diffuse8Sampler, vTextureUV * diffuse8Infos);\n"
-    "\n"
-    "  diffuse5Color.rgb = mix(finalMixColor.rgb, diffuse5Color.rgb, mixColor.r);\n"
-    "   diffuse6Color.rgb = mix(diffuse5Color.rgb, diffuse6Color.rgb, mixColor.g);\n"
-    "   diffuse7Color.rgb = mix(diffuse6Color.rgb, diffuse7Color.rgb, mixColor.b);\n"
-    "  finalMixColor.rgb = mix(diffuse7Color.rgb, diffuse8Color.rgb, 1.0 - mixColor.a);\n"
-    "#endif\n"
-    "  \n"
-    "#endif\n"
-    "\n"
-    "#ifdef VERTEXCOLOR\n"
-    "  finalMixColor.rgb *= vColor.rgb;\n"
-    "#endif\n"
-    "\n"
-    "  // Lighting\n"
-    "  vec3 diffuseBase = vec3(0., 0., 0.);\n"
-    "  lightingInfo info;\n"
-    "  float shadow = 1.;\n"
-    "  \n"
-    "#ifdef SPECULARTERM\n"
-    "  vec3 specularBase = vec3(0., 0., 0.);\n"
-    "#endif\n"
-    "  #include<lightFragment>[0..maxSimultaneousLights]\n"
-    "\n"
-    "#ifdef VERTEXALPHA\n"
-    "  alpha *= vColor.a;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef SPECULARTERM\n"
-    "  vec3 finalSpecular = specularBase * specularColor;\n"
-    "#else\n"
-    "  vec3 finalSpecular = vec3(0.0);\n"
-    "#endif\n"
-    "\n"
-    "  vec3 finalDiffuse = clamp(diffuseBase * diffuseColor * finalMixColor.rgb, 0.0, 1.0);\n"
-    "\n"
-    "  // Composition\n"
-    "  vec4 color = vec4(finalDiffuse + finalSpecular, alpha);\n"
-    "\n"
-    "#include<fogFragment>\n"
-    "\n"
-    "  gl_FragColor = color;\n"
-    "}\n";
+  = R"ShaderCode(
 
+#ifdef GL_ES
+  precision highp float;
+#endif
+
+// Constants
+uniform vec3 vEyePosition;
+uniform vec4 vDiffuseColor;
+
+#ifdef SPECULARTERM
+uniform vec4 vSpecularColor;
+#endif
+
+// Input
+varying vec3 vPositionW;
+
+#ifdef NORMAL
+varying vec3 vNormalW;
+#endif
+
+#ifdef VERTEXCOLOR
+varying vec4 vColor;
+#endif
+
+// Helper functions
+#include<helperFunctions>
+
+// Lights
+#include<__decl__lightFragment>[0..maxSimultaneousLights]
+
+// Samplers
+#ifdef DIFFUSE
+varying vec2 vTextureUV;
+uniform sampler2D mixMap1Sampler;
+uniform vec2 vTextureInfos;
+
+#ifdef MIXMAP2
+uniform sampler2D mixMap2Sampler;
+#endif
+
+uniform sampler2D diffuse1Sampler;
+uniform sampler2D diffuse2Sampler;
+uniform sampler2D diffuse3Sampler;
+uniform sampler2D diffuse4Sampler;
+
+uniform vec2 diffuse1Infos;
+uniform vec2 diffuse2Infos;
+uniform vec2 diffuse3Infos;
+uniform vec2 diffuse4Infos;
+
+#ifdef MIXMAP2
+uniform sampler2D diffuse5Sampler;
+uniform sampler2D diffuse6Sampler;
+uniform sampler2D diffuse7Sampler;
+uniform sampler2D diffuse8Sampler;
+
+uniform vec2 diffuse5Infos;
+uniform vec2 diffuse6Infos;
+uniform vec2 diffuse7Infos;
+uniform vec2 diffuse8Infos;
+#endif
+
+#endif
+
+// Shadows
+#include<lightsFragmentFunctions>
+#include<shadowsFragmentFunctions>
+#include<clipPlaneFragmentDeclaration>
+
+// Fog
+#include<fogFragmentDeclaration>
+
+void main(void) {
+    // Clip plane
+    #include<clipPlaneFragment>
+
+    vec3 viewDirectionW = normalize(vEyePosition - vPositionW);
+
+    // Base color
+    vec4 finalMixColor = vec4(1., 1., 1., 1.);
+    vec3 diffuseColor = vDiffuseColor.rgb;
+
+#ifdef MIXMAP2
+    vec4 mixColor2 = vec4(1., 1., 1., 1.);
+#endif
+
+#ifdef SPECULARTERM
+    float glossiness = vSpecularColor.a;
+    vec3 specularColor = vSpecularColor.rgb;
+#else
+    float glossiness = 0.;
+#endif
+
+    // Alpha
+    float alpha = vDiffuseColor.a;
+
+    // Normal
+#ifdef NORMAL
+    vec3 normalW = normalize(vNormalW);
+#else
+    vec3 normalW = vec3(1.0, 1.0, 1.0);
+#endif
+
+#ifdef DIFFUSE
+    vec4 mixColor = texture2D(mixMap1Sampler, vTextureUV);
+
+#include<depthPrePass>
+
+    mixColor.rgb *= vTextureInfos.y;
+
+    vec4 diffuse1Color = texture2D(diffuse1Sampler, vTextureUV * diffuse1Infos);
+    vec4 diffuse2Color = texture2D(diffuse2Sampler, vTextureUV * diffuse2Infos);
+    vec4 diffuse3Color = texture2D(diffuse3Sampler, vTextureUV * diffuse3Infos);
+    vec4 diffuse4Color = texture2D(diffuse4Sampler, vTextureUV * diffuse4Infos);
+
+    diffuse1Color.rgb *= mixColor.r;
+       diffuse2Color.rgb = mix(diffuse1Color.rgb, diffuse2Color.rgb, mixColor.g);
+       diffuse3Color.rgb = mix(diffuse2Color.rgb, diffuse3Color.rgb, mixColor.b);
+    finalMixColor.rgb = mix(diffuse3Color.rgb, diffuse4Color.rgb, 1.0 - mixColor.a);
+
+#ifdef MIXMAP2
+    mixColor = texture2D(mixMap2Sampler, vTextureUV);
+    mixColor.rgb *= vTextureInfos.y;
+
+    vec4 diffuse5Color = texture2D(diffuse5Sampler, vTextureUV * diffuse5Infos);
+    vec4 diffuse6Color = texture2D(diffuse6Sampler, vTextureUV * diffuse6Infos);
+    vec4 diffuse7Color = texture2D(diffuse7Sampler, vTextureUV * diffuse7Infos);
+    vec4 diffuse8Color = texture2D(diffuse8Sampler, vTextureUV * diffuse8Infos);
+
+    diffuse5Color.rgb = mix(finalMixColor.rgb, diffuse5Color.rgb, mixColor.r);
+       diffuse6Color.rgb = mix(diffuse5Color.rgb, diffuse6Color.rgb, mixColor.g);
+       diffuse7Color.rgb = mix(diffuse6Color.rgb, diffuse7Color.rgb, mixColor.b);
+    finalMixColor.rgb = mix(diffuse7Color.rgb, diffuse8Color.rgb, 1.0 - mixColor.a);
+#endif
+
+#endif
+
+#ifdef VERTEXCOLOR
+    finalMixColor.rgb *= vColor.rgb;
+#endif
+
+    // Lighting
+    vec3 diffuseBase = vec3(0., 0., 0.);
+    lightingInfo info;
+    float shadow = 1.;
+
+#ifdef SPECULARTERM
+    vec3 specularBase = vec3(0., 0., 0.);
+#endif
+    #include<lightFragment>[0..maxSimultaneousLights]
+
+#ifdef VERTEXALPHA
+    alpha *= vColor.a;
+#endif
+
+#ifdef SPECULARTERM
+    vec3 finalSpecular = specularBase * specularColor;
+#else
+    vec3 finalSpecular = vec3(0.0);
+#endif
+
+    vec3 finalDiffuse = clamp(diffuseBase * diffuseColor * finalMixColor.rgb, 0.0, 1.0);
+
+    // Composition
+    vec4 color = vec4(finalDiffuse + finalSpecular, alpha);
+
+#include<fogFragment>
+
+    gl_FragColor = color;
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_MATERIALS_LIBRARY_MIX_MIX_FRAGMENT_FX_H

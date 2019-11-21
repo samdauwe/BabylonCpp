@@ -6,159 +6,162 @@ namespace BABYLON {
 extern const char* triPlanarPixelShader;
 
 const char* triPlanarPixelShader
-  = "#ifdef GL_ES\n"
-    "precision highp float;\n"
-    "#endif\n"
-    "\n"
-    "// Constants\n"
-    "uniform vec3 vEyePosition;\n"
-    "uniform vec4 vDiffuseColor;\n"
-    "\n"
-    "#ifdef SPECULARTERM\n"
-    "uniform vec4 vSpecularColor;\n"
-    "#endif\n"
-    "\n"
-    "// Input\n"
-    "varying vec3 vPositionW;\n"
-    "\n"
-    "#ifdef VERTEXCOLOR\n"
-    "varying vec4 vColor;\n"
-    "#endif\n"
-    "\n"
-    "// Helper functions\n"
-    "#include<helperFunctions>\n"
-    "\n"
-    "// Lights\n"
-    "#include<__decl__lightFragment>[0..maxSimultaneousLights]\n"
-    "\n"
-    "// Samplers\n"
-    "#ifdef DIFFUSEX\n"
-    "varying vec2 vTextureUVX;\n"
-    "uniform sampler2D diffuseSamplerX;\n"
-    "#ifdef BUMPX\n"
-    "uniform sampler2D normalSamplerX;\n"
-    "#endif\n"
-    "#endif\n"
-    "\n"
-    "#ifdef DIFFUSEY\n"
-    "varying vec2 vTextureUVY;\n"
-    "uniform sampler2D diffuseSamplerY;\n"
-    "#ifdef BUMPY\n"
-    "uniform sampler2D normalSamplerY;\n"
-    "#endif\n"
-    "#endif\n"
-    "\n"
-    "#ifdef DIFFUSEZ\n"
-    "varying vec2 vTextureUVZ;\n"
-    "uniform sampler2D diffuseSamplerZ;\n"
-    "#ifdef BUMPZ\n"
-    "uniform sampler2D normalSamplerZ;\n"
-    "#endif\n"
-    "#endif\n"
-    "\n"
-    "#ifdef NORMAL\n"
-    "varying mat3 tangentSpace;\n"
-    "#endif\n"
-    "\n"
-    "#include<lightsFragmentFunctions>\n"
-    "#include<shadowsFragmentFunctions>\n"
-    "#include<clipPlaneFragmentDeclaration>\n"
-    "#include<fogFragmentDeclaration>\n"
-    "\n"
-    "void main(void) {\n"
-    "  // Clip plane\n"
-    "  #include<clipPlaneFragment>\n"
-    "\n"
-    "  vec3 viewDirectionW = normalize(vEyePosition - vPositionW);\n"
-    "\n"
-    "  // Base color\n"
-    "  vec4 baseColor = vec4(0., 0., 0., 1.);\n"
-    "  vec3 diffuseColor = vDiffuseColor.rgb;\n"
-    "\n"
-    "  // Alpha\n"
-    "  float alpha = vDiffuseColor.a;\n"
-    "  \n"
-    "  // Bump\n"
-    "#ifdef NORMAL\n"
-    "  vec3 normalW = tangentSpace[2];\n"
-    "#else\n"
-    "  vec3 normalW = vec3(1.0, 1.0, 1.0);\n"
-    "#endif\n"
-    "\n"
-    "  vec4 baseNormal = vec4(0.0, 0.0, 0.0, 1.0);\n"
-    "  normalW *= normalW;\n"
-    "\n"
-    "#ifdef DIFFUSEX\n"
-    "  baseColor += texture2D(diffuseSamplerX, vTextureUVX) * normalW.x;\n"
-    "#ifdef BUMPX\n"
-    "  baseNormal += texture2D(normalSamplerX, vTextureUVX) * normalW.x;\n"
-    "#endif\n"
-    "#endif\n"
-    "\n"
-    "#ifdef DIFFUSEY\n"
-    "  baseColor += texture2D(diffuseSamplerY, vTextureUVY) * normalW.y;\n"
-    "#ifdef BUMPY\n"
-    "  baseNormal += texture2D(normalSamplerY, vTextureUVY) * normalW.y;\n"
-    "#endif\n"
-    "#endif\n"
-    "\n"
-    "#ifdef DIFFUSEZ\n"
-    "  baseColor += texture2D(diffuseSamplerZ, vTextureUVZ) * normalW.z;\n"
-    "#ifdef BUMPZ\n"
-    "  baseNormal += texture2D(normalSamplerZ, vTextureUVZ) * normalW.z;\n"
-    "#endif\n"
-    "#endif\n"
-    "\n"
-    "#ifdef NORMAL\n"
-    "  normalW = normalize((2.0 * baseNormal.xyz - 1.0) * tangentSpace);\n"
-    "#endif\n"
-    "\n"
-    "#ifdef ALPHATEST\n"
-    "  if (baseColor.a < 0.4)\n"
-    "  discard;\n"
-    "#endif\n"
-    "\n"
-    "#include<depthPrePass>\n"
-    "\n"
-    "#ifdef VERTEXCOLOR\n"
-    "  baseColor.rgb *= vColor.rgb;\n"
-    "#endif\n"
-    "\n"
-    "  // Lighting\n"
-    "  vec3 diffuseBase = vec3(0., 0., 0.);\n"
-    "  lightingInfo info;\n"
-    "  float shadow = 1.;\n"
-    "  \n"
-    "#ifdef SPECULARTERM\n"
-    "  float glossiness = vSpecularColor.a;\n"
-    "  vec3 specularBase = vec3(0., 0., 0.);\n"
-    "  vec3 specularColor = vSpecularColor.rgb;\n"
-    "#else\n"
-    "  float glossiness = 0.;\n"
-    "#endif\n"
-    "\n"
-    "#include<lightFragment>[0..maxSimultaneousLights]\n"
-    "\n"
-    "#ifdef VERTEXALPHA\n"
-    "  alpha *= vColor.a;\n"
-    "#endif\n"
-    "\n"
-    "#ifdef SPECULARTERM\n"
-    "  vec3 finalSpecular = specularBase * specularColor;\n"
-    "#else\n"
-    "  vec3 finalSpecular = vec3(0.0);\n"
-    "#endif\n"
-    "\n"
-    "  vec3 finalDiffuse = clamp(diffuseBase * diffuseColor, 0.0, 1.0) * baseColor.rgb;\n"
-    "\n"
-    "  // Composition\n"
-    "  vec4 color = vec4(finalDiffuse + finalSpecular, alpha);\n"
-    "\n"
-    "#include<fogFragment>\n"
-    "\n"
-    "  gl_FragColor = color;\n"
-    "}\n";
+  = R"ShaderCode(
 
+#ifdef GL_ES
+  precision highp float;
+#endif
+
+// Constants
+uniform vec3 vEyePosition;
+uniform vec4 vDiffuseColor;
+
+#ifdef SPECULARTERM
+uniform vec4 vSpecularColor;
+#endif
+
+// Input
+varying vec3 vPositionW;
+
+#ifdef VERTEXCOLOR
+varying vec4 vColor;
+#endif
+
+// Helper functions
+#include<helperFunctions>
+
+// Lights
+#include<__decl__lightFragment>[0..maxSimultaneousLights]
+
+// Samplers
+#ifdef DIFFUSEX
+varying vec2 vTextureUVX;
+uniform sampler2D diffuseSamplerX;
+#ifdef BUMPX
+uniform sampler2D normalSamplerX;
+#endif
+#endif
+
+#ifdef DIFFUSEY
+varying vec2 vTextureUVY;
+uniform sampler2D diffuseSamplerY;
+#ifdef BUMPY
+uniform sampler2D normalSamplerY;
+#endif
+#endif
+
+#ifdef DIFFUSEZ
+varying vec2 vTextureUVZ;
+uniform sampler2D diffuseSamplerZ;
+#ifdef BUMPZ
+uniform sampler2D normalSamplerZ;
+#endif
+#endif
+
+#ifdef NORMAL
+varying mat3 tangentSpace;
+#endif
+
+#include<lightsFragmentFunctions>
+#include<shadowsFragmentFunctions>
+#include<clipPlaneFragmentDeclaration>
+#include<fogFragmentDeclaration>
+
+void main(void) {
+    // Clip plane
+    #include<clipPlaneFragment>
+
+    vec3 viewDirectionW = normalize(vEyePosition - vPositionW);
+
+    // Base color
+    vec4 baseColor = vec4(0., 0., 0., 1.);
+    vec3 diffuseColor = vDiffuseColor.rgb;
+
+    // Alpha
+    float alpha = vDiffuseColor.a;
+
+    // Bump
+#ifdef NORMAL
+    vec3 normalW = tangentSpace[2];
+#else
+    vec3 normalW = vec3(1.0, 1.0, 1.0);
+#endif
+
+    vec4 baseNormal = vec4(0.0, 0.0, 0.0, 1.0);
+    normalW *= normalW;
+
+#ifdef DIFFUSEX
+    baseColor += texture2D(diffuseSamplerX, vTextureUVX) * normalW.x;
+#ifdef BUMPX
+    baseNormal += texture2D(normalSamplerX, vTextureUVX) * normalW.x;
+#endif
+#endif
+
+#ifdef DIFFUSEY
+    baseColor += texture2D(diffuseSamplerY, vTextureUVY) * normalW.y;
+#ifdef BUMPY
+    baseNormal += texture2D(normalSamplerY, vTextureUVY) * normalW.y;
+#endif
+#endif
+
+#ifdef DIFFUSEZ
+    baseColor += texture2D(diffuseSamplerZ, vTextureUVZ) * normalW.z;
+#ifdef BUMPZ
+    baseNormal += texture2D(normalSamplerZ, vTextureUVZ) * normalW.z;
+#endif
+#endif
+
+#ifdef NORMAL
+    normalW = normalize((2.0 * baseNormal.xyz - 1.0) * tangentSpace);
+#endif
+
+#ifdef ALPHATEST
+    if (baseColor.a < 0.4)
+        discard;
+#endif
+
+#include<depthPrePass>
+
+#ifdef VERTEXCOLOR
+    baseColor.rgb *= vColor.rgb;
+#endif
+
+    // Lighting
+    vec3 diffuseBase = vec3(0., 0., 0.);
+    lightingInfo info;
+    float shadow = 1.;
+
+#ifdef SPECULARTERM
+    float glossiness = vSpecularColor.a;
+    vec3 specularBase = vec3(0., 0., 0.);
+    vec3 specularColor = vSpecularColor.rgb;
+#else
+    float glossiness = 0.;
+#endif
+
+#include<lightFragment>[0..maxSimultaneousLights]
+
+#ifdef VERTEXALPHA
+    alpha *= vColor.a;
+#endif
+
+#ifdef SPECULARTERM
+    vec3 finalSpecular = specularBase * specularColor;
+#else
+    vec3 finalSpecular = vec3(0.0);
+#endif
+
+    vec3 finalDiffuse = clamp(diffuseBase * diffuseColor, 0.0, 1.0) * baseColor.rgb;
+
+    // Composition
+    vec4 color = vec4(finalDiffuse + finalSpecular, alpha);
+
+#include<fogFragment>
+
+    gl_FragColor = color;
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_MATERIALS_LIBRARY_TRIPLANAR_TRI_PLANAR_FRAGMENT_FX_H
