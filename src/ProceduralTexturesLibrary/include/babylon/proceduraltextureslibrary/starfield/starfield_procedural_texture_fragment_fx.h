@@ -6,70 +6,73 @@ namespace BABYLON {
 extern const char* starfieldProceduralTexturePixelShader;
 
 const char* starfieldProceduralTexturePixelShader
-  = "#ifdef GL_ES\n"
-    "precision highp float;\n"
-    "#endif\n"
-    "\n"
-    "//defined as const as fragment shaders does not support uniforms in loops\n"
-    "#define volsteps 20\n"
-    "#define iterations 15\n"
-    "\n"
-    "varying vec2 vPosition;\n"
-    "varying vec2 vUV;\n"
-    "\n"
-    "uniform float time;\n"
-    "uniform float alpha;\n"
-    "uniform float beta;\n"
-    "uniform float zoom;\n"
-    "uniform float formuparam;\n"
-    "uniform float stepsize;\n"
-    "uniform float tile;\n"
-    "uniform float brightness;\n"
-    "uniform float darkmatter;\n"
-    "uniform float distfading;\n"
-    "uniform float saturation;\n"
-    "\n"
-    "void main()\n"
-    "{\n"
-    "  vec3 dir = vec3(vUV * zoom, 1.);\n"
-    "\n"
-    "  float localTime = time * 0.0001;\n"
-    "\n"
-    "  // Rotation\n"
-    "  mat2 rot1 = mat2(cos(alpha), sin(alpha), -sin(alpha), cos(alpha));\n"
-    "  mat2 rot2 = mat2(cos(beta), sin(beta), -sin(beta), cos(beta));\n"
-    "  dir.xz *= rot1;\n"
-    "  dir.xy *= rot2;\n"
-    "  vec3 from = vec3(1., .5, 0.5);\n"
-    "  from += vec3(-2., localTime*2., localTime);\n"
-    "  from.xz *= rot1;\n"
-    "  from.xy *= rot2;\n"
-    "\n"
-    "  //volumetric rendering\n"
-    "  float s = 0.1, fade = 1.;\n"
-    "  vec3 v = vec3(0.);\n"
-    "  for (int r = 0; r < volsteps; r++) {\n"
-    "  vec3 p = from + s*dir*.5;\n"
-    "  p = abs(vec3(tile) - mod(p, vec3(tile*2.))); // tiling fold\n"
-    "  float pa, a = pa = 0.;\n"
-    "  for (int i = 0; i < iterations; i++) {\n"
-    "  p = abs(p) / dot(p, p) - formuparam; // the magic formula\n"
-    "  a += abs(length(p) - pa); // absolute sum of average change\n"
-    "  pa = length(p);\n"
-    "  }\n"
-    "  float dm = max(0., darkmatter - a*a*.001); //dark matter\n"
-    "  a *= a*a; // add contrast\n"
-    "  if (r > 6) fade *= 1. - dm; // dark matter, don't render near\n"
-    "  //v+=vec3(dm,dm*.5,0.);\n"
-    "  v += fade;\n"
-    "  v += vec3(s, s*s, s*s*s*s)*a*brightness*fade; // coloring based on distance\n"
-    "  fade *= distfading; // distance fading\n"
-    "  s += stepsize;\n"
-    "  }\n"
-    "  v = mix(vec3(length(v)), v, saturation); //color adjust\n"
-    "  gl_FragColor = vec4(v*.01, 1.);\n"
-    "}\n";
+  = R"ShaderCode(
 
+#ifdef GL_ES
+  precision highp float;
+#endif
+
+//defined as const as fragment shaders does not support uniforms in loops
+#define volsteps 20
+#define iterations 15
+
+varying vec2 vPosition;
+varying vec2 vUV;
+
+uniform float time;
+uniform float alpha;
+uniform float beta;
+uniform float zoom;
+uniform float formuparam;
+uniform float stepsize;
+uniform float tile;
+uniform float brightness;
+uniform float darkmatter;
+uniform float distfading;
+uniform float saturation;
+
+void main()
+{
+    vec3 dir = vec3(vUV * zoom, 1.);
+
+    float localTime = time * 0.0001;
+
+    // Rotation
+    mat2 rot1 = mat2(cos(alpha), sin(alpha), -sin(alpha), cos(alpha));
+    mat2 rot2 = mat2(cos(beta), sin(beta), -sin(beta), cos(beta));
+    dir.xz *= rot1;
+    dir.xy *= rot2;
+    vec3 from = vec3(1., .5, 0.5);
+    from += vec3(-2., localTime*2., localTime);
+    from.xz *= rot1;
+    from.xy *= rot2;
+
+    //volumetric rendering
+    float s = 0.1, fade = 1.;
+    vec3 v = vec3(0.);
+    for (int r = 0; r < volsteps; r++) {
+        vec3 p = from + s*dir*.5;
+        p = abs(vec3(tile) - mod(p, vec3(tile*2.))); // tiling fold
+        float pa, a = pa = 0.;
+        for (int i = 0; i < iterations; i++) {
+            p = abs(p) / dot(p, p) - formuparam; // the magic formula
+            a += abs(length(p) - pa); // absolute sum of average change
+            pa = length(p);
+        }
+        float dm = max(0., darkmatter - a*a*.001); //dark matter
+        a *= a*a; // add contrast
+        if (r > 6) fade *= 1. - dm; // dark matter, don't render near
+                                  //v+=vec3(dm,dm*.5,0.);
+        v += fade;
+        v += vec3(s, s*s, s*s*s*s)*a*brightness*fade; // coloring based on distance
+        fade *= distfading; // distance fading
+        s += stepsize;
+    }
+    v = mix(vec3(length(v)), v, saturation); //color adjust
+    gl_FragColor = vec4(v*.01, 1.);
+}
+
+)ShaderCode";
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_PROCEDURAL_TEXTURES_LIBRARY_STARFIELD_STARFIELD_PROCEDURAL_TEXTURE_FRAGMENT_FX_H
