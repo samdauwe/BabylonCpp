@@ -22,7 +22,6 @@ void SamplesIndex::fillSamplesFailures() const
   _samplesFailures = {
     {"BlurModeForMirrorsScene", {SampleFailureReasonKind::empty3d}},
     {"CircleCurvesFromBeziersScene", {SampleFailureReasonKind::empty3d, "Rendering empty with 50% chance"}},
-    {"EdgesRendererScene", {SampleFailureReasonKind::segFault}},
     {"EnvironmentTextureScene", {SampleFailureReasonKind::empty3d}},
     {"FurMaterialScene", {SampleFailureReasonKind::segFault}},
     {"InnerMeshPointsScene", {SampleFailureReasonKind::segFault}},

@@ -336,7 +336,7 @@ void RenderingGroup::dispatch(SubMesh* subMesh, AbstractMesh* mesh,
   mesh->_renderingGroup = this;
 
   if (mesh->_edgesRenderer != nullptr && mesh->_edgesRenderer->isEnabled) {
-    _edgesRenderers.emplace_back(mesh->_edgesRenderer.get());
+    _edgesRenderers.push_back(mesh->_edgesRenderer);
   }
 }
 
