@@ -66,8 +66,6 @@ before_build:
   - git submodule update --init --recursive
   - git branch
   - git log -1
-  - dir src\Samples\src\samples\Cameras
-  - dir src\Samples\src\samples\loaders\gltf\simplemodels
 
 build_script:
   - python cmake_build.py all
