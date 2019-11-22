@@ -63,6 +63,7 @@ before_build:
   - IF DEFINED APPVEYOR_PULL_REQUEST_TITLE echo "Building PR %APPVEYOR_PULL_REQUEST_TITLE%"
   - IF NOT DEFINED APPVEYOR_PULL_REQUEST_HEAD_COMMIT git checkout %APPVEYOR_REPO_BRANCH%
   - REM End of boring hacks
+  - git submodule update --init --recursive
   - git branch
   - git log -1
   - dir src\Samples\src\samples\Cameras
