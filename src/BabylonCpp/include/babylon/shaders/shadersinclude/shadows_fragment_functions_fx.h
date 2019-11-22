@@ -326,7 +326,8 @@ const char* shadowsFragmentFunctions
             shadow = mix(darkness, 1., shadow);
             return computeFallOff(shadow, clipSpace.xy, frustumEdgeFalloff);
         }
-
+)ShaderCode"
+R"ShaderCode(
         const vec3 PoissonSamplers32[64] = vec3[64](
             vec3(0.06407013, 0.05409927, 0.),
             vec3(0.7366577, 0.5789394, 0.),

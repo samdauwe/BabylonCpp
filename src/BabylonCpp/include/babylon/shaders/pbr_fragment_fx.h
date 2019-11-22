@@ -406,7 +406,8 @@ void main(void) {
         #ifdef SS_GAMMAREFRACTION
             environmentRefraction.rgb = toLinearSpace(environmentRefraction.rgb);
         #endif
-
+)ShaderCode"
+R"ShaderCode(
         // _____________________________ Levels _____________________________________
         environmentRefraction.rgb *= vRefractionInfos.x;
     #endif
@@ -506,10 +507,6 @@ void main(void) {
 
                 #ifdef REFLECTIONMAP_OPPOSITEZ
                     irradianceVector.z *= -1.0;
-
-)ShaderCode"
-R"ShaderCode(
-
                 #endif
 
                 environmentIrradiance = computeEnvironmentIrradiance(irradianceVector);
@@ -741,7 +738,8 @@ R"ShaderCode(
                     );
                 }
             #endif
-
+)ShaderCode"
+R"ShaderCode(
             #ifdef RGBDREFLECTION
                 environmentClearCoatRadiance.rgb = fromRGBD(environmentClearCoatRadiance);
             #endif
