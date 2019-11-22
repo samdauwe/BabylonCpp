@@ -43,9 +43,9 @@ void ColorGradient2D::calculate()
   if (_colorStops.size() < 4) {
     return;
   }
-
+  _gradient.resize(_resolution);
   for (unsigned int y = 0; y < _resolution; ++y) {
-    _gradient[y].clear();
+    _gradient[y].resize(_resolution);
     for (unsigned int x = 0; x < _resolution; ++x) {
       float u = x / _resolution;
       float v = y / _resolution;

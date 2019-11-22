@@ -123,6 +123,7 @@ void SimplePlanet::render()
     }
 
     auto _relativeZeroIndex = static_cast<uint32_t>(relativeZeroIndex);
+    _planet.faceToTile.resize(positions.size());
     for (uint32_t i = _relativeZeroIndex; i < (positions.size() / 3) - 2; ++i) {
       _planet.faceToTile[indices.size() / 3] = static_cast<uint32_t>(n);
       indices.emplace_back(_relativeZeroIndex);
@@ -131,25 +132,27 @@ void SimplePlanet::render()
     }
 
     // Fix Zipper for Legitimate Diffuse Texture
-    for (size_t i = relativeZeroIndex; i < (uvs.size() / 2) - 2; ++i) {
-      size_t i1 = relativeZeroIndex * 2;
-      size_t i2 = (i + 1) * 2;
-      size_t i3 = (i + 2) * 2;
+    if ((uvs.size() / 2) > 2) {
+      for (size_t i = relativeZeroIndex; i < (uvs.size() / 2) - 2; ++i) {
+        size_t i1 = relativeZeroIndex * 2;
+        size_t i2 = (i + 1) * 2;
+        size_t i3 = (i + 2) * 2;
 
-      Vector3 A(uvs[i1], uvs[i1 + 1], 0);
-      Vector3 BA = Vector3(uvs[i2], uvs[i2 + 1], 0).subtract(A);
-      Vector3 CA = Vector3(uvs[i3], uvs[i3 + 1], 0).subtract(A);
+        Vector3 A(uvs[i1], uvs[i1 + 1], 0);
+        Vector3 BA = Vector3(uvs[i2], uvs[i2 + 1], 0).subtract(A);
+        Vector3 CA = Vector3(uvs[i3], uvs[i3 + 1], 0).subtract(A);
 
-      Vector3 cross = Vector3::Cross(BA, CA);
-      if (cross.z < 0.f) {
-        if (uvs[i1] < 0.25f) {
-          uvs[i1] += 1;
-        }
-        if (uvs[i2] < 0.25f) {
-          uvs[i2] += 1;
-        }
-        if (uvs[i3] < 0.25f) {
-          uvs[i3] += 1;
+        Vector3 cross = Vector3::Cross(BA, CA);
+        if (cross.z < 0.f) {
+          if (uvs[i1] < 0.25f) {
+            uvs[i1] += 1;
+          }
+          if (uvs[i2] < 0.25f) {
+            uvs[i2] += 1;
+          }
+          if (uvs[i3] < 0.25f) {
+            uvs[i3] += 1;
+          }
         }
       }
     }

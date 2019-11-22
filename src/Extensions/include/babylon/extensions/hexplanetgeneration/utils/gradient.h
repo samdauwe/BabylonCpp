@@ -49,6 +49,8 @@ public:
       auto totalSteps
         = std::ceil((nextStop.first - currentStop.first) * _resolution);
       auto step = (nextStop.second - currentStop.second) / (totalSteps - 1);
+      
+      _gradient.resize(static_cast<size_t>(totalSteps + std::ceil(currentStop.first * _resolution)));
 
       for (size_t i = 0; i < totalSteps; ++i) {
         auto gradIdx
