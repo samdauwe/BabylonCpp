@@ -23,7 +23,7 @@ void SamplesIndex::fillSamplesFailures() const
     {"BlurModeForMirrorsScene", {SampleFailureReasonKind::empty3d}},
     {"CircleCurvesFromBeziersScene", {SampleFailureReasonKind::empty3d, "Rendering empty with 50% chance"}},
     {"EnvironmentTextureScene", {SampleFailureReasonKind::empty3d}},
-    {"FurMaterialScene", {SampleFailureReasonKind::segFault}},
+    {"FurMaterialScene", {SampleFailureReasonKind::broken3d, "Black fur!"}},
     {"InnerMeshPointsScene", {SampleFailureReasonKind::broken3d, "Low FPS! Less than 1"}},
     {"IsPointInsideMeshScene", {SampleFailureReasonKind::processHung, "infinite loop inside Mesh::pointIsInside"}},
     {"LevelOfDetailScene", {SampleFailureReasonKind::segFault, "Low FPS / Segfault when dragging the mouse"}},
