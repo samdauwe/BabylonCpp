@@ -6,10 +6,10 @@
 version: 3.3.{build}
 
 # Branches to build
-branches:
-  # whitelist
-  only:
-    - master
+# branches:
+#   # whitelist
+#   only:
+#     - master
 
 #---------------------------------#
 #    Environment configuration    #
@@ -78,4 +78,3 @@ notifications:
   on_build_success: false
   on_build_failure: true
   on_build_status_changed: true
-  
