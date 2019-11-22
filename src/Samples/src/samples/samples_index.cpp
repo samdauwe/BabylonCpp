@@ -26,14 +26,14 @@ void SamplesIndex::fillSamplesFailures() const
     {"FurMaterialScene", {SampleFailureReasonKind::broken3d, "Black fur!"}},
     {"InnerMeshPointsScene", {SampleFailureReasonKind::broken3d, "Low FPS! Less than 1"}},
     {"IsPointInsideMeshScene", {SampleFailureReasonKind::processHung, "infinite loop inside Mesh::pointIsInside"}},
-    {"LinesMeshSpiralScene", {SampleFailureReasonKind::empty3d}},
+    {"LinesMeshSpiralScene", {SampleFailureReasonKind::empty3d, "Rendering empty with 50% chance"}},
     {"LorenzAttractorScene", {SampleFailureReasonKind::empty3d, "Rendering empty with 50% chance"}},
     {"MultiSampleRenderTargetsScene", {SampleFailureReasonKind::empty3d}},
     {"PointsCloudScene", {SampleFailureReasonKind::empty3d}},
     {"ProceduralHexPlanetGenerationScene", {SampleFailureReasonKind::broken3d, "Very small planet..."}},
     {"SimpleSkinScene", {SampleFailureReasonKind::empty3d}},
     {"ShaderMaterialWarpSpeedScene", {SampleFailureReasonKind::empty3d}},
-    {"VolumetricLightScatteringScene", {SampleFailureReasonKind::segFault}}
+    {"VolumetricLightScatteringScene", {SampleFailureReasonKind::broken3d, "No scatter / 3d emtpy after dragging"}}
   };
 
   done = true;
