@@ -48,7 +48,7 @@ install:
 # Perform git clone with submodules
 clone_script:
 - cmd: >-
-    git clone --recursive -q --branch=%APPVEYOR_REPO_BRANCH% https://github.com/%APPVEYOR_REPO_NAME%.git %APPVEYOR_BUILD_FOLDER%
+    git clone --recursive -q https://github.com/%APPVEYOR_REPO_NAME%.git %APPVEYOR_BUILD_FOLDER%
 
 #---------------------------------#
 #       Build configuration       #
@@ -57,10 +57,9 @@ clone_script:
 before_build:
   - cd C:\projects\babyloncpp
   - git clean -fx
-  - git log -1
-  - echo "APPVEYOR_REPO_BRANCH is"
-  - echo %APPVEYOR_REPO_BRANCH%
+  - git checkout %APPVEYOR_REPO_COMMIT%
   - git branch
+  - git log -1
   - dir src\Samples\src\samples\Cameras
   - dir src\Samples\src\samples\loaders\gltf\simplemodels
 
