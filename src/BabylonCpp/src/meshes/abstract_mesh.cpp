@@ -999,7 +999,7 @@ Float32Array AbstractMesh::_getPositionData(bool applySkeleton)
         auto weight = 0.f;
         for (inf = 0; inf < 4; inf++) {
           weight = matricesWeightsData[matWeightIdx + inf];
-          if (weight > 0.f) {
+          if ((weight > 0.f) && (matWeightIdx + inf < matricesIndicesData.size())){
             Matrix::FromFloat32ArrayToRefScaled(
               skeletonMatrices,
               static_cast<unsigned int>(std::floor(matricesIndicesData[matWeightIdx + inf] * 16)),
@@ -1010,7 +1010,7 @@ Float32Array AbstractMesh::_getPositionData(bool applySkeleton)
         if (needExtras) {
           for (inf = 0; inf < 4; ++inf) {
             weight = matricesWeightsExtraData[matWeightIdx + inf];
-            if (weight > 0.f) {
+            if ((weight > 0.f) && (matWeightIdx + inf < matricesIndicesData.size())) {
               Matrix::FromFloat32ArrayToRefScaled(
                 skeletonMatrices,
                 static_cast<unsigned int>(

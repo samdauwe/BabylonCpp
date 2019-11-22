@@ -6,10 +6,10 @@
 version: 3.3.{build}
 
 # Branches to build
-branches:
-  # whitelist
-  only:
-    - master
+# branches:
+#   # whitelist
+#   only:
+#     - master
 
 #---------------------------------#
 #    Environment configuration    #
@@ -48,7 +48,7 @@ install:
 # Perform git clone with submodules
 clone_script:
 - cmd: >-
-    git clone --recursive -q --branch=%APPVEYOR_REPO_BRANCH% https://github.com/%APPVEYOR_REPO_NAME%.git %APPVEYOR_BUILD_FOLDER%
+    git clone --recursive -q https://github.com/%APPVEYOR_REPO_NAME%.git %APPVEYOR_BUILD_FOLDER%
 
 #---------------------------------#
 #       Build configuration       #
@@ -57,12 +57,15 @@ clone_script:
 before_build:
   - cd C:\projects\babyloncpp
   - git clean -fx
-  - git log -1
-  - echo "APPVEYOR_REPO_BRANCH is"
-  - echo %APPVEYOR_REPO_BRANCH%
+  - REM Boring hacks in order to get AppVeyor to build PR branches
+  - IF DEFINED APPVEYOR_PULL_REQUEST_HEAD_REPO_NAME git remote add pr https://github.com/%APPVEYOR_PULL_REQUEST_HEAD_REPO_NAME%.git & git fetch pr
+  - IF DEFINED APPVEYOR_PULL_REQUEST_HEAD_COMMIT git checkout %APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH%
+  - IF DEFINED APPVEYOR_PULL_REQUEST_TITLE echo "Building PR %APPVEYOR_PULL_REQUEST_TITLE%"
+  - IF NOT DEFINED APPVEYOR_PULL_REQUEST_HEAD_COMMIT git checkout %APPVEYOR_REPO_BRANCH%
+  - REM End of boring hacks
+  - git submodule update --init --recursive
   - git branch
-  - dir src\Samples\src\samples\Cameras
-  - dir src\Samples\src\samples\loaders\gltf\simplemodels
+  - git log -1
 
 build_script:
   - python cmake_build.py all
@@ -78,4 +81,3 @@ notifications:
   on_build_success: false
   on_build_failure: true
   on_build_status_changed: true
-  

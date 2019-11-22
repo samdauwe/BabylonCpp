@@ -22,22 +22,18 @@ void SamplesIndex::fillSamplesFailures() const
   _samplesFailures = {
     {"BlurModeForMirrorsScene", {SampleFailureReasonKind::empty3d}},
     {"CircleCurvesFromBeziersScene", {SampleFailureReasonKind::empty3d, "Rendering empty with 50% chance"}},
-    {"EdgesRendererScene", {SampleFailureReasonKind::segFault}},
     {"EnvironmentTextureScene", {SampleFailureReasonKind::empty3d}},
-    {"FurMaterialScene", {SampleFailureReasonKind::segFault}},
-    {"InnerMeshPointsScene", {SampleFailureReasonKind::segFault}},
-    {"IsPointInsideMeshScene", {SampleFailureReasonKind::processHung}},
-    {"LevelOfDetailScene", {SampleFailureReasonKind::segFault, "Low FPS / Segfault when dragging the mouse"}},
-    {"LinesMeshSpiralScene", {SampleFailureReasonKind::empty3d}},
+    {"FurMaterialScene", {SampleFailureReasonKind::broken3d, "Black fur!"}},
+    {"InnerMeshPointsScene", {SampleFailureReasonKind::broken3d, "Low FPS! Less than 1"}},
+    {"IsPointInsideMeshScene", {SampleFailureReasonKind::processHung, "infinite loop inside Mesh::pointIsInside"}},
+    {"LinesMeshSpiralScene", {SampleFailureReasonKind::empty3d, "Rendering empty with 50% chance"}},
     {"LorenzAttractorScene", {SampleFailureReasonKind::empty3d, "Rendering empty with 50% chance"}},
-    {"MergedMeshesScene", {SampleFailureReasonKind::segFault}},
-    {"MotionBlurPostProcessScene", {SampleFailureReasonKind::empty3d}},
     {"MultiSampleRenderTargetsScene", {SampleFailureReasonKind::empty3d}},
     {"PointsCloudScene", {SampleFailureReasonKind::empty3d}},
-    {"ProceduralHexPlanetGenerationScene", {SampleFailureReasonKind::segFault}},
-    {"SimpleSkinScene", {SampleFailureReasonKind::segFault}},
+    {"ProceduralHexPlanetGenerationScene", {SampleFailureReasonKind::broken3d, "Very small planet..."}},
+    {"SimpleSkinScene", {SampleFailureReasonKind::empty3d}},
     {"ShaderMaterialWarpSpeedScene", {SampleFailureReasonKind::empty3d}},
-    {"VolumetricLightScatteringScene", {SampleFailureReasonKind::segFault}}
+    {"VolumetricLightScatteringScene", {SampleFailureReasonKind::broken3d, "No scatter / 3d emtpy after dragging"}}
   };
 
   done = true;
