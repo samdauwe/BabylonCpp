@@ -24,7 +24,7 @@ void SamplesIndex::fillSamplesFailures() const
     {"CircleCurvesFromBeziersScene", {SampleFailureReasonKind::empty3d, "Rendering empty with 50% chance"}},
     {"EnvironmentTextureScene", {SampleFailureReasonKind::empty3d}},
     {"FurMaterialScene", {SampleFailureReasonKind::segFault}},
-    {"InnerMeshPointsScene", {SampleFailureReasonKind::segFault}},
+    {"InnerMeshPointsScene", {SampleFailureReasonKind::broken3d, "Low FPS! Less than 1"}},
     {"IsPointInsideMeshScene", {SampleFailureReasonKind::processHung}},
     {"LevelOfDetailScene", {SampleFailureReasonKind::segFault, "Low FPS / Segfault when dragging the mouse"}},
     {"LinesMeshSpiralScene", {SampleFailureReasonKind::empty3d}},
