@@ -93,18 +93,23 @@ def processShaderFile(shaderPath, outputDir, definePath="BABYLON_SHADERS",
     output += "extern const char* %s;%s%s" % (varName, eol, eol)
     output += "const char* %s%s  = " % (varName, eol)
     output += "R\"ShaderCode(%s%s" % (eol, eol)
+    nb_shader_code_lines = 1
     # process first line
     if lines[0] == "precision highp float;":
         output += "%s%s" % ("#ifdef GL_ES", eol)
         output += "  %s%s" % (lines[0], eol)
         output += "%s%s" % ("#endif", eol)
+        nb_shader_code_lines += 3
     elif lines[0] == "#version 300 es":
         output += "%s%s" % ("BABYLONCPP_GLSL_VERSION_3", eol)
+        nb_shader_code_lines += 1
     else:
         if len(lines) > 1:
             output += "%s%s" % (lines[0], eol)
+            nb_shader_code_lines += 1
         else:
             output += "%s%s%s" % (lines[0], eol, eol)
+            nb_shader_code_lines += 2
     # process remainder of the shader file
     if len(lines) > 1:
         for i in range(1, len(lines)-1):
@@ -112,8 +117,14 @@ def processShaderFile(shaderPath, outputDir, definePath="BABYLON_SHADERS",
                 output += "%s%s" % ("#ifdef GL_ES", eol)
                 output += "  %s%s" % (lines[i], eol)
                 output += "%s%s" % ("#endif", eol)
+                nb_shader_code_lines += 3
             else:
                 output += "%s%s" % (lines[i].replace("\t", " " * 4).rstrip(), eol)
+                nb_shader_code_lines += 1
+            if nb_shader_code_lines % 499 == 0:
+                output += "%s)ShaderCode\"%s" % (eol, eol)
+                output += "R\"ShaderCode(%s%s" % (eol, eol)
+                nb_shader_code_lines = 1
         output += "%s%s%s" % (lines[-1], eol, eol)
     output += ")ShaderCode\";%s" % eol
     output += "} // end of namespace BABYLON%s%s" % (eol, eol)
