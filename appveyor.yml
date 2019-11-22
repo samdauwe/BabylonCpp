@@ -57,7 +57,6 @@ clone_script:
 before_build:
   - cd C:\projects\babyloncpp
   - git clean -fx
-  - git checkout %APPVEYOR_REPO_COMMIT%
   - git branch
   - git log -1
   - dir src\Samples\src\samples\Cameras
