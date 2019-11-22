@@ -154,6 +154,8 @@ private:
       {
         if (ImGui::MenuItem("Quit"))
           shallExit = true;
+        if (ImGui::MenuItem("Save Screenshot"))
+          saveScreenshot();
         ImGui::EndMenu();
       }
       _studioLayout.renderMenu();
@@ -198,7 +200,7 @@ private:
     handleLoopSamples();
 
     if (_appContext._options._flagScreenshotOneSampleAndExit)
-      return saveScreenshot();
+      return saveScreenshotAfterFewFrames();
     else
       return shallExit;
   }
@@ -214,16 +216,23 @@ private:
       _appContext._inspector->setScene(_appContext._sceneWidget->getScene());
   }
 
+  void saveScreenshot(std::string filename = "")
+  {
+    if (filename.empty())
+      filename = std::string(_appContext._sceneWidget->getRenderableScene()->getName()) + ".jpg";
+    int imageWidth = 200;
+    int jpgQuality = 75;
+    this->_appContext._sceneWidget->getCanvas()->saveScreenshotJpg(
+      filename.c_str(), jpgQuality, imageWidth);
+  }
+
   // Saves a screenshot after  few frames (returns true when done)
-  bool saveScreenshot()
+  [[nodiscard]] bool saveScreenshotAfterFewFrames()
   {
     _appContext._frameCounter++;
     if (_appContext._frameCounter < 30)
       return false;
-    int imageWidth = 200;
-    int jpgQuality = 75;
-    this->_appContext._sceneWidget->getCanvas()->saveScreenshotJpg(
-      (_appContext._options._sceneName + ".jpg").c_str(), jpgQuality, imageWidth);
+    saveScreenshot(_appContext._options._sceneName + ".jpg");
     return true;
   }
 
