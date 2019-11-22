@@ -28,7 +28,6 @@ void SamplesIndex::fillSamplesFailures() const
     {"IsPointInsideMeshScene", {SampleFailureReasonKind::processHung, "infinite loop inside Mesh::pointIsInside"}},
     {"LinesMeshSpiralScene", {SampleFailureReasonKind::empty3d}},
     {"LorenzAttractorScene", {SampleFailureReasonKind::empty3d, "Rendering empty with 50% chance"}},
-    {"MotionBlurPostProcessScene", {SampleFailureReasonKind::empty3d}},
     {"MultiSampleRenderTargetsScene", {SampleFailureReasonKind::empty3d}},
     {"PointsCloudScene", {SampleFailureReasonKind::empty3d}},
     {"ProceduralHexPlanetGenerationScene", {SampleFailureReasonKind::broken3d, "Very small planet..."}},

@@ -48,7 +48,7 @@ MotionBlurPostProcess::MotionBlurPostProcess(const std::string& iName, Scene* sc
     // Geometry buffer renderer is supported.
     _geometryBufferRenderer->enableVelocity = true;
 
-    onApply = [this, &scene](Effect* effect, EventState & /*es*/) -> void {
+    onApply = [this, scene](Effect* effect, EventState & /*es*/) -> void {
       effect->setVector2("screenSize",
                          Vector2(static_cast<float>(width), static_cast<float>(height)));
 
