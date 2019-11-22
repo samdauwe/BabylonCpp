@@ -29,7 +29,6 @@ void SamplesIndex::fillSamplesFailures() const
     {"LevelOfDetailScene", {SampleFailureReasonKind::segFault, "Low FPS / Segfault when dragging the mouse"}},
     {"LinesMeshSpiralScene", {SampleFailureReasonKind::empty3d}},
     {"LorenzAttractorScene", {SampleFailureReasonKind::empty3d, "Rendering empty with 50% chance"}},
-    {"MergedMeshesScene", {SampleFailureReasonKind::segFault}},
     {"MotionBlurPostProcessScene", {SampleFailureReasonKind::empty3d}},
     {"MultiSampleRenderTargetsScene", {SampleFailureReasonKind::empty3d}},
     {"PointsCloudScene", {SampleFailureReasonKind::empty3d}},
