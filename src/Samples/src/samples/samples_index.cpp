@@ -35,7 +35,7 @@ void SamplesIndex::fillSamplesFailures() const
     {"MultiSampleRenderTargetsScene", {SampleFailureReasonKind::empty3d}},
     {"PointsCloudScene", {SampleFailureReasonKind::empty3d}},
     {"ProceduralHexPlanetGenerationScene", {SampleFailureReasonKind::broken3d, "Very small planet..."}},
-    {"SimpleSkinScene", {SampleFailureReasonKind::segFault}},
+    {"SimpleSkinScene", {SampleFailureReasonKind::empty3d}},
     {"ShaderMaterialWarpSpeedScene", {SampleFailureReasonKind::empty3d}},
     {"VolumetricLightScatteringScene", {SampleFailureReasonKind::segFault}}
   };
