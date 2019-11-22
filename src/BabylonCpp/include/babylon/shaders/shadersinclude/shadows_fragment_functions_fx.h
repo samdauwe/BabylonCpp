@@ -506,6 +506,10 @@ const char* shadowsFragmentFunctions
             float shadow = 0.;
             for (int i = 0; i < pcfTapCount; i++) {
                 vec3 offset = poissonSamplers[i];
+
+)ShaderCode"
+R"ShaderCode(
+
                 // Rotated offset.
                 offset = vec3(offset.x * rotationVector.x - offset.y * rotationVector.y, offset.y * rotationVector.x + offset.x * rotationVector.y, 0.);
                 shadow += texture2D(shadowSampler, uvDepth + offset * filterRadius);

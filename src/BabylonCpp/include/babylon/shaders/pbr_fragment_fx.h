@@ -506,6 +506,10 @@ void main(void) {
 
                 #ifdef REFLECTIONMAP_OPPOSITEZ
                     irradianceVector.z *= -1.0;
+
+)ShaderCode"
+R"ShaderCode(
+
                 #endif
 
                 environmentIrradiance = computeEnvironmentIrradiance(irradianceVector);
@@ -1004,6 +1008,10 @@ void main(void) {
     // Apply Energy Conservation.
     #ifndef METALLICWORKFLOW
         surfaceAlbedo.rgb = (1. - reflectance) * surfaceAlbedo.rgb;
+
+)ShaderCode"
+R"ShaderCode(
+
     #endif
 
     // _____________________________ Irradiance ______________________________________
