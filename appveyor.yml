@@ -57,9 +57,12 @@ clone_script:
 before_build:
   - cd C:\projects\babyloncpp
   - git clean -fx
+  - REM Boring hacks in order to get AppVeyor to build PR branches
   - IF DEFINED APPVEYOR_PULL_REQUEST_HEAD_REPO_NAME git remote add pr https://github.com/%APPVEYOR_PULL_REQUEST_HEAD_REPO_NAME%.git & git fetch pr
   - IF DEFINED APPVEYOR_PULL_REQUEST_HEAD_COMMIT git checkout %APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH%
   - IF DEFINED APPVEYOR_PULL_REQUEST_TITLE echo "Building PR %APPVEYOR_PULL_REQUEST_TITLE%"
+  - IF NOT DEFINED APPVEYOR_PULL_REQUEST_HEAD_COMMIT git checkout %APPVEYOR_REPO_BRANCH%
+  - REM End of boring hacks
   - git branch
   - git log -1
   - dir src\Samples\src\samples\Cameras
