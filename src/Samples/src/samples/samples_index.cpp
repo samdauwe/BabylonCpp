@@ -31,7 +31,6 @@ void SamplesIndex::fillSamplesFailures() const
     {"MultiSampleRenderTargetsScene", {SampleFailureReasonKind::empty3d}},
     {"PointsCloudScene", {SampleFailureReasonKind::empty3d}},
     {"SimpleSkinScene", {SampleFailureReasonKind::empty3d}},
-    {"ShaderMaterialWarpSpeedScene", {SampleFailureReasonKind::empty3d}},
     {"VolumetricLightScatteringScene", {SampleFailureReasonKind::broken3d, "No scatter / 3d emtpy after dragging"}}
   };
 

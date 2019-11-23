@@ -19,7 +19,7 @@ class ShaderMaterialWarpSpeedScene : public IRenderableScene {
 
 public:
   /** Vertex Shader **/
-  static constexpr const char* customVertexShader
+  static constexpr const char* customVertexShader //
     = R"ShaderCode(
 #ifdef GL_ES
 precision highp float;
@@ -39,15 +39,17 @@ varying vec3 vNormal;
 
 void main() {
   vec4 p = vec4(position, 1.);
+
   vPosition = p;
   vNormal = normal;
+
   gl_Position = worldViewProjection * p;
 }
 )ShaderCode";
 
   /** Pixel (Fragment) Shader **/
   // Interstellar ( https://www.shadertoy.com/view/Xdl3D2 )
-  static constexpr const char* customFragmentShader
+  static constexpr const char* customFragmentShader //
     = R"ShaderCode(
 #ifdef GL_ES
 precision highp float;
@@ -74,9 +76,7 @@ vec3 ToLinear(in vec3 col) {
 }
 
 vec3 ToGamma(in vec3 col) {
-  // Convert back into colour values, so the correct light will come 
-out of the
-  // monitor
+  // Convert back into colour values, so the correct light will come out of the monitor
   return pow(col, vec3(1.0 / GAMMA));
 }
 
@@ -149,11 +149,11 @@ public:
   void initializeScene(ICanvas* canvas, Scene* scene) override
   {
     // Create a camera
-    auto camera = ArcRotateCamera::New("Camera", 0.f, Math::PI_2, 12.f, Vector3::Zero(), scene);
+    auto camera
+      = ArcRotateCamera::New("Camera", Math::PI_2, Math::PI_2, 12.f, Vector3::Zero(), scene);
     camera->attachControl(canvas, false);
     camera->lowerRadiusLimit = 1.f;
     camera->minZ             = 1.f;
-    camera->setPosition(Vector3(-10.f, 0.f, -0.5f));
 
     // Create shader material
     IShaderMaterialOptions shaderMaterialOptions;
@@ -183,7 +183,7 @@ public:
     scene->onAfterCameraRenderObservable.add([this](Camera*, EventState&) {
       _shaderMaterial->setFloat("time", _time);
       _time += 0.02f;
-      _shaderMaterial->setVector3("cameraPosition", _scene->activeCamera()->position);
+      _shaderMaterial->setVector3("cameraPosition", _scene->activeCamera()->position());
     });
   }
 
