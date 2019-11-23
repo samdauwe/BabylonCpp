@@ -83,7 +83,8 @@ struct BABYLON_SHARED_EXPORT IInternalTextureLoader {
    */
   virtual void loadCubeData(
     const std::variant<std::string, ArrayBuffer>& img, const InternalTexturePtr& texture,
-    bool createPolynomials, const std::function<void(const CubeTextureData& data)>& onLoad,
+    bool createPolynomials,
+    const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
     const std::function<void(const std::string& message, const std::string& exception)>& onError)
     = 0;
 
@@ -99,7 +100,7 @@ struct BABYLON_SHARED_EXPORT IInternalTextureLoader {
   virtual void loadCubeData(
     const std::vector<std::variant<std::string, ArrayBuffer>>& imgs,
     const InternalTexturePtr& texture, bool createPolynomials,
-    const std::function<void(const CubeTextureData& datas)>& onLoad,
+    const std::function<void(const std::optional<CubeTextureData>& datas)>& onLoad,
     const std::function<void(const std::string& message, const std::string& exception)>& onError)
     = 0;
 

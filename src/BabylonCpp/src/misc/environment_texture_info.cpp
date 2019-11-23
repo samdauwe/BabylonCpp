@@ -10,32 +10,31 @@ EnvironmentTextureInfo::EnvironmentTextureInfo()
 }
 
 EnvironmentTextureInfo::EnvironmentTextureInfo(const EnvironmentTextureInfo& other) = default;
-EnvironmentTextureInfo::EnvironmentTextureInfo(EnvironmentTextureInfo&& other) = default;
-EnvironmentTextureInfo& EnvironmentTextureInfo::operator=(const EnvironmentTextureInfo& other) = default;
+EnvironmentTextureInfo::EnvironmentTextureInfo(EnvironmentTextureInfo&& other)      = default;
+EnvironmentTextureInfo& EnvironmentTextureInfo::operator=(const EnvironmentTextureInfo& other)
+  = default;
 EnvironmentTextureInfo& EnvironmentTextureInfo::operator=(EnvironmentTextureInfo&& other) = default;
 
 EnvironmentTextureInfo::~EnvironmentTextureInfo() = default;
 
-EnvironmentTextureInfoPtr
-EnvironmentTextureInfo::Parse(const json& parsedManifest)
+EnvironmentTextureInfoPtr EnvironmentTextureInfo::Parse(const json& parsedManifest)
 {
   EnvironmentTextureInfo manifest;
   manifest.version = json_util::get_number(parsedManifest, "version", 0u);
   manifest.width   = json_util::get_number(parsedManifest, "width", 0);
 
   // Irradiance information
-  if (json_util::has_key(parsedManifest, "irradiance")
+  if (json_util::has_valid_key_value(parsedManifest, "irradiance")
       && parsedManifest["irradiance"].is_object()) {
     auto parsedIrradiance = parsedManifest["irradiance"];
-    manifest.irradiance
-      = EnvironmentTextureIrradianceInfoV1::Parse(parsedIrradiance);
+    manifest.irradiance   = EnvironmentTextureIrradianceInfoV1::Parse(parsedIrradiance);
   }
 
   // Specular information
-  if (json_util::has_key(parsedManifest, "specular")
+  if (json_util::has_valid_key_value(parsedManifest, "specular")
       && parsedManifest["specular"].is_object()) {
     auto parsedSpecular = parsedManifest["specular"];
-    manifest.specular = EnvironmentTextureSpecularInfoV1::Parse(parsedSpecular);
+    manifest.specular   = EnvironmentTextureSpecularInfoV1::Parse(parsedSpecular);
   }
 
   return std::make_shared<EnvironmentTextureInfo>(manifest);

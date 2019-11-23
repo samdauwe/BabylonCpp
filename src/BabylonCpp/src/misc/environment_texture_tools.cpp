@@ -34,7 +34,7 @@ EnvironmentTextureTools::~EnvironmentTextureTools() = default;
 EnvironmentTextureInfoPtr EnvironmentTextureTools::GetEnvInfo(const ArrayBuffer& data)
 {
   const auto& dataView = data;
-  size_t pos           = 0;
+  auto pos             = 0ull;
 
   for (unsigned char magicByte : EnvironmentTextureTools::_MagicBytes) {
     if (dataView[pos++] != magicByte) {
@@ -45,7 +45,7 @@ EnvironmentTextureInfoPtr EnvironmentTextureTools::GetEnvInfo(const ArrayBuffer&
 
   // Read json manifest - collect characters up to null terminator
   std::ostringstream manifestString;
-  char charCode = static_cast<char>(dataView[pos++]);
+  auto charCode = static_cast<char>(dataView[pos++]);
   while (charCode) {
     manifestString << String::fromCharCode(charCode);
     charCode = static_cast<char>(dataView[pos++]);
@@ -59,9 +59,7 @@ EnvironmentTextureInfoPtr EnvironmentTextureTools::GetEnvInfo(const ArrayBuffer&
     manifest->specular->specularDataPosition = pos;
     // Fallback to 0.8 exactly if lodGenerationScale is not defined for backward
     // compatibility.
-    manifest->specular->lodGenerationScale = manifest->specular->lodGenerationScale.has_value() ?
-                                               *manifest->specular->lodGenerationScale :
-                                               0.8f;
+    manifest->specular->lodGenerationScale = manifest->specular->lodGenerationScale.value_or(0.8f);
   }
 
   return manifest;

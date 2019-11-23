@@ -4819,7 +4819,7 @@ void Scene::createDefaultCameraOrLight(bool createArcRotateCamera, bool replace,
 MeshPtr Scene::createDefaultSkybox(BaseTexturePtr iEnvironmentTexture, bool pbr, float scale,
                                    float blur, bool setGlobalEnvTexture)
 {
-  if (!environmentTexture()) {
+  if (!iEnvironmentTexture) {
     BABYLON_LOG_WARN("Scene", "Can not create default skybox without environment texture.")
     return nullptr;
   }
@@ -4835,7 +4835,7 @@ MeshPtr Scene::createDefaultSkybox(BaseTexturePtr iEnvironmentTexture, bool pbr,
   if (pbr) {
     auto hdrSkyboxMaterial               = PBRMaterial::New("skyBox", this);
     hdrSkyboxMaterial->backFaceCulling   = false;
-    hdrSkyboxMaterial->reflectionTexture = environmentTexture();
+    hdrSkyboxMaterial->reflectionTexture = iEnvironmentTexture;
     if (hdrSkyboxMaterial->reflectionTexture()) {
       hdrSkyboxMaterial->reflectionTexture()->coordinatesMode = TextureConstants::SKYBOX_MODE;
     }
@@ -4848,7 +4848,7 @@ MeshPtr Scene::createDefaultSkybox(BaseTexturePtr iEnvironmentTexture, bool pbr,
   else {
     auto skyboxMaterial               = StandardMaterial::New("skyBox", this);
     skyboxMaterial->backFaceCulling   = false;
-    skyboxMaterial->reflectionTexture = environmentTexture();
+    skyboxMaterial->reflectionTexture = iEnvironmentTexture;
     if (skyboxMaterial->reflectionTexture()) {
       skyboxMaterial->reflectionTexture()->coordinatesMode = TextureConstants::SKYBOX_MODE;
     }

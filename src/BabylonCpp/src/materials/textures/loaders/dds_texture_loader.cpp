@@ -18,31 +18,29 @@ bool _DDSTextureLoader::supportCascades() const
 
 bool _DDSTextureLoader::canLoad(const std::string& extension,
                                 const std::string& /*textureFormatInUse*/,
-                                const InternalTexturePtr& /*fallback*/,
-                                bool /*isBase64*/, bool /*isBuffer*/)
+                                const InternalTexturePtr& /*fallback*/, bool /*isBase64*/,
+                                bool /*isBuffer*/)
 {
   return String::startsWith(extension, ".dds");
 }
 
-std::string
-_DDSTextureLoader::transformUrl(const std::string& rootUrl,
-                                const std::string& /*textureFormatInUse*/)
+std::string _DDSTextureLoader::transformUrl(const std::string& rootUrl,
+                                            const std::string& /*textureFormatInUse*/)
 {
   return rootUrl;
 }
 
-std::string _DDSTextureLoader::getFallbackTextureUrl(
-  const std::string& /*rootUrl*/, const std::string& /*textureFormatInUse*/)
+std::string _DDSTextureLoader::getFallbackTextureUrl(const std::string& /*rootUrl*/,
+                                                     const std::string& /*textureFormatInUse*/)
 {
   return "";
 }
 
 void _DDSTextureLoader::loadCubeData(
-  const std::variant<std::string, ArrayBuffer>& img,
-  const InternalTexturePtr& texture, bool createPolynomials,
-  const std::function<void(const CubeTextureData& data)>& onLoad,
-  const std::function<void(const std::string& message,
-                           const std::string& exception)>& /*onError*/)
+  const std::variant<std::string, ArrayBuffer>& img, const InternalTexturePtr& texture,
+  bool createPolynomials,
+  const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
+  const std::function<void(const std::string& message, const std::string& exception)>& /*onError*/)
 {
   auto engine = texture->getEngine();
 
@@ -56,8 +54,8 @@ void _DDSTextureLoader::loadCubeData(
     info.sphericalPolynomial = std::make_shared<SphericalPolynomial>();
   }
 
-  auto loadMipmap = (info.isRGB || info.isLuminance || info.mipmapCount > 1)
-                    && texture->generateMipMaps;
+  auto loadMipmap
+    = (info.isRGB || info.isLuminance || info.mipmapCount > 1) && texture->generateMipMaps;
   engine->_unpackFlipY(info.isCompressed);
 
   DDSTools::UploadDDSLevels(engine, texture, data, info, loadMipmap, 6);
@@ -83,9 +81,8 @@ void _DDSTextureLoader::loadCubeData(
 void _DDSTextureLoader::loadCubeData(
   const std::vector<std::variant<std::string, ArrayBuffer>>& imgs,
   const InternalTexturePtr& texture, bool createPolynomials,
-  const std::function<void(const CubeTextureData& data)>& onLoad,
-  const std::function<void(const std::string& message,
-                           const std::string& exception)>& /*onError*/)
+  const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
+  const std::function<void(const std::string& message, const std::string& exception)>& /*onError*/)
 {
   auto engine = texture->getEngine();
   DDSInfo info;
@@ -101,8 +98,8 @@ void _DDSTextureLoader::loadCubeData(
       info.sphericalPolynomial = std::make_shared<SphericalPolynomial>();
     }
 
-    loadMipmap = (info.isRGB || info.isLuminance || info.mipmapCount > 1)
-                 && texture->generateMipMaps;
+    loadMipmap
+      = (info.isRGB || info.isLuminance || info.mipmapCount > 1) && texture->generateMipMaps;
     engine->_unpackFlipY(info.isCompressed);
 
     DDSTools::UploadDDSLevels(engine, texture, data, info, loadMipmap, 6);
@@ -128,20 +125,17 @@ void _DDSTextureLoader::loadCubeData(
 
 void _DDSTextureLoader::loadData(
   const ArrayBuffer& data, const InternalTexturePtr& texture,
-  const std::function<void(int width, int height, bool loadMipmap,
-                           bool isCompressed, const std::function<void()>& done,
-                           bool loadFailed)>& callback)
+  const std::function<void(int width, int height, bool loadMipmap, bool isCompressed,
+                           const std::function<void()>& done, bool loadFailed)>& callback)
 {
   auto info = DDSTools::GetDDSInfo(data);
 
   auto loadMipmap = (info.isRGB || info.isLuminance || info.mipmapCount > 1)
-                    && texture->generateMipMaps
-                    && ((info.width >> (info.mipmapCount - 1)) == 1);
+                    && texture->generateMipMaps && ((info.width >> (info.mipmapCount - 1)) == 1);
   callback(
     info.width, info.height, loadMipmap, info.isFourCC,
     [&texture, &data, &info, &loadMipmap]() {
-      DDSTools::UploadDDSLevels(texture->getEngine(), texture, data, info,
-                                loadMipmap, 1);
+      DDSTools::UploadDDSLevels(texture->getEngine(), texture, data, info, loadMipmap, 1);
     },
     false);
 }

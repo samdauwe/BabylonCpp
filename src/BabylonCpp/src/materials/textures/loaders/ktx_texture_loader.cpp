@@ -18,44 +18,37 @@ bool _KTXTextureLoader::supportCascades() const
 
 bool _KTXTextureLoader::canLoad(const std::string& /*extension*/,
                                 const std::string& textureFormatInUse,
-                                const InternalTexturePtr& fallback,
-                                bool isBase64, bool isBuffer)
+                                const InternalTexturePtr& fallback, bool isBase64, bool isBuffer)
 {
   return !textureFormatInUse.empty() && !isBase64 && !fallback && !isBuffer;
 }
 
-std::string
-_KTXTextureLoader::transformUrl(const std::string& rootUrl,
-                                const std::string& textureFormatInUse)
+std::string _KTXTextureLoader::transformUrl(const std::string& rootUrl,
+                                            const std::string& textureFormatInUse)
 {
   auto lastDot = String::lastIndexOf(rootUrl, ".");
-  if (lastDot != -1
-      && rootUrl.substr(static_cast<size_t>(lastDot + 1)) == "ktx") {
+  if (lastDot != -1 && rootUrl.substr(static_cast<size_t>(lastDot + 1)) == "ktx") {
     // Already transformed
     return rootUrl;
   }
-  return (lastDot > -1 ? rootUrl.substr(0, static_cast<size_t>(lastDot)) :
-                         rootUrl)
+  return (lastDot > -1 ? rootUrl.substr(0, static_cast<size_t>(lastDot)) : rootUrl)
          + textureFormatInUse;
 }
 
-std::string
-_KTXTextureLoader::getFallbackTextureUrl(const std::string& rootUrl,
-                                         const std::string& textureFormatInUse)
+std::string _KTXTextureLoader::getFallbackTextureUrl(const std::string& rootUrl,
+                                                     const std::string& textureFormatInUse)
 {
   // remove the format appended to the rootUrl in the original createCubeTexture
   // call.
   const std::regex regex(textureFormatInUse, std::regex::optimize);
-  return String::regexReplace(rootUrl, regex,
-                              [](const std::smatch& /*m*/) { return ""; });
+  return String::regexReplace(rootUrl, regex, [](const std::smatch& /*m*/) { return ""; });
 }
 
 void _KTXTextureLoader::loadCubeData(
-  const std::variant<std::string, ArrayBuffer>& iData,
-  const InternalTexturePtr& texture, bool /*createPolynomials*/,
-  const std::function<void(const CubeTextureData& data)>& /*onLoad*/,
-  const std::function<void(const std::string& message,
-                           const std::string& exception)>& /*onError*/)
+  const std::variant<std::string, ArrayBuffer>& iData, const InternalTexturePtr& texture,
+  bool /*createPolynomials*/,
+  const std::function<void(const std::optional<CubeTextureData>& data)>& /*onLoad*/,
+  const std::function<void(const std::string& message, const std::string& exception)>& /*onError*/)
 {
   if (!std::holds_alternative<ArrayBuffer>(iData)) {
     return;
@@ -84,17 +77,15 @@ void _KTXTextureLoader::loadCubeData(
 void _KTXTextureLoader::loadCubeData(
   const std::vector<std::variant<std::string, ArrayBuffer>>& /*data*/,
   const InternalTexturePtr& /*texture*/, bool /*createPolynomials*/,
-  const std::function<void(const CubeTextureData& data)>& /*onLoad*/,
-  const std::function<void(const std::string& message,
-                           const std::string& exception)>& /*onError*/)
+  const std::function<void(const std::optional<CubeTextureData>& data)>& /*onLoad*/,
+  const std::function<void(const std::string& message, const std::string& exception)>& /*onError*/)
 {
 }
 
 void _KTXTextureLoader::loadData(
   const ArrayBuffer& data, const InternalTexturePtr& texture,
-  const std::function<void(int width, int height, bool loadMipmap,
-                           bool isCompressed, const std::function<void()>& done,
-                           bool loadFailed)>& callback)
+  const std::function<void(int width, int height, bool loadMipmap, bool isCompressed,
+                           const std::function<void()>& done, bool loadFailed)>& callback)
 {
   // Need to invert vScale as invertY via UNPACK_FLIP_Y_WEBGL is not supported
   // by compressed texture
@@ -102,11 +93,8 @@ void _KTXTextureLoader::loadData(
   KhronosTextureContainer ktx(data, 1);
 
   callback(
-    static_cast<int>(ktx.pixelWidth), static_cast<int>(ktx.pixelHeight), false,
-    true,
-    [&ktx, &texture]() -> void {
-      ktx.uploadLevels(texture, texture->generateMipMaps);
-    },
+    static_cast<int>(ktx.pixelWidth), static_cast<int>(ktx.pixelHeight), false, true,
+    [&ktx, &texture]() -> void { ktx.uploadLevels(texture, texture->generateMipMaps); },
     ktx.isInvalid);
 }
 

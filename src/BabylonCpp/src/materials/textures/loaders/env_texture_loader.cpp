@@ -19,31 +19,29 @@ bool _ENVTextureLoader::supportCascades() const
 
 bool _ENVTextureLoader::canLoad(const std::string& extension,
                                 const std::string& /*textureFormatInUse*/,
-                                const InternalTexturePtr& /*fallback*/,
-                                bool /*isBase64*/, bool /*isBuffer*/)
+                                const InternalTexturePtr& /*fallback*/, bool /*isBase64*/,
+                                bool /*isBuffer*/)
 {
   return String::startsWith(extension, ".env");
 }
 
-std::string
-_ENVTextureLoader::transformUrl(const std::string& rootUrl,
-                                const std::string& /*textureFormatInUse*/)
+std::string _ENVTextureLoader::transformUrl(const std::string& rootUrl,
+                                            const std::string& /*textureFormatInUse*/)
 {
   return rootUrl;
 }
 
-std::string _ENVTextureLoader::getFallbackTextureUrl(
-  const std::string& /*rootUrl*/, const std::string& /*textureFormatInUse*/)
+std::string _ENVTextureLoader::getFallbackTextureUrl(const std::string& /*rootUrl*/,
+                                                     const std::string& /*textureFormatInUse*/)
 {
   return "";
 }
 
 void _ENVTextureLoader::loadCubeData(
-  const std::variant<std::string, ArrayBuffer>& iData,
-  const InternalTexturePtr& texture, bool /*createPolynomials*/,
-  const std::function<void(const CubeTextureData& data)>& onLoad,
-  const std::function<void(const std::string& message,
-                           const std::string& exception)>& onError)
+  const std::variant<std::string, ArrayBuffer>& iData, const InternalTexturePtr& texture,
+  bool /*createPolynomials*/,
+  const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
+  const std::function<void(const std::string& message, const std::string& exception)>& onError)
 {
   if (!std::holds_alternative<ArrayBuffer>(iData)) {
     return;
@@ -60,7 +58,7 @@ void _ENVTextureLoader::loadCubeData(
     {
       texture->isReady = true;
       if (onLoad) {
-        // onLoad();
+        onLoad(std::nullopt);
       }
     }
   }
@@ -72,17 +70,16 @@ void _ENVTextureLoader::loadCubeData(
 void _ENVTextureLoader::loadCubeData(
   const std::vector<std::variant<std::string, ArrayBuffer>>& /*data*/,
   const InternalTexturePtr& /*texture*/, bool /*createPolynomials*/,
-  const std::function<void(const CubeTextureData& data)>& /*onLoad*/,
-  const std::function<void(const std::string& message,
-                           const std::string& exception)>& /*onError*/)
+  const std::function<void(const std::optional<CubeTextureData>& data)>& /*onLoad*/,
+  const std::function<void(const std::string& message, const std::string& exception)>& /*onError*/)
 {
 }
 
 void _ENVTextureLoader::loadData(
   const ArrayBuffer& /*data*/, const InternalTexturePtr& /*texture*/,
-  const std::function<void(
-    int /*width*/, int /*height*/, bool /*loadMipmap*/, bool /*isCompressed*/,
-    const std::function<void()>& done, bool loadFailed)>& /*callback*/)
+  const std::function<void(int /*width*/, int /*height*/, bool /*loadMipmap*/,
+                           bool /*isCompressed*/, const std::function<void()>& done,
+                           bool loadFailed)>& /*callback*/)
 {
   throw std::runtime_error(".env not supported in 2d.");
 }

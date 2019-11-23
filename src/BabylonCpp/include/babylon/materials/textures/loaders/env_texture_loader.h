@@ -62,11 +62,11 @@ struct BABYLON_SHARED_EXPORT _ENVTextureLoader : public IInternalTextureLoader {
    * @param onLoad defines the callback to trigger once the texture is ready
    * @param onError defines the callback to trigger in case of error
    */
-  void loadCubeData(
-    const std::variant<std::string, ArrayBuffer>& data, const InternalTexturePtr& texture,
-    bool createPolynomials, const std::function<void(const CubeTextureData& data)>& onLoad,
-    const std::function<void(const std::string& message, const std::string& exception)>& onError)
-    override;
+  void loadCubeData(const std::variant<std::string, ArrayBuffer>& data,
+                    const InternalTexturePtr& texture, bool createPolynomials,
+                    const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
+                    const std::function<void(const std::string& message,
+                                             const std::string& exception)>& onError) override;
 
   /**
    * @brief Uploads the cube texture data to the WebGl Texture. It has alreday
@@ -79,7 +79,7 @@ struct BABYLON_SHARED_EXPORT _ENVTextureLoader : public IInternalTextureLoader {
    */
   void loadCubeData(const std::vector<std::variant<std::string, ArrayBuffer>>& data,
                     const InternalTexturePtr& texture, bool createPolynomials,
-                    const std::function<void(const CubeTextureData& data)>& onLoad,
+                    const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
                     const std::function<void(const std::string& message,
                                              const std::string& exception)>& onError) override;
 

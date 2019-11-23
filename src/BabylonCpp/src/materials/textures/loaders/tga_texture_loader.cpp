@@ -19,31 +19,29 @@ bool _TGATextureLoader::supportCascades() const
 
 bool _TGATextureLoader::canLoad(const std::string& extension,
                                 const std::string& /*textureFormatInUse*/,
-                                const InternalTexturePtr& /*fallback*/,
-                                bool /*isBase64*/, bool /*isBuffer*/)
+                                const InternalTexturePtr& /*fallback*/, bool /*isBase64*/,
+                                bool /*isBuffer*/)
 {
   return String::startsWith(extension, ".tga");
 }
 
-std::string
-_TGATextureLoader::transformUrl(const std::string& rootUrl,
-                                const std::string& /*textureFormatInUse*/)
+std::string _TGATextureLoader::transformUrl(const std::string& rootUrl,
+                                            const std::string& /*textureFormatInUse*/)
 {
   return rootUrl;
 }
 
-std::string _TGATextureLoader::getFallbackTextureUrl(
-  const std::string& /*rootUrl*/, const std::string& /*textureFormatInUse*/)
+std::string _TGATextureLoader::getFallbackTextureUrl(const std::string& /*rootUrl*/,
+                                                     const std::string& /*textureFormatInUse*/)
 {
   return "";
 }
 
 void _TGATextureLoader::loadCubeData(
-  const std::variant<std::string, ArrayBuffer>& /*iData*/,
-  const InternalTexturePtr& /*texture*/, bool /*createPolynomials*/,
-  const std::function<void(const CubeTextureData& data)>& /*onLoad*/,
-  const std::function<void(const std::string& message,
-                           const std::string& exception)>& /*onError*/)
+  const std::variant<std::string, ArrayBuffer>& /*iData*/, const InternalTexturePtr& /*texture*/,
+  bool /*createPolynomials*/,
+  const std::function<void(const std::optional<CubeTextureData>& data)>& /*onLoad*/,
+  const std::function<void(const std::string& message, const std::string& exception)>& /*onError*/)
 {
   throw std::runtime_error(".env not supported in Cube.");
 }
@@ -51,28 +49,23 @@ void _TGATextureLoader::loadCubeData(
 void _TGATextureLoader::loadCubeData(
   const std::vector<std::variant<std::string, ArrayBuffer>>& /*data*/,
   const InternalTexturePtr& /*texture*/, bool /*createPolynomials*/,
-  const std::function<void(const CubeTextureData& data)>& /*onLoad*/,
-  const std::function<void(const std::string& message,
-                           const std::string& exception)>& /*onError*/)
+  const std::function<void(const std::optional<CubeTextureData>& data)>& /*onLoad*/,
+  const std::function<void(const std::string& message, const std::string& exception)>& /*onError*/)
 {
   throw std::runtime_error(".env not supported in Cube.");
 }
 
 void _TGATextureLoader::loadData(
   const ArrayBuffer& data, const InternalTexturePtr& texture,
-  const std::function<void(int width, int height, bool loadMipmap,
-                           bool isCompressed, const std::function<void()>& done,
-                           bool loadFailed)>& callback)
+  const std::function<void(int width, int height, bool loadMipmap, bool isCompressed,
+                           const std::function<void()>& done, bool loadFailed)>& callback)
 {
   const auto& uintData = data;
 
   auto header = TGATools::GetTGAHeader(uintData);
   callback(
     header.width, header.height, texture->generateMipMaps, false,
-    [&texture, &uintData]() -> void {
-      TGATools::UploadContent(texture, uintData);
-    },
-    false);
+    [&texture, &uintData]() -> void { TGATools::UploadContent(texture, uintData); }, false);
 }
 
 } // end of namespace BABYLON

@@ -4260,7 +4260,7 @@ InternalTexturePtr Engine::createCubeTexture(
         texture->onLoadedObservable.clear();
 
         if (onLoad) {
-          // onLoad();
+          onLoad(std::nullopt);
         }
       },
       files, onError);

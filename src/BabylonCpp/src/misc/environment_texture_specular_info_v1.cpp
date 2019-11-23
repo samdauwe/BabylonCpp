@@ -10,16 +10,20 @@ EnvironmentTextureSpecularInfoV1::EnvironmentTextureSpecularInfoV1()
 }
 
 EnvironmentTextureSpecularInfoV1::EnvironmentTextureSpecularInfoV1(
-const EnvironmentTextureSpecularInfoV1& other) = default;
+  const EnvironmentTextureSpecularInfoV1& other)
+  = default;
 
 EnvironmentTextureSpecularInfoV1::EnvironmentTextureSpecularInfoV1(
-  EnvironmentTextureSpecularInfoV1&& other) = default;
+  EnvironmentTextureSpecularInfoV1&& other)
+  = default;
 
-EnvironmentTextureSpecularInfoV1& EnvironmentTextureSpecularInfoV1::
-operator=(const EnvironmentTextureSpecularInfoV1& other) = default;
+EnvironmentTextureSpecularInfoV1&
+EnvironmentTextureSpecularInfoV1::operator=(const EnvironmentTextureSpecularInfoV1& other)
+  = default;
 
-EnvironmentTextureSpecularInfoV1& EnvironmentTextureSpecularInfoV1::
-operator=(EnvironmentTextureSpecularInfoV1&& other) = default;
+EnvironmentTextureSpecularInfoV1&
+EnvironmentTextureSpecularInfoV1::operator=(EnvironmentTextureSpecularInfoV1&& other)
+  = default;
 
 EnvironmentTextureSpecularInfoV1::~EnvironmentTextureSpecularInfoV1() = default;
 
@@ -36,8 +40,7 @@ EnvironmentTextureSpecularInfoV1::Parse(const json& parsedSpecular)
   }
 
   // mipmaps
-  if (json_util::has_key(parsedSpecular, "mipmaps")
-      && parsedSpecular["mipmaps"].is_array()) {
+  if (json_util::has_key(parsedSpecular, "mipmaps") && parsedSpecular["mipmaps"].is_array()) {
     auto mipmaps = parsedSpecular["mipmaps"].get<std::vector<json>>();
     for (const auto& mipmap : mipmaps) {
       specular.mipmaps.emplace_back(BufferImageData{
