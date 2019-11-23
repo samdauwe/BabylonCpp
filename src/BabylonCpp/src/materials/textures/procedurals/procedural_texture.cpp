@@ -16,17 +16,17 @@
 
 namespace BABYLON {
 
-ProceduralTexture::ProceduralTexture(
-  const std::string& iName, const Size& size,
-  const std::unordered_map<std::string, std::string>& fragment, Scene* scene,
-  Texture* fallbackTexture, bool generateMipMaps, bool isCube)
+ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
+                                     const std::unordered_map<std::string, std::string>& fragment,
+                                     Scene* scene, Texture* fallbackTexture, bool generateMipMaps,
+                                     bool iIsCube)
     : Texture("", scene, !generateMipMaps)
     , isEnabled{true}
     , autoClear{true}
     , _generateMipMaps{generateMipMaps}
+    , _isCube{iIsCube}
     , _effect{nullptr}
-    , refreshRate{this, &ProceduralTexture::get_refreshRate,
-                  &ProceduralTexture::set_refreshRate}
+    , refreshRate{this, &ProceduralTexture::get_refreshRate, &ProceduralTexture::set_refreshRate}
     , _currentRefreshId{-1}
     , _refreshRate{1}
     , _fallbackTextureUsed{false}
@@ -35,8 +35,7 @@ ProceduralTexture::ProceduralTexture(
 {
   scene = getScene();
 
-  auto component
-    = scene->_getComponent(SceneComponentConstants::NAME_PROCEDURALTEXTURE);
+  auto component = scene->_getComponent(SceneComponentConstants::NAME_PROCEDURALTEXTURE);
   if (!component) {
     component = ProceduralTextureSceneComponent::New(scene);
     scene->_addComponent(component);
@@ -51,10 +50,10 @@ ProceduralTexture::ProceduralTexture(
 
   _fallbackTexture = fallbackTexture;
 
-  if (isCube) {
+  if (iIsCube) {
     IRenderTargetOptions options;
     options.generateMipMaps = generateMipMaps;
-    _texture = _engine->createRenderTargetCubeTexture(size, options);
+    _texture                = _engine->createRenderTargetCubeTexture(size, options);
     setFloat("face", 0);
   }
   else {
@@ -80,24 +79,21 @@ ProceduralTexture::ProceduralTexture(
 
 ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
                                      const std::string& fragment, Scene* scene,
-                                     Texture* fallbackTexture,
-                                     bool generateMipMaps, bool isCube)
+                                     Texture* fallbackTexture, bool generateMipMaps, bool iIsCube)
     : Texture("", scene, !generateMipMaps)
     , isEnabled{true}
     , autoClear{true}
     , _generateMipMaps{generateMipMaps}
-    , refreshRate{this, &ProceduralTexture::get_refreshRate,
-                  &ProceduralTexture::set_refreshRate}
+    , _isCube{iIsCube}
+    , refreshRate{this, &ProceduralTexture::get_refreshRate, &ProceduralTexture::set_refreshRate}
     , _currentRefreshId{-1}
     , _refreshRate{1}
     , _fallbackTextureUsed{false}
     , _cachedDefines{""}
     , _contentUpdateId{-1}
 {
-  scene = getScene();
-
-  auto component
-    = scene->_getComponent(SceneComponentConstants::NAME_PROCEDURALTEXTURE);
+  scene          = getScene();
+  auto component = scene->_getComponent(SceneComponentConstants::NAME_PROCEDURALTEXTURE);
   if (!component) {
     component = ProceduralTextureSceneComponent::New(scene);
     scene->_addComponent(component);
@@ -108,16 +104,17 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
   name           = iName;
   isRenderTarget = true;
   _size          = size;
+
   setFragment(fragment);
 
   _fallbackTexture = fallbackTexture;
 
-  if (isCube) {
+  if (iIsCube) {
     IRenderTargetOptions options;
     options.generateMipMaps       = generateMipMaps;
     options.generateDepthBuffer   = false;
     options.generateStencilBuffer = false;
-    _texture = _engine->createRenderTargetCubeTexture(size, options);
+    _texture                      = _engine->createRenderTargetCubeTexture(size, options);
     setFloat("face", 0);
   }
   else {
@@ -125,7 +122,7 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
     options.generateMipMaps       = generateMipMaps;
     options.generateDepthBuffer   = false;
     options.generateStencilBuffer = false;
-    _texture = _engine->createRenderTargetTexture(size, options);
+    _texture                      = _engine->createRenderTargetTexture(size, options);
   }
 
   // VBO
@@ -144,6 +141,7 @@ ProceduralTexture::~ProceduralTexture() = default;
 
 void ProceduralTexture::addToScene(const ProceduralTexturePtr& newTexture)
 {
+  BaseTexture::addToScene(newTexture);
   getScene()->proceduralTextures.emplace_back(newTexture);
 }
 
@@ -190,8 +188,7 @@ void ProceduralTexture::_rebuild()
 
   _createIndexBuffer();
 
-  if (static_cast<unsigned>(refreshRate())
-      == RenderTargetTexture::REFRESHRATE_RENDER_ONCE) {
+  if (static_cast<unsigned>(refreshRate()) == RenderTargetTexture::REFRESHRATE_RENDER_ONCE) {
     refreshRate = RenderTargetTexture::REFRESHRATE_RENDER_ONCE;
   }
 }
@@ -243,20 +240,19 @@ bool ProceduralTexture::isReady()
   options.uniformsNames = _uniforms;
   options.samplers      = _samplers;
   options.defines       = defines;
-  options.onError
-    = [this](const Effect* /*effect*/, const std::string& /*errors*/) {
-        releaseInternalTexture();
+  options.onError       = [this](const Effect* /*effect*/, const std::string& /*errors*/) {
+    releaseInternalTexture();
 
-        if (_fallbackTexture) {
-          _texture = _fallbackTexture->_texture;
+    if (_fallbackTexture) {
+      _texture = _fallbackTexture->_texture;
 
-          if (_texture) {
-            _texture->incrementReferences();
-          }
-        }
+      if (_texture) {
+        _texture->incrementReferences();
+      }
+    }
 
-        _fallbackTextureUsed = true;
-      };
+    _fallbackTextureUsed = true;
+  };
 
   _effect = engine->createEffect(shaders, options, getScene()->getEngine());
 
@@ -268,8 +264,7 @@ void ProceduralTexture::resetRefreshCounter()
   _currentRefreshId = -1;
 }
 
-void ProceduralTexture::setFragment(
-  const std::unordered_map<std::string, std::string>& fragment)
+void ProceduralTexture::setFragment(const std::unordered_map<std::string, std::string>& fragment)
 {
   _fragment = fragment;
 }
@@ -363,8 +358,7 @@ ProceduralTexture& ProceduralTexture::setTexture(const std::string& iName,
   return *this;
 }
 
-ProceduralTexture& ProceduralTexture::setFloat(const std::string& _name,
-                                               float value)
+ProceduralTexture& ProceduralTexture::setFloat(const std::string& _name, float value)
 {
   _checkUniform(_name);
   _floats[_name] = value;
@@ -372,8 +366,7 @@ ProceduralTexture& ProceduralTexture::setFloat(const std::string& _name,
   return *this;
 }
 
-ProceduralTexture& ProceduralTexture::setInt(const std::string& _name,
-                                             int value)
+ProceduralTexture& ProceduralTexture::setInt(const std::string& _name, int value)
 {
   _checkUniform(_name);
   _ints[_name] = value;
@@ -381,8 +374,7 @@ ProceduralTexture& ProceduralTexture::setInt(const std::string& _name,
   return *this;
 }
 
-ProceduralTexture& ProceduralTexture::setFloats(const std::string& _name,
-                                                Float32Array value)
+ProceduralTexture& ProceduralTexture::setFloats(const std::string& _name, Float32Array value)
 {
   _checkUniform(_name);
   _floatsArrays[_name] = value;
@@ -390,8 +382,7 @@ ProceduralTexture& ProceduralTexture::setFloats(const std::string& _name,
   return *this;
 }
 
-ProceduralTexture& ProceduralTexture::setColor3(const std::string& _name,
-                                                const Color3& value)
+ProceduralTexture& ProceduralTexture::setColor3(const std::string& _name, const Color3& value)
 {
   _checkUniform(_name);
   _colors3[_name] = value;
@@ -399,8 +390,7 @@ ProceduralTexture& ProceduralTexture::setColor3(const std::string& _name,
   return *this;
 }
 
-ProceduralTexture& ProceduralTexture::setColor4(const std::string& _name,
-                                                const Color4& value)
+ProceduralTexture& ProceduralTexture::setColor4(const std::string& _name, const Color4& value)
 {
   _checkUniform(_name);
   _colors4[_name] = value;
@@ -408,8 +398,7 @@ ProceduralTexture& ProceduralTexture::setColor4(const std::string& _name,
   return *this;
 }
 
-ProceduralTexture& ProceduralTexture::setVector2(const std::string& _name,
-                                                 const Vector2& value)
+ProceduralTexture& ProceduralTexture::setVector2(const std::string& _name, const Vector2& value)
 {
   _checkUniform(_name);
   _vectors2[_name] = value;
@@ -417,8 +406,7 @@ ProceduralTexture& ProceduralTexture::setVector2(const std::string& _name,
   return *this;
 }
 
-ProceduralTexture& ProceduralTexture::setVector3(const std::string& _name,
-                                                 const Vector3& value)
+ProceduralTexture& ProceduralTexture::setVector3(const std::string& _name, const Vector3& value)
 {
   _checkUniform(_name);
   _vectors3[_name] = value;
@@ -426,8 +414,7 @@ ProceduralTexture& ProceduralTexture::setVector3(const std::string& _name,
   return *this;
 }
 
-ProceduralTexture& ProceduralTexture::setMatrix(const std::string& _name,
-                                                const Matrix& value)
+ProceduralTexture& ProceduralTexture::setMatrix(const std::string& _name, const Matrix& value)
 {
   _checkUniform(_name);
   _matrices[_name] = value;
@@ -550,9 +537,8 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
 ProceduralTexturePtr ProceduralTexture::clone()
 {
   auto textureSize = getSize();
-  auto newTexture
-    = ProceduralTexture::New(name, textureSize.width, _fragment, getScene(),
-                             _fallbackTexture, _generateMipMaps);
+  auto newTexture  = ProceduralTexture::New(name, textureSize.width, _fragment, getScene(),
+                                           _fallbackTexture, _generateMipMaps);
 
   // Base texture
   newTexture->hasAlpha = hasAlpha();

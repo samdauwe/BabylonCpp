@@ -287,6 +287,11 @@ public:
   /**
    * Hidden
    */
+  bool _isCube;
+
+  /**
+   * Hidden
+   */
   EffectPtr _effect;
 
   /**
