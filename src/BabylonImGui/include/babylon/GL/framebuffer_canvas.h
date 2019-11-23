@@ -13,7 +13,6 @@ class FramebufferCanvas : public ICanvas {
 public:
   FramebufferCanvas();
   ~FramebufferCanvas() override;
-  [[nodiscard]] bool onlyRenderBoundingClientRect() const override;
   void initializeFrameBuffer();
 
   ClientRect& getBoundingClientRect() override;

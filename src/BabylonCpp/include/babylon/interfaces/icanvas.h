@@ -16,7 +16,6 @@ public:
   ICanvas();
   virtual ~ICanvas(); // = default
   virtual ClientRect& getBoundingClientRect()                                 = 0;
-  [[nodiscard]] virtual bool onlyRenderBoundingClientRect() const             = 0;
   virtual bool initializeContext3d()                                          = 0;
   virtual ICanvasRenderingContext2D* getContext2d()                           = 0;
   virtual GL::IGLRenderingContext* getContext3d(const EngineOptions& options) = 0;

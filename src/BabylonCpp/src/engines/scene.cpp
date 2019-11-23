@@ -2072,9 +2072,9 @@ void Scene::_animate()
   }
 
   // Animatable::_animate can remove elements from _activeAnimatables
-  // we need to make a copy of it in order to iterate on a vector that 
+  // we need to make a copy of it in order to iterate on a vector that
   // will not be modified during the loop!
-  const auto animatables = _activeAnimatables; 
+  const auto animatables = _activeAnimatables;
   if (animatables.empty()) {
     return;
   }
@@ -2099,9 +2099,9 @@ void Scene::_animate()
     if (animatable) {
       if (!animatable->_animate(std::chrono::milliseconds(animationTime))
           && animatable->disposeOnEnd) {
-            // The animation removed itself from _activeAnimatables
-            // during the call to _animate()
-            ;
+        // The animation removed itself from _activeAnimatables
+        // during the call to _animate()
+        ;
       }
     }
   }
@@ -3804,15 +3804,9 @@ void Scene::render(bool updateCameras, bool ignoreAnimations)
   }
 
   // Clear
-  if (_engine->getRenderingCanvas()->onlyRenderBoundingClientRect()) {
-    const auto& rec = _engine->getRenderingCanvas()->getBoundingClientRect();
-    _engine->scissorClear(rec.left, rec.bottom, rec.width, rec.height, clearColor);
-  }
-  else {
-    if (autoClearDepthAndStencil || autoClear) {
-      _engine->clear(clearColor, autoClear || forceWireframe() || forcePointsCloud(),
-                     autoClearDepthAndStencil, autoClearDepthAndStencil);
-    }
+  if (autoClearDepthAndStencil || autoClear) {
+    _engine->clear(clearColor, autoClear || forceWireframe() || forcePointsCloud(),
+                   autoClearDepthAndStencil, autoClearDepthAndStencil);
   }
 
   // Collects render targets from external components.

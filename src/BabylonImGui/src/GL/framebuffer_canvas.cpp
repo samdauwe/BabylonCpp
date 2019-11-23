@@ -93,11 +93,6 @@ ClientRect& FramebufferCanvas::getBoundingClientRect()
   return _boundingClientRect;
 }
 
-bool FramebufferCanvas::onlyRenderBoundingClientRect() const
-{
-  return false;
-}
-
 ICanvasRenderingContext2D* FramebufferCanvas::getContext2d()
 {
   return nullptr;
