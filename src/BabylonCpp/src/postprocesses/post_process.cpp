@@ -46,10 +46,7 @@ PostProcess::PostProcess(const std::string& iName, const std::string& fragmentUr
     , _scene{nullptr}
     , _engine{nullptr}
     , _renderRatio{1.f}
-    , _options{options}
     , _reusable{false}
-    , _fragmentUrl{fragmentUrl}
-    , _vertexUrl{!vertexUrl.empty() ? vertexUrl : "postprocess"}
     , _parameters{parameters}
     , _scaleRatio{Vector2(1.f, 1.f)}
     , _shareOutputWithPostProcess{nullptr}
@@ -72,6 +69,7 @@ PostProcess::PostProcess(const std::string& iName, const std::string& fragmentUr
     _engine = engine;
   }
 
+  _options                 = options;
   renderTargetSamplingMode = samplingMode;
   _reusable                = reusable;
   _textureType             = textureType;
@@ -79,7 +77,10 @@ PostProcess::PostProcess(const std::string& iName, const std::string& fragmentUr
   _samplers.insert(_samplers.end(), samplers.begin(), samplers.end());
   _samplers.emplace_back("textureSampler");
 
+  _fragmentUrl = fragmentUrl;
+  _vertexUrl   = !vertexUrl.empty() ? vertexUrl : "postprocess";
   _parameters.insert(_parameters.end(), _parameters.begin(), _parameters.end());
+
   _parameters.emplace_back("scale");
 
   _indexParameters = indexParameters;
