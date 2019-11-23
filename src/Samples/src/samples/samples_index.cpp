@@ -30,7 +30,6 @@ void SamplesIndex::fillSamplesFailures() const
     {"LorenzAttractorScene", {SampleFailureReasonKind::empty3d, "Rendering empty with 50% chance"}},
     {"MultiSampleRenderTargetsScene", {SampleFailureReasonKind::empty3d}},
     {"PointsCloudScene", {SampleFailureReasonKind::empty3d}},
-    {"ProceduralHexPlanetGenerationScene", {SampleFailureReasonKind::broken3d, "Very small planet..."}},
     {"SimpleSkinScene", {SampleFailureReasonKind::empty3d}},
     {"ShaderMaterialWarpSpeedScene", {SampleFailureReasonKind::empty3d}},
     {"VolumetricLightScatteringScene", {SampleFailureReasonKind::broken3d, "No scatter / 3d emtpy after dragging"}}

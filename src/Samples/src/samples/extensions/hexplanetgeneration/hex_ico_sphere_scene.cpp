@@ -4,7 +4,7 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/extensions/hexplanetgeneration/icosphere.h>
-#include <babylon/extensions/hexplanetgeneration/utils/xor_shift_128.h>
+#include <babylon/extensions/hexplanetgeneration/xor_shift_128.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/hemispheric_light.h>

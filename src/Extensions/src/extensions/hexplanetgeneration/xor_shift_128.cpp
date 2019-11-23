@@ -1,4 +1,4 @@
-#include <babylon/extensions/hexplanetgeneration/utils/xor_shift_128.h>
+#include <babylon/extensions/hexplanetgeneration/xor_shift_128.h>
 
 #include <cmath>
 

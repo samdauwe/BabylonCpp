@@ -1,8 +1,8 @@
-#ifndef BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_UTILS_XOR_SHIFT_128_H
-#define BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_UTILS_XOR_SHIFT_128_H
+#ifndef BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_XOR_SHIFT_128_H
+#define BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_XOR_SHIFT_128_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/extensions/hexplanetgeneration/utils/irandom_function.h>
+#include <babylon/extensions/hexplanetgeneration/irandom_function.h>
 
 namespace BABYLON {
 namespace Extensions {
@@ -29,4 +29,4 @@ struct BABYLON_SHARED_EXPORT XorShift128 : public IRandomFunction {
 } // end of namespace Extensions
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_UTILS_XOR_SHIFT_128_H
+#endif // end of BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_XOR_SHIFT_128_H
