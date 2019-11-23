@@ -81,10 +81,9 @@ public:
   /**
    * @brief Enables the edge rendering mode on the mesh.
    * This mode makes the mesh edges visible
-   * @param epsilon defines the maximal distance between two angles to detect a
-   * face
-   * @param checkVerticesInsteadOfIndices indicates that we should check vertex
-   * list directly instead of faces
+   * @param epsilon defines the maximal distance between two angles to detect a face
+   * @param checkVerticesInsteadOfIndices indicates that we should check vertex list directly
+   * instead of faces
    * @returns the currentAbstractMesh
    * @see https://www.babylonjs-playground.com/#19O9TU#0
    */
@@ -98,9 +97,9 @@ protected:
    * @param scene defines the hosting scene
    * @param parent defines the parent mesh if any
    * @param source defines the optional source LinesMesh used to clone data from
-   * @param doNotCloneChildren When cloning, skip cloning child meshes of
-   * source, default False. When false, achieved by calling a clone(), also
-   * passing False. This will make creation of children, recursive.
+   * @param doNotCloneChildren When cloning, skip cloning child meshes of source, default False.
+   * When false, achieved by calling a clone(), also passing False.
+   * This will make creation of children, recursive.
    * @param useVertexColor defines if this LinesMesh supports vertex color
    * @param useVertexAlpha defines if this LinesMesh supports vertex alpha
    */
@@ -142,9 +141,9 @@ public:
   float alpha;
 
   /**
-   * The intersection Threshold is the margin applied when intersection a
-   * segment of the LinesMesh with a Ray. This margin is expressed in world
-   * space coordinates, so its value may vary. Default value is 0.1
+   * The intersection Threshold is the margin applied when intersection a segment of the LinesMesh
+   * with a Ray. This margin is expressed in world space coordinates, so its value may vary. Default
+   * value is 0.1
    */
   float intersectionThreshold;
 

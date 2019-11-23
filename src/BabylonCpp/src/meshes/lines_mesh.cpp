@@ -15,14 +15,15 @@
 
 namespace BABYLON {
 
-LinesMesh::LinesMesh(const std::string& iName, Scene* scene, Node* iParent,
-                     LinesMesh* iSource, bool doNotCloneChildren,
-                     bool iUseVertexColor, bool iUseVertexAlpha)
+LinesMesh::LinesMesh(const std::string& iName, Scene* scene, Node* iParent, LinesMesh* iSource,
+                     bool doNotCloneChildren, bool iUseVertexColor, bool iUseVertexAlpha)
     : Mesh(iName, scene, iParent, iSource, doNotCloneChildren)
     , dashSize{0.f}
     , gapSize{0.f}
     , color{Color3(1.f, 1.f, 1.f)}
     , alpha{1.f}
+    , useVertexColor{false}
+    , useVertexAlpha{false}
     , _colorShaderMaterial{nullptr}
 {
   if (_source) {
@@ -36,11 +37,11 @@ LinesMesh::LinesMesh(const std::string& iName, Scene* scene, Node* iParent,
 
   std::vector<std::string> defines;
   IShaderMaterialOptions options;
-  options.attributes = {VertexBuffer::PositionKind, VertexBuffer::World0Kind,
-                        VertexBuffer::World1Kind, VertexBuffer::World2Kind,
-                        VertexBuffer::World3Kind};
-  options.uniforms   = {"vClipPlane",  "vClipPlane2", "vClipPlane3",
-                      "vClipPlane4", "world",       "viewProjection"};
+  options.attributes
+    = {VertexBuffer::PositionKind, VertexBuffer::World0Kind, VertexBuffer::World1Kind,
+       VertexBuffer::World2Kind, VertexBuffer::World3Kind};
+  options.uniforms
+    = {"vClipPlane", "vClipPlane2", "vClipPlane3", "vClipPlane4", "world", "viewProjection"};
   options.needAlphaBlending = true;
   options.defines           = defines;
 
@@ -56,17 +57,15 @@ LinesMesh::LinesMesh(const std::string& iName, Scene* scene, Node* iParent,
     options.attributes.emplace_back(VertexBuffer::ColorKind);
   }
 
-  _colorShader
-    = ShaderMaterial::New("colorShader", getScene(), "color", options);
+  _colorShader = ShaderMaterial::New("colorShader", getScene(), "color", options);
 }
 
 LinesMesh::~LinesMesh() = default;
 
 void LinesMesh::_addClipPlaneDefine(const std::string& label)
 {
-  const auto define = "#define " + label;
-  const auto hasDefine
-    = stl_util::contains(_colorShader->options().defines, define);
+  const auto define    = "#define " + label;
+  const auto hasDefine = stl_util::contains(_colorShader->options().defines, define);
 
   if (hasDefine) {
     return;
@@ -93,14 +92,10 @@ bool LinesMesh::isReady(bool /*completeCheck*/, bool /*forceInstanceSupport*/)
   const auto& scene = *getScene();
 
   // Clip planes
-  scene.clipPlane ? _addClipPlaneDefine("CLIPPLANE") :
-                    _removeClipPlaneDefine("CLIPPLANE");
-  scene.clipPlane2 ? _addClipPlaneDefine("CLIPPLANE2") :
-                     _removeClipPlaneDefine("CLIPPLANE2");
-  scene.clipPlane3 ? _addClipPlaneDefine("CLIPPLANE3") :
-                     _removeClipPlaneDefine("CLIPPLANE3");
-  scene.clipPlane4 ? _addClipPlaneDefine("CLIPPLANE4") :
-                     _removeClipPlaneDefine("CLIPPLANE4");
+  scene.clipPlane ? _addClipPlaneDefine("CLIPPLANE") : _removeClipPlaneDefine("CLIPPLANE");
+  scene.clipPlane2 ? _addClipPlaneDefine("CLIPPLANE2") : _removeClipPlaneDefine("CLIPPLANE2");
+  scene.clipPlane3 ? _addClipPlaneDefine("CLIPPLANE3") : _removeClipPlaneDefine("CLIPPLANE3");
+  scene.clipPlane4 ? _addClipPlaneDefine("CLIPPLANE4") : _removeClipPlaneDefine("CLIPPLANE4");
 
   if (!_colorShader->isReady()) {
     return false;
@@ -135,8 +130,7 @@ bool LinesMesh::get_checkCollisions() const
   return false;
 }
 
-void LinesMesh::_bind(SubMesh* /*subMesh*/, const EffectPtr& /*effect*/,
-                      unsigned int /*fillMode*/)
+void LinesMesh::_bind(SubMesh* /*subMesh*/, const EffectPtr& /*effect*/, unsigned int /*fillMode*/)
 {
   if (!_geometry) {
     return;
@@ -157,8 +151,7 @@ void LinesMesh::_bind(SubMesh* /*subMesh*/, const EffectPtr& /*effect*/,
   MaterialHelper::BindClipPlane(colorEffect, getScene());
 }
 
-void LinesMesh::_draw(SubMesh* subMesh, int /*fillMode*/, size_t instancesCount,
-                      bool /*alternate*/)
+void LinesMesh::_draw(SubMesh* subMesh, int /*fillMode*/, size_t instancesCount, bool /*alternate*/)
 {
   if (!_geometry || _geometry->getVertexBuffers().empty()
       || (!_unIndexed && !_geometry->getIndexBuffer())) {
@@ -169,21 +162,19 @@ void LinesMesh::_draw(SubMesh* subMesh, int /*fillMode*/, size_t instancesCount,
 
   // Draw order
   if (_unIndexed) {
-    engine.drawArraysType(Material::LineListDrawMode,
-                          static_cast<int>(subMesh->verticesStart),
+    engine.drawArraysType(Material::LineListDrawMode, static_cast<int>(subMesh->verticesStart),
                           static_cast<int>(subMesh->verticesCount),
                           static_cast<int>(instancesCount));
   }
   else {
-    engine.drawElementsType(
-      Material::LineListDrawMode, static_cast<int>(subMesh->indexStart),
-      static_cast<int>(subMesh->indexCount), static_cast<int>(instancesCount));
+    engine.drawElementsType(Material::LineListDrawMode, static_cast<int>(subMesh->indexStart),
+                            static_cast<int>(subMesh->indexCount),
+                            static_cast<int>(instancesCount));
   }
 }
 
-PickingInfo
-LinesMesh::intersects(Ray& /*ray*/, bool /*fastCheck*/,
-                      const TrianglePickingPredicate& /*trianglePredicate*/)
+PickingInfo LinesMesh::intersects(Ray& /*ray*/, bool /*fastCheck*/,
+                                  const TrianglePickingPredicate& /*trianglePredicate*/)
 {
   return PickingInfo();
 }
@@ -195,8 +186,7 @@ void LinesMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   Mesh::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 
-LinesMeshPtr LinesMesh::clone(const std::string& iName, Node* newParent,
-                              bool doNotCloneChildren)
+LinesMeshPtr LinesMesh::clone(const std::string& iName, Node* newParent, bool doNotCloneChildren)
 {
   return LinesMesh::New(iName, getScene(), newParent, this, doNotCloneChildren);
 }
@@ -206,13 +196,12 @@ InstancedLinesMeshPtr LinesMesh::createInstance(const std::string& iName)
   return InstancedLinesMesh::New(iName, shared_from_base<LinesMesh>());
 }
 
-AbstractMeshPtr
-LinesMesh::enableEdgesRendering(const AbstractMeshPtr& iSource, float epsilon,
-                                bool checkVerticesInsteadOfIndices)
+AbstractMeshPtr LinesMesh::enableEdgesRendering(const AbstractMeshPtr& iSource, float epsilon,
+                                                bool checkVerticesInsteadOfIndices)
 {
   iSource->disableEdgesRendering();
-  iSource->_edgesRenderer = std::make_shared<LineEdgesRenderer>(
-    iSource, epsilon, checkVerticesInsteadOfIndices);
+  iSource->_edgesRenderer
+    = std::make_shared<LineEdgesRenderer>(iSource, epsilon, checkVerticesInsteadOfIndices);
   return iSource;
 }
 
