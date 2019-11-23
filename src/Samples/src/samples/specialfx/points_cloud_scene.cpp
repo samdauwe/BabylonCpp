@@ -22,7 +22,10 @@ class PointsCloudScene : public IRenderableScene {
 
 public:
   PointsCloudScene(ICanvas* iCanvas)
-      : IRenderableScene(iCanvas), _pointsCount{10000}, _customMesh{nullptr}
+      : IRenderableScene(iCanvas)
+      , _pointsCount{10000}
+      , _animatePointCloud{false}
+      , _customMesh{nullptr}
   {
   }
 
@@ -37,25 +40,26 @@ public:
   {
     // Create a camera
     auto camera = ArcRotateCamera::New("camera1", 0.f, 0.f, 0.f, Vector3::Zero(), scene);
-    camera->setPosition(Vector3(0.f, 50.f, -300.f));
+    camera->setPosition(Vector3(0.f, 0.f, -250.f));
     camera->attachControl(canvas, true);
 
     // Create a custom mesh
     _customMesh = Mesh::New("custom", scene);
 
     // Set arrays for positions and indices
-    Float32Array colors;
+    _positions.clear();
+    _colors.clear();
 
     for (size_t p = 0; p < _pointsCount; p++) {
       auto x = Math::random() * 100.f;
       auto y = Math::random() * 100.f;
       auto z = Math::random() * 100.f;
       stl_util::concat(_positions, {x, y, z});
-      stl_util::concat(colors, {Math::random(), Math::random(), Math::random(), 1.f});
+      stl_util::concat(_colors, {Math::random(), Math::random(), Math::random(), 1.f});
     }
 
     // Set the colors for the vertices
-    _customMesh->setVerticesData(VertexBuffer::ColorKind, colors);
+    _customMesh->setVerticesData(VertexBuffer::ColorKind, _colors);
 
     VertexData vertexData;
 
@@ -73,19 +77,23 @@ public:
 
     _customMesh->material = mat;
 
-    scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) {
-      for (size_t p = 0; p < _pointsCount; ++p) {
-        _positions[3 * p] += Math::random() - 0.5f;
-        _positions[3 * p + 1] += Math::random() - 0.5f;
-        _positions[3 * p + 2] += Math::random() - 0.5f;
-      }
-      _customMesh->updateVerticesData(VertexBuffer::PositionKind, _positions);
-    });
+    if (_animatePointCloud) {
+      scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) {
+        for (size_t p = 0; p < _pointsCount; ++p) {
+          _positions[3 * p] += Math::random() - 0.5f;
+          _positions[3 * p + 1] += Math::random() - 0.5f;
+          _positions[3 * p + 2] += Math::random() - 0.5f;
+        }
+        _customMesh->updateVerticesData(VertexBuffer::PositionKind, _positions);
+      });
+    }
   }
 
 private:
   size_t _pointsCount;
+  bool _animatePointCloud;
   Float32Array _positions;
+  Float32Array _colors;
   MeshPtr _customMesh;
 
 }; // end of struct LensFlaresScene

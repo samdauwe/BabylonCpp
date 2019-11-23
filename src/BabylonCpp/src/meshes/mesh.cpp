@@ -1944,8 +1944,8 @@ Mesh& Mesh::convertToFlatShadedMesh()
     auto vertexIndex = static_cast<unsigned int>(indices[index]);
 
     for (kindIndex = 0; kindIndex < kinds.size(); ++kindIndex) {
-      kind          = kinds[kindIndex];
-      auto stride   = static_cast<size_t>(vbs[kind]->getStrideSize());
+      kind        = kinds[kindIndex];
+      auto stride = static_cast<size_t>(vbs[kind]->getStrideSize());
 
       for (unsigned int offset = 0; offset < stride; ++offset) {
         newdata[kind].emplace_back(data[kind][vertexIndex * stride + offset]);
@@ -2026,8 +2026,8 @@ Mesh& Mesh::convertToUnIndexedMesh()
     auto vertexIndex = static_cast<unsigned int>(indices[index]);
 
     for (kindIndex = 0; kindIndex < kinds.size(); ++kindIndex) {
-      kind          = kinds[kindIndex];
-      auto stride   = static_cast<size_t>(vbs[kind]->getStrideSize());
+      kind        = kinds[kindIndex];
+      auto stride = static_cast<size_t>(vbs[kind]->getStrideSize());
 
       for (unsigned int offset = 0; offset < stride; ++offset) {
         newdata[kind].emplace_back(data[kind][vertexIndex * stride + offset]);
@@ -2562,7 +2562,7 @@ std::vector<Vector3> Mesh::createInnerPoints(size_t pointsNb)
     if (pickInfo.hit) {
       float distance = pickInfo.pickedPoint->subtract(facetPoint).length();
       float gap      = Scalar::RandomRange(0.f, 1.f) * distance;
-      point    = facetPoint.add(direction.scale(gap));
+      point          = facetPoint.add(direction.scale(gap));
     }
     else {
       point.set(0.f, 0.f, 0.f);

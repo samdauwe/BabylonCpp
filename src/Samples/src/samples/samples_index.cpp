@@ -29,7 +29,6 @@ void SamplesIndex::fillSamplesFailures() const
     {"LinesMeshSpiralScene", {SampleFailureReasonKind::empty3d, "Rendering empty with 50% chance"}},
     {"LorenzAttractorScene", {SampleFailureReasonKind::empty3d, "Rendering empty with 50% chance"}},
     {"MultiSampleRenderTargetsScene", {SampleFailureReasonKind::empty3d}},
-    {"PointsCloudScene", {SampleFailureReasonKind::empty3d}},
     {"SimpleSkinScene", {SampleFailureReasonKind::empty3d}},
     {"VolumetricLightScatteringScene", {SampleFailureReasonKind::broken3d, "No scatter / 3d emtpy after dragging"}}
   };
