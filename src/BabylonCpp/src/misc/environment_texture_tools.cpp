@@ -65,6 +65,38 @@ EnvironmentTextureInfoPtr EnvironmentTextureTools::GetEnvInfo(const ArrayBuffer&
   return manifest;
 }
 
+std::vector<std::vector<ArrayBuffer>>
+EnvironmentTextureTools::CreateImageDataArrayBufferViews(const ArrayBuffer& arrayBuffer,
+                                                         const EnvironmentTextureInfo& info)
+{
+  if (info.version != 1) {
+    throw std::runtime_error("Unsupported babylon environment map version "
+                             + std::to_string(info.version));
+  }
+
+  const auto& specularInfo = info.specular;
+
+  // Double checks the enclosed info
+  auto _mipmapsCount = Scalar::Log2(info.width);
+  auto mipmapsCount  = static_cast<size_t>(std::round(_mipmapsCount) + 1);
+  if (specularInfo->mipmaps.size() != 6 * mipmapsCount) {
+    throw std::runtime_error("Unsupported specular mipmaps number "
+                             + std::to_string(specularInfo->mipmaps.size()));
+  }
+
+  std::vector<std::vector<ArrayBuffer>> imageData(mipmapsCount);
+  for (size_t i = 0; i < mipmapsCount; ++i) {
+    imageData[i] = std::vector<ArrayBuffer>(6);
+    for (size_t face = 0; face < 6; ++face) {
+      auto imageInfo     = specularInfo->mipmaps[i * 6 + face];
+      imageData[i][face] = stl_util::to_array<uint8_t>(
+        arrayBuffer, *specularInfo->specularDataPosition + imageInfo.position, imageInfo.length);
+    }
+  }
+
+  return imageData;
+}
+
 void EnvironmentTextureTools::UploadEnvLevels(const InternalTexturePtr& texture,
                                               const ArrayBuffer& arrayBuffer,
                                               const EnvironmentTextureInfo& info)
@@ -80,25 +112,10 @@ void EnvironmentTextureTools::UploadEnvLevels(const InternalTexturePtr& texture,
     return;
   }
 
-  // Double checks the enclosed info
-  auto _mipmapsCount = Scalar::Log2(info.width);
-  auto mipmapsCount  = static_cast<size_t>(std::round(_mipmapsCount) + 1);
-  if (specularInfo->mipmaps.size() != 6 * mipmapsCount) {
-    throw std::runtime_error("Unsupported specular mipmaps number "
-                             + std::to_string(specularInfo->mipmaps.size()));
-  }
-
   texture->_lodGenerationScale = *specularInfo->lodGenerationScale;
 
-  std::vector<std::vector<ArrayBuffer>> imageData(mipmapsCount);
-  for (size_t i = 0; i < mipmapsCount; ++i) {
-    imageData[i] = std::vector<ArrayBuffer>(6);
-    for (size_t face = 0; face < 6; ++face) {
-      auto imageInfo     = specularInfo->mipmaps[i * 6 + face];
-      imageData[i][face] = stl_util::to_array<uint8_t>(
-        arrayBuffer, *specularInfo->specularDataPosition + imageInfo.position, imageInfo.length);
-    }
-  }
+  const auto imageData
+    = EnvironmentTextureTools::CreateImageDataArrayBufferViews(arrayBuffer, info);
 
   return EnvironmentTextureTools::UploadLevels(texture, imageData);
 }

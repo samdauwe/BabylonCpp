@@ -35,38 +35,43 @@ public:
   /**
    * @brief Gets the environment info from an env file.
    * @param data The array buffer containing the .env bytes.
-   * @returns the environment file info (the json header) if successfully
-   * parsed.
+   * @returns the environment file info (the json header) if successfully parsed.
    */
   static EnvironmentTextureInfoPtr GetEnvInfo(const ArrayBuffer& data);
+
+  /**
+   * @brief Creates the ArrayBufferViews used for initializing environment texture image data.
+   * @param arrayBuffer the underlying ArrayBuffer to which the views refer
+   * @param info parameters that determine what views will be created for accessing the underlying
+   * buffer
+   * @return the views described by info providing access to the underlying buffer
+   */
+  static std::vector<std::vector<ArrayBuffer>>
+  CreateImageDataArrayBufferViews(const ArrayBuffer& arrayBuffer,
+                                  const EnvironmentTextureInfo& info);
 
   /**
    * @brief Uploads the texture info contained in the env file to the GPU.
    * @param texture defines the internal texture to upload to
    * @param arrayBuffer defines the buffer cotaining the data to load
-   * @param info defines the texture info retrieved through the GetEnvInfo
-   * method
+   * @param info defines the texture info retrieved through the GetEnvInfo method
+   * @returns a promise
    */
-  static void UploadEnvLevels(const InternalTexturePtr& texture,
-                              const ArrayBuffer& arrayBuffer,
+  static void UploadEnvLevels(const InternalTexturePtr& texture, const ArrayBuffer& arrayBuffer,
                               const EnvironmentTextureInfo& info);
 
   /**
    * @brief Uploads the levels of image data to the GPU.
    * @param texture defines the internal texture to upload to
-   * @param imageData defines the array buffer views of image data
-   * [mipmap][face]
+   * @param imageData defines the array buffer views of image data [mipmap][face]
    */
-  static void
-  UploadLevels(const InternalTexturePtr& texture,
-               const std::vector<std::vector<ArrayBuffer>>& imageData);
+  static void UploadLevels(const InternalTexturePtr& texture,
+                           const std::vector<std::vector<ArrayBuffer>>& imageData);
 
   /**
    * @brief Uploads spherical polynomials information to the texture.
-   * @param texture defines the texture we are trying to upload the information
-   * to
-   * @param info defines the environment texture info retrieved through the
-   * GetEnvInfo method
+   * @param texture defines the texture we are trying to upload the information to
+   * @param info defines the environment texture info retrieved through the GetEnvInfo method
    */
   static void UploadEnvSpherical(const InternalTexturePtr& texture,
                                  const EnvironmentTextureInfo& info);
