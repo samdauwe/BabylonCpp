@@ -110,7 +110,7 @@ def main():
         # Misc
         "andOrNotEvaluator.ts", "assetsManager.ts", "basis.ts",
         "customAnimationFrameRequester.ts", "decorators.ts", "deepCopier.ts",
-        "deferred.ts", "domManagement.ts", "filesInput.ts",
+        "deferred.ts", "domManagement.ts", "fileRequest.ts", "filesInput.ts",
         "filesInputStore.ts", "instantiationTools.ts", "logger.ts",
         "loadFileError.ts", "precisionDate.ts", "promise.ts", "retryStrategy.ts",
         "sceneSerializer.ts", "screenshotTools.ts", "smartArray.ts",
