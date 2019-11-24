@@ -3800,7 +3800,7 @@ unsigned int Engine::updateMultipleRenderTargetTextureSampleCount(
 
   auto& gl = *_gl;
 
-  samples = std::min(samples, static_cast<unsigned>(gl.getParameteri(GL::MAX_SAMPLES)));
+  samples = std::min(samples, getCaps().maxMSAASamples);
 
   // Dispose previous render buffers
   if (textures[0]->_depthStencilBuffer) {

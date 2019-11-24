@@ -666,10 +666,8 @@ public:
    * @brief Unbind a list of render target textures from the webGL context.
    * This is used only when drawBuffer extension or webGL2 are active
    * @param textures defines the render target textures to unbind
-   * @param disableGenerateMipMaps defines a boolean indicating that mipmaps
-   * must not be generated
-   * @param onBeforeUnbind defines a function which will be called before the
-   * effective unbind
+   * @param disableGenerateMipMaps defines a boolean indicating that mipmaps must not be generated
+   * @param onBeforeUnbind defines a function which will be called before the effective unbind
    */
   void unBindMultiColorAttachmentFramebuffer(const std::vector<InternalTexturePtr>& textures,
                                              bool disableGenerateMipMaps                 = false,
@@ -1632,8 +1630,8 @@ public:
    * @see http://doc.babylonjs.com/features/webgl2#multisample-render-targets
    * @param textures defines the textures to update
    * @param samples defines the sample count to set
-   * @returns the effective sample count (could be 0 if multisample render
-   * targets are not supported)
+   * @returns the effective sample count (could be 0 if multisample render targets are not
+   * supported)
    */
   unsigned int
   updateMultipleRenderTargetTextureSampleCount(const std::vector<InternalTexturePtr>& textures,
@@ -1709,25 +1707,21 @@ public:
    * @param rootUrl defines the url where the files to load is located
    * @param scene defines the current scene
    * @param files defines the list of files to load (1 per face)
-   * @param noMipmap defines a boolean indicating that no mipmaps shall be
-   * generated (false by default)
-   * @param onLoad defines an optional callback raised when the texture is
-   * loaded
-   * @param onError defines an optional callback raised if there is an issue to
-   * load the texture
+   * @param noMipmap defines a boolean indicating that no mipmaps shall be generated (false by
+   * default)
+   * @param onLoad defines an optional callback raised when the texture is loaded
+   * @param onError defines an optional callback raised if there is an issue to load the texture
    * @param format defines the format of the data
-   * @param forcedExtension defines the extension to use to pick the right
-   * loader
-   * @param createPolynomials if a polynomial sphere should be created for the
-   * cube texture
-   * @param lodScale defines the scale applied to environment texture. This
-   * manages the range of LOD level used for IBL according to the roughness
-   * @param lodOffset defines the offset applied to environment texture. This
-   * manages first LOD level used for IBL according to the roughness
-   * @param fallback defines texture to use while falling back when (compressed)
-   * texture file not found.
-   * @param excludeLoaders array of texture loaders that should be excluded when
-   * picking a loader for the texture (defualt: empty array)
+   * @param forcedExtension defines the extension to use to pick the right loader
+   * @param createPolynomials if a polynomial sphere should be created for the cube texture
+   * @param lodScale defines the scale applied to environment texture. This manages the range of LOD
+   * level used for IBL according to the roughness
+   * @param lodOffset defines the offset applied to environment texture. This manages first LOD
+   * level used for IBL according to the roughness
+   * @param fallback defines texture to use while falling back when (compressed) texture file not
+   * found.
+   * @param excludeLoaders array of texture loaders that should be excluded when picking a loader
+   * for the texture (defualt: empty array)
    * @returns the cube texture as an InternalTexture
    */
   InternalTexturePtr createCubeTexture(
@@ -1853,7 +1847,7 @@ public:
   InternalTexturePtr createMultiviewRenderTargetTexture(int width, int height);
 
   /**
-   * Binds a multiview framebuffer to be drawn to
+   * @brief Binds a multiview framebuffer to be drawn to.
    * @param multiviewTexture texture to bind
    */
   void bindMultiviewFramebuffer(const InternalTexturePtr& multiviewTexture);
