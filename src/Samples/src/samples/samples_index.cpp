@@ -21,13 +21,10 @@ void SamplesIndex::fillSamplesFailures() const
 
   _samplesFailures = {
     {"BlurModeForMirrorsScene", {SampleFailureReasonKind::empty3d}},
-    {"CircleCurvesFromBeziersScene", {SampleFailureReasonKind::empty3d, "Rendering empty with 50% chance"}},
     {"EnvironmentTextureScene", {SampleFailureReasonKind::empty3d}},
     {"FurMaterialScene", {SampleFailureReasonKind::broken3d, "Black fur!"}},
     {"InnerMeshPointsScene", {SampleFailureReasonKind::broken3d, "Low FPS! Less than 1"}},
     {"IsPointInsideMeshScene", {SampleFailureReasonKind::processHung, "infinite loop inside Mesh::pointIsInside"}},
-    {"LinesMeshSpiralScene", {SampleFailureReasonKind::empty3d, "Rendering empty with 50% chance"}},
-    {"LorenzAttractorScene", {SampleFailureReasonKind::empty3d, "Rendering empty with 50% chance"}},
     {"MultiSampleRenderTargetsScene", {SampleFailureReasonKind::empty3d}},
     {"SimpleSkinScene", {SampleFailureReasonKind::empty3d}},
     {"VolumetricLightScatteringScene", {SampleFailureReasonKind::broken3d, "No scatter / 3d emtpy after dragging"}}
