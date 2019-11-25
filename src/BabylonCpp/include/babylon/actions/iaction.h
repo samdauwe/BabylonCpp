@@ -63,6 +63,14 @@ struct BABYLON_SHARED_EXPORT IAction {
    */
   ActionManager* _actionManager;
 
+  /**
+   * @brief Adds action to chain of actions, may be a DoNothingAction
+   * @param action defines the next action to execute
+   * @returns The action passed in
+   * @see https://www.babylonjs-playground.com/#1T30HR#0
+   */
+  virtual IAction* then(IAction* action) = 0;
+
 }; // end of struct IAction
 
 } // end of namespace BABYLON

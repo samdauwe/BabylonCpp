@@ -21,9 +21,7 @@ Action::Action(unsigned int iTriggerOptions, Condition* condition)
 }
 
 Action::Action(const TriggerOptions& iTriggerOptions, Condition* condition)
-    : _nextActiveAction{this}
-    , _condition{condition}
-    , _triggerParameter{triggerOptions.parameter}
+    : _nextActiveAction{this}, _condition{condition}, _triggerParameter{triggerOptions.parameter}
 {
   triggerOptions = iTriggerOptions;
 }
@@ -89,9 +87,9 @@ void Action::skipToNextActiveAction()
   }
 }
 
-Action* Action::then(Action* action)
+IAction* Action::then(IAction* action)
 {
-  _child = action;
+  _child = static_cast<Action*>(action);
 
   action->_actionManager = _actionManager;
   action->_prepare();
@@ -115,8 +113,7 @@ json Action::serialize(json& /*parent*/) const
   return json();
 }
 
-json Action::_serialize(const json& /*serializedAction*/,
-                        json& /*parent*/) const
+json Action::_serialize(const json& /*serializedAction*/, json& /*parent*/) const
 {
   return nullptr;
 }
@@ -143,8 +140,7 @@ std::string Action::_SerializeValueAsString(const AnimationValue& value)
     }
     case Animation::ANIMATIONTYPE_COLOR4(): {
       const auto& _value = value.get<Color4>();
-      return String::concat(_value.r, ", ", _value.g, ", ", _value.b, ", ",
-                            _value.a);
+      return String::concat(_value.r, ", ", _value.g, ", ", _value.b, ", ", _value.a);
     }
     case Animation::ANIMATIONTYPE_VECTOR2(): {
       const auto& _value = value.get<Vector2>();

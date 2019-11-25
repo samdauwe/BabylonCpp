@@ -2,6 +2,7 @@
 #define BABYLON_ENGINES_ENGINE_STORE_H
 
 #include <memory>
+#include <string>
 #include <vector>
 
 #include <babylon/babylon_api.h>
@@ -12,8 +13,8 @@ class Engine;
 class Scene;
 
 /**
- * @brief The engine store class is responsible to hold all the instances of
- * Engine and Scene created during the life time of the application.
+ * @brief The engine store class is responsible to hold all the instances of Engine and Scene
+ * created during the life time of the application.
  */
 struct BABYLON_SHARED_EXPORT EngineStore {
 
@@ -32,6 +33,19 @@ struct BABYLON_SHARED_EXPORT EngineStore {
    * @brief Gets the latest created scene.
    */
   static Scene* LastCreatedScene();
+
+  /**
+   * Gets or sets a global variable indicating if fallback texture must be used when a texture
+   * cannot be loaded
+   * @ignorenaming
+   */
+  static bool UseFallbackTexture;
+
+  /**
+   * Texture content used if a texture cannot loaded
+   * @ignorenaming
+   */
+  static std::string FallbackTexture;
 
 }; // end of struct EngineStore
 

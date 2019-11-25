@@ -20,4 +20,8 @@ Scene* EngineStore::LastCreatedScene()
   return _LastCreatedScene;
 }
 
+bool EngineStore::UseFallbackTexture = true;
+
+std::string EngineStore::FallbackTexture = "";
+
 } // end of namespace BABYLON

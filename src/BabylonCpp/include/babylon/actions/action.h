@@ -74,7 +74,7 @@ public:
    * @returns The action passed in
    * @see https://www.babylonjs-playground.com/#1T30HR#0
    */
-  Action* then(Action* action);
+  IAction* then(IAction* action) override;
 
   /**
    * @brief Internal only.
