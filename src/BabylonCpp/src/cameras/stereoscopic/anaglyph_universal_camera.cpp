@@ -8,24 +8,19 @@ bool AnaglyphUniversalCamera::NodeConstructorAdded = false;
 
 void AnaglyphUniversalCamera::AddNodeConstructor()
 {
-  Node::AddNodeConstructor(
-    "AnaglyphUniversalCamera", [](const std::string& iName, Scene* scene,
-                                  const std::optional<json>& options) {
-      float interaxialDistance = 0.f;
-      if (options) {
-        interaxialDistance
-          = json_util::get_number<float>(*options, "interaxial_distance");
-      }
-      return AnaglyphUniversalCamera::New(iName, Vector3::Zero(),
-                                          interaxialDistance, scene);
-    });
+  Node::AddNodeConstructor("AnaglyphUniversalCamera", [](const std::string& iName, Scene* scene,
+                                                         const std::optional<json>& options) {
+    auto interaxialDistance = 0.f;
+    if (options) {
+      interaxialDistance = json_util::get_number<float>(*options, "interaxial_distance");
+    }
+    return AnaglyphUniversalCamera::New(iName, Vector3::Zero(), interaxialDistance, scene);
+  });
   AnaglyphUniversalCamera::NodeConstructorAdded = true;
 }
 
-AnaglyphUniversalCamera::AnaglyphUniversalCamera(const std::string& iName,
-                                                 const Vector3& iPosition,
-                                                 float iInteraxialDistance,
-                                                 Scene* scene)
+AnaglyphUniversalCamera::AnaglyphUniversalCamera(const std::string& iName, const Vector3& iPosition,
+                                                 float iInteraxialDistance, Scene* scene)
     : UniversalCamera{iName, iPosition, scene}
 {
   interaxialDistance = iInteraxialDistance;

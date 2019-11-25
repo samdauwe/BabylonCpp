@@ -10,8 +10,7 @@ class AnaglyphUniversalCamera;
 using AnaglyphUniversalCameraPtr = std::shared_ptr<AnaglyphUniversalCamera>;
 
 /**
- * @brief Camera used to simulate anaglyphic rendering (based on
- * UniversalCamera).
+ * @brief Camera used to simulate anaglyphic rendering (based on UniversalCamera).
  * @see http://doc.babylonjs.com/features/cameras#anaglyph-cameras
  */
 class BABYLON_SHARED_EXPORT AnaglyphUniversalCamera : public UniversalCamera {
