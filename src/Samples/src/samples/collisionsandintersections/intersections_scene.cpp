@@ -18,6 +18,7 @@ namespace Samples {
 /**
  * @brief Intersections Scene. Scene demonstrating how to detect when meshes intersect each other.
  * @see https://www.babylonjs-playground.com/#KQV9SA#0
+ * @see https://doc.babylonjs.com/babylon101/intersect_collisions_-_mesh
  */
 class IntersectionsScene : public IRenderableScene {
 
@@ -162,7 +163,7 @@ private:
 namespace BABYLON {
 namespace Samples {
 
-BABYLON_REGISTER_SAMPLE("Collisions and Intersections", IntersectionsScene)
+BABYLON_REGISTER_SAMPLE("Collisions & intersections", IntersectionsScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON

@@ -85,7 +85,7 @@ struct CollisionsScene : public IRenderableScene {
 namespace BABYLON {
 namespace Samples {
 
-BABYLON_REGISTER_SAMPLE("Collisions and Intersections", CollisionsScene)
+BABYLON_REGISTER_SAMPLE("Collisions & intersections", CollisionsScene)
 
 } // end of namespace Samples
 } // end of namespace BABYLON
