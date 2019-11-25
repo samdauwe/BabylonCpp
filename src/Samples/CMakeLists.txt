@@ -81,6 +81,7 @@ file(GLOB EXTENSIONS_HDR_FILES                      ${INCLUDE_PATH}/extensions/*
                                                     ${INCLUDE_PATH}/extensions/noisegeneration/*.h
                                                     ${INCLUDE_PATH}/extensions/polyhedron/*.h
                                                     ${INCLUDE_PATH}/extensions/treegenerators/*.h)
+file(GLOB INTERACTIONSANDEVENTS_HDR_FILES           ${INCLUDE_PATH}/interactionsandevents/*.h)
 file(GLOB LIGHTS_HDR_FILES                          ${INCLUDE_PATH}/lights/*.h)
 if (OPTION_BUILD_LOADERS)
     file(GLOB LOADERS_HDR_FILES                     ${INCLUDE_PATH}/loaders/*.h
@@ -114,6 +115,7 @@ set(BABYLON_SAMPLES_HEADERS
     ${COMMON_HDR_FILES}
     ${EXTENSIONS_HDR_FILES}
     ${LIGHTS_HDR_FILES}
+    ${INTERACTIONSANDEVENTS_HDR_FILES}
     ${LOADERS_HDR_FILES}
     ${MATERIALS_HDR_FILES}
     ${MATERIALS_LIBRARY_HDR_FILES}
@@ -138,6 +140,7 @@ file(GLOB EXTENSIONS_SRC_FILES                      ${SOURCE_PATH}/extensions/*.
                                                     ${SOURCE_PATH}/extensions/noisegeneration/*.cpp
                                                     ${SOURCE_PATH}/extensions/polyhedron/*.cpp
                                                     ${SOURCE_PATH}/extensions/treegenerators/*.cpp)
+file(GLOB INTERACTIONSANDEVENTS_SRC_FILES           ${SOURCE_PATH}/interactionsandevents/*.cpp)
 file(GLOB LIGHTS_SRC_FILES                          ${SOURCE_PATH}/lights/*.cpp)
 if (OPTION_BUILD_LOADERS)
     file(GLOB LOADERS_SRC_FILES                     ${SOURCE_PATH}/loaders/*.cpp
@@ -171,6 +174,7 @@ set(BABYLON_SAMPLES_SOURCES
     ${COMMON_SRC_FILES}
     ${EXTENSIONS_SRC_FILES}
     ${LIGHTS_SRC_FILES}
+    ${INTERACTIONSANDEVENTS_SRC_FILES}
     ${LOADERS_SRC_FILES}
     ${MATERIALS_SRC_FILES}
     ${MATERIALS_LIBRARY_SRC_FILES}
