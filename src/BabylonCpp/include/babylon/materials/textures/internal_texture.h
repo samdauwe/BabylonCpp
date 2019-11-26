@@ -5,13 +5,13 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/core/array_buffer_view.h>
 #include <babylon/core/structs.h>
 #include <babylon/materials/textures/iinternal_texture_tracker.h>
 #include <babylon/misc/observable.h>
 
 namespace BABYLON {
 
-struct ArrayBufferView;
 class BaseTexture;
 class Engine;
 class ICanvasRenderingContext2D;
@@ -230,7 +230,7 @@ public:
   bool _invertVScale;
   int _associatedChannel;
   unsigned int _dataSource;
-  std::variant<std::string, ArrayBuffer, Image> _buffer;
+  std::variant<std::string, ArrayBuffer, ArrayBufferView, Image> _buffer;
   ArrayBuffer _bufferView;
   std::vector<ArrayBufferView> _bufferViewArray;
   std::vector<std::vector<ArrayBuffer>> _bufferViewArrayArray;
@@ -244,11 +244,11 @@ public:
   std::shared_ptr<GL::IGLFramebuffer> _MSAAFramebuffer;
   Uint32Array _attachments;
   std::unique_ptr<GL::IGLRenderbuffer> _MSAARenderBuffer;
-  unsigned int _cachedCoordinatesMode;
-  unsigned int _cachedWrapU;
-  unsigned int _cachedWrapV;
-  unsigned int _cachedWrapR;
-  unsigned int _cachedAnisotropicFilteringLevel;
+  int _cachedCoordinatesMode;
+  int _cachedWrapU;
+  int _cachedWrapV;
+  int _cachedWrapR;
+  int _cachedAnisotropicFilteringLevel;
   bool _isDisabled;
   std::string _compression;
   bool _generateStencilBuffer;

@@ -53,11 +53,11 @@ InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource,
     , _depthStencilBuffer{nullptr}
     , _MSAAFramebuffer{nullptr}
     , _MSAARenderBuffer{nullptr}
-    , _cachedCoordinatesMode{0}
-    , _cachedWrapU{0}
-    , _cachedWrapV{0}
-    , _cachedWrapR{0}
-    , _cachedAnisotropicFilteringLevel{0}
+    , _cachedCoordinatesMode{-1}
+    , _cachedWrapU{-1}
+    , _cachedWrapV{-1}
+    , _cachedWrapR{-1}
+    , _cachedAnisotropicFilteringLevel{-1}
     , _isDisabled{false}
     , _compression{""}
     , _generateStencilBuffer{false}
@@ -120,11 +120,11 @@ void InternalTexture::_rebuild()
 {
   InternalTexturePtr proxy;
   isReady                          = false;
-  _cachedCoordinatesMode           = 0;
-  _cachedWrapU                     = 0;
-  _cachedWrapV                     = 0;
-  _cachedWrapR                     = 0;
-  _cachedAnisotropicFilteringLevel = 0;
+  _cachedCoordinatesMode           = -1;
+  _cachedWrapU                     = -1;
+  _cachedWrapV                     = -1;
+  _cachedWrapR                     = -1;
+  _cachedAnisotropicFilteringLevel = -1;
 
   switch (_dataSource) {
     case InternalTexture::DATASOURCE_TEMP:

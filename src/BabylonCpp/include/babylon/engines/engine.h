@@ -1443,8 +1443,8 @@ public:
     const std::function<void(InternalTexture*, EventState&)>& onLoad = nullptr,
     const std::function<void(const std::string& message, const std::string& exception)>& onError
     = nullptr,
-    const std::variant<std::string, ArrayBuffer, Image>& buffer
-    = std::variant<std::string, ArrayBuffer, Image>());
+    const std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>& buffer
+    = std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>());
 
   /**
    * @brief HUsually called from BABYLON.Texture.ts.
@@ -1479,9 +1479,10 @@ public:
     const std::function<void(InternalTexture*, EventState&)>& onLoad = nullptr,
     const std::function<void(const std::string& message, const std::string& exception)>& onError
     = nullptr,
-    const std::optional<std::variant<std::string, ArrayBuffer, Image>>& buffer = std::nullopt,
-    const InternalTexturePtr& fallBack                                         = nullptr,
-    const std::optional<unsigned int>& format                                  = std::nullopt);
+    const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer
+    = std::nullopt,
+    const InternalTexturePtr& fallBack        = nullptr,
+    const std::optional<unsigned int>& format = std::nullopt);
 
   /**
    * @brief Update a raw texture.

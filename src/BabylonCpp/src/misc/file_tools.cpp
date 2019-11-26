@@ -29,6 +29,7 @@
 #pragma GCC diagnostic pop
 #endif
 
+#include <babylon/core/array_buffer_view.h>
 #include <babylon/core/filesystem.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
@@ -100,7 +101,7 @@ void FileTools::LoadImageFromUrl(
 }
 
 void FileTools::LoadImageFromBuffer(
-  const std::variant<std::string, ArrayBuffer, Image>& input, bool invertY,
+  const std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>& input, bool invertY,
   const std::function<void(const Image& img)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError)
 {
@@ -113,6 +114,9 @@ void FileTools::LoadImageFromBuffer(
   }
   else if (std::holds_alternative<ArrayBuffer>(input)) {
     onLoad(FileTools::ArrayBufferToImage(std::get<ArrayBuffer>(input), invertY));
+  }
+  else if (std::holds_alternative<ArrayBufferView>(input)) {
+    onLoad(FileTools::ArrayBufferToImage(std::get<ArrayBufferView>(input).uint8Array, invertY));
   }
   else if (std::holds_alternative<Image>(input)) {
     onLoad(std::get<Image>(input));

@@ -10,6 +10,7 @@
 
 namespace BABYLON {
 
+struct ArrayBufferView;
 class ProgressEvent;
 
 /**
@@ -43,7 +44,7 @@ public:
    * @param flipVertically whether or not to flip the image vertically
    */
   static void LoadImageFromBuffer(
-    const std::variant<std::string, ArrayBuffer, Image>& input, bool invertY,
+    const std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>& input, bool invertY,
     const std::function<void(const Image& img)>& onLoad,
     const std::function<void(const std::string& message, const std::string& exception)>& onError);
 

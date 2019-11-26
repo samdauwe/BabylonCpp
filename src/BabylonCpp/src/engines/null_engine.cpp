@@ -338,7 +338,7 @@ InternalTexturePtr NullEngine::createTexture(
   const std::string& urlArg, bool noMipmap, bool invertY, Scene* /*scene*/,
   unsigned int samplingMode, const std::function<void(InternalTexture*, EventState&)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& /*onError*/,
-  const std::optional<std::variant<std::string, ArrayBuffer, Image>>& /*buffer*/,
+  const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& /*buffer*/,
   const InternalTexturePtr& /*fallBack*/, const std::optional<unsigned int>& format)
 {
   auto texture    = InternalTexture::New(this, InternalTexture::DATASOURCE_URL);

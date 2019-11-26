@@ -2757,7 +2757,7 @@ InternalTexturePtr Engine::createTexture(
   const std::vector<std::string>& list, bool noMipmap, bool invertY, Scene* scene,
   unsigned int samplingMode, const std::function<void(InternalTexture*, EventState&)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
-  const std::variant<std::string, ArrayBuffer, Image>& buffer)
+  const std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>& buffer)
 {
   if (list.empty()) {
     return nullptr;
@@ -2770,7 +2770,7 @@ InternalTexturePtr Engine::createTexture(
   const std::string& urlArg, bool noMipmap, bool invertY, Scene* scene, unsigned int samplingMode,
   const std::function<void(InternalTexture*, EventState&)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
-  const std::optional<std::variant<std::string, ArrayBuffer, Image>>& buffer,
+  const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer,
   const InternalTexturePtr& fallback, const std::optional<unsigned int>& format)
 {
   // assign a new string, so that the original is still available in case of fallback
@@ -5109,22 +5109,22 @@ bool Engine::_setTexture(int channel, const BaseTexturePtr& texture, bool isPart
       _bindTextureDirectly(GL::TEXTURE_3D, internalTexture, isPartOfTextureArray);
     }
 
-    if (internalTexture && internalTexture->_cachedWrapU != texture->wrapU) {
-      internalTexture->_cachedWrapU = texture->wrapU;
+    if (internalTexture && internalTexture->_cachedWrapU != static_cast<int>(texture->wrapU)) {
+      internalTexture->_cachedWrapU = static_cast<int>(texture->wrapU);
       _setTextureParameterInteger(GL::TEXTURE_3D, GL::TEXTURE_WRAP_S,
                                   static_cast<int>(_getTextureWrapMode(texture->wrapU)),
                                   internalTexture);
     }
 
-    if (internalTexture && internalTexture->_cachedWrapV != texture->wrapV) {
-      internalTexture->_cachedWrapV = texture->wrapV;
+    if (internalTexture && internalTexture->_cachedWrapV != static_cast<int>(texture->wrapV)) {
+      internalTexture->_cachedWrapV = static_cast<int>(texture->wrapV);
       _setTextureParameterInteger(GL::TEXTURE_3D, GL::TEXTURE_WRAP_T,
                                   static_cast<int>(_getTextureWrapMode(texture->wrapV)),
                                   internalTexture);
     }
 
-    if (internalTexture && internalTexture->_cachedWrapR != texture->wrapR) {
-      internalTexture->_cachedWrapR = texture->wrapR;
+    if (internalTexture && internalTexture->_cachedWrapR != static_cast<int>(texture->wrapR)) {
+      internalTexture->_cachedWrapR = static_cast<int>(texture->wrapR);
       _setTextureParameterInteger(GL::TEXTURE_3D, GL::TEXTURE_WRAP_R,
                                   static_cast<int>(_getTextureWrapMode(texture->wrapR)),
                                   internalTexture);
@@ -5137,10 +5137,9 @@ bool Engine::_setTexture(int channel, const BaseTexturePtr& texture, bool isPart
       _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, internalTexture, isPartOfTextureArray);
     }
 
-    if (internalTexture->_cachedCoordinatesMode != texture->coordinatesMode()) {
-      internalTexture->_cachedCoordinatesMode = texture->coordinatesMode();
-      // CUBIC_MODE and SKYBOX_MODE both require CLAMP_TO_EDGE.  All other modes
-      // use REPEAT.
+    if (internalTexture->_cachedCoordinatesMode != static_cast<int>(texture->coordinatesMode())) {
+      internalTexture->_cachedCoordinatesMode = static_cast<int>(texture->coordinatesMode());
+      // CUBIC_MODE and SKYBOX_MODE both require CLAMP_TO_EDGE.  All other modes use REPEAT.
       auto textureWrapMode = (texture->coordinatesMode() != Constants::TEXTURE_CUBIC_MODE
                               && texture->coordinatesMode() != Constants::TEXTURE_SKYBOX_MODE) ?
                                GL::REPEAT :
@@ -5158,15 +5157,15 @@ bool Engine::_setTexture(int channel, const BaseTexturePtr& texture, bool isPart
       _bindTextureDirectly(GL::TEXTURE_2D, internalTexture, isPartOfTextureArray);
     }
 
-    if (internalTexture && internalTexture->_cachedWrapU != texture->wrapU) {
-      internalTexture->_cachedWrapU = texture->wrapU;
+    if (internalTexture && internalTexture->_cachedWrapU != static_cast<int>(texture->wrapU)) {
+      internalTexture->_cachedWrapU = static_cast<int>(texture->wrapU);
       _setTextureParameterInteger(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S,
                                   static_cast<int>(_getTextureWrapMode(texture->wrapU)),
                                   internalTexture);
     }
 
-    if (internalTexture && internalTexture->_cachedWrapV != texture->wrapV) {
-      internalTexture->_cachedWrapV = texture->wrapV;
+    if (internalTexture && internalTexture->_cachedWrapV != static_cast<int>(texture->wrapV)) {
+      internalTexture->_cachedWrapV = static_cast<int>(texture->wrapV);
       _setTextureParameterInteger(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T,
                                   static_cast<int>(_getTextureWrapMode(texture->wrapV)),
                                   internalTexture);
@@ -5224,15 +5223,15 @@ void Engine::_setAnisotropicLevel(unsigned int target, const BaseTexturePtr& tex
   if (internalTexture->samplingMode != Constants::TEXTURE_LINEAR_LINEAR_MIPNEAREST
       && internalTexture->samplingMode != Constants::TEXTURE_LINEAR_LINEAR_MIPLINEAR
       && internalTexture->samplingMode != Constants::TEXTURE_LINEAR_LINEAR) {
-    value = 1; // Forcing the anisotropic to 1 because else webgl will force
-               // filters to linear
+    value = 1; // Forcing the anisotropic to 1 because else webgl will force filters to linear
   }
 
-  if (anisotropicFilterExtension && internalTexture->_cachedAnisotropicFilteringLevel != value) {
+  if (anisotropicFilterExtension
+      && internalTexture->_cachedAnisotropicFilteringLevel != static_cast<int>(value)) {
     _setTextureParameterFloat(target, AnisotropicFilterExtension::TEXTURE_MAX_ANISOTROPY_EXT,
                               static_cast<float>(std::min(value, _caps.maxAnisotropy)),
                               internalTexture);
-    internalTexture->_cachedAnisotropicFilteringLevel = value;
+    internalTexture->_cachedAnisotropicFilteringLevel = static_cast<int>(value);
   }
 }
 void Engine::_setTextureParameterFloat(unsigned int target, unsigned int parameter, float value,

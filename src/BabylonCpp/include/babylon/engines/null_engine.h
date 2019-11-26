@@ -99,8 +99,9 @@ public:
     const std::function<void(InternalTexture*, EventState&)>& onLoad = nullptr,
     const std::function<void(const std::string& message, const std::string& exception)>& onError
     = nullptr,
-    const std::optional<std::variant<std::string, ArrayBuffer, Image>>& buffer = std::nullopt,
-    const InternalTexturePtr& fallBack                                         = nullptr,
+    const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer
+    = std::nullopt,
+    const InternalTexturePtr& fallBack        = nullptr,
     const std::optional<unsigned int>& format = std::nullopt) override;
   InternalTexturePtr createRenderTargetTexture(const std::variant<ISize, float>& size,
                                                const IRenderTargetOptions& options) override;

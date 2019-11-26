@@ -17,11 +17,10 @@ namespace BABYLON {
 bool Texture::UseSerializedUrlIfAny = false;
 
 Texture::Texture(
-  const std::string& iUrl, Scene* scene, bool iNoMipmap, bool invertY,
-  unsigned int samplingMode, const std::function<void()>& onLoad,
-  const std::function<void(const std::string& message,
-                           const std::string& exception)>& onError,
-  const std::optional<std::variant<std::string, ArrayBuffer, Image>>& buffer,
+  const std::string& iUrl, Scene* scene, bool iNoMipmap, bool invertY, unsigned int samplingMode,
+  const std::function<void()>& onLoad,
+  const std::function<void(const std::string& message, const std::string& exception)>& onError,
+  const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer,
   bool deleteBuffer, const std::optional<unsigned int>& format)
     : BaseTexture{scene}
     , uOffset{0.f}
@@ -69,17 +68,36 @@ Texture::Texture(
     _format = format;
   }
 
-  scene = getScene();
+  scene       = getScene();
+  auto engine = scene->getEngine();
 
-  if (!scene) {
+  if (!engine) {
     return;
   }
-  scene->getEngine()->onBeforeTextureInitObservable.notifyObservers(this);
+  engine->onBeforeTextureInitObservable.notifyObservers(this);
 
   _load = [this](InternalTexture*, EventState&) {
-    if (_texture && _texture->_invertVScale) {
-      vScale = -1.f;
+    if (_texture) {
+      if (_texture->_invertVScale) {
+        vScale *= -1.f;
+        vOffset += 1.f;
+      }
+
+      // Update texutre to match internal texture's wrapping
+      if (_texture->_cachedWrapU != -1) {
+        wrapU                  = static_cast<unsigned>(_texture->_cachedWrapU);
+        _texture->_cachedWrapU = -1;
+      }
+      if (_texture->_cachedWrapV != -1) {
+        wrapV                  = static_cast<unsigned>(_texture->_cachedWrapV);
+        _texture->_cachedWrapV = -1;
+      }
+      if (_texture->_cachedWrapR != -1) {
+        wrapR                  = static_cast<unsigned>(_texture->_cachedWrapR);
+        _texture->_cachedWrapR = -1;
+      }
     }
+
     if (_onLoadObservable.hasObservers()) {
       _onLoadObservable.notifyObservers(this);
     }
@@ -102,10 +120,9 @@ Texture::Texture(
   _texture = _getFromCache(url, noMipmap, samplingMode, invertY);
 
   if (!_texture) {
-    if (!scene->useDelayedTextureLoading) {
-      _texture = scene->getEngine()->createTexture(
-        url, noMipmap, invertY, scene, samplingMode, _load, onError, _buffer,
-        nullptr, _format);
+    if (!scene || !scene->useDelayedTextureLoading) {
+      _texture = engine->createTexture(url, noMipmap, invertY, scene, samplingMode, _load, onError,
+                                       _buffer, nullptr, _format);
       if (deleteBuffer) {
         _buffer = std::nullopt;
       }
@@ -173,7 +190,7 @@ bool Texture::get_noMipmap() const
 
 void Texture::updateURL(
   const std::string& iUrl,
-  const std::optional<std::variant<std::string, ArrayBuffer, Image>>& buffer,
+  const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer,
   const std::function<void(InternalTexture*, EventState&)>& onLoad)
 {
   if (iUrl.empty()) {
@@ -181,6 +198,7 @@ void Texture::updateURL(
     getScene()->markAllMaterialsAsDirty(Constants::MATERIAL_TextureDirtyFlag);
   }
 
+  name           = iUrl;
   url            = iUrl;
   _buffer        = buffer;
   delayLoadState = Constants::DELAYLOADSTATE_NOTLOADED;
@@ -207,9 +225,9 @@ void Texture::delayLoad(const std::string& /*forcedExtension*/)
   _texture       = _getFromCache(url, _noMipmap, samplingMode, _invertY);
 
   if (!_texture) {
-    _texture = scene->getEngine()->createTexture(
-      url, _noMipmap, _invertY, getScene(), samplingMode, _delayedOnLoad,
-      _delayedOnError, _buffer, nullptr, _format);
+    _texture = scene->getEngine()->createTexture(url, _noMipmap, _invertY, getScene(), samplingMode,
+                                                 _delayedOnLoad, _delayedOnError, _buffer, nullptr,
+                                                 _format);
     if (_deleteBuffer) {
       // delete _buffer;
     }
@@ -232,8 +250,7 @@ void Texture::delayLoad(const std::string& /*forcedExtension*/)
   _delayedOnError = nullptr;
 }
 
-void Texture::_prepareRowForTextureGeneration(float x, float y, float z,
-                                              Vector3& t)
+void Texture::_prepareRowForTextureGeneration(float x, float y, float z, Vector3& t)
 {
   x *= uScale;
   y *= vScale;
@@ -242,8 +259,7 @@ void Texture::_prepareRowForTextureGeneration(float x, float y, float z,
   y -= vRotationCenter * vScale;
   z -= wRotationCenter;
 
-  Vector3::TransformCoordinatesFromFloatsToRef(x, y, z, *_rowGenerationMatrix,
-                                               t);
+  Vector3::TransformCoordinatesFromFloatsToRef(x, y, z, *_rowGenerationMatrix, t);
 
   t.x += uRotationCenter * uScale + uOffset;
   t.y += vRotationCenter * vScale + vOffset;
@@ -255,10 +271,8 @@ Matrix* Texture::getTextureMatrix()
   if (stl_util::almost_equal(uOffset, _cachedUOffset)
       && stl_util::almost_equal(vOffset, _cachedVOffset)
       && stl_util::almost_equal(uScale, _cachedUScale)
-      && stl_util::almost_equal(vScale, _cachedVScale)
-      && stl_util::almost_equal(uAng, _cachedUAng)
-      && stl_util::almost_equal(vAng, _cachedVAng)
-      && stl_util::almost_equal(wAng, _cachedWAng)) {
+      && stl_util::almost_equal(vScale, _cachedVScale) && stl_util::almost_equal(uAng, _cachedUAng)
+      && stl_util::almost_equal(vAng, _cachedVAng) && stl_util::almost_equal(wAng, _cachedWAng)) {
     return _cachedTextureMatrix.get();
   }
 
@@ -299,10 +313,9 @@ Matrix* Texture::getTextureMatrix()
     return _cachedTextureMatrix.get();
   }
 
-  scene->markAllMaterialsAsDirty(
-    Constants::MATERIAL_TextureDirtyFlag, [this](Material* mat) {
-      return mat->hasTexture(shared_from_base<Texture>());
-    });
+  scene->markAllMaterialsAsDirty(Constants::MATERIAL_TextureDirtyFlag, [this](Material* mat) {
+    return mat->hasTexture(shared_from_base<Texture>());
+  });
 
   return _cachedTextureMatrix.get();
 }
@@ -320,8 +333,7 @@ Matrix* Texture::getReflectionTextureMatrix()
       && stl_util::almost_equal(vScale, _cachedVScale)
       && (static_cast<int>(coordinatesMode()) == _cachedCoordinatesMode)) {
     if (coordinatesMode() == TextureConstants::PROJECTION_MODE) {
-      if (_cachedProjectionMatrixId
-          == scene->getProjectionMatrix().updateFlag) {
+      if (_cachedProjectionMatrixId == scene->getProjectionMatrix().updateFlag) {
         return _cachedTextureMatrix.get();
       }
     }
@@ -361,36 +373,31 @@ Matrix* Texture::getReflectionTextureMatrix()
 
       auto projectionMatrix     = scene->getProjectionMatrix();
       _cachedProjectionMatrixId = projectionMatrix.updateFlag;
-      projectionMatrix.multiplyToRef(*_projectionModeMatrix,
-                                     *_cachedTextureMatrix);
+      projectionMatrix.multiplyToRef(*_projectionModeMatrix, *_cachedTextureMatrix);
     } break;
     default:
       Matrix::IdentityToRef(*_cachedTextureMatrix);
       break;
   }
 
-  scene->markAllMaterialsAsDirty(
-    Constants::MATERIAL_TextureDirtyFlag, [this](Material* mat) {
-      // we need to copy mat->getActiveTextures, since it returns by value!
-      auto activeTextures = mat->getActiveTextures();
-      return (std::find_if(activeTextures.begin(),
-                           activeTextures.end(),
-                           [this](const BaseTexturePtr& texture) {
-                             return texture.get() == this;
-                           })
-              != activeTextures.end());
-    });
+  scene->markAllMaterialsAsDirty(Constants::MATERIAL_TextureDirtyFlag, [this](Material* mat) {
+    // we need to copy mat->getActiveTextures, since it returns by value!
+    auto activeTextures = mat->getActiveTextures();
+    return (std::find_if(activeTextures.begin(), activeTextures.end(),
+                         [this](const BaseTexturePtr& texture) { return texture.get() == this; })
+            != activeTextures.end());
+  });
 
   return _cachedTextureMatrix.get();
 }
 
 TexturePtr Texture::clone() const
 {
-  std::optional<std::variant<std::string, ArrayBuffer, Image>> nullBuffer
+  std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>> nullBuffer
     = std::nullopt;
-  auto newTexture = Texture::New(
-    _texture ? _texture->url : "", getScene(), _noMipmap, _invertY,
-    samplingMode, nullptr, nullptr, _texture ? _texture->_buffer : nullBuffer);
+  auto newTexture
+    = Texture::New(_texture ? _texture->url : "", getScene(), _noMipmap, _invertY, samplingMode,
+                   nullptr, nullptr, _texture ? _texture->_buffer : nullBuffer);
 
   // Base texture
   newTexture->hasAlpha         = hasAlpha();
@@ -433,19 +440,16 @@ void Texture::dispose()
 }
 
 TexturePtr Texture::CreateFromBase64String(
-  const std::string& data, const std::string& iName, Scene* scene,
-  bool iNoMipmap, bool invertY, unsigned int samplingMode,
-  const std::function<void()>& onLoad,
-  const std::function<void(const std::string& message,
-                           const std::string& exception)>& onError,
+  const std::string& data, const std::string& iName, Scene* scene, bool iNoMipmap, bool invertY,
+  unsigned int samplingMode, const std::function<void()>& onLoad,
+  const std::function<void(const std::string& message, const std::string& exception)>& onError,
   unsigned int format)
 {
-  return Texture::New("data:" + iName, scene, iNoMipmap, invertY, samplingMode,
-                      onLoad, onError, data, false, format);
+  return Texture::New("data:" + iName, scene, iNoMipmap, invertY, samplingMode, onLoad, onError,
+                      data, false, format);
 }
 
-BaseTexturePtr Texture::Parse(const json& parsedTexture, Scene* scene,
-                              const std::string& rootUrl)
+BaseTexturePtr Texture::Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl)
 {
   if (json_util::has_valid_key_value(parsedTexture, "isCube")
       && json_util::get_bool(parsedTexture, "isCube")) {
@@ -467,12 +471,11 @@ BaseTexturePtr Texture::Parse(const json& parsedTexture, Scene* scene,
       if (json_util::has_valid_key_value(parsedTexture, "mirrorPlane")) {
         auto mirrorTexture = MirrorTexture::New(
           json_util::get_string(parsedTexture, "name"),
-          json_util::get_number<float>(parsedTexture, "renderTargetSize"),
-          scene, generateMipMaps);
+          json_util::get_number<float>(parsedTexture, "renderTargetSize"), scene, generateMipMaps);
         mirrorTexture->_waitingRenderList
           = json_util::get_array<std::string>(parsedTexture, "renderList");
-        mirrorTexture->mirrorPlane = Plane::FromArray(
-          json_util::get_array<float>(parsedTexture, "mirrorPlane"));
+        mirrorTexture->mirrorPlane
+          = Plane::FromArray(json_util::get_array<float>(parsedTexture, "mirrorPlane"));
 
         return mirrorTexture;
       }
@@ -480,8 +483,7 @@ BaseTexturePtr Texture::Parse(const json& parsedTexture, Scene* scene,
                && json_util::get_bool(parsedTexture, "isRenderTarget")) {
         auto renderTargetTexture = RenderTargetTexture::New(
           json_util::get_string(parsedTexture, "name"),
-          json_util::get_number<float>(parsedTexture, "renderTargetSize"),
-          scene, generateMipMaps);
+          json_util::get_number<float>(parsedTexture, "renderTargetSize"), scene, generateMipMaps);
         renderTargetTexture->_waitingRenderList
           = json_util::get_array<std::string>(parsedTexture, "renderList");
 
@@ -492,8 +494,7 @@ BaseTexturePtr Texture::Parse(const json& parsedTexture, Scene* scene,
         if (json_util::has_valid_key_value(parsedTexture, "base64String")) {
           texture = Texture::CreateFromBase64String(
             json_util::get_string(parsedTexture, "base64String"),
-            json_util::get_string(parsedTexture, "name"), scene,
-            !generateMipMaps);
+            json_util::get_string(parsedTexture, "name"), scene, !generateMipMaps);
         }
         else {
           auto url2 = rootUrl + json_util::get_string(parsedTexture, "name");
@@ -502,9 +503,8 @@ BaseTexturePtr Texture::Parse(const json& parsedTexture, Scene* scene,
               && json_util::has_valid_key_value(parsedTexture, "url")) {
             url2 = json_util::get_string(parsedTexture, "url");
           }
-          texture
-            = Texture::New(url2, scene, !generateMipMaps,
-                           json_util::get_bool(parsedTexture, "invertY", true));
+          texture = Texture::New(url2, scene, !generateMipMaps,
+                                 json_util::get_bool(parsedTexture, "invertY", true));
         }
 
         return texture;
@@ -514,8 +514,7 @@ BaseTexturePtr Texture::Parse(const json& parsedTexture, Scene* scene,
 
   // Update Sampling Mode
   if (json_util::has_valid_key_value(parsedTexture, "samplingMode")) {
-    auto sampling
-      = json_util::get_number<unsigned>(parsedTexture, "samplingMode");
+    auto sampling = json_util::get_number<unsigned>(parsedTexture, "samplingMode");
     if (texture->samplingMode != sampling) {
       texture->updateSamplingMode(sampling);
     }
@@ -523,8 +522,7 @@ BaseTexturePtr Texture::Parse(const json& parsedTexture, Scene* scene,
 
   // Animations
   if (json_util::has_key(parsedTexture, "animations")) {
-    for (auto parsedAnimation :
-         json_util::get_array<json>(parsedTexture, "animations")) {
+    for (auto parsedAnimation : json_util::get_array<json>(parsedTexture, "animations")) {
       texture->animations.emplace_back(Animation::Parse(parsedAnimation));
     }
   }
@@ -534,11 +532,10 @@ BaseTexturePtr Texture::Parse(const json& parsedTexture, Scene* scene,
 
 TexturePtr Texture::LoadFromDataString(
   const std::string& iName,
-  const std::optional<std::variant<std::string, ArrayBuffer, Image>>& buffer,
-  Scene* scene, bool deleteBuffer, bool iNoMipmap, bool invertY,
-  unsigned int samplingMode, const std::function<void()>& onLoad,
-  const std::function<void(const std::string& message,
-                           const std::string& exception)>& onError,
+  const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer,
+  Scene* scene, bool deleteBuffer, bool iNoMipmap, bool invertY, unsigned int samplingMode,
+  const std::function<void()>& onLoad,
+  const std::function<void(const std::string& message, const std::string& exception)>& onError,
   unsigned int format)
 {
   std::string _name = iName;
@@ -546,14 +543,13 @@ TexturePtr Texture::LoadFromDataString(
     _name = "data:" + iName;
   }
 
-  return Texture::New(iName, scene, iNoMipmap, invertY, samplingMode, onLoad,
-                      onError, buffer, deleteBuffer, format);
+  return Texture::New(iName, scene, iNoMipmap, invertY, samplingMode, onLoad, onError, buffer,
+                      deleteBuffer, format);
 }
 
-MirrorTexturePtr
-Texture::_CreateMirror(const std::string& iName,
-                       const std::variant<ISize, float>& renderTargetSize,
-                       Scene* scene, bool generateMipMaps)
+MirrorTexturePtr Texture::_CreateMirror(const std::string& iName,
+                                        const std::variant<ISize, float>& renderTargetSize,
+                                        Scene* scene, bool generateMipMaps)
 {
   return MirrorTexture::New(iName, renderTargetSize, scene, generateMipMaps);
 }
