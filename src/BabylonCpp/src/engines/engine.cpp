@@ -41,6 +41,7 @@
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/dds.h>
+#include <babylon/misc/file_tools.h>
 #include <babylon/misc/tools.h>
 #include <babylon/particles/particle_system.h>
 #include <babylon/postprocesses/pass_post_process.h>
@@ -2727,7 +2728,7 @@ void Engine::_cascadeLoadImgs(
 {
   std::vector<Image> images;
   for (size_t index = 0; index < 6; ++index) {
-    Tools::LoadImageFromUrl(
+    FileTools::LoadImageFromUrl(
       files[index], [&images](const Image& img) { images.emplace_back(img); }, onError, false);
   }
 
@@ -2839,8 +2840,8 @@ InternalTexturePtr Engine::createTexture(
       if (onLoadObserver) {
         texture->onLoadedObservable.remove(onLoadObserver);
       }
-      if (Tools::UseFallbackTexture) {
-        createTexture(Tools::fallbackTexture, noMipmap, invertY, scene, samplingMode, nullptr,
+      if (Tools::UseFallbackTexture()) {
+        createTexture(Tools::FallbackTexture(), noMipmap, invertY, scene, samplingMode, nullptr,
                       onError, buffer, texture);
       }
     }
@@ -2947,14 +2948,14 @@ InternalTexturePtr Engine::createTexture(
         // onload(buffer);
       }
       else {
-        Tools::LoadImageFromUrl(url, onload, onInternalError, invertY);
+        FileTools::LoadImageFromUrl(url, onload, onInternalError, invertY);
       }
     }
     else if (buffer.has_value()
              && (std::holds_alternative<std::string>(*buffer)
                  || std::holds_alternative<ArrayBuffer>(*buffer)
                  || std::holds_alternative<Image>(*buffer))) {
-      Tools::LoadImageFromBuffer(*buffer, invertY, onload, onInternalError);
+      FileTools::LoadImageFromBuffer(*buffer, invertY, onload, onInternalError);
     }
   }
 
@@ -5977,7 +5978,7 @@ IFileRequest Engine::_loadFile(
   const std::function<void(const ProgressEvent& event)>& onProgress, bool useArrayBuffer,
   const std::function<void(const std::string& message, const std::string& exception)>& onError)
 {
-  Tools::LoadFile(url, onSuccess, onProgress, useArrayBuffer, onError);
+  FileTools::LoadFile(url, onSuccess, onProgress, useArrayBuffer, onError);
   return IFileRequest();
 }
 

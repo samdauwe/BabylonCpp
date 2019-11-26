@@ -1,6 +1,8 @@
 #ifndef BABYLON_MATH_FUNCTIONS_H
 #define BABYLON_MATH_FUNCTIONS_H
 
+#include <functional>
+
 #include <babylon/babylon_common.h>
 #include <babylon/core/structs.h>
 #include <babylon/math/vector2.h>
@@ -17,17 +19,13 @@ namespace BABYLON {
  * @param bias defines bias value to add to the result
  * @return minimum and maximum values
  */
-inline MinMax extractMinAndMaxIndexed(const Float32Array& positions,
-                                      const Uint32Array& indices,
+inline MinMax extractMinAndMaxIndexed(const Float32Array& positions, const Uint32Array& indices,
                                       size_t indexStart, size_t indexCount,
-                                      const std::optional<Vector2>& bias
-                                      = std::nullopt)
+                                      const std::optional<Vector2>& bias = std::nullopt)
 {
-  Vector3 minimum(std::numeric_limits<float>::max(),
-                  std::numeric_limits<float>::max(),
+  Vector3 minimum(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
                   std::numeric_limits<float>::max());
-  Vector3 maximum(std::numeric_limits<float>::lowest(),
-                  std::numeric_limits<float>::lowest(),
+  Vector3 maximum(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(),
                   std::numeric_limits<float>::lowest());
 
   for (size_t index = indexStart; index < indexStart + indexCount; ++index) {
@@ -62,16 +60,13 @@ inline MinMax extractMinAndMaxIndexed(const Float32Array& positions,
  * positions in the positions array)
  * @return minimum and maximum values
  */
-inline MinMax
-extractMinAndMax(const Float32Array& positions, size_t start, size_t count,
-                 const std::optional<Vector2>& bias = std::nullopt,
-                 std::optional<unsigned int> stride = std::nullopt)
+inline MinMax extractMinAndMax(const Float32Array& positions, size_t start, size_t count,
+                               const std::optional<Vector2>& bias = std::nullopt,
+                               std::optional<unsigned int> stride = std::nullopt)
 {
-  Vector3 minimum(std::numeric_limits<float>::max(),
-                  std::numeric_limits<float>::max(),
+  Vector3 minimum(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
                   std::numeric_limits<float>::max());
-  Vector3 maximum(std::numeric_limits<float>::lowest(),
-                  std::numeric_limits<float>::lowest(),
+  Vector3 maximum(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(),
                   std::numeric_limits<float>::lowest());
 
   if (!stride) {
@@ -96,6 +91,33 @@ extractMinAndMax(const Float32Array& positions, size_t start, size_t count,
     maximum.x += maximum.x * _bias.x + _bias.y;
     maximum.y += maximum.y * _bias.x + _bias.y;
     maximum.z += maximum.z * _bias.x + _bias.y;
+  }
+
+  return {minimum, maximum};
+}
+
+inline MinMaxVector2
+ExtractMinAndMaxVector2(const std::function<std::optional<Vector2>(std::size_t index)>& feeder,
+                        const std::optional<Vector2>& bias)
+{
+  Vector2 minimum(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+  Vector2 maximum(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
+
+  std::size_t i = 0;
+  auto cur      = feeder(i++);
+  while (cur) {
+    minimum = Vector2::Minimize(*cur, minimum);
+    maximum = Vector2::Maximize(*cur, maximum);
+
+    cur = feeder(i++);
+  }
+
+  if (bias) {
+    const auto& _bias = *bias;
+    minimum.x -= minimum.x * _bias.x + _bias.y;
+    minimum.y -= minimum.y * _bias.x + _bias.y;
+    maximum.x += maximum.x * _bias.x + _bias.y;
+    maximum.y += maximum.y * _bias.x + _bias.y;
   }
 
   return {minimum, maximum};

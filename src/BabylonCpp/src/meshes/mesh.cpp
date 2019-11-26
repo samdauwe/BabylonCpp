@@ -56,7 +56,7 @@
 #include <babylon/meshes/mesh_lod_level.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
-#include <babylon/misc/tools.h>
+#include <babylon/misc/file_tools.h>
 #include <babylon/morph/morph_target.h>
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/particles/particle_system.h>
@@ -1595,7 +1595,7 @@ Mesh& Mesh::_queueLoad(Scene* scene)
 
   const auto getBinaryData = String::contains(delayLoadingFile, ".babylonbinarymeshdata");
 
-  Tools::LoadFile(
+  FileTools::LoadFile(
     delayLoadingFile,
     [this, &scene](const std::variant<std::string, ArrayBuffer>& data,
                    const std::string & /*responseURL*/) -> void {
@@ -1828,7 +1828,7 @@ Mesh& Mesh::applyDisplacementMap(const std::string& url, float minHeight, float 
                                  const std::optional<Vector2>& uvOffset,
                                  const std::optional<Vector2>& uvScale, bool forceUpdate)
 {
-  Tools::LoadImageFromUrl(
+  FileTools::LoadImageFromUrl(
     url,
     [&](const Image& img) {
       auto heightMapWidth  = static_cast<unsigned>(img.width);

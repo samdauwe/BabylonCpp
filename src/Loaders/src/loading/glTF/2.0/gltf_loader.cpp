@@ -24,6 +24,7 @@
 #include <babylon/meshes/geometry.h>
 #include <babylon/meshes/instanced_mesh.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/misc/file_tools.h>
 #include <babylon/misc/tools.h>
 #include <babylon/morph/morph_target.h>
 #include <babylon/morph/morph_target_manager.h>
@@ -2034,7 +2035,7 @@ ArrayBufferView GLTFLoader::loadUriAsync(const std::string& context, const std::
   ArrayBuffer data;
   auto url = _parent.preprocessUrlAsync(_rootUrl + uri);
   if (!_disposed) {
-    Tools::LoadFile(
+    FileTools::LoadFile(
       url,
       [this, &data, &uri](const std::variant<std::string, ArrayBuffer>& fileData,
                           const std::string & /*responseURL*/) -> void {

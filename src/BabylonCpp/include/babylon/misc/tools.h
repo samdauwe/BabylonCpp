@@ -13,7 +13,6 @@ namespace BABYLON {
 
 class Color4;
 class Engine;
-class ProgressEvent;
 
 /**
  * @brief Class containing a set of static utilities functions.
@@ -21,15 +20,26 @@ class ProgressEvent;
 struct BABYLON_SHARED_EXPORT Tools {
 
   /**
-   * Gets or sets a global variable indicating if fallback texture must be used
-   * when a texture cannot be loaded.
+   * @brief Gets a global variable indicating if fallback texture must be used when a texture cannot
+   * be loaded.
    */
-  static bool UseFallbackTexture;
+  static bool UseFallbackTexture();
 
   /**
-   * Texture content used if a texture cannot loaded.
+   * @brief Sets a global variable indicating if fallback texture must be used when a texture cannot
+   * be loaded.
    */
-  static std::string fallbackTexture;
+  static void setUseFallbackTexture(bool value);
+
+  /**
+   * @brief Gets the texture content used if a texture cannot loaded.
+   */
+  static std::string FallbackTexture();
+
+  /**
+   * @brief Sets the texture content used if a texture cannot loaded.
+   */
+  static void setFallbackTexture(const std::string& value);
 
   /**
    * @brief Read the content of a byte array at a specified coordinates (taking
@@ -41,8 +51,8 @@ struct BABYLON_SHARED_EXPORT Tools {
    * @param pixels defines the source byte array
    * @param color defines the output color
    */
-  static void FetchToRef(int u, int v, int width, int height,
-                         const Uint8Array& pixels, Color4& color);
+  static void FetchToRef(int u, int v, int width, int height, const Uint8Array& pixels,
+                         Color4& color);
 
   /**
    * @brief Interpolates between a and b via alpha.
@@ -75,8 +85,7 @@ struct BABYLON_SHARED_EXPORT Tools {
    * present
    * @returns The "folder" part of the path
    */
-  static std::string GetFolderPath(const std::string& uri,
-                                   bool returnUnchangedIfNoSlash = false);
+  static std::string GetFolderPath(const std::string& uri, bool returnUnchangedIfNoSlash = false);
 
   /**
    * @brief Convert an angle in radians to degrees.
@@ -92,91 +101,26 @@ struct BABYLON_SHARED_EXPORT Tools {
    */
   static float ToRadians(float angle);
 
-  static MinMaxVector2 ExtractMinAndMaxVector2(
-    const std::function<std::optional<Vector2>(std::size_t index)>& feeder,
-    const std::optional<Vector2>& bias = std::nullopt);
+  /**
+   * @brief Creates a checkerboard image.
+   * @param size size of the image
+   * @return an image
+   */
   static Image CreateCheckerboardImage(unsigned int size = 256);
+
+  /**
+   * @brief Creates a noise image.
+   * @param size size of the image
+   * @return an image
+   */
   static Image CreateNoiseImage(unsigned int size = 8);
 
   /**
-   * @brief Removes unwanted characters from an url.
-   * @param url defines the url to clean
-   * @returns the cleaned url
+   * @brief Decodes an URI component.
+   * @param s the uri to decode
+   * @return the decoded uri
    */
-  static std::string CleanUrl(std::string url);
-
   static std::string DecodeURIComponent(const std::string& s);
-
-  /**
-   * @brief Gets or sets a function used to pre-process url before using them to
-   * load assets.
-   */
-  static std::function<std::string(std::string url)> PreprocessUrl;
-
-  /**
-   * @brief Converts an ArrayBuffer to an image.
-   * @param buffer the arraybuffer holding the image data
-   * @return the decoded image
-   */
-  static Image ArrayBufferToImage(const ArrayBuffer& buffer,
-                                  bool flipVertically = false);
-
-  /**
-   * @brief Converts an string to an image.
-   * @param buffer the string holding the image data
-   * @return the decoded image
-   */
-  static Image StringToImage(const std::string& buffer,
-                             bool flipVertically = false);
-
-  static void LoadImageFromUrl(
-    std::string url, const std::function<void(const Image& img)>& onLoad,
-    const std::function<void(const std::string& message,
-                             const std::string& exception)>& onError,
-    bool flipVertically = false);
-  static void LoadImageFromBuffer(
-    const std::variant<std::string, ArrayBuffer, Image>& input, bool invertY,
-    const std::function<void(const Image& img)>& onLoad,
-    const std::function<void(const std::string& message,
-                             const std::string& exception)>& onError);
-
-  /**
-   * @brief Loads a file.
-   * @param url url string, ArrayBuffer, or Blob to load
-   * @param onSuccess callback called when the file successfully loads
-   * @param onProgress callback called while file is loading (if the server
-   * supports this mode)
-   * @param database  database for caching
-   * @param useArrayBuffer defines a boolean indicating that date must be
-   * returned as ArrayBuffer
-   * @param onError callback called when the file fails to load
-   */
-  static void LoadFile(
-    std::string url,
-    const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
-                             const std::string& responseURL)>& callback,
-    const std::function<void(const ProgressEvent& event)>& progressCallBack
-    = nullptr,
-    bool useArrayBuffer = false,
-    const std::function<void(const std::string& message,
-                             const std::string& exception)>& onError
-    = nullptr);
-
-  /**
-   * @brief Loads a file.
-   * @param fileToLoad defines the file to load
-   * @param callback defines the callback to call when data is loaded
-   * @param progressCallBack defines the callback to call during loading process
-   * @param useArrayBuffer defines a boolean indicating that data must be
-   * returned as an ArrayBuffer
-   * @returns a file request object
-   */
-  static void ReadFile(
-    std::string fileToLoad,
-    const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
-                             const std::string& responseURL)>& callback,
-    const std::function<void(const ProgressEvent& event)>& onProgress,
-    bool useArrayBuffer);
 
   /**
    * @brief Test if the given uri is a base64 string.

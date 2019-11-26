@@ -18,6 +18,7 @@
 #include <babylon/math/spherical_polynomial.h>
 #include <babylon/math/vector3.h>
 #include <babylon/misc/environment_texture_info.h>
+#include <babylon/misc/file_tools.h>
 #include <babylon/misc/tools.h>
 #include <babylon/postprocesses/post_process.h>
 #include <babylon/postprocesses/post_process_manager.h>
@@ -245,7 +246,7 @@ void EnvironmentTextureTools::UploadLevels(const InternalTexturePtr& texture,
       const auto promise = [=]() -> void {
         // Constructs an image element from image data
         const auto& bytes = imageData[i][face];
-        auto image        = Tools::ArrayBufferToImage(bytes);
+        auto image        = FileTools::ArrayBufferToImage(bytes);
 
         // Upload to the texture.
         if (expandTexture) {

@@ -13,6 +13,7 @@
 #include <babylon/loading/plugins/babylon/babylon_file_loader.h>
 #include <babylon/loading/scene_loader_flags.h>
 #include <babylon/loading/scene_loader_progress_event.h>
+#include <babylon/misc/file_tools.h>
 #include <babylon/misc/tools.h>
 
 namespace BABYLON {
@@ -207,11 +208,11 @@ std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr> SceneLoader::_lo
       };
     }
 
-    Tools::LoadFile(fileInfo.url, dataCallback, progressCallback, useArrayBuffer,
-                    [&](const std::string& message, const std::string& exception) {
-                      onError("Failed to load scene." + (message.empty() ? "" : " " + message),
-                              exception);
-                    });
+    FileTools::LoadFile(fileInfo.url, dataCallback, progressCallback, useArrayBuffer,
+                        [&](const std::string& message, const std::string& exception) {
+                          onError("Failed to load scene." + (message.empty() ? "" : " " + message),
+                                  exception);
+                        });
   };
 
   if (!directLoad.empty()) {
