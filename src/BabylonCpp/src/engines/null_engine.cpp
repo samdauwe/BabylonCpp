@@ -519,11 +519,8 @@ void NullEngine::_bindTexture(int channel, const InternalTexturePtr& texture)
   _bindTextureDirectly(0, texture);
 }
 
-bool NullEngine::_releaseBuffer(GL::IGLBuffer* buffer)
+void NullEngine::_deleteBuffer(GL::IGLBuffer* /*buffer*/)
 {
-  --buffer->references;
-
-  return buffer->references == 0;
 }
 
 void NullEngine::releaseEffects()

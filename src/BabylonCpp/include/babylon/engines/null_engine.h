@@ -130,7 +130,6 @@ public:
   bool _bindTextureDirectly(unsigned int target, const InternalTexturePtr& texture,
                             bool forTextureDataUpdate = false, bool force = false) override;
   void _bindTexture(int channel, const InternalTexturePtr& texture) override;
-  bool _releaseBuffer(GL::IGLBuffer* buffer) override;
   void releaseEffects() override;
   void displayLoadingUI() override;
   void hideLoadingUI() override;
@@ -149,6 +148,8 @@ public:
 
 protected:
   NullEngine(const NullEngineOptions& options = NullEngineOptions{});
+
+  void _deleteBuffer(GL::IGLBuffer* buffer);
 
 private:
   NullEngineOptions _options;
