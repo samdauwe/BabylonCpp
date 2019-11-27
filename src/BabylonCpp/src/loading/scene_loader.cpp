@@ -356,7 +356,7 @@ SceneLoader::ImportMesh(
         onProgress(event);
       }
       catch (const std::exception& e) {
-        errorHandler("Error in onProgress callback", e.what());
+        errorHandler(String::printf("Error in onProgress callback: %s", e.what()), e.what());
       }
     };
   }
@@ -372,7 +372,7 @@ SceneLoader::ImportMesh(
         onSuccess(meshes, particleSystems, skeletons, animationGroups);
       }
       catch (const std::exception& e) {
-        errorHandler("Error in onSuccess callback", e.what());
+        errorHandler(String::printf("Error in onSuccess callback", e.what()), e.what());
       }
     }
   };
