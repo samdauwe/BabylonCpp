@@ -119,26 +119,23 @@ public:
   int cellIndex;
 
   /**
-   * Gets or sets the cell reference in the sprite sheet, uses sprite's filename
-   * when added to sprite sheet
+   * Gets or sets the cell reference in the sprite sheet, uses sprite's filename when added to
+   * sprite sheet
    */
   std::string cellRef;
 
   /**
-   * Gets or sets a boolean indicating if UV coordinates should be inverted in U
-   * axis
+   * Gets or sets a boolean indicating if UV coordinates should be inverted in U axis
    */
   int invertU;
 
   /**
-   * Gets or sets a boolean indicating if UV coordinates should be inverted in B
-   * axis
+   * Gets or sets a boolean indicating if UV coordinates should be inverted in B axis
    */
   int invertV;
 
   /**
-   * Gets or sets a boolean indicating that this sprite should be disposed after
-   * animation ends
+   * Gets or sets a boolean indicating that this sprite should be disposed after animation ends
    */
   bool disposeWhenFinishedAnimating;
 

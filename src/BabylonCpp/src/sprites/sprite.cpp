@@ -92,8 +92,7 @@ void Sprite::_animate(float deltaTime)
   if (_time > _delay) {
     _time = std::fmod(_time, _delay);
     cellIndex += _direction;
-    if ((_direction > 0 && cellIndex > _toIndex)
-        || (_direction < 0 && cellIndex < _fromIndex)) {
+    if ((_direction > 0 && cellIndex > _toIndex) || (_direction < 0 && cellIndex < _fromIndex)) {
       if (_loopAnimation) {
         cellIndex = _direction > 0 ? _fromIndex : _toIndex;
       }
