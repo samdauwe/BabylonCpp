@@ -17,6 +17,7 @@ namespace Samples {
  * @brief Raycast on height map scene. Example demonstrating how to raycast to find positions on a
  * heightmap.
  * @see https://www.babylonjs-playground.com/#QM57B#0
+ * @see https://doc.babylonjs.com/babylon101/raycasts
  */
 class RaycastOnHeightMapScene : public IRenderableScene {
 

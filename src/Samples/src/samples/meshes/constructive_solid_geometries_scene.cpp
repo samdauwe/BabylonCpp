@@ -15,6 +15,7 @@ namespace Samples {
  * @brief Constructive_solid_geometries_scene. Example demonstrating how to use boolean operations
  * on meshes using CSG.
  * @see https://www.babylonjs-playground.com/#T6NP3F#0
+ * @see https://doc.babylonjs.com/api/classes/babylon.csg
  */
 struct ConstructiveSolidGeometriesScene : public IRenderableScene {
 

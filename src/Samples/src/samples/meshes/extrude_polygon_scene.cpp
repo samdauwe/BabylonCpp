@@ -20,6 +20,7 @@ namespace Samples {
  * @brief Extrude Polygon Scene. Example demonstrating how to use MeshBuilder to generate geometry
  * from extruded data.
  * @see https://www.babylonjs-playground.com/#TFLTJJ#0
+ * @see https://doc.babylonjs.com/api/classes/babylon.meshbuilder#extrudepolygon
  */
 class ExtrudePolygonScene : public IRenderableSceneWithHud {
 

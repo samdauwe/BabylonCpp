@@ -23,6 +23,7 @@ namespace Samples {
  * by Steve 'Stv' Duran for BabylonJS featured demos on 02.12.2015
  *
  * @see https://www.babylonjs-playground.com/#N2K3ZN#0
+ * @see https://doc.babylonjs.com/api/classes/babylon.abstractmesh#lookat
  */
 class LookAtScene : public IRenderableScene {
 

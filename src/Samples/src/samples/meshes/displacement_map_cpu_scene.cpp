@@ -14,6 +14,7 @@ namespace Samples {
  * @brief Displacement map (CPU) Scene. Example demonstrating how to update mesh geometry using a
  * displacement map (CPU).
  * @see https://www.babylonjs-playground.com/#04JDPF#0
+ * @see https://doc.babylonjs.com/api/classes/babylon.mesh#applydisplacementmap
  */
 struct DisplacementMapCpuScene : public IRenderableScene {
 

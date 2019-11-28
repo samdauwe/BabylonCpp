@@ -17,6 +17,7 @@ namespace Samples {
  * @brief Height map scene. Example demonstrating how to use a height map to
  * extrude a plane to create mountains.
  * @see https://www.babylonjs-playground.com/#95PXRY#0
+ * @see https://doc.babylonjs.com/babylon101/height_map
  */
 class HeightMapScene : public IRenderableScene {
 
