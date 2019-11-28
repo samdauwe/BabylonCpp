@@ -73,7 +73,6 @@ file(GLOB EXTENSIONS_HDR_FILES  ${INCLUDE_PATH}/extensions/dynamicterrain/*.h
                                 ${INCLUDE_PATH}/extensions/hexplanetgeneration/utils/*.h
                                 ${INCLUDE_PATH}/extensions/navigation/*.h
                                 ${INCLUDE_PATH}/extensions/navigation/rvo2/*.h
-                                ${INCLUDE_PATH}/extensions/navigationmesh/*.h
                                 ${INCLUDE_PATH}/extensions/noisegeneration/*.h
                                 ${INCLUDE_PATH}/extensions/pathfinding/*.h
                                 ${INCLUDE_PATH}/extensions/polyhedron/*.h
@@ -92,7 +91,6 @@ file(GLOB EXTENSIONS_SRC_FILES  ${SOURCE_PATH}/extensions/dynamicterrain/*.cpp
                                 ${SOURCE_PATH}/extensions/hexplanetgeneration/utils/*.cpp
                                 ${SOURCE_PATH}/extensions/navigation/*.cpp
                                 ${SOURCE_PATH}/extensions/navigation/rvo2/*.cpp
-                                ${SOURCE_PATH}/extensions/navigationmesh/*.cpp
                                 ${SOURCE_PATH}/extensions/noisegeneration/*.cpp
                                 ${SOURCE_PATH}/extensions/polyhedron/*.cpp
                                 ${SOURCE_PATH}/extensions/treegenerators/*.cpp)
