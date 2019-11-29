@@ -13,7 +13,7 @@
 #include <babylon/inspector/components/actiontabs/lines/slider_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/vector2_line_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/postprocesses/common_rendering_pipeline_property_grid_component.h>
-#include <babylon/layer/glow_layer.h>
+#include <babylon/layers/glow_layer.h>
 #include <babylon/materials/image_processing_configuration.h>
 #include <babylon/postprocesses/chromatic_aberration_post_process.h>
 #include <babylon/postprocesses/depth_of_field_effect.h>

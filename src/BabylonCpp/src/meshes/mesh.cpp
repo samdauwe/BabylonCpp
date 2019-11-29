@@ -13,7 +13,7 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/igl_rendering_context.h>
-#include <babylon/layer/highlight_layer.h>
+#include <babylon/layers/highlight_layer.h>
 #include <babylon/lights/light.h>
 #include <babylon/lights/shadows/shadow_generator.h>
 #include <babylon/loading/scene_loader.h>

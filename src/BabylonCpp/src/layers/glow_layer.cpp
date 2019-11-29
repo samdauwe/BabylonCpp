@@ -1,4 +1,4 @@
-#include <babylon/layer/glow_layer.h>
+#include <babylon/layers/glow_layer.h>
 
 #include <nlohmann/json.hpp>
 

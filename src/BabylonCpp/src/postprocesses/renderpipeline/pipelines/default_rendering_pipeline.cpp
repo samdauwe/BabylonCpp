@@ -9,7 +9,7 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/icanvas.h>
-#include <babylon/layer/glow_layer.h>
+#include <babylon/layers/glow_layer.h>
 #include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/postprocesses/bloom_effect.h>

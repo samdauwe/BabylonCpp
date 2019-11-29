@@ -36,10 +36,10 @@
 #include <babylon/helpers/environment_helper.h>
 #include <babylon/inputs/click_info.h>
 #include <babylon/interfaces/icanvas.h>
-#include <babylon/layer/effect_layer.h>
-#include <babylon/layer/glow_layer.h>
-#include <babylon/layer/highlight_layer.h>
-#include <babylon/layer/layer.h>
+#include <babylon/layers/effect_layer.h>
+#include <babylon/layers/glow_layer.h>
+#include <babylon/layers/highlight_layer.h>
+#include <babylon/layers/layer.h>
 #include <babylon/lensflares/lens_flare_system.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/lights/light.h>

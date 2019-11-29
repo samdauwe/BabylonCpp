@@ -1,5 +1,5 @@
-#ifndef BABYLON_LAYER_LAYER_H
-#define BABYLON_LAYER_LAYER_H
+#ifndef BABYLON_LAYERS_LAYER_H
+#define BABYLON_LAYERS_LAYER_H
 
 #include <babylon/babylon_api.h>
 #include <babylon/engines/scene.h>
@@ -188,4 +188,4 @@ private:
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_LAYER_LAYER_H
+#endif // end of BABYLON_LAYERS_LAYER_H

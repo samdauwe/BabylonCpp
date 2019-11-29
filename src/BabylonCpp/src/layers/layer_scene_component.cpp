@@ -1,11 +1,11 @@
-#include <babylon/layer/layer_scene_component.h>
+#include <babylon/layers/layer_scene_component.h>
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/abstract_scene.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
-#include <babylon/layer/layer.h>
+#include <babylon/layers/layer.h>
 
 namespace BABYLON {
 

@@ -1,12 +1,12 @@
-#ifndef BABYLON_LAYER_EFFECT_LAYER_H
-#define BABYLON_LAYER_EFFECT_LAYER_H
+#ifndef BABYLON_LAYERS_EFFECT_LAYER_H
+#define BABYLON_LAYERS_EFFECT_LAYER_H
 
 #include <nlohmann/json_fwd.hpp>
 #include <unordered_map>
 
 #include <babylon/babylon_api.h>
 #include <babylon/interfaces/igl_rendering_context.h>
-#include <babylon/layer/ieffect_layer_options.h>
+#include <babylon/layers/ieffect_layer_options.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/size.h>
 #include <babylon/misc/observable.h>
@@ -359,4 +359,4 @@ private:
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_LAYER_EFFECT_LAYER_H
+#endif // end of BABYLON_LAYERS_EFFECT_LAYER_H

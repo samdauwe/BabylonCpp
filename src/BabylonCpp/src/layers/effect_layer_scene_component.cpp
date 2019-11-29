@@ -1,11 +1,11 @@
-#include <babylon/layer/effect_layer_scene_component.h>
+#include <babylon/layers/effect_layer_scene_component.h>
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/abstract_scene.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
-#include <babylon/layer/effect_layer.h>
+#include <babylon/layers/effect_layer.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/meshes/abstract_mesh.h>
 

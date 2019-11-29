@@ -1,11 +1,11 @@
-#ifndef BABYLON_LAYER_HIGHLIGHT_LAYER_H
-#define BABYLON_LAYER_HIGHLIGHT_LAYER_H
+#ifndef BABYLON_LAYERS_HIGHLIGHT_LAYER_H
+#define BABYLON_LAYERS_HIGHLIGHT_LAYER_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/layer/effect_layer.h>
-#include <babylon/layer/ihighlight_layer_excluded_mesh.h>
-#include <babylon/layer/ihighlight_layer_mesh.h>
-#include <babylon/layer/ihighlight_layer_options.h>
+#include <babylon/layers/effect_layer.h>
+#include <babylon/layers/ihighlight_layer_excluded_mesh.h>
+#include <babylon/layers/ihighlight_layer_mesh.h>
+#include <babylon/layers/ihighlight_layer_options.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/isize.h>
 #include <babylon/misc/observable.h>
@@ -282,4 +282,4 @@ private:
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_LAYER_HIGHLIGHT_LAYER_H
+#endif // end of BABYLON_LAYERS_HIGHLIGHT_LAYER_H

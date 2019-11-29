@@ -1,9 +1,9 @@
-#ifndef BABYLON_LAYER_GLOW_LAYER_H
-#define BABYLON_LAYER_GLOW_LAYER_H
+#ifndef BABYLON_LAYERS_GLOW_LAYER_H
+#define BABYLON_LAYERS_GLOW_LAYER_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/layer/effect_layer.h>
-#include <babylon/layer/iglow_layer_options.h>
+#include <babylon/layers/effect_layer.h>
+#include <babylon/layers/iglow_layer_options.h>
 
 namespace BABYLON {
 
@@ -262,4 +262,4 @@ private:
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_LAYER_GLOW_LAYER_H
+#endif // end of BABYLON_LAYERS_GLOW_LAYER_H

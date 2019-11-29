@@ -1,4 +1,4 @@
-#include <babylon/layer/effect_layer.h>
+#include <babylon/layers/effect_layer.h>
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
@@ -6,7 +6,7 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/engines/scene_component_constants.h>
-#include <babylon/layer/effect_layer_scene_component.h>
+#include <babylon/layers/effect_layer_scene_component.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/material.h>

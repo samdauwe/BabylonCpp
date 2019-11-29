@@ -1,7 +1,7 @@
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/irenderable_scene.h>
-#include <babylon/layer/highlight_layer.h>
+#include <babylon/layers/highlight_layer.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/pbr/pbr_material.h>

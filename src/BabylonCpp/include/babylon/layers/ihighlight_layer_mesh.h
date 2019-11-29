@@ -1,5 +1,5 @@
-#ifndef BABYLON_LAYER_IHIGHLIGHT_LAYER_MESH_H
-#define BABYLON_LAYER_IHIGHLIGHT_LAYER_MESH_H
+#ifndef BABYLON_LAYERS_IHIGHLIGHT_LAYER_MESH_H
+#define BABYLON_LAYERS_IHIGHLIGHT_LAYER_MESH_H
 
 #include <babylon/babylon_api.h>
 #include <babylon/math/color3.h>
@@ -47,4 +47,4 @@ struct BABYLON_SHARED_EXPORT IHighlightLayerMesh {
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_LAYER_IHIGHLIGHT_LAYER_MESH_H
+#endif // end of BABYLON_LAYERS_IHIGHLIGHT_LAYER_MESH_H

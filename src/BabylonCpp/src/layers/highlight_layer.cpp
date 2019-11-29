@@ -1,4 +1,4 @@
-#include <babylon/layer/highlight_layer.h>
+#include <babylon/layers/highlight_layer.h>
 
 #include <nlohmann/json.hpp>
 

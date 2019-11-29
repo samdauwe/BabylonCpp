@@ -112,7 +112,7 @@ file(GLOB HELPERS_HDR_FILES         ${INCLUDE_PATH}/helpers/*.h)
 file(GLOB INPUTS_HDR_FILES          ${INCLUDE_PATH}/inputs/*.h)
 file(GLOB INSTRUMENTATION_HDR_FILES ${INCLUDE_PATH}/instrumentation/*.h)
 file(GLOB INTERFACES_HDR_FILES      ${INCLUDE_PATH}/interfaces/*.h)
-file(GLOB LAYER_HDR_FILES           ${INCLUDE_PATH}/layer/*.h)
+file(GLOB LAYERS_HDR_FILES          ${INCLUDE_PATH}/layers/*.h)
 file(GLOB LENSFLARES_HDR_FILES      ${INCLUDE_PATH}/lensflares/*.h)
 file(GLOB LIGHTS_HDR_FILES          ${INCLUDE_PATH}/lights/*.h
                                     ${INCLUDE_PATH}/lights/shadows/*.h)
@@ -194,7 +194,7 @@ set(BABYLON_HEADERS
     ${INPUTS_HDR_FILES}
     ${INSTRUMENTATION_HDR_FILES}
     ${INTERFACES_HDR_FILES}
-    ${LAYER_HDR_FILES}
+    ${LAYERS_HDR_FILES}
     ${LENSFLARES_HDR_FILES}
     ${LIGHTS_HDR_FILES}
     ${LOADING_HDR_FILES}
@@ -251,7 +251,7 @@ file(GLOB HELPERS_SRC_FILES         ${SOURCE_PATH}/helpers/*.cpp)
 file(GLOB INPUTS_SRC_FILES          ${SOURCE_PATH}/inputs/*.cpp)
 file(GLOB INSTRUMENTATION_SRC_FILES ${SOURCE_PATH}/instrumentation/*.cpp)
 file(GLOB INTERFACES_SRC_FILES      ${SOURCE_PATH}/interfaces/*.cpp)
-file(GLOB LAYER_SRC_FILES           ${SOURCE_PATH}/layer/*.cpp)
+file(GLOB LAYERS_SRC_FILES          ${SOURCE_PATH}/layers/*.cpp)
 file(GLOB LENSFLARES_SRC_FILES      ${SOURCE_PATH}/lensflares/*.cpp)
 file(GLOB LIGHTS_SRC_FILES          ${SOURCE_PATH}/lights/*.cpp
                                     ${SOURCE_PATH}/lights/shadows/*.cpp)
@@ -328,7 +328,7 @@ set(BABYLON_SOURCES
     ${INPUTS_SRC_FILES}
     ${INSTRUMENTATION_SRC_FILES}
     ${INTERFACES_SRC_FILES}
-    ${LAYER_SRC_FILES}
+    ${LAYERS_SRC_FILES}
     ${LENSFLARES_SRC_FILES}
     ${LIGHTS_SRC_FILES}
     ${LOADING_SRC_FILES}

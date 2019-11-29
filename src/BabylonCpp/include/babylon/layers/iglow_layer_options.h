@@ -1,5 +1,5 @@
-#ifndef BABYLON_LAYER_IGLOW_LAYER_OPTIONS_H
-#define BABYLON_LAYER_IGLOW_LAYER_OPTIONS_H
+#ifndef BABYLON_LAYERS_IGLOW_LAYER_OPTIONS_H
+#define BABYLON_LAYERS_IGLOW_LAYER_OPTIONS_H
 
 #include <memory>
 #include <optional>
@@ -52,4 +52,4 @@ struct BABYLON_SHARED_EXPORT IGlowLayerOptions {
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_LAYER_IGLOW_LAYER_OPTIONS_H
+#endif // end of BABYLON_LAYERS_IGLOW_LAYER_OPTIONS_H

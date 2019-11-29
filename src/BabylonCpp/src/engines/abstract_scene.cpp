@@ -7,9 +7,9 @@
 #include <babylon/engines/asset_container.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene_component_constants.h>
-#include <babylon/layer/effect_layer.h>
-#include <babylon/layer/glow_layer.h>
-#include <babylon/layer/highlight_layer.h>
+#include <babylon/layers/effect_layer.h>
+#include <babylon/layers/glow_layer.h>
+#include <babylon/layers/highlight_layer.h>
 #include <babylon/lensflares/lens_flare_system.h>
 #include <babylon/lights/shadows/shadow_generator.h>
 #include <babylon/particles/gpu_particle_system.h>
