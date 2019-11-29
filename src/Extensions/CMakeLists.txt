@@ -76,6 +76,7 @@ file(GLOB EXTENSIONS_HDR_FILES  ${INCLUDE_PATH}/extensions/dynamicterrain/*.h
                                 ${INCLUDE_PATH}/extensions/noisegeneration/*.h
                                 ${INCLUDE_PATH}/extensions/pathfinding/*.h
                                 ${INCLUDE_PATH}/extensions/polyhedron/*.h
+                                ${INCLUDE_PATH}/extensions/recastjs/*.h
                                 ${INCLUDE_PATH}/extensions/treegenerators/*.h)
 
 set(BABYLON_EXTENSIONS_HEADERS
@@ -93,7 +94,12 @@ file(GLOB EXTENSIONS_SRC_FILES  ${SOURCE_PATH}/extensions/dynamicterrain/*.cpp
                                 ${SOURCE_PATH}/extensions/navigation/rvo2/*.cpp
                                 ${SOURCE_PATH}/extensions/noisegeneration/*.cpp
                                 ${SOURCE_PATH}/extensions/polyhedron/*.cpp
-                                ${SOURCE_PATH}/extensions/treegenerators/*.cpp)
+                                ${SOURCE_PATH}/extensions/recastjs/*.cpp
+                                ${SOURCE_PATH}/extensions/treegenerators/*.cpp
+                                ${SOURCE_PATH}/recastnavigation/Detour/Source/*.cpp
+                                ${SOURCE_PATH}/recastnavigation/DetourCrowd/Source/*.cpp
+                                ${SOURCE_PATH}/recastnavigation/DetourTileCache/Source/*.cpp
+                                ${SOURCE_PATH}/recastnavigation/Recast/Source/*.cpp)
 
 set(BABYLON_EXTENSIONS_SOURCES
     ${EXTENSIONS_SRC_FILES}
@@ -157,6 +163,10 @@ set_target_properties(${TARGET}
 # Include directories
 target_include_directories(${TARGET}
     PRIVATE
+    ${INCLUDE_PATH}/../recastnavigation/Detour/Include
+    ${INCLUDE_PATH}/../recastnavigation/DetourCrowd/Include
+    ${INCLUDE_PATH}/../recastnavigation/DetourTileCache/Include
+    ${INCLUDE_PATH}/../recastnavigation/Recast/Include
     ${JSON_HPP_INCLUDE_DIRS}
     ${CMAKE_CURRENT_BINARY_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include
