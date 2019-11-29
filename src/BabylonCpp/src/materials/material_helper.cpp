@@ -17,8 +17,8 @@
 #include <babylon/materials/textures/raw_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/uniform_buffer.h>
-#include <babylon/math/plane.h>
-#include <babylon/math/tmp_vectors.h>
+#include <babylon/maths/plane.h>
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/vertex_buffer.h>

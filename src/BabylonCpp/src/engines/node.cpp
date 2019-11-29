@@ -8,7 +8,7 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/lights/light.h>
-#include <babylon/math/matrix.h>
+#include <babylon/maths/matrix.h>
 #include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {

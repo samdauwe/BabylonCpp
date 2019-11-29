@@ -2,7 +2,7 @@
 #define BABYLON_RENDERING_FACE_ADJACENCIES_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 

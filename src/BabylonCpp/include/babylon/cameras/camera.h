@@ -7,10 +7,10 @@
 #include <babylon/cameras/camera_inputs_manager.h>
 #include <babylon/engines/node.h>
 #include <babylon/interfaces/idisposable.h>
-#include <babylon/math/matrix.h>
-#include <babylon/math/plane.h>
-#include <babylon/math/vector3.h>
-#include <babylon/math/viewport.h>
+#include <babylon/maths/matrix.h>
+#include <babylon/maths/plane.h>
+#include <babylon/maths/vector3.h>
+#include <babylon/maths/viewport.h>
 #include <babylon/misc/observable.h>
 
 using json = nlohmann::json;

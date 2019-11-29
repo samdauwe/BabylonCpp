@@ -2,7 +2,7 @@
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/hemispheric_light.h>
-#include <babylon/math/curve3.h>
+#include <babylon/maths/curve3.h>
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/samples/samples_index.h>
 

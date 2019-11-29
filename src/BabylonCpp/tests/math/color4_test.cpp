@@ -1,8 +1,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <babylon/math/color3.h>
-#include <babylon/math/color4.h>
+#include <babylon/maths/color3.h>
+#include <babylon/maths/color4.h>
 
 TEST(TestColor4, CheckColors4)
 {

@@ -3,7 +3,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/materials/push_material.h>
-#include <babylon/math/color3.h>
+#include <babylon/maths/color3.h>
 #include <babylon/misc/observer.h>
 
 namespace BABYLON {

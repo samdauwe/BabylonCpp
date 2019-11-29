@@ -4,7 +4,7 @@
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/octrees/octree_block.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/sub_mesh.h>
 

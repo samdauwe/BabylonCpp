@@ -35,9 +35,9 @@
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/materials/uniform_buffer.h>
-#include <babylon/math/color3.h>
-#include <babylon/math/color4.h>
-#include <babylon/math/scalar.h>
+#include <babylon/maths/color3.h>
+#include <babylon/maths/color4.h>
+#include <babylon/maths/scalar.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/dds.h>

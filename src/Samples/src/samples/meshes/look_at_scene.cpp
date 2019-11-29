@@ -5,8 +5,8 @@
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/standard_material.h>
-#include <babylon/math/color3.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/color3.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/meshes/instanced_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/probes/reflection_probe.h>

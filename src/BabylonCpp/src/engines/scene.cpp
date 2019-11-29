@@ -54,8 +54,8 @@
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/uniform_buffer.h>
-#include <babylon/math/frustum.h>
-#include <babylon/math/tmp_vectors.h>
+#include <babylon/maths/frustum.h>
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/buffer.h>
 #include <babylon/meshes/geometry.h>

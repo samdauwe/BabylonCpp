@@ -6,7 +6,7 @@
 #include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/interfaces/idisposable.h>
-#include <babylon/math/matrix.h>
+#include <babylon/maths/matrix.h>
 #include <babylon/particles/solid_particle.h>
 
 namespace BABYLON {

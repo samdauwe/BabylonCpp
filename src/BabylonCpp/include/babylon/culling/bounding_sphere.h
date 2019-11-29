@@ -2,8 +2,8 @@
 #define BABYLON_CULLING_BOUNDING_SPHERE_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/matrix.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/matrix.h>
+#include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 

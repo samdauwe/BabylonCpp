@@ -2,7 +2,7 @@
 #define BABYLON_MISC_COLOR_GRADIENT_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/color4.h>
+#include <babylon/maths/color4.h>
 #include <babylon/misc/ivalue_gradient.h>
 
 namespace BABYLON {

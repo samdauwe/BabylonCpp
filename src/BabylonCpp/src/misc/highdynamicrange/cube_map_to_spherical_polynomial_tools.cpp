@@ -2,11 +2,11 @@
 
 #include <babylon/engines/constants.h>
 #include <babylon/materials/textures/base_texture.h>
-#include <babylon/math/color3.h>
-#include <babylon/math/scalar.h>
-#include <babylon/math/spherical_harmonics.h>
-#include <babylon/math/spherical_polynomial.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/color3.h>
+#include <babylon/maths/scalar.h>
+#include <babylon/maths/spherical_harmonics.h>
+#include <babylon/maths/spherical_polynomial.h>
+#include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 

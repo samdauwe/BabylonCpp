@@ -2,7 +2,7 @@
 #define BABYLON_MESHES_LINE_MESH_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/color3.h>
+#include <babylon/maths/color3.h>
 #include <babylon/meshes/mesh.h>
 
 namespace BABYLON {

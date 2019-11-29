@@ -7,13 +7,13 @@
 
 #include <babylon/babylon_api.h>
 
-#include <babylon/math/color3.h>
-#include <babylon/math/color4.h>
-#include <babylon/math/matrix.h>
-#include <babylon/math/quaternion.h>
-#include <babylon/math/size.h>
-#include <babylon/math/vector2.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/color3.h>
+#include <babylon/maths/color4.h>
+#include <babylon/maths/matrix.h>
+#include <babylon/maths/quaternion.h>
+#include <babylon/maths/size.h>
+#include <babylon/maths/vector2.h>
+#include <babylon/maths/vector3.h>
 
 #ifndef isNan
 #define isNan(a) ((a) != (a))

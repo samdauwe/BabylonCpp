@@ -1,7 +1,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <babylon/math/matrix.h>
+#include <babylon/maths/matrix.h>
 
 TEST(TestMatrix, Constructor)
 {

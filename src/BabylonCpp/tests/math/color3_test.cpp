@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <babylon/math/color3.h>
+#include <babylon/maths/color3.h>
 
 TEST(TestColor3, Constructor)
 {

@@ -27,8 +27,8 @@
 #include <babylon/materials/textures/cube_texture.h>
 #include <babylon/materials/textures/refraction_texture.h>
 #include <babylon/materials/uniform_buffer.h>
-#include <babylon/math/spherical_polynomial.h>
-#include <babylon/math/tmp_vectors.h>
+#include <babylon/maths/spherical_polynomial.h>
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/base_sub_mesh.h>
 #include <babylon/meshes/geometry.h>

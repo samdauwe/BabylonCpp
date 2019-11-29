@@ -21,10 +21,10 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/multi_material.h>
-#include <babylon/math/matrix.h>
-#include <babylon/math/scalar.h>
-#include <babylon/math/tmp_vectors.h>
-#include <babylon/math/vector2.h>
+#include <babylon/maths/matrix.h>
+#include <babylon/maths/scalar.h>
+#include <babylon/maths/tmp_vectors.h>
+#include <babylon/maths/vector2.h>
 #include <babylon/meshes/_creation_data_storage.h>
 #include <babylon/meshes/_instance_data_storage.h>
 #include <babylon/meshes/_instances_batch.h>

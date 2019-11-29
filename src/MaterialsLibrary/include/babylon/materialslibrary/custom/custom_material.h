@@ -4,7 +4,7 @@
 #include <babylon/babylon_api.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materialslibrary/custom/shader_special_parts.h>
-#include <babylon/math/vector4.h>
+#include <babylon/maths/vector4.h>
 #include <unordered_map>
 
 namespace BABYLON {

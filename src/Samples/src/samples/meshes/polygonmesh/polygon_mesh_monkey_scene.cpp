@@ -2,7 +2,7 @@
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/standard_material.h>
-#include <babylon/math/vector2.h>
+#include <babylon/maths/vector2.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/polygonmesh/polygon.h>
 #include <babylon/meshes/polygonmesh/polygon_mesh_builder.h>

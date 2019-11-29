@@ -2,8 +2,8 @@
 #define BABYLON_MISC_HIGH_DYNAMIC_RANGE_PANORAMA_TO_CUBE_MAP_TOOLS_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/color3.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/color3.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/misc/highdynamicrange/cube_map_info.h>
 
 namespace BABYLON {

@@ -5,8 +5,8 @@
 #include <babylon/core/logging.h>
 #include <babylon/gizmos/axis_scale_gizmo.h>
 #include <babylon/lights/hemispheric_light.h>
-#include <babylon/math/color3.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/color3.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/builders/polyhedron_builder.h>
 #include <babylon/meshes/mesh.h>

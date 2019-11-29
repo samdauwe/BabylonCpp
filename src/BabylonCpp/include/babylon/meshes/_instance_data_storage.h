@@ -5,7 +5,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
-#include <babylon/math/path3d.h>
+#include <babylon/maths/path3d.h>
 
 namespace BABYLON {
 

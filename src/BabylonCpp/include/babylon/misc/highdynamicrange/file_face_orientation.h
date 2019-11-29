@@ -2,7 +2,7 @@
 #define BABYLON_MISC_HIGH_DYNAMIC_RANGE_FILE_FACE_ORIENTATION_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 

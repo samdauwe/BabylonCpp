@@ -4,7 +4,7 @@
 #include <babylon/babylon_api.h>
 #include <babylon/cameras/vr/pose_controlled.h>
 #include <babylon/gamepads/generic_pad.h>
-#include <babylon/math/matrix.h>
+#include <babylon/maths/matrix.h>
 
 namespace BABYLON {
 

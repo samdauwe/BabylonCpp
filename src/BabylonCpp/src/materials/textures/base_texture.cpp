@@ -9,7 +9,7 @@
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/texture.h>
-#include <babylon/math/spherical_polynomial.h>
+#include <babylon/maths/spherical_polynomial.h>
 #include <babylon/misc/guid.h>
 #include <babylon/misc/highdynamicrange/cube_map_to_spherical_polynomial_tools.h>
 

@@ -4,9 +4,9 @@
 #include <babylon/babylon_api.h>
 #include <babylon/lights/shadows/icustom_shader_options.h>
 #include <babylon/lights/shadows/ishadow_generator.h>
-#include <babylon/math/isize.h>
-#include <babylon/math/matrix.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/isize.h>
+#include <babylon/maths/matrix.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/misc/observable.h>
 
 namespace BABYLON {

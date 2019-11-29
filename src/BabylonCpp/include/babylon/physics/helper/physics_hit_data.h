@@ -2,7 +2,7 @@
 #define BABYLON_PHYSICS_HELPER_PHYSICS_HIT_DATA_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 

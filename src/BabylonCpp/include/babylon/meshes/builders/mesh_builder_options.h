@@ -6,11 +6,11 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
-#include <babylon/math/color3.h>
-#include <babylon/math/color4.h>
-#include <babylon/math/isize.h>
-#include <babylon/math/vector2.h>
-#include <babylon/math/vector4.h>
+#include <babylon/maths/color3.h>
+#include <babylon/maths/color4.h>
+#include <babylon/maths/isize.h>
+#include <babylon/maths/vector2.h>
+#include <babylon/maths/vector4.h>
 
 namespace BABYLON {
 

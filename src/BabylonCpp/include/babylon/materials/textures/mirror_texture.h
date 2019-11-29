@@ -4,8 +4,8 @@
 #include <babylon/babylon_api.h>
 #include <babylon/engines/constants.h>
 #include <babylon/materials/textures/render_target_texture.h>
-#include <babylon/math/matrix.h>
-#include <babylon/math/plane.h>
+#include <babylon/maths/matrix.h>
+#include <babylon/maths/plane.h>
 
 namespace BABYLON {
 

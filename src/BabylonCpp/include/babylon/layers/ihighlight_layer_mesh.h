@@ -2,7 +2,7 @@
 #define BABYLON_LAYERS_IHIGHLIGHT_LAYER_MESH_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/color3.h>
+#include <babylon/maths/color3.h>
 #include <babylon/misc/observer.h>
 
 namespace BABYLON {

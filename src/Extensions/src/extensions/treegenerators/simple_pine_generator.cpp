@@ -1,7 +1,7 @@
 #include <babylon/extensions/treegenerators/simple_pine_generator.h>
 
 #include <babylon/core/random.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/meshes/mesh.h>
 
 namespace BABYLON {

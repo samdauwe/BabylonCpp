@@ -7,7 +7,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_shaders_store.h>
 #include <babylon/materials/shader_material.h>
-#include <babylon/math/vector2.h>
+#include <babylon/maths/vector2.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>

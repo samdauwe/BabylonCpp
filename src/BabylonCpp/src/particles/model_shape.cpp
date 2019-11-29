@@ -1,6 +1,6 @@
 #include <babylon/particles/model_shape.h>
 
-#include <babylon/math/vector3.h>
+#include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 

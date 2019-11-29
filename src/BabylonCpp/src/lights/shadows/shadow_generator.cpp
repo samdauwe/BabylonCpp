@@ -23,7 +23,7 @@
 #include <babylon/materials/textures/raw_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/uniform_buffer.h>
-#include <babylon/math/vector2.h>
+#include <babylon/maths/vector2.h>
 #include <babylon/meshes/_instances_batch.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/sub_mesh.h>

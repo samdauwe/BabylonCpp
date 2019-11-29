@@ -2,7 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/culling/bounding_sphere.h>
-#include <babylon/math/plane.h>
+#include <babylon/maths/plane.h>
 
 namespace BABYLON {
 

@@ -9,7 +9,7 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/textures/raw_texture.h>
-#include <babylon/math/tmp_vectors.h>
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {

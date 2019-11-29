@@ -5,9 +5,9 @@
 #include <babylon/cameras/arc_rotate_camera_inputs_manager.h>
 #include <babylon/cameras/target_camera.h>
 #include <babylon/core/structs.h>
-#include <babylon/math/matrix.h>
-#include <babylon/math/vector2.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/matrix.h>
+#include <babylon/maths/vector2.h>
+#include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 

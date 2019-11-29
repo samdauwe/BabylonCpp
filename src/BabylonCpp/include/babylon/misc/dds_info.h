@@ -2,7 +2,7 @@
 #define BABYLON_MISC_DDS_INFO_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/spherical_polynomial.h>
+#include <babylon/maths/spherical_polynomial.h>
 
 namespace BABYLON {
 

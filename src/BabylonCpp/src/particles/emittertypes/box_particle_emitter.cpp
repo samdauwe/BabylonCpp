@@ -2,8 +2,8 @@
 
 #include <babylon/core/json_util.h>
 #include <babylon/materials/effect.h>
-#include <babylon/math/scalar.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/scalar.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/particles/particle_system.h>
 
 namespace BABYLON {

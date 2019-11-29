@@ -2,9 +2,9 @@
 #define BABYLON_MESHES_GROUND_MESH_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/matrix.h>
-#include <babylon/math/vector2.h>
-#include <babylon/math/vector4.h>
+#include <babylon/maths/matrix.h>
+#include <babylon/maths/vector2.h>
+#include <babylon/maths/vector4.h>
 #include <babylon/meshes/mesh.h>
 
 namespace BABYLON {

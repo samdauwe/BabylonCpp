@@ -9,10 +9,10 @@
 #include <babylon/culling/icullable.h>
 #include <babylon/culling/octrees/octree.h>
 #include <babylon/interfaces/idisposable.h>
-#include <babylon/math/axis.h>
-#include <babylon/math/color3.h>
-#include <babylon/math/color4.h>
-#include <babylon/math/matrix.h>
+#include <babylon/maths/axis.h>
+#include <babylon/maths/color3.h>
+#include <babylon/maths/color4.h>
+#include <babylon/maths/matrix.h>
 #include <babylon/meshes/_internal_abstract_mesh_data_info.h>
 #include <babylon/meshes/_waiting_data.h>
 #include <babylon/meshes/facet_parameters.h>

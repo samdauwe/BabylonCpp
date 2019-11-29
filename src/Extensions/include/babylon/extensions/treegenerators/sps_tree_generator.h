@@ -2,7 +2,7 @@
 #define BABYLON_EXTENSIONS_TREE_GENERATORS_SPS_TREE_GENERATOR_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 

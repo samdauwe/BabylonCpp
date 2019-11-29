@@ -6,8 +6,8 @@
 #include <babylon/layers/ihighlight_layer_excluded_mesh.h>
 #include <babylon/layers/ihighlight_layer_mesh.h>
 #include <babylon/layers/ihighlight_layer_options.h>
-#include <babylon/math/color4.h>
-#include <babylon/math/isize.h>
+#include <babylon/maths/color4.h>
+#include <babylon/maths/isize.h>
 #include <babylon/misc/observable.h>
 
 namespace BABYLON {

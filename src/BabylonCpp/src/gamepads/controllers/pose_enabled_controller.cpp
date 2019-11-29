@@ -3,7 +3,7 @@
 #include <babylon/culling/ray.h>
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/ibrowser_gamepad.h>
-#include <babylon/math/tmp_vectors.h>
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {

@@ -4,7 +4,7 @@
 #include <babylon/babylon_api.h>
 #include <babylon/behaviors/meshes/pointer_drag_behavior.h>
 #include <babylon/gizmos/gizmo.h>
-#include <babylon/math/color3.h>
+#include <babylon/maths/color3.h>
 #include <babylon/rendering/utility_layer_renderer.h>
 
 namespace BABYLON {

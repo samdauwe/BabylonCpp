@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include <babylon/math/vector4.h>
+#include <babylon/maths/vector4.h>
 
 namespace TestVector4 {
 float x = 1.2f;

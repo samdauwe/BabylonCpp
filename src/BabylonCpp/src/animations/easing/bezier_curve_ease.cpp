@@ -1,6 +1,6 @@
 #include <babylon/animations/easing/bezier_curve_ease.h>
 
-#include <babylon/math/bezier_curve.h>
+#include <babylon/maths/bezier_curve.h>
 
 namespace BABYLON {
 

@@ -1,8 +1,8 @@
 #include <babylon/animations/path_cursor.h>
 
 #include <babylon/core/logging.h>
-#include <babylon/math/vector2.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/vector2.h>
+#include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 

@@ -7,7 +7,7 @@
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/materials/uniform_buffer.h>
-#include <babylon/math/axis.h>
+#include <babylon/maths/axis.h>
 
 namespace BABYLON {
 

@@ -18,8 +18,8 @@
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 #include <babylon/materials/textures/raw_texture.h>
 #include <babylon/materials/textures/texture.h>
-#include <babylon/math/scalar.h>
-#include <babylon/math/tmp_vectors.h>
+#include <babylon/maths/scalar.h>
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/buffer.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/vertex_buffer.h>

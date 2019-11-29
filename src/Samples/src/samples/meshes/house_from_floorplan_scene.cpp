@@ -4,9 +4,9 @@
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
-#include <babylon/math/color4.h>
-#include <babylon/math/vector3.h>
-#include <babylon/math/vector4.h>
+#include <babylon/maths/color4.h>
+#include <babylon/maths/vector3.h>
+#include <babylon/maths/vector4.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/polygonmesh/polygon_mesh_builder.h>
 #include <babylon/meshes/vertex_data.h>

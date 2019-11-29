@@ -2,8 +2,8 @@
 
 #include <cmath>
 
-#include <babylon/math/matrix.h>
-#include <babylon/math/plane.h>
+#include <babylon/maths/matrix.h>
+#include <babylon/maths/plane.h>
 
 namespace BABYLON {
 

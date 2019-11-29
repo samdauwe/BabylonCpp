@@ -5,7 +5,7 @@
 #include <babylon/extensions/entitycomponentsystem/component.h>
 #include <babylon/extensions/navigation/crowd_roadmap_vertex.h>
 #include <babylon/extensions/navigation/rvo2/vector2.h>
-#include <babylon/math/vector2.h>
+#include <babylon/maths/vector2.h>
 
 namespace BABYLON {
 namespace Extensions {

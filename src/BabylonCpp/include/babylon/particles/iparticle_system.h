@@ -7,9 +7,9 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/interfaces/idisposable.h>
-#include <babylon/math/color4.h>
-#include <babylon/math/vector2.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/color4.h>
+#include <babylon/maths/vector2.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/misc/color_gradient.h>
 #include <babylon/misc/factor_gradient.h>
 

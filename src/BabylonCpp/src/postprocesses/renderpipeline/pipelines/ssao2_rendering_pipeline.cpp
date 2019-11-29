@@ -13,9 +13,9 @@
 #include <babylon/materials/textures/dynamic_texture.h>
 #include <babylon/materials/textures/multi_render_target.h>
 #include <babylon/materials/textures/render_target_texture.h>
-#include <babylon/math/scalar.h>
-#include <babylon/math/tmp_vectors.h>
-#include <babylon/math/vector4.h>
+#include <babylon/maths/scalar.h>
+#include <babylon/maths/tmp_vectors.h>
+#include <babylon/maths/vector4.h>
 #include <babylon/postprocesses/blur_post_process.h>
 #include <babylon/postprocesses/pass_post_process.h>
 #include <babylon/postprocesses/post_process.h>

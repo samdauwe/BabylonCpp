@@ -3,8 +3,8 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/culling/icullable.h>
-#include <babylon/math/matrix.h>
-#include <babylon/math/plane.h>
+#include <babylon/maths/matrix.h>
+#include <babylon/maths/plane.h>
 #include <babylon/meshes/base_sub_mesh.h>
 #include <babylon/meshes/mesh.h>
 

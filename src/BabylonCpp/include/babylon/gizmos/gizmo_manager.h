@@ -3,7 +3,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/interfaces/idisposable.h>
-#include <babylon/math/color3.h>
+#include <babylon/maths/color3.h>
 #include <babylon/misc/observable.h>
 #include <babylon/misc/observer.h>
 

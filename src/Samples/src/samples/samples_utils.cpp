@@ -2,7 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/materials/standard_material.h>
-#include <babylon/math/color3.h>
+#include <babylon/maths/color3.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/vertex_data.h>
 

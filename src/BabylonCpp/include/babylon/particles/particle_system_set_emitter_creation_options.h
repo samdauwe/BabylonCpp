@@ -2,7 +2,7 @@
 #define BABYLON_PARTICLES_PARTICLE_SYSTEM_SET_EMITTER_CREATION_OPTIONS_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/color3.h>
+#include <babylon/maths/color3.h>
 
 namespace BABYLON {
 

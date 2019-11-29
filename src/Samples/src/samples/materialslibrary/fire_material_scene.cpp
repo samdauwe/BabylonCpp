@@ -14,7 +14,7 @@
 #include <babylon/materials/textures/texture.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/materialslibrary/fire/fire_material.h>
-#include <babylon/math/scalar.h>
+#include <babylon/maths/scalar.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/samples/samples_index.h>
 

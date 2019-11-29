@@ -3,7 +3,7 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/icanvas.h>
-#include <babylon/math/axis.h>
+#include <babylon/maths/axis.h>
 
 namespace BABYLON {
 

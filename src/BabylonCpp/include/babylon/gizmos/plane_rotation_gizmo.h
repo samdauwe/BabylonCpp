@@ -4,7 +4,7 @@
 #include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/gizmos/gizmo.h>
-#include <babylon/math/color3.h>
+#include <babylon/maths/color3.h>
 #include <babylon/misc/observable.h>
 #include <babylon/rendering/utility_layer_renderer.h>
 

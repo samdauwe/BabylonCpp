@@ -3,7 +3,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/culling/bounding_info.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 

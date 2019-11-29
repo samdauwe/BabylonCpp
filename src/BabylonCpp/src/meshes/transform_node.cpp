@@ -7,7 +7,7 @@
 #include <babylon/bones/bone.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/scene.h>
-#include <babylon/math/tmp_vectors.h>
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {

@@ -17,9 +17,9 @@
 #include <babylon/materials/textures/multi_render_target.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/textures/texture.h>
-#include <babylon/math/scalar.h>
-#include <babylon/math/vector3.h>
-#include <babylon/math/vector4.h>
+#include <babylon/maths/scalar.h>
+#include <babylon/maths/vector3.h>
+#include <babylon/maths/vector4.h>
 #include <babylon/postprocesses/blur_post_process.h>
 #include <babylon/postprocesses/fxaa_post_process.h>
 #include <babylon/postprocesses/motion_blur_post_process.h>

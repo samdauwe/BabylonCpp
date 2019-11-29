@@ -1,8 +1,8 @@
 #include <babylon/meshes/polygonmesh/polygon.h>
 
 #include <babylon/core/string.h>
-#include <babylon/math/path2.h>
-#include <babylon/math/vector2.h>
+#include <babylon/maths/path2.h>
+#include <babylon/maths/vector2.h>
 
 namespace BABYLON {
 

@@ -131,7 +131,7 @@ file(GLOB MATERIALS_HDR_FILES       ${INCLUDE_PATH}/materials/*.h
                                     ${INCLUDE_PATH}/materials/textures/*.h
                                     ${INCLUDE_PATH}/materials/textures/loaders/*.h
                                     ${INCLUDE_PATH}/materials/textures/procedurals/*.h)
-file(GLOB MATH_HDR_FILES            ${INCLUDE_PATH}/math/*.h)
+file(GLOB MATHS_HDR_FILES           ${INCLUDE_PATH}/maths/*.h)
 file(GLOB MESHES_HDR_FILES          ${INCLUDE_PATH}/meshes/*.h
                                     ${INCLUDE_PATH}/meshes/builders/*.h
                                     ${INCLUDE_PATH}/meshes/csg/*.h
@@ -199,7 +199,7 @@ set(BABYLON_HEADERS
     ${LIGHTS_HDR_FILES}
     ${LOADING_HDR_FILES}
     ${MATERIALS_HDR_FILES}
-    ${MATH_HDR_FILES}
+    ${MATHS_HDR_FILES}
     ${MESHES_HDR_FILES}
     ${MISC_HDR_FILES}
     ${MORPH_HDR_FILES}
@@ -270,7 +270,7 @@ file(GLOB MATERIALS_SRC_FILES       ${SOURCE_PATH}/materials/*.cpp
                                     ${SOURCE_PATH}/materials/textures/*.cpp
                                     ${SOURCE_PATH}/materials/textures/loaders/*.cpp
                                     ${SOURCE_PATH}/materials/textures/procedurals/*.cpp)
-file(GLOB MATH_SRC_FILES            ${SOURCE_PATH}/math/*.cpp)
+file(GLOB MATHS_SRC_FILES           ${SOURCE_PATH}/maths/*.cpp)
 file(GLOB MESHES_SRC_FILES          ${SOURCE_PATH}/meshes/*.cpp
                                     ${SOURCE_PATH}/meshes/builders/*.cpp
                                     ${SOURCE_PATH}/meshes/csg/*.cpp
@@ -333,7 +333,7 @@ set(BABYLON_SOURCES
     ${LIGHTS_SRC_FILES}
     ${LOADING_SRC_FILES}
     ${MATERIALS_SRC_FILES}
-    ${MATH_SRC_FILES}
+    ${MATHS_SRC_FILES}
     ${MESHES_SRC_FILES}
     ${MISC_SRC_FILES}
     ${MORPH_SRC_FILES}

@@ -4,8 +4,8 @@
 #include <functional>
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/quaternion.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/quaternion.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/physics/physics_impostor_parameters.h>
 
 namespace BABYLON {

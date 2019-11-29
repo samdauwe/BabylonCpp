@@ -7,9 +7,9 @@
 #include <babylon/culling/bounding_info.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
-#include <babylon/math/axis.h>
-#include <babylon/math/color4.h>
-#include <babylon/math/tmp_vectors.h>
+#include <babylon/maths/axis.h>
+#include <babylon/maths/color4.h>
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>

@@ -3,8 +3,8 @@
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
-#include <babylon/math/color3.h>
-#include <babylon/math/scalar.h>
+#include <babylon/maths/color3.h>
+#include <babylon/maths/scalar.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/vertex_data.h>
 #include <babylon/samples/samples_index.h>

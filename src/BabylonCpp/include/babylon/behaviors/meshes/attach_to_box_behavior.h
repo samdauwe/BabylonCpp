@@ -4,8 +4,8 @@
 #include <babylon/babylon_api.h>
 #include <babylon/behaviors/behavior.h>
 #include <babylon/behaviors/meshes/face_direction_info.h>
-#include <babylon/math/matrix.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/matrix.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/misc/observer.h>
 
 namespace BABYLON {

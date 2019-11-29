@@ -1,7 +1,7 @@
 #include <babylon/particles/particle.h>
 
-#include <babylon/math/scalar.h>
-#include <babylon/math/tmp_vectors.h>
+#include <babylon/maths/scalar.h>
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/particles/particle_system.h>
 #include <babylon/particles/sub_emitter.h>

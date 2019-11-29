@@ -2,9 +2,9 @@
 #define BABYLON_MESHES_CSG_CSG_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/matrix.h>
-#include <babylon/math/quaternion.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/matrix.h>
+#include <babylon/maths/quaternion.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/meshes/csg/polygon.h>
 
 namespace BABYLON {

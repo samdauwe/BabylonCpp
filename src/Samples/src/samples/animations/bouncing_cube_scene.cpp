@@ -4,7 +4,7 @@
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/standard_material.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/instanced_mesh.h>
 #include <babylon/meshes/mesh.h>

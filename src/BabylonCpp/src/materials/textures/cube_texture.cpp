@@ -8,7 +8,7 @@
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/iinternal_texture_loader.h>
 #include <babylon/materials/textures/texture.h>
-#include <babylon/math/matrix.h>
+#include <babylon/maths/matrix.h>
 #include <babylon/misc/serialization_helper.h>
 #include <babylon/misc/tools.h>
 

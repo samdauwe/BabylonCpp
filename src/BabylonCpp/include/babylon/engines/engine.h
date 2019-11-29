@@ -13,9 +13,9 @@
 #include <babylon/engines/engine_options.h>
 #include <babylon/instrumentation/_time_token.h>
 #include <babylon/materials/textures/texture_constants.h>
-#include <babylon/math/size.h>
-#include <babylon/math/vector4.h>
-#include <babylon/math/viewport.h>
+#include <babylon/maths/size.h>
+#include <babylon/maths/vector4.h>
+#include <babylon/maths/viewport.h>
 #include <babylon/meshes/buffer_pointer.h>
 #include <babylon/misc/ifile_request.h>
 #include <babylon/misc/observable.h>

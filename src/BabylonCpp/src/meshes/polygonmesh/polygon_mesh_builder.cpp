@@ -2,8 +2,8 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/engines/engine.h>
-#include <babylon/math/path2.h>
-#include <babylon/math/vector2.h>
+#include <babylon/maths/path2.h>
+#include <babylon/maths/vector2.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/polygonmesh/indexed_vector2.h>
 #include <babylon/meshes/vertex_buffer.h>

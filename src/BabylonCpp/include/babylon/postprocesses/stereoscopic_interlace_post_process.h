@@ -2,7 +2,7 @@
 #define BABYLON_POSTPROCESSES_STEREOSCOPIC_INTERLACE_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/vector2.h>
+#include <babylon/maths/vector2.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {

@@ -10,7 +10,7 @@
 #define BABYLON_MISC_HIGH_DYNAMIC_RANGE_PMREM_GENERATOR_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/vector4.h>
+#include <babylon/maths/vector4.h>
 #include <babylon/misc/highdynamicrange/cmg_bounding_box.h>
 
 namespace BABYLON {

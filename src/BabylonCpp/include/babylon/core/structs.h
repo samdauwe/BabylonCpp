@@ -4,10 +4,10 @@
 #include <unordered_map>
 
 #include <babylon/babylon_enums.h>
-#include <babylon/math/matrix.h>
-#include <babylon/math/quaternion.h>
-#include <babylon/math/vector2.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/matrix.h>
+#include <babylon/maths/quaternion.h>
+#include <babylon/maths/vector2.h>
+#include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 

@@ -12,9 +12,9 @@
 #include <babylon/materials/effect_includes_shaders_store.h>
 #include <babylon/materials/effect_shaders_store.h>
 #include <babylon/materials/material.h>
-#include <babylon/math/color3.h>
-#include <babylon/math/vector2.h>
-#include <babylon/math/vector4.h>
+#include <babylon/maths/color3.h>
+#include <babylon/maths/vector2.h>
+#include <babylon/maths/vector4.h>
 #include <babylon/shaders/shadersinclude/glsl_version_3.h>
 #include <babylon/misc/tools.h>
 #include <babylon/utils/base64.h>

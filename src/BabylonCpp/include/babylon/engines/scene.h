@@ -17,9 +17,9 @@
 #include <babylon/events/pointer_info_pre.h>
 #include <babylon/helpers/ienvironment_helper_options.h>
 #include <babylon/interfaces/idisposable.h>
-#include <babylon/math/color3.h>
-#include <babylon/math/matrix.h>
-#include <babylon/math/plane.h>
+#include <babylon/maths/color3.h>
+#include <babylon/maths/matrix.h>
+#include <babylon/maths/plane.h>
 #include <babylon/misc/ifile_request.h>
 #include <babylon/misc/observable.h>
 #include <babylon/misc/observer.h>

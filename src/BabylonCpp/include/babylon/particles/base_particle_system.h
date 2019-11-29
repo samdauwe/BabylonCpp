@@ -4,7 +4,7 @@
 #include <functional>
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/particles/iparticle_system.h>
 
 namespace BABYLON {

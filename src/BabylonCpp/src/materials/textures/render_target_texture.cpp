@@ -7,7 +7,7 @@
 #include <babylon/engines/scene.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/internal_texture.h>
-#include <babylon/math/matrix.h>
+#include <babylon/maths/matrix.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/instanced_mesh.h>
 #include <babylon/meshes/mesh.h>

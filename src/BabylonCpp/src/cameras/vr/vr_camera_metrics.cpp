@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include <babylon/math/matrix.h>
+#include <babylon/maths/matrix.h>
 
 namespace BABYLON {
 

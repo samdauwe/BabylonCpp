@@ -8,8 +8,8 @@
 #include <babylon/core/time.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
-#include <babylon/math/axis.h>
-#include <babylon/math/tmp_vectors.h>
+#include <babylon/maths/axis.h>
+#include <babylon/maths/tmp_vectors.h>
 
 namespace BABYLON {
 

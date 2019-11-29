@@ -20,7 +20,7 @@
 #include <babylon/engines/scene.h>
 #include <babylon/materials/textures/multiview_render_target.h>
 #include <babylon/materials/textures/render_target_texture.h>
-#include <babylon/math/frustum.h>
+#include <babylon/maths/frustum.h>
 #include <babylon/misc/serialization_helper.h>
 #include <babylon/misc/tools.h>
 #include <babylon/postprocesses/anaglyph_post_process.h>

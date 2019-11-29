@@ -5,7 +5,7 @@
 #include <babylon/extensions/entitycomponentsystem/world.h>
 #include <babylon/extensions/navigation/crowd_collision_avoidance_system.h>
 #include <babylon/extensions/navigation/crowd_mesh_updater_system.h>
-#include <babylon/math/vector2.h>
+#include <babylon/maths/vector2.h>
 
 namespace BABYLON {
 namespace Extensions {

@@ -2,7 +2,7 @@
 #define BABYLON_POSTPROCESSES_VOLUMETRIC_LIGHT_SCATTERING_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/viewport.h>
+#include <babylon/maths/viewport.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {

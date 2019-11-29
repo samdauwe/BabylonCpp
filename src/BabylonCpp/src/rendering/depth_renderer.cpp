@@ -12,7 +12,7 @@
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/textures/texture.h>
-#include <babylon/math/color4.h>
+#include <babylon/maths/color4.h>
 #include <babylon/meshes/_instances_batch.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>

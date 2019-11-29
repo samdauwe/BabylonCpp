@@ -4,10 +4,10 @@
 #include <babylon/babylon_api.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/water/water_material_defines.h>
-#include <babylon/math/color3.h>
-#include <babylon/math/matrix.h>
-#include <babylon/math/plane.h>
-#include <babylon/math/vector2.h>
+#include <babylon/maths/color3.h>
+#include <babylon/maths/matrix.h>
+#include <babylon/maths/plane.h>
+#include <babylon/maths/vector2.h>
 
 namespace BABYLON {
 

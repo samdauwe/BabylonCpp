@@ -2,7 +2,7 @@
 
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/scene.h>
-#include <babylon/math/position_normal_vertex.h>
+#include <babylon/maths/position_normal_vertex.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/vertex_buffer.h>

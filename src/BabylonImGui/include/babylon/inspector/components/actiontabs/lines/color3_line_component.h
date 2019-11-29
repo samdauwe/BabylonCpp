@@ -6,8 +6,8 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/core/delegates/delegate.h>
-#include <babylon/math/color3.h>
-#include <babylon/math/color4.h>
+#include <babylon/maths/color3.h>
+#include <babylon/maths/color4.h>
 
 namespace BABYLON {
 

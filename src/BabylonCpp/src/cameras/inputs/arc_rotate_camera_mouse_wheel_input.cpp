@@ -3,7 +3,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/engines/scene.h>
 #include <babylon/events/pointer_event_types.h>
-#include <babylon/math/scalar.h>
+#include <babylon/maths/scalar.h>
 
 namespace BABYLON {
 

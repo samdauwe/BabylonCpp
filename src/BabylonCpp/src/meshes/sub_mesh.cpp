@@ -10,8 +10,8 @@
 #include <babylon/materials/multi_material.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/standard_material_defines.h>
-#include <babylon/math/functions.h>
-#include <babylon/math/plane.h>
+#include <babylon/maths/functions.h>
+#include <babylon/maths/plane.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/geometry.h>
 #include <babylon/meshes/instanced_lines_mesh.h>

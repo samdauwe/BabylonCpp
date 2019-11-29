@@ -9,7 +9,7 @@
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/texture.h>
-#include <babylon/math/matrix.h>
+#include <babylon/maths/matrix.h>
 #include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {

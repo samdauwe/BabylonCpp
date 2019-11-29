@@ -3,7 +3,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
-#include <babylon/math/color3.h>
+#include <babylon/maths/color3.h>
 
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {

@@ -5,7 +5,7 @@
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/loading/scene_loader.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/samples/samples_index.h>
 

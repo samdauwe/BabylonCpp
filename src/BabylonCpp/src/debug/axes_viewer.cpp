@@ -2,7 +2,7 @@
 
 #include <babylon/gizmos/axis_drag_gizmo.h>
 #include <babylon/materials/standard_material.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/transform_node.h>
 

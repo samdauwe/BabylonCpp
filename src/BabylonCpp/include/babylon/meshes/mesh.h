@@ -2,8 +2,8 @@
 #define BABYLON_MESHES_MESH_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/isize.h>
-#include <babylon/math/path3d.h>
+#include <babylon/maths/isize.h>
+#include <babylon/maths/path3d.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/iget_set_vertices_data.h>
 #include <babylon/meshes/vertex_data_constants.h>

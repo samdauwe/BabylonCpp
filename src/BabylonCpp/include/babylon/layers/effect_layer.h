@@ -7,8 +7,8 @@
 #include <babylon/babylon_api.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/layers/ieffect_layer_options.h>
-#include <babylon/math/color4.h>
-#include <babylon/math/size.h>
+#include <babylon/maths/color4.h>
+#include <babylon/maths/size.h>
 #include <babylon/misc/observable.h>
 
 using json = nlohmann::json;

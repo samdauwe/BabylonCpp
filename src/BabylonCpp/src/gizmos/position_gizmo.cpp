@@ -4,8 +4,8 @@
 #include <babylon/core/logging.h>
 #include <babylon/gizmos/axis_drag_gizmo.h>
 #include <babylon/gizmos/plane_drag_gizmo.h>
-#include <babylon/math/color3.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/color3.h>
+#include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 

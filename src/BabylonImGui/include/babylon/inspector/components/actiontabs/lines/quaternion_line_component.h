@@ -5,7 +5,7 @@
 #include <imgui.h>
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/quaternion.h>
+#include <babylon/maths/quaternion.h>
 
 namespace BABYLON {
 

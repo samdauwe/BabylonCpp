@@ -3,7 +3,7 @@
 #include <babylon/core/logging.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/engines/scene.h>
-#include <babylon/math/tmp_vectors.h>
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/geometry.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>

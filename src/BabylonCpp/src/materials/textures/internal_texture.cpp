@@ -8,7 +8,7 @@
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/iinternal_texture_loader.h>
 #include <babylon/materials/textures/irender_target_options.h>
-#include <babylon/math/spherical_polynomial.h>
+#include <babylon/maths/spherical_polynomial.h>
 
 namespace BABYLON {
 

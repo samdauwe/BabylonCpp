@@ -3,9 +3,9 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/json_util.h>
 #include <babylon/engines/engine.h>
-#include <babylon/math/axis.h>
-#include <babylon/math/vector2.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/axis.h>
+#include <babylon/maths/vector2.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/facet_parameters.h>
 #include <babylon/meshes/geometry.h>

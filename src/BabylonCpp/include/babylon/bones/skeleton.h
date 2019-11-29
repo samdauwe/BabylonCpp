@@ -8,7 +8,7 @@
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_api.h>
 #include <babylon/interfaces/idisposable.h>
-#include <babylon/math/matrix.h>
+#include <babylon/maths/matrix.h>
 #include <babylon/misc/iinspectable.h>
 #include <babylon/misc/observable.h>
 

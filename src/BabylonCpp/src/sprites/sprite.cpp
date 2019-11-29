@@ -4,7 +4,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/materials/textures/texture.h>
-#include <babylon/math/color4.h>
+#include <babylon/maths/color4.h>
 #include <babylon/sprites/sprite_manager.h>
 
 namespace BABYLON {

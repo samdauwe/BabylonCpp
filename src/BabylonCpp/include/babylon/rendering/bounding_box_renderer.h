@@ -6,7 +6,7 @@
 #include <babylon/babylon_api.h>
 #include <babylon/engines/iscene_component.h>
 #include <babylon/engines/scene_component_constants.h>
-#include <babylon/math/color3.h>
+#include <babylon/maths/color3.h>
 
 namespace BABYLON {
 

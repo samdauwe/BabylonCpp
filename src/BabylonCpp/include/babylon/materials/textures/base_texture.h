@@ -6,7 +6,7 @@
 #include <babylon/babylon_api.h>
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/core/structs.h>
-#include <babylon/math/isize.h>
+#include <babylon/maths/isize.h>
 #include <babylon/misc/observable.h>
 #include <babylon/misc/observer.h>
 

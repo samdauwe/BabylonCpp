@@ -2,7 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/random.h>
-#include <babylon/math/scalar.h>
+#include <babylon/maths/scalar.h>
 
 namespace BABYLON {
 

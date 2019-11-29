@@ -7,7 +7,7 @@
 #include <babylon/core/structs.h>
 #include <babylon/engines/constants.h>
 #include <babylon/materials/textures/texture_constants.h>
-#include <babylon/math/color4.h>
+#include <babylon/maths/color4.h>
 #include <babylon/misc/iinspectable.h>
 #include <babylon/misc/observable.h>
 #include <babylon/misc/observer.h>

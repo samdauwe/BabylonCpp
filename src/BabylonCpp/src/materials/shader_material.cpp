@@ -10,11 +10,11 @@
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/textures/texture.h>
-#include <babylon/math/color3.h>
-#include <babylon/math/color4.h>
-#include <babylon/math/vector2.h>
-#include <babylon/math/vector3.h>
-#include <babylon/math/vector4.h>
+#include <babylon/maths/color3.h>
+#include <babylon/maths/color4.h>
+#include <babylon/maths/vector2.h>
+#include <babylon/maths/vector3.h>
+#include <babylon/maths/vector4.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/vertex_buffer.h>

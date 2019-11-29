@@ -6,7 +6,7 @@
 #include <babylon/babylon_api.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/texture_constants.h>
-#include <babylon/math/matrix.h>
+#include <babylon/maths/matrix.h>
 #include <babylon/misc/iinspectable.h>
 #include <babylon/misc/observable.h>
 

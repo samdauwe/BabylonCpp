@@ -4,9 +4,9 @@
 #include <babylon/helpers/photo_dome_options.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/interfaces/irenderable_scene.h>
-#include <babylon/math/matrix.h>
-#include <babylon/math/quaternion.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/matrix.h>
+#include <babylon/maths/quaternion.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/misc/observer.h>
 #include <babylon/samples/samples_index.h>
 

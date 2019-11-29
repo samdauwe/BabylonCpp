@@ -3,7 +3,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/cameras/free_camera.h>
-#include <babylon/math/axis.h>
+#include <babylon/maths/axis.h>
 
 namespace BABYLON {
 

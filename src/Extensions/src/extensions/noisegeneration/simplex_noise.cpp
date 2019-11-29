@@ -2,9 +2,9 @@
 
 #include <random>
 
-#include <babylon/math/vector2.h>
-#include <babylon/math/vector3.h>
-#include <babylon/math/vector4.h>
+#include <babylon/maths/vector2.h>
+#include <babylon/maths/vector3.h>
+#include <babylon/maths/vector4.h>
 
 namespace BABYLON {
 namespace Extensions {

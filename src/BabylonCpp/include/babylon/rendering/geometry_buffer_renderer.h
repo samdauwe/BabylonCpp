@@ -6,7 +6,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
-#include <babylon/math/matrix.h>
+#include <babylon/maths/matrix.h>
 
 namespace BABYLON {
 

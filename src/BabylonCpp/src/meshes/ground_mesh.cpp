@@ -5,7 +5,7 @@
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/ray.h>
-#include <babylon/math/tmp_vectors.h>
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {

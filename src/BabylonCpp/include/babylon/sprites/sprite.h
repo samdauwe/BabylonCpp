@@ -4,8 +4,8 @@
 #include <babylon/babylon_api.h>
 
 #include <babylon/animations/animation.h>
-#include <babylon/math/color4.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/color4.h>
+#include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 

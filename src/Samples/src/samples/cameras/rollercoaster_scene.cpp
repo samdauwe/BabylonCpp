@@ -6,8 +6,8 @@
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/cube_texture.h>
 #include <babylon/materials/textures/texture.h>
-#include <babylon/math/curve3.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/curve3.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/samples/samples_index.h>
 

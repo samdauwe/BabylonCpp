@@ -5,7 +5,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
-#include <babylon/math/isize.h>
+#include <babylon/maths/isize.h>
 
 namespace BABYLON {
 

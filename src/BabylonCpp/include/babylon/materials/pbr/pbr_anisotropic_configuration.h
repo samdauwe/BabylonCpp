@@ -6,7 +6,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
-#include <babylon/math/vector2.h>
+#include <babylon/maths/vector2.h>
 
 using json = nlohmann::json;
 

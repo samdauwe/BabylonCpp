@@ -6,11 +6,11 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/materials/node/node_material_block_connection_point_types.h>
-#include <babylon/math/color3.h>
-#include <babylon/math/color4.h>
-#include <babylon/math/matrix.h>
-#include <babylon/math/vector2.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/color3.h>
+#include <babylon/maths/color4.h>
+#include <babylon/maths/matrix.h>
+#include <babylon/maths/vector2.h>
+#include <babylon/maths/vector3.h>
 
 #ifndef isNan
 #define isNan(a) (a != a)

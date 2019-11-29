@@ -3,7 +3,7 @@
 #include <cmath>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/math/plane.h>
+#include <babylon/maths/plane.h>
 
 namespace BABYLON {
 

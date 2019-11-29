@@ -2,7 +2,7 @@
 #define BABYLON_MESHES_SIMPLIFICATION_DECIMATION_VERTEX_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/meshes/simplification/quadratic_matrix.h>
 
 namespace BABYLON {

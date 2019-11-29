@@ -14,9 +14,9 @@
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/irender_target_options.h>
-#include <babylon/math/scalar.h>
-#include <babylon/math/spherical_polynomial.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/scalar.h>
+#include <babylon/maths/spherical_polynomial.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/misc/environment_texture_info.h>
 #include <babylon/misc/file_tools.h>
 #include <babylon/misc/tools.h>

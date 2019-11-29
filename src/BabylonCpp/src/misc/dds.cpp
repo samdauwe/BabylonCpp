@@ -6,7 +6,7 @@
 #include <babylon/engines/engine.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/materials/textures/internal_texture.h>
-#include <babylon/math/scalar.h>
+#include <babylon/maths/scalar.h>
 #include <babylon/misc/dds_info.h>
 #include <babylon/misc/highdynamicrange/cube_map_to_spherical_polynomial_tools.h>
 

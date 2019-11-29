@@ -4,8 +4,8 @@
 #include <babylon/babylon_api.h>
 #include <babylon/behaviors/behavior.h>
 #include <babylon/core/structs.h>
-#include <babylon/math/quaternion.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/quaternion.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/misc/observable.h>
 #include <babylon/misc/observer.h>
 

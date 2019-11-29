@@ -4,7 +4,7 @@
 #include <babylon/babylon_api.h>
 #include <babylon/engines/constants.h>
 #include <babylon/materials/textures/texture_constants.h>
-#include <babylon/math/vector2.h>
+#include <babylon/maths/vector2.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {

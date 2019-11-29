@@ -4,7 +4,7 @@
 #include <optional>
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/vector4.h>
+#include <babylon/maths/vector4.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/vertex_data_constants.h>
 

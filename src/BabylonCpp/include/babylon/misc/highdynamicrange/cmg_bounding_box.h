@@ -2,7 +2,7 @@
 #define BABYLON_MISC_HIGH_DYNAMIC_RANGE_CMG_BOUNDING_BOX_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 

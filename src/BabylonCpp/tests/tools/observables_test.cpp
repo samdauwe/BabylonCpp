@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <babylon/math/vector2.h>
+#include <babylon/maths/vector2.h>
 #include <babylon/misc/observable.h>
 #include <babylon/misc/observer.h>
 

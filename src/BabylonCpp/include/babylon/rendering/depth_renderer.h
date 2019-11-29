@@ -3,8 +3,8 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/engines/constants.h>
-#include <babylon/math/color4.h>
-#include <babylon/math/matrix.h>
+#include <babylon/maths/color4.h>
+#include <babylon/maths/matrix.h>
 
 namespace BABYLON {
 

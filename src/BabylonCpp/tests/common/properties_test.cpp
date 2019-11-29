@@ -1,7 +1,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <babylon/math/vector2.h>
+#include <babylon/maths/vector2.h>
 
 template <typename T>
 class PrimitiveTypeProperty {

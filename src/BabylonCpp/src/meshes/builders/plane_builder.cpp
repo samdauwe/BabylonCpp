@@ -1,6 +1,6 @@
 #include <babylon/meshes/builders/plane_builder.h>
 
-#include <babylon/math/plane.h>
+#include <babylon/maths/plane.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/vertex_data.h>

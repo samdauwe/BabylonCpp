@@ -5,8 +5,8 @@
 #include <babylon/collisions/picking_info.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_sphere.h>
-#include <babylon/math/plane.h>
-#include <babylon/math/tmp_vectors.h>
+#include <babylon/maths/plane.h>
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {

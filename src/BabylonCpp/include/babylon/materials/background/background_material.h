@@ -4,9 +4,9 @@
 #include <babylon/babylon_api.h>
 #include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/push_material.h>
-#include <babylon/math/color3.h>
-#include <babylon/math/vector3.h>
-#include <babylon/math/vector4.h>
+#include <babylon/maths/color3.h>
+#include <babylon/maths/vector3.h>
+#include <babylon/maths/vector4.h>
 #include <babylon/misc/observer.h>
 
 namespace BABYLON {

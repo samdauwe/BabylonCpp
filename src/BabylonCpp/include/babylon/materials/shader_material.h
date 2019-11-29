@@ -4,12 +4,12 @@
 #include <babylon/babylon_api.h>
 #include <babylon/materials/ishader_material_options.h>
 #include <babylon/materials/material.h>
-#include <babylon/math/color3.h>
-#include <babylon/math/color4.h>
-#include <babylon/math/matrix.h>
-#include <babylon/math/vector2.h>
-#include <babylon/math/vector3.h>
-#include <babylon/math/vector4.h>
+#include <babylon/maths/color3.h>
+#include <babylon/maths/color4.h>
+#include <babylon/maths/matrix.h>
+#include <babylon/maths/vector2.h>
+#include <babylon/maths/vector3.h>
+#include <babylon/maths/vector4.h>
 #include <unordered_map>
 
 namespace BABYLON {

@@ -17,8 +17,8 @@
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/texture.h>
-#include <babylon/math/scalar.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/scalar.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
 

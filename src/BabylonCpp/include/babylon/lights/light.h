@@ -4,9 +4,9 @@
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
 #include <babylon/engines/node.h>
-#include <babylon/math/color3.h>
-#include <babylon/math/matrix.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/color3.h>
+#include <babylon/maths/matrix.h>
+#include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 

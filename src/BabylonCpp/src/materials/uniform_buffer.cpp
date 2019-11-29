@@ -4,8 +4,8 @@
 #include <babylon/core/logging.h>
 #include <babylon/engines/engine.h>
 #include <babylon/materials/effect.h>
-#include <babylon/math/color3.h>
-#include <babylon/math/vector4.h>
+#include <babylon/maths/color3.h>
+#include <babylon/maths/vector4.h>
 
 namespace BABYLON {
 

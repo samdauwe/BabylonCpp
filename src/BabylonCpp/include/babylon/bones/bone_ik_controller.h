@@ -2,9 +2,9 @@
 #define BABYLON_BONES_IK_CONTROLLER_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/matrix.h>
-#include <babylon/math/quaternion.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/matrix.h>
+#include <babylon/maths/quaternion.h>
+#include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 

@@ -2,7 +2,7 @@
 #define BABYLON_PARTICLES_EMITTER_TYPES_BOX_PARTICLE_EMITTER_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/particles/emittertypes/iparticle_emitter_Type.h>
 
 namespace BABYLON {

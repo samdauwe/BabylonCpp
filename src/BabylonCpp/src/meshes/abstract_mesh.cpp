@@ -21,9 +21,9 @@
 #include <babylon/materials/material_defines.h>
 #include <babylon/materials/textures/raw_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
-#include <babylon/math/frustum.h>
-#include <babylon/math/functions.h>
-#include <babylon/math/tmp_vectors.h>
+#include <babylon/maths/frustum.h>
+#include <babylon/maths/functions.h>
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>

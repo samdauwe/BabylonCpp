@@ -6,8 +6,8 @@
 #include <babylon/lights/spot_light.h>
 #include <babylon/materials/pbr/pbr_metallic_roughness_material.h>
 #include <babylon/materials/standard_material.h>
-#include <babylon/math/color3.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/color3.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>

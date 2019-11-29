@@ -1,6 +1,6 @@
 #include <babylon/meshes/builders/tube_builder.h>
 
-#include <babylon/math/tmp_vectors.h>
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/_creation_data_storage.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/builders/ribbon_builder.h>

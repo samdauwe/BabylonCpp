@@ -2,7 +2,7 @@
 #define BABYLON_MESHES_POLYGONMESH_INDEXED_VECTOR2_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/vector2.h>
+#include <babylon/maths/vector2.h>
 
 namespace BABYLON {
 

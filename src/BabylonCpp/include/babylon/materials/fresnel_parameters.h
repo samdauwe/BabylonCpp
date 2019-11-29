@@ -5,7 +5,7 @@
 #include <nlohmann/json_fwd.hpp>
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/color3.h>
+#include <babylon/maths/color3.h>
 
 using json = nlohmann::json;
 

@@ -3,8 +3,8 @@
 #include <babylon/behaviors/meshes/pointer_drag_behavior.h>
 #include <babylon/core/logging.h>
 #include <babylon/gizmos/plane_rotation_gizmo.h>
-#include <babylon/math/color3.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/color3.h>
+#include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 

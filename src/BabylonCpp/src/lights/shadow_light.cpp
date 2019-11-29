@@ -2,8 +2,8 @@
 
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/scene.h>
-#include <babylon/math/axis.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/axis.h>
+#include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 

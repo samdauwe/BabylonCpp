@@ -1,7 +1,7 @@
 #include <babylon/debug/bone_axes_viewer.h>
 
 #include <babylon/bones/bone.h>
-#include <babylon/math/axis.h>
+#include <babylon/maths/axis.h>
 #include <babylon/meshes/mesh.h>
 
 namespace BABYLON {

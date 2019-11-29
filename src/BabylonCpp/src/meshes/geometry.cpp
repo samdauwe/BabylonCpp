@@ -12,7 +12,7 @@
 #include <babylon/loading/scene_loader.h>
 #include <babylon/loading/scene_loader_flags.h>
 #include <babylon/materials/effect.h>
-#include <babylon/math/functions.h>
+#include <babylon/maths/functions.h>
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>

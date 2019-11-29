@@ -2,7 +2,7 @@
 #define BABYLON_PARTICLES_EMITTER_TYPES_CYLINDER_DIRECTED_PARTICLE_EMITTER_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/particles/emittertypes/cylinder_particle_emitter.h>
 
 namespace BABYLON {

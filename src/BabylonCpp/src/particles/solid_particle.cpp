@@ -1,6 +1,6 @@
 #include <babylon/particles/solid_particle.h>
 
-#include <babylon/math/tmp_vectors.h>
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/particles/solid_particle_system.h>
 

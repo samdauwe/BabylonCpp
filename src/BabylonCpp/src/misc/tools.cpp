@@ -5,8 +5,8 @@
 #include <babylon/core/string.h>
 #include <babylon/engines/engine_store.h>
 #include <babylon/interfaces/igl_rendering_context.h>
-#include <babylon/math/color4.h>
-#include <babylon/math/vector3.h>
+#include <babylon/maths/color4.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/utils/base64.h>
 
 namespace BABYLON {

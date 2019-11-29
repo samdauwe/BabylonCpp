@@ -4,7 +4,7 @@
 #include <functional>
 
 #include <babylon/babylon_api.h>
-#include <babylon/math/color3.h>
+#include <babylon/maths/color3.h>
 #include <babylon/misc/event_state.h>
 
 namespace BABYLON {
