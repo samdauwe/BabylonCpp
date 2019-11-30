@@ -48,14 +48,14 @@ struct AnimationsScene : public IRenderableScene {
     box1->position().x = -20.f;
     // - Box 2
     BoxOptions options;
-    options.size          = 10.f;
-    options.faceColors[0] = Color4(1.f, 0.f, 0.f, 1.f);   // Red
-    options.faceColors[5] = Color4(1.f, 1.f, 0.f, 1.f);   // Yellow
-    options.faceColors[1] = Color4(0.f, 1.f, 0.f, 1.f);   // Green
-    options.faceColors[4] = Color4(0.f, 0.f, 1.f, 1.f);   // Blue
-    options.faceColors[2] = Color4(1.f, 0.f, 1.f, 1.f);   // Magenta
-    options.faceColors[3] = Color4(0.5f, 0.f, 0.5f, 1.f); // Purple
-    auto box2             = MeshBuilder::CreateBox("Box2", options, scene);
+    options.size = 10.f;
+    options.setFaceColor(0, Color4(1.f, 0.f, 0.f, 1.f));   // Red
+    options.setFaceColor(5, Color4(1.f, 1.f, 0.f, 1.f));   // Yellow
+    options.setFaceColor(1, Color4(0.f, 1.f, 0.f, 1.f));   // Green
+    options.setFaceColor(4, Color4(0.f, 0.f, 1.f, 1.f));   // Blue
+    options.setFaceColor(2, Color4(1.f, 0.f, 1.f, 1.f));   // Magenta
+    options.setFaceColor(3, Color4(0.5f, 0.f, 0.5f, 1.f)); // Purple
+    auto box2 = MeshBuilder::CreateBox("Box2", options, scene);
     // - Box 3
     auto box3                 = MeshBuilder::CreateBox("Box1", options, scene);
     box3->position().x        = -20.f;

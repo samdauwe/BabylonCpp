@@ -36,13 +36,15 @@ public:
   BoxOptions();
   ~BoxOptions(); // = default
 
+  void setFaceColor(size_t faceIndex, const Color4& color);
+
 public:
   std::optional<float> size;
   std::optional<float> width;
   std::optional<float> height;
   std::optional<float> depth;
   std::array<Vector4, 6> faceUV;
-  std::array<Color4, 6> faceColors;
+  std::optional<std::array<Color4, 6>> faceColors;
   std::optional<unsigned int> sideOrientation;
   std::optional<Vector4> frontUVs;
   std::optional<Vector4> backUVs;

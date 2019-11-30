@@ -76,8 +76,8 @@ struct TubeAnimationScene : public IRenderableScene {
     mat1->diffuseColor = Color3(0.5f, 0.5f, 1.f);
 
     BoxOptions options;
-    options.size             = 2.f;
-    options.faceColors[3]    = Color4(1.f, 0.f, 0.f, 1.f); // Red
+    options.size = 2.f;
+    options.setFaceColor(3, Color4(1.f, 0.f, 0.f, 1.f)); // Red
     auto cube                = MeshBuilder::CreateBox("box", options, scene);
     cube->rotationQuaternion = Quaternion::Identity();
 

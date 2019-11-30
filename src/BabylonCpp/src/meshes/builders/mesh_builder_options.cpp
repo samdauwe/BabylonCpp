@@ -14,9 +14,7 @@ BoxOptions::BoxOptions()
     , faceUV{{Vector4(0.f, 0.f, 1.f, 1.f), Vector4(0.f, 0.f, 1.f, 1.f), Vector4(0.f, 0.f, 1.f, 1.f),
               Vector4(0.f, 0.f, 1.f, 1.f), Vector4(0.f, 0.f, 1.f, 1.f),
               Vector4(0.f, 0.f, 1.f, 1.f)}}
-    , faceColors{{Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f),
-                  Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f),
-                  Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f)}}
+    , faceColors{std::nullopt}
     , sideOrientation{std::nullopt}
     , frontUVs{std::nullopt}
     , backUVs{std::nullopt}
@@ -25,6 +23,16 @@ BoxOptions::BoxOptions()
     , bottomBaseAt{std::nullopt}
     , updatable{std::nullopt}
 {
+}
+
+void BoxOptions::setFaceColor(size_t faceIndex, const Color4& color)
+{
+  if (!faceColors) {
+    faceColors
+      = {Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f),
+         Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f)};
+  }
+  faceColors.value()[faceIndex] = color;
 }
 
 BoxOptions::~BoxOptions() = default;
@@ -94,7 +102,7 @@ DiscOptions::DiscOptions()
 {
 }
 
-DiscOptions::~DiscOptions()  = default;
+DiscOptions::~DiscOptions() = default;
 
 //------------------------------------------------------------------------------
 // Extrude shape mesh options

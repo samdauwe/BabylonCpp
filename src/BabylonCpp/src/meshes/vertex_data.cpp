@@ -64,8 +64,7 @@ void VertexData::set(const Float32Array& data, const std::string& kind)
   }
 }
 
-VertexData& VertexData::applyToMesh(Mesh& mesh,
-                                    const std::optional<bool>& updatable)
+VertexData& VertexData::applyToMesh(Mesh& mesh, const std::optional<bool>& updatable)
 {
   _applyTo(mesh, updatable);
   return *this;
@@ -95,18 +94,15 @@ VertexData& VertexData::_applyTo(IGetSetVerticesData& meshOrGeometry,
   const auto updatable = iUpdatable.value_or(false);
 
   if (!positions.empty()) {
-    meshOrGeometry.setVerticesData(VertexBuffer::PositionKind, positions,
-                                   updatable);
+    meshOrGeometry.setVerticesData(VertexBuffer::PositionKind, positions, updatable);
   }
 
   if (!normals.empty()) {
-    meshOrGeometry.setVerticesData(VertexBuffer::NormalKind, normals,
-                                   updatable);
+    meshOrGeometry.setVerticesData(VertexBuffer::NormalKind, normals, updatable);
   }
 
   if (!tangents.empty()) {
-    meshOrGeometry.setVerticesData(VertexBuffer::TangentKind, tangents,
-                                   updatable);
+    meshOrGeometry.setVerticesData(VertexBuffer::TangentKind, tangents, updatable);
   }
 
   if (!uvs.empty()) {
@@ -138,23 +134,21 @@ VertexData& VertexData::_applyTo(IGetSetVerticesData& meshOrGeometry,
   }
 
   if (!matricesIndices.empty()) {
-    meshOrGeometry.setVerticesData(VertexBuffer::MatricesIndicesKind,
-                                   matricesIndices, updatable);
+    meshOrGeometry.setVerticesData(VertexBuffer::MatricesIndicesKind, matricesIndices, updatable);
   }
 
   if (!matricesWeights.empty()) {
-    meshOrGeometry.setVerticesData(VertexBuffer::MatricesWeightsKind,
-                                   matricesWeights, updatable);
+    meshOrGeometry.setVerticesData(VertexBuffer::MatricesWeightsKind, matricesWeights, updatable);
   }
 
   if (!matricesIndicesExtra.empty()) {
-    meshOrGeometry.setVerticesData(VertexBuffer::MatricesIndicesExtraKind,
-                                   matricesIndicesExtra, updatable);
+    meshOrGeometry.setVerticesData(VertexBuffer::MatricesIndicesExtraKind, matricesIndicesExtra,
+                                   updatable);
   }
 
   if (!matricesWeightsExtra.empty()) {
-    meshOrGeometry.setVerticesData(VertexBuffer::MatricesWeightsExtraKind,
-                                   matricesWeightsExtra, updatable);
+    meshOrGeometry.setVerticesData(VertexBuffer::MatricesWeightsExtraKind, matricesWeightsExtra,
+                                   updatable);
   }
 
   if (!indices.empty()) {
@@ -167,81 +161,71 @@ VertexData& VertexData::_applyTo(IGetSetVerticesData& meshOrGeometry,
   return *this;
 }
 
-VertexData& VertexData::_update(IGetSetVerticesData* meshOrGeometry,
-                                bool updateExtends, bool makeItUnique)
+VertexData& VertexData::_update(IGetSetVerticesData* meshOrGeometry, bool updateExtends,
+                                bool makeItUnique)
 {
   if (!positions.empty()) {
-    meshOrGeometry->updateVerticesData(VertexBuffer::PositionKind, positions,
-                                       updateExtends, makeItUnique);
+    meshOrGeometry->updateVerticesData(VertexBuffer::PositionKind, positions, updateExtends,
+                                       makeItUnique);
   }
 
   if (!normals.empty()) {
-    meshOrGeometry->updateVerticesData(VertexBuffer::NormalKind, normals,
-                                       updateExtends, makeItUnique);
+    meshOrGeometry->updateVerticesData(VertexBuffer::NormalKind, normals, updateExtends,
+                                       makeItUnique);
   }
 
   if (!tangents.empty()) {
-    meshOrGeometry->updateVerticesData(VertexBuffer::TangentKind, tangents,
-                                       updateExtends, makeItUnique);
+    meshOrGeometry->updateVerticesData(VertexBuffer::TangentKind, tangents, updateExtends,
+                                       makeItUnique);
   }
 
   if (!uvs.empty()) {
-    meshOrGeometry->updateVerticesData(VertexBuffer::UVKind, uvs, updateExtends,
-                                       makeItUnique);
+    meshOrGeometry->updateVerticesData(VertexBuffer::UVKind, uvs, updateExtends, makeItUnique);
   }
 
   if (!uvs2.empty()) {
-    meshOrGeometry->updateVerticesData(VertexBuffer::UV2Kind, uvs2,
-                                       updateExtends, makeItUnique);
+    meshOrGeometry->updateVerticesData(VertexBuffer::UV2Kind, uvs2, updateExtends, makeItUnique);
   }
 
   if (!uvs3.empty()) {
-    meshOrGeometry->updateVerticesData(VertexBuffer::UV3Kind, uvs3,
-                                       updateExtends, makeItUnique);
+    meshOrGeometry->updateVerticesData(VertexBuffer::UV3Kind, uvs3, updateExtends, makeItUnique);
   }
 
   if (!uvs4.empty()) {
-    meshOrGeometry->updateVerticesData(VertexBuffer::UV4Kind, uvs4,
-                                       updateExtends, makeItUnique);
+    meshOrGeometry->updateVerticesData(VertexBuffer::UV4Kind, uvs4, updateExtends, makeItUnique);
   }
 
   if (!uvs5.empty()) {
-    meshOrGeometry->updateVerticesData(VertexBuffer::UV5Kind, uvs5,
-                                       updateExtends, makeItUnique);
+    meshOrGeometry->updateVerticesData(VertexBuffer::UV5Kind, uvs5, updateExtends, makeItUnique);
   }
 
   if (!uvs6.empty()) {
-    meshOrGeometry->updateVerticesData(VertexBuffer::UV6Kind, uvs6,
-                                       updateExtends, makeItUnique);
+    meshOrGeometry->updateVerticesData(VertexBuffer::UV6Kind, uvs6, updateExtends, makeItUnique);
   }
 
   if (!colors.empty()) {
-    meshOrGeometry->updateVerticesData(VertexBuffer::ColorKind, colors,
-                                       updateExtends, makeItUnique);
+    meshOrGeometry->updateVerticesData(VertexBuffer::ColorKind, colors, updateExtends,
+                                       makeItUnique);
   }
 
   if (!matricesIndices.empty()) {
-    meshOrGeometry->updateVerticesData(VertexBuffer::MatricesIndicesKind,
-                                       matricesIndices, updateExtends,
-                                       makeItUnique);
+    meshOrGeometry->updateVerticesData(VertexBuffer::MatricesIndicesKind, matricesIndices,
+                                       updateExtends, makeItUnique);
   }
 
   if (!matricesWeights.empty()) {
-    meshOrGeometry->updateVerticesData(VertexBuffer::MatricesWeightsKind,
-                                       matricesWeights, updateExtends,
-                                       makeItUnique);
+    meshOrGeometry->updateVerticesData(VertexBuffer::MatricesWeightsKind, matricesWeights,
+                                       updateExtends, makeItUnique);
   }
 
   if (!matricesIndicesExtra.empty()) {
-    meshOrGeometry->updateVerticesData(VertexBuffer::MatricesIndicesExtraKind,
-                                       matricesIndicesExtra, updateExtends,
-                                       makeItUnique);
+    meshOrGeometry->updateVerticesData(VertexBuffer::MatricesIndicesExtraKind, matricesIndicesExtra,
+                                       updateExtends, makeItUnique);
   }
 
   if (!matricesWeightsExtra.empty()) {
-    meshOrGeometry->updateVerticesData(VertexBuffer::MatricesWeightsExtraKind,
-                                       matricesWeightsExtra, updateExtends,
-                                       makeItUnique);
+    meshOrGeometry->updateVerticesData(VertexBuffer::MatricesWeightsExtraKind, matricesWeightsExtra,
+                                       updateExtends, makeItUnique);
   }
 
   if (!indices.empty()) {
@@ -312,8 +296,7 @@ VertexData& VertexData::merge(VertexData& other, bool /*use32BitsIndices*/)
   other._validate();
 
   if (!other.indices.empty()) {
-    uint32_t offset
-      = (!positions.empty()) ? static_cast<unsigned>(positions.size()) / 3 : 0;
+    uint32_t offset = (!positions.empty()) ? static_cast<unsigned>(positions.size()) / 3 : 0;
     for (auto& index : other.indices) {
       indices.emplace_back(static_cast<int32_t>(index + offset));
     }
@@ -321,27 +304,24 @@ VertexData& VertexData::merge(VertexData& other, bool /*use32BitsIndices*/)
 
   positions = _mergeElement(positions, other.positions);
 
-  normals         = _mergeElement(normals, other.normals);
-  tangents        = _mergeElement(tangents, other.tangents);
-  uvs             = _mergeElement(uvs, other.uvs);
-  uvs2            = _mergeElement(uvs2, other.uvs2);
-  uvs3            = _mergeElement(uvs3, other.uvs3);
-  uvs4            = _mergeElement(uvs4, other.uvs4);
-  uvs5            = _mergeElement(uvs5, other.uvs5);
-  uvs6            = _mergeElement(uvs6, other.uvs6);
-  colors          = _mergeElement(colors, other.colors);
-  matricesIndices = _mergeElement(matricesIndices, other.matricesIndices);
-  matricesWeights = _mergeElement(matricesWeights, other.matricesWeights);
-  matricesIndicesExtra
-    = _mergeElement(matricesIndicesExtra, other.matricesIndicesExtra);
-  matricesWeightsExtra
-    = _mergeElement(matricesWeightsExtra, other.matricesWeightsExtra);
+  normals              = _mergeElement(normals, other.normals);
+  tangents             = _mergeElement(tangents, other.tangents);
+  uvs                  = _mergeElement(uvs, other.uvs);
+  uvs2                 = _mergeElement(uvs2, other.uvs2);
+  uvs3                 = _mergeElement(uvs3, other.uvs3);
+  uvs4                 = _mergeElement(uvs4, other.uvs4);
+  uvs5                 = _mergeElement(uvs5, other.uvs5);
+  uvs6                 = _mergeElement(uvs6, other.uvs6);
+  colors               = _mergeElement(colors, other.colors);
+  matricesIndices      = _mergeElement(matricesIndices, other.matricesIndices);
+  matricesWeights      = _mergeElement(matricesWeights, other.matricesWeights);
+  matricesIndicesExtra = _mergeElement(matricesIndicesExtra, other.matricesIndicesExtra);
+  matricesWeightsExtra = _mergeElement(matricesWeightsExtra, other.matricesWeightsExtra);
 
   return *this;
 }
 
-Float32Array VertexData::_mergeElement(const Float32Array& source,
-                                       const Float32Array& other) const
+Float32Array VertexData::_mergeElement(const Float32Array& source, const Float32Array& other) const
 {
   if (source.empty()) {
     return other;
@@ -363,27 +343,22 @@ void VertexData::_validate()
     throw std::runtime_error("Positions are required");
   }
 
-  const auto getElementCount
-    = [](const std::string& kind, const Float32Array& values) -> size_t {
+  const auto getElementCount = [](const std::string& kind, const Float32Array& values) -> size_t {
     const auto stride = VertexBuffer::DeduceStride(kind);
     if ((values.size() % stride) != 0) {
-      throw std::runtime_error("The " + kind
-                               + "s array count must be a multiple of "
+      throw std::runtime_error("The " + kind + "s array count must be a multiple of "
                                + std::to_string(stride));
     }
 
     return values.size() / stride;
   };
 
-  const auto positionsElementCount
-    = getElementCount(VertexBuffer::PositionKind, positions);
+  const auto positionsElementCount = getElementCount(VertexBuffer::PositionKind, positions);
 
-  const auto validateElementCount = [&](const std::string& kind,
-                                        const Float32Array& values) {
+  const auto validateElementCount = [&](const std::string& kind, const Float32Array& values) {
     const auto elementCount = getElementCount(kind, values);
     if (elementCount != positionsElementCount) {
-      throw std::runtime_error("The " + kind + "s element count ("
-                               + std::to_string(elementCount)
+      throw std::runtime_error("The " + kind + "s element count (" + std::to_string(elementCount)
                                + ") does not match the positions count ("
                                + std::to_string(positionsElementCount) + ")");
     }
@@ -423,12 +398,10 @@ void VertexData::_validate()
     validateElementCount(VertexBuffer::MatricesWeightsKind, matricesWeights);
   }
   if (!matricesIndicesExtra.empty()) {
-    validateElementCount(VertexBuffer::MatricesIndicesExtraKind,
-                         matricesIndicesExtra);
+    validateElementCount(VertexBuffer::MatricesIndicesExtraKind, matricesIndicesExtra);
   }
   if (!matricesWeightsExtra.empty()) {
-    validateElementCount(VertexBuffer::MatricesWeightsExtraKind,
-                         matricesWeightsExtra);
+    validateElementCount(VertexBuffer::MatricesWeightsExtraKind, matricesWeightsExtra);
   }
 }
 
@@ -437,95 +410,88 @@ json VertexData::serialize() const
   return nullptr;
 }
 
-std::unique_ptr<VertexData>
-VertexData::ExtractFromMesh(Mesh* mesh, bool copyWhenShared, bool forceCopy)
+std::unique_ptr<VertexData> VertexData::ExtractFromMesh(Mesh* mesh, bool copyWhenShared,
+                                                        bool forceCopy)
 {
   return VertexData::_ExtractFrom(mesh, copyWhenShared, forceCopy);
 }
 
-std::unique_ptr<VertexData> VertexData::ExtractFromGeometry(Geometry* geometry,
-                                                            bool copyWhenShared,
+std::unique_ptr<VertexData> VertexData::ExtractFromGeometry(Geometry* geometry, bool copyWhenShared,
                                                             bool forceCopy)
 {
   return VertexData::_ExtractFrom(geometry, copyWhenShared, forceCopy);
 }
 
-std::unique_ptr<VertexData>
-VertexData::_ExtractFrom(IGetSetVerticesData* meshOrGeometry,
-                         bool copyWhenShared, bool forceCopy)
+std::unique_ptr<VertexData> VertexData::_ExtractFrom(IGetSetVerticesData* meshOrGeometry,
+                                                     bool copyWhenShared, bool forceCopy)
 {
   auto result = std::make_unique<VertexData>();
 
   if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::PositionKind)) {
-    result->positions = meshOrGeometry->getVerticesData(
-      VertexBuffer::PositionKind, copyWhenShared, forceCopy);
+    result->positions
+      = meshOrGeometry->getVerticesData(VertexBuffer::PositionKind, copyWhenShared, forceCopy);
   }
 
   if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::NormalKind)) {
-    result->normals = meshOrGeometry->getVerticesData(
-      VertexBuffer::NormalKind, copyWhenShared, forceCopy);
+    result->normals
+      = meshOrGeometry->getVerticesData(VertexBuffer::NormalKind, copyWhenShared, forceCopy);
   }
 
   if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::TangentKind)) {
-    result->tangents = meshOrGeometry->getVerticesData(
-      VertexBuffer::TangentKind, copyWhenShared, forceCopy);
+    result->tangents
+      = meshOrGeometry->getVerticesData(VertexBuffer::TangentKind, copyWhenShared, forceCopy);
   }
 
   if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::UVKind)) {
-    result->uvs = meshOrGeometry->getVerticesData(VertexBuffer::UVKind,
-                                                  copyWhenShared, forceCopy);
+    result->uvs = meshOrGeometry->getVerticesData(VertexBuffer::UVKind, copyWhenShared, forceCopy);
   }
 
   if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::UV2Kind)) {
-    result->uvs2 = meshOrGeometry->getVerticesData(VertexBuffer::UV2Kind,
-                                                   copyWhenShared, forceCopy);
+    result->uvs2
+      = meshOrGeometry->getVerticesData(VertexBuffer::UV2Kind, copyWhenShared, forceCopy);
   }
 
   if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::UV3Kind)) {
-    result->uvs3 = meshOrGeometry->getVerticesData(VertexBuffer::UV3Kind,
-                                                   copyWhenShared, forceCopy);
+    result->uvs3
+      = meshOrGeometry->getVerticesData(VertexBuffer::UV3Kind, copyWhenShared, forceCopy);
   }
 
   if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::UV4Kind)) {
-    result->uvs4 = meshOrGeometry->getVerticesData(VertexBuffer::UV4Kind,
-                                                   copyWhenShared, forceCopy);
+    result->uvs4
+      = meshOrGeometry->getVerticesData(VertexBuffer::UV4Kind, copyWhenShared, forceCopy);
   }
 
   if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::UV5Kind)) {
-    result->uvs5 = meshOrGeometry->getVerticesData(VertexBuffer::UV5Kind,
-                                                   copyWhenShared, forceCopy);
+    result->uvs5
+      = meshOrGeometry->getVerticesData(VertexBuffer::UV5Kind, copyWhenShared, forceCopy);
   }
 
   if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::UV6Kind)) {
-    result->uvs6 = meshOrGeometry->getVerticesData(VertexBuffer::UV6Kind,
-                                                   copyWhenShared, forceCopy);
+    result->uvs6
+      = meshOrGeometry->getVerticesData(VertexBuffer::UV6Kind, copyWhenShared, forceCopy);
   }
 
   if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::ColorKind)) {
-    result->colors = meshOrGeometry->getVerticesData(VertexBuffer::ColorKind,
-                                                     copyWhenShared, forceCopy);
+    result->colors
+      = meshOrGeometry->getVerticesData(VertexBuffer::ColorKind, copyWhenShared, forceCopy);
   }
 
-  if (meshOrGeometry->isVerticesDataPresent(
-        VertexBuffer::MatricesIndicesKind)) {
-    result->matricesIndices = meshOrGeometry->getVerticesData(
-      VertexBuffer::MatricesIndicesKind, copyWhenShared, forceCopy);
+  if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::MatricesIndicesKind)) {
+    result->matricesIndices = meshOrGeometry->getVerticesData(VertexBuffer::MatricesIndicesKind,
+                                                              copyWhenShared, forceCopy);
   }
 
-  if (meshOrGeometry->isVerticesDataPresent(
-        VertexBuffer::MatricesWeightsKind)) {
-    result->matricesWeights = meshOrGeometry->getVerticesData(
-      VertexBuffer::MatricesWeightsKind, copyWhenShared, forceCopy);
+  if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::MatricesWeightsKind)) {
+    result->matricesWeights = meshOrGeometry->getVerticesData(VertexBuffer::MatricesWeightsKind,
+                                                              copyWhenShared, forceCopy);
   }
 
-  if (meshOrGeometry->isVerticesDataPresent(
-        VertexBuffer::MatricesIndicesExtraKind)) {
+  if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::MatricesIndicesExtraKind)) {
     result->matricesIndicesExtra = meshOrGeometry->getVerticesData(
       VertexBuffer::MatricesIndicesExtraKind, copyWhenShared, forceCopy);
   }
 
-  if (meshOrGeometry->isVerticesDataPresent(
-        VertexBuffer::MatricesWeightsExtraKind)) {
+  if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::MatricesWeightsExtraKind)) {
     result->matricesWeightsExtra = meshOrGeometry->getVerticesData(
       VertexBuffer::MatricesWeightsExtraKind, copyWhenShared, forceCopy);
   }
@@ -537,20 +503,17 @@ VertexData::_ExtractFrom(IGetSetVerticesData* meshOrGeometry,
 
 std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
 {
-  auto& pathArray       = options.pathArray;
-  const auto closeArray = options.closeArray.value_or(false);
-  const auto closePath  = options.closePath.value_or(false);
-  const auto invertUV   = options.invertUV.value_or(false);
-  const auto defaultOffset
-    = static_cast<size_t>(std::floor(pathArray[0].size() / 2));
-  auto offset = options.offset.value_or(defaultOffset);
+  auto& pathArray          = options.pathArray;
+  const auto closeArray    = options.closeArray.value_or(false);
+  const auto closePath     = options.closePath.value_or(false);
+  const auto invertUV      = options.invertUV.value_or(false);
+  const auto defaultOffset = static_cast<size_t>(std::floor(pathArray[0].size() / 2));
+  auto offset              = options.offset.value_or(defaultOffset);
   // offset max allowed : defaultOffset
-  offset = offset > defaultOffset ? defaultOffset :
-                                    static_cast<size_t>(std::floor(offset));
-  const auto sideOrientation
-    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
-  const auto& customUV     = options.uvs;
-  const auto& customColors = options.colors;
+  offset = offset > defaultOffset ? defaultOffset : static_cast<size_t>(std::floor(offset));
+  const auto sideOrientation = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
+  const auto& customUV       = options.uvs;
+  const auto& customColors   = options.colors;
 
   Float32Array positions;
   Uint32Array indices;
@@ -682,12 +645,8 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
   else {
     for (p = 0; p < pathArray.size(); ++p) {
       for (i = 0; i < minlg + closePathCorr; ++i) {
-        u = (uTotalDistance[p] != 0.f) ?
-              us[p][i % us[p].size()] / uTotalDistance[p] :
-              0.f;
-        v = (vTotalDistance[i] != 0.f) ?
-              vs[i][p % vs[i].size()] / vTotalDistance[i] :
-              0.f;
+        u = (uTotalDistance[p] != 0.f) ? us[p][i % us[p].size()] / uTotalDistance[p] : 0.f;
+        v = (vTotalDistance[i] != 0.f) ? vs[i][p % vs[i].size()] / vTotalDistance[i] : 0.f;
         if (invertUV) {
           stl_util::concat(uvs, {v, u});
         }
@@ -699,14 +658,13 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
   }
 
   // indices
-  p             = 0;
-  uint32_t pi   = 0;
-  uint32_t l1   = lg[p] - 1;           // path1 length
-  uint32_t l2   = lg[p + 1] - 1;       // path2 length
-  uint32_t min  = (l1 < l2) ? l1 : l2; // current path stop index
-  uint32_t shft = idx[1] - idx[0];     // shift
-  size_t path1nb
-    = closeArray ? lg.size() : lg.size() - 1; // number of path1 to iterate on
+  p              = 0;
+  uint32_t pi    = 0;
+  uint32_t l1    = lg[p] - 1;                              // path1 length
+  uint32_t l2    = lg[p + 1] - 1;                          // path2 length
+  uint32_t min   = (l1 < l2) ? l1 : l2;                    // current path stop index
+  uint32_t shft  = idx[1] - idx[0];                        // shift
+  size_t path1nb = closeArray ? lg.size() : lg.size() - 1; // number of path1 to iterate on
 
   while (pi <= min && p < path1nb) {
     //  stay under min and don't go over next to last path
@@ -725,7 +683,7 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
         // last path of pathArray reached <=> closeArray == true
         shft = idx[0] - idx[p];
         l1   = lg[p] - 1;
-        l2   = lg[0] - 1; 
+        l2   = lg[0] - 1;
       }
       else {
         shft = idx[p + 1] - idx[p];
@@ -752,20 +710,18 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
       else {
         indexLast = normals.size() - 3;
       }
-      normals[indexFirst] = (normals[indexFirst] + normals[indexLast]) * 0.5f;
-      normals[indexFirst + 1]
-        = (normals[indexFirst + 1] + normals[indexLast + 1]) * 0.5f;
-      normals[indexFirst + 2]
-        = (normals[indexFirst + 2] + normals[indexLast + 2]) * 0.5f;
-      normals[indexLast]     = normals[indexFirst];
-      normals[indexLast + 1] = normals[indexFirst + 1];
-      normals[indexLast + 2] = normals[indexFirst + 2];
+      normals[indexFirst]     = (normals[indexFirst] + normals[indexLast]) * 0.5f;
+      normals[indexFirst + 1] = (normals[indexFirst + 1] + normals[indexLast + 1]) * 0.5f;
+      normals[indexFirst + 2] = (normals[indexFirst + 2] + normals[indexLast + 2]) * 0.5f;
+      normals[indexLast]      = normals[indexFirst];
+      normals[indexLast + 1]  = normals[indexFirst + 1];
+      normals[indexLast + 2]  = normals[indexFirst + 2];
     }
   }
 
   // sides
-  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs,
-                            options.frontUVs, options.backUVs);
+  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs, options.frontUVs,
+                            options.backUVs);
 
   // Colors
   Float32Array colors;
@@ -800,14 +756,12 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
 std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
 {
   uint32_t nbFaces = 6;
-  IndicesArray indices{0,  1,  2,  0,  2,  3,  4,  5,  6,  4,  6,  7,
-                       8,  9,  10, 8,  10, 11, 12, 13, 14, 12, 14, 15,
-                       16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23};
-  Float32Array normals{0,  0,  1,  0, 0,  1,  0,  0,  1,  0,  0,  1, 0,  0, -1,
-                       0,  0,  -1, 0, 0,  -1, 0,  0,  -1, 1,  0,  0, 1,  0, 0,
-                       1,  0,  0,  1, 0,  0,  -1, 0,  0,  -1, 0,  0, -1, 0, 0,
-                       -1, 0,  0,  0, 1,  0,  0,  1,  0,  0,  1,  0, 0,  1, 0,
-                       0,  -1, 0,  0, -1, 0,  0,  -1, 0,  0,  -1, 0};
+  IndicesArray indices{0,  1,  2,  0,  2,  3,  4,  5,  6,  4,  6,  7,  8,  9,  10, 8,  10, 11,
+                       12, 13, 14, 12, 14, 15, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23};
+  Float32Array normals{0,  0, 1,  0,  0, 1,  0,  0,  1, 0,  0,  1, 0, 0,  -1, 0, 0,  -1,
+                       0,  0, -1, 0,  0, -1, 1,  0,  0, 1,  0,  0, 1, 0,  0,  1, 0,  0,
+                       -1, 0, 0,  -1, 0, 0,  -1, 0,  0, -1, 0,  0, 0, 1,  0,  0, 1,  0,
+                       0,  1, 0,  0,  1, 0,  0,  -1, 0, 0,  -1, 0, 0, -1, 0,  0, -1, 0};
   Float32Array uvs;
   Float32Array positions;
   const auto width  = options.width.value_or(options.size.value_or(1.f));
@@ -822,22 +776,17 @@ std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
   Int32Array bottomOrder{2, 0, 1, 3};
   auto topIndex    = topOrder[topBaseAt];
   auto bottomIndex = bottomOrder[bottomBaseAt];
-  Float32Array basePositions{
-    1,  -1, 1,  -1, -1, 1,  -1, 1,  1,  1,  1,  1,  1,  1,  -1, -1, 1,  -1,
-    -1, -1, -1, 1,  -1, -1, 1,  1,  -1, 1,  -1, -1, 1,  -1, 1,  1,  1,  1,
-    -1, 1,  1,  -1, -1, 1,  -1, -1, -1, -1, 1,  -1, -1, 1,  1,  -1, 1,  -1,
-    1,  1,  -1, 1,  1,  1,  1,  -1, 1,  1,  -1, -1, -1, -1, -1, -1, -1, 1};
+  Float32Array basePositions{1,  -1, 1,  -1, -1, 1,  -1, 1,  1,  1,  1,  1,  1,  1,  -1, -1, 1,  -1,
+                             -1, -1, -1, 1,  -1, -1, 1,  1,  -1, 1,  -1, -1, 1,  -1, 1,  1,  1,  1,
+                             -1, 1,  1,  -1, -1, 1,  -1, -1, -1, -1, 1,  -1, -1, 1,  1,  -1, 1,  -1,
+                             1,  1,  -1, 1,  1,  1,  1,  -1, 1,  1,  -1, -1, -1, -1, -1, -1, -1, 1};
   if (wrap) {
-    indices = {2, 3,  0,  2, 0,  1, 4,  5,  6,  4,  6,  7,
-               9, 10, 11, 9, 11, 8, 12, 14, 15, 12, 13, 14};
+    indices = {2, 3, 0, 2, 0, 1, 4, 5, 6, 4, 6, 7, 9, 10, 11, 9, 11, 8, 12, 14, 15, 12, 13, 14};
     basePositions
-      = {-1, 1,  1,  1,  1,  1, 1,  -1, 1, -1, -1, 1,  1, 1,  -1, -1,
-         1,  -1, -1, -1, -1, 1, -1, -1, 1, 1,  1,  1,  1, -1, 1,  -1,
-         -1, 1,  -1, 1,  -1, 1, -1, -1, 1, 1,  -1, -1, 1, -1, -1, -1};
-    std::vector<Float32Array> topFaceBase{
-      {1, 1, 1}, {-1, 1, 1}, {-1, 1, -1}, {1, 1, -1}};
-    std::vector<Float32Array> bottomFaceBase{
-      {-1, -1, 1}, {1, -1, 1}, {1, -1, -1}, {-1, -1, -1}};
+      = {-1, 1, 1, 1, 1, 1,  1, -1, 1,  -1, -1, 1, 1,  1, -1, -1, 1, -1, -1, -1, -1, 1,  -1, -1,
+         1,  1, 1, 1, 1, -1, 1, -1, -1, 1,  -1, 1, -1, 1, -1, -1, 1, 1,  -1, -1, 1,  -1, -1, -1};
+    std::vector<Float32Array> topFaceBase{{1, 1, 1}, {-1, 1, 1}, {-1, 1, -1}, {1, 1, -1}};
+    std::vector<Float32Array> bottomFaceBase{{-1, -1, 1}, {1, -1, 1}, {1, -1, -1}, {-1, -1, -1}};
     IndicesArray topFaceOrder{17, 18, 19, 16};
     IndicesArray bottomFaceOrder{22, 23, 20, 21};
     while (topIndex > 0) {
@@ -857,24 +806,18 @@ std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
     auto topFaceBaseFlat    = stl_util::flatten(topFaceBase);
     auto bottomFaceBaseFlat = stl_util::flatten(bottomFaceBase);
 
-    stl_util::concat(basePositions,
-                     stl_util::concat(topFaceBaseFlat, bottomFaceBaseFlat));
-    stl_util::concat(indices,
-                     {topFaceOrder[0], topFaceOrder[2], topFaceOrder[3],
-                      topFaceOrder[0], topFaceOrder[1], topFaceOrder[2]});
-    stl_util::concat(indices, {bottomFaceOrder[0], bottomFaceOrder[2],
-                               bottomFaceOrder[3], bottomFaceOrder[0],
-                               bottomFaceOrder[1], bottomFaceOrder[2]});
+    stl_util::concat(basePositions, stl_util::concat(topFaceBaseFlat, bottomFaceBaseFlat));
+    stl_util::concat(indices, {topFaceOrder[0], topFaceOrder[2], topFaceOrder[3], topFaceOrder[0],
+                               topFaceOrder[1], topFaceOrder[2]});
+    stl_util::concat(indices, {bottomFaceOrder[0], bottomFaceOrder[2], bottomFaceOrder[3],
+                               bottomFaceOrder[0], bottomFaceOrder[1], bottomFaceOrder[2]});
   }
   Float32Array scaleArray{width / 2, height / 2.f, depth / 2.f};
-  for (auto currentIndex = 0ull; currentIndex < basePositions.size();
-       ++currentIndex) {
-    positions.emplace_back(basePositions[currentIndex]
-                           * scaleArray[currentIndex % 3]);
+  for (auto currentIndex = 0ull; currentIndex < basePositions.size(); ++currentIndex) {
+    positions.emplace_back(basePositions[currentIndex] * scaleArray[currentIndex % 3]);
   }
 
-  auto sideOrientation
-    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
+  auto sideOrientation = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
 
   const auto& faceUV     = options.faceUV;
   const auto& faceColors = options.faceColors;
@@ -886,17 +829,18 @@ std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
     stl_util::concat(uvs, {faceUV[index].x, faceUV[index].w});
     stl_util::concat(uvs, {faceUV[index].x, faceUV[index].y});
     stl_util::concat(uvs, {faceUV[index].z, faceUV[index].y});
-    if (!faceColors.empty()) {
+    if (faceColors) {
+      const auto& _faceColors = *faceColors;
       for (auto c = 0u; c < 4; c++) {
-        stl_util::concat(colors, {faceColors[index].r, faceColors[index].g,
-                                  faceColors[index].b, faceColors[index].a});
+        stl_util::concat(colors, {_faceColors[index].r, _faceColors[index].g, _faceColors[index].b,
+                                  _faceColors[index].a});
       }
     }
   }
 
   // sides
-  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs,
-                            options.frontUVs, options.backUVs);
+  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs, options.frontUVs,
+                            options.backUVs);
 
   // Result
   auto vertexData = std::make_unique<VertexData>();
@@ -906,10 +850,9 @@ std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
   vertexData->normals   = std::move(normals);
   vertexData->uvs       = std::move(uvs);
 
-  if (!faceColors.empty()) {
-    auto totalColors = (sideOrientation == VertexData::DOUBLESIDE) ?
-                         stl_util::concat(colors, colors) :
-                         colors;
+  if (faceColors) {
+    auto totalColors
+      = (sideOrientation == VertexData::DOUBLESIDE) ? stl_util::concat(colors, colors) : colors;
     vertexData->colors = totalColors;
   }
 
@@ -925,17 +868,15 @@ std::unique_ptr<VertexData> VertexData::CreateTiledBox(TiledBoxOptions& options)
 
   const auto flipTile = options.pattern.value_or(Mesh::NO_FLIP);
 
-  const auto width     = options.width.value_or(options.size.value_or(1.f));
-  const auto height    = options.height.value_or(options.size.value_or(1.f));
-  const auto depth     = options.depth.value_or(options.size.value_or(1.f));
-  const auto tileWidth = options.tileWidth || options.tileSize || 1;
-  const auto tileHeight
-    = options.tileHeight.value_or(options.tileSize.value_or(1.f));
-  const auto alignH = options.alignHorizontal.value_or(0u);
-  const auto alignV = options.alignVertical.value_or(0u);
+  const auto width      = options.width.value_or(options.size.value_or(1.f));
+  const auto height     = options.height.value_or(options.size.value_or(1.f));
+  const auto depth      = options.depth.value_or(options.size.value_or(1.f));
+  const auto tileWidth  = options.tileWidth || options.tileSize || 1;
+  const auto tileHeight = options.tileHeight.value_or(options.tileSize.value_or(1.f));
+  const auto alignH     = options.alignHorizontal.value_or(0u);
+  const auto alignV     = options.alignVertical.value_or(0u);
 
-  const auto sideOrientation
-    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
+  const auto sideOrientation = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
 
   const auto halfWidth  = width / 2.f;
   const auto halfHeight = height / 2.f;
@@ -1008,24 +949,20 @@ std::unique_ptr<VertexData> VertexData::CreateTiledBox(TiledBoxOptions& options)
     facePositions.emplace_back(std::vector<Vector3>{});
     faceNormals.emplace_back(std::vector<Vector3>{});
     for (auto p = 0u; p < len / 3; ++p) {
-      stl_util::concat(facePositions[f],
-                       {Vector3(faceVertexData[f]->positions[3 * p],
-                                faceVertexData[f]->positions[3 * p + 1],
-                                faceVertexData[f]->positions[3 * p + 2])});
-      stl_util::concat(faceNormals[f],
-                       {Vector3(faceVertexData[f]->normals[3 * p],
-                                faceVertexData[f]->normals[3 * p + 1],
-                                faceVertexData[f]->normals[3 * p + 2])});
+      stl_util::concat(facePositions[f], {Vector3(faceVertexData[f]->positions[3 * p],
+                                                  faceVertexData[f]->positions[3 * p + 1],
+                                                  faceVertexData[f]->positions[3 * p + 2])});
+      stl_util::concat(faceNormals[f], {Vector3(faceVertexData[f]->normals[3 * p],
+                                                faceVertexData[f]->normals[3 * p + 1],
+                                                faceVertexData[f]->normals[3 * p + 2])});
     }
     // uvs
     lu = faceVertexData[f]->uvs.size();
     newFaceUV.emplace_back(Float32Array{});
     for (auto i = 0u; i < lu; i += 2) {
-      stl_util::concat(
-        newFaceUV[f],
-        {faceUV[f].x + (faceUV[f].z - faceUV[f].x) * faceVertexData[f]->uvs[i],
-         faceUV[f].y
-           + (faceUV[f].w - faceUV[f].y) * faceVertexData[f]->uvs[i + 1]});
+      stl_util::concat(newFaceUV[f],
+                       {faceUV[f].x + (faceUV[f].z - faceUV[f].x) * faceVertexData[f]->uvs[i],
+                        faceUV[f].y + (faceUV[f].w - faceUV[f].y) * faceVertexData[f]->uvs[i + 1]});
     }
     stl_util::concat(uvs, newFaceUV[f]);
     for (const auto x : faceVertexData[f]->indices) {
@@ -1034,8 +971,8 @@ std::unique_ptr<VertexData> VertexData::CreateTiledBox(TiledBoxOptions& options)
     li += facePositions[f].size();
     if (!faceColors.empty()) {
       for (auto c = 0; c < 4; c++) {
-        stl_util::concat(colors, {faceColors[f].r, faceColors[f].g,
-                                  faceColors[f].b, faceColors[f].a});
+        stl_util::concat(colors,
+                         {faceColors[f].r, faceColors[f].g, faceColors[f].b, faceColors[f].a});
       }
     }
   }
@@ -1119,16 +1056,13 @@ std::unique_ptr<VertexData> VertexData::CreateTiledBox(TiledBoxOptions& options)
   return vertexData;
 }
 
-std::unique_ptr<VertexData>
-VertexData::CreateTiledPlane(TiledPlaneOptions& options)
+std::unique_ptr<VertexData> VertexData::CreateTiledPlane(TiledPlaneOptions& options)
 {
-  const auto flipTile = options.pattern.value_or(Mesh::NO_FLIP);
-  const auto tileWidth
-    = options.tileWidth.value_or(options.tileSize.value_or(1.f));
-  const auto tileHeight
-    = options.tileHeight.value_or(options.tileSize.value_or(1.f));
-  const auto alignH = options.alignHorizontal.value_or(0u);
-  const auto alignV = options.alignVertical.value_or(0u);
+  const auto flipTile   = options.pattern.value_or(Mesh::NO_FLIP);
+  const auto tileWidth  = options.tileWidth.value_or(options.tileSize.value_or(1.f));
+  const auto tileHeight = options.tileHeight.value_or(options.tileSize.value_or(1.f));
+  const auto alignH     = options.alignHorizontal.value_or(0u);
+  const auto alignV     = options.alignVertical.value_or(0u);
 
   const auto width  = options.width.value_or(options.size.value_or(1.f));
   const auto tilesX = static_cast<unsigned>(std::floor(width / tileWidth));
@@ -1150,10 +1084,10 @@ VertexData::CreateTiledPlane(TiledPlaneOptions& options)
 
   // Part Tiles
   if (offsetX > 0 || offsetY > 0) {
-    startX    = -halfWidth;
-    startY    = -halfHeight;
-    endX = halfWidth;
-    endY = halfHeight;
+    startX = -halfWidth;
+    startY = -halfHeight;
+    endX   = halfWidth;
+    endY   = halfHeight;
 
     switch (alignH) {
       case Mesh::CENTER:
@@ -1199,8 +1133,7 @@ VertexData::CreateTiledPlane(TiledPlaneOptions& options)
   if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::FLIP_ROW) {
     uvBase[1] = {1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 1.f, 1.f};
   }
-  if (flipTile == Mesh::FLIP_N_ROTATE_TILE
-      || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
+  if (flipTile == Mesh::FLIP_N_ROTATE_TILE || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
     uvBase[1] = {0.f, 1.f, 1.f, 1.f, 1.f, 0.f, 0.f, 0.f};
   }
   Float32Array uvs;
@@ -1209,20 +1142,15 @@ VertexData::CreateTiledPlane(TiledPlaneOptions& options)
   auto index = 0u;
   for (auto y = 0u; y < tilesY; ++y) {
     for (auto x = 0u; x < tilesX; ++x) {
-      stl_util::concat(positions,
-                       {-halfWidth + x * tileWidth + adjustX,
-                        -halfHeight + y * tileHeight + adjustY, 0.f});
-      stl_util::concat(positions,
-                       {-halfWidth + (x + 1) * tileWidth + adjustX,
-                        -halfHeight + y * tileHeight + adjustY, 0.f});
-      stl_util::concat(positions,
-                       {-halfWidth + (x + 1) * tileWidth + adjustX,
-                        -halfHeight + (y + 1) * tileHeight + adjustY, 0.f});
-      stl_util::concat(positions,
-                       {-halfWidth + x * tileWidth + adjustX,
-                        -halfHeight + (y + 1) * tileHeight + adjustY, 0.f});
-      stl_util::concat(indices, {index, index + 1, index + 3, index + 1,
-                                 index + 2, index + 3});
+      stl_util::concat(positions, {-halfWidth + x * tileWidth + adjustX,
+                                   -halfHeight + y * tileHeight + adjustY, 0.f});
+      stl_util::concat(positions, {-halfWidth + (x + 1) * tileWidth + adjustX,
+                                   -halfHeight + y * tileHeight + adjustY, 0.f});
+      stl_util::concat(positions, {-halfWidth + (x + 1) * tileWidth + adjustX,
+                                   -halfHeight + (y + 1) * tileHeight + adjustY, 0.f});
+      stl_util::concat(positions, {-halfWidth + x * tileWidth + adjustX,
+                                   -halfHeight + (y + 1) * tileHeight + adjustY, 0.f});
+      stl_util::concat(indices, {index, index + 1, index + 3, index + 1, index + 2, index + 3});
       if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::ROTATE_TILE
           || flipTile == Mesh::FLIP_N_ROTATE_TILE) {
         stl_util::concat(uvs, uvBase[(x % 2 + y % 2) % 2]);
@@ -1234,10 +1162,9 @@ VertexData::CreateTiledPlane(TiledPlaneOptions& options)
       else {
         stl_util::concat(uvs, uvBase[0]);
       }
-      stl_util::concat(colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
-                                1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
-      stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f,
-                                 0.f, 0.f, -1.f});
+      stl_util::concat(
+        colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
+      stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f});
       index += 4;
     }
   }
@@ -1245,28 +1172,20 @@ VertexData::CreateTiledPlane(TiledPlaneOptions& options)
   // Part Tiles
   if (offsetX > 0 || offsetY > 0) {
 
-    const auto partialBottomRow
-      = (offsetY > 0 && (alignV == Mesh::CENTER || alignV == Mesh::TOP));
-    const auto partialTopRow
-      = (offsetY > 0 && (alignV == Mesh::CENTER || alignV == Mesh::BOTTOM));
-    const auto partialLeftCol
-      = (offsetX > 0 && (alignH == Mesh::CENTER || alignH == Mesh::RIGHT));
-    const auto partialRightCol
-      = (offsetX > 0 && (alignH == Mesh::CENTER || alignH == Mesh::LEFT));
+    const auto partialBottomRow = (offsetY > 0 && (alignV == Mesh::CENTER || alignV == Mesh::TOP));
+    const auto partialTopRow  = (offsetY > 0 && (alignV == Mesh::CENTER || alignV == Mesh::BOTTOM));
+    const auto partialLeftCol = (offsetX > 0 && (alignH == Mesh::CENTER || alignH == Mesh::RIGHT));
+    const auto partialRightCol = (offsetX > 0 && (alignH == Mesh::CENTER || alignH == Mesh::LEFT));
     Float32Array uvPart;
     auto a = 0.f, b = 0.f, c = 0.f, d = 0.f;
 
     // corners
     if (partialBottomRow && partialLeftCol) { // bottom left corner
       stl_util::concat(positions, {startX + adjustX, startY + adjustY, 0.f});
-      stl_util::concat(positions,
-                       {-halfWidth + adjustX, startY + adjustY, 0.f});
-      stl_util::concat(positions,
-                       {-halfWidth + adjustX, startY + offsetY + adjustY, 0.f});
-      stl_util::concat(positions,
-                       {startX + adjustX, startY + offsetY + adjustY, 0.f});
-      stl_util::concat(indices, {index, index + 1, index + 3, index + 1,
-                                 index + 2, index + 3});
+      stl_util::concat(positions, {-halfWidth + adjustX, startY + adjustY, 0.f});
+      stl_util::concat(positions, {-halfWidth + adjustX, startY + offsetY + adjustY, 0.f});
+      stl_util::concat(positions, {startX + adjustX, startY + offsetY + adjustY, 0.f});
+      stl_util::concat(indices, {index, index + 1, index + 3, index + 1, index + 2, index + 3});
       index += 4;
       a      = 1.f - offsetX / tileWidth;
       b      = 1.f - offsetY / tileHeight;
@@ -1274,8 +1193,7 @@ VertexData::CreateTiledPlane(TiledPlaneOptions& options)
       d      = 1.f;
       uvPart = {a, b, c, b, c, d, a, d};
       if (flipTile == Mesh::ROTATE_ROW) {
-        uvPart = {1.f - a, 1.f - b, 1.f - c, 1.f - b,
-                  1.f - c, 1.f - d, 1.f - a, 1.f - d};
+        uvPart = {1.f - a, 1.f - b, 1.f - c, 1.f - b, 1.f - c, 1.f - d, 1.f - a, 1.f - d};
       }
       if (flipTile == Mesh::FLIP_ROW) {
         uvPart = {1.f - a, b, 1.f - c, b, 1.f - c, d, 1.f - a, d};
@@ -1284,34 +1202,27 @@ VertexData::CreateTiledPlane(TiledPlaneOptions& options)
         uvPart = {a, 1.f - b, c, 1.f - b, c, 1.f - d, a, 1.f - d};
       }
       stl_util::concat(uvs, uvPart);
-      stl_util::concat(colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
-                                1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
-      stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f,
-                                 0.f, 0.f, -1.f});
+      stl_util::concat(
+        colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
+      stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f});
     }
 
     if (partialBottomRow && partialRightCol) { // bottom right corner
       stl_util::concat(positions, {halfWidth + adjustX, startY + adjustY, 0.f});
       stl_util::concat(positions, {endX + adjustX, startY + adjustY, 0.f});
-      stl_util::concat(positions,
-                       {endX + adjustX, startY + offsetY + adjustY, 0.f});
-      stl_util::concat(positions,
-                       {halfWidth + adjustX, startY + offsetY + adjustY, 0.f});
-      stl_util::concat(indices, {index, index + 1, index + 3, index + 1,
-                                 index + 2, index + 3});
+      stl_util::concat(positions, {endX + adjustX, startY + offsetY + adjustY, 0.f});
+      stl_util::concat(positions, {halfWidth + adjustX, startY + offsetY + adjustY, 0.f});
+      stl_util::concat(indices, {index, index + 1, index + 3, index + 1, index + 2, index + 3});
       index += 4;
       a      = 0.f;
       b      = 1.f - offsetY / tileHeight;
       c      = offsetX / tileWidth;
       d      = 1.f;
       uvPart = {a, b, c, b, c, d, a, d};
-      if (flipTile == Mesh::ROTATE_ROW
-          || (flipTile == Mesh::ROTATE_TILE && (tilesX % 2) == 0)) {
-        uvPart = {1.f - a, 1.f - b, 1.f - c, 1.f - b,
-                  1.f - c, 1.f - d, 1.f - a, 1.f - d};
+      if (flipTile == Mesh::ROTATE_ROW || (flipTile == Mesh::ROTATE_TILE && (tilesX % 2) == 0)) {
+        uvPart = {1.f - a, 1.f - b, 1.f - c, 1.f - b, 1.f - c, 1.f - d, 1.f - a, 1.f - d};
       }
-      if (flipTile == Mesh::FLIP_ROW
-          || (flipTile == Mesh::FLIP_TILE && (tilesX % 2) == 0)) {
+      if (flipTile == Mesh::FLIP_ROW || (flipTile == Mesh::FLIP_TILE && (tilesX % 2) == 0)) {
         uvPart = {1.f - a, b, 1.f - c, b, 1.f - c, d, 1.f - a, d};
       }
       if (flipTile == Mesh::FLIP_N_ROTATE_ROW
@@ -1319,21 +1230,17 @@ VertexData::CreateTiledPlane(TiledPlaneOptions& options)
         uvPart = {a, 1.f - b, c, 1.f - b, c, 1.f - d, a, 1.f - d};
       }
       stl_util::concat(uvs, uvPart);
-      stl_util::concat(colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
-                                1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
-      stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f,
-                                 0.f, 0.f, -1.f});
+      stl_util::concat(
+        colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
+      stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f});
     }
 
     if (partialTopRow && partialLeftCol) { // top left corner
-      stl_util::concat(positions,
-                       {startX + adjustX, halfHeight + adjustY, 0.f});
-      stl_util::concat(positions,
-                       {-halfWidth + adjustX, halfHeight + adjustY, 0.f});
+      stl_util::concat(positions, {startX + adjustX, halfHeight + adjustY, 0.f});
+      stl_util::concat(positions, {-halfWidth + adjustX, halfHeight + adjustY, 0.f});
       stl_util::concat(positions, {-halfWidth + adjustX, endY + adjustY, 0.f});
       stl_util::concat(positions, {startX + adjustX, endY + adjustY, 0.f});
-      stl_util::concat(indices, {index, index + 1, index + 3, index + 1,
-                                 index + 2, index + 3});
+      stl_util::concat(indices, {index, index + 1, index + 3, index + 1, index + 2, index + 3});
       index += 4;
       a      = 1.f - offsetX / tileWidth;
       b      = 0.f;
@@ -1342,8 +1249,7 @@ VertexData::CreateTiledPlane(TiledPlaneOptions& options)
       uvPart = {a, b, c, b, c, d, a, d};
       if ((flipTile == Mesh::ROTATE_ROW && (tilesY % 2) == 1)
           || (flipTile == Mesh::ROTATE_TILE && (tilesY % 1) == 0)) {
-        uvPart = {1.f - a, 1.f - b, 1.f - c, 1.f - b,
-                  1.f - c, 1.f - d, 1.f - a, 1.f - d};
+        uvPart = {1.f - a, 1.f - b, 1.f - c, 1.f - b, 1.f - c, 1.f - d, 1.f - a, 1.f - d};
       }
       if ((flipTile == Mesh::FLIP_ROW && (tilesY % 2) == 1)
           || (flipTile == Mesh::FLIP_TILE && (tilesY % 2) == 0)) {
@@ -1354,20 +1260,17 @@ VertexData::CreateTiledPlane(TiledPlaneOptions& options)
         uvPart = {a, 1.f - b, c, 1.f - b, c, 1.f - d, a, 1.f - d};
       }
       stl_util::concat(uvs, uvPart);
-      stl_util::concat(colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
-                                1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
-      stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f,
-                                 0.f, 0.f, -1.f});
+      stl_util::concat(
+        colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
+      stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f});
     }
 
     if (partialTopRow && partialRightCol) { // top right corner
-      stl_util::concat(positions,
-                       {halfWidth + adjustX, halfHeight + adjustY, 0.f});
+      stl_util::concat(positions, {halfWidth + adjustX, halfHeight + adjustY, 0.f});
       stl_util::concat(positions, {endX + adjustX, halfHeight + adjustY, 0.f});
       stl_util::concat(positions, {endX + adjustX, endY + adjustY, 0.f});
       stl_util::concat(positions, {halfWidth + adjustX, endY + adjustY, 0.f});
-      stl_util::concat(indices, {index, index + 1, index + 3, index + 1,
-                                 index + 2, index + 3});
+      stl_util::concat(indices, {index, index + 1, index + 3, index + 1, index + 2, index + 3});
       index += 4;
       a      = 0.f;
       b      = 0.f;
@@ -1376,23 +1279,20 @@ VertexData::CreateTiledPlane(TiledPlaneOptions& options)
       uvPart = {a, b, c, b, c, d, a, d};
       if ((flipTile == Mesh::ROTATE_ROW && (tilesY % 2) == 1)
           || (flipTile == Mesh::ROTATE_TILE && (tilesY + tilesX) % 2 == 1)) {
-        uvPart = {1.f - a, 1.f - b, 1.f - c, 1.f - b,
-                  1.f - c, 1.f - d, 1.f - a, 1.f - d};
+        uvPart = {1.f - a, 1.f - b, 1.f - c, 1.f - b, 1.f - c, 1.f - d, 1.f - a, 1.f - d};
       }
       if ((flipTile == Mesh::FLIP_ROW && (tilesY % 2) == 1)
           || (flipTile == Mesh::FLIP_TILE && (tilesY + tilesX) % 2 == 1)) {
         uvPart = {1.f - a, b, 1.f - c, b, 1.f - c, d, 1.f - a, d};
       }
       if ((flipTile == Mesh::FLIP_N_ROTATE_ROW && (tilesY % 2) == 1)
-          || (flipTile == Mesh::FLIP_N_ROTATE_TILE
-              && (tilesY + tilesX) % 2 == 1)) {
+          || (flipTile == Mesh::FLIP_N_ROTATE_TILE && (tilesY + tilesX) % 2 == 1)) {
         uvPart = {a, 1.f - b, c, 1.f - b, c, 1.f - d, a, 1.f - d};
       }
       stl_util::concat(uvs, uvPart);
-      stl_util::concat(colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
-                                1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
-      stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f,
-                                 0.f, 0.f, -1.f});
+      stl_util::concat(
+        colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
+      stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f});
     }
 
     // part rows
@@ -1405,27 +1305,23 @@ VertexData::CreateTiledPlane(TiledPlaneOptions& options)
       uvBaseBR[0] = {a, b, c, b, c, d, a, d};
       uvBaseBR[1] = {a, b, c, b, c, d, a, d};
       if (flipTile == Mesh::ROTATE_TILE || flipTile == Mesh::ROTATE_ROW) {
-        uvBaseBR[1] = {1.f - a, 1.f - b, 1.f - c, 1.f - b,
-                       1.f - c, 1.f - d, 1.f - a, 1.f - d};
+        uvBaseBR[1] = {1.f - a, 1.f - b, 1.f - c, 1.f - b, 1.f - c, 1.f - d, 1.f - a, 1.f - d};
       }
       if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::FLIP_ROW) {
         uvBaseBR[1] = {1.f - a, b, 1.f - c, b, 1.f - c, d, 1.f - a, d};
       }
-      if (flipTile == Mesh::FLIP_N_ROTATE_TILE
-          || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
+      if (flipTile == Mesh::FLIP_N_ROTATE_TILE || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
         uvBaseBR[1] = {a, 1.f - b, c, 1.f - b, c, 1.f - d, a, 1.f - d};
       }
       for (auto x = 0u; x < tilesX; ++x) {
-        stl_util::concat(positions, {-halfWidth + x * tileWidth + adjustX,
-                                     startY + adjustY, 0.f});
-        stl_util::concat(positions, {-halfWidth + (x + 1) * tileWidth + adjustX,
-                                     startY + adjustY, 0.f});
-        stl_util::concat(positions, {-halfWidth + (x + 1) * tileWidth + adjustX,
-                                     startY + offsetY + adjustY, 0.f});
-        stl_util::concat(positions, {-halfWidth + x * tileWidth + adjustX,
-                                     startY + offsetY + adjustY, 0.f});
-        stl_util::concat(indices, {index, index + 1, index + 3, index + 1,
-                                   index + 2, index + 3});
+        stl_util::concat(positions, {-halfWidth + x * tileWidth + adjustX, startY + adjustY, 0.f});
+        stl_util::concat(positions,
+                         {-halfWidth + (x + 1) * tileWidth + adjustX, startY + adjustY, 0.f});
+        stl_util::concat(
+          positions, {-halfWidth + (x + 1) * tileWidth + adjustX, startY + offsetY + adjustY, 0.f});
+        stl_util::concat(positions,
+                         {-halfWidth + x * tileWidth + adjustX, startY + offsetY + adjustY, 0.f});
+        stl_util::concat(indices, {index, index + 1, index + 3, index + 1, index + 2, index + 3});
         index += 4;
         if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::ROTATE_TILE
             || flipTile == Mesh::FLIP_N_ROTATE_TILE) {
@@ -1438,10 +1334,9 @@ VertexData::CreateTiledPlane(TiledPlaneOptions& options)
         else {
           stl_util::concat(uvs, uvBaseBR[0]);
         }
-        stl_util::concat(colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
-                                  1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
-        stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f,
-                                   -1.f, 0.f, 0.f, -1.f});
+        stl_util::concat(
+          colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
+        stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f});
       }
     }
 
@@ -1454,27 +1349,23 @@ VertexData::CreateTiledPlane(TiledPlaneOptions& options)
       uvBaseTR[0] = {a, b, c, b, c, d, a, d};
       uvBaseTR[1] = {a, b, c, b, c, d, a, d};
       if (flipTile == Mesh::ROTATE_TILE || flipTile == Mesh::ROTATE_ROW) {
-        uvBaseTR[1] = {1.f - a, 1.f - b, 1.f - c, 1.f - b,
-                       1.f - c, 1.f - d, 1.f - a, 1.f - d};
+        uvBaseTR[1] = {1.f - a, 1.f - b, 1.f - c, 1.f - b, 1.f - c, 1.f - d, 1.f - a, 1.f - d};
       }
       if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::FLIP_ROW) {
         uvBaseTR[1] = {1.f - a, b, 1.f - c, b, 1.f - c, d, 1.f - a, d};
       }
-      if (flipTile == Mesh::FLIP_N_ROTATE_TILE
-          || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
+      if (flipTile == Mesh::FLIP_N_ROTATE_TILE || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
         uvBaseTR[1] = {a, 1.f - b, c, 1.f - b, c, 1.f - d, a, 1.f - d};
       }
       for (auto x = 0u; x < tilesX; ++x) {
-        stl_util::concat(positions, {-halfWidth + x * tileWidth + adjustX,
-                                     endY - offsetY + adjustY, 0.f});
-        stl_util::concat(positions, {-halfWidth + (x + 1) * tileWidth + adjustX,
-                                     endY - offsetY + adjustY, 0.f});
-        stl_util::concat(positions, {-halfWidth + (x + 1) * tileWidth + adjustX,
-                                     endY + adjustY, 0.f});
-        stl_util::concat(positions, {-halfWidth + x * tileWidth + adjustX,
-                                     endY + adjustY, 0.f});
-        stl_util::concat(indices, {index, index + 1, index + 3, index + 1,
-                                   index + 2, index + 3});
+        stl_util::concat(positions,
+                         {-halfWidth + x * tileWidth + adjustX, endY - offsetY + adjustY, 0.f});
+        stl_util::concat(
+          positions, {-halfWidth + (x + 1) * tileWidth + adjustX, endY - offsetY + adjustY, 0.f});
+        stl_util::concat(positions,
+                         {-halfWidth + (x + 1) * tileWidth + adjustX, endY + adjustY, 0.f});
+        stl_util::concat(positions, {-halfWidth + x * tileWidth + adjustX, endY + adjustY, 0.f});
+        stl_util::concat(indices, {index, index + 1, index + 3, index + 1, index + 2, index + 3});
         index += 4;
         if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::ROTATE_TILE
             || flipTile == Mesh::FLIP_N_ROTATE_TILE) {
@@ -1487,10 +1378,9 @@ VertexData::CreateTiledPlane(TiledPlaneOptions& options)
         else {
           stl_util::concat(uvs, uvBaseTR[0]);
         }
-        stl_util::concat(colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
-                                  1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
-        stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f,
-                                   -1.f, 0.f, 0.f, -1.f});
+        stl_util::concat(
+          colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
+        stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f});
       }
     }
 
@@ -1503,31 +1393,24 @@ VertexData::CreateTiledPlane(TiledPlaneOptions& options)
       uvBaseLC[0] = {a, b, c, b, c, d, a, d};
       uvBaseLC[1] = {a, b, c, b, c, d, a, d};
       if (flipTile == Mesh::ROTATE_TILE || flipTile == Mesh::ROTATE_ROW) {
-        uvBaseLC[1] = {1.f - a, 1.f - b, 1.f - c, 1.f - b,
-                       1.f - c, 1.f - d, 1.f - a, 1.f - d};
+        uvBaseLC[1] = {1.f - a, 1.f - b, 1.f - c, 1.f - b, 1.f - c, 1.f - d, 1.f - a, 1.f - d};
       }
       if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::FLIP_ROW) {
         uvBaseLC[1] = {1.f - a, b, 1.f - c, b, 1.f - c, d, 1.f - a, d};
       }
-      if (flipTile == Mesh::FLIP_N_ROTATE_TILE
-          || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
+      if (flipTile == Mesh::FLIP_N_ROTATE_TILE || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
         uvBaseLC[1] = {a, 1.f - b, c, 1.f - b, c, 1.f - d, a, 1.f - d};
       }
       for (auto y = 0u; y < tilesY; y++) {
-        stl_util::concat(
-          positions,
-          {startX + adjustX, -halfHeight + y * tileHeight + adjustY, 0.f});
         stl_util::concat(positions,
-                         {startX + offsetX + adjustX,
-                          -halfHeight + y * tileHeight + adjustY, 0.f});
+                         {startX + adjustX, -halfHeight + y * tileHeight + adjustY, 0.f});
         stl_util::concat(positions,
-                         {startX + offsetX + adjustX,
-                          -halfHeight + (y + 1) * tileHeight + adjustY, 0.f});
+                         {startX + offsetX + adjustX, -halfHeight + y * tileHeight + adjustY, 0.f});
+        stl_util::concat(positions, {startX + offsetX + adjustX,
+                                     -halfHeight + (y + 1) * tileHeight + adjustY, 0.f});
         stl_util::concat(positions,
-                         {startX + adjustX,
-                          -halfHeight + (y + 1) * tileHeight + adjustY, 0.f});
-        stl_util::concat(indices, {index, index + 1, index + 3, index + 1,
-                                   index + 2, index + 3});
+                         {startX + adjustX, -halfHeight + (y + 1) * tileHeight + adjustY, 0.f});
+        stl_util::concat(indices, {index, index + 1, index + 3, index + 1, index + 2, index + 3});
         index += 4;
         if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::ROTATE_TILE
             || flipTile == Mesh::FLIP_N_ROTATE_TILE) {
@@ -1540,10 +1423,9 @@ VertexData::CreateTiledPlane(TiledPlaneOptions& options)
         else {
           stl_util::concat(uvs, uvBaseLC[0]);
         }
-        stl_util::concat(colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
-                                  1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
-        stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f,
-                                   -1.f, 0.f, 0.f, -1.f});
+        stl_util::concat(
+          colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
+        stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f});
       }
     }
 
@@ -1556,31 +1438,23 @@ VertexData::CreateTiledPlane(TiledPlaneOptions& options)
       uvBaseRC[0] = {a, b, c, b, c, d, a, d};
       uvBaseRC[1] = {a, b, c, b, c, d, a, d};
       if (flipTile == Mesh::ROTATE_TILE || flipTile == Mesh::ROTATE_ROW) {
-        uvBaseRC[1] = {1.f - a, 1.f - b, 1 - c,   1.f - b,
-                       1.f - c, 1 - d,   1.f - a, 1.f - d};
+        uvBaseRC[1] = {1.f - a, 1.f - b, 1 - c, 1.f - b, 1.f - c, 1 - d, 1.f - a, 1.f - d};
       }
       if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::FLIP_ROW) {
         uvBaseRC[1] = {1.f - a, b, 1.f - c, b, 1.f - c, d, 1.f - a, d};
       }
-      if (flipTile == Mesh::FLIP_N_ROTATE_TILE
-          || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
+      if (flipTile == Mesh::FLIP_N_ROTATE_TILE || flipTile == Mesh::FLIP_N_ROTATE_ROW) {
         uvBaseRC[1] = {a, 1.f - b, c, 1.f - b, c, 1.f - d, a, 1.f - d};
       }
       for (auto y = 0u; y < tilesY; ++y) {
         stl_util::concat(positions,
-                         {endX - offsetX + adjustX,
-                          -halfHeight + y * tileHeight + adjustY, 0.f});
-        stl_util::concat(
-          positions,
-          {endX + adjustX, -halfHeight + y * tileHeight + adjustY, 0.f});
-        stl_util::concat(
-          positions,
-          {endX + adjustX, -halfHeight + (y + 1) * tileHeight + adjustY, 0.f});
+                         {endX - offsetX + adjustX, -halfHeight + y * tileHeight + adjustY, 0.f});
+        stl_util::concat(positions, {endX + adjustX, -halfHeight + y * tileHeight + adjustY, 0.f});
         stl_util::concat(positions,
-                         {endX - offsetX + adjustX,
-                          -halfHeight + (y + 1) * tileHeight + adjustY, 0.f});
-        stl_util::concat(indices, {index, index + 1, index + 3, index + 1,
-                                   index + 2, index + 3});
+                         {endX + adjustX, -halfHeight + (y + 1) * tileHeight + adjustY, 0.f});
+        stl_util::concat(
+          positions, {endX - offsetX + adjustX, -halfHeight + (y + 1) * tileHeight + adjustY, 0.f});
+        stl_util::concat(indices, {index, index + 1, index + 3, index + 1, index + 2, index + 3});
         index += 4;
         if (flipTile == Mesh::FLIP_TILE || flipTile == Mesh::ROTATE_TILE
             || flipTile == Mesh::FLIP_N_ROTATE_TILE) {
@@ -1593,20 +1467,18 @@ VertexData::CreateTiledPlane(TiledPlaneOptions& options)
         else {
           stl_util::concat(uvs, uvBaseRC[0]);
         }
-        stl_util::concat(colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
-                                  1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
-        stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f,
-                                   -1.f, 0.f, 0.f, -1.f});
+        stl_util::concat(
+          colors, {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f});
+        stl_util::concat(normals, {0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f});
       }
     }
   }
 
-  const auto sideOrientation
-    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
+  const auto sideOrientation = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
 
   // sides
-  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs,
-                            options.frontUVs, options.backUVs);
+  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs, options.frontUVs,
+                            options.backUVs);
 
   // Result
   auto vertexData = std::make_unique<VertexData>();
@@ -1626,22 +1498,16 @@ VertexData::CreateTiledPlane(TiledPlaneOptions& options)
 
 std::unique_ptr<VertexData> VertexData::CreateSphere(SphereOptions& options)
 {
-  const auto segments = options.segments.value_or(32);
-  const auto diameterX
-    = options.diameterX.value_or(options.diameter.value_or(1.f));
-  const auto diameterY
-    = options.diameterY.value_or(options.diameter.value_or(1.f));
-  const auto diameterZ
-    = options.diameterZ.value_or(options.diameter.value_or(1.f));
-  const auto arc
-    = options.arc.has_value() ?
-        ((*options.arc <= 0.f || options.arc > 1.f) ? 1.f : *options.arc) :
-        1.f;
-  const auto slice = options.slice.has_value() ?
-                       ((*options.slice <= 0.f) ? 1.f : *options.slice) :
-                       1.f;
-  const auto sideOrientation
-    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
+  const auto segments  = options.segments.value_or(32);
+  const auto diameterX = options.diameterX.value_or(options.diameter.value_or(1.f));
+  const auto diameterY = options.diameterY.value_or(options.diameter.value_or(1.f));
+  const auto diameterZ = options.diameterZ.value_or(options.diameter.value_or(1.f));
+  const auto arc       = options.arc.has_value() ?
+                     ((*options.arc <= 0.f || options.arc > 1.f) ? 1.f : *options.arc) :
+                     1.f;
+  const auto slice
+    = options.slice.has_value() ? ((*options.slice <= 0.f) ? 1.f : *options.slice) : 1.f;
+  const auto sideOrientation = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
 
   Vector3 radius(diameterX / 2.f, diameterY / 2.f, diameterZ / 2.f);
 
@@ -1653,16 +1519,13 @@ std::unique_ptr<VertexData> VertexData::CreateSphere(SphereOptions& options)
   Float32Array normals;
   Float32Array uvs;
 
-  for (auto zRotationStep = 0u; zRotationStep <= totalZRotationSteps;
-       ++zRotationStep) {
-    auto normalizedZ = static_cast<float>(zRotationStep)
-                       / static_cast<float>(totalZRotationSteps);
-    auto angleZ = normalizedZ * Math::PI * slice;
+  for (auto zRotationStep = 0u; zRotationStep <= totalZRotationSteps; ++zRotationStep) {
+    auto normalizedZ = static_cast<float>(zRotationStep) / static_cast<float>(totalZRotationSteps);
+    auto angleZ      = normalizedZ * Math::PI * slice;
 
-    for (auto yRotationStep = 0u; yRotationStep <= totalYRotationSteps;
-         ++yRotationStep) {
-      auto normalizedY = static_cast<float>(yRotationStep)
-                         / static_cast<float>(totalYRotationSteps);
+    for (auto yRotationStep = 0u; yRotationStep <= totalYRotationSteps; ++yRotationStep) {
+      auto normalizedY
+        = static_cast<float>(yRotationStep) / static_cast<float>(totalYRotationSteps);
 
       auto angleY = normalizedY * Math::PI * 2.f * arc;
 
@@ -1683,8 +1546,7 @@ std::unique_ptr<VertexData> VertexData::CreateSphere(SphereOptions& options)
       auto verticesCount        = static_cast<uint32_t>(positions.size() / 3);
       auto _totalYRotationSteps = static_cast<uint32_t>(totalYRotationSteps);
       for (uint32_t firstIndex = verticesCount - 2 * (_totalYRotationSteps + 1);
-           (firstIndex + _totalYRotationSteps + 2) < verticesCount;
-           ++firstIndex) {
+           (firstIndex + _totalYRotationSteps + 2) < verticesCount; ++firstIndex) {
         indices.emplace_back((firstIndex));
         indices.emplace_back((firstIndex + 1));
         indices.emplace_back(firstIndex + _totalYRotationSteps + 1);
@@ -1697,8 +1559,8 @@ std::unique_ptr<VertexData> VertexData::CreateSphere(SphereOptions& options)
   }
 
   // Sides
-  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs,
-                            options.frontUVs, options.backUVs);
+  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs, options.frontUVs,
+                            options.backUVs);
 
   // Result
   auto vertexData = std::make_unique<VertexData>();
@@ -1714,24 +1576,20 @@ std::unique_ptr<VertexData> VertexData::CreateSphere(SphereOptions& options)
 // Cylinder and cone
 std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
 {
-  const auto height = options.height.value_or(2.f);
-  const auto diameterTop
-    = options.diameterTop.value_or(options.diameter.value_or(1.f));
-  const auto diameterBottom
-    = options.diameterBottom.value_or(options.diameter.value_or(1.f));
-  const auto tessellation = options.tessellation.value_or(24);
-  const auto subdivisions = options.subdivisions.value_or(1.f);
-  const auto hasRings     = options.hasRings.value_or(false);
-  const auto enclose      = options.enclose.value_or(false);
-  const auto cap          = options.cap.value_or(Mesh::CAP_ALL);
-  const auto arc
-    = options.arc.has_value() ?
-        ((*options.arc <= 0.f || options.arc > 1.f) ? 1.f : *options.arc) :
-        1.f;
-  const auto sideOrientation
-    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
-  auto& faceUV     = options.faceUV;
-  auto& faceColors = options.faceColors;
+  const auto height         = options.height.value_or(2.f);
+  const auto diameterTop    = options.diameterTop.value_or(options.diameter.value_or(1.f));
+  const auto diameterBottom = options.diameterBottom.value_or(options.diameter.value_or(1.f));
+  const auto tessellation   = options.tessellation.value_or(24);
+  const auto subdivisions   = options.subdivisions.value_or(1.f);
+  const auto hasRings       = options.hasRings.value_or(false);
+  const auto enclose        = options.enclose.value_or(false);
+  const auto cap            = options.cap.value_or(Mesh::CAP_ALL);
+  const auto arc            = options.arc.has_value() ?
+                     ((*options.arc <= 0.f || options.arc > 1.f) ? 1.f : *options.arc) :
+                     1.f;
+  const auto sideOrientation = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
+  auto& faceUV               = options.faceUV;
+  auto& faceColors           = options.faceColors;
   // default face colors and UV if undefined
   uint32_t quadNb    = (arc != 1.f && enclose) ? 2 : 0;
   uint32_t ringNb    = (hasRings) ? subdivisions : 1;
@@ -1804,9 +1662,8 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
         else {
           ringNormal.x = ringVertex.x;
           ringNormal.z = ringVertex.z;
-          ringNormal.y = std::sqrt(ringNormal.x * ringNormal.x
-                                   + ringNormal.z * ringNormal.z)
-                         * _tan;
+          ringNormal.y
+            = std::sqrt(ringNormal.x * ringNormal.x + ringNormal.z * ringNormal.z) * _tan;
           ringNormal.normalize();
         }
 
@@ -1824,14 +1681,13 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
         else {
           v = faceUV[s].y + (faceUV[s].w - faceUV[s].y) * h;
         }
-        stl_util::concat(
-          uvs, {faceUV[s].x
-                  + (faceUV[s].z - faceUV[s].x) * static_cast<float>(j)
-                      / static_cast<float>(tessellation),
-                v});
+        stl_util::concat(uvs, {faceUV[s].x
+                                 + (faceUV[s].z - faceUV[s].x) * static_cast<float>(j)
+                                     / static_cast<float>(tessellation),
+                               v});
         if (!faceColors.empty()) {
-          stl_util::concat(colors, {faceColors[s].r, faceColors[s].g,
-                                    faceColors[s].b, faceColors[s].a});
+          stl_util::concat(colors,
+                           {faceColors[s].r, faceColors[s].g, faceColors[s].b, faceColors[s].a});
         }
       }
 
@@ -1840,16 +1696,15 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
         stl_util::concat(positions, {ringVertex.x, ringVertex.y, ringVertex.z});
         stl_util::concat(positions, {0.f, ringVertex.y, 0.f});
         stl_util::concat(positions, {0.f, ringVertex.y, 0.f});
-        stl_util::concat(
-          positions, {ringFirstVertex.x, ringFirstVertex.y, ringFirstVertex.z});
+        stl_util::concat(positions, {ringFirstVertex.x, ringFirstVertex.y, ringFirstVertex.z});
         Vector3::CrossToRef(Y, ringNormal, quadNormal);
         quadNormal.normalize();
-        stl_util::concat(normals, {quadNormal.x, quadNormal.y, quadNormal.z,
-                                   quadNormal.x, quadNormal.y, quadNormal.z});
+        stl_util::concat(normals, {quadNormal.x, quadNormal.y, quadNormal.z, quadNormal.x,
+                                   quadNormal.y, quadNormal.z});
         Vector3::CrossToRef(ringFirstNormal, Y, quadNormal);
         quadNormal.normalize();
-        stl_util::concat(normals, {quadNormal.x, quadNormal.y, quadNormal.z,
-                                   quadNormal.x, quadNormal.y, quadNormal.z});
+        stl_util::concat(normals, {quadNormal.x, quadNormal.y, quadNormal.z, quadNormal.x,
+                                   quadNormal.y, quadNormal.z});
         if (hasRings) {
           v = (cs != s) ? faceUV[s + 1].y : faceUV[s + 1].w;
         }
@@ -1867,14 +1722,14 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
         stl_util::concat(uvs, {faceUV[s + 2].x, v});
         stl_util::concat(uvs, {faceUV[s + 2].z, v});
         if (!faceColors.empty()) {
-          stl_util::concat(colors, {faceColors[s + 1].r, faceColors[s + 1].g,
-                                    faceColors[s + 1].b, faceColors[s + 1].a});
-          stl_util::concat(colors, {faceColors[s + 1].r, faceColors[s + 1].g,
-                                    faceColors[s + 1].b, faceColors[s + 1].a});
-          stl_util::concat(colors, {faceColors[s + 2].r, faceColors[s + 2].g,
-                                    faceColors[s + 2].b, faceColors[s + 2].a});
-          stl_util::concat(colors, {faceColors[s + 2].r, faceColors[s + 2].g,
-                                    faceColors[s + 2].b, faceColors[s + 2].a});
+          stl_util::concat(colors, {faceColors[s + 1].r, faceColors[s + 1].g, faceColors[s + 1].b,
+                                    faceColors[s + 1].a});
+          stl_util::concat(colors, {faceColors[s + 1].r, faceColors[s + 1].g, faceColors[s + 1].b,
+                                    faceColors[s + 1].a});
+          stl_util::concat(colors, {faceColors[s + 2].r, faceColors[s + 2].g, faceColors[s + 2].b,
+                                    faceColors[s + 2].a});
+          stl_util::concat(colors, {faceColors[s + 2].r, faceColors[s + 2].g, faceColors[s + 2].b,
+                                    faceColors[s + 2].a});
         }
       }
       if (cs != s) {
@@ -1885,10 +1740,8 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
 
   // indices
   // correction of number of iteration if enclose
-  uint32_t e = (!stl_util::almost_equal(arc, 1.f) && enclose) ?
-                 tessellation + 4 :
-                 tessellation;
-  i = 0;
+  uint32_t e = (!stl_util::almost_equal(arc, 1.f) && enclose) ? tessellation + 4 : tessellation;
+  i          = 0;
   for (s = 0; s < subdivisions; ++s) {
     uint32_t i0 = 0, i1 = 0, i2 = 0, i3 = 0;
     for (j = 0; j < tessellation; ++j) {
@@ -1926,8 +1779,8 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
       c = (isTop) ? faceColors[surfaceNb - 1] : faceColors[0];
     }
     // cap center
-    auto vbase     = static_cast<uint32_t>(positions.size() / 3);
-    float offset   = isTop ? height / 2.f : -height / 2.f;
+    auto vbase   = static_cast<uint32_t>(positions.size() / 3);
+    float offset = isTop ? height / 2.f : -height / 2.f;
     Vector3 center(0.f, offset, 0.f);
     stl_util::concat(positions, {center.x, center.y, center.z});
     stl_util::concat(normals, {0.f, isTop ? 1.f : -1.f, 0.f});
@@ -1939,18 +1792,15 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
 
     Vector2 textureScale(0.5f, 0.5f);
     for (i = 0; i <= tessellation; ++i) {
-      _angle = Math::PI2 * static_cast<float>(i) * arc
-               / static_cast<float>(tessellation);
+      _angle       = Math::PI2 * static_cast<float>(i) * arc / static_cast<float>(tessellation);
       auto _cos    = std::cos(-_angle);
       auto _sin    = std::sin(-_angle);
       circleVector = Vector3(_cos * _radius, offset, _sin * _radius);
-      textureCoordinate
-        = Vector2(_cos * textureScale.x + 0.5f, _sin * textureScale.y + 0.5f);
-      stl_util::concat(positions,
-                       {circleVector.x, circleVector.y, circleVector.z});
+      textureCoordinate = Vector2(_cos * textureScale.x + 0.5f, _sin * textureScale.y + 0.5f);
+      stl_util::concat(positions, {circleVector.x, circleVector.y, circleVector.z});
       stl_util::concat(normals, {0.f, isTop ? 1.f : -1.f, 0.f});
-      stl_util::concat(uvs, {u.x + (u.z - u.x) * textureCoordinate.x,
-                             u.y + (u.w - u.y) * textureCoordinate.y});
+      stl_util::concat(
+        uvs, {u.x + (u.z - u.x) * textureCoordinate.x, u.y + (u.w - u.y) * textureCoordinate.y});
       if (c) {
         const auto& _c = *c;
         stl_util::concat(colors, {_c.r, _c.g, _c.b, _c.a});
@@ -1980,8 +1830,8 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
   }
 
   // Sides
-  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs,
-                            options.frontUVs, options.backUVs);
+  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs, options.frontUVs,
+                            options.backUVs);
 
   auto vertexData = std::make_unique<VertexData>();
 
@@ -2003,11 +1853,10 @@ std::unique_ptr<VertexData> VertexData::CreateTorus(TorusOptions& options)
   Float32Array normals;
   Float32Array uvs;
 
-  const auto diameter     = options.diameter.value_or(1.f);
-  const auto thickness    = options.thickness.value_or(0.5f);
-  const auto tessellation = options.tessellation.value_or(16);
-  const auto sideOrientation
-    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
+  const auto diameter        = options.diameter.value_or(1.f);
+  const auto thickness       = options.thickness.value_or(0.5f);
+  const auto tessellation    = options.tessellation.value_or(16);
+  const auto sideOrientation = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
 
   auto stride = tessellation + 1;
 
@@ -2016,20 +1865,17 @@ std::unique_ptr<VertexData> VertexData::CreateTorus(TorusOptions& options)
   for (uint32_t i = 0; i <= tessellation; ++i) {
     auto u = static_cast<float>(i) / tessellationf;
 
-    auto outerAngle
-      = static_cast<float>(i) * Math::PI * 2.f / tessellationf - Math::PI / 2.f;
+    auto outerAngle = static_cast<float>(i) * Math::PI * 2.f / tessellationf - Math::PI / 2.f;
 
     auto rotationY = Matrix::RotationY(outerAngle);
-    auto transform
-      = Matrix::Translation(diameter / 2.f, 0.f, 0.f).multiply(rotationY);
+    auto transform = Matrix::Translation(diameter / 2.f, 0.f, 0.f).multiply(rotationY);
 
     for (uint32_t j = 0; j <= tessellation; ++j) {
       auto v = 1.f - static_cast<float>(j) / tessellationf;
 
-      auto innerAngle
-        = static_cast<float>(j) * Math::PI * 2.f / tessellationf + Math::PI;
-      auto dx = std::cos(innerAngle);
-      auto dy = std::sin(innerAngle);
+      auto innerAngle = static_cast<float>(j) * Math::PI * 2.f / tessellationf + Math::PI;
+      auto dx         = std::cos(innerAngle);
+      auto dy         = std::sin(innerAngle);
 
       // Create a vertex.
       Vector3 normal(dx, dy, 0.f);
@@ -2058,8 +1904,8 @@ std::unique_ptr<VertexData> VertexData::CreateTorus(TorusOptions& options)
   }
 
   // Sides
-  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs,
-                            options.frontUVs, options.backUVs);
+  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs, options.frontUVs,
+                            options.backUVs);
 
   // Result
   auto vertexData = std::make_unique<VertexData>();
@@ -2072,8 +1918,7 @@ std::unique_ptr<VertexData> VertexData::CreateTorus(TorusOptions& options)
   return vertexData;
 }
 
-std::unique_ptr<VertexData>
-VertexData::CreateLineSystem(LineSystemOptions& options)
+std::unique_ptr<VertexData> VertexData::CreateLineSystem(LineSystemOptions& options)
 {
   Uint32Array indices;
   Float32Array positions;
@@ -2085,13 +1930,12 @@ VertexData::CreateLineSystem(LineSystemOptions& options)
   for (size_t l = 0; l < lines.size(); ++l) {
     const auto& points = lines[l];
     for (size_t index = 0; index < points.size(); ++index) {
-      stl_util::concat(positions,
-                       {points[index].x, points[index].y, points[index].z});
+      stl_util::concat(positions, {points[index].x, points[index].y, points[index].z});
 
       if (!colors.empty()) {
         const auto& color = colors[l];
-        stl_util::concat(vertexColors, {color[index].r, color[index].g,
-                                        color[index].b, color[index].a});
+        stl_util::concat(vertexColors,
+                         {color[index].r, color[index].g, color[index].b, color[index].a});
       }
 
       if (index > 0) {
@@ -2114,8 +1958,7 @@ VertexData::CreateLineSystem(LineSystemOptions& options)
   return vertexData;
 }
 
-std::unique_ptr<VertexData>
-VertexData::CreateDashedLines(DashedLinesOptions& options)
+std::unique_ptr<VertexData> VertexData::CreateDashedLines(DashedLinesOptions& options)
 {
   const auto dashSize = options.dashSize.value_or(3.f);
   const auto gapSize  = options.gapSize.value_or(1.f);
@@ -2145,13 +1988,12 @@ VertexData::CreateDashedLines(DashedLinesOptions& options)
     curvect.normalize();
     for (auto j = 0.f; j < nb; ++j) {
       curshft = shft * j;
-      stl_util::concat(positions, {points[i].x + curshft * curvect.x,
-                                   points[i].y + curshft * curvect.y,
-                                   points[i].z + curshft * curvect.z});
       stl_util::concat(positions,
-                       {points[i].x + (curshft + dashshft) * curvect.x,
-                        points[i].y + (curshft + dashshft) * curvect.y,
-                        points[i].z + (curshft + dashshft) * curvect.z});
+                       {points[i].x + curshft * curvect.x, points[i].y + curshft * curvect.y,
+                        points[i].z + curshft * curvect.z});
+      stl_util::concat(positions, {points[i].x + (curshft + dashshft) * curvect.x,
+                                   points[i].y + (curshft + dashshft) * curvect.y,
+                                   points[i].z + (curshft + dashshft) * curvect.z});
       stl_util::concat(indices, {idx, idx + 1});
       idx += 2;
     }
@@ -2175,12 +2017,10 @@ std::unique_ptr<VertexData> VertexData::CreateGround(GroundOptions& options)
   float rowf, colf;
   float x, y, z;
 
-  const auto width  = options.width.value_or(1);
-  const auto height = options.height.value_or(1);
-  const auto subdivisionsX
-    = options.subdivisionsX.value_or(options.subdivisions.value_or(1));
-  const auto subdivisionsY
-    = options.subdivisionsY.value_or(options.subdivisions.value_or(1));
+  const auto width         = options.width.value_or(1);
+  const auto height        = options.height.value_or(1);
+  const auto subdivisionsX = options.subdivisionsX.value_or(options.subdivisions.value_or(1));
+  const auto subdivisionsY = options.subdivisionsY.value_or(options.subdivisions.value_or(1));
 
   const auto widthf         = static_cast<float>(width);
   const auto heightf        = static_cast<float>(height);
@@ -2193,15 +2033,13 @@ std::unique_ptr<VertexData> VertexData::CreateGround(GroundOptions& options)
       colf = static_cast<float>(col);
       x    = (colf * widthf) / subdivisionsXf - (widthf / 2.f);
       y    = 0.f;
-      z    = ((subdivisionsYf - rowf) * heightf) / subdivisionsYf
-          - (heightf / 2.f);
+      z    = ((subdivisionsYf - rowf) * heightf) / subdivisionsYf - (heightf / 2.f);
       Vector3 position(x, y, z);
       Vector3 normal(0.f, 1.f, 0.f);
 
       stl_util::concat(positions, {position.x, position.y, position.z});
       stl_util::concat(normals, {normal.x, normal.y, normal.z});
-      stl_util::concat(uvs,
-                       {colf / subdivisionsXf, 1.f - rowf / subdivisionsYf});
+      stl_util::concat(uvs, {colf / subdivisionsXf, 1.f - rowf / subdivisionsYf});
     }
   }
 
@@ -2228,8 +2066,7 @@ std::unique_ptr<VertexData> VertexData::CreateGround(GroundOptions& options)
   return vertexData;
 }
 
-std::unique_ptr<VertexData>
-VertexData::CreateTiledGround(TiledGroundOptions& options)
+std::unique_ptr<VertexData> VertexData::CreateTiledGround(TiledGroundOptions& options)
 {
   const auto xmin   = options.xmin.value_or(-1.f);
   const auto zmin   = options.zmin.value_or(-1.f);
@@ -2257,50 +2094,44 @@ VertexData::CreateTiledGround(TiledGroundOptions& options)
   SizeF tileSize = {(xmax - xmin) / static_cast<float>(subdivisions.width), //
                     (zmax - zmin) / static_cast<float>(subdivisions.height)};
 
-  auto applyTile
-    = [&](float xTileMin, float zTileMin, float xTileMax, float zTileMax) {
-        // Indices
-        auto base          = static_cast<unsigned>(positions.size() / 3);
-        uint32_t rowLength = precision_w + 1;
-        for (row = 0; row < precision_h; ++row) {
-          for (col = 0; col < precision_w; ++col) {
-            std::array<uint32_t, 4> square
-              = {{base + col + row * rowLength,             //
-                  base + (col + 1) + row * rowLength,       //
-                  base + (col + 1) + (row + 1) * rowLength, //
-                  base + col + (row + 1) * rowLength}};     //
+  auto applyTile = [&](float xTileMin, float zTileMin, float xTileMax, float zTileMax) {
+    // Indices
+    auto base          = static_cast<unsigned>(positions.size() / 3);
+    uint32_t rowLength = precision_w + 1;
+    for (row = 0; row < precision_h; ++row) {
+      for (col = 0; col < precision_w; ++col) {
+        std::array<uint32_t, 4> square = {{base + col + row * rowLength,             //
+                                           base + (col + 1) + row * rowLength,       //
+                                           base + (col + 1) + (row + 1) * rowLength, //
+                                           base + col + (row + 1) * rowLength}};     //
 
-            indices.emplace_back(square[1]);
-            indices.emplace_back(square[2]);
-            indices.emplace_back(square[3]);
-            indices.emplace_back(square[0]);
-            indices.emplace_back(square[1]);
-            indices.emplace_back(square[3]);
-          }
-        }
+        indices.emplace_back(square[1]);
+        indices.emplace_back(square[2]);
+        indices.emplace_back(square[3]);
+        indices.emplace_back(square[0]);
+        indices.emplace_back(square[1]);
+        indices.emplace_back(square[3]);
+      }
+    }
 
-        // Position, normals and uvs
-        Vector3 position = Vector3::Zero();
-        Vector3 normal(0.f, 1.f, 0.f);
-        for (row = 0; row <= precision_h; ++row) {
-          auto rowf = static_cast<float>(row);
-          position.z
-            = (rowf * (zTileMax - zTileMin)) / static_cast<float>(precision_h)
-              + zTileMin;
-          for (col = 0; col <= precision_w; ++col) {
-            auto colf = static_cast<float>(col);
-            position.x
-              = (colf * (xTileMax - xTileMin)) / static_cast<float>(precision_w)
-                + xTileMin;
-            position.y = 0.f;
+    // Position, normals and uvs
+    Vector3 position = Vector3::Zero();
+    Vector3 normal(0.f, 1.f, 0.f);
+    for (row = 0; row <= precision_h; ++row) {
+      auto rowf  = static_cast<float>(row);
+      position.z = (rowf * (zTileMax - zTileMin)) / static_cast<float>(precision_h) + zTileMin;
+      for (col = 0; col <= precision_w; ++col) {
+        auto colf  = static_cast<float>(col);
+        position.x = (colf * (xTileMax - xTileMin)) / static_cast<float>(precision_w) + xTileMin;
+        position.y = 0.f;
 
-            stl_util::concat(positions, {position.x, position.y, position.z});
-            stl_util::concat(normals, {normal.x, normal.y, normal.z});
-            stl_util::concat(uvs, {colf / static_cast<float>(precision_w),
-                                   rowf / static_cast<float>(precision_h)});
-          }
-        }
-      };
+        stl_util::concat(positions, {position.x, position.y, position.z});
+        stl_util::concat(normals, {normal.x, normal.y, normal.z});
+        stl_util::concat(
+          uvs, {colf / static_cast<float>(precision_w), rowf / static_cast<float>(precision_h)});
+      }
+    }
+  };
 
   for (tileRow = 0; tileRow < subdivisions_h; ++tileRow) {
     auto tileRowf = static_cast<float>(tileRow);
@@ -2357,17 +2188,16 @@ VertexData::CreateGroundFromHeightMap(GroundFromHeightMapOptions& options)
     rowf = static_cast<float>(row);
     for (col = 0; col <= subdivisions; ++col) {
       colf = static_cast<float>(col);
-      Vector3 position(
-        (colf * width) / subdivisionsf - (width / 2.f),                    // x
-        0.f,                                                               // y
-        ((subdivisionsf - rowf) * height) / subdivisionsf - (height / 2.f) // z
+      Vector3 position((colf * width) / subdivisionsf - (width / 2.f),                    // x
+                       0.f,                                                               // y
+                       ((subdivisionsf - rowf) * height) / subdivisionsf - (height / 2.f) // z
       );
 
       // Compute height
-      auto heightMapX = static_cast<unsigned>(
-        ((position.x + width / 2.f) / width) * (bufferWidth - 1.f));
-      auto heightMapY = static_cast<unsigned>(
-        (1.f - (position.z + height / 2.f) / height) * (bufferHeight - 1.f));
+      auto heightMapX
+        = static_cast<unsigned>(((position.x + width / 2.f) / width) * (bufferWidth - 1.f));
+      auto heightMapY = static_cast<unsigned>((1.f - (position.z + height / 2.f) / height)
+                                              * (bufferHeight - 1.f));
 
       const uint32_t pos = (heightMapX + heightMapY * bufferWidth) * 4;
       auto r             = static_cast<float>(buffer[pos]) / 255.f;
@@ -2453,10 +2283,9 @@ std::unique_ptr<VertexData> VertexData::CreatePlane(PlaneOptions& options)
   Float32Array normals;
   Float32Array uvs;
 
-  const auto width  = options.width.value_or(options.size.value_or(1.f));
-  const auto height = options.height.value_or(options.size.value_or(1.f));
-  const auto sideOrientation
-    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
+  const auto width           = options.width.value_or(options.size.value_or(1.f));
+  const auto height          = options.height.value_or(options.size.value_or(1.f));
+  const auto sideOrientation = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
 
   // Vertices
   const auto halfWidth  = width / 2.f;
@@ -2488,8 +2317,8 @@ std::unique_ptr<VertexData> VertexData::CreatePlane(PlaneOptions& options)
   indices.emplace_back(3);
 
   // Sides
-  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs,
-                            options.frontUVs, options.backUVs);
+  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs, options.frontUVs,
+                            options.backUVs);
 
   // Result
   auto vertexData = std::make_unique<VertexData>();
@@ -2511,12 +2340,10 @@ std::unique_ptr<VertexData> VertexData::CreateDisc(DiscOptions& options)
 
   auto radius       = options.radius.value_or(0.5f);
   auto tessellation = options.tessellation.value_or(64);
-  auto arc
-    = options.arc.has_value() ?
-        ((*options.arc <= 0.f || options.arc > 1.f) ? 1.f : *options.arc) :
-        1.f;
-  auto sideOrientation
-    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
+  auto arc          = options.arc.has_value() ?
+               ((*options.arc <= 0.f || options.arc > 1.f) ? 1.f : *options.arc) :
+               1.f;
+  auto sideOrientation = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
 
   // positions and uvs
   stl_util::concat(positions, {0.f, 0.f, 0.f}); // disc center first
@@ -2547,8 +2374,8 @@ std::unique_ptr<VertexData> VertexData::CreateDisc(DiscOptions& options)
   // result
   VertexData::ComputeNormals(positions, indices, normals);
 
-  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs,
-                            options.frontUVs, options.backUVs);
+  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs, options.frontUVs,
+                            options.backUVs);
 
   auto vertexData = std::make_unique<VertexData>();
 
@@ -2560,9 +2387,10 @@ std::unique_ptr<VertexData> VertexData::CreateDisc(DiscOptions& options)
   return vertexData;
 }
 
-std::unique_ptr<VertexData> VertexData::CreatePolygon(
-  Mesh* polygon, uint32_t sideOrientation, const std::vector<Vector4>& fUV,
-  const std::vector<Color4>& fColors, Vector4& frontUVs, Vector4& backUVs)
+std::unique_ptr<VertexData> VertexData::CreatePolygon(Mesh* polygon, uint32_t sideOrientation,
+                                                      const std::vector<Vector4>& fUV,
+                                                      const std::vector<Color4>& fColors,
+                                                      Vector4& frontUVs, Vector4& backUVs)
 {
   auto faceUV     = fUV;
   auto faceColors = fColors;
@@ -2602,20 +2430,18 @@ std::unique_ptr<VertexData> VertexData::CreatePolygon(
     if (std::abs(normals[index + 1] + 1) < 0.001f) {
       face = 2;
     }
-    idx = index / 3;
-    uvs[2 * idx]
-      = (1 - uvs[2 * idx]) * faceUV[face].x + uvs[2 * idx] * faceUV[face].z;
-    uvs[2 * idx + 1] = (1.f - uvs[2 * idx + 1]) * faceUV[face].y
-                       + uvs[2 * idx + 1] * faceUV[face].w;
+    idx          = index / 3;
+    uvs[2 * idx] = (1 - uvs[2 * idx]) * faceUV[face].x + uvs[2 * idx] * faceUV[face].z;
+    uvs[2 * idx + 1]
+      = (1.f - uvs[2 * idx + 1]) * faceUV[face].y + uvs[2 * idx + 1] * faceUV[face].w;
     if (!faceColors.empty()) {
-      stl_util::concat(colors, {faceColors[face].r, faceColors[face].g,
-                                faceColors[face].b, faceColors[face].a});
+      stl_util::concat(
+        colors, {faceColors[face].r, faceColors[face].g, faceColors[face].b, faceColors[face].a});
     }
   }
 
   // sides
-  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs,
-                            frontUVs, backUVs);
+  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs, frontUVs, backUVs);
 
   // Result
   auto vertexData       = std::make_unique<VertexData>();
@@ -2625,27 +2451,24 @@ std::unique_ptr<VertexData> VertexData::CreatePolygon(
   vertexData->uvs       = std::move(uvs);
 
   if (!faceColors.empty()) {
-    auto totalColors = (sideOrientation == Mesh::DOUBLESIDE) ?
-                         stl_util::concat(colors, colors) :
-                         colors;
+    auto totalColors
+      = (sideOrientation == Mesh::DOUBLESIDE) ? stl_util::concat(colors, colors) : colors;
     vertexData->colors = std::move(totalColors);
   }
 
   return vertexData;
 }
 
-std::unique_ptr<VertexData>
-VertexData::CreateIcoSphere(IcoSphereOptions& options)
+std::unique_ptr<VertexData> VertexData::CreateIcoSphere(IcoSphereOptions& options)
 {
-  auto sideOrientation
-    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
-  auto radius        = options.radius.value_or(1.f);
-  auto flat          = options.flat.value_or(true);
-  auto subdivisions  = options.subdivisions.value_or(4);
-  auto subdivisionsf = static_cast<float>(subdivisions);
-  auto radiusX       = options.radiusX.value_or(radius);
-  auto radiusY       = options.radiusY.value_or(radius);
-  auto radiusZ       = options.radiusZ.value_or(radius);
+  auto sideOrientation = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
+  auto radius          = options.radius.value_or(1.f);
+  auto flat            = options.flat.value_or(true);
+  auto subdivisions    = options.subdivisions.value_or(4);
+  auto subdivisionsf   = static_cast<float>(subdivisions);
+  auto radiusX         = options.radiusX.value_or(radius);
+  auto radiusY         = options.radiusY.value_or(radius);
+  auto radiusZ         = options.radiusZ.value_or(radius);
 
   const auto t = (1.f + std::sqrt(5.f)) / 2.f;
 
@@ -2782,19 +2605,16 @@ VertexData::CreateIcoSphere(IcoSphereOptions& options)
       // look up vertex 0,1,2 to its index in 0 to 11 (or 23 including alias)
       const uint32_t v_id = ico_indices[3 * face + v012];
       // vertex have 3D position (x,y,z)
-      face_vertex_pos[v012].copyFromFloats(
-        ico_vertices[3 * vertices_unalias_id[v_id]],
-        ico_vertices[3 * vertices_unalias_id[v_id] + 1],
-        ico_vertices[3 * vertices_unalias_id[v_id] + 2]);
+      face_vertex_pos[v012].copyFromFloats(ico_vertices[3 * vertices_unalias_id[v_id]],
+                                           ico_vertices[3 * vertices_unalias_id[v_id] + 1],
+                                           ico_vertices[3 * vertices_unalias_id[v_id] + 2]);
       // Normalize to get normal, then scale to radius
       face_vertex_pos[v012].normalize().scaleInPlace(radius);
 
       // uv Coordinates from vertex ID
       face_vertex_uv[v012].copyFromFloats(
-        ico_vertexuv[2 * v_id] * ustep + uoffset
-          + island[face] * island_u_offset,
-        ico_vertexuv[2 * v_id + 1] * vstep + voffset
-          + island[face] * island_v_offset);
+        ico_vertexuv[2 * v_id] * ustep + uoffset + island[face] * island_u_offset,
+        ico_vertexuv[2 * v_id + 1] * vstep + voffset + island[face] * island_v_offset);
     }
 
     /**
@@ -2842,27 +2662,22 @@ VertexData::CreateIcoSphere(IcoSphereOptions& options)
       // vertex is interpolated from
       //   - face_vertex_pos[0..2]
       //   - face_vertex_uv[0..2]
-      const auto _div = static_cast<float>(i2) / subdivisionsf;
-      const auto pos_x0
-        = Vector3::Lerp(face_vertex_pos[0], face_vertex_pos[2], _div);
-      const auto pos_x1
-        = Vector3::Lerp(face_vertex_pos[1], face_vertex_pos[2], _div);
-      auto pos_interp
-        = (subdivisions == i2) ?
-            face_vertex_pos[2] :
-            Vector3::Lerp(pos_x0, pos_x1,
-                          i1 / static_cast<float>(subdivisions - i2));
+      const auto _div   = static_cast<float>(i2) / subdivisionsf;
+      const auto pos_x0 = Vector3::Lerp(face_vertex_pos[0], face_vertex_pos[2], _div);
+      const auto pos_x1 = Vector3::Lerp(face_vertex_pos[1], face_vertex_pos[2], _div);
+      auto pos_interp   = (subdivisions == i2) ?
+                          face_vertex_pos[2] :
+                          Vector3::Lerp(pos_x0, pos_x1, i1 / static_cast<float>(subdivisions - i2));
       pos_interp.normalize();
 
       Vector3 vertex_normal;
       if (flat) {
         // in flat mode, recalculate normal as face centroid normal
-        const auto centroid_x0 = Vector3::Lerp(
-          face_vertex_pos[0], face_vertex_pos[2], c2 / subdivisionsf);
-        const auto centroid_x1 = Vector3::Lerp(
-          face_vertex_pos[1], face_vertex_pos[2], c2 / subdivisionsf);
-        vertex_normal
-          = Vector3::Lerp(centroid_x0, centroid_x1, c1 / (subdivisionsf - c2));
+        const auto centroid_x0
+          = Vector3::Lerp(face_vertex_pos[0], face_vertex_pos[2], c2 / subdivisionsf);
+        const auto centroid_x1
+          = Vector3::Lerp(face_vertex_pos[1], face_vertex_pos[2], c2 / subdivisionsf);
+        vertex_normal = Vector3::Lerp(centroid_x0, centroid_x1, c1 / (subdivisionsf - c2));
       }
       else {
         // in smooth mode, recalculate normal from each single vertex
@@ -2875,20 +2690,15 @@ VertexData::CreateIcoSphere(IcoSphereOptions& options)
       vertex_normal.z /= radiusZ;
       vertex_normal.normalize();
 
-      const auto uv_x0
-        = Vector2::Lerp(face_vertex_uv[0], face_vertex_uv[2], _div);
-      const auto uv_x1
-        = Vector2::Lerp(face_vertex_uv[1], face_vertex_uv[2], _div);
+      const auto uv_x0 = Vector2::Lerp(face_vertex_uv[0], face_vertex_uv[2], _div);
+      const auto uv_x1 = Vector2::Lerp(face_vertex_uv[1], face_vertex_uv[2], _div);
       const auto uv_interp
         = (subdivisions == i2) ?
             face_vertex_uv[2] :
-            Vector2::Lerp(uv_x0, uv_x1,
-                          i1 / (subdivisionsf - static_cast<float>(i2)));
+            Vector2::Lerp(uv_x0, uv_x1, i1 / (subdivisionsf - static_cast<float>(i2)));
       stl_util::concat(positions,
-                       {pos_interp.x * radiusX, pos_interp.y * radiusY,
-                        pos_interp.z * radiusZ});
-      stl_util::concat(normals,
-                       {vertex_normal.x, vertex_normal.y, vertex_normal.z});
+                       {pos_interp.x * radiusX, pos_interp.y * radiusY, pos_interp.z * radiusZ});
+      stl_util::concat(normals, {vertex_normal.x, vertex_normal.y, vertex_normal.z});
       stl_util::concat(uvs, {uv_interp.x, uv_interp.y});
       // push each vertex has member of a face
       // Same vertex can bleong to multiple face, it is pushed multiple time
@@ -2918,8 +2728,8 @@ VertexData::CreateIcoSphere(IcoSphereOptions& options)
   }
 
   // Sides
-  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs,
-                            options.frontUVs, options.backUVs);
+  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs, options.frontUVs,
+                            options.backUVs);
 
   // Result
   auto vertexData       = std::make_unique<VertexData>();
@@ -2930,8 +2740,7 @@ VertexData::CreateIcoSphere(IcoSphereOptions& options)
   return vertexData;
 }
 
-std::unique_ptr<VertexData>
-VertexData::CreatePolyhedron(PolyhedronOptions& options)
+std::unique_ptr<VertexData> VertexData::CreatePolyhedron(PolyhedronOptions& options)
 {
   // inspired from // http://stemkoski.github.io/Three.js/Polyhedra.html
   //
@@ -2951,186 +2760,179 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
   // 12 : Elongated Square Dipyramid (J15),
   // 13 : Elongated Pentagonal Dipyramid (J16),
   // 14 : Elongated Pentagonal Cupola (J20)
-  std::vector<std::vector<Float32Array>> polyhedraVertices = {
-    // polyhedra[0].vertex
-    {{0.f, 0.f, 1.732051f},
-     {1.632993f, 0.f, -0.5773503f},
-     {-0.8164966f, 1.414214f, -0.5773503f},
-     {-0.8164966f, -1.414214f, -0.5773503f}},
-    // polyhedra[1].vertex
-    {{0.f, 0.f, 1.414214f},
-     {1.414214f, 0.f, 0.f},
-     {0.f, 1.414214f, 0.f},
-     {-1.414214f, 0.f, 0.f},
-     {0.f, -1.414214f, 0.f},
-     {0.f, 0.f, -1.414214f}},
-    // polyhedra[2].vertex
-    {{0.f, 0.f, 1.070466f},
-     {0.7136442f, 0.f, 0.7978784f},
-     {-0.3568221f, 0.618034f, 0.7978784f},
-     {-0.3568221f, -0.618034f, 0.7978784f},
-     {0.7978784f, 0.618034f, 0.3568221f},
-     {0.7978784f, -0.618034f, 0.3568221f},
-     {-0.9341724f, 0.381966f, 0.3568221f},
-     {0.1362939f, 1.f, 0.3568221f},
-     {0.1362939f, -1.f, 0.3568221f},
-     {-0.9341724f, -0.381966f, 0.3568221f},
-     {0.9341724f, 0.381966f, -0.3568221f},
-     {0.9341724f, -0.381966f, -0.3568221f},
-     {-0.7978784f, 0.618034f, -0.3568221f},
-     {-0.1362939f, 1.f, -0.3568221f},
-     {-0.1362939f, -1.f, -0.3568221f},
-     {-0.7978784f, -0.618034f, -0.3568221f},
-     {0.3568221f, 0.618034f, -0.7978784f},
-     {0.3568221f, -0.618034f, -0.7978784f},
-     {-0.7136442f, 0.f, -0.7978784f},
-     {0.f, 0.f, -1.070466f}},
-    // polyhedra[3].vertex
-    {{0.f, 0.f, 1.175571f},
-     {1.051462f, 0.f, 0.5257311f},
-     {0.3249197f, 1.f, 0.5257311f},
-     {-0.8506508f, 0.618034f, 0.5257311f},
-     {-0.8506508f, -0.618034f, 0.5257311f},
-     {0.3249197f, -1.f, 0.5257311f},
-     {0.8506508f, 0.618034f, -0.5257311f},
-     {0.8506508f, -0.618034f, -0.5257311f},
-     {-0.3249197f, 1.f, -0.5257311f},
-     {-1.051462f, 0.f, -0.5257311f},
-     {-0.3249197f, -1.f, -0.5257311f},
-     {0.f, 0.f, -1.175571f}},
-    // polyhedra[4].vertex
-    {{0.f, 0.f, 1.070722f},
-     {0.7148135f, 0.f, 0.7971752f},
-     {-0.104682f, 0.7071068f, 0.7971752f},
-     {-0.6841528f, 0.2071068f, 0.7971752f},
-     {-0.104682f, -0.7071068f, 0.7971752f},
-     {0.6101315f, 0.7071068f, 0.5236279f},
-     {1.04156f, 0.2071068f, 0.1367736f},
-     {0.6101315f, -0.7071068f, 0.5236279f},
-     {-0.3574067f, 1.f, 0.1367736f},
-     {-0.7888348f, -0.5f, 0.5236279f},
-     {-0.9368776f, 0.5f, 0.1367736f},
-     {-0.3574067f, -1.f, 0.1367736f},
-     {0.3574067f, 1.f, -0.1367736f},
-     {0.9368776f, -0.5f, -0.1367736f},
-     {0.7888348f, 0.5f, -0.5236279f},
-     {0.3574067f, -1.f, -0.1367736f},
-     {-0.6101315f, 0.7071068f, -0.5236279f},
-     {-1.04156f, -0.2071068f, -0.1367736f},
-     {-0.6101315f, -0.7071068f, -0.5236279f},
-     {0.104682f, 0.7071068f, -0.7971752f},
-     {0.6841528f, -0.2071068f, -0.7971752f},
-     {0.104682f, -0.7071068f, -0.7971752f},
-     {-0.7148135f, 0.f, -0.7971752f},
-     {0.f, 0.f, -1.070722f}},
-    // polyhedra[5].vertex
-    {{0.f, 0.f, 1.322876f},
-     {1.309307f, 0.f, 0.1889822f},
-     {-0.9819805f, 0.8660254f, 0.1889822f},
-     {0.1636634f, -1.299038f, 0.1889822f},
-     {0.3273268f, 0.8660254f, -0.9449112f},
-     {-0.8183171f, -0.4330127f, -0.9449112f}},
-    // polyhedra[6].vertex
-    {{0.f, 0.f, 1.159953f},
-     {1.013464f, 0.f, 0.5642542f},
-     {-0.3501431f, 0.9510565f, 0.5642542f},
-     {-0.7715208f, -0.6571639f, 0.5642542f},
-     {0.6633206f, 0.9510565f, -0.03144481f},
-     {0.8682979f, -0.6571639f, -0.3996071f},
-     {-1.121664f, 0.2938926f, -0.03144481f},
-     {-0.2348831f, -1.063314f, -0.3996071f},
-     {0.5181548f, 0.2938926f, -0.9953061f},
-     {-0.5850262f, -0.112257f, -0.9953061f}},
-    // polyhedra[7].vertex
-    {{0.f, 0.f, 1.118034f},
-     {0.8944272f, 0.f, 0.6708204f},
-     {-0.2236068f, 0.8660254f, 0.6708204f},
-     {-0.7826238f, -0.4330127f, 0.6708204f},
-     {0.6708204f, 0.8660254f, 0.2236068f},
-     {1.006231f, -0.4330127f, -0.2236068f},
-     {-1.006231f, 0.4330127f, 0.2236068f},
-     {-0.6708204f, -0.8660254f, -0.2236068f},
-     {0.7826238f, 0.4330127f, -0.6708204f},
-     {0.2236068f, -0.8660254f, -0.6708204f},
-     {-0.8944272f, 0.f, -0.6708204f},
-     {0.f, 0.f, -1.118034f}},
-    // polyhedra[8].vertex
-    {{-0.729665f, 0.670121f, 0.319155f},
-     {-0.655235f, -0.29213f, -0.754096f},
-     {-0.093922f, -0.607123f, 0.537818f},
-     {0.702196f, 0.595691f, 0.485187f},
-     {0.776626f, -0.36656f, -0.588064f}},
-    // polyhedra[9].vertex
-    {{-0.868849f, -0.100041f, 0.61257f},
-     {-0.329458f, 0.976099f, 0.28078f},
-     {-0.26629f, -0.013796f, -0.477654f},
-     {-0.13392f, -1.034115f, 0.229829f},
-     {0.738834f, 0.707117f, -0.307018f},
-     {0.859683f, -0.535264f, -0.338508f}},
-    // polyhedra[10].vertex
-    {{-0.610389f, 0.243975f, 0.531213f},
-     {-0.187812f, -0.48795f, -0.664016f},
-     {-0.187812f, 0.9759f, -0.664016f},
-     {0.187812f, -0.9759f, 0.664016f},
-     {0.798201f, 0.243975f, 0.132803f}},
-    // polyhedra[11].vertex
-    {{-1.028778f, 0.392027f, -0.048786f},
-     {-0.640503f, -0.646161f, 0.621837f},
-     {-0.125162f, -0.395663f, -0.540059f},
-     {0.004683f, 0.888447f, -0.651988f},
-     {0.125161f, 0.395663f, 0.540059f},
-     {0.632925f, -0.791376f, 0.433102f},
-     {1.031672f, 0.157063f, -0.354165f}},
-    // polyhedra[12].vertex
-    {{-0.669867f, 0.334933f, -0.529576f},
-     {-0.669867f, 0.334933f, 0.529577f},
-     {-0.4043f, 1.212901f, 0.f},
-     {-0.334933f, -0.669867f, -0.529576f},
-     {-0.334933f, -0.669867f, 0.529577f},
-     {0.334933f, 0.669867f, -0.529576f},
-     {0.334933f, 0.669867f, 0.529577f},
-     {0.4043f, -1.212901f, 0.f},
-     {0.669867f, -0.334933f, -0.529576f},
-     {0.669867f, -0.334933f, 0.529577f}},
-    // polyhedra[13].vertex
-    {{-0.931836f, 0.219976f, -0.264632f},
-     {-0.636706f, 0.318353f, 0.692816f},
-     {-0.613483f, -0.735083f, -0.264632f},
-     {-0.326545f, 0.979634f, 0.f},
-     {-0.318353f, -0.636706f, 0.692816f},
-     {-0.159176f, 0.477529f, -0.856368f},
-     {0.159176f, -0.477529f, -0.856368f},
-     {0.318353f, 0.636706f, 0.692816f},
-     {0.326545f, -0.979634f, 0.f},
-     {0.613482f, 0.735082f, -0.264632f},
-     {0.636706f, -0.318353f, 0.692816f},
-     {0.931835f, -0.219977f, -0.264632f}},
-    // polyhedra[14].vertex
-    {{-0.93465f, 0.300459f, -0.271185f},  {-0.838689f, -0.260219f, -0.516017f},
-     {-0.711319f, 0.717591f, 0.128359f},  {-0.710334f, -0.156922f, 0.080946f},
-     {-0.599799f, 0.556003f, -0.725148f}, {-0.503838f, -0.004675f, -0.969981f},
-     {-0.487004f, 0.26021f, 0.48049f},    {-0.460089f, -0.750282f, -0.512622f},
-     {-0.376468f, 0.973135f, -0.325605f}, {-0.331735f, -0.646985f, 0.084342f},
-     {-0.254001f, 0.831847f, 0.530001f},  {-0.125239f, -0.494738f, -0.966586f},
-     {0.029622f, 0.027949f, 0.730817f},   {0.056536f, -0.982543f, -0.262295f},
-     {0.08085f, 1.087391f, 0.076037f},    {0.125583f, -0.532729f, 0.485984f},
-     {0.262625f, 0.599586f, 0.780328f},   {0.391387f, -0.726999f, -0.716259f},
-     {0.513854f, -0.868287f, 0.139347f},  {0.597475f, 0.85513f, 0.326364f},
-     {0.641224f, 0.109523f, 0.783723f},   {0.737185f, -0.451155f, 0.538891f},
-     {0.848705f, -0.612742f, -0.314616f}, {0.976075f, 0.365067f, 0.32976f},
-     {1.072036f, -0.19561f, 0.084927f}}};
+  std::vector<std::vector<Float32Array>> polyhedraVertices
+    = {// polyhedra[0].vertex
+       {{0.f, 0.f, 1.732051f},
+        {1.632993f, 0.f, -0.5773503f},
+        {-0.8164966f, 1.414214f, -0.5773503f},
+        {-0.8164966f, -1.414214f, -0.5773503f}},
+       // polyhedra[1].vertex
+       {{0.f, 0.f, 1.414214f},
+        {1.414214f, 0.f, 0.f},
+        {0.f, 1.414214f, 0.f},
+        {-1.414214f, 0.f, 0.f},
+        {0.f, -1.414214f, 0.f},
+        {0.f, 0.f, -1.414214f}},
+       // polyhedra[2].vertex
+       {{0.f, 0.f, 1.070466f},
+        {0.7136442f, 0.f, 0.7978784f},
+        {-0.3568221f, 0.618034f, 0.7978784f},
+        {-0.3568221f, -0.618034f, 0.7978784f},
+        {0.7978784f, 0.618034f, 0.3568221f},
+        {0.7978784f, -0.618034f, 0.3568221f},
+        {-0.9341724f, 0.381966f, 0.3568221f},
+        {0.1362939f, 1.f, 0.3568221f},
+        {0.1362939f, -1.f, 0.3568221f},
+        {-0.9341724f, -0.381966f, 0.3568221f},
+        {0.9341724f, 0.381966f, -0.3568221f},
+        {0.9341724f, -0.381966f, -0.3568221f},
+        {-0.7978784f, 0.618034f, -0.3568221f},
+        {-0.1362939f, 1.f, -0.3568221f},
+        {-0.1362939f, -1.f, -0.3568221f},
+        {-0.7978784f, -0.618034f, -0.3568221f},
+        {0.3568221f, 0.618034f, -0.7978784f},
+        {0.3568221f, -0.618034f, -0.7978784f},
+        {-0.7136442f, 0.f, -0.7978784f},
+        {0.f, 0.f, -1.070466f}},
+       // polyhedra[3].vertex
+       {{0.f, 0.f, 1.175571f},
+        {1.051462f, 0.f, 0.5257311f},
+        {0.3249197f, 1.f, 0.5257311f},
+        {-0.8506508f, 0.618034f, 0.5257311f},
+        {-0.8506508f, -0.618034f, 0.5257311f},
+        {0.3249197f, -1.f, 0.5257311f},
+        {0.8506508f, 0.618034f, -0.5257311f},
+        {0.8506508f, -0.618034f, -0.5257311f},
+        {-0.3249197f, 1.f, -0.5257311f},
+        {-1.051462f, 0.f, -0.5257311f},
+        {-0.3249197f, -1.f, -0.5257311f},
+        {0.f, 0.f, -1.175571f}},
+       // polyhedra[4].vertex
+       {{0.f, 0.f, 1.070722f},
+        {0.7148135f, 0.f, 0.7971752f},
+        {-0.104682f, 0.7071068f, 0.7971752f},
+        {-0.6841528f, 0.2071068f, 0.7971752f},
+        {-0.104682f, -0.7071068f, 0.7971752f},
+        {0.6101315f, 0.7071068f, 0.5236279f},
+        {1.04156f, 0.2071068f, 0.1367736f},
+        {0.6101315f, -0.7071068f, 0.5236279f},
+        {-0.3574067f, 1.f, 0.1367736f},
+        {-0.7888348f, -0.5f, 0.5236279f},
+        {-0.9368776f, 0.5f, 0.1367736f},
+        {-0.3574067f, -1.f, 0.1367736f},
+        {0.3574067f, 1.f, -0.1367736f},
+        {0.9368776f, -0.5f, -0.1367736f},
+        {0.7888348f, 0.5f, -0.5236279f},
+        {0.3574067f, -1.f, -0.1367736f},
+        {-0.6101315f, 0.7071068f, -0.5236279f},
+        {-1.04156f, -0.2071068f, -0.1367736f},
+        {-0.6101315f, -0.7071068f, -0.5236279f},
+        {0.104682f, 0.7071068f, -0.7971752f},
+        {0.6841528f, -0.2071068f, -0.7971752f},
+        {0.104682f, -0.7071068f, -0.7971752f},
+        {-0.7148135f, 0.f, -0.7971752f},
+        {0.f, 0.f, -1.070722f}},
+       // polyhedra[5].vertex
+       {{0.f, 0.f, 1.322876f},
+        {1.309307f, 0.f, 0.1889822f},
+        {-0.9819805f, 0.8660254f, 0.1889822f},
+        {0.1636634f, -1.299038f, 0.1889822f},
+        {0.3273268f, 0.8660254f, -0.9449112f},
+        {-0.8183171f, -0.4330127f, -0.9449112f}},
+       // polyhedra[6].vertex
+       {{0.f, 0.f, 1.159953f},
+        {1.013464f, 0.f, 0.5642542f},
+        {-0.3501431f, 0.9510565f, 0.5642542f},
+        {-0.7715208f, -0.6571639f, 0.5642542f},
+        {0.6633206f, 0.9510565f, -0.03144481f},
+        {0.8682979f, -0.6571639f, -0.3996071f},
+        {-1.121664f, 0.2938926f, -0.03144481f},
+        {-0.2348831f, -1.063314f, -0.3996071f},
+        {0.5181548f, 0.2938926f, -0.9953061f},
+        {-0.5850262f, -0.112257f, -0.9953061f}},
+       // polyhedra[7].vertex
+       {{0.f, 0.f, 1.118034f},
+        {0.8944272f, 0.f, 0.6708204f},
+        {-0.2236068f, 0.8660254f, 0.6708204f},
+        {-0.7826238f, -0.4330127f, 0.6708204f},
+        {0.6708204f, 0.8660254f, 0.2236068f},
+        {1.006231f, -0.4330127f, -0.2236068f},
+        {-1.006231f, 0.4330127f, 0.2236068f},
+        {-0.6708204f, -0.8660254f, -0.2236068f},
+        {0.7826238f, 0.4330127f, -0.6708204f},
+        {0.2236068f, -0.8660254f, -0.6708204f},
+        {-0.8944272f, 0.f, -0.6708204f},
+        {0.f, 0.f, -1.118034f}},
+       // polyhedra[8].vertex
+       {{-0.729665f, 0.670121f, 0.319155f},
+        {-0.655235f, -0.29213f, -0.754096f},
+        {-0.093922f, -0.607123f, 0.537818f},
+        {0.702196f, 0.595691f, 0.485187f},
+        {0.776626f, -0.36656f, -0.588064f}},
+       // polyhedra[9].vertex
+       {{-0.868849f, -0.100041f, 0.61257f},
+        {-0.329458f, 0.976099f, 0.28078f},
+        {-0.26629f, -0.013796f, -0.477654f},
+        {-0.13392f, -1.034115f, 0.229829f},
+        {0.738834f, 0.707117f, -0.307018f},
+        {0.859683f, -0.535264f, -0.338508f}},
+       // polyhedra[10].vertex
+       {{-0.610389f, 0.243975f, 0.531213f},
+        {-0.187812f, -0.48795f, -0.664016f},
+        {-0.187812f, 0.9759f, -0.664016f},
+        {0.187812f, -0.9759f, 0.664016f},
+        {0.798201f, 0.243975f, 0.132803f}},
+       // polyhedra[11].vertex
+       {{-1.028778f, 0.392027f, -0.048786f},
+        {-0.640503f, -0.646161f, 0.621837f},
+        {-0.125162f, -0.395663f, -0.540059f},
+        {0.004683f, 0.888447f, -0.651988f},
+        {0.125161f, 0.395663f, 0.540059f},
+        {0.632925f, -0.791376f, 0.433102f},
+        {1.031672f, 0.157063f, -0.354165f}},
+       // polyhedra[12].vertex
+       {{-0.669867f, 0.334933f, -0.529576f},
+        {-0.669867f, 0.334933f, 0.529577f},
+        {-0.4043f, 1.212901f, 0.f},
+        {-0.334933f, -0.669867f, -0.529576f},
+        {-0.334933f, -0.669867f, 0.529577f},
+        {0.334933f, 0.669867f, -0.529576f},
+        {0.334933f, 0.669867f, 0.529577f},
+        {0.4043f, -1.212901f, 0.f},
+        {0.669867f, -0.334933f, -0.529576f},
+        {0.669867f, -0.334933f, 0.529577f}},
+       // polyhedra[13].vertex
+       {{-0.931836f, 0.219976f, -0.264632f},
+        {-0.636706f, 0.318353f, 0.692816f},
+        {-0.613483f, -0.735083f, -0.264632f},
+        {-0.326545f, 0.979634f, 0.f},
+        {-0.318353f, -0.636706f, 0.692816f},
+        {-0.159176f, 0.477529f, -0.856368f},
+        {0.159176f, -0.477529f, -0.856368f},
+        {0.318353f, 0.636706f, 0.692816f},
+        {0.326545f, -0.979634f, 0.f},
+        {0.613482f, 0.735082f, -0.264632f},
+        {0.636706f, -0.318353f, 0.692816f},
+        {0.931835f, -0.219977f, -0.264632f}},
+       // polyhedra[14].vertex
+       {{-0.93465f, 0.300459f, -0.271185f},  {-0.838689f, -0.260219f, -0.516017f},
+        {-0.711319f, 0.717591f, 0.128359f},  {-0.710334f, -0.156922f, 0.080946f},
+        {-0.599799f, 0.556003f, -0.725148f}, {-0.503838f, -0.004675f, -0.969981f},
+        {-0.487004f, 0.26021f, 0.48049f},    {-0.460089f, -0.750282f, -0.512622f},
+        {-0.376468f, 0.973135f, -0.325605f}, {-0.331735f, -0.646985f, 0.084342f},
+        {-0.254001f, 0.831847f, 0.530001f},  {-0.125239f, -0.494738f, -0.966586f},
+        {0.029622f, 0.027949f, 0.730817f},   {0.056536f, -0.982543f, -0.262295f},
+        {0.08085f, 1.087391f, 0.076037f},    {0.125583f, -0.532729f, 0.485984f},
+        {0.262625f, 0.599586f, 0.780328f},   {0.391387f, -0.726999f, -0.716259f},
+        {0.513854f, -0.868287f, 0.139347f},  {0.597475f, 0.85513f, 0.326364f},
+        {0.641224f, 0.109523f, 0.783723f},   {0.737185f, -0.451155f, 0.538891f},
+        {0.848705f, -0.612742f, -0.314616f}, {0.976075f, 0.365067f, 0.32976f},
+        {1.072036f, -0.19561f, 0.084927f}}};
   std::vector<std::vector<Uint32Array>> polyhedraFaces
     = {// polyhedra[0].face
        {{0, 1, 2}, {0, 2, 3}, {0, 3, 1}, {1, 3, 2}},
        // polyhedra[1].face
-       {{0, 1, 2},
-        {0, 2, 3},
-        {0, 3, 4},
-        {0, 4, 1},
-        {1, 4, 5},
-        {1, 5, 2},
-        {2, 5, 3},
-        {3, 5, 4}},
+       {{0, 1, 2}, {0, 2, 3}, {0, 3, 4}, {0, 4, 1}, {1, 4, 5}, {1, 5, 2}, {2, 5, 3}, {3, 5, 4}},
        // polyhedra[2].face
        {{0, 1, 4, 7, 2},
         {0, 2, 6, 9, 3},
@@ -3145,18 +2947,16 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
         {12, 13, 16, 19, 18},
         {14, 15, 18, 19, 17}},
        // polyhedra[3].face
-       {{0, 1, 2},  {0, 2, 3},  {0, 3, 4},   {0, 4, 5},  {0, 5, 1},
-        {1, 5, 7},  {1, 7, 6},  {1, 6, 2},   {2, 6, 8},  {2, 8, 3},
-        {3, 8, 9},  {3, 9, 4},  {4, 9, 10},  {4, 10, 5}, {5, 10, 7},
-        {6, 7, 11}, {6, 11, 8}, {7, 10, 11}, {8, 11, 9}, {9, 11, 10}},
+       {{0, 1, 2},  {0, 2, 3},  {0, 3, 4},  {0, 4, 5},   {0, 5, 1},  {1, 5, 7},  {1, 7, 6},
+        {1, 6, 2},  {2, 6, 8},  {2, 8, 3},  {3, 8, 9},   {3, 9, 4},  {4, 9, 10}, {4, 10, 5},
+        {5, 10, 7}, {6, 7, 11}, {6, 11, 8}, {7, 10, 11}, {8, 11, 9}, {9, 11, 10}},
        // polyhedra[4].face
-       {{0, 2, 3},        {1, 6, 5},        {4, 9, 11},       {7, 15, 13},
-        {8, 16, 10},      {12, 14, 19},     {17, 22, 18},     {20, 21, 23},
-        {0, 1, 5, 2},     {0, 3, 9, 4},     {0, 4, 7, 1},     {1, 7, 13, 6},
-        {2, 5, 12, 8},    {2, 8, 10, 3},    {3, 10, 17, 9},   {4, 11, 15, 7},
-        {5, 6, 14, 12},   {6, 13, 20, 14},  {8, 12, 19, 16},  {9, 17, 18, 11},
-        {10, 16, 22, 17}, {11, 18, 21, 15}, {13, 15, 21, 20}, {14, 20, 23, 19},
-        {16, 19, 23, 22}, {18, 22, 23, 21}},
+       {{0, 2, 3},        {1, 6, 5},        {4, 9, 11},       {7, 15, 13},      {8, 16, 10},
+        {12, 14, 19},     {17, 22, 18},     {20, 21, 23},     {0, 1, 5, 2},     {0, 3, 9, 4},
+        {0, 4, 7, 1},     {1, 7, 13, 6},    {2, 5, 12, 8},    {2, 8, 10, 3},    {3, 10, 17, 9},
+        {4, 11, 15, 7},   {5, 6, 14, 12},   {6, 13, 20, 14},  {8, 12, 19, 16},  {9, 17, 18, 11},
+        {10, 16, 22, 17}, {11, 18, 21, 15}, {13, 15, 21, 20}, {14, 20, 23, 19}, {16, 19, 23, 22},
+        {18, 22, 23, 21}},
        // polyhedra[5].face
        {{0, 3, 1}, {2, 4, 5}, {0, 1, 4, 2}, {0, 2, 5, 3}, {1, 3, 5, 4}},
        // polyhedra[6].face
@@ -3235,26 +3035,22 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
         {3, 6, 2, 0},      {9, 3, 1, 7},
         {9, 15, 12, 6, 3}, {22, 17, 11, 5, 4, 8, 14, 19, 23, 24}}};
 
-  const auto type
-    = options.type.has_value() ?
-        (*options.type >= polyhedraVertices.size()) ? 0u : *options.type :
-        0u;
-  const auto size  = options.size.value_or(1.f);
-  const auto sizeX = options.sizeX.value_or(size);
-  const auto sizeY = options.sizeY.value_or(size);
-  const auto sizeZ = options.sizeZ.value_or(size);
-  const auto& dataVertices
-    = (!options.custom.has_value() && options.custom->vertices.empty()) ?
-        polyhedraVertices[type] :
-        options.custom->vertices;
-  const auto& dataFaces
-    = (!options.custom.has_value() && options.custom->faces.empty()) ?
-        polyhedraFaces[type] :
-        options.custom->faces;
-  const auto nbfaces = dataFaces.size();
-  const auto flat    = options.flat.value_or(true);
-  const auto sideOrientation
-    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
+  const auto type = options.type.has_value() ?
+                      (*options.type >= polyhedraVertices.size()) ? 0u : *options.type :
+                      0u;
+  const auto size          = options.size.value_or(1.f);
+  const auto sizeX         = options.sizeX.value_or(size);
+  const auto sizeY         = options.sizeY.value_or(size);
+  const auto sizeZ         = options.sizeZ.value_or(size);
+  const auto& dataVertices = (!options.custom.has_value() && options.custom->vertices.empty()) ?
+                               polyhedraVertices[type] :
+                               options.custom->vertices;
+  const auto& dataFaces = (!options.custom.has_value() && options.custom->faces.empty()) ?
+                            polyhedraFaces[type] :
+                            options.custom->faces;
+  const auto nbfaces         = dataFaces.size();
+  const auto flat            = options.flat.value_or(true);
+  const auto sideOrientation = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
 
   Float32Array positions;
   Uint32Array indices;
@@ -3282,15 +3078,13 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
   }
   if (!flat) {
     for (i = 0; i < dataVertices.size(); ++i) {
-      stl_util::concat(positions,
-                       {dataVertices[i][0] * sizeX, dataVertices[i][1] * sizeY,
-                        dataVertices[i][2] * sizeZ});
+      stl_util::concat(positions, {dataVertices[i][0] * sizeX, dataVertices[i][1] * sizeY,
+                                   dataVertices[i][2] * sizeZ});
       stl_util::concat(uvs, {0.f, 0.f});
     }
     for (f = 0; f < nbfaces; ++f) {
       for (i = 0; i < dataFaces[f].size() - 2; ++i) {
-        stl_util::concat(
-          indices, {dataFaces[f][0], dataFaces[f][i + 2], dataFaces[f][i + 1]});
+        stl_util::concat(indices, {dataFaces[f][0], dataFaces[f][i + 2], dataFaces[f][i + 1]});
       }
     }
   }
@@ -3318,24 +3112,23 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
         x   = tmp;
         // colors
         if (!faceColors.empty()) {
-          stl_util::concat(colors, {faceColors[f].r, faceColors[f].g,
-                                    faceColors[f].b, faceColors[f].a});
+          stl_util::concat(colors,
+                           {faceColors[f].r, faceColors[f].g, faceColors[f].b, faceColors[f].a});
         }
       }
 
       // indices from indexes
       for (i = 0; i < fl - 2; ++i) {
-        stl_util::concat(indices,
-                         {indexes[0 + faceIdx], indexes[i + 2 + faceIdx],
-                          indexes[i + 1 + faceIdx]});
+        stl_util::concat(
+          indices, {indexes[0 + faceIdx], indexes[i + 2 + faceIdx], indexes[i + 1 + faceIdx]});
       }
       faceIdx += fl;
     }
   }
 
   VertexData::ComputeNormals(positions, indices, normals);
-  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs,
-                            options.frontUVs, options.backUVs);
+  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs, options.frontUVs,
+                            options.backUVs);
 
   auto vertexData       = std::make_unique<VertexData>();
   vertexData->positions = std::move(positions);
@@ -3348,8 +3141,7 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
   return vertexData;
 }
 
-std::unique_ptr<VertexData>
-VertexData::CreateTorusKnot(TorusKnotOptions& options)
+std::unique_ptr<VertexData> VertexData::CreateTorusKnot(TorusKnotOptions& options)
 {
   Uint32Array indices;
   Float32Array positions;
@@ -3364,8 +3156,7 @@ VertexData::CreateTorusKnot(TorusKnotOptions& options)
   const auto tubularSegmentsf = static_cast<float>(tubularSegments);
   const auto p                = options.p.value_or(2.f);
   const auto q                = options.q.value_or(3.f);
-  const auto sideOrientation
-    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
+  const auto sideOrientation  = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
 
   // Helper
   const auto getPos = [&](float angle) -> Vector3 {
@@ -3439,8 +3230,8 @@ VertexData::CreateTorusKnot(TorusKnotOptions& options)
   VertexData::ComputeNormals(positions, indices, normals);
 
   // Sides
-  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs,
-                            options.frontUVs, options.backUVs);
+  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs, options.frontUVs,
+                            options.backUVs);
 
   // Result
   auto vertexData = std::make_unique<VertexData>();
@@ -3455,38 +3246,36 @@ VertexData::CreateTorusKnot(TorusKnotOptions& options)
 
 // Tools
 
-void VertexData::ComputeNormals(const Float32Array& positions,
-                                const Uint32Array& indices,
-                                Float32Array& normals,
-                                std::optional<FacetParameters> options)
+void VertexData::ComputeNormals(const Float32Array& positions, const Uint32Array& indices,
+                                Float32Array& normals, std::optional<FacetParameters> options)
 {
   if (normals.size() < positions.size()) {
     normals.resize(positions.size());
   }
 
   // temporary scalar variables
-  uint32_t index             = 0;   // facet index
-  float p1p2x                = 0.f; // p1p2 vector x coordinate
-  float p1p2y                = 0.f; // p1p2 vector y coordinate
-  float p1p2z                = 0.f; // p1p2 vector z coordinate
-  float p3p2x                = 0.f; // p3p2 vector x coordinate
-  float p3p2y                = 0.f; // p3p2 vector y coordinate
-  float p3p2z                = 0.f; // p3p2 vector z coordinate
-  float faceNormalx          = 0.f; // facet normal x coordinate
-  float faceNormaly          = 0.f; // facet normal y coordinate
-  float faceNormalz          = 0.f; // facet normal z coordinate
-  float length               = 0.f; // facet normal length before normalization
-  uint32_t v1x               = 0;   // vector1 x index in the positions array
-  uint32_t v1y               = 0;   // vector1 y index in the positions array
-  uint32_t v1z               = 0;   // vector1 z index in the positions array
-  uint32_t v2x               = 0;   // vector2 x index in the positions array
-  uint32_t v2y               = 0;   // vector2 y index in the positions array
-  uint32_t v2z               = 0;   // vector2 z index in the positions array
-  uint32_t v3x               = 0;   // vector3 x index in the positions array
-  uint32_t v3y               = 0;   // vector3 y index in the positions array
-  uint32_t v3z               = 0;   // vector3 z index in the positions array
-  bool computeFacetNormals   = false;
-  bool computeFacetPositions = false;
+  uint32_t index                    = 0;   // facet index
+  float p1p2x                       = 0.f; // p1p2 vector x coordinate
+  float p1p2y                       = 0.f; // p1p2 vector y coordinate
+  float p1p2z                       = 0.f; // p1p2 vector z coordinate
+  float p3p2x                       = 0.f; // p3p2 vector x coordinate
+  float p3p2y                       = 0.f; // p3p2 vector y coordinate
+  float p3p2z                       = 0.f; // p3p2 vector z coordinate
+  float faceNormalx                 = 0.f; // facet normal x coordinate
+  float faceNormaly                 = 0.f; // facet normal y coordinate
+  float faceNormalz                 = 0.f; // facet normal z coordinate
+  float length                      = 0.f; // facet normal length before normalization
+  uint32_t v1x                      = 0;   // vector1 x index in the positions array
+  uint32_t v1y                      = 0;   // vector1 y index in the positions array
+  uint32_t v1z                      = 0;   // vector1 z index in the positions array
+  uint32_t v2x                      = 0;   // vector2 x index in the positions array
+  uint32_t v2y                      = 0;   // vector2 y index in the positions array
+  uint32_t v2z                      = 0;   // vector2 z index in the positions array
+  uint32_t v3x                      = 0;   // vector3 x index in the positions array
+  uint32_t v3y                      = 0;   // vector3 y index in the positions array
+  uint32_t v3z                      = 0;   // vector3 z index in the positions array
+  bool computeFacetNormals          = false;
+  bool computeFacetPositions        = false;
   bool computeFacetPartitioning     = false;
   bool computeDepthSort             = false;
   float faceNormalSign              = 1.f;
@@ -3498,9 +3287,9 @@ void VertexData::ComputeNormals(const Float32Array& positions,
     computeFacetPositions    = !options->facetPositions.empty();
     computeFacetPartitioning = !options->facetPartitioning.empty();
     faceNormalSign           = (options->useRightHandedSystem) ? -1.f : 1.f;
-    ratio            = options->ratio ? *options->ratio : 0.f;
+    ratio                    = options->ratio ? *options->ratio : 0.f;
     computeDepthSort         = (options->depthSort);
-    distanceTo       = options->distanceTo;
+    distanceTo               = options->distanceTo;
     if (computeDepthSort) {
       if (!distanceTo.has_value()) {
         distanceTo = Vector3::Zero();
@@ -3591,12 +3380,9 @@ void VertexData::ComputeNormals(const Float32Array& positions,
     if (computeFacetPositions && options) {
       // compute and the facet barycenter coordinates in the array
       // facetPositions
-      options->facetPositions[index].x
-        = (positions[v1x] + positions[v2x] + positions[v3x]) / 3.f;
-      options->facetPositions[index].y
-        = (positions[v1y] + positions[v2y] + positions[v3y]) / 3.f;
-      options->facetPositions[index].z
-        = (positions[v1z] + positions[v2z] + positions[v3z]) / 3.f;
+      options->facetPositions[index].x = (positions[v1x] + positions[v2x] + positions[v3x]) / 3.f;
+      options->facetPositions[index].y = (positions[v1y] + positions[v2y] + positions[v3y]) / 3.f;
+      options->facetPositions[index].z = (positions[v1z] + positions[v2z] + positions[v3z]) / 3.f;
     }
 
     if (computeFacetPartitioning && options) {
@@ -3604,32 +3390,29 @@ void VertexData::ComputeNormals(const Float32Array& positions,
       // compute each facet vertex (+ facet barycenter) index in the partiniong
       // array
       ox  = static_cast<unsigned>(std::floor(
-        (options->facetPositions[index].x - options->bInfo.minimum().x * ratio)
-        * xSubRatio));
+        (options->facetPositions[index].x - options->bInfo.minimum().x * ratio) * xSubRatio));
       oy  = static_cast<unsigned>(std::floor(
-        (options->facetPositions[index].y - options->bInfo.minimum().y * ratio)
-        * ySubRatio));
+        (options->facetPositions[index].y - options->bInfo.minimum().y * ratio) * ySubRatio));
       oz  = static_cast<unsigned>(std::floor(
-        (options->facetPositions[index].z - options->bInfo.minimum().z * ratio)
-        * zSubRatio));
-      b1x = static_cast<unsigned>(std::floor(
-        (positions[v1x] - options->bInfo.minimum().x * ratio) * xSubRatio));
-      b1y = static_cast<unsigned>(std::floor(
-        (positions[v1y] - options->bInfo.minimum().y * ratio) * ySubRatio));
-      b1z = static_cast<unsigned>(std::floor(
-        (positions[v1z] - options->bInfo.minimum().z * ratio) * zSubRatio));
-      b2x = static_cast<unsigned>(std::floor(
-        (positions[v2x] - options->bInfo.minimum().x * ratio) * xSubRatio));
-      b2y = static_cast<unsigned>(std::floor(
-        (positions[v2y] - options->bInfo.minimum().y * ratio) * ySubRatio));
-      b2z = static_cast<unsigned>(std::floor(
-        (positions[v2z] - options->bInfo.minimum().z * ratio) * zSubRatio));
-      b3x = static_cast<unsigned>(std::floor(
-        (positions[v3x] - options->bInfo.minimum().x * ratio) * xSubRatio));
-      b3y = static_cast<unsigned>(std::floor(
-        (positions[v3y] - options->bInfo.minimum().y * ratio) * ySubRatio));
-      b3z = static_cast<unsigned>(std::floor(
-        (positions[v3z] - options->bInfo.minimum().z * ratio) * zSubRatio));
+        (options->facetPositions[index].z - options->bInfo.minimum().z * ratio) * zSubRatio));
+      b1x = static_cast<unsigned>(
+        std::floor((positions[v1x] - options->bInfo.minimum().x * ratio) * xSubRatio));
+      b1y = static_cast<unsigned>(
+        std::floor((positions[v1y] - options->bInfo.minimum().y * ratio) * ySubRatio));
+      b1z = static_cast<unsigned>(
+        std::floor((positions[v1z] - options->bInfo.minimum().z * ratio) * zSubRatio));
+      b2x = static_cast<unsigned>(
+        std::floor((positions[v2x] - options->bInfo.minimum().x * ratio) * xSubRatio));
+      b2y = static_cast<unsigned>(
+        std::floor((positions[v2y] - options->bInfo.minimum().y * ratio) * ySubRatio));
+      b2z = static_cast<unsigned>(
+        std::floor((positions[v2z] - options->bInfo.minimum().z * ratio) * zSubRatio));
+      b3x = static_cast<unsigned>(
+        std::floor((positions[v3x] - options->bInfo.minimum().x * ratio) * xSubRatio));
+      b3y = static_cast<unsigned>(
+        std::floor((positions[v3y] - options->bInfo.minimum().y * ratio) * ySubRatio));
+      b3z = static_cast<unsigned>(
+        std::floor((positions[v3z] - options->bInfo.minimum().z * ratio) * zSubRatio));
 
       block_idx_v1 = b1x + options->subDiv.max * b1y + subSq * b1z;
       block_idx_v2 = b2x + options->subDiv.max * b2y + subSq * b2z;
@@ -3663,10 +3446,9 @@ void VertexData::ComputeNormals(const Float32Array& positions,
       if (nbFaces >= depthSortedFacets.size()) {
         depthSortedFacets.resize(nbFaces);
       }
-      auto& dsf = depthSortedFacets[index];
-      dsf.ind   = index * 3;
-      dsf.sqDistance
-        = Vector3::DistanceSquared(options->facetPositions[index], *distanceTo);
+      auto& dsf      = depthSortedFacets[index];
+      dsf.ind        = index * 3;
+      dsf.sqDistance = Vector3::DistanceSquared(options->facetPositions[index], *distanceTo);
     }
 
     // compute the normals anyway
@@ -3699,9 +3481,8 @@ void VertexData::ComputeNormals(const Float32Array& positions,
   }
 }
 
-void VertexData::_ComputeSides(std::optional<uint32_t> sideOrientation,
-                               Float32Array& positions, Uint32Array& indices,
-                               Float32Array& normals, Float32Array& uvs,
+void VertexData::_ComputeSides(std::optional<uint32_t> sideOrientation, Float32Array& positions,
+                               Uint32Array& indices, Float32Array& normals, Float32Array& uvs,
                                const std::optional<Vector4>& iFrontUVs,
                                const std::optional<Vector4>& iBackUVs)
 {
@@ -3731,8 +3512,8 @@ void VertexData::_ComputeSides(std::optional<uint32_t> sideOrientation,
       break;
     case VertexData::DOUBLESIDE:
       // positions
-      size_t lp  = positions.size();
-      auto l     = static_cast<unsigned>(lp / 3);
+      size_t lp = positions.size();
+      auto l    = static_cast<unsigned>(lp / 3);
       if (positions.size() < 2 * lp) {
         positions.resize(2 * lp);
       }
@@ -3763,11 +3544,9 @@ void VertexData::_ComputeSides(std::optional<uint32_t> sideOrientation,
       for (std::size_t u = 0; u < lu; ++u) {
         uvs[u + lu] = uvs[u];
       }
-      auto frontUVs
-        = iFrontUVs.has_value() ? *iFrontUVs : Vector4(0.f, 0.f, 1.f, 1.f);
-      auto backUVs
-        = iBackUVs.has_value() ? *iBackUVs : Vector4(0.f, 0.f, 1.f, 1.f);
-      auto u = 0ull;
+      auto frontUVs = iFrontUVs.has_value() ? *iFrontUVs : Vector4(0.f, 0.f, 1.f, 1.f);
+      auto backUVs  = iBackUVs.has_value() ? *iBackUVs : Vector4(0.f, 0.f, 1.f, 1.f);
+      auto u        = 0ull;
       for (u = 0, i = 0; i < lu / 2; ++i) {
         uvs[u]          = frontUVs.x + (frontUVs.z - frontUVs.x) * uvs[u];
         uvs[u + 1]      = frontUVs.y + (frontUVs.w - frontUVs.y) * uvs[u + 1];
@@ -3779,8 +3558,7 @@ void VertexData::_ComputeSides(std::optional<uint32_t> sideOrientation,
   }
 }
 
-void VertexData::ImportVertexData(const json& parsedVertexData,
-                                  Geometry& geometry)
+void VertexData::ImportVertexData(const json& parsedVertexData, Geometry& geometry)
 {
   auto vertexData = std::make_unique<VertexData>();
 
@@ -3804,71 +3582,59 @@ void VertexData::ImportVertexData(const json& parsedVertexData,
 
   // uvs
   if (json_util::has_key(parsedVertexData, "uvs")) {
-    vertexData->set(json_util::get_array<float>(parsedVertexData, "uvs"),
-                    VertexBuffer::UVKind);
+    vertexData->set(json_util::get_array<float>(parsedVertexData, "uvs"), VertexBuffer::UVKind);
   }
 
   // uv2s
   if (json_util::has_key(parsedVertexData, "uv2s")) {
-    vertexData->set(json_util::get_array<float>(parsedVertexData, "uv2s"),
-                    VertexBuffer::UV2Kind);
+    vertexData->set(json_util::get_array<float>(parsedVertexData, "uv2s"), VertexBuffer::UV2Kind);
   }
 
   // uv3s
   if (json_util::has_key(parsedVertexData, "uv3s")) {
-    vertexData->set(json_util::get_array<float>(parsedVertexData, "uv3s"),
-                    VertexBuffer::UV3Kind);
+    vertexData->set(json_util::get_array<float>(parsedVertexData, "uv3s"), VertexBuffer::UV3Kind);
   }
 
   // uv4s
   if (json_util::has_key(parsedVertexData, "uv4s")) {
-    vertexData->set(json_util::get_array<float>(parsedVertexData, "uv4s"),
-                    VertexBuffer::UV4Kind);
+    vertexData->set(json_util::get_array<float>(parsedVertexData, "uv4s"), VertexBuffer::UV4Kind);
   }
 
   // uv5s
   if (json_util::has_key(parsedVertexData, "uv5s")) {
-    vertexData->set(json_util::get_array<float>(parsedVertexData, "uv5s"),
-                    VertexBuffer::UV5Kind);
+    vertexData->set(json_util::get_array<float>(parsedVertexData, "uv5s"), VertexBuffer::UV5Kind);
   }
 
   // uv6s
   if (json_util::has_key(parsedVertexData, "uv6s")) {
-    vertexData->set(json_util::get_array<float>(parsedVertexData, "uv6s"),
-                    VertexBuffer::UV6Kind);
+    vertexData->set(json_util::get_array<float>(parsedVertexData, "uv6s"), VertexBuffer::UV6Kind);
   }
 
   // colors
   if (json_util::has_key(parsedVertexData, "colors")) {
-    const Float32Array colors
-      = json_util::get_array<float>(parsedVertexData, "colors");
-    vertexData->set(Color4::CheckColors4(colors, positions.size() / 3),
-                    VertexBuffer::ColorKind);
+    const Float32Array colors = json_util::get_array<float>(parsedVertexData, "colors");
+    vertexData->set(Color4::CheckColors4(colors, positions.size() / 3), VertexBuffer::ColorKind);
   }
 
   // matricesIndices
   if (json_util::has_key(parsedVertexData, "matricesIndices")) {
-    vertexData->set(
-      json_util::get_array<float>(parsedVertexData, "matricesIndices"),
-      VertexBuffer::MatricesIndicesKind);
+    vertexData->set(json_util::get_array<float>(parsedVertexData, "matricesIndices"),
+                    VertexBuffer::MatricesIndicesKind);
   }
 
   // matricesWeights
   if (json_util::has_key(parsedVertexData, "matricesWeights")) {
-    vertexData->set(
-      json_util::get_array<float>(parsedVertexData, "matricesWeights"),
-      VertexBuffer::MatricesWeightsKind);
+    vertexData->set(json_util::get_array<float>(parsedVertexData, "matricesWeights"),
+                    VertexBuffer::MatricesWeightsKind);
   }
 
   // indices
   if (json_util::has_key(parsedVertexData, "indices")) {
-    vertexData->indices
-      = json_util::get_array<uint32_t>(parsedVertexData, "indices");
+    vertexData->indices = json_util::get_array<uint32_t>(parsedVertexData, "indices");
   }
 
-  geometry.setAllVerticesData(
-    vertexData.get(),
-    json_util::get_bool(parsedVertexData, "updatable", false));
+  geometry.setAllVerticesData(vertexData.get(),
+                              json_util::get_bool(parsedVertexData, "updatable", false));
 }
 
 } // end of namespace BABYLON
