@@ -143,6 +143,7 @@ file(GLOB MISC_HDR_FILES            ${INCLUDE_PATH}/misc/*.h
                                     ${INCLUDE_PATH}/misc/interfaces/*.h
                                     ${INCLUDE_PATH}/misc/optimization/*.h)
 file(GLOB MORPH_HDR_FILES           ${INCLUDE_PATH}/morph/*.h)
+file(GLOB NAVIGATION_HDR_FILES      ${INCLUDE_PATH}/navigation/*.h)
 file(GLOB PARTICLES_HDR_FILES       ${INCLUDE_PATH}/particles/*.h
                                     ${INCLUDE_PATH}/particles/emittertypes/*.h)
 file(GLOB PHYSICS_HDR_FILES         ${INCLUDE_PATH}/physics/*.h
@@ -203,6 +204,7 @@ set(BABYLON_HEADERS
     ${MESHES_HDR_FILES}
     ${MISC_HDR_FILES}
     ${MORPH_HDR_FILES}
+    ${NAVIGATION_HDR_FILES}
     ${PARTICLES_HDR_FILES}
     ${PHYSICS_HDR_FILES}
     ${POSTPROCESSES_HDR_FILES}
