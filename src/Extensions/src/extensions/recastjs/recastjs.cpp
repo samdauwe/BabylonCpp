@@ -320,9 +320,9 @@ void NavMesh::build(const float* positions, const int /*positionCount*/, const i
     params.offMeshConFlags  = nullptr; // geom->getOffMeshConnectionFlags();
     params.offMeshConUserID = nullptr; // geom->getOffMeshConnectionId();
     params.offMeshConCount  = 0;       // geom->getOffMeshConnectionCount();
-    params.walkableHeight   = config.walkableHeight;
-    params.walkableRadius   = config.walkableRadius;
-    params.walkableClimb    = config.walkableClimb;
+    params.walkableHeight   = static_cast<float>(config.walkableHeight);
+    params.walkableRadius   = static_cast<float>(config.walkableRadius);
+    params.walkableClimb    = static_cast<float>(config.walkableClimb);
     rcVcopy(params.bmin, pmesh->bmin);
     rcVcopy(params.bmax, pmesh->bmax);
     params.cs          = cfg.cs;

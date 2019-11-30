@@ -1,14 +1,16 @@
 #pragma once
 #include <recastnavigation/Detour/Include/DetourNavMesh.h>
 #include <recastnavigation/DetourCrowd/Include/DetourCrowd.h>
+
+#include <algorithm>
 #include <vector>
 
 class dtNavMeshQuery;
 class dtNavMesh;
 class MeshLoader;
 class NavMesh;
-class rcPolyMesh;
-class rcPolyMeshDetail;
+struct rcPolyMesh;
+struct rcPolyMeshDetail;
 struct rcConfig;
 
 namespace BABYLON {
