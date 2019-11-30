@@ -249,6 +249,10 @@ target_include_directories(${TARGET}
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../BabylonCpp/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../Extensions/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../Extensions/include/recastnavigation/Detour/Include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../Extensions/include/recastnavigation/DetourCrowd/Include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../Extensions/include/recastnavigation/DetourTileCache/Include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../Extensions/include/recastnavigation/Recast/Include
     ${CMAKE_CURRENT_SOURCE_DIR}/../MaterialsLibrary/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../ProceduralTexturesLibrary/include
     PUBLIC
