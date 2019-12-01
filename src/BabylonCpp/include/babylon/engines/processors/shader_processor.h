@@ -29,28 +29,27 @@ using ShaderDefineExpressionPtr         = std::shared_ptr<ShaderDefineExpression
 class BABYLON_SHARED_EXPORT ShaderProcessor {
 
 public:
-  static void Process(const std::string& sourceCode, const ProcessingOptions& options,
+  static void Process(const std::string& sourceCode, ProcessingOptions& options,
                       const std::function<void(const std::string& migratedCode)> callback);
 
 private:
-  static std::string ProcessPrecision(const std::string& source, const ProcessingOptions& options);
-  static ShaderDefineArithmeticOperatorPtr _ExtractOperation(const std::string& expression);
+  static std::string _ProcessPrecision(std::string source, const ProcessingOptions& options);
+  static ShaderDefineExpressionPtr _ExtractOperation(const std::string& expression);
   static ShaderDefineExpressionPtr _BuildSubExpression(const std::string& expression);
-  static ShaderCodeTestNodePtr _BuildSubExpression(const std::string& line,
-                                                   const std::string& start);
-  static void _MoveCursorWithinIf(const ShaderCodeCursor& cursor,
+  static ShaderCodeTestNodePtr _BuildExpression(const std::string& line, size_t start);
+  static void _MoveCursorWithinIf(ShaderCodeCursor& cursor,
                                   const ShaderCodeConditionNodePtr& rootNode,
-                                  const ShaderCodeNodePtr& ifNode);
-  static bool _MoveCursor(const ShaderCodeCursor& cursor, const ShaderCodeNodePtr& rootNode);
+                                  ShaderCodeNodePtr ifNode);
+  static bool _MoveCursor(ShaderCodeCursor& cursor, const ShaderCodeNodePtr& rootNode);
   static std::string
   _EvaluatePreProcessors(const std::string& sourceCode,
-                         const std::unordered_map<std::string, std::string>& preprocessors,
-                         const ProcessingOptions& options);
+                         std::unordered_map<std::string, std::string>& preprocessors,
+                         ProcessingOptions& options);
   static std::unordered_map<std::string, std::string>
   _PreparePreProcessors(const ProcessingOptions& options);
   static std::string _ProcessShaderConversion(const std::string& sourceCode,
-                                              const ProcessingOptions& options);
-  static void _ProcessIncludes(const std::string& sourceCode, const ProcessingOptions& options,
+                                              ProcessingOptions& options);
+  static void _ProcessIncludes(const std::string& sourceCode, ProcessingOptions& options,
                                const std::function<void(const std::string& data)>& callback);
 
 }; // end of class ShaderProcessor

@@ -5,7 +5,7 @@ namespace BABYLON {
 bool ShaderCodeTestNode::isValid(
   const std::unordered_map<std::string, std::string>& preprocessors) const
 {
-  return testExpression.isTrue(preprocessors);
+  return testExpression->isTrue(preprocessors);
 }
 
 } // end of namespace BABYLON

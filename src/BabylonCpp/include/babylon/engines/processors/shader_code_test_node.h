@@ -10,12 +10,14 @@
 
 namespace BABYLON {
 
+using ShaderDefineExpressionPtr = std::shared_ptr<ShaderDefineExpression>;
+
 /**
  * @brief Hidden
  */
 struct BABYLON_SHARED_EXPORT ShaderCodeTestNode : public ShaderCodeNode {
 
-  ShaderDefineExpression testExpression;
+  ShaderDefineExpressionPtr testExpression = nullptr;
 
   [[nodiscard]] bool
   isValid(const std::unordered_map<std::string, std::string>& preprocessors) const override;
