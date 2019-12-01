@@ -3,7 +3,7 @@
 namespace BABYLON {
 
 std::string
-ShaderCodeConditionNode::process(const std::unordered_map<std::string, std::string>& preprocessors,
+ShaderCodeConditionNode::process(std::unordered_map<std::string, std::string>& preprocessors,
                                  ProcessingOptions& options)
 {
   for (const auto& node : children) {

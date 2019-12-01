@@ -4,50 +4,50 @@ namespace BABYLON {
 
 IShaderProcessor::~IShaderProcessor() = default;
 
-std::string IShaderProcessor::attributeProcessor(const std::string& /*attribute*/)
+std::string IShaderProcessor::attributeProcessor(const std::string& attribute)
 {
-  return "";
+  return attribute;
 }
 
-std::string IShaderProcessor::varyingProcessor(const std::string& /*varying*/, bool /*isFragment*/)
+std::string IShaderProcessor::varyingProcessor(const std::string& varying, bool /*isFragment*/)
 {
-  return "";
+  return varying;
 }
 
-std::string IShaderProcessor::uniformProcessor(const std::string& /*uniform*/, bool /*isFragment*/)
+std::string IShaderProcessor::uniformProcessor(const std::string& uniform, bool /*isFragment*/)
 {
-  return "";
+  return uniform;
 }
 
-std::string IShaderProcessor::uniformBufferProcessor(const std::string& /*uniformBuffer*/,
+std::string IShaderProcessor::uniformBufferProcessor(const std::string& uniformBuffer,
                                                      bool /*isFragment*/)
 {
-  return "";
+  return uniformBuffer;
 }
 
-std::string IShaderProcessor::endOfUniformBufferProcessor(const std::string& /*closingBracketLine*/,
+std::string IShaderProcessor::endOfUniformBufferProcessor(const std::string& closingBracketLine,
                                                           bool /*isFragment*/)
 {
-  return "";
+  return closingBracketLine;
 }
 
-std::string IShaderProcessor::lineProcessor(const std::string& /*line*/, bool /*isFragment*/)
+std::string IShaderProcessor::lineProcessor(const std::string& line, bool /*isFragment*/)
 {
-  return "";
+  return line;
 }
 
-std::string IShaderProcessor::preProcessor(const std::string& /*code*/,
+std::string IShaderProcessor::preProcessor(const std::string& code,
                                            const std::vector<std::string>& /*defines*/,
                                            bool /*isFragment*/)
 {
-  return "";
+  return code;
 }
 
-std::string IShaderProcessor::postProcessor(std::string /*code*/,
+std::string IShaderProcessor::postProcessor(std::string code,
                                             const std::vector<std::string>& /*defines*/,
                                             bool /*isFragment*/)
 {
-  return "";
+  return code;
 }
 
 } // end of namespace BABYLON

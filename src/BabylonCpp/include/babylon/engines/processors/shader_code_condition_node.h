@@ -13,7 +13,7 @@ struct BABYLON_SHARED_EXPORT ShaderCodeConditionNode : public ShaderCodeNode {
 
   ~ShaderCodeConditionNode() override = default;
 
-  std::string process(const std::unordered_map<std::string, std::string>& preprocessors,
+  std::string process(std::unordered_map<std::string, std::string>& preprocessors,
                       ProcessingOptions& options) override;
 
 }; // end of struct ShaderCodeConditionNode

@@ -26,7 +26,7 @@ struct BABYLON_SHARED_EXPORT ShaderCodeNode {
 
   [[nodiscard]] virtual bool
   isValid(const std::unordered_map<std::string, std::string>& preprocessors) const;
-  virtual std::string process(const std::unordered_map<std::string, std::string>& preprocessors,
+  virtual std::string process(std::unordered_map<std::string, std::string>& preprocessors,
                               ProcessingOptions& options);
 
 }; // end of struct ShaderCodeNode
