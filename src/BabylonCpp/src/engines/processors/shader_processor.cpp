@@ -15,6 +15,10 @@
 #include <babylon/engines/processors/shader_code_test_node.h>
 #include <babylon/misc/file_tools.h>
 
+#ifndef isNan
+#define isNan(a) ((a) != (a))
+#endif
+
 namespace BABYLON {
 
 void ShaderProcessor::Process(const std::string& sourceCode, ProcessingOptions& options,
@@ -343,7 +347,7 @@ void ShaderProcessor::_ProcessIncludes(const std::string& sourceCode, Processing
           auto sourceIncludeContent = String::slice(includeContent, 0);
           includeContent            = "";
 
-          if (std::isnan(maxIndex)) {
+          if (isNan(maxIndex)) {
             maxIndex = options.indexParameters[indexSplits[1]];
           }
 
