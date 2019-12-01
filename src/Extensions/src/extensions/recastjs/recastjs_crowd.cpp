@@ -17,9 +17,9 @@ RecastJSCrowd::RecastJSCrowd(RecastJSPlugin* plugin, size_t maxAgents, float max
     : ICrowd{}
 {
   bjsRECASTPlugin = plugin;
-  recastCrowd
-    = std::make_unique<Crowd>(maxAgents, maxAgentRadius, bjsRECASTPlugin->navMesh->getNavMesh());
-  _scene = scene;
+  recastCrowd     = std::make_unique<Crowd>(static_cast<int>(maxAgents), maxAgentRadius,
+                                        bjsRECASTPlugin->navMesh->getNavMesh());
+  _scene          = scene;
 
   _onBeforeAnimationsObserver
     = scene->onBeforeAnimationsObservable.add([this](Scene* scene, EventState & /*es*/) -> void {
