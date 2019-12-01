@@ -73,7 +73,7 @@ void RecastJSPlugin::createMavMesh(const std::vector<MeshPtr>& meshes,
         stl_util::concat(positions, {transformed.x, transformed.y, transformed.z});
       }
 
-      offset += meshPositions.size() / 3;
+      offset += static_cast<int>(meshPositions.size()) / 3;
     }
   }
 

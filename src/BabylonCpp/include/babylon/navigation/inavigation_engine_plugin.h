@@ -2,6 +2,7 @@
 #define BABYLON_NAVIGATION_INAVIGATION_ENGINE_PLUGIN_H
 
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace BABYLON {
@@ -22,8 +23,8 @@ struct INavigationEnginePlugin {
   /**
    * @brief Constructor
    */
-  INavigationEnginePlugin() = default;
-  virtual ~INavigationEnginePlugin()= default;
+  INavigationEnginePlugin()          = default;
+  virtual ~INavigationEnginePlugin() = default;
 
   /**
    * plugin name
