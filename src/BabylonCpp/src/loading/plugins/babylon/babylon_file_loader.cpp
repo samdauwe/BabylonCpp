@@ -42,13 +42,10 @@ BabylonFileLoader::BabylonFileLoader()
 
 BabylonFileLoader::~BabylonFileLoader() = default;
 
-MaterialPtr
-BabylonFileLoader::parseMaterialById(const std::string& id,
-                                     const json& parsedData, Scene* scene,
-                                     const std::string& rootUrl) const
+MaterialPtr BabylonFileLoader::parseMaterialById(const std::string& id, const json& parsedData,
+                                                 Scene* scene, const std::string& rootUrl) const
 {
-  for (const auto& parsedMaterial :
-       json_util::get_array<json>(parsedData, "materials")) {
+  for (const auto& parsedMaterial : json_util::get_array<json>(parsedData, "materials")) {
     if (json_util::get_string(parsedMaterial, "id") == id) {
       return Material::Parse(parsedMaterial, scene, rootUrl);
     }
@@ -56,9 +53,8 @@ BabylonFileLoader::parseMaterialById(const std::string& id,
   return nullptr;
 }
 
-bool BabylonFileLoader::isDescendantOf(
-  const json& mesh, const std::vector<std::string>& names,
-  std::vector<std::string>& hierarchyIds) const
+bool BabylonFileLoader::isDescendantOf(const json& mesh, const std::vector<std::string>& names,
+                                       std::vector<std::string>& hierarchyIds) const
 {
   for (const auto& iName : names) {
     if (json_util::get_string(mesh, "name") == iName) {
@@ -67,8 +63,7 @@ bool BabylonFileLoader::isDescendantOf(
     }
   }
   if (json_util::has_key(mesh, "parentId")
-      && stl_util::contains(hierarchyIds,
-                            json_util::get_string(mesh, "parentId"))) {
+      && stl_util::contains(hierarchyIds, json_util::get_string(mesh, "parentId"))) {
     hierarchyIds.emplace_back(json_util::get_string(mesh, "id"));
     return true;
   }
@@ -84,13 +79,12 @@ std::string BabylonFileLoader::logOperation(const std::string& operation,
                                             const json& producer) const
 {
   return operation + " of " + json_util::get_string(producer, "file") + " from "
-         + json_util::get_string(producer, "name") + " version: "
-         + json_util::get_string(producer, "version") + ", exporter version: "
-         + json_util::get_string(producer, "exporter_version");
+         + json_util::get_string(producer, "name")
+         + " version: " + json_util::get_string(producer, "version")
+         + ", exporter version: " + json_util::get_string(producer, "exporter_version");
 }
 
-void BabylonFileLoader::loadDetailLevels(Scene* scene,
-                                         const AbstractMeshPtr& mesh) const
+void BabylonFileLoader::loadDetailLevels(Scene* scene, const AbstractMeshPtr& mesh) const
 {
   auto mastermesh = std::static_pointer_cast<Mesh>(mesh);
 
@@ -105,13 +99,11 @@ void BabylonFileLoader::loadDetailLevels(Scene* scene,
       if (!mesh->_waitingData.lods->distances.empty()) {
         const auto& distances = mesh->_waitingData.lods->distances;
         if (distances.size() >= lodmeshes.size()) {
-          const auto culling
-            = (distances.size() > lodmeshes.size()) ? distances.back() : 0.f;
+          const auto culling = (distances.size() > lodmeshes.size()) ? distances.back() : 0.f;
           mastermesh->setEnabled(false);
           for (size_t index = 0; index < lodmeshes.size(); index++) {
             const auto& lodid = lodmeshes[index];
-            auto lodmesh
-              = std::static_pointer_cast<Mesh>(scene->getMeshByID(lodid));
+            auto lodmesh      = std::static_pointer_cast<Mesh>(scene->getMeshByID(lodid));
             if (lodmesh != nullptr) {
               mastermesh->addLODLevel(distances[index], lodmesh);
             }
@@ -124,8 +116,7 @@ void BabylonFileLoader::loadDetailLevels(Scene* scene,
           }
         }
         else {
-          BABYLON_LOGF_WARN("BabylonFileLoader",
-                            "Invalid level of detail distances for %s",
+          BABYLON_LOGF_WARN("BabylonFileLoader", "Invalid level of detail distances for %s",
                             mesh->name.c_str())
         }
       }
@@ -135,13 +126,11 @@ void BabylonFileLoader::loadDetailLevels(Scene* scene,
 }
 
 bool BabylonFileLoader::importMesh(
-  const std::vector<std::string>& meshesNames, Scene* scene,
-  const std::string& data, const std::string& rootUrl,
-  std::vector<AbstractMeshPtr>& meshes,
-  std::vector<IParticleSystemPtr>& /*particleSystems*/,
-  std::vector<SkeletonPtr>& skeletons,
-  const std::function<void(const std::string& message,
-                           const std::string& exception)>& onError) const
+  const std::vector<std::string>& meshesNames, Scene* scene, const std::string& data,
+  const std::string& rootUrl, std::vector<AbstractMeshPtr>& meshes,
+  std::vector<IParticleSystemPtr>& /*particleSystems*/, std::vector<SkeletonPtr>& skeletons,
+  const std::function<void(const std::string& message, const std::string& exception)>& onError)
+  const
 {
   // Entire method running in try block, so ALWAYS logs as far as it got, only
   // actually writes details when SceneLoader.debugLogging = true (default), or
@@ -157,34 +146,29 @@ bool BabylonFileLoader::importMesh(
     log.str(" ");
     log.clear();
 
-    auto fullDetails
-      = SceneLoader::LoggingLevel() == SceneLoader::DETAILED_LOGGING;
+    auto fullDetails = SceneLoader::LoggingLevel() == SceneLoader::DETAILED_LOGGING;
 
     std::vector<size_t> loadedSkeletonsIds;
     std::vector<std::string> loadedMaterialsIds;
     std::vector<std::string> hierarchyIds;
 
-    for (const auto& parsedMesh :
-         json_util::get_array<json>(parsedData, "meshes")) {
-      if (meshesNames.empty()
-          || isDescendantOf(parsedMesh, meshesNames, hierarchyIds)) {
+    for (const auto& parsedMesh : json_util::get_array<json>(parsedData, "meshes")) {
+      if (meshesNames.empty() || isDescendantOf(parsedMesh, meshesNames, hierarchyIds)) {
 
         // Id
-        const std::string parsedMeshId
-          = json_util::get_string(parsedMesh, "id");
+        const std::string parsedMeshId = json_util::get_string(parsedMesh, "id");
 
         // Geometry ?
         if (json_util::has_valid_key_value(parsedMesh, "geometryId")) {
-          const auto parsedMeshGeometryId
-            = json_util::get_string(parsedMesh, "geometryId");
+          const auto parsedMeshGeometryId = json_util::get_string(parsedMesh, "geometryId");
           // Does the file contain geometries?
           if (json_util::has_valid_key_value(parsedMesh, "geometries")) {
             auto geometries = parsedData["geometries"];
             // find the correct geometry and add it to the scene
             bool found = false;
-            const std::array<std::string, 8> geometryTypes{
-              {"boxes", "spheres", "cylinders", "toruses", "grounds", "planes",
-               "torusKnots", "vertexData"}};
+            const std::array<std::string, 8> geometryTypes{{"boxes", "spheres", "cylinders",
+                                                            "toruses", "grounds", "planes",
+                                                            "torusKnots", "vertexData"}};
             for (const auto& geometryType : geometryTypes) {
               if (found || !json_util::has_key(geometries, geometryType)
                   || !(geometries[geometryType].is_array())) {
@@ -206,8 +190,7 @@ bool BabylonFileLoader::importMesh(
               }
             }
             if (!found) {
-              BABYLON_LOGF_WARN("BabylonFileLoader",
-                                "Geometry not found for mesh %s",
+              BABYLON_LOGF_WARN("BabylonFileLoader", "Geometry not found for mesh %s",
                                 parsedMeshId.c_str())
             }
           }
@@ -215,35 +198,30 @@ bool BabylonFileLoader::importMesh(
 
         // Material ?
         if (json_util::has_key(parsedMesh, "materialId")) {
-          const auto parsedMeshMaterialId
-            = json_util::get_string(parsedMesh, "materialId");
-          auto materialFound
-            = stl_util::contains(loadedMaterialsIds, parsedMeshMaterialId);
+          const auto parsedMeshMaterialId = json_util::get_string(parsedMesh, "materialId");
+          auto materialFound = stl_util::contains(loadedMaterialsIds, parsedMeshMaterialId);
           if (!parsedMeshMaterialId.empty() && !materialFound
               && json_util::has_key(parsedData, "multiMaterials")
               && parsedData["multiMaterials"].is_array()) {
             for (const auto& parsedMultiMaterial :
                  json_util::get_array<json>(parsedData, "multiMaterials")) {
-              const auto parsedMultiMaterialId
-                = json_util::get_string(parsedMultiMaterial, "id");
+              const auto parsedMultiMaterialId = json_util::get_string(parsedMultiMaterial, "id");
               if ((!parsedMultiMaterialId.empty())
                   && (parsedMultiMaterialId == parsedMeshMaterialId)) {
                 if (json_util::has_key(parsedMultiMaterial, "materials")
                     && parsedMultiMaterial["materials"].is_array()) {
-                  for (const auto& subMatId : json_util::get_array<json>(
-                         parsedMultiMaterial, "materials")) {
-                    loadedMaterialsIds.emplace_back(
-                      subMatId.get<std::string>());
-                    auto mat = parseMaterialById(subMatId.get<std::string>(),
-                                                 parsedData, scene, rootUrl);
+                  for (const auto& subMatId :
+                       json_util::get_array<json>(parsedMultiMaterial, "materials")) {
+                    loadedMaterialsIds.emplace_back(subMatId.get<std::string>());
+                    auto mat
+                      = parseMaterialById(subMatId.get<std::string>(), parsedData, scene, rootUrl);
                     if (mat) {
                       log << "\n\tMaterial " << mat->toString(fullDetails);
                     }
                   }
                 }
                 loadedMaterialsIds.emplace_back(parsedMultiMaterialId);
-                auto mmat = MultiMaterial::ParseMultiMaterial(
-                  parsedMultiMaterial, scene);
+                auto mmat = MultiMaterial::ParseMultiMaterial(parsedMultiMaterial, scene);
                 if (mmat) {
                   materialFound = true;
                   log << "\n\tMulti-Material " << mmat->toString(fullDetails);
@@ -255,11 +233,9 @@ bool BabylonFileLoader::importMesh(
 
           if (!materialFound && !parsedMeshMaterialId.empty()) {
             loadedMaterialsIds.emplace_back(parsedMeshMaterialId);
-            auto mat = parseMaterialById(parsedMeshMaterialId, parsedData,
-                                         scene, rootUrl);
+            auto mat = parseMaterialById(parsedMeshMaterialId, parsedData, scene, rootUrl);
             if (!mat) {
-              BABYLON_LOGF_WARN("BabylonFileLoader",
-                                "Material not found for mesh %s",
+              BABYLON_LOGF_WARN("BabylonFileLoader", "Material not found for mesh %s",
                                 parsedMeshId.c_str())
             }
             else {
@@ -272,20 +248,15 @@ bool BabylonFileLoader::importMesh(
         if (json_util::has_key(parsedMesh, "skeletonId")) {
           const auto parsedMeshSkeletonId
             = json_util::get_number<int>(parsedMesh, "skeletonId", -1);
-          if ((parsedMeshSkeletonId > -1)
-              && json_util::has_key(parsedData, "skeletons")
+          if ((parsedMeshSkeletonId > -1) && json_util::has_key(parsedData, "skeletons")
               && parsedData["skeletons"].is_array()
-              && !stl_util::contains(loadedSkeletonsIds,
-                                     parsedMeshSkeletonId)) {
-            for (const auto& parsedSkeleton :
-                 json_util::get_array<json>(parsedData, "skeletons")) {
-              const auto parsedSkeletonId
-                = json_util::get_number<int>(parsedSkeleton, "id", -1);
+              && !stl_util::contains(loadedSkeletonsIds, parsedMeshSkeletonId)) {
+            for (const auto& parsedSkeleton : json_util::get_array<json>(parsedData, "skeletons")) {
+              const auto parsedSkeletonId = json_util::get_number<int>(parsedSkeleton, "id", -1);
               if (parsedSkeletonId == parsedMeshSkeletonId) {
                 auto skeleton = Skeleton::Parse(parsedSkeleton, scene);
                 skeletons.emplace_back(skeleton);
-                loadedSkeletonsIds.emplace_back(
-                  static_cast<size_t>(parsedSkeletonId));
+                loadedSkeletonsIds.emplace_back(static_cast<size_t>(parsedSkeletonId));
                 log << "\n\tSkeleton " << skeleton->toString(fullDetails);
               }
             }
@@ -353,8 +324,8 @@ bool BabylonFileLoader::importMesh(
     // Particles
     if (json_util::has_key(parsedData, "particleSystems")
         && parsedData["particleSystems"].is_array()) {
-      auto parser = AbstractScene::GetIndividualParser(
-        SceneComponentConstants::NAME_PARTICLESYSTEM);
+      auto parser
+        = AbstractScene::GetIndividualParser(SceneComponentConstants::NAME_PARTICLESYSTEM);
       if (parser.has_value()) {
 
         for (const auto& parsedParticleSystem :
@@ -362,8 +333,7 @@ bool BabylonFileLoader::importMesh(
           const auto parsedParticleSystemEmitterId
             = json_util::get_string(parsedParticleSystem, "emitterId");
           if (!parsedParticleSystemEmitterId.empty()
-              && stl_util::contains(hierarchyIds,
-                                    parsedParticleSystemEmitterId)) {
+              && stl_util::contains(hierarchyIds, parsedParticleSystemEmitterId)) {
             // TODO FIXME
             // particleSystems.emplace_back(
             //  parser.value()(parsedParticleSystem, scene, rootUrl));
@@ -378,8 +348,7 @@ bool BabylonFileLoader::importMesh(
   }
   catch (const std::exception& err) {
     auto msg = json_util::has_key(parsedData, "producer") ?
-                 logOperation("importMesh",
-                              json_util::get_string(parsedData, "producer")) :
+                 logOperation("importMesh", json_util::get_string(parsedData, "producer")) :
                  logOperation("importMesh", "Unknown");
     msg += log.str();
     if (onError) {
@@ -397,10 +366,9 @@ bool BabylonFileLoader::importMesh(
   return false;
 }
 
-bool BabylonFileLoader::load(
-  Scene* scene, const std::string& data, const std::string& rootUrl,
-  const std::function<void(const std::string& message,
-                           const std::string& exception)>& onError) const
+bool BabylonFileLoader::load(Scene* scene, const std::string& data, const std::string& rootUrl,
+                             const std::function<void(const std::string& message,
+                                                      const std::string& exception)>& onError) const
 {
   // Entire method running in try block, so ALWAYS logs as far as it got, only
   // actually writes details when SceneLoader.debugLogging = true (default), or
@@ -417,34 +385,29 @@ bool BabylonFileLoader::load(
     log.clear();
 
     // Scene
-    if (json_util::has_valid_key_value(parsedData,
-                                       "useDelayedTextureLoading")) {
-      scene->useDelayedTextureLoading
-        = json_util::get_bool(parsedData, "useDelayedTextureLoading")
-          && !SceneLoader::ForceFullSceneLoadingForIncremental();
+    if (json_util::has_valid_key_value(parsedData, "useDelayedTextureLoading")) {
+      scene->useDelayedTextureLoading = json_util::get_bool(parsedData, "useDelayedTextureLoading")
+                                        && !SceneLoader::ForceFullSceneLoadingForIncremental();
     }
     if (json_util::has_valid_key_value(parsedData, "autoClear")) {
       scene->autoClear = json_util::get_bool(parsedData, "autoClear", true);
     }
     if (json_util::has_valid_key_value(parsedData, "clearColor")) {
-      scene->clearColor = Color4::FromArray(
-        json_util::get_array<float>(parsedData, "clearColor"));
+      scene->clearColor = Color4::FromArray(json_util::get_array<float>(parsedData, "clearColor"));
     }
     if (json_util::has_valid_key_value(parsedData, "ambientColor")) {
-      scene->ambientColor = Color3::FromArray(
-        json_util::get_array<float>(parsedData, "ambientColor"));
+      scene->ambientColor
+        = Color3::FromArray(json_util::get_array<float>(parsedData, "ambientColor"));
     }
     if (json_util::has_valid_key_value(parsedData, "gravity")) {
-      scene->gravity = Vector3::FromArray(
-        json_util::get_array<float>(parsedData, "gravity"));
+      scene->gravity = Vector3::FromArray(json_util::get_array<float>(parsedData, "gravity"));
     }
 
     // Fog
     if (json_util::has_key(parsedData, "fogMode")
         && (json_util::get_number<unsigned>(parsedData, "fogMode") != 0u)) {
-      scene->fogMode  = json_util::get_number<unsigned>(parsedData, "fogMode");
-      scene->fogColor = Color3::FromArray(
-        json_util::get_array<float>(parsedData, "fogColor"));
+      scene->fogMode    = json_util::get_number<unsigned>(parsedData, "fogMode");
+      scene->fogColor   = Color3::FromArray(json_util::get_array<float>(parsedData, "fogColor"));
       scene->fogStart   = json_util::get_number(parsedData, "fogStart", 0.f);
       scene->fogEnd     = json_util::get_number(parsedData, "fogEnd", 1000.f);
       scene->fogDensity = json_util::get_number(parsedData, "fogDensity", 0.1f);
@@ -475,8 +438,7 @@ bool BabylonFileLoader::load(
 
     // Collisions, if defined. otherwise, default is true
     if (json_util::has_valid_key_value(parsedData, "collisionsEnabled")) {
-      scene->collisionsEnabled
-        = json_util::get_bool(parsedData, "collisionsEnabled", true);
+      scene->collisionsEnabled = json_util::get_bool(parsedData, "collisionsEnabled", true);
     }
 
     auto container = loadAssetContainer(scene, data, rootUrl, onError, true);
@@ -495,63 +457,55 @@ bool BabylonFileLoader::load(
     }
 
     if (json_util::has_valid_key_value(parsedData, "activeCameraID")) {
-      scene->setActiveCameraByID(
-        json_util::get_string(parsedData, "activeCameraID"));
+      scene->setActiveCameraByID(json_util::get_string(parsedData, "activeCameraID"));
     }
 
     // Environment texture
     if (json_util::has_valid_key_value(parsedData, "environmentTexture")) {
-      const auto environmentTextureStr
-        = json_util::get_string(parsedData, "environmentTexture");
+      const auto environmentTextureStr = json_util::get_string(parsedData, "environmentTexture");
       // PBR needed for both HDR texture (gamma space) & a sky box
       auto isPBR = json_util::get_bool(parsedData, "isPBR", true);
       if (json_util::has_valid_key_value(parsedData, "environmentTextureType")
           && json_util::get_string(parsedData, "environmentTextureType")
                == "BABYLON.HDRCubeTexture") {
-        size_t hdrSize = (json_util::has_valid_key_value(
-                           parsedData, "environmentTextureSize")) ?
-                           json_util::get_number<size_t>(
-                             parsedData, "environmentTextureSize") :
+        size_t hdrSize = (json_util::has_valid_key_value(parsedData, "environmentTextureSize")) ?
+                           json_util::get_number<size_t>(parsedData, "environmentTextureSize") :
                            128;
-        auto hdrTexture = HDRCubeTexture::New(rootUrl + environmentTextureStr,
-                                              scene, hdrSize, true, !isPBR);
+        auto hdrTexture
+          = HDRCubeTexture::New(rootUrl + environmentTextureStr, scene, hdrSize, true, !isPBR);
         if (json_util::has_key(parsedData, "environmentTextureRotationY")) {
-          hdrTexture->rotationY = json_util::get_number<float>(
-            parsedData, "environmentTextureRotationY");
+          hdrTexture->rotationY
+            = json_util::get_number<float>(parsedData, "environmentTextureRotationY");
         }
         scene->environmentTexture = hdrTexture;
       }
       else {
         if (String::endsWith(environmentTextureStr, ".env")) {
-          auto compressedTexture
-            = CubeTexture::New(rootUrl + environmentTextureStr, scene);
-          if (json_util::has_valid_key_value(parsedData,
-                                             "environmentTextureRotationY")) {
-            compressedTexture->rotationY = json_util::get_number<float>(
-              parsedData, "environmentTextureRotationY");
+          auto compressedTexture = CubeTexture::New(rootUrl + environmentTextureStr, scene);
+          if (json_util::has_valid_key_value(parsedData, "environmentTextureRotationY")) {
+            compressedTexture->rotationY
+              = json_util::get_number<float>(parsedData, "environmentTextureRotationY");
           }
           scene->environmentTexture = compressedTexture;
         }
         else {
-          auto cubeTexture = CubeTexture::CreateFromPrefilteredData(
-            rootUrl + environmentTextureStr, scene);
+          auto cubeTexture
+            = CubeTexture::CreateFromPrefilteredData(rootUrl + environmentTextureStr, scene);
           if (json_util::has_key(parsedData, "environmentTextureRotationY")) {
-            cubeTexture->rotationY = json_util::get_number<float>(
-              parsedData, "environmentTextureRotationY");
+            cubeTexture->rotationY
+              = json_util::get_number<float>(parsedData, "environmentTextureRotationY");
           }
           scene->environmentTexture = cubeTexture;
         }
       }
       if (json_util::has_key(parsedData, "createDefaultSkybox")
           && json_util::get_bool(parsedData, "createDefaultSkybox")) {
-        auto skyboxScale
-          = (scene->activeCamera() != nullptr) ?
-              (scene->activeCamera()->maxZ - scene->activeCamera()->minZ)
-                / 2.f :
-              1000.f;
+        auto skyboxScale = (scene->activeCamera() != nullptr) ?
+                             (scene->activeCamera()->maxZ - scene->activeCamera()->minZ) / 2.f :
+                             1000.f;
         auto skyboxBlurLevel = json_util::get_number<float>(parsedData, "skyboxBlurLevel", 0.f);
-        scene->createDefaultSkybox(scene->environmentTexture(), isPBR,
-                                   skyboxScale, skyboxBlurLevel);
+        scene->createDefaultSkybox(scene->environmentTexture(), isPBR, skyboxScale,
+                                   skyboxBlurLevel);
       }
     }
 
@@ -562,8 +516,7 @@ bool BabylonFileLoader::load(
   }
   catch (const std::exception& err) {
     auto msg = json_util::has_key(parsedData, "producer") ?
-                 logOperation("importScene",
-                              json_util::get_string(parsedData, "producer")) :
+                 logOperation("importScene", json_util::get_string(parsedData, "producer")) :
                  logOperation("importScene", "Unknown");
     msg += log.str();
     if (onError) {
@@ -583,8 +536,7 @@ bool BabylonFileLoader::load(
 
 AssetContainerPtr BabylonFileLoader::loadAssetContainer(
   Scene* scene, const std::string& data, const std::string& rootUrl,
-  const std::function<void(const std::string& message,
-                           const std::string& exception)>& onError,
+  const std::function<void(const std::string& message, const std::string& exception)>& onError,
   bool addToScene) const
 {
   auto container = AssetContainer::New(scene);
@@ -603,29 +555,26 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
     log.str(" ");
     log.clear();
 
-    auto fullDetails
-      = SceneLoader::LoggingLevel() == SceneLoader::DETAILED_LOGGING;
+    auto fullDetails = SceneLoader::LoggingLevel() == SceneLoader::DETAILED_LOGGING;
 
     // Environment texture
     if (json_util::has_valid_key_value(parsedData, "environmentTexture")) {
-      const auto environmentTextureStr
-        = json_util::get_string(parsedData, "environmentTexture");
+      const auto environmentTextureStr = json_util::get_string(parsedData, "environmentTexture");
       // PBR needed for both HDR texture (gamma space) & a sky box
       auto isPBR = json_util::get_bool(parsedData, "isPBR", true);
       if (json_util::has_valid_key_value(parsedData, "environmentTextureType")
           && json_util::get_string(parsedData, "environmentTextureType")
                == "BABYLON.HDRCubeTexture") {
-        const auto hdrSize = json_util::get_number<size_t>(
-          parsedData, "environmentTextureSize", 128);
+        const auto hdrSize
+          = json_util::get_number<size_t>(parsedData, "environmentTextureSize", 128);
         const std::regex re("https?://", std::regex::optimize);
         const auto regexMatch = String::regexMatch(environmentTextureStr, re);
-        auto hdrTexture       = HDRCubeTexture::New(
-          (!regexMatch.empty() ? "" : rootUrl) + environmentTextureStr, scene,
-          hdrSize, true, !isPBR);
-        if (json_util::has_valid_key_value(parsedData,
-                                           "environmentTextureRotationY")) {
-          hdrTexture->rotationY = json_util::get_number<float>(
-            parsedData, "environmentTextureRotationY");
+        auto hdrTexture
+          = HDRCubeTexture::New((!regexMatch.empty() ? "" : rootUrl) + environmentTextureStr, scene,
+                                hdrSize, true, !isPBR);
+        if (json_util::has_valid_key_value(parsedData, "environmentTextureRotationY")) {
+          hdrTexture->rotationY
+            = json_util::get_number<float>(parsedData, "environmentTextureRotationY");
         }
         scene->environmentTexture = hdrTexture;
       }
@@ -633,13 +582,11 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
         if (String::endsWith(environmentTextureStr, ".env")) {
           const std::regex re("https?://", std::regex::optimize);
           const auto regexMatch = String::regexMatch(environmentTextureStr, re);
-          auto compressedTexture = CubeTexture::New(
-            (!regexMatch.empty() ? "" : rootUrl) + environmentTextureStr,
-            scene);
-          if (json_util::has_valid_key_value(parsedData,
-                                             "environmentTextureRotationY")) {
-            compressedTexture->rotationY = json_util::get_number<float>(
-              parsedData, "environmentTextureRotationY");
+          auto compressedTexture
+            = CubeTexture::New((!regexMatch.empty() ? "" : rootUrl) + environmentTextureStr, scene);
+          if (json_util::has_valid_key_value(parsedData, "environmentTextureRotationY")) {
+            compressedTexture->rotationY
+              = json_util::get_number<float>(parsedData, "environmentTextureRotationY");
           }
           scene->environmentTexture = compressedTexture;
         }
@@ -647,12 +594,10 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
           const std::regex re("https?://", std::regex::optimize);
           const auto regexMatch = String::regexMatch(environmentTextureStr, re);
           auto cubeTexture      = CubeTexture::CreateFromPrefilteredData(
-            (!regexMatch.empty() ? "" : rootUrl) + environmentTextureStr,
-            scene);
-          if (json_util::has_valid_key_value(parsedData,
-                                             "environmentTextureRotationY")) {
-            cubeTexture->rotationY = json_util::get_number<float>(
-              parsedData, "environmentTextureRotationY");
+            (!regexMatch.empty() ? "" : rootUrl) + environmentTextureStr, scene);
+          if (json_util::has_valid_key_value(parsedData, "environmentTextureRotationY")) {
+            cubeTexture->rotationY
+              = json_util::get_number<float>(parsedData, "environmentTextureRotationY");
           }
           scene->environmentTexture = cubeTexture;
         }
@@ -660,21 +605,24 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
       if (json_util::get_bool(parsedData, "createDefaultSkybox")) {
         const auto skyboxScale
           = (scene->activeCamera() != nullptr) ?
-              (scene->activeCamera()->maxZ - scene->activeCamera()->minZ)
-                / 2.f :
+              (scene->activeCamera()->maxZ - scene->activeCamera()->minZ) / 2.f :
               1000.f;
         const auto skyboxBlurLevel
           = json_util::get_number<float>(parsedData, "skyboxBlurLevel", 0.f);
-        scene->createDefaultSkybox(scene->environmentTexture, isPBR,
-                                   skyboxScale, skyboxBlurLevel);
+        scene->createDefaultSkybox(scene->environmentTexture, isPBR, skyboxScale, skyboxBlurLevel);
       }
       container->environmentTexture = scene->environmentTexture();
     }
 
+    // Environment Intensity
+    if (json_util::has_valid_key_value(parsedData, "environmentIntensity")) {
+      scene->environmentIntensity
+        = json_util::get_number<float>(parsedData, "environmentIntensity", 0.f);
+    }
+
     // Lights
     unsigned int index = 0;
-    for (const auto& parsedLight :
-         json_util::get_array<json>(parsedData, "lights")) {
+    for (const auto& parsedLight : json_util::get_array<json>(parsedData, "lights")) {
       auto light = Light::Parse(parsedLight, scene);
       if (light) {
         container->lights.emplace_back(light);
@@ -688,8 +636,7 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
     index = 0;
     for (const auto& parsedReflectionProbe :
          json_util::get_array<json>(parsedData, "reflectionProbes")) {
-      auto reflectionProbe
-        = ReflectionProbe::Parse(parsedReflectionProbe, scene, rootUrl);
+      auto reflectionProbe = ReflectionProbe::Parse(parsedReflectionProbe, scene, rootUrl);
       if (reflectionProbe) {
         container->reflectionProbes.emplace_back(reflectionProbe);
         log << (index == 0 ? "\n\tReflection Probes:" : "");
@@ -699,8 +646,7 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
 
     // Animations
     index = 0;
-    for (const auto& parsedAnimation :
-         json_util::get_array<json>(parsedData, "animations")) {
+    for (const auto& parsedAnimation : json_util::get_array<json>(parsedData, "animations")) {
       auto animation = Animation::Parse(parsedAnimation);
       scene->animations.emplace_back(animation);
       container->animations.emplace_back(animation);
@@ -711,8 +657,7 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
 
     // Materials
     index = 0;
-    for (const auto& parsedMaterial :
-         json_util::get_array<json>(parsedData, "materials")) {
+    for (const auto& parsedMaterial : json_util::get_array<json>(parsedData, "materials")) {
       auto mat = Material::Parse(parsedMaterial, scene, rootUrl);
       if (mat) {
         container->materials.emplace_back(mat);
@@ -750,16 +695,13 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
     }
 
     // Morph targets
-    for (const auto& managerData :
-         json_util::get_array<json>(parsedData, "morphTargetManagers")) {
-      container->morphTargetManagers.emplace_back(
-        MorphTargetManager::Parse(managerData, scene));
+    for (const auto& managerData : json_util::get_array<json>(parsedData, "morphTargetManagers")) {
+      container->morphTargetManagers.emplace_back(MorphTargetManager::Parse(managerData, scene));
     }
 
     // Skeletons
     index = 0;
-    for (const auto& parsedSkeleton :
-         json_util::get_array<json>(parsedData, "skeletons")) {
+    for (const auto& parsedSkeleton : json_util::get_array<json>(parsedData, "skeletons")) {
       auto skeleton = Skeleton::Parse(parsedSkeleton, scene);
       container->skeletons.emplace_back(skeleton);
       log << (index == 0 ? "\n\tSkeletons:" : "");
@@ -773,10 +715,8 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
       std::vector<GeometryPtr> addedGeometry;
 
       // VertexData
-      for (const auto& parsedVertexData :
-           json_util::get_array<json>(geometries, "vertexData")) {
-        addedGeometry.emplace_back(
-          Geometry::Parse(parsedVertexData, scene, rootUrl));
+      for (const auto& parsedVertexData : json_util::get_array<json>(geometries, "vertexData")) {
+        addedGeometry.emplace_back(Geometry::Parse(parsedVertexData, scene, rootUrl));
       }
 
       for (const auto& g : addedGeometry) {
@@ -795,8 +735,7 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
 
     // Meshes
     index = 0;
-    for (const auto& parsedMesh :
-         json_util::get_array<json>(parsedData, "meshes")) {
+    for (const auto& parsedMesh : json_util::get_array<json>(parsedData, "meshes")) {
       auto mesh = Mesh::Parse(parsedMesh, scene, rootUrl);
       container->meshes.emplace_back(mesh);
       log << (index == 0 ? "\n\tMeshes:" : "");
@@ -806,8 +745,7 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
 
     // Cameras
     index = 0;
-    for (const auto& parsedCamera :
-         json_util::get_array<json>(parsedData, "cameras")) {
+    for (const auto& parsedCamera : json_util::get_array<json>(parsedData, "cameras")) {
       auto camera = Camera::Parse(parsedCamera, scene);
       container->cameras.emplace_back(camera);
       log << (index == 0 ? "\n\tCameras:" : "");
@@ -829,8 +767,7 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
     // Browsing all the graph to connect the dots
     for (const auto& camera : scene->cameras) {
       if (!camera->_waitingParentId.empty()) {
-        camera->parent
-          = scene->getLastEntryByID(camera->_waitingParentId).get();
+        camera->parent = scene->getLastEntryByID(camera->_waitingParentId).get();
         camera->_waitingParentId.clear();
       }
     }
@@ -930,10 +867,8 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
         mesh->_waitingData.actions.clear();
       }
     }
-    if (json_util::has_key(parsedData, "actions")
-        && (parsedData["actions"].is_array())) {
-      ActionManager::Parse(json_util::get_array<json>(parsedData, "actions"),
-                           nullptr, scene);
+    if (json_util::has_key(parsedData, "actions") && (parsedData["actions"].is_array())) {
+      ActionManager::Parse(json_util::get_array<json>(parsedData, "actions"), nullptr, scene);
     }
 
     if (!addToScene) {
@@ -942,8 +877,7 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
   }
   catch (const std::exception& err) {
     auto msg = json_util::has_key(parsedData, "producer") ?
-                 logOperation("loadAssets",
-                              json_util::get_string(parsedData, "producer")) :
+                 logOperation("loadAssets", json_util::get_string(parsedData, "producer")) :
                  logOperation("loadAssets", "Unknown");
     msg += log.str();
     if (onError) {
@@ -961,18 +895,16 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
   return container;
 }
 
-void BabylonFileLoader::finally(const std::string& producer,
-                                const std::ostringstream& log,
+void BabylonFileLoader::finally(const std::string& producer, const std::ostringstream& log,
                                 const json& parsedData) const
 {
   const auto _log = log.str();
   if (!_log.empty() && SceneLoader::LoggingLevel() != SceneLoader::NO_LOGGING) {
     const auto msg
-      = json_util::has_key(parsedData, "producer") ? logOperation(
-          producer, json_util::get_string(parsedData, "producer", "Unknown")) :
-                                                     logOperation(producer);
-    const auto logStr
-      = SceneLoader::LoggingLevel() != SceneLoader::MINIMAL_LOGGING ? _log : "";
+      = json_util::has_key(parsedData, "producer") ?
+          logOperation(producer, json_util::get_string(parsedData, "producer", "Unknown")) :
+          logOperation(producer);
+    const auto logStr = SceneLoader::LoggingLevel() != SceneLoader::MINIMAL_LOGGING ? _log : "";
     BABYLON_LOGF_INFO("BabylonFileLoader", "%s%s", msg.c_str(), logStr.c_str())
   }
 }
