@@ -12,6 +12,8 @@ unsigned int CustomMaterial::ShaderIndexer = 1;
 CustomMaterial::CustomMaterial(const std::string& iName, Scene* scene)
     : StandardMaterial{iName, scene}
 {
+  FragmentShader = Effect::ShadersStore()["defaultPixelShader"];
+  VertexShader   = Effect::ShadersStore()["defaultVertexShader"];
 }
 
 CustomMaterial::~CustomMaterial() = default;
@@ -40,16 +42,14 @@ void CustomMaterial::AttachAfterBind(Mesh* /*mesh*/, Effect* effect)
   for (const auto& el : _newSamplerInstances) {
     const auto ea                   = String::split(el.first, '-');
     const auto& _newSamplerInstance = el.second;
-    if (ea[0] == "sampler2D" && _newSamplerInstance->isReady()
-        && _newSamplerInstance->isReady()) {
+    if (ea[0] == "sampler2D" && _newSamplerInstance->isReady() && _newSamplerInstance->isReady()) {
       effect->setTexture(ea[1], _newSamplerInstance);
     }
   }
 }
 
-std::vector<std::string>
-CustomMaterial::ReviewUniform(const std::string& iName,
-                              std::vector<std::string> arr)
+std::vector<std::string> CustomMaterial::ReviewUniform(const std::string& iName,
+                                                       std::vector<std::string> arr)
 {
   if (iName == "uniform") {
     for (const auto& ind : _newUniforms) {
@@ -68,12 +68,11 @@ CustomMaterial::ReviewUniform(const std::string& iName,
   return arr;
 }
 
-std::string
-CustomMaterial::Builder(const std::string& /*shaderName*/,
-                        const std::vector<std::string>& uniforms,
-                        const std::vector<std::string>& /*uniformBuffers*/,
-                        const std::vector<std::string>& samplers,
-                        StandardMaterialDefines& /*defines*/)
+std::string CustomMaterial::Builder(const std::string& /*shaderName*/,
+                                    const std::vector<std::string>& uniforms,
+                                    const std::vector<std::string>& /*uniformBuffers*/,
+                                    const std::vector<std::string>& samplers,
+                                    StandardMaterialDefines& /*defines*/)
 {
   if (_isCreatedShader) {
     return _createdShaderName;
@@ -81,25 +80,21 @@ CustomMaterial::Builder(const std::string& /*shaderName*/,
   _isCreatedShader = false;
 
   ++CustomMaterial::ShaderIndexer;
-  std::string customName
-    = "custom_" + std::to_string(CustomMaterial::ShaderIndexer);
+  std::string customName = "custom_" + std::to_string(CustomMaterial::ShaderIndexer);
 
   ReviewUniform("uniform", uniforms);
   ReviewUniform("sampler", samplers);
 
-  auto _VertexShader = String::replace(
-    VertexShader, "#define CUSTOM_VERTEX_BEGIN",
-    (!CustomParts.Vertex_Begin.empty() ? CustomParts.Vertex_Begin : ""));
+  auto _VertexShader
+    = String::replace(VertexShader, "#define CUSTOM_VERTEX_BEGIN",
+                      (!CustomParts.Vertex_Begin.empty() ? CustomParts.Vertex_Begin : ""));
   String::replaceInPlace(
     _VertexShader, "#define CUSTOM_VERTEX_DEFINITIONS",
     (!_customUniform.empty() ? String::join(_customUniform, '\n') : "")
-      + (!CustomParts.Vertex_Definitions.empty() ?
-           CustomParts.Vertex_Definitions :
-           ""));
-  String::replaceInPlace(_VertexShader, "#define CUSTOM_VERTEX_MAIN_BEGIN",
-                         (!CustomParts.Vertex_MainBegin.empty() ?
-                            CustomParts.Vertex_MainBegin :
-                            ""));
+      + (!CustomParts.Vertex_Definitions.empty() ? CustomParts.Vertex_Definitions : ""));
+  String::replaceInPlace(
+    _VertexShader, "#define CUSTOM_VERTEX_MAIN_BEGIN",
+    (!CustomParts.Vertex_MainBegin.empty() ? CustomParts.Vertex_MainBegin : ""));
   String::replaceInPlace(_VertexShader, "#define CUSTOM_VERTEX_UPDATE_POSITION",
                          (!CustomParts.Vertex_Before_PositionUpdated.empty() ?
                             CustomParts.Vertex_Before_PositionUpdated :
@@ -108,38 +103,37 @@ CustomMaterial::Builder(const std::string& /*shaderName*/,
                          (!CustomParts.Vertex_Before_NormalUpdated.empty() ?
                             CustomParts.Vertex_Before_NormalUpdated :
                             ""));
+  String::replaceInPlace(_VertexShader, "#define CUSTOM_VERTEX_MAIN_END",
+                         (!CustomParts.Vertex_MainEnd.empty() ? CustomParts.Vertex_MainEnd : ""));
   Effect::ShadersStore()[customName + "VertexShader"] = _VertexShader;
 
   // #define CUSTOM_VERTEX_MAIN_END
 
-  auto _FragmentShader = String::replace(
-    FragmentShader, "'#define CUSTOM_FRAGMENT_BEGIN",
-    (!CustomParts.Fragment_Begin.empty() ? CustomParts.Fragment_Begin : ""));
-  String::replaceInPlace(_FragmentShader, "#define CUSTOM_FRAGMENT_MAIN_BEGIN",
-                         (!CustomParts.Fragment_MainBegin.empty() ?
-                            CustomParts.Fragment_MainBegin :
-                            ""));
+  auto _FragmentShader
+    = String::replace(FragmentShader, "'#define CUSTOM_FRAGMENT_BEGIN",
+                      (!CustomParts.Fragment_Begin.empty() ? CustomParts.Fragment_Begin : ""));
+  String::replaceInPlace(
+    _FragmentShader, "#define CUSTOM_FRAGMENT_MAIN_BEGIN",
+    (!CustomParts.Fragment_MainBegin.empty() ? CustomParts.Fragment_MainBegin : ""));
   String::replaceInPlace(
     _FragmentShader, "#define CUSTOM_FRAGMENT_DEFINITIONS",
     (!_customUniform.empty() ? String::join(_customUniform, '\n') : "")
-      + (!CustomParts.Fragment_Definitions.empty() ?
-           CustomParts.Fragment_Definitions :
-           ""));
-  String::replaceInPlace(_FragmentShader,
-                         "#define CUSTOM_FRAGMENT_UPDATE_DIFFUSE",
-                         (!CustomParts.Fragment_Custom_Diffuse.empty() ?
-                            CustomParts.Fragment_Custom_Diffuse :
-                            ""));
-  String::replaceInPlace(_FragmentShader,
-                         "#define CUSTOM_FRAGMENT_UPDATE_ALPHA",
-                         (!CustomParts.Fragment_Custom_Alpha.empty() ?
-                            CustomParts.Fragment_Custom_Alpha :
-                            ""));
-  String::replaceInPlace(_FragmentShader,
-                         "#define CUSTOM_FRAGMENT_BEFORE_FRAGCOLOR",
-                         (!CustomParts.Fragment_Before_FragColor.empty() ?
-                            CustomParts.Fragment_Before_FragColor :
-                            ""));
+      + (!CustomParts.Fragment_Definitions.empty() ? CustomParts.Fragment_Definitions : ""));
+  String::replaceInPlace(
+    _FragmentShader, "#define CUSTOM_FRAGMENT_UPDATE_DIFFUSE",
+    (!CustomParts.Fragment_Custom_Diffuse.empty() ? CustomParts.Fragment_Custom_Diffuse : ""));
+  String::replaceInPlace(
+    _FragmentShader, "#define CUSTOM_FRAGMENT_UPDATE_ALPHA",
+    (!CustomParts.Fragment_Custom_Alpha.empty() ? CustomParts.Fragment_Custom_Alpha : ""));
+  String::replaceInPlace(
+    _FragmentShader, "#define CUSTOM_FRAGMENT_BEFORE_LIGHTS",
+    (!CustomParts.Fragment_Before_Lights.empty() ? CustomParts.Fragment_Before_Lights : ""));
+  String::replaceInPlace(
+    _FragmentShader, "#define CUSTOM_FRAGMENT_BEFORE_FOG",
+    (!CustomParts.Fragment_Before_Fog.empty() ? CustomParts.Fragment_Before_Fog : ""));
+  String::replaceInPlace(
+    _FragmentShader, "#define CUSTOM_FRAGMENT_BEFORE_FRAGCOLOR",
+    (!CustomParts.Fragment_Before_FragColor.empty() ? CustomParts.Fragment_Before_FragColor : ""));
   Effect::ShadersStore()[customName + "PixelShader"] = _FragmentShader;
 
   // #define CUSTOM_FRAGMENT_BEFORE_LIGHTS
@@ -152,9 +146,8 @@ CustomMaterial::Builder(const std::string& /*shaderName*/,
   return customName;
 }
 
-CustomMaterial&
-CustomMaterial::AddUniform(const std::string& iName, const std::string& kind,
-                           const std::optional<UniformInstance>& param)
+CustomMaterial& CustomMaterial::AddUniform(const std::string& iName, const std::string& kind,
+                                           const std::optional<UniformInstance>& param)
 {
   if (param) {
     if (!String::contains(kind, "sampler")) {
@@ -176,41 +169,45 @@ CustomMaterial& CustomMaterial::Fragment_Begin(const std::string& shaderPart)
   return *this;
 }
 
-CustomMaterial&
-CustomMaterial::Fragment_Definitions(const std::string& shaderPart)
+CustomMaterial& CustomMaterial::Fragment_Definitions(const std::string& shaderPart)
 {
   CustomParts.Fragment_Definitions = shaderPart;
   return *this;
 }
 
-CustomMaterial&
-CustomMaterial::Fragment_MainBegin(const std::string& shaderPart)
+CustomMaterial& CustomMaterial::Fragment_MainBegin(const std::string& shaderPart)
 {
   CustomParts.Fragment_MainBegin = shaderPart;
   return *this;
 }
 
-CustomMaterial&
-CustomMaterial::Fragment_Custom_Diffuse(const std::string& shaderPart)
+CustomMaterial& CustomMaterial::Fragment_Custom_Diffuse(const std::string& shaderPart)
 {
-  CustomParts.Fragment_Custom_Diffuse
-    = String::replace(shaderPart, "result", "diffuseColor");
+  CustomParts.Fragment_Custom_Diffuse = String::replace(shaderPart, "result", "diffuseColor");
   return *this;
 }
 
-CustomMaterial&
-CustomMaterial::Fragment_Custom_Alpha(const std::string& shaderPart)
+CustomMaterial& CustomMaterial::Fragment_Custom_Alpha(const std::string& shaderPart)
 {
-  CustomParts.Fragment_Custom_Alpha
-    = String::replace(shaderPart, "result", "alpha");
+  CustomParts.Fragment_Custom_Alpha = String::replace(shaderPart, "result", "alpha");
   return *this;
 }
 
-CustomMaterial&
-CustomMaterial::Fragment_Before_FragColor(const std::string& shaderPart)
+CustomMaterial& CustomMaterial::Fragment_Before_Lights(const std::string& shaderPart)
 {
-  CustomParts.Fragment_Before_FragColor
-    = String::replace(shaderPart, "result", "color");
+  CustomParts.Fragment_Before_Lights = shaderPart;
+  return *this;
+}
+
+CustomMaterial& CustomMaterial::Fragment_Before_Fog(const std::string& shaderPart)
+{
+  CustomParts.Fragment_Before_Fog = shaderPart;
+  return *this;
+}
+
+CustomMaterial& CustomMaterial::Fragment_Before_FragColor(const std::string& shaderPart)
+{
+  CustomParts.Fragment_Before_FragColor = String::replace(shaderPart, "result", "color");
   return *this;
 }
 
@@ -220,8 +217,7 @@ CustomMaterial& CustomMaterial::Vertex_Begin(const std::string& shaderPart)
   return *this;
 }
 
-CustomMaterial&
-CustomMaterial::Vertex_Definitions(const std::string& shaderPart)
+CustomMaterial& CustomMaterial::Vertex_Definitions(const std::string& shaderPart)
 {
   CustomParts.Vertex_Definitions = shaderPart;
   return *this;
@@ -233,19 +229,22 @@ CustomMaterial& CustomMaterial::Vertex_MainBegin(const std::string& shaderPart)
   return *this;
 }
 
-CustomMaterial&
-CustomMaterial::Vertex_Before_PositionUpdated(const std::string& shaderPart)
+CustomMaterial& CustomMaterial::Vertex_Before_PositionUpdated(const std::string& shaderPart)
 {
   CustomParts.Vertex_Before_PositionUpdated
     = String::replace(shaderPart, "result", "positionUpdated");
   return *this;
 }
 
-CustomMaterial&
-CustomMaterial::Vertex_Before_NormalUpdated(const std::string& shaderPart)
+CustomMaterial& CustomMaterial::Vertex_Before_NormalUpdated(const std::string& shaderPart)
 {
-  CustomParts.Vertex_Before_NormalUpdated
-    = String::replace(shaderPart, "result", "normalUpdated");
+  CustomParts.Vertex_Before_NormalUpdated = String::replace(shaderPart, "result", "normalUpdated");
+  return *this;
+}
+
+CustomMaterial& CustomMaterial::Vertex_MainEnd(const std::string& shaderPart)
+{
+  CustomParts.Vertex_MainEnd = shaderPart;
   return *this;
 }
 

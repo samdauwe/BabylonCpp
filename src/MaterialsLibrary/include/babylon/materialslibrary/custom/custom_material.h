@@ -41,12 +41,15 @@ public:
   CustomMaterial& Fragment_MainBegin(const std::string& shaderPart);
   CustomMaterial& Fragment_Custom_Diffuse(const std::string& shaderPart);
   CustomMaterial& Fragment_Custom_Alpha(const std::string& shaderPart);
+  CustomMaterial& Fragment_Before_Lights(const std::string& shaderPart);
+  CustomMaterial& Fragment_Before_Fog(const std::string& shaderPart);
   CustomMaterial& Fragment_Before_FragColor(const std::string& shaderPart);
   CustomMaterial& Vertex_Begin(const std::string& shaderPart);
   CustomMaterial& Vertex_Definitions(const std::string& shaderPart);
   CustomMaterial& Vertex_MainBegin(const std::string& shaderPart);
   CustomMaterial& Vertex_Before_PositionUpdated(const std::string& shaderPart);
   CustomMaterial& Vertex_Before_NormalUpdated(const std::string& shaderPart);
+  CustomMaterial& Vertex_MainEnd(const std::string& shaderPart);
 
 private:
   void _afterBind(Mesh* mesh, Effect* effect);

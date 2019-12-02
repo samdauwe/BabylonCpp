@@ -20,6 +20,10 @@ struct BABYLON_SHARED_EXPORT ShaderSpecialParts {
   // diffuseColor
   std::string Fragment_Custom_Diffuse;
 
+  // lights
+  std::string Fragment_Before_Lights;
+  // fog
+  std::string Fragment_Before_Fog;
   // alpha
   std::string Fragment_Custom_Alpha;
 
@@ -34,6 +38,9 @@ struct BABYLON_SHARED_EXPORT ShaderSpecialParts {
 
   // normalUpdated
   std::string Vertex_Before_NormalUpdated;
+
+  // mainEnd
+  std::string Vertex_MainEnd;
 
 }; // end of class ShaderSpecialParts
 
