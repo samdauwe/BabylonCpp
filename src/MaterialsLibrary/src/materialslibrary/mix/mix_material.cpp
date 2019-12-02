@@ -9,8 +9,8 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/material_flags.h>
 #include <babylon/materials/material_helper.h>
-#include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/materialslibrary/mix/mix_fragment_fx.h>
@@ -26,31 +26,20 @@ namespace MaterialsLibrary {
 
 MixMaterial::MixMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
-    , mixTexture1{this, &MixMaterial::get_mixTexture1,
-                  &MixMaterial::set_mixTexture1}
-    , mixTexture2{this, &MixMaterial::get_mixTexture2,
-                  &MixMaterial::set_mixTexture2}
-    , diffuseTexture1{this, &MixMaterial::get_diffuseTexture1,
-                      &MixMaterial::set_diffuseTexture1}
-    , diffuseTexture2{this, &MixMaterial::get_diffuseTexture2,
-                      &MixMaterial::set_diffuseTexture2}
-    , diffuseTexture3{this, &MixMaterial::get_diffuseTexture3,
-                      &MixMaterial::set_diffuseTexture3}
-    , diffuseTexture4{this, &MixMaterial::get_diffuseTexture4,
-                      &MixMaterial::set_diffuseTexture4}
-    , diffuseTexture5{this, &MixMaterial::get_diffuseTexture5,
-                      &MixMaterial::set_diffuseTexture5}
-    , diffuseTexture6{this, &MixMaterial::get_diffuseTexture6,
-                      &MixMaterial::set_diffuseTexture6}
-    , diffuseTexture7{this, &MixMaterial::get_diffuseTexture7,
-                      &MixMaterial::set_diffuseTexture7}
-    , diffuseTexture8{this, &MixMaterial::get_diffuseTexture8,
-                      &MixMaterial::set_diffuseTexture8}
+    , mixTexture1{this, &MixMaterial::get_mixTexture1, &MixMaterial::set_mixTexture1}
+    , mixTexture2{this, &MixMaterial::get_mixTexture2, &MixMaterial::set_mixTexture2}
+    , diffuseTexture1{this, &MixMaterial::get_diffuseTexture1, &MixMaterial::set_diffuseTexture1}
+    , diffuseTexture2{this, &MixMaterial::get_diffuseTexture2, &MixMaterial::set_diffuseTexture2}
+    , diffuseTexture3{this, &MixMaterial::get_diffuseTexture3, &MixMaterial::set_diffuseTexture3}
+    , diffuseTexture4{this, &MixMaterial::get_diffuseTexture4, &MixMaterial::set_diffuseTexture4}
+    , diffuseTexture5{this, &MixMaterial::get_diffuseTexture5, &MixMaterial::set_diffuseTexture5}
+    , diffuseTexture6{this, &MixMaterial::get_diffuseTexture6, &MixMaterial::set_diffuseTexture6}
+    , diffuseTexture7{this, &MixMaterial::get_diffuseTexture7, &MixMaterial::set_diffuseTexture7}
+    , diffuseTexture8{this, &MixMaterial::get_diffuseTexture8, &MixMaterial::set_diffuseTexture8}
     , diffuseColor{Color3(1.f, 1.f, 1.f)}
     , specularColor{Color3(0.f, 0.f, 0.f)}
     , specularPower{64.f}
-    , disableLighting{this, &MixMaterial::get_disableLighting,
-                      &MixMaterial::set_disableLighting}
+    , disableLighting{this, &MixMaterial::get_disableLighting, &MixMaterial::set_disableLighting}
     , maxSimultaneousLights{this, &MixMaterial::get_maxSimultaneousLights,
                             &MixMaterial::set_maxSimultaneousLights}
     , _disableLighting{false}
@@ -237,8 +226,7 @@ BaseTexturePtr MixMaterial::getAlphaTestTexture()
   return nullptr;
 }
 
-bool MixMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
-                                    bool useInstances)
+bool MixMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool useInstances)
 {
   if (isFrozen()) {
     if (_wasPreviouslyReady && subMesh->effect()) {
@@ -250,10 +238,9 @@ bool MixMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     subMesh->_materialDefines = std::make_unique<MixMaterialDefines>();
   }
 
-  auto definesPtr
-    = std::static_pointer_cast<MixMaterialDefines>(subMesh->_materialDefines);
-  auto& defines = *definesPtr.get();
-  auto scene    = getScene();
+  auto definesPtr = std::static_pointer_cast<MixMaterialDefines>(subMesh->_materialDefines);
+  auto& defines   = *definesPtr.get();
+  auto scene      = getScene();
 
   if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (_renderId == scene->getRenderId()) {
@@ -264,31 +251,56 @@ bool MixMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
   auto engine = scene->getEngine();
 
   // Textures
-  if (scene->texturesEnabled) {
-    if (StandardMaterial::DiffuseTextureEnabled()) {
-      if (_mixTexture1) {
-        if (!_mixTexture1->isReady()) {
-          return false;
-        }
-        else {
-          defines._needUVs           = true;
-          defines.boolDef["DIFFUSE"] = true;
-        }
+  // Textures
+  if (scene->texturesEnabled()) {
+    if (!_mixTexture1 || !_mixTexture1->isReady()) {
+      return false;
+    }
+
+    defines._needUVs = true;
+
+    if (MaterialFlags::DiffuseTextureEnabled()) {
+      if (!_diffuseTexture1 || !_diffuseTexture1->isReady()) {
+        return false;
       }
+
+      defines.boolDef["DIFFUSE"] = true;
+
+      if (!_diffuseTexture2 || !_diffuseTexture2->isReady()) {
+        return false;
+      }
+      if (!_diffuseTexture3 || !_diffuseTexture3->isReady()) {
+        return false;
+      }
+      if (!_diffuseTexture4 || !_diffuseTexture4->isReady()) {
+        return false;
+      }
+
       if (_mixTexture2) {
         if (!_mixTexture2->isReady()) {
           return false;
         }
-        else {
-          defines.boolDef["MIXMAP2"] = true;
+
+        defines.boolDef["MIXMAP2"] = true;
+
+        if (!_diffuseTexture5 || !_diffuseTexture5->isReady()) {
+          return false;
+        }
+        if (!_diffuseTexture6 || !_diffuseTexture6->isReady()) {
+          return false;
+        }
+        if (!_diffuseTexture7 || !_diffuseTexture7->isReady()) {
+          return false;
+        }
+        if (!_diffuseTexture8 || !_diffuseTexture8->isReady()) {
+          return false;
         }
       }
     }
   }
 
   // Misc.
-  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(),
-                                        fogEnabled(),
+  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(), fogEnabled(),
                                         _shouldTurnAlphaTestOn(mesh), defines);
 
   // Lights
@@ -337,8 +349,7 @@ bool MixMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
       attribs.emplace_back(VertexBuffer::ColorKind);
     }
 
-    MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
-                                              *fallbacks);
+    MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines, *fallbacks);
     MaterialHelper::PrepareAttributesForInstances(attribs, defines);
 
     // Legacy browser patch
@@ -346,19 +357,16 @@ bool MixMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     auto join = defines.toString();
 
     const std::vector<std::string> uniforms{
-      "world",         "view",          "viewProjection", "vEyePosition",
-      "vLightsType",   "vDiffuseColor", "vSpecularColor", "vFogInfos",
-      "vFogColor",     "pointSize",     "vTextureInfos",  "mBones",
-      "vClipPlane",    "vClipPlane2",   "vClipPlane3",    "vClipPlane4",
-      "textureMatrix", "diffuse1Infos", "diffuse2Infos",  "diffuse3Infos",
-      "diffuse4Infos", "diffuse5Infos", "diffuse6Infos",  "diffuse7Infos",
-      "diffuse8Infos"};
+      "world",         "view",           "viewProjection", "vEyePosition",  "vLightsType",
+      "vDiffuseColor", "vSpecularColor", "vFogInfos",      "vFogColor",     "pointSize",
+      "vTextureInfos", "mBones",         "vClipPlane",     "vClipPlane2",   "vClipPlane3",
+      "vClipPlane4",   "textureMatrix",  "diffuse1Infos",  "diffuse2Infos", "diffuse3Infos",
+      "diffuse4Infos", "diffuse5Infos",  "diffuse6Infos",  "diffuse7Infos", "diffuse8Infos"};
 
-    const std::vector<std::string> samplers{
-      "mixMap1Sampler",  "mixMap2Sampler",  "diffuse1Sampler",
-      "diffuse2Sampler", "diffuse3Sampler", "diffuse4Sampler",
-      "diffuse5Sampler", "diffuse6Sampler", "diffuse7Sampler",
-      "diffuse8Sampler"};
+    const std::vector<std::string> samplers{"mixMap1Sampler",  "mixMap2Sampler",  "diffuse1Sampler",
+                                            "diffuse2Sampler", "diffuse3Sampler", "diffuse4Sampler",
+                                            "diffuse5Sampler", "diffuse6Sampler", "diffuse7Sampler",
+                                            "diffuse8Sampler"};
     const std::vector<std::string> uniformBuffers{};
 
     EffectCreationOptions options;
@@ -372,13 +380,10 @@ bool MixMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     options.fallbacks             = std::move(fallbacks);
     options.onCompiled            = onCompiled;
     options.onError               = onError;
-    options.indexParameters
-      = {{"maxSimultaneousLights", maxSimultaneousLights()}};
+    options.indexParameters       = {{"maxSimultaneousLights", maxSimultaneousLights()}};
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
-    subMesh->setEffect(
-      scene->getEngine()->createEffect(shaderName, options, engine),
-      definesPtr);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
@@ -395,8 +400,7 @@ void MixMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
-  auto _defines
-    = static_cast<MixMaterialDefines*>(subMesh->_materialDefines.get());
+  auto _defines = static_cast<MixMaterialDefines*>(subMesh->_materialDefines.get());
   if (!_defines) {
     return;
   }
@@ -419,13 +423,11 @@ void MixMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
     // Textures
     if (_mixTexture1) {
       _activeEffect->setTexture("mixMap1Sampler", _mixTexture1);
-      _activeEffect->setFloat2(
-        "vTextureInfos", static_cast<float>(_mixTexture1->coordinatesIndex),
-        _mixTexture1->level);
-      _activeEffect->setMatrix("textureMatrix",
-                               *_mixTexture1->getTextureMatrix());
+      _activeEffect->setFloat2("vTextureInfos", static_cast<float>(_mixTexture1->coordinatesIndex),
+                               _mixTexture1->level);
+      _activeEffect->setMatrix("textureMatrix", *_mixTexture1->getTextureMatrix());
 
-      if (StandardMaterial::DiffuseTextureEnabled()) {
+      if (MaterialFlags::DiffuseTextureEnabled()) {
         if (_diffuseTexture1) {
           _activeEffect->setTexture("diffuse1Sampler", _diffuseTexture1);
           _activeEffect->setFloat2("diffuse1Infos", _diffuseTexture1->uScale,
@@ -452,7 +454,7 @@ void MixMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
     if (_mixTexture2) {
       _activeEffect->setTexture("mixMap2Sampler", _mixTexture2);
 
-      if (StandardMaterial::DiffuseTextureEnabled()) {
+      if (MaterialFlags::DiffuseTextureEnabled()) {
         if (_diffuseTexture5) {
           _activeEffect->setTexture("diffuse5Sampler", _diffuseTexture5);
           _activeEffect->setFloat2("diffuse5Infos", _diffuseTexture5->uScale,
@@ -487,8 +489,7 @@ void MixMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
     MaterialHelper::BindEyePosition(effect, scene);
   }
 
-  _activeEffect->setColor4("vDiffuseColor", diffuseColor,
-                           alpha * mesh->visibility);
+  _activeEffect->setColor4("vDiffuseColor", diffuseColor, alpha * mesh->visibility);
 
   if (defines["SPECULARTERM"]) {
     _activeEffect->setColor4("vSpecularColor", specularColor, specularPower);
@@ -499,8 +500,7 @@ void MixMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
   }
 
   // View
-  if (scene->fogEnabled() && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE) {
+  if (scene->fogEnabled() && mesh->applyFog() && scene->fogMode() != Scene::FOGMODE_NONE) {
     _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 
@@ -635,8 +635,7 @@ void MixMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
   PushMaterial::dispose(forceDisposeEffect, forceDisposeTextures);
 }
 
-MaterialPtr MixMaterial::clone(const std::string& /*name*/,
-                               bool /*cloneChildren*/) const
+MaterialPtr MixMaterial::clone(const std::string& /*name*/, bool /*cloneChildren*/) const
 {
   return nullptr;
 }

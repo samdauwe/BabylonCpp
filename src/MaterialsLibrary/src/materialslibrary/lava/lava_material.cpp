@@ -9,8 +9,8 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/material_flags.h>
 #include <babylon/materials/material_helper.h>
-#include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materialslibrary/lava/lava_fragment_fx.h>
 #include <babylon/materialslibrary/lava/lava_vertex_fx.h>
@@ -24,8 +24,7 @@ namespace MaterialsLibrary {
 
 LavaMaterial::LavaMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
-    , diffuseTexture{this, &LavaMaterial::get_diffuseTexture,
-                     &LavaMaterial::set_diffuseTexture}
+    , diffuseTexture{this, &LavaMaterial::get_diffuseTexture, &LavaMaterial::set_diffuseTexture}
     , noiseTexture{nullptr}
     , fogColor{std::nullopt}
     , speed{1.f}
@@ -33,8 +32,7 @@ LavaMaterial::LavaMaterial(const std::string& iName, Scene* scene)
     , lowFrequencySpeed{1.f}
     , fogDensity{0.15f}
     , diffuseColor{Color3(1.f, 1.f, 1.f)}
-    , disableLighting{this, &LavaMaterial::get_disableLighting,
-                      &LavaMaterial::set_disableLighting}
+    , disableLighting{this, &LavaMaterial::get_disableLighting, &LavaMaterial::set_disableLighting}
     , unlit{this, &LavaMaterial::get_unlit, &LavaMaterial::set_unlit}
     , maxSimultaneousLights{this, &LavaMaterial::get_maxSimultaneousLights,
                             &LavaMaterial::set_maxSimultaneousLights}
@@ -121,8 +119,7 @@ BaseTexturePtr LavaMaterial::getAlphaTestTexture()
   return nullptr;
 }
 
-bool LavaMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
-                                     bool useInstances)
+bool LavaMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool useInstances)
 {
   if (isFrozen()) {
     if (_wasPreviouslyReady && subMesh->effect()) {
@@ -134,10 +131,9 @@ bool LavaMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     subMesh->_materialDefines = std::make_shared<LavaMaterialDefines>();
   }
 
-  auto definesPtr
-    = std::static_pointer_cast<LavaMaterialDefines>(subMesh->_materialDefines);
-  auto& defines = *definesPtr.get();
-  auto scene    = getScene();
+  auto definesPtr = std::static_pointer_cast<LavaMaterialDefines>(subMesh->_materialDefines);
+  auto& defines   = *definesPtr.get();
+  auto scene      = getScene();
 
   if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (_renderId == scene->getRenderId()) {
@@ -151,7 +147,7 @@ bool LavaMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
   if (defines._areTexturesDirty) {
     defines._needUVs = false;
     if (scene->texturesEnabled()) {
-      if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
+      if (_diffuseTexture && MaterialFlags::DiffuseTextureEnabled()) {
         if (!_diffuseTexture->isReady()) {
           return false;
         }
@@ -164,8 +160,7 @@ bool LavaMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
   }
 
   // Misc.
-  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(),
-                                        fogEnabled(),
+  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(), fogEnabled(),
                                         _shouldTurnAlphaTestOn(mesh), defines);
 
   // Lights
@@ -216,26 +211,24 @@ bool LavaMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
       attribs.emplace_back(VertexBuffer::ColorKind);
     }
 
-    MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
-                                              *fallbacks);
+    MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines, *fallbacks);
     MaterialHelper::PrepareAttributesForInstances(attribs, defines);
 
     // Legacy browser patch
     const std::string shaderName{"lava"};
     auto join = defines.toString();
 
-    const std::vector<std::string> uniforms{
-      "world",          "view",
-      "viewProjection", "vEyePosition",
-      "vLightsType",    "vDiffuseColor",
-      "vFogInfos",      "vFogColor",
-      "pointSize",      "vDiffuseInfos",
-      "mBones",         "vClipPlane",
-      "vClipPlane2",    "vClipPlane3",
-      "vClipPlane4",    "diffuseMatrix",
-      "time",           "speed",
-      "movingSpeed",    "fogColor",
-      "fogDensity",     "lowFrequencySpeed"};
+    const std::vector<std::string> uniforms{"world",          "view",
+                                            "viewProjection", "vEyePosition",
+                                            "vLightsType",    "vDiffuseColor",
+                                            "vFogInfos",      "vFogColor",
+                                            "pointSize",      "vDiffuseInfos",
+                                            "mBones",         "vClipPlane",
+                                            "vClipPlane2",    "vClipPlane3",
+                                            "vClipPlane4",    "diffuseMatrix",
+                                            "time",           "speed",
+                                            "movingSpeed",    "fogColor",
+                                            "fogDensity",     "lowFrequencySpeed"};
 
     const std::vector<std::string> samplers{"diffuseSampler", "noiseTexture"};
     const std::vector<std::string> uniformBuffers{};
@@ -251,13 +244,10 @@ bool LavaMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     options.fallbacks             = std::move(fallbacks);
     options.onCompiled            = onCompiled;
     options.onError               = onError;
-    options.indexParameters
-      = {{"maxSimultaneousLights", maxSimultaneousLights()}};
+    options.indexParameters       = {{"maxSimultaneousLights", maxSimultaneousLights()}};
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
-    subMesh->setEffect(
-      scene->getEngine()->createEffect(shaderName, options, engine),
-      definesPtr);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
@@ -274,8 +264,7 @@ void LavaMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
-  auto defines
-    = static_cast<LavaMaterialDefines*>(subMesh->_materialDefines.get());
+  auto defines = static_cast<LavaMaterialDefines*>(subMesh->_materialDefines.get());
   if (!defines) {
     return;
   }
@@ -298,14 +287,13 @@ void LavaMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 
   if (_mustRebind(scene, effect)) {
     // Textures
-    if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
+    if (_diffuseTexture && MaterialFlags::DiffuseTextureEnabled()) {
       _activeEffect->setTexture("diffuseSampler", _diffuseTexture);
 
-      _activeEffect->setFloat2(
-        "vDiffuseInfos", static_cast<float>(_diffuseTexture->coordinatesIndex),
-        _diffuseTexture->level);
-      _activeEffect->setMatrix("diffuseMatrix",
-                               *_diffuseTexture->getTextureMatrix());
+      _activeEffect->setFloat2("vDiffuseInfos",
+                               static_cast<float>(_diffuseTexture->coordinatesIndex),
+                               _diffuseTexture->level);
+      _activeEffect->setMatrix("diffuseMatrix", *_diffuseTexture->getTextureMatrix());
     }
 
     if (noiseTexture) {
@@ -323,16 +311,14 @@ void LavaMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
     MaterialHelper::BindEyePosition(effect, scene);
   }
 
-  _activeEffect->setColor4("vDiffuseColor", _scaledDiffuse,
-                           alpha * mesh->visibility);
+  _activeEffect->setColor4("vDiffuseColor", _scaledDiffuse, alpha * mesh->visibility);
 
   if (scene->lightsEnabled() && !_disableLighting) {
     MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines);
   }
 
   // View
-  if (scene->fogEnabled() && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE) {
+  if (scene->fogEnabled() && mesh->applyFog() && scene->fogMode() != Scene::FOGMODE_NONE) {
     _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 
@@ -406,8 +392,7 @@ void LavaMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
   PushMaterial::dispose(forceDisposeEffect, forceDisposeTextures);
 }
 
-MaterialPtr LavaMaterial::clone(const std::string& /*name*/,
-                                bool /*cloneChildren*/) const
+MaterialPtr LavaMaterial::clone(const std::string& /*name*/, bool /*cloneChildren*/) const
 {
   return nullptr;
 }
