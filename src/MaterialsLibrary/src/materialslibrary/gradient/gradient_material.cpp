@@ -30,8 +30,10 @@ GradientMaterial::GradientMaterial(const std::string& iName, Scene* scene)
     , offset{0}
     , scale{1.f}
     , smoothness{1.f}
-    , disableLighting{false}
+    , disableLighting{this, &GradientMaterial::get_disableLighting,
+                      &GradientMaterial::set_disableLighting}
     , _maxSimultaneousLights{4}
+    , _disableLighting{false}
     , _renderId{-1}
 {
   // Vertex shader
@@ -56,6 +58,19 @@ void GradientMaterial::set_maxSimultaneousLights(unsigned int value)
   }
 }
 
+bool GradientMaterial::get_disableLighting() const
+{
+  return _disableLighting;
+}
+
+void GradientMaterial::set_disableLighting(bool value)
+{
+  if (_disableLighting != value) {
+    _disableLighting = value;
+    _markAllSubMeshesAsLightsDirty();
+  }
+}
+
 bool GradientMaterial::needAlphaBlending() const
 {
   return (alpha < 1.f || topColorAlpha < 1.f || bottomColorAlpha < 1.f);
@@ -71,8 +86,7 @@ BaseTexturePtr GradientMaterial::getAlphaTestTexture()
   return nullptr;
 }
 
-bool GradientMaterial::isReadyForSubMesh(AbstractMesh* mesh,
-                                         BaseSubMesh* subMesh,
+bool GradientMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                                          bool useInstances)
 {
   if (isFrozen()) {
@@ -85,10 +99,9 @@ bool GradientMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     subMesh->_materialDefines = std::make_shared<GradientMaterialDefines>();
   }
 
-  auto definesPtr = std::static_pointer_cast<GradientMaterialDefines>(
-    subMesh->_materialDefines);
-  auto& defines = *definesPtr.get();
-  auto scene    = getScene();
+  auto definesPtr = std::static_pointer_cast<GradientMaterialDefines>(subMesh->_materialDefines);
+  auto& defines   = *definesPtr.get();
+  auto scene      = getScene();
 
   if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (_renderId == scene->getRenderId()) {
@@ -100,12 +113,13 @@ bool GradientMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
   MaterialHelper::PrepareDefinesForFrameBoundValues(scene, engine, defines, useInstances);
 
-  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(),
-                                        fogEnabled(),
+  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(), fogEnabled(),
                                         _shouldTurnAlphaTestOn(mesh), defines);
 
   defines._needNormals = MaterialHelper::PrepareDefinesForLights(
-    scene, mesh, defines, false, _maxSimultaneousLights);
+    scene, mesh, defines, false, _maxSimultaneousLights, _disableLighting);
+
+  defines.boolDef["EMISSIVE"] = _disableLighting;
 
   // Attribs
   MaterialHelper::PrepareDefinesForAttributes(mesh, defines, false, true);
@@ -147,20 +161,16 @@ bool GradientMaterial::isReadyForSubMesh(AbstractMesh* mesh,
       attribs.emplace_back(VertexBuffer::ColorKind);
     }
 
-    MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
-                                              *fallbacks);
+    MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines, *fallbacks);
     MaterialHelper::PrepareAttributesForInstances(attribs, defines);
 
     // Legacy browser patch
     const std::string shaderName{"gradient"};
     auto join = defines.toString();
     const std::vector<std::string> uniforms{
-      "world",       "view",          "viewProjection", "vEyePosition",
-      "vLightsType", "vDiffuseColor", "vFogInfos",      "vFogColor",
-      "pointSize",   "vDiffuseInfos", "mBones",         "vClipPlane",
-      "vClipPlane2", "vClipPlane3",   "vClipPlane4",    "diffuseMatrix",
-      "topColor",    "bottomColor",   "offset",         "smoothness",
-      "scale"};
+      "world",       "view",      "viewProjection", "vEyePosition", "vLightsType", "vFogInfos",
+      "vFogColor",   "pointSize", "mBones",         "vClipPlane",   "vClipPlane2", "vClipPlane3",
+      "vClipPlane4", "topColor",  "bottomColor",    "offset",       "smoothness",  "scale"};
     const std::vector<std::string> samplers{"diffuseSampler"};
     const std::vector<std::string> uniformBuffers{};
 
@@ -179,9 +189,7 @@ bool GradientMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
 
-    subMesh->setEffect(
-      scene->getEngine()->createEffect(shaderName, options, engine),
-      definesPtr);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
   }
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
     return false;
@@ -193,13 +201,11 @@ bool GradientMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   return true;
 }
 
-void GradientMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
-                                      SubMesh* subMesh)
+void GradientMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
-  auto defines
-    = static_cast<GradientMaterialDefines*>(subMesh->_materialDefines.get());
+  auto defines = static_cast<GradientMaterialDefines*>(subMesh->_materialDefines.get());
   if (!defines) {
     return;
   }
@@ -230,16 +236,12 @@ void GradientMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
     MaterialHelper::BindEyePosition(effect, scene);
   }
 
-  _activeEffect->setColor4("vDiffuseColor", _scaledDiffuse,
-                           alpha * mesh->visibility);
-
   if (scene->lightsEnabled() && !disableLighting) {
-    MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines);
+    MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines, maxSimultaneousLights);
   }
 
   // View
-  if (scene->fogEnabled() && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE) {
+  if (scene->fogEnabled() && mesh->applyFog() && scene->fogMode() != Scene::FOGMODE_NONE) {
     _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 
@@ -260,15 +262,13 @@ std::vector<IAnimatablePtr> GradientMaterial::getAnimatables()
   return std::vector<IAnimatablePtr>();
 }
 
-void GradientMaterial::dispose(bool forceDisposeEffect,
-                               bool forceDisposeTextures,
+void GradientMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
                                bool /*notBoundToMesh*/)
 {
   PushMaterial::dispose(forceDisposeEffect, forceDisposeTextures);
 }
 
-MaterialPtr GradientMaterial::clone(const std::string& /*name*/,
-                                    bool /*cloneChildren*/) const
+MaterialPtr GradientMaterial::clone(const std::string& /*name*/, bool /*cloneChildren*/) const
 {
   return nullptr;
 }
@@ -283,8 +283,7 @@ std::string GradientMaterial::getClassName() const
   return "GradientMaterial";
 }
 
-GradientMaterial* GradientMaterial::Parse(const json& /*source*/,
-                                          Scene* /*scene*/,
+GradientMaterial* GradientMaterial::Parse(const json& /*source*/, Scene* /*scene*/,
                                           const std::string& /*rootUrl*/)
 {
   return nullptr;

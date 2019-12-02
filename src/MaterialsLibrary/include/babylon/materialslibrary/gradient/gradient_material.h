@@ -61,6 +61,8 @@ protected:
 
   [[nodiscard]] unsigned int get_maxSimultaneousLights() const;
   void set_maxSimultaneousLights(unsigned int value);
+  [[nodiscard]] bool get_disableLighting() const;
+  void set_disableLighting(bool value);
 
 public:
   Property<GradientMaterial, unsigned int> maxSimultaneousLights;
@@ -72,11 +74,11 @@ public:
   float offset;
   float scale;
   float smoothness;
-  bool disableLighting;
+  Property<GradientMaterial, bool> disableLighting;
 
 private:
   unsigned int _maxSimultaneousLights;
-  Color3 _scaledDiffuse;
+  bool _disableLighting;
   int _renderId;
 
 }; // end of class GradientMaterial
