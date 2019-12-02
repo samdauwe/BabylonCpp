@@ -8,8 +8,8 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/material_flags.h>
 #include <babylon/materials/material_helper.h>
-#include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/materialslibrary/cell/cell_fragment_fx.h>
 #include <babylon/materialslibrary/cell/cell_vertex_fx.h>
@@ -23,13 +23,11 @@ namespace MaterialsLibrary {
 
 CellMaterial::CellMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
-    , diffuseTexture{this, &CellMaterial::get_diffuseTexture,
-                     &CellMaterial::set_diffuseTexture}
+    , diffuseTexture{this, &CellMaterial::get_diffuseTexture, &CellMaterial::set_diffuseTexture}
     , diffuseColor{Color3(1, 1, 1)}
     , computeHighLevel{this, &CellMaterial::get_computeHighLevel,
                        &CellMaterial::set_computeHighLevel}
-    , disableLighting{this, &CellMaterial::get_disableLighting,
-                      &CellMaterial::set_disableLighting}
+    , disableLighting{this, &CellMaterial::get_disableLighting, &CellMaterial::set_disableLighting}
     , maxSimultaneousLights{this, &CellMaterial::get_maxSimultaneousLights,
                             &CellMaterial::set_maxSimultaneousLights}
     , _diffuseTexture{nullptr}
@@ -115,8 +113,7 @@ BaseTexturePtr CellMaterial::getAlphaTestTexture()
   return nullptr;
 }
 
-bool CellMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
-                                     bool useInstances)
+bool CellMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool useInstances)
 {
   if (isFrozen()) {
     if (_wasPreviouslyReady && subMesh->effect()) {
@@ -128,10 +125,9 @@ bool CellMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     subMesh->_materialDefines = std::make_shared<CellMaterialDefines>();
   }
 
-  auto definesPtr
-    = std::static_pointer_cast<CellMaterialDefines>(subMesh->_materialDefines);
-  auto& defines = *definesPtr.get();
-  auto scene    = getScene();
+  auto definesPtr = std::static_pointer_cast<CellMaterialDefines>(subMesh->_materialDefines);
+  auto& defines   = *definesPtr.get();
+  auto scene      = getScene();
 
   if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (_renderId == scene->getRenderId()) {
@@ -145,7 +141,7 @@ bool CellMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
   if (defines._areTexturesDirty) {
     defines._needUVs = false;
     if (scene->texturesEnabled()) {
-      if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
+      if (_diffuseTexture && MaterialFlags::DiffuseTextureEnabled()) {
         if (!_diffuseTexture->isReady()) {
           return false;
         }
@@ -161,8 +157,7 @@ bool CellMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
   defines.boolDef["CELLBASIC"] = !_computeHighLevel;
 
   // Misc.
-  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(),
-                                        fogEnabled(),
+  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(), fogEnabled(),
                                         _shouldTurnAlphaTestOn(mesh), defines);
 
   // Lights
@@ -186,8 +181,7 @@ bool CellMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
       fallbacks->addFallback(1, "FOG");
     }
 
-    MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks,
-                                              _maxSimultaneousLights);
+    MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks, _maxSimultaneousLights);
 
     if (defines.intDef["NUM_BONE_INFLUENCERS"] > 0) {
       fallbacks->addCPUSkinningFallback(0, mesh);
@@ -212,17 +206,15 @@ bool CellMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
       attribs.emplace_back(VertexBuffer::ColorKind);
     }
 
-    MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
-                                              *fallbacks);
+    MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines, *fallbacks);
     MaterialHelper::PrepareAttributesForInstances(attribs, defines);
 
     const std::string shaderName{"cell"};
     auto join = defines.toString();
     const std::vector<std::string> uniforms{
-      "world",        "view",          "viewProjection", "vEyePosition",
-      "vLightsType",  "vDiffuseColor", "vFogInfos",      "vFogColor",
-      "pointSize",    "vDiffuseInfos", "mBones",         "vClipPlane",
-      "diffuseMatrix"};
+      "world",         "view",       "viewProjection", "vEyePosition", "vLightsType",
+      "vDiffuseColor", "vFogInfos",  "vFogColor",      "pointSize",    "vDiffuseInfos",
+      "mBones",        "vClipPlane", "diffuseMatrix"};
     const std::vector<std::string> samplers{"diffuseSampler"};
     const std::vector<std::string> uniformBuffers{};
 
@@ -237,13 +229,10 @@ bool CellMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     options.fallbacks             = std::move(fallbacks);
     options.onCompiled            = onCompiled;
     options.onError               = onError;
-    options.indexParameters
-      = {{"maxSimultaneousLights", _maxSimultaneousLights}};
+    options.indexParameters       = {{"maxSimultaneousLights", _maxSimultaneousLights}};
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
-    subMesh->setEffect(
-      scene->getEngine()->createEffect(shaderName, options, engine),
-      definesPtr);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
@@ -260,8 +249,7 @@ void CellMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
-  auto defines
-    = static_cast<CellMaterialDefines*>(subMesh->_materialDefines.get());
+  auto defines = static_cast<CellMaterialDefines*>(subMesh->_materialDefines.get());
   if (!defines) {
     return;
   }
@@ -281,14 +269,13 @@ void CellMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 
   if (_mustRebind(scene, effect)) {
     // Textures
-    if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
+    if (_diffuseTexture && MaterialFlags::DiffuseTextureEnabled()) {
       _activeEffect->setTexture("diffuseSampler", _diffuseTexture);
 
-      _activeEffect->setFloat2(
-        "vDiffuseInfos", static_cast<float>(_diffuseTexture->coordinatesIndex),
-        _diffuseTexture->level);
-      _activeEffect->setMatrix("diffuseMatrix",
-                               *_diffuseTexture->getTextureMatrix());
+      _activeEffect->setFloat2("vDiffuseInfos",
+                               static_cast<float>(_diffuseTexture->coordinatesIndex),
+                               _diffuseTexture->level);
+      _activeEffect->setMatrix("diffuseMatrix", *_diffuseTexture->getTextureMatrix());
     }
 
     // Clip plane
@@ -302,18 +289,15 @@ void CellMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
     MaterialHelper::BindEyePosition(effect, scene);
   }
 
-  _activeEffect->setColor4("vDiffuseColor", diffuseColor,
-                           alpha * mesh->visibility);
+  _activeEffect->setColor4("vDiffuseColor", diffuseColor, alpha * mesh->visibility);
 
   // Lights
   if (scene->lightsEnabled() && !_disableLighting) {
-    MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines,
-                               _maxSimultaneousLights);
+    MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines, _maxSimultaneousLights);
   }
 
   // View
-  if (scene->fogEnabled() && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE) {
+  if (scene->fogEnabled() && mesh->applyFog() && scene->fogMode() != Scene::FOGMODE_NONE) {
     _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 
@@ -369,8 +353,7 @@ std::string CellMaterial::getClassName() const
   return "CellMaterial";
 }
 
-MaterialPtr CellMaterial::clone(const std::string& /*name*/,
-                                bool /*cloneChildren*/) const
+MaterialPtr CellMaterial::clone(const std::string& /*name*/, bool /*cloneChildren*/) const
 {
   return nullptr;
 }
