@@ -9,8 +9,8 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/material_flags.h>
 #include <babylon/materials/material_helper.h>
-#include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materialslibrary/fire/fire_fragment_fx.h>
 #include <babylon/materialslibrary/fire/fire_vertex_fx.h>
@@ -25,12 +25,10 @@ unsigned int FireMaterial::maxSimultaneousLights = 4;
 
 FireMaterial::FireMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
-    , diffuseTexture{this, &FireMaterial::get_diffuseTexture,
-                     &FireMaterial::set_diffuseTexture}
+    , diffuseTexture{this, &FireMaterial::get_diffuseTexture, &FireMaterial::set_diffuseTexture}
     , distortionTexture{this, &FireMaterial::get_distortionTexture,
                         &FireMaterial::set_distortionTexture}
-    , opacityTexture{this, &FireMaterial::get_opacityTexture,
-                     &FireMaterial::set_opacityTexture}
+    , opacityTexture{this, &FireMaterial::get_opacityTexture, &FireMaterial::set_opacityTexture}
     , diffuseColor{Color3(1.f, 1.f, 1.f)}
     , speed{1.f}
     , _diffuseTexture{nullptr}
@@ -102,8 +100,7 @@ BaseTexturePtr FireMaterial::getAlphaTestTexture()
   return nullptr;
 }
 
-bool FireMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
-                                     bool useInstances)
+bool FireMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool useInstances)
 {
   if (isFrozen()) {
     if (_wasPreviouslyReady && subMesh->effect()) {
@@ -115,10 +112,9 @@ bool FireMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     subMesh->_materialDefines = std::make_shared<FireMaterialDefines>();
   }
 
-  auto definesPtr
-    = std::static_pointer_cast<FireMaterialDefines>(subMesh->_materialDefines);
-  auto& defines = *definesPtr.get();
-  auto scene    = getScene();
+  auto definesPtr = std::static_pointer_cast<FireMaterialDefines>(subMesh->_materialDefines);
+  auto& defines   = *definesPtr.get();
+  auto scene      = getScene();
 
   if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (_renderId == scene->getRenderId()) {
@@ -131,7 +127,7 @@ bool FireMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
   // Textures
   if (defines._areTexturesDirty) {
     defines._needUVs = false;
-    if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
+    if (_diffuseTexture && MaterialFlags::DiffuseTextureEnabled()) {
       if (!_diffuseTexture->isReady()) {
         return false;
       }
@@ -146,11 +142,9 @@ bool FireMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
 
   // Misc.
   if (defines._areMiscDirty) {
-    _defines.boolDef["POINTSIZE"]
-      = (pointsCloud() || scene->forcePointsCloud());
-    _defines.boolDef["FOG"]
-      = (scene->fogEnabled() && mesh->applyFog()
-         && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled());
+    _defines.boolDef["POINTSIZE"] = (pointsCloud() || scene->forcePointsCloud());
+    _defines.boolDef["FOG"]       = (scene->fogEnabled() && mesh->applyFog()
+                               && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled());
   }
 
   // Values that need to be evaluated on every frame
@@ -186,21 +180,19 @@ bool FireMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
       attribs.emplace_back(VertexBuffer::ColorKind);
     }
 
-    MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
-                                              *fallbacks);
+    MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines, *fallbacks);
     MaterialHelper::PrepareAttributesForInstances(attribs, defines);
 
     // Legacy browser patch
     const std::string shaderName{"fire"};
     auto join = defines.toString();
     EffectCreationOptions options;
-    options.attributes = std::move(attribs);
-    options.uniformsNames
-      = {"world", "view", "viewProjection", "vEyePosition", "vFogInfos",
-         "vFogColor", "pointSize", "vDiffuseInfos", "mBones", "vClipPlane",
-         "vClipPlane2", "vClipPlane3", "vClipPlane4", "diffuseMatrix",
-         // Fire
-         "time", "speed"};
+    options.attributes            = std::move(attribs);
+    options.uniformsNames         = {"world", "view", "viewProjection", "vEyePosition", "vFogInfos",
+                             "vFogColor", "pointSize", "vDiffuseInfos", "mBones", "vClipPlane",
+                             "vClipPlane2", "vClipPlane3", "vClipPlane4", "diffuseMatrix",
+                             // Fire
+                             "time", "speed"};
     options.samplers              = {"diffuseSampler",
                         // Fire
                         "distortionSampler", "opacitySampler"};
@@ -210,9 +202,7 @@ bool FireMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     options.onError               = onError;
     options.maxSimultaneousLights = 4;
 
-    subMesh->setEffect(
-      scene->getEngine()->createEffect(shaderName, options, engine),
-      definesPtr);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
@@ -229,8 +219,7 @@ void FireMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
-  auto iDefines
-    = static_cast<FireMaterialDefines*>(subMesh->_materialDefines.get());
+  auto iDefines = static_cast<FireMaterialDefines*>(subMesh->_materialDefines.get());
   if (!iDefines) {
     return;
   }
@@ -250,14 +239,13 @@ void FireMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 
   if (_mustRebind(scene, effect)) {
     // Textures
-    if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
+    if (_diffuseTexture && MaterialFlags::DiffuseTextureEnabled()) {
       _activeEffect->setTexture("diffuseSampler", _diffuseTexture);
 
-      _activeEffect->setFloat2(
-        "vDiffuseInfos", static_cast<float>(_diffuseTexture->coordinatesIndex),
-        _diffuseTexture->level);
-      _activeEffect->setMatrix("diffuseMatrix",
-                               *_diffuseTexture->getTextureMatrix());
+      _activeEffect->setFloat2("vDiffuseInfos",
+                               static_cast<float>(_diffuseTexture->coordinatesIndex),
+                               _diffuseTexture->level);
+      _activeEffect->setMatrix("diffuseMatrix", *_diffuseTexture->getTextureMatrix());
 
       _activeEffect->setTexture("distortionSampler", _distortionTexture);
       _activeEffect->setTexture("opacitySampler", _opacityTexture);
@@ -274,12 +262,10 @@ void FireMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
     MaterialHelper::BindEyePosition(effect, scene);
   }
 
-  _activeEffect->setColor4("vDiffuseColor", _scaledDiffuse,
-                           alpha * mesh->visibility);
+  _activeEffect->setColor4("vDiffuseColor", _scaledDiffuse, alpha * mesh->visibility);
 
   // View
-  if (scene->fogEnabled() && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE) {
+  if (scene->fogEnabled() && mesh->applyFog() && scene->fogMode() != Scene::FOGMODE_NONE) {
     _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 
@@ -374,8 +360,7 @@ void FireMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
   PushMaterial::dispose(forceDisposeEffect, forceDisposeTextures);
 }
 
-MaterialPtr FireMaterial::clone(const std::string& /*name*/,
-                                bool /*cloneChildren*/) const
+MaterialPtr FireMaterial::clone(const std::string& /*name*/, bool /*cloneChildren*/) const
 {
   return nullptr;
 }
