@@ -8,8 +8,8 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/material_flags.h>
 #include <babylon/materials/material_helper.h>
-#include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/materialslibrary/terrain/terrain_fragment_fx.h>
@@ -23,20 +23,16 @@ namespace MaterialsLibrary {
 
 TerrainMaterial::TerrainMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
-    , mixTexture{this, &TerrainMaterial::get_mixTexture,
-                 &TerrainMaterial::set_mixTexture}
+    , mixTexture{this, &TerrainMaterial::get_mixTexture, &TerrainMaterial::set_mixTexture}
     , diffuseTexture1{this, &TerrainMaterial::get_diffuseTexture1,
                       &TerrainMaterial::set_diffuseTexture1}
     , diffuseTexture2{this, &TerrainMaterial::get_diffuseTexture2,
                       &TerrainMaterial::set_diffuseTexture2}
     , diffuseTexture3{this, &TerrainMaterial::get_diffuseTexture3,
                       &TerrainMaterial::set_diffuseTexture3}
-    , bumpTexture1{this, &TerrainMaterial::get_bumpTexture1,
-                   &TerrainMaterial::set_bumpTexture1}
-    , bumpTexture2{this, &TerrainMaterial::get_bumpTexture2,
-                   &TerrainMaterial::set_bumpTexture2}
-    , bumpTexture3{this, &TerrainMaterial::get_bumpTexture3,
-                   &TerrainMaterial::set_bumpTexture3}
+    , bumpTexture1{this, &TerrainMaterial::get_bumpTexture1, &TerrainMaterial::set_bumpTexture1}
+    , bumpTexture2{this, &TerrainMaterial::get_bumpTexture2, &TerrainMaterial::set_bumpTexture2}
+    , bumpTexture3{this, &TerrainMaterial::get_bumpTexture3, &TerrainMaterial::set_bumpTexture3}
     , diffuseColor{Color3(1.f, 1.f, 1.f)}
     , specularColor{Color3(0.f, 0.f, 0.f)}
     , specularPower{64.f}
@@ -196,8 +192,7 @@ BaseTexturePtr TerrainMaterial::getAlphaTestTexture()
   return nullptr;
 }
 
-bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh,
-                                        BaseSubMesh* subMesh, bool useInstances)
+bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool useInstances)
 {
   if (isFrozen()) {
     if (_wasPreviouslyReady && subMesh->effect()) {
@@ -209,10 +204,9 @@ bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     subMesh->_materialDefines = std::make_shared<TerrainMaterialDefines>();
   }
 
-  auto definesPtr = std::static_pointer_cast<TerrainMaterialDefines>(
-    subMesh->_materialDefines);
-  auto& defines = *definesPtr.get();
-  auto scene    = getScene();
+  auto definesPtr = std::static_pointer_cast<TerrainMaterialDefines>(subMesh->_materialDefines);
+  auto& defines   = *definesPtr.get();
+  auto scene      = getScene();
 
   if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (_renderId == scene->getRenderId()) {
@@ -224,26 +218,44 @@ bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
   // Textures
   if (scene->texturesEnabled()) {
-    if (_mixTexture && StandardMaterial::DiffuseTextureEnabled()) {
-      if (!_mixTexture->isReady()) {
+    if (!mixTexture() || !mixTexture()->isReady()) {
+      return false;
+    }
+
+    defines._needUVs = true;
+
+    if (MaterialFlags::DiffuseTextureEnabled()) {
+      if (!diffuseTexture1() || !diffuseTexture1()->isReady()) {
         return false;
       }
-      else {
-        defines._needUVs           = true;
-        defines.boolDef["DIFFUSE"] = true;
+      if (!diffuseTexture2() || !diffuseTexture2()->isReady()) {
+        return false;
       }
+      if (!diffuseTexture3() || !diffuseTexture3()->isReady()) {
+        return false;
+      }
+
+      defines.boolDef["DIFFUSE"] = true;
     }
-    if ((_bumpTexture1 || _bumpTexture2 || _bumpTexture3)
-        && StandardMaterial::BumpTextureEnabled()) {
-      defines._needUVs        = true;
+
+    if (bumpTexture1() && bumpTexture2() && bumpTexture3() && MaterialFlags::BumpTextureEnabled()) {
+      if (!bumpTexture1()->isReady()) {
+        return false;
+      }
+      if (!bumpTexture2()->isReady()) {
+        return false;
+      }
+      if (!bumpTexture3()->isReady()) {
+        return false;
+      }
+
       defines._needNormals    = true;
       defines.boolDef["BUMP"] = true;
     }
   }
 
   // Misc.
-  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(),
-                                        fogEnabled(),
+  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(), fogEnabled(),
                                         _shouldTurnAlphaTestOn(mesh), defines);
 
   // Lights
@@ -267,8 +279,7 @@ bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh,
       fallbacks->addFallback(1, "FOG");
     }
 
-    MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks,
-                                              maxSimultaneousLights());
+    MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks, maxSimultaneousLights());
 
     if (defines.intDef["NUM_BONE_INFLUENCERS"] > 0) {
       fallbacks->addCPUSkinningFallback(0, mesh);
@@ -293,8 +304,7 @@ bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh,
       attribs.emplace_back(VertexBuffer::ColorKind);
     }
 
-    MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
-                                              *fallbacks);
+    MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines, *fallbacks);
     MaterialHelper::PrepareAttributesForInstances(attribs, defines);
 
     // Legacy browser patch
@@ -302,15 +312,14 @@ bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     auto join = defines.toString();
 
     const std::vector<std::string> uniforms{
-      "world",         "view",          "viewProjection", "vEyePosition",
-      "vLightsType",   "vDiffuseColor", "vSpecularColor", "vFogInfos",
-      "vFogColor",     "pointSize",     "vTextureInfos",  "mBones",
-      "vClipPlane",    "vClipPlane2",   "vClipPlane3",    "vClipPlane4",
-      "textureMatrix", "diffuse1Infos", "diffuse2Infos",  "diffuse3Infos"};
+      "world",         "view",           "viewProjection", "vEyePosition",  "vLightsType",
+      "vDiffuseColor", "vSpecularColor", "vFogInfos",      "vFogColor",     "pointSize",
+      "vTextureInfos", "mBones",         "vClipPlane",     "vClipPlane2",   "vClipPlane3",
+      "vClipPlane4",   "textureMatrix",  "diffuse1Infos",  "diffuse2Infos", "diffuse3Infos"};
 
-    const std::vector<std::string> samplers{
-      "textureSampler", "diffuse1Sampler", "diffuse2Sampler", "diffuse3Sampler",
-      "bump1Sampler",   "bump2Sampler",    "bump3Sampler"};
+    const std::vector<std::string> samplers{"textureSampler",  "diffuse1Sampler", "diffuse2Sampler",
+                                            "diffuse3Sampler", "bump1Sampler",    "bump2Sampler",
+                                            "bump3Sampler"};
     const std::vector<std::string> uniformBuffers{};
 
     EffectCreationOptions options;
@@ -324,13 +333,10 @@ bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     options.fallbacks             = std::move(fallbacks);
     options.onCompiled            = onCompiled;
     options.onError               = onError;
-    options.indexParameters
-      = {{"maxSimultaneousLights", maxSimultaneousLights()}};
+    options.indexParameters       = {{"maxSimultaneousLights", maxSimultaneousLights()}};
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
-    subMesh->setEffect(
-      scene->getEngine()->createEffect(shaderName, options, engine),
-      definesPtr);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
@@ -343,13 +349,11 @@ bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   return true;
 }
 
-void TerrainMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
-                                     SubMesh* subMesh)
+void TerrainMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
-  auto _defines
-    = static_cast<TerrainMaterialDefines*>(subMesh->_materialDefines.get());
+  auto _defines = static_cast<TerrainMaterialDefines*>(subMesh->_materialDefines.get());
   if (!_defines) {
     return;
   }
@@ -372,13 +376,11 @@ void TerrainMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
     // Textures
     if (_mixTexture) {
       _activeEffect->setTexture("textureSampler", _mixTexture);
-      _activeEffect->setFloat2(
-        "vTextureInfos", static_cast<float>(_mixTexture->coordinatesIndex),
-        _mixTexture->level);
-      _activeEffect->setMatrix("textureMatrix",
-                               *_mixTexture->getTextureMatrix());
+      _activeEffect->setFloat2("vTextureInfos", static_cast<float>(_mixTexture->coordinatesIndex),
+                               _mixTexture->level);
+      _activeEffect->setMatrix("textureMatrix", *_mixTexture->getTextureMatrix());
 
-      if (StandardMaterial::DiffuseTextureEnabled()) {
+      if (MaterialFlags::DiffuseTextureEnabled()) {
         if (_diffuseTexture1) {
           _activeEffect->setTexture("diffuse1Sampler", _diffuseTexture1);
           _activeEffect->setFloat2("diffuse1Infos", _diffuseTexture1->uScale,
@@ -396,7 +398,7 @@ void TerrainMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
         }
       }
 
-      if (StandardMaterial::BumpTextureEnabled()
+      if (MaterialFlags::BumpTextureEnabled()
           && scene->getEngine()->getCaps().standardDerivatives) {
         if (_bumpTexture1) {
           _activeEffect->setTexture("bump1Sampler", _bumpTexture1);
@@ -420,21 +422,18 @@ void TerrainMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
     MaterialHelper::BindEyePosition(effect, scene);
   }
 
-  _activeEffect->setColor4("vDiffuseColor", diffuseColor,
-                           alpha * mesh->visibility);
+  _activeEffect->setColor4("vDiffuseColor", diffuseColor, alpha * mesh->visibility);
 
   if (defines["SPECULARTERM"]) {
     _activeEffect->setColor4("vSpecularColor", specularColor, specularPower);
   }
 
   if (scene->lightsEnabled() && !_disableLighting) {
-    MaterialHelper::BindLights(scene, mesh, _activeEffect, defines,
-                               maxSimultaneousLights());
+    MaterialHelper::BindLights(scene, mesh, _activeEffect, defines, maxSimultaneousLights());
   }
 
   // View
-  if (scene->fogEnabled() && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE) {
+  if (scene->fogEnabled() && mesh->applyFog() && scene->fogMode() != Scene::FOGMODE_NONE) {
     _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 
@@ -527,8 +526,7 @@ bool TerrainMaterial::hasTexture(const BaseTexturePtr& texture) const
   return false;
 }
 
-void TerrainMaterial::dispose(bool forceDisposeEffect,
-                              bool forceDisposeTextures,
+void TerrainMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
                               bool /*notBoundToMesh*/)
 {
   if (_mixTexture) {
@@ -538,8 +536,7 @@ void TerrainMaterial::dispose(bool forceDisposeEffect,
   PushMaterial::dispose(forceDisposeEffect, forceDisposeTextures);
 }
 
-MaterialPtr TerrainMaterial::clone(const std::string& /*name*/,
-                                   bool /*cloneChildren*/) const
+MaterialPtr TerrainMaterial::clone(const std::string& /*name*/, bool /*cloneChildren*/) const
 {
   return nullptr;
 }
@@ -554,8 +551,7 @@ std::string TerrainMaterial::getClassName() const
   return "TerrainMaterial";
 }
 
-TerrainMaterial* TerrainMaterial::Parse(const json& /*source*/,
-                                        Scene* /*scene*/,
+TerrainMaterial* TerrainMaterial::Parse(const json& /*source*/, Scene* /*scene*/,
                                         const std::string& /*rootUrl*/)
 {
   return nullptr;
