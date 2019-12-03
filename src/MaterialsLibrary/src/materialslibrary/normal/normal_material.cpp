@@ -8,8 +8,8 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/material_flags.h>
 #include <babylon/materials/material_helper.h>
-#include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materialslibrary/normal/normal_fragment_fx.h>
 #include <babylon/materialslibrary/normal/normal_vertex_fx.h>
@@ -23,8 +23,7 @@ namespace MaterialsLibrary {
 
 NormalMaterial::NormalMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
-    , diffuseTexture{this, &NormalMaterial::get_diffuseTexture,
-                     &NormalMaterial::set_diffuseTexture}
+    , diffuseTexture{this, &NormalMaterial::get_diffuseTexture, &NormalMaterial::set_diffuseTexture}
     , diffuseColor{Color3(1.f, 1.f, 1.f)}
     , disableLighting{this, &NormalMaterial::get_disableLighting,
                       &NormalMaterial::set_disableLighting}
@@ -93,6 +92,11 @@ bool NormalMaterial::needAlphaBlending() const
   return (alpha < 1.f);
 }
 
+bool NormalMaterial::needAlphaBlendingForMesh(const AbstractMesh& mesh) const
+{
+  return needAlphaBlending() || (mesh.visibility() < 1.f);
+}
+
 bool NormalMaterial::needAlphaTesting() const
 {
   return false;
@@ -103,8 +107,7 @@ BaseTexturePtr NormalMaterial::getAlphaTestTexture()
   return nullptr;
 }
 
-bool NormalMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
-                                       bool useInstances)
+bool NormalMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool useInstances)
 {
   if (isFrozen()) {
     if (_wasPreviouslyReady && subMesh->effect()) {
@@ -116,10 +119,9 @@ bool NormalMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     subMesh->_materialDefines = std::make_shared<NormalMaterialDefines>();
   }
 
-  auto definesPtr = std::static_pointer_cast<NormalMaterialDefines>(
-    subMesh->_materialDefines);
-  auto& defines = *definesPtr.get();
-  auto scene    = getScene();
+  auto definesPtr = std::static_pointer_cast<NormalMaterialDefines>(subMesh->_materialDefines);
+  auto& defines   = *definesPtr.get();
+  auto scene      = getScene();
 
   if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (_renderId == scene->getRenderId()) {
@@ -133,7 +135,7 @@ bool NormalMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
   if (defines._areTexturesDirty) {
     defines._needUVs = false;
     if (scene->texturesEnabled()) {
-      if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
+      if (_diffuseTexture && MaterialFlags::DiffuseTextureEnabled()) {
         if (!_diffuseTexture->isReady()) {
           return false;
         }
@@ -146,16 +148,18 @@ bool NormalMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
   }
 
   // Misc.
-  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(),
-                                        fogEnabled(),
+  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(), fogEnabled(),
                                         _shouldTurnAlphaTestOn(mesh), defines);
 
   // Lights
-  defines._needNormals = MaterialHelper::PrepareDefinesForLights(
-    scene, mesh, defines, false, _maxSimultaneousLights, _disableLighting);
+  defines._needNormals = true;
+  MaterialHelper::PrepareDefinesForLights(scene, mesh, defines, false, _maxSimultaneousLights,
+                                          _disableLighting);
 
   // Values that need to be evaluated on every frame
   MaterialHelper::PrepareDefinesForFrameBoundValues(scene, engine, defines, useInstances);
+
+  defines.boolDef["LIGHTING"] = !_disableLighting;
 
   // Attribs
   MaterialHelper::PrepareDefinesForAttributes(mesh, defines, true, true);
@@ -193,12 +197,7 @@ bool NormalMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
       attribs.emplace_back(VertexBuffer::UV2Kind);
     }
 
-    if (defines["VERTEXCOLOR"]) {
-      attribs.emplace_back(VertexBuffer::ColorKind);
-    }
-
-    MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
-                                              *fallbacks);
+    MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines, *fallbacks);
     MaterialHelper::PrepareAttributesForInstances(attribs, defines);
 
     const std::string shaderName{"normal"};
@@ -226,9 +225,7 @@ bool NormalMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     options.indexParameters       = {{"maxSimultaneousLights", 4}};
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
-    subMesh->setEffect(
-      scene->getEngine()->createEffect(shaderName, options, engine),
-      definesPtr);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
@@ -245,8 +242,7 @@ void NormalMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
-  auto defines
-    = static_cast<NormalMaterialDefines*>(subMesh->_materialDefines.get());
+  auto defines = static_cast<NormalMaterialDefines*>(subMesh->_materialDefines.get());
   if (!defines) {
     return;
   }
@@ -266,14 +262,13 @@ void NormalMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 
   if (_mustRebind(scene, effect)) {
     // Textures
-    if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
+    if (_diffuseTexture && MaterialFlags::DiffuseTextureEnabled()) {
       _activeEffect->setTexture("diffuseSampler", _diffuseTexture);
 
-      _activeEffect->setFloat2(
-        "vDiffuseInfos", static_cast<float>(_diffuseTexture->coordinatesIndex),
-        _diffuseTexture->level);
-      _activeEffect->setMatrix("diffuseMatrix",
-                               *_diffuseTexture->getTextureMatrix());
+      _activeEffect->setFloat2("vDiffuseInfos",
+                               static_cast<float>(_diffuseTexture->coordinatesIndex),
+                               _diffuseTexture->level);
+      _activeEffect->setMatrix("diffuseMatrix", *_diffuseTexture->getTextureMatrix());
     }
 
     // Clip plane
@@ -287,8 +282,7 @@ void NormalMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
     MaterialHelper::BindEyePosition(effect, scene);
   }
 
-  _activeEffect->setColor4("vDiffuseColor", diffuseColor,
-                           alpha * mesh->visibility);
+  _activeEffect->setColor4("vDiffuseColor", diffuseColor, alpha * mesh->visibility);
 
   // Lights
   if (scene->lightsEnabled() && !_disableLighting) {
@@ -296,8 +290,7 @@ void NormalMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
   }
 
   // View
-  if (scene->fogEnabled() && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE) {
+  if (scene->fogEnabled() && mesh->applyFog() && scene->fogMode() != Scene::FOGMODE_NONE) {
     _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 
@@ -352,8 +345,7 @@ void NormalMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
   PushMaterial::dispose(forceDisposeEffect, forceDisposeTextures);
 }
 
-MaterialPtr NormalMaterial::clone(const std::string& /*name*/,
-                                  bool /*cloneChildren*/) const
+MaterialPtr NormalMaterial::clone(const std::string& /*name*/, bool /*cloneChildren*/) const
 {
   return nullptr;
 }

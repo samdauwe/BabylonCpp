@@ -59,9 +59,8 @@ NormalMaterialDefines::NormalMaterialDefines()
     {"NORMAL", false},         //
     {"UV1", false},            //
     {"UV2", false},            //
-    {"VERTEXCOLOR", false},    //
-    {"VERTEXALPHA", false},    //
     {"INSTANCES", false},      //
+    {"LIGHTING", false},       //
   };
 
   intDef = {

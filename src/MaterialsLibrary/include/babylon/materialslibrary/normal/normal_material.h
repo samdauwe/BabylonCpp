@@ -32,6 +32,7 @@ public:
   [[nodiscard]] Type type() const override;
 
   [[nodiscard]] bool needAlphaBlending() const override;
+  [[nodiscard]] bool needAlphaBlendingForMesh(const AbstractMesh& mesh) const override;
   [[nodiscard]] bool needAlphaTesting() const override;
   BaseTexturePtr getAlphaTestTexture() override;
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
