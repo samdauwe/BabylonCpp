@@ -7,6 +7,9 @@
 namespace BABYLON {
 namespace MaterialsLibrary {
 
+/**
+ * @brief Hidden
+ */
 struct BABYLON_SHARED_EXPORT SkyMaterialDefines : public MaterialDefines {
 
   SkyMaterialDefines();

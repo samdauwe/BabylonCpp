@@ -31,6 +31,7 @@ SkyMaterial::SkyMaterial(const std::string& iName, Scene* scene)
     , azimuth{0.25f}
     , sunPosition{Vector3(0.f, 100.f, 0.f)}
     , useSunPosition{false}
+    , cameraOffset{Vector3::Zero()}
     , _cameraPosition{Vector3::Zero()}
     , _renderId{-1}
 {
@@ -58,8 +59,7 @@ BaseTexturePtr SkyMaterial::getAlphaTestTexture()
   return nullptr;
 }
 
-bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
-                                    bool /*useInstances*/)
+bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool /*useInstances*/)
 {
   if (isFrozen()) {
     if (_wasPreviouslyReady && subMesh->effect()) {
@@ -71,10 +71,9 @@ bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     subMesh->_materialDefines = std::make_shared<SkyMaterialDefines>();
   }
 
-  auto definesPtr
-    = std::static_pointer_cast<SkyMaterialDefines>(subMesh->_materialDefines);
-  auto& defines = *definesPtr.get();
-  auto scene    = getScene();
+  auto definesPtr = std::static_pointer_cast<SkyMaterialDefines>(subMesh->_materialDefines);
+  auto& defines   = *definesPtr.get();
+  auto scene      = getScene();
 
   if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (_renderId == scene->getRenderId()) {
@@ -84,8 +83,8 @@ bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
 
   auto engine = scene->getEngine();
 
-  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(),
-                                        fogEnabled(), false, defines);
+  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(), fogEnabled(), false,
+                                        defines);
 
   // Attribs
   MaterialHelper::PrepareDefinesForAttributes(mesh, defines, true, false);
@@ -112,12 +111,10 @@ bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     const std::string shaderName{"sky"};
     auto join = defines.toString();
     const std::vector<std::string> uniforms{
-      "world",       "viewProjection", "view",
-      "vFogInfos",   "vFogColor",      "pointSize",
-      "vClipPlane",  "vClipPlane2",    "vClipPlane3",
-      "vClipPlane4", "luminance",      "turbidity",
-      "rayleigh",    "mieCoefficient", "mieDirectionalG",
-      "sunPosition", "cameraPosition"};
+      "world",       "viewProjection", "view",        "vFogInfos",      "vFogColor",
+      "pointSize",   "vClipPlane",     "vClipPlane2", "vClipPlane3",    "vClipPlane4",
+      "luminance",   "turbidity",      "rayleigh",    "mieCoefficient", "mieDirectionalG",
+      "sunPosition", "cameraPosition", "cameraOffset"};
     const std::vector<std::string> samplers{};
     const std::vector<std::string> uniformBuffers{};
 
@@ -132,9 +129,7 @@ bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     options.onCompiled          = onCompiled;
     options.onError             = onError;
 
-    subMesh->setEffect(
-      scene->getEngine()->createEffect(shaderName, options, engine),
-      definesPtr);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
@@ -151,8 +146,7 @@ void SkyMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
-  auto defines
-    = static_cast<SkyMaterialDefines*>(subMesh->_materialDefines.get());
+  auto defines = static_cast<SkyMaterialDefines*>(subMesh->_materialDefines.get());
   if (!defines) {
     return;
   }
@@ -178,8 +172,7 @@ void SkyMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
   }
 
   // View
-  if (scene->fogEnabled() && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE) {
+  if (scene->fogEnabled() && mesh->applyFog() && scene->fogMode() != Scene::FOGMODE_NONE) {
     _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 
@@ -195,6 +188,8 @@ void SkyMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
     _cameraPosition.z              = cameraWorldMatrixM[14];
     _activeEffect->setVector3("cameraPosition", _cameraPosition);
   }
+
+  _activeEffect->setVector3("cameraOffset", cameraOffset);
 
   if (luminance > 0.f) {
     _activeEffect->setFloat("luminance", luminance);
@@ -230,8 +225,7 @@ void SkyMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
   Material::dispose(forceDisposeEffect, forceDisposeTextures);
 }
 
-MaterialPtr SkyMaterial::clone(const std::string& /*name*/,
-                               bool /*cloneChildren*/) const
+MaterialPtr SkyMaterial::clone(const std::string& /*name*/, bool /*cloneChildren*/) const
 {
   return nullptr;
 }
