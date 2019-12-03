@@ -12,6 +12,8 @@
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material_helper.h>
+#include <babylon/materialslibrary/shadowonly/shadow_only_fragment_fx.h>
+#include <babylon/materialslibrary/shadowonly/shadow_only_vertex_fx.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
 
@@ -21,11 +23,15 @@ namespace MaterialsLibrary {
 ShadowOnlyMaterial::ShadowOnlyMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
     , shadowColor{Color3::Black()}
-    , activeLight{this, &ShadowOnlyMaterial::get_activeLight,
-                  &ShadowOnlyMaterial::set_activeLight}
+    , activeLight{this, &ShadowOnlyMaterial::get_activeLight, &ShadowOnlyMaterial::set_activeLight}
     , _renderId{-1}
     , _activeLight{nullptr}
 {
+  // Vertex shader
+  Effect::ShadersStore()["shadowOnlyVertexShader"] = shadowOnlyVertexShader;
+
+  // Fragment shader
+  Effect::ShadersStore()["shadowOnlyPixelShader"] = shadowOnlyPixelShader;
 }
 
 ShadowOnlyMaterial::~ShadowOnlyMaterial() = default;
@@ -55,8 +61,7 @@ BaseTexturePtr ShadowOnlyMaterial::getAlphaTestTexture()
   return nullptr;
 }
 
-bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh,
-                                           BaseSubMesh* subMesh,
+bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                                            bool useInstances)
 {
   if (isFrozen()) {
@@ -69,10 +74,9 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     subMesh->_materialDefines = std::make_shared<ShadowOnlyMaterialDefines>();
   }
 
-  auto definesPtr = std::static_pointer_cast<ShadowOnlyMaterialDefines>(
-    subMesh->_materialDefines);
-  auto& defines = *definesPtr.get();
-  auto scene    = getScene();
+  auto definesPtr = std::static_pointer_cast<ShadowOnlyMaterialDefines>(subMesh->_materialDefines);
+  auto& defines   = *definesPtr.get();
+  auto scene      = getScene();
 
   if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (_renderId == scene->getRenderId()) {
@@ -84,19 +88,18 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
   // Ensure that active light is the first shadow light
   if (_activeLight) {
-    for (const auto& light : mesh->_lightSources) {
-      if (light->shadowEnabled) {
+    for (const auto& light : mesh->lightSources()) {
+      if (light->shadowEnabled()) {
         auto iActiveLight = std::dynamic_pointer_cast<Light>(_activeLight);
         if (iActiveLight == light) {
           break; // We are good
         }
 
-        auto it = std::find(mesh->_lightSources.begin(),
-                            mesh->_lightSources.end(), iActiveLight);
+        auto it = std::find(mesh->lightSources().begin(), mesh->lightSources().end(), iActiveLight);
 
-        if (it != mesh->_lightSources.end()) {
-          mesh->_lightSources.erase(it);
-          mesh->_lightSources.insert(mesh->_lightSources.begin(), iActiveLight);
+        if (it != mesh->lightSources().end()) {
+          mesh->lightSources().erase(it);
+          mesh->lightSources().insert(mesh->lightSources().begin(), iActiveLight);
         }
         break;
       }
@@ -105,12 +108,10 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
   MaterialHelper::PrepareDefinesForFrameBoundValues(scene, engine, defines, useInstances);
 
-  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(),
-                                        fogEnabled(),
+  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(), fogEnabled(),
                                         _shouldTurnAlphaTestOn(mesh), defines);
 
-  defines._needNormals
-    = MaterialHelper::PrepareDefinesForLights(scene, mesh, defines, false, 1);
+  defines._needNormals = MaterialHelper::PrepareDefinesForLights(scene, mesh, defines, false, 1);
 
   // Attribs
   MaterialHelper::PrepareDefinesForAttributes(mesh, defines, false, true);
@@ -140,8 +141,7 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh,
       attribs.emplace_back(VertexBuffer::NormalKind);
     }
 
-    MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
-                                              *fallbacks);
+    MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines, *fallbacks);
     MaterialHelper::PrepareAttributesForInstances(attribs, defines);
 
     const std::string shaderName{"shadowOnly"};
@@ -149,10 +149,9 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     EffectCreationOptions options;
     options.attributes = std::move(attribs);
     options.uniformsNames
-      = {"world",       "view",        "viewProjection", "vEyePosition",
-         "vLightsType", "vFogInfos",   "vFogColor",      "pointSize",
-         "alpha",       "shadowColor", "mBones",         "vClipPlane",
-         "vClipPlane2", "vClipPlane3", "vClipPlane4"};
+      = {"world",     "view",       "viewProjection", "vEyePosition", "vLightsType",
+         "vFogInfos", "vFogColor",  "pointSize",      "alpha",        "shadowColor",
+         "mBones",    "vClipPlane", "vClipPlane2",    "vClipPlane3",  "vClipPlane4"};
     options.uniformBuffersNames   = {};
     options.samplers              = {};
     options.defines               = std::move(join);
@@ -162,9 +161,7 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     options.onError               = onError;
     options.indexParameters       = {{"maxSimultaneousLights", 1}};
 
-    subMesh->setEffect(
-      scene->getEngine()->createEffect(shaderName, options, engine),
-      definesPtr);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
@@ -177,13 +174,11 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   return true;
 }
 
-void ShadowOnlyMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
-                                        SubMesh* subMesh)
+void ShadowOnlyMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
-  auto defines
-    = static_cast<ShadowOnlyMaterialDefines*>(subMesh->_materialDefines.get());
+  auto defines = static_cast<ShadowOnlyMaterialDefines*>(subMesh->_materialDefines.get());
   if (!defines) {
     return;
   }
@@ -222,8 +217,7 @@ void ShadowOnlyMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
   }
 
   // View
-  if (scene->fogEnabled() && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE) {
+  if (scene->fogEnabled() && mesh->applyFog() && scene->fogMode() != Scene::FOGMODE_NONE) {
     _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 
@@ -233,8 +227,7 @@ void ShadowOnlyMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
   _afterBind(mesh, _activeEffect);
 }
 
-MaterialPtr ShadowOnlyMaterial::clone(const std::string& /*name*/,
-                                      bool /*cloneChildren*/) const
+MaterialPtr ShadowOnlyMaterial::clone(const std::string& /*name*/, bool /*cloneChildren*/) const
 {
   return nullptr;
 }
@@ -249,8 +242,7 @@ std::string ShadowOnlyMaterial::getClassName() const
   return "ShadowOnlyMaterial";
 }
 
-ShadowOnlyMaterial* ShadowOnlyMaterial::Parse(const json& /*source*/,
-                                              Scene* /*scene*/,
+ShadowOnlyMaterial* ShadowOnlyMaterial::Parse(const json& /*source*/, Scene* /*scene*/,
                                               const std::string& /*rootUrl*/)
 {
   return nullptr;

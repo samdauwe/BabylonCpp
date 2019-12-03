@@ -13,10 +13,21 @@ using IShadowLightPtr = std::shared_ptr<IShadowLight>;
 
 namespace MaterialsLibrary {
 
+class ShadowOnlyMaterial;
+using ShadowOnlyMaterialPtr = std::shared_ptr<ShadowOnlyMaterial>;
+
 class BABYLON_SHARED_EXPORT ShadowOnlyMaterial : public PushMaterial {
 
 public:
-  ShadowOnlyMaterial(const std::string& name, Scene* scene);
+  template <typename... Ts>
+  static ShadowOnlyMaterialPtr New(Ts&&... args)
+  {
+    auto material
+      = std::shared_ptr<ShadowOnlyMaterial>(new ShadowOnlyMaterial(std::forward<Ts>(args)...));
+    material->addMaterialToScene(material);
+
+    return material;
+  }
   ~ShadowOnlyMaterial() override; // = default
 
   [[nodiscard]] bool needAlphaBlending() const override;
@@ -33,6 +44,8 @@ public:
   static ShadowOnlyMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
+  ShadowOnlyMaterial(const std::string& name, Scene* scene);
+
   IShadowLightPtr& get_activeLight();
   void set_activeLight(const IShadowLightPtr& light);
 
