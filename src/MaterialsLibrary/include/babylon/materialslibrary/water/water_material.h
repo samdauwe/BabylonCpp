@@ -13,10 +13,12 @@ namespace BABYLON {
 
 class AbstractMesh;
 class IAnimatable;
+class ImageProcessingConfiguration;
 class Mesh;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
-using IAnimatablePtr  = std::shared_ptr<IAnimatable>;
-using MeshPtr         = std::shared_ptr<Mesh>;
+using AbstractMeshPtr                 = std::shared_ptr<AbstractMesh>;
+using IAnimatablePtr                  = std::shared_ptr<IAnimatable>;
+using ImageProcessingConfigurationPtr = std::shared_ptr<ImageProcessingConfiguration>;
+using MeshPtr                         = std::shared_ptr<Mesh>;
 
 namespace MaterialsLibrary {
 
@@ -156,6 +158,12 @@ public:
    * Defines the waves speed
    */
   float waveSpeed;
+  /**
+   * Sets or gets wether or not automatic clipping should be enabled or not. Setting to true will
+   * save performances and will avoid calculating useless pixels in the pixel shader of the water
+   * material.
+   */
+  bool disableClipPlane;
 
   ReadOnlyProperty<WaterMaterial, RenderTargetTexturePtr> refractionTexture;
   ReadOnlyProperty<WaterMaterial, RenderTargetTexturePtr> reflectionTexture;
@@ -199,6 +207,8 @@ private:
   Matrix _savedViewMatrix;
   Matrix _mirrorMatrix;
   bool _useLogarithmicDepth;
+  ImageProcessingConfigurationPtr _imageProcessingConfiguration;
+  Observer<ImageProcessingConfiguration>::Ptr _imageProcessingObserver;
 
 }; // end of class WaterMaterial
 

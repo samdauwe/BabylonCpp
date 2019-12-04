@@ -10,8 +10,9 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/image_processing_configuration.h>
+#include <babylon/materials/material_flags.h>
 #include <babylon/materials/material_helper.h>
-#include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materialslibrary/water/water_fragment_fx.h>
 #include <babylon/materialslibrary/water/water_vertex_fx.h>
@@ -26,8 +27,7 @@ namespace MaterialsLibrary {
 WaterMaterial::WaterMaterial(const std::string& iName, Scene* scene,
                              const Vector2& renderTargetSize)
     : PushMaterial{iName, scene}
-    , bumpTexture{this, &WaterMaterial::get_bumpTexture,
-                  &WaterMaterial::set_bumpTexture}
+    , bumpTexture{this, &WaterMaterial::get_bumpTexture, &WaterMaterial::set_bumpTexture}
     , diffuseColor{Color3(1.f, 1.f, 1.f)}
     , specularColor{Color3(0.f, 0.f, 0.f)}
     , specularPower{64.f}
@@ -51,6 +51,7 @@ WaterMaterial::WaterMaterial(const std::string& iName, Scene* scene,
     , colorBlendFactor2{0.2f}
     , waveLength{0.1f}
     , waveSpeed{1.f}
+    , disableClipPlane{false}
     , refractionTexture{this, &WaterMaterial::get_refractionTexture}
     , reflectionTexture{this, &WaterMaterial::get_reflectionTexture}
     , renderTargetsEnabled{this, &WaterMaterial::get_renderTargetsEnabled}
@@ -72,6 +73,8 @@ WaterMaterial::WaterMaterial(const std::string& iName, Scene* scene,
     , _savedViewMatrix{Matrix::Zero()}
     , _mirrorMatrix{Matrix::Zero()}
     , _useLogarithmicDepth{false}
+    , _imageProcessingConfiguration{nullptr}
+    , _imageProcessingObserver{nullptr}
 {
   // Vertex shader
   Effect::ShadersStore()["waterVertexShader"] = waterVertexShader;
@@ -89,6 +92,14 @@ WaterMaterial::WaterMaterial(const std::string& iName, Scene* scene,
 
     return _renderTargets;
   };
+
+  _imageProcessingConfiguration = scene->imageProcessingConfiguration();
+  if (_imageProcessingConfiguration) {
+    _imageProcessingObserver = _imageProcessingConfiguration->onUpdateParameters.add(
+      [this](ImageProcessingConfiguration* /*ic*/, EventState & /*es*/) -> void {
+        _markAllSubMeshesAsImageProcessingDirty();
+      });
+  }
 }
 
 WaterMaterial::~WaterMaterial() = default;
@@ -178,8 +189,7 @@ bool WaterMaterial::get_useLogarithmicDepth() const
 
 void WaterMaterial::set_useLogarithmicDepth(bool value)
 {
-  _useLogarithmicDepth
-    = value && getScene()->getEngine()->getCaps().fragmentDepthSupported;
+  _useLogarithmicDepth = value && getScene()->getEngine()->getCaps().fragmentDepthSupported;
   _markAllSubMeshesAsMiscDirty();
 }
 
@@ -247,8 +257,7 @@ BaseTexturePtr WaterMaterial::getAlphaTestTexture()
   return nullptr;
 }
 
-bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
-                                      bool useInstances)
+bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool useInstances)
 {
   if (isFrozen()) {
     if (_wasPreviouslyReady && subMesh->effect()) {
@@ -260,10 +269,9 @@ bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     subMesh->_materialDefines = std::make_shared<WaterMaterialDefines>();
   }
 
-  auto definesPtr
-    = std::static_pointer_cast<WaterMaterialDefines>(subMesh->_materialDefines);
-  auto& defines = *definesPtr.get();
-  auto scene    = getScene();
+  auto definesPtr = std::static_pointer_cast<WaterMaterialDefines>(subMesh->_materialDefines);
+  auto& defines   = *definesPtr.get();
+  auto scene      = getScene();
 
   if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (_renderId == scene->getRenderId()) {
@@ -277,7 +285,7 @@ bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
   if (defines._areTexturesDirty) {
     defines._needUVs = false;
     if (scene->texturesEnabled()) {
-      if (_bumpTexture && StandardMaterial::BumpTextureEnabled()) {
+      if (_bumpTexture && MaterialFlags::BumpTextureEnabled()) {
         if (!_bumpTexture->isReady()) {
           return false;
         }
@@ -287,7 +295,7 @@ bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
         }
       }
 
-      if (StandardMaterial::ReflectionTextureEnabled()) {
+      if (MaterialFlags::ReflectionTextureEnabled()) {
         defines.boolDef["REFLECTION"] = true;
       }
     }
@@ -295,9 +303,8 @@ bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
 
   MaterialHelper::PrepareDefinesForFrameBoundValues(scene, engine, defines, useInstances);
 
-  MaterialHelper::PrepareDefinesForMisc(mesh, scene, _useLogarithmicDepth,
-                                        pointsCloud(), fogEnabled(),
-                                        _shouldTurnAlphaTestOn(mesh), defines);
+  MaterialHelper::PrepareDefinesForMisc(mesh, scene, _useLogarithmicDepth, pointsCloud(),
+                                        fogEnabled(), _shouldTurnAlphaTestOn(mesh), defines);
 
   if (defines._areMiscDirty) {
     if (_fresnelSeparate) {
@@ -316,6 +323,20 @@ bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
   // Lights
   defines._needNormals = MaterialHelper::PrepareDefinesForLights(
     scene, mesh, defines, true, _maxSimultaneousLights, _disableLighting);
+
+  // Image processing
+  if (defines._areImageProcessingDirty && _imageProcessingConfiguration) {
+    if (!_imageProcessingConfiguration->isReady()) {
+      return false;
+    }
+
+    _imageProcessingConfiguration->prepareDefines(defines);
+
+    defines.boolDef["IS_REFLECTION_LINEAR"]
+      = (reflectionTexture() != nullptr && !reflectionTexture()->gammaSpace);
+    defines.boolDef["IS_REFRACTION_LINEAR"]
+      = (refractionTexture() != nullptr && !refractionTexture()->gammaSpace);
+  }
 
   // Attribs
   MaterialHelper::PrepareDefinesForAttributes(mesh, defines, true, true);
@@ -338,8 +359,7 @@ bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
       fallbacks->addFallback(0, "LOGARITHMICDEPTH");
     }
 
-    MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks,
-                                              maxSimultaneousLights());
+    MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks, maxSimultaneousLights());
 
     if (defines.intDef["NUM_BONE_INFLUENCERS"] > 0) {
       fallbacks->addCPUSkinningFallback(0, mesh);
@@ -364,29 +384,32 @@ bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
       attribs.emplace_back(VertexBuffer::ColorKind);
     }
 
-    MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
-                                              *fallbacks);
+    MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines, *fallbacks);
     MaterialHelper::PrepareAttributesForInstances(attribs, defines);
 
     // Legacy browser patch
     const std::string shaderName{"water"};
     auto join = defines.toString();
 
-    const std::vector<std::string> uniforms{
-      "world", "view", "viewProjection", "vEyePosition", "vLightsType",
-      "vDiffuseColor", "vSpecularColor", "vFogInfos", "vFogColor", "pointSize",
-      "vNormalInfos", "mBones", "vClipPlane", "vClipPlane2", "vClipPlane3",
-      "vClipPlane4", "normalMatrix", "logarithmicDepthConstant",
+    std::vector<std::string> uniforms{
+      "world", "view", "viewProjection", "vEyePosition", "vLightsType", "vDiffuseColor",
+      "vSpecularColor", "vFogInfos", "vFogColor", "pointSize", "vNormalInfos", "mBones",
+      "vClipPlane", "vClipPlane2", "vClipPlane3", "vClipPlane4", "normalMatrix",
+      "logarithmicDepthConstant",
       // Water
-      "worldReflectionViewProjection", "windDirection", "waveLength", "time",
-      "windForce", "cameraPosition", "bumpHeight", "waveHeight", "waterColor",
-      "waterColor2", "colorBlendFactor", "colorBlendFactor2", "waveSpeed"};
+      "worldReflectionViewProjection", "windDirection", "waveLength", "time", "windForce",
+      "cameraPosition", "bumpHeight", "waveHeight", "waterColor", "waterColor2", "colorBlendFactor",
+      "colorBlendFactor2", "waveSpeed"};
 
-    const std::vector<std::string> samplers{"normalSampler",
-                                            // Water
-                                            "refractionSampler",
-                                            "reflectionSampler"};
+    std::vector<std::string> samplers{"normalSampler",
+                                      // Water
+                                      "refractionSampler", "reflectionSampler"};
     const std::vector<std::string> uniformBuffers{};
+
+    {
+      ImageProcessingConfiguration::PrepareUniforms(uniforms, defines);
+      ImageProcessingConfiguration::PrepareSamplers(samplers, defines);
+    }
 
     EffectCreationOptions options;
     options.attributes            = std::move(attribs);
@@ -399,13 +422,10 @@ bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     options.fallbacks             = std::move(fallbacks);
     options.onCompiled            = onCompiled;
     options.onError               = onError;
-    options.indexParameters
-      = {{"maxSimultaneousLights", _maxSimultaneousLights}};
+    options.indexParameters       = {{"maxSimultaneousLights", _maxSimultaneousLights}};
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
-    subMesh->setEffect(
-      scene->getEngine()->createEffect(shaderName, options, engine),
-      definesPtr);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
@@ -422,8 +442,7 @@ void WaterMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
-  auto _defines
-    = static_cast<WaterMaterialDefines*>(subMesh->_materialDefines.get());
+  auto _defines = static_cast<WaterMaterialDefines*>(subMesh->_materialDefines.get());
   if (!_defines) {
     return;
   }
@@ -444,14 +463,12 @@ void WaterMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 
   if (_mustRebind(scene, effect)) {
     // Textures
-    if (_bumpTexture && StandardMaterial::BumpTextureEnabled()) {
+    if (_bumpTexture && MaterialFlags::BumpTextureEnabled()) {
       _activeEffect->setTexture("normalSampler", _bumpTexture);
 
-      _activeEffect->setFloat2(
-        "vNormalInfos", static_cast<float>(_bumpTexture->coordinatesIndex),
-        _bumpTexture->level);
-      _activeEffect->setMatrix("normalMatrix",
-                               *_bumpTexture->getTextureMatrix());
+      _activeEffect->setFloat2("vNormalInfos", static_cast<float>(_bumpTexture->coordinatesIndex),
+                               _bumpTexture->level);
+      _activeEffect->setMatrix("normalMatrix", *_bumpTexture->getTextureMatrix());
     }
     // Clip plane
     MaterialHelper::BindClipPlane(_activeEffect, scene);
@@ -464,21 +481,18 @@ void WaterMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
     MaterialHelper::BindEyePosition(effect, scene);
   }
 
-  _activeEffect->setColor4("vDiffuseColor", diffuseColor,
-                           alpha * mesh->visibility);
+  _activeEffect->setColor4("vDiffuseColor", diffuseColor, alpha * mesh->visibility);
 
   if (defines["SPECULARTERM"]) {
     _activeEffect->setColor4("vSpecularColor", specularColor, specularPower);
   }
 
   if (scene->lightsEnabled() && !_disableLighting) {
-    MaterialHelper::BindLights(scene, mesh, _activeEffect, defines,
-                               maxSimultaneousLights());
+    MaterialHelper::BindLights(scene, mesh, _activeEffect, defines, maxSimultaneousLights());
   }
 
   // View
-  if (scene->fogEnabled() && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE) {
+  if (scene->fogEnabled() && mesh->applyFog() && scene->fogMode() != Scene::FOGMODE_NONE) {
     _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 
@@ -489,14 +503,13 @@ void WaterMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
   MaterialHelper::BindLogDepth(defines, _activeEffect, scene);
 
   // Water
-  if (StandardMaterial::ReflectionTextureEnabled()) {
+  if (MaterialFlags::ReflectionTextureEnabled()) {
     _activeEffect->setTexture("refractionSampler", _refractionRTT);
     _activeEffect->setTexture("reflectionSampler", _reflectionRTT);
   }
 
-  auto wrvp = _mesh->getWorldMatrix()
-                .multiply(_reflectionTransform)
-                .multiply(scene->getProjectionMatrix());
+  auto wrvp
+    = _mesh->getWorldMatrix().multiply(_reflectionTransform).multiply(scene->getProjectionMatrix());
 
   // Add delta time. Prevent adding delta time if it hasn't changed.
   auto deltaTime = scene->getEngine()->getDeltaTime();
@@ -518,101 +531,108 @@ void WaterMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
   _activeEffect->setFloat("colorBlendFactor2", colorBlendFactor2);
   _activeEffect->setFloat("waveSpeed", waveSpeed);
 
+  // image processing
+  if (_imageProcessingConfiguration && !_imageProcessingConfiguration->applyByPostProcess()) {
+    _imageProcessingConfiguration->bind(_activeEffect.get());
+  }
+
   _afterBind(mesh, _activeEffect);
 }
 
-void WaterMaterial::_createRenderTargets(Scene* scene,
-                                         const Vector2& renderTargetSize)
+void WaterMaterial::_createRenderTargets(Scene* scene, const Vector2& renderTargetSize)
 {
   auto renderTargetSizeX = static_cast<int>(renderTargetSize.x);
   auto renderTargetSizeY = static_cast<int>(renderTargetSize.y);
 
   // Render targets
-  _refractionRTT = RenderTargetTexture::New(
-    name + "_refraction", ISize{renderTargetSizeX, renderTargetSizeY}, scene,
-    false, true, Constants::TEXTURETYPE_UNSIGNED_INT, false,
-    TextureConstants::TRILINEAR_SAMPLINGMODE, true, false);
-  _refractionRTT->wrapU                = TextureConstants::MIRROR_ADDRESSMODE;
-  _refractionRTT->wrapV                = TextureConstants::MIRROR_ADDRESSMODE;
+  _refractionRTT
+    = RenderTargetTexture::New(name + "_refraction", ISize{renderTargetSizeX, renderTargetSizeY},
+                               scene, false, true, Constants::TEXTURETYPE_UNSIGNED_INT, false,
+                               TextureConstants::TRILINEAR_SAMPLINGMODE, true, false);
+  _refractionRTT->wrapU                = Constants::TEXTURE_MIRROR_ADDRESSMODE;
+  _refractionRTT->wrapV                = Constants::TEXTURE_MIRROR_ADDRESSMODE;
   _refractionRTT->ignoreCameraViewport = true;
 
-  _reflectionRTT = RenderTargetTexture::New(
-    name + "_reflection", ISize{renderTargetSizeX, renderTargetSizeY}, scene,
-    false, true, Constants::TEXTURETYPE_UNSIGNED_INT, false,
-    TextureConstants::TRILINEAR_SAMPLINGMODE, true, false);
-  _reflectionRTT->wrapU                = TextureConstants::MIRROR_ADDRESSMODE;
-  _reflectionRTT->wrapV                = TextureConstants::MIRROR_ADDRESSMODE;
+  _reflectionRTT
+    = RenderTargetTexture::New(name + "_reflection", ISize{renderTargetSizeX, renderTargetSizeY},
+                               scene, false, true, Constants::TEXTURETYPE_UNSIGNED_INT, false,
+                               TextureConstants::TRILINEAR_SAMPLINGMODE, true, false);
+  _reflectionRTT->wrapU                = Constants::TEXTURE_MIRROR_ADDRESSMODE;
+  _reflectionRTT->wrapV                = Constants::TEXTURE_MIRROR_ADDRESSMODE;
   _reflectionRTT->ignoreCameraViewport = true;
 
-  _refractionRTT->onBeforeRender
-    = [this](int* /*faceIndex*/, EventState& /*es*/) {
-        if (_mesh) {
-          _isVisible       = _mesh->isVisible;
-          _mesh->isVisible = false;
-        }
-        // Clip plane
-        _clipPlane = getScene()->clipPlane;
+  _refractionRTT->onBeforeRender = [this](int* /*faceIndex*/, EventState& /*es*/) {
+    if (_mesh) {
+      _isVisible       = _mesh->isVisible;
+      _mesh->isVisible = false;
+    }
+    // Clip plane
+    if (!disableClipPlane) {
+      _clipPlane = getScene()->clipPlane;
 
-        auto positiony        = _mesh ? _mesh->position().y : 0.f;
-        getScene()->clipPlane = Plane::FromPositionAndNormal(
-          Vector3(0.f, positiony + 0.05f, 0.f), Vector3(0.f, 1.f, 0.f));
-      };
+      auto positiony        = _mesh ? _mesh->position().y : 0.f;
+      getScene()->clipPlane = Plane::FromPositionAndNormal(Vector3(0.f, positiony + 0.05f, 0.f),
+                                                           Vector3(0.f, 1.f, 0.f));
+    }
+  };
 
-  _refractionRTT->onAfterRender
-    = [this](int* /*faceIndex*/, EventState& /*es*/) {
-        if (_mesh) {
-          _mesh->isVisible = _isVisible;
-        }
+  _refractionRTT->onAfterRender = [this](int* /*faceIndex*/, EventState& /*es*/) {
+    if (_mesh) {
+      _mesh->isVisible = _isVisible;
+    }
 
-        // Clip plane
-        getScene()->clipPlane = _clipPlane;
-      };
+    // Clip plane
+    if (!disableClipPlane) {
+      getScene()->clipPlane = _clipPlane;
+    }
+  };
 
-  _reflectionRTT->onBeforeRender
-    = [this](int* /*faceIndex*/, EventState& /*es*/) {
-        if (_mesh) {
-          _isVisible       = _mesh->isVisible;
-          _mesh->isVisible = false;
-        }
+  _reflectionRTT->onBeforeRender = [this](int* /*faceIndex*/, EventState& /*es*/) {
+    if (_mesh) {
+      _isVisible       = _mesh->isVisible;
+      _mesh->isVisible = false;
+    }
 
-        auto scene = getScene();
+    auto scene = getScene();
 
-        // Clip plane
-        _clipPlane = scene->clipPlane;
+    // Clip plane
+    if (!disableClipPlane) {
+      _clipPlane = scene->clipPlane;
 
-        float positiony  = _mesh ? _mesh->position().y : 0.f;
-        scene->clipPlane = Plane::FromPositionAndNormal(
-          Vector3(0.f, positiony - 0.05f, 0.f), Vector3(0.f, -1.f, 0.f));
+      float positiony  = _mesh ? _mesh->position().y : 0.f;
+      scene->clipPlane = Plane::FromPositionAndNormal(Vector3(0.f, positiony - 0.05f, 0.f),
+                                                      Vector3(0.f, -1.f, 0.f));
 
-        // Transform
-        Matrix::ReflectionToRef(*scene->clipPlane, _mirrorMatrix);
-        _savedViewMatrix = scene->getViewMatrix();
+      Matrix::ReflectionToRef(*scene->clipPlane, _mirrorMatrix);
+    }
 
-        _mirrorMatrix.multiplyToRef(_savedViewMatrix, _reflectionTransform);
-        Matrix projectionMatrix = scene->getProjectionMatrix();
-        scene->setTransformMatrix(_reflectionTransform, projectionMatrix);
-        scene->getEngine()->cullBackFaces = false;
-        scene->setMirroredCameraPosition(Vector3::TransformCoordinates(
-          scene->activeCamera()->position, _mirrorMatrix));
-      };
+    // Transform
+    _savedViewMatrix = scene->getViewMatrix();
 
-  _reflectionRTT->onAfterRender
-    = [this](int* /*faceIndex*/, EventState& /*es*/) {
-        if (_mesh) {
-          _mesh->isVisible = _isVisible;
-        }
+    _mirrorMatrix.multiplyToRef(_savedViewMatrix, _reflectionTransform);
+    Matrix projectionMatrix = scene->getProjectionMatrix();
+    scene->setTransformMatrix(_reflectionTransform, projectionMatrix);
+    scene->getEngine()->cullBackFaces = false;
+    scene->setMirroredCameraPosition(
+      Vector3::TransformCoordinates(scene->activeCamera()->position, _mirrorMatrix));
+  };
 
-        auto scene = getScene();
+  _reflectionRTT->onAfterRender = [this](int* /*faceIndex*/, EventState& /*es*/) {
+    if (_mesh) {
+      _mesh->isVisible = _isVisible;
+    }
 
-        // Clip plane
-        scene->clipPlane = _clipPlane;
+    auto scene = getScene();
 
-        // Transform
-        auto projectionMatrix = scene->getProjectionMatrix();
-        scene->setTransformMatrix(_savedViewMatrix, projectionMatrix);
-        scene->getEngine()->cullBackFaces = true;
-        scene->_mirroredCameraPosition    = nullptr;
-      };
+    // Clip plane
+    scene->clipPlane = _clipPlane;
+
+    // Transform
+    auto projectionMatrix = scene->getProjectionMatrix();
+    scene->setTransformMatrix(_savedViewMatrix, projectionMatrix);
+    scene->getEngine()->cullBackFaces = true;
+    scene->_mirroredCameraPosition    = nullptr;
+  };
 }
 
 std::vector<IAnimatablePtr> WaterMaterial::getAnimatables()
@@ -663,15 +683,15 @@ void WaterMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
     _bumpTexture->dispose();
   }
 
-  getScene()->customRenderTargets.erase(
-    std::remove(getScene()->customRenderTargets.begin(),
-                getScene()->customRenderTargets.end(), _refractionRTT),
-    getScene()->customRenderTargets.end());
+  getScene()->customRenderTargets.erase(std::remove(getScene()->customRenderTargets.begin(),
+                                                    getScene()->customRenderTargets.end(),
+                                                    _refractionRTT),
+                                        getScene()->customRenderTargets.end());
 
-  getScene()->customRenderTargets.erase(
-    std::remove(getScene()->customRenderTargets.begin(),
-                getScene()->customRenderTargets.end(), _reflectionRTT),
-    getScene()->customRenderTargets.end());
+  getScene()->customRenderTargets.erase(std::remove(getScene()->customRenderTargets.begin(),
+                                                    getScene()->customRenderTargets.end(),
+                                                    _reflectionRTT),
+                                        getScene()->customRenderTargets.end());
 
   if (_reflectionRTT) {
     _reflectionRTT->dispose();
@@ -682,11 +702,15 @@ void WaterMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
     _refractionRTT = nullptr;
   }
 
+  // Remove image-processing observer
+  if (_imageProcessingConfiguration && _imageProcessingObserver) {
+    _imageProcessingConfiguration->onUpdateParameters.remove(_imageProcessingObserver);
+  }
+
   PushMaterial::dispose(forceDisposeEffect, forceDisposeTextures);
 }
 
-MaterialPtr WaterMaterial::clone(const std::string& /*name*/,
-                                 bool /*cloneChildren*/) const
+MaterialPtr WaterMaterial::clone(const std::string& /*name*/, bool /*cloneChildren*/) const
 {
   return nullptr;
 }
