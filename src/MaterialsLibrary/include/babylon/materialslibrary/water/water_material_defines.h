@@ -2,12 +2,14 @@
 #define BABYLON_MATERIALS_LIBRARY_WATER_WATER_MATERIAL_DEFINES_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/materials/iimage_processing_configuration_defines.h>
 #include <babylon/materials/material_defines.h>
 
 namespace BABYLON {
 namespace MaterialsLibrary {
 
-struct BABYLON_SHARED_EXPORT WaterMaterialDefines : public MaterialDefines {
+struct BABYLON_SHARED_EXPORT WaterMaterialDefines : public MaterialDefines,
+                                                    public IImageProcessingConfigurationDefines {
 
   WaterMaterialDefines();
   ~WaterMaterialDefines() override; // = default
