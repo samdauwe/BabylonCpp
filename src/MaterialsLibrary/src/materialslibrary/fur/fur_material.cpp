@@ -9,8 +9,8 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/material_flags.h>
 #include <babylon/materials/material_helper.h>
-#include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/dynamic_texture.h>
 #include <babylon/materialslibrary/fur/fur_fragment_fx.h>
 #include <babylon/materialslibrary/fur/fur_vertex_fx.h>
@@ -24,10 +24,8 @@ namespace MaterialsLibrary {
 
 FurMaterial::FurMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
-    , diffuseTexture{this, &FurMaterial::get_diffuseTexture,
-                     &FurMaterial::set_diffuseTexture}
-    , heightTexture{this, &FurMaterial::get_heightTexture,
-                    &FurMaterial::set_heightTexture}
+    , diffuseTexture{this, &FurMaterial::get_diffuseTexture, &FurMaterial::set_diffuseTexture}
+    , heightTexture{this, &FurMaterial::get_heightTexture, &FurMaterial::set_heightTexture}
     , diffuseColor{Color3(1.f, 1.f, 1.f)}
     , furLength{1.f}
     , furAngle{0.f}
@@ -39,8 +37,7 @@ FurMaterial::FurMaterial(const std::string& iName, Scene* scene)
     , furDensity{20.f}
     , furOcclusion{0.f}
     , furTexture{nullptr}
-    , disableLighting{this, &FurMaterial::get_disableLighting,
-                      &FurMaterial::set_disableLighting}
+    , disableLighting{this, &FurMaterial::get_disableLighting, &FurMaterial::set_disableLighting}
     , maxSimultaneousLights{this, &FurMaterial::get_maxSimultaneousLights,
                             &FurMaterial::set_maxSimultaneousLights}
     , highLevelFur{true}
@@ -141,8 +138,7 @@ BaseTexturePtr FurMaterial::getAlphaTestTexture()
 void FurMaterial::updateFur()
 {
   for (const auto& mesh : _meshes) {
-    if (auto offsetFur
-        = std::dynamic_pointer_cast<FurMaterial>(mesh->material())) {
+    if (auto offsetFur = std::dynamic_pointer_cast<FurMaterial>(mesh->material())) {
       offsetFur->furLength      = furLength;
       offsetFur->furAngle       = furAngle;
       offsetFur->furGravity     = furGravity;
@@ -158,8 +154,7 @@ void FurMaterial::updateFur()
   }
 }
 
-bool FurMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
-                                    bool useInstances)
+bool FurMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool useInstances)
 {
   if (isFrozen()) {
     if (_wasPreviouslyReady && subMesh->effect()) {
@@ -171,10 +166,9 @@ bool FurMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     subMesh->_materialDefines = std::make_shared<FurMaterialDefines>();
   }
 
-  auto definesPtr
-    = std::static_pointer_cast<FurMaterialDefines>(subMesh->_materialDefines);
-  auto& defines = *definesPtr.get();
-  auto scene    = getScene();
+  auto definesPtr = std::static_pointer_cast<FurMaterialDefines>(subMesh->_materialDefines);
+  auto& defines   = *definesPtr.get();
+  auto scene      = getScene();
 
   if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (_renderId == scene->getRenderId()) {
@@ -187,7 +181,7 @@ bool FurMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
   // Textures
   if (defines._areTexturesDirty) {
     if (scene->texturesEnabled()) {
-      if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
+      if (_diffuseTexture && MaterialFlags::DiffuseTextureEnabled()) {
         if (!_diffuseTexture->isReady()) {
           return false;
         }
@@ -215,8 +209,7 @@ bool FurMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
   }
 
   // Misc.
-  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(),
-                                        fogEnabled(),
+  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(), fogEnabled(),
                                         _shouldTurnAlphaTestOn(mesh), defines);
 
   // Lights
@@ -241,8 +234,7 @@ bool FurMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
       fallbacks->addFallback(1, "FOG");
     }
 
-    MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks,
-                                              maxSimultaneousLights());
+    MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks, maxSimultaneousLights());
 
     if (defines.intDef["NUM_BONE_INFLUENCERS"] > 0) {
       fallbacks->addCPUSkinningFallback(0, mesh);
@@ -267,23 +259,19 @@ bool FurMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
       attribs.emplace_back(VertexBuffer::ColorKind);
     }
 
-    MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
-                                              *fallbacks);
+    MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines, *fallbacks);
     MaterialHelper::PrepareAttributesForInstances(attribs, defines);
 
     // Legacy browser patch
     const std::string shaderName{"fur"};
     auto join = defines.toString();
     const std::vector<std::string> uniforms{
-      "world",       "view",          "viewProjection", "vEyePosition",
-      "vLightsType", "vDiffuseColor", "vFogInfos",      "vFogColor",
-      "pointSize",   "vDiffuseInfos", "mBones",         "vClipPlane",
-      "vClipPlane2", "vClipPlane3",   "vClipPlane4",    "diffuseMatrix",
-      "furLength",   "furAngle",      "furColor",       "furOffset",
-      "furGravity",  "furTime",       "furSpacing",     "furDensity",
-      "furOcclusion"};
-    const std::vector<std::string> samplers{"diffuseSampler", "heightTexture",
-                                            "furTexture"};
+      "world",         "view",       "viewProjection", "vEyePosition", "vLightsType",
+      "vDiffuseColor", "vFogInfos",  "vFogColor",      "pointSize",    "vDiffuseInfos",
+      "mBones",        "vClipPlane", "vClipPlane2",    "vClipPlane3",  "vClipPlane4",
+      "diffuseMatrix", "furLength",  "furAngle",       "furColor",     "furOffset",
+      "furGravity",    "furTime",    "furSpacing",     "furDensity",   "furOcclusion"};
+    const std::vector<std::string> samplers{"diffuseSampler", "heightTexture", "furTexture"};
     const std::vector<std::string> uniformBuffers{};
 
     EffectCreationOptions options;
@@ -297,13 +285,10 @@ bool FurMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     options.fallbacks             = std::move(fallbacks);
     options.onCompiled            = onCompiled;
     options.onError               = onError;
-    options.indexParameters
-      = {{"maxSimultaneousLights", maxSimultaneousLights()}};
+    options.indexParameters       = {{"maxSimultaneousLights", maxSimultaneousLights()}};
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
-    subMesh->setEffect(
-      scene->getEngine()->createEffect(shaderName, options, engine),
-      definesPtr);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
@@ -320,8 +305,7 @@ void FurMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
-  auto defines
-    = static_cast<FurMaterialDefines*>(subMesh->_materialDefines.get());
+  auto defines = static_cast<FurMaterialDefines*>(subMesh->_materialDefines.get());
   if (!defines) {
     return;
   }
@@ -341,14 +325,13 @@ void FurMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 
   if (scene->getCachedMaterial() != this) {
     // Textures
-    if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
+    if (_diffuseTexture && MaterialFlags::DiffuseTextureEnabled()) {
       _activeEffect->setTexture("diffuseSampler", _diffuseTexture);
 
-      _activeEffect->setFloat2(
-        "vDiffuseInfos", static_cast<float>(_diffuseTexture->coordinatesIndex),
-        _diffuseTexture->level);
-      _activeEffect->setMatrix("diffuseMatrix",
-                               *_diffuseTexture->getTextureMatrix());
+      _activeEffect->setFloat2("vDiffuseInfos",
+                               static_cast<float>(_diffuseTexture->coordinatesIndex),
+                               _diffuseTexture->level);
+      _activeEffect->setMatrix("diffuseMatrix", *_diffuseTexture->getTextureMatrix());
     }
 
     if (_heightTexture) {
@@ -366,17 +349,14 @@ void FurMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
     MaterialHelper::BindEyePosition(effect, scene);
   }
 
-  _activeEffect->setColor4("vDiffuseColor", diffuseColor,
-                           alpha * mesh->visibility);
+  _activeEffect->setColor4("vDiffuseColor", diffuseColor, alpha * mesh->visibility);
 
   if (scene->lightsEnabled() && !_disableLighting) {
-    MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines,
-                               maxSimultaneousLights());
+    MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines, maxSimultaneousLights());
   }
 
   // View
-  if (scene->fogEnabled() && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE) {
+  if (scene->fogEnabled() && mesh->applyFog() && scene->fogMode() != Scene::FOGMODE_NONE) {
     _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 
@@ -467,8 +447,7 @@ void FurMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
   PushMaterial::dispose(forceDisposeEffect, forceDisposeTextures);
 }
 
-MaterialPtr FurMaterial::clone(const std::string& /*name*/,
-                               bool /*cloneChildren*/) const
+MaterialPtr FurMaterial::clone(const std::string& /*name*/, bool /*cloneChildren*/) const
 {
   return nullptr;
 }
@@ -489,14 +468,12 @@ FurMaterial* FurMaterial::Parse(const json& /*source*/, Scene* /*scene*/,
   return nullptr;
 }
 
-DynamicTexturePtr FurMaterial::GenerateTexture(const std::string& /*name*/,
-                                               Scene* /*scene*/)
+DynamicTexturePtr FurMaterial::GenerateTexture(const std::string& /*name*/, Scene* /*scene*/)
 {
   return nullptr;
 }
 
-std::vector<Mesh*> FurMaterial::FurifyMesh(const MeshPtr& /*sourceMesh*/,
-                                           float /*quality*/)
+std::vector<Mesh*> FurMaterial::FurifyMesh(const MeshPtr& /*sourceMesh*/, float /*quality*/)
 {
   return std::vector<Mesh*>();
 }

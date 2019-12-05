@@ -57,17 +57,15 @@ public:
   static DynamicTexturePtr GenerateTexture(const std::string& name, Scene* scene);
 
   /**
-   * Creates and returns an array of meshes used as shells for the Fur Material
-   * that can be disposed later in your code
-   * The quality is in interval [0, 100]
+   * @brief Creates and returns an array of meshes used as shells for the Fur Material that can be
+   * disposed later in your code The quality is in interval [0, 100]
    */
   static std::vector<Mesh*> FurifyMesh(const MeshPtr& sourceMesh, float quality);
 
 protected:
   /**
-   * Constructor
-   * @param name The name given to the material in order to identify it
-   * afterwards.
+   * @brief Constructor
+   * @param name The name given to the material in order to identify it afterwards.
    * @param scene The scene the material is used in.
    */
   FurMaterial(const std::string& name, Scene* scene);
