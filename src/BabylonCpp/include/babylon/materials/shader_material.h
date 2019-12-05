@@ -20,12 +20,10 @@ using ShaderMaterialPtr = std::shared_ptr<ShaderMaterial>;
 using TexturePtr        = std::shared_ptr<Texture>;
 
 /**
- * @brief The ShaderMaterial object has the necessary methods to pass data from
- * your scene to the Vertex and Fragment Shaders and returns a material that can
- * be applied to any mesh.
+ * @brief The ShaderMaterial object has the necessary methods to pass data from your scene to the
+ * Vertex and Fragment Shaders and returns a material that can be applied to any mesh.
  *
- * This returned material effects how the mesh will look based on the code in
- * the shaders.
+ * This returned material effects how the mesh will look based on the code in the shaders.
  *
  * @see http://doc.babylonjs.com/how_to/shader_material
  */
@@ -271,12 +269,10 @@ public:
 
   /**
    * @brief Disposes the material.
-   * @param forceDisposeEffect specifies if effects should be forcefully
-   * disposed
-   * @param forceDisposeTextures specifies if textures should be forcefully
-   * disposed
-   * @param notBoundToMesh specifies if the material that is being disposed is
-   * known to be not bound to any mesh
+   * @param forceDisposeEffect specifies if effects should be forcefully disposed
+   * @param forceDisposeTextures specifies if textures should be forcefully disposed
+   * @param notBoundToMesh specifies if the material that is being disposed is known to be not bound
+   * to any mesh
    */
   void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
                bool notBoundToMesh = false) override;
@@ -291,8 +287,7 @@ public:
    * @brief Creates a shader material from parsed shader material data.
    * @param source defines the JSON represnetation of the material
    * @param scene defines the hosting scene
-   * @param rootUrl defines the root URL to use to load textures and relative
-   * dependencies
+   * @param rootUrl defines the root URL to use to load textures and relative dependencies
    * @returns a new material
    */
   static std::unique_ptr<ShaderMaterial> Parse(const json& source, Scene* scene,
@@ -301,10 +296,9 @@ public:
 protected:
   /**
    * @brief Instantiate a new shader material.
-   * The ShaderMaterial object has the necessary methods to pass data from your
-   * scene to the Vertex and Fragment Shaders and returns a material that can be
-   * applied to any mesh. This returned material effects how the mesh will look
-   * based on the code in the shaders.
+   * The ShaderMaterial object has the necessary methods to pass data from your scene to the Vertex
+   * and Fragment Shaders and returns a material that can be applied to any mesh. This returned
+   * material effects how the mesh will look based on the code in the shaders.
    * @see http://doc.babylonjs.com/how_to/shader_material
    * @param name Define the name of the material in the scene
    * @param scene Define the scene the material belongs to
