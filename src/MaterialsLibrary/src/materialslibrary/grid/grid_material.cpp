@@ -7,7 +7,9 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/material_flags.h>
 #include <babylon/materials/material_helper.h>
+#include <babylon/materials/textures/base_texture.h>
 #include <babylon/materialslibrary/grid/grid_fragment_fx.h>
 #include <babylon/materialslibrary/grid/grid_vertex_fx.h>
 #include <babylon/meshes/abstract_mesh.h>
@@ -28,8 +30,9 @@ GridMaterial::GridMaterial(const std::string& iName, Scene* scene)
     , minorUnitVisibility{0.33f}
     , opacity{1.f}
     , preMultiplyAlpha{false}
-    , _gridControl{Vector4(gridRatio, majorUnitFrequency, minorUnitVisibility,
-                           opacity)}
+    , opacityTexture{this, &GridMaterial::get_opacityTexture, &GridMaterial::set_opacityTexture}
+    , _opacityTexture{nullptr}
+    , _gridControl{Vector4(gridRatio, majorUnitFrequency, minorUnitVisibility, opacity)}
     , _renderId{-1}
 {
   // Vertex shader
@@ -41,9 +44,22 @@ GridMaterial::GridMaterial(const std::string& iName, Scene* scene)
 
 GridMaterial::~GridMaterial() = default;
 
+BaseTexturePtr& GridMaterial::get_opacityTexture()
+{
+  return _opacityTexture;
+}
+
+void GridMaterial::set_opacityTexture(const BaseTexturePtr& value)
+{
+  if (_opacityTexture != value) {
+    _opacityTexture = value;
+    _markAllSubMeshesAsTexturesDirty();
+  }
+}
+
 bool GridMaterial::needAlphaBlending() const
 {
-  return (opacity < 1.f);
+  return opacity < 1.f || (_opacityTexture && _opacityTexture->isReady());
 }
 
 bool GridMaterial::needAlphaBlendingForMesh(const AbstractMesh& /*mesh*/) const
@@ -51,8 +67,7 @@ bool GridMaterial::needAlphaBlendingForMesh(const AbstractMesh& /*mesh*/) const
   return needAlphaBlending();
 }
 
-bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
-                                     bool /*useInstances*/)
+bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool useInstances)
 {
   if (isFrozen()) {
     if (_wasPreviouslyReady && subMesh->effect()) {
@@ -64,10 +79,9 @@ bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     subMesh->_materialDefines = std::make_shared<GridMaterialDefines>();
   }
 
-  auto definesPtr
-    = std::static_pointer_cast<GridMaterialDefines>(subMesh->_materialDefines);
-  auto& defines = *definesPtr.get();
-  auto scene    = getScene();
+  auto definesPtr = std::static_pointer_cast<GridMaterialDefines>(subMesh->_materialDefines);
+  auto& defines   = *definesPtr.get();
+  auto scene      = getScene();
 
   if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (_renderId == scene->getRenderId()) {
@@ -87,8 +101,27 @@ bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     defines.markAsUnprocessed();
   }
 
-  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, false, fogEnabled(),
-                                        false, defines);
+  // Textures
+  if (defines._areTexturesDirty) {
+    defines._needUVs = false;
+    if (scene->texturesEnabled()) {
+      if (_opacityTexture && MaterialFlags::OpacityTextureEnabled()) {
+        if (!_opacityTexture->isReady()) {
+          return false;
+        }
+        else {
+          defines._needUVs           = true;
+          defines.boolDef["OPACITY"] = true;
+        }
+      }
+    }
+  }
+
+  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, false, fogEnabled(), false, defines);
+
+  // Values that need to be evaluated on every frame
+  MaterialHelper::PrepareDefinesForFrameBoundValues(scene, scene->getEngine(), defines,
+                                                    useInstances);
 
   // Get correct effect
   if (defines.isDirty()) {
@@ -96,19 +129,28 @@ bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     scene->resetCachedMaterial();
 
     // Attributes
-    std::vector<std::string> attribs{VertexBuffer::PositionKind,
-                                     VertexBuffer::NormalKind};
+    MaterialHelper::PrepareDefinesForAttributes(mesh, defines, false, false);
+    std::vector<std::string> attribs{VertexBuffer::PositionKind, VertexBuffer::NormalKind};
+
+    if (defines["UV1"]) {
+      attribs.emplace_back(VertexBuffer::UVKind);
+    }
+    if (defines["UV2"]) {
+      attribs.emplace_back(VertexBuffer::UV2Kind);
+    }
+
+    MaterialHelper::PrepareAttributesForInstances(attribs, defines);
 
     // Defines
     const std::string join = defines.toString();
 
     // Uniforms
     const std::vector<std::string> uniforms{
-      "projection", "worldView", "mainColor", "lineColor", "gridControl",
-      "gridOffset", "vFogInfos", "vFogColor", "world",     "view"};
+      "projection", "mainColor", "lineColor", "gridControl",   "gridOffset",   "vFogInfos",
+      "vFogColor",  "world",     "view",      "opacityMatrix", "vOpacityInfos"};
 
     // Samplers
-    const std::vector<std::string> samplers{};
+    const std::vector<std::string> samplers{"opacitySampler"};
 
     EffectCreationOptions options;
     options.attributes            = std::move(attribs);
@@ -121,8 +163,7 @@ bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     options.onCompiled            = onCompiled;
     options.onError               = onError;
 
-    subMesh->setEffect(
-      scene->getEngine()->createEffect("grid", options, engine), definesPtr);
+    subMesh->setEffect(scene->getEngine()->createEffect("grid", options, engine), definesPtr);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
@@ -139,8 +180,7 @@ void GridMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
-  auto defines
-    = static_cast<GridMaterialDefines*>(subMesh->_materialDefines.get());
+  auto defines = static_cast<GridMaterialDefines*>(subMesh->_materialDefines.get());
   if (!defines) {
     return;
   }
@@ -152,7 +192,9 @@ void GridMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
   _activeEffect = effect;
 
   // Matrices
-  bindOnlyWorldMatrix(world);
+  if (!(*defines)["INSTANCES"]) {
+    bindOnlyWorldMatrix(world);
+  }
   _activeEffect->setMatrix("worldView", world.multiply(scene->getViewMatrix()));
   _activeEffect->setMatrix("view", scene->getViewMatrix());
   _activeEffect->setMatrix("projection", scene->getProjectionMatrix());
@@ -169,6 +211,13 @@ void GridMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
     _gridControl.z = minorUnitVisibility;
     _gridControl.w = opacity;
     _activeEffect->setVector4("gridControl", _gridControl);
+
+    if (_opacityTexture && MaterialFlags::OpacityTextureEnabled()) {
+      _activeEffect->setTexture("opacitySampler", _opacityTexture);
+      _activeEffect->setFloat2("vOpacityInfos", _opacityTexture->coordinatesIndex,
+                               _opacityTexture->level);
+      _activeEffect->setMatrix("opacityMatrix", *_opacityTexture->getTextureMatrix());
+    }
   }
   // Fog
   MaterialHelper::BindFogParameters(scene, mesh, _activeEffect);
@@ -182,8 +231,7 @@ void GridMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
   Material::dispose(forceDisposeEffect, forceDisposeTextures);
 }
 
-MaterialPtr GridMaterial::clone(const std::string& /*name*/,
-                                bool /*cloneChildren*/) const
+MaterialPtr GridMaterial::clone(const std::string& /*name*/, bool /*cloneChildren*/) const
 {
   return nullptr;
 }

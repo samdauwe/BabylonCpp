@@ -31,7 +31,7 @@ public:
   ~GridMaterial() override; // = default
 
   /**
-   * Returns whether or not the grid requires alpha blending.
+   * @brief Returns whether or not the grid requires alpha blending.
    */
   [[nodiscard]] bool needAlphaBlending() const override;
   [[nodiscard]] bool needAlphaBlendingForMesh(const AbstractMesh& mesh) const override;
@@ -39,8 +39,14 @@ public:
                          bool useInstances = false) override;
   void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
   [[nodiscard]] std::string getClassName() const override;
+
+  /**
+   * @brief Dispose the material and its associated resources.
+   * @param forceDisposeEffect will also dispose the used effect when true
+   */
   void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
                bool notBoundToMesh = false) override;
+
   [[nodiscard]] MaterialPtr clone(const std::string& name,
                                   bool cloneChildren = false) const override;
   [[nodiscard]] json serialize() const;
@@ -56,6 +62,9 @@ protected:
    * @param scene The scene the material is used in.
    */
   GridMaterial(const std::string& name, Scene* scene);
+
+  BaseTexturePtr& get_opacityTexture();
+  void set_opacityTexture(const BaseTexturePtr& value);
 
 public:
   /**
@@ -98,7 +107,13 @@ public:
    */
   bool preMultiplyAlpha;
 
+  /**
+   * The opacity texture used by the grid material.
+   */
+  Property<GridMaterial, BaseTexturePtr> opacityTexture;
+
 private:
+  BaseTexturePtr _opacityTexture;
   Vector4 _gridControl;
   int _renderId;
 

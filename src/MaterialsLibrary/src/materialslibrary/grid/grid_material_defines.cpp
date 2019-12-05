@@ -6,9 +6,13 @@ namespace MaterialsLibrary {
 GridMaterialDefines::GridMaterialDefines()
 {
   boolDef = {
-    {"TRANSPARENT", false},     //
-    {"FOG", false},             //
-    {"PREMULTIPLYALPHA", false} //
+    {"OPACITY", false},          //
+    {"TRANSPARENT", false},      //
+    {"FOG", false},              //
+    {"PREMULTIPLYALPHA", false}, //
+    {"UV1", false},              //
+    {"UV2", false},              //
+    {"INSTANCES", false}         //
   };
 }
 
