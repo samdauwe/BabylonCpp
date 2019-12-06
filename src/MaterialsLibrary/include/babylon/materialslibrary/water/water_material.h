@@ -90,6 +90,7 @@ protected:
   RenderTargetTexturePtr& get_refractionTexture();
   RenderTargetTexturePtr& get_reflectionTexture();
   [[nodiscard]] bool get_renderTargetsEnabled() const;
+  float get_lastTime() const;
 
 private:
   void _createRenderTargets(Scene* scene, const Vector2& renderTargetSize);
@@ -168,6 +169,7 @@ public:
   ReadOnlyProperty<WaterMaterial, RenderTargetTexturePtr> refractionTexture;
   ReadOnlyProperty<WaterMaterial, RenderTargetTexturePtr> reflectionTexture;
   ReadOnlyProperty<WaterMaterial, bool> renderTargetsEnabled;
+  ReadOnlyProperty<WaterMaterial, float> lastTime;
 
 protected:
   std::vector<RenderTargetTexturePtr> _renderTargets;

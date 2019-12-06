@@ -55,6 +55,7 @@ WaterMaterial::WaterMaterial(const std::string& iName, Scene* scene,
     , refractionTexture{this, &WaterMaterial::get_refractionTexture}
     , reflectionTexture{this, &WaterMaterial::get_reflectionTexture}
     , renderTargetsEnabled{this, &WaterMaterial::get_renderTargetsEnabled}
+    , lastTime{this, &WaterMaterial::get_lastTime}
     , _bumpTexture{nullptr}
     , _disableLighting{false}
     , _maxSimultaneousLights{4}
@@ -240,6 +241,11 @@ std::vector<AbstractMesh*>& WaterMaterial::getRenderList()
 bool WaterMaterial::get_renderTargetsEnabled() const
 {
   return !(_refractionRTT && _refractionRTT->refreshRate() == 0);
+}
+
+float WaterMaterial::get_lastTime() const
+{
+  return _lastTime;
 }
 
 bool WaterMaterial::needAlphaBlending() const
