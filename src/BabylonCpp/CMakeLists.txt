@@ -120,13 +120,13 @@ file(GLOB LOADING_HDR_FILES         ${INCLUDE_PATH}/loading/*.h
                                     ${INCLUDE_PATH}/loading/plugins/babylon/*.h)
 file(GLOB MATERIALS_HDR_FILES       ${INCLUDE_PATH}/materials/*.h
                                     ${INCLUDE_PATH}/materials/background/*.h
-                                    #${INCLUDE_PATH}/materials/node/*.h
-                                    #${INCLUDE_PATH}/materials/node/blocks/*.h
-                                    #${INCLUDE_PATH}/materials/node/blocks/dual/*.h
-                                    #${INCLUDE_PATH}/materials/node/blocks/fragment/*.h
-                                    #${INCLUDE_PATH}/materials/node/blocks/input/*.h
-                                    #${INCLUDE_PATH}/materials/node/blocks/vertex/*.h
-                                    #${INCLUDE_PATH}/materials/node/optimizers/*.h
+                                    ${INCLUDE_PATH}/materials/node/*.h
+                                    ${INCLUDE_PATH}/materials/node/blocks/*.h
+                                    ${INCLUDE_PATH}/materials/node/blocks/dual/*.h
+                                    ${INCLUDE_PATH}/materials/node/blocks/fragment/*.h
+                                    ${INCLUDE_PATH}/materials/node/blocks/input/*.h
+                                    ${INCLUDE_PATH}/materials/node/blocks/vertex/*.h
+                                    ${INCLUDE_PATH}/materials/node/optimizers/*.h
                                     ${INCLUDE_PATH}/materials/pbr/*.h
                                     ${INCLUDE_PATH}/materials/textures/*.h
                                     ${INCLUDE_PATH}/materials/textures/loaders/*.h
@@ -261,13 +261,13 @@ file(GLOB LOADING_SRC_FILES         ${SOURCE_PATH}/loading/*.cpp
                                     ${SOURCE_PATH}/loading/plugins/babylon/*.cpp)
 file(GLOB MATERIALS_SRC_FILES       ${SOURCE_PATH}/materials/*.cpp
                                     ${SOURCE_PATH}/materials/background/*.cpp
-                                    #${SOURCE_PATH}/materials/node/*.cpp
-                                    #${SOURCE_PATH}/materials/node/blocks/*.cpp
-                                    #${SOURCE_PATH}/materials/node/blocks/dual/*.cpp
-                                    #${SOURCE_PATH}/materials/node/blocks/fragment/*.cpp
-                                    #${SOURCE_PATH}/materials/node/blocks/input/*.cpp
-                                    #${SOURCE_PATH}/materials/node/blocks/vertex/*.cpp
-                                    #${SOURCE_PATH}/materials/node/optimizers/*.cpp
+                                    ${SOURCE_PATH}/materials/node/*.cpp
+                                    ${SOURCE_PATH}/materials/node/blocks/*.cpp
+                                    ${SOURCE_PATH}/materials/node/blocks/dual/*.cpp
+                                    ${SOURCE_PATH}/materials/node/blocks/fragment/*.cpp
+                                    ${SOURCE_PATH}/materials/node/blocks/input/*.cpp
+                                    ${SOURCE_PATH}/materials/node/blocks/vertex/*.cpp
+                                    ${SOURCE_PATH}/materials/node/optimizers/*.cpp
                                     ${SOURCE_PATH}/materials/pbr/*.cpp
                                     ${SOURCE_PATH}/materials/textures/*.cpp
                                     ${SOURCE_PATH}/materials/textures/loaders/*.cpp
