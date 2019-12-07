@@ -12,7 +12,7 @@ struct BABYLON_SHARED_EXPORT INodeMaterialOptions {
   /**
    * Defines if blocks should emit comments
    */
-  bool emitComments;
+  bool emitComments = false;
 }; // end of struct INodeMaterialOptions
 
 } // end of namespace BABYLON

@@ -3,6 +3,7 @@
 
 #include <functional>
 
+#include <babylon/animations/animation_value.h>
 #include <babylon/babylon_api.h>
 #include <babylon/materials/node/blocks/input/animated_input_block_types.h>
 #include <babylon/materials/node/node_material_block.h>
@@ -14,8 +15,9 @@ namespace BABYLON {
 class InputBlock;
 class InputValue;
 class Matrix;
-using InputBlockPtr = std::shared_ptr<InputBlock>;
-using InputValuePtr = std::shared_ptr<InputValue>;
+using AnimationValuePtr = std::shared_ptr<AnimationValue>;
+using InputBlockPtr     = std::shared_ptr<InputBlock>;
+using InputValuePtr     = std::shared_ptr<InputValue>;
 
 /**
  * @brief Block used to expose an input value.
@@ -26,8 +28,7 @@ public:
   template <typename... Ts>
   static InputBlockPtr New(Ts&&... args)
   {
-    return std::shared_ptr<InputBlock>(
-      new InputBlock(std::forward<Ts>(args)...));
+    return std::shared_ptr<InputBlock>(new InputBlock(std::forward<Ts>(args)...));
   }
   ~InputBlock() override;
 
@@ -45,8 +46,7 @@ public:
    * to switch to manual value
    * @returns the current connection point
    */
-  InputBlock&
-  setAsSystemValue(const std::optional<NodeMaterialSystemValues>& value);
+  InputBlock& setAsSystemValue(const std::optional<NodeMaterialSystemValues>& value);
 
   /**
    * @brief Gets the current class name.
@@ -68,8 +68,8 @@ public:
   /**
    * @brief Hidden.
    */
-  void _transmitWorld(Effect* effect, const Matrix& world,
-                      const Matrix& worldView, Matrix& worldViewProjection);
+  void _transmitWorld(Effect* effect, const Matrix& world, const Matrix& worldView,
+                      Matrix& worldViewProjection);
 
   /**
    * @brief Hidden.
@@ -115,27 +115,27 @@ protected:
    * @brief Gets the value of that point.
    * Please note that this value will be ignored if valueCallback is defined
    */
-  InputValuePtr& get_value();
+  AnimationValuePtr& get_value();
 
   /**
    * @brief Sets the value of that point.
    * Please note that this value will be ignored if valueCallback is defined
    */
-  void set_value(const InputValuePtr& value);
+  void set_value(const AnimationValuePtr& value);
 
   /**
    * @brief Gets a callback used to get the value of that point.
    * Please note that setting this value will force the connection point to
    * ignore the value property
    */
-  std::function<InputValuePtr()>& get_valueCallback();
+  std::function<AnimationValuePtr()>& get_valueCallback();
 
   /**
    * @brief Sets a callback used to get the value of that point.
    * Please note that setting this value will force the connection point to
    * ignore the value property
    */
-  void set_valueCallback(const std::function<InputValuePtr()>& value);
+  void set_valueCallback(const std::function<AnimationValuePtr()>& value);
 
   /**
    * @brief Gets the associated variable name in the shader.
@@ -261,14 +261,14 @@ public:
    * Gets or sets the value of that point.
    * Please note that this value will be ignored if valueCallback is defined
    */
-  Property<InputBlock, InputValuePtr> value;
+  Property<InputBlock, AnimationValuePtr> value;
 
   /**
    * Gets or sets a callback used to get the value of that point.
    * Please note that setting this value will force the connection point to
    * ignore the value property
    */
-  Property<InputBlock, std::function<InputValuePtr()>> valueCallback;
+  Property<InputBlock, std::function<AnimationValuePtr()>> valueCallback;
 
   /**
    * Gets or sets the associated variable name in the shader
@@ -320,8 +320,8 @@ public:
 private:
   NodeMaterialBlockConnectionPointMode _mode;
   std::string _associatedVariableName;
-  InputValuePtr _storedValue;
-  std::function<InputValuePtr()> _valueCallback;
+  AnimationValuePtr _storedValue;
+  std::function<AnimationValuePtr()> _valueCallback;
   NodeMaterialBlockConnectionPointTypes _type;
   AnimatedInputBlockTypes _animationType;
 

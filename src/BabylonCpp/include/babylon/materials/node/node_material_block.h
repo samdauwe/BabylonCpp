@@ -356,7 +356,7 @@ public:
   /**
    * Gets or sets the target of the block
    */
-  Property<NodeMaterialBlock, NodeMaterialBlockTargets> target;
+  Property<NodeMaterialBlock, std::optional<NodeMaterialBlockTargets>> target;
 
   /**
    * Gets the list of input points

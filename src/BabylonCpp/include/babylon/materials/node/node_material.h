@@ -14,37 +14,45 @@ class NodeMaterial;
 class NodeMaterialBlock;
 class NodeMaterialBuildState;
 class NodeMaterialDefines;
-class NodeMaterialOptimizer;
+struct NodeMaterialOptimizer;
 struct NodeMaterialBuildStateSharedData;
 class ReflectionTextureBlock;
 class TextureBlock;
-using ImageProcessingConfigurationPtr
-  = std::shared_ptr<ImageProcessingConfiguration>;
-using INodeMaterialEditorOptionsPtr
-  = std::shared_ptr<INodeMaterialEditorOptions>;
-using INodeMaterialOptionsPtr   = std::shared_ptr<INodeMaterialOptions>;
-using InputBlockPtr             = std::shared_ptr<InputBlock>;
-using NodeMaterialPtr           = std::shared_ptr<NodeMaterial>;
-using NodeMaterialBlockPtr      = std::shared_ptr<NodeMaterialBlock>;
-using NodeMaterialBuildStatePtr = std::shared_ptr<NodeMaterialBuildState>;
-using NodeMaterialOptimizerPtr  = std::shared_ptr<NodeMaterialOptimizer>;
-using NodeMaterialBuildStateSharedDataPtr
-  = std::shared_ptr<NodeMaterialBuildStateSharedData>;
-using ReflectionTextureBlockPtr = std::shared_ptr<ReflectionTextureBlock>;
-using TextureBlockPtr           = std::shared_ptr<TextureBlock>;
+using ImageProcessingConfigurationPtr     = std::shared_ptr<ImageProcessingConfiguration>;
+using INodeMaterialEditorOptionsPtr       = std::shared_ptr<INodeMaterialEditorOptions>;
+using INodeMaterialOptionsPtr             = std::shared_ptr<INodeMaterialOptions>;
+using InputBlockPtr                       = std::shared_ptr<InputBlock>;
+using NodeMaterialPtr                     = std::shared_ptr<NodeMaterial>;
+using NodeMaterialBlockPtr                = std::shared_ptr<NodeMaterialBlock>;
+using NodeMaterialBuildStatePtr           = std::shared_ptr<NodeMaterialBuildState>;
+using NodeMaterialOptimizerPtr            = std::shared_ptr<NodeMaterialOptimizer>;
+using NodeMaterialBuildStateSharedDataPtr = std::shared_ptr<NodeMaterialBuildStateSharedData>;
+using ReflectionTextureBlockPtr           = std::shared_ptr<ReflectionTextureBlock>;
+using TextureBlockPtr                     = std::shared_ptr<TextureBlock>;
 
 /**
  * @brief Class used to create a node based material built by assembling shader
  * blocks.
  */
-class BABYLON_SHARED_EXPORT NodeMaterial : public PushMaterial {
+class BABYLON_SHARED_EXPORT NodeMaterial : public PushMaterial,
+                                           public std::enable_shared_from_this<NodeMaterial> {
 
 public:
+  template <typename... Ts>
+  static NodeMaterialPtr New(Ts&&... args)
+  {
+    auto material = std::shared_ptr<NodeMaterial>(new NodeMaterial(std::forward<Ts>(args)...));
+    material->addMaterialToScene(material);
+
+    return material;
+  }
+  ~NodeMaterial() override; // = default
+
   /**
    * @brief Gets the current class name of the material e.g. "NodeMaterial".
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Get a block by its name.
@@ -58,16 +66,16 @@ public:
    * @param predicate defines the predicate used to find the good candidate
    * @returns the required block or null if not found
    */
-  NodeMaterialBlockPtr getBlockByPredicate(
-    const std::function<bool(const NodeMaterialBlockPtr& block)>& predicate);
+  NodeMaterialBlockPtr
+  getBlockByPredicate(const std::function<bool(const NodeMaterialBlockPtr& block)>& predicate);
 
   /**
    * @brief Get an input block by its name.
    * @param predicate defines the predicate used to find the good candidate
    * @returns the required input block or null if not found
    */
-  InputBlockPtr getInputBlockByPredicate(
-    const std::function<bool(const InputBlockPtr& block)>& predicate);
+  InputBlockPtr
+  getInputBlockByPredicate(const std::function<bool(const InputBlockPtr& block)>& predicate);
 
   /**
    * @brief Gets the list of input blocks attached to this material.
@@ -76,14 +84,14 @@ public:
   std::vector<InputBlockPtr> getInputBlocks() const;
 
   /**
-   * @briefAdds a new optimizer to the list of optimizers.
+   * @brief Adds a new optimizer to the list of optimizers.
    * @param optimizer defines the optimizers to add
    * @returns the current material
    */
   NodeMaterial& registerOptimizer(const NodeMaterialOptimizerPtr& optimizer);
 
   /**
-   * @briefRemove an optimizer from the list of optimizers.
+   * @brief Remove an optimizer from the list of optimizers.
    * @param optimizer defines the optimizers to remove
    * @returns the current material
    */
@@ -127,8 +135,8 @@ public:
   void optimize();
 
   /**
-   * @brief Get if the submesh is ready to be used and all its information
-   * available. Child classes can use it to update shaders.
+   * @brief Get if the submesh is ready to be used and all its information available. Child classes
+   * can use it to update shaders.
    * @param mesh defines the mesh to check
    * @param subMesh defines which submesh to check
    * @param useInstances specifies that instances should be used
@@ -138,8 +146,7 @@ public:
                          bool useInstances = false) override;
 
   /**
-   * @brief Get a string representing the shaders built by the current node
-   * graph.
+   * @brief Get a string representing the shaders built by the current node graph.
    */
   std::string compiledShaders() const;
 
@@ -150,8 +157,7 @@ public:
   void bindOnlyWorldMatrix(Matrix& world) override;
 
   /**
-   * @brief Binds the submesh to this material by preparing the effect and
-   * shader to draw
+   * @brief Binds the submesh to this material by preparing the effect and shader to draw
    * @param world defines the world transformation matrix
    * @param mesh defines the mesh containing the submesh
    * @param subMesh defines the submesh to bind the material to
@@ -168,8 +174,7 @@ public:
    * @brief Gets the list of texture blocks.
    * @returns an array of texture blocks
    */
-  std::vector<std::variant<TextureBlockPtr, ReflectionTextureBlockPtr>>
-  getTextureBlocks();
+  std::vector<std::variant<TextureBlockPtr, ReflectionTextureBlockPtr>> getTextureBlocks();
 
   /**
    * @brief Specifies if the material uses a texture.
@@ -180,16 +185,13 @@ public:
 
   /**
    * @brief Disposes the material.
-   * @param forceDisposeEffect specifies if effects should be forcefully
-   * disposed
-   * @param forceDisposeTextures specifies if textures should be forcefully
-   * disposed
-   * @param notBoundToMesh specifies if the material that is being disposed is
-   * known to be not bound to any mesh
+   * @param forceDisposeEffect specifies if effects should be forcefully disposed
+   * @param forceDisposeTextures specifies if textures should be forcefully disposed
+   * @param notBoundToMesh specifies if the material that is being disposed is known to be not bound
+   * to any mesh
    */
-  void dispose(bool forceDisposeEffect   = false,
-               bool forceDisposeTextures = false,
-               bool notBoundToMesh       = false) override;
+  void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
+               bool notBoundToMesh = false) override;
 
   /**
    * @brief Launch the node material editor.
@@ -209,16 +211,16 @@ public:
   void setToDefault();
 
   /**
-   * @brief Loads the current Node Material from a url pointing to a file save
-   * by the Node Material Editor.
+   * @brief Loads the current Node Material from a url pointing to a file save by the Node Material
+   * Editor.
    * @param url defines the url to load from
    * @returns a promise that will fullfil when the material is fully loaded
    */
   void loadAsync(const std::string& url);
 
   /**
-   * @brief Generate a string containing the code declaration required to create
-   * an equivalent of this material
+   * @brief Generate a string containing the code declaration required to create an equivalent of
+   * this material
    * @returns a string
    */
   std::string generateCode();
@@ -230,25 +232,20 @@ public:
   json serialize() const;
 
   /**
-   * @brief Clear the current graph and load a new one from a serialization
-   * object.
+   * @brief Clear the current graph and load a new one from a serialization object.
    * @param source defines the JSON representation of the material
-   * @param rootUrl defines the root URL to use to load textures and relative
-   * dependencies
+   * @param rootUrl defines the root URL to use to load textures and relative dependencies
    */
-  void loadFromSerialization(const json& source,
-                             const std::string& rootUrl = "");
+  void loadFromSerialization(const json& source, const std::string& rootUrl = "");
 
   /**
    * @brief Creates a node material from parsed material data.
    * @param source defines the JSON representation of the material
    * @param scene defines the hosting scene
-   * @param rootUrl defines the root URL to use to load textures and relative
-   * dependencies
+   * @param rootUrl defines the root URL to use to load textures and relative dependencies
    * @returns a new node material
    */
-  static NodeMaterialPtr Parse(const json& source, Scene* scene,
-                               const std::string& rootUrl = "");
+  static NodeMaterialPtr Parse(const json& source, Scene* scene, const std::string& rootUrl = "");
 
   /**
    * @brief Creates a new node material set to default basic configuration.
@@ -256,8 +253,7 @@ public:
    * @param scene defines the hosting scene
    * @returns a new NodeMaterial
    */
-  static NodeMaterialPtr CreateDefault(const std::string& name,
-                                       Scene* scene = nullptr);
+  static NodeMaterialPtr CreateDefault(const std::string& name, Scene* scene = nullptr);
 
 protected:
   /**
@@ -266,8 +262,7 @@ protected:
    * @param scene defines the hosting scene
    * @param options defines creation option
    */
-  NodeMaterial(const std::string& name, Scene* scene,
-               const INodeMaterialOptionsPtr& options);
+  NodeMaterial(const std::string& name, Scene* scene, const INodeMaterialOptionsPtr& options);
 
   /**
    * @brief Gets options to control the node material overall behavior.
@@ -280,54 +275,44 @@ protected:
   void set_options(const INodeMaterialOptionsPtr& value);
 
   /**
-   * @brief Gets the image processing configuration used either in this
-   * material.
+   * @brief Gets the image processing configuration used either in this material.
    */
   ImageProcessingConfigurationPtr& get_imageProcessingConfiguration();
 
   /**
-   * @brief Sets the Default image processing configuration used either in the
-   * this material.
+   * @brief Sets the Default image processing configuration used either in the this material.
    *
    * If sets to null, the scene one is in use.
    */
-  void set_imageProcessingConfiguration(
-    const ImageProcessingConfigurationPtr& value);
+  void set_imageProcessingConfiguration(const ImageProcessingConfigurationPtr& value);
 
   /**
-   * @brief Attaches a new image processing configuration to the Standard
-   * Material.
+   * @brief Attaches a new image processing configuration to the Standard Material.
    * @param configuration
    */
-  void _attachImageProcessingConfiguration(
-    const ImageProcessingConfigurationPtr& configuration);
+  void _attachImageProcessingConfiguration(const ImageProcessingConfigurationPtr& configuration);
 
 private:
   NodeMaterial& _addVertexOutputNode(const NodeMaterialBlockPtr& node);
   NodeMaterial& _removeVertexOutputNode(const NodeMaterialBlockPtr& node);
   NodeMaterial& _addFragmentOutputNode(const NodeMaterialBlockPtr& node);
   NodeMaterial& _removeFragmentOutputNode(const NodeMaterialBlockPtr& node);
-  void _initializeBlock(
-    const NodeMaterialBlockPtr& node, const NodeMaterialBuildStatePtr& state,
-    const std::vector<NodeMaterialBlockPtr>& nodesToProcessForOtherBuildState);
+  void _initializeBlock(const NodeMaterialBlockPtr& node, const NodeMaterialBuildStatePtr& state,
+                        std::vector<NodeMaterialBlockPtr>& nodesToProcessForOtherBuildState);
   void _resetDualBlocks(const NodeMaterialBlockPtr& node, size_t id);
-  void _prepareDefinesForAttributes(AbstractMesh* mesh,
-                                    NodeMaterialDefines& defines);
+  void _prepareDefinesForAttributes(AbstractMesh* mesh, NodeMaterialDefines& defines);
   /**
    * @brief CCreates the node editor window.
    */
   void _createNodeEditor();
-  void _gatherBlocks(const NodeMaterialBlockPtr& rootNode,
-                     const std::vector<NodeMaterialBlockPtr>& list);
-  void _restoreConnections(
-    const NodeMaterialBlockPtr& block, const json& source,
-    const std::unordered_map<size_t, NodeMaterialBlockPtr>& map);
+  void _gatherBlocks(const NodeMaterialBlockPtr& rootNode, std::vector<NodeMaterialBlockPtr>& list);
+  void _restoreConnections(const NodeMaterialBlockPtr& block, const json& source,
+                           const std::unordered_map<size_t, NodeMaterialBlockPtr>& map);
 
 public:
   /**
-   * Gets or sets a boolean indicating that alpha value must be ignored (This
-   * will turn alpha blending off even if an alpha value is produced by the
-   * material)
+   * Gets or sets a boolean indicating that alpha value must be ignored (This will turn alpha
+   * blending off even if an alpha value is produced by the material)
    */
   bool ignoreAlpha;
 
@@ -357,22 +342,18 @@ public:
   Property<NodeMaterial, INodeMaterialOptionsPtr> options;
 
   /**
-   * Gets or sets the image processing configuration used either in this*
-   * material.
+   * Gets or sets the image processing configuration used either in this material.
    */
-  Property<NodeMaterial, ImageProcessingConfigurationPtr>
-    imageProcessingConfiguration;
+  Property<NodeMaterial, ImageProcessingConfigurationPtr> imageProcessingConfiguration;
 
   /**
-   * Gets an array of blocks that needs to be serialized even if they are not
-   * yet connected
+   * Gets an array of blocks that needs to be serialized even if they are not yet connected
    */
   std::vector<NodeMaterialBlockPtr> attachedBlocks;
 
 protected:
   /**
-   * Default configuration related to image processing available in the standard
-   * Material.
+   * Default configuration related to image processing available in the standard Material.
    */
   ImageProcessingConfigurationPtr _imageProcessingConfiguration;
 

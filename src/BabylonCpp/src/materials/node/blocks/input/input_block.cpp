@@ -1,5 +1,6 @@
 #include <babylon/materials/node/blocks/input/input_block.h>
 
+#include <babylon/animations/animation.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json_util.h>
@@ -10,12 +11,10 @@
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_build_state_shared_data.h>
 #include <babylon/materials/node/node_material_system_values.h>
-#include <babylon/math/vector4.h>
 
 namespace BABYLON {
 
-InputBlock::InputBlock(const std::string& iName,
-                       NodeMaterialBlockTargets iTarget,
+InputBlock::InputBlock(const std::string& iName, NodeMaterialBlockTargets iTarget,
                        NodeMaterialBlockConnectionPointTypes type)
     : NodeMaterialBlock(iName, iTarget, false, true)
     , _systemValue{std::nullopt}
@@ -23,20 +22,16 @@ InputBlock::InputBlock(const std::string& iName,
     , type{this, &InputBlock::get_type}
     , output{this, &InputBlock::get_output}
     , value{this, &InputBlock::get_value, &InputBlock::set_value}
-    , valueCallback{this, &InputBlock::get_valueCallback,
-                    &InputBlock::set_valueCallback}
+    , valueCallback{this, &InputBlock::get_valueCallback, &InputBlock::set_valueCallback}
     , associatedVariableName{this, &InputBlock::get_associatedVariableName,
                              &InputBlock::set_associatedVariableName}
-    , animationType{this, &InputBlock::get_animationType,
-                    &InputBlock::set_animationType}
+    , animationType{this, &InputBlock::get_animationType, &InputBlock::set_animationType}
     , isUndefined{this, &InputBlock::get_isUndefined}
     , isUniform{this, &InputBlock::get_isUniform, &InputBlock::set_isUniform}
-    , isAttribute{this, &InputBlock::get_isAttribute,
-                  &InputBlock::set_isAttribute}
+    , isAttribute{this, &InputBlock::get_isAttribute, &InputBlock::set_isAttribute}
     , isVarying{this, &InputBlock::get_isVarying, &InputBlock::set_isVarying}
     , isSystemValue{this, &InputBlock::get_isSystemValue}
-    , systemValue{this, &InputBlock::get_systemValue,
-                  &InputBlock::set_systemValue}
+    , systemValue{this, &InputBlock::get_systemValue, &InputBlock::set_systemValue}
     , _mode{NodeMaterialBlockConnectionPointMode::Undefined}
     , _storedValue{nullptr}
     , _valueCallback{nullptr}
@@ -57,28 +52,28 @@ NodeMaterialBlockConnectionPointTypes& InputBlock::get_type()
 {
   if (_type == NodeMaterialBlockConnectionPointTypes::AutoDetect) {
     if (isUniform() && value() != nullptr) {
-      const auto& valueType = value()->getType();
+      const auto valueType = value()->animationType();
       if (valueType.has_value()) {
         switch (*valueType) {
-          case NodeMaterialBlockConnectionPointTypes::Float:
+          case Animation::ANIMATIONTYPE_FLOAT():
             _type = NodeMaterialBlockConnectionPointTypes::Float;
             return _type;
-          case NodeMaterialBlockConnectionPointTypes::Int:
+          case Animation::ANIMATIONTYPE_INT():
             _type = NodeMaterialBlockConnectionPointTypes::Int;
             return _type;
-          case NodeMaterialBlockConnectionPointTypes::Vector2:
+          case Animation::ANIMATIONTYPE_VECTOR2():
             _type = NodeMaterialBlockConnectionPointTypes::Vector2;
             return _type;
-          case NodeMaterialBlockConnectionPointTypes::Vector3:
+          case Animation::ANIMATIONTYPE_VECTOR3():
             _type = NodeMaterialBlockConnectionPointTypes::Vector3;
             return _type;
-          case NodeMaterialBlockConnectionPointTypes::Vector4:
+          case Animation::ANIMATIONTYPE_VECTOR4():
             _type = NodeMaterialBlockConnectionPointTypes::Vector4;
             return _type;
-          case NodeMaterialBlockConnectionPointTypes::Color3:
+          case Animation::ANIMATIONTYPE_COLOR3():
             _type = NodeMaterialBlockConnectionPointTypes::Color3;
             return _type;
-          case NodeMaterialBlockConnectionPointTypes::Color4:
+          case Animation::ANIMATIONTYPE_COLOR4():
             _type = NodeMaterialBlockConnectionPointTypes::Color4;
             return _type;
           default:
@@ -96,9 +91,8 @@ NodeMaterialBlockConnectionPointTypes& InputBlock::get_type()
         _type = NodeMaterialBlockConnectionPointTypes::Vector2;
         return _type;
       }
-      else if (name == "matricesIndices" || name == "matricesWeights"
-               || name == "world0" || name == "world1" || name == "world2"
-               || name == "world3") {
+      else if (name == "matricesIndices" || name == "matricesWeights" || name == "world0"
+               || name == "world1" || name == "world2" || name == "world3") {
         _type = NodeMaterialBlockConnectionPointTypes::Vector4;
         return _type;
       }
@@ -145,30 +139,29 @@ InputBlock& InputBlock::setAsAttribute(const std::string& attributeName)
   return *this;
 }
 
-InputBlock& InputBlock::setAsSystemValue(
-  const std::optional<NodeMaterialSystemValues>& value)
+InputBlock& InputBlock::setAsSystemValue(const std::optional<NodeMaterialSystemValues>& value)
 {
   systemValue = value;
   return *this;
 }
 
-InputValuePtr& InputBlock::get_value()
+AnimationValuePtr& InputBlock::get_value()
 {
   return _storedValue;
 }
 
-void InputBlock::set_value(const InputValuePtr& value)
+void InputBlock::set_value(const AnimationValuePtr& value)
 {
   _storedValue = value;
   _mode        = NodeMaterialBlockConnectionPointMode::Uniform;
 }
 
-std::function<InputValuePtr()>& InputBlock::get_valueCallback()
+std::function<AnimationValuePtr()>& InputBlock::get_valueCallback()
 {
   return _valueCallback;
 }
 
-void InputBlock::set_valueCallback(const std::function<InputValuePtr()>& value)
+void InputBlock::set_valueCallback(const std::function<AnimationValuePtr()>& value)
 {
   _valueCallback = value;
   _mode          = NodeMaterialBlockConnectionPointMode::Uniform;
@@ -245,8 +238,7 @@ std::optional<NodeMaterialSystemValues>& InputBlock::get_systemValue()
   return _systemValue;
 }
 
-void InputBlock::set_systemValue(
-  const std::optional<NodeMaterialSystemValues>& value)
+void InputBlock::set_systemValue(const std::optional<NodeMaterialSystemValues>& value)
 {
   _mode                  = NodeMaterialBlockConnectionPointMode::Uniform;
   associatedVariableName = "";
@@ -316,8 +308,7 @@ void InputBlock::setDefaultValue()
 std::string InputBlock::_dumpPropertiesCode()
 {
   if (isAttribute()) {
-    return String::printf("%s.setAsAttribute(%s);\r\n",
-                          _codeVariableName.c_str(), name.c_str());
+    return String::printf("%s.setAsAttribute(%s);\r\n", _codeVariableName.c_str(), name.c_str());
   }
   if (isSystemValue()) {
     // TODO
@@ -333,36 +324,32 @@ std::string InputBlock::_dumpPropertiesCode()
         break;
       case NodeMaterialBlockConnectionPointTypes::Vector2: {
         const auto& vector2Value = value()->get<Vector2>();
-        valueString
-          = String::printf("Vector2(%f, %f)", vector2Value.x, vector2Value.y);
+        valueString = String::printf("Vector2(%f, %f)", vector2Value.x, vector2Value.y);
       } break;
       case NodeMaterialBlockConnectionPointTypes::Vector3: {
         const auto& vector3Value = value()->get<Vector3>();
-        valueString = String::printf("Vector3(%f, %f, %f)", vector3Value.x,
-                                     vector3Value.y, vector3Value.z);
+        valueString
+          = String::printf("Vector3(%f, %f, %f)", vector3Value.x, vector3Value.y, vector3Value.z);
       } break;
       case NodeMaterialBlockConnectionPointTypes::Vector4: {
         const auto& vector4Value = value()->get<Vector4>();
-        valueString
-          = String::printf("Vector4(%f, %f, %f, %f)", vector4Value.x,
-                           vector4Value.y, vector4Value.z, vector4Value.w);
+        valueString = String::printf("Vector4(%f, %f, %f, %f)", vector4Value.x, vector4Value.y,
+                                     vector4Value.z, vector4Value.w);
       } break;
       case NodeMaterialBlockConnectionPointTypes::Color3: {
         const auto& color3Value = value()->get<Color3>();
-        valueString = String::printf("Color3(%f, %f, %f)", color3Value.r,
-                                     color3Value.g, color3Value.b);
+        valueString
+          = String::printf("Color3(%f, %f, %f)", color3Value.r, color3Value.g, color3Value.b);
       } break;
       case NodeMaterialBlockConnectionPointTypes::Color4: {
         const auto& color4Value = value()->get<Color4>();
-        valueString
-          = String::printf("Color4(%f, %f, %f, %f)", color4Value.r,
-                           color4Value.g, color4Value.b, color4Value.a);
+        valueString = String::printf("Color4(%f, %f, %f, %f)", color4Value.r, color4Value.g,
+                                     color4Value.b, color4Value.a);
       } break;
       default:
         break;
     }
-    return String::printf("%s.value = %s;\r\n", _codeVariableName.c_str(),
-                          valueString.c_str());
+    return String::printf("%s.value = %s;\r\n", _codeVariableName.c_str(), valueString.c_str());
   }
   return "";
 }
@@ -383,9 +370,8 @@ void InputBlock::_emit(NodeMaterialBuildState& state, const std::string& define)
     if (!define.empty()) {
       state._uniformDeclaration += _emitDefine(define);
     }
-    state._uniformDeclaration
-      += String::printf("uniform %s %s;\r\n", state._getGLType(type()).c_str(),
-                        associatedVariableName().c_str());
+    state._uniformDeclaration += String::printf(
+      "uniform %s %s;\r\n", state._getGLType(type()).c_str(), associatedVariableName().c_str());
     if (!define.empty()) {
       state._uniformDeclaration += "#endif\r\n";
     }
@@ -417,7 +403,7 @@ void InputBlock::_emit(NodeMaterialBuildState& state, const std::string& define)
   if (isAttribute) {
     associatedVariableName = name;
 
-    if (target == NodeMaterialBlockTargets::Vertex
+    if (target().has_value() && *target() == NodeMaterialBlockTargets::Vertex
         && state._vertexState) { // Attribute for fragment need to be carried
                                  // over by varyings
       _emit(*state._vertexState, define);
@@ -433,16 +419,14 @@ void InputBlock::_emit(NodeMaterialBuildState& state, const std::string& define)
       state._attributeDeclaration += _emitDefine(define);
     }
     state._attributeDeclaration += String::printf(
-      "attribute %s %s;\r\n", state._getGLType(type()).c_str(),
-      associatedVariableName().c_str());
+      "attribute %s %s;\r\n", state._getGLType(type()).c_str(), associatedVariableName().c_str());
     if (!define.empty()) {
       state._attributeDeclaration += "#endif\r\n";
     }
   }
 }
 
-void InputBlock::_transmitWorld(Effect* effect, const Matrix& world,
-                                const Matrix& worldView,
+void InputBlock::_transmitWorld(Effect* effect, const Matrix& world, const Matrix& worldView,
                                 Matrix& worldViewProjection)
 {
   if (!_systemValue.has_value()) {
@@ -488,8 +472,7 @@ void InputBlock::_transmit(Effect* effect, Scene* scene)
         effect->setMatrix(variableName, scene->getTransformMatrix());
         break;
       case NodeMaterialSystemValues::CameraPosition:
-        effect->setVector3(variableName,
-                           scene->activeCamera()->globalPosition());
+        effect->setVector3(variableName, scene->activeCamera()->globalPosition());
         break;
       case NodeMaterialSystemValues::FogColor:
         effect->setColor3(variableName, scene->fogColor);
@@ -550,8 +533,8 @@ json InputBlock::serialize() const
   return nullptr;
 }
 
-void InputBlock::_deserialize(const json& /*serializationObject*/,
-                              Scene* /*scene*/, const std::string& /*rootUrl*/)
+void InputBlock::_deserialize(const json& /*serializationObject*/, Scene* /*scene*/,
+                              const std::string& /*rootUrl*/)
 {
 }
 

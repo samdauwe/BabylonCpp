@@ -203,7 +203,7 @@ void TextureBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& /*nodeMa
 
 bool TextureBlock::get__isMixed() const
 {
-  return target() != NodeMaterialBlockTargets::Fragment;
+  return target().has_value() && *target() != NodeMaterialBlockTargets::Fragment;
 }
 
 void TextureBlock::_injectVertexCode(NodeMaterialBuildState& state)

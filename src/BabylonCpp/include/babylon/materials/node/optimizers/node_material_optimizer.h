@@ -14,7 +14,7 @@ using NodeMaterialBlockPtr = std::shared_ptr<NodeMaterialBlock>;
 /**
  * @brief Root class for all node material optimizers.
  */
-class BABYLON_SHARED_EXPORT NodeMaterialOptimizer {
+struct BABYLON_SHARED_EXPORT NodeMaterialOptimizer {
 
   /**
    * @brief Function used to optimize a NodeMaterial graph.
@@ -23,11 +23,10 @@ class BABYLON_SHARED_EXPORT NodeMaterialOptimizer {
    * @param fragmentOutputNodes defines the list of output nodes for the
    * fragment shader
    */
-  virtual void
-  optimize(const std::vector<NodeMaterialBlockPtr>& vertexOutputNodes,
-           const std::vector<NodeMaterialBlockPtr>& fragmentOutputNodes);
+  virtual void optimize(const std::vector<NodeMaterialBlockPtr>& vertexOutputNodes,
+                        const std::vector<NodeMaterialBlockPtr>& fragmentOutputNodes);
 
-}; // end of class NodeMaterialOptimizer
+}; // end of struct NodeMaterialOptimizer
 
 } // end of namespace BABYLON
 
