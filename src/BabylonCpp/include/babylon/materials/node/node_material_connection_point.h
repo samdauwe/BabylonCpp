@@ -24,7 +24,8 @@ using NodeMaterialConnectionPointPtr = std::shared_ptr<NodeMaterialConnectionPoi
 /**
  * @brief Defines a connection point for a block.
  */
-class BABYLON_SHARED_EXPORT NodeMaterialConnectionPoint {
+class BABYLON_SHARED_EXPORT NodeMaterialConnectionPoint
+    : public std::enable_shared_from_this<NodeMaterialConnectionPoint> {
 
 public:
   template <typename... Ts>
@@ -33,13 +34,13 @@ public:
     return std::shared_ptr<NodeMaterialConnectionPoint>(
       new NodeMaterialConnectionPoint(std::forward<Ts>(args)...));
   }
-  ~NodeMaterialConnectionPoint();
+  ~NodeMaterialConnectionPoint() = default;
 
   /**
    * @brief Gets the current class name e.g. "NodeMaterialConnectionPoint".
    * @returns the class name
    */
-  const std::string getClassName() const;
+  std::string getClassName() const;
 
   /**
    * @brief Gets an boolean indicating if the current point can be connected to
@@ -56,7 +57,7 @@ public:
    * is false)
    * @returns the current connection point
    */
-  NodeMaterialConnectionPoint& connectTo(const NodeMaterialConnectionPointPtr& connectionPoint,
+  NodeMaterialConnectionPoint& connectTo(NodeMaterialConnectionPointPtr& connectionPoint,
                                          bool ignoreConstraints = false);
 
   /**
@@ -64,7 +65,7 @@ public:
    * @param endpoint defines the other connection point
    * @returns the current connection point
    */
-  NodeMaterialConnectionPoint& disconnectFrom(const NodeMaterialConnectionPoint& endpoint);
+  NodeMaterialConnectionPoint& disconnectFrom(NodeMaterialConnectionPoint& endpoint);
 
   /**
    * @brief Serializes this point in a JSON representation.
@@ -88,12 +89,12 @@ protected:
   /**
    * @brief Sets the associated variable name in the shader.
    */
-  void set_associatedVariableName(const std::string& value);
+  void set_associatedVariableName(std::string value);
 
   /**
    * @brief Gets the connection point type (default is float).
    */
-  NodeMaterialBlockConnectionPointTypes get_type() const;
+  NodeMaterialBlockConnectionPointTypes& get_type();
 
   /**
    * @brief Sets the connection point type (default is float).
@@ -123,13 +124,13 @@ protected:
   /**
    * @brief Get the block that owns this connection point.
    */
-  NodeMaterialBlock& get_ownerBlock();
+  NodeMaterialBlockPtr& get_ownerBlock();
 
   /**
    * @brief Get the block connected on the other side of this connection (if
    * any).
    */
-  NodeMaterialBlock& get_sourceBlock();
+  NodeMaterialBlockPtr& get_sourceBlock();
 
   /**
    * @brief Get the block connected on the endpoints of this connection (if
@@ -172,6 +173,9 @@ public:
    */
   Property<NodeMaterialConnectionPoint, std::string> associatedVariableName;
 
+  /**
+   * Hidden
+   */
   Property<NodeMaterialConnectionPoint, NodeMaterialBlockConnectionPointTypes> type;
 
   /**
@@ -222,7 +226,7 @@ public:
   /**
    * Get the block connected on the other side of this connection (if any).
    */
-  ReadOnlyProperty<NodeMaterialConnectionPoint, NodeMaterialBlock> sourceBlock;
+  ReadOnlyProperty<NodeMaterialConnectionPoint, NodeMaterialBlockPtr> sourceBlock;
 
   /**
    * Get the block connected on the endpoints of this connection (if any).
@@ -244,6 +248,9 @@ private:
   std::vector<NodeMaterialConnectionPointPtr> _endpoints;
   std::string _associatedVariableName;
   NodeMaterialBlockConnectionPointTypes _type;
+  InputBlockPtr _connectInputBlock;
+  NodeMaterialBlockPtr _sourceBlock;
+  std::vector<NodeMaterialBlockPtr> _connectedBlocks;
 
 }; // end of enum class NodeMaterialConnectionPoint
 
