@@ -40,7 +40,7 @@ TrigonometryBlock& TrigonometryBlock::_buildBlock(NodeMaterialBuildState& state)
 {
   NodeMaterialBlock::_buildBlock(state);
 
-  const auto& output = _outputs[0];
+  const auto& iOutput = _outputs[0];
   std::string _operation{""};
 
   switch (operation) {
@@ -78,7 +78,7 @@ TrigonometryBlock& TrigonometryBlock::_buildBlock(NodeMaterialBuildState& state)
     }
   }
 
-  state.compilationString += _declareOutput(output, state)
+  state.compilationString += _declareOutput(iOutput, state)
                              + String::printf(" = %s(%s);\r\n", _operation.c_str(),
                                               input()->associatedVariableName().c_str());
 

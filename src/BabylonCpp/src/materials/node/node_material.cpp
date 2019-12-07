@@ -588,20 +588,20 @@ bool NodeMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, b
       {"maxSimultaneousLights", maxSimultaneousLights},
       {"maxSimultaneousMorphTargets", defines->intDef["NUM_MORPH_INFLUENCERS"]}};
 
-    EffectCreationOptions options;
-    options.attributes            = _vertexCompilationState->attributes;
-    options.uniformsNames         = std::move(mergedUniforms);
-    options.uniformBuffersNames   = std::move(mergedUniformBuffers);
-    options.samplers              = std::move(mergedSamplers);
-    options.materialDefines       = defines.get();
-    options.defines               = std::move(join);
-    options.fallbacks             = std::move(fallbacks);
-    options.onCompiled            = onCompiled;
-    options.onError               = onError;
-    options.indexParameters       = std::move(indexParameters);
-    options.maxSimultaneousLights = maxSimultaneousLights;
+    EffectCreationOptions iOptions;
+    iOptions.attributes           = _vertexCompilationState->attributes;
+    iOptions.uniformsNames        = std::move(mergedUniforms);
+    iOptions.uniformBuffersNames  = std::move(mergedUniformBuffers);
+    iOptions.samplers             = std::move(mergedSamplers);
+    iOptions.materialDefines      = defines.get();
+    iOptions.defines              = std::move(join);
+    iOptions.fallbacks            = std::move(fallbacks);
+    iOptions.onCompiled           = onCompiled;
+    iOptions.onError              = onError;
+    iOptions.indexParameters      = std::move(indexParameters);
+    iOptions.maxSimultaneousLights = maxSimultaneousLights;
 
-    auto effect = scene->getEngine()->createEffect(baseName, options, engine);
+    auto effect = scene->getEngine()->createEffect(baseName, iOptions, engine);
 
     if (effect) {
       // Use previous effect while new one is compiling

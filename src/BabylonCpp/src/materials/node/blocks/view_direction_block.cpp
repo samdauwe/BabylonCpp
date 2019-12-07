@@ -66,9 +66,9 @@ ViewDirectionBlock& ViewDirectionBlock::_buildBlock(NodeMaterialBuildState& stat
 {
   NodeMaterialBlock::_buildBlock(state);
 
-  const auto& output = _outputs[0];
+  const auto& iOutput = _outputs[0];
 
-  state.compilationString += _declareOutput(output, state)
+  state.compilationString += _declareOutput(iOutput, state)
                              + String::printf(" = normalize(%s - %s).xyz);\r\n",
                                               cameraPosition()->associatedVariableName().c_str(),
                                               worldPosition()->associatedVariableName().c_str());

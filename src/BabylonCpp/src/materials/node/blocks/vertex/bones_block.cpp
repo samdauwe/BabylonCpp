@@ -186,17 +186,17 @@ BonesBlock& BonesBlock::_buildBlock(NodeMaterialBuildState& state)
                                      }}                      // replaceStrings
                                   });
 
-  const auto& output     = _outputs[0];
+  const auto& iOutput     = _outputs[0];
   const auto& worldInput = world();
 
   state.compilationString += "#if NUM_BONE_INFLUENCERS>0\r\n";
   state.compilationString
-    += _declareOutput(output, state)
+    += _declareOutput(iOutput, state)
        + String::printf(" = %s * %s;\r\n", worldInput->associatedVariableName().c_str(),
                         influenceVariablename.c_str());
   state.compilationString += "#else\r\n";
   state.compilationString
-    += _declareOutput(output, state)
+    += _declareOutput(iOutput, state)
        + String::printf(" = %s;\r\n", worldInput->associatedVariableName().c_str());
   state.compilationString += "#endif\r\n";
 

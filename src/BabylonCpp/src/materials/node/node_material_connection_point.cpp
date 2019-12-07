@@ -162,26 +162,26 @@ std::string NodeMaterialConnectionPoint::getClassName() const
 bool NodeMaterialConnectionPoint::canConnectTo(const NodeMaterialConnectionPoint& connectionPoint)
 {
   if (type != connectionPoint.type
-      && connectionPoint.type != NodeMaterialBlockConnectionPointTypes::AutoDetect) {
+      && connectionPoint.type() != NodeMaterialBlockConnectionPointTypes::AutoDetect) {
     // Equivalents
     switch (type) {
       case NodeMaterialBlockConnectionPointTypes::Vector3: {
-        if (connectionPoint.type == NodeMaterialBlockConnectionPointTypes::Color3) {
+        if (connectionPoint.type() == NodeMaterialBlockConnectionPointTypes::Color3) {
           return true;
         }
       } break;
       case NodeMaterialBlockConnectionPointTypes::Vector4: {
-        if (connectionPoint.type == NodeMaterialBlockConnectionPointTypes::Color4) {
+        if (connectionPoint.type() == NodeMaterialBlockConnectionPointTypes::Color4) {
           return true;
         }
       } break;
       case NodeMaterialBlockConnectionPointTypes::Color3: {
-        if (connectionPoint.type == NodeMaterialBlockConnectionPointTypes::Vector3) {
+        if (connectionPoint.type() == NodeMaterialBlockConnectionPointTypes::Vector3) {
           return true;
         }
       } break;
       case NodeMaterialBlockConnectionPointTypes::Color4: {
-        if (connectionPoint.type == NodeMaterialBlockConnectionPointTypes::Vector4) {
+        if (connectionPoint.type() == NodeMaterialBlockConnectionPointTypes::Vector4) {
           return true;
         }
       } break;

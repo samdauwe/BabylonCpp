@@ -139,9 +139,9 @@ InputBlock& InputBlock::setAsAttribute(const std::string& attributeName)
   return *this;
 }
 
-InputBlock& InputBlock::setAsSystemValue(const std::optional<NodeMaterialSystemValues>& value)
+InputBlock& InputBlock::setAsSystemValue(const std::optional<NodeMaterialSystemValues>& iValue)
 {
-  systemValue = value;
+  systemValue = iValue;
   return *this;
 }
 
@@ -150,9 +150,9 @@ AnimationValuePtr& InputBlock::get_value()
   return _storedValue;
 }
 
-void InputBlock::set_value(const AnimationValuePtr& value)
+void InputBlock::set_value(const AnimationValuePtr& iValue)
 {
-  _storedValue = value;
+  _storedValue = iValue;
   _mode        = NodeMaterialBlockConnectionPointMode::Uniform;
 }
 
@@ -161,9 +161,9 @@ std::function<AnimationValuePtr()>& InputBlock::get_valueCallback()
   return _valueCallback;
 }
 
-void InputBlock::set_valueCallback(const std::function<AnimationValuePtr()>& value)
+void InputBlock::set_valueCallback(const std::function<AnimationValuePtr()>& iValue)
 {
-  _valueCallback = value;
+  _valueCallback = iValue;
   _mode          = NodeMaterialBlockConnectionPointMode::Uniform;
 }
 
@@ -172,9 +172,9 @@ std::string InputBlock::get_associatedVariableName() const
   return _associatedVariableName;
 }
 
-void InputBlock::set_associatedVariableName(std::string value)
+void InputBlock::set_associatedVariableName(std::string iValue)
 {
-  _associatedVariableName = std::move(value);
+  _associatedVariableName = std::move(iValue);
 }
 
 AnimatedInputBlockTypes& InputBlock::get_animationType()
@@ -182,9 +182,9 @@ AnimatedInputBlockTypes& InputBlock::get_animationType()
   return _animationType;
 }
 
-void InputBlock::set_animationType(const AnimatedInputBlockTypes& value)
+void InputBlock::set_animationType(const AnimatedInputBlockTypes& iValue)
 {
-  _animationType = value;
+  _animationType = iValue;
 }
 
 bool InputBlock::get_isUndefined() const
@@ -197,10 +197,10 @@ bool InputBlock::get_isUniform() const
   return _mode == NodeMaterialBlockConnectionPointMode::Uniform;
 }
 
-void InputBlock::set_isUniform(bool value)
+void InputBlock::set_isUniform(bool iValue)
 {
-  _mode = value ? NodeMaterialBlockConnectionPointMode::Uniform :
-                  NodeMaterialBlockConnectionPointMode::Undefined;
+  _mode = iValue ? NodeMaterialBlockConnectionPointMode::Uniform :
+                   NodeMaterialBlockConnectionPointMode::Undefined;
   associatedVariableName = "";
 }
 
@@ -209,10 +209,10 @@ bool InputBlock::get_isAttribute() const
   return _mode == NodeMaterialBlockConnectionPointMode::Attribute;
 }
 
-void InputBlock::set_isAttribute(bool value)
+void InputBlock::set_isAttribute(bool iValue)
 {
-  _mode = value ? NodeMaterialBlockConnectionPointMode::Attribute :
-                  NodeMaterialBlockConnectionPointMode::Undefined;
+  _mode = iValue ? NodeMaterialBlockConnectionPointMode::Attribute :
+                   NodeMaterialBlockConnectionPointMode::Undefined;
   associatedVariableName = "";
 }
 
@@ -221,10 +221,10 @@ bool InputBlock::get_isVarying() const
   return _mode == NodeMaterialBlockConnectionPointMode::Varying;
 }
 
-void InputBlock::set_isVarying(bool value)
+void InputBlock::set_isVarying(bool iValue)
 {
-  _mode = value ? NodeMaterialBlockConnectionPointMode::Varying :
-                  NodeMaterialBlockConnectionPointMode::Undefined;
+  _mode = iValue ? NodeMaterialBlockConnectionPointMode::Varying :
+                   NodeMaterialBlockConnectionPointMode::Undefined;
   associatedVariableName = "";
 }
 
@@ -238,11 +238,11 @@ std::optional<NodeMaterialSystemValues>& InputBlock::get_systemValue()
   return _systemValue;
 }
 
-void InputBlock::set_systemValue(const std::optional<NodeMaterialSystemValues>& value)
+void InputBlock::set_systemValue(const std::optional<NodeMaterialSystemValues>& iValue)
 {
   _mode                  = NodeMaterialBlockConnectionPointMode::Uniform;
   associatedVariableName = "";
-  _systemValue           = value;
+  _systemValue           = iValue;
 }
 
 std::string InputBlock::getClassName() const
@@ -254,7 +254,7 @@ void InputBlock::animate(Scene* scene)
 {
   switch (_animationType) {
     case AnimatedInputBlockTypes::Time: {
-      if (type == NodeMaterialBlockConnectionPointTypes::Float) {
+      if (type() == NodeMaterialBlockConnectionPointTypes::Float) {
         value()->get<float>() += scene->getAnimationRatio() * 0.01f;
       }
       break;
@@ -483,36 +483,36 @@ void InputBlock::_transmit(Effect* effect, Scene* scene)
     return;
   }
 
-  const auto& value = _valueCallback ? _valueCallback() : _storedValue;
+  const auto& iValue = _valueCallback ? _valueCallback() : _storedValue;
 
-  if (value == nullptr) {
+  if (iValue == nullptr) {
     return;
   }
 
   switch (type()) {
     case NodeMaterialBlockConnectionPointTypes::Float:
-      effect->setFloat(variableName, value->get<float>());
+      effect->setFloat(variableName, iValue->get<float>());
       break;
     case NodeMaterialBlockConnectionPointTypes::Int:
-      effect->setInt(variableName, value->get<int>());
+      effect->setInt(variableName, iValue->get<int>());
       break;
     case NodeMaterialBlockConnectionPointTypes::Color3:
-      effect->setColor3(variableName, value->get<Color3>());
+      effect->setColor3(variableName, iValue->get<Color3>());
       break;
     case NodeMaterialBlockConnectionPointTypes::Color4:
-      effect->setDirectColor4(variableName, value->get<Color4>());
+      effect->setDirectColor4(variableName, iValue->get<Color4>());
       break;
     case NodeMaterialBlockConnectionPointTypes::Vector2:
-      effect->setVector2(variableName, value->get<Vector2>());
+      effect->setVector2(variableName, iValue->get<Vector2>());
       break;
     case NodeMaterialBlockConnectionPointTypes::Vector3:
-      effect->setVector3(variableName, value->get<Vector3>());
+      effect->setVector3(variableName, iValue->get<Vector3>());
       break;
     case NodeMaterialBlockConnectionPointTypes::Vector4:
-      effect->setVector4(variableName, value->get<Vector4>());
+      effect->setVector4(variableName, iValue->get<Vector4>());
       break;
     case NodeMaterialBlockConnectionPointTypes::Matrix:
-      effect->setMatrix(variableName, value->get<Matrix>());
+      effect->setMatrix(variableName, iValue->get<Matrix>());
       break;
     default:
       break;

@@ -41,10 +41,10 @@ ClampBlock& ClampBlock::_buildBlock(NodeMaterialBuildState& state)
 {
   NodeMaterialBlock::_buildBlock(state);
 
-  const auto& output = _outputs[0];
+  const auto& iOutput = _outputs[0];
 
   state.compilationString
-    += _declareOutput(output, state)
+    += _declareOutput(iOutput, state)
        + String::printf(" = clamp(%s , %s, %s);\r\n", value()->associatedVariableName().c_str(),
                         _writeFloat(minimum).c_str(), _writeFloat(maximum).c_str());
 

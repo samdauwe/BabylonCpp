@@ -13,7 +13,7 @@ class InputBlock;
 class NodeMaterial;
 class NodeMaterialBlock;
 class NodeMaterialBuildState;
-class NodeMaterialDefines;
+struct NodeMaterialDefines;
 struct NodeMaterialOptimizer;
 struct NodeMaterialBuildStateSharedData;
 class ReflectionTextureBlock;

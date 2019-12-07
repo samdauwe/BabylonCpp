@@ -214,7 +214,8 @@ void GridMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 
     if (_opacityTexture && MaterialFlags::OpacityTextureEnabled()) {
       _activeEffect->setTexture("opacitySampler", _opacityTexture);
-      _activeEffect->setFloat2("vOpacityInfos", _opacityTexture->coordinatesIndex,
+      _activeEffect->setFloat2("vOpacityInfos",
+                               static_cast<float>(_opacityTexture->coordinatesIndex),
                                _opacityTexture->level);
       _activeEffect->setMatrix("opacityMatrix", *_opacityTexture->getTextureMatrix());
     }

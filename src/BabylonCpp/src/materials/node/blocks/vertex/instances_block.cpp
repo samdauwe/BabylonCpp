@@ -145,22 +145,22 @@ InstancesBlock& InstancesBlock::_buildBlock(NodeMaterialBuildState& state)
   state.sharedData->blocksWithDefines.emplace_back(this);
 
   // Emit code
-  const auto& output  = _outputs[0];
-  const auto& _world0 = world0();
-  const auto& _world1 = world1();
-  const auto& _world2 = world2();
-  const auto& _world3 = world3();
+  const auto& iOutput = _outputs[0];
+  const auto& iWorld0 = world0();
+  const auto& iWorld1 = world1();
+  const auto& iWorld2 = world2();
+  const auto& iWorld3 = world3();
 
   state.compilationString += "#ifdef INSTANCES\r\n";
   state.compilationString
-    += _declareOutput(output, state)
-       + String::printf(" = mat4(%s, %s, %s, %s);\r\n", _world0->associatedVariableName().c_str(),
-                        _world1->associatedVariableName().c_str(),
-                        _world2->associatedVariableName().c_str(),
-                        _world3->associatedVariableName().c_str());
+    += _declareOutput(iOutput, state)
+       + String::printf(" = mat4(%s, %s, %s, %s);\r\n", iWorld0->associatedVariableName().c_str(),
+                        iWorld1->associatedVariableName().c_str(),
+                        iWorld2->associatedVariableName().c_str(),
+                        iWorld3->associatedVariableName().c_str());
   state.compilationString += "#else\r\n";
   state.compilationString
-    += _declareOutput(output, state)
+    += _declareOutput(iOutput, state)
        + String::printf(" = %s;\r\n", world()->associatedVariableName().c_str());
   state.compilationString += "#endif\r\n";
   return *this;

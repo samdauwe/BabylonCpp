@@ -119,8 +119,8 @@ void FogBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& /*nodeMateri
   }
 
   const auto& scene = mesh->getScene();
-  effect->setFloat4(_fogParameters, scene->fogMode(), scene->fogStart, scene->fogEnd,
-                    scene->fogDensity);
+  effect->setFloat4(_fogParameters, static_cast<float>(scene->fogMode()), scene->fogStart,
+                    scene->fogEnd, scene->fogDensity);
 }
 
 FogBlock& FogBlock::_buildBlock(NodeMaterialBuildState& state)
@@ -149,7 +149,7 @@ FogBlock& FogBlock::_buildBlock(NodeMaterialBuildState& state)
     const auto& color        = input();
     const auto& _fogColor    = fogColor();
     _fogParameters           = state._getFreeVariableName("fogParameters");
-    const auto& output       = _outputs[0];
+    const auto& iOutput      = _outputs[0];
 
     state._emitUniformFromString(_fogParameters, "vec4");
 
@@ -158,12 +158,12 @@ FogBlock& FogBlock::_buildBlock(NodeMaterialBuildState& state)
       += String::printf("float %s = CalcFogFactor(%s, %s);\r\n", tempFogVariablename.c_str(),
                         _fogDistanceName.c_str(), _fogParameters.c_str());
     state.compilationString
-      += _declareOutput(output, state)
+      += _declareOutput(iOutput, state)
          + String::printf(" = %s * %s.rgb + (1.0 - %s) * %s..rgb;\r\n", tempFogVariablename.c_str(),
                           color->associatedVariableName().c_str(), tempFogVariablename.c_str(),
-                          _fogColor->associatedVariableName());
+                          _fogColor->associatedVariableName().c_str());
     state.compilationString
-      += String::printf("#else\r\n%s = %s.rgb;\r\n", _declareOutput(output, state).c_str(),
+      += String::printf("#else\r\n%s = %s.rgb;\r\n", _declareOutput(iOutput, state).c_str(),
                         color->associatedVariableName().c_str());
     state.compilationString += "#endif\r\n";
   }

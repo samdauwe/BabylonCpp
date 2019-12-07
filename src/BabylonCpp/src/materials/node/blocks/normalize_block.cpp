@@ -40,10 +40,10 @@ NormalizeBlock& NormalizeBlock::_buildBlock(NodeMaterialBuildState& state)
 {
   NodeMaterialBlock::_buildBlock(state);
 
-  const auto& output = _outputs[0];
+  const auto& iOutput = _outputs[0];
 
   state.compilationString
-    += _declareOutput(output, state)
+    += _declareOutput(iOutput, state)
        + String::printf(" = normalize(%s);\r\n", input()->associatedVariableName().c_str());
 
   return *this;

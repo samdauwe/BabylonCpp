@@ -78,10 +78,10 @@ std::vector<NodeMaterialConnectionPointPtr>& NodeMaterialBlock::get_outputs()
   return _outputs;
 }
 
-NodeMaterialConnectionPointPtr NodeMaterialBlock::getInputByName(const std::string& name) const
+NodeMaterialConnectionPointPtr NodeMaterialBlock::getInputByName(const std::string& iName) const
 {
   for (const auto& input : _inputs) {
-    if (input->name == name) {
+    if (input->name == iName) {
       return input;
     }
   }
@@ -89,10 +89,10 @@ NodeMaterialConnectionPointPtr NodeMaterialBlock::getInputByName(const std::stri
   return nullptr;
 }
 
-NodeMaterialConnectionPointPtr NodeMaterialBlock::getOutputByName(const std::string& name) const
+NodeMaterialConnectionPointPtr NodeMaterialBlock::getOutputByName(const std::string& iName) const
 {
   for (const auto& output : _outputs) {
-    if (output->name == name) {
+    if (output->name == iName) {
       return output;
     }
   }
@@ -146,15 +146,15 @@ std::string NodeMaterialBlock::getClassName() const
 }
 
 NodeMaterialBlock&
-NodeMaterialBlock::registerInput(const std::string& name,
+NodeMaterialBlock::registerInput(const std::string& iName,
                                  const NodeMaterialBlockConnectionPointTypes& type, bool isOptional,
-                                 const std::optional<NodeMaterialBlockTargets>& target)
+                                 const std::optional<NodeMaterialBlockTargets>& iTarget)
 {
-  auto point        = NodeMaterialConnectionPoint::New(name, shared_from_this());
+  auto point        = NodeMaterialConnectionPoint::New(iName, shared_from_this());
   point->type       = type;
   point->isOptional = isOptional;
-  if (target.has_value()) {
-    point->target = *target;
+  if (iTarget.has_value()) {
+    point->target = *iTarget;
   }
 
   _inputs.emplace_back(point);
@@ -163,14 +163,14 @@ NodeMaterialBlock::registerInput(const std::string& name,
 }
 
 NodeMaterialBlock&
-NodeMaterialBlock::registerOutput(const std::string& name,
+NodeMaterialBlock::registerOutput(const std::string& iName,
                                   const NodeMaterialBlockConnectionPointTypes& type,
-                                  const std::optional<NodeMaterialBlockTargets>& target)
+                                  const std::optional<NodeMaterialBlockTargets>& iTarget)
 {
-  auto point  = NodeMaterialConnectionPoint::New(name, shared_from_this());
+  auto point  = NodeMaterialConnectionPoint::New(iName, shared_from_this());
   point->type = type;
-  if (target.has_value()) {
-    point->target = *target;
+  if (iTarget.has_value()) {
+    point->target = *iTarget;
   }
 
   _outputs.emplace_back(point);
@@ -447,14 +447,14 @@ bool NodeMaterialBlock::build(NodeMaterialBuildState& state,
   return false;
 }
 
-std::string NodeMaterialBlock::_inputRename(const std::string& name)
+std::string NodeMaterialBlock::_inputRename(const std::string& iName)
 {
-  return name;
+  return iName;
 }
 
-std::string NodeMaterialBlock::_outputRename(const std::string& name)
+std::string NodeMaterialBlock::_outputRename(const std::string& iName)
 {
-  return name;
+  return iName;
 }
 
 std::string NodeMaterialBlock::_dumpPropertiesCode()

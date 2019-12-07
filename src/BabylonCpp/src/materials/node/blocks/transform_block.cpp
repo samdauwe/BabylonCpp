@@ -48,19 +48,19 @@ TransformBlock& TransformBlock::_buildBlock(NodeMaterialBuildState& state)
 {
   NodeMaterialBlock::_buildBlock(state);
 
-  const auto& output = _outputs[0];
+  const auto& iOutput = _outputs[0];
 
   switch (vector()->connectedPoint()->type()) {
     case NodeMaterialBlockConnectionPointTypes::Vector2:
       state.compilationString
-        += _declareOutput(output, state)
+        += _declareOutput(iOutput, state)
            + String::printf(" = %s * vec4(%s, %s, %s);\r\n",
                             transform()->associatedVariableName().c_str(),
                             vector()->associatedVariableName().c_str(),
                             _writeFloat(complementZ).c_str(), _writeFloat(complementW).c_str());
       break;
     case NodeMaterialBlockConnectionPointTypes::Vector3:
-      state.compilationString += _declareOutput(output, state)
+      state.compilationString += _declareOutput(iOutput, state)
                                  + String::printf(" = %s * vec4(%s, %s);\r\n",
                                                   transform()->associatedVariableName().c_str(),
                                                   vector()->associatedVariableName().c_str(),
@@ -68,7 +68,7 @@ TransformBlock& TransformBlock::_buildBlock(NodeMaterialBuildState& state)
       break;
     default:
       state.compilationString
-        += _declareOutput(output, state)
+        += _declareOutput(iOutput, state)
            + String::printf(" = %s * %s;\r\n", transform()->associatedVariableName().c_str(),
                             vector()->associatedVariableName().c_str());
       break;

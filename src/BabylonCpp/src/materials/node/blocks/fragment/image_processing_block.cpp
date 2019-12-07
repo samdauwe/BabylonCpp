@@ -117,34 +117,35 @@ ImageProcessingBlock& ImageProcessingBlock::_buildBlock(NodeMaterialBuildState& 
 
   // Emit code
   const auto& _color  = color();
-  const auto& output  = _outputs[0];
+  const auto& iOutput = _outputs[0];
   const auto comments = String::printf("//%s", name.c_str());
 
   state._emitFunctionFromInclude("helperFunctions", comments);
   state._emitFunctionFromInclude("imageProcessingDeclaration", comments);
   state._emitFunctionFromInclude("imageProcessingFunctions", comments);
 
-  if (_color->connectedPoint()->type == NodeMaterialBlockConnectionPointTypes::Color4) {
-    state.compilationString += String::printf("%s = %s;\r\n", _declareOutput(output, state).c_str(),
-                                              _color->associatedVariableName().c_str());
+  if (_color->connectedPoint()->type() == NodeMaterialBlockConnectionPointTypes::Color4) {
+    state.compilationString
+      += String::printf("%s = %s;\r\n", _declareOutput(iOutput, state).c_str(),
+                        _color->associatedVariableName().c_str());
   }
   else {
     state.compilationString
-      += String::printf("%s = vec4(%s, 1.0);\r\n", _declareOutput(output, state).c_str(),
+      += String::printf("%s = vec4(%s, 1.0);\r\n", _declareOutput(iOutput, state).c_str(),
                         _color->associatedVariableName().c_str());
   }
   state.compilationString += "#ifdef IMAGEPROCESSINGPOSTPROCESS\r\n";
   state.compilationString += String::printf("%s.rgb = toLinearSpace(%s.rgb);\r\n",
-                                            output->associatedVariableName().c_str(),
+                                            iOutput->associatedVariableName().c_str(),
                                             _color->associatedVariableName().c_str());
   state.compilationString += "#else\r\n";
   state.compilationString += "#ifdef IMAGEPROCESSING\r\n";
   state.compilationString += String::printf("%s.rgb = toLinearSpace(%s.rgb);\r\n",
-                                            output->associatedVariableName().c_str(),
+                                            iOutput->associatedVariableName().c_str(),
                                             _color->associatedVariableName().c_str());
   state.compilationString += String::printf("%s = applyImageProcessing(%s);\r\n",
-                                            output->associatedVariableName().c_str(),
-                                            output->associatedVariableName().c_str());
+                                            iOutput->associatedVariableName().c_str(),
+                                            iOutput->associatedVariableName().c_str());
   state.compilationString += "#endif\r\n";
   state.compilationString += "#endif\r\n";
 

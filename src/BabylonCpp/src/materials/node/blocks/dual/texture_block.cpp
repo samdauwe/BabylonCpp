@@ -255,7 +255,7 @@ void TextureBlock::_writeOutput(NodeMaterialBuildState& state,
 {
   const auto& uvInput = uv();
 
-  if (uv()->ownerBlock()->target == NodeMaterialBlockTargets::Fragment) {
+  if (uv()->ownerBlock()->target() == NodeMaterialBlockTargets::Fragment) {
     state.compilationString += String::printf(
       "%s = texture2D(%s, %s).%s;\r\n", _declareOutput(output, state).c_str(), _samplerName.c_str(),
       uvInput->associatedVariableName().c_str(), swizzle.c_str());
@@ -318,7 +318,7 @@ std::string TextureBlock::_dumpPropertiesCode()
   }
 
   const auto codeString = String::printf("%s.texture = new BABYLON.Texture(\"%s\");\r\n",
-                                         _codeVariableName.c_str(), texture->name);
+                                         _codeVariableName.c_str(), texture->name.c_str());
 
   return codeString;
 }

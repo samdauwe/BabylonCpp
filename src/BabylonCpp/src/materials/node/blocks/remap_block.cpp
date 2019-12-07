@@ -43,10 +43,10 @@ RemapBlock& RemapBlock::_buildBlock(NodeMaterialBuildState& state)
 {
   NodeMaterialBlock::_buildBlock(state);
 
-  const auto& output = _outputs[0];
+  const auto& iOutput = _outputs[0];
 
   state.compilationString
-    += _declareOutput(output, state)
+    += _declareOutput(iOutput, state)
        + String::printf(
          " = %s + (%s - %s) * (%s - %s) / (%s - %s);\r\n", _writeFloat(targetRange.x).c_str(),
          _inputs[0]->associatedVariableName().c_str(), _writeFloat(sourceRange.x).c_str(),

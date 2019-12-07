@@ -47,10 +47,10 @@ DotBlock& DotBlock::_buildBlock(NodeMaterialBuildState& state)
 {
   NodeMaterialBlock::_buildBlock(state);
 
-  const auto& output = _outputs[0];
+  const auto& iOutput = _outputs[0];
 
   state.compilationString
-    += _declareOutput(output, state)
+    += _declareOutput(iOutput, state)
        + String::printf(" = dot(%s, %s);\r\n", left()->associatedVariableName().c_str(),
                         right()->associatedVariableName().c_str());
 
