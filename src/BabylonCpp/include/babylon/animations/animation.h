@@ -98,6 +98,11 @@ private:
   static constexpr unsigned int _ANIMATIONTYPE_FLOAT32ARRAY = 30;
 
   /**
+   * Vector4 animation type
+   */
+  static constexpr unsigned int _ANIMATIONTYPE_VECTOR4 = 40;
+
+  /**
    * Relative Loop Mode
    */
   static constexpr unsigned int _ANIMATIONLOOPMODE_RELATIVE = 0;
@@ -207,6 +212,14 @@ public:
   static constexpr unsigned int ANIMATIONTYPE_FLOAT32ARRAY()
   {
     return Animation::_ANIMATIONTYPE_FLOAT32ARRAY;
+  }
+
+  /**
+   * @brief Get the Vector4 animation type.
+   */
+  static constexpr unsigned int ANIMATIONTYPE_VECTOR4()
+  {
+    return Animation::_ANIMATIONTYPE_VECTOR4;
   }
 
   /**

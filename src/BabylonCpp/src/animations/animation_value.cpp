@@ -31,8 +31,7 @@ AnimationValue AnimationValue::subtract(const AnimationValue& fromValue)
     case Animation::ANIMATIONTYPE_VECTOR3():
       return AnimationValue(get<Vector3>().subtract(fromValue.get<Vector3>()));
     case Animation::ANIMATIONTYPE_QUATERNION():
-      return AnimationValue(
-        get<Quaternion>().subtract(fromValue.get<Quaternion>()));
+      return AnimationValue(get<Quaternion>().subtract(fromValue.get<Quaternion>()));
     case Animation::ANIMATIONTYPE_MATRIX():
       return AnimationValue(get<Matrix>().subtract(fromValue.get<Matrix>()));
     case Animation::ANIMATIONTYPE_COLOR3():
@@ -48,13 +47,15 @@ AnimationValue AnimationValue::subtract(const AnimationValue& fromValue)
     case Animation::ANIMATIONTYPE_FLOAT32ARRAY(): {
       const auto& currentArray = get<Float32Array>();
       const auto& otherArray   = fromValue.get<Float32Array>();
-      auto count = std::min(currentArray.size(), otherArray.size());
+      auto count               = std::min(currentArray.size(), otherArray.size());
       Float32Array result(count);
       for (size_t i = 0; i < count; ++i) {
         result[i] = currentArray[i] - otherArray[i];
       }
       return AnimationValue(result);
     }
+    case Animation::ANIMATIONTYPE_VECTOR4():
+      return AnimationValue(get<Vector4>().subtract(fromValue.get<Vector4>()));
     default:
       return *this;
   }
@@ -67,8 +68,7 @@ AnimationValue AnimationValue::operator-(const AnimationValue& fromValue)
 
 AnimationValue AnimationValue::operator!()
 {
-  if (_value.has_value()
-      && animationType() == Animation::ANIMATIONTYPE_BOOL()) {
+  if (_value.has_value() && animationType() == Animation::ANIMATIONTYPE_BOOL()) {
     return AnimationValue(!std::get<bool>(_value.value()));
   }
   return *this;
@@ -110,10 +110,12 @@ std::optional<unsigned int> AnimationValue::animationType() const
     case 8:
       return Animation::ANIMATIONTYPE_VECTOR3();
     case 9:
-      return Animation::ANIMATIONTYPE_QUATERNION();
+      return Animation::ANIMATIONTYPE_VECTOR4();
     case 10:
-      return Animation::ANIMATIONTYPE_MATRIX();
+      return Animation::ANIMATIONTYPE_QUATERNION();
     case 11:
+      return Animation::ANIMATIONTYPE_MATRIX();
+    case 12:
       return Animation::ANIMATIONTYPE_FLOAT32ARRAY();
     default:
       break;

@@ -14,6 +14,7 @@
 #include <babylon/maths/size.h>
 #include <babylon/maths/vector2.h>
 #include <babylon/maths/vector3.h>
+#include <babylon/maths/vector4.h>
 
 #ifndef isNan
 #define isNan(a) ((a) != (a))
@@ -24,8 +25,9 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT AnimationValue {
 
 public:
-  using AnimationValueType = std::variant<bool, int, float, std::string, Size, Color3, Color4,
-                                          Vector2, Vector3, Quaternion, Matrix, Float32Array>;
+  using AnimationValueType
+    = std::variant<bool, int, float, std::string, Size, Color3, Color4, Vector2, Vector3, Vector4,
+                   Quaternion, Matrix, Float32Array>;
 
 public:
   AnimationValue();
