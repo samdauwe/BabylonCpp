@@ -11,6 +11,7 @@
 #include <babylon/maths/matrix.h>
 #include <babylon/maths/vector2.h>
 #include <babylon/maths/vector3.h>
+#include <babylon/maths/vector4.h>
 
 #ifndef isNan
 #define isNan(a) (a != a)
@@ -24,15 +25,13 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT InputValue {
 
 public:
-  using InputValueType = std::variant<float, int, Vector2, Vector3, Vector4,
-                                      Color3, Color4, Matrix>;
+  using InputValueType
+    = std::variant<float, int, Vector2, Vector3, Vector4, Color3, Color4, Matrix>;
 
 public:
   InputValue();
 
-  template <typename T,
-            typename
-            = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+  template <typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
   InputValue(T value)
   {
     if (!isNan(value)) {
@@ -40,9 +39,7 @@ public:
     }
   }
 
-  template <typename T,
-            typename
-            = typename std::enable_if<!std::is_arithmetic<T>::value, T>::type>
+  template <typename T, typename = typename std::enable_if<!std::is_arithmetic<T>::value, T>::type>
   InputValue(const T& value)
   {
     _value = value;

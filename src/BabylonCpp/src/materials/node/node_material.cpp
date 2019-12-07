@@ -9,6 +9,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/image_processing_configuration.h>
+#include <babylon/materials/node/blocks/dual/reflection_texture_block.h>
 #include <babylon/materials/node/blocks/dual/texture_block.h>
 #include <babylon/materials/node/blocks/fragment/fragment_output_block.h>
 #include <babylon/materials/node/blocks/input/input_block.h>
@@ -174,7 +175,7 @@ NodeMaterial& NodeMaterial::registerOptimizer(const NodeMaterialOptimizerPtr& op
   return *this;
 }
 
-NodeMaterial& NodeMaterial::unregisterOptimizer(const NodeMaterialOptimizer& optimizer)
+NodeMaterial& NodeMaterial::unregisterOptimizer(const NodeMaterialOptimizerPtr& optimizer)
 {
   auto index = stl_util::index_of(_optimizers, optimizer);
 
@@ -189,17 +190,17 @@ NodeMaterial& NodeMaterial::unregisterOptimizer(const NodeMaterialOptimizer& opt
 
 NodeMaterial& NodeMaterial::addOutputNode(const NodeMaterialBlockPtr& node)
 {
-  if (!node->target().has_value()) {
+  if (node->target() == NodeMaterialBlockTargets::Unkown) {
     throw std::runtime_error(
       "This node is not meant to be an output node. You may want to explicitly set its target "
       "value.");
   }
 
-  if ((*node->target() == NodeMaterialBlockTargets::Vertex) != 0) {
+  if ((node->target() == NodeMaterialBlockTargets::Vertex) != 0) {
     _addVertexOutputNode(node);
   }
 
-  if ((*node->target() == NodeMaterialBlockTargets::Fragment) != 0) {
+  if ((node->target() == NodeMaterialBlockTargets::Fragment) != 0) {
     _addFragmentOutputNode(node);
   }
 
@@ -208,15 +209,15 @@ NodeMaterial& NodeMaterial::addOutputNode(const NodeMaterialBlockPtr& node)
 
 NodeMaterial& NodeMaterial::removeOutputNode(const NodeMaterialBlockPtr& node)
 {
-  if (!node->target().has_value()) {
+  if (node->target() == NodeMaterialBlockTargets::Unkown) {
     return *this;
   }
 
-  if (*node->target() == NodeMaterialBlockTargets::Vertex) {
+  if (node->target() == NodeMaterialBlockTargets::Vertex) {
     _removeVertexOutputNode(node);
   }
 
-  if (*node->target() == NodeMaterialBlockTargets::Fragment) {
+  if (node->target() == NodeMaterialBlockTargets::Fragment) {
     _removeFragmentOutputNode(node);
   }
 
@@ -305,11 +306,11 @@ void NodeMaterial::_initializeBlock(
     if (connectedPoint) {
       const auto block = connectedPoint->ownerBlock();
       if (block != node) {
-        if (*block->target() == NodeMaterialBlockTargets::VertexAndFragment) {
+        if (block->target() == NodeMaterialBlockTargets::VertexAndFragment) {
           nodesToProcessForOtherBuildState.emplace_back(block);
         }
         else if (iState->target == NodeMaterialBlockTargets::Fragment
-                 && *block->target() == NodeMaterialBlockTargets::Vertex
+                 && block->target() == NodeMaterialBlockTargets::Vertex
                  && block->_preparationId != _buildId) {
           nodesToProcessForOtherBuildState.emplace_back(block);
         }
@@ -325,7 +326,7 @@ void NodeMaterial::_initializeBlock(
 
 void NodeMaterial::_resetDualBlocks(const NodeMaterialBlockPtr& node, size_t iId)
 {
-  if (*node->target() == NodeMaterialBlockTargets::VertexAndFragment) {
+  if (node->target() == NodeMaterialBlockTargets::VertexAndFragment) {
     node->buildId = iId;
   }
 
@@ -695,11 +696,11 @@ std::vector<BaseTexturePtr> NodeMaterial::getActiveTextures() const
 
   for (const auto& t : _sharedData->textureBlocks) {
     if (std::holds_alternative<TextureBlockPtr>(t) && std::get<TextureBlockPtr>(t)) {
-      activeTextures.emplace_back(std::get<TextureBlockPtr>(t));
+      activeTextures.emplace_back(std::get<TextureBlockPtr>(t)->texture);
     }
     else if (std::holds_alternative<ReflectionTextureBlockPtr>(t)
              && std::get<ReflectionTextureBlockPtr>(t)) {
-      activeTextures.emplace_back(std::get<ReflectionTextureBlockPtr>(t));
+      activeTextures.emplace_back(std::get<ReflectionTextureBlockPtr>(t)->texture);
     }
   }
 
@@ -727,11 +728,12 @@ bool NodeMaterial::hasTexture(const BaseTexturePtr& texture) const
   }
 
   for (const auto& t : _sharedData->textureBlocks) {
-    if (std::holds_alternative<TextureBlockPtr>(t) && std::get<TextureBlockPtr>(t) == texture) {
+    if (std::holds_alternative<TextureBlockPtr>(t)
+        && std::get<TextureBlockPtr>(t)->texture == texture) {
       return true;
     }
     else if (std::holds_alternative<ReflectionTextureBlockPtr>(t)
-             && std::get<ReflectionTextureBlockPtr>(t) == texture) {
+             && std::get<ReflectionTextureBlockPtr>(t)->texture == texture) {
       return true;
     }
   }

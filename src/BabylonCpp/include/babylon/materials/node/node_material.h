@@ -95,7 +95,7 @@ public:
    * @param optimizer defines the optimizers to remove
    * @returns the current material
    */
-  NodeMaterial& unregisterOptimizer(const NodeMaterialOptimizer& optimizer);
+  NodeMaterial& unregisterOptimizer(const NodeMaterialOptimizerPtr& optimizer);
 
   /**
    * @brief Add a new block to the list of output nodes.
@@ -262,7 +262,8 @@ protected:
    * @param scene defines the hosting scene
    * @param options defines creation option
    */
-  NodeMaterial(const std::string& name, Scene* scene, const INodeMaterialOptionsPtr& options);
+  NodeMaterial(const std::string& name, Scene* scene,
+               const INodeMaterialOptionsPtr& options = nullptr);
 
   /**
    * @brief Gets options to control the node material overall behavior.

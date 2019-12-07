@@ -18,8 +18,7 @@ public:
   template <typename... Ts>
   static MorphTargetsBlockPtr New(Ts&&... args)
   {
-    return std::shared_ptr<MorphTargetsBlock>(
-      new MorphTargetsBlock(std::forward<Ts>(args)...));
+    return std::shared_ptr<MorphTargetsBlock>(new MorphTargetsBlock(std::forward<Ts>(args)...));
   }
   ~MorphTargetsBlock() override;
 
@@ -27,7 +26,7 @@ public:
    * @brief Gets the current class name.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Initialize the block and prepare the context for build.
@@ -49,11 +48,9 @@ public:
    * @param useInstances specifies that instances should be used
    */
   void prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
-                      NodeMaterialDefines& defines,
-                      bool useInstances = false) override;
+                      NodeMaterialDefines& defines, bool useInstances = false) override;
   /**
-   * @brief Bind data to effect. Will only be called for blocks with isBindable
-   * === true.
+   * @brief Bind data to effect. Will only be called for blocks with isBindable === true.
    * @param effect defines the effect to bind data to
    * @param nodeMaterial defines the hosting NodeMaterial
    * @param mesh defines the mesh that will be rendered
@@ -62,20 +59,15 @@ public:
             Mesh* mesh = nullptr) override;
 
   /**
-   * @brief Function called when a block is declared as repeatable content
-   * generator.
-   * @param vertexShaderState defines the current compilation state for the
-   * vertex shader
-   * @param fragmentShaderState defines the current compilation state for the
-   * fragment shader
+   * @brief Function called when a block is declared as repeatable content generator.
+   * @param vertexShaderState defines the current compilation state for the vertex shader
+   * @param fragmentShaderState defines the current compilation state for the fragment shader
    * @param mesh defines the mesh to be rendered
    * @param defines defines the material defines to update
    */
-  void
-  replaceRepeatableContent(NodeMaterialBuildState& vertexShaderState,
-                           const NodeMaterialBuildState& fragmentShaderState,
-                           AbstractMesh* mesh,
-                           NodeMaterialDefines& defines) override;
+  void replaceRepeatableContent(NodeMaterialBuildState& vertexShaderState,
+                                const NodeMaterialBuildState& fragmentShaderState,
+                                AbstractMesh* mesh, NodeMaterialDefines& defines) override;
 
 protected:
   /**
@@ -153,20 +145,17 @@ public:
   /**
    * Gets the position output component
    */
-  ReadOnlyProperty<MorphTargetsBlock, NodeMaterialConnectionPointPtr>
-    positionOutput;
+  ReadOnlyProperty<MorphTargetsBlock, NodeMaterialConnectionPointPtr> positionOutput;
 
   /**
    * Gets the normal output component
    */
-  ReadOnlyProperty<MorphTargetsBlock, NodeMaterialConnectionPointPtr>
-    normalOutput;
+  ReadOnlyProperty<MorphTargetsBlock, NodeMaterialConnectionPointPtr> normalOutput;
 
   /**
    * Gets the tangent output component
    */
-  ReadOnlyProperty<MorphTargetsBlock, NodeMaterialConnectionPointPtr>
-    tangentOutput;
+  ReadOnlyProperty<MorphTargetsBlock, NodeMaterialConnectionPointPtr> tangentOutput;
 
   /**
    * Gets the uv output component

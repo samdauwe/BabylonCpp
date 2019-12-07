@@ -57,7 +57,7 @@ public:
    * is false)
    * @returns the current connection point
    */
-  NodeMaterialConnectionPoint& connectTo(NodeMaterialConnectionPointPtr& connectionPoint,
+  NodeMaterialConnectionPoint& connectTo(const NodeMaterialConnectionPointPtr& connectionPoint,
                                          bool ignoreConstraints = false);
 
   /**
@@ -65,7 +65,7 @@ public:
    * @param endpoint defines the other connection point
    * @returns the current connection point
    */
-  NodeMaterialConnectionPoint& disconnectFrom(NodeMaterialConnectionPoint& endpoint);
+  NodeMaterialConnectionPoint& disconnectFrom(const NodeMaterialConnectionPointPtr& endpoint);
 
   /**
    * @brief Serializes this point in a JSON representation.

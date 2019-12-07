@@ -16,8 +16,7 @@ FresnelBlock::FresnelBlock(const std::string& iName)
     , fresnel{this, &FresnelBlock::get_fresnel}
 {
   registerInput("worldNormal", NodeMaterialBlockConnectionPointTypes::Vector4);
-  registerInput("viewDirection",
-                NodeMaterialBlockConnectionPointTypes::Vector3);
+  registerInput("viewDirection", NodeMaterialBlockConnectionPointTypes::Vector3);
   registerInput("bias", NodeMaterialBlockConnectionPointTypes::Float);
   registerInput("power", NodeMaterialBlockConnectionPointTypes::Float);
 
@@ -28,7 +27,7 @@ FresnelBlock::~FresnelBlock()
 {
 }
 
-const std::string FresnelBlock::getClassName() const
+std::string FresnelBlock::getClassName() const
 {
   return "FresnelBlock";
 }
@@ -62,13 +61,13 @@ void FresnelBlock::autoConfigure(const NodeMaterialPtr& /*material*/)
 {
   if (!bias()->isConnected()) {
     auto biasInput   = InputBlock::New("bias");
-    biasInput->value = std::make_shared<InputValue>(0.f);
+    biasInput->value = std::make_shared<AnimationValue>(0.f);
     biasInput->output()->connectTo(bias);
   }
 
   if (!power()->isConnected()) {
     auto powerInput   = InputBlock::New("power");
-    powerInput->value = std::make_shared<InputValue>(1.f);
+    powerInput->value = std::make_shared<AnimationValue>(1.f);
     powerInput->output()->connectTo(power);
   }
 }
@@ -83,13 +82,12 @@ FresnelBlock& FresnelBlock::_buildBlock(NodeMaterialBuildState& state)
   options.removeIfDef = true;
   state._emitFunctionFromInclude("fresnelFunction", comments, options);
 
-  state.compilationString
-    += _declareOutput(fresnel, state)
-       + String::printf(" = computeFresnelTerm(%s, %s, %s, %s);\r\n",
-                        viewDirection()->associatedVariableName().c_str(),
-                        worldNormal()->associatedVariableName().c_str(),
-                        bias()->associatedVariableName().c_str(),
-                        power()->associatedVariableName().c_str());
+  state.compilationString += _declareOutput(fresnel, state)
+                             + String::printf(" = computeFresnelTerm(%s, %s, %s, %s);\r\n",
+                                              viewDirection()->associatedVariableName().c_str(),
+                                              worldNormal()->associatedVariableName().c_str(),
+                                              bias()->associatedVariableName().c_str(),
+                                              power()->associatedVariableName().c_str());
 
   return *this;
 }

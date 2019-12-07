@@ -34,7 +34,7 @@ VectorSplitterBlock::~VectorSplitterBlock()
 {
 }
 
-const std::string VectorSplitterBlock::getClassName() const
+std::string VectorSplitterBlock::getClassName() const
 {
   return "VectorSplitterBlock";
 }
@@ -106,14 +106,11 @@ std::string VectorSplitterBlock::_outputRename(const std::string& iName)
   return iName;
 }
 
-VectorSplitterBlock&
-VectorSplitterBlock::_buildBlock(NodeMaterialBuildState& state)
+VectorSplitterBlock& VectorSplitterBlock::_buildBlock(NodeMaterialBuildState& state)
 {
   NodeMaterialBlock::_buildBlock(state);
 
-  const auto& input = xyzw()->isConnected() ?
-                        xyzw() :
-                        xyzIn()->isConnected() ? xyzIn() : xyIn();
+  const auto& input = xyzw()->isConnected() ? xyzw() : xyzIn()->isConnected() ? xyzIn() : xyIn();
 
   const auto& xyzOutput = _outputs[0];
   const auto& xyOutput  = _outputs[1];
@@ -126,45 +123,38 @@ VectorSplitterBlock::_buildBlock(NodeMaterialBuildState& state)
     if (input == xyIn()) {
       state.compilationString
         += _declareOutput(xyzOutput, state)
-           + String::printf(" = vec3(%s, 0.0);\r\n",
-                            input->associatedVariableName().c_str());
+           + String::printf(" = vec3(%s, 0.0);\r\n", input->associatedVariableName().c_str());
     }
     else {
       state.compilationString
         += _declareOutput(xyzOutput, state)
-           + String::printf(" = %s.xyz;\r\n",
-                            input->associatedVariableName().c_str());
+           + String::printf(" = %s.xyz;\r\n", input->associatedVariableName().c_str());
     }
   }
   if (xyOutput->hasEndpoints()) {
     state.compilationString
       += _declareOutput(xyOutput, state)
-         + String::printf(" = %s.xy;\r\n",
-                          input->associatedVariableName().c_str());
+         + String::printf(" = %s.xy;\r\n", input->associatedVariableName().c_str());
   }
   if (xOutput->hasEndpoints()) {
     state.compilationString
       += _declareOutput(xOutput, state)
-         + String::printf(" = %s.x;\r\n",
-                          input->associatedVariableName().c_str());
+         + String::printf(" = %s.x;\r\n", input->associatedVariableName().c_str());
   }
   if (yOutput->hasEndpoints()) {
     state.compilationString
       += _declareOutput(yOutput, state)
-         + String::printf(" = %s.y;\r\n",
-                          input->associatedVariableName().c_str());
+         + String::printf(" = %s.y;\r\n", input->associatedVariableName().c_str());
   }
   if (zOutput->hasEndpoints()) {
     state.compilationString
       += _declareOutput(zOutput, state)
-         + String::printf(" = %s.z;\r\n",
-                          input->associatedVariableName().c_str());
+         + String::printf(" = %s.z;\r\n", input->associatedVariableName().c_str());
   }
   if (wOutput->hasEndpoints()) {
     state.compilationString
       += _declareOutput(wOutput, state)
-         + String::printf(" = %s.w;\r\n",
-                          input->associatedVariableName().c_str());
+         + String::printf(" = %s.w;\r\n", input->associatedVariableName().c_str());
   }
 
   return *this;

@@ -10,8 +10,7 @@ class VectorSplitterBlock;
 using VectorSplitterBlockPtr = std::shared_ptr<VectorSplitterBlock>;
 
 /**
- * @brief Block used to expand a Vector3/4 into 4 outputs (one for each
- * component).
+ * @brief Block used to expand a Vector3/4 into 4 outputs (one for each component).
  */
 class BABYLON_SHARED_EXPORT VectorSplitterBlock : public NodeMaterialBlock {
 
@@ -19,8 +18,7 @@ public:
   template <typename... Ts>
   static VectorSplitterBlockPtr New(Ts&&... args)
   {
-    return std::shared_ptr<VectorSplitterBlock>(
-      new VectorSplitterBlock(std::forward<Ts>(args)...));
+    return std::shared_ptr<VectorSplitterBlock>(new VectorSplitterBlock(std::forward<Ts>(args)...));
   }
   ~VectorSplitterBlock() override;
 
@@ -28,7 +26,7 @@ public:
    * @brief Gets the current class name.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
 protected:
   /**

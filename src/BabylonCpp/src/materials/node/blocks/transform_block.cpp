@@ -24,7 +24,7 @@ TransformBlock::~TransformBlock()
 {
 }
 
-const std::string TransformBlock::getClassName() const
+std::string TransformBlock::getClassName() const
 {
   return "TransformBlock";
 }
@@ -57,21 +57,19 @@ TransformBlock& TransformBlock::_buildBlock(NodeMaterialBuildState& state)
            + String::printf(" = %s * vec4(%s, %s, %s);\r\n",
                             transform()->associatedVariableName().c_str(),
                             vector()->associatedVariableName().c_str(),
-                            _writeFloat(complementZ).c_str(),
-                            _writeFloat(complementW).c_str());
+                            _writeFloat(complementZ).c_str(), _writeFloat(complementW).c_str());
+      break;
     case NodeMaterialBlockConnectionPointTypes::Vector3:
-      state.compilationString
-        += _declareOutput(output, state)
-           + String::printf(" = %s * vec4(%s, %s);\r\n",
-                            transform()->associatedVariableName().c_str(),
-                            vector()->associatedVariableName().c_str(),
-                            _writeFloat(complementW).c_str());
+      state.compilationString += _declareOutput(output, state)
+                                 + String::printf(" = %s * vec4(%s, %s);\r\n",
+                                                  transform()->associatedVariableName().c_str(),
+                                                  vector()->associatedVariableName().c_str(),
+                                                  _writeFloat(complementW).c_str());
       break;
     default:
       state.compilationString
         += _declareOutput(output, state)
-           + String::printf(" = %s * %s;\r\n",
-                            transform()->associatedVariableName().c_str(),
+           + String::printf(" = %s * %s;\r\n", transform()->associatedVariableName().c_str(),
                             vector()->associatedVariableName().c_str());
       break;
   }
@@ -84,19 +82,17 @@ json TransformBlock::serialize() const
   return nullptr;
 }
 
-void TransformBlock::_deserialize(const json& /*serializationObject*/,
-                                  Scene* /*scene*/,
+void TransformBlock::_deserialize(const json& /*serializationObject*/, Scene* /*scene*/,
                                   const std::string& /*rootUrl*/)
 {
 }
 
 std::string TransformBlock::_dumpPropertiesCode()
 {
-  auto codeString = String::printf("%s.complementZ = %f;\r\n",
-                                   _codeVariableName.c_str(), complementZ);
+  auto codeString
+    = String::printf("%s.complementZ = %f;\r\n", _codeVariableName.c_str(), complementZ);
 
-  codeString += String::printf("%s.complementW = %f;\r\n",
-                               _codeVariableName.c_str(), complementW);
+  codeString += String::printf("%s.complementW = %f;\r\n", _codeVariableName.c_str(), complementW);
 
   return codeString;
 }

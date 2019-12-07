@@ -27,7 +27,7 @@ public:
    * @brief Gets the current class name.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Initialize the block and prepare the context for build.
@@ -44,8 +44,7 @@ public:
    * @returns true if the block is ready
    */
   bool isReady(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
-               const NodeMaterialDefines& defines,
-               bool useInstances = false) override;
+               const NodeMaterialDefines& defines, bool useInstances = false) override;
 
   /**
    * @brief Update defines for shader compilation.
@@ -55,17 +54,15 @@ public:
    * @param useInstances specifies that instances should be used
    */
   void prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
-                      const NodeMaterialDefines& defines,
-                      bool useInstances = false) override;
+                      NodeMaterialDefines& defines, bool useInstances = false) override;
 
   /**
-   * @brief Bind data to effect. Will only be called for blocks with isBindable
-   * === true.
+   * @brief Bind data to effect. Will only be called for blocks with isBindable === true.
    * @param effect defines the effect to bind data to
    * @param nodeMaterial defines the hosting NodeMaterial
    * @param mesh defines the mesh that will be rendered
    */
-  void bind(Effect* effect, const NodeMaterialPtr& nodeMaterial,
+  void bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMaterial,
             Mesh* mesh = nullptr) override;
 
 protected:

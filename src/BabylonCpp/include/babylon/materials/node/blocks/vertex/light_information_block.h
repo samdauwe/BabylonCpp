@@ -29,16 +29,15 @@ public:
    * @brief Gets the current class name.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
-   * @brief Bind data to effect. Will only be called for blocks with isBindable
-   * === true.
+   * @brief Bind data to effect. Will only be called for blocks with isBindable === true.
    * @param effect defines the effect to bind data to
    * @param nodeMaterial defines the hosting NodeMaterial
    * @param mesh defines the mesh that will be rendered
    */
-  void bind(Effect* effect, const NodeMaterialPtr& nodeMaterial,
+  void bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMaterial,
             Mesh* mesh = nullptr) override;
 
   /**
@@ -89,14 +88,12 @@ public:
   /**
    * Gets the world position input component
    */
-  ReadOnlyProperty<LightInformationBlock, NodeMaterialConnectionPointPtr>
-    worldPosition;
+  ReadOnlyProperty<LightInformationBlock, NodeMaterialConnectionPointPtr> worldPosition;
 
   /**
    * Gets the direction output component
    */
-  ReadOnlyProperty<LightInformationBlock, NodeMaterialConnectionPointPtr>
-    direction;
+  ReadOnlyProperty<LightInformationBlock, NodeMaterialConnectionPointPtr> direction;
 
   /**
    * Gets the color output component

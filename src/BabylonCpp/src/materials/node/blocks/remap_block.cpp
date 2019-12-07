@@ -24,7 +24,7 @@ RemapBlock::~RemapBlock()
 {
 }
 
-const std::string RemapBlock::getClassName() const
+std::string RemapBlock::getClassName() const
 {
   return "RemapBlock";
 }
@@ -48,25 +48,21 @@ RemapBlock& RemapBlock::_buildBlock(NodeMaterialBuildState& state)
   state.compilationString
     += _declareOutput(output, state)
        + String::printf(
-         " = %s + (%s - %s) * (%s - %s) / (%s - %s);\r\n",
-         _writeFloat(targetRange.x).c_str(),
-         _inputs[0]->associatedVariableName().c_str(),
-         _writeFloat(sourceRange.x).c_str(), _writeFloat(targetRange.y).c_str(),
-         _writeFloat(targetRange.x).c_str(), _writeFloat(sourceRange.y).c_str(),
-         _writeFloat(sourceRange.x).c_str());
+         " = %s + (%s - %s) * (%s - %s) / (%s - %s);\r\n", _writeFloat(targetRange.x).c_str(),
+         _inputs[0]->associatedVariableName().c_str(), _writeFloat(sourceRange.x).c_str(),
+         _writeFloat(targetRange.y).c_str(), _writeFloat(targetRange.x).c_str(),
+         _writeFloat(sourceRange.y).c_str(), _writeFloat(sourceRange.x).c_str());
 
   return *this;
 }
 
 std::string RemapBlock::_dumpPropertiesCode()
 {
-  auto codeString
-    = String::printf("%s.sourceRange = Vector2(%f, %f);\r\n",
-                     _codeVariableName.c_str(), sourceRange.x, sourceRange.y);
+  auto codeString = String::printf("%s.sourceRange = Vector2(%f, %f);\r\n",
+                                   _codeVariableName.c_str(), sourceRange.x, sourceRange.y);
 
-  codeString
-    += String::printf("%s.targetRange = Vector2(%f, %f);\r\n",
-                      _codeVariableName.c_str(), targetRange.x, targetRange.y);
+  codeString += String::printf("%s.targetRange = Vector2(%f, %f);\r\n", _codeVariableName.c_str(),
+                               targetRange.x, targetRange.y);
 
   return codeString;
 }
@@ -76,8 +72,8 @@ json RemapBlock::serialize() const
   return nullptr;
 }
 
-void RemapBlock::_deserialize(const json& /*serializationObject*/,
-                              Scene* /*scene*/, const std::string& /*rootUrl*/)
+void RemapBlock::_deserialize(const json& /*serializationObject*/, Scene* /*scene*/,
+                              const std::string& /*rootUrl*/)
 {
 }
 

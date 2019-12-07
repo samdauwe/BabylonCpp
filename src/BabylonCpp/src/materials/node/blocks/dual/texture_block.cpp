@@ -52,6 +52,11 @@ TextureBlock::~TextureBlock()
 {
 }
 
+std::string TextureBlock::getClassName() const
+{
+  return "TextureBlock";
+}
+
 NodeMaterialConnectionPointPtr& TextureBlock::get_uv()
 {
   return _inputs[0];
@@ -96,7 +101,7 @@ NodeMaterialBlockTargets& TextureBlock::get_target()
     return _currentTarget;
   }
 
-  if (uv()->sourceBlock().isInput()) {
+  if (uv()->sourceBlock()->isInput()) {
     _currentTarget = NodeMaterialBlockTargets::VertexAndFragment;
     return _currentTarget;
   }
@@ -203,7 +208,7 @@ void TextureBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& /*nodeMa
 
 bool TextureBlock::get__isMixed() const
 {
-  return target().has_value() && *target() != NodeMaterialBlockTargets::Fragment;
+  return target() != NodeMaterialBlockTargets::Fragment;
 }
 
 void TextureBlock::_injectVertexCode(NodeMaterialBuildState& state)
@@ -281,8 +286,10 @@ TextureBlock& TextureBlock::_buildBlock(NodeMaterialBuildState& state)
     return *this;
   }
 
-  state.sharedData->blockingBlocks.emplace_back(this);
-  state.sharedData->textureBlocks.emplace_back(this);
+  state.sharedData->blockingBlocks.emplace_back(
+    std::static_pointer_cast<NodeMaterialBlock>(shared_from_this()));
+  state.sharedData->textureBlocks.emplace_back(
+    std::static_pointer_cast<TextureBlock>(shared_from_this()));
 
   _samplerName = state._getFreeVariableName(name + "Sampler");
   state.samplers.emplace_back(_samplerName);

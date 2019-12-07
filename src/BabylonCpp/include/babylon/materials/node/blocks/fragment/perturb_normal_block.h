@@ -18,8 +18,7 @@ public:
   template <typename... Ts>
   static PerturbNormalBlockPtr New(Ts&&... args)
   {
-    return std::shared_ptr<PerturbNormalBlock>(
-      new PerturbNormalBlock(std::forward<Ts>(args)...));
+    return std::shared_ptr<PerturbNormalBlock>(new PerturbNormalBlock(std::forward<Ts>(args)...));
   }
   ~PerturbNormalBlock() override;
 
@@ -27,7 +26,7 @@ public:
    * @brief Gets the current class name.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Update defines for shader compilation.
@@ -37,17 +36,15 @@ public:
    * @param useInstances specifies that instances should be used
    */
   void prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
-                      const NodeMaterialDefines& defines,
-                      bool useInstances = false) override;
+                      NodeMaterialDefines& defines, bool useInstances = false) override;
 
   /**
-   * @brief Bind data to effect. Will only be called for blocks with isBindable
-   * === true.
+   * @brief Bind data to effect. Will only be called for blocks with isBindable === true.
    * @param effect defines the effect to bind data to
    * @param nodeMaterial defines the hosting NodeMaterial
    * @param mesh defines the mesh that will be rendered
    */
-  void bind(Effect* effect, const NodeMaterialPtr& nodeMaterial,
+  void bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMaterial,
             Mesh* mesh = nullptr) override;
 
   /**
@@ -129,14 +126,12 @@ public:
   /**
    * Gets the world position input component
    */
-  ReadOnlyProperty<PerturbNormalBlock, NodeMaterialConnectionPointPtr>
-    worldPosition;
+  ReadOnlyProperty<PerturbNormalBlock, NodeMaterialConnectionPointPtr> worldPosition;
 
   /**
    * Gets the world normal input component
    */
-  ReadOnlyProperty<PerturbNormalBlock, NodeMaterialConnectionPointPtr>
-    worldNormal;
+  ReadOnlyProperty<PerturbNormalBlock, NodeMaterialConnectionPointPtr> worldNormal;
 
   /**
    * Gets the uv input component
@@ -146,8 +141,7 @@ public:
   /**
    * Gets the normal map color input component
    */
-  ReadOnlyProperty<PerturbNormalBlock, NodeMaterialConnectionPointPtr>
-    normalMapColor;
+  ReadOnlyProperty<PerturbNormalBlock, NodeMaterialConnectionPointPtr> normalMapColor;
 
   /**
    * Gets the strength input component

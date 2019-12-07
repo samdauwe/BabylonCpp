@@ -24,7 +24,7 @@ AddBlock::~AddBlock()
 {
 }
 
-const std::string AddBlock::getClassName() const
+std::string AddBlock::getClassName() const
 {
   return "AddBlock";
 }
@@ -52,8 +52,7 @@ AddBlock& AddBlock::_buildBlock(NodeMaterialBuildState& state)
 
   state.compilationString
     += _declareOutput(output, state)
-       + String::printf(" = %s + %s;\r\n",
-                        left()->associatedVariableName().c_str(),
+       + String::printf(" = %s + %s;\r\n", left()->associatedVariableName().c_str(),
                         right()->associatedVariableName().c_str());
 
   return *this;

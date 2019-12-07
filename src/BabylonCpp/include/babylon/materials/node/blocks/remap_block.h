@@ -19,8 +19,7 @@ public:
   template <typename... Ts>
   static RemapBlockPtr New(Ts&&... args)
   {
-    return std::shared_ptr<RemapBlock>(
-      new RemapBlock(std::forward<Ts>(args)...));
+    return std::shared_ptr<RemapBlock>(new RemapBlock(std::forward<Ts>(args)...));
   }
   ~RemapBlock() override;
 
@@ -28,7 +27,7 @@ public:
    * @brief Gets the current class name.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Serializes this block in a JSON representation.

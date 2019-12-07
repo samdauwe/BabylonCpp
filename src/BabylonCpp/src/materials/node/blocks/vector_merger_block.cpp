@@ -30,7 +30,7 @@ VectorMergerBlock::~VectorMergerBlock()
 {
 }
 
-const std::string VectorMergerBlock::getClassName() const
+std::string VectorMergerBlock::getClassName() const
 {
   return "VectorMergerBlock";
 }
@@ -86,25 +86,23 @@ VectorMergerBlock& VectorMergerBlock::_buildBlock(NodeMaterialBuildState& state)
   if (v4Output->hasEndpoints()) {
     state.compilationString
       += _declareOutput(v4Output, state)
-         + String::printf(
-           " = vec4(%s, %s, %s, %s);\r\n", _writeVariable(xInput).c_str(),
-           _writeVariable(yInput).c_str(),
-           zInput->isConnected() ? _writeVariable(zInput).c_str() : "0.0",
-           zInput->isConnected() ? _writeVariable(wInput).c_str() : "0.0");
+         + String::printf(" = vec4(%s, %s, %s, %s);\r\n", _writeVariable(xInput).c_str(),
+                          _writeVariable(yInput).c_str(),
+                          zInput->isConnected() ? _writeVariable(zInput).c_str() : "0.0",
+                          zInput->isConnected() ? _writeVariable(wInput).c_str() : "0.0");
   }
   else if (v3Output->hasEndpoints()) {
     state.compilationString
       += _declareOutput(v3Output, state)
-         + String::printf(
-           " = vec3(%s, %s, %s);\r\n", _writeVariable(xInput).c_str(),
-           _writeVariable(yInput).c_str(),
-           zInput->isConnected() ? _writeVariable(zInput).c_str() : "0.0");
+         + String::printf(" = vec3(%s, %s, %s);\r\n", _writeVariable(xInput).c_str(),
+                          _writeVariable(yInput).c_str(),
+                          zInput->isConnected() ? _writeVariable(zInput).c_str() : "0.0");
   }
   else if (v2Output->hasEndpoints()) {
-    state.compilationString += _declareOutput(v2Output, state)
-                               + String::printf(" = vec2(%s, %s);\r\n",
-                                                _writeVariable(xInput).c_str(),
-                                                _writeVariable(yInput).c_str());
+    state.compilationString
+      += _declareOutput(v2Output, state)
+         + String::printf(" = vec2(%s, %s);\r\n", _writeVariable(xInput).c_str(),
+                          _writeVariable(yInput).c_str());
   }
 
   return *this;

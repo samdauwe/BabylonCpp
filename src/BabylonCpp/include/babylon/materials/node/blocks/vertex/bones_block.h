@@ -18,8 +18,7 @@ public:
   template <typename... Ts>
   static BonesBlockPtr New(Ts&&... args)
   {
-    return std::shared_ptr<BonesBlock>(
-      new BonesBlock(std::forward<Ts>(args)...));
+    return std::shared_ptr<BonesBlock>(new BonesBlock(std::forward<Ts>(args)...));
   }
   ~BonesBlock() override;
 
@@ -33,7 +32,7 @@ public:
    * @brief Gets the current class name.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Lets the block try to connect some inputs automatically.
@@ -46,8 +45,7 @@ public:
    * @param mesh defines the mesh to be rendered
    * @param fallbacks defines the current prioritized list of fallbacks
    */
-  void provideFallbacks(AbstractMesh* mesh,
-                        EffectFallbacks* fallbacks) override;
+  void provideFallbacks(AbstractMesh* mesh, EffectFallbacks* fallbacks) override;
 
   /**
    * @brief Bind data to effect. Will only be called for blocks with isBindable
@@ -67,8 +65,7 @@ public:
    * @param useInstances specifies that instances should be used
    */
   void prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
-                      NodeMaterialDefines& defines,
-                      bool useInstances = false) override;
+                      NodeMaterialDefines& defines, bool useInstances = false) override;
 
 protected:
   /**
@@ -126,14 +123,12 @@ public:
   /**
    * Gets the matrix weights input component
    */
-  ReadOnlyProperty<BonesBlock, NodeMaterialConnectionPointPtr>
-    matricesIndicesExtra;
+  ReadOnlyProperty<BonesBlock, NodeMaterialConnectionPointPtr> matricesIndicesExtra;
 
   /**
    * Gets the extra matrix weights input component
    */
-  ReadOnlyProperty<BonesBlock, NodeMaterialConnectionPointPtr>
-    matricesWeightsExtra;
+  ReadOnlyProperty<BonesBlock, NodeMaterialConnectionPointPtr> matricesWeightsExtra;
 
   /**
    * Gets the world input component

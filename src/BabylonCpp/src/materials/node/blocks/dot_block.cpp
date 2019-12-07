@@ -23,7 +23,7 @@ DotBlock::~DotBlock()
 {
 }
 
-const std::string DotBlock::getClassName() const
+std::string DotBlock::getClassName() const
 {
   return "DotBlock";
 }
@@ -51,8 +51,7 @@ DotBlock& DotBlock::_buildBlock(NodeMaterialBuildState& state)
 
   state.compilationString
     += _declareOutput(output, state)
-       + String::printf(" = dot(%s, %s);\r\n",
-                        left()->associatedVariableName().c_str(),
+       + String::printf(" = dot(%s, %s);\r\n", left()->associatedVariableName().c_str(),
                         right()->associatedVariableName().c_str());
 
   return *this;

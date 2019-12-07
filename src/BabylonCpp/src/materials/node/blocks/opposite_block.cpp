@@ -21,7 +21,7 @@ OppositeBlock::~OppositeBlock()
 {
 }
 
-const std::string OppositeBlock::getClassName() const
+std::string OppositeBlock::getClassName() const
 {
   return "OppositeBlock";
 }
@@ -44,8 +44,7 @@ OppositeBlock& OppositeBlock::_buildBlock(NodeMaterialBuildState& state)
 
   state.compilationString
     += _declareOutput(output, state)
-       + String::printf(" = 1. - %s;\r\n",
-                        input()->associatedVariableName().c_str());
+       + String::printf(" = 1. - %s;\r\n", input()->associatedVariableName().c_str());
 
   return *this;
 }

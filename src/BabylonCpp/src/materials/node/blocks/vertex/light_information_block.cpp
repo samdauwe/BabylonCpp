@@ -16,8 +16,8 @@ LightInformationBlock::LightInformationBlock(const std::string& iName)
     , direction{this, &LightInformationBlock::get_direction}
     , color{this, &LightInformationBlock::get_color}
 {
-  registerInput("worldPosition", NodeMaterialBlockConnectionPointTypes::Vector4,
-                false, NodeMaterialBlockTargets::Vertex);
+  registerInput("worldPosition", NodeMaterialBlockConnectionPointTypes::Vector4, false,
+                NodeMaterialBlockTargets::Vertex);
   registerOutput("direction", NodeMaterialBlockConnectionPointTypes::Vector3);
   registerOutput("color", NodeMaterialBlockConnectionPointTypes::Color3);
 }
@@ -26,7 +26,7 @@ LightInformationBlock::~LightInformationBlock()
 {
 }
 
-const std::string LightInformationBlock::getClassName() const
+std::string LightInformationBlock::getClassName() const
 {
   return "LightInformationBlock";
 }
@@ -46,8 +46,7 @@ NodeMaterialConnectionPointPtr& LightInformationBlock::get_color()
   return _outputs[1];
 }
 
-void LightInformationBlock::bind(Effect* effect,
-                                 const NodeMaterialPtr& /*nodeMaterial*/,
+void LightInformationBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& /*nodeMaterial*/,
                                  Mesh* mesh)
 {
   if (!mesh) {
@@ -65,8 +64,7 @@ void LightInformationBlock::bind(Effect* effect,
   effect->setColor3(_lightColorDefineName, light->diffuse);
 }
 
-LightInformationBlock&
-LightInformationBlock::_buildBlock(NodeMaterialBuildState& state)
+LightInformationBlock& LightInformationBlock::_buildBlock(NodeMaterialBuildState& state)
 {
   NodeMaterialBlock::_buildBlock(state);
 
@@ -76,10 +74,8 @@ LightInformationBlock::_buildBlock(NodeMaterialBuildState& state)
   const auto& _color     = color();
 
   if (!light) {
-    state.compilationString
-      += _declareOutput(_direction, state) + " = vec3(0.);\r\n";
-    state.compilationString
-      += _declareOutput(_color, state) + " = vec3(0.);\r\n";
+    state.compilationString += _declareOutput(_direction, state) + " = vec3(0.);\r\n";
+    state.compilationString += _declareOutput(_color, state) + " = vec3(0.);\r\n";
   }
   else {
     _lightDataDefineName = state._getFreeDefineName("lightData");
@@ -91,19 +87,16 @@ LightInformationBlock::_buildBlock(NodeMaterialBuildState& state)
     if (light->type() == Type::POINTLIGHT) {
       state.compilationString
         += _declareOutput(_direction, state)
-           + String::printf(" = normalize(%s - %s.xyz);\r\n)",
-                            _lightDataDefineName.c_str(),
+           + String::printf(" = normalize(%s - %s.xyz);\r\n)", _lightDataDefineName.c_str(),
                             worldPosition()->associatedVariableName().c_str());
     }
     else {
-      state.compilationString
-        += _declareOutput(_direction, state)
-           + String::printf(" = %s;\r\n", _lightDataDefineName.c_str());
+      state.compilationString += _declareOutput(_direction, state)
+                                 + String::printf(" = %s;\r\n", _lightDataDefineName.c_str());
     }
 
     state.compilationString
-      += _declareOutput(_color, state)
-         + String::printf(" = %s;\r\n", _lightDataDefineName.c_str());
+      += _declareOutput(_color, state) + String::printf(" = %s;\r\n", _lightDataDefineName.c_str());
   }
 
   return *this;
@@ -114,8 +107,7 @@ json LightInformationBlock::serialize() const
   return nullptr;
 }
 
-void LightInformationBlock::_deserialize(const json& /*serializationObject*/,
-                                         Scene* /*scene*/,
+void LightInformationBlock::_deserialize(const json& /*serializationObject*/, Scene* /*scene*/,
                                          const std::string& /*rootUrl*/)
 {
 }

@@ -26,7 +26,7 @@ LerpBlock::~LerpBlock()
 {
 }
 
-const std::string LerpBlock::getClassName() const
+std::string LerpBlock::getClassName() const
 {
   return "LerpBlock";
 }
@@ -59,8 +59,7 @@ LerpBlock& LerpBlock::_buildBlock(NodeMaterialBuildState& state)
 
   state.compilationString
     += _declareOutput(output, state)
-       + String::printf(" = mix(%s, %s, %s);\r\n",
-                        left()->associatedVariableName().c_str(),
+       + String::printf(" = mix(%s, %s, %s);\r\n", left()->associatedVariableName().c_str(),
                         right()->associatedVariableName().c_str(),
                         gradient()->associatedVariableName().c_str());
 

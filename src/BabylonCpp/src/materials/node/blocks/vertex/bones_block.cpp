@@ -23,14 +23,10 @@ BonesBlock::BonesBlock(const std::string& iName)
     , world{this, &BonesBlock::get_world}
     , output{this, &BonesBlock::get_output}
 {
-  registerInput("matricesIndices",
-                NodeMaterialBlockConnectionPointTypes::Vector4);
-  registerInput("matricesWeights",
-                NodeMaterialBlockConnectionPointTypes::Vector4);
-  registerInput("matricesIndicesExtra",
-                NodeMaterialBlockConnectionPointTypes::Vector4, true);
-  registerInput("matricesWeightsExtra",
-                NodeMaterialBlockConnectionPointTypes::Vector4, true);
+  registerInput("matricesIndices", NodeMaterialBlockConnectionPointTypes::Vector4);
+  registerInput("matricesWeights", NodeMaterialBlockConnectionPointTypes::Vector4);
+  registerInput("matricesIndicesExtra", NodeMaterialBlockConnectionPointTypes::Vector4, true);
+  registerInput("matricesWeightsExtra", NodeMaterialBlockConnectionPointTypes::Vector4, true);
   registerInput("world", NodeMaterialBlockConnectionPointTypes::Matrix);
 
   registerOutput("output", NodeMaterialBlockConnectionPointTypes::Matrix);
@@ -48,7 +44,7 @@ void BonesBlock::initialize(NodeMaterialBuildState& state)
   state._excludeVariableName("BonesPerMesh");
 }
 
-const std::string BonesBlock::getClassName() const
+std::string BonesBlock::getClassName() const
 {
   return "BonesBlock";
 }
@@ -110,11 +106,10 @@ void BonesBlock::autoConfigure(const NodeMaterialPtr& material)
     matricesWeightsInput->output()->connectTo(matricesWeights());
   }
   if (!world()->isConnected()) {
-    auto worldInput
-      = material->getInputBlockByPredicate([](const InputBlockPtr& b) -> bool {
-          return b->systemValue().has_value()
-                 && b->systemValue().value() == NodeMaterialSystemValues::World;
-        });
+    auto worldInput = material->getInputBlockByPredicate([](const InputBlockPtr& b) -> bool {
+      return b->systemValue().has_value()
+             && b->systemValue().value() == NodeMaterialSystemValues::World;
+    });
 
     if (!worldInput) {
       worldInput = InputBlock::New("world");
@@ -124,25 +119,20 @@ void BonesBlock::autoConfigure(const NodeMaterialPtr& material)
   }
 }
 
-void BonesBlock::provideFallbacks(AbstractMesh* mesh,
-                                  EffectFallbacks* fallbacks)
+void BonesBlock::provideFallbacks(AbstractMesh* mesh, EffectFallbacks* fallbacks)
 {
-  if (mesh && mesh->useBones() && mesh->computeBonesUsingShaders()
-      && mesh->skeleton()) {
+  if (mesh && mesh->useBones() && mesh->computeBonesUsingShaders() && mesh->skeleton()) {
     fallbacks->addCPUSkinningFallback(0, mesh);
   }
 }
 
-void BonesBlock::bind(const EffectPtr& effect,
-                      const NodeMaterialPtr& /*nodeMaterial*/, Mesh* mesh)
+void BonesBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& /*nodeMaterial*/, Mesh* mesh)
 {
   MaterialHelper::BindBonesParameters(mesh, effect);
 }
 
-void BonesBlock::prepareDefines(AbstractMesh* mesh,
-                                const NodeMaterialPtr& /*nodeMaterial*/,
-                                NodeMaterialDefines& defines,
-                                bool /*useInstances*/)
+void BonesBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& /*nodeMaterial*/,
+                                NodeMaterialDefines& defines, bool /*useInstances*/)
 {
   if (!defines._areAttributesDirty) {
     return;
@@ -183,18 +173,18 @@ BonesBlock& BonesBlock::_buildBlock(NodeMaterialBuildState& state)
 
   auto influenceVariablename = state._getFreeVariableName("influence");
 
-  state.compilationString += state._emitCodeFromInclude(
-    "bonesVertex", comments,
-    EmitCodeFromIncludeOptions{
-      {StringsReplacement{
-         "finalWorld=finalWorld\\*influence;", // search
-         ""                                    // repeatKey
-       },
-       StringsReplacement{
-         "influence",          // search
-         influenceVariablename // repeatKey
-       }}                      // replaceStrings
-    });
+  state.compilationString
+    += state._emitCodeFromInclude("bonesVertex", comments,
+                                  EmitCodeFromIncludeOptions{
+                                    {StringsReplacement{
+                                       "finalWorld=finalWorld\\*influence;", // search
+                                       ""                                    // repeatKey
+                                     },
+                                     StringsReplacement{
+                                       "influence",          // search
+                                       influenceVariablename // repeatKey
+                                     }}                      // replaceStrings
+                                  });
 
   const auto& output     = _outputs[0];
   const auto& worldInput = world();
@@ -202,14 +192,12 @@ BonesBlock& BonesBlock::_buildBlock(NodeMaterialBuildState& state)
   state.compilationString += "#if NUM_BONE_INFLUENCERS>0\r\n";
   state.compilationString
     += _declareOutput(output, state)
-       + String::printf(" = %s * %s;\r\n",
-                        worldInput->associatedVariableName().c_str(),
+       + String::printf(" = %s * %s;\r\n", worldInput->associatedVariableName().c_str(),
                         influenceVariablename.c_str());
   state.compilationString += "#else\r\n";
   state.compilationString
     += _declareOutput(output, state)
-       + String::printf(" = %s;\r\n",
-                        worldInput->associatedVariableName().c_str());
+       + String::printf(" = %s;\r\n", worldInput->associatedVariableName().c_str());
   state.compilationString += "#endif\r\n";
 
   return *this;

@@ -18,8 +18,7 @@ public:
   template <typename... Ts>
   static ClampBlockPtr New(Ts&&... args)
   {
-    return std::shared_ptr<ClampBlock>(
-      new ClampBlock(std::forward<Ts>(args)...));
+    return std::shared_ptr<ClampBlock>(new ClampBlock(std::forward<Ts>(args)...));
   }
   ~ClampBlock() override;
 
@@ -27,7 +26,7 @@ public:
    * @brief Gets the current class name.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Serializes this block in a JSON representation.

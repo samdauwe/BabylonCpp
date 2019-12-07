@@ -21,7 +21,7 @@ NormalizeBlock::~NormalizeBlock()
 {
 }
 
-const std::string NormalizeBlock::getClassName() const
+std::string NormalizeBlock::getClassName() const
 {
   return "NormalizeBlock";
 }
@@ -44,8 +44,7 @@ NormalizeBlock& NormalizeBlock::_buildBlock(NodeMaterialBuildState& state)
 
   state.compilationString
     += _declareOutput(output, state)
-       + String::printf(" = normalize(%s);\r\n",
-                        input()->associatedVariableName().c_str());
+       + String::printf(" = normalize(%s);\r\n", input()->associatedVariableName().c_str());
 
   return *this;
 }

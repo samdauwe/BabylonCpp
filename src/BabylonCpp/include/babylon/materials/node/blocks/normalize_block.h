@@ -18,8 +18,7 @@ public:
   template <typename... Ts>
   static NormalizeBlockPtr New(Ts&&... args)
   {
-    return std::shared_ptr<NormalizeBlock>(
-      new NormalizeBlock(std::forward<Ts>(args)...));
+    return std::shared_ptr<NormalizeBlock>(new NormalizeBlock(std::forward<Ts>(args)...));
   }
   ~NormalizeBlock() override;
 
@@ -27,7 +26,7 @@ public:
    * @brief Gets the current class name.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
 protected:
   /**

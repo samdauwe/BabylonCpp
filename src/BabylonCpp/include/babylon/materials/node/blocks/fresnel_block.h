@@ -18,8 +18,7 @@ public:
   template <typename... Ts>
   static FresnelBlockPtr New(Ts&&... args)
   {
-    return std::shared_ptr<FresnelBlock>(
-      new FresnelBlock(std::forward<Ts>(args)...));
+    return std::shared_ptr<FresnelBlock>(new FresnelBlock(std::forward<Ts>(args)...));
   }
   ~FresnelBlock() override;
 
@@ -27,7 +26,7 @@ public:
    * @brief Gets the current class name.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Lets the block try to connect some inputs automatically.

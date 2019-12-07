@@ -198,7 +198,7 @@ bool NodeMaterialConnectionPoint::canConnectTo(const NodeMaterialConnectionPoint
 }
 
 NodeMaterialConnectionPoint&
-NodeMaterialConnectionPoint::connectTo(NodeMaterialConnectionPointPtr& connectionPoint,
+NodeMaterialConnectionPoint::connectTo(const NodeMaterialConnectionPointPtr& connectionPoint,
                                        bool ignoreConstraints)
 {
   if (!ignoreConstraints && !canConnectTo(*connectionPoint)) {
@@ -213,7 +213,7 @@ NodeMaterialConnectionPoint::connectTo(NodeMaterialConnectionPointPtr& connectio
 }
 
 NodeMaterialConnectionPoint&
-NodeMaterialConnectionPoint::disconnectFrom(NodeMaterialConnectionPoint& endpoint)
+NodeMaterialConnectionPoint::disconnectFrom(const NodeMaterialConnectionPointPtr& endpoint)
 {
   auto index = stl_util::index_of(_endpoints, endpoint);
 
@@ -222,9 +222,9 @@ NodeMaterialConnectionPoint::disconnectFrom(NodeMaterialConnectionPoint& endpoin
   }
 
   stl_util::splice(_endpoints, index, 1);
-  endpoint._connectedPoint                = nullptr;
-  _enforceAssociatedVariableName          = false;
-  endpoint._enforceAssociatedVariableName = false;
+  endpoint->_connectedPoint                = nullptr;
+  _enforceAssociatedVariableName           = false;
+  endpoint->_enforceAssociatedVariableName = false;
   return *this;
 }
 

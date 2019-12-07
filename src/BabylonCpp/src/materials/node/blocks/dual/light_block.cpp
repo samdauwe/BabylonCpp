@@ -41,7 +41,7 @@ LightBlock::~LightBlock()
 {
 }
 
-const std::string LightBlock::getClassName() const
+std::string LightBlock::getClassName() const
 {
   return "LightBlock";
 }

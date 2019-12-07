@@ -10,8 +10,7 @@ class ColorSplitterBlock;
 using ColorSplitterBlockPtr = std::shared_ptr<ColorSplitterBlock>;
 
 /**
- * @brief Block used to expand a Color3/4 into 4 outputs (one for each
- * component).
+ * @brief Block used to expand a Color3/4 into 4 outputs (one for each component).
  */
 class BABYLON_SHARED_EXPORT ColorSplitterBlock : public NodeMaterialBlock {
 
@@ -19,8 +18,7 @@ public:
   template <typename... Ts>
   static ColorSplitterBlockPtr New(Ts&&... args)
   {
-    return std::shared_ptr<ColorSplitterBlock>(
-      new ColorSplitterBlock(std::forward<Ts>(args)...));
+    return std::shared_ptr<ColorSplitterBlock>(new ColorSplitterBlock(std::forward<Ts>(args)...));
   }
   ~ColorSplitterBlock() override;
 
@@ -28,7 +26,7 @@ public:
    * @brief Gets the current class name.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
 protected:
   /**

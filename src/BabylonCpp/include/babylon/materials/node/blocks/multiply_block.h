@@ -18,8 +18,7 @@ public:
   template <typename... Ts>
   static MultiplyBlockPtr New(Ts&&... args)
   {
-    return std::shared_ptr<MultiplyBlock>(
-      new MultiplyBlock(std::forward<Ts>(args)...));
+    return std::shared_ptr<MultiplyBlock>(new MultiplyBlock(std::forward<Ts>(args)...));
   }
   ~MultiplyBlock() override;
 
@@ -27,7 +26,7 @@ public:
    * @brief Gets the current class name.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
 protected:
   /**

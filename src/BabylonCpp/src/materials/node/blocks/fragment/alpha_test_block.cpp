@@ -22,7 +22,7 @@ AlphaTestBlock::~AlphaTestBlock()
 {
 }
 
-const std::string AlphaTestBlock::getClassName() const
+std::string AlphaTestBlock::getClassName() const
 {
   return "AlphaTestBlock";
 }
@@ -43,15 +43,13 @@ AlphaTestBlock& AlphaTestBlock::_buildBlock(NodeMaterialBuildState& state)
 
   state.sharedData->hints.needAlphaTesting = true;
 
-  if (color()->connectedPoint().has_value()) {
-    state.compilationString
-      += String::printf("if (%s.a < %f) discard;\r\n",
-                        color()->associatedVariableName().c_str(), alphaCutOff);
+  if (color()->connectedPoint()) {
+    state.compilationString += String::printf(
+      "if (%s.a < %f) discard;\r\n", color()->associatedVariableName().c_str(), alphaCutOff);
   }
   else {
-    state.compilationString
-      += String::printf("if (%s.a < %f) discard;\r\n",
-                        alpha()->associatedVariableName().c_str(), alphaCutOff);
+    state.compilationString += String::printf(
+      "if (%s.a < %f) discard;\r\n", alpha()->associatedVariableName().c_str(), alphaCutOff);
   }
 
   return *this;
@@ -59,8 +57,8 @@ AlphaTestBlock& AlphaTestBlock::_buildBlock(NodeMaterialBuildState& state)
 
 std::string AlphaTestBlock::_dumpPropertiesCode()
 {
-  auto codeString = String::printf("%s.alphaCutOff = %f;\r\n",
-                                   _codeVariableName.c_str(), alphaCutOff);
+  auto codeString
+    = String::printf("%s.alphaCutOff = %f;\r\n", _codeVariableName.c_str(), alphaCutOff);
 
   return codeString;
 }
@@ -70,8 +68,7 @@ json AlphaTestBlock::serialize() const
   return nullptr;
 }
 
-void AlphaTestBlock::_deserialize(const json& /*serializationObject*/,
-                                  Scene* /*scene*/,
+void AlphaTestBlock::_deserialize(const json& /*serializationObject*/, Scene* /*scene*/,
                                   const std::string& /*rootUrl*/)
 {
 }

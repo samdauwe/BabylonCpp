@@ -31,12 +31,9 @@ MorphTargetsBlock::MorphTargetsBlock(const std::string& iName)
   registerInput("normal", NodeMaterialBlockConnectionPointTypes::Vector3);
   registerInput("tangent", NodeMaterialBlockConnectionPointTypes::Vector3);
   registerInput("uv", NodeMaterialBlockConnectionPointTypes::Vector2);
-  registerOutput("positionOutput",
-                 NodeMaterialBlockConnectionPointTypes::Vector3);
-  registerOutput("normalOutput",
-                 NodeMaterialBlockConnectionPointTypes::Vector3);
-  registerOutput("tangentOutput",
-                 NodeMaterialBlockConnectionPointTypes::Vector3);
+  registerOutput("positionOutput", NodeMaterialBlockConnectionPointTypes::Vector3);
+  registerOutput("normalOutput", NodeMaterialBlockConnectionPointTypes::Vector3);
+  registerOutput("tangentOutput", NodeMaterialBlockConnectionPointTypes::Vector3);
   registerOutput("uvOutput", NodeMaterialBlockConnectionPointTypes::Vector2);
 }
 
@@ -44,7 +41,7 @@ MorphTargetsBlock::~MorphTargetsBlock()
 {
 }
 
-const std::string MorphTargetsBlock::getClassName() const
+std::string MorphTargetsBlock::getClassName() const
 {
   return "MorphTargetsBlock";
 }
@@ -97,10 +94,8 @@ void MorphTargetsBlock::initialize(NodeMaterialBuildState& state)
 void MorphTargetsBlock::autoConfigure(const NodeMaterialPtr& material)
 {
   if (!position()->isConnected()) {
-    auto positionInput
-      = material->getInputBlockByPredicate([](const InputBlockPtr& b) -> bool {
-          return b->isAttribute() && b->name == "position";
-        });
+    auto positionInput = material->getInputBlockByPredicate(
+      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name == "position"; });
 
     if (!positionInput) {
       positionInput = InputBlock::New("position");
@@ -109,10 +104,8 @@ void MorphTargetsBlock::autoConfigure(const NodeMaterialPtr& material)
     positionInput->output()->connectTo(position);
   }
   if (!normal()->isConnected()) {
-    auto normalInput
-      = material->getInputBlockByPredicate([](const InputBlockPtr& b) -> bool {
-          return b->isAttribute() && b->name == "normal";
-        });
+    auto normalInput = material->getInputBlockByPredicate(
+      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name == "normal"; });
 
     if (!normalInput) {
       normalInput = InputBlock::New("normal");
@@ -121,10 +114,8 @@ void MorphTargetsBlock::autoConfigure(const NodeMaterialPtr& material)
     normalInput->output()->connectTo(normal);
   }
   if (!tangent()->isConnected()) {
-    auto tangentInput
-      = material->getInputBlockByPredicate([](const InputBlockPtr& b) -> bool {
-          return b->isAttribute() && b->name == "tangent";
-        });
+    auto tangentInput = material->getInputBlockByPredicate(
+      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name == "tangent"; });
 
     if (!tangentInput) {
       tangentInput = InputBlock::New("tangent");
@@ -133,10 +124,8 @@ void MorphTargetsBlock::autoConfigure(const NodeMaterialPtr& material)
     tangentInput->output()->connectTo(tangent);
   }
   if (!uv()->isConnected()) {
-    auto uvInput
-      = material->getInputBlockByPredicate([](const InputBlockPtr& b) -> bool {
-          return b->isAttribute() && b->name == "uv";
-        });
+    auto uvInput = material->getInputBlockByPredicate(
+      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name == "uv"; });
 
     if (!uvInput) {
       uvInput = InputBlock::New("uv");
@@ -146,10 +135,8 @@ void MorphTargetsBlock::autoConfigure(const NodeMaterialPtr& material)
   }
 }
 
-void MorphTargetsBlock::prepareDefines(AbstractMesh* mesh,
-                                       const NodeMaterialPtr& /*nodeMaterial*/,
-                                       NodeMaterialDefines& defines,
-                                       bool /*useInstances*/)
+void MorphTargetsBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& /*nodeMaterial*/,
+                                       NodeMaterialDefines& defines, bool /*useInstances*/)
 {
   if (!defines._areAttributesDirty) {
     return;
@@ -157,8 +144,7 @@ void MorphTargetsBlock::prepareDefines(AbstractMesh* mesh,
   MaterialHelper::PrepareDefinesForMorphTargets(mesh, defines);
 }
 
-void MorphTargetsBlock::bind(const EffectPtr& effect,
-                             const NodeMaterialPtr& /*nodeMaterial*/,
+void MorphTargetsBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& /*nodeMaterial*/,
                              Mesh* mesh)
 {
   if (mesh && _repeatebleContentGenerated > 0) {
@@ -169,9 +155,8 @@ void MorphTargetsBlock::bind(const EffectPtr& effect,
 }
 
 void MorphTargetsBlock::replaceRepeatableContent(
-  NodeMaterialBuildState& vertexShaderState,
-  const NodeMaterialBuildState& fragmentShaderState, AbstractMesh* mesh,
-  NodeMaterialDefines& defines)
+  NodeMaterialBuildState& vertexShaderState, const NodeMaterialBuildState& /*fragmentShaderState*/,
+  AbstractMesh* mesh, NodeMaterialDefines& defines)
 {
   const auto& _position       = position();
   const auto& _normal         = normal();
@@ -185,67 +170,61 @@ void MorphTargetsBlock::replaceRepeatableContent(
   auto repeatCount            = defines.intDef["NUM_MORPH_INFLUENCERS"];
   _repeatebleContentGenerated = repeatCount;
 
-  auto& manager   = static_cast<Mesh*>(mesh)->morphTargetManager();
-  auto hasNormals = manager && manager->supportsNormals() && defines["NORMAL"];
-  auto hasTangents
-    = manager && manager->supportsTangents() && defines["TANGENT"];
-  auto hasUVs = manager && manager->supportsUVs() && defines["UV1"];
+  auto& manager    = static_cast<Mesh*>(mesh)->morphTargetManager();
+  auto hasNormals  = manager && manager->supportsNormals() && defines["NORMAL"];
+  auto hasTangents = manager && manager->supportsTangents() && defines["TANGENT"];
+  auto hasUVs      = manager && manager->supportsUVs() && defines["UV1"];
 
   std::string injectionCode = "";
 
   for (size_t index = 0; index < repeatCount; index++) {
     injectionCode += "#ifdef MORPHTARGETS\r\n";
-    injectionCode += String::printf(
-      "%s += (position%zu - %s) * morphTargetInfluences[%zu];\r\n",
-      _positionOutput->associatedVariableName().c_str(), index,
-      _position->associatedVariableName().c_str(), index);
+    injectionCode += String::printf("%s += (position%zu - %s) * morphTargetInfluences[%zu];\r\n",
+                                    _positionOutput->associatedVariableName().c_str(), index,
+                                    _position->associatedVariableName().c_str(), index);
 
     if (hasNormals) {
       injectionCode += "#ifdef MORPHTARGETS_NORMAL\r\n";
-      injectionCode += String::printf(
-        "%s += (normal%zu - %s) * morphTargetInfluences[%zu];\r\n",
-        _normalOutput->associatedVariableName().c_str(), index,
-        _normal->associatedVariableName().c_str(), index);
+      injectionCode += String::printf("%s += (normal%zu - %s) * morphTargetInfluences[%zu];\r\n",
+                                      _normalOutput->associatedVariableName().c_str(), index,
+                                      _normal->associatedVariableName().c_str(), index);
       injectionCode += "#endif\r\n";
     }
 
     if (hasTangents) {
       injectionCode += "#ifdef MORPHTARGETS_TANGENT\r\n";
-      injectionCode += String::printf(
-        "%s.xyz += (tangent%zu - %s.xyz) * morphTargetInfluences[%zu];\r\n",
-        _tangentOutput->associatedVariableName().c_str(), index,
-        _tangent->associatedVariableName().c_str(), index);
+      injectionCode
+        += String::printf("%s.xyz += (tangent%zu - %s.xyz) * morphTargetInfluences[%zu];\r\n",
+                          _tangentOutput->associatedVariableName().c_str(), index,
+                          _tangent->associatedVariableName().c_str(), index);
       injectionCode += "#endif\r\n";
     }
 
     if (hasUVs) {
       injectionCode += "#ifdef MORPHTARGETS_UV\r\n";
-      injectionCode += String::printf(
-        "%s.xyz += (uv_%zu - %s.xyz) * morphTargetInfluences[%zu];\r\n",
-        _uvOutput->associatedVariableName().c_str(), index,
-        _uv->associatedVariableName().c_str(), index);
+      injectionCode
+        += String::printf("%s.xyz += (uv_%zu - %s.xyz) * morphTargetInfluences[%zu];\r\n",
+                          _uvOutput->associatedVariableName().c_str(), index,
+                          _uv->associatedVariableName().c_str(), index);
       injectionCode += "#endif\r\n";
     }
 
     injectionCode += "#endif\r\n";
   }
 
-  _state.compilationString = String::replace(
-    _state.compilationString, _repeatableContentAnchor, injectionCode);
+  _state.compilationString
+    = String::replace(_state.compilationString, _repeatableContentAnchor, injectionCode);
 
   if (repeatCount > 0) {
     for (size_t index = 0; index < repeatCount; index++) {
-      _state.attributes.emplace_back(
-        String::printf("%s%zu", VertexBuffer::PositionKind, index));
+      _state.attributes.emplace_back(String::printf("%s%zu", VertexBuffer::PositionKind, index));
 
       if (hasNormals) {
-        _state.attributes.emplace_back(
-          String::printf("%s%zu", VertexBuffer::NormalKind, index));
+        _state.attributes.emplace_back(String::printf("%s%zu", VertexBuffer::NormalKind, index));
       }
 
       if (hasTangents) {
-        _state.attributes.emplace_back(
-          String::printf("%s%zu", VertexBuffer::TangentKind, index));
+        _state.attributes.emplace_back(String::printf("%s%zu", VertexBuffer::TangentKind, index));
       }
     }
   }
@@ -277,25 +256,24 @@ MorphTargetsBlock& MorphTargetsBlock::_buildBlock(NodeMaterialBuildState& state)
 
   state.uniforms.emplace_back("morphTargetInfluences");
 
-  state._emitFunctionFromInclude("morphTargetsVertexGlobalDeclaration",
-                                 comments);
+  state._emitFunctionFromInclude("morphTargetsVertexGlobalDeclaration", comments);
   state._emitFunctionFromInclude("morphTargetsVertexDeclaration", comments,
                                  EmitFunctionFromIncludeOptions{
                                    "maxSimultaneousMorphTargets" // repeatKey
                                  });
 
-  state.compilationString += String::printf(
-    "%s = %s;\r\n", _declareOutput(_positionOutput, state).c_str(),
-    _position->associatedVariableName().c_str());
+  state.compilationString
+    += String::printf("%s = %s;\r\n", _declareOutput(_positionOutput, state).c_str(),
+                      _position->associatedVariableName().c_str());
   state.compilationString += "#ifdef NORMAL\r\n";
-  state.compilationString += String::printf(
-    "%s = %s;\r\n", _declareOutput(_normalOutput, state).c_str(),
-    _normal->associatedVariableName().c_str());
+  state.compilationString
+    += String::printf("%s = %s;\r\n", _declareOutput(_normalOutput, state).c_str(),
+                      _normal->associatedVariableName().c_str());
   state.compilationString += "#endif\r\n";
   state.compilationString += "#ifdef TANGENT\r\n";
-  state.compilationString += String::printf(
-    "%s = %s;\r\n", _declareOutput(_tangentOutput, state).c_str(),
-    _tangent->associatedVariableName().c_str());
+  state.compilationString
+    += String::printf("%s = %s;\r\n", _declareOutput(_tangentOutput, state).c_str(),
+                      _tangent->associatedVariableName().c_str());
   state.compilationString += "#endif\r\n";
   state.compilationString += "#ifdef UV1\r\n";
   state.compilationString
@@ -304,7 +282,7 @@ MorphTargetsBlock& MorphTargetsBlock::_buildBlock(NodeMaterialBuildState& state)
   state.compilationString += "#endif\r\n";
 
   // Repeatable content
-  _repeatableContentAnchor = state._repeatableContentAnchor;
+  _repeatableContentAnchor = state._repeatableContentAnchor();
   state.compilationString += _repeatableContentAnchor;
 
   return *this;

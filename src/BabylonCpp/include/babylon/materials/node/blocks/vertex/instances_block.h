@@ -19,8 +19,7 @@ public:
   template <typename... Ts>
   static InstancesBlockPtr New(Ts&&... args)
   {
-    return std::shared_ptr<InstancesBlock>(
-      new InstancesBlock(std::forward<Ts>(args)...));
+    return std::shared_ptr<InstancesBlock>(new InstancesBlock(std::forward<Ts>(args)...));
   }
   ~InstancesBlock() override;
 
@@ -28,7 +27,7 @@ public:
    * @brief Gets the current class name.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Lets the block try to connect some inputs automatically.
@@ -44,8 +43,7 @@ public:
    * @param useInstances specifies that instances should be used
    */
   void prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
-                      NodeMaterialDefines& defines,
-                      bool useInstances = false) override;
+                      NodeMaterialDefines& defines, bool useInstances = false) override;
 
 protected:
   /**

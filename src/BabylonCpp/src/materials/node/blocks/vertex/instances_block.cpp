@@ -32,6 +32,11 @@ InstancesBlock::~InstancesBlock()
 {
 }
 
+std::string InstancesBlock::getClassName() const
+{
+  return "InstancesBlock";
+}
+
 NodeMaterialConnectionPointPtr& InstancesBlock::get_world0()
 {
   return _inputs[0];
@@ -65,10 +70,8 @@ NodeMaterialConnectionPointPtr& InstancesBlock::get_output()
 void InstancesBlock::autoConfigure(const NodeMaterialPtr& material)
 {
   if (!world0()->connectedPoint()) {
-    auto world0Input
-      = material->getInputBlockByPredicate([](const InputBlockPtr& b) -> bool {
-          return b->isAttribute() && b->name == "world0";
-        });
+    auto world0Input = material->getInputBlockByPredicate(
+      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name == "world0"; });
 
     if (!world0Input) {
       world0Input = InputBlock::New("world0");
@@ -77,10 +80,8 @@ void InstancesBlock::autoConfigure(const NodeMaterialPtr& material)
     world0Input->output()->connectTo(world0());
   }
   if (!world1()->connectedPoint()) {
-    auto world1Input
-      = material->getInputBlockByPredicate([](const InputBlockPtr& b) -> bool {
-          return b->isAttribute() && b->name == "world1";
-        });
+    auto world1Input = material->getInputBlockByPredicate(
+      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name == "world1"; });
 
     if (!world1Input) {
       world1Input = InputBlock::New("world1");
@@ -89,10 +90,8 @@ void InstancesBlock::autoConfigure(const NodeMaterialPtr& material)
     world1Input->output()->connectTo(world1);
   }
   if (!world2()->connectedPoint()) {
-    auto world2Input
-      = material->getInputBlockByPredicate([](const InputBlockPtr& b) -> bool {
-          return b->isAttribute() && b->name == "world2";
-        });
+    auto world2Input = material->getInputBlockByPredicate(
+      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name == "world2"; });
 
     if (!world2Input) {
       world2Input = InputBlock::New("world2");
@@ -101,10 +100,8 @@ void InstancesBlock::autoConfigure(const NodeMaterialPtr& material)
     world2Input->output()->connectTo(world2);
   }
   if (!world3()->connectedPoint()) {
-    auto world3Input
-      = material->getInputBlockByPredicate([](const InputBlockPtr& b) -> bool {
-          return b->isAttribute() && b->name == "world3";
-        });
+    auto world3Input = material->getInputBlockByPredicate(
+      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name == "world3"; });
 
     if (!world3Input) {
       world3Input = InputBlock::New("world3");
@@ -113,10 +110,8 @@ void InstancesBlock::autoConfigure(const NodeMaterialPtr& material)
     world3Input->output()->connectTo(world3);
   }
   if (!world()->connectedPoint()) {
-    auto worldInput
-      = material->getInputBlockByPredicate([](const InputBlockPtr& b) -> bool {
-          return b->isAttribute() && b->name == "world";
-        });
+    auto worldInput = material->getInputBlockByPredicate(
+      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name == "world"; });
 
     if (!worldInput) {
       worldInput = InputBlock::New("world");
@@ -128,10 +123,8 @@ void InstancesBlock::autoConfigure(const NodeMaterialPtr& material)
   world()->define = "!INSTANCES";
 }
 
-void InstancesBlock::prepareDefines(AbstractMesh* /*mesh*/,
-                                    const NodeMaterialPtr& /*nodeMaterial*/,
-                                    NodeMaterialDefines& defines,
-                                    bool useInstances)
+void InstancesBlock::prepareDefines(AbstractMesh* /*mesh*/, const NodeMaterialPtr& /*nodeMaterial*/,
+                                    NodeMaterialDefines& defines, bool useInstances)
 {
   auto changed = false;
   if (defines["INSTANCES"] != useInstances) {
@@ -161,16 +154,14 @@ InstancesBlock& InstancesBlock::_buildBlock(NodeMaterialBuildState& state)
   state.compilationString += "#ifdef INSTANCES\r\n";
   state.compilationString
     += _declareOutput(output, state)
-       + String::printf(" = mat4(%s, %s, %s, %s);\r\n",
-                        _world0->associatedVariableName().c_str(),
+       + String::printf(" = mat4(%s, %s, %s, %s);\r\n", _world0->associatedVariableName().c_str(),
                         _world1->associatedVariableName().c_str(),
                         _world2->associatedVariableName().c_str(),
                         _world3->associatedVariableName().c_str());
   state.compilationString += "#else\r\n";
   state.compilationString
     += _declareOutput(output, state)
-       + String::printf(" = %s;\r\n",
-                        world()->associatedVariableName().c_str());
+       + String::printf(" = %s;\r\n", world()->associatedVariableName().c_str());
   state.compilationString += "#endif\r\n";
   return *this;
 }

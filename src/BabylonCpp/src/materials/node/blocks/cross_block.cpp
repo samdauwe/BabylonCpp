@@ -24,7 +24,7 @@ CrossBlock::~CrossBlock()
 {
 }
 
-const std::string CrossBlock::getClassName() const
+std::string CrossBlock::getClassName() const
 {
   return "CrossBlock";
 }
@@ -52,8 +52,7 @@ CrossBlock& CrossBlock::_buildBlock(NodeMaterialBuildState& state)
 
   state.compilationString
     += _declareOutput(output, state)
-       + String::printf(" = cross(%s, %s);\r\n",
-                        left()->associatedVariableName().c_str(),
+       + String::printf(" = cross(%s, %s);\r\n", left()->associatedVariableName().c_str(),
                         right()->associatedVariableName().c_str());
 
   return *this;

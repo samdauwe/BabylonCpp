@@ -21,7 +21,7 @@ TrigonometryBlock::~TrigonometryBlock()
 {
 }
 
-const std::string TrigonometryBlock::getClassName() const
+std::string TrigonometryBlock::getClassName() const
 {
   return "TrigonometryBlock";
 }
@@ -78,10 +78,9 @@ TrigonometryBlock& TrigonometryBlock::_buildBlock(NodeMaterialBuildState& state)
     }
   }
 
-  state.compilationString
-    += _declareOutput(output, state)
-       + String::printf(" = %s(%s);\r\n", _operation.c_str(),
-                        input()->associatedVariableName().c_str());
+  state.compilationString += _declareOutput(output, state)
+                             + String::printf(" = %s(%s);\r\n", _operation.c_str(),
+                                              input()->associatedVariableName().c_str());
 
   return *this;
 }
@@ -91,8 +90,7 @@ json TrigonometryBlock::serialize() const
   return nullptr;
 }
 
-void TrigonometryBlock::_deserialize(const json& /*serializationObject*/,
-                                     Scene* /*scene*/,
+void TrigonometryBlock::_deserialize(const json& /*serializationObject*/, Scene* /*scene*/,
                                      const std::string& /*rootUrl*/)
 {
 }

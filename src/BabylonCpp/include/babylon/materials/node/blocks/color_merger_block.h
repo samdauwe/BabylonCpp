@@ -10,8 +10,7 @@ class ColorMergerBlock;
 using ColorMergerBlockPtr = std::shared_ptr<ColorMergerBlock>;
 
 /**
- * @brief Block used to create a Color3/4 out of individual inputs (one for each
- * component).
+ * @brief Block used to create a Color3/4 out of individual inputs (one for each component).
  */
 class BABYLON_SHARED_EXPORT ColorMergerBlock : public NodeMaterialBlock {
 
@@ -19,8 +18,7 @@ public:
   template <typename... Ts>
   static ColorMergerBlockPtr New(Ts&&... args)
   {
-    return std::shared_ptr<ColorMergerBlock>(
-      new ColorMergerBlock(std::forward<Ts>(args)...));
+    return std::shared_ptr<ColorMergerBlock>(new ColorMergerBlock(std::forward<Ts>(args)...));
   }
   ~ColorMergerBlock() override;
 
@@ -28,7 +26,7 @@ public:
    * @brief Gets the current class name.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
 protected:
   /**

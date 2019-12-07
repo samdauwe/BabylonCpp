@@ -22,7 +22,7 @@ ClampBlock::~ClampBlock()
 {
 }
 
-const std::string ClampBlock::getClassName() const
+std::string ClampBlock::getClassName() const
 {
   return "ClampBlock";
 }
@@ -45,21 +45,17 @@ ClampBlock& ClampBlock::_buildBlock(NodeMaterialBuildState& state)
 
   state.compilationString
     += _declareOutput(output, state)
-       + String::printf(" = clamp(%s , %s, %s);\r\n",
-                        value()->associatedVariableName().c_str(),
-                        _writeFloat(minimum).c_str(),
-                        _writeFloat(maximum).c_str());
+       + String::printf(" = clamp(%s , %s, %s);\r\n", value()->associatedVariableName().c_str(),
+                        _writeFloat(minimum).c_str(), _writeFloat(maximum).c_str());
 
   return *this;
 }
 
 std::string ClampBlock::_dumpPropertiesCode()
 {
-  auto codeString = String::printf("%s.minimum = %f;\r\n",
-                                   _codeVariableName.c_str(), minimum);
+  auto codeString = String::printf("%s.minimum = %f;\r\n", _codeVariableName.c_str(), minimum);
 
-  codeString += String::printf("%s.maximum = %f;\r\n",
-                               _codeVariableName.c_str(), maximum);
+  codeString += String::printf("%s.maximum = %f;\r\n", _codeVariableName.c_str(), maximum);
 
   return codeString;
 }
@@ -69,8 +65,8 @@ json ClampBlock::serialize() const
   return nullptr;
 }
 
-void ClampBlock::_deserialize(const json& /*serializationObject*/,
-                              Scene* /*scene*/, const std::string& /*rootUrl*/)
+void ClampBlock::_deserialize(const json& /*serializationObject*/, Scene* /*scene*/,
+                              const std::string& /*rootUrl*/)
 {
 }
 

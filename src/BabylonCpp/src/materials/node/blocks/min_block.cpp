@@ -24,7 +24,7 @@ MinBlock::~MinBlock()
 {
 }
 
-const std::string MinBlock::getClassName() const
+std::string MinBlock::getClassName() const
 {
   return "MinBlock";
 }
@@ -52,8 +52,7 @@ MinBlock& MinBlock::_buildBlock(NodeMaterialBuildState& state)
 
   state.compilationString
     += _declareOutput(output, state)
-       + String::printf(" = min(%s, %s);\r\n",
-                        left()->associatedVariableName().c_str(),
+       + String::printf(" = min(%s, %s);\r\n", left()->associatedVariableName().c_str(),
                         right()->associatedVariableName().c_str());
 
   return *this;

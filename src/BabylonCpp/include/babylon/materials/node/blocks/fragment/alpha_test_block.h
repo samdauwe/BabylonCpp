@@ -18,8 +18,7 @@ public:
   template <typename... Ts>
   static AlphaTestBlockPtr New(Ts&&... args)
   {
-    return std::shared_ptr<AlphaTestBlock>(
-      new AlphaTestBlock(std::forward<Ts>(args)...));
+    return std::shared_ptr<AlphaTestBlock>(new AlphaTestBlock(std::forward<Ts>(args)...));
   }
   ~AlphaTestBlock() override;
 
@@ -27,7 +26,7 @@ public:
    * @brief Gets the current class name.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Serializes this block in a JSON representation.

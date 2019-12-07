@@ -51,25 +51,22 @@ void NodeMaterialBuildStateSharedData::emitErrors()
   std::ostringstream errorMessage;
 
   if (!checks.emitVertex) {
-    errorMessage
-      << "NodeMaterial does not have a vertex output. You need to at least add "
-         "a block that generates a glPosition value.\r\n";
+    errorMessage << "NodeMaterial does not have a vertex output. You need to at least add "
+                    "a block that generates a glPosition value.\r\n";
   }
   if (!checks.emitFragment) {
-    errorMessage
-      << "NodeMaterial does not have a fragment output. You need to at least "
-         "add a block that generates a glFragColor value.\r\n";
+    errorMessage << "NodeMaterial does not have a fragment output. You need to at least "
+                    "add a block that generates a glFragColor value.\r\n";
   }
   for (const auto& notConnectedInput : checks.notConnectedNonOptionalInputs) {
     errorMessage << "input " << notConnectedInput->name << " from block "
-                 << notConnectedInput->ownerBlock().name << "["
-                 << notConnectedInput->ownerBlock().getClassName()
+                 << notConnectedInput->ownerBlock()->name << "["
+                 << notConnectedInput->ownerBlock()->getClassName()
                  << "] is not connected and is not optional.\r\n";
   }
 
   if (errorMessage) {
-    throw std::runtime_error("Build of NodeMaterial failed:\r\n"
-                             + errorMessage.str());
+    throw std::runtime_error("Build of NodeMaterial failed:\r\n" + errorMessage.str());
   }
 }
 

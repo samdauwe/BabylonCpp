@@ -109,6 +109,11 @@ std::string NodeMaterialBuildState::_getFreeDefineName(const std::string& prefix
   return prefix + std::to_string(sharedData->defineNames[prefix]);
 }
 
+void NodeMaterialBuildState::_excludeVariableName(const std::string& name)
+{
+  sharedData->variableNames[name] = 0;
+}
+
 std::string NodeMaterialBuildState::_getGLType(NodeMaterialBlockConnectionPointTypes type) const
 {
   switch (type) {

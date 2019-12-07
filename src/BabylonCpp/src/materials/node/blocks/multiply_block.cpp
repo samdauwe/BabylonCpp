@@ -24,7 +24,7 @@ MultiplyBlock::~MultiplyBlock()
 {
 }
 
-const std::string MultiplyBlock::getClassName() const
+std::string MultiplyBlock::getClassName() const
 {
   return "MultiplyBlock";
 }
@@ -52,8 +52,7 @@ MultiplyBlock& MultiplyBlock::_buildBlock(NodeMaterialBuildState& state)
 
   state.compilationString
     += _declareOutput(output, state)
-       + String::printf(" = %s * %s;\r\n",
-                        left()->associatedVariableName().c_str(),
+       + String::printf(" = %s * %s;\r\n", left()->associatedVariableName().c_str(),
                         right()->associatedVariableName().c_str());
 
   return *this;

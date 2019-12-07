@@ -19,8 +19,7 @@ public:
   template <typename... Ts>
   static VectorMergerBlockPtr New(Ts&&... args)
   {
-    return std::shared_ptr<VectorMergerBlock>(
-      new VectorMergerBlock(std::forward<Ts>(args)...));
+    return std::shared_ptr<VectorMergerBlock>(new VectorMergerBlock(std::forward<Ts>(args)...));
   }
   ~VectorMergerBlock() override;
 
@@ -28,7 +27,7 @@ public:
    * @brief Gets the current class name.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
 protected:
   /**

@@ -24,7 +24,7 @@ DivideBlock::~DivideBlock()
 {
 }
 
-const std::string DivideBlock::getClassName() const
+std::string DivideBlock::getClassName() const
 {
   return "DivideBlock";
 }
@@ -52,8 +52,7 @@ DivideBlock& DivideBlock::_buildBlock(NodeMaterialBuildState& state)
 
   state.compilationString
     += _declareOutput(output, state)
-       + String::printf(" = %s / %s;\r\n",
-                        left()->associatedVariableName().c_str(),
+       + String::printf(" = %s / %s;\r\n", left()->associatedVariableName().c_str(),
                         right()->associatedVariableName().c_str());
 
   return *this;

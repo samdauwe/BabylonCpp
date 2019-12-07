@@ -34,16 +34,16 @@ public:
 
   /**
    * @brief Set the source of this connection point to a vertex attribute.
-   * @param attributeName defines the attribute name (position, uv, normal,
-   * etc...). If not specified it will take the connection point name
+   * @param attributeName defines the attribute name (position, uv, normal, etc...). If not
+   * specified it will take the connection point name
    * @returns the current connection point
    */
   InputBlock& setAsAttribute(const std::string& attributeName = "");
 
   /**
    * @brief Set the source of this connection point to a system value.
-   * @param value define the system value to use (world, view, etc...) or null
-   * to switch to manual value
+   * @param value define the system value to use (world, view, etc...) or null to switch to manual
+   * value
    * @returns the current connection point
    */
   InputBlock& setAsSystemValue(const std::optional<NodeMaterialSystemValues>& value);
@@ -52,7 +52,7 @@ public:
    * @brief Gets the current class name.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Animate the input if animationType !== None
@@ -125,15 +125,15 @@ protected:
 
   /**
    * @brief Gets a callback used to get the value of that point.
-   * Please note that setting this value will force the connection point to
-   * ignore the value property
+   * Please note that setting this value will force the connection point to ignore the value
+   * property
    */
   std::function<AnimationValuePtr()>& get_valueCallback();
 
   /**
    * @brief Sets a callback used to get the value of that point.
-   * Please note that setting this value will force the connection point to
-   * ignore the value property
+   * Please note that setting this value will force the connection point to ignore the value
+   * property
    */
   void set_valueCallback(const std::function<AnimationValuePtr()>& value);
 
@@ -171,53 +171,50 @@ protected:
   bool get_isUniform() const;
 
   /**
-   * @brief Sets a boolean indicating that this connection point is coming from
-   * an uniform. In this case the connection point name must be the name of the
-   * uniform to use. Can only be set on inputs.
+   * @brief Sets a boolean indicating that this connection point is coming from an uniform. In this
+   * case the connection point name must be the name of the uniform to use. Can only be set on
+   * inputs.
    */
   void set_isUniform(bool value);
 
   /**
-   * @brief Gets a boolean indicating that this connection point is coming from
-   * an attribute. In this case the connection point name must be the name of
-   * the attribute to use Can only be set on inputs.
+   * @brief Gets a boolean indicating that this connection point is coming from an attribute. In
+   * this case the connection point name must be the name of the attribute to use Can only be set on
+   * inputs.
    */
   bool get_isAttribute() const;
 
   /**
-   * @brief Sets a boolean indicating that this connection point is coming from
-   * an attribute. In this case the connection point name must be the name of
-   * the attribute to use Can only be set on inputs.
+   * @brief Sets a boolean indicating that this connection point is coming from an attribute. In
+   * this case the connection point name must be the name of the attribute to use Can only be set on
+   * inputs.
    */
   void set_isAttribute(bool value);
 
   /**
-   * @brief Gets a boolean indicating that this connection point is generating a
-   * varying variable. Can only be set on exit points.
+   * @brief Gets a boolean indicating that this connection point is generating a varying variable.
+   * Can only be set on exit points.
    */
   bool get_isVarying() const;
 
   /**
-   * @brief Sets a boolean indicating that this connection point is generating a
-   * varying variable. Can only be set on exit points.
+   * @brief Sets a boolean indicating that this connection point is generating a varying variable.
+   * Can only be set on exit points.
    */
   void set_isVarying(bool value);
 
   /**
-   * @brief Gets a boolean indicating that the current connection point is a
-   * system value.
+   * @brief Gets a boolean indicating that the current connection point is a system value.
    */
   bool get_isSystemValue() const;
 
   /**
-   * @brief Gets the current well known value or null if not defined as a system
-   * value.
+   * @brief Gets the current well known value or null if not defined as a system value.
    */
   std::optional<NodeMaterialSystemValues>& get_systemValue();
 
   /**
-   * @brief sets the current well known value or null if not defined as a system
-   * value.
+   * @brief sets the current well known value or null if not defined as a system value.
    */
   void set_systemValue(const std::optional<NodeMaterialSystemValues>& value);
 
@@ -286,34 +283,32 @@ public:
   ReadOnlyProperty<InputBlock, bool> isUndefined;
 
   /**
-   * Gets or sets a boolean indicating that this connection point is coming from
-   * an uniform. In this case the connection point name must be the name of the
-   * uniform to use. Can only be set on inputs
+   * Gets or sets a boolean indicating that this connection point is coming from an uniform. In this
+   * case the connection point name must be the name of the uniform to use. Can only be set on
+   * inputs
    */
   Property<InputBlock, bool> isUniform;
 
   /**
-   * Gets or sets a boolean indicating that this connection point is coming from
-   * an attribute. In this case the connection point name must be the name of
-   * the attribute to use Can only be set on inputs
+   * Gets or sets a boolean indicating that this connection point is coming from an attribute. In
+   * this case the connection point name must be the name of the attribute to use Can only be set on
+   * inputs
    */
   Property<InputBlock, bool> isAttribute;
 
   /**
-   * Gets or sets a boolean indicating that this connection point is generating
-   * a varying variable. Can only be set on exit points
+   * Gets or sets a boolean indicating that this connection point is generating a varying variable.
+   * Can only be set on exit points
    */
   Property<InputBlock, bool> isVarying;
 
   /**
-   * Gets a boolean indicating that the current connection point is a system
-   * value
+   * Gets a boolean indicating that the current connection point is a system value
    */
   ReadOnlyProperty<InputBlock, bool> isSystemValue;
 
   /**
-   * Gets or sets the current well known value or null if not defined as a
-   * system value
+   * Gets or sets the current well known value or null if not defined as a system value
    */
   Property<InputBlock, std::optional<NodeMaterialSystemValues>> systemValue;
 

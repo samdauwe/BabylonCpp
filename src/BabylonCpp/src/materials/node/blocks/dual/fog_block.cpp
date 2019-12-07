@@ -48,7 +48,7 @@ FogBlock::~FogBlock()
 {
 }
 
-const std::string FogBlock::getClassName() const
+std::string FogBlock::getClassName() const
 {
   return "FogBlock";
 }

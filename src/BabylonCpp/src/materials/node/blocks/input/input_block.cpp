@@ -245,7 +245,7 @@ void InputBlock::set_systemValue(const std::optional<NodeMaterialSystemValues>& 
   _systemValue           = value;
 }
 
-const std::string InputBlock::getClassName() const
+std::string InputBlock::getClassName() const
 {
   return "InputBlock";
 }
@@ -311,7 +311,9 @@ std::string InputBlock::_dumpPropertiesCode()
     return String::printf("%s.setAsAttribute(%s);\r\n", _codeVariableName.c_str(), name.c_str());
   }
   if (isSystemValue()) {
-    // TODO
+    // TODO FIXME
+    // return String::printf("%s.setAsSystemValue(NodeMaterialSystemValues::%s);\r\n",
+    //                      _codeVariableName.c_str(), NodeMaterialSystemValues[*_systemValue]);
   }
   if (isUniform()) {
     std::string valueString = "";
@@ -352,7 +354,7 @@ std::string InputBlock::_dumpPropertiesCode()
     return String::printf("%s.value = %s;\r\n", _codeVariableName.c_str(), valueString.c_str());
   }
   return "";
-}
+} // namespace BABYLON
 
 void InputBlock::_emit(NodeMaterialBuildState& state, const std::string& define)
 {
@@ -403,7 +405,7 @@ void InputBlock::_emit(NodeMaterialBuildState& state, const std::string& define)
   if (isAttribute) {
     associatedVariableName = name;
 
-    if (target().has_value() && *target() == NodeMaterialBlockTargets::Vertex
+    if (target() == NodeMaterialBlockTargets::Vertex
         && state._vertexState) { // Attribute for fragment need to be carried
                                  // over by varyings
       _emit(*state._vertexState, define);
@@ -526,6 +528,8 @@ InputBlock& InputBlock::_buildBlock(NodeMaterialBuildState& state)
   }
 
   _emit(state);
+
+  return *this;
 }
 
 json InputBlock::serialize() const

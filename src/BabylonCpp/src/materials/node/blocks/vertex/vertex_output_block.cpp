@@ -16,7 +16,7 @@ VertexOutputBlock::~VertexOutputBlock()
 {
 }
 
-const std::string VertexOutputBlock::getClassName() const
+std::string VertexOutputBlock::getClassName() const
 {
   return "VertexOutputBlock";
 }
@@ -32,8 +32,8 @@ VertexOutputBlock& VertexOutputBlock::_buildBlock(NodeMaterialBuildState& state)
 
   const auto& input = vector();
 
-  state.compilationString += String::printf(
-    "gl_Position = %s;\r\n", input->associatedVariableName().c_str());
+  state.compilationString
+    += String::printf("gl_Position = %s;\r\n", input->associatedVariableName().c_str());
 
   return *this;
 }

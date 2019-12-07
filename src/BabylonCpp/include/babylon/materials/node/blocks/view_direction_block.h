@@ -18,8 +18,7 @@ public:
   template <typename... Ts>
   static ViewDirectionBlockPtr New(Ts&&... args)
   {
-    return std::shared_ptr<ViewDirectionBlock>(
-      new ViewDirectionBlock(std::forward<Ts>(args)...));
+    return std::shared_ptr<ViewDirectionBlock>(new ViewDirectionBlock(std::forward<Ts>(args)...));
   }
   ~ViewDirectionBlock() override;
 
@@ -27,7 +26,7 @@ public:
    * @brief Gets the current class name.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Lets the block try to connect some inputs automatically.
@@ -66,14 +65,12 @@ public:
   /**
    * Gets the world position component
    */
-  ReadOnlyProperty<ViewDirectionBlock, NodeMaterialConnectionPointPtr>
-    worldPosition;
+  ReadOnlyProperty<ViewDirectionBlock, NodeMaterialConnectionPointPtr> worldPosition;
 
   /**
    * Gets the camera position component
    */
-  ReadOnlyProperty<ViewDirectionBlock, NodeMaterialConnectionPointPtr>
-    cameraPosition;
+  ReadOnlyProperty<ViewDirectionBlock, NodeMaterialConnectionPointPtr> cameraPosition;
 
   /**
    * Gets the output component

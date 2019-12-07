@@ -24,7 +24,7 @@ SubtractBlock::~SubtractBlock()
 {
 }
 
-const std::string SubtractBlock::getClassName() const
+std::string SubtractBlock::getClassName() const
 {
   return "SubtractBlock";
 }
@@ -52,8 +52,7 @@ SubtractBlock& SubtractBlock::_buildBlock(NodeMaterialBuildState& state)
 
   state.compilationString
     += _declareOutput(output, state)
-       + String::printf(" = %s - %s;\r\n",
-                        left()->associatedVariableName().c_str(),
+       + String::printf(" = %s - %s;\r\n", left()->associatedVariableName().c_str(),
                         right()->associatedVariableName().c_str());
 
   return *this;

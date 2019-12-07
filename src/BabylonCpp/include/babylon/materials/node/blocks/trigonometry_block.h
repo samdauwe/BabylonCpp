@@ -40,8 +40,7 @@ public:
   template <typename... Ts>
   static TrigonometryBlockPtr New(Ts&&... args)
   {
-    return std::shared_ptr<TrigonometryBlock>(
-      new TrigonometryBlock(std::forward<Ts>(args)...));
+    return std::shared_ptr<TrigonometryBlock>(new TrigonometryBlock(std::forward<Ts>(args)...));
   }
   ~TrigonometryBlock() override;
 
@@ -49,7 +48,7 @@ public:
    * @brief Gets the current class name.
    * @returns the class name
    */
-  const std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Serializes this block in a JSON representation.

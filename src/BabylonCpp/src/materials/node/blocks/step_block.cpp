@@ -21,7 +21,7 @@ StepBlock::~StepBlock()
 {
 }
 
-const std::string StepBlock::getClassName() const
+std::string StepBlock::getClassName() const
 {
   return "StepBlock";
 }
@@ -49,8 +49,7 @@ StepBlock& StepBlock::_buildBlock(NodeMaterialBuildState& state)
 
   state.compilationString
     += _declareOutput(output, state)
-       + String::printf(" = step(%s, %s);\r\n",
-                        edge()->associatedVariableName().c_str(),
+       + String::printf(" = step(%s, %s);\r\n", edge()->associatedVariableName().c_str(),
                         value()->associatedVariableName().c_str());
 
   return *this;

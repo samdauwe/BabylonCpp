@@ -23,7 +23,7 @@ ScaleBlock::~ScaleBlock()
 {
 }
 
-const std::string ScaleBlock::getClassName() const
+std::string ScaleBlock::getClassName() const
 {
   return "ScaleBlock";
 }
@@ -51,8 +51,7 @@ ScaleBlock& ScaleBlock::_buildBlock(NodeMaterialBuildState& state)
 
   state.compilationString
     += _declareOutput(output, state)
-       + String::printf(" = %s * %s;\r\n",
-                        input()->associatedVariableName().c_str(),
+       + String::printf(" = %s * %s;\r\n", input()->associatedVariableName().c_str(),
                         factor()->associatedVariableName().c_str());
 
   return *this;

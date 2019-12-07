@@ -30,7 +30,7 @@ ColorSplitterBlock::~ColorSplitterBlock()
 {
 }
 
-const std::string ColorSplitterBlock::getClassName() const
+std::string ColorSplitterBlock::getClassName() const
 {
   return "ColorSplitterBlock";
 }
@@ -86,8 +86,7 @@ std::string ColorSplitterBlock::_outputRename(const std::string& iName)
   return iName;
 }
 
-ColorSplitterBlock&
-ColorSplitterBlock::_buildBlock(NodeMaterialBuildState& state)
+ColorSplitterBlock& ColorSplitterBlock::_buildBlock(NodeMaterialBuildState& state)
 {
   NodeMaterialBlock::_buildBlock(state);
 
@@ -106,32 +105,27 @@ ColorSplitterBlock::_buildBlock(NodeMaterialBuildState& state)
   if (rgbOutput->hasEndpoints()) {
     state.compilationString
       += _declareOutput(rgbOutput, state)
-         + String::printf(" = %s.rgb;\r\n",
-                          input->associatedVariableName().c_str());
+         + String::printf(" = %s.rgb;\r\n", input->associatedVariableName().c_str());
   }
   if (rOutput->hasEndpoints()) {
     state.compilationString
       += _declareOutput(rOutput, state)
-         + String::printf(" = %s.r;\r\n",
-                          input->associatedVariableName().c_str());
+         + String::printf(" = %s.r;\r\n", input->associatedVariableName().c_str());
   }
   if (gOutput->hasEndpoints()) {
     state.compilationString
       += _declareOutput(gOutput, state)
-         + String::printf(" = %s.g;\r\n",
-                          input->associatedVariableName().c_str());
+         + String::printf(" = %s.g;\r\n", input->associatedVariableName().c_str());
   }
   if (bOutput->hasEndpoints()) {
     state.compilationString
       += _declareOutput(bOutput, state)
-         + String::printf(" = %s.b;\r\n",
-                          input->associatedVariableName().c_str());
+         + String::printf(" = %s.b;\r\n", input->associatedVariableName().c_str());
   }
   if (aOutput->hasEndpoints()) {
     state.compilationString
       += _declareOutput(aOutput, state)
-         + String::printf(" = %s.a;\r\n",
-                          input->associatedVariableName().c_str());
+         + String::printf(" = %s.a;\r\n", input->associatedVariableName().c_str());
   }
 
   return *this;

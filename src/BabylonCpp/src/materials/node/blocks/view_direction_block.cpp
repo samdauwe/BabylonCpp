@@ -15,10 +15,8 @@ ViewDirectionBlock::ViewDirectionBlock(const std::string& iName)
     , cameraPosition{this, &ViewDirectionBlock::get_cameraPosition}
     , output{this, &ViewDirectionBlock::get_output}
 {
-  registerInput("worldPosition",
-                NodeMaterialBlockConnectionPointTypes::Vector4);
-  registerInput("cameraPosition",
-                NodeMaterialBlockConnectionPointTypes::Vector3);
+  registerInput("worldPosition", NodeMaterialBlockConnectionPointTypes::Vector4);
+  registerInput("cameraPosition", NodeMaterialBlockConnectionPointTypes::Vector3);
 
   registerOutput("output", NodeMaterialBlockConnectionPointTypes::Vector3);
 }
@@ -27,7 +25,7 @@ ViewDirectionBlock::~ViewDirectionBlock()
 {
 }
 
-const std::string ViewDirectionBlock::getClassName() const
+std::string ViewDirectionBlock::getClassName() const
 {
   return "ViewDirectionBlock";
 }
@@ -53,31 +51,27 @@ void ViewDirectionBlock::autoConfigure(const NodeMaterialPtr& material)
     auto cameraPositionInput
       = material->getInputBlockByPredicate([](const InputBlockPtr& b) -> bool {
           return b->systemValue().has_value()
-                 && b->systemValue().value()
-                      == NodeMaterialSystemValues::CameraPosition;
+                 && b->systemValue().value() == NodeMaterialSystemValues::CameraPosition;
         });
 
     if (!cameraPositionInput) {
       cameraPositionInput = InputBlock::New("cameraPosition");
-      cameraPositionInput->setAsSystemValue(
-        NodeMaterialSystemValues::CameraPosition);
+      cameraPositionInput->setAsSystemValue(NodeMaterialSystemValues::CameraPosition);
     }
     cameraPositionInput->output()->connectTo(cameraPosition);
   }
 }
 
-ViewDirectionBlock&
-ViewDirectionBlock::_buildBlock(NodeMaterialBuildState& state)
+ViewDirectionBlock& ViewDirectionBlock::_buildBlock(NodeMaterialBuildState& state)
 {
   NodeMaterialBlock::_buildBlock(state);
 
   const auto& output = _outputs[0];
 
-  state.compilationString
-    += _declareOutput(output, state)
-       + String::printf(" = normalize(%s - %s).xyz);\r\n",
-                        cameraPosition()->associatedVariableName().c_str(),
-                        worldPosition()->associatedVariableName().c_str());
+  state.compilationString += _declareOutput(output, state)
+                             + String::printf(" = normalize(%s - %s).xyz);\r\n",
+                                              cameraPosition()->associatedVariableName().c_str(),
+                                              worldPosition()->associatedVariableName().c_str());
 
   return *this;
 }

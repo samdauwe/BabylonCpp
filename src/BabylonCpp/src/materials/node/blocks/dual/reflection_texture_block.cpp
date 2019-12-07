@@ -55,7 +55,7 @@ ReflectionTextureBlock::~ReflectionTextureBlock()
 {
 }
 
-const std::string ReflectionTextureBlock::getClassName() const
+std::string ReflectionTextureBlock::getClassName() const
 {
   return "ReflectionTextureBlock";
 }
@@ -294,8 +294,10 @@ ReflectionTextureBlock& ReflectionTextureBlock::_buildBlock(NodeMaterialBuildSta
     return *this;
   }
 
-  state.sharedData->blockingBlocks.emplace_back(this);
-  state.sharedData->textureBlocks.emplace_back(this);
+  state.sharedData->blockingBlocks.emplace_back(
+    std::static_pointer_cast<NodeMaterialBlock>(shared_from_this()));
+  state.sharedData->textureBlocks.emplace_back(
+    std::static_pointer_cast<ReflectionTextureBlock>(shared_from_this()));
 
   // Samplers
   _cubeSamplerName = state._getFreeVariableName(name + "CubeSampler");

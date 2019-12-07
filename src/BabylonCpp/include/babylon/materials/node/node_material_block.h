@@ -283,12 +283,12 @@ protected:
   /**
    * @brief Gets the target of the block.
    */
-  virtual std::optional<NodeMaterialBlockTargets>& get_target();
+  virtual NodeMaterialBlockTargets& get_target();
 
   /**
    * @brief Sets the target of the block.
    */
-  void set_target(const std::optional<NodeMaterialBlockTargets>& value);
+  void set_target(const NodeMaterialBlockTargets& value);
 
   /**
    * @brief Gets the list of input points.
@@ -356,7 +356,7 @@ public:
   /**
    * Gets or sets the target of the block
    */
-  Property<NodeMaterialBlock, std::optional<NodeMaterialBlockTargets>> target;
+  Property<NodeMaterialBlock, NodeMaterialBlockTargets> target;
 
   /**
    * Gets the list of input points
@@ -371,7 +371,7 @@ public:
 private:
   size_t _buildId;
   NodeMaterialBlockTargets _buildTarget;
-  std::optional<NodeMaterialBlockTargets> _target;
+  NodeMaterialBlockTargets _target;
   bool _isFinalMerger;
   bool _isInput;
 

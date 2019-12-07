@@ -20,6 +20,7 @@ NodeMaterialBlock::NodeMaterialBlock(const std::string& iName, NodeMaterialBlock
     , target{this, &NodeMaterialBlock::get_target, &NodeMaterialBlock::set_target}
     , inputs{this, &NodeMaterialBlock::get_inputs}
     , outputs{this, &NodeMaterialBlock::get_outputs}
+    , _target{NodeMaterialBlockTargets::Unkown}
 {
   name = iName;
 
@@ -54,12 +55,12 @@ void NodeMaterialBlock::set_buildId(size_t value)
   _buildId = value;
 }
 
-std::optional<NodeMaterialBlockTargets>& NodeMaterialBlock::get_target()
+NodeMaterialBlockTargets& NodeMaterialBlock::get_target()
 {
   return _target;
 }
 
-void NodeMaterialBlock::set_target(const std::optional<NodeMaterialBlockTargets>& value)
+void NodeMaterialBlock::set_target(const NodeMaterialBlockTargets& value)
 {
   if (_target != value) {
     return;
@@ -196,9 +197,9 @@ NodeMaterialConnectionPointPtr
 NodeMaterialBlock::getFirstAvailableOutput(const NodeMaterialBlockPtr& forBlock)
 {
   for (const auto& output : _outputs) {
-    if (!forBlock || !forBlock->target().has_value()
-        || *forBlock->target() == NodeMaterialBlockTargets::Neutral
-        || (*forBlock->target() != output->target)) {
+    if (!forBlock || (forBlock->target() == NodeMaterialBlockTargets::Unkown)
+        || forBlock->target() == NodeMaterialBlockTargets::Neutral
+        || (forBlock->target() != output->target)) {
       return output;
     }
   }
@@ -317,12 +318,11 @@ void NodeMaterialBlock::_processBuild(const NodeMaterialBlockPtr& block,
   const auto localBlockIsFragment = (state._vertexState != nullptr);
   const auto otherBlockWasGeneratedInVertexShader
     = block->_buildTarget == NodeMaterialBlockTargets::Vertex
-      && (block->target().has_value()
-          && *block->target() != NodeMaterialBlockTargets::VertexAndFragment);
+      && (block->target() != NodeMaterialBlockTargets::VertexAndFragment);
 
   if (localBlockIsFragment
-      && (((block->target().has_value() && *block->target() == input->target))
-          || (target().has_value() && *target() != NodeMaterialBlockTargets::VertexAndFragment
+      && (((block->target() == input->target))
+          || (target() != NodeMaterialBlockTargets::VertexAndFragment
               && otherBlockWasGeneratedInVertexShader))) { // context switch! We need a varying
     if ((!block->isInput()
          && state.target != block->_buildTarget) // block was already emitted by vertex shader
@@ -360,8 +360,8 @@ bool NodeMaterialBlock::build(NodeMaterialBuildState& state,
       continue;
     }
 
-    if (target().has_value() && *target() != NodeMaterialBlockTargets::Neutral) {
-      if (input->target == *target()) {
+    if (target() != NodeMaterialBlockTargets::Neutral) {
+      if (input->target == target()) {
         continue;
       }
 
@@ -392,8 +392,8 @@ bool NodeMaterialBlock::build(NodeMaterialBuildState& state,
   if (!isInput()) {
     /** Prepare outputs */
     for (const auto& output : _outputs) {
-      if (target().has_value() && target() != NodeMaterialBlockTargets::Neutral) {
-        if (output->target == *target()) {
+      if (target() != NodeMaterialBlockTargets::Neutral) {
+        if (output->target == target()) {
           continue;
         }
         if (output->target == state.target) {
@@ -439,8 +439,7 @@ bool NodeMaterialBlock::build(NodeMaterialBuildState& state,
     for (const auto& endpoint : output->endpoints()) {
       const auto& block = endpoint->ownerBlock();
 
-      if (block && (block->target().has_value() && *block->target() != state.target)
-          && stl_util::contains(activeBlocks, block)) {
+      if (block && (block->target() != state.target) && stl_util::contains(activeBlocks, block)) {
         _processBuild(block, state, endpoint, activeBlocks);
       }
     }
