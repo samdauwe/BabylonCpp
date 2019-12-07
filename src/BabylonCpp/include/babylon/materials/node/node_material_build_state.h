@@ -8,11 +8,11 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/materials/node/node_material_block_connection_point_types.h>
 #include <babylon/materials/node/node_material_block_targets.h>
 
 namespace BABYLON {
 
-enum class NodeMaterialBlockConnectionPointTypes;
 class NodeMaterialBuildState;
 struct NodeMaterialBuildStateSharedData;
 struct ReplaceStrings;
@@ -44,6 +44,14 @@ struct BABYLON_SHARED_EXPORT EmitFunctionFromIncludeOptions {
 class BABYLON_SHARED_EXPORT NodeMaterialBuildState {
 
 public:
+  NodeMaterialBuildState();
+  ~NodeMaterialBuildState() = default;
+
+  /**
+   * @brief Hidden
+   */
+  std::string _repeatableContentAnchor();
+
   /**
    * @brief Finalize the compilation strings.
    * @param state defines the current compilation state
@@ -53,7 +61,7 @@ public:
   /**
    * @brief Hidden
    */
-  std::string _getFreeVariableName(const std::string& prefix);
+  std::string _getFreeVariableName(std::string prefix);
 
   /**
    * @brief Hidden
@@ -78,7 +86,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _emitFunction(const std::string& name, const std::string& code, const std::string& comments);
+  void _emitFunction(const std::string& name, std::string code, const std::string& comments);
 
   /**
    * @brief Hidden
@@ -90,10 +98,10 @@ public:
   /**
    * @brief Hidden
    */
-  std::string _emitFunctionFromInclude(const std::string& includeName, const std::string& comments,
-                                       const std::optional<EmitFunctionFromIncludeOptions>& options
-                                       = std::nullopt,
-                                       const std::string& storeKey = "");
+  void _emitFunctionFromInclude(const std::string& includeName, const std::string& comments,
+                                const std::optional<EmitFunctionFromIncludeOptions>& options
+                                = std::nullopt,
+                                const std::string& storeKey = "");
 
   /**
    * @brief Hidden
@@ -116,7 +124,7 @@ protected:
   /**
    * @brief Hidden
    */
-  std::string get__repeatableContentAnchor() const;
+  std::string get__repeatableContentAnchor();
 
 public:
   /**
@@ -181,9 +189,6 @@ public:
    * Gets the emitted compilation strings
    */
   std::string compilationString;
-
-  /** @hidden */
-  ReadOnlyProperty<NodeMaterialBuildState, std::string> _repeatableContentAnchor;
 
 private:
   size_t _repeatableContentAnchorIndex;
