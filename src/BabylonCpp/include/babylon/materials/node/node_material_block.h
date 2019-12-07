@@ -38,7 +38,8 @@ struct NodeMaterialBlockConnectionOptions {
 /**
  * @brief Defines a block that can be used inside a node based material.
  */
-class BABYLON_SHARED_EXPORT NodeMaterialBlock {
+class BABYLON_SHARED_EXPORT NodeMaterialBlock
+    : public std::enable_shared_from_this<NodeMaterialBlock> {
 
 public:
   template <typename... Ts>
@@ -81,7 +82,7 @@ public:
    * @brief Gets the current class name e.g. "NodeMaterialBlock".
    * @returns the class name
    */
-  virtual const std::string getClassName() const;
+  virtual std::string getClassName() const;
 
   /**
    * @brief Register a new input. Must be called inside a block constructor.
@@ -215,14 +216,13 @@ public:
    * @param activeBlocks defines the list of active blocks (i.e. blocks to compile)
    * @returns true if already built
    */
-  bool build(const NodeMaterialBuildState& state,
-             const std::vector<NodeMaterialBlockPtr>& activeBlocks);
+  bool build(NodeMaterialBuildState& state, const std::vector<NodeMaterialBlockPtr>& activeBlocks);
 
   /**
    * @brief Hidden
    */
-  std::string _dumpCode(const std::vector<std::string>& uniqueNames,
-                        const std::vector<NodeMaterialBlockPtr>& alreadyDumped);
+  std::string _dumpCode(std::vector<std::string>& uniqueNames,
+                        std::vector<NodeMaterialBlockPtr>& alreadyDumped);
 
   /**
    * @brief Clone the current block to a new identical block.
@@ -283,12 +283,12 @@ protected:
   /**
    * @brief Gets the target of the block.
    */
-  virtual NodeMaterialBlockTargets& get_target();
+  virtual std::optional<NodeMaterialBlockTargets>& get_target();
 
   /**
    * @brief Sets the target of the block.
    */
-  void set_target(const NodeMaterialBlockTargets& value);
+  void set_target(const std::optional<NodeMaterialBlockTargets>& value);
 
   /**
    * @brief Gets the list of input points.
@@ -311,7 +311,7 @@ protected:
   virtual std::string _dumpPropertiesCode();
 
 private:
-  void _processBuild(const NodeMaterialBlockPtr& block, const NodeMaterialBuildState& state,
+  void _processBuild(const NodeMaterialBlockPtr& block, NodeMaterialBuildState& state,
                      const NodeMaterialConnectionPointPtr& input,
                      const std::vector<NodeMaterialBlockPtr>& activeBlocks);
 
@@ -371,7 +371,7 @@ public:
 private:
   size_t _buildId;
   NodeMaterialBlockTargets _buildTarget;
-  NodeMaterialBlockTargets _target;
+  std::optional<NodeMaterialBlockTargets> _target;
   bool _isFinalMerger;
   bool _isInput;
 
