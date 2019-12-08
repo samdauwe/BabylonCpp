@@ -20,9 +20,7 @@ CrossBlock::CrossBlock(const std::string& iName)
   _linkConnectionTypes(0, 1);
 }
 
-CrossBlock::~CrossBlock()
-{
-}
+CrossBlock::~CrossBlock() = default;
 
 std::string CrossBlock::getClassName() const
 {

@@ -37,9 +37,7 @@ MorphTargetsBlock::MorphTargetsBlock(const std::string& iName)
   registerOutput("uvOutput", NodeMaterialBlockConnectionPointTypes::Vector2);
 }
 
-MorphTargetsBlock::~MorphTargetsBlock()
-{
-}
+MorphTargetsBlock::~MorphTargetsBlock() = default;
 
 std::string MorphTargetsBlock::getClassName() const
 {

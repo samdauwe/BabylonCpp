@@ -44,9 +44,7 @@ FogBlock::FogBlock(const std::string& iName)
     NodeMaterialBlockConnectionPointTypes::Color4);
 }
 
-FogBlock::~FogBlock()
-{
-}
+FogBlock::~FogBlock() = default;
 
 std::string FogBlock::getClassName() const
 {

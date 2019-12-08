@@ -22,9 +22,7 @@ LightInformationBlock::LightInformationBlock(const std::string& iName)
   registerOutput("color", NodeMaterialBlockConnectionPointTypes::Color3);
 }
 
-LightInformationBlock::~LightInformationBlock()
-{
-}
+LightInformationBlock::~LightInformationBlock() = default;
 
 std::string LightInformationBlock::getClassName() const
 {

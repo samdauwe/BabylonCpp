@@ -20,9 +20,7 @@ RemapBlock::RemapBlock(const std::string& iName)
   _outputs[0]->_typeConnectionSource = _inputs[0];
 }
 
-RemapBlock::~RemapBlock()
-{
-}
+RemapBlock::~RemapBlock() = default;
 
 std::string RemapBlock::getClassName() const
 {

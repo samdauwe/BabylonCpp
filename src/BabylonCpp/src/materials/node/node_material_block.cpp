@@ -31,9 +31,7 @@ NodeMaterialBlock::NodeMaterialBlock(const std::string& iName, NodeMaterialBlock
   uniqueId       = UniqueIdGenerator::UniqueId();
 }
 
-NodeMaterialBlock::~NodeMaterialBlock()
-{
-}
+NodeMaterialBlock::~NodeMaterialBlock() = default;
 
 bool NodeMaterialBlock::get_isFinalMerger() const
 {

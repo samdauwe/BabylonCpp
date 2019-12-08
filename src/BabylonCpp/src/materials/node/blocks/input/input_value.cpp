@@ -6,13 +6,9 @@ InputValue::InputValue() : _value{std::nullopt}
 {
 }
 
-InputValue::InputValue(const InputValue& other) : _value{other._value}
-{
-}
+InputValue::InputValue(const InputValue& other) = default;
 
-InputValue::InputValue(InputValue&& other) : _value{std::move(other._value)}
-{
-}
+InputValue::InputValue(InputValue&& other) = default;
 
 InputValue& InputValue::operator=(const InputValue& other)
 {

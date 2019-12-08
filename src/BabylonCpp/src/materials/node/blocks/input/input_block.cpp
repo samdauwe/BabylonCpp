@@ -44,9 +44,7 @@ InputBlock::InputBlock(const std::string& iName, NodeMaterialBlockTargets iTarge
   registerOutput("output", type);
 }
 
-InputBlock::~InputBlock()
-{
-}
+InputBlock::~InputBlock() = default;
 
 NodeMaterialBlockConnectionPointTypes& InputBlock::get_type()
 {

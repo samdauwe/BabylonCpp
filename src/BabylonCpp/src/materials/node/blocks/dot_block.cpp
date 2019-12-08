@@ -19,9 +19,7 @@ DotBlock::DotBlock(const std::string& iName)
   _linkConnectionTypes(0, 1);
 }
 
-DotBlock::~DotBlock()
-{
-}
+DotBlock::~DotBlock() = default;
 
 std::string DotBlock::getClassName() const
 {

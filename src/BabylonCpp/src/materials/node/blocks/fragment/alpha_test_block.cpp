@@ -18,9 +18,7 @@ AlphaTestBlock::AlphaTestBlock(const std::string& iName)
   registerInput("alpha", NodeMaterialBlockConnectionPointTypes::Float, true);
 }
 
-AlphaTestBlock::~AlphaTestBlock()
-{
-}
+AlphaTestBlock::~AlphaTestBlock() = default;
 
 std::string AlphaTestBlock::getClassName() const
 {

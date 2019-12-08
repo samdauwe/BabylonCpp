@@ -18,9 +18,7 @@ ClampBlock::ClampBlock(const std::string& iName)
   registerOutput("output", NodeMaterialBlockConnectionPointTypes::Float);
 }
 
-ClampBlock::~ClampBlock()
-{
-}
+ClampBlock::~ClampBlock() = default;
 
 std::string ClampBlock::getClassName() const
 {

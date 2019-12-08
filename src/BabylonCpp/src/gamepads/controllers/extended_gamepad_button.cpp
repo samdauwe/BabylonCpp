@@ -2,10 +2,6 @@
 
 namespace BABYLON {
 
-ExtendedGamepadButton::ExtendedGamepadButton()
-{
-}
-
 ExtendedGamepadButton::ExtendedGamepadButton(int value, bool touched,
                                              bool pressed)
     : MutableGamepadButton(value, touched, pressed)

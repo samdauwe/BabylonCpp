@@ -19,9 +19,7 @@ ScaleBlock::ScaleBlock(const std::string& iName)
   _outputs[0]->_typeConnectionSource = _inputs[0];
 }
 
-ScaleBlock::~ScaleBlock()
-{
-}
+ScaleBlock::~ScaleBlock() = default;
 
 std::string ScaleBlock::getClassName() const
 {

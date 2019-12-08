@@ -17,9 +17,7 @@ OppositeBlock::OppositeBlock(const std::string& iName)
   _outputs[0]->_typeConnectionSource = _inputs[0];
 }
 
-OppositeBlock::~OppositeBlock()
-{
-}
+OppositeBlock::~OppositeBlock() = default;
 
 std::string OppositeBlock::getClassName() const
 {

@@ -17,9 +17,7 @@ StepBlock::StepBlock(const std::string& iName)
   registerOutput("output", NodeMaterialBlockConnectionPointTypes::Float);
 }
 
-StepBlock::~StepBlock()
-{
-}
+StepBlock::~StepBlock() = default;
 
 std::string StepBlock::getClassName() const
 {

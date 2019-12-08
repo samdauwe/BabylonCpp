@@ -51,9 +51,7 @@ ReflectionTextureBlock::ReflectionTextureBlock(const std::string& iName)
                  NodeMaterialBlockTargets::Fragment);
 }
 
-ReflectionTextureBlock::~ReflectionTextureBlock()
-{
-}
+ReflectionTextureBlock::~ReflectionTextureBlock() = default;
 
 std::string ReflectionTextureBlock::getClassName() const
 {

@@ -17,9 +17,7 @@ TrigonometryBlock::TrigonometryBlock(const std::string& iName)
   registerInput("output", NodeMaterialBlockConnectionPointTypes::Float);
 }
 
-TrigonometryBlock::~TrigonometryBlock()
-{
-}
+TrigonometryBlock::~TrigonometryBlock() = default;
 
 std::string TrigonometryBlock::getClassName() const
 {

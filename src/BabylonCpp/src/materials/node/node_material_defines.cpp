@@ -44,9 +44,7 @@ NodeMaterialDefines::NodeMaterialDefines() : MaterialDefines{}
   };
 }
 
-NodeMaterialDefines::~NodeMaterialDefines()
-{
-}
+NodeMaterialDefines::~NodeMaterialDefines() = default;
 
 void NodeMaterialDefines::setValue(const std::string& name, bool value)
 {

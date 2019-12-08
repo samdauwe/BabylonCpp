@@ -54,9 +54,7 @@ NodeMaterial::NodeMaterial(const std::string& iName, Scene* iScene,
   _attachImageProcessingConfiguration(nullptr);
 }
 
-NodeMaterial::~NodeMaterial()
-{
-}
+NodeMaterial::~NodeMaterial() = default;
 
 INodeMaterialOptionsPtr& NodeMaterial::get_options()
 {

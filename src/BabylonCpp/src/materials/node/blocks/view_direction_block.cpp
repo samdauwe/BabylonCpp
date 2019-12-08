@@ -21,9 +21,7 @@ ViewDirectionBlock::ViewDirectionBlock(const std::string& iName)
   registerOutput("output", NodeMaterialBlockConnectionPointTypes::Vector3);
 }
 
-ViewDirectionBlock::~ViewDirectionBlock()
-{
-}
+ViewDirectionBlock::~ViewDirectionBlock() = default;
 
 std::string ViewDirectionBlock::getClassName() const
 {

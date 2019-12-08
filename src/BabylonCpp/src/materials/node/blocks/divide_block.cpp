@@ -20,9 +20,7 @@ DivideBlock::DivideBlock(const std::string& iName)
   _linkConnectionTypes(0, 1);
 }
 
-DivideBlock::~DivideBlock()
-{
-}
+DivideBlock::~DivideBlock() = default;
 
 std::string DivideBlock::getClassName() const
 {

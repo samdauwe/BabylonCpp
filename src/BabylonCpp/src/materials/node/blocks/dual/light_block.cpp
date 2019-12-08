@@ -37,9 +37,7 @@ LightBlock::LightBlock(const std::string& iName)
                  NodeMaterialBlockTargets::Fragment);
 }
 
-LightBlock::~LightBlock()
-{
-}
+LightBlock::~LightBlock() = default;
 
 std::string LightBlock::getClassName() const
 {

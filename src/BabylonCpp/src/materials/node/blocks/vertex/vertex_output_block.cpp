@@ -12,9 +12,7 @@ VertexOutputBlock::VertexOutputBlock(const std::string& iName)
 {
 }
 
-VertexOutputBlock::~VertexOutputBlock()
-{
-}
+VertexOutputBlock::~VertexOutputBlock() = default;
 
 std::string VertexOutputBlock::getClassName() const
 {

@@ -20,9 +20,7 @@ TransformBlock::TransformBlock(const std::string& iName)
   registerOutput("output", NodeMaterialBlockConnectionPointTypes::Vector4);
 }
 
-TransformBlock::~TransformBlock()
-{
-}
+TransformBlock::~TransformBlock() = default;
 
 std::string TransformBlock::getClassName() const
 {
