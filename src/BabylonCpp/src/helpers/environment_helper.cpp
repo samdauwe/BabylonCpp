@@ -15,10 +15,6 @@
 
 namespace BABYLON {
 
-constexpr const char* EnvironmentHelper::_groundTextureCDNUrl;
-constexpr const char* EnvironmentHelper::_skyboxTextureCDNUrl;
-constexpr const char* EnvironmentHelper::_environmentTextureCDNUrl;
-
 EnvironmentHelper::EnvironmentHelper(Scene* scene)
     : EnvironmentHelper(EnvironmentHelper::_getDefaultOptions(), scene)
 

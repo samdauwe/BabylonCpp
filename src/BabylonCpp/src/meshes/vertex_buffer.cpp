@@ -7,50 +7,7 @@
 
 namespace BABYLON {
 
-constexpr const char* VertexBuffer::PositionKind;
-constexpr const char* VertexBuffer::NormalKind;
-constexpr const char* VertexBuffer::TangentKind;
-constexpr const char* VertexBuffer::UVKind;
-constexpr const char* VertexBuffer::UV2Kind;
-constexpr const char* VertexBuffer::UV3Kind;
-constexpr const char* VertexBuffer::UV4Kind;
-constexpr const char* VertexBuffer::UV5Kind;
-constexpr const char* VertexBuffer::UV6Kind;
-constexpr const char* VertexBuffer::ColorKind;
-constexpr const char* VertexBuffer::MatricesIndicesKind;
-constexpr const char* VertexBuffer::MatricesWeightsKind;
-constexpr const char* VertexBuffer::MatricesIndicesExtraKind;
-constexpr const char* VertexBuffer::MatricesWeightsExtraKind;
-constexpr const char* VertexBuffer::World0Kind;
-constexpr const char* VertexBuffer::World1Kind;
-constexpr const char* VertexBuffer::World2Kind;
-constexpr const char* VertexBuffer::World3Kind;
-constexpr const char* VertexBuffer::CellInfoKind;
-constexpr const char* VertexBuffer::OptionsKind;
-constexpr const char* VertexBuffer::AgeKind;
-constexpr const char* VertexBuffer::LifeKind;
-constexpr const char* VertexBuffer::VelocityKind;
-constexpr const char* VertexBuffer::DirectionKind;
-constexpr const char* VertexBuffer::InitialDirectionKind;
-constexpr const char* VertexBuffer::OffsetKind;
-constexpr const char* VertexBuffer::SeedKind;
-constexpr const char* VertexBuffer::SizeKind;
-constexpr const char* VertexBuffer::AngleKind;
-constexpr const char* VertexBuffer::CellStartOffsetKind;
-constexpr const char* VertexBuffer::NoiseCoordinates1Kind;
-constexpr const char* VertexBuffer::NoiseCoordinates2Kind;
-constexpr const char* VertexBuffer::RemapDataKind;
-constexpr const char* VertexBuffer::InvertsKind;
-
-constexpr const unsigned int VertexBuffer::BYTE;
-constexpr const unsigned int VertexBuffer::UNSIGNED_BYTE;
-constexpr const unsigned int VertexBuffer::SHORT;
-constexpr const unsigned int VertexBuffer::UNSIGNED_SHORT;
-constexpr const unsigned int VertexBuffer::INT;
-constexpr const unsigned int VertexBuffer::UNSIGNED_INT;
-constexpr const unsigned int VertexBuffer::FLOAT;
-
-VertexBuffer::VertexBuffer(Engine* engine, const std::variant<Float32Array, Buffer*> data,
+VertexBuffer::VertexBuffer(Engine* engine, const std::variant<Float32Array, Buffer*>& data,
                            const std::string& kind, bool updatable,
                            const std::optional<bool>& postponeInternalCreation,
                            std::optional<size_t> stride, const std::optional<bool>& instanced,
