@@ -8,13 +8,10 @@ namespace BABYLON {
 
 ValueCondition::ValueCondition(ActionManager* actionManager,
                                const IAnimatablePtr& target,
-                               const std::string& propertyPath,
-                               AnimationValue* value, unsigned int operatorType)
+                               const std::string& propertyPath)
     : Condition{actionManager}
     , _propertyPath{propertyPath}
-    , _operatorType{operatorType}
     , _target{target}
-    , _value{value}
 {
   _effectiveTarget = _getEffectiveTarget(target, propertyPath);
   _property        = _getProperty(propertyPath);
