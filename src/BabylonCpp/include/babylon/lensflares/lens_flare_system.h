@@ -147,7 +147,7 @@ protected:
    * be a camera, a light or a mesh).
    * @param scene Define the scene the lens flare system belongs to
    */
-  LensFlareSystem(const std::string name, const LensFlareEmitterType& emitter, Scene* scene);
+  LensFlareSystem(const std::string& name, const LensFlareEmitterType& emitter, Scene* scene);
 
 private:
   [[nodiscard]] bool get_isEnabled() const;

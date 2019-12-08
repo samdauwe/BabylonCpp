@@ -6,8 +6,8 @@
 
 namespace BABYLON {
 
-LogMessage::LogMessage(unsigned int lvl, const std::string& ctx)
-    : _level{lvl}, _context{ctx}
+LogMessage::LogMessage(unsigned int level, const std::string& context)
+    : _level{level}, _context{context}
 {
   // Set timestamp
   _timestamp = Time::systemTimepointNow();
@@ -81,16 +81,16 @@ LogMessage& LogMessage::operator=(LogMessage&& otherLogMessage)
 
 LogMessage::~LogMessage() = default;
 
-std::ostream& operator<<(std::ostream& os, const LogMessage& logMessage)
+std::ostream& operator<<(std::ostream& os, const LogMessage& logMsg)
 {
-  os << '[' << Time::toIso8601Ms(logMessage.timestamp()) << "] "
-     << "[" << std::setw(5) << LogLevels::ToReadableLevel(logMessage.level())
+  os << '[' << Time::toIso8601Ms(logMsg.timestamp()) << "] "
+     << "[" << std::setw(5) << LogLevels::ToReadableLevel(logMsg.level())
      << "] "
-     << "[" << logMessage.context() << "::" << logMessage.function() << "] "
-     << "| " << logMessage.message();
+     << "[" << logMsg.context() << "::" << logMsg.function() << "] "
+     << "| " << logMsg.message();
   // Add file and line number for traces
-  if (logMessage.level() == LogLevels::LEVEL_TRACE) {
-    os << " (" << logMessage.file() << ":" << logMessage.lineNumber() << ")";
+  if (logMsg.level() == LogLevels::LEVEL_TRACE) {
+    os << " (" << logMsg.file() << ":" << logMsg.lineNumber() << ")";
   }
   return os;
 }

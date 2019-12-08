@@ -119,7 +119,7 @@ protected:
    * @param name Define the name in the scene
    * @param scene Define the scene the material belongs to
    */
-  MultiMaterial(const std::string name, Scene* scene);
+  MultiMaterial(const std::string& name, Scene* scene);
 
   /**
    * @brief Gets the list of Materials used within the multi material.

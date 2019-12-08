@@ -20,7 +20,7 @@ struct BABYLON_SHARED_EXPORT FaceDirectionInfo {
   ~FaceDirectionInfo(); // = default
   [[nodiscard]] FaceDirectionInfo copy() const;
   [[nodiscard]] std::unique_ptr<FaceDirectionInfo> clone() const;
-  friend std::ostream& operator<<(std::ostream& os, const FaceDirectionInfo& arc);
+  friend std::ostream& operator<<(std::ostream& os, const FaceDirectionInfo& faceDirectionInfo);
   friend bool operator==(const FaceDirectionInfo& lhs, const FaceDirectionInfo& rhs);
   friend bool operator!=(const FaceDirectionInfo& lhs, const FaceDirectionInfo& rhs);
 

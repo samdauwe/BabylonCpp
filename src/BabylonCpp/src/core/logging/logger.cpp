@@ -17,12 +17,12 @@ bool LogMessageHandler::takes(unsigned int level)
   return (level >= _minLevel) && (level <= _maxLevel);
 }
 
-void LogMessageHandler::handle(const LogMessage& logMessage)
+void LogMessageHandler::handle(const LogMessage& msg)
 {
-  if (_logMessageListeners.find(logMessage.level())
+  if (_logMessageListeners.find(msg.level())
       != _logMessageListeners.end()) {
-    for (auto& logMsgListener : _logMessageListeners[logMessage.level()]) {
-      (*logMsgListener)(LogMessage(logMessage));
+    for (auto& logMsgListener : _logMessageListeners[msg.level()]) {
+      (*logMsgListener)(LogMessage(msg));
     }
   }
 }

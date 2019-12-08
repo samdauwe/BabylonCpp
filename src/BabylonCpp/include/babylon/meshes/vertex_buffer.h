@@ -159,7 +159,7 @@ public:
    * @param normalized whether the data contains normalized data (optional)
    * @param useBytes set to true if stride and offset are in bytes (optional)
    */
-  VertexBuffer(Engine* engine, const std::variant<Float32Array, Buffer*> data,
+  VertexBuffer(Engine* engine, const std::variant<Float32Array, Buffer*>& data,
                const std::string& kind, bool updatable,
                const std::optional<bool>& postponeInternalCreation = std::nullopt,
                std::optional<size_t> stride                        = std::nullopt,

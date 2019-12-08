@@ -24,10 +24,10 @@
 
 namespace BABYLON {
 
-LensFlareSystem::LensFlareSystem(const std::string iName,
+LensFlareSystem::LensFlareSystem(const std::string& name,
                                  const LensFlareEmitterType& emitter,
                                  Scene* scene)
-    : name{iName}
+    : name{name}
     , borderLimit{300}
     , viewportBorder{0.f}
     , layerMask{0x0FFFFFFF}
@@ -46,7 +46,7 @@ LensFlareSystem::LensFlareSystem(const std::string iName,
   }
 
   _emitter = emitter;
-  id       = iName;
+  id       = name;
 
   meshesSelectionPredicate = [this](const AbstractMeshPtr& m) {
     return _scene->activeCamera() && m->material() && m->isVisible

@@ -20,7 +20,7 @@ struct BABYLON_SHARED_EXPORT FollowCameraInputsManager
    * @brief Instantiates a new FollowCameraInputsManager.
    * @param camera Defines the camera the inputs belong to
    */
-  FollowCameraInputsManager(FollowCamera* _camera);
+  FollowCameraInputsManager(FollowCamera* camera);
   ~FollowCameraInputsManager(); // = default
 
   /**
