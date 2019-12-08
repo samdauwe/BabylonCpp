@@ -326,7 +326,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(
   // Hover color change
   std::unordered_map<int, AbstractMeshPtr> pointerIds;
   _pointerObserver
-    = gizmoLayer->utilityLayerScene.get()->onPointerObservable.add(
+    = gizmoLayer->utilityLayerScene->onPointerObservable.add(
       [&](PointerInfo* pointerInfo, EventState& /*es*/) {
         if (!stl_util::contains(pointerIds,
                                 (pointerInfo->pointerEvent).pointerId)) {

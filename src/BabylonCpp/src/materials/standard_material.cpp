@@ -498,7 +498,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   auto scene      = getScene();
   auto definesPtr = std::static_pointer_cast<StandardMaterialDefines>(
     subMesh->_materialDefines);
-  auto& defines = *definesPtr.get();
+  auto& defines = *definesPtr;
   if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (defines._renderId == scene->getRenderId()) {
       return true;

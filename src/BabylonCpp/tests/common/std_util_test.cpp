@@ -177,7 +177,7 @@ TEST(TestStdUtil, contains)
     auto numbersFiltered = std::vector<std::reference_wrapper<const int>>{};
     std::for_each(numbers.begin(), numbers.end(), [&numbersFiltered](auto& v) {
       if (*v > 5) {
-        numbersFiltered.emplace_back(std::ref(*v.get()));
+        numbersFiltered.emplace_back(std::ref(*v));
       }
     });
 
