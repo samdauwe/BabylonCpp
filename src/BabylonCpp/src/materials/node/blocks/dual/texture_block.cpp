@@ -141,7 +141,7 @@ void TextureBlock::autoConfigure(const NodeMaterialPtr& material)
 {
   if (!uv()->isConnected()) {
     auto uvInput = material->getInputBlockByPredicate(
-      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name == "uv"; });
+      [](const InputBlockPtr& inputBlock) -> bool { return inputBlock->isAttribute() && inputBlock->name == "uv"; });
 
     if (!uvInput) {
       uvInput = InputBlock::New("uv");
