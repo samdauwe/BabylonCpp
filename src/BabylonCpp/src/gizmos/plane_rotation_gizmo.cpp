@@ -109,8 +109,8 @@ PlaneRotationGizmo::PlaneRotationGizmo(
           _planeNormalTowardsCamera, _rotationMatrix);
       }
       // Flip up vector depending on which side the camera is on
-      if (gizmoLayer->utilityLayerScene.get()->activeCamera()) {
-        auto camVec = gizmoLayer->utilityLayerScene.get()
+      if (gizmoLayer->utilityLayerScene->activeCamera()) {
+        auto camVec = gizmoLayer->utilityLayerScene
                         ->activeCamera()
                         ->position()
                         .subtract(attachedMesh()->position());
