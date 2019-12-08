@@ -228,7 +228,7 @@ public:
    * @param scale defines the scaling factor
    * @returns a new Vector2
    */
-  [[nodiscard]] Vector2 scale(float scaleVal) const;
+  [[nodiscard]] Vector2 scale(float iScale) const;
 
   /**
    * @brief Scale the current Vector2 values by a factor to a given Vector2.

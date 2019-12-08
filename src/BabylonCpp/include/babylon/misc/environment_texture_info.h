@@ -29,8 +29,7 @@ public:
    * @param parsedEnvironmentTextureInfo defines EnvironmentTextureInfo data
    * @returns the parsed raw texture data
    */
-  static EnvironmentTextureInfoPtr
-  Parse(const json& parsedEnvironmentTextureInfo);
+  static EnvironmentTextureInfoPtr Parse(const json& parsedManifest);
 
 public:
   /**

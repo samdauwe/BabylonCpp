@@ -936,7 +936,7 @@ public:
    * @param instancesCount defines the number of instances to draw (if
    * instanciation is enabled)
    */
-  virtual void drawElementsType(unsigned int fillMode, int indexStart, int verticesCount,
+  virtual void drawElementsType(unsigned int fillMode, int indexStart, int indexCount,
                                 int instancesCount = 0);
 
   /**

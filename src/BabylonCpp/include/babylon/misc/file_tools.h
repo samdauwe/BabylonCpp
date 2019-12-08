@@ -73,9 +73,9 @@ public:
   static void LoadFile(
     std::string url,
     const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
-                             const std::string& responseURL)>& callback,
-    const std::function<void(const ProgressEvent& event)>& progressCallBack = nullptr,
-    bool useArrayBuffer                                                     = false,
+                             const std::string& responseURL)>& onSuccess,
+    const std::function<void(const ProgressEvent& event)>& onProgress = nullptr,
+    bool useArrayBuffer                                               = false,
     const std::function<void(const std::string& message, const std::string& exception)>& onError
     = nullptr);
 
@@ -93,7 +93,7 @@ public:
    * @param buffer the string holding the image data
    * @return the decoded image
    */
-  static Image StringToImage(const std::string& buffer, bool flipVertically = false);
+  static Image StringToImage(const std::string& uri, bool flipVertically = false);
 
 private:
   /**

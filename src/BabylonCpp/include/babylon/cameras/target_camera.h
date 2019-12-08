@@ -163,7 +163,7 @@ protected:
   /**
    * @brief Set the current rotation of the camera.
    */
-  void set_rotation(const Vector3& value);
+  void set_rotation(const Vector3& newRotation);
 
 private:
   /**

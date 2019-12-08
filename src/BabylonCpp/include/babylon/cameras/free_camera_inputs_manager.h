@@ -22,7 +22,7 @@ struct BABYLON_SHARED_EXPORT FreeCameraInputsManager
    * @brief Instantiates a new FreeCameraInputsManager.
    * @param camera Defines the camera the inputs belong to
    */
-  FreeCameraInputsManager(FreeCamera* _camera);
+  FreeCameraInputsManager(FreeCamera* iCamera);
   ~FreeCameraInputsManager(); // = default
 
   /**

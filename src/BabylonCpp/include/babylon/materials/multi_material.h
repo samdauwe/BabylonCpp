@@ -77,7 +77,7 @@ public:
    * the parent instance
    * @returns the cloned material
    */
-  [[nodiscard]] MaterialPtr clone(const std::string& _name,
+  [[nodiscard]] MaterialPtr clone(const std::string& iName,
                                   bool cloneChildren = false) const override;
 
   /**
