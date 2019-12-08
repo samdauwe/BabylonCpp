@@ -608,7 +608,7 @@ void BoundingBoxGizmo::_updateScaleBoxes()
   }
 }
 
-void BoundingBoxGizmo::setEnabledRotationAxis(const std::string axis)
+void BoundingBoxGizmo::setEnabledRotationAxis(const std::string& axis)
 {
   size_t i = 0;
   for (auto& m : _rotateSpheresParent->getChildMeshes()) {

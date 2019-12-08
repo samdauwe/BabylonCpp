@@ -22,7 +22,7 @@
 namespace BABYLON {
 
 void ShaderProcessor::Process(const std::string& sourceCode, ProcessingOptions& options,
-                              const std::function<void(const std::string& migratedCode)> callback)
+                              const std::function<void(const std::string& migratedCode)>& callback)
 {
   _ProcessIncludes(sourceCode, options,
                    [&options, callback](const std::string& codeWithIncludes) -> void {
@@ -302,8 +302,8 @@ std::string ShaderProcessor::_ProcessShaderConversion(const std::string& sourceC
 void ShaderProcessor::_ProcessIncludes(const std::string& sourceCode, ProcessingOptions& options,
                                        const std::function<void(const std::string& data)>& callback)
 {
-  const auto re = "#include<(.+)>(\\((.*)\\))*(\\[(.*)\\])*";
-  std::regex regex(re, std::regex::optimize);
+  static std::string re = R"(#include<(.+)>(\((.*)\))*(\[(.*)\])*)";
+  static std::regex regex(re, std::regex::optimize);
   std::smatch match;
   std::regex_search(sourceCode, match, regex);
 

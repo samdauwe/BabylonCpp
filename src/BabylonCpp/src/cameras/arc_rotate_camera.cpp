@@ -649,7 +649,7 @@ void ArcRotateCamera::_onCollisionPositionChange(
   _collisionTriggered = false;
 }
 
-void ArcRotateCamera::zoomOn(const std::vector<AbstractMeshPtr> meshes,
+void ArcRotateCamera::zoomOn(const std::vector<AbstractMeshPtr>& meshes,
                              bool doNotUpdateMaxZ)
 {
   auto _meshes = meshes.empty() ? getScene()->getMeshes() : meshes;

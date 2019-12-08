@@ -58,7 +58,7 @@ public:
 
 private:
   FaceDirectionInfo _closestFace(const Vector3& targetDirection);
-  void _lookAtToRef(const Vector3& pos, Quaternion& ref, const Vector3 up = Vector3(0.f, 1.f, 0.f));
+  void _lookAtToRef(const Vector3& pos, Quaternion& ref, Vector3 up = Vector3(0.f, 1.f, 0.f));
 
 public:
   /**

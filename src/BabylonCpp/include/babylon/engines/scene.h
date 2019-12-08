@@ -1765,7 +1765,7 @@ private:
    */
   void _registerTransientComponents();
 
-  void _updatePointerPosition(const PointerEvent evt);
+  void _updatePointerPosition(const PointerEvent& evt);
   void _createUbo();
   void _createAlternateUbo();
   // Pointers handling

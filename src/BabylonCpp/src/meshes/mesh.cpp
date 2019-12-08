@@ -1824,7 +1824,7 @@ void Mesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 }
 
 Mesh& Mesh::applyDisplacementMap(const std::string& url, float minHeight, float maxHeight,
-                                 const std::function<void(Mesh* mesh)> onSuccess,
+                                 std::function<void(Mesh* mesh)> onSuccess,
                                  const std::optional<Vector2>& uvOffset,
                                  const std::optional<Vector2>& uvScale, bool forceUpdate)
 {
@@ -3499,7 +3499,7 @@ MeshPtr Mesh::MergeMeshes(const std::vector<MeshPtr>& meshes, bool disposeSource
       otherVertexData->transform(wm);
 
       if (vertexData) {
-        vertexData->merge(*otherVertexData.get(), allow32BitsIndices);
+        vertexData->merge(*otherVertexData, allow32BitsIndices);
       }
       else {
         vertexData = std::move(otherVertexData);

@@ -163,7 +163,7 @@ protected:
   void set_pointerY(int value);
 
 private:
-  void _updatePointerPosition(const PointerEvent evt);
+  void _updatePointerPosition(const PointerEvent& evt);
   void _processPointerMove(std::optional<PickingInfo>& pickResult, const PointerEvent& evt);
   // Pointers handling
   void _setRayOnPointerInfo(PointerInfo& pointerInfo);

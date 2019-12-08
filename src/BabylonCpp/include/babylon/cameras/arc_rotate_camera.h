@@ -148,7 +148,7 @@ public:
    * zooming on the mesh (this can happen if the mesh is big and the maxradius
    * pretty small for instance)
    */
-  void zoomOn(const std::vector<AbstractMeshPtr> meshes, bool doNotUpdateMaxZ = false);
+  void zoomOn(const std::vector<AbstractMeshPtr>& meshes, bool doNotUpdateMaxZ = false);
 
   /**
    * @brief Focus on a mesh or a bounding box. This adapts the target and

@@ -91,7 +91,7 @@ void InputManager::set_pointerY(int value)
   _pointerY = value;
 }
 
-void InputManager::_updatePointerPosition(const PointerEvent evt)
+void InputManager::_updatePointerPosition(const PointerEvent& evt)
 {
   auto canvasRect = _scene->getEngine()->getRenderingCanvasClientRect();
 

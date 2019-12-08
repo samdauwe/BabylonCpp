@@ -850,7 +850,7 @@ public:
    * @returns the Mesh.
    */
   Mesh& applyDisplacementMap(const std::string& url, float minHeight, float maxHeight,
-                             const std::function<void(Mesh* mesh)> onSuccess = nullptr,
+                             std::function<void(Mesh* mesh)> onSuccess = nullptr,
                              const std::optional<Vector2>& uvOffset          = std::nullopt,
                              const std::optional<Vector2>& uvScale           = std::nullopt,
                              bool boolforceUpdate                            = false);

@@ -947,7 +947,7 @@ void Scene::incrementRenderId()
   ++_renderId;
 }
 
-void Scene::_updatePointerPosition(const PointerEvent evt)
+void Scene::_updatePointerPosition(const PointerEvent& evt)
 {
   auto canvasRect = _engine->getRenderingCanvasClientRect();
 
