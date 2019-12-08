@@ -6045,6 +6045,8 @@ int Engine::GetExponentOfTwo(int value, int max, unsigned int mode)
     case Constants::SCALEMODE_CEILING:
       pot = Engine::CeilingPOT(value);
       break;
+    default:
+      throw std::runtime_error("Engine::GetExponentOfTwo: unexpected mode");
   }
 
   return std::min(pot, max);
