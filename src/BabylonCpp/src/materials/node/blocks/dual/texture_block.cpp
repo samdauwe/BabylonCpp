@@ -48,9 +48,7 @@ TextureBlock::TextureBlock(const std::string& iName)
     NodeMaterialBlockConnectionPointTypes::Vector4);
 }
 
-TextureBlock::~TextureBlock()
-{
-}
+TextureBlock::~TextureBlock() = default;
 
 std::string TextureBlock::getClassName() const
 {

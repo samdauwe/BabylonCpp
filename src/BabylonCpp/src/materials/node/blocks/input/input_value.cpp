@@ -28,9 +28,7 @@ InputValue& InputValue::operator=(InputValue&& other)
   return *this;
 }
 
-InputValue::~InputValue()
-{
-}
+InputValue::~InputValue() = default;
 
 InputValue InputValue::copy() const
 {
