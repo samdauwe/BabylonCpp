@@ -576,7 +576,7 @@ void Geometry::_applyToMesh(Mesh* mesh)
   }
 
   // indexBuffer
-  if (numOfMeshes == 1 && _indices.size() > 0) {
+  if (numOfMeshes == 1 && !_indices.empty()) {
     _indexBuffer = std::unique_ptr<GL::IGLBuffer>(_engine->createIndexBuffer(_indices));
   }
   if (_indexBuffer) {

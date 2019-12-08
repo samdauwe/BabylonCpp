@@ -58,7 +58,7 @@ ShaderDefineExpressionPtr ShaderProcessor::_ExtractOperation(const std::string& 
   std::regex regex(reStr, std::regex::optimize);
   std::smatch match;
 
-  if (std::regex_search(expression, match, regex) && match.size() > 0) {
+  if (std::regex_search(expression, match, regex) && !match.empty()) {
     return std::make_shared<ShaderDefineIsDefinedOperator>(String::trimCopy(match[1]),
                                                            expression[0] == '!');
   }
@@ -172,7 +172,7 @@ bool ShaderProcessor::_MoveCursor(ShaderCodeCursor& cursor, const ShaderCodeNode
     std::regex regex(reKeywords, std::regex::optimize);
     std::smatch matches;
 
-    if (std::regex_search(line, matches, regex) && matches.size() > 0) {
+    if (std::regex_search(line, matches, regex) && !matches.empty()) {
       auto keyword = matches[0];
 
       if (keyword == "#ifdef") {

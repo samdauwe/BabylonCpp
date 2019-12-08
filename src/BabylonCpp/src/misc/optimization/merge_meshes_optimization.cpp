@@ -45,7 +45,7 @@ bool MergeMeshesOptimization::_canBeMerged(const AbstractMeshPtr& abstractMesh)
     return false;
   }
 
-  if (mesh->instances.size() > 0) {
+  if (!mesh->instances.empty()) {
     return false;
   }
 

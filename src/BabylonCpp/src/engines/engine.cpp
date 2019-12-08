@@ -827,7 +827,7 @@ void Engine::_renderLoop()
     }
   }
 
-  if (_activeRenderLoops.size() > 0) {
+  if (!_activeRenderLoops.empty()) {
     // Register new frame
   }
   else {

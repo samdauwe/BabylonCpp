@@ -292,7 +292,7 @@ bool Light::canAffectMesh(AbstractMesh* mesh)
                    [mesh](const AbstractMeshPtr& includedOnlyMesh) {
                      return includedOnlyMesh.get() == mesh;
                    });
-  if (_includedOnlyMeshes.size() > 0 && it1 == _includedOnlyMeshes.end()) {
+  if (!_includedOnlyMeshes.empty() && it1 == _includedOnlyMeshes.end()) {
     return false;
   }
 
@@ -300,7 +300,7 @@ bool Light::canAffectMesh(AbstractMesh* mesh)
                           [mesh](const AbstractMeshPtr& excludedMesh) {
                             return excludedMesh.get() == mesh;
                           });
-  if (_excludedMeshes.size() > 0 && it2 != _excludedMeshes.end()) {
+  if (!_excludedMeshes.empty() && it2 != _excludedMeshes.end()) {
     return false;
   }
 

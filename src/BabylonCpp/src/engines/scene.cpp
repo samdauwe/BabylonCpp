@@ -1762,7 +1762,7 @@ bool Scene::isReady()
     auto _mesh = static_cast<Mesh*>(mesh.get());
     auto hardwareInstancedRendering
       = mesh->getClassName() == std::string("InstancedMesh")
-        || (engine->getCaps().instancedArrays && _mesh->instances.size() > 0);
+        || (engine->getCaps().instancedArrays && !_mesh->instances.empty());
 
     // Is Ready For Mesh
     for (const auto& step : _isReadyForMeshStage) {
@@ -1867,7 +1867,7 @@ void Scene::getWaitingItemsCount()
 
 bool Scene::get_isLoading() const
 {
-  return _pendingData.size() > 0;
+  return !_pendingData.empty();
 }
 
 void Scene::executeWhenReady(const std::function<void(Scene* scene, EventState& es)>& func)
@@ -4478,7 +4478,7 @@ Scene::_internalPickSprites(const Ray& ray, const std::function<bool(Sprite* spr
     camera = _activeCamera;
   }
 
-  if (spriteManagers.size() > 0) {
+  if (!spriteManagers.empty()) {
     for (const auto& spriteManager : spriteManagers) {
       if (!spriteManager->isPickable) {
         continue;
@@ -4565,7 +4565,7 @@ std::vector<PickingInfo> Scene::_internalMultiPickSprites(
     camera = activeCamera();
   }
 
-  if (spriteManagers.size() > 0) {
+  if (!spriteManagers.empty()) {
     for (const auto& spriteManager : spriteManagers) {
       if (!spriteManager->isPickable) {
         continue;

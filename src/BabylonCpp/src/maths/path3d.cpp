@@ -39,35 +39,35 @@ std::ostream& operator<<(std::ostream& os, const Path3D& path)
 {
   os << "{\"Raw\":" << path._raw;
   os << ",\"Curve\":[";
-  if (path._curve.size() > 0) {
+  if (!path._curve.empty()) {
     for (unsigned int i = 0; i < path._curve.size() - 1; ++i) {
       os << path._curve[i] << ",";
     }
     os << path._curve.back();
   }
   os << "],\"Distances\":[";
-  if (path._distances.size() > 0) {
+  if (!path._distances.empty()) {
     for (unsigned int i = 0; i < path._distances.size() - 1; ++i) {
       os << path._distances[i] << ",";
     }
     os << path._distances.back();
   }
   os << "],\"Tangents\":[";
-  if (path._tangents.size() > 0) {
+  if (!path._tangents.empty()) {
     for (unsigned int i = 0; i < path._tangents.size() - 1; ++i) {
       os << path._tangents[i] << ",";
     }
     os << path._tangents.back();
   }
   os << "],\"Normals\":[";
-  if (path._normals.size() > 0) {
+  if (!path._normals.empty()) {
     for (unsigned int i = 0; i < path._normals.size() - 1; ++i) {
       os << path._normals[i] << ",";
     }
     os << path._normals.back();
   }
   os << "],\"Binormals\":[";
-  if (path._binormals.size() > 0) {
+  if (!path._binormals.empty()) {
     for (unsigned int i = 0; i < path._binormals.size() - 1; ++i) {
       os << path._binormals[i] << ",";
     }

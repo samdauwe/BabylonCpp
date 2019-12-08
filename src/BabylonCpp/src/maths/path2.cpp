@@ -60,7 +60,7 @@ std::unique_ptr<Path2> Path2::clone() const
 std::ostream& operator<<(std::ostream& os, const Path2& path)
 {
   os << "{\"Points\":[";
-  if (path._points.size() > 0) {
+  if (!path._points.empty()) {
     for (unsigned int i = 0; i < path._points.size() - 1; ++i) {
       os << path._points[i] << ",";
     }

@@ -495,7 +495,7 @@ void PostProcess::dispose(Camera* camera)
   pCamera->detachPostProcess(this);
 
   const auto index = stl_util::index_of_raw_ptr(pCamera->_postProcesses, this);
-  if (index == 0 && pCamera->_postProcesses.size() > 0) {
+  if (index == 0 && !pCamera->_postProcesses.empty()) {
     auto firstPostProcess = _camera->_getFirstPostProcess();
     if (firstPostProcess) {
       firstPostProcess->markTextureDirty();
