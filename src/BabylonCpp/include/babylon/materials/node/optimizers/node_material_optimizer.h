@@ -15,7 +15,7 @@ using NodeMaterialBlockPtr = std::shared_ptr<NodeMaterialBlock>;
  * @brief Root class for all node material optimizers.
  */
 struct BABYLON_SHARED_EXPORT NodeMaterialOptimizer {
-
+  virtual ~NodeMaterialOptimizer() = default;
   /**
    * @brief Function used to optimize a NodeMaterial graph.
    * @param vertexOutputNodes defines the list of output nodes for the vertex
