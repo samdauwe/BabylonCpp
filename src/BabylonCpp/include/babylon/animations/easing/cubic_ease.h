@@ -32,7 +32,7 @@ public:
   [[nodiscard]] float easeInCore(float gradient) const override;
 
 protected:
-  CubicEase();
+  CubicEase() = default;
 
 }; // end of class CubicEase
 

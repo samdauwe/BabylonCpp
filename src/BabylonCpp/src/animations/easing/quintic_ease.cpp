@@ -2,10 +2,6 @@
 
 namespace BABYLON {
 
-QuinticEase::QuinticEase()
-{
-}
-
 QuinticEase::~QuinticEase() = default;
 
 float QuinticEase::easeInCore(float gradient) const

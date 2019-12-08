@@ -6,10 +6,6 @@
 
 namespace BABYLON {
 
-SineEase::SineEase()
-{
-}
-
 SineEase::~SineEase() = default;
 
 float SineEase::easeInCore(float gradient) const

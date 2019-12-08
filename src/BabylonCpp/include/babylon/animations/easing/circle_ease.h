@@ -32,7 +32,7 @@ public:
   [[nodiscard]] float easeInCore(float gradient) const override;
 
 protected:
-  CircleEase();
+  CircleEase() = default;
 
 }; // end of class CircleEase
 

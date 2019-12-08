@@ -23,9 +23,7 @@ FresnelBlock::FresnelBlock(const std::string& iName)
   registerOutput("fresnel", NodeMaterialBlockConnectionPointTypes::Float);
 }
 
-FresnelBlock::~FresnelBlock()
-{
-}
+FresnelBlock::~FresnelBlock() = default;
 
 std::string FresnelBlock::getClassName() const
 {

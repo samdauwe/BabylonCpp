@@ -32,7 +32,7 @@ public:
   [[nodiscard]] float easeInCore(float gradient) const override;
 
 protected:
-  QuinticEase();
+  QuinticEase() = default;
 
 }; // end of class QuinticEase
 

@@ -2,10 +2,6 @@
 
 namespace BABYLON {
 
-CubicEase::CubicEase()
-{
-}
-
 CubicEase::~CubicEase() = default;
 
 float CubicEase::easeInCore(float gradient) const
