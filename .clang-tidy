@@ -10,6 +10,8 @@ Checks:         '
 
                 hicpp-use-equals-default,
 
+                -bugprone-narrowing-conversions,
+
                 -clang-analyzer-optin.performance.Padding,
                 -clang-analyzer-security.insecureAPI.rand,
                 -clang-analyzer-security.FloatLoopCounter,
@@ -18,6 +20,8 @@ Checks:         '
                 -modernize-use-nodiscard,
                 -modernize-avoid-c-arrays,
                 -modernize-pass-by-value,
+                -modernize-make-shared,
+                -modernize-concat-nested-namespaces,
 
                 -readability-magic-numbers,
                 -readability-uppercase-literal-suffix,
@@ -26,6 +30,8 @@ Checks:         '
                 -readability-convert-member-functions-to-static,
                 -readability-isolate-declaration,
                 -readability-named-parameter,
+                -readability-else-after-return,
+                -readability-redundant-string-init,
 
                 -misc-non-private-member-variables-in-classes,
                 -misc-definitions-in-headers,
