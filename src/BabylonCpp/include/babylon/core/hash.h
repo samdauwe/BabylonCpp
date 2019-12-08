@@ -18,7 +18,7 @@ limitations under the License.
 #define BABYLON_CORE_HASH_H
 
 #include <cstddef>
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 
 #include <babylon/babylon_api.h>

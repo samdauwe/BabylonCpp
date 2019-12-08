@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 #include <babylon/core/hash.h>
-#include <ctype.h>
+#include <cctype>
 
 namespace BABYLON {
 
