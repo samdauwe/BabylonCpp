@@ -2008,7 +2008,7 @@ public:
   virtual void texImage2D(GLenum target, GLint level, GLint internalformat,
                           GLsizei width, GLsizei height, GLint border,
                           GLenum format, GLenum type,
-                          const Uint8Array* const pixels)
+                          const Uint8Array* const pixels) // NOLINT ([readability-avoid-const-params-in-decls])
     = 0;
 
   /**
