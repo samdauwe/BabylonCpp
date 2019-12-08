@@ -268,17 +268,17 @@ public:
 
   some& operator=(some&& s)
   {
-    return assign(std::move(s));
+    return assign(std::move(s)); // NOLINT
   }
-  some& operator=(some const& s)
+  some& operator=(some const& s) // NOLINT
   {
-    return assign(s);
+    return assign(s); // NOLINT
   }
 
   template <typename V, typename = none<decay<V>>>
   some& operator=(V&& v)
   {
-    return assign(std::forward<V>(v));
+    return assign(std::forward<V>(v)); // NOLINT
   }
 
   friend void swap(some& s, some& r)

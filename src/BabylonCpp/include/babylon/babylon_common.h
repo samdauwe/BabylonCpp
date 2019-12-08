@@ -159,7 +159,7 @@ public:
   WriteOnlyProperty& operator=(const WriteOnlyProperty&) = delete;
   WriteOnlyProperty(const WriteOnlyProperty&)            = delete;
 
-  C& operator=(T theValue)
+  C& operator=(T theValue) // NOLINT
   {
     (_object->*_setter)(theValue);
     return *_object;
@@ -186,7 +186,7 @@ public:
   WriteOnlyProperty& operator=(const WriteOnlyProperty&) = delete;
   WriteOnlyProperty(const WriteOnlyProperty&)            = delete;
 
-  C& operator=(const T& newValue)
+  C& operator=(const T& newValue) // NOLINT
   {
     (_object->*_setter)(newValue);
     return *_object;
@@ -240,7 +240,7 @@ public:
     return _attribute ? (_object->*_attribute) : (_object->*_getter)();
   }
 
-  C& operator=(T newValue)
+  C& operator=(T newValue) // NOLINT
   {
     if (_attribute) {
       (_object->*_attribute) = newValue;
@@ -306,7 +306,7 @@ public:
     return _attribute ? (_object->*_attribute) : (_object->*_getter)();
   }
 
-  C& operator=(const T& newValue)
+  C& operator=(const T& newValue) // NOLINT
   {
     if (_attribute) {
       (_object->*_attribute) = newValue;
