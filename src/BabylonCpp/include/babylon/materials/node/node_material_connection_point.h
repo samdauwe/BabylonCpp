@@ -169,6 +169,11 @@ public:
   std::vector<NodeMaterialBlockConnectionPointTypes> acceptedConnectionPointTypes;
 
   /**
+   * Gets or sets the additional types excluded by this connection point
+   */
+  std::vector<NodeMaterialBlockConnectionPointTypes> excludedConnectionPointTypes;
+
+  /**
    * Gets or sets the associated variable name in the shader
    */
   Property<NodeMaterialConnectionPoint, std::string> associatedVariableName;
