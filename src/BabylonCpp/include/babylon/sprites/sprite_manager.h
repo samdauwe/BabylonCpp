@@ -57,9 +57,20 @@ public:
    * potential sprite is will be used and not the closer)
    * @returns null if no hit or a PickingInfo
    */
-  std::optional<PickingInfo> intersects(const Ray ray, const CameraPtr& camera,
-                                        std::function<bool(Sprite* sprite)> predicate,
+  std::optional<PickingInfo> intersects(const Ray& ray, const CameraPtr& camera,
+                                        const std::function<bool(Sprite* sprite)>& predicate,
                                         bool fastCheck) override;
+
+  /**
+   * @brief Intersects the sprites with a ray.
+   * @param ray defines the ray to intersect with
+   * @param camera defines the current active camera
+   * @param predicate defines a predicate used to select candidate sprites
+   * @returns null if no hit or a PickingInfo array
+   */
+  std::vector<PickingInfo>
+  multiIntersects(const Ray& ray, const CameraPtr& camera,
+                  const std::function<bool(Sprite* sprite)>& predicate) override;
 
   /**
    * @brief Render all child sprites.
@@ -81,6 +92,8 @@ protected:
    * @param scene defines the hosting scene
    * @param epsilon defines the epsilon value to align texture (0.01 by default)
    * @param samplingMode defines the smapling mode to use with spritesheet
+   * @param fromPacked set to false; do not alter
+   * @param spriteJSON null otherwise a JSON object defining sprite sheet data; do not alter
    */
   SpriteManager(const std::string& name, const std::string& imgUrl, unsigned int capacity,
                 const ISize& cellSize, Scene* scene, float epsilon = 0.01f,
@@ -103,14 +116,20 @@ protected:
   void set_texture(const TexturePtr& value);
 
 private:
-  void _appendSpriteVertex(size_t index, const Sprite& sprite, int offsetX, int offsetY,
-                           int rowSize);
+  void _makePacked(const std::string& imgUrl, const std::string& spriteJSON);
+  void _appendSpriteVertex(size_t index, Sprite& sprite, int offsetX, int offsetY,
+                           const ISize& baseSize);
 
 public:
   /**
    * Defines the manager's name
    */
   std::string name;
+
+  /**
+   * A JSON object defining sprite sheet data
+   */
+  std::string spriteJSON;
 
   /**
    * Gets or sets a boolean indicating if the manager must consider scene fog
@@ -144,8 +163,24 @@ public:
   Property<SpriteManager, TexturePtr> texture;
 
 private:
+  /**
+   * Associative array from JSON sprite data file
+   */
+  std::string _cellData;
+
+  /**
+   * Array of sprite names from JSON sprite data file
+   */
+  std::vector<std::string> _spriteMap;
+
+  /**
+   * True when packed cell data from JSON file is ready
+   */
+  bool _packedAndReady;
+
   Observer<SpriteManager>::Ptr _onDisposeObserver;
   size_t _capacity;
+  bool _fromPacked;
   TexturePtr _spriteTexture;
   float _epsilon;
   Scene* _scene;

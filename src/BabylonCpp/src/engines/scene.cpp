@@ -4553,6 +4553,66 @@ Scene::pickSpriteWithRay(const Ray& ray, const std::function<bool(Sprite* sprite
   return _internalPickSprites(*_tempSpritePickingRay, predicate, fastCheck, camera);
 }
 
+std::vector<PickingInfo> Scene::_internalMultiPickSprites(
+  const Ray& ray, const std::function<bool(Sprite* sprite)>& predicate, CameraPtr& camera)
+{
+  std::vector<PickingInfo> pickingInfos;
+
+  if (!camera) {
+    if (!activeCamera()) {
+      return pickingInfos;
+    }
+    camera = activeCamera();
+  }
+
+  if (spriteManagers.size() > 0) {
+    for (const auto& spriteManager : spriteManagers) {
+      if (!spriteManager->isPickable) {
+        continue;
+      }
+
+      auto results = spriteManager->multiIntersects(ray, camera, predicate);
+
+      if (!results.empty()) {
+        pickingInfos = stl_util::concat(pickingInfos, results);
+      }
+    }
+  }
+
+  return pickingInfos;
+}
+
+std::vector<PickingInfo>
+Scene::multiPickSprite(int x, int y, const std::function<bool(Sprite* sprite)>& predicate,
+                       CameraPtr& camera)
+{
+  createPickingRayInCameraSpaceToRef(x, y, *_tempSpritePickingRay, camera);
+
+  return _internalMultiPickSprites(*_tempSpritePickingRay, predicate, camera);
+}
+
+std::vector<PickingInfo>
+Scene::multiPickSpriteWithRay(const Ray& ray, const std::function<bool(Sprite* sprite)>& predicate,
+                              CameraPtr& camera)
+{
+  std::vector<PickingInfo> pickingInfos;
+
+  if (!_tempSpritePickingRay) {
+    return pickingInfos;
+  }
+
+  if (!camera) {
+    if (!activeCamera()) {
+      return pickingInfos;
+    }
+    camera = activeCamera();
+  }
+
+  Ray::TransformToRef(ray, camera->getViewMatrix(), *_tempSpritePickingRay);
+
+  return _internalMultiPickSprites(*_tempSpritePickingRay, predicate, camera);
+}
+
 std::optional<PickingInfo> Scene::pickWithRay(
   const Ray& ray, const std::function<bool(const AbstractMeshPtr& mesh)>& predicate, bool fastCheck)
 {

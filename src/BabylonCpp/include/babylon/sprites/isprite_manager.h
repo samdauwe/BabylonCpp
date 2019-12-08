@@ -19,26 +19,24 @@ using CameraPtr = std::shared_ptr<Camera>;
 using SpritePtr = std::shared_ptr<Sprite>;
 
 /**
- * @brief Defines the minimum interface to fullfil in order to be a sprite
- * manager.
+ * @brief Defines the minimum interface to fullfil in order to be a sprite manager.
  */
 struct BABYLON_SHARED_EXPORT ISpriteManager : public IDisposable {
 
   /**
    * Restricts the camera to viewing objects with the same layerMask.
-   * A camera with a layerMask of 1 will render spriteManager.layerMask &
-   * camera.layerMask!== 0
+   * A camera with a layerMask of 1 will render spriteManager.layerMask & camera.layerMask!== 0
    */
   unsigned int layerMask = 0x0FFFFFFF;
 
   /**
-   * Gets or sets a boolean indicating if the mesh can be picked (by scene.pick
-   * for instance or through actions). Default is true
+   * Gets or sets a boolean indicating if the mesh can be picked (by scene.pick for instance or
+   * through actions). Default is true
    */
   bool isPickable = false;
 
   /**
-   * Specifies the rendering group id for this mesh (0 by default).
+   * Specifies the rendering group id for this mesh (0 by default)
    * @see
    * http://doc.babylonjs.com/resources/transparency_and_how_meshes_are_rendered#rendering-groups
    */
@@ -53,15 +51,25 @@ struct BABYLON_SHARED_EXPORT ISpriteManager : public IDisposable {
    * @brief Tests the intersection of a sprite with a specific ray.
    * @param ray The ray we are sending to test the collision
    * @param camera The camera space we are sending rays in
-   * @param predicate A predicate allowing excluding sprites from the list of
-   * object to test
-   * @param fastCheck Is the hit test done in a OOBB or AOBB fashion the faster,
-   * the less precise
+   * @param predicate A predicate allowing excluding sprites from the list of object to test
+   * @param fastCheck Is the hit test done in a OOBB or AOBB fashion the faster, the less precise
    * @returns picking info or null.
    */
   virtual std::optional<PickingInfo>
-  intersects(const Ray ray, const CameraPtr& camera,
-             std::function<bool(Sprite* sprite)> predicate, bool fastCheck)
+  intersects(const Ray& ray, const CameraPtr& camera,
+             const std::function<bool(Sprite* sprite)>& predicate, bool fastCheck)
+    = 0;
+
+  /**
+   * @brief Intersects the sprites with a ray.
+   * @param ray defines the ray to intersect with
+   * @param camera defines the current active camera
+   * @param predicate defines a predicate used to select candidate sprites
+   * @returns null if no hit or a PickingInfo array
+   */
+  virtual std::vector<PickingInfo>
+  multiIntersects(const Ray& ray, const CameraPtr& camera,
+                  const std::function<bool(Sprite* sprite)>& predicate)
     = 0;
 
   /**

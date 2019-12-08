@@ -126,18 +126,16 @@ public:
    */
   static unsigned int DragMovementThreshold;
   /**
-   * Time in milliseconds to wait to raise long press events if button is still
-   * pressed.
+   * Time in milliseconds to wait to raise long press events if button is still pressed.
    */
   static milliseconds_t LongPressDelay;
   /**
-   * Time in milliseconds with two consecutive clicks will be considered as a
-   * double click.
+   * Time in milliseconds with two consecutive clicks will be considered as a double click.
    */
   static milliseconds_t DoubleClickDelay;
   /**
-   * If you need to check double click without raising a single click at first
-   * click, enable this flag.
+   * If you need to check double click without raising a single click at first click, enable this
+   * flag.
    */
   static bool ExclusiveDoubleClickMode;
 
@@ -153,8 +151,8 @@ public:
 
   /**
    * @brief Add a component to the scene.
-   * Note that the component could be registered on th next frame if this is
-   * called after the register component stage.
+   * Note that the component could be registered on th next frame if this is called after the
+   * register component stage.
    * @param component Defines the component to add to the scene
    * Hidden
    */
@@ -209,8 +207,7 @@ public:
   /**
    * @brief Sets the default candidate providers for the scene.
    * This sets the getActiveMeshCandidates, getActiveSubMeshCandidates,
-   * getIntersectingSubMeshCandidates and getCollidingSubMeshCandidates to their
-   * default function
+   * getIntersectingSubMeshCandidates and getCollidingSubMeshCandidates to their default function
    */
   void setDefaultCandidateProviders();
 
@@ -300,8 +297,8 @@ public:
   const std::vector<AbstractMesh*>& getActiveMeshes() const;
 
   /**
-   * @brief Gets the animation ratio (which is 1.0 is the scene renders at 60fps
-   * and 2 if the scene renders at 30fps, etc.).
+   * @brief Gets the animation ratio (which is 1.0 is the scene renders at 60fps and 2 if the scene
+   * renders at 30fps, etc.).
    * @returns a number
    */
   float getAnimationRatio() const;
@@ -338,8 +335,7 @@ public:
   /**
    * @brief Use this method to simulate a pointer down on a mesh.
    * The pickResult parameter can be obtained from a scene.pick or scene.pickWithRay
-   * @param pickResult pickingInfo of the object wished to simulate pointer
-   * event on
+   * @param pickResult pickingInfo of the object wished to simulate pointer event on
    * @param pointerEventInit pointer event state to be used when simulating the pointer event (eg.
    * pointer id for multitouch)
    * @returns the current scene
@@ -348,8 +344,7 @@ public:
 
   /**
    * @brief Use this method to simulate a pointer up on a mesh.
-   * The pickResult parameter can be obtained from a scene.pick or
-   * scene.pickWithRay
+   * The pickResult parameter can be obtained from a scene.pick or scene.pickWithRay
    * @param pickResult pickingInfo of the object wished to simulate pointer event on
    * @param pointerEventInit pointer event state to be used when simulating the pointer event (eg.
    * pointer id for multitouch)
@@ -392,8 +387,7 @@ public:
   bool isReady();
 
   /**
-   * @brief Resets all cached information relative to material (including effect
-   * and visibility).
+   * @brief Resets all cached information relative to material (including effect and visibility).
    */
   void resetCachedMaterial();
 
@@ -472,15 +466,12 @@ public:
    * @param to defines until which frame should animation run.
    * @param weight defines the weight to apply to the animation (1.0 by default)
    * @param loop defines if the animation loops
-   * @param speedRatio defines the speed in which to run the animation (1.0 by
-   * default)
-   * @param onAnimationEnd defines the function to be executed when the
-   * animation ends
-   * @param animatable defines an animatable object. If not provided a new one
-   * will be created from the given params
-   * @param targetMask defines if the target should be animated if animations
-   * are present (this is called recursively on descendant animatables
-   * regardless of return value)
+   * @param speedRatio defines the speed in which to run the animation (1.0 by default)
+   * @param onAnimationEnd defines the function to be executed when the animation ends
+   * @param animatable defines an animatable object. If not provided a new one will be created from
+   * the given params
+   * @param targetMask defines if the target should be animated if animations are present (this is
+   * called recursively on descendant animatables regardless of return value)
    * @param onAnimationLoop defines the callback to call when an animation loops
    * @returns the animatable object created for this animation
    */
@@ -498,17 +489,13 @@ public:
    * @param from defines from which frame should animation start
    * @param to defines until which frame should animation run.
    * @param loop defines if the animation loops
-   * @param speedRatio defines the speed in which to run the animation (1.0 by
-   * default)
-   * @param onAnimationEnd defines the function to be executed when the
-   * animation ends
-   * @param animatable defines an animatable object. If not provided a new one
-   * will be created from the given params
-   * @param stopCurrent defines if the current animations must be stopped first
-   * (true by default)
-   * @param targetMask defines if the target should be animate if animations are
-   * present (this is called recursively on descendant animatables regardless of
-   * return value)
+   * @param speedRatio defines the speed in which to run the animation (1.0 by default)
+   * @param onAnimationEnd defines the function to be executed when the animation ends
+   * @param animatable defines an animatable object. If not provided a new one will be created from
+   * the given params
+   * @param stopCurrent defines if the current animations must be stopped first (true by default)
+   * @param targetMask defines if the target should be animate if animations are present (this is
+   * called recursively on descendant animatables regardless of return value)
    * @param onAnimationLoop defines the callback to call when an animation loops
    * @returns the animatable object created for this animation
    */
@@ -520,26 +507,21 @@ public:
                                const std::function<void()>& onAnimationLoop = nullptr);
 
   /**
-   * @brief Will start the animation sequence of a given target and its
-   * hierarchy.
+   * @brief Will start the animation sequence of a given target and its hierarchy.
    * @param target defines the target
-   * @param directDescendantsOnly if true only direct descendants will be used,
-   * if false direct and also indirect (children of children, an so on in a
-   * recursive manner) descendants will be used.
+   * @param directDescendantsOnly if true only direct descendants will be used, if false direct and
+   * also indirect (children of children, an so on in a recursive manner) descendants will be used.
    * @param from defines from which frame should animation start
    * @param to defines until which frame should animation run.
    * @param loop defines if the animation loops
-   * @param speedRatio defines the speed in which to run the animation (1.0 by
-   * default)
+   * @param speedRatio defines the speed in which to run the animation (1.0 by default)
    * @param onAnimationEnd defines the function to be executed when the
    * animation ends
-   * @param animatable defines an animatable object. If not provided a new one
-   * will be created from the given params
-   * @param stopCurrent defines if the current animations must be stopped first
-   * (true by default)
-   * @param targetMask defines if the target should be animated if animations
-   * are present (this is called recursively on descendant animatables
-   * regardless of return value)
+   * @param animatable defines an animatable object. If not provided a new one will be created from
+   * the given params
+   * @param stopCurrent defines if the current animations must be stopped first (true by default)
+   * @param targetMask defines if the target should be animated if animations are present (this is
+   * called recursively on descendant animatables regardless of return value)
    * @param onAnimationLoop defines the callback to call when an animation loops
    * @returns the list of created animatables
    */
@@ -559,8 +541,8 @@ public:
    * @param to defines the final value
    * @param loop defines if you want animation to loop (off by default)
    * @param speedRatio defines the speed ratio to apply to all animations
-   * @param onAnimationEnd defines the callback to call when an animation ends
-   * (will be called once per node)
+   * @param onAnimationEnd defines the callback to call when an animation ends (will be called once
+   * per node)
    * @param onAnimationLoop defines the callback to call when an animation loops
    * @returns the list of created animatables
    */
@@ -573,9 +555,8 @@ public:
   /**
    * @brief Begin a new animation on a given node and its hierarchy.
    * @param target defines the root node where the animation will take place
-   * @param directDescendantsOnly if true only direct descendants will be used,
-   * if false direct and also indirect (children of children, an so on in a
-   * recursive manner) descendants will be used.
+   * @param directDescendantsOnly if true only direct descendants will be used, if false direct and
+   * also indirect (children of children, an so on in a recursive manner) descendants will be used.
    * @param animations defines the list of animations to start
    * @param from defines the initial value
    * @param to defines the final value
@@ -611,11 +592,10 @@ public:
   /**
    * @brief Will stop the animation of the given target.
    * @param target - the target
-   * @param animationName - the name of the animation to stop (all animations
-   * will be stopped if both this and targetMask are empty)
-   * @param targetMask - a function that determines if the animation should be
-   * stopped based on its target (all animations will be stopped if both this
-   * and animationName are empty)
+   * @param animationName - the name of the animation to stop (all animations will be stopped if
+   * both this and targetMask are empty)
+   * @param targetMask - a function that determines if the animation should be stopped based on its
+   * target (all animations will be stopped if both this and animationName are empty)
    */
   void stopAnimation(const IAnimatablePtr& target, const std::string& animationName = "",
                      const std::function<bool(IAnimatable* target)>& targetMask = nullptr);
@@ -623,18 +603,16 @@ public:
   /**
    * @brief Will stop the animation of the given target.
    * @param target - the target
-   * @param animationName - the name of the animation to stop (all animations
-   * will be stopped if both this and targetMask are empty)
-   * @param targetMask - a function that determines if the animation should be
-   * stopped based on its target (all animations will be stopped if both this
-   * and animationName are empty)
+   * @param animationName - the name of the animation to stop (all animations will be stopped if
+   * both this and targetMask are empty)
+   * @param targetMask - a function that determines if the animation should be stopped based on its
+   * target (all animations will be stopped if both this and animationName are empty)
    */
   void stopAnimation(IAnimatable* target, const std::string& animationName = "",
                      const std::function<bool(IAnimatable* target)>& targetMask = nullptr);
 
   /**
-   * @brief Stops and removes all animations that have been applied to the
-   * scene.
+   * @brief Stops and removes all animations that have been applied to the scene.
    */
   void stopAllAnimations();
 
@@ -899,8 +877,8 @@ public:
   /**
    * @brief Switch active camera.
    * @param newCamera defines the new active camera
-   * @param attachControl defines if attachControl must be called for the new
-   * active camera (default: true)
+   * @param attachControl defines if attachControl must be called for the new active camera
+   * (default: true)
    */
   void switchActiveCamera(const CameraPtr& newCamera, bool attachControl = true);
 
@@ -1033,8 +1011,8 @@ public:
   /**
    * @brief Add a new geometry to this scene.
    * @param geometry defines the geometry to be added to the scene.
-   * @param force defines if the geometry must be pushed even if a geometry with
-   * this id already exists
+   * @param force defines if the geometry must be pushed even if a geometry with this id already
+   * exists
    * @return a boolean defining if the geometry was added or not
    */
   bool pushGeometry(const GeometryPtr& geometry, bool force = false);
@@ -1150,16 +1128,16 @@ public:
   SoundPtr getSoundByName(const std::string& name);
 
   /**
-   * @brief Gets a skeleton using a given id (if many are found, this function
-   * will pick the last one).
+   * @brief Gets a skeleton using a given id (if many are found, this function will pick the last
+   * one).
    * @param id defines the id to search for
    * @return the found skeleton or null if not found at all.
    */
   SkeletonPtr getLastSkeletonByID(const std::string& id);
 
   /**
-   * @brief Gets a skeleton using a given id (if many are found, this function
-   * will pick the first one).
+   * @brief Gets a skeleton using a given id (if many are found, this function will pick the first
+   * one).
    * @param id defines the id to search for
    * @return the found skeleton or null if not found at all.
    */
@@ -1180,8 +1158,8 @@ public:
   SkeletonPtr getSkeletonByName(const std::string& name);
 
   /**
-   * @brief Gets a morph target manager  using a given id (if many are found,
-   * this function will pick the last one).
+   * @brief Gets a morph target manager  using a given id (if many are found, this function will
+   * pick the last one).
    * @param id defines the id to search for
    * @return the found morph target manager or null if not found at all.
    */
@@ -1202,20 +1180,18 @@ public:
   bool isActiveMesh(const AbstractMeshPtr& mesh);
 
   /**
-   * @brief Clear the processed materials smart array preventing retention point
-   * in material dispose.
+   * @brief Clear the processed materials smart array preventing retention point in material
+   * dispose.
    */
   void freeProcessedMaterials();
 
   /**
-   * @brief Clear the active meshes smart array preventing retention point in
-   * mesh dispose.
+   * @brief Clear the active meshes smart array preventing retention point in mesh dispose.
    */
   void freeActiveMeshes();
 
   /**
-   * @brief Clear the info related to rendering groups preventing retention
-   * points during dispose.
+   * @brief Clear the info related to rendering groups preventing retention points during dispose.
    */
   void freeRenderingGroups();
 
@@ -1237,31 +1213,27 @@ public:
   IActiveMeshCandidateProvider* getActiveMeshCandidateProvider() const;
 
   /**
-   * @brief Use this function to stop evaluating active meshes. The current list
-   * will be keep alive between frames.
+   * @brief Use this function to stop evaluating active meshes. The current list will be keep alive
+   * between frames.
    * @returns the current scene
    */
   Scene& freezeActiveMeshes();
 
   /**
-   * @brief Use this function to restart evaluating active meshes on every
-   * frame.
+   * @brief Use this function to restart evaluating active meshes on every frame.
    * @returns the current scene
    */
   Scene& unfreezeActiveMeshes();
 
   /**
-   * @brief Update the transform matrix to update from the current active
-   * camera.
-   * @param force defines a boolean used to force the update even if cache is up
-   * to date
+   * @brief Update the transform matrix to update from the current active camera.
+   * @param force defines a boolean used to force the update even if cache is up to date
    */
   void updateTransformMatrix(bool force = false);
 
   /**
-   * @brief Defines an alternate camera (used mostly in VR-like scenario where
-   * two cameras can render the same scene from a slightly different point of
-   * view).
+   * @brief Defines an alternate camera (used mostly in VR-like scenario where two cameras can
+   * render the same scene from a slightly different point of view).
    * @param alternateCamera defines the camera to use
    */
   void updateAlternateTransformMatrix(Camera* alternateCamera);
@@ -1273,22 +1245,21 @@ public:
 
   /**
    * @brief Render the scene.
-   * @param updateCameras defines a boolean indicating if cameras must update
-   * according to their inputs (true by default)
-   * @param ignoreAnimations defines a boolean indicating if animations should
-   * not be executed (false by default)
+   * @param updateCameras defines a boolean indicating if cameras must update according to their
+   * inputs (true by default)
+   * @param ignoreAnimations defines a boolean indicating if animations should not be executed
+   * (false by default)
    */
   void render(bool updateCameras = true, bool ignoreAnimations = false);
 
   /** Rendering **/
 
   /**
-   * @brief Creates a depth renderer a given camera which contains a depth map
-   * which can be used for post processing.
-   * @param camera The camera to create the depth renderer on (default: scene's
-   * active camera)
-   * @param storeNonLinearDepth Defines whether the depth is stored linearly
-   * like in Babylon Shadows or directly like glFragCoord.z
+   * @brief Creates a depth renderer a given camera which contains a depth map which can be used for
+   * post processing.
+   * @param camera The camera to create the depth renderer on (default: scene's active camera)
+   * @param storeNonLinearDepth Defines whether the depth is stored linearly like in Babylon Shadows
+   * or directly like glFragCoord.z
    * @returns the created depth renderer
    */
   DepthRendererPtr enableDepthRenderer(const CameraPtr& camera  = nullptr,
@@ -1296,15 +1267,14 @@ public:
 
   /**
    * @brief Disables a depth renderer for a given camera.
-   * @param camera The camera to disable the depth renderer on (default: scene's
-   * active camera)
+   * @param camera The camera to disable the depth renderer on (default: scene's active camera)
    */
   void disableDepthRenderer(const CameraPtr& camera = nullptr);
 
   /**
    * @brief Enables a GeometryBufferRender and associates it with the scene.
-   * @param ratio defines the scaling ratio to apply to the renderer (1 by
-   * default which means same resolution)
+   * @param ratio defines the scaling ratio to apply to the renderer (1 by default which means same
+   * resolution)
    * @returns the GeometryBufferRenderer
    */
   GeometryBufferRendererPtr& enableGeometryBufferRenderer(float ratio = 1.f);
@@ -1333,8 +1303,8 @@ public:
 
   /**
    * @brief Call this function to reduce memory footprint of the scene.
-   * Vertex buffers will not store CPU data anymore (this will prevent picking,
-   * collisions or physics to work correctly)
+   * Vertex buffers will not store CPU data anymore (this will prevent picking, collisions or
+   * physics to work correctly)
    */
   void clearCachedVertexData();
 
@@ -1348,8 +1318,8 @@ public:
 
   /**
    * @brief Get the world extend vectors with an optional filter.
-   * @param filterPredicate the predicate - which meshes should be included when
-   * calculating the world size
+   * @param filterPredicate the predicate - which meshes should be included when calculating the
+   * world size
    * @returns {{ min: Vector3; max: Vector3 }} min and max vectors
    */
   MinMax getWorldExtends(const std::function<bool(const AbstractMeshPtr& mesh)>& filterPredicate
@@ -1371,11 +1341,10 @@ public:
    * @brief Creates a ray that can be used to pick in the scene.
    * @param x defines the x coordinate of the origin (on-screen)
    * @param y defines the y coordinate of the origin (on-screen)
-   * @param world defines the world matrix to use if you want to pick in object
-   * space (instead of world space)
+   * @param world defines the world matrix to use if you want to pick in object space (instead of
+   * world space)
    * @param camera defines the camera to use for the picking
-   * @param cameraViewSpace defines if picking will be done in view space (false
-   * by default)
+   * @param cameraViewSpace defines if picking will be done in view space (false by default)
    * @returns a Ray
    */
   Ray createPickingRay(int x, int y, Matrix& world, const CameraPtr& camera = nullptr,
@@ -1385,12 +1354,11 @@ public:
    * @brief Creates a ray that can be used to pick in the scene.
    * @param x defines the x coordinate of the origin (on-screen)
    * @param y defines the y coordinate of the origin (on-screen)
-   * @param world defines the world matrix to use if you want to pick in object
-   * space (instead of world space)
+   * @param world defines the world matrix to use if you want to pick in object space (instead of
+   * world space)
    * @param result defines the ray where to store the picking ray
    * @param camera defines the camera to use for the picking
-   * @param cameraViewSpace defines if picking will be done in view space (false
-   * by default)
+   * @param cameraViewSpace defines if picking will be done in view space (false by default)
    * @returns the current scene
    */
   Scene& createPickingRayToRef(int x, int y, const std::optional<Matrix>& world, Ray& result,
@@ -1419,13 +1387,11 @@ public:
    * @brief Launch a ray to try to pick a mesh in the scene.
    * @param x position on screen
    * @param y position on screen
-   * @param predicate Predicate function used to determine eligible meshes. Can
-   * be set to null. In this case, a mesh must be enabled, visible and with
-   * isPickable set to true
-   * @param fastCheck Launch a fast check only using the bounding boxes. Can be
-   * set to null.
-   * @param camera to use for computing the picking ray. Can be set to null. In
-   * this case, the scene.activeCamera will be used
+   * @param predicate Predicate function used to determine eligible meshes. Can be set to null. In
+   * this case, a mesh must be enabled, visible and with isPickable set to true
+   * @param fastCheck Launch a fast check only using the bounding boxes. Can be set to null.
+   * @param camera to use for computing the picking ray. Can be set to null. In this case, the
+   * scene.activeCamera will be used
    * @returns a PickingInfo
    */
   std::optional<PickingInfo>
@@ -1436,12 +1402,11 @@ public:
    * @brief Launch a ray to try to pick a sprite in the scene.
    * @param x position on screen
    * @param y position on screen
-   * @param predicate Predicate function used to determine eligible sprites. Can
-   * be set to null. In this case, a sprite must have isPickable set to true
-   * @param fastCheck Launch a fast check only using the bounding boxes. Can be
-   * set to null.
-   * @param camera camera to use for computing the picking ray. Can be set to
-   * null. In this case, the scene.activeCamera will be used
+   * @param predicate Predicate function used to determine eligible sprites. Can be set to null. In
+   * this case, a sprite must have isPickable set to true
+   * @param fastCheck Launch a fast check only using the bounding boxes. Can be set to null.
+   * @param camera camera to use for computing the picking ray. Can be set to null. In this case,
+   * the scene.activeCamera will be used
    * @returns a PickingInfo
    */
   std::optional<PickingInfo>
@@ -1449,19 +1414,56 @@ public:
              bool fastCheck = false, const CameraPtr& camera = nullptr);
 
   /**
-   * Use the given ray to pick a sprite in the scene
+   * @brief Use the given ray to pick a sprite in the scene.
    * @param ray The ray (in world space) to use to pick meshes
-   * @param predicate Predicate function used to determine eligible sprites. Can
-   * be set to null. In this case, a sprite must have isPickable set to true
-   * @param fastCheck Launch a fast check only using the bounding boxes. Can be
-   * set to null.
-   * @param camera camera to use. Can be set to null. In this case, the
-   * scene.activeCamera will be used
+   * @param predicate Predicate function used to determine eligible sprites. Can be set to null. In
+   * this case, a sprite must have isPickable set to true
+   * @param fastCheck Launch a fast check only using the bounding boxes. Can be set to null.
+   * @param camera camera to use. Can be set to null. In this case, the scene.activeCamera will be
+   * used
    * @returns a PickingInfo
    */
   std::optional<PickingInfo> pickSpriteWithRay(const Ray& ray,
                                                const std::function<bool(Sprite* sprite)>& predicate,
                                                bool fastCheck, CameraPtr& camera);
+
+  /**
+   * @brief Hidden
+   * @param ray
+   * @param predicate
+   * @param camera
+   * @return
+   */
+  std::vector<PickingInfo>
+  _internalMultiPickSprites(const Ray& ray, const std::function<bool(Sprite* sprite)>& predicate,
+                            CameraPtr& camera);
+
+  /**
+   * @brief Launch a ray to try to pick sprites in the scene
+   * @param x position on screen
+   * @param y position on screen
+   * @param predicate Predicate function used to determine eligible sprites. Can be set to null. In
+   * this case, a sprite must have isPickable set to true
+   * @param camera camera to use for computing the picking ray. Can be set to null. In this case,
+   * the scene.activeCamera will be used
+   * @returns a PickingInfo array
+   */
+  std::vector<PickingInfo> multiPickSprite(int x, int y,
+                                           const std::function<bool(Sprite* sprite)>& predicate,
+                                           CameraPtr& camera);
+
+  /**
+   * @brief Use the given ray to pick sprites in the scene
+   * @param ray The ray (in world space) to use to pick meshes
+   * @param predicate Predicate function used to determine eligible sprites. Can be set to null. In
+   * this case, a sprite must have isPickable set to true
+   * @param camera camera to use. Can be set to null. In this case, the scene.activeCamera will be
+   * used
+   * @returns a PickingInfo array
+   */
+  std::vector<PickingInfo>
+  multiPickSpriteWithRay(const Ray& ray, const std::function<bool(Sprite* sprite)>& predicate,
+                         CameraPtr& camera);
 
   /**
    * @brief Use the given ray to pick a mesh in the scene.
