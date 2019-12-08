@@ -232,7 +232,7 @@ inline float MoveTowards(float current, float target, float maxDelta)
     result = target;
   }
   else {
-    result = current + Scalar::Sign(target - current) * maxDelta;
+    result = current + Scalar::Signf(target - current) * maxDelta;
   }
   return result;
 }
