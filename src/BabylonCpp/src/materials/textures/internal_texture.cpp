@@ -12,20 +12,6 @@
 
 namespace BABYLON {
 
-constexpr unsigned int InternalTexture::DATASOURCE_UNKNOWN;
-constexpr unsigned int InternalTexture::DATASOURCE_URL;
-constexpr unsigned int InternalTexture::DATASOURCE_TEMP;
-constexpr unsigned int InternalTexture::DATASOURCE_RAW;
-constexpr unsigned int InternalTexture::DATASOURCE_DYNAMIC;
-constexpr unsigned int InternalTexture::DATASOURCE_RENDERTARGET;
-constexpr unsigned int InternalTexture::DATASOURCE_MULTIRENDERTARGET;
-constexpr unsigned int InternalTexture::DATASOURCE_CUBE;
-constexpr unsigned int InternalTexture::DATASOURCE_CUBERAW;
-constexpr unsigned int InternalTexture::DATASOURCE_CUBEPREFILTERED;
-constexpr unsigned int InternalTexture::DATASOURCE_RAW3D;
-constexpr unsigned int InternalTexture::DATASOURCE_DEPTHTEXTURE;
-constexpr unsigned int InternalTexture::DATASOURCE_CUBERAW_RGBD;
-
 InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource,
                                  bool delayAllocation)
     : isReady{false}
