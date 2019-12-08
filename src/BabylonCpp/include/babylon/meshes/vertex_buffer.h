@@ -105,6 +105,7 @@ public:
   static constexpr const char* NoiseCoordinates1Kind = "noiseCoordinates1";
   static constexpr const char* NoiseCoordinates2Kind = "noiseCoordinates2";
   static constexpr const char* RemapDataKind         = "remapData";
+  static constexpr const char* InvertsKind           = "inverts";
 
   /**
    * The byte type.

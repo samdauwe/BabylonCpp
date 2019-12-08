@@ -40,6 +40,7 @@ constexpr const char* VertexBuffer::CellStartOffsetKind;
 constexpr const char* VertexBuffer::NoiseCoordinates1Kind;
 constexpr const char* VertexBuffer::NoiseCoordinates2Kind;
 constexpr const char* VertexBuffer::RemapDataKind;
+constexpr const char* VertexBuffer::InvertsKind;
 
 constexpr const unsigned int VertexBuffer::BYTE;
 constexpr const unsigned int VertexBuffer::UNSIGNED_BYTE;
@@ -49,15 +50,13 @@ constexpr const unsigned int VertexBuffer::INT;
 constexpr const unsigned int VertexBuffer::UNSIGNED_INT;
 constexpr const unsigned int VertexBuffer::FLOAT;
 
-VertexBuffer::VertexBuffer(
-  Engine* engine, const std::variant<Float32Array, Buffer*> data,
-  const std::string& kind, bool updatable,
-  const std::optional<bool>& postponeInternalCreation,
-  std::optional<size_t> stride, const std::optional<bool>& instanced,
-  const std::optional<size_t>& offset, const std::optional<size_t>& size,
-  std::optional<unsigned int> iType, bool iNormalized, bool useBytes)
-    : instanceDivisor{this, &VertexBuffer::get_instanceDivisor,
-                      &VertexBuffer::set_instanceDivisor}
+VertexBuffer::VertexBuffer(Engine* engine, const std::variant<Float32Array, Buffer*> data,
+                           const std::string& kind, bool updatable,
+                           const std::optional<bool>& postponeInternalCreation,
+                           std::optional<size_t> stride, const std::optional<bool>& instanced,
+                           const std::optional<size_t>& offset, const std::optional<size_t>& size,
+                           std::optional<unsigned int> iType, bool iNormalized, bool useBytes)
+    : instanceDivisor{this, &VertexBuffer::get_instanceDivisor, &VertexBuffer::set_instanceDivisor}
 {
   if (std::holds_alternative<Buffer*>(data)) {
     _buffer      = std::get<Buffer*>(data);
@@ -86,23 +85,19 @@ VertexBuffer::VertexBuffer(
 
   auto buffer = _buffer ? _buffer : _ownedBuffer.get();
   if (useBytes) {
-    _size = size.has_value() ? *size :
-                               (stride ? (*stride / typeByteLength) :
-                                         VertexBuffer::DeduceStride(kind));
-    byteStride
-      = stride.has_value() ?
-          *stride :
-          buffer->byteStride ? buffer->byteStride : (_size * typeByteLength);
+    _size = size.has_value() ?
+              *size :
+              (stride ? (*stride / typeByteLength) : VertexBuffer::DeduceStride(kind));
+    byteStride = stride.has_value() ?
+                   *stride :
+                   buffer->byteStride ? buffer->byteStride : (_size * typeByteLength);
     byteOffset = offset.has_value() ? *offset : 0ull;
   }
   else {
-    _size = size.has_value() ?
-              *size :
-              stride ? *stride : VertexBuffer::DeduceStride(kind);
+    _size      = size.has_value() ? *size : stride ? *stride : VertexBuffer::DeduceStride(kind);
     byteStride = stride.has_value() ?
                    (*stride * typeByteLength) :
-                   (buffer->byteStride != 0 ? buffer->byteStride :
-                                              (_size * typeByteLength));
+                   (buffer->byteStride != 0 ? buffer->byteStride : (_size * typeByteLength));
     byteOffset = (offset.has_value() ? *offset : 0) * typeByteLength;
   }
 
@@ -205,8 +200,7 @@ GL::IGLBuffer* VertexBuffer::update(const Float32Array& data)
   return _getBuffer()->update(data);
 }
 
-GL::IGLBuffer* VertexBuffer::updateDirectly(const Float32Array& data,
-                                            size_t offset, bool useBytes)
+GL::IGLBuffer* VertexBuffer::updateDirectly(const Float32Array& data, size_t offset, bool useBytes)
 {
   return _getBuffer()->updateDirectly(data, offset, std::nullopt, useBytes);
 }
@@ -219,32 +213,29 @@ void VertexBuffer::dispose()
   }
 }
 
-void VertexBuffer::forEach(
-  size_t count, const std::function<void(float value, size_t index)>& callback)
+void VertexBuffer::forEach(size_t count,
+                           const std::function<void(float value, size_t index)>& callback)
 {
-  VertexBuffer::ForEach(_buffer->getData(), byteOffset, byteStride, _size, type,
-                        count, normalized, callback);
+  VertexBuffer::ForEach(_buffer->getData(), byteOffset, byteStride, _size, type, count, normalized,
+                        callback);
 }
 
 size_t VertexBuffer::DeduceStride(const std::string& kind)
 {
   // Deduce stride from kind
-  if (kind == VertexBuffer::UVKind || kind == VertexBuffer::UV2Kind
-      || kind == VertexBuffer::UV3Kind || kind == VertexBuffer::UV4Kind
-      || kind == VertexBuffer::UV5Kind || kind == VertexBuffer::UV6Kind) {
+  if (kind == VertexBuffer::UVKind || kind == VertexBuffer::UV2Kind || kind == VertexBuffer::UV3Kind
+      || kind == VertexBuffer::UV4Kind || kind == VertexBuffer::UV5Kind
+      || kind == VertexBuffer::UV6Kind) {
     return 2;
   }
-  else if (kind == VertexBuffer::NormalKind
-           || kind == VertexBuffer::PositionKind) {
+  else if (kind == VertexBuffer::NormalKind || kind == VertexBuffer::PositionKind) {
     return 3;
   }
-  else if (kind == VertexBuffer::ColorKind
-           || kind == VertexBuffer::MatricesIndicesKind
+  else if (kind == VertexBuffer::ColorKind || kind == VertexBuffer::MatricesIndicesKind
            || kind == VertexBuffer::MatricesIndicesExtraKind
            || kind == VertexBuffer::MatricesIndicesExtraKind
            || kind == VertexBuffer::MatricesWeightsKind
-           || kind == VertexBuffer::MatricesWeightsExtraKind
-           || kind == VertexBuffer::TangentKind) {
+           || kind == VertexBuffer::MatricesWeightsExtraKind || kind == VertexBuffer::TangentKind) {
     return 4;
   }
   else {
@@ -270,28 +261,25 @@ unsigned int VertexBuffer::GetTypeByteLength(unsigned int type)
   }
 }
 
-void VertexBuffer::ForEach(
-  const Float32Array& data, size_t byteOffset, size_t byteStride,
-  size_t componentCount, unsigned int /*componentType*/, size_t count,
-  bool /*normalized*/,
-  const std::function<void(float value, size_t index)>& callback)
+void VertexBuffer::ForEach(const Float32Array& data, size_t byteOffset, size_t byteStride,
+                           size_t componentCount, unsigned int /*componentType*/, size_t count,
+                           bool /*normalized*/,
+                           const std::function<void(float value, size_t index)>& callback)
 {
   auto offset = byteOffset / 4;
   auto stride = byteStride / 4;
   for (size_t index = 0; index < count; index += componentCount) {
-    for (size_t componentIndex = 0; componentIndex < componentCount;
-         componentIndex++) {
+    for (size_t componentIndex = 0; componentIndex < componentCount; componentIndex++) {
       callback(data[offset + componentIndex], index + componentIndex);
     }
     offset += stride;
   }
 }
 
-void VertexBuffer::ForEach(
-  const std::variant<ArrayBuffer, DataView>& data, size_t byteOffset,
-  size_t byteStride, size_t componentCount, unsigned int componentType,
-  size_t count, bool normalized,
-  const std::function<void(float value, size_t index)>& callback)
+void VertexBuffer::ForEach(const std::variant<ArrayBuffer, DataView>& data, size_t byteOffset,
+                           size_t byteStride, size_t componentCount, unsigned int componentType,
+                           size_t count, bool normalized,
+                           const std::function<void(float value, size_t index)>& callback)
 {
   DataView dataView = std::holds_alternative<ArrayBuffer>(data) ?
                         DataView(std::get<ArrayBuffer>(data)) :
@@ -299,10 +287,9 @@ void VertexBuffer::ForEach(
   auto componentByteLength = VertexBuffer::GetTypeByteLength(componentType);
   for (size_t index = 0; index < count; index += componentCount) {
     auto componentByteOffset = byteOffset;
-    for (size_t componentIndex = 0; componentIndex < componentCount;
-         componentIndex++) {
-      const auto value = VertexBuffer::_GetFloatValue(
-        dataView, componentType, componentByteOffset, normalized);
+    for (size_t componentIndex = 0; componentIndex < componentCount; componentIndex++) {
+      const auto value
+        = VertexBuffer::_GetFloatValue(dataView, componentType, componentByteOffset, normalized);
       callback(value, index + componentIndex);
       componentByteOffset += componentByteLength;
     }
@@ -310,8 +297,8 @@ void VertexBuffer::ForEach(
   }
 }
 
-float VertexBuffer::_GetFloatValue(const DataView& dataView, unsigned int type,
-                                   size_t byteOffset, bool normalized)
+float VertexBuffer::_GetFloatValue(const DataView& dataView, unsigned int type, size_t byteOffset,
+                                   bool normalized)
 {
   switch (type) {
     case VertexBuffer::BYTE: {
@@ -352,8 +339,7 @@ float VertexBuffer::_GetFloatValue(const DataView& dataView, unsigned int type,
       return dataView.getFloat32(byteOffset, true);
     }
     default: {
-      throw std::runtime_error("Invalid component type "
-                               + std::to_string(type));
+      throw std::runtime_error("Invalid component type " + std::to_string(type));
     }
   }
 }
