@@ -17,9 +17,9 @@ PostProcess::PostProcess(const std::string& iName, const std::string& fragmentUr
                          const std::vector<std::string>& parameters,
                          const std::vector<std::string>& samplers,
                          const std::variant<float, PostProcessOptions>& options,
-                         const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
-                         bool reusable, const std::string& defines, unsigned int textureType,
-                         const std::string& vertexUrl,
+                         const CameraPtr& camera, const std::optional<unsigned int>& samplingMode,
+                         Engine* engine, bool reusable, const std::string& defines,
+                         unsigned int textureType, const std::string& vertexUrl,
                          const std::unordered_map<std::string, unsigned int>& indexParameters,
                          bool blockCompilation)
     : name{iName}
@@ -70,7 +70,7 @@ PostProcess::PostProcess(const std::string& iName, const std::string& fragmentUr
   }
 
   _options                 = options;
-  renderTargetSamplingMode = samplingMode;
+  renderTargetSamplingMode = samplingMode.value_or(Constants::TEXTURE_NEAREST_SAMPLINGMODE);
   _reusable                = reusable;
   _textureType             = textureType;
 
@@ -300,7 +300,7 @@ InternalTexturePtr PostProcess::activate(const CameraPtr& camera,
       }
     }
 
-    if (renderTargetSamplingMode != Constants::TEXTURE_TRILINEAR_SAMPLINGMODE || alwaysForcePOT) {
+    if (renderTargetSamplingMode == Constants::TEXTURE_TRILINEAR_SAMPLINGMODE || alwaysForcePOT) {
       if (!std::holds_alternative<PostProcessOptions>(_options)) {
         desiredWidth = engine->needPOTTextures() ?
                          Engine::GetExponentOfTwo(desiredWidth, maxSize, scaleMode) :

@@ -32,7 +32,7 @@ protected:
   GlowBlurPostProcess(const std::string& name, const Vector2& direction, float kernel,
                       const std::variant<float, PostProcessOptions>& options,
                       const CameraPtr& camera,
-                      unsigned int samplingMode = TextureConstants::BILINEAR_SAMPLINGMODE,
+                      const std::optional<unsigned int>& samplingMode = std::nullopt,
                       Engine* engine = nullptr, bool reusable = false);
 
 public:

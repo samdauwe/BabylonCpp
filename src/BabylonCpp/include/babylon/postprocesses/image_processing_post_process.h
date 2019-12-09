@@ -44,7 +44,8 @@ public:
 
 protected:
   ImageProcessingPostProcess(const std::string& name, float renderRatio, const CameraPtr& camera,
-                             unsigned int samplingMode, Engine* engine, bool reusable = false,
+                             const std::optional<unsigned int>& samplingMode = std::nullopt,
+                             Engine* engine = nullptr, bool reusable = false,
                              unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
                              ImageProcessingConfiguration* imageProcessingConfiguration = nullptr);
 

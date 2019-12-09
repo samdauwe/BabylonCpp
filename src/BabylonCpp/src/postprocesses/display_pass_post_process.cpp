@@ -2,14 +2,12 @@
 
 namespace BABYLON {
 
-DisplayPassPostProcess::DisplayPassPostProcess(const std::string& iName,
-                                               float ratio,
+DisplayPassPostProcess::DisplayPassPostProcess(const std::string& iName, float ratio,
                                                const CameraPtr& camera,
-                                               unsigned int samplingMode,
+                                               const std::optional<unsigned int>& samplingMode,
                                                Engine* engine, bool reusable)
-    : PostProcess{iName,           "displayPass", {"passSampler"},
-                  {"passSampler"}, ratio,         camera,
-                  samplingMode,    engine,        reusable}
+    : PostProcess{iName,  "displayPass", {"passSampler"}, {"passSampler"}, ratio,
+                  camera, samplingMode,  engine,          reusable}
 {
 }
 

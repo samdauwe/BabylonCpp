@@ -10,9 +10,9 @@ namespace BABYLON {
 
 CircleOfConfusionPostProcess::CircleOfConfusionPostProcess(
   const std::string& iName, RenderTargetTexture* depthTexture,
-  const std::variant<float, PostProcessOptions>& options,
-  const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
-  bool reusable, unsigned int textureType, bool blockCompilation)
+  const std::variant<float, PostProcessOptions>& options, const CameraPtr& camera,
+  const std::optional<unsigned int>& samplingMode, Engine* engine, bool reusable,
+  unsigned int textureType, bool blockCompilation)
     : PostProcess{iName,
                   "circleOfConfusion",
                   {"cameraMinMaxZ", "focusDistance", "cocPrecalculation"},
@@ -44,12 +44,11 @@ CircleOfConfusionPostProcess::CircleOfConfusionPostProcess(
 
     // Circle of confusion calculation, See
     // https://developer.nvidia.com/gpugems/GPUGems/gpugems_ch23.html
-    float aperture = lensSize / fStop;
-    float cocPrecalculation
-      = ((aperture * focalLength)
-         / ((focusDistance - focalLength))); // * ((focusDistance -
-                                             // pixelDistance)/pixelDistance)
-                                             // [This part is done in shader]
+    float aperture          = lensSize / fStop;
+    float cocPrecalculation = ((aperture * focalLength)
+                               / ((focusDistance - focalLength))); // * ((focusDistance -
+                                                                   // pixelDistance)/pixelDistance)
+                                                                   // [This part is done in shader]
 
     effect->setFloat("focusDistance", focusDistance);
     effect->setFloat("cocPrecalculation", cocPrecalculation);
@@ -63,8 +62,7 @@ CircleOfConfusionPostProcess::CircleOfConfusionPostProcess(
 
 CircleOfConfusionPostProcess::~CircleOfConfusionPostProcess() = default;
 
-void CircleOfConfusionPostProcess::set_depthTexture(
-  const RenderTargetTexturePtr& value)
+void CircleOfConfusionPostProcess::set_depthTexture(const RenderTargetTexturePtr& value)
 {
   _depthTexture = value;
 }

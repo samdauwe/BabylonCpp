@@ -12,7 +12,8 @@ namespace BABYLON {
 
 MotionBlurPostProcess::MotionBlurPostProcess(const std::string& iName, Scene* scene,
                                              const std::variant<float, PostProcessOptions>& options,
-                                             const CameraPtr& camera, unsigned int samplingMode,
+                                             const CameraPtr& camera,
+                                             const std::optional<unsigned int>& samplingMode,
                                              Engine* engine, bool reusable,
                                              unsigned int textureType, bool blockCompilation)
     : PostProcess{iName,

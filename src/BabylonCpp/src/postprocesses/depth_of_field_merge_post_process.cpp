@@ -8,8 +8,8 @@ DepthOfFieldMergePostProcess::DepthOfFieldMergePostProcess(
   const std::string& iName, const PostProcessPtr& originalFromInput,
   const PostProcessPtr& circleOfConfusion, const std::vector<PostProcessPtr>& iBlurSteps,
   const std::variant<float, PostProcessOptions>& options, const CameraPtr& camera,
-  unsigned int samplingMode, Engine* engine, bool reusable, unsigned int textureType,
-  bool blockCompilation)
+  const std::optional<unsigned int>& samplingMode, Engine* engine, bool reusable,
+  unsigned int textureType, bool blockCompilation)
     : PostProcess{iName,        "depthOfFieldMerge",
                   {},           {"circleOfConfusionSampler", "blurStep0", "blurStep1", "blurStep2"},
                   options,      camera,

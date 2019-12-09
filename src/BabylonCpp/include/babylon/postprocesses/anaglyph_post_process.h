@@ -40,7 +40,7 @@ protected:
    */
   AnaglyphPostProcess(const std::string& name, float ratio,
                       const std::vector<CameraPtr>& rigCameras,
-                      unsigned int samplingMode = TextureConstants::NEAREST_SAMPLINGMODE,
+                      const std::optional<unsigned int>& samplingMode = std::nullopt,
                       Engine* engine = nullptr, bool reusable = false);
 
 private:

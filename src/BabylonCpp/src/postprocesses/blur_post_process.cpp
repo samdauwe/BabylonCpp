@@ -8,21 +8,19 @@
 
 namespace BABYLON {
 
-BlurPostProcess::BlurPostProcess(
-  const std::string& iName, const Vector2& iDrection, float kernel,
-  const std::variant<float, PostProcessOptions>& options,
-  const CameraPtr& camera, std::optional<unsigned int> samplingMode,
-  Engine* engine, bool reusable, unsigned int textureType,
-  const std::string& defines, bool iBlockCompilation)
+BlurPostProcess::BlurPostProcess(const std::string& iName, const Vector2& iDrection, float kernel,
+                                 const std::variant<float, PostProcessOptions>& options,
+                                 const CameraPtr& camera,
+                                 const std::optional<unsigned int>& samplingMode, Engine* engine,
+                                 bool reusable, unsigned int textureType,
+                                 const std::string& defines, bool iBlockCompilation)
     : PostProcess{iName,
                   "kernelBlur",
                   {"delta", "direction", "cameraMinMaxZ"},
                   {"circleOfConfusionSampler"},
                   options,
                   camera,
-                  samplingMode.has_value() ?
-                    *samplingMode :
-                    TextureConstants::BILINEAR_SAMPLINGMODE,
+                  samplingMode.value_or(TextureConstants::BILINEAR_SAMPLINGMODE),
                   engine,
                   reusable,
                   "",
@@ -32,8 +30,7 @@ BlurPostProcess::BlurPostProcess(
                   true}
     , direction{iDrection}
     , kernel{this, &BlurPostProcess::get_kernel, &BlurPostProcess::set_kernel}
-    , packedFloat{this, &BlurPostProcess::get_packedFloat,
-                  &BlurPostProcess::set_packedFloat}
+    , packedFloat{this, &BlurPostProcess::get_packedFloat, &BlurPostProcess::set_packedFloat}
     , _packedFloat{false}
     , _staticDefines{defines}
     , blockCompilation{iBlockCompilation}
@@ -42,14 +39,11 @@ BlurPostProcess::BlurPostProcess(
 
   onApplyObservable.add([&](Effect* effect, EventState&) {
     if (_outputTexture) {
-      effect->setFloat2(
-        "delta",
-        (1.f / static_cast<float>(_outputTexture->width)) * direction.x,
-        (1.f / static_cast<float>(_outputTexture->height)) * direction.y);
+      effect->setFloat2("delta", (1.f / static_cast<float>(_outputTexture->width)) * direction.x,
+                        (1.f / static_cast<float>(_outputTexture->height)) * direction.y);
     }
     else {
-      effect->setFloat2("delta",
-                        (1.f / static_cast<float>(width)) * direction.x,
+      effect->setFloat2("delta", (1.f / static_cast<float>(width)) * direction.x,
                         (1.f / static_cast<float>(height)) * direction.y);
     }
   });
@@ -147,19 +141,15 @@ void BlurPostProcess::_updateParameters(
       auto sharedCell = (j == centerIndex);
 
       auto weightLinear = (weights[i] + weights[j] * (sharedCell ? 0.5f : 1.f));
-      auto offsetLinear = static_cast<std::int32_t>(
-        offsets[i] + 1 / (1 + weights[i] / weights[j]));
+      auto offsetLinear = static_cast<std::int32_t>(offsets[i] + 1 / (1 + weights[i] / weights[j]));
 
       if (offsetLinear == 0) {
         linearSamplingMap.emplace_back(std::make_pair(offsets[i], weights[i]));
-        linearSamplingMap.emplace_back(
-          std::make_pair(offsets[i + 1], weights[i + 1]));
+        linearSamplingMap.emplace_back(std::make_pair(offsets[i + 1], weights[i + 1]));
       }
       else {
-        linearSamplingMap.emplace_back(
-          std::make_pair(offsetLinear, weightLinear));
-        linearSamplingMap.emplace_back(
-          std::make_pair(-offsetLinear, weightLinear));
+        linearSamplingMap.emplace_back(std::make_pair(offsetLinear, weightLinear));
+        linearSamplingMap.emplace_back(std::make_pair(-offsetLinear, weightLinear));
       }
     }
   }
@@ -177,12 +167,10 @@ void BlurPostProcess::_updateParameters(
   weights = linearSamplingWeights;
 
   // Generate shaders
-  int maxVaryingRows = getEngine()->getCaps().maxVaryingVectors;
-  int freeVaryingVec2
-    = std::max(maxVaryingRows, 0) - 1; // Because of sampleCenter
+  int maxVaryingRows  = getEngine()->getCaps().maxVaryingVectors;
+  int freeVaryingVec2 = std::max(maxVaryingRows, 0) - 1; // Because of sampleCenter
 
-  int varyingCount
-    = std::min(static_cast<int>(offsets.size()), freeVaryingVec2);
+  int varyingCount = std::min(static_cast<int>(offsets.size()), freeVaryingVec2);
 
   std::ostringstream defines;
   defines << _staticDefines;
@@ -191,21 +179,19 @@ void BlurPostProcess::_updateParameters(
   // handled manualy in the fragment shader.
   if (String::contains(_staticDefines, "DOF")) {
     defines << "#define CENTER_WEIGHT "
-            << _glslFloat(weights[static_cast<unsigned>(varyingCount) - 1])
-            << "\r\n";
+            << _glslFloat(weights[static_cast<unsigned>(varyingCount) - 1]) << "\r\n";
     --varyingCount;
   }
 
   for (int i = 0; i < varyingCount; ++i) {
-    defines << "#define KERNEL_OFFSET" << i << " "
-            << _glslFloat(static_cast<float>(offsets[i])) << "\r\n";
-    defines << "#define KERNEL_WEIGHT" << i << " "
-            << _glslFloat(static_cast<float>(weights[i])) << "\r\n";
+    defines << "#define KERNEL_OFFSET" << i << " " << _glslFloat(static_cast<float>(offsets[i]))
+            << "\r\n";
+    defines << "#define KERNEL_WEIGHT" << i << " " << _glslFloat(static_cast<float>(weights[i]))
+            << "\r\n";
   }
 
   unsigned int depCount = 0;
-  if (freeVaryingVec2 >= 0)
-  {
+  if (freeVaryingVec2 >= 0) {
     for (int i = freeVaryingVec2; i < static_cast<int>(offsets.size()); ++i) {
       defines << "#define KERNEL_DEP_OFFSET" << depCount << " "
               << _glslFloat(static_cast<float>(offsets[i])) << "\r\n";
@@ -222,9 +208,8 @@ void BlurPostProcess::_updateParameters(
   blockCompilation = false;
   PostProcess::updateEffect(
     defines.str(), {}, {},
-    {{"varyingCount", static_cast<unsigned>(varyingCount)},
-     {"depCount", depCount}},
-    onCompiled, onError);
+    {{"varyingCount", static_cast<unsigned>(varyingCount)}, {"depCount", depCount}}, onCompiled,
+    onError);
 }
 
 float BlurPostProcess::_nearestBestKernel(float idealKernel) const
@@ -233,8 +218,7 @@ float BlurPostProcess::_nearestBestKernel(float idealKernel) const
   Float32Array vec{v, v - 1, v + 1, v - 2, v + 2};
   for (auto k : vec) {
     if (!stl_util::almost_equal(std::fmod(k, 2.f), 0.f)
-        && (stl_util::almost_equal(std::fmod(std::floor(k / 2.f), 2.f), 0.f))
-        && k > 0.f) {
+        && (stl_util::almost_equal(std::fmod(std::floor(k / 2.f), 2.f), 0.f)) && k > 0.f) {
       return std::max(k, 3.f);
     }
   }
@@ -259,8 +243,7 @@ float BlurPostProcess::_gaussianWeight(float x) const
   return weight;
 }
 
-std::string BlurPostProcess::_glslFloat(float x,
-                                        unsigned int decimalFigures) const
+std::string BlurPostProcess::_glslFloat(float x, unsigned int decimalFigures) const
 {
   std::ostringstream oss;
   oss.precision(decimalFigures);

@@ -16,27 +16,27 @@
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/render_target_texture.h>
+#include <babylon/materials/textures/texture_constants.h>
 #include <babylon/meshes/_instances_batch.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 
-namespace 
-{
-  Color4 savedSceneClearColor;
-  Color4 sceneClearColor(0.f, 0.f, 0.f, 1.f);
-  } // namespace
+namespace {
+Color4 savedSceneClearColor;
+Color4 sceneClearColor(0.f, 0.f, 0.f, 1.f);
+} // namespace
 
 VolumetricLightScatteringPostProcess::VolumetricLightScatteringPostProcess(
-  const std::string& iName, float ratio, const CameraPtr& camera,
-  const MeshPtr& iMesh, unsigned int iSamples, unsigned int samplingMode,
-  Engine* engine, bool reusable, Scene* scene)
-    : PostProcess(
-      iName, "volumetricLightScattering",
-      {"decay", "exposure", "weight", "meshPositionOnScreen", "density"},
-      {"lightScatteringSampler"}, ratio, camera, samplingMode, engine, reusable,
-      "#define NUM_SAMPLES " + std::to_string(iSamples))
+  const std::string& iName, float ratio, const CameraPtr& camera, const MeshPtr& iMesh,
+  unsigned int iSamples, const std::optional<unsigned int>& samplingMode, Engine* engine,
+  bool reusable, Scene* scene)
+    : PostProcess(iName, "volumetricLightScattering",
+                  {"decay", "exposure", "weight", "meshPositionOnScreen", "density"},
+                  {"lightScatteringSampler"}, ratio, camera,
+                  samplingMode.value_or(TextureConstants::BILINEAR_SAMPLINGMODE), engine, reusable,
+                  "#define NUM_SAMPLES " + std::to_string(iSamples))
     , attachedNode{nullptr}
     , customMeshPosition{Vector3::Zero()}
     , useCustomMeshPosition{false}
@@ -51,15 +51,12 @@ VolumetricLightScatteringPostProcess::VolumetricLightScatteringPostProcess(
   auto scene_ = (camera == nullptr) ? scene : camera->getScene();
 
   auto engine_ = scene_->getEngine();
-  _viewPort
-    = Viewport(0, 0, 1, 1)
-        .toGlobal(engine_->getRenderWidth(), engine_->getRenderHeight());
+  _viewPort = Viewport(0, 0, 1, 1).toGlobal(engine_->getRenderWidth(), engine_->getRenderHeight());
 
   // Configure mesh
-  mesh = (iMesh != nullptr) ?
-           iMesh :
-           VolumetricLightScatteringPostProcess::CreateDefaultMesh(
-             "VolumetricLightScatteringMesh", scene);
+  mesh = (iMesh != nullptr) ? iMesh :
+                              VolumetricLightScatteringPostProcess::CreateDefaultMesh(
+                                "VolumetricLightScatteringMesh", scene);
 
   // Configure
   _createPass(scene, ratio);
@@ -91,8 +88,7 @@ std::string VolumetricLightScatteringPostProcess::getClassName() const
   return "VolumetricLightScatteringPostProcess";
 }
 
-bool VolumetricLightScatteringPostProcess::_isReady(SubMesh* subMesh,
-                                                    bool useInstances)
+bool VolumetricLightScatteringPostProcess::_isReady(SubMesh* subMesh, bool useInstances)
 {
   auto _mesh = subMesh->getMesh();
 
@@ -129,8 +125,7 @@ bool VolumetricLightScatteringPostProcess::_isReady(SubMesh* subMesh,
                          + std::to_string(mesh->numBoneInfluencers()));
     defines.emplace_back(
       "#define BonesPerMesh "
-      + std::to_string(mesh->skeleton() ? (mesh->skeleton()->bones.size() + 1) :
-                                          0));
+      + std::to_string(mesh->skeleton() ? (mesh->skeleton()->bones.size() + 1) : 0));
   }
   else {
     defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
@@ -148,25 +143,20 @@ bool VolumetricLightScatteringPostProcess::_isReady(SubMesh* subMesh,
     _cachedDefines = join;
 
     EffectCreationOptions options;
-    options.attributes = std::move(attribs);
-    options.uniformsNames
-      = {"world", "mBones", "viewProjection", "diffuseMatrix"};
-    options.samplers = {"diffuseSampler"};
-    options.defines  = std::move(join);
-    options.indexParameters
-      = {{"maxSimultaneousMorphTargets", mesh->numBoneInfluencers()}};
+    options.attributes      = std::move(attribs);
+    options.uniformsNames   = {"world", "mBones", "viewProjection", "diffuseMatrix"};
+    options.samplers        = {"diffuseSampler"};
+    options.defines         = std::move(join);
+    options.indexParameters = {{"maxSimultaneousMorphTargets", mesh->numBoneInfluencers()}};
 
-    _volumetricLightScatteringPass
-      = mesh->getScene()->getEngine()->createEffect(
-        "volumetricLightScatteringPass", options,
-        mesh->getScene()->getEngine());
+    _volumetricLightScatteringPass = mesh->getScene()->getEngine()->createEffect(
+      "volumetricLightScatteringPass", options, mesh->getScene()->getEngine());
   }
 
   return _volumetricLightScatteringPass->isReady();
 }
 
-void VolumetricLightScatteringPostProcess::setCustomMeshPosition(
-  const Vector3& position)
+void VolumetricLightScatteringPostProcess::setCustomMeshPosition(const Vector3& position)
 {
   customMeshPosition = position;
 }
@@ -180,8 +170,7 @@ void VolumetricLightScatteringPostProcess::dispose(Camera* camera)
 {
   camera->getScene()->customRenderTargets.erase(
     std::remove(camera->getScene()->customRenderTargets.begin(),
-                camera->getScene()->customRenderTargets.end(),
-                _volumetricLightScatteringRTT),
+                camera->getScene()->customRenderTargets.end(), _volumetricLightScatteringRTT),
     camera->getScene()->customRenderTargets.end());
 
   _volumetricLightScatteringRTT->dispose();
@@ -193,24 +182,21 @@ RenderTargetTexturePtr& VolumetricLightScatteringPostProcess::getPass()
   return _volumetricLightScatteringRTT;
 }
 
-bool VolumetricLightScatteringPostProcess::_meshExcluded(
-  const AbstractMeshPtr& mesh_)
+bool VolumetricLightScatteringPostProcess::_meshExcluded(const AbstractMeshPtr& mesh_)
 {
   return !excludedMeshes.empty()
 
          && (stl_util::index_of(excludedMeshes, mesh_) != -1);
 }
 
-void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
-                                                       float ratio)
+void VolumetricLightScatteringPostProcess::_createPass(Scene* scene, float ratio)
 {
   auto engine = scene->getEngine();
 
   _volumetricLightScatteringRTT = RenderTargetTexture::New(
     "volumetricLightScatteringMap",
-    ISize(
-      static_cast<int>(static_cast<float>(engine->getRenderWidth()) * ratio),
-      static_cast<int>(static_cast<float>(engine->getRenderHeight()) * ratio)),
+    ISize(static_cast<int>(static_cast<float>(engine->getRenderWidth()) * ratio),
+          static_cast<int>(static_cast<float>(engine->getRenderHeight()) * ratio)),
     scene, false, true, Constants::TEXTURETYPE_UNSIGNED_INT);
   _volumetricLightScatteringRTT->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
   _volumetricLightScatteringRTT->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
@@ -273,60 +259,55 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
       else {
         auto iMterial = subMesh->getMaterial();
 
-        _volumetricLightScatteringPass->setMatrix("viewProjection",
-                                                  scene_->getTransformMatrix());
+        _volumetricLightScatteringPass->setMatrix("viewProjection", scene_->getTransformMatrix());
 
         // Alpha test
         if (iMterial && iMterial->needAlphaTesting()) {
           auto alphaTexture = iMterial->getAlphaTestTexture();
 
-          _volumetricLightScatteringPass->setTexture("diffuseSampler",
-                                                     alphaTexture);
+          _volumetricLightScatteringPass->setTexture("diffuseSampler", alphaTexture);
 
           if (alphaTexture) {
-            _volumetricLightScatteringPass->setMatrix(
-              "diffuseMatrix", *alphaTexture->getTextureMatrix());
+            _volumetricLightScatteringPass->setMatrix("diffuseMatrix",
+                                                      *alphaTexture->getTextureMatrix());
           }
         }
 
         // Bones
-        if (mesh->useBones() && mesh->computeBonesUsingShaders()
-            && mesh->skeleton()) {
+        if (mesh->useBones() && mesh->computeBonesUsingShaders() && mesh->skeleton()) {
           _volumetricLightScatteringPass->setMatrices(
             "mBones", mesh->skeleton()->getTransformMatrices(mesh.get()));
         }
       }
 
       // Draw
-      mesh->_processRendering(subMesh, _volumetricLightScatteringPass,
-                              Material::TriangleFillMode, batch,
-                              hardwareInstancedRendering,
-                              [effect](bool /*isInstance*/, Matrix world,
-                                  Material* /*effectiveMaterial*/) {
-                                effect->setMatrix("world", world);
-                              });
+      mesh->_processRendering(
+        subMesh, _volumetricLightScatteringPass, Material::TriangleFillMode, batch,
+        hardwareInstancedRendering,
+        [effect](bool /*isInstance*/, Matrix world, Material* /*effectiveMaterial*/) {
+          effect->setMatrix("world", world);
+        });
     }
   };
 
   // Render target texture callbacks
-  //Color4 savedSceneClearColor;
-  //Color4 sceneClearColor(0.f, 0.f, 0.f, 1.f);
+  // Color4 savedSceneClearColor;
+  // Color4 sceneClearColor(0.f, 0.f, 0.f, 1.f);
 
-  _volumetricLightScatteringRTT->onBeforeRenderObservable.add(
-    [scene](int*, EventState&) {
-      savedSceneClearColor = scene->clearColor;
-      scene->clearColor    = sceneClearColor;
-    });
+  _volumetricLightScatteringRTT->onBeforeRenderObservable.add([scene](int*, EventState&) {
+    savedSceneClearColor = scene->clearColor;
+    scene->clearColor    = sceneClearColor;
+  });
 
   _volumetricLightScatteringRTT->onAfterRenderObservable.add(
     [scene](int*, EventState&) { scene->clearColor = savedSceneClearColor; });
 
   _volumetricLightScatteringRTT->customRenderFunction
     = [scene, engine, renderSubMesh](const std::vector<SubMesh*>& opaqueSubMeshes,
-          const std::vector<SubMesh*>& alphaTestSubMeshes,
-          const std::vector<SubMesh*>& transparentSubMeshes,
-          const std::vector<SubMesh*>& depthOnlySubMeshes,
-          const std::function<void()>& /*beforeTransparents*/) {
+                                     const std::vector<SubMesh*>& alphaTestSubMeshes,
+                                     const std::vector<SubMesh*>& transparentSubMeshes,
+                                     const std::vector<SubMesh*>& depthOnlySubMeshes,
+                                     const std::function<void()>& /*beforeTransparents*/) {
         auto pEngine = scene->getEngine();
 
         if (!depthOnlySubMeshes.empty()) {
@@ -353,35 +334,32 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
             if (scene->activeCamera()) {
               submesh->_alphaIndex = submesh->getMesh()->alphaIndex;
               submesh->_distanceToCamera
-                = boundingInfo.boundingSphere.centerWorld
-                    .subtract(scene->activeCamera()->position)
+                = boundingInfo.boundingSphere.centerWorld.subtract(scene->activeCamera()->position)
                     .length();
             }
           }
 
-          auto sortedArray
-            = stl_util::slice(transparentSubMeshes, 0,
-                              static_cast<int>(transparentSubMeshes.size()));
-          BABYLON::stl_util::sort_js_style(sortedArray,
-                    [](const SubMesh* a, const SubMesh* b) {
-                      // Alpha index first
-                      if (a->_alphaIndex > b->_alphaIndex) {
-                        return 1;
-                      }
-                      if (a->_alphaIndex < b->_alphaIndex) {
-                        return -1;
-                      }
+          auto sortedArray = stl_util::slice(transparentSubMeshes, 0,
+                                             static_cast<int>(transparentSubMeshes.size()));
+          BABYLON::stl_util::sort_js_style(sortedArray, [](const SubMesh* a, const SubMesh* b) {
+            // Alpha index first
+            if (a->_alphaIndex > b->_alphaIndex) {
+              return 1;
+            }
+            if (a->_alphaIndex < b->_alphaIndex) {
+              return -1;
+            }
 
-                      // Then distance to camera
-                      if (a->_distanceToCamera < b->_distanceToCamera) {
-                        return 1;
-                      }
-                      if (a->_distanceToCamera > b->_distanceToCamera) {
-                        return -1;
-                      }
+            // Then distance to camera
+            if (a->_distanceToCamera < b->_distanceToCamera) {
+              return 1;
+            }
+            if (a->_distanceToCamera > b->_distanceToCamera) {
+              return -1;
+            }
 
-                      return 0;
-                    });
+            return 0;
+          });
 
           // Render sub meshes
           pEngine->setAlphaMode(Constants::ALPHA_COMBINE);
@@ -393,8 +371,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
       };
 }
 
-void VolumetricLightScatteringPostProcess::_updateMeshScreenCoordinates(
-  Scene* scene)
+void VolumetricLightScatteringPostProcess::_updateMeshScreenCoordinates(Scene* scene)
 {
   auto transform = scene->getTransformMatrix();
   Vector3 meshPosition;
@@ -406,13 +383,11 @@ void VolumetricLightScatteringPostProcess::_updateMeshScreenCoordinates(
     meshPosition = *attachedNode;
   }
   else {
-    meshPosition
-      = mesh->parent() ? mesh->getAbsolutePosition() : mesh->position();
+    meshPosition = mesh->parent() ? mesh->getAbsolutePosition() : mesh->position();
   }
 
   auto identityMatrix = Matrix::Identity();
-  auto pos
-    = Vector3::Project(meshPosition, identityMatrix, transform, _viewPort);
+  auto pos            = Vector3::Project(meshPosition, identityMatrix, transform, _viewPort);
 
   _screenCoordinates.x = pos.x / static_cast<float>(_viewPort.width);
   _screenCoordinates.y = pos.y / static_cast<float>(_viewPort.height);
@@ -422,8 +397,8 @@ void VolumetricLightScatteringPostProcess::_updateMeshScreenCoordinates(
   }
 }
 
-MeshPtr VolumetricLightScatteringPostProcess::CreateDefaultMesh(
-  const std::string& iName, Scene* scene)
+MeshPtr VolumetricLightScatteringPostProcess::CreateDefaultMesh(const std::string& iName,
+                                                                Scene* scene)
 {
   auto mesh           = Mesh::CreatePlane(iName, 1.f, scene);
   mesh->billboardMode = AbstractMesh::BILLBOARDMODE_ALL;

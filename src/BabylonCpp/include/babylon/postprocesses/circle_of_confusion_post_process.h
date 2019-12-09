@@ -41,7 +41,8 @@ public:
    */
   CircleOfConfusionPostProcess(const std::string& name, RenderTargetTexture* depthTexture,
                                const std::variant<float, PostProcessOptions>& options,
-                               const CameraPtr& camera, unsigned int samplingMode = 0,
+                               const CameraPtr& camera,
+                               const std::optional<unsigned int>& samplingMode = std::nullopt,
                                Engine* engine = nullptr, bool reusable = false,
                                unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
                                bool blockCompilation    = false);

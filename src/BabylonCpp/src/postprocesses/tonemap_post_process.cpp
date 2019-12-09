@@ -6,14 +6,22 @@
 
 namespace BABYLON {
 
-TonemapPostProcess::TonemapPostProcess(
-  const std::string& iName, const TonemappingOperator& operator_,
-  float exposureAdjustment, const CameraPtr& camera, unsigned int samplingMode,
-  Engine* engine, unsigned int textureFormat)
-    : PostProcess{iName,        "tonemap",    {"_ExposureAdjustment"},
-                  {},           1.f,          camera,
-                  samplingMode, engine,       true,
-                  "",           textureFormat}
+TonemapPostProcess::TonemapPostProcess(const std::string& iName,
+                                       const TonemappingOperator& operator_,
+                                       float exposureAdjustment, const CameraPtr& camera,
+                                       const std::optional<unsigned int>& samplingMode,
+                                       Engine* engine, unsigned int textureFormat)
+    : PostProcess{iName,
+                  "tonemap",
+                  {"_ExposureAdjustment"},
+                  {},
+                  1.f,
+                  camera,
+                  samplingMode.value_or(Constants::TEXTURE_BILINEAR_SAMPLINGMODE),
+                  engine,
+                  true,
+                  "",
+                  textureFormat}
     , _operator{operator_}
 {
   std::ostringstream defines;

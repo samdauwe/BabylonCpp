@@ -3,16 +3,27 @@
 #include <babylon/core/string.h>
 #include <babylon/engines/engine.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/textures/texture_constants.h>
 
 namespace BABYLON {
 
-FxaaPostProcess::FxaaPostProcess(const std::string& iName, float ratio,
-                                 const CameraPtr& camera,
-                                 unsigned int samplingMode, Engine* engine,
+FxaaPostProcess::FxaaPostProcess(const std::string& iName, float ratio, const CameraPtr& camera,
+                                 const std::optional<unsigned int>& samplingMode, Engine* engine,
                                  bool reusable, unsigned int textureType)
-    : PostProcess{iName,        "fxaa", {"texelSize"}, {}, ratio,       camera,
-                  samplingMode, engine, reusable,      "", textureType, "fxaa",
-                  {},           true}
+    : PostProcess{iName,
+                  "fxaa",
+                  {"texelSize"},
+                  {},
+                  ratio,
+                  camera,
+                  samplingMode.value_or(TextureConstants::BILINEAR_SAMPLINGMODE),
+                  engine,
+                  reusable,
+                  "",
+                  textureType,
+                  "fxaa",
+                  {},
+                  true}
 {
   const auto defines = _getDefines();
   updateEffect(defines);
@@ -33,8 +44,7 @@ std::string FxaaPostProcess::_getDefines()
   }
 
   auto glInfo = engine->getGlInfo();
-  if (!glInfo.renderer.empty()
-      && String::contains(String::toLowerCase(glInfo.renderer), "mali")) {
+  if (!glInfo.renderer.empty() && String::contains(String::toLowerCase(glInfo.renderer), "mali")) {
     return "#define MALI 1\n";
   }
 

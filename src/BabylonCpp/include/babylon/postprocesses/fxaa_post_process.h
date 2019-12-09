@@ -31,7 +31,7 @@ public:
 
 protected:
   FxaaPostProcess(const std::string& iName, float ratio, const CameraPtr& camera = nullptr,
-                  unsigned int samplingMode = TextureConstants::BILINEAR_SAMPLINGMODE,
+                  const std::optional<unsigned int>& samplingMode = std::nullopt,
                   Engine* engine = nullptr, bool reusable = false,
                   unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT);
 

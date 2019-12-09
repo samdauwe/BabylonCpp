@@ -7,25 +7,26 @@
 namespace BABYLON {
 
 DepthOfFieldBlurPostProcess::DepthOfFieldBlurPostProcess(
-  const std::string& iName, Scene* scene, const Vector2& iDirection,
-  float iKernel, const std::variant<float, PostProcessOptions>& options,
-  const CameraPtr& camera, PostProcess* circleOfConfusion,
-  PostProcess* imageToBlur, unsigned int samplingMode, Engine* engine,
-  bool reusable, unsigned int textureType, bool blockCompilation)
+  const std::string& iName, Scene* scene, const Vector2& iDirection, float iKernel,
+  const std::variant<float, PostProcessOptions>& options, const CameraPtr& camera,
+  PostProcess* circleOfConfusion, PostProcess* imageToBlur,
+  const std::optional<unsigned int>& samplingMode, Engine* engine, bool reusable,
+  unsigned int textureType, bool blockCompilation)
     : BlurPostProcess{
-      iName,       iDirection,          iKernel,         options,
-      camera,      samplingMode,        engine,          reusable,
-      textureType, "#define DOF 1\r\n", blockCompilation}
+      iName,           iDirection,
+      iKernel,         options,
+      camera,          samplingMode.value_or(Constants::TEXTURE_BILINEAR_SAMPLINGMODE),
+      engine,          reusable,
+      textureType,     "#define DOF 1\r\n",
+      blockCompilation}
 {
   onApplyObservable.add([&](Effect* effect, EventState& /*es*/) {
     if (imageToBlur != nullptr) {
       effect->setTextureFromPostProcess("textureSampler", imageToBlur);
     }
-    effect->setTextureFromPostProcessOutput("circleOfConfusionSampler",
-                                            circleOfConfusion);
+    effect->setTextureFromPostProcessOutput("circleOfConfusionSampler", circleOfConfusion);
     if (scene->activeCamera()) {
-      effect->setFloat2("cameraMinMaxZ", scene->activeCamera()->minZ,
-                        scene->activeCamera()->maxZ);
+      effect->setFloat2("cameraMinMaxZ", scene->activeCamera()->minZ, scene->activeCamera()->maxZ);
     }
   });
 }

@@ -7,22 +7,19 @@
 namespace BABYLON {
 
 ColorCorrectionPostProcess::ColorCorrectionPostProcess(
-  const std::string& iName, const std::string& colorTableUrl, float ratio,
-  const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
-  bool reusable)
+  const std::string& iName, const std::string& colorTableUrl, float ratio, const CameraPtr& camera,
+  const std::optional<unsigned int>& samplingMode, Engine* engine, bool reusable)
     : PostProcess{iName,  "colorCorrection", {},     {"colorTable"}, ratio,
                   camera, samplingMode,      engine, reusable}
 {
-  _colorTableTexture
-    = Texture::New(colorTableUrl, camera->getScene(), true, false,
-                   TextureConstants::TRILINEAR_SAMPLINGMODE);
+  _colorTableTexture = Texture::New(colorTableUrl, camera->getScene(), true, false,
+                                    TextureConstants::TRILINEAR_SAMPLINGMODE);
   _colorTableTexture->anisotropicFilteringLevel = 1;
-  _colorTableTexture->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
-  _colorTableTexture->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
+  _colorTableTexture->wrapU                     = TextureConstants::CLAMP_ADDRESSMODE;
+  _colorTableTexture->wrapV                     = TextureConstants::CLAMP_ADDRESSMODE;
 
-  onApply = [&](Effect* effect, EventState&) {
-    effect->setTexture("colorTable", _colorTableTexture);
-  };
+  onApply
+    = [&](Effect* effect, EventState&) { effect->setTexture("colorTable", _colorTableTexture); };
 }
 
 ColorCorrectionPostProcess::~ColorCorrectionPostProcess() = default;

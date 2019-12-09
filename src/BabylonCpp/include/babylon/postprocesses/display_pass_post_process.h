@@ -27,7 +27,8 @@ public:
    * (default: false)
    */
   DisplayPassPostProcess(const std::string& name, float ratio, const CameraPtr& camera,
-                         unsigned int samplingMode, Engine* engine, bool reusable = false);
+                         const std::optional<unsigned int>& samplingMode = std::nullopt,
+                         Engine* engine = nullptr, bool reusable = false);
   ~DisplayPassPostProcess() override; // = default
 
 }; // end of class DisplayPassPostProcess

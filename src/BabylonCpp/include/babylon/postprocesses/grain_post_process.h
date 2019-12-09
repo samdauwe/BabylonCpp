@@ -47,8 +47,9 @@ protected:
    * at a later time. (default: false)
    */
   GrainPostProcess(const std::string& name, const std::variant<float, PostProcessOptions>& options,
-                   const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
-                   bool reusable            = false,
+                   const CameraPtr& camera,
+                   const std::optional<unsigned int>& samplingMode = std::nullopt,
+                   Engine* engine = nullptr, bool reusable = false,
                    unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
                    bool blockCompilation    = false);
 

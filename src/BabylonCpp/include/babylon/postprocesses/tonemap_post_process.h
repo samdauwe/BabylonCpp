@@ -27,8 +27,8 @@ public:
    */
   TonemapPostProcess(const std::string& name, const TonemappingOperator& operator_,
                      float exposureAdjustment, const CameraPtr& camera,
-                     unsigned int samplingMode  = Constants::TEXTURE_BILINEAR_SAMPLINGMODE,
-                     Engine* engine             = nullptr,
+                     const std::optional<unsigned int>& samplingMode = std::nullopt,
+                     Engine* engine                                  = nullptr,
                      unsigned int textureFormat = Constants::TEXTURETYPE_UNSIGNED_INT);
   ~TonemapPostProcess() override; // = default
 

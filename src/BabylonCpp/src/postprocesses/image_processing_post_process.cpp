@@ -11,32 +11,24 @@ namespace BABYLON {
 
 ImageProcessingPostProcess::ImageProcessingPostProcess(
   const std::string& iName, float renderRatio, const CameraPtr& camera,
-  unsigned int samplingMode, Engine* engine, bool reusable,
-  unsigned int textureType,
-  ImageProcessingConfiguration* imageProcessingConfiguration)
-    : PostProcess{iName,       "imageProcessing", {},     {},       renderRatio,
-                  camera,      samplingMode,      engine, reusable, "",
-                  textureType, "postprocess",     {},     true}
+  const std::optional<unsigned int>& samplingMode, Engine* engine, bool reusable,
+  unsigned int textureType, ImageProcessingConfiguration* imageProcessingConfiguration)
+    : PostProcess{iName,  "imageProcessing", {}, {},          renderRatio,   camera, samplingMode,
+                  engine, reusable,          "", textureType, "postprocess", {},     true}
     , imageProcessingConfiguration{this,
-                                   &ImageProcessingPostProcess::
-                                     get_imageProcessingConfiguration,
-                                   &ImageProcessingPostProcess::
-                                     set_imageProcessingConfiguration}
+                                   &ImageProcessingPostProcess::get_imageProcessingConfiguration,
+                                   &ImageProcessingPostProcess::set_imageProcessingConfiguration}
     , colorCurves{this, &ImageProcessingPostProcess::get_colorCurves,
                   &ImageProcessingPostProcess::set_colorCurves}
-    , colorCurvesEnabled{this,
-                         &ImageProcessingPostProcess::get_colorCurvesEnabled,
+    , colorCurvesEnabled{this, &ImageProcessingPostProcess::get_colorCurvesEnabled,
                          &ImageProcessingPostProcess::set_colorCurvesEnabled}
-    , colorGradingTexture{this,
-                          &ImageProcessingPostProcess::get_colorGradingTexture,
+    , colorGradingTexture{this, &ImageProcessingPostProcess::get_colorGradingTexture,
                           &ImageProcessingPostProcess::set_colorGradingTexture}
-    , colorGradingEnabled{this,
-                          &ImageProcessingPostProcess::get_colorGradingEnabled,
+    , colorGradingEnabled{this, &ImageProcessingPostProcess::get_colorGradingEnabled,
                           &ImageProcessingPostProcess::set_colorGradingEnabled}
     , exposure{this, &ImageProcessingPostProcess::get_exposure,
                &ImageProcessingPostProcess::set_exposure}
-    , toneMappingEnabled{this,
-                         &ImageProcessingPostProcess::get_toneMappingEnabled,
+    , toneMappingEnabled{this, &ImageProcessingPostProcess::get_toneMappingEnabled,
                          &ImageProcessingPostProcess::set_toneMappingEnabled}
     , toneMappingType{this, &ImageProcessingPostProcess::get_toneMappingType,
                       &ImageProcessingPostProcess::set_toneMappingType}
@@ -52,11 +44,9 @@ ImageProcessingPostProcess::ImageProcessingPostProcess(
                      &ImageProcessingPostProcess::set_vignetteWeight}
     , vignetteColor{this, &ImageProcessingPostProcess::get_vignetteColor,
                     &ImageProcessingPostProcess::set_vignetteColor}
-    , vignetteCameraFov{this,
-                        &ImageProcessingPostProcess::get_vignetteCameraFov,
+    , vignetteCameraFov{this, &ImageProcessingPostProcess::get_vignetteCameraFov,
                         &ImageProcessingPostProcess::set_vignetteCameraFov}
-    , vignetteBlendMode{this,
-                        &ImageProcessingPostProcess::get_vignetteBlendMode,
+    , vignetteBlendMode{this, &ImageProcessingPostProcess::get_vignetteBlendMode,
                         &ImageProcessingPostProcess::set_vignetteBlendMode}
     , vignetteEnabled{this, &ImageProcessingPostProcess::get_vignetteEnabled,
                       &ImageProcessingPostProcess::set_vignetteEnabled}
@@ -93,8 +83,7 @@ std::string ImageProcessingPostProcess::getClassName() const
   return "ImageProcessingPostProcess";
 }
 
-ImageProcessingConfiguration*&
-ImageProcessingPostProcess::get_imageProcessingConfiguration()
+ImageProcessingConfiguration*& ImageProcessingPostProcess::get_imageProcessingConfiguration()
 {
   return _imageProcessingConfiguration;
 }
@@ -117,8 +106,7 @@ void ImageProcessingPostProcess::_attachImageProcessingConfiguration(
 
   // Detaches observer.
   if (_imageProcessingConfiguration && _imageProcessingObserver) {
-    _imageProcessingConfiguration->onUpdateParameters.remove(
-      _imageProcessingObserver);
+    _imageProcessingConfiguration->onUpdateParameters.remove(_imageProcessingObserver);
   }
 
   // Pick the scene configuration if needed.
@@ -146,11 +134,8 @@ void ImageProcessingPostProcess::_attachImageProcessingConfiguration(
 
   // Attaches observer.
   if (_imageProcessingConfiguration) {
-    _imageProcessingObserver
-      = _imageProcessingConfiguration->onUpdateParameters.add(
-        [this](ImageProcessingConfiguration* /*conf*/, EventState& /*es*/) {
-          _updateParameters();
-        });
+    _imageProcessingObserver = _imageProcessingConfiguration->onUpdateParameters.add(
+      [this](ImageProcessingConfiguration* /*conf*/, EventState& /*es*/) { _updateParameters(); });
   }
 
   // Ensure the effect will be rebuilt.
@@ -164,8 +149,7 @@ std::shared_ptr<ColorCurves>& ImageProcessingPostProcess::get_colorCurves()
   return _imageProcessingConfiguration->colorCurves;
 }
 
-void ImageProcessingPostProcess::set_colorCurves(
-  const std::shared_ptr<ColorCurves>& value)
+void ImageProcessingPostProcess::set_colorCurves(const std::shared_ptr<ColorCurves>& value)
 {
   _imageProcessingConfiguration->colorCurves = value;
 }
@@ -185,8 +169,7 @@ BaseTexturePtr& ImageProcessingPostProcess::get_colorGradingTexture()
   return _imageProcessingConfiguration->colorGradingTexture;
 }
 
-void ImageProcessingPostProcess::set_colorGradingTexture(
-  const BaseTexturePtr& value)
+void ImageProcessingPostProcess::set_colorGradingTexture(const BaseTexturePtr& value)
 {
   _imageProcessingConfiguration->colorGradingTexture = value;
 }
@@ -401,8 +384,7 @@ void ImageProcessingPostProcess::dispose(Camera* camera)
   PostProcess::dispose(camera);
 
   if (_imageProcessingConfiguration && _imageProcessingObserver) {
-    _imageProcessingConfiguration->onUpdateParameters.remove(
-      _imageProcessingObserver);
+    _imageProcessingConfiguration->onUpdateParameters.remove(_imageProcessingObserver);
   }
 
   if (_imageProcessingConfiguration) {

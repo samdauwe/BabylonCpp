@@ -82,7 +82,7 @@ protected:
    */
   ConvolutionPostProcess(const std::string& name, const Float32Array& kernel, float ratio,
                          const CameraPtr& camera,
-                         unsigned int samplingMode = TextureConstants::NEAREST_SAMPLINGMODE,
+                         const std::optional<unsigned int>& samplingMode = std::nullopt,
                          Engine* engine = nullptr, bool reusable = false,
                          unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT);
 

@@ -96,7 +96,7 @@ protected:
    */
   VolumetricLightScatteringPostProcess(
     const std::string& name, float ratio, const CameraPtr& camera, const MeshPtr& mesh,
-    unsigned int samples = 100, unsigned int samplingMode = TextureConstants::BILINEAR_SAMPLINGMODE,
+    unsigned int samples = 100, const std::optional<unsigned int>& samplingMode = std::nullopt,
     Engine* engine = nullptr, bool reusable = false, Scene* scene = nullptr);
 
 private:

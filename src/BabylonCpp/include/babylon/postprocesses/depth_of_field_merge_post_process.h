@@ -19,14 +19,15 @@ class BABYLON_SHARED_EXPORT DepthOfFieldMergePostProcess : public PostProcess {
 public:
   template <typename... Ts>
   static DepthOfFieldMergePostProcessPtr
-  New(const std::string& name, const PostProcessPtr& originalFromInput,
+  New(const std::string& iName, const PostProcessPtr& originalFromInput,
       const PostProcessPtr& circleOfConfusion, const std::vector<PostProcessPtr>& blurSteps,
       const std::variant<float, PostProcessOptions>& options, const CameraPtr& camera,
-      unsigned int samplingMode = 0, Engine* engine = nullptr, bool reusable = false,
-      unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT, bool blockCompilation = false)
+      const std::optional<unsigned int>& samplingMode = std::nullopt, Engine* engine = nullptr,
+      bool reusable = false, unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
+      bool blockCompilation = false)
   {
     auto r = std::shared_ptr<DepthOfFieldMergePostProcess>(new DepthOfFieldMergePostProcess(
-      name, originalFromInput, circleOfConfusion, blurSteps, options, camera, samplingMode, engine,
+      iName, originalFromInput, circleOfConfusion, blurSteps, options, camera, samplingMode, engine,
       reusable, textureType, blockCompilation));
     if (!blockCompilation)
       r->updateEffect();
@@ -86,7 +87,8 @@ protected:
                                const PostProcessPtr& circleOfConfusion,
                                const std::vector<PostProcessPtr>& blurSteps,
                                const std::variant<float, PostProcessOptions>& options,
-                               const CameraPtr& camera, unsigned int samplingMode = 0,
+                               const CameraPtr& camera,
+                               const std::optional<unsigned int>& samplingMode = std::nullopt,
                                Engine* engine = nullptr, bool reusable = false,
                                unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
                                bool blockCompilation    = false);

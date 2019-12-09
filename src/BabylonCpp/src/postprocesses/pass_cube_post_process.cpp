@@ -4,9 +4,8 @@ namespace BABYLON {
 
 PassCubePostProcess::PassCubePostProcess(const std::string& iName, float ratio,
                                          const CameraPtr& camera,
-                                         unsigned int samplingMode,
-                                         Engine* engine, bool reusable,
-                                         unsigned int textureType,
+                                         const std::optional<unsigned int>& samplingMode,
+                                         Engine* engine, bool reusable, unsigned int textureType,
                                          bool blockCompilation)
     : PostProcess{iName,        "passCube",
                   {},           {},

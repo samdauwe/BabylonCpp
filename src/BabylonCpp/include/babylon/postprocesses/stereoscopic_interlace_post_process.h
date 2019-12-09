@@ -44,7 +44,8 @@ protected:
    */
   StereoscopicInterlacePostProcess(const std::string& name,
                                    const std::vector<CameraPtr>& rigCameras,
-                                   bool isStereoscopicHoriz, unsigned int samplingMode = 0,
+                                   bool isStereoscopicHoriz,
+                                   const std::optional<unsigned int>& samplingMode = std::nullopt,
                                    Engine* engine = nullptr, bool reusable = false);
 
 private:

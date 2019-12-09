@@ -7,13 +7,13 @@ namespace BABYLON {
 
 ChromaticAberrationPostProcess::ChromaticAberrationPostProcess(
   const std::string& iName, int iScreenWidth, int iScreenHeight,
-  const std::variant<float, PostProcessOptions>& options,
-  const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
-  bool reusable, unsigned int textureType, bool blockCompilation)
+  const std::variant<float, PostProcessOptions>& options, const CameraPtr& camera,
+  const std::optional<unsigned int>& samplingMode, Engine* engine, bool reusable,
+  unsigned int textureType, bool blockCompilation)
     : PostProcess{iName,
                   "chromaticAberration",
-                  {"chromatic_aberration", "screen_width", "screen_height",
-                   "direction", "radialIntensity", "centerPosition"},
+                  {"chromatic_aberration", "screen_width", "screen_height", "direction",
+                   "radialIntensity", "centerPosition"},
                   {},
                   options,
                   camera,

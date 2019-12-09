@@ -77,8 +77,8 @@ protected:
    */
   BlurPostProcess(const std::string& name, const Vector2& iDrection, float kernel,
                   const std::variant<float, PostProcessOptions>& options, const CameraPtr& camera,
-                  std::optional<unsigned int> samplingMode = std::nullopt, Engine* engine = nullptr,
-                  bool reusable              = false,
+                  const std::optional<unsigned int>& samplingMode = std::nullopt,
+                  Engine* engine = nullptr, bool reusable = false,
                   unsigned int textureType   = Constants::TEXTURETYPE_UNSIGNED_INT,
                   const std::string& defines = "", bool blockCompilation = false);
 
