@@ -14,6 +14,16 @@ if(CCACHE_PROGRAM)
     endif()
 endif()
 
+# Compile to Wasm
+option(BABYLON_WASM "Target emscriptem / wasm" OFF)
+if (BABYLON_WASM)
+    # -DCMAKE_TOOLCHAIN_FILE=/Users/pascal/bin/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
+    set(BABYLON_DISABLE_INSTALL ON)
+    set(BABYLON_DISABLE_TESTS ON)
+    add_compile_definitions(BABYLON_WASM)
+    include(${CMAKE_CURRENT_LIST_DIR}/cmake/WasmEmscriptenOptions.cmake)
+endif()
+
 # use clang-tidy if present
 option(BABYLON_USE_CLANG_TIDY "Use clang-tidy static analysis" OFF)
 if (BABYLON_USE_CLANG_TIDY)
