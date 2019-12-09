@@ -30,7 +30,7 @@ class BABYLON_SHARED_EXPORT ShaderProcessor {
 
 public:
   static void Process(const std::string& sourceCode, ProcessingOptions& options,
-                      const std::function<void(const std::string& migratedCode)> callback);
+                      const std::function<void(const std::string& migratedCode)>& callback);
 
 private:
   static std::string _ProcessPrecision(std::string source, const ProcessingOptions& options);

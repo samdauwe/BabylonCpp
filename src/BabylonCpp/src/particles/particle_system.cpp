@@ -164,7 +164,7 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
       auto directionScale = scaledUpdateSpeed;
 
       // Velocity
-      if (_velocityGradients.size() > 0) {
+      if (!_velocityGradients.empty()) {
         GradientHelper::GetCurrentGradient<FactorGradient>(
           ratio, _velocityGradients,
           [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
@@ -859,7 +859,7 @@ void ParticleSystem::start(size_t delay)
 
   // Reset emit gradient so it acts the same on every start
   if (!_emitRateGradients.empty()) {
-    if (_emitRateGradients.size() > 0) {
+    if (!_emitRateGradients.empty()) {
       _currentEmitRateGradient = _emitRateGradients[0];
       _currentEmitRate1        = _currentEmitRateGradient->getFactor();
       _currentEmitRate2        = _currentEmitRate1;
@@ -870,7 +870,7 @@ void ParticleSystem::start(size_t delay)
   }
   // Reset start size gradient so it acts the same on every start
   if (!_startSizeGradients.empty()) {
-    if (_startSizeGradients.size() > 0) {
+    if (!_startSizeGradients.empty()) {
       _currentStartSizeGradient = _startSizeGradients[0];
       _currentStartSize1        = _currentStartSizeGradient->getFactor();
       _currentStartSize2        = _currentStartSize1;

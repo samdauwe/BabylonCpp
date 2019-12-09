@@ -26,9 +26,7 @@ ColorSplitterBlock::ColorSplitterBlock(const std::string& iName)
   registerOutput("a", NodeMaterialBlockConnectionPointTypes::Float);
 }
 
-ColorSplitterBlock::~ColorSplitterBlock()
-{
-}
+ColorSplitterBlock::~ColorSplitterBlock() = default;
 
 std::string ColorSplitterBlock::getClassName() const
 {

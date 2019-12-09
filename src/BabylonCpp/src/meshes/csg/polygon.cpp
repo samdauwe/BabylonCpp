@@ -43,7 +43,7 @@ namespace CSG {
 std::ostream& operator<<(std::ostream& os, const Polygon& polygon)
 {
   os << "{\"Vertices\":[";
-  if (polygon.vertices.size() > 0) {
+  if (!polygon.vertices.empty()) {
     for (unsigned int i = 0; i < polygon.vertices.size() - 1; ++i) {
       os << polygon.vertices[i] << ",";
     }

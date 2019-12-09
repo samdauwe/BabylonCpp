@@ -542,7 +542,7 @@ std::optional<Version> GLTFFileLoader::_parseVersion(const std::string& version)
     };
   }
 
-  const std::regex regex(R"((\d+)\.(\d+))", std::regex::optimize);
+  static std::regex regex(R"((\d+)\.(\d+))", std::regex::optimize);
   auto match = String::regexMatch(version, regex);
   if (match.size() < 2) {
     return std::nullopt;

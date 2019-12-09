@@ -52,7 +52,7 @@ public:
    * others.
    * @param axis The list of axis that should be enabled (eg. "xy" or "xyz")
    */
-  void setEnabledRotationAxis(const std::string axis);
+  void setEnabledRotationAxis(const std::string& axis);
 
   /**
    * @brief Enables/disables scaling.

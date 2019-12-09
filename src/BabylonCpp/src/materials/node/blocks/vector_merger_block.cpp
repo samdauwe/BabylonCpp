@@ -26,9 +26,7 @@ VectorMergerBlock::VectorMergerBlock(const std::string& iName)
   registerOutput("xy", NodeMaterialBlockConnectionPointTypes::Vector2);
 }
 
-VectorMergerBlock::~VectorMergerBlock()
-{
-}
+VectorMergerBlock::~VectorMergerBlock() = default;
 
 std::string VectorMergerBlock::getClassName() const
 {

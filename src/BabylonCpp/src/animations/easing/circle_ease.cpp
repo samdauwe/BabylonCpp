@@ -6,10 +6,6 @@
 
 namespace BABYLON {
 
-CircleEase::CircleEase()
-{
-}
-
 CircleEase::~CircleEase() = default;
 
 float CircleEase::easeInCore(float gradient) const

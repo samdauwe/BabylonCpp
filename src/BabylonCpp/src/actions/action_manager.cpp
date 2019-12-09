@@ -116,7 +116,7 @@ bool ActionManager::get_hasPickTriggers() const
 bool ActionManager::HasTriggers()
 {
   return std::accumulate(ActionManager::Triggers.begin(),
-                         ActionManager::Triggers.end(), 0)
+                         ActionManager::Triggers.end(), 0u)
          != 0;
 }
 
@@ -126,7 +126,7 @@ bool ActionManager::HasPickTriggers()
   const auto end   = ActionManager::OnPickUpTrigger + 1;
 
   return std::accumulate(ActionManager::Triggers.begin() + start,
-                         ActionManager::Triggers.begin() + end, 0)
+                         ActionManager::Triggers.begin() + end, 0u)
          != 0;
 }
 

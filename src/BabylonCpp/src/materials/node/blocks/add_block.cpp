@@ -20,9 +20,7 @@ AddBlock::AddBlock(const std::string& iName)
   _linkConnectionTypes(0, 1);
 }
 
-AddBlock::~AddBlock()
-{
-}
+AddBlock::~AddBlock() = default;
 
 std::string AddBlock::getClassName() const
 {

@@ -60,7 +60,7 @@ public:
   static LogMessage CreateMessage(unsigned int level, std::string context,
                                   char const* file, int lineNumber,
                                   char const* func, char const* prettyFunc);
-  void log(const LogMessage& logMessage);
+  void log(const LogMessage& msg);
   bool takes(unsigned int level);
 
   bool isSubscribed(unsigned int level, LogMessageListener& logMsgListener);

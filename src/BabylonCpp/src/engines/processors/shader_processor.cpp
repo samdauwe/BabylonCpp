@@ -22,7 +22,7 @@
 namespace BABYLON {
 
 void ShaderProcessor::Process(const std::string& sourceCode, ProcessingOptions& options,
-                              const std::function<void(const std::string& migratedCode)> callback)
+                              const std::function<void(const std::string& migratedCode)>& callback)
 {
   _ProcessIncludes(sourceCode, options,
                    [&options, callback](const std::string& codeWithIncludes) -> void {
@@ -58,7 +58,7 @@ ShaderDefineExpressionPtr ShaderProcessor::_ExtractOperation(const std::string& 
   std::regex regex(reStr, std::regex::optimize);
   std::smatch match;
 
-  if (std::regex_search(expression, match, regex) && match.size() > 0) {
+  if (std::regex_search(expression, match, regex) && !match.empty()) {
     return std::make_shared<ShaderDefineIsDefinedOperator>(String::trimCopy(match[1]),
                                                            expression[0] == '!');
   }
@@ -172,7 +172,7 @@ bool ShaderProcessor::_MoveCursor(ShaderCodeCursor& cursor, const ShaderCodeNode
     std::regex regex(reKeywords, std::regex::optimize);
     std::smatch matches;
 
-    if (std::regex_search(line, matches, regex) && matches.size() > 0) {
+    if (std::regex_search(line, matches, regex) && !matches.empty()) {
       auto keyword = matches[0];
 
       if (keyword == "#ifdef") {
@@ -302,8 +302,8 @@ std::string ShaderProcessor::_ProcessShaderConversion(const std::string& sourceC
 void ShaderProcessor::_ProcessIncludes(const std::string& sourceCode, ProcessingOptions& options,
                                        const std::function<void(const std::string& data)>& callback)
 {
-  const auto re = "#include<(.+)>(\\((.*)\\))*(\\[(.*)\\])*";
-  std::regex regex(re, std::regex::optimize);
+  static std::string re = R"(#include<(.+)>(\((.*)\))*(\[(.*)\])*)";
+  static std::regex regex(re, std::regex::optimize);
   std::smatch match;
   std::regex_search(sourceCode, match, regex);
 

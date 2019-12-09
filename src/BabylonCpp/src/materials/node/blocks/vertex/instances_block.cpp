@@ -28,9 +28,7 @@ InstancesBlock::InstancesBlock(const std::string& iName)
   registerOutput("output", NodeMaterialBlockConnectionPointTypes::Matrix);
 }
 
-InstancesBlock::~InstancesBlock()
-{
-}
+InstancesBlock::~InstancesBlock() = default;
 
 std::string InstancesBlock::getClassName() const
 {

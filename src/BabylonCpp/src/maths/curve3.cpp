@@ -33,7 +33,7 @@ std::unique_ptr<Curve3> Curve3::clone() const
 std::ostream& operator<<(std::ostream& os, const Curve3& curve)
 {
   os << "{\"Points\":[";
-  if (curve._points.size() > 0) {
+  if (!curve._points.empty()) {
     for (unsigned int i = 0; i < curve._points.size() - 1; ++i) {
       os << curve._points[i] << ",";
     }

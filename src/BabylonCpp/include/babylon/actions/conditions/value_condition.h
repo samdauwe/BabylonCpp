@@ -83,8 +83,7 @@ public:
    * @param operator the conditional operator, default ValueCondition.IsEqual
    */
   ValueCondition(ActionManager* actionManager, const IAnimatablePtr& target,
-                 const std::string& propertyPath, AnimationValue* value,
-                 unsigned int operatorType = ValueCondition::IsEqual());
+                 const std::string& propertyPath);
   ~ValueCondition() override; // = default
 
   /** Methods **/
@@ -113,7 +112,7 @@ public:
 
 private:
   std::string _propertyPath;
-  unsigned int _operatorType;
+  // unsigned int _operatorType;
 
   /**
    * Internal only
@@ -130,7 +129,7 @@ private:
    */
   std::string _property;
 
-  AnimationValue* _value;
+  // AnimationValue* _value;
 
 }; // end of class ValueCondition
 

@@ -42,9 +42,7 @@ NodeMaterialBuildStateSharedData::NodeMaterialBuildStateSharedData()
   defineNames["MAINUV7"] = 0;
 }
 
-NodeMaterialBuildStateSharedData::~NodeMaterialBuildStateSharedData()
-{
-}
+NodeMaterialBuildStateSharedData::~NodeMaterialBuildStateSharedData() = default;
 
 void NodeMaterialBuildStateSharedData::emitErrors()
 {

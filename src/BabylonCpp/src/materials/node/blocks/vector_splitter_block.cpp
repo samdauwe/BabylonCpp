@@ -30,9 +30,7 @@ VectorSplitterBlock::VectorSplitterBlock(const std::string& iName)
   registerOutput("w", NodeMaterialBlockConnectionPointTypes::Float);
 }
 
-VectorSplitterBlock::~VectorSplitterBlock()
-{
-}
+VectorSplitterBlock::~VectorSplitterBlock() = default;
 
 std::string VectorSplitterBlock::getClassName() const
 {

@@ -195,7 +195,7 @@ void TargetCamera::_updateCache(bool ignoreParentClass)
       _cache.lockedTarget.reset(lockedTargetPosition);
     }
     else {
-      _cache.lockedTarget.get()->copyFrom(*lockedTargetPosition);
+      _cache.lockedTarget->copyFrom(*lockedTargetPosition);
     }
   }
 

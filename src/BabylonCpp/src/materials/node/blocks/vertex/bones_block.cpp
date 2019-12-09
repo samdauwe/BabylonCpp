@@ -32,9 +32,7 @@ BonesBlock::BonesBlock(const std::string& iName)
   registerOutput("output", NodeMaterialBlockConnectionPointTypes::Matrix);
 }
 
-BonesBlock::~BonesBlock()
-{
-}
+BonesBlock::~BonesBlock() = default;
 
 void BonesBlock::initialize(NodeMaterialBuildState& state)
 {

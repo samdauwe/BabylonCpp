@@ -19,9 +19,7 @@ FragmentOutputBlock::FragmentOutputBlock(const std::string& iName)
   registerInput("a", NodeMaterialBlockConnectionPointTypes::Float, true);
 }
 
-FragmentOutputBlock::~FragmentOutputBlock()
-{
-}
+FragmentOutputBlock::~FragmentOutputBlock() = default;
 
 std::string FragmentOutputBlock::getClassName() const
 {

@@ -33,13 +33,13 @@ Color3 MaterialHelper::_tempFogColor = Color3::Black();
 void MaterialHelper::BindEyePosition(const EffectPtr& effect, Scene* scene)
 {
   if (scene->_forcedViewPosition) {
-    effect->setVector3("vEyePosition", *scene->_forcedViewPosition.get());
+    effect->setVector3("vEyePosition", *scene->_forcedViewPosition);
     return;
   }
   const auto& globalPosition = scene->activeCamera()->globalPosition();
 
   effect->setVector3("vEyePosition", scene->_mirroredCameraPosition ?
-                                       *scene->_mirroredCameraPosition.get() :
+                                       *scene->_mirroredCameraPosition :
                                        globalPosition);
 }
 

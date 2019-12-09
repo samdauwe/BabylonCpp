@@ -48,9 +48,7 @@ TextureBlock::TextureBlock(const std::string& iName)
     NodeMaterialBlockConnectionPointTypes::Vector4);
 }
 
-TextureBlock::~TextureBlock()
-{
-}
+TextureBlock::~TextureBlock() = default;
 
 std::string TextureBlock::getClassName() const
 {
@@ -141,7 +139,7 @@ void TextureBlock::autoConfigure(const NodeMaterialPtr& material)
 {
   if (!uv()->isConnected()) {
     auto uvInput = material->getInputBlockByPredicate(
-      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name == "uv"; });
+      [](const InputBlockPtr& inputBlock) -> bool { return inputBlock->isAttribute() && inputBlock->name == "uv"; });
 
     if (!uvInput) {
       uvInput = InputBlock::New("uv");

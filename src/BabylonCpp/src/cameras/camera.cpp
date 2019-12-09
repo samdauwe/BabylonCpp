@@ -666,7 +666,7 @@ bool Camera::get_isRightCamera() const
 
 FreeCameraPtr Camera::leftCamera()
 {
-  if (_rigCameras.size() < 1) {
+  if (_rigCameras.empty()) {
     return nullptr;
   }
   return std::static_pointer_cast<FreeCamera>(_rigCameras[0]);
@@ -682,7 +682,7 @@ FreeCameraPtr Camera::rightCamera()
 
 Vector3* Camera::getLeftTarget()
 {
-  if (_rigCameras.size() < 1) {
+  if (_rigCameras.empty()) {
     return nullptr;
   }
   return &std::static_pointer_cast<TargetCamera>(_rigCameras[0])->getTarget();

@@ -6,6 +6,7 @@
 #endif // _WIN32
 #include <babylon/core/filesystem.h>
 #include <babylon/core/system.h>
+#include <babylon/core/logging.h>
 
 namespace BABYLON {
 namespace System {
@@ -32,7 +33,9 @@ void chdirToExecutableFolder()
 #ifdef _WIN32
   _chdir(exeFolder.c_str());
 #else
-  chdir(exeFolder.c_str());
+  int result = chdir(exeFolder.c_str());
+  if (result != 0)
+      BABYLON_LOG_WARN("system.cpp", "chdir to %s failed", exeFolder.c_str());
 #endif
 }
 
@@ -40,7 +43,9 @@ void openBrowser(const std::string &url)
 {
 #ifndef _WIN32
   std::string cmd = std::string("open ") + url;
-  system(cmd.c_str());
+  int result = system(cmd.c_str());
+  if (result != 0)
+    BABYLON_LOG_WARN("system.cpp", "system(%S) failed", cmd.c_str());
 #else
   ShellExecute(0, 0, url.c_str(), 0, 0, SW_SHOW);
 #endif
@@ -50,7 +55,9 @@ void openFile(const std::string &filename)
 {
 #ifndef _WIN32
   std::string cmd = std::string("open ") + BABYLON::Filesystem::absolutePath(filename);
-  system(cmd.c_str());
+  int result = system(cmd.c_str());
+  if (result != 0)
+    BABYLON_LOG_WARN("system.cpp", "system(%S) failed", cmd.c_str());
 #else
   std::string canonical_path = BABYLON::Filesystem::absolutePath(filename);
   ShellExecute(0, 0, canonical_path.c_str(), 0, 0, SW_SHOW);

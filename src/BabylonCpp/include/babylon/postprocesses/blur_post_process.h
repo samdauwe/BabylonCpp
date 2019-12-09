@@ -75,7 +75,7 @@ protected:
    * the constructor. The updateEffect method can be used to compile the shader
    * at a later time. (default: false)
    */
-  BlurPostProcess(const std::string& name, const Vector2& direction, float kernel,
+  BlurPostProcess(const std::string& name, const Vector2& iDrection, float kernel,
                   const std::variant<float, PostProcessOptions>& options, const CameraPtr& camera,
                   std::optional<unsigned int> samplingMode = std::nullopt, Engine* engine = nullptr,
                   bool reusable              = false,

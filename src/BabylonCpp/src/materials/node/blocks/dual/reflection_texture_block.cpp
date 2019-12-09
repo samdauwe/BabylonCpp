@@ -51,9 +51,7 @@ ReflectionTextureBlock::ReflectionTextureBlock(const std::string& iName)
                  NodeMaterialBlockTargets::Fragment);
 }
 
-ReflectionTextureBlock::~ReflectionTextureBlock()
-{
-}
+ReflectionTextureBlock::~ReflectionTextureBlock() = default;
 
 std::string ReflectionTextureBlock::getClassName() const
 {
@@ -114,7 +112,7 @@ void ReflectionTextureBlock::autoConfigure(const NodeMaterialPtr& material)
 {
   if (!position()->isConnected()) {
     auto positionInput = material->getInputBlockByPredicate(
-      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name == "position"; });
+      [](const InputBlockPtr& inputBlock) -> bool { return inputBlock->isAttribute() && inputBlock->name == "position"; });
 
     if (!positionInput) {
       positionInput = InputBlock::New("position");
@@ -124,8 +122,8 @@ void ReflectionTextureBlock::autoConfigure(const NodeMaterialPtr& material)
   }
 
   if (!world()->isConnected()) {
-    auto worldInput = material->getInputBlockByPredicate([](const InputBlockPtr& b) -> bool {
-      return b->systemValue() == NodeMaterialSystemValues::World;
+    auto worldInput = material->getInputBlockByPredicate([](const InputBlockPtr& inputBlock) -> bool {
+      return inputBlock->systemValue() == NodeMaterialSystemValues::World;
     });
 
     if (!worldInput) {
@@ -137,8 +135,8 @@ void ReflectionTextureBlock::autoConfigure(const NodeMaterialPtr& material)
 
   if (!cameraPosition()->isConnected()) {
     auto cameraPositionInput
-      = material->getInputBlockByPredicate([](const InputBlockPtr& b) -> bool {
-          return b->systemValue() == NodeMaterialSystemValues::CameraPosition;
+      = material->getInputBlockByPredicate([](const InputBlockPtr& inputBlock) -> bool {
+          return inputBlock->systemValue() == NodeMaterialSystemValues::CameraPosition;
         });
 
     if (!cameraPositionInput) {
@@ -149,8 +147,8 @@ void ReflectionTextureBlock::autoConfigure(const NodeMaterialPtr& material)
   }
 
   if (!view()->isConnected()) {
-    auto viewInput = material->getInputBlockByPredicate([](const InputBlockPtr& b) -> bool {
-      return b->systemValue() == NodeMaterialSystemValues::View;
+    auto viewInput = material->getInputBlockByPredicate([](const InputBlockPtr& inputBlock) -> bool {
+      return inputBlock->systemValue() == NodeMaterialSystemValues::View;
     });
 
     if (!viewInput) {

@@ -308,7 +308,7 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   auto scene = getScene();
   auto definesPtr
     = std::static_pointer_cast<PBRMaterialDefines>(subMesh->_materialDefines);
-  auto& defines = *definesPtr.get();
+  auto& defines = *definesPtr;
   if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (defines._renderId == scene->getRenderId()) {
       return true;
@@ -1543,39 +1543,38 @@ std::vector<IAnimatablePtr> PBRBaseMaterial::getAnimatables()
 {
   std::vector<IAnimatablePtr> results;
 
-  if (_albedoTexture && _albedoTexture->animations.size() > 0) {
+  if (_albedoTexture && !_albedoTexture->animations.empty()) {
     results.emplace_back(_albedoTexture);
   }
 
-  if (_ambientTexture && _ambientTexture->animations.size() > 0) {
+  if (_ambientTexture && !_ambientTexture->animations.empty()) {
     results.emplace_back(_ambientTexture);
   }
 
-  if (_opacityTexture && _opacityTexture->animations.size() > 0) {
+  if (_opacityTexture && !_opacityTexture->animations.empty()) {
     results.emplace_back(_opacityTexture);
   }
 
-  if (_reflectionTexture && _reflectionTexture->animations.size() > 0) {
+  if (_reflectionTexture && !_reflectionTexture->animations.empty()) {
     results.emplace_back(_reflectionTexture);
   }
 
-  if (_emissiveTexture && _emissiveTexture->animations.size() > 0) {
+  if (_emissiveTexture && !_emissiveTexture->animations.empty()) {
     results.emplace_back(_emissiveTexture);
   }
 
-  if (_metallicTexture && _metallicTexture->animations.size() > 0) {
+  if (_metallicTexture && !_metallicTexture->animations.empty()) {
     results.emplace_back(_metallicTexture);
   }
-  else if (_reflectivityTexture
-           && _reflectivityTexture->animations.size() > 0) {
+  else if (_reflectivityTexture && !_reflectivityTexture->animations.empty()) {
     results.emplace_back(_reflectivityTexture);
   }
 
-  if (_bumpTexture && _bumpTexture->animations.size() > 0) {
+  if (_bumpTexture && !_bumpTexture->animations.empty()) {
     results.emplace_back(_bumpTexture);
   }
 
-  if (_lightmapTexture && _lightmapTexture->animations.size() > 0) {
+  if (_lightmapTexture && !_lightmapTexture->animations.empty()) {
     results.emplace_back(_lightmapTexture);
   }
 

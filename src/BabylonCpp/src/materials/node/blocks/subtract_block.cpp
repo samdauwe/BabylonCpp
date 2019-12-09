@@ -20,9 +20,7 @@ SubtractBlock::SubtractBlock(const std::string& iName)
   _linkConnectionTypes(0, 1);
 }
 
-SubtractBlock::~SubtractBlock()
-{
-}
+SubtractBlock::~SubtractBlock() = default;
 
 std::string SubtractBlock::getClassName() const
 {

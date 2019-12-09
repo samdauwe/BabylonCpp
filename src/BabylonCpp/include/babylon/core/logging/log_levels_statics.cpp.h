@@ -9,13 +9,6 @@
 // this file is included by the "BabylonCpp" lib *AND* the "inspector" lib.
 
 namespace BABYLON {
-  constexpr unsigned int LogLevels::LEVEL_QUIET;
-  constexpr unsigned int LogLevels::LEVEL_ERROR;
-  constexpr unsigned int LogLevels::LEVEL_WARN;
-  constexpr unsigned int LogLevels::LEVEL_INFO;
-  constexpr unsigned int LogLevels::LEVEL_DEBUG;
-  constexpr unsigned int LogLevels::LEVEL_TRACE;
-
   const std::vector<std::pair<unsigned int, std::string>> LogLevels::Levels
     = { std::make_pair(LogLevels::LEVEL_QUIET, "QUIET"),
        std::make_pair(LogLevels::LEVEL_ERROR, "ERROR"),

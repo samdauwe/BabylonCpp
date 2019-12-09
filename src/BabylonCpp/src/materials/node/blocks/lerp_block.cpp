@@ -22,9 +22,7 @@ LerpBlock::LerpBlock(const std::string& iName)
   _linkConnectionTypes(0, 1);
 }
 
-LerpBlock::~LerpBlock()
-{
-}
+LerpBlock::~LerpBlock() =  default;
 
 std::string LerpBlock::getClassName() const
 {

@@ -20,9 +20,7 @@ MinBlock::MinBlock(const std::string& iName)
   _linkConnectionTypes(0, 1);
 }
 
-MinBlock::~MinBlock()
-{
-}
+MinBlock::~MinBlock() = default;
 
 std::string MinBlock::getClassName() const
 {

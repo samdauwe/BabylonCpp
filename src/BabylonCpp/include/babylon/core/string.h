@@ -242,16 +242,11 @@ template <typename T>
 inline bool isDigit(T x)
 {
   std::string s;
-  std::regex e("^-?\\d+", std::regex::optimize);
+  static std::regex e("^-?\\d+", std::regex::optimize);
   std::stringstream ss;
   ss << x;
   ss >> s;
-  if (std::regex_match(s, e)) {
-    return true;
-  }
-  else {
-    return false;
-  }
+  return std::regex_match(s, e);
 }
 
 /**

@@ -14,7 +14,7 @@ class BABYLON_SHARED_EXPORT ExtendedGamepadButton
     : public MutableGamepadButton {
 
 public:
-  ExtendedGamepadButton();
+  ExtendedGamepadButton() = default;
   ExtendedGamepadButton(int value, bool touched, bool pressed);
   ~ExtendedGamepadButton(); // = default
 

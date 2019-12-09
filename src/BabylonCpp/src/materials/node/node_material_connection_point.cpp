@@ -151,7 +151,7 @@ std::vector<NodeMaterialConnectionPointPtr>& NodeMaterialConnectionPoint::get_en
 
 bool NodeMaterialConnectionPoint::get_hasEndpoints() const
 {
-  return _endpoints.size() > 0;
+  return !_endpoints.empty();
 }
 
 std::string NodeMaterialConnectionPoint::getClassName() const

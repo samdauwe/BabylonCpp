@@ -7,8 +7,8 @@
 
 namespace BABYLON {
 
-MultiMaterial::MultiMaterial(const std::string iName, Scene* scene)
-    : Material{iName, scene, true}
+MultiMaterial::MultiMaterial(const std::string& name, Scene* scene)
+    : Material{name, scene, true}
     , subMaterials{this, &MultiMaterial::get_subMaterials,
                    &MultiMaterial::set_subMaterials}
 {

@@ -139,8 +139,8 @@ void BaseParticleSystem::set_isAnimationSheetEnabled(bool value)
 
 bool BaseParticleSystem::_hasTargetStopDurationDependantGradient() const
 {
-  return (_startSizeGradients.size() > 0) || (_emitRateGradients.size() > 0)
-         || (_lifeTimeGradients.size() > 0);
+  return (!_startSizeGradients.empty()) || (!_emitRateGradients.empty())
+         || (!_lifeTimeGradients.empty());
 }
 
 std::vector<FactorGradient>& BaseParticleSystem::getDragGradients()

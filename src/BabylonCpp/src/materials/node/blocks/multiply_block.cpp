@@ -20,9 +20,7 @@ MultiplyBlock::MultiplyBlock(const std::string& iName)
   _linkConnectionTypes(0, 1);
 }
 
-MultiplyBlock::~MultiplyBlock()
-{
-}
+MultiplyBlock::~MultiplyBlock() =  default;
 
 std::string MultiplyBlock::getClassName() const
 {

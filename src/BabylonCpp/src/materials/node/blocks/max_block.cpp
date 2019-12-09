@@ -20,9 +20,7 @@ MaxBlock::MaxBlock(const std::string& iName)
   _linkConnectionTypes(0, 1);
 }
 
-MaxBlock::~MaxBlock()
-{
-}
+MaxBlock::~MaxBlock() = default;
 
 std::string MaxBlock::getClassName() const
 {

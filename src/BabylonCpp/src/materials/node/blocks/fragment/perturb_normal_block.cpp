@@ -34,9 +34,7 @@ PerturbNormalBlock::PerturbNormalBlock(const std::string& iName)
   registerOutput("output", NodeMaterialBlockConnectionPointTypes::Vector4);
 }
 
-PerturbNormalBlock::~PerturbNormalBlock()
-{
-}
+PerturbNormalBlock::~PerturbNormalBlock() = default;
 
 std::string PerturbNormalBlock::getClassName() const
 {

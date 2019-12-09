@@ -24,9 +24,7 @@ ColorMergerBlock::ColorMergerBlock(const std::string& iName)
   registerOutput("rgb", NodeMaterialBlockConnectionPointTypes::Color3);
 }
 
-ColorMergerBlock::~ColorMergerBlock()
-{
-}
+ColorMergerBlock::~ColorMergerBlock() = default;
 
 std::string ColorMergerBlock::getClassName() const
 {

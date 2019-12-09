@@ -7,8 +7,8 @@
 
 namespace BABYLON {
 
-FollowCameraInputsManager::FollowCameraInputsManager(FollowCamera* iCamera)
-    : CameraInputsManager{iCamera}
+FollowCameraInputsManager::FollowCameraInputsManager(FollowCamera* camera)
+    : CameraInputsManager{camera}
 {
 }
 

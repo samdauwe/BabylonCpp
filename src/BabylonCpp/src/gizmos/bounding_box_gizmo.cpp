@@ -326,7 +326,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(
   // Hover color change
   std::unordered_map<int, AbstractMeshPtr> pointerIds;
   _pointerObserver
-    = gizmoLayer->utilityLayerScene.get()->onPointerObservable.add(
+    = gizmoLayer->utilityLayerScene->onPointerObservable.add(
       [&](PointerInfo* pointerInfo, EventState& /*es*/) {
         if (!stl_util::contains(pointerIds,
                                 (pointerInfo->pointerEvent).pointerId)) {
@@ -608,7 +608,7 @@ void BoundingBoxGizmo::_updateScaleBoxes()
   }
 }
 
-void BoundingBoxGizmo::setEnabledRotationAxis(const std::string axis)
+void BoundingBoxGizmo::setEnabledRotationAxis(const std::string& axis)
 {
   size_t i = 0;
   for (auto& m : _rotateSpheresParent->getChildMeshes()) {

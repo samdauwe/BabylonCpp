@@ -52,7 +52,7 @@ void InterpolateValueAction::execute(const std::optional<IActionEvent>& /*evt*/)
 
   auto animation
     = Animation::New("InterpolateValueAction", _property,
-                     static_cast<size_t>(100 * (1000.f / duration)),
+                     static_cast<size_t>(100 * (1000.f / float(duration))),
                      dataType.value(), Animation::ANIMATIONLOOPMODE_CONSTANT());
 
   animation->setKeys(keys);

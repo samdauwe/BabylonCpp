@@ -23,9 +23,7 @@ ImageProcessingBlock::ImageProcessingBlock(const std::string& iName)
     NodeMaterialBlockConnectionPointTypes::Color3);
 }
 
-ImageProcessingBlock::~ImageProcessingBlock()
-{
-}
+ImageProcessingBlock::~ImageProcessingBlock() = default;
 
 std::string ImageProcessingBlock::getClassName() const
 {

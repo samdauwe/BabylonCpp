@@ -17,9 +17,7 @@ NormalizeBlock::NormalizeBlock(const std::string& iName)
   _outputs[0]->_typeConnectionSource = _inputs[0];
 }
 
-NormalizeBlock::~NormalizeBlock()
-{
-}
+NormalizeBlock::~NormalizeBlock() =  default;
 
 std::string NormalizeBlock::getClassName() const
 {

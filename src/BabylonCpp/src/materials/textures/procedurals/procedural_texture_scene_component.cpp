@@ -34,15 +34,13 @@ void ProceduralTextureSceneComponent::dispose()
 void ProceduralTextureSceneComponent::_beforeClear()
 {
   if (scene->proceduralTexturesEnabled) {
-    Tools::StartPerformanceCounter("Procedural textures",
-                                   scene->proceduralTextures.size() > 0);
+    Tools::StartPerformanceCounter("Procedural textures", !scene->proceduralTextures.empty());
     for (const auto& proceduralTexture : scene->proceduralTextures) {
       if (proceduralTexture->_shouldRender()) {
         proceduralTexture->render();
       }
     }
-    Tools::EndPerformanceCounter("Procedural textures",
-                                 scene->proceduralTextures.size() > 0);
+    Tools::EndPerformanceCounter("Procedural textures", !scene->proceduralTextures.empty());
   }
 }
 

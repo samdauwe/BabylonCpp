@@ -107,10 +107,8 @@ bool LayerSceneComponent::_drawRenderTargetPredicate(
   const Layer& layer, bool isBackground, unsigned int cameraLayerMask,
   const RenderTargetTexturePtr& renderTargetTexture) const
 {
-  return (layer.renderTargetTextures.size() > 0)
-         && layer.isBackground == isBackground
-         && (stl_util::index_of(layer.renderTargetTextures, renderTargetTexture)
-             > -1)
+  return (!layer.renderTargetTextures.empty()) && layer.isBackground == isBackground
+         && (stl_util::index_of(layer.renderTargetTextures, renderTargetTexture) > -1)
          && ((layer.layerMask & cameraLayerMask) != 0);
 }
 

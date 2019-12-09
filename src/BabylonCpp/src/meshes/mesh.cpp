@@ -291,7 +291,7 @@ void Mesh::set_onBeforeDraw(const std::function<void(Mesh*, EventState&)>& callb
 
 bool Mesh::get_hasInstances() const
 {
-  return instances.size() > 0;
+  return !instances.empty();
 }
 
 std::string Mesh::toString(bool fullDetails)
@@ -340,7 +340,7 @@ void Mesh::_unBindEffect()
 
 bool Mesh::get_hasLODLevels() const
 {
-  return _internalMeshDataInfo->_LODLevels.size() > 0;
+  return !_internalMeshDataInfo->_LODLevels.empty();
 }
 
 std::vector<MeshLODLevelPtr>& Mesh::getLODLevels()
@@ -575,7 +575,7 @@ bool Mesh::isReady(bool completeCheck, bool forceInstanceSupport)
   auto engine = getEngine();
   auto scene  = getScene();
   auto hardwareInstancedRendering
-    = forceInstanceSupport || (engine->getCaps().instancedArrays && instances.size() > 0);
+    = forceInstanceSupport || (engine->getCaps().instancedArrays && !instances.empty());
 
   computeWorldMatrix();
 
@@ -944,7 +944,7 @@ void Mesh::_bind(SubMesh* subMesh, const EffectPtr& effect, unsigned int fillMod
 
 void Mesh::_draw(SubMesh* subMesh, int fillMode, size_t instancesCount, bool /*alternate*/)
 {
-  if (!_geometry || !_geometry->getVertexBuffers().size()
+  if (!_geometry || _geometry->getVertexBuffers().empty()
       || (!_unIndexed && !_geometry->getIndexBuffer())) {
     return;
   }
@@ -1824,7 +1824,7 @@ void Mesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 }
 
 Mesh& Mesh::applyDisplacementMap(const std::string& url, float minHeight, float maxHeight,
-                                 const std::function<void(Mesh* mesh)> onSuccess,
+                                 std::function<void(Mesh* mesh)> onSuccess,
                                  const std::optional<Vector2>& uvOffset,
                                  const std::optional<Vector2>& uvScale, bool forceUpdate)
 {
@@ -3499,7 +3499,7 @@ MeshPtr Mesh::MergeMeshes(const std::vector<MeshPtr>& meshes, bool disposeSource
       otherVertexData->transform(wm);
 
       if (vertexData) {
-        vertexData->merge(*otherVertexData.get(), allow32BitsIndices);
+        vertexData->merge(*otherVertexData, allow32BitsIndices);
       }
       else {
         vertexData = std::move(otherVertexData);
