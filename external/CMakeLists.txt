@@ -17,15 +17,19 @@ set(EARCUT_HPP_INCLUDE_DIRS
 
 
 # GLFW (Free, open source, portable framework for OpenGL application development).
-SET(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries" FORCE)
-SET(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "Build the GLFW example programs" FORCE)
-SET(GLFW_BUILD_TESTS OFF CACHE BOOL "Build the GLFW test programs" FORCE)
-SET(GLFW_BUILD_DOCS OFF CACHE BOOL "Build the GLFW documentation" FORCE)
-set(GLFW_BUILD_INSTALL OFF CACHE BOOL "Generate installation target" FORCE)
-add_subdirectory(glfw)
+if (NOT BABYLON_WASM)
+    SET(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries" FORCE)
+    SET(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "Build the GLFW example programs" FORCE)
+    SET(GLFW_BUILD_TESTS OFF CACHE BOOL "Build the GLFW test programs" FORCE)
+    SET(GLFW_BUILD_DOCS OFF CACHE BOOL "Build the GLFW documentation" FORCE)
+    set(GLFW_BUILD_INSTALL OFF CACHE BOOL "Generate installation target" FORCE)
+    add_subdirectory(glfw)
+endif()
 
 # GoogleTest (Google's framework for writing C++ tests on a variety of platforms).
-add_subdirectory(googletest)
+if (NOT BABYLON_WASM)
+    add_subdirectory(googletest)
+endif()
 
 # json.hpp (JSON for Modern C++)
 include_directories("json.hpp")
@@ -96,7 +100,7 @@ set(STB_IMAGE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/stb_image/include
     CACHE INTERNAL "Include directories of stb_image")
 
 # RuntimeCompiledCPlusPlus
-if (NOT APPLE)
+if (NOT APPLE AND NOT BABYLON_WASM)
     option(BABYLON_BUILD_PLAYGROUND "Build the interactive playground (modify and run the playground code interactively without exiting)" ON)
 else()
     option(BABYLON_BUILD_PLAYGROUND "Build the interactive playground (modify and run the playground code interactively without exiting)" OFF)
