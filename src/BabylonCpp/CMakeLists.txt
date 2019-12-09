@@ -534,9 +534,11 @@ endif(OPTION_BUILD_TESTS AND EXISTS ${TESTS_PATH})
 # ============================================================================ #
 
 # 'make install' to the correct location
-install(TARGETS ${TARGET}
-    EXPORT   "${TARGET}-export"                    COMPONENT dev
-    ARCHIVE  DESTINATION ${ARCHIVE_OUTPUT_PATH}    COMPONENT dev
-    RUNTIME  DESTINATION ${EXECUTABLE_OUTPUT_PATH} COMPONENT runtime
-    LIBRARY  DESTINATION ${LIBRARY_OUTPUT_PATH}    COMPONENT runtime
-)
+if (NOT BABYLON_DISABLE_INSTALL)
+    install(TARGETS ${TARGET}
+        EXPORT   "${TARGET}-export"                    COMPONENT dev
+        ARCHIVE  DESTINATION ${ARCHIVE_OUTPUT_PATH}    COMPONENT dev
+        RUNTIME  DESTINATION ${EXECUTABLE_OUTPUT_PATH} COMPONENT runtime
+        LIBRARY  DESTINATION ${LIBRARY_OUTPUT_PATH}    COMPONENT runtime
+    )
+endif()

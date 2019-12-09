@@ -370,23 +370,25 @@ add_custom_command(
 # ============================================================================ #
 
 # 'make install' to the correct location
-install(TARGETS ${TARGET}
-    EXPORT   ${TARGET}Config
-    ARCHIVE  DESTINATION ${ARCHIVE_OUTPUT_PATH}
-    RUNTIME  DESTINATION ${EXECUTABLE_OUTPUT_PATH}
-    LIBRARY  DESTINATION ${LIBRARY_OUTPUT_PATH}
-)
-install(DIRECTORY include/ DESTINATION ${INCLUDE_OUTPUT_PATH})
+if (NOT BABYLON_DISABLE_INSTALL)
+    install(TARGETS ${TARGET}
+        EXPORT   ${TARGET}Config
+        ARCHIVE  DESTINATION ${ARCHIVE_OUTPUT_PATH}
+        RUNTIME  DESTINATION ${EXECUTABLE_OUTPUT_PATH}
+        LIBRARY  DESTINATION ${LIBRARY_OUTPUT_PATH}
+    )
+    install(DIRECTORY include/ DESTINATION ${INCLUDE_OUTPUT_PATH})
 
-# Make the project importable from the install directory
-install(EXPORT ${TARGET}Config
-    DESTINATION ${TARGET}/${CMAKE_OUTPUT_PATH}
-)
+    # Make the project importable from the install directory
+    install(EXPORT ${TARGET}Config
+        DESTINATION ${TARGET}/${CMAKE_OUTPUT_PATH}
+    )
 
-# Make the project importable from the build directory
-export(TARGETS ${TARGET}
-    FILE ${TARGET}Config.cmake
-)
+    # Make the project importable from the build directory
+    export(TARGETS ${TARGET}
+        FILE ${TARGET}Config.cmake
+    )
+endif()
 
 # Copy asset directories
 # Loaders assets
