@@ -65,6 +65,7 @@ cmake-build-debug/
 cmake-build-release/
 cmake-build-relwithdebinfo/
 cmake-build-minsizerel/
+cmake-build-emscripten/
 
 # cquery
 .cquery_cache
