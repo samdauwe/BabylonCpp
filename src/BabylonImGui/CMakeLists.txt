@@ -27,7 +27,7 @@ set(EXPORT_MACRO "${TARGET_UPPER}_SHARED_EXPORT")
 #                       Project configuration options                          #
 # ============================================================================ #
 option(BUILD_SHARED_LIBS     "Build shared instead of static libraries."     ON)
-option(OPTION_BUILD_TESTS    "Build tests."                                  ON)
+option(OPTION_BUILD_TESTS    "Build tests."       ${OPTION_BUILD_TESTS_DEFAULT})
 
 # ============================================================================ #
 #                       Project description and (meta) information             #
@@ -140,9 +140,7 @@ target_include_directories(${TARGET}
 
 # Libraries
 target_link_libraries(${TARGET}
-    PUBLIC
     PRIVATE
-    glfw
     BabylonCpp
     MaterialsLibrary
     Samples
@@ -150,6 +148,10 @@ target_link_libraries(${TARGET}
     imgui
     imgui_utils
 )
+if (NOT BABYLON_WASM)
+    target_link_libraries(${TARGET} PRIVATE glfw)
+endif()
+
 if (APPLE) # Special case for Apple OpenGL framework
     target_link_libraries(${TARGET} PRIVATE "-framework OpenGL")
 endif()

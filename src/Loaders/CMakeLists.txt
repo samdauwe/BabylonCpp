@@ -27,7 +27,7 @@ set(EXPORT_MACRO "${TARGET_UPPER}_SHARED_EXPORT")
 #                       Project configuration options                          #
 # ============================================================================ #
 option(BUILD_SHARED_LIBS     "Build shared instead of static libraries."     ON)
-option(OPTION_BUILD_TESTS    "Build tests."                                  ON)
+option(OPTION_BUILD_TESTS    "Build tests."       ${OPTION_BUILD_TESTS_DEFAULT})
 
 # ============================================================================ #
 #                       Project description and (meta) information             #

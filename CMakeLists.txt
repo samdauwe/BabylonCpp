@@ -19,9 +19,11 @@ option(BABYLON_WASM "Target emscriptem / wasm" OFF)
 if (BABYLON_WASM)
     # -DCMAKE_TOOLCHAIN_FILE=/Users/pascal/bin/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
     set(BABYLON_DISABLE_INSTALL ON)
-    set(BABYLON_DISABLE_TESTS ON)
+    set(OPTION_BUILD_TESTS_DEFAULT OFF)
     add_compile_definitions(BABYLON_WASM)
     include(${CMAKE_CURRENT_LIST_DIR}/cmake/WasmEmscriptenOptions.cmake)
+else()
+  set(OPTION_BUILD_TESTS_DEFAULT ON)
 endif()
 
 # use clang-tidy if present
