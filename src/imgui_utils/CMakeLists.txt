@@ -47,12 +47,14 @@ target_include_directories(${TARGET} PRIVATE SYSTEM ${CMAKE_CURRENT_LIST_DIR}/..
 # Libraries
 target_link_libraries(${TARGET}
     PUBLIC
-    glfw
     glad
     imgui
     ${OPENGL_LIBRARIES}
     BabylonCpp
 )
+if (NOT BABYLON_WASM)
+    target_link_libraries(${TARGET} PUBLIC glfw)
+endif()
 
 if (UNIX AND NOT APPLE)
     target_link_libraries(${TARGET} PUBLIC X11)
