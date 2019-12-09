@@ -29,13 +29,6 @@ public:
   void setScene(Scene* scene);
   void render();
 
-  // these methods handle the internals of imgui
-  // they are not part of the inspector interface
-  // when imgui is handled elsewhere
-  void imgui_initialize();
-  void imgui_LoadFontAwesome();
-  void imgui_dispose();
-
   // Global function that will be called when a new sample is selected
   // (This function is set from SampleLauncher/src/main.cpp)
   static std::function<void(const std::string&)> OnSampleChanged;
