@@ -1,7 +1,7 @@
 #ifndef BABYLON_CORE_FILESYSTEM_FILESYSTEM_UNIX_H
 #define BABYLON_CORE_FILESYSTEM_FILESYSTEM_UNIX_H
 
-#if !(defined(__APPLE__))
+#if (!defined(__APPLE__) && !defined(BABYLON_WASM))
 #include <linux/limits.h>
 #endif
 #include <string>
