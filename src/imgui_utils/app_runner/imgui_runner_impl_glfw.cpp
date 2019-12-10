@@ -18,14 +18,13 @@ namespace ImGuiUtils
 namespace ImGuiRunner
 {
 
-void Glad_Init()
-{
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    throw std::runtime_error("gladLoadGLLoader: Failed");
-  if (!GLAD_GL_VERSION_3_3)
-    throw(std::runtime_error("GLAD could not initialize OpenGl 3.3"));
-}
-
+  void Glad_Init()
+  {
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+      throw std::runtime_error("gladLoadGLLoader: Failed");
+    if (!GLAD_GL_VERSION_3_3)
+      throw(std::runtime_error("GLAD could not initialize OpenGl 3.3"));
+  }
 
   void ImGui_Init(GLFWwindow* window)
   {
