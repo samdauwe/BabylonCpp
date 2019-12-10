@@ -5,31 +5,27 @@
 
 namespace ImGuiUtils
 {
-  namespace GlfwRunner
+namespace GlfwRunner
+{
+
+  void glfw_error_callback(int error, const char* description);
+
+  void InitGlfw_Hints();
+
+  struct GLFWWindowParams
   {
-    void glfw_error_callback(int error, const char* description);
+    bool FullScreen = false;
+    int Width = 1280;
+    int Height = 720;
+    std::string Title = "My Window";
+    GLFWwindow *ParentWindow = nullptr;
+  };
 
-    void InitGlfw_Hints();
+  GLFWwindow* GLFW_CreateWindow(const GLFWWindowParams & params);
 
-    std::string SelectGlslVersion();
+  void GLFW_Cleanup(GLFWwindow* window);
 
-    struct GLFWWindowParams
-    {
-      bool FullScreen = false;
-      int Width = 1280;
-      int Height = 720;
-      std::string Title = "My Window";
-      GLFWwindow *ParentWindow = nullptr;
-    };
+  void GLFW_Init();
 
-    GLFWwindow* GLFW_CreateWindow(const GLFWWindowParams & params);
-
-    void GLFW_Cleanup(GLFWwindow* window);
-
-    void GLFW_Init();
-
-    void Glad_Init();
-
-    } // namespace GlfwRunner
-
-    } // namespace ImGuiUtils
+} // namespace GlfwRunner
+} // namespace ImGuiUtils
