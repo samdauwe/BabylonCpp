@@ -5,6 +5,10 @@
 # CMake version
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 
+if (NOT BABYLON_WASM)
+    option(BUILD_SHARED_LIBS     "Build shared instead of static libraries."     ON)
+endif()
+
 # use ccache if present
 find_program(CCACHE_PROGRAM ccache)
 if(CCACHE_PROGRAM)
@@ -21,7 +25,7 @@ if (BABYLON_WASM)
     #  - if (EMSCRIPTEN) in cmake code
     #  - #ifdef __EMSCRIPTEN__ in c++ code
     set(EMSCRIPTEN ON)
-
+    set(BUILD_SHARED_LIBS OFF)
     set(BABYLON_DISABLE_INSTALL ON)
     set(OPTION_BUILD_TESTS_DEFAULT OFF)
     include(${CMAKE_CURRENT_LIST_DIR}/cmake/WasmEmscriptenOptions.cmake)
