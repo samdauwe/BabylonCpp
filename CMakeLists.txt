@@ -17,10 +17,13 @@ endif()
 # Compile to Wasm
 option(BABYLON_WASM "Target emscriptem / wasm" OFF)
 if (BABYLON_WASM)
-    # -DCMAKE_TOOLCHAIN_FILE=/Users/pascal/bin/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
+    # emscripten is detected via 
+    #  - if (EMSCRIPTEN) in cmake code
+    #  - #ifdef __EMSCRIPTEN__ in c++ code
+    set(EMSCRIPTEN ON)
+
     set(BABYLON_DISABLE_INSTALL ON)
     set(OPTION_BUILD_TESTS_DEFAULT OFF)
-    add_compile_definitions(BABYLON_WASM)
     include(${CMAKE_CURRENT_LIST_DIR}/cmake/WasmEmscriptenOptions.cmake)
 else()
   set(OPTION_BUILD_TESTS_DEFAULT ON)
