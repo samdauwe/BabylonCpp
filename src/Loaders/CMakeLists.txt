@@ -151,11 +151,7 @@ target_include_directories(${TARGET}
 )
 
 # Libraries
-target_link_libraries(${TARGET}
-    PUBLIC
-    PRIVATE
-    BabylonCpp
-)
+target_link_libraries(${TARGET} PRIVATE BabylonCpp)
 
 # Compile definitions
 target_compile_definitions(${TARGET}
