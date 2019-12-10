@@ -1,10 +1,19 @@
 #ifndef BABYLONCPP_IMGUI_SDL_EMSCRIPTEN_RUNNER_H
 #define BABYLONCPP_IMGUI_SDL_EMSCRIPTEN_RUNNER_H
 
-#include <functional>
+#include <imgui_utils/app_runner/imgui_runner.h>
 
-using GuiFunction = std::function<void()>;
+namespace ImGuiUtils
+{
+namespace ImGuiRunner
+{
+  void RunGui_Emscripten(
+    GuiFunctionWithExit guiFunction,
+    AppWindowParams appWindowParams = AppWindowParams(),
+    PostInitFunction postInitFunction = EmptyPostInitFunction
+  );
 
-void run_app(GuiFunction f);
+} // namespace ImGuiRunner
+} // namespace ImGuiUtils
 
 #endif // BABYLONCPP_IMGUI_SDL_EMSCRIPTEN_RUNNER_H
