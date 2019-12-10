@@ -3,7 +3,9 @@
 #include <imgui.h>
 
 // Use stb_image.h to load a PNG from disk and turn it into raw RGBA pixel data:
+#ifndef __EMSCRIPTEN__
 #define STB_IMAGE_IMPLEMENTATION
+#endif
 #include <stb_image/stb_image.h>
 #include <babylon/core/filesystem.h>
 
