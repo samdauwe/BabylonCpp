@@ -68,17 +68,25 @@ if (NOT EMSCRIPTEN)
     file(GLOB IMGUI_BACKEND_FILES
         ${IMGUI_DIR}/examples/imgui_impl_glfw*.*
         ${IMGUI_DIR}/examples/imgui_impl_opengl*.*)
+else()
+    file(GLOB IMGUI_BACKEND_FILES
+        ${IMGUI_DIR}/examples/imgui_impl_sdl*.*
+        ${IMGUI_DIR}/examples/imgui_impl_opengl*.*)
 endif()
 set(IMGUI_FILES ${IMGUI_MAIN_FILES} ${IMGUI_BACKEND_FILES})
 source_group_by_path_all(${IMGUI_DIR} ${IMGUI_FILES})
 add_library(imgui ${IMGUI_FILES})
-
+target_link_libraries(imgui PRIVATE glad)
 if (NOT EMSCRIPTEN)
     target_link_libraries(imgui PRIVATE glfw)
-endif()
-if (NOT EMSCRIPTEN)
-    target_link_libraries(imgui PRIVATE glad)
-    target_compile_definitions(imgui PUBLIC -DIMGUI_IMPL_OPENGL_LOADER_GLAD)
+    target_compile_definitions(imgui PUBLIC 
+        -DIMGUI_IMPL_OPENGL_LOADER_GLAD
+        -DBABYLON_IMGUI__WITH_GLFW
+        )
+else()
+    target_compile_definitions(imgui PUBLIC 
+        -DBABYLON_IMGUI__WITH_SDL
+    )
 endif()
 
 target_include_directories(imgui PUBLIC SYSTEM ${IMGUI_DIR} ${IMGUI_DIR}/examples)
