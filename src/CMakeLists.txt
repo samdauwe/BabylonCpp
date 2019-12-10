@@ -10,27 +10,20 @@ option(OPTION_BUILD_LOADERS       "Build the loader plugins."            ON)
 
 #-- Libraries --##
 set(IDE_FOLDER "")
-# - imgui_utils
+
 add_subdirectory(imgui_utils)
-# - Babylon.js Cpp
 add_subdirectory(BabylonCpp)
-# - Extensions
 add_subdirectory(Extensions)
-# - Materials Library
 add_subdirectory(MaterialsLibrary)
-# - Procedural Textures Library
 add_subdirectory(ProceduralTexturesLibrary)
+add_subdirectory(Samples)
 if (OPTION_BUILD_LOADERS)
-    # - Loaders
     add_subdirectory(Loaders)
 endif()
-# - imgui_babylon and Inspector
 if (OPTION_BUILD_IMGUI_BABYLON)
     add_subdirectory(BabylonImGui)
 endif()
-# - Samples
-add_subdirectory(Samples)
 
 #-- Applications
-# - Babylon Studio
 add_subdirectory(BabylonStudio)
+add_subdirectory(BabylonStudio_Wasm)
