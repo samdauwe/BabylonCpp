@@ -26,8 +26,8 @@ public:
    * @brief Creates a new AxesViewer.
    * @param scene defines the hosting scene
    * @param scaleLines defines a number used to scale line length (1 by default)
-   * @param renderingGroupId defines a number used to set the renderingGroupId
-   * of the meshes (2 by default)
+   * @param renderingGroupId defines a number used to set the renderingGroupId of the meshes (2 by
+   * default)
    * @param xAxis defines the node hierarchy used to render the x-axis
    * @param yAxis defines the node hierarchy used to render the y-axis
    * @param zAxis defines the node hierarchy used to render the z-axis

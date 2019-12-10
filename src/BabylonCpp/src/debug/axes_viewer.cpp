@@ -10,9 +10,8 @@ namespace BABYLON {
 namespace Debug {
 
 AxesViewer::AxesViewer(Scene* iScene, float iScaleLines,
-                       const std::optional<int>& iRenderingGroupId,
-                       TransformNodePtr iXAxis, TransformNodePtr iYAxis,
-                       TransformNodePtr iZAxis)
+                       const std::optional<int>& iRenderingGroupId, TransformNodePtr iXAxis,
+                       TransformNodePtr iYAxis, TransformNodePtr iZAxis)
     : scaleLines{iScaleLines}
     , xAxis{this, &AxesViewer::get_xAxis}
     , yAxis{this, &AxesViewer::get_yAxis}
@@ -24,7 +23,7 @@ AxesViewer::AxesViewer(Scene* iScene, float iScaleLines,
     auto redColoredMaterial             = StandardMaterial::New("", scene);
     redColoredMaterial->disableLighting = true;
     redColoredMaterial->emissiveColor   = Color3::Red().scale(0.5f);
-    iXAxis = AxisDragGizmo::_CreateArrow(scene, redColoredMaterial);
+    iXAxis                              = AxisDragGizmo::_CreateArrow(scene, redColoredMaterial);
   }
 
   if (!iYAxis) {
@@ -38,7 +37,7 @@ AxesViewer::AxesViewer(Scene* iScene, float iScaleLines,
     auto blueColoredMaterial             = StandardMaterial::New("", scene);
     blueColoredMaterial->disableLighting = true;
     blueColoredMaterial->emissiveColor   = Color3::Blue().scale(0.5f);
-    iZAxis = AxisDragGizmo::_CreateArrow(scene, blueColoredMaterial);
+    iZAxis                               = AxisDragGizmo::_CreateArrow(scene, blueColoredMaterial);
   }
 
   _xAxis = iXAxis;
@@ -75,8 +74,8 @@ TransformNodePtr& AxesViewer::get_zAxis()
   return _zAxis;
 }
 
-void AxesViewer::update(const Vector3& position, const Vector3& xaxis,
-                        const Vector3& yaxis, const Vector3& zaxis)
+void AxesViewer::update(const Vector3& position, const Vector3& xaxis, const Vector3& yaxis,
+                        const Vector3& zaxis)
 {
   _xAxis->position().copyFrom(position);
   _xAxis->setDirection(xaxis);
@@ -96,8 +95,8 @@ std::unique_ptr<AxesViewer> AxesViewer::createInstance() const
   const auto iXAxis = AxisDragGizmo::_CreateArrowInstance(scene, _xAxis);
   const auto iYAxis = AxisDragGizmo::_CreateArrowInstance(scene, _yAxis);
   const auto iZAxis = AxisDragGizmo::_CreateArrowInstance(scene, _zAxis);
-  auto axesViewer   = std::make_unique<AxesViewer>(
-    scene, scaleLines, std::nullopt, iXAxis, iYAxis, iZAxis);
+  auto axesViewer
+    = std::make_unique<AxesViewer>(scene, scaleLines, std::nullopt, iXAxis, iYAxis, iZAxis);
   axesViewer->_instanced = true;
   return axesViewer;
 }
