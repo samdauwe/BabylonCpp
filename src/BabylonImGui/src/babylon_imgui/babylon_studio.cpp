@@ -22,6 +22,18 @@
 
 namespace BABYLON {
 
+
+struct EmptyScene : public BABYLON::IRenderableScene {
+  const char* getName() override
+  {
+    return "Empty Scene";
+  }
+  void initializeScene(BABYLON::ICanvas*, BABYLON::Scene*) override
+  {
+  }
+};
+
+
 class BabylonStudioApp {
 public:
   BabylonStudioApp()
@@ -362,6 +374,8 @@ void runBabylonStudio(std::shared_ptr<BABYLON::IRenderableScene> scene,
 )
 {
   BABYLON::BabylonStudioApp app;
+  if (scene == nullptr)
+    scene = std::make_shared<EmptyScene>();
   app.RunApp(scene, options);
 }
 
