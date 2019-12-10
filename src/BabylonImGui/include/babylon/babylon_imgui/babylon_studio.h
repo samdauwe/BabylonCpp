@@ -38,7 +38,8 @@ namespace BABYLON {
 
   void runBabylonStudio(
     std::shared_ptr<BABYLON::IRenderableScene> scene = nullptr,
-    BabylonStudioOptions options = BabylonStudioOptions()
+    BabylonStudioOptions options = BabylonStudioOptions(),
+    ImGuiUtils::ImGuiRunner::ImGuiRunnerFunctionType imGuiRunnerImplem = {}
   );
 } // end of namespace BABYLON
 

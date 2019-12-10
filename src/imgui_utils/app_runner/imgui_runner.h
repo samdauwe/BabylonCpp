@@ -48,7 +48,9 @@ namespace ImGuiRunner
     std::function<void(ImGuiID /* fullDockSpace */)> InitialDockLayoutFunction;
   };
 
-  void RunGui(
+  using ImGuiRunnerFunctionType = std::function<void(GuiFunctionWithExit, AppWindowParams, PostInitFunction)>;
+
+  void RunGui_WithExit( // type is ImGuiRunnerFunctionType
     GuiFunctionWithExit guiFunction,
     AppWindowParams appWindowParams = AppWindowParams(),
     PostInitFunction postInitFunction = EmptyPostInitFunction

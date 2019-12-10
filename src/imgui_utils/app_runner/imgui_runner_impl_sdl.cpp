@@ -204,7 +204,7 @@ bool LoopProc(
   return shouldExit_Button || shouldExit_CloseWindow;
 }
 
-void RunGui(
+void RunGui_WithExit(
   GuiFunctionWithExit guiFunction,
   AppWindowParams appWindowParams,
   PostInitFunction postInitFunction

@@ -73,7 +73,7 @@ namespace ImGuiRunner
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
   }
 
-  void RunGui(
+  void RunGui_WithExit(
     GuiFunctionWithExit guiFunction,
     AppWindowParams appWindowParams,
     PostInitFunction postInitFunction
@@ -179,7 +179,7 @@ namespace ImGuiRunner
       guiFunction();
       return false;
     };
-    RunGui(guiFunctionWithExit, windowParams, postInitFunction);
+    RunGui_WithExit(guiFunctionWithExit, windowParams, postInitFunction);
   }
 
   void ResetDockLayout()

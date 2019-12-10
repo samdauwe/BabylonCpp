@@ -47,7 +47,9 @@ public:
   }
 
   void RunApp(std::shared_ptr<BABYLON::IRenderableScene> initialScene,
-              const BabylonStudioOptions& options)
+              const BabylonStudioOptions& options,
+              ImGuiUtils::ImGuiRunner::ImGuiRunnerFunctionType imGuiRunnerImplem
+              )
   {
     _appContext._options                              = options;
     _appContext._options._appWindowParams.ShowMenuBar = true;
@@ -74,7 +76,7 @@ public:
     _appContext._options._appWindowParams.InitialDockLayoutFunction = [this](ImGuiID mainDockId) {
       _studioLayout.PrepareLayout(mainDockId);
     };
-    ImGuiUtils::ImGuiRunner::RunGui(showGuiLambda, _appContext._options._appWindowParams,
+    imGuiRunnerImplem(showGuiLambda, _appContext._options._appWindowParams,
                                     initSceneLambda);
   }
 
@@ -370,13 +372,17 @@ private:
 
 // public API
 void runBabylonStudio(std::shared_ptr<BABYLON::IRenderableScene> scene,
-                      BabylonStudioOptions options /* = SceneWithInspectorOptions() */
+                      BabylonStudioOptions options /* = SceneWithInspectorOptions() */,
+                      ImGuiUtils::ImGuiRunner::ImGuiRunnerFunctionType imGuiRunnerImplem /*= {}*/
 )
 {
   BABYLON::BabylonStudioApp app;
   if (scene == nullptr)
     scene = std::make_shared<EmptyScene>();
-  app.RunApp(scene, options);
+  if (!imGuiRunnerImplem)
+    imGuiRunnerImplem = ImGuiUtils::ImGuiRunner::RunGui_WithExit;
+
+  app.RunApp(scene, options, imGuiRunnerImplem);
 }
 
 } // namespace BABYLON
