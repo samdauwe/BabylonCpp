@@ -6,6 +6,7 @@
 #include <imgui_utils/imgui_utils.h>
 #include "imgui_runner_utils.h"
 #include "imgui_utils/icons_font_awesome_5.h"
+#include <babylon/core/filesystem.h>
 
 namespace ImGuiUtils
 {
@@ -67,12 +68,39 @@ namespace details
     config.MergeMode = true;
     auto fontRegularPath
       = std::string("../assets/fonts/") + FONT_ICON_FILE_NAME_FAR;
-    _fontRegular = io.Fonts->AddFontFromFileTTF(fontRegularPath.c_str(),
-                                                ImGui::IconSize, &config, ranges);
+
+    if (! BABYLON::Filesystem::isFile(fontRegularPath))
+    {
+      fontRegularPath
+        = std::string("assets/fonts/") + FONT_ICON_FILE_NAME_FAR;
+    }
+    if (BABYLON::Filesystem::isFile(fontRegularPath))
+    {
+      _fontRegular = io.Fonts->AddFontFromFileTTF(fontRegularPath.c_str(),
+                                                  ImGui::IconSize, &config, ranges);
+    }
+    else
+    {
+      printf("Could not read font file %s", fontRegularPath.c_str());
+    }
+
     auto fontSolidPath
       = std::string("../assets/fonts/") + FONT_ICON_FILE_NAME_FAS;
-    _fontSolid = io.Fonts->AddFontFromFileTTF(fontSolidPath.c_str(),
-                                              ImGui::IconSize, &config, ranges);
+    if (! BABYLON::Filesystem::isFile(fontSolidPath))
+    {
+      fontSolidPath
+        = std::string("assets/fonts/") + FONT_ICON_FILE_NAME_FAS;
+    }
+    if (BABYLON::Filesystem::isFile(fontSolidPath))
+    {
+      _fontSolid = io.Fonts->AddFontFromFileTTF(fontSolidPath.c_str(),
+                                                ImGui::IconSize, &config, ranges);
+    }
+    else
+    {
+      printf("Could not read font file %s", fontSolidPath.c_str());
+    }
+
   }
 
   void pushFontAwesome()

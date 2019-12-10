@@ -54,6 +54,10 @@ std::function<std::string(std::string url)> FileTools::PreprocessUrl = [](std::s
   if (Filesystem::exists(absolutePath)) {
     return String::concat("file:", absolutePath);
   }
+  absolutePath = Filesystem::absolutePath("assets/" + url);
+  if (Filesystem::exists(absolutePath)) {
+    return String::concat("file:", absolutePath);
+  }
   return url;
 };
 

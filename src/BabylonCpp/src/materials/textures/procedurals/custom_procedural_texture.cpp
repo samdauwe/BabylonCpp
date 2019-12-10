@@ -58,6 +58,10 @@ void CustomProceduralTexture::_loadJson(const std::string& jsonUrl)
     if (Filesystem::exists(absolutePath)) {
       return absolutePath;
     }
+    absolutePath = Filesystem::absolutePath("assets/" + iUrl);
+    if (Filesystem::exists(absolutePath)) {
+      return absolutePath;
+    }
     return iUrl;
   };
 
