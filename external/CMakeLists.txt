@@ -3,7 +3,9 @@ mark_as_advanced(BUILD_OGL43)
 
 # OpenGL dependency
 set(OpenGL_GL_PREFERENCE GLVND)
-find_package(OpenGL REQUIRED)
+if (NOT EMSCRIPTEN)
+    find_package(OpenGL REQUIRED)
+endif()
 include_directories(SYSTEM ${OPENGL_INCLUDE_DIRS})
 
 # Configure build environment
@@ -17,7 +19,7 @@ set(EARCUT_HPP_INCLUDE_DIRS
 
 
 # GLFW (Free, open source, portable framework for OpenGL application development).
-if (NOT BABYLON_WASM)
+if (NOT EMSCRIPTEN)
     SET(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries" FORCE)
     SET(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "Build the GLFW example programs" FORCE)
     SET(GLFW_BUILD_TESTS OFF CACHE BOOL "Build the GLFW test programs" FORCE)
@@ -27,7 +29,7 @@ if (NOT BABYLON_WASM)
 endif()
 
 # GoogleTest (Google's framework for writing C++ tests on a variety of platforms).
-if (NOT BABYLON_WASM)
+if (NOT EMSCRIPTEN)
     add_subdirectory(googletest)
 endif()
 
@@ -44,7 +46,7 @@ set(GLAD_FILES
     ${GLAD_DIR}/include/glad/glad.h
     ${GLAD_DIR}/include/KHR/khrplatform.h)
 source_group_by_path_all(${GLAD_DIR} ${GLAD_FILES})
-add_library(glad SHARED ${GLAD_FILES})
+add_library(glad ${GLAD_FILES})
 target_include_directories(glad PUBLIC SYSTEM ${GLAD_DIR}/include)
 if(WIN32)
     target_link_libraries(glad PUBLIC opengl32.lib)
@@ -53,24 +55,34 @@ else()
 endif()
 get_target_property(library_type glad TYPE)
 if (library_type STREQUAL SHARED_LIBRARY)
-  # If glad is a shared lobrary, define the macro GLAD_API_EXPORT on the command line.
-  target_compile_definitions(glad PRIVATE GLAD_GLAPI_EXPORT)
-  target_compile_definitions(glad PUBLIC GLAD_GLAPI_EXPORT PRIVATE GLAD_GLAPI_EXPORT_BUILD)
+# If glad is a shared lobrary, define the macro GLAD_API_EXPORT on the command line.
+target_compile_definitions(glad PRIVATE GLAD_GLAPI_EXPORT)
+target_compile_definitions(glad PUBLIC GLAD_GLAPI_EXPORT PRIVATE GLAD_GLAPI_EXPORT_BUILD)
 endif()
 
 # imgui (Bloat-free Immediate Mode Graphical User interface for C++ with minimal dependencies).
 # imgui library as a standalone shared library
 set(IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/imgui CACHE INTERNAL "imgui directory")
 file(GLOB IMGUI_MAIN_FILES ${IMGUI_DIR}/*.h ${IMGUI_DIR}/*.cpp)
-file(GLOB IMGUI_BACKEND_FILES
-    ${IMGUI_DIR}/examples/imgui_impl_glfw*.*
-    ${IMGUI_DIR}/examples/imgui_impl_opengl*.*)
+if (NOT EMSCRIPTEN)
+    file(GLOB IMGUI_BACKEND_FILES
+        ${IMGUI_DIR}/examples/imgui_impl_glfw*.*
+        ${IMGUI_DIR}/examples/imgui_impl_opengl*.*)
+endif()
 set(IMGUI_FILES ${IMGUI_MAIN_FILES} ${IMGUI_BACKEND_FILES})
 source_group_by_path_all(${IMGUI_DIR} ${IMGUI_FILES})
-add_library(imgui SHARED ${IMGUI_FILES})
-target_link_libraries(imgui PRIVATE glfw glad)
+add_library(imgui ${IMGUI_FILES})
+
+if (NOT EMSCRIPTEN)
+    target_link_libraries(imgui PRIVATE glfw)
+endif()
+if (NOT EMSCRIPTEN)
+    target_link_libraries(imgui PRIVATE glad)
+    target_compile_definitions(imgui PUBLIC -DIMGUI_IMPL_OPENGL_LOADER_GLAD)
+endif()
+
 target_include_directories(imgui PUBLIC SYSTEM ${IMGUI_DIR} ${IMGUI_DIR}/examples)
-target_compile_definitions(imgui PUBLIC -DIMGUI_IMPL_OPENGL_LOADER_GLAD)
+
 if (WIN32)
   get_target_property(library_type imgui TYPE)
   if (library_type STREQUAL SHARED_LIBRARY)
@@ -100,7 +112,7 @@ set(STB_IMAGE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/stb_image/include
     CACHE INTERNAL "Include directories of stb_image")
 
 # RuntimeCompiledCPlusPlus
-if (NOT APPLE AND NOT BABYLON_WASM)
+if (NOT APPLE AND NOT EMSCRIPTEN)
     option(BABYLON_BUILD_PLAYGROUND "Build the interactive playground (modify and run the playground code interactively without exiting)" ON)
 else()
     option(BABYLON_BUILD_PLAYGROUND "Build the interactive playground (modify and run the playground code interactively without exiting)" OFF)

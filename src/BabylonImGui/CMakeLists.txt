@@ -144,15 +144,15 @@ target_link_libraries(${TARGET}
     BabylonCpp
     MaterialsLibrary
     Samples
-    glad
     imgui
     imgui_utils
+    glad
 )
-if (NOT BABYLON_WASM)
+if (NOT EMSCRIPTEN)
     target_link_libraries(${TARGET} PRIVATE glfw)
 endif()
 
-if (APPLE) # Special case for Apple OpenGL framework
+if (APPLE AND NOT EMSCRIPTEN) # Special case for Apple OpenGL framework
     target_link_libraries(${TARGET} PRIVATE "-framework OpenGL")
 endif()
 
