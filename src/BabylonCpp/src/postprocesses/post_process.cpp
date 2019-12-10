@@ -366,8 +366,7 @@ InternalTexturePtr PostProcess::activate(const CameraPtr& camera,
     target = inputTexture();
   }
 
-  // Bind the input of this post process to be used as the output of the
-  // previous post process.
+  // Bind the input of this post process to be used as the output of the previous post process.
   if (enablePixelPerfectMode) {
     _scaleRatio.copyFromFloats(static_cast<float>(requiredWidth) / static_cast<float>(desiredWidth),
                                static_cast<float>(requiredHeight)
@@ -439,8 +438,7 @@ EffectPtr PostProcess::apply()
                                    _alphaConstants.a);
   }
 
-  // Bind the output texture of the preivous post process as the input to this
-  // post process.
+  // Bind the output texture of the previous post process as the input to this post process.
   InternalTexturePtr source = nullptr;
   if (_shareOutputWithPostProcess) {
     source = _shareOutputWithPostProcess->inputTexture();
@@ -449,8 +447,9 @@ EffectPtr PostProcess::apply()
     source = _forcedOutputTexture;
   }
   else {
-    if (!_textures.empty())
+    if (!_textures.empty()) {
       source = inputTexture();
+    }
   }
   _effect->_bindTexture("textureSampler", source);
 
