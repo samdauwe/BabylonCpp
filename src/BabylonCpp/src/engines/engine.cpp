@@ -3421,23 +3421,15 @@ InternalTexturePtr Engine::createRenderTargetTexture(const std::variant<ISize, f
                                                      const IRenderTargetOptions& options)
 {
   RenderTargetCreationOptions fullOptions;
-  fullOptions.generateMipMaps
-    = options.generateMipMaps.has_value() ? options.generateMipMaps.value() : true;
+  fullOptions.generateMipMaps = options.generateMipMaps;
   fullOptions.generateDepthBuffer
-    = options.generateDepthBuffer.has_value() ? options.generateDepthBuffer.value() : true;
+    = !options.generateDepthBuffer.has_value() ? true : options.generateDepthBuffer;
   fullOptions.generateStencilBuffer
-    = fullOptions.generateDepthBuffer
-      && (options.generateStencilBuffer.has_value() ? options.generateStencilBuffer.value() :
-                                                      false);
-  fullOptions.type
-    = options.type.has_value() ? options.type.value() : Constants::TEXTURETYPE_UNSIGNED_INT;
-  fullOptions.samplingMode = options.samplingMode.has_value() ?
-                               options.samplingMode.value() :
-                               Constants::TEXTURE_TRILINEAR_SAMPLINGMODE;
-  fullOptions.format
-    = options.format.has_value() ? options.format.value() : Constants::TEXTUREFORMAT_RGBA;
-  fullOptions.generateStencilBuffer
-    = fullOptions.generateDepthBuffer.value() && fullOptions.generateStencilBuffer.value();
+    = fullOptions.generateDepthBuffer.value() && options.generateStencilBuffer.value_or(false);
+  fullOptions.type = options.type.value_or(Constants::TEXTURETYPE_UNSIGNED_INT);
+  fullOptions.samplingMode
+    = options.samplingMode.value_or(Constants::TEXTURE_TRILINEAR_SAMPLINGMODE);
+  fullOptions.format = options.format.value_or(Constants::TEXTUREFORMAT_RGBA);
 
   if (fullOptions.type.value() == Constants::TEXTURETYPE_FLOAT
       && !_caps.textureFloatLinearFiltering) {
