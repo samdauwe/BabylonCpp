@@ -38,6 +38,8 @@ include_directories("json.hpp")
 set(JSON_HPP_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/json.hpp
     CACHE INTERNAL "Include directories of json.hpp")
+add_library(json_hpp INTERFACE)
+target_include_directories(json_hpp INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/json.hpp)
 
 # glad as a standalone dynamic library
 set(GLAD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/glad CACHE INTERNAL "Directory of glad")
