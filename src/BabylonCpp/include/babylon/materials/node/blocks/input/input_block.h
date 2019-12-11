@@ -6,9 +6,9 @@
 #include <babylon/animations/animation_value.h>
 #include <babylon/babylon_api.h>
 #include <babylon/materials/node/blocks/input/animated_input_block_types.h>
+#include <babylon/materials/node/enums/node_material_block_connection_point_mode.h>
+#include <babylon/materials/node/enums/node_material_system_values.h>
 #include <babylon/materials/node/node_material_block.h>
-#include <babylon/materials/node/node_material_block_connection_point_mode.h>
-#include <babylon/materials/node/node_material_system_values.h>
 
 namespace BABYLON {
 

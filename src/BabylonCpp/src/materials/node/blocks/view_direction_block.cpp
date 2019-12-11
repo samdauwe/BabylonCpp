@@ -2,10 +2,10 @@
 
 #include <babylon/core/string.h>
 #include <babylon/materials/node/blocks/input/input_block.h>
+#include <babylon/materials/node/enums/node_material_system_values.h>
 #include <babylon/materials/node/node_material.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
-#include <babylon/materials/node/node_material_system_values.h>
 
 namespace BABYLON {
 

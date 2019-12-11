@@ -8,8 +8,8 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
-#include <babylon/materials/node/node_material_block_connection_point_types.h>
-#include <babylon/materials/node/node_material_block_targets.h>
+#include <babylon/materials/node/enums/node_material_block_connection_point_types.h>
+#include <babylon/materials/node/enums/node_material_block_targets.h>
 
 namespace BABYLON {
 

@@ -126,6 +126,7 @@ file(GLOB MATERIALS_HDR_FILES       ${INCLUDE_PATH}/materials/*.h
                                     ${INCLUDE_PATH}/materials/node/blocks/fragment/*.h
                                     ${INCLUDE_PATH}/materials/node/blocks/input/*.h
                                     ${INCLUDE_PATH}/materials/node/blocks/vertex/*.h
+                                    ${INCLUDE_PATH}/materials/node/enums/*.h
                                     ${INCLUDE_PATH}/materials/node/optimizers/*.h
                                     ${INCLUDE_PATH}/materials/pbr/*.h
                                     ${INCLUDE_PATH}/materials/textures/*.h

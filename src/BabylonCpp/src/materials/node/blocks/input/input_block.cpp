@@ -8,9 +8,9 @@
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/node/blocks/input/input_value.h>
+#include <babylon/materials/node/enums/node_material_system_values.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_build_state_shared_data.h>
-#include <babylon/materials/node/node_material_system_values.h>
 
 namespace BABYLON {
 

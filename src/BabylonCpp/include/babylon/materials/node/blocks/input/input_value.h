@@ -5,7 +5,7 @@
 #include <variant>
 
 #include <babylon/babylon_api.h>
-#include <babylon/materials/node/node_material_block_connection_point_types.h>
+#include <babylon/materials/node/enums/node_material_block_connection_point_types.h>
 #include <babylon/maths/color3.h>
 #include <babylon/maths/color4.h>
 #include <babylon/maths/matrix.h>

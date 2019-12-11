@@ -5,12 +5,12 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/node/blocks/input/input_block.h>
+#include <babylon/materials/node/enums/node_material_system_values.h>
 #include <babylon/materials/node/node_material.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_build_state_shared_data.h>
 #include <babylon/materials/node/node_material_connection_point.h>
 #include <babylon/materials/node/node_material_defines.h>
-#include <babylon/materials/node/node_material_system_values.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
 

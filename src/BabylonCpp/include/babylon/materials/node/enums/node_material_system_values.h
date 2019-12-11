@@ -1,13 +1,12 @@
-#ifndef BABYLON_MATERIALS_NODE_NODE_MATERIAL_SYSTEM_VALUES_H
-#define BABYLON_MATERIALS_NODE_NODE_MATERIAL_SYSTEM_VALUES_H
+#ifndef BABYLON_MATERIALS_NODE_ENUMS_NODE_MATERIAL_SYSTEM_VALUES_H
+#define BABYLON_MATERIALS_NODE_ENUMS_NODE_MATERIAL_SYSTEM_VALUES_H
 
 #include <babylon/babylon_api.h>
 
 namespace BABYLON {
 
 /**
- * @brief Enum used to define system values e.g. values automatically provided
- * by the system.
+ * @brief Enum used to define system values e.g. values automatically provided by the system.
  */
 enum class BABYLON_SHARED_EXPORT NodeMaterialSystemValues : unsigned int {
   /** World */
@@ -25,9 +24,11 @@ enum class BABYLON_SHARED_EXPORT NodeMaterialSystemValues : unsigned int {
   /** CameraPosition */
   CameraPosition = 7,
   /** Fog Color */
-  FogColor = 8
+  FogColor = 8,
+  /** Delta time */
+  DeltaTime = 9
 }; // end of enum class NodeMaterialSystemValues
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_MATERIALS_NODE_NODE_MATERIAL_SYSTEM_VALUES_H
+#endif // end of BABYLON_MATERIALS_NODE_ENUMS_NODE_MATERIAL_SYSTEM_VALUES_H
