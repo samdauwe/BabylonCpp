@@ -72,7 +72,7 @@ build_script:
   - cd build
   - cmake .. -G"Visual Studio 15 2017 Win64"
   - cmake --build . --config Release
-  - ctest . -C Release
+  - ctest . -C Release --output-on-failure
 
 #---------------------------------#
 #       Build notifications       #
