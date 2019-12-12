@@ -92,7 +92,7 @@ void FramebufferCanvas::resize(int iWidth, int iHeight)
 
     // Resize renderbuffer
     _renderingContext->bindRenderbuffer(GL_RENDERBUFFER, mRenderbuffer);
-    _renderingContext->renderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, clientWidth,
+    _renderingContext->renderbufferStorage(GL_RENDERBUFFER, DEPTH24_STENCIL8, clientWidth,
                                            clientHeight);
 
     // Set "renderedTexture" as our colour attachement #0
