@@ -76,9 +76,7 @@ file(GLOB_RECURSE BABYLON_SOURCES
     ${SOURCE_PATH}/*.c
     )
 
-# Group source files
-source_group_by_path_all(${INCLUDE_PATH})
-source_group_by_path_all(${SOURCE_PATH})
+source_group_by_path_all(${CMAKE_CURRENT_SOURCE_DIR} ${BABYLON_HEADERS} ${BABYLON_SOURCES})
 
 # ============================================================================ #
 #                       Create library                                         #

@@ -60,9 +60,7 @@ set(SOURCE_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/src")
 file(GLOB_RECURSE BABYLON_INSPECTOR_HEADERS ${INCLUDE_PATH}/*.h)
 file(GLOB_RECURSE BABYLON_INSPECTOR_SOURCES ${SOURCE_PATH}/*.cpp)
 
-# Group source files
-source_group_by_path_all(${INCLUDE_PATH})
-source_group_by_path_all(${SOURCE_PATH})
+source_group_by_path_all(${CMAKE_CURRENT_SOURCE_DIR} ${BABYLON_INSPECTOR_HEADERS} ${BABYLON_INSPECTOR_SOURCES})
 
 # ============================================================================ #
 #                       Create library                                         #
