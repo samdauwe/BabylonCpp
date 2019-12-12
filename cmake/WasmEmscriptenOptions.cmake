@@ -1,1 +1,6 @@
 set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-s USE_SDL=2 -s USE_WEBGL2=1 -s WASM=1 -s FULL_ES3=1 -s ALLOW_MEMORY_GROWTH=1")
+#set(CMAKE_CXX_FLAGS -g4 ${CMAKE_CXX_FLAGS})
+#set(CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG} -O0 -g4)
+set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g4")
+#add_compile_options(-O0 -g4)
+add_link_options(--source-map-base http://localhost:8001/src/ --preload-file build/assets@/)
