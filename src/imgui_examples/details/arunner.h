@@ -16,11 +16,11 @@ public:
   virtual void Select_Gl_Version() = 0;
   virtual std::string GlslVersion() = 0;
   virtual void CreateWindowAndContext() = 0;
-  virtual void SetupImgGuiContext();
-  virtual void SetupImGuiStyle();
+  void SetupImgGuiContext();
+  void SetupImGuiStyle();
   virtual void InitGlLoader() = 0;
   virtual void SetupPlatformRendererBindings() = 0;
-  virtual void LoadFonts();
+  void LoadFonts();
 
   ImVec4 ClearColor();
   virtual bool ExitRequired() = 0;
@@ -28,8 +28,15 @@ public:
   virtual void NewFrame_OpenGl() = 0; // this could also be vulkan
   virtual void NewFrame_Backend() = 0;
   void ImGuiRender();
+  virtual void RenderDrawData_To_OpenGl() = 0;
+  virtual void UpdateAndRenderAdditionalPlatformWindows() = 0;
+  virtual void SwapBuffers() = 0;
+  virtual void Cleanup() = 0;
+
   // override this function with your own gui!
-  virtual void ShowGui();
+  virtual void ShowGui() = 0;
+
+  void RunIt();
 };
 
 } // namespace ImGuiUtils

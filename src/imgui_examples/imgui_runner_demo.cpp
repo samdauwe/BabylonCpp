@@ -82,7 +82,34 @@ void ShowDemo()
 } // namespace ImGuiUtils
 
 
+int main1()
+{
+  //ImGuiUtils::ImGuiRunner::ShowDemo();
+  return 0;
+}
+
+
+#include <imgui_examples/details/runner_glfw.h>
+
+#ifdef BABYLON_USE_GLFW
+class MyRunner: public ImGuiUtils::ImGuiRunner::ImGuiRunnerGlfw
+{
+public:
+void ShowGui()
+{
+  static bool show_demo_window = true;
+  if (show_demo_window)
+    ImGui::ShowDemoWindow(&show_demo_window);
+}
+
+};
+#endif
+
 int main()
 {
-  ImGuiUtils::ImGuiRunner::ShowDemo();
+#ifdef BABYLON_USE_GLFW
+  MyRunner runner;
+  runner.RunIt();
+#endif
+  return 0;
 }

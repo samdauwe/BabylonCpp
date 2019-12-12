@@ -1,6 +1,6 @@
-#ifndef BABYLONCPP_RUNNER_IMPL_GLFW_H
-#define BABYLONCPP_RUNNER_IMPL_GLFW_H
-
+#ifndef BABYLONCPP_RUNNER_GLFW_H
+#define BABYLONCPP_RUNNER_GLFW_H
+#ifdef BABYLON_USE_GLFW
 #include "imgui_examples/details/arunner.h"
 
 #include <glad/glad.h>
@@ -11,10 +11,9 @@
 namespace ImGuiUtils {
 namespace ImGuiRunner {
 
-class RunnerImplGlfw: public ARunner {
+class ImGuiRunnerGlfw : public ARunner {
 public:
-  virtual ~RunnerImplGlfw() = default;
-
+  virtual ~ImGuiRunnerGlfw() = default;
 
   void InitBackend() override;
   void Select_Gl_Version() override;
@@ -27,6 +26,10 @@ public:
   void PollEvents() override;
   void NewFrame_OpenGl() override;
   void NewFrame_Backend() override;
+  void RenderDrawData_To_OpenGl() override;
+  void UpdateAndRenderAdditionalPlatformWindows() override;
+  void Cleanup() override;
+  void SwapBuffers() override;
 
 private:
   GLFWwindow* mWindow = nullptr;
@@ -34,5 +37,5 @@ private:
 
 } // namespace ImGuiUtils
 } // namespace ImGuiRunner
-
-#endif // BABYLONCPP_RUNNER_IMPL_GLFW_H
+#endif // #ifdef BABYLON_USE_GLFW
+#endif // BABYLONCPP_RUNNER_GLFW_H

@@ -54,12 +54,12 @@ void ARunner::LoadFonts()
 
 }
 
-void ARunner::ShowGui()
-{
-  static bool show_demo_window = true;
-  if (show_demo_window)
-    ImGui::ShowDemoWindow(&show_demo_window);
-}
+//void ARunner::ShowGui()
+//{
+//  static bool show_demo_window = true;
+//  if (show_demo_window)
+//    ImGui::ShowDemoWindow(&show_demo_window);
+//}
 
 void ARunner::ImGuiRender()
 {
@@ -74,6 +74,38 @@ void ARunner::ImGuiRender()
 ImVec4 ARunner::ClearColor()
 {
   return ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+}
+
+void ARunner::RunIt()
+{
+  InitBackend();
+  Select_Gl_Version();
+  CreateWindowAndContext();
+  InitGlLoader();
+  SetupImgGuiContext();
+  SetupImGuiStyle();
+  SetupPlatformRendererBindings();
+  LoadFonts();
+
+  while(!ExitRequired())
+  {
+    PollEvents();
+
+    NewFrame_OpenGl();
+    NewFrame_Backend();
+    ImGui::NewFrame();
+
+    ShowGui();
+
+    ImGuiRender();
+    RenderDrawData_To_OpenGl();
+
+    UpdateAndRenderAdditionalPlatformWindows();
+
+    SwapBuffers();
+  }
+
+  Cleanup();
 }
 
 } // namespace ImGuiUtils
