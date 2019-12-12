@@ -5,7 +5,7 @@ if (BABYLON_BUILD_BENCHMARK)
     message(STATUS "Benchmarks ${TARGET}")
 
     file(GLOB_RECURSE SRC_FILES *.cpp)
-    package_add_test(${TARGET} ${SRC_FILES})
+    babylon_add_test(${TARGET} ${SRC_FILES})
     babylon_target_clang_tidy(${TARGET})
 
     # Libraries

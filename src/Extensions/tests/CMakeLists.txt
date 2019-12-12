@@ -11,7 +11,7 @@ else()
       ${SRC_FILES}
   )
 
-  package_add_test(${TARGET} ${sources})
+  babylon_add_test(${TARGET} ${sources})
   babylon_target_clang_tidy(${TARGET})
 
   target_include_directories(${TARGET}

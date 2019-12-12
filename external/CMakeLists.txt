@@ -11,40 +11,24 @@ include_directories(SYSTEM ${OPENGL_INCLUDE_DIRS})
 # Configure build environment
 include(../cmake/BuildEnvironment.cmake)
 
-#
-# Build gtest and gmock
-#
+# Build gtest and gmock + macro "babylon_add_test"
 # Adapted from https://cliutils.gitlab.io/modern-cmake/chapters/testing/googletest.html
 if(OPTION_BUILD_TESTS)
-#    include(GoogleTest)
     mark_as_advanced(
         BUILD_GMOCK BUILD_GTEST BUILD_SHARED_LIBS
         gmock_build_tests gtest_build_samples gtest_build_tests
         gtest_disable_pthreads gtest_force_shared_crt gtest_hide_internal_symbols
     )
-    macro(package_add_test TESTNAME)
-        message("package_add_test ${TESTNAME}")
+    macro(babylon_add_test TESTNAME)
+        message("babylon_add_test ${TESTNAME}")
         add_executable(${TESTNAME} ${ARGN})
         # Create namespaced alias
         add_executable(${META_PROJECT_NAME}::${TESTNAME} ALIAS ${TESTNAME})
 
         target_link_libraries(${TESTNAME} PRIVATE gtest gmock gtest_main)
-        # set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
         add_test(NAME ${TESTNAME} COMMAND ${TESTNAME})
-        # message("add_test(NAME ${TESTNAME} COMMAND ${TESTNAME})")
     endmacro()
-    #set(gmock_build_tests           OFF CACHE BOOL "")
-    #set(gtest_build_samples         OFF CACHE BOOL "")
-    #set(gtest_build_tests           OFF CACHE BOOL "")
-    #set(gtest_disable_pthreads      OFF CACHE BOOL "")
-    #set(gtest_force_shared_crt      ON  CACHE BOOL "")
-    #set(gtest_hide_internal_symbols OFF CACHE BOOL "")
-
     add_subdirectory(googletest)
-    #set_target_properties(gtest PROPERTIES FOLDER extern)
-    #set_target_properties(gtest_main PROPERTIES FOLDER extern)
-    #set_target_properties(gmock PROPERTIES FOLDER extern)
-    #set_target_properties(gmock_main PROPERTIES FOLDER extern)
 endif(OPTION_BUILD_TESTS)
 
 
