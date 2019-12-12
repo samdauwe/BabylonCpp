@@ -12,6 +12,7 @@
 #include <imgui_utils/imgui_utils.h>
 
 #include <utility>
+#include <stdexcept>
 
 namespace ImGuiUtils
 {
