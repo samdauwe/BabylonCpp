@@ -33,6 +33,7 @@ public:
   virtual void SwapBuffers() = 0;
   virtual void Cleanup() = 0;
 
+
   // override this function with your own gui!
   virtual void ShowGui() = 0;
 

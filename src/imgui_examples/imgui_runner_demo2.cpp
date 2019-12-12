@@ -1,6 +1,8 @@
 #include "imgui.h"
 #include "imgui_internal.h"
-#include <imgui_utils/app_runner/imgui_runner.h>
+//#include <imgui_utils/app_runner/imgui_runner.h>
+#include <imgui_examples/details/runner_glfw.h>
+#include <imgui_examples/details/runner_sdl.h>
 
 #include <map>
 #include <string>
@@ -56,8 +58,8 @@ void DummyWindow(const char* title)
     if (show_demo_window)
       ImGui::ShowDemoWindow(&show_demo_window);
 
-    if (ImGui::Button("Reset Layout"))
-      ImGuiRunner::ResetDockLayout();
+//    if (ImGui::Button("Reset Layout"))
+//      ImGuiRunner::ResetDockLayout();
 
     ImGui::End();
   }
@@ -72,14 +74,12 @@ void DemoGui()
 
 void ShowDemo()
 {
-  ImGuiUtils::ImGuiRunner::AppWindowParams params;
-  params.DefaultWindowType         = DefaultWindowTypeOption::ProvideFullScreenDockSpace;
-  params.InitialDockLayoutFunction = MyCreateDockLayout;
-  params.Title                     = "Hello World";
-  ImGuiUtils::ImGuiRunner::RunGui(DemoGui, params);
+//  ImGuiUtils::ImGuiRunner::AppWindowParams params;
+//  params.DefaultWindowType         = DefaultWindowTypeOption::ProvideFullScreenDockSpace;
+//  params.InitialDockLayoutFunction = MyCreateDockLayout;
+//  params.Title                     = "Hello World";
+//  ImGuiUtils::ImGuiRunner::RunGui(DemoGui, params);
 }
-} // namespace ImGuiRunner
-} // namespace ImGuiUtils
 
 
 int main1()
@@ -89,8 +89,6 @@ int main1()
 }
 
 
-#include <imgui_examples/details/runner_glfw.h>
-#include <imgui_examples/details/runner_sdl.h>
 
 #ifdef IMGUI_RUNNER_USE_GLFW
 class MyRunner: public ImGui::ImGuiRunner::RunnerGlfw
@@ -106,11 +104,19 @@ void ShowGui()
   if (show_demo_window)
     ImGui::ShowDemoWindow(&show_demo_window);
 }
+void LoadFonts()
+{
+
+}
 };
+
+} // namespace ImGuiRunner
+} // namespace ImGuiUtils
+
 
 int main()
 {
-  MyRunner runner;
+  ImGuiUtils::ImGuiRunner::MyRunner runner;
   runner.RunIt();
   return 0;
 }

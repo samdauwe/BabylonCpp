@@ -9,7 +9,7 @@ struct GLFWwindow;
 
 namespace ImGuiUtils
 {
-namespace ImGuiRunner
+namespace ImGuiRunner2
 {
   // GuiFunction : any function that displays widgets using ImGui
   using GuiFunction = std::function<void(void)>;
