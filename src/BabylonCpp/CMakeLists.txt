@@ -24,11 +24,6 @@ set(EXPORT_FILE  "include/${BABYLON_NAMESPACE}/${BABYLON_NAMESPACE}_api.h")
 set(EXPORT_MACRO "${TARGET_UPPER}_SHARED_EXPORT")
 
 # ============================================================================ #
-#                       Project configuration options                          #
-# ============================================================================ #
-option(OPTION_BUILD_TESTS    "Build tests."       ${OPTION_BUILD_TESTS_DEFAULT})
-
-# ============================================================================ #
 #                       Project description and (meta) information             #
 # ============================================================================ #
 
@@ -67,10 +62,9 @@ configure_file(options.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/${BABYLON_NAMESP
 #                       Sources                                                #
 # ============================================================================ #
 
-# Include, Source and Tests path
+# Include, Source
 set(INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include/${BABYLON_NAMESPACE}")
 set(SOURCE_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/src")
-set(TESTS_PATH   "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 
 # Header files
 file(GLOB ACTIONS_HDR_FILES         ${INCLUDE_PATH}/actions/*.h
@@ -466,67 +460,10 @@ endif()
 #                       Setup test environment                                 #
 # ============================================================================ #
 
-# Check if tests are enabled
-if(OPTION_BUILD_TESTS AND EXISTS ${TESTS_PATH})
-
-# Function: Build test and add command to execute it via target 'test'
-function(add_test_without_ctest target)
-    add_subdirectory(${target})
-
-    if(NOT TARGET ${target})
-        return()
-    endif()
-
-    add_dependencies(test ${target})
-    if (NOT MSVC)
-        add_custom_command(TARGET test POST_BUILD
-        COMMAND $<TARGET_FILE:${target}> --gtest_output=xml:gtests-${target}.xml)
-    endif()
-endfunction()
-
-# Build gmock
-set(gmock_build_tests           OFF CACHE BOOL "")
-set(gtest_build_samples         OFF CACHE BOOL "")
-set(gtest_build_tests           OFF CACHE BOOL "")
-set(gtest_disable_pthreads      OFF CACHE BOOL "")
-set(gtest_force_shared_crt      ON  CACHE BOOL "")
-set(gtest_hide_internal_symbols OFF CACHE BOOL "")
-
-# Create interface library to link against gmock
-add_library(gmock-dev INTERFACE)
-
-target_include_directories(gmock-dev
-    SYSTEM INTERFACE
-    ${CMAKE_SOURCE_DIR}/external/googletest/googletest/include
-    ${CMAKE_SOURCE_DIR}/external/googletest/googlemock/include
-)
-
-target_link_libraries(gmock-dev
-    INTERFACE
-    gmock
-)
-
-if(NOT MSVC)
-    # Target 'tests'
-    add_custom_target(BabylonCppUnitTests)
-    set_target_properties(BabylonCppUnitTests
-        PROPERTIES TEST_EXCLUDE_FROM_DEFAULT_BUILD 0)
-    # Tests
-    add_test_without_ctest(tests)
-else()
-    message("MSVC Test!")
+if(OPTION_BUILD_TESTS)
     add_subdirectory(tests)
+    add_subdirectory(benchmarks)
 endif()
-
-# Target 'benchmarks'
-add_custom_target(BabylonCppBenchmarks)
-set_target_properties(BabylonCppBenchmarks
-    PROPERTIES TEST_EXCLUDE_FROM_DEFAULT_BUILD 1)
-
-# Benchmarks
-add_test_without_ctest(benchmarks)
-
-endif(OPTION_BUILD_TESTS AND EXISTS ${TESTS_PATH})
 
 # ============================================================================ #
 #                       Deployment                                             #

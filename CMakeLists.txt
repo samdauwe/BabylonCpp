@@ -33,6 +33,11 @@ else()
   set(OPTION_BUILD_TESTS_DEFAULT ON)
 endif()
 
+option(OPTION_BUILD_TESTS    "Build tests."       ${OPTION_BUILD_TESTS_DEFAULT})
+if(OPTION_BUILD_TESTS)
+    enable_testing()
+endif()
+
 # use clang-tidy if present
 option(BABYLON_USE_CLANG_TIDY "Use clang-tidy static analysis" OFF)
 if (BABYLON_USE_CLANG_TIDY)
@@ -68,9 +73,7 @@ set(IDE_FOLDER "")
 # Project name
 project(BabylonCpp C CXX)
 
-if (MSVC)
-    enable_testing()
-endif()
+
 
 # Project modules
 add_subdirectory(codegeneration)

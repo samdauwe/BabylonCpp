@@ -62,10 +62,9 @@ target_link_libraries(${TARGET}
     BabylonImGui
     BabylonCpp
     Samples
-    glad
 )
 if (NOT EMSCRIPTEN)
-    target_link_libraries(${TARGET} PRIVATE glfw ${OPENGL_LIBRARIES})
+    target_link_libraries(${TARGET} PRIVATE ${OPENGL_LIBRARIES})
 endif()
 
 if (BABYLON_BUILD_PLAYGROUND)

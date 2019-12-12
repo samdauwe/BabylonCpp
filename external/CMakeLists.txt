@@ -11,6 +11,43 @@ include_directories(SYSTEM ${OPENGL_INCLUDE_DIRS})
 # Configure build environment
 include(../cmake/BuildEnvironment.cmake)
 
+#
+# Build gtest and gmock
+#
+# Adapted from https://cliutils.gitlab.io/modern-cmake/chapters/testing/googletest.html
+if(OPTION_BUILD_TESTS)
+#    include(GoogleTest)
+    mark_as_advanced(
+        BUILD_GMOCK BUILD_GTEST BUILD_SHARED_LIBS
+        gmock_build_tests gtest_build_samples gtest_build_tests
+        gtest_disable_pthreads gtest_force_shared_crt gtest_hide_internal_symbols
+    )
+    macro(package_add_test TESTNAME)
+        message("package_add_test ${TESTNAME}")
+        add_executable(${TESTNAME} ${ARGN})
+        # Create namespaced alias
+        add_executable(${META_PROJECT_NAME}::${TESTNAME} ALIAS ${TESTNAME})
+
+        target_link_libraries(${TESTNAME} PRIVATE gtest gmock gtest_main)
+        # set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
+        add_test(NAME ${TESTNAME} COMMAND ${TESTNAME})
+        # message("add_test(NAME ${TESTNAME} COMMAND ${TESTNAME})")
+    endmacro()
+    #set(gmock_build_tests           OFF CACHE BOOL "")
+    #set(gtest_build_samples         OFF CACHE BOOL "")
+    #set(gtest_build_tests           OFF CACHE BOOL "")
+    #set(gtest_disable_pthreads      OFF CACHE BOOL "")
+    #set(gtest_force_shared_crt      ON  CACHE BOOL "")
+    #set(gtest_hide_internal_symbols OFF CACHE BOOL "")
+
+    add_subdirectory(googletest)
+    #set_target_properties(gtest PROPERTIES FOLDER extern)
+    #set_target_properties(gtest_main PROPERTIES FOLDER extern)
+    #set_target_properties(gmock PROPERTIES FOLDER extern)
+    #set_target_properties(gmock_main PROPERTIES FOLDER extern)
+endif(OPTION_BUILD_TESTS)
+
+
 # Earcut.hpp (A C++ port of earcut.js, a fast, header-only polygon triangulation library).
 include_directories(SYSTEM "earcut.hpp")
 set(EARCUT_HPP_INCLUDE_DIRS
@@ -27,11 +64,6 @@ if (NOT EMSCRIPTEN)
     add_subdirectory(glfw)
 endif()
 
-# GoogleTest (Google's framework for writing C++ tests on a variety of platforms).
-if (NOT EMSCRIPTEN)
-    add_subdirectory(googletest)
-endif()
-
 # json.hpp (JSON for Modern C++)
 include_directories("json.hpp")
 set(JSON_HPP_INCLUDE_DIRS
@@ -41,24 +73,29 @@ add_library(json_hpp INTERFACE)
 target_include_directories(json_hpp INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/json.hpp)
 
 # glad as a standalone dynamic library
-set(GLAD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/glad CACHE INTERNAL "Directory of glad")
-set(GLAD_FILES
-    ${GLAD_DIR}/src/glad.c
-    ${GLAD_DIR}/include/glad/glad.h
-    ${GLAD_DIR}/include/KHR/khrplatform.h)
-source_group_by_path_all(${GLAD_DIR} ${GLAD_FILES})
-add_library(glad ${GLAD_FILES})
-target_include_directories(glad PUBLIC SYSTEM ${GLAD_DIR}/include)
-if(WIN32)
-    target_link_libraries(glad PUBLIC opengl32.lib)
+if (NOT EMSCRIPTEN)
+    set(GLAD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/glad CACHE INTERNAL "Directory of glad")
+    set(GLAD_FILES
+        ${GLAD_DIR}/src/glad.c
+        ${GLAD_DIR}/include/glad/glad.h
+        ${GLAD_DIR}/include/KHR/khrplatform.h)
+    source_group_by_path_all(${GLAD_DIR} ${GLAD_FILES})
+    add_library(glad ${GLAD_FILES})
+    target_include_directories(glad PUBLIC SYSTEM ${GLAD_DIR}/include)
+    if(WIN32)
+        target_link_libraries(glad PUBLIC opengl32.lib)
+    else()
+        target_link_libraries(glad PUBLIC ${OPENGL_LIBRARIES})
+    endif()
+    get_target_property(library_type glad TYPE)
+    if (library_type STREQUAL SHARED_LIBRARY)
+        # If glad is a shared lobrary, define the macro GLAD_API_EXPORT on the command line.
+        target_compile_definitions(glad PRIVATE GLAD_GLAPI_EXPORT)
+        target_compile_definitions(glad PUBLIC GLAD_GLAPI_EXPORT PRIVATE GLAD_GLAPI_EXPORT_BUILD)
+    endif()
 else()
-    target_link_libraries(glad PUBLIC ${OPENGL_LIBRARIES})
-endif()
-get_target_property(library_type glad TYPE)
-if (library_type STREQUAL SHARED_LIBRARY)
-# If glad is a shared lobrary, define the macro GLAD_API_EXPORT on the command line.
-target_compile_definitions(glad PRIVATE GLAD_GLAPI_EXPORT)
-target_compile_definitions(glad PUBLIC GLAD_GLAPI_EXPORT PRIVATE GLAD_GLAPI_EXPORT_BUILD)
+    add_library(glad INTERFACE)
+    target_include_directories(glad INTERFACE ${CMAKE_CURRENT_LIST_DIR}/glad_wasm_dummy/include)
 endif()
 
 # imgui (Bloat-free Immediate Mode Graphical User interface for C++ with minimal dependencies).
@@ -77,12 +114,15 @@ endif()
 set(IMGUI_FILES ${IMGUI_MAIN_FILES} ${IMGUI_BACKEND_FILES})
 source_group_by_path_all(${IMGUI_DIR} ${IMGUI_FILES})
 add_library(imgui ${IMGUI_FILES})
-target_link_libraries(imgui PRIVATE glad)
+target_link_libraries(imgui PUBLIC glad)
 if (NOT EMSCRIPTEN)
-    target_link_libraries(imgui PRIVATE glfw)
-    target_compile_definitions(imgui PUBLIC 
+    target_link_libraries(imgui PUBLIC glfw)
+#    find_package(SDL2 CONFIG REQUIRED)
+#    target_link_libraries(imgui PUBLIC glad SDL2::SDL2main SDL2::SDL2-static)
+    target_compile_definitions(imgui PUBLIC
         -DIMGUI_IMPL_OPENGL_LOADER_GLAD
         -DBABYLON_IMGUI__WITH_GLFW
+#        -DBABYLON_IMGUI__WITH_SDL
         )
 else()
     target_compile_definitions(imgui PUBLIC 

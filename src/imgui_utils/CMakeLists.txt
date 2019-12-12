@@ -51,10 +51,9 @@ target_link_libraries(${TARGET}
     PUBLIC
     imgui    
     BabylonCpp
-    glad
 )
 if (NOT EMSCRIPTEN)
-    target_link_libraries(${TARGET} PUBLIC glfw ${OPENGL_LIBRARIES})
+    target_link_libraries(${TARGET} PUBLIC ${OPENGL_LIBRARIES})
 endif()
 
 if (UNIX AND NOT APPLE AND NOT EMSCRIPTEN)

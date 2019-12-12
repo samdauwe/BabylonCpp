@@ -21,12 +21,7 @@ set(sources
 # ============================================================================ #
 
 # Build executable
-add_executable(${TARGET}
-    ${sources}
-)
-
-# Create namespaced alias
-add_executable(${META_PROJECT_NAME}::${TARGET} ALIAS ${TARGET})
+package_add_test(${TARGET} ${sources})
 babylon_target_clang_tidy(${TARGET})
 
 # Project options
@@ -47,7 +42,6 @@ target_link_libraries(${TARGET}
     PRIVATE
     BabylonCpp
     Extensions
-    gmock-dev
 )
 
 # Compile definitions
@@ -59,20 +53,3 @@ target_compile_definitions(${TARGET}
 target_compile_options(${TARGET}
     PRIVATE
 )
-
-# ============================================================================ #
-#                            Run unit tests at build time                      #
-# ============================================================================ #
-
-# Check if unit tests should run at build time
-get_target_property(TEST_EXCLUDE_FROM_DEFAULT_BUILD
-    BabylonCppExtensionsUnitTests EXCLUDE_FROM_DEFAULT_BUILD
-)
-
-if(NOT TEST_EXCLUDE_FROM_DEFAULT_BUILD)
-    add_custom_command (
-      TARGET ${TARGET} POST_BUILD
-      COMMAND ${TARGET} --gtest_output=xml:${TARGET}.xml
-      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}
-    )
-endif()
