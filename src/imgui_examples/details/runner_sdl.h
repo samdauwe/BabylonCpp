@@ -1,19 +1,19 @@
-#ifndef BABYLONCPP_RUNNER_SDL_H
-#define BABYLONCPP_RUNNER_SDL_H
-#ifdef BABYLON_USE_SDL
-#include "imgui_examples/details/arunner.h"
+#ifndef IMGUI_RUNNER_SDL_H
+#define IMGUI_RUNNER_SDL_H
+#ifdef IMGUI_RUNNER_USE_SDL
+#include "imgui_examples/details/abstract_runner.h"
 
 #include <glad/glad.h>
 #include <SDL.h>
 
 // SDL + OpenGL3 + glad
 
-namespace ImGuiUtils {
+namespace ImGui {
 namespace ImGuiRunner {
 
-class ImGuiRunnerSdl : public ARunner {
+class RunnerSdl : public AbstractRunner {
 public:
-  virtual ~ImGuiRunnerSdl() = default;
+  virtual ~RunnerSdl() = default;
 
   void InitBackend() override;
   void Select_Gl_Version() override;
@@ -37,8 +37,8 @@ private:
   bool mExitRequired = false;
 };
 
-} // namespace ImGuiUtils
 } // namespace ImGuiRunner
+} // namespace ImGui
 
-#endif // #ifdef BABYLON_USE_SDL
-#endif // BABYLONCPP_RUNNER_SDL_H
+#endif // #ifdef IMGUI_RUNNER_USE_SDL
+#endif // IMGUI_RUNNER_SDL_H

@@ -92,11 +92,11 @@ int main1()
 #include <imgui_examples/details/runner_glfw.h>
 #include <imgui_examples/details/runner_sdl.h>
 
-#ifdef BABYLON_USE_GLFW
-class MyRunner: public ImGuiUtils::ImGuiRunner::ImGuiRunnerGlfw
+#ifdef IMGUI_RUNNER_USE_GLFW
+class MyRunner: public ImGui::ImGuiRunner::RunnerGlfw
 #endif
-#ifdef BABYLON_USE_SDL
-class MyRunner: public ImGuiUtils::ImGuiRunner::ImGuiRunnerSdl
+#ifdef IMGUI_RUNNER_USE_SDL
+class MyRunner: public ImGui::ImGuiRunner::RunnerSdl
 #endif
 {
 public:

@@ -1,4 +1,4 @@
-#ifdef BABYLON_USE_SDL
+#ifdef IMGUI_RUNNER_USE_SDL
 
 #include <imgui_examples/details/runner_sdl.h>
 #include <examples/imgui_impl_opengl3.h>
@@ -7,20 +7,20 @@
 #include <sstream>
 #include <SDL.h>
 
-namespace ImGuiUtils {
+namespace ImGui {
 namespace ImGuiRunner {
 
-void ImGuiRunnerSdl::InitBackend()
+void RunnerSdl::InitBackend()
 {
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0)
   {
     std::stringstream msg;
-    msg << "ImGuiRunnerSdl::InitBackend error " << SDL_GetError();
+    msg << "RunnerSdl::InitBackend error " << SDL_GetError();
     throw std::runtime_error(msg.str().c_str());
   }
 }
 
-void ImGuiRunnerSdl::Select_Gl_Version()
+void RunnerSdl::Select_Gl_Version()
 {
   // Decide GL+GLSL versions
 #if __APPLE__
@@ -40,7 +40,7 @@ void ImGuiRunnerSdl::Select_Gl_Version()
 #endif
 }
 
-std::string ImGuiRunnerSdl::GlslVersion()
+std::string RunnerSdl::GlslVersion()
 {
 #if __APPLE__
   // GL 3.2 Core + GLSL 150
@@ -52,7 +52,7 @@ std::string ImGuiRunnerSdl::GlslVersion()
     return glsl_version;
 }
 
-void ImGuiRunnerSdl::CreateWindowAndContext()
+void RunnerSdl::CreateWindowAndContext()
 {
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
@@ -64,7 +64,7 @@ void ImGuiRunnerSdl::CreateWindowAndContext()
   SDL_GL_SetSwapInterval(1); // Enable vsync
 }
 
-void ImGuiRunnerSdl::InitGlLoader()
+void RunnerSdl::InitGlLoader()
 {
 //  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 //    throw std::runtime_error("gladLoadGLLoader: Failed");
@@ -87,18 +87,18 @@ void ImGuiRunnerSdl::InitGlLoader()
   }
 
 }
-void ImGuiRunnerSdl::SetupPlatformRendererBindings()
+void RunnerSdl::SetupPlatformRendererBindings()
 {
   ImGui_ImplSDL2_InitForOpenGL(mWindow, mGlContext);
   ImGui_ImplOpenGL3_Init(GlslVersion().c_str());
 }
 
-bool ImGuiRunnerSdl::ExitRequired()
+bool RunnerSdl::ExitRequired()
 {
   return mExitRequired;
 }
 
-void ImGuiRunnerSdl::PollEvents()
+void RunnerSdl::PollEvents()
 {
   SDL_Event event;
   while (SDL_PollEvent(&event))
@@ -115,22 +115,22 @@ void ImGuiRunnerSdl::PollEvents()
   }
 }
 
-void ImGuiRunnerSdl::NewFrame_OpenGl()
+void RunnerSdl::NewFrame_OpenGl()
 {
   ImGui_ImplOpenGL3_NewFrame();
 }
 
-void ImGuiRunnerSdl::NewFrame_Backend()
+void RunnerSdl::NewFrame_Backend()
 {
   ImGui_ImplSDL2_NewFrame(mWindow);
 }
 
-void ImGuiRunnerSdl::RenderDrawData_To_OpenGl()
+void RunnerSdl::RenderDrawData_To_OpenGl()
 {
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void ImGuiRunnerSdl::UpdateAndRenderAdditionalPlatformWindows()
+void RunnerSdl::UpdateAndRenderAdditionalPlatformWindows()
 {
   SDL_Window* backup_current_window = SDL_GL_GetCurrentWindow();
   SDL_GLContext backup_current_context = SDL_GL_GetCurrentContext();
@@ -139,7 +139,7 @@ void ImGuiRunnerSdl::UpdateAndRenderAdditionalPlatformWindows()
   SDL_GL_MakeCurrent(backup_current_window, backup_current_context);
 }
 
-void ImGuiRunnerSdl::Cleanup()
+void RunnerSdl::Cleanup()
 {
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplSDL2_Shutdown();
@@ -150,13 +150,13 @@ void ImGuiRunnerSdl::Cleanup()
   SDL_Quit();
 }
 
-void ImGuiRunnerSdl::SwapBuffers()
+void RunnerSdl::SwapBuffers()
 {
   SDL_GL_SwapWindow(mWindow);
 }
 
-} // namespace ImGuiUtils
 } // namespace ImGuiRunner
+} // namespace ImGui
 
-#endif // #ifdef BABYLON_USE_SDL
+#endif // #ifdef IMGUI_RUNNER_USE_SDL
 

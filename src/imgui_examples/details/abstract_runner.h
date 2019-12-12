@@ -1,16 +1,16 @@
-#ifndef BABYLONCPP_ARUNNER_H
-#define BABYLONCPP_ARUNNER_H
+#ifndef BABYLONCPP_ABSTRACT_RUNNER_H
+#define BABYLONCPP_ABSTRACT_RUNNER_H
 
 #include <string>
 #include <imgui.h>
 
-namespace ImGuiUtils {
+namespace ImGui {
 namespace ImGuiRunner {
 
-class ARunner {
+class AbstractRunner {
 public:
-  ARunner() = default;
-  virtual ~ARunner() = default;
+  AbstractRunner() = default;
+  virtual ~AbstractRunner() = default;
 
   virtual void InitBackend() = 0;
   virtual void Select_Gl_Version() = 0;
@@ -39,7 +39,7 @@ public:
   void RunIt();
 };
 
-} // namespace ImGuiUtils
 } // namespace ImGuiRunner
+} // namespace ImGui
 
-#endif // BABYLONCPP_ARUNNER_H
+#endif // BABYLONCPP_ABSTRACT_RUNNER_H

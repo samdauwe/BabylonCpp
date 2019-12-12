@@ -1,19 +1,19 @@
-#ifndef BABYLONCPP_RUNNER_GLFW_H
-#define BABYLONCPP_RUNNER_GLFW_H
-#ifdef BABYLON_USE_GLFW
-#include "imgui_examples/details/arunner.h"
+#ifndef IMGUI_RUNNER_GLFW_H
+#define IMGUI_RUNNER_GLFW_H
+#ifdef IMGUI_RUNNER_USE_GLFW
+#include "imgui_examples/details/abstract_runner.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 // GLFW + OpenGL3 + glad
 
-namespace ImGuiUtils {
+namespace ImGui {
 namespace ImGuiRunner {
 
-class ImGuiRunnerGlfw : public ARunner {
+class RunnerGlfw : public AbstractRunner {
 public:
-  virtual ~ImGuiRunnerGlfw() = default;
+  virtual ~RunnerGlfw() = default;
 
   void InitBackend() override;
   void Select_Gl_Version() override;
@@ -35,7 +35,7 @@ private:
   GLFWwindow* mWindow = nullptr;
 };
 
-} // namespace ImGuiUtils
 } // namespace ImGuiRunner
-#endif // #ifdef BABYLON_USE_GLFW
-#endif // BABYLONCPP_RUNNER_GLFW_H
+} // namespace ImGui
+#endif // #ifdef IMGUI_RUNNER_USE_GLFW
+#endif // IMGUI_RUNNER_GLFW_H

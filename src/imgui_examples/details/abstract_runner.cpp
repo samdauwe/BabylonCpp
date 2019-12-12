@@ -1,11 +1,11 @@
-#include "imgui_examples/details/arunner.h"
+#include "imgui_examples/details/abstract_runner.h"
 #include <glad/glad.h>
 #include <imgui.h>
 
-namespace ImGuiUtils {
+namespace ImGui {
 namespace ImGuiRunner {
 
-void ARunner::SetupImgGuiContext()
+void AbstractRunner::SetupImgGuiContext()
 {
   // Setup Dear ImGui context
   IMGUI_CHECKVERSION();
@@ -19,7 +19,7 @@ void ARunner::SetupImgGuiContext()
   //io.ConfigViewportsNoTaskBarIcon = true;
 
 }
-void ARunner::SetupImGuiStyle()
+void AbstractRunner::SetupImGuiStyle()
 {
   auto & io = ImGui::GetIO();
   // Setup Dear ImGui style
@@ -35,7 +35,7 @@ void ARunner::SetupImGuiStyle()
   }
 
 }
-void ARunner::LoadFonts()
+void AbstractRunner::LoadFonts()
 {
   // Load Fonts
   // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
@@ -54,14 +54,14 @@ void ARunner::LoadFonts()
 
 }
 
-//void ARunner::ShowGui()
+//void AbstractRunner::ShowGui()
 //{
 //  static bool show_demo_window = true;
 //  if (show_demo_window)
 //    ImGui::ShowDemoWindow(&show_demo_window);
 //}
 
-void ARunner::ImGuiRender()
+void AbstractRunner::ImGuiRender()
 {
   auto & io = ImGui::GetIO();
   ImGui::Render();
@@ -71,12 +71,12 @@ void ARunner::ImGuiRender()
   glClear(GL_COLOR_BUFFER_BIT);
   //ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
-ImVec4 ARunner::ClearColor()
+ImVec4 AbstractRunner::ClearColor()
 {
   return ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 }
 
-void ARunner::RunIt()
+void AbstractRunner::RunIt()
 {
   InitBackend();
   Select_Gl_Version();
@@ -109,5 +109,5 @@ void ARunner::RunIt()
   Cleanup();
 }
 
-} // namespace ImGuiUtils
 } // namespace ImGuiRunner
+} // namespace ImGui
