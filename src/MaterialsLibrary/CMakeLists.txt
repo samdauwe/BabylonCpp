@@ -57,54 +57,15 @@ set(INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include/${BABYLON_NAMESPACE}")
 set(SOURCE_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 # Header files
-file(GLOB MATERIALS_HDR_FILES   ${INCLUDE_PATH}/materialslibrary/cell/*.h
-                                ${INCLUDE_PATH}/materialslibrary/custom/*.h
-                                ${INCLUDE_PATH}/materialslibrary/fire/*.h
-                                ${INCLUDE_PATH}/materialslibrary/fur/*.h
-                                ${INCLUDE_PATH}/materialslibrary/gradient/*.h
-                                ${INCLUDE_PATH}/materialslibrary/grid/*.h
-                                ${INCLUDE_PATH}/materialslibrary/lava/*.h
-                                ${INCLUDE_PATH}/materialslibrary/mix/*.h
-                                ${INCLUDE_PATH}/materialslibrary/normal/*.h
-                                ${INCLUDE_PATH}/materialslibrary/shadowonly/*.h
-                                ${INCLUDE_PATH}/materialslibrary/simple/*.h
-                                ${INCLUDE_PATH}/materialslibrary/sky/*.h
-                                ${INCLUDE_PATH}/materialslibrary/terrain/*.h
-                                ${INCLUDE_PATH}/materialslibrary/triplanar/*.h
-                                ${INCLUDE_PATH}/materialslibrary/water/*.h)
-
-set(BABYLON_MATERIALS_HEADERS
-    ${MATERIALS_HDR_FILES}
-)
-
+file(GLOB_RECURSE BABYLON_MATERIALS_HEADERS   ${INCLUDE_PATH}/*.h)
 # Source files
-file(GLOB MATERIALS_SRC_FILES   ${SOURCE_PATH}/materialslibrary/cell/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/custom/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/fire/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/fur/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/gradient/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/grid/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/lava/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/mix/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/normal/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/shadowonly/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/simple/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/sky/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/terrain/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/triplanar/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/water/*.cpp)
-
-set(BABYLON_MATERIALS_SOURCES
-    ${MATERIALS_SRC_FILES}
-)
+file(GLOB_RECURSE BABYLON_MATERIALS_SOURCES ${SOURCE_PATH}/*.cpp)
 
 # Group source files
 set(HEADER_GROUP "Header Files (API)")
 set(SOURCE_GROUP "Source Files")
-source_group_by_path(${INCLUDE_PATH} "\\\\.h$|\\\\.hpp$"
-    ${HEADER_GROUP} ${BABYLON_MATERIALS_HEADERS})
-source_group_by_path(${SOURCE_PATH}  "\\\\.cpp$|\\\\.c$|\\\\.h$|\\\\.hpp$"
-    ${SOURCE_GROUP} ${BABYLON_MATERIALS_SOURCES})
+source_group_by_path_all(${INCLUDE_PATH})
+source_group_by_path_all(${SOURCE_PATH})
 
 # ============================================================================ #
 #                       Create library                                         #

@@ -42,18 +42,6 @@ source_group_by_path_all(${CMAKE_CURRENT_SOURCE_DIR} ${SOURCES_H_CPP})
 add_executable(${TARGET} ${SOURCES_H_CPP})
 babylon_target_clang_tidy(${TARGET})
 
-# Include directories
-target_include_directories(${TARGET}
-    PRIVATE
-    ${JSON_HPP_INCLUDE_DIRS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../BabylonCpp/include
-    ${CMAKE_CURRENT_BINARY_DIR}/../BabylonCpp/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../Extensions/include
-    ${CMAKE_CURRENT_BINARY_DIR}/../Extensions/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../Samples/include
-)
-
-
 # Libraries
 target_link_libraries(${TARGET}
     PRIVATE
@@ -62,6 +50,7 @@ target_link_libraries(${TARGET}
     BabylonImGui
     BabylonCpp
     Samples
+    json_hpp
 )
 if (NOT EMSCRIPTEN)
     target_link_libraries(${TARGET} PRIVATE ${OPENGL_LIBRARIES})

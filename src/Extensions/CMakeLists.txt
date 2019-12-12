@@ -57,47 +57,8 @@ set(INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include/${BABYLON_NAMESPACE}")
 set(SOURCE_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 # Header files
-file(GLOB EXTENSIONS_HDR_FILES  ${INCLUDE_PATH}/extensions/dynamicterrain/*.h
-                                ${INCLUDE_PATH}/extensions/entitycomponentsystem/*.h
-                                ${INCLUDE_PATH}/extensions/entitycomponentsystem/detail/*.h
-                                ${INCLUDE_PATH}/extensions/entitycomponentsystem/util/*.h
-                                ${INCLUDE_PATH}/extensions/hexplanetgeneration/*.h
-                                ${INCLUDE_PATH}/extensions/hexplanetgeneration/terrain/*.h
-                                ${INCLUDE_PATH}/extensions/hexplanetgeneration/utils/*.h
-                                ${INCLUDE_PATH}/extensions/navigation/*.h
-                                ${INCLUDE_PATH}/extensions/navigation/rvo2/*.h
-                                ${INCLUDE_PATH}/extensions/noisegeneration/*.h
-                                ${INCLUDE_PATH}/extensions/pathfinding/*.h
-                                ${INCLUDE_PATH}/extensions/polyhedron/*.h
-                                ${INCLUDE_PATH}/extensions/recastjs/*.h
-                                ${INCLUDE_PATH}/extensions/treegenerators/*.h)
-
-set(BABYLON_EXTENSIONS_HEADERS
-    ${EXTENSIONS_HDR_FILES}
-)
-
-# Source files
-file(GLOB EXTENSIONS_SRC_FILES  ${SOURCE_PATH}/extensions/dynamicterrain/*.cpp
-                                ${SOURCE_PATH}/extensions/entitycomponentsystem/*.cpp
-                                ${SOURCE_PATH}/extensions/entitycomponentsystem/detail/*.cpp
-                                ${SOURCE_PATH}/extensions/hexplanetgeneration/*.cpp
-                                ${SOURCE_PATH}/extensions/hexplanetgeneration/terrain/*.cpp
-                                ${SOURCE_PATH}/extensions/hexplanetgeneration/utils/*.cpp
-                                ${SOURCE_PATH}/extensions/navigation/*.cpp
-                                ${SOURCE_PATH}/extensions/navigation/rvo2/*.cpp
-                                ${SOURCE_PATH}/extensions/noisegeneration/*.cpp
-                                ${SOURCE_PATH}/extensions/polyhedron/*.cpp
-                                ${SOURCE_PATH}/extensions/recastjs/*.cpp
-                                ${SOURCE_PATH}/extensions/treegenerators/*.cpp
-                                ${SOURCE_PATH}/recastnavigation/Detour/Source/*.cpp
-                                ${SOURCE_PATH}/recastnavigation/DetourCrowd/Source/*.cpp
-                                ${SOURCE_PATH}/recastnavigation/DetourTileCache/Source/*.cpp
-                                ${SOURCE_PATH}/recastnavigation/Recast/Source/*.cpp)
-
-set(BABYLON_EXTENSIONS_SOURCES
-    ${EXTENSIONS_SRC_FILES}
-)
-
+file(GLOB_RECURSE BABYLON_EXTENSIONS_HEADERS  ${INCLUDE_PATH}/*.h)
+file(GLOB_RECURSE BABYLON_EXTENSIONS_SOURCES  ${SOURCE_PATH}/*.cpp)
 # Group source files
 source_group_by_path_all(${INCLUDE_PATH})
 source_group_by_path_all(${SOURCE_PATH})
@@ -156,7 +117,6 @@ target_include_directories(${TARGET}
     ${INCLUDE_PATH}/../recastnavigation/DetourCrowd/Include
     ${INCLUDE_PATH}/../recastnavigation/DetourTileCache/Include
     ${INCLUDE_PATH}/../recastnavigation/Recast/Include
-    ${JSON_HPP_INCLUDE_DIRS}
     ${CMAKE_CURRENT_BINARY_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../BabylonCpp/include
@@ -171,18 +131,13 @@ target_link_libraries(${TARGET}
     PUBLIC
     PRIVATE
     BabylonCpp
+    json_hpp
 )
 
 # Compile definitions
 target_compile_definitions(${TARGET}
     PUBLIC
     $<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:${TARGET_UPPER}_STATIC_DEFINE>
-)
-
-# Compile options
-target_compile_options(${TARGET}
-    PRIVATE
-    PUBLIC
 )
 
 # Set library ouput name

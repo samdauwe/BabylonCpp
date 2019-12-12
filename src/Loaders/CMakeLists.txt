@@ -57,22 +57,9 @@ set(INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include/${BABYLON_NAMESPACE}")
 set(SOURCE_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 # Header files
-file(GLOB LOADERS_HDR_FILES   ${INCLUDE_PATH}/loading/glTF/*.h
-                              ${INCLUDE_PATH}/loading/glTF/2.0/*.h
-                              ${INCLUDE_PATH}/loading/glTF/2.0/extensions/*.h)
-
-set(BABYLON_LOADERS_HEADERS
-    ${LOADERS_HDR_FILES}
-)
-
+file(GLOB_RECURSE BABYLON_LOADERS_HEADERS   ${INCLUDE_PATH}/*.h)
 # Source files
-file(GLOB LOADERS_SRC_FILES   ${SOURCE_PATH}/loading/glTF/*.cpp
-                              ${SOURCE_PATH}/loading/glTF/2.0/*.cpp
-                              ${SOURCE_PATH}/loading/glTF/2.0/extensions/*.cpp)
-
-set(BABYLON_LOADERS_SOURCES
-    ${LOADERS_SRC_FILES}
-)
+file(GLOB_RECURSE BABYLON_LOADERS_SOURCES   ${SOURCE_PATH}/*.cpp)
 
 # Group source files
 set(HEADER_GROUP "Header Files (API)")
@@ -133,7 +120,6 @@ set_target_properties(${TARGET}
 # Include directories
 target_include_directories(${TARGET}
     PRIVATE
-    ${JSON_HPP_INCLUDE_DIRS}
     ${CMAKE_CURRENT_BINARY_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../BabylonCpp/include
@@ -144,7 +130,7 @@ target_include_directories(${TARGET}
 )
 
 # Libraries
-target_link_libraries(${TARGET} PRIVATE BabylonCpp)
+target_link_libraries(${TARGET} PRIVATE BabylonCpp json_hpp)
 
 # Compile definitions
 target_compile_definitions(${TARGET}
