@@ -23,8 +23,7 @@ namespace ImGuiUtils
 namespace ImGuiRunner
 {
 
-//#ifndef __EMSCRIPTEN__
-#if 1
+#ifndef __EMSCRIPTEN__
 void Glad_Init()
 {
   if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress))
