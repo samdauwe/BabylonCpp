@@ -1,55 +1,30 @@
-# ============================================================================ #
-#                            Executable name and options                       #
-# ============================================================================ #
+if (WIN32)
+  message(WARNING "ExtensionsTests needs to be fixed for windows")
+else()
+  # Target name
+  set(TARGET ExtensionsTests)
+  message(STATUS "Test ${TARGET}")
 
-# Target name
-set(TARGET ExtensionsTests)
-message(STATUS "Test ${TARGET}")
+  # Sources
+  file(GLOB_RECURSE SRC_FILES *.cpp)
+  set(sources
+      ${SRC_FILES}
+  )
 
-# ============================================================================ #
-#                            Sources                                           #
-# ============================================================================ #
+  package_add_test(${TARGET} ${sources})
+  babylon_target_clang_tidy(${TARGET})
 
-# Sources
-file(GLOB_RECURSE SRC_FILES *.cpp)
-set(sources
-    ${SRC_FILES}
-)
+  set_target_properties(${TARGET}
+      PROPERTIES ${DEFAULT_PROJECT_OPTIONS}
+      FOLDER "${IDE_FOLDER}"
+  )
 
-# ============================================================================ #
-#                            Create executable                                 #
-# ============================================================================ #
+  target_include_directories(${TARGET}
+      PRIVATE
+      ${CMAKE_CURRENT_SOURCE_DIR}/../include
+      ${CMAKE_CURRENT_BINARY_DIR}/../include
+  )
 
-# Build executable
-package_add_test(${TARGET} ${sources})
-babylon_target_clang_tidy(${TARGET})
-
-# Project options
-set_target_properties(${TARGET}
-    PROPERTIES ${DEFAULT_PROJECT_OPTIONS}
-    FOLDER "${IDE_FOLDER}"
-)
-
-# Include directories
-target_include_directories(${TARGET}
-    PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/../include
-    ${CMAKE_CURRENT_BINARY_DIR}/../include
-)
-
-# Libraries
-target_link_libraries(${TARGET}
-    PRIVATE
-    BabylonCpp
-    Extensions
-)
-
-# Compile definitions
-target_compile_definitions(${TARGET}
-    PRIVATE
-)
-
-# Compile options
-target_compile_options(${TARGET}
-    PRIVATE
-)
+  # Libraries
+  target_link_libraries(${TARGET} PRIVATE BabylonCpp Extensions)
+endif()
