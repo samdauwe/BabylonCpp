@@ -80,3 +80,9 @@ void ShowDemo()
 }
 } // namespace ImGuiRunner
 } // namespace ImGuiUtils
+
+
+int main()
+{
+  ImGuiUtils::ImGuiRunner::ShowDemo();
+}

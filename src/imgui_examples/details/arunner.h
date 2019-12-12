@@ -1,0 +1,38 @@
+#ifndef BABYLONCPP_ARUNNER_H
+#define BABYLONCPP_ARUNNER_H
+
+#include <string>
+#include <imgui.h>
+
+namespace ImGuiUtils {
+namespace ImGuiRunner {
+
+class ARunner {
+public:
+  ARunner() = default;
+  virtual ~ARunner() = default;
+
+  virtual void InitBackend() = 0;
+  virtual void Select_Gl_Version() = 0;
+  virtual std::string GlslVersion() = 0;
+  virtual void CreateWindowAndContext() = 0;
+  virtual void SetupImgGuiContext();
+  virtual void SetupImGuiStyle();
+  virtual void InitGlLoader() = 0;
+  virtual void SetupPlatformRendererBindings() = 0;
+  virtual void LoadFonts();
+
+  ImVec4 ClearColor();
+  virtual bool ExitRequired() = 0;
+  virtual void PollEvents() = 0;
+  virtual void NewFrame_OpenGl() = 0; // this could also be vulkan
+  virtual void NewFrame_Backend() = 0;
+  void ImGuiRender();
+  // override this function with your own gui!
+  virtual void ShowGui();
+};
+
+} // namespace ImGuiUtils
+} // namespace ImGuiRunner
+
+#endif // BABYLONCPP_ARUNNER_H
