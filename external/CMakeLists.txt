@@ -157,3 +157,8 @@ if (BABYLON_BUILD_PLAYGROUND)
     target_include_directories(RuntimeCompiler INTERFACE SYSTEM ${RuntimeCompiledCPlusPlus_Dir})
     target_include_directories(RuntimeObjectSystem INTERFACE SYSTEM ${RuntimeCompiledCPlusPlus_Dir})
 endif()
+
+# SDL
+set (SdlDir ${CMAKE_CURRENT_SOURCE_DIR}/SDL)
+add_subdirectory(${SdlDir})
+
