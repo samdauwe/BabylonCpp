@@ -61,9 +61,29 @@ std::string RunnerGlfw::GlslVersion()
 
 void RunnerGlfw::CreateWindowAndContext()
 {
-  mWindow = glfwCreateWindow(1280, 720, "Dear ImGui GLFW+OpenGL3 example", NULL, NULL);
+  // Check if full screen mode is requested
+  if (mBackendFullScreen)
+  {
+    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+    glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+    glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+    glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+    glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+    mWindow = glfwCreateWindow(mode->width, mode->height, mBackendWindowTitle.c_str(), monitor, nullptr);
+  }
+  else
+  {
+    mWindow = glfwCreateWindow((int)mBackendWindowSize.x, (int)mBackendWindowSize.y, mBackendWindowTitle.c_str(), NULL, NULL);
+  }
+  if ( (mBackendWindowPosition.x >= 0.f ) && (mBackendWindowPosition.y >= 0.f))
+    glfwSetWindowPos(mWindow, (int)mBackendWindowPosition.x , (int)mBackendWindowPosition.y);
+
   if (mWindow == NULL)
+  {
+    glfwTerminate();
     throw std::runtime_error("RunnerGlfw::CreateWindowAndContext failed");
+  }
   glfwMakeContextCurrent(mWindow);
   glfwSwapInterval(1); // Enable vsync
 }

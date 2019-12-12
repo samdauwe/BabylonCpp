@@ -5,6 +5,32 @@
 namespace ImGui {
 namespace ImGuiRunner {
 
+#if defined(_WIN32)
+#undef APIENTRY
+  #include <windows.h>
+  ImVec2 MainScreenResolution()
+  {
+    return {
+      (int)GetSystemMetrics(SM_CXSCREEN),
+      (int)GetSystemMetrics(SM_CYSCREEN)
+    };
+  }
+#elif defined(__linux__)
+  #include <X11/Xlib.h>
+  ImVec2 MainScreenResolution()
+  {
+    Display* d = XOpenDisplay(NULL);
+    Screen* s  = DefaultScreenOfDisplay(d);
+    return { s->width, s->height };
+  }
+#else
+ImVec2 MainScreenResolution()
+{
+  return { 1280.f, 720.f };
+}
+#endif
+
+
 void AbstractRunner::SetupImgGuiContext()
 {
   // Setup Dear ImGui context
@@ -66,14 +92,10 @@ void AbstractRunner::ImGuiRender()
   auto & io = ImGui::GetIO();
   ImGui::Render();
   glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
-  ImVec4 clear_color = ClearColor();
+  ImVec4 clear_color = mClearColor;
   glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
   glClear(GL_COLOR_BUFFER_BIT);
   //ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-}
-ImVec4 AbstractRunner::ClearColor()
-{
-  return ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 }
 
 void AbstractRunner::RunIt()
