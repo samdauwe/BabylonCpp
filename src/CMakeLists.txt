@@ -25,3 +25,4 @@ endif()
 #-- Applications
 add_subdirectory(BabylonStudio)
 add_subdirectory(BabylonStudio_Wasm)
+add_subdirectory(imgui_examples)

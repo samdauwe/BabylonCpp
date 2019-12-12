@@ -159,6 +159,8 @@ if (BABYLON_BUILD_PLAYGROUND)
 endif()
 
 # SDL
-set (SdlDir ${CMAKE_CURRENT_SOURCE_DIR}/SDL)
-add_subdirectory(${SdlDir})
-
+option(BABYLON_SDL "Build babylon sdl version (glfw is always built)" ON)
+if (NOT EMSCRIPTEN) # SDL is already provided in emscripten
+    set (SdlDir ${CMAKE_CURRENT_SOURCE_DIR}/SDL)
+    add_subdirectory(${SdlDir})
+endif()
