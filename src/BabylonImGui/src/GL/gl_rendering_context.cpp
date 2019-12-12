@@ -171,6 +171,7 @@ void glad_pre_call_callback(const char* name, void* /*funcptr*/,
 
 bool GLRenderingContext::initialize(bool enableGLDebugging)
 {
+#ifndef __EMSCRIPTEN__
   // HUM : glad already loaded by imgui ?
   // Initialize glad
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -184,7 +185,7 @@ bool GLRenderingContext::initialize(bool enableGLDebugging)
   glad_set_pre_callback(glad_pre_call_callback);
   glad_set_post_callback(glad_post_call_callback);
 #endif
-
+#endif // __EMSCRIPTEN__
   // Log the GL version
   BABYLON_LOGF_INFO("GLRenderingContext", "Using GL version: %s",
                     glGetString(GL_VERSION));
@@ -195,11 +196,12 @@ bool GLRenderingContext::initialize(bool enableGLDebugging)
   // backupGLState();
 
   // Enable debug output
+#ifndef __EMSCRIPTEN__
   if (enableGLDebugging) {
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(MessageCallback, nullptr);
   }
-
+#endif //__EMSCRIPTEN__
   return true;
 }
 
