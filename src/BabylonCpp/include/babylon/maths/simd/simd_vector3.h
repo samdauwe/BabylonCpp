@@ -1,6 +1,6 @@
 #ifndef BABYLON_MATH_SIMD_VECTOR3_H
 #define BABYLON_MATH_SIMD_VECTOR3_H
-
+#ifdef OPTION_ENABLE_SIMD
 #include <babylon/babylon_api.h>
 
 namespace BABYLON {
@@ -23,5 +23,5 @@ struct BABYLON_SHARED_EXPORT SIMDVector3 {
 
 } // end of namespace SIMD
 } // end of namespace BABYLON
-
+#endif // #ifdef OPTION_ENABLE_SIMD
 #endif // end of BABYLON_MATH_SIMD_VECTOR3_H
