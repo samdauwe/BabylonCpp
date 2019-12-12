@@ -14,11 +14,6 @@ else()
   package_add_test(${TARGET} ${sources})
   babylon_target_clang_tidy(${TARGET})
 
-  set_target_properties(${TARGET}
-      PROPERTIES ${DEFAULT_PROJECT_OPTIONS}
-      FOLDER "${IDE_FOLDER}"
-  )
-
   target_include_directories(${TARGET}
       PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/../include

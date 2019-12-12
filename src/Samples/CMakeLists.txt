@@ -229,12 +229,6 @@ generate_export_header(${TARGET}
     EXPORT_MACRO_NAME ${EXPORT_MACRO}
 )
 
-# Project options
-set_target_properties(${TARGET}
-    PROPERTIES ${DEFAULT_PROJECT_OPTIONS}
-    FOLDER "${IDE_FOLDER}"
-)
-
 # Include directories
 target_include_directories(${TARGET}
     PRIVATE
