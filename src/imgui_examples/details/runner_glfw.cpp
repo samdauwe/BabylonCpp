@@ -59,6 +59,15 @@ std::string ImGuiRunnerGlfw::GlslVersion()
   return glsl_version;
 }
 
+void ImGuiRunnerGlfw::CreateWindowAndContext()
+{
+  mWindow = glfwCreateWindow(1280, 720, "Dear ImGui GLFW+OpenGL3 example", NULL, NULL);
+  if (mWindow == NULL)
+    throw std::runtime_error("ImGuiRunnerGlfw::CreateWindowAndContext failed");
+  glfwMakeContextCurrent(mWindow);
+  glfwSwapInterval(1); // Enable vsync
+}
+
 void ImGuiRunnerGlfw::InitGlLoader()
 {
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -83,16 +92,6 @@ void ImGuiRunnerGlfw::InitGlLoader()
 //  }
 }
 
-
-void ImGuiRunnerGlfw::CreateWindowAndContext()
-{
-  mWindow = glfwCreateWindow(1280, 720, "Dear ImGui GLFW+OpenGL3 example", NULL, NULL);
-  if (mWindow == NULL)
-    throw std::runtime_error("ImGuiRunnerGlfw::CreateWindowAndContext failed");
-  glfwMakeContextCurrent(mWindow);
-  glfwSwapInterval(1); // Enable vsync
-}
-
 void ImGuiRunnerGlfw::SetupPlatformRendererBindings()
 {
   ImGui_ImplGlfw_InitForOpenGL(mWindow, true);
@@ -114,20 +113,21 @@ void ImGuiRunnerGlfw::PollEvents()
   glfwPollEvents();
 }
 
-void ImGuiRunnerGlfw::NewFrame_Backend()
-{
-  ImGui_ImplGlfw_NewFrame();
-}
-
 void ImGuiRunnerGlfw::NewFrame_OpenGl()
 {
   ImGui_ImplOpenGL3_NewFrame();
+}
+
+void ImGuiRunnerGlfw::NewFrame_Backend()
+{
+  ImGui_ImplGlfw_NewFrame();
 }
 
 void ImGuiRunnerGlfw::RenderDrawData_To_OpenGl()
 {
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
+
 void ImGuiRunnerGlfw::UpdateAndRenderAdditionalPlatformWindows()
 {
   GLFWwindow* backup_current_context = glfwGetCurrentContext();

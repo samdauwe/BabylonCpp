@@ -21,8 +21,8 @@ set(sources_demo
     )
 
 add_executable(imgui_runner_demo_glfw ${sources_demo})
-add_executable(imgui_runner_demo_sdl ${sources_demo})
+add_executable(imgui_runner_demo_sdl ${sources_demo} ${imgui_dir}/examples/imgui_impl_sdl.cpp)
 target_compile_definitions(imgui_runner_demo_glfw PRIVATE BABYLON_USE_GLFW)
 target_compile_definitions(imgui_runner_demo_sdl PRIVATE BABYLON_USE_SDL)
-target_link_libraries(imgui_runner_demo_glfw PRIVATE imgui_utils)
-target_link_libraries(imgui_runner_demo_sdl PRIVATE imgui_utils)
+target_link_libraries(imgui_runner_demo_glfw PRIVATE imgui_utils glfw)
+target_link_libraries(imgui_runner_demo_sdl PRIVATE imgui_utils SDL2)

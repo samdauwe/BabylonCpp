@@ -1,19 +1,19 @@
-#ifndef BABYLONCPP_RUNNER_GLFW_H
-#define BABYLONCPP_RUNNER_GLFW_H
-#ifdef BABYLON_USE_GLFW
+#ifndef BABYLONCPP_RUNNER_SDL_H
+#define BABYLONCPP_RUNNER_SDL_H
+#ifdef BABYLON_USE_SDL
 #include "imgui_examples/details/arunner.h"
 
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include <SDL.h>
 
-// GLFW + OpenGL3 + glad
+// SDL + OpenGL3 + glad
 
 namespace ImGuiUtils {
 namespace ImGuiRunner {
 
-class ImGuiRunnerGlfw : public ARunner {
+class ImGuiRunnerSdl : public ARunner {
 public:
-  virtual ~ImGuiRunnerGlfw() = default;
+  virtual ~ImGuiRunnerSdl() = default;
 
   void InitBackend() override;
   void Select_Gl_Version() override;
@@ -32,10 +32,13 @@ public:
   void SwapBuffers() override;
 
 private:
-  GLFWwindow* mWindow = nullptr;
+  SDL_Window* mWindow = nullptr;
+  SDL_GLContext mGlContext = nullptr;
+  bool mExitRequired = false;
 };
 
 } // namespace ImGuiUtils
 } // namespace ImGuiRunner
-#endif // #ifdef BABYLON_USE_GLFW
-#endif // BABYLONCPP_RUNNER_GLFW_H
+
+#endif // #ifdef BABYLON_USE_SDL
+#endif // BABYLONCPP_RUNNER_SDL_H

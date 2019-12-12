@@ -90,9 +90,14 @@ int main1()
 
 
 #include <imgui_examples/details/runner_glfw.h>
+#include <imgui_examples/details/runner_sdl.h>
 
 #ifdef BABYLON_USE_GLFW
 class MyRunner: public ImGuiUtils::ImGuiRunner::ImGuiRunnerGlfw
+#endif
+#ifdef BABYLON_USE_SDL
+class MyRunner: public ImGuiUtils::ImGuiRunner::ImGuiRunnerSdl
+#endif
 {
 public:
 void ShowGui()
@@ -101,15 +106,11 @@ void ShowGui()
   if (show_demo_window)
     ImGui::ShowDemoWindow(&show_demo_window);
 }
-
 };
-#endif
 
 int main()
 {
-#ifdef BABYLON_USE_GLFW
   MyRunner runner;
   runner.RunIt();
-#endif
   return 0;
 }

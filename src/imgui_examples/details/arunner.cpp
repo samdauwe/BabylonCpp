@@ -100,7 +100,8 @@ void ARunner::RunIt()
     ImGuiRender();
     RenderDrawData_To_OpenGl();
 
-    UpdateAndRenderAdditionalPlatformWindows();
+    if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+      UpdateAndRenderAdditionalPlatformWindows();
 
     SwapBuffers();
   }
