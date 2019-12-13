@@ -4,7 +4,7 @@
 #include <babylon/inspector/inspector.h>
 #include <babylon/inspector/samples_browser.h>
 #include <functional>
-#include <imgui_utils/app_runner/imgui_runner_old.h>
+#include <imgui_runner_babylon/runner_babylon.h>
 #include <imgui_utils/code_editor.h>
 #include <map>
 
@@ -38,8 +38,7 @@ namespace BABYLON {
 
   void runBabylonStudio(
     std::shared_ptr<BABYLON::IRenderableScene> scene = nullptr,
-    BabylonStudioOptions options = BabylonStudioOptions(),
-    ImGuiUtils::ImGuiRunner::ImGuiRunnerFunctionType imGuiRunnerImplem = {}
+    BabylonStudioOptions options = BabylonStudioOptions()
   );
 } // end of namespace BABYLON
 

@@ -1,15 +1,15 @@
 #ifndef IMGUI_UTILS_IMGUI_RUNNER_H
 #define IMGUI_UTILS_IMGUI_RUNNER_H
+#include "imgui_runner/abstract_runner.h"
 #include <functional>
 #include <imgui.h>
-#include "imgui_runner/abstract_runner.h"
 #include <memory>
 #include <string>
 
-
 namespace ImGuiUtils {
 namespace ImGuiRunner {
-// GuiFunction : any function that displays widgets using ImGui
+
+// GuiFunctionWithExit : any function that displays widgets using ImGui
 // and returns true if exit is desired
 using GuiFunctionWithExit = std::function<bool(void)>;
 
@@ -38,7 +38,7 @@ struct AppWindowParams {
   std::string Title = "My Window";
   ImVec4 ClearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-  DefaultWindowTypeOption DefaultWindowType;
+  DefaultWindowTypeOption DefaultWindowType = DefaultWindowTypeOption::ProvideFullScreenWindow;
 
   bool ShowMenuBar                       = false;
   bool ConfigWindowsMoveFromTitleBarOnly = true;
@@ -46,9 +46,6 @@ struct AppWindowParams {
 
   std::function<void(ImGuiID /* fullDockSpace */)> InitialDockLayoutFunction;
 };
-
-using ImGuiRunnerFunctionType
-  = std::function<void(GuiFunctionWithExit, AppWindowParams, PostInitFunction)>;
 
 class RunnerBabylon {
 public:
@@ -60,11 +57,33 @@ public:
   static void ResetDockLayout();
 
 private:
+  void DoInit();
+
   std::unique_ptr<ImGui::ImGuiRunner::AbstractRunner> mAbstractRunner;
   AppWindowParams mAppWindowParams;
   GuiFunctionWithExit mGuiFunctionWithExit;
   PostInitFunction mPostInitFunction;
 };
+
+#ifdef IMGUI_RUNNER_USE_GLFW
+void InvokeRunnerBabylonGlfw(const AppWindowParams& appWindowParams,
+                             GuiFunctionWithExit guiFunctionWithExit,
+                             PostInitFunction postInitFunction = EmptyPostInitFunction);
+#endif
+#ifdef IMGUI_RUNNER_USE_SDL
+void InvokeRunnerBabylonSdl(const AppWindowParams& appWindowParams,
+                            GuiFunctionWithExit guiFunctionWithExit,
+                            PostInitFunction postInitFunction);
+#endif
+#ifdef EMSCRIPTEN
+void InvokeRunnerBabylonEmscripten(const AppWindowParams& appWindowParams,
+                                   GuiFunctionWithExit guiFunctionWithExit,
+                                   PostInitFunction postInitFunction);
+#endif
+
+void InvokeRunnerBabylon(const AppWindowParams& appWindowParams,
+                         GuiFunctionWithExit guiFunctionWithExit,
+                         PostInitFunction postInitFunction = EmptyPostInitFunction);
 
 } // namespace ImGuiRunner
 } // namespace ImGuiUtils

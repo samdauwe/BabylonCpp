@@ -1,11 +1,11 @@
-#include "BabylonStudio/HelloScene.h"
+#include "HelloScene.h"
 
 #include <babylon/cameras/free_camera.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/meshes/mesh.h>
 
 // This files demonstrates how to create a very simple renderable scene
-struct HelloScene : public BABYLON::IRenderableScene
+struct HelloScene : public BABYLON::IRenderableSceneWithHud
 {
   HelloScene()
   {
@@ -43,7 +43,7 @@ struct HelloScene : public BABYLON::IRenderableScene
   }
 };
 
-std::shared_ptr<BABYLON::IRenderableScene> MakeHelloScene()
+std::shared_ptr<BABYLON::IRenderableSceneWithHud> MakeHelloScene()
 {
   return std::make_shared<HelloScene>();
 }

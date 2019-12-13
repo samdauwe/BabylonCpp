@@ -3,7 +3,7 @@
 #include <babylon/core/string.h>
 #include <babylon/core/system.h>
 #include <functional>
-#include <imgui_utils/app_runner/imgui_runner_old.h>
+#include <imgui_runner_babylon/runner_babylon.h>
 #include <imgui_utils/code_editor.h>
 #include <imgui_utils/icons_font_awesome_5.h>
 #include <imgui_utils/imgui_utils.h>
@@ -351,13 +351,15 @@ void demoCodeEditor()
        "../../../src/imgui_babylon/include/babylon/imgui_babylon/sample_list_page.h"};
   ImGuiUtils::CodeEditor codeEditor(true);
   codeEditor.setFiles(path);
-  auto demoGui = [&]() { codeEditor.render(); };
+  auto demoGui = [&]() { codeEditor.render(); return false;};
 
   ImGuiUtils::ImGuiRunner::AppWindowParams params;
   // params.FullScreen = true;
   params.Title       = "Hello World";
   params.ShowMenuBar = true;
-  ImGuiUtils::ImGuiRunner::RunGui(demoGui, params);
+
+
+  ImGuiUtils::ImGuiRunner::InvokeRunnerBabylon(params, demoGui);
 }
 
 } // namespace ImGuiUtils

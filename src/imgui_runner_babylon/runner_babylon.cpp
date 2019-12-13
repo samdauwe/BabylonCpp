@@ -4,7 +4,9 @@
 #include <glad/glad.h>
 #include "imgui_utils/icons_font_awesome_5.h"
 #include <imgui_utils/imgui_utils.h>
-
+#include "imgui_runner/runner_glfw.h"
+#include "imgui_runner/runner_sdl.h"
+#include "imgui_runner/runner_emscripten.h"
 
 namespace ImGuiUtils
 {
@@ -140,19 +142,24 @@ RunnerBabylon::RunnerBabylon(
   , mGuiFunctionWithExit(guiFunctionWithExit)
   , mPostInitFunction(postInitFunction)
 {
-  mAbstractRunner->SetBackendFullScreen(appWindowParams.FullScreen);
-  mAbstractRunner->SetBackendWindowTitle(appWindowParams.Title);
-  mAbstractRunner->SetBackendWindowSize(ImVec2((float)appWindowParams.Width, (float)appWindowParams.Height) );
+  DoInit();
+}
+
+void RunnerBabylon::DoInit()
+{
+  mAbstractRunner->SetBackendFullScreen(mAppWindowParams.FullScreen);
+  mAbstractRunner->SetBackendWindowTitle(mAppWindowParams.Title);
+  mAbstractRunner->SetBackendWindowSize(ImVec2((float)mAppWindowParams.Width, (float)mAppWindowParams.Height) );
 
   if (mAppWindowParams.WindowedFullScreen)
   {
     ImVec2 winSize;
     winSize.x = (float)ImGui::ImGuiRunner::MainScreenResolution().x;
-    winSize.y = (float)ImGui::ImGuiRunner::MainScreenResolution().y - appWindowParams.WindowedFullScreen_HeightReduce;
+    winSize.y = (float)ImGui::ImGuiRunner::MainScreenResolution().y - mAppWindowParams.WindowedFullScreen_HeightReduce;
     mAbstractRunner->SetBackendWindowSize(winSize);
   }
 
-  mAbstractRunner->SetClearColor(appWindowParams.ClearColor);
+  mAbstractRunner->SetClearColor(mAppWindowParams.ClearColor);
 
   mAbstractRunner->LoadFonts = runner_babylon_details::LoadFontAwesome;
 
@@ -198,14 +205,80 @@ RunnerBabylon::RunnerBabylon(
 
   mAbstractRunner->ShowGui = showGui;
 }
+
 void RunnerBabylon::Run()
 {
   mAbstractRunner->Run();
 }
+
 void RunnerBabylon::ResetDockLayout()
 {
   runner_babylon_details::SetDockLayout_NotDone();
 }
+
+#ifdef IMGUI_RUNNER_USE_GLFW
+void InvokeRunnerBabylonGlfw(const AppWindowParams& appWindowParams,
+                             GuiFunctionWithExit guiFunctionWithExit,
+                             PostInitFunction postInitFunction)
+{
+  auto runner = std::make_unique<ImGui::ImGuiRunner::RunnerGlfw>();
+  auto runner_babylon = RunnerBabylon(
+    std::move(runner),
+    appWindowParams,
+    guiFunctionWithExit,
+    postInitFunction
+    );
+  runner_babylon.Run();
+}
+#endif
+
+#ifdef IMGUI_RUNNER_USE_SDL
+void InvokeRunnerBabylonSdl(const AppWindowParams& appWindowParams,
+                             GuiFunctionWithExit guiFunctionWithExit,
+                             PostInitFunction postInitFunction)
+{
+  auto runner = std::make_unique<ImGui::ImGuiRunner::RunnerSdl>();
+  auto runner_babylon = RunnerBabylon(
+    std::move(runner),
+    appWindowParams,
+    guiFunctionWithExit,
+    postInitFunction
+  );
+  runner_babylon.Run();
+}
+#endif
+
+#ifdef EMSCRIPTEN
+void InvokeRunnerBabylonEmscripten(const AppWindowParams& appWindowParams,
+                                   GuiFunctionWithExit guiFunctionWithExit,
+                                   PostInitFunction postInitFunction)
+{
+  auto runner = std::make_unique<ImGui::ImGuiRunner::RunnerEmscripten>();
+  auto runner_babylon = RunnerBabylon(
+    std::move(runner),
+    appWindowParams,
+    guiFunctionWithExit,
+    postInitFunction
+  );
+  runner_babylon.Run();
+}
+#endif
+
+void InvokeRunnerBabylon(const AppWindowParams& appWindowParams,
+                         GuiFunctionWithExit guiFunctionWithExit,
+                         PostInitFunction postInitFunction)
+{
+#ifdef EMSCRIPTEN
+  InvokeRunnerBabylonEmscripten(appWindowParams, guiFunctionWithExit, postInitFunction);
+#elif defined(IMGUI_RUNNER_USE_GLFW)
+  InvokeRunnerBabylonGlfw(appWindowParams, guiFunctionWithExit, postInitFunction);
+#elif defined(IMGUI_RUNNER_USE_SDL)
+  InvokeRunnerBabylonSdl(appWindowParams, guiFunctionWithExit, postInitFunction);
+#else
+  #error "InvokeRunnerBabylon: Not Backend available!"
+#endif
+}
+
 
 } // namespace ImGuiRunner
 } // namespace ImGuiUtils

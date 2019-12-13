@@ -7,7 +7,7 @@
 #include <babylon/interfaces/irenderable_scene_with_hud.h>
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <imgui_utils/app_runner/imgui_runner_old.h>
+#include <imgui_runner_babylon/runner_babylon.h>
 #include <imgui_utils/icons_font_awesome_5.h>
 
 #include <babylon/babylon_imgui/babylon_studio_layout.h>
@@ -47,9 +47,7 @@ public:
   }
 
   void RunApp(std::shared_ptr<BABYLON::IRenderableScene> initialScene,
-              const BabylonStudioOptions& options,
-              ImGuiUtils::ImGuiRunner::ImGuiRunnerFunctionType imGuiRunnerImplem
-              )
+              const BabylonStudioOptions& options)
   {
     _appContext._options                              = options;
     _appContext._options._appWindowParams.ShowMenuBar = true;
@@ -76,8 +74,11 @@ public:
     _appContext._options._appWindowParams.InitialDockLayoutFunction = [this](ImGuiID mainDockId) {
       _studioLayout.PrepareLayout(mainDockId);
     };
-    imGuiRunnerImplem(showGuiLambda, _appContext._options._appWindowParams,
-                                    initSceneLambda);
+    ImGuiUtils::ImGuiRunner::InvokeRunnerBabylon(
+      _appContext._options._appWindowParams,
+      showGuiLambda,
+      initSceneLambda
+    );
   }
 
 private:
@@ -372,17 +373,13 @@ private:
 
 // public API
 void runBabylonStudio(std::shared_ptr<BABYLON::IRenderableScene> scene,
-                      BabylonStudioOptions options /* = SceneWithInspectorOptions() */,
-                      ImGuiUtils::ImGuiRunner::ImGuiRunnerFunctionType imGuiRunnerImplem /*= {}*/
+                      BabylonStudioOptions options /* = SceneWithInspectorOptions() */
 )
 {
   BABYLON::BabylonStudioApp app;
   if (scene == nullptr)
     scene = std::make_shared<EmptyScene>();
-  if (!imGuiRunnerImplem)
-    imGuiRunnerImplem = ImGuiUtils::ImGuiRunner::RunGui_WithExit;
-
-  app.RunApp(scene, options, imGuiRunnerImplem);
+  app.RunApp(scene, options);
 }
 
 } // namespace BABYLON
