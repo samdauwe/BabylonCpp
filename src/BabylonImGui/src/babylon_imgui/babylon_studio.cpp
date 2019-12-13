@@ -46,7 +46,7 @@ public:
     _playgroundCodeEditor.setLightPalette();
   }
 
-  void RunApp(std::shared_ptr<BABYLON::IRenderableScene> initialScene,
+  void RunApp(const std::shared_ptr<BABYLON::IRenderableScene>& initialScene,
               const BabylonStudioOptions& options)
   {
     _appContext._options                              = options;
@@ -377,9 +377,9 @@ void runBabylonStudio(std::shared_ptr<BABYLON::IRenderableScene> scene,
 )
 {
   BABYLON::BabylonStudioApp app;
-  if (scene == nullptr)
-    scene = std::make_shared<EmptyScene>();
-  app.RunApp(scene, options);
+  std::shared_ptr<BABYLON::IRenderableScene> sceneNotNull =
+    scene ? scene : std::make_shared<EmptyScene>();
+  app.RunApp(sceneNotNull, options);
 }
 
 } // namespace BABYLON

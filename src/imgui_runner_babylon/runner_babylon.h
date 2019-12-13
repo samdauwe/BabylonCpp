@@ -50,7 +50,8 @@ struct AppWindowParams {
 class RunnerBabylon {
 public:
   RunnerBabylon(std::unique_ptr<ImGui::ImGuiRunner::AbstractRunner> abstractRunner,
-                const AppWindowParams& appWindowParams, GuiFunctionWithExit guiFunctionWithExit,
+                const AppWindowParams& appWindowParams,
+                GuiFunctionWithExit guiFunctionWithExit,
                 PostInitFunction postInitFunction = EmptyPostInitFunction);
 
   void Run();
@@ -62,7 +63,7 @@ private:
   std::unique_ptr<ImGui::ImGuiRunner::AbstractRunner> mAbstractRunner;
   AppWindowParams mAppWindowParams;
   GuiFunctionWithExit mGuiFunctionWithExit;
-  PostInitFunction mPostInitFunction;
+  PostInitFunction mPostInitFunction = EmptyPostInitFunction;
 };
 
 #ifdef IMGUI_RUNNER_USE_GLFW

@@ -37,7 +37,7 @@ namespace BABYLON {
   };
 
   void runBabylonStudio(
-    std::shared_ptr<BABYLON::IRenderableScene> scene = nullptr,
+    const std::shared_ptr<BABYLON::IRenderableScene>& scene = nullptr,
     BabylonStudioOptions options = BabylonStudioOptions()
   );
 } // end of namespace BABYLON
