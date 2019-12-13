@@ -12,10 +12,9 @@
 
 void MyCreateDockLayout(ImGuiID fullDockSpaceId)
 {
-  ImGuiViewport* viewport = ImGui::GetMainViewport();
   ImGui::DockBuilderRemoveNode(fullDockSpaceId); // Clear out existing layout
   ImGui::DockBuilderAddNode(fullDockSpaceId);    // Add empty node
-  ImGui::DockBuilderSetNodeSize(fullDockSpaceId, viewport->Size);
+  ImGui::DockBuilderSetNodeSize(fullDockSpaceId, ImGui::GetIO().DisplaySize);
 
   ImGuiID dock_main_id
     = fullDockSpaceId; // This variable will track the document node, however we are not using it
