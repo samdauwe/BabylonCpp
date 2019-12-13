@@ -1,6 +1,7 @@
 #include "imgui_runner/abstract_runner.h"
 #include <glad/glad.h>
 #include <imgui.h>
+#include <iostream>
 
 namespace ImGui {
 namespace ImGuiRunner {
@@ -145,14 +146,23 @@ void AbstractRunner::Frame_OpenGl_ClearColor()
 
 void AbstractRunner::FullInit()
 {
+  std::cout << "FullInit start \n";
   InitBackend();
+  std::cout << "FullInit after InitBackend \n";
   Select_Gl_Version();
+  std::cout << "FullInit after Select_Gl_Version \n";
   CreateWindowAndContext();
+  std::cout << "FullInit after CreateWindowAndContext \n";
   InitGlLoader();
+  std::cout << "FullInit after InitGlLoader \n";
   SetupImgGuiContext();
+  std::cout << "FullInit after SetupImgGuiContext \n";
   SetupImGuiStyle();
+  std::cout << "FullInit after SetupImGuiStyle \n";
   SetupPlatformRendererBindings();
+  std::cout << "FullInit after SetupPlatformRendererBindings \n";
   LoadFonts();
+  std::cout << "FullInit after LoadFonts \n";
 }
 
 void AbstractRunner::LoopProc()
