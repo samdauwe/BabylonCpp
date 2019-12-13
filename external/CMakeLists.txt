@@ -84,6 +84,7 @@ endif()
 
 # imgui (Bloat-free Immediate Mode Graphical User interface for C++ with minimal dependencies).
 # imgui library as a standalone shared library
+option(IMGUI_IMPL_OPENGL_LOADER_GLAD "Use glad loader for imgui" ON)
 set(IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/imgui CACHE INTERNAL "imgui directory")
 file(GLOB IMGUI_MAIN_FILES ${IMGUI_DIR}/*.h ${IMGUI_DIR}/*.cpp)
 if (NOT EMSCRIPTEN)

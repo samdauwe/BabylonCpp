@@ -3,6 +3,7 @@ set(TARGET BabylonRunStandalone)
 file(GLOB sources *.*)
 add_executable(${TARGET} ${sources})
 target_link_libraries(${TARGET}
+    PRIVATE
     BabylonImGui
     MaterialsLibrary
     Samples

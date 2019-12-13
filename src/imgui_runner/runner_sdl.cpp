@@ -101,18 +101,13 @@ void RunnerSdl::CreateWindowAndContext()
 void RunnerSdl::InitGlLoader()
 {
 #ifndef __EMSCRIPTEN__
-//  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-//    throw std::runtime_error("gladLoadGLLoader: Failed");
-//  if (!GLAD_GL_VERSION_3_3)
-//    throw(std::runtime_error("GLAD could not initialize OpenGl 3.3"));
-
   // Initialize OpenGL loader
 #if defined(IMGUI_IMPL_OPENGL_LOADER_GL3W)
   bool err = gl3wInit() != 0;
 #elif defined(IMGUI_IMPL_OPENGL_LOADER_GLEW)
   bool err = glewInit() != GLEW_OK;
 #elif defined(IMGUI_IMPL_OPENGL_LOADER_GLAD)
-  bool err = gladLoadGL() == 0;
+  bool err = gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress) == 0;
 #else
   bool err = false; // If you use IMGUI_IMPL_OPENGL_LOADER_CUSTOM, your loader is likely to requires some form of initialization.
 #endif
@@ -121,6 +116,11 @@ void RunnerSdl::InitGlLoader()
     throw std::runtime_error("Failed to initialize OpenGL loader!");
   }
 #endif // #ifndef __EMSCRIPTEN__
+
+#ifdef GLAD_DEBUG
+  glad_set_pre_callback(glad_pre_call_callback);
+  glad_set_post_callback(glad_post_call_callback);
+#endif
 }
 
 void RunnerSdl::SetupPlatformRendererBindings()

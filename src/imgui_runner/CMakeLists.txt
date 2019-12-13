@@ -22,3 +22,6 @@ if (IMGUI_RUNNER_USE_SDL)
     target_compile_definitions(imgui_runner PUBLIC IMGUI_RUNNER_USE_SDL)
 endif()
 
+if (IMGUI_IMPL_OPENGL_LOADER_GLAD)
+    target_compile_definitions(imgui_runner PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLAD)
+endif()
