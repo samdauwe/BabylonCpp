@@ -5,6 +5,10 @@
 # Configure build environment
 include(../../cmake/BuildEnvironment.cmake)
 
+if (EMSCRIPTEN)
+    set(CMAKE_EXECUTABLE_SUFFIX ".html")
+endif()
+
 # OpenGL dependency
 set(OpenGL_GL_PREFERENCE GLVND)
 if (NOT EMSCRIPTEN)

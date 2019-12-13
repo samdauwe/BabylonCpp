@@ -4,3 +4,5 @@ set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-s USE_SDL=2 -s USE_WEBGL2=1 -s WASM=1 -
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g4")
 #add_compile_options(-O0 -g4)
 #add_link_options(--source-map-base http://localhost:8001/src/ --preload-file build/assets@/)
+set(link_options_shell_emscripten --shell-file ${CMAKE_SOURCE_DIR}/src/imgui_runner/runner_emscripten_shell.html)
+add_link_options(${link_options_shell_emscripten})

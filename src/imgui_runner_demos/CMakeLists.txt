@@ -3,7 +3,6 @@ include(../../cmake/BuildEnvironment.cmake)
 
 if (EMSCRIPTEN)
     set(CMAKE_EXECUTABLE_SUFFIX ".html")
-    set(link_options_emscripten --shell-file ${CMAKE_CURRENT_LIST_DIR}/../imgui_runner/runner_emscripten_shell.html)
 endif()
 
 #
@@ -20,8 +19,6 @@ endif()
 if (EMSCRIPTEN)
     add_executable(imgui_runner_demo_emscripten imgui_runner_demo_emscripten.cpp example_gui.cpp example_gui.h)
     target_link_libraries(imgui_runner_demo_emscripten PRIVATE imgui_runner_babylon)
-
-    target_link_options(imgui_runner_demo_emscripten PRIVATE ${link_options_emscripten})
 endif()
 
 #
@@ -47,8 +44,6 @@ if (EMSCRIPTEN)
         runner_babylon_demo.cpp
         runner_babylon_demo.h)
     target_link_libraries(imgui_runner_babylon_demo_emscripten PRIVATE imgui_runner_babylon)
-
-    target_link_options(imgui_runner_babylon_demo_emscripten PRIVATE ${link_options_emscripten})
 endif()
 
 
