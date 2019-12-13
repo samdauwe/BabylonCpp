@@ -58,7 +58,24 @@ void RunnerSdl::CreateWindowAndContext()
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
   SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-  mWindow = SDL_CreateWindow("Dear ImGui SDL2+OpenGL3 example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
+  int xPos = SDL_WINDOWPOS_CENTERED, yPos = SDL_WINDOWPOS_CENTERED;
+  if (mBackendWindowPosition.x >= 0.f)
+    xPos = (int)mBackendWindowPosition.x;
+  if (mBackendWindowPosition.y >= 0.f)
+    xPos = (int)mBackendWindowPosition.y;
+  mWindow = SDL_CreateWindow(
+    mBackendWindowTitle.c_str(),
+    xPos,
+    yPos,
+    (int)mBackendWindowSize.x,
+    (int)mBackendWindowSize.y,
+    window_flags);
+
+  if (mBackendFullScreen)
+  {
+    SDL_SetWindowFullscreen(mWindow, SDL_WINDOW_FULLSCREEN);
+  }
+
   mGlContext = SDL_GL_CreateContext(mWindow);
   SDL_GL_MakeCurrent(mWindow, mGlContext);
   SDL_GL_SetSwapInterval(1); // Enable vsync

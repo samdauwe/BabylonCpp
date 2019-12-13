@@ -86,6 +86,10 @@ void ShowDemo()
   params.DefaultWindowType         = DefaultWindowTypeOption::ProvideFullScreenDockSpace;
   params.InitialDockLayoutFunction = MyCreateDockLayout;
   params.Title                     = "Hello World";
+  params.Width = 1280;
+  params.Height = 720;
+  params.FullScreen = true;
+  //params.WindowedFullScreen = true;
   //ImGuiUtils::ImGuiRunner::RunGui(DemoGui, params);
 
 #ifdef IMGUI_RUNNER_USE_GLFW
