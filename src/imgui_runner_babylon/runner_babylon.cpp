@@ -200,7 +200,7 @@ RunnerBabylon::RunnerBabylon(
 }
 void RunnerBabylon::Run()
 {
-  mAbstractRunner->RunIt();
+  mAbstractRunner->Run();
 }
 void RunnerBabylon::ResetDockLayout()
 {

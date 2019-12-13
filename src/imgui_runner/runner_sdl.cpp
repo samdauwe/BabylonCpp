@@ -30,6 +30,11 @@ void RunnerSdl::Select_Gl_Version()
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+#elif defined(__EMSCRIPTEN__)
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 #else
   // GL 3.0 + GLSL 130
   // const char* glsl_version = "#version 130";
@@ -45,11 +50,14 @@ std::string RunnerSdl::GlslVersion()
 #if __APPLE__
   // GL 3.2 Core + GLSL 150
   const char* glsl_version = "#version 150";
+#elif defined(__EMSCRIPTEN__)
+  const char* glsl_version = "#version 100";
+  //const char* glsl_version = "#version 300 es";
 #else
   // GL 3.0 + GLSL 130
-    const char* glsl_version = "#version 130";
+  const char* glsl_version = "#version 130";
 #endif
-    return glsl_version;
+  return glsl_version;
 }
 
 void RunnerSdl::CreateWindowAndContext()
@@ -57,6 +65,8 @@ void RunnerSdl::CreateWindowAndContext()
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+
+#ifndef __EMSCRIPTEN__
   SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
   int xPos = SDL_WINDOWPOS_CENTERED, yPos = SDL_WINDOWPOS_CENTERED;
   if (mBackendWindowPosition.x >= 0.f)
@@ -75,14 +85,30 @@ void RunnerSdl::CreateWindowAndContext()
   {
     SDL_SetWindowFullscreen(mWindow, SDL_WINDOW_FULLSCREEN);
   }
+#else
+  SDL_DisplayMode current;
+  SDL_GetCurrentDisplayMode(0, &current);
+  SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+  mWindow = SDL_CreateWindow(
+    mBackendWindowTitle.c_str(),
+    SDL_WINDOWPOS_CENTERED,
+    SDL_WINDOWPOS_CENTERED,
+    1280,
+    720,
+    window_flags);
+#endif
 
   mGlContext = SDL_GL_CreateContext(mWindow);
+  if (!mGlContext)
+    throw std::runtime_error("RunnerSdl::CreateWindowAndContext(): Failed to initialize WebGL context!");
+
   SDL_GL_MakeCurrent(mWindow, mGlContext);
   SDL_GL_SetSwapInterval(1); // Enable vsync
 }
 
 void RunnerSdl::InitGlLoader()
 {
+#ifndef __EMSCRIPTEN__
 //  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 //    throw std::runtime_error("gladLoadGLLoader: Failed");
 //  if (!GLAD_GL_VERSION_3_3)
@@ -102,8 +128,9 @@ void RunnerSdl::InitGlLoader()
   {
     throw std::runtime_error("Failed to initialize OpenGL loader!");
   }
-
+#endif // #ifndef __EMSCRIPTEN__
 }
+
 void RunnerSdl::SetupPlatformRendererBindings()
 {
   ImGui_ImplSDL2_InitForOpenGL(mWindow, mGlContext);

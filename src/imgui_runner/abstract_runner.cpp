@@ -2,27 +2,31 @@
 #include <glad/glad.h>
 #include <imgui.h>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 namespace ImGui {
 namespace ImGuiRunner {
 
 #if defined(_WIN32)
 #undef APIENTRY
-  #include <windows.h>
-  ImVec2 MainScreenResolution()
-  {
-    return {
-      (int)GetSystemMetrics(SM_CXSCREEN),
-      (int)GetSystemMetrics(SM_CYSCREEN)
-    };
-  }
+#include <windows.h>
+ImVec2 MainScreenResolution()
+{
+  return {
+    (int)GetSystemMetrics(SM_CXSCREEN),
+    (int)GetSystemMetrics(SM_CYSCREEN)
+  };
+}
 #elif defined(__linux__)
-  #include <X11/Xlib.h>
-  ImVec2 MainScreenResolution()
-  {
-    Display* d = XOpenDisplay(NULL);
-    Screen* s  = DefaultScreenOfDisplay(d);
-    return { s->width, s->height };
-  }
+#include <X11/Xlib.h>
+ImVec2 MainScreenResolution()
+{
+  Display* d = XOpenDisplay(NULL);
+  Screen* s  = DefaultScreenOfDisplay(d);
+  return { s->width, s->height };
+}
 #else
 ImVec2 MainScreenResolution()
 {
@@ -145,7 +149,7 @@ void AbstractRunner::ImGuiRender()
   //ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void AbstractRunner::RunIt()
+void AbstractRunner::FullInit()
 {
   InitBackend();
   Select_Gl_Version();
@@ -155,30 +159,56 @@ void AbstractRunner::RunIt()
   SetupImGuiStyle();
   SetupPlatformRendererBindings();
   LoadFonts();
+}
 
+void AbstractRunner::LoopProc()
+{
+  PollEvents();
+
+  NewFrame_OpenGl();
+  NewFrame_Backend();
+  ImGui::NewFrame();
+
+  bool exitRequired = ShowGui();
+  if (exitRequired)
+    mExitRequired = true;
+
+  ImGuiRender();
+  RenderDrawData_To_OpenGl();
+
+  if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    UpdateAndRenderAdditionalPlatformWindows();
+
+  SwapBuffers();
+}
+
+
+#ifndef __EMSCRIPTEN__
+void AbstractRunner::Run()
+{
+  FullInit();
   while(!mExitRequired)
-  {
-    PollEvents();
-
-    NewFrame_OpenGl();
-    NewFrame_Backend();
-    ImGui::NewFrame();
-
-    bool exitRequired = ShowGui();
-    if (exitRequired)
-      mExitRequired = true;
-
-    ImGuiRender();
-    RenderDrawData_To_OpenGl();
-
-    if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-      UpdateAndRenderAdditionalPlatformWindows();
-
-    SwapBuffers();
-  }
-
+    LoopProc();
   Cleanup();
 }
+#endif
+#ifdef __EMSCRIPTEN__
+AbstractRunner *gAbstractRunner = nullptr;
+
+void emscripten_imgui_main_loop(void* arg)
+{
+  (void)arg;
+  gAbstractRunner->LoopProc();
+}
+
+void AbstractRunner::Run()
+{
+  FullInit();
+  gAbstractRunner = this;
+  emscripten_set_main_loop_arg(emscripten_imgui_main_loop, NULL, 0, true);
+}
+#endif // #ifdef __EMSCRIPTEN__
+
 
 } // namespace ImGuiRunner
 } // namespace ImGui

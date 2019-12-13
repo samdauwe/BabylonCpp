@@ -58,5 +58,5 @@ int main()
 {
   ImGui::ImGuiRunner::RunnerGlfw runner;
   runner.ShowGui = MyGui;
-  runner.RunIt();
+  runner.Run();
 }

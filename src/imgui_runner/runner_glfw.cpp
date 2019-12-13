@@ -90,6 +90,7 @@ void RunnerGlfw::CreateWindowAndContext()
 
 void RunnerGlfw::InitGlLoader()
 {
+#ifndef __EMSCRIPTEN__
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     throw std::runtime_error("gladLoadGLLoader: Failed");
   if (!GLAD_GL_VERSION_3_3)
@@ -110,6 +111,7 @@ void RunnerGlfw::InitGlLoader()
 //    fprintf(stderr, "Failed to initialize OpenGL loader!\n");
 //    return 1;
 //  }
+#endif // #ifndef __EMSCRIPTEN__
 }
 
 void RunnerGlfw::SetupPlatformRendererBindings()

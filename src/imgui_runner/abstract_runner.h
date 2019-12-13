@@ -55,7 +55,13 @@ public:
   // Replace this by your own font loading function
   VoidFunctionPointer LoadFonts = LoadNoAdditionalFont;
 
-  void RunIt();
+  void Run();
+
+private:
+  friend void emscripten_imgui_main_loop(void *);
+  void LoopProc();
+
+  void FullInit();
 
 protected:
   std::string mBackendWindowTitle = "Dear ImGui example";
