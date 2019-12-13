@@ -8,6 +8,7 @@
 #include "imgui_runner/runner_glfw.h"
 #include "imgui_runner/runner_sdl.h"
 #include "imgui_runner/runner_emscripten.h"
+#include <iostream>
 
 namespace ImGuiUtils
 {
