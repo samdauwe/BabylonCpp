@@ -7,6 +7,7 @@ include(../../cmake/BuildEnvironment.cmake)
 
 if (EMSCRIPTEN)
     set(CMAKE_EXECUTABLE_SUFFIX ".html")
+    add_link_options(--preload-file  ${CMAKE_SOURCE_DIR}/assets@/assets)
 endif()
 
 # OpenGL dependency
@@ -75,3 +76,7 @@ endif()
 # Copy asset directories
 ## - Icons
 copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/icons")
+
+if (EMSCRIPTEN)
+    target_link_options(${TARGET} BEFORE PRIVATE --preload-file  ${CMAKE_SOURCE_DIR}/assets@/assets)
+endif()

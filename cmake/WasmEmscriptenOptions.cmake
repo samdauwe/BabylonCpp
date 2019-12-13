@@ -14,4 +14,4 @@ endif()
 
 # Provide a default html shell
 set(link_options_shell_emscripten --shell-file ${CMAKE_SOURCE_DIR}/src/imgui_runner/runner_emscripten_shell.html)
-add_link_options(${link_options_shell_emscripten})
+add_link_options(${link_options_shell_emscripten} --preload-file  ${CMAKE_SOURCE_DIR}/assets@/assets)
