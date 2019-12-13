@@ -139,9 +139,11 @@ RunnerBabylon::RunnerBabylon(
 
 void RunnerBabylon::DoInit()
 {
+  std::cout << "RunnerBabylon::DoInit 1 \n";
   mAbstractRunner->SetBackendFullScreen(mAppWindowParams.FullScreen);
   mAbstractRunner->SetBackendWindowTitle(mAppWindowParams.Title);
   mAbstractRunner->SetBackendWindowSize(ImVec2((float)mAppWindowParams.Width, (float)mAppWindowParams.Height) );
+  std::cout << "RunnerBabylon::DoInit 2 \n";
 
   if (mAppWindowParams.WindowedFullScreen)
   {
@@ -150,52 +152,81 @@ void RunnerBabylon::DoInit()
     winSize.y = (float)ImGui::ImGuiRunner::MainScreenResolution().y - mAppWindowParams.WindowedFullScreen_HeightReduce;
     mAbstractRunner->SetBackendWindowSize(winSize);
   }
+  std::cout << "RunnerBabylon::DoInit 3 \n";
 
   mAbstractRunner->SetClearColor(mAppWindowParams.ClearColor);
 
   mAbstractRunner->LoadFonts = runner_babylon_details::LoadFontAwesome;
+  std::cout << "RunnerBabylon::DoInit 4 \n";
 
-  auto postInit = [this]() {
+  auto postInitFunctionCopy = mPostInitFunction;
+  std::function<void(void)> postInit = [this, postInitFunctionCopy]() {
+  
+    std::cout << "RunnerBabylon::DoInit  postInit 0, postInitFunctionCopy is " << bool(postInitFunctionCopy) << "\n";
+    std::cout << "RunnerBabylon::DoInit  postInit 1 \n";
     if (mAppWindowParams.DefaultWindowType == DefaultWindowTypeOption::ProvideFullScreenDockSpace)
       ImGui::GetIO().ConfigFlags = ImGui::GetIO().ConfigFlags | ImGuiConfigFlags_DockingEnable;
+    std::cout << "RunnerBabylon::DoInit  postInit 2 \n";
 
-    mPostInitFunction();
+    postInitFunctionCopy();
+    
+    std::cout << "RunnerBabylon::DoInit  postInit 3 \n";
     ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = mAppWindowParams.ConfigWindowsMoveFromTitleBarOnly;
-
+    std::cout << "RunnerBabylon::DoInit  postInit 4 \n";
   };
+  std::cout << "RunnerBabylon::DoInit 5 \n";
 
   std::function<void(void)> provideWindowOrDock = [this](){
+    std::cout << "RunnerBabylon::DoInit  provideWindowOrDock 1 \n";
     if (mAppWindowParams.DefaultWindowType == DefaultWindowTypeOption::ProvideFullScreenWindow)
       runner_babylon_details::ImplProvideFullScreenWindow(mAppWindowParams);
+    std::cout << "RunnerBabylon::DoInit  provideWindowOrDock 2 \n";
 
     if (mAppWindowParams.DefaultWindowType == DefaultWindowTypeOption::ProvideFullScreenDockSpace)
     {
+      std::cout << "RunnerBabylon::DoInit  provideWindowOrDock 3 \n";
       if (!runner_babylon_details::WasDockLayoutDone())
       {
+        std::cout << "RunnerBabylon::DoInit  provideWindowOrDock 4 \n";
         if (mAppWindowParams.InitialDockLayoutFunction)
           mAppWindowParams.InitialDockLayoutFunction(runner_babylon_details::MainDockSpaceId());
         runner_babylon_details::SetDockLayout_Done();
+        std::cout << "RunnerBabylon::DoInit  provideWindowOrDock 5 \n";
       }
+      std::cout << "RunnerBabylon::DoInit  provideWindowOrDock 6 \n";
       runner_babylon_details::ImplProvideFullScreenDockSpace(mAppWindowParams);
+      std::cout << "RunnerBabylon::DoInit  provideWindowOrDock 7 \n";
     }
   };
+  std::cout << "RunnerBabylon::DoInit 6 \n";
+
   auto guiFunctionWithExitCopy = mGuiFunctionWithExit;
   std::function<bool(void)> showGui = [this, postInit, provideWindowOrDock, guiFunctionWithExitCopy]() {
+    std::cout << "RunnerBabylon::DoInit  showGui 1 \n";
     static bool postInited = false;
     if (!postInited)
     {
-      postInit();
+      std::cout << "RunnerBabylon::DoInit  showGui 1.1 \n";
       postInited = true;
+      std::cout << "RunnerBabylon::DoInit  showGui 2 \n";
+      postInit();
+      std::cout << "RunnerBabylon::DoInit  showGui 3 \n";
     }
+    std::cout << "RunnerBabylon::DoInit  showGui 4 \n";
     provideWindowOrDock();
+    std::cout << "RunnerBabylon::DoInit  showGui 5 \n";
     bool shouldExit = guiFunctionWithExitCopy();
+    std::cout << "RunnerBabylon::DoInit  showGui 6 \n";
 
     if (mAppWindowParams.DefaultWindowType != DefaultWindowTypeOption::NoDefaultWindow)
       ImGui::End();
+    std::cout << "RunnerBabylon::DoInit  showGui 7 \n";
     return shouldExit;
   };
+  std::cout << "RunnerBabylon::DoInit 7 \n";
 
   mAbstractRunner->ShowGui = showGui;
+  std::cout << "RunnerBabylon::DoInit 8 \n";
 }
 
 void RunnerBabylon::Run()
