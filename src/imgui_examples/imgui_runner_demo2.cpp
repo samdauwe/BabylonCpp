@@ -1,15 +1,13 @@
 #include "imgui.h"
 #include "imgui_internal.h"
-//#include <imgui_utils/app_runner/imgui_runner.h>
 #include <imgui_examples/details/runner_glfw.h>
 #include <imgui_examples/details/runner_sdl.h>
+#include <imgui_examples/runner_babylon.h>
 
 #include <map>
 #include <string>
 #include <vector>
 
-namespace ImGuiUtils {
-namespace ImGuiRunner {
 void MyCreateDockLayout(ImGuiID fullDockSpaceId)
 {
   ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -40,8 +38,9 @@ void MyCreateDockLayout(ImGuiID fullDockSpaceId)
   ImGui::DockBuilderFinish(fullDockSpaceId);
 }
 
-void DummyWindow(const char* title)
+bool DummyWindow(const char* title)
 {
+  bool shouldExit = false;
   static std::map<std::string, bool> openStatuses;
   if (openStatuses.find(title) == openStatuses.end())
     openStatuses[title] = true;
@@ -58,65 +57,55 @@ void DummyWindow(const char* title)
     if (show_demo_window)
       ImGui::ShowDemoWindow(&show_demo_window);
 
-//    if (ImGui::Button("Reset Layout"))
-//      ImGuiRunner::ResetDockLayout();
+    if (ImGui::Button("Reset Layout"))
+      ImGuiUtils::ImGuiRunner2::RunnerBabylon::ResetDockLayout();
+
+    if (ImGui::Button("Quit"))
+      shouldExit = true;
 
     ImGui::End();
   }
+  return shouldExit;
 }
-void DemoGui()
+
+bool DemoGui()
 {
+  bool shouldExit = false;
   std::vector<std::string> titles
     = {"Left", "LeftBottom1", "LeftBottom2", "LeftBottom3", "Right", "Main", "Bottom"};
   for (const auto& title : titles)
-    DummyWindow((title + "").c_str());
+    if (DummyWindow((title + "").c_str()))
+      shouldExit = true;
+  return shouldExit;
 }
 
 void ShowDemo()
 {
-//  ImGuiUtils::ImGuiRunner::AppWindowParams params;
-//  params.DefaultWindowType         = DefaultWindowTypeOption::ProvideFullScreenDockSpace;
-//  params.InitialDockLayoutFunction = MyCreateDockLayout;
-//  params.Title                     = "Hello World";
-//  ImGuiUtils::ImGuiRunner::RunGui(DemoGui, params);
-}
-
-
-int main1()
-{
-  //ImGuiUtils::ImGuiRunner::ShowDemo();
-  return 0;
-}
-
-
+  using namespace ImGuiUtils::ImGuiRunner2;
+  AppWindowParams params;
+  params.DefaultWindowType         = DefaultWindowTypeOption::ProvideFullScreenDockSpace;
+  params.InitialDockLayoutFunction = MyCreateDockLayout;
+  params.Title                     = "Hello World";
+  //ImGuiUtils::ImGuiRunner::RunGui(DemoGui, params);
 
 #ifdef IMGUI_RUNNER_USE_GLFW
-class MyRunner: public ImGui::ImGuiRunner::RunnerGlfw
+  auto runnerGlfw = std::make_unique<ImGui::ImGuiRunner::RunnerGlfw>();
+#else
+  auto runnerGlfw = std::make_unique<ImGui::ImGuiRunner::RunnerSdl>();
 #endif
-#ifdef IMGUI_RUNNER_USE_SDL
-class MyRunner: public ImGui::ImGuiRunner::RunnerSdl
-#endif
-{
-public:
-void ShowGui()
-{
-  static bool show_demo_window = true;
-  if (show_demo_window)
-    ImGui::ShowDemoWindow(&show_demo_window);
+  ImGuiUtils::ImGuiRunner2::RunnerBabylon runnerBabylon(
+    std::move(runnerGlfw),
+    params,
+    DemoGui
+  );
+  runnerBabylon.Run();
 }
-void LoadFonts()
-{
-
-}
-};
-
-} // namespace ImGuiRunner
-} // namespace ImGuiUtils
 
 
 int main()
 {
-  ImGuiUtils::ImGuiRunner::MyRunner runner;
-  runner.RunIt();
+  ShowDemo();
   return 0;
 }
+
+

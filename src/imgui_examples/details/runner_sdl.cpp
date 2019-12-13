@@ -93,11 +93,6 @@ void RunnerSdl::SetupPlatformRendererBindings()
   ImGui_ImplOpenGL3_Init(GlslVersion().c_str());
 }
 
-bool RunnerSdl::ExitRequired()
-{
-  return mExitRequired;
-}
-
 void RunnerSdl::PollEvents()
 {
   SDL_Event event;

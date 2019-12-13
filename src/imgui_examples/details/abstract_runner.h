@@ -3,11 +3,20 @@
 
 #include <string>
 #include <imgui.h>
+#include <functional>
 
 namespace ImGui {
 namespace ImGuiRunner {
 
 ImVec2 MainScreenResolution();
+
+// GuiFunctionPointer ; any function that displays a GUI via ImGui
+// and returns false most of the time, except if Quit is required
+using GuiFunctionPointer = std::function<bool(void)>;
+using VoidFunctionPointer = std::function<void(void)>;
+
+bool ExampleGui();
+void LoadNoAdditionalFont();
 
 class AbstractRunner {
 public:
@@ -29,10 +38,9 @@ public:
   void SetupImGuiStyle();
   virtual void InitGlLoader() = 0;
   virtual void SetupPlatformRendererBindings() = 0;
-  void LoadFonts();
 
   void SetClearColor(const ImVec4& color) { mClearColor = color; }
-  virtual bool ExitRequired() = 0;
+  virtual void SetExitRequired(bool v) { mExitRequired = v; };
   virtual void PollEvents() = 0;
   virtual void NewFrame_OpenGl() = 0; // this could also be vulkan
   virtual void NewFrame_Backend() = 0;
@@ -42,9 +50,10 @@ public:
   virtual void SwapBuffers() = 0;
   virtual void Cleanup() = 0;
 
-
-  // override this function with your own gui!
-  virtual void ShowGui() = 0;
+  // Gui function pointer : replace it by your own Gui function!
+  GuiFunctionPointer ShowGui = ExampleGui;
+  // Replace this by your own font loading function
+  VoidFunctionPointer LoadFonts = LoadNoAdditionalFont;
 
   void RunIt();
 
@@ -54,6 +63,7 @@ protected:
   ImVec2 mBackendWindowSize = MainScreenResolution();
   bool mBackendFullScreen = false;
   ImVec4 mClearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+  bool mExitRequired = false;
 };
 
 } // namespace ImGuiRunner

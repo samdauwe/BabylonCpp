@@ -22,7 +22,6 @@ public:
   void InitGlLoader() override;
   void SetupPlatformRendererBindings() override;
 
-  bool ExitRequired() override;
   void PollEvents() override;
   void NewFrame_OpenGl() override;
   void NewFrame_Backend() override;

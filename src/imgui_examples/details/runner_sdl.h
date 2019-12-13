@@ -22,7 +22,6 @@ public:
   void InitGlLoader() override;
   void SetupPlatformRendererBindings() override;
 
-  bool ExitRequired() override;
   void PollEvents() override;
   void NewFrame_OpenGl() override;
   void NewFrame_Backend() override;
@@ -34,7 +33,6 @@ public:
 private:
   SDL_Window* mWindow = nullptr;
   SDL_GLContext mGlContext = nullptr;
-  bool mExitRequired = false;
 };
 
 } // namespace ImGuiRunner
