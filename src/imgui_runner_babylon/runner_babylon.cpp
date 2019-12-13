@@ -8,8 +8,7 @@
 
 namespace ImGuiUtils
 {
-namespace ImGuiRunner2
-{
+namespace ImGuiRunner {
 namespace runner_babylon_details
 {
 static ImFont* _fontRegular = nullptr;

@@ -2,16 +2,13 @@
 #define IMGUI_UTILS_IMGUI_RUNNER_H
 #include <functional>
 #include <imgui.h>
-#include <imgui_examples/details/abstract_runner.h>
+#include "imgui_runner/abstract_runner.h"
 #include <memory>
 #include <string>
 
 
 namespace ImGuiUtils {
-namespace ImGuiRunner2 {
-// GuiFunction : any function that displays widgets using ImGui
-using GuiFunction = std::function<void(void)>;
-
+namespace ImGuiRunner {
 // GuiFunction : any function that displays widgets using ImGui
 // and returns true if exit is desired
 using GuiFunctionWithExit = std::function<bool(void)>;
@@ -53,19 +50,6 @@ struct AppWindowParams {
 using ImGuiRunnerFunctionType
   = std::function<void(GuiFunctionWithExit, AppWindowParams, PostInitFunction)>;
 
-//  void RunGui_WithExit( // type is ImGuiRunnerFunctionType
-//    GuiFunctionWithExit guiFunction,
-//    AppWindowParams appWindowParams = AppWindowParams(),
-//    PostInitFunction postInitFunction = EmptyPostInitFunction
-//    );
-//  void RunGui(
-//    GuiFunction guiFunction,
-//    AppWindowParams appWindowParams = AppWindowParams(),
-//    PostInitFunction postInitFunction = EmptyPostInitFunction
-//  );
-//
-//  void ResetDockLayout();
-
 class RunnerBabylon {
 public:
   RunnerBabylon(std::unique_ptr<ImGui::ImGuiRunner::AbstractRunner> abstractRunner,
@@ -82,7 +66,7 @@ private:
   PostInitFunction mPostInitFunction;
 };
 
-} // namespace ImGuiRunner2
+} // namespace ImGuiRunner
 } // namespace ImGuiUtils
 
 #endif // #ifdef IMGUI_UTILS_IMGUI_RUNNER_H

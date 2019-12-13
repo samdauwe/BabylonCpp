@@ -1,6 +1,6 @@
 #ifdef IMGUI_RUNNER_USE_SDL
 
-#include <imgui_examples/details/runner_sdl.h>
+#include "imgui_runner/runner_sdl.h"
 #include <examples/imgui_impl_opengl3.h>
 #include <examples/imgui_impl_sdl.h>
 

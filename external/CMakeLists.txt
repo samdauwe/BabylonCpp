@@ -40,7 +40,7 @@ set(EARCUT_HPP_INCLUDE_DIRS
 
 
 # GLFW (Free, open source, portable framework for OpenGL application development).
-if (NOT EMSCRIPTEN)
+if (BABYLON_GLFW_BACKEND AND NOT EMSCRIPTEN)
     SET(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "Build the GLFW example programs" FORCE)
     SET(GLFW_BUILD_TESTS OFF CACHE BOOL "Build the GLFW test programs" FORCE)
     SET(GLFW_BUILD_DOCS OFF CACHE BOOL "Build the GLFW documentation" FORCE)
@@ -159,8 +159,7 @@ if (BABYLON_BUILD_PLAYGROUND)
 endif()
 
 # SDL
-option(BABYLON_SDL "Build babylon sdl version (glfw is always built)" ON)
-if (NOT EMSCRIPTEN) # SDL is already provided in emscripten
+if (BABYLON_SDL_BACKEND AND NOT EMSCRIPTEN) # SDL is already build by emscripten
     set (SdlDir ${CMAKE_CURRENT_SOURCE_DIR}/SDL)
     add_subdirectory(${SdlDir})
 endif()

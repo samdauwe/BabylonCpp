@@ -5,6 +5,24 @@
 # CMake version
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 
+option(BABYLON_SDL_BACKEND "Build babylon sdl version" ON)
+option(BABYLON_GLFW_BACKEND "Build babylon glfw version" ON)
+
+# Compile to Wasm
+option(BABYLON_WASM "Target emscriptem / wasm" OFF)
+if (BABYLON_WASM)
+    # emscripten is detected via
+    #  - if (EMSCRIPTEN) in cmake code
+    #  - #ifdef __EMSCRIPTEN__ in c++ code
+    set(EMSCRIPTEN ON)
+    set(BUILD_SHARED_LIBS OFF)
+    set(BABYLON_DISABLE_INSTALL ON)
+    set(OPTION_BUILD_TESTS_DEFAULT OFF)
+    include(${CMAKE_CURRENT_LIST_DIR}/cmake/WasmEmscriptenOptions.cmake)
+else()
+    set(OPTION_BUILD_TESTS_DEFAULT ON)
+endif()
+
 if (NOT BABYLON_WASM)
     option(BUILD_SHARED_LIBS     "Build shared instead of static libraries."     ON)
 endif()
@@ -16,21 +34,6 @@ if(CCACHE_PROGRAM)
     if (USE_CCACHE)
         set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
     endif()
-endif()
-
-# Compile to Wasm
-option(BABYLON_WASM "Target emscriptem / wasm" OFF)
-if (BABYLON_WASM)
-    # emscripten is detected via 
-    #  - if (EMSCRIPTEN) in cmake code
-    #  - #ifdef __EMSCRIPTEN__ in c++ code
-    set(EMSCRIPTEN ON)
-    set(BUILD_SHARED_LIBS OFF)
-    set(BABYLON_DISABLE_INSTALL ON)
-    set(OPTION_BUILD_TESTS_DEFAULT OFF)
-    include(${CMAKE_CURRENT_LIST_DIR}/cmake/WasmEmscriptenOptions.cmake)
-else()
-  set(OPTION_BUILD_TESTS_DEFAULT ON)
 endif()
 
 option(OPTION_BUILD_TESTS    "Build tests."       ${OPTION_BUILD_TESTS_DEFAULT})

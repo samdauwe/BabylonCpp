@@ -1,4 +1,4 @@
-#include "imgui_examples/details/abstract_runner.h"
+#include "imgui_runner/abstract_runner.h"
 #include <glad/glad.h>
 #include <imgui.h>
 

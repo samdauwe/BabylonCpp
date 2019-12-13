@@ -1,8 +1,10 @@
+#include "runner_babylon_demo.h"
+
 #include "imgui.h"
 #include "imgui_internal.h"
-#include <imgui_examples/details/runner_glfw.h>
-#include <imgui_examples/details/runner_sdl.h>
-#include <imgui_examples/runner_babylon.h>
+#include "imgui_runner/runner_glfw.h"
+#include "imgui_runner/runner_sdl.h"
+#include <imgui_runner_babylon/runner_babylon.h>
 
 #include <map>
 #include <string>
@@ -58,7 +60,7 @@ bool DummyWindow(const char* title)
       ImGui::ShowDemoWindow(&show_demo_window);
 
     if (ImGui::Button("Reset Layout"))
-      ImGuiUtils::ImGuiRunner2::RunnerBabylon::ResetDockLayout();
+      ImGuiUtils::ImGuiRunner::RunnerBabylon::ResetDockLayout();
 
     if (ImGui::Button("Quit"))
       shouldExit = true;
@@ -79,37 +81,21 @@ bool DemoGui()
   return shouldExit;
 }
 
-void ShowDemo()
+void ShowDemo(std::unique_ptr<ImGui::ImGuiRunner::AbstractRunner> runner)
 {
-  using namespace ImGuiUtils::ImGuiRunner2;
+  using namespace ImGuiUtils::ImGuiRunner;
   AppWindowParams params;
   params.DefaultWindowType         = DefaultWindowTypeOption::ProvideFullScreenDockSpace;
   params.InitialDockLayoutFunction = MyCreateDockLayout;
   params.Title                     = "Hello World";
   params.Width = 1280;
   params.Height = 720;
-  params.FullScreen = true;
-  //params.WindowedFullScreen = true;
-  //ImGuiUtils::ImGuiRunner::RunGui(DemoGui, params);
+  // params.FullScreen = true;
 
-#ifdef IMGUI_RUNNER_USE_GLFW
-  auto runnerGlfw = std::make_unique<ImGui::ImGuiRunner::RunnerGlfw>();
-#else
-  auto runnerGlfw = std::make_unique<ImGui::ImGuiRunner::RunnerSdl>();
-#endif
-  ImGuiUtils::ImGuiRunner2::RunnerBabylon runnerBabylon(
-    std::move(runnerGlfw),
+  ImGuiUtils::ImGuiRunner::RunnerBabylon runnerBabylon(
+    std::move(runner),
     params,
     DemoGui
   );
   runnerBabylon.Run();
 }
-
-
-int main()
-{
-  ShowDemo();
-  return 0;
-}
-
-
