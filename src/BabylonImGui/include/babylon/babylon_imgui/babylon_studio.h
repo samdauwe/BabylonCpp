@@ -1,12 +1,12 @@
 #ifndef BABYLON_INSPECTOR_APP_H
 #define BABYLON_INSPECTOR_APP_H
-#include <functional>
-#include <map>
 #include <babylon/babylon_imgui/imgui_scene_widget.h>
 #include <babylon/inspector/inspector.h>
 #include <babylon/inspector/samples_browser.h>
+#include <functional>
+#include <imgui_utils/app_runner/imgui_runner_old.h>
 #include <imgui_utils/code_editor.h>
-#include <imgui_utils/app_runner/imgui_runner.h>
+#include <map>
 
 namespace BABYLON {
 

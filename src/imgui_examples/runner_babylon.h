@@ -6,7 +6,6 @@
 #include <memory>
 #include <string>
 
-struct GLFWwindow;
 
 namespace ImGuiUtils {
 namespace ImGuiRunner2 {

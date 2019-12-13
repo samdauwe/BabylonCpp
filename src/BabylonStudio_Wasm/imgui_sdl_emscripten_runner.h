@@ -1,7 +1,7 @@
 #ifndef BABYLONCPP_IMGUI_SDL_EMSCRIPTEN_RUNNER_H
 #define BABYLONCPP_IMGUI_SDL_EMSCRIPTEN_RUNNER_H
 
-#include <imgui_utils/app_runner/imgui_runner.h>
+#include <imgui_utils/app_runner/imgui_runner_old.h>
 
 namespace ImGuiUtils
 {

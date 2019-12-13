@@ -1,7 +1,6 @@
 #include "run_standalone_imgui.h"
-#include <imgui_utils/app_runner/imgui_runner.h>
 #include <babylon/babylon_imgui/imgui_scene_widget.h>
-
+#include <imgui_utils/app_runner/imgui_runner_old.h>
 
 // This file demonstrates how to run a standalone scene, using imgui as a backend
 void runStandalone_imgui(

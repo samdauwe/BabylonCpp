@@ -7,7 +7,7 @@
 #include <babylon/interfaces/irenderable_scene_with_hud.h>
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <imgui_utils/app_runner/imgui_runner.h>
+#include <imgui_utils/app_runner/imgui_runner_old.h>
 #include <imgui_utils/icons_font_awesome_5.h>
 
 #include <babylon/babylon_imgui/babylon_studio_layout.h>

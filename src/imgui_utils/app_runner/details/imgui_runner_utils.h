@@ -2,7 +2,7 @@
 #define BABYLONCPP_IMGUI_RUNNER_UTILS_H
 
 #include <glad/glad.h>
-#include <imgui_utils/app_runner/imgui_runner.h>
+#include <imgui_utils/app_runner/imgui_runner_old.h>
 #include <string>
 namespace ImGuiUtils
 {

@@ -7,7 +7,7 @@
 #include <imgui_utils/app_runner/details/glfw_runner.h>
 
 #include "imgui_impl_opengl3.h"
-#include <imgui_utils/app_runner/imgui_runner.h>
+#include <imgui_utils/app_runner/imgui_runner_old.h>
 #include <imgui_utils/icons_font_awesome_5.h>
 #include <imgui_utils/imgui_utils.h>
 
