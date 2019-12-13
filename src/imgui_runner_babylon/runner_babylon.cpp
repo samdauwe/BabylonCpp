@@ -31,6 +31,7 @@ void LoadFontAwesome()
   {
     _fontRegular = io.Fonts->AddFontFromFileTTF(fontRegularPath.c_str(),
                                                 ImGui::IconSize, &config, ranges);
+    printf("Found font file %s", fontRegularPath.c_str());
   }
   else
   {
@@ -38,16 +39,12 @@ void LoadFontAwesome()
   }
 
   auto fontSolidPath
-    = std::string("../assets/fonts/") + FONT_ICON_FILE_NAME_FAS;
-  if (! BABYLON::Filesystem::isFile(fontSolidPath))
-  {
-    fontSolidPath
-      = std::string("assets/fonts/") + FONT_ICON_FILE_NAME_FAS;
-  }
+    = std::string(BABYLON::assets_folder() + "/fonts/") + FONT_ICON_FILE_NAME_FAS;
   if (BABYLON::Filesystem::isFile(fontSolidPath))
   {
     _fontSolid = io.Fonts->AddFontFromFileTTF(fontSolidPath.c_str(),
                                               ImGui::IconSize, &config, ranges);
+    printf("Found font file %s", fontSolidPath.c_str());
   }
   else
   {
