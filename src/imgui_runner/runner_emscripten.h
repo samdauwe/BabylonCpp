@@ -11,15 +11,13 @@ namespace ImGuiRunner {
 class RunnerEmscripten : public RunnerSdl {
 public:
   virtual ~RunnerEmscripten() = default;
-
   void Run() override;
 
+protected:
   void Select_Gl_Version() override;
   std::string GlslVersion() override;
   void InitGlLoader() override;
   void SetupImgGuiContext() override;
-
-private:
 };
 
 } // namespace ImGuiRunner

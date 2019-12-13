@@ -15,6 +15,7 @@ class RunnerSdl : public AbstractRunner {
 public:
   virtual ~RunnerSdl() = default;
 
+protected:
   void InitBackend() override;
   void Select_Gl_Version() override;
   std::string GlslVersion() override;

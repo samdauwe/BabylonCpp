@@ -15,6 +15,7 @@ class RunnerGlfw : public AbstractRunner {
 public:
   virtual ~RunnerGlfw() = default;
 
+protected:
   void InitBackend() override;
   void Select_Gl_Version() override;
   std::string GlslVersion() override;
