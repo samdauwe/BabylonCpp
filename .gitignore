@@ -47,6 +47,7 @@ src/Studio
 
 # Absolete code
 src/InspectorV1
+src/SampleLauncher
 
 # Executables
 *.exe
