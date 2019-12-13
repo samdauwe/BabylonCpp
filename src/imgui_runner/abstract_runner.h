@@ -44,7 +44,7 @@ public:
   virtual void PollEvents() = 0;
   virtual void NewFrame_OpenGl() = 0; // this could also be vulkan
   virtual void NewFrame_Backend() = 0;
-  void ImGuiRender();
+  virtual void Frame_OpenGl_ClearColor() = 0;
   virtual void RenderDrawData_To_OpenGl() = 0;
   virtual void UpdateAndRenderAdditionalPlatformWindows() = 0;
   virtual void SwapBuffers() = 0;

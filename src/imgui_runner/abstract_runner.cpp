@@ -138,15 +138,13 @@ void LoadNoAdditionalFont()
 
 }
 
-void AbstractRunner::ImGuiRender()
+void AbstractRunner::Frame_OpenGl_ClearColor()
 {
   auto & io = ImGui::GetIO();
-  ImGui::Render();
   glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
   ImVec4 clear_color = mClearColor;
   glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
   glClear(GL_COLOR_BUFFER_BIT);
-  //ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 void AbstractRunner::FullInit()
@@ -173,7 +171,8 @@ void AbstractRunner::LoopProc()
   if (exitRequired)
     mExitRequired = true;
 
-  ImGuiRender();
+  ImGui::Render();
+  Frame_OpenGl_ClearColor();
   RenderDrawData_To_OpenGl();
 
   if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)

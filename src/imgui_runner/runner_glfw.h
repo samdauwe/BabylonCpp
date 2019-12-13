@@ -25,6 +25,7 @@ public:
   void PollEvents() override;
   void NewFrame_OpenGl() override;
   void NewFrame_Backend() override;
+  void Frame_OpenGl_ClearColor() override;
   void RenderDrawData_To_OpenGl() override;
   void UpdateAndRenderAdditionalPlatformWindows() override;
   void Cleanup() override;

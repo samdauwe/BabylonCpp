@@ -141,6 +141,15 @@ void RunnerGlfw::NewFrame_Backend()
   ImGui_ImplGlfw_NewFrame();
 }
 
+void RunnerGlfw::Frame_OpenGl_ClearColor()
+{
+  auto & io = ImGui::GetIO();
+  glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
+  ImVec4 clear_color = mClearColor;
+  glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+  glClear(GL_COLOR_BUFFER_BIT);
+}
+
 void RunnerGlfw::RenderDrawData_To_OpenGl()
 {
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
