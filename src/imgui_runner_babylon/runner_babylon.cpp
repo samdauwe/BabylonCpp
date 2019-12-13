@@ -1,6 +1,7 @@
 #include "runner_babylon.h"
 
 #include <babylon/core/filesystem.h>
+#include <babylon/babylon_common.h>
 #include <glad/glad.h>
 #include "imgui_utils/icons_font_awesome_5.h"
 #include <imgui_utils/imgui_utils.h>
@@ -25,13 +26,7 @@ void LoadFontAwesome()
   ImFontConfig config;
   config.MergeMode = true;
   auto fontRegularPath
-    = std::string("../assets/fonts/") + FONT_ICON_FILE_NAME_FAR;
-
-  if (! BABYLON::Filesystem::isFile(fontRegularPath))
-  {
-    fontRegularPath
-      = std::string("assets/fonts/") + FONT_ICON_FILE_NAME_FAR;
-  }
+    = std::string(BABYLON::assets_folder() + "/fonts/") + FONT_ICON_FILE_NAME_FAR;
   if (BABYLON::Filesystem::isFile(fontRegularPath))
   {
     _fontRegular = io.Fonts->AddFontFromFileTTF(fontRegularPath.c_str(),

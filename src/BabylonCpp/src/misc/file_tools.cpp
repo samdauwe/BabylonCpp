@@ -50,11 +50,7 @@ std::function<std::string(std::string url)> FileTools::PreprocessUrl = [](std::s
     return String::concat("file:", absolutePath);
   }
   // - Check in assets folder
-  absolutePath = Filesystem::absolutePath("../assets/" + url);
-  if (Filesystem::exists(absolutePath)) {
-    return String::concat("file:", absolutePath);
-  }
-  absolutePath = Filesystem::absolutePath("assets/" + url);
+  absolutePath = Filesystem::absolutePath(BABYLON::assets_folder() + url);
   if (Filesystem::exists(absolutePath)) {
     return String::concat("file:", absolutePath);
   }
