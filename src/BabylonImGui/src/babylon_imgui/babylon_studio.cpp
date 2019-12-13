@@ -52,7 +52,8 @@ public:
     _appContext._options                              = options;
     _appContext._options._appWindowParams.ShowMenuBar = true;
 
-    std::function<bool(void)> showGuiLambda = [this]() -> bool {
+    auto showGuiLambda = [this]() -> bool {
+      std::cout << "showGuiLambda 1 \n";
       bool r = this->render();
       for (auto f : _appContext._options._heartbeatCallbacks)
         f();
@@ -66,7 +67,7 @@ public:
       return r;
     };
 
-    auto initSceneLambda = [&]() {
+    auto initSceneLambda = [=]() {
       this->initScene();
       this->setRenderableScene(initialScene);
     };
@@ -372,7 +373,7 @@ private:
 }; // end of class BabylonInspectorApp
 
 // public API
-void runBabylonStudio(std::shared_ptr<BABYLON::IRenderableScene> scene,
+void runBabylonStudio(const std::shared_ptr<BABYLON::IRenderableScene>& scene,
                       BabylonStudioOptions options /* = SceneWithInspectorOptions() */
 )
 {

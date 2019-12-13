@@ -179,8 +179,8 @@ void RunnerBabylon::DoInit()
       runner_babylon_details::ImplProvideFullScreenDockSpace(mAppWindowParams);
     }
   };
-
-  std::function<bool(void)> showGui = [this, postInit, provideWindowOrDock]() {
+  auto guiFunctionWithExitCopy = mGuiFunctionWithExit;
+  std::function<bool(void)> showGui = [this, postInit, provideWindowOrDock, guiFunctionWithExitCopy]() {
     static bool postInited = false;
     if (!postInited)
     {
@@ -188,7 +188,7 @@ void RunnerBabylon::DoInit()
       postInited = true;
     }
     provideWindowOrDock();
-    bool shouldExit = mGuiFunctionWithExit();
+    bool shouldExit = guiFunctionWithExitCopy();
 
     if (mAppWindowParams.DefaultWindowType != DefaultWindowTypeOption::NoDefaultWindow)
       ImGui::End();
