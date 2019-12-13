@@ -95,7 +95,9 @@ void RunnerSdl::CreateWindowAndContext()
     throw std::runtime_error("RunnerSdl::CreateWindowAndContext(): Failed to initialize WebGL context!");
 
   SDL_GL_MakeCurrent(mWindow, mGlContext);
+#ifndef __EMSCRIPTEN__
   SDL_GL_SetSwapInterval(1); // Enable vsync
+#endif
 }
 
 void RunnerSdl::InitGlLoader()

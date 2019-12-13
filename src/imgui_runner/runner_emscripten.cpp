@@ -21,6 +21,8 @@ void RunnerEmscripten::Run()
   gRunnerEmscripten = this;
   // This function call won't return, and will engage in an infinite loop, processing events from the browser, and dispatching them.
   emscripten_set_main_loop_arg(emscripten_imgui_main_loop, NULL, 0, true);
+
+  SDL_GL_SetSwapInterval(1); // Enable vsync
 }
 
 void RunnerEmscripten::SetupImgGuiContext()
