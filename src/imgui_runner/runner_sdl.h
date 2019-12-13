@@ -1,7 +1,7 @@
 #ifndef IMGUI_RUNNER_SDL_H
 #define IMGUI_RUNNER_SDL_H
 #ifdef IMGUI_RUNNER_USE_SDL
-#include "imgui_runner//abstract_runner.h"
+#include "imgui_runner/abstract_runner.h"
 
 #include <glad/glad.h>
 #include <SDL.h>

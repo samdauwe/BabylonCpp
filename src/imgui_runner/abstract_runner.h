@@ -34,7 +34,7 @@ public:
 
   virtual void CreateWindowAndContext() = 0;
 
-  void SetupImgGuiContext();
+  virtual void SetupImgGuiContext();
   void SetupImGuiStyle();
   virtual void InitGlLoader() = 0;
   virtual void SetupPlatformRendererBindings() = 0;
@@ -55,12 +55,11 @@ public:
   // Replace this by your own font loading function
   VoidFunctionPointer LoadFonts = LoadNoAdditionalFont;
 
-  void Run();
+  virtual void Run();
 
-private:
+protected:
   friend void emscripten_imgui_main_loop(void *);
   void LoopProc();
-
   void FullInit();
 
 protected:

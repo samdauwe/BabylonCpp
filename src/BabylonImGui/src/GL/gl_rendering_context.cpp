@@ -820,7 +820,8 @@ GLfloat GLRenderingContext::getParameterf(GLenum pname)
 GLboolean GLRenderingContext::getQueryParameterb(IGLQuery* query, GLenum pname)
 {
   int parameter = 0;
-  glGetQueryObjectiv(query->value, pname, &parameter);
+  //glGetQueryObjectiv(query->value, pname, &parameter);
+  //glGetQueryObjectuiv(query->value, pname, &parameter);
   return parameter == GL_TRUE;
 }
 

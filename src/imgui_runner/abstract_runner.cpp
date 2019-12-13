@@ -2,10 +2,6 @@
 #include <glad/glad.h>
 #include <imgui.h>
 
-#ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-#endif
-
 namespace ImGui {
 namespace ImGuiRunner {
 
@@ -101,8 +97,8 @@ void AbstractRunner::SetupImgGuiContext()
 
   //io.ConfigViewportsNoAutoMerge = true;
   //io.ConfigViewportsNoTaskBarIcon = true;
-
 }
+
 void AbstractRunner::SetupImGuiStyle()
 {
   auto & io = ImGui::GetIO();
@@ -136,7 +132,6 @@ void LoadNoAdditionalFont()
   //io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f);
   //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
   //IM_ASSERT(font != NULL);
-
 }
 
 void AbstractRunner::Frame_OpenGl_ClearColor()
@@ -182,8 +177,6 @@ void AbstractRunner::LoopProc()
   SwapBuffers();
 }
 
-
-#ifndef __EMSCRIPTEN__
 void AbstractRunner::Run()
 {
   FullInit();
@@ -191,23 +184,6 @@ void AbstractRunner::Run()
     LoopProc();
   Cleanup();
 }
-#endif
-#ifdef __EMSCRIPTEN__
-AbstractRunner *gAbstractRunner = nullptr;
-
-void emscripten_imgui_main_loop(void* arg)
-{
-  (void)arg;
-  gAbstractRunner->LoopProc();
-}
-
-void AbstractRunner::Run()
-{
-  FullInit();
-  gAbstractRunner = this;
-  emscripten_set_main_loop_arg(emscripten_imgui_main_loop, NULL, 0, true);
-}
-#endif // #ifdef __EMSCRIPTEN__
 
 
 } // namespace ImGuiRunner
