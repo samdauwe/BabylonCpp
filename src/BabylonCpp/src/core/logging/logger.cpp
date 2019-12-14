@@ -1,6 +1,7 @@
 #include <babylon/core/logging/logger.h>
 
 #include <babylon/core/logging/log_message.h>
+#include <iostream>
 
 namespace BABYLON {
 
@@ -25,6 +26,9 @@ void LogMessageHandler::handle(const LogMessage& msg)
       (*logMsgListener)(LogMessage(msg));
     }
   }
+#ifdef __EMSCRIPTEN__
+  std::cout << msg.toString() << "\n";
+#endif
 }
 
 //BABYLON::Logger& Logger::Instance()
