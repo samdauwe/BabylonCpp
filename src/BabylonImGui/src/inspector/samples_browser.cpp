@@ -13,7 +13,7 @@
 #include <imgui.h>
 
 #include <babylon/inspector/inspector.h>
-#include <babylon/samples/samples_index.h>
+
 
 
 

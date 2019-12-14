@@ -1,10 +1,11 @@
 #include <babylon/samples/samples_index.h>
 
+#include <babylon/samples/babylon_register_sample.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/string.h>
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/babylon_common.h>
-
+#include <babylon/samples/samples_auto_declarations.h>
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
@@ -37,6 +38,11 @@ void SamplesIndex::fillSamplesFailures() const
 SamplesIndex& SamplesIndex::Instance()
 {
   static SamplesIndex instance;
+  static bool wasPopulated = false;
+  if (!wasPopulated) {
+    wasPopulated = true;
+    auto_populate_samples(instance);
+  }
   return instance;
 }
 
