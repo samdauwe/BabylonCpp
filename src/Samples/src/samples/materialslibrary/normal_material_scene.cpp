@@ -3,7 +3,7 @@
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materialslibrary/normal/normal_material.h>
 #include <babylon/meshes/mesh.h>
-#include <babylon/samples/samples_index.h>
+#include <babylon/samples/babylon_register_sample.h>
 
 namespace BABYLON {
 namespace Samples {

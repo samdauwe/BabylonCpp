@@ -9,7 +9,7 @@
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
-#include <babylon/samples/samples_index.h>
+#include <babylon/samples/babylon_register_sample.h>
 
 /**
  * @brief Chains and Gears ( https://www.shadertoy.com/view/Msl3Rn )

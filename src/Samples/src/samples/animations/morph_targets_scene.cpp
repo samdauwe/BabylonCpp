@@ -10,7 +10,7 @@
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 #include <babylon/morph/morph_target_manager.h>
-#include <babylon/samples/samples_index.h>
+#include <babylon/samples/babylon_register_sample.h>
 
 namespace BABYLON {
 namespace Samples {

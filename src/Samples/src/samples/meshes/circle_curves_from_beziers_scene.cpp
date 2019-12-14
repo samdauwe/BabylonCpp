@@ -4,7 +4,7 @@
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/maths/curve3.h>
 #include <babylon/meshes/lines_mesh.h>
-#include <babylon/samples/samples_index.h>
+#include <babylon/samples/babylon_register_sample.h>
 
 namespace BABYLON {
 namespace Samples {

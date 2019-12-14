@@ -6,7 +6,7 @@
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/polygonmesh/polygon.h>
 #include <babylon/meshes/polygonmesh/polygon_mesh_builder.h>
-#include <babylon/samples/samples_index.h>
+#include <babylon/samples/babylon_register_sample.h>
 
 namespace BABYLON {
 namespace Samples {

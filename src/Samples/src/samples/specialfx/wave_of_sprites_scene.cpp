@@ -3,7 +3,7 @@
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/hemispheric_light.h>
-#include <babylon/samples/samples_index.h>
+#include <babylon/samples/babylon_register_sample.h>
 #include <babylon/sprites/sprite_manager.h>
 
 namespace BABYLON {

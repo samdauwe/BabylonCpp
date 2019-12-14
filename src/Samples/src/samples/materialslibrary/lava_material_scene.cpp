@@ -4,7 +4,7 @@
 #include <babylon/materials/textures/texture.h>
 #include <babylon/materialslibrary/lava/lava_material.h>
 #include <babylon/meshes/mesh.h>
-#include <babylon/samples/samples_index.h>
+#include <babylon/samples/babylon_register_sample.h>
 
 namespace BABYLON {
 namespace Samples {

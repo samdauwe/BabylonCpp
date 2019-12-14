@@ -4,7 +4,7 @@
 #include <babylon/lights/point_light.h>
 #include <babylon/loading/scene_loader.h>
 #include <babylon/postprocesses/blur_post_process.h>
-#include <babylon/samples/samples_index.h>
+#include <babylon/samples/babylon_register_sample.h>
 
 namespace BABYLON {
 namespace Samples {

@@ -3,6 +3,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/string.h>
 #include <babylon/interfaces/irenderable_scene.h>
+#include <babylon/babylon_common.h>
 
 #include <fstream>
 #include <iostream>
@@ -71,18 +72,18 @@ bool SamplesIndex::sampleExists(const std::string& sampleName) const
 
 nlohmann::json ReadSampleInfoFile()
 {
-  std::ifstream is("samples_info.json");
-  if (!is.good())
-    is = std::ifstream("../samples_info.json");
-  if (!is.good())
-    is = std::ifstream("../../samples_info.json");
+  std::ifstream is(BABYLON::assets_folder() + "/samples_info.json");
   if (is.good()) {
+    std::cout << "Found samples_info.json\n";
     nlohmann::json j;
     is >> j;
     return j;
   }
   else
+  {
+    std::cout << "Not Found samples_info.json\n";
     return nlohmann::json();
+  }
 }
 
 SampleInfo SamplesIndex::getSampleInfo(const std::string& sampleNameMixedCase) const

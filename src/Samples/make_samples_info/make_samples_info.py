@@ -5,6 +5,7 @@ THIS_SCRIPT_DIR = (os.path.dirname(os.path.realpath(__file__)))
 ROOT_DIR = (os.path.realpath(THIS_SCRIPT_DIR + "/../../.."))
 SAMPLES_INCLUDE_DIR = ROOT_DIR + "/src/Samples/include/babylon/samples"
 SAMPLES_SOURCE_DIR = ROOT_DIR + "/src/Samples/src/samples"
+ASSETS_DIR = ROOT_DIR + "/assets"
 
 def all_files_with_extension(root_dir, extension):
     result = []
@@ -91,7 +92,7 @@ def make_all_info():
 
 def write_json_info_file():
     infos = make_all_info()
-    with open("samples_info.json", "w") as f:
+    with open(ASSETS_DIR + "/samples_info.json", "w") as f:
         f.write(json.dumps(infos, indent=4))
 
 if __name__ == "__main__":

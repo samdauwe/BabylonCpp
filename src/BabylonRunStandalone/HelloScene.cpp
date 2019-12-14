@@ -4,12 +4,18 @@
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/meshes/mesh.h>
 
+#include <iostream>
+#include <stdexcept>
+
+#define LOG_OBJECT_ADRESS(variable_name, message) \
+std::cout << (message) << ": " << #variable_name << " addr=" << (void *)(&variable_name) << "\n";
+#define LOG_POINTER_ADRESS(variable_name, message) \
+std::cout << message << ": " << #variable_name << " addr=" << (void *)(variable_name) << "\n";
+
 // This files demonstrates how to create a very simple renderable scene
 struct HelloScene : public BABYLON::IRenderableSceneWithHud
 {
-  HelloScene()
-  {
-  }
+  HelloScene(){}
   const char* getName() override { return "Hello Scene"; }
 
   void initializeScene(BABYLON::ICanvas* canvas, BABYLON::Scene* scene) override
