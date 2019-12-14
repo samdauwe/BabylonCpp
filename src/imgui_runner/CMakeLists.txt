@@ -12,6 +12,10 @@ add_library(imgui_runner ${sources})
 target_link_libraries(imgui_runner PUBLIC imgui)
 target_include_directories(imgui_runner PUBLIC ${CMAKE_CURRENT_LIST_DIR}/..)
 
+if (UNIX AND NOT APPLE AND NOT EMSCRIPTEN)
+    target_link_libraries(imgui_runner PUBLIC X11)
+endif()
+
 if (IMGUI_RUNNER_USE_GLFW)
     target_link_libraries(imgui_runner PUBLIC glfw)
     target_compile_definitions(imgui_runner PUBLIC IMGUI_RUNNER_USE_GLFW)
