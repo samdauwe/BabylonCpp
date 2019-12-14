@@ -120,6 +120,11 @@ public:
   void _emitUniformFromString(const std::string& name, const std::string& type,
                               const std::string& define = "", bool notDefine = false);
 
+  /**
+   * @brief Hidden
+   */
+  std::string _emitFloat(float value);
+
 protected:
   /**
    * @brief Hidden

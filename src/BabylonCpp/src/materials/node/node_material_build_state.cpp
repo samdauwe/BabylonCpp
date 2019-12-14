@@ -313,4 +313,13 @@ void NodeMaterialBuildState::_emitUniformFromString(const std::string& name,
   }
 }
 
+std::string NodeMaterialBuildState::_emitFloat(float value)
+{
+  if (fabsf(roundf(value) - value) <= 0.00001f) {
+    return String::printf("%d.0", static_cast<int>(value));
+  }
+
+  return std::to_string(value);
+}
+
 } // end of namespace BABYLON
