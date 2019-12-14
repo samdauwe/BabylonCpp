@@ -2014,8 +2014,8 @@ GL::IGLShaderPtr Engine::_compileRawShader(const std::string& source, const std:
   if (!_gl->getShaderParameter(shader.get(), GL::COMPILE_STATUS)) {
     auto log = _gl->getShaderInfoLog(shader.get());
     if (!log.empty()) {
-      BABYLON_LOG_ERROR("Engine", log)
-      BABYLON_LOG_ERROR("Engine", source)
+      BABYLON_LOG_ERROR("Engine", "CompileRawShader error : %s", log)
+      BABYLON_LOG_ERROR("Engine", "With source=\n%s\n", source)
     }
     return nullptr;
   }
@@ -2032,13 +2032,13 @@ Engine::createRawShaderProgram(const std::string& vertexCode, const std::string&
 
   auto vertexShader   = _compileRawShader(vertexCode, "vertex");
   if (!vertexShader) {
-    std::cout << "Engine::createRawShaderProgram failed on vertexShader\n"
-      << "code:\n" <<  vertexCode << "\n";
+    BABYLON_LOG_ERROR("Engine", "Engine::createRawShaderProgram failed on vertexShader");
+    return nullptr;
   }
   auto fragmentShader = _compileRawShader(fragmentCode, "fragment");
   if (!fragmentShader) {
-    std::cout << "Engine::createRawShaderProgram failed on fragmentShader\n"
-              << "code:\n" <<  fragmentCode << "\n";
+    BABYLON_LOG_ERROR("Engine", "Engine::createRawShaderProgram failed on fragmentShader");
+    return nullptr;
   }
 
   return _createShaderProgram(vertexShader, fragmentShader, context, transformFeedbackVaryings);
@@ -2057,13 +2057,13 @@ Engine::createShaderProgram(const std::string& vertexCode, const std::string& fr
     = (_webGLVersion > 1.f) ? BABYLONCPP_GLSL_VERSION_3 "#define WEBGL2 \n" : "";
   auto vertexShader   = _compileShader(vertexCode, "vertex", defines, shaderVersion);
   if (!vertexShader) {
-    std::cout << "Engine::createShaderProgram failed on vertexShader\n"
-              << "code:\n" <<  vertexCode << "\n";
+    BABYLON_LOG_ERROR("Engine", "Engine::createShaderProgram failed on vertexShader");
+    return nullptr;
   }
   auto fragmentShader = _compileShader(fragmentCode, "fragment", defines, shaderVersion);
   if (!fragmentShader) {
-    std::cout << "Engine::createShaderProgram failed on fragmentShader\n"
-              << "code:\n" <<  fragmentCode << "\n";
+    BABYLON_LOG_ERROR("Engine", "Engine::createShaderProgram failed on fragmentShader");
+    return nullptr;
   }
 
   auto program
