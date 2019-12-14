@@ -12,8 +12,8 @@ namespace ImGuiRunner {
 ImVec2 MainScreenResolution()
 {
   return {
-    (int)GetSystemMetrics(SM_CXSCREEN),
-    (int)GetSystemMetrics(SM_CYSCREEN)
+    (float)GetSystemMetrics(SM_CXSCREEN),
+    (float)GetSystemMetrics(SM_CYSCREEN)
   };
 }
 #elif defined(__linux__)
@@ -22,7 +22,7 @@ ImVec2 MainScreenResolution()
 {
   Display* d = XOpenDisplay(NULL);
   Screen* s  = DefaultScreenOfDisplay(d);
-  return { s->width, s->height };
+  return { (float)s->width, (float)s->height };
 }
 #else
 ImVec2 MainScreenResolution()
