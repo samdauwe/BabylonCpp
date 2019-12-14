@@ -61,7 +61,7 @@ private:
   void DoInit();
 
   std::unique_ptr<ImGui::ImGuiRunner::AbstractRunner> mAbstractRunner;
-  AppWindowParams mAppWindowParams;
+  const AppWindowParams mAppWindowParams;
   GuiFunctionWithExit mGuiFunctionWithExit;
   PostInitFunction mPostInitFunction = EmptyPostInitFunction;
 };

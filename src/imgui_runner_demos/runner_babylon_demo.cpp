@@ -80,21 +80,25 @@ bool DemoGui()
   return shouldExit;
 }
 
+#ifdef EMSCRIPTEN
+// With emscripten we will run an external loop, so that we need to keep a global variable
+std::unique_ptr<ImGuiUtils::ImGuiRunner::RunnerBabylon> gRunnerBabylon;
+#endif
+
 void ShowDemo(std::unique_ptr<ImGui::ImGuiRunner::AbstractRunner> runner)
 {
-  using namespace ImGuiUtils::ImGuiRunner;
-  AppWindowParams params;
-  params.DefaultWindowType         = DefaultWindowTypeOption::ProvideFullScreenDockSpace;
+  ImGuiUtils::ImGuiRunner::AppWindowParams params;
+  params.DefaultWindowType         = ImGuiUtils::ImGuiRunner::DefaultWindowTypeOption::ProvideFullScreenDockSpace;
   params.InitialDockLayoutFunction = MyCreateDockLayout;
   params.Title                     = "Hello World";
   params.Width = 1280;
   params.Height = 720;
   // params.FullScreen = true;
 
-  ImGuiUtils::ImGuiRunner::RunnerBabylon runnerBabylon(
+  gRunnerBabylon = std::make_unique<ImGuiUtils::ImGuiRunner::RunnerBabylon>(
     std::move(runner),
     params,
     DemoGui
   );
-  runnerBabylon.Run();
+  gRunnerBabylon->Run();
 }
