@@ -379,11 +379,16 @@ private:
 }; // end of class BabylonInspectorApp
 
 // public API
+#ifdef __EMSCRIPTEN__
+BABYLON::BabylonStudioApp app;
+#endif
 void runBabylonStudio(const std::shared_ptr<BABYLON::IRenderableScene>& scene,
                       BabylonStudioOptions options /* = SceneWithInspectorOptions() */
 )
 {
+#ifndef __EMSCRIPTEN__
   BABYLON::BabylonStudioApp app;
+#endif
   std::shared_ptr<BABYLON::IRenderableScene> sceneNotNull =
     scene ? scene : std::make_shared<EmptyScene>();
   app.RunApp(sceneNotNull, options);
