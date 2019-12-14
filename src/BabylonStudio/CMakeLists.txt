@@ -5,9 +5,16 @@
 # Configure build environment
 include(../../cmake/BuildEnvironment.cmake)
 
+if (EMSCRIPTEN)
+    set(CMAKE_EXECUTABLE_SUFFIX ".html")
+    add_link_options(--preload-file  ${CMAKE_SOURCE_DIR}/assets@/assets)
+endif()
+
 # OpenGL dependency
 set(OpenGL_GL_PREFERENCE GLVND)
-find_package(OpenGL REQUIRED)
+if (NOT EMSCRIPTEN)
+    find_package(OpenGL REQUIRED)
+endif()
 include_directories(${OPENGL_INCLUDE_DIRS})
 
 # Target name
@@ -40,30 +47,19 @@ source_group_by_path_all(${CMAKE_CURRENT_SOURCE_DIR} ${SOURCES_H_CPP})
 add_executable(${TARGET} ${SOURCES_H_CPP})
 babylon_target_clang_tidy(${TARGET})
 
-# Include directories
-target_include_directories(${TARGET}
-    PRIVATE
-    ${JSON_HPP_INCLUDE_DIRS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../BabylonCpp/include
-    ${CMAKE_CURRENT_BINARY_DIR}/../BabylonCpp/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../Extensions/include
-    ${CMAKE_CURRENT_BINARY_DIR}/../Extensions/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../Samples/include
-)
-
-
 # Libraries
 target_link_libraries(${TARGET}
     PRIVATE
-    glfw
-    glad
     imgui
     imgui_utils
     BabylonImGui
-    ${OPENGL_LIBRARIES}
     BabylonCpp
     Samples
+    json_hpp
 )
+if (NOT EMSCRIPTEN)
+    target_link_libraries(${TARGET} PRIVATE ${OPENGL_LIBRARIES})
+endif()
 
 if (BABYLON_BUILD_PLAYGROUND)
     target_compile_definitions(${TARGET} PRIVATE -DBABYLON_BUILD_PLAYGROUND)
@@ -80,3 +76,7 @@ endif()
 # Copy asset directories
 ## - Icons
 copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/icons")
+
+if (EMSCRIPTEN)
+    target_link_options(${TARGET} BEFORE PRIVATE --preload-file  ${CMAKE_SOURCE_DIR}/assets@/assets)
+endif()

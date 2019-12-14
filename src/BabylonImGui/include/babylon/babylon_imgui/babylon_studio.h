@@ -1,12 +1,12 @@
 #ifndef BABYLON_INSPECTOR_APP_H
 #define BABYLON_INSPECTOR_APP_H
-#include <functional>
-#include <map>
 #include <babylon/babylon_imgui/imgui_scene_widget.h>
 #include <babylon/inspector/inspector.h>
 #include <babylon/inspector/samples_browser.h>
+#include <functional>
+#include <imgui_runner_babylon/runner_babylon.h>
 #include <imgui_utils/code_editor.h>
-#include <imgui_utils/app_runner/imgui_runner.h>
+#include <map>
 
 namespace BABYLON {
 
@@ -37,7 +37,7 @@ namespace BABYLON {
   };
 
   void runBabylonStudio(
-    std::shared_ptr<BABYLON::IRenderableScene> scene,
+    const std::shared_ptr<BABYLON::IRenderableScene>& scene = nullptr,
     BabylonStudioOptions options = BabylonStudioOptions()
   );
 } // end of namespace BABYLON

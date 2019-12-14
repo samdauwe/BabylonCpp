@@ -1,7 +1,7 @@
 #include "babylon/babylon_imgui/babylon_studio_layout.h"
 
 #include "imgui_internal.h"
-#include "imgui_utils/app_runner/imgui_runner.h"
+#include "imgui_runner_babylon/runner_babylon.h"
 #include "imgui_utils/icons_font_awesome_5.h"
 
 namespace BABYLON {
@@ -123,10 +123,9 @@ bool BabylonStudioLayout::IsShowingSceneOnly()
 
 void BabylonStudioLayout::PrepareLayout(ImGuiID fullDockSpaceId)
 {
-  ImGuiViewport* viewport = ImGui::GetMainViewport();
   ImGui::DockBuilderRemoveNode(fullDockSpaceId); // Clear out existing layout
   ImGui::DockBuilderAddNode(fullDockSpaceId);    // Add empty node
-  ImGui::DockBuilderSetNodeSize(fullDockSpaceId, viewport->Size);
+  ImGui::DockBuilderSetNodeSize(fullDockSpaceId, ImGui::GetIO().DisplaySize);
 
   ImGuiID dock_main_id = fullDockSpaceId;
   ImGuiID dock_id_bottom = DoSplit(&dock_main_id, ImGuiDir_Down, 0.25f);
@@ -188,7 +187,7 @@ void BabylonStudioLayout::ApplyLayoutMode(LayoutMode mode)
     default:
       break;
   }
-  ImGuiUtils::ImGuiRunner::ResetDockLayout();
+  ImGuiUtils::ImGuiRunner::RunnerBabylon::ResetDockLayout();
 }
 
 } // namespace BABYLON

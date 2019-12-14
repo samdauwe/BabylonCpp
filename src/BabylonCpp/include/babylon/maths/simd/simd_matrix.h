@@ -1,6 +1,6 @@
 #ifndef BABYLON_MATH_SIMD_MATRIX_H
 #define BABYLON_MATH_SIMD_MATRIX_H
-
+#ifdef OPTION_ENABLE_SIMD
 #include <array>
 
 #include <babylon/babylon_api.h>
@@ -38,5 +38,5 @@ struct BABYLON_SHARED_EXPORT SIMDMatrix {
 
 } // end of namespace SIMD
 } // end of namespace BABYLON
-
+#endif // #ifdef OPTION_ENABLE_SIMD
 #endif // end of BABYLON_MATH_SIMD_MATRIX_H

@@ -24,12 +24,6 @@ set(EXPORT_FILE  "include/${BABYLON_NAMESPACE}/${BABYLON_NAMESPACE}_api.h")
 set(EXPORT_MACRO "${TARGET_UPPER}_SHARED_EXPORT")
 
 # ============================================================================ #
-#                       Project configuration options                          #
-# ============================================================================ #
-option(BUILD_SHARED_LIBS     "Build shared instead of static libraries."     ON)
-option(OPTION_BUILD_TESTS    "Build tests."                                  ON)
-
-# ============================================================================ #
 #                       Project description and (meta) information             #
 # ============================================================================ #
 
@@ -61,57 +55,11 @@ configure_file(version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/${BABYLON_NAMESP
 # Include, Source and Tests path
 set(INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include/${BABYLON_NAMESPACE}")
 set(SOURCE_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/src")
-set(TESTS_PATH   "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 
 # Header files
-file(GLOB EXTENSIONS_HDR_FILES  ${INCLUDE_PATH}/extensions/dynamicterrain/*.h
-                                ${INCLUDE_PATH}/extensions/entitycomponentsystem/*.h
-                                ${INCLUDE_PATH}/extensions/entitycomponentsystem/detail/*.h
-                                ${INCLUDE_PATH}/extensions/entitycomponentsystem/util/*.h
-                                ${INCLUDE_PATH}/extensions/hexplanetgeneration/*.h
-                                ${INCLUDE_PATH}/extensions/hexplanetgeneration/terrain/*.h
-                                ${INCLUDE_PATH}/extensions/hexplanetgeneration/utils/*.h
-                                ${INCLUDE_PATH}/extensions/navigation/*.h
-                                ${INCLUDE_PATH}/extensions/navigation/rvo2/*.h
-                                ${INCLUDE_PATH}/extensions/noisegeneration/*.h
-                                ${INCLUDE_PATH}/extensions/pathfinding/*.h
-                                ${INCLUDE_PATH}/extensions/polyhedron/*.h
-                                ${INCLUDE_PATH}/extensions/recastjs/*.h
-                                ${INCLUDE_PATH}/extensions/treegenerators/*.h)
-
-set(BABYLON_EXTENSIONS_HEADERS
-    ${EXTENSIONS_HDR_FILES}
-)
-
-# Source files
-file(GLOB EXTENSIONS_SRC_FILES  ${SOURCE_PATH}/extensions/dynamicterrain/*.cpp
-                                ${SOURCE_PATH}/extensions/entitycomponentsystem/*.cpp
-                                ${SOURCE_PATH}/extensions/entitycomponentsystem/detail/*.cpp
-                                ${SOURCE_PATH}/extensions/hexplanetgeneration/*.cpp
-                                ${SOURCE_PATH}/extensions/hexplanetgeneration/terrain/*.cpp
-                                ${SOURCE_PATH}/extensions/hexplanetgeneration/utils/*.cpp
-                                ${SOURCE_PATH}/extensions/navigation/*.cpp
-                                ${SOURCE_PATH}/extensions/navigation/rvo2/*.cpp
-                                ${SOURCE_PATH}/extensions/noisegeneration/*.cpp
-                                ${SOURCE_PATH}/extensions/polyhedron/*.cpp
-                                ${SOURCE_PATH}/extensions/recastjs/*.cpp
-                                ${SOURCE_PATH}/extensions/treegenerators/*.cpp
-                                ${SOURCE_PATH}/recastnavigation/Detour/Source/*.cpp
-                                ${SOURCE_PATH}/recastnavigation/DetourCrowd/Source/*.cpp
-                                ${SOURCE_PATH}/recastnavigation/DetourTileCache/Source/*.cpp
-                                ${SOURCE_PATH}/recastnavigation/Recast/Source/*.cpp)
-
-set(BABYLON_EXTENSIONS_SOURCES
-    ${EXTENSIONS_SRC_FILES}
-)
-
-# Group source files
-set(HEADER_GROUP "Header Files (API)")
-set(SOURCE_GROUP "Source Files")
-source_group_by_path(${INCLUDE_PATH} "\\\\.h$|\\\\.hpp$"
-    ${HEADER_GROUP} ${BABYLON_EXTENSIONS_HEADERS})
-source_group_by_path(${SOURCE_PATH}  "\\\\.cpp$|\\\\.c$|\\\\.h$|\\\\.hpp$"
-    ${SOURCE_GROUP} ${BABYLON_EXTENSIONS_SOURCES})
+file(GLOB_RECURSE BABYLON_EXTENSIONS_HEADERS  ${INCLUDE_PATH}/*.h)
+file(GLOB_RECURSE BABYLON_EXTENSIONS_SOURCES  ${SOURCE_PATH}/*.cpp)
+source_group_by_path_all(${CMAKE_CURRENT_SOURCE_DIR} ${BABYLON_EXTENSIONS_HEADERS} ${BABYLON_EXTENSIONS_SOURCES})
 
 # ============================================================================ #
 #                       Create library                                         #
@@ -154,12 +102,6 @@ generate_export_header(${TARGET}
     EXPORT_MACRO_NAME ${EXPORT_MACRO}
 )
 
-# Project options
-set_target_properties(${TARGET}
-    PROPERTIES ${DEFAULT_PROJECT_OPTIONS}
-    FOLDER "${IDE_FOLDER}"
-)
-
 # Include directories
 target_include_directories(${TARGET}
     PRIVATE
@@ -167,7 +109,6 @@ target_include_directories(${TARGET}
     ${INCLUDE_PATH}/../recastnavigation/DetourCrowd/Include
     ${INCLUDE_PATH}/../recastnavigation/DetourTileCache/Include
     ${INCLUDE_PATH}/../recastnavigation/Recast/Include
-    ${JSON_HPP_INCLUDE_DIRS}
     ${CMAKE_CURRENT_BINARY_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../BabylonCpp/include
@@ -182,18 +123,13 @@ target_link_libraries(${TARGET}
     PUBLIC
     PRIVATE
     BabylonCpp
+    json_hpp
 )
 
 # Compile definitions
 target_compile_definitions(${TARGET}
     PUBLIC
     $<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:${TARGET_UPPER}_STATIC_DEFINE>
-)
-
-# Compile options
-target_compile_options(${TARGET}
-    PRIVATE
-    PUBLIC
 )
 
 # Set library ouput name
@@ -209,60 +145,31 @@ set_target_properties(${TARGET}
 # ============================================================================ #
 
 # Check if tests are enabled
-if(OPTION_BUILD_TESTS AND EXISTS ${TESTS_PATH})
-
-# Function: Build test and add command to execute it via target 'test'
-function(add_test_without_ctest target)
-    add_subdirectory(${target})
-
-    if(NOT TARGET ${target})
-        return()
-    endif()
-
-    add_dependencies(test ${target})
-    add_custom_command(TARGET test POST_BUILD
-       COMMAND $<TARGET_FILE:${target}> --gtest_output=xml:gtests-${target}.xml)
-endfunction()
-
-# Build gmock
-set(gmock_build_tests           OFF CACHE BOOL "")
-set(gtest_build_samples         OFF CACHE BOOL "")
-set(gtest_build_tests           OFF CACHE BOOL "")
-set(gtest_disable_pthreads      OFF CACHE BOOL "")
-set(gtest_force_shared_crt      ON  CACHE BOOL "")
-set(gtest_hide_internal_symbols OFF CACHE BOOL "")
-
-if(NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
-# Target 'test'
-add_custom_target(BabylonCppExtensionsUnitTests)
-set_target_properties(BabylonCppExtensionsUnitTests
-    PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD 0)
-
-# Tests
-add_test_without_ctest(tests)
+if(OPTION_BUILD_TESTS)
+    add_subdirectory(tests)
 endif()
-
-endif(OPTION_BUILD_TESTS AND EXISTS ${TESTS_PATH})
 
 # ============================================================================ #
 #                       Deployment                                             #
 # ============================================================================ #
 
 # 'make install' to the correct location
-install(TARGETS ${TARGET}
-    EXPORT   ${TARGET}Config
-    ARCHIVE  DESTINATION ${ARCHIVE_OUTPUT_PATH}
-    RUNTIME  DESTINATION ${EXECUTABLE_OUTPUT_PATH}
-    LIBRARY  DESTINATION ${LIBRARY_OUTPUT_PATH}
-)
-install(DIRECTORY include/ DESTINATION ${INCLUDE_OUTPUT_PATH})
+if (NOT BABYLON_DISABLE_INSTALL)
+    install(TARGETS ${TARGET}
+        EXPORT   ${TARGET}Config
+        ARCHIVE  DESTINATION ${ARCHIVE_OUTPUT_PATH}
+        RUNTIME  DESTINATION ${EXECUTABLE_OUTPUT_PATH}
+        LIBRARY  DESTINATION ${LIBRARY_OUTPUT_PATH}
+    )
+    install(DIRECTORY include/ DESTINATION ${INCLUDE_OUTPUT_PATH})
 
-# Make the project importable from the install directory
-install(EXPORT ${TARGET}Config
-    DESTINATION ${TARGET}/${CMAKE_OUTPUT_PATH}
-)
+    # Make the project importable from the install directory
+    install(EXPORT ${TARGET}Config
+        DESTINATION ${TARGET}/${CMAKE_OUTPUT_PATH}
+    )
 
-# Make the project importable from the build directory
-export(TARGETS ${TARGET}
-    FILE ${TARGET}Config.cmake
-)
+    # Make the project importable from the build directory
+    export(TARGETS ${TARGET}
+        FILE ${TARGET}Config.cmake
+    )
+endif()

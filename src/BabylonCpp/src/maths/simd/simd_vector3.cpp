@@ -1,3 +1,4 @@
+#ifdef OPTION_ENABLE_SIMD
 #include <babylon/math/simd/simd_vector3.h>
 
 #include <babylon/math/matrix.h>
@@ -37,3 +38,4 @@ void SIMDVector3::TransformCoordinatesFromFloatsToRefSIMD(
 
 } // end of namespace SIMD
 } // namespace BABYLON
+#endif // #ifdef OPTION_ENABLE_SIMD

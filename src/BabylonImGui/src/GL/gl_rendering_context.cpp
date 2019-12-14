@@ -112,79 +112,8 @@ GLRenderingContext::GLRenderingContext()
 
 GLRenderingContext::~GLRenderingContext() = default;
 
-std::string GlErrorCodeStr(GLenum error_code)
-{
-  std::string error;
-  switch (error_code) {
-    case GL_INVALID_ENUM:
-      error = "INVALID_ENUM";
-      break;
-    case GL_INVALID_VALUE:
-      error = "INVALID_VALUE";
-      break;
-    case GL_INVALID_OPERATION:
-      error = "INVALID_OPERATION";
-      break;
-    case GL_STACK_OVERFLOW:
-      error = "STACK_OVERFLOW";
-      break;
-    case GL_STACK_UNDERFLOW:
-      error = "STACK_UNDERFLOW";
-      break;
-    case GL_OUT_OF_MEMORY:
-      error = "OUT_OF_MEMORY";
-      break;
-    case GL_INVALID_FRAMEBUFFER_OPERATION:
-      error = "INVALID_FRAMEBUFFER_OPERATION";
-      break;
-  }
-  return error;
-}
-
-void glad_post_call_callback(const char* name, void* /*funcptr*/,
-                             int /*len_args*/, ...)
-{
-  GLenum error_code;
-  error_code = glad_glGetError();
-
-  std::stringstream msg_str;
-  msg_str << "ERROR " << GlErrorCodeStr(error_code) << "(" << error_code
-          << ") in " << name << "\n";
-  if (error_code != GL_NO_ERROR) {
-    fprintf(stderr, "%s", msg_str.str().c_str());
-#ifdef _MSC_VER
-    OutputDebugString(msg_str.str().c_str());
-#endif
-  }
-}
-
-void glad_pre_call_callback(const char* name, void* /*funcptr*/,
-                            int /*len_args*/, ...)
-{
-  std::stringstream msg_str;
-  msg_str << "glad_pre_call_callback " << name << "\n";
-  fprintf(stderr, "%s", msg_str.str().c_str());
-#ifdef _MSC_VER
-  OutputDebugString(msg_str.str().c_str());
-#endif
-}
-
 bool GLRenderingContext::initialize(bool enableGLDebugging)
 {
-  // HUM : glad already loaded by imgui ?
-  // Initialize glad
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-    fprintf(stderr, "gladLoadGLLoader: Failed to initialize OpenGL context\n");
-    return false;
-  }
-  if (!GLAD_GL_VERSION_3_3) {
-    fprintf(stderr, "GLAD could not initialize OpenGl 3.3\n");
-  }
-#ifdef GLAD_DEBUG
-  glad_set_pre_callback(glad_pre_call_callback);
-  glad_set_post_callback(glad_post_call_callback);
-#endif
-
   // Log the GL version
   BABYLON_LOGF_INFO("GLRenderingContext", "Using GL version: %s",
                     glGetString(GL_VERSION));
@@ -195,11 +124,12 @@ bool GLRenderingContext::initialize(bool enableGLDebugging)
   // backupGLState();
 
   // Enable debug output
+#ifndef __EMSCRIPTEN__
   if (enableGLDebugging) {
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(MessageCallback, nullptr);
   }
-
+#endif //__EMSCRIPTEN__
   return true;
 }
 
@@ -817,8 +747,9 @@ GLfloat GLRenderingContext::getParameterf(GLenum pname)
 
 GLboolean GLRenderingContext::getQueryParameterb(IGLQuery* query, GLenum pname)
 {
-  int parameter = 0;
-  glGetQueryObjectiv(query->value, pname, &parameter);
+  GLuint parameter = 0;
+  //glGetQueryObjectiv(query->value, pname, &parameter);
+  glGetQueryObjectuiv(query->value, pname, &parameter);
   return parameter == GL_TRUE;
 }
 

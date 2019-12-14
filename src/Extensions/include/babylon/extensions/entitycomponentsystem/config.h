@@ -32,7 +32,14 @@
 #define ANAX_VERSION_MINOR 1
 #define ANAX_VERSION_PATCH 0
 
-#ifdef ANAX_32_BIT_ENTITY_IDS
+#if defined(_WIN32) && !defined(_WIN64)
+#define ANAX_32_BIT_ENTITY_IDS
+#endif
+#ifdef __EMSCRIPTEN__
+#define ANAX_32_BIT_ENTITY_IDS
+#endif
+
+#if defined(ANAX_32_BIT_ENTITY_IDS)
 #define ANAX_ENTITY_ID_INDEX_BIT_COUNT 20
 #define ANAX_ENTITY_ID_COUNTER_BIT_COUNT 12
 #else

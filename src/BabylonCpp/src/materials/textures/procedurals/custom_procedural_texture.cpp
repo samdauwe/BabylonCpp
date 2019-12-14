@@ -54,7 +54,7 @@ void CustomProceduralTexture::_loadJson(const std::string& jsonUrl)
       return absolutePath;
     }
     // - Check in assets folder
-    absolutePath = Filesystem::absolutePath("../assets/" + iUrl);
+    absolutePath = Filesystem::absolutePath(BABYLON::assets_folder() + iUrl);
     if (Filesystem::exists(absolutePath)) {
       return absolutePath;
     }

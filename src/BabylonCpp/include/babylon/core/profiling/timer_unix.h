@@ -1,6 +1,6 @@
 #ifndef BABYLON_CORE_PROFILING_TIMER_H
 #define BABYLON_CORE_PROFILING_TIMER_H
-
+#ifndef _WIN32
 #include <babylon/babylon_api.h>
 #include <sys/time.h>
 
@@ -71,5 +71,5 @@ private:
 }; // end of class Timer
 
 } // end of namespace BABYLON
-
+#endif //#ifndef _WIN32
 #endif // BABYLON_CORE_PROFILING_TIMER_H

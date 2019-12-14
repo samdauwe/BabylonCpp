@@ -1,7 +1,8 @@
+#ifdef OPTION_ENABLE_SIMD
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <babylon/math/simd/float32x4.h>
+#include <babylon/maths/simd/float32x4.h>
 
 TEST(TestSIMDFloat32x4, add)
 {
@@ -188,3 +189,4 @@ TEST(TestSIMDFloat32x4, swizzle)
   EXPECT_EQ(res.z(), 1);
   EXPECT_EQ(res.w(), 4);
 }
+#endif //#ifdef OPTION_ENABLE_SIMD

@@ -1,3 +1,4 @@
+#ifdef OPTION_ENABLE_SIMD
 #include <babylon/math/simd/simd_matrix.h>
 
 #include <babylon/math/matrix.h>
@@ -301,3 +302,4 @@ void SIMDMatrix::LookAtLHToRefSIMD(const Vector3& eyeRef,
 
 } // end of namespace SIMD
 } // namespace BABYLON
+#endif // #ifdef OPTION_ENABLE_SIMD

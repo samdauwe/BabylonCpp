@@ -1,3 +1,4 @@
+#ifndef _WIN32
 #include <babylon/core/profiling/timer_unix.h>
 
 namespace BABYLON {
@@ -51,3 +52,4 @@ double Timer::getElapsedTime()
 }
 
 } // end of namespace BABYLON
+#endif // #ifndef _WIN32

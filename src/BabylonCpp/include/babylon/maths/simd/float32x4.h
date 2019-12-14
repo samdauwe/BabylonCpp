@@ -1,6 +1,8 @@
 #ifndef BABYLON_MATH_SIMD_FLOAT32X4_H
 #define BABYLON_MATH_SIMD_FLOAT32X4_H
 
+#ifdef OPTION_ENABLE_SIMD
+
 #include <babylon/babylon_api.h>
 
 #include <xmmintrin.h>
@@ -476,4 +478,5 @@ struct BABYLON_SHARED_EXPORT Float32x4 {
 } // end of namespace SIMD
 } // end of namespace BABYLON
 
+#endif // #ifdef OPTION_ENABLE_SIMD
 #endif // end of BABYLON_MATH_SIMD_FLOAT32X4_H

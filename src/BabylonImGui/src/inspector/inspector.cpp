@@ -3,18 +3,6 @@
 #include <iomanip>
 #include <sstream>
 
-// glad
-#include <glad/glad.h>
-
-// GLFW
-#include <GLFW/glfw3.h>
-#ifdef _WIN32
-#undef APIENTRY
-#define GLFW_EXPOSE_NATIVE_WIN32
-#define GLFW_EXPOSE_NATIVE_WGL
-#include <GLFW/glfw3native.h>
-#endif
-
 // ImGui
 #include <imgui.h>
 
@@ -85,51 +73,6 @@ void Inspector::setScene(Scene* scene)
   _actionTabsHost->setScene(scene);
 }
 
-void Inspector::imgui_initialize()
-{
-  // Initialize glad
-  if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
-    fprintf(stderr, "Failed to initialize glad\n");
-    return;
-  }
-
-  // Setup Dear ImGui context
-  ImGui::CreateContext();
-  imgui_LoadFontAwesome();
-  // Setup Dear ImGui style
-  ImGui::StyleColorsDark();
-  // Setup Platform/Renderer bindings
-  ImGui_ImplGlfw_InitForOpenGL(_glfwWindow, true);
-#if __APPLE__
-  // GL 3.2 + GLSL 150
-  const char* glsl_version = "#version 150";
-#else
-  // GL 3.0 + GLSL 130
-  const char* glsl_version = "#version 130";
-#endif
-  ImGui_ImplOpenGL3_Init(glsl_version);
-  // Actions
-  _addActions();
-}
-
-void Inspector::imgui_LoadFontAwesome()
-{
-  // Loads fonts
-  ImGuiIO& io = ImGui::GetIO();
-  io.Fonts->AddFontDefault();
-  static ImWchar ranges[] = { 0xf000, 0xf82f, 0 };
-  ImFontConfig config;
-  config.MergeMode = true;
-  auto fontRegularPath
-    = String::concat("../assets/fonts/", FONT_ICON_FILE_NAME_FAR);
-  _fontRegular = io.Fonts->AddFontFromFileTTF(fontRegularPath.c_str(),
-    ImGui::IconSize, &config, ranges);
-  auto fontSolidPath
-    = String::concat("../assets/fonts/", FONT_ICON_FILE_NAME_FAS);
-  _fontSolid = io.Fonts->AddFontFromFileTTF(fontSolidPath.c_str(),
-    ImGui::IconSize, &config, ranges);
-}
-
 void Inspector::render()
 {
   _renderInspector();
@@ -142,16 +85,6 @@ void Inspector::_showFps()
   //auto statsSize = ImGui::CalcTextSize(stats);
   //ImGui::SameLine(ImGui::GetContentRegionMax().x - statsSize.x);
   ImGui::Text("%s", stats);
-}
-
-void Inspector::imgui_dispose()
-{
-  // Cleanup ImGui
-  ImGui_ImplOpenGL3_Shutdown();
-  ImGui_ImplGlfw_Shutdown();
-  ImGui::DestroyContext();
-
-  glfwDestroyWindow(_glfwWindow);
 }
 
 void Inspector::_fileMenu()
