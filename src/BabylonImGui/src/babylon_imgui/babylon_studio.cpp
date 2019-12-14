@@ -54,12 +54,9 @@ public:
     _appContext._options._appWindowParams.ShowMenuBar = true;
 
     auto showGuiLambda = [this]() -> bool {
-      std::cout << "showGuiLambda 1 \n";
       bool r = this->render();
-      std::cout << "showGuiLambda 2 \n";
       for (auto f : _appContext._options._heartbeatCallbacks)
         f();
-      std::cout << "showGuiLambda 2 \n";
       if (_appContext._options._playgroundCompilerCallback) {
         PlaygroundCompilerStatus playgroundCompilerStatus
           = _appContext._options._playgroundCompilerCallback();
@@ -67,16 +64,12 @@ public:
           setRenderableScene(playgroundCompilerStatus._renderableScene);
         _appContext._isCompiling = playgroundCompilerStatus._isCompiling;
       }
-      std::cout << "showGuiLambda 3 \n";
       return r;
     };
 
     auto initSceneLambda = [=]() {
-      std::cout << "initSceneLambda 1 \n";
       this->initScene();
-      std::cout << "initSceneLambda 2 \n";
       this->setRenderableScene(initialScene);
-      std::cout << "initSceneLambda 3 \n";
     };
 
     _appContext._options._appWindowParams.InitialDockLayoutFunction = [this](ImGuiID mainDockId) {
