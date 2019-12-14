@@ -1,6 +1,7 @@
 #include <babylon/GL/framebuffer_canvas.h>
 #include <babylon/babylon_imgui/babylon_logs_window.h>
 #include <babylon/babylon_imgui/babylon_studio.h>
+#include <babylon/cameras/free_camera.h>
 #include <babylon/core/filesystem.h>
 #include <babylon/core/system.h>
 #include <babylon/inspector/components/actiontabs/action_tabs_component.h>
@@ -12,7 +13,6 @@
 
 #include <babylon/babylon_imgui/babylon_studio_layout.h>
 #include <babylon/core/logging.h>
-#include <babylon/samples/samples_index.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -28,8 +28,9 @@ struct EmptyScene : public BABYLON::IRenderableScene {
   {
     return "Empty Scene";
   }
-  void initializeScene(BABYLON::ICanvas*, BABYLON::Scene*) override
+  void initializeScene(BABYLON::ICanvas*, BABYLON::Scene* scene) override
   {
+    auto camera = BABYLON::FreeCamera::New("camera1", Vector3(0.f, 0.f, 0.f), scene);
   }
 };
 
