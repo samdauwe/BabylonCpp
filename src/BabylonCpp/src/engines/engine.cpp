@@ -2031,7 +2031,15 @@ Engine::createRawShaderProgram(const std::string& vertexCode, const std::string&
   context = context ? context : _gl;
 
   auto vertexShader   = _compileRawShader(vertexCode, "vertex");
+  if (!vertexShader) {
+    std::cout << "Engine::createRawShaderProgram failed on vertexShader\n"
+      << "code:\n" <<  vertexCode << "\n";
+  }
   auto fragmentShader = _compileRawShader(fragmentCode, "fragment");
+  if (!fragmentShader) {
+    std::cout << "Engine::createRawShaderProgram failed on fragmentShader\n"
+              << "code:\n" <<  fragmentCode << "\n";
+  }
 
   return _createShaderProgram(vertexShader, fragmentShader, context, transformFeedbackVaryings);
 }
@@ -2048,7 +2056,15 @@ Engine::createShaderProgram(const std::string& vertexCode, const std::string& fr
   const std::string shaderVersion
     = (_webGLVersion > 1.f) ? BABYLONCPP_GLSL_VERSION_3 "#define WEBGL2 \n" : "";
   auto vertexShader   = _compileShader(vertexCode, "vertex", defines, shaderVersion);
+  if (!vertexShader) {
+    std::cout << "Engine::createShaderProgram failed on vertexShader\n"
+              << "code:\n" <<  vertexCode << "\n";
+  }
   auto fragmentShader = _compileShader(fragmentCode, "fragment", defines, shaderVersion);
+  if (!fragmentShader) {
+    std::cout << "Engine::createShaderProgram failed on fragmentShader\n"
+              << "code:\n" <<  fragmentCode << "\n";
+  }
 
   auto program
     = _createShaderProgram(vertexShader, fragmentShader, context, transformFeedbackVaryings);
