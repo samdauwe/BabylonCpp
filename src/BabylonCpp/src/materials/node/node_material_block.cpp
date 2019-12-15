@@ -20,7 +20,7 @@ NodeMaterialBlock::NodeMaterialBlock(const std::string& iName, NodeMaterialBlock
     , target{this, &NodeMaterialBlock::get_target, &NodeMaterialBlock::set_target}
     , inputs{this, &NodeMaterialBlock::get_inputs}
     , outputs{this, &NodeMaterialBlock::get_outputs}
-    , _target{NodeMaterialBlockTargets::Unkown}
+    , _target{NodeMaterialBlockTargets::Undefined}
 {
   name = iName;
 
@@ -195,7 +195,7 @@ NodeMaterialConnectionPointPtr
 NodeMaterialBlock::getFirstAvailableOutput(const NodeMaterialBlockPtr& forBlock)
 {
   for (const auto& output : _outputs) {
-    if (!forBlock || (forBlock->target() == NodeMaterialBlockTargets::Unkown)
+    if (!forBlock || (forBlock->target() == NodeMaterialBlockTargets::Undefined)
         || forBlock->target() == NodeMaterialBlockTargets::Neutral
         || (forBlock->target() != output->target)) {
       return output;

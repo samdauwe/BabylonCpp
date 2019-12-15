@@ -9,8 +9,6 @@ namespace BABYLON {
  * @brief Enum used to define the target of a block.
  */
 enum class BABYLON_SHARED_EXPORT NodeMaterialBlockTargets : unsigned int {
-  /** Unkown */
-  Unkown = 0,
   /** Vertex shader */
   Vertex = 1,
   /** Fragment shader */
@@ -18,7 +16,9 @@ enum class BABYLON_SHARED_EXPORT NodeMaterialBlockTargets : unsigned int {
   /** Neutral */
   Neutral = 4,
   /** Vertex and Fragment */
-  VertexAndFragment = Vertex | Fragment
+  VertexAndFragment = Vertex | Fragment,
+  /** Target is undefined */
+  Undefined = 5,
 }; // end of enum class NodeMaterialBlockTargets
 
 } // end of namespace BABYLON

@@ -188,7 +188,7 @@ NodeMaterial& NodeMaterial::unregisterOptimizer(const NodeMaterialOptimizerPtr& 
 
 NodeMaterial& NodeMaterial::addOutputNode(const NodeMaterialBlockPtr& node)
 {
-  if (node->target() == NodeMaterialBlockTargets::Unkown) {
+  if (node->target() == NodeMaterialBlockTargets::Undefined) {
     throw std::runtime_error(
       "This node is not meant to be an output node. You may want to explicitly set its target "
       "value.");
@@ -207,7 +207,7 @@ NodeMaterial& NodeMaterial::addOutputNode(const NodeMaterialBlockPtr& node)
 
 NodeMaterial& NodeMaterial::removeOutputNode(const NodeMaterialBlockPtr& node)
 {
-  if (node->target() == NodeMaterialBlockTargets::Unkown) {
+  if (node->target() == NodeMaterialBlockTargets::Undefined) {
     return *this;
   }
 
@@ -587,16 +587,16 @@ bool NodeMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, b
       {"maxSimultaneousMorphTargets", defines->intDef["NUM_MORPH_INFLUENCERS"]}};
 
     EffectCreationOptions iOptions;
-    iOptions.attributes           = _vertexCompilationState->attributes;
-    iOptions.uniformsNames        = std::move(mergedUniforms);
-    iOptions.uniformBuffersNames  = std::move(mergedUniformBuffers);
-    iOptions.samplers             = std::move(mergedSamplers);
-    iOptions.materialDefines      = defines.get();
-    iOptions.defines              = std::move(join);
-    iOptions.fallbacks            = std::move(fallbacks);
-    iOptions.onCompiled           = onCompiled;
-    iOptions.onError              = onError;
-    iOptions.indexParameters      = std::move(indexParameters);
+    iOptions.attributes            = _vertexCompilationState->attributes;
+    iOptions.uniformsNames         = std::move(mergedUniforms);
+    iOptions.uniformBuffersNames   = std::move(mergedUniformBuffers);
+    iOptions.samplers              = std::move(mergedSamplers);
+    iOptions.materialDefines       = defines.get();
+    iOptions.defines               = std::move(join);
+    iOptions.fallbacks             = std::move(fallbacks);
+    iOptions.onCompiled            = onCompiled;
+    iOptions.onError               = onError;
+    iOptions.indexParameters       = std::move(indexParameters);
     iOptions.maxSimultaneousLights = maxSimultaneousLights;
 
     auto effect = scene->getEngine()->createEffect(baseName, iOptions, engine);
