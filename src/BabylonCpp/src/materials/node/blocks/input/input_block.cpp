@@ -116,6 +116,8 @@ NodeMaterialBlockConnectionPointTypes& InputBlock::get_type()
         case NodeMaterialSystemValues::FogColor:
           _type = NodeMaterialBlockConnectionPointTypes::Color3;
           return _type;
+        default:
+          break;
       }
     }
   }
@@ -476,6 +478,8 @@ void InputBlock::_transmit(Effect* effect, Scene* scene)
         break;
       case NodeMaterialSystemValues::FogColor:
         effect->setColor3(variableName, scene->fogColor);
+        break;
+      default:
         break;
     }
     return;

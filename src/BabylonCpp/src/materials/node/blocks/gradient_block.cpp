@@ -74,7 +74,7 @@ GradientBlock& GradientBlock::_buildBlock(NodeMaterialBuildState& state)
 
   auto gradientSource = gradient()->associatedVariableName();
 
-  if (gradient()->connectedPoint()->type != NodeMaterialBlockConnectionPointTypes::Float) {
+  if (gradient()->connectedPoint()->type() != NodeMaterialBlockConnectionPointTypes::Float) {
     gradientSource += ".x";
   }
 
@@ -85,7 +85,7 @@ GradientBlock& GradientBlock::_buildBlock(NodeMaterialBuildState& state)
       "%s = clamp((%s - %s) / (%s -  %s), 0.0, 1.0) * step(%s, %s);\r\n", tempPosition.c_str(),
       gradientSource.c_str(), state._emitFloat(previousStep.step).c_str(),
       state._emitFloat(step.step).c_str(), state._emitFloat(previousStep.step).c_str(),
-      state._emitFloat(index).c_str(), state._emitFloat(colorSteps.size() - 1));
+      state._emitFloat(index).c_str(), state._emitFloat(colorSteps.size() - 1).c_str());
     state.compilationString
       += String::printf("%s = mix(%s, %s, %s);\r\n", tempColor.c_str(), tempColor.c_str(),
                         _writeColorConstant(index).c_str(), tempPosition.c_str());
