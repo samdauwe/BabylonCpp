@@ -3,8 +3,6 @@
 
 #include <optional>
 
-#include <babylon/babylon_api.h>
-
 namespace BABYLON {
 
 /**
@@ -12,7 +10,7 @@ namespace BABYLON {
  * options
  * @link https://doc.babylonjs.com/api/classes/babylon.screenshottools
  */
-struct BABYLON_SHARED_EXPORT IScreenshotSize {
+struct IScreenshotSize {
   /**
    * number in pixels for canvas height
    */
