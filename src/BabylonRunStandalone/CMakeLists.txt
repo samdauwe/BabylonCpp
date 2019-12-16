@@ -15,6 +15,5 @@ target_link_libraries(${TARGET}
     Samples
     imgui
     imgui_utils
-    imgui_runner_babylon
     json_hpp
     )
