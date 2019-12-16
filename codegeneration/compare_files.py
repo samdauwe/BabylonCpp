@@ -88,9 +88,12 @@ def main():
         # Cameras / XR
         "webXRCamera.ts", "webXRController.ts", "webXRControllerModelLoader.ts",
         "webXRControllerPointerSelection.ts", "webXRControllerTeleportation.ts",
-        "webXRDefaultExperience.ts", "webXREnterExitUI.ts", "webXRInput.ts",
-        "webXRExperienceHelper.ts", "webXRManagedOutputCanvas.ts",
-        "webXRSessionManager.ts",
+        "webXRDefaultExperience.ts", "webXREnterExitUI.ts",
+        "webXRExperienceHelper.ts", "webXRFeaturesManager.ts", "webXRInput.ts",
+        "webXRManagedOutputCanvas.ts","webXRSessionManager.ts", "webXRTypes.ts",
+        # Cameras / XR / features
+        "WebXRAnchorSystem.ts", "WebXRBackgroundRemover.ts",
+        "WebXRHitTestLegacy.ts", "WebXRPlaneDetector.ts",
         # Debug
         "debugLayer.ts",
         # Engines
@@ -110,11 +113,12 @@ def main():
         # Meshes / Compression
         "dracoCompression.ts",
         # Misc
-        "andOrNotEvaluator.ts", "assetsManager.ts", "basis.ts",
-        "customAnimationFrameRequester.ts", "decorators.ts", "deepCopier.ts",
-        "deferred.ts", "domManagement.ts", "fileRequest.ts", "filesInput.ts",
-        "filesInputStore.ts", "instantiationTools.ts", "logger.ts",
-        "loadFileError.ts", "precisionDate.ts", "promise.ts", "retryStrategy.ts",
+        "andOrNotEvaluator.ts", "assetsManager.ts", "basis.ts", "baseError.ts",
+        "canvasGenerator.ts", "customAnimationFrameRequester.ts",
+        "decorators.ts", "deepCopier.ts", "deferred.ts", "domManagement.ts",
+        "fileRequest.ts", "filesInput.ts", "filesInputStore.ts",
+        "instantiationTools.ts", "logger.ts", "loadFileError.ts",
+        "precisionDate.ts", "promise.ts", "retryStrategy.ts",
         "sceneSerializer.ts", "screenshotTools.ts", "smartArray.ts",
         "stringDictionary.ts", "tags.ts", "typeStore.ts", "videoRecorder.ts",
         "virtualJoystick.ts", "webRequest.ts", "workerPool.ts",
