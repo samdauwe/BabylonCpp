@@ -76,7 +76,6 @@ endif()
 # Copy asset directories
 ## - Icons
 copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/icons")
-copy_resource_files("${CMAKE_SOURCE_DIR}/assets/samples_info.json")
 
 if (EMSCRIPTEN)
     target_link_options(${TARGET} BEFORE PRIVATE --preload-file  ${CMAKE_SOURCE_DIR}/assets@/assets)
