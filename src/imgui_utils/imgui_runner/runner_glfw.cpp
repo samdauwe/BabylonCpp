@@ -1,8 +1,8 @@
 #ifdef IMGUI_RUNNER_USE_GLFW
 #include "runner_glfw.h"
 
-#include "imgui_runner/runner_glfw.h"
-#include "imgui_runner/glad_callbacks.h"
+#include "imgui_utils/imgui_runner/runner_glfw.h"
+#include "imgui_utils/imgui_runner/glad_callbacks.h"
 #include <GLFW/glfw3.h>
 #include <examples/imgui_impl_glfw.h>
 #include <examples/imgui_impl_opengl3.h>

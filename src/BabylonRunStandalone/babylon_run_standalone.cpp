@@ -1,9 +1,9 @@
 #include "babylon_run_standalone.h"
 #include <babylon/babylon_imgui/imgui_scene_widget.h>
-#include <imgui_runner_babylon/runner_babylon.h>
-#include <imgui_runner/runner_sdl.h>
-#include <imgui_runner/runner_glfw.h>
-#include <imgui_runner/runner_emscripten.h>
+#include <imgui_utils/imgui_runner_babylon/runner_babylon.h>
+#include <imgui_utils/imgui_runner/runner_sdl.h>
+#include <imgui_utils/imgui_runner/runner_glfw.h>
+#include <imgui_utils/imgui_runner/runner_emscripten.h>
 
 struct AppContext
 {

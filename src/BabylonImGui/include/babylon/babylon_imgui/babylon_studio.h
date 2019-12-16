@@ -4,7 +4,7 @@
 #include <babylon/inspector/inspector.h>
 #include <babylon/inspector/samples_browser.h>
 #include <functional>
-#include <imgui_runner_babylon/runner_babylon.h>
+#include <imgui_utils/imgui_runner_babylon/runner_babylon.h>
 #include <imgui_utils/code_editor.h>
 #include <map>
 

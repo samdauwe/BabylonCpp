@@ -2,9 +2,9 @@
 
 #include "imgui.h"
 #include "imgui_internal.h"
-#include "imgui_runner/runner_glfw.h"
-#include "imgui_runner/runner_sdl.h"
-#include <imgui_runner_babylon/runner_babylon.h>
+#include "imgui_utils/imgui_runner/runner_glfw.h"
+#include "imgui_utils/imgui_runner/runner_sdl.h"
+#include <imgui_utils/imgui_runner_babylon/runner_babylon.h>
 
 #include <map>
 #include <string>

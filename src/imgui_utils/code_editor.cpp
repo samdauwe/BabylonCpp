@@ -3,7 +3,7 @@
 #include <babylon/core/string.h>
 #include <babylon/core/system.h>
 #include <functional>
-#include <imgui_runner_babylon/runner_babylon.h>
+#include <imgui_utils/imgui_runner_babylon/runner_babylon.h>
 #include <imgui_utils/code_editor.h>
 #include <imgui_utils/icons_font_awesome_5.h>
 #include <imgui_utils/imgui_utils.h>

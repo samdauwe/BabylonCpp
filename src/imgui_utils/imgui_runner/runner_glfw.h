@@ -1,19 +1,19 @@
-#ifndef IMGUI_RUNNER_SDL_H
-#define IMGUI_RUNNER_SDL_H
-#ifdef IMGUI_RUNNER_USE_SDL
-#include "imgui_runner/abstract_runner.h"
+#ifndef IMGUI_RUNNER_GLFW_H
+#define IMGUI_RUNNER_GLFW_H
+#ifdef IMGUI_RUNNER_USE_GLFW
+#include "imgui_utils/imgui_runner/abstract_runner.h"
 
 #include <glad/glad.h>
-#include <SDL.h>
+#include <GLFW/glfw3.h>
 
-// SDL + OpenGL3 + glad
+// GLFW + OpenGL3 + glad
 
 namespace ImGui {
 namespace ImGuiRunner {
 
-class RunnerSdl : public AbstractRunner {
+class RunnerGlfw : public AbstractRunner {
 public:
-  virtual ~RunnerSdl() = default;
+  virtual ~RunnerGlfw() = default;
 
 protected:
   void InitBackend() override;
@@ -33,12 +33,10 @@ protected:
   void SwapBuffers() override;
 
 private:
-  SDL_Window* mWindow = nullptr;
-  SDL_GLContext mGlContext = nullptr;
+  GLFWwindow* mWindow = nullptr;
 };
 
 } // namespace ImGuiRunner
 } // namespace ImGui
-
-#endif // #ifdef IMGUI_RUNNER_USE_SDL
-#endif // IMGUI_RUNNER_SDL_H
+#endif // #ifdef IMGUI_RUNNER_USE_GLFW
+#endif // IMGUI_RUNNER_GLFW_H
