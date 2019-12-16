@@ -5,9 +5,6 @@
 # CMake version
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 
-option(IMGUI_RUNNER_USE_SDL "Build babylon sdl version" ON)
-option(IMGUI_RUNNER_USE_GLFW "Build babylon glfw version" ON)
-
 # Compile to Wasm
 option(BABYLON_WASM "Target emscriptem / wasm" OFF)
 if (BABYLON_WASM)
