@@ -68,17 +68,16 @@ const std::array<float, 16>& Matrix::m() const
 
 void Matrix::_markAsUpdated()
 {
-  updateFlag = (Matrix::_updateFlagSeed < std::numeric_limits<int>::max()) ?
-                 Matrix::_updateFlagSeed++ :
-                 0;
+  updateFlag
+    = (Matrix::_updateFlagSeed < std::numeric_limits<int>::max()) ? Matrix::_updateFlagSeed++ : 0;
   _isIdentity         = false;
   _isIdentity3x2      = false;
   _isIdentityDirty    = true;
   _isIdentity3x2Dirty = true;
 }
 
-void Matrix::_updateIdentityStatus(bool isIdentity, bool isIdentityDirty,
-                                   bool isIdentity3x2, bool isIdentity3x2Dirty)
+void Matrix::_updateIdentityStatus(bool isIdentity, bool isIdentityDirty, bool isIdentity3x2,
+                                   bool isIdentity3x2Dirty)
 {
   updateFlag          = Matrix::_updateFlagSeed++;
   _isIdentity         = isIdentity;
@@ -94,10 +93,9 @@ bool Matrix::isIdentity()
     _isIdentityDirty = false;
     const auto& m    = _m;
     _isIdentity
-      = (m[0] == 1.f && m[1] == 0.f && m[2] == 0.f && m[3] == 0.f && m[4] == 0.f
-         && m[5] == 1.f && m[6] == 0.f && m[7] == 0.f && m[8] == 0.f
-         && m[9] == 0.f && m[10] == 1.f && m[11] == 0.f && m[12] == 0.f
-         && m[13] == 0.f && m[14] == 0.f && m[15] == 1.f);
+      = (m[0] == 1.f && m[1] == 0.f && m[2] == 0.f && m[3] == 0.f && m[4] == 0.f && m[5] == 1.f
+         && m[6] == 0.f && m[7] == 0.f && m[8] == 0.f && m[9] == 0.f && m[10] == 1.f && m[11] == 0.f
+         && m[12] == 0.f && m[13] == 0.f && m[14] == 0.f && m[15] == 1.f);
   }
 
   return _isIdentity;
@@ -110,10 +108,9 @@ bool Matrix::isIdentityAs3x2()
     if (_m[0] != 1.f || _m[5] != 1.f || _m[15] != 1.f) {
       _isIdentity3x2 = false;
     }
-    else if (_m[1] != 0.f || _m[2] != 0.f || _m[3] != 0.f || _m[4] != 0.f
-             || _m[6] != 0.f || _m[7] != 0.f || _m[8] != 0.f || _m[9] != 0.f
-             || _m[10] != 0.f || _m[11] != 0.f || _m[12] != 0.f || _m[13] != 0.f
-             || _m[14] != 0.f) {
+    else if (_m[1] != 0.f || _m[2] != 0.f || _m[3] != 0.f || _m[4] != 0.f || _m[6] != 0.f
+             || _m[7] != 0.f || _m[8] != 0.f || _m[9] != 0.f || _m[10] != 0.f || _m[11] != 0.f
+             || _m[12] != 0.f || _m[13] != 0.f || _m[14] != 0.f) {
       _isIdentity3x2 = false;
     }
     else {
@@ -269,8 +266,7 @@ Matrix& Matrix::invertToRef(Matrix& other)
   const auto cofact_02 = +(m10 * det_21_33 - m11 * det_20_33 + m13 * det_20_31);
   const auto cofact_03 = -(m10 * det_21_32 - m11 * det_20_32 + m12 * det_20_31);
 
-  const auto det
-    = m00 * cofact_00 + m01 * cofact_01 + m02 * cofact_02 + m03 * cofact_03;
+  const auto det = m00 * cofact_00 + m01 * cofact_01 + m02 * cofact_02 + m03 * cofact_03;
 
   if (det == 0.f) {
     // not invertible
@@ -307,15 +303,12 @@ Matrix& Matrix::invertToRef(Matrix& other)
   const auto cofact_32 = -(m00 * det_11_23 - m01 * det_10_23 + m03 * det_10_21);
   const auto cofact_33 = +(m00 * det_11_22 - m01 * det_10_22 + m02 * det_10_21);
 
-  Matrix::FromValuesToRef(cofact_00 * detInv, cofact_10 * detInv,
-                          cofact_20 * detInv, cofact_30 * detInv, //
-                          cofact_01 * detInv, cofact_11 * detInv,
-                          cofact_21 * detInv, cofact_31 * detInv, //
-                          cofact_02 * detInv, cofact_12 * detInv,
-                          cofact_22 * detInv, cofact_32 * detInv, //
-                          cofact_03 * detInv, cofact_13 * detInv,
-                          cofact_23 * detInv, cofact_33 * detInv, //
-                          other);
+  Matrix::FromValuesToRef(
+    cofact_00 * detInv, cofact_10 * detInv, cofact_20 * detInv, cofact_30 * detInv, //
+    cofact_01 * detInv, cofact_11 * detInv, cofact_21 * detInv, cofact_31 * detInv, //
+    cofact_02 * detInv, cofact_12 * detInv, cofact_22 * detInv, cofact_32 * detInv, //
+    cofact_03 * detInv, cofact_13 * detInv, cofact_23 * detInv, cofact_33 * detInv, //
+    other);
 #endif
   return *this;
 }
@@ -385,8 +378,7 @@ Matrix& Matrix::removeRotationAndScaling()
                           0.f, 1.f, 0.f, 0.f, //
                           0.f, 0.f, 1.f, 0.f, //
                           m[12], m[13], m[14], m[15], *this);
-  _updateIdentityStatus(m[12] == 0.f && m[13] == 0.f && m[14] == 0.f
-                        && m[15] == 1.f);
+  _updateIdentityStatus(m[12] == 0.f && m[13] == 0.f && m[14] == 0.f && m[15] == 1.f);
   return *this;
 }
 
@@ -410,27 +402,38 @@ Matrix& Matrix::copyFrom(const Matrix& other)
 {
   other.copyToArray(_m);
   const auto& o = other;
-  _updateIdentityStatus(o._isIdentity, o._isIdentityDirty, o._isIdentity3x2,
-                        o._isIdentity3x2Dirty);
+  _updateIdentityStatus(o._isIdentity, o._isIdentityDirty, o._isIdentity3x2, o._isIdentity3x2Dirty);
   return *this;
 }
 
-const Matrix& Matrix::copyToArray(std::array<float, 16>& array,
-                                  unsigned int offset) const
+const Matrix& Matrix::copyToArray(std::array<float, 16>& array, unsigned int offset) const
 {
   if (offset != 0) {
     return *this;
   }
 
-  for (unsigned int index = 0; index != 16; ++index) {
-    array[offset + index] = _m[index];
-  }
+  auto& source       = _m;
+  array[offset]      = source[0];
+  array[offset + 1]  = source[1];
+  array[offset + 2]  = source[2];
+  array[offset + 3]  = source[3];
+  array[offset + 4]  = source[4];
+  array[offset + 5]  = source[5];
+  array[offset + 6]  = source[6];
+  array[offset + 7]  = source[7];
+  array[offset + 8]  = source[8];
+  array[offset + 9]  = source[9];
+  array[offset + 10] = source[10];
+  array[offset + 11] = source[11];
+  array[offset + 12] = source[12];
+  array[offset + 13] = source[13];
+  array[offset + 14] = source[14];
+  array[offset + 15] = source[15];
 
   return *this;
 }
 
-const Matrix& Matrix::copyToArray(Float32Array& array,
-                                  unsigned int offset) const
+const Matrix& Matrix::copyToArray(Float32Array& array, unsigned int offset) const
 {
   if (array.size() < 16 + offset) {
     return *this;
@@ -460,8 +463,7 @@ Matrix& Matrix::multiplyToRef(const Matrix& other, Matrix& result)
   return *this;
 }
 
-const Matrix& Matrix::multiplyToArray(const Matrix& other,
-                                      std::array<float, 16>& result,
+const Matrix& Matrix::multiplyToArray(const Matrix& other, std::array<float, 16>& result,
                                       unsigned int offset) const
 {
 #if BABYLONCPP_OPTION_ENABLE_SIMD == true
@@ -476,10 +478,8 @@ const Matrix& Matrix::multiplyToArray(const Matrix& other,
 
   const auto om0 = otherM[0], om1 = otherM[1], om2 = otherM[2], om3 = otherM[3];
   const auto om4 = otherM[4], om5 = otherM[5], om6 = otherM[6], om7 = otherM[7];
-  const auto om8 = otherM[8], om9 = otherM[9], om10 = otherM[10],
-             om11 = otherM[11];
-  const auto om12 = otherM[12], om13 = otherM[13], om14 = otherM[14],
-             om15 = otherM[15];
+  const auto om8 = otherM[8], om9 = otherM[9], om10 = otherM[10], om11 = otherM[11];
+  const auto om12 = otherM[12], om13 = otherM[13], om14 = otherM[14], om15 = otherM[15];
 
   result[offset]     = tm0 * om0 + tm1 * om4 + tm2 * om8 + tm3 * om12;
   result[offset + 1] = tm0 * om1 + tm1 * om5 + tm2 * om9 + tm3 * om13;
@@ -524,10 +524,8 @@ const Matrix& Matrix::multiplyToArray(const Matrix& other, Float32Array& result,
 
   const auto om0 = otherM[0], om1 = otherM[1], om2 = otherM[2], om3 = otherM[3];
   const auto om4 = otherM[4], om5 = otherM[5], om6 = otherM[6], om7 = otherM[7];
-  const auto om8 = otherM[8], om9 = otherM[9], om10 = otherM[10],
-             om11 = otherM[11];
-  const auto om12 = otherM[12], om13 = otherM[13], om14 = otherM[14],
-             om15 = otherM[15];
+  const auto om8 = otherM[8], om9 = otherM[9], om10 = otherM[10], om11 = otherM[11];
+  const auto om12 = otherM[12], om13 = otherM[13], om14 = otherM[14], om15 = otherM[15];
 
   result[offset]     = tm0 * om0 + tm1 * om4 + tm2 * om8 + tm3 * om12;
   result[offset + 1] = tm0 * om1 + tm1 * om5 + tm2 * om9 + tm3 * om13;
@@ -565,26 +563,17 @@ bool Matrix::equals(const Matrix& value) const
   const auto& m  = _m;
   const auto& om = other.m();
 
-  return (stl_util::almost_equal(m[0], om[0])
-          && stl_util::almost_equal(m[1], om[1])
-          && stl_util::almost_equal(m[2], om[2])
-          && stl_util::almost_equal(m[3], om[3])
-          && stl_util::almost_equal(m[4], om[4])
-          && stl_util::almost_equal(m[5], om[5])
-          && stl_util::almost_equal(m[6], om[6])
-          && stl_util::almost_equal(m[7], om[7])
-          && stl_util::almost_equal(m[8], om[8])
-          && stl_util::almost_equal(m[9], om[9])
-          && stl_util::almost_equal(m[10], om[10])
-          && stl_util::almost_equal(m[11], om[11])
-          && stl_util::almost_equal(m[12], om[12])
-          && stl_util::almost_equal(m[13], om[13])
-          && stl_util::almost_equal(m[14], om[14])
-          && stl_util::almost_equal(m[15], om[15]));
+  return (stl_util::almost_equal(m[0], om[0]) && stl_util::almost_equal(m[1], om[1])
+          && stl_util::almost_equal(m[2], om[2]) && stl_util::almost_equal(m[3], om[3])
+          && stl_util::almost_equal(m[4], om[4]) && stl_util::almost_equal(m[5], om[5])
+          && stl_util::almost_equal(m[6], om[6]) && stl_util::almost_equal(m[7], om[7])
+          && stl_util::almost_equal(m[8], om[8]) && stl_util::almost_equal(m[9], om[9])
+          && stl_util::almost_equal(m[10], om[10]) && stl_util::almost_equal(m[11], om[11])
+          && stl_util::almost_equal(m[12], om[12]) && stl_util::almost_equal(m[13], om[13])
+          && stl_util::almost_equal(m[14], om[14]) && stl_util::almost_equal(m[15], om[15]));
 }
 
-bool Matrix::decompose(std::optional<Vector3>& scale,
-                       std::optional<Quaternion>& rotation,
+bool Matrix::decompose(std::optional<Vector3>& scale, std::optional<Quaternion>& rotation,
                        std::optional<Vector3>& translation) const
 {
   if (_isIdentity) {
@@ -662,8 +651,7 @@ Matrix& Matrix::transposeToRef(Matrix& result)
   return *this;
 }
 
-Matrix& Matrix::setRowFromFloats(unsigned int index, float x, float y, float z,
-                                 float w)
+Matrix& Matrix::setRowFromFloats(unsigned int index, float x, float y, float z, float w)
 {
   if (index > 3) {
     return *this;
@@ -827,8 +815,7 @@ Matrix Matrix::FromArray(const Float32Array& array, unsigned int offset)
   return result;
 }
 
-void Matrix::FromArrayToRef(const Float32Array& array, unsigned int offset,
-                            Matrix& result)
+void Matrix::FromArrayToRef(const Float32Array& array, unsigned int offset, Matrix& result)
 {
   for (unsigned int index = 0; index < 16; ++index) {
     result._m[index] = array[index + offset];
@@ -836,9 +823,8 @@ void Matrix::FromArrayToRef(const Float32Array& array, unsigned int offset,
   result._markAsUpdated();
 }
 
-void Matrix::FromFloat32ArrayToRefScaled(const Float32Array& array,
-                                         unsigned int offset, float scale,
-                                         Matrix& result)
+void Matrix::FromFloat32ArrayToRefScaled(const Float32Array& array, unsigned int offset,
+                                         float scale, Matrix& result)
 {
   for (unsigned int index = 0; index < 16; ++index) {
     result._m[index] = array[index + offset] * scale;
@@ -851,14 +837,11 @@ Matrix Matrix::IdentityReadOnly()
   return Matrix::_identityReadOnly;
 }
 
-void Matrix::FromValuesToRef(float initialM11, float initialM12,
-                             float initialM13, float initialM14,
-                             float initialM21, float initialM22,
-                             float initialM23, float initialM24,
-                             float initialM31, float initialM32,
-                             float initialM33, float initialM34,
-                             float initialM41, float initialM42,
-                             float initialM43, float initialM44, Matrix& result)
+void Matrix::FromValuesToRef(float initialM11, float initialM12, float initialM13, float initialM14,
+                             float initialM21, float initialM22, float initialM23, float initialM24,
+                             float initialM31, float initialM32, float initialM33, float initialM34,
+                             float initialM41, float initialM42, float initialM43, float initialM44,
+                             Matrix& result)
 {
   auto& m = result._m;
   m[0]    = initialM11;
@@ -881,12 +864,10 @@ void Matrix::FromValuesToRef(float initialM11, float initialM12,
   result._markAsUpdated();
 }
 
-Matrix Matrix::FromValues(float initialM11, float initialM12, float initialM13,
-                          float initialM14, float initialM21, float initialM22,
-                          float initialM23, float initialM24, float initialM31,
-                          float initialM32, float initialM33, float initialM34,
-                          float initialM41, float initialM42, float initialM43,
-                          float initialM44)
+Matrix Matrix::FromValues(float initialM11, float initialM12, float initialM13, float initialM14,
+                          float initialM21, float initialM22, float initialM23, float initialM24,
+                          float initialM31, float initialM32, float initialM33, float initialM34,
+                          float initialM41, float initialM42, float initialM43, float initialM44)
 {
   Matrix result;
   auto& m = result._m;
@@ -910,8 +891,7 @@ Matrix Matrix::FromValues(float initialM11, float initialM12, float initialM13,
   return result;
 }
 
-Matrix Matrix::Compose(const Vector3& scale, const Quaternion& rotation,
-                       const Vector3& translation)
+Matrix Matrix::Compose(const Vector3& scale, const Quaternion& rotation, const Vector3& translation)
 {
   Matrix result;
   Matrix::ComposeToRef(scale, rotation, translation, result);
@@ -1087,8 +1067,7 @@ void Matrix::RotationAxisToRef(Vector3& axis, float angle, Matrix& result)
   result._markAsUpdated();
 }
 
-void Matrix::RotationAlignToRef(const Vector3& from, const Vector3& to,
-                                Matrix& result)
+void Matrix::RotationAlignToRef(const Vector3& from, const Vector3& to, Matrix& result)
 {
   const auto v = Vector3::Cross(to, from);
   const auto c = Vector3::Dot(to, from);
@@ -1122,11 +1101,9 @@ Matrix Matrix::RotationYawPitchRoll(float yaw, float pitch, float roll)
   return result;
 }
 
-void Matrix::RotationYawPitchRollToRef(float yaw, float pitch, float roll,
-                                       Matrix& result)
+void Matrix::RotationYawPitchRollToRef(float yaw, float pitch, float roll, Matrix& result)
 {
-  Quaternion::RotationYawPitchRollToRef(yaw, pitch, roll,
-                                        MathTmp::QuaternionArray[0]);
+  Quaternion::RotationYawPitchRollToRef(yaw, pitch, roll, MathTmp::QuaternionArray[0]);
   MathTmp::QuaternionArray[0].toRotationMatrix(result);
 }
 
@@ -1164,16 +1141,15 @@ void Matrix::TranslationToRef(float x, float y, float z, Matrix& result)
   result._updateIdentityStatus(x == 0.f && y == 0.f && z == 0.f);
 }
 
-Matrix Matrix::Lerp(const Matrix& startValue, const Matrix& endValue,
-                    float gradient)
+Matrix Matrix::Lerp(const Matrix& startValue, const Matrix& endValue, float gradient)
 {
   Matrix result;
   Matrix::LerpToRef(startValue, endValue, gradient, result);
   return result;
 }
 
-void Matrix::LerpToRef(const Matrix& startValue, const Matrix& endValue,
-                       float gradient, Matrix& result)
+void Matrix::LerpToRef(const Matrix& startValue, const Matrix& endValue, float gradient,
+                       Matrix& result)
 {
   auto& resultM      = result._m;
   const auto& startM = startValue.m();
@@ -1185,16 +1161,15 @@ void Matrix::LerpToRef(const Matrix& startValue, const Matrix& endValue,
   result._markAsUpdated();
 }
 
-Matrix Matrix::DecomposeLerp(Matrix& startValue, Matrix& endValue,
-                             float gradient)
+Matrix Matrix::DecomposeLerp(Matrix& startValue, Matrix& endValue, float gradient)
 {
   Matrix result;
   Matrix::DecomposeLerpToRef(startValue, endValue, gradient, result);
   return result;
 }
 
-void Matrix::DecomposeLerpToRef(Matrix& startValue, Matrix& endValue,
-                                float gradient, Matrix& result)
+void Matrix::DecomposeLerpToRef(Matrix& startValue, Matrix& endValue, float gradient,
+                                Matrix& result)
 {
   std::optional<Vector3> startScale       = MathTmp::Vector3Array[0];
   std::optional<Quaternion> startRotation = MathTmp::QuaternionArray[0];
@@ -1209,12 +1184,10 @@ void Matrix::DecomposeLerpToRef(Matrix& startValue, Matrix& endValue,
   auto& resultScale = MathTmp::Vector3Array[4];
   Vector3::LerpToRef(*startScale, *endScale, gradient, resultScale);
   auto& resultRotation = MathTmp::QuaternionArray[2];
-  Quaternion::SlerpToRef(*startRotation, *endRotation, gradient,
-                         resultRotation);
+  Quaternion::SlerpToRef(*startRotation, *endRotation, gradient, resultRotation);
 
   auto& resultTranslation = MathTmp::Vector3Array[5];
-  Vector3::LerpToRef(*startTranslation, *endTranslation, gradient,
-                     resultTranslation);
+  Vector3::LerpToRef(*startTranslation, *endTranslation, gradient, resultTranslation);
 
   Matrix::ComposeToRef(resultScale, resultRotation, resultTranslation, result);
 }
@@ -1226,8 +1199,8 @@ Matrix Matrix::LookAtLH(const Vector3& eye, Vector3& target, const Vector3& up)
   return result;
 }
 
-void Matrix::LookAtLHToRef(const Vector3& eye, const Vector3& target,
-                           const Vector3& up, Matrix& result)
+void Matrix::LookAtLHToRef(const Vector3& eye, const Vector3& target, const Vector3& up,
+                           Matrix& result)
 {
 #if BABYLONCPP_OPTION_ENABLE_SIMD == true
   SIMD::SIMDMatrix::LookAtLHToRefSIMD(eye, target, up, result);
@@ -1276,8 +1249,8 @@ Matrix Matrix::LookAtRH(const Vector3& eye, Vector3& target, const Vector3& up)
   return result;
 }
 
-void Matrix::LookAtRHToRef(const Vector3& eye, const Vector3& target,
-                           const Vector3& up, Matrix& result)
+void Matrix::LookAtRHToRef(const Vector3& eye, const Vector3& target, const Vector3& up,
+                           Matrix& result)
 {
   auto& xAxis = MathTmp::Vector3Array[0];
   auto& yAxis = MathTmp::Vector3Array[1];
@@ -1321,8 +1294,7 @@ Matrix Matrix::OrthoLH(float width, float height, float znear, float zfar)
   return matrix;
 }
 
-void Matrix::OrthoLHToRef(float width, float height, float znear, float zfar,
-                          Matrix& result)
+void Matrix::OrthoLHToRef(float width, float height, float znear, float zfar, Matrix& result)
 {
   const auto n = znear;
   const auto f = zfar;
@@ -1341,17 +1313,16 @@ void Matrix::OrthoLHToRef(float width, float height, float znear, float zfar,
   result._updateIdentityStatus(a == 1.f && b == 1.f && c == 1.f && d == 0.f);
 }
 
-Matrix Matrix::OrthoOffCenterLH(float left, float right, float bottom,
-                                float top, float znear, float zfar)
+Matrix Matrix::OrthoOffCenterLH(float left, float right, float bottom, float top, float znear,
+                                float zfar)
 {
   Matrix matrix;
   Matrix::OrthoOffCenterLHToRef(left, right, bottom, top, znear, zfar, matrix);
   return matrix;
 }
 
-void Matrix::OrthoOffCenterLHToRef(float left, float right, float bottom,
-                                   float top, float znear, float zfar,
-                                   Matrix& result)
+void Matrix::OrthoOffCenterLHToRef(float left, float right, float bottom, float top, float znear,
+                                   float zfar, Matrix& result)
 {
   const auto n = znear;
   const auto f = zfar;
@@ -1372,17 +1343,16 @@ void Matrix::OrthoOffCenterLHToRef(float left, float right, float bottom,
   result._markAsUpdated();
 }
 
-Matrix Matrix::OrthoOffCenterRH(float left, float right, float bottom,
-                                float top, float znear, float zfar)
+Matrix Matrix::OrthoOffCenterRH(float left, float right, float bottom, float top, float znear,
+                                float zfar)
 {
   Matrix matrix;
   Matrix::OrthoOffCenterRHToRef(left, right, bottom, top, znear, zfar, matrix);
   return matrix;
 }
 
-void Matrix::OrthoOffCenterRHToRef(float left, float right, float bottom,
-                                   float top, float znear, float zfar,
-                                   Matrix& result)
+void Matrix::OrthoOffCenterRHToRef(float left, float right, float bottom, float top, float znear,
+                                   float zfar, Matrix& result)
 {
   Matrix::OrthoOffCenterLHToRef(left, right, bottom, top, znear, zfar, result);
   result._m[10] *= -1.f; // No need to call _markAsUpdated as previous function
@@ -1411,16 +1381,14 @@ Matrix Matrix::PerspectiveLH(float width, float height, float znear, float zfar)
   return matrix;
 }
 
-Matrix Matrix::PerspectiveFovLH(float fov, float aspect, float znear,
-                                float zfar)
+Matrix Matrix::PerspectiveFovLH(float fov, float aspect, float znear, float zfar)
 {
   Matrix matrix;
   Matrix::PerspectiveFovLHToRef(fov, aspect, znear, zfar, matrix);
   return matrix;
 }
 
-void Matrix::PerspectiveFovLHToRef(float fov, float aspect, float znear,
-                                   float zfar, Matrix& result,
+void Matrix::PerspectiveFovLHToRef(float fov, float aspect, float znear, float zfar, Matrix& result,
                                    bool isVerticalFovFixed)
 {
   const auto n = znear;
@@ -1440,8 +1408,22 @@ void Matrix::PerspectiveFovLHToRef(float fov, float aspect, float znear,
   result._updateIdentityStatus(false);
 }
 
-Matrix Matrix::PerspectiveFovRH(float fov, float aspect, float znear,
-                                float zfar)
+void Matrix::PerspectiveFovReverseLHToRef(float fov, float aspect, float znear, float /*zfar*/,
+                                          Matrix& result, bool isVerticalFovFixed)
+{
+  const auto t = 1.f / (std::tan(fov * 0.5f));
+  const auto a = isVerticalFovFixed ? (t / aspect) : t;
+  const auto b = isVerticalFovFixed ? t : (t * aspect);
+  Matrix::FromValuesToRef(a, 0.f, 0.f, 0.f,      //
+                          0.f, b, 0.f, 0.f,      //
+                          0.f, 0.f, -znear, 1.f, //
+                          0.f, 0.f, 1.f, 0.f,    //
+                          result                 //
+  );
+  result._updateIdentityStatus(false);
+}
+
+Matrix Matrix::PerspectiveFovRH(float fov, float aspect, float znear, float zfar)
 {
   Matrix matrix = Matrix::Zero();
 
@@ -1450,8 +1432,7 @@ Matrix Matrix::PerspectiveFovRH(float fov, float aspect, float znear,
   return matrix;
 }
 
-void Matrix::PerspectiveFovRHToRef(float fov, float aspect, float znear,
-                                   float zfar, Matrix& result,
+void Matrix::PerspectiveFovRHToRef(float fov, float aspect, float znear, float zfar, Matrix& result,
                                    bool isVerticalFovFixed)
 {
   // alternatively this could be expressed as:
@@ -1477,8 +1458,30 @@ void Matrix::PerspectiveFovRHToRef(float fov, float aspect, float znear,
   result._updateIdentityStatus(false);
 }
 
-void Matrix::PerspectiveFovWebVRToRef(const VRFov& fov, float znear, float zfar,
-                                      Matrix& result, bool rightHanded)
+void Matrix::PerspectiveFovReverseRHToRef(float fov, float aspect, float znear, float /*zfar*/,
+                                          Matrix& result, bool isVerticalFovFixed)
+{
+  // alternatively this could be expressed as:
+  //    m = PerspectiveFovLHToRef
+  //    m[10] *= -1.0;
+  //    m[11] *= -1.0;
+
+  const auto t = 1.f / (std::tan(fov * 0.5f));
+  const auto a = isVerticalFovFixed ? (t / aspect) : t;
+  const auto b = isVerticalFovFixed ? t : (t * aspect);
+
+  Matrix::FromValuesToRef(a, 0.f, 0.f, 0.f,       //
+                          0.f, b, 0.f, 0.f,       //
+                          0.f, 0.f, -znear, -1.f, //
+                          0.f, 0.f, -1.f, 0.f,    //
+                          result                  //
+  );
+
+  result._updateIdentityStatus(false);
+}
+
+void Matrix::PerspectiveFovWebVRToRef(const VRFov& fov, float znear, float zfar, Matrix& result,
+                                      bool rightHanded)
 {
   const float rightHandedFactor = rightHanded ? -1.f : 1.f;
   const float upTan             = std::tan(fov.upDegrees * Math::PI / 180.f);
@@ -1502,20 +1505,18 @@ void Matrix::PerspectiveFovWebVRToRef(const VRFov& fov, float znear, float zfar,
   result._markAsUpdated();
 }
 
-Matrix Matrix::GetFinalMatrix(const Viewport& viewport, Matrix& world,
-                              Matrix& view, Matrix& projection, float zmin,
-                              float zmax)
+Matrix Matrix::GetFinalMatrix(const Viewport& viewport, Matrix& world, Matrix& view,
+                              Matrix& projection, float zmin, float zmax)
 {
   const auto cw = static_cast<float>(viewport.width);
   const auto ch = static_cast<float>(viewport.height);
   const auto cx = static_cast<float>(viewport.x);
   const auto cy = static_cast<float>(viewport.y);
 
-  auto viewportMatrix
-    = Matrix::FromValues(cw / 2.f, 0.f, 0.f, 0.f,    //
-                         0.f, -ch / 2.f, 0.f, 0.f,   //
-                         0.f, 0.f, zmax - zmin, 0.f, //
-                         cx + cw / 2.f, ch / 2.f + cy, zmin, 1.f);
+  auto viewportMatrix = Matrix::FromValues(cw / 2.f, 0.f, 0.f, 0.f,    //
+                                           0.f, -ch / 2.f, 0.f, 0.f,   //
+                                           0.f, 0.f, zmax - zmin, 0.f, //
+                                           cx + cw / 2.f, ch / 2.f + cy, zmin, 1.f);
 
   auto& matrix = MathTmp::MatrixArray[0];
   world.multiplyToRef(view, matrix);
@@ -1600,8 +1601,8 @@ void Matrix::ReflectionToRef(Plane& plane, Matrix& result)
                           result);
 }
 
-void Matrix::FromXYZAxesToRef(const Vector3& xaxis, const Vector3& yaxis,
-                              const Vector3& zaxis, Matrix& result)
+void Matrix::FromXYZAxesToRef(const Vector3& xaxis, const Vector3& yaxis, const Vector3& zaxis,
+                              Matrix& result)
 {
   Matrix::FromValuesToRef(xaxis.x, xaxis.y, xaxis.z, 0.f, //
                           yaxis.x, yaxis.y, yaxis.z, 0.f, //

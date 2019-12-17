@@ -893,6 +893,18 @@ public:
                                     Matrix& result, bool isVerticalFovFixed = true);
 
   /**
+   * @brief Stores a left-handed perspective projection into a given matrix with depth reversed.
+   * @param fov defines the horizontal field of view
+   * @param aspect defines the aspect ratio
+   * @param znear defines the near clip plane
+   * @param zfar not used as infinity is used as far clip
+   * @param result defines the target matrix
+   * @param isVerticalFovFixed defines it the fov is vertically fixed (default) or horizontally
+   */
+  static void PerspectiveFovReverseLHToRef(float fov, float aspect, float znear, float zfar,
+                                           Matrix& result, bool isVerticalFovFixed = true);
+
+  /**
    * @brief Creates a right-handed perspective projection matrix.
    * @param fov defines the horizontal field of view
    * @param aspect defines the aspect ratio
@@ -914,6 +926,18 @@ public:
    */
   static void PerspectiveFovRHToRef(float fov, float aspect, float znear, float zfar,
                                     Matrix& result, bool isVerticalFovFixed = true);
+
+  /**
+   * @brief Stores a right-handed perspective projection into a given matrix.
+   * @param fov defines the horizontal field of view
+   * @param aspect defines the aspect ratio
+   * @param znear defines the near clip plane
+   * @param zfar not used as infinity is used as far clip
+   * @param result defines the target matrix
+   * @param isVerticalFovFixed defines it the fov is vertically fixed (default) or horizontally
+   */
+  static void PerspectiveFovReverseRHToRef(float fov, float aspect, float znear, float zfar,
+                                           Matrix& result, bool isVerticalFovFixed = true);
 
   /**
    * @brief Stores a perspective projection for WebVR info a given matrix.
