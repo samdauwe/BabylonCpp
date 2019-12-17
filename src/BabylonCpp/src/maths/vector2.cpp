@@ -11,8 +11,7 @@ Vector2::Vector2(float ix, float iy) : x{ix}, y{iy}
 {
 }
 
-Vector2::Vector2(int ix, int iy)
-    : x{static_cast<float>(ix)}, y{static_cast<float>(iy)}
+Vector2::Vector2(int ix, int iy) : x{static_cast<float>(ix)}, y{static_cast<float>(iy)}
 {
 }
 
@@ -98,8 +97,7 @@ Vector2 Vector2::add(const Vector2& otherVector) const
   return Vector2(x + otherVector.x, y + otherVector.y);
 }
 
-const Vector2& Vector2::addToRef(const Vector2& otherVector,
-                                 Vector2& result) const
+const Vector2& Vector2::addToRef(const Vector2& otherVector, Vector2& result) const
 {
   result.x = x + otherVector.x;
   result.y = y + otherVector.y;
@@ -125,8 +123,7 @@ Vector2 Vector2::subtract(const Vector2& otherVector) const
   return Vector2(x - otherVector.x, y - otherVector.y);
 }
 
-const Vector2& Vector2::subtractToRef(const Vector2& otherVector,
-                                      Vector2& result) const
+const Vector2& Vector2::subtractToRef(const Vector2& otherVector, Vector2& result) const
 {
   result.x = x - otherVector.x;
   result.y = y - otherVector.y;
@@ -155,8 +152,7 @@ Vector2 Vector2::multiply(const Vector2& otherVector) const
   return Vector2(x * otherVector.x, y * otherVector.y);
 }
 
-const Vector2& Vector2::multiplyToRef(const Vector2& otherVector,
-                                      Vector2& result) const
+const Vector2& Vector2::multiplyToRef(const Vector2& otherVector, Vector2& result) const
 {
   result.x = x * otherVector.x;
   result.y = y * otherVector.y;
@@ -174,8 +170,7 @@ Vector2 Vector2::divide(const Vector2& otherVector) const
   return Vector2(x / otherVector.x, y / otherVector.y);
 }
 
-const Vector2& Vector2::divideToRef(const Vector2& otherVector,
-                                    Vector2& result) const
+const Vector2& Vector2::divideToRef(const Vector2& otherVector, Vector2& result) const
 {
   result.x = x / otherVector.x;
   result.y = y / otherVector.y;
@@ -230,8 +225,7 @@ const Vector2& Vector2::scaleAndAddToRef(float iScale, Vector2& result) const
 
 bool Vector2::equals(const Vector2& otherVector) const
 {
-  return stl_util::almost_equal(x, otherVector.x)
-         && stl_util::almost_equal(y, otherVector.y);
+  return stl_util::almost_equal(x, otherVector.x) && stl_util::almost_equal(y, otherVector.y);
 }
 
 bool Vector2::equalsWithEpsilon(const Vector2& otherVector, float epsilon) const
@@ -404,10 +398,8 @@ Vector2& Vector2::normalize()
     return *this;
   }
 
-  const float num = 1.f / len;
-
-  x *= num;
-  y *= num;
+  x /= len;
+  y /= len;
 
   return *this;
 }
@@ -428,16 +420,14 @@ Vector2 Vector2::FromArray(const Float32Array& array, unsigned int offset)
   return Vector2(array[offset], array[offset + 1]);
 }
 
-void Vector2::FromArrayToRef(const Float32Array& array, unsigned int offset,
-                             Vector2& result)
+void Vector2::FromArrayToRef(const Float32Array& array, unsigned int offset, Vector2& result)
 {
   result.x = array[offset];
   result.y = array[offset + 1];
 }
 
-Vector2 Vector2::CatmullRom(const Vector2& value1, const Vector2& value2,
-                            const Vector2& value3, const Vector2& value4,
-                            float amount)
+Vector2 Vector2::CatmullRom(const Vector2& value1, const Vector2& value2, const Vector2& value3,
+                            const Vector2& value4, float amount)
 {
   const float squared = amount * amount;
   const float cubed   = amount * squared;
@@ -445,26 +435,19 @@ Vector2 Vector2::CatmullRom(const Vector2& value1, const Vector2& value2,
   const float x
     = 0.5f
       * ((((2.f * value2.x) + ((-value1.x + value3.x) * amount))
-          + (((((2.f * value1.x) - (5.f * value2.x)) + (4.f * value3.x))
-              - value4.x)
-             * squared))
-         + ((((-value1.x + (3.f * value2.x)) - (3.f * value3.x)) + value4.x)
-            * cubed));
+          + (((((2.f * value1.x) - (5.f * value2.x)) + (4.f * value3.x)) - value4.x) * squared))
+         + ((((-value1.x + (3.f * value2.x)) - (3.f * value3.x)) + value4.x) * cubed));
 
   const float y
     = 0.5f
       * ((((2.f * value2.y) + ((-value1.y + value3.y) * amount))
-          + (((((2.f * value1.y) - (5.f * value2.y)) + (4.f * value3.y))
-              - value4.y)
-             * squared))
-         + ((((-value1.y + (3.f * value2.y)) - (3.f * value3.y)) + value4.y)
-            * cubed));
+          + (((((2.f * value1.y) - (5.f * value2.y)) + (4.f * value3.y)) - value4.y) * squared))
+         + ((((-value1.y + (3.f * value2.y)) - (3.f * value3.y)) + value4.y) * cubed));
 
   return Vector2(x, y);
 }
 
-Vector2 Vector2::Clamp(const Vector2& value, const Vector2& min,
-                       const Vector2& max)
+Vector2 Vector2::Clamp(const Vector2& value, const Vector2& min, const Vector2& max)
 {
   float x = value.x;
 
@@ -479,9 +462,8 @@ Vector2 Vector2::Clamp(const Vector2& value, const Vector2& min,
   return Vector2(x, y);
 }
 
-Vector2 Vector2::Hermite(const Vector2& value1, const Vector2& tangent1,
-                         const Vector2& value2, const Vector2& tangent2,
-                         float amount)
+Vector2 Vector2::Hermite(const Vector2& value1, const Vector2& tangent1, const Vector2& value2,
+                         const Vector2& tangent2, float amount)
 {
   const float squared = amount * amount;
   const float cubed   = amount * squared;
@@ -491,11 +473,9 @@ Vector2 Vector2::Hermite(const Vector2& value1, const Vector2& tangent1,
   const float part4   = cubed - squared;
 
   const float x
-    = (((value1.x * part1) + (value2.x * part2)) + (tangent1.x * part3))
-      + (tangent2.x * part4);
+    = (((value1.x * part1) + (value2.x * part2)) + (tangent1.x * part3)) + (tangent2.x * part4);
   const float y
-    = (((value1.y * part1) + (value2.y * part2)) + (tangent1.y * part3))
-      + (tangent2.y * part4);
+    = (((value1.y * part1) + (value2.y * part2)) + (tangent1.y * part3)) + (tangent2.y * part4);
 
   return Vector2(x, y);
 }
@@ -543,8 +523,7 @@ Vector2 Vector2::Transform(const Vector2& vector, const Matrix& transformation)
   return r;
 }
 
-void Vector2::TransformToRef(const Vector2& vector,
-                             const Matrix& transformation, Vector2& result)
+void Vector2::TransformToRef(const Vector2& vector, const Matrix& transformation, Vector2& result)
 {
   const auto& m = transformation.m();
   const auto x  = (vector.x * m[0]) + (vector.y * m[4]) + m[12];
@@ -553,19 +532,14 @@ void Vector2::TransformToRef(const Vector2& vector,
   result.y      = y;
 }
 
-bool Vector2::PointInTriangle(const Vector2& p, const Vector2& p0,
-                              const Vector2& p1, const Vector2& p2)
+bool Vector2::PointInTriangle(const Vector2& p, const Vector2& p0, const Vector2& p1,
+                              const Vector2& p2)
 {
-  const float a = 1.f / 2.f
-                  * (-p1.y * p2.x + p0.y * (-p1.x + p2.x) + p0.x * (p1.y - p2.y)
-                     + p1.x * p2.y);
+  const float a
+    = 1.f / 2.f * (-p1.y * p2.x + p0.y * (-p1.x + p2.x) + p0.x * (p1.y - p2.y) + p1.x * p2.y);
   const float sign = a < 0.f ? -1.f : 1.f;
-  const float s
-    = (p0.y * p2.x - p0.x * p2.y + (p2.y - p0.y) * p.x + (p0.x - p2.x) * p.y)
-      * sign;
-  const float t
-    = (p0.x * p1.y - p0.y * p1.x + (p0.y - p1.y) * p.x + (p1.x - p0.x) * p.y)
-      * sign;
+  const float s    = (p0.y * p2.x - p0.x * p2.y + (p2.y - p0.y) * p.x + (p0.x - p2.x) * p.y) * sign;
+  const float t    = (p0.x * p1.y - p0.y * p1.x + (p0.y - p1.y) * p.x + (p1.x - p0.x) * p.y) * sign;
 
   return s > 0.f && t > 0.f && (s + t) < 2.f * a * sign;
 }
@@ -597,9 +571,8 @@ float Vector2::DistanceOfPointFromSegment(const Vector2& p, const Vector2& segA,
   if (stl_util::almost_equal(l2, 0.f)) {
     return Vector2::Distance(p, segA);
   }
-  const Vector2 v = segB.subtract(segA);
-  const float t
-    = std::max(0.f, std::min(1.f, Vector2::Dot(p.subtract(segA), v) / l2));
+  const Vector2 v    = segB.subtract(segA);
+  const float t      = std::max(0.f, std::min(1.f, Vector2::Dot(p.subtract(segA), v) / l2));
   const Vector2 proj = segA.add(v.multiplyByFloats(t, t));
   return Vector2::Distance(p, proj);
 }
