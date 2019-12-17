@@ -112,6 +112,10 @@ GLRenderingContext::GLRenderingContext()
 
 GLRenderingContext::~GLRenderingContext() = default;
 
+#if defined(_WIN32) && !defined(_WIN64)
+#define WIN_32BITS
+#endif
+
 bool GLRenderingContext::initialize(bool enableGLDebugging)
 {
   // Log the GL version
@@ -124,7 +128,7 @@ bool GLRenderingContext::initialize(bool enableGLDebugging)
   // backupGLState();
 
   // Enable debug output
-#ifndef __EMSCRIPTEN__
+#if ! defined(__EMSCRIPTEN_) && !defined(WIN_32BITS)
   if (enableGLDebugging) {
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(MessageCallback, nullptr);
