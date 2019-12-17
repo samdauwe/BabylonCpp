@@ -9,6 +9,12 @@
 // below. #define GLAD_DEBUG
 #include <glad/glad.h>
 
+// FIXME! Using deprecated Gl Apis?
+// There is an issue with emscripten builds: the build only works of glfw is included!
+// We have errors like "use of undeclared identifier 'GL_MULTISAMPLE', 'GL_BLEND_SRC', etc."
+// For example, it seems like GL_MULTISAMPLE is deprecated
+#include <GLFW/glfw3.h>
+
 // Logging
 #include <babylon/core/logging.h>
 
@@ -19,6 +25,7 @@
 namespace BABYLON {
 namespace GL {
 
+#ifndef __EMSCRIPTEN__
 void MessageCallback(GLenum /*source*/, GLenum type, GLuint /*id*/,
                      GLenum severity, GLsizei /*length*/, const GLchar* message,
                      const void* /*userParam*/)
@@ -28,6 +35,7 @@ void MessageCallback(GLenum /*source*/, GLenum type, GLuint /*id*/,
           (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity,
           message);
 }
+#endif
 
 GLRenderingContext::GLRenderingContext()
 {
