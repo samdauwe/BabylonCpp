@@ -1,4 +1,5 @@
 #include <babylon/misc/file_tools.h>
+#include <future>
 
 #define STB_IMAGE_IMPLEMENTATION
 #if defined(__GNUC__) || defined(__MINGW32__)
@@ -63,6 +64,28 @@ std::string FileTools::_CleanUrl(std::string url)
   return url;
 }
 
+std::optional<Image> LoadImage_Stbi_Impl(
+  const char *filename,
+  int nb_desired_channels,
+  bool flipVertically)
+{
+
+  // Basic usage (see HDR discussion below for HDR usage):
+  int w, h, nb_channels_real;
+  stbi_set_flip_vertically_on_load(flipVertically);
+  unsigned char *data = stbi_load(filename, &w, &h, &nb_channels_real, nb_desired_channels);
+  stbi_set_flip_vertically_on_load(false);
+  if (data)
+  {
+    unsigned int glColorMode = (nb_desired_channels == 3) ? GL::RGB : GL::RGBA;
+    Image image(data, w * h * nb_desired_channels, w, h, nb_desired_channels, glColorMode);
+    stbi_image_free(data);
+    return image;
+  }
+  return std::nullopt;
+}
+
+
 void FileTools::LoadImageFromUrl(
   std::string url, const std::function<void(const Image& img)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
@@ -71,33 +94,21 @@ void FileTools::LoadImageFromUrl(
   url = FileTools::_CleanUrl(url);
   url = FileTools::PreprocessUrl(url);
 
-  if (String::startsWith(url, "file:")) {
-    using stbi_ptr = std::unique_ptr<unsigned char, std::function<void(unsigned char*)>>;
+  if (!String::startsWith(url, "file:"))
+    throw std::runtime_error("FileTools::LoadImageFromUrl only supports file urls");
 
-    for (auto req_comp : {STBI_rgb_alpha, STBI_rgb}) {
-      int w = -1, h = -1, n = -1;
-      stbi_set_flip_vertically_on_load(flipVertically);
-      stbi_ptr data(stbi_load(url.substr(5).c_str(), &w, &h, &n, req_comp),
-                    [](unsigned char* _data) {
-                      if (_data) {
-                        stbi_image_free(_data);
-                      }
-                    });
-      stbi_set_flip_vertically_on_load(false);
+  const char *filename = url.substr(5).c_str();
+  std::optional<Image> image;
 
-      if (data) {
-        Image image(data.get(), w * h * req_comp, w, h, req_comp,
-                    (req_comp == 3) ? GL::RGB : GL::RGBA);
-        onLoad(image);
-        return;
-      }
-    }
+  // Try to load RGBA, then load RGB on fail (is this really required? we could instead trust stbi)
+  image = LoadImage_Stbi_Impl(filename, STBI_rgb_alpha, flipVertically);
+  if (!image)
+    image = LoadImage_Stbi_Impl(filename, STBI_rgb, flipVertically);
 
-    if (onError) {
-      onError("Error loading image from file " + url, "");
-      return;
-    }
-  }
+  if (image)
+      onLoad(*image);
+  else if (onError)
+    onError("Error loading image from file " + url, "");
 }
 
 void FileTools::LoadImageFromBuffer(
@@ -137,27 +148,21 @@ Image FileTools::ArrayBufferToImage(const ArrayBuffer& buffer, bool flipVertical
   if (buffer.empty()) {
     return Image();
   }
-
-  using stbi_ptr = std::unique_ptr<unsigned char, std::function<void(unsigned char*)>>;
-
   auto bufferSize = static_cast<int>(buffer.size());
-  auto w = -1, h = -1, n = -1;
-  auto req_comp = STBI_rgb_alpha;
+  int w = -1, h = -1, n = -1;
+  int req_comp = STBI_rgb_alpha;
+
   stbi_set_flip_vertically_on_load(flipVertically);
-  stbi_ptr data(stbi_load_from_memory(buffer.data(), bufferSize, &w, &h, &n, req_comp),
-                [](unsigned char* _data) {
-                  if (_data) {
-                    stbi_image_free(_data);
-                  }
-                });
+  unsigned char * ucharBuffer = stbi_load_from_memory(buffer.data(), bufferSize, &w, &h, &n, req_comp);
   stbi_set_flip_vertically_on_load(false);
 
-  if (!data) {
+  if (!ucharBuffer)
     return Image();
-  }
 
   n = STBI_rgb_alpha;
-  return Image(data.get(), w * h * n, w, h, n, (n == 3) ? GL::RGB : GL::RGBA);
+  Image image (ucharBuffer, w * h * n, w, h, n, (n == 3) ? GL::RGB : GL::RGBA);
+  stbi_image_free(ucharBuffer);
+  return image;
 }
 
 Image FileTools::StringToImage(const std::string& uri, bool flipVertically)
