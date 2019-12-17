@@ -11,8 +11,10 @@ include_directories(SYSTEM ${OPENGL_INCLUDE_DIRS})
 # Configure build environment
 include(../cmake/BuildEnvironment.cmake)
 
+
 # imgui + backends (SDL, GLFW) compilation
 include("CMakeLists_imgui.cmake")
+
 
 # Build gtest and gmock + macro "babylon_add_test"
 # Adapted from https://cliutils.gitlab.io/modern-cmake/chapters/testing/googletest.html
@@ -42,7 +44,6 @@ set(EARCUT_HPP_INCLUDE_DIRS
     CACHE INTERNAL "Include directories of Earcut hpp")
 
 
-
 # json.hpp (JSON for Modern C++)
 include_directories("json.hpp")
 set(JSON_HPP_INCLUDE_DIRS
@@ -51,7 +52,9 @@ set(JSON_HPP_INCLUDE_DIRS
 add_library(json_hpp INTERFACE)
 target_include_directories(json_hpp INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/json.hpp)
 
-# glad as a standalone dynamic library
+
+# glad as a standalone library
+# (in the case of emscripten, fake library that includes GlES)
 if (NOT EMSCRIPTEN)
     set(GLAD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/glad CACHE INTERNAL "Directory of glad")
     set(GLAD_FILES
@@ -78,9 +81,10 @@ else()
 endif()
 
 
-# stb_image includes
+# stb_image
 set(STB_IMAGE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/stb_image/include
     CACHE INTERNAL "Include directories of stb_image")
+
 
 # RuntimeCompiledCPlusPlus
 if (NOT APPLE AND NOT EMSCRIPTEN)

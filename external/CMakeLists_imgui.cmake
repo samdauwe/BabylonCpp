@@ -25,9 +25,6 @@ endif()
 
 
 # imgui (Bloat-free Immediate Mode Graphical User interface for C++ with minimal dependencies).
-# imgui library as a standalone shared library
-# imgui options
-option(IMGUI_IMPL_OPENGL_LOADER_GLAD "Use glad loader for imgui" ON)
 # Sources
 set(imgui_dir ${CMAKE_CURRENT_SOURCE_DIR}/imgui CACHE INTERNAL "imgui directory")
 file(GLOB imgui_sources ${imgui_dir}/*.h ${imgui_dir}/*.cpp)
@@ -71,6 +68,9 @@ if (IMGUI_RUNNER_USE_GLFW)
 endif()
 if (IMGUI_RUNNER_USE_SDL)
     target_compile_definitions(imgui PUBLIC IMGUI_RUNNER_USE_SDL SDL_MAIN_HANDLED)
+endif()
+if (NOT EMSCRIPTEN)
+    target_compile_definitions(imgui PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLAD)
 endif()
 # DLL / Dynamic library options
 if (WIN32)
