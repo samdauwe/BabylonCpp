@@ -33,8 +33,7 @@ public:
   friend std::ostream& operator<<(std::ostream& os, const Path2& path);
 
   /**
-   * @brief Adds a new segment until the given coordinates (x, y) to the current
-   * Path2.
+   * @brief Adds a new segment until the given coordinates (x, y) to the current Path2.
    * @param x the added points x value
    * @param y the added points y value
    * @returns the updated Path2.
@@ -42,9 +41,9 @@ public:
   Path2& addLineTo(float x, float y);
 
   /**
-   * @brief Adds _numberOfSegments_ segments according to the arc definition
-   * (middle point coordinates, end point coordinates, the arc start point being
-   * the current Path2 last point) to the current Path2.
+   * @brief Adds _numberOfSegments_ segments according to the arc definition (middle point
+   * coordinates, end point coordinates, the arc start point being the current Path2 last point) to
+   * the current Path2.
    * @param midX middle point x value
    * @param midY middle point y value
    * @param endX end point x value
@@ -62,8 +61,7 @@ public:
   Path2& close();
 
   /**
-   * @brief Gets the sum of the distance between each sequential point in the
-   * path.
+   * @brief Gets the sum of the distance between each sequential point in the path.
    * @returns the Path2 total length (float).
    */
   [[nodiscard]] float length() const;
@@ -82,10 +80,8 @@ public:
 
   /**
    * @brief Retreives the point at the distance aways from the starting point.
-   * @param normalizedLengthPosition the length along the path to retreive the
-   * point from
-   * @returns a new Vector2 located at a percentage of the Path2 total length on
-   * this path.
+   * @param normalizedLengthPosition the length along the path to retreive the point from
+   * @returns a new Vector2 located at a percentage of the Path2 total length on this path.
    */
   [[nodiscard]] Vector2 getPointAtLengthPosition(float normalizedLengthPosition) const;
 

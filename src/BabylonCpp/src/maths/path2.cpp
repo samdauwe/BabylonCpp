@@ -12,14 +12,12 @@ Path2::Path2(float x, float y) : closed{false}, _length{0.f}
   _points.emplace_back(Vector2(x, y));
 }
 
-Path2::Path2(const Path2& otherPath)
-    : _points{otherPath._points}, _length{otherPath._length}
+Path2::Path2(const Path2& otherPath) : _points{otherPath._points}, _length{otherPath._length}
 {
 }
 
 Path2::Path2(Path2&& otherPath)
-    : _points{std::move(otherPath._points)}
-    , _length{std::move(otherPath._length)}
+    : _points{std::move(otherPath._points)}, _length{std::move(otherPath._length)}
 {
 }
 
@@ -118,11 +116,11 @@ Path2& Path2::close()
 
 float Path2::length() const
 {
-  float result = _length;
+  auto result = _length;
 
-  if (!closed) {
-    const Vector2 lastPoint  = _points[_points.size() - 1];
-    const Vector2 firstPoint = _points[0];
+  if (closed) {
+    const auto lastPoint  = _points[_points.size() - 1];
+    const auto firstPoint = _points[0];
     result += (firstPoint.subtract(lastPoint).length());
   }
 
