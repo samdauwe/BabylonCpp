@@ -184,5 +184,6 @@ def write_samples_auto_declarations_file():
 
 
 if __name__ == "__main__":
+    print("Running make_samples_info.py")
     write_json_info_file()
     write_samples_auto_declarations_file()

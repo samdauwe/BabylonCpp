@@ -308,7 +308,7 @@ endif()
 # ============================================================================ #
 execute_process(
     COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/make_samples_info/make_samples_info.py
-    COMMENT "make_samples_info"
+    COMMAND_ECHO STDOUT
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/build/bin
 )
 
@@ -344,4 +344,6 @@ if (OPTION_BUILD_LOADERS)
 endif()
 copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/scenes")
 copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/textures")
-copy_resource_files("${CMAKE_SOURCE_DIR}/assets/samples_info.json")
+if (EXISTS "${CMAKE_SOURCE_DIR}/assets/samples_info.json")
+    copy_resource_files("${CMAKE_SOURCE_DIR}/assets/samples_info.json")
+endif()
