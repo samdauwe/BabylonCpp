@@ -268,10 +268,10 @@ void InvokeRunnerBabylon(const AppWindowParams& appWindowParams,
 {
 #ifdef EMSCRIPTEN
   InvokeRunnerBabylonEmscripten(appWindowParams, guiFunctionWithExit, postInitFunction);
-#elif defined(IMGUI_RUNNER_USE_GLFW)
-  InvokeRunnerBabylonGlfw(appWindowParams, guiFunctionWithExit, postInitFunction);
 #elif defined(IMGUI_RUNNER_USE_SDL)
   InvokeRunnerBabylonSdl(appWindowParams, guiFunctionWithExit, postInitFunction);
+#elif defined(IMGUI_RUNNER_USE_GLFW)
+  InvokeRunnerBabylonGlfw(appWindowParams, guiFunctionWithExit, postInitFunction);
 #else
   #error "InvokeRunnerBabylon: Not Backend available!"
 #endif
