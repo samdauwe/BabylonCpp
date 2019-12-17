@@ -15,10 +15,9 @@ class Quaternion;
 class Viewport;
 
 /**
- * @brief Classed used to store (x,y,z) vector representation
+ * @brief Class used to store (x,y,z) vector representation.
  * A Vector3 is the main object used in 3D geometry
- * It can represent etiher the coordinates of a point the space, either a
- * direction
+ * It can represent etiher the coordinates of a point the space, either a direction
  * Reminder: js uses a left handed forward facing system
  */
 class BABYLON_SHARED_EXPORT Vector3 {
@@ -28,8 +27,7 @@ private:
 
 public:
   /**
-   * @brief Creates a new Vector3 object from the given x, y, z (floats)
-   * coordinates.
+   * @brief Creates a new Vector3 object from the given x, y, z (floats) coordinates.
    * @param x defines the first coordinates (on X axis)
    * @param y defines the second coordinates (on Y axis)
    * @param z defines the third coordinates (on Z axis)
@@ -70,15 +68,14 @@ public:
   /** Operators **/
 
   /**
-   * @brief Creates an array containing three elements : the coordinates of the
-   * Vector3.
+   * @brief Creates an array containing three elements : the coordinates of the Vector3.
    * @returns a new array of numbers
    */
   [[nodiscard]] Float32Array asArray() const;
 
   /**
-   * @brief Populates the given array or Float32Array from the given index with
-   * the successive coordinates of the Vector3.
+   * @brief Populates the given array or Float32Array from the given index with the successive
+   * coordinates of the Vector3.
    * @param array defines the destination array
    * @param index defines the offset in the destination array
    * @returns the current Vector3
@@ -86,8 +83,8 @@ public:
   const Vector3& toArray(Float32Array& array, unsigned int index = 0) const;
 
   /**
-   * @brief Converts the current Vector3 into a quaternion (considering that the
-   * Vector3 contains Euler angles representation of a rotation).
+   * @brief Converts the current Vector3 into a quaternion (considering that the Vector3 contains
+   * Euler angles representation of a rotation).
    * @returns a new Quaternion object, computed from the Vector3 coordinates
    */
   [[nodiscard]] Quaternion toQuaternion() const;
@@ -109,16 +106,14 @@ public:
   Vector3& addInPlaceFromFloats(float x, float y, float z);
 
   /**
-   * @brief Gets a new Vector3, result of the addition the current Vector3 and
-   * the given vector.
+   * @brief Gets a new Vector3, result of the addition the current Vector3 and the given vector.
    * @param otherVector defines the second operand
    * @returns the resulting Vector3
    */
   [[nodiscard]] Vector3 add(const Vector3& otherVector) const;
 
   /**
-   * @brief Adds the current Vector3 to the given one and stores the result in
-   * the vector "result".
+   * @brief Adds the current Vector3 to the given one and stores the result in the vector "result".
    * @param otherVector defines the second operand
    * @param result defines the Vector3 object where to store the result
    * @returns the current Vector3
@@ -126,8 +121,7 @@ public:
   Vector3& addToRef(const Vector3& otherVector, Vector3& result);
 
   /**
-   * @brief Adds the current Vector3 to the given one and stores the result in
-   * the vector "result".
+   * @brief Adds the current Vector3 to the given one and stores the result in the vector "result".
    * @param otherVector defines the second operand
    * @param result defines the Vector3 object where to store the result
    * @returns the current Vector3
@@ -142,16 +136,16 @@ public:
   Vector3& subtractInPlace(const Vector3& otherVector);
 
   /**
-   * @brief Returns a new Vector3, result of the subtraction of the given vector
-   * from the current Vector3.
+   * @brief Returns a new Vector3, result of the subtraction of the given vector from the current
+   * Vector3.
    * @param otherVector defines the second operand
    * @returns the resulting Vector3
    */
   [[nodiscard]] Vector3 subtract(const Vector3& otherVector) const;
 
   /**
-   * @brief Subtracts the given vector from the current Vector3 and stores the
-   * result in the vector "result".
+   * @brief Subtracts the given vector from the current Vector3 and stores the result in the vector
+   * "result".
    * @param otherVector defines the second operand
    * @param result defines the Vector3 object where to store the result
    * @returns the current Vector3
@@ -159,8 +153,8 @@ public:
   Vector3& subtractToRef(const Vector3& otherVector, Vector3& result);
 
   /**
-   * @brief Subtracts the given vector from the current Vector3 and stores the
-   * result in the vector "result".
+   * @brief Subtracts the given vector from the current Vector3 and stores the result in the vector
+   * "result".
    * @param otherVector defines the second operand
    * @param result defines the Vector3 object where to store the result
    * @returns the current Vector3
@@ -168,8 +162,8 @@ public:
   const Vector3& subtractToRef(const Vector3& otherVector, Vector3& result) const;
 
   /**
-   * @brief Returns a new Vector3 set with the subtraction of the given floats
-   * from the current Vector3 coordinates.
+   * @brief Returns a new Vector3 set with the subtraction of the given floats from the current
+   * Vector3 coordinates.
    * @param x defines the x coordinate of the operand
    * @param y defines the y coordinate of the operand
    * @param z defines the z coordinate of the operand
@@ -178,8 +172,8 @@ public:
   [[nodiscard]] Vector3 subtractFromFloats(float x, float y, float z) const;
 
   /**
-   * @brief Subtracts the given floats from the current Vector3 coordinates and
-   * set the given vector "result" with this result.
+   * @brief Subtracts the given floats from the current Vector3 coordinates and set the given vector
+   * "result" with this result.
    * @param x defines the x coordinate of the operand
    * @param y defines the y coordinate of the operand
    * @param z defines the z coordinate of the operand
@@ -189,8 +183,8 @@ public:
   Vector3& subtractFromFloatsToRef(float x, float y, float z, Vector3& result);
 
   /**
-   * @brief Subtracts the given floats from the current Vector3 coordinates and
-   * set the given vector "result" with this result.
+   * @brief Subtracts the given floats from the current Vector3 coordinates and set the given vector
+   * "result" with this result.
    * @param x defines the x coordinate of the operand
    * @param y defines the y coordinate of the operand
    * @param z defines the z coordinate of the operand
@@ -213,16 +207,16 @@ public:
   Vector3& scaleInPlace(float iscale);
 
   /**
-   * @brief Returns a new Vector3 set with the current Vector3 coordinates
-   * multiplied by the float "scale".
+   * @brief Returns a new Vector3 set with the current Vector3 coordinates multiplied by the float
+   * "scale".
    * @param scale defines the multiplier factor
    * @returns a new Vector3
    */
   [[nodiscard]] Vector3 scale(float iscale) const;
 
   /**
-   * @brief Multiplies the current Vector3 coordinates by the float "scale" and
-   * stores the result in the given vector "result" coordinates.
+   * @brief Multiplies the current Vector3 coordinates by the float "scale" and stores the result in
+   * the given vector "result" coordinates.
    * @param scale defines the multiplier factor
    * @param result defines the Vector3 object where to store the result
    * @returns the current Vector3
@@ -230,8 +224,8 @@ public:
   const Vector3& scaleToRef(int iscale, Vector3& result) const;
 
   /**
-   * @brief Multiplies the current Vector3 coordinates by the float "scale" and
-   * stores the result in the passed vector "result" coordinates.
+   * @brief Multiplies the current Vector3 coordinates by the float "scale" and stores the result in
+   * the passed vector "result" coordinates.
    * @param scale defines the multiplier factor
    * @param result defines the Vector3 object where to store the result
    * @returns the current Vector3
@@ -239,8 +233,7 @@ public:
   const Vector3& scaleToRef(float iscale, Vector3& result) const;
 
   /**
-   * @brief Scale the current Vector3 values by a factor and add the result to a
-   * given Vector3.
+   * @brief Scale the current Vector3 values by a factor and add the result to a given Vector3.
    * @param scale defines the scale factor
    * @param result defines the Vector3 object where to store the result
    * @returns the unmodified current Vector3
@@ -248,8 +241,7 @@ public:
   const Vector3& scaleAndAddToRef(int iscale, Vector3& result) const;
 
   /**
-   * @brief Scale the current Vector3 values by a factor and add the result to a
-   * given Vector3.
+   * @brief Scale the current Vector3 values by a factor and add the result to a given Vector3.
    * @param scale defines the scale factor
    * @param result defines the Vector3 object where to store the result
    * @returns the unmodified current Vector3
@@ -257,16 +249,15 @@ public:
   const Vector3& scaleAndAddToRef(float iscale, Vector3& result) const;
 
   /**
-   * @brief Returns true if the current Vector3 and the given vector coordinates
-   * are strictly equal.
+   * @brief Returns true if the current Vector3 and the given vector coordinates are strictly equal.
    * @param otherVector defines the second operand
    * @returns true if both vectors are equals
    */
   [[nodiscard]] bool equals(const Vector3& otherVector) const;
 
   /**
-   * @brief Returns true if the current Vector3 and the given vector coordinates
-   * are distant less than epsilon.
+   * @brief Returns true if the current Vector3 and the given vector coordinates are distant less
+   * than epsilon.
    * @param otherVector defines the second operand
    * @param epsilon defines the minimal distance to define values as equals
    * @returns true if both vectors are distant less than epsilon
@@ -275,8 +266,7 @@ public:
                                        float epsilon = Math::Epsilon) const;
 
   /**
-   * @brief Returns true if the current Vector3 coordinates equals the given
-   * floats.
+   * @brief Returns true if the current Vector3 coordinates equals the given floats.
    * @param x defines the x coordinate of the operand
    * @param y defines the y coordinate of the operand
    * @param z defines the z coordinate of the operand
@@ -292,16 +282,16 @@ public:
   Vector3& multiplyInPlace(const Vector3& otherVector);
 
   /**
-   * @brief Returns a new Vector3, result of the multiplication of the current
-   * Vector3 by the given vector.
+   * @brief Returns a new Vector3, result of the multiplication of the current Vector3 by the given
+   * vector.
    * @param otherVector defines the second operand
    * @returns the new Vector3
    */
   [[nodiscard]] Vector3 multiply(const Vector3& otherVector) const;
 
   /**
-   * @brief Multiplies the current Vector3 by the given one and stores the
-   * result in the given vector "result".
+   * @brief Multiplies the current Vector3 by the given one and stores the result in the given
+   * vector "result".
    * @param otherVector defines the second operand
    * @param result defines the Vector3 object where to store the result
    * @returns the current Vector3
@@ -319,16 +309,16 @@ public:
   [[nodiscard]] Vector3 multiplyByFloats(float x, float y, float z) const;
 
   /**
-   * @brief Returns a new Vector3 set with the result of the division of the
-   * current Vector3 coordinates by the given ones.
+   * @brief Returns a new Vector3 set with the result of the division of the current Vector3
+   * coordinates by the given ones.
    * @param otherVector defines the second operand
    * @returns the new Vector3
    */
   [[nodiscard]] Vector3 divide(const Vector3& otherVector) const;
 
   /**
-   * @brief Divides the current Vector3 coordinates by the given ones and stores
-   * the result in the given vector "result".
+   * @brief Divides the current Vector3 coordinates by the given ones and stores the result in the
+   * given vector "result".
    * @param otherVector defines the second operand
    * @param result defines the Vector3 object where to store the result
    * @returns the current Vector3
@@ -343,24 +333,24 @@ public:
   Vector3& divideInPlace(const Vector3& otherVector);
 
   /**
-   * @brief Updates the current Vector3 with the minimal coordinate values
-   * between its and the given vector ones.
+   * @brief Updates the current Vector3 with the minimal coordinate values between its and the given
+   * vector ones.
    * @param other defines the second operand
    * @returns the current updated Vector3
    */
   Vector3& minimizeInPlace(const Vector3& other);
 
   /**
-   * @brief Updates the current Vector3 with the maximal coordinate values
-   * between its and the given vector ones.
+   * @brief Updates the current Vector3 with the maximal coordinate values between its and the given
+   * vector ones.
    * @param other defines the second operand
    * @returns the current updated Vector3
    */
   Vector3& maximizeInPlace(const Vector3& other);
 
   /**
-   * @brief Updates the current Vector3 with the minimal coordinate values
-   * between its and the given coordinates.
+   * @brief Updates the current Vector3 with the minimal coordinate values between its and the given
+   * coordinates.
    * @param x defines the x coordinate of the operand
    * @param y defines the y coordinate of the operand
    * @param z defines the z coordinate of the operand
@@ -369,8 +359,8 @@ public:
   Vector3& minimizeInPlaceFromFloats(float x, float y, float z);
 
   /**
-   * @brief Updates the current Vector3 with the maximal coordinate values
-   * between its and the given coordinates.
+   * @brief Updates the current Vector3 with the maximal coordinate values between its and the given
+   * coordinates.
    * @param x defines the x coordinate of the operand
    * @param y defines the y coordinate of the operand
    * @param z defines the z coordinate of the operand
@@ -379,18 +369,17 @@ public:
   Vector3& maximizeInPlaceFromFloats(float x, float y, float z);
 
   /**
-   * @brief Due to float precision, scale of a mesh could be uniform but float
-   * values are off by a small fraction Check if is non uniform within a certain
-   * amount of decimal places to account for this.
+   * @brief Due to float precision, scale of a mesh could be uniform but float values are off by a
+   * small fraction Check if is non uniform within a certain amount of decimal places to account for
+   * this.
    * @param epsilon the amount the values can differ
-   * @returns if the the vector is non uniform to a certain number of decimal
-   * places
+   * @returns if the the vector is non uniform to a certain number of decimal places
    */
   bool isNonUniformWithinEpsilon(float epsilon);
 
   /**
-   * @brief Gets a boolean indicating that the vector is non uniform meaning x,
-   * y or z are not all the same.
+   * @brief Gets a boolean indicating that the vector is non uniform meaning x, y or z are not all
+   * the same.
    */
   [[nodiscard]] bool isNonUniform() const;
 
@@ -450,8 +439,8 @@ public:
 
   /**
    * @brief Reorders the x y z properties of the vector in place.
-   * @param order new ordering of the properties (eg. for vector 1,2,3 with
-   * "ZYX" will produce 3,2,1)
+   * @param order new ordering of the properties (eg. for vector 1,2,3 with "ZYX" will produce
+   * 3,2,1)
    * @returns the current updated vector
    */
   Vector3& reorderInPlace(std::string order);
@@ -473,6 +462,14 @@ public:
    */
   Vector3& rotateByQuaternionAroundPointToRef(const Quaternion& quaternion, const Vector3& point,
                                               Vector3& result);
+
+  /**
+   * @brief Returns a new Vector3 as the cross product of the current vector and the "other" one
+   * The cross product is then orthogonal to both current and "other"
+   * @param other defines the right operand
+   * @returns the cross product
+   */
+  Vector3 cross(const Vector3& other);
 
   /**
    * @brief Normalize the current Vector3 with the given input length.
@@ -551,8 +548,7 @@ public:
                                       const Vector3& normal);
 
   /**
-   * @brief Returns a new Vector3 set from the index "offset" of the given
-   * array.
+   * @brief Returns a new Vector3 set from the index "offset" of the given array.
    * @param array defines the source array
    * @param offset defines the offset in the source array
    * @returns the new Vector3
@@ -560,8 +556,8 @@ public:
   static Vector3 FromArray(const Float32Array& array, unsigned int offset = 0);
 
   /**
-   * @brief Sets the given vector "result" with the element values from the
-   * index "offset" of the given array.
+   * @brief Sets the given vector "result" with the element values from the index "offset" of the
+   * given array.
    * @param array defines the source array
    * @param offset defines the offset in the source array
    * @param result defines the Vector3 where to store the result
@@ -569,8 +565,8 @@ public:
   static void FromArrayToRef(const Float32Array& array, unsigned int offset, Vector3& result);
 
   /**
-   * @brief Sets the given vector "result" with the element values from the
-   * index "offset" of the given array.
+   * @brief Sets the given vector "result" with the element values from the index "offset" of the
+   * given array.
    * @param array defines the source array
    * @param offset defines the offset in the source array
    * @param result defines the Vector3 where to store the result
@@ -579,28 +575,28 @@ public:
                              Vector3& result);
 
   /**
-   * @brief Sets the given vector "result" with the element values from the
-   * index "offset" of the given Float32Array. This function is deprecated.  Use
-   * FromArrayToRef instead.
+   * @brief Sets the given vector "result" with the element values from the index "offset" of the
+   * given Float32Array.
    * @param array defines the source array
    * @param offset defines the offset in the source array
    * @param result defines the Vector3 where to store the result
+   * @deprecated Please use FromArrayToRef instead.
    */
   static void FromFloatArrayToRef(const Float32Array& array, unsigned int offset, Vector3& result);
 
   /**
-   * @brief Sets the given vector "result" with the element values from the
-   * index "offset" of the given Float32Array. This function is deprecated.  Use
-   * FromArrayToRef instead.
+   * @brief Sets the given vector "result" with the element values from the index "offset" of the
+   * given Float32Array.
    * @param array defines the source array
    * @param offset defines the offset in the source array
    * @param result defines the Vector3 where to store the result
+   * @deprecated Please use FromArrayToRef instead.
    */
   static void FromFloatArrayToRef(const std::array<float, 16>& array, unsigned int offset,
                                   Vector3& result);
 
   /**
-   * Sets the given vector "result" with the given floats.
+   * @brief Sets the given vector "result" with the given floats.
    * @param x defines the x coordinate of the source
    * @param y defines the y coordinate of the source
    * @param z defines the z coordinate of the source
@@ -662,10 +658,9 @@ public:
   static Vector3 Left();
 
   /**
-   * @brief Returns a new Vector3 set with the result of the transformation by
-   * the given matrix of the given vector. This method computes tranformed
-   * coordinates only, not transformed direction vectors (ie. it takes
-   * translation in account).
+   * @brief Returns a new Vector3 set with the result of the transformation by the given matrix of
+   * the given vector. This method computes tranformed coordinates only, not transformed direction
+   * vectors (ie. it takes translation in account).
    * @param vector defines the Vector3 to transform
    * @param transformation defines the transformation matrix
    * @returns the transformed Vector3
@@ -673,10 +668,9 @@ public:
   static Vector3 TransformCoordinates(const Vector3& vector, const Matrix& transformation);
 
   /**
-   * @brief Sets the given vector "result" coordinates with the result of the
-   * transformation by the given matrix of the given vector. This method
-   * computes tranformed coordinates only, not transformed direction vectors
-   * (ie. it takes translation in account).
+   * @brief Sets the given vector "result" coordinates with the result of the transformation by the
+   * given matrix of the given vector. This method computes tranformed coordinates only, not
+   * transformed direction vectors (ie. it takes translation in account).
    * @param vector defines the Vector3 to transform
    * @param transformation defines the transformation matrix
    * @param result defines the Vector3 where to store the result
@@ -685,10 +679,9 @@ public:
                                         Vector3& result);
 
   /**
-   * @brief Sets the given vector "result" coordinates with the result of the
-   * transformation by the given matrix of the given floats (x, y, z). This
-   * method computes tranformed coordinates only, not transformed direction
-   * vectors.
+   * @brief Sets the given vector "result" coordinates with the result of the transformation by the
+   * given matrix of the given floats (x, y, z). This method computes tranformed coordinates only,
+   * not transformed direction vectors.
    * @param x define the x coordinate of the source vector
    * @param y define the y coordinate of the source vector
    * @param z define the z coordinate of the source vector
@@ -699,10 +692,9 @@ public:
                                                   const Matrix& transformation, Vector3& result);
 
   /**
-   * @brief Returns a new Vector3 set with the result of the normal
-   * transformation by the given matrix of the given vector. This methods
-   * computes transformed normalized direction vectors only (ie. it does not
-   * apply translation).
+   * @brief Returns a new Vector3 set with the result of the normal transformation by the given
+   * matrix of the given vector. This methods computes transformed normalized direction vectors only
+   * (ie. it does not apply translation).
    * @param vector defines the Vector3 to transform
    * @param transformation defines the transformation matrix
    * @returns the new Vector3
@@ -710,10 +702,9 @@ public:
   static Vector3 TransformNormal(const Vector3& vector, const Matrix& transformation);
 
   /**
-   * @brief Sets the given vector "result" with the result of the normal
-   * transformation by the given matrix of the given vector. This methods
-   * computes transformed normalized direction vectors only (ie. it does not
-   * apply translation).
+   * @brief Sets the given vector "result" with the result of the normal transformation by the given
+   * matrix of the given vector. This methods computes transformed normalized direction vectors only
+   * (ie. it does not apply translation).
    * @param vector defines the Vector3 to transform
    * @param transformation defines the transformation matrix
    * @param result defines the Vector3 where to store the result
@@ -722,10 +713,9 @@ public:
                                    Vector3& result);
 
   /**
-   * @brief Sets the given vector "result" with the result of the normal
-   * transformation by the given matrix of the given floats (x, y, z) This
-   * methods computes transformed normalized direction vectors only (ie. it does
-   * not apply translation).
+   * @brief Sets the given vector "result" with the result of the normal transformation by the given
+   * matrix of the given floats (x, y, z) This methods computes transformed normalized direction
+   * vectors only (ie. it does not apply translation).
    * @param x define the x coordinate of the source vector
    * @param y define the y coordinate of the source vector
    * @param z define the z coordinate of the source vector
@@ -736,9 +726,8 @@ public:
                                              const Matrix& transformation, Vector3& result);
 
   /**
-   * @brief Returns a new Vector3 located for "amount" on the CatmullRom
-   * interpolation spline defined by the vectors "value1", "value2", "value3",
-   * "value4".
+   * @brief Returns a new Vector3 located for "amount" on the CatmullRom interpolation spline
+   * defined by the vectors "value1", "value2", "value3", "value4".
    * @param value1 defines the first control point
    * @param value2 defines the second control point
    * @param value3 defines the third control point
@@ -750,11 +739,10 @@ public:
                             const Vector3& value4, float amount);
 
   /**
-   * @brief Returns a new Vector3 set with the coordinates of "value", if the
-   * vector "value" is in the cube defined by the vectors "min" and "max". If a
-   * coordinate value of "value" is lower than one of the "min" coordinate, then
-   * this "value" coordinate is set with the "min" one. If a coordinate value of
-   * "value" is greater than one of the "max" coordinate, then this "value"
+   * @brief Returns a new Vector3 set with the coordinates of "value", if the vector "value" is in
+   * the cube defined by the vectors "min" and "max". If a coordinate value of "value" is lower than
+   * one of the "min" coordinate, then this "value" coordinate is set with the "min" one. If a
+   * coordinate value of "value" is greater than one of the "max" coordinate, then this "value"
    * coordinate is set with the "max" one.
    * @param value defines the current value
    * @param min defines the lower range value
@@ -764,12 +752,11 @@ public:
   static Vector3 Clamp(const Vector3& value, const Vector3& min, const Vector3& max);
 
   /**
-   * @brief Sets the given vector "result" with the coordinates of "value", if
-   * the vector "value" is in the cube defined by the vectors "min" and "max" If
-   * a coordinate value of "value" is lower than one of the "min" coordinate,
-   * then this "value" coordinate is set with the "min" one If a coordinate
-   * value of "value" is greater than one of the "max" coordinate, then this
-   * "value" coordinate is set with the "max" one
+   * @brief Sets the given vector "result" with the coordinates of "value", if the vector "value" is
+   * in the cube defined by the vectors "min" and "max" If a coordinate value of "value" is lower
+   * than one of the "min" coordinate, then this "value" coordinate is set with the "min" one If a
+   * coordinate value of "value" is greater than one of the "max" coordinate, then this "value"
+   * coordinate is set with the "max" one
    * @param value defines the current value
    * @param min defines the lower range value
    * @param max defines the upper range value
@@ -787,9 +774,8 @@ public:
   static void CheckExtends(Vector3& v, Vector3& min, Vector3& max);
 
   /**
-   * @brief Returns a new Vector3 located for "amount" (float) on the Hermite
-   * interpolation spline defined by the vectors "value1", "tangent1", "value2",
-   * "tangent2".
+   * @brief Returns a new Vector3 located for "amount" (float) on the Hermite interpolation spline
+   * defined by the vectors "value1", "tangent1", "value2", "tangent2".
    * @param value1 defines the first control point
    * @param tangent1 defines the first tangent vector
    * @param value2 defines the second control point
@@ -802,8 +788,8 @@ public:
                          const Vector3& tangent2, float amount);
 
   /**
-   * @brief Returns a new Vector3 located for "amount" (float) on the linear
-   * interpolation between the vectors "start" and "end".
+   * @brief Returns a new Vector3 located for "amount" (float) on the linear interpolation between
+   * the vectors "start" and "end".
    * @param start defines the start value
    * @param end defines the end value
    * @param amount max defines amount between both (between 0 and 1)
@@ -812,8 +798,8 @@ public:
   static Vector3 Lerp(const Vector3& start, const Vector3& end, float amount);
 
   /**
-   * @brief Sets the given vector "result" with the result of the linear
-   * interpolation from the vector "start" for "amount" to the vector "end".
+   * @brief Sets the given vector "result" with the result of the linear interpolation from the
+   * vector "start" for "amount" to the vector "end".
    * @param start defines the start value
    * @param end defines the end value
    * @param amount max defines amount between both (between 0 and 1)
@@ -822,8 +808,7 @@ public:
   static void LerpToRef(const Vector3& start, const Vector3& end, float amount, Vector3& result);
 
   /**
-   * @brief Returns the dot product (float) between the vectors "left" and
-   * "right".
+   * @brief Returns the dot product (float) between the vectors "left" and "right".
    * @param left defines the left operand
    * @param right defines the right operand
    * @returns the dot product
@@ -831,8 +816,8 @@ public:
   static float Dot(const Vector3& left, const Vector3& right);
 
   /**
-   * @brief Returns a new Vector3 as the cross product of the vectors "left" and
-   * "right". The cross product is then orthogonal to both "left" and "right".
+   * @brief Returns a new Vector3 as the cross product of the vectors "left" and "right". The cross
+   * product is then orthogonal to both "left" and "right".
    * @param left defines the left operand
    * @param right defines the right operand
    * @returns the cross product
@@ -840,8 +825,8 @@ public:
   static Vector3 Cross(const Vector3& left, const Vector3& right);
 
   /**
-   * @brief Sets the given vector "result" with the cross product of "left" and
-   * "right". The cross product is then orthogonal to both "left" and "right"
+   * @brief Sets the given vector "result" with the cross product of "left" and "right". The cross
+   * product is then orthogonal to both "left" and "right"
    * @param left defines the left operand
    * @param right defines the right operand
    * @param result defines the Vector3 where to store the result
@@ -856,8 +841,7 @@ public:
   static Vector3 Normalize(const Vector3& vector);
 
   /**
-   * @brief Sets the given vector "result" with the normalization of the given
-   * first vector.
+   * @brief Sets the given vector "result" with the normalization of the given first vector.
    * @param vector defines the Vector3 to normalize
    * @param result defines the Vector3 where to store the result
    */
@@ -885,8 +869,7 @@ public:
    * @param source defines the screen space Vector3 to use
    * @param viewportWidth defines the current width of the viewport
    * @param viewportHeight defines the current height of the viewport
-   * @param world defines the world matrix to use (can be set to Identity to go
-   * to world space)
+   * @param world defines the world matrix to use (can be set to Identity to go to world space)
    * @param transform defines the transform (view x projection) matrix to use
    * @returns the new Vector3
    */
@@ -898,8 +881,7 @@ public:
    * @param source defines the screen space Vector3 to use
    * @param viewportWidth defines the current width of the viewport
    * @param viewportHeight defines the current height of the viewport
-   * @param world defines the world matrix to use (can be set to Identity to go
-   * to world space)
+   * @param world defines the world matrix to use (can be set to Identity to go to world space)
    * @param view defines the view matrix to use
    * @param projection defines the projection matrix to use
    * @returns the new Vector3
@@ -912,8 +894,7 @@ public:
    * @param source defines the screen space Vector3 to use
    * @param viewportWidth defines the current width of the viewport
    * @param viewportHeight defines the current height of the viewport
-   * @param world defines the world matrix to use (can be set to Identity to go
-   * to world space)
+   * @param world defines the world matrix to use (can be set to Identity to go to world space)
    * @param view defines the view matrix to use
    * @param projection defines the projection matrix to use
    * @param result defines the Vector3 where to store the result
@@ -928,8 +909,7 @@ public:
    * @param sourceZ defines the screen space z coordinate to use
    * @param viewportWidth defines the current width of the viewport
    * @param viewportHeight defines the current height of the viewport
-   * @param world defines the world matrix to use (can be set to Identity to go
-   * to world space)
+   * @param world defines the world matrix to use (can be set to Identity to go to world space)
    * @param view defines the view matrix to use
    * @param projection defines the projection matrix to use
    * @param result defines the Vector3 where to store the result
@@ -963,8 +943,7 @@ public:
   static float Distance(const Vector3& value1, const Vector3& value2);
 
   /**
-   * @brief Returns the squared distance between the vectors "value1" and
-   * "value2".
+   * @brief Returns the squared distance between the vectors "value1" and "value2".
    * @param value1 defines the first operand
    * @param value2 defines the second operand
    * @returns the squared distance
@@ -981,11 +960,10 @@ public:
   static Vector3 Center(const Vector3& value1, const Vector3& value2);
 
   /**
-   * @brief Given three orthogonal normalized left-handed oriented Vector3 axis
-   * in space (target system), RotationFromAxis() returns the rotation Euler
-   * angles (ex : rotation.x, rotation.y, rotation.z) to apply to something in
-   * order to rotate it from its local system to the given target system. Note:
-   * axis1, axis2 and axis3 are normalized during this operation.
+   * @brief Given three orthogonal normalized left-handed oriented Vector3 axis in space (target
+   * system), RotationFromAxis() returns the rotation Euler angles (ex : rotation.x, rotation.y,
+   * rotation.z) to apply to something in order to rotate it from its local system to the given
+   * target system. Note: axis1, axis2 and axis3 are normalized during this operation.
    * @param axis1 defines the first axis
    * @param axis2 defines the second axis
    * @param axis3 defines the third axis
@@ -994,8 +972,8 @@ public:
   static Vector3 RotationFromAxis(Vector3& axis1, Vector3& axis2, Vector3& axis3);
 
   /**
-   * @brief The same than RotationFromAxis but updates the given ref Vector3
-   * parameter instead of returning a new Vector3.
+   * @brief The same than RotationFromAxis but updates the given ref Vector3 parameter instead of
+   * returning a new Vector3.
    * @param axis1 defines the first axis
    * @param axis2 defines the second axis
    * @param axis3 defines the third axis

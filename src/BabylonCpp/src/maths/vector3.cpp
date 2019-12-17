@@ -499,6 +499,11 @@ Vector3& Vector3::rotateByQuaternionAroundPointToRef(const Quaternion& quaternio
   return result;
 }
 
+Vector3 Vector3::cross(const Vector3& other)
+{
+  return Vector3::Cross(*this, other);
+}
+
 Vector3& Vector3::normalizeFromLength(float len)
 {
   if (len == 0.f || len == 1.f) {
