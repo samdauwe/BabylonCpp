@@ -97,18 +97,22 @@ void FileTools::LoadImageFromUrl(
   if (!String::startsWith(url, "file:"))
     throw std::runtime_error("FileTools::LoadImageFromUrl only supports file urls");
 
-  const char *filename = url.substr(5).c_str();
-  std::optional<Image> image;
+  std::string filename = url.substr(5).c_str();
 
-  // Try to load RGBA, then load RGB on fail (is this really required? we could instead trust stbi)
-  image = LoadImage_Stbi_Impl(filename, STBI_rgb_alpha, flipVertically);
-  if (!image)
-    image = LoadImage_Stbi_Impl(filename, STBI_rgb, flipVertically);
+  auto load_image_file_proc = [filename, flipVertically, onLoad, onError]() {
+    std::optional<Image> image;
+    // Try to load RGBA, then load RGB on fail (is this really required? we could instead trust stbi)
+    image = LoadImage_Stbi_Impl(filename.c_str(), STBI_rgb_alpha, flipVertically);
+    if (!image)
+      image = LoadImage_Stbi_Impl(filename.c_str(), STBI_rgb, flipVertically);
 
-  if (image)
+    if (image)
       onLoad(*image);
-  else if (onError)
-    onError("Error loading image from file " + url, "");
+    else if (onError)
+      onError("Error loading image from file " + filename, "");
+  };
+
+  load_image_file_proc();
 }
 
 void FileTools::LoadImageFromBuffer(
