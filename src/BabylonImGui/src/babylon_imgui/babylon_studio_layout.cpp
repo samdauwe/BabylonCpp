@@ -1,7 +1,7 @@
 #include "babylon/babylon_imgui/babylon_studio_layout.h"
 
 #include "imgui_internal.h"
-#include "imgui_runner_babylon/runner_babylon.h"
+#include "imgui_utils/imgui_runner_babylon/runner_babylon.h"
 #include "imgui_utils/icons_font_awesome_5.h"
 
 namespace BABYLON {

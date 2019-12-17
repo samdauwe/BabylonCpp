@@ -5,9 +5,9 @@
 #include <glad/glad.h>
 #include "imgui_utils/icons_font_awesome_5.h"
 #include <imgui_utils/imgui_utils.h>
-#include "imgui_runner/runner_glfw.h"
-#include "imgui_runner/runner_sdl.h"
-#include "imgui_runner/runner_emscripten.h"
+#include "imgui_utils/imgui_runner/runner_glfw.h"
+#include "imgui_utils/imgui_runner/runner_sdl.h"
+#include "imgui_utils/imgui_runner/runner_emscripten.h"
 #include <iostream>
 
 namespace ImGuiUtils
@@ -66,7 +66,6 @@ void ImplProvideFullScreenWindow(const AppWindowParams& appWindowParams)
                                  | ImGuiWindowFlags_NoBringToFrontOnFocus;
   if (appWindowParams.ShowMenuBar)
     windowFlags |= ImGuiWindowFlags_MenuBar;
-  //std::cout << "ImGui::Begin in ImplProvideFullScreenWindow \n";
   ImGui::Begin("Main window (title bar invisible)", nullptr, windowFlags);
 }
 
@@ -97,7 +96,6 @@ void ImplProvideFullScreenDockSpace(const AppWindowParams& appWindowParams)
   ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
   static bool p_open = true;
-  //std::cout << "ImGui::Begin in ImplProvideFullScreenDockSpace \n";
   ImGui::Begin(appWindowParams.Title.c_str(), &p_open, window_flags);
   ImGui::PopStyleVar(3);
 
@@ -142,11 +140,9 @@ RunnerBabylon::RunnerBabylon(
 
 void RunnerBabylon::DoInit()
 {
-  //std::cout << "RunnerBabylon::DoInit 1 \n";
   mAbstractRunner->SetBackendFullScreen(mAppWindowParams.FullScreen);
   mAbstractRunner->SetBackendWindowTitle(mAppWindowParams.Title);
   mAbstractRunner->SetBackendWindowSize(ImVec2((float)mAppWindowParams.Width, (float)mAppWindowParams.Height) );
-  //std::cout << "RunnerBabylon::DoInit 2 \n";
 
   if (mAppWindowParams.WindowedFullScreen)
   {
@@ -155,83 +151,54 @@ void RunnerBabylon::DoInit()
     winSize.y = (float)ImGui::ImGuiRunner::MainScreenResolution().y - mAppWindowParams.WindowedFullScreen_HeightReduce;
     mAbstractRunner->SetBackendWindowSize(winSize);
   }
-  //std::cout << "RunnerBabylon::DoInit 3 \n";
 
   mAbstractRunner->SetClearColor(mAppWindowParams.ClearColor);
 
   mAbstractRunner->LoadFonts = runner_babylon_details::LoadFontAwesome;
-  //std::cout << "RunnerBabylon::DoInit 4 \n";
 
   std::function<void(void)> postInit = [this]() {
-  
     if (mAppWindowParams.DefaultWindowType == DefaultWindowTypeOption::ProvideFullScreenDockSpace)
       ImGui::GetIO().ConfigFlags = ImGui::GetIO().ConfigFlags | ImGuiConfigFlags_DockingEnable;
-    //std::cout << "RunnerBabylon::DoInit  postInit 2 \n";
-
     mPostInitFunction();
-    
-    std::cout << "RunnerBabylon::DoInit  postInit 3 \n";
     ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = mAppWindowParams.ConfigWindowsMoveFromTitleBarOnly;
-    std::cout << "RunnerBabylon::DoInit  postInit 4 \n";
   };
-  //std::cout << "RunnerBabylon::DoInit 5 \n";
 
   std::function<void(void)> provideWindowOrDock = [this](){
-    //std::cout << "RunnerBabylon::DoInit  provideWindowOrDock 1 \n";
     if (mAppWindowParams.DefaultWindowType == DefaultWindowTypeOption::ProvideFullScreenWindow)
       runner_babylon_details::ImplProvideFullScreenWindow(mAppWindowParams);
-    //std::cout << "RunnerBabylon::DoInit  provideWindowOrDock 2 \n";
 
     if (mAppWindowParams.DefaultWindowType == DefaultWindowTypeOption::ProvideFullScreenDockSpace)
     {
-      //std::cout << "RunnerBabylon::DoInit  provideWindowOrDock 3 \n";
       if (!runner_babylon_details::WasDockLayoutDone())
       {
-        //std::cout << "RunnerBabylon::DoInit  provideWindowOrDock 4 \n";
         if (mAppWindowParams.InitialDockLayoutFunction)
           mAppWindowParams.InitialDockLayoutFunction(runner_babylon_details::MainDockSpaceId());
         runner_babylon_details::SetDockLayout_Done();
-        //std::cout << "RunnerBabylon::DoInit  provideWindowOrDock 5 \n";
       }
-      //std::cout << "RunnerBabylon::DoInit  provideWindowOrDock 6 \n";
       runner_babylon_details::ImplProvideFullScreenDockSpace(mAppWindowParams);
-      //std::cout << "RunnerBabylon::DoInit  provideWindowOrDock 7 \n";
     }
   };
-  std::cout << "RunnerBabylon::DoInit 6 \n";
 
   auto guiFunctionWithExitCopy = mGuiFunctionWithExit;
   std::function<bool(void)> showGui =
     [this, postInit, provideWindowOrDock, guiFunctionWithExitCopy]
     () {
-      //std::cout << "RunnerBabylon::DoInit  showGui 1 \n";
     static bool postInited = false;
     if (!postInited)
     {
-      //std::cout << "RunnerBabylon::DoInit  showGui 1.1 \n";
       postInited = true;
-      //std::cout << "RunnerBabylon::DoInit  showGui 2 \n";
       postInit();
-      //std::cout << "RunnerBabylon::DoInit  showGui 3 \n";
     }
-    //std::cout << "RunnerBabylon::DoInit  showGui 4 \n";
     provideWindowOrDock();
-    //std::cout << "RunnerBabylon::DoInit  showGui 5 \n";
     bool shouldExit = guiFunctionWithExitCopy();
-    //std::cout << "RunnerBabylon::DoInit  showGui 6 \n";
 
     if (mAppWindowParams.DefaultWindowType != DefaultWindowTypeOption::NoDefaultWindow) {
-      //std::cout << "Before Call ImGui::End\n";
       ImGui::End();
-      //std::cout << "After Call ImGui::End\n";
     }
-    //std::cout << "RunnerBabylon::DoInit  showGui 7 \n";
     return shouldExit;
   };
-  //std::cout << "RunnerBabylon::DoInit 7 \n";
 
   mAbstractRunner->ShowGui = showGui;
-  //std::cout << "RunnerBabylon::DoInit 8 \n";
 }
 
 void RunnerBabylon::Run()
@@ -301,10 +268,10 @@ void InvokeRunnerBabylon(const AppWindowParams& appWindowParams,
 {
 #ifdef EMSCRIPTEN
   InvokeRunnerBabylonEmscripten(appWindowParams, guiFunctionWithExit, postInitFunction);
-#elif defined(IMGUI_RUNNER_USE_GLFW)
-  InvokeRunnerBabylonGlfw(appWindowParams, guiFunctionWithExit, postInitFunction);
 #elif defined(IMGUI_RUNNER_USE_SDL)
   InvokeRunnerBabylonSdl(appWindowParams, guiFunctionWithExit, postInitFunction);
+#elif defined(IMGUI_RUNNER_USE_GLFW)
+  InvokeRunnerBabylonGlfw(appWindowParams, guiFunctionWithExit, postInitFunction);
 #else
   #error "InvokeRunnerBabylon: Not Backend available!"
 #endif

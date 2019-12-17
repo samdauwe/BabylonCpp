@@ -2,7 +2,7 @@
 #include <babylon/helpers/photo_dome.h>
 #include <babylon/helpers/photo_dome_options.h>
 #include <babylon/interfaces/irenderable_scene.h>
-#include <babylon/samples/samples_index.h>
+#include <babylon/samples/babylon_register_sample.h>
 
 namespace BABYLON {
 namespace Samples {

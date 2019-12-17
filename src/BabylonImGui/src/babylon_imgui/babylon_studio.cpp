@@ -1,18 +1,18 @@
 #include <babylon/GL/framebuffer_canvas.h>
 #include <babylon/babylon_imgui/babylon_logs_window.h>
 #include <babylon/babylon_imgui/babylon_studio.h>
+#include <babylon/cameras/free_camera.h>
 #include <babylon/core/filesystem.h>
 #include <babylon/core/system.h>
 #include <babylon/inspector/components/actiontabs/action_tabs_component.h>
 #include <babylon/interfaces/irenderable_scene_with_hud.h>
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <imgui_runner_babylon/runner_babylon.h>
+#include <imgui_utils/imgui_runner_babylon/runner_babylon.h>
 #include <imgui_utils/icons_font_awesome_5.h>
 
 #include <babylon/babylon_imgui/babylon_studio_layout.h>
 #include <babylon/core/logging.h>
-#include <babylon/samples/samples_index.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -28,8 +28,9 @@ struct EmptyScene : public BABYLON::IRenderableScene {
   {
     return "Empty Scene";
   }
-  void initializeScene(BABYLON::ICanvas*, BABYLON::Scene*) override
+  void initializeScene(BABYLON::ICanvas*, BABYLON::Scene* scene) override
   {
+    auto camera = BABYLON::FreeCamera::New("camera1", Vector3(0.f, 0.f, 0.f), scene);
   }
 };
 
@@ -53,12 +54,9 @@ public:
     _appContext._options._appWindowParams.ShowMenuBar = true;
 
     auto showGuiLambda = [this]() -> bool {
-      std::cout << "showGuiLambda 1 \n";
       bool r = this->render();
-      std::cout << "showGuiLambda 2 \n";
       for (auto f : _appContext._options._heartbeatCallbacks)
         f();
-      std::cout << "showGuiLambda 2 \n";
       if (_appContext._options._playgroundCompilerCallback) {
         PlaygroundCompilerStatus playgroundCompilerStatus
           = _appContext._options._playgroundCompilerCallback();
@@ -66,16 +64,12 @@ public:
           setRenderableScene(playgroundCompilerStatus._renderableScene);
         _appContext._isCompiling = playgroundCompilerStatus._isCompiling;
       }
-      std::cout << "showGuiLambda 3 \n";
       return r;
     };
 
     auto initSceneLambda = [=]() {
-      std::cout << "initSceneLambda 1 \n";
       this->initScene();
-      std::cout << "initSceneLambda 2 \n";
       this->setRenderableScene(initialScene);
-      std::cout << "initSceneLambda 3 \n";
     };
 
     _appContext._options._appWindowParams.InitialDockLayoutFunction = [this](ImGuiID mainDockId) {
@@ -385,11 +379,16 @@ private:
 }; // end of class BabylonInspectorApp
 
 // public API
+#ifdef __EMSCRIPTEN__
+BABYLON::BabylonStudioApp app;
+#endif
 void runBabylonStudio(const std::shared_ptr<BABYLON::IRenderableScene>& scene,
                       BabylonStudioOptions options /* = SceneWithInspectorOptions() */
 )
 {
+#ifndef __EMSCRIPTEN__
   BABYLON::BabylonStudioApp app;
+#endif
   std::shared_ptr<BABYLON::IRenderableScene> sceneNotNull =
     scene ? scene : std::make_shared<EmptyScene>();
   app.RunApp(sceneNotNull, options);

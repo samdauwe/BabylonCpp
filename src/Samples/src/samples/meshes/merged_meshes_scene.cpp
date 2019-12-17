@@ -1,4 +1,4 @@
-#include <babylon/samples/samples_index.h>
+#include <babylon/samples/babylon_register_sample.h>
 #include <babylon/cameras/free_camera.h>
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>

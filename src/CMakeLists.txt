@@ -9,8 +9,6 @@ option(OPTION_BUILD_LOADERS       "Build the loader plugins."            ON)
 # ============================================================================ #
 
 #-- Libraries --##
-add_subdirectory(imgui_runner)
-add_subdirectory(imgui_runner_babylon)
 add_subdirectory(imgui_utils)
 add_subdirectory(BabylonCpp)
 add_subdirectory(Extensions)

@@ -9,7 +9,7 @@
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/mesh.h>
-#include <babylon/samples/samples_index.h>
+#include <babylon/samples/babylon_register_sample.h>
 
 namespace BABYLON {
 
@@ -115,7 +115,6 @@ public:
       }
     });
   }
-
 private:
   high_res_time_point_t _previousTimestamp;
   StandardMaterialPtr _materialBox2;

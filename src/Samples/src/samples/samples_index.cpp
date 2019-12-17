@@ -1,9 +1,11 @@
 #include <babylon/samples/samples_index.h>
 
+#include <babylon/samples/babylon_register_sample.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/string.h>
 #include <babylon/interfaces/irenderable_scene.h>
-
+#include <babylon/babylon_common.h>
+#include <babylon/samples/samples_auto_declarations.h>
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
@@ -36,6 +38,11 @@ void SamplesIndex::fillSamplesFailures() const
 SamplesIndex& SamplesIndex::Instance()
 {
   static SamplesIndex instance;
+  static bool wasPopulated = false;
+  if (!wasPopulated) {
+    wasPopulated = true;
+    auto_populate_samples(instance);
+  }
   return instance;
 }
 
@@ -71,18 +78,18 @@ bool SamplesIndex::sampleExists(const std::string& sampleName) const
 
 nlohmann::json ReadSampleInfoFile()
 {
-  std::ifstream is("samples_info.json");
-  if (!is.good())
-    is = std::ifstream("../samples_info.json");
-  if (!is.good())
-    is = std::ifstream("../../samples_info.json");
+  std::ifstream is(BABYLON::assets_folder() + "/samples_info.json");
   if (is.good()) {
+    std::cout << "Found samples_info.json\n";
     nlohmann::json j;
     is >> j;
     return j;
   }
   else
+  {
+    std::cout << "Not Found samples_info.json\n";
     return nlohmann::json();
+  }
 }
 
 SampleInfo SamplesIndex::getSampleInfo(const std::string& sampleNameMixedCase) const

@@ -13,7 +13,7 @@
 #include <babylon/meshes/ground_mesh.h>
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/transform_node.h>
-#include <babylon/samples/samples_index.h>
+#include <babylon/samples/babylon_register_sample.h>
 #include <babylon/core/logging.h>
 
 namespace BABYLON {

@@ -306,11 +306,9 @@ endif()
 # ============================================================================ #
 #                       make samples info                                      #
 # ============================================================================ #
-add_custom_command(
-    TARGET Samples
-    PRE_BUILD
+execute_process(
     COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/make_samples_info/make_samples_info.py
-    COMMENT "make_samples_info"
+    COMMAND_ECHO STDOUT
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/build/bin
 )
 
@@ -344,7 +342,8 @@ endif()
 if (OPTION_BUILD_LOADERS)
     copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/glTF-Sample-Models")
 endif()
-## - Scenes
 copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/scenes")
-## - Textures
 copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/textures")
+if (EXISTS "${CMAKE_SOURCE_DIR}/assets/samples_info.json")
+    copy_resource_files("${CMAKE_SOURCE_DIR}/assets/samples_info.json")
+endif()

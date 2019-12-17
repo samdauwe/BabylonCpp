@@ -3,7 +3,7 @@
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/textures/cube_texture.h>
-#include <babylon/samples/samples_index.h>
+#include <babylon/samples/babylon_register_sample.h>
 
 namespace BABYLON {
 namespace Samples {

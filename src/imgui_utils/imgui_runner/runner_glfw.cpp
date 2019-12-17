@@ -1,8 +1,8 @@
 #ifdef IMGUI_RUNNER_USE_GLFW
 #include "runner_glfw.h"
 
-#include "imgui_runner/runner_glfw.h"
-#include "imgui_runner/glad_callbacks.h"
+#include "imgui_utils/imgui_runner/runner_glfw.h"
+#include "imgui_utils/imgui_runner/glad_callbacks.h"
 #include <GLFW/glfw3.h>
 #include <examples/imgui_impl_glfw.h>
 #include <examples/imgui_impl_opengl3.h>
@@ -45,7 +45,7 @@ void RunnerGlfw::Select_Gl_Version()
   // GL 3.0 + GLSL 130
   //const char* glsl_version = "#version 130";
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
   //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 #endif

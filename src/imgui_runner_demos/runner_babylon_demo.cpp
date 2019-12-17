@@ -2,9 +2,9 @@
 
 #include "imgui.h"
 #include "imgui_internal.h"
-#include "imgui_runner/runner_glfw.h"
-#include "imgui_runner/runner_sdl.h"
-#include <imgui_runner_babylon/runner_babylon.h>
+#include "imgui_utils/imgui_runner/runner_glfw.h"
+#include "imgui_utils/imgui_runner/runner_sdl.h"
+#include <imgui_utils/imgui_runner_babylon/runner_babylon.h>
 
 #include <map>
 #include <string>
@@ -80,10 +80,10 @@ bool DemoGui()
   return shouldExit;
 }
 
-#ifdef EMSCRIPTEN
-// With emscripten we will run an external loop, so that we need to keep a global variable
+
+// With emscripten the code will run in an external loop,
+// so that we need to keep a global variable
 std::unique_ptr<ImGuiUtils::ImGuiRunner::RunnerBabylon> gRunnerBabylon;
-#endif
 
 void ShowDemo(std::unique_ptr<ImGui::ImGuiRunner::AbstractRunner> runner)
 {

@@ -1,5 +1,4 @@
 #include <babylon/core/system.h>
-#include <babylon/samples/samples_index.h>
 #include <babylon/babylon_imgui/babylon_studio.h>
 #include <babylon/core/logging/init_console_logger.h>
 #include <babylon/utils/CLI11.h>

@@ -8,7 +8,7 @@
 #include <babylon/maths/quaternion.h>
 #include <babylon/maths/vector3.h>
 #include <babylon/misc/observer.h>
-#include <babylon/samples/samples_index.h>
+#include <babylon/samples/babylon_register_sample.h>
 
 namespace BABYLON {
 

@@ -3,7 +3,7 @@
 
 #ifdef __EMSCRIPTEN__
 
-#include "imgui_runner/runner_sdl.h"
+#include "imgui_utils/imgui_runner/runner_sdl.h"
 
 namespace ImGui {
 namespace ImGuiRunner {

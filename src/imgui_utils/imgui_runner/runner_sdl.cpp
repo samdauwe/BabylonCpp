@@ -1,6 +1,6 @@
 #ifdef IMGUI_RUNNER_USE_SDL
 
-#include "imgui_runner/runner_sdl.h"
+#include "imgui_utils/imgui_runner/runner_sdl.h"
 #include <examples/imgui_impl_opengl3.h>
 #include <examples/imgui_impl_sdl.h>
 
@@ -36,7 +36,7 @@ void RunnerSdl::Select_Gl_Version()
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 #endif
 }
 

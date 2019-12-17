@@ -5,9 +5,6 @@
 # CMake version
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 
-option(IMGUI_RUNNER_USE_SDL "Build babylon sdl version" ON)
-option(IMGUI_RUNNER_USE_GLFW "Build babylon glfw version" ON)
-
 # Compile to Wasm
 option(BABYLON_WASM "Target emscriptem / wasm" OFF)
 if (BABYLON_WASM)
@@ -17,7 +14,6 @@ if (BABYLON_WASM)
     set(EMSCRIPTEN ON)
     set(BUILD_SHARED_LIBS OFF)
     set(BABYLON_DISABLE_INSTALL ON)
-    set(IMGUI_RUNNER_USE_GLFW OFF)
     set(OPTION_BUILD_TESTS_DEFAULT OFF)
     include(${CMAKE_CURRENT_LIST_DIR}/cmake/WasmEmscriptenOptions.cmake)
 else()
