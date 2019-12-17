@@ -94,7 +94,11 @@ endif()
 # imgui library as a standalone shared library
 # imgui options
 option(IMGUI_RUNNER_USE_SDL "Build babylon sdl version" ON)
-option(IMGUI_RUNNER_USE_GLFW "Build babylon glfw version" ON)
+if (NOT EMSCRIPTEN)
+    option(IMGUI_RUNNER_USE_GLFW "Build babylon glfw version" ON)
+else()
+    set(IMGUI_RUNNER_USE_GLFW OFF)
+endif()
 option(IMGUI_IMPL_OPENGL_LOADER_GLAD "Use glad loader for imgui" ON)
 # Sources
 set(imgui_dir ${CMAKE_CURRENT_SOURCE_DIR}/imgui CACHE INTERNAL "imgui directory")
@@ -103,19 +107,17 @@ set(imgui_sources ${imgui_sources}
   ${imgui_dir}/examples/imgui_impl_opengl3.h
   ${imgui_dir}/examples/imgui_impl_opengl3.cpp
 )
-if (NOT EMSCRIPTEN)
-  if (IMGUI_RUNNER_USE_SDL)
-    set(imgui_sources ${imgui_sources} 
+if (IMGUI_RUNNER_USE_SDL)
+    set(imgui_sources ${imgui_sources}
         ${imgui_dir}/examples/imgui_impl_sdl.h
         ${imgui_dir}/examples/imgui_impl_sdl.cpp
      )
-  endif()
-  if (IMGUI_RUNNER_USE_GLFW)
-    set(imgui_sources ${imgui_sources} 
+endif()
+if (IMGUI_RUNNER_USE_GLFW)
+    set(imgui_sources ${imgui_sources}
         ${imgui_dir}/examples/imgui_impl_glfw.h
         ${imgui_dir}/examples/imgui_impl_glfw.cpp
      )
-  endif()
 endif()
 # Add library
 source_group_by_path_all(${imgui_dir} ${imgui_sources})
