@@ -128,7 +128,7 @@ bool GLRenderingContext::initialize(bool enableGLDebugging)
   // backupGLState();
 
   // Enable debug output
-#if ! defined(__EMSCRIPTEN_) && !defined(WIN_32BITS)
+#if ! defined(__EMSCRIPTEN__) && !defined(WIN_32BITS)
   if (enableGLDebugging) {
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(MessageCallback, nullptr);
