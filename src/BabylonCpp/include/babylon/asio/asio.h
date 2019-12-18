@@ -50,6 +50,20 @@ void LoadFileAsync_Binary(
   const OnProgressFunction& onProgressFunction = nullptr
   );
 
+void LoadUrlAsync_Text(
+  const std::string& url,
+  const std::function<void(const std::string& data)>& onSuccessFunction,
+  const OnErrorFunction& onErrorFunction,
+  const OnProgressFunction& onProgressFunction = nullptr
+);
+
+void LoadUrlAsync_Binary(
+  const std::string& url,
+  const std::function<void(const ArrayBuffer& data)>& onSuccessFunction,
+  const OnErrorFunction& onErrorFunction,
+  const OnProgressFunction& onProgressFunction = nullptr
+);
+
 
 void Service_WaitAll();
 

@@ -1,5 +1,6 @@
 #include <babylon/asio/asio.h>
 #include <babylon/core/filesystem.h>
+#include <babylon/core/string.h>
 
 #include <future>
 #include <algorithm>
@@ -7,6 +8,7 @@
 #include <chrono>
 #include <fstream>
 #include <iostream>
+#include <stdexcept>
 
 namespace BABYLON {
 namespace asio {
@@ -206,6 +208,32 @@ void LoadFileAsync_Binary(
   service.LoadData(syncLoader, onSuccessFunction, onErrorFunction);
 }
 
+void LoadUrlAsync_Text(
+  const std::string& url,
+  const std::function<void(const std::string& data)>& onSuccessFunction,
+  const OnErrorFunction& onErrorFunction,
+  const OnProgressFunction& onProgressFunction
+)
+{
+  if (!String::startsWith(url, "file://"))
+    throw std::runtime_error("LoadUrlAsync_Text only support files for the moment");
+  std::string filename = url.substr(7);
+  LoadFileAsync_Text(filename, onSuccessFunction, onErrorFunction, onProgressFunction);
+}
+
+void LoadUrlAsync_Binary(
+  const std::string& url,
+  const std::function<void(const ArrayBuffer& data)>& onSuccessFunction,
+  const OnErrorFunction& onErrorFunction,
+  const OnProgressFunction& onProgressFunction
+)
+{
+  if (!String::startsWith(url, "file://"))
+    throw std::runtime_error("LoadUrlAsync_Text only support files for the moment");
+  std::string filename = url.substr(7);
+  LoadFileAsync_Binary(filename, onSuccessFunction, onErrorFunction, onProgressFunction);
+}
+
 
 void Service_WaitAll()
 {
@@ -214,6 +242,7 @@ void Service_WaitAll()
   service.WaitAll();
   service2.WaitAll();
 }
+
 
 } // namespace asio
 } // namespace BABYLON
