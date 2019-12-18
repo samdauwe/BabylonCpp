@@ -1,6 +1,5 @@
 #include <babylon/materials/node/blocks/fragment/image_processing_block.h>
 
-#include <babylon/core/json_util.h>
 #include <babylon/core/string.h>
 #include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/node/node_material.h>

@@ -1,6 +1,5 @@
 #include <babylon/materials/node/blocks/fragment/fragment_output_block.h>
 
-#include <babylon/core/json_util.h>
 #include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_build_state_shared_data.h>
