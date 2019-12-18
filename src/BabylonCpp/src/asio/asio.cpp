@@ -36,13 +36,10 @@ private:
   {
     mStopRequested       = false;
     mBackgoundWork_Async = really_async([this]() { this->BackgroundWork(); });
-    std::cerr << "Construct AsyncLoadService\n";
   }
   ~AsyncLoadService()
   {
-    WaitAll();
     mStopRequested = true;
-    std::cerr << "Destruct AsyncLoadService\n";
   }
   using OnSuccessFunction            = std::function<void(const DataType& data)>;
   using FutureDataTypeOrErrorMessage = std::future<DataTypeOrErrorMessage<DataType>>;
@@ -101,8 +98,11 @@ private:
   std::atomic<bool> mStopRequested;
 
 public:
-  void LoadData(const SyncLoaderFunction<DataType>& syncLoader, const OnSuccessFunction& onSuccessFunction,
-                const OnErrorFunction& onErrorFunction)
+  void LoadData(
+    const SyncLoaderFunction<DataType>& syncLoader,
+    const OnSuccessFunction& onSuccessFunction,
+    const OnErrorFunction& onErrorFunction
+  )
   {
     FutureDataTypeOrErrorMessage futureData = really_async(syncLoader);
     FutureAndCallbacks payload{onSuccessFunction, onErrorFunction, std::move(futureData)};
@@ -124,30 +124,70 @@ public:
 };
 
 
-DataTypeOrErrorMessage<std::string> LoadTextFileSync(const std::string& filename)
+DataTypeOrErrorMessage<std::string> LoadFileSync_Text(
+  const std::string& filename, const OnProgressFunction& onProgressFunction)
 {
   std::ifstream ifs(filename);
   if (!ifs.good())
-    return ErrorMessage("LoadTextFile: Could not open file " + std::string(filename));
+    return ErrorMessage("LoadFileSync_Text: Could not open file " + std::string(filename));
 
   std::string str;
 
+
   ifs.seekg(0, std::ios::end);
-  str.reserve(ifs.tellg());
+  size_t fileSize = ifs.tellg();
+  str.reserve(fileSize);
+  if (onProgressFunction)
+    onProgressFunction(true, 0, fileSize);
   ifs.seekg(0, std::ios::beg);
   str.assign((std::istreambuf_iterator<char>(ifs)),
              std::istreambuf_iterator<char>());
-  //std::cerr << "Finished LoadTextFileSync\n";
+  if (onProgressFunction)
+    onProgressFunction(true, fileSize, fileSize);
   return str;
+}
+
+DataTypeOrErrorMessage<ArrayBuffer> LoadFileSync_Binary(
+  const std::string& filename,
+  const OnProgressFunction& onProgressFunction
+)
+{
+  std::ifstream ifs(filename.c_str(), std::ios::binary | std::ios::ate);
+  if (!ifs.good())
+    return ErrorMessage("LoadFileSync_Binary: Could not open file " + std::string(filename));
+
+  size_t fileSize = ifs.tellg();
+  ifs.seekg(0, std::ios::beg);
+
+  ArrayBuffer buffer;
+  buffer.resize(fileSize);
+
+  size_t alreadyReadSize = 0;
+  size_t blockSize = 1024 * 1024; // blocks of 1MB
+
+  while (alreadyReadSize < fileSize)
+  {
+    if (onProgressFunction)
+      onProgressFunction(true, alreadyReadSize, fileSize);
+
+    size_t sizeToRead = fileSize - alreadyReadSize > blockSize ? blockSize : fileSize - alreadyReadSize;
+    char * bufferPosition = (char*)(buffer.data() + alreadyReadSize);
+    ifs.read(bufferPosition, sizeToRead);
+    alreadyReadSize += sizeToRead;
+  }
+
+  return buffer;
 }
 
 void LoadFileAsync_Text(const std::string& filename,
                        const std::function<void(const std::string& data)>& onSuccessFunction,
-                       const OnErrorFunction& onErrorFunction)
+                       const OnErrorFunction& onErrorFunction,
+                       const OnProgressFunction& onProgressFunction
+                       )
 {
   auto & service = AsyncLoadService<std::string>::Instance();
-  auto syncLoader = [filename]() {
-    return LoadTextFileSync(filename);
+  auto syncLoader = [filename, onProgressFunction]() {
+    return LoadFileSync_Text(filename, onProgressFunction);
   };
   service.LoadData(syncLoader, onSuccessFunction, onErrorFunction);
 }
@@ -155,12 +195,13 @@ void LoadFileAsync_Text(const std::string& filename,
 void LoadFileAsync_Binary(
   const std::string& filename,
   const std::function<void(const ArrayBuffer& data)>& onSuccessFunction,
-  const OnErrorFunction& onErrorFunction)
+  const OnErrorFunction& onErrorFunction,
+  const OnProgressFunction& onProgressFunction
+  )
 {
   auto & service = AsyncLoadService<ArrayBuffer>::Instance();
-  auto syncLoader = [filename]() {
-    ArrayBuffer r = BABYLON::Filesystem::readBinaryFile(filename.c_str());
-    return r;
+  auto syncLoader = [filename, onProgressFunction]() {
+    return LoadFileSync_Binary(filename, onProgressFunction);
   };
   service.LoadData(syncLoader, onSuccessFunction, onErrorFunction);
 }
@@ -173,21 +214,6 @@ void Service_WaitAll()
   service.WaitAll();
   service2.WaitAll();
 }
-
-//SyncLoaderFunction<std::string> LoadTextAsync(const std::string& url)
-//{
-//  SyncLoaderFunction<std::string> f;
-//  return f;
-//}
-
-// auto & gAsyncLoadString = AsyncLoadService<std::string>::Instance();
-// AsyncLoadService<ArrayBuffer> gAsyncLoadArrayBuffer;
-
-//void LoadTextAsync(const std::string& url,
-//                   const std::function<void(const std::string& data)>& onSuccessFunction,
-//                   const OnErrorFunction& onErrorFunction)
-//{
-//}
 
 } // namespace asio
 } // namespace BABYLON

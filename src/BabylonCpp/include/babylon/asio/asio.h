@@ -2,7 +2,6 @@
 #define BABYLON_ASYNC_REQUESTS_H
 
 #include <babylon/babylon_common.h>
-
 #include <variant>
 #include <functional>
 #include <string>
@@ -12,6 +11,9 @@ namespace asio {
 
 
 using OnErrorFunction = std::function<void(const std::string& errorMessage)>;
+
+using OnProgressFunction =
+  std::function<void(bool lengthComputable, size_t loaded, size_t total)>;
 
 struct ErrorMessage {
   std::string errorMessage;
@@ -24,17 +26,29 @@ using DataTypeOrErrorMessage = std::variant<DataType, ErrorMessage>;
 template <typename DataType>
 using SyncLoaderFunction = std::function<DataTypeOrErrorMessage<DataType>()>;
 
-DataTypeOrErrorMessage<std::string> LoadTextFileSync(const std::string& filename);
+DataTypeOrErrorMessage<std::string> LoadFileSync_Text(
+  const std::string& filename,
+  const OnProgressFunction& onProgressFunction
+  );
+
+DataTypeOrErrorMessage<ArrayBuffer> LoadFileSync_Binary(
+  const std::string& filename,
+  const OnProgressFunction& onProgressFunction
+  );
 
 void LoadFileAsync_Text(
   const std::string& filename,
   const std::function<void(const std::string& data)>& onSuccessFunction,
-  const OnErrorFunction& onErrorFunction);
+  const OnErrorFunction& onErrorFunction,
+  const OnProgressFunction& onProgressFunction = nullptr
+  );
 
 void LoadFileAsync_Binary(
   const std::string& filename,
   const std::function<void(const ArrayBuffer& data)>& onSuccessFunction,
-  const OnErrorFunction& onErrorFunction);
+  const OnErrorFunction& onErrorFunction,
+  const OnProgressFunction& onProgressFunction = nullptr
+  );
 
 
 void Service_WaitAll();
