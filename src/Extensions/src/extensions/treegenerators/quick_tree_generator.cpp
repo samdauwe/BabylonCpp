@@ -11,11 +11,9 @@
 namespace BABYLON {
 namespace Extensions {
 
-MeshPtr QuickTreeGenerator::CreateTree(float sizeBranch, float sizeTrunk,
-                                       float radius,
+MeshPtr QuickTreeGenerator::CreateTree(float sizeBranch, float sizeTrunk, float radius,
                                        const MaterialPtr& trunkMaterial,
-                                       const MaterialPtr& leafMaterial,
-                                       Scene* scene)
+                                       const MaterialPtr& leafMaterial, Scene* scene)
 {
   auto tree       = Mesh::New("tree", scene);
   tree->isVisible = false;
@@ -76,7 +74,7 @@ MeshPtr QuickTreeGenerator::CreateTree(float sizeBranch, float sizeTrunk,
     auto ry = randomNumber(_min, _max);
     auto rz = randomNumber(_min, _max);
 
-    for (unsigned long i : sizes[v]) {
+    for (auto i : sizes[v]) {
       positions[i] += rx;
       positions[i + 1] += ry;
       positions[i + 2] += rz;
@@ -92,8 +90,7 @@ MeshPtr QuickTreeGenerator::CreateTree(float sizeBranch, float sizeTrunk,
   leaves->material     = leafMaterial;
   leaves->position().y = sizeTrunk + sizeBranch / 2.f - 2.f;
 
-  auto trunk = Mesh::CreateCylinder("trunk", sizeTrunk,
-                                    radius - 2.f < 1.f ? 1.f : radius - 2.f,
+  auto trunk = Mesh::CreateCylinder("trunk", sizeTrunk, radius - 2.f < 1.f ? 1.f : radius - 2.f,
                                     radius, 10, 1, scene);
 
   trunk->position().y = (sizeBranch / 2.f + 2.f) - sizeTrunk / 2.f;
