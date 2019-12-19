@@ -312,8 +312,8 @@ ReflectionTextureBlock& ReflectionTextureBlock::_buildBlock(NodeMaterialBuildSta
   state._samplerDeclaration += "#endif\r\n";
 
   // Fragment
-  state.sharedData->blocksWithDefines.emplace_back(this);
-  state.sharedData->bindableBlocks.emplace_back(this);
+  state.sharedData->blocksWithDefines.emplace_back(shared_from_this());
+  state.sharedData->bindableBlocks.emplace_back(shared_from_this());
 
   auto comments = String::printf("//%s", name.c_str());
   state._emitFunction("ReciprocalPI", "#define RECIPROCAL_PI2 0.15915494", "");

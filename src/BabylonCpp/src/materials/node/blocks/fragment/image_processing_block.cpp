@@ -92,13 +92,13 @@ ImageProcessingBlock& ImageProcessingBlock::_buildBlock(NodeMaterialBuildState& 
   NodeMaterialBlock::_buildBlock(state);
 
   // Register for defines
-  state.sharedData->blocksWithDefines.emplace_back(this);
+  state.sharedData->blocksWithDefines.emplace_back(shared_from_this());
 
   // Register for blocking
-  state.sharedData->blockingBlocks.emplace_back(this);
+  state.sharedData->blockingBlocks.emplace_back(shared_from_this());
 
   // Register for binding
-  state.sharedData->bindableBlocks.emplace_back(this);
+  state.sharedData->bindableBlocks.emplace_back(shared_from_this());
 
   // Uniforms
   state.uniforms.emplace_back("exposureLinear");

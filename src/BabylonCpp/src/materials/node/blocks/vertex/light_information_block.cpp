@@ -66,7 +66,7 @@ LightInformationBlock& LightInformationBlock::_buildBlock(NodeMaterialBuildState
 {
   NodeMaterialBlock::_buildBlock(state);
 
-  state.sharedData->bindableBlocks.emplace_back(this);
+  state.sharedData->bindableBlocks.emplace_back(shared_from_this());
 
   const auto& _direction = direction();
   const auto& _color     = color();

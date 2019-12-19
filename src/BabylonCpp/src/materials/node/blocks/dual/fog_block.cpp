@@ -126,8 +126,8 @@ FogBlock& FogBlock::_buildBlock(NodeMaterialBuildState& state)
   NodeMaterialBlock::_buildBlock(state);
 
   if (state.target == NodeMaterialBlockTargets::Fragment) {
-    state.sharedData->blocksWithDefines.emplace_back(this);
-    state.sharedData->bindableBlocks.emplace_back(this);
+    state.sharedData->blocksWithDefines.emplace_back(shared_from_this());
+    state.sharedData->bindableBlocks.emplace_back(shared_from_this());
 
     state._emitFunctionFromInclude(
       "fogFragmentDeclaration", String::printf("//%s", name.c_str()),

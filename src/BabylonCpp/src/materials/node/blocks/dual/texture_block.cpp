@@ -294,9 +294,9 @@ TextureBlock& TextureBlock::_buildBlock(NodeMaterialBuildState& state)
   state._samplerDeclaration += String::printf("uniform sampler2D %s;\r\n", _samplerName.c_str());
 
   // Fragment
-  state.sharedData->bindableBlocks.emplace_back(this);
+  state.sharedData->bindableBlocks.emplace_back(shared_from_this());
   if (_isMixed()) {
-    state.sharedData->blocksWithDefines.emplace_back(this);
+    state.sharedData->blocksWithDefines.emplace_back(shared_from_this());
     state._emitUniformFromString(_textureInfoName, "float");
   }
 

@@ -143,13 +143,13 @@ BonesBlock& BonesBlock::_buildBlock(NodeMaterialBuildState& state)
   NodeMaterialBlock::_buildBlock(state);
 
   // Register for compilation fallbacks
-  state.sharedData->blocksWithFallbacks.emplace_back(this);
+  state.sharedData->blocksWithFallbacks.emplace_back(shared_from_this());
 
   // Register for binding
-  state.sharedData->bindableBlocks.emplace_back(this);
+  state.sharedData->bindableBlocks.emplace_back(shared_from_this());
 
   // Register for defines
-  state.sharedData->blocksWithDefines.emplace_back(this);
+  state.sharedData->blocksWithDefines.emplace_back(shared_from_this());
 
   // Register internal uniforms and samplers
   state.uniforms.emplace_back("boneTextureWidth");

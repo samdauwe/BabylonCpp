@@ -117,14 +117,15 @@ void LightBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeM
 
 void LightBlock::updateUniformsAndSamples(NodeMaterialBuildState& state,
                                           const NodeMaterialPtr& nodeMaterial,
-                                          const NodeMaterialDefines& defines)
+                                          const NodeMaterialDefines& defines,
+                                          std::vector<std::string>& uniformBuffers)
 {
   for (auto lightIndex = 0u; lightIndex < nodeMaterial->maxSimultaneousLights; ++lightIndex) {
     if (!defines["LIGHT" + std::to_string(lightIndex)]) {
       break;
     }
     MaterialHelper::PrepareUniformsAndSamplersForLight(lightIndex, state.uniforms, state.samplers,
-                                                       state.uniformBuffers, false);
+                                                       uniformBuffers, false);
   }
 }
 
@@ -219,8 +220,8 @@ LightBlock& LightBlock::_buildBlock(NodeMaterialBuildState& state)
   }
 
   // Fragment
-  state.sharedData->bindableBlocks.emplace_back(this);
-  state.sharedData->blocksWithDefines.emplace_back(this);
+  state.sharedData->bindableBlocks.emplace_back(shared_from_this());
+  state.sharedData->blocksWithDefines.emplace_back(shared_from_this());
 
   auto comments        = String::printf("//%s", name.c_str());
   const auto& worldPos = worldPosition();
@@ -252,10 +253,6 @@ LightBlock& LightBlock::_buildBlock(NodeMaterialBuildState& state)
     state._emitFunctionFromInclude(state.supportUniformBuffers ? "lightUboDeclaration" :
                                                                  "lightFragmentDeclaration",
                                    comments, options, std::to_string(_lightId));
-
-    // Uniforms and samplers
-    MaterialHelper::PrepareUniformsAndSamplersForLight(_lightId, state.uniforms, state.samplers,
-                                                       state.uniformBuffers, true, false);
   }
 
   // Code
