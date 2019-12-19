@@ -1,6 +1,8 @@
 #ifndef BABYLON_ASYNC_REQUESTS_H
 #define BABYLON_ASYNC_REQUESTS_H
 
+#define ASIO_SYNC_CALLBACKS
+
 #include <babylon/babylon_common.h>
 #include <variant>
 #include <functional>
@@ -20,21 +22,6 @@ struct ErrorMessage {
   explicit ErrorMessage(const std::string & message): errorMessage(message) {};
 };
 
-template <typename DataType>
-using DataTypeOrErrorMessage = std::variant<DataType, ErrorMessage>;
-
-template <typename DataType>
-using SyncLoaderFunction = std::function<DataTypeOrErrorMessage<DataType>()>;
-
-DataTypeOrErrorMessage<std::string> LoadFileSync_Text(
-  const std::string& filename,
-  const OnProgressFunction& onProgressFunction
-  );
-
-DataTypeOrErrorMessage<ArrayBuffer> LoadFileSync_Binary(
-  const std::string& filename,
-  const OnProgressFunction& onProgressFunction
-  );
 
 void LoadFileAsync_Text(
   const std::string& filename,
@@ -64,8 +51,15 @@ void LoadUrlAsync_Binary(
   const OnProgressFunction& onProgressFunction = nullptr
 );
 
+// Call this in the app's main loop:
+// after the io completion, it will run the callbacks *synchronously*
+void HeartBeat_Sync();
 
-void Service_WaitAll();
+//
+bool HasRemainingTasks();
+
+//
+void Service_WaitAll_Sync();
 
 } // namespace asio
 } // namespace BABYLON

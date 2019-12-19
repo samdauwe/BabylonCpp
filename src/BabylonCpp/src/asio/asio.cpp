@@ -2,6 +2,7 @@
 #include <babylon/core/filesystem.h>
 #include <babylon/core/string.h>
 
+#include <deque>
 #include <future>
 #include <algorithm>
 #include <atomic>
@@ -32,64 +33,100 @@ future_running_status get_future_running_status(std::future<T>& v)
 }
 
 template <typename DataType>
+using DataTypeOrErrorMessage = std::variant<DataType, ErrorMessage>;
+
+template <typename DataType>
+using SyncLoaderFunction = std::function<DataTypeOrErrorMessage<DataType>()>;
+
+template<typename DataType>
+using OnSuccessFunction            = std::function<void(const DataType& data)>;
+
+template<typename DataType>
+using FutureDataTypeOrErrorMessage = std::future<DataTypeOrErrorMessage<DataType>>;
+
+using VoidCallback = std::function<void()>;
+
+
+void EmptyVoidCallback() {}
+
+template<typename DataType>
+struct FutureAndCallbacks {
+  OnSuccessFunction<DataType> onSuccessFunction;
+  OnErrorFunction onErrorFunction;
+  FutureDataTypeOrErrorMessage<DataType> futureDataTypeOrErrorMessage;
+
+
+  std::optional<VoidCallback> shallCallNextCallback()
+  {
+    auto status = get_future_running_status(futureDataTypeOrErrorMessage);
+    if (status != future_running_status::future_ready)
+      return std::nullopt;
+
+    DataTypeOrErrorMessage<DataType> v = futureDataTypeOrErrorMessage.get();
+
+    VoidCallback nextCallback = EmptyVoidCallback;
+    if (std::holds_alternative<ErrorMessage>(v))
+    {
+      if (onErrorFunction)
+      {
+        const auto& errorMessage = std::get<ErrorMessage>(v);
+
+        auto onErrorFunctionCopy = this->onErrorFunction;
+        nextCallback = [errorMessage, onErrorFunctionCopy]() {
+          onErrorFunctionCopy(errorMessage.errorMessage);
+        };
+      }
+    }
+
+    if (std::holds_alternative<DataType>(v))
+    {
+      if (onSuccessFunction)
+      {
+        const auto& data = std::get<DataType>(v);
+
+        auto onSuccessFunctionCopy = this->onSuccessFunction;
+        nextCallback = [onSuccessFunctionCopy, data]() {
+          onSuccessFunctionCopy(data);
+        };
+      }
+    }
+    return nextCallback;
+  }
+
+};
+
+
+template <typename DataType>
 class AsyncLoadService {
 private:
   AsyncLoadService()
   {
     mStopRequested       = false;
-    mHasRunningTasks     = false;
-    mBackgoundWork_Async = really_async([this]() { this->BackgroundWork(); });
+    mHasRunningIOTasks       = false;
+    mCheckIOCompletion_Async = really_async([this]() { this->CheckIOCompletion_AsyncProc(); });
   }
   ~AsyncLoadService()
   {
     mStopRequested = true;
   }
-  using OnSuccessFunction            = std::function<void(const DataType& data)>;
-  using FutureDataTypeOrErrorMessage = std::future<DataTypeOrErrorMessage<DataType>>;
-
-  struct FutureAndCallbacks {
-    OnSuccessFunction onSuccessFunction;
-    OnErrorFunction onErrorFunction;
-    FutureDataTypeOrErrorMessage futureDataTypeOrErrorMessage;
-
-    bool signalCallbacksIfFinished()
-    {
-      auto status = get_future_running_status(futureDataTypeOrErrorMessage);
-      if (status == future_running_status::future_ready) {
-        DataTypeOrErrorMessage<DataType> v = futureDataTypeOrErrorMessage.get();
-        if (std::holds_alternative<ErrorMessage>(v)) {
-          const auto& errorMessage = std::get<ErrorMessage>(v);
-          onErrorFunction(errorMessage.errorMessage);
-        }
-        if (std::holds_alternative<DataType>(v)) {
-          const auto& data = std::get<DataType>(v);
-          onSuccessFunction(data);
-        }
-        return true;
-      }
-      return false;
-    }
-
-    bool stillRunning()
-    {
-      bool finished = signalCallbacksIfFinished();
-      return !finished;
-    }
-  };
 
   void CheckTasksStatus()
   {
-    std::lock_guard<std::mutex> guard(mMutexTasks);
-    std::vector<FutureAndCallbacks> stillRunningTasks;
-    for (auto& runningTask : mRunningTasks) {
-      if (runningTask.stillRunning())
+    std::lock_guard<std::mutex> guard(mMutexRunningIOTasks);
+    std::vector<FutureAndCallbacks<DataType>> stillRunningTasks;
+    for (auto& runningTask : mRunningIOTasks)
+    {
+      std::optional<VoidCallback> nextCallback = runningTask.shallCallNextCallback();
+      if (nextCallback.has_value())
+        mRemainingCallbacksSync.emplace_back(std::move(nextCallback.value()));
+      else
         stillRunningTasks.emplace_back(std::move(runningTask));
     }
-    mRunningTasks = std::move(stillRunningTasks);
-    mHasRunningTasks = ! mRunningTasks.empty();
+    mRunningIOTasks  = std::move(stillRunningTasks);
+    mHasRunningIOTasks = !mRunningIOTasks.empty();
   }
 
-  void BackgroundWork()
+  void CheckIOCompletion_AsyncProc() // This will be called in a parallel thread
   {
     using namespace std::literals;
     while (!mStopRequested) {
@@ -98,26 +135,19 @@ private:
     }
   }
 
-  std::vector<FutureAndCallbacks> mRunningTasks;
-  std::future<void> mBackgoundWork_Async;
-  std::atomic<bool> mStopRequested;
-  std::atomic<bool> mHasRunningTasks;
-
-  std::mutex mMutexTasks;
-
 public:
   void LoadData(
     const SyncLoaderFunction<DataType>& syncLoader,
-    const OnSuccessFunction& onSuccessFunction,
+    const OnSuccessFunction<DataType>& onSuccessFunction,
     const OnErrorFunction& onErrorFunction
   )
   {
-    FutureDataTypeOrErrorMessage futureData = really_async(syncLoader);
-    FutureAndCallbacks payload{onSuccessFunction, onErrorFunction, std::move(futureData)};
-    mHasRunningTasks = true;
+    FutureDataTypeOrErrorMessage<DataType> futureData = really_async(syncLoader);
+    FutureAndCallbacks<DataType> payload{onSuccessFunction, onErrorFunction, std::move(futureData)};
+    mHasRunningIOTasks = true;
 
-    std::lock_guard<std::mutex> guard(mMutexTasks);
-    mRunningTasks.emplace_back(std::move(payload));
+    std::lock_guard<std::mutex> guard(mMutexRunningIOTasks);
+    mRunningIOTasks.emplace_back(std::move(payload));
   }
 
   static AsyncLoadService<DataType>& Instance()
@@ -126,12 +156,41 @@ public:
     return instance;
   }
 
-  void WaitAll()
+  void HeartBeat_Sync()
+  {
+    if (!mRemainingCallbacksSync.empty())
+    {
+      auto callback = mRemainingCallbacksSync.front();
+      mRemainingCallbacksSync.pop_front();
+      callback();
+    }
+  }
+
+  void WaitAll_Sync()
   {
     using namespace std::literals;
-    while(mHasRunningTasks)
-      std::this_thread::sleep_for(50ms);
+    while(HasRemainingTasks())
+    {
+      HeartBeat_Sync();
+      // In the meantime, mCheckIOCompletion_Async is still running
+    }
   }
+
+  bool HasRemainingTasks()
+  {
+    return mHasRunningIOTasks || !mRemainingCallbacksSync.empty();
+  }
+
+private:
+  std::vector<FutureAndCallbacks<DataType>> mRunningIOTasks;
+  std::atomic<bool> mHasRunningIOTasks;
+  std::mutex mMutexRunningIOTasks;
+
+  std::deque<VoidCallback> mRemainingCallbacksSync;
+
+  std::future<void> mCheckIOCompletion_Async;
+  std::atomic<bool> mStopRequested;
+
 };
 
 
@@ -243,15 +302,31 @@ void LoadUrlAsync_Binary(
   LoadFileAsync_Binary(filename, onSuccessFunction, onErrorFunction, onProgressFunction);
 }
 
-
-void Service_WaitAll()
+// Call this in the app's main loop: it will run the callbacks synchronously
+// after the io completion
+void HeartBeat_Sync()
 {
   auto & service = AsyncLoadService<std::string>::Instance();
   auto & service2 = AsyncLoadService<BABYLON::ArrayBuffer>::Instance();
-  service.WaitAll();
-  service2.WaitAll();
+  service.HeartBeat_Sync();
+  service2.HeartBeat_Sync();
 }
 
+
+void Service_WaitAll_Sync()
+{
+  auto & service = AsyncLoadService<std::string>::Instance();
+  auto & service2 = AsyncLoadService<BABYLON::ArrayBuffer>::Instance();
+  service.WaitAll_Sync();
+  service2.WaitAll_Sync();
+}
+
+bool HasRemainingTasks()
+{
+  auto & service = AsyncLoadService<std::string>::Instance();
+  auto & service2 = AsyncLoadService<BABYLON::ArrayBuffer>::Instance();
+  return service.HasRemainingTasks() || service2.HasRemainingTasks();
+}
 
 } // namespace asio
 } // namespace BABYLON
