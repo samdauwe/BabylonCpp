@@ -27,6 +27,7 @@ NodeMaterialBuildStateSharedData::NodeMaterialBuildStateSharedData()
   variableNames["diffuseBase"]          = 0;
   variableNames["specularBase"]         = 0;
   variableNames["worldPos"]             = 0;
+  variableNames["shadow"]               = 0;
 
   // Exclude known varyings
   variableNames["vTBN"] = 0;

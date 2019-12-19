@@ -150,10 +150,12 @@ public:
    * @param state defines the state to update
    * @param nodeMaterial defines the node material requesting the update
    * @param defines defines the material defines to update
+   * @param uniformBuffers defines the list of uniform buffer names
    */
   virtual void updateUniformsAndSamples(NodeMaterialBuildState& state,
                                         const NodeMaterialPtr& nodeMaterial,
-                                        const NodeMaterialDefines& defines);
+                                        const NodeMaterialDefines& defines,
+                                        std::vector<std::string>& uniformBuffers);
 
   /**
    * @brief Add potential fallbacks if shader compilation fails.

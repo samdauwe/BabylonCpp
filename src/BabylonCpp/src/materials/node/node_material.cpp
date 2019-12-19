@@ -535,8 +535,10 @@ bool NodeMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, b
     }
 
     // Uniforms
+    std::vector<std::string> uniformBuffers;
     for (const auto& b : _sharedData->dynamicUniformBlocks) {
-      b->updateUniformsAndSamples(*_vertexCompilationState, shared_from_this(), *defines);
+      b->updateUniformsAndSamples(*_vertexCompilationState, shared_from_this(), *defines,
+                                  uniformBuffers);
     }
 
     auto mergedUniforms = _vertexCompilationState->uniforms;
@@ -544,15 +546,6 @@ bool NodeMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, b
     for (const auto& u : _fragmentCompilationState->uniforms) {
       if (!stl_util::contains(mergedUniforms, u)) {
         mergedUniforms.emplace_back(u);
-      }
-    }
-
-    // Uniform buffers
-    auto mergedUniformBuffers = _vertexCompilationState->uniformBuffers;
-
-    for (const auto& u : _fragmentCompilationState->uniformBuffers) {
-      if (!stl_util::contains(mergedUniformBuffers, u)) {
-        mergedUniformBuffers.emplace_back(u);
       }
     }
 
@@ -589,7 +582,7 @@ bool NodeMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, b
     EffectCreationOptions iOptions;
     iOptions.attributes            = _vertexCompilationState->attributes;
     iOptions.uniformsNames         = std::move(mergedUniforms);
-    iOptions.uniformBuffersNames   = std::move(mergedUniformBuffers);
+    iOptions.uniformBuffersNames   = std::move(uniformBuffers);
     iOptions.samplers              = std::move(mergedSamplers);
     iOptions.materialDefines       = defines.get();
     iOptions.defines               = std::move(join);

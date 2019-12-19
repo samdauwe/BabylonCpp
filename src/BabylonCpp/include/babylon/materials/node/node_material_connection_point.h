@@ -9,6 +9,7 @@
 #include <babylon/babylon_common.h>
 #include <babylon/materials/node/enums/node_material_block_connection_point_types.h>
 #include <babylon/materials/node/enums/node_material_block_targets.h>
+#include <babylon/misc/observable.h>
 
 using json = nlohmann::json;
 
@@ -20,6 +21,28 @@ class NodeMaterialConnectionPoint;
 using InputBlockPtr                  = std::shared_ptr<InputBlock>;
 using NodeMaterialBlockPtr           = std::shared_ptr<NodeMaterialBlock>;
 using NodeMaterialConnectionPointPtr = std::shared_ptr<NodeMaterialConnectionPoint>;
+
+/**
+ * @brief  Enum used to define the compatibility state between two connection points.
+ */
+enum class BABYLON_SHARED_EXPORT NodeMaterialConnectionPointCompatibilityStates {
+  /** Points are compatibles */
+  Compatible,
+  /** Points are incompatible because of their types */
+  TypeIncompatible,
+  /** Points are incompatible because of their targets (vertex vs fragment) */
+  TargetIncompatible
+}; // end of enum class NodeMaterialConnectionPointCompatibilityStates
+
+/**
+ * @brief Defines the direction of a connection point.
+ */
+enum class BABYLON_SHARED_EXPORT NodeMaterialConnectionPointDirection {
+  /** Input */
+  Input,
+  /** Output */
+  Output
+}; // end of enum class NodeMaterialConnectionPointDirection
 
 /**
  * @brief Defines a connection point for a block.
@@ -43,12 +66,19 @@ public:
   std::string getClassName() const;
 
   /**
-   * @brief Gets an boolean indicating if the current point can be connected to
-   * another point.
+   * @brief Gets a boolean indicating if the current point can be connected to another point.
    * @param connectionPoint defines the other connection point
-   * @returns true if the connection is possible
+   * @returns a boolean
    */
   bool canConnectTo(const NodeMaterialConnectionPoint& connectionPoint);
+
+  /**
+   * @brief Gets a number indicating if the current point can be connected to another point.
+   * @param connectionPoint defines the other connection point
+   * @returns a number defining the compatibility state
+   */
+  NodeMaterialConnectionPointCompatibilityStates
+  checkCompatibilityState(const NodeMaterialConnectionPoint& connectionPoint);
 
   /**
    * @brief Connect this point to another connection point.
@@ -73,13 +103,25 @@ public:
    */
   json serialize() const;
 
+  /**
+   * @brief Release resources.
+   */
+  void dispose();
+
 protected:
   /**
-   * @brief Creates a new connection point.
+   * @brief Creates a new connection point
    * @param name defines the connection point name
    * @param ownerBlock defines the block hosting this connection point
+   * @param direction defines the direction of the connection point
    */
-  NodeMaterialConnectionPoint(const std::string& name, const NodeMaterialBlockPtr& ownerBlock);
+  NodeMaterialConnectionPoint(const std::string& name, const NodeMaterialBlockPtr& ownerBlock,
+                              const NodeMaterialConnectionPointDirection& direction);
+
+  /**
+   * @brief Gets the direction of the point
+   */
+  NodeMaterialConnectionPointDirection& get_direction();
 
   /**
    * @brief Gets the associated variable name in the shader.
@@ -100,6 +142,16 @@ protected:
    * @brief Sets the connection point type (default is float).
    */
   void set_type(const NodeMaterialBlockConnectionPointTypes& value);
+
+  /**
+   * @brief Gets the target of that connection point.
+   */
+  NodeMaterialBlockTargets& get_target();
+
+  /**
+   * @brief Sets the target of that connection point.
+   */
+  void set_target(const NodeMaterialBlockTargets& value);
 
   /**
    * @brief Gets a boolean indicating that the current point is connected.
@@ -148,6 +200,16 @@ protected:
    */
   bool get_hasEndpoints() const;
 
+  /**
+   * @brief Gets a boolean indicating that this connection will be used in the vertex shader.
+   */
+  bool get_isConnectedInVertexShader() const;
+
+  /**
+   * @brief Gets a boolean indicating that this connection will be used in the fragment shader.
+   */
+  bool get_isConnectedInFragmentShader() const;
+
 public:
   /** Hidden */
   NodeMaterialBlockPtr _ownerBlock;
@@ -164,7 +226,12 @@ public:
   bool _enforceAssociatedVariableName;
 
   /**
-   * Gets or sets the additional types supported byt this connection point
+   * Gets the direction of the point
+   */
+  ReadOnlyProperty<NodeMaterialConnectionPoint, NodeMaterialConnectionPointDirection> direction;
+
+  /**
+   * Gets or sets the additional types supported by this connection point.
    */
   std::vector<NodeMaterialBlockConnectionPointTypes> acceptedConnectionPointTypes;
 
@@ -172,6 +239,11 @@ public:
    * Gets or sets the additional types excluded by this connection point
    */
   std::vector<NodeMaterialBlockConnectionPointTypes> excludedConnectionPointTypes;
+
+  /**
+   * Observable triggered when this point is connected
+   */
+  Observable<NodeMaterialConnectionPoint> onConnectionObservable;
 
   /**
    * Gets or sets the associated variable name in the shader
@@ -199,9 +271,14 @@ public:
   std::string define;
 
   /**
+   * Hidden
+   */
+  bool _prioritizeVertex;
+
+  /**
    * Gets or sets the target of that connection point
    */
-  NodeMaterialBlockTargets target;
+  Property<NodeMaterialConnectionPoint, NodeMaterialBlockTargets> target;
 
   /**
    * Gets a boolean indicating that the current point is connected.
@@ -249,13 +326,26 @@ public:
    */
   ReadOnlyProperty<NodeMaterialConnectionPoint, bool> hasEndpoints;
 
+  /**
+   * Gets a boolean indicating that this connection will be used in the vertex shader
+   */
+  ReadOnlyProperty<NodeMaterialConnectionPoint, bool> isConnectedInVertexShader;
+
+  /**
+   * Gets a boolean indicating that this connection will be used in the fragment shader
+   */
+  ReadOnlyProperty<NodeMaterialConnectionPoint, bool> isConnectedInFragmentShader;
+
 private:
   std::vector<NodeMaterialConnectionPointPtr> _endpoints;
   std::string _associatedVariableName;
+  NodeMaterialConnectionPointDirection _direction;
+  NodeMaterialBlockTargets _target;
   NodeMaterialBlockConnectionPointTypes _type;
   InputBlockPtr _connectInputBlock;
   NodeMaterialBlockPtr _sourceBlock;
   std::vector<NodeMaterialBlockPtr> _connectedBlocks;
+  NodeMaterialBlockTargets _tmpTarget;
 
 }; // end of enum class NodeMaterialConnectionPoint
 

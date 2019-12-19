@@ -76,6 +76,11 @@ public:
   /**
    * @brief Hidden
    */
+  void _emit2DSampler(const std::string& name);
+
+  /**
+   * @brief Hidden
+   */
   std::string _getGLType(NodeMaterialBlockConnectionPointTypes type) const;
 
   /**
@@ -145,9 +150,9 @@ public:
    */
   std::vector<std::string> uniforms;
   /**
-   * Gets the list of emitted uniform buffers
+   * Gets the list of emitted constants
    */
-  std::vector<std::string> uniformBuffers;
+  std::vector<std::string> constants;
   /**
    * Gets the list of emitted samplers
    */
@@ -182,6 +187,8 @@ public:
   std::string _attributeDeclaration;
   /** @hidden */
   std::string _uniformDeclaration;
+  /** @hidden */
+  std::string _constantDeclaration;
   /** @hidden */
   std::string _samplerDeclaration;
   /** @hidden */

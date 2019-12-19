@@ -15,13 +15,13 @@ class InputBlock;
 class NodeMaterialBlock;
 class NodeMaterialConnectionPoint;
 class ReflectionTextureBlock;
+class Scene;
 class TextureBlock;
-using InputBlockPtr        = std::shared_ptr<InputBlock>;
-using NodeMaterialBlockPtr = std::shared_ptr<NodeMaterialBlock>;
-using NodeMaterialConnectionPointPtr
-  = std::shared_ptr<NodeMaterialConnectionPoint>;
-using ReflectionTextureBlockPtr = std::shared_ptr<ReflectionTextureBlock>;
-using TextureBlockPtr           = std::shared_ptr<TextureBlock>;
+using InputBlockPtr                  = std::shared_ptr<InputBlock>;
+using NodeMaterialBlockPtr           = std::shared_ptr<NodeMaterialBlock>;
+using NodeMaterialConnectionPointPtr = std::shared_ptr<NodeMaterialConnectionPoint>;
+using ReflectionTextureBlockPtr      = std::shared_ptr<ReflectionTextureBlock>;
+using TextureBlockPtr                = std::shared_ptr<TextureBlock>;
 
 struct BABYLON_SHARED_EXPORT NodeMaterialCompilationHints {
   bool needWorldViewMatrix           = false;
@@ -75,8 +75,7 @@ struct BABYLON_SHARED_EXPORT NodeMaterialBuildStateSharedData {
   /**
    * Input blocks
    */
-  std::vector<std::variant<TextureBlockPtr, ReflectionTextureBlockPtr>>
-    textureBlocks;
+  std::vector<std::variant<TextureBlockPtr, ReflectionTextureBlockPtr>> textureBlocks;
 
   /**
    * Bindable blocks (Blocks that need to set data to the effect)
@@ -137,6 +136,11 @@ struct BABYLON_SHARED_EXPORT NodeMaterialBuildStateSharedData {
    * Emit build activity
    */
   bool verbose;
+
+  /**
+   * Gets or sets the hosting scene
+   */
+  Scene* scene;
 
   /**
    * Gets the compilation hints emitted at compilation time

@@ -148,7 +148,8 @@ NodeMaterialBlock::registerInput(const std::string& iName,
                                  const NodeMaterialBlockConnectionPointTypes& type, bool isOptional,
                                  const std::optional<NodeMaterialBlockTargets>& iTarget)
 {
-  auto point        = NodeMaterialConnectionPoint::New(iName, shared_from_this());
+  auto point        = NodeMaterialConnectionPoint::New(iName, shared_from_this(),
+                                                NodeMaterialConnectionPointDirection::Input);
   point->type       = type;
   point->isOptional = isOptional;
   if (iTarget.has_value()) {
@@ -165,7 +166,8 @@ NodeMaterialBlock::registerOutput(const std::string& iName,
                                   const NodeMaterialBlockConnectionPointTypes& type,
                                   const std::optional<NodeMaterialBlockTargets>& iTarget)
 {
-  auto point  = NodeMaterialConnectionPoint::New(iName, shared_from_this());
+  auto point  = NodeMaterialConnectionPoint::New(iName, shared_from_this(),
+                                                NodeMaterialConnectionPointDirection::Output);
   point->type = type;
   if (iTarget.has_value()) {
     point->target = *iTarget;
@@ -257,7 +259,8 @@ NodeMaterialBlock& NodeMaterialBlock::_buildBlock(NodeMaterialBuildState& /*stat
 
 void NodeMaterialBlock::updateUniformsAndSamples(NodeMaterialBuildState& /*state*/,
                                                  const NodeMaterialPtr& /*nodeMaterial*/,
-                                                 const NodeMaterialDefines& /*defines*/)
+                                                 const NodeMaterialDefines& /*defines*/,
+                                                 std::vector<std::string>& /*uniformBuffers*/)
 {
   // Do nothing
 }

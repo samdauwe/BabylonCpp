@@ -7,18 +7,22 @@
 
 namespace BABYLON {
 
-NodeMaterialConnectionPoint::NodeMaterialConnectionPoint(const std::string& iName,
-                                                         const NodeMaterialBlockPtr& ownerBlock)
+NodeMaterialConnectionPoint::NodeMaterialConnectionPoint(
+  const std::string& iName, const NodeMaterialBlockPtr& ownerBlock,
+  const NodeMaterialConnectionPointDirection& direction)
     : _ownerBlock{nullptr}
     , _connectedPoint{nullptr}
     , _typeConnectionSource{nullptr}
     , _linkedConnectionSource{nullptr}
     , _enforceAssociatedVariableName{false}
+    , direction{this, &NodeMaterialConnectionPoint::get_direction}
     , associatedVariableName{this, &NodeMaterialConnectionPoint::get_associatedVariableName,
                              &NodeMaterialConnectionPoint::set_associatedVariableName}
     , type{this, &NodeMaterialConnectionPoint::get_type, &NodeMaterialConnectionPoint::set_type}
     , isOptional{false}
-    , target{NodeMaterialBlockTargets::VertexAndFragment}
+    , _prioritizeVertex{false}
+    , target{this, &NodeMaterialConnectionPoint::get_target,
+             &NodeMaterialConnectionPoint::set_target}
     , isConnected{this, &NodeMaterialConnectionPoint::get_isConnected}
     , isConnectedToInputBlock{this, &NodeMaterialConnectionPoint::get_isConnectedToInputBlock}
     , connectInputBlock{this, &NodeMaterialConnectionPoint::get_connectInputBlock}
@@ -28,12 +32,22 @@ NodeMaterialConnectionPoint::NodeMaterialConnectionPoint(const std::string& iNam
     , connectedBlocks{this, &NodeMaterialConnectionPoint::get_connectedBlocks}
     , endpoints{this, &NodeMaterialConnectionPoint::get_endpoints}
     , hasEndpoints{this, &NodeMaterialConnectionPoint::get_hasEndpoints}
+    , isConnectedInVertexShader{this, &NodeMaterialConnectionPoint::get_isConnectedInVertexShader}
+    , isConnectedInFragmentShader{this,
+                                  &NodeMaterialConnectionPoint::get_isConnectedInFragmentShader}
+    , _target{NodeMaterialBlockTargets::VertexAndFragment}
     , _type{NodeMaterialBlockConnectionPointTypes::Float}
     , _connectInputBlock{nullptr}
     , _sourceBlock{nullptr}
 {
   _ownerBlock = ownerBlock;
   name        = iName;
+  _direction  = direction;
+}
+
+NodeMaterialConnectionPointDirection& NodeMaterialConnectionPoint::get_direction()
+{
+  return _direction;
 }
 
 std::string NodeMaterialConnectionPoint::get_associatedVariableName() const
@@ -86,6 +100,30 @@ NodeMaterialBlockConnectionPointTypes& NodeMaterialConnectionPoint::get_type()
 void NodeMaterialConnectionPoint::set_type(const NodeMaterialBlockConnectionPointTypes& value)
 {
   _type = value;
+}
+
+NodeMaterialBlockTargets& NodeMaterialConnectionPoint::get_target()
+{
+  if (!_prioritizeVertex || !_ownerBlock) {
+    return _target;
+  }
+
+  if (_target != NodeMaterialBlockTargets::VertexAndFragment) {
+    return _target;
+  }
+
+  if (_ownerBlock->target == NodeMaterialBlockTargets::Fragment) {
+    _tmpTarget = NodeMaterialBlockTargets::Fragment;
+    return _tmpTarget;
+  }
+
+  _tmpTarget = NodeMaterialBlockTargets::Vertex;
+  return _tmpTarget;
+}
+
+void NodeMaterialConnectionPoint::set_target(const NodeMaterialBlockTargets& value)
+{
+  _target = value;
 }
 
 bool NodeMaterialConnectionPoint::get_isConnected() const
@@ -154,6 +192,66 @@ bool NodeMaterialConnectionPoint::get_hasEndpoints() const
   return !_endpoints.empty();
 }
 
+bool NodeMaterialConnectionPoint::get_isConnectedInVertexShader() const
+{
+  if (target() == NodeMaterialBlockTargets::Vertex) {
+    return true;
+  }
+
+  if (!hasEndpoints()) {
+    return false;
+  }
+
+  for (const auto& endpoint : _endpoints) {
+    if (endpoint->ownerBlock()->target() == NodeMaterialBlockTargets::Vertex) {
+      return true;
+    }
+
+    if (endpoint->target() == NodeMaterialBlockTargets::Vertex) {
+      return true;
+    }
+
+    if (endpoint->ownerBlock()->target() == NodeMaterialBlockTargets::Neutral
+        || endpoint->ownerBlock()->target() == NodeMaterialBlockTargets::VertexAndFragment) {
+      for (const auto& o : endpoint->ownerBlock()->outputs()) {
+        if (o->isConnectedInVertexShader()) {
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
+bool NodeMaterialConnectionPoint::get_isConnectedInFragmentShader() const
+{
+  if (target() == NodeMaterialBlockTargets::Fragment) {
+    return true;
+  }
+
+  if (!hasEndpoints()) {
+    return false;
+  }
+
+  for (const auto& endpoint : _endpoints) {
+    if (endpoint->ownerBlock()->target() == NodeMaterialBlockTargets::Fragment) {
+      return true;
+    }
+
+    if (endpoint->ownerBlock()->target() == NodeMaterialBlockTargets::Neutral
+        || endpoint->ownerBlock()->target() == NodeMaterialBlockTargets::VertexAndFragment) {
+      for (const auto& o : endpoint->ownerBlock()->outputs()) {
+        if (o->isConnectedInFragmentShader()) {
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
 std::string NodeMaterialConnectionPoint::getClassName() const
 {
   return "NodeMaterialConnectionPoint";
@@ -161,28 +259,52 @@ std::string NodeMaterialConnectionPoint::getClassName() const
 
 bool NodeMaterialConnectionPoint::canConnectTo(const NodeMaterialConnectionPoint& connectionPoint)
 {
+  return checkCompatibilityState(connectionPoint)
+         == NodeMaterialConnectionPointCompatibilityStates::Compatible;
+}
+
+NodeMaterialConnectionPointCompatibilityStates NodeMaterialConnectionPoint::checkCompatibilityState(
+  const NodeMaterialConnectionPoint& connectionPoint)
+{
+  const auto& iOwnerBlock = _ownerBlock;
+
+  if (iOwnerBlock->target() == NodeMaterialBlockTargets::Fragment) {
+    // Let's check we are not going reverse
+    const auto& otherBlock = connectionPoint.ownerBlock();
+
+    if (otherBlock->target() == NodeMaterialBlockTargets::Vertex) {
+      return NodeMaterialConnectionPointCompatibilityStates::TargetIncompatible;
+    }
+
+    for (const auto& output : otherBlock->outputs()) {
+      if (output->isConnectedInVertexShader()) {
+        return NodeMaterialConnectionPointCompatibilityStates::TargetIncompatible;
+      }
+    }
+  }
+
   if (type != connectionPoint.type
       && connectionPoint.type() != NodeMaterialBlockConnectionPointTypes::AutoDetect) {
     // Equivalents
     switch (type) {
       case NodeMaterialBlockConnectionPointTypes::Vector3: {
         if (connectionPoint.type() == NodeMaterialBlockConnectionPointTypes::Color3) {
-          return true;
+          return NodeMaterialConnectionPointCompatibilityStates::Compatible;
         }
       } break;
       case NodeMaterialBlockConnectionPointTypes::Vector4: {
         if (connectionPoint.type() == NodeMaterialBlockConnectionPointTypes::Color4) {
-          return true;
+          return NodeMaterialConnectionPointCompatibilityStates::Compatible;
         }
       } break;
       case NodeMaterialBlockConnectionPointTypes::Color3: {
         if (connectionPoint.type() == NodeMaterialBlockConnectionPointTypes::Vector3) {
-          return true;
+          return NodeMaterialConnectionPointCompatibilityStates::Compatible;
         }
       } break;
       case NodeMaterialBlockConnectionPointTypes::Color4: {
         if (connectionPoint.type() == NodeMaterialBlockConnectionPointTypes::Vector4) {
-          return true;
+          return NodeMaterialConnectionPointCompatibilityStates::Compatible;
         }
       } break;
       default:
@@ -190,11 +312,22 @@ bool NodeMaterialConnectionPoint::canConnectTo(const NodeMaterialConnectionPoint
     }
 
     // Accepted types
-    return (!connectionPoint.acceptedConnectionPointTypes.empty()
-            && stl_util::contains(connectionPoint.acceptedConnectionPointTypes, type));
+    if (!connectionPoint.acceptedConnectionPointTypes.empty()
+        && stl_util::contains(connectionPoint.acceptedConnectionPointTypes, type)) {
+      return NodeMaterialConnectionPointCompatibilityStates::Compatible;
+    }
+    else {
+      return NodeMaterialConnectionPointCompatibilityStates::TypeIncompatible;
+    }
   }
 
-  return true;
+  // Excluded
+  if ((!connectionPoint.excludedConnectionPointTypes.empty()
+       && stl_util::contains(connectionPoint.excludedConnectionPointTypes, type))) {
+    return NodeMaterialConnectionPointCompatibilityStates::TypeIncompatible;
+  }
+
+  return NodeMaterialConnectionPointCompatibilityStates::Compatible;
 }
 
 NodeMaterialConnectionPoint&
@@ -202,13 +335,17 @@ NodeMaterialConnectionPoint::connectTo(const NodeMaterialConnectionPointPtr& con
                                        bool ignoreConstraints)
 {
   if (!ignoreConstraints && !canConnectTo(*connectionPoint)) {
-    throw std::runtime_error("Cannot connect two different connection types.");
+    throw std::runtime_error("Cannot connect these two connectors.");
   }
 
   _endpoints.emplace_back(connectionPoint);
   connectionPoint->_connectedPoint = shared_from_this();
 
   _enforceAssociatedVariableName = false;
+
+  onConnectionObservable.notifyObservers(connectionPoint.get());
+  connectionPoint->onConnectionObservable.notifyObservers(this);
+
   return *this;
 }
 
@@ -231,6 +368,11 @@ NodeMaterialConnectionPoint::disconnectFrom(const NodeMaterialConnectionPointPtr
 json NodeMaterialConnectionPoint::serialize() const
 {
   return nullptr;
+}
+
+void NodeMaterialConnectionPoint::dispose()
+{
+  onConnectionObservable.clear();
 }
 
 } // end of namespace BABYLON

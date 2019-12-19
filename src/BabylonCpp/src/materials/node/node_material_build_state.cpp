@@ -28,6 +28,11 @@ void NodeMaterialBuildState::finalize(const NodeMaterialBuildState& state)
     = String::printf("\r\n%svoid main(void) {\r\n%s", emitComments ? "//Entry point\r\n" : "",
                      compilationString.c_str());
 
+  if (!_constantDeclaration.empty()) {
+    compilationString = String::printf("\r\n%s%s\r\n%s", emitComments ? "//Constants\r\n" : "",
+                                       _constantDeclaration.c_str(), compilationString.c_str());
+  }
+
   std::string functionCode = "";
   for (const auto& functionItem : functions) {
     functionCode += functionItem.second + "\r\n";
@@ -112,6 +117,12 @@ std::string NodeMaterialBuildState::_getFreeDefineName(const std::string& prefix
 void NodeMaterialBuildState::_excludeVariableName(const std::string& name)
 {
   sharedData->variableNames[name] = 0;
+}
+
+void NodeMaterialBuildState::_emit2DSampler(const std::string& name)
+{
+  _samplerDeclaration += String::printf("uniform sampler2D %s;\r\n", name.c_str());
+  samplers.emplace_back(name);
 }
 
 std::string NodeMaterialBuildState::_getGLType(NodeMaterialBlockConnectionPointTypes type) const
