@@ -1,4 +1,5 @@
 #include <babylon/asio/internal/file_loader_sync.h>
+#include <babylon/asio/internal/sync_callback_runner.h>
 
 #include <fstream>
 
@@ -21,12 +22,23 @@ DataTypeOrErrorMessage<std::string> LoadFileSync_Text(
   size_t fileSize = ifs.tellg();
   str.reserve(fileSize);
   if (onProgressFunction)
-    onProgressFunction(true, 0, fileSize);
+  {
+    auto f = [onProgressFunction, fileSize]() {
+      onProgressFunction(true, 0, fileSize);
+    };
+    sync_callback_runner::PushCallback(f);
+  }
+
   ifs.seekg(0, std::ios::beg);
   str.assign((std::istreambuf_iterator<char>(ifs)),
              std::istreambuf_iterator<char>());
   if (onProgressFunction)
-    onProgressFunction(true, fileSize, fileSize);
+  {
+    auto f = [onProgressFunction, fileSize]() {
+      onProgressFunction(true, fileSize, fileSize);
+    };
+    sync_callback_runner::PushCallback(f);
+  }
   return str;
 }
 
@@ -51,7 +63,13 @@ DataTypeOrErrorMessage<ArrayBuffer> LoadFileSync_Binary(
   while (alreadyReadSize < fileSize)
   {
     if (onProgressFunction)
-      onProgressFunction(true, alreadyReadSize, fileSize);
+    {
+      auto f = [onProgressFunction, alreadyReadSize, fileSize]() {
+        onProgressFunction(true, alreadyReadSize, fileSize);
+      };
+      sync_callback_runner::PushCallback(f);
+    }
+
 
     size_t sizeToRead = fileSize - alreadyReadSize > blockSize ? blockSize : fileSize - alreadyReadSize;
     char * bufferPosition = (char*)(buffer.data() + alreadyReadSize);

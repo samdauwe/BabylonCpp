@@ -12,31 +12,16 @@
 namespace BABYLON {
 namespace asio {
 
-
-void LoadFileAsync_Text(
-  const std::string& filename,
-  const OnSuccessFunction<std::string>& onSuccessFunction,
-  const OnErrorFunction& onErrorFunction,
-  const OnProgressFunction& onProgressFunction = nullptr
-  );
-
-void LoadFileAsync_Binary(
-  const std::string& filename,
-  const OnSuccessFunction<ArrayBuffer>& onSuccessFunction,
-  const OnErrorFunction& onErrorFunction,
-  const OnProgressFunction& onProgressFunction = nullptr
-  );
-
 void LoadUrlAsync_Text(
   const std::string& url,
-  const std::function<void(const std::string& data)>& onSuccessFunction,
+  const OnSuccessFunction<std::string>& onSuccessFunction,
   const OnErrorFunction& onErrorFunction,
   const OnProgressFunction& onProgressFunction = nullptr
 );
 
 void LoadUrlAsync_Binary(
   const std::string& url,
-  const std::function<void(const ArrayBuffer& data)>& onSuccessFunction,
+  const OnSuccessFunction<ArrayBuffer>& onSuccessFunction,
   const OnErrorFunction& onErrorFunction,
   const OnProgressFunction& onProgressFunction = nullptr
 );

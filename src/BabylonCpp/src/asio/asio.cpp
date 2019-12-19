@@ -4,15 +4,12 @@
 #include <babylon/asio/internal/future_utils.h>
 #include <babylon/core/filesystem.h>
 #include <babylon/core/string.h>
+#include <babylon/asio/internal/sync_callback_runner.h>
 
 #include <deque>
 #include <future>
-#include <algorithm>
 #include <atomic>
 #include <chrono>
-#include <fstream>
-#include <iostream>
-#include <stdexcept>
 
 namespace BABYLON {
 namespace asio {
@@ -25,10 +22,6 @@ using OnSuccessFunction            = std::function<void(const DataType& data)>;
 template<typename DataType>
 using FutureDataTypeOrErrorMessage = std::future<DataTypeOrErrorMessage<DataType>>;
 
-using VoidCallback = std::function<void()>;
-
-
-void EmptyVoidCallback() {}
 
 template<typename DataType>
 struct FutureAndCallbacks {
@@ -99,7 +92,7 @@ private:
     {
       std::optional<VoidCallback> nextCallback = runningTask.shallCallNextCallback();
       if (nextCallback.has_value())
-        mRemainingCallbacksSync.emplace_back(std::move(nextCallback.value()));
+        sync_callback_runner::PushCallback(std::move(nextCallback.value()));
       else
         stillRunningTasks.emplace_back(std::move(runningTask));
     }
@@ -137,37 +130,22 @@ public:
     return instance;
   }
 
-  void HeartBeat_Sync()
-  {
-    if (!mRemainingCallbacksSync.empty())
-    {
-      auto callback = mRemainingCallbacksSync.front();
-      mRemainingCallbacksSync.pop_front();
-      callback();
-    }
-  }
-
-  void WaitAll_Sync()
+  void WaitIoCompletion_Sync()
   {
     using namespace std::literals;
-    while(HasRemainingTasks())
-    {
-      HeartBeat_Sync();
-      // In the meantime, mCheckIOCompletion_Async is still running
-    }
+    while(mHasRunningIOTasks)
+      std::this_thread::sleep_for(50ms);
   }
 
-  bool HasRemainingTasks()
+  bool HasRunningIOTasks()
   {
-    return mHasRunningIOTasks || !mRemainingCallbacksSync.empty();
+    return mHasRunningIOTasks;
   }
 
 private:
   std::vector<FutureAndCallbacks<DataType>> mRunningIOTasks;
   std::atomic<bool> mHasRunningIOTasks;
   std::mutex mMutexRunningIOTasks;
-
-  std::deque<VoidCallback> mRemainingCallbacksSync;
 
   std::future<void> mCheckIOCompletion_Async;
   std::atomic<bool> mStopRequested;
@@ -233,10 +211,7 @@ void LoadUrlAsync_Binary(
 // after the io completion
 void HeartBeat_Sync()
 {
-  auto & service = AsyncLoadService<std::string>::Instance();
-  auto & service2 = AsyncLoadService<BABYLON::ArrayBuffer>::Instance();
-  service.HeartBeat_Sync();
-  service2.HeartBeat_Sync();
+  sync_callback_runner::HeartBeat();
 }
 
 
@@ -244,15 +219,18 @@ void Service_WaitAll_Sync()
 {
   auto & service = AsyncLoadService<std::string>::Instance();
   auto & service2 = AsyncLoadService<BABYLON::ArrayBuffer>::Instance();
-  service.WaitAll_Sync();
-  service2.WaitAll_Sync();
+  service.WaitIoCompletion_Sync();
+  service2.WaitIoCompletion_Sync();
+  sync_callback_runner::CallAllPendingCallbacks();
 }
 
 bool HasRemainingTasks()
 {
   auto & service = AsyncLoadService<std::string>::Instance();
   auto & service2 = AsyncLoadService<BABYLON::ArrayBuffer>::Instance();
-  return service.HasRemainingTasks() || service2.HasRemainingTasks();
+  return    service.HasRunningIOTasks()
+         || service2.HasRunningIOTasks()
+         || sync_callback_runner::HasRemainingCallbacks();
 }
 
 } // namespace asio
