@@ -1,4 +1,7 @@
 #include <babylon/asio/asio.h>
+
+#include <babylon/asio/internal/file_loader_sync.h>
+#include <babylon/asio/internal/future_utils.h>
 #include <babylon/core/filesystem.h>
 #include <babylon/core/string.h>
 
@@ -14,29 +17,7 @@
 namespace BABYLON {
 namespace asio {
 
-template <typename F, typename... Ts>
-inline auto really_async(F&& f, Ts&&... params)
-{
-  return std::async(std::launch::async, std::forward<F>(f), std::forward<Ts>(params)...);
-}
-
-enum class future_running_status { future_not_launched, future_running, future_ready };
-template <typename T>
-future_running_status get_future_running_status(std::future<T>& v)
-{
-  if (!v.valid())
-    return future_running_status::future_not_launched;
-  if (v.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
-    return future_running_status::future_ready;
-  else
-    return future_running_status::future_running;
-}
-
-template <typename DataType>
-using DataTypeOrErrorMessage = std::variant<DataType, ErrorMessage>;
-
-template <typename DataType>
-using SyncLoaderFunction = std::function<DataTypeOrErrorMessage<DataType>()>;
+using namespace sync_io_impl;
 
 template<typename DataType>
 using OnSuccessFunction            = std::function<void(const DataType& data)>;
@@ -194,60 +175,6 @@ private:
 };
 
 
-DataTypeOrErrorMessage<std::string> LoadFileSync_Text(
-  const std::string& filename, const OnProgressFunction& onProgressFunction)
-{
-  std::ifstream ifs(filename);
-  if (!ifs.good())
-    return ErrorMessage("LoadFileSync_Text: Could not open file " + std::string(filename));
-
-  std::string str;
-
-
-  ifs.seekg(0, std::ios::end);
-  size_t fileSize = ifs.tellg();
-  str.reserve(fileSize);
-  if (onProgressFunction)
-    onProgressFunction(true, 0, fileSize);
-  ifs.seekg(0, std::ios::beg);
-  str.assign((std::istreambuf_iterator<char>(ifs)),
-             std::istreambuf_iterator<char>());
-  if (onProgressFunction)
-    onProgressFunction(true, fileSize, fileSize);
-  return str;
-}
-
-DataTypeOrErrorMessage<ArrayBuffer> LoadFileSync_Binary(
-  const std::string& filename,
-  const OnProgressFunction& onProgressFunction
-)
-{
-  std::ifstream ifs(filename.c_str(), std::ios::binary | std::ios::ate);
-  if (!ifs.good())
-    return ErrorMessage("LoadFileSync_Binary: Could not open file " + std::string(filename));
-
-  size_t fileSize = ifs.tellg();
-  ifs.seekg(0, std::ios::beg);
-
-  ArrayBuffer buffer;
-  buffer.resize(fileSize);
-
-  size_t alreadyReadSize = 0;
-  size_t blockSize = 1024 * 1024; // blocks of 1MB
-
-  while (alreadyReadSize < fileSize)
-  {
-    if (onProgressFunction)
-      onProgressFunction(true, alreadyReadSize, fileSize);
-
-    size_t sizeToRead = fileSize - alreadyReadSize > blockSize ? blockSize : fileSize - alreadyReadSize;
-    char * bufferPosition = (char*)(buffer.data() + alreadyReadSize);
-    ifs.read(bufferPosition, sizeToRead);
-    alreadyReadSize += sizeToRead;
-  }
-
-  return buffer;
-}
 
 void LoadFileAsync_Text(const std::string& filename,
                        const std::function<void(const std::string& data)>& onSuccessFunction,

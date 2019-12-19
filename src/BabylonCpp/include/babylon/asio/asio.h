@@ -4,6 +4,7 @@
 #define ASIO_SYNC_CALLBACKS
 
 #include <babylon/babylon_common.h>
+#include <babylon/asio/callback_types.h>
 #include <variant>
 #include <functional>
 #include <string>
@@ -12,27 +13,16 @@ namespace BABYLON {
 namespace asio {
 
 
-using OnErrorFunction = std::function<void(const std::string& errorMessage)>;
-
-using OnProgressFunction =
-  std::function<   void (bool lengthComputable, size_t loaded, size_t total)  >;
-
-struct ErrorMessage {
-  std::string errorMessage;
-  explicit ErrorMessage(const std::string & message): errorMessage(message) {};
-};
-
-
 void LoadFileAsync_Text(
   const std::string& filename,
-  const std::function<void(const std::string& data)>& onSuccessFunction,
+  const OnSuccessFunction<std::string>& onSuccessFunction,
   const OnErrorFunction& onErrorFunction,
   const OnProgressFunction& onProgressFunction = nullptr
   );
 
 void LoadFileAsync_Binary(
   const std::string& filename,
-  const std::function<void(const ArrayBuffer& data)>& onSuccessFunction,
+  const OnSuccessFunction<ArrayBuffer>& onSuccessFunction,
   const OnErrorFunction& onErrorFunction,
   const OnProgressFunction& onProgressFunction = nullptr
   );
