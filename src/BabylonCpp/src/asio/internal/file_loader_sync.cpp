@@ -70,7 +70,6 @@ DataTypeOrErrorMessage<ArrayBuffer> LoadFileSync_Binary(
       sync_callback_runner::PushCallback(f);
     }
 
-
     size_t sizeToRead = fileSize - alreadyReadSize > blockSize ? blockSize : fileSize - alreadyReadSize;
     char * bufferPosition = (char*)(buffer.data() + alreadyReadSize);
     ifs.read(bufferPosition, sizeToRead);

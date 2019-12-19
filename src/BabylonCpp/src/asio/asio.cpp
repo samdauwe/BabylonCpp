@@ -105,7 +105,7 @@ private:
     using namespace std::literals;
     while (!mStopRequested) {
       CheckTasksStatus();
-      std::this_thread::sleep_for(50ms);
+      std::this_thread::sleep_for(15ms);
     }
   }
 
