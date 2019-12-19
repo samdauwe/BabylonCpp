@@ -38,25 +38,39 @@
 #include <babylon/loading/progress_event.h>
 #include <babylon/utils/base64.h>
 
+#include <stdexcept>
+
 namespace BABYLON {
 
-std::function<std::string(std::string url)> FileTools::PreprocessUrl = [](std::string url) {
-  if (String::startsWith(url, "file:")) {
-    url = url.substr(5);
-  }
+std::string tryFindFile(const std::string filename)
+{
   // Check if the file is locally available
   // - Check in local folder
-  auto absolutePath = Filesystem::absolutePath(url);
+  auto absolutePath = Filesystem::absolutePath(filename);
   if (Filesystem::exists(absolutePath)) {
-    return String::concat("file:", absolutePath);
+    return absolutePath;
   }
   // - Check in assets folder
-  absolutePath = Filesystem::absolutePath(BABYLON::assets_folder() + url);
+  absolutePath = Filesystem::absolutePath(BABYLON::assets_folder() + filename);
   if (Filesystem::exists(absolutePath)) {
-    return String::concat("file:", absolutePath);
+    return absolutePath;
   }
-  return url;
+  return filename;
 };
+
+std::string FileTools::PreprocessUrl(const std::string& url_)
+{
+  std::string url = url_;
+  if (String::startsWith(url, "http"))
+    throw std::runtime_error("PreprocessUrl only supports file urls for the moment");
+
+  if ( ! String::startsWith(url, "file:/"))
+    url = std::string("file:/") + url;
+
+  std::string filename = url.substr(6);
+  filename = tryFindFile(filename);
+  return std::string("file:/") + filename;
+}
 
 std::string FileTools::_CleanUrl(std::string url)
 {

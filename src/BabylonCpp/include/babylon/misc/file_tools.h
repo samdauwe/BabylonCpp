@@ -19,10 +19,7 @@ class ProgressEvent;
 class BABYLON_SHARED_EXPORT FileTools {
 
 public:
-  /**
-   * @brief Gets or sets a function used to pre-process url before using them to load assets.
-   */
-  static std::function<std::string(std::string url)> PreprocessUrl;
+  static std::string PreprocessUrl(const std::string& url);
 
   /**
    * @brief Loads an image from an url.
