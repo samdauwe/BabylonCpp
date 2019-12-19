@@ -79,6 +79,7 @@ private:
 
   void CheckTasksStatus()
   {
+    std::lock_guard<std::mutex> guard(mMutexTasks);
     std::vector<FutureAndCallbacks> stillRunningTasks;
     for (auto& runningTask : mRunningTasks) {
       if (runningTask.stillRunning())
@@ -102,6 +103,8 @@ private:
   std::atomic<bool> mStopRequested;
   std::atomic<bool> mHasRunningTasks;
 
+  std::mutex mMutexTasks;
+
 public:
   void LoadData(
     const SyncLoaderFunction<DataType>& syncLoader,
@@ -112,6 +115,8 @@ public:
     FutureDataTypeOrErrorMessage futureData = really_async(syncLoader);
     FutureAndCallbacks payload{onSuccessFunction, onErrorFunction, std::move(futureData)};
     mHasRunningTasks = true;
+
+    std::lock_guard<std::mutex> guard(mMutexTasks);
     mRunningTasks.emplace_back(std::move(payload));
   }
 
