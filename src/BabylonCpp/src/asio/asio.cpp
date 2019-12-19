@@ -37,6 +37,7 @@ private:
   AsyncLoadService()
   {
     mStopRequested       = false;
+    mHasRunningTasks     = false;
     mBackgoundWork_Async = really_async([this]() { this->BackgroundWork(); });
   }
   ~AsyncLoadService()
@@ -84,6 +85,7 @@ private:
         stillRunningTasks.emplace_back(std::move(runningTask));
     }
     mRunningTasks = std::move(stillRunningTasks);
+    mHasRunningTasks = ! mRunningTasks.empty();
   }
 
   void BackgroundWork()
@@ -98,6 +100,7 @@ private:
   std::vector<FutureAndCallbacks> mRunningTasks;
   std::future<void> mBackgoundWork_Async;
   std::atomic<bool> mStopRequested;
+  std::atomic<bool> mHasRunningTasks;
 
 public:
   void LoadData(
@@ -108,6 +111,7 @@ public:
   {
     FutureDataTypeOrErrorMessage futureData = really_async(syncLoader);
     FutureAndCallbacks payload{onSuccessFunction, onErrorFunction, std::move(futureData)};
+    mHasRunningTasks = true;
     mRunningTasks.emplace_back(std::move(payload));
   }
 
@@ -120,7 +124,7 @@ public:
   void WaitAll()
   {
     using namespace std::literals;
-    while(!mRunningTasks.empty())
+    while(mHasRunningTasks)
       std::this_thread::sleep_for(50ms);
   }
 };
