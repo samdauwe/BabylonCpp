@@ -10,7 +10,7 @@ class LerpBlock;
 using LerpBlockPtr = std::shared_ptr<LerpBlock>;
 
 /**
- * @brief Block used to lerp 2 values.
+ * @brief Block used to lerp between 2 values.
  */
 class BABYLON_SHARED_EXPORT LerpBlock : public NodeMaterialBlock {
 

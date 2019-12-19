@@ -51,9 +51,11 @@ public:
    * @param state defines the state to update
    * @param nodeMaterial defines the node material requesting the update
    * @param defines defines the material defines to update
+   * @param uniformBuffers defines the list of uniform buffer names
    */
   void updateUniformsAndSamples(NodeMaterialBuildState& state, const NodeMaterialPtr& nodeMaterial,
-                                const NodeMaterialDefines& defines) override;
+                                const NodeMaterialDefines& defines,
+                                std::vector<std::string>& uniformBuffers) override;
 
   /**
    * @brief Bind data to effect. Will only be called for blocks with isBindable === true.

@@ -83,11 +83,11 @@ ReplaceColorBlock& ReplaceColorBlock::_buildBlock(NodeMaterialBuildState& state)
   state.compilationString
     += String::printf("%s = %s;\r\n", iOutput->associatedVariableName().c_str(),
                       replacement()->associatedVariableName().c_str());
-  state.compilationString += String::printf("} else {\r\n");
+  state.compilationString += "} else {\r\n";
   state.compilationString
     += String::printf("%s =  %s;\r\n", iOutput->associatedVariableName().c_str(),
                       value()->associatedVariableName().c_str());
-  state.compilationString += String::printf("}\r\n");
+  state.compilationString += "}\r\n";
 
   return *this;
 }

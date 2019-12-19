@@ -14,10 +14,22 @@ CrossBlock::CrossBlock(const std::string& iName)
 {
   registerInput("left", NodeMaterialBlockConnectionPointTypes::AutoDetect);
   registerInput("right", NodeMaterialBlockConnectionPointTypes::AutoDetect);
-  registerOutput("output", NodeMaterialBlockConnectionPointTypes::BasedOnInput);
+  registerOutput("output", NodeMaterialBlockConnectionPointTypes::Vector3);
 
-  _outputs[0]->_typeConnectionSource = _inputs[0];
   _linkConnectionTypes(0, 1);
+
+  _inputs[0]->excludedConnectionPointTypes.emplace_back(
+    NodeMaterialBlockConnectionPointTypes::Float);
+  _inputs[0]->excludedConnectionPointTypes.emplace_back(
+    NodeMaterialBlockConnectionPointTypes::Matrix);
+  _inputs[0]->excludedConnectionPointTypes.emplace_back(
+    NodeMaterialBlockConnectionPointTypes::Vector2);
+  _inputs[1]->excludedConnectionPointTypes.emplace_back(
+    NodeMaterialBlockConnectionPointTypes::Float);
+  _inputs[1]->excludedConnectionPointTypes.emplace_back(
+    NodeMaterialBlockConnectionPointTypes::Matrix);
+  _inputs[1]->excludedConnectionPointTypes.emplace_back(
+    NodeMaterialBlockConnectionPointTypes::Vector2);
 }
 
 CrossBlock::~CrossBlock() = default;
@@ -50,7 +62,7 @@ CrossBlock& CrossBlock::_buildBlock(NodeMaterialBuildState& state)
 
   state.compilationString
     += _declareOutput(iOutput, state)
-       + String::printf(" = cross(%s, %s);\r\n", left()->associatedVariableName().c_str(),
+       + String::printf(" = cross(%s.xyz, %s.xyz);\r\n", left()->associatedVariableName().c_str(),
                         right()->associatedVariableName().c_str());
 
   return *this;

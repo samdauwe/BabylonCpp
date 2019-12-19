@@ -17,6 +17,14 @@ DotBlock::DotBlock(const std::string& iName)
   registerOutput("output", NodeMaterialBlockConnectionPointTypes::Float);
 
   _linkConnectionTypes(0, 1);
+  _inputs[0]->excludedConnectionPointTypes.emplace_back(
+    NodeMaterialBlockConnectionPointTypes::Float);
+  _inputs[0]->excludedConnectionPointTypes.emplace_back(
+    NodeMaterialBlockConnectionPointTypes::Matrix);
+  _inputs[1]->excludedConnectionPointTypes.emplace_back(
+    NodeMaterialBlockConnectionPointTypes::Float);
+  _inputs[1]->excludedConnectionPointTypes.emplace_back(
+    NodeMaterialBlockConnectionPointTypes::Matrix);
 }
 
 DotBlock::~DotBlock() = default;
