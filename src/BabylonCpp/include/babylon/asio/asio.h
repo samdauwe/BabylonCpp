@@ -13,7 +13,7 @@ namespace asio {
 using OnErrorFunction = std::function<void(const std::string& errorMessage)>;
 
 using OnProgressFunction =
-  std::function<void(bool lengthComputable, size_t loaded, size_t total)>;
+  std::function<   void (bool lengthComputable, size_t loaded, size_t total)  >;
 
 struct ErrorMessage {
   std::string errorMessage;
