@@ -1,5 +1,5 @@
 #include <babylon/misc/file_tools.h>
-#include <future>
+#include <babylon/asio/asio.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #if defined(__GNUC__) || defined(__MINGW32__)
@@ -98,6 +98,9 @@ std::optional<Image> LoadImage_Stbi_Impl(
   }
   return std::nullopt;
 }
+
+
+
 
 
 void FileTools::LoadImageFromUrl(
@@ -388,69 +391,56 @@ Image FileTools::StringToImage(const std::string& uri, bool flipVertically)
   return Image();
 }
 
-void FileTools::ReadFile(
-  std::string fileToLoad,
-  const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
-                           const std::string& responseURL)>& callback,
-  const std::function<void(const ProgressEvent& event)>& onProgress, bool useArrayBuffer)
-{
-  if (!Filesystem::exists(fileToLoad)) {
-    BABYLON_LOGF_ERROR("Tools", "Error while reading file: %s", fileToLoad.c_str())
-    if (callback) {
-      callback("", "");
-    }
-    if (onProgress) {
-      onProgress(ProgressEvent{"ReadFileEvent", true, 100, 100});
-    }
-    return;
-  }
-
-  if (!useArrayBuffer) {
-    // Read file contents
-    if (callback) {
-      callback(Filesystem::readFileContents(fileToLoad.c_str()), "");
-    }
-    if (onProgress) {
-      onProgress(ProgressEvent{"ReadFileEvent", true, 100, 100});
-    }
-    return;
-  }
-  else {
-    // Read file contents
-    if (callback) {
-      callback(Filesystem::readBinaryFile(fileToLoad.c_str()), "");
-    }
-    if (onProgress) {
-      onProgress(ProgressEvent{"ReadFileEvent", true, 100, 100});
-    }
-    return;
-  }
-}
-
 void FileTools::LoadFile(
-  std::string url,
+  const std::string& url,
   const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
                            const std::string& responseURL)>& onSuccess,
-  const std::function<void(const ProgressEvent& event)>& onProgress, bool useArrayBuffer,
+  const std::function<void(const ProgressEvent& event)>& onProgress,
+  bool useArrayBuffer,
   const std::function<void(const std::string& message, const std::string& exception)>& onError)
 {
-  url = FileTools::_CleanUrl(url);
+  // LoadFile's signature is extremely complicated for no good reason
+  // Let's write some wrappers from the simple callbacks of BABYLON::asio
+  // We will need to refactor this later
 
-  url = FileTools::PreprocessUrl(url);
+  // Superfluous params?
+  constexpr const char * dummyResponseUrl = "";
+  constexpr const char * dummyExceptionString = "";
+  constexpr const char * dummyProgressType = "";
 
-  // If file and file input are set
-  if (String::startsWith(url, "file:")) {
-    const auto fileName = url.substr(5);
-    if (!fileName.empty()) {
-      FileTools::ReadFile(fileName, onSuccess, onProgress, useArrayBuffer);
-      return;
-    }
+  std::string url_clean = FileTools::_CleanUrl(url);
+  url_clean = FileTools::PreprocessUrl(url);
+
+  auto onErrorWrapper = [onError](const std::string& errorMessage) {
+    if (onError)
+      onError(errorMessage, dummyExceptionString);
+  };
+  auto onProgressWrapper = [onProgress](bool lengthComputable, size_t loaded, size_t total) {
+    if (onProgress)
+      onProgress({dummyProgressType, lengthComputable, loaded, total});
+  };
+
+  if (useArrayBuffer)
+  {
+    auto onSuccessWrapper = [onSuccess](const ArrayBuffer& data) {
+      if (onSuccess)
+        onSuccess(data, dummyResponseUrl);
+    };
+    asio::LoadUrlAsync_Binary(url_clean, onSuccessWrapper, onErrorWrapper, onProgressWrapper);
+  }
+  else
+  {
+    auto onSuccessWrapper = [onSuccess](const std::string& data) {
+      if (onSuccess) {
+        std::cout << "-->\n" << data << "\n<--" << std::endl;
+        onSuccess(data, dummyResponseUrl);
+      }
+    };
+    asio::LoadUrlAsync_Text(url_clean, onSuccessWrapper, onErrorWrapper, onProgressWrapper);
   }
 
-  // Report error
-  if (onError) {
-    onError("Unable to load file from location " + url, "");
-  }
+  asio::Service_WaitAll();
+  std::cout << "WaitAll finished\n";
 }
 
 } // end of namespace BABYLON

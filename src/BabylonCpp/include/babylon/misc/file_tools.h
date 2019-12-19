@@ -47,19 +47,6 @@ public:
 
   /**
    * @brief Loads a file.
-   * @param fileToLoad defines the file to load
-   * @param callback defines the callback to call when data is loaded
-   * @param progressCallBack defines the callback to call during loading process
-   * @param useArrayBuffer defines a boolean indicating that data must be returned as an ArrayBuffer
-   */
-  static void ReadFile(std::string fileToLoad,
-                       const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
-                                                const std::string& responseURL)>& callback,
-                       const std::function<void(const ProgressEvent& event)>& onProgress,
-                       bool useArrayBuffer);
-
-  /**
-   * @brief Loads a file.
    * @param url url string, ArrayBuffer, or Blob to load
    * @param onSuccess callback called when the file successfully loads
    * @param onProgress callback called while file is loading (if the server supports this mode)
@@ -68,7 +55,7 @@ public:
    * @param onError callback called when the file fails to load
    */
   static void LoadFile(
-    std::string url,
+    const std::string& url,
     const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
                              const std::string& responseURL)>& onSuccess,
     const std::function<void(const ProgressEvent& event)>& onProgress = nullptr,
