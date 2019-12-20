@@ -14,11 +14,7 @@ namespace BABYLON {
 namespace asio {
 namespace sync_io_impl
 {
-DataTypeOrErrorMessage<std::string> LoadFileSync_Text(
-  const std::string& filename, const OnProgressFunction& onProgressFunction
-  );
-
-DataTypeOrErrorMessage<ArrayBuffer> LoadFileSync_Binary(
+ArrayBufferOrErrorMessage LoadFileSync_Binary(
   const std::string& filename,
   const OnProgressFunction& onProgressFunction
   );

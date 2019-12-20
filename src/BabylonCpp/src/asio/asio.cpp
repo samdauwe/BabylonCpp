@@ -16,19 +16,15 @@ namespace asio {
 
 using namespace sync_io_impl;
 
-template<typename DataType>
-using OnSuccessFunction            = std::function<void(const DataType& data)>;
+using OnSuccessFunctionArrayBuffer            = std::function<void(const ArrayBuffer& data)>;
 
-template<typename DataType>
-using FutureDataTypeOrErrorMessage = std::future<DataTypeOrErrorMessage<DataType>>;
+using FutureArrayBufferOrErrorMessage = std::future<ArrayBufferOrErrorMessage>;
 
 
-template<typename DataType>
 struct FutureAndCallbacks {
-  OnSuccessFunction<DataType> onSuccessFunction;
+  OnSuccessFunctionArrayBuffer onSuccessFunctionArrayBuffer;
   OnErrorFunction onErrorFunction;
-  FutureDataTypeOrErrorMessage<DataType> futureDataTypeOrErrorMessage;
-
+  FutureArrayBufferOrErrorMessage futureDataTypeOrErrorMessage;
 
   std::optional<VoidCallback> shallCallNextCallback()
   {
@@ -36,7 +32,7 @@ struct FutureAndCallbacks {
     if (status != future_running_status::future_ready)
       return std::nullopt;
 
-    DataTypeOrErrorMessage<DataType> v = futureDataTypeOrErrorMessage.get();
+    ArrayBufferOrErrorMessage v = futureDataTypeOrErrorMessage.get();
 
     VoidCallback nextCallback = EmptyVoidCallback;
     if (std::holds_alternative<ErrorMessage>(v))
@@ -52,13 +48,13 @@ struct FutureAndCallbacks {
       }
     }
 
-    if (std::holds_alternative<DataType>(v))
+    if (std::holds_alternative<ArrayBuffer>(v))
     {
-      if (onSuccessFunction)
+      if (onSuccessFunctionArrayBuffer)
       {
-        const auto& data = std::get<DataType>(v);
+        const auto& data = std::get<ArrayBuffer>(v);
 
-        auto onSuccessFunctionCopy = this->onSuccessFunction;
+        auto onSuccessFunctionCopy = this->onSuccessFunctionArrayBuffer;
         nextCallback = [onSuccessFunctionCopy, data]() {
           onSuccessFunctionCopy(data);
         };
@@ -70,7 +66,6 @@ struct FutureAndCallbacks {
 };
 
 
-template <typename DataType>
 class AsyncLoadService {
 private:
   AsyncLoadService()
@@ -87,7 +82,7 @@ private:
   void CheckTasksStatus()
   {
     std::lock_guard<std::mutex> guard(mMutexRunningIOTasks);
-    std::vector<FutureAndCallbacks<DataType>> stillRunningTasks;
+    std::vector<FutureAndCallbacks> stillRunningTasks;
     for (auto& runningTask : mRunningIOTasks)
     {
       std::optional<VoidCallback> nextCallback = runningTask.shallCallNextCallback();
@@ -111,22 +106,22 @@ private:
 
 public:
   void LoadData(
-    const SyncLoaderFunction<DataType>& syncLoader,
-    const OnSuccessFunction<DataType>& onSuccessFunction,
+    const SyncLoaderFunction& syncLoader,
+    const OnSuccessFunctionArrayBuffer & onSuccessFunctionArrayBuffer,
     const OnErrorFunction& onErrorFunction
   )
   {
-    FutureDataTypeOrErrorMessage<DataType> futureData = really_async(syncLoader);
-    FutureAndCallbacks<DataType> payload{onSuccessFunction, onErrorFunction, std::move(futureData)};
+    FutureArrayBufferOrErrorMessage futureData = really_async(syncLoader);
+    FutureAndCallbacks payload{onSuccessFunctionArrayBuffer, onErrorFunction, std::move(futureData)};
     mHasRunningIOTasks = true;
 
     std::lock_guard<std::mutex> guard(mMutexRunningIOTasks);
     mRunningIOTasks.emplace_back(std::move(payload));
   }
 
-  static AsyncLoadService<DataType>& Instance()
+  static AsyncLoadService& Instance()
   {
-    static AsyncLoadService<DataType> instance;
+    static AsyncLoadService instance;
     return instance;
   }
 
@@ -143,7 +138,7 @@ public:
   }
 
 private:
-  std::vector<FutureAndCallbacks<DataType>> mRunningIOTasks;
+  std::vector<FutureAndCallbacks> mRunningIOTasks;
   std::atomic<bool> mHasRunningIOTasks;
   std::mutex mMutexRunningIOTasks;
 
@@ -152,29 +147,40 @@ private:
 
 };
 
-
+static std::string ArrayBufferToString(const ArrayBuffer & dataUint8)
+{
+  std::string dataString;
+  dataString.resize(dataUint8.size());
+  for (size_t i = 0; i < dataUint8.size(); ++i)
+    dataString[i] = static_cast<char>(dataUint8[i]);
+  dataString = BABYLON::String::replace(dataString, "\r\n", "\n");
+  return dataString;
+}
 
 void LoadFileAsync_Text(const std::string& filename,
-                       const std::function<void(const std::string& data)>& onSuccessFunction,
+                       const OnSuccessFunction<std::string>& onSuccessFunction,
                        const OnErrorFunction& onErrorFunction,
                        const OnProgressFunction& onProgressFunction
                        )
 {
-  auto & service = AsyncLoadService<std::string>::Instance();
+  auto & service = AsyncLoadService::Instance();
   auto syncLoader = [filename, onProgressFunction]() {
-    return LoadFileSync_Text(filename, onProgressFunction);
+    return LoadFileSync_Binary(filename, onProgressFunction);
   };
-  service.LoadData(syncLoader, onSuccessFunction, onErrorFunction);
+  auto onSuccessFunctionArrayBuffer = [onSuccessFunction](const ArrayBuffer & dataUint8) {
+    onSuccessFunction(ArrayBufferToString(dataUint8));
+  };
+  service.LoadData(syncLoader, onSuccessFunctionArrayBuffer, onErrorFunction);
 }
 
 void LoadFileAsync_Binary(
   const std::string& filename,
-  const std::function<void(const ArrayBuffer& data)>& onSuccessFunction,
+  const OnSuccessFunction<ArrayBuffer>& onSuccessFunction,
   const OnErrorFunction& onErrorFunction,
   const OnProgressFunction& onProgressFunction
   )
 {
-  auto & service = AsyncLoadService<ArrayBuffer>::Instance();
+  auto & service = AsyncLoadService::Instance();
   auto syncLoader = [filename, onProgressFunction]() {
     return LoadFileSync_Binary(filename, onProgressFunction);
   };
@@ -217,19 +223,15 @@ void HeartBeat_Sync()
 
 void Service_WaitAll_Sync()
 {
-  auto & service = AsyncLoadService<std::string>::Instance();
-  auto & service2 = AsyncLoadService<BABYLON::ArrayBuffer>::Instance();
+  auto & service = AsyncLoadService::Instance();
   service.WaitIoCompletion_Sync();
-  service2.WaitIoCompletion_Sync();
   sync_callback_runner::CallAllPendingCallbacks();
 }
 
 bool HasRemainingTasks()
 {
-  auto & service = AsyncLoadService<std::string>::Instance();
-  auto & service2 = AsyncLoadService<BABYLON::ArrayBuffer>::Instance();
+  auto & service = AsyncLoadService::Instance();
   return    service.HasRunningIOTasks()
-         || service2.HasRunningIOTasks()
          || sync_callback_runner::HasRemainingCallbacks();
 }
 

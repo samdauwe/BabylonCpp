@@ -8,41 +8,7 @@ namespace asio {
 namespace sync_io_impl
 {
 
-DataTypeOrErrorMessage<std::string> LoadFileSync_Text(
-  const std::string& filename, const OnProgressFunction& onProgressFunction)
-{
-  std::ifstream ifs(filename);
-  if (!ifs.good())
-    return ErrorMessage("LoadFileSync_Text: Could not open file " + std::string(filename));
-
-  std::string str;
-
-
-  ifs.seekg(0, std::ios::end);
-  size_t fileSize = ifs.tellg();
-  str.reserve(fileSize);
-  if (onProgressFunction)
-  {
-    auto f = [onProgressFunction, fileSize]() {
-      onProgressFunction(true, 0, fileSize);
-    };
-    sync_callback_runner::PushCallback(f);
-  }
-
-  ifs.seekg(0, std::ios::beg);
-  str.assign((std::istreambuf_iterator<char>(ifs)),
-             std::istreambuf_iterator<char>());
-  if (onProgressFunction)
-  {
-    auto f = [onProgressFunction, fileSize]() {
-      onProgressFunction(true, fileSize, fileSize);
-    };
-    sync_callback_runner::PushCallback(f);
-  }
-  return str;
-}
-
-DataTypeOrErrorMessage<ArrayBuffer> LoadFileSync_Binary(
+ArrayBufferOrErrorMessage LoadFileSync_Binary(
   const std::string& filename,
   const OnProgressFunction& onProgressFunction
 )
@@ -74,6 +40,14 @@ DataTypeOrErrorMessage<ArrayBuffer> LoadFileSync_Binary(
     char * bufferPosition = (char*)(buffer.data() + alreadyReadSize);
     ifs.read(bufferPosition, sizeToRead);
     alreadyReadSize += sizeToRead;
+  }
+
+  if (onProgressFunction)
+  {
+    auto f = [onProgressFunction, alreadyReadSize, fileSize]() {
+      onProgressFunction(true, alreadyReadSize, fileSize);
+    };
+    sync_callback_runner::PushCallback(f);
   }
 
   return buffer;

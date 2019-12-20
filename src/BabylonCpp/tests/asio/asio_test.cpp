@@ -91,3 +91,22 @@ TEST(async_requests, SampleApplicationLoop)
 {
   SampleApplicationLoop();
 }
+
+TEST(async_requests, LoadText)
+{
+#if 0 // This code works, but features no real google test call
+  std::cout << "\n";
+  auto onSuccessText = [](const std::string& textContent) {
+    std::cout << "\n==>\n" << textContent << "\n<==\n";
+  };
+  auto onError = [](const std::string& message) {
+    std::cout << "Error:" << message << "!!!\n";
+  };
+  auto onProgress = [](bool lengthComputable, size_t loaded, size_t total) {
+    std::cout << "onProgress " << loaded << " / " << total << " lengthComputable: " << lengthComputable << "\n";
+  };
+
+  BABYLON::asio::LoadUrlAsync_Text(textUrl, onSuccessText, onError, onProgress);
+  BABYLON::asio::Service_WaitAll_Sync();
+#endif
+}
