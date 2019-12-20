@@ -34,22 +34,22 @@ void SampleApplicationLoop()
   // Sample callbacks that will be called *synchronously*
   auto onSuccessText = [&nb_success_text, mainThreadId](const std::string& /*textContent*/) {
     auto thisThreadId = std::this_thread::get_id();
-    assert(thisThreadId == mainThreadId);
+    EXPECT_EQ(thisThreadId, mainThreadId);
     ++nb_success_text;
   };
   auto onSuccessBinary = [&nb_success_binary, mainThreadId](const BABYLON::ArrayBuffer& /*data*/) {
     auto thisThreadId = std::this_thread::get_id();
-    assert(thisThreadId == mainThreadId);
+    EXPECT_EQ(thisThreadId, mainThreadId);
     ++nb_success_binary;
   };
   auto onError = [&nb_error, mainThreadId](const std::string& /*message*/) {
     auto thisThreadId = std::this_thread::get_id();
-    assert(thisThreadId == mainThreadId);
+    EXPECT_EQ(thisThreadId, mainThreadId);
     ++nb_error;
   };
   auto onProgress = [&nb_calls_to_progress, mainThreadId](bool /*lengthComputable*/, size_t /*loaded*/, size_t /*total*/) {
     auto thisThreadId = std::this_thread::get_id();
-    assert(thisThreadId == mainThreadId);
+    EXPECT_EQ(thisThreadId, mainThreadId);
     ++nb_calls_to_progress;
   };
 
