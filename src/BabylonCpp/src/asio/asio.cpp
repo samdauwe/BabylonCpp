@@ -6,6 +6,14 @@
 #include <babylon/core/string.h>
 #include <babylon/asio/internal/sync_callback_runner.h>
 
+#if defined(__linux__) or defined(__APPLE__)
+#define HAS_PTHREAD
+#endif
+
+#ifdef HAS_PTHREAD
+#include <pthread.h>
+#endif
+
 #include <deque>
 #include <future>
 #include <atomic>
@@ -98,6 +106,9 @@ private:
   void CheckIOCompletion_AsyncProc() // This will be called in a parallel thread
   {
     using namespace std::literals;
+#ifdef HAS_PTHREAD
+    pthread_setname_np("asio: CheckIOCompletion");
+#endif
     while (!mStopRequested) {
       CheckTasksStatus();
       std::this_thread::sleep_for(15ms);
@@ -111,11 +122,11 @@ public:
     const OnErrorFunction& onErrorFunction
   )
   {
+    std::lock_guard<std::mutex> guard(mMutexRunningIOTasks);
+    mHasRunningIOTasks = true;
     FutureArrayBufferOrErrorMessage futureData = really_async(syncLoader);
     FutureAndCallbacks payload{onSuccessFunctionArrayBuffer, onErrorFunction, std::move(futureData)};
-    mHasRunningIOTasks = true;
 
-    std::lock_guard<std::mutex> guard(mMutexRunningIOTasks);
     mRunningIOTasks.emplace_back(std::move(payload));
   }
 
@@ -165,6 +176,9 @@ void LoadFileAsync_Text(const std::string& filename,
 {
   auto & service = AsyncLoadService::Instance();
   auto syncLoader = [filename, onProgressFunction]() {
+#ifdef HAS_PTHREAD
+    pthread_setname_np("asio: LoadFileSync_Text");
+#endif
     return LoadFileSync_Binary(filename, onProgressFunction);
   };
   auto onSuccessFunctionArrayBuffer = [onSuccessFunction](const ArrayBuffer & dataUint8) {
@@ -182,6 +196,9 @@ void LoadFileAsync_Binary(
 {
   auto & service = AsyncLoadService::Instance();
   auto syncLoader = [filename, onProgressFunction]() {
+#ifdef HAS_PTHREAD
+    pthread_setname_np("asio: LoadFileSync_Binary");
+#endif
     return LoadFileSync_Binary(filename, onProgressFunction);
   };
   service.LoadData(syncLoader, onSuccessFunction, onErrorFunction);

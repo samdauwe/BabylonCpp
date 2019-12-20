@@ -432,14 +432,13 @@ void FileTools::LoadFile(
   {
     auto onSuccessWrapper = [onSuccess](const std::string& data) {
       if (onSuccess) {
-        std::cout << "-->\n" << data << "\n<--" << std::endl;
         onSuccess(data, dummyResponseUrl);
       }
     };
     asio::LoadUrlAsync_Text(url_clean, onSuccessWrapper, onErrorWrapper, onProgressWrapper);
   }
 
-  asio::Service_WaitAll();
+  asio::Service_WaitAll_Sync();
   std::cout << "WaitAll finished\n";
 }
 

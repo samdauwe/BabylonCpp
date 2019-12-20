@@ -23,15 +23,19 @@ void PushCallback(const VoidCallback & function)
 
 void HeartBeat()
 {
-  std::lock_guard<std::mutex> guard(gMutexPendingCallbacks);
-  if (!gPendingCallbacks.empty())
+  VoidCallback callback;
+
   {
+    std::lock_guard<std::mutex> guard(gMutexPendingCallbacks);
+    if (!gPendingCallbacks.empty())
     {
-      auto callback = gPendingCallbacks.front();
+      callback = gPendingCallbacks.front();
       gPendingCallbacks.pop_front();
-      callback();
     }
   }
+
+  if (callback)
+    callback();
 }
 
 bool HasRemainingCallbacks()
