@@ -15,9 +15,14 @@ NormalizeBlock::NormalizeBlock(const std::string& iName)
   registerOutput("output", NodeMaterialBlockConnectionPointTypes::BasedOnInput);
 
   _outputs[0]->_typeConnectionSource = _inputs[0];
+
+  _inputs[0]->excludedConnectionPointTypes.emplace_back(
+    NodeMaterialBlockConnectionPointTypes::Float);
+  _inputs[0]->excludedConnectionPointTypes.emplace_back(
+    NodeMaterialBlockConnectionPointTypes::Matrix);
 }
 
-NormalizeBlock::~NormalizeBlock() =  default;
+NormalizeBlock::~NormalizeBlock() = default;
 
 std::string NormalizeBlock::getClassName() const
 {
