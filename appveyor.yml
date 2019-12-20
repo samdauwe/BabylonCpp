@@ -6,10 +6,10 @@
 version: 3.3.{build}
 
 # Branches to build
-# branches:
-#   # whitelist
-#   only:
-#     - master
+branches:
+  # whitelist
+  only:
+    - master
 
 #---------------------------------#
 #    Environment configuration    #
