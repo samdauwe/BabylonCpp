@@ -199,7 +199,7 @@ NodeMaterialBlock::getFirstAvailableOutput(const NodeMaterialBlockPtr& forBlock)
   for (const auto& output : _outputs) {
     if (!forBlock || (forBlock->target() == NodeMaterialBlockTargets::Undefined)
         || forBlock->target() == NodeMaterialBlockTargets::Neutral
-        || (forBlock->target() != output->target)) {
+        || (forBlock->target() != output->target())) {
       return output;
     }
   }
@@ -322,7 +322,7 @@ void NodeMaterialBlock::_processBuild(const NodeMaterialBlockPtr& block,
       && (block->target() != NodeMaterialBlockTargets::VertexAndFragment);
 
   if (localBlockIsFragment
-      && (((block->target() == input->target))
+      && (((block->target() == input->target()))
           || (target() != NodeMaterialBlockTargets::VertexAndFragment
               && otherBlockWasGeneratedInVertexShader))) { // context switch! We need a varying
     if ((!block->isInput()
@@ -362,11 +362,11 @@ bool NodeMaterialBlock::build(NodeMaterialBuildState& state,
     }
 
     if (target() != NodeMaterialBlockTargets::Neutral) {
-      if (input->target == target()) {
+      if (input->target() == target()) {
         continue;
       }
 
-      if (input->target == state.target) {
+      if (input->target() == state.target) {
         continue;
       }
     }
@@ -394,10 +394,10 @@ bool NodeMaterialBlock::build(NodeMaterialBuildState& state,
     /** Prepare outputs */
     for (const auto& output : _outputs) {
       if (target() != NodeMaterialBlockTargets::Neutral) {
-        if (output->target == target()) {
+        if (output->target() == target()) {
           continue;
         }
-        if (output->target == state.target) {
+        if (output->target() == state.target) {
           continue;
         }
       }
@@ -433,7 +433,7 @@ bool NodeMaterialBlock::build(NodeMaterialBuildState& state,
 
   // Compile connected blocks
   for (const auto& output : _outputs) {
-    if (output->target == state.target) {
+    if (output->target() == state.target) {
       continue;
     }
 

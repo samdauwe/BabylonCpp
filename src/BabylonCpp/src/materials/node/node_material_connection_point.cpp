@@ -112,7 +112,7 @@ NodeMaterialBlockTargets& NodeMaterialConnectionPoint::get_target()
     return _target;
   }
 
-  if (_ownerBlock->target == NodeMaterialBlockTargets::Fragment) {
+  if (_ownerBlock->target() == NodeMaterialBlockTargets::Fragment) {
     _tmpTarget = NodeMaterialBlockTargets::Fragment;
     return _tmpTarget;
   }

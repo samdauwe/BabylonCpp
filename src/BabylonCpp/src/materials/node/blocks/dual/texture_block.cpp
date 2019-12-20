@@ -107,24 +107,24 @@ NodeMaterialBlockTargets& TextureBlock::get_target()
   auto parent = uv()->connectedPoint();
 
   while (parent) {
-    if (parent->target == NodeMaterialBlockTargets::Fragment) {
+    if (parent->target() == NodeMaterialBlockTargets::Fragment) {
       _currentTarget = NodeMaterialBlockTargets::Fragment;
       return _currentTarget;
     }
 
-    if (parent->target == NodeMaterialBlockTargets::Vertex) {
+    if (parent->target() == NodeMaterialBlockTargets::Vertex) {
       _currentTarget = NodeMaterialBlockTargets::VertexAndFragment;
       return _currentTarget;
     }
 
-    if (parent->target == NodeMaterialBlockTargets::Neutral
-        || parent->target == NodeMaterialBlockTargets::VertexAndFragment) {
+    if (parent->target() == NodeMaterialBlockTargets::Neutral
+        || parent->target() == NodeMaterialBlockTargets::VertexAndFragment) {
       auto& parentBlock = parent->ownerBlock();
 
       parent = nullptr;
       for (const auto& input : parentBlock->inputs()) {
         if (input->connectedPoint()) {
-          parent = input->connectedPoint;
+          parent = input->connectedPoint();
           break;
         }
       }
@@ -138,8 +138,9 @@ NodeMaterialBlockTargets& TextureBlock::get_target()
 void TextureBlock::autoConfigure(const NodeMaterialPtr& material)
 {
   if (!uv()->isConnected()) {
-    auto uvInput = material->getInputBlockByPredicate(
-      [](const InputBlockPtr& inputBlock) -> bool { return inputBlock->isAttribute() && inputBlock->name == "uv"; });
+    auto uvInput = material->getInputBlockByPredicate([](const InputBlockPtr& inputBlock) -> bool {
+      return inputBlock->isAttribute() && inputBlock->name == "uv";
+    });
 
     if (!uvInput) {
       uvInput = InputBlock::New("uv");
