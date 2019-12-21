@@ -379,7 +379,7 @@ SceneLoader::ImportMesh(
 
   return SceneLoader::_loadData(
     *fileInfo, scene,
-    [=, &fileInfo](const std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>& plugin,
+    [=](const std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>& plugin,
         const std::string& data, const std::string& responseURL) -> void {
       if (std::holds_alternative<ISceneLoaderPluginPtr>(plugin)) {
         auto syncedPlugin = std::get<ISceneLoaderPluginPtr>(plugin);
