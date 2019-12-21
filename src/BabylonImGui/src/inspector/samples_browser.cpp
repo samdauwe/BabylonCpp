@@ -9,6 +9,7 @@
 #include <imgui_utils/imgui_utils.h>
 #include <babylon/inspector/samples_browser.h>
 #include <babylon/interfaces/irenderable_scene.h>
+#include <babylon/babylon_common.h>
 
 #include <imgui.h>
 
@@ -38,13 +39,8 @@ std::string to_snake_case(const std::string &sPascalCase)
   return ss.str();
 }
 
-#ifdef _WIN32
-const std::string screenshotsFolderCurrent = "../../../assets/screenshots/samples_current/";
-const std::string screenshotsFolderOriginal = "../../../assets/screenshots/samples/";
-#else
-const std::string screenshotsFolderCurrent = "../assets/screenshots/samples_current/";
-const std::string screenshotsFolderOriginal = "../assets/screenshots/samples/";
-#endif
+const std::string screenshotsFolderCurrent = BABYLON::assets_folder() + "/screenshots/samples_current/";
+const std::string screenshotsFolderOriginal = BABYLON::assets_folder() +"/screenshots/samples/";
 
 } // end anonymous namespace
 

@@ -1,4 +1,5 @@
 #include <babylon/misc/file_tools.h>
+#include <babylon/asio/asio.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #if defined(__GNUC__) || defined(__MINGW32__)
@@ -37,31 +38,42 @@
 #include <babylon/loading/progress_event.h>
 #include <babylon/utils/base64.h>
 
+#include <stdexcept>
+
 namespace BABYLON {
 
-std::function<std::string(std::string url)> FileTools::PreprocessUrl = [](std::string url) {
-  if (String::startsWith(url, "file:")) {
-    url = url.substr(5);
-  }
-  // Check if the file is locally available
-  // - Check in local folder
-  auto absolutePath = Filesystem::absolutePath(url);
-  if (Filesystem::exists(absolutePath)) {
-    return String::concat("file:", absolutePath);
-  }
-  // - Check in assets folder
-  absolutePath = Filesystem::absolutePath(BABYLON::assets_folder() + url);
-  if (Filesystem::exists(absolutePath)) {
-    return String::concat("file:", absolutePath);
-  }
+std::string FileTools::PreprocessUrl(const std::string& url)
+{
   return url;
-};
+}
 
 std::string FileTools::_CleanUrl(std::string url)
 {
   String::replaceInPlace(url, "#", "%23");
   return url;
 }
+
+std::optional<Image> LoadImage_Stbi_Impl(
+  const char *filename,
+  int nb_desired_channels,
+  bool flipVertically)
+{
+
+  // Basic usage (see HDR discussion below for HDR usage):
+  int w, h, nb_channels_real;
+  stbi_set_flip_vertically_on_load(flipVertically);
+  unsigned char *data = stbi_load(filename, &w, &h, &nb_channels_real, nb_desired_channels);
+  stbi_set_flip_vertically_on_load(false);
+  if (data)
+  {
+    unsigned int glColorMode = (nb_desired_channels == 3) ? GL::RGB : GL::RGBA;
+    Image image(data, w * h * nb_desired_channels, w, h, nb_desired_channels, glColorMode);
+    stbi_image_free(data);
+    return image;
+  }
+  return std::nullopt;
+}
+
 
 void FileTools::LoadImageFromUrl(
   std::string url, const std::function<void(const Image& img)>& onLoad,
@@ -71,33 +83,17 @@ void FileTools::LoadImageFromUrl(
   url = FileTools::_CleanUrl(url);
   url = FileTools::PreprocessUrl(url);
 
-  if (String::startsWith(url, "file:")) {
-    using stbi_ptr = std::unique_ptr<unsigned char, std::function<void(unsigned char*)>>;
+  std::string filename = url;
 
-    for (auto req_comp : {STBI_rgb_alpha, STBI_rgb}) {
-      int w = -1, h = -1, n = -1;
-      stbi_set_flip_vertically_on_load(flipVertically);
-      stbi_ptr data(stbi_load(url.substr(5).c_str(), &w, &h, &n, req_comp),
-                    [](unsigned char* _data) {
-                      if (_data) {
-                        stbi_image_free(_data);
-                      }
-                    });
-      stbi_set_flip_vertically_on_load(false);
+  auto onArrayBufferReceived = [=](const ArrayBuffer & buffer) {
+    auto image = ArrayBufferToImage(buffer, flipVertically);
+    onLoad(image);
+  };
+  auto onErrorWrapper = [=](const std::string& errorMessage) {
+    onError(errorMessage, "");
+  };
 
-      if (data) {
-        Image image(data.get(), w * h * req_comp, w, h, req_comp,
-                    (req_comp == 3) ? GL::RGB : GL::RGBA);
-        onLoad(image);
-        return;
-      }
-    }
-
-    if (onError) {
-      onError("Error loading image from file " + url, "");
-      return;
-    }
-  }
+  asio::LoadUrlAsync_Binary(url, onArrayBufferReceived, onErrorWrapper);
 }
 
 void FileTools::LoadImageFromBuffer(
@@ -137,27 +133,21 @@ Image FileTools::ArrayBufferToImage(const ArrayBuffer& buffer, bool flipVertical
   if (buffer.empty()) {
     return Image();
   }
-
-  using stbi_ptr = std::unique_ptr<unsigned char, std::function<void(unsigned char*)>>;
-
   auto bufferSize = static_cast<int>(buffer.size());
-  auto w = -1, h = -1, n = -1;
-  auto req_comp = STBI_rgb_alpha;
+  int w = -1, h = -1, n = -1;
+  int req_comp = STBI_rgb_alpha;
+
   stbi_set_flip_vertically_on_load(flipVertically);
-  stbi_ptr data(stbi_load_from_memory(buffer.data(), bufferSize, &w, &h, &n, req_comp),
-                [](unsigned char* _data) {
-                  if (_data) {
-                    stbi_image_free(_data);
-                  }
-                });
+  unsigned char * ucharBuffer = stbi_load_from_memory(buffer.data(), bufferSize, &w, &h, &n, req_comp);
   stbi_set_flip_vertically_on_load(false);
 
-  if (!data) {
+  if (!ucharBuffer)
     return Image();
-  }
 
   n = STBI_rgb_alpha;
-  return Image(data.get(), w * h * n, w, h, n, (n == 3) ? GL::RGB : GL::RGBA);
+  Image image (ucharBuffer, w * h * n, w, h, n, (n == 3) ? GL::RGB : GL::RGBA);
+  stbi_image_free(ucharBuffer);
+  return image;
 }
 
 Image FileTools::StringToImage(const std::string& uri, bool flipVertically)
@@ -365,69 +355,55 @@ Image FileTools::StringToImage(const std::string& uri, bool flipVertically)
   return Image();
 }
 
-void FileTools::ReadFile(
-  std::string fileToLoad,
-  const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
-                           const std::string& responseURL)>& callback,
-  const std::function<void(const ProgressEvent& event)>& onProgress, bool useArrayBuffer)
-{
-  if (!Filesystem::exists(fileToLoad)) {
-    BABYLON_LOGF_ERROR("Tools", "Error while reading file: %s", fileToLoad.c_str())
-    if (callback) {
-      callback("", "");
-    }
-    if (onProgress) {
-      onProgress(ProgressEvent{"ReadFileEvent", true, 100, 100});
-    }
-    return;
-  }
-
-  if (!useArrayBuffer) {
-    // Read file contents
-    if (callback) {
-      callback(Filesystem::readFileContents(fileToLoad.c_str()), "");
-    }
-    if (onProgress) {
-      onProgress(ProgressEvent{"ReadFileEvent", true, 100, 100});
-    }
-    return;
-  }
-  else {
-    // Read file contents
-    if (callback) {
-      callback(Filesystem::readBinaryFile(fileToLoad.c_str()), "");
-    }
-    if (onProgress) {
-      onProgress(ProgressEvent{"ReadFileEvent", true, 100, 100});
-    }
-    return;
-  }
-}
-
 void FileTools::LoadFile(
-  std::string url,
+  const std::string& url,
   const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
                            const std::string& responseURL)>& onSuccess,
-  const std::function<void(const ProgressEvent& event)>& onProgress, bool useArrayBuffer,
+  const std::function<void(const ProgressEvent& event)>& onProgress,
+  bool useArrayBuffer,
   const std::function<void(const std::string& message, const std::string& exception)>& onError)
 {
-  url = FileTools::_CleanUrl(url);
+  // LoadFile's signature is extremely complicated for no good reason
+  // Let's write some wrappers from the simple callbacks of BABYLON::asio
+  // We will need to refactor this later
 
-  url = FileTools::PreprocessUrl(url);
+  // Superfluous params?
+  constexpr const char * dummyResponseUrl = "";
+  constexpr const char * dummyExceptionString = "";
+  constexpr const char * dummyProgressType = "";
 
-  // If file and file input are set
-  if (String::startsWith(url, "file:")) {
-    const auto fileName = url.substr(5);
-    if (!fileName.empty()) {
-      FileTools::ReadFile(fileName, onSuccess, onProgress, useArrayBuffer);
-      return;
-    }
+  std::string url_clean = FileTools::_CleanUrl(url);
+  url_clean = FileTools::PreprocessUrl(url);
+
+  auto onErrorWrapper = [onError](const std::string& errorMessage) {
+    if (onError)
+      onError(errorMessage, dummyExceptionString);
+  };
+  auto onProgressWrapper = [onProgress](bool lengthComputable, size_t loaded, size_t total) {
+    if (onProgress)
+      onProgress({dummyProgressType, lengthComputable, loaded, total});
+  };
+
+  if (useArrayBuffer)
+  {
+    auto onSuccessWrapper = [onSuccess](const ArrayBuffer& data) {
+      if (onSuccess)
+        onSuccess(data, dummyResponseUrl);
+    };
+    asio::LoadUrlAsync_Binary(url_clean, onSuccessWrapper, onErrorWrapper, onProgressWrapper);
+  }
+  else
+  {
+    auto onSuccessWrapper = [onSuccess](const std::string& data) {
+      if (onSuccess) {
+        onSuccess(data, dummyResponseUrl);
+      }
+    };
+    asio::LoadUrlAsync_Text(url_clean, onSuccessWrapper, onErrorWrapper, onProgressWrapper);
   }
 
-  // Report error
-  if (onError) {
-    onError("Unable to load file from location " + url, "");
-  }
+  asio::Service_WaitAll_Sync();
+  //std::cout << "WaitAll finished\n";
 }
 
 } // end of namespace BABYLON
