@@ -42,22 +42,6 @@
 
 namespace BABYLON {
 
-std::string tryFindFile(const std::string filename)
-{
-  // Check if the file is locally available
-  // - Check in local folder
-  auto absolutePath = Filesystem::absolutePath(filename);
-  if (Filesystem::exists(absolutePath)) {
-    return absolutePath;
-  }
-  // - Check in assets folder
-  absolutePath = Filesystem::absolutePath(BABYLON::assets_folder() + filename);
-  if (Filesystem::exists(absolutePath)) {
-    return absolutePath;
-  }
-  return filename;
-};
-
 std::string FileTools::PreprocessUrl(const std::string& url_)
 {
   std::string url = url_;
@@ -68,7 +52,6 @@ std::string FileTools::PreprocessUrl(const std::string& url_)
     url = std::string("file:/") + url;
 
   std::string filename = url.substr(6);
-  filename = tryFindFile(filename);
   return std::string("file:/") + filename;
 }
 
