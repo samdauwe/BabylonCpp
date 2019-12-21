@@ -1,5 +1,6 @@
-#include "babylon/GL/framebuffer_canvas.h"
-#include "babylon/babylon_imgui/imgui_scene_widget.h"
+#include <babylon/GL/framebuffer_canvas.h>
+#include <babylon/babylon_imgui/imgui_scene_widget.h>
+#include <babylon/asio/asio.h>
 #include <cmath>
 #include <imgui.h>
 
@@ -62,6 +63,8 @@ namespace BABYLON {
 
   void ImGuiSceneWidget::render(ImVec2 size)
   {
+    BABYLON::asio::HeartBeat_Sync();
+
     // Resize framebuffer if needed 
     int width = static_cast<int>(size.x);
     int height = static_cast<int>(size.y);
