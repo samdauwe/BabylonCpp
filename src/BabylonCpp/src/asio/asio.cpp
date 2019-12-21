@@ -7,12 +7,18 @@
 #include <babylon/asio/internal/sync_callback_runner.h>
 
 #if defined(__linux__) or defined(__APPLE__)
-#define HAS_PTHREAD
+#define CAN_NAME_THREAD
 #endif
 
-#ifdef HAS_PTHREAD
-#include <pthread.h>
+#ifdef CAN_NAME_THREAD
+  #include <pthread.h>
+  #ifdef __APPLE__
+    #define THIS_THREAD_SET_NAME(name)  pthread_setname_np(name)
+  #elif defined(__linux__)
+    #define THIS_THREAD_SET_NAME(name) pthread_setname_np(pthread_self(), name)
+  #endif
 #endif
+
 
 #include <deque>
 #include <future>
@@ -106,8 +112,8 @@ private:
   void CheckIOCompletion_AsyncProc() // This will be called in a parallel thread
   {
     using namespace std::literals;
-#ifdef HAS_PTHREAD
-    pthread_setname_np("asio: CheckIOCompletion");
+#ifdef CAN_NAME_THREAD
+    THIS_THREAD_SET_NAME("asio: CheckIOCompletion");
 #endif
     while (!mStopRequested) {
       CheckTasksStatus();
@@ -176,8 +182,8 @@ void LoadFileAsync_Text(const std::string& filename,
 {
   auto & service = AsyncLoadService::Instance();
   auto syncLoader = [filename, onProgressFunction]() {
-#ifdef HAS_PTHREAD
-    pthread_setname_np("asio: LoadFileSync_Text");
+#ifdef CAN_NAME_THREAD
+    THIS_THREAD_SET_NAME("asio: LoadFileSync_Text");
 #endif
     return LoadFileSync_Binary(filename, onProgressFunction);
   };
@@ -196,9 +202,10 @@ void LoadFileAsync_Binary(
 {
   auto & service = AsyncLoadService::Instance();
   auto syncLoader = [filename, onProgressFunction]() {
-#ifdef HAS_PTHREAD
-    pthread_setname_np("asio: LoadFileSync_Binary");
+#ifdef CAN_NAME_THREAD
+    THIS_THREAD_SET_NAME("asio: LoadFileSync_Binary");
 #endif
+
     return LoadFileSync_Binary(filename, onProgressFunction);
   };
   service.LoadData(syncLoader, onSuccessFunction, onErrorFunction);
