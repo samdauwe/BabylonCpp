@@ -24,7 +24,7 @@ std::string tryFindFile(const std::string filename)
 
   // Failure !
   return "";
-};
+}
 
 ArrayBufferOrErrorMessage LoadFileSync_Binary(
   const std::string& filenameNotSearched,
