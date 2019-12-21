@@ -438,8 +438,8 @@ void FileTools::LoadFile(
     asio::LoadUrlAsync_Text(url_clean, onSuccessWrapper, onErrorWrapper, onProgressWrapper);
   }
 
-  asio::Service_WaitAll_Sync();
-  std::cout << "WaitAll finished\n";
+  //asio::Service_WaitAll_Sync();
+  //std::cout << "WaitAll finished\n";
 }
 
 } // end of namespace BABYLON
