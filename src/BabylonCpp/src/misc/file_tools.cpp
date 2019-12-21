@@ -42,17 +42,9 @@
 
 namespace BABYLON {
 
-std::string FileTools::PreprocessUrl(const std::string& url_)
+std::string FileTools::PreprocessUrl(const std::string& url)
 {
-  std::string url = url_;
-  if (String::startsWith(url, "http"))
-    throw std::runtime_error("PreprocessUrl only supports file urls for the moment");
-
-  if ( ! String::startsWith(url, "file:/"))
-    url = std::string("file:/") + url;
-
-  std::string filename = url.substr(6);
-  return std::string("file:/") + filename;
+  return url;
 }
 
 std::string FileTools::_CleanUrl(std::string url)
@@ -94,10 +86,7 @@ void FileTools::LoadImageFromUrl(
   url = FileTools::_CleanUrl(url);
   url = FileTools::PreprocessUrl(url);
 
-  if (!String::startsWith(url, "file:"))
-    throw std::runtime_error("FileTools::LoadImageFromUrl only supports file urls");
-
-  std::string filename = url.substr(5).c_str();
+  std::string filename = url;
 
   auto load_image_file_proc = [filename, flipVertically, onLoad, onError]() {
     std::optional<Image> image;
@@ -421,7 +410,7 @@ void FileTools::LoadFile(
     asio::LoadUrlAsync_Text(url_clean, onSuccessWrapper, onErrorWrapper, onProgressWrapper);
   }
 
-  //asio::Service_WaitAll_Sync();
+  asio::Service_WaitAll_Sync();
   //std::cout << "WaitAll finished\n";
 }
 

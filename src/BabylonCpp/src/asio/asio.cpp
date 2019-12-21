@@ -205,27 +205,40 @@ void LoadFileAsync_Binary(
 }
 
 void LoadUrlAsync_Text(
-  const std::string& url,
+  const std::string& url_,
   const std::function<void(const std::string& data)>& onSuccessFunction,
   const OnErrorFunction& onErrorFunction,
   const OnProgressFunction& onProgressFunction
 )
 {
-  if (!String::startsWith(url, "file:/"))
+  std::string url = url_;
+
+  if (String::startsWith(url, "http://"))
     throw std::runtime_error("LoadUrlAsync_Text only support files for the moment");
+
+  // Add automatically "file:/"
+  if (!String::startsWith(url, "file:/"))
+    url = std::string("file:/") + url;
+
   std::string filename = url.substr(6);
   LoadFileAsync_Text(filename, onSuccessFunction, onErrorFunction, onProgressFunction);
 }
 
 void LoadUrlAsync_Binary(
-  const std::string& url,
+  const std::string& url_,
   const std::function<void(const ArrayBuffer& data)>& onSuccessFunction,
   const OnErrorFunction& onErrorFunction,
   const OnProgressFunction& onProgressFunction
 )
 {
-  if (!String::startsWith(url, "file:/"))
+  std::string url = url_;
+  if (String::startsWith(url, "http://"))
     throw std::runtime_error("LoadUrlAsync_Text only support files for the moment");
+
+  // Add automatically "file:/"
+  if (!String::startsWith(url, "file:/"))
+    url = std::string("file:/") + url;
+
   std::string filename = url.substr(6);
   LoadFileAsync_Binary(filename, onSuccessFunction, onErrorFunction, onProgressFunction);
 }
