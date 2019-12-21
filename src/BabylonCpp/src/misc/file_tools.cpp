@@ -75,9 +75,6 @@ std::optional<Image> LoadImage_Stbi_Impl(
 }
 
 
-
-
-
 void FileTools::LoadImageFromUrl(
   std::string url, const std::function<void(const Image& img)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
@@ -88,20 +85,15 @@ void FileTools::LoadImageFromUrl(
 
   std::string filename = url;
 
-  auto load_image_file_proc = [filename, flipVertically, onLoad, onError]() {
-    std::optional<Image> image;
-    // Try to load RGBA, then load RGB on fail (is this really required? we could instead trust stbi)
-    image = LoadImage_Stbi_Impl(filename.c_str(), STBI_rgb_alpha, flipVertically);
-    if (!image)
-      image = LoadImage_Stbi_Impl(filename.c_str(), STBI_rgb, flipVertically);
-
-    if (image)
-      onLoad(*image);
-    else if (onError)
-      onError("Error loading image from file " + filename, "");
+  auto onArrayBufferReceived = [=](const ArrayBuffer & buffer) {
+    auto image = ArrayBufferToImage(buffer, flipVertically);
+    onLoad(image);
+  };
+  auto onErrorWrapper = [=](const std::string& errorMessage) {
+    onError(errorMessage, "");
   };
 
-  load_image_file_proc();
+  asio::LoadUrlAsync_Binary(url, onArrayBufferReceived, onErrorWrapper);
 }
 
 void FileTools::LoadImageFromBuffer(
