@@ -1239,7 +1239,7 @@ struct IGLTF : public IProperty {
   /**
    * An array of keyframe animations
    */
-  std::vector<GLTF2::IAnimation> animations;
+  std::vector<std::shared_ptr<GLTF2::IAnimation>> animations;
   /**
    * Metadata about the glTF asset
    */
@@ -1416,7 +1416,7 @@ struct IAnimation : public IGLTF2::IAnimation, IArrayItem {
   /** @hidden */
   AnimationGroupPtr _babylonAnimationGroup = nullptr;
 
-  static IAnimation Parse(const json& parsedAnimation);
+  static std::shared_ptr<IAnimation> Parse(const json& parsedAnimation);
 
 }; // end of struct IAnimation
 
