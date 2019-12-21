@@ -36,6 +36,11 @@ protected:
   ColorMergerBlock(const std::string& name);
 
   /**
+   * @brief Gets the rgb component (input).
+   */
+  NodeMaterialConnectionPointPtr& get_rgbIn();
+
+  /**
    * @brief Gets the r component (input).
    */
   NodeMaterialConnectionPointPtr& get_r();
@@ -63,7 +68,7 @@ protected:
   /**
    * @brief Gets the rgb component (output).
    */
-  NodeMaterialConnectionPointPtr& get_rgb();
+  NodeMaterialConnectionPointPtr& get_rgbOut();
 
   /**
    * @brief Hidden
@@ -71,6 +76,11 @@ protected:
   ColorMergerBlock& _buildBlock(NodeMaterialBuildState& state) override;
 
 public:
+  /**
+   * Gets the rgb component (input)
+   */
+  ReadOnlyProperty<ColorMergerBlock, NodeMaterialConnectionPointPtr> rgbIn;
+
   /**
    * Gets the r component (input)
    */
@@ -99,7 +109,7 @@ public:
   /**
    * Gets the rgb component (output)
    */
-  ReadOnlyProperty<ColorMergerBlock, NodeMaterialConnectionPointPtr> rgb;
+  ReadOnlyProperty<ColorMergerBlock, NodeMaterialConnectionPointPtr> rgbOut;
 
 }; // end of class ColorMergerBlock
 

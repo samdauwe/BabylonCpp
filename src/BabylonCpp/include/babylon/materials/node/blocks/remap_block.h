@@ -54,6 +54,26 @@ protected:
   NodeMaterialConnectionPointPtr& get_input();
 
   /**
+   * @brief Gets the source min input component.
+   */
+  NodeMaterialConnectionPointPtr& get_sourceMin();
+
+  /**
+   * @brief Gets the source max input component.
+   */
+  NodeMaterialConnectionPointPtr& get_sourceMax();
+
+  /**
+   * @brief Gets the target min input component.
+   */
+  NodeMaterialConnectionPointPtr& get_targetMin();
+
+  /**
+   * @brief Gets the target max input component.
+   */
+  NodeMaterialConnectionPointPtr& get_targetMax();
+
+  /**
    * @brief Gets the output component.
    */
   NodeMaterialConnectionPointPtr& get_output();
@@ -83,6 +103,26 @@ public:
    * Gets the input component
    */
   ReadOnlyProperty<RemapBlock, NodeMaterialConnectionPointPtr> input;
+
+  /**
+   * Gets the source min input component
+   */
+  ReadOnlyProperty<RemapBlock, NodeMaterialConnectionPointPtr> sourceMin;
+
+  /**
+   * Gets the source max input component
+   */
+  ReadOnlyProperty<RemapBlock, NodeMaterialConnectionPointPtr> sourceMax;
+
+  /**
+   * Gets the target min input component
+   */
+  ReadOnlyProperty<RemapBlock, NodeMaterialConnectionPointPtr> targetMin;
+
+  /**
+   * Gets the target max input component
+   */
+  ReadOnlyProperty<RemapBlock, NodeMaterialConnectionPointPtr> targetMax;
 
   /**
    * Gets the output component

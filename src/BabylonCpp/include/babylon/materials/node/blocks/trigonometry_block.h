@@ -29,6 +29,26 @@ enum class BABYLON_SHARED_EXPORT TrigonometryBlockOperations {
   Floor,
   /** Ceiling */
   Ceiling,
+  /** Square root */
+  Sqrt,
+  /** Log */
+  Log,
+  /** Tangent */
+  Tan,
+  /** Arc tangent */
+  ArcTan,
+  /** Arc cosinus */
+  ArcCos,
+  /** Arc sinus */
+  ArcSin,
+  /** Fraction */
+  Fract,
+  /** Sign */
+  Sign,
+  /** To radians (from degrees) */
+  Radians,
+  /** To degrees (from radians) */
+  Degrees
 }; // end of enum class TrigonometryBlockOperations
 
 /**
@@ -83,6 +103,11 @@ protected:
    * @brief Hidden
    */
   TrigonometryBlock& _buildBlock(NodeMaterialBuildState& state) override;
+
+  /**
+   * @brief Hidden
+   */
+  std::string _dumpPropertiesCode() override;
 
 public:
   /**

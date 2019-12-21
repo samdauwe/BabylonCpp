@@ -2,6 +2,7 @@
 
 #include <babylon/core/json_util.h>
 #include <babylon/core/string.h>
+#include <babylon/materials/node/blocks/input/input_block.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
 
@@ -18,6 +19,17 @@ TransformBlock::TransformBlock(const std::string& iName)
   registerInput("vector", NodeMaterialBlockConnectionPointTypes::AutoDetect);
   registerInput("transform", NodeMaterialBlockConnectionPointTypes::Matrix);
   registerOutput("output", NodeMaterialBlockConnectionPointTypes::Vector4);
+
+  _inputs[0]->onConnectionObservable.add(
+    [this](NodeMaterialConnectionPoint* other, EventState & /*es*/) -> void {
+      if (other && other->ownerBlock()->isInput()) {
+        const auto otherAsInput = std::static_pointer_cast<InputBlock>(other->ownerBlock());
+
+        if (otherAsInput->name == "normal") {
+          complementW = 0.f;
+        }
+      }
+    });
 }
 
 TransformBlock::~TransformBlock() = default;
@@ -58,6 +70,7 @@ TransformBlock& TransformBlock::_buildBlock(NodeMaterialBuildState& state)
                             _writeFloat(complementZ).c_str(), _writeFloat(complementW).c_str());
       break;
     case NodeMaterialBlockConnectionPointTypes::Vector3:
+    case NodeMaterialBlockConnectionPointTypes::Color3:
       state.compilationString += _declareOutput(iOutput, state)
                                  + String::printf(" = %s * vec4(%s, %s);\r\n",
                                                   transform()->associatedVariableName().c_str(),

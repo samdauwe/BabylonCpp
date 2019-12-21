@@ -2,6 +2,7 @@
 
 #include <babylon/core/string.h>
 #include <babylon/materials/node/blocks/input/input_block.h>
+#include <babylon/materials/node/blocks/view_direction_block.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
 
@@ -55,8 +56,14 @@ NodeMaterialConnectionPointPtr& FresnelBlock::get_fresnel()
   return _outputs[0];
 }
 
-void FresnelBlock::autoConfigure(const NodeMaterialPtr& /*material*/)
+void FresnelBlock::autoConfigure(const NodeMaterialPtr& material)
 {
+  if (!viewDirection()->isConnected()) {
+    auto viewDirectionInput = ViewDirectionBlock::New("View direction");
+    viewDirectionInput->output()->connectTo(viewDirection);
+    viewDirectionInput->autoConfigure(material);
+  }
+
   if (!bias()->isConnected()) {
     auto biasInput   = InputBlock::New("bias");
     biasInput->value = std::make_shared<AnimationValue>(0.f);
@@ -74,14 +81,14 @@ FresnelBlock& FresnelBlock::_buildBlock(NodeMaterialBuildState& state)
 {
   NodeMaterialBlock::_buildBlock(state);
 
-  auto comments = String::printf("//%s", name.c_str());
+  const auto comments = String::printf("//%s", name.c_str());
 
   EmitFunctionFromIncludeOptions options;
   options.removeIfDef = true;
   state._emitFunctionFromInclude("fresnelFunction", comments, options);
 
   state.compilationString += _declareOutput(fresnel, state)
-                             + String::printf(" = computeFresnelTerm(%s, %s, %s, %s);\r\n",
+                             + String::printf(" = computeFresnelTerm(%s.xyz, %s.xyz, %s, %s);\r\n",
                                               viewDirection()->associatedVariableName().c_str(),
                                               worldNormal()->associatedVariableName().c_str(),
                                               bias()->associatedVariableName().c_str(),

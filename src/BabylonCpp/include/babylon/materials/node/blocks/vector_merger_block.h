@@ -10,8 +10,7 @@ class VectorMergerBlock;
 using VectorMergerBlockPtr = std::shared_ptr<VectorMergerBlock>;
 
 /**
- * @brief Block used to create a Vector2/3/4 out of individual inputs (one for
- * each component).
+ * @brief Block used to create a Vector2/3/4 out of individual inputs (one for each component).
  */
 class BABYLON_SHARED_EXPORT VectorMergerBlock : public NodeMaterialBlock {
 
@@ -35,6 +34,16 @@ protected:
    * @param name defines the block name
    */
   VectorMergerBlock(const std::string& name);
+
+  /**
+   * @brief Gets the xyz component (input).
+   */
+  NodeMaterialConnectionPointPtr& get_xyzIn();
+
+  /**
+   * @brief Gets the xy component (input).
+   */
+  NodeMaterialConnectionPointPtr& get_xyIn();
 
   /**
    * @brief Gets the x component (input).
@@ -64,12 +73,12 @@ protected:
   /**
    * @brief Gets the xyz component (output).
    */
-  NodeMaterialConnectionPointPtr& get_xyz();
+  NodeMaterialConnectionPointPtr& get_xyzOut();
 
   /**
    * @brief Gets the xy component (output).
    */
-  NodeMaterialConnectionPointPtr& get_xy();
+  NodeMaterialConnectionPointPtr& get_xyOut();
 
   /**
    * @brief Hidden
@@ -77,6 +86,16 @@ protected:
   VectorMergerBlock& _buildBlock(NodeMaterialBuildState& state) override;
 
 public:
+  /**
+   * Gets the xyz component (input)
+   */
+  ReadOnlyProperty<VectorMergerBlock, NodeMaterialConnectionPointPtr> xyzIn;
+
+  /**
+   * Gets the xy component (input)
+   */
+  ReadOnlyProperty<VectorMergerBlock, NodeMaterialConnectionPointPtr> xyIn;
+
   /**
    * Gets the x component (input)
    */
@@ -105,12 +124,12 @@ public:
   /**
    * Gets the xyz component (output)
    */
-  ReadOnlyProperty<VectorMergerBlock, NodeMaterialConnectionPointPtr> xyz;
+  ReadOnlyProperty<VectorMergerBlock, NodeMaterialConnectionPointPtr> xyzOut;
 
   /**
    * Gets the xy component (output)
    */
-  ReadOnlyProperty<VectorMergerBlock, NodeMaterialConnectionPointPtr> xy;
+  ReadOnlyProperty<VectorMergerBlock, NodeMaterialConnectionPointPtr> xyOut;
 
 }; // end of class VectorMergerBlock
 

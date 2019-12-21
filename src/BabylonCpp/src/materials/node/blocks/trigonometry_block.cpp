@@ -13,8 +13,10 @@ TrigonometryBlock::TrigonometryBlock(const std::string& iName)
     , input{this, &TrigonometryBlock::get_input}
     , output{this, &TrigonometryBlock::get_output}
 {
-  registerInput("input", NodeMaterialBlockConnectionPointTypes::Float);
-  registerInput("output", NodeMaterialBlockConnectionPointTypes::Float);
+  registerInput("input", NodeMaterialBlockConnectionPointTypes::AutoDetect);
+  registerOutput("output", NodeMaterialBlockConnectionPointTypes::BasedOnInput);
+
+  _outputs[0]->_typeConnectionSource = _inputs[0];
 }
 
 TrigonometryBlock::~TrigonometryBlock() = default;
@@ -74,6 +76,46 @@ TrigonometryBlock& TrigonometryBlock::_buildBlock(NodeMaterialBuildState& state)
       _operation = "ceil";
       break;
     }
+    case TrigonometryBlockOperations::Sqrt: {
+      _operation = "sqrt";
+      break;
+    }
+    case TrigonometryBlockOperations::Log: {
+      _operation = "log";
+      break;
+    }
+    case TrigonometryBlockOperations::Tan: {
+      _operation = "tan";
+      break;
+    }
+    case TrigonometryBlockOperations::ArcTan: {
+      _operation = "atan";
+      break;
+    }
+    case TrigonometryBlockOperations::ArcCos: {
+      _operation = "acos";
+      break;
+    }
+    case TrigonometryBlockOperations::ArcSin: {
+      _operation = "asin";
+      break;
+    }
+    case TrigonometryBlockOperations::Fract: {
+      _operation = "fract";
+      break;
+    }
+    case TrigonometryBlockOperations::Sign: {
+      _operation = "sign";
+      break;
+    }
+    case TrigonometryBlockOperations::Radians: {
+      _operation = "radians";
+      break;
+    }
+    case TrigonometryBlockOperations::Degrees: {
+      _operation = "degrees";
+      break;
+    }
   }
 
   state.compilationString += _declareOutput(iOutput, state)
@@ -91,6 +133,14 @@ json TrigonometryBlock::serialize() const
 void TrigonometryBlock::_deserialize(const json& /*serializationObject*/, Scene* /*scene*/,
                                      const std::string& /*rootUrl*/)
 {
+}
+
+std::string TrigonometryBlock::_dumpPropertiesCode()
+{
+  const auto codeString
+    = String::printf("%s.operation = static_cast<TrigonometryBlockOperations>(%d);\r\n",
+                     _codeVariableName.c_str(), operation);
+  return codeString;
 }
 
 } // end of namespace BABYLON
