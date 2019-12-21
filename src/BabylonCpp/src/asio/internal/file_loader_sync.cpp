@@ -22,8 +22,8 @@ std::string tryFindFile(const std::string filename)
     return absolutePath;
   }
 
-  // Failure !
-  return "";
+  // failure
+  return filename;
 }
 
 ArrayBufferOrErrorMessage LoadFileSync_Binary(
@@ -34,8 +34,10 @@ ArrayBufferOrErrorMessage LoadFileSync_Binary(
   std::string filename = tryFindFile(filenameNotSearched);
 
   std::ifstream ifs(filename.c_str(), std::ios::binary | std::ios::ate);
-  if (!ifs.good())
-    return ErrorMessage("LoadFileSync_Binary: Could not open file " + std::string(filename));
+  if (!ifs.good()) {
+    std::string message = "LoadFileSync_Binary: Could not open file " + std::string(filename);
+    return ErrorMessage(message);
+  }
 
   size_t fileSize = ifs.tellg();
   ifs.seekg(0, std::ios::beg);

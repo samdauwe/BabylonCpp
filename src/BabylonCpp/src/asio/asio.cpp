@@ -117,8 +117,6 @@ private:
     while (!mStopRequested) {
       CheckTasksStatus();
       std::this_thread::sleep_for(15ms);
-      if (mStopRequested)
-        std::cout << "stop";
     }
   }
 

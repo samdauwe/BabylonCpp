@@ -91,8 +91,8 @@ void SampleApplicationLoop()
 TEST(async_requests, SampleApplicationLoop)
 {
   std::cout << "BABYLON_REPO_DIR is " << BABYLON_REPO_DIR << "\n";
-  std::cout << "isFile(" <<  textUrl << ") => " << BABYLON::Filesystem::isFile(textUrl) << "\n";
-  std::cout << "isFile(" <<  binaryUrl << ") => " << BABYLON::Filesystem::isFile(binaryUrl) << "\n";
+  std::cout << "isFile(" <<  textUrl.substr(6) << ") => " << BABYLON::Filesystem::isFile(textUrl.substr(6)) << "\n";
+  std::cout << "isFile(" <<  binaryUrl.substr(6) << ") => " << BABYLON::Filesystem::isFile(binaryUrl.substr(6)) << "\n";
   SampleApplicationLoop();
   BABYLON::asio::Service_Stop();
 }
