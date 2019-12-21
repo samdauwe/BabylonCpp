@@ -1386,6 +1386,8 @@ std::shared_ptr<ArrayBufferView>& GLTFLoader::loadBufferViewAsync(const std::str
   auto& buffer    = ArrayItem::Get(String::printf("%s/buffer", context.c_str()), _gltf->buffers,
                                 bufferView.buffer);
   const auto data = _loadBufferAsync(String::printf("/buffers/%ld", buffer.index), buffer);
+
+  // ASYNC_FIXME: We cannot treat the data right now, it will be otained later!
   try {
     bufferView._data = std::make_shared<ArrayBufferView>();
 
@@ -2015,6 +2017,8 @@ std::shared_ptr<ArrayBufferView> GLTFLoader::loadImageAsync(const std::string& c
 
   return image._data;
 }
+
+// ASYNC_FIXME this should return a promise, not a value !!! As in the js code.
 
 std::shared_ptr<ArrayBufferView> GLTFLoader::loadUriAsync(const std::string& context, const std::string& uri)
 {

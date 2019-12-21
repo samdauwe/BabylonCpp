@@ -6,6 +6,7 @@ namespace BABYLON {
 
 ArrayBufferView::ArrayBufferView() = default;
 
+// ASYNC_FIXME ArrayBufferView multiplies the memory footprint by 7 (7 copies of the same data)!
 ArrayBufferView::ArrayBufferView(const Int8Array& buffer)
     : byteOffset{0}
     , int8Array{buffer}
