@@ -355,6 +355,11 @@ Image FileTools::StringToImage(const std::string& uri, bool flipVertically)
   return Image();
 }
 
+// Superfluous params?
+constexpr const char* dummyResponseUrl     = "";
+constexpr const char* dummyExceptionString = "";
+constexpr const char* dummyProgressType    = "";
+
 void FileTools::LoadFile(
   const std::string& url,
   const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
@@ -367,10 +372,6 @@ void FileTools::LoadFile(
   // Let's write some wrappers from the simple callbacks of BABYLON::asio
   // We will need to refactor this later
 
-  // Superfluous params?
-  constexpr const char * dummyResponseUrl = "";
-  constexpr const char * dummyExceptionString = "";
-  constexpr const char * dummyProgressType = "";
 
   std::string url_clean = FileTools::_CleanUrl(url);
   url_clean = FileTools::PreprocessUrl(url);
