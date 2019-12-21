@@ -1361,7 +1361,7 @@ _IAnimationSamplerData GLTFLoader::_loadAnimationSamplerAsync(const std::string&
   return sampler._data.value();
 }
 
-ArrayBufferView& GLTFLoader::_loadBufferAsync(const std::string& context, IBuffer& buffer)
+std::shared_ptr<ArrayBufferView> GLTFLoader::_loadBufferAsync(const std::string& context, IBuffer& buffer)
 {
   if (buffer._data) {
     return buffer._data;
@@ -1376,7 +1376,7 @@ ArrayBufferView& GLTFLoader::_loadBufferAsync(const std::string& context, IBuffe
   return buffer._data;
 }
 
-ArrayBufferView& GLTFLoader::loadBufferViewAsync(const std::string& context,
+std::shared_ptr<ArrayBufferView>& GLTFLoader::loadBufferViewAsync(const std::string& context,
                                                  IBufferView& bufferView)
 {
   if (bufferView._data) {
@@ -1387,8 +1387,10 @@ ArrayBufferView& GLTFLoader::loadBufferViewAsync(const std::string& context,
                                 bufferView.buffer);
   const auto data = _loadBufferAsync(String::printf("/buffers/%ld", buffer.index), buffer);
   try {
-    bufferView._data = stl_util::to_array<uint8_t>(
-      data.uint8Array, data.byteOffset + (bufferView.byteOffset.value_or(0)),
+    bufferView._data = std::make_shared<ArrayBufferView>();
+
+    bufferView._data->uint8Array = stl_util::to_array<uint8_t>(
+      data->uint8Array, data->byteOffset + (bufferView.byteOffset.value_or(0)),
       bufferView.byteLength);
   }
   catch (const std::exception& e) {
@@ -1420,20 +1422,20 @@ ArrayBufferView& GLTFLoader::_loadAccessorAsync(const std::string& context, IAcc
     auto data
       = loadBufferViewAsync(String::printf("/bufferViews/%ld", bufferView.index), bufferView);
     if (accessor.componentType == IGLTF2::AccessorComponentType::FLOAT && !accessor.normalized) {
-      data = GLTFLoader::_GetTypedArray(context, accessor.componentType, data, accessor.byteOffset,
+      *data = GLTFLoader::_GetTypedArray(context, accessor.componentType, *data, accessor.byteOffset,
                                         length);
     }
     else {
       auto typedArray = Float32Array(length);
       VertexBuffer::ForEach(
-        data.float32Array, accessor.byteOffset || 0, bufferView.byteStride || byteStride,
+        data->float32Array, accessor.byteOffset || 0, bufferView.byteStride || byteStride,
         numComponents, static_cast<unsigned>(accessor.componentType), typedArray.size(),
         accessor.normalized || false,
         [&typedArray](float value, size_t index) -> void { typedArray[index] = value; });
-      data = typedArray;
+      *data = typedArray;
     }
 
-    accessor._data = GLTFLoader::_GetTypedArray(context, accessor.componentType, data,
+    accessor._data = GLTFLoader::_GetTypedArray(context, accessor.componentType, *data,
                                                 accessor.byteOffset, length);
   }
 
@@ -1455,11 +1457,11 @@ ArrayBufferView& GLTFLoader::_loadAccessorAsync(const std::string& context, IAcc
       const auto& indices = _castIndicesTo32bit(
         sparse.indices.componentType,
         GLTFLoader::_GetTypedArray(String::printf("%s/sparse/indices", context.c_str()),
-                                   sparse.indices.componentType, indicesData,
+                                   sparse.indices.componentType, *indicesData,
                                    sparse.indices.byteOffset, sparse.count));
       const auto& values
         = GLTFLoader::_GetTypedArray(String::printf("%s/sparse/values", context.c_str()),
-                                     accessor.componentType, valuesData, sparse.values.byteOffset,
+                                     accessor.componentType, *valuesData, sparse.values.byteOffset,
                                      numComponents * sparse.count)
             .float32Array;
       size_t valuesIndex = 0;
@@ -1529,7 +1531,7 @@ IndicesArray& GLTFLoader::_loadIndicesAccessorAsync(const std::string& context, 
                                     _gltf->bufferViews, *accessor.bufferView);
   const auto data
     = loadBufferViewAsync(String::printf("/bufferViews/%ld", bufferView.index), bufferView);
-  accessor._data = GLTFLoader::_GetTypedArray(context, accessor.componentType, data,
+  accessor._data = GLTFLoader::_GetTypedArray(context, accessor.componentType, *data,
                                               accessor.byteOffset, accessor.count);
 
   return _getConverted32bitIndices(accessor);
@@ -1544,7 +1546,7 @@ BufferPtr GLTFLoader::_loadVertexBufferViewAsync(IBufferView& bufferView,
 
   auto data = loadBufferViewAsync(String::printf("/bufferViews/%ld", bufferView.index), bufferView);
   bufferView._babylonBuffer
-    = std::make_shared<Buffer>(_babylonScene->getEngine(), data.float32Array, false);
+    = std::make_shared<Buffer>(_babylonScene->getEngine(), data->float32Array, false);
 
   return bufferView._babylonBuffer;
 }
@@ -1959,7 +1961,7 @@ BaseTexturePtr GLTFLoader::_loadTextureAsync(
                           image.uri :
                           String::printf("%s#image%ld", _fileName.c_str(), image.index);
       const auto dataUrl = String::printf("data:%s%s", _uniqueRootUrl.c_str(), name.c_str());
-      babylonTexture->updateURL(dataUrl, data.uint8Array);
+      babylonTexture->updateURL(dataUrl, data->uint8Array);
     });
   }
 
@@ -1993,7 +1995,7 @@ _ISamplerData GLTFLoader::_loadSampler(const std::string& context, ISampler& sam
   return *sampler._data;
 }
 
-ArrayBufferView& GLTFLoader::loadImageAsync(const std::string& context, IImage& image)
+std::shared_ptr<ArrayBufferView> GLTFLoader::loadImageAsync(const std::string& context, IImage& image)
 {
   if (!image._data) {
     logOpen(String::printf("%s %s", context.c_str(), image.name.c_str()));
@@ -2014,11 +2016,11 @@ ArrayBufferView& GLTFLoader::loadImageAsync(const std::string& context, IImage& 
   return image._data;
 }
 
-ArrayBufferView GLTFLoader::loadUriAsync(const std::string& context, const std::string& uri)
+std::shared_ptr<ArrayBufferView> GLTFLoader::loadUriAsync(const std::string& context, const std::string& uri)
 {
   const auto extensionPromise = _extensionsLoadUriAsync(context, uri);
-  if (extensionPromise.has_value()) {
-    return *extensionPromise;
+  if (extensionPromise) {
+    return extensionPromise;
   }
 
   if (!GLTFLoader::_ValidateUri(uri)) {
@@ -2026,35 +2028,37 @@ ArrayBufferView GLTFLoader::loadUriAsync(const std::string& context, const std::
   }
 
   if (Tools::IsBase64(uri)) {
-    const auto data = Tools::DecodeBase64(uri);
-    log(String::printf("Decoded %s... (%ld bytes)", uri.substr(0, 64).c_str(), data.size()));
-    return data;
+    auto arrayBufferView = std::make_shared<ArrayBufferView>();
+    arrayBufferView->uint8Array = Tools::DecodeBase64(uri);
+    log(String::printf("Decoded %s... (%ld bytes)", uri.substr(0, 64).c_str(), arrayBufferView->uint8Array.size()));
+    return arrayBufferView;
   }
 
   log(String::printf("Loading %s", uri.c_str()));
 
-  ArrayBuffer data;
+  auto arrayBufferView = std::make_shared<ArrayBufferView>();
+  //ArrayBuffer data;
   auto url = _parent.preprocessUrlAsync(_rootUrl + uri);
   if (!_disposed) {
     FileTools::LoadFile(
       url,
-      [this, &data, &uri](const std::variant<std::string, ArrayBuffer>& fileData,
+      [this, arrayBufferView, uri](const std::variant<std::string, ArrayBuffer>& fileData, // FIXME!! Cannot capture by ref here!!!
                           const std::string & /*responseURL*/) -> void {
         if (!_disposed) {
           if (std::holds_alternative<ArrayBuffer>(fileData)) {
-            data = std::get<ArrayBuffer>(fileData);
-            log(String::printf("Loaded %s (%ld bytes)", uri.c_str(), data.size()));
+            arrayBufferView->uint8Array = std::get<ArrayBuffer>(fileData);
+            log(String::printf("Loaded %s (%ld bytes)", uri.c_str(), arrayBufferView->uint8Array.size()));
           }
         }
       },
       nullptr, true,
-      [this, &context, &uri](const std::string& message, const std::string& exception) -> void {
+      [this, context, uri](const std::string& message, const std::string& exception) -> void {
         log(String::printf("%s: Failed to load (%s %s)", context.c_str(), uri.c_str(),
                            message.c_str(), exception.c_str()));
       });
   }
 
-  return data;
+  return arrayBufferView;
 }
 
 void GLTFLoader::_onProgress()
@@ -2359,10 +2363,10 @@ AnimationGroupPtr GLTFLoader::_extensionsLoadAnimationAsync(const std::string& /
   return nullptr;
 }
 
-std::optional<ArrayBufferView> GLTFLoader::_extensionsLoadUriAsync(const std::string& /*context*/,
+std::shared_ptr<ArrayBufferView> GLTFLoader::_extensionsLoadUriAsync(const std::string& /*context*/,
                                                                    const std::string& /*uri*/)
 {
-  return std::nullopt;
+  return nullptr;
 }
 
 void GLTFLoader::logOpen(const std::string& message)
