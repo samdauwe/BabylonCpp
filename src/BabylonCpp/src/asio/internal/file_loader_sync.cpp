@@ -13,12 +13,12 @@ std::string tryFindFile(const std::string filename)
   // Check if the file is locally available
   // - Check in local folder
   auto absolutePath = Filesystem::absolutePath(filename);
-  if (Filesystem::exists(absolutePath)) {
+  if (Filesystem::isFile(absolutePath)) {
     return absolutePath;
   }
   // - Check in assets folder
   absolutePath = Filesystem::absolutePath(BABYLON::assets_folder() + filename);
-  if (Filesystem::exists(absolutePath)) {
+  if (Filesystem::isFile(absolutePath)) {
     return absolutePath;
   }
 
