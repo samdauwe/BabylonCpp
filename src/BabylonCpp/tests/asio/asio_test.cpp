@@ -90,6 +90,7 @@ void SampleApplicationLoop()
 TEST(async_requests, SampleApplicationLoop)
 {
   SampleApplicationLoop();
+  BABYLON::asio::Service_Stop();
 }
 
 TEST(async_requests, LoadText)

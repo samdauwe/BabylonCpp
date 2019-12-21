@@ -56,6 +56,8 @@ BABYLON_SHARED_EXPORT bool HasRemainingTasks();
  */
 BABYLON_SHARED_EXPORT void Service_WaitAll_Sync();
 
+BABYLON_SHARED_EXPORT void Service_Stop();
+
 } // namespace asio
 } // namespace BABYLON
 

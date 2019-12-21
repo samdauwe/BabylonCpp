@@ -92,7 +92,6 @@ private:
   {
     mStopRequested = true;
   }
-
   void CheckTasksStatus()
   {
     std::lock_guard<std::mutex> guard(mMutexRunningIOTasks);
@@ -118,6 +117,8 @@ private:
     while (!mStopRequested) {
       CheckTasksStatus();
       std::this_thread::sleep_for(15ms);
+      if (mStopRequested)
+        std::cout << "stop";
     }
   }
 
@@ -152,6 +153,11 @@ public:
   bool HasRunningIOTasks()
   {
     return mHasRunningIOTasks;
+  }
+
+  void Stop()
+  {
+    mStopRequested = true;
   }
 
 private:
@@ -263,6 +269,12 @@ void Service_WaitAll_Sync()
   auto & service = AsyncLoadService::Instance();
   service.WaitIoCompletion_Sync();
   sync_callback_runner::CallAllPendingCallbacks();
+}
+
+BABYLON_SHARED_EXPORT void Service_Stop()
+{
+  auto& service = AsyncLoadService::Instance();
+  service.Stop();
 }
 
 bool HasRemainingTasks()
