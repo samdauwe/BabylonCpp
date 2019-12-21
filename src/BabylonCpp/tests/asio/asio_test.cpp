@@ -42,10 +42,11 @@ void SampleApplicationLoop()
     EXPECT_EQ(thisThreadId, mainThreadId);
     ++nb_success_binary;
   };
-  auto onError = [&nb_error, mainThreadId](const std::string& /*message*/) {
+  auto onError = [&nb_error, mainThreadId](const std::string& message) {
     auto thisThreadId = std::this_thread::get_id();
     EXPECT_EQ(thisThreadId, mainThreadId);
     ++nb_error;
+    std::cout << "onError: "<< message << "\n";
   };
   auto onProgress = [&nb_calls_to_progress, mainThreadId](bool /*lengthComputable*/, size_t /*loaded*/, size_t /*total*/) {
     auto thisThreadId = std::this_thread::get_id();
@@ -89,6 +90,9 @@ void SampleApplicationLoop()
 
 TEST(async_requests, SampleApplicationLoop)
 {
+  std::cout << "BABYLON_REPO_DIR is " << BABYLON_REPO_DIR << "\n";
+  std::cout << "isFile(" <<  textUrl << ") => " << BABYLON::Filesystem::isFile(textUrl) << "\n";
+  std::cout << "isFile(" <<  binaryUrl << ") => " << BABYLON::Filesystem::isFile(binaryUrl) << "\n";
   SampleApplicationLoop();
   BABYLON::asio::Service_Stop();
 }
