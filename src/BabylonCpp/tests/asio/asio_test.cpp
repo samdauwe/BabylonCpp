@@ -9,7 +9,7 @@
 
 std::string assets_folder = std::string(BABYLON_REPO_DIR) + std::string("/assets/");
 
-std::string textUrl = std::string("file:/") + assets_folder + "/samples_info.json";
+std::string textUrl = std::string("file:/") + assets_folder + "/fonts/fa-regular-400.ttf";
 std::string binaryUrl = std::string("file:/") + assets_folder
   + "/glTF-Sample-Models/2.0/AntiqueCamera/glTF/camera_camera_Normal.png";
 std::string nonExistingFileUrl = "file:/non_existing_file";
