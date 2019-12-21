@@ -2,6 +2,7 @@
 
 #include <future>
 
+#include <babylon/asio/asio.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/babylon_version.h>
 #include <babylon/cameras/camera.h>
@@ -2743,8 +2744,14 @@ void Engine::_cascadeLoadImgs(
   std::vector<Image> images;
   for (size_t index = 0; index < 6; ++index) {
     FileTools::LoadImageFromUrl(
-      files[index], [&images](const Image& img) { images.emplace_back(img); }, onError, false);
+      files[index],
+      [&images](const Image& img) { images.emplace_back(img); },
+      onError, false);
   }
+
+  // Force sync
+  // because the code before seems deprecated, and is difficult enough to make it async
+  BABYLON::asio::Service_WaitAll_Sync();
 
   if (images.size() == 6) {
     onfinish(images);
