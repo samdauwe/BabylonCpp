@@ -6,7 +6,7 @@
 #include <babylon/core/string.h>
 #include <babylon/asio/internal/sync_callback_runner.h>
 
-#if defined(__linux__) or defined(__APPLE__)
+#if defined(__linux__) || defined(__APPLE__)
 #define CAN_NAME_THREAD
 #endif
 
