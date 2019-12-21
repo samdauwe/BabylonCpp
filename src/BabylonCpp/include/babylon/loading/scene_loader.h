@@ -128,7 +128,7 @@ private:
     const std::function<void(const std::string& message,
                              const std::string& exception)>& onError,
     const std::function<void()>& onDispose, const std::string& pluginExtension);
-  static std::optional<IFileInfo>
+  static std::shared_ptr<IFileInfo>
   _getFileInfo(std::string rootUrl, const std::string& sceneFilename);
 
 public:

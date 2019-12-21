@@ -232,7 +232,7 @@ std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr> SceneLoader::_lo
   return plugin;
 }
 
-std::optional<IFileInfo> SceneLoader::_getFileInfo(std::string rootUrl,
+std::shared_ptr<IFileInfo> SceneLoader::_getFileInfo(std::string rootUrl,
                                                    const std::string& sceneFilename)
 {
   std::string url;
@@ -246,19 +246,20 @@ std::optional<IFileInfo> SceneLoader::_getFileInfo(std::string rootUrl,
   else {
     if (sceneFilename.substr(0, 1) == "/") {
       BABYLON_LOG_ERROR("SceneLoader", "Wrong sceneFilename parameter")
-      return std::nullopt;
+      return nullptr;
     }
 
     url  = rootUrl + sceneFilename;
     name = sceneFilename;
   }
 
-  return IFileInfo{
-    url,         // url
-    rootUrl,     // rootUrl
-    name,        // name
-    std::nullopt // file
-  };
+
+  auto r = std::make_shared<IFileInfo>();
+  r->url = url;
+  r->rootUrl = rootUrl;
+  r->name = name;
+  r->file = std::nullopt;
+  return r;
 }
 
 std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr, ISceneLoaderPluginFactoryPtr>
@@ -327,7 +328,7 @@ SceneLoader::ImportMesh(
     return std::nullopt;
   }
 
-  auto fileInfo = SceneLoader::_getFileInfo(rootUrl, sceneFilename);
+  std::shared_ptr<IFileInfo> fileInfo = SceneLoader::_getFileInfo(rootUrl, sceneFilename);
   if (!fileInfo) {
     return std::nullopt;
   }
