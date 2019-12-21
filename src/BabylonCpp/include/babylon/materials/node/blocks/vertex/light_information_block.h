@@ -41,6 +41,16 @@ public:
             Mesh* mesh = nullptr) override;
 
   /**
+   * @brief Update defines for shader compilation.
+   * @param mesh defines the mesh to be rendered
+   * @param nodeMaterial defines the node material requesting the update
+   * @param defines defines the material defines to update
+   * @param useInstances specifies that instances should be used
+   */
+  void prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
+                      NodeMaterialDefines& defines, bool useInstances = false) override;
+
+  /**
    * @brief Serializes this block in a JSON representation.
    * @returns the serialized block object
    */
@@ -75,6 +85,11 @@ protected:
   NodeMaterialConnectionPointPtr& get_color();
 
   /**
+   * @brief Gets the intensity output component.
+   */
+  NodeMaterialConnectionPointPtr& get_intensity();
+
+  /**
    * @brief Hidden
    */
   LightInformationBlock& _buildBlock(NodeMaterialBuildState& state) override;
@@ -100,9 +115,15 @@ public:
    */
   ReadOnlyProperty<LightInformationBlock, NodeMaterialConnectionPointPtr> color;
 
+  /**
+   * Gets the intensity output component
+   */
+  ReadOnlyProperty<LightInformationBlock, NodeMaterialConnectionPointPtr> intensity;
+
 private:
-  std::string _lightDataDefineName;
-  std::string _lightColorDefineName;
+  std::string _lightDataUniformName;
+  std::string _lightColorUniformName;
+  std::string _lightTypeDefineName;
 
 }; // end of class LightInformationBlock
 

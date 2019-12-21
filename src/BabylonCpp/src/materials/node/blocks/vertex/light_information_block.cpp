@@ -2,11 +2,14 @@
 
 #include <babylon/core/json_util.h>
 #include <babylon/core/string.h>
+#include <babylon/engines/scene.h>
 #include <babylon/lights/light.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/node/node_material.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_build_state_shared_data.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/materials/node/node_material_defines.h>
 
 namespace BABYLON {
 
@@ -15,11 +18,13 @@ LightInformationBlock::LightInformationBlock(const std::string& iName)
     , worldPosition{this, &LightInformationBlock::get_worldPosition}
     , direction{this, &LightInformationBlock::get_direction}
     , color{this, &LightInformationBlock::get_color}
+    , intensity{this, &LightInformationBlock::get_intensity}
 {
   registerInput("worldPosition", NodeMaterialBlockConnectionPointTypes::Vector4, false,
                 NodeMaterialBlockTargets::Vertex);
   registerOutput("direction", NodeMaterialBlockConnectionPointTypes::Vector3);
   registerOutput("color", NodeMaterialBlockConnectionPointTypes::Color3);
+  registerOutput("intensity", NodeMaterialBlockConnectionPointTypes::Float);
 }
 
 LightInformationBlock::~LightInformationBlock() = default;
@@ -44,22 +49,49 @@ NodeMaterialConnectionPointPtr& LightInformationBlock::get_color()
   return _outputs[1];
 }
 
-void LightInformationBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& /*nodeMaterial*/,
+NodeMaterialConnectionPointPtr& LightInformationBlock::get_intensity()
+{
+  return _outputs[2];
+}
+
+void LightInformationBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMaterial,
                                  Mesh* mesh)
 {
   if (!mesh) {
     return;
   }
 
+  if (light && light->isDisposed()) {
+    light = nullptr;
+  }
+
+  auto scene = nodeMaterial->getScene();
+
+  if (!light && !scene->lights.empty()) {
+    light = scene->lights[0];
+  }
+
   if (!light || !light->isEnabled()) {
-    effect->setFloat3(_lightDataDefineName, 0.f, 0.f, 0.f);
-    effect->setFloat3(_lightColorDefineName, 0.f, 0.f, 0.f);
+    effect->setFloat3(_lightDataUniformName, 0.f, 0.f, 0.f);
+    effect->setFloat4(_lightColorUniformName, 0.f, 0.f, 0.f, 0.f);
     return;
   }
 
-  light->transferToNodeMaterialEffect(effect, _lightDataDefineName);
+  light->transferToNodeMaterialEffect(effect, _lightDataUniformName);
 
-  effect->setColor3(_lightColorDefineName, light->diffuse);
+  effect->setColor4(_lightColorUniformName, light->diffuse, light->intensity);
+}
+
+void LightInformationBlock::prepareDefines(AbstractMesh* /*mesh*/,
+                                           const NodeMaterialPtr& /*nodeMaterial*/,
+                                           NodeMaterialDefines& defines, bool /*useInstances*/)
+{
+  if (!defines._areLightsDirty) {
+    return;
+  }
+
+  defines.setValue(_lightTypeDefineName,
+                   light && light->getClassName() == "PointLight" ? true : false);
 }
 
 LightInformationBlock& LightInformationBlock::_buildBlock(NodeMaterialBuildState& state)
@@ -67,35 +99,33 @@ LightInformationBlock& LightInformationBlock::_buildBlock(NodeMaterialBuildState
   NodeMaterialBlock::_buildBlock(state);
 
   state.sharedData->bindableBlocks.emplace_back(shared_from_this());
+  state.sharedData->blocksWithDefines.emplace_back(shared_from_this());
 
   const auto& _direction = direction();
   const auto& _color     = color();
+  const auto& _intensity = intensity();
 
-  if (!light) {
-    state.compilationString += _declareOutput(_direction, state) + " = vec3(0.);\r\n";
-    state.compilationString += _declareOutput(_color, state) + " = vec3(0.);\r\n";
-  }
-  else {
-    _lightDataDefineName = state._getFreeDefineName("lightData");
-    state._emitUniformFromString(_lightDataDefineName, "vec3");
+  _lightDataUniformName  = state._getFreeVariableName("lightData");
+  _lightColorUniformName = state._getFreeVariableName("lightColor");
+  _lightTypeDefineName   = state._getFreeDefineName("LIGHTPOINTTYPE");
 
-    _lightColorDefineName = state._getFreeDefineName("lightColor");
-    state._emitUniformFromString(_lightColorDefineName, "vec3");
+  state._emitUniformFromString(_lightDataUniformName, "vec3");
+  state._emitUniformFromString(_lightColorUniformName, "vec4");
 
-    if (light->type() == Type::POINTLIGHT) {
-      state.compilationString
-        += _declareOutput(_direction, state)
-           + String::printf(" = normalize(%s - %s.xyz);\r\n)", _lightDataDefineName.c_str(),
-                            worldPosition()->associatedVariableName().c_str());
-    }
-    else {
-      state.compilationString += _declareOutput(_direction, state)
-                                 + String::printf(" = %s;\r\n", _lightDataDefineName.c_str());
-    }
+  state.compilationString += String::printf("#if %s\r\n", _lightTypeDefineName.c_str());
+  state.compilationString
+    += _declareOutput(_direction, state)
+       + String::printf(" = normalize(%s - %s.xyz);\r\n", _lightDataUniformName.c_str(),
+                        worldPosition()->associatedVariableName().c_str());
+  state.compilationString += "#else\r\n";
+  state.compilationString += _declareOutput(_direction, state)
+                             + String::printf(" = %s;\r\n", _lightDataUniformName.c_str());
+  state.compilationString += "#endif\r\n";
 
-    state.compilationString
-      += _declareOutput(_color, state) + String::printf(" = %s;\r\n", _lightDataDefineName.c_str());
-  }
+  state.compilationString += _declareOutput(_color, state)
+                             + String::printf(" = %s.rgb;\r\n", _lightColorUniformName.c_str());
+  state.compilationString += _declareOutput(_intensity, state)
+                             + String::printf(" = %s.a;\r\n", _lightColorUniformName.c_str());
 
   return *this;
 }

@@ -10,6 +10,7 @@ VertexOutputBlock::VertexOutputBlock(const std::string& iName)
     : NodeMaterialBlock{iName, NodeMaterialBlockTargets::Vertex, true}
     , vector{this, &VertexOutputBlock::get_vector}
 {
+  registerInput("vector", NodeMaterialBlockConnectionPointTypes::Vector4);
 }
 
 VertexOutputBlock::~VertexOutputBlock() = default;
