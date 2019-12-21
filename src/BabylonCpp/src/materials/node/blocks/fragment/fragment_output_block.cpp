@@ -16,6 +16,8 @@ FragmentOutputBlock::FragmentOutputBlock(const std::string& iName)
   registerInput("rgba", NodeMaterialBlockConnectionPointTypes::Color4, true);
   registerInput("rgb", NodeMaterialBlockConnectionPointTypes::Color3, true);
   registerInput("a", NodeMaterialBlockConnectionPointTypes::Float, true);
+
+  rgb()->acceptedConnectionPointTypes.emplace_back(NodeMaterialBlockConnectionPointTypes::Float);
 }
 
 FragmentOutputBlock::~FragmentOutputBlock() = default;
@@ -50,18 +52,32 @@ FragmentOutputBlock& FragmentOutputBlock::_buildBlock(NodeMaterialBuildState& st
   state.sharedData->hints.needAlphaBlending = _rgba->isConnected() || _a->isConnected();
 
   if (_rgba->connectedPoint()) {
-    state.compilationString
-      += String::printf("gl_FragColor = %s;\r\n", _rgba->associatedVariableName().c_str());
-  }
-  else if (_rgb->connectedPoint()) {
-    if (_a->connectedPoint()) {
-      state.compilationString += String::printf("gl_FragColor = vec4(%s, %s);\r\n",
-                                                _rgb->associatedVariableName().c_str(),
+    if (_a->isConnected()) {
+      state.compilationString += String::printf("gl_FragColor = vec4(%s.rgb, %s);\r\n",
+                                                _rgba->associatedVariableName().c_str(),
                                                 _a->associatedVariableName().c_str());
     }
     else {
-      state.compilationString += String::printf("gl_FragColor = vec4(%s, 1.0);\r\n",
-                                                _rgb->associatedVariableName().c_str());
+      state.compilationString
+        += String::printf("gl_FragColor = %s;\r\n", _rgba->associatedVariableName().c_str());
+    }
+  }
+  else if (_rgb->connectedPoint()) {
+    std::string aValue = "1.0";
+
+    if (_a->connectedPoint()) {
+      aValue = _a->associatedVariableName();
+    }
+
+    if (_rgb->connectedPoint()->type() == NodeMaterialBlockConnectionPointTypes::Float) {
+      state.compilationString += String::printf(
+        "gl_FragColor = vec4(%s, %s, %s, %s);\r\n", _rgb->associatedVariableName().c_str(),
+        _rgb->associatedVariableName().c_str(), _rgb->associatedVariableName().c_str(),
+        aValue.c_str());
+    }
+    else {
+      state.compilationString += String::printf(
+        "gl_FragColor = vec4(%s, %s);\r\n", _rgb->associatedVariableName().c_str(), aValue.c_str());
     }
   }
   else {

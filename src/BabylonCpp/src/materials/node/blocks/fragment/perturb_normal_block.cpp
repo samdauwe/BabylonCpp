@@ -2,6 +2,7 @@
 
 #include <babylon/core/json_util.h>
 #include <babylon/core/string.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/node/blocks/input/input_block.h>
 #include <babylon/materials/node/node_material.h>
@@ -78,10 +79,15 @@ void PerturbNormalBlock::prepareDefines(AbstractMesh* /*mesh*/,
   defines.setValue("BUMP", true);
 }
 
-void PerturbNormalBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& /*nodeMaterial*/,
+void PerturbNormalBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMaterial,
                               Mesh* /*mesh*/)
 {
-  effect->setFloat2(_tangentSpaceParameterName, invertX ? -1.f : 1.f, invertY ? -1.f : 1.f);
+  if (nodeMaterial->getScene()->_mirroredCameraPosition) {
+    effect->setFloat2(_tangentSpaceParameterName, invertX ? 1.f : -1.f, invertY ? 1.f : -1.f);
+  }
+  else {
+    effect->setFloat2(_tangentSpaceParameterName, invertX ? -1.f : 1.f, invertY ? -1.f : 1.f);
+  }
 }
 
 void PerturbNormalBlock::autoConfigure(const NodeMaterialPtr& material)
@@ -108,10 +114,10 @@ PerturbNormalBlock& PerturbNormalBlock::_buildBlock(NodeMaterialBuildState& stat
 {
   NodeMaterialBlock::_buildBlock(state);
 
-  const auto comments       = String::printf("//%s", name.c_str());
-  const auto _uv            = uv();
-  const auto _worldPosition = worldPosition();
-  const auto _worldNormal   = worldNormal();
+  const auto comments        = String::printf("//%s", name.c_str());
+  const auto& _uv            = uv();
+  const auto& _worldPosition = worldPosition();
+  const auto& _worldNormal   = worldNormal();
 
   state.sharedData->blocksWithDefines.emplace_back(shared_from_this());
   state.sharedData->bindableBlocks.emplace_back(shared_from_this());
@@ -120,23 +126,30 @@ PerturbNormalBlock& PerturbNormalBlock::_buildBlock(NodeMaterialBuildState& stat
 
   state._emitUniformFromString(_tangentSpaceParameterName, "vec2");
 
-  state._emitExtension("bump", "#extension GL_OES_standard_derivatives : enable");
+  const auto replaceForBumpInfos
+    = strength()->isConnectedToInputBlock() && strength()->connectInputBlock()->isConstant ?
+        state._emitFloat(1.f / strength()->connectInputBlock()->value()->get<float>()).c_str() :
+        String::printf("1.0 / %s", strength()->associatedVariableName().c_str());
+
+  state._emitExtension("derivatives", "#extension GL_OES_standard_derivatives : enable");
   EmitFunctionFromIncludeOptions emitFunctionFromIncludeOptions;
   emitFunctionFromIncludeOptions.replaceStrings
-    = {{"vBumpInfos.y", String::printf("1.0 / %s", strength()->associatedVariableName().c_str())},
+    = {{"vBumpInfos.y", replaceForBumpInfos},
        {"vTangentSpaceParams", _tangentSpaceParameterName},
-       {"vPositionW", _worldPosition->associatedVariableName() + ".xyz"}};
+       {"vPositionW", _worldPosition->associatedVariableName() + ".xyz"},
+       {"defined\\(TANGENT\\)", "defined(IGNORE)"}};
   state._emitFunctionFromInclude("bumpFragmentFunctions", comments, emitFunctionFromIncludeOptions);
   state.compilationString += _declareOutput(output, state) + " = vec4(0.);\r\n";
   EmitCodeFromIncludeOptions emitCodeFromIncludeOptions;
   emitCodeFromIncludeOptions.replaceStrings = {
     {"perturbNormal\\(TBN,vBumpUV\\+uvOffset\\)",
      String::printf("perturbNormal(TBN, %s)", normalMapColor()->associatedVariableName().c_str())},
-    {"vBumpInfos.y", String::printf("1.0 /  %s", strength()->associatedVariableName().c_str())},
+    {"vBumpInfos.y", replaceForBumpInfos},
     {"vBumpUV", _uv->associatedVariableName()},
     {"vPositionW", _worldPosition->associatedVariableName() + ".xyz"},
     {"normalW=", output()->associatedVariableName() + ".xyz = "},
-    {"normalW", _worldNormal->associatedVariableName() + ".xyz"}};
+    {"normalW", _worldNormal->associatedVariableName() + ".xyz"},
+    {"defined\\(TANGENT\\)", "defined(IGNORE)"}};
   state.compilationString
     += state._emitCodeFromInclude("bumpFragment", comments, emitCodeFromIncludeOptions);
 

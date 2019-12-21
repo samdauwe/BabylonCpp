@@ -19,6 +19,7 @@ InputBlock::InputBlock(const std::string& iName, NodeMaterialBlockTargets iTarge
     : NodeMaterialBlock(iName, iTarget, false, true)
     , _systemValue{std::nullopt}
     , visibleInInspector{false}
+    , isConstant{false}
     , type{this, &InputBlock::get_type}
     , output{this, &InputBlock::get_output}
     , value{this, &InputBlock::get_value, &InputBlock::set_value}

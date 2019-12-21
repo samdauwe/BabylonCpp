@@ -245,6 +245,11 @@ public:
   bool visibleInInspector;
 
   /**
+   * Gets or sets a boolean indicating that the value of this input will not change after a build
+   */
+  bool isConstant;
+
+  /**
    * Gets or sets the connection point type (default is float)
    */
   ReadOnlyProperty<InputBlock, NodeMaterialBlockConnectionPointTypes> type;
