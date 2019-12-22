@@ -25,6 +25,8 @@
 #include <atomic>
 #include <chrono>
 
+
+
 namespace BABYLON {
 namespace asio {
 
@@ -33,6 +35,7 @@ using namespace sync_io_impl;
 using OnSuccessFunctionArrayBuffer            = std::function<void(const ArrayBuffer& data)>;
 
 using FutureArrayBufferOrErrorMessage = std::future<ArrayBufferOrErrorMessage>;
+
 
 
 struct FutureAndCallbacks {
@@ -178,6 +181,14 @@ static std::string ArrayBufferToString(const ArrayBuffer & dataUint8)
   return dataString;
 }
 
+bool HACK_DISABLE_ASYNC = false;
+
+void set_HACK_DISABLE_ASYNC(bool v)
+{
+  HACK_DISABLE_ASYNC = v;
+}
+
+
 void LoadFileAsync_Text(const std::string& filename,
                        const OnSuccessFunction<std::string>& onSuccessFunction,
                        const OnErrorFunction& onErrorFunction,
@@ -194,7 +205,17 @@ void LoadFileAsync_Text(const std::string& filename,
   auto onSuccessFunctionArrayBuffer = [onSuccessFunction](const ArrayBuffer & dataUint8) {
     onSuccessFunction(ArrayBufferToString(dataUint8));
   };
-  service.LoadData(syncLoader, onSuccessFunctionArrayBuffer, onErrorFunction);
+
+  if (!HACK_DISABLE_ASYNC)
+    service.LoadData(syncLoader, onSuccessFunctionArrayBuffer, onErrorFunction);
+  else
+  {
+    ArrayBufferOrErrorMessage r = LoadFileSync_Binary(filename, onProgressFunction);
+    if (std::holds_alternative<ErrorMessage>(r))
+      onErrorFunction( std::get<ErrorMessage>(r).errorMessage );
+    else
+      onSuccessFunctionArrayBuffer(std::get<ArrayBuffer>(r));
+  }
 }
 
 void LoadFileAsync_Binary(
@@ -209,10 +230,19 @@ void LoadFileAsync_Binary(
 #ifdef CAN_NAME_THREAD
     THIS_THREAD_SET_NAME("asio: LoadFileSync_Binary");
 #endif
-
     return LoadFileSync_Binary(filename, onProgressFunction);
   };
-  service.LoadData(syncLoader, onSuccessFunction, onErrorFunction);
+
+  if (!HACK_DISABLE_ASYNC)
+    service.LoadData(syncLoader, onSuccessFunction, onErrorFunction);
+  else
+  {
+    ArrayBufferOrErrorMessage r = LoadFileSync_Binary(filename, onProgressFunction);
+    if (std::holds_alternative<ErrorMessage>(r))
+      onErrorFunction( std::get<ErrorMessage>(r).errorMessage );
+    else
+      onSuccessFunction(std::get<ArrayBuffer>(r));
+  }
 }
 
 void LoadUrlAsync_Text(
