@@ -13,8 +13,7 @@ class BaseTexture;
 using BaseTexturePtr = std::shared_ptr<BaseTexture>;
 
 /**
- * @brief Represents the different options available during the creation of a
- * Environment helper.
+ * @brief Represents the different options available during the creation of a Environment helper.
  *
  * This can control the default ground, skybox and image processing setup of
  * your scene.
@@ -91,10 +90,8 @@ struct BABYLON_SHARED_EXPORT IEnvironmentHelperOptions {
 
   /**
    * Specifies the ground mirror reflectance weight.
-   * This uses the standard weight of the background material to setup the
-   * fresnel effect
-   * of the mirror.
-   * 1 by default.
+   * This uses the standard weight of the background material to setup the fresnel effect of the
+   * mirror. 1 by default.
    */
   float groundMirrorFresnelWeight = 1.f;
 
@@ -112,8 +109,8 @@ struct BABYLON_SHARED_EXPORT IEnvironmentHelperOptions {
   unsigned int groundMirrorTextureType;
 
   /**
-   * Specifies a bias applied to the ground vertical position to prevent
-   * z-fighting with the shown objects.
+   * Specifies a bias applied to the ground vertical position to prevent z-fighting with the shown
+   * objects.
    */
   float groundYBias;
 
@@ -168,8 +165,7 @@ struct BABYLON_SHARED_EXPORT IEnvironmentHelperOptions {
 
   /**
    * The texture used as your environment texture in the scene.
-   * Comes from the BabylonJS CDN by default and in use if setupImageProcessing
-   * is true.
+   * Comes from the BabylonJS CDN by default and in use if setupImageProcessing is true.
    *
    * Remarks: Can be either a texture or a url.
    */
