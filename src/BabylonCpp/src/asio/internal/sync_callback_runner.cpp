@@ -1,4 +1,5 @@
 #include <babylon/asio/internal/sync_callback_runner.h>
+#include <babylon/core/logging.h>
 #include <future>
 #include <deque>
 
@@ -23,19 +24,44 @@ void PushCallback(const VoidCallback & function)
 
 void HeartBeat()
 {
-  VoidCallback callback;
+  int nbRemainingCallback = -1;
+  int nbCallbackAtStart = -1;
+  static int nbRemainingCallback_Last = -1;
 
+  bool done = false;
+  while (!done)
   {
-    std::lock_guard<std::mutex> guard(gMutexPendingCallbacks);
-    if (!gPendingCallbacks.empty())
+    VoidCallback callback;
     {
-      callback = gPendingCallbacks.front();
-      gPendingCallbacks.pop_front();
-    }
-  }
+      std::lock_guard<std::mutex> guard(gMutexPendingCallbacks);
 
-  if (callback)
-    callback();
+      if (nbCallbackAtStart < 0)
+        nbCallbackAtStart = gPendingCallbacks.size();
+
+      if (!gPendingCallbacks.empty())
+      {
+        callback = gPendingCallbacks.front();
+        gPendingCallbacks.pop_front();
+      }
+      nbRemainingCallback = gPendingCallbacks.size();
+    }
+
+    if (callback) {
+      BABYLON_LOG_INFO("sync_callback_runner", "Calling one callback, remaining ", nbRemainingCallback);
+      callback();
+    }
+    else
+      done = true;
+   }
+
+  if (nbRemainingCallback != nbRemainingCallback_Last) {
+    char msg[1000];
+    snprintf(msg, 1000, "HeartBeat end, called %i callbacks, remaining %i",
+             nbCallbackAtStart - nbRemainingCallback,
+             nbRemainingCallback);
+    BABYLON_LOG_INFO("sync_callback_runner", msg, "");
+    nbRemainingCallback_Last = nbRemainingCallback;
+  }
 }
 
 bool HasRemainingCallbacks()

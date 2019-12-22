@@ -1,6 +1,7 @@
 #include <babylon/asio/internal/file_loader_sync.h>
 #include <babylon/asio/internal/sync_callback_runner.h>
 #include <babylon/core/filesystem.h>
+#include <babylon/core/logging.h>
 #include <fstream>
 
 namespace BABYLON {
@@ -72,6 +73,7 @@ ArrayBufferOrErrorMessage LoadFileSync_Binary(
     sync_callback_runner::PushCallback(f);
   }
 
+  BABYLON_LOG_INFO("LoadFileSync_Binary", "Finished loading ", filename.c_str());
   return buffer;
 }
 
