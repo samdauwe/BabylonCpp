@@ -3,7 +3,6 @@ include(../../cmake/BuildEnvironment.cmake)
 
 if (EMSCRIPTEN)
     set(CMAKE_EXECUTABLE_SUFFIX ".html")
-    add_link_options(--preload-file  ${CMAKE_SOURCE_DIR}/assets@/assets)
 endif()
 
 #
