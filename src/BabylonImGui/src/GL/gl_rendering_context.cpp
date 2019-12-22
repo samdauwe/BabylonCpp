@@ -9,6 +9,9 @@
 // below. #define GLAD_DEBUG
 #include <glad/glad.h>
 
+// ASYNC_FIXME: needed for emscripten, but should be removed
+#include <GLFW/glfw3.h>
+
 // Logging
 #include <babylon/core/logging.h>
 

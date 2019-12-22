@@ -403,6 +403,11 @@ void Effect::_processShaderConversion(
   const std::string& sourceCode, bool isFragment,
   const std::function<void(const std::string&)>& callback)
 {
+  // Debug
+  {
+    static int nbCalls = 0;
+    BABYLON_LOG_DEBUG("Effect", "_processShaderConversion #", (++nbCalls));
+  }
 
   auto preparedSourceCode = _processPrecision(sourceCode);
 
@@ -429,13 +434,13 @@ void Effect::_processShaderConversion(
   const std::string regex(
     "#extension.+(GL_OES_standard_derivatives|GL_EXT_shader_texture_lod|GL_EXT_"
     "frag_depth|GL_EXT_draw_buffers).+(enable|require)");
-  auto result = String::regexReplace(preparedSourceCode, regex, "");
+  auto result = String::regexReplace_Cached(preparedSourceCode, regex, "");
 
   // Migrate to GLSL v300
-  result = String::regexReplace(result, "varying(?![\n\r])\\s",
+  result = String::regexReplace_Cached(result, "varying(?![\n\r])\\s",
                                 isFragment ? "in " : "out ");
-  result = String::regexReplace(result, "attribute[ \t]", "in ");
-  result = String::regexReplace(result, "[ \t]attribute", " in");
+  result = String::regexReplace_Cached(result, "attribute[ \t]", "in ");
+  result = String::regexReplace_Cached(result, "[ \t]attribute", " in");
 
   if (isFragment) {
     const std::vector<std::pair<std::string, std::string>> fragmentMappings{
@@ -452,7 +457,7 @@ void Effect::_processShaderConversion(
 
     };
     for (const auto& fragmentMapping : fragmentMappings) {
-      result = String::regexReplace(result, fragmentMapping.first,
+      result = String::regexReplace_Cached(result, fragmentMapping.first,
                                     fragmentMapping.second);
     }
   }

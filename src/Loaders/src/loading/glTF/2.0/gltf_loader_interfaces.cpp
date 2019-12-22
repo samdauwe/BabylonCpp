@@ -119,25 +119,25 @@ IGLTF2::IAccessorSparseValues::Parse(const json& parsedAccessorSparseValues)
   return accessorSparseValues;
 }
 
-std::shared_ptr<IAnimation> IAnimation::Parse(const json& parsedAnimation)
+IAnimation IAnimation::Parse(const json& parsedAnimation)
 {
-  auto animation = std::make_shared<IAnimation>();
+  IAnimation animation;
 
   // Channels
   for (const auto& channel :
        json_util::get_array<json>(parsedAnimation, "channels")) {
-    animation->channels.emplace_back(IAnimationChannel::Parse(channel));
+    animation.channels.emplace_back(IAnimationChannel::Parse(channel));
   }
 
   // Samplers
   for (const auto& sampler :
        json_util::get_array<json>(parsedAnimation, "samplers")) {
-    animation->samplers.emplace_back(IAnimationSampler::Parse(sampler));
+    animation.samplers.emplace_back(IAnimationSampler::Parse(sampler));
   }
 
   // Name
   if (json_util::has_valid_key_value(parsedAnimation, "name")) {
-    animation->name = json_util::get_string(parsedAnimation, "name");
+    animation.name = json_util::get_string(parsedAnimation, "name");
   }
 
   return animation;

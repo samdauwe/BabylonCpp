@@ -1239,7 +1239,7 @@ struct IGLTF : public IProperty {
   /**
    * An array of keyframe animations
    */
-  std::vector<std::shared_ptr<GLTF2::IAnimation>> animations;
+  std::vector<GLTF2::IAnimation> animations;
   /**
    * Metadata about the glTF asset
    */
@@ -1416,7 +1416,7 @@ struct IAnimation : public IGLTF2::IAnimation, IArrayItem {
   /** @hidden */
   AnimationGroupPtr _babylonAnimationGroup = nullptr;
 
-  static std::shared_ptr<IAnimation> Parse(const json& parsedAnimation);
+  static IAnimation Parse(const json& parsedAnimation);
 
 }; // end of struct IAnimation
 
@@ -1425,7 +1425,7 @@ struct IAnimation : public IGLTF2::IAnimation, IArrayItem {
  */
 struct IBuffer : public IGLTF2::IBuffer, IArrayItem {
   /** @hidden */
-  std::shared_ptr<ArrayBufferView> _data;
+  ArrayBufferView _data;
 
   static IBuffer Parse(const json& parsedBuffer);
 
@@ -1436,7 +1436,7 @@ struct IBuffer : public IGLTF2::IBuffer, IArrayItem {
  */
 struct IBufferView : public IGLTF2::IBufferView, IArrayItem {
   /** @hidden */
-  std::shared_ptr<ArrayBufferView> _data;
+  ArrayBufferView _data;
 
   /** @hidden */
   BufferPtr _babylonBuffer = nullptr;
@@ -1457,7 +1457,7 @@ struct ICamera : public IGLTF2::ICamera, IArrayItem {
  */
 struct IImage : public IGLTF2::IImage, IArrayItem {
   /** @hidden */
-  std::shared_ptr<ArrayBufferView> _data;
+  ArrayBufferView _data;
 
   static IImage Parse(const json& parsedImage);
 

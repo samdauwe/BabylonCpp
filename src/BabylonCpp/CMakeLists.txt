@@ -146,6 +146,7 @@ target_include_directories(${TARGET}
     ${JSON_HPP_INCLUDE_DIRS}
     PUBLIC SYSTEM
     ${STB_IMAGE_INCLUDE_DIR}
+    ${PROMISE_CPP_INCLUDE_DIR}
 )
 
 # Compile definitions

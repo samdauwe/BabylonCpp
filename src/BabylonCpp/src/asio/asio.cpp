@@ -5,19 +5,28 @@
 #include <babylon/core/filesystem.h>
 #include <babylon/core/string.h>
 #include <babylon/asio/internal/sync_callback_runner.h>
+#include <iostream>
 
-#if defined(__linux__) or defined(__APPLE__)
-#define HAS_PTHREAD
+#if defined(__linux__) || defined(__APPLE__)
+#define CAN_NAME_THREAD
 #endif
 
-#ifdef HAS_PTHREAD
-#include <pthread.h>
+#ifdef CAN_NAME_THREAD
+  #include <pthread.h>
+  #ifdef __APPLE__
+    #define THIS_THREAD_SET_NAME(name)  pthread_setname_np(name)
+  #elif defined(__linux__)
+    #define THIS_THREAD_SET_NAME(name) pthread_setname_np(pthread_self(), name)
+  #endif
 #endif
+
 
 #include <deque>
 #include <future>
 #include <atomic>
 #include <chrono>
+
+
 
 namespace BABYLON {
 namespace asio {
@@ -27,6 +36,7 @@ using namespace sync_io_impl;
 using OnSuccessFunctionArrayBuffer            = std::function<void(const ArrayBuffer& data)>;
 
 using FutureArrayBufferOrErrorMessage = std::future<ArrayBufferOrErrorMessage>;
+
 
 
 struct FutureAndCallbacks {
@@ -84,9 +94,8 @@ private:
   }
   ~AsyncLoadService()
   {
-    mStopRequested = true;
+    // mStopRequested = true;
   }
-
   void CheckTasksStatus()
   {
     std::lock_guard<std::mutex> guard(mMutexRunningIOTasks);
@@ -106,8 +115,8 @@ private:
   void CheckIOCompletion_AsyncProc() // This will be called in a parallel thread
   {
     using namespace std::literals;
-#ifdef HAS_PTHREAD
-    pthread_setname_np("asio: CheckIOCompletion");
+#ifdef CAN_NAME_THREAD
+    THIS_THREAD_SET_NAME("asio: CheckIOCompletion");
 #endif
     while (!mStopRequested) {
       CheckTasksStatus();
@@ -148,6 +157,11 @@ public:
     return mHasRunningIOTasks;
   }
 
+  void Stop()
+  {
+    mStopRequested = true;
+  }
+
 private:
   std::vector<FutureAndCallbacks> mRunningIOTasks;
   std::atomic<bool> mHasRunningIOTasks;
@@ -168,23 +182,54 @@ static std::string ArrayBufferToString(const ArrayBuffer & dataUint8)
   return dataString;
 }
 
+#ifdef __EMSCRIPTEN__
+bool HACK_DISABLE_ASYNC = true;
+#else
+bool HACK_DISABLE_ASYNC = false;
+#endif
+void set_HACK_DISABLE_ASYNC(bool v)
+{
+#ifndef __EMSCRIPTEN__
+  HACK_DISABLE_ASYNC = v;
+#endif
+}
+
+
 void LoadFileAsync_Text(const std::string& filename,
                        const OnSuccessFunction<std::string>& onSuccessFunction,
                        const OnErrorFunction& onErrorFunction,
                        const OnProgressFunction& onProgressFunction
                        )
 {
-  auto & service = AsyncLoadService::Instance();
-  auto syncLoader = [filename, onProgressFunction]() {
-#ifdef HAS_PTHREAD
-    pthread_setname_np("asio: LoadFileSync_Text");
+  if (!HACK_DISABLE_ASYNC)
+  {
+    auto& service   = AsyncLoadService::Instance();
+    auto syncLoader = [filename, onProgressFunction]() {
+#ifdef CAN_NAME_THREAD
+      THIS_THREAD_SET_NAME("asio: LoadFileSync_Text");
 #endif
-    return LoadFileSync_Binary(filename, onProgressFunction);
-  };
-  auto onSuccessFunctionArrayBuffer = [onSuccessFunction](const ArrayBuffer & dataUint8) {
-    onSuccessFunction(ArrayBufferToString(dataUint8));
-  };
-  service.LoadData(syncLoader, onSuccessFunctionArrayBuffer, onErrorFunction);
+      return LoadFileSync_Binary(filename, onProgressFunction);
+    };
+    auto onSuccessFunctionArrayBuffer = [onSuccessFunction](const ArrayBuffer& dataUint8) {
+      onSuccessFunction(ArrayBufferToString(dataUint8));
+    };
+    service.LoadData(syncLoader, onSuccessFunctionArrayBuffer, onErrorFunction);
+  }
+  else
+  {
+    ArrayBufferOrErrorMessage r = LoadFileSync_Binary(filename, onProgressFunction);
+    if (std::holds_alternative<ErrorMessage>(r)) {
+      std::cout << "LoadFileAsync_Text hack error with " << filename << "\n";
+      onErrorFunction( std::get<ErrorMessage>(r).errorMessage );
+    }
+    else {
+      auto onSuccessFunctionArrayBuffer = [onSuccessFunction](const ArrayBuffer& dataUint8) {
+        onSuccessFunction(ArrayBufferToString(dataUint8));
+      };
+      onSuccessFunctionArrayBuffer(std::get<ArrayBuffer>(r));
+    }
+
+  }
 }
 
 void LoadFileAsync_Binary(
@@ -194,14 +239,28 @@ void LoadFileAsync_Binary(
   const OnProgressFunction& onProgressFunction
   )
 {
-  auto & service = AsyncLoadService::Instance();
-  auto syncLoader = [filename, onProgressFunction]() {
-#ifdef HAS_PTHREAD
-    pthread_setname_np("asio: LoadFileSync_Binary");
+  if (!HACK_DISABLE_ASYNC) {
+    auto & service = AsyncLoadService::Instance();
+    auto syncLoader = [filename, onProgressFunction]() {
+#ifdef CAN_NAME_THREAD
+      THIS_THREAD_SET_NAME("asio: LoadFileSync_Binary");
 #endif
-    return LoadFileSync_Binary(filename, onProgressFunction);
-  };
-  service.LoadData(syncLoader, onSuccessFunction, onErrorFunction);
+      return LoadFileSync_Binary(filename, onProgressFunction);
+    };
+    service.LoadData(syncLoader, onSuccessFunction, onErrorFunction);
+  }
+  else
+  {
+    ArrayBufferOrErrorMessage r = LoadFileSync_Binary(filename, onProgressFunction);
+    if (std::holds_alternative<ErrorMessage>(r)) {
+      std::cout << "LoadFileAsync_Binary hack error with " << filename << "\n";
+      onErrorFunction(std::get<ErrorMessage>(r).errorMessage);
+    }
+    else {
+      std::cout << "LoadFileAsync_Binary hack success with " << filename << "\n";
+      onSuccessFunction(std::get<ArrayBuffer>(r));
+    }
+  }
 }
 
 void LoadUrlAsync_Text(
@@ -253,9 +312,17 @@ void HeartBeat_Sync()
 
 void Service_WaitAll_Sync()
 {
+#ifndef __EMSCRIPTEN__
   auto & service = AsyncLoadService::Instance();
   service.WaitIoCompletion_Sync();
   sync_callback_runner::CallAllPendingCallbacks();
+#endif
+}
+
+BABYLON_SHARED_EXPORT void Service_Stop()
+{
+  auto& service = AsyncLoadService::Instance();
+  service.Stop();
 }
 
 bool HasRemainingTasks()

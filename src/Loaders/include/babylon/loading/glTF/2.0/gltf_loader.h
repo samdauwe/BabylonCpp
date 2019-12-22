@@ -250,7 +250,7 @@ public:
    * @returns A promise that resolves with the loaded Babylon animation group
    * when the load is complete
    */
-  AnimationGroupPtr loadAnimationAsync(const std::string& context, std::shared_ptr<IAnimation>& animation);
+  AnimationGroupPtr loadAnimationAsync(const std::string& context, IAnimation& animation);
 
   /**
    * @brief Loads a glTF animation channel.
@@ -264,7 +264,7 @@ public:
    * @returns A void promise when the channel load is complete
    */
   void _loadAnimationChannelAsync(const std::string& context, const std::string& animationContext,
-                                  const std::shared_ptr<IAnimation>& animation, const IAnimationChannel& channel,
+                                  IAnimation& animation, const IAnimationChannel& channel,
                                   const AnimationGroupPtr& babylonAnimationGroup,
                                   const IAnimatablePtr& animationTargetOverride = nullptr);
 
@@ -275,7 +275,7 @@ public:
    * @returns A promise that resolves with the loaded data when the load is
    * complete
    */
-  std::shared_ptr<ArrayBufferView>& loadBufferViewAsync(const std::string& context, IBufferView& bufferView);
+  ArrayBufferView& loadBufferViewAsync(const std::string& context, IBufferView& bufferView);
 
   /**
    * @brief Hidden
@@ -347,7 +347,7 @@ public:
    * @returns A promise that resolves with the loaded data when the load is
    * complete
    */
-  std::shared_ptr<ArrayBufferView> loadImageAsync(const std::string& context, IImage& image);
+  ArrayBufferView& loadImageAsync(const std::string& context, IImage& image);
   /**
    * @brief Loads a glTF uri.
    * @param context The context when loading the asset
@@ -355,7 +355,7 @@ public:
    * @returns A promise that resolves with the loaded data when the load is
    * complete
    */
-  std::shared_ptr<ArrayBufferView> loadUriAsync(const std::string& context, const std::string& uri);
+  ArrayBufferView loadUriAsync(const std::string& context, const std::string& uri);
 
   /**
    * @brief Adds a JSON pointer to the metadata of the Babylon object at
@@ -463,7 +463,7 @@ private:
   void _loadAnimationsAsync();
   _IAnimationSamplerData _loadAnimationSamplerAsync(const std::string& context,
                                                     IAnimationSampler& sampler);
-  std::shared_ptr<ArrayBufferView> _loadBufferAsync(const std::string& context, IBuffer& buffer);
+  ArrayBufferView& _loadBufferAsync(const std::string& context, IBuffer& buffer);
   template <typename T>
   ArrayBufferView& _loadAccessorAsync(const std::string& context, IAccessor& accessor);
   Float32Array& _loadFloatAccessorAsync(const std::string& context, IAccessor& accessor);
@@ -525,8 +525,8 @@ private:
     const std::string& context, const IGLTF2::ITextureInfo& textureInfo,
     const std::function<void(const BaseTexturePtr& babylonTexture)>& assign);
   AnimationGroupPtr _extensionsLoadAnimationAsync(const std::string& context,
-                                                  const std::shared_ptr<IAnimation>& animation);
-  std::shared_ptr<ArrayBufferView> _extensionsLoadUriAsync(const std::string& context,
+                                                  const IAnimation& animation);
+  std::optional<ArrayBufferView> _extensionsLoadUriAsync(const std::string& context,
                                                          const std::string& uri);
 
 private:

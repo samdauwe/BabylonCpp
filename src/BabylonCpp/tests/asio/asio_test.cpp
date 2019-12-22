@@ -9,7 +9,7 @@
 
 std::string assets_folder = std::string(BABYLON_REPO_DIR) + std::string("/assets/");
 
-std::string textUrl = std::string("file:/") + assets_folder + "/samples_info.json";
+std::string textUrl = std::string("file:/") + assets_folder + "/fonts/fa-regular-400.ttf";
 std::string binaryUrl = std::string("file:/") + assets_folder
   + "/glTF-Sample-Models/2.0/AntiqueCamera/glTF/camera_camera_Normal.png";
 std::string nonExistingFileUrl = "file:/non_existing_file";
@@ -42,10 +42,11 @@ void SampleApplicationLoop()
     EXPECT_EQ(thisThreadId, mainThreadId);
     ++nb_success_binary;
   };
-  auto onError = [&nb_error, mainThreadId](const std::string& /*message*/) {
+  auto onError = [&nb_error, mainThreadId](const std::string& message) {
     auto thisThreadId = std::this_thread::get_id();
     EXPECT_EQ(thisThreadId, mainThreadId);
     ++nb_error;
+    std::cout << "onError: "<< message << "\n";
   };
   auto onProgress = [&nb_calls_to_progress, mainThreadId](bool /*lengthComputable*/, size_t /*loaded*/, size_t /*total*/) {
     auto thisThreadId = std::this_thread::get_id();
@@ -89,7 +90,13 @@ void SampleApplicationLoop()
 
 TEST(async_requests, SampleApplicationLoop)
 {
+#ifndef _WIN32
+  std::cout << "BABYLON_REPO_DIR is " << BABYLON_REPO_DIR << "\n";
+  std::cout << "isFile(" <<  textUrl.substr(6) << ") => " << BABYLON::Filesystem::isFile(textUrl.substr(6)) << "\n";
+  std::cout << "isFile(" <<  binaryUrl.substr(6) << ") => " << BABYLON::Filesystem::isFile(binaryUrl.substr(6)) << "\n";
   SampleApplicationLoop();
+  BABYLON::asio::Service_Stop();
+#endif // _WIN32
 }
 
 TEST(async_requests, LoadText)

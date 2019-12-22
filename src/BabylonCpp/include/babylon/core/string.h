@@ -450,6 +450,31 @@ inline std::string regexReplace(const std::string& source,
 }
 
 /**
+ * @brief regexReplace_Cached
+ * Performs a regex and stores the std::regex in a static cache.
+ * Use it for commonly used replacements.
+ */
+inline std::string regexReplace_Cached(
+  const std::string& source,
+  const std::string& reSearch,
+  const std::string& replacement)
+{
+  std::string result;
+  std::regex * regex;
+  {
+    static std::unordered_map<std::string, std::regex> preparedRegexes;
+    if (preparedRegexes.find(reSearch) == preparedRegexes.end())
+      preparedRegexes[reSearch] = std::regex(reSearch, std::regex::optimize);
+
+    regex = & preparedRegexes.at(reSearch);
+  }
+
+  std::regex_replace(std::back_inserter(result), source.begin(), source.end(),
+                     *regex, replacement);
+  return result;
+}
+
+/**
  * @brief Uses a regular expression to perform substitution on a sequence of
  * characters.
  * @param source The input character sequence.

@@ -1,5 +1,6 @@
 #include "runner_babylon.h"
 
+#include <babylon/asio/asio.h>
 #include <babylon/core/filesystem.h>
 #include <babylon/babylon_common.h>
 #include <glad/glad.h>
@@ -224,6 +225,7 @@ void InvokeRunnerBabylonGlfw(const AppWindowParams& appWindowParams,
     postInitFunction
     );
   runner_babylon.Run();
+  BABYLON::asio::Service_Stop();
 }
 #endif
 
@@ -240,6 +242,7 @@ void InvokeRunnerBabylonSdl(const AppWindowParams& appWindowParams,
     postInitFunction
   );
   runner_babylon.Run();
+  BABYLON::asio::Service_Stop();
 }
 #endif
 
@@ -259,6 +262,7 @@ void InvokeRunnerBabylonEmscripten(const AppWindowParams& appWindowParams,
     postInitFunction
   );
   gRunnerBabylon->Run();
+  BABYLON::asio::Service_Stop();
 }
 #endif
 
