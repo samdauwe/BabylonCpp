@@ -11,31 +11,26 @@
 
 namespace BABYLON {
 
-PhotoDome::PhotoDome(
-  std::string iName, const std::string& urlOfPhoto, PhotoDomeOptions options,
-  Scene* scene,
-  const std::function<void(const std::string& message)>& /*onError*/)
+PhotoDome::PhotoDome(std::string iName, const std::string& urlOfPhoto, PhotoDomeOptions options,
+                     Scene* scene,
+                     const std::function<void(const std::string& message)>& /*onError*/)
     : TransformNode{iName, scene}
-    , photoTexture{this, &PhotoDome::get_photoTexture,
-                   &PhotoDome::set_photoTexture}
+    , photoTexture{this, &PhotoDome::get_photoTexture, &PhotoDome::set_photoTexture}
     , mesh{this, &PhotoDome::get_mesh}
-    , fovMultiplier{this, &PhotoDome::get_fovMultiplier,
-                    &PhotoDome::set_fovMultiplier}
+    , fovMultiplier{this, &PhotoDome::get_fovMultiplier, &PhotoDome::set_fovMultiplier}
     , imageMode{this, &PhotoDome::get_imageMode, &PhotoDome::set_imageMode}
     , _useDirectMapping{false}
     , _imageMode{PhotoDome::MODE_MONOSCOPIC}
     , _onBeforeCameraRenderObserver{nullptr}
 {
   // set defaults and manage values
-  name = !iName.empty() ? iName : "photoDome";
-  options.resolution
-    = options.resolution.has_value() ? *options.resolution : 32u;
+  name               = !iName.empty() ? iName : "photoDome";
+  options.resolution = options.resolution.has_value() ? *options.resolution : 32u;
   options.size
     = options.size.has_value() ?
         *options.size :
-        (scene->activeCamera() ?
-           static_cast<unsigned>(scene->activeCamera()->maxZ * 0.48f) :
-           1000u);
+        (scene->activeCamera() ? static_cast<unsigned>(scene->activeCamera()->maxZ * 0.48f) :
+                                 1000u);
 
   if (!options.useDirectMapping.has_value()) {
     _useDirectMapping = true;
@@ -51,11 +46,9 @@ PhotoDome::PhotoDome(
   _setReady(false);
 
   // create
-  auto material = _material
-    = BackgroundMaterial::New(name + "_material", scene);
-  _mesh = Mesh::CreateSphere(name + "_mesh", *options.resolution,
-                             static_cast<float>(*options.size), scene, false,
-                             Mesh::BACKSIDE);
+  auto material = _material = BackgroundMaterial::New(name + "_material", scene);
+  _mesh = Mesh::CreateSphere(name + "_mesh", *options.resolution, static_cast<float>(*options.size),
+                             scene, false, Mesh::BACKSIDE);
 
   // configure material
   material->opacityFresnel        = false;
@@ -75,9 +68,8 @@ PhotoDome::PhotoDome(
   if (*options.faceForward && scene->activeCamera()) {
     auto& camera = scene->activeCamera();
 
-    auto iForward = Vector3::Forward();
-    auto direction
-      = Vector3::TransformNormal(iForward, camera->getViewMatrix());
+    auto iForward  = Vector3::Forward();
+    auto direction = Vector3::TransformNormal(iForward, camera->getViewMatrix());
     direction.normalize();
 
     rotation().y = std::acos(Vector3::Dot(iForward, direction));
