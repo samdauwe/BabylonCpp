@@ -153,8 +153,8 @@ target_include_directories(${TARGET}
 target_compile_definitions(${TARGET}
     PUBLIC
     $<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:${TARGET_UPPER}_STATIC_DEFINE>
+    BABYLON_REPO_FOLDER="${CMAKE_SOURCE_DIR}"
 )
-
 # Compile options
 target_compile_options(${TARGET}
     PUBLIC

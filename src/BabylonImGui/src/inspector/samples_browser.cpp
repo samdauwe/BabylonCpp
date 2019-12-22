@@ -10,6 +10,7 @@
 #include <babylon/inspector/samples_browser.h>
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/babylon_common.h>
+#include <babylon/samples/samples_index.h>
 
 #include <imgui.h>
 
@@ -170,8 +171,10 @@ private:
     {
       ImGui::SameLine();
       std::string viewCodeLabel = ICON_FA_EDIT " View code##" + sampleName;
-      if (ImGui::Button(viewCodeLabel.c_str()))
-        OnEditFiles({ sampleInfo.HeaderFile, sampleInfo.SourceFile });
+      if (ImGui::Button(viewCodeLabel.c_str())) {
+        std::string sample_cpp_file = Samples::SamplesProjectFolder() + "/" + sampleInfo.SourceFile;
+        OnEditFiles({ sample_cpp_file });
+      }
     }
 
     if (!sampleInfo.Links.empty()) {

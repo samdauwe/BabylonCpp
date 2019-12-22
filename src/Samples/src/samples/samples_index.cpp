@@ -1,5 +1,6 @@
 #include <babylon/samples/samples_index.h>
 
+#include <babylon/babylon_common.h>
 #include <babylon/samples/babylon_register_sample.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/string.h>
@@ -225,6 +226,13 @@ std::string SampleFailureReason_Str(SampleFailureReasonKind s)
       throw "Unhandled enum!";
   }
 }
+
+std::string SamplesProjectFolder()
+{
+  std::string folder = babylon_repo_folder() + "/src/Samples/";
+  return folder;
+}
+
 
 } // end of namespace Samples
 } // end of namespace BABYLON

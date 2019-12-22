@@ -324,6 +324,12 @@ inline std::string assets_folder() {
 #endif
 }
 
+inline std::string babylon_repo_folder() {
+  static std::string repo_dir = BABYLON_REPO_FOLDER;
+  return repo_dir;
+}
+
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_COMMON_H

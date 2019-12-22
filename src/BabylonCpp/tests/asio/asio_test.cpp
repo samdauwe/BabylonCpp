@@ -7,7 +7,7 @@
 #include <thread>
 #include <iostream>
 
-std::string assets_folder = std::string(BABYLON_REPO_DIR) + std::string("/assets/");
+std::string assets_folder = BABYLON::babylon_repo_folder() + std::string("/assets/");
 
 std::string textUrl = std::string("file:/") + assets_folder + "/fonts/fa-regular-400.ttf";
 std::string binaryUrl = std::string("file:/") + assets_folder
@@ -91,7 +91,6 @@ void SampleApplicationLoop()
 TEST(async_requests, SampleApplicationLoop)
 {
 #ifndef _WIN32
-  std::cout << "BABYLON_REPO_DIR is " << BABYLON_REPO_DIR << "\n";
   std::cout << "isFile(" <<  textUrl.substr(6) << ") => " << BABYLON::Filesystem::isFile(textUrl.substr(6)) << "\n";
   std::cout << "isFile(" <<  binaryUrl.substr(6) << ") => " << BABYLON::Filesystem::isFile(binaryUrl.substr(6)) << "\n";
   SampleApplicationLoop();
