@@ -1,3 +1,5 @@
+#ifndef __EMSCRIPTEN__
+
 #include <babylon/asio/asio.h>
 
 #include <babylon/asio/internal/file_loader_sync.h>
@@ -182,16 +184,10 @@ static std::string ArrayBufferToString(const ArrayBuffer & dataUint8)
   return dataString;
 }
 
-#ifdef __EMSCRIPTEN__
-bool HACK_DISABLE_ASYNC = true;
-#else
 bool HACK_DISABLE_ASYNC = false;
-#endif
 void set_HACK_DISABLE_ASYNC(bool v)
 {
-#ifndef __EMSCRIPTEN__
   HACK_DISABLE_ASYNC = v;
-#endif
 }
 
 
@@ -312,11 +308,9 @@ void HeartBeat_Sync()
 
 void Service_WaitAll_Sync()
 {
-#ifndef __EMSCRIPTEN__
   auto & service = AsyncLoadService::Instance();
   service.WaitIoCompletion_Sync();
   sync_callback_runner::CallAllPendingCallbacks();
-#endif
 }
 
 BABYLON_SHARED_EXPORT void Service_Stop()
@@ -334,3 +328,5 @@ bool HasRemainingTasks()
 
 } // namespace asio
 } // namespace BABYLON
+
+#endif // #ifndef __EMSCRIPTEN__
