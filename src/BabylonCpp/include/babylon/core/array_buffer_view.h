@@ -34,7 +34,7 @@ struct BABYLON_SHARED_EXPORT ArrayBufferView {
   [[nodiscard]] size_t byteLength() const;
   operator bool() const;
 
-  size_t byteOffset;
+  size_t byteOffset = 0;
   Int8Array int8Array;
   Uint8Array uint8Array;
   Int16Array int16Array;
