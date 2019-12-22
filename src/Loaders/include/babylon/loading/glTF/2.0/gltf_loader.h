@@ -250,7 +250,7 @@ public:
    * @returns A promise that resolves with the loaded Babylon animation group
    * when the load is complete
    */
-  AnimationGroupPtr loadAnimationAsync(const std::string& context, std::shared_ptr<IAnimation>& animation);
+  AnimationGroupPtr loadAnimationAsync(const std::string& context, IAnimation& animation);
 
   /**
    * @brief Loads a glTF animation channel.
@@ -264,7 +264,7 @@ public:
    * @returns A void promise when the channel load is complete
    */
   void _loadAnimationChannelAsync(const std::string& context, const std::string& animationContext,
-                                  const std::shared_ptr<IAnimation>& animation, const IAnimationChannel& channel,
+                                  IAnimation& animation, const IAnimationChannel& channel,
                                   const AnimationGroupPtr& babylonAnimationGroup,
                                   const IAnimatablePtr& animationTargetOverride = nullptr);
 
@@ -525,7 +525,7 @@ private:
     const std::string& context, const IGLTF2::ITextureInfo& textureInfo,
     const std::function<void(const BaseTexturePtr& babylonTexture)>& assign);
   AnimationGroupPtr _extensionsLoadAnimationAsync(const std::string& context,
-                                                  const std::shared_ptr<IAnimation>& animation);
+                                                  const IAnimation& animation);
   std::optional<ArrayBufferView> _extensionsLoadUriAsync(const std::string& context,
                                                          const std::string& uri);
 
