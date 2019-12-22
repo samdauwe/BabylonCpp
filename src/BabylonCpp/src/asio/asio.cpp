@@ -5,6 +5,7 @@
 #include <babylon/core/filesystem.h>
 #include <babylon/core/string.h>
 #include <babylon/asio/internal/sync_callback_runner.h>
+#include <iostream>
 
 #if defined(__linux__) || defined(__APPLE__)
 #define CAN_NAME_THREAD
@@ -181,11 +182,16 @@ static std::string ArrayBufferToString(const ArrayBuffer & dataUint8)
   return dataString;
 }
 
+#ifdef __EMSCRIPTEN__
+bool HACK_DISABLE_ASYNC = true;
+#else
 bool HACK_DISABLE_ASYNC = false;
-
+#endif
 void set_HACK_DISABLE_ASYNC(bool v)
 {
+#ifndef __EMSCRIPTEN__
   HACK_DISABLE_ASYNC = v;
+#endif
 }
 
 
@@ -211,10 +217,15 @@ void LoadFileAsync_Text(const std::string& filename,
   else
   {
     ArrayBufferOrErrorMessage r = LoadFileSync_Binary(filename, onProgressFunction);
-    if (std::holds_alternative<ErrorMessage>(r))
+    if (std::holds_alternative<ErrorMessage>(r)) {
+      std::cout << "LoadFileAsync_Text hack error with " << filename << "\n";
       onErrorFunction( std::get<ErrorMessage>(r).errorMessage );
-    else
+    }
+    else {
+      std::cout << "LoadFileAsync_Text hack success with " << filename << "\n";
       onSuccessFunctionArrayBuffer(std::get<ArrayBuffer>(r));
+    }
+
   }
 }
 
@@ -238,10 +249,14 @@ void LoadFileAsync_Binary(
   else
   {
     ArrayBufferOrErrorMessage r = LoadFileSync_Binary(filename, onProgressFunction);
-    if (std::holds_alternative<ErrorMessage>(r))
-      onErrorFunction( std::get<ErrorMessage>(r).errorMessage );
-    else
+    if (std::holds_alternative<ErrorMessage>(r)) {
+      std::cout << "LoadFileAsync_Binary hack error with " << filename << "\n";
+      onErrorFunction(std::get<ErrorMessage>(r).errorMessage);
+    }
+    else {
+      std::cout << "LoadFileAsync_Binary hack success with " << filename << "\n";
       onSuccessFunction(std::get<ArrayBuffer>(r));
+    }
   }
 }
 
