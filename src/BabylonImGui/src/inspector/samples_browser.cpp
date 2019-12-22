@@ -40,8 +40,7 @@ std::string to_snake_case(const std::string &sPascalCase)
   return ss.str();
 }
 
-const std::string screenshotsFolderCurrent = BABYLON::assets_folder() + "/screenshots/samples_current/";
-const std::string screenshotsFolderOriginal = BABYLON::assets_folder() +"/screenshots/samples/";
+const std::string screenshotsFolderCurrent = "screenshots/samples_current/";
 
 } // end anonymous namespace
 
@@ -194,25 +193,12 @@ private:
     const auto & sampleInfo = _samplesInfos[sampleName];
     std::string currentScreenshotFile = screenshotsFolderCurrent + sampleName + ".jpg";
     std::string sample_snake = to_snake_case(sampleName);
-    std::string originalScreenshotFile = screenshotsFolderOriginal + sample_snake + ".png";
 
     if (_showCurrentScreenshots)
     {
       ImGui::BeginGroup();
       ImVec2 imageSize(ImGui::GetWindowWidth() / 3.f, 0.f);
       ImGuiUtils::ImageFromFile(currentScreenshotFile, imageSize);
-      if (_showOriginalScreenshots && _showCurrentScreenshots)
-        ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 0.7f), "Current(c++)");
-      ImGui::EndGroup();
-      ImGui::SameLine();
-    }
-
-    if (_showOriginalScreenshots)
-    {
-      ImGui::BeginGroup();
-      ImGuiUtils::ImageFromFile(originalScreenshotFile);
-      if (_showOriginalScreenshots && _showCurrentScreenshots)
-        ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 0.7f), "Original(js)");
       ImGui::EndGroup();
       ImGui::SameLine();
     }
@@ -297,7 +283,6 @@ private:
     bool onlyFailures = false;
   } _query;
 
-  bool _showOriginalScreenshots = false;
   bool _showCurrentScreenshots = true;
 };
 
