@@ -53,28 +53,6 @@ std::string FileTools::_CleanUrl(std::string url)
   return url;
 }
 
-std::optional<Image> LoadImage_Stbi_Impl(
-  const char *filename,
-  int nb_desired_channels,
-  bool flipVertically)
-{
-
-  // Basic usage (see HDR discussion below for HDR usage):
-  int w, h, nb_channels_real;
-  stbi_set_flip_vertically_on_load(flipVertically);
-  unsigned char *data = stbi_load(filename, &w, &h, &nb_channels_real, nb_desired_channels);
-  stbi_set_flip_vertically_on_load(false);
-  if (data)
-  {
-    unsigned int glColorMode = (nb_desired_channels == 3) ? GL::RGB : GL::RGBA;
-    Image image(data, w * h * nb_desired_channels, w, h, nb_desired_channels, glColorMode);
-    stbi_image_free(data);
-    return image;
-  }
-  return std::nullopt;
-}
-
-
 void FileTools::LoadImageFromUrl(
   std::string url, const std::function<void(const Image& img)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
