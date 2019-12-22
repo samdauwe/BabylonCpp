@@ -403,6 +403,11 @@ void Effect::_processShaderConversion(
   const std::string& sourceCode, bool isFragment,
   const std::function<void(const std::string&)>& callback)
 {
+  // Debug
+  {
+    static int nbCalls = 0;
+    BABYLON_LOG_DEBUG("Effect", "_processShaderConversion #", (++nbCalls));
+  }
 
   auto preparedSourceCode = _processPrecision(sourceCode);
 
