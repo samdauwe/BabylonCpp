@@ -100,3 +100,8 @@ if (BABYLON_BUILD_PLAYGROUND)
     target_include_directories(RuntimeObjectSystem INTERFACE SYSTEM ${RuntimeCompiledCPlusPlus_Dir})
 endif()
 
+# promise-cpp
+add_library(promise_cpp INTERFACE)
+target_include_directories(promise_cpp INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/promise-cpp)
+set(PROMISE_CPP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/promise-cpp
+    CACHE INTERNAL "Include directories of promise-cpp")
