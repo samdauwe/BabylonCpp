@@ -90,11 +90,13 @@ void SampleApplicationLoop()
 
 TEST(async_requests, SampleApplicationLoop)
 {
+#ifndef _WIN32
   std::cout << "BABYLON_REPO_DIR is " << BABYLON_REPO_DIR << "\n";
   std::cout << "isFile(" <<  textUrl.substr(6) << ") => " << BABYLON::Filesystem::isFile(textUrl.substr(6)) << "\n";
   std::cout << "isFile(" <<  binaryUrl.substr(6) << ") => " << BABYLON::Filesystem::isFile(binaryUrl.substr(6)) << "\n";
   SampleApplicationLoop();
   BABYLON::asio::Service_Stop();
+#endif // _WIN32
 }
 
 TEST(async_requests, LoadText)
