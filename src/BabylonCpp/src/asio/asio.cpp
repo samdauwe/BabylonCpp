@@ -201,19 +201,20 @@ void LoadFileAsync_Text(const std::string& filename,
                        const OnProgressFunction& onProgressFunction
                        )
 {
-  auto & service = AsyncLoadService::Instance();
-  auto syncLoader = [filename, onProgressFunction]() {
-#ifdef CAN_NAME_THREAD
-    THIS_THREAD_SET_NAME("asio: LoadFileSync_Text");
-#endif
-    return LoadFileSync_Binary(filename, onProgressFunction);
-  };
-  auto onSuccessFunctionArrayBuffer = [onSuccessFunction](const ArrayBuffer & dataUint8) {
-    onSuccessFunction(ArrayBufferToString(dataUint8));
-  };
-
   if (!HACK_DISABLE_ASYNC)
+  {
+    auto& service   = AsyncLoadService::Instance();
+    auto syncLoader = [filename, onProgressFunction]() {
+#ifdef CAN_NAME_THREAD
+      THIS_THREAD_SET_NAME("asio: LoadFileSync_Text");
+#endif
+      return LoadFileSync_Binary(filename, onProgressFunction);
+    };
+    auto onSuccessFunctionArrayBuffer = [onSuccessFunction](const ArrayBuffer& dataUint8) {
+      onSuccessFunction(ArrayBufferToString(dataUint8));
+    };
     service.LoadData(syncLoader, onSuccessFunctionArrayBuffer, onErrorFunction);
+  }
   else
   {
     ArrayBufferOrErrorMessage r = LoadFileSync_Binary(filename, onProgressFunction);
@@ -222,7 +223,9 @@ void LoadFileAsync_Text(const std::string& filename,
       onErrorFunction( std::get<ErrorMessage>(r).errorMessage );
     }
     else {
-      std::cout << "LoadFileAsync_Text hack success with " << filename << "\n";
+      auto onSuccessFunctionArrayBuffer = [onSuccessFunction](const ArrayBuffer& dataUint8) {
+        onSuccessFunction(ArrayBufferToString(dataUint8));
+      };
       onSuccessFunctionArrayBuffer(std::get<ArrayBuffer>(r));
     }
 
@@ -236,16 +239,16 @@ void LoadFileAsync_Binary(
   const OnProgressFunction& onProgressFunction
   )
 {
-  auto & service = AsyncLoadService::Instance();
-  auto syncLoader = [filename, onProgressFunction]() {
+  if (!HACK_DISABLE_ASYNC) {
+    auto & service = AsyncLoadService::Instance();
+    auto syncLoader = [filename, onProgressFunction]() {
 #ifdef CAN_NAME_THREAD
-    THIS_THREAD_SET_NAME("asio: LoadFileSync_Binary");
+      THIS_THREAD_SET_NAME("asio: LoadFileSync_Binary");
 #endif
-    return LoadFileSync_Binary(filename, onProgressFunction);
-  };
-
-  if (!HACK_DISABLE_ASYNC)
+      return LoadFileSync_Binary(filename, onProgressFunction);
+    };
     service.LoadData(syncLoader, onSuccessFunction, onErrorFunction);
+  }
   else
   {
     ArrayBufferOrErrorMessage r = LoadFileSync_Binary(filename, onProgressFunction);
@@ -309,9 +312,11 @@ void HeartBeat_Sync()
 
 void Service_WaitAll_Sync()
 {
+#ifndef __EMSCRIPTEN__
   auto & service = AsyncLoadService::Instance();
   service.WaitIoCompletion_Sync();
   sync_callback_runner::CallAllPendingCallbacks();
+#endif
 }
 
 BABYLON_SHARED_EXPORT void Service_Stop()
