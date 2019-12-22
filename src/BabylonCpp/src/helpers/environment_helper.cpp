@@ -21,8 +21,8 @@ EnvironmentHelper::EnvironmentHelper(Scene* scene)
 {
 }
 
-EnvironmentHelper::EnvironmentHelper(
-  const std::optional<IEnvironmentHelperOptions>& options, Scene* scene)
+EnvironmentHelper::EnvironmentHelper(const std::optional<IEnvironmentHelperOptions>& options,
+                                     Scene* scene)
     : _rootMesh{nullptr}
     , _skybox{nullptr}
     , _skyboxTexture{nullptr}
@@ -32,8 +32,7 @@ EnvironmentHelper::EnvironmentHelper(
     , _groundMirror{nullptr}
     , _groundMaterial{nullptr}
     , _scene{scene}
-    , _options{options.has_value() ? *options :
-                                     EnvironmentHelper::_getDefaultOptions()}
+    , _options{options.has_value() ? *options : EnvironmentHelper::_getDefaultOptions()}
 {
   _setupBackground();
   _setupImageProcessing();
@@ -173,18 +172,18 @@ IEnvironmentHelperOptions EnvironmentHelper::_getDefaultOptions()
   const auto preprocessCDNUrl = [](const char* textureCDNUrl) -> std::string {
     std::string textureCDNUrlStr(textureCDNUrl);
     if (String::startsWith(textureCDNUrlStr, "https://assets.babylonjs.com")) {
-      textureCDNUrlStr = String::replace(
-        textureCDNUrlStr, "https://assets.babylonjs.com", "textures");
+      textureCDNUrlStr
+        = String::replace(textureCDNUrlStr, "https://assets.babylonjs.com", "textures");
     }
     return textureCDNUrlStr;
   };
 
   IEnvironmentHelperOptions options;
-  options.createGround  = true;
-  options.groundSize    = 15;
-  options.groundTexture = preprocessCDNUrl(_groundTextureCDNUrl);
-  options.groundColor   = Color3(0.2f, 0.2f, 0.3f).toLinearSpace().scale(3.f);
-  options.groundOpacity = 0.9f;
+  options.createGround       = true;
+  options.groundSize         = 15;
+  options.groundTexture      = preprocessCDNUrl(_groundTextureCDNUrl);
+  options.groundColor        = Color3(0.2f, 0.2f, 0.3f).toLinearSpace().scale(3.f);
+  options.groundOpacity      = 0.9f;
   options.enableGroundShadow = true;
   options.groundShadowLevel  = 0.5f;
 
@@ -219,10 +218,9 @@ IEnvironmentHelperOptions EnvironmentHelper::_getDefaultOptions()
 void EnvironmentHelper::_setupImageProcessing()
 {
   if (_options.setupImageProcessing) {
-    _scene->imageProcessingConfiguration()->contrast = _options.cameraContrast;
-    _scene->imageProcessingConfiguration()->exposure = _options.cameraExposure;
-    _scene->imageProcessingConfiguration()->toneMappingEnabled
-      = _options.toneMappingEnabled;
+    _scene->imageProcessingConfiguration()->contrast           = _options.cameraContrast;
+    _scene->imageProcessingConfiguration()->exposure           = _options.cameraExposure;
+    _scene->imageProcessingConfiguration()->toneMappingEnabled = _options.toneMappingEnabled;
     _setupEnvironmentTexture();
   }
 }
@@ -234,8 +232,7 @@ void EnvironmentHelper::_setupEnvironmentTexture()
   }
 
   if (std::holds_alternative<BaseTexturePtr>(_options.environmentTexture)) {
-    _scene->environmentTexture
-      = std::get<BaseTexturePtr>(_options.environmentTexture);
+    _scene->environmentTexture = std::get<BaseTexturePtr>(_options.environmentTexture);
     return;
   }
 
@@ -284,16 +281,14 @@ ISceneSize EnvironmentHelper::_getSceneSize()
     return ISceneSize{groundSize, skyboxSize, rootPosition};
   }
 
-  const auto sceneExtends
-    = _scene->getWorldExtends([this](const AbstractMeshPtr& mesh) -> bool {
-        return (mesh != _ground && mesh != _rootMesh && mesh != _skybox);
-      });
+  const auto sceneExtends  = _scene->getWorldExtends([this](const AbstractMeshPtr& mesh) -> bool {
+    return (mesh != _ground && mesh != _rootMesh && mesh != _skybox);
+  });
   const auto sceneDiagonal = sceneExtends.max.subtract(sceneExtends.min);
 
   if (_options.sizeAuto) {
     if (_scene->activeCamera()->type() == Type::ARCROTATECAMERA) {
-      auto activecamera
-        = std::static_pointer_cast<ArcRotateCamera>(_scene->activeCamera());
+      auto activecamera = std::static_pointer_cast<ArcRotateCamera>(_scene->activeCamera());
       if (activecamera->upperRadiusLimit.has_value()) {
         groundSize = *activecamera->upperRadiusLimit * 2.f;
         skyboxSize = groundSize;
@@ -319,8 +314,7 @@ ISceneSize EnvironmentHelper::_getSceneSize()
 void EnvironmentHelper::_setupGround(const ISceneSize& sceneSize)
 {
   if (!_ground || _ground->isDisposed()) {
-    _ground
-      = Mesh::CreatePlane("BackgroundPlane", sceneSize.groundSize, _scene);
+    _ground               = Mesh::CreatePlane("BackgroundPlane", sceneSize.groundSize, _scene);
     _ground->rotation().x = Math::PI_2; // Face up by default.
     _ground->setParent(_rootMesh.get());
     _ground->onDisposeObservable.add(
@@ -333,8 +327,7 @@ void EnvironmentHelper::_setupGround(const ISceneSize& sceneSize)
 void EnvironmentHelper::_setupGroundMaterial()
 {
   if (!_groundMaterial) {
-    _groundMaterial
-      = BackgroundMaterial::New("BackgroundPlaneMaterial", _scene);
+    _groundMaterial = BackgroundMaterial::New("BackgroundPlaneMaterial", _scene);
   }
   _groundMaterial->alpha        = _options.groundOpacity;
   _groundMaterial->alphaMode    = Constants::ALPHA_PREMULTIPLIED_PORTERDUFF;
@@ -359,15 +352,13 @@ void EnvironmentHelper::_setupGroundDiffuseTexture()
   }
 
   if (std::holds_alternative<BaseTexturePtr>(_options.skyboxTexture)) {
-    _groundMaterial->diffuseTexture
-      = std::get<BaseTexturePtr>(_options.groundTexture);
+    _groundMaterial->diffuseTexture = std::get<BaseTexturePtr>(_options.groundTexture);
     return;
   }
 
-  const auto diffuseTexture
-    = Texture::New(std::get<std::string>(_options.groundTexture), _scene);
-  diffuseTexture->gammaSpace      = false;
-  diffuseTexture->hasAlpha        = true;
+  const auto diffuseTexture  = Texture::New(std::get<std::string>(_options.groundTexture), _scene);
+  diffuseTexture->gammaSpace = false;
+  diffuseTexture->hasAlpha   = true;
   _groundMaterial->diffuseTexture = diffuseTexture;
 }
 
@@ -376,10 +367,9 @@ void EnvironmentHelper::_setupGroundMirrorTexture(const ISceneSize& sceneSize)
   auto wrapping = TextureConstants::CLAMP_ADDRESSMODE;
   if (!_groundMirror) {
     _groundMirror = MirrorTexture::New(
-      "BackgroundPlaneMirrorTexture", _options.groundMirrorSizeRatio, _scene,
-      false, _options.groundMirrorTextureType,
-      TextureConstants::BILINEAR_SAMPLINGMODE, true);
-    _groundMirror->mirrorPlane = Plane(0, -1, 0, sceneSize.rootPosition.y);
+      "BackgroundPlaneMirrorTexture", _options.groundMirrorSizeRatio, _scene, false,
+      _options.groundMirrorTextureType, TextureConstants::BILINEAR_SAMPLINGMODE, true);
+    _groundMirror->mirrorPlane               = Plane(0, -1, 0, sceneSize.rootPosition.y);
     _groundMirror->anisotropicFilteringLevel = 1;
     _groundMirror->wrapU                     = wrapping;
     _groundMirror->wrapV                     = wrapping;
@@ -404,21 +394,19 @@ void EnvironmentHelper::_setupGroundMirrorTexture(const ISceneSize& sceneSize)
 void EnvironmentHelper::_setupMirrorInGroundMaterial()
 {
   if (_groundMaterial) {
-    _groundMaterial->reflectionTexture = _groundMirror;
-    _groundMaterial->reflectionFresnel = true;
-    _groundMaterial->reflectionAmount  = _options.groundMirrorAmount;
-    _groundMaterial->reflectionStandardFresnelWeight
-      = _options.groundMirrorFresnelWeight;
-    _groundMaterial->reflectionFalloffDistance
-      = _options.groundMirrorFallOffDistance;
+    _groundMaterial->reflectionTexture               = _groundMirror;
+    _groundMaterial->reflectionFresnel               = true;
+    _groundMaterial->reflectionAmount                = _options.groundMirrorAmount;
+    _groundMaterial->reflectionStandardFresnelWeight = _options.groundMirrorFresnelWeight;
+    _groundMaterial->reflectionFalloffDistance       = _options.groundMirrorFallOffDistance;
   }
 }
 
 void EnvironmentHelper::_setupSkybox(const ISceneSize& sceneSize)
 {
   if (!_skybox || _skybox->isDisposed()) {
-    _skybox = Mesh::CreateBox("BackgroundSkybox", sceneSize.skyboxSize, _scene,
-                              false, Mesh::BACKSIDE);
+    _skybox
+      = Mesh::CreateBox("BackgroundSkybox", sceneSize.skyboxSize, _scene, false, Mesh::BACKSIDE);
     _skybox->onDisposeObservable.add(
       [this](Node* /*node*/, EventState& /*es*/) { _skybox = nullptr; });
   }
@@ -432,8 +420,7 @@ void EnvironmentHelper::_setupSkyboxMaterial()
   }
 
   if (!_skyboxMaterial) {
-    _skyboxMaterial
-      = BackgroundMaterial::New("BackgroundSkyboxMaterial", _scene);
+    _skyboxMaterial = BackgroundMaterial::New("BackgroundSkyboxMaterial", _scene);
   }
   _skyboxMaterial->useRGBColor  = false;
   _skyboxMaterial->primaryColor = _options.skyboxColor;
@@ -453,20 +440,17 @@ void EnvironmentHelper::_setupSkyboxReflectionTexture()
   }
 
   if (std::holds_alternative<BaseTexturePtr>(_options.skyboxTexture)) {
-    _skyboxMaterial->reflectionTexture
-      = std::get<BaseTexturePtr>(_options.skyboxTexture);
+    _skyboxMaterial->reflectionTexture = std::get<BaseTexturePtr>(_options.skyboxTexture);
     return;
   }
 
-  _skyboxTexture
-    = CubeTexture::New(std::get<std::string>(_options.skyboxTexture), _scene);
+  _skyboxTexture = CubeTexture::New(std::get<std::string>(_options.skyboxTexture), _scene);
   _skyboxTexture->coordinatesMode    = TextureConstants::SKYBOX_MODE;
   _skyboxTexture->gammaSpace         = false;
   _skyboxMaterial->reflectionTexture = _skyboxTexture;
 }
 
-void EnvironmentHelper::_errorHandler(const std::string& message,
-                                      const std::exception& exception)
+void EnvironmentHelper::_errorHandler(const std::string& message, const std::exception& exception)
 {
   Exception _exception{message, exception};
   onErrorObservable.notifyObservers(&_exception);

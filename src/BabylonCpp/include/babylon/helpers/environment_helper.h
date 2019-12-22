@@ -22,10 +22,9 @@ using MirrorTexturePtr       = std::shared_ptr<MirrorTexture>;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 /**
- * @brief The Environment helper class can be used to add a fully featuread none
- * expensive background to your scene. It includes by default a skybox and a
- * ground relying on the BackgroundMaterial. It also helps with the default
- * setup of your imageProcessing configuration.
+ * @brief The Environment helper class can be used to add a fully featuread none expensive
+ * background to your scene. It includes by default a skybox and a ground relying on the
+ * BackgroundMaterial. It also helps with the default setup of your imageProcessing configuration.
  */
 class BABYLON_SHARED_EXPORT EnvironmentHelper {
 
@@ -61,19 +60,18 @@ public:
    * @param options
    * @param scene The scene to add the material to
    */
-  EnvironmentHelper(const std::optional<IEnvironmentHelperOptions>& options,
-                    Scene* scene);
+  EnvironmentHelper(const std::optional<IEnvironmentHelperOptions>& options, Scene* scene);
 
   ~EnvironmentHelper(); // = default
 
   /**
-   * Updates the background according to the new options.
+   * @brief Updates the background according to the new options.
    * @param color the main color to affect to the ground and the background
    */
   void updateOptions(const IEnvironmentHelperOptions& options);
 
   /**
-   * Sets the primary color of all the available elements.
+   * @brief Sets the primary color of all the available elements.
    * @param color
    */
   void setMainColor(const Color3& color);
@@ -114,8 +112,8 @@ public:
   MirrorTexturePtr& groundMirror();
 
   /**
-   * @brief Gets the ground mirror render list to helps pushing the meshes
-   * you wish in the ground reflection.
+   * @brief Gets the ground mirror render list to helps pushing the meshes you wish in the ground
+   * reflection.
    */
   std::vector<AbstractMesh*>& groundMirrorRenderList();
 
@@ -191,8 +189,7 @@ private:
   void _setupSkyboxMaterial();
 
   /**
-   * @brief Setup the skybox reflection texture according to the specified
-   * options.
+   * @brief Setup the skybox reflection texture according to the specified options.
    */
   void _setupSkyboxReflectionTexture();
 
