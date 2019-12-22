@@ -90,7 +90,7 @@ private:
   }
   ~AsyncLoadService()
   {
-    mStopRequested = true;
+    // mStopRequested = true;
   }
   void CheckTasksStatus()
   {
