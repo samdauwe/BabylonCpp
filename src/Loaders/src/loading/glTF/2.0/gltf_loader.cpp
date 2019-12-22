@@ -1666,22 +1666,22 @@ MaterialPtr GLTFLoader::_loadMaterialAsync(
     return extensionPromise;
   }
 
-  std::shared_ptr<GLTF2::IMaterialData> babylonData = nullptr;
+  std::optional<GLTF2::IMaterialData> babylonData = std::nullopt;
   if (stl_util::contains(material._data, babylonDrawMode)) {
-    babylonData = std::make_shared<GLTF2::IMaterialData>();
-    *babylonData = material._data[babylonDrawMode];
+    babylonData = material._data[babylonDrawMode];
   }
 
-  if (!babylonData) {
+  if (!babylonData.has_value()) {
     logOpen(String::printf("%s %s", context.c_str(), material.name.c_str()));
 
     const auto babylonMaterial = createMaterial(context, material, babylonDrawMode);
     loadMaterialPropertiesAsync(context, material, babylonMaterial);
 
-    babylonData = std::make_shared<GLTF2::IMaterialData>();
-    babylonData->babylonMaterial = babylonMaterial;
-    babylonData->babylonMeshes = {};
-    babylonData->promise = nullptr;
+    babylonData = GLTF2::IMaterialData{
+      babylonMaterial, // babylonMaterial
+      {},              // babylonMeshes
+      nullptr          // promise
+    };
 
     material._data[babylonDrawMode] = *babylonData;
 
