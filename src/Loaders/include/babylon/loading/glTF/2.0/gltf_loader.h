@@ -275,7 +275,7 @@ public:
    * @returns A promise that resolves with the loaded data when the load is
    * complete
    */
-  std::shared_ptr<ArrayBufferView>& loadBufferViewAsync(const std::string& context, IBufferView& bufferView);
+  ArrayBufferView& loadBufferViewAsync(const std::string& context, IBufferView& bufferView);
 
   /**
    * @brief Hidden
@@ -347,7 +347,7 @@ public:
    * @returns A promise that resolves with the loaded data when the load is
    * complete
    */
-  std::shared_ptr<ArrayBufferView> loadImageAsync(const std::string& context, IImage& image);
+  ArrayBufferView& loadImageAsync(const std::string& context, IImage& image);
   /**
    * @brief Loads a glTF uri.
    * @param context The context when loading the asset
@@ -355,7 +355,7 @@ public:
    * @returns A promise that resolves with the loaded data when the load is
    * complete
    */
-  std::shared_ptr<ArrayBufferView> loadUriAsync(const std::string& context, const std::string& uri);
+  ArrayBufferView loadUriAsync(const std::string& context, const std::string& uri);
 
   /**
    * @brief Adds a JSON pointer to the metadata of the Babylon object at
@@ -463,7 +463,7 @@ private:
   void _loadAnimationsAsync();
   _IAnimationSamplerData _loadAnimationSamplerAsync(const std::string& context,
                                                     IAnimationSampler& sampler);
-  std::shared_ptr<ArrayBufferView> _loadBufferAsync(const std::string& context, IBuffer& buffer);
+  ArrayBufferView& _loadBufferAsync(const std::string& context, IBuffer& buffer);
   template <typename T>
   ArrayBufferView& _loadAccessorAsync(const std::string& context, IAccessor& accessor);
   Float32Array& _loadFloatAccessorAsync(const std::string& context, IAccessor& accessor);
@@ -526,7 +526,7 @@ private:
     const std::function<void(const BaseTexturePtr& babylonTexture)>& assign);
   AnimationGroupPtr _extensionsLoadAnimationAsync(const std::string& context,
                                                   const std::shared_ptr<IAnimation>& animation);
-  std::shared_ptr<ArrayBufferView> _extensionsLoadUriAsync(const std::string& context,
+  std::optional<ArrayBufferView> _extensionsLoadUriAsync(const std::string& context,
                                                          const std::string& uri);
 
 private:
