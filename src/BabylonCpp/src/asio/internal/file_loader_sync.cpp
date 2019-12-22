@@ -73,7 +73,7 @@ ArrayBufferOrErrorMessage LoadFileSync_Binary(
     sync_callback_runner::PushCallback(f);
   }
 
-  BABYLON_LOG_INFO("LoadFileSync_Binary", "Finished loading ", filename.c_str());
+  BABYLON_LOG_DEBUG("LoadFileSync_Binary", "Finished loading ", filename.c_str());
   return buffer;
 }
 
