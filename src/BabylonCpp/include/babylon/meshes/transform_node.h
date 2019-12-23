@@ -1,6 +1,8 @@
 #ifndef BABYLON_MESHES_TRANSFORM_NODE_H
 #define BABYLON_MESHES_TRANSFORM_NODE_H
 
+#include <optional>
+
 #include <babylon/babylon_api.h>
 #include <babylon/engines/node.h>
 
@@ -10,11 +12,14 @@ class Bone;
 class Camera;
 using CameraPtr = std::shared_ptr<Camera>;
 
+struct InstantiateHierarychyOptions {
+  bool doNotInstantiate = false;
+}; // end of struct InstantiateHierarychyOptions
+
 /**
- * @brief A TransformNode is an object that is not rendered but can be used as a
- * center of transformation. This can decrease memory usage and increase
- * rendering speed compared to using an empty mesh as a parent and is less
- * complicated than using a pivot matrix.
+ * @brief A TransformNode is an object that is not rendered but can be used as a center of
+ * transformation. This can decrease memory usage and increase rendering speed compared to using an
+ * empty mesh as a parent and is less complicated than using a pivot matrix.
  * @see https://doc.babylonjs.com/how_to/transformnode
  */
 class BABYLON_SHARED_EXPORT TransformNode : public Node {
@@ -68,6 +73,11 @@ public:
    * @brief Adds the transform node to the scene.
    */
   void addToScene(const TransformNodePtr& transformNode);
+
+  /**
+   * @brief Hidden
+   */
+  TransformNodePtr _this() const;
 
   /**
    * @brief Returns the object type.
@@ -163,9 +173,16 @@ public:
   /**
    * @brief Instantiate (when possible) or clone that node with its hierarchy.
    * @param newParent defines the new parent to use for the instance (or clone)
+   * @param options defines options to configure how copy is done
+   * @param onNewNodeCreated defines an option callback to call when a clone or an instance is
+   * created
    * @returns an instance (or a clone) of the current node with its hiearchy
    */
-  TransformNodePtr instantiateHierarychy(TransformNode* newParent = nullptr);
+  TransformNodePtr instantiateHierarychy(
+    TransformNode* newParent                                   = nullptr,
+    const std::optional<InstantiateHierarychyOptions>& options = std::nullopt,
+    const std::function<void(TransformNode* source, TransformNode* clone)>& onNewNodeCreated
+    = nullptr);
 
   /**
    * @brief Prevents the World matrix to be computed any longer.

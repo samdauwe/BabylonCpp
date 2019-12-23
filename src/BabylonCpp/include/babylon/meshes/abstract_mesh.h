@@ -170,6 +170,7 @@ public:
 
   Type type() const override;
   void addToScene(const AbstractMeshPtr& newMesh);
+  AbstractMeshPtr _this() const;
 
   /**
    * @brief Hidden
@@ -210,7 +211,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _resyncLighSource(const LightPtr& light);
+  void _resyncLightSource(const LightPtr& light);
 
   /**
    * @brief Hidden

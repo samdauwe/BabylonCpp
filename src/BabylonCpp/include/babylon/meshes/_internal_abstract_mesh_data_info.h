@@ -29,6 +29,7 @@ struct BABYLON_SHARED_EXPORT _InternalAbstractMeshDataInfo {
   bool _onlyForInstances             = false;
   bool _isActiveIntermediate         = false;
   bool _onlyForInstancesIntermediate = false;
+  bool _actAsRegularMesh             = false;
 }; // end of struct _InternalAbstractMeshDataInfo
 
 } // end of namespace BABYLON

@@ -152,8 +152,15 @@ Type AbstractMesh::type() const
 
 void AbstractMesh::addToScene(const AbstractMeshPtr& newMesh)
 {
-  newMesh->addToRootNodes();
   getScene()->addMesh(newMesh);
+}
+
+AbstractMeshPtr AbstractMesh::_this() const
+{
+  const auto& meshes = getScene()->meshes;
+  auto it            = std::find_if(meshes.begin(), meshes.end(),
+                         [this](const AbstractMeshPtr& mesh) { return mesh.get() == this; });
+  return (it != meshes.end()) ? (*it) : nullptr;
 }
 
 size_t AbstractMesh::get_facetNb() const
@@ -590,7 +597,7 @@ void AbstractMesh::_resyncLightSources()
   _markSubMeshesAsLightDirty();
 }
 
-void AbstractMesh::_resyncLighSource(const LightPtr& light)
+void AbstractMesh::_resyncLightSource(const LightPtr& light)
 {
   const auto isIn = light && light->isEnabled() && light->canAffectMesh(this);
 
@@ -999,7 +1006,7 @@ Float32Array AbstractMesh::_getPositionData(bool applySkeleton)
         auto weight = 0.f;
         for (inf = 0; inf < 4; inf++) {
           weight = matricesWeightsData[matWeightIdx + inf];
-          if ((weight > 0.f) && (matWeightIdx + inf < matricesIndicesData.size())){
+          if ((weight > 0.f) && (matWeightIdx + inf < matricesIndicesData.size())) {
             Matrix::FromFloat32ArrayToRefScaled(
               skeletonMatrices,
               static_cast<unsigned int>(std::floor(matricesIndicesData[matWeightIdx + inf] * 16)),
@@ -1518,10 +1525,12 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   auto lightsCopy = getScene()->lights;
   for (const auto& light : lightsCopy) {
     // Included meshes
-    stl_util::remove_vector_elements_equal_sharedptr_wrapped(light->includedOnlyMeshes, this); // Checked
+    stl_util::remove_vector_elements_equal_sharedptr_wrapped(light->includedOnlyMeshes,
+                                                             this); // Checked
 
     // Excluded meshes
-    stl_util::remove_vector_elements_equal_sharedptr_wrapped(light->excludedMeshes, this); // Checked
+    stl_util::remove_vector_elements_equal_sharedptr_wrapped(light->excludedMeshes,
+                                                             this); // Checked
 
     // Shadow generators
     auto generator = light->getShadowGenerator();
@@ -1710,8 +1719,7 @@ AbstractMesh& AbstractMesh::updateFacetData()
   VertexData::ComputeNormals(positions, indices, normals, data.facetParameters);
 
   if (data.facetDepthSort && data.facetDepthSortEnabled) {
-    BABYLON::stl_util::sort_js_style(data.depthSortedFacets,
-              data.facetDepthSortFunction);
+    BABYLON::stl_util::sort_js_style(data.depthSortedFacets, data.facetDepthSortFunction);
     auto l = (data.depthSortedIndices.size() / 3);
     for (size_t f = 0; f < l; f++) {
       const auto& sind                   = data.depthSortedFacets[f].ind;
@@ -1857,10 +1865,10 @@ int AbstractMesh::getClosestFacetAtLocalCoordinates(float x, float y, float z, V
     return closest;
   }
   // Get the closest facet to (x, y, z)
-  auto shortest    = std::numeric_limits<float>::max(); // init distance vars
-  auto fib         = 0ull; // current facet in the block
-  Vector3 norm;            // current facet normal
-  Vector3 p0;              // current facet barycenter position
+  auto shortest = std::numeric_limits<float>::max(); // init distance vars
+  auto fib      = 0ull;                              // current facet in the block
+  Vector3 norm;                                      // current facet normal
+  Vector3 p0;                                        // current facet barycenter position
   // loop on all the facets in the current partitioning block
   for (unsigned int idx : facetsInBlock) {
     fib  = idx;

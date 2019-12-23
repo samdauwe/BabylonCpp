@@ -14,19 +14,14 @@ namespace BABYLON {
 
 std::unique_ptr<Vector3> TransformNode::_lookAtVectorCache
   = std::make_unique<Vector3>(0.f, 0.f, 0.f);
-std::unique_ptr<Quaternion> TransformNode::_rotationAxisCache
-  = std::make_unique<Quaternion>();
+std::unique_ptr<Quaternion> TransformNode::_rotationAxisCache = std::make_unique<Quaternion>();
 
-TransformNode::TransformNode(const std::string& iName, Scene* scene,
-                             bool isPure)
+TransformNode::TransformNode(const std::string& iName, Scene* scene, bool isPure)
     : Node{iName, scene}
-    , billboardMode{this, &TransformNode::get_billboardMode,
-                    &TransformNode::set_billboardMode}
+    , billboardMode{this, &TransformNode::get_billboardMode, &TransformNode::set_billboardMode}
     , preserveParentRotationForBillboard{this,
-                                         &TransformNode::
-                                           get_preserveParentRotationForBillboard,
-                                         &TransformNode::
-                                           set_preserveParentRotationForBillboard}
+                                         &TransformNode::get_preserveParentRotationForBillboard,
+                                         &TransformNode::set_preserveParentRotationForBillboard}
     , infiniteDistance{this, &TransformNode::get_infiniteDistance,
                        &TransformNode::set_infiniteDistance}
     , scalingDeterminant{1.f}
@@ -45,8 +40,7 @@ TransformNode::TransformNode(const std::string& iName, Scene* scene,
     , right{this, &TransformNode::get_right}
     , absolutePosition{this, &TransformNode::get_absolutePosition}
     , absoluteScaling{this, &TransformNode::get_absoluteScaling}
-    , absoluteRotationQuaternion{this,
-                                 &TransformNode::get_absoluteRotationQuaternion}
+    , absoluteRotationQuaternion{this, &TransformNode::get_absoluteRotationQuaternion}
     , isWorldMatrixFrozen{this, &TransformNode::get_isWorldMatrixFrozen}
     , nonUniformScaling{this, &TransformNode::get_nonUniformScaling}
     , _scaling{Vector3::One()}
@@ -85,10 +79,18 @@ TransformNode::~TransformNode() = default;
 
 void TransformNode::addToScene(const TransformNodePtr& transformNode)
 {
-  transformNode->addToRootNodes();
   if (transformNode->_isPure) {
     transformNode->getScene()->addTransformNode(transformNode);
   }
+}
+
+TransformNodePtr TransformNode::_this() const
+{
+  const auto& transformNodes = getScene()->transformNodes;
+  auto it                    = std::find_if(
+    transformNodes.begin(), transformNodes.end(),
+    [this](const TransformNodePtr& transformNode) { return transformNode.get() == this; });
+  return (it != transformNodes.end()) ? (*it) : nullptr;
 }
 
 Type TransformNode::type() const
@@ -96,8 +98,7 @@ Type TransformNode::type() const
   return Type::TRANSFORMNODE;
 }
 
-AnimationValue
-TransformNode::getProperty(const std::vector<std::string>& targetPropertyPath)
+AnimationValue TransformNode::getProperty(const std::vector<std::string>& targetPropertyPath)
 {
   if (targetPropertyPath.size() == 1) {
     const auto& target = targetPropertyPath[0];
@@ -124,9 +125,8 @@ TransformNode::getProperty(const std::vector<std::string>& targetPropertyPath)
   return AnimationValue();
 }
 
-void TransformNode::setProperty(
-  const std::vector<std::string>& targetPropertyPath,
-  const AnimationValue& value)
+void TransformNode::setProperty(const std::vector<std::string>& targetPropertyPath,
+                                const AnimationValue& value)
 {
   const auto animationType = value.animationType();
   if (animationType.has_value()) {
@@ -260,8 +260,7 @@ std::optional<Quaternion>& TransformNode::get_rotationQuaternion()
   return _rotationQuaternion;
 }
 
-void TransformNode::set_rotationQuaternion(
-  const std::optional<Quaternion>& quaternion)
+void TransformNode::set_rotationQuaternion(const std::optional<Quaternion>& quaternion)
 {
   _rotationQuaternion = quaternion;
   // reset the rotation vector.
@@ -273,28 +272,27 @@ void TransformNode::set_rotationQuaternion(
 
 Vector3& TransformNode::get_forward()
 {
-  _forwardNormalized = Vector3::Normalize(Vector3::TransformNormal(
-    getScene()->useRightHandedSystem() ? _forwardInverted : _forward, //
-    getWorldMatrix()                                                  //
-    ));
+  _forwardNormalized = Vector3::Normalize(
+    Vector3::TransformNormal(getScene()->useRightHandedSystem() ? _forwardInverted : _forward, //
+                             getWorldMatrix()                                                  //
+                             ));
   return _forwardNormalized;
 }
 
 Vector3& TransformNode::get_up()
 {
-  _upNormalized
-    = Vector3::Normalize(Vector3::TransformNormal(_up,             //
-                                                  getWorldMatrix() //
-                                                  ));
+  _upNormalized = Vector3::Normalize(Vector3::TransformNormal(_up,             //
+                                                              getWorldMatrix() //
+                                                              ));
   return _upNormalized;
 }
 
 Vector3& TransformNode::get_right()
 {
-  _rightNormalized = Vector3::Normalize(Vector3::TransformNormal(
-    getScene()->useRightHandedSystem() ? _rightInverted : _right, //
-    getWorldMatrix()                                              //
-    ));
+  _rightNormalized = Vector3::Normalize(
+    Vector3::TransformNormal(getScene()->useRightHandedSystem() ? _rightInverted : _right, //
+                             getWorldMatrix()                                              //
+                             ));
   return _rightNormalized;
 }
 
@@ -321,8 +319,7 @@ bool TransformNode::_isSynchronized()
 {
   auto& cache = _cache;
 
-  if (billboardMode != cache.billboardMode
-      || billboardMode != TransformNode::BILLBOARDMODE_NONE) {
+  if (billboardMode != cache.billboardMode || billboardMode != TransformNode::BILLBOARDMODE_NONE) {
     return false;
   }
 
@@ -397,8 +394,7 @@ TransformNode& TransformNode::setPreTransformMatrix(Matrix& matrix)
   return setPivotMatrix(matrix, false);
 }
 
-TransformNode& TransformNode::setPivotMatrix(Matrix matrix,
-                                             bool postMultiplyPivotMatrix)
+TransformNode& TransformNode::setPivotMatrix(Matrix matrix, bool postMultiplyPivotMatrix)
 {
   _pivotMatrix.copyFrom(matrix);
   _usePivotMatrix = !_pivotMatrix.isIdentity();
@@ -408,8 +404,7 @@ TransformNode& TransformNode::setPivotMatrix(Matrix matrix,
 
   if (_postMultiplyPivotMatrix) {
     if (!_pivotMatrixInverse) {
-      _pivotMatrixInverse
-        = std::make_unique<Matrix>(Matrix::Invert(_pivotMatrix));
+      _pivotMatrixInverse = std::make_unique<Matrix>(Matrix::Invert(_pivotMatrix));
     }
     else {
       _pivotMatrix.invertToRef(*_pivotMatrixInverse);
@@ -428,29 +423,37 @@ const Matrix& TransformNode::getPivotMatrix() const
   return _pivotMatrix;
 }
 
-TransformNodePtr TransformNode::instantiateHierarychy(TransformNode* newParent)
+TransformNodePtr TransformNode::instantiateHierarychy(
+  TransformNode* newParent, const std::optional<InstantiateHierarychyOptions>& options,
+  const std::function<void(TransformNode* source, TransformNode* clone)>& onNewNodeCreated)
 {
-  auto cloneTransformNode = clone("Clone of " + (!name.empty() ? name : id),
-                                  newParent ? newParent : parent(), true);
+  auto cloneTransformNode
+    = clone("Clone of " + (!name.empty() ? name : id), newParent ? newParent : parent(), true);
+
+  if (cloneTransformNode) {
+    if (onNewNodeCreated) {
+      onNewNodeCreated(this, cloneTransformNode.get());
+    }
+  }
 
   for (const auto& child : getChildTransformNodes(true)) {
-    child->instantiateHierarychy(cloneTransformNode.get());
+    child->instantiateHierarychy(cloneTransformNode.get(), options, onNewNodeCreated);
   }
 
   return cloneTransformNode;
 }
 
-TransformNode&
-TransformNode::freezeWorldMatrix(const std::optional<Matrix>& newWorldMatrix)
+TransformNode& TransformNode::freezeWorldMatrix(const std::optional<Matrix>& newWorldMatrix)
 {
   if (newWorldMatrix) {
-    _worldMatrix = _worldMatrix;
+    _worldMatrix = *newWorldMatrix;
   }
   else {
     _isWorldMatrixFrozen = false; // no guarantee world is not already frozen,
                                   // switch off temporarily
     computeWorldMatrix(true);
   }
+  _isDirty             = false;
   _isWorldMatrixFrozen = true;
   return *this;
 }
@@ -473,8 +476,7 @@ Vector3& TransformNode::getAbsolutePosition()
   return _absolutePosition;
 }
 
-TransformNode& TransformNode::setAbsolutePosition(
-  const std::optional<Vector3>& iAbsolutePosition)
+TransformNode& TransformNode::setAbsolutePosition(const std::optional<Vector3>& iAbsolutePosition)
 {
   if (!iAbsolutePosition) {
     return *this;
@@ -487,8 +489,7 @@ TransformNode& TransformNode::setAbsolutePosition(
     auto& invertParentWorldMatrix = TmpVectors::MatrixArray[0];
     parent()->getWorldMatrix().invertToRef(invertParentWorldMatrix);
     Vector3::TransformCoordinatesFromFloatsToRef(
-      absolutePositionX, absolutePositionY, absolutePositionZ,
-      invertParentWorldMatrix, position);
+      absolutePositionX, absolutePositionY, absolutePositionZ, invertParentWorldMatrix, position);
   }
   else {
     position().x = absolutePositionX;
@@ -520,8 +521,8 @@ TransformNode& TransformNode::locallyTranslate(const Vector3& vector3)
   return *this;
 }
 
-TransformNode& TransformNode::lookAt(const Vector3& targetPoint, float yawCor,
-                                     float pitchCor, float rollCor, Space space)
+TransformNode& TransformNode::lookAt(const Vector3& targetPoint, float yawCor, float pitchCor,
+                                     float rollCor, Space space)
 {
   auto& dv = *TransformNode::_lookAtVectorCache;
   auto pos = (space == Space::LOCAL) ? position : getAbsolutePosition();
@@ -573,24 +574,21 @@ Vector3 TransformNode::getDirection(const Vector3& localAxis)
   return result;
 }
 
-TransformNode& TransformNode::getDirectionToRef(const Vector3& localAxis,
-                                                Vector3& result)
+TransformNode& TransformNode::getDirectionToRef(const Vector3& localAxis, Vector3& result)
 {
   Vector3::TransformNormalToRef(localAxis, getWorldMatrix(), result);
   return *this;
 }
 
-TransformNode& TransformNode::setDirection(const Vector3& localAxis,
-                                           float yawCor, float pitchCor,
+TransformNode& TransformNode::setDirection(const Vector3& localAxis, float yawCor, float pitchCor,
                                            float rollCor)
 {
-  const auto yaw = -std::atan2(localAxis.z, localAxis.x) + Math::PI_2;
-  const auto len
-    = std::sqrt(localAxis.x * localAxis.x + localAxis.z * localAxis.z);
+  const auto yaw   = -std::atan2(localAxis.z, localAxis.x) + Math::PI_2;
+  const auto len   = std::sqrt(localAxis.x * localAxis.x + localAxis.z * localAxis.z);
   const auto pitch = -std::atan2(localAxis.y, len);
   if (rotationQuaternion().has_value()) {
-    Quaternion::RotationYawPitchRollToRef(yaw + yawCor, pitch + pitchCor,
-                                          rollCor, *rotationQuaternion());
+    Quaternion::RotationYawPitchRollToRef(yaw + yawCor, pitch + pitchCor, rollCor,
+                                          *rotationQuaternion());
   }
   else {
     rotation().x = pitch + pitchCor;
@@ -707,8 +705,7 @@ bool TransformNode::_updateNonUniformScalingState(bool value)
   return true;
 }
 
-TransformNode& TransformNode::attachToBone(Bone* bone,
-                                           TransformNode* affectedTransformNode)
+TransformNode& TransformNode::attachToBone(Bone* bone, TransformNode* affectedTransformNode)
 {
   _transformToBoneReferal = affectedTransformNode;
   Node::set_parent(bone);
@@ -742,10 +739,9 @@ TransformNode& TransformNode::rotate(Vector3 axis, float amount, Space space)
   }
   Quaternion iRotationQuaternion;
   if (space == Space::LOCAL) {
-    iRotationQuaternion = Quaternion::RotationAxisToRef(
-      axis, amount, *TransformNode::_rotationAxisCache);
-    this->rotationQuaternion()->multiplyToRef(iRotationQuaternion,
-                                              *rotationQuaternion());
+    iRotationQuaternion
+      = Quaternion::RotationAxisToRef(axis, amount, *TransformNode::_rotationAxisCache);
+    this->rotationQuaternion()->multiplyToRef(iRotationQuaternion, *rotationQuaternion());
   }
   else {
     if (parent()) {
@@ -753,21 +749,18 @@ TransformNode& TransformNode::rotate(Vector3 axis, float amount, Space space)
       parent()->getWorldMatrix().invertToRef(invertParentWorldMatrix);
       axis = Vector3::TransformNormal(axis, invertParentWorldMatrix);
     }
-    iRotationQuaternion = Quaternion::RotationAxisToRef(
-      axis, amount, *TransformNode::_rotationAxisCache);
-    iRotationQuaternion.multiplyToRef(*rotationQuaternion(),
-                                      *rotationQuaternion());
+    iRotationQuaternion
+      = Quaternion::RotationAxisToRef(axis, amount, *TransformNode::_rotationAxisCache);
+    iRotationQuaternion.multiplyToRef(*rotationQuaternion(), *rotationQuaternion());
   }
   return *this;
 }
 
-TransformNode& TransformNode::rotateAround(const Vector3& point, Vector3& axis,
-                                           float amount)
+TransformNode& TransformNode::rotateAround(const Vector3& point, Vector3& axis, float amount)
 {
   axis.normalize();
   if (!rotationQuaternion().has_value()) {
-    rotationQuaternion = Quaternion::RotationYawPitchRoll(
-      rotation().y, rotation().x, rotation().z);
+    rotationQuaternion = Quaternion::RotationYawPitchRoll(rotation().y, rotation().x, rotation().z);
     rotation().setAll(0.f);
   }
 
@@ -800,8 +793,7 @@ TransformNode& TransformNode::rotateAround(const Vector3& point, Vector3& axis,
   return *this;
 }
 
-TransformNode& TransformNode::translate(const Vector3& axis, float distance,
-                                        Space space)
+TransformNode& TransformNode::translate(const Vector3& axis, float distance, Space space)
 {
   auto displacementVector = axis.scale(distance);
   if (space == Space::LOCAL) {
@@ -822,8 +814,8 @@ TransformNode& TransformNode::addRotation(float x, float y, float z)
   }
   else {
     rotationQuaternionTmp = TmpVectors::QuaternionArray[1];
-    Quaternion::RotationYawPitchRollToRef(rotation().y, rotation().x,
-                                          rotation().z, rotationQuaternionTmp);
+    Quaternion::RotationYawPitchRollToRef(rotation().y, rotation().x, rotation().z,
+                                          rotationQuaternionTmp);
   }
   auto& accumulation = TmpVectors::QuaternionArray[0];
   Quaternion::RotationYawPitchRollToRef(y, x, z, accumulation);
@@ -839,8 +831,7 @@ Node* TransformNode::_getEffectiveParent() const
   return parent();
 }
 
-Matrix& TransformNode::computeWorldMatrix(bool force,
-                                          bool /*useWasUpdatedFlag*/)
+Matrix& TransformNode::computeWorldMatrix(bool force, bool /*useWasUpdatedFlag*/)
 {
   if (_isWorldMatrixFrozen && !_isDirty) {
     return _worldMatrix;
@@ -856,25 +847,21 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
   const auto useBillboardPosition
     = (_billboardMode & TransformNode::BILLBOARDMODE_USE_POSITION) != 0;
   const auto useBillboardPath
-    = _billboardMode != TransformNode::BILLBOARDMODE_NONE
-      && !preserveParentRotationForBillboard;
+    = _billboardMode != TransformNode::BILLBOARDMODE_NONE && !preserveParentRotationForBillboard;
 
   // Billboarding based on camera position
   if (useBillboardPath && camera && useBillboardPosition) {
     lookAt(camera->position());
 
-    if ((billboardMode & TransformNode::BILLBOARDMODE_X)
-        != TransformNode::BILLBOARDMODE_X) {
+    if ((billboardMode & TransformNode::BILLBOARDMODE_X) != TransformNode::BILLBOARDMODE_X) {
       rotation().x = 0.f;
     }
 
-    if ((billboardMode & TransformNode::BILLBOARDMODE_Y)
-        != TransformNode::BILLBOARDMODE_Y) {
+    if ((billboardMode & TransformNode::BILLBOARDMODE_Y) != TransformNode::BILLBOARDMODE_Y) {
       rotation().y = 0.f;
     }
 
-    if ((billboardMode & TransformNode::BILLBOARDMODE_Z)
-        != TransformNode::BILLBOARDMODE_Z) {
+    if ((billboardMode & TransformNode::BILLBOARDMODE_Z) != TransformNode::BILLBOARDMODE_Z) {
       rotation().z = 0.f;
     }
   }
@@ -899,8 +886,7 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
     if (!parent() && camera) {
       auto cameraWorldMatrix = camera->getWorldMatrix();
       auto cameraGlobalPosition
-        = Vector3(cameraWorldMatrix.m()[12], cameraWorldMatrix.m()[13],
-                  cameraWorldMatrix.m()[14]);
+        = Vector3(cameraWorldMatrix.m()[12], cameraWorldMatrix.m()[13], cameraWorldMatrix.m()[14]);
 
       iTranslation.copyFromFloats(_position.x + cameraGlobalPosition.x,
                                   _position.y + cameraGlobalPosition.y,
@@ -915,8 +901,7 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
   }
 
   // Scaling
-  iScaling.copyFromFloats(_scaling.x * scalingDeterminant,
-                          _scaling.y * scalingDeterminant,
+  iScaling.copyFromFloats(_scaling.x * scalingDeterminant, _scaling.y * scalingDeterminant,
                           _scaling.z * scalingDeterminant);
 
   // Rotation
@@ -925,16 +910,15 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
     if (reIntegrateRotationIntoRotationQuaternion) {
       const auto len = rotation().lengthSquared();
       if (len != 0.f) {
-        _rotationQuaternion->multiplyInPlace(Quaternion::RotationYawPitchRoll(
-          _rotation.y, _rotation.x, _rotation.z));
+        _rotationQuaternion->multiplyInPlace(
+          Quaternion::RotationYawPitchRoll(_rotation.y, _rotation.x, _rotation.z));
         _rotation.copyFromFloats(0.f, 0.f, 0.f);
       }
     }
     iRotation.copyFrom(*_rotationQuaternion);
   }
   else {
-    Quaternion::RotationYawPitchRollToRef(_rotation.y, _rotation.x, _rotation.z,
-                                          iRotation);
+    Quaternion::RotationYawPitchRollToRef(_rotation.y, _rotation.x, _rotation.z, iRotation);
     cache.rotation.copyFrom(_rotation);
   }
 
@@ -956,8 +940,7 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
       _localMatrix.multiplyToRef(*_pivotMatrixInverse, _localMatrix);
     }
 
-    _localMatrix.addTranslationFromFloats(iTranslation.x, iTranslation.y,
-                                          iTranslation.z);
+    _localMatrix.addTranslationFromFloats(iTranslation.x, iTranslation.y, iTranslation.z);
   }
   else {
     Matrix::ComposeToRef(iScaling, iRotation, iTranslation, _localMatrix);
@@ -970,9 +953,8 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
     }
     if (useBillboardPath) {
       if (_transformToBoneReferal) {
-        iParent->getWorldMatrix().multiplyToRef(
-          _transformToBoneReferal->getWorldMatrix(),
-          TmpVectors::MatrixArray[7]);
+        iParent->getWorldMatrix().multiplyToRef(_transformToBoneReferal->getWorldMatrix(),
+                                                TmpVectors::MatrixArray[7]);
       }
       else {
         TmpVectors::MatrixArray[7].copyFrom(iParent->getWorldMatrix());
@@ -983,18 +965,16 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
       std::optional<Vector3> translation  = TmpVectors::Vector3Array[5];
       std::optional<Vector3> scale        = TmpVectors::Vector3Array[6];
       TmpVectors::MatrixArray[7].decompose(scale, rotation_, translation);
-      Matrix::ScalingToRef(scale->x, scale->y, scale->z,
-                           TmpVectors::MatrixArray[7]);
+      Matrix::ScalingToRef(scale->x, scale->y, scale->z, TmpVectors::MatrixArray[7]);
       TmpVectors::MatrixArray[7].setTranslation(*translation);
 
       _localMatrix.multiplyToRef(TmpVectors::MatrixArray[7], _worldMatrix);
     }
     else {
       if (_transformToBoneReferal) {
-        _localMatrix.multiplyToRef(iParent->getWorldMatrix(),
-                                   TmpVectors::MatrixArray[6]);
-        TmpVectors::MatrixArray[6].multiplyToRef(
-          _transformToBoneReferal->getWorldMatrix(), _worldMatrix);
+        _localMatrix.multiplyToRef(iParent->getWorldMatrix(), TmpVectors::MatrixArray[6]);
+        TmpVectors::MatrixArray[6].multiplyToRef(_transformToBoneReferal->getWorldMatrix(),
+                                                 _worldMatrix);
       }
       else {
         _localMatrix.multiplyToRef(iParent->getWorldMatrix(), _worldMatrix);
@@ -1017,8 +997,7 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
     TmpVectors::MatrixArray[1].setTranslationFromFloats(0.f, 0.f, 0.f);
     TmpVectors::MatrixArray[1].invertToRef(TmpVectors::MatrixArray[0]);
 
-    if ((billboardMode & TransformNode::BILLBOARDMODE_ALL)
-        != TransformNode::BILLBOARDMODE_ALL) {
+    if ((billboardMode & TransformNode::BILLBOARDMODE_ALL) != TransformNode::BILLBOARDMODE_ALL) {
       std::optional<Vector3> scale        = std::nullopt;
       std::optional<Quaternion> rotation_ = TmpVectors::QuaternionArray[0];
       std::optional<Vector3> translation  = std::nullopt;
@@ -1026,23 +1005,19 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
       auto& eulerAngles = TmpVectors::Vector3Array[1];
       TmpVectors::QuaternionArray[0].toEulerAnglesToRef(eulerAngles);
 
-      if ((billboardMode & TransformNode::BILLBOARDMODE_X)
-          != TransformNode::BILLBOARDMODE_X) {
+      if ((billboardMode & TransformNode::BILLBOARDMODE_X) != TransformNode::BILLBOARDMODE_X) {
         eulerAngles.x = 0;
       }
 
-      if ((billboardMode & TransformNode::BILLBOARDMODE_Y)
-          != TransformNode::BILLBOARDMODE_Y) {
+      if ((billboardMode & TransformNode::BILLBOARDMODE_Y) != TransformNode::BILLBOARDMODE_Y) {
         eulerAngles.y = 0;
       }
 
-      if ((billboardMode & TransformNode::BILLBOARDMODE_Z)
-          != TransformNode::BILLBOARDMODE_Z) {
+      if ((billboardMode & TransformNode::BILLBOARDMODE_Z) != TransformNode::BILLBOARDMODE_Z) {
         eulerAngles.z = 0;
       }
 
-      Matrix::RotationYawPitchRollToRef(eulerAngles.y, eulerAngles.x,
-                                        eulerAngles.z,
+      Matrix::RotationYawPitchRollToRef(eulerAngles.y, eulerAngles.x, eulerAngles.z,
                                         TmpVectors::MatrixArray[0]);
     }
     _worldMatrix.setTranslationFromFloats(0.f, 0.f, 0.f);
@@ -1112,29 +1087,25 @@ TransformNode& TransformNode::unregisterAfterWorldMatrixUpdate(
 Vector3 TransformNode::getPositionInCameraSpace(const CameraPtr& camera) const
 {
   if (!camera) {
-    return Vector3::TransformCoordinates(
-      absolutePosition(), getScene()->activeCamera()->getViewMatrix());
+    return Vector3::TransformCoordinates(absolutePosition(),
+                                         getScene()->activeCamera()->getViewMatrix());
   }
   else {
-    return Vector3::TransformCoordinates(absolutePosition(),
-                                         camera->getViewMatrix());
+    return Vector3::TransformCoordinates(absolutePosition(), camera->getViewMatrix());
   }
 }
 
 float TransformNode::getDistanceToCamera(const CameraPtr& camera)
 {
   if (!camera) {
-    return absolutePosition()
-      .subtract(getScene()->activeCamera()->globalPosition())
-      .length();
+    return absolutePosition().subtract(getScene()->activeCamera()->globalPosition()).length();
   }
   else {
     return absolutePosition().subtract(camera->globalPosition()).length();
   }
 }
 
-TransformNodePtr TransformNode::clone(const std::string& /*name*/,
-                                      Node* /*newParent*/,
+TransformNodePtr TransformNode::clone(const std::string& /*name*/, Node* /*newParent*/,
                                       bool /*doNotCloneChildren*/)
 {
   return nullptr;
@@ -1145,23 +1116,20 @@ json TransformNode::serialize(json& /*currentSerializationObject*/)
   return nullptr;
 }
 
-TransformNodePtr TransformNode::Parse(const json& /*parsedTransformNode*/,
-                                      Scene* /*scene*/,
+TransformNodePtr TransformNode::Parse(const json& /*parsedTransformNode*/, Scene* /*scene*/,
                                       const std::string& /*rootUrl*/)
 {
   return nullptr;
 }
 
-std::vector<TransformNodePtr> TransformNode::getChildTransformNodes(
-  bool directDescendantsOnly,
-  const std::function<bool(const NodePtr& node)>& predicate)
+std::vector<TransformNodePtr>
+TransformNode::getChildTransformNodes(bool directDescendantsOnly,
+                                      const std::function<bool(const NodePtr& node)>& predicate)
 {
   std::vector<TransformNodePtr> results;
-  _getDescendants(results, directDescendantsOnly,
-                  [&predicate](const NodePtr& node) {
-                    return ((!predicate || predicate(node))
-                            && (std::static_pointer_cast<TransformNode>(node)));
-                  });
+  _getDescendants(results, directDescendantsOnly, [&predicate](const NodePtr& node) {
+    return ((!predicate || predicate(node)) && (std::static_pointer_cast<TransformNode>(node)));
+  });
   return results;
 }
 
@@ -1204,10 +1172,9 @@ TransformNode& TransformNode::normalizeToUnitCube(
     }
   }
 
-  auto boundingVectors
-    = getHierarchyBoundingVectors(includeDescendants, predicate);
-  auto sizeVec      = boundingVectors.max.subtract(boundingVectors.min);
-  auto maxDimension = std::max(sizeVec.x, std::max(sizeVec.y, sizeVec.z));
+  auto boundingVectors = getHierarchyBoundingVectors(includeDescendants, predicate);
+  auto sizeVec         = boundingVectors.max.subtract(boundingVectors.min);
+  auto maxDimension    = std::max(sizeVec.x, std::max(sizeVec.y, sizeVec.z));
 
   if (maxDimension == 0.f) {
     return *this;
