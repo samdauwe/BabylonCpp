@@ -101,6 +101,26 @@ protected:
   NodeMaterialConnectionPointPtr& get_cameraPosition();
 
   /**
+   * @brief Gets the glossiness component.
+   */
+  NodeMaterialConnectionPointPtr& get_glossiness();
+
+  /**
+   * @brief Gets the glossinness power component.
+   */
+  NodeMaterialConnectionPointPtr& get_glossPower();
+
+  /**
+   * @brief Gets the diffuse color component.
+   */
+  NodeMaterialConnectionPointPtr& get_diffuseColor();
+
+  /**
+   * @brief Gets the specular color component.
+   */
+  NodeMaterialConnectionPointPtr& get_specularColor();
+
+  /**
    * @brief Gets the diffuse output component.
    */
   NodeMaterialConnectionPointPtr& get_diffuseOutput();
@@ -109,6 +129,11 @@ protected:
    * @brief Gets the specular output component.
    */
   NodeMaterialConnectionPointPtr& get_specularOutput();
+
+  /**
+   * @brief Gets the shadow output component.
+   */
+  NodeMaterialConnectionPointPtr& get_shadow();
 
   /**
    * @brief Hidden
@@ -140,6 +165,26 @@ public:
   ReadOnlyProperty<LightBlock, NodeMaterialConnectionPointPtr> cameraPosition;
 
   /**
+   * Gets the glossiness component
+   */
+  ReadOnlyProperty<LightBlock, NodeMaterialConnectionPointPtr> glossiness;
+
+  /**
+   * Gets the glossinness power component
+   */
+  ReadOnlyProperty<LightBlock, NodeMaterialConnectionPointPtr> glossPower;
+
+  /**
+   * Gets the diffuse color component
+   */
+  ReadOnlyProperty<LightBlock, NodeMaterialConnectionPointPtr> diffuseColor;
+
+  /**
+   * Gets the specular color component
+   */
+  ReadOnlyProperty<LightBlock, NodeMaterialConnectionPointPtr> specularColor;
+
+  /**
    * Gets the diffuse output component
    */
   ReadOnlyProperty<LightBlock, NodeMaterialConnectionPointPtr> diffuseOutput;
@@ -148,6 +193,11 @@ public:
    * Gets the specular output component
    */
   ReadOnlyProperty<LightBlock, NodeMaterialConnectionPointPtr> specularOutput;
+
+  /**
+   * Gets the shadow output component
+   */
+  ReadOnlyProperty<LightBlock, NodeMaterialConnectionPointPtr> shadow;
 
 private:
   uint32_t _lightId;

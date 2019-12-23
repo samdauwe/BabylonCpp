@@ -261,6 +261,11 @@ protected:
                     bool isFinalMerger = false, bool isInput = false);
 
   /**
+   * @brief Hidden
+   */
+  bool _isUnique;
+
+  /**
    * @brief Gets a boolean indicating that this block is an end block (e.g. it is generating a
    * system value).
    */

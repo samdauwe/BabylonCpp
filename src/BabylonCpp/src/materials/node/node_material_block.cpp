@@ -14,7 +14,8 @@ namespace BABYLON {
 
 NodeMaterialBlock::NodeMaterialBlock(const std::string& iName, NodeMaterialBlockTargets target,
                                      bool isFinalMerger, bool isInput)
-    : isFinalMerger{this, &NodeMaterialBlock::get_isFinalMerger}
+    : _isUnique{false}
+    , isFinalMerger{this, &NodeMaterialBlock::get_isFinalMerger}
     , isInput{this, &NodeMaterialBlock::get_isInput}
     , buildId{this, &NodeMaterialBlock::get_buildId, &NodeMaterialBlock::set_buildId}
     , target{this, &NodeMaterialBlock::get_target, &NodeMaterialBlock::set_target}

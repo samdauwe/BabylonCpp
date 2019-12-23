@@ -21,19 +21,36 @@ LightBlock::LightBlock(const std::string& iName)
     , worldPosition{this, &LightBlock::get_worldPosition}
     , worldNormal{this, &LightBlock::get_worldNormal}
     , cameraPosition{this, &LightBlock::get_cameraPosition}
+    , glossiness{this, &LightBlock::get_glossiness}
+    , glossPower{this, &LightBlock::get_glossPower}
+    , diffuseColor{this, &LightBlock::get_diffuseColor}
+    , specularColor{this, &LightBlock::get_specularColor}
     , diffuseOutput{this, &LightBlock::get_diffuseOutput}
     , specularOutput{this, &LightBlock::get_specularOutput}
+    , shadow{this, &LightBlock::get_shadow}
 {
+  _isUnique = true;
+
   registerInput("worldPosition", NodeMaterialBlockConnectionPointTypes::Vector4, false,
                 NodeMaterialBlockTargets::Vertex);
   registerInput("worldNormal", NodeMaterialBlockConnectionPointTypes::Vector4, false,
                 NodeMaterialBlockTargets::Fragment);
-
   registerInput("cameraPosition", NodeMaterialBlockConnectionPointTypes::Vector3, false,
                 NodeMaterialBlockTargets::Fragment);
+  registerInput("glossiness", NodeMaterialBlockConnectionPointTypes::Float, true,
+                NodeMaterialBlockTargets::Fragment);
+  registerInput("glossPower", NodeMaterialBlockConnectionPointTypes::Float, true,
+                NodeMaterialBlockTargets::Fragment);
+  registerInput("diffuseColor", NodeMaterialBlockConnectionPointTypes::Color3, true,
+                NodeMaterialBlockTargets::Fragment);
+  registerInput("specularColor", NodeMaterialBlockConnectionPointTypes::Color3, true,
+                NodeMaterialBlockTargets::Fragment);
+
   registerOutput("diffuseOutput", NodeMaterialBlockConnectionPointTypes::Color3,
                  NodeMaterialBlockTargets::Fragment);
   registerOutput("specularOutput", NodeMaterialBlockConnectionPointTypes::Color3,
+                 NodeMaterialBlockTargets::Fragment);
+  registerOutput("shadow", NodeMaterialBlockConnectionPointTypes::Float,
                  NodeMaterialBlockTargets::Fragment);
 }
 
@@ -59,6 +76,26 @@ NodeMaterialConnectionPointPtr& LightBlock::get_cameraPosition()
   return _inputs[2];
 }
 
+NodeMaterialConnectionPointPtr& LightBlock::get_glossiness()
+{
+  return _inputs[3];
+}
+
+NodeMaterialConnectionPointPtr& LightBlock::get_glossPower()
+{
+  return _inputs[4];
+}
+
+NodeMaterialConnectionPointPtr& LightBlock::get_diffuseColor()
+{
+  return _inputs[5];
+}
+
+NodeMaterialConnectionPointPtr& LightBlock::get_specularColor()
+{
+  return _inputs[6];
+}
+
 NodeMaterialConnectionPointPtr& LightBlock::get_diffuseOutput()
 {
   return _outputs[0];
@@ -67,6 +104,11 @@ NodeMaterialConnectionPointPtr& LightBlock::get_diffuseOutput()
 NodeMaterialConnectionPointPtr& LightBlock::get_specularOutput()
 {
   return _outputs[1];
+}
+
+NodeMaterialConnectionPointPtr& LightBlock::get_shadow()
+{
+  return _outputs[2];
 }
 
 void LightBlock::autoConfigure(const NodeMaterialPtr& material)
@@ -142,7 +184,7 @@ void LightBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMateri
                                false);
   }
   else {
-    MaterialHelper::BindLight(light, _lightId, scene, mesh, effect, true, false);
+    MaterialHelper::BindLight(light, _lightId, scene, nullptr, effect, true, false);
   }
 }
 
@@ -265,7 +307,10 @@ LightBlock& LightBlock::_buildBlock(NodeMaterialBuildState& state)
     }
     state.compilationString += "lightingInfo info;\r\n";
     state.compilationString += "float shadow = 1.;\r\n";
-    state.compilationString += "float glossiness = 0.;\r\n";
+    state.compilationString += String::printf(
+      "float glossiness = %s * %s;\r\n",
+      glossiness()->isConnected() ? glossiness()->associatedVariableName().c_str() : "1.0",
+      glossPower()->isConnected ? glossPower()->associatedVariableName().c_str() : "1024.0");
     state.compilationString += "vec3 diffuseBase = vec3(0., 0., 0.);\r\n";
     state.compilationString += "vec3 specularBase = vec3(0., 0., 0.);\r\n";
     state.compilationString += String::printf("vec3 normalW = %s.xyz;\r\n",
@@ -289,10 +334,24 @@ LightBlock& LightBlock::_buildBlock(NodeMaterialBuildState& state)
   const auto& _specularOutput = specularOutput();
 
   state.compilationString
-    += String::printf("%s = diffuseBase;\r\n", _declareOutput(_diffuseOutput, state).c_str());
+    += _declareOutput(_diffuseOutput, state)
+       + String::printf(
+         " = diffuseBase%s;\r\n",
+         diffuseColor()->isConnected() ?
+           String::printf(" * %s", diffuseColor()->associatedVariableName().c_str()).c_str() :
+           "");
   if (_specularOutput->hasEndpoints()) {
     state.compilationString
-      += String::printf("%s = specularBase;\r\n", _declareOutput(_specularOutput, state).c_str());
+      += _declareOutput(_specularOutput, state)
+         + String::printf(
+           " = specularBase%s;\r\n",
+           specularColor()->isConnected() ?
+             String::printf(" * %s", specularColor()->associatedVariableName().c_str()).c_str() :
+             "");
+  }
+
+  if (shadow()->hasEndpoints()) {
+    state.compilationString += _declareOutput(shadow, state) + " = shadow;\r\n";
   }
 
   return *this;
