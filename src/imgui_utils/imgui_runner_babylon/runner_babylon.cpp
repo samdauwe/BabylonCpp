@@ -27,8 +27,16 @@ void LoadFontAwesome()
   static ImWchar ranges[] = { 0xf000, 0xf82f, 0 };
   ImFontConfig config;
   config.MergeMode = true;
+
+  std::string fontFolder;
+#ifdef __EMSCRIPTEN__
+  fontFolder = std::string("emscripten_static_assets_folder/fonts/");
+#else
+  fontFolder = BABYLON::assets_folder() + "/fonts/";
+#endif
+
   auto fontRegularPath
-    = std::string(BABYLON::assets_folder() + "/fonts/") + FONT_ICON_FILE_NAME_FAR;
+    = fontFolder + FONT_ICON_FILE_NAME_FAR;
   if (BABYLON::Filesystem::isFile(fontRegularPath))
   {
     _fontRegular = io.Fonts->AddFontFromFileTTF(fontRegularPath.c_str(),
@@ -41,7 +49,7 @@ void LoadFontAwesome()
   }
 
   auto fontSolidPath
-    = std::string(BABYLON::assets_folder() + "/fonts/") + FONT_ICON_FILE_NAME_FAS;
+    = fontFolder + FONT_ICON_FILE_NAME_FAS;
   if (BABYLON::Filesystem::isFile(fontSolidPath))
   {
     _fontSolid = io.Fonts->AddFontFromFileTTF(fontSolidPath.c_str(),
