@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <thread>
 #include <chrono>
+#include <sstream>
 
 namespace BABYLON {
 namespace asio {
@@ -52,7 +53,10 @@ DownloadId storeDownloadInfo(
 DownloadInfo consumeDownloadInfo(DownloadId id)
 {
   if (gDownloadInfos.find(id) == gDownloadInfos.end()) {
-    throw std::runtime_error("consumeDownloadInfo; bad id");
+    std::stringstream msg;
+    msg << "consumeDownloadInfo bad id:" << id <<  " gDownloadInfos size=" << gDownloadInfos.size();
+    BABYLON_LOG_ERROR("asio_emscripten", msg.str().c_str(), "");
+    throw std::runtime_error(msg.str().c_str());
   }
   DownloadInfo r = gDownloadInfos.at(id);
   gDownloadInfos.erase(id);
