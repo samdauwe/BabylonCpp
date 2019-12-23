@@ -111,8 +111,10 @@ NodeMaterialConnectionPointPtr& ReflectionTextureBlock::get_b()
 void ReflectionTextureBlock::autoConfigure(const NodeMaterialPtr& material)
 {
   if (!position()->isConnected()) {
-    auto positionInput = material->getInputBlockByPredicate(
-      [](const InputBlockPtr& inputBlock) -> bool { return inputBlock->isAttribute() && inputBlock->name == "position"; });
+    auto positionInput
+      = material->getInputBlockByPredicate([](const InputBlockPtr& inputBlock) -> bool {
+          return inputBlock->isAttribute() && inputBlock->name == "position";
+        });
 
     if (!positionInput) {
       positionInput = InputBlock::New("position");
@@ -122,9 +124,10 @@ void ReflectionTextureBlock::autoConfigure(const NodeMaterialPtr& material)
   }
 
   if (!world()->isConnected()) {
-    auto worldInput = material->getInputBlockByPredicate([](const InputBlockPtr& inputBlock) -> bool {
-      return inputBlock->systemValue() == NodeMaterialSystemValues::World;
-    });
+    auto worldInput
+      = material->getInputBlockByPredicate([](const InputBlockPtr& inputBlock) -> bool {
+          return inputBlock->systemValue() == NodeMaterialSystemValues::World;
+        });
 
     if (!worldInput) {
       worldInput = InputBlock::New("world");
@@ -147,9 +150,10 @@ void ReflectionTextureBlock::autoConfigure(const NodeMaterialPtr& material)
   }
 
   if (!view()->isConnected()) {
-    auto viewInput = material->getInputBlockByPredicate([](const InputBlockPtr& inputBlock) -> bool {
-      return inputBlock->systemValue() == NodeMaterialSystemValues::View;
-    });
+    auto viewInput
+      = material->getInputBlockByPredicate([](const InputBlockPtr& inputBlock) -> bool {
+          return inputBlock->systemValue() == NodeMaterialSystemValues::View;
+        });
 
     if (!viewInput) {
       viewInput = InputBlock::New("view");
@@ -272,6 +276,18 @@ ReflectionTextureBlock& ReflectionTextureBlock::_buildBlock(NodeMaterialBuildSta
 {
   NodeMaterialBlock::_buildBlock(state);
 
+  if (!texture) {
+    if (state.target == NodeMaterialBlockTargets::Fragment) {
+      for (const auto& output : _outputs) {
+        if (output->hasEndpoints()) {
+          state.compilationString += String::printf(
+            "%s = vec3(0.).%s;\r\n", _declareOutput(output, state).c_str(), output->name.c_str());
+        }
+      }
+    }
+    return *this;
+  }
+
   if (state.target != NodeMaterialBlockTargets::Fragment) {
     _define3DName              = state._getFreeDefineName("REFLECTIONMAP_3D");
     _defineCubicName           = state._getFreeDefineName("REFLECTIONMAP_CUBIC");
@@ -336,7 +352,6 @@ ReflectionTextureBlock& ReflectionTextureBlock::_buildBlock(NodeMaterialBuildSta
   auto _view            = view()->associatedVariableName();
 
   state.compilationString += String::printf("vec3 %s;\r\n", _reflectionColorName.c_str());
-  state.compilationString += String::printf("#ifdef %s\r\n", _define3DName.c_str());
   state.compilationString
     += String::printf("#ifdef %s \r\n", _defineMirroredEquirectangularFixedName.c_str());
   state.compilationString += String::printf(
@@ -401,6 +416,7 @@ ReflectionTextureBlock& ReflectionTextureBlock::_buildBlock(NodeMaterialBuildSta
     += String::printf("    vec3 %s = vec3(0, 0, 0);\r\n", _reflectionCoordsName.c_str());
   state.compilationString += "#endif\r\n";
 
+  state.compilationString += String::printf("#ifdef %s\r\n", _define3DName.c_str());
   state.compilationString
     += String::printf("%s = textureCube(%s, %s).rgb;\r\n", _reflectionColorName.c_str(),
                       _cubeSamplerName.c_str(), _reflectionCoordsName.c_str());
@@ -427,6 +443,28 @@ ReflectionTextureBlock& ReflectionTextureBlock::_buildBlock(NodeMaterialBuildSta
   }
 
   return *this;
+}
+
+std::string ReflectionTextureBlock::_dumpPropertiesCode()
+{
+  if (!texture) {
+    return "";
+  }
+
+  std::string codeString;
+
+  if (texture->isCube()) {
+    codeString = String::printf("%s.texture = CubeTexture::New(\"%s\");\r\n",
+                                _codeVariableName.c_str(), texture->name.c_str());
+  }
+  else {
+    codeString = String::printf("%s.texture = Texture::New(\"%s\");\r\n", _codeVariableName.c_str(),
+                                texture->name.c_str());
+  }
+  codeString += String::printf("%s.texture.coordinatesMode = %u;\r\n", _codeVariableName.c_str(),
+                               texture->coordinatesMode());
+
+  return codeString;
 }
 
 json ReflectionTextureBlock::serialize() const

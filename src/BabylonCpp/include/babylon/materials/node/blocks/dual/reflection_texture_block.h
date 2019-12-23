@@ -147,6 +147,7 @@ private:
   void _injectVertexCode(NodeMaterialBuildState& state);
   void _writeOutput(NodeMaterialBuildState& state, const NodeMaterialConnectionPointPtr& output,
                     const std::string& swizzle);
+  std::string _dumpPropertiesCode() override;
 
 public:
   /**
