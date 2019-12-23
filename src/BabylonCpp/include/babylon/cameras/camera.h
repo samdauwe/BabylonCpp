@@ -126,6 +126,7 @@ public:
 
   Type type() const override;
   void addToScene(const CameraPtr& newCamera);
+  CameraPtr _this() const;
 
   /**
    * @brief Store current camera state (fov, position, etc..)
@@ -453,6 +454,11 @@ public:
    * @return the direction
    */
   Vector3 getDirection(const Vector3& localAxis);
+
+  /**
+   * @brief Returns the current camera absolute rotation.
+   */
+  Quaternion absoluteRotation();
 
   /**
    * @brief Gets the direction of the camera relative to a given local axis into

@@ -32,8 +32,7 @@ namespace BABYLON {
 
 bool Camera::ForceAttachControlToAlwaysPreventDefault = false;
 
-CameraPtr Camera::_createDefaultParsedCamera(const std::string& iName,
-                                             Scene* scene)
+CameraPtr Camera::_createDefaultParsedCamera(const std::string& iName, Scene* scene)
 {
   return UniversalCamera::New(iName, Vector3::Zero(), scene);
 }
@@ -79,7 +78,8 @@ Camera::Camera(const std::string& iName, const Vector3& iPosition, Scene* scene,
     , _setActiveOnSceneIfNoneActive{setActiveOnSceneIfNoneActive}
 {
   position = iPosition;
-  // _initCache(); // is done inside addToScene() (cannot call a virtual function in a constructor !)
+  // _initCache(); // is done inside addToScene() (cannot call a virtual function in a constructor
+  // !)
 }
 
 Camera::~Camera() = default;
@@ -91,16 +91,24 @@ Type Camera::type() const
 
 void Camera::addToScene(const CameraPtr& newCamera)
 {
-  if (! _cache.cache_inited)
+  if (!_cache.cache_inited) {
     _initCache();
+  }
   _setupInputs();
+
+  getScene()->addCamera(newCamera);
 
   if (_setActiveOnSceneIfNoneActive && !getScene()->activeCamera()) {
     getScene()->activeCamera = newCamera;
   }
+}
 
-  newCamera->addToRootNodes();
-  getScene()->addCamera(newCamera);
+CameraPtr Camera::_this() const
+{
+  const auto& cameras = getScene()->cameras;
+  auto it             = std::find_if(cameras.begin(), cameras.end(),
+                         [this](const CameraPtr& camera) { return camera.get() == this; });
+  return (it != cameras.end()) ? (*it) : nullptr;
 }
 
 Vector3& Camera::get_position()
@@ -175,8 +183,7 @@ std::vector<AbstractMesh*>& Camera::getActiveMeshes()
 
 bool Camera::isActiveMesh(const AbstractMeshPtr& mesh)
 {
-  return std::find(_activeMeshes.begin(), _activeMeshes.end(), mesh.get())
-         != _activeMeshes.end();
+  return std::find(_activeMeshes.begin(), _activeMeshes.end(), mesh.get()) != _activeMeshes.end();
 }
 
 bool Camera::isReady(bool completeCheck, bool /*forceInstanceSupport*/)
@@ -196,11 +203,9 @@ void Camera::_initCache()
 {
   Node::_initCache();
 
-  _cache.position = Vector3(std::numeric_limits<float>::max(),
-                            std::numeric_limits<float>::max(),
+  _cache.position = Vector3(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
                             std::numeric_limits<float>::max());
-  _cache.upVector = Vector3(std::numeric_limits<float>::max(),
-                            std::numeric_limits<float>::max(),
+  _cache.upVector = Vector3(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
                             std::numeric_limits<float>::max());
 
   _cache.mode = 0;
@@ -258,8 +263,7 @@ bool Camera::_isSynchronizedProjectionMatrix()
 
   if (mode == Camera::PERSPECTIVE_CAMERA) {
     check = stl_util::almost_equal(_cache.fov, fov) && _cache.fovMode == fovMode
-            && stl_util::almost_equal(_cache.aspectRatio,
-                                      engine->getAspectRatio(*this));
+            && stl_util::almost_equal(_cache.aspectRatio, engine->getAspectRatio(*this));
   }
   else {
     check = stl_util::almost_equal(_cache.orthoLeft, orthoLeft)
@@ -275,8 +279,7 @@ bool Camera::_isSynchronizedProjectionMatrix()
 
 // Controls
 void Camera::attachControl(ICanvas* /*canvas*/, bool /*noPreventDefault*/,
-                           bool /*useCtrlForPanning*/,
-                           MouseButtonType /*panningMouseButton*/)
+                           bool /*useCtrlForPanning*/, MouseButtonType /*panningMouseButton*/)
 {
 }
 
@@ -356,11 +359,8 @@ void Camera::_cascadePostProcessesToRigCams()
 
 int Camera::attachPostProcess(const PostProcessPtr& postProcess, int insertAt)
 {
-  if (!postProcess->isReusable()
-      && stl_util::index_of(_postProcesses, postProcess) > -1) {
-    BABYLON_LOG_WARN(
-      "Camera",
-      "You're trying to reuse a post process not defined as reusable.")
+  if (!postProcess->isReusable() && stl_util::index_of(_postProcesses, postProcess) > -1) {
+    BABYLON_LOG_WARN("Camera", "You're trying to reuse a post process not defined as reusable.")
     return 0;
   }
 
@@ -427,8 +427,7 @@ Matrix& Camera::getViewMatrix(bool force)
   _refreshFrustumPlanes = true;
 
   if (_cameraRigParams.vrPreViewMatrixSet) {
-    _computedViewMatrix.multiplyToRef(_cameraRigParams.vrPreViewMatrix,
-                                      _computedViewMatrix);
+    _computedViewMatrix.multiplyToRef(_cameraRigParams.vrPreViewMatrix, _computedViewMatrix);
   }
 
   // Notify parent camera if rig camera is changed
@@ -464,8 +463,7 @@ void Camera::unfreezeProjectionMatrix()
 
 Matrix& Camera::getProjectionMatrix(bool force)
 {
-  if (_doNotComputeProjectionMatrix
-      || (!force && _isSynchronizedProjectionMatrix())) {
+  if (_doNotComputeProjectionMatrix || (!force && _isSynchronizedProjectionMatrix())) {
     return _projectionMatrix;
   }
 
@@ -488,16 +486,36 @@ Matrix& Camera::getProjectionMatrix(bool force)
       minZ = 0.1f;
     }
 
+    const auto reverseDepth = engine->useReverseDepthBuffer;
+    std::function<void(float fov, float aspect, float znear, float zfar, Matrix& result,
+                       bool isVerticalFovFixed)>
+      getProjectionMatrix = nullptr;
     if (scene->useRightHandedSystem()) {
-      Matrix::PerspectiveFovRHToRef(fov, engine->getAspectRatio(*this), minZ,
-                                    maxZ, _projectionMatrix,
-                                    fovMode == Camera::FOVMODE_VERTICAL_FIXED);
+      getProjectionMatrix = [reverseDepth](float iFov, float aspect, float znear, float zfar,
+                                           Matrix& result, bool isVerticalFovFixed) -> void {
+        if (reverseDepth) {
+          Matrix::PerspectiveFovReverseRHToRef(iFov, aspect, znear, zfar, result,
+                                               isVerticalFovFixed);
+        }
+        else {
+          Matrix::PerspectiveFovRHToRef(iFov, aspect, znear, zfar, result, isVerticalFovFixed);
+        }
+      };
     }
     else {
-      Matrix::PerspectiveFovLHToRef(fov, engine->getAspectRatio(*this), minZ,
-                                    maxZ, _projectionMatrix,
-                                    fovMode == Camera::FOVMODE_VERTICAL_FIXED);
+      getProjectionMatrix = [reverseDepth](float iFov, float aspect, float znear, float zfar,
+                                           Matrix& result, bool isVerticalFovFixed) -> void {
+        if (reverseDepth) {
+          Matrix::PerspectiveFovReverseLHToRef(iFov, aspect, znear, zfar, result,
+                                               isVerticalFovFixed);
+        }
+        else {
+          Matrix::PerspectiveFovLHToRef(iFov, aspect, znear, zfar, result, isVerticalFovFixed);
+        }
+      };
     }
+    getProjectionMatrix(fov, engine->getAspectRatio(*this), minZ, maxZ, _projectionMatrix,
+                        fovMode == Camera::FOVMODE_VERTICAL_FIXED);
   }
   else {
     auto halfWidth  = static_cast<float>(engine->getRenderWidth()) / 2.f;
@@ -507,16 +525,16 @@ Matrix& Camera::getProjectionMatrix(bool force)
         !stl_util::almost_equal(orthoLeft, 0.f) ? orthoLeft : -halfWidth,
         !stl_util::almost_equal(orthoRight, 0.f) ? orthoRight : halfWidth,
         !stl_util::almost_equal(orthoBottom, 0.f) ? orthoBottom : -halfHeight,
-        !stl_util::almost_equal(orthoTop, 0.f) ? orthoTop : halfHeight, minZ,
-        maxZ, _projectionMatrix);
+        !stl_util::almost_equal(orthoTop, 0.f) ? orthoTop : halfHeight, minZ, maxZ,
+        _projectionMatrix);
     }
     else {
       Matrix::OrthoOffCenterLHToRef(
         !stl_util::almost_equal(orthoLeft, 0.f) ? orthoLeft : -halfWidth,
         !stl_util::almost_equal(orthoRight, 0.f) ? orthoRight : halfWidth,
         !stl_util::almost_equal(orthoBottom, 0.f) ? orthoBottom : -halfHeight,
-        !stl_util::almost_equal(orthoTop, 0.f) ? orthoTop : halfHeight, minZ,
-        maxZ, _projectionMatrix);
+        !stl_util::almost_equal(orthoTop, 0.f) ? orthoTop : halfHeight, minZ, maxZ,
+        _projectionMatrix);
     }
 
     _cache.orthoLeft    = orthoLeft;
@@ -583,13 +601,12 @@ bool Camera::isCompletelyInFrustum(ICullable* target)
 Ray Camera::getForwardRay(float length, const std::optional<Matrix>& iTransform,
                           const std::optional<Vector3>& iOrigin)
 {
-  const auto transform
-    = iTransform.has_value() ? *iTransform : getWorldMatrix();
+  const auto transform = iTransform.has_value() ? *iTransform : getWorldMatrix();
 
   const auto origin = iOrigin.has_value() ? *iOrigin : position();
 
-  const auto forward = _scene->useRightHandedSystem ? Vector3(0.f, 0.f, -1.f) :
-                                                      Vector3(0.f, 0.f, 1.f);
+  const auto forward
+    = _scene->useRightHandedSystem ? Vector3(0.f, 0.f, -1.f) : Vector3(0.f, 0.f, 1.f);
   const auto forwardWorld = Vector3::TransformNormal(forward, transform);
 
   const auto direction = Vector3::Normalize(forwardWorld);
@@ -696,8 +713,7 @@ Vector3* Camera::getRightTarget()
   return &std::static_pointer_cast<TargetCamera>(_rigCameras[1])->getTarget();
 }
 
-void Camera::setCameraRigMode(unsigned int iMode,
-                              const RigParamaters& rigParams)
+void Camera::setCameraRigMode(unsigned int iMode, const RigParamaters& rigParams)
 {
   if (cameraRigMode == iMode) {
     return;
@@ -715,8 +731,7 @@ void Camera::setCameraRigMode(unsigned int iMode,
   // from interaxialDistance and target, not from a given angle as it is now,
   // but until that complete code rewriting provisional stereoHalfAngle value is
   // introduced
-  _cameraRigParams.interaxialDistance
-    = rigParams.interaxialDistance.value_or(0.0637f);
+  _cameraRigParams.interaxialDistance = rigParams.interaxialDistance.value_or(0.0637f);
   _cameraRigParams.stereoHalfAngle
     = Tools::ToRadians(_cameraRigParams.interaxialDistance / 0.0637f);
 
@@ -761,42 +776,36 @@ void Camera::_setStereoscopicRigMode(Camera& camera)
 {
   const auto isStereoscopicHoriz
     = camera.cameraRigMode == Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL
-      || camera.cameraRigMode
-           == Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED;
+      || camera.cameraRigMode == Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED;
 
-  camera._rigCameras[0]->_rigPostProcess = PassPostProcess::New(
-    camera.name + "_passthru", 1.f, camera._rigCameras[0]);
-  camera._rigCameras[1]->_rigPostProcess
-    = StereoscopicInterlacePostProcess::New(camera.name + "_stereoInterlace",
-                                            camera._rigCameras,
-                                            isStereoscopicHoriz);
+  camera._rigCameras[0]->_rigPostProcess
+    = PassPostProcess::New(camera.name + "_passthru", 1.f, camera._rigCameras[0]);
+  camera._rigCameras[1]->_rigPostProcess = StereoscopicInterlacePostProcess::New(
+    camera.name + "_stereoInterlace", camera._rigCameras, isStereoscopicHoriz);
 }
 
 void Camera::_setStereoscopicAnaglyphRigMode(Camera& camera)
 {
-  camera._rigCameras[0]->_rigPostProcess = PassPostProcess::New(
-    camera.name + "_passthru", 1.f, camera._rigCameras[0]);
-  camera._rigCameras[1]->_rigPostProcess = AnaglyphPostProcess::New(
-    camera.name + "_anaglyph", 1.f, camera._rigCameras);
+  camera._rigCameras[0]->_rigPostProcess
+    = PassPostProcess::New(camera.name + "_passthru", 1.f, camera._rigCameras[0]);
+  camera._rigCameras[1]->_rigPostProcess
+    = AnaglyphPostProcess::New(camera.name + "_anaglyph", 1.f, camera._rigCameras);
 }
 
-void Camera::_setVRRigMode(Camera& /*camera*/,
-                           const RigParamaters& /*rigParams*/)
+void Camera::_setVRRigMode(Camera& /*camera*/, const RigParamaters& /*rigParams*/)
 {
 }
 
-void Camera::_setWebVRRigMode(Camera& /*camera*/,
-                              const RigParamaters& /*rigParams*/)
+void Camera::_setWebVRRigMode(Camera& /*camera*/, const RigParamaters& /*rigParams*/)
 {
 }
 
 Matrix& Camera::_getVRProjectionMatrix()
 {
   Matrix::PerspectiveFovLHToRef(_cameraRigParams.vrMetrics.aspectRatioFov,
-                                _cameraRigParams.vrMetrics.aspectRatio, minZ,
-                                maxZ, _cameraRigParams.vrWorkMatrix);
-  _cameraRigParams.vrWorkMatrix.multiplyToRef(_cameraRigParams.vrHMatrix,
-                                              _projectionMatrix);
+                                _cameraRigParams.vrMetrics.aspectRatio, minZ, maxZ,
+                                _cameraRigParams.vrWorkMatrix);
+  _cameraRigParams.vrWorkMatrix.multiplyToRef(_cameraRigParams.vrHMatrix, _projectionMatrix);
   return _projectionMatrix;
 }
 
@@ -829,8 +838,7 @@ void Camera::setCameraRigParameter(const std::string& _name, float value)
   }
 }
 
-CameraPtr Camera::createRigCamera(const std::string& /*name*/,
-                                  int /*cameraIndex*/)
+CameraPtr Camera::createRigCamera(const std::string& /*name*/, int /*cameraIndex*/)
 {
   return nullptr;
 }
@@ -873,6 +881,17 @@ Vector3 Camera::getDirection(const Vector3& localAxis)
   return result;
 }
 
+Quaternion Camera::absoluteRotation()
+{
+  std::optional<Vector3> iScale       = std::nullopt;
+  std::optional<Quaternion> result    = Quaternion::Zero();
+  std::optional<Vector3> iTranslation = std::nullopt;
+
+  getWorldMatrix().decompose(iScale, result, iTranslation);
+
+  return *result;
+}
+
 void Camera::getDirectionToRef(const Vector3& localAxis, Vector3& result)
 {
   Vector3::TransformNormalToRef(localAxis, getWorldMatrix(), result);
@@ -886,14 +905,12 @@ Matrix& Camera::computeWorldMatrix(bool /*force*/, bool /*useWasUpdatedFlag*/)
 void Camera::_resizeOrCreateMultiviewTexture(int width, int height)
 {
   if (!_multiviewTexture) {
-    _multiviewTexture
-      = MultiviewRenderTarget::New(getScene(), ISize{width, height});
+    _multiviewTexture = MultiviewRenderTarget::New(getScene(), ISize{width, height});
   }
   else if (_multiviewTexture->getRenderWidth() != width
            || _multiviewTexture->getRenderHeight() != height) {
     _multiviewTexture->dispose();
-    _multiviewTexture
-      = MultiviewRenderTarget::New(getScene(), ISize{width, height});
+    _multiviewTexture = MultiviewRenderTarget::New(getScene(), ISize{width, height});
   }
 }
 
@@ -910,25 +927,22 @@ void Camera::_AddNodeConstructors()
   VirtualJoysticksCamera::AddNodeConstructor();
 }
 
-std::function<CameraPtr()> Camera::GetConstructorFromName(
-  const std::string& type, const std::string& iName, Scene* scene,
-  float interaxial_distance, bool isStereoscopicSideBySide)
+std::function<CameraPtr()> Camera::GetConstructorFromName(const std::string& type,
+                                                          const std::string& iName, Scene* scene,
+                                                          float interaxial_distance,
+                                                          bool isStereoscopicSideBySide)
 {
-  auto constructorFunc = Node::Construct(
-    type, iName, scene,
-    json{{"interaxial_distance", interaxial_distance},
-         {"isStereoscopicSideBySide", isStereoscopicSideBySide}});
+  auto constructorFunc
+    = Node::Construct(type, iName, scene,
+                      json{{"interaxial_distance", interaxial_distance},
+                           {"isStereoscopicSideBySide", isStereoscopicSideBySide}});
 
   if (constructorFunc) {
-    return [constructorFunc]() {
-      return std::static_pointer_cast<Camera>(constructorFunc());
-    };
+    return [constructorFunc]() { return std::static_pointer_cast<Camera>(constructorFunc()); };
   }
 
   // Default to universal camera
-  return [iName, scene]() {
-    return UniversalCamera::New(iName, Vector3::Zero(), scene);
-  };
+  return [iName, scene]() { return UniversalCamera::New(iName, Vector3::Zero(), scene); };
 }
 
 CameraPtr Camera::Parse(const json& parsedCamera, Scene* scene)
@@ -957,18 +971,17 @@ CameraPtr Camera::Parse(const json& parsedCamera, Scene* scene)
   // Need to force position
   if (camera->type() == Type::ARCROTATECAMERA) {
     camera->position().copyFromFloats(0.f, 0.f, 0.f);
-    if (auto arcRotateCamera
-        = std::static_pointer_cast<ArcRotateCamera>(camera)) {
-      arcRotateCamera->setPosition(Vector3::FromArray(
-        json_util::get_array<float>(parsedCamera, "position")));
+    if (auto arcRotateCamera = std::static_pointer_cast<ArcRotateCamera>(camera)) {
+      arcRotateCamera->setPosition(
+        Vector3::FromArray(json_util::get_array<float>(parsedCamera, "position")));
     }
   }
 
   // Target
   if (json_util::has_valid_key_value(parsedCamera, "target")) {
     if (auto targetCamera = std::static_pointer_cast<TargetCamera>(camera)) {
-      targetCamera->setTarget(Vector3::FromArray(
-        json_util::get_array<float>(parsedCamera, "target")));
+      targetCamera->setTarget(
+        Vector3::FromArray(json_util::get_array<float>(parsedCamera, "target")));
     }
   }
 
@@ -979,26 +992,23 @@ CameraPtr Camera::Parse(const json& parsedCamera, Scene* scene)
       rigParams.interaxialDistance
         = json_util::get_number<float>(parsedCamera, "interaxial_distance");
     }
-    camera->setCameraRigMode(
-      json_util::get_number<unsigned int>(parsedCamera, "cameraRigMode"),
-      rigParams);
+    camera->setCameraRigMode(json_util::get_number<unsigned int>(parsedCamera, "cameraRigMode"),
+                             rigParams);
   }
 
   // Animations
   if (json_util::has_key(parsedCamera, "animations")) {
-    for (const auto& parsedAnimation :
-         json_util::get_array<json>(parsedCamera, "animations")) {
+    for (const auto& parsedAnimation : json_util::get_array<json>(parsedCamera, "animations")) {
       camera->animations.emplace_back(Animation::Parse(parsedAnimation));
     }
     Node::ParseAnimationRanges(*camera, parsedCamera, scene);
   }
 
   if (json_util::has_key(parsedCamera, "autoAnimate")) {
-    scene->beginAnimation(
-      camera, json_util::get_number(parsedCamera, "autoAnimateFrom", 0.f),
-      json_util::get_number(parsedCamera, "autoAnimateTo", 0.f),
-      json_util::get_bool(parsedCamera, "autoAnimateLoop"),
-      json_util::get_number(parsedCamera, "autoAnimateSpeed", 1.f));
+    scene->beginAnimation(camera, json_util::get_number(parsedCamera, "autoAnimateFrom", 0.f),
+                          json_util::get_number(parsedCamera, "autoAnimateTo", 0.f),
+                          json_util::get_bool(parsedCamera, "autoAnimateLoop"),
+                          json_util::get_number(parsedCamera, "autoAnimateSpeed", 1.f));
   }
 
   return camera;
