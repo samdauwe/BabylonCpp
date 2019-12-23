@@ -7,6 +7,10 @@
 #include <babylon/core/filesystem.h>
 #include <babylon/core/system.h>
 #include <babylon/core/logging.h>
+#include <babylon/core/string.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 namespace BABYLON {
 namespace System {
@@ -41,13 +45,17 @@ void chdirToExecutableFolder()
 
 void openBrowser(const std::string &url)
 {
-#ifndef _WIN32
+#if defined(_WIN32)
+  ShellExecute(0, 0, url.c_str(), 0, 0, SW_SHOW);
+#elif defined(__EMSCRIPTEN__)
+  std::string jsCode = "window.open('url','_blank');";
+  jsCode = String::replace(jsCode, "url", url);
+  emscripten_run_script(jsCode.c_str());
+#else
   std::string cmd = std::string("open ") + url;
   int result = system(cmd.c_str());
   if (result != 0)
     BABYLON_LOG_WARN("system.cpp", "system(%S) failed", cmd.c_str());
-#else
-  ShellExecute(0, 0, url.c_str(), 0, 0, SW_SHOW);
 #endif
 }
 
