@@ -12,8 +12,7 @@ namespace BABYLON {
 class Engine;
 
 /**
- * @brief This class can be used to get instrumentation data from a Babylon
- * engine.
+ * @brief This class can be used to get instrumentation data from a Babylon engine.
  * @see
  * http://doc.babylonjs.com/how_to/optimizing_your_scene#engineinstrumentation
  */
@@ -23,8 +22,7 @@ public:
   /**
    * @brief Instantiates a new engine instrumentation.
    * This class can be used to get instrumentation data from a Babylon engine
-   * @see
-   * http://doc.babylonjs.com/how_to/optimizing_your_scene#engineinstrumentation
+   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#engineinstrumentation
    * @param engine Defines the engine to instrument
    */
   EngineInstrumentation(Engine* engine);

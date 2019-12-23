@@ -12,8 +12,7 @@ class Camera;
 class Scene;
 
 /**
- * @brief This class can be used to get instrumentation data from a Babylon
- * engine.
+ * @brief This class can be used to get instrumentation data from a Babylon engine.
  * @see
  * http://doc.babylonjs.com/how_to/optimizing_your_scene#sceneinstrumentation
  */
@@ -23,8 +22,7 @@ public:
   /**
    * @brief Instantiates a new scene instrumentation.
    * This class can be used to get instrumentation data from a Babylon engine
-   * @see
-   * http://doc.babylonjs.com/how_to/optimizing_your_scene#sceneinstrumentation
+   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#sceneinstrumentation
    * @param scene Defines the scene to instrument
    */
   SceneInstrumentation(Scene* scene);
