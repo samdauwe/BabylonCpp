@@ -7,8 +7,9 @@
 #define STB_IMAGE_IMPLEMENTATION
 #endif
 #include <stb_image/stb_image.h>
-#include <babylon/core/filesystem.h>
-
+#include <babylon/asio/asio.h>
+#include <babylon/core/logging.h>
+#include <memory>
 
 namespace ImGuiUtils
 {
@@ -22,22 +23,25 @@ namespace ImGuiUtils
     ImageFileTexture() = default;
     ImageFileTexture(const std::string &filename)
     {
-      if (!BABYLON::Filesystem::exists(filename))
-      {
-        found = false;
-        return;
-      }
+      auto onSuccessLoadBuffer = [this](const BABYLON::ArrayBuffer &data) {
+        unsigned char* my_image_data = stbi_load_from_memory(
+          data.data(), data.size() , &_width, &_height, nullptr, 4);
 
-      unsigned char* my_image_data = stbi_load(filename.c_str(), &_width, &_height, nullptr, 4);
+        // Turn the RGBA pixel data into an OpenGL texture:
+        glGenTextures(1, &_textureId);
+        glBindTexture(GL_TEXTURE_2D, _textureId);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, my_image_data);
+        stbi_image_free(my_image_data);
+      };
 
-      // Turn the RGBA pixel data into an OpenGL texture:
-      glGenTextures(1, &_textureId);
-      glBindTexture(GL_TEXTURE_2D, _textureId);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, my_image_data);
-      stbi_image_free(my_image_data);
+      auto onError = [](const std::string & errorMessage) {
+        BABYLON_LOG_WARN("ImGuiUtils::ImageFileTexture ->", errorMessage.c_str(), "");
+      };
+
+      BABYLON::asio::LoadUrlAsync_Binary(filename, onSuccessLoadBuffer, onError);
     }
     
     ~ImageFileTexture() = default;
@@ -47,11 +51,11 @@ namespace ImGuiUtils
 
   void ImageFromFile(const Filename &filename, ImVec2 size /*= ImVec2(0.f, 0.f)*/)
   {
-    static std::map<Filename, ImageFileTexture> cacheImageFileTexture;
+    static std::map<Filename, std::unique_ptr<ImageFileTexture>> cacheImageFileTexture;
     if (cacheImageFileTexture.find(filename) == cacheImageFileTexture.end())
-      cacheImageFileTexture[filename] = std::move(ImageFileTexture(filename));
+      cacheImageFileTexture[filename] = std::make_unique<ImageFileTexture>(filename);
 
-    const ImageFileTexture & texture = cacheImageFileTexture.at(filename);
+    const ImageFileTexture & texture = * cacheImageFileTexture.at(filename);
     if (texture.found)
     {
       if ((size.x == 0.f) && (size.y == 0.f))

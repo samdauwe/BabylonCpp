@@ -10,6 +10,7 @@
 #include <babylon/inspector/samples_browser.h>
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/babylon_common.h>
+#include <babylon/samples/samples_index.h>
 
 #include <imgui.h>
 
@@ -39,8 +40,7 @@ std::string to_snake_case(const std::string &sPascalCase)
   return ss.str();
 }
 
-const std::string screenshotsFolderCurrent = BABYLON::assets_folder() + "/screenshots/samples_current/";
-const std::string screenshotsFolderOriginal = BABYLON::assets_folder() +"/screenshots/samples/";
+const std::string screenshotsFolderCurrent = "screenshots/samples_current/";
 
 } // end anonymous namespace
 
@@ -138,7 +138,6 @@ private:
         {
           for (const std::string & sample : samples)
           {
-            //ImGui::Text("%s", sample.c_str());
             guiOneSample(sample);
             ImGui::Separator();
           }
@@ -148,6 +147,26 @@ private:
     ImGui::EndChild();
 
   }
+
+  void guiOneSampleLinks(const std::string & sampleName)
+  {
+    const auto & sampleInfo = _samplesInfos.at(sampleName);
+
+    if (!sampleInfo->Links.empty()) {
+      for (auto link : sampleInfo->Links) {
+        std::string btnUrlString = std::string(ICON_FA_EXTERNAL_LINK_ALT "##") + link;
+        if (ImGui::Button(btnUrlString.c_str()))
+          BABYLON::System::openBrowser(link);
+        ImGui::SameLine();
+        ImVec4 linkColor(0.5f, 0.5f, 0.95f, 1.f);
+        float wrap_width = 350.f;
+        ImGui::PushTextWrapPos(ImGui::GetWindowWidth() - 15.);
+        ImGui::TextColored(linkColor, "%s", link.c_str());
+        ImGui::PopTextWrapPos();
+      }
+    }
+  }
+
 
   void guiOneSampleInfos(const std::string & sampleName)
   {
@@ -170,18 +189,9 @@ private:
     {
       ImGui::SameLine();
       std::string viewCodeLabel = ICON_FA_EDIT " View code##" + sampleName;
-      if (ImGui::Button(viewCodeLabel.c_str()))
-        OnEditFiles({ sampleInfo.HeaderFile, sampleInfo.SourceFile });
-    }
-
-    if (!sampleInfo.Links.empty()) {
-      for (auto link : sampleInfo.Links) {
-        std::string btnUrlString = std::string(ICON_FA_EXTERNAL_LINK_ALT "##") + link;
-        if (ImGui::Button(btnUrlString.c_str()))
-          BABYLON::System::openBrowser(link);
-        ImGui::SameLine();
-        ImVec4 linkColor(0.5f, 0.5f, 0.95f, 1.f);
-        ImGui::TextColored(linkColor, "%s", link.c_str());
+      if (ImGui::Button(viewCodeLabel.c_str())) {
+        std::string sample_cpp_file = Samples::SamplesProjectFolder() + "/" + sampleInfo->SourceFile;
+        OnEditFiles({ sample_cpp_file });
       }
     }
   }
@@ -191,32 +201,19 @@ private:
     const auto & sampleInfo = _samplesInfos[sampleName];
     std::string currentScreenshotFile = screenshotsFolderCurrent + sampleName + ".jpg";
     std::string sample_snake = to_snake_case(sampleName);
-    std::string originalScreenshotFile = screenshotsFolderOriginal + sample_snake + ".png";
 
     if (_showCurrentScreenshots)
     {
       ImGui::BeginGroup();
       ImVec2 imageSize(ImGui::GetWindowWidth() / 3.f, 0.f);
       ImGuiUtils::ImageFromFile(currentScreenshotFile, imageSize);
-      if (_showOriginalScreenshots && _showCurrentScreenshots)
-        ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 0.7f), "Current(c++)");
-      ImGui::EndGroup();
-      ImGui::SameLine();
-    }
-
-    if (_showOriginalScreenshots)
-    {
-      ImGui::BeginGroup();
-      ImGuiUtils::ImageFromFile(originalScreenshotFile);
-      if (_showOriginalScreenshots && _showCurrentScreenshots)
-        ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 0.7f), "Original(js)");
       ImGui::EndGroup();
       ImGui::SameLine();
     }
 
     ImGui::BeginGroup();
     ImGui::Text("%s", sampleName.c_str());
-    ImGui::TextWrapped("%s", sampleInfo.Brief.c_str());
+    ImGui::TextWrapped("%s", sampleInfo->Brief.c_str());
     auto failure = _samplesIndex.doesSampleFail(sampleName);
     if (failure)
     {
@@ -230,8 +227,9 @@ private:
     }
     guiOneSampleInfos(sampleName);
     ImGui::EndGroup();
-    ImGui::SameLine();
+    //ImGui::SameLine();
 
+    guiOneSampleLinks(sampleName);
   }
 
   bool doesSampleMatchQuery(const CategoryName & categoryName, const SampleName & sampleName)
@@ -285,7 +283,7 @@ private:
     return r;
   }
 
-  std::map<SampleName, SampleInfo> _samplesInfos;
+  std::map<SampleName, std::shared_ptr<SampleInfo>> _samplesInfos;
   SamplesIndex & _samplesIndex;
   std::map<CategoryName, std::vector<SampleName>> _matchingSamples;
 
@@ -294,7 +292,6 @@ private:
     bool onlyFailures = false;
   } _query;
 
-  bool _showOriginalScreenshots = false;
   bool _showCurrentScreenshots = true;
 };
 

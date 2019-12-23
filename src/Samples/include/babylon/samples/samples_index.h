@@ -68,7 +68,7 @@ public:
    * @param sampleName the name of the sample to check
    * @return SampleInfo struct. May throw if sample was not found.
    */
-  SampleInfo getSampleInfo(const std::string& sampleName) const;
+  std::shared_ptr<SampleInfo> getSampleInfo(const std::string& sampleName) const;
 
   /**
    * @brief Returns a sorted list containing the enabled examples.
@@ -122,6 +122,8 @@ private:
   mutable std::unordered_map<std::string, SampleFailureReason> _samplesFailures;
 
 }; // end of class SamplesIndex
+
+std::string SamplesProjectFolder();
 
 } // end of namespace Samples
 } // end of namespace BABYLON

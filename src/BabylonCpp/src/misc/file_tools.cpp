@@ -381,7 +381,7 @@ void FileTools::LoadFile(
     asio::LoadUrlAsync_Text(url_clean, onSuccessWrapper, onErrorWrapper, onProgressWrapper);
   }
 
-  asio::Service_WaitAll_Sync();
+  // asio::Service_WaitAll_Sync();
   //std::cout << "WaitAll finished\n";
 }
 

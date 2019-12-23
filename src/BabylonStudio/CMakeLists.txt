@@ -6,8 +6,27 @@
 include(../../cmake/BuildEnvironment.cmake)
 
 if (EMSCRIPTEN)
+    set(repo_assets_folder ${CMAKE_SOURCE_DIR}/assets)
+    set(emscripten_static_assets_folder ${CMAKE_BINARY_DIR}/build/bin/emscripten_static_assets)
+    set(emscripten_http_assets_folder ${CMAKE_BINARY_DIR}/build/bin/emscripten_http_assets)
+
+    function(copy_static_assets)
+        file(COPY ${repo_assets_folder}/fonts DESTINATION ${emscripten_static_assets_folder})
+        file(COPY ${CMAKE_SOURCE_DIR}/src/Samples DESTINATION ${emscripten_static_assets_folder})
+    endfunction()
+
+    function(copy_http_assets)
+        file(COPY ${repo_assets_folder} DESTINATION ${emscripten_http_assets_folder})
+    endfunction()
+
+    copy_static_assets()
+    copy_http_assets()
+
     set(CMAKE_EXECUTABLE_SUFFIX ".html")
-    add_link_options(--preload-file  ${CMAKE_SOURCE_DIR}/assets@/assets)
+    add_link_options(
+        ${EMSCRIPTEN_LINK_OPTIONS}
+        --preload-file ${emscripten_static_assets_folder}@/emscripten_static_assets_folder
+    )
 endif()
 
 # OpenGL dependency
@@ -76,7 +95,3 @@ endif()
 # Copy asset directories
 ## - Icons
 copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/icons")
-
-if (EMSCRIPTEN)
-    target_link_options(${TARGET} BEFORE PRIVATE --preload-file  ${CMAKE_SOURCE_DIR}/assets@/assets)
-endif()
