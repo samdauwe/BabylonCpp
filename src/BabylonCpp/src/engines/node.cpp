@@ -15,15 +15,13 @@ namespace BABYLON {
 
 std::unordered_map<std::string, NodeConstructor> Node::_NodeConstructors;
 
-void Node::AddNodeConstructor(const std::string& type,
-                              const NodeConstructor& constructorFunc)
+void Node::AddNodeConstructor(const std::string& type, const NodeConstructor& constructorFunc)
 {
   _NodeConstructors[type] = constructorFunc;
 }
 
-std::function<NodePtr()> Node::Construct(const std::string& type,
-                                         const std::string& name, Scene* scene,
-                                         const std::optional<json>& options)
+std::function<NodePtr()> Node::Construct(const std::string& type, const std::string& name,
+                                         Scene* scene, const std::optional<json>& options)
 {
   if (!stl_util::contains(_NodeConstructors, type)) {
     return nullptr;
@@ -38,10 +36,10 @@ std::function<NodePtr()> Node::Construct(const std::string& type,
   };
 }
 
-Node::Node(const std::string& iName, Scene* scene, bool addToRootNodes)
+Node::Node(const std::string& iName, Scene* scene)
     : name{iName}
     , id{iName}
-    , doNotSerialize{false}
+    , doNotSerialize{this, &Node::get_doNotSerialize, &Node::set_doNotSerialize}
     , _isDisposed{false}
     , onReady{nullptr}
     , _currentRenderId{-1}
@@ -52,6 +50,7 @@ Node::Node(const std::string& iName, Scene* scene, bool addToRootNodes)
     , onDispose{this, &Node::set_onDispose}
     , behaviors{this, &Node::get_behaviors}
     , _isNode{true}
+    , _doNotSerialize{false}
     , _isEnabled{true}
     , _isParentEnabled{true}
     , _isReady{true}
@@ -60,7 +59,6 @@ Node::Node(const std::string& iName, Scene* scene, bool addToRootNodes)
     , _sceneRootNodesIndex{-1}
     , _animationPropertiesOverride{nullptr}
     , _onDisposeObserver{nullptr}
-    , _addToRootNodes{addToRootNodes}
 {
   state    = "";
   _scene   = scene ? scene : Engine::LastCreatedScene();
@@ -78,13 +76,6 @@ Node::Node(const std::string& iName, Scene* scene, bool addToRootNodes)
 
 Node::~Node() = default;
 
-void Node::addToRootNodes()
-{
-  if (_addToRootNodes) {
-    addToSceneRootNodes();
-  }
-}
-
 Type Node::type() const
 {
   return Type::NODE;
@@ -93,6 +84,24 @@ Type Node::type() const
 bool Node::isDisposed() const
 {
   return _isDisposed;
+}
+
+bool Node::get_doNotSerialize() const
+{
+  if (_doNotSerialize) {
+    return true;
+  }
+
+  if (_parentNode) {
+    return _parentNode->doNotSerialize();
+  }
+
+  return false;
+}
+
+void Node::set_doNotSerialize(bool value)
+{
+  _doNotSerialize = value;
 }
 
 void Node::set_parent(Node* const& iParent)
@@ -108,7 +117,7 @@ void Node::set_parent(Node* const& iParent)
     stl_util::remove_vector_elements_equal_sharedptr(_parentNode->_children, this);
 
     if (!iParent && !_isDisposed) {
-      addToSceneRootNodes();
+      _addToSceneRootNodes();
     }
   }
 
@@ -120,7 +129,7 @@ void Node::set_parent(Node* const& iParent)
     _parentNode->_children.emplace_back(shared_from_this());
 
     if (!previousParentNode) {
-      removeFromSceneRootNodes();
+      _removeFromSceneRootNodes();
     }
   }
 
@@ -133,7 +142,7 @@ Node*& Node::get_parent()
   return _parentNode;
 }
 
-void Node::addToSceneRootNodes()
+void Node::_addToSceneRootNodes()
 {
   if (_sceneRootNodesIndex == -1) {
     _sceneRootNodesIndex = static_cast<int>(_scene->rootNodes.size());
@@ -141,7 +150,7 @@ void Node::addToSceneRootNodes()
   }
 }
 
-void Node::removeFromSceneRootNodes()
+void Node::_removeFromSceneRootNodes()
 {
   if (_sceneRootNodesIndex != -1) {
     auto& rootNodes                                      = _scene->rootNodes;
@@ -162,8 +171,7 @@ AnimationPropertiesOverridePtr& Node::get_animationPropertiesOverride()
   return _animationPropertiesOverride;
 }
 
-void Node::set_animationPropertiesOverride(
-  const AnimationPropertiesOverridePtr& value)
+void Node::set_animationPropertiesOverride(const AnimationPropertiesOverridePtr& value)
 {
   _animationPropertiesOverride = value;
 }
@@ -173,8 +181,7 @@ std::string Node::getClassName() const
   return "Node";
 }
 
-void Node::set_onDispose(
-  const std::function<void(Node* node, EventState& es)>& callback)
+void Node::set_onDispose(const std::function<void(Node* node, EventState& es)>& callback)
 {
   if (_onDisposeObserver) {
     onDisposeObservable.remove(_onDisposeObserver);
@@ -203,10 +210,9 @@ Node& Node::addBehavior(Behavior<Node>* behavior, bool attachImmediately)
   behavior->init();
   if (_scene->isLoading() && !attachImmediately) {
     // We defer the attach when the scene will be loaded
-    _scene->onDataLoadedObservable.addOnce(
-      [this, &behavior](Scene* /*scene*/, EventState /*es*/) {
-        behavior->attach(shared_from_this());
-      });
+    _scene->onDataLoadedObservable.addOnce([this, &behavior](Scene* /*scene*/, EventState /*es*/) {
+      behavior->attach(shared_from_this());
+    });
   }
   else {
     behavior->attach(shared_from_this());
@@ -237,10 +243,9 @@ std::vector<Behavior<Node>*>& Node::get_behaviors()
 
 Behavior<Node>* Node::getBehaviorByName(const std::string& iName)
 {
-  auto it = std::find_if(_behaviors.begin(), _behaviors.end(),
-                         [&iName](const Behavior<Node>* behavior) {
-                           return behavior->name == iName;
-                         });
+  auto it
+    = std::find_if(_behaviors.begin(), _behaviors.end(),
+                   [&iName](const Behavior<Node>* behavior) { return behavior->name == iName; });
 
   return (it != _behaviors.end() ? *it : nullptr);
 }
@@ -276,10 +281,9 @@ void Node::initCacheImpl()
 {
   if (_cache.cache_inited)
     return;
-  _cache.parent = nullptr;
+  _cache.parent       = nullptr;
   _cache.cache_inited = true;
 }
-
 
 void Node::updateCache(bool force)
 {
@@ -293,8 +297,7 @@ void Node::updateCache(bool force)
 }
 
 AbstractActionManagerPtr
-Node::_getActionManagerForTrigger(const std::optional<unsigned int>& trigger,
-                                  bool /*initialCall*/)
+Node::_getActionManagerForTrigger(const std::optional<unsigned int>& trigger, bool /*initialCall*/)
 {
   if (!parent()) {
     return nullptr;
@@ -395,9 +398,8 @@ bool Node::isDescendantOf(const Node* ancestor)
 }
 
 template <typename T>
-void Node::_getDescendants(
-  std::vector<std::shared_ptr<T>>& results, bool directDescendantsOnly,
-  const std::function<bool(const NodePtr& node)>& predicate)
+void Node::_getDescendants(std::vector<std::shared_ptr<T>>& results, bool directDescendantsOnly,
+                           const std::function<bool(const NodePtr& node)>& predicate)
 {
   if (_children.empty()) {
     return;
@@ -416,9 +418,8 @@ void Node::_getDescendants(
   }
 }
 
-std::vector<NodePtr>
-Node::getDescendants(bool directDescendantsOnly,
-                     const std::function<bool(const NodePtr& node)>& predicate)
+std::vector<NodePtr> Node::getDescendants(bool directDescendantsOnly,
+                                          const std::function<bool(const NodePtr& node)>& predicate)
 {
   std::vector<NodePtr> results;
   _getDescendants(results, directDescendantsOnly, predicate);
@@ -431,17 +432,14 @@ Node::getChildMeshes(bool directDescendantsOnly,
                      const std::function<bool(const NodePtr& node)>& predicate)
 {
   std::vector<AbstractMeshPtr> results;
-  _getDescendants(results, directDescendantsOnly,
-                  [&predicate](const NodePtr& node) {
-                    return ((!predicate || predicate(node))
-                            && (std::static_pointer_cast<AbstractMesh>(node)));
-                  });
+  _getDescendants(results, directDescendantsOnly, [&predicate](const NodePtr& node) {
+    return ((!predicate || predicate(node)) && (std::static_pointer_cast<AbstractMesh>(node)));
+  });
   return results;
 }
 
-std::vector<NodePtr>
-Node::getChildren(const std::function<bool(const NodePtr& node)>& predicate,
-                  bool directDescendantsOnly)
+std::vector<NodePtr> Node::getChildren(const std::function<bool(const NodePtr& node)>& predicate,
+                                       bool directDescendantsOnly)
 {
   return getDescendants(directDescendantsOnly, predicate);
 }
@@ -471,10 +469,9 @@ std::vector<AnimationPtr> Node::getAnimations()
 
 AnimationPtr Node::getAnimationByName(const std::string& iName)
 {
-  auto it = std::find_if(animations.begin(), animations.end(),
-                         [&iName](const AnimationPtr& animation) {
-                           return animation->name == iName;
-                         });
+  auto it
+    = std::find_if(animations.begin(), animations.end(),
+                   [&iName](const AnimationPtr& animation) { return animation->name == iName; });
 
   return (it == animations.end() ? nullptr : *it);
 }
@@ -521,8 +518,7 @@ std::vector<AnimationRangePtr> Node::getAnimationRanges()
   return animationRanges;
 }
 
-AnimatablePtr Node::beginAnimation(const std::string& iName, bool loop,
-                                   float speedRatio,
+AnimatablePtr Node::beginAnimation(const std::string& iName, bool loop, float speedRatio,
                                    std::function<void()> onAnimationEnd)
 {
   auto range = getAnimationRange(iName);
@@ -533,16 +529,14 @@ AnimatablePtr Node::beginAnimation(const std::string& iName, bool loop,
 
   auto _this = std::static_pointer_cast<IAnimatable>(shared_from_this());
 
-  return _scene->beginAnimation(_this, range->from, range->to, loop, speedRatio,
-                                onAnimationEnd);
+  return _scene->beginAnimation(_this, range->from, range->to, loop, speedRatio, onAnimationEnd);
 }
 
 std::vector<AnimationRange> Node::serializeAnimationRanges()
 {
   std::vector<AnimationRange> serializationRanges;
   for (const auto& [rangeName, range] : _ranges) {
-    serializationRanges.emplace_back(
-      AnimationRange(rangeName, range->from, range->to));
+    serializationRanges.emplace_back(AnimationRange(rangeName, range->from, range->to));
   }
 
   return serializationRanges;
@@ -565,7 +559,7 @@ void Node::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   }
 
   if (!parent()) {
-    removeFromSceneRootNodes();
+    _removeFromSceneRootNodes();
   }
   else {
     parent = nullptr;
@@ -583,8 +577,7 @@ void Node::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   _behaviors.clear();
 }
 
-void Node::ParseAnimationRanges(Node& /*node*/, const json& /*parsedNode*/,
-                                Scene* /*scene*/)
+void Node::ParseAnimationRanges(Node& /*node*/, const json& /*parsedNode*/, Scene* /*scene*/)
 {
 }
 
@@ -601,19 +594,16 @@ MinMax Node::getHierarchyBoundingVectors(
   Vector3 max;
 
   auto thisAbstractMesh = static_cast<AbstractMesh*>(this);
-  if (thisAbstractMesh->getBoundingInfo()
-      && !thisAbstractMesh->subMeshes.empty()) {
+  if (thisAbstractMesh->getBoundingInfo() && !thisAbstractMesh->subMeshes.empty()) {
     // If this is an abstract mesh get its bounding info
     const auto& boundingInfo = *thisAbstractMesh->getBoundingInfo();
     min                      = boundingInfo.boundingBox.minimumWorld;
     max                      = boundingInfo.boundingBox.maximumWorld;
   }
   else {
-    min = Vector3(std::numeric_limits<float>::max(),
-                  std::numeric_limits<float>::max(),
+    min = Vector3(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
                   std::numeric_limits<float>::max());
-    max = Vector3(std::numeric_limits<float>::lowest(),
-                  std::numeric_limits<float>::lowest(),
+    max = Vector3(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(),
                   std::numeric_limits<float>::lowest());
   }
 
@@ -651,14 +641,16 @@ MinMax Node::getHierarchyBoundingVectors(
   };
 }
 
-template void Node::_getDescendants<Node>(
-  std::vector<NodePtr>& results, bool directDescendantsOnly,
-  const std::function<bool(const NodePtr& node)>& predicate);
-template void Node::_getDescendants<AbstractMesh>(
-  std::vector<AbstractMeshPtr>& results, bool directDescendantsOnly,
-  const std::function<bool(const NodePtr& node)>& predicate);
-template void Node::_getDescendants<TransformNode>(
-  std::vector<TransformNodePtr>& results, bool directDescendantsOnly,
-  const std::function<bool(const NodePtr& node)>& predicate);
+template void
+Node::_getDescendants<Node>(std::vector<NodePtr>& results, bool directDescendantsOnly,
+                            const std::function<bool(const NodePtr& node)>& predicate);
+template void
+Node::_getDescendants<AbstractMesh>(std::vector<AbstractMeshPtr>& results,
+                                    bool directDescendantsOnly,
+                                    const std::function<bool(const NodePtr& node)>& predicate);
+template void
+Node::_getDescendants<TransformNode>(std::vector<TransformNodePtr>& results,
+                                     bool directDescendantsOnly,
+                                     const std::function<bool(const NodePtr& node)>& predicate);
 
 } // end of namespace BABYLON

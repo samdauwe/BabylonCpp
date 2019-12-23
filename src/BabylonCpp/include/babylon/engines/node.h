@@ -78,9 +78,8 @@ public:
    * @brief Creates a new Node.
    * @param name the name and id to be given to this node
    * @param scene the scene this node will be added to
-   * @param addToRootNodes the node will be added to scene.rootNodes
    */
-  Node(const std::string& name, Scene* scene = nullptr, bool addToRootNodes = true);
+  Node(const std::string& name, Scene* scene = nullptr);
   ~Node() override; // = default
 
   template <typename Derived>
@@ -88,11 +87,6 @@ public:
   {
     return std::static_pointer_cast<Derived>(shared_from_this());
   }
-
-  /**
-   * @brief Hidden
-   */
-  void addToRootNodes();
 
   /**
    * @brief Returns the type of this node
@@ -104,6 +98,16 @@ public:
    * @returns true if the node was disposed
    */
   bool isDisposed() const;
+
+  /**
+   * @brief Hidden
+   */
+  void _addToSceneRootNodes();
+
+  /**
+   * @brief Hidden
+   */
+  void _removeFromSceneRootNodes();
 
   /**
    * @brief Gets a string idenfifying the name of the class.
@@ -128,8 +132,8 @@ public:
    * @brief Attach a behavior to the node.
    * @see http://doc.babylonjs.com/features/behaviour
    * @param behavior defines the behavior to attach
-   * @param attachImmediately defines that the behavior must be attached even if
-   * the scene is still loading
+   * @param attachImmediately defines that the behavior must be attached even if the scene is still
+   * loading
    * @returns the current Node
    */
   Node& addBehavior(Behavior<Node>* behavior, bool attachImmediately = false) override;
@@ -211,19 +215,19 @@ public:
 
   /**
    * @brief Is this node ready to be used/rendered.
-   * @param completeCheck defines if a complete check (including materials and
-   * lights) has to be done (false by default)
+   * @param completeCheck defines if a complete check (including materials and lights) has to be
+   * done (false by default)
    * @return true if the node is ready
    */
   virtual bool isReady(bool completeCheck = false, bool forceInstanceSupport = false);
 
   /**
    * @brief Is this node enabled?
-   * If the node has a parent, all ancestors will be checked and false will be
-   * returned if any are false (not enabled), otherwise will return true
+   * If the node has a parent, all ancestors will be checked and false will be returned if any are
+   * false (not enabled), otherwise will return true
    * @param checkAncestors indicates if this method should check the ancestors.
-   * The default is to check the ancestors. If set to false, the method will
-   * return the value of this node without checking ancestors
+   * The default is to check the ancestors. If set to false, the method will return the value of
+   * this node without checking ancestors
    * @return whether this node (and its parent) is enabled
    */
   bool isEnabled(bool checkAncestors = true);
@@ -236,26 +240,24 @@ public:
 
   /**
    * @brief Is this node a descendant of the given node?
-   * The function will iterate up the hierarchy until the ancestor was found or
-   * no more parents defined
+   * The function will iterate up the hierarchy until the ancestor was found or no more parents
+   * defined
    * @param ancestor defines the parent node to inspect
-   * @returns a boolean indicating if this node is a descendant of the given
-   * node
+   * @returns a boolean indicating if this node is a descendant of the given node
    */
   bool isDescendantOf(const Node* ancestor);
 
   /**
-   * @brief Evaluate the list of children and determine if they should be
-   * considered as descendants considering the given criterias.
-   * @param {BABYLON.Node[]} results the result array containing the nodes
-   * matching the given criterias
-   * @param {boolean} directDescendantsOnly if true only direct descendants of
-   * 'this' will be considered, if false direct and also indirect (children of
-   * children, an so on in a recursive manner) descendants of 'this' will be
-   * considered.
-   * @param predicate: an optional predicate that will be called on every
-   * evaluated children, the predicate must return true for a given child to be
-   * part of the result, otherwise it will be ignored.
+   * @brief Evaluate the list of children and determine if they should be considered as descendants
+   * considering the given criterias.
+   * @param {BABYLON.Node[]} results the result array containing the nodes matching the given
+   * criterias
+   * @param {boolean} directDescendantsOnly if true only direct descendants of 'this' will be
+   * considered, if false direct and also indirect (children of children, an so on in a recursive
+   * manner) descendants of 'this' will be considered.
+   * @param predicate: an optional predicate that will be called on every evaluated children, the
+   * predicate must return true for a given child to be part of the result, otherwise it will be
+   * ignored.
    */
   template <typename T>
   void _getDescendants(std::vector<std::shared_ptr<T>>& results, bool directDescendantsOnly = false,
@@ -263,13 +265,12 @@ public:
 
   /**
    * @brief Will return all nodes that have this node as ascendant.
-   * @param directDescendantsOnly defines if true only direct descendants of
-   * 'this' will be considered, if false direct and also indirect (children of
-   * children, an so on in a recursive manner) descendants of 'this' will be
-   * considered
-   * @param predicate defines an optional predicate that will be called on every
-   * evaluated child, the predicate must return true for a given child to be
-   * part of the result, otherwise it will be ignored
+   * @param directDescendantsOnly defines if true only direct descendants of 'this' will be
+   * considered, if false direct and also indirect (children of children, an so on in a recursive
+   * manner) descendants of 'this' will be considered
+   * @param predicate defines an optional predicate that will be called on every evaluated child,
+   * the predicate must return true for a given child to be part of the result, otherwise it will be
+   * ignored
    * @return all children nodes of all types
    */
   std::vector<NodePtr> getDescendants(bool directDescendantsOnly = false,
@@ -278,13 +279,12 @@ public:
 
   /**
    * @brief Get all child-meshes of this node.
-   * @param directDescendantsOnly defines if true only direct descendants of
-   * 'this' will be considered, if false direct and also indirect (children of
-   * children, an so on in a recursive manner) descendants of 'this' will be
-   * considered (Default: false)
-   * @param predicate defines an optional predicate that will be called on every
-   * evaluated child, the predicate must return true for a given child to be
-   * part of the result, otherwise it will be ignored
+   * @param directDescendantsOnly defines if true only direct descendants of'this' will be
+   * considered, if false direct and also indirect (children of children, an so on in a recursive
+   * manner) descendants of 'this' will be considered (Default: false)
+   * @param predicate defines an optional predicate that will be called on every evaluated child,
+   * the predicate must return true for a given child to be part of the result, otherwise it will be
+   * ignored
    * @returns an array of AbstractMesh
    */
   virtual std::vector<AbstractMeshPtr>
@@ -293,13 +293,12 @@ public:
 
   /**
    * @brief Get all direct children of this node.
-   * @param predicate defines an optional predicate that will be called on every
-   * evaluated child, the predicate must return true for a given child to be
-   * part of the result, otherwise it will be ignored
-   * @param directDescendantsOnly defines if true only direct descendants of
-   * 'this' will be considered, if false direct and also indirect (children of
-   * children, an so on in a recursive manner) descendants of 'this' will be
-   * considered (Default: true)
+   * @param predicate defines an optional predicate that will be called on every evaluated child,
+   * the predicate must return true for a given child to be part of the result, otherwise it will be
+   * ignored
+   * @param directDescendantsOnly defines if true only direct descendants of 'this' will be
+   * considered, if false direct and also indirect (children of children, an so on in a recursive
+   * manner) descendants of 'this' will be considered (Default: true)
    * @returns an array of Node
    */
   std::vector<NodePtr> getChildren(const std::function<bool(const NodePtr& node)>& predicate
@@ -356,12 +355,10 @@ public:
    * @brief Will start the animation sequence.
    * @param name defines the range frames for animation sequence
    * @param loop defines if the animation should loop (false by default)
-   * @param speedRatio defines the speed factor in which to run the animation (1
-   * by default)
-   * @param onAnimationEnd defines a function to be executed when the animation
-   * ended (undefined by default)
-   * @returns the object created for this animation. If range does not exist, it
-   * will return null
+   * @param speedRatio defines the speed factor in which to run the animation (1 by default)
+   * @param onAnimationEnd defines a function to be executed when the animation ended (undefined by
+   * default)
+   * @returns the object created for this animation. If range does not exist, it will return null
    */
   AnimatablePtr beginAnimation(const std::string& name, bool loop = false, float speedRatio = 1.f,
                                std::function<void()> onAnimationEnd = nullptr);
@@ -374,24 +371,23 @@ public:
 
   /**
    * @brief Computes the world matrix of the node.
-   * @param force defines if the cache version should be invalidated forcing the
-   * world matrix to be created from scratch
+   * @param force defines if the cache version should be invalidated forcing the world matrix to be
+   * created from scratch
    * @returns the world matrix
    */
   virtual Matrix& computeWorldMatrix(bool force = false, bool useWasUpdatedFlag = false);
 
   /**
    * @brief Releases resources associated with this node.
-   * @param doNotRecurse Set to true to not recurse into each children (recurse
-   * into each children by default)
-   * @param disposeMaterialAndTextures Set to true to also dispose referenced
-   * materials and textures (false by default)
+   * @param doNotRecurse Set to true to not recurse into each children (recurse into each children
+   * by default)
+   * @param disposeMaterialAndTextures Set to true to also dispose referenced materials and textures
+   * (false by default)
    */
   void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
-   * @brief Parse animation range data from a serialization object and store
-   * them into a given node.
+   * @brief Parse animation range data from a serialization object and store them into a given node.
    * @param node defines where to store the animation ranges
    * @param parsedNode defines the serialization object to read data from
    * @param scene defines the hosting scene
@@ -399,13 +395,10 @@ public:
   static void ParseAnimationRanges(Node& node, const json& parsedNode, Scene* scene);
 
   /**
-   * @brief Return the minimum and maximum world vectors of the entire hierarchy
-   * under current node
-   * @param includeDescendants Include bounding info from descendants as well
-   * (true by default)
-   * @param predicate defines a callback function that can be customize to
-   * filter what meshes should be included in the list used to compute the
-   * bounding vectors
+   * @brief Return the minimum and maximum world vectors of the entire hierarchy* under current node
+   * @param includeDescendants Include bounding info from descendants as well (true by default)
+   * @param predicate defines a callback function that can be customize to filter what meshes should
+   * be included in the list used to compute the bounding vectors
    * @returns the new bounding vectors
    */
   MinMax getHierarchyBoundingVectors(
@@ -414,15 +407,23 @@ public:
 
 protected:
   /**
-   * @brief Sets the parent of the node (without keeping the current position in
-   * the scene).
+   * @brief Gets a boolean used to define if the node must be serialized.
+   */
+  bool get_doNotSerialize() const;
+
+  /**
+   * @brief Sets a boolean used to define if the node must be serialized.
+   */
+  void set_doNotSerialize(bool value);
+
+  /**
+   * @brief Sets the parent of the node (without keeping the current position in the scene).
    * @see https://doc.babylonjs.com/how_to/parenting
    */
   void set_parent(Node* const& parent) override;
 
   /**
-   * @brief Gets the parent of the node (without keeping the current position in
-   * the scene).
+   * @brief Gets the parent of the node (without keeping the current position in the scene).
    * @see https://doc.babylonjs.com/how_to/parenting
    */
   Node*& get_parent() override;
@@ -453,13 +454,7 @@ protected:
    */
   virtual void _syncParentEnabledState();
 
-  /**
-   * @brief Hidden
-   */
-  void addToSceneRootNodes();
-
 private:
-  void removeFromSceneRootNodes();
   void initCacheImpl(); // non virtual implementation of initCache for this base class
 
 public:
@@ -492,7 +487,7 @@ public:
   /**
    * Gets or sets a boolean used to define if the node must be serialized
    */
-  bool doNotSerialize;
+  Property<Node, bool> doNotSerialize;
 
   /** Hidden */
   bool _isDisposed;
@@ -547,6 +542,7 @@ protected:
   std::unordered_map<std::string, AnimationRangePtr> _ranges;
 
 private:
+  bool _doNotSerialize;
   bool _isEnabled;
   bool _isParentEnabled;
   bool _isReady;
@@ -556,7 +552,6 @@ private:
   int _sceneRootNodesIndex;
   AnimationPropertiesOverridePtr _animationPropertiesOverride;
   Observer<Node>::Ptr _onDisposeObserver;
-  bool _addToRootNodes;
 
   // Behaviors
   std::vector<Behavior<Node>*> _behaviors;
