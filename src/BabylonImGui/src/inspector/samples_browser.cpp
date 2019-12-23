@@ -138,7 +138,6 @@ private:
         {
           for (const std::string & sample : samples)
           {
-            //ImGui::Text("%s", sample.c_str());
             guiOneSample(sample);
             ImGui::Separator();
           }
@@ -148,6 +147,26 @@ private:
     ImGui::EndChild();
 
   }
+
+  void guiOneSampleLinks(const std::string & sampleName)
+  {
+    const auto & sampleInfo = _samplesInfos.at(sampleName);
+
+    if (!sampleInfo->Links.empty()) {
+      for (auto link : sampleInfo->Links) {
+        std::string btnUrlString = std::string(ICON_FA_EXTERNAL_LINK_ALT "##") + link;
+        if (ImGui::Button(btnUrlString.c_str()))
+          BABYLON::System::openBrowser(link);
+        ImGui::SameLine();
+        ImVec4 linkColor(0.5f, 0.5f, 0.95f, 1.f);
+        float wrap_width = 350.f;
+        ImGui::PushTextWrapPos(ImGui::GetWindowWidth() - 15.);
+        ImGui::TextColored(linkColor, "%s", link.c_str());
+        ImGui::PopTextWrapPos();
+      }
+    }
+  }
+
 
   void guiOneSampleInfos(const std::string & sampleName)
   {
@@ -173,17 +192,6 @@ private:
       if (ImGui::Button(viewCodeLabel.c_str())) {
         std::string sample_cpp_file = Samples::SamplesProjectFolder() + "/" + sampleInfo->SourceFile;
         OnEditFiles({ sample_cpp_file });
-      }
-    }
-
-    if (!sampleInfo->Links.empty()) {
-      for (auto link : sampleInfo->Links) {
-        std::string btnUrlString = std::string(ICON_FA_EXTERNAL_LINK_ALT "##") + link;
-        if (ImGui::Button(btnUrlString.c_str()))
-          BABYLON::System::openBrowser(link);
-        ImGui::SameLine();
-        ImVec4 linkColor(0.5f, 0.5f, 0.95f, 1.f);
-        ImGui::TextColored(linkColor, "%s", link.c_str());
       }
     }
   }
@@ -219,8 +227,9 @@ private:
     }
     guiOneSampleInfos(sampleName);
     ImGui::EndGroup();
-    ImGui::SameLine();
+    //ImGui::SameLine();
 
+    guiOneSampleLinks(sampleName);
   }
 
   bool doesSampleMatchQuery(const CategoryName & categoryName, const SampleName & sampleName)

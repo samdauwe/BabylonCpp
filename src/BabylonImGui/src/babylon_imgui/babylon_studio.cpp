@@ -178,6 +178,8 @@ private:
           shallExit = true;
         if (ImGui::MenuItem("Save Screenshot"))
           saveScreenshot();
+        if (ImGui::MenuItem("ImGui demo window", nullptr, _appContext._imgui_show_demo_window))
+          _appContext._imgui_show_demo_window = ! _appContext._imgui_show_demo_window;
         ImGui::EndMenu();
       }
       _studioLayout.renderMenu();
@@ -206,6 +208,9 @@ private:
   // renders the GUI. Returns true when exit required
   bool render()
   {
+    if (_appContext._imgui_show_demo_window)
+      ImGui::ShowDemoWindow(&_appContext._imgui_show_demo_window);
+
     static bool wasInitialLayoutApplied = false;
     if (!wasInitialLayoutApplied)
     {
@@ -362,6 +367,7 @@ private:
     int _frameCounter = 0;
     BabylonStudioOptions _options;
     bool _isCompiling = false;
+    bool _imgui_show_demo_window = false;
 
     BABYLON::SamplesBrowser& sampleListComponent() {
       if (!_sampleListComponent) {

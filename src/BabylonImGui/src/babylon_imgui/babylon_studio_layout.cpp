@@ -129,7 +129,7 @@ void BabylonStudioLayout::PrepareLayout(ImGuiID fullDockSpaceId)
 
   ImGuiID dock_main_id = fullDockSpaceId;
   ImGuiID dock_id_bottom = DoSplit(&dock_main_id, ImGuiDir_Down, 0.25f);
-  ImGuiID dock_id_left = DoSplit(&dock_main_id, ImGuiDir_Left, 0.30f);
+  ImGuiID dock_id_left = DoSplit(&dock_main_id, ImGuiDir_Left, 0.33f);
   ImGuiID dock_id_right = DoSplit(&dock_main_id, ImGuiDir_Right, 0.45f);
 
 #ifdef BABYLON_BUILD_PLAYGROUND
