@@ -2626,6 +2626,11 @@ public:
   bool useConstantAnimationDeltaTime;
 
   /**
+   * Gets the current delta time used by animation engine
+   */
+  float deltaTime;
+
+  /**
    * Gets or sets a boolean indicating if the scene must keep the
    * meshUnderPointer property updated Please note that it requires to run a ray
    * cast through the scene on every frame

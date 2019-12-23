@@ -17,6 +17,9 @@ namespace BABYLON {
 InputBlock::InputBlock(const std::string& iName, NodeMaterialBlockTargets iTarget,
                        NodeMaterialBlockConnectionPointTypes type)
     : NodeMaterialBlock(iName, iTarget, false, true)
+    , min{0.f}
+    , max{0.f}
+    , matrixMode{0}
     , _systemValue{std::nullopt}
     , visibleInInspector{false}
     , isConstant{false}
@@ -117,8 +120,9 @@ NodeMaterialBlockConnectionPointTypes& InputBlock::get_type()
         case NodeMaterialSystemValues::FogColor:
           _type = NodeMaterialBlockConnectionPointTypes::Color3;
           return _type;
-        default:
-          break;
+        case NodeMaterialSystemValues::DeltaTime:
+          _type = NodeMaterialBlockConnectionPointTypes::Float;
+          return _type;
       }
     }
   }
@@ -274,6 +278,11 @@ std::string InputBlock::_emitDefine(const std::string& define) const
   return String::printf("#ifdef %s\r\n", define.c_str());
 }
 
+void InputBlock::initialize(NodeMaterialBuildState& /*state*/)
+{
+  associatedVariableName = "";
+}
+
 void InputBlock::setDefaultValue()
 {
   switch (type) {
@@ -306,56 +315,41 @@ void InputBlock::setDefaultValue()
   }
 }
 
-std::string InputBlock::_dumpPropertiesCode()
+std::string InputBlock::_emitConstant(NodeMaterialBuildState& state)
 {
-  if (isAttribute()) {
-    return String::printf("%s.setAsAttribute(%s);\r\n", _codeVariableName.c_str(), name.c_str());
-  }
-  if (isSystemValue()) {
-    // TODO FIXME
-    // return String::printf("%s.setAsSystemValue(NodeMaterialSystemValues::%s);\r\n",
-    //                      _codeVariableName.c_str(), NodeMaterialSystemValues[*_systemValue]);
-  }
-  if (isUniform()) {
-    std::string valueString = "";
-    switch (type) {
-      case NodeMaterialBlockConnectionPointTypes::Float:
-        valueString = std::to_string(value()->get<float>());
-        break;
-      case NodeMaterialBlockConnectionPointTypes::Int:
-        valueString = std::to_string(value()->get<int>());
-        break;
-      case NodeMaterialBlockConnectionPointTypes::Vector2: {
-        const auto& vector2Value = value()->get<Vector2>();
-        valueString = String::printf("Vector2(%f, %f)", vector2Value.x, vector2Value.y);
-      } break;
-      case NodeMaterialBlockConnectionPointTypes::Vector3: {
-        const auto& vector3Value = value()->get<Vector3>();
-        valueString
-          = String::printf("Vector3(%f, %f, %f)", vector3Value.x, vector3Value.y, vector3Value.z);
-      } break;
-      case NodeMaterialBlockConnectionPointTypes::Vector4: {
-        const auto& vector4Value = value()->get<Vector4>();
-        valueString = String::printf("Vector4(%f, %f, %f, %f)", vector4Value.x, vector4Value.y,
-                                     vector4Value.z, vector4Value.w);
-      } break;
-      case NodeMaterialBlockConnectionPointTypes::Color3: {
-        const auto& color3Value = value()->get<Color3>();
-        valueString
-          = String::printf("Color3(%f, %f, %f)", color3Value.r, color3Value.g, color3Value.b);
-      } break;
-      case NodeMaterialBlockConnectionPointTypes::Color4: {
-        const auto& color4Value = value()->get<Color4>();
-        valueString = String::printf("Color4(%f, %f, %f, %f)", color4Value.r, color4Value.g,
-                                     color4Value.b, color4Value.a);
-      } break;
-      default:
-        break;
+  switch (type()) {
+    case NodeMaterialBlockConnectionPointTypes::Float: {
+      const auto floatValue = value()->get<float>();
+      return state._emitFloat(floatValue);
     }
-    return String::printf("%s.value = %s;\r\n", _codeVariableName.c_str(), valueString.c_str());
+    case NodeMaterialBlockConnectionPointTypes::Vector2: {
+      const auto& vector2Value = value()->get<Vector2>();
+      return String::printf("vec2(%f, %f)", vector2Value.x, vector2Value.y);
+    }
+    case NodeMaterialBlockConnectionPointTypes::Vector3: {
+      const auto& vector3Value = value()->get<Vector3>();
+      return String::printf("vec3(%f, %f, %f)", vector3Value.x, vector3Value.y, vector3Value.z);
+    }
+    case NodeMaterialBlockConnectionPointTypes::Vector4: {
+      const auto& vector4Value = value()->get<Vector4>();
+      return String::printf("vec4(%f, %f, %f, %f)", vector4Value.x, vector4Value.y, vector4Value.z,
+                            vector4Value.w);
+    }
+    case NodeMaterialBlockConnectionPointTypes::Color3: {
+      const auto& color3Value = value()->get<Color3>();
+      return String::printf("vec3(%f, %f, %f)", color3Value.r, color3Value.g, color3Value.b);
+    }
+    case NodeMaterialBlockConnectionPointTypes::Color4: {
+      const auto& color4Value = value()->get<Color4>();
+      return String::printf("vec4(%f, %f, %f, %f)", color4Value.r, color4Value.g, color4Value.b,
+                            color4Value.a);
+    }
+    default:
+      break;
   }
+
   return "";
-} // namespace BABYLON
+}
 
 void InputBlock::_emit(NodeMaterialBuildState& state, const std::string& define)
 {
@@ -363,6 +357,16 @@ void InputBlock::_emit(NodeMaterialBuildState& state, const std::string& define)
   if (isUniform) {
     if (associatedVariableName().empty()) {
       associatedVariableName = state._getFreeVariableName("u_" + name);
+    }
+
+    if (isConstant) {
+      if (stl_util::contains(state.constants, associatedVariableName())) {
+        return;
+      }
+      state.constants.emplace_back(associatedVariableName);
+      state._constantDeclaration += _declareOutput(output, state)
+                                    + String::printf(" = %s;\r\n", _emitConstant(state).c_str());
+      return;
     }
 
     if (stl_util::contains(state.uniforms, associatedVariableName())) {
@@ -480,8 +484,8 @@ void InputBlock::_transmit(Effect* effect, Scene* scene)
       case NodeMaterialSystemValues::FogColor:
         effect->setColor3(variableName, scene->fogColor);
         break;
-      default:
-        break;
+      case NodeMaterialSystemValues::DeltaTime:
+        effect->setFloat(variableName, scene->deltaTime / 1000.f);
     }
     return;
   }
@@ -533,6 +537,72 @@ InputBlock& InputBlock::_buildBlock(NodeMaterialBuildState& state)
   _emit(state);
 
   return *this;
+}
+
+std::string InputBlock::_dumpPropertiesCode()
+{
+  if (isAttribute()) {
+    return String::printf("%s.setAsAttribute(\"%s\");\r\n", _codeVariableName.c_str(),
+                          name.c_str());
+  }
+  if (isSystemValue()) {
+    return String::printf("%s.setAsSystemValue(NodeMaterialSystemValues(%u));\r\n",
+                          _codeVariableName.c_str(), static_cast<unsigned int>(*_systemValue));
+  }
+  if (isUniform()) {
+    std::string valueString = "";
+    switch (type) {
+      case NodeMaterialBlockConnectionPointTypes::Float: {
+        const auto floatValue = value()->get<float>();
+        auto returnValue
+          = String::printf("%s.value = %f;\r\n", _codeVariableName.c_str(), floatValue);
+
+        returnValue += String::printf("%s.min = %f;\r\n", _codeVariableName.c_str(), min);
+        returnValue += String::printf("%s.max = %f;\r\n", _codeVariableName.c_str(), max);
+        returnValue
+          += String::printf("%s.matrixMode = %u;\r\n", _codeVariableName.c_str(), matrixMode);
+        returnValue
+          += String::printf("%s.animationType  = AnimatedInputBlockTypes(%u);\r\n",
+                            _codeVariableName.c_str(), static_cast<unsigned int>(animationType()));
+
+        return returnValue;
+      }
+      case NodeMaterialBlockConnectionPointTypes::Vector2: {
+        const auto& vector2Value = value()->get<Vector2>();
+        valueString = String::printf("Vector2(%f, %f)", vector2Value.x, vector2Value.y);
+      } break;
+      case NodeMaterialBlockConnectionPointTypes::Vector3: {
+        const auto& vector3Value = value()->get<Vector3>();
+        valueString
+          = String::printf("Vector3(%f, %f, %f)", vector3Value.x, vector3Value.y, vector3Value.z);
+      } break;
+      case NodeMaterialBlockConnectionPointTypes::Vector4: {
+        const auto& vector4Value = value()->get<Vector4>();
+        valueString = String::printf("Vector4(%f, %f, %f, %f)", vector4Value.x, vector4Value.y,
+                                     vector4Value.z, vector4Value.x);
+      } break;
+      case NodeMaterialBlockConnectionPointTypes::Color3: {
+        const auto& color3Value = value()->get<Color3>();
+        valueString
+          = String::printf("Color3(%f, %f, %f)", color3Value.r, color3Value.g, color3Value.b);
+      } break;
+      case NodeMaterialBlockConnectionPointTypes::Color4: {
+        const auto& color4Value = value()->get<Color4>();
+        valueString = String::printf("Color4(%f, %f, %f, %f)", color4Value.r, color4Value.g,
+                                     color4Value.b, color4Value.a);
+      } break;
+      default:
+        break;
+    }
+    auto finalOutput = String::printf("%s.value = ${valueString};\r\n", _codeVariableName.c_str());
+    finalOutput += String::printf("%s.isConstant = %s;\r\n", _codeVariableName.c_str(),
+                                  isConstant ? "true" : "false");
+    finalOutput += String::printf("%s.visibleInInspector = %s;\r\n", _codeVariableName.c_str(),
+                                  visibleInInspector ? "true" : "false");
+
+    return finalOutput;
+  }
+  return "";
 }
 
 json InputBlock::serialize() const

@@ -61,6 +61,12 @@ public:
   void animate(Scene* scene);
 
   /**
+   * @brief Initialize the block and prepare the context for build.
+   * @param state defines the state that will be used for the build
+   */
+  void initialize(NodeMaterialBuildState& state) override;
+
+  /**
    * @brief Set the input block to its default value (based on its type).
    */
   void setDefaultValue();
@@ -230,9 +236,26 @@ protected:
 
 private:
   std::string _emitDefine(const std::string& define) const;
+  std::string _emitConstant(NodeMaterialBuildState& state);
   void _emit(NodeMaterialBuildState& state, const std::string& define = "");
 
 public:
+  /**
+   * Gets or set a value used to limit the range of float values
+   */
+  float min;
+
+  /**
+   * Gets or set a value used to limit the range of float values
+   */
+  float max;
+
+  /**
+   * Gets or sets a value used by the Node Material editor to determine how to configure the current
+   * value if it is a matrix
+   */
+  unsigned int matrixMode;
+
   /**
    * Hidden
    */
@@ -248,6 +271,11 @@ public:
    * Gets or sets a boolean indicating that the value of this input will not change after a build
    */
   bool isConstant;
+
+  /**
+   * Gets or sets the group to use to display this block in the Inspector
+   */
+  std::string groupInInspector;
 
   /**
    * Gets or sets the connection point type (default is float)
