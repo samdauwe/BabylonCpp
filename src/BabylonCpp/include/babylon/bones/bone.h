@@ -27,9 +27,7 @@ public:
   {
     auto bone = std::shared_ptr<Bone>(
       new Bone(iName, skeleton, parentBone, localMatrix, restPose, baseMatrix, index));
-    bone->addToRootNodes();
     bone->addToSkeleton(bone);
-
     bone->setParent(parentBone, false);
 
     if (baseMatrix || localMatrix) {
@@ -81,10 +79,15 @@ public:
   std::vector<BonePtr>& getChildren();
 
   /**
+   * @brief Gets the node index in matrix array generated for rendering
+   * @returns the node index
+   */
+  int getIndex();
+
+  /**
    * @brief Sets the parent bone.
    * @param parent defines the parent (can be null if the bone is the root)
-   * @param updateDifferenceMatrix defines if the difference matrix must be
-   * updated
+   * @param updateDifferenceMatrix defines if the difference matrix must be updated
    */
   void setParent(Bone* parent, bool updateDifferenceMatrix = true);
 
