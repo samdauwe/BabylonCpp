@@ -13,8 +13,7 @@
 
 namespace BABYLON {
 
-ColorGradingTexture::ColorGradingTexture(const std::string& iUrl, Scene* scene)
-    : BaseTexture{scene}
+ColorGradingTexture::ColorGradingTexture(const std::string& iUrl, Scene* scene) : BaseTexture{scene}
 {
   if (iUrl.empty()) {
     return;
@@ -47,7 +46,7 @@ ColorGradingTexture::ColorGradingTexture(const std::string& iUrl, Scene* scene)
 
 ColorGradingTexture::~ColorGradingTexture() = default;
 
-Matrix* ColorGradingTexture::getTextureMatrix()
+Matrix* ColorGradingTexture::getTextureMatrix(int /*uBase*/)
 {
   return _textureMatrix.get();
 }
@@ -56,14 +55,12 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
 {
   InternalTexturePtr texture = nullptr;
   if (_engine->webGLVersion() == 1.f) {
-    texture = _engine->createRawTexture(
-      Uint8Array(), 1, 1, Constants::TEXTUREFORMAT_RGBA, false, false,
-      TextureConstants::BILINEAR_SAMPLINGMODE);
+    texture = _engine->createRawTexture(Uint8Array(), 1, 1, Constants::TEXTUREFORMAT_RGBA, false,
+                                        false, TextureConstants::BILINEAR_SAMPLINGMODE);
   }
   else {
-    texture = _engine->createRawTexture3D(
-      Uint8Array(), 1, 1, 1, Constants::TEXTUREFORMAT_RGBA, false, false,
-      TextureConstants::BILINEAR_SAMPLINGMODE);
+    texture = _engine->createRawTexture3D(Uint8Array(), 1, 1, 1, Constants::TEXTUREFORMAT_RGBA,
+                                          false, false, TextureConstants::BILINEAR_SAMPLINGMODE);
   }
 
   _texture = texture;
@@ -98,8 +95,7 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
         // Number of space + one
         size = words.size();
         data.clear();
-        data.resize(size * size * size
-                    * 4); // volume texture of side size and rgb 8
+        data.resize(size * size * size * 4); // volume texture of side size and rgb 8
         tempData.clear();
         tempData.resize(size * size * size * 4);
         continue;
@@ -115,8 +111,7 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
         maxColor = std::max(b, maxColor);
 
         size_t pixelStorageIndex
-          = (pixelIndexW + pixelIndexSlice * size + pixelIndexH * size * size)
-            * 4;
+          = (pixelIndexW + pixelIndexSlice * size + pixelIndexH * size * size) * 4;
 
         if (pixelStorageIndex + 2 < tempData.size()) {
           tempData[pixelStorageIndex + 0] = static_cast<float>(r);
@@ -152,13 +147,11 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
     const auto _size = static_cast<int>(size);
     if (_texture->is3D) {
       _texture->updateSize(_size, _size, _size);
-      _engine->updateRawTexture3D(_texture, data, Constants::TEXTUREFORMAT_RGBA,
-                                  false);
+      _engine->updateRawTexture3D(_texture, data, Constants::TEXTUREFORMAT_RGBA, false);
     }
     else {
       _texture->updateSize(_size * _size, _size);
-      _engine->updateRawTexture(_texture, data, Constants::TEXTUREFORMAT_RGBA,
-                                false);
+      _engine->updateRawTexture(_texture, data, Constants::TEXTUREFORMAT_RGBA, false);
     }
   };
 
@@ -204,9 +197,9 @@ void ColorGradingTexture::delayLoad(const std::string& /*forcedExtension*/)
   }
 }
 
-std::unique_ptr<ColorGradingTexture>
-ColorGradingTexture::Parse(const json& /*parsedTexture*/, Scene* /*scene*/,
-                           const std::string& /*rootUrl*/)
+std::unique_ptr<ColorGradingTexture> ColorGradingTexture::Parse(const json& /*parsedTexture*/,
+                                                                Scene* /*scene*/,
+                                                                const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

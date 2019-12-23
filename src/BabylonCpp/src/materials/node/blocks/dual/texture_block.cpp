@@ -9,7 +9,8 @@
 #include <babylon/materials/node/node_material_build_state_shared_data.h>
 #include <babylon/materials/node/node_material_connection_point.h>
 #include <babylon/materials/node/node_material_defines.h>
-#include <babylon/materials/textures/base_texture.h>
+#include <babylon/materials/textures/texture.h>
+#include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 
@@ -30,22 +31,24 @@ TextureBlock::TextureBlock(const std::string& iName)
                 NodeMaterialBlockTargets::VertexAndFragment);
 
   registerOutput("rgba", NodeMaterialBlockConnectionPointTypes::Color4,
-                 NodeMaterialBlockTargets::Fragment);
+                 NodeMaterialBlockTargets::Neutral);
   registerOutput("rgb", NodeMaterialBlockConnectionPointTypes::Color3,
-                 NodeMaterialBlockTargets::Fragment);
+                 NodeMaterialBlockTargets::Neutral);
   registerOutput("r", NodeMaterialBlockConnectionPointTypes::Float,
-                 NodeMaterialBlockTargets::Fragment);
+                 NodeMaterialBlockTargets::Neutral);
   registerOutput("g", NodeMaterialBlockConnectionPointTypes::Float,
-                 NodeMaterialBlockTargets::Fragment);
+                 NodeMaterialBlockTargets::Neutral);
   registerOutput("b", NodeMaterialBlockConnectionPointTypes::Float,
-                 NodeMaterialBlockTargets::Fragment);
+                 NodeMaterialBlockTargets::Neutral);
   registerOutput("a", NodeMaterialBlockConnectionPointTypes::Float,
-                 NodeMaterialBlockTargets::Fragment);
+                 NodeMaterialBlockTargets::Neutral);
 
   _inputs[0]->acceptedConnectionPointTypes.emplace_back(
     NodeMaterialBlockConnectionPointTypes::Vector3);
   _inputs[0]->acceptedConnectionPointTypes.emplace_back(
     NodeMaterialBlockConnectionPointTypes::Vector4);
+
+  _inputs[0]->_prioritizeVertex = true;
 }
 
 TextureBlock::~TextureBlock() = default;
@@ -161,7 +164,7 @@ void TextureBlock::initializeDefines(AbstractMesh* /*mesh*/,
   defines.setValue(_mainUVDefineName, false);
 }
 
-void TextureBlock::prepareDefines(AbstractMesh* /*mesh*/, const NodeMaterialPtr& /*nodeMaterial*/,
+void TextureBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& /*nodeMaterial*/,
                                   NodeMaterialDefines& defines, bool /*useInstances*/)
 {
   if (!defines._areTexturesDirty) {
@@ -169,16 +172,38 @@ void TextureBlock::prepareDefines(AbstractMesh* /*mesh*/, const NodeMaterialPtr&
   }
 
   if (!texture || !texture->getTextureMatrix()) {
+    defines.setValue(_defineName, false);
+    defines.setValue(_mainUVDefineName, true);
     return;
   }
 
-  if (!texture->getTextureMatrix()->isIdentityAs3x2()) {
-    defines.setValue(_defineName, true);
+  defines.setValue(_linearDefineName, !texture->gammaSpace);
+  if (_isMixed) {
+    if (!texture->getTextureMatrix(_getTextureBase(static_cast<Mesh*>(mesh)))->isIdentityAs3x2()) {
+      defines.setValue(_defineName, true);
+    }
+    else {
+      defines.setValue(_defineName, false);
+      defines.setValue(_mainUVDefineName, true);
+    }
   }
-  else {
-    defines.setValue(_defineName, false);
-    defines.setValue(_mainUVDefineName, true);
+}
+
+int TextureBlock::_getTextureBase(Mesh* mesh)
+{
+  auto base = 1;
+  // By default textures loaded by the node material are loaded with invertY set to false. But for
+  // regular meshes (created by the MeshBuilder) we need to switch it
+  if (texture && mesh
+      && (!mesh->overrideMaterialSideOrientation.has_value()
+          || *mesh->overrideMaterialSideOrientation
+               == Constants::MATERIAL_CounterClockWiseSideOrientation)) {
+    if (!texture->invertY()) {
+      base = -1;
+    }
   }
+
+  return base;
 }
 
 bool TextureBlock::isReady(AbstractMesh* /*mesh*/, const NodeMaterialPtr& /*nodeMaterial*/,
@@ -200,7 +225,7 @@ void TextureBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& /*nodeMa
 
   if (_isMixed) {
     effect->setFloat(_textureInfoName, texture->level);
-    effect->setMatrix(_textureTransformName, *texture->getTextureMatrix());
+    effect->setMatrix(_textureTransformName, *texture->getTextureMatrix(_getTextureBase(mesh)));
   }
   effect->setTexture(_samplerName, texture);
 }
@@ -216,8 +241,7 @@ void TextureBlock::_injectVertexCode(NodeMaterialBuildState& state)
 
   // Inject code in vertex
   _defineName       = state._getFreeDefineName("UVTRANSFORM");
-  _mainUVDefineName = state._getFreeDefineName(
-    String::printf("vMain%s", uvInput->associatedVariableName().c_str()));
+  _mainUVDefineName = "VMAIN" + String::toUpperCase(uvInput->associatedVariableName());
 
   if (uvInput->connectedPoint()->ownerBlock()->isInput) {
     auto uvInputOwnerBlock
@@ -242,36 +266,94 @@ void TextureBlock::_injectVertexCode(NodeMaterialBuildState& state)
   state.compilationString
     += String::printf("%s = vec2(%s * vec4(%s.xy, 1.0, 0.0));\r\n", _transformedUVName.c_str(),
                       _textureTransformName.c_str(), uvInput->associatedVariableName().c_str());
-  state.compilationString += "#else\r\n";
+  state.compilationString += "#endif\r\n";
+  state.compilationString += String::printf("#ifdef %s\r\n", _mainUVDefineName.c_str());
   state.compilationString += String::printf("%s = %s.xy;\r\n", _mainUVName.c_str(),
                                             uvInput->associatedVariableName().c_str());
+  state.compilationString += "#endif\r\n";
+
+  for (const auto& o : _outputs) {
+    if (!o->isConnectedInVertexShader()) {
+      return;
+    }
+  }
+
+  _writeTextureRead(state, true);
+
+  for (const auto& output : _outputs) {
+    if (output->hasEndpoints()) {
+      _writeOutput(state, output, output->name, true);
+    }
+  }
+}
+
+void TextureBlock::_writeTextureRead(NodeMaterialBuildState& state, bool vertexMode)
+{
+  const auto& uvInput = uv();
+
+  if (vertexMode) {
+    if (state.target == NodeMaterialBlockTargets::Fragment) {
+      return;
+    }
+
+    state.compilationString
+      += String::printf("vec4 %s = texture2D(%s, %s);\r\n", _tempTextureRead.c_str(),
+                        _samplerName.c_str(), uvInput->associatedVariableName().c_str());
+    return;
+  }
+
+  if (uv()->ownerBlock()->target() == NodeMaterialBlockTargets::Fragment) {
+    state.compilationString
+      += String::printf("vec4 %s = texture2D(%s, %s);\r\n", _tempTextureRead.c_str(),
+                        _samplerName.c_str(), uvInput->associatedVariableName().c_str());
+    return;
+  }
+
+  state.compilationString += String::printf("#ifdef %s\r\n", _defineName.c_str());
+  state.compilationString
+    += String::printf("vec4 %s = texture2D(%s, %s);\r\n", _tempTextureRead.c_str(),
+                      _samplerName.c_str(), _transformedUVName.c_str());
+  state.compilationString += "#endif\r\n";
+  state.compilationString += String::printf("#ifdef %s\r\n", _mainUVDefineName.c_str());
+  state.compilationString
+    += String::printf("vec4 %s = texture2D(%s, %s);\r\n", _tempTextureRead.c_str(),
+                      _samplerName.c_str(), _mainUVName.c_str());
   state.compilationString += "#endif\r\n";
 }
 
 void TextureBlock::_writeOutput(NodeMaterialBuildState& state,
                                 const NodeMaterialConnectionPointPtr& output,
-                                const std::string& swizzle)
+                                const std::string& swizzle, bool vertexMode)
 {
-  const auto& uvInput = uv();
+  if (vertexMode) {
+    if (state.target == NodeMaterialBlockTargets::Fragment) {
+      return;
+    }
+
+    state.compilationString
+      += String::printf("%s = %s.%s;\r\n", _declareOutput(output, state).c_str(),
+                        _tempTextureRead.c_str(), swizzle.c_str());
+
+    return;
+  }
 
   if (uv()->ownerBlock()->target() == NodeMaterialBlockTargets::Fragment) {
-    state.compilationString += String::printf(
-      "%s = texture2D(%s, %s).%s;\r\n", _declareOutput(output, state).c_str(), _samplerName.c_str(),
-      uvInput->associatedVariableName().c_str(), swizzle.c_str());
+    state.compilationString
+      += String::printf("%s = %s.%s;\r\n", _declareOutput(output, state).c_str(),
+                        _tempTextureRead.c_str(), swizzle.c_str());
     return;
   }
 
   const auto complement = String::printf(" * %s", _textureInfoName.c_str());
 
-  state.compilationString += String::printf("#ifdef %s\r\n", _defineName.c_str());
-  state.compilationString += String::printf(
-    "%s = texture2D(%s, %s).%s%s;\r\n", _declareOutput(output, state).c_str(), _samplerName.c_str(),
-    _transformedUVName.c_str(), swizzle.c_str(), complement.c_str());
-  state.compilationString += "#else\r\n";
-  state.compilationString += String::printf(
-    "%s = texture2D(%s, vMain%s).%s%s;\r\n", _declareOutput(output, state).c_str(),
-    _samplerName.c_str(), uvInput->associatedVariableName().c_str(), swizzle.c_str(),
-    complement.c_str());
+  state.compilationString
+    += String::printf("%s = %s.%s%s;\r\n", _declareOutput(output, state).c_str(),
+                      _tempTextureRead.c_str(), swizzle.c_str(), complement.c_str());
+
+  state.compilationString += String::printf("#ifdef %s\r\n", _linearDefineName.c_str());
+  state.compilationString
+    += String::printf("%s = toGammaSpace(%s);\r\n", output->associatedVariableName().c_str(),
+                      output->associatedVariableName().c_str());
   state.compilationString += "#endif\r\n";
 }
 
@@ -279,27 +361,52 @@ TextureBlock& TextureBlock::_buildBlock(NodeMaterialBuildState& state)
 {
   NodeMaterialBlock::_buildBlock(state);
 
+  if (state.target == NodeMaterialBlockTargets::Vertex) {
+    _tempTextureRead = state._getFreeVariableName("tempTextureRead");
+  }
+
+  if ((!_isMixed && state.target == NodeMaterialBlockTargets::Fragment)
+      || (_isMixed && state.target == NodeMaterialBlockTargets::Vertex)) {
+    _samplerName = state._getFreeVariableName(name + "Sampler");
+
+    state._emit2DSampler(_samplerName);
+
+    // Declarations
+    state.sharedData->blockingBlocks.emplace_back(shared_from_this());
+    state.sharedData->textureBlocks.emplace_back(
+      std::static_pointer_cast<TextureBlock>(shared_from_this()));
+    state.sharedData->blocksWithDefines.emplace_back(shared_from_this());
+    state.sharedData->bindableBlocks.emplace_back(shared_from_this());
+  }
+
   if (state.target != NodeMaterialBlockTargets::Fragment) {
     // Vertex
     _injectVertexCode(state);
     return *this;
   }
 
-  state.sharedData->blockingBlocks.emplace_back(
-    std::static_pointer_cast<NodeMaterialBlock>(shared_from_this()));
-  state.sharedData->textureBlocks.emplace_back(
-    std::static_pointer_cast<TextureBlock>(shared_from_this()));
-
-  _samplerName = state._getFreeVariableName(name + "Sampler");
-  state.samplers.emplace_back(_samplerName);
-  state._samplerDeclaration += String::printf("uniform sampler2D %s;\r\n", _samplerName.c_str());
-
   // Fragment
-  state.sharedData->bindableBlocks.emplace_back(shared_from_this());
-  if (_isMixed()) {
-    state.sharedData->blocksWithDefines.emplace_back(shared_from_this());
+  for (const auto& o : _outputs) {
+    if (!o->isConnectedInFragmentShader()) {
+      return *this;
+    }
+  }
+
+  if (_isMixed) {
+    // Reexport the sampler
+    state._emit2DSampler(_samplerName);
+  }
+
+  _linearDefineName = state._getFreeDefineName("ISLINEAR");
+
+  auto comments = String::printf("//%s", name.c_str());
+  state._emitFunctionFromInclude("helperFunctions", comments);
+
+  if (_isMixed) {
     state._emitUniformFromString(_textureInfoName, "float");
   }
+
+  _writeTextureRead(state);
 
   for (const auto& output : _outputs) {
     if (output->hasEndpoints()) {
@@ -316,8 +423,28 @@ std::string TextureBlock::_dumpPropertiesCode()
     return "";
   }
 
-  const auto codeString = String::printf("%s.texture = new BABYLON.Texture(\"%s\");\r\n",
-                                         _codeVariableName.c_str(), texture->name.c_str());
+  auto codeString = String::printf("%s.texture = Texture::New(\"%s\");\r\n",
+                                   _codeVariableName.c_str(), texture->name.c_str());
+  codeString
+    += String::printf("%s.texture.wrapU = %u;\r\n", _codeVariableName.c_str(), texture->wrapU);
+  codeString
+    += String::printf("%s.texture.wrapV = %u;\r\n", _codeVariableName.c_str(), texture->wrapV);
+  codeString
+    += String::printf("%s.texture.uAng = %f;\r\n", _codeVariableName.c_str(), texture->uAng);
+  codeString
+    += String::printf("%s.texture.vAng = %f;\r\n", _codeVariableName.c_str(), texture->vAng);
+  codeString
+    += String::printf("%s.texture.wAng = %f;\r\n", _codeVariableName.c_str(), texture->wAng);
+  codeString
+    += String::printf("%s.texture.uOffset = %f;\r\n", _codeVariableName.c_str(), texture->uOffset);
+  codeString
+    += String::printf("%s.texture.vOffset = %f;\r\n", _codeVariableName.c_str(), texture->vOffset);
+  codeString
+    += String::printf("%s.texture.uScale = %f;\r\n", _codeVariableName.c_str(), texture->uScale);
+  codeString
+    += String::printf("%s.texture.vScale = %f;\r\n", _codeVariableName.c_str(), texture->vScale);
+  codeString += String::printf("%s.texture.gammaSpace = %d;\r\n", _codeVariableName.c_str(),
+                               texture->gammaSpace);
 
   return codeString;
 }

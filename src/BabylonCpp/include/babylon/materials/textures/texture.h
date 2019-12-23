@@ -72,7 +72,7 @@ public:
    * rotation components.
    * @returns the transform matrix of the texture.
    */
-  Matrix* getTextureMatrix() override;
+  Matrix* getTextureMatrix(int uBase = 1) override;
 
   /**
    * @brief Get the current matrix used to apply reflection. This is useful to rotate an environment

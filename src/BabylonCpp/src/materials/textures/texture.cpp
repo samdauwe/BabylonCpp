@@ -266,7 +266,7 @@ void Texture::_prepareRowForTextureGeneration(float x, float y, float z, Vector3
   t.z += wRotationCenter;
 }
 
-Matrix* Texture::getTextureMatrix()
+Matrix* Texture::getTextureMatrix(int /*uBase*/)
 {
   if (stl_util::almost_equal(uOffset, _cachedUOffset)
       && stl_util::almost_equal(vOffset, _cachedVOffset)

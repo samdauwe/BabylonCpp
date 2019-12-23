@@ -75,7 +75,7 @@ public:
    * @brief Get the texture transform matrix used to offset tile the texture for istance.
    * @returns the transformation matrix
    */
-  virtual Matrix* getTextureMatrix();
+  virtual Matrix* getTextureMatrix(int uBase = 1);
 
   /**
    * @brief Get the texture reflection matrix used to rotate/transform the reflection.

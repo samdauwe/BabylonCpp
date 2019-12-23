@@ -270,7 +270,7 @@ Scene* BaseTexture::getScene() const
   return _scene;
 }
 
-Matrix* BaseTexture::getTextureMatrix()
+Matrix* BaseTexture::getTextureMatrix(int /*uBase*/)
 {
   return &_textureMatrix;
 }
@@ -455,12 +455,11 @@ ArrayBufferView BaseTexture::readPixels(unsigned int faceIndex, int iLevel,
   }
 
   if (_texture->isCube) {
-    return engine->_readTexturePixels(_texture, width, height,
-                                      static_cast<int>(faceIndex), iLevel, buffer);
+    return engine->_readTexturePixels(_texture, width, height, static_cast<int>(faceIndex), iLevel,
+                                      buffer);
   }
 
-  return engine->_readTexturePixels(_texture, width, height, -1,
-                                    iLevel, buffer);
+  return engine->_readTexturePixels(_texture, width, height, -1, iLevel, buffer);
 }
 
 void BaseTexture::releaseInternalTexture()

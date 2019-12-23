@@ -22,6 +22,8 @@
 #include <babylon/materials/node/node_material_connection_point.h>
 #include <babylon/materials/node/node_material_defines.h>
 #include <babylon/materials/node/optimizers/node_material_optimizer.h>
+#include <babylon/materials/textures/base_texture.h>
+#include <babylon/materials/textures/texture.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/file_tools.h>
@@ -720,7 +722,7 @@ bool NodeMaterial::hasTexture(const BaseTexturePtr& texture) const
 
   for (const auto& t : _sharedData->textureBlocks) {
     if (std::holds_alternative<TextureBlockPtr>(t)
-        && std::get<TextureBlockPtr>(t)->texture == texture) {
+        && std::get<TextureBlockPtr>(t)->texture == std::static_pointer_cast<Texture>(texture)) {
       return true;
     }
     else if (std::holds_alternative<ReflectionTextureBlockPtr>(t)

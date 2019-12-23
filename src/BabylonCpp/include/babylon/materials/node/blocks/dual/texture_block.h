@@ -8,9 +8,9 @@
 
 namespace BABYLON {
 
-class BaseTexture;
+class Texture;
 class TextureBlock;
-using BaseTexturePtr  = std::shared_ptr<BaseTexture>;
+using TexturePtr      = std::shared_ptr<Texture>;
 using TextureBlockPtr = std::shared_ptr<TextureBlock>;
 
 /**
@@ -153,15 +153,17 @@ protected:
   std::string _dumpPropertiesCode() override;
 
 private:
+  int _getTextureBase(Mesh* mesh);
   void _injectVertexCode(NodeMaterialBuildState& state);
+  void _writeTextureRead(NodeMaterialBuildState& state, bool vertexMode = false);
   void _writeOutput(NodeMaterialBuildState& state, const NodeMaterialConnectionPointPtr& output,
-                    const std::string& swizzle);
+                    const std::string& swizzle, bool vertexMode = false);
 
 public:
   /**
    * Gets or sets the texture associated with the node
    */
-  BaseTexturePtr texture;
+  TexturePtr texture;
 
   /**
    * Gets the uv input component.
@@ -205,6 +207,8 @@ public:
 
 private:
   std::string _defineName;
+  std::string _linearDefineName;
+  std::string _tempTextureRead;
   std::string _samplerName;
   std::string _transformedUVName;
   std::string _textureTransformName;

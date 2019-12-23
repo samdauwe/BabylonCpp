@@ -35,7 +35,7 @@ public:
    * This is not used in color grading but keep for troubleshooting purpose
    * (easily swap diffuse by colorgrading to look in).
    */
-  Matrix* getTextureMatrix() override;
+  Matrix* getTextureMatrix(int uBase = 1) override;
 
   /**
    * @brief Clones the color gradind texture.
