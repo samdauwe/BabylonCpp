@@ -2476,6 +2476,12 @@ public:
    */
   bool validateShaderPrograms;
 
+  /**
+   * Gets or sets a boolean indicating if depth buffer should be reverse, going from far to near.
+   * This can provide greater z depth for distant objects.
+   */
+  bool useReverseDepthBuffer;
+
   // Observables
 
   /**

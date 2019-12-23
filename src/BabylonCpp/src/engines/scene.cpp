@@ -2087,11 +2087,11 @@ void Scene::_animate()
     }
     _animationTimeLast = now;
   }
-  const auto deltaTime
+  const auto iDeltaTime
     = useConstantAnimationDeltaTime ?
         16.f :
         Time::fpTimeSince<size_t, std::milli>(*_animationTimeLast) * animationTimeScale;
-  _animationTime += static_cast<int>(deltaTime);
+  _animationTime += static_cast<int>(iDeltaTime);
   const auto& animationTime = _animationTime;
   _animationTimeLast        = now;
 
@@ -3642,11 +3642,11 @@ void Scene::_checkIntersections()
 void Scene::animate()
 {
   if (_engine->isDeterministicLockStep()) {
-    auto deltaTime = (std::max(static_cast<float>(Scene::MinDeltaTime.count()),
-                               std::min(_engine->getDeltaTime() * 1000.f,
-                                        static_cast<float>(Scene::MaxDeltaTime.count())))
-                      / 1000.f)
-                     + _timeAccumulator;
+    auto iDeltaTime = (std::max(static_cast<float>(Scene::MinDeltaTime.count()),
+                                std::min(_engine->getDeltaTime() * 1000.f,
+                                         static_cast<float>(Scene::MaxDeltaTime.count())))
+                       / 1000.f)
+                      + _timeAccumulator;
 
     auto defaultFPS = (60.f / 1000.f);
 
@@ -3656,9 +3656,8 @@ void Scene::animate()
 
     auto maxSubSteps = _engine->getLockstepMaxSteps();
 
-    // compute the amount of fixed steps we should have taken since the last
-    // step
-    auto internalSteps = static_cast<unsigned int>(std::floor(deltaTime / (1000.f * defaultFPS)));
+    // compute the amount of fixed steps we should have taken since the last step
+    auto internalSteps = static_cast<unsigned int>(std::floor(iDeltaTime / (1000.f * defaultFPS)));
     internalSteps      = std::min(internalSteps, maxSubSteps);
 
     do {
@@ -3676,26 +3675,26 @@ void Scene::animate()
       ++_currentStepId;
 
       ++stepsTaken;
-      deltaTime -= defaultFrameTime;
+      iDeltaTime -= defaultFrameTime;
 
-    } while (deltaTime > 0.f && stepsTaken < internalSteps);
+    } while (iDeltaTime > 0.f && stepsTaken < internalSteps);
 
-    _timeAccumulator = deltaTime < 0.f ? 0.f : deltaTime;
+    _timeAccumulator = iDeltaTime < 0.f ? 0.f : iDeltaTime;
   }
   else {
     // Animations
-    const float deltaTime
+    const float iDeltaTime
       = useConstantAnimationDeltaTime ?
           16.f :
           std::max(Time::fpMillisecondsDuration<float>(Scene::MinDeltaTime),
                    std::min(_engine->getDeltaTime(),
                             Time::fpMillisecondsDuration<float>(Scene::MaxDeltaTime)));
-    _animationRatio = deltaTime * (60.f / 1000.f);
+    _animationRatio = iDeltaTime * (60.f / 1000.f);
     _animate();
     onAfterAnimationsObservable.notifyObservers(this);
 
     // Physics
-    _advancePhysicsEngineStep(deltaTime);
+    _advancePhysicsEngineStep(iDeltaTime);
   }
 }
 

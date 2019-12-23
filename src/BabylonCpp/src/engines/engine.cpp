@@ -88,6 +88,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , enableOfflineSupport{false}
     , disableManifestCheck{false}
     , validateShaderPrograms{false}
+    , useReverseDepthBuffer{false}
     , _badOS{false}
     , _badDesktopOS{false}
     , disableTextureBindingOptimization{false}

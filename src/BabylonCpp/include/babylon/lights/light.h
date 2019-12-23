@@ -189,6 +189,26 @@ public:
                                 const std::string& uniformName1);
 
   /**
+   * @brief Sets the passed Effect "effect" with the Light textures.
+   * @param effect The effect to update
+   * @param lightIndex The index of the light in the effect to update
+   * @returns The light
+   */
+  virtual Light& transferTexturesToEffect(const EffectPtr& effect, const std::string& lightIndex);
+
+  /**
+   * @brief Binds the lights information from the scene to the effect for the given mesh.
+   * @param lightIndex Light index
+   * @param scene The scene where the light belongs to
+   * @param effect The effect we are binding the data to
+   * @param useSpecular Defines if specular is supported
+   * @param usePhysicalLightFalloff Specifies whether the light falloff is defined physically or not
+   * @param rebuildInParallel Specifies whether the shader is rebuilding in parallel
+   */
+  void bindLight(unsigned int lightIndex, Scene* scene, const EffectPtr& effect, bool useSpecular,
+                 bool usePhysicalLightFalloff = false, bool rebuildInParallel = false);
+
+  /**
    * @brief Sets the passed Effect "effect" with the Light information.
    * @param effect The effect to update
    * @param lightDataUniformName The uniform used to store light data (position
@@ -506,6 +526,11 @@ public:
    * Internal use only.
    */
   std::unique_ptr<UniformBuffer> _uniformBuffer;
+
+  /**
+   * Hidden
+   */
+  int _renderId;
 
   /**
    * Photometric scale used to interpret the intensity

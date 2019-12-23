@@ -265,6 +265,11 @@ private:
 
 public:
   /**
+   * Hidden
+   */
+  bool _alreadyBound;
+
+  /**
    * Lambda to Update a 3x3 Matrix in a uniform buffer.
    * This is dynamic to allow compat with webgl 1 and 2.
    * You will need to pass the name of the uniform as well as the value.

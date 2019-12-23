@@ -10,6 +10,7 @@
 #include <babylon/lights/shadows/shadow_generator.h>
 #include <babylon/lights/spot_light.h>
 #include <babylon/materials/uniform_buffer.h>
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/misc/serialization_helper.h>
 
@@ -24,6 +25,7 @@ Light::Light(const std::string& iName, Scene* scene)
     , intensity{1.f}
     , _shadowGenerator{nullptr}
     , _uniformBuffer{std::make_unique<UniformBuffer>(scene->getEngine())}
+    , _renderId{-1}
     , intensityMode{this, &Light::get_intensityMode, &Light::set_intensityMode}
     , radius{this, &Light::get_radius, &Light::set_radius}
     , shadowEnabled{this, &Light::get_shadowEnabled, &Light::set_shadowEnabled}
@@ -55,8 +57,7 @@ Type Light::type() const
   return Type::LIGHT;
 }
 
-AnimationValue
-Light::getProperty(const std::vector<std::string>& targetPropertyPath)
+AnimationValue Light::getProperty(const std::vector<std::string>& targetPropertyPath)
 {
   if (targetPropertyPath.size() == 1) {
     const auto& target = targetPropertyPath[0];
@@ -87,8 +88,7 @@ void Light::setProperty(const std::vector<std::string>& targetPropertyPath,
 
 void Light::addToScene(const LightPtr& newLight)
 {
-  getScene()->addLight(newLight); // Need to add light first to the scene!
-  newLight->addToRootNodes();
+  getScene()->addLight(newLight);
   newLight->_buildUniformLayout();
   newLight->_resyncMeshes();
 }
@@ -96,10 +96,8 @@ void Light::addToScene(const LightPtr& newLight)
 LightPtr Light::_this() const
 {
   const auto& lights = getScene()->lights;
-  auto it
-    = std::find_if(lights.begin(), lights.end(), [this](const LightPtr& light) {
-        return light.get() == this;
-      });
+  auto it            = std::find_if(lights.begin(), lights.end(),
+                         [this](const LightPtr& light) { return light.get() == this; });
   return (it != lights.end()) ? (*it) : nullptr;
 }
 
@@ -113,8 +111,7 @@ std::string Light::toString(bool fullDetails) const
   std::ostringstream oss;
   oss << "Name: " << name;
   oss << ", type: ";
-  const std::array<std::string, 4> types{
-    {"Point", "Directional", "Spot", "Hemispheric"}};
+  const std::array<std::string, 4> types{{"Point", "Directional", "Spot", "Hemispheric"}};
   oss << (getTypeID() < types.size() ? types[getTypeID()] : "Unknown");
   if (!animations.empty()) {
     for (auto& animation : animations) {
@@ -133,7 +130,9 @@ void Light::_buildUniformLayout()
 void Light::_syncParentEnabledState()
 {
   Node::_syncParentEnabledState();
-  _resyncMeshes();
+  if (!isDisposed()) {
+    _resyncMeshes();
+  }
 }
 
 void Light::setEnabled(bool value)
@@ -270,15 +269,66 @@ Vector3 Light::getAbsolutePosition()
   return Vector3::Zero();
 }
 
-void Light::transferToEffect(const EffectPtr& /*effect*/,
-                             const std::string& /*lightIndex*/)
+void Light::transferToEffect(const EffectPtr& /*effect*/, const std::string& /*lightIndex*/)
 {
 }
 
-void Light::transferToEffect(const EffectPtr& /*effect*/,
-                             const std::string& /*uniformName0*/,
+void Light::transferToEffect(const EffectPtr& /*effect*/, const std::string& /*uniformName0*/,
                              const std::string& /*uniformName1*/)
 {
+}
+
+Light& Light::transferTexturesToEffect(const EffectPtr& /*effect*/,
+                                       const std::string& /*lightIndex*/)
+{
+  // Do nothing by default.
+  return *this;
+}
+
+void Light::bindLight(unsigned int lightIndex, Scene* scene, const EffectPtr& effect,
+                      bool useSpecular, bool usePhysicalLightFalloff, bool rebuildInParallel)
+{
+  auto iAsString  = std::to_string(lightIndex);
+  auto needUpdate = false;
+
+  if (rebuildInParallel && _uniformBuffer->_alreadyBound) {
+    return;
+  }
+
+  _uniformBuffer->bindToEffect(effect.get(), "Light" + iAsString);
+
+  if (_renderId != scene->getRenderId() || !_uniformBuffer->useUbo()) {
+    _renderId = scene->getRenderId();
+
+    auto scaledIntensity = getScaledIntensity();
+
+    transferToEffect(effect, iAsString);
+
+    diffuse.scaleToRef(scaledIntensity, TmpVectors::Color3Array[0]);
+    _uniformBuffer->updateColor4("vLightDiffuse", TmpVectors::Color3Array[0],
+                                 usePhysicalLightFalloff ? radius : range, iAsString);
+    if (useSpecular) {
+      specular.scaleToRef(scaledIntensity, TmpVectors::Color3Array[1]);
+      _uniformBuffer->updateColor3("vLightSpecular", TmpVectors::Color3Array[1], iAsString);
+    }
+    needUpdate = true;
+  }
+
+  // Textures might still need to be rebound.
+  transferTexturesToEffect(effect, iAsString);
+
+  // Shadows
+  if (scene->shadowsEnabled() && shadowEnabled()) {
+    auto shadowGenerator = getShadowGenerator();
+    if (shadowGenerator) {
+      shadowGenerator->bindShadowLight(iAsString, effect);
+      needUpdate = true;
+    }
+  }
+
+  if (needUpdate) {
+    _uniformBuffer->update();
+  }
 }
 
 bool Light::canAffectMesh(AbstractMesh* mesh)
@@ -287,25 +337,21 @@ bool Light::canAffectMesh(AbstractMesh* mesh)
     return true;
   }
 
-  auto it1
-    = std::find_if(_includedOnlyMeshes.begin(), _includedOnlyMeshes.end(),
-                   [mesh](const AbstractMeshPtr& includedOnlyMesh) {
-                     return includedOnlyMesh.get() == mesh;
-                   });
+  auto it1 = std::find_if(
+    _includedOnlyMeshes.begin(), _includedOnlyMeshes.end(),
+    [mesh](const AbstractMeshPtr& includedOnlyMesh) { return includedOnlyMesh.get() == mesh; });
   if (!_includedOnlyMeshes.empty() && it1 == _includedOnlyMeshes.end()) {
     return false;
   }
 
-  auto it2 = std::find_if(_excludedMeshes.begin(), _excludedMeshes.end(),
-                          [mesh](const AbstractMeshPtr& excludedMesh) {
-                            return excludedMesh.get() == mesh;
-                          });
+  auto it2 = std::find_if(
+    _excludedMeshes.begin(), _excludedMeshes.end(),
+    [mesh](const AbstractMeshPtr& excludedMesh) { return excludedMesh.get() == mesh; });
   if (!_excludedMeshes.empty() && it2 != _excludedMeshes.end()) {
     return false;
   }
 
-  if (_includeOnlyWithLayerMask != 0
-      && (_includeOnlyWithLayerMask & mesh->layerMask()) == 0) {
+  if (_includeOnlyWithLayerMask != 0 && (_includeOnlyWithLayerMask & mesh->layerMask()) == 0) {
     return false;
   }
 
@@ -377,17 +423,13 @@ void Light::_AddNodeConstructors()
   SpotLight::AddNodeConstructor();
 }
 
-std::function<LightPtr()>
-Light::GetConstructorFromName(unsigned int type, const std::string& iName,
-                              Scene* scene)
+std::function<LightPtr()> Light::GetConstructorFromName(unsigned int type, const std::string& iName,
+                                                        Scene* scene)
 {
-  auto constructorFunc
-    = Node::Construct("Light_Type_" + std::to_string(type), iName, scene);
+  auto constructorFunc = Node::Construct("Light_Type_" + std::to_string(type), iName, scene);
 
   if (constructorFunc) {
-    return [constructorFunc]() {
-      return std::static_pointer_cast<Light>(constructorFunc());
-    };
+    return [constructorFunc]() { return std::static_pointer_cast<Light>(constructorFunc()); };
   }
 
   // Default to no light for none present once.
@@ -398,9 +440,9 @@ LightPtr Light::Parse(const json& parsedLight, Scene* scene)
 {
   _AddNodeConstructors();
 
-  auto constructor = Light::GetConstructorFromName(
-    json_util::get_number<unsigned>(parsedLight, "type"),
-    json_util::get_string(parsedLight, "name"), scene);
+  auto constructor
+    = Light::GetConstructorFromName(json_util::get_number<unsigned>(parsedLight, "type"),
+                                    json_util::get_string(parsedLight, "name"), scene);
 
   if (!constructor) {
     return nullptr;
@@ -410,8 +452,7 @@ LightPtr Light::Parse(const json& parsedLight, Scene* scene)
 
   // Inclusion / exclusions
   if (json_util::has_valid_key_value(parsedLight, "excludedMeshesIds")) {
-    light->_excludedMeshesIds
-      = json_util::get_array<std::string>(parsedLight, "excludedMeshesIds");
+    light->_excludedMeshesIds = json_util::get_array<std::string>(parsedLight, "excludedMeshesIds");
   }
 
   if (json_util::has_valid_key_value(parsedLight, "includedOnlyMeshesIds")) {
@@ -426,31 +467,27 @@ LightPtr Light::Parse(const json& parsedLight, Scene* scene)
 
   // Falloff
   if (json_util::has_valid_key_value(parsedLight, "falloffType")) {
-    light->falloffType
-      = json_util::get_number<unsigned int>(parsedLight, "falloffType");
+    light->falloffType = json_util::get_number<unsigned int>(parsedLight, "falloffType");
   }
 
   // Lightmaps
   if (json_util::has_valid_key_value(parsedLight, "lightmapMode")) {
-    light->lightmapMode
-      = json_util::get_number<unsigned int>(parsedLight, "lightmapMode");
+    light->lightmapMode = json_util::get_number<unsigned int>(parsedLight, "lightmapMode");
   }
 
   // Animations
   if (json_util::has_key(parsedLight, "animations")) {
-    for (const auto& parsedAnimation :
-         json_util::get_array<json>(parsedLight, "animations")) {
+    for (const auto& parsedAnimation : json_util::get_array<json>(parsedLight, "animations")) {
       light->animations.emplace_back(Animation::Parse(parsedAnimation));
     }
     Node::ParseAnimationRanges(*light, parsedLight, scene);
   }
 
   if (json_util::has_key(parsedLight, "autoAnimate")) {
-    scene->beginAnimation(
-      light, json_util::get_number(parsedLight, "autoAnimateFrom", 0.f),
-      json_util::get_number(parsedLight, "autoAnimateTo", 0.f),
-      json_util::get_bool(parsedLight, "autoAnimateLoop"),
-      json_util::get_number(parsedLight, "autoAnimateSpeed", 1.f));
+    scene->beginAnimation(light, json_util::get_number(parsedLight, "autoAnimateFrom", 0.f),
+                          json_util::get_number(parsedLight, "autoAnimateTo", 0.f),
+                          json_util::get_bool(parsedLight, "autoAnimateLoop"),
+                          json_util::get_number(parsedLight, "autoAnimateSpeed", 1.f));
   }
 
   return light;
@@ -460,24 +497,22 @@ void Light::_hookArrayForExcluded(const std::vector<AbstractMeshPtr>& /*array*/)
 {
 }
 
-void Light::_hookArrayForIncludedOnly(
-  const std::vector<AbstractMeshPtr>& /*array*/)
+void Light::_hookArrayForIncludedOnly(const std::vector<AbstractMeshPtr>& /*array*/)
 {
 }
 
 void Light::_resyncMeshes()
 {
   for (auto& mesh : getScene()->meshes) {
-    mesh->_resyncLighSource(_this());
+    mesh->_resyncLightSource(_this());
   }
 }
 
 void Light::_markMeshesAsLightDirty()
 {
   for (auto& mesh : getScene()->meshes) {
-    if (std::find_if(
-          mesh->lightSources().begin(), mesh->lightSources().end(),
-          [this](const LightPtr& light) { return light.get() == this; })
+    if (std::find_if(mesh->lightSources().begin(), mesh->lightSources().end(),
+                     [this](const LightPtr& light) { return light.get() == this; })
         != mesh->lightSources().end()) {
       mesh->_markSubMeshesAsLightDirty();
     }
@@ -529,16 +564,14 @@ float Light::_getPhotometricScale()
           photometricScale = 1.f;
           break;
         case Light::INTENSITYMODE_LUMINANCE:
-          // When radius (and therefore solid angle) is non-zero a directional
-          // lights brightness can be specified via central (peak) luminance.
-          // For a directional light the 'radius' defines the angular radius
-          // (in radians) rather than world-space radius (e.g. in metres).
+          // When radius (and therefore solid angle) is non-zero a directional lights brightness can
+          // be specified via central (peak) luminance. For a directional light the 'radius' defines
+          // the angular radius (in radians) rather than world-space radius (e.g. in metres).
           auto apexAngleRadians = radius();
-          // Impose a minimum light angular size to avoid the light becoming
-          // an infinitely small angular light source (i.e. a dirac delta
-          // function).
+          // Impose a minimum light angular size to avoid the light becoming an infinitely small
+          // angular light source (i.e. a dirac delta function).
           apexAngleRadians = std::max(apexAngleRadians, 0.001f);
-          auto solidAngle = 2.f * Math::PI * (1.f - std::cos(apexAngleRadians));
+          auto solidAngle  = 2.f * Math::PI * (1.f - std::cos(apexAngleRadians));
           photometricScale = solidAngle;
           break;
       }
