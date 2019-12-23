@@ -171,13 +171,13 @@ private:
       ImGui::SameLine();
       std::string viewCodeLabel = ICON_FA_EDIT " View code##" + sampleName;
       if (ImGui::Button(viewCodeLabel.c_str())) {
-        std::string sample_cpp_file = Samples::SamplesProjectFolder() + "/" + sampleInfo.SourceFile;
+        std::string sample_cpp_file = Samples::SamplesProjectFolder() + "/" + sampleInfo->SourceFile;
         OnEditFiles({ sample_cpp_file });
       }
     }
 
-    if (!sampleInfo.Links.empty()) {
-      for (auto link : sampleInfo.Links) {
+    if (!sampleInfo->Links.empty()) {
+      for (auto link : sampleInfo->Links) {
         std::string btnUrlString = std::string(ICON_FA_EXTERNAL_LINK_ALT "##") + link;
         if (ImGui::Button(btnUrlString.c_str()))
           BABYLON::System::openBrowser(link);
@@ -205,7 +205,7 @@ private:
 
     ImGui::BeginGroup();
     ImGui::Text("%s", sampleName.c_str());
-    ImGui::TextWrapped("%s", sampleInfo.Brief.c_str());
+    ImGui::TextWrapped("%s", sampleInfo->Brief.c_str());
     auto failure = _samplesIndex.doesSampleFail(sampleName);
     if (failure)
     {
@@ -274,7 +274,7 @@ private:
     return r;
   }
 
-  std::map<SampleName, SampleInfo> _samplesInfos;
+  std::map<SampleName, std::shared_ptr<SampleInfo>> _samplesInfos;
   SamplesIndex & _samplesIndex;
   std::map<CategoryName, std::vector<SampleName>> _matchingSamples;
 

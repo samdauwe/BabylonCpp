@@ -1,9 +1,11 @@
 #include <babylon/samples/samples_index.h>
 
+#include <babylon/asio/asio.h>
 #include <babylon/babylon_common.h>
 #include <babylon/samples/babylon_register_sample.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/string.h>
+#include <babylon/core/logging.h>
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/babylon_common.h>
 #include <babylon/samples/samples_auto_declarations.h>
@@ -77,47 +79,74 @@ bool SamplesIndex::sampleExists(const std::string& sampleName) const
   return false;
 }
 
-nlohmann::json ReadSampleInfoFile()
+class SamplesInfoCache
 {
-  std::ifstream is(BABYLON::assets_folder() + "/samples_info.json");
-  if (is.good()) {
-    std::cout << "Found samples_info.json\n";
-    nlohmann::json j;
-    is >> j;
-    return j;
-  }
-  else
+public:
+  std::shared_ptr<SampleInfo> getSampleInfo(const std::string& sampleNameMixedCase)
   {
-    std::cout << "Not Found samples_info.json\n";
-    return nlohmann::json();
+    std::string name = lowerCaseName(sampleNameMixedCase);
+    if (cacheSampleInfo_.find(name) == cacheSampleInfo_.end())
+      cacheSampleInfo_[name] = std::make_shared<SampleInfo>();
+    return cacheSampleInfo_.at(name);
   }
-}
 
-SampleInfo SamplesIndex::getSampleInfo(const std::string& sampleNameMixedCase) const
-{
-  static nlohmann::json _samplesInfo = ReadSampleInfoFile();
-  static std::map<std::string, SampleInfo> cache;
+  static SamplesInfoCache& instance()
+  {
+    static SamplesInfoCache instance;
+    return instance;
+  }
 
-  std::string sampleNameLowerCase;
-  for (auto c : sampleNameMixedCase)
-    sampleNameLowerCase += static_cast<char>(std::tolower(c));
+private:
+  SamplesInfoCache()
+  {
+    std::cout << "SamplesInfoCache() 1 \n";
+    auto onSuccessLoad = [this](const std::string& jsonString) {
+      this->onJsonLoaded(jsonString);
+    };
+    auto onErrorLoad = [this](const std::string& errorMessage) {
+      this->onJsonErrorLoad(errorMessage);
+    };
+    std::cout << "SamplesInfoCache() 2 \n";
+    BABYLON::asio::LoadUrlAsync_Text("samples_info.json", onSuccessLoad, onErrorLoad);
+    std::cout << "SamplesInfoCache() 3 \n";
+  }
 
-  if (cache.find(sampleNameLowerCase) != cache.end())
-    return cache.at(sampleNameLowerCase);
+  std::string lowerCaseName(const std::string & sampleNameMixedCase)
+  {
+    std::string sampleNameLowerCase;
+    for (auto c : sampleNameMixedCase)
+      sampleNameLowerCase += static_cast<char>(std::tolower(c));
+    return sampleNameLowerCase;
+  }
 
-  SampleInfo result;
-  for (const auto& element : _samplesInfo) {
-    if (element["sample_name"] == sampleNameLowerCase) {
-      result.Brief      = element["brief"];
-      result.HeaderFile = element["header_file"];
-      result.SourceFile = element["source_file"];
+  void onJsonErrorLoad(const std::string &errorMessage)
+  {
+    BABYLON_LOG_ERROR("SamplesInfoCache", "Error while reading samples_info.json ==>", errorMessage.c_str());
+  }
+
+  void onJsonLoaded(const std::string &jsonString)
+  {
+    auto json_all_samples_info = nlohmann::json::parse(jsonString);
+    for (const auto& element : json_all_samples_info)
+    {
+      std::string name = element["sample_name"];
+      std::shared_ptr<SampleInfo> sampleInfo = getSampleInfo(name);
+      sampleInfo->Brief      = element["brief"];
+      sampleInfo->HeaderFile = element["header_file"];
+      sampleInfo->SourceFile = element["source_file"];
       for (const auto& link : element["links"]) {
-        result.Links.push_back(link);
+        sampleInfo->Links.push_back(link);
       }
     }
   }
-  cache[sampleNameLowerCase] = result;
-  return result;
+
+  std::map<std::string, std::shared_ptr<SampleInfo>> cacheSampleInfo_;
+  bool wasJsonLoadStarted = false;
+};
+
+std::shared_ptr<SampleInfo> SamplesIndex::getSampleInfo(const std::string& sampleName) const
+{
+  return SamplesInfoCache::instance().getSampleInfo(sampleName);
 }
 
 std::vector<std::string> SamplesIndex::getSampleNames() const
@@ -229,7 +258,11 @@ std::string SampleFailureReason_Str(SampleFailureReasonKind s)
 
 std::string SamplesProjectFolder()
 {
+#ifndef __EMSCRIPTEN__
   std::string folder = babylon_repo_folder() + "/src/Samples/";
+#else
+  std::string folder = "/SamplesProjectFolder/";
+#endif
   return folder;
 }
 

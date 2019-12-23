@@ -111,7 +111,7 @@ private:
     
     _studioLayout.registerGuiRenderFunction(
       DockableWindowId::SampleBrowser, 
-      [this]() { _appContext._sampleListComponent.render(); });
+      [this]() { _appContext.sampleListComponent().render(); });
     
 #ifdef BABYLON_BUILD_PLAYGROUND
     _studioLayout.registerGuiRenderFunction(
@@ -127,21 +127,21 @@ private:
   void initScene()
   {
     std::cout << "initScene 1 \n";
-    _appContext._sampleListComponent.OnNewRenderableScene
+    _appContext.sampleListComponent().OnNewRenderableScene
       = [&](std::shared_ptr<IRenderableScene> scene) {
           this->setRenderableScene(scene);
           _studioLayout.FocusWindow(DockableWindowId::Scene3d);
         };
     std::cout << "initScene 2 \n";
 
-    _appContext._sampleListComponent.OnEditFiles = [&](const std::vector<std::string>& files) {
+    _appContext.sampleListComponent().OnEditFiles = [&](const std::vector<std::string>& files) {
       _samplesCodeEditor.setFiles(files);
       _studioLayout.setVisible(DockableWindowId::SamplesCodeViewer, true);
       _studioLayout.FocusWindow(DockableWindowId::SamplesCodeViewer);
     };
     std::cout << "initScene 3 \n";
 
-    _appContext._sampleListComponent.OnLoopSamples = [&](const std::vector<std::string>& samples) {
+    _appContext.sampleListComponent().OnLoopSamples = [&](const std::vector<std::string>& samples) {
       _appContext._loopSamples.flagLoop      = true;
       _appContext._loopSamples.samplesToLoop = samples;
       _appContext._loopSamples.currentIdx    = 0;
@@ -359,16 +359,25 @@ private:
   struct AppContext {
     std::unique_ptr<BABYLON::ImGuiSceneWidget> _sceneWidget;
     std::unique_ptr<BABYLON::Inspector> _inspector;
-    BABYLON::SamplesBrowser _sampleListComponent;
     int _frameCounter = 0;
     BabylonStudioOptions _options;
     bool _isCompiling = false;
+
+    BABYLON::SamplesBrowser& sampleListComponent() {
+      if (!_sampleListComponent) {
+        _sampleListComponent = std::make_unique<BABYLON::SamplesBrowser>();
+      }
+      return *_sampleListComponent;
+    }
 
     struct {
       bool flagLoop     = false;
       size_t currentIdx = 0;
       std::vector<std::string> samplesToLoop;
     } _loopSamples;
+
+  private:
+    std::unique_ptr<BABYLON::SamplesBrowser> _sampleListComponent;
   };
 
   AppContext _appContext;
