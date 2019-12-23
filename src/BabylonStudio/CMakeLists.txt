@@ -12,12 +12,11 @@ if (EMSCRIPTEN)
 
     function(copy_static_assets)
         file(COPY ${repo_assets_folder}/fonts DESTINATION ${emscripten_static_assets_folder})
-        file(COPY ${repo_assets_folder}/samples_info.json DESTINATION ${emscripten_static_assets_folder}/)
+        file(COPY ${CMAKE_SOURCE_DIR}/src/Samples DESTINATION ${emscripten_static_assets_folder})
     endfunction()
 
     function(copy_http_assets)
         file(COPY ${repo_assets_folder} DESTINATION ${emscripten_http_assets_folder})
-        file(COPY ${CMAKE_SOURCE_DIR}/src/Samples DESTINATION ${emscripten_http_assets_folder})
     endfunction()
 
     copy_static_assets()

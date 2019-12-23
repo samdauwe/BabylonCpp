@@ -261,7 +261,7 @@ std::string SamplesProjectFolder()
 #ifndef __EMSCRIPTEN__
   std::string folder = babylon_repo_folder() + "/src/Samples/";
 #else
-  std::string folder = "/SamplesProjectFolder/";
+  std::string folder = "/emscripten_static_assets_folder/Samples/";
 #endif
   return folder;
 }
