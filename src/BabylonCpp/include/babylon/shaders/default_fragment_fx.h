@@ -349,6 +349,10 @@ vec3 reflectionColor = vec3(0., 0., 0.);
     float refractionFresnelTerm = computeFresnelTerm(viewDirectionW, normalW, refractionRightColor.a, refractionLeftColor.a);
 
     refractionColor *= refractionLeftColor.rgb * (1.0 - refractionFresnelTerm) + refractionFresnelTerm * refractionRightColor.rgb;
+
+)ShaderCode"
+R"ShaderCode(
+
 #endif
 
 #ifdef OPACITY

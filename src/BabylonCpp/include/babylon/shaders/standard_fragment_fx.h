@@ -328,6 +328,10 @@ vec4 textureDistorted(sampler2D tex, vec2 texcoord, vec2 direction, vec3 distort
         texture2D(tex, texcoord + direction * distortion.r).r,
         texture2D(tex, texcoord + direction * distortion.g).g,
         texture2D(tex, texcoord + direction * distortion.b).b,
+
+)ShaderCode"
+R"ShaderCode(
+
         1.0
     );
 }

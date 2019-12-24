@@ -251,6 +251,10 @@ void main(void) {
 
                 #ifdef MICROSURFACEMAP
                     vec4 microSurfaceTexel = texture2D(microSurfaceSampler, vMicroSurfaceSamplerUV + uvOffset) * vMicroSurfaceSamplerInfos.y;
+
+)ShaderCode"
+R"ShaderCode(
+
                     microSurface *= microSurfaceTexel.r;
                 #endif
 
@@ -422,6 +426,10 @@ void main(void) {
             vec3 reflectionVector = computeReflectionCoords(vec4(vPositionW, 1.0), anisotropicNormal);
         #else
             vec3 reflectionVector = computeReflectionCoords(vec4(vPositionW, 1.0), normalW);
+
+)ShaderCode"
+R"ShaderCode(
+
         #endif
 
         #ifdef REFLECTIONMAP_OPPOSITEZ
@@ -593,6 +601,10 @@ void main(void) {
             #else
                 float lodSheenReflectionNormalized = saturate(sheenReflectionLOD / log2(vReflectionMicrosurfaceInfos.x));
                 float lodSheenReflectionNormalizedDoubled = lodSheenReflectionNormalized * 2.0;
+
+)ShaderCode"
+R"ShaderCode(
+
 
                 vec4 environmentSheenMid = sampleReflection(reflectionSampler, reflectionCoords);
                 if(lodSheenReflectionNormalizedDoubled < 1.0){
@@ -766,6 +778,10 @@ void main(void) {
             #ifdef CLEARCOAT_TINT
                 // Used later on in the light fragment and ibl.
                 vec3 clearCoatVRefract = -refract(vPositionW, clearCoatNormalW, vClearCoatRefractionParams.y);
+
+)ShaderCode"
+R"ShaderCode(
+
                 // The order 1886 page 3.
                 float clearCoatNdotVRefract = absEps(dot(clearCoatNormalW, clearCoatVRefract));
                 vec3 absorption = vec3(0.);
@@ -976,6 +992,10 @@ void main(void) {
             // // Simulate Flat Surface
             // thickness /=  dot(refractionVector, -normalW);
 
+)ShaderCode"
+R"ShaderCode(
+
+
             // // Simulate Curved Surface
             // float NdotRefract = dot(normalW, refractionVector);
             // thickness *= -NdotRefract;
@@ -1172,6 +1192,10 @@ void main(void) {
     vec3 emissiveColorTex = texture2D(emissiveSampler, vEmissiveUV + uvOffset).rgb;
     finalEmissive *= toLinearSpace(emissiveColorTex.rgb);
     finalEmissive *=  vEmissiveInfos.y;
+
+)ShaderCode"
+R"ShaderCode(
+
 #endif
 
 // ______________________________ Ambient ________________________________________

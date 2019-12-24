@@ -277,6 +277,10 @@ float finalAlpha = alpha;
     float viewAngleToFloor = dot(normalW, normalize(vEyePosition - vBackgroundCenter));
 
     // Fade out the floor plane as the angle between the floor and the camera tends to 0 (starting from startAngle)
+
+)ShaderCode"
+R"ShaderCode(
+
     const float startAngle = 0.1;
     float fadeFactor = saturate(viewAngleToFloor/startAngle);
 

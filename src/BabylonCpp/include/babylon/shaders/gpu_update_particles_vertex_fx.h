@@ -337,6 +337,10 @@ void main() {
 #endif
 #endif
 
+
+)ShaderCode"
+R"ShaderCode(
+
 #ifdef NOISE
     outNoiseCoordinates1 = noiseCoordinates1;
     outNoiseCoordinates2 = noiseCoordinates2;

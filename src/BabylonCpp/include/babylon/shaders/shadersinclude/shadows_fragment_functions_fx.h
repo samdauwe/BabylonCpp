@@ -205,6 +205,10 @@ const char* shadowsFragmentFunctions
 
         float esm = 1.0 - clamp(exp(min(87., depthScale * shadowPixelDepth)) * shadowMapSample, 0., 1. - darkness);
 
+)ShaderCode"
+R"ShaderCode(
+
+
         return computeFallOff(esm, clipSpace.xy, frustumEdgeFalloff);
     }
 
@@ -364,6 +368,10 @@ const char* shadowsFragmentFunctions
 
             vec3(0., 0., 0.),
             vec3(0., 0., 0.),
+
+)ShaderCode"
+R"ShaderCode(
+
             vec3(0., 0., 0.),
             vec3(0., 0., 0.),
             vec3(0., 0., 0.),

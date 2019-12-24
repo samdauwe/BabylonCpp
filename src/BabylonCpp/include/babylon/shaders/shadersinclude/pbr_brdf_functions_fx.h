@@ -208,6 +208,10 @@ float normalDistributionFunction_TrowbridgeReitzGGX(float NdotH, float alphaG)
 
     // From smithVisibilityG1_TrowbridgeReitzGGX * dot / dot to cancel the cook
     // torrance denominator :-)
+
+)ShaderCode"
+R"ShaderCode(
+
     float smithVisibilityG1_TrowbridgeReitzGGXFast(float dot, float alphaG)
     {
         #ifdef MOBILE
