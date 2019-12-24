@@ -46,7 +46,6 @@ SceneInstrumentation::SceneInstrumentation(Scene* iScene)
     , captureCameraRenderTime{this, &SceneInstrumentation::get_captureCameraRenderTime,
                               &SceneInstrumentation::set_captureCameraRenderTime}
     , drawCallsCounter{this, &SceneInstrumentation::get_drawCallsCounter}
-    , textureCollisionsCounter{this, &SceneInstrumentation::get_textureCollisionsCounter}
     , _captureActiveMeshesEvaluationTime{false}
     , _captureRenderTargetsRenderTime{false}
     , _captureFrameTime{false}
@@ -108,7 +107,6 @@ SceneInstrumentation::SceneInstrumentation(Scene* iScene)
         }
 
         scene->getEngine()->_drawCalls.fetchNewFrame();
-        scene->getEngine()->_textureCollisions.fetchNewFrame();
       });
 
   // After render
@@ -474,11 +472,6 @@ void SceneInstrumentation::set_captureCameraRenderTime(bool value)
 PerfCounter& SceneInstrumentation::get_drawCallsCounter()
 {
   return scene->getEngine()->_drawCalls;
-}
-
-PerfCounter& SceneInstrumentation::get_textureCollisionsCounter()
-{
-  return scene->getEngine()->_textureCollisions;
 }
 
 void SceneInstrumentation::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextures*/)
