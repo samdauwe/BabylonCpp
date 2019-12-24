@@ -60,6 +60,7 @@ void main(void)
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_GLOW_BLUR_POST_PROCESS_FRAGMENT_FX_H

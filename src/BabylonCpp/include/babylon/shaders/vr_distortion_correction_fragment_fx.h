@@ -35,6 +35,7 @@ void main(void)
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_VR_DISTORTION_CORRECTION_FRAGMENT_FX_H

@@ -13,10 +13,9 @@ class AbstractMesh;
 class Effect;
 
 /**
- * @brief EffectFallbacks can be used to add fallbacks (properties to disable)
- * to certain properties when desired to improve performance. (Eg. Start at high
- * quality with reflection and fog, if fps is low, remove reflection, if still
- * low remove fog)
+ * @brief EffectFallbacks can be used to add fallbacks (properties to disable) to certain properties
+ * when desired to improve performance. (Eg. Start at high quality with reflection and fog, if fps
+ * is low, remove reflection, if still low remove fog)
  */
 class BABYLON_SHARED_EXPORT EffectFallbacks {
 
@@ -38,27 +37,25 @@ public:
 
   /**
    * @brief Adds a fallback on the specified property.
-   * @param rank The rank of the fallback (Lower ranks will be fallbacked to
-   * first)
+   * @param rank The rank of the fallback (Lower ranks will be fallbacked to first)
    * @param define The name of the define in the shader
    */
   void addFallback(unsigned int rank, const std::string& define);
 
   /**
    * @brief Sets the mesh to use CPU skinning when needing to fallback.
-   * @param rank The rank of the fallback (Lower ranks will be fallbacked to
-   * first)
+   * @param rank The rank of the fallback (Lower ranks will be fallbacked to first)
    * @param mesh The mesh to use the fallbacks.
    */
   void addCPUSkinningFallback(unsigned int rank, AbstractMesh* mesh);
 
   /**
-   * @brief Checks to see if more fallbacks are still availible.
+   * @brief Checks to see if more fallbacks are still available.
    */
-  [[nodiscard]] bool isMoreFallbacks() const;
+  [[nodiscard]] bool hasMoreFallbacks() const;
 
   /**
-   * @brief Removes the defines that shoould be removed when falling back.
+   * @brief Removes the defines that should be removed when falling back.
    * @param currentDefines defines the current define statements for the shader.
    * @param effect defines the current effect we try to compile
    * @returns The resulting defines with defines of the current rank removed.

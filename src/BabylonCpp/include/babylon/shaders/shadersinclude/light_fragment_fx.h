@@ -9,7 +9,7 @@ const char* lightFragment
   = R"ShaderCode(
 
 #ifdef LIGHT{X}
-    #if defined(SHADOWONLY) || (defined(LIGHTMAP) && defined(LIGHTMAPEXCLUDED{X}) && defined(LIGHTMAPNOSPECULAR{X}))
+    #if defined(SHADOWONLY) || defined(LIGHTMAP) && defined(LIGHTMAPEXCLUDED{X}) && defined(LIGHTMAPNOSPECULAR{X})
         //No light calculation
     #else
         #ifdef PBR
@@ -195,15 +195,15 @@ const char* lightFragment
                 specularBase += computeCustomSpecularLighting(info, specularBase, shadow);
             #endif
         #elif defined(LIGHTMAP) && defined(LIGHTMAPEXCLUDED{X})
-            diffuseBase += lightmapColor * shadow;
+            diffuseBase += lightmapColor.rgb * shadow;
             #ifdef SPECULARTERM
                 #ifndef LIGHTMAPNOSPECULAR{X}
-                    specularBase += info.specular * shadow * lightmapColor;
+                    specularBase += info.specular * shadow * lightmapColor.rgb;
                 #endif
             #endif
             #ifdef CLEARCOAT
                 #ifndef LIGHTMAPNOSPECULAR{X}
-                    clearCoatBase += info.clearCoat.rgb * shadow * lightmapColor;
+                    clearCoatBase += info.clearCoat.rgb * shadow * lightmapColor.rgb;
                 #endif
             #endif
             #ifdef SHEEN
@@ -227,6 +227,7 @@ const char* lightFragment
 #endif
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_LIGHT_FRAGMENT_FX_H

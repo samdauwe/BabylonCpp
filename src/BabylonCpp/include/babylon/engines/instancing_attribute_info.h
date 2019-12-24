@@ -7,8 +7,7 @@
 namespace BABYLON {
 
 /**
- * @brief Interface for attribute information associated with buffer
- * instanciation.
+ * @brief Interface for attribute information associated with buffer instanciation.
  */
 struct BABYLON_SHARED_EXPORT InstancingAttributeInfo {
   /**
@@ -22,15 +21,13 @@ struct BABYLON_SHARED_EXPORT InstancingAttributeInfo {
   int attributeSize;
 
   /**
-   * type of the attribute, gl.BYTE, gl.UNSIGNED_BYTE, gl.SHORT,
-   * gl.UNSIGNED_SHORT, gl.FIXED, gl.FLOAT.
-   * default is FLOAT
+   * type of the attribute, gl.BYTE, gl.UNSIGNED_BYTE, gl.SHORT, gl.UNSIGNED_SHORT, gl.FIXED,
+   * gl.FLOAT. default is FLOAT
    */
   unsigned int attribyteType = GL::FLOAT;
 
   /**
-   * normalization of fixed-point data. behavior unclear, use FALSE, default is
-   * FALSE
+   * normalization of fixed-point data. behavior unclear, use FALSE, default is FALSE
    */
   bool normalized = false;
 

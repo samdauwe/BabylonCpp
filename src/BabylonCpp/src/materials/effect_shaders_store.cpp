@@ -75,6 +75,7 @@
 #include <babylon/shaders/tonemap_fragment_fx.h>
 #include <babylon/shaders/volumetric_light_scattering_fragment_fx.h>
 #include <babylon/shaders/volumetric_light_scattering_pass_fragment_fx.h>
+#include <babylon/shaders/volumetric_light_scattering_pass_vertex_fx.h>
 #include <babylon/shaders/vr_distortion_correction_fragment_fx.h>
 #include <babylon/shaders/vr_multiview_to_singleview_fragment_fx.h>
 
@@ -173,6 +174,8 @@ std::unordered_map<std::string, std::string> EffectShadersStore::_shaders = {
    volumetricLightScatteringPixelShader},
   {"volumetricLightScatteringPassPixelShader",
    volumetricLightScatteringPassPixelShader},
+  {"volumetricLightScatteringPassVertexShader",
+   volumetricLightScatteringPassVertexShader},
   {"vrDistortionCorrectionPixelShader", vrDistortionCorrectionPixelShader},
   {"vrMultiviewToSingleviewPixelShader", vrMultiviewToSingleviewPixelShader}};
 

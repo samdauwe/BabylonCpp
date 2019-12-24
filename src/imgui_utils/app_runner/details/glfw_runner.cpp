@@ -18,27 +18,30 @@ namespace ImGuiUtils
 
       // Initialize OpenGL context
 #if __APPLE__
-  // GL 3.2
-      glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-      glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-      glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // 3.2+ only
-      glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // Required on Mac
+    // OpenGL ES 3.0
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+    glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_EGL_CONTEXT_API);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #else
-  // GL 3.3
-      glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-      glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-
-      // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // 3.2+ only
-      // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);           // 3.0+ only
+    // OpenGL ES 3.0
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+    glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_EGL_CONTEXT_API);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
     }
 
     std::string SelectGlslVersion()
     {
 #if __APPLE__    
-      const char* glsl_version = "#version 150"; // GL 3.2 + GLSL 150
+      const char* glsl_version = "#version 300 es"; //  WebGL 2.0
 #else    
-      const char* glsl_version = "#version 130"; // GL 3.0 + GLSL 130
+      const char* glsl_version = "#version 300 es"; //  WebGL 2.0
 #endif
       return std::string(glsl_version);
     }
@@ -107,10 +110,10 @@ namespace ImGuiUtils
 
     void Glad_Init()
     {
-      if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+      if (!gladLoadGLES2Loader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
         throw std::runtime_error("gladLoadGLLoader: Failed");
-      if (!GLAD_GL_VERSION_3_3)
-        throw(std::runtime_error("GLAD could not initialize OpenGl 3.3"));
+      if (!GLAD_GL_ES_VERSION_3_0)
+        throw(std::runtime_error("GLAD could not initialize OpenGl ES 3.0"));
     }
 
   } // namespace GlfwRunner

@@ -87,46 +87,38 @@ def processShaderFile(shaderPath, outputDir, definePath="BABYLON_SHADERS",
     eol = '\n'
     output = "#ifndef %s%s" % (defineName, eol)
     output += "#define %s%s%s" % (defineName, eol, eol)
-    if lines[0] == "#version 300 es":
-        output += "%s%s%s" % ("#include <babylon/shaders/shadersinclude/glsl_version_3.h>", eol, eol)
     output += "namespace BABYLON {%s%s" % (eol, eol)
     output += "extern const char* %s;%s%s" % (varName, eol, eol)
     output += "const char* %s%s  = " % (varName, eol)
-    output += "R\"ShaderCode(%s%s" % (eol, eol)
-    nb_shader_code_lines = 1
+    output += "R\"ShaderCode("
+    shader_code = "%s%s" % (eol, eol)
     # process first line
     if lines[0] == "precision highp float;":
-        output += "%s%s" % ("#ifdef GL_ES", eol)
-        output += "  %s%s" % (lines[0], eol)
-        output += "%s%s" % ("#endif", eol)
-        nb_shader_code_lines += 3
-    elif lines[0] == "#version 300 es":
-        output += "%s%s" % ("BABYLONCPP_GLSL_VERSION_3", eol)
-        nb_shader_code_lines += 1
+        shader_code += "%s%s" % ("#ifdef GL_ES", eol)
+        shader_code += "  %s%s" % (lines[0], eol)
+        shader_code += "%s%s" % ("#endif", eol)
     else:
         if len(lines) > 1:
-            output += "%s%s" % (lines[0], eol)
-            nb_shader_code_lines += 1
+            shader_code += "%s%s" % (lines[0], eol)
         else:
-            output += "%s%s%s" % (lines[0], eol, eol)
-            nb_shader_code_lines += 2
+            shader_code += "%s%s%s" % (lines[0], eol, eol)
     # process remainder of the shader file
     if len(lines) > 1:
         for i in range(1, len(lines)-1):
             if lines[i] == "precision highp float;":
-                output += "%s%s" % ("#ifdef GL_ES", eol)
-                output += "  %s%s" % (lines[i], eol)
-                output += "%s%s" % ("#endif", eol)
-                nb_shader_code_lines += 3
+                shader_code += "%s%s" % ("#ifdef GL_ES", eol)
+                shader_code += "  %s%s" % (lines[i], eol)
+                shader_code += "%s%s" % ("#endif", eol)
             else:
-                output += "%s%s" % (lines[i].replace("\t", " " * 4).rstrip(), eol)
-                nb_shader_code_lines += 1
-            if nb_shader_code_lines % 499 == 0:
+                shader_code += "%s%s" % (lines[i].replace("\t", " " * 4).rstrip(), eol)
+            if len(shader_code) > 65000:
+                output += shader_code
                 output += "%s)ShaderCode\"%s" % (eol, eol)
                 output += "R\"ShaderCode(%s%s" % (eol, eol)
-                nb_shader_code_lines = 1
-        output += "%s%s%s" % (lines[-1], eol, eol)
-    output += ")ShaderCode\";%s" % eol
+                shader_code = ""
+        shader_code += "%s%s%s" % (lines[-1], eol, eol)
+    output += shader_code
+    output += ")ShaderCode\";%s%s" % (eol, eol)
     output += "} // end of namespace BABYLON%s%s" % (eol, eol)
     output += "#endif // end of %s%s" % (defineName, eol)
     # write header file content to file

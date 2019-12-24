@@ -9,8 +9,7 @@ TEST(TestString, toCharCodes)
   using namespace BABYLON;
 
   const std::string s("Babylon.js");
-  const std::vector<uint8_t> expected{66,  97,  98, 121, 108,
-                                      111, 110, 46, 106, 115};
+  const std::vector<uint8_t> expected{66, 97, 98, 121, 108, 111, 110, 46, 106, 115};
   EXPECT_THAT(String::toCharCodes(s), ::testing::ContainerEq(expected));
 }
 
@@ -57,8 +56,7 @@ TEST(TestString, escapeStrings)
   using namespace BABYLON;
 
   const std::vector<std::string> input{",", "*", "||", ";", "\\"};
-  const std::vector<std::string> expected{",", "\\*", "\\|\\|", ";",
-                                              "\\\\"};
+  const std::vector<std::string> expected{",", "\\*", "\\|\\|", ";", "\\\\"};
 
   EXPECT_THAT(String::escape(input), ::testing::ContainerEq(expected));
 }
@@ -116,8 +114,7 @@ TEST(TestString, join)
 {
   using namespace BABYLON;
 
-  std::vector<std::string> v{"A", "B", "C", "D", "E",
-                                 "F", "G", "H", "I", "J"};
+  std::vector<std::string> v{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
   const std::string expected{"A,B,C,D,E,F,G,H,I,J"};
   EXPECT_EQ(String::join(v, ','), expected);
 }
@@ -159,8 +156,7 @@ TEST(TestString, printf)
   EXPECT_EQ(String::printf("%s", "Hello"), "Hello");
   EXPECT_EQ(String::printf("Pi = %.5lf", 3.14159), "Pi = 3.14159");
 
-  auto test = String::printf("Hello %s, did you know that pi equals %.2lf?\n",
-                             "User", 3.14159);
+  auto test = String::printf("Hello %s, did you know that pi equals %.2lf?\n", "User", 3.14159);
   std::string expected{"Hello User, did you know that pi equals 3.14?\n"};
   EXPECT_EQ(test, expected);
 }
@@ -207,18 +203,15 @@ TEST(TestString, regexMatch)
   {
     const std::string s{"#include<__decl__defaultFragment>"};
     const auto r = String::regexMatch(s, re);
-    const std::vector<std::string> e{
-      s, "__decl__defaultFragment", "", "", "", ""};
+    const std::vector<std::string> e{s, "__decl__defaultFragment", "", "", "", ""};
     EXPECT_THAT(r, ::testing::ContainerEq(e));
   }
 
   {
-    const std::string s{
-      "#include<__decl__lightFragment>[0..maxSimultaneousLights]"};
+    const std::string s{"#include<__decl__lightFragment>[0..maxSimultaneousLights]"};
     const auto r = String::regexMatch(s, re);
-    const std::vector<std::string> e{
-      s,  "__decl__lightFragment",      "",
-      "", "[0..maxSimultaneousLights]", "0..maxSimultaneousLights"};
+    const std::vector<std::string> e{s,  "__decl__lightFragment",      "",
+                                     "", "[0..maxSimultaneousLights]", "0..maxSimultaneousLights"};
     EXPECT_THAT(r, ::testing::ContainerEq(e));
   }
 }
@@ -228,8 +221,7 @@ TEST(TestString, regexReplace)
   using namespace BABYLON;
 
   {
-    const std::string s{
-      "#define CUSTOM_VERTEX_BEGIN\n\nattribute vec3 position;"};
+    const std::string s{"#define CUSTOM_VERTEX_BEGIN\n\nattribute vec3 position;"};
     const std::string regex{"attribute[ \t]"};
     const std::string r{String::regexReplace(s, regex, "in ")};
     const std::string e{"#define CUSTOM_VERTEX_BEGIN\n\nin vec3 position;"};
@@ -286,8 +278,8 @@ TEST(TestString, regexReplace)
 
   {
     const std::string s{"void main(void)"};
-    const std::string r{String::regexReplace(
-      s, "void\\s+?main\\(", "out vec4 glFragColor;\nvoid main(")};
+    const std::string r{
+      String::regexReplace(s, "void\\s+?main\\(", "out vec4 glFragColor;\nvoid main(")};
     const std::string e{"out vec4 glFragColor;\nvoid main(void)"};
     EXPECT_EQ(r, e);
   }
@@ -315,8 +307,8 @@ TEST(TestString, regexReplaceWithCallback)
   // Using free function
   {
     const std::string s{"1, 9, 19"};
-    const std::string r{String::regexReplace(
-      s, std::regex("\\d+", std::regex::optimize), my_callback)};
+    const std::string r{
+      String::regexReplace(s, std::regex("\\d+", std::regex::optimize), my_callback)};
     const std::string e{"2, 10, 20"};
     EXPECT_EQ(r, e);
   }
@@ -328,8 +320,8 @@ TEST(TestString, regexReplaceWithCallback)
       return std::to_string(int_m + 1);
     };
     const std::string s{"1, 9, 19"};
-    const std::string r{String::regexReplace(
-      s, std::regex(R"(\d+)", std::regex::optimize), callback)};
+    const std::string r{
+      String::regexReplace(s, std::regex(R"(\d+)", std::regex::optimize), callback)};
     const std::string e{"2, 10, 20"};
     EXPECT_EQ(r, e);
   }
@@ -361,8 +353,7 @@ TEST(TestString, regexReplaceWithCallback)
         const int cval = static_cast<int>((fval - 32) * 5.f / 9.f);
         return std::to_string(cval) + 'C';
       };
-      return String::regexReplace(
-        x, std::regex("(\\d+)F", std::regex::optimize), convert);
+      return String::regexReplace(x, std::regex("(\\d+)F", std::regex::optimize), convert);
     };
     EXPECT_EQ(f2c("212F"), "100C");
   }
@@ -370,14 +361,11 @@ TEST(TestString, regexReplaceWithCallback)
   // Example: number lines
   {
     const std::string s{"line1\nline2\nline3"};
-    int i               = 2;
-    const auto callback = [&i](const std::smatch& /*m*/) {
-      return "\n" + std::to_string(i++) + "\t";
-    };
+    int i = 2;
+    const auto callback
+      = [&i](const std::smatch& /*m*/) { return "\n" + std::to_string(i++) + "\t"; };
     const std::string r{
-      "1\t"
-      + String::regexReplace(s, std::regex("\n", std::regex::optimize),
-                             callback)};
+      "1\t" + String::regexReplace(s, std::regex("\n", std::regex::optimize), callback)};
     const std::string e{"1\tline1\n2\tline2\n3\tline3"};
     EXPECT_EQ(r, e);
   }
@@ -407,10 +395,8 @@ TEST(TestString, replace)
   using namespace BABYLON;
 
   // remove whitespace characters
-  std::string source{
-    "  gl_FragColor = vec4(rightFrag.rgb * leftFrag.rgb, 1.0);\n"};
-  std::string expected{
-    "gl_FragColor=vec4(rightFrag.rgb*leftFrag.rgb,1.0);\n"};
+  std::string source{"  gl_FragColor = vec4(rightFrag.rgb * leftFrag.rgb, 1.0);\n"};
+  std::string expected{"gl_FragColor=vec4(rightFrag.rgb*leftFrag.rgb,1.0);\n"};
   String::replaceInPlace(source, " ", "");
   EXPECT_EQ(source, expected);
 }
@@ -420,8 +406,7 @@ TEST(TestString, split)
   using namespace BABYLON;
 
   const std::string str{"A,B*CxD,E;F,G,H,I,J"};
-  std::vector<std::string> expected{"A", "B*CxD", "E;F", "G",
-                                        "H", "I",     "J"};
+  std::vector<std::string> expected{"A", "B*CxD", "E;F", "G", "H", "I", "J"};
   EXPECT_THAT(String::split(str, ','), ::testing::ContainerEq(expected));
 }
 
@@ -433,6 +418,36 @@ TEST(TestString, slice)
   EXPECT_EQ(String::slice(str), "Hello world!");
   EXPECT_EQ(String::slice(str, 0), "Hello world!");
   EXPECT_EQ(String::slice(str, 3), "lo world!");
+}
+
+TEST(TestString, stripComments)
+{
+  using namespace BABYLON;
+
+  {
+    const std::string str{"// A Comment"};
+    EXPECT_EQ(String::stripComments(str, "//"), "");
+  }
+
+  {
+    const std::string str{"    // A Comment"};
+    EXPECT_EQ(String::stripComments(str, "//"), "");
+  }
+
+  {
+    const std::string str{"Hello world! // A Comment"};
+    EXPECT_EQ(String::stripComments(str, "//"), "Hello world!");
+  }
+
+  {
+    const std::string str{"const float a = 1.0 / b;"};
+    EXPECT_EQ(String::stripComments(str, "//"), str);
+  }
+
+  {
+    const std::string str{"a /= b; // A Comment"};
+    EXPECT_EQ(String::stripComments(str, "//"), "a /= b;");
+  }
 }
 
 TEST(TestString, toLowerCase)

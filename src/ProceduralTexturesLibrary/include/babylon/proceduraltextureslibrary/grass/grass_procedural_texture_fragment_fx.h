@@ -49,6 +49,7 @@ void main(void) {
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_PROCEDURAL_TEXTURES_LIBRARY_GRASS_GRASS_PROCEDURAL_TEXTURE_FRAGMENT_FX_H

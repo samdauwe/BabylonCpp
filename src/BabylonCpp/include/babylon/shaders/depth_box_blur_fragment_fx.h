@@ -27,6 +27,7 @@ void main(void)
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_DEPTH_BOX_BLUR_FRAGMENT_FX_H

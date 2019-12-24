@@ -41,8 +41,7 @@ SubMesh::SubMesh(unsigned int iMaterialIndex, unsigned int iVerticesStart, size_
     , _linesIndexBuffer{nullptr}
     , _currentMaterial{nullptr}
 {
-  _renderingMesh
-    = renderingMesh ? renderingMesh : std::static_pointer_cast<Mesh>(mesh);
+  _renderingMesh = renderingMesh ? renderingMesh : std::static_pointer_cast<Mesh>(mesh);
 
   _id = mesh->subMeshes.size() /*- 1*/; // Submesh is not yet to the list
 
@@ -59,15 +58,13 @@ void SubMesh::addToMesh(const std::shared_ptr<SubMesh>& newSubMesh)
   _mesh->subMeshes.emplace_back(newSubMesh);
 }
 
-SubMeshPtr SubMesh::AddToMesh(unsigned int materialIndex,
-                              unsigned int verticesStart, size_t verticesCount,
-                              unsigned int indexStart, size_t indexCount,
-                              const AbstractMeshPtr& mesh,
-                              const MeshPtr& renderingMesh,
+SubMeshPtr SubMesh::AddToMesh(unsigned int materialIndex, unsigned int verticesStart,
+                              size_t verticesCount, unsigned int indexStart, size_t indexCount,
+                              const AbstractMeshPtr& mesh, const MeshPtr& renderingMesh,
                               bool createBoundingBox)
 {
-  return SubMesh::New(materialIndex, verticesStart, verticesCount, indexStart,
-                      indexCount, mesh, renderingMesh, createBoundingBox);
+  return SubMesh::New(materialIndex, verticesStart, verticesCount, indexStart, indexCount, mesh,
+                      renderingMesh, createBoundingBox);
 }
 
 bool SubMesh::isGlobal() const
@@ -108,7 +105,7 @@ MaterialPtr SubMesh::getMaterial()
     return _mesh->getScene()->defaultMaterial();
   }
   else if (rootMaterial && (rootMaterial->type() == Type::MULTIMATERIAL)) {
-    auto multiMaterial = std::static_pointer_cast<MultiMaterial>(rootMaterial);
+    auto multiMaterial     = std::static_pointer_cast<MultiMaterial>(rootMaterial);
     auto effectiveMaterial = multiMaterial->getSubMaterial(materialIndex);
 
     if (_currentMaterial != effectiveMaterial) {
@@ -131,9 +128,7 @@ SubMesh& SubMesh::refreshBoundingInfo(const Float32Array& iData)
     return *this;
   }
 
-  auto data = !iData.empty() ?
-                iData :
-                _renderingMesh->getVerticesData(VertexBuffer::PositionKind);
+  auto data = !iData.empty() ? iData : _renderingMesh->getVerticesData(VertexBuffer::PositionKind);
 
   if (data.empty()) {
     _boundingInfo = std::make_unique<BoundingInfo>(*_mesh->_boundingInfo);
@@ -155,9 +150,8 @@ SubMesh& SubMesh::refreshBoundingInfo(const Float32Array& iData)
     };
   }
   else {
-    extend
-      = extractMinAndMaxIndexed(data, indices, indexStart, indexCount,
-                                *_renderingMesh->geometry()->boundingBias());
+    extend = extractMinAndMaxIndexed(data, indices, indexStart, indexCount,
+                                     *_renderingMesh->geometry()->boundingBias());
   }
 
   if (_boundingInfo) {
@@ -190,8 +184,7 @@ SubMesh& SubMesh::updateBoundingInfo(const Matrix& world)
   return *this;
 }
 
-bool SubMesh::isInFrustum(const std::array<Plane, 6>& frustumPlanes,
-                          unsigned int /*strategy*/)
+bool SubMesh::isInFrustum(const std::array<Plane, 6>& frustumPlanes, unsigned int /*strategy*/)
 {
   auto boundingInfo = getBoundingInfo();
 
@@ -219,16 +212,14 @@ SubMesh& SubMesh::render(bool enableAlphaMode)
   return *this;
 }
 
-std::unique_ptr<GL::IGLBuffer>&
-SubMesh::_getLinesIndexBuffer(const IndicesArray& indices, Engine* engine)
+WebGLDataBufferPtr& SubMesh::_getLinesIndexBuffer(const IndicesArray& indices, Engine* engine)
 {
   if (!_linesIndexBuffer) {
     Uint32Array linesIndices;
 
     for (auto index = indexStart; index < indexStart + indexCount; index += 3) {
-      stl_util::concat(linesIndices, {indices[index + 0], indices[index + 1],
-                                      indices[index + 1], indices[index + 2],
-                                      indices[index + 2], indices[index + 0]});
+      stl_util::concat(linesIndices, {indices[index + 0], indices[index + 1], indices[index + 1],
+                                      indices[index + 2], indices[index + 2], indices[index + 0]});
     }
 
     _linesIndexBuffer = engine->createIndexBuffer(linesIndices);
@@ -249,9 +240,8 @@ bool SubMesh::canIntersects(const Ray& ray)
 }
 
 std::optional<IntersectionInfo>
-SubMesh::intersects(Ray& ray, const std::vector<Vector3>& positions,
-                    const Uint32Array& indices, bool fastCheck,
-                    const TrianglePickingPredicate& trianglePredicate)
+SubMesh::intersects(Ray& ray, const std::vector<Vector3>& positions, const Uint32Array& indices,
+                    bool fastCheck, const TrianglePickingPredicate& trianglePredicate)
 {
   std::optional<IntersectionInfo> intersectInfo = std::nullopt;
 
@@ -271,34 +261,27 @@ SubMesh::intersects(Ray& ray, const std::vector<Vector3>& positions,
   }
 
   // LineMesh first as it's also a Mesh...
-  if (_mesh->getClassName() == "InstancedLinesMesh"
-      || _mesh->getClassName() == "LinesMesh") {
-    auto intersectionThreshold
-      = std::static_pointer_cast<LinesMesh>(_mesh)->intersectionThreshold;
+  if (_mesh->getClassName() == "InstancedLinesMesh" || _mesh->getClassName() == "LinesMesh") {
+    auto intersectionThreshold = std::static_pointer_cast<LinesMesh>(_mesh)->intersectionThreshold;
     // Check if mesh is unindexed
     if (indices.empty()) {
-      return _intersectUnIndexedLines(ray, positions, indices,
-                                      intersectionThreshold, fastCheck);
+      return _intersectUnIndexedLines(ray, positions, indices, intersectionThreshold, fastCheck);
     }
-    return _intersectLines(ray, positions, indices, intersectionThreshold,
-                           fastCheck);
+    return _intersectLines(ray, positions, indices, intersectionThreshold, fastCheck);
   }
   else {
     // Check if mesh is unindexed
     if (indices.empty() && _mesh->_unIndexed) {
-      return _intersectUnIndexedTriangles(ray, positions, indices, fastCheck,
-                                          trianglePredicate);
+      return _intersectUnIndexedTriangles(ray, positions, indices, fastCheck, trianglePredicate);
     }
 
-    return _intersectTriangles(ray, positions, indices, fastCheck,
-                               trianglePredicate);
+    return _intersectTriangles(ray, positions, indices, fastCheck, trianglePredicate);
   }
 }
 
 std::optional<IntersectionInfo>
 SubMesh::_intersectLines(Ray& ray, const std::vector<Vector3>& positions,
-                         const IndicesArray& indices,
-                         float intersectionThreshold, bool fastCheck)
+                         const IndicesArray& indices, float intersectionThreshold, bool fastCheck)
 {
   std::optional<IntersectionInfo> intersectInfo = std::nullopt;
 
@@ -324,15 +307,15 @@ SubMesh::_intersectLines(Ray& ray, const std::vector<Vector3>& positions,
   return intersectInfo;
 }
 
-std::optional<IntersectionInfo> SubMesh::_intersectUnIndexedLines(
-  Ray& ray, const std::vector<Vector3>& positions,
-  const IndicesArray& /*indices*/, float intersectionThreshold, bool fastCheck)
+std::optional<IntersectionInfo>
+SubMesh::_intersectUnIndexedLines(Ray& ray, const std::vector<Vector3>& positions,
+                                  const IndicesArray& /*indices*/, float intersectionThreshold,
+                                  bool fastCheck)
 {
   std::optional<IntersectionInfo> intersectInfo = std::nullopt;
 
   // Line test
-  for (auto index = verticesStart; index < verticesStart + verticesCount;
-       index += 2) {
+  for (auto index = verticesStart; index < verticesStart + verticesCount; index += 2) {
     const auto& p0 = positions[index];
     const auto& p1 = positions[index + 1];
 
@@ -380,8 +363,7 @@ SubMesh::_intersectTriangles(Ray& ray, const std::vector<Vector3>& positions,
         continue;
       }
 
-      if (fastCheck || !intersectInfo
-          || currentIntersectInfo->distance < intersectInfo->distance) {
+      if (fastCheck || !intersectInfo || currentIntersectInfo->distance < intersectInfo->distance) {
         intersectInfo         = currentIntersectInfo;
         intersectInfo->faceId = index / 3;
 
@@ -395,10 +377,10 @@ SubMesh::_intersectTriangles(Ray& ray, const std::vector<Vector3>& positions,
   return intersectInfo;
 }
 
-std::optional<IntersectionInfo> SubMesh::_intersectUnIndexedTriangles(
-  Ray& ray, const std::vector<Vector3>& positions,
-  const IndicesArray& /*indices*/, bool fastCheck,
-  const TrianglePickingPredicate& trianglePredicate)
+std::optional<IntersectionInfo>
+SubMesh::_intersectUnIndexedTriangles(Ray& ray, const std::vector<Vector3>& positions,
+                                      const IndicesArray& /*indices*/, bool fastCheck,
+                                      const TrianglePickingPredicate& trianglePredicate)
 {
   std::optional<IntersectionInfo> intersectInfo = std::nullopt;
 
@@ -419,8 +401,7 @@ std::optional<IntersectionInfo> SubMesh::_intersectUnIndexedTriangles(
         continue;
       }
 
-      if (fastCheck || !intersectInfo
-          || currentIntersectInfo->distance < intersectInfo->distance) {
+      if (fastCheck || !intersectInfo || currentIntersectInfo->distance < intersectInfo->distance) {
         intersectInfo         = currentIntersectInfo;
         intersectInfo->faceId = index / 3;
 
@@ -442,12 +423,10 @@ void SubMesh::_rebuild()
 }
 
 // Clone
-SubMeshPtr SubMesh::clone(const AbstractMeshPtr& newMesh,
-                          const MeshPtr& newRenderingMesh)
+SubMeshPtr SubMesh::clone(const AbstractMeshPtr& newMesh, const MeshPtr& newRenderingMesh)
 {
-  auto result
-    = SubMesh::New(materialIndex, verticesStart, verticesCount, indexStart,
-                   indexCount, newMesh, newRenderingMesh, false);
+  auto result = SubMesh::New(materialIndex, verticesStart, verticesCount, indexStart, indexCount,
+                             newMesh, newRenderingMesh, false);
 
   if (!isGlobal()) {
     auto boundingInfo = getBoundingInfo();
@@ -456,8 +435,8 @@ SubMeshPtr SubMesh::clone(const AbstractMeshPtr& newMesh,
       return result;
     }
 
-    result->_boundingInfo = std::make_shared<BoundingInfo>(
-      boundingInfo->minimum, boundingInfo->maximum);
+    result->_boundingInfo
+      = std::make_shared<BoundingInfo>(boundingInfo->minimum, boundingInfo->maximum);
   }
 
   return result;
@@ -467,8 +446,8 @@ SubMeshPtr SubMesh::clone(const AbstractMeshPtr& newMesh,
 void SubMesh::dispose()
 {
   if (_linesIndexBuffer) {
-    _mesh->getScene()->getEngine()->_releaseBuffer(_linesIndexBuffer.get());
-    _linesIndexBuffer.reset(nullptr);
+    _mesh->getScene()->getEngine()->_releaseBuffer(_linesIndexBuffer);
+    _linesIndexBuffer = nullptr;
   }
 
   // Remove from mesh
@@ -480,18 +459,15 @@ std::string SubMesh::getClassName() const
   return "SubMesh";
 }
 
-SubMeshPtr SubMesh::CreateFromIndices(unsigned int materialIndex,
-                                      unsigned int startIndex,
-                                      size_t indexCount,
-                                      const AbstractMeshPtr& mesh,
+SubMeshPtr SubMesh::CreateFromIndices(unsigned int materialIndex, unsigned int startIndex,
+                                      size_t indexCount, const AbstractMeshPtr& mesh,
                                       const MeshPtr& renderingMesh)
 {
   auto minVertexIndex = std::numeric_limits<unsigned>::max();
   auto maxVertexIndex = std::numeric_limits<unsigned>::lowest();
 
-  auto whatWillRender
-    = renderingMesh ? renderingMesh : std::static_pointer_cast<Mesh>(mesh);
-  auto indices = whatWillRender->getIndices();
+  auto whatWillRender = renderingMesh ? renderingMesh : std::static_pointer_cast<Mesh>(mesh);
+  auto indices        = whatWillRender->getIndices();
 
   for (size_t index = startIndex; index < startIndex + indexCount; ++index) {
     auto& vertexIndex = indices[index];
@@ -504,9 +480,8 @@ SubMeshPtr SubMesh::CreateFromIndices(unsigned int materialIndex,
     }
   }
 
-  return SubMesh::New(materialIndex, minVertexIndex,
-                      maxVertexIndex - minVertexIndex + 1, startIndex,
-                      indexCount, mesh, renderingMesh);
+  return SubMesh::New(materialIndex, minVertexIndex, maxVertexIndex - minVertexIndex + 1,
+                      startIndex, indexCount, mesh, renderingMesh);
 }
 
 } // end of namespace BABYLON

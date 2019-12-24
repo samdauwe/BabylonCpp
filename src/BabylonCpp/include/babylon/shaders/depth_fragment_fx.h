@@ -15,6 +15,10 @@ uniform sampler2D diffuseSampler;
 
 varying float vDepthMetric;
 
+#ifdef PACKED
+    #include<packingFunctions>
+#endif
+
 void main(void)
 {
 #ifdef ALPHATEST
@@ -22,10 +26,23 @@ void main(void)
         discard;
 #endif
 
-    gl_FragColor = vec4(vDepthMetric, vDepthMetric * vDepthMetric, 0.0, 1.0);
+#ifdef NONLINEARDEPTH
+    #ifdef PACKED
+        gl_FragColor = pack(gl_FragCoord.z);
+    #else
+        gl_FragColor = vec4(gl_FragCoord.z, 0.0, 0.0, 0.0);
+    #endif
+#else
+    #ifdef PACKED
+        gl_FragColor = pack(vDepthMetric);
+    #else
+        gl_FragColor = vec4(vDepthMetric, 0.0, 0.0, 1.0);
+    #endif
+#endif
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_DEPTH_FRAGMENT_FX_H

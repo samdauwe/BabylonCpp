@@ -10,19 +10,17 @@ class Effect;
 class Engine;
 class ProceduralTexture;
 class VertexBuffer;
+class WebGLDataBuffer;
 using EffectPtr            = std::shared_ptr<Effect>;
 using ProceduralTexturePtr = std::shared_ptr<ProceduralTexture>;
 using VertexBufferPtr      = std::shared_ptr<VertexBuffer>;
-
-namespace GL {
-class IGLBuffer;
-} // end of namespace GL
+using WebGLDataBufferPtr   = std::shared_ptr<WebGLDataBuffer>;
 
 /**
  * @brief Procedural texturing is a way to programmatically create a texture.
- * There are 2 types of procedural textures: code-only, and code that references
- * some classic 2D images, sometimes calmpler' images. This is the base class of
- * any Procedural texture and contains most of the shareable code.
+ * There are 2 types of procedural textures: code-only, and code that references some classic 2D
+ * images, sometimes calmpler' images. This is the base class of any Procedural texture and contains
+ * most of the shareable code.
  * @see http://doc.babylonjs.com/how_to/how_to_use_procedural_textures
  */
 class BABYLON_SHARED_EXPORT ProceduralTexture : public Texture {
@@ -50,8 +48,7 @@ public:
   EffectPtr& getEffect();
 
   /**
-   * @brief Gets texture content (Use this function wisely as reading from a
-   * texture can be slow).
+   * @brief Gets texture content (Use this function wisely as reading from a texture can be slow).
    * @returns an ArrayBufferView (Uint8Array or Float32Array)
    */
   ArrayBufferView& getContent();
@@ -74,23 +71,22 @@ public:
   bool isReady() override;
 
   /**
-   * @brief Resets the refresh counter of the texture and start bak from
-   * scratch. Could be usefull to regenerate the texture if it is setup to
-   * render only once.
+   * @brief Resets the refresh counter of the texture and start back from scratch. Could be usefull
+   * to regenerate the texture if it is setup to render only once.
    */
   void resetRefreshCounter();
 
   /**
    * @brief Set the fragment shader to use in order to render the texture.
-   * @param fragment This can be set to a path (into the shader store) or to a
-   * json object containing a fragmentElement property.
+   * @param fragment This can be set to a path (into the shader store) or to a json object
+   * containing a fragmentElement property.
    */
   void setFragment(const std::unordered_map<std::string, std::string>& fragment);
 
   /**
    * @brief Set the fragment shader to use in order to render the texture.
-   * @param fragment This can be set to a path (into the shader store) or to a
-   * json object containing a fragmentElement property.
+   * @param fragment This can be set to a path (into the shader store) or to a json object
+   * containing a fragmentElement property.
    */
   void setFragment(const std::string& fragment);
 
@@ -114,15 +110,13 @@ public:
   /**
    * @brief Resize the texture to new value.
    * @param size Define the new size the texture should have
-   * @param generateMipMaps Define whether the new texture should create mip
-   * maps
+   * @param generateMipMaps Define whether the new texture should create mip maps
    */
   void resize(const Size& size, bool generateMipMaps);
 
   /**
    * @brief Set a texture in the shader program used to render.
-   * @param name Define the name of the uniform samplers as defined in the
-   * shader
+   * @param name Define the name of the uniform samplers as defined in the shader
    * @param texture Define the texture to bind to this sampler
    * @return the texture itself allowing "fluent" like uniform updates
    */
@@ -213,11 +207,10 @@ public:
 protected:
   /**
    * @brief Instantiates a new procedural texture.
-   * Procedural texturing is a way to programmatically create a texture. There
-   * are 2 types of procedural textures: code-only, and code that references
-   * some classic 2D images, sometimes called 'refMaps' or 'sampler' images.
-   * This is the base class of any Procedural texture and contains most of the
-   * shareable code.
+   * Procedural texturing is a way to programmatically create a texture. There are 2 types of
+   * procedural textures: code-only, and code that references some classic 2D images, sometimes
+   * called 'refMaps' or 'sampler' images. This is the base class of any Procedural texture and
+   * contains most of the shareable code.
    * @see http://doc.babylonjs.com/how_to/how_to_use_procedural_textures
    * @param name  Define the name of the texture
    * @param size Define the size of the texture to create
@@ -240,15 +233,15 @@ protected:
 
   /**
    * @brief Define the refresh rate of the texture or the rendering frequency.
-   * Use 0 to render just once, 1 to render on every frame, 2 to render every
-   * two frames and so on...
+   * Use 0 to render just once, 1 to render on every frame, 2 to render every two frames and so
+   * on...
    */
   float get_refreshRate() const;
 
   /**
    * @brief Define the refresh rate of the texture or the rendering frequency.
-   * Use 0 to render just once, 1 to render on every frame, 2 to render every
-   * two frames and so on...
+   * Use 0 to render just once, 1 to render on every frame, 2 to render every two frames and so
+   * on...
    */
   void set_refreshRate(float value);
 
@@ -301,8 +294,8 @@ public:
 
   /**
    * Define the refresh rate of the texture or the rendering frequency.
-   * Use 0 to render just once, 1 to render on every frame, 2 to render every
-   * two frames and so on...
+   * Use 0 to render just once, 1 to render on every frame, 2 to render every two frames and so
+   * on...
    */
   Property<ProceduralTexture, float> refreshRate;
 
@@ -312,7 +305,7 @@ private:
   int _currentRefreshId;
   float _refreshRate;
   std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
-  std::unique_ptr<GL::IGLBuffer> _indexBuffer;
+  WebGLDataBufferPtr _indexBuffer;
   std::vector<std::string> _uniforms;
   std::vector<std::string> _samplers;
   std::unordered_map<std::string, std::string> _fragment;

@@ -316,6 +316,7 @@ vec4 color = vec4(finalColor, finalAlpha);
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_BACKGROUND_FRAGMENT_FX_H

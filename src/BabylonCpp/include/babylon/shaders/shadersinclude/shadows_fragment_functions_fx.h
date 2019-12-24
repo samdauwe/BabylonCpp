@@ -10,6 +10,7 @@ const char* shadowsFragmentFunctions
 
 #ifdef SHADOWS
     #ifndef SHADOWFLOAT
+        // Dupplicate to prevent include in include issues
         float unpack(vec4 color)
         {
             const vec4 bit_shift = vec4(1.0 / (255.0 * 255.0 * 255.0), 1.0 / (255.0 * 255.0), 1.0 / 255.0, 1.0);
@@ -326,8 +327,7 @@ const char* shadowsFragmentFunctions
             shadow = mix(darkness, 1., shadow);
             return computeFallOff(shadow, clipSpace.xy, frustumEdgeFalloff);
         }
-)ShaderCode"
-R"ShaderCode(
+
         const vec3 PoissonSamplers32[64] = vec3[64](
             vec3(0.06407013, 0.05409927, 0.),
             vec3(0.7366577, 0.5789394, 0.),
@@ -507,10 +507,6 @@ R"ShaderCode(
             float shadow = 0.;
             for (int i = 0; i < pcfTapCount; i++) {
                 vec3 offset = poissonSamplers[i];
-
-)ShaderCode"
-R"ShaderCode(
-
                 // Rotated offset.
                 offset = vec3(offset.x * rotationVector.x - offset.y * rotationVector.y, offset.y * rotationVector.x + offset.x * rotationVector.y, 0.);
                 shadow += texture2D(shadowSampler, uvDepth + offset * filterRadius);
@@ -545,6 +541,7 @@ R"ShaderCode(
 #endif
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_SHADOWS_FRAGMENT_FUNCTIONS_FX_H

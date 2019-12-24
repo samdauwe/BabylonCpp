@@ -18,6 +18,7 @@
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
+#include <babylon/meshes/webgl/webgl_data_buffer.h>
 #include <babylon/misc/guid.h>
 
 namespace BABYLON {
@@ -274,14 +275,14 @@ void Geometry::_updateBoundingInfo(bool updateExtends, const Float32Array& data)
   }
 }
 
-void Geometry::_bind(const EffectPtr& effect, GL::IGLBuffer* indexToBind)
+void Geometry::_bind(const EffectPtr& effect, WebGLDataBufferPtr indexToBind)
 {
   if (!effect) {
     return;
   }
 
   if (indexToBind == nullptr) {
-    indexToBind = _indexBuffer.get();
+    indexToBind = _indexBuffer;
   }
 
   auto vbs = getVertexBuffers();
@@ -290,7 +291,7 @@ void Geometry::_bind(const EffectPtr& effect, GL::IGLBuffer* indexToBind)
     return;
   }
 
-  if (indexToBind != _indexBuffer.get() /*|| _vertexArrayObjects.empty()*/) {
+  if (indexToBind != _indexBuffer /*|| _vertexArrayObjects.empty()*/) {
     _engine->bindBuffers(vbs, indexToBind, effect);
     return;
   }
@@ -425,7 +426,7 @@ AbstractMesh* Geometry::setIndices(const IndicesArray& indices, size_t totalVert
                                    bool updatable)
 {
   if (_indexBuffer) {
-    _engine->_releaseBuffer(_indexBuffer.get());
+    _engine->_releaseBuffer(_indexBuffer);
   }
 
   _disposeVertexArrayObjects();
@@ -433,7 +434,7 @@ AbstractMesh* Geometry::setIndices(const IndicesArray& indices, size_t totalVert
   _indices                = indices;
   _indexBufferIsUpdatable = updatable;
   if (!_meshes.empty()) {
-    _indexBuffer = std::unique_ptr<GL::IGLBuffer>(_engine->createIndexBuffer(_indices, updatable));
+    _indexBuffer = _engine->createIndexBuffer(_indices, updatable);
   }
 
   if (totalVertices != 0) { // including null and undefined
@@ -472,12 +473,12 @@ IndicesArray Geometry::getIndices(bool copyWhenShared, bool forceCopy)
   }
 }
 
-GL::IGLBuffer* Geometry::getIndexBuffer()
+WebGLDataBufferPtr Geometry::getIndexBuffer()
 {
   if (!isReady()) {
     return nullptr;
   }
-  return _indexBuffer.get();
+  return _indexBuffer;
 }
 
 void Geometry::_releaseVertexArrayObject(const EffectPtr& effect)
@@ -577,7 +578,7 @@ void Geometry::_applyToMesh(Mesh* mesh)
 
   // indexBuffer
   if (numOfMeshes == 1 && !_indices.empty()) {
-    _indexBuffer = std::unique_ptr<GL::IGLBuffer>(_engine->createIndexBuffer(_indices));
+    _indexBuffer = _engine->createIndexBuffer(_indices);
   }
   if (_indexBuffer) {
     _indexBuffer->references = numOfMeshes;
@@ -711,7 +712,7 @@ void Geometry::dispose()
   _totalVertices = 0;
 
   if (_indexBuffer) {
-    _engine->_releaseBuffer(_indexBuffer.get());
+    _engine->_releaseBuffer(_indexBuffer);
   }
   _indexBuffer = nullptr;
   _indices.clear();

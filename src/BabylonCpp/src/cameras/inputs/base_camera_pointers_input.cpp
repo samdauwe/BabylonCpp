@@ -10,8 +10,7 @@ namespace BABYLON {
 
 template <class TCamera>
 BaseCameraPointersInput<TCamera>::BaseCameraPointersInput()
-    : buttons{{MouseButtonType::LEFT, MouseButtonType::MIDDLE,
-               MouseButtonType::RIGHT}}
+    : buttons{{MouseButtonType::LEFT, MouseButtonType::MIDDLE, MouseButtonType::RIGHT}}
     , _altKey{false}
     , _ctrlKey{false}
     , _metaKey{false}
@@ -45,8 +44,7 @@ std::string BaseCameraPointersInput<TCamera>::getSimpleName() const
 }
 
 template <class TCamera>
-void BaseCameraPointersInput<TCamera>::attachControl(ICanvas* element,
-                                                     bool noPreventDefault)
+void BaseCameraPointersInput<TCamera>::attachControl(ICanvas* element, bool noPreventDefault)
 {
   _element                       = element;
   _noPreventDefault              = noPreventDefault;
@@ -67,13 +65,8 @@ void BaseCameraPointersInput<TCamera>::attachControl(ICanvas* element,
     auto& evt    = p->pointerEvent;
     auto isTouch = evt.pointerType == PointerType::TOUCH;
 
-    if (_engine->isInVRExclusivePointerMode()) {
-      return;
-    }
-
     if (p->type != PointerEventTypes::POINTERMOVE
-        && (std::find(buttons.begin(), buttons.end(), evt.button)
-            == buttons.end())) {
+        && (std::find(buttons.begin(), buttons.end(), evt.button) == buttons.end())) {
       return;
     }
 
@@ -158,8 +151,7 @@ void BaseCameraPointersInput<TCamera>::attachControl(ICanvas* element,
         }
       }
 
-      if (_previousPinchSquaredDistance != 0.f
-          || _previousMultiTouchPanPosition) {
+      if (_previousPinchSquaredDistance != 0.f || _previousMultiTouchPanPosition) {
         // Previous pinch data is populated but a button has been lifted
         // so pinch has ended.
         onMultiTouch(pointA, pointB, _previousPinchSquaredDistance,
@@ -193,11 +185,11 @@ void BaseCameraPointersInput<TCamera>::attachControl(ICanvas* element,
       }
       // Two buttons down: pinch
       else if (pointA && pointB) {
-        auto ed    = (pointA->pointerId == evt.pointerId) ? pointA : pointB;
-        ed->x      = evt.clientX;
-        ed->y      = evt.clientY;
-        auto distX = pointA->x - pointB->x;
-        auto distY = pointA->y - pointB->y;
+        auto ed                    = (pointA->pointerId == evt.pointerId) ? pointA : pointB;
+        ed->x                      = evt.clientX;
+        ed->y                      = evt.clientY;
+        auto distX                 = pointA->x - pointB->x;
+        auto distY                 = pointA->y - pointB->y;
         auto pinchSquaredDistance  = static_cast<float>((distX * distX) + (distY * distY));
         auto multiTouchPanPosition = PointerTouch{
           (pointA->x + pointB->x) / 2, // x
@@ -206,9 +198,8 @@ void BaseCameraPointersInput<TCamera>::attachControl(ICanvas* element,
           evt.pointerType              // pointerType
         };
 
-        onMultiTouch(pointA, pointB, _previousPinchSquaredDistance,
-                     pinchSquaredDistance, _previousMultiTouchPanPosition,
-                     multiTouchPanPosition);
+        onMultiTouch(pointA, pointB, _previousPinchSquaredDistance, pinchSquaredDistance,
+                     _previousMultiTouchPanPosition, multiTouchPanPosition);
 
         _previousMultiTouchPanPosition = multiTouchPanPosition;
         _previousPinchSquaredDistance  = pinchSquaredDistance;
@@ -216,11 +207,10 @@ void BaseCameraPointersInput<TCamera>::attachControl(ICanvas* element,
     }
   };
 
-  _observer
-    = ICameraInput<TCamera>::camera->getScene()->onPointerObservable.add(
-      _pointerInput, static_cast<int>(PointerEventTypes::POINTERDOWN)
-                       | static_cast<int>(PointerEventTypes::POINTERUP)
-                       | static_cast<int>(PointerEventTypes::POINTERMOVE));
+  _observer = ICameraInput<TCamera>::camera->getScene()->onPointerObservable.add(
+    _pointerInput, static_cast<int>(PointerEventTypes::POINTERDOWN)
+                     | static_cast<int>(PointerEventTypes::POINTERUP)
+                     | static_cast<int>(PointerEventTypes::POINTERMOVE));
 
   _onLostFocus = [this](const FocusEvent&) {
     pointA = pointB                = std::nullopt;
@@ -247,8 +237,7 @@ void BaseCameraPointersInput<TCamera>::detachControl(ICanvas* element)
   }
 
   if (element && _observer) {
-    ICameraInput<TCamera>::camera->getScene()->onPointerObservable.remove(
-      _observer);
+    ICameraInput<TCamera>::camera->getScene()->onPointerObservable.remove(_observer);
     _observer = nullptr;
 
     /*if (onContextMenu) {
@@ -276,16 +265,14 @@ void BaseCameraPointersInput<TCamera>::onDoubleTap(const std::string& /*type*/)
 }
 
 template <class TCamera>
-void BaseCameraPointersInput<TCamera>::onTouch(
-  const std::optional<PointerTouch>& /*point*/, int /*offsetX*/,
-  int /*offsetY*/)
+void BaseCameraPointersInput<TCamera>::onTouch(const std::optional<PointerTouch>& /*point*/,
+                                               int /*offsetX*/, int /*offsetY*/)
 {
 }
 
 template <class TCamera>
 void BaseCameraPointersInput<TCamera>::onMultiTouch(
-  const std::optional<PointerTouch>& /*pointA*/,
-  const std::optional<PointerTouch>& /*pointB*/,
+  const std::optional<PointerTouch>& /*pointA*/, const std::optional<PointerTouch>& /*pointB*/,
   float /*previousPinchSquaredDistance*/, float /*pinchSquaredDistance*/,
   const std::optional<PointerTouch>& /*previousMultiTouchPanPosition*/,
   const std::optional<PointerTouch>& /*multiTouchPanPosition*/)

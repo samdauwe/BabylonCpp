@@ -13,6 +13,7 @@ layout(location = 0) out vec4 glFragData[{X}];
 #endif
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_MRT_FRAGMENT_DECLARATION_FX_H

@@ -48,6 +48,7 @@ void main(void)
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_CONVOLUTION_FRAGMENT_FX_H

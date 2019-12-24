@@ -13,8 +13,7 @@
 namespace BABYLON {
 
 EdgesRenderer::EdgesRenderer(const AbstractMeshPtr& source, float epsilon,
-                             bool checkVerticesInsteadOfIndices,
-                             bool generateEdgesLines)
+                             bool checkVerticesInsteadOfIndices, bool generateEdgesLines)
     : edgesWidthScalerForOrthographic{1000.f}
     , edgesWidthScalerForPerspective{50.f}
     , _source{source}
@@ -33,8 +32,8 @@ EdgesRenderer::EdgesRenderer(const AbstractMeshPtr& source, float epsilon,
   _meshRebuildObserver = _source->onRebuildObservable.add(
     [this](AbstractMesh* /*mesh*/, EventState& /*es*/) { _rebuild(); });
 
-  _meshDisposeObserver = _source->onDisposeObservable.add(
-    [this](Node* /*node*/, EventState& /*es*/) { dispose(); });
+  _meshDisposeObserver
+    = _source->onDisposeObservable.add([this](Node* /*node*/, EventState& /*es*/) { dispose(); });
 }
 
 EdgesRenderer::~EdgesRenderer() = default;
@@ -47,11 +46,10 @@ void EdgesRenderer::_prepareResources()
 
   IShaderMaterialOptions shaderMaterialOptions;
   shaderMaterialOptions.attributes = {"position", "normal"};
-  shaderMaterialOptions.uniforms
-    = {"worldViewProjection", "color", "width", "aspectRatio"};
+  shaderMaterialOptions.uniforms   = {"worldViewProjection", "color", "width", "aspectRatio"};
 
-  _lineShader = ShaderMaterial::New("lineShader", _source->getScene(), "line",
-                                    shaderMaterialOptions);
+  _lineShader
+    = ShaderMaterial::New("lineShader", _source->getScene(), "line", shaderMaterialOptions);
 
   _lineShader->disableDepthWrite = true;
   _lineShader->backFaceCulling   = false;
@@ -59,8 +57,7 @@ void EdgesRenderer::_prepareResources()
 
 void EdgesRenderer::_rebuild()
 {
-  for (auto bufferKind :
-       {VertexBuffer::PositionKind, VertexBuffer::NormalKind}) {
+  for (auto bufferKind : {VertexBuffer::PositionKind, VertexBuffer::NormalKind}) {
     if (stl_util::contains(_buffers, bufferKind)) {
       auto& buffer = _buffers[bufferKind];
       if (buffer) {
@@ -74,8 +71,7 @@ void EdgesRenderer::_rebuild()
   _ib         = engine->createIndexBuffer(_linesIndices);
 }
 
-void EdgesRenderer::dispose(bool /*doNotRecurse*/,
-                            bool /*disposeMaterialAndTextures*/)
+void EdgesRenderer::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextures*/)
 {
   _source->onRebuildObservable.remove(_meshRebuildObserver);
   _source->onDisposeObservable.remove(_meshDisposeObserver);
@@ -99,14 +95,13 @@ void EdgesRenderer::dispose(bool /*doNotRecurse*/,
   _buffers.clear();
 
   if (_ib) {
-    _source->getScene()->getEngine()->_releaseBuffer(_ib.get());
+    _source->getScene()->getEngine()->_releaseBuffer(_ib);
   }
   _lineShader->dispose();
 }
 
-int EdgesRenderer::_processEdgeForAdjacencies(unsigned int pa, unsigned int pb,
-                                              unsigned int p0, unsigned int p1,
-                                              unsigned int p2)
+int EdgesRenderer::_processEdgeForAdjacencies(unsigned int pa, unsigned int pb, unsigned int p0,
+                                              unsigned int p1, unsigned int p2)
 {
   if ((pa == p0 && pb == p1) || (pa == p1 && pb == p0)) {
     return 0;
@@ -123,10 +118,8 @@ int EdgesRenderer::_processEdgeForAdjacencies(unsigned int pa, unsigned int pb,
   return -1;
 }
 
-int EdgesRenderer::_processEdgeForAdjacenciesWithVertices(const Vector3& pa,
-                                                          const Vector3& pb,
-                                                          const Vector3& p0,
-                                                          const Vector3& p1,
+int EdgesRenderer::_processEdgeForAdjacenciesWithVertices(const Vector3& pa, const Vector3& pb,
+                                                          const Vector3& p0, const Vector3& p1,
                                                           const Vector3& p2)
 {
   if ((pa.equalsWithEpsilon(p0) && pb.equalsWithEpsilon(p1))
@@ -147,8 +140,7 @@ int EdgesRenderer::_processEdgeForAdjacenciesWithVertices(const Vector3& pa,
   return -1;
 }
 
-void EdgesRenderer::_checkEdge(size_t faceIndex, int edge,
-                               const std::vector<Vector3>& faceNormals,
+void EdgesRenderer::_checkEdge(size_t faceIndex, int edge, const std::vector<Vector3>& faceNormals,
                                const Vector3& p0, const Vector3& p1)
 {
   auto needToCreateLine = false;
@@ -157,8 +149,7 @@ void EdgesRenderer::_checkEdge(size_t faceIndex, int edge,
     needToCreateLine = true;
   }
   else {
-    auto dotProduct  = Vector3::Dot(faceNormals[faceIndex],
-                                   faceNormals[static_cast<size_t>(edge)]);
+    auto dotProduct  = Vector3::Dot(faceNormals[faceIndex], faceNormals[static_cast<size_t>(edge)]);
     needToCreateLine = dotProduct < _epsilon;
   }
 
@@ -168,8 +159,7 @@ void EdgesRenderer::_checkEdge(size_t faceIndex, int edge,
   }
 }
 
-void EdgesRenderer::createLine(const Vector3& p0, const Vector3& p1,
-                               uint32_t offset)
+void EdgesRenderer::createLine(const Vector3& p0, const Vector3& p1, uint32_t offset)
 {
   // Positions
   stl_util::concat(_linesPositions, {
@@ -217,17 +207,13 @@ void EdgesRenderer::_generateEdgesLines()
     _faceAdjacencies.edges = {0, 0, 0};
 
     _faceAdjacencies.p0
-      = Vector3(positions[p0Index * 3 + 0], positions[p0Index * 3 + 1],
-                positions[p0Index * 3 + 2]);
+      = Vector3(positions[p0Index * 3 + 0], positions[p0Index * 3 + 1], positions[p0Index * 3 + 2]);
     _faceAdjacencies.p1
-      = Vector3(positions[p1Index * 3 + 0], positions[p1Index * 3 + 1],
-                positions[p1Index * 3 + 2]);
+      = Vector3(positions[p1Index * 3 + 0], positions[p1Index * 3 + 1], positions[p1Index * 3 + 2]);
     _faceAdjacencies.p2
-      = Vector3(positions[p2Index * 3 + 0], positions[p2Index * 3 + 1],
-                positions[p2Index * 3 + 2]);
-    auto faceNormal
-      = Vector3::Cross(_faceAdjacencies.p1.subtract(_faceAdjacencies.p0),
-                       _faceAdjacencies.p2.subtract(_faceAdjacencies.p1));
+      = Vector3(positions[p2Index * 3 + 0], positions[p2Index * 3 + 1], positions[p2Index * 3 + 2]);
+    auto faceNormal = Vector3::Cross(_faceAdjacencies.p1.subtract(_faceAdjacencies.p0),
+                                     _faceAdjacencies.p2.subtract(_faceAdjacencies.p1));
 
     faceNormal.normalize();
 
@@ -239,8 +225,7 @@ void EdgesRenderer::_generateEdgesLines()
   for (unsigned int index = 0; index < adjacencies.size(); ++index) {
     auto& faceAdjacencies = adjacencies[index];
 
-    for (unsigned int otherIndex = index + 1; otherIndex < adjacencies.size();
-         ++otherIndex) {
+    for (unsigned int otherIndex = index + 1; otherIndex < adjacencies.size(); ++otherIndex) {
       auto& otherFaceAdjacencies = adjacencies[otherIndex];
 
       if (faceAdjacencies.edgesConnectedCount == 3) { // Full
@@ -271,8 +256,7 @@ void EdgesRenderer::_generateEdgesLines()
             }
             else {
               otherEdgeIndex = _processEdgeForAdjacencies(
-                indices[index * 3], indices[index * 3 + 1], otherP0, otherP1,
-                otherP2);
+                indices[index * 3], indices[index * 3 + 1], otherP0, otherP1, otherP2);
             }
             break;
           case 1:
@@ -283,8 +267,7 @@ void EdgesRenderer::_generateEdgesLines()
             }
             else {
               otherEdgeIndex = _processEdgeForAdjacencies(
-                indices[index * 3 + 1], indices[index * 3 + 2], otherP0,
-                otherP1, otherP2);
+                indices[index * 3 + 1], indices[index * 3 + 2], otherP0, otherP1, otherP2);
             }
             break;
           case 2:
@@ -296,8 +279,7 @@ void EdgesRenderer::_generateEdgesLines()
             }
             else {
               otherEdgeIndex = _processEdgeForAdjacencies(
-                indices[index * 3 + 2], indices[index * 3], otherP0, otherP1,
-                otherP2);
+                indices[index * 3 + 2], indices[index * 3], otherP0, otherP1, otherP2);
             }
         }
 
@@ -306,8 +288,7 @@ void EdgesRenderer::_generateEdgesLines()
         }
 
         faceAdjacencies.edges[edgeIndex] = static_cast<int>(otherIndex);
-        otherFaceAdjacencies.edges[static_cast<size_t>(otherEdgeIndex)]
-          = static_cast<int>(index);
+        otherFaceAdjacencies.edges[static_cast<size_t>(otherEdgeIndex)] = static_cast<int>(index);
 
         ++faceAdjacencies.edgesConnectedCount;
         ++otherFaceAdjacencies.edgesConnectedCount;
@@ -333,8 +314,8 @@ void EdgesRenderer::_generateEdgesLines()
   // Merge into a single mesh
   auto engine = _source->getScene()->getEngine();
 
-  _buffers[VertexBuffer::PositionKind] = std::make_shared<VertexBuffer>(
-    engine, _linesPositions, VertexBuffer::PositionKind, false);
+  _buffers[VertexBuffer::PositionKind]
+    = std::make_shared<VertexBuffer>(engine, _linesPositions, VertexBuffer::PositionKind, false);
   _buffers[VertexBuffer::NormalKind] = std::make_shared<VertexBuffer>(
     engine, _linesNormals, VertexBuffer::NormalKind, false, false, 4);
 
@@ -367,27 +348,23 @@ void EdgesRenderer::render()
   }
 
   // VBOs
-  engine->bindBuffers(_buffers, _ib.get(), _lineShader->getEffect());
+  engine->bindBuffers(_buffers, _ib, _lineShader->getEffect());
 
   scene->resetCachedMaterial();
   _lineShader->setColor4("color", _source->edgesColor);
 
   if (scene->activeCamera()->mode == Camera::ORTHOGRAPHIC_CAMERA) {
-    _lineShader->setFloat("width", _source->edgesWidth
-                                     / edgesWidthScalerForOrthographic);
+    _lineShader->setFloat("width", _source->edgesWidth / edgesWidthScalerForOrthographic);
   }
   else {
-    _lineShader->setFloat("width",
-                          _source->edgesWidth / edgesWidthScalerForPerspective);
+    _lineShader->setFloat("width", _source->edgesWidth / edgesWidthScalerForPerspective);
   }
 
-  _lineShader->setFloat("aspectRatio",
-                        engine->getAspectRatio(*scene->activeCamera()));
+  _lineShader->setFloat("aspectRatio", engine->getAspectRatio(*scene->activeCamera()));
   _lineShader->bind(_source->getWorldMatrix());
 
   // Draw order
-  engine->drawElementsType(Material::TriangleFillMode, 0,
-                           static_cast<int>(_indicesCount));
+  engine->drawElementsType(Material::TriangleFillMode, 0, static_cast<int>(_indicesCount));
   _lineShader->unbind();
 }
 

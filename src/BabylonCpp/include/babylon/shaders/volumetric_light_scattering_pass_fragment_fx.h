@@ -28,8 +28,8 @@ void main(void)
     gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
 }
 
-
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_VOLUMETRIC_LIGHT_SCATTERING_PASS_FRAGMENT_FX_H

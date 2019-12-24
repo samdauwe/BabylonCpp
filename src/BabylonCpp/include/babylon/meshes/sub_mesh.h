@@ -12,11 +12,9 @@ namespace BABYLON {
 
 class IntersectionInfo;
 class SubMesh;
-using SubMeshPtr = std::shared_ptr<SubMesh>;
-
-namespace GL {
-class IGLBuffer;
-} // end of namespace GL
+class WebGLDataBuffer;
+using SubMeshPtr         = std::shared_ptr<SubMesh>;
+using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
 
 /**
  * @brief
@@ -71,8 +69,7 @@ public:
 
   /**
    * @brief Sets a new updated BoundingInfo object to the submesh.
-   * @param data defines an optional position array to use to determine the
-   * bounding info
+   * @param data defines an optional position array to use to determine the bounding info
    * @returns the SubMesh
    */
   SubMesh& refreshBoundingInfo(const Float32Array& data = {});
@@ -110,7 +107,7 @@ public:
    * @brief Returns a new Index Buffer.
    * @returns The WebGLBuffer.
    */
-  std::unique_ptr<GL::IGLBuffer>& _getLinesIndexBuffer(const IndicesArray& indices, Engine* engine);
+  WebGLDataBufferPtr& _getLinesIndexBuffer(const IndicesArray& indices, Engine* engine);
 
   /**
    * @brief Returns if the passed Ray intersects the submesh bounding box.
@@ -123,8 +120,8 @@ public:
    * @param positions defines mesh's positions array
    * @param indices defines mesh's indices array
    * @param fastCheck defines if only bounding info should be used
-   * @param trianglePredicate defines an optional predicate used to select faces
-   * when a mesh intersection is detected
+   * @param trianglePredicate defines an optional predicate used to select faces when a mesh
+   * intersection is detected
    * @returns intersection info or null if no intersection
    */
   std::optional<IntersectionInfo>
@@ -166,10 +163,8 @@ public:
   /**
    * @brief Creates a new Submesh from the passed parameters.
    * @param materialIndex (integer) : the index of the main mesh material.
-   * @param startIndex (integer) : the index where to start the copy in the mesh
-   * indices array.
-   * @param indexCount (integer) : the number of indices to copy then from the
-   * startIndex.
+   * @param startIndex (integer) : the index where to start the copy in the mesh indices array.
+   * @param indexCount (integer) : the number of indices to copy then from the startIndex.
    * @param mesh (Mesh) : the main mesh to create the submesh from.
    * @param renderingMesh (optional Mesh) : rendering mesh.
    * @return The created SubMesh object.
@@ -238,7 +233,7 @@ private:
   AbstractMeshPtr _mesh;
   MeshPtr _renderingMesh;
   BoundingInfoPtr _boundingInfo;
-  std::unique_ptr<GL::IGLBuffer> _linesIndexBuffer;
+  WebGLDataBufferPtr _linesIndexBuffer;
   MaterialPtr _currentMaterial;
 
 }; // end of class SubMesh

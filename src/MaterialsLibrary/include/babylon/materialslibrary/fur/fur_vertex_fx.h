@@ -184,6 +184,7 @@ float r = Rand(position);
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_MATERIALS_LIBRARY_FUR_FUR_VERTEX_FX_H

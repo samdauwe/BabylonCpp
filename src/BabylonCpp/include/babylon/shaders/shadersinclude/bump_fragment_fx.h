@@ -50,6 +50,7 @@ vec2 uvOffset = vec2(0.0, 0.0);
 #endif
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_BUMP_FRAGMENT_FX_H

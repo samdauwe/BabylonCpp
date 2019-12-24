@@ -267,6 +267,7 @@ vec4 color = vec4(finalDiffuse + finalSpecular, alpha);
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_MATERIALS_LIBRARY_WATER_WATER_FRAGMENT_FX_H

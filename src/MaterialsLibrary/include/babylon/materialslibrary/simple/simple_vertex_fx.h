@@ -113,6 +113,7 @@ void main(void) {
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_MATERIALS_LIBRARY_SIMPLE_SIMPLE_VERTEX_FX_H

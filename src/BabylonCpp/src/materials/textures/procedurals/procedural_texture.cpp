@@ -491,7 +491,7 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
       engine->bindFramebuffer(_texture, face, std::nullopt, std::nullopt, true);
 
       // VBOs
-      engine->bindBuffers(_vertexBuffers, _indexBuffer.get(), _effect);
+      engine->bindBuffers(_vertexBuffers, _indexBuffer, _effect);
 
       _effect->setFloat("face", static_cast<float>(face));
 
@@ -513,7 +513,7 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
     engine->bindFramebuffer(_texture, 0u, std::nullopt, std::nullopt, true);
 
     // VBOs
-    engine->bindBuffers(_vertexBuffers, _indexBuffer.get(), _effect);
+    engine->bindBuffers(_vertexBuffers, _indexBuffer, _effect);
 
     // Clear
     if (autoClear) {
@@ -567,7 +567,7 @@ void ProceduralTexture::dispose()
     _vertexBuffers.erase(VertexBuffer::PositionKind);
   }
 
-  if (_indexBuffer && _engine->_releaseBuffer(_indexBuffer.get())) {
+  if (_indexBuffer && _engine->_releaseBuffer(_indexBuffer)) {
     _indexBuffer = nullptr;
   }
 

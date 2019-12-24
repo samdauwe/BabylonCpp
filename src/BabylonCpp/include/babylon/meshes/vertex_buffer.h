@@ -14,10 +14,8 @@ class Buffer;
 class DataView;
 class Engine;
 class Scene;
-
-namespace GL {
-class IGLBuffer;
-} // end of namespace GL
+class WebGLDataBuffer;
+using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
 
 /**
  * @brief Specialized buffer used to store vertex data.
@@ -149,8 +147,8 @@ public:
    * @param data the data to use for this vertex buffer
    * @param kind the vertex buffer kind
    * @param updatable whether the data is updatable
-   * @param postponeInternalCreation whether to postpone creating the internal
-   * WebGL buffer (optional)
+   * @param postponeInternalCreation whether to postpone creating the internal WebGL buffer
+   * (optional)
    * @param stride the stride (optional)
    * @param instanced whether the buffer is instanced (optional)
    * @param offset the offset of the data (optional)
@@ -206,7 +204,7 @@ public:
    * @brief Gets underlying native buffer.
    * @returns underlying native buffer
    */
-  GL::IGLBuffer* getBuffer();
+  WebGLDataBufferPtr& getBuffer();
 
   /**
    * @brief Gets the stride in float32 units (i.e. byte stride / 4).
@@ -245,34 +243,33 @@ public:
   /** Methods **/
 
   /**
-   * @brief Store data into the buffer. If the buffer was already used it will
-   * be either recreated or updated depending on isUpdatable property.
+   * @brief Store data into the buffer. If the buffer was already used it will be either recreated
+   * or updated depending on isUpdatable property.
    */
-  GL::IGLBuffer* create();
+  WebGLDataBufferPtr create();
 
   /**
-   * @brief Store data into the buffer. If the buffer was already used it will
-   * be either recreated or updated depending on isUpdatable property.
+   * @brief Store data into the buffer. If the buffer was already used it will be either recreated
+   * or updated depending on isUpdatable property.
    * @param data defines the data to store
    */
-  GL::IGLBuffer* create(const Float32Array& data);
+  WebGLDataBufferPtr create(const Float32Array& data);
 
   /**
-   * @briefUpdates the underlying buffer according to the passed numeric array
-   * or Float32Array. This function will create a new buffer if the current one
-   * is not updatable.
+   * @briefUpdates the underlying buffer according to the passed numeric array or Float32Array. This
+   * function will create a new buffer if the current one is not updatable.
    * @param data defines the data to store
    */
-  GL::IGLBuffer* update(const Float32Array& data);
+  WebGLDataBufferPtr update(const Float32Array& data);
 
   /**
-   *@brief  Updates directly the underlying WebGLBuffer according to the passed
-   *numeric array or Float32Array. Returns the directly updated WebGLBuffer.
+   *@brief  Updates directly the underlying WebGLBuffer according to the passed numeric array or
+   *Float32Array. Returns the directly updated WebGLBuffer.
    * @param data the new data
    * @param offset the new offset
    * @param useBytes set to true if the offset is in bytes
    */
-  GL::IGLBuffer* updateDirectly(const Float32Array& data, size_t offset, bool useBytes = false);
+  WebGLDataBufferPtr updateDirectly(const Float32Array& data, size_t offset, bool useBytes = false);
 
   /**
    * @brief Disposes the VertexBuffer and the underlying WebGLBuffer.
@@ -368,8 +365,8 @@ public:
   size_t byteOffset;
 
   /**
-   * Gets whether integer data values should be normalized into a certain range
-   * when being casted to a float.
+   * Gets whether integer data values should be normalized into a certain range when being casted to
+   * a float.
    */
   bool normalized;
 

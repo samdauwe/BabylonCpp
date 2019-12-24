@@ -16,6 +16,7 @@ const char* shadowsVertex
 #endif
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_SHADOWS_VERTEX_FX_H

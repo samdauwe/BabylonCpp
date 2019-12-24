@@ -5,7 +5,8 @@
 namespace BABYLON {
 
 WebGLPipelineContext::WebGLPipelineContext()
-    : engine{nullptr}
+    : IPipelineContext{}
+    , engine{nullptr}
     , program{nullptr}
     , context{nullptr}
     , vertexShader{nullptr}
@@ -18,12 +19,12 @@ WebGLPipelineContext::WebGLPipelineContext()
 
 WebGLPipelineContext::~WebGLPipelineContext() = default;
 
-bool WebGLPipelineContext::get_isAsync() const
+bool WebGLPipelineContext::isAsync()
 {
   return isParallelCompiled;
 }
 
-bool WebGLPipelineContext::get_isReady() const
+bool WebGLPipelineContext::isReady()
 {
   if (program) {
     if (isParallelCompiled) {

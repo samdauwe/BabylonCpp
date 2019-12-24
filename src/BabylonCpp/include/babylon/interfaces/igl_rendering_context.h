@@ -504,7 +504,9 @@ enum GLEnums : GLenum {
   COMPLETION_STATUS_KHR = 0x91B1,
   // IGL_EXT_texture_filter_anisotropic
   TEXTURE_MAX_ANISOTROPY_EXT     = 0x84FE,
-  MAX_TEXTURE_MAX_ANISOTROPY_EXT = 0x84FF
+  MAX_TEXTURE_MAX_ANISOTROPY_EXT = 0x84FF,
+  // Debugging
+  DEBUG_TYPE_ERROR = 0x824C
 }; // end of enum GLEnums
 
 class IGLFramebuffer;
@@ -519,8 +521,7 @@ using IGLTransformFeedbackPtr = std::shared_ptr<IGLTransformFeedback>;
 class BABYLON_SHARED_EXPORT IGLBuffer {
 
 public:
-  IGLBuffer(GLuint _value)
-      : references{1}, is32Bits{true}, capacity{1}, value{_value}
+  IGLBuffer(GLuint _value) : references{1}, is32Bits{true}, capacity{1}, value{_value}
   {
   }
 
@@ -571,10 +572,9 @@ public:
   bool isParallelCompiled;
   GLuint value;
   IGLTransformFeedbackPtr transformFeedback;
-  std::function<void(
-    const std::string& vertexSourceCode, const std::string& fragmentSourceCode,
-    const std::function<void(GL::IGLProgram* program)>& onCompiled,
-    const std::function<void(const std::string& message)>& onError)>
+  std::function<void(const std::string& vertexSourceCode, const std::string& fragmentSourceCode,
+                     const std::function<void(GL::IGLProgram* program)>& onCompiled,
+                     const std::function<void(const std::string& message)>& onError)>
     __SPECTOR_rebuildProgram;
 
 }; // end of class IGLProgram
@@ -760,8 +760,6 @@ public:
 public:
   virtual ~IGLRenderingContext()                          = default;
   virtual bool initialize(bool enableGLDebugging = false) = 0;
-  virtual void backupGLState()                            = 0;
-  virtual void restoreGLState()                           = 0;
   // virtual ICanvas* getCanvas() = 0;
   // virtual GLsizei getDrawingBufferWidth() = 0;
   // virtual GLsizei getDrawingBufferHeight() = 0;
@@ -786,8 +784,7 @@ public:
    * written to transform feedback buffers.
    * @param query An IGLQuery object for which to start the querying.
    */
-  virtual void beginQuery(GLenum target, const std::unique_ptr<IGLQuery>& query)
-    = 0;
+  virtual void beginQuery(GLenum target, const std::unique_ptr<IGLQuery>& query) = 0;
 
   /**
    * @brief Starts a transform feedback operation.
@@ -804,9 +801,7 @@ public:
    * @param name A string specifying the name of the variable to bind to the
    * generic vertex index.
    */
-  virtual void bindAttribLocation(IGLProgram* program, GLuint index,
-                                  const std::string& name)
-    = 0;
+  virtual void bindAttribLocation(IGLProgram* program, GLuint index, const std::string& name) = 0;
 
   /**
    * @brief Binds a given IGLBuffer to a target.
@@ -828,17 +823,14 @@ public:
    * @param index
    * @param buffer
    */
-  virtual void bindBufferBase(GLenum target, GLuint index, IGLBuffer* buffer)
-    = 0;
+  virtual void bindBufferBase(GLenum target, GLuint index, IGLBuffer* buffer) = 0;
 
   /**
    * @brief Binds a IGLRenderbuffer object to a given target.
    * @param target A GLenum specifying the binding point (target).
    * @param renderbuffer A IGLRenderbuffer object to bind.
    */
-  virtual void
-  bindRenderbuffer(GLenum target,
-                   const std::unique_ptr<IGLRenderbuffer>& renderbuffer)
+  virtual void bindRenderbuffer(GLenum target, const std::unique_ptr<IGLRenderbuffer>& renderbuffer)
     = 0;
 
   /**
@@ -854,9 +846,7 @@ public:
    * GL::TRANSFORM_FEEDBACK.
    * @param transformFeedback A IGLTransformFeedback object to bind.
    */
-  virtual void bindTransformFeedback(GLenum target,
-                                     IGLTransformFeedback* transformFeedback)
-    = 0;
+  virtual void bindTransformFeedback(GLenum target, IGLTransformFeedback* transformFeedback) = 0;
 
   /**
    * @brief Sets the source and destination blending factors.
@@ -866,9 +856,7 @@ public:
    * @param alpha A GLclampf for the alpha component (transparency) in the range
    * of 0 to 1.
    */
-  virtual void blendColor(GLclampf red, GLclampf green, GLclampf blue,
-                          GLclampf alpha)
-    = 0;
+  virtual void blendColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha) = 0;
 
   /**
    * @brief Sets both the RGB blend equation and alpha blend equation to a
@@ -908,12 +896,10 @@ public:
    * @param dstAlpha A GLenum specifying a multiplier for the alpha destination
    * blending factor.
    */
-  virtual void blendFuncSeparate(GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha,
-                                 GLenum dstAlpha)
+  virtual void blendFuncSeparate(GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha)
     = 0;
-  virtual void blitFramebuffer(GLint srcX0, GLint srcY0, GLint srcX1,
-                               GLint srcY1, GLint dstX0, GLint dstY0,
-                               GLint dstX1, GLint dstY1, GLbitfield mask,
+  virtual void blitFramebuffer(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0,
+                               GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask,
                                GLenum filter)
     = 0;
 
@@ -933,8 +919,7 @@ public:
    * store.
    * @param usage A GLenum specifying the usage pattern of the data store.
    */
-  virtual void bufferData(GLenum target, const Float32Array& data, GLenum usage)
-    = 0;
+  virtual void bufferData(GLenum target, const Float32Array& data, GLenum usage) = 0;
 
   /**
    * @brief Initializes and creates the buffer object's data store.
@@ -943,8 +928,7 @@ public:
    * store.
    * @param usage A GLenum specifying the usage pattern of the data store.
    */
-  virtual void bufferData(GLenum target, const Int32Array& data, GLenum usage)
-    = 0;
+  virtual void bufferData(GLenum target, const Int32Array& data, GLenum usage) = 0;
 
   /**
    * @brief Initializes and creates the buffer object's data store.
@@ -953,8 +937,7 @@ public:
    * store.
    * @param usage A GLenum specifying the usage pattern of the data store.
    */
-  virtual void bufferData(GLenum target, const Uint16Array& data, GLenum usage)
-    = 0;
+  virtual void bufferData(GLenum target, const Uint16Array& data, GLenum usage) = 0;
 
   /**
    * @brief Initializes and creates the buffer object's data store.
@@ -963,8 +946,7 @@ public:
    * store.
    * @param usage A GLenum specifying the usage pattern of the data store.
    */
-  virtual void bufferData(GLenum target, const Uint32Array& data, GLenum usage)
-    = 0;
+  virtual void bufferData(GLenum target, const Uint32Array& data, GLenum usage) = 0;
 
   /**
    * @brief Updates a subset of a buffer object's data store.
@@ -974,9 +956,7 @@ public:
    * @param data A Uint8Array typed array that will be copied into the data
    * store.
    */
-  virtual void bufferSubData(GLenum target, GLintptr offset,
-                             const Uint8Array& data)
-    = 0;
+  virtual void bufferSubData(GLenum target, GLintptr offset, const Uint8Array& data) = 0;
 
   /**
    * @brief Updates a subset of a buffer object's data store.
@@ -986,9 +966,7 @@ public:
    * @param data A Float32Array typed array that will be copied into the data
    * store.
    */
-  virtual void bufferSubData(GLenum target, GLintptr offset,
-                             const Float32Array& data)
-    = 0;
+  virtual void bufferSubData(GLenum target, GLintptr offset, const Float32Array& data) = 0;
 
   /**
    * @brief Updates a subset of a buffer object's data store.
@@ -998,8 +976,7 @@ public:
    * @param data An Int32Array typed array that will be copied into the data
    * store.
    */
-  virtual void bufferSubData(GLenum target, GLintptr offset, Int32Array& data)
-    = 0;
+  virtual void bufferSubData(GLenum target, GLintptr offset, Int32Array& data) = 0;
 
   /**
    * @brief Binds a passed IGLVertexArrayObject object to the buffer.
@@ -1029,8 +1006,7 @@ public:
    * @param values Specifying the values to clear to.
    * @param srcOffset optional source offset
    */
-  virtual void clearBufferfv(GLenum buffer, GLint drawbuffer,
-                             const std::vector<GLfloat>& values,
+  virtual void clearBufferfv(GLenum buffer, GLint drawbuffer, const std::vector<GLfloat>& values,
                              GLint srcOffset = 0)
     = 0;
 
@@ -1041,8 +1017,7 @@ public:
    * @param values Specifying the values to clear to.
    * @param srcOffset optional source offset
    */
-  virtual void clearBufferiv(GLenum buffer, GLint drawbuffer,
-                             const std::vector<GLint>& values,
+  virtual void clearBufferiv(GLenum buffer, GLint drawbuffer, const std::vector<GLint>& values,
                              GLint srcOffset = 0)
     = 0;
 
@@ -1053,8 +1028,7 @@ public:
    * @param values Specifying the values to clear to.
    * @param srcOffset An optional source offset
    */
-  virtual void clearBufferuiv(GLenum buffer, GLint drawbuffer,
-                              const std::vector<GLuint>& values,
+  virtual void clearBufferuiv(GLenum buffer, GLint drawbuffer, const std::vector<GLuint>& values,
                               GLint srcOffset = 0)
     = 0;
 
@@ -1067,9 +1041,7 @@ public:
    * @param stencil A GLint specifying the value to clear the stencil render
    * buffer to.
    */
-  virtual void clearBufferfi(GLenum buffer, GLint drawbuffer, GLfloat depth,
-                             GLint stencil)
-    = 0;
+  virtual void clearBufferfi(GLenum buffer, GLint drawbuffer, GLfloat depth, GLint stencil) = 0;
 
   /**
    * @brief Specifies the color values used when clearing color buffers.
@@ -1082,9 +1054,7 @@ public:
    * @param alpha A GLclampf specifying the alpha (transparency) value used when
    * the color buffers are cleared.
    */
-  virtual void clearColor(GLclampf red, GLclampf green, GLclampf blue,
-                          GLclampf alpha)
-    = 0;
+  virtual void clearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha) = 0;
 
   /**
    * @brief Specifies the clear value for the depth buffer.
@@ -1112,9 +1082,7 @@ public:
    * @param alpha A GLboolean specifying whether or not the alpha (transparency)
    * component can be written into the frame buffer.
    */
-  virtual void colorMask(GLboolean red, GLboolean green, GLboolean blue,
-                         GLboolean alpha)
-    = 0;
+  virtual void colorMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha) = 0;
 
   /**
    * @brief Compiles a GLSL shader into binary data so that it can be used by a
@@ -1136,9 +1104,8 @@ public:
    * @param pixels An Uint8Array that be used as a data store for the compressed
    * image data in memory.
    */
-  virtual void compressedTexImage2D(GLenum target, GLint level,
-                                    GLenum internalformat, GLsizei width,
-                                    GLsizei height, GLint border,
+  virtual void compressedTexImage2D(GLenum target, GLint level, GLenum internalformat,
+                                    GLsizei width, GLsizei height, GLint border,
                                     const Uint8Array& pixels)
     = 0;
 
@@ -1159,10 +1126,9 @@ public:
    * @param size A GLsizeiptr setting the size of the buffer object's data
    * store.
    */
-  virtual void compressedTexSubImage2D(GLenum target, GLint level,
-                                       GLint xoffset, GLint yoffset,
-                                       GLsizei width, GLsizei height,
-                                       GLenum format, GLsizeiptr size)
+  virtual void compressedTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset,
+                                       GLsizei width, GLsizei height, GLenum format,
+                                       GLsizeiptr size)
     = 0;
 
   /**
@@ -1182,9 +1148,8 @@ public:
    * @param height A GLsizei specifying the height of the texture.
    * @param border A GLint specifying the width of the border. Must be 0.
    */
-  virtual void copyTexImage2D(GLenum target, GLint level, GLenum internalformat,
-                              GLint x, GLint y, GLsizei width, GLsizei height,
-                              GLint border)
+  virtual void copyTexImage2D(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y,
+                              GLsizei width, GLsizei height, GLint border)
     = 0;
 
   /**
@@ -1205,9 +1170,8 @@ public:
    * @param width A GLsizei specifying the width of the texture.
    * @param height A GLsizei specifying the height of the texture.
    */
-  virtual void copyTexSubImage2D(GLenum target, GLint level, GLint xoffset,
-                                 GLint yoffset, GLint x, GLint y, GLint width,
-                                 GLint height)
+  virtual void copyTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint x,
+                                 GLint y, GLint width, GLint height)
     = 0;
 
   /**
@@ -1215,7 +1179,7 @@ public:
    * colors.
    * @return An IGLBuffer storing data such as vertices or colors.
    */
-  virtual std::unique_ptr<IGLBuffer> createBuffer() = 0;
+  virtual std::shared_ptr<IGLBuffer> createBuffer() = 0;
 
   /**
    * @brief Creates and initializes a IGLFramebuffer object.
@@ -1334,8 +1298,7 @@ public:
    * @brief Deletes a given IGLTransformFeedback object.
    * @param transformFeedback A IGLTransformFeedback object to delete.
    */
-  virtual void deleteTransformFeedback(IGLTransformFeedback* transformFeedback)
-    = 0;
+  virtual void deleteTransformFeedback(IGLTransformFeedback* transformFeedback) = 0;
 
   /**
    * @brief Deletes a given IGLVertexArrayObject object.
@@ -1409,8 +1372,7 @@ public:
    * @param instanceCount A GLsizei specifying the number of instances of the
    * range of elements to execute.
    */
-  virtual void drawArraysInstanced(GLenum mode, GLint first, GLsizei count,
-                                   GLsizei instanceCount)
+  virtual void drawArraysInstanced(GLenum mode, GLint first, GLsizei count, GLsizei instanceCount)
     = 0;
 
   /**
@@ -1430,9 +1392,7 @@ public:
    * buffer.
    * @param offset A GLintptr specifying an offset in the element array buffer.
    */
-  virtual void drawElements(GLenum mode, GLsizei count, GLenum type,
-                            GLintptr offset)
-    = 0;
+  virtual void drawElements(GLenum mode, GLsizei count, GLenum type, GLintptr offset) = 0;
 
   /**
    * @brief Renders primitives from array data like the drawElements() method.
@@ -1446,8 +1406,8 @@ public:
    * @param instanceCount A GLsizei specifying the number of instances of the
    * set of elements to execute.
    */
-  virtual void drawElementsInstanced(GLenum mode, GLsizei count, GLenum type,
-                                     GLintptr offset, GLsizei instanceCount)
+  virtual void drawElementsInstanced(GLenum mode, GLsizei count, GLenum type, GLintptr offset,
+                                     GLsizei instanceCount)
     = 0;
 
   /**
@@ -1503,8 +1463,7 @@ public:
    * for the render buffer.
    * @param renderbuffer An IGLRenderbuffer object to attach.
    */
-  virtual void framebufferRenderbuffer(GLenum target, GLenum attachment,
-                                       GLenum renderbuffertarget,
+  virtual void framebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget,
                                        IGLRenderbuffer* renderbuffer)
     = 0;
 
@@ -1517,9 +1476,8 @@ public:
    * @param level A GLint specifying the mipmap level of the texture image to be
    * attached. Must be 0.
    */
-  virtual void framebufferTexture2D(GLenum target, GLenum attachment,
-                                    GLenum textarget, IGLTexture* texture,
-                                    GLint level)
+  virtual void framebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget,
+                                    IGLTexture* texture, GLint level)
     = 0;
 
   /**
@@ -1532,10 +1490,8 @@ public:
    * @see
    * https://www.khronos.org/registry/OpenGL/extensions/OVR/OVR_multiview.txt
    */
-  virtual void framebufferTextureMultiviewOVR(GLenum target, GLenum attachment,
-                                              IGLTexture* texture, GLint level,
-                                              GLint baseViewIndex,
-                                              GLint numViews)
+  virtual void framebufferTextureMultiviewOVR(GLenum target, GLenum attachment, IGLTexture* texture,
+                                              GLint level, GLint baseViewIndex, GLint numViews)
     = 0;
 
   /**
@@ -1568,8 +1524,7 @@ public:
    * @return A GLint number indicating the location of the variable name if
    * found. Returns -1 otherwise.
    */
-  virtual GLint getAttribLocation(IGLProgram* program, const std::string& name)
-    = 0;
+  virtual GLint getAttribLocation(IGLProgram* program, const std::string& name) = 0;
 
   /**
    * @brief Returns true if the specified GL extension is supported.
@@ -1696,8 +1651,8 @@ public:
    * MEDIUM_FLOAT, HIGH_FLOAT, LOW_INT, MEDIUM_INT, or HIGH_INT.
    * @return A IGLShaderPrecisionFormat object or nullptr, if an error occurs.
    */
-  virtual IGLShaderPrecisionFormat*
-  getShaderPrecisionFormat(GLenum shadertype, GLenum precisiontype)
+  virtual IGLShaderPrecisionFormat* getShaderPrecisionFormat(GLenum shadertype,
+                                                             GLenum precisiontype)
     = 0;
 
   /**
@@ -1714,12 +1669,11 @@ public:
    * to whose index to retrieve.
    * @return A GLuint indicating the uniform block index.
    */
-  virtual GLuint getUniformBlockIndex(IGLProgram* program,
-                                      const std::string& uniformBlockName)
-    = 0;
+  virtual GLuint getUniformBlockIndex(IGLProgram* program, const std::string& uniformBlockName) = 0;
 
-  virtual std::unique_ptr<IGLUniformLocation>
-  getUniformLocation(IGLProgram* program, const std::string& name) = 0;
+  virtual std::unique_ptr<IGLUniformLocation> getUniformLocation(IGLProgram* program,
+                                                                 const std::string& name)
+    = 0;
 
   /**
    * @brief Specifies hints for certain behaviors. The interpretation of these
@@ -1835,8 +1789,8 @@ public:
    * @param type A GLenum specifying the data type of the pixel data.
    * @param pixels An Float32Array object to read data into.
    */
-  virtual void readPixels(GLint x, GLint y, GLsizei width, GLsizei height,
-                          GLenum format, GLenum type, Float32Array& pixels)
+  virtual void readPixels(GLint x, GLint y, GLsizei width, GLsizei height, GLenum format,
+                          GLenum type, Float32Array& pixels)
     = 0;
 
   /**
@@ -1852,8 +1806,8 @@ public:
    * @param type A GLenum specifying the data type of the pixel data.
    * @param pixels An Uint8Array object to read data into.
    */
-  virtual void readPixels(GLint x, GLint y, GLsizei width, GLsizei height,
-                          GLenum format, GLenum type, Uint8Array& pixels)
+  virtual void readPixels(GLint x, GLint y, GLsizei width, GLsizei height, GLenum format,
+                          GLenum type, Uint8Array& pixels)
     = 0;
 
   /**
@@ -1865,8 +1819,8 @@ public:
    * @param height A GLsizei specifying the height of the renderbuffer in
    * pixels.
    */
-  virtual void renderbufferStorage(GLenum target, GLenum internalformat,
-                                   GLsizei width, GLsizei height)
+  virtual void renderbufferStorage(GLenum target, GLenum internalformat, GLsizei width,
+                                   GLsizei height)
     = 0;
 
   /**
@@ -1881,8 +1835,7 @@ public:
    * @param height A GLsizei specifying the height of the renderbuffer in
    * pixels.
    */
-  virtual void renderbufferStorageMultisample(GLenum target, GLsizei samples,
-                                              GLenum internalFormat,
+  virtual void renderbufferStorageMultisample(GLenum target, GLsizei samples, GLenum internalFormat,
                                               GLsizei width, GLsizei height)
     = 0;
 
@@ -1940,9 +1893,7 @@ public:
    * @param mask A GLuint specifying a bit-wise mask that is used to AND the
    * reference value and the stored stencil value when the test is done.
    */
-  virtual void stencilFuncSeparate(GLenum face, GLenum func, GLint ref,
-                                   GLuint mask)
-    = 0;
+  virtual void stencilFuncSeparate(GLenum face, GLenum func, GLint ref, GLuint mask) = 0;
 
   /**
    * @brief Controls enabling and disabling of both the front and back writing
@@ -1986,9 +1937,7 @@ public:
    * test and the depth test pass, or when the stencil test passes and there is
    * no depth buffer or depth testing is disabled.
    */
-  virtual void stencilOpSeparate(GLenum face, GLenum fail, GLenum zfail,
-                                 GLenum zpass)
-    = 0;
+  virtual void stencilOpSeparate(GLenum face, GLenum fail, GLenum zfail, GLenum zpass) = 0;
 
   /**
    * @brief Specifies a two-dimensional texture image.
@@ -2005,10 +1954,10 @@ public:
    * @param type A GLenum specifying the data type of the texel data.
    * @param pixels An Uint8Array pixel source for the texture (can be nullptr)
    */
-  virtual void texImage2D(GLenum target, GLint level, GLint internalformat,
-                          GLsizei width, GLsizei height, GLint border,
-                          GLenum format, GLenum type,
-                          const Uint8Array* const pixels) // NOLINT ([readability-avoid-const-params-in-decls])
+  virtual void
+  texImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height,
+             GLint border, GLenum format, GLenum type,
+             const Uint8Array* const pixels) // NOLINT ([readability-avoid-const-params-in-decls])
     = 0;
 
   /**
@@ -2027,9 +1976,8 @@ public:
    * @param type A GLenum specifying the data type of the texel data.
    * @param pixels An Uint8Array pixel source for the texture.
    */
-  virtual void texImage3D(GLenum target, GLint level, GLint internalformat,
-                          GLsizei width, GLsizei height, GLsizei depth,
-                          GLint border, GLenum format, GLenum type,
+  virtual void texImage3D(GLenum target, GLint level, GLint internalformat, GLsizei width,
+                          GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type,
                           const Uint8Array& pixels)
     = 0;
 
@@ -2064,8 +2012,8 @@ public:
    * @param height A GLsizei specifying the height of the texture.
    * @param depth A GLsizei specifying the depth of the texture.
    */
-  virtual void texStorage3D(GLenum target, GLint levels, GLenum internalformat,
-                            GLsizei width, GLsizei height, GLsizei depth)
+  virtual void texStorage3D(GLenum target, GLint levels, GLenum internalformat, GLsizei width,
+                            GLsizei height, GLsizei depth)
     = 0;
 
   /**
@@ -2084,9 +2032,8 @@ public:
    * @param type A GLenum specifying the data type of the texel data.
    * @param pixels A pixel source for the texture.
    */
-  virtual void texSubImage2D(GLenum target, GLint level, GLint xoffset,
-                             GLint yoffset, GLsizei width, GLsizei height,
-                             GLenum format, GLenum type, any pixels)
+  virtual void texSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset,
+                             GLsizei width, GLsizei height, GLenum format, GLenum type, any pixels)
     = 0;
 
   /**
@@ -2097,10 +2044,9 @@ public:
    * @param bufferMode A GLenum specifying the mode to use when capturing the
    * varying variables.
    */
-  virtual void
-  transformFeedbackVaryings(IGLProgram* program,
-                            const std::vector<std::string>& varyings,
-                            GLenum bufferMode)
+  virtual void transformFeedbackVaryings(IGLProgram* program,
+                                         const std::vector<std::string>& varyings,
+                                         GLenum bufferMode)
     = 0;
 
   /**
@@ -2117,9 +2063,7 @@ public:
    * uniform attribute to modify.
    * @param array A Float32Array to be used for the uniform variable.
    */
-  virtual void uniform1fv(GL::IGLUniformLocation* location,
-                          const Float32Array& array)
-    = 0;
+  virtual void uniform1fv(GL::IGLUniformLocation* location, const Float32Array& array) = 0;
 
   /**
    * @brief Specifies the value of the uniform variable.
@@ -2135,8 +2079,7 @@ public:
    * uniform attribute to modify.
    * @param v An Int32Array to be used for the uniform variable.
    */
-  virtual void uniform1iv(IGLUniformLocation* location, const Int32Array& v)
-    = 0;
+  virtual void uniform1iv(IGLUniformLocation* location, const Int32Array& v) = 0;
 
   /**
    * @brief Specifies the values of the uniform variable.
@@ -2145,8 +2088,7 @@ public:
    * @param v0 A GLfloat to be used for the uniform variable.
    * @param v1 A GLfloat to be used for the uniform variable.
    */
-  virtual void uniform2f(IGLUniformLocation* location, GLfloat v0, GLfloat v1)
-    = 0;
+  virtual void uniform2f(IGLUniformLocation* location, GLfloat v0, GLfloat v1) = 0;
 
   /**
    * @brief Specifies the values of the uniform variable.
@@ -2154,8 +2096,7 @@ public:
    * uniform attribute to modify.
    * @param v A Float32Array to be used for the uniform variable.
    */
-  virtual void uniform2fv(IGLUniformLocation* location, const Float32Array& v)
-    = 0;
+  virtual void uniform2fv(IGLUniformLocation* location, const Float32Array& v) = 0;
 
   /**
    * @brief Specifies the values of the uniform variable.
@@ -2172,8 +2113,7 @@ public:
    * uniform attribute to modify.
    * @param v An Int32Array to be used for the uniform variable.
    */
-  virtual void uniform2iv(IGLUniformLocation* location, const Int32Array& v)
-    = 0;
+  virtual void uniform2iv(IGLUniformLocation* location, const Int32Array& v) = 0;
 
   /**
    * @brief Specifies the values of the uniform variable.
@@ -2183,9 +2123,7 @@ public:
    * @param v1 A GLfloat to be used for the uniform variable.
    * @param v2 A GLfloat to be used for the uniform variable.
    */
-  virtual void uniform3f(IGLUniformLocation* location, GLfloat v0, GLfloat v1,
-                         GLfloat v2)
-    = 0;
+  virtual void uniform3f(IGLUniformLocation* location, GLfloat v0, GLfloat v1, GLfloat v2) = 0;
 
   /**
    * @brief Specifies the values of the uniform variable.
@@ -2193,8 +2131,7 @@ public:
    * uniform attribute to modify.
    * @param v A Float32Array to be used for the uniform variable.
    */
-  virtual void uniform3fv(IGLUniformLocation* location, const Float32Array& v)
-    = 0;
+  virtual void uniform3fv(IGLUniformLocation* location, const Float32Array& v) = 0;
 
   /**
    * @brief Specifies the values of the uniform variable.
@@ -2204,9 +2141,7 @@ public:
    * @param v1 A GLint to be used for the uniform variable.
    * @param v2 A GLint to be used for the uniform variable.
    */
-  virtual void uniform3i(IGLUniformLocation* location, GLint v0, GLint v1,
-                         GLint v2)
-    = 0;
+  virtual void uniform3i(IGLUniformLocation* location, GLint v0, GLint v1, GLint v2) = 0;
 
   /**
    * @brief Specifies the values of the uniform variable.
@@ -2214,8 +2149,7 @@ public:
    * uniform attribute to modify.
    * @param v An Int32Array to be used for the uniform variable.
    */
-  virtual void uniform3iv(IGLUniformLocation* location, const Int32Array& v)
-    = 0;
+  virtual void uniform3iv(IGLUniformLocation* location, const Int32Array& v) = 0;
 
   /**
    * @brief Specifies the values of the uniform variable.
@@ -2226,8 +2160,8 @@ public:
    * @param v2 A GLfloat to be used for the uniform variable.
    * @param v3 A GLfloat to be used for the uniform variable.
    */
-  virtual void uniform4f(IGLUniformLocation* location, GLfloat v0, GLfloat v1,
-                         GLfloat v2, GLfloat v3)
+  virtual void uniform4f(IGLUniformLocation* location, GLfloat v0, GLfloat v1, GLfloat v2,
+                         GLfloat v3)
     = 0;
 
   /**
@@ -2236,8 +2170,7 @@ public:
    * uniform attribute to modify.
    * @param v A Float32Array to be used for the uniform variable.
    */
-  virtual void uniform4fv(IGLUniformLocation* location, const Float32Array& v)
-    = 0;
+  virtual void uniform4fv(IGLUniformLocation* location, const Float32Array& v) = 0;
 
   /**
    * @brief Specifies the values of the uniform variable.
@@ -2248,9 +2181,7 @@ public:
    * @param v2 A GLint to be used for the uniform variable.
    * @param v3 A GLint to be used for the uniform variable.
    */
-  virtual void uniform4i(IGLUniformLocation* location, GLint v0, GLint v1,
-                         GLint v2, GLint v3)
-    = 0;
+  virtual void uniform4i(IGLUniformLocation* location, GLint v0, GLint v1, GLint v2, GLint v3) = 0;
 
   /**
    * @brief Specifies the values of the uniform variable.
@@ -2258,8 +2189,7 @@ public:
    * uniform attribute to modify.
    * @param An Int32Array to be used for the uniform variable.
    */
-  virtual void uniform4iv(IGLUniformLocation* location, const Int32Array& v)
-    = 0;
+  virtual void uniform4iv(IGLUniformLocation* location, const Int32Array& v) = 0;
 
   /**
    * @brief Assigns binding points for active uniform blocks.
@@ -2270,8 +2200,7 @@ public:
    * @param uniformBlockBinding A GLuint specifying the binding point to which
    * to bind the uniform block.
    */
-  virtual void uniformBlockBinding(IGLProgram* program,
-                                   GLuint uniformBlockIndex,
+  virtual void uniformBlockBinding(IGLProgram* program, GLuint uniformBlockIndex,
                                    GLuint uniformBlockBinding)
     = 0;
 
@@ -2283,8 +2212,8 @@ public:
    * Must be false.
    * @param value A Float32Array of float values.
    */
-  virtual void uniformMatrix2fv(IGLUniformLocation* location,
-                                GLboolean transpose, const Float32Array& value)
+  virtual void uniformMatrix2fv(IGLUniformLocation* location, GLboolean transpose,
+                                const Float32Array& value)
     = 0;
 
   /**
@@ -2295,8 +2224,8 @@ public:
    * Must be false.
    * @param value A Float32Array of float values.
    */
-  virtual void uniformMatrix3fv(IGLUniformLocation* location,
-                                GLboolean transpose, const Float32Array& value)
+  virtual void uniformMatrix3fv(IGLUniformLocation* location, GLboolean transpose,
+                                const Float32Array& value)
     = 0;
 
   /**
@@ -2307,8 +2236,8 @@ public:
    * Must be false.
    * @param value A Float32Array of float values.
    */
-  virtual void uniformMatrix4fv(IGLUniformLocation* location,
-                                GLboolean transpose, const Float32Array& value)
+  virtual void uniformMatrix4fv(IGLUniformLocation* location, GLboolean transpose,
+                                const Float32Array& value)
     = 0;
 
   /**
@@ -2319,8 +2248,7 @@ public:
    * Must be false.
    * @param value A Float32Array of float values.
    */
-  virtual void uniformMatrix4fv(IGLUniformLocation* location,
-                                GLboolean transpose,
+  virtual void uniformMatrix4fv(IGLUniformLocation* location, GLboolean transpose,
                                 const std::array<float, 16>& value)
     = 0;
 
@@ -2372,8 +2300,7 @@ public:
    * @param v1 A floating point Number for the vertex attribute value.
    * @param v2 A floating point Number for the vertex attribute value.
    */
-  virtual void vertexAttrib3f(GLuint index, GLfloat v0, GLfloat v1, GLfloat v2)
-    = 0;
+  virtual void vertexAttrib3f(GLuint index, GLfloat v0, GLfloat v1, GLfloat v2) = 0;
 
   /**
    * @brief Specifies values for generic vertex attributes.
@@ -2393,9 +2320,7 @@ public:
    * @param v2 A floating point Number for the vertex attribute value.
    * @param v3 A floating point Number for the vertex attribute value.
    */
-  virtual void vertexAttrib4f(GLuint index, GLfloat v0, GLfloat v1, GLfloat v2,
-                              GLfloat v3)
-    = 0;
+  virtual void vertexAttrib4f(GLuint index, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3) = 0;
 
   /**
    * @brief Specifies the values for generic vertex attributes.
@@ -2432,9 +2357,8 @@ public:
    * @param offset A GLintptr specifying an offset in bytes of the first
    * component in the vertex attribute array.
    */
-  virtual void vertexAttribPointer(GLuint index, GLint size, GLenum type,
-                                   GLboolean normalized, GLint stride,
-                                   GLintptr offset)
+  virtual void vertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized,
+                                   GLint stride, GLintptr offset)
     = 0;
 
   /**
@@ -2448,23 +2372,6 @@ public:
    * @param height A non-negative GLsizei specifying the height of the viewport.
    */
   virtual void viewport(GLint x, GLint y, GLsizei width, GLsizei height) = 0;
-
-protected:
-  GLuint last_program;
-  GLint last_texture;
-  GLint last_active_texture;
-  GLint last_array_buffer;
-  GLint last_element_array_buffer;
-  GLint last_vertex_array;
-  GLint last_blend_src;
-  GLint last_blend_dst;
-  GLint last_blend_equation_rgb;
-  GLint last_blend_equation_alpha;
-  GLint last_viewport[4];
-  GLboolean last_enable_blend;
-  GLboolean last_enable_cull_face;
-  GLboolean last_enable_depth_test;
-  GLboolean last_enable_scissor_test;
 
 }; // end of class GLRenderContext
 

@@ -13,6 +13,7 @@ const char* pointCloudVertexDeclaration
 #endif
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_POINT_CLOUD_VERTEX_DECLARATION_FX_H

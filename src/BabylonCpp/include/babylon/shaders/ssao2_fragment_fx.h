@@ -245,6 +245,7 @@ void main()
 #endif
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SSAO2_FRAGMENT_FX_H

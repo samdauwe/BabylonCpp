@@ -70,6 +70,7 @@ vec4 finalColor = glowColor;
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_GLOW_MAP_GENERATION_FRAGMENT_FX_H

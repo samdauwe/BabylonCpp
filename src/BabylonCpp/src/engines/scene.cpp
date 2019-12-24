@@ -26,6 +26,7 @@
 #include <babylon/debug/debug_layer.h>
 #include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
+#include <babylon/engines/engine_store.h>
 #include <babylon/engines/iscene_component.h>
 #include <babylon/engines/iscene_serializable_component.h>
 #include <babylon/events/keyboard_event_types.h>
@@ -248,7 +249,6 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , _collisionCoordinator{nullptr}
     , _hasAudioEngine{false}
     , _mainSoundTrack{nullptr}
-    , _engine{engine ? engine : Engine::LastCreatedEngine()}
     , _animationRatio{1.f}
     , _animationTimeLast{std::nullopt}
     , _animationTime(0)
@@ -292,7 +292,11 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , _transformMatrixR{Matrix::Zero()}
     , _multiviewSceneUbo{nullptr}
 {
-  engine->scenes.emplace_back(this);
+  _engine = engine ? engine : Engine::LastCreatedEngine();
+  if (!options) {
+    EngineStore::_LastCreatedScene = this;
+    _engine->scenes.emplace_back(this);
+  }
 
   _renderingManager = std::make_unique<RenderingManager>(this);
 
@@ -324,6 +328,11 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
 }
 
 Scene::~Scene() = default;
+
+void Scene::postInitialize()
+{
+  environmentTexture = nullptr;
+}
 
 Type Scene::type() const
 {
@@ -3825,8 +3834,7 @@ void Scene::render(bool updateCameras, bool ignoreAnimations)
   }
   else {
     if (!_activeCamera) {
-      BABYLON_LOG_ERROR("Scene", "No camera defined")
-      return;
+      throw std::runtime_error("No camera defined");
     }
 
     _processSubCameras(_activeCamera);

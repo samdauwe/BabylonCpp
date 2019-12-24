@@ -11,8 +11,7 @@
 
 namespace BABYLON {
 
-EffectFallbacks::EffectFallbacks()
-    : _currentRank{32}, _maxRank{0}, _mesh{nullptr}
+EffectFallbacks::EffectFallbacks() : _currentRank{32}, _maxRank{0}, _mesh{nullptr}
 {
 }
 
@@ -60,8 +59,7 @@ void EffectFallbacks::addFallback(unsigned int rank, const std::string& define)
   _defines[rank].emplace_back(define);
 }
 
-void EffectFallbacks::addCPUSkinningFallback(unsigned int rank,
-                                             AbstractMesh* mesh)
+void EffectFallbacks::addCPUSkinningFallback(unsigned int rank, AbstractMesh* mesh)
 {
   _mesh = mesh;
 
@@ -73,7 +71,7 @@ void EffectFallbacks::addCPUSkinningFallback(unsigned int rank,
   }
 }
 
-bool EffectFallbacks::isMoreFallbacks() const
+bool EffectFallbacks::hasMoreFallbacks() const
 {
   return _currentRank <= _maxRank;
 }
@@ -81,23 +79,24 @@ bool EffectFallbacks::isMoreFallbacks() const
 std::string EffectFallbacks::reduce(std::string currentDefines, Effect* effect)
 {
   // First we try to switch to CPU skinning
-  if (_mesh && _mesh->computeBonesUsingShaders()
-      && _mesh->numBoneInfluencers() > 0 && _mesh->material()) {
+  if (_mesh && _mesh->computeBonesUsingShaders() && _mesh->numBoneInfluencers() > 0) {
     _mesh->computeBonesUsingShaders = false;
-    const std::string toReplace = std::string("#define NUM_BONE_INFLUENCERS ")
-                                  + std::to_string(_mesh->numBoneInfluencers());
-    String::replaceInPlace(currentDefines, toReplace,
-                           "#define NUM_BONE_INFLUENCERS 0");
+    const std::string toReplace
+      = std::string("#define NUM_BONE_INFLUENCERS ") + std::to_string(_mesh->numBoneInfluencers());
+    String::replaceInPlace(currentDefines, toReplace, "#define NUM_BONE_INFLUENCERS 0");
     effect->_bonesComputationForcedToCPU = true;
 
     auto scene = _mesh->getScene();
     for (const auto& otherMesh : scene->meshes) {
       if (!otherMesh->material()) {
+        if (!_mesh->material() && otherMesh->computeBonesUsingShaders()
+            && otherMesh->numBoneInfluencers() > 0) {
+          otherMesh->computeBonesUsingShaders = false;
+        }
         continue;
       }
 
-      if (!otherMesh->computeBonesUsingShaders()
-          || otherMesh->numBoneInfluencers() == 0) {
+      if (!otherMesh->computeBonesUsingShaders() || otherMesh->numBoneInfluencers() == 0) {
         continue;
       }
 
@@ -117,11 +116,9 @@ std::string EffectFallbacks::reduce(std::string currentDefines, Effect* effect)
     }
   }
   else {
-    if (_defines.find(_currentRank) != _defines.end()
-        && !_defines[_currentRank].empty()) {
+    if (_defines.find(_currentRank) != _defines.end() && !_defines[_currentRank].empty()) {
       for (const auto& currentFallback : _defines[_currentRank]) {
-        String::replaceInPlace(currentDefines, "#define " + currentFallback,
-                               "");
+        String::replaceInPlace(currentDefines, "#define " + currentFallback, "");
       }
     }
     ++_currentRank;

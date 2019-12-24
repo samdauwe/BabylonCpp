@@ -22,6 +22,7 @@ void main(void)
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_BLOOM_MERGE_FRAGMENT_FX_H

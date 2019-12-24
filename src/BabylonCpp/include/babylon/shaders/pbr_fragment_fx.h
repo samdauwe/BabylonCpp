@@ -28,7 +28,7 @@ const char* pbrPixelShader
 
 // Forces linear space for image processing
 #ifndef FROMLINEARSPACE
-    #define FROMLINEARSPACE;
+    #define FROMLINEARSPACE
 #endif
 
 // Declaration
@@ -353,6 +353,8 @@ void main(void) {
 
         #ifdef SS_LODINREFRACTIONALPHA
             float refractionLOD = getLodFromAlphaG(vRefractionMicrosurfaceInfos.x, alphaG, NdotVUnclamped);
+        #elif defined(SS_LINEARSPECULARREFRACTION)
+            float refractionLOD = getLinearLodFromRoughness(vRefractionMicrosurfaceInfos.x, roughness);
         #else
             float refractionLOD = getLodFromAlphaG(vRefractionMicrosurfaceInfos.x, alphaG);
         #endif
@@ -406,8 +408,7 @@ void main(void) {
         #ifdef SS_GAMMAREFRACTION
             environmentRefraction.rgb = toLinearSpace(environmentRefraction.rgb);
         #endif
-)ShaderCode"
-R"ShaderCode(
+
         // _____________________________ Levels _____________________________________
         environmentRefraction.rgb *= vRefractionInfos.x;
     #endif
@@ -440,6 +441,8 @@ R"ShaderCode(
 
         #if defined(LODINREFLECTIONALPHA) && !defined(REFLECTIONMAP_SKYBOX)
             float reflectionLOD = getLodFromAlphaG(vReflectionMicrosurfaceInfos.x, alphaG, NdotVUnclamped);
+        #elif defined(LINEARSPECULARREFLECTION)
+            float refractionLOD = getLinearLodFromRoughness(vReflectionMicrosurfaceInfos.x, roughness);
         #else
             float reflectionLOD = getLodFromAlphaG(vReflectionMicrosurfaceInfos.x, alphaG);
         #endif
@@ -511,6 +514,15 @@ R"ShaderCode(
 
                 environmentIrradiance = computeEnvironmentIrradiance(irradianceVector);
             #endif
+        #elif defined(USEIRRADIANCEMAP)
+            environmentIrradiance = sampleReflection(irradianceSampler, reflectionCoords).rgb;
+            #ifdef RGBDREFLECTION
+                environmentIrradiance.rgb = fromRGBD(environmentIrradiance);
+            #endif
+
+            #ifdef GAMMAREFLECTION
+                environmentIrradiance.rgb = toLinearSpace(environmentIrradiance.rgb);
+            #endif
         #endif
 
         // _____________________________ Levels _____________________________________
@@ -568,6 +580,8 @@ R"ShaderCode(
             // _____________________________ 2D vs 3D Maps ________________________________
             #if defined(LODINREFLECTIONALPHA) && !defined(REFLECTIONMAP_SKYBOX)
                 float sheenReflectionLOD = getLodFromAlphaG(vReflectionMicrosurfaceInfos.x, sheenAlphaG, NdotVUnclamped);
+            #elif defined(LINEARSPECULARREFLECTION)
+                float sheenReflectionLOD = getLinearLodFromRoughness(vReflectionMicrosurfaceInfos.x, sheenRoughness);
             #else
                 float sheenReflectionLOD = getLodFromAlphaG(vReflectionMicrosurfaceInfos.x, sheenAlphaG);
             #endif
@@ -660,7 +674,7 @@ R"ShaderCode(
                 clearCoatNormalW = normalize(texture2D(clearCoatBumpSampler, vClearCoatBumpUV + uvOffset).xyz  * 2.0 - 1.0);
                 clearCoatNormalW = normalize(mat3(normalMatrix) * clearCoatNormalW);
             #else
-                clearCoatNormalW = perturbNormal(TBN, vClearCoatBumpUV + uvOffset, clearCoatBumpSampler, vClearCoatBumpInfos.y);
+                clearCoatNormalW = perturbNormal(TBN, texture2D(clearCoatBumpSampler, vClearCoatBumpUV + uvOffset).xyz, vClearCoatBumpInfos.y);
             #endif
         #endif
 
@@ -709,6 +723,8 @@ R"ShaderCode(
 
             #if defined(LODINREFLECTIONALPHA) && !defined(REFLECTIONMAP_SKYBOX)
                 float clearCoatReflectionLOD = getLodFromAlphaG(vReflectionMicrosurfaceInfos.x, clearCoatAlphaG, clearCoatNdotVUnclamped);
+            #elif defined(LINEARSPECULARREFLECTION)
+                float sheenReflectionLOD = getLinearLodFromRoughness(vReflectionMicrosurfaceInfos.x, clearCoatRoughness);
             #else
                 float clearCoatReflectionLOD = getLodFromAlphaG(vReflectionMicrosurfaceInfos.x, clearCoatAlphaG);
             #endif
@@ -738,8 +754,7 @@ R"ShaderCode(
                     );
                 }
             #endif
-)ShaderCode"
-R"ShaderCode(
+
             #ifdef RGBDREFLECTION
                 environmentClearCoatRadiance.rgb = fromRGBD(environmentClearCoatRadiance);
             #endif
@@ -765,7 +780,7 @@ R"ShaderCode(
     // _____________________________ IBL BRDF + Energy Cons ________________________________
     #if defined(ENVIRONMENTBRDF)
         // BRDF Lookup
-        vec3 environmentBrdf = getBRDFLookup(NdotV, roughness, environmentBrdfSampler);
+        vec3 environmentBrdf = getBRDFLookup(NdotV, roughness);
 
         #ifdef MS_BRDF_ENERGY_CONSERVATION
             vec3 energyConservationFactor = getEnergyConservationFactor(specularEnvironmentR0, environmentBrdf);
@@ -829,11 +844,16 @@ R"ShaderCode(
     #endif
 
     #ifdef LIGHTMAP
-        vec3 lightmapColor = texture2D(lightmapSampler, vLightmapUV + uvOffset).rgb;
-        #ifdef GAMMALIGHTMAP
-            lightmapColor = toLinearSpace(lightmapColor);
+        vec4 lightmapColor = texture2D(lightmapSampler, vLightmapUV + uvOffset);
+
+        #ifdef RGBDLIGHTMAP
+            lightmapColor.rgb = fromRGBD(lightmapColor);
         #endif
-        lightmapColor *= vLightmapInfos.y;
+
+        #ifdef GAMMALIGHTMAP
+            lightmapColor.rgb = toLinearSpace(lightmapColor.rgb);
+        #endif
+        lightmapColor.rgb *= vLightmapInfos.y;
     #endif
 
     // Direct Lighting Variables
@@ -892,7 +912,7 @@ R"ShaderCode(
     #ifdef CLEARCOAT
         #if defined(ENVIRONMENTBRDF) && !defined(REFLECTIONMAP_SKYBOX)
             // BRDF Lookup
-            vec3 environmentClearCoatBrdf = getBRDFLookup(clearCoatNdotV, clearCoatRoughness, environmentBrdfSampler);
+            vec3 environmentClearCoatBrdf = getBRDFLookup(clearCoatNdotV, clearCoatRoughness);
             vec3 clearCoatEnvironmentReflectance = getReflectanceFromBRDFLookup(vec3(vClearCoatRefractionParams.x), environmentClearCoatBrdf);
 
             #ifdef RADIANCEOCCLUSION
@@ -915,7 +935,7 @@ R"ShaderCode(
 
         clearCoatEnvironmentReflectance *= clearCoatIntensity;
 
-        #ifdef CLEARCOAT_TINT
+        #if defined(REFLECTION) && defined(CLEARCOAT_TINT)
             // NdotL = NdotV in IBL
             absorption = computeClearCoatAbsorption(clearCoatNdotVRefract, clearCoatNdotVRefract, clearCoatColor, clearCoatThickness, clearCoatIntensity);
 
@@ -977,8 +997,10 @@ R"ShaderCode(
         // Decrease Albedo Contribution
         surfaceAlbedo *= (1. - refractionIntensity);
 
-        // Decrease irradiance Contribution
-        environmentIrradiance *= (1. - refractionIntensity);
+        #ifdef REFLECTION
+            // Decrease irradiance Contribution
+            environmentIrradiance *= (1. - refractionIntensity);
+        #endif
 
         // Add Multiple internal bounces.
         vec3 bounceSpecularEnvironmentReflectance = (2.0 * specularEnvironmentReflectance) / (1.0 + specularEnvironmentReflectance);
@@ -989,7 +1011,7 @@ R"ShaderCode(
     #endif
 
     // _______________________________  IBL Translucency ________________________________
-    #if defined(REFLECTION) && defined(USESPHERICALFROMREFLECTIONMAP) && defined(SS_TRANSLUCENCY)
+    #if defined(REFLECTION) && defined(SS_TRANSLUCENCY)
         #if defined(USESPHERICALINVERTEX)
             vec3 irradianceVector = vec3(reflectionMatrix * vec4(normalW, 0)).xyz;
             #ifdef REFLECTIONMAP_OPPOSITEZ
@@ -997,7 +1019,21 @@ R"ShaderCode(
             #endif
         #endif
 
-        vec3 refractionIrradiance = computeEnvironmentIrradiance(-irradianceVector);
+        #if defined(USESPHERICALFROMREFLECTIONMAP)
+            vec3 refractionIrradiance = computeEnvironmentIrradiance(-irradianceVector);
+        #elif defined(USEIRRADIANCEMAP)
+            vec3 refractionIrradiance = sampleReflection(irradianceSampler, -irradianceVector).rgb;
+            #ifdef RGBDREFLECTION
+                refractionIrradiance.rgb = fromRGBD(refractionIrradiance);
+            #endif
+
+            #ifdef GAMMAREFLECTION
+                refractionIrradiance.rgb = toLinearSpace(refractionIrradiance.rgb);
+            #endif
+        #else
+            vec3 refractionIrradiance = vec3(0.);
+        #endif
+
         refractionIrradiance *= transmittance;
     #endif
 
@@ -1006,16 +1042,12 @@ R"ShaderCode(
     // Apply Energy Conservation.
     #ifndef METALLICWORKFLOW
         surfaceAlbedo.rgb = (1. - reflectance) * surfaceAlbedo.rgb;
-
-)ShaderCode"
-R"ShaderCode(
-
     #endif
 
     // _____________________________ Irradiance ______________________________________
     #ifdef REFLECTION
         vec3 finalIrradiance = environmentIrradiance;
-        #if defined(USESPHERICALFROMREFLECTIONMAP) && defined(SS_TRANSLUCENCY)
+        #if defined(SS_TRANSLUCENCY)
             finalIrradiance += refractionIrradiance;
         #endif
         finalIrradiance *= surfaceAlbedo.rgb;
@@ -1200,9 +1232,9 @@ R"ShaderCode(
 #ifdef LIGHTMAP
     #ifndef LIGHTMAPEXCLUDED
         #ifdef USELIGHTMAPASSHADOWMAP
-            finalColor.rgb *= lightmapColor;
+            finalColor.rgb *= lightmapColor.rgb;
         #else
-            finalColor.rgb += lightmapColor;
+            finalColor.rgb += lightmapColor.rgb;
         #endif
     #endif
 #endif
@@ -1237,6 +1269,7 @@ R"ShaderCode(
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_PBR_FRAGMENT_FX_H

@@ -18,12 +18,10 @@ class Mesh;
 class Particle;
 class Scene;
 class VertexBuffer;
-using EffectPtr       = std::shared_ptr<Effect>;
-using VertexBufferPtr = std::shared_ptr<VertexBuffer>;
-
-namespace GL {
-class IGLBuffer;
-} // end of namespace GL
+class WebGLDataBuffer;
+using EffectPtr          = std::shared_ptr<Effect>;
+using VertexBufferPtr    = std::shared_ptr<VertexBuffer>;
+using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
 
 /**
  * @brief This represents a particle system in Babylon.
@@ -592,7 +590,7 @@ private:
   std::unique_ptr<Buffer> _vertexBuffer;
   std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
   std::unique_ptr<Buffer> _spriteBuffer;
-  std::unique_ptr<GL::IGLBuffer> _indexBuffer;
+  WebGLDataBufferPtr _indexBuffer;
   EffectPtr _effect;
   EffectPtr _customEffect;
   std::string _cachedDefines;

@@ -162,6 +162,7 @@ void main(void) {
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_MATERIALS_LIBRARY_TRIPLANAR_TRI_PLANAR_FRAGMENT_FX_H

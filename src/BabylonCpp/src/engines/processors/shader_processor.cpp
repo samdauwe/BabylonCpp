@@ -15,10 +15,6 @@
 #include <babylon/engines/processors/shader_code_test_node.h>
 #include <babylon/misc/file_tools.h>
 
-#ifndef isNan
-#define isNan(a) ((a) != (a))
-#endif
-
 namespace BABYLON {
 
 void ShaderProcessor::Process(const std::string& sourceCode, ProcessingOptions& options,
@@ -54,7 +50,7 @@ std::string ShaderProcessor::_ProcessPrecision(std::string source, const Process
 
 ShaderDefineExpressionPtr ShaderProcessor::_ExtractOperation(const std::string& expression)
 {
-  auto reStr = "defined\\((.+)\\)";
+  auto reStr = R"(defined\((.+)\))";
   std::regex regex(reStr, std::regex::optimize);
   std::smatch match;
 
@@ -145,7 +141,7 @@ void ShaderProcessor::_MoveCursorWithinIf(ShaderCodeCursor& cursor,
 {
   auto line = cursor.currentLine();
   while (_MoveCursor(cursor, ifNode)) {
-    line        = cursor.currentLine;
+    line        = cursor.currentLine();
     auto first5 = String::toLowerCase(line.substr(0, 5));
 
     if (first5 == "#else") {
@@ -165,15 +161,15 @@ void ShaderProcessor::_MoveCursorWithinIf(ShaderCodeCursor& cursor,
 
 bool ShaderProcessor::_MoveCursor(ShaderCodeCursor& cursor, const ShaderCodeNodePtr& rootNode)
 {
-  while (cursor.canRead) {
+  while (cursor.canRead()) {
     ++cursor.lineIndex;
     const auto& line      = cursor.currentLine();
-    const auto reKeywords = "(#ifdef)|(#else)|(#elif)|(#endif)|(#ifndef)|(#if)";
+    const auto reKeywords = R"((#ifdef)|(#else)|(#elif)|(#endif)|(#ifndef)|(#if))";
     std::regex regex(reKeywords, std::regex::optimize);
     std::smatch matches;
 
     if (std::regex_search(line, matches, regex) && !matches.empty()) {
-      auto keyword = matches[0];
+      auto keyword = matches[0].str();
 
       if (keyword == "#ifdef") {
         auto newRootNode = std::make_shared<ShaderCodeConditionNode>();
@@ -204,7 +200,6 @@ bool ShaderProcessor::_MoveCursor(ShaderCodeCursor& cursor, const ShaderCodeNode
 
         newRootNode->children.emplace_back(ifNode);
         _MoveCursorWithinIf(cursor, newRootNode, ifNode);
-        break;
       }
     }
     else {
@@ -226,6 +221,22 @@ bool ShaderProcessor::_MoveCursor(ShaderCodeCursor& cursor, const ShaderCodeNode
   return false;
 }
 
+std::vector<std::string>
+ShaderProcessor::_removeCommentsAndEmptyLines(const std::vector<std::string>& sourceCodeLines)
+{
+  std::vector<std::string> result;
+  for (const auto& sourceCodeLine : sourceCodeLines) {
+    const auto line = String::stripComments(sourceCodeLine, "//");
+
+    // Ignore empty lines
+    if (!line.empty()) {
+      result.emplace_back(line);
+    }
+  }
+
+  return result;
+}
+
 std::string
 ShaderProcessor::_EvaluatePreProcessors(const std::string& sourceCode,
                                         std::unordered_map<std::string, std::string>& preprocessors,
@@ -235,7 +246,7 @@ ShaderProcessor::_EvaluatePreProcessors(const std::string& sourceCode,
   ShaderCodeCursor cursor;
 
   cursor.lineIndex = -1;
-  cursor.lines     = String::split(sourceCode, '\n');
+  cursor.lines     = _removeCommentsAndEmptyLines(String::split(sourceCode, '\n'));
 
   // Decompose (We keep it in 2 steps so it is easier to maintain and perf hit is insignificant)
   _MoveCursor(cursor, rootNode);
@@ -302,14 +313,15 @@ std::string ShaderProcessor::_ProcessShaderConversion(const std::string& sourceC
 void ShaderProcessor::_ProcessIncludes(const std::string& sourceCode, ProcessingOptions& options,
                                        const std::function<void(const std::string& data)>& callback)
 {
-  static std::string re = R"(#include<(.+)>(\((.*)\))*(\[(.*)\])*)";
-  static std::regex regex(re, std::regex::optimize);
-  std::smatch match;
-  std::regex_search(sourceCode, match, regex);
+  static std::string reStr = R"(#include<(.+)>(\((.*)\))*(\[(.*)\])*)";
+  static std::regex regex(reStr, std::regex::optimize);
+  auto regexBegin = std::sregex_iterator(sourceCode.begin(), sourceCode.end(), regex);
+  auto regexEnd   = std::sregex_iterator();
 
   auto returnValue = sourceCode;
 
-  while (!match.empty()) {
+  for (std::sregex_iterator regexIt = regexBegin; regexIt != regexEnd; ++regexIt) {
+    auto match       = *regexIt;
     auto includeFile = match[1].str();
 
     // Uniform declaration
@@ -341,17 +353,18 @@ void ShaderProcessor::_ProcessIncludes(const std::string& sourceCode, Processing
 
         if (String::indexOf(indexString, "..") != -1) {
           String::replaceInPlace(indexString, "..", "@");
-          auto indexSplits          = String::split(indexString, '@');
-          auto minIndex             = String::toNumber<int>(indexSplits[0]);
-          auto maxIndex             = String::toNumber<int>(indexSplits[1]);
+          auto indexSplits = String::split(indexString, '@');
+          auto minIndex    = String::toNumber<int>(indexSplits[0]);
+          auto maxIndex
+            = String::isDigit(indexSplits[1]) ? String::toNumber<int>(indexSplits[1]) : -1;
           auto sourceIncludeContent = String::slice(includeContent, 0);
           includeContent            = "";
 
-          if (isNan(maxIndex)) {
+          if (maxIndex <= 0) {
             maxIndex = options.indexParameters[indexSplits[1]];
           }
 
-          for (int i = minIndex; i < maxIndex; i++) {
+          for (int i = minIndex; i < maxIndex; ++i) {
             if (!options.supportsUniformBuffers) {
               // Ubo replacement
               /*sourceIncludeContent = sourceIncludeContent.replace(/light\{X\}.(\w*)/g, (str:
@@ -359,7 +372,7 @@ void ShaderProcessor::_ProcessIncludes(const std::string& sourceCode, Processing
              });*/
             }
             includeContent
-              += String::regexReplace(sourceIncludeContent, "\\{X\\}", String::printf("%d\n", i));
+              += String::regexReplace(sourceIncludeContent, R"(\{X\})", std::to_string(i)) + "\n";
           }
         }
         else {
@@ -369,12 +382,12 @@ void ShaderProcessor::_ProcessIncludes(const std::string& sourceCode, Processing
             => { return p1 + "{X}";
             });*/
           }
-          includeContent = String::regexReplace(includeContent, "\\{X\\}", indexString);
+          includeContent = String::regexReplace(includeContent, R"(\{X\})", indexString);
         }
       }
 
       // Replace
-      returnValue = String::replace(returnValue, match[0], includeContent);
+      returnValue = String::replace(returnValue, match[0].str(), includeContent);
     }
     else {
       auto includeShaderUrl = options.shadersRepository + "ShadersInclude/" + includeFile + ".fx";
@@ -391,8 +404,6 @@ void ShaderProcessor::_ProcessIncludes(const std::string& sourceCode, Processing
                           });
       return;
     }
-
-    std::regex_search(sourceCode, match, regex);
   }
 
   callback(returnValue);

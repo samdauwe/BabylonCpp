@@ -5,6 +5,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/irender_target_options.h>
+#include <babylon/meshes/webgl/webgl_data_buffer.h>
 #include <babylon/states/_alpha_state.h>
 #include <babylon/states/_depth_culling_state.h>
 #include <babylon/states/_stencil_state.h>
@@ -80,17 +81,17 @@ NullEngine::NullEngine(const NullEngineOptions& options) : Engine{nullptr}
 
 NullEngine::~NullEngine() = default;
 
-Engine::GLBufferPtr NullEngine::createVertexBuffer(const Float32Array& /*vertices*/)
+WebGLDataBufferPtr NullEngine::createVertexBuffer(const Float32Array& /*vertices*/)
 {
-  auto buffer        = std::make_unique<GL::IGLBuffer>(0);
+  auto buffer        = std::make_shared<WebGLDataBuffer>(nullptr);
   buffer->references = 1;
   return buffer;
 }
 
-Engine::GLBufferPtr NullEngine::createIndexBuffer(const IndicesArray& /*indices*/,
-                                                  bool /*updatable*/)
+WebGLDataBufferPtr NullEngine::createIndexBuffer(const IndicesArray& /*indices*/,
+                                                 bool /*updatable*/)
 {
-  auto buffer        = std::make_unique<GL::IGLBuffer>(0);
+  auto buffer        = std::make_shared<WebGLDataBuffer>(nullptr);
   buffer->references = 1;
   return buffer;
 }
@@ -125,11 +126,12 @@ void NullEngine::setViewport(Viewport& viewport, const std::optional<int>& /*req
   _cachedViewport = viewport;
 }
 
-GL::IGLProgramPtr NullEngine::createShaderProgram(const IPipelineContextPtr& /*pipelineContext*/,
-                                                  const std::string& /*vertexCode*/,
-                                                  const std::string& /*fragmentCode*/,
-                                                  const std::string& /*defines*/,
-                                                  GL::IGLRenderingContext* /*context*/)
+GL::IGLProgramPtr
+NullEngine::createShaderProgram(const IPipelineContextPtr& /*pipelineContext*/,
+                                const std::string& /*vertexCode*/,
+                                const std::string& /*fragmentCode*/, const std::string& /*defines*/,
+                                GL::IGLRenderingContext* /*context*/,
+                                const std::vector<std::string>& /*transformFeedbackVaryings*/)
 {
   auto program                      = std::make_shared<GL::IGLProgram>(0);
   program->__SPECTOR_rebuildProgram = nullptr;
@@ -222,10 +224,6 @@ void NullEngine::setMatrices(GL::IGLUniformLocation* /*uniform*/, const Float32A
 {
 }
 
-void NullEngine::setMatrix(GL::IGLUniformLocation* /*uniform*/, const Matrix& /*matrix*/)
-{
-}
-
 void NullEngine::setMatrix3x3(GL::IGLUniformLocation* /*uniform*/, const Float32Array& /*matrix*/)
 {
 }
@@ -259,16 +257,6 @@ void NullEngine::setFloat4(GL::IGLUniformLocation* /*uniform*/, float /*x*/, flo
                            float /*z*/, float /*w*/)
 {
 }
-
-void NullEngine::setColor3(GL::IGLUniformLocation* /*uniform*/, const Color3& /*color3*/)
-{
-}
-
-void NullEngine::setColor4(GL::IGLUniformLocation* /*uniform*/, const Color3& /*color3*/,
-                           float /*alpha*/)
-{
-}
-
 void NullEngine::setAlphaMode(unsigned int mode, bool noDepthWriteChange)
 {
   if (_alphaMode == mode) {
@@ -285,7 +273,7 @@ void NullEngine::setAlphaMode(unsigned int mode, bool noDepthWriteChange)
 
 void NullEngine::bindBuffers(
   const std::unordered_map<std::string, VertexBufferPtr>& /*vertexBuffers*/,
-  GL::IGLBuffer* /*indexBuffer*/, const EffectPtr& /*effect*/)
+  const WebGLDataBufferPtr& /*indexBuffer*/, const EffectPtr& /*effect*/)
 {
 }
 
@@ -325,7 +313,7 @@ void NullEngine::drawArraysType(unsigned int /*fillMode*/, int /*verticesStart*/
 {
 }
 
-Engine::GLTexturePtr NullEngine::_createTexture()
+std::unique_ptr<GL::IGLTexture> NullEngine::_createTexture()
 {
   return std::make_unique<GL::IGLTexture>(0);
 }
@@ -339,7 +327,8 @@ InternalTexturePtr NullEngine::createTexture(
   unsigned int samplingMode, const std::function<void(InternalTexture*, EventState&)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& /*onError*/,
   const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& /*buffer*/,
-  const InternalTexturePtr& /*fallBack*/, const std::optional<unsigned int>& format)
+  const InternalTexturePtr& /*fallBack*/, const std::optional<unsigned int>& format,
+  const std::string& /*forcedExtension*/)
 {
   auto texture    = InternalTexture::New(this, InternalTexture::DATASOURCE_URL);
   const auto& url = urlArg;
@@ -455,9 +444,9 @@ void NullEngine::unBindFramebuffer(const InternalTexturePtr& texture,
   _currentFramebuffer = nullptr;
 }
 
-Engine::GLBufferPtr NullEngine::createDynamicVertexBuffer(const Float32Array& /*vertices*/)
+WebGLDataBufferPtr NullEngine::createDynamicVertexBuffer(const Float32Array& /*vertices*/)
 {
-  auto buffer        = std::make_unique<GL::IGLBuffer>(0);
+  auto buffer        = std::make_shared<WebGLDataBuffer>(nullptr);
   buffer->references = 1;
   buffer->capacity   = 1;
   return buffer;
@@ -465,7 +454,8 @@ Engine::GLBufferPtr NullEngine::createDynamicVertexBuffer(const Float32Array& /*
 
 void NullEngine::updateDynamicTexture(const InternalTexturePtr& /*texture*/, ICanvas* /*canvas*/,
                                       bool /*invertY*/, bool /*premulAlpha*/,
-                                      unsigned int /*format*/)
+                                      std::optional<unsigned int> /*format*/,
+                                      bool /*forceBindTexture*/)
 {
 }
 
@@ -488,12 +478,12 @@ void NullEngine::_unpackFlipY(bool /*value*/)
 {
 }
 
-void NullEngine::updateDynamicIndexBuffer(const GLBufferPtr& /*indexBuffer*/,
+void NullEngine::updateDynamicIndexBuffer(const WebGLDataBufferPtr& /*indexBuffer*/,
                                           const IndicesArray& /*indices*/, int /*offset*/)
 {
 }
 
-void NullEngine::updateDynamicVertexBuffer(const GLBufferPtr& /*vertexBuffer*/,
+void NullEngine::updateDynamicVertexBuffer(const WebGLDataBufferPtr& /*vertexBuffer*/,
                                            const Float32Array& /*data*/, int /*byteOffset*/,
                                            int /*byteLength*/)
 {
@@ -545,7 +535,9 @@ void NullEngine::_uploadCompressedDataToTextureDirectly(const InternalTexturePtr
 
 void NullEngine::_uploadDataToTextureDirectly(const InternalTexturePtr& /*texture*/,
                                               const ArrayBufferView& /*imageData*/,
-                                              unsigned int /*faceIndex*/, int /*lod*/)
+                                              unsigned int /*faceIndex*/, int /*lod*/,
+                                              int /*babylonInternalFormat*/,
+                                              bool /*useTextureWidthAndHeight*/)
 {
 }
 

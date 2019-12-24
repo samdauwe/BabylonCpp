@@ -418,7 +418,7 @@ void SpriteManager::render()
   }
 
   // VBOs
-  engine->bindBuffers(_vertexBuffers, _indexBuffer.get(), effect);
+  engine->bindBuffers(_vertexBuffers, _indexBuffer, effect);
 
   // Draw order
   engine->setDepthFunctionToLessOrEqual();
@@ -441,7 +441,7 @@ void SpriteManager::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndText
   }
 
   if (_indexBuffer) {
-    _scene->getEngine()->_releaseBuffer(_indexBuffer.get());
+    _scene->getEngine()->_releaseBuffer(_indexBuffer);
     _indexBuffer = nullptr;
   }
 

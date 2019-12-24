@@ -12,18 +12,16 @@ namespace BABYLON {
 class Effect;
 struct EffectWrapper;
 class Engine;
+struct IEffectRendererOptions;
 class Texture;
 class VertexBuffer;
 class Viewport;
-struct IEffectRendererOptions;
-using EffectPtr        = std::shared_ptr<Effect>;
-using EffectWrapperPtr = std::shared_ptr<EffectWrapper>;
-using TexturePtr       = std::shared_ptr<Texture>;
-using VertexBufferPtr  = std::shared_ptr<VertexBuffer>;
-
-namespace GL {
-class IGLBuffer;
-} // end of namespace GL
+class WebGLDataBuffer;
+using EffectPtr          = std::shared_ptr<Effect>;
+using EffectWrapperPtr   = std::shared_ptr<EffectWrapper>;
+using TexturePtr         = std::shared_ptr<Texture>;
+using VertexBufferPtr    = std::shared_ptr<VertexBuffer>;
+using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
 
 /**
  * @brief Helper class to render one or more effects.
@@ -95,7 +93,7 @@ public:
 
 private:
   std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
-  std::unique_ptr<GL::IGLBuffer> _indexBuffer;
+  WebGLDataBufferPtr _indexBuffer;
 
   size_t _ringBufferIndex;
   std::vector<TexturePtr> _ringScreenBuffer;

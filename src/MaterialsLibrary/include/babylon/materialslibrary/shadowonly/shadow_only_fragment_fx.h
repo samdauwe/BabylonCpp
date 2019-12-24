@@ -67,6 +67,7 @@ void main(void) {
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_MATERIALS_LIBRARY_SHADOWONLY_SHADOW_ONLY_FRAGMENT_FX_H

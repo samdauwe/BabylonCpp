@@ -1,11 +1,11 @@
-﻿#ifndef BABYLON_SHADERS_DEPTH_VERTEX_FX_H
-#define BABYLON_SHADERS_DEPTH_VERTEX_FX_H
+﻿#ifndef BABYLON_SHADERS_VOLUMETRIC_LIGHT_SCATTERING_PASS_VERTEX_FX_H
+#define BABYLON_SHADERS_VOLUMETRIC_LIGHT_SCATTERING_PASS_VERTEX_FX_H
 
 namespace BABYLON {
 
-extern const char* depthVertexShader;
+extern const char* volumetricLightScatteringPassVertexShader;
 
-const char* depthVertexShader
+const char* volumetricLightScatteringPassVertexShader
   = R"ShaderCode(
 
 // Attribute
@@ -32,12 +32,10 @@ attribute vec2 uv2;
 #endif
 #endif
 
-varying float vDepthMetric;
-
 void main(void)
 {
     vec3 positionUpdated = position;
-#ifdef UV1
+#if (defined(ALPHATEST) || defined(NEED_UV)) && defined(UV1)
     vec2 uvUpdated = uv;
 #endif
 #include<morphTargetsVertex>[0..maxSimultaneousMorphTargets]
@@ -45,10 +43,6 @@ void main(void)
 #include<instancesVertex>
 
 #include<bonesVertex>
-
-    gl_Position = viewProjection * finalWorld * vec4(positionUpdated, 1.0);
-
-    vDepthMetric = ((gl_Position.z + depthValues.x) / (depthValues.y));
 
 #if defined(ALPHATEST) || defined(BASIC_RENDER)
 #ifdef UV1
@@ -64,4 +58,4 @@ void main(void)
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_SHADERS_DEPTH_VERTEX_FX_H
+#endif // end of BABYLON_SHADERS_VOLUMETRIC_LIGHT_SCATTERING_PASS_VERTEX_FX_H

@@ -462,6 +462,7 @@ color.rgb = max(color.rgb, 0.);
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_DEFAULT_FRAGMENT_FX_H

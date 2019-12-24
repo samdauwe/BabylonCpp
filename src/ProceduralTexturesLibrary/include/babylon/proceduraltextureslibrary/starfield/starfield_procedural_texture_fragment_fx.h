@@ -73,6 +73,7 @@ void main()
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_PROCEDURAL_TEXTURES_LIBRARY_STARFIELD_STARFIELD_PROCEDURAL_TEXTURE_FRAGMENT_FX_H

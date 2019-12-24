@@ -917,7 +917,7 @@ void Mesh::_bind(SubMesh* subMesh, const EffectPtr& effect, unsigned int fillMod
   auto engine = getScene()->getEngine();
 
   // Wireframe
-  GL::IGLBuffer* indexToBind;
+  WebGLDataBufferPtr indexToBind = nullptr;
 
   if (_unIndexed) {
     indexToBind = nullptr;
@@ -929,7 +929,7 @@ void Mesh::_bind(SubMesh* subMesh, const EffectPtr& effect, unsigned int fillMod
         break;
       case Material::WireFrameFillMode: {
         const auto& linesIndexBuffer = subMesh->_getLinesIndexBuffer(getIndices(), engine);
-        indexToBind                  = linesIndexBuffer ? linesIndexBuffer.get() : nullptr;
+        indexToBind                  = linesIndexBuffer ? linesIndexBuffer : nullptr;
       } break;
       default:
       case Material::TriangleFillMode:

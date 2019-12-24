@@ -13,13 +13,11 @@ class InternalTexture;
 class PostProcess;
 class Scene;
 class VertexBuffer;
+class WebGLDataBuffer;
 using InternalTexturePtr = std::shared_ptr<InternalTexture>;
 using PostProcessPtr     = std::shared_ptr<PostProcess>;
 using VertexBufferPtr    = std::shared_ptr<VertexBuffer>;
-
-namespace GL {
-class IGLBuffer;
-} // end of namespace GL
+using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
 
 /**
  * @brief PostProcessManager is used to manage one or more post processes or
@@ -66,8 +64,8 @@ public:
    */
   void directRender(const std::vector<PostProcessPtr>& postProcesses,
                     const InternalTexturePtr& targetTexture = nullptr,
-                    bool forceFullscreenViewport            = false,
-                    unsigned int faceIndex = 0, int lodLevel = 0);
+                    bool forceFullscreenViewport = false, unsigned int faceIndex = 0,
+                    int lodLevel = 0);
 
   /**
    * @brief Finalize the result of the output of the postprocesses.
@@ -79,9 +77,8 @@ public:
    * 0,0,textureWidth,textureHeight (default: false)
    * Hidden
    */
-  void _finalizeFrame(bool doNotPresent,
-                      const InternalTexturePtr& targetTexture = nullptr,
-                      unsigned int faceIndex                  = 0,
+  void _finalizeFrame(bool doNotPresent, const InternalTexturePtr& targetTexture = nullptr,
+                      unsigned int faceIndex                           = 0,
                       const std::vector<PostProcessPtr>& postProcesses = {},
                       bool forceFullscreenViewport                     = false);
 
@@ -96,7 +93,7 @@ private:
 
 private:
   Scene* _scene;
-  std::unique_ptr<GL::IGLBuffer> _indexBuffer;
+  WebGLDataBufferPtr _indexBuffer;
   Float32Array _vertexDeclaration;
   std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
 

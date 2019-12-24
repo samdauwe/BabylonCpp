@@ -24,15 +24,13 @@
 
 namespace BABYLON {
 
-LensFlareSystem::LensFlareSystem(const std::string& name,
-                                 const LensFlareEmitterType& emitter,
+LensFlareSystem::LensFlareSystem(const std::string& name, const LensFlareEmitterType& emitter,
                                  Scene* scene)
     : name{name}
     , borderLimit{300}
     , viewportBorder{0.f}
     , layerMask{0x0FFFFFFF}
-    , isEnabled{this, &LensFlareSystem::get_isEnabled,
-                &LensFlareSystem::set_isEnabled}
+    , isEnabled{this, &LensFlareSystem::get_isEnabled, &LensFlareSystem::set_isEnabled}
     , _indexBuffer{nullptr}
     , _isEnabled{true}
 {
@@ -49,8 +47,7 @@ LensFlareSystem::LensFlareSystem(const std::string& name,
   id       = name;
 
   meshesSelectionPredicate = [this](const AbstractMeshPtr& m) {
-    return _scene->activeCamera() && m->material() && m->isVisible
-           && m->isEnabled() && m->isBlocker
+    return _scene->activeCamera() && m->material() && m->isVisible && m->isEnabled() && m->isBlocker
            && ((m->layerMask() & _scene->activeCamera()->layerMask) != 0);
   };
 
@@ -62,8 +59,8 @@ LensFlareSystem::LensFlareSystem(const std::string& name,
                            -1.f, -1.f, //
                            1.f,  -1.f};
 
-  _vertexBuffers[VertexBuffer::PositionKind] = std::make_shared<VertexBuffer>(
-    engine, vertices, VertexBuffer::PositionKind, false, false, 2);
+  _vertexBuffers[VertexBuffer::PositionKind]
+    = std::make_shared<VertexBuffer>(engine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
   // Indices
   Uint32Array indices = {
@@ -82,8 +79,8 @@ LensFlareSystem::LensFlareSystem(const std::string& name,
   effectCreationOptions.uniformsNames = {"color", "viewportMatrix"};
   effectCreationOptions.samplers      = {"textureSampler"};
 
-  _effect = _scene->getEngine()->createEffect(
-    "lensFlare", effectCreationOptions, _scene->getEngine());
+  _effect
+    = _scene->getEngine()->createEffect("lensFlare", effectCreationOptions, _scene->getEngine());
 }
 
 LensFlareSystem::~LensFlareSystem() = default;
@@ -137,14 +134,12 @@ bool LensFlareSystem::computeEffectivePosition(Viewport& globalViewport)
 
   auto identityMatrix  = Matrix::Identity();
   auto transformMatrix = _scene->getTransformMatrix();
-  position = Vector3::Project(position, identityMatrix, transformMatrix,
-                              globalViewport);
+  position = Vector3::Project(position, identityMatrix, transformMatrix, globalViewport);
 
   _positionX = position.x;
   _positionY = position.y;
 
-  position = Vector3::TransformCoordinates(getEmitterPosition(),
-                                           _scene->getViewMatrix());
+  position = Vector3::TransformCoordinates(getEmitterPosition(), _scene->getViewMatrix());
 
   if (viewportBorder > 0) {
     globalViewport.x -= static_cast<int>(viewportBorder);
@@ -158,8 +153,7 @@ bool LensFlareSystem::computeEffectivePosition(Viewport& globalViewport)
   }
 
   if (position.z > 0.f) {
-    if ((_positionX > globalViewport.x)
-        && (_positionX < globalViewport.x + globalViewport.width)) {
+    if ((_positionX > globalViewport.x) && (_positionX < globalViewport.x + globalViewport.width)) {
       if ((_positionY > globalViewport.y)
           && (_positionY < globalViewport.y + globalViewport.height)) {
         return true;
@@ -178,9 +172,8 @@ bool LensFlareSystem::_isVisible()
   }
 
   auto emitterPosition = getEmitterPosition();
-  auto direction
-    = emitterPosition.subtract(_scene->activeCamera()->globalPosition());
-  auto distance = direction.length();
+  auto direction       = emitterPosition.subtract(_scene->activeCamera()->globalPosition());
+  auto distance        = direction.length();
   direction.normalize();
 
   Ray ray(_scene->activeCamera()->globalPosition(), direction);
@@ -198,10 +191,10 @@ bool LensFlareSystem::render()
     return false;
   }
 
-  auto engine         = _scene->getEngine();
-  auto viewport       = _scene->activeCamera()->viewport;
-  auto globalViewport = viewport.toGlobal(engine->getRenderWidth(true),
-                                          engine->getRenderHeight(true));
+  auto engine   = _scene->getEngine();
+  auto viewport = _scene->activeCamera()->viewport;
+  auto globalViewport
+    = viewport.toGlobal(engine->getRenderWidth(true), engine->getRenderHeight(true));
 
   // Position
   if (!computeEffectivePosition(globalViewport)) {
@@ -226,8 +219,7 @@ bool LensFlareSystem::render()
   if (_positionX < borderLimitf + globalViewport_x) {
     awayX = borderLimitf + globalViewport_x - _positionX;
   }
-  else if (_positionX
-           > globalViewport_x + globalViewport_width - borderLimitf) {
+  else if (_positionX > globalViewport_x + globalViewport_width - borderLimitf) {
     awayX = _positionX - globalViewport_x - globalViewport_width + borderLimitf;
   }
   else {
@@ -237,10 +229,8 @@ bool LensFlareSystem::render()
   if (_positionY < borderLimitf + globalViewport_y) {
     awayY = borderLimitf + globalViewport_y - _positionY;
   }
-  else if (_positionY
-           > globalViewport_y + globalViewport_height - borderLimitf) {
-    awayY
-      = _positionY - globalViewport_y - globalViewport_height + borderLimitf;
+  else if (_positionY > globalViewport_y + globalViewport_height - borderLimitf) {
+    awayY = _positionY - globalViewport_y - globalViewport_height + borderLimitf;
   }
   else {
     awayY = 0.f;
@@ -283,7 +273,7 @@ bool LensFlareSystem::render()
   engine->setAlphaMode(Constants::ALPHA_ONEONE);
 
   // VBOs
-  engine->bindBuffers(_vertexBuffers, _indexBuffer.get(), _effect);
+  engine->bindBuffers(_vertexBuffers, _indexBuffer, _effect);
 
   // Flares
   for (const auto& flare : lensFlares) {
@@ -299,8 +289,7 @@ bool LensFlareSystem::render()
     auto cw = flare->size;
     auto ch = flare->size * engine->getAspectRatio(*_scene->activeCamera());
     auto cx = 2.f * (x / (globalViewport_width + globalViewport_x * 2.f)) - 1.f;
-    auto cy
-      = 1.f - 2.f * (y / (globalViewport_height + globalViewport_y * 2.f));
+    auto cy = 1.f - 2.f * (y / (globalViewport_height + globalViewport_y * 2.f));
 
     auto viewportMatrix = Matrix::FromValues(cw / 2.f, 0.f, 0.f, 0.f, //
                                              0.f, ch / 2.f, 0.f, 0.f, //
@@ -314,9 +303,8 @@ bool LensFlareSystem::render()
     _effect->setTexture("textureSampler", flare->texture);
 
     // Color
-    _effect->setFloat4("color", flare->color.r * intensity,
-                       flare->color.g * intensity, flare->color.b * intensity,
-                       1.f);
+    _effect->setFloat4("color", flare->color.r * intensity, flare->color.g * intensity,
+                       flare->color.b * intensity, 1.f);
 
     // Draw order
     engine->drawElementsType(Material::TriangleFillMode, 0, 6);
@@ -339,7 +327,7 @@ void LensFlareSystem::dispose()
   }
 
   if (_indexBuffer) {
-    _scene->getEngine()->_releaseBuffer(_indexBuffer.get());
+    _scene->getEngine()->_releaseBuffer(_indexBuffer);
     _indexBuffer = nullptr;
   }
 
@@ -353,8 +341,7 @@ void LensFlareSystem::dispose()
   stl_util::remove_vector_elements_equal_sharedptr(_scene->lensFlareSystems, this);
 }
 
-LensFlareSystemPtr LensFlareSystem::Parse(const json& /*parsedLensFlareSystem*/,
-                                          Scene* /*scene*/,
+LensFlareSystemPtr LensFlareSystem::Parse(const json& /*parsedLensFlareSystem*/, Scene* /*scene*/,
                                           const std::string& /*rootUrl*/)
 {
 #if 0

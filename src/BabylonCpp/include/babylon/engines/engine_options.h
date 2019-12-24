@@ -10,8 +10,7 @@ namespace BABYLON {
  */
 struct BABYLON_SHARED_EXPORT EngineOptions {
   /**
-   * Defines whether to adapt to the device's viewport characteristics (default:
-   * false)
+   * Defines whether to adapt to the device's viewport characteristics (default: false)
    */
   bool adaptToDeviceRatio = false;
   /**
@@ -20,8 +19,7 @@ struct BABYLON_SHARED_EXPORT EngineOptions {
   bool antialias = true;
   /**
    * Defines if the engine should no exceed a specified device ratio
-   * @see
-   * https://developer.mozilla.org/en-US/docs/Web/API/Window/devicePixelRatio
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/devicePixelRatio
    */
   int limitDeviceRatio = false;
   /**
@@ -51,14 +49,23 @@ struct BABYLON_SHARED_EXPORT EngineOptions {
    */
   unsigned int lockstepMaxSteps = 4;
   /**
-   * Defines that engine should ignore modifying touch action attribute and
-   * style If not handle, you might need to set it up on your side for expected
-   * touch devices behavior.
+   * Defines that engine should ignore modifying touch action attribute and style If not handle, you
+   * might need to set it up on your side for expected touch devices behavior.
    */
   bool doNotHandleContextLost = false;
   /**
-   * Defines that engine should compile shaders with high precision floats (if
-   * supported). True by default
+   * Defines that engine should ignore modifying touch action attribute and style
+   * If not handle, you might need to set it up on your side for expected touch devices behavior.
+   */
+  bool doNotHandleTouchAction = false;
+  /**
+   * Defines that engine should compile shaders with high precision floats (if supported). True by
+   * default
+   */
+  bool useHighPrecisionFloats = false;
+  /**
+   * Defines that engine should compile shaders with high precision floats (if supported). True by
+   * default
    */
   bool premultipliedAlpha = true;
 }; // end of struct EngineOptions

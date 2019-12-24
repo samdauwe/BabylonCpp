@@ -127,6 +127,7 @@ vec3 computeProjectionTextureDiffuseLighting(sampler2D projectionLightSampler, m
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_LIGHTS_FRAGMENT_FUNCTIONS_FX_H

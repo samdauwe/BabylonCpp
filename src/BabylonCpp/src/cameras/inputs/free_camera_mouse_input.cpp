@@ -8,8 +8,7 @@
 namespace BABYLON {
 
 FreeCameraMouseInput::FreeCameraMouseInput(bool iTouchEnabled)
-    : buttons{{MouseButtonType::LEFT, MouseButtonType::MIDDLE,
-               MouseButtonType::RIGHT}}
+    : buttons{{MouseButtonType::LEFT, MouseButtonType::MIDDLE, MouseButtonType::RIGHT}}
     , angularSensibility{2000.f}
     , _allowCameraRotation{true}
     , touchEnabled{iTouchEnabled}
@@ -35,16 +34,11 @@ void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
     _pointerInput = [this](PointerInfo* p, EventState&) -> void {
       auto& evt = p->pointerEvent;
 
-      if (_engine->isInVRExclusivePointerMode()) {
-        return;
-      }
-
       if (!touchEnabled && evt.pointerType == PointerType::TOUCH) {
         return;
       }
 
-      if (p->type != PointerEventTypes::POINTERMOVE
-          && evt.button == MouseButtonType::UNDEFINED) {
+      if (p->type != PointerEventTypes::POINTERMOVE && evt.button == MouseButtonType::UNDEFINED) {
         return;
       }
 
@@ -84,8 +78,7 @@ void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
         if (camera->getScene()->useRightHandedSystem()) {
           offsetX *= -1.f;
         }
-        if (camera->parent
-            && camera->parent()->_getWorldMatrixDeterminant() < 0.f) {
+        if (camera->parent && camera->parent()->_getWorldMatrixDeterminant() < 0.f) {
           offsetX *= -1.f;
         }
 
@@ -116,16 +109,11 @@ void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
       return;
     }
 
-    if (_engine->isInVRExclusivePointerMode()) {
-      return;
-    }
-
     auto offsetX = static_cast<float>(evt.movementX);
     if (camera->getScene()->useRightHandedSystem()) {
       offsetX *= -1.f;
     }
-    if (camera->parent
-        && camera->parent()->_getWorldMatrixDeterminant() < 0.f) {
+    if (camera->parent && camera->parent()->_getWorldMatrixDeterminant() < 0.f) {
       offsetX *= -1.f;
     }
     camera->cameraRotation->y += offsetX / angularSensibility;

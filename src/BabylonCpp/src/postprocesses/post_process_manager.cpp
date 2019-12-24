@@ -11,8 +11,7 @@
 
 namespace BABYLON {
 
-PostProcessManager::PostProcessManager(Scene* scene)
-    : _scene{scene}, _indexBuffer{nullptr}
+PostProcessManager::PostProcessManager(Scene* scene) : _scene{scene}, _indexBuffer{nullptr}
 {
 }
 
@@ -63,22 +62,18 @@ void PostProcessManager::_rebuild()
   _buildIndexBuffer();
 }
 
-bool PostProcessManager::_prepareFrame(
-  const InternalTexturePtr& sourceTexture,
-  const std::vector<PostProcessPtr>& iPostProcesses)
+bool PostProcessManager::_prepareFrame(const InternalTexturePtr& sourceTexture,
+                                       const std::vector<PostProcessPtr>& iPostProcesses)
 {
   const auto& camera = _scene->activeCamera();
   if (!camera) {
     return false;
   }
 
-  auto postProcesses
-    = !iPostProcesses.empty() ? iPostProcesses : camera->_postProcesses;
+  auto postProcesses = !iPostProcesses.empty() ? iPostProcesses : camera->_postProcesses;
 
   // Filter out all null elements
-  stl_util::erase_remove_if(postProcesses,
-    [](const PostProcessPtr& pp) { return pp == nullptr; }
-  );
+  stl_util::erase_remove_if(postProcesses, [](const PostProcessPtr& pp) { return pp == nullptr; });
 
   if (postProcesses.empty() || !_scene->postProcessesEnabled) {
     return false;
@@ -88,10 +83,10 @@ bool PostProcessManager::_prepareFrame(
   return true;
 }
 
-void PostProcessManager::directRender(
-  const std::vector<PostProcessPtr>& postProcesses,
-  const InternalTexturePtr& targetTexture, bool forceFullscreenViewport,
-  unsigned int faceIndex, int lodLevel)
+void PostProcessManager::directRender(const std::vector<PostProcessPtr>& postProcesses,
+                                      const InternalTexturePtr& targetTexture,
+                                      bool forceFullscreenViewport, unsigned int faceIndex,
+                                      int lodLevel)
 {
   auto engine = _scene->getEngine();
 
@@ -101,9 +96,8 @@ void PostProcessManager::directRender(
     }
     else {
       if (targetTexture) {
-        engine->bindFramebuffer(targetTexture, faceIndex, std::nullopt,
-                                std::nullopt, forceFullscreenViewport, nullptr,
-                                lodLevel);
+        engine->bindFramebuffer(targetTexture, faceIndex, std::nullopt, std::nullopt,
+                                forceFullscreenViewport, nullptr, lodLevel);
       }
       else {
         engine->restoreDefaultFramebuffer();
@@ -118,7 +112,7 @@ void PostProcessManager::directRender(
 
       // VBOs
       _prepareBuffers();
-      engine->bindBuffers(_vertexBuffers, _indexBuffer.get(), effect);
+      engine->bindBuffers(_vertexBuffers, _indexBuffer, effect);
 
       // Draw order
       engine->drawElementsType(Material::TriangleFillMode, 0, 6);
@@ -132,23 +126,20 @@ void PostProcessManager::directRender(
   engine->setDepthWrite(true);
 }
 
-void PostProcessManager::_finalizeFrame(
-  bool doNotPresent, const InternalTexturePtr& targetTexture,
-  unsigned int faceIndex, const std::vector<PostProcessPtr>& _postProcesses,
-  bool forceFullscreenViewport)
+void PostProcessManager::_finalizeFrame(bool doNotPresent, const InternalTexturePtr& targetTexture,
+                                        unsigned int faceIndex,
+                                        const std::vector<PostProcessPtr>& _postProcesses,
+                                        bool forceFullscreenViewport)
 {
   const auto& camera = _scene->activeCamera();
   if (!camera) {
     return;
   }
 
-  auto postProcesses
-    = _postProcesses.empty() ? camera->_postProcesses : _postProcesses;
+  auto postProcesses = _postProcesses.empty() ? camera->_postProcesses : _postProcesses;
 
   // Filter out all null elements
-  stl_util::erase_remove_if(postProcesses,
-    [](const PostProcessPtr& pp) { return pp == nullptr; }
-  );
+  stl_util::erase_remove_if(postProcesses, [](const PostProcessPtr& pp) { return pp == nullptr; });
 
   if (postProcesses.empty() || !_scene->postProcessesEnabled) {
     return;
@@ -158,13 +149,11 @@ void PostProcessManager::_finalizeFrame(
   for (size_t index = 0, len = postProcesses.size(); index < len; ++index) {
     auto& pp = postProcesses[index];
     if (index < len - 1) {
-      pp->_outputTexture
-        = postProcesses[index + 1]->activate(camera, targetTexture);
+      pp->_outputTexture = postProcesses[index + 1]->activate(camera, targetTexture);
     }
     else {
       if (targetTexture) {
-        engine->bindFramebuffer(targetTexture, faceIndex, 0, 0,
-                                forceFullscreenViewport);
+        engine->bindFramebuffer(targetTexture, faceIndex, 0, 0, forceFullscreenViewport);
         pp->_outputTexture = targetTexture;
       }
       else {
@@ -184,7 +173,7 @@ void PostProcessManager::_finalizeFrame(
 
       // VBOs
       _prepareBuffers();
-      engine->bindBuffers(_vertexBuffers, _indexBuffer.get(), effect);
+      engine->bindBuffers(_vertexBuffers, _indexBuffer, effect);
 
       // Draw order
       engine->drawElementsType(Material::TriangleFillMode, 0, 6);
@@ -211,7 +200,7 @@ void PostProcessManager::dispose()
   }
 
   if (_indexBuffer) {
-    _scene->getEngine()->_releaseBuffer(_indexBuffer.get());
+    _scene->getEngine()->_releaseBuffer(_indexBuffer);
     _indexBuffer = nullptr;
   }
 }

@@ -161,6 +161,7 @@ vec3 computeProjectionTextureDiffuseLighting(sampler2D projectionLightSampler, m
 #endif
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_PBR_DIRECT_LIGHTING_FUNCTIONS_FX_H

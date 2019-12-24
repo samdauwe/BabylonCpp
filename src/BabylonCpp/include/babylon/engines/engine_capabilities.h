@@ -12,12 +12,10 @@ struct BABYLON_SHARED_EXPORT AnisotropicFilterExtension {
 
 struct BABYLON_SHARED_EXPORT InstancedArrays {
   std::function<void(unsigned int, int)> vertexAttribDivisorANGLE;
-  std::function<void(unsigned int mode, int indexCount,
-                     unsigned int indexFormat, unsigned int start,
-                     int instancesCount)>
+  std::function<void(unsigned int mode, int indexCount, unsigned int indexFormat,
+                     unsigned int start, int instancesCount)>
     drawElementsInstancedANGLE;
-  std::function<void(unsigned int mode, int verticesStart, int verticesCount,
-                     int instancesCount)>
+  std::function<void(unsigned int mode, int verticesStart, int verticesCount, int instancesCount)>
     drawArraysInstancedANGLE;
 }; // end of struct InstancedArrays
 
@@ -66,11 +64,8 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   bool textureFloat;
   /** Defines if vertex array objects are supported */
   bool vertexArrayObject = false;
-  /**
-   * Gets the webgl extension for anisotropic filtering (null if not supported)
-   */
-  std::optional<GL::EXT_texture_filter_anisotropic>
-    textureAnisotropicFilterExtension;
+  /** Gets the webgl extension for anisotropic filtering (null if not supported) */
+  std::optional<GL::EXT_texture_filter_anisotropic> textureAnisotropicFilterExtension;
   /** Gets the maximum level of anisotropy supported */
   unsigned int maxAnisotropy;
   /** Defines if instancing is supported */

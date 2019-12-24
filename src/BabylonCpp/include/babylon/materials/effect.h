@@ -1,11 +1,14 @@
 #ifndef BABYLON_MATERIALS_EFFECT_H
 #define BABYLON_MATERIALS_EFFECT_H
 
+#include <unordered_map>
+#include <variant>
+
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/interfaces/idisposable.h>
 #include <babylon/misc/observable.h>
 #include <babylon/misc/observer.h>
-#include <unordered_map>
 
 namespace BABYLON {
 
@@ -17,40 +20,46 @@ struct EffectCreationOptions;
 class EffectFallbacks;
 class Engine;
 class InternalTexture;
+class IPipelineContext;
 class Matrix;
 class PostProcess;
 class RenderTargetTexture;
 class Vector2;
 class Vector3;
 class Vector4;
+class WebGLDataBuffer;
 using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
 using EffectPtr              = std::shared_ptr<Effect>;
 using InternalTexturePtr     = std::shared_ptr<InternalTexture>;
+using IPipelineContextPtr    = std::shared_ptr<IPipelineContext>;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+using WebGLDataBufferPtr     = std::shared_ptr<WebGLDataBuffer>;
 
 namespace GL {
-class IGLBuffer;
 class IGLProgram;
 class IGLUniformLocation;
 } // end of namespace GL
 
 /**
- * @brief Effect containing vertex and fragment shader that can be executed on
- * an object.
+ * @brief Effect containing vertex and fragment shader that can be executed on an object.
  */
-class BABYLON_SHARED_EXPORT Effect {
+class BABYLON_SHARED_EXPORT Effect : public IDisposable {
 
   friend class Engine;
 
 public:
+  /**
+   * Gets or sets the relative url used to load shaders if using the engine in non-minified mode
+   */
+  static std::string ShadersRepository;
+
   /**
    * Store of each shader (The can be looked up using effect.key)
    */
   static std::unordered_map<std::string, std::string>& ShadersStore();
 
   /**
-   * Store of each included file for a shader (The can be looked up using
-   * effect.key)
+   * Store of each included file for a shader (The can be looked up using effect.key)
    */
   static std::unordered_map<std::string, std::string>& IncludesShadersStore();
 
@@ -60,7 +69,7 @@ public:
   {
     return std::shared_ptr<Effect>(new Effect(std::forward<Ts>(args)...));
   }
-  ~Effect(); // = default
+  ~Effect() override; // = default
 
   /** Properties **/
 
@@ -82,10 +91,10 @@ public:
   [[nodiscard]] Engine* getEngine() const;
 
   /**
-   * @brief The compiled webGL program for the effect
-   * @returns the webGL program.
+   * @brief The pipeline context for this effect.
+   * @returns the associated pipeline context
    */
-  GL::IGLProgram* getProgram();
+  IPipelineContextPtr& getPipelineContext();
 
   /**
    * @brief The set of names of attribute variables for the shader.
@@ -142,8 +151,8 @@ public:
   /** Methods **/
 
   /**
-   * @brief Adds a callback to the onCompiled observable and call the callback
-   * immediatly if already ready.
+   * @brief Adds a callback to the onCompiled observable and call the callback immediatly if already
+   * ready.
    * @param func The callback to be used.
    */
   void executeWhenCompiled(const std::function<void(Effect* effect)>& func);
@@ -174,17 +183,10 @@ public:
    * @param onError Callback called on error.
    * Hidden
    */
-  void _rebuildProgram(const std::string& vertexSourceCode, const std::string& fragmentSourceCode,
-                       const std::function<void(GL::IGLProgram* program)>& onCompiled,
-                       const std::function<void(const std::string& message)>& onError);
-
-  /**
-   * @brief Gets the uniform locations of the the specified variable names
-   * @param names THe names of the variables to lookup.
-   * @returns Array of locations in the same order as variable names.
-   */
-  std::unordered_map<std::string, std::unique_ptr<GL::IGLUniformLocation>>
-  getSpecificUniformLocations(const std::vector<std::string>& names);
+  void
+  _rebuildProgram(const std::string& vertexSourceCode, const std::string& fragmentSourceCode,
+                  const std::function<void(const IPipelineContextPtr& pipelineContext)>& onCompiled,
+                  const std::function<void(const std::string& message)>& onError);
 
   /**
    * @brief Prepares the effect
@@ -214,8 +216,8 @@ public:
   void setTexture(const std::string& channel, const BaseTexturePtr& texture);
 
   /**
-   * @brief Sets a depth stencil texture from a render target on the engine to
-   * be used in the shader.
+   * @brief Sets a depth stencil texture from a render target on the engine to be used in the
+   * shader.
    * @param channel Name of the sampler variable.
    * @param texture Texture to set.
    */
@@ -229,18 +231,17 @@ public:
   void setTextureArray(const std::string& channel, const std::vector<BaseTexturePtr>& textures);
 
   /**
-   * @brief Sets a texture to be the input of the specified post process. (To
-   * use the output, pass in the next post process in the pipeline).
+   * @brief Sets a texture to be the input of the specified post process. (To use the output, pass
+   * in the next post process in the pipeline).
    * @param channel Name of the sampler variable.
    * @param postProcess Post process to get the input texture from.
    */
   void setTextureFromPostProcess(const std::string& channel, PostProcess* postProcess);
 
   /**
-   * @brief (Warning! setTextureFromPostProcessOutput may be desired instead)
-   * Sets the input texture of the passed in post process to be input of this
-   * effect. (To use the output of the passed in post process use
-   * setTextureFromPostProcessOutput)
+   * @brief (Warning! setTextureFromPostProcessOutput may be desired instead) Sets the input texture
+   * of the passed in post process to be input of this effect. (To use the output of the passed in
+   * post process use setTextureFromPostProcessOutput)
    * @param channel Name of the sampler variable.
    * @param postProcess Post process to get the output texture from.
    */
@@ -256,7 +257,7 @@ public:
    * @param buffer Buffer to bind.
    * @param name Name of the uniform variable to bind to.
    */
-  void bindUniformBuffer(GL::IGLBuffer* _buffer, const std::string& name);
+  void bindUniformBuffer(const WebGLDataBufferPtr& buffer, const std::string& name);
 
   /**
    * @brief Binds block to a uniform.
@@ -282,8 +283,8 @@ public:
   Effect& setIntArray(const std::string& uniformName, const Int32Array& array);
 
   /**
-   * @brief Sets an int array 2 on a uniform variable. (Array is specified as
-   * single array eg. [1,2,3,4] will result in [[1,2],[3,4]] in the shader)
+   * @brief Sets an int array 2 on a uniform variable. (Array is specified as single array eg.
+   * [1,2,3,4] will result in [[1,2],[3,4]] in the shader)
    * @param uniformName Name of the variable.
    * @param array array to be set.
    * @returns this effect.
@@ -291,9 +292,8 @@ public:
   Effect& setIntArray2(const std::string& uniformName, const Int32Array& array);
 
   /**
-   * @brief Sets an int array 3 on a uniform variable. (Array is specified as
-   * single array eg. [1,2,3,4,5,6] will result in [[1,2,3],[4,5,6]] in the
-   * shader)
+   * @brief Sets an int array 3 on a uniform variable. (Array is specified as single array eg.
+   * [1,2,3,4,5,6] will result in [[1,2,3],[4,5,6]] in the shader)
    * @param uniformName Name of the variable.
    * @param array array to be set.
    * @returns this effect.
@@ -301,9 +301,8 @@ public:
   Effect& setIntArray3(const std::string& uniformName, const Int32Array& array);
 
   /**
-   * @brief Sets an int array 4 on a uniform variable. (Array is specified as
-   * single array eg. [1,2,3,4,5,6,7,8] will result in [[1,2,3,4],[5,6,7,8]] in
-   * the shader)
+   * @brief Sets an int array 4 on a uniform variable. (Array is specified as single array eg.
+   * [1,2,3,4,5,6,7,8] will result in [[1,2,3,4],[5,6,7,8]] in the shader)
    * @param uniformName Name of the variable.
    * @param array array to be set.
    * @returns this effect.
@@ -319,8 +318,8 @@ public:
   Effect& setFloatArray(const std::string& uniformName, const Float32Array& array);
 
   /**
-   * @brief Sets an float array 2 on a uniform variable. (Array is specified as
-   * single array eg. [1,2,3,4] will result in [[1,2],[3,4]] in the shader)
+   * @brief Sets an float array 2 on a uniform variable. (Array is specified as single array eg.
+   * [1,2,3,4] will result in [[1,2],[3,4]] in the shader)
    * @param uniformName Name of the variable.
    * @param array array to be set.
    * @returns this effect.
@@ -328,9 +327,8 @@ public:
   Effect& setFloatArray2(const std::string& uniformName, const Float32Array& array);
 
   /**
-   * @brief Sets an float array 3 on a uniform variable. (Array is specified as
-   * single array eg. [1,2,3,4,5,6] will result in [[1,2,3],[4,5,6]] in the
-   * shader)
+   * @brief Sets an float array 3 on a uniform variable. (Array is specified as single array eg.
+   * [1,2,3,4,5,6] will result in [[1,2,3],[4,5,6]] in the shader)
    * @param uniformName Name of the variable.
    * @param array array to be set.
    * @returns this effect.
@@ -338,9 +336,8 @@ public:
   Effect& setFloatArray3(const std::string& uniformName, const Float32Array& array);
 
   /**
-   * @brief Sets an float array 4 on a uniform variable. (Array is specified as
-   * single array eg. [1,2,3,4,5,6,7,8] will result in [[1,2,3,4],[5,6,7,8]] in
-   * the shader)
+   * @brief Sets an float array 4 on a uniform variable. (Array is specified as single array eg.
+   * [1,2,3,4,5,6,7,8] will result in [[1,2,3,4],[5,6,7,8]] in the shader)
    * @param uniformName Name of the variable.
    * @param array array to be set.
    * @returns this effect.
@@ -356,8 +353,8 @@ public:
   Effect& setArray(const std::string& uniformName, Float32Array array);
 
   /**
-   * @brief Sets an array 2 on a uniform variable. (Array is specified as single
-   * array eg. [1,2,3,4] will result in [[1,2],[3,4]] in the shader)
+   * @brief Sets an array 2 on a uniform variable. (Array is specified as single array eg. [1,2,3,4]
+   * will result in [[1,2],[3,4]] in the shader)
    * @param uniformName Name of the variable.
    * @param array array to be set.
    * @returns this effect.
@@ -365,8 +362,8 @@ public:
   Effect& setArray2(const std::string& uniformName, Float32Array array);
 
   /**
-   * @brief Sets an array 3 on a uniform variable. (Array is specified as single
-   * array eg. [1,2,3,4,5,6] will result in [[1,2,3],[4,5,6]] in the shader)
+   * @brief Sets an array 3 on a uniform variable. (Array is specified as single array eg.
+   * [1,2,3,4,5,6] will result in [[1,2,3],[4,5,6]] in the shader)
    * @param uniformName Name of the variable.
    * @param array array to be set.
    * @returns this effect.
@@ -374,9 +371,8 @@ public:
   Effect& setArray3(const std::string& uniformName, Float32Array array);
 
   /**
-   * @brief Sets an array 4 on a uniform variable. (Array is specified as single
-   * array eg. [1,2,3,4,5,6,7,8] will result in [[1,2,3,4],[5,6,7,8]] in the
-   * shader)
+   * @brief Sets an array 4 on a uniform variable. (Array is specified as single array eg.
+   * [1,2,3,4,5,6,7,8] will result in [[1,2,3,4],[5,6,7,8]] in the shader)
    * @param uniformName Name of the variable.
    * @param array array to be set.
    * @returns this effect.
@@ -400,8 +396,8 @@ public:
   Effect& setMatrix(const std::string& uniformName, const Matrix& matrix);
 
   /**
-   * @brief Sets a 3x3 matrix on a uniform variable. (Speicified as
-   * [1,2,3,4,5,6,7,8,9] will result in [1,2,3][4,5,6][7,8,9] matrix)
+   * @brief Sets a 3x3 matrix on a uniform variable. (Speicified as [1,2,3,4,5,6,7,8,9] will result
+   * in [1,2,3][4,5,6][7,8,9] matrix)
    * @param uniformName Name of the variable.
    * @param matrix matrix to be set.
    * @returns this effect.
@@ -409,8 +405,8 @@ public:
   Effect& setMatrix3x3(const std::string& uniformName, const Float32Array& matrix);
 
   /**
-   * @brief Sets a 2x2 matrix on a uniform variable. (Speicified as [1,2,3,4]
-   * will result in [1,2][3,4] matrix)
+   * @brief Sets a 2x2 matrix on a uniform variable. (Speicified as [1,2,3,4] will result in
+   * [1,2][3,4] matrix)
    * @param uniformName Name of the variable.
    * @param matrix matrix to be set.
    * @returns this effect.
@@ -515,7 +511,7 @@ public:
   /**
    * @brief Release all associated resources.
    */
-  void dispose();
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   // Statics
 
@@ -539,24 +535,20 @@ protected:
    * @brief Instantiates an effect.
    * An effect can be used to create/manage/execute vertex and fragment shaders.
    * @param baseName Name of the effect.
-   * @param attributesNamesOrOptions List of attribute names that will be passed
-   * to the shader or set of all options to create the effect.
-   * @param uniformsNamesOrEngine List of uniform variable names that will be
-   * passed to the shader or the engine that will be used to render effect.
-   * @param samplers List of sampler variables that will be passed to the
-   * shader.
+   * @param attributesNamesOrOptions List of attribute names that will be passed to the shader or
+   * set of all options to create the effect.
+   * @param uniformsNamesOrEngine List of uniform variable names that will be passed to the shader
+   * or the engine that will be used to render effect.
+   * @param samplers List of sampler variables that will be passed to the shader.
    * @param engine Engine to be used to render the effect
    * @param defines Define statements to be added to the shader.
-   * @param fallbacks Possible fallbacks for this effect to improve performance
-   * when needed.
+   * @param fallbacks Possible fallbacks for this effect to improve performance when needed.
    * @param onCompiled Callback that will be called when the shader is compiled.
-   * @param onError Callback that will be called if an error occurs during
-   * shader compilation.
-   * @param indexParameters Parameters to be used with Babylons include syntax
-   * to iterate over an array (eg. {lights: 10})
+   * @param onError Callback that will be called if an error occurs during shader compilation.
+   * @param indexParameters Parameters to be used with Babylons include syntax to iterate over an
+   * array (eg. {lights: 10})
    */
-  Effect(const std::string& baseName, EffectCreationOptions& options, Engine* engine);
-  Effect(const std::unordered_map<std::string, std::string>& baseName,
+  Effect(const std::variant<std::string, std::unordered_map<std::string, std::string>>& baseName,
          EffectCreationOptions& options, Engine* engine);
 
   /**
@@ -565,17 +557,20 @@ protected:
   Observable<Effect>& get_onBindObservable();
 
 private:
-  void _processShaderConversion(const std::string& sourceCode, bool isFragment,
-                                const std::function<void(const std::string&)>& callback);
-  void _processIncludes(const std::string& sourceCode,
-                        const std::function<void(const std::string&)>& callback);
-  std::string _processPrecision(std::string source);
+  void _useFinalCode(
+    const std::string& migratedVertexCode, const std::string& migratedFragmentCode,
+    const std::variant<std::string, std::unordered_map<std::string, std::string>>& baseName);
+  bool _isReadyInternal() const;
+  void _checkIsReady();
+  void _processCompilationErrors(const std::exception& e,
+                                 const IPipelineContextPtr& previousPipelineContext);
+  int _getChannel(const std::string& channel);
 
 public:
   /**
    * Name of the effect.
    */
-  std::string name;
+  std::variant<std::string, std::unordered_map<std::string, std::string>> name;
   /**
    * String container all the define statements that should be set on the
    * shader.
@@ -599,6 +594,8 @@ public:
   std::size_t uniqueId;
   /**
    * Observable that will be called when the shader is compiled.
+   * It is recommended to use executeWhenCompile() or to make sure that scene.isReady() is called to
+   * get this observable raised.
    */
   Observable<Effect> onCompileObservable;
   /**
@@ -625,7 +622,7 @@ public:
    * Compiled shader to webGL program.
    * Hidden
    */
-  std::shared_ptr<GL::IGLProgram> _program;
+  IPipelineContextPtr _pipelineContext;
 
 private:
   Observer<Effect>::Ptr _onCompileObserver;
@@ -633,7 +630,8 @@ private:
   Engine* _engine;
   std::unordered_map<std::string, unsigned int> _uniformBuffersNames;
   std::vector<std::string> _uniformsNames;
-  std::vector<std::string> _samplers;
+  std::vector<std::string> _samplerList;
+  std::unordered_map<std::string, int> _samplers;
   bool _isReady;
   std::string _compilationError;
   std::vector<std::string> _attributesNames;
@@ -647,7 +645,7 @@ private:
   std::string _fragmentSourceCodeOverride;
   std::vector<std::string> _transformFeedbackVaryings;
   std::unordered_map<std::string, Float32Array> _valueCache;
-  static std::unordered_map<unsigned int, GL::IGLBuffer*> _baseCache;
+  static std::unordered_map<unsigned int, WebGLDataBufferPtr> _baseCache;
 
 }; // end of class Effect
 

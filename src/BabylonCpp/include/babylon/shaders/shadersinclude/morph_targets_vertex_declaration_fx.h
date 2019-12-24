@@ -18,9 +18,14 @@ const char* morphTargetsVertexDeclaration
     #ifdef MORPHTARGETS_TANGENT
     attribute vec3 tangent{X};
     #endif
+
+    #ifdef MORPHTARGETS_UV
+    attribute vec2 uv_{X};
+    #endif
 #endif
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_MORPH_TARGETS_VERTEX_DECLARATION_FX_H

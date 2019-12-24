@@ -6,6 +6,7 @@
 // glad
 #include <glad/glad.h>
 
+#define GLFW_INCLUDE_NONE
 // GLFW
 #include <GLFW/glfw3.h>
 #ifdef _WIN32
@@ -88,7 +89,7 @@ void Inspector::setScene(Scene* scene)
 void Inspector::imgui_initialize()
 {
   // Initialize glad
-  if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
+  if (!gladLoadGLES2Loader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
     fprintf(stderr, "Failed to initialize glad\n");
     return;
   }

@@ -62,6 +62,7 @@ void main(void) {
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_MATERIALS_LIBRARY_SKY_SKY_VERTEX_FX_H

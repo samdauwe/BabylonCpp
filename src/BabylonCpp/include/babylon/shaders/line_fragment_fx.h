@@ -15,6 +15,7 @@ void main(void) {
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_LINE_FRAGMENT_FX_H

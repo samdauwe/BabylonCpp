@@ -86,6 +86,7 @@ preLightingInfo computeHemisphericPreLightingInfo(vec4 lightData, vec3 V, vec3 N
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_PBR_DIRECT_LIGHTING_SETUP_FUNCTIONS_FX_H

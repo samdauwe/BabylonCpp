@@ -116,9 +116,8 @@ inline std::string escape(char character)
 inline std::string escape(const std::string& s)
 {
   std::ostringstream ostream;
-  std::for_each(s.begin(), s.end(), [&ostream](const char character) {
-    ostream << escape(character);
-  });
+  std::for_each(s.begin(), s.end(),
+                [&ostream](const char character) { ostream << escape(character); });
   return ostream.str();
 }
 
@@ -222,8 +221,7 @@ inline std::vector<uint8_t> toCharCodes(const std::string& str)
  * @return A Number, representing the position where the specified searchvalue
  * occurs for the first time, or -1 if it never occurs.
  */
-inline int indexOf(const std::string& src, const std::string& searchvalue,
-                   size_t start = 0)
+inline int indexOf(const std::string& src, const std::string& searchvalue, size_t start = 0)
 {
   int index                  = -1;
   std::string::size_type loc = src.find(searchvalue, start);
@@ -278,8 +276,7 @@ inline std::string join(const T& v, char delim)
  * @return A Number, representing the position where the specified searchvalue
  * occurs for the first time, or -1 if it never occurs.
  */
-inline int lastIndexOf(const std::string& src, const std::string& searchvalue,
-                       size_t start)
+inline int lastIndexOf(const std::string& src, const std::string& searchvalue, size_t start)
 {
   int index                  = -1;
   std::string::size_type loc = src.rfind(searchvalue, start);
@@ -312,8 +309,7 @@ inline char nthChar(const char (&arr)[N], unsigned i)
  * width.
  */
 template <typename T>
-void pad(std::basic_string<T>& s, typename std::basic_string<T>::size_type n,
-         T c)
+void pad(std::basic_string<T>& s, typename std::basic_string<T>::size_type n, T c)
 {
   if (n > s.length()) {
     s.append(n - s.length(), c);
@@ -343,8 +339,7 @@ inline void pushFront(std::string& s1, const std::string& s2)
 }
 
 namespace {
-const std::string defaultChars
-  = "abcdefghijklmnaoqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+const std::string defaultChars = "abcdefghijklmnaoqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 } // namespace
 
 inline std::string randomString(std::size_t len                 = 64,
@@ -354,8 +349,7 @@ inline std::string randomString(std::size_t len                 = 64,
   std::uniform_int_distribution<std::size_t> dist{0, allowedChars.length() - 1};
   std::string ret;
   ret.reserve(len);
-  std::generate_n(std::back_inserter(ret), len,
-                  [&] { return allowedChars[dist(gen)]; });
+  std::generate_n(std::back_inserter(ret), len, [&] { return allowedChars[dist(gen)]; });
   return ret;
 }
 
@@ -394,14 +388,14 @@ inline std::vector<T> regexMatch(const T& s, const std::regex& re)
 }
 
 template <class BidirIt, class Traits, class CharT, class UnaryFunction>
-std::basic_string<CharT> inline regexReplace(
-  BidirIt first, BidirIt last, const std::basic_regex<CharT, Traits>& re,
-  UnaryFunction f)
+std::basic_string<CharT> inline regexReplace(BidirIt first, BidirIt last,
+                                             const std::basic_regex<CharT, Traits>& re,
+                                             UnaryFunction f)
 {
   std::basic_string<CharT> s;
 
   typename std::match_results<BidirIt>::difference_type positionOfLastMatch = 0;
-  auto endOfLastMatch = first;
+  auto endOfLastMatch                                                       = first;
 
   auto callback = [&](const std::match_results<BidirIt>& match) {
     auto positionOfThisMatch = match.position(0);
@@ -438,14 +432,12 @@ std::basic_string<CharT> inline regexReplace(
  * @param replace The regex replacement format string.
  * @return Result of the replacement.
  */
-inline std::string regexReplace(const std::string& source,
-                                const std::string& reSearch,
+inline std::string regexReplace(const std::string& source, const std::string& reSearch,
                                 const std::string& replace)
 {
   std::string result;
   std::regex regex(reSearch, std::regex::optimize);
-  std::regex_replace(std::back_inserter(result), source.begin(), source.end(),
-                     regex, replace);
+  std::regex_replace(std::back_inserter(result), source.begin(), source.end(), regex, replace);
   return result;
 }
 
@@ -460,8 +452,7 @@ inline std::string regexReplace(const std::string& source,
  */
 template <class Traits, class CharT, class UnaryFunction>
 inline std::string regexReplace(const std::string& source,
-                                const std::basic_regex<CharT, Traits>& reSearch,
-                                UnaryFunction f)
+                                const std::basic_regex<CharT, Traits>& reSearch, UnaryFunction f)
 {
   return regexReplace(source.cbegin(), source.cend(), reSearch, f);
 }
@@ -548,6 +539,34 @@ inline std::vector<std::string> split(const std::string& value, char separator)
 }
 
 /**
+ * @brief Strips the white characters from the end of the line.
+ * @param input the input string
+ * @return The sripped result string
+ */
+inline std::string stripWhite(const std::string& input)
+{
+  size_t b = input.find_first_not_of(' ');
+  if (b == std::string::npos) {
+    b = 0;
+  }
+  return input.substr(b, input.find_last_not_of(' ') + 1 - b);
+}
+
+/**
+ * @brief Removes text that follow any of a set of comment markers from a string.
+ * @param input the input string
+ * @param delimiters the comment delimiter characters
+ * @return The input string without comment
+ * @see https://www.rosettacode.org/wiki/Strip_comments_from_a_string#C.2B.2B
+ */
+inline std::string stripComments(const std::string& input, const std::string& delimiters = "//")
+{
+  int delimitersIndex = String::indexOf(input, delimiters);
+  return delimitersIndex >= 0 ? stripWhite(input.substr(0, static_cast<size_t>(delimitersIndex))) :
+                                input;
+}
+
+/**
  * @brief Converts a string to a char vector.
  * @param str Required. The string to convert
  * @return An Array, containing the chars of the original string.
@@ -565,9 +584,8 @@ inline std::vector<char> toCharArray(const std::string& str)
  */
 inline std::string toLowerCase(std::string source)
 {
-  std::transform(
-    source.begin(), source.end(), source.begin(),
-    [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+  std::transform(source.begin(), source.end(), source.begin(),
+                 [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
   return source;
 }
 /**
@@ -577,9 +595,8 @@ inline std::string toLowerCase(std::string source)
  */
 inline std::string toUpperCase(std::string source)
 {
-  std::transform(
-    source.begin(), source.end(), source.begin(),
-    [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
+  std::transform(source.begin(), source.end(), source.begin(),
+                 [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
   return source;
 }
 
@@ -633,9 +650,8 @@ inline std::string& toTitleCase(std::string& str)
  */
 inline std::string& trimLeft(std::string& str)
 {
-  auto it2 = std::find_if(str.begin(), str.end(), [](char ch) {
-    return !std::isspace<char>(ch, std::locale::classic());
-  });
+  auto it2 = std::find_if(str.begin(), str.end(),
+                          [](char ch) { return !std::isspace<char>(ch, std::locale::classic()); });
   str.erase(str.begin(), it2);
   return str;
 }
@@ -647,9 +663,8 @@ inline std::string& trimLeft(std::string& str)
  */
 inline std::string& trimRight(std::string& str)
 {
-  auto it1 = std::find_if(str.rbegin(), str.rend(), [](char ch) {
-    return !std::isspace<char>(ch, std::locale::classic());
-  });
+  auto it1 = std::find_if(str.rbegin(), str.rend(),
+                          [](char ch) { return !std::isspace<char>(ch, std::locale::classic()); });
   str.erase(it1.base(), str.end());
   return str;
 }

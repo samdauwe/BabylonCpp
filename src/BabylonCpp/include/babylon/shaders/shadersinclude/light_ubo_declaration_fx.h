@@ -52,6 +52,7 @@ const char* lightUboDeclaration
 #endif
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_LIGHT_UBO_DECLARATION_FX_H

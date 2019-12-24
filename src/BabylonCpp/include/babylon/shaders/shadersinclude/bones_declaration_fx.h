@@ -41,6 +41,7 @@ const char* bonesDeclaration
 #endif
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_BONES_DECLARATION_FX_H

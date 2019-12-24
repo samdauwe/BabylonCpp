@@ -18,20 +18,17 @@ class Engine;
 class Matrix;
 class Vector3;
 class Vector4;
-using BaseTexturePtr = std::shared_ptr<BaseTexture>;
-using EffectPtr      = std::shared_ptr<Effect>;
-
-namespace GL {
-class IGLBuffer;
-} // end of namespace GL
+class WebGLDataBuffer;
+using BaseTexturePtr     = std::shared_ptr<BaseTexture>;
+using EffectPtr          = std::shared_ptr<Effect>;
+using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
 
 /**
  * @brief Uniform buffer objects.
  *
  * Handles blocks of uniform on the GPU.
  *
- * If WebGL 2 is not available, this class falls back on traditionnal
- * setUniformXXX calls.
+ * If WebGL 2 is not available, this class falls back on traditionnal setUniformXXX calls.
  *
  * For more information, please refer to :
  * https://www.khronos.org/opengl/wiki/Uniform_Buffer_Object
@@ -44,8 +41,7 @@ public:
    *
    * Handles blocks of uniform on the GPU.
    *
-   * If WebGL 2 is not available, this class falls back on traditionnal
-   * setUniformXXX calls.
+   * If WebGL 2 is not available, this class falls back on traditionnal setUniformXXX calls.
    *
    * For more information, please refer to :
    * @see https://www.khronos.org/opengl/wiki/Uniform_Buffer_Object
@@ -59,21 +55,21 @@ public:
 
   // Properties
   /**
-   * @brief Indicates if the buffer is using the WebGL2 UBO implementation,
-   * or just falling back on setUniformXXX calls.
+   * @brief Indicates if the buffer is using the WebGL2 UBO implementation, or just falling back on
+   * setUniformXXX calls.
    */
   [[nodiscard]] bool useUbo() const;
 
   /**
-   * @brief Indicates if the WebGL underlying uniform buffer is in sync
-   * with the javascript cache data.
+   * @brief Indicates if the WebGL underlying uniform buffer is in sync with the javascript cache
+   * data.
    */
   [[nodiscard]] bool isSync() const;
 
   /**
    * @brief Indicates if the WebGL underlying uniform buffer is dynamic.
-   * Also, a dynamic UniformBuffer will disable cache verification and always
-   * update the underlying WebGL uniform buffer to the GPU.
+   * Also, a dynamic UniformBuffer will disable cache verification and always update the underlying
+   * WebGL uniform buffer to the GPU.
    * @returns if Dynamic, otherwise false
    */
   [[nodiscard]] bool isDynamic() const;
@@ -88,12 +84,12 @@ public:
    * @brief The underlying WebGL Uniform buffer.
    * @returns the webgl buffer
    */
-  GL::IGLBuffer* getBuffer();
+  WebGLDataBufferPtr& getBuffer();
 
   /**
    * @brief Adds an uniform in the buffer.
-   * Warning : the subsequents calls of this function must be in the same order
-   * as declared in the shader for the layout to be correct !
+   * Warning : the subsequents calls of this function must be in the same order as declared in the
+   * shader for the layout to be correct !
    * @param name Name of the uniform, as used in the uniform block in the
    * shader.
    * @param size Data size, or data directly.
@@ -102,16 +98,14 @@ public:
 
   /**
    * @brief Adds a Matrix 4x4 to the uniform buffer.
-   * @param name Name of the uniform, as used in the uniform block in the
-   * shader.
+   * @param name Name of the uniform, as used in the uniform block in the shader.
    * @param mat A 4x4 matrix.
    */
   void addMatrix(const std::string& name, const Matrix& mat);
 
   /**
    * @brief Adds a vec2 to the uniform buffer.
-   * @param name Name of the uniform, as used in the uniform block in the
-   * shader.
+   * @param name Name of the uniform, as used in the uniform block in the shader.
    * @param x Define the x component value of the vec2
    * @param y Define the y component value of the vec2
    */
@@ -119,8 +113,7 @@ public:
 
   /**
    * @brief Adds a vec3 to the uniform buffer.
-   * @param name Name of the uniform, as used in the uniform block in the
-   * shader.
+   * @param name Name of the uniform, as used in the uniform block in the shader.
    * @param x Define the x component value of the vec3
    * @param y Define the y component value of the vec3
    * @param z Define the z component value of the vec3
@@ -129,16 +122,14 @@ public:
 
   /**
    * @brief Adds a vec3 to the uniform buffer.
-   * @param name Name of the uniform, as used in the uniform block in the
-   * shader.
+   * @param name Name of the uniform, as used in the uniform block in the shader.
    * @param color Define the vec3 from a Color
    */
   void addColor3(const std::string& name, const Color3& color);
 
   /**
    * @brief Adds a vec4 to the uniform buffer.
-   * @param name Name of the uniform, as used in the uniform block in the
-   * shader.
+   * @param name Name of the uniform, as used in the uniform block in the shader.
    * @param color Define the rgb components from a Color
    * @param alpha Define the a component of the vec4
    */
@@ -146,29 +137,26 @@ public:
 
   /**
    * @brief Adds a vec3 to the uniform buffer.
-   * @param name Name of the uniform, as used in the uniform block in the
-   * shader.
+   * @param name Name of the uniform, as used in the uniform block in the shader.
    * @param vector Define the vec3 components from a Vector
    */
   void addVector3(const std::string& name, const Vector3& vector);
 
   /**
    * @brief Adds a Matrix 3x3 to the uniform buffer.
-   * @param name Name of the uniform, as used in the uniform block in the
-   * shader.
+   * @param name Name of the uniform, as used in the uniform block in the shader.
    */
   void addMatrix3x3(const std::string& name);
 
   /**
    * @brief Adds a Matrix 2x2 to the uniform buffer.
-   * @param name Name of the uniform, as used in the uniform block in the
-   * shader.
+   * @param name Name of the uniform, as used in the uniform block in the shader.
    */
   void addMatrix2x2(const std::string& name);
 
   /**
-   * @brief Effectively creates the WebGL Uniform Buffer, once layout is
-   * completed with `addUniform`.
+   * @brief Effectively creates the WebGL Uniform Buffer, once layout is completed with
+   * `addUniform`.
    */
   void create();
 
@@ -185,10 +173,9 @@ public:
   void update();
 
   /**
-   * @brief Updates the value of an uniform. The `update` method must be called
-   * afterwards to make it effective in the GPU.
-   * @param uniformName Define the name of the uniform, as used in the uniform
-   * block in the shader.
+   * @brief Updates the value of an uniform. The `update` method must be called afterwards to make
+   * it effective in the GPU.
+   * @param uniformName Define the name of the uniform, as used in the uniform block in the shader.
    * @param data Define the flattened data
    * @param size Define the size of the data.
    */
@@ -202,8 +189,7 @@ public:
   void setTexture(const std::string& name, const BaseTexturePtr& texture);
 
   /**
-   * @brief Directly updates the value of the uniform in the cache AND on the
-   * GPU.
+   * @brief Directly updates the value of the uniform in the cache AND on the GPU.
    * @param uniformName Define the name of the uniform, as used in the uniform
    * block in the shader.
    * @param data Define the flattened data
@@ -225,8 +211,7 @@ public:
 private:
   /**
    * @brief std140 layout specifies how to align data within an UBO structure.
-   * See
-   * https://khronos.org/registry/OpenGL/specs/gl/glspec45.core.pdf#page=159
+   * @see https://khronos.org/registry/OpenGL/specs/gl/glspec45.core.pdf#page=159
    * for specs.
    */
   void _fillAlignment(size_t size);
@@ -355,7 +340,7 @@ public:
 
 private:
   Engine* _engine;
-  std::unique_ptr<GL::IGLBuffer> _buffer;
+  WebGLDataBufferPtr _buffer;
   Float32Array _data;
   Float32Array _bufferData;
   bool _dynamic;

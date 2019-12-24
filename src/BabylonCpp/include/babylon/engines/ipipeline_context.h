@@ -13,8 +13,7 @@ class IPipelineContext;
 using IPipelineContextPtr = std::shared_ptr<IPipelineContext>;
 
 /**
- * @brief Class used to store and describe the pipeline context associated with
- * an effect.
+ * @brief Class used to store and describe the pipeline context associated with an effect.
  */
 class BABYLON_SHARED_EXPORT IPipelineContext {
 
@@ -22,22 +21,17 @@ public:
   IPipelineContext();
   virtual ~IPipelineContext(); // = default
 
-protected:
-  [[nodiscard]] virtual bool get_isAsync() const;
-  [[nodiscard]] virtual bool get_isReady() const;
-
 public:
   /**
-   * Gets a boolean indicating that this pipeline context is supporting
-   * asynchronous creating
+   * Gets a boolean indicating that this pipeline context is supporting asynchronous creating.
    */
-  ReadOnlyProperty<IPipelineContext, bool> isAsync;
+  virtual bool isAsync();
 
   /**
-   * Gets a boolean indicating that the context is ready to be used (like
-   * shaders / pipelines are compiled and ready for instance)
+   * Gets a boolean indicating that the context is ready to be used (like shaders / pipelines are
+   * compiled and ready for instance).
    */
-  ReadOnlyProperty<IPipelineContext, bool> isReady;
+  virtual bool isReady();
 
   /**
    * Hidden

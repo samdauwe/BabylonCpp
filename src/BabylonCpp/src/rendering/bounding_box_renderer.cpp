@@ -27,8 +27,7 @@ BoundingBoxRenderer::BoundingBoxRenderer(Scene* iScene)
 
 BoundingBoxRenderer::~BoundingBoxRenderer() = default;
 
-void BoundingBoxRenderer::addToScene(
-  const BoundingBoxRendererPtr& newBoundingBoxRenderer)
+void BoundingBoxRenderer::addToScene(const BoundingBoxRendererPtr& newBoundingBoxRenderer)
 {
   ISceneComponent::name = BoundingBoxRenderer::name;
   scene->_addComponent(newBoundingBoxRenderer);
@@ -37,24 +36,20 @@ void BoundingBoxRenderer::addToScene(
 void BoundingBoxRenderer::_register()
 {
   scene->_beforeEvaluateActiveMeshStage.registerStep(
-    SceneComponentConstants::STEP_BEFOREEVALUATEACTIVEMESH_BOUNDINGBOXRENDERER,
-    this, [this]() { reset(); });
+    SceneComponentConstants::STEP_BEFOREEVALUATEACTIVEMESH_BOUNDINGBOXRENDERER, this,
+    [this]() { reset(); });
 
   scene->_activeMeshStage.registerStep(
     SceneComponentConstants::STEP_ACTIVEMESH_BOUNDINGBOXRENDERER, this,
-    [this](AbstractMesh* sourceMesh, AbstractMesh* mesh) {
-      _activeMesh(sourceMesh, mesh);
-    });
+    [this](AbstractMesh* sourceMesh, AbstractMesh* mesh) { _activeMesh(sourceMesh, mesh); });
 
   scene->_evaluateSubMeshStage.registerStep(
     SceneComponentConstants::STEP_EVALUATESUBMESH_BOUNDINGBOXRENDERER, this,
-    [this](AbstractMesh* mesh, SubMesh* subMesh) {
-      _evaluateSubMesh(mesh, subMesh);
-    });
+    [this](AbstractMesh* mesh, SubMesh* subMesh) { _evaluateSubMesh(mesh, subMesh); });
 
   scene->_afterRenderingGroupDrawStage.registerStep(
-    SceneComponentConstants::STEP_AFTERRENDERINGGROUPDRAW_BOUNDINGBOXRENDERER,
-    this, [this](int renderingGroupId) { render(renderingGroupId); });
+    SceneComponentConstants::STEP_AFTERRENDERINGGROUPDRAW_BOUNDINGBOXRENDERER, this,
+    [this](int renderingGroupId) { render(renderingGroupId); });
 }
 
 void BoundingBoxRenderer::_evaluateSubMesh(AbstractMesh* mesh, SubMesh* subMesh)
@@ -66,8 +61,7 @@ void BoundingBoxRenderer::_evaluateSubMesh(AbstractMesh* mesh, SubMesh* subMesh)
   }
 }
 
-void BoundingBoxRenderer::_activeMesh(AbstractMesh* sourceMesh,
-                                      AbstractMesh* mesh)
+void BoundingBoxRenderer::_activeMesh(AbstractMesh* sourceMesh, AbstractMesh* mesh)
 {
   if (sourceMesh->showBoundingBox || scene->forceShowBoundingBoxes) {
     auto& boundingInfo            = *sourceMesh->getBoundingInfo();
@@ -86,15 +80,14 @@ void BoundingBoxRenderer::_prepareResources()
   shaderMaterialOptions.attributes = {VertexBuffer::PositionKind};
   shaderMaterialOptions.uniforms   = {"world", "viewProjection", "color"};
 
-  _colorShader
-    = ShaderMaterial::New("colorShader", scene, "color", shaderMaterialOptions);
+  _colorShader = ShaderMaterial::New("colorShader", scene, "color", shaderMaterialOptions);
 
   auto engine = scene->getEngine();
   BoxOptions options;
-  options.size                               = 1.f;
-  auto boxdata                               = VertexData::CreateBox(options);
-  _vertexBuffers[VertexBuffer::PositionKind] = std::make_shared<VertexBuffer>(
-    engine, boxdata->positions, VertexBuffer::PositionKind, false);
+  options.size = 1.f;
+  auto boxdata = VertexData::CreateBox(options);
+  _vertexBuffers[VertexBuffer::PositionKind]
+    = std::make_shared<VertexBuffer>(engine, boxdata->positions, VertexBuffer::PositionKind, false);
   _createIndexBuffer();
   _fillIndexData = boxdata->indices;
 }
@@ -102,8 +95,7 @@ void BoundingBoxRenderer::_prepareResources()
 void BoundingBoxRenderer::_createIndexBuffer()
 {
   auto engine = scene->getEngine();
-  const Uint32Array indices{0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6,
-                            6, 7, 7, 4, 0, 7, 1, 6, 2, 5, 3, 4};
+  const Uint32Array indices{0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 7, 1, 6, 2, 5, 3, 4};
   _indexBuffer = engine->createIndexBuffer(indices);
 }
 
@@ -147,14 +139,12 @@ void BoundingBoxRenderer::render(int renderingGroupId)
     auto diff       = max.subtract(min);
     auto median     = min.add(diff.scale(0.5f));
 
-    auto worldMatrix
-      = Matrix::Scaling(diff.x, diff.y, diff.z)
-          .multiply(Matrix::Translation(median.x, median.y, median.z))
-          .multiply(boundingBox.getWorldMatrix());
+    auto worldMatrix = Matrix::Scaling(diff.x, diff.y, diff.z)
+                         .multiply(Matrix::Translation(median.x, median.y, median.z))
+                         .multiply(boundingBox.getWorldMatrix());
 
     // VBOs
-    engine->bindBuffers(_vertexBuffers, _indexBuffer.get(),
-                        _colorShader->getEffect());
+    engine->bindBuffers(_vertexBuffers, _indexBuffer, _colorShader->getEffect());
 
     if (showBackLines) {
       // Back
@@ -204,13 +194,11 @@ void BoundingBoxRenderer::renderOcclusionBoundingBox(AbstractMesh* mesh)
   auto diff         = max.subtract(min);
   auto median       = min.add(diff.scale(0.5f));
 
-  auto worldMatrix
-    = Matrix::Scaling(diff.x, diff.y, diff.z)
-        .multiply(Matrix::Translation(median.x, median.y, median.z))
-        .multiply(boundingBox.getWorldMatrix());
+  auto worldMatrix = Matrix::Scaling(diff.x, diff.y, diff.z)
+                       .multiply(Matrix::Translation(median.x, median.y, median.z))
+                       .multiply(boundingBox.getWorldMatrix());
 
-  engine->bindBuffers(_vertexBuffers, _fillIndexBuffer.get(),
-                      _colorShader->getEffect());
+  engine->bindBuffers(_vertexBuffers, _fillIndexBuffer, _colorShader->getEffect());
 
   engine->setDepthFunctionToLess();
   scene->resetCachedMaterial();
@@ -243,10 +231,10 @@ void BoundingBoxRenderer::dispose()
     }
   }
 
-  scene->getEngine()->_releaseBuffer(_indexBuffer.get());
+  scene->getEngine()->_releaseBuffer(_indexBuffer);
 
   if (_fillIndexBuffer) {
-    scene->getEngine()->_releaseBuffer(_fillIndexBuffer.get());
+    scene->getEngine()->_releaseBuffer(_fillIndexBuffer);
     _fillIndexBuffer = nullptr;
   }
 }

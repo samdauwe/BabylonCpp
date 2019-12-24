@@ -54,7 +54,9 @@ attribute vec2 uv2;
 void main(void)
 {
     vec3 positionUpdated = position;
-
+#ifdef UV1
+    vec2 uvUpdated = uv;
+#endif
 #include<morphTargetsVertex>[0..maxSimultaneousMorphTargets]
 #include<instancesVertex>
 #include<bonesVertex>
@@ -69,7 +71,7 @@ void main(void)
 
 #ifdef DIFFUSE
     #ifdef DIFFUSEUV1
-        vUVDiffuse = vec2(diffuseMatrix * vec4(uv, 1.0, 0.0));
+        vUVDiffuse = vec2(diffuseMatrix * vec4(uvUpdated, 1.0, 0.0));
     #endif
     #ifdef DIFFUSEUV2
         vUVDiffuse = vec2(diffuseMatrix * vec4(uv2, 1.0, 0.0));
@@ -78,7 +80,7 @@ void main(void)
 
 #ifdef OPACITY
     #ifdef OPACITYUV1
-        vUVOpacity = vec2(opacityMatrix * vec4(uv, 1.0, 0.0));
+        vUVOpacity = vec2(opacityMatrix * vec4(uvUpdated, 1.0, 0.0));
     #endif
     #ifdef OPACITYUV2
         vUVOpacity = vec2(opacityMatrix * vec4(uv2, 1.0, 0.0));
@@ -87,7 +89,7 @@ void main(void)
 
 #ifdef EMISSIVE
     #ifdef EMISSIVEUV1
-        vUVEmissive = vec2(emissiveMatrix * vec4(uv, 1.0, 0.0));
+        vUVEmissive = vec2(emissiveMatrix * vec4(uvUpdated, 1.0, 0.0));
     #endif
     #ifdef EMISSIVEUV2
         vUVEmissive = vec2(emissiveMatrix * vec4(uv2, 1.0, 0.0));
@@ -100,6 +102,7 @@ void main(void)
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_GLOW_MAP_GENERATION_VERTEX_FX_H

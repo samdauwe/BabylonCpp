@@ -9,6 +9,7 @@
 // below. #define GLAD_DEBUG
 #include <glad/glad.h>
 
+#define GLFW_INCLUDE_NONE
 // GLFW
 #include <GLFW/glfw3.h>
 #ifdef _WIN32
@@ -28,14 +29,11 @@
 namespace BABYLON {
 namespace GL {
 
-void MessageCallback(GLenum /*source*/, GLenum type, GLuint /*id*/,
-                     GLenum severity, GLsizei /*length*/, const GLchar* message,
-                     const void* /*userParam*/)
+void MessageCallback(GLenum /*source*/, GLenum type, GLuint /*id*/, GLenum severity,
+                     GLsizei /*length*/, const GLchar* message, const void* /*userParam*/)
 {
-  fprintf(stderr,
-          "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
-          (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity,
-          message);
+  fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+          (type == DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
 }
 
 GLRenderingContext::GLRenderingContext()
@@ -125,12 +123,6 @@ std::string GlErrorCodeStr(GLenum error_code)
     case GL_INVALID_OPERATION:
       error = "INVALID_OPERATION";
       break;
-    case GL_STACK_OVERFLOW:
-      error = "STACK_OVERFLOW";
-      break;
-    case GL_STACK_UNDERFLOW:
-      error = "STACK_UNDERFLOW";
-      break;
     case GL_OUT_OF_MEMORY:
       error = "OUT_OF_MEMORY";
       break;
@@ -141,15 +133,13 @@ std::string GlErrorCodeStr(GLenum error_code)
   return error;
 }
 
-void glad_post_call_callback(const char* name, void* /*funcptr*/,
-                             int /*len_args*/, ...)
+void glad_post_call_callback(const char* name, void* /*funcptr*/, int /*len_args*/, ...)
 {
   GLenum error_code;
   error_code = glad_glGetError();
 
   std::stringstream msg_str;
-  msg_str << "ERROR " << GlErrorCodeStr(error_code) << "(" << error_code
-          << ") in " << name << "\n";
+  msg_str << "ERROR " << GlErrorCodeStr(error_code) << "(" << error_code << ") in " << name << "\n";
   if (error_code != GL_NO_ERROR) {
     fprintf(stderr, "%s", msg_str.str().c_str());
 #ifdef _MSC_VER
@@ -158,8 +148,7 @@ void glad_post_call_callback(const char* name, void* /*funcptr*/,
   }
 }
 
-void glad_pre_call_callback(const char* name, void* /*funcptr*/,
-                            int /*len_args*/, ...)
+void glad_pre_call_callback(const char* name, void* /*funcptr*/, int /*len_args*/, ...)
 {
   std::stringstream msg_str;
   msg_str << "glad_pre_call_callback " << name << "\n";
@@ -173,12 +162,12 @@ bool GLRenderingContext::initialize(bool enableGLDebugging)
 {
   // HUM : glad already loaded by imgui ?
   // Initialize glad
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-    fprintf(stderr, "gladLoadGLLoader: Failed to initialize OpenGL context\n");
+  if (!gladLoadGLES2Loader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
+    fprintf(stderr, "gladLoadGLLoader: Failed to initialize OpenGL ES context\n");
     return false;
   }
-  if (!GLAD_GL_VERSION_3_3) {
-    fprintf(stderr, "GLAD could not initialize OpenGl 3.3\n");
+  if (!GLAD_GL_ES_VERSION_3_0) {
+    fprintf(stderr, "GLAD could not initialize OpenGl ES 3.0\n");
   }
 #ifdef GLAD_DEBUG
   glad_set_pre_callback(glad_pre_call_callback);
@@ -186,88 +175,18 @@ bool GLRenderingContext::initialize(bool enableGLDebugging)
 #endif
 
   // Log the GL version
-  BABYLON_LOGF_INFO("GLRenderingContext", "Using GL version: %s",
-                    glGetString(GL_VERSION));
+  BABYLON_LOGF_INFO("GLRenderingContext", "Using GL version: %s", glGetString(GL_VERSION))
 
   // Setup OpenGL options
-  glEnable(GL_MULTISAMPLE);
-
-  // backupGLState();
+  // glEnable(GL_MULTISAMPLE);
 
   // Enable debug output
   if (enableGLDebugging) {
-    glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(MessageCallback, nullptr);
+    // glEnable(GL_DEBUG_OUTPUT);
+    // glDebugMessageCallback(MessageCallback, nullptr);
   }
 
   return true;
-}
-
-void GLRenderingContext::backupGLState()
-{
-  // Force states
-  // glPushAttrib(GL_ALL_ATTRIB_BITS);
-  glEnable(GL_DEPTH_TEST);
-  glDisable(GL_SCISSOR_TEST);
-  // Backup GL state
-  glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
-  glGetIntegerv(GL_ACTIVE_TEXTURE, &last_active_texture);
-  glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &last_array_buffer);
-  glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &last_element_array_buffer);
-  glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &last_vertex_array);
-  glGetIntegerv(GL_BLEND_SRC, &last_blend_src);
-  glGetIntegerv(GL_BLEND_DST, &last_blend_dst);
-  glGetIntegerv(GL_BLEND_EQUATION_RGB, &last_blend_equation_rgb);
-  glGetIntegerv(GL_BLEND_EQUATION_ALPHA, &last_blend_equation_alpha);
-  glGetIntegerv(GL_VIEWPORT, last_viewport);
-  last_enable_blend        = glIsEnabled(GL_BLEND);
-  last_enable_cull_face    = glIsEnabled(GL_CULL_FACE);
-  last_enable_depth_test   = glIsEnabled(GL_DEPTH_TEST);
-  last_enable_scissor_test = glIsEnabled(GL_SCISSOR_TEST);
-  glUseProgram(last_program);
-}
-
-void GLRenderingContext::restoreGLState()
-{
-  // Restore modified GL state
-  glUseProgram(0);
-  glActiveTexture(static_cast<GLenum>(last_active_texture));
-  glBindTexture(GL_TEXTURE_2D, static_cast<GLenum>(last_texture));
-  glBindVertexArray(static_cast<GLenum>(last_vertex_array));
-  glBindBuffer(GL_ARRAY_BUFFER, static_cast<GLenum>(last_array_buffer));
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
-               static_cast<GLenum>(last_element_array_buffer));
-  glBlendEquationSeparate(static_cast<GLenum>(last_blend_equation_rgb),
-                          static_cast<GLenum>(last_blend_equation_alpha));
-  glBlendFunc(static_cast<GLenum>(last_blend_src),
-              static_cast<GLenum>(last_blend_dst));
-  if (last_enable_blend) {
-    glEnable(GL_BLEND);
-  }
-  else {
-    glDisable(GL_BLEND);
-  }
-  if (last_enable_cull_face) {
-    glEnable(GL_CULL_FACE);
-  }
-  else {
-    glDisable(GL_CULL_FACE);
-  }
-  if (last_enable_depth_test) {
-    glEnable(GL_DEPTH_TEST);
-  }
-  else {
-    glDisable(GL_DEPTH_TEST);
-  }
-  if (last_enable_scissor_test) {
-    glEnable(GL_SCISSOR_TEST);
-  }
-  else {
-    glDisable(GL_SCISSOR_TEST);
-  }
-  glViewport(last_viewport[0], last_viewport[1], last_viewport[2],
-             last_viewport[3]);
-  // glPopAttrib();
 }
 
 GLenum GLRenderingContext::operator[](const std::string& name)
@@ -285,8 +204,7 @@ void GLRenderingContext::attachShader(IGLProgram* program, IGLShader* shader)
   glAttachShader(program->value, shader ? shader->value : 0);
 }
 
-void GLRenderingContext::beginQuery(GLenum target,
-                                    const std::unique_ptr<IGLQuery>& query)
+void GLRenderingContext::beginQuery(GLenum target, const std::unique_ptr<IGLQuery>& query)
 {
   glBeginQuery(target, query ? query->value : 0);
 }
@@ -307,20 +225,18 @@ void GLRenderingContext::bindBuffer(GLenum target, IGLBuffer* buffer)
   glBindBuffer(target, buffer ? buffer->value : 0);
 }
 
-void GLRenderingContext::bindFramebuffer(GLenum target,
-                                         IGLFramebuffer* framebuffer)
+void GLRenderingContext::bindFramebuffer(GLenum target, IGLFramebuffer* framebuffer)
 {
   glBindFramebuffer(target, framebuffer ? framebuffer->value : 0);
 }
 
-void GLRenderingContext::bindBufferBase(GLenum target, GLuint index,
-                                        IGLBuffer* buffer)
+void GLRenderingContext::bindBufferBase(GLenum target, GLuint index, IGLBuffer* buffer)
 {
   glBindBufferBase(target, index, buffer ? buffer->value : 0);
 }
 
-void GLRenderingContext::bindRenderbuffer(
-  GLenum target, const std::unique_ptr<IGLRenderbuffer>& renderbuffer)
+void GLRenderingContext::bindRenderbuffer(GLenum target,
+                                          const std::unique_ptr<IGLRenderbuffer>& renderbuffer)
 {
   glBindRenderbuffer(target, renderbuffer ? renderbuffer->value : 0);
 }
@@ -335,14 +251,13 @@ void GLRenderingContext::bindTexture(GLenum target, IGLTexture* texture)
   }
 }
 
-void GLRenderingContext::bindTransformFeedback(
-  GLenum target, IGLTransformFeedback* transformFeedback)
+void GLRenderingContext::bindTransformFeedback(GLenum target,
+                                               IGLTransformFeedback* transformFeedback)
 {
   glBindTransformFeedback(target, transformFeedback->value);
 }
 
-void GLRenderingContext::blendColor(GLclampf red, GLclampf green, GLclampf blue,
-                                    GLclampf alpha)
+void GLRenderingContext::blendColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
 {
   glBlendColor(red, green, blue, alpha);
 }
@@ -362,78 +277,57 @@ void GLRenderingContext::blendFunc(GLenum sfactor, GLenum dfactor)
   glBlendFunc(sfactor, dfactor);
 }
 
-void GLRenderingContext::blendFuncSeparate(GLenum srcRGB, GLenum dstRGB,
-                                           GLenum srcAlpha, GLenum dstAlpha)
+void GLRenderingContext::blendFuncSeparate(GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha,
+                                           GLenum dstAlpha)
 {
   glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
 }
 
-void GLRenderingContext::blitFramebuffer(GLint srcX0, GLint srcY0, GLint srcX1,
-                                         GLint srcY1, GLint dstX0, GLint dstY0,
-                                         GLint dstX1, GLint dstY1,
+void GLRenderingContext::blitFramebuffer(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1,
+                                         GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1,
                                          GLbitfield mask, GLenum filter)
 {
-  glBlitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1,
-                    mask, filter);
+  glBlitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
 }
 
-void GLRenderingContext::bufferData(GLenum target, GLsizeiptr sizeiptr,
-                                    GLenum usage)
+void GLRenderingContext::bufferData(GLenum target, GLsizeiptr sizeiptr, GLenum usage)
 {
-  glBufferData(target, sizeiptr >> 32,
-               reinterpret_cast<any>(sizeiptr & 0x0000ffff), usage);
+  glBufferData(target, sizeiptr >> 32, reinterpret_cast<any>(sizeiptr & 0x0000ffff), usage);
 }
 
-void GLRenderingContext::bufferData(GLenum target, const Float32Array& data,
-                                    GLenum usage)
+void GLRenderingContext::bufferData(GLenum target, const Float32Array& data, GLenum usage)
 {
-  glBufferData(target, static_cast<GLint>(data.size() * sizeof(GLfloat)),
-               data.data(), usage);
+  glBufferData(target, static_cast<GLint>(data.size() * sizeof(GLfloat)), data.data(), usage);
 }
 
-void GLRenderingContext::bufferData(GLenum target, const Int32Array& data,
-                                    GLenum usage)
+void GLRenderingContext::bufferData(GLenum target, const Int32Array& data, GLenum usage)
 {
-  glBufferData(target, static_cast<GLint>(data.size() * sizeof(int32_t)),
-               data.data(), usage);
+  glBufferData(target, static_cast<GLint>(data.size() * sizeof(int32_t)), data.data(), usage);
 }
 
-void GLRenderingContext::bufferData(GLenum target, const Uint16Array& data,
-                                    GLenum usage)
+void GLRenderingContext::bufferData(GLenum target, const Uint16Array& data, GLenum usage)
 {
-  glBufferData(target, static_cast<GLint>(data.size() * sizeof(uint16_t)),
-               data.data(), usage);
+  glBufferData(target, static_cast<GLint>(data.size() * sizeof(uint16_t)), data.data(), usage);
 }
 
-void GLRenderingContext::bufferData(GLenum target, const Uint32Array& data,
-                                    GLenum usage)
+void GLRenderingContext::bufferData(GLenum target, const Uint32Array& data, GLenum usage)
 {
-  glBufferData(target, static_cast<GLint>(data.size() * sizeof(uint32_t)),
-               data.data(), usage);
+  glBufferData(target, static_cast<GLint>(data.size() * sizeof(uint32_t)), data.data(), usage);
 }
 
-void GLRenderingContext::bufferSubData(GLenum target, GLintptr offset,
-                                       const Uint8Array& data)
+void GLRenderingContext::bufferSubData(GLenum target, GLintptr offset, const Uint8Array& data)
 {
-  glBufferSubData(target, offset,
-                  static_cast<GLint>(data.size() * sizeof(GLbyte)),
-                  data.data());
+  glBufferSubData(target, offset, static_cast<GLint>(data.size() * sizeof(GLbyte)), data.data());
 }
 
-void GLRenderingContext::bufferSubData(GLenum target, GLintptr offset,
-                                       const Float32Array& data)
+void GLRenderingContext::bufferSubData(GLenum target, GLintptr offset, const Float32Array& data)
 {
-  glBufferSubData(target, offset,
-                  static_cast<GLint>(data.size() * sizeof(GLfloat)),
-                  data.data());
+  glBufferSubData(target, offset, static_cast<GLint>(data.size() * sizeof(GLfloat)), data.data());
 }
 
-void GLRenderingContext::bufferSubData(GLenum target, GLintptr offset,
-                                       Int32Array& data)
+void GLRenderingContext::bufferSubData(GLenum target, GLintptr offset, Int32Array& data)
 {
-  glBufferSubData(target, offset,
-                  static_cast<GLint>(data.size() * sizeof(int32_t)),
-                  data.data());
+  glBufferSubData(target, offset, static_cast<GLint>(data.size() * sizeof(int32_t)), data.data());
 }
 
 void GLRenderingContext::bindVertexArray(GL::IGLVertexArrayObject* vao)
@@ -452,41 +346,37 @@ void GLRenderingContext::clear(GLbitfield mask)
 }
 
 void GLRenderingContext::clearBufferfv(GLenum buffer, GLint drawbuffer,
-                                       const std::vector<GLfloat>& values,
-                                       GLint /*srcOffset*/)
+                                       const std::vector<GLfloat>& values, GLint /*srcOffset*/)
 {
   glClearBufferfv(buffer, drawbuffer, values.data());
 }
 
 void GLRenderingContext::clearBufferiv(GLenum buffer, GLint drawbuffer,
-                                       const std::vector<GLint>& values,
-                                       GLint /*srcOffset*/)
+                                       const std::vector<GLint>& values, GLint /*srcOffset*/)
 {
   glClearBufferiv(buffer, drawbuffer, values.data());
 }
 
 void GLRenderingContext::clearBufferuiv(GLenum buffer, GLint drawbuffer,
-                                        const std::vector<GLuint>& values,
-                                        GLint /*srcOffset*/)
+                                        const std::vector<GLuint>& values, GLint /*srcOffset*/)
 {
   glClearBufferuiv(buffer, drawbuffer, values.data());
 }
 
-void GLRenderingContext::clearBufferfi(GLenum buffer, GLint drawbuffer,
-                                       GLfloat depth, GLint stencil)
+void GLRenderingContext::clearBufferfi(GLenum buffer, GLint drawbuffer, GLfloat depth,
+                                       GLint stencil)
 {
   glClearBufferfi(buffer, drawbuffer, depth, stencil);
 }
 
-void GLRenderingContext::clearColor(GLclampf red, GLclampf green, GLclampf blue,
-                                    GLclampf alpha)
+void GLRenderingContext::clearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
 {
   glClearColor(red, green, blue, alpha);
 }
 
 void GLRenderingContext::clearDepth(GLclampf depth)
 {
-  glClearDepth(static_cast<double>(depth));
+  glClearDepthf(depth);
 }
 
 void GLRenderingContext::clearStencil(GLint stencil)
@@ -494,8 +384,7 @@ void GLRenderingContext::clearStencil(GLint stencil)
   glClearStencil(stencil);
 }
 
-void GLRenderingContext::colorMask(GLboolean red, GLboolean green,
-                                   GLboolean blue, GLboolean alpha)
+void GLRenderingContext::colorMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha)
 {
   glColorMask(red, green, blue, alpha);
 }
@@ -505,47 +394,40 @@ void GLRenderingContext::compileShader(IGLShader* shader)
   glCompileShader(shader->value);
 }
 
-void GLRenderingContext::compressedTexImage2D(GLenum target, GLint level,
-                                              GLenum internalformat,
-                                              GLint width, GLint height,
-                                              GLint border,
+void GLRenderingContext::compressedTexImage2D(GLenum target, GLint level, GLenum internalformat,
+                                              GLint width, GLint height, GLint border,
                                               const Uint8Array& pixels)
 {
   glCompressedTexImage2D(target, level, internalformat, width, height, border,
-                         static_cast<GLint>(pixels.size() * sizeof(GLbyte)),
-                         &pixels[0]);
+                         static_cast<GLint>(pixels.size() * sizeof(GLbyte)), &pixels[0]);
 }
 
-void GLRenderingContext::compressedTexSubImage2D(GLenum target, GLint level,
-                                                 GLint xoffset, GLint yoffset,
-                                                 GLsizei width, GLsizei height,
+void GLRenderingContext::compressedTexSubImage2D(GLenum target, GLint level, GLint xoffset,
+                                                 GLint yoffset, GLsizei width, GLsizei height,
                                                  GLenum format, GLsizeiptr size)
 {
-  glCompressedTexSubImage2D(target, level, xoffset, yoffset, width, height,
-                            format, static_cast<GLint>(size >> 32),
+  glCompressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format,
+                            static_cast<GLint>(size >> 32),
                             reinterpret_cast<const GLint*>(size & 0x0000ffff));
 }
 
-void GLRenderingContext::copyTexImage2D(GLenum target, GLint level,
-                                        GLenum internalformat, GLint x, GLint y,
-                                        GLint width, GLint height, GLint border)
+void GLRenderingContext::copyTexImage2D(GLenum target, GLint level, GLenum internalformat, GLint x,
+                                        GLint y, GLint width, GLint height, GLint border)
 {
   glCopyTexImage2D(target, level, internalformat, x, y, width, height, border);
 }
 
-void GLRenderingContext::copyTexSubImage2D(GLenum target, GLint level,
-                                           GLint xoffset, GLint yoffset,
-                                           GLint x, GLint y, GLint width,
-                                           GLint height)
+void GLRenderingContext::copyTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset,
+                                           GLint x, GLint y, GLint width, GLint height)
 {
   glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
 }
 
-std::unique_ptr<IGLBuffer> GLRenderingContext::createBuffer()
+std::shared_ptr<IGLBuffer> GLRenderingContext::createBuffer()
 {
   GLuint buffer = 0;
   glGenBuffers(1, &buffer);
-  return std::make_unique<IGLBuffer>(buffer);
+  return std::make_shared<IGLBuffer>(buffer);
 }
 
 IGLFramebufferPtr GLRenderingContext::createFramebuffer()
@@ -641,8 +523,7 @@ void GLRenderingContext::deleteTexture(IGLTexture* texture)
   texture->value = 0;
 }
 
-void GLRenderingContext::deleteTransformFeedback(
-  IGLTransformFeedback* transformFeedback)
+void GLRenderingContext::deleteTransformFeedback(IGLTransformFeedback* transformFeedback)
 {
   glDeleteTransformFeedbacks(1, &transformFeedback->value);
   transformFeedback->value = 0;
@@ -666,7 +547,7 @@ void GLRenderingContext::depthMask(GLboolean flag)
 
 void GLRenderingContext::depthRange(GLclampf zNear, GLclampf zFar)
 {
-  glDepthRange(static_cast<double>(zNear), static_cast<double>(zFar));
+  glDepthRangef(zNear, zFar);
 }
 
 void GLRenderingContext::detachShader(IGLProgram* program, IGLShader* shader)
@@ -689,8 +570,7 @@ void GLRenderingContext::drawArrays(GLenum mode, GLint first, GLint count)
   glDrawArrays(mode, first, count);
 }
 
-void GLRenderingContext::drawArraysInstanced(GLenum mode, GLint first,
-                                             GLsizei count,
+void GLRenderingContext::drawArraysInstanced(GLenum mode, GLint first, GLsizei count,
                                              GLsizei instanceCount)
 {
   glDrawArraysInstanced(mode, first, count, instanceCount);
@@ -702,18 +582,15 @@ void GLRenderingContext::drawBuffers(const std::vector<GLenum>& buffers)
   glDrawBuffers(n, &buffers[0]);
 }
 
-void GLRenderingContext::drawElements(GLenum mode, GLint count, GLenum type,
-                                      GLintptr offset)
+void GLRenderingContext::drawElements(GLenum mode, GLint count, GLenum type, GLintptr offset)
 {
   glDrawElements(mode, count, type, reinterpret_cast<any>(offset));
 }
 
-void GLRenderingContext::drawElementsInstanced(GLenum mode, GLsizei count,
-                                               GLenum type, GLintptr offset,
-                                               GLsizei instanceCount)
+void GLRenderingContext::drawElementsInstanced(GLenum mode, GLsizei count, GLenum type,
+                                               GLintptr offset, GLsizei instanceCount)
 {
-  glDrawElementsInstanced(mode, count, type, reinterpret_cast<any>(offset),
-                          instanceCount);
+  glDrawElementsInstanced(mode, count, type, reinterpret_cast<any>(offset), instanceCount);
 }
 
 void GLRenderingContext::enable(GLenum cap)
@@ -746,25 +623,22 @@ void GLRenderingContext::flush()
   glFlush();
 }
 
-void GLRenderingContext::framebufferRenderbuffer(GLenum target,
-                                                 GLenum attachment,
+void GLRenderingContext::framebufferRenderbuffer(GLenum target, GLenum attachment,
                                                  GLenum renderbuffertarget,
                                                  IGLRenderbuffer* renderbuffer)
 {
-  glFramebufferRenderbuffer(target, attachment, renderbuffertarget,
-                            renderbuffer->value);
+  glFramebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer->value);
 }
 
-void GLRenderingContext::framebufferTexture2D(GLenum target, GLenum attachment,
-                                              GLenum textarget,
+void GLRenderingContext::framebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget,
                                               IGLTexture* texture, GLint level)
 {
   glFramebufferTexture2D(target, attachment, textarget, texture->value, level);
 }
 
-void GLRenderingContext::framebufferTextureMultiviewOVR(
-  GLenum /*target*/, GLenum /*attachment*/, IGLTexture* /*texture*/,
-  GLint /*level*/, GLint /*baseViewIndex*/, GLint /*numViews*/)
+void GLRenderingContext::framebufferTextureMultiviewOVR(GLenum /*target*/, GLenum /*attachment*/,
+                                                        IGLTexture* /*texture*/, GLint /*level*/,
+                                                        GLint /*baseViewIndex*/, GLint /*numViews*/)
 {
 }
 
@@ -778,15 +652,13 @@ void GLRenderingContext::generateMipmap(GLenum target)
   glGenerateMipmap(target);
 }
 
-std::vector<IGLShader*>
-GLRenderingContext::getAttachedShaders(IGLProgram* /*program*/)
+std::vector<IGLShader*> GLRenderingContext::getAttachedShaders(IGLProgram* /*program*/)
 {
   // Not supported
   return std::vector<IGLShader*>();
 }
 
-GLint GLRenderingContext::getAttribLocation(IGLProgram* program,
-                                            const std::string& name)
+GLint GLRenderingContext::getAttribLocation(IGLProgram* program, const std::string& name)
 {
   return glGetAttribLocation(program->value, name.c_str());
 }
@@ -817,8 +689,8 @@ GLfloat GLRenderingContext::getParameterf(GLenum pname)
 
 GLboolean GLRenderingContext::getQueryParameterb(IGLQuery* query, GLenum pname)
 {
-  int parameter = 0;
-  glGetQueryObjectiv(query->value, pname, &parameter);
+  GLuint parameter = 0;
+  glGetQueryObjectuiv(query->value, pname, &parameter);
   return parameter == GL_TRUE;
 }
 
@@ -865,10 +737,6 @@ const char* GLRenderingContext::getErrorString(GLenum err)
       return "Invalid value";
     case GL_OUT_OF_MEMORY:
       return "Out of memory";
-    case GL_STACK_OVERFLOW:
-      return "Stack overflow";
-    case GL_STACK_UNDERFLOW:
-      return "Stack underflow";
     default:
       return "Unknown error";
   }
@@ -909,9 +777,8 @@ GLint GLRenderingContext::getShaderParameter(IGLShader* shader, GLenum pname)
   return parameter;
 }
 
-IGLShaderPrecisionFormat*
-  GLRenderingContext::getShaderPrecisionFormat(GLenum /*shadertype*/,
-                                               GLenum /*precisiontype*/)
+IGLShaderPrecisionFormat* GLRenderingContext::getShaderPrecisionFormat(GLenum /*shadertype*/,
+                                                                       GLenum /*precisiontype*/)
 {
   return nullptr;
 }
@@ -940,16 +807,14 @@ std::string GLRenderingContext::getShaderSource(IGLShader* shader)
   return std::string(buffer, static_cast<std::size_t>(size) + 1);
 }
 
-GLuint
-GLRenderingContext::getUniformBlockIndex(IGLProgram* program,
-                                         const std::string& uniformBlockName)
+GLuint GLRenderingContext::getUniformBlockIndex(IGLProgram* program,
+                                                const std::string& uniformBlockName)
 {
   return glGetUniformBlockIndex(program->value, uniformBlockName.data());
 }
 
-std::unique_ptr<IGLUniformLocation>
-GLRenderingContext::getUniformLocation(IGLProgram* program,
-                                       const std::string& name)
+std::unique_ptr<IGLUniformLocation> GLRenderingContext::getUniformLocation(IGLProgram* program,
+                                                                           const std::string& name)
 {
   GLint value = glGetUniformLocation(program->value, name.c_str());
   if (value != -1) {
@@ -1032,35 +897,29 @@ void GLRenderingContext::readBuffer(GLenum src)
   glReadBuffer(src);
 }
 
-void GLRenderingContext::readPixels(GLint x, GLint y, GLsizei width,
-                                    GLsizei height, GLenum format, GLenum type,
-                                    Float32Array& pixels)
+void GLRenderingContext::readPixels(GLint x, GLint y, GLsizei width, GLsizei height, GLenum format,
+                                    GLenum type, Float32Array& pixels)
 {
   glReadPixels(x, y, width, height, format, type, &pixels[0]);
 }
 
-void GLRenderingContext::readPixels(GLint x, GLint y, GLint width, GLint height,
-                                    GLenum format, GLenum type,
-                                    Uint8Array& pixels)
+void GLRenderingContext::readPixels(GLint x, GLint y, GLint width, GLint height, GLenum format,
+                                    GLenum type, Uint8Array& pixels)
 {
   glReadPixels(x, y, width, height, format, type, &pixels[0]);
 }
 
-void GLRenderingContext::renderbufferStorage(GLenum target,
-                                             GLenum internalformat, GLint width,
+void GLRenderingContext::renderbufferStorage(GLenum target, GLenum internalformat, GLint width,
                                              GLint height)
 {
   glRenderbufferStorage(target, internalformat, width, height);
 }
 
-void GLRenderingContext::renderbufferStorageMultisample(GLenum target,
-                                                        GLsizei samples,
-                                                        GLenum internalFormat,
-                                                        GLsizei width,
+void GLRenderingContext::renderbufferStorageMultisample(GLenum target, GLsizei samples,
+                                                        GLenum internalFormat, GLsizei width,
                                                         GLsizei height)
 {
-  glRenderbufferStorageMultisample(target, samples, internalFormat, width,
-                                   height);
+  glRenderbufferStorageMultisample(target, samples, internalFormat, width, height);
 }
 
 void GLRenderingContext::sampleCoverage(GLclampf value, GLboolean invert)
@@ -1073,8 +932,7 @@ void GLRenderingContext::scissor(GLint x, GLint y, GLint width, GLint height)
   glScissor(x, y, width, height);
 }
 
-void GLRenderingContext::shaderSource(IGLShader* shader,
-                                      const std::string& source)
+void GLRenderingContext::shaderSource(IGLShader* shader, const std::string& source)
 {
   auto length        = static_cast<int>(source.length());
   const GLchar* line = source.c_str();
@@ -1086,8 +944,7 @@ void GLRenderingContext::stencilFunc(GLenum func, GLint ref, GLuint mask)
   glStencilFunc(func, ref, mask);
 }
 
-void GLRenderingContext::stencilFuncSeparate(GLenum face, GLenum func,
-                                             GLint ref, GLuint mask)
+void GLRenderingContext::stencilFuncSeparate(GLenum face, GLenum func, GLint ref, GLuint mask)
 {
   glStencilFuncSeparate(face, func, ref, mask);
 }
@@ -1107,39 +964,33 @@ void GLRenderingContext::stencilOp(GLenum fail, GLenum zfail, GLenum zpass)
   glStencilOp(fail, zfail, zpass);
 }
 
-void GLRenderingContext::stencilOpSeparate(GLenum face, GLenum fail,
-                                           GLenum zfail, GLenum zpass)
+void GLRenderingContext::stencilOpSeparate(GLenum face, GLenum fail, GLenum zfail, GLenum zpass)
 {
   glStencilOpSeparate(face, fail, zfail, zpass);
 }
 
-void GLRenderingContext::texImage2D(GLenum target, GLint level,
-                                    GLint internalformat, GLsizei width,
-                                    GLsizei height, GLint border, GLenum format,
-                                    GLenum type, const Uint8Array* const pixels)
+void GLRenderingContext::texImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width,
+                                    GLsizei height, GLint border, GLenum format, GLenum type,
+                                    const Uint8Array* const pixels)
 {
   if (pixels == nullptr) {
-    glTexImage2D(target, level, internalformat, width, height, border, format,
-                 type, nullptr);
+    glTexImage2D(target, level, internalformat, width, height, border, format, type, nullptr);
   }
   else {
-    glTexImage2D(target, level, internalformat, width, height, border, format,
-                 type, pixels->data());
+    glTexImage2D(target, level, internalformat, width, height, border, format, type,
+                 pixels->data());
   }
 }
 
-void GLRenderingContext::texImage3D(GLenum target, GLint level,
-                                    GLint internalformat, GLsizei width,
-                                    GLsizei height, GLsizei depth, GLint border,
-                                    GLenum format, GLenum type,
-                                    const Uint8Array& pixels)
+void GLRenderingContext::texImage3D(GLenum target, GLint level, GLint internalformat, GLsizei width,
+                                    GLsizei height, GLsizei depth, GLint border, GLenum format,
+                                    GLenum type, const Uint8Array& pixels)
 {
-  glTexImage3D(target, level, internalformat, width, height, depth, border,
-               format, type, &pixels[0]);
+  glTexImage3D(target, level, internalformat, width, height, depth, border, format, type,
+               &pixels[0]);
 }
 
-void GLRenderingContext::texParameterf(GLenum target, GLenum pname,
-                                       GLfloat param)
+void GLRenderingContext::texParameterf(GLenum target, GLenum pname, GLfloat param)
 {
   glTexParameterf(target, pname, param);
 }
@@ -1149,33 +1000,30 @@ void GLRenderingContext::texParameteri(GLenum target, GLenum pname, GLint param)
   glTexParameteri(target, pname, param);
 }
 
-void GLRenderingContext::texStorage3D(GLenum target, GLint levels,
-                                      GLenum internalformat, GLsizei width,
-                                      GLsizei height, GLsizei depth)
+void GLRenderingContext::texStorage3D(GLenum target, GLint levels, GLenum internalformat,
+                                      GLsizei width, GLsizei height, GLsizei depth)
 {
   glTexStorage3D(target, levels, internalformat, width, height, depth);
 }
 
-void GLRenderingContext::texSubImage2D(GLenum target, GLint level,
-                                       GLint xoffset, GLint yoffset,
-                                       GLint width, GLint height, GLenum format,
-                                       GLenum type, any pixels)
+void GLRenderingContext::texSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset,
+                                       GLint width, GLint height, GLenum format, GLenum type,
+                                       any pixels)
 {
-  glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type,
-                  pixels);
+  glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels);
 }
 
-void GLRenderingContext::transformFeedbackVaryings(
-  IGLProgram* program, const std::vector<std::string>& varyings,
-  GLenum bufferMode)
+void GLRenderingContext::transformFeedbackVaryings(IGLProgram* program,
+                                                   const std::vector<std::string>& varyings,
+                                                   GLenum bufferMode)
 {
   std::vector<const char*> _varyings;
   for (auto varying : varyings) {
     _varyings.emplace_back(varying.c_str());
   }
 
-  glTransformFeedbackVaryings(program->value, static_cast<int>(varyings.size()),
-                              &_varyings[0], bufferMode);
+  glTransformFeedbackVaryings(program->value, static_cast<int>(varyings.size()), &_varyings[0],
+                              bufferMode);
 }
 
 void GLRenderingContext::uniform1f(IGLUniformLocation* location, GLfloat x)
@@ -1183,11 +1031,10 @@ void GLRenderingContext::uniform1f(IGLUniformLocation* location, GLfloat x)
   glUniform1f(location->value, x);
 }
 
-void GLRenderingContext::GLRenderingContext::uniform1fv(
-  GL::IGLUniformLocation* uniform, const Float32Array& array)
+void GLRenderingContext::GLRenderingContext::uniform1fv(GL::IGLUniformLocation* uniform,
+                                                        const Float32Array& array)
 {
-  glUniform1fv(uniform->value, static_cast<int>(array.size() * sizeof(GLfloat)),
-               array.data());
+  glUniform1fv(uniform->value, static_cast<int>(array.size() * sizeof(GLfloat)), array.data());
 }
 
 void GLRenderingContext::uniform1i(IGLUniformLocation* location, GLint x)
@@ -1195,133 +1042,108 @@ void GLRenderingContext::uniform1i(IGLUniformLocation* location, GLint x)
   glUniform1i(location->value, x);
 }
 
-void GLRenderingContext::uniform1iv(IGLUniformLocation* location,
-                                    const Int32Array& v)
+void GLRenderingContext::uniform1iv(IGLUniformLocation* location, const Int32Array& v)
 {
-  glUniform1iv(location->value, static_cast<GLint>(v.size() * sizeof(int32_t)),
-               v.data());
+  glUniform1iv(location->value, static_cast<GLint>(v.size() * sizeof(int32_t)), v.data());
 }
 
-void GLRenderingContext::uniform2f(IGLUniformLocation* location, GLfloat x,
-                                   GLfloat y)
+void GLRenderingContext::uniform2f(IGLUniformLocation* location, GLfloat x, GLfloat y)
 {
   glUniform2f(location->value, x, y);
 }
 
-void GLRenderingContext::uniform2fv(IGLUniformLocation* location,
-                                    const Float32Array& v)
+void GLRenderingContext::uniform2fv(IGLUniformLocation* location, const Float32Array& v)
 {
-  glUniform2fv(location->value, static_cast<GLint>(v.size() * sizeof(GLfloat)),
-               v.data());
+  glUniform2fv(location->value, static_cast<GLint>(v.size() * sizeof(GLfloat)), v.data());
 }
 
-void GLRenderingContext::uniform2i(IGLUniformLocation* location, GLint x,
-                                   GLint y)
+void GLRenderingContext::uniform2i(IGLUniformLocation* location, GLint x, GLint y)
 {
   glUniform2i(location->value, x, y);
 }
 
-void GLRenderingContext::uniform2iv(IGLUniformLocation* location,
-                                    const Int32Array& v)
+void GLRenderingContext::uniform2iv(IGLUniformLocation* location, const Int32Array& v)
 {
-  glUniform2iv(location->value, static_cast<GLint>(v.size() * sizeof(int32_t)),
-               v.data());
+  glUniform2iv(location->value, static_cast<GLint>(v.size() * sizeof(int32_t)), v.data());
 }
 
-void GLRenderingContext::uniform3f(IGLUniformLocation* location, GLfloat x,
-                                   GLfloat y, GLfloat z)
+void GLRenderingContext::uniform3f(IGLUniformLocation* location, GLfloat x, GLfloat y, GLfloat z)
 {
   glUniform3f(location->value, x, y, z);
 }
 
-void GLRenderingContext::uniform3fv(IGLUniformLocation* location,
-                                    const Float32Array& v)
+void GLRenderingContext::uniform3fv(IGLUniformLocation* location, const Float32Array& v)
 {
-  glUniform3fv(location->value, static_cast<GLint>(v.size() * sizeof(GLfloat)),
-               v.data());
+  glUniform3fv(location->value, static_cast<GLint>(v.size() * sizeof(GLfloat)), v.data());
 }
 
-void GLRenderingContext::uniform3i(IGLUniformLocation* location, GLint x,
-                                   GLint y, GLint z)
+void GLRenderingContext::uniform3i(IGLUniformLocation* location, GLint x, GLint y, GLint z)
 {
   glUniform3i(location->value, x, y, z);
 }
 
-void GLRenderingContext::uniform3iv(IGLUniformLocation* location,
-                                    const Int32Array& v)
+void GLRenderingContext::uniform3iv(IGLUniformLocation* location, const Int32Array& v)
 {
-  glUniform3iv(location->value, static_cast<GLint>(v.size() * sizeof(int32_t)),
-               v.data());
+  glUniform3iv(location->value, static_cast<GLint>(v.size() * sizeof(int32_t)), v.data());
 }
 
-void GLRenderingContext::uniform4f(IGLUniformLocation* location, GLfloat x,
-                                   GLfloat y, GLfloat z, GLfloat w)
+void GLRenderingContext::uniform4f(IGLUniformLocation* location, GLfloat x, GLfloat y, GLfloat z,
+                                   GLfloat w)
 {
   glUniform4f(location->value, x, y, z, w);
 }
 
-void GLRenderingContext::uniform4fv(IGLUniformLocation* location,
-                                    const Float32Array& v)
+void GLRenderingContext::uniform4fv(IGLUniformLocation* location, const Float32Array& v)
 {
-  glUniform4fv(location->value, static_cast<GLint>(v.size() * sizeof(GLfloat)),
-               v.data());
+  glUniform4fv(location->value, static_cast<GLint>(v.size() * sizeof(GLfloat)), v.data());
 }
 
-void GLRenderingContext::uniform4i(IGLUniformLocation* location, GLint x,
-                                   GLint y, GLint z, GLint w)
+void GLRenderingContext::uniform4i(IGLUniformLocation* location, GLint x, GLint y, GLint z, GLint w)
 {
   glUniform4i(location->value, x, y, z, w);
 }
 
-void GLRenderingContext::uniform4iv(IGLUniformLocation* location,
-                                    const Int32Array& v)
+void GLRenderingContext::uniform4iv(IGLUniformLocation* location, const Int32Array& v)
 {
-  glUniform4iv(location->value, static_cast<GLint>(v.size() * sizeof(int32_t)),
-               v.data());
+  glUniform4iv(location->value, static_cast<GLint>(v.size() * sizeof(int32_t)), v.data());
 }
 
-void GLRenderingContext::uniformBlockBinding(IGLProgram* program,
-                                             GLuint uniformBlockIndex,
+void GLRenderingContext::uniformBlockBinding(IGLProgram* program, GLuint uniformBlockIndex,
                                              GLuint uniformBlockBinding)
 {
   glUniformBlockBinding(program->value, uniformBlockIndex, uniformBlockBinding);
 }
 
-void GLRenderingContext::uniformMatrix2fv(IGLUniformLocation* location,
-                                          GLboolean transpose,
+void GLRenderingContext::uniformMatrix2fv(IGLUniformLocation* location, GLboolean transpose,
                                           const Float32Array& value)
 {
-  glUniformMatrix2fv(location->value, static_cast<GLint>(value.size() / 16),
-                     transpose, value.data());
+  glUniformMatrix2fv(location->value, static_cast<GLint>(value.size() / 16), transpose,
+                     value.data());
 }
 
-void GLRenderingContext::uniformMatrix3fv(IGLUniformLocation* location,
-                                          GLboolean transpose,
+void GLRenderingContext::uniformMatrix3fv(IGLUniformLocation* location, GLboolean transpose,
                                           const Float32Array& value)
 {
-  glUniformMatrix3fv(location->value, static_cast<GLint>(value.size() / 16),
-                     transpose, value.data());
+  glUniformMatrix3fv(location->value, static_cast<GLint>(value.size() / 16), transpose,
+                     value.data());
 }
 
-void GLRenderingContext::uniformMatrix4fv(IGLUniformLocation* location,
-                                          GLboolean transpose,
+void GLRenderingContext::uniformMatrix4fv(IGLUniformLocation* location, GLboolean transpose,
                                           const Float32Array& value)
 {
-  glUniformMatrix4fv(location->value, static_cast<GLint>(value.size() / 16),
-                     transpose, value.data());
+  glUniformMatrix4fv(location->value, static_cast<GLint>(value.size() / 16), transpose,
+                     value.data());
 }
 
-void GLRenderingContext::uniformMatrix4fv(IGLUniformLocation* location,
-                                          GLboolean transpose,
+void GLRenderingContext::uniformMatrix4fv(IGLUniformLocation* location, GLboolean transpose,
                                           const std::array<float, 16>& value)
 {
-  glUniformMatrix4fv(location->value, static_cast<GLint>(value.size() / 16),
-                     transpose, value.data());
+  glUniformMatrix4fv(location->value, static_cast<GLint>(value.size() / 16), transpose,
+                     value.data());
 }
 
 void GLRenderingContext::useProgram(IGLProgram* program)
 {
-  last_program = program->value;
   glUseProgram(program->value);
 }
 
@@ -1350,8 +1172,7 @@ void GLRenderingContext::vertexAttrib2fv(GLuint indx, Float32Array& values)
   glVertexAttrib2fv(indx, values.data());
 }
 
-void GLRenderingContext::vertexAttrib3f(GLuint indx, GLfloat x, GLfloat y,
-                                        GLfloat z)
+void GLRenderingContext::vertexAttrib3f(GLuint indx, GLfloat x, GLfloat y, GLfloat z)
 {
   glVertexAttrib3f(indx, x, y, z);
 }
@@ -1361,8 +1182,7 @@ void GLRenderingContext::vertexAttrib3fv(GLuint indx, Float32Array& values)
   glVertexAttrib3fv(indx, values.data());
 }
 
-void GLRenderingContext::vertexAttrib4f(GLuint indx, GLfloat x, GLfloat y,
-                                        GLfloat z, GLfloat w)
+void GLRenderingContext::vertexAttrib4f(GLuint indx, GLfloat x, GLfloat y, GLfloat z, GLfloat w)
 {
   glVertexAttrib4f(indx, x, y, z, w);
 }
@@ -1377,12 +1197,10 @@ void GLRenderingContext::vertexAttribDivisor(GLuint index, GLuint divisor)
   glVertexAttribDivisor(index, divisor);
 }
 
-void GLRenderingContext::vertexAttribPointer(GLuint indx, GLint size,
-                                             GLenum type, GLboolean normalized,
-                                             GLint stride, GLintptr offset)
+void GLRenderingContext::vertexAttribPointer(GLuint indx, GLint size, GLenum type,
+                                             GLboolean normalized, GLint stride, GLintptr offset)
 {
-  glVertexAttribPointer(indx, size, type, normalized, stride,
-                        reinterpret_cast<any>(offset));
+  glVertexAttribPointer(indx, size, type, normalized, stride, reinterpret_cast<any>(offset));
 }
 
 void GLRenderingContext::viewport(GLint x, GLint y, GLint width, GLint height)

@@ -83,6 +83,7 @@ uniform Scene {
 };
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_PBR_UBO_DECLARATION_FX_H

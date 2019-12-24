@@ -17,7 +17,7 @@ const char* pbrHelperFunctions
 
 float convertRoughnessToAverageSlope(float roughness)
 {
-    // Calculate AlphaG as square of roughness; add epsilon to avoid numerical issues
+    // Calculate AlphaG as square of roughness (add epsilon to avoid numerical issues)
     return square(roughness) + MINIMUMVARIANCE;
 }
 
@@ -115,6 +115,7 @@ vec2 getAARoughnessFactors(vec3 normalVector) {
 #endif
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_PBR_HELPER_FUNCTIONS_FX_H

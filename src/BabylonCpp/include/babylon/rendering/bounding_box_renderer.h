@@ -16,13 +16,11 @@ class BoundingBoxRenderer;
 class ShaderMaterial;
 class SubMesh;
 class VertexBuffer;
+class WebGLDataBuffer;
 using BoundingBoxRendererPtr = std::shared_ptr<BoundingBoxRenderer>;
 using ShaderMaterialPtr      = std::shared_ptr<ShaderMaterial>;
 using VertexBufferPtr        = std::shared_ptr<VertexBuffer>;
-
-namespace GL {
-class IGLBuffer;
-} // end of namespace GL
+using WebGLDataBufferPtr     = std::shared_ptr<WebGLDataBuffer>;
 
 /**
  * @brief Component responsible of rendering the bounding box of the meshes in a
@@ -123,8 +121,8 @@ public:
 private:
   ShaderMaterialPtr _colorShader;
   std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
-  std::unique_ptr<GL::IGLBuffer> _indexBuffer;
-  std::unique_ptr<GL::IGLBuffer> _fillIndexBuffer;
+  WebGLDataBufferPtr _indexBuffer;
+  WebGLDataBufferPtr _fillIndexBuffer;
   IndicesArray _fillIndexData;
 
 }; // end of class BoundingBoxRenderer

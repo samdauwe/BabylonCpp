@@ -42,6 +42,7 @@ void main()
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_PROCEDURAL_TEXTURES_LIBRARY_NORMALMAP_NORMAL_MAP_PROCEDURAL_TEXTURE_FRAGMENT_FX_H

@@ -236,6 +236,7 @@ void main(void) {
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_MATERIALS_LIBRARY_LAVA_LAVA_VERTEX_FX_H

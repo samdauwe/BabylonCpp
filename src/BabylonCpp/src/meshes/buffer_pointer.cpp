@@ -4,9 +4,9 @@ namespace BABYLON {
 
 BufferPointer::BufferPointer() = default;
 
-BufferPointer::BufferPointer(bool _active, unsigned int _indx, int _size,
-                             unsigned int _type, bool _normalized, int _stride,
-                             int _offset, GL::IGLBuffer* _buffer)
+BufferPointer::BufferPointer(bool _active, unsigned int _indx, int _size, unsigned int _type,
+                             bool _normalized, int _stride, int _offset,
+                             const WebGLDataBufferPtr& _buffer)
     : active{_active}
     , index{_indx}
     , size{_size}

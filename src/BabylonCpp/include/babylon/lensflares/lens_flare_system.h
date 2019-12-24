@@ -27,6 +27,7 @@ class TransformNode;
 class Vector3;
 class VertexBuffer;
 class Viewport;
+class WebGLDataBuffer;
 using AbstractMeshPtr    = std::shared_ptr<AbstractMesh>;
 using CameraPtr          = std::shared_ptr<Camera>;
 using EffectPtr          = std::shared_ptr<Effect>;
@@ -37,15 +38,11 @@ using LightPtr           = std::shared_ptr<Light>;
 using MeshPtr            = std::shared_ptr<Mesh>;
 using TransformNodePtr   = std::shared_ptr<TransformNode>;
 using VertexBufferPtr    = std::shared_ptr<VertexBuffer>;
-
-namespace GL {
-class IGLBuffer;
-} // end of namespace GL
+using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
 
 /**
- * @brief This represents a Lens Flare System or the shiny effect created by the
- * light reflection on the  camera lenses. It is usually composed of several
- * `lensFlare`.
+ * @brief This represents a Lens Flare System or the shiny effect created by the light reflection on
+ * the  camera lenses. It is usually composed of several `lensFlare`.
  * @see http://doc.babylonjs.com/how_to/how_to_use_lens_flares
  */
 class BABYLON_SHARED_EXPORT LensFlareSystem {
@@ -74,24 +71,21 @@ public:
 
   /**
    * @brief Get the emitter of the lens flare system.
-   * It defines the source of the lens flares (it can be a camera, a light or a
-   * mesh).
+   * It defines the source of the lens flares (it can be a camera, a light or a mesh).
    * @returns the emitter of the lens flare system
    */
   LensFlareEmitterType& getEmitter();
 
   /**
    * @brief Set the emitter of the lens flare system.
-   * It defines the source of the lens flares (it can be a camera, a light or a
-   * mesh).
+   * It defines the source of the lens flares (it can be a camera, a light or a mesh).
    * @param newEmitter Define the new emitter of the system
    */
   void setEmitter(const LensFlareEmitterType& newEmitter);
 
   /**
    * @brief Get the lens flare system emitter position.
-   * The emitter defines the source of the lens flares (it can be a camera, a
-   * light or a mesh).
+   * The emitter defines the source of the lens flares (it can be a camera, a light or a mesh).
    * @returns the position
    */
   Vector3 getEmitterPosition();
@@ -128,8 +122,8 @@ public:
    * @brief Parse a lens flare system from a JSON repressentation.
    * @param parsedLensFlareSystem Define the JSON to parse
    * @param scene Define the scene the parsed system should be instantiated in
-   * @param rootUrl Define the rootUrl of the load sequence to easily find a
-   * load relative dependencies such as textures
+   * @param rootUrl Define the rootUrl of the load sequence to easily find a load relative
+   * dependencies such as textures
    * @returns the parsed system
    */
   static LensFlareSystemPtr Parse(const json& parsedLensFlareSystem, Scene* scene,
@@ -138,13 +132,12 @@ public:
 protected:
   /**
    * @brief Instantiates a lens flare system.
-   * This represents a Lens Flare System or the shiny effect created by the
-   * light reflection on the  camera lenses. It is usually composed of several
-   * `lensFlare`.
+   * This represents a Lens Flare System or the shiny effect created by the light reflection on the
+   * camera lenses. It is usually composed of several `lensFlare`.
    * @see http://doc.babylonjs.com/how_to/how_to_use_lens_flares
    * @param name Define the name of the lens flare system in the scene
-   * @param emitter Define the source (the emitter) of the lens flares (it can
-   * be a camera, a light or a mesh).
+   * @param emitter Define the source (the emitter) of the lens flares (it can be a camera, a light
+   * or a mesh).
    * @param scene Define the scene the lens flare system belongs to
    */
   LensFlareSystem(const std::string& name, const LensFlareEmitterType& emitter, Scene* scene);
@@ -181,14 +174,12 @@ public:
   float viewportBorder;
 
   /**
-   * Define a predicate which could limit the list of meshes able to occlude the
-   * effect.
+   * Define a predicate which could limit the list of meshes able to occlude the effect.
    */
   std::function<bool(const AbstractMeshPtr& mesh)> meshesSelectionPredicate;
 
   /**
-   * Restricts the rendering of the effect to only the camera rendering this
-   * layer mask.
+   * Restricts the rendering of the effect to only the camera rendering this layer mask.
    */
   unsigned int layerMask;
 
@@ -203,7 +194,7 @@ private:
   // Float32Array _vertexDeclaration;
   // int _vertexStrideSize;
   std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
-  std::unique_ptr<GL::IGLBuffer> _indexBuffer;
+  WebGLDataBufferPtr _indexBuffer;
   EffectPtr _effect;
   float _positionX;
   float _positionY;

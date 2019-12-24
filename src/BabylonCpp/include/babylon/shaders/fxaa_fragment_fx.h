@@ -258,6 +258,7 @@ void main(){
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_FXAA_FRAGMENT_FX_H

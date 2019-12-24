@@ -29,12 +29,19 @@ public:
   WebGLPipelineContext();
   ~WebGLPipelineContext() override; // = default
 
+  /**
+   * Gets a boolean indicating that this pipeline context is supporting asynchronous creating.
+   */
+  bool isAsync() override;
+
+  /**
+   * Gets a boolean indicating that the context is ready to be used (like shaders / pipelines are
+   * compiled and ready for instance).
+   */
+  bool isReady() override;
+
   void _handlesSpectorRebuildCallback(
     const std::function<void(const GL::IGLProgramPtr& program)>& onCompiled);
-
-protected:
-  [[nodiscard]] bool get_isAsync() const override;
-  [[nodiscard]] bool get_isReady() const override;
 
 public:
   Engine* engine;

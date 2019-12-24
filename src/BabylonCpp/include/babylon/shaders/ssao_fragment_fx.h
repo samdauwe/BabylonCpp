@@ -79,6 +79,7 @@ void main()
 #endif
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SSAO_FRAGMENT_FX_H

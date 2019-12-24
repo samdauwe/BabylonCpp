@@ -47,6 +47,7 @@ struct IMultiRenderTargetOptions;
 class InternalTexture;
 class IPipelineContext;
 struct IRenderTargetOptions;
+struct IShaderProcessor;
 class Material;
 class PassPostProcess;
 class PostProcess;
@@ -57,6 +58,8 @@ class Scene;
 class Texture;
 class UniformBuffer;
 class VertexBuffer;
+class WebGLDataBuffer;
+class WebGLPipelineContext;
 using BaseTexturePtr                 = std::shared_ptr<BaseTexture>;
 using DummyInternalTextureTrackerPtr = std::shared_ptr<DummyInternalTextureTracker>;
 using AudioEnginePtr                 = std::shared_ptr<AudioEngine>;
@@ -65,26 +68,28 @@ using IInternalTextureLoaderPtr      = std::shared_ptr<IInternalTextureLoader>;
 using IInternalTextureTrackerPtr     = std::shared_ptr<IInternalTextureTracker>;
 using InternalTexturePtr             = std::shared_ptr<InternalTexture>;
 using IPipelineContextPtr            = std::shared_ptr<IPipelineContext>;
+using IShaderProcessorPtr            = std::shared_ptr<IShaderProcessor>;
 using PassPostProcessPtr             = std::shared_ptr<PassPostProcess>;
 using PostProcessPtr                 = std::shared_ptr<PostProcess>;
 using RenderTargetTexturePtr         = std::shared_ptr<RenderTargetTexture>;
 using VertexBufferPtr                = std::shared_ptr<VertexBuffer>;
+using WebGLDataBufferPtr             = std::shared_ptr<WebGLDataBuffer>;
+using WebGLPipelineContextPtr        = std::shared_ptr<WebGLPipelineContext>;
 
 /**
- * @brief The engine class is responsible for interfacing with all lower-level
- * APIs such as WebGL and Audio.
+ * @brief The engine class is responsible for interfacing with all lower-level APIs such as WebGL
+ * and Audio.
  */
 class BABYLON_SHARED_EXPORT Engine {
 
 public:
   using ArrayBufferViewArray   = std::vector<ArrayBufferView>;
-  using GLBufferPtr            = std::unique_ptr<GL::IGLBuffer>;
   using GLFrameBufferPtr       = std::unique_ptr<GL::IGLFramebuffer>;
   using GLProgramPtr           = std::unique_ptr<GL::IGLProgram>;
   using GLQueryPtr             = std::unique_ptr<GL::IGLQuery>;
   using GLRenderBufferPtr      = std::unique_ptr<GL::IGLRenderbuffer>;
   using GLShaderPtr            = GL::IGLShaderPtr;
-  using GLTexturePtr           = std::unique_ptr<GL::IGLTexture>;
+  using GLTexturePtr           = std::shared_ptr<GL::IGLTexture>;
   using GLTransformFeedbackPtr = std::unique_ptr<GL::IGLTransformFeedback>;
   using GLUniformLocationPtr   = std::unique_ptr<GL::IGLUniformLocation>;
   using GLVertexArrayObjectPtr = std::unique_ptr<GL::IGLVertexArrayObject>;
@@ -99,9 +104,14 @@ private:
 
 public:
   /**
-   * @brief Gets the engine version.
+   * @brief Returns the current version of the framework.
    */
   static std::string Version();
+
+  /**
+   * @brief Returns a string describing the current engine.
+   */
+  std::string description() const;
 
   /**
    * @brief Gets the audio engine.
@@ -117,23 +127,26 @@ public:
   static float CollisionsEpsilon;
 
   /**
-   * Gets or sets the relative url used to load code if using the engine in
-   * non-minified mode
+   * @brief Gets the relative url used to load shaders if using the engine in non-minified mode
    */
-  static std::string CodeRepository;
+  static std::string ShadersRepository();
 
   /**
-   * Gets or sets the relative url used to load shaders if using the engine in
-   * non-minified mode
+   * @brief Sets the relative url used to load shaders if using the engine in non-minified mode
    */
-  static std::string ShadersRepository;
+  static void setShadersRepository(const std::string& value);
+
+  /**
+   * Method called to create the default rescale post process on each engine.
+   */
+  static std::function<PostProcessPtr(Engine* engine)> _RescalePostProcessFactory;
 
   // Engine instances
 
   /**
    * Gets the list of created engines
    */
-  static std::vector<Engine*> Instances;
+  static std::vector<Engine*>& Instances();
 
 public:
   template <typename... Ts>
@@ -186,14 +199,6 @@ public:
   [[nodiscard]] float webGLVersion() const;
 
   /**
-   * @brief Gets a boolean indicating that the engine is currently in VR
-   * exclusive mode for the pointers.
-   * @see
-   * https://docs.microsoft.com/en-us/microsoft-edge/webvr/essentials#mouse-input
-   */
-  [[nodiscard]] bool isInVRExclusivePointerMode() const;
-
-  /**
    * @brief Gets a boolean indicating that the engine supports uniform buffers.
    * @see http://doc.babylonjs.com/features/webgl2#uniform-buffer-objets
    */
@@ -230,10 +235,21 @@ public:
   [[nodiscard]] PerformanceMonitor* performanceMonitor() const;
 
   /**
+   * @brief Gets a string idenfifying the name of the class.
+   * @returns "Engine" string
+   */
+  std::string getClassName() const;
+
+  /**
    * @brief Returns true if the stencil buffer has been enabled through the
    * creation option of the context.
    */
   [[nodiscard]] bool isStencilEnable() const;
+
+  /**
+   * @brief Hidden
+   */
+  void _prepareWorkingCanvas();
 
   /**
    * @brief Reset the texture cache to empty state.
@@ -340,27 +356,7 @@ public:
    */
   EngineCapabilities& getCaps();
 
-  /**
-   * @brief Hidden
-   */
-  [[nodiscard]] size_t drawCalls() const;
-
-  /**
-   * @brief Hidden
-   */
-  std::optional<PerfCounter> drawCallsPerfCounter();
-
   /** Methods **/
-
-  /**
-   * @brief Backup the GL state.
-   */
-  void backupGLState();
-
-  /**
-   * @brief Restore the GL state.
-   */
-  void restoreGLState();
 
   /**
    * @brief Gets the current depth function.
@@ -569,16 +565,29 @@ public:
   virtual void clear(const Color4& color, bool backBuffer, bool depth, bool stencil = false);
 
   /**
-   * @brief Executes a scissor clear (ie. a clear on a specific portion of the
-   * screen).
-   * @param x defines the x-coordinate of the top left corner of the clear
-   * rectangle
+   * @brief Executes a scissor clear (ie. a clear on a specific portion of the screen).
+   * @param x defines the x-coordinate of the top left corner of the clear rectangle
    * @param y defines the y-coordinate of the corner of the clear rectangle
    * @param width defines the width of the clear rectangle
    * @param height defines the height of the clear rectangle
    * @param clearColor defines the clear color
    */
   void scissorClear(int x, int y, int width, int height, const Color4& clearColor);
+
+  /**
+   * @brief Enable scissor test on a specific rectangle (ie. render will only be executed on a
+   * specific portion of the screen).
+   * @param x defines the x-coordinate of the top left corner of the clear rectangle
+   * @param y defines the y-coordinate of the corner of the clear rectangle
+   * @param width defines the width of the clear rectangle
+   * @param height defines the height of the clear rectangle
+   */
+  void enableScissor(int x, int y, int width, int height);
+
+  /**
+   * @brief Disable previously set scissor test rectangle.
+   */
+  void disableScissor();
 
   /**
    * @brief Hidden
@@ -629,7 +638,7 @@ public:
    * @param width defines the new canvas' width
    * @param height defines the new canvas' height
    */
-  void setSize(int width, int height);
+  void setSize(int width = 0, int height = 0);
 
   /**
    * @brief Binds the frame buffer to the specified texture.
@@ -651,12 +660,15 @@ public:
                                InternalTexture* depthStencilTexture = nullptr, int lodLevel = 0);
 
   /**
-   * @brief Unbind the current render target texture from the webGL context.
+   * @brief Hidden
+   */
+  void _bindUnboundFramebuffer(const GL::IGLFramebufferPtr& framebuffer);
+
+  /**
+   * @brief Unbind the current render target texture from the webGL context
    * @param texture defines the render target texture to unbind
-   * @param disableGenerateMipMaps defines a boolean indicating that mipmaps
-   * must not be generated
-   * @param onBeforeUnbind defines a function which will be called before the
-   * effective unbind
+   * @param disableGenerateMipMaps defines a boolean indicating that mipmaps must not be generated
+   * @param onBeforeUnbind defines a function which will be called before the effective unbind
    */
   virtual void unBindFramebuffer(const InternalTexturePtr& texture,
                                  bool disableGenerateMipMaps                 = false,
@@ -697,7 +709,7 @@ public:
    * @param elements defines the content of the uniform buffer
    * @returns the webGL uniform buffer
    */
-  GLBufferPtr createUniformBuffer(const Float32Array& elements);
+  WebGLDataBufferPtr createUniformBuffer(const Float32Array& elements);
 
   /**
    * @brief Create a dynamic uniform buffer.
@@ -705,18 +717,17 @@ public:
    * @param elements defines the content of the uniform buffer
    * @returns the webGL uniform buffer
    */
-  GLBufferPtr createDynamicUniformBuffer(const Float32Array& elements);
+  WebGLDataBufferPtr createDynamicUniformBuffer(const Float32Array& elements);
 
   /**
    * @brief Update an existing uniform buffer.
    * @see http://doc.babylonjs.com/features/webgl2#uniform-buffer-objets
    * @param uniformBuffer defines the target uniform buffer
    * @param elements defines the content to update
-   * @param offset defines the offset in the uniform buffer where update should
-   * start
+   * @param offset defines the offset in the uniform buffer where update should start
    * @param count defines the size of the data to update
    */
-  void updateUniformBuffer(GL::IGLBuffer* uniformBuffer, const Float32Array& elements,
+  void updateUniformBuffer(const WebGLDataBufferPtr& uniformBuffer, const Float32Array& elements,
                            int offset = -1, int count = -1);
 
   /** VBOs **/
@@ -726,24 +737,23 @@ public:
    * @param data the data for the vertex buffer
    * @returns the new WebGL static buffer
    */
-  virtual GLBufferPtr createVertexBuffer(const Float32Array& vertices);
+  virtual WebGLDataBufferPtr createVertexBuffer(const Float32Array& vertices);
 
   /**
    * @brief Creates a dynamic vertex buffer.
    * @param data the data for the dynamic vertex buffer
    * @returns the new WebGL dynamic buffer
    */
-  virtual GLBufferPtr createDynamicVertexBuffer(const Float32Array& vertices);
+  virtual WebGLDataBufferPtr createDynamicVertexBuffer(const Float32Array& vertices);
 
   /**
    * @brief Update a dynamic index buffer.
    * @param indexBuffer defines the target index buffer
    * @param indices defines the data to update
-   * @param offset defines the offset in the target index buffer where update
-   * should start
+   * @param offset defines the offset in the target index buffer where update should start
    */
-  virtual void updateDynamicIndexBuffer(const GLBufferPtr& indexBuffer, const IndicesArray& indices,
-                                        int offset = 0);
+  virtual void updateDynamicIndexBuffer(const WebGLDataBufferPtr& indexBuffer,
+                                        const IndicesArray& indices, int offset = 0);
 
   /**
    * @brief Updates a dynamic vertex buffer.
@@ -752,8 +762,9 @@ public:
    * @param byteOffset the byte offset of the data
    * @param byteLength the byte length of the data
    */
-  virtual void updateDynamicVertexBuffer(const GLBufferPtr& vertexBuffer, const Float32Array& data,
-                                         int byteOffset = -1, int byteLength = -1);
+  virtual void updateDynamicVertexBuffer(const WebGLDataBufferPtr& vertexBuffer,
+                                         const Float32Array& data, int byteOffset = -1,
+                                         int byteLength = -1);
 
   /**
    * @brief Creates a new index buffer.
@@ -761,34 +772,34 @@ public:
    * @param updatable defines if the index buffer must be updatable
    * @returns a new webGL buffer
    */
-  virtual GLBufferPtr createIndexBuffer(const IndicesArray& indices, bool updatable = false);
+  virtual WebGLDataBufferPtr createIndexBuffer(const IndicesArray& indices, bool updatable = false);
 
   /**
    * @brief Bind a webGL buffer to the webGL context.
    * @param buffer defines the buffer to bind
    */
-  void bindArrayBuffer(GL::IGLBuffer* buffer);
+  void bindArrayBuffer(const WebGLDataBufferPtr& buffer);
 
   /**
    * @brief Bind an uniform buffer to the current webGL context.
    * @param buffer defines the buffer to bind
    */
-  void bindUniformBuffer(GL::IGLBuffer* buffer);
+  void bindUniformBuffer(const WebGLDataBufferPtr& buffer);
 
   /**
    * @brief Bind a buffer to the current webGL context at a given location.
    * @param buffer defines the buffer to bind
    * @param location defines the index where to bind the buffer
    */
-  void bindUniformBufferBase(GL::IGLBuffer* buffer, unsigned int location);
+  void bindUniformBufferBase(const WebGLDataBufferPtr& buffer, unsigned int location);
 
   /**
    * @brief Bind a specific block at a given index in a specific shader program.
-   * @param shaderProgram defines the shader program
+   * @param pipelineContext defines the pipeline context to use
    * @param blockName defines the block name
    * @param index defines the index where to bind the block
    */
-  void bindUniformBlock(GL::IGLProgram* shaderProgram, const std::string& blockName,
+  void bindUniformBlock(const IPipelineContextPtr& pipelineContext, const std::string& blockName,
                         unsigned int index);
 
   /**
@@ -807,7 +818,7 @@ public:
    */
   GLVertexArrayObjectPtr
   recordVertexArrayObject(const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers,
-                          GL::IGLBuffer* indexBuffer, const EffectPtr& effect);
+                          const WebGLDataBufferPtr& indexBuffer, const EffectPtr& effect);
 
   /**
    * @brief Bind a specific vertex array object.
@@ -816,18 +827,18 @@ public:
    * @param indexBuffer defines the index buffer to bind
    */
   void bindVertexArrayObject(GL::IGLVertexArrayObject* vertexArrayObject,
-                             GL::IGLBuffer* indexBuffer);
+                             const WebGLDataBufferPtr& indexBuffer);
 
   /**
    * @brief Bind webGl buffers directly to the webGL context.
    * @param vertexBuffer defines the vertex buffer to bind
    * @param indexBuffer defines the index buffer to bind
-   * @param vertexDeclaration defines the vertex declaration to use with the
-   * vertex buffer
+   * @param vertexDeclaration defines the vertex declaration to use with the vertex buffer
    * @param vertexStrideSize defines the vertex stride of the vertex buffer
    * @param effect defines the effect associated with the vertex buffer
    */
-  void bindBuffersDirectly(GL::IGLBuffer* vertexBuffer, GL::IGLBuffer* indexBuffer,
+  void bindBuffersDirectly(const WebGLDataBufferPtr& vertexBuffer,
+                           const WebGLDataBufferPtr& indexBuffer,
                            const Float32Array& vertexDeclaration, int vertexStrideSize = 3,
                            const EffectPtr& effect = nullptr);
 
@@ -838,7 +849,7 @@ public:
    * @param effect defines the effect associated with the vertex buffers
    */
   virtual void bindBuffers(const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers,
-                           GL::IGLBuffer* indexBuffer, const EffectPtr& effect);
+                           const WebGLDataBufferPtr& indexBuffer, const EffectPtr& effect);
 
   /**
    * @brief Unbind all instance attributes.
@@ -854,41 +865,42 @@ public:
   /**
    * @brief Hidden
    */
-  virtual bool _releaseBuffer(GL::IGLBuffer* buffer);
+  virtual bool _releaseBuffer(const WebGLDataBufferPtr& buffer);
 
   /**
    * @brief Creates a webGL buffer to use with instanciation.
    * @param capacity defines the size of the buffer
    * @returns the webGL buffer
    */
-  GLBufferPtr createInstancesBuffer(unsigned int capacity);
+  WebGLDataBufferPtr createInstancesBuffer(unsigned int capacity);
 
   /**
    * @brief Delete a webGL buffer used with instanciation.
    * @param buffer defines the webGL buffer to delete
    */
-  void deleteInstancesBuffer(GL::IGLBuffer* buffer);
+  void deleteInstancesBuffer(const WebGLDataBufferPtr& buffer);
 
   /**
-   * @brief Update the content of a webGL buffer used with instanciation and
-   * bind it to the webGL context.
+   * @brief Update the content of a webGL buffer used with instanciation and bind it to the webGL
+   * context.
    * @param instancesBuffer defines the webGL buffer to update and bind
    * @param data defines the data to store in the buffer
-   * @param offsetLocations defines the offsets or attributes information used
-   * to determine where data must be stored in the buffer
+   * @param offsetLocations defines the offsets or attributes information used to determine where
+   * data must be stored in the buffer
    */
-  void updateAndBindInstancesBuffer(GL::IGLBuffer* instancesBuffer, const Float32Array& data,
-                                    const Uint32Array& offsetLocations);
+  void updateAndBindInstancesBuffer(const WebGLDataBufferPtr& instancesBuffer,
+                                    const Float32Array& data, const Uint32Array& offsetLocations);
 
   /**
-   * @brief Update the content of a webGL buffer used with instanciation and
-   * bind it to the webGL context.
+   * @brief Update the content of a webGL buffer used with instanciation and bind it to the webGL
+   * context.
    * @param instancesBuffer defines the webGL buffer to update and bind
    * @param data defines the data to store in the buffer
-   * @param offsetLocations defines the offsets or attributes information used
-   * to determine where data must be stored in the buffer
+   * @param offsetLocations defines the offsets or attributes information used to determine where
+   * data must be stored in the buffer
    */
-  void updateAndBindInstancesBuffer(GL::IGLBuffer* instancesBuffer, const Float32Array& data,
+  void updateAndBindInstancesBuffer(const WebGLDataBufferPtr& instancesBuffer,
+                                    const Float32Array& data,
                                     const std::vector<InstancingAttributeInfo>& offsetLocations);
 
   /**
@@ -898,12 +910,10 @@ public:
 
   /**
    * @brief Send a draw order.
-   * @param useTriangles defines if triangles must be used to draw (else
-   * wireframe will be used)
+   * @param useTriangles defines if triangles must be used to draw (else wireframe will be used)
    * @param indexStart defines the starting index
    * @param indexCount defines the number of index to draw
-   * @param instancesCount defines the number of instances to draw (if
-   * instanciation is enabled)
+   * @param instancesCount defines the number of instances to draw (if instanciation is enabled)
    */
   virtual void draw(bool useTriangles, int indexStart, int indexCount, int instancesCount = 0);
 
@@ -960,7 +970,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _deleteProgram(GL::IGLProgram* program);
+  void _deletePipelineContext(const IPipelineContextPtr& pipelineContext);
 
   /**
    * @brief Create a new effect (used to store vertex/fragment shaders).
@@ -1034,75 +1044,78 @@ public:
 
   /**
    * @brief Directly creates a webGL program.
+   * @param pipelineContext  defines the pipeline context to attach to
    * @param vertexCode defines the vertex shader code to use
    * @param fragmentCode defines the fragment shader code to use
-   * @param context defines the webGL context to use (if not set, the current
-   * one will be used)
-   * @param transformFeedbackVaryings defines the list of transform feedback
-   * varyings to use
+   * @param context defines the webGL context to use (if not set, the current one will be used)
+   * @param transformFeedbackVaryings defines the list of transform feedback varyings to use
    * @returns the new webGL program
    */
   GL::IGLProgramPtr
-  createRawShaderProgram(const std::string& vertexCode, const std::string& fragmentCode,
+  createRawShaderProgram(const IPipelineContextPtr& pipelineContext, const std::string& vertexCode,
+                         const std::string& fragmentCode,
                          GL::IGLRenderingContext* context                          = nullptr,
                          const std::vector<std::string>& transformFeedbackVaryings = {});
 
   /**
    * @brief Creates a webGL program.
+   * @param pipelineContext  defines the pipeline context to attach to
    * @param vertexCode  defines the vertex shader code to use
    * @param fragmentCode defines the fragment shader code to use
-   * @param defines defines the string containing the defines to use to compile
-   * the shaders
-   * @param context defines the webGL context to use (if not set, the current
-   * one will be used)
-   * @param transformFeedbackVaryings defines the list of transform feedback
-   * varyings to use
+   * @param defines defines the string containing the defines to use to compile the shaders
+   * @param context defines the webGL context to use (if not set, the current one will be used)
+   * @param transformFeedbackVaryings defines the list of transform feedback varyings to use
    * @returns the new webGL program
    */
-  GL::IGLProgramPtr
-  createShaderProgram(const std::string& vertexCode, const std::string& fragmentCode,
-                      const std::string& defines, GL::IGLRenderingContext* context = nullptr,
+  virtual GL::IGLProgramPtr
+  createShaderProgram(const IPipelineContextPtr& pipelineContext, const std::string& vertexCode,
+                      const std::string& fragmentCode, const std::string& defines,
+                      GL::IGLRenderingContext* context                          = nullptr,
                       const std::vector<std::string>& transformFeedbackVaryings = {});
 
-  virtual GL::IGLProgramPtr createShaderProgram(const IPipelineContextPtr& pipelineContext,
-                                                const std::string& vertexCode,
-                                                const std::string& fragmentCode,
-                                                const std::string& defines,
-                                                GL::IGLRenderingContext* context = nullptr);
+  /**
+   * @brief Creates a new pipeline context.
+   * @returns the new pipeline
+   */
+  IPipelineContextPtr createPipelineContext();
 
   /**
    * @brief Hidden
    */
-  bool _isProgramCompiled(GL::IGLProgram* shaderProgram);
+  void _preparePipelineContext(const IPipelineContextPtr& pipelineContext,
+                               const std::string& vertexSourceCode,
+                               const std::string& fragmentSourceCode, bool createAsRaw,
+                               bool rebuildRebind, const std::string& defines,
+                               const std::vector<std::string>& transformFeedbackVaryings);
 
   /**
    * @brief Hidden
    */
-  bool _isRenderingStateCompiled(IPipelineContext const* pipelineContext);
+  bool _isRenderingStateCompiled(IPipelineContext* pipelineContext);
 
   /**
-   * @brief Gets the list of webGL uniform locations associated with a specific
-   * program based on a list of uniform names.
-   * @param shaderProgram defines the webGL program to use
+   * @brief Hidden
+   */
+  void _executeWhenRenderingStateIsCompiled(const IPipelineContextPtr& pipelineContext,
+                                            const std::function<void()>& action);
+
+  /**
+   * @brief Gets the list of webGL uniform locations associated with a specific program based on a
+   * list of uniform names.
+   * @param pipelineContext defines the pipeline context to use
    * @param uniformsNames defines the list of uniform names
    * @returns an array of webGL uniform locations
    */
-  std::unordered_map<std::string, GLUniformLocationPtr>
-  getUniforms(GL::IGLProgram* shaderProgram, const std::vector<std::string>& uniformsNames);
-
   virtual std::unordered_map<std::string, GLUniformLocationPtr>
   getUniforms(const IPipelineContextPtr& pipelineContext,
               const std::vector<std::string>& uniformsNames);
 
   /**
    * @brief Gets the lsit of active attributes for a given webGL program.
-   * @param shaderProgram defines the webGL program to use
+   * @param pipelineContext defines the pipeline context to use
    * @param attributesNames defines the list of attribute names to get
    * @returns an array of indices indicating the offset of each attribute
    */
-  Int32Array getAttributes(GL::IGLProgram* shaderProgram,
-                           const std::vector<std::string>& attributesNames);
-
   virtual Int32Array getAttributes(const IPipelineContextPtr& pipelineContext,
                                    const std::vector<std::string>& attributesNames);
 
@@ -1206,13 +1219,6 @@ public:
   virtual void setMatrices(GL::IGLUniformLocation* uniform, const Float32Array& matrices);
 
   /**
-   * @brief Set the value of an uniform to a matrix.
-   * @param uniform defines the webGL uniform location where to store the value
-   * @param matrix defines the matrix to store
-   */
-  virtual void setMatrix(GL::IGLUniformLocation* uniform, const Matrix& matrix);
-
-  /**
    * @brief Set the value of an uniform to a matrix (3x3).
    * @param uniform defines the webGL uniform location where to store the value
    * @param matrix defines the Float32Array representing the 3x3 matrix to store
@@ -1275,21 +1281,6 @@ public:
    * @param w defines the 4th component of the value
    */
   virtual void setFloat4(GL::IGLUniformLocation* uniform, float x, float y, float z, float w);
-
-  /**
-   * @brief Set the value of an uniform to a Color3.
-   * @param uniform defines the webGL uniform location where to store the value
-   * @param color3 defines the color to store
-   */
-  virtual void setColor3(GL::IGLUniformLocation* uniform, const Color3& color3);
-
-  /**
-   * @brief Set the value of an uniform to a Color3 and an alpha value.
-   * @param uniform defines the webGL uniform location where to store the value
-   * @param color3 defines the color to store
-   * @param alpha defines the alpha component to store
-   */
-  virtual void setColor4(GL::IGLUniformLocation* uniform, const Color3& color3, float alpha);
 
   /**
    * @brief Sets a Color4 on a uniform variable.
@@ -1364,11 +1355,10 @@ public:
 
   /**
    * @brief Sets the current alpha mode.
-   * @param mode defines the mode to use (one of the BABYLON.Engine.ALPHA_XXX)
-   * @param noDepthWriteChange defines if depth writing state should remains
-   * unchanged (false by default)
-   * @see
-   * http://doc.babylonjs.com/resources/transparency_and_how_meshes_are_rendered
+   * @param mode defines the mode to use (one of the Engine.ALPHA_XXX)
+   * @param noDepthWriteChange defines if depth writing state should remains unchanged (false by
+   * default)
+   * @see http://doc.babylonjs.com/resources/transparency_and_how_meshes_are_rendered
    */
   virtual void setAlphaMode(unsigned int mode, bool noDepthWriteChange = false);
 
@@ -1432,7 +1422,12 @@ public:
   /**
    * @brief Hidden
    */
-  virtual GLTexturePtr _createTexture();
+  SamplingParameters _getSamplingParameters(unsigned int samplingMode, bool generateMipMaps);
+
+  /**
+   * @brief Hidden
+   */
+  virtual std::unique_ptr<GL::IGLTexture> _createTexture();
 
   /**
    * @brief Hidden
@@ -1447,30 +1442,30 @@ public:
     = std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>());
 
   /**
-   * @brief HUsually called from BABYLON.Texture.ts.
+   * @brief Usually called from Texture.ts.
    * Passed information to create a WebGLTexture
    * @param urlArg defines a value which contains one of the following:
    * * A conventional http URL, e.g. 'http://...' or 'file://...'
-   * * A base64 string of in-line texture data, e.g.
-   * 'data:image/jpg;base64,/...'
-   * * An indicator that data being passed using the buffer parameter, e.g.
-   * 'data:mytexture.jpg'
-   * @param noMipmap defines a boolean indicating that no mipmaps shall be
-   * generated.  Ignored for compressed textures.  They must be in the file
-   * @param invertY when true, image is flipped when loaded.  You probably want
-   * true. Ignored for compressed textures.  Must be flipped in the file
+   * * A base64 string of in-line texture data, e.g. 'data:image/jpg;base64,/...'
+   * * An indicator that data being passed using the buffer parameter, e.g. 'data:mytexture.jpg'
+   * @param noMipmap defines a boolean indicating that no mipmaps shall be generated.  Ignored for
+   * compressed textures.  They must be in the file
+   * @param invertY when true, image is flipped when loaded.  You probably want true. Certain
+   * compressed textures may invert this if their default is inverted (eg. ktx)
    * @param scene needed for loading to the correct scene
-   * @param samplingMode mode with should be used sample / access the texture
-   * (Default: BABYLON.Texture.TRILINEAR_SAMPLINGMODE)
+   * @param samplingMode mode with should be used sample / access the texture (Default:
+   * Texture.TRILINEAR_SAMPLINGMODE)
    * @param onLoad optional callback to be called upon successful completion
    * @param onError optional callback to be called upon failure
-   * @param buffer a source of a file previously fetched as either a base64
-   * string, an ArrayBuffer (compressed or image format), HTMLImageElement
-   * (image format), or a Blob
-   * @param fallback an internal argument in case the function must be called
-   * again, due to etc1 not having alpha capabilities
-   * @param format internal format.  Default: RGB when extension is '.jpg' else
-   * RGBA.  Ignored for compressed textures
+   * @param buffer a source of a file previously fetched as either a base64 string, an ArrayBuffer
+   * (compressed or image format), HTMLImageElement (image format), or a Blob
+   * @param fallback an internal argument in case the function must be called again, due to etc1 not
+   * having alpha capabilities
+   * @param format internal format.  Default: RGB when extension is '.jpg' else RGBA.  Ignored for
+   * compressed textures
+   * @param forcedExtension defines the extension to use to pick the right loader
+   * @param excludeLoaders array of texture loaders that should be excluded when picking a loader
+   * for the texture (default: empty array)
    * @returns a InternalTexture for assignment back into BABYLON.Texture
    */
   virtual InternalTexturePtr createTexture(
@@ -1482,7 +1477,20 @@ public:
     const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer
     = std::nullopt,
     const InternalTexturePtr& fallBack        = nullptr,
-    const std::optional<unsigned int>& format = std::nullopt);
+    const std::optional<unsigned int>& format = std::nullopt,
+    const std::string& forcedExtension        = "");
+
+  /**
+   * @brief Rescales a texture.
+   * @param source input texutre
+   * @param destination destination texture
+   * @param scene scene to use to render the resize
+   * @param internalFormat format to use when resizing
+   * @param onComplete callback to be called when resize has completed
+   */
+  void _rescaleTexture(const InternalTexturePtr& source, const InternalTexturePtr& destination,
+                       Scene* scene, unsigned int internalFormat,
+                       const std::function<void()>& onComplete);
 
   /**
    * @brief Update a raw texture.
@@ -1507,11 +1515,10 @@ public:
    * @param format defines the format of the data
    * @param generateMipMaps defines if the engine should generate the mip levels
    * @param invertY defines if data must be stored with Y axis inverted
-   * @param samplingMode defines the required sampling mode
-   * (Texture.NEAREST_SAMPLINGMODE by default)
+   * @param samplingMode defines the required sampling mode (BABYLON.Texture.NEAREST_SAMPLINGMODE by
+   * default)
    * @param compression defines the compression used (null by default)
-   * @param type defines the type fo the data (Engine.TEXTURETYPE_UNSIGNED_INT
-   * by default)
+   * @param type defines the type fo the data (BABYLON.Engine.TEXTURETYPE_UNSIGNED_INT by default)
    * @returns the raw texture inside an InternalTexture
    */
   InternalTexturePtr createRawTexture(const Uint8Array& data, int width, int height,
@@ -1540,8 +1547,8 @@ public:
    * @param width defines the width of the texture
    * @param height defines the height of the texture
    * @param generateMipMaps defines if the engine should generate the mip levels
-   * @param samplingMode defines the required sampling mode
-   * (BABYLON.Texture.NEAREST_SAMPLINGMODE by default)
+   * @param samplingMode defines the required sampling mode (Texture.NEAREST_SAMPLINGMODE by
+   * default)
    * @returns the dynamic texture inside an InternalTexture
    */
   InternalTexturePtr createDynamicTexture(int width, int height, bool generateMipMaps,
@@ -1562,10 +1569,13 @@ public:
    * @param invertY defines if data must be stored with Y axis inverted
    * @param premulAlpha defines if alpha is stored as premultiplied
    * @param format defines the format of the data
+   * @param forceBindTexture if the texture should be forced to be bound eg. after a graphics
+   * context loss (Default: false)
    */
   virtual void updateDynamicTexture(const InternalTexturePtr& texture, ICanvas* canvas,
                                     bool invertY, bool premulAlpha = false,
-                                    unsigned int format = Constants::TEXTUREFORMAT_RGBA);
+                                    std::optional<unsigned int> format = std::nullopt,
+                                    bool forceBindTexture              = false);
 
   /**
    *@brief Updates a depth texture Comparison Mode and Function.
@@ -1577,6 +1587,13 @@ public:
    *comparison required
    */
   void updateTextureComparisonFunction(const InternalTexturePtr& texture, int comparisonFunction);
+
+  /**
+   * @brief Hidden
+   */
+  void _setupDepthStencilTexture(InternalTexture* internalTexture,
+                                 const std::variant<int, ISize>& size, bool generateStencil,
+                                 bool bilinearFiltering, int comparisonFunction);
 
   /**
    * @brief Creates a depth stencil texture.
@@ -1616,6 +1633,13 @@ public:
   createMultipleRenderTarget(ISize size, const IMultiRenderTargetOptions& options);
 
   /**
+   * @brief Hidden
+   */
+  GLRenderBufferPtr _setupFramebufferDepthAttachments(bool generateStencilBuffer,
+                                                      bool generateDepthBuffer, int width,
+                                                      int height, int samples = 1);
+
+  /**
    * @brief Updates the sample count of a render target texture.
    * @see http://doc.babylonjs.com/features/webgl2#multisample-render-targets
    * @param texture defines the texture to update
@@ -1651,7 +1675,9 @@ public:
    */
   virtual void _uploadDataToTextureDirectly(const InternalTexturePtr& texture,
                                             const ArrayBufferView& imageData,
-                                            unsigned int faceIndex = 0, int lod = 0);
+                                            unsigned int faceIndex = 0, int lod = 0,
+                                            int babylonInternalFormat     = -1,
+                                            bool useTextureWidthAndHeight = false);
 
   /**
    * @brief Hidden
@@ -1755,13 +1781,10 @@ public:
    * @param data defines the array of data to use to create each face
    * @param size defines the size of the textures
    * @param format defines the format of the data
-   * @param type defines the type of the data (like
-   * Engine.TEXTURETYPE_UNSIGNED_INT)
-   * @param generateMipMaps  defines if the engine should generate the mip
-   * levels
+   * @param type defines the type of the data (like Engine.TEXTURETYPE_UNSIGNED_INT)
+   * @param generateMipMaps  defines if the engine should generate the mip levels
    * @param invertY defines if data must be stored with Y axis inverted
-   * @param samplingMode defines the required sampling mode (like
-   * Texture.NEAREST_SAMPLINGMODE)
+   * @param samplingMode defines the required sampling mode (like Texture.NEAREST_SAMPLINGMODE)
    * @param compression defines the compression used (null by default)
    * @returns the cube texture as an InternalTexture
    */
@@ -1827,8 +1850,7 @@ public:
    * @param format defines the format of the texture
    * @param generateMipMaps defines if the engine must generate mip levels
    * @param invertY defines if data must be stored with Y axis inverted
-   * @param samplingMode defines the required sampling mode (like
-   * BABYLON.Texture.NEAREST_SAMPLINGMODE)
+   * @param samplingMode defines the required sampling mode (like Texture.NEAREST_SAMPLINGMODE)
    * @param compression defines the compressed used (can be null)
    * @param textureType defines the compressed used (can be null)
    * @returns a new raw 3D texture (stored in an InternalTexture)
@@ -1856,6 +1878,12 @@ public:
   /**
    * @brief Hidden
    */
+  ArrayBufferView _convertRGBtoRGBATextureData(const ArrayBufferView& rgbData, int width,
+                                               int height, unsigned int textureType);
+
+  /**
+   * @brief Hidden
+   */
   void _releaseFramebufferObjects(InternalTexture* texture);
 
   /**
@@ -1868,6 +1896,12 @@ public:
    * @param effect defines the effect to bind
    */
   virtual void bindSamplers(Effect& effect);
+
+  /**
+   * @brief Hidden
+   */
+  virtual bool _bindTextureDirectly(unsigned int target, const InternalTexturePtr& texture,
+                                    bool forTextureDataUpdate = false, bool force = false);
 
   /**
    * @brief Hidden
@@ -2053,6 +2087,11 @@ public:
   /**
    * @brief Hidden
    */
+  [[nodiscard]] GL::GLenum _getInternalFormat(unsigned int format) const;
+
+  /**
+   * @brief Hidden
+   */
   [[nodiscard]] GL::GLenum
   _getRGBABufferInternalSizedFormat(unsigned int type,
                                     const std::optional<unsigned int>& format = std::nullopt) const;
@@ -2169,7 +2208,7 @@ public:
    * @brief Bind a webGL buffer for a transform feedback operation.
    * @param value defines the webGL buffer to bind
    */
-  void bindTransformFeedbackBuffer(GL::IGLBuffer* value);
+  void bindTransformFeedbackBuffer(const WebGLDataBufferPtr& value);
 
   /**
    * @brief Hidden
@@ -2269,41 +2308,35 @@ protected:
    */
   Engine(ICanvas* canvas, const EngineOptions& options = EngineOptions());
 
-  /**
-   * @brief Hidden
-   */
-  virtual bool _bindTextureDirectly(unsigned int target, const InternalTexturePtr& texture,
-                                    bool forTextureDataUpdate = false, bool force = false);
+  bool get__shouldUseHighPrecisionShader() const;
+
+  void _deleteBuffer(const WebGLDataBufferPtr& buffer);
+  static std::string _concatenateShader(const std::string& source, const std::string& defines,
+                                        const std::string& shaderVersion = "");
+  void _deleteTexture(const GLTexturePtr& texture);
+  void _setProgram(const GL::IGLProgramPtr& program);
+  bool _setTexture(int channel, const BaseTexturePtr& texture, bool isPartOfTextureArray = false,
+                   bool depthStencilTexture = false);
 
 private:
-  void _prepareWorkingCanvas();
   void _rebuildInternalTextures();
   void _rebuildEffects();
   void _rebuildBuffers();
   void _initGLContext();
-  void _onVRFullScreenTriggered();
-  void _getVRDisplays();
   void _bindSamplerUniformToChannel(int sourceSlot, int destination);
   [[nodiscard]] unsigned int _getTextureWrapMode(unsigned int mode) const;
-  bool _setTexture(int channel, const BaseTexturePtr& texture, bool isPartOfTextureArray = false,
-                   bool depthStencilTexture = false);
   void _setTextureParameterFloat(unsigned int target, unsigned int parameter, float value,
                                  const InternalTexturePtr& texture);
   void _setTextureParameterInteger(unsigned int target, unsigned int parameter, int value,
                                    const InternalTexturePtr& texture = nullptr);
-  void bindUnboundFramebuffer(const GL::IGLFramebufferPtr& framebuffer);
-  void bindIndexBuffer(GL::IGLBuffer* buffer);
-  void bindBuffer(GL::IGLBuffer* buffer, int target);
-  void _vertexAttribPointer(GL::IGLBuffer* buffer, unsigned int indx, int size, unsigned int type,
-                            bool normalized, int stride, int offset);
-  void _bindIndexBufferWithCache(GL::IGLBuffer* indexBuffer);
+  void bindIndexBuffer(const WebGLDataBufferPtr& buffer);
+  void bindBuffer(const WebGLDataBufferPtr& buffer, int target);
+  void _vertexAttribPointer(const WebGLDataBufferPtr& buffer, unsigned int indx, int size,
+                            unsigned int type, bool normalized, int stride, int offset);
+  void _bindIndexBufferWithCache(const WebGLDataBufferPtr& indexBuffer);
   void _bindVertexBuffersAttributes(
     const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers, const EffectPtr& effect);
   void _unbindVertexArrayObject();
-  void setProgram(GL::IGLProgram* program);
-  void _moveBoundTextureOnTop(const InternalTexturePtr& internalTexture);
-  void _linkTrackers(const IInternalTextureTrackerPtr& previous,
-                     const IInternalTextureTrackerPtr& next);
   void _activateCurrentTexture();
   void _cascadeLoadImgs(
     const std::string& rootUrl, Scene* scene,
@@ -2311,12 +2344,6 @@ private:
     const std::vector<std::string>& files,
     const std::function<void(const std::string& message, const std::string& exception)>& onError
     = nullptr);
-  void _rescaleTexture(const InternalTexturePtr& source, const InternalTexturePtr& destination,
-                       Scene* scene, unsigned int internalFormat,
-                       const std::function<void()>& onComplete);
-  void _setupDepthStencilTexture(InternalTexture* internalTexture,
-                                 const std::variant<int, ISize>& size, bool generateStencil,
-                                 bool bilinearFiltering, int comparisonFunction);
 
   /**
    * @brief Creates a depth stencil texture.
@@ -2344,17 +2371,11 @@ private:
                                   const std::string& defines, const std::string& shaderVersion);
   GL::IGLShaderPtr _compileRawShader(const std::string& source, const std::string& type);
   GL::IGLProgramPtr
-  _createShaderProgram(const GL::IGLShaderPtr& vertexShader, const GL::IGLShaderPtr& fragmentShader,
+  _createShaderProgram(const WebGLPipelineContextPtr& pipelineContext,
+                       const GL::IGLShaderPtr& vertexShader, const GL::IGLShaderPtr& fragmentShader,
                        GL::IGLRenderingContext* context,
                        const std::vector<std::string>& transformFeedbackVaryings = {});
-  void _finalizeProgram(const GL::IGLProgramPtr& shaderProgram,
-                        const GL::IGLShaderPtr& vertexShader,
-                        const GL::IGLShaderPtr& fragmentShader, GL::IGLRenderingContext* context,
-                        bool linked);
-  SamplingParameters _getSamplingParameters(unsigned int samplingMode, bool generateMipMaps);
-  GLRenderBufferPtr _setupFramebufferDepthAttachments(bool generateStencilBuffer,
-                                                      bool generateDepthBuffer, int width,
-                                                      int height, int samples = 1);
+  void _finalizePipelineContext(WebGLPipelineContext* pipelineContext);
   void _prepareWebGLTextureContinuation(const InternalTexturePtr& texture, Scene* scene,
                                         bool noMipmap, bool isCompressed,
                                         unsigned int samplingMode);
@@ -2364,8 +2385,6 @@ private:
     const std::function<bool(int width, int height,
                              const std::function<void()>& continuationCallback)>& processFunction,
     unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE);
-  ArrayBufferView _convertRGBtoRGBATextureData(const ArrayBufferView& rgbData, int width,
-                                               int height, unsigned int textureType);
   /** VBOs **/
   void _resetVertexBufferBinding();
   void _resetIndexBufferBinding();
@@ -2375,7 +2394,6 @@ private:
   bool _canRenderToFloatFramebuffer();
   bool _canRenderToHalfFloatFramebuffer();
   bool _canRenderToFramebuffer(unsigned int type);
-  [[nodiscard]] GL::GLenum _getInternalFormat(unsigned int format) const;
 
   /** Occlusion Queries **/
 
@@ -2404,24 +2422,20 @@ private:
    */
   bool _getTimeQueryAvailability(const GLQueryPtr& query);
 
-  /** File loading */
-  void _cascadeLoadFiles(
-    Scene* scene,
-    const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
-                             const std::string& responseURL)>& onloaddata,
-    const std::vector<std::string>& files,
-    const std::function<void(const std::string& message, const std::string& exception)>& onError);
-
 public:
   /**
-   * Gets or sets a boolean that indicates if textures must be forced to power
-   * of 2 size even if not required
+   * Hidden
+   */
+  IShaderProcessorPtr _shaderProcessor;
+
+  /**
+   * Gets or sets a boolean that indicates if textures must be forced to power of 2 size even if not
+   * required
    */
   bool forcePOTTextures;
 
   /**
-   * Gets a boolean indicating if the engine is currently rendering in
-   * fullscreen mode
+   * Gets a boolean indicating if the engine is currently rendering in fullscreen mode
    */
   bool isFullscreen;
 
@@ -2431,14 +2445,13 @@ public:
   bool isPointerLock;
 
   /**
-   * Gets or sets a boolean indicating if back faces must be culled (true by
-   * default)
+   * Gets or sets a boolean indicating if back faces must be culled (true by default)
    */
   bool cullBackFaces;
 
   /**
-   * Gets or sets a boolean indicating if the engine must keep rendering even
-   * if the window is not in foregroun
+   * Gets or sets a boolean indicating if the engine must keep rendering even if the window is not
+   * in foregroun
    */
   bool renderEvenInBackground;
 
@@ -2448,15 +2461,13 @@ public:
   bool preventCacheWipeBetweenFrames;
 
   /**
-   * Gets or sets a boolean to enable/disable IndexedDB support and avoid XHR
-   *on .manifest
+   * Gets or sets a boolean to enable/disable IndexedDB support and avoid XHR on .manifest
    **/
   bool enableOfflineSupport;
 
   /**
-   * Gets or sets a boolean to enable/disable checking manifest if IndexedDB
-   * support is enabled (Babylon.js will always consider the database is up to
-   * date)
+   * Gets or sets a boolean to enable/disable checking manifest if IndexedDB support is enabled (js
+   * will always consider the database is up to date)
    **/
   bool disableManifestCheck;
 
@@ -2466,13 +2477,17 @@ public:
   std::vector<Scene*> scenes;
 
   /**
+   * Event raised when a new scene is created
+   */
+  Observable<Scene> onNewSceneAddedObservable;
+
+  /**
    * Gets the list of created postprocesses
    */
   std::vector<PostProcessPtr> postProcesses;
 
   /**
-   * Gets or sets a boolean indicating if the engine should validate programs
-   * after compilation
+   * Gets or sets a boolean indicating if the engine should validate programs after compilation
    */
   bool validateShaderPrograms;
 
@@ -2532,6 +2547,11 @@ public:
   /**
    * Hidden
    */
+  GL::IGLRenderingContext* _gl;
+
+  /**
+   * Hidden
+   */
   bool _badOS;
 
   /**
@@ -2540,30 +2560,15 @@ public:
   bool _badDesktopOS;
 
   /**
-   * Gets or sets a value indicating if we want to disable texture binding
-   * optmization. This could be required on some buggy drivers which wants to
-   * have textures bound in a progressive order. By default Babylon.js will
-   * try to let textures bound where they are and only update the samplers to
-   * point where the texture is
+   * Hidden
    */
-  bool disableTextureBindingOptimization;
-
-  // WebVR
-
-  // The new WebVR uses promises.
-  // this promise resolves with the current devices available.
-  int vrDisplaysPromise;
-  int _vrDisplays;
-  bool _vrDisplayEnabled;
-  Size _oldSize;
-  int _oldHardwareScaleFactor;
-  int _vrAnimationFrameHandler;
+  EngineCapabilities _caps;
 
   // Uniform buffers list
 
   /**
-   * Gets or sets a boolean indicating that uniform buffers must be disabled
-   * even if they are supported
+   * Gets or sets a boolean indicating that uniform buffers must be disabled even if they are
+   * supported
    */
   bool disableUniformBuffers;
 
@@ -2575,17 +2580,12 @@ public:
   /**
    * Hidden
    */
-  GL::IGLRenderingContext* _gl;
+  ReadOnlyProperty<Engine, bool> _shouldUseHighPrecisionShader;
 
   /**
    * Hidden
    */
   PerfCounter _drawCalls;
-
-  /**
-   * Hidden
-   */
-  PerfCounter _textureCollisions;
 
   // Lost context
 
@@ -2600,21 +2600,62 @@ public:
   Observable<Engine> onContextRestoredObservable;
 
   /**
-   * Turn this value on if you want to pause FPS computation when in
-   * background
+   * Hidden
+   */
+  bool _doNotHandleContextLost;
+
+  /**
+   * Turn this value on if you want to pause FPS computation when in background
    */
   bool disablePerformanceMonitorInBackground;
 
   /**
-   * Defines whether the engine has been created with the premultipliedAlpha
-   * option on or not.
+   * Gets or sets a boolean indicating that vertex array object must be disabled even if they are
+   * supported
+   */
+  bool disableVertexArrayObjects;
+
+  // Cache
+  std::vector<InternalTexturePtr> _internalTexturesCache;
+
+  /**
+   * Hidden
+   */
+  InternalTexturePtr _currentRenderTarget;
+
+  /**
+   * Hidden
+   */
+  ICanvas* _workingCanvas;
+
+  /**
+   * Hidden
+   */
+  ICanvasRenderingContext2D* _workingContext;
+
+  /**
+   * Hidden
+   */
+  std::function<void()> _bindedRenderFunction;
+
+  /**
+   * Hidden
+   */
+  int _frameHandler;
+
+  /**
+   * Hidden
+   */
+  std::string _textureFormatInUse;
+
+  /**
+   * Defines whether the engine has been created with the premultipliedAlpha option on or not.
    */
   bool premultipliedAlpha;
 
   /**
-   * In case you are sharing the context with other applications, it might
-   * be interested to not cache the unpack flip y state to ensure a consistent
-   * value would be set.
+   * In case you are sharing the context with other applications, it might be interested to not
+   * cache the unpack flip y state to ensure a consistent value would be set.
    */
   bool enableUnpackFlipYCached;
 
@@ -2622,7 +2663,17 @@ protected:
   /**
    * Hidden
    */
-  EngineCapabilities _caps;
+  float _webGLVersion;
+
+  /**
+   * Hidden
+   */
+  bool _highPrecisionShadersAllowed;
+
+  /**
+   * Hidden
+   */
+  bool _colorWrite;
 
   // States
 
@@ -2646,9 +2697,6 @@ protected:
    */
   unsigned int _alphaMode;
 
-  // Cache
-  std::vector<InternalTexturePtr> _internalTexturesCache;
-
   /**
    * Hidden
    */
@@ -2667,7 +2715,7 @@ protected:
   /**
    * Hidden
    */
-  GL::IGLProgram* _currentProgram;
+  GL::IGLProgramPtr _currentProgram;
 
   /**
    * Hidden
@@ -2682,12 +2730,12 @@ protected:
   /**
    * Hidden
    */
-  GL::IGLBuffer* _cachedVertexBuffers;
+  WebGLDataBufferPtr _cachedVertexBuffers;
 
   /**
    * Hidden
    */
-  GL::IGLBuffer* _cachedIndexBuffer;
+  WebGLDataBufferPtr _cachedIndexBuffer;
 
   /**
    * Hidden
@@ -2697,14 +2745,14 @@ protected:
   /**
    * Hidden
    */
-  InternalTexturePtr _currentRenderTarget;
+  std::unordered_map<int, GL::IGLUniformLocation*> _boundUniforms;
 
   /**
    * Hidden
    */
   std::shared_ptr<GL::IGLFramebuffer> _currentFramebuffer;
-  // _previousFrameBuffer : stores the previous frameBuffer
-  // during calls to bindFrameBuffer(), so that unBindFrameBuffer can restore it
+  // _previousFrameBuffer : stores the previous frameBuffer during calls to bindFrameBuffer(), so
+  // that unBindFrameBuffer can restore it
   std::unique_ptr<GL::IGLFramebuffer> _previousFrameBuffer;
 
 private:
@@ -2713,7 +2761,6 @@ private:
   // Private Members
   ICanvas* _renderingCanvas;
   bool _windowIsBackground;
-  float _webGLVersion;
 
   // Focus
   std::function<void()> _onFocus;
@@ -2729,7 +2776,6 @@ private:
   int _hardwareScalingLevel;
   bool _pointerLockRequested;
   bool _isStencilEnable;
-  bool _colorWrite;
 
   ILoadingScreen* _loadingScreen;
 
@@ -2750,7 +2796,6 @@ private:
   std::function<void(Event&& evt)> _onContextLost;
   std::function<void(Event&& evt)> _onContextRestored;
   bool _contextWasLost;
-  bool _doNotHandleContextLost;
 
   // FPS
   std::unique_ptr<PerformanceMonitor> _performanceMonitor;
@@ -2767,30 +2812,22 @@ private:
   std::vector<bool> _vertexAttribArraysEnabled;
   GL::IGLVertexArrayObject* _cachedVertexArrayObject;
   bool _uintIndicesCurrentlySet;
-  std::unordered_map<int, GL::IGLBuffer*> _currentBoundBuffer;
+  std::unordered_map<int, WebGLDataBufferPtr> _currentBoundBuffer;
   std::unordered_map<unsigned int, BufferPointer> _currentBufferPointers;
   Int32Array _currentInstanceLocations;
-  std::vector<GL::IGLBuffer*> _currentInstanceBuffers;
+  std::vector<WebGLDataBufferPtr> _currentInstanceBuffers;
   Int32Array _textureUnits;
-  DummyInternalTextureTrackerPtr _firstBoundInternalTextureTracker;
-  DummyInternalTextureTrackerPtr _lastBoundInternalTextureTracker;
-  ICanvas* _workingCanvas;
-  ICanvasRenderingContext2D* _workingContext;
-  PassPostProcessPtr _rescalePostProcess;
+  PostProcessPtr _rescalePostProcess;
   GL::IGLFramebufferPtr _dummyFramebuffer;
-  std::function<void()> _bindedRenderFunction;
   bool _vaoRecordInProgress;
   bool _mustWipeVertexAttributes;
   InternalTexturePtr _emptyTexture;
   InternalTexturePtr _emptyCubeTexture;
   InternalTexturePtr _emptyTexture3D;
-  int _frameHandler;
   // Hardware supported Compressed Textures
   std::vector<std::string> _texturesSupported;
   Int32Array _nextFreeTextureSlots;
   unsigned int _maxSimultaneousTextures;
-  std::string _textureFormatInUse;
-  std::unordered_map<int, GL::IGLUniformLocation*> _boundUniforms;
   Vector4 _viewportCached;
   std::optional<bool> _unpackFlipYCached;
 

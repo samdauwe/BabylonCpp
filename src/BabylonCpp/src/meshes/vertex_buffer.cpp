@@ -111,7 +111,7 @@ Float32Array& VertexBuffer::getData()
   return _getBuffer()->getData();
 }
 
-GL::IGLBuffer* VertexBuffer::getBuffer()
+WebGLDataBufferPtr& VertexBuffer::getBuffer()
 {
   return _getBuffer()->getBuffer();
 }
@@ -141,23 +141,23 @@ unsigned int VertexBuffer::getInstanceDivisor() const
   return _instanceDivisor;
 }
 
-// Methods
-GL::IGLBuffer* VertexBuffer::create()
+WebGLDataBufferPtr VertexBuffer::create()
 {
   return _getBuffer()->create();
 }
 
-GL::IGLBuffer* VertexBuffer::create(const Float32Array& data)
+WebGLDataBufferPtr VertexBuffer::create(const Float32Array& data)
 {
   return _getBuffer()->create(data);
 }
 
-GL::IGLBuffer* VertexBuffer::update(const Float32Array& data)
+WebGLDataBufferPtr VertexBuffer::update(const Float32Array& data)
 {
   return _getBuffer()->update(data);
 }
 
-GL::IGLBuffer* VertexBuffer::updateDirectly(const Float32Array& data, size_t offset, bool useBytes)
+WebGLDataBufferPtr VertexBuffer::updateDirectly(const Float32Array& data, size_t offset,
+                                                bool useBytes)
 {
   return _getBuffer()->updateDirectly(data, offset, std::nullopt, useBytes);
 }

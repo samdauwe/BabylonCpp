@@ -54,6 +54,7 @@ void main(void)
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_CHROMATIC_ABERRATION_FRAGMENT_FX_H

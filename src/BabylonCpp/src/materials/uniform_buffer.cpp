@@ -116,9 +116,9 @@ Float32Array& UniformBuffer::getData()
   return _bufferData;
 }
 
-GL::IGLBuffer* UniformBuffer::getBuffer()
+WebGLDataBufferPtr& UniformBuffer::getBuffer()
 {
-  return _buffer.get();
+  return _buffer;
 }
 
 void UniformBuffer::_fillAlignment(size_t size)
@@ -275,7 +275,7 @@ void UniformBuffer::update()
     return;
   }
 
-  _engine->updateUniformBuffer(_buffer.get(), _bufferData);
+  _engine->updateUniformBuffer(_buffer, _bufferData);
 
   _needSync = false;
 }
@@ -290,7 +290,7 @@ void UniformBuffer::updateUniform(const std::string& uniformName, const Float32A
       BABYLON_LOG_ERROR("UniformBuffer", "Cannot add an uniform after UBO has been created.")
       return;
     }
-    addUniform(uniformName, (int)size);
+    addUniform(uniformName, static_cast<int>(size));
     location = _uniformLocations[uniformName];
   }
 
@@ -500,7 +500,7 @@ void UniformBuffer::bindToEffect(Effect* effect, const std::string& name)
     return;
   }
 
-  effect->bindUniformBuffer(_buffer.get(), name);
+  effect->bindUniformBuffer(_buffer, name);
 }
 
 void UniformBuffer::dispose()
@@ -514,7 +514,7 @@ void UniformBuffer::dispose()
   if (!_buffer) {
     return;
   }
-  if (_engine->_releaseBuffer(_buffer.get())) {
+  if (_engine->_releaseBuffer(_buffer)) {
     _buffer = nullptr;
   }
 }

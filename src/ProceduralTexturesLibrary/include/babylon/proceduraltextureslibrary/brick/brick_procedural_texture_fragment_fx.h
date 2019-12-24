@@ -81,6 +81,7 @@ void main(void)
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_PROCEDURAL_TEXTURES_LIBRARY_BRICK_BRICK_PROCEDURAL_TEXTURE_FRAGMENT_FX_H

@@ -160,6 +160,7 @@ void main(void) {
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_BACKGROUND_VERTEX_FX_H

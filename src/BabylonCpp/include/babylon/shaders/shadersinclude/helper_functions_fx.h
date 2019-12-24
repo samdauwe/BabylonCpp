@@ -116,6 +116,7 @@ vec3 fromRGBD(vec4 rgbd) {
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_HELPER_FUNCTIONS_FX_H

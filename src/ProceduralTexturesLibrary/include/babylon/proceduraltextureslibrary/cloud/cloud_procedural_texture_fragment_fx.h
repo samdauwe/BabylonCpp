@@ -47,6 +47,7 @@ void main() {
 
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_PROCEDURAL_TEXTURES_LIBRARY_CLOUD_CLOUD_PROCEDURAL_TEXTURE_FRAGMENT_FX_H

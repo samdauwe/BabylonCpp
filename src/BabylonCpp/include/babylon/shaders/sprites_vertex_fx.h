@@ -11,11 +11,11 @@ const char* spritesVertexShader
 // Attributes
 attribute vec4 position;
 attribute vec4 options;
+attribute vec2 inverts;
 attribute vec4 cellInfo;
 attribute vec4 color;
 
 // Uniforms
-uniform vec2 textureInfos;
 uniform mat4 view;
 uniform mat4 projection;
 
@@ -32,7 +32,6 @@ void main(void) {
     float angle = position.w;
     vec2 size = vec2(options.x, options.y);
     vec2 offset = options.zw;
-    vec2 uvScale = textureInfos.xy;
 
     cornerPos = vec2(offset.x - 0.5, offset.y  - 0.5) * size;
 
@@ -50,9 +49,12 @@ void main(void) {
     vColor = color;
 
     // Texture
-    vec2 uvOffset = vec2(abs(offset.x - cellInfo.x), 1.0 - abs(offset.y - cellInfo.y));
+    vec2 uvOffset = vec2(abs(offset.x - inverts.x), abs(1.0 - offset.y - inverts.y));
+    vec2 uvPlace = cellInfo.xy;
+    vec2 uvSize = cellInfo.zw;
 
-    vUV = (uvOffset + cellInfo.zw) * uvScale;
+    vUV.x = uvPlace.x + uvSize.x * uvOffset.x;
+    vUV.y = uvPlace.y + uvSize.y * uvOffset.y;
 
     // Fog
 #ifdef FOG
@@ -61,6 +63,7 @@ void main(void) {
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SPRITES_VERTEX_FX_H

@@ -14,6 +14,7 @@ const char* depthPrePass
 #endif
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_DEPTH_PRE_PASS_FX_H

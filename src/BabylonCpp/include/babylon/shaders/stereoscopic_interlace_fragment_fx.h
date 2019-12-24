@@ -47,6 +47,7 @@ void main(void)
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_STEREOSCOPIC_INTERLACE_FRAGMENT_FX_H

@@ -18,9 +18,14 @@ const char* morphTargetsVertex
     #ifdef MORPHTARGETS_TANGENT
     tangentUpdated.xyz += (tangent{X} - tangent.xyz) * morphTargetInfluences[{X}];
     #endif
+
+    #ifdef MORPHTARGETS_UV
+    uvUpdated += (uv_{X} - uv) * morphTargetInfluences[{X}];
+    #endif
 #endif
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_MORPH_TARGETS_VERTEX_FX_H

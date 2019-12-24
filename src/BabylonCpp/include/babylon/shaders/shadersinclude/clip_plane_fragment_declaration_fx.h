@@ -25,6 +25,7 @@ const char* clipPlaneFragmentDeclaration
 #endif
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_CLIP_PLANE_FRAGMENT_DECLARATION_FX_H

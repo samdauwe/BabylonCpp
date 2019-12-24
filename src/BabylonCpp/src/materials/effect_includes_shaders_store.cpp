@@ -3,7 +3,6 @@
 #include <babylon/shaders/shadersinclude/background_fragment_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/background_ubo_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/background_vertex_declaration_fx.h>
-#include <babylon/shaders/shadersinclude/bones300_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/bones_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/bones_vertex_fx.h>
 #include <babylon/shaders/shadersinclude/bump_fragment_fx.h>
@@ -29,7 +28,6 @@
 #include <babylon/shaders/shadersinclude/helper_functions_fx.h>
 #include <babylon/shaders/shadersinclude/image_processing_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/image_processing_functions_fx.h>
-#include <babylon/shaders/shadersinclude/instances300_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/instances_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/instances_vertex_fx.h>
 #include <babylon/shaders/shadersinclude/kernel_blur_fragment_fx.h>
@@ -47,6 +45,7 @@
 #include <babylon/shaders/shadersinclude/morph_targets_vertex_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/morph_targets_vertex_global_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/mrt_fragment_declaration_fx.h>
+#include <babylon/shaders/shadersinclude/packing_functions_fx.h>
 #include <babylon/shaders/shadersinclude/pbr_brdf_functions_fx.h>
 #include <babylon/shaders/shadersinclude/pbr_debug_fx.h>
 #include <babylon/shaders/shadersinclude/pbr_direct_lighting_falloff_functions_fx.h>
@@ -88,7 +87,6 @@ std::unordered_map<std::string, std::string>
   = {{"backgroundFragmentDeclaration", backgroundFragmentDeclaration},
      {"backgroundUboDeclaration", backgroundUboDeclaration},
      {"backgroundVertexDeclaration", backgroundVertexDeclaration},
-     {"bones300Declaration", bones300Declaration},
      {"bonesDeclaration", bonesDeclaration},
      {"bonesVertex", bonesVertex},
      {"bumpFragment", bumpFragment},
@@ -114,7 +112,6 @@ std::unordered_map<std::string, std::string>
      {"helperFunctions", helperFunctions},
      {"imageProcessingDeclaration", imageProcessingDeclaration},
      {"imageProcessingFunctions", imageProcessingFunctions},
-     {"instances300Declaration", instances300Declaration},
      {"instancesDeclaration", instancesDeclaration},
      {"instancesVertex", instancesVertex},
      {"kernelBlurFragment", kernelBlurFragment},
@@ -132,6 +129,7 @@ std::unordered_map<std::string, std::string>
      {"morphTargetsVertexDeclaration", morphTargetsVertexDeclaration},
      {"morphTargetsVertexGlobalDeclaration", morphTargetsVertexGlobalDeclaration},
      {"mrtFragmentDeclaration", mrtFragmentDeclaration},
+     {"packingFunctions", packingFunctions},
      {"pbrBRDFFunctions", pbrBRDFFunctions},
      {"pbrDebug", pbrDebug},
      {"pbrDirectLightingFalloffFunctions", pbrDirectLightingFalloffFunctions},

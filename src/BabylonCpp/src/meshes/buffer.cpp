@@ -9,8 +9,8 @@
 namespace BABYLON {
 
 Buffer::Buffer(Engine* engine, const Float32Array& data, bool updatable,
-               std::optional<size_t> stride, bool postponeInternalCreation,
-               bool instanced, bool useBytes)
+               std::optional<size_t> stride, bool postponeInternalCreation, bool instanced,
+               bool useBytes)
     : _data{data}
     , _engine{engine ? engine : Engine::LastCreatedEngine()}
     , _buffer{nullptr}
@@ -28,9 +28,8 @@ Buffer::Buffer(Engine* engine, const Float32Array& data, bool updatable,
   }
 }
 
-Buffer::Buffer(Mesh* mesh, const Float32Array& data, bool updatable,
-               std::optional<size_t> stride, bool postponeInternalCreation,
-               bool instanced, bool useBytes)
+Buffer::Buffer(Mesh* mesh, const Float32Array& data, bool updatable, std::optional<size_t> stride,
+               bool postponeInternalCreation, bool instanced, bool useBytes)
     : _data{data}
     , _engine{mesh->getScene()->getEngine()}
     , _buffer{nullptr}
@@ -50,21 +49,19 @@ Buffer::Buffer(Mesh* mesh, const Float32Array& data, bool updatable,
 
 Buffer::~Buffer() = default;
 
-std::unique_ptr<VertexBuffer>
-Buffer::createVertexBuffer(const std::string& kind, size_t offset, size_t size,
-                           std::optional<size_t> stride,
-                           std::optional<bool> instanced, bool useBytes)
+std::unique_ptr<VertexBuffer> Buffer::createVertexBuffer(const std::string& kind, size_t offset,
+                                                         size_t size, std::optional<size_t> stride,
+                                                         std::optional<bool> instanced,
+                                                         bool useBytes)
 {
   const auto _byteOffset = useBytes ? offset : offset * sizeof(float);
-  const auto _byteStride = stride.has_value() ?
-                             (useBytes ? *stride : *stride * sizeof(float)) :
-                             byteStride;
+  const auto _byteStride
+    = stride.has_value() ? (useBytes ? *stride : *stride * sizeof(float)) : byteStride;
 
   // a lot of these parameters are ignored as they are overriden by the buffer
-  return std::make_unique<VertexBuffer>(
-    _engine, this, kind, _updatable, true, _byteStride,
-    !instanced.has_value() ? _instanced : *instanced, _byteOffset, size,
-    std::nullopt, false, true);
+  return std::make_unique<VertexBuffer>(_engine, this, kind, _updatable, true, _byteStride,
+                                        !instanced.has_value() ? _instanced : *instanced,
+                                        _byteOffset, size, std::nullopt, false, true);
 }
 
 // Properties
@@ -78,9 +75,9 @@ Float32Array& Buffer::getData()
   return _data;
 }
 
-GL::IGLBuffer* Buffer::getBuffer()
+WebGLDataBufferPtr& Buffer::getBuffer()
 {
-  return _buffer.get();
+  return _buffer;
 }
 
 size_t Buffer::getStrideSize() const
@@ -89,7 +86,7 @@ size_t Buffer::getStrideSize() const
 }
 
 // Methods
-GL::IGLBuffer* Buffer::create(Float32Array data)
+WebGLDataBufferPtr Buffer::create(Float32Array data)
 {
   if (data.empty() && _buffer) {
     return nullptr; // nothing to do
@@ -120,7 +117,7 @@ GL::IGLBuffer* Buffer::create(Float32Array data)
     _data = std::move(data);
   }
 
-  return _buffer ? _buffer.get() : nullptr;
+  return _buffer;
 }
 
 void Buffer::_rebuild()
@@ -129,14 +126,13 @@ void Buffer::_rebuild()
   create(_data);
 }
 
-GL::IGLBuffer* Buffer::update(const Float32Array& data)
+WebGLDataBufferPtr Buffer::update(const Float32Array& data)
 {
   return create(data);
 }
 
-GL::IGLBuffer* Buffer::updateDirectly(const Float32Array& data, size_t offset,
-                                      const std::optional<size_t>& vertexCount,
-                                      bool useBytes)
+WebGLDataBufferPtr Buffer::updateDirectly(const Float32Array& data, size_t offset,
+                                          const std::optional<size_t>& vertexCount, bool useBytes)
 {
   if (!_buffer) {
     return nullptr;
@@ -144,15 +140,12 @@ GL::IGLBuffer* Buffer::updateDirectly(const Float32Array& data, size_t offset,
 
   if (_updatable) { // update buffer
     _engine->updateDynamicVertexBuffer(
-      _buffer, data,
-      useBytes ? static_cast<int>(offset) :
-                 static_cast<int>(offset * sizeof(float)),
-      (vertexCount.has_value() ? static_cast<int>(*vertexCount * byteStride) :
-                                 -1));
+      _buffer, data, useBytes ? static_cast<int>(offset) : static_cast<int>(offset * sizeof(float)),
+      (vertexCount.has_value() ? static_cast<int>(*vertexCount * byteStride) : -1));
     _data.clear();
   }
 
-  return _buffer ? _buffer.get() : nullptr;
+  return _buffer;
 }
 
 void Buffer::dispose()
@@ -160,8 +153,8 @@ void Buffer::dispose()
   if (!_buffer) {
     return;
   }
-  if (_engine->_releaseBuffer(_buffer.get())) {
-    _buffer.reset(nullptr);
+  if (_engine->_releaseBuffer(_buffer)) {
+    _buffer = nullptr;
   }
 }
 

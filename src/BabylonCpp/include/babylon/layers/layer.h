@@ -14,18 +14,15 @@ class Effect;
 class Layer;
 class Texture;
 class VertexBuffer;
-using EffectPtr       = std::shared_ptr<Effect>;
-using TexturePtr      = std::shared_ptr<Texture>;
-using VertexBufferPtr = std::shared_ptr<VertexBuffer>;
-
-namespace GL {
-class IGLBuffer;
-} // end of namespace GL
+class WebGLDataBuffer;
+using EffectPtr          = std::shared_ptr<Effect>;
+using TexturePtr         = std::shared_ptr<Texture>;
+using VertexBufferPtr    = std::shared_ptr<VertexBuffer>;
+using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
 
 /**
  * @brief This represents a full screen 2d layer.
- * This can be useful to display a picture in the  background of your scene for
- * instance.
+ * This can be useful to display a picture in the  background of your scene for instance.
  * @see https://www.babylonjs-playground.com/#08A2BS#1
  */
 class BABYLON_SHARED_EXPORT Layer : public std::enable_shared_from_this<Layer> {
@@ -59,18 +56,15 @@ protected:
   /**
    * @brief Instantiates a new layer.
    * This represents a full screen 2d layer.
-   * This can be useful to display a picture in the  background of your scene
-   * for instance.
+   * This can be useful to display a picture in the  background of your scene for instance.
    * @see https://www.babylonjs-playground.com/#08A2BS#1
    * @param name Define the name of the layer in the scene
    * @param imgUrl Define the url of the texture to display in the layer
    * @param scene Define the scene the layer belongs to
-   * @param isBackground Defines whether the layer is displayed in front or
-   * behind the scene
+   * @param isBackground Defines whether the layer is displayed in front or behind the scene
    * @param color Defines a color for the layer
    */
-  Layer(const std::string& name, const std::string& imgUrl, Scene* scene,
-        bool isBackground   = true,
+  Layer(const std::string& name, const std::string& imgUrl, Scene* scene, bool isBackground = true,
         const Color4& color = Color4(1.f, 1.f, 1.f, 1.f));
 
   // Events
@@ -108,16 +102,14 @@ public:
   Vector2 offset;
 
   /**
-   * Define the alpha blending mode used in the layer in case the texture or
-   * color has an alpha.
+   * Define the alpha blending mode used in the layer in case the texture or color has an alpha.
    */
   unsigned int alphaBlendingMode;
 
   /**
-   * Define if the layer should alpha test or alpha blend with the rest of the
-   * scene. Alpha test will not mix with the background color in case of
-   * transparency. It will either use the texture color or the background
-   * depending on the alpha value of the current pixel.
+   * Define if the layer should alpha test or alpha blend with the rest of the scene. Alpha test
+   * will not mix with the background color in case of transparency. It will either use the texture
+   * color or the background depending on the alpha value of the current pixel.
    */
   bool alphaTest;
 
@@ -132,8 +124,8 @@ public:
   std::vector<RenderTargetTexturePtr> renderTargetTextures;
 
   /**
-   * Define if the layer is only used in renderTarget or if it also
-   * renders in the main frame buffer of the canvas.
+   * Define if the layer is only used in renderTarget or if it also renders in the main frame buffer
+   * of the canvas.
    */
   bool renderOnlyInRenderTargetTextures;
 
@@ -155,8 +147,7 @@ public:
 
   /**
    * Back compatibility with callback before the onBeforeRenderObservable
-   * existed. The set callback will be triggered just before rendering the
-   * layer.
+   * existed. The set callback will be triggered just before rendering the layer.
    */
   WriteOnlyProperty<Layer, LayerCallbackType> onBeforeRender;
 
@@ -166,8 +157,8 @@ public:
   Observable<Layer> onAfterRenderObservable;
 
   /**
-   * Back compatibility with callback before the onAfterRenderObservable
-   * existed. The set callback will be triggered just after rendering the layer.
+   * Back compatibility with callback before the onAfterRenderObservable existed. The set callback
+   * will be triggered just after rendering the layer.
    */
   WriteOnlyProperty<Layer, LayerCallbackType> onAfterRender;
 
@@ -180,7 +171,7 @@ private:
   std::string _name;
   Scene* _scene;
   std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
-  std::unique_ptr<GL::IGLBuffer> _indexBuffer;
+  WebGLDataBufferPtr _indexBuffer;
   EffectPtr _effect;
   EffectPtr _alphaTestEffect;
 

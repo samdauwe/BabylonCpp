@@ -8,9 +8,7 @@ extern const char* vrMultiviewToSingleviewPixelShader;
 const char* vrMultiviewToSingleviewPixelShader
   = R"ShaderCode(
 
-#ifdef GL_ES
-    precision mediump sampler2DArray;
-#endif
+precision mediump sampler2DArray;
 
 varying vec2 vUV;
 uniform sampler2DArray multiviewSampler;
@@ -22,6 +20,7 @@ void main(void)
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_VR_MULTIVIEW_TO_SINGLEVIEW_FRAGMENT_FX_H

@@ -75,7 +75,7 @@ void EffectRenderer::setViewport(Viewport& viewport)
 
 void EffectRenderer::bindBuffers(const EffectPtr& effect)
 {
-  engine->bindBuffers(_vertexBuffers, _indexBuffer.get(), effect);
+  engine->bindBuffers(_vertexBuffers, _indexBuffer, effect);
 }
 
 void EffectRenderer::applyEffectWrapper(const EffectWrapperPtr& effectWrapper)
@@ -154,7 +154,7 @@ void EffectRenderer::dispose()
   }
 
   if (_indexBuffer) {
-    engine->_releaseBuffer(_indexBuffer.get());
+    engine->_releaseBuffer(_indexBuffer);
   }
 }
 

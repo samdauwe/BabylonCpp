@@ -28,8 +28,7 @@ EffectLayer::EffectLayer(const std::string& iName, Scene* scene)
     : name{iName}
     , isEnabled{true}
     , camera{this, &EffectLayer::get_camera}
-    , renderingGroupId{this, &EffectLayer::get_renderingGroupId,
-                       &EffectLayer::set_renderingGroupId}
+    , renderingGroupId{this, &EffectLayer::get_renderingGroupId, &EffectLayer::set_renderingGroupId}
     , _mainTexture{nullptr}
     , _maxSize{0}
     , _mainTextureDesiredSize{ISize{0, 0}}
@@ -111,8 +110,8 @@ void EffectLayer::_generateVertexBuffer()
     1,  -1  //
   };
 
-  auto vertexBuffer = std::make_shared<VertexBuffer>(
-    _engine, vertices, VertexBuffer::PositionKind, false, false, 2);
+  auto vertexBuffer = std::make_shared<VertexBuffer>(_engine, vertices, VertexBuffer::PositionKind,
+                                                     false, false, 2);
   _vertexBuffers[VertexBuffer::PositionKind] = std::move(vertexBuffer);
 }
 
@@ -123,10 +122,10 @@ void EffectLayer::_setMainTextureSize()
     _mainTextureDesiredSize.height = *_effectLayerOptions.mainTextureFixedSize;
   }
   else {
-    _mainTextureDesiredSize.width = static_cast<int>(
-      _engine->getRenderWidth() * _effectLayerOptions.mainTextureRatio);
-    _mainTextureDesiredSize.height = static_cast<int>(
-      _engine->getRenderHeight() * _effectLayerOptions.mainTextureRatio);
+    _mainTextureDesiredSize.width
+      = static_cast<int>(_engine->getRenderWidth() * _effectLayerOptions.mainTextureRatio);
+    _mainTextureDesiredSize.height
+      = static_cast<int>(_engine->getRenderHeight() * _effectLayerOptions.mainTextureRatio);
 
     _mainTextureDesiredSize.width
       = _engine->needPOTTextures() ?
@@ -138,17 +137,14 @@ void EffectLayer::_setMainTextureSize()
           _mainTextureDesiredSize.height;
   }
 
-  _mainTextureDesiredSize.width
-    = static_cast<int>(std::floor(_mainTextureDesiredSize.width));
-  _mainTextureDesiredSize.height
-    = static_cast<int>(std::floor(_mainTextureDesiredSize.height));
+  _mainTextureDesiredSize.width  = static_cast<int>(std::floor(_mainTextureDesiredSize.width));
+  _mainTextureDesiredSize.height = static_cast<int>(std::floor(_mainTextureDesiredSize.height));
 }
 
 void EffectLayer::_createMainTexture()
 {
   _mainTexture = RenderTargetTexture::New(
-    "HighlightLayerMainRTT",
-    ISize{_mainTextureDesiredSize.width, _mainTextureDesiredSize.height},
+    "HighlightLayerMainRTT", ISize{_mainTextureDesiredSize.width, _mainTextureDesiredSize.height},
     _scene, false, true, Constants::TEXTURETYPE_UNSIGNED_INT);
   _mainTexture->activeCamera              = _effectLayerOptions.camera;
   _mainTexture->wrapU                     = TextureConstants::CLAMP_ADDRESSMODE;
@@ -160,45 +156,42 @@ void EffectLayer::_createMainTexture()
   _mainTexture->ignoreCameraViewport = true;
 
   // Custom render function
-  _mainTexture->customRenderFunction
-    = [this](const std::vector<SubMesh*>& opaqueSubMeshes,
-             const std::vector<SubMesh*>& alphaTestSubMeshes,
-             const std::vector<SubMesh*>& transparentSubMeshes,
-             const std::vector<SubMesh*>& depthOnlySubMeshes,
-             const std::function<void()>& /*beforeTransparents*/) {
-        onBeforeRenderMainTextureObservable.notifyObservers(this);
+  _mainTexture->customRenderFunction = [this](const std::vector<SubMesh*>& opaqueSubMeshes,
+                                              const std::vector<SubMesh*>& alphaTestSubMeshes,
+                                              const std::vector<SubMesh*>& transparentSubMeshes,
+                                              const std::vector<SubMesh*>& depthOnlySubMeshes,
+                                              const std::function<void()>& /*beforeTransparents*/) {
+    onBeforeRenderMainTextureObservable.notifyObservers(this);
 
-        auto engine = _scene->getEngine();
+    auto engine = _scene->getEngine();
 
-        if (!depthOnlySubMeshes.empty()) {
-          engine->setColorWrite(false);
-          for (const auto& depthOnlySubMesh : depthOnlySubMeshes) {
-            _renderSubMesh(depthOnlySubMesh);
-          }
-          engine->setColorWrite(true);
-        }
+    if (!depthOnlySubMeshes.empty()) {
+      engine->setColorWrite(false);
+      for (const auto& depthOnlySubMesh : depthOnlySubMeshes) {
+        _renderSubMesh(depthOnlySubMesh);
+      }
+      engine->setColorWrite(true);
+    }
 
-        for (const auto& opaqueSubMesh : opaqueSubMeshes) {
-          _renderSubMesh(opaqueSubMesh);
-        }
+    for (const auto& opaqueSubMesh : opaqueSubMeshes) {
+      _renderSubMesh(opaqueSubMesh);
+    }
 
-        for (const auto& alphaTestSubMesh : alphaTestSubMeshes) {
-          _renderSubMesh(alphaTestSubMesh);
-        }
+    for (const auto& alphaTestSubMesh : alphaTestSubMeshes) {
+      _renderSubMesh(alphaTestSubMesh);
+    }
 
-        const auto previousAlphaMode = engine->getAlphaMode();
+    const auto previousAlphaMode = engine->getAlphaMode();
 
-        for (const auto& transparentSubMesh : transparentSubMeshes) {
-          _renderSubMesh(transparentSubMesh, true);
-        }
+    for (const auto& transparentSubMesh : transparentSubMeshes) {
+      _renderSubMesh(transparentSubMesh, true);
+    }
 
-        engine->setAlphaMode(previousAlphaMode);
-      };
+    engine->setAlphaMode(previousAlphaMode);
+  };
 
   _mainTexture->onClearObservable.add(
-    [this](Engine* engine, EventState& /*es*/) {
-      engine->clear(neutralColor, true, true, true);
-    });
+    [this](Engine* engine, EventState& /*es*/) { engine->clear(neutralColor, true, true, true); });
 }
 
 void EffectLayer::_addCustomEffectDefines(std::vector<std::string>& /*defines*/)
@@ -215,8 +208,7 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
     return false;
   }
 
-  if (!material->isReadyForSubMesh(subMesh->getMesh().get(), subMesh,
-                                   useInstances)) {
+  if (!material->isReadyForSubMesh(subMesh->getMesh().get(), subMesh, useInstances)) {
     return false;
   }
 
@@ -232,10 +224,9 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
   if (material) {
     const auto needAlphaTest = material->needAlphaTesting();
 
-    const auto& diffuseTexture = material->getAlphaTestTexture();
-    const auto standardMaterial
-      = std::static_pointer_cast<StandardMaterial>(material);
-    const auto pbrMaterial = std::static_pointer_cast<PBRMaterial>(material);
+    const auto& diffuseTexture  = material->getAlphaTestTexture();
+    const auto standardMaterial = std::static_pointer_cast<StandardMaterial>(material);
+    const auto pbrMaterial      = std::static_pointer_cast<PBRMaterial>(material);
     const auto needAlphaBlendFromDiffuse
       = diffuseTexture && diffuseTexture->hasAlpha
         && ((standardMaterial && standardMaterial->useAlphaFromDiffuseTexture)
@@ -259,10 +250,8 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
       }
     }
 
-    auto opacityTexture
-      = standardMaterial ?
-          standardMaterial->opacityTexture() :
-          pbrMaterial ? pbrMaterial->opacityTexture() : nullptr;
+    auto opacityTexture = standardMaterial ? standardMaterial->opacityTexture() :
+                                             pbrMaterial ? pbrMaterial->opacityTexture() : nullptr;
     if (opacityTexture) {
       defines.emplace_back("#define OPACITY");
       if (mesh->isVerticesDataPresent(VertexBuffer::UV2Kind)
@@ -292,8 +281,7 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
   }
 
   // Vertex
-  if (mesh->isVerticesDataPresent(VertexBuffer::ColorKind)
-      && mesh->hasVertexAlpha) {
+  if (mesh->isVerticesDataPresent(VertexBuffer::ColorKind) && mesh->hasVertexAlpha) {
     attribs.emplace_back(VertexBuffer::ColorKind);
     defines.emplace_back("#define VERTEXALPHA");
   }
@@ -320,17 +308,15 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
                          + std::to_string(mesh->numBoneInfluencers()));
     defines.emplace_back(
       "#define BonesPerMesh "
-      + std::to_string(mesh->skeleton() ? (mesh->skeleton()->bones.size() + 1) :
-                                          0));
+      + std::to_string(mesh->skeleton() ? (mesh->skeleton()->bones.size() + 1) : 0));
 
     auto& skeleton = mesh->skeleton();
     if (skeleton && skeleton->isUsingTextureForMatrices()) {
       defines.emplace_back("#define BONETEXTURE");
     }
     else {
-      defines.emplace_back(
-        "#define BonesPerMesh "
-        + std::to_string(skeleton ? (skeleton->bones.size() + 1) : 0ull));
+      defines.emplace_back("#define BonesPerMesh "
+                           + std::to_string(skeleton ? (skeleton->bones.size() + 1) : 0ull));
     }
 
     if (mesh->numBoneInfluencers > 0) {
@@ -349,12 +335,11 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
       if (manager->numInfluencers > 0) {
         defines.emplace_back("#define MORPHTARGETS");
         morphInfluencers = static_cast<unsigned>(manager->numInfluencers);
-        defines.emplace_back("#define NUM_MORPH_INFLUENCERS "
-                             + std::to_string(morphInfluencers));
+        defines.emplace_back("#define NUM_MORPH_INFLUENCERS " + std::to_string(morphInfluencers));
         MaterialDefines iDefines;
         iDefines.intDef["NUM_MORPH_INFLUENCERS"] = morphInfluencers;
-        MaterialHelper::PrepareAttributesForMorphTargetsInfluencers(
-          attribs, mesh.get(), morphInfluencers);
+        MaterialHelper::PrepareAttributesForMorphTargetsInfluencers(attribs, mesh.get(),
+                                                                    morphInfluencers);
       }
     }
   }
@@ -373,12 +358,11 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
     _cachedDefines = join;
 
     EffectCreationOptions effectCreationOptions;
-    effectCreationOptions.attributes = std::move(attribs);
-    effectCreationOptions.defines    = std::move(join);
-    effectCreationOptions.fallbacks  = std::move(fallbacks);
-    effectCreationOptions.indexParameters
-      = {{"maxSimultaneousMorphTargets", morphInfluencers}};
-    effectCreationOptions.uniformsNames = {"world",
+    effectCreationOptions.attributes      = std::move(attribs);
+    effectCreationOptions.defines         = std::move(join);
+    effectCreationOptions.fallbacks       = std::move(fallbacks);
+    effectCreationOptions.indexParameters = {{"maxSimultaneousMorphTargets", morphInfluencers}};
+    effectCreationOptions.uniformsNames   = {"world",
                                            "mBones",
                                            "viewProjection",
                                            "glowColor",
@@ -422,7 +406,7 @@ void EffectLayer::render()
   engine->setState(false);
 
   // VBOs
-  engine->bindBuffers(_vertexBuffers, _indexBuffer.get(), currentEffect);
+  engine->bindBuffers(_vertexBuffers, _indexBuffer, currentEffect);
 
   // Cache
   auto previousAlphaMode = engine->getAlphaMode();
@@ -466,8 +450,7 @@ bool EffectLayer::_shouldRenderMesh(AbstractMesh* /*mesh*/) const
   return true;
 }
 
-bool EffectLayer::_canRenderMesh(const AbstractMeshPtr& mesh,
-                                 const MaterialPtr& material) const
+bool EffectLayer::_canRenderMesh(const AbstractMeshPtr& mesh, const MaterialPtr& material) const
 {
   return material->needAlphaBlendingForMesh(*mesh);
 }
@@ -511,77 +494,62 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
     return;
   }
 
-  auto hardwareInstancedRendering
-    = (engine->getCaps().instancedArrays)
-      && (stl_util::contains(batch->visibleInstances, subMesh->_id))
-      && (!batch->visibleInstances[subMesh->_id].empty());
+  auto hardwareInstancedRendering = (engine->getCaps().instancedArrays)
+                                    && (stl_util::contains(batch->visibleInstances, subMesh->_id))
+                                    && (!batch->visibleInstances[subMesh->_id].empty());
 
   _setEmissiveTextureAndColor(mesh, subMesh, material);
 
-  if (_isReady(subMesh, hardwareInstancedRendering,
-               _emissiveTextureAndColor.texture)) {
+  if (_isReady(subMesh, hardwareInstancedRendering, _emissiveTextureAndColor.texture)) {
     engine->enableEffect(_effectLayerMapGenerationEffect);
-    mesh->_bind(subMesh, _effectLayerMapGenerationEffect,
-                Material::TriangleFillMode);
+    mesh->_bind(subMesh, _effectLayerMapGenerationEffect, Material::TriangleFillMode);
 
-    _effectLayerMapGenerationEffect->setMatrix("viewProjection",
-                                               scene->getTransformMatrix());
+    _effectLayerMapGenerationEffect->setMatrix("viewProjection", scene->getTransformMatrix());
 
     _effectLayerMapGenerationEffect->setFloat4(
-      "glowColor", _emissiveTextureAndColor.color.r,
-      _emissiveTextureAndColor.color.g, _emissiveTextureAndColor.color.b,
-      _emissiveTextureAndColor.color.a);
+      "glowColor", _emissiveTextureAndColor.color.r, _emissiveTextureAndColor.color.g,
+      _emissiveTextureAndColor.color.b, _emissiveTextureAndColor.color.a);
 
     const auto needAlphaTest = material->needAlphaTesting();
 
-    const auto& diffuseTexture = material->getAlphaTestTexture();
-    const auto standardMaterial
-      = std::static_pointer_cast<StandardMaterial>(material);
-    const auto pbrMaterial = std::static_pointer_cast<PBRMaterial>(material);
+    const auto& diffuseTexture  = material->getAlphaTestTexture();
+    const auto standardMaterial = std::static_pointer_cast<StandardMaterial>(material);
+    const auto pbrMaterial      = std::static_pointer_cast<PBRMaterial>(material);
     const auto needAlphaBlendFromDiffuse
       = diffuseTexture && diffuseTexture->hasAlpha
         && ((standardMaterial && standardMaterial->useAlphaFromDiffuseTexture)
             || (pbrMaterial && pbrMaterial->useAlphaFromAlbedoTexture()));
 
     if (diffuseTexture && (needAlphaTest || needAlphaBlendFromDiffuse)) {
-      _effectLayerMapGenerationEffect->setTexture("diffuseSampler",
-                                                  diffuseTexture);
+      _effectLayerMapGenerationEffect->setTexture("diffuseSampler", diffuseTexture);
       const auto& textureMatrix = diffuseTexture->getTextureMatrix();
 
       if (textureMatrix) {
-        _effectLayerMapGenerationEffect->setMatrix("diffuseMatrix",
-                                                   *textureMatrix);
+        _effectLayerMapGenerationEffect->setMatrix("diffuseMatrix", *textureMatrix);
       }
     }
 
-    auto opacityTexture
-      = standardMaterial ?
-          standardMaterial->opacityTexture() :
-          pbrMaterial ? pbrMaterial->opacityTexture() : nullptr;
+    auto opacityTexture = standardMaterial ? standardMaterial->opacityTexture() :
+                                             pbrMaterial ? pbrMaterial->opacityTexture() : nullptr;
     if (opacityTexture) {
-      _effectLayerMapGenerationEffect->setTexture("opacitySampler",
-                                                  opacityTexture);
-      _effectLayerMapGenerationEffect->setFloat("opacityIntensity",
-                                                opacityTexture->level);
+      _effectLayerMapGenerationEffect->setTexture("opacitySampler", opacityTexture);
+      _effectLayerMapGenerationEffect->setFloat("opacityIntensity", opacityTexture->level);
       const auto& textureMatrix = opacityTexture->getTextureMatrix();
       if (textureMatrix) {
-        _effectLayerMapGenerationEffect->setMatrix("opacityMatrix",
-                                                   *textureMatrix);
+        _effectLayerMapGenerationEffect->setMatrix("opacityMatrix", *textureMatrix);
       }
     }
 
     // Glow emissive only
     if (_emissiveTextureAndColor.texture) {
-      _effectLayerMapGenerationEffect->setTexture(
-        "emissiveSampler", _emissiveTextureAndColor.texture);
+      _effectLayerMapGenerationEffect->setTexture("emissiveSampler",
+                                                  _emissiveTextureAndColor.texture);
       _effectLayerMapGenerationEffect->setMatrix(
-        "emissiveMatrix",
-        *_emissiveTextureAndColor.texture->getTextureMatrix());
+        "emissiveMatrix", *_emissiveTextureAndColor.texture->getTextureMatrix());
     }
 
     // Bones
-    if (mesh->useBones() && mesh->computeBonesUsingShaders()
-        && mesh->skeleton()) {
+    if (mesh->useBones() && mesh->computeBonesUsingShaders() && mesh->skeleton()) {
       auto& skeleton = mesh->skeleton();
 
       if (skeleton->isUsingTextureForMatrices()) {
@@ -592,18 +560,16 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
 
         _effectLayerMapGenerationEffect->setTexture("boneSampler", boneTexture);
         _effectLayerMapGenerationEffect->setFloat(
-          "boneTextureWidth",
-          4.f * static_cast<float>(skeleton->bones.size() + 1));
+          "boneTextureWidth", 4.f * static_cast<float>(skeleton->bones.size() + 1));
       }
       else {
-        _effectLayerMapGenerationEffect->setMatrices(
-          "mBones", skeleton->getTransformMatrices((mesh.get())));
+        _effectLayerMapGenerationEffect->setMatrices("mBones",
+                                                     skeleton->getTransformMatrices((mesh.get())));
       }
     }
 
     // Morph targets
-    MaterialHelper::BindMorphTargetParameters(mesh.get(),
-                                              _effectLayerMapGenerationEffect);
+    MaterialHelper::BindMorphTargetParameters(mesh.get(), _effectLayerMapGenerationEffect);
 
     // Alpha mode
     if (enableAlphaMode) {
@@ -612,10 +578,9 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
 
     // Draw
     mesh->_processRendering(
-      subMesh, _effectLayerMapGenerationEffect, Material::TriangleFillMode,
-      batch, hardwareInstancedRendering,
-      [&](bool /*isInstance*/, const Matrix& world,
-          Material* /*effectiveMaterial*/) {
+      subMesh, _effectLayerMapGenerationEffect, Material::TriangleFillMode, batch,
+      hardwareInstancedRendering,
+      [&](bool /*isInstance*/, const Matrix& world, Material* /*effectiveMaterial*/) {
         _effectLayerMapGenerationEffect->setMatrix("world", world);
       });
   }
@@ -668,7 +633,7 @@ void EffectLayer::dispose()
   }
 
   if (_indexBuffer) {
-    _scene->getEngine()->_releaseBuffer(_indexBuffer.get());
+    _scene->getEngine()->_releaseBuffer(_indexBuffer);
     _indexBuffer = nullptr;
   }
 
@@ -693,8 +658,7 @@ std::string EffectLayer::getClassName() const
   return "EffectLayer";
 }
 
-EffectLayer* EffectLayer::Parse(const json& /*parsedEffectLayer*/,
-                                Scene* /*scene*/,
+EffectLayer* EffectLayer::Parse(const json& /*parsedEffectLayer*/, Scene* /*scene*/,
                                 const std::string& /*rootUrl*/)
 {
   return nullptr;

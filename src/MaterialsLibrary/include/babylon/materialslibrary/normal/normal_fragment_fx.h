@@ -112,6 +112,7 @@ void main(void) {
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_MATERIALS_LIBRARY_NORMAL_NORMAL_FRAGMENT_FX_H

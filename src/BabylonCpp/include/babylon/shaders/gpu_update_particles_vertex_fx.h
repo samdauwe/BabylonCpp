@@ -1,8 +1,6 @@
 ﻿#ifndef BABYLON_SHADERS_GPU_UPDATE_PARTICLES_VERTEX_FX_H
 #define BABYLON_SHADERS_GPU_UPDATE_PARTICLES_VERTEX_FX_H
 
-#include <babylon/shaders/shadersinclude/glsl_version_3.h>
-
 namespace BABYLON {
 
 extern const char* gpuUpdateParticlesVertexShader;
@@ -10,7 +8,7 @@ extern const char* gpuUpdateParticlesVertexShader;
 const char* gpuUpdateParticlesVertexShader
   = R"ShaderCode(
 
-BABYLONCPP_GLSL_VERSION_3
+#version 300 es
 
 #define PI 3.14159
 
@@ -291,7 +289,7 @@ void main() {
     float s = 2.0 * PI * randoms2.x;
 
     #ifdef CONEEMITTERSPAWNPOINT
-        float h = 0.00001;
+        float h = 0.0001;
     #else
         float h = randoms2.y * height.y;
 
@@ -313,7 +311,7 @@ void main() {
         direction = vec3(0., 1.0, 0.);
     } else {
         vec3 randoms3 = getRandomVec3(seed.z);
-        direction = position + directionRandomizer * randoms3;
+        direction = normalize(position + directionRandomizer * randoms3);
     }
 #else
     // Create the particle at origin
@@ -430,6 +428,7 @@ void main() {
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_GPU_UPDATE_PARTICLES_VERTEX_FX_H

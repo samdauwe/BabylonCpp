@@ -11,17 +11,19 @@ namespace BABYLON {
  */
 template <class T>
 struct BABYLON_SHARED_EXPORT DataBuffer {
+
   virtual ~DataBuffer() = default;
+
   /**
    * Gets or sets the number of objects referencing this buffer
    */
-
   size_t references = 0;
+
   /**
    * Gets or sets the size of the underlying buffer
    */
-
   size_t capacity = 0;
+
   /**
    * Gets or sets a boolean indicating if the buffer contains 32bits indices
    */

@@ -38,6 +38,7 @@ const char* imageProcessingDeclaration
 #endif
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_IMAGE_PROCESSING_DECLARATION_FX_H

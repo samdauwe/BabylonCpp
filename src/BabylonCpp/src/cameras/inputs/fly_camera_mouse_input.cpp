@@ -88,10 +88,6 @@ void FlyCameraMouseInput::_pointerInput(PointerInfo* p, EventState& /*s*/)
 
   auto engine = camera->getEngine();
 
-  if (engine->isInVRExclusivePointerMode()) {
-    return;
-  }
-
   if (!touchEnabled && e.pointerType == PointerType::TOUCH) {
     return;
   }
@@ -161,7 +157,7 @@ void FlyCameraMouseInput::_onMouseMove(MouseEvent& e)
 {
   auto engine = camera->getEngine();
 
-  if (!engine->isPointerLock || engine->isInVRExclusivePointerMode()) {
+  if (!engine->isPointerLock) {
     return;
   }
 

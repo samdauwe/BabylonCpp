@@ -11,10 +11,8 @@ namespace BABYLON {
 class Engine;
 class Mesh;
 class VertexBuffer;
-
-namespace GL {
-class IGLBuffer;
-} // end of namespace GL
+class WebGLDataBuffer;
+using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
 
 /**
  * @brief Class used to store data that will be store in GPU memory.
@@ -28,8 +26,8 @@ public:
    * @param data the data to use for this buffer
    * @param updatable whether the data is updatable
    * @param stride the stride (optional)
-   * @param postponeInternalCreation whether to postpone creating the internal
-   * WebGL buffer (optional)
+   * @param postponeInternalCreation whether to postpone creating the internal WebGL buffer
+   * (optional)
    * @param instanced whether the buffer is instanced (optional)
    * @param useBytes set to true if the stride in in bytes (optional)
    */
@@ -43,8 +41,8 @@ public:
    * @param data the data to use for this buffer
    * @param updatable whether the data is updatable
    * @param stride the stride (optional)
-   * @param postponeInternalCreation whether to postpone creating the internal
-   * WebGL buffer (optional)
+   * @param postponeInternalCreation whether to postpone creating the internal WebGL buffer
+   * (optional)
    * @param instanced whether the buffer is instanced (optional)
    * @param useBytes set to true if the stride in in bytes (optional)
    */
@@ -58,10 +56,9 @@ public:
    * @brief Create a new VertexBuffer based on the current buffer.
    * @param kind defines the vertex buffer kind (position, normal, etc.)
    * @param offset defines offset in the buffer (0 by default)
-   * @param size defines the size in floats of attributes (position is 3 for
-   * instance)
-   * @param stride defines the stride size in floats in the buffer (the offset
-   * to apply to reach next value when data is interleaved)
+   * @param size defines the size in floats of attributes (position is 3 for instance)
+   * @param stride defines the stride size in floats in the buffer (the offset to apply to reach
+   * next value when data is interleaved)
    * @param instanced defines if the vertex buffer contains indexed data
    * @param useBytes defines if the offset and stride are in bytes
    * @returns the new vertex buffer
@@ -90,7 +87,7 @@ public:
    * @brief Gets underlying native buffer
    * @returns underlying native buffer
    */
-  GL::IGLBuffer* getBuffer();
+  WebGLDataBufferPtr& getBuffer();
 
   /**
    * @brief Gets the stride in float32 units (i.e. byte stride / 4).
@@ -103,11 +100,11 @@ public:
   // Methods
 
   /**
-   * @brief Store data into the buffer. If the buffer was already used it will
-   * be either recreated or updated depending on isUpdatable property
+   * @brief Store data into the buffer. If the buffer was already used it will be either recreated
+   * or updated depending on isUpdatable property
    * @param data defines the data to store
    */
-  GL::IGLBuffer* create(Float32Array data = {});
+  WebGLDataBufferPtr create(Float32Array data = {});
 
   /**
    * @brief Hidden
@@ -118,7 +115,7 @@ public:
    * @brief Update current buffer data
    * @param data defines the data to store
    */
-  GL::IGLBuffer* update(const Float32Array& data);
+  WebGLDataBufferPtr update(const Float32Array& data);
 
   /**
    * @brief Updates the data directly.
@@ -127,9 +124,9 @@ public:
    * @param vertexCount the vertex count (optional)
    * @param useBytes set to true if the offset is in bytes
    */
-  GL::IGLBuffer* updateDirectly(const Float32Array& data, size_t offset,
-                                const std::optional<size_t>& vertexCount = std::nullopt,
-                                bool useBytes                            = false);
+  WebGLDataBufferPtr updateDirectly(const Float32Array& data, size_t offset,
+                                    const std::optional<size_t>& vertexCount = std::nullopt,
+                                    bool useBytes                            = false);
 
   /**
    * @brief Release all resources
@@ -149,7 +146,7 @@ public:
 
 private:
   Engine* _engine;
-  std::unique_ptr<GL::IGLBuffer> _buffer;
+  WebGLDataBufferPtr _buffer;
   bool _updatable;
   bool _instanced;
 

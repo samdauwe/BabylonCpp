@@ -21,13 +21,14 @@ class Mesh;
 class Scene;
 class VertexBuffer;
 class VertexData;
-using EffectPtr       = std::shared_ptr<Effect>;
-using GeometryPtr     = std::shared_ptr<Geometry>;
-using MeshPtr         = std::shared_ptr<Mesh>;
-using VertexBufferPtr = std::shared_ptr<VertexBuffer>;
+class WebGLDataBuffer;
+using EffectPtr          = std::shared_ptr<Effect>;
+using GeometryPtr        = std::shared_ptr<Geometry>;
+using MeshPtr            = std::shared_ptr<Mesh>;
+using VertexBufferPtr    = std::shared_ptr<VertexBuffer>;
+using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
 
 namespace GL {
-class IGLBuffer;
 class IGLVertexArrayObject;
 } // end of namespace GL
 
@@ -145,7 +146,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _bind(const EffectPtr& effect, GL::IGLBuffer* indexToBind = nullptr);
+  void _bind(const EffectPtr& effect, WebGLDataBufferPtr indexToBind = nullptr);
 
   /**
    * @brief Gets total number of vertices.
@@ -238,7 +239,7 @@ public:
    * @brief Gets the index buffer.
    * @return the index buffer
    */
-  GL::IGLBuffer* getIndexBuffer();
+  WebGLDataBufferPtr getIndexBuffer();
 
   /**
    * @brief Hidden
@@ -328,9 +329,8 @@ public:
    * Implementation from
    * http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/2117523#answer-2117523
    * Be aware Math.random() could cause collisions, but:
-   * "All but 6 of the 128 bits of the ID are randomly generated, which means
-   * that for any two ids, there's a 1 in 2^^122 (or 5.3x10^^36) chance they'll
-   * collide"
+   * "All but 6 of the 128 bits of the ID are randomly generated, which means that for any two ids,
+   * there's a 1 in 2^^122 (or 5.3x10^^36) chance they'll collide"
    * @returns a string containing a new GUID
    */
   static std::string RandomId();
@@ -375,8 +375,8 @@ protected:
 
   /**
    *  @brief Sets the Bias Vector to apply on the bounding elements.
-   * (box/sphere), the max extend is computed as v += v * bias.x + bias.y, the
-   * min is computed as v -= v * bias.x + bias.y
+   * (box/sphere), the max extend is computed as v += v * bias.x + bias.y, the min is computed as v
+   * -= v * bias.x + bias.y
    */
   void set_boundingBias(const std::optional<Vector2>& value);
 
@@ -445,8 +445,8 @@ public:
 
   /**
    *  Gets or sets the Bias Vector to apply on the bounding elements
-   * (box/sphere), the max extend is computed as v += v * bias.x + bias.y, the
-   * min is computed as v -= v * bias.x + bias.y
+   * (box/sphere), the max extend is computed as v += v * bias.x + bias.y, the min is computed as v
+   * -= v * bias.x + bias.y
    */
   Property<Geometry, std::optional<Vector2>> boundingBias;
 
@@ -472,7 +472,7 @@ private:
   bool _isDisposed;
   std::optional<MinMax> _extend;
   std::optional<Vector2> _boundingBias;
-  std::unique_ptr<GL::IGLBuffer> _indexBuffer;
+  WebGLDataBufferPtr _indexBuffer;
   bool _indexBufferIsUpdatable;
 
 }; // end of class Geometry

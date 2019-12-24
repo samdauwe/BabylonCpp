@@ -14,13 +14,11 @@ class AbstractMesh;
 class Node;
 class ShaderMaterial;
 class VertexBuffer;
-using AbstractMeshPtr   = std::shared_ptr<AbstractMesh>;
-using ShaderMaterialPtr = std::shared_ptr<ShaderMaterial>;
-using VertexBufferPtr   = std::shared_ptr<VertexBuffer>;
-
-namespace GL {
-class IGLBuffer;
-} // end of namespace GL
+class WebGLDataBuffer;
+using AbstractMeshPtr    = std::shared_ptr<AbstractMesh>;
+using ShaderMaterialPtr  = std::shared_ptr<ShaderMaterial>;
+using VertexBufferPtr    = std::shared_ptr<VertexBuffer>;
+using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
 
 /**
  * @brief This class is used to generate edges of the mesh that could then
@@ -113,7 +111,7 @@ protected:
   float _epsilon;
   size_t _indicesCount;
   ShaderMaterialPtr _lineShader;
-  std::unique_ptr<GL::IGLBuffer> _ib;
+  WebGLDataBufferPtr _ib;
   std::unordered_map<std::string, VertexBufferPtr> _buffers;
   bool _checkVerticesInsteadOfIndices;
 

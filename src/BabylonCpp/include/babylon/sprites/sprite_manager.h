@@ -18,15 +18,13 @@ class Ray;
 class SpriteManager;
 class Texture;
 class VertexBuffer;
-using CameraPtr        = std::shared_ptr<Camera>;
-using EffectPtr        = std::shared_ptr<Effect>;
-using SpriteManagerPtr = std::shared_ptr<SpriteManager>;
-using TexturePtr       = std::shared_ptr<Texture>;
-using VertexBufferPtr  = std::shared_ptr<VertexBuffer>;
-
-namespace GL {
-class IGLBuffer;
-} // end of namespace GL
+class WebGLDataBuffer;
+using CameraPtr          = std::shared_ptr<Camera>;
+using EffectPtr          = std::shared_ptr<Effect>;
+using SpriteManagerPtr   = std::shared_ptr<SpriteManager>;
+using TexturePtr         = std::shared_ptr<Texture>;
+using VertexBufferPtr    = std::shared_ptr<VertexBuffer>;
+using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
 
 /**
  * @brief Class used to manage multiple sprites on the same spritesheet.
@@ -187,7 +185,7 @@ private:
   Float32Array _vertexData;
   std::unique_ptr<Buffer> _buffer;
   std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
-  std::unique_ptr<GL::IGLBuffer> _indexBuffer;
+  WebGLDataBufferPtr _indexBuffer;
   EffectPtr _effectBase;
   EffectPtr _effectFog;
 

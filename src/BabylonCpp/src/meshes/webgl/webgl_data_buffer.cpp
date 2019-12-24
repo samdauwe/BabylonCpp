@@ -2,14 +2,14 @@
 
 namespace BABYLON {
 
-WebGLDataBuffer::WebGLDataBuffer(GL::IGLBuffer* resource)
+WebGLDataBuffer::WebGLDataBuffer(const GL::IGLBufferPtr& resource)
 {
   _buffer = resource;
 }
 
 WebGLDataBuffer::~WebGLDataBuffer() = default;
 
-GL::IGLBuffer* WebGLDataBuffer::underlyingResource()
+GL::IGLBufferPtr WebGLDataBuffer::underlyingResource()
 {
   return _buffer;
 }

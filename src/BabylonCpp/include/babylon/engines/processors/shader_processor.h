@@ -41,6 +41,8 @@ private:
                                   const ShaderCodeConditionNodePtr& rootNode,
                                   ShaderCodeNodePtr ifNode);
   static bool _MoveCursor(ShaderCodeCursor& cursor, const ShaderCodeNodePtr& rootNode);
+  static std::vector<std::string>
+  _removeCommentsAndEmptyLines(const std::vector<std::string>& sourceCodeLines);
   static std::string
   _EvaluatePreProcessors(const std::string& sourceCode,
                          std::unordered_map<std::string, std::string>& preprocessors,

@@ -14,8 +14,8 @@
 
 namespace BABYLON {
 
-Layer::Layer(const std::string& name, const std::string& imgUrl, Scene* scene,
-             bool iIsBackground, const Color4& iColor)
+Layer::Layer(const std::string& name, const std::string& imgUrl, Scene* scene, bool iIsBackground,
+             const Color4& iColor)
     : isBackground{iIsBackground}
     , color{iColor}
     , scale{Vector2(1.f, 1.f)}
@@ -52,8 +52,8 @@ Layer::Layer(const std::string& name, const std::string& imgUrl, Scene* scene,
     1.f,  -1.f  //
   };
 
-  _vertexBuffers[VertexBuffer::PositionKind] = std::make_shared<VertexBuffer>(
-    engine, vertices, VertexBuffer::PositionKind, false, false, 2);
+  _vertexBuffers[VertexBuffer::PositionKind]
+    = std::make_shared<VertexBuffer>(engine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
   _createIndexBuffer();
 
@@ -75,8 +75,7 @@ Layer::Layer(const std::string& name, const std::string& imgUrl, Scene* scene,
     options.samplers      = {"textureSampler"};
     options.defines       = "#define ALPHATEST";
 
-    _alphaTestEffect
-      = engine->createEffect("layer", options, _scene->getEngine());
+    _alphaTestEffect = engine->createEffect("layer", options, _scene->getEngine());
   }
 }
 
@@ -163,7 +162,7 @@ void Layer::render()
   currentEffect->setVector2("scale", scale);
 
   // VBOs
-  engine->bindBuffers(_vertexBuffers, _indexBuffer.get(), currentEffect);
+  engine->bindBuffers(_vertexBuffers, _indexBuffer, currentEffect);
 
   // Draw order
   if (!alphaTest) {
@@ -189,7 +188,7 @@ void Layer::dispose()
   }
 
   if (_indexBuffer) {
-    _scene->getEngine()->_releaseBuffer(_indexBuffer.get());
+    _scene->getEngine()->_releaseBuffer(_indexBuffer);
     _indexBuffer = nullptr;
   }
 

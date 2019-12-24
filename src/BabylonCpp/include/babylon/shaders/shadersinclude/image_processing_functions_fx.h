@@ -181,6 +181,7 @@ vec4 applyImageProcessing(vec4 result) {
 }
 
 )ShaderCode";
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_SHADERS_SHADERS_INCLUDE_IMAGE_PROCESSING_FUNCTIONS_FX_H
