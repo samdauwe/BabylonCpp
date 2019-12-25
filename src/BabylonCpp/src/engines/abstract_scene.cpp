@@ -3,16 +3,21 @@
 #include <babylon/audio/audio_engine.h>
 #include <babylon/audio/sound.h>
 #include <babylon/babylon_stl_util.h>
+#include <babylon/bones/bone.h>
 #include <babylon/bones/skeleton.h>
+#include <babylon/cameras/camera.h>
 #include <babylon/core/json_util.h>
 #include <babylon/engines/asset_container.h>
 #include <babylon/engines/engine.h>
+#include <babylon/engines/node.h>
 #include <babylon/engines/scene_component_constants.h>
 #include <babylon/layers/effect_layer.h>
 #include <babylon/layers/glow_layer.h>
 #include <babylon/layers/highlight_layer.h>
 #include <babylon/lensflares/lens_flare_system.h>
+#include <babylon/lights/light.h>
 #include <babylon/lights/shadows/shadow_generator.h>
+#include <babylon/meshes/abstract_mesh.h>
 #include <babylon/particles/gpu_particle_system.h>
 #include <babylon/particles/particle_system.h>
 
