@@ -14,8 +14,7 @@
 
 namespace BABYLON {
 
-Skeleton::Skeleton(const std::string& iName, const std::string& iId,
-                   Scene* scene)
+Skeleton::Skeleton(const std::string& iName, const std::string& iId, Scene* scene)
     : needInitialSkinMatrix{false}
     , overrideMesh{nullptr}
     , name{iName}
@@ -23,11 +22,8 @@ Skeleton::Skeleton(const std::string& iName, const std::string& iId,
     , _numBonesWithLinkedTransformNode{0}
     , _hasWaitingData{std::nullopt}
     , doNotSerialize{false}
-    , useTextureToStoreBoneMatrices{this,
-                                    &Skeleton::
-                                      get_useTextureToStoreBoneMatrices,
-                                    &Skeleton::
-                                      set_useTextureToStoreBoneMatrices}
+    , useTextureToStoreBoneMatrices{this, &Skeleton::get_useTextureToStoreBoneMatrices,
+                                    &Skeleton::set_useTextureToStoreBoneMatrices}
     , isUsingTextureForMatrices{this, &Skeleton::get_isUsingTextureForMatrices}
     , uniqueId{this, &Skeleton::get_uniqueId}
     , _isDirty{true}
@@ -48,8 +44,7 @@ Skeleton::Skeleton(const std::string& iName, const std::string& iId,
   _isDirty = true;
 
   const auto& engineCaps = _scene->getEngine()->getCaps();
-  _canUseTextureForBones
-    = engineCaps.textureFloat && engineCaps.maxVertexTextureImageUnits > 0;
+  _canUseTextureForBones = engineCaps.textureFloat && engineCaps.maxVertexTextureImageUnits > 0;
 }
 
 Skeleton::~Skeleton() = default;
@@ -99,8 +94,7 @@ AnimationPropertiesOverridePtr& Skeleton::get_animationPropertiesOverride()
   return _animationPropertiesOverride;
 }
 
-void Skeleton ::set_animationPropertiesOverride(
-  const AnimationPropertiesOverridePtr& value)
+void Skeleton ::set_animationPropertiesOverride(const AnimationPropertiesOverridePtr& value)
 {
   _animationPropertiesOverride = value;
 }
@@ -171,8 +165,7 @@ std::string Skeleton::toString(bool fullDetails)
 
 int Skeleton::getBoneIndexByName(const std::string& _name)
 {
-  for (size_t boneIndex = 0, cache = bones.size(); boneIndex < cache;
-       ++boneIndex) {
+  for (size_t boneIndex = 0, cache = bones.size(); boneIndex < cache; ++boneIndex) {
     if (bones[boneIndex]->name == _name) {
       return static_cast<int>(boneIndex);
     }
@@ -180,8 +173,7 @@ int Skeleton::getBoneIndexByName(const std::string& _name)
   return -1;
 }
 
-void Skeleton::createAnimationRange(const std::string& _name, float from,
-                                    float to)
+void Skeleton::createAnimationRange(const std::string& _name, float from, float to)
 {
   // check name not already in use
   if (!stl_util::contains(_ranges, _name)) {
@@ -240,10 +232,8 @@ bool Skeleton::copyAnimationRange(Skeleton* source, const std::string& _name,
   }
 
   if (bones.size() != sourceBones.size()) {
-    BABYLON_LOGF_WARN(
-      "Skeleton",
-      "copyAnimationRange: this rig has %zu bones, while source as %zu",
-      bones.size(), sourceBones.size())
+    BABYLON_LOGF_WARN("Skeleton", "copyAnimationRange: this rig has %zu bones, while source as %zu",
+                      bones.size(), sourceBones.size())
     ret = false;
   }
 
@@ -255,14 +245,12 @@ bool Skeleton::copyAnimationRange(Skeleton* source, const std::string& _name,
   for (const auto& bone : bones) {
     if (stl_util::contains(boneDict, bone->name)) {
       ret = ret
-            && bone->copyAnimationRange(boneDict[bone->name], _name,
-                                        static_cast<int>(frameOffset),
+            && bone->copyAnimationRange(boneDict[bone->name], _name, static_cast<int>(frameOffset),
                                         rescaleAsRequired, skelDimensionsRatio);
     }
     else {
-      BABYLON_LOGF_WARN(
-        "Skeleton", "copyAnimationRange: not same rig, missing source bone %s",
-        bone->name.c_str())
+      BABYLON_LOGF_WARN("Skeleton", "copyAnimationRange: not same rig, missing source bone %s",
+                        bone->name.c_str())
       ret = false;
     }
   }
@@ -270,8 +258,8 @@ bool Skeleton::copyAnimationRange(Skeleton* source, const std::string& _name,
   // was already done
   auto range = source->getAnimationRange(_name);
   if (range) {
-    _ranges[_name] = std::make_shared<AnimationRange>(
-      _name, range->from + frameOffset, range->to + frameOffset);
+    _ranges[_name]
+      = std::make_shared<AnimationRange>(_name, range->from + frameOffset, range->to + frameOffset);
   }
   return ret;
 }
@@ -297,10 +285,8 @@ float Skeleton::_getHighestAnimationFrame()
   return ret;
 }
 
-Animatable*
-Skeleton::beginAnimation(const std::string& _name, bool /*loop*/,
-                         float /*speedRatio*/,
-                         const std::function<void()>& /*onAnimationEnd*/)
+Animatable* Skeleton::beginAnimation(const std::string& _name, bool /*loop*/, float /*speedRatio*/,
+                                     const std::function<void()>& /*onAnimationEnd*/)
 {
   auto range = getAnimationRange(_name);
 
@@ -330,8 +316,8 @@ void Skeleton::_unregisterMeshWithPoseMatrix(AbstractMesh* mesh)
   stl_util::erase(_meshesWithPoseMatrix, mesh);
 }
 
-void Skeleton::_computeTransformMatrices(
-  Float32Array& targetMatrix, const std::optional<Matrix>& initialSkinMatrix)
+void Skeleton::_computeTransformMatrices(Float32Array& targetMatrix,
+                                         const std::optional<Matrix>& initialSkinMatrix)
 {
   onBeforeComputeObservable.notifyObservers(this);
 
@@ -341,13 +327,11 @@ void Skeleton::_computeTransformMatrices(
     auto parentBone = bone->getParent();
 
     if (parentBone) {
-      bone->getLocalMatrix().multiplyToRef(parentBone->getWorldMatrix(),
-                                           bone->getWorldMatrix());
+      bone->getLocalMatrix().multiplyToRef(parentBone->getWorldMatrix(), bone->getWorldMatrix());
     }
     else {
       if (initialSkinMatrix.has_value()) {
-        bone->getLocalMatrix().multiplyToRef(*initialSkinMatrix,
-                                             bone->getWorldMatrix());
+        bone->getLocalMatrix().multiplyToRef(*initialSkinMatrix, bone->getWorldMatrix());
       }
       else {
         bone->getWorldMatrix().copyFrom(bone->getLocalMatrix());
@@ -355,17 +339,15 @@ void Skeleton::_computeTransformMatrices(
     }
 
     if (!bone->_index.has_value() || *bone->_index != -1) {
-      auto mappedIndex = !bone->_index.has_value() ?
-                           index :
-                           static_cast<unsigned int>(*bone->_index);
-      bone->getInvertedAbsoluteTransform().multiplyToArray(
-        bone->getWorldMatrix(), targetMatrix, mappedIndex * 16);
+      auto mappedIndex
+        = !bone->_index.has_value() ? index : static_cast<unsigned int>(*bone->_index);
+      bone->getInvertedAbsoluteTransform().multiplyToArray(bone->getWorldMatrix(), targetMatrix,
+                                                           mappedIndex * 16);
     }
     ++index;
   }
 
-  _identity.copyToArray(targetMatrix,
-                        static_cast<unsigned int>(bones.size()) * 16);
+  _identity.copyToArray(targetMatrix, static_cast<unsigned int>(bones.size()) * 16);
 }
 
 void Skeleton::prepare()
@@ -410,18 +392,15 @@ void Skeleton::prepare()
         if (isUsingTextureForMatrices()) {
           const auto textureWidth = static_cast<int>((bones.size() + 1) * 4);
           if (!mesh->_transformMatrixTexture
-              || mesh->_transformMatrixTexture->getSize().width
-                   != textureWidth) {
+              || mesh->_transformMatrixTexture->getSize().width != textureWidth) {
 
             if (mesh->_transformMatrixTexture) {
               mesh->_transformMatrixTexture->dispose();
             }
 
             mesh->_transformMatrixTexture = RawTexture::CreateRGBATexture(
-              mesh->_bonesTransformMatrices,
-              static_cast<int>((bones.size() + 1) * 4), 1, _scene, false, false,
-              Constants::TEXTURE_NEAREST_SAMPLINGMODE,
-              Constants::TEXTURETYPE_FLOAT);
+              mesh->_bonesTransformMatrices, static_cast<int>((bones.size() + 1) * 4), 1, _scene,
+              false, false, Constants::TEXTURE_NEAREST_SAMPLINGMODE, Constants::TEXTURETYPE_FLOAT);
           }
         }
       }
@@ -443,9 +422,8 @@ void Skeleton::prepare()
         }
 
         _transformMatrixTexture = RawTexture::CreateRGBATexture(
-          _transformMatrices, static_cast<int>((bones.size() + 1) * 4), 1,
-          _scene, false, false, Constants::TEXTURE_NEAREST_SAMPLINGMODE,
-          Constants::TEXTURETYPE_FLOAT);
+          _transformMatrices, static_cast<int>((bones.size() + 1) * 4), 1, _scene, false, false,
+          Constants::TEXTURE_NEAREST_SAMPLINGMODE, Constants::TEXTURETYPE_FLOAT);
       }
     }
 
@@ -482,24 +460,6 @@ std::vector<AnimationPtr> Skeleton::getAnimations()
 std::unique_ptr<Skeleton> Skeleton::clone(const std::string& /*iName*/,
                                           const std::string& /*iId*/) const
 {
-  /*auto result = Skeleton::New(name, id, this->_scene);
-
-  for (auto source : bones) {
-    Bone* parentBone = nullptr;
-
-    if (source->getParent()) {
-      auto parentIndex
-        = find(begin(bones), end(bones), source->getParent()) - begin(bones);
-      parentBone = result->bones[parentIndex];
-    }
-
-    auto bone
-      = Bone::New(source->name, result, parentBone, source->getBaseMatrix());
-    Tools::DeepCopy(source->animations, bone->animations);
-  }
-
-  return result;*/
-
   return nullptr;
 }
 
@@ -513,8 +473,7 @@ void Skeleton::enableBlending(float blendingSpeed)
   }
 }
 
-void Skeleton::dispose(bool /*doNotRecurse*/,
-                       bool /*disposeMaterialAndTextures*/)
+void Skeleton::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextures*/)
 {
   _meshesWithPoseMatrix.clear();
 
@@ -537,36 +496,31 @@ json Skeleton::serialize() const
 
 SkeletonPtr Skeleton::Parse(const json& parsedSkeleton, Scene* scene)
 {
-  auto skeleton = Skeleton::New(
-    json_util::get_string(parsedSkeleton, "name"),
-    std::to_string(json_util::get_number(parsedSkeleton, "id", -1)), scene);
+  auto skeleton
+    = Skeleton::New(json_util::get_string(parsedSkeleton, "name"),
+                    std::to_string(json_util::get_number(parsedSkeleton, "id", -1)), scene);
   if (json_util::has_valid_key_value(parsedSkeleton, "dimensionsAtRest")) {
-    skeleton->dimensionsAtRest = std::make_unique<Vector3>(Vector3::FromArray(
-      json_util::get_array<float>(parsedSkeleton, "dimensionsAtRest")));
+    skeleton->dimensionsAtRest = std::make_unique<Vector3>(
+      Vector3::FromArray(json_util::get_array<float>(parsedSkeleton, "dimensionsAtRest")));
   }
 
-  skeleton->needInitialSkinMatrix
-    = json_util::get_bool(parsedSkeleton, "needInitialSkinMatrix");
+  skeleton->needInitialSkinMatrix = json_util::get_bool(parsedSkeleton, "needInitialSkinMatrix");
 
-  for (const auto& parsedBone :
-       json_util::get_array<json>(parsedSkeleton, "bones")) {
+  for (const auto& parsedBone : json_util::get_array<json>(parsedSkeleton, "bones")) {
     BonePtr parentBone = nullptr;
     if (json_util::get_number<int>(parsedBone, "parentBoneIndex", -1) > -1) {
-      auto parentBoneIndex = static_cast<size_t>(
-        json_util::get_number<int>(parsedBone, "parentBoneIndex", -1));
+      auto parentBoneIndex
+        = static_cast<size_t>(json_util::get_number<int>(parsedBone, "parentBoneIndex", -1));
       parentBone = skeleton->bones[parentBoneIndex];
     }
     std::optional<Matrix> rest = std::nullopt;
-    if (json_util::has_key(parsedBone, "rest")
-        && parsedBone["rest"].is_array()) {
+    if (json_util::has_key(parsedBone, "rest") && parsedBone["rest"].is_array()) {
       rest = Matrix::FromArray(json_util::get_array<float>(parsedBone, "rest"));
     }
 
-    auto bone = Bone::New(
-      json_util::get_string(parsedBone, "name"), skeleton.get(),
-      parentBone.get(),
-      Matrix::FromArray(json_util::get_array<float>(parsedBone, "matrix")),
-      rest);
+    auto bone
+      = Bone::New(json_util::get_string(parsedBone, "name"), skeleton.get(), parentBone.get(),
+                  Matrix::FromArray(json_util::get_array<float>(parsedBone, "matrix")), rest);
 
     if (json_util::has_valid_key_value(parsedBone, "id")) {
       bone->id = json_util::get_string(parsedBone, "id");
@@ -585,16 +539,14 @@ SkeletonPtr Skeleton::Parse(const json& parsedSkeleton, Scene* scene)
     }
 
     if (json_util::has_valid_key_value(parsedBone, "linkedTransformNodeId")) {
-      skeleton->_hasWaitingData = true;
-      bone->_waitingTransformNodeId
-        = json_util::get_string(parsedBone, "linkedTransformNodeId");
+      skeleton->_hasWaitingData     = true;
+      bone->_waitingTransformNodeId = json_util::get_string(parsedBone, "linkedTransformNodeId");
     }
   }
 
   // placed after bones, so createAnimationRange can cascade down
   if (json_util::has_key(parsedSkeleton, "ranges")) {
-    for (const auto& data :
-         json_util::get_array<json>(parsedSkeleton, "ranges")) {
+    for (const auto& data : json_util::get_array<json>(parsedSkeleton, "ranges")) {
       skeleton->createAnimationRange(json_util::get_string(data, "name"),
                                      json_util::get_number<float>(data, "from"),
                                      json_util::get_number<float>(data, "to"));
@@ -607,8 +559,7 @@ void Skeleton::computeAbsoluteTransforms(bool forceUpdate)
 {
   auto renderId = _scene->getRenderId();
 
-  if ((_lastAbsoluteTransformsUpdateId != renderId || forceUpdate)
-      && (!bones.empty())) {
+  if ((_lastAbsoluteTransformsUpdateId != renderId || forceUpdate) && (!bones.empty())) {
     bones[0]->computeAbsoluteTransforms();
     _lastAbsoluteTransformsUpdateId = renderId;
   }
@@ -651,10 +602,8 @@ void Skeleton::_sortBones(unsigned int index, std::vector<BonePtr>& iBones,
   }
 
   const auto boneIndexOf = [this](Bone* iBone) {
-    auto it
-      = std::find_if(bones.begin(), bones.end(), [&iBone](const BonePtr& bone) {
-          return bone.get() == iBone;
-        });
+    auto it = std::find_if(bones.begin(), bones.end(),
+                           [&iBone](const BonePtr& bone) { return bone.get() == iBone; });
     if (it != bones.end()) {
       return static_cast<int>(it - bones.begin());
     }

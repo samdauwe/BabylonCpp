@@ -67,19 +67,16 @@ public:
   /** Members **/
 
   /**
-   * @brief Gets the list of transform matrices to send to shaders (one matrix
-   * per bone).
-   * @param mesh defines the mesh to use to get the root matrix (if
-   * needInitialSkinMatrix === true)
+   * @brief Gets the list of transform matrices to send to shaders (one matrix per bone).
+   * @param mesh defines the mesh to use to get the root matrix (if needInitialSkinMatrix === true)
    * @returns a Float32Array containing matrices data
    */
   Float32Array& getTransformMatrices(AbstractMesh* mesh);
 
   /**
-   * @brief Gets the list of transform matrices to send to shaders inside a
-   * texture (one matrix per bone).
-   * @param mesh defines the mesh to use to get the root matrix (if
-   * needInitialSkinMatrix === true)
+   * @brief Gets the list of transform matrices to send to shaders inside a texture (one matrix per
+   * bone).
+   * @param mesh defines the mesh to use to get the root matrix (if needInitialSkinMatrix === true)
    * @returns a raw texture containing the data
    */
   RawTexturePtr& getTransformMatrixTexture(AbstractMesh* mesh);
@@ -94,8 +91,7 @@ public:
 
   /**
    * @brief Gets a string representing the current skeleton data.
-   * @param fullDetails defines a boolean indicating if we want a verbose
-   * version
+   * @param fullDetails defines a boolean indicating if we want a verbose version
    * @returns a string representing the current skeleton data
    */
   std::string toString(bool fullDetails = false);
@@ -137,8 +133,8 @@ public:
 
   /**
    * @brief Copy animation range from a source skeleton.
-   * This is not for a complete retargeting, only between very similar
-   * skeleton's with only possible bone length differences
+   * This is not for a complete retargeting, only between very similar skeleton's with only possible
+   * bone length differences
    * @param source defines the source skeleton
    * @param name defines the name of the range to copy
    * @param rescaleAsRequired defines if rescaling must be applied if required
@@ -157,8 +153,7 @@ public:
    * @param name defines the name of the range to start
    * @param loop defines if looping must be turned on (false by default)
    * @param speedRatio defines the speed ratio to apply (1 by default)
-   * @param onAnimationEnd defines a callback which will be called when
-   * animation will end
+   * @param onAnimationEnd defines a callback which will be called when animation will end
    * @returns a new animatable
    */
   Animatable* beginAnimation(const std::string& name, bool loop = false, float speedRatio = 1.f,
@@ -249,18 +244,16 @@ protected:
   Skeleton(const std::string& name, const std::string& id, Scene* scene);
 
   /**
-   * @brief Gets a boolean indicating that bone matrices should be stored as a
-   * texture instead of using shader uniforms (default is true).
-   * Please note that this option is not available if the hardware does not
-   * support it
+   * @brief Gets or sets a boolean indicating that bone matrices should be stored as a texture
+   * instead of using shader uniforms (default is true).
+   * Please note that this option is not available if the hardware does not support it
    */
   [[nodiscard]] bool get_useTextureToStoreBoneMatrices() const;
 
   /**
-   * @brief Sets a boolean indicating that bone matrices should be stored as a
-   * texture instead of using shader uniforms (default is true).
-   * Please note that this option is not available if the hardware does not
-   * support it
+   * @brief Sets a boolean indicating that bone matrices should be stored as a texture instead of
+   * using shader uniforms (default is true). Please note that this option is not available if the
+   * hardware does not support it
    */
   void set_useTextureToStoreBoneMatrices(bool value);
 
@@ -303,14 +296,13 @@ public:
   std::unique_ptr<Vector3> dimensionsAtRest;
 
   /**
-   * Defines a boolean indicating if the root matrix is provided by meshes or by
-   * the current skeleton (this is the default value)
+   * Defines a boolean indicating if the root matrix is provided by meshes or by the current
+   * skeleton (this is the default value)
    */
   bool needInitialSkinMatrix;
 
   /**
-   * Defines a mesh that override the matrix used to get the world matrix (null
-   * by default).
+   * Defines a mesh that override the matrix used to get the world matrix (null by default).
    */
   AbstractMeshPtr overrideMesh;
 
@@ -334,10 +326,9 @@ public:
   bool doNotSerialize;
 
   /**
-   * Gets or sets a boolean indicating that bone matrices should be stored as a
-   * texture instead of using shader uniforms (default is true).
-   * Please note that this option is not available if the hardware does not
-   * support it
+   * Gets or sets a boolean indicating that bone matrices should be stored as a texture instead of
+   * using shader uniforms (default is true). Please note that this option is not available if the
+   * hardware does not support it
    */
   Property<Skeleton, bool> useTextureToStoreBoneMatrices;
 
