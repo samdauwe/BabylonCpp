@@ -144,6 +144,10 @@ const char* lightFragment
         #elif defined(SHADOWESM{X})
             #if defined(SHADOWCUBE{X})
                 shadow = computeShadowWithESMCube(light{X}.vLightData.xyz, shadowSampler{X}, light{X}.shadowsInfo.x, light{X}.shadowsInfo.z, light{X}.depthValues);
+
+)ShaderCode"
+R"ShaderCode(
+
             #else
                 shadow = computeShadowWithESM(vPositionFromLight{X}, vDepthMetric{X}, shadowSampler{X}, light{X}.shadowsInfo.x, light{X}.shadowsInfo.z, light{X}.shadowsInfo.w);
             #endif

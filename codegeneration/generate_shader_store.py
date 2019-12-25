@@ -111,7 +111,7 @@ def processShaderFile(shaderPath, outputDir, definePath="BABYLON_SHADERS",
                 shader_code += "%s%s" % ("#endif", eol)
             else:
                 shader_code += "%s%s" % (lines[i].replace("\t", " " * 4).rstrip(), eol)
-            if len(shader_code) > 65000:
+            if len(shader_code) > 8192:
                 output += shader_code
                 output += "%s)ShaderCode\"%s" % (eol, eol)
                 output += "R\"ShaderCode(%s%s" % (eol, eol)

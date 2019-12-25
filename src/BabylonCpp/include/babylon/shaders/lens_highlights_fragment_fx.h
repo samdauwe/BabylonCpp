@@ -134,6 +134,10 @@ void main(void)
         blurred += highlightColor(texture2D(textureSampler, vUV + vec2(1.21*w, 2.88*h)));
         blurred += highlightColor(texture2D(textureSampler, vUV + vec2(-2.84*w, -1.30*h)));
         blurred += highlightColor(texture2D(textureSampler, vUV + vec2(2.98*w, -0.96*h)));
+
+)ShaderCode"
+R"ShaderCode(
+
 #endif
 
     blurred /= 39.0;

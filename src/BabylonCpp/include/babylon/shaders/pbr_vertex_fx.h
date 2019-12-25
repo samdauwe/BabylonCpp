@@ -358,6 +358,10 @@ void main(void) {
 #endif
 
 #ifdef SHEEN
+
+)ShaderCode"
+R"ShaderCode(
+
     #if defined(SHEEN_TEXTURE) && SHEEN_TEXTUREDIRECTUV == 0
         if (vSheenInfos.x == 0.)
         {
