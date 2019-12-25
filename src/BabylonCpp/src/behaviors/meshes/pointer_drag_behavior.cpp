@@ -12,8 +12,7 @@ namespace BABYLON {
 int PointerDragBehavior::_AnyMouseID                    = -2;
 std::unique_ptr<Scene> PointerDragBehavior::_planeScene = nullptr;
 
-PointerDragBehavior::PointerDragBehavior(
-  const PointerDragBehaviorOptions& iOptions)
+PointerDragBehavior::PointerDragBehavior(const PointerDragBehaviorOptions& iOptions)
     : attachedNode{nullptr}
     , maxDragAngle{0.f}
     , _useAlternatePickedPointAboveMaxDragAngle{false}
@@ -25,6 +24,7 @@ PointerDragBehavior::PointerDragBehavior(
     , startAndReleaseDragOnPointerEvents{true}
     , detachCameraControls{true}
     , useObjectOrienationForDragging{true}
+    , options{this, &PointerDragBehavior::get_options, &PointerDragBehavior::set_options}
     , _dragPlane{nullptr}
     , _scene{nullptr}
     , _pointerObserver{nullptr}
@@ -61,11 +61,20 @@ PointerDragBehavior::PointerDragBehavior(
       "expected");
   }
 
-  validateDrag
-    = [](const Vector3 & /*targetPosition*/) -> bool { return true; };
+  validateDrag = [](const Vector3 & /*targetPosition*/) -> bool { return true; };
 }
 
 PointerDragBehavior::~PointerDragBehavior() = default;
+
+PointerDragBehaviorOptions& PointerDragBehavior::get_options()
+{
+  return _options;
+}
+
+void PointerDragBehavior::set_options(const PointerDragBehaviorOptions& options)
+{
+  _options = options;
+}
 
 std::string PointerDragBehavior::name() const
 {
@@ -76,9 +85,8 @@ void PointerDragBehavior::init()
 {
 }
 
-void PointerDragBehavior::attach(
-  const AbstractMeshPtr& ownerNode,
-  const std::function<bool(const AbstractMeshPtr& m)>& predicate)
+void PointerDragBehavior::attach(const AbstractMeshPtr& ownerNode,
+                                 const std::function<bool(const AbstractMeshPtr& m)>& predicate)
 {
   _scene       = ownerNode->getScene();
   attachedNode = ownerNode;
@@ -92,22 +100,19 @@ void PointerDragBehavior::attach(
       PointerDragBehavior::_planeScene = Scene::New(_scene->getEngine());
       PointerDragBehavior::_planeScene->detachControl();
       _scene->getEngine()->scenes.pop_back();
-      _scene->onDisposeObservable.addOnce(
-        [](Scene* /*scene*/, EventState& /*es*/) {
-          PointerDragBehavior::_planeScene->dispose();
-          PointerDragBehavior::_planeScene = nullptr;
-        });
+      _scene->onDisposeObservable.addOnce([](Scene* /*scene*/, EventState& /*es*/) {
+        PointerDragBehavior::_planeScene->dispose();
+        PointerDragBehavior::_planeScene = nullptr;
+      });
     }
   }
   _dragPlane = Mesh::CreatePlane("pointerDragPlane", _debugMode ? 1.f : 10000.f,
-                                 PointerDragBehavior::_planeScene.get(), false,
-                                 Mesh::DOUBLESIDE);
+                                 PointerDragBehavior::_planeScene.get(), false, Mesh::DOUBLESIDE);
 
   // State of the drag
   Vector3 lastPosition{0.f, 0.f, 0.f};
 
-  const auto& pickPredicate
-    = predicate ? predicate : [this](const AbstractMeshPtr& m) -> bool {
+  const auto& pickPredicate = predicate ? predicate : [this](const AbstractMeshPtr& m) -> bool {
     return attachedNode == m || m->isDescendantOf(attachedNode.get());
   };
 
@@ -119,18 +124,15 @@ void PointerDragBehavior::attach(
 
       const auto& _pickInfo = pointerInfo->pickInfo;
       if (pointerInfo->type == PointerEventTypes::POINTERDOWN) {
-        if (startAndReleaseDragOnPointerEvents && !dragging && _pickInfo.hit
-            && _pickInfo.pickedMesh && _pickInfo.pickedPoint && _pickInfo.ray
-            && pickPredicate(_pickInfo.pickedMesh)) {
-          _startDrag(pointerInfo->pointerEvent.pointerId,
-                     pointerInfo->pickInfo.ray,
+        if (startAndReleaseDragOnPointerEvents && !dragging && _pickInfo.hit && _pickInfo.pickedMesh
+            && _pickInfo.pickedPoint && _pickInfo.ray && pickPredicate(_pickInfo.pickedMesh)) {
+          _startDrag(pointerInfo->pointerEvent.pointerId, pointerInfo->pickInfo.ray,
                      pointerInfo->pickInfo.pickedPoint);
         }
       }
       else if (pointerInfo->type == PointerEventTypes::POINTERUP) {
         if (startAndReleaseDragOnPointerEvents
-            && currentDraggingPointerID
-                 == pointerInfo->pointerEvent.pointerId) {
+            && currentDraggingPointerID == pointerInfo->pointerEvent.pointerId) {
           releaseDrag();
         }
       }
@@ -143,8 +145,7 @@ void PointerDragBehavior::attach(
             && pointerId != PointerDragBehavior::_AnyMouseID
             && (pointerInfo->pointerEvent.pointerType == PointerType::MOUSE)) {
           if (stl_util::contains(_lastPointerRay, currentDraggingPointerID)) {
-            _lastPointerRay[pointerId]
-              = _lastPointerRay[currentDraggingPointerID];
+            _lastPointerRay[pointerId] = _lastPointerRay[currentDraggingPointerID];
             _lastPointerRay.erase(currentDraggingPointerID);
           }
           currentDraggingPointerID = pointerId;
@@ -156,10 +157,8 @@ void PointerDragBehavior::attach(
           _lastPointerRay[pointerId] = Ray(Vector3(), Vector3());
         }
         if (pointerInfo->pickInfo.ray) {
-          _lastPointerRay[pointerId].origin.copyFrom(
-            pointerInfo->pickInfo.ray->origin);
-          _lastPointerRay[pointerId].direction.copyFrom(
-            pointerInfo->pickInfo.ray->direction);
+          _lastPointerRay[pointerId].origin.copyFrom(pointerInfo->pickInfo.ray->origin);
+          _lastPointerRay[pointerId].direction.copyFrom(pointerInfo->pickInfo.ray->direction);
           if (currentDraggingPointerID == pointerId && dragging) {
             _moveDrag(*pointerInfo->pickInfo.ray);
           }
@@ -167,21 +166,20 @@ void PointerDragBehavior::attach(
       }
     });
 
-  _beforeRenderObserver = _scene->onBeforeRenderObservable.add(
-    [&](Scene* /*scene*/, EventState& /*es*/) {
-      if (_moving && moveAttached) {
-        PivotTools::_RemoveAndStorePivotPoint(attachedNode);
-        // Slowly move mesh to avoid jitter
-        _targetPosition.subtractToRef(attachedNode->absolutePosition,
-                                      _tmpVector);
-        _tmpVector.scaleInPlace(dragDeltaRatio);
-        attachedNode->getAbsolutePosition().addToRef(_tmpVector, _tmpVector);
-        if (validateDrag(_tmpVector)) {
-          (attachedNode)->setAbsolutePosition(_tmpVector);
+  _beforeRenderObserver
+    = _scene->onBeforeRenderObservable.add([&](Scene* /*scene*/, EventState& /*es*/) {
+        if (_moving && moveAttached) {
+          PivotTools::_RemoveAndStorePivotPoint(attachedNode);
+          // Slowly move mesh to avoid jitter
+          _targetPosition.subtractToRef(attachedNode->absolutePosition, _tmpVector);
+          _tmpVector.scaleInPlace(dragDeltaRatio);
+          attachedNode->getAbsolutePosition().addToRef(_tmpVector, _tmpVector);
+          if (validateDrag(_tmpVector)) {
+            (attachedNode)->setAbsolutePosition(_tmpVector);
+          }
+          PivotTools::_RestorePivotPoint(attachedNode);
         }
-        PivotTools::_RestorePivotPoint(attachedNode);
-      }
-    });
+      });
 }
 
 void PointerDragBehavior::releaseDrag()
@@ -201,9 +199,8 @@ void PointerDragBehavior::releaseDrag()
   }
 }
 
-void PointerDragBehavior::startDrag(
-  int pointerId, const std::optional<Ray>& fromRay,
-  const std::optional<Vector3>& startPickedPoint)
+void PointerDragBehavior::startDrag(int pointerId, const std::optional<Ray>& fromRay,
+                                    const std::optional<Vector3>& startPickedPoint)
 {
   _startDrag(pointerId, fromRay, startPickedPoint);
 
@@ -211,8 +208,7 @@ void PointerDragBehavior::startDrag(
   if (stl_util::contains(_lastPointerRay, pointerId)) {
     lastRay = _lastPointerRay[pointerId];
   }
-  if (pointerId == PointerDragBehavior::_AnyMouseID
-      && stl_util::contains(_lastPointerRay, 0)) {
+  if (pointerId == PointerDragBehavior::_AnyMouseID && stl_util::contains(_lastPointerRay, 0)) {
     lastRay = _lastPointerRay[0];
   }
 
@@ -222,9 +218,8 @@ void PointerDragBehavior::startDrag(
   }
 }
 
-void PointerDragBehavior::_startDrag(
-  int pointerId, const std::optional<Ray>& fromRay,
-  const std::optional<Vector3>& startPickedPoint)
+void PointerDragBehavior::_startDrag(int pointerId, const std::optional<Ray>& fromRay,
+                                     const std::optional<Vector3>& startPickedPoint)
 {
   if (!_scene->activeCamera() || dragging || !attachedNode) {
     return;
@@ -239,12 +234,10 @@ void PointerDragBehavior::_startDrag(
   else {
     _startDragRay.origin.copyFrom(_scene->activeCamera()->position);
     attachedNode->getWorldMatrix().getTranslationToRef(_tmpVector);
-    _tmpVector.subtractToRef(_scene->activeCamera()->position,
-                             _startDragRay.direction);
+    _tmpVector.subtractToRef(_scene->activeCamera()->position, _startDragRay.direction);
   }
 
-  _updateDragPlanePosition(_startDragRay,
-                           startPickedPoint ? *startPickedPoint : _tmpVector);
+  _updateDragPlanePosition(_startDragRay, startPickedPoint ? *startPickedPoint : _tmpVector);
 
   auto pickedPoint = _pickWithRayOnDragPlane(_startDragRay);
   if (pickedPoint) {
@@ -257,16 +250,13 @@ void PointerDragBehavior::_startDrag(
     dragStartOrEndEvent.pointerId      = currentDraggingPointerID;
 
     onDragStartObservable.notifyObservers(&dragStartOrEndEvent);
-    _targetPosition.copyFrom(
-      std::dynamic_pointer_cast<Mesh>(attachedNode)->absolutePosition());
+    _targetPosition.copyFrom(std::dynamic_pointer_cast<Mesh>(attachedNode)->absolutePosition());
 
     // Detatch camera controls
-    if (detachCameraControls && _scene->activeCamera()
-        && !_scene->activeCamera()->leftCamera()) {
+    if (detachCameraControls && _scene->activeCamera() && !_scene->activeCamera()->leftCamera()) {
       if (_scene->activeCamera()->inputs.attachedElement) {
         _attachedElement = _scene->activeCamera()->inputs.attachedElement;
-        _scene->activeCamera()->detachControl(
-          _scene->activeCamera()->inputs.attachedElement);
+        _scene->activeCamera()->detachControl(_scene->activeCamera()->inputs.attachedElement);
       }
       else {
         _attachedElement = nullptr;
@@ -292,8 +282,7 @@ void PointerDragBehavior::_moveDrag(const Ray& ray)
       // Convert local drag axis to world if useObjectOrienationForDragging
       if (useObjectOrienationForDragging) {
         Vector3::TransformCoordinatesToRef(
-          *_options.dragAxis,
-          attachedNode->getWorldMatrix().getRotationMatrix(), _worldDragAxis);
+          *_options.dragAxis, attachedNode->getWorldMatrix().getRotationMatrix(), _worldDragAxis);
       }
       else {
         _worldDragAxis.copyFrom(*_options.dragAxis);
@@ -322,8 +311,7 @@ void PointerDragBehavior::_moveDrag(const Ray& ray)
   }
 }
 
-std::optional<Vector3>
-PointerDragBehavior::_pickWithRayOnDragPlane(const std::optional<Ray>& ray)
+std::optional<Vector3> PointerDragBehavior::_pickWithRayOnDragPlane(const std::optional<Ray>& ray)
 {
   if (!ray) {
     return std::nullopt;
@@ -342,12 +330,10 @@ PointerDragBehavior::_pickWithRayOnDragPlane(const std::optional<Ray>& ray)
     if (_useAlternatePickedPointAboveMaxDragAngle) {
       // Invert ray direction along the towards object axis
       _tmpVector.copyFrom((*ray).direction);
-      attachedNode->absolutePosition().subtractToRef((*ray).origin,
-                                                     _alternatePickedPoint);
+      attachedNode->absolutePosition().subtractToRef((*ray).origin, _alternatePickedPoint);
       _alternatePickedPoint.normalize();
-      _alternatePickedPoint.scaleInPlace(
-        _useAlternatePickedPointAboveMaxDragAngleDragSpeed
-        * Vector3::Dot(_alternatePickedPoint, _tmpVector));
+      _alternatePickedPoint.scaleInPlace(_useAlternatePickedPointAboveMaxDragAngleDragSpeed
+                                         * Vector3::Dot(_alternatePickedPoint, _tmpVector));
       _tmpVector.addInPlace(_alternatePickedPoint);
 
       // Project resulting vector onto the drag plane and add it to the attached
@@ -365,8 +351,7 @@ PointerDragBehavior::_pickWithRayOnDragPlane(const std::optional<Ray>& ray)
 
   auto pickResult = PointerDragBehavior::_planeScene->pickWithRay(
     *ray, [this](const AbstractMeshPtr& m) -> bool { return m == _dragPlane; });
-  if (pickResult && (*pickResult).hit && (*pickResult).pickedMesh
-      && (*pickResult).pickedPoint) {
+  if (pickResult && (*pickResult).hit && (*pickResult).pickedMesh && (*pickResult).pickedPoint) {
     return (*pickResult).pickedPoint;
   }
   else {
@@ -374,15 +359,13 @@ PointerDragBehavior::_pickWithRayOnDragPlane(const std::optional<Ray>& ray)
   }
 }
 
-void PointerDragBehavior::_updateDragPlanePosition(
-  const Ray& ray, const Vector3& dragPlanePosition)
+void PointerDragBehavior::_updateDragPlanePosition(const Ray& ray, const Vector3& dragPlanePosition)
 {
   _pointA.copyFrom(dragPlanePosition);
   if (_options.dragAxis) {
     if (useObjectOrienationForDragging) {
       Vector3::TransformCoordinatesToRef(
-        *_options.dragAxis, attachedNode->getWorldMatrix().getRotationMatrix(),
-        _localAxis);
+        *_options.dragAxis, attachedNode->getWorldMatrix().getRotationMatrix(), _localAxis);
     }
     else {
       _localAxis.copyFrom(*_options.dragAxis);
@@ -409,8 +392,7 @@ void PointerDragBehavior::_updateDragPlanePosition(
   else if (_options.dragPlaneNormal) {
     if (useObjectOrienationForDragging) {
       Vector3::TransformCoordinatesToRef(
-        *_options.dragPlaneNormal,
-        attachedNode->getWorldMatrix().getRotationMatrix(), _localAxis);
+        *_options.dragPlaneNormal, attachedNode->getWorldMatrix().getRotationMatrix(), _localAxis);
     }
     else {
       _localAxis.copyFrom(*_options.dragPlaneNormal);

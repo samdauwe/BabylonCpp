@@ -21,17 +21,17 @@ using MeshPtr         = std::shared_ptr<Mesh>;
 using NodePtr         = std::shared_ptr<Node>;
 
 /**
- * @brief A behavior that when attached to a mesh will allow the mesh to be
- * dragged around the screen based on pointer events.
+ * @brief A behavior that when attached to a mesh will allow the mesh to be dragged around the
+ * screen based on pointer events.
  */
 class BABYLON_SHARED_EXPORT PointerDragBehavior : public Behavior<AbstractMesh> {
 
 public:
   /**
    * @brief Creates a pointer drag behavior that can be attached to a mesh.
-   * @param options The drag axis or normal of the plane that will be dragged
-   * across. pointerObservableScene can be used to listen to drag events from
-   * another scene(eg. if the attached mesh is in an overlay scene).
+   * @param options The drag axis or normal of the plane that will be dragged across.
+   * pointerObservableScene can be used to listen to drag events from another scene(eg. if the
+   * attached mesh is in an overlay scene).
    */
   PointerDragBehavior(const PointerDragBehaviorOptions& options = PointerDragBehaviorOptions());
   ~PointerDragBehavior() override; // = default
@@ -63,10 +63,10 @@ public:
    * @brief Simulates the start of a pointer drag event on the behavior.
    * @param pointerId pointerID of the pointer that should be simulated
    * (Default: Any mouse pointer ID)
-   * @param fromRay initial ray of the pointer to be simulated (Default: Ray
-   * from camera to attached mesh)
-   * @param startPickedPoint picked point of the pointer to be simulated
-   * (Default: attached mesh position)
+   * @param fromRay initial ray of the pointer to be simulated (Default: Ray from camera to attached
+   * mesh)
+   * @param startPickedPoint picked point of the pointer to be simulated (Default: attached mesh
+   * position)
    */
   void startDrag(int pointerId                                  = PointerDragBehavior::_AnyMouseID,
                  const std::optional<Ray>& fromRay              = std::nullopt,
@@ -77,6 +77,17 @@ public:
    */
   void detach() override;
 
+protected:
+  /**
+   * @brief Gets the options used by the behavior.
+   */
+  PointerDragBehaviorOptions& get_options();
+
+  /**
+   * @brief Sets the options used by the behavior.
+   */
+  void set_options(const PointerDragBehaviorOptions& options);
+
 private:
   void _startDrag(int pointerId = 1, const std::optional<Ray>& fromRay = std::nullopt,
                   const std::optional<Vector3>& startPickedPoint = std::nullopt);
@@ -84,8 +95,8 @@ private:
   std::optional<Vector3> _pickWithRayOnDragPlane(const std::optional<Ray>& ray);
 
   /**
-   * @brief Position the drag plane based on the attached mesh position, for
-   * single axis rotate the plane along the axis to face the camera.
+   * @brief Position the drag plane based on the attached mesh position, for single axis rotate the
+   * plane along the axis to face the camera.
    */
   void _updateDragPlanePosition(const Ray& ray, const Vector3& dragPlanePosition);
 
@@ -96,8 +107,8 @@ public:
   AbstractMeshPtr attachedNode;
 
   /**
-   * The maximum tolerated angle between the drag plane and dragging pointer
-   * rays to trigger pointer events. Set to 0 to allow any angle (default: 0)
+   * The maximum tolerated angle between the drag plane and dragging pointer rays to trigger pointer
+   * events. Set to 0 to allow any angle (default: 0)
    */
   float maxDragAngle;
 
@@ -107,8 +118,8 @@ public:
   bool _useAlternatePickedPointAboveMaxDragAngle;
 
   /**
-   * The id of the pointer that is currently interacting with the behavior (-1
-   * when no pointer is active)
+   * The id of the pointer that is currently interacting with the behavior (-1 when no pointer is
+   * active)
    */
   int currentDraggingPointerID;
 
@@ -123,21 +134,19 @@ public:
   bool dragging;
 
   /**
-   * The distance towards the target drag position to move each frame. This
-   * can be useful to avoid jitter. Set this to 1 for no delay. (Default: 0.2)
+   * The distance towards the target drag position to move each frame. This can be useful to avoid
+   * jitter. Set this to 1 for no delay. (Default: 0.2)
    */
   float dragDeltaRatio;
 
   /**
-   * If the drag plane orientation should be updated during the dragging
-   * (Default: true)
+   * If the drag plane orientation should be updated during the dragging (Default: true)
    */
   bool updateDragPlane;
 
   /**
    *  Fires each time the attached mesh is dragged with the pointer
-   *  * delta between last drag position and current drag position in world
-   *    space
+   *  * delta between last drag position and current drag position in world space
    *  * dragDistance along the drag axis
    *  * dragPlaneNormal normal of the current drag plane used during the drag
    *  * dragPlanePoint in world space where the drag intersects the drag plane
@@ -175,14 +184,18 @@ public:
   bool detachCameraControls;
 
   /**
-   * If set, the drag plane/axis will be rotated based on the attached mesh's
-   * world rotation (Default: true)
+   * If set, the drag plane/axis will be rotated based on the attached mesh's world rotation
+   * (Default: true)
    */
   bool useObjectOrienationForDragging;
 
   /**
-   * Predicate to determine if it is valid to move the object to a new position
-   * when it is moved
+   * Gets or sets the options used by the behavior.
+   */
+  Property<PointerDragBehavior, PointerDragBehaviorOptions> options;
+
+  /**
+   * Predicate to determine if it is valid to move the object to a new position when it is moved
    */
   std::function<bool(const Vector3& targetPosition)> validateDrag;
 
@@ -202,8 +215,8 @@ private:
 
   /**
    * The drag axis or normal of the plane that will be dragged across.
-   * pointerObservableScene can be used to listen to drag events from another
-   * scene(eg. if the attached mesh is in an overlay scene)
+   * pointerObservableScene can be used to listen to drag events from another scene(eg. if the
+   * attached mesh is in an overlay scene)
    */
   PointerDragBehaviorOptions _options;
 
