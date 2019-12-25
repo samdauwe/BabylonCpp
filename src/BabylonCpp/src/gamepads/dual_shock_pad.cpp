@@ -6,43 +6,31 @@
 
 namespace BABYLON {
 
-DualShockPad::DualShockPad(const std::string& iId, int iIndex,
-                           const IBrowserGamepadPtr& gamepad)
-    : Gamepad{String::replace(iId, "STANDARD GAMEPAD",
-                              "SONY PLAYSTATION DUALSHOCK"),
+DualShockPad::DualShockPad(const std::string& iId, int iIndex, const IBrowserGamepadPtr& gamepad)
+    : Gamepad{String::replace(iId, "STANDARD GAMEPAD", "SONY PLAYSTATION DUALSHOCK"),
               iIndex,
               gamepad,
               0,
               1,
               2,
               3}
-    , leftTrigger{this, &DualShockPad::get_leftTrigger,
-                  &DualShockPad::set_leftTrigger}
-    , rightTrigger{this, &DualShockPad::get_rightTrigger,
-                   &DualShockPad::set_rightTrigger}
-    , buttonCross{this, &DualShockPad::get_buttonCross,
-                  &DualShockPad::set_buttonCross}
-    , buttonCircle{this, &DualShockPad::get_buttonCircle,
-                   &DualShockPad::set_buttonCircle}
-    , buttonSquare{this, &DualShockPad::get_buttonSquare,
-                   &DualShockPad::set_buttonSquare}
-    , buttonTriangle{this, &DualShockPad::get_buttonTriangle,
-                     &DualShockPad::set_buttonTriangle}
-    , buttonOptions{this, &DualShockPad::get_buttonOptions,
-                    &DualShockPad::set_buttonOptions}
-    , buttonShare{this, &DualShockPad::get_buttonShare,
-                  &DualShockPad::set_buttonShare}
+    , leftTrigger{this, &DualShockPad::get_leftTrigger, &DualShockPad::set_leftTrigger}
+    , rightTrigger{this, &DualShockPad::get_rightTrigger, &DualShockPad::set_rightTrigger}
+    , buttonCross{this, &DualShockPad::get_buttonCross, &DualShockPad::set_buttonCross}
+    , buttonCircle{this, &DualShockPad::get_buttonCircle, &DualShockPad::set_buttonCircle}
+    , buttonSquare{this, &DualShockPad::get_buttonSquare, &DualShockPad::set_buttonSquare}
+    , buttonTriangle{this, &DualShockPad::get_buttonTriangle, &DualShockPad::set_buttonTriangle}
+    , buttonOptions{this, &DualShockPad::get_buttonOptions, &DualShockPad::set_buttonOptions}
+    , buttonShare{this, &DualShockPad::get_buttonShare, &DualShockPad::set_buttonShare}
     , buttonL1{this, &DualShockPad::get_buttonL1, &DualShockPad::set_buttonL1}
     , buttonR1{this, &DualShockPad::get_buttonR1, &DualShockPad::set_buttonR1}
-    , buttonLeftStick{this, &DualShockPad::get_buttonLeftStick,
-                      &DualShockPad::set_buttonLeftStick}
+    , buttonLeftStick{this, &DualShockPad::get_buttonLeftStick, &DualShockPad::set_buttonLeftStick}
     , buttonRightStick{this, &DualShockPad::get_buttonRightStick,
                        &DualShockPad::set_buttonRightStick}
     , dPadUp{this, &DualShockPad::get_dPadUp, &DualShockPad::set_dPadUp}
     , dPadDown{this, &DualShockPad::get_dPadDown, &DualShockPad::set_dPadDown}
     , dPadLeft{this, &DualShockPad::get_dPadLeft, &DualShockPad::set_dPadLeft}
-    , dPadRight{this, &DualShockPad::get_dPadRight,
-                &DualShockPad::set_dPadRight}
+    , dPadRight{this, &DualShockPad::get_dPadRight, &DualShockPad::set_dPadRight}
     , _leftTrigger{0.f}
     , _rightTrigger{0.f}
     , _onlefttriggerchanged{nullptr}
@@ -71,8 +59,7 @@ DualShockPad::DualShockPad(const std::string& iId, int iIndex,
 
 DualShockPad::~DualShockPad() = default;
 
-void DualShockPad::onrighttriggerchanged(
-  const std::function<void(float value)>& callback)
+void DualShockPad::onrighttriggerchanged(const std::function<void(float value)>& callback)
 {
   _onrighttriggerchanged = callback;
 }
@@ -84,8 +71,7 @@ float DualShockPad::get_leftTrigger() const
 
 void DualShockPad::set_leftTrigger(float newValue)
 {
-  if (_onlefttriggerchanged
-      && !stl_util::almost_equal(_leftTrigger, newValue)) {
+  if (_onlefttriggerchanged && !stl_util::almost_equal(_leftTrigger, newValue)) {
     _onlefttriggerchanged(newValue);
   }
   _leftTrigger = newValue;
@@ -98,23 +84,20 @@ float DualShockPad::get_rightTrigger() const
 
 void DualShockPad::set_rightTrigger(float newValue)
 {
-  if (_onrighttriggerchanged
-      && !stl_util::almost_equal(_rightTrigger, newValue)) {
+  if (_onrighttriggerchanged && !stl_util::almost_equal(_rightTrigger, newValue)) {
     _onrighttriggerchanged(newValue);
   }
   _rightTrigger = newValue;
 }
 
 void DualShockPad::onbuttondown(
-  const std::function<void(DualShockPad::DualShockButton buttonPressed)>&
-    callback)
+  const std::function<void(DualShockPad::DualShockButton buttonPressed)>& callback)
 {
   _onbuttondown = callback;
 }
 
 void DualShockPad::onbuttonup(
-  const std::function<void(DualShockPad::DualShockButton buttonReleased)>&
-    callback)
+  const std::function<void(DualShockPad::DualShockButton buttonReleased)>& callback)
 {
   _onbuttonup = callback;
 }
@@ -131,8 +114,7 @@ void DualShockPad::ondpadup(
   _ondpadup = callback;
 }
 
-unsigned int DualShockPad::_setButtonValue(unsigned int newValue,
-                                           unsigned int currentValue,
+unsigned int DualShockPad::_setButtonValue(unsigned int newValue, unsigned int currentValue,
                                            DualShockButton buttonType)
 {
   if (newValue != currentValue) {
@@ -155,8 +137,7 @@ unsigned int DualShockPad::_setButtonValue(unsigned int newValue,
   return newValue;
 }
 
-unsigned int DualShockPad::_setDPadValue(unsigned int newValue,
-                                         unsigned int currentValue,
+unsigned int DualShockPad::_setDPadValue(unsigned int newValue, unsigned int currentValue,
                                          DualShockDpad buttonType)
 {
   if (newValue != currentValue) {
@@ -195,8 +176,7 @@ unsigned int DualShockPad::get_buttonCircle() const
 
 void DualShockPad::set_buttonCircle(unsigned int value)
 {
-  _buttonCircle
-    = _setButtonValue(value, _buttonCircle, DualShockButton::Circle);
+  _buttonCircle = _setButtonValue(value, _buttonCircle, DualShockButton::Circle);
 }
 
 unsigned int DualShockPad::get_buttonSquare() const
@@ -206,8 +186,7 @@ unsigned int DualShockPad::get_buttonSquare() const
 
 void DualShockPad::set_buttonSquare(unsigned int value)
 {
-  _buttonSquare
-    = _setButtonValue(value, _buttonSquare, DualShockButton::Square);
+  _buttonSquare = _setButtonValue(value, _buttonSquare, DualShockButton::Square);
 }
 
 unsigned int DualShockPad::get_buttonTriangle() const
@@ -217,8 +196,7 @@ unsigned int DualShockPad::get_buttonTriangle() const
 
 void DualShockPad::set_buttonTriangle(unsigned int value)
 {
-  _buttonTriangle
-    = _setButtonValue(value, _buttonTriangle, DualShockButton::Triangle);
+  _buttonTriangle = _setButtonValue(value, _buttonTriangle, DualShockButton::Triangle);
 }
 
 unsigned int DualShockPad::get_buttonOptions() const
@@ -228,8 +206,7 @@ unsigned int DualShockPad::get_buttonOptions() const
 
 void DualShockPad::set_buttonOptions(unsigned int value)
 {
-  _buttonOptions
-    = _setButtonValue(value, _buttonOptions, DualShockButton::Options);
+  _buttonOptions = _setButtonValue(value, _buttonOptions, DualShockButton::Options);
 }
 
 unsigned int DualShockPad::get_buttonShare() const
@@ -269,8 +246,7 @@ unsigned int DualShockPad::get_buttonLeftStick() const
 
 void DualShockPad::set_buttonLeftStick(unsigned int value)
 {
-  _buttonLeftStick
-    = _setButtonValue(value, _buttonLeftStick, DualShockButton::LeftStick);
+  _buttonLeftStick = _setButtonValue(value, _buttonLeftStick, DualShockButton::LeftStick);
 }
 
 unsigned int DualShockPad::get_buttonRightStick() const
@@ -280,8 +256,7 @@ unsigned int DualShockPad::get_buttonRightStick() const
 
 void DualShockPad::set_buttonRightStick(unsigned int value)
 {
-  _buttonRightStick
-    = _setButtonValue(value, _buttonRightStick, DualShockButton::RightStick);
+  _buttonRightStick = _setButtonValue(value, _buttonRightStick, DualShockButton::RightStick);
 }
 
 unsigned int DualShockPad::get_dPadUp() const

@@ -5,26 +5,21 @@
 
 namespace BABYLON {
 
-Xbox360Pad::Xbox360Pad(const std::string& iId, int iIndex,
-                       const IBrowserGamepadPtr& gamepad, bool xboxOne)
+Xbox360Pad::Xbox360Pad(const std::string& iId, int iIndex, const IBrowserGamepadPtr& gamepad,
+                       bool xboxOne)
     : Gamepad(iId, iIndex, gamepad, 0, 1, 2, 3)
-    , leftTrigger{this, &Xbox360Pad::get_leftTrigger,
-                  &Xbox360Pad::set_leftTrigger}
-    , rightTrigger{this, &Xbox360Pad::get_rightTrigger,
-                   &Xbox360Pad::set_rightTrigger}
+    , leftTrigger{this, &Xbox360Pad::get_leftTrigger, &Xbox360Pad::set_leftTrigger}
+    , rightTrigger{this, &Xbox360Pad::get_rightTrigger, &Xbox360Pad::set_rightTrigger}
     , buttonA{this, &Xbox360Pad::get_buttonA, &Xbox360Pad::set_buttonA}
     , buttonB{this, &Xbox360Pad::get_buttonB, &Xbox360Pad::set_buttonB}
     , buttonX{this, &Xbox360Pad::get_buttonX, &Xbox360Pad::set_buttonX}
     , buttonY{this, &Xbox360Pad::get_buttonY, &Xbox360Pad::set_buttonY}
-    , buttonStart{this, &Xbox360Pad::get_buttonStart,
-                  &Xbox360Pad::set_buttonStart}
+    , buttonStart{this, &Xbox360Pad::get_buttonStart, &Xbox360Pad::set_buttonStart}
     , buttonBack{this, &Xbox360Pad::get_buttonBack, &Xbox360Pad::set_buttonBack}
     , buttonLB{this, &Xbox360Pad::get_buttonLB, &Xbox360Pad::set_buttonLB}
     , buttonRB{this, &Xbox360Pad::get_buttonRB, &Xbox360Pad::set_buttonRB}
-    , buttonLeftStick{this, &Xbox360Pad::get_buttonLeftStick,
-                      &Xbox360Pad::set_buttonLeftStick}
-    , buttonRightStick{this, &Xbox360Pad::get_buttonRightStick,
-                       &Xbox360Pad::set_buttonRightStick}
+    , buttonLeftStick{this, &Xbox360Pad::get_buttonLeftStick, &Xbox360Pad::set_buttonLeftStick}
+    , buttonRightStick{this, &Xbox360Pad::get_buttonRightStick, &Xbox360Pad::set_buttonRightStick}
     , dPadUp{this, &Xbox360Pad::get_dPadUp, &Xbox360Pad::set_dPadUp}
     , dPadDown{this, &Xbox360Pad::get_dPadDown, &Xbox360Pad::set_dPadDown}
     , dPadLeft{this, &Xbox360Pad::get_dPadLeft, &Xbox360Pad::set_dPadLeft}
@@ -52,14 +47,12 @@ Xbox360Pad::Xbox360Pad(const std::string& iId, int iIndex,
 
 Xbox360Pad::~Xbox360Pad() = default;
 
-void Xbox360Pad::setOnlefttriggerchanged(
-  const std::function<void(float value)>& callback)
+void Xbox360Pad::setOnlefttriggerchanged(const std::function<void(float value)>& callback)
 {
   _onlefttriggerchanged = callback;
 }
 
-void Xbox360Pad::onrighttriggerchanged(
-  const std::function<void(float value)>& callback)
+void Xbox360Pad::onrighttriggerchanged(const std::function<void(float value)>& callback)
 {
   _onrighttriggerchanged = callback;
 }
@@ -71,8 +64,7 @@ float Xbox360Pad::get_leftTrigger() const
 
 void Xbox360Pad::set_leftTrigger(float newValue)
 {
-  if (_onlefttriggerchanged
-      && !stl_util::almost_equal(_leftTrigger, newValue)) {
+  if (_onlefttriggerchanged && !stl_util::almost_equal(_leftTrigger, newValue)) {
     _onlefttriggerchanged(newValue);
   }
   _leftTrigger = newValue;
@@ -85,39 +77,33 @@ float Xbox360Pad::get_rightTrigger() const
 
 void Xbox360Pad::set_rightTrigger(float newValue)
 {
-  if (_onrighttriggerchanged
-      && !stl_util::almost_equal(_rightTrigger, newValue)) {
+  if (_onrighttriggerchanged && !stl_util::almost_equal(_rightTrigger, newValue)) {
     _onrighttriggerchanged(newValue);
   }
   _rightTrigger = newValue;
 }
 
-void Xbox360Pad::onbuttondown(
-  const std::function<void(Xbox360Button buttonPressed)>& callback)
+void Xbox360Pad::onbuttondown(const std::function<void(Xbox360Button buttonPressed)>& callback)
 {
   _onbuttondown = callback;
 }
 
-void Xbox360Pad::onbuttonup(
-  const std::function<void(Xbox360Button buttonReleased)>& callback)
+void Xbox360Pad::onbuttonup(const std::function<void(Xbox360Button buttonReleased)>& callback)
 {
   _onbuttonup = callback;
 }
 
-void Xbox360Pad::ondpaddown(
-  const std::function<void(Xbox360Dpad dPadPressed)>& callback)
+void Xbox360Pad::ondpaddown(const std::function<void(Xbox360Dpad dPadPressed)>& callback)
 {
   _ondpaddown = callback;
 }
 
-void Xbox360Pad::ondpadup(
-  const std::function<void(Xbox360Dpad dPadReleased)>& callback)
+void Xbox360Pad::ondpadup(const std::function<void(Xbox360Dpad dPadReleased)>& callback)
 {
   _ondpadup = callback;
 }
 
-unsigned int Xbox360Pad::_setButtonValue(unsigned int newValue,
-                                         unsigned int currentValue,
+unsigned int Xbox360Pad::_setButtonValue(unsigned int newValue, unsigned int currentValue,
                                          Xbox360Button buttonType)
 {
   if (newValue != currentValue) {
@@ -140,8 +126,7 @@ unsigned int Xbox360Pad::_setButtonValue(unsigned int newValue,
   return newValue;
 }
 
-unsigned int Xbox360Pad::_setDPadValue(unsigned int newValue,
-                                       unsigned int currentValue,
+unsigned int Xbox360Pad::_setDPadValue(unsigned int newValue, unsigned int currentValue,
                                        Xbox360Dpad buttonType)
 {
   if (newValue != currentValue) {
@@ -250,8 +235,7 @@ unsigned int Xbox360Pad::get_buttonLeftStick() const
 
 void Xbox360Pad::set_buttonLeftStick(unsigned int value)
 {
-  _buttonLeftStick
-    = _setButtonValue(value, _buttonLeftStick, Xbox360Button::LeftStick);
+  _buttonLeftStick = _setButtonValue(value, _buttonLeftStick, Xbox360Button::LeftStick);
 }
 
 unsigned int Xbox360Pad::get_buttonRightStick() const
@@ -261,8 +245,7 @@ unsigned int Xbox360Pad::get_buttonRightStick() const
 
 void Xbox360Pad::set_buttonRightStick(unsigned int value)
 {
-  _buttonRightStick
-    = _setButtonValue(value, _buttonRightStick, Xbox360Button::RightStick);
+  _buttonRightStick = _setButtonValue(value, _buttonRightStick, Xbox360Button::RightStick);
 }
 
 unsigned int Xbox360Pad::get_dPadUp() const

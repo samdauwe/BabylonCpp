@@ -6,15 +6,12 @@
 
 namespace BABYLON {
 
-bool DaydreamControllerFactory::canCreate(
-  const IBrowserGamepadPtr& gamepadInfo) const
+bool DaydreamControllerFactory::canCreate(const IBrowserGamepadPtr& gamepadInfo) const
 {
-  return String::startsWith(gamepadInfo->id,
-                            DaydreamController::GAMEPAD_ID_PREFIX);
+  return String::startsWith(gamepadInfo->id, DaydreamController::GAMEPAD_ID_PREFIX);
 }
 
-WebVRControllerPtr
-DaydreamControllerFactory::create(const IBrowserGamepadPtr& gamepadInfo) const
+WebVRControllerPtr DaydreamControllerFactory::create(const IBrowserGamepadPtr& gamepadInfo) const
 {
   return DaydreamController::New(gamepadInfo);
 }
@@ -31,13 +28,11 @@ void DaydreamController::initControllerMesh(
   Scene* scene, const std::function<void(AbstractMesh* mesh)>& meshLoaded)
 {
   SceneLoader::ImportMesh(
-    {}, DaydreamController::MODEL_BASE_URL, DaydreamController::MODEL_FILENAME,
-    scene,
-    [this,
-     &meshLoaded](const std::vector<AbstractMeshPtr>& newMeshes,
-                  const std::vector<IParticleSystemPtr>& /*particleSystems*/,
-                  const std::vector<SkeletonPtr>& /*skeletons*/,
-                  const std::vector<AnimationGroupPtr>& /*animationGroups*/) {
+    {}, DaydreamController::MODEL_BASE_URL, DaydreamController::MODEL_FILENAME, scene,
+    [this, &meshLoaded](const std::vector<AbstractMeshPtr>& newMeshes,
+                        const std::vector<IParticleSystemPtr>& /*particleSystems*/,
+                        const std::vector<SkeletonPtr>& /*skeletons*/,
+                        const std::vector<AnimationGroupPtr>& /*animationGroups*/) {
       _defaultModel = newMeshes[1];
       attachToMesh(_defaultModel);
       if (meshLoaded) {
@@ -46,9 +41,9 @@ void DaydreamController::initControllerMesh(
     });
 }
 
-void DaydreamController::_handleButtonChange(
-  unsigned int buttonIdx, const ExtendedGamepadButton& state,
-  const GamepadButtonChanges& /*changes*/)
+void DaydreamController::_handleButtonChange(unsigned int buttonIdx,
+                                             const ExtendedGamepadButton& state,
+                                             const GamepadButtonChanges& /*changes*/)
 {
   // Daydream controller only has 1 GamepadButton (on the trackpad).
   if (buttonIdx == 0) {
@@ -60,8 +55,7 @@ void DaydreamController::_handleButtonChange(
   }
   else {
     // If the app or home buttons are ever made available
-    BABYLON_LOGF_WARN("DaydreamController",
-                      "Unrecognized Daydream button index: %d", buttonIdx)
+    BABYLON_LOGF_WARN("DaydreamController", "Unrecognized Daydream button index: %d", buttonIdx)
   }
 }
 

@@ -46,7 +46,11 @@ WindowsMotionController::WindowsMotionController(
         &WindowsMotionController::get_onTouchpadValuesChangedObservable}
     , trackpad{0.f,0.f}
     , _loadedMeshInfo{std::nullopt}
+    // Semantic button names
     ,_mappingButtons{"thumbstick", "trigger", "grip", "menu", "trackpad"}
+    // trigger, grip, trackpad, thumbstick, menu
+    // A mapping of the button name to glTF model node name
+    // that should be transformed by button value.
     , _mappingButtonMeshNames{              //
         {"trigger", "SELECT"},              //
         {"menu", "MENU"},                   //
@@ -54,6 +58,7 @@ WindowsMotionController::WindowsMotionController(
         {"thumbstick", "THUMBSTICK_PRESS"}, //
         {"trackpad", "TOUCHPAD_PRESS"}      //
     }                                       //
+    // This mapping is used to translate from the Motion Controller to Babylon semantics
     ,_mappingButtonObservableNames {                         //
         {"trigger", "onTriggerStateChangedObservable"},      //
         {"menu", "onSecondaryButtonStateChangedObservable"}, //
@@ -61,12 +66,17 @@ WindowsMotionController::WindowsMotionController(
         {"thumbstick", "onPadStateChangedObservable"},       //
         {"trackpad", "onTrackpadChangedObservable"}          //
     }                                                        //
+    // A mapping of the axis name to glTF model node name
+    // that should be transformed by axis value.
+    // This array mirrors the browserGamepad.axes array, such that
+    // the mesh corresponding to axis 0 is in this array index 0.
     ,_mappingAxisMeshNames{ //
         "THUMBSTICK_X",     //
         "THUMBSTICK_Y",     //
         "TOUCHPAD_TOUCH_X", //
         "TOUCHPAD_TOUCH_Y"  //
     }                       //
+    // upside down in webxr
     ,_mappingPointingPoseMeshName{ PoseEnabledController::POINTING_POSE}
 
 {
@@ -113,8 +123,10 @@ void WindowsMotionController::_updateTrackpad()
   if (browserGamepad->axes.size() >= 4) {
     if (!stl_util::almost_equal(browserGamepad->axes[2], trackpad.x)
         || !stl_util::almost_equal(browserGamepad->axes[3], trackpad.y)) {
-      trackpad.x = browserGamepad->axes[2];
-      trackpad.y = browserGamepad->axes[3];
+      trackpad.x = browserGamepad->axes[static_cast<size_t>(
+        stl_util::index_of(_mappingAxisMeshNames, "TOUCHPAD_TOUCH_X"))];
+      trackpad.y = browserGamepad->axes[static_cast<size_t>(
+        stl_util::index_of(_mappingAxisMeshNames, "TOUCHPAD_TOUCH_Y"))];
       onTrackpadValuesChangedObservable.notifyObservers(&trackpad);
     }
   }
@@ -300,6 +312,7 @@ void WindowsMotionController::dispose()
   WebVRController::dispose();
 
   onTrackpadChangedObservable.clear();
+  onTrackpadValuesChangedObservable.clear();
 }
 
 } // end of namespace BABYLON

@@ -15,18 +15,15 @@ using ViveControllerPtr = std::shared_ptr<ViveController>;
  */
 struct ViveControllerFactory : public _GamePadFactory {
   /**
-   * @brief Returns wether or not the current gamepad can be created for this
-   * type of controller.
-   * @param gamepadInfo Defines the gamepad info as receveid from the controller
-   * APIs.
+   * @brief Returns wether or not the current gamepad can be created for this type of controller.
+   * @param gamepadInfo Defines the gamepad info as receveid from the controller APIs.
    * @returns true if it can be created, otherwise false
    */
   [[nodiscard]] bool canCreate(const IBrowserGamepadPtr& gamepadInfo) const override;
 
   /**
    * @brief Creates a new instance of the Gamepad.
-   * @param gamepadInfo Defines the gamepad info as receveid from the controller
-   * APIs.
+   * @param gamepadInfo Defines the gamepad info as receveid from the controller APIs.
    * @returns the new gamepad instance
    */
   [[nodiscard]] WebVRControllerPtr create(const IBrowserGamepadPtr& gamepadInfo) const override;
@@ -56,11 +53,11 @@ public:
   ~ViveController() override; // = default
 
   /**
-   * @brief Implements abstract method on WebVRController class, loading
-   * controller meshes and calling this.attachToMesh if successful.
+   * @brief Implements abstract method on WebVRController class, loading controller meshes and
+   * calling this.attachToMesh if successful.
    * @param scene scene in which to add meshes
-   * @param meshLoaded optional callback function that will be called if the
-   * mesh loads successfully.
+   * @param meshLoaded optional callback function that will be called if the mesh loads
+   * successfully.
    */
   void initControllerMesh(Scene* scene,
                           const std::function<void(AbstractMesh* mesh)>& meshLoaded) override;

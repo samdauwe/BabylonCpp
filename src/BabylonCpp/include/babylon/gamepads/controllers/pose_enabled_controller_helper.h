@@ -16,9 +16,8 @@ using IBrowserGamepadPtr = std::shared_ptr<IBrowserGamepad>;
 using WebVRControllerPtr = std::shared_ptr<WebVRController>;
 
 /**
- * @brief Defines the PoseEnabledControllerHelper object that is used initialize
- * a gamepad as the controller type it is specified as (eg. windows mixed
- * reality controller).
+ * @brief Defines the PoseEnabledControllerHelper object that is used initialize a gamepad as the
+ * controller type it is specified as (eg. windows mixed reality controller).
  */
 struct BABYLON_SHARED_EXPORT PoseEnabledControllerHelper {
 
@@ -29,13 +28,12 @@ struct BABYLON_SHARED_EXPORT PoseEnabledControllerHelper {
   static std::optional<_GamePadFactory> _DefaultControllerFactory;
 
   /**
-   * @brief Initializes a gamepad as the controller type it is specified as (eg.
-   * windows mixed reality controller).
+   * @brief Initializes a gamepad as the controller type it is specified as (eg. windows mixed
+   * reality controller).
    * @param vrGamepad the gamepad to initialized
    * @returns a vr controller of the type the gamepad identified as
    */
-  static WebVRControllerPtr
-  InitiateController(const IBrowserGamepadPtr& vrGamepad);
+  static WebVRControllerPtr InitiateController(const IBrowserGamepadPtr& vrGamepad);
 
 }; // end of struct PoseEnabledControllerHelper
 

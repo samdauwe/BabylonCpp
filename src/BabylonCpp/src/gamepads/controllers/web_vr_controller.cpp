@@ -94,6 +94,8 @@ void WebVRController::dispose()
 {
   PoseEnabledController::dispose();
 
+  _defaultModel = nullptr;
+
   onTriggerStateChangedObservable.clear();
   onMainButtonStateChangedObservable.clear();
   onSecondaryButtonStateChangedObservable.clear();

@@ -22,12 +22,11 @@ std::vector<_GamePadFactory> PoseEnabledControllerHelper::_ControllerFactories{
   WindowsMotionControllerFactory() //
 };
 
-std::optional<_GamePadFactory>
-  PoseEnabledControllerHelper::_DefaultControllerFactory
+std::optional<_GamePadFactory> PoseEnabledControllerHelper::_DefaultControllerFactory
   = GenericControllerFactory();
 
-WebVRControllerPtr PoseEnabledControllerHelper::InitiateController(
-  const IBrowserGamepadPtr& vrGamepad)
+WebVRControllerPtr
+PoseEnabledControllerHelper::InitiateController(const IBrowserGamepadPtr& vrGamepad)
 {
   for (const auto& factory : _ControllerFactories) {
     if (factory.canCreate(vrGamepad)) {

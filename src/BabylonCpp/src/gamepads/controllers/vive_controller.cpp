@@ -7,14 +7,12 @@
 
 namespace BABYLON {
 
-bool ViveControllerFactory::canCreate(
-  const IBrowserGamepadPtr& gamepadInfo) const
+bool ViveControllerFactory::canCreate(const IBrowserGamepadPtr& gamepadInfo) const
 {
   return String::contains(String::toLowerCase(gamepadInfo->id), "openvr");
 }
 
-WebVRControllerPtr
-ViveControllerFactory::create(const IBrowserGamepadPtr& gamepadInfo) const
+WebVRControllerPtr ViveControllerFactory::create(const IBrowserGamepadPtr& gamepadInfo) const
 {
   return ViveController::New(gamepadInfo);
 }
@@ -22,13 +20,11 @@ ViveControllerFactory::create(const IBrowserGamepadPtr& gamepadInfo) const
 ViveController::ViveController(const IBrowserGamepadPtr& vrGamepad)
     : WebVRController{vrGamepad}
     , onLeftButtonStateChangedObservable{this,
-                                         &ViveController::
-                                           get_onLeftButtonStateChangedObservable}
+                                         &ViveController::get_onLeftButtonStateChangedObservable}
     , onRightButtonStateChangedObservable{this,
-                                          &ViveController::
-                                            get_onRightButtonStateChangedObservable}
-    , onMenuButtonStateChangedObservable{
-        this, &ViveController::get_onMenuButtonStateChangedObservable}
+                                          &ViveController::get_onRightButtonStateChangedObservable}
+    , onMenuButtonStateChangedObservable{this,
+                                         &ViveController::get_onMenuButtonStateChangedObservable}
 {
   _defaultModel     = nullptr;
   controllerType    = PoseEnabledControllerType::VIVE;
@@ -37,16 +33,15 @@ ViveController::ViveController(const IBrowserGamepadPtr& vrGamepad)
 
 ViveController::~ViveController() = default;
 
-void ViveController::initControllerMesh(
-  Scene* scene, const std::function<void(AbstractMesh* mesh)>& meshLoaded)
+void ViveController::initControllerMesh(Scene* scene,
+                                        const std::function<void(AbstractMesh* mesh)>& meshLoaded)
 {
   SceneLoader::ImportMesh(
     {}, ViveController::MODEL_BASE_URL, ViveController::MODEL_FILENAME, scene,
-    [this,
-     &meshLoaded](const std::vector<AbstractMeshPtr>& newMeshes,
-                  const std::vector<IParticleSystemPtr>& /*particleSystems*/,
-                  const std::vector<SkeletonPtr>& /*skeletons*/,
-                  const std::vector<AnimationGroupPtr>& /*animationGroups*/) {
+    [this, &meshLoaded](const std::vector<AbstractMeshPtr>& newMeshes,
+                        const std::vector<IParticleSystemPtr>& /*particleSystems*/,
+                        const std::vector<SkeletonPtr>& /*skeletons*/,
+                        const std::vector<AnimationGroupPtr>& /*animationGroups*/) {
       /*
       Parent Mesh name: ViveWand
       - body
@@ -66,40 +61,33 @@ void ViveController::initControllerMesh(
     });
 }
 
-Observable<ExtendedGamepadButton>&
-ViveController::get_onLeftButtonStateChangedObservable()
+Observable<ExtendedGamepadButton>& ViveController::get_onLeftButtonStateChangedObservable()
 {
   return onMainButtonStateChangedObservable;
 }
 
-Observable<ExtendedGamepadButton>&
-ViveController::get_onRightButtonStateChangedObservable()
+Observable<ExtendedGamepadButton>& ViveController::get_onRightButtonStateChangedObservable()
 {
   return onMainButtonStateChangedObservable;
 }
 
-Observable<ExtendedGamepadButton>&
-ViveController::get_onMenuButtonStateChangedObservable()
+Observable<ExtendedGamepadButton>& ViveController::get_onMenuButtonStateChangedObservable()
 {
   return onSecondaryButtonStateChangedObservable;
 }
 
-void ViveController::_handleButtonChange(
-  unsigned int buttonIdx, const ExtendedGamepadButton& state,
-  const GamepadButtonChanges& /*changes*/)
+void ViveController::_handleButtonChange(unsigned int buttonIdx, const ExtendedGamepadButton& state,
+                                         const GamepadButtonChanges& /*changes*/)
 {
-  auto notifyObject = state; //{ state: state, changes: changes };
-  auto defaultModelChildren
-    = std::static_pointer_cast<Node>(_defaultModel)->getChildren();
+  auto notifyObject         = state; //{ state: state, changes: changes };
+  auto defaultModelChildren = std::static_pointer_cast<Node>(_defaultModel)->getChildren();
   switch (buttonIdx) {
     case 0:
       onPadStateChangedObservable.notifyObservers(&notifyObject);
       return;
     case 1: // index trigger
       if (_defaultModel) {
-        (std::static_pointer_cast<AbstractMesh>(defaultModelChildren[6]))
-          ->rotation()
-          .x
+        (std::static_pointer_cast<AbstractMesh>(defaultModelChildren[6]))->rotation().x
           = -notifyObject.value() * 0.15f;
       }
       onTriggerStateChangedObservable.notifyObservers(&notifyObject);
@@ -110,16 +98,10 @@ void ViveController::_handleButtonChange(
     case 3:
       if (_defaultModel) {
         if (notifyObject.pressed()) {
-          (std::static_pointer_cast<AbstractMesh>(defaultModelChildren[2]))
-            ->position()
-            .y
-            = -0.001f;
+          (std::static_pointer_cast<AbstractMesh>(defaultModelChildren[2]))->position().y = -0.001f;
         }
         else {
-          (std::static_pointer_cast<AbstractMesh>(defaultModelChildren[2]))
-            ->position()
-            .y
-            = 0.f;
+          (std::static_pointer_cast<AbstractMesh>(defaultModelChildren[2]))->position().y = 0.f;
         }
       }
       onSecondaryButtonStateChangedObservable.notifyObservers(&notifyObject);

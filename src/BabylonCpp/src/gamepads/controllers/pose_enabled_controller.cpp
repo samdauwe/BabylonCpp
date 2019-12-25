@@ -46,9 +46,6 @@ void PoseEnabledController::_disableTrackPosition(const Vector3& fixedPosition)
 
 void PoseEnabledController::update()
 {
-  if (isXR) {
-    return;
-  }
   Gamepad::update();
   _updatePoseAndMesh();
 }

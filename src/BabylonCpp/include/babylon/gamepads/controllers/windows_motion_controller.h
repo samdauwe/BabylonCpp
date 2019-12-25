@@ -258,9 +258,12 @@ protected:
    */
   Observable<StickValues>& get_onTouchpadValuesChangedObservable();
 
-private:
+  /**
+   * @brief Hidden
+   */
   void _updateTrackpad();
 
+private:
   /**
    * @brief Takes a list of meshes (as loaded from the glTF file) and finds the root node, as well
    * as nodes that can be transformed by button presses and axes values, based on this._mapping.
