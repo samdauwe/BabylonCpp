@@ -10,9 +10,9 @@
 
 namespace BABYLON {
 
-MorphTarget::MorphTarget(const std::string& name, float iInfluence,
-                         Scene* scene)
+MorphTarget::MorphTarget(const std::string& name, float iInfluence, Scene* scene)
     : influence{this, &MorphTarget::get_influence, &MorphTarget::set_influence}
+    , uniqueId{this, &MorphTarget::get_uniqueId}
     , hasPositions{this, &MorphTarget::get_hasPositions}
     , hasNormals{this, &MorphTarget::get_hasNormals}
     , hasTangents{this, &MorphTarget::get_hasTangents}
@@ -20,9 +20,14 @@ MorphTarget::MorphTarget(const std::string& name, float iInfluence,
     , _name{name}
     , _scene{scene ? scene : Engine::LastCreatedScene()}
     , _influence{-1.f} // -1  means Undefined
+    , _uniqueId{0}
     , _animationPropertiesOverride{nullptr}
 {
   influence = iInfluence;
+
+  if (_scene) {
+    _uniqueId = _scene->getUniqueId();
+  }
 }
 
 MorphTarget::~MorphTarget() = default;
@@ -32,8 +37,7 @@ Type MorphTarget::type() const
   return Type::MORPHTARGET;
 }
 
-AnimationValue
-MorphTarget::getProperty(const std::vector<std::string>& targetPropertyPath)
+AnimationValue MorphTarget::getProperty(const std::vector<std::string>& targetPropertyPath)
 {
   if (targetPropertyPath.size() == 1) {
     const auto& target = targetPropertyPath[0];
@@ -45,9 +49,8 @@ MorphTarget::getProperty(const std::vector<std::string>& targetPropertyPath)
   return AnimationValue();
 }
 
-void MorphTarget::setProperty(
-  const std::vector<std::string>& targetPropertyPath,
-  const AnimationValue& value)
+void MorphTarget::setProperty(const std::vector<std::string>& targetPropertyPath,
+                              const AnimationValue& value)
 {
   const auto animationType = value.animationType();
   if (animationType.has_value()) {
@@ -91,10 +94,14 @@ AnimationPropertiesOverridePtr& MorphTarget::get_animationPropertiesOverride()
   return _animationPropertiesOverride;
 }
 
-void MorphTarget::set_animationPropertiesOverride(
-  const AnimationPropertiesOverridePtr& value)
+void MorphTarget::set_animationPropertiesOverride(const AnimationPropertiesOverridePtr& value)
 {
   _animationPropertiesOverride = value;
+}
+
+size_t MorphTarget::get_uniqueId() const
+{
+  return _uniqueId;
 }
 
 bool MorphTarget::get_hasPositions() const
@@ -201,6 +208,11 @@ const Float32Array& MorphTarget::getUVs() const
   return _uvs;
 }
 
+MorphTargetPtr MorphTarget::clone()
+{
+  return nullptr;
+}
+
 json MorphTarget::serialize() const
 {
   return nullptr;
@@ -217,21 +229,18 @@ std::unique_ptr<MorphTarget> MorphTarget::Parse(const json& serializationObject)
     json_util::get_string(serializationObject, "name"),
     json_util::get_number<float>(serializationObject, "influence", 0.f));
 
-  result->setPositions(
-    json_util::get_array<float>(serializationObject, "positions"));
+  result->setPositions(json_util::get_array<float>(serializationObject, "positions"));
 
   if (json_util::has_valid_key_value(serializationObject, "id")) {
     result->id = json_util::get_string(serializationObject, "id");
   }
 
   if (json_util::has_key(serializationObject, "normals")) {
-    result->setNormals(
-      json_util::get_array<float>(serializationObject, "normals"));
+    result->setNormals(json_util::get_array<float>(serializationObject, "normals"));
   }
 
   if (json_util::has_key(serializationObject, "tangents")) {
-    result->setNormals(
-      json_util::get_array<float>(serializationObject, "tangents"));
+    result->setNormals(json_util::get_array<float>(serializationObject, "tangents"));
   }
 
   if (json_util::has_key(serializationObject, "uvs")) {
@@ -240,8 +249,7 @@ std::unique_ptr<MorphTarget> MorphTarget::Parse(const json& serializationObject)
 
   // Animations
   if (json_util::has_key(serializationObject, "animations")) {
-    for (auto parsedAnimation :
-         json_util::get_array<json>(serializationObject, "animations")) {
+    for (auto parsedAnimation : json_util::get_array<json>(serializationObject, "animations")) {
       result->animations.emplace_back(Animation::Parse(parsedAnimation));
     }
   }
@@ -249,8 +257,7 @@ std::unique_ptr<MorphTarget> MorphTarget::Parse(const json& serializationObject)
   return result;
 }
 
-MorphTargetPtr MorphTarget::FromMesh(const AbstractMeshPtr& mesh,
-                                     std::string name, float influence)
+MorphTargetPtr MorphTarget::FromMesh(const AbstractMeshPtr& mesh, std::string name, float influence)
 {
   if (name.empty()) {
     name = mesh->name;

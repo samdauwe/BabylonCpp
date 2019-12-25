@@ -11,8 +11,7 @@ class MorphTargetManager;
 using MorphTargetManagerPtr = std::shared_ptr<MorphTargetManager>;
 
 /**
- * @brief This class is used to deform meshes using morphing between different
- * targets.
+ * @brief This class is used to deform meshes using morphing between different targets.
  * @see http://doc.babylonjs.com/how_to/how_to_use_morphtargets
  */
 class BABYLON_SHARED_EXPORT MorphTargetManager {
@@ -32,8 +31,8 @@ public:
   void addToScene(const MorphTargetManagerPtr& newMorphTargetManager);
 
   /**
-   * @brief Gets the active target at specified index. An active target is a
-   * target with an influence > 0
+   * @brief Gets the active target at specified index. An active target is a target with an
+   * influence > 0
    * @param index defines the index to check
    * @returns the requested target
    */
@@ -59,14 +58,19 @@ public:
   void removeTarget(MorphTarget* target);
 
   /**
+   * @brief Clone the current manager.
+   * @returns a new MorphTargetManager
+   */
+  MorphTargetManagerPtr clone() const;
+
+  /**
    * @brief Serializes the current manager into a Serialization object.
    * @returns the serialized object
    */
   json serialize();
 
   /**
-   * @brief Synchronize the targets with all the meshes using this morph target
-   * manager.
+   * @brief Synchronize the targets with all the meshes using this morph target manager.
    */
   void synchronize();
 
@@ -91,20 +95,17 @@ protected:
   [[nodiscard]] size_t get_vertexCount() const;
 
   /**
-   * @brief Gets a boolean indicating if this manager supports morphing of
-   * normals.
+   * @brief Gets a boolean indicating if this manager supports morphing of normals.
    */
   [[nodiscard]] bool get_supportsNormals() const;
 
   /**
-   * @brief Gets a boolean indicating if this manager supports morphing of
-   * tangents.
+   * @brief Gets a boolean indicating if this manager supports morphing of tangents.
    */
   [[nodiscard]] bool get_supportsTangents() const;
 
   /**
-   * @brief Gets a boolean indicating if this manager supports morphing of
-   * texture coordinates.
+   * @brief Gets a boolean indicating if this manager supports morphing of texture coordinates.
    */
   [[nodiscard]] bool get_supportsUVs() const;
 
@@ -114,8 +115,7 @@ protected:
   [[nodiscard]] size_t get_numTargets() const;
 
   /**
-   * @brief Gets the number of influencers (ie. the number of targets with
-   * influences > 0)
+   * @brief Gets the number of influencers (ie. the number of targets with influences > 0)
    */
   [[nodiscard]] size_t get_numInfluencers() const;
 

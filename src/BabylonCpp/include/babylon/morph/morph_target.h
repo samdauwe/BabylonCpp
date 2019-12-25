@@ -119,6 +119,12 @@ public:
   [[nodiscard]] const Float32Array& getUVs() const;
 
   /**
+   * @brief Clone the current target.
+   * @returns a new MorphTarget
+   */
+  MorphTargetPtr clone();
+
+  /**
    * @brief Serializes the current target into a Serialization object.
    * @returns the serialized object.
    */
@@ -173,6 +179,11 @@ protected:
   void set_animationPropertiesOverride(const AnimationPropertiesOverridePtr& value) override;
 
   /**
+   * @brief Gets the unique ID of this manager.
+   */
+  [[nodiscard]] size_t get_uniqueId() const;
+
+  /**
    * @brief Gets a boolean defining if the target contains position data.
    */
   [[nodiscard]] bool get_hasPositions() const;
@@ -188,8 +199,7 @@ protected:
   [[nodiscard]] bool get_hasTangents() const;
 
   /**
-   * @brief Gets a boolean defining if the target contains texture coordinates
-   * data.
+   * @brief Gets a boolean defining if the target contains texture coordinates data.
    */
   [[nodiscard]] bool get_hasUVs() const;
 
@@ -228,6 +238,11 @@ public:
   std::string id;
 
   /**
+   * Gets the unique ID of this manager
+   */
+  ReadOnlyProperty<MorphTarget, size_t> uniqueId;
+
+  /**
    * Gets a boolean defining if the target contains position data
    */
   ReadOnlyProperty<MorphTarget, bool> hasPositions;
@@ -259,6 +274,7 @@ private:
   Float32Array _tangents;
   Float32Array _uvs;
   float _influence;
+  size_t _uniqueId;
   AnimationPropertiesOverridePtr _animationPropertiesOverride;
 
 }; // end of class MorphTarget

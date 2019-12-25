@@ -32,8 +32,7 @@ MorphTargetManager::MorphTargetManager(Scene* scene)
 
 MorphTargetManager::~MorphTargetManager() = default;
 
-void MorphTargetManager::addToScene(
-  const MorphTargetManagerPtr& newMorphTargetManager)
+void MorphTargetManager::addToScene(const MorphTargetManagerPtr& newMorphTargetManager)
 {
   if (_scene) {
     _scene->morphTargetManagers.emplace_back(newMorphTargetManager);
@@ -105,27 +104,30 @@ void MorphTargetManager::addTarget(const MorphTargetPtr& target)
   _targets.emplace_back(target);
   _targetInfluenceChangedObservers.emplace_back(_targets.back()->onInfluenceChanged.add(
     [this](const bool* needUpdate, EventState&) { _syncActiveTargets(*needUpdate); }));
-  _targetDataLayoutChangedObservers.emplace_back(
-    _targets.back()->_onDataLayoutChanged.add(
-      [this](void*, EventState&) { _syncActiveTargets(true); }));
+  _targetDataLayoutChangedObservers.emplace_back(_targets.back()->_onDataLayoutChanged.add(
+    [this](void*, EventState&) { _syncActiveTargets(true); }));
   _syncActiveTargets(true);
 }
 
 void MorphTargetManager::removeTarget(MorphTarget* target)
 {
-  auto it = std::find_if(_targets.begin(), _targets.end(),
-                         [target](const MorphTargetPtr& morphTarget) {
-                           return target == morphTarget.get();
-                         });
+  auto it
+    = std::find_if(_targets.begin(), _targets.end(), [target](const MorphTargetPtr& morphTarget) {
+        return target == morphTarget.get();
+      });
   if (it != _targets.end()) {
     _targets.erase(it);
 
     size_t index = static_cast<size_t>(it - _targets.begin());
     target->onInfluenceChanged.remove(_targetInfluenceChangedObservers[index]);
-    target->_onDataLayoutChanged.remove(
-      _targetDataLayoutChangedObservers[index]);
+    target->_onDataLayoutChanged.remove(_targetDataLayoutChangedObservers[index]);
     _syncActiveTargets(true);
   }
+}
+
+MorphTargetManagerPtr MorphTargetManager::clone() const
+{
+  return nullptr;
 }
 
 json MorphTargetManager::serialize()
@@ -164,10 +166,9 @@ void MorphTargetManager::_syncActiveTargets(bool needUpdate)
         _vertexCount = iVertexCount;
       }
       else if (_vertexCount != iVertexCount) {
-        BABYLON_LOG_ERROR(
-          "MorphTargetManager",
-          "Incompatible target. Targets must all have the same vertices "
-          "count.")
+        BABYLON_LOG_ERROR("MorphTargetManager",
+                          "Incompatible target. Targets must all have the same vertices "
+                          "count.")
         return;
       }
     }
@@ -196,18 +197,15 @@ void MorphTargetManager::synchronize()
   }
 }
 
-MorphTargetManagerPtr MorphTargetManager::Parse(const json& serializationObject,
-                                                Scene* scene)
+MorphTargetManagerPtr MorphTargetManager::Parse(const json& serializationObject, Scene* scene)
 {
   auto result = MorphTargetManager::New(scene);
 
-  result->_uniqueId
-    = json_util::get_number<unsigned>(serializationObject, "id", 0);
+  result->_uniqueId = json_util::get_number<unsigned>(serializationObject, "id", 0);
 
   if (json_util::has_key(serializationObject, "targets")
       && (serializationObject["targets"].is_array())) {
-    for (auto& targetData :
-         json_util::get_array<json>(serializationObject, "targets")) {
+    for (auto& targetData : json_util::get_array<json>(serializationObject, "targets")) {
       result->addTarget(MorphTarget::Parse(targetData));
     }
   }
