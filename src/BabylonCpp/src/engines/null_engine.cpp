@@ -6,9 +6,9 @@
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/meshes/webgl/webgl_data_buffer.h>
-#include <babylon/states/_alpha_state.h>
-#include <babylon/states/_depth_culling_state.h>
-#include <babylon/states/_stencil_state.h>
+#include <babylon/states/alpha_state.h>
+#include <babylon/states/depth_culling_state.h>
+#include <babylon/states/stencil_state.h>
 
 namespace BABYLON {
 

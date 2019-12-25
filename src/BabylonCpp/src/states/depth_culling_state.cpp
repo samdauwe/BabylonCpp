@@ -1,25 +1,19 @@
-#include <babylon/states/_depth_culling_state.h>
+#include <babylon/states/depth_culling_state.h>
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 
 namespace BABYLON {
 
-_DepthCullingState::_DepthCullingState()
-    : isDirty{this, &_DepthCullingState::get_isDirty}
-    , zOffset{this, &_DepthCullingState::get_zOffset,
-              &_DepthCullingState::set_zOffset}
-    , cullFace{this, &_DepthCullingState::get_cullFace,
-               &_DepthCullingState::set_cullFace}
-    , cull{this, &_DepthCullingState::get_cull, &_DepthCullingState::set_cull}
-    , depthFunc{this, &_DepthCullingState::get_depthFunc,
-                &_DepthCullingState::set_depthFunc}
-    , depthMask{this, &_DepthCullingState::get_depthMask,
-                &_DepthCullingState::set_depthMask}
-    , depthTest{this, &_DepthCullingState::get_depthTest,
-                &_DepthCullingState::set_depthTest}
-    , frontFace{this, &_DepthCullingState::get_frontFace,
-                &_DepthCullingState::set_frontFace}
+DepthCullingState::DepthCullingState()
+    : isDirty{this, &DepthCullingState::get_isDirty}
+    , zOffset{this, &DepthCullingState::get_zOffset, &DepthCullingState::set_zOffset}
+    , cullFace{this, &DepthCullingState::get_cullFace, &DepthCullingState::set_cullFace}
+    , cull{this, &DepthCullingState::get_cull, &DepthCullingState::set_cull}
+    , depthFunc{this, &DepthCullingState::get_depthFunc, &DepthCullingState::set_depthFunc}
+    , depthMask{this, &DepthCullingState::get_depthMask, &DepthCullingState::set_depthMask}
+    , depthTest{this, &DepthCullingState::get_depthTest, &DepthCullingState::set_depthTest}
+    , frontFace{this, &DepthCullingState::get_frontFace, &DepthCullingState::set_frontFace}
     , _isDepthTestDirty{false}
     , _isDepthMaskDirty{false}
     , _isDepthFuncDirty{false}
@@ -36,21 +30,20 @@ _DepthCullingState::_DepthCullingState()
   reset();
 }
 
-_DepthCullingState::~_DepthCullingState() = default;
+DepthCullingState::~DepthCullingState() = default;
 
-bool _DepthCullingState::get_isDirty() const
+bool DepthCullingState::get_isDirty() const
 {
-  return _isDepthFuncDirty || _isDepthTestDirty || _isDepthMaskDirty
-         || _isCullFaceDirty || _isCullDirty || _isZOffsetDirty
-         || _isFrontFaceDirty;
+  return _isDepthFuncDirty || _isDepthTestDirty || _isDepthMaskDirty || _isCullFaceDirty
+         || _isCullDirty || _isZOffsetDirty || _isFrontFaceDirty;
 }
 
-float _DepthCullingState::get_zOffset() const
+float DepthCullingState::get_zOffset() const
 {
   return _zOffset;
 }
 
-void _DepthCullingState::set_zOffset(float value)
+void DepthCullingState::set_zOffset(float value)
 {
   if (stl_util::almost_equal(_zOffset, value)) {
     return;
@@ -60,12 +53,12 @@ void _DepthCullingState::set_zOffset(float value)
   _isZOffsetDirty = true;
 }
 
-std::optional<int>& _DepthCullingState::get_cullFace()
+std::optional<int>& DepthCullingState::get_cullFace()
 {
   return _cullFace;
 }
 
-void _DepthCullingState::set_cullFace(const std::optional<int>& value)
+void DepthCullingState::set_cullFace(const std::optional<int>& value)
 {
   if (_cullFace == value) {
     return;
@@ -75,12 +68,12 @@ void _DepthCullingState::set_cullFace(const std::optional<int>& value)
   _isCullFaceDirty = true;
 }
 
-std::optional<bool>& _DepthCullingState::get_cull()
+std::optional<bool>& DepthCullingState::get_cull()
 {
   return _cull;
 }
 
-void _DepthCullingState::set_cull(const std::optional<bool>& value)
+void DepthCullingState::set_cull(const std::optional<bool>& value)
 {
   if (_cull == value) {
     return;
@@ -90,12 +83,12 @@ void _DepthCullingState::set_cull(const std::optional<bool>& value)
   _isCullDirty = true;
 }
 
-std::optional<int>& _DepthCullingState::get_depthFunc()
+std::optional<int>& DepthCullingState::get_depthFunc()
 {
   return _depthFunc;
 }
 
-void _DepthCullingState::set_depthFunc(const std::optional<int>& value)
+void DepthCullingState::set_depthFunc(const std::optional<int>& value)
 {
   if (_depthFunc == value) {
     return;
@@ -105,12 +98,12 @@ void _DepthCullingState::set_depthFunc(const std::optional<int>& value)
   _isDepthFuncDirty = true;
 }
 
-bool _DepthCullingState::get_depthMask() const
+bool DepthCullingState::get_depthMask() const
 {
   return _depthMask;
 }
 
-void _DepthCullingState::set_depthMask(bool value)
+void DepthCullingState::set_depthMask(bool value)
 {
   if (_depthMask == value) {
     return;
@@ -120,12 +113,12 @@ void _DepthCullingState::set_depthMask(bool value)
   _isDepthMaskDirty = true;
 }
 
-bool _DepthCullingState::get_depthTest() const
+bool DepthCullingState::get_depthTest() const
 {
   return _depthTest;
 }
 
-void _DepthCullingState::set_depthTest(bool value)
+void DepthCullingState::set_depthTest(bool value)
 {
   if (_depthTest == value) {
     return;
@@ -135,12 +128,12 @@ void _DepthCullingState::set_depthTest(bool value)
   _isDepthTestDirty = true;
 }
 
-std::optional<unsigned int>& _DepthCullingState::get_frontFace()
+std::optional<unsigned int>& DepthCullingState::get_frontFace()
 {
   return _frontFace;
 }
 
-void _DepthCullingState::set_frontFace(const std::optional<unsigned int>& value)
+void DepthCullingState::set_frontFace(const std::optional<unsigned int>& value)
 {
   if (_frontFace == value) {
     return;
@@ -150,7 +143,7 @@ void _DepthCullingState::set_frontFace(const std::optional<unsigned int>& value)
   _isFrontFaceDirty = true;
 }
 
-void _DepthCullingState::reset()
+void DepthCullingState::reset()
 {
   _depthMask = true;
   _depthTest = true;
@@ -169,7 +162,7 @@ void _DepthCullingState::reset()
   _isFrontFaceDirty = false;
 }
 
-void _DepthCullingState::apply(GL::IGLRenderingContext& gl)
+void DepthCullingState::apply(GL::IGLRenderingContext& gl)
 {
   if (!isDirty()) {
     return;

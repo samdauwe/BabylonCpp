@@ -24,9 +24,9 @@
 
 namespace BABYLON {
 
-class _AlphaState;
-class _DepthCullingState;
-class _StencilState;
+class AlphaState;
+class DepthCullingState;
+class StencilState;
 class AudioEngine;
 class BaseTexture;
 class Camera;
@@ -1374,7 +1374,7 @@ public:
    * @brief Gets the current stensil state.
    * @returns the current stensil state
    */
-  _StencilState* stencilState();
+  StencilState* stencilState();
 
   /** Textures **/
 
@@ -2680,17 +2680,17 @@ protected:
   /**
    * Hidden
    */
-  std::unique_ptr<_DepthCullingState> _depthCullingState;
+  std::unique_ptr<DepthCullingState> _depthCullingState;
 
   /**
    * Hidden
    */
-  std::unique_ptr<_StencilState> _stencilState;
+  std::unique_ptr<StencilState> _stencilState;
 
   /**
    * Hidden
    */
-  std::unique_ptr<_AlphaState> _alphaState;
+  std::unique_ptr<AlphaState> _alphaState;
 
   /**
    * Hidden

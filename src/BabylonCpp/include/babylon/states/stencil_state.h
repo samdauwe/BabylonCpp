@@ -11,13 +11,12 @@ namespace GL {
 class IGLRenderingContext;
 } // end of namespace GL
 
-class BABYLON_SHARED_EXPORT _StencilState {
+class BABYLON_SHARED_EXPORT StencilState {
 
 public:
   /**
-   * Passed to depthFunction or stencilFunction to specify depth or stencil
-   * tests will always pass. i.e. Pixels will be drawn in the order they are
-   * drawn
+   * Passed to depthFunction or stencilFunction to specify depth or stencil tests will always pass.
+   * i.e. Pixels will be drawn in the order they are drawn
    */
   static constexpr unsigned int ALWAYS = Constants::ALWAYS;
   /**
@@ -33,8 +32,8 @@ public:
   /**
    * Initializes the state.
    */
-  _StencilState();
-  ~_StencilState(); // = default
+  StencilState();
+  ~StencilState(); // = default
 
   void reset();
   void apply(GL::IGLRenderingContext& gl);
@@ -59,15 +58,15 @@ protected:
   void set_stencilTest(bool value);
 
 public:
-  ReadOnlyProperty<_StencilState, bool> isDirty;
-  Property<_StencilState, unsigned int> stencilFunc;
-  Property<_StencilState, int> stencilFuncRef;
-  Property<_StencilState, unsigned int> stencilFuncMask;
-  Property<_StencilState, unsigned int> stencilOpStencilFail;
-  Property<_StencilState, unsigned int> stencilOpDepthFail;
-  Property<_StencilState, unsigned int> stencilOpStencilDepthPass;
-  Property<_StencilState, unsigned int> stencilMask;
-  Property<_StencilState, bool> stencilTest;
+  ReadOnlyProperty<StencilState, bool> isDirty;
+  Property<StencilState, unsigned int> stencilFunc;
+  Property<StencilState, int> stencilFuncRef;
+  Property<StencilState, unsigned int> stencilFuncMask;
+  Property<StencilState, unsigned int> stencilOpStencilFail;
+  Property<StencilState, unsigned int> stencilOpDepthFail;
+  Property<StencilState, unsigned int> stencilOpStencilDepthPass;
+  Property<StencilState, unsigned int> stencilMask;
+  Property<StencilState, bool> stencilTest;
 
 private:
   bool _isStencilTestDirty;
@@ -87,7 +86,7 @@ private:
   unsigned int _stencilOpDepthFail;
   unsigned int _stencilOpStencilDepthPass;
 
-}; // end of class _StencilState
+}; // end of class StencilState
 
 } // end of namespace BABYLON
 

@@ -12,14 +12,14 @@ namespace GL {
 class IGLRenderingContext;
 } // end of namespace GL
 
-class BABYLON_SHARED_EXPORT _AlphaState {
+class BABYLON_SHARED_EXPORT AlphaState {
 
 public:
   /**
    * @brief Initializes the state.
    */
-  _AlphaState();
-  ~_AlphaState(); // = default
+  AlphaState();
+  ~AlphaState(); // = default
 
   void setAlphaBlendConstants(float r, float g, float b, float a);
   void setAlphaBlendFunctionParameters(unsigned int value0, unsigned int value1,
@@ -34,8 +34,8 @@ protected:
   void set_alphaBlend(bool value);
 
 public:
-  ReadOnlyProperty<_AlphaState, bool> isDirty;
-  Property<_AlphaState, bool> alphaBlend;
+  ReadOnlyProperty<AlphaState, bool> isDirty;
+  Property<AlphaState, bool> alphaBlend;
 
 private:
   bool _isAlphaBlendDirty;
@@ -47,7 +47,7 @@ private:
   std::array<std::optional<unsigned int>, 2> _blendEquationParameters;
   std::array<std::optional<float>, 4> _blendConstants;
 
-}; // end of class _AlphaState
+}; // end of class AlphaState
 
 } // end of namespace BABYLON
 

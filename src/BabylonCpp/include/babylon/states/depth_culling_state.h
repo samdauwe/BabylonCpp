@@ -10,14 +10,14 @@ namespace GL {
 class IGLRenderingContext;
 } // end of namespace GL
 
-class BABYLON_SHARED_EXPORT _DepthCullingState {
+class BABYLON_SHARED_EXPORT DepthCullingState {
 
 public:
   /**
    * @brief Initializes the state.
    */
-  _DepthCullingState();
-  ~_DepthCullingState(); // = default
+  DepthCullingState();
+  ~DepthCullingState(); // = default
 
   void reset();
   void apply(GL::IGLRenderingContext& _gl);
@@ -40,14 +40,14 @@ protected:
   void set_frontFace(const std::optional<unsigned int>& value);
 
 public:
-  ReadOnlyProperty<_DepthCullingState, bool> isDirty;
-  Property<_DepthCullingState, float> zOffset;
-  Property<_DepthCullingState, std::optional<int>> cullFace;
-  Property<_DepthCullingState, std::optional<bool>> cull;
-  Property<_DepthCullingState, std::optional<int>> depthFunc;
-  Property<_DepthCullingState, bool> depthMask;
-  Property<_DepthCullingState, bool> depthTest;
-  Property<_DepthCullingState, std::optional<unsigned int>> frontFace;
+  ReadOnlyProperty<DepthCullingState, bool> isDirty;
+  Property<DepthCullingState, float> zOffset;
+  Property<DepthCullingState, std::optional<int>> cullFace;
+  Property<DepthCullingState, std::optional<bool>> cull;
+  Property<DepthCullingState, std::optional<int>> depthFunc;
+  Property<DepthCullingState, bool> depthMask;
+  Property<DepthCullingState, bool> depthTest;
+  Property<DepthCullingState, std::optional<unsigned int>> frontFace;
 
 private:
   bool _isDepthTestDirty;
@@ -66,7 +66,7 @@ private:
   float _zOffset;
   std::optional<unsigned int> _frontFace;
 
-}; // end of class _DepthCullingState
+}; // end of class DepthCullingState
 
 } // end of namespace BABYLON
 

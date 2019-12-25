@@ -1,14 +1,13 @@
-#include <babylon/states/_alpha_state.h>
+#include <babylon/states/alpha_state.h>
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 
 namespace BABYLON {
 
-_AlphaState::_AlphaState()
-    : isDirty{this, &_AlphaState::get_isDirty}
-    , alphaBlend{this, &_AlphaState::get_alphaBlend,
-                 &_AlphaState::set_alphaBlend}
+AlphaState::AlphaState()
+    : isDirty{this, &AlphaState::get_isDirty}
+    , alphaBlend{this, &AlphaState::get_alphaBlend, &AlphaState::set_alphaBlend}
     , _isAlphaBlendDirty{false}
     , _isBlendFunctionParametersDirty{false}
     , _isBlendEquationParametersDirty{false}
@@ -18,19 +17,19 @@ _AlphaState::_AlphaState()
   reset();
 }
 
-_AlphaState::~_AlphaState() = default;
+AlphaState::~AlphaState() = default;
 
-bool _AlphaState::get_isDirty() const
+bool AlphaState::get_isDirty() const
 {
   return _isAlphaBlendDirty || _isBlendFunctionParametersDirty;
 }
 
-bool _AlphaState::get_alphaBlend() const
+bool AlphaState::get_alphaBlend() const
 {
   return _alphaBlend;
 }
 
-void _AlphaState::set_alphaBlend(bool value)
+void AlphaState::set_alphaBlend(bool value)
 {
   if (_alphaBlend == value) {
     return;
@@ -40,7 +39,7 @@ void _AlphaState::set_alphaBlend(bool value)
   _isAlphaBlendDirty = true;
 }
 
-void _AlphaState::setAlphaBlendConstants(float r, float g, float b, float a)
+void AlphaState::setAlphaBlendConstants(float r, float g, float b, float a)
 {
   if (stl_util::almost_equal(*_blendConstants[0], r)
       && stl_util::almost_equal(*_blendConstants[1], g)
@@ -57,15 +56,11 @@ void _AlphaState::setAlphaBlendConstants(float r, float g, float b, float a)
   _isBlendConstantsDirty = true;
 }
 
-void _AlphaState::setAlphaBlendFunctionParameters(unsigned int value0,
-                                                  unsigned int value1,
-                                                  unsigned int value2,
-                                                  unsigned int value3)
+void AlphaState::setAlphaBlendFunctionParameters(unsigned int value0, unsigned int value1,
+                                                 unsigned int value2, unsigned int value3)
 {
-  if (_blendFunctionParameters[0] == value0
-      && _blendFunctionParameters[1] == value1
-      && _blendFunctionParameters[2] == value2
-      && _blendFunctionParameters[3] == value3) {
+  if (_blendFunctionParameters[0] == value0 && _blendFunctionParameters[1] == value1
+      && _blendFunctionParameters[2] == value2 && _blendFunctionParameters[3] == value3) {
     return;
   }
 
@@ -77,11 +72,9 @@ void _AlphaState::setAlphaBlendFunctionParameters(unsigned int value0,
   _isBlendFunctionParametersDirty = true;
 }
 
-void _AlphaState::setAlphaEquationParameters(unsigned int rgb,
-                                             unsigned int alpha)
+void AlphaState::setAlphaEquationParameters(unsigned int rgb, unsigned int alpha)
 {
-  if (_blendEquationParameters[0] == rgb
-      && _blendEquationParameters[1] == alpha) {
+  if (_blendEquationParameters[0] == rgb && _blendEquationParameters[1] == alpha) {
     return;
   }
 
@@ -91,7 +84,7 @@ void _AlphaState::setAlphaEquationParameters(unsigned int rgb,
   _isBlendEquationParametersDirty = true;
 }
 
-void _AlphaState::reset()
+void AlphaState::reset()
 {
   _alphaBlend                 = false;
   _blendFunctionParameters[0] = std::nullopt;
@@ -113,7 +106,7 @@ void _AlphaState::reset()
   _isBlendConstantsDirty          = false;
 }
 
-void _AlphaState::apply(GL::IGLRenderingContext& gl)
+void AlphaState::apply(GL::IGLRenderingContext& gl)
 {
   if (!isDirty()) {
     return;
@@ -133,16 +126,14 @@ void _AlphaState::apply(GL::IGLRenderingContext& gl)
 
   // Alpha function
   if (_isBlendFunctionParametersDirty) {
-    gl.blendFuncSeparate(
-      *_blendFunctionParameters[0], *_blendFunctionParameters[1],
-      *_blendFunctionParameters[2], *_blendFunctionParameters[3]);
+    gl.blendFuncSeparate(*_blendFunctionParameters[0], *_blendFunctionParameters[1],
+                         *_blendFunctionParameters[2], *_blendFunctionParameters[3]);
     _isBlendFunctionParametersDirty = false;
   }
 
   // Alpha equation
   if (_isBlendEquationParametersDirty) {
-    gl.blendEquationSeparate(*_blendEquationParameters[0],
-                             *_blendEquationParameters[1]);
+    gl.blendEquationSeparate(*_blendEquationParameters[0], *_blendEquationParameters[1]);
     _isBlendEquationParametersDirty = false;
   }
 

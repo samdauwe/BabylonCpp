@@ -71,9 +71,9 @@ PointerDragBehaviorOptions& PointerDragBehavior::get_options()
   return _options;
 }
 
-void PointerDragBehavior::set_options(const PointerDragBehaviorOptions& options)
+void PointerDragBehavior::set_options(const PointerDragBehaviorOptions& iOptions)
 {
-  _options = options;
+  _options = iOptions;
 }
 
 std::string PointerDragBehavior::name() const

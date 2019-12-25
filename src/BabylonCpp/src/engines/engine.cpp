@@ -50,9 +50,9 @@
 #include <babylon/postprocesses/pass_post_process.h>
 #include <babylon/postprocesses/post_process.h>
 #include <babylon/postprocesses/post_process_manager.h>
-#include <babylon/states/_alpha_state.h>
-#include <babylon/states/_depth_culling_state.h>
-#include <babylon/states/_stencil_state.h>
+#include <babylon/states/alpha_state.h>
+#include <babylon/states/depth_culling_state.h>
+#include <babylon/states/stencil_state.h>
 
 namespace BABYLON {
 
@@ -134,9 +134,9 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _webGLVersion{1.f}
     , _highPrecisionShadersAllowed{true}
     , _colorWrite{true}
-    , _depthCullingState{std::make_unique<_DepthCullingState>()}
-    , _stencilState{std::make_unique<_StencilState>()}
-    , _alphaState{std::make_unique<_AlphaState>()}
+    , _depthCullingState{std::make_unique<DepthCullingState>()}
+    , _stencilState{std::make_unique<StencilState>()}
+    , _alphaState{std::make_unique<AlphaState>()}
     , _alphaMode{Constants::ALPHA_DISABLE}
     , _activeChannel{0}
     , _currentEffect{nullptr}
@@ -2611,7 +2611,7 @@ unsigned int Engine::getAlphaMode() const
   return _alphaMode;
 }
 
-_StencilState* Engine::stencilState()
+StencilState* Engine::stencilState()
 {
   return _stencilState.get();
 }
