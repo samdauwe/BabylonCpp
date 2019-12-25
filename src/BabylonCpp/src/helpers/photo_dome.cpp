@@ -56,6 +56,7 @@ PhotoDome::PhotoDome(std::string iName, const std::string& urlOfPhoto, PhotoDome
   material->fovMultiplier         = 1.f;
 
   photoTexture = Texture::New(urlOfPhoto, scene, true, !_useDirectMapping);
+  photoTexture()->anisotropicFilteringLevel = 1;
 
   photoTexture()->onLoadObservable().addOnce(
     [this](Texture* /*texture*/, EventState& /*es*/) { _setReady(true); });
