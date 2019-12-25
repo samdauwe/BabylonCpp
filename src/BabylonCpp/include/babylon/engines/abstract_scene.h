@@ -65,28 +65,25 @@ using TransformNodePtr         = std::shared_ptr<TransformNode>;
 
 /**
  * Defines how the parser contract is defined.
- * These parsers are used to parse a list of specific assets (like particle
- * systems, etc..)
+ * These parsers are used to parse a list of specific assets (like particle systems, etc..)
  */
 using BabylonFileParser
-  = std::function<void(const nlohmann::json& parsedData, Scene* scene,
-                       AssetContainer& container, const std::string& rootUrl)>;
+  = std::function<void(const nlohmann::json& parsedData, Scene* scene, AssetContainer& container,
+                       const std::string& rootUrl)>;
 
 /**
  * Defines how the individual parser contract is defined.
  * These parser can parse an individual asset
  */
-using IndividualBabylonFileParser = std::function<any(
-  const nlohmann::json& parsedData, Scene* scene, const std::string& rootUrl)>;
+using IndividualBabylonFileParser
+  = std::function<any(const nlohmann::json& parsedData, Scene* scene, const std::string& rootUrl)>;
 
 /**
- * @brief Base class of the scene acting as a container for the different
- * elements composing a scene. This class is dynamically extended by the
- * different components of the scene increasing flexibility and reducing
- * coupling
+ * @brief Base class of the scene acting as a container for the different elements composing a
+ * scene. This class is dynamically extended by the different components of the scene increasing
+ * flexibility and reducing coupling
  */
-class BABYLON_SHARED_EXPORT AbstractScene
-    : public std::enable_shared_from_this<AbstractScene> {
+class BABYLON_SHARED_EXPORT AbstractScene : public std::enable_shared_from_this<AbstractScene> {
 
 public:
   /**
@@ -100,8 +97,7 @@ public:
    * @param name Defines the name of the parser
    * @param parser Defines the parser to add
    */
-  static void AddParser(const std::string& name,
-                        const BabylonFileParser& parser);
+  static void AddParser(const std::string& name, const BabylonFileParser& parser);
 
   /**
    * @brief Gets a general parser from the list of avaialble ones.
@@ -123,20 +119,17 @@ public:
    * @param name Defines the name of the parser
    * @returns the requested parser or null
    */
-  static std::optional<IndividualBabylonFileParser>
-  GetIndividualParser(const std::string& name);
+  static std::optional<IndividualBabylonFileParser> GetIndividualParser(const std::string& name);
 
   /**
-   * @brief Parser json data and populate both a scene and its associated
-   * container object.
+   * @brief Parser json data and populate both a scene and its associated container object.
    * @param jsonData Defines the data to parse
    * @param scene Defines the scene to parse the data for
    * @param container Defines the container attached to the parsing sequence
    * @param rootUrl Defines the root url of the data
    */
   static void Parse(const nlohmann::json& jsonData, Scene* scene,
-                    const AssetContainerPtr& container,
-                    const std::string& rootUrl);
+                    const AssetContainerPtr& container, const std::string& rootUrl);
 
   /**
    * @brief Removes the given effect layer from this scene.
@@ -205,6 +198,11 @@ public:
    */
   void addReflectionProbe(const ReflectionProbePtr& newReflectionProbe);
 
+  /**
+   * @returns all meshes, lights, cameras, transformNodes and bones.
+   */
+  std::vector<NodePtr> getNodes() const;
+
 private:
   /**
    * @brief Adds the individual component parser to the scene parsers.
@@ -269,11 +267,10 @@ public:
   std::vector<MultiMaterialPtr> multiMaterials;
 
   /**
-   * All of the materials added to this scene
+   * All of the materials added to this scene.
    * In the context of a Scene, it is not supposed to be modified manually.
-   * Any addition or removal should be done using the addMaterial and
-   * removeMAterial Scene methods. Note also that the order of the Material
-   * wihin the array is not significant and might change.
+   * Any addition or removal should be done using the addMaterial and removeMaterial Scene methods.
+   * Note also that the order of the Material within the array is not significant and might change.
    * @see http://doc.babylonjs.com/babylon101/materials
    */
   std::vector<MaterialPtr> materials;
@@ -292,9 +289,9 @@ public:
   /**
    * All of the tranform nodes added to this scene
    * In the context of a Scene, it is not supposed to be modified manually.
-   * Any addition or removal should be done using the addTransformNode and
-   * removeTransformNode Scene methods. Note also that the order of the
-   * TransformNode wihin the array is not significant and might change.
+   * Any addition or removal should be done using the addTransformNode and removeTransformNode Scene
+   * methods. Note also that the order of the TransformNode wihin the array is not significant and
+   * might change.
    * @see http://doc.babylonjs.com/how_to/transformnode
    */
   std::vector<TransformNodePtr> transformNodes;
@@ -363,8 +360,7 @@ private:
   /**
    * Stores the list of available individual parsers in the application.
    */
-  static std::unordered_map<std::string, IndividualBabylonFileParser>
-    _IndividualBabylonFileParsers;
+  static std::unordered_map<std::string, IndividualBabylonFileParser> _IndividualBabylonFileParsers;
 
   /** Hidden */
   BaseTexturePtr _environmentTexture;
