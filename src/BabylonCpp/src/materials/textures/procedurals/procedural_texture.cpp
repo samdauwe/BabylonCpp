@@ -28,6 +28,7 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
     , _effect{nullptr}
     , refreshRate{this, &ProceduralTexture::get_refreshRate, &ProceduralTexture::set_refreshRate}
     , _currentRefreshId{-1}
+    , _frameId{-1}
     , _refreshRate{1}
     , _fallbackTextureUsed{false}
     , _cachedDefines{""}
@@ -152,12 +153,12 @@ EffectPtr& ProceduralTexture::getEffect()
 
 ArrayBufferView& ProceduralTexture::getContent()
 {
-  if (_contentData && _currentRefreshId == _contentUpdateId) {
+  if (_contentData && _frameId == _contentUpdateId) {
     return _contentData;
   }
 
   _contentData     = readPixels(0, 0, _contentData);
-  _contentUpdateId = _currentRefreshId;
+  _contentUpdateId = _frameId;
 
   return _contentData;
 }
@@ -300,11 +301,13 @@ bool ProceduralTexture::_shouldRender()
 
   if (_currentRefreshId == -1) { // At least render once
     _currentRefreshId = 1;
+    _frameId++;
     return true;
   }
 
   if (static_cast<int>(refreshRate()) == _currentRefreshId) {
     _currentRefreshId = 1;
+    _frameId++;
     return true;
   }
 

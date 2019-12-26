@@ -17,10 +17,10 @@ using VertexBufferPtr      = std::shared_ptr<VertexBuffer>;
 using WebGLDataBufferPtr   = std::shared_ptr<WebGLDataBuffer>;
 
 /**
- * @brief Procedural texturing is a way to programmatically create a texture.
- * There are 2 types of procedural textures: code-only, and code that references some classic 2D
- * images, sometimes calmpler' images. This is the base class of any Procedural texture and contains
- * most of the shareable code.
+ * @brief Procedural texturing is a way to programmatically create a texture. There are 2 types of
+ * procedural textures: code-only, and code that references some classic 2D images, sometimes
+ * calmpler' images. This is the base class of any Procedural texture and contains most of the
+ * shareable code.
  * @see http://doc.babylonjs.com/how_to/how_to_use_procedural_textures
  */
 class BABYLON_SHARED_EXPORT ProceduralTexture : public Texture {
@@ -303,6 +303,7 @@ private:
   Size _size;
   bool _doNotChangeAspectRatio;
   int _currentRefreshId;
+  int _frameId;
   float _refreshRate;
   std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
   WebGLDataBufferPtr _indexBuffer;

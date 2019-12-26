@@ -16,9 +16,8 @@ ProceduralTextureSceneComponent::~ProceduralTextureSceneComponent() = default;
 
 void ProceduralTextureSceneComponent::_register()
 {
-  scene->_beforeClearStage.registerStep(
-    SceneComponentConstants::STEP_BEFORECLEAR_PROCEDURALTEXTURE, this,
-    [this]() { _beforeClear(); });
+  scene->_beforeClearStage.registerStep(SceneComponentConstants::STEP_BEFORECLEAR_PROCEDURALTEXTURE,
+                                        this, [this]() { _beforeClear(); });
 }
 
 void ProceduralTextureSceneComponent::rebuild()

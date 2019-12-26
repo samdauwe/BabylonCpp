@@ -56,10 +56,9 @@ protected:
    * @param name defines the name fo the texture
    * @param size defines the size of the texture (default is 256)
    * @param scene defines the hosting scene
-   * @param fallbackTexture defines the texture to use if the
-   * NoiseProceduralTexture can't be created
-   * @param generateMipMaps defines if mipmaps must be generated (true by
-   * default)
+   * @param fallbackTexture defines the texture to use if the NoiseProceduralTexture can't be
+   * created
+   * @param generateMipMaps defines if mipmaps must be generated (true by default)
    */
   NoiseProceduralTexture(const std::string& name, int size = 256, Scene* scene = nullptr,
                          Texture* fallbackTexture = nullptr, bool generateMipMaps = false);
