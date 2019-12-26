@@ -9,10 +9,9 @@ namespace BABYLON {
 class Engine;
 
 /**
- * @brief This represents a color grading texture. This acts as a lookup table
- * LUT, useful during post process It can help converting any input color in a
- * desired output one. This can then be used to create effects from sepia, black
- * and white to sixties or futuristic rendering...
+ * @brief This represents a color grading texture. This acts as a lookup table LUT, useful during
+ * post process It can help converting any input color in a desired output one. This can then be
+ * used to create effects from sepia, black and white to sixties or futuristic rendering...
  *
  * The only supported format is currently 3dl.
  * More information on LUT: https://en.wikipedia.org/wiki/3D_lookup_table
@@ -23,8 +22,7 @@ public:
   /**
    * @brief Instantiates a ColorGradingTexture from the following parameters.
    *
-   * @param url The location of the color gradind data (currently only
-   * supporting 3dl)
+   * @param url The location of the color gradind data (currently only supporting 3dl)
    * @param scene The scene the texture will be used in
    */
   ColorGradingTexture(const std::string& url, Scene* scene);
@@ -32,8 +30,8 @@ public:
 
   /**
    * @brief Returns the texture matrix used in most of the material.
-   * This is not used in color grading but keep for troubleshooting purpose
-   * (easily swap diffuse by colorgrading to look in).
+   * This is not used in color grading but keep for troubleshooting purpose (easily swap diffuse by
+   * colorgrading to look in).
    */
   Matrix* getTextureMatrix(int uBase = 1) override;
 
@@ -81,8 +79,7 @@ public:
 
 private:
   /**
-   * The current texture matrix. (will always be identity in color grading
-   * texture)
+   * The current texture matrix. (will always be identity in color grading texture)
    */
   std::unique_ptr<Matrix> _textureMatrix;
 

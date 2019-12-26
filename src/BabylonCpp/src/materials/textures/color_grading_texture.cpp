@@ -56,11 +56,13 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
   InternalTexturePtr texture = nullptr;
   if (_engine->webGLVersion() == 1.f) {
     texture = _engine->createRawTexture(Uint8Array(), 1, 1, Constants::TEXTUREFORMAT_RGBA, false,
-                                        false, TextureConstants::BILINEAR_SAMPLINGMODE);
+                                        false, TextureConstants::BILINEAR_SAMPLINGMODE, "",
+                                        Constants::TEXTURETYPE_UNSIGNED_INT);
   }
   else {
     texture = _engine->createRawTexture3D(Uint8Array(), 1, 1, 1, Constants::TEXTUREFORMAT_RGBA,
-                                          false, false, TextureConstants::BILINEAR_SAMPLINGMODE);
+                                          false, false, TextureConstants::BILINEAR_SAMPLINGMODE, "",
+                                          Constants::TEXTURETYPE_UNSIGNED_INT);
   }
 
   _texture = texture;

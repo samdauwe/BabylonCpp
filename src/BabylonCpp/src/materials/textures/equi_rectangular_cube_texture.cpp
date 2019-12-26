@@ -9,14 +9,13 @@
 
 namespace BABYLON {
 
-std::array<std::string, 6> EquiRectangularCubeTexture::_FacesMapping{
-  "right", "left", "up", "down", "front", "back"};
+std::array<std::string, 6> EquiRectangularCubeTexture::_FacesMapping{"right", "left",  "up",
+                                                                     "down",  "front", "back"};
 
 EquiRectangularCubeTexture::EquiRectangularCubeTexture(
-  const std::string& iUrl, Scene* scene, size_t size, bool iNoMipmap,
-  bool iGammaSpace, const std::function<void()>& onLoad,
-  const std::function<void(const std::string& message,
-                           const std::string& exception)>& onError)
+  const std::string& iUrl, Scene* scene, size_t size, bool iNoMipmap, bool iGammaSpace,
+  const std::function<void()>& onLoad,
+  const std::function<void(const std::string& message, const std::string& exception)>& onError)
     : BaseTexture{scene}
     , coordinatesMode{TextureConstants::CUBIC_MODE}
     , _onLoad{nullptr}
@@ -52,16 +51,14 @@ EquiRectangularCubeTexture::EquiRectangularCubeTexture(
       onLoad();
     }
     else {
-      _texture->onLoadedObservable.add(
-        [&](InternalTexture*, EventState&) { onLoad(); });
+      _texture->onLoadedObservable.add([&](InternalTexture*, EventState&) { onLoad(); });
     }
   }
 }
 
 void EquiRectangularCubeTexture::loadImage(
   const std::function<void()>& /*loadTextureCallback*/,
-  const std::function<void(const std::string& message,
-                           const std::string& exception)>& /*onError*/)
+  const std::function<void(const std::string& message, const std::string& exception)>& /*onError*/)
 {
 }
 
@@ -71,14 +68,12 @@ void EquiRectangularCubeTexture::loadTexture()
 {
   using ArrayBufferViewArray = std::vector<ArrayBufferView>;
 
-  auto scene = getScene();
-  const auto callback
-    = [this](const ArrayBuffer & /*arrayBuffer*/) -> ArrayBufferViewArray {
+  auto scene          = getScene();
+  const auto callback = [this](const ArrayBuffer & /*arrayBuffer*/) -> ArrayBufferViewArray {
     auto imageData = getFloat32ArrayFromArrayBuffer(_buffer);
 
     // Extract the raw linear data.
-    auto data = PanoramaToCubeMapTools::ConvertPanoramaToCubemap(
-      imageData, _width, _height, _size);
+    auto data = PanoramaToCubeMapTools::ConvertPanoramaToCubemap(imageData, _width, _height, _size);
 
     ArrayBufferViewArray results;
 
@@ -116,9 +111,8 @@ void EquiRectangularCubeTexture::loadTexture()
     scene,                        //
     static_cast<int>(_size),      //
     Constants::TEXTUREFORMAT_RGB, //
-    scene->getEngine()->getCaps().textureFloat ?
-      Constants::TEXTURETYPE_FLOAT :
-      Constants::TEXTURETYPE_UNSIGNED_INTEGER,
+    scene->getEngine()->getCaps().textureFloat ? Constants::TEXTURETYPE_FLOAT :
+                                                 Constants::TEXTURETYPE_UNSIGNED_INTEGER,
     _noMipmap, //
     callback,  //
     nullptr,   //
@@ -127,8 +121,7 @@ void EquiRectangularCubeTexture::loadTexture()
   );
 }
 
-Float32Array EquiRectangularCubeTexture::getFloat32ArrayFromArrayBuffer(
-  const ArrayBuffer& buffer)
+Float32Array EquiRectangularCubeTexture::getFloat32ArrayFromArrayBuffer(const ArrayBuffer& buffer)
 {
   DataView dataView(buffer);
   Float32Array floatImageData((buffer.size() * 3) / 4);
@@ -137,7 +130,7 @@ Float32Array EquiRectangularCubeTexture::getFloat32ArrayFromArrayBuffer(
   for (size_t i = 0; i < buffer.size(); ++i) {
     // We drop the transparency channel, because we do not need/want it
     if ((i + 1) % 4 != 0) {
-      floatImageData[k++] =  static_cast<float>(dataView.getUint8(i)) / 255.f;
+      floatImageData[k++] = static_cast<float>(dataView.getUint8(i)) / 255.f;
     }
   }
 
@@ -156,8 +149,7 @@ EquiRectangularCubeTexturePtr EquiRectangularCubeTexture::clone() const
     return nullptr;
   }
 
-  auto newTexture
-    = EquiRectangularCubeTexture::New(url, scene, _size, _noMipmap, gammaSpace);
+  auto newTexture = EquiRectangularCubeTexture::New(url, scene, _size, _noMipmap, gammaSpace);
 
   // Base texture
   newTexture->level            = level;

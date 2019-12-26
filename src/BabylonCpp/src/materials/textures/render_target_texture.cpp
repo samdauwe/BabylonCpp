@@ -20,16 +20,16 @@
 
 namespace BABYLON {
 
-RenderTargetTexture::RenderTargetTexture(
-  const std::string& iName, const std::variant<ISize, float>& size,
-  Scene* scene, bool generateMipMaps, bool doNotChangeAspectRatio,
-  unsigned int type, bool iIsCube, unsigned int iSamplingMode,
-  bool generateDepthBuffer, bool generateStencilBuffer, bool isMulti,
-  unsigned int format, bool delayAllocation)
+RenderTargetTexture::RenderTargetTexture(const std::string& iName,
+                                         const std::variant<ISize, float>& size, Scene* scene,
+                                         bool generateMipMaps, bool doNotChangeAspectRatio,
+                                         unsigned int type, bool iIsCube,
+                                         unsigned int iSamplingMode, bool generateDepthBuffer,
+                                         bool generateStencilBuffer, bool isMulti,
+                                         unsigned int format, bool delayAllocation)
     : Texture{"", scene, !generateMipMaps}
     , renderListPredicate{nullptr}
-    , renderList{this, &RenderTargetTexture::get_renderList,
-                 &RenderTargetTexture::set_renderList}
+    , renderList{this, &RenderTargetTexture::get_renderList, &RenderTargetTexture::set_renderList}
     , renderParticles{true}
     , renderSprites{false}
     , activeCamera{nullptr}
@@ -41,8 +41,7 @@ RenderTargetTexture::RenderTargetTexture(
     , onAfterRender{this, &RenderTargetTexture::set_onAfterRender}
     , onClear{this, &RenderTargetTexture::set_onClear}
     , renderTargetOptions{this, &RenderTargetTexture::get_renderTargetOptions}
-    , samples{this, &RenderTargetTexture::get_samples,
-              &RenderTargetTexture::set_samples}
+    , samples{this, &RenderTargetTexture::get_samples, &RenderTargetTexture::set_samples}
     , refreshRate{this, &RenderTargetTexture::get_refreshRate,
                   &RenderTargetTexture::set_refreshRate}
     , _sizeRatio{0.f}
@@ -72,14 +71,13 @@ RenderTargetTexture::RenderTargetTexture(
 
   _processSizeParameter(size);
 
-  _resizeObserver
-    = scene->getEngine()->onResizeObservable.add([](Engine*, EventState&) {});
+  _resizeObserver = scene->getEngine()->onResizeObservable.add([](Engine*, EventState&) {});
 
   _generateMipMaps        = generateMipMaps;
   _doNotChangeAspectRatio = doNotChangeAspectRatio;
 
   // Rendering groups
-  _renderingManager = std::make_unique<RenderingManager>(scene);
+  _renderingManager                          = std::make_unique<RenderingManager>(scene);
   _renderingManager->_useSceneAutoClearSetup = true;
 
   if (isMulti) {
@@ -100,14 +98,13 @@ RenderTargetTexture::RenderTargetTexture(
 
   if (!delayAllocation) {
     if (iIsCube) {
-      _texture = scene->getEngine()->createRenderTargetCubeTexture(
-        getRenderSize(), _renderTargetOptions);
+      _texture
+        = scene->getEngine()->createRenderTargetCubeTexture(getRenderSize(), _renderTargetOptions);
       coordinatesMode = TextureConstants::INVCUBIC_MODE;
       _textureMatrix  = std::make_unique<Matrix>(Matrix::Identity());
     }
     else {
-      _texture = scene->getEngine()->createRenderTargetTexture(
-        size, _renderTargetOptions);
+      _texture = scene->getEngine()->createRenderTargetTexture(size, _renderTargetOptions);
     }
   }
 }
@@ -126,14 +123,12 @@ std::vector<AbstractMesh*>& RenderTargetTexture::get_renderList()
   return _renderList;
 }
 
-void RenderTargetTexture::set_renderList(
-  const std::vector<AbstractMesh*>& value)
+void RenderTargetTexture::set_renderList(const std::vector<AbstractMesh*>& value)
 {
   _renderList = value;
 }
 
-void RenderTargetTexture::set_boundingBoxSize(
-  const std::optional<Vector3>& value)
+void RenderTargetTexture::set_boundingBoxSize(const std::optional<Vector3>& value)
 {
   if (_boundingBoxSize && (*_boundingBoxSize).equals(*value)) {
     return;
@@ -191,8 +186,7 @@ RenderTargetCreationOptions& RenderTargetTexture::get_renderTargetOptions()
   return _renderTargetOptions;
 }
 
-void RenderTargetTexture::createDepthStencilTexture(int comparisonFunction,
-                                                    bool bilinearFiltering,
+void RenderTargetTexture::createDepthStencilTexture(int comparisonFunction, bool bilinearFiltering,
                                                     bool generateStencil)
 {
   if (!getScene()) {
@@ -205,13 +199,12 @@ void RenderTargetTexture::createDepthStencilTexture(int comparisonFunction,
   options.comparisonFunction = comparisonFunction;
   options.generateStencil    = generateStencil;
   options.isCube             = isCube;
-  depthStencilTexture = engine->createDepthStencilTexture(_size, options);
+  depthStencilTexture        = engine->createDepthStencilTexture(_size, options);
 
   engine->setFrameBufferDepthStencilTexture(this);
 }
 
-void RenderTargetTexture::_processSizeParameter(
-  const std::variant<ISize, float>& size)
+void RenderTargetTexture::_processSizeParameter(const std::variant<ISize, float>& size)
 {
   if (std::holds_alternative<float>(size)) {
     _sizeRatio = std::get<float>(size);
@@ -244,8 +237,7 @@ void RenderTargetTexture::set_samples(unsigned int value)
     return;
   }
 
-  _samples
-    = scene->getEngine()->updateRenderTargetTextureSampleCount(_texture, value);
+  _samples = scene->getEngine()->updateRenderTargetTextureSampleCount(_texture, value);
 }
 
 void RenderTargetTexture::resetRefreshCounter()
@@ -303,8 +295,7 @@ void RenderTargetTexture::removePostProcess(const PostProcessPtr& postProcess)
     return;
   }
 
-  auto it
-    = std::find(_postProcesses.begin(), _postProcesses.end(), postProcess);
+  auto it = std::find(_postProcesses.begin(), _postProcesses.end(), postProcess);
 
   if (it == _postProcesses.end()) {
     return;
@@ -363,7 +354,9 @@ bool RenderTargetTexture::canRescale() const
 
 void RenderTargetTexture::scale(float ratio)
 {
-  ISize newSize = _size * ratio;
+  ISize newSize  = getRenderSize() * ratio;
+  newSize.width  = std::max(1, newSize.width);
+  newSize.height = std::max(1, newSize.height);
   resize(newSize);
 }
 
@@ -390,12 +383,11 @@ void RenderTargetTexture::resize(const std::variant<ISize, float>& size)
   _processSizeParameter(size);
 
   if (wasCube) {
-    _texture = scene->getEngine()->createRenderTargetCubeTexture(
-      getRenderSize(), _renderTargetOptions);
+    _texture
+      = scene->getEngine()->createRenderTargetCubeTexture(getRenderSize(), _renderTargetOptions);
   }
   else {
-    _texture = scene->getEngine()->createRenderTargetTexture(
-      _size, _renderTargetOptions);
+    _texture = scene->getEngine()->createRenderTargetTexture(_size, _renderTargetOptions);
   }
 
   if (onResizeObservable.hasObservers()) {
@@ -451,8 +443,7 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
   CameraPtr camera = nullptr;
   if (activeCamera) {
     camera = activeCamera;
-    engine->setViewport(activeCamera->viewport, getRenderWidth(),
-                        getRenderHeight());
+    engine->setViewport(activeCamera->viewport, getRenderWidth(), getRenderHeight());
 
     if (activeCamera != scene->activeCamera()) {
       scene->setTransformMatrix(activeCamera->getViewMatrix(),
@@ -462,8 +453,7 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
   else {
     camera = scene->activeCamera();
     if (camera) {
-      engine->setViewport(scene->activeCamera()->viewport, getRenderWidth(),
-                          getRenderHeight());
+      engine->setViewport(scene->activeCamera()->viewport, getRenderWidth(), getRenderHeight());
     }
   }
 
@@ -495,12 +485,10 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
         isMasked = false;
       }
 
-      if (mesh->isEnabled() && mesh->isVisible && (!mesh->subMeshes.empty())
-          && !isMasked) {
-        if (mesh->_activate(sceneRenderId, true)) {
+      if (mesh->isEnabled() && mesh->isVisible && (!mesh->subMeshes.empty()) && !isMasked) {
+        if (mesh->_activate(sceneRenderId, true) && !mesh->subMeshes.empty()) {
           if (!mesh->isAnInstance()) {
-            mesh->_internalAbstractMeshDataInfo._onlyForInstancesIntermediate
-              = false;
+            mesh->_internalAbstractMeshDataInfo._onlyForInstancesIntermediate = false;
           }
           else {
             mesh = static_cast<InstancedMesh*>(mesh);
@@ -508,7 +496,6 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
           mesh->_internalAbstractMeshDataInfo._isActiveIntermediate = true;
 
           for (const auto& subMesh : mesh->subMeshes) {
-            scene->_activeIndices.addCount(subMesh->indexCount, false);
             _renderingManager->dispatch(subMesh.get(), mesh);
           }
         }
@@ -518,14 +505,12 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
 
   for (const auto& particleSystem : scene->particleSystems) {
     if (!particleSystem->isStarted() || !particleSystem->hasEmitter()
-        || !(
-          std::holds_alternative<AbstractMeshPtr>(particleSystem->emitter)
-          && std::get<AbstractMeshPtr>(particleSystem->emitter)->isEnabled())) {
+        || !(std::holds_alternative<AbstractMeshPtr>(particleSystem->emitter)
+             && std::get<AbstractMeshPtr>(particleSystem->emitter)->isEnabled())) {
       continue;
     }
-    if (stl_util::index_of(
-          currentRenderList(),
-          std::get<AbstractMeshPtr>(particleSystem->emitter).get())
+    if (stl_util::index_of(currentRenderList(),
+                           std::get<AbstractMeshPtr>(particleSystem->emitter).get())
         >= 0) {
       _renderingManager->dispatchParticles(particleSystem.get());
     }
@@ -533,8 +518,7 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
 
   if (isCube) {
     for (unsigned int face = 0; face < 6; ++face) {
-      renderToTarget(face, currentRenderList(), useCameraPostProcess,
-                     dumpForDebug);
+      renderToTarget(face, currentRenderList(), useCameraPostProcess, dumpForDebug);
       scene->incrementRenderId();
       scene->resetCachedMaterial();
     }
@@ -550,9 +534,8 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
     // camera may have overwrite these
     if (scene->getEngine()->scenes.size() > 1
         || (activeCamera && activeCamera != scene->activeCamera())) {
-      scene->setTransformMatrix(
-        scene->activeCamera()->getViewMatrix(),
-        scene->activeCamera()->getProjectionMatrix(true));
+      scene->setTransformMatrix(scene->activeCamera()->getViewMatrix(),
+                                scene->activeCamera()->getProjectionMatrix(true));
     }
     engine->setViewport(scene->activeCamera()->viewport);
   }
@@ -560,13 +543,12 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
   scene->resetCachedMaterial();
 }
 
-int RenderTargetTexture::_bestReflectionRenderTargetDimension(
-  int renderDimension, float scale) const
+int RenderTargetTexture::_bestReflectionRenderTargetDimension(int renderDimension,
+                                                              float scale) const
 {
   const int minimum = 128;
   const float x     = renderDimension * scale;
-  const int curved  = Engine::NearestPOT(
-    static_cast<int>(x + (minimum * minimum / (minimum + x))));
+  const int curved  = Engine::NearestPOT(static_cast<int>(x + (minimum * minimum / (minimum + x))));
 
   // Ensure we don't exceed the render dimension (while staying POT)
   return std::min(Engine::FloorPOT(renderDimension), curved);
@@ -585,14 +567,12 @@ void RenderTargetTexture::_bindFrameBuffer(unsigned int faceIndex)
     if (isCube()) {
       iFaceIndex = faceIndex;
     }
-    engine->bindFramebuffer(
-      _texture, iFaceIndex, std::nullopt, std::nullopt, ignoreCameraViewport,
-      depthStencilTexture ? depthStencilTexture.get() : nullptr);
+    engine->bindFramebuffer(_texture, iFaceIndex, std::nullopt, std::nullopt, ignoreCameraViewport,
+                            depthStencilTexture ? depthStencilTexture.get() : nullptr);
   }
 }
 
-void RenderTargetTexture::unbindFrameBuffer(Engine* engine,
-                                            unsigned int faceIndex)
+void RenderTargetTexture::unbindFrameBuffer(Engine* engine, unsigned int faceIndex)
 {
   if (!_texture) {
     return;
@@ -603,9 +583,9 @@ void RenderTargetTexture::unbindFrameBuffer(Engine* engine,
   });
 }
 
-void RenderTargetTexture::renderToTarget(
-  unsigned int faceIndex, const std::vector<AbstractMesh*>& currentRenderList,
-  bool useCameraPostProcess, bool dumpForDebug)
+void RenderTargetTexture::renderToTarget(unsigned int faceIndex,
+                                         const std::vector<AbstractMesh*>& currentRenderList,
+                                         bool useCameraPostProcess, bool dumpForDebug)
 {
   auto scene = getScene();
   if (!scene) {
@@ -622,8 +602,7 @@ void RenderTargetTexture::renderToTarget(
   if (_postProcessManager) {
     _postProcessManager->_prepareFrame(_texture, _postProcesses);
   }
-  else if (!useCameraPostProcess
-           || !scene->postProcessManager->_prepareFrame(_texture)) {
+  else if (!useCameraPostProcess || !scene->postProcessManager->_prepareFrame(_texture)) {
     _bindFrameBuffer(faceIndex);
   }
 
@@ -635,8 +614,7 @@ void RenderTargetTexture::renderToTarget(
     onClearObservable.notifyObservers(engine);
   }
   else {
-    engine->clear(clearColor.has_value() ? *clearColor : scene->clearColor,
-                  true, true, true);
+    engine->clear(clearColor.has_value() ? *clearColor : scene->clearColor, true, true, true);
   }
 
   if (!_doNotChangeAspectRatio) {
@@ -645,27 +623,24 @@ void RenderTargetTexture::renderToTarget(
 
   // Before Camera Draw
   for (const auto& step : scene->_beforeRenderTargetDrawStage) {
-    step.action(
-      std::static_pointer_cast<RenderTargetTexture>(shared_from_this()));
+    step.action(std::static_pointer_cast<RenderTargetTexture>(shared_from_this()));
   }
 
   // Render
-  _renderingManager->render(customRenderFunction, currentRenderList,
-                            renderParticles, renderSprites);
+  _renderingManager->render(customRenderFunction, currentRenderList, renderParticles,
+                            renderSprites);
 
   // After Camera Draw
   for (const auto& step : scene->_afterRenderTargetDrawStage) {
-    step.action(
-      std::static_pointer_cast<RenderTargetTexture>(shared_from_this()));
+    step.action(std::static_pointer_cast<RenderTargetTexture>(shared_from_this()));
   }
 
   if (_postProcessManager) {
-    _postProcessManager->_finalizeFrame(false, _texture, faceIndex,
-                                        _postProcesses, ignoreCameraViewport);
+    _postProcessManager->_finalizeFrame(false, _texture, faceIndex, _postProcesses,
+                                        ignoreCameraViewport);
   }
   else if (useCameraPostProcess) {
-    scene->postProcessManager->_finalizeFrame(
-      false, _texture, static_cast<unsigned>(_faceIndex));
+    scene->postProcessManager->_finalizeFrame(false, _texture, static_cast<unsigned>(_faceIndex));
   }
 
   if (!_doNotChangeAspectRatio) {
@@ -694,39 +669,33 @@ void RenderTargetTexture::renderToTarget(
 
 void RenderTargetTexture::setRenderingOrder(
   unsigned int renderingGroupId,
-  const std::function<int(const SubMesh* a, const SubMesh* b)>&
-    opaqueSortCompareFn,
-  const std::function<int(const SubMesh* a, const SubMesh* b)>&
-    alphaTestSortCompareFn,
-  const std::function<int(const SubMesh* a, const SubMesh* b)>&
-    transparentSortCompareFn)
+  const std::function<int(const SubMesh* a, const SubMesh* b)>& opaqueSortCompareFn,
+  const std::function<int(const SubMesh* a, const SubMesh* b)>& alphaTestSortCompareFn,
+  const std::function<int(const SubMesh* a, const SubMesh* b)>& transparentSortCompareFn)
 {
   _renderingManager->setRenderingOrder(renderingGroupId, opaqueSortCompareFn,
-                                       alphaTestSortCompareFn,
-                                       transparentSortCompareFn);
+                                       alphaTestSortCompareFn, transparentSortCompareFn);
 }
 
-void RenderTargetTexture::setRenderingAutoClearDepthStencil(
-  unsigned int renderingGroupId, bool autoClearDepthStencil)
+void RenderTargetTexture::setRenderingAutoClearDepthStencil(unsigned int renderingGroupId,
+                                                            bool autoClearDepthStencil)
 {
-  _renderingManager->setRenderingAutoClearDepthStencil(renderingGroupId,
-                                                       autoClearDepthStencil);
+  _renderingManager->setRenderingAutoClearDepthStencil(renderingGroupId, autoClearDepthStencil);
   _renderingManager->_useSceneAutoClearSetup = false;
 }
 
 RenderTargetTexturePtr RenderTargetTexture::clone()
 {
   auto textureSize = getSize();
-  auto newTexture  = RenderTargetTexture::New(
-    name,                                              //
-    textureSize, getScene(),                           //
-    _renderTargetOptions.generateMipMaps.value(),      //
-    _doNotChangeAspectRatio,                           //
-    _renderTargetOptions.type.value(),                 //
-    isCube,                                            //
-    _renderTargetOptions.samplingMode.value(),         //
-    _renderTargetOptions.generateDepthBuffer.value(),  //
-    _renderTargetOptions.generateStencilBuffer.value() //
+  auto newTexture  = RenderTargetTexture::New(name,                                              //
+                                             textureSize, getScene(),                           //
+                                             _renderTargetOptions.generateMipMaps.value(),      //
+                                             _doNotChangeAspectRatio,                           //
+                                             _renderTargetOptions.type.value(),                 //
+                                             isCube,                                            //
+                                             _renderTargetOptions.samplingMode.value(),         //
+                                             _renderTargetOptions.generateDepthBuffer.value(),  //
+                                             _renderTargetOptions.generateStencilBuffer.value() //
   );
 
   // Base texture

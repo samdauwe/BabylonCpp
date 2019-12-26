@@ -11,8 +11,8 @@ class EquiRectangularCubeTexture;
 using EquiRectangularCubeTexturePtr = std::shared_ptr<EquiRectangularCubeTexture>;
 
 /**
- * @brief This represents a texture coming from an equirectangular image
- * supported by the web browser canvas.
+ * @brief This represents a texture coming from an equirectangular image supported by the web
+ * browser canvas.
  */
 class BABYLON_SHARED_EXPORT EquiRectangularCubeTexture : public BaseTexture {
 
@@ -29,31 +29,27 @@ public:
   ~EquiRectangularCubeTexture() override; // = default
 
   /**
-   * @brief Get the current class name of the texture useful for serialization
-   * or dynamic coding.
+   * @brief Get the current class name of the texture useful for serialization or dynamic coding.
    * @returns "EquiRectangularCubeTexture"
    */
   std::string getClassName() const;
 
   /**
-   * @brief Create a clone of the current EquiRectangularCubeTexture and return
-   * it.
+   * @brief Create a clone of the current EquiRectangularCubeTexture and return it.
    * @returns A clone of the current EquiRectangularCubeTexture.
    */
   EquiRectangularCubeTexturePtr clone() const;
 
 protected:
   /**
-   * @brief Instantiates an EquiRectangularCubeTexture from the following
-   * parameters.
+   * @brief Instantiates an EquiRectangularCubeTexture from the following parameters.
    * @param url The location of the image
    * @param scene The scene the texture will be used in
-   * @param size The cubemap desired size (the more it increases the longer the
-   * generation will be)
+   * @param size The cubemap desired size (the more it increases the longer the generation will be)
    * @param noMipmap Forces to not generate the mipmap if true
-   * @param gammaSpace Specifies if the texture will be used in gamma or linear
-   * space (the PBR material requires those textures in linear space, but the
-   * standard material would require them in Gamma space)
+   * @param gammaSpace Specifies if the texture will be used in gamma or linear space
+   * (the PBR material requires those textures in linear space, but the standard material would
+   * require them in Gamma space)
    * @param onLoad — defines a callback called when texture is loaded
    * @param onError — defines a callback called if there is an error
    */
@@ -65,8 +61,7 @@ protected:
 
 private:
   /**
-   * @brief Load the image data, by putting the image on a canvas and extracting
-   * its buffer.
+   * @brief Load the image data, by putting the image on a canvas and extracting its buffer.
    */
   void loadImage(
     const std::function<void()>& loadTextureCallback,
@@ -78,8 +73,7 @@ private:
   void loadTexture();
 
   /**
-   * @brief Convert the ArrayBuffer into a Float32Array and drop the
-   * transparency channel.
+   * @brief Convert the ArrayBuffer into a Float32Array and drop the transparency channel.
    * @param buffer The ArrayBuffer that should be converted.
    * @returns The buffer as Float32Array.
    */
@@ -92,8 +86,8 @@ public:
   std::string url;
 
   /**
-   * The texture coordinates mode. As this texture is stored in a cube format,
-   * please modify carefully.
+   * The texture coordinates mode. As this texture is stored in a cube format, please modify
+   * carefully.
    */
   unsigned int coordinatesMode;
 

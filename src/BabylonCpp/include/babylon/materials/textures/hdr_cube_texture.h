@@ -12,8 +12,8 @@ using HDRCubeTexturePtr = std::shared_ptr<HDRCubeTexture>;
 /**
  * @brief This represents a texture coming from an HDR input.
  *
- * The only supported format is currently panorama picture stored in RGBE
- * format. Example of such files can be found on HDRLib: http://hdrlib.com/
+ * The only supported format is currently panorama picture stored in RGBE format.
+ * Example of such files can be found on HDRLib: http://hdrlib.com/
  */
 class BABYLON_SHARED_EXPORT HDRCubeTexture : public BaseTexture {
 
@@ -29,8 +29,7 @@ public:
   ~HDRCubeTexture() override; // = default
 
   /**
-   * @brief Get the current class name of the texture useful for serialization
-   * or dynamic coding.
+   * @brief Get the current class name of the texture useful for serialization or dynamic coding.
    * @returns "HDRCubeTexture"
    */
   std::string getClassName() const;
@@ -41,8 +40,7 @@ public:
   void delayLoad(const std::string& forcedExtension = "") override;
 
   /**
-   * @brief Get the texture reflection matrix used to rotate/transform the
-   * reflection.
+   * @brief Get the texture reflection matrix used to rotate/transform the reflection.
    * @returns the reflection matrix
    */
   Matrix* getReflectionTextureMatrix() override;
@@ -55,12 +53,10 @@ public:
   void setReflectionTextureMatrix(Matrix& value);
 
   /**
-   * @brief Parses a JSON representation of an HDR Texture in order to create
-   * the texture
+   * @brief Parses a JSON representation of an HDR Texture in order to create the texture
    * @param parsedTexture Define the JSON representation
    * @param scene Define the scene the texture should be created in
-   * @param rootUrl Define the root url in case we need to load relative
-   * dependencies
+   * @param rootUrl Define the root url in case we need to load relative dependencies
    * @returns the newly created texture after parsing
    */
   static HDRCubeTexture* Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
@@ -70,17 +66,15 @@ public:
 protected:
   /**
    * @brief Instantiates an HDRTexture from the following parameters.
-   * @param url The location of the HDR raw data (Panorama stored in RGBE
-   * format)
+   * @param url The location of the HDR raw data (Panorama stored in RGBE format)
    * @param scene The scene the texture will be used in
-   * @param size The cubemap desired size (the more it increases the longer the
-   * generation will be)
+   * @param size The cubemap desired size (the more it increases the longer the generation will be)
    * @param noMipmap Forces to not generate the mipmap if true
-   * @param generateHarmonics Specifies whether you want to extract the
-   * polynomial harmonics during the generation process
-   * @param gammaSpace Specifies if the texture will be use in gamma or linear
-   * space (the PBR material requires those texture in linear space, but the
-   * standard material would require them in Gamma space)
+   * @param generateHarmonics Specifies whether you want to extract the polynomial harmonics during
+   * the generation process
+   * @param gammaSpace Specifies if the texture will be use in gamma or linear space (the PBR
+   * material requires those texture in linear space, but the standard material would require them
+   * in Gamma space)
    * @param reserved Reserved flag for internal use.
    */
   HDRCubeTexture(
@@ -146,8 +140,8 @@ public:
   Property<HDRCubeTexture, float> rotationY;
 
   /**
-   * Gets or sets the center of the bounding box associated with the cube
-   * texture It must define where the camera used to render the texture was set
+   * Gets or sets the center of the bounding box associated with the cube texture It must define
+   * where the camera used to render the texture was set
    */
   Vector3 boundingBoxPosition;
 
