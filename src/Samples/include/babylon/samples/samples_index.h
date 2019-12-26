@@ -123,7 +123,7 @@ private:
 
 }; // end of class SamplesIndex
 
-std::string SamplesProjectFolder();
+BABYLON_SHARED_EXPORT std::string SamplesProjectFolder();
 
 } // end of namespace Samples
 } // end of namespace BABYLON

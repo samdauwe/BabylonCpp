@@ -35,14 +35,14 @@ void HeartBeat()
       std::lock_guard<std::mutex> guard(gMutexPendingCallbacks);
 
       if (nbCallbackAtStart < 0)
-        nbCallbackAtStart = gPendingCallbacks.size();
+        nbCallbackAtStart = static_cast<int>(gPendingCallbacks.size());
 
       if (!gPendingCallbacks.empty())
       {
         callback = gPendingCallbacks.front();
         gPendingCallbacks.pop_front();
       }
-      nbRemainingCallback = gPendingCallbacks.size();
+      nbRemainingCallback = static_cast<int>(gPendingCallbacks.size());
     }
 
     if (callback) {

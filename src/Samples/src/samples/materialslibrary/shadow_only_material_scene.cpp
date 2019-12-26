@@ -35,7 +35,7 @@ public:
     scene->clearColor   = Color4(0.f, 0.f, 0.f, 0.f);
     scene->ambientColor = Color3(0.4f, 0.4f, 0.4f);
 
-    auto camera = ArcRotateCamera::New("Camera", -0.5f, 0.8f, 200, Vector3::Zero(), scene);
+    auto camera = ArcRotateCamera::New("Camera", -0.5f, 0.8f, 200.f, Vector3::Zero(), scene);
     camera->attachControl(canvas, true);
 
     auto light       = DirectionalLight::New("light", Vector3(0.f, -1.f, 1.f), scene);

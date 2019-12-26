@@ -159,8 +159,8 @@ private:
           BABYLON::System::openBrowser(link);
         ImGui::SameLine();
         ImVec4 linkColor(0.5f, 0.5f, 0.95f, 1.f);
-        float wrap_width = 350.f;
-        ImGui::PushTextWrapPos(ImGui::GetWindowWidth() - 15.);
+        // float wrap_width = 350.f;
+        ImGui::PushTextWrapPos(ImGui::GetWindowWidth() - 15.f);
         ImGui::TextColored(linkColor, "%s", link.c_str());
         ImGui::PopTextWrapPos();
       }

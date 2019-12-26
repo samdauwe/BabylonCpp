@@ -61,7 +61,7 @@ BABYLON_SHARED_EXPORT void Service_Stop();
 /**
  * Desesperate patch for glTF loading
  */
-void set_HACK_DISABLE_ASYNC(bool v);
+BABYLON_SHARED_EXPORT void set_HACK_DISABLE_ASYNC(bool v);
 
 } // namespace asio
 } // namespace BABYLON
