@@ -1,78 +1,13 @@
-# ============================================================================ #
-#                            Executable name and options                       #
-# ============================================================================ #
+option(BABYLON_BUILD_BENCHMARK    "Add benchmark to tests" OFF)
 
-# Target name
-set(TARGET BabylonCppLibBenchmarks)
-message(STATUS "Benchmarks ${TARGET}")
+if (BABYLON_BUILD_BENCHMARK)
+    set(TARGET BabylonCppLibBenchmarks)
+    message(STATUS "Benchmarks ${TARGET}")
 
-# ============================================================================ #
-#                            Sources                                           #
-# ============================================================================ #
+    file(GLOB_RECURSE SRC_FILES *.cpp)
+    babylon_add_test(${TARGET} ${SRC_FILES})
+    babylon_target_clang_tidy(${TARGET})
 
-# Sources
-file(GLOB_RECURSE SRC_FILES *.cpp)
-set(sources
-    ${SRC_FILES}
-)
-
-# ============================================================================ #
-#                            Create executable                                 #
-# ============================================================================ #
-
-# Build executable
-add_executable(${TARGET}
-    ${sources}
-)
-babylon_target_clang_tidy(${TARGET})
-
-
-# Create namespaced alias
-add_executable(${META_PROJECT_NAME}::${TARGET} ALIAS ${TARGET})
-
-# Project options
-set_target_properties(${TARGET}
-    PROPERTIES ${DEFAULT_PROJECT_OPTIONS}
-    FOLDER "${IDE_FOLDER}"
-)
-
-# Include directories
-target_include_directories(${TARGET}
-    PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/../include
-    ${CMAKE_CURRENT_BINARY_DIR}/../include
-)
-
-# Libraries
-target_link_libraries(${TARGET}
-    PRIVATE
-    BabylonCpp
-    gmock-dev
-)
-
-# Compile definitions
-target_compile_definitions(${TARGET}
-    PRIVATE
-)
-
-# Compile options
-target_compile_options(${TARGET}
-    PRIVATE
-)
-
-# ============================================================================ #
-#                            Run unit tests at build time                      #
-# ============================================================================ #
-
-# Check if unit tests should run at build time
-get_target_property(TEST_EXCLUDE_FROM_DEFAULT_BUILD
-    BabylonCppBenchmarks EXCLUDE_FROM_DEFAULT_BUILD
-)
-
-if(EXCLUDE_FROM_DEFAULT_BUILD)
-    add_custom_command (
-      TARGET ${TARGET} POST_BUILD
-      COMMAND ${TARGET} --gtest_output=xml:${TARGET}.xml
-      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}
-    )
+    # Libraries
+    target_link_libraries(${TARGET} PRIVATE BabylonCpp)
 endif()

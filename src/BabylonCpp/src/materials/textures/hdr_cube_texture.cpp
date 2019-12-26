@@ -26,15 +26,12 @@ std::vector<std::string> HDRCubeTexture::_facesMapping{
 };
 
 HDRCubeTexture::HDRCubeTexture(
-  const std::string& iUrl, Scene* scene, size_t size, bool iNoMipmap,
-  bool generateHarmonics, bool iGammaSpace, bool /*reserved*/,
-  const std::function<void()>& onLoad,
-  const std::function<void(const std::string& message,
-                           const std::string& exception)>& onError)
+  const std::string& iUrl, Scene* scene, size_t size, bool iNoMipmap, bool generateHarmonics,
+  bool iGammaSpace, bool /*reserved*/, const std::function<void()>& onLoad,
+  const std::function<void(const std::string& message, const std::string& exception)>& onError)
     : BaseTexture(scene)
     , url{iUrl}
-    , rotationY{this, &HDRCubeTexture::get_rotationY,
-                &HDRCubeTexture::set_rotationY}
+    , rotationY{this, &HDRCubeTexture::get_rotationY, &HDRCubeTexture::set_rotationY}
     , boundingBoxPosition{Vector3::Zero()}
     , _isBlocking{true}
     , _rotationY{0.f}
@@ -134,8 +131,7 @@ std::optional<Vector3>& HDRCubeTexture::get_boundingBoxSize()
 
 void HDRCubeTexture::loadTexture()
 {
-  const auto callback
-    = [this](const ArrayBuffer& buffer) -> std::vector<ArrayBufferView> {
+  const auto callback = [this](const ArrayBuffer& buffer) -> std::vector<ArrayBufferView> {
     lodGenerationOffset = 0.f;
     lodGenerationScale  = 0.8f;
 
@@ -149,8 +145,8 @@ void HDRCubeTexture::loadTexture()
 
     // Generate harmonics if needed.
     if (_generateHarmonics) {
-      auto _sphericalPolynomial = CubeMapToSphericalPolynomialTools::
-        ConvertCubeMapToSphericalPolynomial(data);
+      auto _sphericalPolynomial
+        = CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(data);
       sphericalPolynomial = _sphericalPolynomial;
     }
 
@@ -166,7 +162,7 @@ void HDRCubeTexture::loadTexture()
         byteArray.resize(_size * _size * 3);
       }
 
-      auto& dataFace = data[HDRCubeTexture::_facesMapping[j]].float32Array;
+      auto dataFace = data[HDRCubeTexture::_facesMapping[j]].float32Array();
 
       // If special cases.
       if (gammaSpace || !byteArray.empty()) {
@@ -174,12 +170,9 @@ void HDRCubeTexture::loadTexture()
 
           // Put in gamma space if requested.
           if (gammaSpace) {
-            dataFace[(i * 3) + 0]
-              = std::pow(dataFace[(i * 3) + 0], Math::ToGammaSpace);
-            dataFace[(i * 3) + 1]
-              = std::pow(dataFace[(i * 3) + 1], Math::ToGammaSpace);
-            dataFace[(i * 3) + 2]
-              = std::pow(dataFace[(i * 3) + 2], Math::ToGammaSpace);
+            dataFace[(i * 3) + 0] = std::pow(dataFace[(i * 3) + 0], Math::ToGammaSpace);
+            dataFace[(i * 3) + 1] = std::pow(dataFace[(i * 3) + 1], Math::ToGammaSpace);
+            dataFace[(i * 3) + 2] = std::pow(dataFace[(i * 3) + 2], Math::ToGammaSpace);
           }
 
           // Convert to int texture for fallback.
@@ -218,9 +211,8 @@ void HDRCubeTexture::loadTexture()
   if (scene) {
     _texture = scene->getEngine()->createRawCubeTextureFromUrl(
       url, scene, static_cast<int>(_size), Constants::TEXTUREFORMAT_RGB,
-      scene->getEngine()->getCaps().textureFloat ?
-        Constants::TEXTURETYPE_FLOAT :
-        Constants::TEXTURETYPE_UNSIGNED_INT,
+      scene->getEngine()->getCaps().textureFloat ? Constants::TEXTURETYPE_FLOAT :
+                                                   Constants::TEXTURETYPE_UNSIGNED_INT,
       _noMipmap, callback, nullptr, _onLoad, _onError);
   }
 }
@@ -232,8 +224,8 @@ HDRCubeTexturePtr HDRCubeTexture::clone() const
     return nullptr;
   }
 
-  auto newTexture = HDRCubeTexture::New(url, scene, _size, _noMipmap,
-                                        _generateHarmonics, gammaSpace);
+  auto newTexture
+    = HDRCubeTexture::New(url, scene, _size, _noMipmap, _generateHarmonics, gammaSpace);
 
   // Base texture
   newTexture->level            = level;
@@ -276,18 +268,15 @@ void HDRCubeTexture::setReflectionTextureMatrix(Matrix& value)
     getScene()->markAllMaterialsAsDirty(
       Constants::MATERIAL_TextureDirtyFlag, [this](Material* mat) -> bool {
         auto activeTextures = mat->getActiveTextures();
-        auto it = std::find_if(activeTextures.begin(),
-                               activeTextures.end(),
-                               [this](const BaseTexturePtr& texture) {
-                                 return texture.get() == this;
-                               });
+        auto it
+          = std::find_if(activeTextures.begin(), activeTextures.end(),
+                         [this](const BaseTexturePtr& texture) { return texture.get() == this; });
         return it != activeTextures.end();
       });
   }
 }
 
-HDRCubeTexture* HDRCubeTexture::Parse(const json& /*parsedTexture*/,
-                                      Scene* /*scene*/,
+HDRCubeTexture* HDRCubeTexture::Parse(const json& /*parsedTexture*/, Scene* /*scene*/,
                                       const std::string& /*rootUrl*/)
 {
   return nullptr;

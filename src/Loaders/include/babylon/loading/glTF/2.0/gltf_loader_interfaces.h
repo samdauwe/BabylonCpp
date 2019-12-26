@@ -14,7 +14,7 @@ namespace BABYLON {
 
 class AbstractMesh;
 class AnimationGroup;
-struct ArrayBufferView;
+class ArrayBufferView;
 class Bone;
 class Buffer;
 class Material;
@@ -53,15 +53,12 @@ struct IScene;
 struct ISkin;
 struct ITexture;
 struct ITextureInfo;
-using IMaterialNormalTextureInfoPtr
-  = std::shared_ptr<IMaterialNormalTextureInfo>;
-using IMaterialOcclusionTextureInfoPtr
-  = std::shared_ptr<IMaterialOcclusionTextureInfo>;
-using IMaterialPbrMetallicRoughnessPtr
-  = std::shared_ptr<IMaterialPbrMetallicRoughness>;
-using INodePtr        = std::shared_ptr<INode>;
-using ITextureInfoPtr = std::shared_ptr<ITextureInfo>;
-using VertexBufferPtr = std::shared_ptr<VertexBuffer>;
+using IMaterialNormalTextureInfoPtr    = std::shared_ptr<IMaterialNormalTextureInfo>;
+using IMaterialOcclusionTextureInfoPtr = std::shared_ptr<IMaterialOcclusionTextureInfo>;
+using IMaterialPbrMetallicRoughnessPtr = std::shared_ptr<IMaterialPbrMetallicRoughness>;
+using INodePtr                         = std::shared_ptr<INode>;
+using ITextureInfoPtr                  = std::shared_ptr<ITextureInfo>;
+using VertexBufferPtr                  = std::shared_ptr<VertexBuffer>;
 
 namespace IGLTF2 {
 
@@ -380,8 +377,7 @@ enum class TextureWrapMode {
 
 struct EnumUtils {
 
-  static unsigned int
-  AccessorComponentTypeToNumber(const AccessorComponentType& value)
+  static unsigned int AccessorComponentTypeToNumber(const AccessorComponentType& value)
   {
     switch (value) {
       case AccessorComponentType::BYTE:
@@ -517,8 +513,7 @@ struct EnumUtils {
     }
   }
 
-  static AnimationChannelTargetPath
-  StringToAnimationChannelTargetPath(const std::string& value)
+  static AnimationChannelTargetPath StringToAnimationChannelTargetPath(const std::string& value)
   {
     if (value == "translation") {
       return AnimationChannelTargetPath::TRANSLATION;
@@ -750,8 +745,7 @@ struct IAnimationChannelTarget : public IProperty {
    */
   AnimationChannelTargetPath path;
 
-  static IAnimationChannelTarget
-  Parse(const json& parsedAnimationChannelTarget);
+  static IAnimationChannelTarget Parse(const json& parsedAnimationChannelTarget);
 };
 
 /**
@@ -1339,10 +1333,9 @@ struct IGLTFValidationResults {
  */
 struct IGLTFValidationOptions {
   std::string uri;
-  std::function<Uint8Array(const std::string& uri)> externalResourceFunction
-    = nullptr;
-  std::optional<bool> validateAccessorData = std::nullopt;
-  std::optional<size_t> maxIssues          = std::nullopt;
+  std::function<Uint8Array(const std::string& uri)> externalResourceFunction = nullptr;
+  std::optional<bool> validateAccessorData                                   = std::nullopt;
+  std::optional<size_t> maxIssues                                            = std::nullopt;
   std::vector<std::string> ignoredIssues;
   json severityOverrides;
 }; // end of struct IGLTFValidationOptions
@@ -1351,8 +1344,8 @@ struct IGLTFValidationOptions {
  * @brief Interface validator object Typings.
  */
 struct IGLTFValidatorTypings {
-  std::function<IGLTFValidationResults(
-    const std::string& json, std::optional<IGLTFValidationOptions>& options)>
+  std::function<IGLTFValidationResults(const std::string& json,
+                                       std::optional<IGLTFValidationOptions>& options)>
     externalResourceFunction = nullptr;
 }; // end of struct IGLTFValidatorTypings
 
@@ -1468,30 +1461,25 @@ struct IImage : public IGLTF2::IImage, IArrayItem {
  */
 struct IMaterialNormalTextureInfo : public IGLTF2::IMaterialNormalTextureInfo {
 
-  static IMaterialNormalTextureInfoPtr
-  Parse(const json& parsedMaterialNormalTextureInfo);
+  static IMaterialNormalTextureInfoPtr Parse(const json& parsedMaterialNormalTextureInfo);
 
 }; // end of struct IMaterialNormalTextureInfo
 
 /**
  * Loader interface with additional members.
  */
-struct IMaterialOcclusionTextureInfo
-    : public IGLTF2::IMaterialOcclusionTextureInfo {
+struct IMaterialOcclusionTextureInfo : public IGLTF2::IMaterialOcclusionTextureInfo {
 
-  static IMaterialOcclusionTextureInfoPtr
-  Parse(const json& parsedMaterialOcclusionTextureInfo);
+  static IMaterialOcclusionTextureInfoPtr Parse(const json& parsedMaterialOcclusionTextureInfo);
 
 }; // end of struct IMaterialOcclusionTextureInfo
 
 /**
  * @brief Loader interface with additional members.
  */
-struct IMaterialPbrMetallicRoughness
-    : public IGLTF2::IMaterialPbrMetallicRoughness {
+struct IMaterialPbrMetallicRoughness : public IGLTF2::IMaterialPbrMetallicRoughness {
 
-  static IMaterialPbrMetallicRoughnessPtr
-  Parse(const json& parsedMaterialPbrMetallicRoughness);
+  static IMaterialPbrMetallicRoughnessPtr Parse(const json& parsedMaterialPbrMetallicRoughness);
 
 }; // end of struct IMaterialPbrMetallicRoughness
 

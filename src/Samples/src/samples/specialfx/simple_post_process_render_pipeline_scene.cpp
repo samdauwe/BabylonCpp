@@ -8,7 +8,7 @@
 #include <babylon/postprocesses/renderpipeline/post_process_render_effect.h>
 #include <babylon/postprocesses/renderpipeline/post_process_render_pipeline.h>
 #include <babylon/postprocesses/renderpipeline/post_process_render_pipeline_manager.h>
-#include <babylon/samples/samples_index.h>
+#include <babylon/samples/babylon_register_sample.h>
 
 namespace BABYLON {
 namespace Samples {

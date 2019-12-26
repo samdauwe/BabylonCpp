@@ -12,12 +12,6 @@
 #define GLFW_INCLUDE_NONE
 // GLFW
 #include <GLFW/glfw3.h>
-#ifdef _WIN32
-#undef APIENTRY
-#define GLFW_EXPOSE_NATIVE_WIN32
-#define GLFW_EXPOSE_NATIVE_WGL
-#include <GLFW/glfw3native.h>
-#endif
 
 // Logging
 #include <babylon/core/logging.h>
@@ -155,6 +149,9 @@ void glad_pre_call_callback(const char* name, void* /*funcptr*/, int /*len_args*
   fprintf(stderr, "%s", msg_str.str().c_str());
 #ifdef _MSC_VER
   OutputDebugString(msg_str.str().c_str());
+#if defined(_WIN32) && !defined(_WIN64)
+#define WIN_32BITS
+#endif
 #endif
 }
 
@@ -162,13 +159,13 @@ bool GLRenderingContext::initialize(bool enableGLDebugging)
 {
   // HUM : glad already loaded by imgui ?
   // Initialize glad
-  if (!gladLoadGLES2Loader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
+  /*if (!gladLoadGLES2Loader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
     fprintf(stderr, "gladLoadGLLoader: Failed to initialize OpenGL ES context\n");
     return false;
   }
   if (!GLAD_GL_ES_VERSION_3_0) {
     fprintf(stderr, "GLAD could not initialize OpenGl ES 3.0\n");
-  }
+  }*/
 #ifdef GLAD_DEBUG
   glad_set_pre_callback(glad_pre_call_callback);
   glad_set_post_callback(glad_post_call_callback);
@@ -181,11 +178,12 @@ bool GLRenderingContext::initialize(bool enableGLDebugging)
   // glEnable(GL_MULTISAMPLE);
 
   // Enable debug output
+#if !defined(__EMSCRIPTEN__) && !defined(WIN_32BITS)
   if (enableGLDebugging) {
     // glEnable(GL_DEBUG_OUTPUT);
     // glDebugMessageCallback(MessageCallback, nullptr);
   }
-
+#endif //__EMSCRIPTEN__
   return true;
 }
 

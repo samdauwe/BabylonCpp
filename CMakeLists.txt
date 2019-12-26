@@ -5,6 +5,25 @@
 # CMake version
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 
+# Compile to Wasm
+option(BABYLON_WASM "Target emscriptem / wasm" OFF)
+if (BABYLON_WASM)
+    # emscripten is detected via
+    #  - if (EMSCRIPTEN) in cmake code
+    #  - #ifdef __EMSCRIPTEN__ in c++ code
+    set(EMSCRIPTEN ON)
+    set(BUILD_SHARED_LIBS OFF)
+    set(BABYLON_DISABLE_INSTALL ON)
+    set(OPTION_BUILD_TESTS_DEFAULT OFF)
+    include(${CMAKE_CURRENT_LIST_DIR}/cmake/WasmEmscriptenOptions.cmake)
+else()
+    set(OPTION_BUILD_TESTS_DEFAULT ON)
+endif()
+
+if (NOT BABYLON_WASM)
+    option(BUILD_SHARED_LIBS     "Build shared instead of static libraries."     ON)
+endif()
+
 # use ccache if present
 find_program(CCACHE_PROGRAM ccache)
 if(CCACHE_PROGRAM)
@@ -12,6 +31,11 @@ if(CCACHE_PROGRAM)
     if (USE_CCACHE)
         set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
     endif()
+endif()
+
+option(OPTION_BUILD_TESTS    "Build tests."       ${OPTION_BUILD_TESTS_DEFAULT})
+if(OPTION_BUILD_TESTS)
+    enable_testing()
 endif()
 
 # use clang-tidy if present
@@ -41,17 +65,11 @@ function(babylon_target_clang_tidy target)
   endif()
 endfunction()
 
-
 # Generate folders for IDE targets (e.g., VisualStudio solutions)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-set(IDE_FOLDER "")
 
 # Project name
 project(BabylonCpp C CXX)
-
-if (MSVC)
-    enable_testing()
-endif()
 
 # Project modules
 add_subdirectory(codegeneration)

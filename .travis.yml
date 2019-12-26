@@ -106,6 +106,7 @@ before_script:
 # Build steps
 script:
   - make all -j 4 -k
+  - ctest . --output-on-failure
 
 # Notifications settings
 notifications:

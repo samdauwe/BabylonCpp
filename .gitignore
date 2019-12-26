@@ -1,3 +1,6 @@
+# auto generated files
+assets/samples_info.json
+
 # Compiled Object files
 *.slo
 *.lo
@@ -66,6 +69,8 @@ cmake-build-debug/
 cmake-build-release/
 cmake-build-relwithdebinfo/
 cmake-build-minsizerel/
+cmake-build-emscripten/
+cmake-build-emscripten_release/
 
 # cquery
 .cquery_cache

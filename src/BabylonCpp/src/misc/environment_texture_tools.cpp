@@ -309,7 +309,7 @@ void EnvironmentTextureTools::UploadLevels(const InternalTexturePtr& texture,
     }
     for (size_t i = imageData.size(); i < mipmapsCount; ++i) {
       for (unsigned int face = 0; face < 6; face++) {
-        engine->_uploadArrayBufferViewToTexture(texture, data.uint8Array, face,
+        engine->_uploadArrayBufferViewToTexture(texture, data.uint8Array(), face,
                                                 static_cast<int>(i));
       }
     }

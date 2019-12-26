@@ -24,12 +24,6 @@ set(EXPORT_FILE  "include/${BABYLON_NAMESPACE}/${BABYLON_NAMESPACE}_api.h")
 set(EXPORT_MACRO "${TARGET_UPPER}_SHARED_EXPORT")
 
 # ============================================================================ #
-#                       Project configuration options                          #
-# ============================================================================ #
-option(BUILD_SHARED_LIBS     "Build shared instead of static libraries."     ON)
-option(OPTION_BUILD_TESTS    "Build tests."                                  ON)
-
-# ============================================================================ #
 #                       Project description and (meta) information             #
 # ============================================================================ #
 
@@ -58,60 +52,16 @@ configure_file(version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/${BABYLON_NAMESP
 #                       Sources                                                #
 # ============================================================================ #
 
-# Include, Source and Tests path
+# Include, Source
 set(INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include/${BABYLON_NAMESPACE}")
 set(SOURCE_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/src")
-set(TESTS_PATH   "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 
 # Header files
-file(GLOB MATERIALS_HDR_FILES   ${INCLUDE_PATH}/materialslibrary/cell/*.h
-                                ${INCLUDE_PATH}/materialslibrary/custom/*.h
-                                ${INCLUDE_PATH}/materialslibrary/fire/*.h
-                                ${INCLUDE_PATH}/materialslibrary/fur/*.h
-                                ${INCLUDE_PATH}/materialslibrary/gradient/*.h
-                                ${INCLUDE_PATH}/materialslibrary/grid/*.h
-                                ${INCLUDE_PATH}/materialslibrary/lava/*.h
-                                ${INCLUDE_PATH}/materialslibrary/mix/*.h
-                                ${INCLUDE_PATH}/materialslibrary/normal/*.h
-                                ${INCLUDE_PATH}/materialslibrary/shadowonly/*.h
-                                ${INCLUDE_PATH}/materialslibrary/simple/*.h
-                                ${INCLUDE_PATH}/materialslibrary/sky/*.h
-                                ${INCLUDE_PATH}/materialslibrary/terrain/*.h
-                                ${INCLUDE_PATH}/materialslibrary/triplanar/*.h
-                                ${INCLUDE_PATH}/materialslibrary/water/*.h)
-
-set(BABYLON_MATERIALS_HEADERS
-    ${MATERIALS_HDR_FILES}
-)
-
+file(GLOB_RECURSE BABYLON_MATERIALS_HEADERS   ${INCLUDE_PATH}/*.h)
 # Source files
-file(GLOB MATERIALS_SRC_FILES   ${SOURCE_PATH}/materialslibrary/cell/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/custom/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/fire/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/fur/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/gradient/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/grid/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/lava/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/mix/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/normal/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/shadowonly/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/simple/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/sky/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/terrain/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/triplanar/*.cpp
-                                ${SOURCE_PATH}/materialslibrary/water/*.cpp)
+file(GLOB_RECURSE BABYLON_MATERIALS_SOURCES ${SOURCE_PATH}/*.cpp)
 
-set(BABYLON_MATERIALS_SOURCES
-    ${MATERIALS_SRC_FILES}
-)
-
-# Group source files
-set(HEADER_GROUP "Header Files (API)")
-set(SOURCE_GROUP "Source Files")
-source_group_by_path(${INCLUDE_PATH} "\\\\.h$|\\\\.hpp$"
-    ${HEADER_GROUP} ${BABYLON_MATERIALS_HEADERS})
-source_group_by_path(${SOURCE_PATH}  "\\\\.cpp$|\\\\.c$|\\\\.h$|\\\\.hpp$"
-    ${SOURCE_GROUP} ${BABYLON_MATERIALS_SOURCES})
+source_group_by_path_all(${CMAKE_CURRENT_SOURCE_DIR} ${BABYLON_MATERIALS_HEADERS} ${BABYLON_MATERIALS_SOURCES})
 
 # ============================================================================ #
 #                       Create library                                         #
@@ -154,12 +104,6 @@ generate_export_header(${TARGET}
     EXPORT_MACRO_NAME ${EXPORT_MACRO}
 )
 
-# Project options
-set_target_properties(${TARGET}
-    PROPERTIES ${DEFAULT_PROJECT_OPTIONS}
-    FOLDER "${IDE_FOLDER}"
-)
-
 # Include directories
 target_include_directories(${TARGET}
     PRIVATE
@@ -174,11 +118,7 @@ target_include_directories(${TARGET}
 )
 
 # Libraries
-target_link_libraries(${TARGET}
-    PUBLIC
-    PRIVATE
-    BabylonCpp
-)
+target_link_libraries(${TARGET} PRIVATE BabylonCpp)
 
 # Compile definitions
 target_compile_definitions(${TARGET}
@@ -204,63 +144,29 @@ set_target_properties(${TARGET}
 #                       Setup test environment                                 #
 # ============================================================================ #
 
-# Check if tests are enabled
-if(OPTION_BUILD_TESTS AND EXISTS ${TESTS_PATH})
-
-# DISABLE CMP0037: Target names should not be reserved and should match a
-# validity pattern.
-set_policy(CMP0037 OLD)
-
-# Function: Build test and add command to execute it via target 'test'
-function(add_test_without_ctest target)
-    add_subdirectory(${target})
-    
-    if(NOT TARGET ${target})
-        return()
-    endif()
-    
-    add_dependencies(test ${target})
-    add_custom_command(TARGET test POST_BUILD 
-       COMMAND $<TARGET_FILE:${target}> --gtest_output=xml:gtests-${target}.xml)
-endfunction()
-
-# Build gmock
-set(gmock_build_tests           OFF CACHE BOOL "")
-set(gtest_build_samples         OFF CACHE BOOL "")
-set(gtest_build_tests           OFF CACHE BOOL "")
-set(gtest_disable_pthreads      OFF CACHE BOOL "")
-set(gtest_force_shared_crt      ON  CACHE BOOL "")
-set(gtest_hide_internal_symbols OFF CACHE BOOL "")
-
-# Target 'test'
-add_custom_target(BabylonCppExtensionsUnitTests)
-set_target_properties(BabylonCppExtensionsUnitTests
-    PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD 0)
-
-# Tests
-add_test_without_ctest(tests)
-
-endif(OPTION_BUILD_TESTS AND EXISTS ${TESTS_PATH})
+# No test here
 
 # ============================================================================ #
 #                       Deployment                                             #
 # ============================================================================ #
 
 # 'make install' to the correct location
-install(TARGETS ${TARGET}
-    EXPORT   ${TARGET}Config
-    ARCHIVE  DESTINATION ${ARCHIVE_OUTPUT_PATH}
-    RUNTIME  DESTINATION ${EXECUTABLE_OUTPUT_PATH}
-    LIBRARY  DESTINATION ${LIBRARY_OUTPUT_PATH}
-)
-install(DIRECTORY include/ DESTINATION ${INCLUDE_OUTPUT_PATH})
+if (NOT BABYLON_DISABLE_INSTALL)
+    install(TARGETS ${TARGET}
+        EXPORT   ${TARGET}Config
+        ARCHIVE  DESTINATION ${ARCHIVE_OUTPUT_PATH}
+        RUNTIME  DESTINATION ${EXECUTABLE_OUTPUT_PATH}
+        LIBRARY  DESTINATION ${LIBRARY_OUTPUT_PATH}
+    )
+    install(DIRECTORY include/ DESTINATION ${INCLUDE_OUTPUT_PATH})
 
-# Make the project importable from the install directory
-install(EXPORT ${TARGET}Config
-    DESTINATION ${TARGET}/${CMAKE_OUTPUT_PATH}
-)
+    # Make the project importable from the install directory
+    install(EXPORT ${TARGET}Config
+        DESTINATION ${TARGET}/${CMAKE_OUTPUT_PATH}
+    )
 
-# Make the project importable from the build directory
-export(TARGETS ${TARGET}
-    FILE ${TARGET}Config.cmake
-)
+    # Make the project importable from the build directory
+    export(TARGETS ${TARGET}
+        FILE ${TARGET}Config.cmake
+    )
+endif()

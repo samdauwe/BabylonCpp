@@ -17,7 +17,7 @@ namespace BABYLON {
 
 class AbstractMesh;
 class AnimationGroup;
-struct ArrayBufferView;
+class ArrayBufferView;
 struct ImportedMeshes;
 class IParticleSystem;
 class ProgressEvent;
@@ -134,19 +134,18 @@ struct BABYLON_SHARED_EXPORT IGLTFLoader : public IDisposable {
 
   std::optional<GLTFLoaderState> state = std::nullopt;
 
-  virtual ImportedMeshes importMeshAsync(
-    const std::vector<std::string>& meshesNames, Scene* scene,
-    const IGLTFLoaderData& data, const std::string& rootUrl,
-    const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress
-    = nullptr,
-    const std::string& fileName = "")
+  virtual ImportedMeshes
+  importMeshAsync(const std::vector<std::string>& meshesNames, Scene* scene,
+                  const IGLTFLoaderData& data, const std::string& rootUrl,
+                  const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress
+                  = nullptr,
+                  const std::string& fileName = "")
     = 0;
 
-  virtual void loadAsync(
-    Scene* scene, const IGLTFLoaderData& data, const std::string& rootUrl,
-    const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress
-    = nullptr,
-    const std::string& fileName = "")
+  virtual void
+  loadAsync(Scene* scene, const IGLTFLoaderData& data, const std::string& rootUrl,
+            const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress = nullptr,
+            const std::string& fileName                                                  = "")
     = 0;
 
 }; // end of struct IGLTFLoader

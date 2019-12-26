@@ -191,7 +191,7 @@ std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr> SceneLoader::_lo
   }
 
   const auto dataCallback
-    = [&](const std::variant<std::string, ArrayBuffer>& data, const std::string& responseURL) {
+    = [=](const std::variant<std::string, ArrayBuffer>& data, const std::string& responseURL) {
         if (scene->isDisposed()) {
           onError("Scene has been disposed", "");
           return;
@@ -200,16 +200,16 @@ std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr> SceneLoader::_lo
         onSuccess(plugin, std::get<std::string>(data), responseURL);
       };
 
-  const auto manifestChecked = [&]() {
+  const auto manifestChecked = [=]() {
     std::function<void(const ProgressEvent& event)> progressCallback = nullptr;
     if (onProgress) {
-      progressCallback = [&](const ProgressEvent& event) {
+      progressCallback = [=](const ProgressEvent& event) {
         onProgress(SceneLoaderProgressEvent::FromProgressEvent(event));
       };
     }
 
     FileTools::LoadFile(fileInfo.url, dataCallback, progressCallback, useArrayBuffer,
-                        [&](const std::string& message, const std::string& exception) {
+                        [=](const std::string& message, const std::string& exception) {
                           onError("Failed to load scene." + (message.empty() ? "" : " " + message),
                                   exception);
                         });
@@ -232,7 +232,7 @@ std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr> SceneLoader::_lo
   return plugin;
 }
 
-std::optional<IFileInfo> SceneLoader::_getFileInfo(std::string rootUrl,
+std::shared_ptr<IFileInfo> SceneLoader::_getFileInfo(std::string rootUrl,
                                                    const std::string& sceneFilename)
 {
   std::string url;
@@ -246,19 +246,20 @@ std::optional<IFileInfo> SceneLoader::_getFileInfo(std::string rootUrl,
   else {
     if (sceneFilename.substr(0, 1) == "/") {
       BABYLON_LOG_ERROR("SceneLoader", "Wrong sceneFilename parameter")
-      return std::nullopt;
+      return nullptr;
     }
 
     url  = rootUrl + sceneFilename;
     name = sceneFilename;
   }
 
-  return IFileInfo{
-    url,         // url
-    rootUrl,     // rootUrl
-    name,        // name
-    std::nullopt // file
-  };
+
+  auto r = std::make_shared<IFileInfo>();
+  r->url = url;
+  r->rootUrl = rootUrl;
+  r->name = name;
+  r->file = std::nullopt;
+  return r;
 }
 
 std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr, ISceneLoaderPluginFactoryPtr>
@@ -327,14 +328,14 @@ SceneLoader::ImportMesh(
     return std::nullopt;
   }
 
-  auto fileInfo = SceneLoader::_getFileInfo(rootUrl, sceneFilename);
+  std::shared_ptr<IFileInfo> fileInfo = SceneLoader::_getFileInfo(rootUrl, sceneFilename);
   if (!fileInfo) {
     return std::nullopt;
   }
 
   const auto disposeHandler = []() {};
 
-  const auto errorHandler = [&](const std::string& message, const std::string& exception) {
+  const auto errorHandler = [=](const std::string& message, const std::string& exception) {
     const auto errorMessage = String::concat("Unable to import meshes from ", fileInfo->url,
                                              (!message.empty() ? ": " + message : ""));
 
@@ -351,7 +352,7 @@ SceneLoader::ImportMesh(
 
   std::function<void(const SceneLoaderProgressEvent& event)> progressHandler = nullptr;
   if (onProgress) {
-    progressHandler = [&](const SceneLoaderProgressEvent& event) {
+    progressHandler = [=](const SceneLoaderProgressEvent& event) {
       try {
         onProgress(event);
       }
@@ -361,7 +362,7 @@ SceneLoader::ImportMesh(
     };
   }
 
-  const auto successHandler = [&](const std::vector<AbstractMeshPtr>& meshes,
+  const auto successHandler = [=](const std::vector<AbstractMeshPtr>& meshes,
                                   const std::vector<IParticleSystemPtr>& particleSystems,
                                   const std::vector<SkeletonPtr>& skeletons,
                                   const std::vector<AnimationGroupPtr>& animationGroups) {
@@ -379,7 +380,7 @@ SceneLoader::ImportMesh(
 
   return SceneLoader::_loadData(
     *fileInfo, scene,
-    [&](const std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>& plugin,
+    [=](const std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>& plugin,
         const std::string& data, const std::string& responseURL) -> void {
       if (std::holds_alternative<ISceneLoaderPluginPtr>(plugin)) {
         auto syncedPlugin = std::get<ISceneLoaderPluginPtr>(plugin);
@@ -462,7 +463,7 @@ std::optional<std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>> S
 
   const auto disposeHandler = [&scene]() { scene->getEngine()->hideLoadingUI(); };
 
-  const auto errorHandler = [&](const std::string& message, const std::string& exception) {
+  const auto errorHandler = [=](const std::string& message, const std::string& exception) {
     const auto errorMessage = String::concat("Unable to load from ", fileInfo->url,
                                              (!message.empty() ? ": " + message : ""));
     if (onError) {
@@ -478,7 +479,7 @@ std::optional<std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>> S
 
   std::function<void(const SceneLoaderProgressEvent& event)> progressHandler = nullptr;
   if (onProgress) {
-    progressHandler = [&](const SceneLoaderProgressEvent& event) {
+    progressHandler = [=](const SceneLoaderProgressEvent& event) {
       try {
         onProgress(event);
       }
@@ -488,7 +489,7 @@ std::optional<std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>> S
     };
   }
 
-  const auto successHandler = [&]() {
+  const auto successHandler = [=]() {
     if (onSuccess) {
       try {
         onSuccess(scene);
@@ -501,7 +502,7 @@ std::optional<std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>> S
 
   return SceneLoader::_loadData(
     *fileInfo, scene,
-    [&](const std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>& plugin,
+    [=](const std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>& plugin,
         const std::string& data, const std::string & /*responseURL*/) -> void {
       if (std::holds_alternative<ISceneLoaderPluginPtr>(plugin)) {
         auto syncedPlugin = std::get<ISceneLoaderPluginPtr>(plugin);

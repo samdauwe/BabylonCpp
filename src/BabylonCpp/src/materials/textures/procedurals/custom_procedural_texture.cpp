@@ -4,6 +4,7 @@
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/scene.h>
+#include <babylon/asio/asio.h>
 
 namespace BABYLON {
 
@@ -28,10 +29,13 @@ CustomProceduralTexture::~CustomProceduralTexture() = default;
 
 void CustomProceduralTexture::_loadJson(const std::string& jsonUrl)
 {
-  const auto noConfigFile = [&]() {
-    BABYLON_LOGF_WARN("CustomProceduralTexture",
-                      "No config file found in %s trying to use ShadersStore or DOM element",
-                      jsonUrl.c_str())
+  const auto noConfigFile = [jsonUrl, this](const std::string & errorMessage) {
+    BABYLON_LOGF_WARN(
+      "CustomProceduralTexture",
+      "No config file found in %s trying to use ShadersStore or DOM element, message: %s",
+      jsonUrl.c_str(),
+      errorMessage.c_str()
+      )
     try {
       setFragment(_texturePath);
     }
@@ -41,25 +45,8 @@ void CustomProceduralTexture::_loadJson(const std::string& jsonUrl)
     }
   };
 
-  const auto preprocessUrl = [](std::string iUrl) {
-    // Check if the file is locally available
-    // - Check in local folder
-    auto absolutePath = Filesystem::absolutePath(iUrl);
-    if (Filesystem::exists(absolutePath)) {
-      return absolutePath;
-    }
-    // - Check in assets folder
-    absolutePath = Filesystem::absolutePath("../assets/" + iUrl);
-    if (Filesystem::exists(absolutePath)) {
-      return absolutePath;
-    }
-    return iUrl;
-  };
-
-  const auto configFileUrl = preprocessUrl(jsonUrl + "/config.json");
-  if (Filesystem::exists(configFileUrl)) {
+  const auto onSuccessLoadJson = [noConfigFile, this](const std::string& configJSON) {
     try {
-      auto configJSON = Filesystem::readFileContents(configFileUrl.c_str());
       _config         = json::parse(configJSON);
       _configSet      = true;
 
@@ -71,12 +58,12 @@ void CustomProceduralTexture::_loadJson(const std::string& jsonUrl)
       refreshRate = json_util::get_number<float>(_config, "refreshrate");
     }
     catch (...) {
-      noConfigFile();
+      noConfigFile("json file loaded, but exception raised!");
     }
-  }
-  else {
-    noConfigFile();
-  }
+  };
+
+  const auto configFileUrl = jsonUrl + "/config.json";
+  asio::LoadUrlAsync_Text(configFileUrl, onSuccessLoadJson, noConfigFile);
 }
 
 bool CustomProceduralTexture::isReady()

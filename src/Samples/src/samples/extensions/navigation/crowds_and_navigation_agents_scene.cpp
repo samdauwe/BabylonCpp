@@ -11,7 +11,7 @@
 #include <babylon/navigation/iagent_parameters.h>
 #include <babylon/navigation/icrowd.h>
 #include <babylon/navigation/inav_mesh_parameters.h>
-#include <babylon/samples/samples_index.h>
+#include <babylon/samples/babylon_register_sample.h>
 #include <babylon/samples/samples_utils.h>
 
 namespace BABYLON {

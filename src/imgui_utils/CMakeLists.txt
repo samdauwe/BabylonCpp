@@ -7,7 +7,9 @@ include(../../cmake/BuildEnvironment.cmake)
 
 # OpenGL dependency
 set(OpenGL_GL_PREFERENCE GLVND)
-find_package(OpenGL REQUIRED)
+if (NOT EMSCRIPTEN)
+    find_package(OpenGL REQUIRED)
+endif()
 include_directories(${OPENGL_INCLUDE_DIRS})
 
 # Target name
@@ -47,13 +49,13 @@ target_include_directories(${TARGET} PRIVATE SYSTEM ${CMAKE_CURRENT_LIST_DIR}/..
 # Libraries
 target_link_libraries(${TARGET}
     PUBLIC
-    glfw
-    glad
     imgui
-    ${OPENGL_LIBRARIES}
     BabylonCpp
 )
+if (NOT EMSCRIPTEN)
+    target_link_libraries(${TARGET} PUBLIC ${OPENGL_LIBRARIES})
+endif()
 
-if (UNIX AND NOT APPLE)
+if (UNIX AND NOT APPLE AND NOT EMSCRIPTEN)
     target_link_libraries(${TARGET} PUBLIC X11)
 endif()

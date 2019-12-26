@@ -95,7 +95,7 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity, Scene*
 
     if (noiseTexture()) { // We need to get texture data back to CPU
       noiseTextureSize = noiseTexture()->getSize();
-      noiseTextureData = noiseTexture()->getContent().uint8Array;
+      noiseTextureData = noiseTexture()->getContent().uint8Array();
     }
 
     for (unsigned int index = 0; index < _particles.size(); ++index) {

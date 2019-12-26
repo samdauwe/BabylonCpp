@@ -21,7 +21,7 @@
 #include <babylon/proceduraltextureslibrary/marble/marble_procedural_texture.h>
 #include <babylon/proceduraltextureslibrary/road/road_procedural_texture.h>
 #include <babylon/proceduraltextureslibrary/wood/wood_procedural_texture.h>
-#include <babylon/samples/samples_index.h>
+#include <babylon/samples/babylon_register_sample.h>
 
 namespace BABYLON {
 using namespace ProceduralTexturesLibrary;

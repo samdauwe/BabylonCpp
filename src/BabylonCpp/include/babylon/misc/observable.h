@@ -149,7 +149,7 @@ public:
    * @param observer the instance of the Observer to remove
    * @returns false if it doesn't belong to this Observable
    */
-  bool remove(typename Observer<T>::Ptr& observer)
+  bool remove(const typename Observer<T>::Ptr& observer)
   {
     if (!observer) {
       return false;

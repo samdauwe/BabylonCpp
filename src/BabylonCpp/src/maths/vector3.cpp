@@ -9,11 +9,6 @@
 #include <babylon/maths/vector3.h>
 #include <babylon/maths/viewport.h>
 
-// SIMD
-#if BABYLONCPP_OPTION_ENABLE_SIMD == true
-#include <babylon/maths/simd/simd_vector3.h>
-#endif
-
 namespace BABYLON {
 
 const Vector3 Vector3::_UpReadOnly = Vector3::Up();
@@ -672,20 +667,13 @@ Vector3 Vector3::TransformCoordinates(const Vector3& vector, const Matrix& trans
 void Vector3::TransformCoordinatesToRef(const Vector3& vector, const Matrix& transformation,
                                         Vector3& result)
 {
-#if BABYLONCPP_OPTION_ENABLE_SIMD == true
-  SIMD::SIMDVector3::TransformCoordinatesToRefSIMD(vector, transformation, result);
-#else
   Vector3::TransformCoordinatesFromFloatsToRef(vector.x, vector.y, vector.z, transformation,
                                                result);
-#endif
 }
 
 void Vector3::TransformCoordinatesFromFloatsToRef(float x, float y, float z,
                                                   const Matrix& transformation, Vector3& result)
 {
-#if BABYLONCPP_OPTION_ENABLE_SIMD == true
-  SIMD::SIMDVector3::TransformCoordinatesFromFloatsToRefSIMD(x, y, z, transformation, result);
-#else
   const auto& m = transformation.m();
   const auto rx = x * m[0] + y * m[4] + z * m[8] + m[12];
   const auto ry = x * m[1] + y * m[5] + z * m[9] + m[13];
@@ -695,7 +683,6 @@ void Vector3::TransformCoordinatesFromFloatsToRef(float x, float y, float z,
   result.x = rx * rw;
   result.y = ry * rw;
   result.z = rz * rw;
-#endif
 }
 
 Vector3 Vector3::TransformNormal(const Vector3& vector, const Matrix& transformation)

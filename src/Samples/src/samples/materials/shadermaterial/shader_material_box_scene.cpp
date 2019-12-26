@@ -6,7 +6,7 @@
 #include <babylon/materials/effect_shaders_store.h>
 #include <babylon/materials/shader_material.h>
 #include <babylon/meshes/mesh.h>
-#include <babylon/samples/samples_index.h>
+#include <babylon/samples/babylon_register_sample.h>
 
 namespace BABYLON {
 namespace Samples {

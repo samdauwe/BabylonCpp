@@ -8,11 +8,6 @@
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
 
-// SIMD
-#if BABYLONCPP_OPTION_ENABLE_SIMD == true
-#include <babylon/maths/simd/simd_matrix.h>
-#endif
-
 namespace BABYLON {
 
 class Plane;
@@ -1041,10 +1036,6 @@ public:
    * use it to speed the comparison between two versions of the same matrix.
    */
   int updateFlag;
-
-#if BABYLONCPP_OPTION_ENABLE_SIMD == true
-  SIMD::SIMDMatrix simdMatrix;
-#endif
 
 private:
   static int _updateFlagSeed;

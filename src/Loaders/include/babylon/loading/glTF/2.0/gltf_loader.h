@@ -27,7 +27,7 @@ namespace BABYLON {
 
 class AbstractMesh;
 class AnimationGroup;
-struct ArrayBufferView;
+class ArrayBufferView;
 class BaseTexture;
 class Bone;
 class Buffer;
@@ -466,11 +466,11 @@ private:
   ArrayBufferView& _loadBufferAsync(const std::string& context, IBuffer& buffer);
   template <typename T>
   ArrayBufferView& _loadAccessorAsync(const std::string& context, IAccessor& accessor);
-  Float32Array& _loadFloatAccessorAsync(const std::string& context, IAccessor& accessor);
-  IndicesArray& _getConverted32bitIndices(IAccessor& accessor);
+  Float32Array _loadFloatAccessorAsync(const std::string& context, IAccessor& accessor);
+  IndicesArray _getConverted32bitIndices(IAccessor& accessor);
   IndicesArray _castIndicesTo32bit(const IGLTF2::AccessorComponentType& type,
                                    const ArrayBufferView& buffer);
-  IndicesArray& _loadIndicesAccessorAsync(const std::string& context, IAccessor& accessor);
+  IndicesArray _loadIndicesAccessorAsync(const std::string& context, IAccessor& accessor);
   BufferPtr _loadVertexBufferViewAsync(IBufferView& bufferView, const std::string& kind);
   VertexBufferPtr& _loadVertexAccessorAsync(const std::string& context, IAccessor& accessor,
                                             const std::string& kind);

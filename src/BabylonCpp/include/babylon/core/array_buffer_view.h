@@ -17,8 +17,9 @@ namespace BABYLON {
  *  - Uint32Array,
  *  - Float32Array,
  */
-struct BABYLON_SHARED_EXPORT ArrayBufferView {
+class BABYLON_SHARED_EXPORT ArrayBufferView {
 
+public:
   ArrayBufferView();
   ArrayBufferView(const Int8Array& buffer);
   ArrayBufferView(const ArrayBuffer& arrayBuffer);
@@ -34,16 +35,28 @@ struct BABYLON_SHARED_EXPORT ArrayBufferView {
   [[nodiscard]] size_t byteLength() const;
   operator bool() const;
 
-  size_t byteOffset;
-  Int8Array int8Array;
-  Uint8Array uint8Array;
-  Int16Array int16Array;
-  Uint16Array uint16Array;
-  Int32Array int32Array;
-  Uint32Array uint32Array;
-  Float32Array float32Array;
+  Uint8Array& uint8Array();
+  const Uint8Array& uint8Array() const;
+  Int8Array int8Array() const;
+  Int16Array int16Array() const;
+  Uint16Array uint16Array() const;
+  Int32Array int32Array() const;
+  Uint32Array uint32Array() const;
+  Float32Array float32Array() const;
 
-}; // end of struct ArrayBufferView
+public:
+  size_t byteOffset = 0;
+
+private:
+  Int8Array _int8Array;
+  Uint8Array _uint8Array;
+  Int16Array _int16Array;
+  Uint16Array _uint16Array;
+  Int32Array _int32Array;
+  Uint32Array _uint32Array;
+  Float32Array _float32Array;
+
+}; // end of class ArrayBufferView
 
 } // end of namespace BABYLON
 

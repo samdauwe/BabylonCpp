@@ -238,9 +238,6 @@ Matrix& Matrix::addToSelf(const Matrix& other)
 
 Matrix& Matrix::invertToRef(Matrix& other)
 {
-#if BABYLONCPP_OPTION_ENABLE_SIMD == true
-  simdMatrix.invertToRefSIMD(other);
-#else
   if (_isIdentity) {
     Matrix::IdentityToRef(other);
     return *this;
@@ -309,7 +306,7 @@ Matrix& Matrix::invertToRef(Matrix& other)
     cofact_02 * detInv, cofact_12 * detInv, cofact_22 * detInv, cofact_32 * detInv, //
     cofact_03 * detInv, cofact_13 * detInv, cofact_23 * detInv, cofact_33 * detInv, //
     other);
-#endif
+
   return *this;
 }
 
@@ -466,9 +463,6 @@ Matrix& Matrix::multiplyToRef(const Matrix& other, Matrix& result)
 const Matrix& Matrix::multiplyToArray(const Matrix& other, std::array<float, 16>& result,
                                       unsigned int offset) const
 {
-#if BABYLONCPP_OPTION_ENABLE_SIMD == true
-  simdMatrix.multiplyToArraySIMD(other, result, offset);
-#else
   const auto& m      = _m;
   const auto& otherM = other.m();
   const auto tm0 = m[0], tm1 = m[1], tm2 = m[2], tm3 = m[3];
@@ -500,7 +494,6 @@ const Matrix& Matrix::multiplyToArray(const Matrix& other, std::array<float, 16>
   result[offset + 13] = tm12 * om1 + tm13 * om5 + tm14 * om9 + tm15 * om13;
   result[offset + 14] = tm12 * om2 + tm13 * om6 + tm14 * om10 + tm15 * om14;
   result[offset + 15] = tm12 * om3 + tm13 * om7 + tm14 * om11 + tm15 * om15;
-#endif
 
   return *this;
 }
@@ -512,11 +505,8 @@ const Matrix& Matrix::multiplyToArray(const Matrix& other, Float32Array& result,
     return *this;
   }
 
-#if BABYLONCPP_OPTION_ENABLE_SIMD == true
-  simdMatrix.multiplyToArraySIMD(other, result, offset);
-#else
-  const auto& m       = _m;
-  const auto& otherM  = other.m();
+  const auto& m      = _m;
+  const auto& otherM = other.m();
   const auto tm0 = m[0], tm1 = m[1], tm2 = m[2], tm3 = m[3];
   const auto tm4 = m[4], tm5 = m[5], tm6 = m[6], tm7 = m[7];
   const auto tm8 = m[8], tm9 = m[9], tm10 = m[10], tm11 = m[11];
@@ -546,7 +536,6 @@ const Matrix& Matrix::multiplyToArray(const Matrix& other, Float32Array& result,
   result[offset + 13] = tm12 * om1 + tm13 * om5 + tm14 * om9 + tm15 * om13;
   result[offset + 14] = tm12 * om2 + tm13 * om6 + tm14 * om10 + tm15 * om14;
   result[offset + 15] = tm12 * om3 + tm13 * om7 + tm14 * om11 + tm15 * om15;
-#endif
 
   return *this;
 }
@@ -1202,12 +1191,9 @@ Matrix Matrix::LookAtLH(const Vector3& eye, Vector3& target, const Vector3& up)
 void Matrix::LookAtLHToRef(const Vector3& eye, const Vector3& target, const Vector3& up,
                            Matrix& result)
 {
-#if BABYLONCPP_OPTION_ENABLE_SIMD == true
-  SIMD::SIMDMatrix::LookAtLHToRefSIMD(eye, target, up, result);
-#else
-  auto& xAxis         = MathTmp::Vector3Array[0];
-  auto& yAxis         = MathTmp::Vector3Array[1];
-  auto& zAxis         = MathTmp::Vector3Array[2];
+  auto& xAxis = MathTmp::Vector3Array[0];
+  auto& yAxis = MathTmp::Vector3Array[1];
+  auto& zAxis = MathTmp::Vector3Array[2];
 
   // Z axis
   target.subtractToRef(eye, zAxis);
@@ -1238,7 +1224,6 @@ void Matrix::LookAtLHToRef(const Vector3& eye, const Vector3& target, const Vect
                           xAxis.z, yAxis.z, zAxis.z, 0.f, //
                           ex, ey, ez, 1.f,                //
                           result);
-#endif
 }
 
 Matrix Matrix::LookAtRH(const Vector3& eye, Vector3& target, const Vector3& up)

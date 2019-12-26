@@ -52,9 +52,9 @@ void FramebufferCanvas::initializeFrameBuffer()
   // Create a renderbuffer object for depth and stencil attachment
   mRenderbuffer = _renderingContext->createRenderbuffer();
   _renderingContext->bindRenderbuffer(GL_RENDERBUFFER, mRenderbuffer);
-  _renderingContext->renderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, clientWidth,
+  _renderingContext->renderbufferStorage(GL_RENDERBUFFER, DEPTH24_STENCIL8, clientWidth,
                                          clientHeight);
-  _renderingContext->framebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
+  _renderingContext->framebufferRenderbuffer(GL_FRAMEBUFFER, DEPTH_STENCIL_ATTACHMENT,
                                              GL_RENDERBUFFER, mRenderbuffer.get());
 
   // Set "renderedTexture" as our colour attachement #0
@@ -92,7 +92,7 @@ void FramebufferCanvas::resize(int iWidth, int iHeight)
 
     // Resize renderbuffer
     _renderingContext->bindRenderbuffer(GL_RENDERBUFFER, mRenderbuffer);
-    _renderingContext->renderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, clientWidth,
+    _renderingContext->renderbufferStorage(GL_RENDERBUFFER, DEPTH24_STENCIL8, clientWidth,
                                            clientHeight);
 
     // Set "renderedTexture" as our colour attachement #0

@@ -1,6 +1,8 @@
 #ifndef BABYLON_CORE_FILESYSTEM_FILESYSTEM_WIN32_H
 #define BABYLON_CORE_FILESYSTEM_FILESYSTEM_WIN32_H
 
+#ifdef _WIN32
+
 #include <Shlwapi.h>
 #include <iostream>
 #include <string>
@@ -77,4 +79,5 @@ inline bool removeFile(const std::string& path)
 } // end of namespace Filesystem
 } // end of namespace BABYLON
 
+#endif // _WIN32
 #endif // end of BABYLON_CORE_FILESYSTEM_FILESYSTEM_WIN32_H

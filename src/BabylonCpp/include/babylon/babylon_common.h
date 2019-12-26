@@ -1,18 +1,10 @@
 #ifndef BABYLON_COMMON_H
 #define BABYLON_COMMON_H
 
-// Containers library
 #include <vector>
-
-// Time functions
 #include <chrono>
-
-// Standard library header
 #include <cstdint>
-
-// Strings library
 #include <string>
-
 #include <optional>
 
 namespace BABYLON {
@@ -323,6 +315,20 @@ private:
   TGetter const _getter;
   TSetter const _setter;
 };
+
+inline std::string assets_folder() {
+#ifndef __EMSCRIPTEN__
+  return "../assets/";
+#else
+  return "assets/";
+#endif
+}
+
+inline std::string babylon_repo_folder() {
+  static std::string repo_dir = BABYLON_REPO_FOLDER;
+  return repo_dir;
+}
+
 
 } // end of namespace BABYLON
 

@@ -16,3 +16,9 @@
 [submodule "external/RuntimeCompiledCPlusPlus"]
 	path = external/RuntimeCompiledCPlusPlus
 	url = https://github.com/RuntimeCompiledCPlusPlus/RuntimeCompiledCPlusPlus.git
+[submodule "external/SDL"]
+	path = external/SDL
+	url = https://github.com/SDL-mirror/SDL.git
+[submodule "external/promise-cpp"]
+	path = external/promise-cpp
+	url = https://github.com/xhawk18/promise-cpp.git

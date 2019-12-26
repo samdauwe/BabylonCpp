@@ -9,7 +9,7 @@
 
 namespace BABYLON {
 
-struct ArrayBufferView;
+class ArrayBufferView;
 class EnvironmentTextureInfo;
 class InternalTexture;
 using EnvironmentTextureInfoPtr = std::shared_ptr<EnvironmentTextureInfo>;

@@ -23,13 +23,13 @@ if (${CMAKE_VERSION} VERSION_LESS "3.2")
 endif()
 
 # Git version
-include(${CMAKE_MODULE_PATH}/GetGitRevisionDescription.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/GetGitRevisionDescription.cmake)
 
 # Custom cmake functions
-include(${CMAKE_MODULE_PATH}/Custom.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/Custom.cmake)
 
 # Compiler settings and options
-include(${CMAKE_MODULE_PATH}/CompileOptions.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/CompileOptions.cmake)
 
 # Set policies
 set_policy(CMP0028 NEW) # ENABLE CMP0028: Double colon in target name means ALIAS or IMPORTED target.

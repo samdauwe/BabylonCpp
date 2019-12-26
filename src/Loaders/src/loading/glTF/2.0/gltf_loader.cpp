@@ -838,8 +838,7 @@ void GLTFLoader::_loadMorphTargetVertexDataAsync(
 
     auto& accessor = ArrayItem::Get(String::printf("%s/%s", context.c_str(), attribute.c_str()),
                                     _gltf->accessors, attributes.at(attribute));
-    auto& data
-      = _loadFloatAccessorAsync(String::printf("/accessors/%ld", accessor.index), accessor);
+    auto data = _loadFloatAccessorAsync(String::printf("/accessors/%ld", accessor.index), accessor);
     setData(babylonVertexBuffer, data);
   };
 
@@ -1385,9 +1384,11 @@ ArrayBufferView& GLTFLoader::loadBufferViewAsync(const std::string& context,
   auto& buffer    = ArrayItem::Get(String::printf("%s/buffer", context.c_str()), _gltf->buffers,
                                 bufferView.buffer);
   const auto data = _loadBufferAsync(String::printf("/buffers/%ld", buffer.index), buffer);
+
+  // ASYNC_FIXME: We cannot treat the data right now, it will be otained later!
   try {
     bufferView._data = stl_util::to_array<uint8_t>(
-      data.uint8Array, data.byteOffset + (bufferView.byteOffset.value_or(0)),
+      data.uint8Array(), data.byteOffset + (bufferView.byteOffset.value_or(0)),
       bufferView.byteLength);
   }
   catch (const std::exception& e) {
@@ -1423,9 +1424,10 @@ ArrayBufferView& GLTFLoader::_loadAccessorAsync(const std::string& context, IAcc
                                         length);
     }
     else {
-      auto typedArray = Float32Array(length);
+      auto typedArray             = Float32Array(length);
+      const auto dataFloat32Array = data.float32Array();
       VertexBuffer::ForEach(
-        data.float32Array, accessor.byteOffset || 0, bufferView.byteStride || byteStride,
+        dataFloat32Array, accessor.byteOffset || 0, bufferView.byteStride || byteStride,
         numComponents, static_cast<unsigned>(accessor.componentType), typedArray.size(),
         accessor.normalized || false,
         [&typedArray](float value, size_t index) -> void { typedArray[index] = value; });
@@ -1440,7 +1442,7 @@ ArrayBufferView& GLTFLoader::_loadAccessorAsync(const std::string& context, IAcc
     const auto& sparse            = *accessor.sparse;
     const auto accessor_data_then = [this, &context, &sparse, &numComponents,
                                      &accessor](const ArrayBufferView& view) -> Float32Array {
-      auto data = view.float32Array;
+      auto data = view.float32Array();
       auto& indicesBufferView
         = ArrayItem::Get(String::printf("%s/sparse/indices/bufferView", context.c_str()),
                          _gltf->bufferViews, sparse.indices.bufferView);
@@ -1456,11 +1458,11 @@ ArrayBufferView& GLTFLoader::_loadAccessorAsync(const std::string& context, IAcc
         GLTFLoader::_GetTypedArray(String::printf("%s/sparse/indices", context.c_str()),
                                    sparse.indices.componentType, indicesData,
                                    sparse.indices.byteOffset, sparse.count));
-      const auto& values
+      const auto values
         = GLTFLoader::_GetTypedArray(String::printf("%s/sparse/values", context.c_str()),
                                      accessor.componentType, valuesData, sparse.values.byteOffset,
                                      numComponents * sparse.count)
-            .float32Array;
+            .float32Array();
       size_t valuesIndex = 0;
       for (unsigned int indice : indices) {
         auto dataIndex = indice * numComponents;
@@ -1476,9 +1478,9 @@ ArrayBufferView& GLTFLoader::_loadAccessorAsync(const std::string& context, IAcc
   return *accessor._data;
 }
 
-Float32Array& GLTFLoader::_loadFloatAccessorAsync(const std::string& context, IAccessor& accessor)
+Float32Array GLTFLoader::_loadFloatAccessorAsync(const std::string& context, IAccessor& accessor)
 {
-  return _loadAccessorAsync<float>(context, accessor).float32Array;
+  return _loadAccessorAsync<float>(context, accessor).float32Array();
 }
 
 IndicesArray GLTFLoader::_castIndicesTo32bit(const IGLTF2::AccessorComponentType& type,
@@ -1486,29 +1488,30 @@ IndicesArray GLTFLoader::_castIndicesTo32bit(const IGLTF2::AccessorComponentType
 {
   switch (type) {
     case IGLTF2::AccessorComponentType::UNSIGNED_BYTE:
-      return stl_util::cast_array_elements<uint32_t, uint8_t>(buffer.uint8Array);
+      return stl_util::cast_array_elements<uint32_t, uint8_t>(buffer.uint8Array());
     case IGLTF2::AccessorComponentType::UNSIGNED_SHORT:
-      return stl_util::cast_array_elements<uint32_t, uint16_t>(buffer.uint16Array);
+      return stl_util::cast_array_elements<uint32_t, uint16_t>(buffer.uint16Array());
     default:
-      return buffer.uint32Array;
+      return buffer.uint32Array();
   }
 }
 
-IndicesArray& GLTFLoader::_getConverted32bitIndices(IAccessor& accessor)
+IndicesArray GLTFLoader::_getConverted32bitIndices(IAccessor& accessor)
 {
   switch (accessor.componentType) {
     case IGLTF2::AccessorComponentType::UNSIGNED_BYTE:
     case IGLTF2::AccessorComponentType::UNSIGNED_SHORT:
-      accessor._data->uint32Array = _castIndicesTo32bit(accessor.componentType, *accessor._data);
+      accessor._data
+        = ArrayBufferView(_castIndicesTo32bit(accessor.componentType, *accessor._data));
       break;
     default:
       break;
   }
 
-  return accessor._data->uint32Array;
+  return accessor._data->uint32Array();
 }
 
-IndicesArray& GLTFLoader::_loadIndicesAccessorAsync(const std::string& context, IAccessor& accessor)
+IndicesArray GLTFLoader::_loadIndicesAccessorAsync(const std::string& context, IAccessor& accessor)
 {
   if (accessor.type != IGLTF2::AccessorType::SCALAR) {
     throw std::runtime_error(String::printf("%s/type: Invalid value", context.c_str()));
@@ -1543,7 +1546,7 @@ BufferPtr GLTFLoader::_loadVertexBufferViewAsync(IBufferView& bufferView,
 
   auto data = loadBufferViewAsync(String::printf("/bufferViews/%ld", bufferView.index), bufferView);
   bufferView._babylonBuffer
-    = std::make_shared<Buffer>(_babylonScene->getEngine(), data.float32Array, false);
+    = std::make_shared<Buffer>(_babylonScene->getEngine(), data.float32Array(), false);
 
   return bufferView._babylonBuffer;
 }
@@ -1958,7 +1961,7 @@ BaseTexturePtr GLTFLoader::_loadTextureAsync(
                           image.uri :
                           String::printf("%s#image%ld", _fileName.c_str(), image.index);
       const auto dataUrl = String::printf("data:%s%s", _uniqueRootUrl.c_str(), name.c_str());
-      babylonTexture->updateURL(dataUrl, data.uint8Array);
+      babylonTexture->updateURL(dataUrl, data.uint8Array());
     });
   }
 
@@ -2013,6 +2016,7 @@ ArrayBufferView& GLTFLoader::loadImageAsync(const std::string& context, IImage& 
   return image._data;
 }
 
+// ASYNC_FIXME this should return a promise, not a value !!! As in the js code.
 ArrayBufferView GLTFLoader::loadUriAsync(const std::string& context, const std::string& uri)
 {
   const auto extensionPromise = _extensionsLoadUriAsync(context, uri);
@@ -2155,7 +2159,7 @@ ArrayBufferView GLTFLoader::_GetTypedArray(const std::string& context,
                                            const ArrayBufferView& bufferView,
                                            std::optional<size_t> byteOffset, size_t length)
 {
-  const auto& buffer = bufferView.uint8Array;
+  const auto& buffer = bufferView.uint8Array();
   byteOffset         = bufferView.byteOffset + byteOffset.value_or(0);
 
   try {

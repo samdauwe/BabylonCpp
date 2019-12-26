@@ -10,25 +10,17 @@
 
 namespace BABYLON {
 
-std::array<FileFaceOrientation, 6> CubeMapToSphericalPolynomialTools::FileFaces
-  = {{
-    FileFaceOrientation("right", Vector3(1, 0, 0), Vector3(0, 0, -1),
-                        Vector3(0, -1, 0)), // +X east
-    FileFaceOrientation("left", Vector3(-1, 0, 0), Vector3(0, 0, 1),
-                        Vector3(0, -1, 0)), // -X west
-    FileFaceOrientation("up", Vector3(0, 1, 0), Vector3(1, 0, 0),
-                        Vector3(0, 0, 1)), // +Y north
-    FileFaceOrientation("down", Vector3(0, -1, 0), Vector3(1, 0, 0),
-                        Vector3(0, 0, -1)), // -Y south
-    FileFaceOrientation("front", Vector3(0, 0, 1), Vector3(1, 0, 0),
-                        Vector3(0, -1, 0)), // +Z top
-    FileFaceOrientation("back", Vector3(0, 0, -1), Vector3(-1, 0, 0),
-                        Vector3(0, -1, 0)) // -Z bottom
-  }};
+std::array<FileFaceOrientation, 6> CubeMapToSphericalPolynomialTools::FileFaces = {{
+  FileFaceOrientation("right", Vector3(1, 0, 0), Vector3(0, 0, -1), Vector3(0, -1, 0)), // +X east
+  FileFaceOrientation("left", Vector3(-1, 0, 0), Vector3(0, 0, 1), Vector3(0, -1, 0)),  // -X west
+  FileFaceOrientation("up", Vector3(0, 1, 0), Vector3(1, 0, 0), Vector3(0, 0, 1)),      // +Y north
+  FileFaceOrientation("down", Vector3(0, -1, 0), Vector3(1, 0, 0), Vector3(0, 0, -1)),  // -Y south
+  FileFaceOrientation("front", Vector3(0, 0, 1), Vector3(1, 0, 0), Vector3(0, -1, 0)),  // +Z top
+  FileFaceOrientation("back", Vector3(0, 0, -1), Vector3(-1, 0, 0), Vector3(0, -1, 0))  // -Z bottom
+}};
 
 SphericalPolynomialPtr
-CubeMapToSphericalPolynomialTools::ConvertCubeMapTextureToSphericalPolynomial(
-  BaseTexture& texture)
+CubeMapToSphericalPolynomialTools::ConvertCubeMapTextureToSphericalPolynomial(BaseTexture& texture)
 {
   if (!texture.isCube) {
     // Only supports cube Textures currently.
@@ -78,8 +70,7 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapTextureToSphericalPolynomial(
 }
 
 SphericalPolynomialPtr
-CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
-  const CubeMapInfo& cubeInfo)
+CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(const CubeMapInfo& cubeInfo)
 {
   SphericalHarmonics sphericalHarmonics;
   auto totalSolidAngle = 0.f;
@@ -92,17 +83,16 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
   auto minUV = du * 0.5f - 1.f;
 
   for (auto faceIndex = 0u; faceIndex < 6; ++faceIndex) {
-    const auto& fileFace  = FileFaces[faceIndex];
-    const auto& dataArray = cubeInfo[fileFace.name].float32Array;
-    auto v                = minUV;
+    const auto& fileFace = FileFaces[faceIndex];
+    const auto dataArray = cubeInfo[fileFace.name].float32Array();
+    auto v               = minUV;
 
     // TODO: we could perform the summation directly into a SphericalPolynomial
     // (SP), which is more efficient than SphericalHarmonic (SH).
     // This is possible because during the summation we do not need the
     // SH-specific properties, e.g. orthogonality.
     // Because SP is still linear, so summation is fine in that basis.
-    const auto stride
-      = cubeInfo.format == Constants::TEXTUREFORMAT_RGBA ? 4u : 3u;
+    const auto stride = cubeInfo.format == Constants::TEXTUREFORMAT_RGBA ? 4u : 3u;
     for (auto y = 0ull; y < cubeInfo.size; ++y) {
       auto u = minUV;
 
