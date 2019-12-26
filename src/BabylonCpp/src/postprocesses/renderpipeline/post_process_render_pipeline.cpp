@@ -8,11 +8,11 @@
 
 namespace BABYLON {
 
-PostProcessRenderPipeline::PostProcessRenderPipeline(Engine* iEngine,
-                                                     const std::string& name)
+PostProcessRenderPipeline::PostProcessRenderPipeline(Engine* iEngine, const std::string& name)
 
     : _name{name}
     , name{this, &PostProcessRenderPipeline::get_name}
+    , cameras{this, &PostProcessRenderPipeline::get_cameras}
     , isSupported{this, &PostProcessRenderPipeline::get_isSupported}
     , engine{iEngine}
 {
@@ -30,6 +30,11 @@ std::string PostProcessRenderPipeline::get_name() const
   return _name;
 }
 
+std::vector<CameraPtr>& PostProcessRenderPipeline::get_cameras()
+{
+  return _cameras;
+}
+
 bool PostProcessRenderPipeline::get_isSupported() const
 {
   for (const auto& item : _renderEffects) {
@@ -40,8 +45,7 @@ bool PostProcessRenderPipeline::get_isSupported() const
   return true;
 }
 
-void PostProcessRenderPipeline::addEffect(
-  const PostProcessRenderEffectPtr& renderEffect)
+void PostProcessRenderPipeline::addEffect(const PostProcessRenderEffectPtr& renderEffect)
 {
   _renderEffects[renderEffect->_name] = renderEffect;
 }
@@ -50,8 +54,8 @@ void PostProcessRenderPipeline::_rebuild()
 {
 }
 
-void PostProcessRenderPipeline::_enableEffect(
-  const std::string& renderEffectName, const std::vector<CameraPtr>& cameras)
+void PostProcessRenderPipeline::_enableEffect(const std::string& renderEffectName,
+                                              const std::vector<CameraPtr>& iCameras)
 {
   auto& renderEffects = _renderEffects[renderEffectName];
 
@@ -59,25 +63,24 @@ void PostProcessRenderPipeline::_enableEffect(
     return;
   }
 
-  auto& _cam = cameras.empty() ? _cameras : cameras;
+  auto& _cam = iCameras.empty() ? _cameras : iCameras;
   renderEffects->_enable(_cam);
 }
 
-void PostProcessRenderPipeline::_disableEffect(
-  const std::string& renderEffectName, const std::vector<CameraPtr>& cameras)
+void PostProcessRenderPipeline::_disableEffect(const std::string& renderEffectName,
+                                               const std::vector<CameraPtr>& iCameras)
 {
   if (!stl_util::contains(_renderEffects, renderEffectName)) {
     return;
   }
 
-  auto& _cam = cameras.empty() ? _cameras : cameras;
+  auto& _cam = iCameras.empty() ? _cameras : iCameras;
   _renderEffects[renderEffectName]->_disable(_cam);
 }
 
-void PostProcessRenderPipeline::_attachCameras(
-  const std::vector<CameraPtr>& cameras, bool unique)
+void PostProcessRenderPipeline::_attachCameras(const std::vector<CameraPtr>& iCameras, bool unique)
 {
-  auto& cams = cameras.empty() ? _cameras : cameras;
+  auto& cams = iCameras.empty() ? _cameras : iCameras;
 
   if (cams.empty()) {
     return;
@@ -87,10 +90,10 @@ void PostProcessRenderPipeline::_attachCameras(
   for (const auto& camera : cams) {
     const auto& cameraName = camera->name;
 
-    auto it = std::find_if(_cameras.begin(), _cameras.end(),
-                           [&cameraName](const CameraPtr& cameraEntry) {
-                             return cameraName == cameraEntry->name;
-                           });
+    auto it
+      = std::find_if(_cameras.begin(), _cameras.end(), [&cameraName](const CameraPtr& cameraEntry) {
+          return cameraName == cameraEntry->name;
+        });
     if (it == _cameras.end()) {
       _cameras.emplace_back(camera);
     }
@@ -100,10 +103,10 @@ void PostProcessRenderPipeline::_attachCameras(
   }
 
   for (const auto& camera : camerasToDelete) {
-    auto it = std::find_if(_cameras.begin(), _cameras.end(),
-                           [&camera](const CameraPtr& cameraEntry) {
-                             return camera->name == cameraEntry->name;
-                           });
+    auto it
+      = std::find_if(_cameras.begin(), _cameras.end(), [&camera](const CameraPtr& cameraEntry) {
+          return camera->name == cameraEntry->name;
+        });
     if (it != _cameras.end())
       _cameras.erase(it);
   }
@@ -113,10 +116,9 @@ void PostProcessRenderPipeline::_attachCameras(
   }
 }
 
-void PostProcessRenderPipeline::_detachCameras(
-  const std::vector<CameraPtr>& cameras)
+void PostProcessRenderPipeline::_detachCameras(const std::vector<CameraPtr>& iCameras)
 {
-  auto cams = cameras.empty() ? _cameras : cameras;
+  auto cams = iCameras.empty() ? _cameras : iCameras;
 
   if (cams.empty()) {
     return;
@@ -127,10 +129,10 @@ void PostProcessRenderPipeline::_detachCameras(
   }
 
   for (const auto& camera : cams) {
-    auto it = std::find_if(_cameras.begin(), _cameras.end(),
-                           [&camera](const CameraPtr& cameraEntry) {
-                             return camera->name == cameraEntry->name;
-                           });
+    auto it
+      = std::find_if(_cameras.begin(), _cameras.end(), [&camera](const CameraPtr& cameraEntry) {
+          return camera->name == cameraEntry->name;
+        });
     if (it != _cameras.end()) {
       _cameras.erase(it);
     }
@@ -157,18 +159,15 @@ void PostProcessRenderPipeline::_reset()
   _renderEffectsForIsolatedPass.clear();
 }
 
-bool PostProcessRenderPipeline::_enableMSAAOnFirstPostProcess(
-  unsigned int sampleCount)
+bool PostProcessRenderPipeline::_enableMSAAOnFirstPostProcess(unsigned int sampleCount)
 {
   if (engine->webGLVersion() == 1.f) {
     return false;
   }
 
-  // Set samples of the very first post process to 4 to enable native
-  // anti-aliasing in browsers that support webGL 2.0 (See:
-  // https://github.com/BabylonJS/Babylon.js/issues/3754)
+  // Set samples of the very first post process to 4 to enable native anti-aliasing in browsers that
+  // support webGL 2.0 (See: https://github.com/BabylonJS/Babylon.js/issues/3754)
   auto effectKeys = stl_util::extract_keys(_renderEffects);
-
   if (!effectKeys.empty()) {
     auto postProcesses = _renderEffects[effectKeys[0]]->getPostProcesses();
     if (!postProcesses.empty()) {
@@ -179,8 +178,7 @@ bool PostProcessRenderPipeline::_enableMSAAOnFirstPostProcess(
   return false;
 }
 
-void PostProcessRenderPipeline::dispose(bool /*doNotRecurse*/,
-                                        bool /*disposeMaterialAndTextures*/)
+void PostProcessRenderPipeline::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextures*/)
 {
   // Must be implemented by children
 }

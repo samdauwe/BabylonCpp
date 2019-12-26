@@ -1,4 +1,4 @@
-#ifndef BABYLON_POSTPROCESSES_RENDERPIPELINE_POST_PROCESS_RENDER_PIPELINE_H
+﻿#ifndef BABYLON_POSTPROCESSES_RENDERPIPELINE_POST_PROCESS_RENDER_PIPELINE_H
 #define BABYLON_POSTPROCESSES_RENDERPIPELINE_POST_PROCESS_RENDER_PIPELINE_H
 
 #include <memory>
@@ -102,6 +102,11 @@ protected:
   [[nodiscard]] std::string get_name() const;
 
   /**
+   * @brief Gets the list of attached cameras.
+   */
+  std::vector<CameraPtr>& get_cameras();
+
+  /**
    * @brief If all the render effects in the pipeline are supported.
    */
   [[nodiscard]] bool get_isSupported() const;
@@ -129,13 +134,18 @@ public:
   ReadOnlyProperty<PostProcessRenderPipeline, std::string> name;
 
   /**
+   * Gets the list of attached cameras
+   */
+  ReadOnlyProperty<PostProcessRenderPipeline, std::vector<CameraPtr>> cameras;
+
+  /**
    * If all the render effects in the pipeline are supported
    */
   ReadOnlyProperty<PostProcessRenderPipeline, bool> isSupported;
 
 protected:
   /**
-   * Hidden
+   * The list of attached cameras
    */
   std::vector<CameraPtr> _cameras;
 

@@ -27,8 +27,8 @@ using InternalTexturePtr = std::shared_ptr<InternalTexture>;
 using PostProcessPtr     = std::shared_ptr<PostProcess>;
 
 /**
- * @brief PostProcess can be used to apply a shader to a texture after it has been rendered See
- * https://doc.babylonjs.com/how_to/how_to_use_postprocesses
+ * @brief PostProcess can be used to apply a shader to a texture after it has been rendered
+ * @see https://doc.babylonjs.com/how_to/how_to_use_postprocesses
  */
 class BABYLON_SHARED_EXPORT PostProcess {
 

@@ -324,9 +324,16 @@ InternalTexturePtr PostProcess::activate(const CameraPtr& camera,
       width  = desiredWidth;
       height = desiredHeight;
 
+      const auto needMipMaps
+        = renderTargetSamplingMode == Constants::TEXTURE_TRILINEAR_SAMPLINGMODE
+          || renderTargetSamplingMode == Constants::TEXTURE_NEAREST_NEAREST_MIPLINEAR
+          || renderTargetSamplingMode == Constants::TEXTURE_LINEAR_LINEAR_MIPLINEAR
+          || renderTargetSamplingMode == Constants::TEXTURE_NEAREST_LINEAR_MIPLINEAR
+          || renderTargetSamplingMode == Constants::TEXTURE_LINEAR_NEAREST_MIPLINEAR;
+
       auto textureSize = ISize(width, height);
       IRenderTargetOptions textureOptions;
-      textureOptions.generateMipMaps = false;
+      textureOptions.generateMipMaps = needMipMaps;
       textureOptions.generateDepthBuffer
         = forceDepthStencil || (stl_util::index_of_raw_ptr(pCamera->_postProcesses, this) == 0);
       textureOptions.generateStencilBuffer

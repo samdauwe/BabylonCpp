@@ -55,8 +55,8 @@ public:
    */
   static constexpr const char* SSAOBlurVRenderEffect = "SSAOBlurVRenderEffect";
   /**
-   * The PostProcess id in the pipeline that combines the SSAO-Blur output with
-   * the original scene color (SSAOOriginalSceneColorEffect)
+   * The PostProcess id in the pipeline that combines the SSAO-Blur output with the original scene
+   * color (SSAOOriginalSceneColorEffect)
    */
   static constexpr const char* SSAOCombineRenderEffect = "SSAOCombineRenderEffect";
 
@@ -91,8 +91,7 @@ public:
   void _rebuild() override;
 
   /**
-   * @brief Removes the internal pipeline assets and detatches the pipeline from
-   * the scene cameras.
+   * @brief Removes the internal pipeline assets and detatches the pipeline from the scene cameras.
    */
   void dispose(bool disableGeometryBufferRenderer = false,
                bool disposeMaterialAndTextures    = false) override;
@@ -118,10 +117,9 @@ protected:
    * @brief Constructor
    * @param name The rendering pipeline name
    * @param scene The scene linked to this pipeline
-   * @param ratio The size of the postprocesses. Can be a number shared between
-   * passes or an object for more precision: { ssaoRatio: 0.5, blurRatio: 1.0 }
-   * @param cameras The array of cameras that the rendering pipeline will be
-   * attached to
+   * @param ratio The size of the postprocesses. Can be a number shared between passes or an object
+   * for more precision: { ssaoRatio: 0.5, blurRatio: 1.0 }
+   * @param cameras The array of cameras that the rendering pipeline will be attached to
    */
   SSAO2RenderingPipeline(const std::string& name, Scene* scene, float ratio,
                          const std::vector<CameraPtr>& cameras);
@@ -152,8 +150,8 @@ public:
   float totalStrength;
 
   /**
-   * Maximum depth value to still render AO. A smooth falloff makes the dimming
-   * more natural, so there will be no abrupt shading change.
+   * Maximum depth value to still render AO. A smooth falloff makes the dimming more natural, so
+   * there will be no abrupt shading change.
    */
   float maxZ;
 
@@ -179,24 +177,21 @@ public:
   Property<SSAO2RenderingPipeline, bool> expensiveBlur;
 
   /**
-   * The radius around the analyzed pixel used by the SSAO post-process. Default
-   * value is 2.0
+   * The radius around the analyzed pixel used by the SSAO post-process. Default value is 2.0
    */
   float radius;
 
   /**
-   * Related to fallOff, used to interpolate SSAO samples (first interpolate
-   * function input) based on the occlusion difference of each pixel
-   * Must not be equal to fallOff and superior to fallOff.
+   * Related to fallOff, used to interpolate SSAO samples (first interpolate function input) based
+   * on the occlusion difference of each pixel Must not be equal to fallOff and superior to fallOff.
    * Default value is 0.0075
    */
   float area;
 
   /**
-   * Related to area, used to interpolate SSAO samples (second interpolate
-   * function input) based on the occlusion difference of each pixel
-   * Must not be equal to area and inferior to area.
-   * Default value is 0.000001
+   * Related to area, used to interpolate SSAO samples (second interpolate function input) based on
+   * the occlusion difference of each pixel Must not be equal to area and inferior to area. Default
+   * value is 0.000001
    */
   float fallOff;
 
@@ -250,7 +245,6 @@ private:
   PostProcessPtr _blurVPostProcess;
   PostProcessPtr _ssaoCombinePostProcess;
 
-  bool _firstUpdate;
   Uint32Array _bits;
 
 }; // end of class SSAORenderingPipeline
