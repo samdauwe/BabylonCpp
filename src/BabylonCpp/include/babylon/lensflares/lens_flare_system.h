@@ -42,7 +42,7 @@ using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
 
 /**
  * @brief This represents a Lens Flare System or the shiny effect created by the light reflection on
- * the  camera lenses. It is usually composed of several `lensFlare`.
+ * the camera lenses. It is usually composed of several `lensFlare`.
  * @see http://doc.babylonjs.com/how_to/how_to_use_lens_flares
  */
 class BABYLON_SHARED_EXPORT LensFlareSystem {

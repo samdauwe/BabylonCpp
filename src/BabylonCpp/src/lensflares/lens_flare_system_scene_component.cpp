@@ -41,8 +41,7 @@ void LensFlareSystemSceneComponent::addFromContainer(AbstractScene* container)
   }
 }
 
-void LensFlareSystemSceneComponent::removeFromContainer(
-  AbstractScene* container, bool dispose)
+void LensFlareSystemSceneComponent::removeFromContainer(AbstractScene* container, bool dispose)
 {
   if (container->lensFlareSystems.empty()) {
     return;

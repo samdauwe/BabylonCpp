@@ -19,15 +19,14 @@ class LensFlareSystemSceneComponent;
 using LensFlareSystemSceneComponentPtr = std::shared_ptr<LensFlareSystemSceneComponent>;
 
 /**
- * @brief Defines the lens flare scene component responsible to manage any lens
- * flares in a given scene.
+ * @brief Defines the lens flare scene component responsible to manage any lens flares in a given
+ * scene.
  */
 class BABYLON_SHARED_EXPORT LensFlareSystemSceneComponent : public ISceneComponent {
 
 public:
   /**
-   * The component name helpfull to identify the component in the list of scene
-   * components.
+   * The component name helpfull to identify the component in the list of scene components.
    */
   static constexpr const char* name = SceneComponentConstants::NAME_LENSFLARESYSTEM;
 
@@ -46,8 +45,7 @@ public:
   void _register() override;
 
   /**
-   * @brief Rebuilds the elements related to this component in case of
-   * context lost for instance.
+   * @brief Rebuilds the elements related to this component in case of context lost for instance.
    */
   void rebuild() override;
 
@@ -77,7 +75,7 @@ public:
 
 protected:
   /**
-   * Creates a new instance of the component for the given scene
+   * @brief Creates a new instance of the component for the given scene.
    * @param scene Defines the scene to register the component in
    */
   LensFlareSystemSceneComponent(Scene* scene);
