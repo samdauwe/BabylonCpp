@@ -9,8 +9,10 @@ namespace BABYLON {
 
 class Light;
 class StandardMaterial;
+class TransformNode;
 using LightPtr            = std::shared_ptr<Light>;
 using StandardMaterialPtr = std::shared_ptr<StandardMaterial>;
+using TransformNodePtr    = std::shared_ptr<TransformNode>;
 
 /**
  * @brief Gizmo that enables viewing a light.
@@ -43,7 +45,7 @@ private:
   /**
    * Creates the lines for a light mesh
    */
-  static MeshPtr _createLightLines(float levels, Scene* scene);
+  static MeshPtr _CreateLightLines(float levels, Scene* scene);
 
   static MeshPtr _CreateHemisphericLightMesh(Scene* scene);
   static MeshPtr _CreatePointLightMesh(Scene* scene);
@@ -81,8 +83,9 @@ private:
   static float _Scale;
   MeshPtr _lightMesh;
   StandardMaterialPtr _material;
-  Vector3 cachedPosition;
-  Vector3 cachedForward;
+  Vector3 _cachedPosition;
+  Vector3 _cachedForward;
+  TransformNodePtr _attachedMeshParent;
   LightPtr _light;
 
 }; // end of class LightGizmo

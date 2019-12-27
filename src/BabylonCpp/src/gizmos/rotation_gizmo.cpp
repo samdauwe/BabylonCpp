@@ -8,22 +8,18 @@
 
 namespace BABYLON {
 
-RotationGizmo::RotationGizmo(const UtilityLayerRendererPtr& iGizmoLayer,
-                             unsigned int tessellation, bool useEulerRotation)
+RotationGizmo::RotationGizmo(const UtilityLayerRendererPtr& iGizmoLayer, unsigned int tessellation,
+                             bool useEulerRotation)
     : Gizmo{iGizmoLayer}
-    , snapDistance{this, &RotationGizmo::get_snapDistance,
-                   &RotationGizmo::set_snapDistance}
+    , snapDistance{this, &RotationGizmo::get_snapDistance, &RotationGizmo::set_snapDistance}
     , _meshAttached{nullptr}
 {
-  xGizmo = std::make_unique<PlaneRotationGizmo>(
-    Vector3(1.f, 0.f, 0.f), Color3::Red().scale(0.5f), iGizmoLayer,
-    tessellation, this, useEulerRotation);
-  yGizmo = std::make_unique<PlaneRotationGizmo>(
-    Vector3(0.f, 1.f, 0.f), Color3::Green().scale(0.5f), iGizmoLayer,
-    tessellation, this, useEulerRotation);
-  zGizmo = std::make_unique<PlaneRotationGizmo>(
-    Vector3(0.f, 0.f, 1.f), Color3::Blue().scale(0.5f), iGizmoLayer,
-    tessellation, this, useEulerRotation);
+  xGizmo = std::make_unique<PlaneRotationGizmo>(Vector3(1.f, 0.f, 0.f), Color3::Red().scale(0.5f),
+                                                iGizmoLayer, tessellation, this, useEulerRotation);
+  yGizmo = std::make_unique<PlaneRotationGizmo>(Vector3(0.f, 1.f, 0.f), Color3::Green().scale(0.5f),
+                                                iGizmoLayer, tessellation, this, useEulerRotation);
+  zGizmo = std::make_unique<PlaneRotationGizmo>(Vector3(0.f, 0.f, 1.f), Color3::Blue().scale(0.5f),
+                                                iGizmoLayer, tessellation, this, useEulerRotation);
 
   // Relay drag events
   for (const auto& gizmo : {xGizmo.get(), yGizmo.get(), zGizmo.get()}) {
@@ -112,13 +108,12 @@ void RotationGizmo::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   onDragEndObservable.clear();
 }
 
-void RotationGizmo::setCustomMesh(const MeshPtr& /*mesh*/,
-                                  bool /*useGizmoMaterial*/)
+void RotationGizmo::setCustomMesh(const MeshPtr& /*mesh*/, bool /*useGizmoMaterial*/)
 {
-  BABYLON_LOG_ERROR("RotationGizmo",
-                    "Custom meshes are not supported on this gizmo, please set "
-                    "the custom meshes on the gizmos contained within this one "
-                    "(gizmo.xGizmo, gizmo.yGizmo, gizmo.zGizmo)")
+  BABYLON_LOG_ERROR(
+    "RotationGizmo",
+    "Custom meshes are not supported on this gizmo, please set the custom meshes on the gizmos "
+    "contained within this one (gizmo.xGizmo, gizmo.yGizmo, gizmo.zGizmo)")
 }
 
 } // end of namespace BABYLON

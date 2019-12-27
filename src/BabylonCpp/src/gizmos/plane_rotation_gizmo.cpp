@@ -14,15 +14,14 @@
 
 namespace BABYLON {
 
-PlaneRotationGizmo::PlaneRotationGizmo(
-  const Vector3& planeNormal, const Color3& color,
-  const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer,
-  unsigned int tessellation, RotationGizmo* parent, bool useEulerRotation)
+PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3& color,
+                                       const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer,
+                                       unsigned int tessellation, RotationGizmo* parent,
+                                       bool useEulerRotation)
     : Gizmo{iGizmoLayer}
     , dragBehavior{nullptr}
     , snapDistance{0.f}
-    , isEnabled{this, &PlaneRotationGizmo::get_isEnabled,
-                &PlaneRotationGizmo::set_isEnabled}
+    , isEnabled{this, &PlaneRotationGizmo::get_isEnabled, &PlaneRotationGizmo::set_isEnabled}
     , _pointerObserver{nullptr}
     , _isEnabled{true}
     , _parent{nullptr}
@@ -30,23 +29,20 @@ PlaneRotationGizmo::PlaneRotationGizmo(
 {
   _parent = parent;
   // Create Material
-  auto coloredMaterial
-    = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
+  auto coloredMaterial           = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
   coloredMaterial->diffuseColor  = color;
   coloredMaterial->specularColor = color.subtract(Color3(0.1f, 0.1f, 0.1f));
 
-  auto hoverMaterial
-    = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
+  auto hoverMaterial          = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
   hoverMaterial->diffuseColor = color.add(Color3(0.3f, 0.3f, 0.3f));
 
   // Build mesh on root node
   auto parentMesh = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
 
-  auto drag              = Mesh::CreateTorus("", 0.6f, 0.03f, tessellation,
-                                gizmoLayer->utilityLayerScene.get());
-  drag->visibility       = 0.f;
-  auto rotationMesh      = Mesh::CreateTorus("", 0.6f, 0.005f, tessellation,
-                                        gizmoLayer->utilityLayerScene.get());
+  auto drag = Mesh::CreateTorus("", 0.6f, 0.03f, tessellation, gizmoLayer->utilityLayerScene.get());
+  drag->visibility = 0.f;
+  auto rotationMesh
+    = Mesh::CreateTorus("", 0.6f, 0.005f, tessellation, gizmoLayer->utilityLayerScene.get());
   rotationMesh->material = coloredMaterial;
 
   // Position arrow pointing in its drag axis
@@ -67,21 +63,18 @@ PlaneRotationGizmo::PlaneRotationGizmo(
   dragBehavior->_useAlternatePickedPointAboveMaxDragAngle = true;
   // _rootMesh->addBehavior(dragBehavior.get());
 
-  dragBehavior->onDragStartObservable.add(
-    [&](DragStartOrEndEvent* e, EventState& /*es*/) {
-      if (attachedMesh()) {
-        _lastDragPosition.copyFrom(e->dragPlanePoint);
-      }
-    });
+  dragBehavior->onDragStartObservable.add([&](DragStartOrEndEvent* e, EventState& /*es*/) {
+    if (attachedMesh()) {
+      _lastDragPosition.copyFrom(e->dragPlanePoint);
+    }
+  });
 
   _currentSnapDragDistance = 0.f;
-  dragBehavior->onDragObservable.add([&](DragMoveEvent* event,
-                                         EventState& /*es*/) {
+  dragBehavior->onDragObservable.add([&](DragMoveEvent* event, EventState& /*es*/) {
     if (attachedMesh()) {
       if (!attachedMesh()->rotationQuaternion() || useEulerRotation) {
         attachedMesh()->rotationQuaternion = Quaternion::RotationYawPitchRoll(
-          attachedMesh()->rotation().y, attachedMesh()->rotation().x,
-          attachedMesh()->rotation().z);
+          attachedMesh()->rotation().y, attachedMesh()->rotation().x, attachedMesh()->rotation().z);
       }
 
       // Remove parent priort to rotating
@@ -92,12 +85,9 @@ PlaneRotationGizmo::PlaneRotationGizmo(
 
       // Calc angle over full 360 degree
       // (https://stackoverflow.com/questions/43493711/the-angle-between-two-3d-vectors-with-a-result-range-0-360)
-      auto Vector
-        = event->dragPlanePoint.subtract(attachedMesh()->absolutePosition)
-            .normalize();
+      auto Vector = event->dragPlanePoint.subtract(attachedMesh()->absolutePosition).normalize();
       auto originalVector
-        = _lastDragPosition.subtract(attachedMesh()->absolutePosition)
-            .normalize();
+        = _lastDragPosition.subtract(attachedMesh()->absolutePosition).normalize();
       auto cross = Vector3::Cross(Vector, originalVector);
       auto dot   = Vector3::Dot(Vector, originalVector);
       auto angle = std::atan2(cross.length(), dot);
@@ -105,22 +95,19 @@ PlaneRotationGizmo::PlaneRotationGizmo(
       _localPlaneNormalTowardsCamera.copyFrom(planeNormal);
       if (updateGizmoRotationToMatchAttachedMesh) {
         attachedMesh()->rotationQuaternion()->toRotationMatrix(_rotationMatrix);
-        _localPlaneNormalTowardsCamera = Vector3::TransformCoordinates(
-          _planeNormalTowardsCamera, _rotationMatrix);
+        _localPlaneNormalTowardsCamera
+          = Vector3::TransformCoordinates(_planeNormalTowardsCamera, _rotationMatrix);
       }
       // Flip up vector depending on which side the camera is on
       if (gizmoLayer->utilityLayerScene->activeCamera()) {
-        auto camVec = gizmoLayer->utilityLayerScene
-                        ->activeCamera()
-                        ->position()
-                        .subtract(attachedMesh()->position());
+        auto camVec = gizmoLayer->utilityLayerScene->activeCamera()->position().subtract(
+          attachedMesh()->position());
         if (Vector3::Dot(camVec, _localPlaneNormalTowardsCamera) > 0.f) {
           _planeNormalTowardsCamera.scaleInPlace(-1.f);
           _localPlaneNormalTowardsCamera.scaleInPlace(-1.f);
         }
       }
-      auto halfCircleSide
-        = Vector3::Dot(_localPlaneNormalTowardsCamera, cross) > 0.f;
+      auto halfCircleSide = Vector3::Dot(_localPlaneNormalTowardsCamera, cross) > 0.f;
       if (halfCircleSide) {
         angle = -angle;
       }
@@ -130,29 +117,26 @@ PlaneRotationGizmo::PlaneRotationGizmo(
       if (snapDistance != 0.f) {
         _currentSnapDragDistance += angle;
         if (std::abs(_currentSnapDragDistance) > snapDistance) {
-          auto dragSteps
-            = std::floor(std::abs(_currentSnapDragDistance) / snapDistance);
+          auto dragSteps = std::floor(std::abs(_currentSnapDragDistance) / snapDistance);
           if (_currentSnapDragDistance < 0.f) {
             dragSteps *= -1.f;
           }
-          _currentSnapDragDistance
-            = std::fmod(_currentSnapDragDistance, snapDistance);
-          angle   = snapDistance * dragSteps;
-          snapped = true;
+          _currentSnapDragDistance = std::fmod(_currentSnapDragDistance, snapDistance);
+          angle                    = snapDistance * dragSteps;
+          snapped                  = true;
         }
         else {
           angle = 0;
         }
       }
 
-      // If the mesh has a parent, convert needed world rotation to local
-      // rotation
+      // If the mesh has a parent, convert needed world rotation to local rotation
       _tmpMatrix.reset();
       if (attachedMesh()->parent) {
         attachedMesh()->parent()->computeWorldMatrix().invertToRef(_tmpMatrix);
         _tmpMatrix.getRotationMatrixToRef(_tmpMatrix);
-        Vector3::TransformCoordinatesToRef(
-          _planeNormalTowardsCamera, _tmpMatrix, _planeNormalTowardsCamera);
+        Vector3::TransformCoordinatesToRef(_planeNormalTowardsCamera, _tmpMatrix,
+                                           _planeNormalTowardsCamera);
       }
 
       // Convert angle and axis to quaternion
@@ -163,18 +147,18 @@ PlaneRotationGizmo::PlaneRotationGizmo(
                           _planeNormalTowardsCamera.z * quaternionCoefficient,
                           std::cos(angle / 2.f));
 
-      // If the meshes local scale is inverted (eg. loaded gltf file parent with
-      // z scale of -1) the rotation needs to be inverted on the y axis
+      // If the meshes local scale is inverted (eg. loaded gltf file parent with z scale of -1) the
+      // rotation needs to be inverted on the y axis
       if (_tmpMatrix.determinant() > 0) {
         _amountToRotate.toEulerAnglesToRef(_tmpVector);
-        Quaternion::RotationYawPitchRollToRef(_tmpVector.y, -_tmpVector.x,
-                                              -_tmpVector.z, _amountToRotate);
+        Quaternion::RotationYawPitchRollToRef(_tmpVector.y, -_tmpVector.x, -_tmpVector.z,
+                                              _amountToRotate);
       }
 
       if (updateGizmoRotationToMatchAttachedMesh) {
         // Rotate selected mesh quaternion over fixed axis
-        attachedMesh()->rotationQuaternion()->multiplyToRef(
-          _amountToRotate, *attachedMesh()->rotationQuaternion());
+        attachedMesh()->rotationQuaternion()->multiplyToRef(_amountToRotate,
+                                                            *attachedMesh()->rotationQuaternion());
       }
       else {
         // Rotate selected mesh quaternion over rotated axis
@@ -206,22 +190,21 @@ PlaneRotationGizmo::PlaneRotationGizmo(
       if (_customMeshSet) {
         return;
       }
-      auto isHovered = stl_util::contains(_rootMesh->getChildMeshes(),
-                                          pointerInfo->pickInfo.pickedMesh);
-      auto material  = isHovered ? hoverMaterial : coloredMaterial;
+      auto isHovered
+        = stl_util::contains(_rootMesh->getChildMeshes(), pointerInfo->pickInfo.pickedMesh);
+      auto material = isHovered ? hoverMaterial : coloredMaterial;
       for (auto& m : _rootMesh->getChildMeshes()) {
         m->material = material;
         // if ((static_cast<LinesMesh*>(m))->color)
         {
-          std::static_pointer_cast<LinesMesh>(m)->color
-            = material->diffuseColor;
+          std::static_pointer_cast<LinesMesh>(m)->color = material->diffuseColor;
         }
       }
     });
 
-  const auto& light         = gizmoLayer->_getSharedGizmoLight();
-  light->includedOnlyMeshes = stl_util::concat(
-    light->includedOnlyMeshes(), _rootMesh->getChildMeshes(false));
+  const auto& light = gizmoLayer->_getSharedGizmoLight();
+  light->includedOnlyMeshes
+    = stl_util::concat(light->includedOnlyMeshes(), _rootMesh->getChildMeshes(false));
 }
 
 PlaneRotationGizmo::~PlaneRotationGizmo() = default;
@@ -251,8 +234,7 @@ bool PlaneRotationGizmo::get_isEnabled() const
   return _isEnabled;
 }
 
-void PlaneRotationGizmo::dispose(bool doNotRecurse,
-                                 bool disposeMaterialAndTextures)
+void PlaneRotationGizmo::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
   onSnapObservable.clear();
   gizmoLayer->utilityLayerScene->onPointerObservable.remove(_pointerObserver);

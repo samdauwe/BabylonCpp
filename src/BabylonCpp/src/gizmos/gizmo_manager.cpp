@@ -34,44 +34,47 @@ GizmoManager::GizmoManager(Scene* iScene)
     , _boundingBoxColor{Color3::FromHexString("#0984e3")}
 {
   _defaultKeepDepthUtilityLayer = UtilityLayerRenderer::New(iScene);
-  _defaultKeepDepthUtilityLayer->utilityLayerScene->autoClearDepthAndStencil
-    = false;
+  _defaultKeepDepthUtilityLayer->utilityLayerScene->autoClearDepthAndStencil = false;
   _defaultUtilityLayer = UtilityLayerRenderer::DefaultUtilityLayer();
 
   // Instatiate/dispose gizmos based on pointer actions
-  _pointerObserver = _scene->onPointerObservable.add(
-    [this](PointerInfo* pointerInfo, EventState& /*es*/) {
-      if (!usePointerToAttachGizmos) {
-        return;
-      }
-      if (pointerInfo->type == PointerEventTypes::POINTERDOWN) {
-        if (pointerInfo->pickInfo.pickedMesh) {
-          auto node = pointerInfo->pickInfo.pickedMesh ?
-                        pointerInfo->pickInfo.pickedMesh :
-                        nullptr;
-          if (attachableMeshes == std::nullopt) {
-            // Attach to the most parent node
-            while (node && node->parent() != nullptr) {
-              // node = node->parent();
-            }
-          }
-          else {
-            // Attach to the parent node that is an attachableMesh
-            auto found = false;
-            for (auto& mesh : *attachableMeshes) {
-              if (node && (node == mesh || node->isDescendantOf(mesh.get()))) {
-                node  = mesh;
-                found = true;
+  _pointerObserver
+    = _scene->onPointerObservable.add([this](PointerInfo* pointerInfo, EventState& /*es*/) {
+        if (!usePointerToAttachGizmos) {
+          return;
+        }
+        if (pointerInfo->type == PointerEventTypes::POINTERDOWN) {
+          if (pointerInfo->pickInfo.pickedMesh) {
+            auto node
+              = pointerInfo->pickInfo.pickedMesh ? pointerInfo->pickInfo.pickedMesh : nullptr;
+            if (attachableMeshes == std::nullopt) {
+              // Attach to the most parent node
+              while (node && node->parent() != nullptr) {
+                // node = node->parent();
               }
             }
-            if (!found) {
-              node = nullptr;
+            else {
+              // Attach to the parent node that is an attachableMesh
+              auto found = false;
+              for (auto& mesh : *attachableMeshes) {
+                if (node && (node == mesh || node->isDescendantOf(mesh.get()))) {
+                  node  = mesh;
+                  found = true;
+                }
+              }
+              if (!found) {
+                node = nullptr;
+              }
             }
-          }
-          if (node && node->type() == Type::ABSTRACTMESH) {
-            if (_attachedMesh != node) {
-              attachToMesh(std::static_pointer_cast<AbstractMesh>(
-                node->shared_from_this()));
+            if (node && node->type() == Type::ABSTRACTMESH) {
+              if (_attachedMesh != node) {
+                attachToMesh(std::static_pointer_cast<AbstractMesh>(node->shared_from_this()));
+              }
+            }
+            else {
+              if (clearGizmoOnEmptyPointerEvent) {
+                attachToMesh(nullptr);
+              }
             }
           }
           else {
@@ -80,13 +83,7 @@ GizmoManager::GizmoManager(Scene* iScene)
             }
           }
         }
-        else {
-          if (clearGizmoOnEmptyPointerEvent) {
-            attachToMesh(nullptr);
-          }
-        }
-      }
-    });
+      });
 }
 
 GizmoManager::~GizmoManager() = default;
@@ -131,8 +128,7 @@ void GizmoManager::set_positionGizmoEnabled(bool value)
 {
   if (value) {
     if (!gizmos.positionGizmo) {
-      gizmos.positionGizmo
-        = std::make_unique<PositionGizmo>(_defaultUtilityLayer);
+      gizmos.positionGizmo = std::make_unique<PositionGizmo>(_defaultUtilityLayer);
     }
     gizmos.positionGizmo->attachedMesh = _attachedMesh;
   }
@@ -151,11 +147,10 @@ void GizmoManager::set_rotationGizmoEnabled(bool value)
 {
   if (value) {
     if (!gizmos.rotationGizmo) {
-      gizmos.rotationGizmo
-        = std::make_unique<RotationGizmo>(_defaultUtilityLayer);
+      gizmos.rotationGizmo = std::make_unique<RotationGizmo>(_defaultUtilityLayer);
     }
     gizmos.rotationGizmo->updateGizmoRotationToMatchAttachedMesh = false;
-    gizmos.rotationGizmo->attachedMesh = _attachedMesh;
+    gizmos.rotationGizmo->attachedMesh                           = _attachedMesh;
   }
   else if (gizmos.rotationGizmo) {
     gizmos.rotationGizmo->attachedMesh = nullptr;
@@ -191,8 +186,8 @@ void GizmoManager::set_boundingBoxGizmoEnabled(bool value)
 {
   if (value) {
     if (!gizmos.boundingBoxGizmo) {
-      gizmos.boundingBoxGizmo = std::make_unique<BoundingBoxGizmo>(
-        _boundingBoxColor, _defaultKeepDepthUtilityLayer);
+      gizmos.boundingBoxGizmo
+        = std::make_unique<BoundingBoxGizmo>(_boundingBoxColor, _defaultKeepDepthUtilityLayer);
     }
     gizmos.boundingBoxGizmo->attachedMesh = _attachedMesh;
     if (_attachedMesh) {
@@ -214,8 +209,7 @@ bool GizmoManager::get_boundingBoxGizmoEnabled() const
   return _gizmosEnabled.boundingBoxGizmo;
 }
 
-void GizmoManager::dispose(bool /*doNotRecurse*/,
-                           bool /*disposeMaterialAndTextures*/)
+void GizmoManager::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextures*/)
 {
   _scene->onPointerObservable.remove(_pointerObserver);
 

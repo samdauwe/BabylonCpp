@@ -20,8 +20,8 @@
 
 namespace BABYLON {
 
-BoundingBoxGizmo::BoundingBoxGizmo(
-  const Color3& color, const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
+BoundingBoxGizmo::BoundingBoxGizmo(const Color3& color,
+                                   const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
     : Gizmo{iGizmoLayer}
     , ignoreChildren{false}
     , includeChildPredicate{nullptr}
@@ -44,23 +44,19 @@ BoundingBoxGizmo::BoundingBoxGizmo(
     , coloredMaterial{nullptr}
     , hoverColoredMaterial{nullptr}
 {
-  // Do not update the gizmo's scale so it has a fixed size to the object its
-  // attached to
+  // Do not update the gizmo's scale so it has a fixed size to the object its attached to
   updateScale = false;
 
-  _anchorMesh
-    = AbstractMesh::New("anchor", iGizmoLayer->utilityLayerScene.get());
+  _anchorMesh = AbstractMesh::New("anchor", iGizmoLayer->utilityLayerScene.get());
   // Create Materials
-  coloredMaterial
-    = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
+  coloredMaterial                  = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
   coloredMaterial->disableLighting = true;
 
-  hoverColoredMaterial
-    = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
+  hoverColoredMaterial = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
   hoverColoredMaterial->disableLighting = true;
 
   // Build bounding box out of lines
-  _lineBoundingBox = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
+  _lineBoundingBox                     = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
   _lineBoundingBox->rotationQuaternion = Quaternion();
   std::vector<LinesMeshPtr> lines;
   std::vector<std::vector<Vector3>> linesPoints{
@@ -79,26 +75,22 @@ BoundingBoxGizmo::BoundingBoxGizmo(
      Vector3(_boundingDimensions.x, 0.f, _boundingDimensions.z)},
     {Vector3(0.f, 0.f, _boundingDimensions.z),
      Vector3(0.f, _boundingDimensions.y, _boundingDimensions.z)},
-    {Vector3(_boundingDimensions.x, _boundingDimensions.y,
-             _boundingDimensions.z),
+    {Vector3(_boundingDimensions.x, _boundingDimensions.y, _boundingDimensions.z),
      Vector3(0.f, _boundingDimensions.y, _boundingDimensions.z)},
-    {Vector3(_boundingDimensions.x, _boundingDimensions.y,
-             _boundingDimensions.z),
+    {Vector3(_boundingDimensions.x, _boundingDimensions.y, _boundingDimensions.z),
      Vector3(_boundingDimensions.x, 0.f, _boundingDimensions.z)},
-    {Vector3(_boundingDimensions.x, _boundingDimensions.y,
-             _boundingDimensions.z),
+    {Vector3(_boundingDimensions.x, _boundingDimensions.y, _boundingDimensions.z),
      Vector3(_boundingDimensions.x, _boundingDimensions.y, 0.f)},
   };
   for (const auto& linePoints : linesPoints) {
     LinesOptions options;
     options.points = linePoints;
-    lines.emplace_back(LinesBuilder::CreateLines(
-      "lines", options, gizmoLayer->utilityLayerScene.get()));
+    lines.emplace_back(
+      LinesBuilder::CreateLines("lines", options, gizmoLayer->utilityLayerScene.get()));
   }
   for (const auto& l : lines) {
     l->color = color;
-    l->position().addInPlace(Vector3(-_boundingDimensions.x / 2.f,
-                                     -_boundingDimensions.y / 2.f,
+    l->position().addInPlace(Vector3(-_boundingDimensions.x / 2.f, -_boundingDimensions.y / 2.f,
                                      -_boundingDimensions.z / 2.f));
     l->isPickable = false;
     _lineBoundingBox->addChild(*l);
@@ -108,14 +100,13 @@ BoundingBoxGizmo::BoundingBoxGizmo(
   setColor(color);
 
   // Create rotation spheres
-  _rotateSpheresParent
-    = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
+  _rotateSpheresParent = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
   _rotateSpheresParent->rotationQuaternion = Quaternion();
   for (unsigned int i = 0; i < 12; ++i) {
     SphereOptions sphereOptions;
     sphereOptions.diameter = 1.f;
-    auto sphere            = SphereBuilder::CreateSphere(
-      "", sphereOptions, gizmoLayer->utilityLayerScene.get());
+    auto sphere
+      = SphereBuilder::CreateSphere("", sphereOptions, gizmoLayer->utilityLayerScene.get());
     sphere->rotationQuaternion = Quaternion();
     sphere->material           = coloredMaterial;
 
@@ -131,8 +122,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(
         startingTurnDirection.copyFrom(sphere->forward());
         totalTurnAmountOfDrag = 0.f;
       });
-    _dragBehavior.onDragObservable.add([this, i](DragMoveEvent* event,
-                                                 EventState& /*es*/) {
+    _dragBehavior.onDragObservable.add([this, i](DragMoveEvent* event, EventState& /*es*/) {
       onRotationSphereDragObservable.notifyObservers({});
       if (attachedMesh()) {
         auto originalParent = attachedMesh()->parent();
@@ -140,8 +130,8 @@ BoundingBoxGizmo::BoundingBoxGizmo(
           auto _originalParent = static_cast<Mesh*>(originalParent);
           if (_originalParent->scaling().isNonUniformWithinEpsilon(0.001f)) {
             BABYLON_LOG_WARN("BoundingBoxGizmo",
-                             "BoundingBoxGizmo controls are not supported on "
-                             "child meshes with non-uniform parent scaling")
+                             "BoundingBoxGizmo controls are not supported on child meshes with "
+                             "non-uniform parent scaling")
             return;
           }
         }
@@ -150,8 +140,8 @@ BoundingBoxGizmo::BoundingBoxGizmo(
         auto worldDragDirection = startingTurnDirection;
 
         // Project the world right on to the drag plane
-        auto toSub = event->dragPlaneNormal.scale(
-          Vector3::Dot(event->dragPlaneNormal, worldDragDirection));
+        auto toSub
+          = event->dragPlaneNormal.scale(Vector3::Dot(event->dragPlaneNormal, worldDragDirection));
         auto dragAxis = worldDragDirection.subtract(toSub).normalizeToNew();
 
         // project drag delta on to the resulting drag axis and rotate based
@@ -161,8 +151,8 @@ BoundingBoxGizmo::BoundingBoxGizmo(
                              -std::abs(event->delta.length());
 
         // Make rotation relative to size of mesh.
-        projectDist = (projectDist / _boundingDimensions.length())
-                      * _anchorMesh->scaling().length();
+        projectDist
+          = (projectDist / _boundingDimensions.length()) * _anchorMesh->scaling().length();
 
         // Rotate based on axis
         if (!attachedMesh()->rotationQuaternion()) {
@@ -172,30 +162,26 @@ BoundingBoxGizmo::BoundingBoxGizmo(
         }
         if (!_anchorMesh->rotationQuaternion()) {
           _anchorMesh->rotationQuaternion = Quaternion::RotationYawPitchRoll(
-            _anchorMesh->rotation().y, _anchorMesh->rotation().x,
-            _anchorMesh->rotation().z);
+            _anchorMesh->rotation().y, _anchorMesh->rotation().x, _anchorMesh->rotation().z);
         }
 
         // Do not allow the object to turn more than a full circle
         totalTurnAmountOfDrag += projectDist;
         if (std::abs(totalTurnAmountOfDrag) <= Math::PI2) {
           if (i >= 8) {
-            Quaternion::RotationYawPitchRollToRef(0.f, 0.f, projectDist,
-                                                  _tmpQuaternion);
+            Quaternion::RotationYawPitchRollToRef(0.f, 0.f, projectDist, _tmpQuaternion);
           }
           else if (i >= 4) {
-            Quaternion::RotationYawPitchRollToRef(projectDist, 0.f, 0.f,
-                                                  _tmpQuaternion);
+            Quaternion::RotationYawPitchRollToRef(projectDist, 0.f, 0.f, _tmpQuaternion);
           }
           else {
-            Quaternion::RotationYawPitchRollToRef(0.f, projectDist, 0.f,
-                                                  _tmpQuaternion);
+            Quaternion::RotationYawPitchRollToRef(0.f, projectDist, 0.f, _tmpQuaternion);
           }
 
           // Rotate around center of bounding box
           _anchorMesh->addChild(*attachedMesh());
-          _anchorMesh->rotationQuaternion()->multiplyToRef(
-            _tmpQuaternion, *_anchorMesh->rotationQuaternion());
+          _anchorMesh->rotationQuaternion()->multiplyToRef(_tmpQuaternion,
+                                                           *_anchorMesh->rotationQuaternion());
           _anchorMesh->removeChild(*attachedMesh());
           attachedMesh()->setParent(originalParent);
         }
@@ -212,81 +198,67 @@ BoundingBoxGizmo::BoundingBoxGizmo(
         onDragStartObservable.notifyObservers(nullptr);
         _selectNode(sphere);
       });
-    _dragBehavior.onDragEndObservable.add(
-      [&](DragStartOrEndEvent* /*event*/, EventState& /*es*/) {
-        onRotationSphereDragEndObservable.notifyObservers(nullptr);
-        _selectNode(nullptr);
-        _updateDummy();
-      });
+    _dragBehavior.onDragEndObservable.add([&](DragStartOrEndEvent* /*event*/, EventState& /*es*/) {
+      onRotationSphereDragEndObservable.notifyObservers(nullptr);
+      _selectNode(nullptr);
+      _updateDummy();
+    });
 
     _rotateSpheresParent->addChild(*sphere);
   }
   _rootMesh->addChild(*_rotateSpheresParent);
 
   // Create scale cubes
-  _scaleBoxesParent
-    = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
+  _scaleBoxesParent = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
   _scaleBoxesParent->rotationQuaternion = Quaternion();
   for (unsigned int i = 0; i < 2; i++) {
     for (unsigned int j = 0; j < 2; j++) {
       for (unsigned int k = 0; k < 2; k++) {
         BoxOptions boxOptions;
         boxOptions.size = 0.1f;
-        auto box        = BoxBuilder::CreateBox("", boxOptions,
-                                         gizmoLayer->utilityLayerScene.get());
-        box->material   = coloredMaterial;
+        auto box      = BoxBuilder::CreateBox("", boxOptions, gizmoLayer->utilityLayerScene.get());
+        box->material = coloredMaterial;
 
         // Dragging logic
-        auto dragAxis = Vector3(i == 0 ? -1.f : 1.f, j == 0 ? -1.f : 1.f,
-                                k == 0 ? -1.f : 1.f);
+        auto dragAxis = Vector3(i == 0 ? -1.f : 1.f, j == 0 ? -1.f : 1.f, k == 0 ? -1.f : 1.f);
         PointerDragBehaviorOptions options;
         options.dragAxis = dragAxis;
         PointerDragBehavior _dragBehavior(options);
         _dragBehavior.moveAttached = false;
         // box->addBehavior(&_dragBehavior);
-        _dragBehavior.onDragObservable.add([&](DragMoveEvent* event,
-                                               EventState& /*es*/) {
+        _dragBehavior.onDragObservable.add([&](DragMoveEvent* event, EventState& /*es*/) {
           onScaleBoxDragObservable.notifyObservers(nullptr);
           if (attachedMesh()) {
             auto originalParent = attachedMesh()->parent();
             if (originalParent) {
               auto _originalParent = static_cast<Mesh*>(originalParent);
-              if (_originalParent->scaling().isNonUniformWithinEpsilon(
-                    0.001f)) {
-                BABYLON_LOG_WARN(
-                  "BoundingBoxGizmo",
-                  "BoundingBoxGizmo controls are not supported on "
-                  "child meshes with non-uniform parent scaling")
+              if (_originalParent->scaling().isNonUniformWithinEpsilon(0.001f)) {
+                BABYLON_LOG_WARN("BoundingBoxGizmo",
+                                 "BoundingBoxGizmo controls are not supported on child meshes with "
+                                 "non-uniform parent scaling")
                 return;
               }
             }
             PivotTools::_RemoveAndStorePivotPoint(attachedMesh);
-            auto relativeDragDistance
-              = (event->dragDistance / _boundingDimensions.length())
-                * _anchorMesh->scaling().length();
-            Vector3 deltaScale(relativeDragDistance, relativeDragDistance,
-                               relativeDragDistance);
+            auto relativeDragDistance = (event->dragDistance / _boundingDimensions.length())
+                                        * _anchorMesh->scaling().length();
+            Vector3 deltaScale(relativeDragDistance, relativeDragDistance, relativeDragDistance);
             deltaScale.scaleInPlace(_scaleDragSpeed);
             updateBoundingBox();
 
             if (scalePivot) {
-              attachedMesh()->getWorldMatrix().getRotationMatrixToRef(
-                _tmpRotationMatrix);
-              // Move anchor to desired pivot point (Bottom left corner +
-              // dimension/2)
+              attachedMesh()->getWorldMatrix().getRotationMatrixToRef(_tmpRotationMatrix);
+              // Move anchor to desired pivot point (Bottom left corner + dimension/2)
               _boundingDimensions.scaleToRef(0.5f, _tmpVector);
-              Vector3::TransformCoordinatesToRef(_tmpVector, _tmpRotationMatrix,
-                                                 _tmpVector);
+              Vector3::TransformCoordinatesToRef(_tmpVector, _tmpRotationMatrix, _tmpVector);
               _anchorMesh->position().subtractInPlace(_tmpVector);
               _boundingDimensions.multiplyToRef(*scalePivot, _tmpVector);
-              Vector3::TransformCoordinatesToRef(_tmpVector, _tmpRotationMatrix,
-                                                 _tmpVector);
+              Vector3::TransformCoordinatesToRef(_tmpVector, _tmpRotationMatrix, _tmpVector);
               _anchorMesh->position().addInPlace(_tmpVector);
             }
             else {
               // Scale from the position of the opposite corner
-              box->absolutePosition().subtractToRef(_anchorMesh->position(),
-                                                    _tmpVector);
+              box->absolutePosition().subtractToRef(_anchorMesh->position(), _tmpVector);
               _anchorMesh->position().subtractInPlace(_tmpVector);
             }
 
@@ -325,41 +297,35 @@ BoundingBoxGizmo::BoundingBoxGizmo(
 
   // Hover color change
   std::unordered_map<int, AbstractMeshPtr> pointerIds;
-  _pointerObserver
-    = gizmoLayer->utilityLayerScene->onPointerObservable.add(
-      [&](PointerInfo* pointerInfo, EventState& /*es*/) {
-        if (!stl_util::contains(pointerIds,
-                                (pointerInfo->pointerEvent).pointerId)) {
-          const auto changeHoverColor
-            = [&](const std::vector<AbstractMeshPtr>& meshes) {
-                for (auto& mesh : meshes) {
-                  if (pointerInfo->pickInfo.pickedMesh == mesh) {
-                    pointerIds[(pointerInfo->pointerEvent).pointerId] = mesh;
-                    mesh->material = hoverColoredMaterial;
-                  }
-                }
-              };
-          changeHoverColor(_rotateSpheresParent->getChildMeshes());
-          changeHoverColor(_scaleBoxesParent->getChildMeshes());
-        }
-        else {
-          if (stl_util::contains(pointerIds,
-                                 (pointerInfo->pointerEvent).pointerId)
-              && pointerInfo->pickInfo.pickedMesh
-                   != pointerIds[(pointerInfo->pointerEvent).pointerId]) {
-            pointerIds[(pointerInfo->pointerEvent).pointerId]->material
-              = coloredMaterial;
-            pointerIds.erase((pointerInfo->pointerEvent).pointerId);
+  _pointerObserver = gizmoLayer->utilityLayerScene->onPointerObservable.add(
+    [&](PointerInfo* pointerInfo, EventState& /*es*/) {
+      if (!stl_util::contains(pointerIds, (pointerInfo->pointerEvent).pointerId)) {
+        const auto changeHoverColor = [&](const std::vector<AbstractMeshPtr>& meshes) {
+          for (auto& mesh : meshes) {
+            if (pointerInfo->pickInfo.pickedMesh == mesh) {
+              pointerIds[(pointerInfo->pointerEvent).pointerId] = mesh;
+              mesh->material                                    = hoverColoredMaterial;
+            }
           }
+        };
+        changeHoverColor(_rotateSpheresParent->getChildMeshes());
+        changeHoverColor(_scaleBoxesParent->getChildMeshes());
+      }
+      else {
+        if (stl_util::contains(pointerIds, (pointerInfo->pointerEvent).pointerId)
+            && pointerInfo->pickInfo.pickedMesh
+                 != pointerIds[(pointerInfo->pointerEvent).pointerId]) {
+          pointerIds[(pointerInfo->pointerEvent).pointerId]->material = coloredMaterial;
+          pointerIds.erase((pointerInfo->pointerEvent).pointerId);
         }
-      });
+      }
+    });
 
   // Update bounding box positions
   _renderObserver = gizmoLayer->originalScene->onBeforeRenderObservable.add(
     [this](Scene* /*scene*/, EventState& /*es*/) {
       // Only update the bouding box if scaling has changed
-      if (attachedMesh()
-          && !_existingMeshScale.equals(attachedMesh()->scaling())) {
+      if (attachedMesh() && !_existingMeshScale.equals(attachedMesh()->scaling())) {
         updateBoundingBox();
       }
       else if (fixedDragMeshScreenSize) {
@@ -367,13 +333,11 @@ BoundingBoxGizmo::BoundingBoxGizmo(
         _updateScaleBoxes();
       }
 
-      // If dragg mesh is enabled and dragging, update the attached mesh pose to
-      // match the drag mesh
+      // If dragg mesh is enabled and dragging, update the attached mesh pose to match the drag mesh
       if (_dragMesh && attachedMesh() && pointerDragBehavior->dragging) {
-        _lineBoundingBox->position().rotateByQuaternionToRef(
-          *_rootMesh->rotationQuaternion(), _tmpVector);
-        attachedMesh()->setAbsolutePosition(
-          _dragMesh->position().add(_tmpVector.scale(-1.f)));
+        _lineBoundingBox->position().rotateByQuaternionToRef(*_rootMesh->rotationQuaternion(),
+                                                             _tmpVector);
+        attachedMesh()->setAbsolutePosition(_dragMesh->position().add(_tmpVector.scale(-1.f)));
       }
     });
   updateBoundingBox();
@@ -383,9 +347,8 @@ BoundingBoxGizmo::~BoundingBoxGizmo() = default;
 
 void BoundingBoxGizmo::setColor(const Color3& color)
 {
-  coloredMaterial->emissiveColor = color;
-  hoverColoredMaterial->emissiveColor
-    = color.copy().add(Color3(0.3f, 0.3f, 0.3f));
+  coloredMaterial->emissiveColor      = color;
+  hoverColoredMaterial->emissiveColor = color.copy().add(Color3(0.3f, 0.3f, 0.3f));
   for (const auto& l : _lineBoundingBox->getChildren()) {
     auto lineMesh = std::static_pointer_cast<LinesMesh>(l);
     if (lineMesh) {
@@ -411,9 +374,7 @@ void BoundingBoxGizmo::_attachedMeshChanged(const AbstractMeshPtr& value)
     }
 
     gizmoLayer->utilityLayerScene->onAfterRenderObservable.addOnce(
-      [this](Scene* /*scene*/, EventState & /*es*/) -> void {
-        _updateDummy();
-      });
+      [this](Scene* /*scene*/, EventState & /*es*/) -> void { _updateDummy(); });
   }
 }
 
@@ -437,7 +398,7 @@ void BoundingBoxGizmo::updateBoundingBox()
     // Store original skelton override mesh
     AbstractMeshPtr originalSkeletonOverrideMesh = nullptr;
     if (attachedMesh()->skeleton()) {
-      originalSkeletonOverrideMesh = attachedMesh()->skeleton()->overrideMesh;
+      originalSkeletonOverrideMesh             = attachedMesh()->skeleton()->overrideMesh;
       attachedMesh()->skeleton()->overrideMesh = nullptr;
     }
 
@@ -446,38 +407,33 @@ void BoundingBoxGizmo::updateBoundingBox()
     // Rotate based on axis
     if (!attachedMesh()->rotationQuaternion()) {
       attachedMesh()->rotationQuaternion = Quaternion::RotationYawPitchRoll(
-        attachedMesh()->rotation().y, attachedMesh()->rotation().x,
-        attachedMesh()->rotation().z);
+        attachedMesh()->rotation().y, attachedMesh()->rotation().x, attachedMesh()->rotation().z);
     }
     if (!_anchorMesh->rotationQuaternion()) {
       _anchorMesh->rotationQuaternion = Quaternion::RotationYawPitchRoll(
-        _anchorMesh->rotation().y, _anchorMesh->rotation().x,
-        _anchorMesh->rotation().z);
+        _anchorMesh->rotation().y, _anchorMesh->rotation().x, _anchorMesh->rotation().z);
     }
-    _anchorMesh->rotationQuaternion()->copyFrom(
-      *attachedMesh()->rotationQuaternion());
+    _anchorMesh->rotationQuaternion()->copyFrom(*attachedMesh()->rotationQuaternion());
 
-    // Store original position and reset mesh to origin before computing the
-    // bounding box
+    // Store original position and reset mesh to origin before computing the bounding box
     _tmpQuaternion.copyFrom(*attachedMesh()->rotationQuaternion());
     _tmpVector.copyFrom(attachedMesh()->position());
     attachedMesh()->rotationQuaternion()->set(0.f, 0.f, 0.f, 1.f);
     attachedMesh()->position().set(0.f, 0.f, 0.f);
 
     // Update bounding dimensions/positions
-    auto boundingMinMax = attachedMesh()->getHierarchyBoundingVectors(
-      !ignoreChildren, includeChildPredicate);
+    auto boundingMinMax
+      = attachedMesh()->getHierarchyBoundingVectors(!ignoreChildren, includeChildPredicate);
     boundingMinMax.max.subtractToRef(boundingMinMax.min, _boundingDimensions);
 
     // Update gizmo to match bounding box scaling and rotation
-    // The position set here is the offset from the origin for the boundingbox
-    // when the attached mesh is at the origin The position of the gizmo is then
-    // set to the attachedMesh in gizmo._update
+    // The position set here is the offset from the origin for the boundingbox when the attached
+    // mesh is at the origin The position of the gizmo is then set to the attachedMesh in
+    // gizmo._update
     _lineBoundingBox->scaling().copyFrom(_boundingDimensions);
-    _lineBoundingBox->position().set(
-      (boundingMinMax.max.x + boundingMinMax.min.x) / 2.f,
-      (boundingMinMax.max.y + boundingMinMax.min.y) / 2.f,
-      (boundingMinMax.max.z + boundingMinMax.min.z) / 2.f);
+    _lineBoundingBox->position().set((boundingMinMax.max.x + boundingMinMax.min.x) / 2.f,
+                                     (boundingMinMax.max.y + boundingMinMax.min.y) / 2.f,
+                                     (boundingMinMax.max.z + boundingMinMax.min.z) / 2.f);
     _rotateSpheresParent->position().copyFrom(_lineBoundingBox->position());
     _scaleBoxesParent->position().copyFrom(_lineBoundingBox->position());
     _lineBoundingBox->computeWorldMatrix();
@@ -515,57 +471,49 @@ void BoundingBoxGizmo::_updateRotationSpheres()
         auto index = ((i * 4) + (j * 2)) + k;
         if (index < rotateSpheres.size()) {
           if (i == 0) {
-            rotateSpheres[index]->position().set(_boundingDimensions.x / 2.f,
-                                                 _boundingDimensions.y * j,
-                                                 _boundingDimensions.z * k);
-            rotateSpheres[index]->position().addInPlace(Vector3(
-              -_boundingDimensions.x / 2.f, -_boundingDimensions.y / 2.f,
-              -_boundingDimensions.z / 2.f));
+            rotateSpheres[index]->position().set(
+              _boundingDimensions.x / 2.f, _boundingDimensions.y * j, _boundingDimensions.z * k);
+            rotateSpheres[index]->position().addInPlace(Vector3(-_boundingDimensions.x / 2.f,
+                                                                -_boundingDimensions.y / 2.f,
+                                                                -_boundingDimensions.z / 2.f));
             rotateSpheres[index]->lookAt(
-              Vector3::Cross(rotateSpheres[index]->position().normalizeToNew(),
-                             Vector3::Right())
+              Vector3::Cross(rotateSpheres[index]->position().normalizeToNew(), Vector3::Right())
                 .normalizeToNew()
                 .add(rotateSpheres[index]->position));
           }
           if (i == 1) {
-            rotateSpheres[index]->position().set(_boundingDimensions.x * j,
-                                                 _boundingDimensions.y / 2.f,
-                                                 _boundingDimensions.z * k);
-            rotateSpheres[index]->position().addInPlace(Vector3(
-              -_boundingDimensions.x / 2.f, -_boundingDimensions.y / 2.f,
-              -_boundingDimensions.z / 2.f));
+            rotateSpheres[index]->position().set(
+              _boundingDimensions.x * j, _boundingDimensions.y / 2.f, _boundingDimensions.z * k);
+            rotateSpheres[index]->position().addInPlace(Vector3(-_boundingDimensions.x / 2.f,
+                                                                -_boundingDimensions.y / 2.f,
+                                                                -_boundingDimensions.z / 2.f));
             rotateSpheres[index]->lookAt(
-              Vector3::Cross(rotateSpheres[index]->position().normalizeToNew(),
-                             Vector3::Up())
+              Vector3::Cross(rotateSpheres[index]->position().normalizeToNew(), Vector3::Up())
                 .normalizeToNew()
                 .add(rotateSpheres[index]->position));
           }
           if (i == 2) {
-            rotateSpheres[index]->position().set(_boundingDimensions.x * j,
-                                                 _boundingDimensions.y * k,
-                                                 _boundingDimensions.z / 2.f);
-            rotateSpheres[index]->position().addInPlace(Vector3(
-              -_boundingDimensions.x / 2.f, -_boundingDimensions.y / 2.f,
-              -_boundingDimensions.z / 2.f));
+            rotateSpheres[index]->position().set(
+              _boundingDimensions.x * j, _boundingDimensions.y * k, _boundingDimensions.z / 2.f);
+            rotateSpheres[index]->position().addInPlace(Vector3(-_boundingDimensions.x / 2.f,
+                                                                -_boundingDimensions.y / 2.f,
+                                                                -_boundingDimensions.z / 2.f));
             rotateSpheres[index]->lookAt(
-              Vector3::Cross(rotateSpheres[index]->position().normalizeToNew(),
-                             Vector3::Forward())
+              Vector3::Cross(rotateSpheres[index]->position().normalizeToNew(), Vector3::Forward())
                 .normalizeToNew()
                 .add(rotateSpheres[index]->position));
           }
-          if (fixedDragMeshScreenSize
-              && gizmoLayer->utilityLayerScene->activeCamera()) {
+          if (fixedDragMeshScreenSize && gizmoLayer->utilityLayerScene->activeCamera()) {
             rotateSpheres[index]->absolutePosition().subtractToRef(
-              gizmoLayer->utilityLayerScene->activeCamera()->position(),
-              _tmpVector);
-            auto distanceFromCamera = rotationSphereSize * _tmpVector.length()
-                                      / fixedDragMeshScreenSizeDistanceFactor;
-            rotateSpheres[index]->scaling().set(
-              distanceFromCamera, distanceFromCamera, distanceFromCamera);
+              gizmoLayer->utilityLayerScene->activeCamera()->position(), _tmpVector);
+            auto distanceFromCamera
+              = rotationSphereSize * _tmpVector.length() / fixedDragMeshScreenSizeDistanceFactor;
+            rotateSpheres[index]->scaling().set(distanceFromCamera, distanceFromCamera,
+                                                distanceFromCamera);
           }
           else {
-            rotateSpheres[index]->scaling().set(
-              rotationSphereSize, rotationSphereSize, rotationSphereSize);
+            rotateSpheres[index]->scaling().set(rotationSphereSize, rotationSphereSize,
+                                                rotationSphereSize);
           }
         }
       }
@@ -582,25 +530,21 @@ void BoundingBoxGizmo::_updateScaleBoxes()
       for (unsigned int k = 0; k < 2; ++k) {
         auto index = ((i * 4) + (j * 2)) + k;
         if (index < scaleBoxes.size() && scaleBoxes[index]) {
-          scaleBoxes[index]->position().set(_boundingDimensions.x * i,
-                                            _boundingDimensions.y * j,
+          scaleBoxes[index]->position().set(_boundingDimensions.x * i, _boundingDimensions.y * j,
                                             _boundingDimensions.z * k);
-          scaleBoxes[index]->position().addInPlace(
-            Vector3(-_boundingDimensions.x / 2.f, -_boundingDimensions.y / 2.f,
-                    -_boundingDimensions.z / 2.f));
-          if (fixedDragMeshScreenSize
-              && gizmoLayer->utilityLayerScene->activeCamera()) {
+          scaleBoxes[index]->position().addInPlace(Vector3(-_boundingDimensions.x / 2.f,
+                                                           -_boundingDimensions.y / 2.f,
+                                                           -_boundingDimensions.z / 2.f));
+          if (fixedDragMeshScreenSize && gizmoLayer->utilityLayerScene->activeCamera()) {
             scaleBoxes[index]->absolutePosition().subtractToRef(
-              gizmoLayer->utilityLayerScene->activeCamera()->position(),
-              _tmpVector);
-            auto distanceFromCamera = scaleBoxSize * _tmpVector.length()
-                                      / fixedDragMeshScreenSizeDistanceFactor;
-            scaleBoxes[index]->scaling().set(
-              distanceFromCamera, distanceFromCamera, distanceFromCamera);
+              gizmoLayer->utilityLayerScene->activeCamera()->position(), _tmpVector);
+            auto distanceFromCamera
+              = scaleBoxSize * _tmpVector.length() / fixedDragMeshScreenSizeDistanceFactor;
+            scaleBoxes[index]->scaling().set(distanceFromCamera, distanceFromCamera,
+                                             distanceFromCamera);
           }
           else {
-            scaleBoxes[index]->scaling().set(scaleBoxSize, scaleBoxSize,
-                                             scaleBoxSize);
+            scaleBoxes[index]->scaling().set(scaleBoxSize, scaleBoxSize, scaleBoxSize);
           }
         }
       }
@@ -643,15 +587,14 @@ void BoundingBoxGizmo::_updateDummy()
 
 void BoundingBoxGizmo::enableDragBehavior()
 {
-  _dragMesh = Mesh::CreateBox("dummy", 1, gizmoLayer->utilityLayerScene.get());
-  _dragMesh->visibility                               = 0.f;
-  _dragMesh->rotationQuaternion                       = Quaternion();
+  _dragMesh                     = Mesh::CreateBox("dummy", 1, gizmoLayer->utilityLayerScene.get());
+  _dragMesh->visibility         = 0.f;
+  _dragMesh->rotationQuaternion = Quaternion();
   pointerDragBehavior->useObjectOrienationForDragging = false;
   // _dragMesh->addBehavior(pointerDragBehavior);
 }
 
-void BoundingBoxGizmo::dispose(bool doNotRecurse,
-                               bool disposeMaterialAndTextures)
+void BoundingBoxGizmo::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
   gizmoLayer->utilityLayerScene->onPointerObservable.remove(_pointerObserver);
   gizmoLayer->originalScene->onBeforeRenderObservable.remove(_renderObserver);
@@ -720,11 +663,9 @@ MeshPtr BoundingBoxGizmo::MakeNotPickableAndWrapInBoundingBox(Mesh* mesh)
   return box;
 }
 
-void BoundingBoxGizmo::setCustomMesh(const MeshPtr& /*mesh*/,
-                                     bool /*useGizmoMaterial*/)
+void BoundingBoxGizmo::setCustomMesh(const MeshPtr& /*mesh*/, bool /*useGizmoMaterial*/)
 {
-  BABYLON_LOG_ERROR("BoundingBoxGizmo",
-                    "Custom meshes are not supported on this gizmo")
+  BABYLON_LOG_ERROR("BoundingBoxGizmo", "Custom meshes are not supported on this gizmo")
 }
 
 } // end of namespace BABYLON

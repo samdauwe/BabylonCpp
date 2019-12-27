@@ -18,8 +18,8 @@ using MeshPtr                 = std::shared_ptr<Mesh>;
 using UtilityLayerRendererPtr = std::shared_ptr<UtilityLayerRenderer>;
 
 /**
- * @brief Renders gizmos on top of an existing scene which provide controls for
- * position, rotation, etc.
+ * @brief Renders gizmos on top of an existing scene which provide controls for position, rotation,
+ * etc.
  */
 class BABYLON_SHARED_EXPORT Gizmo : public IDisposable {
 
@@ -32,11 +32,9 @@ public:
   ~Gizmo() override; // = default
 
   /**
-   * @brief Disposes and replaces the current meshes in the gizmo with the
-   * specified mesh.
+   * @brief Disposes and replaces the current meshes in the gizmo with the specified mesh.
    * @param mesh The mesh to replace the default mesh of the gizmo
-   * @param useGizmoMaterial If the gizmo's default material should be used
-   * (default: false)
+   * @param useGizmoMaterial If the gizmo's default material should be used (default: false)
    */
   virtual void setCustomMesh(const MeshPtr& mesh, bool useGizmoMaterial = false);
 
@@ -57,26 +55,26 @@ protected:
   [[nodiscard]] virtual float get_scaleRatio() const;
 
   /**
-   * @brief Gets the mesh that the gizmo will be attached to. (eg. on a drag
-   * gizmo the mesh that will be dragged).
+   * @brief Gets the mesh that the gizmo will be attached to. (eg. on a drag gizmo the mesh that
+   * will be dragged).
    */
   virtual AbstractMeshPtr& get_attachedMesh();
 
   /**
-   * @brief Sets the mesh that the gizmo will be attached to. (eg. on a drag
-   * gizmo the mesh that will be dragged).
+   * @brief Sets the mesh that the gizmo will be attached to. (eg. on a drag gizmo the mesh that
+   * will be dragged).
    */
   virtual void set_attachedMesh(const AbstractMeshPtr& value);
 
   /**
-   * @brief Sets if set the gizmo's position will be updated to match the
-   * attached mesh each frame (Default: true).
+   * @brief Sets if set the gizmo's position will be updated to match the attached mesh each frame
+   * (Default: true).
    */
   virtual void set_updateGizmoRotationToMatchAttachedMesh(bool value);
 
   /**
-   * @brief Gets if set the gizmo's position will be updated to match the
-   * attached mesh each frame (Default: true).
+   * @brief Gets if set the gizmo's position will be updated to match the attached mesh each frame
+   * (Default: true).
    */
   [[nodiscard]] virtual bool get_updateGizmoRotationToMatchAttachedMesh() const;
 
@@ -103,8 +101,7 @@ public:
   Property<Gizmo, float> scaleRatio;
 
   /**
-   * Mesh that the gizmo will be attached to. (eg. on a drag gizmo the mesh that
-   * will be dragged)
+   * Mesh that the gizmo will be attached to. (eg. on a drag gizmo the mesh that will be dragged)
    * * When set, interactions will be enabled
    */
   Property<Gizmo, AbstractMeshPtr> attachedMesh;
@@ -115,20 +112,20 @@ public:
   UtilityLayerRendererPtr gizmoLayer;
 
   /**
-   * If set the gizmo's rotation will be updated to match the attached mesh each
-   * frame (Default: true)
+   * If set the gizmo's rotation will be updated to match the attached mesh each frame (Default:
+   * true)
    */
   Property<Gizmo, bool> updateGizmoRotationToMatchAttachedMesh;
 
   /**
-   * If set the gizmo's position will be updated to match the attached mesh each
-   * frame (Default: true)
+   * If set the gizmo's position will be updated to match the attached mesh each frame (Default:
+   * true)
    */
   bool updateGizmoPositionToMatchAttachedMesh;
 
   /**
-   * When set, the gizmo will always appear the same size no matter where the
-   * camera is (default: true)
+   * When set, the gizmo will always appear the same size no matter where the camera is (default:
+   * true)
    */
   bool updateScale;
 

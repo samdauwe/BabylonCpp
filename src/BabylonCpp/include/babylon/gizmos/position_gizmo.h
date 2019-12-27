@@ -32,11 +32,9 @@ public:
   void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
-   * @brief Disposes and replaces the current meshes in the gizmo with the
-   * specified mesh.
+   * @brief Disposes and replaces the current meshes in the gizmo with the specified mesh.
    * @param mesh The mesh to replace the default mesh of the gizmo
-   * @param useGizmoMaterial If the gizmo's default material should be used
-   * (default: false)
+   * @param useGizmoMaterial If the gizmo's default material should be used (default: false)
    */
   void setCustomMesh(const MeshPtr& mesh, bool useGizmoMaterial = false) override;
 
@@ -51,8 +49,7 @@ protected:
 
   /**
    * @brief Sets if the planar drag gizmo is enabled.
-   * setting this will enable/disable XY, XZ and YZ planes regardless of
-   * individual gizmo settings.
+   * setting this will enable/disable XY, XZ and YZ planes regardless of individual gizmo settings.
    */
   void set_planarGizmoEnabled(bool value);
 
@@ -106,14 +103,12 @@ public:
 
   /**
    * If the planar drag gizmo is enabled
-   * setting this will enable/disable XY, XZ and YZ planes regardless of
-   * individual gizmo settings.
+   * setting this will enable/disable XY, XZ and YZ planes regardless of individual gizmo settings.
    */
   Property<PositionGizmo, bool> planarGizmoEnabled;
 
   /**
-   * Drag distance in babylon units that the gizmo will snap to when dragged
-   * (Default: 0)
+   * Drag distance in babylon units that the gizmo will snap to when dragged (Default: 0)
    */
   Property<PositionGizmo, float> snapDistance;
 

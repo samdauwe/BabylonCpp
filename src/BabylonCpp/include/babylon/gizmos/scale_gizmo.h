@@ -37,6 +37,8 @@ protected:
   [[nodiscard]] float get_snapDistance() const;
   void set_scaleRatio(float value) override;
   [[nodiscard]] float get_scaleRatio() const override;
+  void set_sensitivity(float value);
+  [[nodiscard]] float get_sensitivity() const;
 
 public:
   /**
@@ -70,10 +72,14 @@ public:
   Observable<DragStartOrEndEvent> onDragEndObservable;
 
   /**
-   * Drag distance in babylon units that the gizmo will snap to when dragged
-   * (Default: 0)
+   * Drag distance in babylon units that the gizmo will snap to when dragged (Default: 0)
    */
   Property<ScaleGizmo, float> snapDistance;
+
+  /**
+   * Sensitivity factor for dragging (Default: 1)
+   */
+  Property<ScaleGizmo, float> sensitivity;
 
 private:
   AbstractMeshPtr _meshAttached;
@@ -82,6 +88,7 @@ private:
   float _scaleRatio;
   MeshPtr _uniformScalingMesh;
   MeshPtr _octahedron;
+  float _sensitivity;
 
 }; // end of class ScaleGizmo
 

@@ -113,14 +113,14 @@ protected:
 
 public:
   /**
-   * Gizmo's created by the gizmo manager, gizmo will be null until gizmo has
-   * been enabled for the first time
+   * Gizmo's created by the gizmo manager, gizmo will be null until gizmo has been enabled for the
+   * first time
    */
   Gizmos gizmos;
 
   /**
-   * When true, the gizmo will be detached from the current object when a
-   * pointer down occurs with an empty picked mesh
+   * When true, the gizmo will be detached from the current object when a pointer down occurs with
+   * an empty picked mesh
    */
   bool clearGizmoOnEmptyPointerEvent;
 
@@ -130,20 +130,19 @@ public:
   Observable<AbstractMesh> onAttachedToMeshObservable;
 
   /**
-   * When bounding box gizmo is enabled, this can be used to track drag/end
-   * events
+   * When bounding box gizmo is enabled, this can be used to track drag/end events
    */
   std::unique_ptr<SixDofDragBehavior> boundingBoxDragBehavior;
 
   /**
-   * Array of meshes which will have the gizmo attached when a pointer selected
-   * them. If null, all meshes are attachable. (Default: null)
+   * Array of meshes which will have the gizmo attached when a pointer selected them. If null, all
+   * meshes are attachable. (Default: null)
    */
   std::optional<std::vector<AbstractMeshPtr>> attachableMeshes;
 
   /**
-   * If pointer events should perform attaching/detaching a gizmo, if false this
-   * can be done manually via attachToMesh. (Default: true)
+   * If pointer events should perform attaching/detaching a gizmo, if false this can be done
+   * manually via attachToMesh. (Default: true)
    */
   bool usePointerToAttachGizmos;
 

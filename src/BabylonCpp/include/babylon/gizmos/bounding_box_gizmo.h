@@ -48,8 +48,7 @@ public:
   void updateBoundingBox();
 
   /**
-   * @brief Enables rotation on the specified axis and disables rotation on the
-   * others.
+   * @brief Enables rotation on the specified axis and disables rotation on the others.
    * @param axis The list of axis that should be enabled (eg. "xy" or "xyz")
    */
   void setEnabledRotationAxis(const std::string& axis);
@@ -71,9 +70,8 @@ public:
   void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
-   * @brief Makes a mesh not pickable and wraps the mesh inside of a bounding
-   * box mesh that is pickable. (This is useful to avoid picking within complex
-   * geometry).
+   * @brief Makes a mesh not pickable and wraps the mesh inside of a bounding box mesh that is
+   * pickable. (This is useful to avoid picking within complex geometry).
    * @param mesh the mesh to wrap in the bounding box mesh and make not pickable
    * @returns the bounding box mesh with the passed in mesh as a child
    */
@@ -96,21 +94,18 @@ private:
 
 public:
   /**
-   * If child meshes should be ignored when calculating the boudning box. This
-   * should be set to true to avoid perf hits with heavily nested meshes
-   * (Default: false)
+   * If child meshes should be ignored when calculating the boudning box. This should be set to true
+   * to avoid perf hits with heavily nested meshes (Default: false)
    */
   bool ignoreChildren;
   /**
-   * Returns true if a descendant should be included when computing the bounding
-   * box. When null, all descendants are included. If ignoreChildren is set this
-   * will be ignored. (Default: null)
+   * Returns true if a descendant should be included when computing the bounding box. When null, all
+   * descendants are included. If ignoreChildren is set this will be ignored. (Default: null)
    */
   std::function<bool(const AbstractMeshPtr& abstractMesh)> includeChildPredicate;
 
   /**
-   * The size of the rotation spheres attached to the bounding box (Default:
-   * 0.1)
+   * The size of the rotation spheres attached to the bounding box (Default: 0.1)
    */
   float rotationSphereSize;
   /**
@@ -118,9 +113,8 @@ public:
    */
   float scaleBoxSize;
   /**
-   * If set, the rotation spheres and scale boxes will increase in size based on
-   * the distance away from the camera to have a consistent screen size
-   * (Default: false)
+   * If set, the rotation spheres and scale boxes will increase in size based on the distance away
+   * from the camera to have a consistent screen size (Default: false)
    */
   bool fixedDragMeshScreenSize;
 
@@ -150,9 +144,8 @@ public:
    */
   Observable<DragStartOrEndEvent> onRotationSphereDragEndObservable;
   /**
-   * Relative bounding box pivot used when scaling the attached mesh. When null
-   * object with scale from the opposite corner. 0.5,0.5,0.5 for center and
-   * 0.5,0,0.5 for bottom (Default: null)
+   * Relative bounding box pivot used when scaling the attached mesh. When null object with scale
+   * from the opposite corner. 0.5,0.5,0.5 for center and 0.5,0,0.5 for bottom (Default: null)
    */
   std::optional<Vector3> scalePivot;
 

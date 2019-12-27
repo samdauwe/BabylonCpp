@@ -16,13 +16,12 @@
 namespace BABYLON {
 
 AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
-                               const UtilityLayerRendererPtr& iGizmoLayer,
-                               ScaleGizmo* parent)
+                               const UtilityLayerRendererPtr& iGizmoLayer, ScaleGizmo* parent)
     : Gizmo{iGizmoLayer}
     , snapDistance{0.f}
     , uniformScaling{false}
-    , isEnabled{this, &AxisScaleGizmo::get_isEnabled,
-                &AxisScaleGizmo::set_isEnabled}
+    , sensitivity{1.f}
+    , isEnabled{this, &AxisScaleGizmo::get_isEnabled, &AxisScaleGizmo::set_isEnabled}
     , _pointerObserver{nullptr}
     , _isEnabled{true}
     , _parent{nullptr}
@@ -34,30 +33,28 @@ AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
 {
   _parent = parent;
   // Create Material
-  _coloredMaterial
-    = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
+  _coloredMaterial                = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
   _coloredMaterial->diffuseColor  = color;
   _coloredMaterial->specularColor = color.subtract(Color3(0.1f, 0.1f, 0.1f));
 
-  _hoverMaterial
-    = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
+  _hoverMaterial               = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
   _hoverMaterial->diffuseColor = color.add(Color3(0.3f, 0.3f, 0.3f));
 
   // Build mesh on root node
   _arrow = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
   BoxOptions boxOptions;
   boxOptions.size = 0.4f;
-  auto arrowMesh  = BoxBuilder::CreateBox("yPosMesh", boxOptions,
-                                         gizmoLayer->utilityLayerScene.get());
+  auto arrowMesh
+    = BoxBuilder::CreateBox("yPosMesh", boxOptions, gizmoLayer->utilityLayerScene.get());
 
   CylinderOptions cylinderOptions;
   cylinderOptions.diameterTop    = 0.005f;
   cylinderOptions.height         = 0.275f;
   cylinderOptions.diameterBottom = 0.005f;
   cylinderOptions.tessellation   = 96;
-  auto arrowTail                 = CylinderBuilder::CreateCylinder(
-    "cylinder", cylinderOptions, gizmoLayer->utilityLayerScene.get());
-  arrowTail->material = _coloredMaterial;
+  auto arrowTail                 = CylinderBuilder::CreateCylinder("cylinder", cylinderOptions,
+                                                   gizmoLayer->utilityLayerScene.get());
+  arrowTail->material            = _coloredMaterial;
   _arrow->addChild(*arrowMesh);
   _arrow->addChild(*arrowTail);
 
@@ -79,57 +76,53 @@ AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
   dragBehavior->moveAttached = false;
   // _rootMesh->addBehavior(dragBehavior);
 
-  dragBehavior->onDragObservable.add(
-    [&](DragMoveEvent* event, EventState& /*es*/) {
-      if (attachedMesh()) {
-        // Drag strength is modified by the scale of the gizmo (eg. for small
-        // objects like boombox the strength will be increased to match the
-        // behavior of larger objects)
-        const auto dragStrength
-          = event->dragDistance
-            * ((scaleRatio * 3) / _rootMesh->scaling().length());
+  dragBehavior->onDragObservable.add([&](DragMoveEvent* event, EventState& /*es*/) {
+    if (attachedMesh()) {
+      // Drag strength is modified by the scale of the gizmo (eg. for small objects like boombox the
+      // strength will be increased to match the behavior of larger objects)
+      const auto dragStrength
+        = sensitivity * event->dragDistance * ((scaleRatio * 3) / _rootMesh->scaling().length());
 
-        // Snapping logic
-        auto snapped   = false;
-        auto dragSteps = 0;
-        if (uniformScaling) {
-          attachedMesh()->scaling().normalizeToRef(_tmpVector);
-          if (_tmpVector.y < 0.f) {
-            _tmpVector.scaleInPlace(-1.f);
-          }
-        }
-        else {
-          _tmpVector.copyFrom(dragAxis);
-        }
-        if (snapDistance == 0.f) {
-          _tmpVector.scaleToRef(dragStrength, _tmpVector);
-        }
-        else {
-          _currentSnapDragDistance += dragStrength;
-          if (std::abs(_currentSnapDragDistance) > snapDistance) {
-            dragSteps = static_cast<int>(
-              std::floor(std::abs(_currentSnapDragDistance) / snapDistance));
-            if (_currentSnapDragDistance < 0.f) {
-              dragSteps *= -1;
-            }
-            _currentSnapDragDistance
-              = std::fmod(_currentSnapDragDistance, snapDistance);
-            _tmpVector.scaleToRef(snapDistance * dragSteps, _tmpVector);
-            snapped = true;
-          }
-          else {
-            _tmpVector.scaleInPlace(0.f);
-          }
-        }
-
-        attachedMesh()->scaling().addInPlace(_tmpVector);
-
-        if (snapped) {
-          _tmpSnapEvent.snapDistance = snapDistance * dragSteps;
-          onSnapObservable.notifyObservers(&_tmpSnapEvent);
+      // Snapping logic
+      auto snapped   = false;
+      auto dragSteps = 0;
+      if (uniformScaling) {
+        attachedMesh()->scaling().normalizeToRef(_tmpVector);
+        if (_tmpVector.y < 0.f) {
+          _tmpVector.scaleInPlace(-1.f);
         }
       }
-    });
+      else {
+        _tmpVector.copyFrom(dragAxis);
+      }
+      if (snapDistance == 0.f) {
+        _tmpVector.scaleToRef(dragStrength, _tmpVector);
+      }
+      else {
+        _currentSnapDragDistance += dragStrength;
+        if (std::abs(_currentSnapDragDistance) > snapDistance) {
+          dragSteps
+            = static_cast<int>(std::floor(std::abs(_currentSnapDragDistance) / snapDistance));
+          if (_currentSnapDragDistance < 0.f) {
+            dragSteps *= -1;
+          }
+          _currentSnapDragDistance = std::fmod(_currentSnapDragDistance, snapDistance);
+          _tmpVector.scaleToRef(snapDistance * dragSteps, _tmpVector);
+          snapped = true;
+        }
+        else {
+          _tmpVector.scaleInPlace(0.f);
+        }
+      }
+
+      attachedMesh()->scaling().addInPlace(_tmpVector);
+
+      if (snapped) {
+        _tmpSnapEvent.snapDistance = snapDistance * dragSteps;
+        onSnapObservable.notifyObservers(&_tmpSnapEvent);
+      }
+    }
+  });
 
   _pointerObserver = gizmoLayer->utilityLayerScene->onPointerObservable.add(
     [&](PointerInfo* pointerInfo, EventState& /*es*/) {
@@ -138,9 +131,9 @@ AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
       }
 
       auto pickedMesh = pointerInfo->pickInfo.pickedMesh;
-      auto it         = std::find(_rootMesh->getChildMeshes().begin(),
-                          _rootMesh->getChildMeshes().end(), pickedMesh);
-      auto isHovered  = (it != _rootMesh->getChildMeshes().end());
+      auto it = std::find(_rootMesh->getChildMeshes().begin(), _rootMesh->getChildMeshes().end(),
+                          pickedMesh);
+      auto isHovered = (it != _rootMesh->getChildMeshes().end());
 
       auto material = isHovered ? _hoverMaterial : _coloredMaterial;
       for (auto& m : _rootMesh->getChildMeshes()) {
@@ -152,9 +145,9 @@ AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
       }
     });
 
-  const auto& light         = gizmoLayer->_getSharedGizmoLight();
-  light->includedOnlyMeshes = stl_util::concat(light->includedOnlyMeshes(),
-                                               _rootMesh->getChildMeshes());
+  const auto& light = gizmoLayer->_getSharedGizmoLight();
+  light->includedOnlyMeshes
+    = stl_util::concat(light->includedOnlyMeshes(), _rootMesh->getChildMeshes());
 }
 
 AxisScaleGizmo::~AxisScaleGizmo() = default;
@@ -162,7 +155,7 @@ AxisScaleGizmo::~AxisScaleGizmo() = default;
 void AxisScaleGizmo::_attachedMeshChanged(const AbstractMeshPtr& value)
 {
   if (dragBehavior) {
-    dragBehavior->enabled = static_cast<bool>(value);
+    dragBehavior->enabled = value ? true : false;
   }
 }
 

@@ -12,10 +12,8 @@ Gizmo::Gizmo(const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
     , attachedMesh{this, &Gizmo::get_attachedMesh, &Gizmo::set_attachedMesh}
     , gizmoLayer{iGizmoLayer}
     , updateGizmoRotationToMatchAttachedMesh{this,
-                                             &Gizmo::
-                                               get_updateGizmoRotationToMatchAttachedMesh,
-                                             &Gizmo::
-                                               set_updateGizmoRotationToMatchAttachedMesh}
+                                             &Gizmo::get_updateGizmoRotationToMatchAttachedMesh,
+                                             &Gizmo::set_updateGizmoRotationToMatchAttachedMesh}
     , updateGizmoPositionToMatchAttachedMesh{true}
     , updateScale{true}
     , _customMeshSet{false}
@@ -24,11 +22,10 @@ Gizmo::Gizmo(const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
     , _updateGizmoRotationToMatchAttachedMesh{true}
     , _attachedMesh{nullptr}
 {
-  _rootMesh = Mesh::New("gizmoRootNode", gizmoLayer->utilityLayerScene.get());
+  _rootMesh                     = Mesh::New("gizmoRootNode", gizmoLayer->utilityLayerScene.get());
   _rootMesh->rotationQuaternion = Quaternion::Identity();
-  _beforeRenderObserver
-    = gizmoLayer->utilityLayerScene->onBeforeRenderObservable.add(
-      [this](Scene* /*scene*/, EventState& /*es*/) { _update(); });
+  _beforeRenderObserver         = gizmoLayer->utilityLayerScene->onBeforeRenderObservable.add(
+    [this](Scene* /*scene*/, EventState& /*es*/) { _update(); });
   attachedMesh = nullptr;
 }
 
@@ -70,8 +67,8 @@ void Gizmo::setCustomMesh(const MeshPtr& mesh, bool /*useGizmoMaterial*/)
 {
   if (mesh->getScene() != gizmoLayer->utilityLayerScene.get()) {
     throw std::runtime_error(
-      "When setting a custom mesh on a gizmo, the custom meshes scene must be "
-      "the same as the gizmos (eg. gizmo.gizmoLayer.utilityLayerScene)");
+      "When setting a custom mesh on a gizmo, the custom meshes scene must be the same as the "
+      "gizmos (eg. gizmo.gizmoLayer.utilityLayerScene)");
   }
   for (const auto& c : _rootMesh->getChildMeshes()) {
     c->dispose();
@@ -87,9 +84,8 @@ void Gizmo::_attachedMeshChanged(const AbstractMeshPtr& /*value*/)
 void Gizmo::_update()
 {
   if (attachedMesh()) {
-    auto effectiveMesh = attachedMesh()->_effectiveMesh() ?
-                           attachedMesh()->_effectiveMesh() :
-                           attachedMesh().get();
+    auto effectiveMesh
+      = attachedMesh()->_effectiveMesh() ? attachedMesh()->_effectiveMesh() : attachedMesh().get();
 
     // Position
     if (updateGizmoPositionToMatchAttachedMesh) {
@@ -100,8 +96,8 @@ void Gizmo::_update()
     if (updateGizmoRotationToMatchAttachedMesh) {
       std::optional<Vector3> scale       = std::nullopt;
       std::optional<Vector3> translation = std::nullopt;
-      effectiveMesh->getWorldMatrix().decompose(
-        scale, _rootMesh->rotationQuaternion(), translation);
+      effectiveMesh->getWorldMatrix().decompose(scale, _rootMesh->rotationQuaternion(),
+                                                translation);
     }
     else {
       _rootMesh->rotationQuaternion()->set(0.f, 0.f, 0.f, 1.f);
@@ -109,7 +105,7 @@ void Gizmo::_update()
 
     // Scale
     if (updateScale) {
-      const auto& activeCamera = gizmoLayer->utilityLayerScene->activeCamera();
+      const auto& activeCamera   = gizmoLayer->utilityLayerScene->activeCamera();
       const auto& cameraPosition = activeCamera->globalPosition();
       _rootMesh->position().subtractToRef(cameraPosition, _tempVector);
       const auto dist = _tempVector.length() * scaleRatio;
@@ -130,8 +126,7 @@ void Gizmo::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
   _rootMesh->dispose(doNotRecurse, disposeMaterialAndTextures);
   if (_beforeRenderObserver) {
-    gizmoLayer->utilityLayerScene->onBeforeRenderObservable.remove(
-      _beforeRenderObserver);
+    gizmoLayer->utilityLayerScene->onBeforeRenderObservable.remove(_beforeRenderObserver);
   }
 }
 

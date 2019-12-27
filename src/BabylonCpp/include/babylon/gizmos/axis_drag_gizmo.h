@@ -71,8 +71,7 @@ public:
   std::unique_ptr<PointerDragBehavior> dragBehavior;
 
   /**
-   * Drag distance in babylon units that the gizmo will snap to when dragged
-   * (Default: 0)
+   * Drag distance in babylon units that the gizmo will snap to when dragged (Default: 0)
    */
   float snapDistance;
 

@@ -20,8 +20,7 @@ public:
   /**
    * @brief Creates a RotationGizmo.
    * @param gizmoLayer The utility layer the gizmo will be added to
-   * @param tessellation Amount of tessellation to be used when creating
-   * rotation circles
+   * @param tessellation Amount of tessellation to be used when creating rotation circles
    * @param useEulerRotation Use and update Euler angle instead of quaternion
    */
   RotationGizmo(const UtilityLayerRendererPtr& gizmoLayer
@@ -35,11 +34,9 @@ public:
   void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
-   * @brief Disposes and replaces the current meshes in the gizmo with the
-   * specified mesh.
+   * @brief Disposes and replaces the current meshes in the gizmo with the specified mesh.
    * @param mesh The mesh to replace the default mesh of the gizmo
-   * @param useGizmoMaterial If the gizmo's default material should be used
-   * (default: false)
+   * @param useGizmoMaterial If the gizmo's default material should be used (default: false)
    */
   void setCustomMesh(const MeshPtr& mesh, bool useGizmoMaterial = false) override;
 
@@ -80,8 +77,7 @@ public:
   Observable<DragStartOrEndEvent> onDragEndObservable;
 
   /**
-   * Drag distance in babylon units that the gizmo will snap to when dragged
-   * (Default: 0)
+   * Drag distance in babylon units that the gizmo will snap to when dragged (Default: 0)
    */
   Property<RotationGizmo, float> snapDistance;
 

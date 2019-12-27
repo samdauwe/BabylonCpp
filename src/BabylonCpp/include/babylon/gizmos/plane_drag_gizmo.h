@@ -38,8 +38,7 @@ public:
   /**
    * @brief Creates a PlaneDragGizmo.
    * @param gizmoLayer The utility layer the gizmo will be added to
-   * @param dragPlaneNormal The axis normal to which the gizmo will be able to
-   * drag on
+   * @param dragPlaneNormal The axis normal to which the gizmo will be able to drag on
    * @param color The color of the gizmo
    */
   PlaneDragGizmo(const Vector3& dragPlaneNormal, const Color3& color = Color3::Gray(),
@@ -73,8 +72,7 @@ public:
   PointerDragBehaviorPtr dragBehavior;
 
   /**
-   * Drag distance in babylon units that the gizmo will snap to when dragged
-   * (Default: 0)
+   * Drag distance in babylon units that the gizmo will snap to when dragged (Default: 0)
    */
   float snapDistance;
   /**

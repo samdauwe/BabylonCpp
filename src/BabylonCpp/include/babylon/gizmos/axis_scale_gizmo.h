@@ -39,11 +39,9 @@ public:
   void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
-   * @brief Disposes and replaces the current meshes in the gizmo with the
-   * specified mesh.
+   * @brief Disposes and replaces the current meshes in the gizmo with the specified mesh.
    * @param mesh The mesh to replace the default mesh of the gizmo
-   * @param useGizmoMaterial If the gizmo's default material should be used
-   * (default: false)
+   * @param useGizmoMaterial If the gizmo's default material should be used (default: false)
    */
   void setCustomMesh(const MeshPtr& mesh, bool useGizmoMaterial = false) override;
 
@@ -67,8 +65,7 @@ public:
   std::unique_ptr<PointerDragBehavior> dragBehavior;
 
   /**
-   * Scale distance in babylon units that the gizmo will snap to when dragged
-   * (Default: 0)
+   * Scale distance in babylon units that the gizmo will snap to when dragged (Default: 0)
    */
   float snapDistance;
 
@@ -82,6 +79,11 @@ public:
    * If the scaling operation should be done on all axis (default: false)
    */
   bool uniformScaling;
+
+  /**
+   * Custom sensitivity value for the drag strength
+   */
+  float sensitivity;
 
   /**
    * If the gizmo is enabled

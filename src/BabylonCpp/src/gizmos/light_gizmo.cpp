@@ -20,11 +20,15 @@ LightGizmo::LightGizmo(const UtilityLayerRendererPtr& iGizmoLayer)
     , material{this, &LightGizmo::get_material}
     , _lightMesh{nullptr}
     , _material{nullptr}
-    , cachedForward{Vector3(0.f, 0.f, 1.f)}
+    , _cachedForward{Vector3(0.f, 0.f, 1.f)}
+    , _attachedMeshParent{nullptr}
     , _light{nullptr}
 {
-  attachedMesh = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
-  _material    = StandardMaterial::New("light", gizmoLayer->originalScene);
+  attachedMesh        = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
+  _attachedMeshParent = TransformNode::New("parent", gizmoLayer->originalScene);
+
+  attachedMesh()->parent   = _attachedMeshParent.get();
+  _material                = StandardMaterial::New("light", gizmoLayer->originalScene);
   _material->diffuseColor  = Color3(0.5f, 0.5f, 0.5f);
   _material->specularColor = Color3(0.1f, 0.1f, 0.1f);
 }
@@ -41,20 +45,16 @@ void LightGizmo::set_light(const LightPtr& iLight)
     }
 
     if (iLight->type() == Type::HEMISPHERICLIGHT) {
-      _lightMesh = LightGizmo::_CreateHemisphericLightMesh(
-        gizmoLayer->utilityLayerScene.get());
+      _lightMesh = LightGizmo::_CreateHemisphericLightMesh(gizmoLayer->utilityLayerScene.get());
     }
     else if (iLight->type() == Type::DIRECTIONALLIGHT) {
-      _lightMesh = LightGizmo::_CreateDirectionalLightMesh(
-        gizmoLayer->utilityLayerScene.get());
+      _lightMesh = LightGizmo::_CreateDirectionalLightMesh(gizmoLayer->utilityLayerScene.get());
     }
     else if (iLight->type() == Type::SPOTLIGHT) {
-      _lightMesh
-        = LightGizmo::_CreateSpotLightMesh(gizmoLayer->utilityLayerScene.get());
+      _lightMesh = LightGizmo::_CreateSpotLightMesh(gizmoLayer->utilityLayerScene.get());
     }
     else {
-      _lightMesh = LightGizmo::_CreatePointLightMesh(
-        gizmoLayer->utilityLayerScene.get());
+      _lightMesh = LightGizmo::_CreatePointLightMesh(gizmoLayer->utilityLayerScene.get());
     }
     for (const auto& m : _lightMesh->getChildMeshes(false)) {
       m->material = _material;
@@ -62,11 +62,15 @@ void LightGizmo::set_light(const LightPtr& iLight)
     _lightMesh->parent = _rootMesh.get();
 
     // Add lighting to the light gizmo
-    const auto& gizmoLight         = gizmoLayer->_getSharedGizmoLight();
-    gizmoLight->includedOnlyMeshes = stl_util::concat(
-      gizmoLight->includedOnlyMeshes(), _lightMesh->getChildMeshes(false));
+    const auto& gizmoLight = gizmoLayer->_getSharedGizmoLight();
+    gizmoLight->includedOnlyMeshes
+      = stl_util::concat(gizmoLight->includedOnlyMeshes(), _lightMesh->getChildMeshes(false));
 
     _lightMesh->rotationQuaternion = Quaternion();
+
+    if (iLight->parent()) {
+      _attachedMeshParent->freezeWorldMatrix(iLight->parent()->getWorldMatrix());
+    }
 
     // Get update position and direction if the light has it
     auto shadowLight = std::static_pointer_cast<ShadowLight>(_light);
@@ -95,14 +99,18 @@ void LightGizmo::_update()
   if (!_light) {
     return;
   }
+
+  if (_light->parent()) {
+    _attachedMeshParent->freezeWorldMatrix(_light->parent()->getWorldMatrix());
+  }
+
   auto shadowLight = std::static_pointer_cast<ShadowLight>(_light);
   if (shadowLight) {
-    // If the gizmo is moved update the light otherwise update the gizmo to
-    // match the light
-    if (!attachedMesh()->position().equals(cachedPosition)) {
+    // If the gizmo is moved update the light otherwise update the gizmo to match the light
+    if (!attachedMesh()->position().equals(_cachedPosition)) {
       // update light to match gizmo
       shadowLight->position().copyFrom(attachedMesh()->position());
-      cachedPosition.copyFrom(attachedMesh()->position());
+      _cachedPosition.copyFrom(attachedMesh()->position());
     }
     else {
       // update gizmo to match light
@@ -110,33 +118,29 @@ void LightGizmo::_update()
     }
   }
   if (shadowLight) {
-    // If the gizmo is moved update the light otherwise update the gizmo to
-    // match the light
-    if (Vector3::DistanceSquared(attachedMesh()->forward(), cachedForward)
-        > 0.0001f) {
+    // If the gizmo is moved update the light otherwise update the gizmo to match the light
+    if (Vector3::DistanceSquared(attachedMesh()->forward(), _cachedForward) > 0.0001f) {
       // update light to match gizmo
       shadowLight->direction().copyFrom(attachedMesh()->forward);
-      cachedForward.copyFrom(attachedMesh()->forward);
+      _cachedForward.copyFrom(attachedMesh()->forward);
     }
-    else if (Vector3::DistanceSquared(attachedMesh()->forward,
-                                      shadowLight->direction())
+    else if (Vector3::DistanceSquared(attachedMesh()->forward, shadowLight->direction())
              > 0.0001f) {
       // update gizmo to match light
       attachedMesh()->setDirection(shadowLight->direction());
-      cachedForward.copyFrom(_lightMesh->forward);
+      _cachedForward.copyFrom(_lightMesh->forward);
     }
   }
   if (!_light->isEnabled()) {
     _material->diffuseColor.set(0.f, 0.f, 0.f);
   }
   else {
-    _material->diffuseColor.set(_light->diffuse.r / 3.f,
-                                _light->diffuse.g / 3.f,
+    _material->diffuseColor.set(_light->diffuse.r / 3.f, _light->diffuse.g / 3.f,
                                 _light->diffuse.b / 3.f);
   }
 }
 
-MeshPtr LightGizmo::_createLightLines(float levels, Scene* scene)
+MeshPtr LightGizmo::_CreateLightLines(float levels, Scene* scene)
 {
   auto distFromSphere = 1.2f;
 
@@ -144,9 +148,9 @@ MeshPtr LightGizmo::_createLightLines(float levels, Scene* scene)
   root->rotation().x = Math::PI_2;
 
   // Create the top line, this will be cloned for all other lines
-  auto linePivot    = Mesh::New("linePivot", scene);
-  linePivot->parent = root.get();
-  auto line = Mesh::CreateCylinder("line", 2.f, 0.2f, 0.3f, 6, 1, scene);
+  auto linePivot     = Mesh::New("linePivot", scene);
+  linePivot->parent  = root.get();
+  auto line          = Mesh::CreateCylinder("line", 2.f, 0.2f, 0.3f, 6, 1, scene);
   line->position().y = line->scaling().y / 2.f + distFromSphere;
   line->parent       = linePivot.get();
 
@@ -159,8 +163,7 @@ MeshPtr LightGizmo::_createLightLines(float levels, Scene* scene)
     l->rotation().y = (Math::PI_2) + (Math::PI_2 * i);
 
     l->getChildMeshes()[0]->scaling().y = 0.5f;
-    l->getChildMeshes()[0]->scaling().x = l->getChildMeshes()[0]->scaling().z
-      = 0.8f;
+    l->getChildMeshes()[0]->scaling().x = l->getChildMeshes()[0]->scaling().z = 0.8f;
     l->getChildMeshes()[0]->position().y
       = l->getChildMeshes()[0]->scaling().y / 2.f + distFromSphere;
   }
@@ -183,8 +186,7 @@ MeshPtr LightGizmo::_createLightLines(float levels, Scene* scene)
     l->rotation().y = (Math::PI_2) + (Math::PI_2 * i);
 
     l->getChildMeshes()[0]->scaling().y = 0.5;
-    l->getChildMeshes()[0]->scaling().x = l->getChildMeshes()[0]->scaling().z
-      = 0.8f;
+    l->getChildMeshes()[0]->scaling().x = l->getChildMeshes()[0]->scaling().z = 0.8f;
     l->getChildMeshes()[0]->position().y
       = l->getChildMeshes()[0]->scaling().y / 2.f + distFromSphere;
   }
@@ -202,6 +204,7 @@ void LightGizmo::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
   _material->dispose();
   Gizmo::dispose(doNotRecurse, disposeMaterialAndTextures);
+  _attachedMeshParent->dispose();
 }
 
 MeshPtr LightGizmo::_CreateHemisphericLightMesh(Scene* scene)
@@ -210,13 +213,12 @@ MeshPtr LightGizmo::_CreateHemisphericLightMesh(Scene* scene)
   HemisphereOptions hemisphereOptions;
   hemisphereOptions.diameter = 1.f;
   hemisphereOptions.segments = 10;
-  auto hemisphere
-    = HemisphereBuilder::CreateHemisphere(root->name, hemisphereOptions, scene);
+  auto hemisphere = HemisphereBuilder::CreateHemisphere(root->name, hemisphereOptions, scene);
   hemisphere->position().z = -0.15f;
   hemisphere->rotation().x = Math::PI_2;
   hemisphere->parent       = root.get();
 
-  auto lines          = _createLightLines(3.f, scene);
+  auto lines          = _CreateLightLines(3.f, scene);
   lines->parent       = root.get();
   lines->position().z = 0.15f;
 
@@ -232,11 +234,11 @@ MeshPtr LightGizmo::_CreatePointLightMesh(Scene* scene)
   SphereOptions sphereOptions;
   sphereOptions.diameter = 1.f;
   sphereOptions.segments = 10;
-  auto sphere = SphereBuilder::CreateSphere(root->name, sphereOptions, scene);
-  sphere->rotation().x = Math::PI_2;
-  sphere->parent       = root.get();
+  auto sphere            = SphereBuilder::CreateSphere(root->name, sphereOptions, scene);
+  sphere->rotation().x   = Math::PI_2;
+  sphere->parent         = root.get();
 
-  auto lines    = _createLightLines(5.f, scene);
+  auto lines    = _CreateLightLines(5.f, scene);
   lines->parent = root.get();
   root->scaling().scaleInPlace(LightGizmo::_Scale);
   root->rotation().x = Math::PI_2;
@@ -250,18 +252,17 @@ MeshPtr LightGizmo::_CreateSpotLightMesh(Scene* scene)
   SphereOptions sphereOptions;
   sphereOptions.diameter = 1.f;
   sphereOptions.segments = 10;
-  auto sphere = SphereBuilder::CreateSphere(root->name, sphereOptions, scene);
-  sphere->parent = root.get();
+  auto sphere            = SphereBuilder::CreateSphere(root->name, sphereOptions, scene);
+  sphere->parent         = root.get();
 
   HemisphereOptions hemisphereOptions;
   hemisphereOptions.diameter = 2.f;
   hemisphereOptions.segments = 10;
-  auto hemisphere
-    = HemisphereBuilder::CreateHemisphere(root->name, hemisphereOptions, scene);
-  hemisphere->parent       = root.get();
+  auto hemisphere    = HemisphereBuilder::CreateHemisphere(root->name, hemisphereOptions, scene);
+  hemisphere->parent = root.get();
   hemisphere->rotation().x = -Math::PI_2;
 
-  auto lines    = _createLightLines(2.f, scene);
+  auto lines    = _CreateLightLines(2.f, scene);
   lines->parent = root.get();
   root->scaling().scaleInPlace(LightGizmo::_Scale);
   root->rotation().x = Math::PI_2;
@@ -292,8 +293,7 @@ MeshPtr LightGizmo::_CreateDirectionalLightMesh(Scene* scene)
   right->scaling().y = 0.5f;
   right->position().x += -1.25f;
 
-  auto arrowHead
-    = Mesh::CreateCylinder(root->name, 1.f, 0.f, 0.6f, 6, 1, scene);
+  auto arrowHead = Mesh::CreateCylinder(root->name, 1.f, 0.f, 0.6f, 6, 1, scene);
   arrowHead->position().y += 3.f;
   arrowHead->parent = mesh.get();
 
