@@ -7,16 +7,15 @@
 namespace BABYLON {
 
 /**
- * @brief Performance monitor tracks rolling average frame-time and frame-time
- * variance over a user defined sliding-window
+ * @brief Performance monitor tracks rolling average frame-time and frame-time variance over a user
+ * defined sliding-window
  */
 class BABYLON_SHARED_EXPORT PerformanceMonitor {
 
 public:
   /**
    * @brief Constructor
-   * @param frameSampleSize The number of samples required to saturate the
-   * sliding window
+   * @param frameSampleSize The number of samples required to saturate the sliding window
    */
   PerformanceMonitor(std::size_t frameSampleSize = 30);
   ~PerformanceMonitor(); // = default
@@ -28,20 +27,19 @@ public:
 
   /**
    * @brief Samples current frame
-   * @param timeMs A timestamp in milliseconds of the current frame to compare
-   * with other frames
+   * @param timeMs A timestamp in milliseconds of the current frame to compare with other frames
    */
   void sampleFrame(high_res_time_point_t timeMs);
 
   /**
-   * @brief Returns the average frame time in milliseconds over the sliding
-   * window (or the subset of frames sampled so far)
+   * @brief Returns the average frame time in milliseconds over the sliding window (or the subset of
+   * frames sampled so far)
    */
   [[nodiscard]] float averageFrameTime() const;
 
   /**
-   * @brief Returns the variance frame time in milliseconds over the sliding
-   * window (or the subset of frames sampled so far)
+   * @brief Returns the variance frame time in milliseconds over the sliding window (or the subset
+   * of frames sampled so far)
    */
   [[nodiscard]] float averageFrameTimeVariance() const;
 
@@ -51,20 +49,18 @@ public:
   [[nodiscard]] float instantaneousFrameTime() const;
 
   /**
-   * @brief Returns the average framerate in frames per second over the sliding
-   * window (or the subset of frames sampled so far)
+   * @brief Returns the average framerate in frames per second over the sliding window (or the
+   * subset of frames sampled so far)
    */
   [[nodiscard]] float averageFPS() const;
 
   /**
-   * @brief Returns the average framerate in frames per second using the most
-   * recent frame time
+   * @brief Returns the average framerate in frames per second using the most recent frame time
    */
   [[nodiscard]] float instantaneousFPS() const;
 
   /**
-   * @brief Returns true if enough samples have been taken to completely fill
-   * the sliding window
+   * @brief Returns true if enough samples have been taken to completely fill the sliding window
    */
   [[nodiscard]] bool isSaturated() const;
 
@@ -74,8 +70,8 @@ public:
   void enable();
 
   /**
-   * @brief Disables contributions to the sliding window sample set
-   * Samples will not be interpolated over the disabled period
+   * @brief Disables contributions to the sliding window sample set Samples will not be interpolated
+   * over the disabled period
    */
   void disable();
 

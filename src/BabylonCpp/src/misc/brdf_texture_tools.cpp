@@ -1,5 +1,7 @@
 #include <babylon/misc/brdf_texture_tools.h>
 
+#include <babylon/babylon_stl_util.h>
+#include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/misc/rgbd_texture_tools.h>
@@ -14,9 +16,16 @@ BaseTexturePtr BRDFTextureTools::GetEnvironmentBRDFTexture(Scene* scene)
     auto useDelayedTextureLoading   = scene->useDelayedTextureLoading;
     scene->useDelayedTextureLoading = false;
 
-    auto texture                  = Texture::CreateFromBase64String(_environmentBRDFBase64Texture,
+    auto texture = Texture::CreateFromBase64String(_environmentBRDFBase64Texture,
                                                    "EnvironmentBRDFTexture", scene, true, false,
                                                    TextureConstants::BILINEAR_SAMPLINGMODE);
+    // BRDF Texture should not be cached here due to pre processing and redundant scene caches.
+    auto& texturesCache = scene->getEngine()->getLoadedTexturesCache();
+    auto index          = stl_util::index_of(texturesCache, texture->getInternalTexture());
+    if (index != -1) {
+      stl_util::splice(texturesCache, index, 1);
+    }
+
     texture->isRGBD               = true;
     texture->wrapU                = TextureConstants::CLAMP_ADDRESSMODE;
     texture->wrapV                = TextureConstants::CLAMP_ADDRESSMODE;
