@@ -472,16 +472,18 @@ void BaseTexture::releaseInternalTexture()
 
 SphericalPolynomialPtr& BaseTexture::get_sphericalPolynomial()
 {
-  if (!_texture || !isReady()) {
-    return _nullSphericalPolynomial;
+  if (_texture) {
+    if (_texture->_sphericalPolynomial) {
+      return _texture->_sphericalPolynomial;
+    }
+
+    if (_texture->isReady) {
+      _texture->_sphericalPolynomial
+        = CubeMapToSphericalPolynomialTools::ConvertCubeMapTextureToSphericalPolynomial(*this);
+    }
   }
 
-  if (!_texture->_sphericalPolynomial) {
-    _texture->_sphericalPolynomial
-      = CubeMapToSphericalPolynomialTools::ConvertCubeMapTextureToSphericalPolynomial(*this);
-  }
-
-  return _texture->_sphericalPolynomial;
+  return _nullSphericalPolynomial;
 }
 
 void BaseTexture::set_sphericalPolynomial(const SphericalPolynomialPtr& value)
