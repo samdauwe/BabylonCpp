@@ -27,6 +27,7 @@ BaseTexture::BaseTexture(Scene* scene)
     , anisotropicFilteringLevel{BaseTexture::DEFAULT_ANISOTROPIC_FILTERING_LEVEL}
     , isCube{this, &BaseTexture::get_isCube, &BaseTexture::set_isCube}
     , is3D{this, &BaseTexture::get_is3D, &BaseTexture::set_is3D}
+    , is2DArray{this, &BaseTexture::get_is2DArray, &BaseTexture::set_is2DArray}
     , gammaSpace{true}
     , isRGBD{this, &BaseTexture::get_isRGBD, &BaseTexture::set_isRGBD}
     , invertZ{false}
@@ -150,6 +151,24 @@ void BaseTexture::set_is3D(bool value)
   }
 
   _texture->is3D = value;
+}
+
+bool BaseTexture::get_is2DArray() const
+{
+  if (!_texture) {
+    return false;
+  }
+
+  return _texture->is2DArray;
+}
+
+void BaseTexture::set_is2DArray(bool value)
+{
+  if (!_texture) {
+    return;
+  }
+
+  _texture->is2DArray = value;
 }
 
 bool BaseTexture::get_noMipmap() const

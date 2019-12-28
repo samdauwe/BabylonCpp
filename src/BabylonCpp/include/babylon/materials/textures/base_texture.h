@@ -225,6 +225,8 @@ protected:
   void set_isCube(bool value);
   bool get_is3D() const;
   void set_is3D(bool value);
+  bool get_is2DArray() const;
+  void set_is2DArray(bool value);
   virtual bool get_noMipmap() const;
 
   /**
@@ -356,6 +358,11 @@ public:
    * Define if the texture is a 3d texture (webgl 2) or if false a 2d texture.
    */
   Property<BaseTexture, bool> is3D;
+
+  /**
+   * Define if the texture is a 2d array texture (webgl 2) or if false a 2d texture.
+   */
+  Property<BaseTexture, bool> is2DArray;
 
   /**
    * Define if the texture contains data in gamma space (most of the png/jpg aside bump). HDR
