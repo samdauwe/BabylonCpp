@@ -163,6 +163,10 @@ public:
    */
   bool is3D;
   /**
+   * Defines if the texture contains 2D array data
+   */
+  bool is2DArray;
+  /**
    * Defines if the texture contains multiview data
    */
   bool isMultiview;

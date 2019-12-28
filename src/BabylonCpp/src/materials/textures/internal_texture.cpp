@@ -12,11 +12,11 @@
 
 namespace BABYLON {
 
-InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource,
-                                 bool delayAllocation)
+InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource, bool delayAllocation)
     : isReady{false}
     , isCube{false}
     , is3D{false}
+    , is2DArray{false}
     , isMultiview{false}
     , url{""}
     , generateMipMaps{false}
@@ -118,30 +118,27 @@ void InternalTexture::_rebuild()
     case InternalTexture::DATASOURCE_URL: {
       proxy = _engine->createTexture(
         url, !generateMipMaps, invertY, nullptr, samplingMode,
-        [this](InternalTexture*, EventState&) { isReady = true; }, nullptr,
-        _buffer, nullptr, format);
+        [this](InternalTexture*, EventState&) { isReady = true; }, nullptr, _buffer, nullptr,
+        format);
       proxy->_swapAndDie(shared_from_this());
     }
       return;
     case InternalTexture::DATASOURCE_RAW: {
-      proxy = _engine->createRawTexture(_bufferView, baseWidth, baseHeight,
-                                        format, generateMipMaps, invertY,
-                                        samplingMode, _compression);
+      proxy = _engine->createRawTexture(_bufferView, baseWidth, baseHeight, format, generateMipMaps,
+                                        invertY, samplingMode, _compression);
       proxy->_swapAndDie(shared_from_this());
       isReady = true;
     }
       return;
     case InternalTexture::DATASOURCE_RAW3D: {
-      proxy = _engine->createRawTexture3D(_bufferView, baseWidth, baseHeight,
-                                          baseDepth, format, generateMipMaps,
-                                          invertY, samplingMode, _compression);
+      proxy = _engine->createRawTexture3D(_bufferView, baseWidth, baseHeight, baseDepth, format,
+                                          generateMipMaps, invertY, samplingMode, _compression);
       proxy->_swapAndDie(shared_from_this());
       isReady = true;
     }
       return;
     case InternalTexture::DATASOURCE_DYNAMIC: {
-      proxy = _engine->createDynamicTexture(baseWidth, baseHeight,
-                                            generateMipMaps, samplingMode);
+      proxy = _engine->createDynamicTexture(baseWidth, baseHeight, generateMipMaps, samplingMode);
       proxy->_swapAndDie(shared_from_this());
       // _engine->updateDynamicTexture(this, _engine->getRenderingCanvas(),
       // invertY, undefined, undefined, true);
@@ -190,24 +187,20 @@ void InternalTexture::_rebuild()
     case InternalTexture::DATASOURCE_CUBE: {
       proxy = _engine->createCubeTexture(
         url, nullptr, _files, !generateMipMaps,
-        [this](const std::optional<CubeTextureData>& /*data*/) {
-          isReady = true;
-        },
-        nullptr, format, _extension);
+        [this](const std::optional<CubeTextureData>& /*data*/) { isReady = true; }, nullptr, format,
+        _extension);
       proxy->_swapAndDie(shared_from_this());
     }
       return;
     case InternalTexture::DATASOURCE_CUBERAW: {
-      proxy = _engine->createRawCubeTexture(_bufferViewArray, width, format,
-                                            type, generateMipMaps, invertY,
-                                            samplingMode, _compression);
+      proxy = _engine->createRawCubeTexture(_bufferViewArray, width, format, type, generateMipMaps,
+                                            invertY, samplingMode, _compression);
       proxy->_swapAndDie(shared_from_this());
       isReady = true;
     }
       return;
     case InternalTexture::DATASOURCE_CUBERAW_RGBD: {
-      proxy = _engine->createRawCubeTexture({}, width, format, type,
-                                            generateMipMaps, invertY,
+      proxy = _engine->createRawCubeTexture({}, width, format, type, generateMipMaps, invertY,
                                             samplingMode, _compression);
 #if 0
       InternalTexture::_UpdateRGBDAsync(
@@ -228,8 +221,7 @@ void InternalTexture::_rebuild()
           isReady = true;
         },
         nullptr, format, _extension);
-      proxy->_sphericalPolynomial
-        = std::unique_ptr<SphericalPolynomial>(&*_sphericalPolynomial);
+      proxy->_sphericalPolynomial = std::unique_ptr<SphericalPolynomial>(&*_sphericalPolynomial);
     }
       return;
   }
