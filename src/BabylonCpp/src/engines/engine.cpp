@@ -4712,6 +4712,28 @@ InternalTexturePtr Engine::createRawTexture3D(const ArrayBufferView& data, int w
   return texture;
 }
 
+InternalTexturePtr
+Engine::createRawTexture2DArray(const ArrayBufferView& /*data*/, int /*width*/, int /*height*/,
+                                int /*depth*/, unsigned int /*format*/, bool /*generateMipMaps*/,
+                                bool /*invertY*/, unsigned int /*samplingMode*/,
+                                const std::string& /*compression*/, unsigned int /*textureType*/)
+{
+  return nullptr;
+}
+
+void Engine::updateRawTexture2DArray(const InternalTexturePtr& /*texture*/,
+                                     const ArrayBufferView& /*data*/, unsigned int /*format*/,
+                                     bool /*invertY*/)
+{
+}
+
+void Engine::updateRawTexture2DArray(const InternalTexturePtr& /*texture*/,
+                                     const ArrayBufferView& /*data*/, unsigned int /*format*/,
+                                     bool /*invertY*/, const std::string& /*compression*/,
+                                     unsigned int /*textureType*/)
+{
+}
+
 InternalTexturePtr Engine::createMultiviewRenderTargetTexture(int width, int height)
 {
   if (!getCaps().multiview) {

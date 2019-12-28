@@ -1862,6 +1862,51 @@ public:
                      unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT);
 
   /**
+   * @brief Creates a new raw 2D array texture.
+   * @param data defines the data used to create the texture
+   * @param width defines the width of the texture
+   * @param height defines the height of the texture
+   * @param depth defines the number of layers of the texture
+   * @param format defines the format of the texture
+   * @param generateMipMaps defines if the engine must generate mip levels
+   * @param invertY defines if data must be stored with Y axis inverted
+   * @param samplingMode defines the required sampling mode (like Texture.NEAREST_SAMPLINGMODE)
+   * @param compression defines the compressed used (can be null)
+   * @param textureType defines the compressed used (can be null)
+   * @returns a new raw 2D array texture (stored in an InternalTexture)
+   */
+  InternalTexturePtr
+  createRawTexture2DArray(const ArrayBufferView& data, int width, int height, int depth,
+                          unsigned int format, bool generateMipMaps, bool invertY,
+                          unsigned int samplingMode, const std::string& compression = "",
+                          unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT);
+
+  /**
+   * @brief Update a raw 2D array texture.
+   * @param texture defines the texture to update
+   * @param data defines the data to store
+   * @param format defines the data format
+   * @param invertY defines if data must be stored with Y axis inverted
+   */
+  void updateRawTexture2DArray(const InternalTexturePtr& texture, const ArrayBufferView& data,
+                               unsigned int format, bool invertY = true);
+
+  /**
+   * @brief Update a raw 2D array texture.
+   * @param texture defines the texture to update
+   * @param data defines the data to store
+   * @param format defines the data format
+   * @param invertY defines if data must be stored with Y axis inverted
+   * @param compression defines the used compression (can be null)
+   * @param textureType defines the texture Type (Engine.TEXTURETYPE_UNSIGNED_INT,
+   * Engine.TEXTURETYPE_FLOAT...)
+   */
+  void updateRawTexture2DArray(const InternalTexturePtr& texture, const ArrayBufferView& data,
+                               unsigned int format, bool invertY = true,
+                               const std::string& compression = "",
+                               unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT);
+
+  /**
    * @brief Creates a new multiview render target.
    * @param width defines the width of the texture
    * @param height defines the height of the texture
