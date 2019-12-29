@@ -45,6 +45,7 @@ struct BABYLON_SHARED_EXPORT GLInfo {
 enum GLEnums : GLenum {
   // FALSE = 0x0000,
   // TRUE  = 0x0001,
+  NO_ERROR = 0,
   /* ClearBufferMask */
   DEPTH_BUFFER_BIT   = 0x00000100,
   STENCIL_BUFFER_BIT = 0x00000400,
@@ -491,6 +492,7 @@ enum GLEnums : GLenum {
   RENDERBUFFER_BINDING                         = 0x8CA7,
   READ_FRAMEBUFFER                             = 0x8CA8,
   DRAW_FRAMEBUFFER                             = 0x8CA9,
+  DEPTH_COMPONENT32F                           = 0x8CAC,
   DEPTH32F_STENCIL8                            = 0x8CAD,
   MAX_RENDERBUFFER_SIZE                        = 0x84E8,
   INVALID_FRAMEBUFFER_OPERATION                = 0x0506,
@@ -512,10 +514,12 @@ enum GLEnums : GLenum {
 class IGLFramebuffer;
 class IGLProgram;
 class IGLShader;
+class IGLTexture;
 class IGLTransformFeedback;
 using IGLFramebufferPtr       = std::shared_ptr<IGLFramebuffer>;
 using IGLProgramPtr           = std::shared_ptr<IGLProgram>;
 using IGLShaderPtr            = std::shared_ptr<IGLShader>;
+using IGLTexturePtr           = std::shared_ptr<IGLTexture>;
 using IGLTransformFeedbackPtr = std::shared_ptr<IGLTransformFeedback>;
 
 class BABYLON_SHARED_EXPORT IGLBuffer {
@@ -1221,7 +1225,7 @@ public:
    * @brief Creates and initializes a IGLTexture object.
    * @return An IGLTexture object to which images can be bound to.
    */
-  virtual std::unique_ptr<IGLTexture> createTexture() = 0;
+  virtual IGLTexturePtr createTexture() = 0;
 
   /**
    * @brief Creates and initializes a IGLTransformFeedback object.
