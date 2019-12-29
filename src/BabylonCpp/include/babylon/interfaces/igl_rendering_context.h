@@ -14,7 +14,6 @@ class ICanvas;
 namespace GL {
 
 class BaseTexture;
-class IGLVertexArrayObject;
 
 using GLenum     = unsigned int;
 using GLboolean  = bool;
@@ -516,11 +515,13 @@ class IGLProgram;
 class IGLShader;
 class IGLTexture;
 class IGLTransformFeedback;
+class IGLVertexArrayObject;
 using IGLFramebufferPtr       = std::shared_ptr<IGLFramebuffer>;
 using IGLProgramPtr           = std::shared_ptr<IGLProgram>;
 using IGLShaderPtr            = std::shared_ptr<IGLShader>;
 using IGLTexturePtr           = std::shared_ptr<IGLTexture>;
 using IGLTransformFeedbackPtr = std::shared_ptr<IGLTransformFeedback>;
+using IGLVertexArrayObjectPtr = std::shared_ptr<IGLVertexArrayObject>;
 
 class BABYLON_SHARED_EXPORT IGLBuffer {
 
@@ -1240,7 +1241,7 @@ public:
    * @return An IGLVertexArrayObject representing a vertex array object (VAO)
    * which points to vertex array data.
    */
-  virtual std::unique_ptr<IGLVertexArrayObject> createVertexArray() = 0;
+  virtual IGLVertexArrayObjectPtr createVertexArray() = 0;
 
   /**
    * @brief Specifies whether or not front- and/or back-facing polygons can be

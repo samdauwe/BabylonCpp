@@ -3,19 +3,990 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/string.h>
 #include <babylon/engines/engine_store.h>
+#include <babylon/engines/instancing_attribute_info.h>
 #include <babylon/engines/scene.h>
 #include <babylon/engines/webgl/webgl_pipeline_context.h>
+#include <babylon/interfaces/icanvas.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/iinternal_texture_loader.h>
 #include <babylon/materials/textures/internal_texture.h>
+#include <babylon/materials/uniform_buffer.h>
+#include <babylon/maths/viewport.h>
+#include <babylon/meshes/vertex_buffer.h>
+#include <babylon/meshes/webgl/webgl_data_buffer.h>
 #include <babylon/states/alpha_state.h>
 #include <babylon/states/depth_culling_state.h>
 #include <babylon/states/stencil_state.h>
 
 namespace BABYLON {
+
+void ThinEngine::_rebuildInternalTextures()
+{
+  const auto currentState
+    = _internalTexturesCache; // Do a copy because the rebuild will add proxies
+
+  for (const auto& internalTexture : currentState) {
+    internalTexture->_rebuild();
+  }
+}
+
+void ThinEngine::_rebuildEffects()
+{
+  for (const auto& item : _compiledEffects) {
+    const auto& effect = item.second;
+
+    effect->_prepareEffect();
+  }
+
+  Effect::ResetCache();
+}
+
+bool ThinEngine::areAllEffectsReady() const
+{
+  for (const auto& compiledEffectItem : _compiledEffects) {
+    const auto& effect = compiledEffectItem.second;
+
+    if (!effect->isReady()) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+void ThinEngine::_rebuildBuffers()
+{
+  // Uniforms
+  for (const auto& uniformBuffer : _uniformBuffers) {
+    uniformBuffer->_rebuild();
+  }
+}
+
+void ThinEngine::_initGLContext()
+{
+}
+
+std::string ThinEngine::getClassName() const
+{
+  return "ThinEngine";
+}
+
+void ThinEngine::_prepareWorkingCanvas()
+{
+  if (_workingCanvas) {
+    return;
+  }
+
+  _workingCanvas = _renderingCanvas;
+  auto context   = _workingCanvas->getContext2d();
+
+  if (context) {
+    _workingContext = context;
+  }
+}
+
+void ThinEngine::resetTextureCache()
+{
+  for (auto& boundTextureItem : _boundTexturesCache) {
+    boundTextureItem.second = nullptr;
+  }
+
+  _currentTextureChannel = -1;
+}
+
+GL::GLInfo ThinEngine::getGlInfo()
+{
+  return {
+    _glVendor,   // vendor
+    _glRenderer, // renderer
+    _glVersion   // version
+  };
+}
+
+void ThinEngine::setHardwareScalingLevel(int level)
+{
+  _hardwareScalingLevel = level;
+  resize();
+}
+
+float ThinEngine::getHardwareScalingLevel() const
+{
+  return _hardwareScalingLevel;
+}
+
+std::vector<InternalTexturePtr>& ThinEngine::getLoadedTexturesCache()
+{
+  return _internalTexturesCache;
+}
+
+EngineCapabilities& ThinEngine::getCaps()
+{
+  return _caps;
+}
+
+void ThinEngine::stopRenderLoop()
+{
+  _activeRenderLoops.clear();
+}
+
+void ThinEngine::stopRenderLoop(const SA::delegate<void()>& renderFunction)
+{
+  _activeRenderLoops.erase(
+    std::remove(_activeRenderLoops.begin(), _activeRenderLoops.end(), renderFunction),
+    _activeRenderLoops.end());
+}
+
+void ThinEngine::_renderLoop()
+{
+  if (!_contextWasLost) {
+    auto shouldRender = true;
+    if (!renderEvenInBackground && _windowIsBackground) {
+      shouldRender = false;
+    }
+
+    if (shouldRender) {
+      // Start new frame
+      beginFrame();
+
+      for (const auto& renderFunction : _activeRenderLoops) {
+        renderFunction();
+      }
+
+      // Present
+      endFrame();
+    }
+  }
+
+  if (!_activeRenderLoops.empty()) {
+    // Register new frame
+  }
+  else {
+    _renderingQueueLaunched = false;
+  }
+}
+
+ICanvas* ThinEngine::getRenderingCanvas()
+{
+  return _renderingCanvas;
+}
+
+int ThinEngine::getRenderWidth(bool useScreen) const
+{
+  if (!useScreen && _currentRenderTarget) {
+    return _currentRenderTarget->width;
+  }
+
+  return _gl->drawingBufferWidth;
+}
+
+int ThinEngine::getRenderHeight(bool useScreen) const
+{
+  if (!useScreen && _currentRenderTarget) {
+    return _currentRenderTarget->height;
+  }
+
+  return _gl->drawingBufferHeight;
+}
+
+void ThinEngine::runRenderLoop(const std::function<void()>& renderFunction)
+{
+  if (std::find(_activeRenderLoops.begin(), _activeRenderLoops.end(), renderFunction)
+      != _activeRenderLoops.end()) {
+    return;
+  }
+
+  _activeRenderLoops.emplace_back(renderFunction);
+
+  if (!_renderingQueueLaunched) {
+    _renderingQueueLaunched = true;
+  }
+}
+
+void ThinEngine::clear(const std::optional<Color4>& color, bool backBuffer, bool depth,
+                       bool stencil)
+{
+  applyStates();
+
+  auto mode = 0u;
+  if (backBuffer && color) {
+    _gl->clearColor(color->r, color->g, color->b, color->a);
+    mode |= GL::COLOR_BUFFER_BIT;
+  }
+  if (depth) {
+    if (useReverseDepthBuffer) {
+      _depthCullingState->depthFunc = GL::GREATER;
+      _gl->clearDepth(0.f);
+    }
+    else {
+      _gl->clearDepth(1.f);
+    }
+    mode |= GL::DEPTH_BUFFER_BIT;
+  }
+  if (stencil) {
+    _gl->clearStencil(0);
+    mode |= GL::STENCIL_BUFFER_BIT;
+  }
+  _gl->clear(mode);
+}
+
+void ThinEngine::_viewport(float x, float y, float width, float height)
+{
+  if (!stl_util::almost_equal(x, _viewportCached.x) || !stl_util::almost_equal(y, _viewportCached.y)
+      || !stl_util::almost_equal(width, _viewportCached.z)
+      || !stl_util::almost_equal(height, _viewportCached.w)) {
+    _viewportCached.x = x;
+    _viewportCached.y = y;
+    _viewportCached.z = width;
+    _viewportCached.w = height;
+
+    _gl->viewport(static_cast<int>(x), static_cast<int>(y), static_cast<int>(width),
+                  static_cast<int>(height));
+  }
+}
+
+void ThinEngine::setViewport(const Viewport& viewport, const std::optional<int>& requiredWidth,
+                             const std::optional<int>& requiredHeight)
+{
+
+  auto width  = requiredWidth.value_or(getRenderWidth());
+  auto height = requiredHeight.value_or(getRenderHeight());
+  auto x      = viewport.x;
+  auto y      = viewport.y;
+
+  _cachedViewport = viewport;
+
+  _viewport(x * width, y * height, width * viewport.width, height * viewport.height);
+}
+
+void ThinEngine::beginFrame()
+{
+}
+
+void ThinEngine::endFrame()
+{
+  // Force a flush in case we are using a bad OS.
+  if (_badOS) {
+    flushFramebuffer();
+  }
+}
+
+void ThinEngine::resize()
+{
+  const auto width  = _renderingCanvas ? _renderingCanvas->clientWidth : 0;
+  const auto height = _renderingCanvas ? _renderingCanvas->clientHeight : 0;
+
+  setSize(static_cast<int>(width / _hardwareScalingLevel),
+          static_cast<int>(height / _hardwareScalingLevel));
+}
+
+void ThinEngine::setSize(int width, int height)
+{
+  if (!_renderingCanvas) {
+    return;
+  }
+
+  if (_renderingCanvas->width == width && _renderingCanvas->height == height) {
+    return;
+  }
+
+  _renderingCanvas->width  = width;
+  _renderingCanvas->height = height;
+}
+
+void ThinEngine::bindFramebuffer(const InternalTexturePtr& texture,
+                                 std::optional<unsigned int> faceIndex,
+                                 std::optional<int> requiredWidth,
+                                 std::optional<int> requiredHeight,
+                                 std::optional<bool> forceFullscreenViewport,
+                                 InternalTexture* depthStencilTexture, int lodLevel)
+{
+  if (_currentRenderTarget) {
+    unBindFramebuffer(_currentRenderTarget);
+  }
+  _currentRenderTarget = texture;
+  _bindUnboundFramebuffer(texture->_MSAAFramebuffer ? texture->_MSAAFramebuffer :
+                                                      texture->_framebuffer);
+  auto& gl = *_gl;
+  if (texture->isCube) {
+    if (!faceIndex.has_value()) {
+      faceIndex = 0u;
+    }
+    gl.framebufferTexture2D(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
+                            GL::TEXTURE_CUBE_MAP_POSITIVE_X + (*faceIndex),
+                            texture->_webGLTexture.get(), lodLevel);
+
+    if (depthStencilTexture) {
+      if (depthStencilTexture->_generateStencilBuffer) {
+        gl.framebufferTexture2D(GL::FRAMEBUFFER, GL::DEPTH_STENCIL_ATTACHMENT,
+                                GL::TEXTURE_CUBE_MAP_POSITIVE_X + *faceIndex,
+                                depthStencilTexture->_webGLTexture.get(), lodLevel);
+      }
+      else {
+        gl.framebufferTexture2D(GL::FRAMEBUFFER, GL::DEPTH_ATTACHMENT,
+                                GL::TEXTURE_CUBE_MAP_POSITIVE_X + *faceIndex,
+                                depthStencilTexture->_webGLTexture.get(), lodLevel);
+      }
+    }
+  }
+
+  if (_cachedViewport && !forceFullscreenViewport && requiredWidth.has_value()
+      && requiredHeight.has_value()) {
+    setViewport(*_cachedViewport, *requiredWidth, *requiredHeight);
+  }
+  else {
+    if (!requiredWidth) {
+      requiredWidth = texture->width;
+      if (lodLevel) {
+        requiredWidth = static_cast<int>(*requiredWidth / std::pow(2, lodLevel));
+      }
+    }
+    if (!requiredHeight) {
+      requiredHeight = texture->height;
+      if (lodLevel) {
+        requiredHeight = static_cast<int>(*requiredHeight / std::pow(2, lodLevel));
+      }
+    }
+
+    _viewport(0.f, 0.f, static_cast<float>(*requiredWidth), static_cast<float>(*requiredHeight));
+  }
+
+  wipeCaches();
+}
+
+void ThinEngine::_bindUnboundFramebuffer(const WebGLFramebufferPtr& framebuffer)
+{
+  if (_currentFramebuffer != framebuffer) {
+    _gl->bindFramebuffer(GL::FRAMEBUFFER, framebuffer.get());
+    _currentFramebuffer = framebuffer;
+  }
+}
+
+void ThinEngine::unBindFramebuffer(const InternalTexturePtr& texture, bool disableGenerateMipMaps,
+                                   const std::function<void()>& onBeforeUnbind)
+{
+  _currentRenderTarget = nullptr;
+
+  // If MSAA, we need to bitblt back to main texture
+  auto& gl = *_gl;
+
+  if (texture->_MSAAFramebuffer) {
+    gl.bindFramebuffer(GL::READ_FRAMEBUFFER, texture->_MSAAFramebuffer.get());
+    gl.bindFramebuffer(GL::DRAW_FRAMEBUFFER, texture->_framebuffer.get());
+    gl.blitFramebuffer(0, 0, texture->width, texture->height, 0, 0, texture->width, texture->height,
+                       GL::COLOR_BUFFER_BIT, GL::NEAREST);
+  }
+
+  if (texture->generateMipMaps && !disableGenerateMipMaps && !texture->isCube) {
+    _bindTextureDirectly(GL::TEXTURE_2D, texture, true);
+    gl.generateMipmap(GL::TEXTURE_2D);
+    _bindTextureDirectly(GL::TEXTURE_2D, nullptr);
+  }
+
+  if (onBeforeUnbind) {
+    if (texture->_MSAAFramebuffer) {
+      // Bind the correct framebuffer
+      _bindUnboundFramebuffer(texture->_framebuffer);
+    }
+    onBeforeUnbind();
+  }
+
+  _bindUnboundFramebuffer(nullptr);
+}
+
+void ThinEngine::flushFramebuffer()
+{
+  _gl->flush();
+}
+
+void ThinEngine::restoreDefaultFramebuffer()
+{
+  if (_currentRenderTarget) {
+    unBindFramebuffer(_currentRenderTarget);
+  }
+  else {
+    _bindUnboundFramebuffer(nullptr);
+  }
+
+  if (_cachedViewport) {
+    setViewport(*_cachedViewport);
+  }
+
+  wipeCaches();
+}
+
+void ThinEngine::_resetVertexBufferBinding()
+{
+  bindArrayBuffer(nullptr);
+  _cachedVertexBuffers = nullptr;
+}
+
+WebGLDataBufferPtr ThinEngine::createVertexBuffer(const Float32Array& data)
+{
+  return _createVertexBuffer(data, GL::STATIC_DRAW);
+}
+
+WebGLDataBufferPtr ThinEngine::_createVertexBuffer(const Float32Array& data, unsigned int usage)
+{
+  auto vbo = _gl->createBuffer();
+
+  if (!vbo) {
+    throw std::runtime_error("Unable to create vertex buffer");
+  }
+
+  auto dataBuffer = std::make_shared<WebGLDataBuffer>(vbo);
+  bindArrayBuffer(dataBuffer);
+
+  _gl->bufferData(GL::ARRAY_BUFFER, data, usage);
+
+  _resetVertexBufferBinding();
+
+  dataBuffer->references = 1;
+  return dataBuffer;
+}
+
+WebGLDataBufferPtr ThinEngine::createDynamicVertexBuffer(const Float32Array& data)
+{
+  return _createVertexBuffer(data, GL::DYNAMIC_DRAW);
+}
+
+void ThinEngine::_resetIndexBufferBinding()
+{
+  bindIndexBuffer(nullptr);
+  _cachedIndexBuffer = nullptr;
+}
+
+WebGLDataBufferPtr ThinEngine::createIndexBuffer(const IndicesArray& indices, bool updatable)
+{
+  auto vbo        = _gl->createBuffer();
+  auto dataBuffer = std::make_shared<WebGLDataBuffer>(vbo);
+
+  if (!vbo) {
+    throw std::runtime_error("Unable to create index buffer");
+  }
+
+  bindIndexBuffer(dataBuffer);
+
+  Uint16Array uint16ArrayResult;
+  Uint32Array uint32ArrayResult;
+  _normalizeIndexData(indices, uint16ArrayResult, uint32ArrayResult);
+  if (!uint16ArrayResult.empty()) {
+    _gl->bufferData(GL::ELEMENT_ARRAY_BUFFER, uint16ArrayResult,
+                    updatable ? GL::DYNAMIC_DRAW : GL::STATIC_DRAW);
+  }
+  else {
+    _gl->bufferData(GL::ELEMENT_ARRAY_BUFFER, uint32ArrayResult,
+                    updatable ? GL::DYNAMIC_DRAW : GL::STATIC_DRAW);
+  }
+  _resetIndexBufferBinding();
+  dataBuffer->references = 1;
+  dataBuffer->is32Bits   = !uint32ArrayResult.empty();
+  return dataBuffer;
+}
+
+void ThinEngine::_normalizeIndexData(const IndicesArray& indices, Uint16Array& uint16ArrayResult,
+                                     Uint32Array& uint32ArrayResult)
+{
+  // Check for 32 bits indices
+  if (_caps.uintIndices) {
+    // number[] or Int32Array, check if 32 bit is necessary
+    using namespace std::placeholders;
+    auto it = std::find_if(indices.begin(), indices.end(),
+                           std::bind(std::greater<uint32_t>(), _1, 65535));
+    if (it != indices.end()) {
+      // 32 bit is necessary
+      uint32ArrayResult.assign(indices.begin(), indices.end());
+    }
+    else {
+      // 16 bit is sufficient
+      for (auto v : indices) {
+        uint16ArrayResult.push_back(static_cast<uint16_t>(v));
+      }
+    }
+  }
+}
+
+void ThinEngine::bindArrayBuffer(const WebGLDataBufferPtr& buffer)
+{
+  if (!_vaoRecordInProgress) {
+    _unbindVertexArrayObject();
+  }
+  bindBuffer(buffer, GL::ARRAY_BUFFER);
+}
+
+void ThinEngine::bindUniformBlock(const IPipelineContextPtr& pipelineContext,
+                                  const std::string& blockName, unsigned int index)
+{
+  auto program = std::static_pointer_cast<WebGLPipelineContext>(pipelineContext)->program.get();
+
+  auto uniformLocation = _gl->getUniformBlockIndex(program, blockName);
+
+  _gl->uniformBlockBinding(program, uniformLocation, index);
+}
+
+void ThinEngine::bindIndexBuffer(const WebGLDataBufferPtr& buffer)
+{
+  if (!_vaoRecordInProgress) {
+    _unbindVertexArrayObject();
+  }
+  bindBuffer(buffer, GL::ELEMENT_ARRAY_BUFFER);
+}
+
+void ThinEngine::bindBuffer(const WebGLDataBufferPtr& buffer, int target)
+{
+  if (_vaoRecordInProgress || (_currentBoundBuffer.find(target) == _currentBoundBuffer.end())
+      || (_currentBoundBuffer[target] != buffer)) {
+    _gl->bindBuffer(static_cast<unsigned int>(target),
+                    buffer ? buffer->underlyingResource().get() : nullptr);
+    _currentBoundBuffer[target] = buffer;
+  }
+}
+
+void ThinEngine::updateArrayBuffer(const Float32Array& data)
+{
+  _gl->bufferSubData(GL::ARRAY_BUFFER, 0, data);
+}
+
+void ThinEngine::_vertexAttribPointer(const WebGLDataBufferPtr& buffer, unsigned int indx, int size,
+                                      unsigned int type, bool normalized, int stride, int offset)
+{
+  auto& pointer = _currentBufferPointers[indx];
+
+  auto changed = false;
+  if (!pointer.active) {
+    changed            = true;
+    pointer.active     = true;
+    pointer.index      = indx;
+    pointer.size       = size;
+    pointer.type       = type;
+    pointer.normalized = normalized;
+    pointer.stride     = stride;
+    pointer.offset     = offset;
+    pointer.buffer     = buffer;
+  }
+  else {
+    if (pointer.buffer != buffer) {
+      pointer.buffer = buffer;
+      changed        = true;
+    }
+    if (pointer.size != size) {
+      pointer.size = size;
+      changed      = true;
+    }
+    if (pointer.type != type) {
+      pointer.type = type;
+      changed      = true;
+    }
+    if (pointer.normalized != normalized) {
+      pointer.normalized = normalized;
+      changed            = true;
+    }
+    if (pointer.stride != stride) {
+      pointer.stride = stride;
+      changed        = true;
+    }
+    if (pointer.offset != offset) {
+      pointer.offset = offset;
+      changed        = true;
+    }
+  }
+
+  if (changed || _vaoRecordInProgress) {
+    bindArrayBuffer(buffer);
+    _gl->vertexAttribPointer(indx, size, type, normalized, stride, offset);
+  }
+}
+
+void ThinEngine::_bindIndexBufferWithCache(const WebGLDataBufferPtr& indexBuffer)
+{
+  if (indexBuffer == nullptr) {
+    return;
+  }
+  if (_cachedIndexBuffer != indexBuffer) {
+    _cachedIndexBuffer = indexBuffer;
+    bindIndexBuffer(indexBuffer);
+    _uintIndicesCurrentlySet = indexBuffer->is32Bits;
+  }
+}
+
+void ThinEngine::_bindVertexBuffersAttributes(
+  const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers, const EffectPtr& effect)
+{
+  auto attributes = effect->getAttributesNames();
+
+  if (!_vaoRecordInProgress) {
+    _unbindVertexArrayObject();
+  }
+
+  unbindAllAttributes();
+
+  auto _order = 0u;
+  for (unsigned int index = 0; index < attributes.size(); ++index) {
+    auto order = effect->getAttributeLocation(index);
+
+    if (order >= 0) {
+      _order             = static_cast<unsigned int>(order);
+      auto& vertexBuffer = vertexBuffers.at(attributes[index]);
+
+      if (!vertexBuffer) {
+        continue;
+      }
+
+      _gl->enableVertexAttribArray(_order);
+      if (!_vaoRecordInProgress) {
+        _vertexAttribArraysEnabled[_order] = true;
+      }
+
+      auto buffer = vertexBuffer->getBuffer();
+      if (buffer) {
+        _vertexAttribPointer(buffer, _order, static_cast<int>(vertexBuffer->getSize()),
+                             vertexBuffer->type, vertexBuffer->normalized,
+                             static_cast<int>(vertexBuffer->byteStride),
+                             static_cast<int>(vertexBuffer->byteOffset));
+
+        if (vertexBuffer->getIsInstanced()) {
+          _gl->vertexAttribDivisor(_order, vertexBuffer->getInstanceDivisor());
+          if (!_vaoRecordInProgress) {
+            _currentInstanceLocations.emplace_back(order);
+            _currentInstanceBuffers.emplace_back(buffer);
+          }
+        }
+      }
+    }
+  }
+}
+
+WebGLVertexArrayObjectPtr ThinEngine::recordVertexArrayObject(
+  const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers,
+  const WebGLDataBufferPtr& indexBuffer, const EffectPtr& effect)
+{
+  auto vao = _gl->createVertexArray();
+
+  _vaoRecordInProgress = true;
+
+  _gl->bindVertexArray(vao.get());
+
+  _mustWipeVertexAttributes = true;
+  _bindVertexBuffersAttributes(vertexBuffers, effect);
+
+  bindIndexBuffer(indexBuffer);
+
+  _vaoRecordInProgress = false;
+  _gl->bindVertexArray(nullptr);
+
+  return vao;
+}
+
+void ThinEngine::bindVertexArrayObject(const WebGLVertexArrayObjectPtr& vertexArrayObject,
+                                       const WebGLDataBufferPtr& indexBuffer)
+{
+  if (_cachedVertexArrayObject != vertexArrayObject) {
+    _cachedVertexArrayObject = vertexArrayObject;
+
+    _gl->bindVertexArray(vertexArrayObject.get());
+    _cachedVertexBuffers = nullptr;
+    _cachedIndexBuffer   = nullptr;
+
+    _uintIndicesCurrentlySet  = indexBuffer != nullptr && indexBuffer->is32Bits;
+    _mustWipeVertexAttributes = true;
+  }
+}
+
+void ThinEngine::bindBuffersDirectly(const WebGLDataBufferPtr& vertexBuffer,
+                                     const WebGLDataBufferPtr& indexBuffer,
+                                     const Float32Array& vertexDeclaration, int vertexStrideSize,
+                                     const EffectPtr& effect)
+{
+  if (_cachedVertexBuffers != vertexBuffer || _cachedEffectForVertexBuffers != effect) {
+    _cachedVertexBuffers          = vertexBuffer;
+    _cachedEffectForVertexBuffers = effect;
+
+    auto attributesCount = effect->getAttributesCount();
+
+    _unbindVertexArrayObject();
+    unbindAllAttributes();
+
+    auto offset = 0;
+    for (unsigned int index = 0; index < attributesCount; ++index) {
+
+      if (index < vertexDeclaration.size()) {
+
+        auto vertexDeclarationi = static_cast<int>(vertexDeclaration[index]);
+        auto order              = effect->getAttributeLocation(index);
+
+        if (order >= 0) {
+          auto _order = static_cast<unsigned int>(order);
+          _gl->enableVertexAttribArray(_order);
+          _vertexAttribArraysEnabled[_order] = true;
+          _vertexAttribPointer(vertexBuffer, _order, vertexDeclarationi, GL::FLOAT, false,
+                               vertexStrideSize, offset);
+        }
+
+        offset += vertexDeclarationi * 4;
+      }
+    }
+  }
+
+  _bindIndexBufferWithCache(indexBuffer);
+}
+
+void ThinEngine::_unbindVertexArrayObject()
+{
+  if (!_cachedVertexArrayObject) {
+    return;
+  }
+
+  _cachedVertexArrayObject = nullptr;
+  _gl->bindVertexArray(nullptr);
+}
+
+void ThinEngine::bindBuffers(const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers,
+                             const WebGLDataBufferPtr& indexBuffer, const EffectPtr& effect)
+{
+  if (_cachedVertexBuffersMap != vertexBuffers || _cachedEffectForVertexBuffers != effect) {
+    _cachedVertexBuffersMap       = vertexBuffers;
+    _cachedEffectForVertexBuffers = effect;
+
+    _bindVertexBuffersAttributes(vertexBuffers, effect);
+  }
+
+  _bindIndexBufferWithCache(indexBuffer);
+}
+
+void ThinEngine::unbindInstanceAttributes()
+{
+  WebGLDataBufferPtr boundBuffer = nullptr;
+  for (size_t i = 0, ul = _currentInstanceLocations.size(); i < ul; ++i) {
+    const auto& instancesBuffer = _currentInstanceBuffers[i];
+    if (boundBuffer != instancesBuffer && instancesBuffer->references) {
+      boundBuffer = instancesBuffer;
+      bindArrayBuffer(instancesBuffer);
+    }
+    const auto offsetLocation = static_cast<unsigned int>(_currentInstanceLocations[i]);
+    _gl->vertexAttribDivisor(offsetLocation, 0);
+  }
+  _currentInstanceBuffers.clear();
+  _currentInstanceLocations.clear();
+}
+
+void ThinEngine::releaseVertexArrayObject(const WebGLVertexArrayObjectPtr& vao)
+{
+  _gl->deleteVertexArray(vao.get());
+}
+
+bool ThinEngine::_releaseBuffer(const WebGLDataBufferPtr& buffer)
+{
+  buffer->references--;
+
+  if (buffer->references == 0) {
+    _deleteBuffer(buffer);
+    return true;
+  }
+
+  return false;
+}
+
+void ThinEngine::_deleteBuffer(const WebGLDataBufferPtr& buffer)
+{
+  _gl->deleteBuffer(buffer->underlyingResource().get());
+}
+
+void ThinEngine::updateAndBindInstancesBuffer(
+  const WebGLDataBufferPtr& instancesBuffer, const Float32Array& data,
+  std::variant<Uint32Array, std::vector<InstancingAttributeInfo>>& offsetLocations)
+{
+  bindArrayBuffer(instancesBuffer);
+  if (!data.empty()) {
+    _gl->bufferSubData(GL::ARRAY_BUFFER, 0, data);
+  }
+
+  if (std::holds_alternative<std::vector<InstancingAttributeInfo>>(offsetLocations)) {
+    bindInstancesBuffer(instancesBuffer,
+                        std::get<std::vector<InstancingAttributeInfo>>(offsetLocations), true);
+  }
+  else if (std::holds_alternative<Uint32Array>(offsetLocations)) {
+    const auto& _offsetLocations = std::get<Uint32Array>(offsetLocations);
+    for (unsigned int index = 0; index < 4; index++) {
+      const auto offsetLocation = _offsetLocations[index];
+
+      if (!stl_util::contains(_vertexAttribArraysEnabled, offsetLocation)
+          || !_vertexAttribArraysEnabled[offsetLocation]) {
+        _gl->enableVertexAttribArray(offsetLocation);
+        _vertexAttribArraysEnabled[offsetLocation] = true;
+      }
+
+      _vertexAttribPointer(instancesBuffer, offsetLocation, 4, GL::FLOAT, false, 64,
+                           static_cast<int>(index) * 16);
+      _gl->vertexAttribDivisor(offsetLocation, 1);
+      _currentInstanceLocations.emplace_back(offsetLocation);
+      _currentInstanceBuffers.emplace_back(instancesBuffer);
+    }
+  }
+}
+
+void ThinEngine::bindInstancesBuffer(const WebGLDataBufferPtr& instancesBuffer,
+                                     std::vector<InstancingAttributeInfo>& attributesInfo,
+                                     bool computeStride)
+{
+  bindArrayBuffer(instancesBuffer);
+
+  auto stride = 0;
+  if (computeStride) {
+    for (const auto& ai : attributesInfo) {
+      stride += ai.attributeSize * 4;
+    }
+  }
+
+  for (auto& ai : attributesInfo) {
+    if (!ai.index.has_value()) {
+      ai.index = _currentEffect->getAttributeLocationByName(ai.attributeName);
+    }
+
+    if (!stl_util::contains(_vertexAttribArraysEnabled, *ai.index)
+        || !_vertexAttribArraysEnabled[*ai.index]) {
+      _gl->enableVertexAttribArray(*ai.index);
+      _vertexAttribArraysEnabled[*ai.index] = true;
+    }
+
+    _vertexAttribPointer(instancesBuffer, *ai.index, ai.attributeSize,
+                         ai.attributeType.value_or(GL::FLOAT), ai.normalized.value_or(false),
+                         stride, ai.offset);
+    _gl->vertexAttribDivisor(*ai.index, ai.divisor.value_or(1));
+    _currentInstanceLocations.emplace_back(*ai.index);
+    _currentInstanceBuffers.emplace_back(instancesBuffer);
+  }
+}
+
+void ThinEngine::disableInstanceAttributeByName(const std::string& name)
+{
+  if (!_currentEffect) {
+    return;
+  }
+
+  const auto attributeLocation = _currentEffect->getAttributeLocationByName(name);
+  if (attributeLocation >= 0) {
+    disableInstanceAttribute(static_cast<unsigned int>(attributeLocation));
+  }
+}
+
+void ThinEngine::disableInstanceAttribute(unsigned int attributeLocation)
+{
+  auto shouldClean = false;
+  auto index       = 0;
+  while ((index = stl_util::index_of(_currentInstanceLocations, attributeLocation)) != -1) {
+    stl_util::splice(_currentInstanceLocations, index, 1);
+    stl_util::splice(_currentInstanceBuffers, index, 1);
+
+    shouldClean = true;
+    index       = stl_util::index_of(_currentInstanceLocations, attributeLocation);
+  }
+
+  if (shouldClean) {
+    _gl->vertexAttribDivisor(attributeLocation, 0);
+    disableAttributeByIndex(attributeLocation);
+  }
+}
+
+void ThinEngine::disableAttributeByIndex(unsigned int attributeLocation)
+{
+  _gl->disableVertexAttribArray(attributeLocation);
+  _vertexAttribArraysEnabled[attributeLocation]    = false;
+  _currentBufferPointers[attributeLocation].active = false;
+}
+
+void ThinEngine::draw(bool useTriangles, int indexStart, int indexCount, int instancesCount)
+{
+  drawElementsType(useTriangles ? Constants::MATERIAL_TriangleFillMode :
+                                  Constants::MATERIAL_WireFrameFillMode,
+                   indexStart, indexCount, instancesCount);
+}
+
+void ThinEngine::drawPointClouds(int verticesStart, int verticesCount, int instancesCount)
+{
+  drawArraysType(Constants::MATERIAL_PointFillMode, verticesStart, verticesCount, instancesCount);
+}
+
+void ThinEngine::drawUnIndexed(bool useTriangles, int verticesStart, int verticesCount,
+                               int instancesCount)
+{
+  drawArraysType(useTriangles ? Constants::MATERIAL_TriangleFillMode :
+                                Constants::MATERIAL_WireFrameFillMode,
+                 verticesStart, verticesCount, instancesCount);
+}
+
+void ThinEngine::drawElementsType(unsigned int fillMode, int indexStart, int indexCount,
+                                  int instancesCount)
+{
+  // Apply states
+  applyStates();
+
+  _reportDrawCall();
+
+  // Render
+  const auto drawMode = _drawMode(fillMode);
+  auto indexFormat    = _uintIndicesCurrentlySet ? GL::UNSIGNED_INT : GL::UNSIGNED_SHORT;
+  auto mult           = _uintIndicesCurrentlySet ? 4 : 2;
+  if (instancesCount) {
+    _gl->drawElementsInstanced(drawMode, indexCount, indexFormat, indexStart * mult,
+                               instancesCount);
+  }
+  else {
+    _gl->drawElements(drawMode, indexCount, indexFormat, indexStart * mult);
+  }
+}
+
+void ThinEngine::drawArraysType(unsigned int fillMode, int verticesStart, int verticesCount,
+                                int instancesCount)
+{
+  // Apply states
+  applyStates();
+
+  _reportDrawCall();
+
+  // Render
+  const auto drawMode = _drawMode(fillMode);
+  if (instancesCount) {
+    _gl->drawArraysInstanced(drawMode, verticesStart, verticesCount, instancesCount);
+  }
+  else {
+    _gl->drawArrays(drawMode, verticesStart, verticesCount);
+  }
+}
+
+unsigned int ThinEngine::_drawMode(unsigned int fillMode) const
+{
+  switch (fillMode) {
+    // Triangle views
+    case Constants::MATERIAL_TriangleFillMode:
+      return GL::TRIANGLES;
+    case Constants::MATERIAL_PointFillMode:
+      return GL::POINTS;
+    case Constants::MATERIAL_WireFrameFillMode:
+      return GL::LINES;
+    // Draw modes
+    case Constants::MATERIAL_PointListDrawMode:
+      return GL::POINTS;
+    case Constants::MATERIAL_LineListDrawMode:
+      return GL::LINES;
+    case Constants::MATERIAL_LineLoopDrawMode:
+      return GL::LINE_LOOP;
+    case Constants::MATERIAL_LineStripDrawMode:
+      return GL::LINE_STRIP;
+    case Constants::MATERIAL_TriangleStripDrawMode:
+      return GL::TRIANGLE_STRIP;
+    case Constants::MATERIAL_TriangleFanDrawMode:
+      return GL::TRIANGLE_FAN;
+    default:
+      return GL::TRIANGLES;
+  }
+}
+
+void ThinEngine::_reportDrawCall()
+{
+  // Will be implemented by children
+}
 
 void ThinEngine::_releaseEffect(Effect* effect)
 {
