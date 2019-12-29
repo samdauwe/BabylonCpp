@@ -144,9 +144,9 @@ target_include_directories(${TARGET}
     PRIVATE SYSTEM
     ${EARCUT_HPP_INCLUDE_DIRS}
     ${JSON_HPP_INCLUDE_DIRS}
-    PUBLIC SYSTEM
-    ${STB_IMAGE_INCLUDE_DIR}
-    ${PROMISE_CPP_INCLUDE_DIR}
+    PUBLIC
+    $<BUILD_INTERFACE:${STB_IMAGE_INCLUDE_DIR}>
+    $<BUILD_INTERFACE:${PROMISE_CPP_INCLUDE_DIR}>
 )
 
 # Compile definitions
@@ -192,6 +192,7 @@ if(OPTION_BUILD_TESTS)
     add_subdirectory(benchmarks)
 endif()
 
+
 # ============================================================================ #
 #                       Deployment                                             #
 # ============================================================================ #
@@ -203,5 +204,10 @@ if (NOT BABYLON_DISABLE_INSTALL)
         ARCHIVE  DESTINATION ${ARCHIVE_OUTPUT_PATH}    COMPONENT dev
         RUNTIME  DESTINATION ${EXECUTABLE_OUTPUT_PATH} COMPONENT runtime
         LIBRARY  DESTINATION ${LIBRARY_OUTPUT_PATH}    COMPONENT runtime
+    )
+
+    # Make the project importable from the install directory
+    install(EXPORT "${TARGET}-export"
+        DESTINATION ${TARGET}/${CMAKE_OUTPUT_PATH}
     )
 endif()
