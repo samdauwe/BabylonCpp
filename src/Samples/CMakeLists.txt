@@ -37,8 +37,8 @@ set(META_PROJECT_DESCRIPTION "")
 set(META_AUTHOR_ORGANIZATION "")
 set(META_AUTHOR_DOMAIN       "")
 set(META_AUTHOR_MAINTAINER   "")
-set(META_VERSION_MAJOR       "3")
-set(META_VERSION_MINOR       "3")
+set(META_VERSION_MAJOR       "4")
+set(META_VERSION_MINOR       "0")
 set(META_VERSION_PATCH       "0")
 set(META_VERSION_REVISION    "${GIT_REV}")
 set(META_VERSION             "${META_VERSION_MAJOR}.${META_VERSION_MINOR}.${META_VERSION_PATCH}")
@@ -258,7 +258,7 @@ endif()
 # Libraries
 target_link_libraries(${TARGET}
     PRIVATE
-    imgui
+    #imgui
     imgui_utils
     BabylonCpp
     Extensions
