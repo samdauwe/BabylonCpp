@@ -24,8 +24,8 @@ struct BABYLON_SHARED_EXPORT ParallelShaderCompile {
 }; // end of struct ParallelShaderCompile
 
 /**
- * @brief Class used to describe the capabilities of the engine relatively to
- * the current browser.
+ * @brief Interface used to describe the capabilities of the engine relatively to the current
+ * browser.
  */
 struct BABYLON_SHARED_EXPORT EngineCapabilities {
   /** Maximum textures units per fragment shader */
@@ -36,6 +36,8 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   int maxCombinedTexturesImageUnits;
   /** Maximum texture size */
   int maxTextureSize;
+  /** Maximum texture samples */
+  int maxSamples;
   /** Maximum cube texture size */
   int maxCubemapTextureSize;
   /** Maximum render texture size */
@@ -100,11 +102,17 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   bool canUseTimestampForTimerQuery;
   /** Defines if multiview is supported
    * (https://www.khronos.org/registry/webgl/extensions/WEBGL_multiview/) */
-  bool multiview = false;
+  GL::any multiview;
+  /** Defines if oculus multiview is supported
+   * (https://developer.oculus.com/documentation/oculus-browser/latest/concepts/browser-multiview/)
+   */
+  GL::any oculusMultiview;
   /** Function used to let the system compiles shaders in background */
   std::optional<ParallelShaderCompile> parallelShaderCompile = std::nullopt;
   /** Max number of texture samples for MSAA */
   unsigned int maxMSAASamples = 1;
+  /** Defines if the blend min max extension is supported */
+  bool blendMinMax;
 }; // end of struct EngineCapabilities
 
 } // end of namespace BABYLON

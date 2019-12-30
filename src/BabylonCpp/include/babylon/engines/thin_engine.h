@@ -62,6 +62,47 @@ using WebGLUniformLocationPtr   = std::shared_ptr<GL::IGLUniformLocation>;
 class BABYLON_SHARED_EXPORT ThinEngine {
 
 public:
+  static std::vector<IInternalTextureLoaderPtr> _TextureLoaders;
+
+  /**
+   * @brief Returns the current version of the framework.
+   */
+  static std::string Version();
+
+  /**
+   * @brief Returns a string describing the current engine.
+   */
+  std::string description() const;
+
+  // Updatable statics so stick with vars here
+
+  /**
+   * Gets or sets the epsilon value used by collision engine
+   */
+  static float CollisionsEpsilon;
+
+  /**
+   * @brief Gets the relative url used to load shaders if using the engine in non-minified mode
+   */
+  static std::string ShadersRepository();
+
+  /**
+   * @brief Sets the relative url used to load shaders if using the engine in non-minified mode
+   */
+  static void setShadersRepository(const std::string& value);
+
+  /**
+   * @brief Filters the compressed texture formats to only include
+   * files that are not included in the skippable list
+   *
+   * @param url the current extension
+   * @param textureFormatInUse the current compressed texture format
+   * @returns "format" string
+   */
+  std::string excludedCompressedTextureFormats(const std::string& url,
+                                               const std::string& textureFormatInUse) const;
+
+public:
   ThinEngine();
   virtual ~ThinEngine();
 
@@ -139,7 +180,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _renderLoop();
+  virtual void _renderLoop();
 
   /**
    * @brief Gets the HTML canvas attached with the current webGL context.
@@ -197,24 +238,24 @@ public:
   /**
    * @brief Begin a new frame.
    */
-  void beginFrame();
+  virtual void beginFrame();
 
   /**
    * @brief End the current frame.
    */
-  void endFrame();
+  virtual void endFrame();
 
   /**
    * @brief Resize the view according to the canvas' size.
    */
-  void resize();
+  virtual void resize();
 
   /**
    * @brief Force a specific size of the canvas.
    * @param width defines the new canvas' width
    * @param height defines the new canvas' height
    */
-  void setSize(int width = 0, int height = 0);
+  virtual void setSize(int width = 0, int height = 0);
 
   /**
    * @brief Binds the frame buffer to the specified texture.
@@ -458,7 +499,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _deletePipelineContext(const IPipelineContextPtr& pipelineContext);
+  virtual void _deletePipelineContext(const IPipelineContextPtr& pipelineContext);
 
   /**
    * @brief Create a new effect (used to store vertex/fragment shaders).
@@ -778,9 +819,10 @@ public:
    * @param internalFormat format to use when resizing
    * @param onComplete callback to be called when resize has completed
    */
-  void _rescaleTexture(const InternalTexturePtr& source, const InternalTexturePtr& destination,
-                       Scene* scene, unsigned int internalFormat,
-                       const std::function<void()>& onComplete);
+  virtual void _rescaleTexture(const InternalTexturePtr& source,
+                               const InternalTexturePtr& destination, Scene* scene,
+                               unsigned int internalFormat,
+                               const std::function<void()>& onComplete);
 
   /**
    * @brief Creates a raw texture.
@@ -887,14 +929,14 @@ public:
    * @param wrapV defines the texture wrap mode of the v coordinates
    * @param wrapR defines the texture wrap mode of the r coordinates
    */
-  void updateTextureWrappingMode(InternalTexture* texture, std::optional<int> wrapU,
+  void updateTextureWrappingMode(const InternalTexturePtr& texture, std::optional<int> wrapU,
                                  std::optional<int> wrapV = std::nullopt,
                                  std::optional<int> wrapR = std::nullopt);
 
   /**
    * @brief Hidden
    */
-  void _setupDepthStencilTexture(InternalTexture* internalTexture,
+  void _setupDepthStencilTexture(const InternalTexturePtr& internalTexture,
                                  const std::variant<int, ISize>& size, bool generateStencil,
                                  bool bilinearFiltering, int comparisonFunction);
 
@@ -932,12 +974,12 @@ public:
   /**
    * @brief Hidden
    */
-  void _releaseFramebufferObjects(InternalTexture* texture);
+  void _releaseFramebufferObjects(const InternalTexturePtr& texture);
 
   /**
    * @brief Hidden
    */
-  virtual void _releaseTexture(InternalTexture* texture);
+  virtual void _releaseTexture(const InternalTexturePtr& texture);
 
   /**
    * @brief Binds an effect to the webGL context.
@@ -998,7 +1040,7 @@ public:
   /**
    * @brief Dispose and release all associated resources.
    */
-  void dispose();
+  virtual void dispose();
 
   /**
    * @brief Get the current error code of the webGL context.
@@ -1081,21 +1123,99 @@ public:
 
 protected:
   /**
-   * Gets the depth culling state manager
+   * @brief Gets a boolean indicating that the engine supports uniform buffers.
+   * @see http://doc.babylonjs.com/features/webgl2#uniform-buffer-objets
+   */
+  bool get_supportsUniformBuffers() const;
+
+  /**
+   * @brief Gets a boolean indicating that only power of 2 textures are supported.
+   * Please note that you can still use non power of 2 textures but in this case the engine will
+   * forcefully convert them
+   */
+  bool get_needPOTTextures() const;
+
+  /**
+   * @brief Gets a boolean indicating if resources should be retained to be able to handle context
+   * lost events.
+   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#handling-webgl-context-lost
+   */
+  bool get_doNotHandleContextLost() const;
+
+  /**
+   * @brief Sets a boolean indicating if resources should be retained to be able to handle context
+   * lost events.
+   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#handling-webgl-context-lost
+   */
+  void set_doNotHandleContextLost(bool value);
+
+  /**
+   * @brief Hidden
+   */
+  virtual bool get__supportsHardwareTextureRescaling() const;
+
+  /**
+   * @brief Gets the list of texture formats supported.
+   */
+  std::vector<std::string>& get_texturesSupported();
+
+  /**
+   * @brief Gets the list of texture formats in use.
+   */
+  std::string get_textureFormatInUse();
+
+  /**
+   * @brief Gets the current viewport.
+   */
+  Viewport& get_currentViewport();
+
+  /**.
+   * @brief Gets the default empty texture
+   */
+  InternalTexturePtr& get_emptyTexture();
+
+  /**
+   * @brief Gets the default empty 3D texture.
+   */
+  InternalTexturePtr& get_emptyTexture3D();
+
+  /**
+   * @brief Gets the default empty 2D array texture.
+   */
+  InternalTexturePtr& get_emptyTexture2DArray();
+
+  /**
+   * @brief Gets the default empty cube texture.
+   */
+  InternalTexturePtr& get_emptyCubeTexture();
+
+  /**
+   * @brief Gets version of the current webGL context.
+   */
+  float get_webGLVersion();
+
+  /**
+   * @brief Returns true if the stencil buffer has been enabled through the creation option of the
+   * context.
+   */
+  bool get_isStencilEnable() const;
+
+  /**
+   * @brief Gets the depth culling state manager.
    */
   std::unique_ptr<DepthCullingState>& get_depthCullingState();
 
   /**
-   * Gets the alpha state manager
+   * @brief Gets the alpha state manager.
    */
   std::unique_ptr<AlphaState>& get_alphaState();
 
   /**
-   * Gets the stencil state manager
+   * @brief Gets the stencil state manager.
    */
   std::unique_ptr<StencilState>& get_stencilState();
 
-  void _rebuildBuffers();
+  virtual void _rebuildBuffers();
   /** VBOs **/
   /** @hidden */
   void _resetVertexBufferBinding();
@@ -1107,7 +1227,7 @@ protected:
   virtual void _reportDrawCall();
   static std::string _ConcatenateShader(const std::string& source, const std::string& defines,
                                         const std::string& shaderVersion);
-  WebGLProgramPtr
+  virtual WebGLProgramPtr
   _createShaderProgram(const WebGLPipelineContextPtr& pipelineContext,
                        const WebGLShaderPtr& vertexShader, const WebGLShaderPtr& fragmentShader,
                        WebGLRenderingContext* context,
@@ -1138,7 +1258,7 @@ private:
   WebGLShaderPtr _compileShader(const std::string& source, const std::string& type,
                                 const std::string& defines, const std::string& shaderVersion);
   WebGLShaderPtr _compileRawShader(const std::string& source, const std::string& type);
-  unsigned int _getTextureTarget(InternalTexture* texture) const;
+  unsigned int _getTextureTarget(const InternalTexturePtr& texture) const;
   void _prepareWebGLTexture(
     const InternalTexturePtr& texture, Scene* scene, int width, int height,
     std::optional<bool> invertY, bool noMipmap, bool isCompressed,
@@ -1193,7 +1313,9 @@ public:
    */
   bool preventCacheWipeBetweenFrames = false;
 
-  /** Gets or sets a boolean indicating if the engine should validate programs after compilation */
+  /**
+   * Gets or sets a boolean indicating if the engine should validate programs after compilation
+   */
   bool validateShaderPrograms = false;
 
   /**
@@ -1201,6 +1323,7 @@ public:
    * This can provide greater z depth for distant objects.
    */
   bool useReverseDepthBuffer = false;
+
   // Uniform buffers list
 
   /**
@@ -1212,8 +1335,21 @@ public:
   /** @hidden */
   std::vector<UniformBuffer*> _uniformBuffers;
 
+  /**
+   * Gets a boolean indicating that the engine supports uniform buffers
+   * @see http://doc.babylonjs.com/features/webgl2#uniform-buffer-objets
+   */
+  ReadOnlyProperty<ThinEngine, bool> supportsUniformBuffers;
+
   /** @hidden */
-  WebGLRenderingContext* _gl;
+  WebGLRenderingContext* _gl = nullptr;
+
+  /**
+   * Gets a boolean indicating that only power of 2 textures are supported
+   * Please note that you can still use non power of 2 textures but in this case the engine will
+   * forcefully convert them
+   */
+  ReadOnlyProperty<ThinEngine, bool> needPOTTextures;
 
   /** @hidden */
   bool _badOS = false;
@@ -1241,6 +1377,13 @@ public:
   bool _doNotHandleContextLost = false;
 
   /**
+   * Gets or sets a boolean indicating if resources should be retained to be able to handle context
+   * lost events
+   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#handling-webgl-context-lost
+   */
+  Property<ThinEngine, bool> doNotHandleContextLost;
+
+  /**
    * Gets or sets a boolean indicating that vertex array object must be disabled even if they are
    * supported
    */
@@ -1263,6 +1406,57 @@ public:
   ICanvas* _workingCanvas = nullptr;
   /** @hidden */
   ICanvasRenderingContext2D* _workingContext = nullptr;
+
+  /** @hidden */
+  int _frameHandler = -1;
+
+  /** @hidden */
+  std::string _textureFormatInUse;
+
+  /**
+   * Gets the list of texture formats supported
+   */
+  ReadOnlyProperty<ThinEngine, std::vector<std::string>> texturesSupported;
+
+  /**
+   * Gets the list of texture formats in use
+   */
+  ReadOnlyProperty<ThinEngine, std::string> textureFormatInUse;
+
+  /**
+   * Gets the current viewport
+   */
+  ReadOnlyProperty<ThinEngine, Viewport> currentViewport;
+
+  /**
+   * Gets the default empty texture
+   */
+  ReadOnlyProperty<ThinEngine, InternalTexturePtr> emptyTexture;
+
+  /**
+   * Gets the default empty 3D texture
+   */
+  ReadOnlyProperty<ThinEngine, InternalTexturePtr> emptyTexture3D;
+
+  /**
+   * Gets the default empty 2D array texture
+   */
+  ReadOnlyProperty<ThinEngine, InternalTexturePtr> emptyTexture2DArray;
+
+  /**
+   * Gets the default empty cube texture
+   */
+  ReadOnlyProperty<ThinEngine, InternalTexturePtr> emptyCubeTexture;
+
+  /**
+   * Gets version of the current webGL context
+   */
+  ReadOnlyProperty<ThinEngine, float> webGLVersion;
+
+  /**
+   * Returns true if the stencil buffer has been enabled through the creation option of the context.
+   */
+  ReadOnlyProperty<ThinEngine, bool> isStencilEnable;
 
   /**
    * Gets the depth culling state manager
@@ -1331,10 +1525,10 @@ protected:
   std::unordered_map<int, WebGLDataBufferPtr> _currentBoundBuffer;
   /** @hidden */
   WebGLFramebufferPtr _currentFramebuffer = nullptr;
-  /** @hidden */
-  int _frameHandler = -1;
   // Hardware supported Compressed Textures
   std::vector<std::string> _texturesSupported;
+  /** @hidden */
+  ReadOnlyProperty<ThinEngine, bool> _supportsHardwareTextureRescaling;
 
   /**
    * Defines whether the engine has been created with the premultipliedAlpha option on or not.

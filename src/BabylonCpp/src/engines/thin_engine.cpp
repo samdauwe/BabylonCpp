@@ -1,18 +1,25 @@
 #include <babylon/engines/thin_engine.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/babylon_version.h>
 #include <babylon/core/string.h>
 #include <babylon/engines/engine_store.h>
 #include <babylon/engines/instancing_attribute_info.h>
 #include <babylon/engines/scene.h>
 #include <babylon/engines/webgl/webgl_pipeline_context.h>
 #include <babylon/interfaces/icanvas.h>
+#include <babylon/interfaces/icanvas_rendering_context2D.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/iinternal_texture_loader.h>
 #include <babylon/materials/textures/internal_texture.h>
+#include <babylon/materials/textures/loaders/dds_texture_loader.h>
+#include <babylon/materials/textures/loaders/env_texture_loader.h>
+#include <babylon/materials/textures/loaders/ktx_texture_loader.h>
+#include <babylon/materials/textures/loaders/tga_texture_loader.h>
+#include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/maths/viewport.h>
 #include <babylon/meshes/vertex_buffer.h>
@@ -22,6 +29,144 @@
 #include <babylon/states/stencil_state.h>
 
 namespace BABYLON {
+
+// Register the loaders
+std::vector<IInternalTextureLoaderPtr> ThinEngine::_TextureLoaders = {
+  std::make_shared<_DDSTextureLoader>(), // DDS Texture Loader
+  std::make_shared<_ENVTextureLoader>(), // ENV Texture Loader
+  std::make_shared<_KTXTextureLoader>(), // KTX Texture Loader
+  std::make_shared<_TGATextureLoader>()  // TGA Texture Loader
+};
+
+std::string ThinEngine::Version()
+{
+  return BABYLONCPP_VERSION;
+}
+
+std::string ThinEngine::description() const
+{
+  std::ostringstream description;
+  description << "WebGL" << webGLVersion();
+
+  if (_caps.parallelShaderCompile) {
+    description << " - Parallel shader compilation";
+  }
+
+  return description.str();
+}
+
+float ThinEngine::CollisionsEpsilon = 0.001f;
+
+std::string ThinEngine::ShadersRepository()
+{
+  return Effect::ShadersRepository;
+}
+
+void ThinEngine::setShadersRepository(const std::string& value)
+{
+  Effect::ShadersRepository = value;
+}
+
+std::string
+ThinEngine::excludedCompressedTextureFormats(const std::string& url,
+                                             const std::string& textureFormatInUse) const
+{
+  const auto skipCompression = [this, &url]() -> bool {
+    for (const auto& entry : _excludedCompressedTextures) {
+      const auto strRegExPattern = "\\b" + entry + "\\b";
+      std::regex regex(strRegExPattern, std::regex::optimize);
+      std::smatch match;
+
+      if (!url.empty()
+          && (url == entry || (std::regex_search(url, match, regex) && !match.empty()))) {
+        return true;
+      }
+      return false;
+    }
+  };
+
+  return skipCompression() ? "" : textureFormatInUse;
+}
+
+bool ThinEngine::get_supportsUniformBuffers() const
+{
+  return webGLVersion() > 1.f && !disableUniformBuffers;
+}
+
+bool ThinEngine::get_needPOTTextures() const
+{
+  return _webGLVersion < 2.f || forcePOTTextures;
+}
+
+bool ThinEngine::get_doNotHandleContextLost() const
+{
+  return _doNotHandleContextLost;
+}
+
+void ThinEngine::set_doNotHandleContextLost(bool value)
+{
+  _doNotHandleContextLost = value;
+}
+
+bool ThinEngine::get__supportsHardwareTextureRescaling() const
+{
+  return false;
+}
+
+std::string ThinEngine::get_textureFormatInUse()
+{
+  return _textureFormatInUse;
+}
+
+Viewport& ThinEngine::get_currentViewport()
+{
+  return _cachedViewport;
+}
+
+InternalTexturePtr& ThinEngine::get_emptyTexture()
+{
+  if (!_emptyTexture) {
+    _emptyTexture = createRawTexture(Uint8Array(4), 1, 1, Constants::TEXTUREFORMAT_RGBA, false,
+                                     false, Constants::TEXTURE_NEAREST_SAMPLINGMODE);
+  }
+
+  return _emptyTexture;
+}
+
+InternalTexturePtr& ThinEngine::get_emptyTexture3D()
+{
+  if (!_emptyTexture3D) {
+    _emptyTexture3D = createRawTexture3D(Uint8Array(4), 1, 1, 1, Constants::TEXTUREFORMAT_RGBA,
+                                         false, false, Constants::TEXTURE_NEAREST_SAMPLINGMODE);
+  }
+
+  return _emptyTexture3D;
+}
+
+InternalTexturePtr& ThinEngine::get_emptyTexture2DArray()
+{
+  if (!_emptyTexture2DArray) {
+    _emptyTexture2DArray
+      = createRawTexture2DArray(Uint8Array(4), 1, 1, 1, Constants::TEXTUREFORMAT_RGBA, false, false,
+                                Constants::TEXTURE_NEAREST_SAMPLINGMODE);
+  }
+
+  return _emptyTexture2DArray;
+}
+
+InternalTexturePtr& ThinEngine::get_emptyCubeTexture()
+{
+  if (!_emptyCubeTexture) {
+    Uint8Array faceData(4);
+    std::vector<ArrayBufferView> cubeData{faceData, faceData, faceData,
+                                          faceData, faceData, faceData};
+    _emptyCubeTexture = createRawCubeTexture(cubeData, 1, Constants::TEXTUREFORMAT_RGBA,
+                                             Constants::TEXTURETYPE_UNSIGNED_INT, false, false,
+                                             Constants::TEXTURE_NEAREST_SAMPLINGMODE);
+  }
+
+  return _emptyCubeTexture;
+}
 
 void ThinEngine::_rebuildInternalTextures()
 {
@@ -67,11 +212,181 @@ void ThinEngine::_rebuildBuffers()
 
 void ThinEngine::_initGLContext()
 {
+  // Caps
+  _caps.maxTexturesImageUnits         = _gl->getParameteri(GL::MAX_TEXTURE_IMAGE_UNITS);
+  _caps.maxCombinedTexturesImageUnits = _gl->getParameteri(GL::MAX_COMBINED_TEXTURE_IMAGE_UNITS);
+  _caps.maxVertexTextureImageUnits    = _gl->getParameteri(GL::MAX_VERTEX_TEXTURE_IMAGE_UNITS);
+  _caps.maxTextureSize                = _gl->getParameteri(GL::MAX_TEXTURE_SIZE);
+  _caps.maxSamples                = _webGLVersion > 1.f ? _gl->getParameteri(GL::MAX_SAMPLES) : 1;
+  _caps.maxCubemapTextureSize     = _gl->getParameteri(GL::MAX_CUBE_MAP_TEXTURE_SIZE);
+  _caps.maxRenderTextureSize      = _gl->getParameteri(GL::MAX_RENDERBUFFER_SIZE);
+  _caps.maxVertexAttribs          = _gl->getParameteri(GL::MAX_VERTEX_ATTRIBS);
+  _caps.maxVaryingVectors         = _gl->getParameteri(GL::MAX_VARYING_VECTORS);
+  _caps.maxFragmentUniformVectors = _gl->getParameteri(GL::MAX_FRAGMENT_UNIFORM_VECTORS);
+  _caps.maxVertexUniformVectors   = _gl->getParameteri(GL::MAX_VERTEX_UNIFORM_VECTORS);
+  _caps.parallelShaderCompile
+    = _gl->getExtension("KHR_parallel_shader_compile") ? std::nullopt : std::nullopt;
+  _caps.standardDerivatives
+    = _webGLVersion > 1.f || (_gl->getExtension("OES_standard_derivatives") != nullptr);
+  _caps.maxAnisotropy = 1;
+  _caps.astc          = _gl->getExtension("WEBGL_compressed_texture_astc") ?
+                 _gl->getExtension("WEBGL_compressed_texture_astc") :
+                 _gl->getExtension("WEBKIT_WEBGL_compressed_texture_astc");
+  _caps.s3tc = (_gl->getExtension("WEBGL_compressed_texture_s3tc")
+                || _gl->getExtension("WEBKIT_WEBGL_compressed_texture_s3tc")) ?
+                 std::nullopt :
+                 std::nullopt;
+  _caps.pvrtc = _gl->getExtension("WEBGL_compressed_texture_pvrtc") ?
+                  _gl->getExtension("WEBGL_compressed_texture_pvrtc") :
+                  _gl->getExtension("WEBKIT_WEBGL_compressed_texture_pvrtc");
+  _caps.etc1 = _gl->getExtension("WEBGL_compressed_texture_etc1") ?
+                 _gl->getExtension("WEBGL_compressed_texture_etc1") :
+                 _gl->getExtension("WEBKIT_WEBGL_compressed_texture_etc1");
+  _caps.etc2
+    = _gl->getExtension("WEBGL_compressed_texture_etc") ?
+        _gl->getExtension("WEBGL_compressed_texture_etc") :
+        _gl->getExtension("WEBKIT_WEBGL_compressed_texture_etc") ?
+        _gl->getExtension("WEBKIT_WEBGL_compressed_texture_etc") :
+        _gl->getExtension("WEBGL_compressed_texture_es3_0"); // also a requirement of OpenGL ES 3
+  _caps.textureAnisotropicFilterExtension
+    = (_gl->getExtension("EXT_texture_filter_anisotropic")
+       || _gl->getExtension("WEBKIT_EXT_texture_filter_anisotropic")
+       || _gl->getExtension("MOZ_EXT_texture_filter_anisotropic")) ?
+        std::nullopt :
+        std::nullopt;
+  _caps.uintIndices = _webGLVersion > 1.f || _gl->getExtension("OES_element_index_uint") != nullptr;
+  _caps.fragmentDepthSupported
+    = _webGLVersion > 1 || _gl->getExtension("EXT_frag_depth") != nullptr;
+  _caps.highPrecisionShaderSupported = false;
+  _caps.timerQuery                   = _gl->getExtension("EXT_disjoint_timer_query_webgl2")
+                         || _gl->getExtension("EXT_disjoint_timer_query") ?
+                       nullptr :
+                       nullptr;
+  _caps.canUseTimestampForTimerQuery = false;
+  _caps.drawBuffersExtension         = false;
+  _caps.maxMSAASamples               = 1;
+  _caps.colorBufferFloat = _webGLVersion > 1 && _gl->getExtension("EXT_color_buffer_float");
+  _caps.textureFloat = (_webGLVersion > 1 || _gl->getExtension("OES_texture_float")) ? true : false;
+  _caps.textureHalfFloat
+    = (_webGLVersion > 1 || _gl->getExtension("OES_texture_half_float")) ? true : false;
+  _caps.textureHalfFloatRender          = false;
+  _caps.textureFloatLinearFiltering     = false;
+  _caps.textureFloatRender              = false;
+  _caps.textureHalfFloatLinearFiltering = false;
+  _caps.vertexArrayObject               = false;
+  _caps.instancedArrays                 = false;
+  _caps.textureLOD
+    = (_webGLVersion > 1.f || _gl->getExtension("EXT_shader_texture_lod")) ? true : false;
+  _caps.blendMinMax           = false;
+  _caps.multiview             = _gl->getExtension("OVR_multiview2");
+  _caps.oculusMultiview       = _gl->getExtension("OCULUS_multiview");
+  _caps.depthTextureExtension = false;
+
+  // Infos
+  _glVersion  = _gl->getString(GL::VERSION);
+  _glRenderer = _gl->getString(GL::RENDERER);
+  _glVendor   = _gl->getString(GL::VENDOR);
+
+  if (_glVendor.empty()) {
+    _glVendor = "Unknown vendor";
+  }
+
+  if (_glRenderer.empty()) {
+    _glRenderer = "Unknown renderer";
+  }
+
+  // Extensions
+  auto extensionList = String::split(_gl->getString(GL::EXTENSIONS), ' ');
+  std::set<std::string> extensions;
+  for (const auto& extension : extensionList) {
+    extensions.insert(extension);
+  }
+
+  _caps.maxAnisotropy
+    = static_cast<unsigned>(_gl->getParameteri(GL::MAX_TEXTURE_MAX_ANISOTROPY_EXT));
+  _caps.uintIndices                  = (_webGLVersion > 1.f);
+  _caps.fragmentDepthSupported       = (_webGLVersion > 1.f);
+  _caps.highPrecisionShaderSupported = false;
+
+  // Checks if some of the format renders first to allow the use of webgl inspector.
+  _caps.colorBufferFloat = (_webGLVersion > 1.f);
+
+  _caps.textureFloat
+    = (_webGLVersion > 1.f) || stl_util::contains(extensions, "GL_ARB_texture_float");
+  _caps.textureFloatLinearFiltering = _caps.textureFloat;
+  _caps.textureFloatRender          = _caps.textureFloat && _canRenderToFloatFramebuffer();
+
+  _caps.textureHalfFloat                = (_webGLVersion > 1.f);
+  _caps.textureHalfFloatLinearFiltering = (_webGLVersion > 1.f);
+  if (_webGLVersion > 1) {
+    _gl->HALF_FLOAT_OES = 0x140B;
+  }
+  _caps.textureHalfFloatRender = _caps.textureHalfFloat && _canRenderToHalfFloatFramebuffer();
+
+  _caps.textureLOD = (_webGLVersion > 1.f);
+
+  _caps.multiview = nullptr;
+
+  // Draw buffers
+  if (_webGLVersion > 1.f) {
+    _caps.drawBuffersExtension = true;
+  }
+
+  // Shader compiler threads
+  _caps.parallelShaderCompile = std::nullopt;
+
+  // Depth Texture
+  if (_webGLVersion > 1.f) {
+    _caps.depthTextureExtension = true;
+  }
+
+  // Vertex array object
+  if (disableVertexArrayObjects) {
+    _caps.vertexArrayObject = false;
+  }
+  else if (_webGLVersion > 1.f) {
+    _caps.vertexArrayObject = true;
+  }
+
+  // Instances count
+  if (_webGLVersion > 1.f) {
+    _caps.instancedArrays = true;
+  }
+
+  if (_webGLVersion > 1.f) {
+    _caps.blendMinMax = true;
+  }
+
+  auto highp = _gl->getShaderPrecisionFormat(GL::FRAGMENT_SHADER, GL::HIGH_FLOAT);
+  if (highp) {
+    _caps.highPrecisionShaderSupported = highp ? highp->precision != 0 : false;
+  }
+
+  // Depth buffer
+  _depthCullingState->depthTest = true;
+  _depthCullingState->depthFunc = GL::LEQUAL;
+  _depthCullingState->depthMask = true;
+
+  // Texture maps
+  _maxSimultaneousTextures = static_cast<unsigned>(_caps.maxCombinedTexturesImageUnits);
+  for (unsigned int slot = 0; slot < _maxSimultaneousTextures; ++slot) {
+    _nextFreeTextureSlots.emplace_back(slot);
+  }
+}
+
+float ThinEngine::get_webGLVersion()
+{
+  return _webGLVersion;
 }
 
 std::string ThinEngine::getClassName() const
 {
   return "ThinEngine";
+}
+
+bool ThinEngine::get_isStencilEnable() const
+{
+  return _isStencilEnable;
 }
 
 void ThinEngine::_prepareWorkingCanvas()
@@ -420,7 +735,7 @@ void ThinEngine::restoreDefaultFramebuffer()
 void ThinEngine::_resetVertexBufferBinding()
 {
   bindArrayBuffer(nullptr);
-  _cachedVertexBuffers = nullptr;
+  _cachedVertexBuffers.clear();
 }
 
 WebGLDataBufferPtr ThinEngine::createVertexBuffer(const Float32Array& data)
@@ -489,7 +804,7 @@ WebGLDataBufferPtr ThinEngine::createIndexBuffer(const IndicesArray& indices, bo
 void ThinEngine::_normalizeIndexData(const IndicesArray& indices, Uint16Array& uint16ArrayResult,
                                      Uint32Array& uint32ArrayResult)
 {
-  // Check for 32 bits indices
+  // Check 32 bit support
   if (_caps.uintIndices) {
     // number[] or Int32Array, check if 32 bit is necessary
     using namespace std::placeholders;
@@ -627,8 +942,8 @@ void ThinEngine::_bindVertexBuffersAttributes(
     auto order = effect->getAttributeLocation(index);
 
     if (order >= 0) {
-      _order             = static_cast<unsigned int>(order);
-      auto& vertexBuffer = vertexBuffers.at(attributes[index]);
+      _order                   = static_cast<unsigned int>(order);
+      const auto& vertexBuffer = vertexBuffers.at(attributes[index]);
 
       if (!vertexBuffer) {
         continue;
@@ -686,8 +1001,8 @@ void ThinEngine::bindVertexArrayObject(const WebGLVertexArrayObjectPtr& vertexAr
     _cachedVertexArrayObject = vertexArrayObject;
 
     _gl->bindVertexArray(vertexArrayObject.get());
-    _cachedVertexBuffers = nullptr;
-    _cachedIndexBuffer   = nullptr;
+    _cachedVertexBuffers.clear();
+    _cachedIndexBuffer = nullptr;
 
     _uintIndicesCurrentlySet  = indexBuffer != nullptr && indexBuffer->is32Bits;
     _mustWipeVertexAttributes = true;
@@ -1520,7 +1835,7 @@ void ThinEngine::wipeCaches(bool bruteForce)
     _stencilState.reset();
 
     _depthCullingState.reset();
-    _depthCullingState.depthFunc = GL::LEQUAL;
+    _depthCullingState->depthFunc = GL::LEQUAL;
 
     _alphaState.reset();
     _alphaMode     = Constants::ALPHA_ADD;
@@ -1815,7 +2130,7 @@ InternalTexturePtr ThinEngine::createTexture(
           auto maxTextureSize = _caps.maxTextureSize;
 
           if (img.width > maxTextureSize || img.height > maxTextureSize
-              || Engine::_RescalePostProcessFactory == nullptr) {
+              || !_supportsHardwareTextureRescaling) {
             _prepareWorkingCanvas();
             if (!_workingCanvas || !_workingContext) {
               return false;
@@ -1889,7 +2204,7 @@ int ThinEngine::_getUnpackAlignement()
   return _gl->getParameteri(GL::UNPACK_ALIGNMENT);
 }
 
-unsigned int ThinEngine::_getTextureTarget(InternalTexture* texture) const
+unsigned int ThinEngine::_getTextureTarget(const InternalTexturePtr& texture) const
 {
   if (texture->isCube) {
     return GL::TEXTURE_CUBE_MAP;
@@ -1922,13 +2237,14 @@ void ThinEngine::updateTextureSamplingMode(unsigned int samplingMode,
   texture->samplingMode = samplingMode;
 }
 
-void ThinEngine::updateTextureWrappingMode(InternalTexture* texture, std::optional<int> wrapU,
-                                           std::optional<int> wrapV, std::optional<int> wrapR)
+void ThinEngine::updateTextureWrappingMode(const InternalTexturePtr& texture,
+                                           std::optional<int> wrapU, std::optional<int> wrapV,
+                                           std::optional<int> wrapR)
 {
   const auto target = _getTextureTarget(texture);
 
   if (wrapU) {
-    _setTextureParameterInteger(target, GL::TEXTURE_WRAP_S, _getTextureWrapMode(*wrapU), texture);
+    _setTextureParameterInteger(target, GL::TEXTURE_WRAP_S, _getTextureWrapMode(*wrapU)), texture);
     texture->_cachedWrapU = *wrapU;
   }
   if (wrapV) {
@@ -1943,7 +2259,7 @@ void ThinEngine::updateTextureWrappingMode(InternalTexture* texture, std::option
   _bindTextureDirectly(target, nullptr);
 }
 
-void ThinEngine::_setupDepthStencilTexture(InternalTexture* internalTexture,
+void ThinEngine::_setupDepthStencilTexture(const InternalTexturePtr& internalTexture,
                                            const std::variant<int, ISize>& size,
                                            bool generateStencil, bool bilinearFiltering,
                                            int comparisonFunction)
@@ -2172,7 +2488,7 @@ WebGLRenderbufferPtr ThinEngine::_getDepthStencilBuffer(int width, int height, i
   return depthStencilBuffer;
 }
 
-void ThinEngine::_releaseFramebufferObjects(InternalTexture* texture)
+void ThinEngine::_releaseFramebufferObjects(const InternalTexturePtr& texture)
 {
   auto& gl = *_gl;
 
@@ -2197,7 +2513,7 @@ void ThinEngine::_releaseFramebufferObjects(InternalTexture* texture)
   }
 }
 
-void ThinEngine::_releaseTexture(InternalTexture* texture)
+void ThinEngine::_releaseTexture(const InternalTexturePtr& texture)
 {
   _releaseFramebufferObjects(texture);
 
@@ -2206,7 +2522,7 @@ void ThinEngine::_releaseTexture(InternalTexture* texture)
   // Unbind channels
   unbindAllTextures();
 
-  stl_util::remove_vector_elements_equal_sharedptr(_internalTexturesCache, texture);
+  stl_util::remove_vector_elements_equal_sharedptr(_internalTexturesCache, texture.get());
 
   // Integrated fixed lod samplers.
   if (texture->_lodTextureHigh) {
@@ -2357,7 +2673,7 @@ void ThinEngine::_bindSamplerUniformToChannel(int sourceSlot, int destination)
   if (!uniform || uniform->_currentState == destination) {
     return;
   }
-  _gl->uniform1i(uniform, destination);
+  _gl->uniform1i(uniform.get(), destination);
   uniform->_currentState = destination;
 }
 
@@ -2594,7 +2910,7 @@ void ThinEngine::unbindAllAttributes()
   if (_mustWipeVertexAttributes) {
     _mustWipeVertexAttributes = false;
 
-    for (int i = 0; i < _caps.maxVertexAttribs; i++) {
+    for (unsigned int i = 0, ul = static_cast<unsigned int>(_caps.maxVertexAttribs); i < ul; ++i) {
       disableAttributeByIndex(i);
     }
     return;
@@ -2625,17 +2941,17 @@ void ThinEngine::dispose()
   stopRenderLoop();
 
   // Clear observables
-  if (onBeforeTextureInitObservable) {
+  /* if (onBeforeTextureInitObservable) */ {
     onBeforeTextureInitObservable.clear();
   }
 
   // Empty texture
   if (_emptyTexture) {
-    _releaseTexture(_emptyTexture);
+    _releaseTexture(_emptyTexture.get());
     _emptyTexture = nullptr;
   }
   if (_emptyCubeTexture) {
-    _releaseTexture(_emptyCubeTexture);
+    _releaseTexture(_emptyCubeTexture.get());
     _emptyCubeTexture = nullptr;
   }
 
@@ -2844,7 +3160,7 @@ unsigned int
 ThinEngine::_getRGBABufferInternalSizedFormat(unsigned int type,
                                               const std::optional<unsigned int>& format) const
 {
-  const auto _format = format.value_or(std::numeric_limits<unsigned>::max());
+  const auto _format = format.value_or(std::numeric_limits<unsigned int>::max());
 
   if (_webGLVersion == 1.f) {
     if (format.has_value()) {

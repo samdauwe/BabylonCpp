@@ -1532,6 +1532,14 @@ public:
   virtual GLint getAttribLocation(IGLProgram* program, const std::string& name) = 0;
 
   /**
+   * @brief Enables a GL extension.
+   * @param name A String for the name of the GL extension to enable.
+   * @return A GL extension object, or null if name does not match (case-insensitive) to one of the
+   * strings in WebGLRenderingContext.getSupportedExtensions.
+   */
+  virtual GL::any getExtension(const std::string& name);
+
+  /**
    * @brief Returns true if the specified GL extension is supported.
    * @param extension A String specifying the extension to query.
    * @return A GLboolean indicating whether or not the GL extension is
