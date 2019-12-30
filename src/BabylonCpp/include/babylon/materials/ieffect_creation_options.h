@@ -1,5 +1,5 @@
-#ifndef BABYLON_MATERIALS_EFFECT_CREATE_OPTIONS_H
-#define BABYLON_MATERIALS_EFFECT_CREATE_OPTIONS_H
+#ifndef BABYLON_MATERIALS_IEFFECT_CREATE_OPTIONS_H
+#define BABYLON_MATERIALS_IEFFECT_CREATE_OPTIONS_H
 
 #include <functional>
 #include <memory>
@@ -16,7 +16,7 @@ using EffectPtr = std::shared_ptr<Effect>;
 /**
  * @brief Options to be used when creating an effect.
  */
-struct BABYLON_SHARED_EXPORT EffectCreationOptions {
+struct BABYLON_SHARED_EXPORT IEffectCreationOptions {
   /**
    * Atrributes that will be used in the shader.
    */
@@ -33,11 +33,6 @@ struct BABYLON_SHARED_EXPORT EffectCreationOptions {
    * Sampler texture variable names that will be set in the shader.
    */
   std::vector<std::string> samplers{};
-  /**
-   * See
-   * https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/transformFeedbackVaryings
-   */
-  std::vector<std::string> transformFeedbackVaryings{};
   /**
    * MaterialDefines pointer.
    */
@@ -57,8 +52,7 @@ struct BABYLON_SHARED_EXPORT EffectCreationOptions {
   /**
    * Callback that will be called if an error occurs during shader compilation.
    */
-  std::function<void(Effect* effect, const std::string& errors)> onError{
-    nullptr};
+  std::function<void(Effect* effect, const std::string& errors)> onError{nullptr};
   /**
    * Parameters to be used with Babylons include syntax to iterate over an array
    * (eg. {lights: 10})
@@ -72,8 +66,13 @@ struct BABYLON_SHARED_EXPORT EffectCreationOptions {
    * Max number of lights that can be used in the shader.
    */
   unsigned int maxSimultaneousLights{4};
-}; // end of class EffectCreationOptions
+  /**
+   * See
+   * https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/transformFeedbackVaryings
+   */
+  std::vector<std::string> transformFeedbackVaryings{};
+}; // end of class IEffectCreationOptions
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_MATERIALS_EFFECT_CREATE_OPTIONS_H
+#endif // end of BABYLON_MATERIALS_IEFFECT_CREATE_OPTIONS_H
