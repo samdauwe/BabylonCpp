@@ -500,6 +500,7 @@ void UniformBuffer::bindToEffect(Effect* effect, const std::string& name)
     return;
   }
 
+  _alreadyBound = true;
   effect->bindUniformBuffer(_buffer, name);
 }
 
