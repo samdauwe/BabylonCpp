@@ -5,6 +5,7 @@
 #include <babylon/core/string.h>
 #include <babylon/engines/engine_store.h>
 #include <babylon/engines/extensions/alpha_extension.h>
+#include <babylon/engines/extensions/cube_texture_extension.h>
 #include <babylon/engines/instancing_attribute_info.h>
 #include <babylon/engines/scene.h>
 #include <babylon/engines/webgl/webgl_pipeline_context.h>
@@ -3429,6 +3430,43 @@ void ThinEngine::setAlphaEquation(unsigned int equation)
 unsigned int ThinEngine::getAlphaEquation() const
 {
   return _alphaExtension->getAlphaEquation();
+}
+
+//------------------------------------------------------------------------------------------------
+//                              Cube Texture Extension
+//------------------------------------------------------------------------------------------------
+
+InternalTexturePtr
+ThinEngine::_createDepthStencilCubeTexture(int size, const DepthTextureCreationOptions& options)
+{
+  return _cubeTextureExtension->_createDepthStencilCubeTexture(size, options);
+}
+
+InternalTexturePtr ThinEngine::createCubeTexture(
+  std::string rootUrl, Scene* scene, const std::vector<std::string>& files, bool noMipmap,
+  const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
+  const std::function<void(const std::string& message, const std::string& exception)>& onError,
+  unsigned int format, const std::string& forcedExtension, bool createPolynomials, float lodScale,
+  float lodOffset, const InternalTexturePtr& fallback,
+  const std::vector<IInternalTextureLoaderPtr>& excludeLoaders)
+{
+  return _cubeTextureExtension->createCubeTexture(rootUrl, scene, files, noMipmap, onLoad, onError,
+                                                  format, forcedExtension, createPolynomials,
+                                                  lodScale, lodOffset, fallback, excludeLoaders);
+}
+
+void ThinEngine::_cascadeLoadImgs(
+  const std::string& rootUrl, Scene* scene,
+  const std::function<void(const std::vector<Image>& images)>& onfinish,
+  const std::vector<std::string>& files,
+  const std::function<void(const std::string& message, const std::string& exception)>& onError)
+{
+  _cubeTextureExtension->_cascadeLoadImgs(rootUrl, scene, onfinish, files, onError);
+}
+
+void ThinEngine::_setCubeMapTextureParams(bool loadMipmap)
+{
+  _cubeTextureExtension->_setCubeMapTextureParams(loadMipmap);
 }
 
 } // end of namespace BABYLON
