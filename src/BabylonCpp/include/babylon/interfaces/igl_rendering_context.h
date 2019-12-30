@@ -70,10 +70,13 @@ enum GLEnums : GLenum {
   DST_COLOR           = 0x0306,
   ONE_MINUS_DST_COLOR = 0x0307,
   SRC_ALPHA_SATURATE  = 0x0308,
-  /* BlendEquationSeparate */
+  /* BlendEquationSeparate  */
   FUNC_ADD       = 0x8006,
   BLEND_EQUATION = 0x8009,
-  /* same as BLEND_EQUATION*/
+  /* MIN / MAX */
+  MIN = 0x8007,
+  MAX = 0x8008,
+  /* same as BLEND_EQUATION */
   BLEND_EQUATION_RGB   = 0x8009,
   BLEND_EQUATION_ALPHA = 0x883D,
   /* BlendSubtract */

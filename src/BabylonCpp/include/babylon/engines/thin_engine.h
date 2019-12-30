@@ -17,6 +17,7 @@
 
 namespace BABYLON {
 
+class AlphaExtension;
 class AlphaState;
 class BaseTexture;
 class DepthCullingState;
@@ -1121,6 +1122,47 @@ public:
    */
   static int GetExponentOfTwo(int value, int max, unsigned int mode = Constants::SCALEMODE_NEAREST);
 
+  //------------------------------------------------------------------------------------------------
+  //                              Alpha Extension
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * @brief Sets alpha constants used by some alpha blending modes.
+   * @param r defines the red component
+   * @param g defines the green component
+   * @param b defines the blue component
+   * @param a defines the alpha component
+   */
+  void setAlphaConstants(float r, float g, float b, float a);
+
+  /**
+   * @brief Sets the current alpha mode.
+   * @param mode defines the mode to use (one of the Engine.ALPHA_XXX)
+   * @param noDepthWriteChange defines if depth writing state should remains unchanged (false by
+   * default)
+   * @see http://doc.babylonjs.com/resources/transparency_and_how_meshes_are_rendered
+   */
+  void setAlphaMode(unsigned int mode, bool noDepthWriteChange = false);
+
+  /**
+   * @brief Gets the current alpha mode.
+   * @see http://doc.babylonjs.com/resources/transparency_and_how_meshes_are_rendered
+   * @returns the current alpha mode
+   */
+  unsigned int getAlphaMode() const;
+
+  /**
+   * @brief Sets the current alpha equation.
+   * @param equation defines the equation to use (one of the Engine.ALPHA_EQUATION_XXX)
+   */
+  void setAlphaEquation(unsigned int equation);
+
+  /**
+   * @brief Gets the current alpha equation.
+   * @returns the current alpha equation
+   */
+  unsigned int getAlphaEquation() const;
+
 protected:
   /**
    * @brief Gets a boolean indicating that the engine supports uniform buffers.
@@ -1580,6 +1622,9 @@ private:
   Vector4 _viewportCached;
 
   std::optional<bool> _unpackFlipYCached = std::nullopt;
+
+  /** Extensions */
+  std::unique_ptr<AlphaExtension> _alphaExtension;
 
 }; // end of class ThinEngine
 

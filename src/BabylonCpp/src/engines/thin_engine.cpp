@@ -4,6 +4,7 @@
 #include <babylon/babylon_version.h>
 #include <babylon/core/string.h>
 #include <babylon/engines/engine_store.h>
+#include <babylon/engines/extensions/alpha_extension.h>
 #include <babylon/engines/instancing_attribute_info.h>
 #include <babylon/engines/scene.h>
 #include <babylon/engines/webgl/webgl_pipeline_context.h>
@@ -3399,6 +3400,35 @@ int ThinEngine::GetExponentOfTwo(int value, int max, unsigned int mode)
   }
 
   return std::min(pot, max);
+}
+
+//--------------------------------------------------------------------------------------------------
+//                              Alpha Extension
+//--------------------------------------------------------------------------------------------------
+
+void ThinEngine::setAlphaConstants(float r, float g, float b, float a)
+{
+  _alphaExtension->setAlphaConstants(r, g, b, a);
+}
+
+void ThinEngine::setAlphaMode(unsigned int mode, bool noDepthWriteChange)
+{
+  _alphaExtension->setAlphaMode(mode, noDepthWriteChange);
+}
+
+unsigned int ThinEngine::getAlphaMode() const
+{
+  return _alphaExtension->getAlphaMode();
+}
+
+void ThinEngine::setAlphaEquation(unsigned int equation)
+{
+  _alphaExtension->setAlphaEquation(equation);
+}
+
+unsigned int ThinEngine::getAlphaEquation() const
+{
+  return _alphaExtension->getAlphaEquation();
 }
 
 } // end of namespace BABYLON
