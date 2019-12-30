@@ -6,38 +6,82 @@
 namespace BABYLON {
 
 /**
- * @brief Defines the cross module used constants to avoid circular
- * dependencies.
+ * @brief Defines the cross module used constants to avoid circular dependencies.
  */
 struct BABYLON_SHARED_EXPORT Constants {
   /** Defines that alpha blending is disabled */
   static constexpr unsigned int ALPHA_DISABLE = 0;
-  /** Defines that alpha blending to SRC ALPHA * SRC + DEST */
+  /** Defines that alpha blending is SRC ALPHA * SRC + DEST */
   static constexpr unsigned int ALPHA_ADD = 1;
-  /** Defines that alpha blending to SRC ALPHA * SRC + (1 - SRC ALPHA) * DEST */
+  /** Defines that alpha blending is SRC ALPHA * SRC + (1 - SRC ALPHA) * DEST */
   static constexpr unsigned int ALPHA_COMBINE = 2;
-  /** Defines that alpha blending to DEST - SRC * DEST */
+  /** Defines that alpha blending is DEST - SRC * DEST */
   static constexpr unsigned int ALPHA_SUBTRACT = 3;
-  /** Defines that alpha blending to SRC * DEST */
+  /** Defines that alpha blending is SRC * DEST */
   static constexpr unsigned int ALPHA_MULTIPLY = 4;
-  /** Defines that alpha blending to SRC ALPHA * SRC + (1 - SRC) * DEST */
+  /** Defines that alpha blending is SRC ALPHA * SRC + (1 - SRC) * DEST */
   static constexpr unsigned int ALPHA_MAXIMIZED = 5;
-  /** Defines that alpha blending to SRC + DEST */
+  /** Defines that alpha blending is SRC + DEST */
   static constexpr unsigned int ALPHA_ONEONE = 6;
-  /** Defines that alpha blending to SRC + (1 - SRC ALPHA) * DEST */
+  /** Defines that alpha blending is SRC + (1 - SRC ALPHA) * DEST */
   static constexpr unsigned int ALPHA_PREMULTIPLIED = 7;
   /**
-   * Defines that alpha blending to SRC + (1 - SRC ALPHA) * DEST
+   * Defines that alpha blending is SRC + (1 - SRC ALPHA) * DEST
    * Alpha will be set to (1 - SRC ALPHA) * DEST ALPHA
    */
   static constexpr unsigned int ALPHA_PREMULTIPLIED_PORTERDUFF = 8;
-  /** Defines that alpha blending to CST * SRC + (1 - CST) * DEST */
+  /** Defines that alpha blending is CST * SRC + (1 - CST) * DEST */
   static constexpr unsigned int ALPHA_INTERPOLATE = 9;
   /**
-   * Defines that alpha blending to SRC + (1 - SRC) * DEST
+   * Defines that alpha blending is SRC + (1 - SRC) * DEST
    * Alpha will be set to SRC ALPHA + (1 - SRC ALPHA) * DEST ALPHA
    */
   static constexpr unsigned int ALPHA_SCREENMODE = 10;
+  /**
+   * Defines that alpha blending is SRC + DST
+   * Alpha will be set to SRC ALPHA + DST ALPHA
+   */
+  static constexpr unsigned int ALPHA_ONEONE_ONEONE = 11;
+  /**
+   * Defines that alpha blending is SRC * DST ALPHA + DST
+   * Alpha will be set to 0
+   */
+  static constexpr unsigned int ALPHA_ALPHATOCOLOR = 12;
+  /**
+   * Defines that alpha blending is SRC * (1 - DST) + DST * (1 - SRC)
+   */
+  static constexpr unsigned int ALPHA_REVERSEONEMINUS = 13;
+  /**
+   * Defines that alpha blending is SRC + DST * (1 - SRC ALPHA)
+   * Alpha will be set to SRC ALPHA + DST ALPHA * (1 - SRC ALPHA)
+   */
+  static constexpr unsigned int ALPHA_SRC_DSTONEMINUSSRCALPHA = 14;
+  /**
+   * Defines that alpha blending is SRC + DST
+   * Alpha will be set to SRC ALPHA
+   */
+  static constexpr unsigned int ALPHA_ONEONE_ONEZERO = 15;
+  /**
+   * Defines that alpha blending is SRC * (1 - DST) + DST * (1 - SRC)
+   * Alpha will be set to DST ALPHA
+   */
+  static constexpr unsigned int ALPHA_EXCLUSION = 16;
+
+  /** Defines that alpha blending equation a SUM */
+  static constexpr unsigned int ALPHA_EQUATION_ADD = 0;
+  /** Defines that alpha blending equation a SUBSTRACTION */
+  static constexpr unsigned int ALPHA_EQUATION_SUBSTRACT = 1;
+  /** Defines that alpha blending equation a REVERSE SUBSTRACTION */
+  static constexpr unsigned int ALPHA_EQUATION_REVERSE_SUBTRACT = 2;
+  /** Defines that alpha blending equation a MAX operation */
+  static constexpr unsigned int ALPHA_EQUATION_MAX = 3;
+  /** Defines that alpha blending equation a MIN operation */
+  static constexpr unsigned int ALPHA_EQUATION_MIN = 4;
+  /**
+   * Defines that alpha blending equation a DARKEN operation:
+   * It takes the min of the src and sums the alpha channels.
+   */
+  static constexpr unsigned int ALPHA_EQUATION_DARKEN = 5;
 
   /** Defines that the ressource is not delayed*/
   static constexpr unsigned int DELAYLOADSTATE_NONE = 0;
@@ -49,54 +93,45 @@ struct BABYLON_SHARED_EXPORT Constants {
   static constexpr unsigned int DELAYLOADSTATE_NOTLOADED = 4;
 
   // Depht or Stencil test Constants.
-  /** Passed to depthFunction or stencilFunction to specify depth or stencil
-   * tests will never pass. i.e. Nothing will be drawn */
+  /** Passed to depthFunction or stencilFunction to specify depth or stencil tests will never pass.
+   * i.e. Nothing will be drawn */
   static constexpr unsigned int NEVER = 0x0200;
-  /** Passed to depthFunction or stencilFunction to specify depth or stencil
-   * tests will always pass. i.e. Pixels will be drawn in the order they are
-   * drawn */
+  /** Passed to depthFunction or stencilFunction to specify depth or stencil tests will always pass.
+   * i.e. Pixels will be drawn in the order they are drawn */
   static constexpr unsigned int ALWAYS = 0x0207;
-  /** Passed to depthFunction or stencilFunction to specify depth or stencil
-   * tests will pass if the new depth value is less than the stored value */
+  /** Passed to depthFunction or stencilFunction to specify depth or stencil tests will pass if the
+   * new depth value is less than the stored value */
   static constexpr unsigned int LESS = 0x0201;
-  /** Passed to depthFunction or stencilFunction to specify depth or stencil
-   * tests will pass if the new depth value is equals to the stored value */
+  /** Passed to depthFunction or stencilFunction to specify depth or stencil tests will pass if the
+   * new depth value is equals to the stored value */
   static constexpr unsigned int EQUAL = 0x0202;
-  /** Passed to depthFunction or stencilFunction to specify depth or stencil
-   * tests will pass if the new depth value is less than or equal to the stored
-   * value */
+  /** Passed to depthFunction or stencilFunction to specify depth or stencil tests will pass if the
+   * new depth value is less than or equal to the stored value */
   static constexpr unsigned int LEQUAL = 0x0203;
-  /** Passed to depthFunction or stencilFunction to specify depth or stencil
-   * tests will pass if the new depth value is greater than the stored value */
+  /** Passed to depthFunction or stencilFunction to specify depth or stencil tests will pass if the
+   * new depth value is greater than the stored value */
   static constexpr unsigned int GREATER = 0x0204;
-  /** Passed to depthFunction or stencilFunction to specify depth or stencil
-   * tests will pass if the new depth value is greater than or equal to the
-   * stored value */
+  /** Passed to depthFunction or stencilFunction to specify depth or stencil tests will pass if the
+   * new depth value is greater than or equal to the stored value */
   static constexpr unsigned int GEQUAL = 0x0206;
-  /** Passed to depthFunction or stencilFunction to specify depth or stencil
-   * tests will pass if the new depth value is not equal to the stored value */
+  /** Passed to depthFunction or stencilFunction to specify depth or stencil tests will pass if the
+   * new depth value is not equal to the stored value */
   static constexpr unsigned int NOTEQUAL = 0x0205;
 
   // Stencil Actions Constants.
   /** Passed to stencilOperation to specify that stencil value must be kept */
   static constexpr unsigned int KEEP = 0x1E00;
-  /** Passed to stencilOperation to specify that stencil value must be replaced
-   */
+  /** Passed to stencilOperation to specify that stencil value must be replaced */
   static constexpr unsigned int REPLACE = 0x1E01;
-  /** Passed to stencilOperation to specify that stencil value must be
-   * incremented */
+  /** Passed to stencilOperation to specify that stencil value must be incremented */
   static constexpr unsigned int INCR = 0x1E02;
-  /** Passed to stencilOperation to specify that stencil value must be
-   * decremented */
+  /** Passed to stencilOperation to specify that stencil value must be decremented */
   static constexpr unsigned int DECR = 0x1E03;
-  /** Passed to stencilOperation to specify that stencil value must be inverted
-   */
+  /** Passed to stencilOperation to specify that stencil value must be inverted */
   static constexpr unsigned int INVERT = 0x150A;
-  /** Passed to stencilOperation to specify that stencil value must be
-   * incremented with wrapping */
+  /** Passed to stencilOperation to specify that stencil value must be incremented with wrapping */
   static constexpr unsigned int INCR_WRAP = 0x8507;
-  /** Passed to stencilOperation to specify that stencil value must be
-   * decremented with wrapping */
+  /** Passed to stencilOperation to specify that stencil value must be decremented with wrapping */
   static constexpr unsigned int DECR_WRAP = 0x8508;
 
   /** Texture is not repeating outside of 0..1 UVs */
@@ -168,7 +203,7 @@ struct BABYLON_SHARED_EXPORT Constants {
   /** FLOAT_32_UNSIGNED_INT_24_8_REV */
   static constexpr unsigned int TEXTURETYPE_FLOAT_32_UNSIGNED_INT_24_8_REV = 15;
 
-  /** nearest is mag = nearest and min = nearest and mip = linear */
+  /** nearest is mag = nearest and min = nearest and mip = nearest */
   static constexpr unsigned int TEXTURE_NEAREST_SAMPLINGMODE = 1;
   /** Bilinear is mag = linear and min = linear and mip = nearest */
   static constexpr unsigned int TEXTURE_BILINEAR_SAMPLINGMODE = 2;
@@ -221,14 +256,11 @@ struct BABYLON_SHARED_EXPORT Constants {
   static constexpr unsigned int TEXTURE_FIXED_EQUIRECTANGULAR_MIRRORED_MODE = 9;
 
   // Texture rescaling mode
-  /** Defines that texture rescaling will use a floor to find the closer power
-   * of 2 size */
+  /** Defines that texture rescaling will use a floor to find the closer power of 2 size */
   static constexpr unsigned int SCALEMODE_FLOOR = 1;
-  /** Defines that texture rescaling will look for the nearest power of 2 size
-   */
+  /** Defines that texture rescaling will look for the nearest power of 2 size */
   static constexpr unsigned int SCALEMODE_NEAREST = 2;
-  /** Defines that texture rescaling will use a ceil to find the closer power of
-   * 2 size */
+  /** Defines that texture rescaling will use a ceil to find the closer power of 2 size */
   static constexpr unsigned int SCALEMODE_CEILING = 3;
 
   /**
@@ -399,53 +431,44 @@ struct BABYLON_SHARED_EXPORT Constants {
    */
   static constexpr unsigned int PARTICLES_BILLBOARDMODE_ALL = 7;
   /**
-   * Special billboard mode where the particle will be biilboard to the camera
-   * but rotated to align with direction
+   * Special billboard mode where the particle will be biilboard to the camera but rotated to align
+   * with direction
    */
   static constexpr unsigned int PARTICLES_BILLBOARDMODE_STRETCHED = 8;
-  /**
-   * Gets or sets base Assets URL
-   */
-  static const char* PARTICLES_BaseAssetsUrl;
 
-  /** Default culling strategy : this is an exclusion test and it's the more
-   * accurate. Test order : Is the bounding sphere outside the frustum ? If not,
-   * are the bounding box vertices outside the frustum ? It not, then the
-   * cullable object is in the frustum.
+  /** Default culling strategy : this is an exclusion test and it's the more accurate.
+   *  Test order :
+   *  Is the bounding sphere outside the frustum ?
+   *  If not, are the bounding box vertices outside the frustum ?
+   *  It not, then the cullable object is in the frustum.
    */
   static constexpr unsigned int MESHES_CULLINGSTRATEGY_STANDARD = 0;
   /** Culling strategy : Bounding Sphere Only.
-   *  This is an exclusion test. It's faster than the standard strategy because
-   * the bounding box is not tested. It's also less accurate than the standard
-   * because some not visible objects can still be selected. Test : is the
-   * bounding sphere outside the frustum ? If not, then the cullable object is
-   * in the frustum.
+   *  This is an exclusion test. It's faster than the standard strategy because the bounding box is
+   * not tested. It's also less accurate than the standard because some not visible objects can
+   * still be selected. Test : is the bounding sphere outside the frustum ? If not, then the
+   * cullable object is in the frustum.
    */
   static constexpr unsigned int MESHES_CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY = 1;
   /** Culling strategy : Optimistic Inclusion.
    *  This in an inclusion test first, then the standard exclusion test.
-   *  This can be faster when a cullable object is expected to be almost always
-   * in the camera frustum. This could also be a little slower than the standard
-   * test when the tested object center is not the frustum but one of its
-   * bounding box vertex is still inside. Anyway, it's as accurate as the
-   * standard strategy. Test : Is the cullable object bounding sphere center in
-   * the frustum ? If not, apply the default culling strategy.
+   *  This can be faster when a cullable object is expected to be almost always in the camera
+   * frustum. This could also be a little slower than the standard test when the tested object
+   * center is not the frustum but one of its bounding box vertex is still inside. Anyway, it's as
+   * accurate as the standard strategy. Test : Is the cullable object bounding sphere center in the
+   * frustum ? If not, apply the default culling strategy.
    */
   static constexpr unsigned int MESHES_CULLINGSTRATEGY_OPTIMISTIC_INCLUSION = 2;
   /** Culling strategy : Optimistic Inclusion then Bounding Sphere Only.
-   *  This in an inclusion test first, then the bounding sphere only exclusion
-   * test. This can be the fastest test when a cullable object is expected to be
-   * almost always in the camera frustum. This could also be a little slower
-   * than the BoundingSphereOnly strategy when the tested object center is not
-   * in the frustum but its bounding sphere still intersects it. It's less
-   * accurate than the standard strategy and as accurate as the
-   * BoundingSphereOnly strategy. Test : Is the cullable object bounding sphere
-   * center in the frustum ? If not, apply the Bounding Sphere Only strategy. No
-   * Bounding Box is tested here.
+   *  This in an inclusion test first, then the bounding sphere only exclusion test.
+   *  This can be the fastest test when a cullable object is expected to be almost always in the
+   * camera frustum. This could also be a little slower than the BoundingSphereOnly strategy when
+   * the tested object center is not in the frustum but its bounding sphere still intersects it.
+   *  It's less accurate than the standard strategy and as accurate as the BoundingSphereOnly
+   * strategy. Test : Is the cullable object bounding sphere center in the frustum ? If not, apply
+   * the Bounding Sphere Only strategy. No Bounding Box is tested here.
    */
-  static constexpr unsigned int
-    MESHES_CULLINGSTRATEGY_OPTIMISTIC_INCLUSION_THEN_BSPHERE_ONLY
-    = 3;
+  static constexpr unsigned int MESHES_CULLINGSTRATEGY_OPTIMISTIC_INCLUSION_THEN_BSPHERE_ONLY = 3;
 
   /**
    * No logging while loading
