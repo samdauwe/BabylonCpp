@@ -6,6 +6,7 @@
 #include <babylon/engines/engine_store.h>
 #include <babylon/engines/extensions/alpha_extension.h>
 #include <babylon/engines/extensions/cube_texture_extension.h>
+#include <babylon/engines/extensions/dynamic_texture_extension.h>
 #include <babylon/engines/instancing_attribute_info.h>
 #include <babylon/engines/scene.h>
 #include <babylon/engines/webgl/webgl_pipeline_context.h>
@@ -3467,6 +3468,25 @@ void ThinEngine::_cascadeLoadImgs(
 void ThinEngine::_setCubeMapTextureParams(bool loadMipmap)
 {
   _cubeTextureExtension->_setCubeMapTextureParams(loadMipmap);
+}
+
+//------------------------------------------------------------------------------------------------
+//                              Dynamic Texture Extension
+//------------------------------------------------------------------------------------------------
+
+InternalTexturePtr ThinEngine::createDynamicTexture(int width, int height, bool generateMipMaps,
+                                                    unsigned int samplingMode)
+{
+  return _dynamicTextureExtension->createDynamicTexture(width, height, generateMipMaps,
+                                                        samplingMode);
+}
+
+void ThinEngine::updateDynamicTexture(const InternalTexturePtr& texture, ICanvas* canvas,
+                                      bool invertY, bool premulAlpha,
+                                      std::optional<unsigned int> format, bool forceBindTexture)
+{
+  _dynamicTextureExtension->updateDynamicTexture(texture, canvas, invertY, premulAlpha, format,
+                                                 forceBindTexture);
 }
 
 } // end of namespace BABYLON
