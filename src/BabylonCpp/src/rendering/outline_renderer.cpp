@@ -7,8 +7,8 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
-#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/textures/base_texture.h>
@@ -37,14 +37,12 @@ void OutlineRenderer::_register()
 {
   scene->_beforeRenderingMeshStage.registerStep(
     SceneComponentConstants::STEP_BEFORERENDERINGMESH_OUTLINE, this,
-    [this](AbstractMesh* mesh, SubMesh* subMesh,
-           const _InstancesBatchPtr& batch) {
+    [this](AbstractMesh* mesh, SubMesh* subMesh, const _InstancesBatchPtr& batch) {
       _beforeRenderingMesh(mesh, subMesh, batch);
     });
   scene->_afterRenderingMeshStage.registerStep(
     SceneComponentConstants::STEP_AFTERRENDERINGMESH_OUTLINE, this,
-    [this](AbstractMesh* mesh, SubMesh* subMesh,
-           const _InstancesBatchPtr& batch) {
+    [this](AbstractMesh* mesh, SubMesh* subMesh, const _InstancesBatchPtr& batch) {
       _afterRenderingMesh(mesh, subMesh, batch);
     });
 }
@@ -59,15 +57,13 @@ void OutlineRenderer::dispose()
   // Nothing to do here.
 }
 
-void OutlineRenderer::render(SubMesh* subMesh, const _InstancesBatchPtr& batch,
-                             bool useOverlay)
+void OutlineRenderer::render(SubMesh* subMesh, const _InstancesBatchPtr& batch, bool useOverlay)
 {
   auto engine = scene->getEngine();
 
   bool hardwareInstancedRendering
     = engine->getCaps().instancedArrays
-      && (batch->visibleInstances.find(subMesh->_id)
-          != batch->visibleInstances.end())
+      && (batch->visibleInstances.find(subMesh->_id) != batch->visibleInstances.end())
       && (!batch->visibleInstances[subMesh->_id].empty());
 
   if (!isReady(subMesh, hardwareInstancedRendering)) {
@@ -85,22 +81,18 @@ void OutlineRenderer::render(SubMesh* subMesh, const _InstancesBatchPtr& batch,
 
   // Logarithmic depth
   if (material->useLogarithmicDepth()) {
-    _effect->setFloat(
-      "logarithmicDepthConstant",
-      2.f / (std::log(scene->activeCamera()->maxZ + 1.f) / Math::LN2));
+    _effect->setFloat("logarithmicDepthConstant",
+                      2.f / (std::log(scene->activeCamera()->maxZ + 1.f) / Math::LN2));
   }
 
   _effect->setFloat("offset", useOverlay ? 0 : mesh->outlineWidth);
-  _effect->setColor4("color",
-                     useOverlay ? mesh->overlayColor : mesh->outlineColor,
+  _effect->setColor4("color", useOverlay ? mesh->overlayColor : mesh->outlineColor,
                      useOverlay ? mesh->overlayAlpha : material->alpha());
   _effect->setMatrix("viewProjection", scene->getTransformMatrix());
 
   // Bones
-  if (mesh->useBones() && mesh->computeBonesUsingShaders()
-      && mesh->skeleton()) {
-    _effect->setMatrices("mBones",
-                         mesh->skeleton()->getTransformMatrices(mesh.get()));
+  if (mesh->useBones() && mesh->computeBonesUsingShaders() && mesh->skeleton()) {
+    _effect->setMatrices("mBones", mesh->skeleton()->getTransformMatrices(mesh.get()));
   }
 
   // Morph targets
@@ -119,11 +111,9 @@ void OutlineRenderer::render(SubMesh* subMesh, const _InstancesBatchPtr& batch,
 
   engine->setZOffset(-zOffset);
 
-  mesh->_processRendering(subMesh, _effect, Material::TriangleFillMode, batch,
-                          hardwareInstancedRendering,
-                          [this](bool, const Matrix& world, Material*) {
-                            _effect->setMatrix("world", world);
-                          });
+  mesh->_processRendering(
+    subMesh, _effect, Material::TriangleFillMode, batch, hardwareInstancedRendering,
+    [this](bool, const Matrix& world, Material*) { _effect->setMatrix("world", world); });
 
   engine->setZOffset(0.f);
 }
@@ -131,8 +121,7 @@ void OutlineRenderer::render(SubMesh* subMesh, const _InstancesBatchPtr& batch,
 bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
 {
   std::vector<std::string> defines;
-  std::vector<std::string> attribs{VertexBuffer::PositionKind,
-                                   VertexBuffer::NormalKind};
+  std::vector<std::string> attribs{VertexBuffer::PositionKind, VertexBuffer::NormalKind};
 
   auto mesh     = subMesh->getMesh();
   auto material = subMesh->getMaterial();
@@ -169,24 +158,21 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
                          + std::to_string(mesh->numBoneInfluencers()));
     defines.emplace_back(
       "#define BonesPerMesh "
-      + std::to_string(
-          (mesh->skeleton() ? mesh->skeleton()->bones.size() + 1 : 0)));
+      + std::to_string((mesh->skeleton() ? mesh->skeleton()->bones.size() + 1 : 0)));
   }
   else {
     defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
   }
 
   // Morph targets
-  auto morphTargetManager
-    = std::static_pointer_cast<Mesh>(mesh)->morphTargetManager();
+  auto morphTargetManager  = std::static_pointer_cast<Mesh>(mesh)->morphTargetManager();
   auto numMorphInfluencers = 0ull;
   if (morphTargetManager) {
     if (morphTargetManager->numInfluencers() > 0) {
       numMorphInfluencers = morphTargetManager->numInfluencers();
 
       defines.emplace_back("#define MORPHTARGETS");
-      defines.emplace_back("#define NUM_MORPH_INFLUENCERS "
-                           + std::to_string(numMorphInfluencers));
+      defines.emplace_back("#define NUM_MORPH_INFLUENCERS " + std::to_string(numMorphInfluencers));
 
       MaterialHelper::PrepareAttributesForMorphTargetsInfluencers(
         attribs, mesh.get(), static_cast<unsigned int>(numMorphInfluencers));
@@ -204,18 +190,17 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
   if (_cachedDefines != join) {
     _cachedDefines = join;
 
-    EffectCreationOptions options;
-    options.attributes    = std::move(attribs);
-    options.uniformsNames = {
-      "world",  "mBones", "viewProjection",           "diffuseMatrix",
-      "offset", "color",  "logarithmicDepthConstant", "morphTargetInfluences"};
-    options.samplers        = {"diffuseSampler"};
-    options.defines         = std::move(join);
-    options.indexParameters = {{"maxSimultaneousMorphTargets",
-                                static_cast<unsigned>(numMorphInfluencers)}};
+    IEffectCreationOptions options;
+    options.attributes = std::move(attribs);
+    options.uniformsNames
+      = {"world",  "mBones", "viewProjection",           "diffuseMatrix",
+         "offset", "color",  "logarithmicDepthConstant", "morphTargetInfluences"};
+    options.samplers = {"diffuseSampler"};
+    options.defines  = std::move(join);
+    options.indexParameters
+      = {{"maxSimultaneousMorphTargets", static_cast<unsigned>(numMorphInfluencers)}};
 
-    _effect = scene->getEngine()->createEffect("outline", options,
-                                               scene->getEngine());
+    _effect = scene->getEngine()->createEffect("outline", options, scene->getEngine());
   }
 
   return _effect->isReady();

@@ -6,8 +6,8 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
-#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/maths/color3.h>
@@ -342,7 +342,7 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   auto previousEffect = _effect;
   auto join           = String::join(defines, '\n');
 
-  EffectCreationOptions options;
+  IEffectCreationOptions options;
   options.attributes          = std::move(attribs);
   options.uniformsNames       = _options.uniforms;
   options.uniformBuffersNames = _options.uniformBuffers;

@@ -1,12 +1,12 @@
 #include <babylon/materials/effect_wrapper.h>
 
 #include <babylon/materials/effect.h>
-#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_wrapper_creation_options.h>
+#include <babylon/materials/ieffect_creation_options.h>
 
 namespace BABYLON {
 
-EffectWrapper::EffectWrapper(EffectWrapperCreationOptions& /*creationOptions*/)
+EffectWrapper::EffectWrapper(IEffectWrapperCreationOptions& /*creationOptions*/)
 {
   // TODO Implement
 }

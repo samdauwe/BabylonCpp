@@ -22,8 +22,8 @@
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/interfaces/iloading_screen.h>
 #include <babylon/materials/effect.h>
-#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/dummy_internal_texture_tracker.h>
 #include <babylon/materials/textures/iinternal_texture_loader.h>
@@ -1925,7 +1925,7 @@ void Engine::_deletePipelineContext(const IPipelineContextPtr& pipelineContext)
   }
 }
 
-EffectPtr Engine::createEffect(const std::string& baseName, EffectCreationOptions& options,
+EffectPtr Engine::createEffect(const std::string& baseName, IEffectCreationOptions& options,
                                Engine* engine,
                                const std::function<void(const EffectPtr& effect)>& onCompiled)
 {
@@ -1946,7 +1946,7 @@ EffectPtr Engine::createEffect(const std::string& baseName, EffectCreationOption
 }
 
 EffectPtr Engine::createEffect(std::unordered_map<std::string, std::string>& baseName,
-                               EffectCreationOptions& options, Engine* engine)
+                               IEffectCreationOptions& options, Engine* engine)
 {
   auto vertex = stl_util::contains(baseName, "vertexElement") ?
                   baseName["vertexElement"] :
@@ -1968,7 +1968,7 @@ EffectPtr Engine::createEffect(std::unordered_map<std::string, std::string>& bas
 }
 
 EffectPtr Engine::createEffectForParticles(const std::string& fragmentName,
-                                           EffectCreationOptions& options)
+                                           IEffectCreationOptions& options)
 {
   auto attributesNamesOrOptions = ParticleSystem::_GetAttributeNamesOrOptions();
   auto effectCreationOption     = ParticleSystem::_GetEffectCreationOptions();
@@ -1983,7 +1983,7 @@ EffectPtr Engine::createEffectForParticles(const std::string& fragmentName,
     samplers.emplace_back("diffuseSampler");
   }
 
-  EffectCreationOptions effectOptions;
+  IEffectCreationOptions effectOptions;
   std::unordered_map<std::string, std::string> baseName{
     {"vertex", "particles"},           //
     {"fragmentElement", fragmentName}, //
@@ -2037,12 +2037,12 @@ Engine::createRawShaderProgram(const IPipelineContextPtr& pipelineContext,
 
   auto vertexShader = _compileRawShader(vertexCode, "vertex");
   if (!vertexShader) {
-    BABYLON_LOG_ERROR("Engine", "Engine::createRawShaderProgram failed on vertexShader");
+    BABYLON_LOG_ERROR("Engine", "Engine::createRawShaderProgram failed on vertexShader")
     return nullptr;
   }
   auto fragmentShader = _compileRawShader(fragmentCode, "fragment");
   if (!fragmentShader) {
-    BABYLON_LOG_ERROR("Engine", "Engine::createRawShaderProgram failed on fragmentShader");
+    BABYLON_LOG_ERROR("Engine", "Engine::createRawShaderProgram failed on fragmentShader")
     return nullptr;
   }
 

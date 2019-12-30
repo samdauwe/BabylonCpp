@@ -9,8 +9,8 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
-#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/image_processing_configuration_defines.h>
 #include <babylon/materials/material.h>
@@ -1345,7 +1345,7 @@ EffectPtr ParticleSystem::_getEffect(unsigned int iBlendMode)
                                                     *_imageProcessingConfigurationDefines);
     }
 
-    EffectCreationOptions options;
+    IEffectCreationOptions options;
     options.attributes    = std::move(attributesNamesOrOptions);
     options.uniformsNames = std::move(effectCreationOption);
     options.samplers      = std::move(samplers);

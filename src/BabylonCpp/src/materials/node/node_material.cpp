@@ -7,7 +7,7 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
-#include <babylon/materials/effect_creation_options.h>
+#include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/node/blocks/dual/reflection_texture_block.h>
 #include <babylon/materials/node/blocks/dual/texture_block.h>
@@ -581,7 +581,7 @@ bool NodeMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, b
       {"maxSimultaneousLights", maxSimultaneousLights},
       {"maxSimultaneousMorphTargets", defines->intDef["NUM_MORPH_INFLUENCERS"]}};
 
-    EffectCreationOptions iOptions;
+    IEffectCreationOptions iOptions;
     iOptions.attributes            = _vertexCompilationState->attributes;
     iOptions.uniformsNames         = std::move(mergedUniforms);
     iOptions.uniformBuffersNames   = std::move(uniformBuffers);

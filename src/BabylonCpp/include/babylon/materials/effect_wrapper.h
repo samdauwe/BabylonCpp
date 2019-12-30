@@ -7,7 +7,7 @@
 namespace BABYLON {
 
 class Effect;
-struct EffectWrapperCreationOptions;
+struct IEffectWrapperCreationOptions;
 using EffectPtr = std::shared_ptr<Effect>;
 
 /**
@@ -29,7 +29,7 @@ struct BABYLON_SHARED_EXPORT EffectWrapper {
    * @brief Creates an effect to be renderer.
    * @param creationOptions options to create the effect
    */
-  EffectWrapper(EffectWrapperCreationOptions& creationOptions);
+  EffectWrapper(IEffectWrapperCreationOptions& creationOptions);
   ~EffectWrapper();
 
   /**

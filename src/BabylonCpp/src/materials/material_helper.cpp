@@ -11,8 +11,8 @@
 #include <babylon/lights/shadows/shadow_generator.h>
 #include <babylon/lights/spot_light.h>
 #include <babylon/materials/effect.h>
-#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material_defines.h>
 #include <babylon/materials/textures/raw_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
@@ -464,7 +464,7 @@ void MaterialHelper::PrepareUniformsAndSamplersList(std::vector<std::string>& un
   }
 }
 
-void MaterialHelper::PrepareUniformsAndSamplersList(EffectCreationOptions& options)
+void MaterialHelper::PrepareUniformsAndSamplersList(IEffectCreationOptions& options)
 {
   auto& uniformsList          = options.uniformsNames;
   auto& uniformBuffersList    = options.uniformBuffersNames;

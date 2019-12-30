@@ -10,10 +10,10 @@
 #include <babylon/engines/processors/processing_options.h>
 #include <babylon/engines/processors/shader_processor.h>
 #include <babylon/engines/scene.h>
-#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/effect_includes_shaders_store.h>
 #include <babylon/materials/effect_shaders_store.h>
+#include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material.h>
 #include <babylon/maths/color3.h>
 #include <babylon/maths/vector2.h>
@@ -40,7 +40,7 @@ std::unordered_map<unsigned int, WebGLDataBufferPtr> Effect::_baseCache{};
 
 Effect::Effect(
   const std::variant<std::string, std::unordered_map<std::string, std::string>>& baseName,
-  EffectCreationOptions& options, Engine* engine)
+  IEffectCreationOptions& options, Engine* engine)
     : name{baseName}
     , defines{options.defines}
     , onCompiled{options.onCompiled}

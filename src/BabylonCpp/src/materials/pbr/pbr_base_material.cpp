@@ -5,8 +5,8 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
-#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/material_flags.h>
 #include <babylon/materials/material_helper.h>
@@ -43,8 +43,7 @@ PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
     , transparencyMode{this, &PBRBaseMaterial::get_transparencyMode,
                        &PBRBaseMaterial::set_transparencyMode}
-    , debugMode{this, &PBRBaseMaterial::get_debugMode,
-                &PBRBaseMaterial::set_debugMode}
+    , debugMode{this, &PBRBaseMaterial::get_debugMode, &PBRBaseMaterial::set_debugMode}
     , clearCoat{std::make_shared<PBRClearCoatConfiguration>(
         [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
     , anisotropy{std::make_shared<PBRAnisotropicConfiguration>(
@@ -64,8 +63,7 @@ PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
     , _albedoTexture{nullptr}
     , _ambientTexture{nullptr}
     , _ambientTextureStrength{1.f}
-    , _ambientTextureImpactOnAnalyticalLights{PBRBaseMaterial::
-                                                DEFAULT_AO_ON_ANALYTICAL_LIGHTS}
+    , _ambientTextureImpactOnAnalyticalLights{PBRBaseMaterial::DEFAULT_AO_ON_ANALYTICAL_LIGHTS}
     , _opacityTexture{nullptr}
     , _reflectionTexture{nullptr}
     , _emissiveTexture{nullptr}
@@ -114,12 +112,11 @@ PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
     , _forceIrradianceInFragment{false}
     , _forceNormalForward{false}
     , _enableSpecularAntiAliasing{false}
-    , _imageProcessingConfiguration{std::make_shared<
-        ImageProcessingConfiguration>()}
+    , _imageProcessingConfiguration{std::make_shared<ImageProcessingConfiguration>()}
     , _unlit{false}
     , _rebuildInParallel{false}
-    , _lightingInfos{Vector4(_directIntensity, _emissiveIntensity,
-                             _environmentIntensity, _specularIntensity)}
+    , _lightingInfos{Vector4(_directIntensity, _emissiveIntensity, _environmentIntensity,
+                             _specularIntensity)}
     , _imageProcessingObserver{nullptr}
     , _globalAmbientColor{Color3(0.f, 0.f, 0.f)}
     , _useLogarithmicDepth{false}
@@ -158,8 +155,7 @@ void PBRBaseMaterial::_attachImageProcessingConfiguration(
 
   // Detaches observer.
   if (_imageProcessingConfiguration && _imageProcessingObserver) {
-    _imageProcessingConfiguration->onUpdateParameters.remove(
-      _imageProcessingObserver);
+    _imageProcessingConfiguration->onUpdateParameters.remove(_imageProcessingObserver);
   }
 
   // Pick the scene configuration if needed.
@@ -172,11 +168,10 @@ void PBRBaseMaterial::_attachImageProcessingConfiguration(
 
   // Attaches observer.
   if (_imageProcessingConfiguration) {
-    _imageProcessingObserver
-      = _imageProcessingConfiguration->onUpdateParameters.add(
-        [this](ImageProcessingConfiguration* /*conf*/, EventState&) {
-          _markAllSubMeshesAsImageProcessingDirty();
-        });
+    _imageProcessingObserver = _imageProcessingConfiguration->onUpdateParameters.add(
+      [this](ImageProcessingConfiguration* /*conf*/, EventState&) {
+        _markAllSubMeshesAsImageProcessingDirty();
+      });
   }
 }
 
@@ -217,8 +212,7 @@ bool PBRBaseMaterial::get_useLogarithmicDepth() const
 
 void PBRBaseMaterial::set_useLogarithmicDepth(bool value)
 {
-  _useLogarithmicDepth
-    = value && getScene()->getEngine()->getCaps().fragmentDepthSupported;
+  _useLogarithmicDepth = value && getScene()->getEngine()->getCaps().fragmentDepthSupported;
 }
 
 std::optional<unsigned int>& PBRBaseMaterial::get_transparencyMode()
@@ -226,8 +220,7 @@ std::optional<unsigned int>& PBRBaseMaterial::get_transparencyMode()
   return _transparencyMode;
 }
 
-void PBRBaseMaterial::set_transparencyMode(
-  const std::optional<unsigned int>& value)
+void PBRBaseMaterial::set_transparencyMode(const std::optional<unsigned int>& value)
 {
   if (_transparencyMode == value) {
     return;
@@ -252,8 +245,7 @@ bool PBRBaseMaterial::needAlphaBlending() const
   if (_disableAlphaBlending()) {
     return false;
   }
-  return (alpha() < 1.f) || (_opacityTexture != nullptr)
-         || _shouldUseAlphaFromAlbedoTexture();
+  return (alpha() < 1.f) || (_opacityTexture != nullptr) || _shouldUseAlphaFromAlbedoTexture();
 }
 
 bool PBRBaseMaterial::needAlphaBlendingForMesh(const AbstractMesh& mesh) const
@@ -282,8 +274,7 @@ bool PBRBaseMaterial::needAlphaTesting() const
 
 bool PBRBaseMaterial::_shouldUseAlphaFromAlbedoTexture() const
 {
-  return _albedoTexture != nullptr && _albedoTexture->hasAlpha()
-         && _useAlphaFromAlbedoTexture
+  return _albedoTexture != nullptr && _albedoTexture->hasAlpha() && _useAlphaFromAlbedoTexture
          && *_transparencyMode != PBRBaseMaterial::PBRMATERIAL_OPAQUE;
 }
 
@@ -292,8 +283,7 @@ BaseTexturePtr PBRBaseMaterial::getAlphaTestTexture()
   return _albedoTexture;
 }
 
-bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
-                                        BaseSubMesh* subMesh, bool useInstances)
+bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool useInstances)
 {
   if (subMesh->effect() && isFrozen()) {
     if (_wasPreviouslyReady) {
@@ -305,10 +295,9 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     subMesh->_materialDefines = std::make_shared<PBRMaterialDefines>();
   }
 
-  auto scene = getScene();
-  auto definesPtr
-    = std::static_pointer_cast<PBRMaterialDefines>(subMesh->_materialDefines);
-  auto& defines = *definesPtr;
+  auto scene      = getScene();
+  auto definesPtr = std::static_pointer_cast<PBRMaterialDefines>(subMesh->_materialDefines);
+  auto& defines   = *definesPtr;
   if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (defines._renderId == scene->getRenderId()) {
       return true;
@@ -343,8 +332,7 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
           return false;
         }
         if (reflectionTexture->irradianceTexture()
-            && !reflectionTexture->irradianceTexture()
-                  ->isReadyOrNotBlocking()) {
+            && !reflectionTexture->irradianceTexture()->isReadyOrNotBlocking()) {
           return false;
         }
       }
@@ -388,8 +376,7 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
         }
       }
 
-      if (_environmentBRDFTexture
-          && MaterialFlags::ReflectionTextureEnabled()) {
+      if (_environmentBRDFTexture && MaterialFlags::ReflectionTextureEnabled()) {
         // This is blocking.
         if (!_environmentBRDFTexture->isReady()) {
           return false;
@@ -414,15 +401,13 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   if (!engine->getCaps().standardDerivatives
       && !mesh->isVerticesDataPresent(VertexBuffer::NormalKind)) {
     mesh->createNormals(true);
-    BABYLON_LOGF_WARN("PBRBaseMaterial",
-                      "PBRMaterial: Normals have been created for the mesh: %s",
+    BABYLON_LOGF_WARN("PBRBaseMaterial", "PBRMaterial: Normals have been created for the mesh: %s",
                       mesh->name.c_str())
   }
 
   auto& previousEffect     = subMesh->effect();
   const auto lightDisposed = defines._areLightsDisposed;
-  auto effect
-    = _prepareEffect(mesh, defines, onCompiled, onError, useInstances);
+  auto effect              = _prepareEffect(mesh, defines, onCompiled, onError, useInstances);
 
   if (effect) {
     // Use previous effect while new one is compiling
@@ -468,8 +453,7 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
   AbstractMesh* mesh, PBRMaterialDefines& defines,
   const std::function<void(Effect* effect)>& iOnCompiled,
   std::function<void(Effect* effect, const std::string& errors)> iOnError,
-  const std::optional<bool>& useInstances,
-  const std::optional<bool>& useClipPlane)
+  const std::optional<bool>& useInstances, const std::optional<bool>& useClipPlane)
 {
   _prepareDefines(mesh, defines, useInstances, useClipPlane);
   if (!defines.isDirty()) {
@@ -507,14 +491,10 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
     fallbacks->addFallback(fallbackRank++, "PARALLAXOCCLUSION");
   }
 
-  fallbackRank = PBRAnisotropicConfiguration::AddFallbacks(defines, *fallbacks,
-                                                           fallbackRank);
-  fallbackRank = PBRAnisotropicConfiguration::AddFallbacks(defines, *fallbacks,
-                                                           fallbackRank);
-  fallbackRank = PBRSubSurfaceConfiguration::AddFallbacks(defines, *fallbacks,
-                                                          fallbackRank);
-  fallbackRank
-    = PBRSheenConfiguration::AddFallbacks(defines, *fallbacks, fallbackRank);
+  fallbackRank = PBRAnisotropicConfiguration::AddFallbacks(defines, *fallbacks, fallbackRank);
+  fallbackRank = PBRAnisotropicConfiguration::AddFallbacks(defines, *fallbacks, fallbackRank);
+  fallbackRank = PBRSubSurfaceConfiguration::AddFallbacks(defines, *fallbacks, fallbackRank);
+  fallbackRank = PBRSheenConfiguration::AddFallbacks(defines, *fallbacks, fallbackRank);
 
   if (defines["ENVIRONMENTBRDF"]) {
     fallbacks->addFallback(fallbackRank++, "ENVIRONMENTBRDF");
@@ -528,8 +508,8 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
     fallbacks->addFallback(fallbackRank++, "BUMP");
   }
 
-  fallbackRank = MaterialHelper::HandleFallbacksForShadows(
-    defines, *fallbacks, _maxSimultaneousLights, fallbackRank++);
+  fallbackRank = MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks,
+                                                           _maxSimultaneousLights, fallbackRank++);
 
   if (defines["SPECULARTERM"]) {
     fallbacks->addFallback(fallbackRank++, "SPECULARTERM");
@@ -697,13 +677,12 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
     {"maxSimultaneousMorphTargets", defines.intDef["NUM_MORPH_INFLUENCERS"]}};
 
   if (customShaderNameResolve) {
-    shaderName = customShaderNameResolve(shaderName, uniforms, uniformBuffers,
-                                         samplers, defines);
+    shaderName = customShaderNameResolve(shaderName, uniforms, uniformBuffers, samplers, defines);
   }
 
   auto join = defines.toString();
 
-  EffectCreationOptions options;
+  IEffectCreationOptions options;
   options.attributes            = std::move(attribs);
   options.uniformsNames         = std::move(uniforms);
   options.uniformBuffersNames   = std::move(uniformBuffers);
@@ -721,8 +700,7 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
   return engine->createEffect(shaderName, options, engine);
 }
 
-void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
-                                      PBRMaterialDefines& defines,
+void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& defines,
                                       const std::optional<bool>& useInstances,
                                       const std::optional<bool>& useClipPlane)
 {
@@ -730,8 +708,8 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
   auto engine = scene->getEngine();
 
   // Lights
-  MaterialHelper::PrepareDefinesForLights(
-    scene, mesh, defines, true, _maxSimultaneousLights, _disableLighting);
+  MaterialHelper::PrepareDefinesForLights(scene, mesh, defines, true, _maxSimultaneousLights,
+                                          _disableLighting);
   defines._needNormals = true;
 
   // Multiview
@@ -747,16 +725,14 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
       }
 
       if (_albedoTexture && MaterialFlags::DiffuseTextureEnabled()) {
-        MaterialHelper::PrepareDefinesForMergedUV(_albedoTexture, defines,
-                                                  "ALBEDO");
+        MaterialHelper::PrepareDefinesForMergedUV(_albedoTexture, defines, "ALBEDO");
       }
       else {
         defines.boolDef["ALBEDO"] = false;
       }
 
       if (_ambientTexture && MaterialFlags::AmbientTextureEnabled()) {
-        MaterialHelper::PrepareDefinesForMergedUV(_ambientTexture, defines,
-                                                  "AMBIENT");
+        MaterialHelper::PrepareDefinesForMergedUV(_ambientTexture, defines, "AMBIENT");
         defines.boolDef["AMBIENTINGRAYSCALE"] = _useAmbientInGrayScale;
       }
       else {
@@ -764,8 +740,7 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
       }
 
       if (_opacityTexture && MaterialFlags::OpacityTextureEnabled()) {
-        MaterialHelper::PrepareDefinesForMergedUV(_opacityTexture, defines,
-                                                  "OPACITY");
+        MaterialHelper::PrepareDefinesForMergedUV(_opacityTexture, defines, "OPACITY");
         defines.boolDef["OPACITYRGB"] = _opacityTexture->getAlphaFromRGB;
       }
       else {
@@ -774,19 +749,16 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
 
       auto reflectionTexture = _getReflectionTexture();
       if (reflectionTexture && MaterialFlags::ReflectionTextureEnabled()) {
-        defines.boolDef["REFLECTION"]      = true;
-        defines.boolDef["GAMMAREFLECTION"] = reflectionTexture->gammaSpace;
-        defines.boolDef["RGBDREFLECTION"]  = reflectionTexture->isRGBD;
-        defines.boolDef["REFLECTIONMAP_OPPOSITEZ"]
-          = getScene()->useRightHandedSystem() ? !reflectionTexture->invertZ :
-                                                 reflectionTexture->invertZ;
-        defines.boolDef["LODINREFLECTIONALPHA"]
-          = reflectionTexture->lodLevelInAlpha;
-        defines.boolDef["LINEARSPECULARREFLECTION"]
-          = reflectionTexture->linearSpecularLOD();
+        defines.boolDef["REFLECTION"]              = true;
+        defines.boolDef["GAMMAREFLECTION"]         = reflectionTexture->gammaSpace;
+        defines.boolDef["RGBDREFLECTION"]          = reflectionTexture->isRGBD;
+        defines.boolDef["REFLECTIONMAP_OPPOSITEZ"] = getScene()->useRightHandedSystem() ?
+                                                       !reflectionTexture->invertZ :
+                                                       reflectionTexture->invertZ;
+        defines.boolDef["LODINREFLECTIONALPHA"]     = reflectionTexture->lodLevelInAlpha;
+        defines.boolDef["LINEARSPECULARREFLECTION"] = reflectionTexture->linearSpecularLOD();
 
-        if (reflectionTexture->coordinatesMode()
-            == TextureConstants::INVCUBIC_MODE) {
+        if (reflectionTexture->coordinatesMode() == TextureConstants::INVCUBIC_MODE) {
           defines.boolDef["INVERTCUBICMAP"] = true;
         }
 
@@ -826,8 +798,7 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
             defines.boolDef["REFLECTIONMAP_EQUIRECTANGULAR_FIXED"] = true;
             break;
           case TextureConstants::FIXED_EQUIRECTANGULAR_MIRRORED_MODE:
-            defines.boolDef["REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED"]
-              = true;
+            defines.boolDef["REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED"] = true;
             break;
           case TextureConstants::CUBIC_MODE:
           case TextureConstants::INVCUBIC_MODE:
@@ -837,8 +808,7 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
             break;
         }
 
-        if (reflectionTexture->coordinatesMode()
-            != TextureConstants::SKYBOX_MODE) {
+        if (reflectionTexture->coordinatesMode() != TextureConstants::SKYBOX_MODE) {
           if (reflectionTexture->irradianceTexture()) {
             defines.boolDef["USEIRRADIANCEMAP"]              = true;
             defines.boolDef["USESPHERICALFROMREFLECTIONMAP"] = false;
@@ -886,19 +856,17 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
       }
 
       if (_lightmapTexture && MaterialFlags::LightmapTextureEnabled()) {
-        MaterialHelper::PrepareDefinesForMergedUV(_lightmapTexture, defines,
-                                                  "LIGHTMAP");
+        MaterialHelper::PrepareDefinesForMergedUV(_lightmapTexture, defines, "LIGHTMAP");
         defines.boolDef["USELIGHTMAPASSHADOWMAP"] = _useLightmapAsShadowmap;
-        defines.boolDef["GAMMALIGHTMAP"] = _lightmapTexture->gammaSpace;
-        defines.boolDef["RGBDLIGHTMAP"]  = _lightmapTexture->isRGBD();
+        defines.boolDef["GAMMALIGHTMAP"]          = _lightmapTexture->gammaSpace;
+        defines.boolDef["RGBDLIGHTMAP"]           = _lightmapTexture->isRGBD();
       }
       else {
         defines.boolDef["LIGHTMAP"] = false;
       }
 
       if (_emissiveTexture && MaterialFlags::EmissiveTextureEnabled()) {
-        MaterialHelper::PrepareDefinesForMergedUV(_emissiveTexture, defines,
-                                                  "EMISSIVE");
+        MaterialHelper::PrepareDefinesForMergedUV(_emissiveTexture, defines, "EMISSIVE");
       }
       else {
         defines.boolDef["EMISSIVE"] = false;
@@ -906,33 +874,26 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
 
       if (MaterialFlags::SpecularTextureEnabled()) {
         if (_metallicTexture) {
-          MaterialHelper::PrepareDefinesForMergedUV(_metallicTexture, defines,
-                                                    "REFLECTIVITY");
-          defines.boolDef["ROUGHNESSSTOREINMETALMAPALPHA"]
-            = _useRoughnessFromMetallicTextureAlpha;
+          MaterialHelper::PrepareDefinesForMergedUV(_metallicTexture, defines, "REFLECTIVITY");
+          defines.boolDef["ROUGHNESSSTOREINMETALMAPALPHA"] = _useRoughnessFromMetallicTextureAlpha;
           defines.boolDef["ROUGHNESSSTOREINMETALMAPGREEN"]
-            = !_useRoughnessFromMetallicTextureAlpha
-              && _useRoughnessFromMetallicTextureGreen;
-          defines.boolDef["METALLNESSSTOREINMETALMAPBLUE"]
-            = _useMetallnessFromMetallicTextureBlue;
-          defines.boolDef["AOSTOREINMETALMAPRED"]
-            = _useAmbientOcclusionFromMetallicTextureRed;
+            = !_useRoughnessFromMetallicTextureAlpha && _useRoughnessFromMetallicTextureGreen;
+          defines.boolDef["METALLNESSSTOREINMETALMAPBLUE"] = _useMetallnessFromMetallicTextureBlue;
+          defines.boolDef["AOSTOREINMETALMAPRED"] = _useAmbientOcclusionFromMetallicTextureRed;
         }
         else if (_reflectivityTexture) {
-          MaterialHelper::PrepareDefinesForMergedUV(_reflectivityTexture,
-                                                    defines, "REFLECTIVITY");
+          MaterialHelper::PrepareDefinesForMergedUV(_reflectivityTexture, defines, "REFLECTIVITY");
           defines.boolDef["MICROSURFACEFROMREFLECTIVITYMAP"]
             = _useMicroSurfaceFromReflectivityMapAlpha;
-          defines.boolDef["MICROSURFACEAUTOMATIC"]
-            = _useAutoMicroSurfaceFromReflectivityMap;
+          defines.boolDef["MICROSURFACEAUTOMATIC"] = _useAutoMicroSurfaceFromReflectivityMap;
         }
         else {
           defines.boolDef["REFLECTIVITY"] = false;
         }
 
         if (_microSurfaceTexture) {
-          MaterialHelper::PrepareDefinesForMergedUV(_microSurfaceTexture,
-                                                    defines, "MICROSURFACEMAP");
+          MaterialHelper::PrepareDefinesForMergedUV(_microSurfaceTexture, defines,
+                                                    "MICROSURFACEMAP");
         }
         else {
           defines.boolDef["MICROSURFACEMAP"] = false;
@@ -945,11 +906,9 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
 
       if (scene->getEngine()->getCaps().standardDerivatives && _bumpTexture
           && MaterialFlags::BumpTextureEnabled() && !_disableBumpMap) {
-        MaterialHelper::PrepareDefinesForMergedUV(_bumpTexture, defines,
-                                                  "BUMP");
+        MaterialHelper::PrepareDefinesForMergedUV(_bumpTexture, defines, "BUMP");
 
-        if (_useParallax && _albedoTexture
-            && MaterialFlags::DiffuseTextureEnabled()) {
+        if (_useParallax && _albedoTexture && MaterialFlags::DiffuseTextureEnabled()) {
           defines.boolDef["PARALLAX"]          = true;
           defines.boolDef["PARALLAXOCCLUSION"] = !!_useParallaxOcclusion;
         }
@@ -962,12 +921,10 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
         defines.boolDef["BUMP"] = false;
       }
 
-      if (_environmentBRDFTexture
-          && MaterialFlags::ReflectionTextureEnabled()) {
+      if (_environmentBRDFTexture && MaterialFlags::ReflectionTextureEnabled()) {
         defines.boolDef["ENVIRONMENTBRDF"] = true;
         // Not actual true RGBD, only the B chanel is encoded as RGBD for sheen.
-        defines.boolDef["ENVIRONMENTBRDF_RGBD"]
-          = _environmentBRDFTexture->isRGBD();
+        defines.boolDef["ENVIRONMENTBRDF_RGBD"] = _environmentBRDFTexture->isRGBD();
       }
       else {
         defines.boolDef["ENVIRONMENTBRDF"]      = false;
@@ -1007,20 +964,17 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
     }
 
     defines.boolDef["SPECULARAA"]
-      = scene->getEngine()->getCaps().standardDerivatives
-        && _enableSpecularAntiAliasing;
+      = scene->getEngine()->getCaps().standardDerivatives && _enableSpecularAntiAliasing;
   }
 
   if (defines._areTexturesDirty || defines._areMiscDirty) {
     defines.stringDef["ALPHATESTVALUE"]
-      = std::to_string(_alphaCutOff)
-        + (std::fmod(_alphaCutOff, 1.f) == 0.f ? "." : "");
+      = std::to_string(_alphaCutOff) + (std::fmod(_alphaCutOff, 1.f) == 0.f ? "." : "");
     defines.boolDef["PREMULTIPLYALPHA"]
       = (alphaMode() == Constants::ALPHA_PREMULTIPLIED
          || alphaMode() == Constants::ALPHA_PREMULTIPLIED_PORTERDUFF);
-    defines.boolDef["ALPHABLEND"] = needAlphaBlendingForMesh(*mesh);
-    defines.boolDef["ALPHAFRESNEL"]
-      = _useAlphaFresnel || _useLinearAlphaFresnel;
+    defines.boolDef["ALPHABLEND"]         = needAlphaBlendingForMesh(*mesh);
+    defines.boolDef["ALPHAFRESNEL"]       = _useAlphaFresnel || _useLinearAlphaFresnel;
     defines.boolDef["LINEARALPHAFRESNEL"] = _useLinearAlphaFresnel;
   }
 
@@ -1036,13 +990,12 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
 
   // Misc.
   if (defines._areMiscDirty) {
-    MaterialHelper::PrepareDefinesForMisc(
-      mesh, scene, _useLogarithmicDepth, pointsCloud(), fogEnabled(),
-      _shouldTurnAlphaTestOn(mesh) || _forceAlphaTest, defines);
-    defines.boolDef["UNLIT"]
-      = _unlit
-        || ((pointsCloud() || wireframe())
-            && !mesh->isVerticesDataPresent(VertexBuffer::NormalKind));
+    MaterialHelper::PrepareDefinesForMisc(mesh, scene, _useLogarithmicDepth, pointsCloud(),
+                                          fogEnabled(),
+                                          _shouldTurnAlphaTestOn(mesh) || _forceAlphaTest, defines);
+    defines.boolDef["UNLIT"] = _unlit
+                               || ((pointsCloud() || wireframe())
+                                   && !mesh->isVerticesDataPresent(VertexBuffer::NormalKind));
     defines.intDef["DEBUGMODE"] = static_cast<unsigned>(_debugMode);
   }
 
@@ -1059,29 +1012,26 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
 
   // Attribs
   MaterialHelper::PrepareDefinesForAttributes(
-    mesh, defines, true, true, true,
-    _transparencyMode != PBRBaseMaterial::PBRMATERIAL_OPAQUE);
+    mesh, defines, true, true, true, _transparencyMode != PBRBaseMaterial::PBRMATERIAL_OPAQUE);
 }
 
-void PBRBaseMaterial::forceCompilation(
-  AbstractMesh* mesh, std::function<void(Material* material)>& iOnCompiled,
-  bool clipPlane)
+void PBRBaseMaterial::forceCompilation(AbstractMesh* mesh,
+                                       std::function<void(Material* material)>& iOnCompiled,
+                                       bool clipPlane)
 {
   PBRMaterialDefines defines;
-  auto effect
-    = _prepareEffect(mesh, defines, nullptr, nullptr, std::nullopt, clipPlane);
+  auto effect = _prepareEffect(mesh, defines, nullptr, nullptr, std::nullopt, clipPlane);
   if (effect->isReady()) {
     if (iOnCompiled) {
       iOnCompiled(this);
     }
   }
   else {
-    effect->onCompileObservable.add(
-      [&](Effect* /*effect*/, EventState& /*es*/) {
-        if (iOnCompiled) {
-          iOnCompiled(this);
-        }
-      });
+    effect->onCompileObservable.add([&](Effect* /*effect*/, EventState& /*es*/) {
+      if (iOnCompiled) {
+        iOnCompiled(this);
+      }
+    });
   }
 }
 
@@ -1150,13 +1100,11 @@ void PBRBaseMaterial::unbind()
   PushMaterial::unbind();
 }
 
-void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
-                                     SubMesh* subMesh)
+void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
-  auto definesTmp
-    = static_cast<PBRMaterialDefines*>(subMesh->_materialDefines.get());
+  auto definesTmp = static_cast<PBRMaterialDefines*>(subMesh->_materialDefines.get());
   if (!definesTmp) {
     return;
   }
@@ -1199,42 +1147,33 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
       // Texture uniforms
       if (scene->texturesEnabled()) {
         if (_albedoTexture && MaterialFlags::DiffuseTextureEnabled()) {
-          ubo.updateFloat2("vAlbedoInfos",
-                           static_cast<float>(_albedoTexture->coordinatesIndex),
+          ubo.updateFloat2("vAlbedoInfos", static_cast<float>(_albedoTexture->coordinatesIndex),
                            _albedoTexture->level, "");
           MaterialHelper::BindTextureMatrix(*_albedoTexture, ubo, "albedo");
         }
 
         if (_ambientTexture && MaterialFlags::AmbientTextureEnabled()) {
-          ubo.updateFloat4(
-            "vAmbientInfos",
-            static_cast<float>(_ambientTexture->coordinatesIndex),
-            _ambientTexture->level, _ambientTextureStrength,
-            static_cast<float>(_ambientTextureImpactOnAnalyticalLights), "");
+          ubo.updateFloat4("vAmbientInfos", static_cast<float>(_ambientTexture->coordinatesIndex),
+                           _ambientTexture->level, _ambientTextureStrength,
+                           static_cast<float>(_ambientTextureImpactOnAnalyticalLights), "");
           MaterialHelper::BindTextureMatrix(*_ambientTexture, ubo, "ambient");
         }
 
         if (_opacityTexture && MaterialFlags::OpacityTextureEnabled()) {
-          ubo.updateFloat2(
-            "vOpacityInfos",
-            static_cast<float>(_opacityTexture->coordinatesIndex),
-            _opacityTexture->level, "");
+          ubo.updateFloat2("vOpacityInfos", static_cast<float>(_opacityTexture->coordinatesIndex),
+                           _opacityTexture->level, "");
           MaterialHelper::BindTextureMatrix(*_opacityTexture, ubo, "opacity");
         }
 
         if (reflectionTexture && MaterialFlags::ReflectionTextureEnabled()) {
-          ubo.updateMatrix("reflectionMatrix",
-                           *reflectionTexture->getReflectionTextureMatrix());
+          ubo.updateMatrix("reflectionMatrix", *reflectionTexture->getReflectionTextureMatrix());
           ubo.updateFloat2("vReflectionInfos", reflectionTexture->level, 0, "");
 
           if (reflectionTexture->boundingBoxSize()) {
-            auto cubeTexture
-              = std::static_pointer_cast<CubeTexture>(reflectionTexture);
+            auto cubeTexture = std::static_pointer_cast<CubeTexture>(reflectionTexture);
             if (cubeTexture) {
-              ubo.updateVector3("vReflectionPosition",
-                                cubeTexture->boundingBoxPosition);
-              ubo.updateVector3("vReflectionSize",
-                                *cubeTexture->boundingBoxSize());
+              ubo.updateVector3("vReflectionPosition", cubeTexture->boundingBoxPosition);
+              ubo.updateVector3("vReflectionSize", *cubeTexture->boundingBoxSize());
             }
           }
 
@@ -1244,118 +1183,92 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
               auto polynomials = *_polynomials;
               if (defines["SPHERICAL_HARMONICS"]) {
                 auto& preScaledHarmonics = polynomials.preScaledHarmonics();
-                _activeEffect->setVector3("vSphericalL00",
-                                          preScaledHarmonics.l00);
-                _activeEffect->setVector3("vSphericalL1_1",
-                                          preScaledHarmonics.l1_1);
-                _activeEffect->setVector3("vSphericalL10",
-                                          preScaledHarmonics.l10);
-                _activeEffect->setVector3("vSphericalL11",
-                                          preScaledHarmonics.l11);
-                _activeEffect->setVector3("vSphericalL2_2",
-                                          preScaledHarmonics.l2_2);
-                _activeEffect->setVector3("vSphericalL2_1",
-                                          preScaledHarmonics.l2_1);
-                _activeEffect->setVector3("vSphericalL20",
-                                          preScaledHarmonics.l20);
-                _activeEffect->setVector3("vSphericalL21",
-                                          preScaledHarmonics.l21);
-                _activeEffect->setVector3("vSphericalL22",
-                                          preScaledHarmonics.l22);
+                _activeEffect->setVector3("vSphericalL00", preScaledHarmonics.l00);
+                _activeEffect->setVector3("vSphericalL1_1", preScaledHarmonics.l1_1);
+                _activeEffect->setVector3("vSphericalL10", preScaledHarmonics.l10);
+                _activeEffect->setVector3("vSphericalL11", preScaledHarmonics.l11);
+                _activeEffect->setVector3("vSphericalL2_2", preScaledHarmonics.l2_2);
+                _activeEffect->setVector3("vSphericalL2_1", preScaledHarmonics.l2_1);
+                _activeEffect->setVector3("vSphericalL20", preScaledHarmonics.l20);
+                _activeEffect->setVector3("vSphericalL21", preScaledHarmonics.l21);
+                _activeEffect->setVector3("vSphericalL22", preScaledHarmonics.l22);
               }
               else {
-                _activeEffect->setFloat3("vSphericalX", polynomials.x.x,
-                                         polynomials.x.y, polynomials.x.z);
-                _activeEffect->setFloat3("vSphericalY", polynomials.y.x,
-                                         polynomials.y.y, polynomials.y.z);
-                _activeEffect->setFloat3("vSphericalZ", polynomials.z.x,
-                                         polynomials.z.y, polynomials.z.z);
-                _activeEffect->setFloat3("vSphericalXX_ZZ",
-                                         polynomials.xx.x - polynomials.zz.x,
+                _activeEffect->setFloat3("vSphericalX", polynomials.x.x, polynomials.x.y,
+                                         polynomials.x.z);
+                _activeEffect->setFloat3("vSphericalY", polynomials.y.x, polynomials.y.y,
+                                         polynomials.y.z);
+                _activeEffect->setFloat3("vSphericalZ", polynomials.z.x, polynomials.z.y,
+                                         polynomials.z.z);
+                _activeEffect->setFloat3("vSphericalXX_ZZ", polynomials.xx.x - polynomials.zz.x,
                                          polynomials.xx.y - polynomials.zz.y,
                                          polynomials.xx.z - polynomials.zz.z);
-                _activeEffect->setFloat3("vSphericalYY_ZZ",
-                                         polynomials.yy.x - polynomials.zz.x,
+                _activeEffect->setFloat3("vSphericalYY_ZZ", polynomials.yy.x - polynomials.zz.x,
                                          polynomials.yy.y - polynomials.zz.y,
                                          polynomials.yy.z - polynomials.zz.z);
-                _activeEffect->setFloat3("vSphericalZZ", polynomials.zz.x,
-                                         polynomials.zz.y, polynomials.zz.z);
-                _activeEffect->setFloat3("vSphericalXY", polynomials.xy.x,
-                                         polynomials.xy.y, polynomials.xy.z);
-                _activeEffect->setFloat3("vSphericalYZ", polynomials.yz.x,
-                                         polynomials.yz.y, polynomials.yz.z);
-                _activeEffect->setFloat3("vSphericalZX", polynomials.zx.x,
-                                         polynomials.zx.y, polynomials.zx.z);
+                _activeEffect->setFloat3("vSphericalZZ", polynomials.zz.x, polynomials.zz.y,
+                                         polynomials.zz.z);
+                _activeEffect->setFloat3("vSphericalXY", polynomials.xy.x, polynomials.xy.y,
+                                         polynomials.xy.z);
+                _activeEffect->setFloat3("vSphericalYZ", polynomials.yz.x, polynomials.yz.y,
+                                         polynomials.yz.z);
+                _activeEffect->setFloat3("vSphericalZX", polynomials.zx.x, polynomials.zx.y,
+                                         polynomials.zx.z);
               }
             }
           }
 
           ubo.updateFloat3(
-            "vReflectionMicrosurfaceInfos",
-            static_cast<float>(reflectionTexture->getSize().width),
-            reflectionTexture->lodGenerationScale(),
-            reflectionTexture->lodGenerationOffset(), "");
+            "vReflectionMicrosurfaceInfos", static_cast<float>(reflectionTexture->getSize().width),
+            reflectionTexture->lodGenerationScale(), reflectionTexture->lodGenerationOffset(), "");
         }
 
         if (_emissiveTexture && MaterialFlags::EmissiveTextureEnabled()) {
-          ubo.updateFloat2(
-            "vEmissiveInfos",
-            static_cast<float>(_emissiveTexture->coordinatesIndex),
-            _emissiveTexture->level, "");
+          ubo.updateFloat2("vEmissiveInfos", static_cast<float>(_emissiveTexture->coordinatesIndex),
+                           _emissiveTexture->level, "");
           MaterialHelper::BindTextureMatrix(*_emissiveTexture, ubo, "emissive");
         }
 
         if (_lightmapTexture && MaterialFlags::LightmapTextureEnabled()) {
-          ubo.updateFloat2(
-            "vLightmapInfos",
-            static_cast<float>(_lightmapTexture->coordinatesIndex),
-            _lightmapTexture->level, "");
+          ubo.updateFloat2("vLightmapInfos", static_cast<float>(_lightmapTexture->coordinatesIndex),
+                           _lightmapTexture->level, "");
           MaterialHelper::BindTextureMatrix(*_lightmapTexture, ubo, "lightmap");
         }
 
         if (MaterialFlags::SpecularTextureEnabled()) {
           if (_metallicTexture) {
-            ubo.updateFloat3(
-              "vReflectivityInfos",
-              static_cast<float>(_metallicTexture->coordinatesIndex),
-              _metallicTexture->level, _ambientTextureStrength, "");
-            MaterialHelper::BindTextureMatrix(*_metallicTexture, ubo,
-                                              "reflectivity");
+            ubo.updateFloat3("vReflectivityInfos",
+                             static_cast<float>(_metallicTexture->coordinatesIndex),
+                             _metallicTexture->level, _ambientTextureStrength, "");
+            MaterialHelper::BindTextureMatrix(*_metallicTexture, ubo, "reflectivity");
           }
           else if (_reflectivityTexture) {
-            ubo.updateFloat3(
-              "vReflectivityInfos",
-              static_cast<float>(_reflectivityTexture->coordinatesIndex),
-              _reflectivityTexture->level, 1.f, "");
-            MaterialHelper::BindTextureMatrix(*_reflectivityTexture, ubo,
-                                              "reflectivity");
+            ubo.updateFloat3("vReflectivityInfos",
+                             static_cast<float>(_reflectivityTexture->coordinatesIndex),
+                             _reflectivityTexture->level, 1.f, "");
+            MaterialHelper::BindTextureMatrix(*_reflectivityTexture, ubo, "reflectivity");
           }
 
           if (_microSurfaceTexture) {
-            ubo.updateFloat2(
-              "vMicroSurfaceSamplerInfos",
-              static_cast<float>(_microSurfaceTexture->coordinatesIndex),
-              _microSurfaceTexture->level, "");
-            MaterialHelper::BindTextureMatrix(*_microSurfaceTexture, ubo,
-                                              "microSurfaceSampler");
+            ubo.updateFloat2("vMicroSurfaceSamplerInfos",
+                             static_cast<float>(_microSurfaceTexture->coordinatesIndex),
+                             _microSurfaceTexture->level, "");
+            MaterialHelper::BindTextureMatrix(*_microSurfaceTexture, ubo, "microSurfaceSampler");
           }
         }
 
         if (_bumpTexture && engine->getCaps().standardDerivatives
             && MaterialFlags::BumpTextureEnabled() && !_disableBumpMap) {
-          ubo.updateFloat3("vBumpInfos",
-                           static_cast<float>(_bumpTexture->coordinatesIndex),
+          ubo.updateFloat3("vBumpInfos", static_cast<float>(_bumpTexture->coordinatesIndex),
                            _bumpTexture->level, _parallaxScaleBias, "");
           MaterialHelper::BindTextureMatrix(*_bumpTexture, ubo, "bump");
 
           if (scene->_mirroredCameraPosition) {
-            ubo.updateFloat2("vTangentSpaceParams",
-                             _invertNormalMapX ? 1.f : -1.f,
+            ubo.updateFloat2("vTangentSpaceParams", _invertNormalMapX ? 1.f : -1.f,
                              _invertNormalMapY ? 1.f : -1.f, "");
           }
           else {
-            ubo.updateFloat2("vTangentSpaceParams",
-                             _invertNormalMapX ? -1.f : 1.f,
+            ubo.updateFloat2("vTangentSpaceParams", _invertNormalMapX ? -1.f : 1.f,
                              _invertNormalMapY ? -1.f : 1.f, "");
           }
         }
@@ -1368,26 +1281,19 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
 
       // Colors
       if (defines["METALLICWORKFLOW"]) {
-        TmpVectors::Color3Array[0].r
-          = !_metallic.has_value() ? 1.f : *_metallic;
-        TmpVectors::Color3Array[0].g
-          = !_roughness.has_value() ? 1.f : *_roughness;
-        ubo.updateColor4("vReflectivityColor", TmpVectors::Color3Array[0], 0,
-                         "");
+        TmpVectors::Color3Array[0].r = !_metallic.has_value() ? 1.f : *_metallic;
+        TmpVectors::Color3Array[0].g = !_roughness.has_value() ? 1.f : *_roughness;
+        ubo.updateColor4("vReflectivityColor", TmpVectors::Color3Array[0], 0, "");
       }
       else {
-        ubo.updateColor4("vReflectivityColor", _reflectivityColor,
-                         _microSurface, "");
+        ubo.updateColor4("vReflectivityColor", _reflectivityColor, _microSurface, "");
       }
 
-      ubo.updateColor3("vEmissiveColor",
-                       MaterialFlags::EmissiveTextureEnabled() ?
-                         _emissiveColor :
-                         Color3::BlackReadOnly(),
-                       "");
+      ubo.updateColor3(
+        "vEmissiveColor",
+        MaterialFlags::EmissiveTextureEnabled() ? _emissiveColor : Color3::BlackReadOnly(), "");
       ubo.updateColor3("vReflectionColor", _reflectionColor, "");
-      if (!defines["SS_REFRACTION"]
-          && subSurface->linkRefractionWithTransparency()) {
+      if (!defines["SS_REFRACTION"] && subSurface->linkRefractionWithTransparency()) {
         ubo.updateColor4("vAlbedoColor", _albedoColor, 1.f, "");
       }
       else {
@@ -1425,23 +1331,19 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
           ubo.setTexture("reflectionSampler", reflectionTexture);
         }
         else {
-          ubo.setTexture("reflectionSampler",
-                         reflectionTexture->_lodTextureMid() ?
-                           reflectionTexture->_lodTextureMid() :
-                           reflectionTexture);
-          ubo.setTexture("reflectionSamplerLow",
-                         reflectionTexture->_lodTextureLow() ?
-                           reflectionTexture->_lodTextureLow() :
-                           reflectionTexture);
-          ubo.setTexture("reflectionSamplerHigh",
-                         reflectionTexture->_lodTextureHigh() ?
-                           reflectionTexture->_lodTextureHigh() :
-                           reflectionTexture);
+          ubo.setTexture("reflectionSampler", reflectionTexture->_lodTextureMid() ?
+                                                reflectionTexture->_lodTextureMid() :
+                                                reflectionTexture);
+          ubo.setTexture("reflectionSamplerLow", reflectionTexture->_lodTextureLow() ?
+                                                   reflectionTexture->_lodTextureLow() :
+                                                   reflectionTexture);
+          ubo.setTexture("reflectionSamplerHigh", reflectionTexture->_lodTextureHigh() ?
+                                                    reflectionTexture->_lodTextureHigh() :
+                                                    reflectionTexture);
         }
 
         if (defines["USEIRRADIANCEMAP"]) {
-          ubo.setTexture("irradianceSampler",
-                         reflectionTexture->irradianceTexture());
+          ubo.setTexture("irradianceSampler", reflectionTexture->irradianceTexture());
         }
       }
 
@@ -1476,10 +1378,9 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
       }
     }
 
-    subSurface->bindForSubMesh(ubo, scene, engine, isFrozen(),
-                               defines["LODBASEDMICROSFURACE"]);
-    clearCoat->bindForSubMesh(ubo, scene, engine, _disableBumpMap, isFrozen(),
-                              _invertNormalMapX, _invertNormalMapY);
+    subSurface->bindForSubMesh(ubo, scene, engine, isFrozen(), defines["LODBASEDMICROSFURACE"]);
+    clearCoat->bindForSubMesh(ubo, scene, engine, _disableBumpMap, isFrozen(), _invertNormalMapX,
+                              _invertNormalMapY);
     anisotropy->bindForSubMesh(ubo, scene, isFrozen());
     sheen->bindForSubMesh(ubo, scene, isFrozen());
 
@@ -1491,13 +1392,12 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
 
     auto eyePosition = scene->_forcedViewPosition ?
                          *scene->_forcedViewPosition :
-                         (scene->_mirroredCameraPosition ?
-                            *scene->_mirroredCameraPosition :
-                            scene->activeCamera()->globalPosition());
-    auto invertNormal = (scene->useRightHandedSystem()
-                         == (scene->_mirroredCameraPosition != nullptr));
-    effect->setFloat4("vEyePosition", eyePosition.x, eyePosition.y,
-                      eyePosition.z, invertNormal ? -1.f : 1.f);
+                         (scene->_mirroredCameraPosition ? *scene->_mirroredCameraPosition :
+                                                           scene->activeCamera()->globalPosition());
+    auto invertNormal
+      = (scene->useRightHandedSystem() == (scene->_mirroredCameraPosition != nullptr));
+    effect->setFloat4("vEyePosition", eyePosition.x, eyePosition.y, eyePosition.z,
+                      invertNormal ? -1.f : 1.f);
     effect->setColor3("vAmbientColor", _globalAmbientColor);
 
     effect->setFloat2("vDebugMode", debugLimit, debugFactor);
@@ -1506,15 +1406,13 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
   if (mustRebind || !isFrozen()) {
     // Lights
     if (scene->lightsEnabled() && !_disableLighting) {
-      MaterialHelper::BindLights(
-        scene, mesh, _activeEffect, defines, _maxSimultaneousLights,
-        _lightFalloff != PBRBaseMaterial::LIGHTFALLOFF_STANDARD,
-        _rebuildInParallel);
+      MaterialHelper::BindLights(scene, mesh, _activeEffect, defines, _maxSimultaneousLights,
+                                 _lightFalloff != PBRBaseMaterial::LIGHTFALLOFF_STANDARD,
+                                 _rebuildInParallel);
     }
 
     // View
-    if ((scene->fogEnabled() && mesh->applyFog()
-         && scene->fogMode() != Scene::FOGMODE_NONE)
+    if ((scene->fogEnabled() && mesh->applyFog() && scene->fogMode() != Scene::FOGMODE_NONE)
         || reflectionTexture) {
       bindView(effect.get());
     }
@@ -1693,8 +1591,7 @@ bool PBRBaseMaterial::hasTexture(const BaseTexturePtr& texture) const
          || sheen->hasTexture(texture) || anisotropy->hasTexture(texture);
 }
 
-void PBRBaseMaterial::dispose(bool forceDisposeEffect,
-                              bool forceDisposeTextures,
+void PBRBaseMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
                               bool /*notBoundToMesh*/)
 {
   if (forceDisposeTextures) {
@@ -1714,8 +1611,7 @@ void PBRBaseMaterial::dispose(bool forceDisposeEffect,
       _reflectionTexture->dispose();
     }
 
-    if (_environmentBRDFTexture
-        && getScene()->environmentBRDFTexture != _environmentBRDFTexture) {
+    if (_environmentBRDFTexture && getScene()->environmentBRDFTexture != _environmentBRDFTexture) {
       _environmentBRDFTexture->dispose();
     }
 
@@ -1748,8 +1644,7 @@ void PBRBaseMaterial::dispose(bool forceDisposeEffect,
   _renderTargets.clear();
 
   if (_imageProcessingConfiguration && _imageProcessingObserver) {
-    _imageProcessingConfiguration->onUpdateParameters.remove(
-      _imageProcessingObserver);
+    _imageProcessingConfiguration->onUpdateParameters.remove(_imageProcessingObserver);
   }
 
   PushMaterial::dispose(forceDisposeEffect, forceDisposeTextures);

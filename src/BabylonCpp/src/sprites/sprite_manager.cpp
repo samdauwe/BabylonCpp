@@ -8,8 +8,8 @@
 #include <babylon/engines/scene.h>
 #include <babylon/engines/scene_component_constants.h>
 #include <babylon/materials/effect.h>
-#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/maths/color3.h>
@@ -107,7 +107,7 @@ SpriteManager::SpriteManager(const std::string& iName, const std::string& imgUrl
   // Effects
 
   {
-    EffectCreationOptions spriteOptions;
+    IEffectCreationOptions spriteOptions;
     spriteOptions.attributes
       = {VertexBuffer::PositionKind, "options", "inverts", "cellInfo", VertexBuffer::ColorKind};
     spriteOptions.uniformsNames = {"view", "projection", "textureInfos", "alphaTest"};
@@ -117,7 +117,7 @@ SpriteManager::SpriteManager(const std::string& iName, const std::string& imgUrl
   }
 
   {
-    EffectCreationOptions spriteOptions;
+    IEffectCreationOptions spriteOptions;
     spriteOptions.attributes
       = {VertexBuffer::PositionKind, "options", "inverts", "cellInfo", VertexBuffer::ColorKind};
     spriteOptions.uniformsNames

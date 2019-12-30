@@ -11,8 +11,8 @@ namespace BABYLON {
 class Buffer;
 class Effect;
 class Engine;
-struct EffectCreationOptions;
 class GPUParticleSystem;
+struct IEffectCreationOptions;
 class Mesh;
 class RawTexture;
 using EffectPtr     = std::shared_ptr<Effect>;
@@ -481,7 +481,7 @@ private:
   RawTexturePtr _randomTexture2;
 
   int _attributesStrideSize;
-  EffectCreationOptions* _updateEffectOptions;
+  IEffectCreationOptions* _updateEffectOptions;
 
   size_t _randomTextureSize;
   int _actualFrame;

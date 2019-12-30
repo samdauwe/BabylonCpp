@@ -6,8 +6,8 @@
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/materials/effect.h>
-#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/irender_target_options.h>
 
@@ -242,7 +242,7 @@ void PostProcess::updateEffect(
   std::unordered_map<std::string, std::string> baseName{{"vertex", _vertexUrl},
                                                         {"fragment", _fragmentUrl}};
 
-  EffectCreationOptions options;
+  IEffectCreationOptions options;
   options.attributes      = {"position"};
   options.uniformsNames   = !uniforms.empty() ? uniforms : _parameters;
   options.samplers        = !samplers.empty() ? samplers : _samplers;

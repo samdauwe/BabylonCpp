@@ -9,8 +9,8 @@
 #include <babylon/lights/ishadow_light.h>
 #include <babylon/lights/light.h>
 #include <babylon/materials/effect.h>
-#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materialslibrary/shadowonly/shadow_only_fragment_fx.h>
 #include <babylon/materialslibrary/shadowonly/shadow_only_vertex_fx.h>
@@ -146,7 +146,7 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subM
 
     const std::string shaderName{"shadowOnly"};
     auto join = defines.toString();
-    EffectCreationOptions options;
+    IEffectCreationOptions options;
     options.attributes = std::move(attribs);
     options.uniformsNames
       = {"world",     "view",       "viewProjection", "vEyePosition", "vLightsType",

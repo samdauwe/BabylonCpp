@@ -6,8 +6,8 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
-#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materialslibrary/gradient/gradient_fragment_fx.h>
 #include <babylon/materialslibrary/gradient/gradient_vertex_fx.h>
@@ -174,7 +174,7 @@ bool GradientMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMes
     const std::vector<std::string> samplers{"diffuseSampler"};
     const std::vector<std::string> uniformBuffers{};
 
-    EffectCreationOptions options;
+    IEffectCreationOptions options;
     options.attributes            = std::move(attribs);
     options.uniformsNames         = std::move(uniforms);
     options.uniformBuffersNames   = std::move(uniformBuffers);

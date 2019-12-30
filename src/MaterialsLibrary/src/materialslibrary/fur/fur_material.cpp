@@ -7,8 +7,8 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
-#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material_flags.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/textures/dynamic_texture.h>
@@ -274,7 +274,7 @@ bool FurMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bo
     const std::vector<std::string> samplers{"diffuseSampler", "heightTexture", "furTexture"};
     const std::vector<std::string> uniformBuffers{};
 
-    EffectCreationOptions options;
+    IEffectCreationOptions options;
     options.attributes            = std::move(attribs);
     options.uniformsNames         = std::move(uniforms);
     options.uniformBuffersNames   = std::move(uniformBuffers);

@@ -5,8 +5,8 @@
 #include <babylon/engines/scene_component_constants.h>
 #include <babylon/layers/layer_scene_component.h>
 #include <babylon/materials/effect.h>
-#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/maths/matrix.h>
@@ -59,7 +59,7 @@ Layer::Layer(const std::string& name, const std::string& imgUrl, Scene* scene, b
 
   // Effects
   {
-    EffectCreationOptions options;
+    IEffectCreationOptions options;
     options.attributes    = {VertexBuffer::PositionKind};
     options.uniformsNames = {"textureMatrix", "color", "scale", "offset"};
     options.samplers      = {"textureSampler"};
@@ -69,7 +69,7 @@ Layer::Layer(const std::string& name, const std::string& imgUrl, Scene* scene, b
   }
 
   {
-    EffectCreationOptions options;
+    IEffectCreationOptions options;
     options.attributes    = {VertexBuffer::PositionKind};
     options.uniformsNames = {"textureMatrix", "color", "scale", "offset"};
     options.samplers      = {"textureSampler"};

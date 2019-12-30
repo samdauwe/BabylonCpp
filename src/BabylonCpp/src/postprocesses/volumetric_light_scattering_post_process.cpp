@@ -10,8 +10,8 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
-#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/standard_material.h>
@@ -142,7 +142,7 @@ bool VolumetricLightScatteringPostProcess::_isReady(SubMesh* subMesh, bool useIn
   if (_cachedDefines != join) {
     _cachedDefines = join;
 
-    EffectCreationOptions options;
+    IEffectCreationOptions options;
     options.attributes      = std::move(attribs);
     options.uniformsNames   = {"world", "mBones", "viewProjection", "diffuseMatrix"};
     options.samplers        = {"diffuseSampler"};

@@ -15,7 +15,7 @@ namespace BABYLON {
 class AbstractMesh;
 class BaseTexture;
 class Effect;
-struct EffectCreationOptions;
+struct IEffectCreationOptions;
 class EffectFallbacks;
 class Engine;
 class Light;
@@ -222,7 +222,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param defines The defines helping in the list generation
    * @param maxSimultaneousLights The maximum number of simultanous light allowed in the effect
    */
-  static void PrepareUniformsAndSamplersList(EffectCreationOptions& options);
+  static void PrepareUniformsAndSamplersList(IEffectCreationOptions& options);
 
   /**
    * @brief This helps decreasing rank by rank the shadow quality (0 being the highest rank and

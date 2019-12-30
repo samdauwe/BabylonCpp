@@ -6,8 +6,8 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
-#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/textures/render_target_texture.h>
@@ -23,8 +23,8 @@
 
 namespace BABYLON {
 
-DepthRenderer::DepthRenderer(Scene* scene, unsigned int type,
-                             const CameraPtr& camera, bool storeNonLinearDepth)
+DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, const CameraPtr& camera,
+                             bool storeNonLinearDepth)
     : isPacked{type == Constants::TEXTURETYPE_UNSIGNED_BYTE}
     , useOnlyInActiveCamera{false}
     , _depthMap{nullptr}
@@ -51,13 +51,11 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type,
   auto engine = scene->getEngine();
 
   // Render target
-  const auto format = (isPacked || engine->webGLVersion() == 1.f) ?
-                        Constants::TEXTUREFORMAT_RGBA :
-                        Constants::TEXTUREFORMAT_R;
+  const auto format = (isPacked || engine->webGLVersion() == 1.f) ? Constants::TEXTUREFORMAT_RGBA :
+                                                                    Constants::TEXTUREFORMAT_R;
   _depthMap = RenderTargetTexture::New(
-    "depthMap", ISize{engine->getRenderWidth(), engine->getRenderHeight()},
-    _scene, false, true, type, false, TextureConstants::TRILINEAR_SAMPLINGMODE,
-    true, false, false, format);
+    "depthMap", ISize{engine->getRenderWidth(), engine->getRenderHeight()}, _scene, false, true,
+    type, false, TextureConstants::TRILINEAR_SAMPLINGMODE, true, false, false, format);
   _depthMap->wrapU           = TextureConstants::CLAMP_ADDRESSMODE;
   _depthMap->wrapV           = TextureConstants::CLAMP_ADDRESSMODE;
   _depthMap->refreshRate     = 1;
@@ -70,9 +68,8 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type,
   _depthMap->useCameraPostProcesses = false;
 
   // set default depth value to 1.0 (far away)
-  _depthMap->onClearObservable.add([this](Engine* _engine, EventState&) {
-    _engine->clear(_clearColor, true, true);
-  });
+  _depthMap->onClearObservable.add(
+    [this](Engine* _engine, EventState&) { _engine->clear(_clearColor, true, true); });
 
   // Custom render function
   auto renderSubMesh = [this](SubMesh* subMesh) {
@@ -88,8 +85,7 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type,
     }
 
     // Culling and reverse (right handed system)
-    engine->setState(material->backFaceCulling(), 0, false,
-                     scene->useRightHandedSystem());
+    engine->setState(material->backFaceCulling(), 0, false, scene->useRightHandedSystem());
 
     // Managing instances
     auto batch = mesh->_getInstancesRenderList(subMesh->_id);
@@ -100,8 +96,7 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type,
 
     bool hardwareInstancedRendering
       = engine->getCaps().instancedArrays
-        && (batch->visibleInstances.find(subMesh->_id)
-            != batch->visibleInstances.end());
+        && (batch->visibleInstances.find(subMesh->_id) != batch->visibleInstances.end());
 
     auto camera = (!_camera) ? _camera : scene->activeCamera;
     if (isReady(subMesh, hardwareInstancedRendering) && camera) {
@@ -110,46 +105,40 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type,
 
       _effect->setMatrix("viewProjection", _scene->getTransformMatrix());
 
-      _effect->setFloat2("depthValues", camera->minZ,
-                         camera->minZ + camera->maxZ);
+      _effect->setFloat2("depthValues", camera->minZ, camera->minZ + camera->maxZ);
 
       // Alpha test
       if (material && material->needAlphaTesting()) {
         auto alphaTexture = material->getAlphaTestTexture();
         if (alphaTexture) {
           _effect->setTexture("diffuseSampler", alphaTexture);
-          _effect->setMatrix("diffuseMatrix",
-                             *alphaTexture->getTextureMatrix());
+          _effect->setMatrix("diffuseMatrix", *alphaTexture->getTextureMatrix());
         }
       }
 
       // Bones
-      if (mesh->useBones() && mesh->computeBonesUsingShaders()
-          && mesh->skeleton()) {
-        _effect->setMatrices(
-          "mBones", mesh->skeleton()->getTransformMatrices(mesh.get()));
+      if (mesh->useBones() && mesh->computeBonesUsingShaders() && mesh->skeleton()) {
+        _effect->setMatrices("mBones", mesh->skeleton()->getTransformMatrices(mesh.get()));
       }
 
       // Morph targets
       MaterialHelper::BindMorphTargetParameters(mesh.get(), _effect);
 
       // Draw
-      mesh->_processRendering(subMesh, _effect, Material::TriangleFillMode,
-                              batch, hardwareInstancedRendering,
-                              [this](bool /*isInstance*/, Matrix world,
-                                     Material* /*effectiveMaterial*/) {
-                                _effect->setMatrix("world", world);
-                              });
+      mesh->_processRendering(
+        subMesh, _effect, Material::TriangleFillMode, batch, hardwareInstancedRendering,
+        [this](bool /*isInstance*/, Matrix world, Material* /*effectiveMaterial*/) {
+          _effect->setMatrix("world", world);
+        });
     }
   };
 
   _depthMap->customRenderFunction
-    = [engine,
-       renderSubMesh](const std::vector<SubMesh*>& opaqueSubMeshes,
-                      const std::vector<SubMesh*>& alphaTestSubMeshes,
-                      const std::vector<SubMesh*>& /*transparentSubMeshes*/,
-                      const std::vector<SubMesh*>& depthOnlySubMeshes,
-                      const std::function<void()>& /*beforeTransparents*/) {
+    = [engine, renderSubMesh](const std::vector<SubMesh*>& opaqueSubMeshes,
+                              const std::vector<SubMesh*>& alphaTestSubMeshes,
+                              const std::vector<SubMesh*>& /*transparentSubMeshes*/,
+                              const std::vector<SubMesh*>& depthOnlySubMeshes,
+                              const std::function<void()>& /*beforeTransparents*/) {
         if (!depthOnlySubMeshes.empty()) {
           engine->setColorWrite(false);
           for (auto& depthOnlySubMesh : depthOnlySubMeshes) {
@@ -184,8 +173,7 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
   auto mesh = subMesh->getMesh();
 
   // Alpha test
-  if (material && material->needAlphaTesting()
-      && material->getAlphaTestTexture()) {
+  if (material && material->needAlphaTesting() && material->getAlphaTestTexture()) {
     defines.emplace_back("#define ALPHATEST");
     if (mesh->isVerticesDataPresent(VertexBuffer::UVKind)) {
       attribs.emplace_back(VertexBuffer::UVKind);
@@ -207,26 +195,23 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
     }
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
                          + std::to_string(mesh->numBoneInfluencers()));
-    defines.emplace_back("#define BonesPerMesh "
-                         + std::to_string(mesh->skeleton() ?
-                                            mesh->skeleton()->bones.size() + 1 :
-                                            0));
+    defines.emplace_back(
+      "#define BonesPerMesh "
+      + std::to_string(mesh->skeleton() ? mesh->skeleton()->bones.size() + 1 : 0));
   }
   else {
     defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
   }
 
   // Morph targets
-  auto morphTargetManager
-    = std::static_pointer_cast<Mesh>(mesh)->morphTargetManager();
+  auto morphTargetManager  = std::static_pointer_cast<Mesh>(mesh)->morphTargetManager();
   auto numMorphInfluencers = 0ull;
   if (morphTargetManager) {
     if (morphTargetManager->numInfluencers > 0) {
       numMorphInfluencers = morphTargetManager->numInfluencers();
 
       defines.emplace_back("#define MORPHTARGETS");
-      defines.emplace_back("#define NUM_MORPH_INFLUENCERS "
-                           + std::to_string(numMorphInfluencers));
+      defines.emplace_back("#define NUM_MORPH_INFLUENCERS " + std::to_string(numMorphInfluencers));
 
       MaterialHelper::PrepareAttributesForMorphTargetsInfluencers(
         attribs, mesh.get(), static_cast<unsigned>(numMorphInfluencers));
@@ -254,18 +239,16 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
   if (_cachedDefines != join) {
     _cachedDefines = join;
 
-    EffectCreationOptions options;
-    options.attributes = std::move(attribs);
-    options.uniformsNames
-      = {"world",         "mBones",      "viewProjection",
-         "diffuseMatrix", "depthValues", "morphTargetInfluences"};
-    options.samplers        = {"diffuseSampler"};
-    options.defines         = std::move(join);
-    options.indexParameters = {{"maxSimultaneousMorphTargets",
-                                static_cast<unsigned>(numMorphInfluencers)}};
+    IEffectCreationOptions options;
+    options.attributes    = std::move(attribs);
+    options.uniformsNames = {"world",         "mBones",      "viewProjection",
+                             "diffuseMatrix", "depthValues", "morphTargetInfluences"};
+    options.samplers      = {"diffuseSampler"};
+    options.defines       = std::move(join);
+    options.indexParameters
+      = {{"maxSimultaneousMorphTargets", static_cast<unsigned>(numMorphInfluencers)}};
 
-    _effect = _scene->getEngine()->createEffect("depth", options,
-                                                _scene->getEngine());
+    _effect = _scene->getEngine()->createEffect("depth", options, _scene->getEngine());
   }
 
   return _effect->isReady();

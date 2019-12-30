@@ -8,8 +8,8 @@
 #include <babylon/materials/background/background_material_defines.h>
 #include <babylon/materials/color_curves.h>
 #include <babylon/materials/effect.h>
-#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material_flags.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/standard_material.h>
@@ -41,14 +41,10 @@ BackgroundMaterial::BackgroundMaterial(const std::string& iName, Scene* scene)
                    &BackgroundMaterial::set_primaryColor}
     , _perceptualColor{this, &BackgroundMaterial::get__perceptualColor,
                        &BackgroundMaterial::set__perceptualColor}
-    , primaryColorShadowLevel{this,
-                              &BackgroundMaterial::get_primaryColorShadowLevel,
+    , primaryColorShadowLevel{this, &BackgroundMaterial::get_primaryColorShadowLevel,
                               &BackgroundMaterial::set_primaryColorShadowLevel}
-    , primaryColorHighlightLevel{this,
-                                 &BackgroundMaterial::
-                                   get_primaryColorHighlightLevel,
-                                 &BackgroundMaterial::
-                                   set_primaryColorHighlightLevel}
+    , primaryColorHighlightLevel{this, &BackgroundMaterial::get_primaryColorHighlightLevel,
+                                 &BackgroundMaterial::set_primaryColorHighlightLevel}
     , reflectionTexture{this, &BackgroundMaterial::get_reflectionTexture,
                         &BackgroundMaterial::set_reflectionTexture}
     , reflectionBlur{this, &BackgroundMaterial::get_reflectionBlur,
@@ -57,69 +53,43 @@ BackgroundMaterial::BackgroundMaterial(const std::string& iName, Scene* scene)
                      &BackgroundMaterial::set_diffuseTexture}
     , shadowLights{this, &BackgroundMaterial::get_shadowLights,
                    &BackgroundMaterial::set_shadowLights}
-    , shadowLevel{this, &BackgroundMaterial::get_shadowLevel,
-                  &BackgroundMaterial::set_shadowLevel}
-    , sceneCenter{this, &BackgroundMaterial::get_sceneCenter,
-                  &BackgroundMaterial::set_sceneCenter}
+    , shadowLevel{this, &BackgroundMaterial::get_shadowLevel, &BackgroundMaterial::set_shadowLevel}
+    , sceneCenter{this, &BackgroundMaterial::get_sceneCenter, &BackgroundMaterial::set_sceneCenter}
     , opacityFresnel{this, &BackgroundMaterial::get_opacityFresnel,
                      &BackgroundMaterial::set_opacityFresnel}
     , reflectionFresnel{this, &BackgroundMaterial::get_reflectionFresnel,
                         &BackgroundMaterial::set_reflectionFresnel}
-    , reflectionFalloffDistance{this,
-                                &BackgroundMaterial::
-                                  get_reflectionFalloffDistance,
-                                &BackgroundMaterial::
-                                  set_reflectionFalloffDistance}
+    , reflectionFalloffDistance{this, &BackgroundMaterial::get_reflectionFalloffDistance,
+                                &BackgroundMaterial::set_reflectionFalloffDistance}
     , reflectionAmount{this, &BackgroundMaterial::get_reflectionAmount,
                        &BackgroundMaterial::set_reflectionAmount}
-    , reflectionReflectance0{this,
-                             &BackgroundMaterial::get_reflectionReflectance0,
+    , reflectionReflectance0{this, &BackgroundMaterial::get_reflectionReflectance0,
                              &BackgroundMaterial::set_reflectionReflectance0}
-    , reflectionReflectance90{this,
-                              &BackgroundMaterial::get_reflectionReflectance90,
+    , reflectionReflectance90{this, &BackgroundMaterial::get_reflectionReflectance90,
                               &BackgroundMaterial::set_reflectionReflectance90}
     , reflectionStandardFresnelWeight{this,
-                                      &BackgroundMaterial::
-                                        set_reflectionStandardFresnelWeight}
-    , useRGBColor{this, &BackgroundMaterial::get_useRGBColor,
-                  &BackgroundMaterial::set_useRGBColor}
-    , enableNoise{this, &BackgroundMaterial::get_enableNoise,
-                  &BackgroundMaterial::set_enableNoise}
+                                      &BackgroundMaterial::set_reflectionStandardFresnelWeight}
+    , useRGBColor{this, &BackgroundMaterial::get_useRGBColor, &BackgroundMaterial::set_useRGBColor}
+    , enableNoise{this, &BackgroundMaterial::get_enableNoise, &BackgroundMaterial::set_enableNoise}
     , fovMultiplier{this, &BackgroundMaterial::get_fovMultiplier,
                     &BackgroundMaterial::set_fovMultiplier}
     , useEquirectangularFOV{false}
-    , maxSimultaneousLights{this,
-                            &BackgroundMaterial::get_maxSimultaneousLights,
+    , maxSimultaneousLights{this, &BackgroundMaterial::get_maxSimultaneousLights,
                             &BackgroundMaterial::set_maxSimultaneousLights}
-    , imageProcessingConfiguration{this,
-                                   &BackgroundMaterial::
-                                     get_imageProcessingConfiguration,
-                                   &BackgroundMaterial::
-                                     set_imageProcessingConfiguration}
-    , cameraColorCurvesEnabled{this,
-                               &BackgroundMaterial::
-                                 get_cameraColorCurvesEnabled,
-                               &BackgroundMaterial::
-                                 set_cameraColorCurvesEnabled}
-    , cameraColorGradingEnabled{this,
-                                &BackgroundMaterial::
-                                  get_cameraColorGradingEnabled,
-                                &BackgroundMaterial::
-                                  set_cameraColorGradingEnabled}
-    , cameraToneMappingEnabled{this,
-                               &BackgroundMaterial::
-                                 get_cameraToneMappingEnabled,
-                               &BackgroundMaterial::
-                                 set_cameraToneMappingEnabled}
+    , imageProcessingConfiguration{this, &BackgroundMaterial::get_imageProcessingConfiguration,
+                                   &BackgroundMaterial::set_imageProcessingConfiguration}
+    , cameraColorCurvesEnabled{this, &BackgroundMaterial::get_cameraColorCurvesEnabled,
+                               &BackgroundMaterial::set_cameraColorCurvesEnabled}
+    , cameraColorGradingEnabled{this, &BackgroundMaterial::get_cameraColorGradingEnabled,
+                                &BackgroundMaterial::set_cameraColorGradingEnabled}
+    , cameraToneMappingEnabled{this, &BackgroundMaterial::get_cameraToneMappingEnabled,
+                               &BackgroundMaterial::set_cameraToneMappingEnabled}
     , cameraExposure{this, &BackgroundMaterial::get_cameraExposure,
                      &BackgroundMaterial::set_cameraExposure}
     , cameraContrast{this, &BackgroundMaterial::get_cameraContrast,
                      &BackgroundMaterial::set_cameraContrast}
-    , cameraColorGradingTexture{this,
-                                &BackgroundMaterial::
-                                  get_cameraColorGradingTexture,
-                                &BackgroundMaterial::
-                                  set_cameraColorGradingTexture}
+    , cameraColorGradingTexture{this, &BackgroundMaterial::get_cameraColorGradingTexture,
+                                &BackgroundMaterial::set_cameraColorGradingTexture}
     , cameraColorCurves{this, &BackgroundMaterial::get_cameraColorCurves,
                         &BackgroundMaterial::set_cameraColorCurves}
     , _primaryColor{Color3::White()}
@@ -156,8 +126,7 @@ BackgroundMaterial::BackgroundMaterial(const std::string& iName, Scene* scene)
     _renderTargets.clear();
 
     if (_diffuseTexture && _diffuseTexture->isRenderTarget) {
-      _renderTargets.emplace_back(
-        std::static_pointer_cast<RenderTargetTexture>(_diffuseTexture));
+      _renderTargets.emplace_back(std::static_pointer_cast<RenderTargetTexture>(_diffuseTexture));
     }
 
     if (_reflectionTexture && _reflectionTexture->isRenderTarget) {
@@ -191,8 +160,7 @@ std::optional<Color3>& BackgroundMaterial::get__perceptualColor()
   return __perceptualColor;
 }
 
-void BackgroundMaterial::set__perceptualColor(
-  const std::optional<Color3>& value)
+void BackgroundMaterial::set__perceptualColor(const std::optional<Color3>& value)
 {
   __perceptualColor = value;
   _computePrimaryColorFromPerceptualColor();
@@ -273,8 +241,7 @@ std::vector<IShadowLightPtr>& BackgroundMaterial::get_shadowLights()
   return _shadowLights;
 }
 
-void BackgroundMaterial::set_shadowLights(
-  const std::vector<IShadowLightPtr>& iShadowLights)
+void BackgroundMaterial::set_shadowLights(const std::vector<IShadowLightPtr>& iShadowLights)
 {
   _shadowLights = iShadowLights;
   _markAllSubMeshesAsTexturesDirty();
@@ -404,11 +371,9 @@ void BackgroundMaterial::set_reflectionStandardFresnelWeight(float value)
   auto reflectionWeight = value;
 
   if (reflectionWeight < 0.5f) {
-    reflectionWeight = reflectionWeight * 2.f;
-    reflectionReflectance0
-      = BackgroundMaterial::StandardReflectance0() * reflectionWeight;
-    reflectionReflectance90
-      = BackgroundMaterial::StandardReflectance90() * reflectionWeight;
+    reflectionWeight        = reflectionWeight * 2.f;
+    reflectionReflectance0  = BackgroundMaterial::StandardReflectance0() * reflectionWeight;
+    reflectionReflectance90 = BackgroundMaterial::StandardReflectance90() * reflectionWeight;
   }
   else {
     reflectionWeight = reflectionWeight * 2.f - 1.f;
@@ -417,8 +382,7 @@ void BackgroundMaterial::set_reflectionStandardFresnelWeight(float value)
         + (1.f - BackgroundMaterial::StandardReflectance0()) * reflectionWeight;
     reflectionReflectance90
       = BackgroundMaterial::StandardReflectance90()
-        + (1.f - BackgroundMaterial::StandardReflectance90())
-            * reflectionWeight;
+        + (1.f - BackgroundMaterial::StandardReflectance90()) * reflectionWeight;
   }
 }
 
@@ -489,8 +453,7 @@ void BackgroundMaterial::_attachImageProcessingConfiguration(
 
   // Detaches observer.
   if (_imageProcessingConfiguration && _imageProcessingObserver) {
-    _imageProcessingConfiguration->onUpdateParameters.remove(
-      _imageProcessingObserver);
+    _imageProcessingConfiguration->onUpdateParameters.remove(_imageProcessingObserver);
   }
 
   // Pick the scene configuration if needed.
@@ -503,17 +466,15 @@ void BackgroundMaterial::_attachImageProcessingConfiguration(
 
   // Attaches observer.
   if (_imageProcessingConfiguration) {
-    _imageProcessingObserver
-      = _imageProcessingConfiguration->onUpdateParameters.add(
-        [this](ImageProcessingConfiguration* /*conf*/, EventState /*es*/) {
-          _computePrimaryColorFromPerceptualColor();
-          _markAllSubMeshesAsImageProcessingDirty();
-        });
+    _imageProcessingObserver = _imageProcessingConfiguration->onUpdateParameters.add(
+      [this](ImageProcessingConfiguration* /*conf*/, EventState /*es*/) {
+        _computePrimaryColorFromPerceptualColor();
+        _markAllSubMeshesAsImageProcessingDirty();
+      });
   }
 }
 
-ImageProcessingConfigurationPtr&
-BackgroundMaterial::get_imageProcessingConfiguration()
+ImageProcessingConfigurationPtr& BackgroundMaterial::get_imageProcessingConfiguration()
 {
   return _imageProcessingConfiguration;
 }
@@ -582,8 +543,7 @@ BaseTexturePtr& BackgroundMaterial::get_cameraColorGradingTexture()
   return _imageProcessingConfiguration->colorGradingTexture;
 }
 
-void BackgroundMaterial::set_cameraColorGradingTexture(
-  const BaseTexturePtr& value)
+void BackgroundMaterial::set_cameraColorGradingTexture(const BaseTexturePtr& value)
 {
   _imageProcessingConfiguration->colorGradingTexture = value;
 }
@@ -595,8 +555,7 @@ ColorCurvesPtr& BackgroundMaterial::get_cameraColorCurves()
 
 void BackgroundMaterial::set_cameraColorCurves(const ColorCurvesPtr& value)
 {
-  _imageProcessingConfiguration->colorCurves
-    = std::make_shared<ColorCurves>(*value);
+  _imageProcessingConfiguration->colorCurves = std::make_shared<ColorCurves>(*value);
 }
 
 bool BackgroundMaterial::get_hasRenderTargetTextures() const
@@ -619,12 +578,10 @@ bool BackgroundMaterial::needAlphaTesting() const
 
 bool BackgroundMaterial::needAlphaBlending() const
 {
-  return ((alpha() < 0.f)
-          || (_diffuseTexture != nullptr && _diffuseTexture->hasAlpha()));
+  return ((alpha() < 0.f) || (_diffuseTexture != nullptr && _diffuseTexture->hasAlpha()));
 }
 
-bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
-                                           BaseSubMesh* subMesh,
+bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                                            bool useInstances)
 {
   if (subMesh->effect() && isFrozen()) {
@@ -638,9 +595,8 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   }
 
   auto scene      = getScene();
-  auto definesPtr = std::static_pointer_cast<BackgroundMaterialDefines>(
-    subMesh->_materialDefines);
-  auto& defines = *definesPtr;
+  auto definesPtr = std::static_pointer_cast<BackgroundMaterialDefines>(subMesh->_materialDefines);
+  auto& defines   = *definesPtr;
   if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (defines._renderId == scene->getRenderId()) {
       return true;
@@ -650,8 +606,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   auto engine = scene->getEngine();
 
   // Lights
-  MaterialHelper::PrepareDefinesForLights(scene, mesh, defines, false,
-                                          _maxSimultaneousLights);
+  MaterialHelper::PrepareDefinesForLights(scene, mesh, defines, false, _maxSimultaneousLights);
   defines._needNormals = true;
 
   // Multiview
@@ -670,8 +625,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
           return false;
         }
 
-        MaterialHelper::PrepareDefinesForMergedUV(_diffuseTexture, defines,
-                                                  "DIFFUSE");
+        MaterialHelper::PrepareDefinesForMergedUV(_diffuseTexture, defines, "DIFFUSE");
         defines.boolDef["DIFFUSEHASALPHA"] = _diffuseTexture->hasAlpha();
         defines.boolDef["GAMMADIFFUSE"]    = _diffuseTexture->gammaSpace;
         defines.boolDef["OPACITYFRESNEL"]  = _opacityFresnel;
@@ -689,21 +643,18 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
           return false;
         }
 
-        defines.boolDef["REFLECTION"]      = true;
-        defines.boolDef["GAMMAREFLECTION"] = iReflectionTexture->gammaSpace;
-        defines.boolDef["RGBDREFLECTION"]  = iReflectionTexture->isRGBD();
-        defines.boolDef["REFLECTIONBLUR"]  = _reflectionBlur > 0.f;
-        defines.boolDef["REFLECTIONMAP_OPPOSITEZ"]
-          = getScene()->useRightHandedSystem() ? !iReflectionTexture->invertZ :
-                                                 iReflectionTexture->invertZ;
-        defines.boolDef["LODINREFLECTIONALPHA"]
-          = iReflectionTexture->lodLevelInAlpha;
-        defines.boolDef["EQUIRECTANGULAR_RELFECTION_FOV"]
-          = useEquirectangularFOV;
-        defines.boolDef["REFLECTIONBGR"] = switchToBGR;
+        defines.boolDef["REFLECTION"]              = true;
+        defines.boolDef["GAMMAREFLECTION"]         = iReflectionTexture->gammaSpace;
+        defines.boolDef["RGBDREFLECTION"]          = iReflectionTexture->isRGBD();
+        defines.boolDef["REFLECTIONBLUR"]          = _reflectionBlur > 0.f;
+        defines.boolDef["REFLECTIONMAP_OPPOSITEZ"] = getScene()->useRightHandedSystem() ?
+                                                       !iReflectionTexture->invertZ :
+                                                       iReflectionTexture->invertZ;
+        defines.boolDef["LODINREFLECTIONALPHA"]           = iReflectionTexture->lodLevelInAlpha;
+        defines.boolDef["EQUIRECTANGULAR_RELFECTION_FOV"] = useEquirectangularFOV;
+        defines.boolDef["REFLECTIONBGR"]                  = switchToBGR;
 
-        if (iReflectionTexture->coordinatesMode
-            == TextureConstants::INVCUBIC_MODE) {
+        if (iReflectionTexture->coordinatesMode == TextureConstants::INVCUBIC_MODE) {
           defines.boolDef["INVERTCUBICMAP"] = true;
         }
 
@@ -734,8 +685,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
             defines.boolDef["REFLECTIONMAP_EQUIRECTANGULAR_FIXED"] = true;
             break;
           case TextureConstants::FIXED_EQUIRECTANGULAR_MIRRORED_MODE:
-            defines.boolDef["REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED"]
-              = true;
+            defines.boolDef["REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED"] = true;
             break;
           case TextureConstants::CUBIC_MODE:
           case TextureConstants::INVCUBIC_MODE:
@@ -746,8 +696,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
         if (reflectionFresnel()) {
           defines.boolDef["REFLECTIONFRESNEL"] = true;
-          defines.boolDef["REFLECTIONFALLOFF"]
-            = reflectionFalloffDistance() > 0.f;
+          defines.boolDef["REFLECTIONFALLOFF"] = reflectionFalloffDistance() > 0.f;
 
           _reflectionControls.x = reflectionAmount();
           _reflectionControls.y = reflectionReflectance0();
@@ -792,9 +741,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
   if (defines._areLightsDirty) {
     defines.boolDef["USEHIGHLIGHTANDSHADOWCOLORS"]
-      = !_useRGBColor
-        && (_primaryColorShadowLevel != 0.f
-            || _primaryColorHighlightLevel != 0.f);
+      = !_useRGBColor && (_primaryColorShadowLevel != 0.f || _primaryColorHighlightLevel != 0.f);
   }
 
   if (defines._areImageProcessingDirty && _imageProcessingConfiguration) {
@@ -806,25 +753,21 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   }
 
   // Misc.
-  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(),
-                                        fogEnabled(),
+  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(), fogEnabled(),
                                         _shouldTurnAlphaTestOn(mesh), defines);
 
   // Values that need to be evaluated on every frame
-  MaterialHelper::PrepareDefinesForFrameBoundValues(scene, engine, defines,
-                                                    useInstances);
+  MaterialHelper::PrepareDefinesForFrameBoundValues(scene, engine, defines, useInstances);
 
   // Attribs
-  if (MaterialHelper::PrepareDefinesForAttributes(mesh, defines, false, true,
-                                                  false)) {
+  if (MaterialHelper::PrepareDefinesForAttributes(mesh, defines, false, true, false)) {
     if (mesh) {
       if (!scene->getEngine()->getCaps().standardDerivatives
           && !mesh->isVerticesDataPresent(VertexBuffer::NormalKind)) {
         mesh->createNormals(true);
-        BABYLON_LOGF_WARN(
-          "BackgroundMaterial",
-          "BackgroundMaterial: Normals have been created for the mesh: %s",
-          mesh->name.c_str())
+        BABYLON_LOGF_WARN("BackgroundMaterial",
+                          "BackgroundMaterial: Normals have been created for the mesh: %s",
+                          mesh->name.c_str())
       }
     }
   }
@@ -848,8 +791,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
       fallbacks->addFallback(0, "MULTIVIEW");
     }
 
-    MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks,
-                                              _maxSimultaneousLights);
+    MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks, _maxSimultaneousLights);
 
     // Attributes
     std::vector<std::string> attribs{VertexBuffer::PositionKind};
@@ -866,8 +808,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
       attribs.emplace_back(VertexBuffer::UV2Kind);
     }
 
-    MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
-                                              *fallbacks);
+    MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines, *fallbacks);
     MaterialHelper::PrepareAttributesForInstances(attribs, defines);
 
     std::vector<std::string> uniforms{"world",
@@ -895,8 +836,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
                                       "vReflectionControl",
                                       "vDiffuseInfos",
                                       "diffuseMatrix"};
-    std::vector<std::string> samplers{"diffuseSampler", "reflectionSampler",
-                                      "reflectionSamplerLow",
+    std::vector<std::string> samplers{"diffuseSampler", "reflectionSampler", "reflectionSamplerLow",
                                       "reflectionSamplerHigh"};
     std::vector<std::string> uniformBuffers{"Material", "Scene"};
 
@@ -919,7 +859,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
     auto join = defines.toString();
 
-    EffectCreationOptions options;
+    IEffectCreationOptions options;
     options.attributes            = std::move(attribs);
     options.uniformsNames         = std::move(uniforms);
     options.uniformBuffersNames   = std::move(uniformBuffers);
@@ -934,9 +874,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
 
-    subMesh->setEffect(
-      scene->getEngine()->createEffect("background", options, engine),
-      definesPtr);
+    subMesh->setEffect(scene->getEngine()->createEffect("background", options, engine), definesPtr);
 
     buildUniformLayout();
   }
@@ -965,8 +903,7 @@ void BackgroundMaterial::_computePrimaryColorFromPerceptualColor()
   // Revert image processing configuration.
   if (_imageProcessingConfiguration) {
     // Revert Exposure.
-    _primaryColor.scaleToRef(1.f / _imageProcessingConfiguration->exposure(),
-                             _primaryColor);
+    _primaryColor.scaleToRef(1.f / _imageProcessingConfiguration->exposure(), _primaryColor);
   }
 
   _computePrimaryColors();
@@ -984,8 +921,7 @@ void BackgroundMaterial::_computePrimaryColors()
 
   // Find the shadow color based on the configuration.
   _white.subtractToRef(_primaryColor, _primaryHighlightColor);
-  _primaryHighlightColor.scaleToRef(_primaryColorHighlightLevel,
-                                    _primaryHighlightColor);
+  _primaryHighlightColor.scaleToRef(_primaryColorHighlightLevel, _primaryHighlightColor);
   _primaryColor.addToRef(_primaryHighlightColor, _primaryHighlightColor);
 }
 
@@ -1027,13 +963,11 @@ void BackgroundMaterial::bindOnlyWorldMatrix(Matrix& world)
   _activeEffect->setMatrix("world", world);
 }
 
-void BackgroundMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
-                                        SubMesh* subMesh)
+void BackgroundMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
-  auto definesTmp
-    = static_cast<BackgroundMaterialDefines*>(subMesh->_materialDefines.get());
+  auto definesTmp = static_cast<BackgroundMaterialDefines*>(subMesh->_materialDefines.get());
   if (!definesTmp) {
     return;
   }
@@ -1063,26 +997,21 @@ void BackgroundMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
       // Texture uniforms
       if (scene->texturesEnabled()) {
         if (_diffuseTexture && MaterialFlags::DiffuseTextureEnabled()) {
-          _uniformBuffer->updateFloat2(
-            "vDiffuseInfos",
-            static_cast<float>(_diffuseTexture->coordinatesIndex),
-            _diffuseTexture->level, "");
-          MaterialHelper::BindTextureMatrix(*_diffuseTexture, *_uniformBuffer,
-                                            "diffuse");
+          _uniformBuffer->updateFloat2("vDiffuseInfos",
+                                       static_cast<float>(_diffuseTexture->coordinatesIndex),
+                                       _diffuseTexture->level, "");
+          MaterialHelper::BindTextureMatrix(*_diffuseTexture, *_uniformBuffer, "diffuse");
         }
 
         if (iReflectionTexture && MaterialFlags::ReflectionTextureEnabled()) {
-          _uniformBuffer->updateMatrix(
-            "reflectionMatrix",
-            *iReflectionTexture->getReflectionTextureMatrix());
-          _uniformBuffer->updateFloat2(
-            "vReflectionInfos", iReflectionTexture->level, _reflectionBlur, "");
+          _uniformBuffer->updateMatrix("reflectionMatrix",
+                                       *iReflectionTexture->getReflectionTextureMatrix());
+          _uniformBuffer->updateFloat2("vReflectionInfos", iReflectionTexture->level,
+                                       _reflectionBlur, "");
 
           _uniformBuffer->updateFloat3(
-            "vReflectionMicrosurfaceInfos",
-            static_cast<float>(iReflectionTexture->getSize().width),
-            iReflectionTexture->lodGenerationScale,
-            iReflectionTexture->lodGenerationOffset, "");
+            "vReflectionMicrosurfaceInfos", static_cast<float>(iReflectionTexture->getSize().width),
+            iReflectionTexture->lodGenerationScale, iReflectionTexture->lodGenerationOffset, "");
         }
       }
 
@@ -1097,10 +1026,8 @@ void BackgroundMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
       }
 
       if (defines.boolDef["USEHIGHLIGHTANDSHADOWCOLORS"]) {
-        _uniformBuffer->updateColor4("vPrimaryColor", _primaryHighlightColor,
-                                     1.f, "");
-        _uniformBuffer->updateColor4("vPrimaryColorShadow", _primaryShadowColor,
-                                     1.f, "");
+        _uniformBuffer->updateColor4("vPrimaryColor", _primaryHighlightColor, 1.f, "");
+        _uniformBuffer->updateColor4("vPrimaryColorShadow", _primaryShadowColor, 1.f, "");
       }
       else {
         _uniformBuffer->updateColor4("vPrimaryColor", _primaryColor, 1.f, "");
@@ -1123,10 +1050,9 @@ void BackgroundMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
           _uniformBuffer->setTexture("reflectionSampler", iReflectionTexture);
         }
         else {
-          _uniformBuffer->setTexture("reflectionSampler",
-                                     iReflectionTexture->_lodTextureMid() ?
-                                       iReflectionTexture->_lodTextureMid() :
-                                       iReflectionTexture);
+          _uniformBuffer->setTexture("reflectionSampler", iReflectionTexture->_lodTextureMid() ?
+                                                            iReflectionTexture->_lodTextureMid() :
+                                                            iReflectionTexture);
           _uniformBuffer->setTexture("reflectionSamplerLow",
                                      iReflectionTexture->_lodTextureLow() ?
                                        iReflectionTexture->_lodTextureLow() :
@@ -1138,11 +1064,11 @@ void BackgroundMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
         }
 
         if (defines["REFLECTIONFRESNEL"]) {
-          _uniformBuffer->updateFloat3("vBackgroundCenter", sceneCenter().x,
-                                       sceneCenter().y, sceneCenter().z, "");
-          _uniformBuffer->updateFloat4(
-            "vReflectionControl", _reflectionControls.x, _reflectionControls.y,
-            _reflectionControls.z, _reflectionControls.w, "");
+          _uniformBuffer->updateFloat3("vBackgroundCenter", sceneCenter().x, sceneCenter().y,
+                                       sceneCenter().z, "");
+          _uniformBuffer->updateFloat4("vReflectionControl", _reflectionControls.x,
+                                       _reflectionControls.y, _reflectionControls.z,
+                                       _reflectionControls.w, "");
         }
       }
     }
@@ -1155,8 +1081,8 @@ void BackgroundMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
 
   if (mustRebind || !isFrozen()) {
     if (scene->lightsEnabled()) {
-      MaterialHelper::BindLights(scene, mesh, _activeEffect, defines,
-                                 _maxSimultaneousLights, false);
+      MaterialHelper::BindLights(scene, mesh, _activeEffect, defines, _maxSimultaneousLights,
+                                 false);
     }
 
     // View
@@ -1193,8 +1119,7 @@ bool BackgroundMaterial::hasTexture(const BaseTexturePtr& texture) const
   return false;
 }
 
-void BackgroundMaterial::dispose(bool forceDisposeEffect,
-                                 bool forceDisposeTextures,
+void BackgroundMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
                                  bool /*notBoundToMesh*/)
 {
   if (forceDisposeTextures) {
@@ -1209,15 +1134,13 @@ void BackgroundMaterial::dispose(bool forceDisposeEffect,
   _renderTargets.clear();
 
   if (_imageProcessingConfiguration && _imageProcessingObserver) {
-    _imageProcessingConfiguration->onUpdateParameters.remove(
-      _imageProcessingObserver);
+    _imageProcessingConfiguration->onUpdateParameters.remove(_imageProcessingObserver);
   }
 
   PushMaterial::dispose(forceDisposeEffect);
 }
 
-MaterialPtr BackgroundMaterial::clone(const std::string& /*name*/,
-                                      bool /*cloneChildren*/) const
+MaterialPtr BackgroundMaterial::clone(const std::string& /*name*/, bool /*cloneChildren*/) const
 {
   return nullptr;
 }
@@ -1233,8 +1156,7 @@ std::string BackgroundMaterial::getClassName() const
 }
 
 std::unique_ptr<BackgroundMaterial>
-BackgroundMaterial::Parse(const json& /*source*/, Scene* /*scene*/,
-                          const std::string& /*url*/)
+BackgroundMaterial::Parse(const json& /*source*/, Scene* /*scene*/, const std::string& /*url*/)
 {
   return nullptr;
 }

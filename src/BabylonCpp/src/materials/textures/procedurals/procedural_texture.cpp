@@ -5,8 +5,8 @@
 #include <babylon/engines/scene.h>
 #include <babylon/engines/scene_component_constants.h>
 #include <babylon/materials/effect.h>
-#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/irender_target_options.h>
@@ -236,7 +236,7 @@ bool ProceduralTexture::isReady()
 
   _cachedDefines = defines;
 
-  EffectCreationOptions options;
+  IEffectCreationOptions options;
   options.attributes    = {VertexBuffer::PositionKind};
   options.uniformsNames = _uniforms;
   options.samplers      = _samplers;

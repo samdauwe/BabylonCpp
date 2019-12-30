@@ -36,9 +36,9 @@ struct CubeTextureData;
 struct DepthTextureCreationOptions;
 struct DummyInternalTextureTracker;
 class Effect;
-struct EffectCreationOptions;
 class EffectFallbacks;
 class ICanvasRenderingContext2D;
+struct IEffectCreationOptions;
 struct IInternalTextureLoader;
 struct IInternalTextureTracker;
 class ILoadingScreen;
@@ -993,7 +993,7 @@ public:
    * to compile shaders (like the maximum number of simultaneous lights)
    * @returns the new Effect
    */
-  EffectPtr createEffect(const std::string& baseName, EffectCreationOptions& options,
+  EffectPtr createEffect(const std::string& baseName, IEffectCreationOptions& options,
                          Engine* engine,
                          const std::function<void(const EffectPtr& effect)>& onCompiled = nullptr);
 
@@ -1019,7 +1019,7 @@ public:
    * @returns the new Effect
    */
   EffectPtr createEffect(std::unordered_map<std::string, std::string>& baseName,
-                         EffectCreationOptions& options, Engine* engine);
+                         IEffectCreationOptions& options, Engine* engine);
 
   /**
    * @brief Create an effect to use with particle systems.
@@ -1040,7 +1040,7 @@ public:
    * @returns the new Effect
    */
   EffectPtr createEffectForParticles(const std::string& fragmentName,
-                                     EffectCreationOptions& options);
+                                     IEffectCreationOptions& options);
 
   /**
    * @brief Directly creates a webGL program.

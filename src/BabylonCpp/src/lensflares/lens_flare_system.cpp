@@ -12,8 +12,8 @@
 #include <babylon/lensflares/lens_flare_system_scene_component.h>
 #include <babylon/lights/ishadow_light.h>
 #include <babylon/materials/effect.h>
-#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/texture.h>
@@ -74,7 +74,7 @@ LensFlareSystem::LensFlareSystem(const std::string& name, const LensFlareEmitter
   _indexBuffer = engine->createIndexBuffer(indices);
 
   // Effects
-  EffectCreationOptions effectCreationOptions;
+  IEffectCreationOptions effectCreationOptions;
   effectCreationOptions.attributes    = {VertexBuffer::PositionKind};
   effectCreationOptions.uniformsNames = {"color", "viewportMatrix"};
   effectCreationOptions.samplers      = {"textureSampler"};

@@ -16,7 +16,7 @@ class BaseTexture;
 class Color3;
 class Color4;
 class Effect;
-struct EffectCreationOptions;
+struct IEffectCreationOptions;
 class EffectFallbacks;
 class Engine;
 class InternalTexture;
@@ -549,7 +549,7 @@ protected:
    * array (eg. {lights: 10})
    */
   Effect(const std::variant<std::string, std::unordered_map<std::string, std::string>>& baseName,
-         EffectCreationOptions& options, Engine* engine);
+         IEffectCreationOptions& options, Engine* engine);
 
   /**
    * @brief Observable that will be called when effect is bound.

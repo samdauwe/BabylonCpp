@@ -10,8 +10,8 @@
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/materials/effect.h>
-#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/render_target_texture.h>
@@ -122,7 +122,7 @@ std::string HighlightLayer::getEffectName() const
 EffectPtr HighlightLayer::_createMergeEffect()
 {
   // Effect
-  EffectCreationOptions effectCreationOptions;
+  IEffectCreationOptions effectCreationOptions;
   effectCreationOptions.attributes          = {VertexBuffer::PositionKind};
   effectCreationOptions.uniformBuffersNames = {"offset"};
   effectCreationOptions.samplers            = {"textureSampler"};

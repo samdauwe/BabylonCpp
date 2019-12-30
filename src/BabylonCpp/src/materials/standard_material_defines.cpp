@@ -25,6 +25,8 @@ StandardMaterialDefines::StandardMaterialDefines()
     {"CLIPPLANE2", false},                                  //
     {"CLIPPLANE3", false},                                  //
     {"CLIPPLANE4", false},                                  //
+    {"CLIPPLANE5", false},                                  //
+    {"CLIPPLANE6", false},                                  //
     {"ALPHATEST", false},                                   //
     {"DEPTHPREPASS", false},                                //
     {"ALPHAFROMDIFFUSE", false},                            //
@@ -125,10 +127,9 @@ void StandardMaterialDefines::setReflectionMode(const std::string& modeToEnable)
 {
   static const std::array<std::string, 10> modes{
     {"REFLECTIONMAP_CUBIC", "REFLECTIONMAP_EXPLICIT", "REFLECTIONMAP_PLANAR",
-     "REFLECTIONMAP_PROJECTION", "REFLECTIONMAP_PROJECTION",
-     "REFLECTIONMAP_SKYBOX", "REFLECTIONMAP_SPHERICAL",
-     "REFLECTIONMAP_EQUIRECTANGULAR", "REFLECTIONMAP_EQUIRECTANGULAR_FIXED",
-     "REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED"}};
+     "REFLECTIONMAP_PROJECTION", "REFLECTIONMAP_PROJECTION", "REFLECTIONMAP_SKYBOX",
+     "REFLECTIONMAP_SPHERICAL", "REFLECTIONMAP_EQUIRECTANGULAR",
+     "REFLECTIONMAP_EQUIRECTANGULAR_FIXED", "REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED"}};
 
   for (const auto& mode : modes) {
     boolDef[mode] = (mode == modeToEnable);

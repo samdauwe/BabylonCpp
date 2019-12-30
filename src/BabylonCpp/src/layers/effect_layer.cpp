@@ -8,7 +8,7 @@
 #include <babylon/engines/scene_component_constants.h>
 #include <babylon/layers/effect_layer_scene_component.h>
 #include <babylon/materials/effect.h>
-#include <babylon/materials/effect_creation_options.h>
+#include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/material_defines.h>
 #include <babylon/materials/material_helper.h>
@@ -357,7 +357,7 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
   if (_cachedDefines != join) {
     _cachedDefines = join;
 
-    EffectCreationOptions effectCreationOptions;
+    IEffectCreationOptions effectCreationOptions;
     effectCreationOptions.attributes      = std::move(attribs);
     effectCreationOptions.defines         = std::move(join);
     effectCreationOptions.fallbacks       = std::move(fallbacks);

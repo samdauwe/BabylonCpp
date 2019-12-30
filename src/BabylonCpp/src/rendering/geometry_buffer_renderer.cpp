@@ -7,7 +7,7 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
-#include <babylon/materials/effect_creation_options.h>
+#include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/textures/multi_render_target.h>
@@ -30,8 +30,7 @@ GeometryBufferRenderer::GeometryBufferRenderer(Scene* scene, float ratio)
                      &GeometryBufferRenderer::set_enableVelocity}
     , scene{this, &GeometryBufferRenderer::get_scene}
     , ratio{this, &GeometryBufferRenderer::get_ratio}
-    , samples{this, &GeometryBufferRenderer::get_samples,
-              &GeometryBufferRenderer::set_samples}
+    , samples{this, &GeometryBufferRenderer::get_samples, &GeometryBufferRenderer::set_samples}
     , _effect{nullptr}
     , _cachedDefines{""}
     , _multiRenderTarget{nullptr}
@@ -44,10 +43,8 @@ GeometryBufferRenderer::GeometryBufferRenderer(Scene* scene, float ratio)
   _ratio = ratio;
 
   // Register the G Buffer component to the scene.
-  auto component
-    = std::static_pointer_cast<GeometryBufferRendererSceneComponent>(
-      scene->_getComponent(
-        SceneComponentConstants::NAME_GEOMETRYBUFFERRENDERER));
+  auto component = std::static_pointer_cast<GeometryBufferRendererSceneComponent>(
+    scene->_getComponent(SceneComponentConstants::NAME_GEOMETRYBUFFERRENDERER));
   if (!component) {
     component = GeometryBufferRendererSceneComponent::New(scene);
     scene->_addComponent(component);
@@ -134,8 +131,7 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
 
   std::vector<std::string> defines;
 
-  std::vector<std::string> attribs{VertexBuffer::PositionKind,
-                                   VertexBuffer::NormalKind};
+  std::vector<std::string> attribs{VertexBuffer::PositionKind, VertexBuffer::NormalKind};
 
   auto mesh = subMesh->getMesh();
 
@@ -155,14 +151,12 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
   // Buffers
   if (_enablePosition) {
     defines.emplace_back("#define POSITION");
-    defines.emplace_back("#define POSITION_INDEX "
-                         + std::to_string(_positionIndex));
+    defines.emplace_back("#define POSITION_INDEX " + std::to_string(_positionIndex));
   }
 
   if (_enableVelocity) {
     defines.emplace_back("#define VELOCITY");
-    defines.emplace_back("#define VELOCITY_INDEX "
-                         + std::to_string(_velocityIndex));
+    defines.emplace_back("#define VELOCITY_INDEX " + std::to_string(_velocityIndex));
     if (stl_util::contains(excludedSkinnedMeshesFromVelocity, mesh)) {
       defines.emplace_back("#define BONES_VELOCITY_ENABLED");
     }
@@ -178,26 +172,23 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
     }
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
                          + std::to_string(mesh->numBoneInfluencers()));
-    defines.emplace_back("#define BonesPerMesh "
-                         + std::to_string(mesh->skeleton() ?
-                                            mesh->skeleton()->bones.size() + 1 :
-                                            0));
+    defines.emplace_back(
+      "#define BonesPerMesh "
+      + std::to_string(mesh->skeleton() ? mesh->skeleton()->bones.size() + 1 : 0));
   }
   else {
     defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
   }
 
   // Morph targets
-  auto morphTargetManager
-    = std::static_pointer_cast<Mesh>(mesh)->morphTargetManager();
+  auto morphTargetManager  = std::static_pointer_cast<Mesh>(mesh)->morphTargetManager();
   auto numMorphInfluencers = 0ull;
   if (morphTargetManager) {
     if (morphTargetManager->numInfluencers() > 0) {
       numMorphInfluencers = morphTargetManager->numInfluencers();
 
       defines.emplace_back("#define MORPHTARGETS");
-      defines.emplace_back("#define NUM_MORPH_INFLUENCERS "
-                           + std::to_string(numMorphInfluencers));
+      defines.emplace_back("#define NUM_MORPH_INFLUENCERS " + std::to_string(numMorphInfluencers));
 
       MaterialHelper::PrepareAttributesForMorphTargetsInfluencers(
         attribs, mesh.get(), static_cast<unsigned int>(numMorphInfluencers));
@@ -222,7 +213,7 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
     const std::unordered_map<std::string, unsigned int> indexParameters{
       {"buffersCount", _enablePosition ? 3u : 2u}};
 
-    EffectCreationOptions options;
+    IEffectCreationOptions options;
     options.attributes      = std::move(attribs);
     options.uniformsNames   = {"world",
                              "mBones",
@@ -236,12 +227,11 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
     options.samplers        = {"diffuseSampler"};
     options.defines         = std::move(join);
     options.indexParameters = std::move(indexParameters);
-    options.indexParameters = {{"buffersCount", _enablePosition ? 3u : 2u},
-                               {"maxSimultaneousMorphTargets",
-                                static_cast<unsigned>(numMorphInfluencers)}};
+    options.indexParameters
+      = {{"buffersCount", _enablePosition ? 3u : 2u},
+         {"maxSimultaneousMorphTargets", static_cast<unsigned>(numMorphInfluencers)}};
 
-    _effect = _scene->getEngine()->createEffect("geometry", options,
-                                                _scene->getEngine());
+    _effect = _scene->getEngine()->createEffect("geometry", options, _scene->getEngine());
   }
 
   return _effect->isReady();
@@ -346,17 +336,14 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
   mesh->_internalAbstractMeshDataInfo._isActiveIntermediate = false;
 
   // Velocity
-  if (_enableVelocity
-      && !stl_util::contains(_previousTransformationMatrices, mesh->uniqueId)) {
-    _previousTransformationMatrices[mesh->uniqueId]
-      = ISavedTransformationMatrix{
-        Matrix::Identity(),          // world
-        _scene->getTransformMatrix() // viewProjection
-      };
+  if (_enableVelocity && !stl_util::contains(_previousTransformationMatrices, mesh->uniqueId)) {
+    _previousTransformationMatrices[mesh->uniqueId] = ISavedTransformationMatrix{
+      Matrix::Identity(),          // world
+      _scene->getTransformMatrix() // viewProjection
+    };
 
     if (mesh->skeleton()) {
-      const auto bonesTransformations
-        = mesh->skeleton()->getTransformMatrices(mesh.get());
+      const auto bonesTransformations = mesh->skeleton()->getTransformMatrices(mesh.get());
       Float32Array dest(bonesTransformations.size());
       _previousBonesTransformationMatrices[mesh->uniqueId]
         = _copyBonesTransformationMatrices(bonesTransformations, dest);
@@ -364,8 +351,7 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
   }
 
   // Culling
-  engine->setState(material->backFaceCulling(), 0, false,
-                   _scene->useRightHandedSystem());
+  engine->setState(material->backFaceCulling(), 0, false, _scene->useRightHandedSystem());
 
   // Managing instances
   auto batch = mesh->_getInstancesRenderList(subMesh->_id);
@@ -374,10 +360,9 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
     return;
   }
 
-  auto hardwareInstancedRendering
-    = (engine->getCaps().instancedArrays != 0)
-      && (stl_util::contains(batch->visibleInstances, subMesh->_id))
-      && (!batch->visibleInstances[subMesh->_id].empty());
+  auto hardwareInstancedRendering = (engine->getCaps().instancedArrays != 0)
+                                    && (stl_util::contains(batch->visibleInstances, subMesh->_id))
+                                    && (!batch->visibleInstances[subMesh->_id].empty());
 
   if (isReady(subMesh, hardwareInstancedRendering)) {
     engine->enableEffect(_effect);
@@ -396,14 +381,11 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
     }
 
     // Bones
-    if (mesh->useBones() && mesh->computeBonesUsingShaders()
-        && mesh->skeleton()) {
-      _effect->setMatrices("mBones",
-                           mesh->skeleton()->getTransformMatrices(mesh.get()));
+    if (mesh->useBones() && mesh->computeBonesUsingShaders() && mesh->skeleton()) {
+      _effect->setMatrices("mBones", mesh->skeleton()->getTransformMatrices(mesh.get()));
       if (_enableVelocity) {
-        _effect->setMatrices(
-          "mPreviousBones",
-          _previousBonesTransformationMatrices[mesh->uniqueId]);
+        _effect->setMatrices("mPreviousBones",
+                             _previousBonesTransformationMatrices[mesh->uniqueId]);
       }
     }
 
@@ -412,38 +394,32 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
 
     // Velocity
     if (_enableVelocity) {
-      _effect->setMatrix("previousWorld",
-                         _previousTransformationMatrices[mesh->uniqueId].world);
-      _effect->setMatrix(
-        "previousViewProjection",
-        _previousTransformationMatrices[mesh->uniqueId].viewProjection);
+      _effect->setMatrix("previousWorld", _previousTransformationMatrices[mesh->uniqueId].world);
+      _effect->setMatrix("previousViewProjection",
+                         _previousTransformationMatrices[mesh->uniqueId].viewProjection);
     }
 
     // Draw
-    mesh->_processRendering(subMesh, _effect, Material::TriangleFillMode, batch,
-                            hardwareInstancedRendering,
-                            [this](bool /*isInstance*/, Matrix world,
-                                   Material* /*effectiveMaterial*/) {
-                              _effect->setMatrix("world", world);
-                            });
+    mesh->_processRendering(
+      subMesh, _effect, Material::TriangleFillMode, batch, hardwareInstancedRendering,
+      [this](bool /*isInstance*/, Matrix world, Material* /*effectiveMaterial*/) {
+        _effect->setMatrix("world", world);
+      });
   }
 
   // Velocity
   if (_enableVelocity) {
-    _previousTransformationMatrices[mesh->uniqueId].world
-      = mesh->getWorldMatrix();
-    _previousTransformationMatrices[mesh->uniqueId].viewProjection
-      = _scene->getTransformMatrix();
+    _previousTransformationMatrices[mesh->uniqueId].world          = mesh->getWorldMatrix();
+    _previousTransformationMatrices[mesh->uniqueId].viewProjection = _scene->getTransformMatrix();
     if (mesh->skeleton()) {
-      _copyBonesTransformationMatrices(
-        mesh->skeleton()->getTransformMatrices(mesh.get()),
-        _previousBonesTransformationMatrices[mesh->uniqueId]);
+      _copyBonesTransformationMatrices(mesh->skeleton()->getTransformMatrices(mesh.get()),
+                                       _previousBonesTransformationMatrices[mesh->uniqueId]);
     }
   }
 }
 
-Float32Array& GeometryBufferRenderer::_copyBonesTransformationMatrices(
-  const Float32Array& source, Float32Array& target)
+Float32Array& GeometryBufferRenderer::_copyBonesTransformationMatrices(const Float32Array& source,
+                                                                       Float32Array& target)
 {
   for (size_t i = 0; i < source.size(); ++i) {
     target[i] = source[i];
