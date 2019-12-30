@@ -99,7 +99,7 @@ def main():
         # Engines
         "nativeEngine.ts",
         # Engines / Extensions
-        "engine.webVR.ts",
+        "engine.videoTexture.ts", "engine.views.ts", "engine.webVR.ts",
         # Engines / Native
         "nativeShaderProcessor.ts",
         # Helpers
