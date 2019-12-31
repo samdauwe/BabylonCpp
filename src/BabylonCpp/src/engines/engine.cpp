@@ -7,6 +7,7 @@
 #include <babylon/engines/engine_store.h>
 #include <babylon/engines/extensions/multiview_extension.h>
 #include <babylon/engines/extensions/occlusion_query_extension.h>
+#include <babylon/engines/extensions/transform_feedback_extension.h>
 #include <babylon/engines/scene.h>
 #include <babylon/engines/webgl/webgl_pipeline_context.h>
 #include <babylon/interfaces/icanvas.h>
@@ -1284,6 +1285,46 @@ unsigned int Engine::_getTimeQueryResult(const WebGLQueryPtr& query)
 bool Engine::_getTimeQueryAvailability(const WebGLQueryPtr& query)
 {
   return _occlusionQueryExtension->_getTimeQueryAvailability(query);
+}
+
+//--------------------------------------------------------------------------------------------------
+//                              Transform Feedback Extension
+//--------------------------------------------------------------------------------------------------
+
+WebGLTransformFeedbackPtr Engine::createTransformFeedback()
+{
+  return _transformFeedbackExtension->createTransformFeedback();
+}
+
+void Engine::deleteTransformFeedback(const WebGLTransformFeedbackPtr& value)
+{
+  _transformFeedbackExtension->deleteTransformFeedback(value);
+}
+
+void Engine::bindTransformFeedback(const WebGLTransformFeedbackPtr& value)
+{
+  _transformFeedbackExtension->bindTransformFeedback(value);
+}
+
+void Engine::beginTransformFeedback(bool usePoints)
+{
+  _transformFeedbackExtension->beginTransformFeedback(usePoints);
+}
+
+void Engine::endTransformFeedback()
+{
+  _transformFeedbackExtension->endTransformFeedback();
+}
+
+void Engine::setTranformFeedbackVaryings(const WebGLProgramPtr& program,
+                                         const std::vector<std::string>& value)
+{
+  _transformFeedbackExtension->setTranformFeedbackVaryings(program, value);
+}
+
+void Engine::bindTransformFeedbackBuffer(const WebGLDataBufferPtr& value)
+{
+  _transformFeedbackExtension->bindTransformFeedbackBuffer(value);
 }
 
 } // end of namespace BABYLON

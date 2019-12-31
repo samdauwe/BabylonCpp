@@ -17,12 +17,15 @@ class MultiviewExtension;
 class OcclusionQueryExtension;
 class PostProcess;
 class RenderTargetTexture;
-using WebGLQuery             = GL::IGLQuery;
-using AudioEnginePtr         = std::shared_ptr<AudioEngine>;
-using ILoadingScreenPtr      = std::shared_ptr<ILoadingScreen>;
-using PostProcessPtr         = std::shared_ptr<PostProcess>;
-using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
-using WebGLQueryPtr          = std::shared_ptr<WebGLQuery>;
+class TransformFeedbackExtension;
+using WebGLQuery                = GL::IGLQuery;
+using AudioEnginePtr            = std::shared_ptr<AudioEngine>;
+using ILoadingScreenPtr         = std::shared_ptr<ILoadingScreen>;
+using PostProcessPtr            = std::shared_ptr<PostProcess>;
+using RenderTargetTexturePtr    = std::shared_ptr<RenderTargetTexture>;
+using WebGLTransformFeedback    = GL::IGLTransformFeedback;
+using WebGLTransformFeedbackPtr = std::shared_ptr<WebGLTransformFeedback>;
+using WebGLQueryPtr             = std::shared_ptr<WebGLQuery>;
 
 /**
  * @brief The engine class is responsible for interfacing with all lower-level APIs such as WebGL
@@ -1051,6 +1054,54 @@ public:
    */
   bool _getTimeQueryAvailability(const WebGLQueryPtr& query);
 
+  //------------------------------------------------------------------------------------------------
+  //                              Transform Feedback Extension
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * @brief Creates a webGL transform feedback object.
+   * Please makes sure to check webGLVersion property to check if you are running webGL 2+
+   * @returns the webGL transform feedback object
+   */
+  WebGLTransformFeedbackPtr createTransformFeedback();
+
+  /**
+   * @brief Delete a webGL transform feedback object.
+   * @param value defines the webGL transform feedback object to delete
+   */
+  void deleteTransformFeedback(const WebGLTransformFeedbackPtr& value);
+
+  /**
+   * @brief Bind a webGL transform feedback object to the webgl context.
+   * @param value defines the webGL transform feedback object to bind
+   */
+  void bindTransformFeedback(const WebGLTransformFeedbackPtr& value);
+
+  /**
+   * @brief Begins a transform feedback operation.
+   * @param usePoints defines if points or triangles must be used
+   */
+  void beginTransformFeedback(bool usePoints = true);
+
+  /**
+   * @brief Ends a transform feedback operation.
+   */
+  void endTransformFeedback();
+
+  /**
+   * @brief Specify the varyings to use with transform feedback.
+   * @param program defines the associated webGL program
+   * @param value defines the list of strings representing the varying names
+   */
+  void setTranformFeedbackVaryings(const WebGLProgramPtr& program,
+                                   const std::vector<std::string>& value);
+
+  /**
+   * @brief Bind a webGL buffer for a transform feedback operation.
+   * @param value defines the webGL buffer to bind
+   */
+  void bindTransformFeedbackBuffer(const WebGLDataBufferPtr& value);
+
 protected:
   bool get__supportsHardwareTextureRescaling() const override;
 
@@ -1246,8 +1297,9 @@ private:
   int _cachedStencilReference;
 
   /** Extensions */
-  std::unique_ptr<MultiviewExtension> _multiviewExtension           = nullptr;
-  std::unique_ptr<OcclusionQueryExtension> _occlusionQueryExtension = nullptr;
+  std::unique_ptr<MultiviewExtension> _multiviewExtension                 = nullptr;
+  std::unique_ptr<OcclusionQueryExtension> _occlusionQueryExtension       = nullptr;
+  std::unique_ptr<TransformFeedbackExtension> _transformFeedbackExtension = nullptr;
 
 }; // end of class Engine
 
