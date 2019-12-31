@@ -776,6 +776,7 @@ private:
   bool _useFullFloat;
   unsigned int _textureType;
   Matrix _defaultTextureMatrix;
+  std::optional<size_t> _storedUniqueId;
 
 }; // end of class ShadowGenerator
 

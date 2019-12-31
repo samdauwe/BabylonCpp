@@ -33,14 +33,13 @@ void ShadowGeneratorSceneComponent::serialize(json& /*serializationObject*/)
 {
 }
 
-void ShadowGeneratorSceneComponent::addFromContainer(
-  AbstractScene& /*container*/)
+void ShadowGeneratorSceneComponent::addFromContainer(AbstractScene& /*container*/)
 {
   // Nothing To Do Here. (directly attached to a light)
 }
 
-void ShadowGeneratorSceneComponent::removeFromContainer(
-  AbstractScene& /*container*/, bool /*dispose*/)
+void ShadowGeneratorSceneComponent::removeFromContainer(AbstractScene& /*container*/,
+                                                        bool /*dispose*/)
 {
   // Nothing To Do Here. (directly attached to a light)
 }
@@ -60,10 +59,9 @@ void ShadowGeneratorSceneComponent::_gatherRenderTargets(
 
       if (light->isEnabled() && light->shadowEnabled && shadowGenerator) {
         auto shadowMap = shadowGenerator->getShadowMap();
-        auto it = std::find_if(scene->textures.begin(), scene->textures.end(),
-                               [&shadowMap](const BaseTexturePtr& texture) {
-                                 return texture == shadowMap;
-                               });
+        auto it        = std::find_if(
+          scene->textures.begin(), scene->textures.end(),
+          [&shadowMap](const BaseTexturePtr& texture) { return texture == shadowMap; });
         if (it != scene->textures.end()) {
           renderTargets.emplace_back(shadowMap);
         }

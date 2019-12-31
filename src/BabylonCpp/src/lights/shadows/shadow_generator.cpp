@@ -110,6 +110,7 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, const IShadowLightPtr& li
     , _useFullFloat{true}
     , _textureType{0}
     , _defaultTextureMatrix{Matrix::Identity()}
+    , _storedUniqueId{std::nullopt}
 {
   auto component = _scene->_getComponent(SceneComponentConstants::NAME_SHADOWGENERATOR);
   if (!component) {
@@ -548,6 +549,9 @@ void ShadowGenerator::_initializeShadowMap()
   _shadowMap->updateSamplingMode(TextureConstants::BILINEAR_SAMPLINGMODE);
   _shadowMap->renderParticles      = false;
   _shadowMap->ignoreCameraViewport = true;
+  if (_storedUniqueId.has_value()) {
+    _shadowMap->uniqueId = *_storedUniqueId;
+  }
 
   // Record Face Index before render.
   _shadowMap->onBeforeRenderObservable.add([this](const int* faceIndex, EventState&) {
@@ -600,7 +604,8 @@ void ShadowGenerator::_initializeShadowMap()
   });
 
   _shadowMap->onResizeObservable.add([this](RenderTargetTexture* RTT, EventState&) -> void {
-    _mapSize = RTT->getRenderSize();
+    _storedUniqueId = _shadowMap->uniqueId;
+    _mapSize        = RTT->getRenderSize();
     _light->_markMeshesAsLightDirty();
     recreateShadowMap();
   });

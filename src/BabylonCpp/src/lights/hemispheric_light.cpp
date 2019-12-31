@@ -13,11 +13,10 @@ bool HemisphericLight::NodeConstructorAdded = false;
 
 void HemisphericLight::AddNodeConstructor()
 {
-  Node::AddNodeConstructor(
-    "Light_Type_3", [](const std::string& iName, Scene* scene,
-                       const std::optional<json>& /*options*/) {
-      return HemisphericLight::New(iName, Vector3::Zero(), scene);
-    });
+  Node::AddNodeConstructor("Light_Type_3", [](const std::string& iName, Scene* scene,
+                                              const std::optional<json>& /*options*/) {
+    return HemisphericLight::New(iName, Vector3::Zero(), scene);
+  });
   HemisphericLight::NodeConstructorAdded = true;
 }
 
@@ -26,11 +25,9 @@ HemisphericLight::HemisphericLight(const std::string& iName, Scene* scene)
 {
 }
 
-HemisphericLight::HemisphericLight(const std::string& iName,
-                                   const Vector3& iDirection, Scene* scene)
-    : Light{iName, scene}
-    , groundColor{Color3(0.f, 0.f, 0.f)}
-    , direction{iDirection}
+HemisphericLight::HemisphericLight(const std::string& iName, const Vector3& iDirection,
+                                   Scene* scene)
+    : Light{iName, scene}, groundColor{Color3(0.f, 0.f, 0.f)}, direction{iDirection}
 {
 }
 
@@ -68,8 +65,7 @@ IShadowGeneratorPtr HemisphericLight::getShadowGenerator()
   return nullptr;
 }
 
-void HemisphericLight::transferToEffect(const EffectPtr& /*effect*/,
-                                        const std::string& lightIndex)
+void HemisphericLight::transferToEffect(const EffectPtr& /*effect*/, const std::string& lightIndex)
 {
   auto normalizeDirection = Vector3::Normalize(direction);
 
@@ -80,21 +76,20 @@ void HemisphericLight::transferToEffect(const EffectPtr& /*effect*/,
                                0.f,                  //
                                lightIndex);
 
-  _uniformBuffer->updateColor3("vLightGround", groundColor.scale(intensity),
-                               lightIndex);
+  _uniformBuffer->updateColor3("vLightGround", groundColor.scale(intensity), lightIndex);
 }
 
-HemisphericLight& HemisphericLight::transferToNodeMaterialEffect(
-  const EffectPtr& effect, const std::string& lightDataUniformName)
+HemisphericLight&
+HemisphericLight::transferToNodeMaterialEffect(const EffectPtr& effect,
+                                               const std::string& lightDataUniformName)
 {
   const auto normalizeDirection = Vector3::Normalize(direction);
-  effect->setFloat3(lightDataUniformName, normalizeDirection.x,
-                    normalizeDirection.y, normalizeDirection.z);
+  effect->setFloat3(lightDataUniformName, normalizeDirection.x, normalizeDirection.y,
+                    normalizeDirection.z);
   return *this;
 }
 
-Matrix& HemisphericLight::computeWorldMatrix(bool /*force*/,
-                                             bool /*useWasUpdatedFlag*/)
+Matrix& HemisphericLight::computeWorldMatrix(bool /*force*/, bool /*useWasUpdatedFlag*/)
 {
   return _worldMatrix;
 }

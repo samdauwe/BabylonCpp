@@ -12,12 +12,11 @@ using SpotLightPtr   = std::shared_ptr<SpotLight>;
 using BaseTexturePtr = std::shared_ptr<BaseTexture>;
 
 /**
- * @brief A spot light is defined by a position, a direction, an angle, and an
- * exponent. These values define a cone of light starting from the position,
- * emitting toward the direction. The angle, in radians, defines the size (field
- * of illumination) of the spotlight's conical beam, and the exponent defines
- * the speed of the decay of the light with distance (reach). Documentation:
- * https://doc.babylonjs.com/babylon101/lights
+ * @brief A spot light is defined by a position, a direction, an angle, and an exponent.
+ * These values define a cone of light starting from the position, emitting toward the direction.
+ * The angle, in radians, defines the size (field of illumination) of the spotlight's conical beam,
+ * and the exponent defines the speed of the decay of the light with distance (reach).
+ * Documentation: https://doc.babylonjs.com/babylon101/lights
  */
 class BABYLON_SHARED_EXPORT SpotLight : public ShadowLight {
 
@@ -50,8 +49,16 @@ public:
   unsigned int getTypeID() const override;
 
   /**
-   * @brief Sets the passed Effect object with the SpotLight transfomed position
-   * (or position if not parented) and normalized direction.
+   * @brief Sets the passed Effect "effect" with the Light textures.
+   * @param effect The effect to update
+   * @param lightIndex The index of the light in the effect to update
+   * @returns The light
+   */
+  Light& transferTexturesToEffect(const EffectPtr& effect, const std::string& lightIndex) override;
+
+  /**
+   * @brief Sets the passed Effect object with the SpotLight transfomed position (or position if not
+   * parented) and normalized direction.
    * @param effect The effect to update
    * @param lightIndex The index of the light in the effect to update
    * @returns The spot light
@@ -61,8 +68,7 @@ public:
   /**
    * @brief Sets the passed Effect "effect" with the Light information.
    * @param effect The effect to update
-   * @param lightDataUniformName The uniform used to store light data (position
-   * or direction)
+   * @param lightDataUniformName The uniform used to store light data (position or direction)
    * @returns The light
    */
   SpotLight& transferToNodeMaterialEffect(const EffectPtr& effect,
@@ -82,15 +88,14 @@ public:
 
 protected:
   /**
-   * @brief Creates a SpotLight object in the scene. A spot light is a simply
-   * light oriented cone. It can cast shadows. Documentation :
-   * https://doc.babylonjs.com/babylon101/lights
+   * @brief Creates a SpotLight object in the scene. A spot light is a simply light oriented cone.
+   * It can cast shadows.
+   * Documentation : https://doc.babylonjs.com/babylon101/lights
    * @param name The light friendly name
    * @param position The position of the spot light in the scene
    * @param direction The direction of the light in the scene
    * @param angle The cone angle of the light in Radians
-   * @param exponent The light decay speed with the distance from the emission
-   * spot
+   * @param exponent The light decay speed with the distance from the emission spot
    * @param scene The scene the lights belongs to
    */
   SpotLight(const std::string& name, const Vector3& position, const Vector3& direction, float angle,
@@ -107,16 +112,14 @@ protected:
   void set_angle(float value);
 
   /**
-   * @brief Only used in gltf falloff mode, this defines the angle where
-   * the directional falloff will start before cutting at angle which could be
-   * seen as outer angle.
+   * @brief Only used in gltf falloff mode, this defines the angle where the directional falloff
+   * will start before cutting at angle which could be seen as outer angle.
    */
   float get_innerAngle() const;
 
   /**
-   * @brief Only used in gltf falloff mode, this defines the angle where
-   * the directional falloff will start before cutting at angle which could be
-   * seen as outer angle.
+   * @brief Only used in gltf falloff mode, this defines the angle where the directional falloff
+   * will start before cutting at angle which could be seen as outer angle.
    */
   void set_innerAngle(float value);
 
@@ -176,21 +179,18 @@ protected:
   void set_projectionTexture(const BaseTexturePtr& value);
 
   /**
-   * @brief Overrides the direction setter to recompute the projection texture
-   * view light Matrix.
+   * @brief Overrides the direction setter to recompute the projection texture view light Matrix.
    */
   void _setDirection(const Vector3& value) override;
 
   /**
-   * @brief Overrides the position setter to recompute the projection texture
-   * view light Matrix.
+   * @brief Overrides the position setter to recompute the projection texture view light Matrix.
    */
   void _setPosition(const Vector3& value) override;
 
   /**
-   * @brief Sets the passed matrix "matrix" as perspective projection matrix for
-   * the shadows and the passed view matrix with the fov equal to the SpotLight
-   * angle and and aspect ratio of 1.0.
+   * @brief Sets the passed matrix "matrix" as perspective projection matrix for the shadows and the
+   * passed view matrix with the fov equal to the SpotLight angle and and aspect ratio of 1.0.
    * @returns the SpotLight.
    */
   void _setDefaultShadowProjectionMatrix(Matrix& matrix, const Matrix& viewMatrix,
@@ -221,9 +221,8 @@ public:
   Property<SpotLight, float> angle;
 
   /**
-   * Only used in gltf falloff mode, this defines the angle where the
-   * directional falloff will start before cutting at angle which could be seen
-   * as outer angle.
+   * Only used in gltf falloff mode, this defines the angle where the directional falloff will start
+   * before cutting at angle which could be seen as outer angle.
    */
   Property<SpotLight, float> innerAngle;
 
@@ -264,18 +263,16 @@ protected:
 
 private:
   /**
-   * upVector , rightVector and direction will form the coordinate system for
-   * this spot light. These three vectors will be used as projection matrix when
-   * doing texture projection.
+   * upVector , rightVector and direction will form the coordinate system for this spot light.
+   * These three vectors will be used as projection matrix when doing texture projection.
    *
    * Also we have the following rules always holds:
    * direction cross up   = right
    * right cross direction = up
    * up cross right       = forward
    *
-   * light_near and light_far will control the range of the texture projection.
-   * If a plane is out of the range in spot light space, there is no texture
-   * projection.
+   * light_near and light_far will control the range of the texture projection. If a plane is out of
+   * the range in spot light space, there is no texture projection.
    */
   float _angle;
   float _innerAngle;

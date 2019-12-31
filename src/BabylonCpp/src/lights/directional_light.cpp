@@ -16,16 +16,15 @@ bool DirectionalLight::NodeConstructorAdded = false;
 
 void DirectionalLight::AddNodeConstructor()
 {
-  Node::AddNodeConstructor(
-    "Light_Type_1", [](const std::string& iName, Scene* scene,
-                       const std::optional<json>& /*options*/) {
-      return DirectionalLight::New(iName, Vector3::Zero(), scene);
-    });
+  Node::AddNodeConstructor("Light_Type_1", [](const std::string& iName, Scene* scene,
+                                              const std::optional<json>& /*options*/) {
+    return DirectionalLight::New(iName, Vector3::Zero(), scene);
+  });
   DirectionalLight::NodeConstructorAdded = true;
 }
 
-DirectionalLight::DirectionalLight(const std::string& iName,
-                                   const Vector3& iDirection, Scene* scene)
+DirectionalLight::DirectionalLight(const std::string& iName, const Vector3& iDirection,
+                                   Scene* scene)
     : ShadowLight{iName, scene}
     , shadowFrustumSize{this, &DirectionalLight::get_shadowFrustumSize,
                         &DirectionalLight::set_shadowFrustumSize}
@@ -83,8 +82,7 @@ void DirectionalLight::set_shadowOrthoScale(float value)
 }
 
 void DirectionalLight::_setDefaultShadowProjectionMatrix(
-  Matrix& matrix, const Matrix& viewMatrix,
-  const std::vector<AbstractMesh*>& renderList)
+  Matrix& matrix, const Matrix& viewMatrix, const std::vector<AbstractMesh*>& renderList)
 {
   if (shadowFrustumSize() > 0.f) {
     _setDefaultFixedFrustumShadowProjectionMatrix(matrix);
@@ -94,8 +92,7 @@ void DirectionalLight::_setDefaultShadowProjectionMatrix(
   }
 }
 
-void DirectionalLight::_setDefaultFixedFrustumShadowProjectionMatrix(
-  Matrix& matrix)
+void DirectionalLight::_setDefaultFixedFrustumShadowProjectionMatrix(Matrix& matrix)
 {
   auto& activeCamera = getScene()->activeCamera();
 
@@ -105,13 +102,11 @@ void DirectionalLight::_setDefaultFixedFrustumShadowProjectionMatrix(
 
   Matrix::OrthoLHToRef(shadowFrustumSize(), shadowFrustumSize(),
                        shadowMinZ() ? *shadowMinZ() : activeCamera->minZ,
-                       shadowMaxZ() ? *shadowMaxZ() : activeCamera->maxZ,
-                       matrix);
+                       shadowMaxZ() ? *shadowMaxZ() : activeCamera->maxZ, matrix);
 }
 
 void DirectionalLight::_setDefaultAutoExtendShadowProjectionMatrix(
-  Matrix& matrix, const Matrix& viewMatrix,
-  const std::vector<AbstractMesh*>& renderList)
+  Matrix& matrix, const Matrix& viewMatrix, const std::vector<AbstractMesh*>& renderList)
 {
   auto& activeCamera = getScene()->activeCamera();
 
@@ -120,9 +115,7 @@ void DirectionalLight::_setDefaultAutoExtendShadowProjectionMatrix(
   }
 
   // Check extends
-  if (autoUpdateExtends
-      || stl_util::almost_equal(_orthoLeft,
-                                std::numeric_limits<float>::max())) {
+  if (autoUpdateExtends || stl_util::almost_equal(_orthoLeft, std::numeric_limits<float>::max())) {
     auto tempVector3 = Vector3::Zero();
 
     _orthoLeft   = std::numeric_limits<float>::max();
@@ -163,22 +156,16 @@ void DirectionalLight::_setDefaultAutoExtendShadowProjectionMatrix(
   const auto yOffset = _orthoTop - _orthoBottom;
 
   if (getScene()->useRightHandedSystem()) {
-    Matrix::OrthoOffCenterRHToRef(_orthoLeft - xOffset * shadowOrthoScale,
-                                  _orthoRight + xOffset * shadowOrthoScale,
-                                  _orthoBottom - yOffset * shadowOrthoScale,
-                                  _orthoTop + yOffset * shadowOrthoScale,
-                                  shadowMinZ().value_or(activeCamera->minZ),
-                                  shadowMaxZ().value_or(activeCamera->maxZ),
-                                  matrix);
+    Matrix::OrthoOffCenterRHToRef(
+      _orthoLeft - xOffset * shadowOrthoScale, _orthoRight + xOffset * shadowOrthoScale,
+      _orthoBottom - yOffset * shadowOrthoScale, _orthoTop + yOffset * shadowOrthoScale,
+      shadowMinZ().value_or(activeCamera->minZ), shadowMaxZ().value_or(activeCamera->maxZ), matrix);
   }
   else {
-    Matrix::OrthoOffCenterLHToRef(_orthoLeft - xOffset * shadowOrthoScale(),
-                                  _orthoRight + xOffset * shadowOrthoScale(),
-                                  _orthoBottom - yOffset * shadowOrthoScale(),
-                                  _orthoTop + yOffset * shadowOrthoScale(),
-                                  shadowMinZ().value_or(activeCamera->minZ),
-                                  shadowMaxZ().value_or(activeCamera->maxZ),
-                                  matrix);
+    Matrix::OrthoOffCenterLHToRef(
+      _orthoLeft - xOffset * shadowOrthoScale(), _orthoRight + xOffset * shadowOrthoScale(),
+      _orthoBottom - yOffset * shadowOrthoScale(), _orthoTop + yOffset * shadowOrthoScale(),
+      shadowMinZ().value_or(activeCamera->minZ), shadowMaxZ().value_or(activeCamera->maxZ), matrix);
   }
 }
 
@@ -192,19 +179,16 @@ void DirectionalLight::_buildUniformLayout()
   _uniformBuffer->create();
 }
 
-void DirectionalLight::transferToEffect(const EffectPtr& /*effect*/,
-                                        const std::string& lightIndex)
+void DirectionalLight::transferToEffect(const EffectPtr& /*effect*/, const std::string& lightIndex)
 {
   const auto& iTransformedDirection = transformedDirection();
   if (computeTransformedInformation()) {
     if (getScene()->useRightHandedSystem()) {
-      _uniformBuffer->updateFloat4("vLightData", -iTransformedDirection.x,
-                                   -iTransformedDirection.y,
+      _uniformBuffer->updateFloat4("vLightData", -iTransformedDirection.x, -iTransformedDirection.y,
                                    -iTransformedDirection.z, 1.f, lightIndex);
     }
     else {
-      _uniformBuffer->updateFloat4("vLightData", transformedDirection().x,
-                                   iTransformedDirection.y,
+      _uniformBuffer->updateFloat4("vLightData", transformedDirection().x, iTransformedDirection.y,
                                    iTransformedDirection.z, 1, lightIndex);
     }
     return;
@@ -212,38 +196,37 @@ void DirectionalLight::transferToEffect(const EffectPtr& /*effect*/,
 
   const auto& iDirection = direction();
   if (getScene()->useRightHandedSystem()) {
-    _uniformBuffer->updateFloat4("vLightData", -iDirection.x, -iDirection.y,
-                                 -iDirection.z, 1.f, lightIndex);
+    _uniformBuffer->updateFloat4("vLightData", -iDirection.x, -iDirection.y, -iDirection.z, 1.f,
+                                 lightIndex);
   }
   else {
-    _uniformBuffer->updateFloat4("vLightData", iDirection.x, iDirection.y,
-                                 iDirection.z, 1.f, lightIndex);
+    _uniformBuffer->updateFloat4("vLightData", iDirection.x, iDirection.y, iDirection.z, 1.f,
+                                 lightIndex);
   }
 }
 
-DirectionalLight& DirectionalLight::transferToNodeMaterialEffect(
-  const EffectPtr& effect, const std::string& lightDataUniformName)
+DirectionalLight&
+DirectionalLight::transferToNodeMaterialEffect(const EffectPtr& effect,
+                                               const std::string& lightDataUniformName)
 {
   if (computeTransformedInformation()) {
     const auto& iTransformedDirection = transformedDirection();
     if (getScene()->useRightHandedSystem) {
-      effect->setFloat3(lightDataUniformName, -iTransformedDirection.x,
-                        -iTransformedDirection.y, -iTransformedDirection.z);
+      effect->setFloat3(lightDataUniformName, -iTransformedDirection.x, -iTransformedDirection.y,
+                        -iTransformedDirection.z);
     }
     else {
-      effect->setFloat3(lightDataUniformName, iTransformedDirection.x,
-                        iTransformedDirection.y, iTransformedDirection.z);
+      effect->setFloat3(lightDataUniformName, iTransformedDirection.x, iTransformedDirection.y,
+                        iTransformedDirection.z);
     }
     return *this;
   }
   const auto& iDirection = direction();
   if (getScene()->useRightHandedSystem()) {
-    effect->setFloat3(lightDataUniformName, -iDirection.x, -iDirection.y,
-                      -iDirection.z);
+    effect->setFloat3(lightDataUniformName, -iDirection.x, -iDirection.y, -iDirection.z);
   }
   else {
-    effect->setFloat3(lightDataUniformName, iDirection.x, iDirection.y,
-                      iDirection.z);
+    effect->setFloat3(lightDataUniformName, iDirection.x, iDirection.y, iDirection.z);
   }
 
   return *this;

@@ -35,14 +35,14 @@ public:
 
   /**
    * @brief Gets the direction if it has been set.
-   * In case of direction provided, the shadow will not use a cube texture but
-   * simulate a spot shadow as a fallback
+   * In case of direction provided, the shadow will not use a cube texture but simulate a spot
+   * shadow as a fallback
    */
   Vector3& get_direction() override;
 
   /**
-   * @brief In case of direction provided, the shadow will not use a cube
-   * texture but simulate a spot shadow as a fallback
+   * @brief In case of direction provided, the shadow will not use a cube texture but simulate a
+   * spot shadow as a fallback
    */
   void set_direction(const Vector3& value) override;
 
@@ -65,18 +65,17 @@ public:
   bool needCube() const override;
 
   /**
-   * @brief Returns a new Vector3 aligned with the PointLight cube system
-   * according to the passed cube face index (integer).
-   * @param faceIndex The index of the face we are computed the direction to
-   * generate shadow
-   * @returns The set direction in 2d mode otherwise the direction to the
-   * cubemap face if needCube() is true
+   * @brief Returns a new Vector3 aligned with the PointLight cube system according to the passed
+   * cube face index (integer).
+   * @param faceIndex The index of the face we are computed the direction to generate shadow
+   * @returns The set direction in 2d mode otherwise the direction to the cubemap face if needCube()
+   * is true
    */
   Vector3 getShadowDirection(unsigned int faceIndex) override;
 
   /**
-   * @brief Sets the passed Effect "effect" with the PointLight transformed
-   * position (or position, if none) and passed name (string).
+   * @brief Sets the passed Effect "effect" with the PointLight transformed position (or position,
+   * if none) and passed name (string).
    * @param effect The effect to update
    * @param lightIndex The index of the light in the effect to update
    * @returns The point light
@@ -86,8 +85,7 @@ public:
   /**
    * @brief Sets the passed Effect "effect" with the Light information.
    * @param effect The effect to update
-   * @param lightDataUniformName The uniform used to store light data (position
-   * or direction)
+   * @param lightDataUniformName The uniform used to store light data (position or direction)
    * @returns The light
    */
   PointLight& transferToNodeMaterialEffect(const EffectPtr& effect,
@@ -102,10 +100,10 @@ public:
 
 protected:
   /**
-   * @brief Creates a PointLight object from the passed name and position
-   * (Vector3) and adds it in the scene. A PointLight emits the light in every
-   * direction. It can cast shadows. If the scene camera is already defined and
-   * you want to set your PointLight at the camera position, just set it :
+   * @brief Creates a PointLight object from the passed name and position (Vector3) and adds it in
+   * the scene. A PointLight emits the light in every direction. It can cast shadows. If the scene
+   * camera is already defined and you want to set your PointLight at the camera position, just set
+   * it :
    * ```javascript
    * var pointLight = new PointLight("pl", camera.position, scene);
    * ```
@@ -117,8 +115,8 @@ protected:
   PointLight(const std::string& name, const Vector3& position, Scene* scene);
 
   /**
-   * @brief Sets the passed matrix "matrix" as a left-handed perspective
-   * projection matrix with the following settings:
+   * @brief Sets the passed matrix "matrix" as a left-handed perspective projection matrix with the
+   * following settings :
    * - fov = PI / 2
    * - aspect ratio : 1.0
    * - z-near and far equal to the active camera minZ and maxZ.
@@ -130,22 +128,22 @@ protected:
   void _buildUniformLayout() override;
 
   /**
-   * @brief Getter: In case of direction provided, the shadow will not use a
-   * cube texture but simulate a spot shadow as a fallback
-   * This specifies what angle the shadow will use to be created.
+   * @brief Getter: In case of direction provided, the shadow will not use a cube texture but
+   * simulate a spot shadow as a fallback This specifies what angle the shadow will use to be
+   * created.
    *
-   * It default to 90 degrees to work nicely with the cube texture generation
-   * for point lights shadow maps.
+   * It default to 90 degrees to work nicely with the cube texture generation for point lights
+   * shadow maps.
    */
   float get_shadowAngle() const;
 
   /**
-   * @brief Setter: In case of direction provided, the shadow will not use a
-   * cube texture but simulate a spot shadow as a fallback
-   * This specifies what angle the shadow will use to be created.
+   * @brief Setter: In case of direction provided, the shadow will not use a cube texture but
+   * simulate a spot shadow as a fallback This specifies what angle the shadow will use to be
+   * created.
    *
-   * It default to 90 degrees to work nicely with the cube texture generation
-   * for point lights shadow maps.
+   * It default to 90 degrees to work nicely with the cube texture generation for point lights
+   * shadow maps.
    */
   void set_shadowAngle(float value);
 

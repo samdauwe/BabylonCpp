@@ -13,19 +13,16 @@ bool PointLight::NodeConstructorAdded = false;
 
 void PointLight::AddNodeConstructor()
 {
-  Node::AddNodeConstructor(
-    "Light_Type_0", [](const std::string& iName, Scene* scene,
-                       const std::optional<json>& /*options*/) {
-      return PointLight::New(iName, Vector3::Zero(), scene);
-    });
+  Node::AddNodeConstructor("Light_Type_0", [](const std::string& iName, Scene* scene,
+                                              const std::optional<json>& /*options*/) {
+    return PointLight::New(iName, Vector3::Zero(), scene);
+  });
   PointLight::NodeConstructorAdded = true;
 }
 
-PointLight::PointLight(const std::string& iName, const Vector3& iPosition,
-                       Scene* scene)
+PointLight::PointLight(const std::string& iName, const Vector3& iPosition, Scene* scene)
     : ShadowLight{iName, scene}
-    , shadowAngle{this, &PointLight::get_shadowAngle,
-                  &PointLight::set_shadowAngle}
+    , shadowAngle{this, &PointLight::get_shadowAngle, &PointLight::set_shadowAngle}
     , _shadowAngle{Math::PI_2}
 {
   position = iPosition;
@@ -105,9 +102,8 @@ Vector3 PointLight::getShadowDirection(unsigned int faceIndex)
   return Vector3::Zero();
 }
 
-void PointLight::_setDefaultShadowProjectionMatrix(
-  Matrix& matrix, const Matrix& /*viewMatrix*/,
-  const std::vector<AbstractMesh*>& /*renderList*/)
+void PointLight::_setDefaultShadowProjectionMatrix(Matrix& matrix, const Matrix& /*viewMatrix*/,
+                                                   const std::vector<AbstractMesh*>& /*renderList*/)
 {
   auto activeCamera = getScene()->activeCamera();
 
@@ -130,8 +126,7 @@ void PointLight::_buildUniformLayout()
   _uniformBuffer->create();
 }
 
-void PointLight::transferToEffect(const EffectPtr& /*effect*/,
-                                  const std::string& lightIndex)
+void PointLight::transferToEffect(const EffectPtr& /*effect*/, const std::string& lightIndex)
 {
   if (computeTransformedInformation()) {
     _uniformBuffer->updateFloat4("vLightData",            //
@@ -142,8 +137,8 @@ void PointLight::transferToEffect(const EffectPtr& /*effect*/,
                                  lightIndex);
   }
   else {
-    _uniformBuffer->updateFloat4("vLightData", position().x, position().y,
-                                 position().z, 0, lightIndex);
+    _uniformBuffer->updateFloat4("vLightData", position().x, position().y, position().z, 0,
+                                 lightIndex);
   }
 
   _uniformBuffer->updateFloat4("vLightFalloff",      //
@@ -155,25 +150,23 @@ void PointLight::transferToEffect(const EffectPtr& /*effect*/,
   );
 }
 
-PointLight& PointLight::transferToNodeMaterialEffect(
-  const EffectPtr& effect, const std::string& lightDataUniformName)
+PointLight& PointLight::transferToNodeMaterialEffect(const EffectPtr& effect,
+                                                     const std::string& lightDataUniformName)
 {
   if (computeTransformedInformation()) {
-    const auto iTransformedPosition = transformedPosition();
-    effect->setFloat3(lightDataUniformName, iTransformedPosition.x,
-                      iTransformedPosition.y, iTransformedPosition.z);
+    const auto& iTransformedPosition = transformedPosition();
+    effect->setFloat3(lightDataUniformName, iTransformedPosition.x, iTransformedPosition.y,
+                      iTransformedPosition.z);
   }
   else {
-    const auto iPosition = position();
-    effect->setFloat3(lightDataUniformName, iPosition.x, iPosition.y,
-                      iPosition.z);
+    const auto& iPosition = position();
+    effect->setFloat3(lightDataUniformName, iPosition.x, iPosition.y, iPosition.z);
   }
 
   return *this;
 }
 
-void PointLight::prepareLightSpecificDefines(MaterialDefines& defines,
-                                             unsigned int lightIndex)
+void PointLight::prepareLightSpecificDefines(MaterialDefines& defines, unsigned int lightIndex)
 {
   defines.boolDef["POINTLIGHT" + std::to_string(lightIndex)] = true;
 }

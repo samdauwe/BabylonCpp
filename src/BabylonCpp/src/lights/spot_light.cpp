@@ -15,35 +15,28 @@ bool SpotLight::NodeConstructorAdded = false;
 
 void SpotLight::AddNodeConstructor()
 {
-  Node::AddNodeConstructor(
-    "Light_Type_2", [](const std::string& iName, Scene* scene,
-                       const std::optional<json>& /*options*/) {
-      return SpotLight::New(iName, Vector3::Zero(), Vector3::Zero(), 0.f, 0.f,
-                            scene);
-    });
+  Node::AddNodeConstructor("Light_Type_2", [](const std::string& iName, Scene* scene,
+                                              const std::optional<json>& /*options*/) {
+    return SpotLight::New(iName, Vector3::Zero(), Vector3::Zero(), 0.f, 0.f, scene);
+  });
   SpotLight::NodeConstructorAdded = true;
 }
 
-SpotLight::SpotLight(const std::string& iName, const Vector3& iPosition,
-                     const Vector3& iDirection, float iAngle, float iExponent,
-                     Scene* scene)
+SpotLight::SpotLight(const std::string& iName, const Vector3& iPosition, const Vector3& iDirection,
+                     float iAngle, float iExponent, Scene* scene)
     : ShadowLight{iName, scene}
     , exponent{iExponent}
     , angle{this, &SpotLight::get_angle, &SpotLight::set_angle}
     , innerAngle{this, &SpotLight::get_innerAngle, &SpotLight::set_innerAngle}
-    , shadowAngleScale{this, &SpotLight::get_shadowAngleScale,
-                       &SpotLight::set_shadowAngleScale}
+    , shadowAngleScale{this, &SpotLight::get_shadowAngleScale, &SpotLight::set_shadowAngleScale}
     , projectionTextureMatrix{this, &SpotLight::get_projectionTextureMatrix}
-    , projectionTextureLightNear{this,
-                                 &SpotLight::get_projectionTextureLightNear,
+    , projectionTextureLightNear{this, &SpotLight::get_projectionTextureLightNear,
                                  &SpotLight::set_projectionTextureLightNear}
     , projectionTextureLightFar{this, &SpotLight::get_projectionTextureLightFar,
                                 &SpotLight::set_projectionTextureLightFar}
-    , projectionTextureUpDirection{this,
-                                   &SpotLight::get_projectionTextureUpDirection,
+    , projectionTextureUpDirection{this, &SpotLight::get_projectionTextureUpDirection,
                                    &SpotLight::set_projectionTextureUpDirection}
-    , projectionTexture{this, &SpotLight::get_projectionTexture,
-                        &SpotLight::set_projectionTexture}
+    , projectionTexture{this, &SpotLight::get_projectionTexture, &SpotLight::set_projectionTexture}
     , _projectionTextureLightNear{1e-6f}
     , _projectionTextureLightFar{1000.f}
     , _projectionTextureUpDirection{Vector3::Up()}
@@ -192,9 +185,8 @@ void SpotLight::_setPosition(const Vector3& value)
   _projectionTextureViewLightDirty = true;
 }
 
-void SpotLight::_setDefaultShadowProjectionMatrix(
-  Matrix& matrix, const Matrix& /*viewMatrix*/,
-  const std::vector<AbstractMesh*>& /*renderList*/)
+void SpotLight::_setDefaultShadowProjectionMatrix(Matrix& matrix, const Matrix& /*viewMatrix*/,
+                                                  const std::vector<AbstractMesh*>& /*renderList*/)
 {
   auto activeCamera = getScene()->activeCamera();
 
@@ -216,8 +208,7 @@ void SpotLight::_computeProjectionTextureViewLightMatrix()
 
   position().addToRef(direction(), _projectionTextureViewTargetVector);
   Matrix::LookAtLHToRef(position(), _projectionTextureViewTargetVector,
-                        _projectionTextureUpDirection,
-                        _projectionTextureViewLightMatrix);
+                        _projectionTextureUpDirection, _projectionTextureViewLightMatrix);
 }
 
 void SpotLight::_computeProjectionTextureProjectionLightMatrix()
@@ -245,10 +236,9 @@ void SpotLight::_computeProjectionTextureMatrix()
 {
   _projectionTextureDirty = false;
 
-  _projectionTextureViewLightMatrix.multiplyToRef(
-    _projectionTextureProjectionLightMatrix, _projectionTextureMatrix);
-  _projectionTextureMatrix.multiplyToRef(_projectionTextureScalingMatrix,
-                                         _projectionTextureMatrix);
+  _projectionTextureViewLightMatrix.multiplyToRef(_projectionTextureProjectionLightMatrix,
+                                                  _projectionTextureMatrix);
+  _projectionTextureMatrix.multiplyToRef(_projectionTextureScalingMatrix, _projectionTextureMatrix);
 }
 
 void SpotLight::_buildUniformLayout()
@@ -265,13 +255,29 @@ void SpotLight::_buildUniformLayout()
 
 void SpotLight::_computeAngleValues()
 {
-  _lightAngleScale
-    = 1.f / std::max(0.001f, (std::cos(_innerAngle * 0.5f) - _cosHalfAngle));
+  _lightAngleScale  = 1.f / std::max(0.001f, (std::cos(_innerAngle * 0.5f) - _cosHalfAngle));
   _lightAngleOffset = -_cosHalfAngle * _lightAngleScale;
 }
 
-void SpotLight::transferToEffect(const EffectPtr& effect,
-                                 const std::string& lightIndex)
+Light& SpotLight::transferTexturesToEffect(const EffectPtr& effect, const std::string& lightIndex)
+{
+  if (projectionTexture() && projectionTexture()->isReady()) {
+    if (_projectionTextureViewLightDirty) {
+      _computeProjectionTextureViewLightMatrix();
+    }
+    if (_projectionTextureProjectionLightDirty) {
+      _computeProjectionTextureProjectionLightMatrix();
+    }
+    if (_projectionTextureDirty) {
+      _computeProjectionTextureMatrix();
+    }
+    effect->setMatrix("textureProjectionMatrix" + lightIndex, _projectionTextureMatrix);
+    effect->setTexture("projectionLightSampler" + lightIndex, projectionTexture);
+  }
+  return *this;
+}
+
+void SpotLight::transferToEffect(const EffectPtr& /*effect*/, const std::string& lightIndex)
 {
   auto normalizeDirection = Vector3::Zero();
 
@@ -324,27 +330,10 @@ void SpotLight::transferToEffect(const EffectPtr& effect,
                                _lightAngleOffset,    // Value
                                lightIndex            // Index
   );
-
-  if (projectionTexture() && projectionTexture()->isReady()) {
-    if (_projectionTextureViewLightDirty) {
-      _computeProjectionTextureViewLightMatrix();
-    }
-    if (_projectionTextureProjectionLightDirty) {
-      _computeProjectionTextureProjectionLightMatrix();
-    }
-    if (_projectionTextureDirty) {
-      _computeProjectionTextureMatrix();
-    }
-    effect->setMatrix("textureProjectionMatrix" + lightIndex,
-                      _projectionTextureMatrix);
-    effect->setTexture("projectionLightSampler" + lightIndex,
-                       projectionTexture());
-  }
 }
 
-SpotLight&
-SpotLight::transferToNodeMaterialEffect(const EffectPtr& effect,
-                                        const std::string& lightDataUniformName)
+SpotLight& SpotLight::transferToNodeMaterialEffect(const EffectPtr& effect,
+                                                   const std::string& lightDataUniformName)
 {
   Vector3 normalizeDirection;
 
@@ -356,12 +345,12 @@ SpotLight::transferToNodeMaterialEffect(const EffectPtr& effect,
   }
 
   if (getScene()->useRightHandedSystem()) {
-    effect->setFloat3(lightDataUniformName, -normalizeDirection.x,
-                      -normalizeDirection.y, -normalizeDirection.z);
+    effect->setFloat3(lightDataUniformName, -normalizeDirection.x, -normalizeDirection.y,
+                      -normalizeDirection.z);
   }
   else {
-    effect->setFloat3(lightDataUniformName, normalizeDirection.x,
-                      normalizeDirection.y, normalizeDirection.z);
+    effect->setFloat3(lightDataUniformName, normalizeDirection.x, normalizeDirection.y,
+                      normalizeDirection.z);
   }
 
   return *this;
@@ -375,8 +364,7 @@ void SpotLight::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   }
 }
 
-void SpotLight::prepareLightSpecificDefines(MaterialDefines& defines,
-                                            unsigned int lightIndex)
+void SpotLight::prepareLightSpecificDefines(MaterialDefines& defines, unsigned int lightIndex)
 {
   const auto lightIndexStr = std::to_string(lightIndex);
 
