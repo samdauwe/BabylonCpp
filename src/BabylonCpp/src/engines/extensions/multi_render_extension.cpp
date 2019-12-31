@@ -124,7 +124,7 @@ MultiRenderExtension::createMultipleRenderTarget(ISize size,
     if (type == Constants::TEXTURETYPE_FLOAT && !_this->_caps.textureFloat) {
       type = Constants::TEXTURETYPE_UNSIGNED_INT;
       BABYLON_LOG_WARN(
-        "Engine",
+        "MultiRenderExtension",
         "Float textures are not supported. Render target forced to TEXTURETYPE_UNSIGNED_BYTE type")
     }
 
