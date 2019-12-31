@@ -2,7 +2,6 @@
 #define BABYLON_ENGINES_EXTENSIONS_ALPHA_EXTENSION_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/meshes/abstract_mesh_constants.h>
 
 namespace BABYLON {
 

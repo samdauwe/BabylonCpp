@@ -7,7 +7,6 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
-#include <babylon/meshes/abstract_mesh_constants.h>
 
 namespace BABYLON {
 
