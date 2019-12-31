@@ -8,6 +8,7 @@
 #include <babylon/engines/extensions/cube_texture_extension.h>
 #include <babylon/engines/extensions/dynamic_texture_extension.h>
 #include <babylon/engines/extensions/multi_render_extension.h>
+#include <babylon/engines/extensions/render_target_extension.h>
 #include <babylon/engines/instancing_attribute_info.h>
 #include <babylon/engines/scene.h>
 #include <babylon/engines/webgl/webgl_pipeline_context.h>
@@ -3512,6 +3513,29 @@ unsigned int ThinEngine::updateMultipleRenderTargetTextureSampleCount(
   const std::vector<InternalTexturePtr>& textures, unsigned int samples)
 {
   return _multiRenderExtension->updateMultipleRenderTargetTextureSampleCount(textures, samples);
+}
+
+//------------------------------------------------------------------------------------------------
+//                              Render Target Extension
+//------------------------------------------------------------------------------------------------
+
+InternalTexturePtr ThinEngine::createRenderTargetTexture(const std::variant<ISize, float>& size,
+                                                         const IRenderTargetOptions& options)
+{
+  return _renderTargetExtension->createRenderTargetTexture(size, options);
+}
+
+InternalTexturePtr ThinEngine::createDepthStencilTexture(const std::variant<int, ISize>& size,
+                                                         const DepthTextureCreationOptions& options)
+{
+  return _renderTargetExtension->createDepthStencilTexture(size, options);
+}
+
+InternalTexturePtr
+ThinEngine::_createDepthStencilTexture(const std::variant<int, ISize>& size,
+                                       const DepthTextureCreationOptions& options)
+{
+  return _renderTargetExtension->_createDepthStencilTexture(size, options);
 }
 
 } // end of namespace BABYLON

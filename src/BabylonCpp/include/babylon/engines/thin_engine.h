@@ -33,10 +33,12 @@ struct IInternalTextureLoader;
 struct InstancingAttributeInfo;
 class InternalTexture;
 class IPipelineContext;
+struct IRenderTargetOptions;
 struct IShaderProcessor;
 struct ISize;
 class MultiRenderExtension;
 struct IMultiRenderTargetOptions;
+class RenderTargetExtension;
 class Scene;
 class StencilState;
 class Texture;
@@ -1298,6 +1300,35 @@ public:
   updateMultipleRenderTargetTextureSampleCount(const std::vector<InternalTexturePtr>& textures,
                                                unsigned int samples);
 
+  //------------------------------------------------------------------------------------------------
+  //                              Render Target Extension
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * @brief Creates a new render target texture.
+   * @param size defines the size of the texture
+   * @param options defines the options used to create the texture
+   * @returns a new render target texture stored in an InternalTexture
+   */
+  InternalTexturePtr createRenderTargetTexture(const std::variant<ISize, float>& size,
+                                               const IRenderTargetOptions& options);
+
+  /**
+   * @brief Creates a depth stencil texture.
+   * This is only available in WebGL 2 or with the depth texture extension available.
+   * @param size The size of face edge in the texture.
+   * @param options The options defining the texture.
+   * @returns The texture
+   */
+  InternalTexturePtr createDepthStencilTexture(const std::variant<int, ISize>& size,
+                                               const DepthTextureCreationOptions& options);
+
+  /**
+   * @brief Hidden
+   */
+  InternalTexturePtr _createDepthStencilTexture(const std::variant<int, ISize>& size,
+                                                const DepthTextureCreationOptions& options);
+
 protected:
   /**
    * @brief Gets a boolean indicating that the engine supports uniform buffers.
@@ -1763,6 +1794,10 @@ private:
   std::unique_ptr<CubeTextureExtension> _cubeTextureExtension       = nullptr;
   std::unique_ptr<DynamicTextureExtension> _dynamicTextureExtension = nullptr;
   std::unique_ptr<MultiRenderExtension> _multiRenderExtension       = nullptr;
+  std::unique_ptr<RenderTargetExtension> _renderTargetExtension     = nullptr;
+
+  // Friend classes
+  friend class RenderTargetExtension;
 
 }; // end of class ThinEngine
 
