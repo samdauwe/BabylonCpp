@@ -35,6 +35,8 @@ class InternalTexture;
 class IPipelineContext;
 struct IShaderProcessor;
 struct ISize;
+class MultiRenderExtension;
+struct IMultiRenderTargetOptions;
 class Scene;
 class StencilState;
 class Texture;
@@ -1259,6 +1261,43 @@ public:
                             std::optional<unsigned int> format = std::nullopt,
                             bool forceBindTexture              = false);
 
+  //------------------------------------------------------------------------------------------------
+  //                              Multi Render Extension
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * @brief Unbind a list of render target textures from the webGL context.
+   * This is used only when drawBuffer extension or webGL2 are active
+   * @param textures defines the render target textures to unbind
+   * @param disableGenerateMipMaps defines a boolean indicating that mipmaps must not be generated
+   * @param onBeforeUnbind defines a function which will be called before the effective unbind
+   */
+  void unBindMultiColorAttachmentFramebuffer(const std::vector<InternalTexturePtr>& textures,
+                                             bool disableGenerateMipMaps                 = false,
+                                             const std::function<void()>& onBeforeUnbind = nullptr);
+
+  /**
+   * @brief Create a multi render target texture.
+   * @see http://doc.babylonjs.com/features/webgl2#multiple-render-target
+   * @param size defines the size of the texture
+   * @param options defines the creation options
+   * @returns the cube texture as an InternalTexture
+   */
+  std::vector<InternalTexturePtr>
+  createMultipleRenderTarget(ISize size, const IMultiRenderTargetOptions& options);
+
+  /**
+   * @brief Update the sample count for a given multiple render target texture
+   * @see http://doc.babylonjs.com/features/webgl2#multisample-render-targets
+   * @param textures defines the textures to update
+   * @param samples defines the sample count to set
+   * @returns the effective sample count (could be 0 if multisample render targets are not
+   * supported)
+   */
+  unsigned int
+  updateMultipleRenderTargetTextureSampleCount(const std::vector<InternalTexturePtr>& textures,
+                                               unsigned int samples);
+
 protected:
   /**
    * @brief Gets a boolean indicating that the engine supports uniform buffers.
@@ -1723,6 +1762,7 @@ private:
   std::unique_ptr<AlphaExtension> _alphaExtension                   = nullptr;
   std::unique_ptr<CubeTextureExtension> _cubeTextureExtension       = nullptr;
   std::unique_ptr<DynamicTextureExtension> _dynamicTextureExtension = nullptr;
+  std::unique_ptr<MultiRenderExtension> _multiRenderExtension       = nullptr;
 
 }; // end of class ThinEngine
 

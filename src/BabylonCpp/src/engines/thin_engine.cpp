@@ -7,6 +7,7 @@
 #include <babylon/engines/extensions/alpha_extension.h>
 #include <babylon/engines/extensions/cube_texture_extension.h>
 #include <babylon/engines/extensions/dynamic_texture_extension.h>
+#include <babylon/engines/extensions/multi_render_extension.h>
 #include <babylon/engines/instancing_attribute_info.h>
 #include <babylon/engines/scene.h>
 #include <babylon/engines/webgl/webgl_pipeline_context.h>
@@ -3487,6 +3488,30 @@ void ThinEngine::updateDynamicTexture(const InternalTexturePtr& texture, ICanvas
 {
   _dynamicTextureExtension->updateDynamicTexture(texture, canvas, invertY, premulAlpha, format,
                                                  forceBindTexture);
+}
+
+//------------------------------------------------------------------------------------------------
+//                              Multi Render Extension
+//------------------------------------------------------------------------------------------------
+
+void ThinEngine::unBindMultiColorAttachmentFramebuffer(
+  const std::vector<InternalTexturePtr>& textures, bool disableGenerateMipMaps,
+  const std::function<void()>& onBeforeUnbind)
+{
+  _multiRenderExtension->unBindMultiColorAttachmentFramebuffer(textures, disableGenerateMipMaps,
+                                                               onBeforeUnbind);
+}
+
+std::vector<InternalTexturePtr>
+ThinEngine::createMultipleRenderTarget(ISize size, const IMultiRenderTargetOptions& options)
+{
+  return _multiRenderExtension->createMultipleRenderTarget(size, options);
+}
+
+unsigned int ThinEngine::updateMultipleRenderTargetTextureSampleCount(
+  const std::vector<InternalTexturePtr>& textures, unsigned int samples)
+{
+  return _multiRenderExtension->updateMultipleRenderTargetTextureSampleCount(textures, samples);
 }
 
 } // end of namespace BABYLON
