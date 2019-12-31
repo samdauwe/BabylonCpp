@@ -9,15 +9,12 @@
 
 namespace BABYLON {
 
-ConeParticleEmitter::ConeParticleEmitter(float iRadius, float iAngle,
-                                         float iDirectionRandomizer)
+ConeParticleEmitter::ConeParticleEmitter(float iRadius, float iAngle, float iDirectionRandomizer)
     : radiusRange{1.f}
     , heightRange{1.f}
     , emitFromSpawnPointOnly{false}
-    , radius{this, &ConeParticleEmitter::get_radius,
-             &ConeParticleEmitter::set_radius}
-    , angle{this, &ConeParticleEmitter::get_angle,
-            &ConeParticleEmitter::set_angle}
+    , radius{this, &ConeParticleEmitter::get_radius, &ConeParticleEmitter::set_radius}
+    , angle{this, &ConeParticleEmitter::get_angle, &ConeParticleEmitter::set_angle}
     , directionRandomizer{iDirectionRandomizer}
 {
   angle  = iAngle;
@@ -59,17 +56,14 @@ void ConeParticleEmitter::_buildHeight()
 }
 
 void ConeParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
-                                                 Vector3& directionToUpdate,
-                                                 Particle* particle)
+                                                 Vector3& directionToUpdate, Particle* particle)
 {
   if (std::abs(std::cos(_angle)) == 1.f) {
-    Vector3::TransformNormalFromFloatsToRef(0.f, 1.0, 0.f, worldMatrix,
-                                            directionToUpdate);
+    Vector3::TransformNormalFromFloatsToRef(0.f, 1.0, 0.f, worldMatrix, directionToUpdate);
   }
   else {
     // measure the direction Vector from the emitter to the particle.
-    auto direction
-      = particle->position.subtract(worldMatrix.getTranslation()).normalize();
+    auto direction   = particle->position.subtract(worldMatrix.getTranslation()).normalize();
     const auto randX = Scalar::RandomRange(0.f, directionRandomizer);
     const auto randY = Scalar::RandomRange(0.f, directionRandomizer);
     const auto randZ = Scalar::RandomRange(0.f, directionRandomizer);
@@ -78,14 +72,13 @@ void ConeParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
     direction.z += randZ;
     direction.normalize();
 
-    Vector3::TransformNormalFromFloatsToRef(
-      direction.x, direction.y, direction.z, worldMatrix, directionToUpdate);
+    Vector3::TransformNormalFromFloatsToRef(direction.x, direction.y, direction.z, worldMatrix,
+                                            directionToUpdate);
   }
 }
 
 void ConeParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
-                                                Vector3& positionToUpdate,
-                                                Particle* /*particle*/)
+                                                Vector3& positionToUpdate, Particle* /*particle*/)
 {
   const auto s = Scalar::RandomRange(0.f, Math::PI2);
   auto h       = 0.f;
@@ -105,14 +98,12 @@ void ConeParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
   const auto randZ = iRadius * std::cos(s);
   const auto randY = h * _height;
 
-  Vector3::TransformCoordinatesFromFloatsToRef(randX, randY, randZ, worldMatrix,
-                                               positionToUpdate);
+  Vector3::TransformCoordinatesFromFloatsToRef(randX, randY, randZ, worldMatrix, positionToUpdate);
 }
 
 std::unique_ptr<IParticleEmitterType> ConeParticleEmitter::clone() const
 {
-  auto newOne = std::make_unique<ConeParticleEmitter>(_radius, _angle,
-                                                      directionRandomizer);
+  auto newOne = std::make_unique<ConeParticleEmitter>(_radius, _angle, directionRandomizer);
 
   return newOne;
 }
@@ -148,16 +139,24 @@ json ConeParticleEmitter::serialize() const
 
 void ConeParticleEmitter::parse(const json& serializationObject)
 {
-  if (json_util::has_key(serializationObject, "radius")) {
+  if (json_util::has_valid_key_value(serializationObject, "radius")) {
     radius = json_util::get_number<float>(serializationObject, "radius", 1.f);
   }
-  if (json_util::has_key(serializationObject, "angle")) {
-    angle
-      = json_util::get_number<float>(serializationObject, "angle", Math::PI);
+  if (json_util::has_valid_key_value(serializationObject, "angle")) {
+    angle = json_util::get_number<float>(serializationObject, "angle", Math::PI);
   }
-  if (json_util::has_key(serializationObject, "directionRandomizer")) {
-    directionRandomizer = json_util::get_number<float>(
-      serializationObject, "directionRandomizer", 0.f);
+  if (json_util::has_valid_key_value(serializationObject, "directionRandomizer")) {
+    directionRandomizer
+      = json_util::get_number<float>(serializationObject, "directionRandomizer", 0.f);
+  }
+  if (json_util::has_valid_key_value(serializationObject, "radiusRange")) {
+    radiusRange = json_util::get_number<float>(serializationObject, "radiusRange", 1.f);
+  }
+  if (json_util::has_valid_key_value(serializationObject, "heightRange")) {
+    heightRange = json_util::get_number<float>(serializationObject, "heightRange", 1.f);
+  }
+  if (json_util::has_valid_key_value(serializationObject, "emitFromSpawnPointOnly")) {
+    emitFromSpawnPointOnly = json_util::get_bool(serializationObject, "emitFromSpawnPointOnly");
   }
 }
 
