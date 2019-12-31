@@ -5,6 +5,7 @@
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
 #include <babylon/engines/engine_store.h>
+#include <babylon/engines/extensions/multiview_extension.h>
 #include <babylon/engines/scene.h>
 #include <babylon/engines/webgl/webgl_pipeline_context.h>
 #include <babylon/interfaces/icanvas.h>
@@ -1199,6 +1200,20 @@ void Engine::_RequestFullscreen(ICanvas* /*element*/)
 
 void Engine::_ExitFullscreen()
 {
+}
+
+//--------------------------------------------------------------------------------------------------
+//                              Multiview Extension
+//--------------------------------------------------------------------------------------------------
+
+InternalTexturePtr Engine::createMultiviewRenderTargetTexture(int width, int height)
+{
+  return _multiviewExtension->createMultiviewRenderTargetTexture(width, height);
+}
+
+void Engine::bindMultiviewFramebuffer(const InternalTexturePtr& multiviewTexture)
+{
+  _multiviewExtension->bindMultiviewFramebuffer(multiviewTexture);
 }
 
 } // end of namespace BABYLON

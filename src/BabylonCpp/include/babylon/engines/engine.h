@@ -12,6 +12,7 @@ class AudioEngine;
 class Camera;
 class ILoadingScreen;
 class Material;
+class MultiviewExtension;
 class PostProcess;
 class RenderTargetTexture;
 using AudioEnginePtr         = std::shared_ptr<AudioEngine>;
@@ -940,6 +941,24 @@ public:
    */
   static void _ExitFullscreen();
 
+  //------------------------------------------------------------------------------------------------
+  //                              Multiview Extension
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * @brief Creates a new multiview render target.
+   * @param width defines the width of the texture
+   * @param height defines the height of the texture
+   * @returns the created multiview texture
+   */
+  InternalTexturePtr createMultiviewRenderTargetTexture(int width, int height);
+
+  /**
+   * @brief Binds a multiview framebuffer to be drawn to.
+   * @param multiviewTexture texture to bind
+   */
+  void bindMultiviewFramebuffer(const InternalTexturePtr& multiviewTexture);
+
 protected:
   bool get__supportsHardwareTextureRescaling() const override;
 
@@ -1133,6 +1152,9 @@ private:
   unsigned int _cachedStencilOperationFail;
   unsigned int _cachedStencilOperationDepthFail;
   int _cachedStencilReference;
+
+  /** Extensions */
+  std::unique_ptr<MultiviewExtension> _multiviewExtension = nullptr;
 
 }; // end of class Engine
 
