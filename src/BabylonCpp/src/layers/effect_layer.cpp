@@ -500,7 +500,12 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
 
   _setEmissiveTextureAndColor(mesh, subMesh, material);
 
-  if (_isReady(subMesh, hardwareInstancedRendering, _emissiveTextureAndColor.texture)) {
+  onBeforeRenderMeshToEffect.notifyObservers(mesh.get());
+
+  if (_useMeshMaterial(mesh)) {
+    mesh->render(subMesh, hardwareInstancedRendering);
+  }
+  else if (_isReady(subMesh, hardwareInstancedRendering, _emissiveTextureAndColor.texture)) {
     engine->enableEffect(_effectLayerMapGenerationEffect);
     mesh->_bind(subMesh, _effectLayerMapGenerationEffect, Material::TriangleFillMode);
 
@@ -588,6 +593,13 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
     // Need to reset refresh rate of the main map
     _mainTexture->resetRefreshCounter();
   }
+
+  onAfterRenderMeshToEffect.notifyObservers(mesh.get());
+}
+
+bool EffectLayer::_useMeshMaterial(const AbstractMeshPtr& /*mesh*/) const
+{
+  return false;
 }
 
 void EffectLayer::_rebuild()
@@ -649,6 +661,8 @@ void EffectLayer::dispose()
   onDisposeObservable.clear();
   onBeforeRenderMainTextureObservable.clear();
   onBeforeComposeObservable.clear();
+  onBeforeRenderMeshToEffect.clear();
+  onAfterRenderMeshToEffect.clear();
   onAfterComposeObservable.clear();
   onSizeChangedObservable.clear();
 }

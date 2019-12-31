@@ -19,15 +19,13 @@ using LayerSceneComponentPtr = std::shared_ptr<LayerSceneComponent>;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 /**
- * @brief Defines the layer scene component responsible to manage any layers
- * in a given scene.
+ * @brief Defines the layer scene component responsible to manage any layers in a given scene.
  */
 class BABYLON_SHARED_EXPORT LayerSceneComponent : public ISceneComponent {
 
 public:
   /**
-   * The component name helpfull to identify the component in the list of scene
-   * components.
+   * The component name helpfull to identify the component in the list of scene components.
    */
   static constexpr const char* name = SceneComponentConstants::NAME_LAYER;
 
@@ -45,8 +43,7 @@ public:
   void _register() override;
 
   /**
-   * @brief Rebuilds the elements related to this component in case of
-   * context lost for instance.
+   * @brief Rebuilds the elements related to this component in case of context lost for instance.
    */
   void rebuild() override;
 

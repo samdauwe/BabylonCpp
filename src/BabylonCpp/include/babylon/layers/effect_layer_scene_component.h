@@ -21,8 +21,8 @@ class Engine;
 using EffectLayerSceneComponentPtr = std::shared_ptr<EffectLayerSceneComponent>;
 
 /**
- * @brief Defines the layer scene component responsible to manage any effect
- * layers in a given scene.
+ * @brief Defines the layer scene component responsible to manage any effect layers in a given
+ * scene.
  */
 class BABYLON_SHARED_EXPORT EffectLayerSceneComponent : public ISceneComponent {
 
@@ -48,8 +48,7 @@ public:
   void _register() override;
 
   /**
-   * @brief Rebuilds the elements related to this component in case of
-   * context lost for instance.
+   * @brief Rebuilds the elements related to this component in case of context lost for instance.
    */
   void rebuild() override;
 

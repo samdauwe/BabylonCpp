@@ -20,18 +20,16 @@ LayerSceneComponent::~LayerSceneComponent() = default;
 
 void LayerSceneComponent::_register()
 {
-  scene->_beforeCameraDrawStage.registerStep(
-    SceneComponentConstants::STEP_BEFORECAMERADRAW_LAYER, this,
-    [this](Camera* camera) -> bool {
-      _drawCameraBackground(camera);
-      return true;
-    });
-  scene->_afterCameraDrawStage.registerStep(
-    SceneComponentConstants::STEP_AFTERCAMERADRAW_LAYER, this,
-    [this](Camera* camera) -> bool {
-      _drawCameraForeground(camera);
-      return true;
-    });
+  scene->_beforeCameraDrawStage.registerStep(SceneComponentConstants::STEP_BEFORECAMERADRAW_LAYER,
+                                             this, [this](Camera* camera) -> bool {
+                                               _drawCameraBackground(camera);
+                                               return true;
+                                             });
+  scene->_afterCameraDrawStage.registerStep(SceneComponentConstants::STEP_AFTERCAMERADRAW_LAYER,
+                                            this, [this](Camera* camera) -> bool {
+                                              _drawCameraForeground(camera);
+                                              return true;
+                                            });
 
   scene->_beforeRenderTargetDrawStage.registerStep(
     SceneComponentConstants::STEP_BEFORERENDERTARGETDRAW_LAYER, this,
@@ -65,8 +63,7 @@ void LayerSceneComponent::dispose()
   layers.clear();
 }
 
-void LayerSceneComponent::_draw(
-  const std::function<bool(const Layer& layer)>& predicate)
+void LayerSceneComponent::_draw(const std::function<bool(const Layer& layer)>& predicate)
 {
   const auto& layers = scene->layers;
 
@@ -81,11 +78,10 @@ void LayerSceneComponent::_draw(
   }
 }
 
-bool LayerSceneComponent::_drawCameraPredicate(
-  const Layer& layer, bool isBackground, unsigned int cameraLayerMask) const
+bool LayerSceneComponent::_drawCameraPredicate(const Layer& layer, bool isBackground,
+                                               unsigned int cameraLayerMask) const
 {
-  return !layer.renderOnlyInRenderTargetTextures
-         && layer.isBackground == isBackground
+  return !layer.renderOnlyInRenderTargetTextures && layer.isBackground == isBackground
          && ((layer.layerMask & cameraLayerMask) != 0);
 }
 
@@ -112,21 +108,17 @@ bool LayerSceneComponent::_drawRenderTargetPredicate(
          && ((layer.layerMask & cameraLayerMask) != 0);
 }
 
-void LayerSceneComponent::_drawRenderTargetBackground(
-  const RenderTargetTexturePtr& renderTarget)
+void LayerSceneComponent::_drawRenderTargetBackground(const RenderTargetTexturePtr& renderTarget)
 {
   _draw([this, &renderTarget](const Layer& layer) -> bool {
-    return _drawRenderTargetPredicate(
-      layer, true, scene->activeCamera()->layerMask, renderTarget);
+    return _drawRenderTargetPredicate(layer, true, scene->activeCamera()->layerMask, renderTarget);
   });
 }
 
-void LayerSceneComponent::_drawRenderTargetForeground(
-  const RenderTargetTexturePtr& renderTarget)
+void LayerSceneComponent::_drawRenderTargetForeground(const RenderTargetTexturePtr& renderTarget)
 {
   _draw([this, &renderTarget](const Layer& layer) -> bool {
-    return _drawRenderTargetPredicate(
-      layer, false, scene->activeCamera()->layerMask, renderTarget);
+    return _drawRenderTargetPredicate(layer, false, scene->activeCamera()->layerMask, renderTarget);
   });
 }
 
@@ -140,8 +132,7 @@ void LayerSceneComponent::addFromContainer(const AbstractScene& container)
   }
 }
 
-void LayerSceneComponent::removeFromContainer(const AbstractScene& container,
-                                              bool dispose)
+void LayerSceneComponent::removeFromContainer(const AbstractScene& container, bool dispose)
 {
   if (container.layers.empty()) {
     return;

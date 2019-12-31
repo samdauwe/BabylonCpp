@@ -246,6 +246,12 @@ protected:
    */
   void _renderSubMesh(SubMesh* subMesh, bool enableAlphaMode = false);
 
+  /**
+   * @brief Defines wether the current material of the mesh should be use to render the effect.
+   * @param mesh defines the current mesh to render
+   */
+  virtual bool _useMeshMaterial(const AbstractMeshPtr& mesh) const;
+
 private:
   /**
    * @brief Generates the index buffer of the full screen quad blending to the main canvas.
@@ -309,6 +315,16 @@ public:
    * An event triggered when the generated texture is being merged in the scene.
    */
   Observable<EffectLayer> onBeforeComposeObservable;
+
+  /**
+   * An event triggered when the mesh is rendered into the effect render target.
+   */
+  Observable<AbstractMesh> onBeforeRenderMeshToEffect;
+
+  /**
+   * An event triggered after the mesh has been rendered into the effect render target.
+   */
+  Observable<AbstractMesh> onAfterRenderMeshToEffect;
 
   /**
    * An event triggered when the generated texture has been merged in the scene.

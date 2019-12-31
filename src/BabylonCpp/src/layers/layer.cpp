@@ -56,27 +56,6 @@ Layer::Layer(const std::string& name, const std::string& imgUrl, Scene* scene, b
     = std::make_shared<VertexBuffer>(engine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
   _createIndexBuffer();
-
-  // Effects
-  {
-    IEffectCreationOptions options;
-    options.attributes    = {VertexBuffer::PositionKind};
-    options.uniformsNames = {"textureMatrix", "color", "scale", "offset"};
-    options.samplers      = {"textureSampler"};
-    options.defines       = "";
-
-    _effect = engine->createEffect("layer", options, _scene->getEngine());
-  }
-
-  {
-    IEffectCreationOptions options;
-    options.attributes    = {VertexBuffer::PositionKind};
-    options.uniformsNames = {"textureMatrix", "color", "scale", "offset"};
-    options.samplers      = {"textureSampler"};
-    options.defines       = "#define ALPHATEST";
-
-    _alphaTestEffect = engine->createEffect("layer", options, _scene->getEngine());
-  }
 }
 
 Layer::~Layer() = default;
@@ -135,14 +114,35 @@ void Layer::_rebuild()
 
 void Layer::render()
 {
-  auto currentEffect = alphaTest ? _alphaTestEffect : _effect;
+  auto engine = _scene->getEngine();
 
-  // Check
-  if (!currentEffect->isReady() || !texture || !texture->isReady()) {
-    return;
+  std::string defines = "";
+
+  if (alphaTest) {
+    defines = "#define ALPHATEST";
   }
 
-  auto engine = _scene->getEngine();
+  if (texture && !texture->gammaSpace) {
+    defines += "\r\n#define LINEAR";
+  }
+
+  if (_previousDefines != defines) {
+    _previousDefines = defines;
+
+    IEffectCreationOptions options;
+    options.attributes    = {VertexBuffer::PositionKind};
+    options.uniformsNames = {"textureMatrix", "color", "scale", "offset"};
+    options.samplers      = {"textureSampler"};
+    options.defines       = defines;
+
+    _effect = engine->createEffect("layer", options, engine);
+  }
+  auto currentEffect = _effect;
+
+  // Check
+  if (!currentEffect || !currentEffect->isReady() || !texture || !texture->isReady()) {
+    return;
+  }
 
   onBeforeRenderObservable.notifyObservers(this);
 

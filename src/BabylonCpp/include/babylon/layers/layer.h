@@ -173,7 +173,7 @@ private:
   std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
   WebGLDataBufferPtr _indexBuffer;
   EffectPtr _effect;
-  EffectPtr _alphaTestEffect;
+  std::string _previousDefines;
 
 }; // end of class Layer
 

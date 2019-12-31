@@ -23,11 +23,9 @@ using SubMeshPtr         = std::shared_ptr<SubMesh>;
 using TexturePtr         = std::shared_ptr<Texture>;
 
 /**
- * @brief The glow layer Helps adding a glow effect around the emissive parts of
- * a mesh.
+ * @brief The glow layer Helps adding a glow effect around the emissive parts of a mesh.
  *
- * Once instantiated in a scene, simply use the pushMesh or removeMesh method to
- * add or remove glowy meshes to your scene.
+ * Once instantiated in a scene, by default, all the emissive meshes will glow.
  *
  * Documentation: https://doc.babylonjs.com/how_to/glow_layer
  */
@@ -117,6 +115,18 @@ public:
    * @returns true if the mesh will be highlighted by the current glow layer
    */
   bool hasMesh(AbstractMesh* mesh) const override;
+
+  /**
+   * @brief Add a mesh to be rendered through its own material and not with emissive only.
+   * @param mesh The mesh for which we need to use its material
+   */
+  void referenceMeshToUseItsOwnMaterial(const AbstractMeshPtr& mesh);
+
+  /**
+   * @brief Remove a mesh from being rendered through its own material and not with emissive only.
+   * @param mesh The mesh for which we need to not use its material
+   */
+  void unReferenceMeshFromUsingItsOwnMaterial(const AbstractMeshPtr& mesh);
 
   /**
    * @brief Free any resources and references associated to a mesh.
@@ -226,6 +236,12 @@ protected:
    */
   void _addCustomEffectDefines(std::vector<std::string>& defines) override;
 
+  /**
+   * @brief Defines wether the current material of the mesh should be use to render the effect.
+   * @param mesh defines the current mesh to render
+   */
+  bool _useMeshMaterial(const AbstractMeshPtr& mesh) const override;
+
 public:
   /**
    * Callback used to let the user override the color selection on a per mesh
@@ -257,6 +273,7 @@ private:
 
   Uint64Array _includedOnlyMeshes;
   Uint64Array _excludedMeshes;
+  std::vector<size_t> _meshesUsingTheirOwnMaterials;
 
 }; // end of struct GlowLayer
 

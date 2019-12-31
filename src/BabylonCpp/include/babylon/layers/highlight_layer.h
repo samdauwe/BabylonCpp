@@ -22,8 +22,7 @@ using PassPostProcessPtr     = std::shared_ptr<PassPostProcess>;
 /**
  * @brief The highlight layer Helps adding a glow effect around a mesh.
  *
- * Once instantiated in a scene, simply use the pushMesh or removeMesh method to
- * add or remove
+ * Once instantiated in a scene, simply use the addMesh or removeMesh method to add or remove
  * glowy meshes to your scene.
  *
  * !!! THIS REQUIRES AN ACTIVE STENCIL BUFFER ON THE CANVAS !!!

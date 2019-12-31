@@ -357,6 +357,28 @@ bool GlowLayer::hasMesh(AbstractMesh* mesh) const
   return true;
 }
 
+bool GlowLayer::_useMeshMaterial(const AbstractMeshPtr& mesh) const
+{
+  if (_meshesUsingTheirOwnMaterials.empty()) {
+    return false;
+  }
+  return stl_util::contains(_meshesUsingTheirOwnMaterials, mesh->uniqueId);
+}
+
+void GlowLayer::referenceMeshToUseItsOwnMaterial(const AbstractMeshPtr& mesh)
+{
+  _meshesUsingTheirOwnMaterials.emplace_back(mesh->uniqueId);
+}
+
+void GlowLayer::unReferenceMeshFromUsingItsOwnMaterial(const AbstractMeshPtr& mesh)
+{
+  auto index = stl_util::index_of(_meshesUsingTheirOwnMaterials, mesh->uniqueId);
+  while (index > 0) {
+    stl_util::slice_in_place(_meshesUsingTheirOwnMaterials, index, index + 1);
+    index = stl_util::index_of(_meshesUsingTheirOwnMaterials, mesh->uniqueId);
+  }
+}
+
 void GlowLayer::_disposeMesh(Mesh* mesh)
 {
   removeIncludedOnlyMesh(mesh);

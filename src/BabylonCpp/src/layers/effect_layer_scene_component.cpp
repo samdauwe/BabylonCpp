@@ -44,8 +44,7 @@ void EffectLayerSceneComponent::_register()
     });
 
   scene->_afterRenderingGroupDrawStage.registerStep(
-    SceneComponentConstants::STEP_AFTERRENDERINGGROUPDRAW_EFFECTLAYER_DRAW,
-    this,
+    SceneComponentConstants::STEP_AFTERRENDERINGGROUPDRAW_EFFECTLAYER_DRAW, this,
     [this](int renderingGroupId) { _drawRenderingGroup(renderingGroupId); });
 
   scene->_afterCameraDrawStage.registerStep(
@@ -84,8 +83,7 @@ void EffectLayerSceneComponent::addFromContainer(AbstractScene* container)
   }
 }
 
-void EffectLayerSceneComponent::removeFromContainer(AbstractScene* container,
-                                                    bool dispose)
+void EffectLayerSceneComponent::removeFromContainer(AbstractScene* container, bool dispose)
 {
   if (container->effectLayers.empty()) {
     return;
@@ -107,8 +105,7 @@ void EffectLayerSceneComponent::dispose()
   layers.clear();
 }
 
-bool EffectLayerSceneComponent::_isReadyForMesh(AbstractMesh* mesh,
-                                                bool hardwareInstancedRendering)
+bool EffectLayerSceneComponent::_isReadyForMesh(AbstractMesh* mesh, bool hardwareInstancedRendering)
 {
   const auto& layers = scene->effectLayers;
   for (const auto& layer : layers) {
@@ -141,8 +138,7 @@ bool EffectLayerSceneComponent::_renderMainTexture(Camera* camera)
               || (effectLayer->camera()->cameraRigMode == Camera::RIG_MODE_NONE
                   && camera == effectLayer->camera().get())
               || (effectLayer->camera()->cameraRigMode != Camera::RIG_MODE_NONE
-                  && stl_util::contains(effectLayer->camera()->_rigCameras,
-                                        camera)))) {
+                  && stl_util::contains(effectLayer->camera()->_rigCameras, camera)))) {
 
         _renderEffects = true;
         _needStencil   = _needStencil || effectLayer->needStencil();
