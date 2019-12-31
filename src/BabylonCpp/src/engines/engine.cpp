@@ -6,6 +6,7 @@
 #include <babylon/core/string.h>
 #include <babylon/engines/engine_store.h>
 #include <babylon/engines/extensions/multiview_extension.h>
+#include <babylon/engines/extensions/occlusion_query_extension.h>
 #include <babylon/engines/scene.h>
 #include <babylon/engines/webgl/webgl_pipeline_context.h>
 #include <babylon/interfaces/icanvas.h>
@@ -1214,6 +1215,75 @@ InternalTexturePtr Engine::createMultiviewRenderTargetTexture(int width, int hei
 void Engine::bindMultiviewFramebuffer(const InternalTexturePtr& multiviewTexture)
 {
   _multiviewExtension->bindMultiviewFramebuffer(multiviewTexture);
+}
+
+//--------------------------------------------------------------------------------------------------
+//                              Occlusion Query Extension
+//--------------------------------------------------------------------------------------------------
+
+WebGLQueryPtr Engine::createQuery()
+{
+  return _occlusionQueryExtension->createQuery();
+}
+
+Engine& Engine::deleteQuery(const WebGLQueryPtr& query)
+{
+  return _occlusionQueryExtension->deleteQuery(query);
+}
+
+bool Engine::isQueryResultAvailable(const WebGLQueryPtr& query)
+{
+  return _occlusionQueryExtension->isQueryResultAvailable(query);
+}
+
+unsigned int Engine::getQueryResult(const WebGLQueryPtr& query)
+{
+  return _occlusionQueryExtension->getQueryResult(query);
+}
+
+Engine& Engine::beginOcclusionQuery(unsigned int algorithmType, const WebGLQueryPtr& query)
+{
+  return _occlusionQueryExtension->beginOcclusionQuery(algorithmType, query);
+}
+
+Engine& Engine::endOcclusionQuery(unsigned int algorithmType)
+{
+  return _occlusionQueryExtension->endOcclusionQuery(algorithmType);
+}
+
+std::optional<_TimeToken> Engine::startTimeQuery()
+{
+  return _occlusionQueryExtension->startTimeQuery();
+}
+
+int Engine::endTimeQuery(std::optional<_TimeToken>& token)
+{
+  return _occlusionQueryExtension->endTimeQuery(token);
+}
+
+WebGLQueryPtr Engine::_createTimeQuery()
+{
+  return _occlusionQueryExtension->_createTimeQuery();
+}
+
+void Engine::_deleteTimeQuery(const WebGLQueryPtr& query)
+{
+  _occlusionQueryExtension->_deleteTimeQuery(query);
+}
+
+unsigned int Engine::_getGlAlgorithmType(unsigned int algorithmType) const
+{
+  return _occlusionQueryExtension->_getGlAlgorithmType(algorithmType);
+}
+
+unsigned int Engine::_getTimeQueryResult(const WebGLQueryPtr& query)
+{
+  return _occlusionQueryExtension->_getTimeQueryResult(query);
+}
+
+bool Engine::_getTimeQueryAvailability(const WebGLQueryPtr& query)
+{
+  return _occlusionQueryExtension->_getTimeQueryAvailability(query);
 }
 
 } // end of namespace BABYLON

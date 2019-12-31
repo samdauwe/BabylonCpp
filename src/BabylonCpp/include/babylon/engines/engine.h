@@ -3,6 +3,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/engines/thin_engine.h>
+#include <babylon/instrumentation/_time_token.h>
 #include <babylon/misc/perf_counter.h>
 #include <babylon/misc/performance_monitor.h>
 
@@ -13,12 +14,15 @@ class Camera;
 class ILoadingScreen;
 class Material;
 class MultiviewExtension;
+class OcclusionQueryExtension;
 class PostProcess;
 class RenderTargetTexture;
+using WebGLQuery             = GL::IGLQuery;
 using AudioEnginePtr         = std::shared_ptr<AudioEngine>;
 using ILoadingScreenPtr      = std::shared_ptr<ILoadingScreen>;
 using PostProcessPtr         = std::shared_ptr<PostProcess>;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+using WebGLQueryPtr          = std::shared_ptr<WebGLQuery>;
 
 /**
  * @brief The engine class is responsible for interfacing with all lower-level APIs such as WebGL
@@ -959,6 +963,94 @@ public:
    */
   void bindMultiviewFramebuffer(const InternalTexturePtr& multiviewTexture);
 
+  //------------------------------------------------------------------------------------------------
+  //                              Occlusion Query Extension
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * @brief Create a new webGL query (you must be sure that queries are supported by checking
+   * getCaps() function).
+   * @return the new query
+   */
+  WebGLQueryPtr createQuery();
+
+  /**
+   * @brief Delete and release a webGL query.
+   * @param query defines the query to delete
+   * @return the current engine
+   */
+  Engine& deleteQuery(const WebGLQueryPtr& query);
+
+  /**
+   * @brief Check if a given query has resolved and got its value.
+   * @param query defines the query to check
+   * @returns true if the query got its value
+   */
+  bool isQueryResultAvailable(const WebGLQueryPtr& query);
+
+  /**
+   * @brief Gets the value of a given query.
+   * @param query defines the query to check
+   * @returns the value of the query
+   */
+  unsigned int getQueryResult(const WebGLQueryPtr& query);
+
+  /**
+   * @brief Initiates an occlusion query.
+   * @param algorithmType defines the algorithm to use
+   * @param query defines the query to use
+   * @returns the current engine
+   * @see http://doc.babylonjs.com/features/occlusionquery
+   */
+  Engine& beginOcclusionQuery(unsigned int algorithmType, const WebGLQueryPtr& query);
+
+  /**
+   * @brief Ends an occlusion query.
+   * @see http://doc.babylonjs.com/features/occlusionquery
+   * @param algorithmType defines the algorithm to use
+   * @returns the current engine
+   */
+  Engine& endOcclusionQuery(unsigned int algorithmType);
+
+  /**
+   * @brief Starts a time query (used to measure time spent by the GPU on a specific frame)
+   * Please note that only one query can be issued at a time
+   * @returns a time token used to track the time span
+   */
+  std::optional<_TimeToken> startTimeQuery();
+
+  /**
+   * @brief Ends a time query.
+   * @param token defines the token used to measure the time span
+   * @returns the time spent (in ns)
+   */
+  int endTimeQuery(std::optional<_TimeToken>& token);
+
+  /**
+   * @brief Hidden
+   */
+  WebGLQueryPtr _createTimeQuery();
+
+  /**
+   * @brief Hidden
+   */
+  void _deleteTimeQuery(const WebGLQueryPtr& query);
+
+  /**
+   * @brief Hidden
+   */
+  unsigned int _getGlAlgorithmType(unsigned int algorithmType) const;
+
+  /**
+   * @brief Hidden
+   */
+  unsigned int _getTimeQueryResult(const WebGLQueryPtr& query);
+
+  /**
+   * @brief Hidden
+   */
+  bool _getTimeQueryAvailability(const WebGLQueryPtr& query);
+
 protected:
   bool get__supportsHardwareTextureRescaling() const override;
 
@@ -1154,7 +1246,8 @@ private:
   int _cachedStencilReference;
 
   /** Extensions */
-  std::unique_ptr<MultiviewExtension> _multiviewExtension = nullptr;
+  std::unique_ptr<MultiviewExtension> _multiviewExtension           = nullptr;
+  std::unique_ptr<OcclusionQueryExtension> _occlusionQueryExtension = nullptr;
 
 }; // end of class Engine
 

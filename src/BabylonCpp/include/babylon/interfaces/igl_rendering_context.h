@@ -792,7 +792,7 @@ public:
    * written to transform feedback buffers.
    * @param query An IGLQuery object for which to start the querying.
    */
-  virtual void beginQuery(GLenum target, const std::unique_ptr<IGLQuery>& query) = 0;
+  virtual void beginQuery(GLenum target, IGLQuery* query) = 0;
 
   /**
    * @brief Starts a transform feedback operation.
