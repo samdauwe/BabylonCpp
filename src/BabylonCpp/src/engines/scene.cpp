@@ -4340,7 +4340,6 @@ Scene& Scene::createPickingRayToRef(int x, int y, const std::optional<Matrix>& w
 
   if (!camera) {
     if (!_activeCamera) {
-      BABYLON_LOG_ERROR("Scene", "Active camera not set")
       return *this;
     }
 
