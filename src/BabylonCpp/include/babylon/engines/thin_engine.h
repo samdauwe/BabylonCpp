@@ -45,6 +45,7 @@ class Scene;
 class StencilState;
 class Texture;
 class UniformBuffer;
+class UniformBufferExtension;
 class VertexBuffer;
 class WebGLDataBuffer;
 class WebGLPipelineContext;
@@ -337,15 +338,6 @@ public:
    * @param buffer defines the buffer to bind
    */
   void bindArrayBuffer(const WebGLDataBufferPtr& buffer);
-
-  /**
-   * @brief Bind a specific block at a given index in a specific shader program.
-   * @param pipelineContext defines the pipeline context to use
-   * @param blockName defines the block name
-   * @param index defines the index where to bind the block
-   */
-  void bindUniformBlock(const IPipelineContextPtr& pipelineContext, const std::string& blockName,
-                        unsigned int index);
 
   /**
    * @brief Update the bound buffer with the given data.
@@ -1344,6 +1336,59 @@ public:
   InternalTexturePtr createRenderTargetCubeTexture(const ISize& size,
                                                    const RenderTargetCreationOptions& options);
 
+  //------------------------------------------------------------------------------------------------
+  //                              Uniform Buffer Extension
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * @brief CCreate an uniform buffer.
+   * @see http://doc.babylonjs.com/features/webgl2#uniform-buffer-objets
+   * @param elements defines the content of the uniform buffer
+   * @returns the webGL uniform buffer
+   */
+  WebGLDataBufferPtr createUniformBuffer(const Float32Array& elements);
+
+  /**
+   * @brief Create a dynamic uniform buffer.
+   * @see http://doc.babylonjs.com/features/webgl2#uniform-buffer-objets
+   * @param elements defines the content of the uniform buffer
+   * @returns the webGL uniform buffer
+   */
+  WebGLDataBufferPtr createDynamicUniformBuffer(const Float32Array& elements);
+
+  /**
+   * @brief Update an existing uniform buffer.
+   * @see http://doc.babylonjs.com/features/webgl2#uniform-buffer-objets
+   * @param uniformBuffer defines the target uniform buffer
+   * @param elements defines the content to update
+   * @param offset defines the offset in the uniform buffer where update should start
+   * @param count defines the size of the data to update
+   */
+  void updateUniformBuffer(const WebGLDataBufferPtr& uniformBuffer, const Float32Array& elements,
+                           int offset = -1, int count = -1);
+
+  /**
+   * @brief Bind an uniform buffer to the current webGL context
+   * @param buffer defines the buffer to bind
+   */
+  void bindUniformBuffer(const WebGLDataBufferPtr& buffer);
+
+  /**
+   * @brief Bind a buffer to the current webGL context at a given location.
+   * @param buffer defines the buffer to bind
+   * @param location defines the index where to bind the buffer
+   */
+  void bindUniformBufferBase(const WebGLDataBufferPtr& buffer, unsigned int location);
+
+  /**
+   * @brief Bind a specific block at a given index in a specific shader program.
+   * @param pipelineContext defines the pipeline context to use
+   * @param blockName defines the block name
+   * @param index defines the index where to bind the block
+   */
+  void bindUniformBlock(const IPipelineContextPtr& pipelineContext, const std::string& blockName,
+                        unsigned int index);
+
 protected:
   /**
    * @brief Gets a boolean indicating that the engine supports uniform buffers.
@@ -1811,6 +1856,7 @@ private:
   std::unique_ptr<MultiRenderExtension> _multiRenderExtension           = nullptr;
   std::unique_ptr<RenderTargetExtension> _renderTargetExtension         = nullptr;
   std::unique_ptr<RenderTargetCubeExtension> _renderTargetCubeExtension = nullptr;
+  std::unique_ptr<UniformBufferExtension> _uniformBufferExtension       = nullptr;
 
   // Friend classes
   friend class RenderTargetExtension;

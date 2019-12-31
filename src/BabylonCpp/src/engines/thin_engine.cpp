@@ -10,6 +10,7 @@
 #include <babylon/engines/extensions/multi_render_extension.h>
 #include <babylon/engines/extensions/render_target_cube_extension.h>
 #include <babylon/engines/extensions/render_target_extension.h>
+#include <babylon/engines/extensions/uniform_buffer_extension.h>
 #include <babylon/engines/instancing_attribute_info.h>
 #include <babylon/engines/scene.h>
 #include <babylon/engines/webgl/webgl_pipeline_context.h>
@@ -835,16 +836,6 @@ void ThinEngine::bindArrayBuffer(const WebGLDataBufferPtr& buffer)
     _unbindVertexArrayObject();
   }
   bindBuffer(buffer, GL::ARRAY_BUFFER);
-}
-
-void ThinEngine::bindUniformBlock(const IPipelineContextPtr& pipelineContext,
-                                  const std::string& blockName, unsigned int index)
-{
-  auto program = std::static_pointer_cast<WebGLPipelineContext>(pipelineContext)->program.get();
-
-  auto uniformLocation = _gl->getUniformBlockIndex(program, blockName);
-
-  _gl->uniformBlockBinding(program, uniformLocation, index);
 }
 
 void ThinEngine::bindIndexBuffer(const WebGLDataBufferPtr& buffer)
@@ -3436,9 +3427,9 @@ unsigned int ThinEngine::getAlphaEquation() const
   return _alphaExtension->getAlphaEquation();
 }
 
-//------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 //                              Cube Texture Extension
-//------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
 InternalTexturePtr
 ThinEngine::_createDepthStencilCubeTexture(int size, const DepthTextureCreationOptions& options)
@@ -3473,9 +3464,9 @@ void ThinEngine::_setCubeMapTextureParams(bool loadMipmap)
   _cubeTextureExtension->_setCubeMapTextureParams(loadMipmap);
 }
 
-//------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 //                              Dynamic Texture Extension
-//------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
 InternalTexturePtr ThinEngine::createDynamicTexture(int width, int height, bool generateMipMaps,
                                                     unsigned int samplingMode)
@@ -3492,9 +3483,9 @@ void ThinEngine::updateDynamicTexture(const InternalTexturePtr& texture, ICanvas
                                                  forceBindTexture);
 }
 
-//------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 //                              Multi Render Extension
-//------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
 void ThinEngine::unBindMultiColorAttachmentFramebuffer(
   const std::vector<InternalTexturePtr>& textures, bool disableGenerateMipMaps,
@@ -3516,9 +3507,9 @@ unsigned int ThinEngine::updateMultipleRenderTargetTextureSampleCount(
   return _multiRenderExtension->updateMultipleRenderTargetTextureSampleCount(textures, samples);
 }
 
-//------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 //                              Render Target Extension
-//------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
 InternalTexturePtr ThinEngine::createRenderTargetTexture(const std::variant<ISize, float>& size,
                                                          const IRenderTargetOptions& options)
@@ -3539,15 +3530,51 @@ ThinEngine::_createDepthStencilTexture(const std::variant<int, ISize>& size,
   return _renderTargetExtension->_createDepthStencilTexture(size, options);
 }
 
-//------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 //                              Render Target Cube Extension
-//------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
 InternalTexturePtr
 ThinEngine::createRenderTargetCubeTexture(const ISize& size,
                                           const RenderTargetCreationOptions& options)
 {
   return _renderTargetCubeExtension->createRenderTargetCubeTexture(size, options);
+}
+
+//--------------------------------------------------------------------------------------------------
+//                              Uniform Buffer Extension
+//--------------------------------------------------------------------------------------------------
+
+WebGLDataBufferPtr ThinEngine::createUniformBuffer(const Float32Array& elements)
+{
+  return _uniformBufferExtension->createUniformBuffer(elements);
+}
+
+WebGLDataBufferPtr ThinEngine::createDynamicUniformBuffer(const Float32Array& elements)
+{
+  return _uniformBufferExtension->createDynamicUniformBuffer(elements);
+}
+
+void ThinEngine::updateUniformBuffer(const WebGLDataBufferPtr& uniformBuffer,
+                                     const Float32Array& elements, int offset, int count)
+{
+  _uniformBufferExtension->updateUniformBuffer(uniformBuffer, elements, offset, count);
+}
+
+void ThinEngine::bindUniformBuffer(const WebGLDataBufferPtr& buffer)
+{
+  _uniformBufferExtension->bindUniformBuffer(buffer);
+}
+
+void ThinEngine::bindUniformBufferBase(const WebGLDataBufferPtr& buffer, unsigned int location)
+{
+  _uniformBufferExtension->bindUniformBufferBase(buffer, location);
+}
+
+void ThinEngine::bindUniformBlock(const IPipelineContextPtr& pipelineContext,
+                                  const std::string& blockName, unsigned int index)
+{
+  _uniformBufferExtension->bindUniformBlock(pipelineContext, blockName, index);
 }
 
 } // end of namespace BABYLON
