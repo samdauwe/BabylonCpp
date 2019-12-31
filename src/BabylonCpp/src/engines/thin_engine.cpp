@@ -8,6 +8,7 @@
 #include <babylon/engines/extensions/cube_texture_extension.h>
 #include <babylon/engines/extensions/dynamic_texture_extension.h>
 #include <babylon/engines/extensions/multi_render_extension.h>
+#include <babylon/engines/extensions/render_target_cube_extension.h>
 #include <babylon/engines/extensions/render_target_extension.h>
 #include <babylon/engines/instancing_attribute_info.h>
 #include <babylon/engines/scene.h>
@@ -3536,6 +3537,17 @@ ThinEngine::_createDepthStencilTexture(const std::variant<int, ISize>& size,
                                        const DepthTextureCreationOptions& options)
 {
   return _renderTargetExtension->_createDepthStencilTexture(size, options);
+}
+
+//------------------------------------------------------------------------------------------------
+//                              Render Target Cube Extension
+//------------------------------------------------------------------------------------------------
+
+InternalTexturePtr
+ThinEngine::createRenderTargetCubeTexture(const ISize& size,
+                                          const RenderTargetCreationOptions& options)
+{
+  return _renderTargetCubeExtension->createRenderTargetCubeTexture(size, options);
 }
 
 } // end of namespace BABYLON

@@ -38,6 +38,8 @@ struct IShaderProcessor;
 struct ISize;
 class MultiRenderExtension;
 struct IMultiRenderTargetOptions;
+struct RenderTargetCreationOptions;
+class RenderTargetCubeExtension;
 class RenderTargetExtension;
 class Scene;
 class StencilState;
@@ -1329,6 +1331,19 @@ public:
   InternalTexturePtr _createDepthStencilTexture(const std::variant<int, ISize>& size,
                                                 const DepthTextureCreationOptions& options);
 
+  //------------------------------------------------------------------------------------------------
+  //                              Render Target Cube Extension
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * @brief Creates a new render target cube texture.
+   * @param size defines the size of the texture
+   * @param options defines the options used to create the texture
+   * @returns a new render target cube texture stored in an InternalTexture
+   */
+  InternalTexturePtr createRenderTargetCubeTexture(const ISize& size,
+                                                   const RenderTargetCreationOptions& options);
+
 protected:
   /**
    * @brief Gets a boolean indicating that the engine supports uniform buffers.
@@ -1790,11 +1805,12 @@ private:
   std::optional<bool> _unpackFlipYCached = std::nullopt;
 
   /** Extensions */
-  std::unique_ptr<AlphaExtension> _alphaExtension                   = nullptr;
-  std::unique_ptr<CubeTextureExtension> _cubeTextureExtension       = nullptr;
-  std::unique_ptr<DynamicTextureExtension> _dynamicTextureExtension = nullptr;
-  std::unique_ptr<MultiRenderExtension> _multiRenderExtension       = nullptr;
-  std::unique_ptr<RenderTargetExtension> _renderTargetExtension     = nullptr;
+  std::unique_ptr<AlphaExtension> _alphaExtension                       = nullptr;
+  std::unique_ptr<CubeTextureExtension> _cubeTextureExtension           = nullptr;
+  std::unique_ptr<DynamicTextureExtension> _dynamicTextureExtension     = nullptr;
+  std::unique_ptr<MultiRenderExtension> _multiRenderExtension           = nullptr;
+  std::unique_ptr<RenderTargetExtension> _renderTargetExtension         = nullptr;
+  std::unique_ptr<RenderTargetCubeExtension> _renderTargetCubeExtension = nullptr;
 
   // Friend classes
   friend class RenderTargetExtension;
