@@ -7,6 +7,7 @@
 #include <babylon/engines/engine_store.h>
 #include <babylon/engines/extensions/multiview_extension.h>
 #include <babylon/engines/extensions/occlusion_query_extension.h>
+#include <babylon/engines/extensions/raw_texture_extension.h>
 #include <babylon/engines/extensions/transform_feedback_extension.h>
 #include <babylon/engines/scene.h>
 #include <babylon/engines/webgl/webgl_pipeline_context.h>
@@ -1285,6 +1286,99 @@ unsigned int Engine::_getTimeQueryResult(const WebGLQueryPtr& query)
 bool Engine::_getTimeQueryAvailability(const WebGLQueryPtr& query)
 {
   return _occlusionQueryExtension->_getTimeQueryAvailability(query);
+}
+
+//--------------------------------------------------------------------------------------------------
+//                              Raw Texture Extension
+//--------------------------------------------------------------------------------------------------
+
+InternalTexturePtr Engine::createRawTexture(const Uint8Array& data, int width, int height,
+                                            unsigned int format, bool generateMipMaps, bool invertY,
+                                            unsigned int samplingMode,
+                                            const std::string& compression, unsigned int type)
+{
+  return _rawTextureExtension->createRawTexture(data, width, height, format, generateMipMaps,
+                                                invertY, samplingMode, compression, type);
+}
+
+void Engine::updateRawTexture(const InternalTexturePtr& texture, const Uint8Array& data,
+                              unsigned int format, bool invertY, const std::string& compression,
+                              unsigned int type)
+{
+  _rawTextureExtension->updateRawTexture(texture, data, format, invertY, compression, type);
+}
+
+InternalTexturePtr Engine::createRawCubeTexture(const std::vector<ArrayBufferView>& data, int size,
+                                                unsigned int format, unsigned int type,
+                                                bool generateMipMaps, bool invertY,
+                                                unsigned int samplingMode,
+                                                const std::string& compression)
+{
+  return _rawTextureExtension->createRawCubeTexture(data, size, format, type, generateMipMaps,
+                                                    invertY, samplingMode, compression);
+}
+
+void Engine::updateRawCubeTexture(const InternalTexturePtr& texture,
+                                  const std::vector<ArrayBufferView>& data, unsigned int format,
+                                  unsigned int type, bool invertY, const std::string& compression,
+                                  unsigned int level)
+{
+  _rawTextureExtension->updateRawCubeTexture(texture, data, format, type, invertY, compression,
+                                             level);
+}
+
+InternalTexturePtr Engine::createRawCubeTextureFromUrl(
+  const std::string& url, Scene* scene, int size, unsigned int format, unsigned int type,
+  bool noMipmap,
+  const std::function<ArrayBufferViewArray(const ArrayBuffer& arrayBuffer)>& callback,
+  const std::function<std::vector<ArrayBufferViewArray>(const ArrayBufferViewArray& faces)>&
+    mipmapGenerator,
+  const std::function<void()>& onLoad,
+  const std::function<void(const std::string& message, const std::string& exception)>& onError,
+  unsigned int samplingMode, bool invertY)
+{
+  return _rawTextureExtension->createRawCubeTextureFromUrl(url, scene, size, format, type, noMipmap,
+                                                           callback, mipmapGenerator, onLoad,
+                                                           onError, samplingMode, invertY);
+}
+
+InternalTexturePtr Engine::createRawTexture3D(const ArrayBufferView& data, int width, int height,
+                                              int depth, unsigned int format, bool generateMipMaps,
+                                              bool invertY, unsigned int samplingMode,
+                                              const std::string& compression,
+                                              unsigned int textureType)
+{
+  return _rawTextureExtension->createRawTexture3D(data, width, height, depth, format,
+                                                  generateMipMaps, invertY, samplingMode,
+                                                  compression, textureType);
+}
+
+void Engine::updateRawTexture3D(const InternalTexturePtr& texture, const ArrayBufferView& data,
+                                unsigned int format, bool invertY, const std::string& compression,
+                                unsigned int textureType)
+{
+  _rawTextureExtension->updateRawTexture3D(texture, data, format, invertY, compression,
+                                           textureType);
+}
+
+InternalTexturePtr Engine::createRawTexture2DArray(const ArrayBufferView& data, int width,
+                                                   int height, int depth, unsigned int format,
+                                                   bool generateMipMaps, bool invertY,
+                                                   unsigned int samplingMode,
+                                                   const std::string& compression,
+                                                   unsigned int textureType)
+{
+  return _rawTextureExtension->createRawTexture2DArray(data, width, height, depth, format,
+                                                       generateMipMaps, invertY, samplingMode,
+                                                       compression, textureType);
+}
+
+void Engine::updateRawTexture2DArray(const InternalTexturePtr& texture, const ArrayBufferView& data,
+                                     unsigned int format, bool invertY,
+                                     const std::string& compression, unsigned int textureType)
+{
+  _rawTextureExtension->updateRawTexture2DArray(texture, data, format, invertY, compression,
+                                                textureType);
 }
 
 //--------------------------------------------------------------------------------------------------
