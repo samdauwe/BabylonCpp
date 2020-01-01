@@ -2611,6 +2611,16 @@ public:
   std::optional<Plane> clipPlane4;
 
   /**
+   * Gets or sets the active clipplane 5
+   */
+  std::optional<Plane> clipPlane5;
+
+  /**
+   * Gets or sets the active clipplane 6
+   */
+  std::optional<Plane> clipPlane6;
+
+  /**
    * Gets or sets a boolean indicating if all bounding boxes must be rendered
    */
   Property<Scene, bool> forceShowBoundingBoxes;

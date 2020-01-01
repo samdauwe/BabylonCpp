@@ -118,6 +118,8 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , clipPlane2{std::nullopt}
     , clipPlane3{std::nullopt}
     , clipPlane4{std::nullopt}
+    , clipPlane5{std::nullopt}
+    , clipPlane6{std::nullopt}
     , forceShowBoundingBoxes{this, &Scene::get_forceShowBoundingBoxes,
                              &Scene::set_forceShowBoundingBoxes}
     , animationsEnabled{true}

@@ -40,8 +40,8 @@ LinesMesh::LinesMesh(const std::string& iName, Scene* scene, Node* iParent, Line
   options.attributes
     = {VertexBuffer::PositionKind, VertexBuffer::World0Kind, VertexBuffer::World1Kind,
        VertexBuffer::World2Kind, VertexBuffer::World3Kind};
-  options.uniforms
-    = {"vClipPlane", "vClipPlane2", "vClipPlane3", "vClipPlane4", "world", "viewProjection"};
+  options.uniforms          = {"vClipPlane",  "vClipPlane2", "vClipPlane3", "vClipPlane4",
+                      "vClipPlane5", "vClipPlane6", "world",       "viewProjection"};
   options.needAlphaBlending = true;
   options.defines           = defines;
 
@@ -96,6 +96,8 @@ bool LinesMesh::isReady(bool /*completeCheck*/, bool /*forceInstanceSupport*/)
   scene.clipPlane2 ? _addClipPlaneDefine("CLIPPLANE2") : _removeClipPlaneDefine("CLIPPLANE2");
   scene.clipPlane3 ? _addClipPlaneDefine("CLIPPLANE3") : _removeClipPlaneDefine("CLIPPLANE3");
   scene.clipPlane4 ? _addClipPlaneDefine("CLIPPLANE4") : _removeClipPlaneDefine("CLIPPLANE4");
+  scene.clipPlane5 ? _addClipPlaneDefine("CLIPPLANE5") : _removeClipPlaneDefine("CLIPPLANE5");
+  scene.clipPlane6 ? _addClipPlaneDefine("CLIPPLANE6") : _removeClipPlaneDefine("CLIPPLANE6");
 
   if (!_colorShader->isReady()) {
     return false;
