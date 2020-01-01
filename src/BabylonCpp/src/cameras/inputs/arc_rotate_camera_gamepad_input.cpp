@@ -10,6 +10,9 @@ ArcRotateCameraGamepadInput::ArcRotateCameraGamepadInput()
     : gamepad{nullptr}
     , gamepadRotationSensibility{80.f}
     , gamepadMoveSensibility{40.f}
+    , invertYAxis{this, &ArcRotateCameraGamepadInput::get_invertYAxis,
+                  &ArcRotateCameraGamepadInput::set_invertYAxis}
+    , _yAxisScale{1.f}
     , _onGamepadConnectedObserver{nullptr}
     , _onGamepadDisconnectedObserver{nullptr}
 {
@@ -17,8 +20,17 @@ ArcRotateCameraGamepadInput::ArcRotateCameraGamepadInput()
 
 ArcRotateCameraGamepadInput::~ArcRotateCameraGamepadInput() = default;
 
-void ArcRotateCameraGamepadInput::attachControl(ICanvas* /*canvas*/,
-                                                bool /*noPreventDefault*/)
+bool ArcRotateCameraGamepadInput::get_invertYAxis() const
+{
+  return _yAxisScale != 1.f;
+}
+
+void ArcRotateCameraGamepadInput::set_invertYAxis(bool value)
+{
+  _yAxisScale = value ? -1.f : 1.f;
+}
+
+void ArcRotateCameraGamepadInput::attachControl(ICanvas* /*canvas*/, bool /*noPreventDefault*/)
 {
   auto& manager               = camera->getScene()->gamepadManager();
   _onGamepadConnectedObserver = manager->onGamepadConnectedObservable.add(
@@ -64,7 +76,7 @@ void ArcRotateCameraGamepadInput::checkInputs()
       }
 
       if (RSValues->y != 0.f) {
-        auto normalizedRY = RSValues->y / gamepadRotationSensibility;
+        auto normalizedRY = (RSValues->y / gamepadRotationSensibility) * _yAxisScale;
         if (normalizedRY != 0.f && std::abs(normalizedRY) > 0.005f) {
           camera->inertialBetaOffset += normalizedRY;
         }

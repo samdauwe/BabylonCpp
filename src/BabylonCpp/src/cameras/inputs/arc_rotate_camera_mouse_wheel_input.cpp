@@ -19,14 +19,12 @@ ArcRotateCameraMouseWheelInput::ArcRotateCameraMouseWheelInput()
 
 ArcRotateCameraMouseWheelInput::~ArcRotateCameraMouseWheelInput() = default;
 
-float ArcRotateCameraMouseWheelInput::computeDeltaFromMouseWheelLegacyEvent(
-  const MouseWheelEvent& mouseWheelLegacyEvent, float radius) const
+float ArcRotateCameraMouseWheelInput::computeDeltaFromMouseWheelLegacyEvent(float mouseWheelDelta,
+                                                                            float radius) const
 {
-  auto delta = 0.f;
-  const auto wheelDelta
-    = (mouseWheelLegacyEvent.wheelDelta * 0.01f * wheelDeltaPercentage)
-      * radius;
-  if (mouseWheelLegacyEvent.wheelDelta > 0.f) {
+  auto delta            = 0.f;
+  const auto wheelDelta = (mouseWheelDelta * 0.01f * wheelDeltaPercentage) * radius;
+  if (mouseWheelDelta > 0.f) {
     delta = wheelDelta / (1.f + wheelDeltaPercentage);
   }
   else {
@@ -35,8 +33,7 @@ float ArcRotateCameraMouseWheelInput::computeDeltaFromMouseWheelLegacyEvent(
   return delta;
 }
 
-void ArcRotateCameraMouseWheelInput::attachControl(ICanvas* canvas,
-                                                   bool noPreventDefault)
+void ArcRotateCameraMouseWheelInput::attachControl(ICanvas* canvas, bool noPreventDefault)
 {
   _canvas           = canvas;
   _noPreventDefault = noPreventDefault;
@@ -50,35 +47,34 @@ void ArcRotateCameraMouseWheelInput::attachControl(ICanvas* canvas,
     auto delta        = 0.f;
 
     const auto& mouseWheelLegacyEvent = event;
-    if (!stl_util::almost_equal(mouseWheelLegacyEvent.wheelDelta, 0.f)) {
-      if (!stl_util::almost_equal(wheelDeltaPercentage, 0.f)) {
-        delta = computeDeltaFromMouseWheelLegacyEvent(mouseWheelLegacyEvent,
-                                                      camera->radius);
+    auto wheelDelta                   = 0.f;
 
-        // If zooming in, estimate the target radius and use that to compute the
-        // delta for inertia this will stop multiple scroll events zooming in
-        // from adding too much inertia
-        if (delta > 0.f) {
-          auto estimatedTargetRadius = camera->radius;
-          auto targetInertia         = camera->inertialRadiusOffset + delta;
-          for (uint32_t i = 0; i < 20 && std::abs(targetInertia) > 0.001f;
-               ++i) {
-            estimatedTargetRadius -= targetInertia;
-            targetInertia *= camera->inertia;
-          }
-          estimatedTargetRadius = Scalar::Clamp(
-            estimatedTargetRadius, 0.f, std::numeric_limits<float>::max());
-          delta = computeDeltaFromMouseWheelLegacyEvent(mouseWheelLegacyEvent,
-                                                        estimatedTargetRadius);
+    if (!stl_util::almost_equal(mouseWheelLegacyEvent.wheelDelta, 0.f)) {
+      wheelDelta = mouseWheelLegacyEvent.wheelDelta;
+    }
+    else {
+      wheelDelta = -event.detail * 60.f;
+    }
+
+    if (!stl_util::almost_equal(wheelDeltaPercentage, 0.f)) {
+      delta = computeDeltaFromMouseWheelLegacyEvent(wheelDelta, camera->radius);
+
+      // If zooming in, estimate the target radius and use that to compute the delta for inertia
+      // this will stop multiple scroll events zooming in from adding too much inertia
+      if (delta > 0.f) {
+        auto estimatedTargetRadius = camera->radius;
+        auto targetInertia         = camera->inertialRadiusOffset + delta;
+        for (uint32_t i = 0; i < 20 && std::abs(targetInertia) > 0.001f; ++i) {
+          estimatedTargetRadius -= targetInertia;
+          targetInertia *= camera->inertia;
         }
-      }
-      else {
-        delta = mouseWheelLegacyEvent.wheelDelta / (wheelPrecision * 40.f);
+        estimatedTargetRadius
+          = Scalar::Clamp(estimatedTargetRadius, 0.f, std::numeric_limits<float>::max());
+        delta = computeDeltaFromMouseWheelLegacyEvent(wheelDelta, estimatedTargetRadius);
       }
     }
     else {
-      const auto deltaValue = event.detail;
-      delta                 = -deltaValue / wheelPrecision;
+      delta = wheelDelta / (wheelPrecision * 40.f);
     }
 
     if (!stl_util::almost_equal(delta, 0.f)) {

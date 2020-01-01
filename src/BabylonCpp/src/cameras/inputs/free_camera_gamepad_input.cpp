@@ -10,6 +10,9 @@ FreeCameraGamepadInput::FreeCameraGamepadInput()
     : gamepad{nullptr}
     , gamepadAngularSensibility{200.f}
     , gamepadMoveSensibility{40.f}
+    , invertYAxis{this, &FreeCameraGamepadInput::get_invertYAxis,
+                  &FreeCameraGamepadInput::set_invertYAxis}
+    , _yAxisScale{1.f}
     , _onGamepadConnectedObserver{nullptr}
     , _onGamepadDisconnectedObserver{nullptr}
     , _cameraTransform{Matrix::Identity()}
@@ -20,6 +23,16 @@ FreeCameraGamepadInput::FreeCameraGamepadInput()
 }
 
 FreeCameraGamepadInput::~FreeCameraGamepadInput() = default;
+
+bool FreeCameraGamepadInput::get_invertYAxis() const
+{
+  return _yAxisScale != 1.f;
+}
+
+void FreeCameraGamepadInput::set_invertYAxis(bool value)
+{
+  _yAxisScale = value ? -1.f : 1.f;
+}
 
 void FreeCameraGamepadInput::attachControl(ICanvas* /*canvas*/, bool /*noPreventDefault*/)
 {
@@ -65,7 +78,7 @@ void FreeCameraGamepadInput::checkInputs()
     auto& RSValues = gamepad->rightStick();
     if (RSValues) {
       auto normalizedRX = RSValues->x / gamepadAngularSensibility;
-      auto normalizedRY = RSValues->y / gamepadAngularSensibility;
+      auto normalizedRY = (RSValues->y / gamepadAngularSensibility) * _yAxisScale;
       RSValues->x       = std::abs(normalizedRX) > 0.001f ? 0.f + normalizedRX : 0.f;
       RSValues->y       = std::abs(normalizedRY) > 0.001f ? 0.f + normalizedRY : 0.f;
     }

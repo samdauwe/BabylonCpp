@@ -24,12 +24,10 @@ public:
   ~ArcRotateCameraGamepadInput() override; // = default
 
   /**
-   * @brief Attach the input controls to a specific dom element to get the input
-   * from.
+   * @brief Attach the input controls to a specific dom element to get the input from.
    * @param element Defines the element the controls should be listened from
-   * @param noPreventDefault Defines whether event caught by the controls should
-   * call preventdefault()
-   * (https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)
+   * @param noPreventDefault Defines whether event caught by the controls should call
+   * preventdefault() (https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)
    */
   void attachControl(ICanvas* canvas, bool noPreventDefault) override;
 
@@ -40,9 +38,9 @@ public:
   void detachControl(ICanvas* canvas) override;
 
   /**
-   * @brief Update the current camera state depending on the inputs that have
-   * been used this frame. This is a dynamically created lambda to avoid the
-   * performance penalty of looping for inputs in the render loop.
+   * @brief Update the current camera state depending on the inputs that have been used this frame.
+   * This is a dynamically created lambda to avoid the performance penalty of looping for inputs in
+   * the render loop.
    */
   void checkInputs() override;
 
@@ -58,6 +56,17 @@ public:
    */
   [[nodiscard]] std::string getSimpleName() const override;
 
+protected:
+  /**
+   * @brief Gets a boolean indicating that Yaxis (for right stick) should be inverted.
+   */
+  bool get_invertYAxis() const;
+
+  /**
+   * @brief Sets a boolean indicating that Yaxis (for right stick) should be inverted.
+   */
+  void set_invertYAxis(bool value);
+
 public:
   /**
    * Defines the gamepad the input is gathering event from.
@@ -66,19 +75,23 @@ public:
 
   /**
    * Defines the gamepad rotation sensiblity.
-   * This is the threshold from when rotation starts to be accounted for to
-   * prevent jittering.
+   * This is the threshold from when rotation starts to be accounted for to prevent jittering.
    */
   float gamepadRotationSensibility;
 
   /**
    * Defines the gamepad move sensiblity.
-   * This is the threshold from when moving starts to be accounted for for to
-   * prevent jittering.
+   * This is the threshold from when moving starts to be accounted for for to prevent jittering.
    */
   float gamepadMoveSensibility;
 
+  /**
+   * Gets or sets a boolean indicating that Yaxis (for right stick) should be inverted
+   */
+  Property<ArcRotateCameraGamepadInput, bool> invertYAxis;
+
 private:
+  float _yAxisScale;
   Observer<Gamepad>::Ptr _onGamepadConnectedObserver;
   Observer<Gamepad>::Ptr _onGamepadDisconnectedObserver;
 

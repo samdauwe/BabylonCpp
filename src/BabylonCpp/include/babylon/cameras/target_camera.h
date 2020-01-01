@@ -208,7 +208,7 @@ public:
   float speed;
 
   /**
-   * Add cconstraint to the camera to prevent it to move freely in all directions and around all
+   * Add constraint to the camera to prevent it to move freely in all directions and around all
    * axis.
    */
   bool noRotationConstraint;

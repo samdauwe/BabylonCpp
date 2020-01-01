@@ -24,12 +24,10 @@ public:
   ~ArcRotateCameraMouseWheelInput() override; // = default
 
   /**
-   * @brief Attach the input controls to a specific dom element to get the input
-   * from.
+   * @brief Attach the input controls to a specific dom element to get the input from.
    * @param element Defines the element the controls should be listened from
-   * @param noPreventDefault Defines whether event caught by the controls should
-   * call preventdefault()
-   * (https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)
+   * @param noPreventDefault Defines whether event caught by the controls should call
+   * preventdefault() (https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)
    */
   void attachControl(ICanvas* canvas, bool noPreventDefault = false) override;
 
@@ -40,9 +38,9 @@ public:
   void detachControl(ICanvas* canvas) override;
 
   /**
-   * @brief Update the current camera state depending on the inputs that have
-   * been used this frame. This is a dynamically created lambda to avoid the
-   * performance penalty of looping for inputs in the render loop.
+   * @brief Update the current camera state depending on the inputs that have been used this frame.
+   * This is a dynamically created lambda to avoid the performance penalty of looping for inputs in
+   * the render loop.
    */
   void checkInputs() override;
 
@@ -59,9 +57,8 @@ public:
   [[nodiscard]] std::string getSimpleName() const override;
 
 private:
-  [[nodiscard]] float
-  computeDeltaFromMouseWheelLegacyEvent(const MouseWheelEvent& mouseWheelLegacyEvent,
-                                        float radius) const;
+  [[nodiscard]] float computeDeltaFromMouseWheelLegacyEvent(float mouseWheelDelta,
+                                                            float radius) const;
 
 public:
   /**

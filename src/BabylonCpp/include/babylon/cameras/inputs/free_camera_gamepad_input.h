@@ -60,6 +60,17 @@ public:
    */
   [[nodiscard]] std::string getSimpleName() const override;
 
+protected:
+  /**
+   * @brief Gets a boolean indicating that Yaxis (for right stick) should be inverted.
+   */
+  bool get_invertYAxis() const;
+
+  /**
+   * @brief Sets a boolean indicating that Yaxis (for right stick) should be inverted.
+   */
+  void set_invertYAxis(bool value);
+
 public:
   /**
    * Define the Gamepad controlling the input
@@ -80,7 +91,13 @@ public:
    */
   float gamepadMoveSensibility;
 
+  /**
+   * Gets or sets a boolean indicating that Yaxis (for right stick) should be inverted
+   */
+  Property<FreeCameraGamepadInput, bool> invertYAxis;
+
 private:
+  float _yAxisScale;
   Observer<Gamepad>::Ptr _onGamepadConnectedObserver;
   Observer<Gamepad>::Ptr _onGamepadDisconnectedObserver;
 
