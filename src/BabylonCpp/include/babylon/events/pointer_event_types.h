@@ -8,11 +8,10 @@ namespace BABYLON {
  */
 enum class PointerEventTypes {
   /**
-   * The pointerdown event is fired when a pointer becomes active. For mouse, it
-   * is fired when the device transitions from no buttons depressed to at least
-   * one button depressed. For touch, it is fired when physical contact is made
-   * with the digitizer. For pen, it is fired when the stylus makes physical
-   * contact with the digitizer.
+   * The pointerdown event is fired when a pointer becomes active. For mouse, it is fired when the
+   * device transitions from no buttons depressed to at least one button depressed. For touch, it is
+   * fired when physical contact is made with the digitizer. For pen, it is fired when the stylus
+   * makes physical contact with the digitizer.
    */
   POINTERDOWN = 0x01,
   /**
@@ -28,8 +27,7 @@ enum class PointerEventTypes {
    */
   POINTERWHEEL = 0x08,
   /**
-   * The pointerpick event is fired when a mesh or sprite has been picked by the
-   * pointer.
+   * The pointerpick event is fired when a mesh or sprite has been picked by the pointer.
    */
   POINTERPICK = 0x10,
   /**
@@ -38,8 +36,8 @@ enum class PointerEventTypes {
    */
   POINTERTAP = 0x20,
   /**
-   * The pointerdoubletap event is fired when a the object has been touched and
-   * released twice without drag.
+   * The pointerdoubletap event is fired when a the object has been touched and released twice
+   * without drag.
    */
   POINTERDOUBLETAP = 0x40,
 }; // end of enum class PointerEventTypes
