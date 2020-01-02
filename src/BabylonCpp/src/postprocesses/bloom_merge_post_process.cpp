@@ -20,8 +20,8 @@ BloomMergePostProcess::BloomMergePostProcess(const std::string& iName,
     , weight{iWeight}
 {
   onApplyObservable.add([&](Effect* effect, EventState& /*es*/) {
-    effect->setTextureFromPostProcess("textureSampler", originalFromInput.get());
-    effect->setTextureFromPostProcessOutput("bloomBlur", blurred.get());
+    effect->setTextureFromPostProcess("textureSampler", originalFromInput);
+    effect->setTextureFromPostProcessOutput("bloomBlur", blurred);
     effect->setFloat("bloomWeight", weight);
   });
 

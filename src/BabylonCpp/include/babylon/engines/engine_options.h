@@ -1,6 +1,8 @@
 #ifndef BABYLON_ENGINES_ENGINE_OPTIONS_H
 #define BABYLON_ENGINES_ENGINE_OPTIONS_H
 
+#include <optional>
+
 #include <babylon/babylon_api.h>
 
 namespace BABYLON {
@@ -48,6 +50,10 @@ struct BABYLON_SHARED_EXPORT EngineOptions {
    * Defines the maximum steps to use with deterministic lock step mode
    */
   unsigned int lockstepMaxSteps = 4;
+  /**
+   * Defines the seconds between each deterministic lock step
+   */
+  std::optional<float> timeStep = std::nullopt;
   /**
    * Defines that engine should ignore modifying touch action attribute and style If not handle, you
    * might need to set it up on your side for expected touch devices behavior.

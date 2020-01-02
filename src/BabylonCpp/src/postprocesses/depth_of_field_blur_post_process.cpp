@@ -9,7 +9,7 @@ namespace BABYLON {
 DepthOfFieldBlurPostProcess::DepthOfFieldBlurPostProcess(
   const std::string& iName, Scene* scene, const Vector2& iDirection, float iKernel,
   const std::variant<float, PostProcessOptions>& options, const CameraPtr& camera,
-  PostProcess* circleOfConfusion, PostProcess* imageToBlur,
+  const PostProcessPtr& circleOfConfusion, const PostProcessPtr& imageToBlur,
   const std::optional<unsigned int>& samplingMode, Engine* engine, bool reusable,
   unsigned int textureType, bool blockCompilation)
     : BlurPostProcess{

@@ -20,11 +20,11 @@ DepthOfFieldMergePostProcess::DepthOfFieldMergePostProcess(
     , blurSteps{iBlurSteps}
 {
   onApplyObservable.add([&](Effect* effect, EventState& /*es*/) {
-    effect->setTextureFromPostProcessOutput("circleOfConfusionSampler", circleOfConfusion.get());
-    effect->setTextureFromPostProcess("textureSampler", originalFromInput.get());
+    effect->setTextureFromPostProcessOutput("circleOfConfusionSampler", circleOfConfusion);
+    effect->setTextureFromPostProcess("textureSampler", originalFromInput);
     for (auto& blurStep : blurSteps)
       effect->setTextureFromPostProcessOutput("blurStep" + std::to_string(blurSteps.size() - 1),
-                                              blurStep.get());
+                                              blurStep);
   });
 
   // updateEffect() is a virtual method, and thus cannot be called in the constructor

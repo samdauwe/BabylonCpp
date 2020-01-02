@@ -317,7 +317,7 @@ InternalTexturePtr PostProcess::activate(const CameraPtr& camera,
     if (width != desiredWidth || height != desiredHeight) {
       if (!_textures.empty()) {
         for (const auto& texture : _textures) {
-          _engine->_releaseTexture(texture.get());
+          _engine->_releaseTexture(texture);
         }
         _textures.clear();
       }
@@ -475,7 +475,7 @@ void PostProcess::_disposeTextures()
 
   if (!_textures.empty()) {
     for (const auto& texture : _textures) {
-      _engine->_releaseTexture(texture.get());
+      _engine->_releaseTexture(texture);
     }
   }
 

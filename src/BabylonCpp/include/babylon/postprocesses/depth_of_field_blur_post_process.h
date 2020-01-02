@@ -59,8 +59,8 @@ protected:
    */
   DepthOfFieldBlurPostProcess(const std::string& name, Scene* scene, const Vector2& direction,
                               float kernel, const std::variant<float, PostProcessOptions>& options,
-                              const CameraPtr& camera, PostProcess* circleOfConfusion,
-                              PostProcess* imageToBlur                        = nullptr,
+                              const CameraPtr& camera, const PostProcessPtr& circleOfConfusion,
+                              const PostProcessPtr& imageToBlur               = nullptr,
                               const std::optional<unsigned int>& samplingMode = std::nullopt,
                               Engine* engine = nullptr, bool reusable = false,
                               unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,

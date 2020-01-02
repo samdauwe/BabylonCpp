@@ -54,7 +54,7 @@ public:
    * highlight extraction
    * Hidden
    */
-  PostProcess* _inputPostProcess;
+  PostProcessPtr _inputPostProcess;
 
 }; // end of class ExtractHighlightsPostProcess
 

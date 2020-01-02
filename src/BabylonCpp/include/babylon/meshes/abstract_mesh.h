@@ -56,6 +56,9 @@ namespace GL {
 class IGLQuery;
 } // end of namespace GL
 
+using WebGLQuery    = GL::IGLQuery;
+using WebGLQueryPtr = std::shared_ptr<WebGLQuery>;
+
 /**
  * @brief Class used to store all common mesh properties.
  */
@@ -1460,7 +1463,7 @@ public:
   bool definedFacingForward;
 
   /** Hidden */
-  std::unique_ptr<GL::IGLQuery> _occlusionQuery;
+  WebGLQueryPtr _occlusionQuery;
 
   /** Hidden */
   RenderingGroup* _renderingGroup;

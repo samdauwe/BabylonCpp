@@ -31,8 +31,8 @@ public:
 
 private:
   std::shared_ptr<BABYLON::GL::IGLFramebuffer> mFrameBuffer;
-  std::unique_ptr<BABYLON::GL::IGLTexture> mTextureColorBuffer;
-  std::unique_ptr<IGLRenderbuffer> mRenderbuffer;
+  std::shared_ptr<BABYLON::GL::IGLTexture> mTextureColorBuffer;
+  std::shared_ptr<IGLRenderbuffer> mRenderbuffer;
 };
 
 } // end of namespace GL

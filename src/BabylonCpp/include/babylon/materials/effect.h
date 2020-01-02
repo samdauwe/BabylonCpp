@@ -18,12 +18,12 @@ class Color4;
 class Effect;
 struct IEffectCreationOptions;
 class EffectFallbacks;
-class Engine;
 class InternalTexture;
 class IPipelineContext;
 class Matrix;
 class PostProcess;
 class RenderTargetTexture;
+class ThinEngine;
 class Vector2;
 class Vector3;
 class Vector4;
@@ -32,6 +32,7 @@ using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
 using EffectPtr              = std::shared_ptr<Effect>;
 using InternalTexturePtr     = std::shared_ptr<InternalTexture>;
 using IPipelineContextPtr    = std::shared_ptr<IPipelineContext>;
+using PostProcessPtr         = std::shared_ptr<PostProcess>;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 using WebGLDataBufferPtr     = std::shared_ptr<WebGLDataBuffer>;
 
@@ -39,6 +40,9 @@ namespace GL {
 class IGLProgram;
 class IGLUniformLocation;
 } // end of namespace GL
+
+using WebGLProgramPtr         = std::shared_ptr<GL::IGLProgram>;
+using WebGLUniformLocationPtr = std::shared_ptr<GL::IGLUniformLocation>;
 
 /**
  * @brief Effect containing vertex and fragment shader that can be executed on an object.
@@ -88,7 +92,7 @@ public:
    * @brief The engine the effect was initialized with.
    * @returns the engine.
    */
-  [[nodiscard]] Engine* getEngine() const;
+  [[nodiscard]] ThinEngine* getEngine() const;
 
   /**
    * @brief The pipeline context for this effect.
@@ -134,7 +138,7 @@ public:
    * @param uniformName of the uniform to look up.
    * @returns the location of the uniform.
    */
-  GL::IGLUniformLocation* getUniform(const std::string& uniformName);
+  WebGLUniformLocationPtr getUniform(const std::string& uniformName);
 
   /**
    * @brief Returns an array of sampler variable names
@@ -236,7 +240,7 @@ public:
    * @param channel Name of the sampler variable.
    * @param postProcess Post process to get the input texture from.
    */
-  void setTextureFromPostProcess(const std::string& channel, PostProcess* postProcess);
+  void setTextureFromPostProcess(const std::string& channel, const PostProcessPtr& postProcess);
 
   /**
    * @brief (Warning! setTextureFromPostProcessOutput may be desired instead) Sets the input texture
@@ -245,7 +249,8 @@ public:
    * @param channel Name of the sampler variable.
    * @param postProcess Post process to get the output texture from.
    */
-  void setTextureFromPostProcessOutput(const std::string& channel, PostProcess* postProcess);
+  void setTextureFromPostProcessOutput(const std::string& channel,
+                                       const PostProcessPtr& postProcess);
 
   bool _cacheMatrix(const std::string& uniformName, const Matrix& matrix);
   bool _cacheFloat2(const std::string& uniformName, float x, float y);
@@ -549,7 +554,7 @@ protected:
    * array (eg. {lights: 10})
    */
   Effect(const std::variant<std::string, std::unordered_map<std::string, std::string>>& baseName,
-         IEffectCreationOptions& options, Engine* engine);
+         IEffectCreationOptions& options, ThinEngine* engine);
 
   /**
    * @brief Observable that will be called when effect is bound.
@@ -627,7 +632,7 @@ public:
 private:
   Observer<Effect>::Ptr _onCompileObserver;
   static std::size_t _uniqueIdSeed;
-  Engine* _engine;
+  ThinEngine* _engine;
   std::unordered_map<std::string, unsigned int> _uniformBuffersNames;
   std::vector<std::string> _uniformsNames;
   std::vector<std::string> _samplerList;
@@ -636,7 +641,7 @@ private:
   std::string _compilationError;
   std::vector<std::string> _attributesNames;
   Int32Array _attributes;
-  std::unordered_map<std::string, std::unique_ptr<GL::IGLUniformLocation>> _uniforms;
+  std::unordered_map<std::string, WebGLUniformLocationPtr> _uniforms;
   std::unordered_map<std::string, unsigned int> _indexParameters;
   std::unique_ptr<EffectFallbacks> _fallbacks;
   std::string _vertexSourceCode;

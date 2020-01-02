@@ -2112,7 +2112,6 @@ void Scene::_animate()
           && animatable->disposeOnEnd) {
         // The animation removed itself from _activeAnimatables
         // during the call to _animate()
-        ;
       }
     }
   }
@@ -3828,7 +3827,7 @@ void Scene::render(bool updateCameras, bool ignoreAnimations)
   if (!activeCameras.empty()) {
     for (unsigned int cameraIndex = 0; cameraIndex < activeCameras.size(); ++cameraIndex) {
       if (cameraIndex > 0) {
-        _engine->clear(true, true);
+        _engine->clear(std::nullopt, false, true, true);
       }
 
       _processSubCameras(activeCameras[cameraIndex]);

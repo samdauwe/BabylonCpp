@@ -12,8 +12,8 @@
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/octrees/octree_scene_component.h>
 #include <babylon/culling/ray.h>
-#include <babylon/engines/_occlusion_data_storage.h>
 #include <babylon/engines/engine.h>
+#include <babylon/engines/extensions/occlusion_query_extension.h>
 #include <babylon/engines/scene.h>
 #include <babylon/lights/light.h>
 #include <babylon/lights/shadows/shadow_generator.h>

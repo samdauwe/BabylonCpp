@@ -16,24 +16,20 @@ bool DDSTools::StoreLODInAlphaChannel = false;
 Float32Array DDSTools::_FloatView;
 Int32Array DDSTools::_Int32View;
 
-DDSInfo
-DDSTools::GetDDSInfo(const std::variant<std::string, ArrayBuffer>& iArrayBuffer)
+DDSInfo DDSTools::GetDDSInfo(const std::variant<std::string, ArrayBuffer>& iArrayBuffer)
 {
   const auto arrayBuffer = ToArrayBuffer(iArrayBuffer);
 
-  auto header
-    = stl_util::to_array<int32_t>(arrayBuffer, 0, DDS::headerLengthInt);
-  auto extendedHeader
-    = stl_util::to_array<int32_t>(arrayBuffer, 0, DDS::headerLengthInt + 4);
+  auto header         = stl_util::to_array<int32_t>(arrayBuffer, 0, DDS::headerLengthInt);
+  auto extendedHeader = stl_util::to_array<int32_t>(arrayBuffer, 0, DDS::headerLengthInt + 4);
 
   int mipmapCount = 1;
   if (header[off_flags] & DDSD_MIPMAPCOUNT) {
     mipmapCount = std::max(1, header[off_mipmapCount]);
   }
 
-  auto fourCC = header[off_pfFourCC];
-  auto dxgiFormat
-    = (fourCC == DDS::FOURCC_DX10) ? extendedHeader[off_dxgiFormat] : 0;
+  auto fourCC      = header[off_pfFourCC];
+  auto dxgiFormat  = (fourCC == DDS::FOURCC_DX10) ? extendedHeader[off_dxgiFormat] : 0;
   auto textureType = Constants::TEXTURETYPE_UNSIGNED_INT;
 
   switch (fourCC) {
@@ -71,8 +67,7 @@ DDSTools::GetDDSInfo(const std::variant<std::string, ArrayBuffer>& iArrayBuffer)
     // isCube
     (header[off_caps2] & DDSCAPS2_CUBEMAP) == DDSCAPS2_CUBEMAP,
     // isCompressed
-    (fourCC == DDS::FOURCC_DXT1 || fourCC == DDS::FOURCC_DXT3
-     || fourCC == DDS::FOURCC_DXT5),
+    (fourCC == DDS::FOURCC_DXT1 || fourCC == DDS::FOURCC_DXT3 || fourCC == DDS::FOURCC_DXT5),
     // dxgiFormat
     dxgiFormat,
     // textureType
@@ -138,18 +133,16 @@ float DDSTools::_FromHalfFloat(uint16_t value)
     return f ? 0.f : ((s ? -1.f : 1.f) * std::numeric_limits<int>::infinity());
   }
 
-  auto result
-    = (s ? -1 : 1) * std::pow(2, e - 15) * (1 + (f / std::pow(2, 10)));
+  auto result = (s ? -1 : 1) * std::pow(2, e - 15) * (1 + (f / std::pow(2, 10)));
   return static_cast<float>(result);
 }
 
-Float32Array DDSTools::_GetHalfFloatAsFloatRGBAArrayBuffer(
-  float width, float height, int dataOffset, size_t dataLength,
-  const Uint8Array& arrayBuffer, int lod)
+Float32Array DDSTools::_GetHalfFloatAsFloatRGBAArrayBuffer(float width, float height,
+                                                           int dataOffset, size_t dataLength,
+                                                           const Uint8Array& arrayBuffer, int lod)
 {
   Float32Array destArray(dataLength);
-  Uint16Array srcData(
-    stl_util::to_array<uint16_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
+  Uint16Array srcData(stl_util::to_array<uint16_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
   size_t index = 0;
   for (float y = 0; y < height; ++y) {
     for (float x = 0; x < width; ++x) {
@@ -170,15 +163,13 @@ Float32Array DDSTools::_GetHalfFloatAsFloatRGBAArrayBuffer(
   return destArray;
 }
 
-Uint16Array
-DDSTools::_GetHalfFloatRGBAArrayBuffer(float width, float height,
-                                       int dataOffset, size_t dataLength,
-                                       const Uint8Array& arrayBuffer, int lod)
+Uint16Array DDSTools::_GetHalfFloatRGBAArrayBuffer(float width, float height, int dataOffset,
+                                                   size_t dataLength, const Uint8Array& arrayBuffer,
+                                                   int lod)
 {
   if (DDSTools::StoreLODInAlphaChannel) {
     Uint16Array destArray(dataLength);
-    Uint16Array srcData(stl_util::to_array<uint16_t>(
-      arrayBuffer, static_cast<size_t>(dataOffset)));
+    Uint16Array srcData(stl_util::to_array<uint16_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
     size_t index = 0;
     for (float y = 0; y < height; ++y) {
       for (float x = 0; x < width; ++x) {
@@ -186,8 +177,8 @@ DDSTools::_GetHalfFloatRGBAArrayBuffer(float width, float height,
         destArray[index]     = srcData[srcPos];
         destArray[index + 1] = srcData[srcPos + 1];
         destArray[index + 2] = srcData[srcPos + 2];
-        destArray[index + 3] = static_cast<uint8_t>(
-          DDSTools::_ToHalfFloat(static_cast<float>(lod)));
+        destArray[index + 3]
+          = static_cast<uint8_t>(DDSTools::_ToHalfFloat(static_cast<float>(lod)));
         index += 4;
       }
     }
@@ -195,20 +186,16 @@ DDSTools::_GetHalfFloatRGBAArrayBuffer(float width, float height,
     return destArray;
   }
 
-  return stl_util::to_array<uint16_t>(
-    arrayBuffer, static_cast<size_t>(dataOffset), dataLength);
+  return stl_util::to_array<uint16_t>(arrayBuffer, static_cast<size_t>(dataOffset), dataLength);
 }
 
-Float32Array DDSTools::_GetFloatRGBAArrayBuffer(float width, float height,
-                                                int dataOffset,
-                                                size_t dataLength,
-                                                const Uint8Array& arrayBuffer,
+Float32Array DDSTools::_GetFloatRGBAArrayBuffer(float width, float height, int dataOffset,
+                                                size_t dataLength, const Uint8Array& arrayBuffer,
                                                 int lod)
 {
   if (DDSTools::StoreLODInAlphaChannel) {
     Float32Array destArray(dataLength);
-    Float32Array srcData(
-      stl_util::to_array<float>(arrayBuffer, static_cast<size_t>(dataOffset)));
+    Float32Array srcData(stl_util::to_array<float>(arrayBuffer, static_cast<size_t>(dataOffset)));
     size_t index = 0;
     for (float y = 0; y < height; ++y) {
       for (float x = 0; x < width; ++x) {
@@ -223,18 +210,15 @@ Float32Array DDSTools::_GetFloatRGBAArrayBuffer(float width, float height,
 
     return destArray;
   }
-  return stl_util::to_array<float>(arrayBuffer, static_cast<size_t>(dataOffset),
-                                   dataLength);
+  return stl_util::to_array<float>(arrayBuffer, static_cast<size_t>(dataOffset), dataLength);
 }
 
-Float32Array
-DDSTools::_GetFloatAsUIntRGBAArrayBuffer(float width, float height,
-                                         int dataOffset, size_t dataLength,
-                                         const Uint8Array& arrayBuffer, int lod)
+Float32Array DDSTools::_GetFloatAsUIntRGBAArrayBuffer(float width, float height, int dataOffset,
+                                                      size_t dataLength,
+                                                      const Uint8Array& arrayBuffer, int lod)
 {
   Float32Array destArray(dataLength);
-  Float32Array srcData(
-    stl_util::to_array<float>(arrayBuffer, static_cast<size_t>(dataOffset)));
+  Float32Array srcData(stl_util::to_array<float>(arrayBuffer, static_cast<size_t>(dataOffset)));
   size_t index = 0;
   for (float y = 0; y < height; ++y) {
     for (float x = 0; x < width; ++x) {
@@ -255,30 +239,25 @@ DDSTools::_GetFloatAsUIntRGBAArrayBuffer(float width, float height,
   return destArray;
 }
 
-Float32Array DDSTools::_GetHalfFloatAsUIntRGBAArrayBuffer(
-  float width, float height, int dataOffset, size_t dataLength,
-  const Uint8Array& arrayBuffer, int lod)
+Float32Array DDSTools::_GetHalfFloatAsUIntRGBAArrayBuffer(float width, float height, int dataOffset,
+                                                          size_t dataLength,
+                                                          const Uint8Array& arrayBuffer, int lod)
 {
   Float32Array destArray(dataLength);
-  Uint16Array srcData(
-    stl_util::to_array<uint16_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
+  Uint16Array srcData(stl_util::to_array<uint16_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
   size_t index = 0;
   for (float y = 0; y < height; ++y) {
     for (float x = 0; x < width; ++x) {
       auto srcPos = static_cast<size_t>((x + y * width) * 4);
 
-      destArray[index]
-        = Scalar::Clamp(DDSTools::_FromHalfFloat(srcData[srcPos])) * 255;
-      destArray[index + 1]
-        = Scalar::Clamp(DDSTools::_FromHalfFloat(srcData[srcPos + 1])) * 255;
-      destArray[index + 2]
-        = Scalar::Clamp(DDSTools::_FromHalfFloat(srcData[srcPos + 2])) * 255;
+      destArray[index]     = Scalar::Clamp(DDSTools::_FromHalfFloat(srcData[srcPos])) * 255;
+      destArray[index + 1] = Scalar::Clamp(DDSTools::_FromHalfFloat(srcData[srcPos + 1])) * 255;
+      destArray[index + 2] = Scalar::Clamp(DDSTools::_FromHalfFloat(srcData[srcPos + 2])) * 255;
       if (DDSTools::StoreLODInAlphaChannel) {
         destArray[index + 3] = static_cast<float>(lod);
       }
       else {
-        destArray[index + 3]
-          = Scalar::Clamp(DDSTools::_FromHalfFloat(srcData[srcPos + 3])) * 255;
+        destArray[index + 3] = Scalar::Clamp(DDSTools::_FromHalfFloat(srcData[srcPos + 3])) * 255;
       }
       index += 4;
     }
@@ -287,15 +266,12 @@ Float32Array DDSTools::_GetHalfFloatAsUIntRGBAArrayBuffer(
   return destArray;
 }
 
-Uint8Array DDSTools::_GetRGBAArrayBuffer(float width, float height,
-                                         int dataOffset, size_t dataLength,
-                                         const Uint8Array& arrayBuffer,
-                                         int rOffset, int gOffset, int bOffset,
-                                         int aOffset)
+Uint8Array DDSTools::_GetRGBAArrayBuffer(float width, float height, int dataOffset,
+                                         size_t dataLength, const Uint8Array& arrayBuffer,
+                                         int rOffset, int gOffset, int bOffset, int aOffset)
 {
   Uint8Array byteArray(dataLength);
-  Uint8Array srcData(
-    stl_util::to_array<uint8_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
+  Uint8Array srcData(stl_util::to_array<uint8_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
   size_t index = 0;
   for (float y = 0; y < height; ++y) {
     for (float x = 0; x < width; ++x) {
@@ -321,14 +297,12 @@ int DDSTools::_ExtractLongWordOrder(int value)
   return 1 + DDSTools::_ExtractLongWordOrder(value >> 8);
 }
 
-Uint8Array DDSTools::_GetRGBArrayBuffer(float width, float height,
-                                        int dataOffset, size_t dataLength,
-                                        const Uint8Array& arrayBuffer,
+Uint8Array DDSTools::_GetRGBArrayBuffer(float width, float height, int dataOffset,
+                                        size_t dataLength, const Uint8Array& arrayBuffer,
                                         int rOffset, int gOffset, int bOffset)
 {
   Uint8Array byteArray(dataLength);
-  Uint8Array srcData(
-    stl_util::to_array<uint8_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
+  Uint8Array srcData(stl_util::to_array<uint8_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
   size_t index = 0;
   for (float y = 0; y < height; ++y) {
     for (float x = 0; x < width; ++x) {
@@ -344,13 +318,11 @@ Uint8Array DDSTools::_GetRGBArrayBuffer(float width, float height,
   return byteArray;
 }
 
-Uint8Array DDSTools::_GetLuminanceArrayBuffer(float width, float height,
-                                              int dataOffset, size_t dataLength,
-                                              const Uint8Array& arrayBuffer)
+Uint8Array DDSTools::_GetLuminanceArrayBuffer(float width, float height, int dataOffset,
+                                              size_t dataLength, const Uint8Array& arrayBuffer)
 {
   Uint8Array byteArray(dataLength);
-  Uint8Array srcData(
-    stl_util::to_array<uint8_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
+  Uint8Array srcData(stl_util::to_array<uint8_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
   size_t index = 0;
   for (float y = 0; y < height; ++y) {
     for (float x = 0; x < width; ++x) {
@@ -363,10 +335,10 @@ Uint8Array DDSTools::_GetLuminanceArrayBuffer(float width, float height,
   return byteArray;
 }
 
-void DDSTools::UploadDDSLevels(
-  Engine* engine, const InternalTexturePtr& texture,
-  const std::variant<std::string, ArrayBuffer>& iArrayBuffer, DDSInfo& info,
-  bool loadMipmaps, unsigned int faces, int lodIndex, int currentFace)
+void DDSTools::UploadDDSLevels(ThinEngine* engine, const InternalTexturePtr& texture,
+                               const std::variant<std::string, ArrayBuffer>& iArrayBuffer,
+                               DDSInfo& info, bool loadMipmaps, unsigned int faces, int lodIndex,
+                               int currentFace)
 {
   const auto arrayBuffer = ToArrayBuffer(iArrayBuffer);
 
@@ -377,9 +349,8 @@ void DDSTools::UploadDDSLevels(
   }
   auto ext = engine->getCaps().s3tc;
 
-  Int32Array header
-    = stl_util::to_array<int32_t>(arrayBuffer, 0, DDS::headerLengthInt);
-  int fourCC = 0;
+  Int32Array header = stl_util::to_array<int32_t>(arrayBuffer, 0, DDS::headerLengthInt);
+  int fourCC        = 0;
   Uint8Array byteArray;
   int blockBytes                        = 1;
   unsigned int internalCompressedFormat = 0;
@@ -393,14 +364,12 @@ void DDSTools::UploadDDSLevels(
   }
 
   if (!info.isFourCC && !info.isRGB && !info.isLuminance) {
-    BABYLON_LOG_ERROR("DDSTools",
-                      "Unsupported format, must contain a FourCC code")
+    BABYLON_LOG_ERROR("DDSTools", "Unsupported format, must contain a FourCC code")
     return;
   }
 
   if (info.isCompressed && !ext) {
-    BABYLON_LOG_ERROR("DDSTools",
-                      "Compressed textures are not supported on this platform.")
+    BABYLON_LOG_ERROR("DDSTools", "Compressed textures are not supported on this platform.")
     return;
   }
 
@@ -452,8 +421,7 @@ void DDSTools::UploadDDSLevels(
         }
       } break;
       default:
-        BABYLON_LOG_ERROR("DDSTools",
-                          "Unsupported FourCC code: ", Int32ToFourCC(fourCC))
+        BABYLON_LOG_ERROR("DDSTools", "Unsupported FourCC code: ", Int32ToFourCC(fourCC))
         return;
     }
   }
@@ -464,8 +432,7 @@ void DDSTools::UploadDDSLevels(
   auto aOffset = DDSTools::_ExtractLongWordOrder(header[off_AMask]);
 
   if (computeFormats) {
-    internalCompressedFormat
-      = engine->_getRGBABufferInternalSizedFormat(info.textureType);
+    internalCompressedFormat = engine->_getRGBABufferInternalSizedFormat(info.textureType);
   }
 
   int mipmapCount = 1;
@@ -473,8 +440,7 @@ void DDSTools::UploadDDSLevels(
     mipmapCount = std::max(1, header[off_mipmapCount]);
   }
 
-  const auto startFace
-    = currentFace >= 0 ? static_cast<unsigned>(currentFace) : 0u;
+  const auto startFace = currentFace >= 0 ? static_cast<unsigned>(currentFace) : 0u;
   for (unsigned int face = startFace; face < faces; ++face) {
     width  = static_cast<float>(header[off_width]);
     height = static_cast<float>(header[off_height]);
@@ -491,26 +457,23 @@ void DDSTools::UploadDDSLevels(
 
           if (engine->_badOS || engine->_badDesktopOS
               || (!engine->getCaps().textureHalfFloat
-                  && !engine->getCaps()
-                        .textureFloat)) { // Required because iOS has many
-                                          // issues with float and half float
-                                          // generation
+                  && !engine->getCaps().textureFloat)) { // Required because iOS has many
+                                                         // issues with float and half float
+                                                         // generation
             if (bpp == 128) {
-              floatArray = DDSTools::_GetFloatAsUIntRGBAArrayBuffer(
-                width, height, dataOffset, dataLength, arrayBuffer, i);
+              floatArray = DDSTools::_GetFloatAsUIntRGBAArrayBuffer(width, height, dataOffset,
+                                                                    dataLength, arrayBuffer, i);
               if (i == 0) {
-                sphericalPolynomialFaces.emplace_back(
-                  DDSTools::_GetFloatRGBAArrayBuffer(
-                    width, height, dataOffset, dataLength, arrayBuffer, i));
+                sphericalPolynomialFaces.emplace_back(DDSTools::_GetFloatRGBAArrayBuffer(
+                  width, height, dataOffset, dataLength, arrayBuffer, i));
               }
             }
             else if (bpp == 64) {
-              floatArray = DDSTools::_GetHalfFloatAsUIntRGBAArrayBuffer(
-                width, height, dataOffset, dataLength, arrayBuffer, i);
+              floatArray = DDSTools::_GetHalfFloatAsUIntRGBAArrayBuffer(width, height, dataOffset,
+                                                                        dataLength, arrayBuffer, i);
               if (i == 0) {
-                sphericalPolynomialFaces.emplace_back(
-                  DDSTools::_GetHalfFloatAsFloatRGBAArrayBuffer(
-                    width, height, dataOffset, dataLength, arrayBuffer, i));
+                sphericalPolynomialFaces.emplace_back(DDSTools::_GetHalfFloatAsFloatRGBAArrayBuffer(
+                  width, height, dataOffset, dataLength, arrayBuffer, i));
               }
             }
 
@@ -519,8 +482,8 @@ void DDSTools::UploadDDSLevels(
           else {
             if (bpp == 128) {
               texture->type = Constants::TEXTURETYPE_FLOAT;
-              floatArray    = DDSTools::_GetFloatRGBAArrayBuffer(
-                width, height, dataOffset, dataLength, arrayBuffer, i);
+              floatArray = DDSTools::_GetFloatRGBAArrayBuffer(width, height, dataOffset, dataLength,
+                                                              arrayBuffer, i);
               if (i == 0) {
                 sphericalPolynomialFaces.emplace_back(floatArray);
               }
@@ -535,12 +498,11 @@ void DDSTools::UploadDDSLevels(
             }
             else { // 64
               texture->type = Constants::TEXTURETYPE_HALF_FLOAT;
-              floatArray    = DDSTools::_GetHalfFloatRGBAArrayBuffer(
-                width, height, dataOffset, dataLength, arrayBuffer, i);
+              floatArray    = DDSTools::_GetHalfFloatRGBAArrayBuffer(width, height, dataOffset,
+                                                                  dataLength, arrayBuffer, i);
               if (i == 0) {
-                sphericalPolynomialFaces.emplace_back(
-                  DDSTools::_GetHalfFloatAsFloatRGBAArrayBuffer(
-                    width, height, dataOffset, dataLength, arrayBuffer, i));
+                sphericalPolynomialFaces.emplace_back(DDSTools::_GetHalfFloatAsFloatRGBAArrayBuffer(
+                  width, height, dataOffset, dataLength, arrayBuffer, i));
               }
             }
           }
@@ -554,17 +516,16 @@ void DDSTools::UploadDDSLevels(
           if (bpp == 24) {
             texture->format = Constants::TEXTUREFORMAT_RGB;
             dataLength      = static_cast<size_t>(width * height * 3);
-            byteArray = DDSTools::_GetRGBArrayBuffer(width, height, dataOffset,
-                                                     dataLength, arrayBuffer,
-                                                     rOffset, gOffset, bOffset);
+            byteArray       = DDSTools::_GetRGBArrayBuffer(width, height, dataOffset, dataLength,
+                                                     arrayBuffer, rOffset, gOffset, bOffset);
             engine->_uploadDataToTextureDirectly(texture, byteArray, face, i);
           }
           else { // 32
             texture->format = Constants::TEXTUREFORMAT_RGBA;
             dataLength      = static_cast<size_t>(width * height * 4);
-            byteArray       = DDSTools::_GetRGBAArrayBuffer(
-              width, height, dataOffset, dataLength, arrayBuffer, rOffset,
-              gOffset, bOffset, aOffset);
+            byteArray
+              = DDSTools::_GetRGBAArrayBuffer(width, height, dataOffset, dataLength, arrayBuffer,
+                                              rOffset, gOffset, bOffset, aOffset);
             engine->_uploadDataToTextureDirectly(texture, byteArray, face, i);
           }
         }
@@ -572,13 +533,11 @@ void DDSTools::UploadDDSLevels(
           int unpackAlignment   = engine->_getUnpackAlignement();
           float unpaddedRowSize = width;
           float paddedRowSize
-            = std::floor((width + unpackAlignment - 1) / unpackAlignment)
-              * unpackAlignment;
-          dataLength = static_cast<size_t>(paddedRowSize * (height - 1)
-                                           + unpaddedRowSize);
+            = std::floor((width + unpackAlignment - 1) / unpackAlignment) * unpackAlignment;
+          dataLength = static_cast<size_t>(paddedRowSize * (height - 1) + unpaddedRowSize);
 
-          byteArray = DDSTools::_GetLuminanceArrayBuffer(
-            width, height, dataOffset, dataLength, arrayBuffer);
+          byteArray = DDSTools::_GetLuminanceArrayBuffer(width, height, dataOffset, dataLength,
+                                                         arrayBuffer);
 
           texture->format = Constants::TEXTUREFORMAT_LUMINANCE;
           texture->type   = Constants::TEXTURETYPE_UNSIGNED_INT;
@@ -586,19 +545,19 @@ void DDSTools::UploadDDSLevels(
           engine->_uploadDataToTextureDirectly(texture, byteArray, face, i);
         }
         else {
-          dataLength = static_cast<size_t>(
-            std::max(4.f, width) / 4 * std::max(4.f, height) / 4 * blockBytes);
-          byteArray = stl_util::to_array<uint8_t>(
-            arrayBuffer, static_cast<size_t>(dataOffset), dataLength);
+          dataLength = static_cast<size_t>(std::max(4.f, width) / 4 * std::max(4.f, height) / 4
+                                           * blockBytes);
+          byteArray
+            = stl_util::to_array<uint8_t>(arrayBuffer, static_cast<size_t>(dataOffset), dataLength);
 
           texture->type = Constants::TEXTURETYPE_UNSIGNED_INT;
           engine->_uploadCompressedDataToTextureDirectly(
-            texture, internalCompressedFormat, width, height, byteArray, face,
-            i);
+            texture, internalCompressedFormat, static_cast<int>(width), static_cast<int>(height),
+            byteArray, face, i);
         }
       }
-      dataOffset += bpp ? static_cast<int>(width * height * (bpp / 8)) :
-                          static_cast<int>(dataLength);
+      dataOffset
+        += bpp ? static_cast<int>(width * height * (bpp / 8)) : static_cast<int>(dataLength);
       width *= 0.5f;
       height *= 0.5f;
 
@@ -625,16 +584,14 @@ void DDSTools::UploadDDSLevels(
     cubeInfo.gammaSpace = false;
 
     info.sphericalPolynomial
-      = CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
-        cubeInfo);
+      = CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(cubeInfo);
   }
   else {
     info.sphericalPolynomial = nullptr;
   }
 }
 
-ArrayBuffer DDSTools::ToArrayBuffer(
-  const std::variant<std::string, ArrayBuffer>& arrayBuffer)
+ArrayBuffer DDSTools::ToArrayBuffer(const std::variant<std::string, ArrayBuffer>& arrayBuffer)
 {
   ArrayBuffer byteArray;
   if (std::holds_alternative<std::string>(arrayBuffer)) {

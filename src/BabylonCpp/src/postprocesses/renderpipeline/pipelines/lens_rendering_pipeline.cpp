@@ -17,13 +17,13 @@
 
 namespace BABYLON {
 
-LensRenderingPipeline::LensRenderingPipeline(
-  const std::string& iName, const LensRenderingPipelineParameters& parameters,
-  Scene* scene, float ratio, const std::vector<CameraPtr>& cameras)
+LensRenderingPipeline::LensRenderingPipeline(const std::string& iName,
+                                             const LensRenderingPipelineParameters& parameters,
+                                             Scene* scene, float ratio,
+                                             const std::vector<CameraPtr>& cameras)
     : PostProcessRenderPipeline(scene->getEngine(), iName)
     , scene{this, &LensRenderingPipeline::get_scene}
-    , edgeBlur{this, &LensRenderingPipeline::get_edgeBlur,
-               &LensRenderingPipeline::set_edgeBlur}
+    , edgeBlur{this, &LensRenderingPipeline::get_edgeBlur, &LensRenderingPipeline::set_edgeBlur}
     , grainAmount{this, &LensRenderingPipeline::get_grainAmount,
                   &LensRenderingPipeline::set_grainAmount}
     , chromaticAberration{this, &LensRenderingPipeline::get_chromaticAberration,
@@ -36,8 +36,7 @@ LensRenderingPipeline::LensRenderingPipeline(
                     &LensRenderingPipeline::set_dofDistortion}
     , darkenOutOfFocus{this, &LensRenderingPipeline::get_darkenOutOfFocus,
                        &LensRenderingPipeline::set_darkenOutOfFocus}
-    , blurNoise{this, &LensRenderingPipeline::get_blurNoise,
-                &LensRenderingPipeline::set_blurNoise}
+    , blurNoise{this, &LensRenderingPipeline::get_blurNoise, &LensRenderingPipeline::set_blurNoise}
     , pentagonBokeh{this, &LensRenderingPipeline::get_pentagonBokeh,
                     &LensRenderingPipeline::set_pentagonBokeh}
     , highlightsGain{this, &LensRenderingPipeline::get_highlightsGain,
@@ -49,8 +48,7 @@ LensRenderingPipeline::LensRenderingPipeline(
     , _pentagonBokehIsEnabled{false}
 {
   // Fetch texture samplers
-  _depthTexture
-    = scene->enableDepthRenderer()->getDepthMap(); // Force depth renderer "on"
+  _depthTexture = scene->enableDepthRenderer()->getDepthMap(); // Force depth renderer "on"
   if (parameters.grain_texture) {
     _grainTexture = parameters.grain_texture;
   }
@@ -79,18 +77,13 @@ LensRenderingPipeline::LensRenderingPipeline(
   // Set up pipeline
   addEffect(PostProcessRenderEffect::New(
     scene->getEngine(), LensChromaticAberrationEffect,
-    [&]() -> std::vector<PostProcessPtr> {
-      return {_chromaticAberrationPostProcess};
-    },
-    true));
+    [&]() -> std::vector<PostProcessPtr> { return {_chromaticAberrationPostProcess}; }, true));
   addEffect(PostProcessRenderEffect::New(
     scene->getEngine(), HighlightsEnhancingEffect,
-    [&]() -> std::vector<PostProcessPtr> { return {_highlightsPostProcess}; },
-    true));
+    [&]() -> std::vector<PostProcessPtr> { return {_highlightsPostProcess}; }, true));
   addEffect(PostProcessRenderEffect::New(
     scene->getEngine(), LensDepthOfFieldEffect,
-    [&]() -> std::vector<PostProcessPtr> { return {_depthOfFieldPostProcess}; },
-    true));
+    [&]() -> std::vector<PostProcessPtr> { return {_depthOfFieldPostProcess}; }, true));
 
   if (stl_util::almost_equal(_highlightsGain, -1.f)) {
     _disableEffect(HighlightsEnhancingEffect, std::vector<CameraPtr>());
@@ -99,15 +92,12 @@ LensRenderingPipeline::LensRenderingPipeline(
 
 LensRenderingPipeline::~LensRenderingPipeline() = default;
 
-void LensRenderingPipeline::addToScene(
-  const LensRenderingPipelinePtr& lensRenderingPipeline)
+void LensRenderingPipeline::addToScene(const LensRenderingPipelinePtr& lensRenderingPipeline)
 {
   // Finish
-  _scene->postProcessRenderPipelineManager()->addPipeline(
-    lensRenderingPipeline);
+  _scene->postProcessRenderPipelineManager()->addPipeline(lensRenderingPipeline);
   if (!_cameraList.empty()) {
-    _scene->postProcessRenderPipelineManager()->attachCamerasToRenderPipeline(
-      _name, _cameraList);
+    _scene->postProcessRenderPipelineManager()->attachCamerasToRenderPipeline(_name, _cameraList);
   }
 }
 
@@ -336,11 +326,10 @@ void LensRenderingPipeline::disableHighlights()
   _highlightsGain = -1.f;
 }
 
-void LensRenderingPipeline::dispose(bool disableDepthRender,
-                                    bool /*disposeMaterialAndTextures */)
+void LensRenderingPipeline::dispose(bool disableDepthRender, bool /*disposeMaterialAndTextures */)
 {
-  _scene->postProcessRenderPipelineManager()->detachCamerasFromRenderPipeline(
-    _name, _scene->cameras);
+  _scene->postProcessRenderPipelineManager()->detachCamerasFromRenderPipeline(_name,
+                                                                              _scene->cameras);
 
   _chromaticAberrationPostProcess = nullptr;
   _highlightsPostProcess          = nullptr;
@@ -357,19 +346,15 @@ void LensRenderingPipeline::_createChromaticAberrationPostProcess(float ratio)
 {
   _chromaticAberrationPostProcess = PostProcess::New(
     "LensChromaticAberration", "chromaticAberration",
-    {"chromatic_aberration", "screen_width", "screen_height", "direction",
-     "radialIntensity", "centerPosition"}, // uniforms
-    {},                                    // samplers
-    ratio, nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE,
-    _scene->getEngine(), false);
+    {"chromatic_aberration", "screen_width", "screen_height", "direction", "radialIntensity",
+     "centerPosition"}, // uniforms
+    {},                 // samplers
+    ratio, nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(), false);
 
   _chromaticAberrationPostProcess->onApply = [&](Effect* effect, EventState&) {
     effect->setFloat("chromatic_aberration", _chromaticAberration);
-    effect->setFloat("screen_width",
-                     static_cast<float>(_scene->getEngine()->getRenderWidth()));
-    effect->setFloat(
-      "screen_height",
-      static_cast<float>(_scene->getEngine()->getRenderHeight()));
+    effect->setFloat("screen_width", static_cast<float>(_scene->getEngine()->getRenderWidth()));
+    effect->setFloat("screen_height", static_cast<float>(_scene->getEngine()->getRenderHeight()));
     effect->setFloat("radialIntensity", 1.f);
     effect->setFloat2("direction", 17.f, 17.f);
     effect->setFloat2("centerPosition", 0.5f, 0.5f);
@@ -378,23 +363,19 @@ void LensRenderingPipeline::_createChromaticAberrationPostProcess(float ratio)
 
 void LensRenderingPipeline::_createHighlightsPostProcess(float ratio)
 {
-  _highlightsPostProcess = PostProcess::New(
-    "LensHighlights", "lensHighlights",
-    {"gain", "threshold", "screen_width", "screen_height"}, // uniforms
-    {},                                                     // samplers
-    ratio, nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE,
-    _scene->getEngine(), false, _dofPentagon ? "#define PENTAGON\n" : "");
+  _highlightsPostProcess
+    = PostProcess::New("LensHighlights", "lensHighlights",
+                       {"gain", "threshold", "screen_width", "screen_height"}, // uniforms
+                       {},                                                     // samplers
+                       ratio, nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE,
+                       _scene->getEngine(), false, _dofPentagon ? "#define PENTAGON\n" : "");
 
   _highlightsPostProcess->onApply = [&](Effect* effect, EventState&) {
     effect->setFloat("gain", _highlightsGain);
     effect->setFloat("threshold", _highlightsThreshold);
-    effect->setTextureFromPostProcess("textureSampler",
-                                      _chromaticAberrationPostProcess.get());
-    effect->setFloat("screen_width",
-                     static_cast<float>(_scene->getEngine()->getRenderWidth()));
-    effect->setFloat(
-      "screen_height",
-      static_cast<float>(_scene->getEngine()->getRenderHeight()));
+    effect->setTextureFromPostProcess("textureSampler", _chromaticAberrationPostProcess);
+    effect->setFloat("screen_width", static_cast<float>(_scene->getEngine()->getRenderWidth()));
+    effect->setFloat("screen_height", static_cast<float>(_scene->getEngine()->getRenderHeight()));
   };
 }
 
@@ -402,28 +383,22 @@ void LensRenderingPipeline::_createDepthOfFieldPostProcess(float ratio)
 {
   _depthOfFieldPostProcess = PostProcess::New(
     "LensDepthOfField", "depthOfField",
-    {"grain_amount", "blur_noise", "screen_width", "screen_height",
-     "distortion", "dof_enabled", "screen_distance", "aperture", "darken",
-     "edge_blur", "highlights", "near", "far"},
+    {"grain_amount", "blur_noise", "screen_width", "screen_height", "distortion", "dof_enabled",
+     "screen_distance", "aperture", "darken", "edge_blur", "highlights", "near", "far"},
     {"depthSampler", "grainSampler", "highlightsSampler"}, ratio, nullptr,
     TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(), false);
 
   _depthOfFieldPostProcess->onApply = [&](Effect* effect, EventState&) {
     effect->setTexture("depthSampler", _depthTexture);
     effect->setTexture("grainSampler", _grainTexture);
-    effect->setTextureFromPostProcess("textureSampler",
-                                      _highlightsPostProcess.get());
-    effect->setTextureFromPostProcess("highlightsSampler",
-                                      _depthOfFieldPostProcess.get());
+    effect->setTextureFromPostProcess("textureSampler", _highlightsPostProcess);
+    effect->setTextureFromPostProcess("highlightsSampler", _depthOfFieldPostProcess);
 
     effect->setFloat("grain_amount", _grainAmount);
     effect->setBool("blur_noise", _blurNoise);
 
-    effect->setFloat("screen_width",
-                     static_cast<float>(_scene->getEngine()->getRenderWidth()));
-    effect->setFloat(
-      "screen_height",
-      static_cast<float>(_scene->getEngine()->getRenderHeight()));
+    effect->setFloat("screen_width", static_cast<float>(_scene->getEngine()->getRenderWidth()));
+    effect->setFloat("screen_height", static_cast<float>(_scene->getEngine()->getRenderHeight()));
 
     effect->setFloat("distortion", _distortion);
 
@@ -434,8 +409,7 @@ void LensRenderingPipeline::_createDepthOfFieldPostProcess(float ratio)
 
     effect->setFloat("edge_blur", _edgeBlur);
 
-    effect->setBool("highlights",
-                    !stl_util::almost_equal(_highlightsGain, -1.f));
+    effect->setBool("highlights", !stl_util::almost_equal(_highlightsGain, -1.f));
 
     if (_scene->activeCamera()) {
       effect->setFloat("near", _scene->activeCamera()->minZ);
@@ -452,23 +426,20 @@ void LensRenderingPipeline::_createGrainTexture()
   options.width  = static_cast<int>(size);
   options.height = static_cast<int>(size);
 
-  _grainTexture
-    = DynamicTexture::New("LensNoiseTexture", options, _scene, false,
-                          TextureConstants::BILINEAR_SAMPLINGMODE);
+  _grainTexture        = DynamicTexture::New("LensNoiseTexture", options, _scene, false,
+                                      TextureConstants::BILINEAR_SAMPLINGMODE);
   _grainTexture->wrapU = TextureConstants::WRAP_ADDRESSMODE;
   _grainTexture->wrapV = TextureConstants::WRAP_ADDRESSMODE;
 
   ICanvasRenderingContext2D* context
     = std::static_pointer_cast<DynamicTexture>(_grainTexture)->getContext();
 
-  auto rand
-    = [](float min, float max) { return Math::random() * (max - min) + min; };
+  auto rand = [](float min, float max) { return Math::random() * (max - min) + min; };
 
   std::string value;
   for (size_t x = 0; x < size; ++x) {
     for (size_t y = 0; y < size; ++y) {
-      value = std::to_string(
-        static_cast<int>(std::floor(rand(0.42f, 0.58f) * 255.f)));
+      value              = std::to_string(static_cast<int>(std::floor(rand(0.42f, 0.58f) * 255.f)));
       context->fillStyle = "rgb(" + value + ", " + value + ", " + value + ")";
       context->fillRect(static_cast<int>(x), static_cast<int>(y), 1, 1);
     }

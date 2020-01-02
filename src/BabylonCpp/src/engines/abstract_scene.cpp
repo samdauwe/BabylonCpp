@@ -126,7 +126,7 @@ void AbstractScene::_addParsers()
       if (json_util::has_key(parsedData, "sounds")) {
         for (const auto& parsedSound : json_util::get_array<json>(parsedData, "sounds")) {
           auto parsedSoundName = json_util::get_string(parsedSound, "name");
-          if (Engine::AudioEngine()->canUseWebAudio) {
+          if (Engine::audioEngine->canUseWebAudio) {
             std::string parsedSoundUrl;
             if (!json_util::has_key(parsedSound, "url")) {
               parsedSoundUrl = parsedSoundName;

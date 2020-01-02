@@ -14,7 +14,6 @@ class ICanvas;
 namespace GL {
 
 class BaseTexture;
-class IGLVertexArrayObject;
 
 using GLenum     = unsigned int;
 using GLboolean  = bool;
@@ -45,6 +44,7 @@ struct BABYLON_SHARED_EXPORT GLInfo {
 enum GLEnums : GLenum {
   // FALSE = 0x0000,
   // TRUE  = 0x0001,
+  NO_ERROR = 0,
   /* ClearBufferMask */
   DEPTH_BUFFER_BIT   = 0x00000100,
   STENCIL_BUFFER_BIT = 0x00000400,
@@ -70,10 +70,13 @@ enum GLEnums : GLenum {
   DST_COLOR           = 0x0306,
   ONE_MINUS_DST_COLOR = 0x0307,
   SRC_ALPHA_SATURATE  = 0x0308,
-  /* BlendEquationSeparate */
+  /* BlendEquationSeparate  */
   FUNC_ADD       = 0x8006,
   BLEND_EQUATION = 0x8009,
-  /* same as BLEND_EQUATION*/
+  /* MIN / MAX */
+  MIN = 0x8007,
+  MAX = 0x8008,
+  /* same as BLEND_EQUATION */
   BLEND_EQUATION_RGB   = 0x8009,
   BLEND_EQUATION_ALPHA = 0x883D,
   /* BlendSubtract */
@@ -491,6 +494,7 @@ enum GLEnums : GLenum {
   RENDERBUFFER_BINDING                         = 0x8CA7,
   READ_FRAMEBUFFER                             = 0x8CA8,
   DRAW_FRAMEBUFFER                             = 0x8CA9,
+  DEPTH_COMPONENT32F                           = 0x8CAC,
   DEPTH32F_STENCIL8                            = 0x8CAD,
   MAX_RENDERBUFFER_SIZE                        = 0x84E8,
   INVALID_FRAMEBUFFER_OPERATION                = 0x0506,
@@ -511,12 +515,18 @@ enum GLEnums : GLenum {
 
 class IGLFramebuffer;
 class IGLProgram;
+class IGLRenderbuffer;
 class IGLShader;
+class IGLTexture;
 class IGLTransformFeedback;
+class IGLVertexArrayObject;
 using IGLFramebufferPtr       = std::shared_ptr<IGLFramebuffer>;
 using IGLProgramPtr           = std::shared_ptr<IGLProgram>;
+using IGLRenderbufferPtr      = std::shared_ptr<IGLRenderbuffer>;
 using IGLShaderPtr            = std::shared_ptr<IGLShader>;
+using IGLTexturePtr           = std::shared_ptr<IGLTexture>;
 using IGLTransformFeedbackPtr = std::shared_ptr<IGLTransformFeedback>;
+using IGLVertexArrayObjectPtr = std::shared_ptr<IGLVertexArrayObject>;
 
 class BABYLON_SHARED_EXPORT IGLBuffer {
 
@@ -784,7 +794,7 @@ public:
    * written to transform feedback buffers.
    * @param query An IGLQuery object for which to start the querying.
    */
-  virtual void beginQuery(GLenum target, const std::unique_ptr<IGLQuery>& query) = 0;
+  virtual void beginQuery(GLenum target, IGLQuery* query) = 0;
 
   /**
    * @brief Starts a transform feedback operation.
@@ -830,8 +840,7 @@ public:
    * @param target A GLenum specifying the binding point (target).
    * @param renderbuffer A IGLRenderbuffer object to bind.
    */
-  virtual void bindRenderbuffer(GLenum target, const std::unique_ptr<IGLRenderbuffer>& renderbuffer)
-    = 0;
+  virtual void bindRenderbuffer(GLenum target, IGLRenderbuffer* renderbuffer) = 0;
 
   /**
    * @brief Binds a IGLTexture object to a given target.
@@ -1207,7 +1216,7 @@ public:
    * @return A IGLRenderbuffer object that stores data such an image, or can be
    * source or target of an rendering operation.
    */
-  virtual std::unique_ptr<IGLRenderbuffer> createRenderbuffer() = 0;
+  virtual IGLRenderbufferPtr createRenderbuffer() = 0;
 
   /**
    * @brief Creates a IGLShader that can then be configured further using
@@ -1221,7 +1230,7 @@ public:
    * @brief Creates and initializes a IGLTexture object.
    * @return An IGLTexture object to which images can be bound to.
    */
-  virtual std::unique_ptr<IGLTexture> createTexture() = 0;
+  virtual IGLTexturePtr createTexture() = 0;
 
   /**
    * @brief Creates and initializes a IGLTransformFeedback object.
@@ -1236,7 +1245,7 @@ public:
    * @return An IGLVertexArrayObject representing a vertex array object (VAO)
    * which points to vertex array data.
    */
-  virtual std::unique_ptr<IGLVertexArrayObject> createVertexArray() = 0;
+  virtual IGLVertexArrayObjectPtr createVertexArray() = 0;
 
   /**
    * @brief Specifies whether or not front- and/or back-facing polygons can be
@@ -1525,6 +1534,14 @@ public:
    * found. Returns -1 otherwise.
    */
   virtual GLint getAttribLocation(IGLProgram* program, const std::string& name) = 0;
+
+  /**
+   * @brief Enables a GL extension.
+   * @param name A String for the name of the GL extension to enable.
+   * @return A GL extension object, or null if name does not match (case-insensitive) to one of the
+   * strings in WebGLRenderingContext.getSupportedExtensions.
+   */
+  virtual GL::any getExtension(const std::string& name) = 0;
 
   /**
    * @brief Returns true if the specified GL extension is supported.

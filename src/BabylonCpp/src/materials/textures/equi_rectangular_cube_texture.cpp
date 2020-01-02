@@ -66,8 +66,6 @@ EquiRectangularCubeTexture::~EquiRectangularCubeTexture() = default;
 
 void EquiRectangularCubeTexture::loadTexture()
 {
-  using ArrayBufferViewArray = std::vector<ArrayBufferView>;
-
   auto scene          = getScene();
   const auto callback = [this](const ArrayBuffer & /*arrayBuffer*/) -> ArrayBufferViewArray {
     auto imageData = getFloat32ArrayFromArrayBuffer(_buffer);

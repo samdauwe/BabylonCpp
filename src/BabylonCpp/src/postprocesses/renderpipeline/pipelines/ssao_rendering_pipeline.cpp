@@ -19,16 +19,15 @@
 
 namespace BABYLON {
 
-SSAORenderingPipeline::SSAORenderingPipeline(
-  const std::string& iName, Scene* scene, float ratio,
-  const std::vector<CameraPtr>& cameras)
+SSAORenderingPipeline::SSAORenderingPipeline(const std::string& iName, Scene* scene, float ratio,
+                                             const std::vector<CameraPtr>& cameras)
     : SSAORenderingPipeline(iName, scene, {ratio, ratio}, cameras)
 {
 }
 
-SSAORenderingPipeline::SSAORenderingPipeline(
-  const std::string& iName, Scene* scene, const SSARatio& ratio,
-  const std::vector<CameraPtr>& cameras)
+SSAORenderingPipeline::SSAORenderingPipeline(const std::string& iName, Scene* scene,
+                                             const SSARatio& ratio,
+                                             const std::vector<CameraPtr>& cameras)
     : PostProcessRenderPipeline(scene->getEngine(), iName)
     , totalStrength{1.f}
     , radius{0.0001f}
@@ -47,9 +46,9 @@ SSAORenderingPipeline::SSAORenderingPipeline(
   auto ssaoRatio    = ratio.ssaoRatio;
   auto combineRatio = ratio.combineRatio;
 
-  _originalColorPostProcess = PassPostProcess::New(
-    "SSAOOriginalSceneColor", combineRatio, nullptr,
-    TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false);
+  _originalColorPostProcess
+    = PassPostProcess::New("SSAOOriginalSceneColor", combineRatio, nullptr,
+                           TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false);
   _createSSAOPostProcess(ssaoRatio);
   _createBlurPostProcess(ssaoRatio);
   _createSSAOCombinePostProcess(combineRatio);
@@ -57,39 +56,30 @@ SSAORenderingPipeline::SSAORenderingPipeline(
   // Set up pipeline
   addEffect(PostProcessRenderEffect::New(
     scene->getEngine(), SSAOOriginalSceneColorEffect,
-    [&]() -> std::vector<PostProcessPtr> {
-      return {_originalColorPostProcess};
-    },
-    true));
+    [&]() -> std::vector<PostProcessPtr> { return {_originalColorPostProcess}; }, true));
   addEffect(PostProcessRenderEffect::New(
     scene->getEngine(), SSAORenderEffect,
     [&]() -> std::vector<PostProcessPtr> { return {_ssaoPostProcess}; }, true));
   addEffect(PostProcessRenderEffect::New(
     scene->getEngine(), SSAOBlurHRenderEffect,
-    [&]() -> std::vector<PostProcessPtr> { return {_blurHPostProcess}; },
-    true));
+    [&]() -> std::vector<PostProcessPtr> { return {_blurHPostProcess}; }, true));
   addEffect(PostProcessRenderEffect::New(
     scene->getEngine(), SSAOBlurVRenderEffect,
-    [&]() -> std::vector<PostProcessPtr> { return {_blurVPostProcess}; },
-    true));
+    [&]() -> std::vector<PostProcessPtr> { return {_blurVPostProcess}; }, true));
 
   addEffect(PostProcessRenderEffect::New(
     scene->getEngine(), SSAOCombineRenderEffect,
-    [&]() -> std::vector<PostProcessPtr> { return {_ssaoCombinePostProcess}; },
-    true));
+    [&]() -> std::vector<PostProcessPtr> { return {_ssaoCombinePostProcess}; }, true));
 }
 
 SSAORenderingPipeline::~SSAORenderingPipeline() = default;
 
-void SSAORenderingPipeline::addToScene(
-  const SSAORenderingPipelinePtr& ssao2RenderingPipeline)
+void SSAORenderingPipeline::addToScene(const SSAORenderingPipelinePtr& ssao2RenderingPipeline)
 {
   // Finish
-  _scene->postProcessRenderPipelineManager()->addPipeline(
-    ssao2RenderingPipeline);
+  _scene->postProcessRenderPipelineManager()->addPipeline(ssao2RenderingPipeline);
   if (!_cameraList.empty()) {
-    _scene->postProcessRenderPipelineManager()->attachCamerasToRenderPipeline(
-      _name, _cameraList);
+    _scene->postProcessRenderPipelineManager()->attachCamerasToRenderPipeline(_name, _cameraList);
   }
 }
 
@@ -103,8 +93,7 @@ std::string SSAORenderingPipeline::getClassName() const
   return "SSAORenderingPipeline";
 }
 
-void SSAORenderingPipeline::dispose(bool disableDepthRender,
-                                    bool /*disposeMaterialAndTextures*/)
+void SSAORenderingPipeline::dispose(bool disableDepthRender, bool /*disposeMaterialAndTextures*/)
 {
   for (auto& camera : _scene->cameras) {
     auto _camera = camera.get();
@@ -121,8 +110,8 @@ void SSAORenderingPipeline::dispose(bool disableDepthRender,
     _scene->disableDepthRenderer();
   }
 
-  _scene->postProcessRenderPipelineManager()->detachCamerasFromRenderPipeline(
-    _name, _scene->cameras);
+  _scene->postProcessRenderPipelineManager()->detachCamerasFromRenderPipeline(_name,
+                                                                              _scene->cameras);
 
   PostProcessRenderPipeline::dispose(disableDepthRender);
 }
@@ -132,13 +121,11 @@ void SSAORenderingPipeline::_createBlurPostProcess(float ratio)
   auto size = 16.f;
 
   _blurHPostProcess = BlurPostProcess::New(
-    "BlurH", Vector2(1.f, 0.f), size, ratio, nullptr,
-    TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
-    Constants::TEXTURETYPE_UNSIGNED_INT);
+    "BlurH", Vector2(1.f, 0.f), size, ratio, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
+    _scene->getEngine(), false, Constants::TEXTURETYPE_UNSIGNED_INT);
   _blurVPostProcess = BlurPostProcess::New(
-    "BlurV", Vector2(0.f, 1.f), size, ratio, nullptr,
-    TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
-    Constants::TEXTURETYPE_UNSIGNED_INT);
+    "BlurV", Vector2(0.f, 1.f), size, ratio, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
+    _scene->getEngine(), false, Constants::TEXTURETYPE_UNSIGNED_INT);
 
   _blurHPostProcess->onActivateObservable.add([&, size](Camera*, EventState&) {
     auto dw = static_cast<float>(_blurHPostProcess->width)
@@ -184,11 +171,10 @@ void SSAORenderingPipeline::_createSSAOPostProcess(float ratio)
 
   _ssaoPostProcess = PostProcess::New(
     "ssao", "ssao",
-    {"sampleSphere", "samplesFactor", "randTextureTiles", "totalStrength",
-     "radius", "area", "fallOff", "base", "range", "viewport"},
-    {"randomSampler"}, ratio, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
-    _scene->getEngine(), false,
-    "#define SAMPLES " + std::to_string(numSamples) + "\n#define SSAO");
+    {"sampleSphere", "samplesFactor", "randTextureTiles", "totalStrength", "radius", "area",
+     "fallOff", "base", "range", "viewport"},
+    {"randomSampler"}, ratio, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(),
+    false, "#define SAMPLES " + std::to_string(numSamples) + "\n#define SSAO");
 
   _ssaoPostProcess->onApply = [&](Effect* effect, EventState&) {
     if (_firstUpdate) {
@@ -211,15 +197,12 @@ void SSAORenderingPipeline::_createSSAOPostProcess(float ratio)
 void SSAORenderingPipeline::_createSSAOCombinePostProcess(float ratio)
 {
   _ssaoCombinePostProcess = PostProcess::New(
-    "ssaoCombine", "ssaoCombine", {}, {"originalColor", "viewport"}, ratio,
-    nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(),
-    false);
+    "ssaoCombine", "ssaoCombine", {}, {"originalColor", "viewport"}, ratio, nullptr,
+    TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false);
 
   _ssaoCombinePostProcess->onApply = [&](Effect* effect, EventState&) {
-    effect->setVector4("viewport", TmpVectors::Vector4Array[0].copyFromFloats(
-                                     0.f, 0.f, 1.f, 1.f));
-    effect->setTextureFromPostProcess("originalColor",
-                                      _originalColorPostProcess.get());
+    effect->setVector4("viewport", TmpVectors::Vector4Array[0].copyFromFloats(0.f, 0.f, 1.f, 1.f));
+    effect->setTextureFromPostProcess("originalColor", _originalColorPostProcess);
   };
 }
 
@@ -231,17 +214,14 @@ void SSAORenderingPipeline::_createRandomTexture()
   options.width  = static_cast<int>(size);
   options.height = static_cast<int>(size);
 
-  _randomTexture
-    = DynamicTexture::New("SSAORandomTexture", options, _scene, false,
-                          TextureConstants::TRILINEAR_SAMPLINGMODE);
+  _randomTexture        = DynamicTexture::New("SSAORandomTexture", options, _scene, false,
+                                       TextureConstants::TRILINEAR_SAMPLINGMODE);
   _randomTexture->wrapU = TextureConstants::WRAP_ADDRESSMODE;
   _randomTexture->wrapV = TextureConstants::WRAP_ADDRESSMODE;
 
-  auto context
-    = std::static_pointer_cast<DynamicTexture>(_randomTexture)->getContext();
+  auto context = std::static_pointer_cast<DynamicTexture>(_randomTexture)->getContext();
 
-  const auto rand
-    = [](float min, float max) { return Math::random() * (max - min) + min; };
+  const auto rand = [](float min, float max) { return Math::random() * (max - min) + min; };
 
   auto randVector = Vector3::Zero();
 
@@ -252,8 +232,8 @@ void SSAORenderingPipeline::_createRandomTexture()
       randVector.z = std::floor(rand(-1.f, 1.f) * 255.f);
 
       context->fillStyle = "rgb(" + std::to_string(randVector.x) + ", "
-                           + std::to_string(randVector.y) + ", "
-                           + std::to_string(randVector.z) + ")";
+                           + std::to_string(randVector.y) + ", " + std::to_string(randVector.z)
+                           + ")";
       context->fillRect(static_cast<int>(x), static_cast<int>(y), 1, 1);
     }
   }

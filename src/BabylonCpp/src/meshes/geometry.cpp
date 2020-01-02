@@ -301,7 +301,7 @@ void Geometry::_bind(const EffectPtr& effect, WebGLDataBufferPtr indexToBind)
     _vertexArrayObjects[effect->key()] = _engine->recordVertexArrayObject(vbs, indexToBind, effect);
   }
 
-  _engine->bindVertexArrayObject(_vertexArrayObjects[effect->key()].get(), indexToBind);
+  _engine->bindVertexArrayObject(_vertexArrayObjects[effect->key()], indexToBind);
 }
 
 size_t Geometry::getTotalVertices() const
@@ -488,8 +488,8 @@ void Geometry::_releaseVertexArrayObject(const EffectPtr& effect)
   }
 
   if (stl_util::contains(_vertexArrayObjects, effect->key())) {
-    _engine->releaseVertexArrayObject(_vertexArrayObjects[effect->key()].get());
-    _vertexArrayObjects[effect->key()].reset(nullptr);
+    _engine->releaseVertexArrayObject(_vertexArrayObjects[effect->key()]);
+    _vertexArrayObjects[effect->key()] = nullptr;
   }
 }
 
@@ -689,7 +689,7 @@ void Geometry::_disposeVertexArrayObjects()
 {
   if (!_vertexArrayObjects.empty()) {
     for (const auto& item : _vertexArrayObjects) {
-      _engine->releaseVertexArrayObject(item.second.get());
+      _engine->releaseVertexArrayObject(item.second);
     }
     _vertexArrayObjects.clear();
   }

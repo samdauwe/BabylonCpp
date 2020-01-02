@@ -20,10 +20,15 @@ using AbstractMeshPtr  = std::shared_ptr<AbstractMesh>;
 using TransformNodePtr = std::shared_ptr<TransformNode>;
 
 /**
- * @brief Represents a set of particle systems working together to create a
- * specific effect.
+ * @brief Represents a set of particle systems working together to create a specific effect.
  */
 class BABYLON_SHARED_EXPORT ParticleSystemSet : public IDisposable {
+
+public:
+  /**
+   * Gets or sets base Assets URL
+   */
+  static constexpr const char* BaseAssetsUrl = "https://assets.babylonjs.com/particles";
 
 public:
   ParticleSystemSet();

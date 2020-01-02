@@ -40,7 +40,7 @@ std::unordered_map<unsigned int, WebGLDataBufferPtr> Effect::_baseCache{};
 
 Effect::Effect(
   const std::variant<std::string, std::unordered_map<std::string, std::string>>& baseName,
-  IEffectCreationOptions& options, Engine* engine)
+  IEffectCreationOptions& options, ThinEngine* engine)
     : name{baseName}
     , defines{options.defines}
     , onCompiled{options.onCompiled}
@@ -104,7 +104,7 @@ Effect::Effect(
   processorOptions.defines                      = String::split(defines, '\n');
   processorOptions.indexParameters              = _indexParameters;
   processorOptions.isFragment                   = false;
-  processorOptions.shouldUseHighPrecisionShader = _engine->_shouldUseHighPrecisionShader;
+  processorOptions.shouldUseHighPrecisionShader = _engine->_shouldUseHighPrecisionShader();
   processorOptions.processor                    = _engine->_shaderProcessor;
   processorOptions.supportsUniformBuffers       = _engine->supportsUniformBuffers();
   processorOptions.shadersRepository            = Effect::ShadersRepository;
@@ -204,7 +204,7 @@ bool Effect::_isReadyInternal() const
   return false;
 }
 
-Engine* Effect::getEngine() const
+ThinEngine* Effect::getEngine() const
 {
   return _engine;
 }
@@ -245,10 +245,10 @@ int Effect::getUniformIndex(const std::string& uniformName)
   return stl_util::index_of(_uniformsNames, uniformName);
 }
 
-GL::IGLUniformLocation* Effect::getUniform(const std::string& uniformName)
+WebGLUniformLocationPtr Effect::getUniform(const std::string& uniformName)
 {
   if (stl_util::contains(_uniforms, uniformName)) {
-    return _uniforms[uniformName].get();
+    return _uniforms[uniformName];
   }
 
   return nullptr;
@@ -443,8 +443,11 @@ void Effect::_rebuildProgram(
     }
   };
   this->onCompiled = [&](const Effect* /*effect*/) {
-    for (const auto& scene : getEngine()->scenes) {
-      scene->markAllMaterialsAsDirty(Constants::MATERIAL_AllDirtyFlag);
+    auto engine = static_cast<Engine*>(getEngine());
+    if (engine) {
+      for (const auto& scene : engine->scenes) {
+        scene->markAllMaterialsAsDirty(Constants::MATERIAL_AllDirtyFlag);
+      }
     }
 
     if (_pipelineContext) {
@@ -604,7 +607,10 @@ void Effect::setTexture(const std::string& channel, const BaseTexturePtr& textur
 void Effect::setDepthStencilTexture(const std::string& channel,
                                     const RenderTargetTexturePtr& texture)
 {
-  _engine->setDepthStencilTexture(_getChannel(channel), getUniform(channel), texture);
+  auto engine = static_cast<Engine*>(_engine);
+  if (engine) {
+    engine->setDepthStencilTexture(_getChannel(channel), getUniform(channel), texture);
+  }
 }
 
 void Effect::setTextureArray(const std::string& channel,
@@ -629,14 +635,22 @@ void Effect::setTextureArray(const std::string& channel,
   _engine->setTextureArray(_samplers[channel], getUniform(channel), textures);
 }
 
-void Effect::setTextureFromPostProcess(const std::string& channel, PostProcess* postProcess)
+void Effect::setTextureFromPostProcess(const std::string& channel,
+                                       const PostProcessPtr& postProcess)
 {
-  _engine->setTextureFromPostProcess(_getChannel(channel), postProcess);
+  auto engine = static_cast<Engine*>(_engine);
+  if (engine) {
+    engine->setTextureFromPostProcess(_getChannel(channel), postProcess);
+  }
 }
 
-void Effect::setTextureFromPostProcessOutput(const std::string& channel, PostProcess* postProcess)
+void Effect::setTextureFromPostProcessOutput(const std::string& channel,
+                                             const PostProcessPtr& postProcess)
 {
-  _engine->setTextureFromPostProcessOutput(_getChannel(channel), postProcess);
+  auto engine = static_cast<Engine*>(_engine);
+  if (engine) {
+    engine->setTextureFromPostProcessOutput(_getChannel(channel), postProcess);
+  }
 }
 
 bool Effect::_cacheMatrix(const std::string& uniformName, const Matrix& matrix)
@@ -804,7 +818,7 @@ Effect& Effect::setIntArray4(const std::string& uniformName, const Int32Array& a
 Effect& Effect::setFloatArray(const std::string& uniformName, const Float32Array& array)
 {
   _valueCache.erase(uniformName);
-  _engine->setFloatArray(getUniform(uniformName), array);
+  _engine->setArray(getUniform(uniformName), array);
 
   return *this;
 }
@@ -812,7 +826,7 @@ Effect& Effect::setFloatArray(const std::string& uniformName, const Float32Array
 Effect& Effect::setFloatArray2(const std::string& uniformName, const Float32Array& array)
 {
   _valueCache.erase(uniformName);
-  _engine->setFloatArray2(getUniform(uniformName), array);
+  _engine->setArray2(getUniform(uniformName), array);
 
   return *this;
 }
@@ -820,7 +834,7 @@ Effect& Effect::setFloatArray2(const std::string& uniformName, const Float32Arra
 Effect& Effect::setFloatArray3(const std::string& uniformName, const Float32Array& array)
 {
   _valueCache.erase(uniformName);
-  _engine->setFloatArray3(getUniform(uniformName), array);
+  _engine->setArray3(getUniform(uniformName), array);
 
   return *this;
 }
@@ -828,7 +842,7 @@ Effect& Effect::setFloatArray3(const std::string& uniformName, const Float32Arra
 Effect& Effect::setFloatArray4(const std::string& uniformName, const Float32Array& array)
 {
   _valueCache.erase(uniformName);
-  _engine->setFloatArray4(getUniform(uniformName), array);
+  _engine->setArray4(getUniform(uniformName), array);
 
   return *this;
 }
@@ -925,7 +939,7 @@ Effect& Effect::setBool(const std::string& uniformName, bool _bool)
 
   _valueCache[uniformName] = {_bool ? 1.f : 0.f};
 
-  _engine->setBool(getUniform(uniformName), _bool ? 1 : 0);
+  _engine->setInt(getUniform(uniformName), _bool ? 1 : 0);
 
   return *this;
 }
@@ -1005,7 +1019,7 @@ Effect& Effect::setColor4(const std::string& uniformName, const Color3& color3, 
 Effect& Effect::setDirectColor4(const std::string& uniformName, const Color4& color4)
 {
   if (_cacheFloat4(uniformName, color4.r, color4.g, color4.b, color4.a)) {
-    _engine->setDirectColor4(getUniform(uniformName), color4);
+    _engine->setFloat4(getUniform(uniformName), color4.r, color4.g, color4.b, color4.a);
   }
 
   return *this;

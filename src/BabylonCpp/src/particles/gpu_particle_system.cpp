@@ -549,7 +549,7 @@ void GPUParticleSystem::_reset()
   _releaseBuffers();
 }
 
-std::unique_ptr<GL::IGLVertexArrayObject> GPUParticleSystem::_createUpdateVAO(Buffer* source)
+WebGLVertexArrayObjectPtr GPUParticleSystem::_createUpdateVAO(Buffer* source)
 {
   std::unordered_map<std::string, VertexBufferPtr> updateVertexBuffers;
   updateVertexBuffers["position"] = source->createVertexBuffer(VertexBuffer::PositionKind, 0, 3);
@@ -609,8 +609,7 @@ std::unique_ptr<GL::IGLVertexArrayObject> GPUParticleSystem::_createUpdateVAO(Bu
   return vao;
 }
 
-std::unique_ptr<GL::IGLVertexArrayObject> GPUParticleSystem::_createRenderVAO(Buffer* source,
-                                                                              Buffer* spriteSource)
+WebGLVertexArrayObjectPtr GPUParticleSystem::_createRenderVAO(Buffer* source, Buffer* spriteSource)
 {
   std::unordered_map<std::string, VertexBufferPtr> renderVertexBuffers;
   auto attributesStrideSizeT = static_cast<size_t>(_attributesStrideSize);
@@ -1215,7 +1214,7 @@ size_t GPUParticleSystem::render(bool preWarm)
   _updateEffect->setMatrix("emitterWM", emitterWM);
 
   // Bind source VAO
-  _engine->bindVertexArrayObject(_updateVAO[_targetIndex].get(), nullptr);
+  _engine->bindVertexArrayObject(_updateVAO[_targetIndex], nullptr);
 
   // Update
   _engine->bindTransformFeedbackBuffer(_targetBuffer->getBuffer());
@@ -1290,7 +1289,7 @@ size_t GPUParticleSystem::render(bool preWarm)
     }
 
     // Bind source VAO
-    _engine->bindVertexArrayObject(_renderVAO[_targetIndex].get(), nullptr);
+    _engine->bindVertexArrayObject(_renderVAO[_targetIndex], nullptr);
 
     // Render
     _engine->drawArraysType(Material::TriangleFanDrawMode, 0, 4,
@@ -1338,12 +1337,12 @@ void GPUParticleSystem::_releaseVAOs()
   }
 
   for (auto& _updateVAOItem : _updateVAO) {
-    _engine->releaseVertexArrayObject(_updateVAOItem.get());
+    _engine->releaseVertexArrayObject(_updateVAOItem);
   }
   _updateVAO.clear();
 
   for (auto& _renderVAOItem : _renderVAO) {
-    _engine->releaseVertexArrayObject(_renderVAOItem.get());
+    _engine->releaseVertexArrayObject(_renderVAOItem);
   }
   _renderVAO.clear();
 }

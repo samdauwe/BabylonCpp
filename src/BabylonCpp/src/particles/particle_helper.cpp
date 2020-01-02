@@ -9,24 +9,23 @@
 
 namespace BABYLON {
 
-const char* ParticleHelper::BaseAssetsUrl = Constants::PARTICLES_BaseAssetsUrl;
+const char* ParticleHelper::BaseAssetsUrl = ParticleSystemSet::BaseAssetsUrl;
 
-IParticleSystem* ParticleHelper::CreateDefault(
-  const std::variant<AbstractMeshPtr, Vector3>& emitter, size_t capacity,
-  Scene* scene, bool useGPU)
+IParticleSystem*
+ParticleHelper::CreateDefault(const std::variant<AbstractMeshPtr, Vector3>& emitter,
+                              size_t capacity, Scene* scene, bool useGPU)
 {
   IParticleSystem* system = nullptr;
   if (useGPU) {
-    system
-      = new GPUParticleSystem("default system", capacity, std::nullopt, scene);
+    system = new GPUParticleSystem("default system", capacity, std::nullopt, scene);
   }
   else {
     system = new ParticleSystem("default system", capacity, scene);
   }
 
-  system->emitter         = emitter;
-  system->particleTexture = Texture::New(
-    "https://www.babylonjs.com/assets/Flare.png", system->getScene());
+  system->emitter = emitter;
+  system->particleTexture
+    = Texture::New("https://www.babylonjs.com/assets/Flare.png", system->getScene());
   system->createConeEmitter(0.1f, Math::PI / 4.f);
 
   // Particle color
@@ -50,8 +49,8 @@ IParticleSystem* ParticleHelper::CreateDefault(
   return system;
 }
 
-ParticleSystemSet* ParticleHelper::CreateAsync(const std::string& /*type*/,
-                                               Scene* /*scene*/, bool /*gpu*/)
+ParticleSystemSet* ParticleHelper::CreateAsync(const std::string& /*type*/, Scene* /*scene*/,
+                                               bool /*gpu*/)
 {
   return nullptr;
 }

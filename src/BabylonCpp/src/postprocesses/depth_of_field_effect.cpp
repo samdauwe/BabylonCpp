@@ -13,32 +13,23 @@
 
 namespace BABYLON {
 
-DepthOfFieldEffect::DepthOfFieldEffect(Scene* scene,
-                                       RenderTargetTexture* iDepthTexture,
+DepthOfFieldEffect::DepthOfFieldEffect(Scene* scene, RenderTargetTexture* iDepthTexture,
                                        DepthOfFieldEffectBlurLevel blurLevel,
-                                       unsigned int pipelineTextureType,
-                                       bool blockCompilation)
+                                       unsigned int pipelineTextureType, bool blockCompilation)
     : PostProcessRenderEffect{scene->getEngine(), "depth of field",
-                              [&]() -> std::vector<PostProcessPtr> {
-                                return _effects;
-                              },
-                              true}
-    , focalLength{this, &DepthOfFieldEffect::get_focalLength,
-                  &DepthOfFieldEffect::set_focalLength}
-    , fStop{this, &DepthOfFieldEffect::get_fStop,
-            &DepthOfFieldEffect::set_fStop}
+                              [&]() -> std::vector<PostProcessPtr> { return _effects; }, true}
+    , focalLength{this, &DepthOfFieldEffect::get_focalLength, &DepthOfFieldEffect::set_focalLength}
+    , fStop{this, &DepthOfFieldEffect::get_fStop, &DepthOfFieldEffect::set_fStop}
     , focusDistance{this, &DepthOfFieldEffect::get_focusDistance,
                     &DepthOfFieldEffect::set_focusDistance}
-    , lensSize{this, &DepthOfFieldEffect::get_lensSize,
-               &DepthOfFieldEffect::set_lensSize}
+    , lensSize{this, &DepthOfFieldEffect::get_lensSize, &DepthOfFieldEffect::set_lensSize}
     , depthTexture{this, &DepthOfFieldEffect::set_depthTexture}
 {
   // Circle of confusion value for each pixel is used to determine how
   // much to blur that pixel
   _circleOfConfusion = std::make_unique<CircleOfConfusionPostProcess>(
-    "circleOfConfusion", iDepthTexture, 1.f, nullptr,
-    TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-    pipelineTextureType, blockCompilation);
+    "circleOfConfusion", iDepthTexture, 1.f, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
+    scene->getEngine(), false, pipelineTextureType, blockCompilation);
 
   // Create a pyramid of blurred images (eg. fullSize 1/4 blur, half
   // size 1/2 blur, quarter size 3/4 blur, eith size 4/4 blur) Blur the
@@ -66,23 +57,20 @@ DepthOfFieldEffect::DepthOfFieldEffect(Scene* scene,
       break;
     }
   }
-  auto adjustedKernelSize
-    = static_cast<float>(kernelSize / std::pow(2, blurCount - 1));
-  auto ratio = 1.f;
+  auto adjustedKernelSize = static_cast<float>(kernelSize / std::pow(2, blurCount - 1));
+  auto ratio              = 1.f;
   for (int i = 0; i < blurCount; ++i) {
     auto blurY = DepthOfFieldBlurPostProcess::New(
-      "verticle blur", scene, Vector2(0.f, 1.f), adjustedKernelSize, ratio,
-      nullptr, _depthOfFieldPass.get(),
-      i == 0 ? _circleOfConfusion.get() : nullptr,
-      TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-      pipelineTextureType, blockCompilation);
+      "verticle blur", scene, Vector2(0.f, 1.f), adjustedKernelSize, ratio, nullptr,
+      _depthOfFieldPass, i == 0 ? _circleOfConfusion : nullptr,
+      TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false, pipelineTextureType,
+      blockCompilation);
     blurY->autoClear = false;
     ratio            = 0.75f / std::pow(2.f, static_cast<float>(i));
     auto blurX       = DepthOfFieldBlurPostProcess::New(
-      "horizontal blur", scene, Vector2(1.f, 0.f), adjustedKernelSize, ratio,
-      nullptr, _depthOfFieldPass.get(), nullptr,
-      TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-      pipelineTextureType, blockCompilation);
+      "horizontal blur", scene, Vector2(1.f, 0.f), adjustedKernelSize, ratio, nullptr,
+      _depthOfFieldPass, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(),
+      false, pipelineTextureType, blockCompilation);
     blurX->autoClear = false;
     _depthOfFieldBlurY.emplace_back(blurY);
     _depthOfFieldBlurX.emplace_back(blurX);
@@ -90,8 +78,7 @@ DepthOfFieldEffect::DepthOfFieldEffect(Scene* scene,
 
   std::vector<PostProcessPtr> blurSteps;
   for (auto& depthOfFieldBlurX : _depthOfFieldBlurX) {
-    blurSteps.emplace_back(
-      std::dynamic_pointer_cast<PostProcess>(depthOfFieldBlurX));
+    blurSteps.emplace_back(std::dynamic_pointer_cast<PostProcess>(depthOfFieldBlurX));
   }
 
   // Set all post processes on the effect.
@@ -104,15 +91,14 @@ DepthOfFieldEffect::DepthOfFieldEffect(Scene* scene,
   // Cast DepthOfFieldBlurPostProcess to PostProcess
   std::vector<PostProcessPtr> castedDepthOfFieldBlurX;
   for (const auto& depthOfFieldBlurX : _depthOfFieldBlurX) {
-    castedDepthOfFieldBlurX.emplace_back(
-      std::static_pointer_cast<PostProcess>(depthOfFieldBlurX));
+    castedDepthOfFieldBlurX.emplace_back(std::static_pointer_cast<PostProcess>(depthOfFieldBlurX));
   }
 
   // Merge blurred images with original image based on circleOfConfusion
   _dofMerge = DepthOfFieldMergePostProcess::New(
-    "dofMerge", _circleOfConfusion, _circleOfConfusion, castedDepthOfFieldBlurX,
-    ratio, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(),
-    false, pipelineTextureType, blockCompilation);
+    "dofMerge", _circleOfConfusion, _circleOfConfusion, castedDepthOfFieldBlurX, ratio, nullptr,
+    TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false, pipelineTextureType,
+    blockCompilation);
   _dofMerge->autoClear = false;
   _effects.emplace_back(_dofMerge);
 }

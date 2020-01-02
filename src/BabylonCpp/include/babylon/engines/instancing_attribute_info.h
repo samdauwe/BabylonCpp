@@ -11,35 +11,44 @@ namespace BABYLON {
  */
 struct BABYLON_SHARED_EXPORT InstancingAttributeInfo {
   /**
-   * Index/offset of the attribute in the vertex shader
+   * Name of the GLSL attribute
+   * if attribute index is not specified, this is used to retrieve the index from the effect
    */
-  unsigned int index;
+  std::string attributeName;
+
+  /**
+   * Index/offset of the attribute in the vertex shader
+   * if not specified, this will be computes from the name.
+   */
+  std::optional<unsigned int> index = std::nullopt;
 
   /**
    * size of the attribute, 1, 2, 3 or 4
    */
-  int attributeSize;
+  int attributeSize = 0;
+
+  /**
+   * Offset of the data in the Vertex Buffer acting as the instancing buffer
+   */
+  int offset = 0;
+
+  /**
+   * Modifies the rate at which generic vertex attributes advance when rendering multiple instances
+   * default to 1
+   */
+  std::optional<unsigned int> divisor = std::nullopt;
 
   /**
    * type of the attribute, gl.BYTE, gl.UNSIGNED_BYTE, gl.SHORT, gl.UNSIGNED_SHORT, gl.FIXED,
    * gl.FLOAT. default is FLOAT
    */
-  unsigned int attribyteType = GL::FLOAT;
+  std::optional<unsigned int> attributeType = std::nullopt;
 
   /**
    * normalization of fixed-point data. behavior unclear, use FALSE, default is FALSE
    */
-  bool normalized = false;
+  std::optional<bool> normalized = std::nullopt;
 
-  /**
-   * Offset of the data in the Vertex Buffer acting as the instancing buffer
-   */
-  int offset;
-
-  /**
-   * Name of the GLSL attribute, for debugging purpose only
-   */
-  std::string attributeName;
 }; // end of struct InstancingAttributeInfo
 
 } // end of namespace BABYLON
