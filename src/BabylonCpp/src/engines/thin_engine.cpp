@@ -2,6 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/babylon_version.h>
+#include <babylon/core/logging.h>
 #include <babylon/core/string.h>
 #include <babylon/engines/engine_store.h>
 #include <babylon/engines/extensions/alpha_extension.h>
@@ -13,6 +14,7 @@
 #include <babylon/engines/extensions/uniform_buffer_extension.h>
 #include <babylon/engines/instancing_attribute_info.h>
 #include <babylon/engines/scene.h>
+#include <babylon/engines/webgl/webgl2_shader_processor.h>
 #include <babylon/engines/webgl/webgl_pipeline_context.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/interfaces/icanvas_rendering_context2D.h>
@@ -31,6 +33,7 @@
 #include <babylon/maths/viewport.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/webgl/webgl_data_buffer.h>
+#include <babylon/misc/file_tools.h>
 #include <babylon/states/alpha_state.h>
 #include <babylon/states/depth_culling_state.h>
 #include <babylon/states/stencil_state.h>
@@ -95,6 +98,88 @@ ThinEngine::excludedCompressedTextureFormats(const std::string& url,
   return skipCompression() ? "" : textureFormatInUse;
 }
 
+ThinEngine::ThinEngine(ICanvas* canvas, const EngineOptions& options)
+    : supportsUniformBuffers{this, &ThinEngine::get_supportsUniformBuffers}
+    , needPOTTextures{this, &ThinEngine::get_needPOTTextures}
+    , doNotHandleContextLost{this, &ThinEngine::get_doNotHandleContextLost,
+                             &ThinEngine::set_doNotHandleContextLost}
+    , _alphaState{std::make_unique<AlphaState>()}
+    , texturesSupported{this, &ThinEngine::get_texturesSupported}
+    , textureFormatInUse{this, &ThinEngine::get_textureFormatInUse}
+    , currentViewport{this, &ThinEngine::get_currentViewport}
+    , emptyTexture{this, &ThinEngine::get_emptyTexture}
+    , emptyTexture3D{this, &ThinEngine::get_emptyTexture3D}
+    , emptyTexture2DArray{this, &ThinEngine::get_emptyTexture2DArray}
+    , emptyCubeTexture{this, &ThinEngine::get_emptyCubeTexture}
+    , webGLVersion{this, &ThinEngine::get_webGLVersion}
+    , isStencilEnable{this, &ThinEngine::get_isStencilEnable}
+    , depthCullingState{this, &ThinEngine::get_depthCullingState}
+    , alphaState{this, &ThinEngine::get_alphaState}
+    , stencilState{this, &ThinEngine::get_stencilState}
+    , _depthCullingState{std::make_unique<DepthCullingState>()}
+    , _stencilState{std::make_unique<StencilState>()}
+    , _supportsHardwareTextureRescaling{this, &ThinEngine::get__supportsHardwareTextureRescaling}
+    , _alphaExtension{std::make_unique<AlphaExtension>(this)}
+    , _cubeTextureExtension{std::make_unique<CubeTextureExtension>(this)}
+    , _dynamicTextureExtension{std::make_unique<DynamicTextureExtension>(this)}
+    , _multiRenderExtension{std::make_unique<MultiRenderExtension>(this)}
+    , _renderTargetExtension{std::make_unique<RenderTargetExtension>(this)}
+    , _renderTargetCubeExtension{std::make_unique<RenderTargetCubeExtension>(this)}
+    , _uniformBufferExtension{std::make_unique<UniformBufferExtension>(this)}
+{
+  if (!canvas) {
+    return;
+  }
+
+  // GL
+  if (!options.disableWebGL2Support) {
+    _gl = canvas->getContext3d(options);
+    if (_gl) {
+      _webGLVersion = 2.f;
+    }
+  }
+
+  if (!_gl) {
+    if (!canvas) {
+      BABYLON_LOG_ERROR("ThinEngine", "The provided canvas is null or undefined")
+      return;
+    }
+    _gl = canvas->getContext3d(options);
+  }
+
+  if (!_gl) {
+    BABYLON_LOG_ERROR("ThinEngine", "GL not supported")
+    return;
+  }
+
+  // Viewport
+  _hardwareScalingLevel = options.adaptToDeviceRatio ? 1 : 1;
+  resize();
+
+  _isStencilEnable = options.stencil;
+  _initGLContext();
+
+  // Prepare buffer pointers
+  for (unsigned int i = 0, ul = static_cast<unsigned>(_caps.maxVertexAttribs); i < ul; ++i) {
+    _currentBufferPointers[i] = BufferPointer();
+  }
+
+  // Shader processor
+  if (webGLVersion() > 1.f) {
+    _shaderProcessor = std::make_shared<WebGL2ShaderProcessor>();
+  }
+
+  // Detect if we are running on a faulty buggy OS.
+  _badOS = false;
+
+  // Detect if we are running on a faulty buggy desktop OS.
+  _badDesktopOS = false;
+
+  _creationOptions = options;
+  BABYLON_LOGF_INFO("ThinEngine", "Babylon.js v%s - %s", ThinEngine::Version().c_str(),
+                    description().c_str())
+}
+
 bool ThinEngine::get_supportsUniformBuffers() const
 {
   return webGLVersion() > 1.f && !disableUniformBuffers;
@@ -120,7 +205,7 @@ bool ThinEngine::get__supportsHardwareTextureRescaling() const
   return false;
 }
 
-std::string ThinEngine::get_textureFormatInUse()
+std::string ThinEngine::get_textureFormatInUse() const
 {
   return _textureFormatInUse;
 }
@@ -381,7 +466,7 @@ void ThinEngine::_initGLContext()
   }
 }
 
-float ThinEngine::get_webGLVersion()
+float ThinEngine::get_webGLVersion() const
 {
   return _webGLVersion;
 }
@@ -742,7 +827,8 @@ void ThinEngine::restoreDefaultFramebuffer()
 void ThinEngine::_resetVertexBufferBinding()
 {
   bindArrayBuffer(nullptr);
-  _cachedVertexBuffers.clear();
+  _cachedVertexBuffersMap.clear();
+  _cachedVertexBuffers = nullptr;
 }
 
 WebGLDataBufferPtr ThinEngine::createVertexBuffer(const Float32Array& data)
@@ -998,8 +1084,9 @@ void ThinEngine::bindVertexArrayObject(const WebGLVertexArrayObjectPtr& vertexAr
     _cachedVertexArrayObject = vertexArrayObject;
 
     _gl->bindVertexArray(vertexArrayObject.get());
-    _cachedVertexBuffers.clear();
-    _cachedIndexBuffer = nullptr;
+    _cachedVertexBuffersMap.clear();
+    _cachedVertexBuffers = nullptr;
+    _cachedIndexBuffer   = nullptr;
 
     _uintIndicesCurrentlySet  = indexBuffer != nullptr && indexBuffer->is32Bits;
     _mustWipeVertexAttributes = true;
@@ -1424,7 +1511,7 @@ IPipelineContextPtr ThinEngine::createPipelineContext()
     pipelineContext->isParallelCompiled = true;
   }
 
-  return pipelineContext;
+  return std::static_pointer_cast<IPipelineContext>(pipelineContext);
 }
 
 WebGLProgramPtr ThinEngine::_createShaderProgram(
@@ -1449,13 +1536,13 @@ WebGLProgramPtr ThinEngine::_createShaderProgram(
   pipelineContext->fragmentShader = fragmentShader;
 
   if (!pipelineContext->isParallelCompiled) {
-    _finalizePipelineContext(pipelineContext);
+    _finalizePipelineContext(pipelineContext.get());
   }
 
   return shaderProgram;
 }
 
-void ThinEngine::_finalizePipelineContext(const WebGLPipelineContextPtr& pipelineContext)
+void ThinEngine::_finalizePipelineContext(WebGLPipelineContext* pipelineContext)
 {
   const auto& context        = pipelineContext->context;
   const auto& vertexShader   = pipelineContext->vertexShader;
@@ -1535,9 +1622,9 @@ void ThinEngine::_preparePipelineContext(const IPipelineContextPtr& pipelineCont
   webGLRenderingState->program->__SPECTOR_rebuildProgram = nullptr; // rebuildRebind;
 }
 
-bool ThinEngine::_isRenderingStateCompiled(const IPipelineContextPtr& pipelineContext)
+bool ThinEngine::_isRenderingStateCompiled(IPipelineContext* pipelineContext)
 {
-  auto webGLPipelineContext = std::static_pointer_cast<WebGLPipelineContext>(pipelineContext);
+  auto webGLPipelineContext = static_cast<WebGLPipelineContext*>(pipelineContext);
   if (_gl->getProgramParameter(webGLPipelineContext->program.get(),
                                _caps.parallelShaderCompile->COMPLETION_STATUS_KHR)) {
     _finalizePipelineContext(webGLPipelineContext);
@@ -2154,7 +2241,7 @@ InternalTexturePtr ThinEngine::createTexture(
                             img.height, 0, GL::RGBA, GL::UNSIGNED_BYTE, &img.data);
 
             _rescaleTexture(source, texture, scene, internalFormat, [&]() {
-              _releaseTexture(source.get());
+              _releaseTexture(source);
               _bindTextureDirectly(GL::TEXTURE_2D, texture);
 
               continuationCallback();
@@ -2171,18 +2258,35 @@ InternalTexturePtr ThinEngine::createTexture(
         // onload(buffer);
       }
       else {
-        ThinEngine::_FileToolsLoadImage(url, onload, onInternalError, invertY);
+        ThinEngine::_FileToolsLoadImageFromUrl(url, onload, onInternalError, invertY, mimeType);
       }
     }
     else if (buffer.has_value()
              && (std::holds_alternative<std::string>(*buffer)
                  || std::holds_alternative<ArrayBuffer>(*buffer)
                  || std::holds_alternative<Image>(*buffer))) {
-      ThinEngine::_FileToolsLoadImage(*buffer, invertY, onload, onInternalError);
+      ThinEngine::_FileToolsLoadImage(*buffer, invertY, onload, onInternalError, mimeType);
     }
   }
 
   return texture;
+}
+
+void ThinEngine::_FileToolsLoadImageFromUrl(
+  std::string url, const std::function<void(const Image& img)>& onLoad,
+  const std::function<void(const std::string& message, const std::string& exception)>& onError,
+  bool flipVertically, const std::string& /*mimeType*/)
+{
+  FileTools::LoadImageFromUrl(url, onLoad, onError, flipVertically);
+}
+
+void ThinEngine::_FileToolsLoadImage(
+  const std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>& input, bool invertY,
+  const std::function<void(const Image& img)>& onLoad,
+  const std::function<void(const std::string& message, const std::string& exception)>& onError,
+  const std::string& /*mimeType*/)
+{
+  FileTools::LoadImageFromBuffer(input, invertY, onLoad, onError);
 }
 
 void ThinEngine::_unpackFlipY(bool value)
@@ -2235,22 +2339,26 @@ void ThinEngine::updateTextureSamplingMode(unsigned int samplingMode,
 }
 
 void ThinEngine::updateTextureWrappingMode(const InternalTexturePtr& texture,
-                                           std::optional<int> wrapU, std::optional<int> wrapV,
-                                           std::optional<int> wrapR)
+                                           std::optional<unsigned int> wrapU,
+                                           std::optional<unsigned int> wrapV,
+                                           std::optional<unsigned int> wrapR)
 {
   const auto target = _getTextureTarget(texture);
 
   if (wrapU) {
-    _setTextureParameterInteger(target, GL::TEXTURE_WRAP_S, _getTextureWrapMode(*wrapU)), texture);
-    texture->_cachedWrapU = *wrapU;
+    _setTextureParameterInteger(target, GL::TEXTURE_WRAP_S,
+                                static_cast<int>(_getTextureWrapMode(*wrapU)), texture);
+    texture->_cachedWrapU = static_cast<int>(*wrapU);
   }
   if (wrapV) {
-    _setTextureParameterInteger(target, GL::TEXTURE_WRAP_T, _getTextureWrapMode(*wrapV), texture);
-    texture->_cachedWrapV = *wrapV;
+    _setTextureParameterInteger(target, GL::TEXTURE_WRAP_T,
+                                static_cast<int>(_getTextureWrapMode(*wrapV)), texture);
+    texture->_cachedWrapV = static_cast<int>(*wrapV);
   }
   if (wrapR) {
-    _setTextureParameterInteger(target, GL::TEXTURE_WRAP_R, _getTextureWrapMode(*wrapR), texture);
-    texture->_cachedWrapR = *wrapR;
+    _setTextureParameterInteger(target, GL::TEXTURE_WRAP_R,
+                                static_cast<int>(_getTextureWrapMode(*wrapR)), texture);
+    texture->_cachedWrapR = static_cast<int>(*wrapR);
   }
 
   _bindTextureDirectly(target, nullptr);
@@ -2471,7 +2579,7 @@ WebGLRenderbufferPtr ThinEngine::_getDepthStencilBuffer(int width, int height, i
   auto& gl                = *_gl;
   auto depthStencilBuffer = gl.createRenderbuffer();
 
-  gl.bindRenderbuffer(GL::RENDERBUFFER, depthStencilBuffer);
+  gl.bindRenderbuffer(GL::RENDERBUFFER, depthStencilBuffer.get());
 
   if (samples > 1) {
     gl.renderbufferStorageMultisample(GL::RENDERBUFFER, samples, msInternalFormat, width, height);
@@ -2944,11 +3052,11 @@ void ThinEngine::dispose()
 
   // Empty texture
   if (_emptyTexture) {
-    _releaseTexture(_emptyTexture.get());
+    _releaseTexture(_emptyTexture);
     _emptyTexture = nullptr;
   }
   if (_emptyCubeTexture) {
-    _releaseTexture(_emptyCubeTexture.get());
+    _releaseTexture(_emptyCubeTexture);
     _emptyCubeTexture = nullptr;
   }
 
@@ -2964,7 +3072,6 @@ void ThinEngine::dispose()
   _currentBufferPointers = {};
   _renderingCanvas       = nullptr;
   _currentProgram        = nullptr;
-  _boundRenderFunction   = nullptr;
 
   Effect::ResetCache();
 }
@@ -3332,6 +3439,17 @@ unsigned int ThinEngine::_getRGBAMultiSampleBufferFormat(unsigned int type) cons
   }
 
   return GL::RGBA8;
+}
+
+IFileRequest ThinEngine::_loadFile(
+  const std::string& url,
+  const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
+                           const std::string& responseURL)>& onSuccess,
+  const std::function<void(const ProgressEvent& event)>& onProgress, bool useArrayBuffer,
+  const std::function<void(const std::string& message, const std::string& exception)>& onError)
+{
+  FileTools::LoadFile(url, onSuccess, onProgress, useArrayBuffer, onError);
+  return IFileRequest();
 }
 
 Uint8Array ThinEngine::readPixels(int x, int y, int width, int height, bool hasAlpha)

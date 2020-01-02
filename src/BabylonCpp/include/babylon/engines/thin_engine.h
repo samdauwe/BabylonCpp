@@ -29,7 +29,9 @@ class Color4;
 class Effect;
 struct EffectCreationOptions;
 class ICanvasRenderingContext2D;
+struct IFileRequest;
 struct IInternalTextureLoader;
+struct IMultiRenderTargetOptions;
 struct InstancingAttributeInfo;
 class InternalTexture;
 class IPipelineContext;
@@ -37,7 +39,7 @@ struct IRenderTargetOptions;
 struct IShaderProcessor;
 struct ISize;
 class MultiRenderExtension;
-struct IMultiRenderTargetOptions;
+class ProgressEvent;
 struct RenderTargetCreationOptions;
 class RenderTargetCubeExtension;
 class RenderTargetExtension;
@@ -115,8 +117,13 @@ public:
                                                const std::string& textureFormatInUse) const;
 
 public:
-  ThinEngine();
-  virtual ~ThinEngine();
+  template <typename... Ts>
+  static std::unique_ptr<ThinEngine> New(Ts&&... args)
+  {
+    std::unique_ptr<ThinEngine> engine(new ThinEngine(std::forward<Ts>(args)...));
+    return engine;
+  }
+  virtual ~ThinEngine(); // = default
 
   /**
    * @brief Gets a boolean indicating if all created effects are ready.
@@ -573,7 +580,7 @@ public:
   /**
    * @brief Hidden
    */
-  bool _isRenderingStateCompiled(const IPipelineContextPtr& pipelineContext);
+  bool _isRenderingStateCompiled(IPipelineContext* pipelineContext);
 
   /**
    * @brief Hidden
@@ -815,6 +822,37 @@ public:
     const std::string& mimeType                                  = "");
 
   /**
+   * @brief Loads an image as an HTMLImageElement.
+   * @param input url string
+   * @param onLoad callback called when the image successfully loads
+   * @param onError callback called when the image fails to load
+   * @param offlineProvider offline provider for caching
+   * @param mimeType optional mime type
+   * @returns the HTMLImageElement of the loaded image
+   * @hidden
+   */
+  static void _FileToolsLoadImageFromUrl(
+    std::string url, const std::function<void(const Image& img)>& onLoad,
+    const std::function<void(const std::string& message, const std::string& exception)>& onError,
+    bool flipVertically = false, const std::string& mimeType = "");
+
+  /**
+   * @brief Loads an image as an HTMLImageElement.
+   * @param input url string, ArrayBuffer, or Blob to load
+   * @param onLoad callback called when the image successfully loads
+   * @param onError callback called when the image fails to load
+   * @param offlineProvider offline provider for caching
+   * @param mimeType optional mime type
+   * @returns the HTMLImageElement of the loaded image
+   * @hidden
+   */
+  static void _FileToolsLoadImage(
+    const std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>& input, bool invertY,
+    const std::function<void(const Image& img)>& onLoad,
+    const std::function<void(const std::string& message, const std::string& exception)>& onError,
+    const std::string& mimeType);
+
+  /**
    * @brief Rescales a texture.
    * @param source input texutre
    * @param destination destination texture
@@ -932,9 +970,10 @@ public:
    * @param wrapV defines the texture wrap mode of the v coordinates
    * @param wrapR defines the texture wrap mode of the r coordinates
    */
-  void updateTextureWrappingMode(const InternalTexturePtr& texture, std::optional<int> wrapU,
-                                 std::optional<int> wrapV = std::nullopt,
-                                 std::optional<int> wrapR = std::nullopt);
+  void updateTextureWrappingMode(const InternalTexturePtr& texture,
+                                 std::optional<unsigned int> wrapU,
+                                 std::optional<unsigned int> wrapV = std::nullopt,
+                                 std::optional<unsigned int> wrapR = std::nullopt);
 
   /**
    * @brief Hidden
@@ -1073,6 +1112,18 @@ public:
    * @brief Hidden
    */
   unsigned int _getRGBAMultiSampleBufferFormat(unsigned int type) const;
+
+  /**
+   * @brief Hidden
+   */
+  IFileRequest _loadFile(
+    const std::string& url,
+    const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
+                             const std::string& responseURL)>& onSuccess,
+    const std::function<void(const ProgressEvent& event)>& onProgress = nullptr,
+    bool useArrayBuffer                                               = false,
+    const std::function<void(const std::string& message, const std::string& exception)>& onError
+    = nullptr);
 
   /**
    * @brief Reads pixels from the current frame buffer. Please note that this function can be slow
@@ -1391,6 +1442,19 @@ public:
 
 protected:
   /**
+   * @brief Creates a new engine.
+   * @param canvasOrContext defines the canvas or WebGL context to use for rendering. If you provide
+   * a WebGL context, Babylon.js will not hook events on the canvas (like pointers, keyboards,
+   * etc...) so no event observables will be available. This is mostly used when Babylon.js is used
+   * as a plugin on a system which alreay used the WebGL context
+   * @param antialias defines enable antialiasing (default: false)
+   * @param options defines further options to be sent to the getContext() function
+   * @param adaptToDeviceRatio defines whether to adapt to the device's viewport characteristics
+   * (default: false)
+   */
+  ThinEngine(ICanvas* canvas, const EngineOptions& options = EngineOptions());
+
+  /**
    * @brief Gets a boolean indicating that the engine supports uniform buffers.
    * @see http://doc.babylonjs.com/features/webgl2#uniform-buffer-objets
    */
@@ -1430,7 +1494,7 @@ protected:
   /**
    * @brief Gets the list of texture formats in use.
    */
-  std::string get_textureFormatInUse();
+  std::string get_textureFormatInUse() const;
 
   /**
    * @brief Gets the current viewport.
@@ -1460,7 +1524,7 @@ protected:
   /**
    * @brief Gets version of the current webGL context.
    */
-  float get_webGLVersion();
+  float get_webGLVersion() const;
 
   /**
    * @brief Returns true if the stencil buffer has been enabled through the creation option of the
@@ -1500,7 +1564,7 @@ protected:
                        const WebGLShaderPtr& vertexShader, const WebGLShaderPtr& fragmentShader,
                        WebGLRenderingContext* context,
                        const std::vector<std::string>& transformFeedbackVaryings = {});
-  void _finalizePipelineContext(const WebGLPipelineContextPtr& pipelineContext);
+  void _finalizePipelineContext(WebGLPipelineContext* pipelineContext);
   void _prepareWebGLTextureContinuation(const InternalTexturePtr& texture, Scene* scene,
                                         bool noMipmap, bool isCompressed,
                                         unsigned int samplingMode);
@@ -1784,7 +1848,9 @@ protected:
   /** @hidden */
   std::optional<Viewport> _cachedViewport = std::nullopt;
   /** @hidden */
-  std::unordered_map<std::string, VertexBufferPtr> _cachedVertexBuffers;
+  WebGLDataBufferPtr _cachedVertexBuffers = nullptr;
+  /** @hidden */
+  std::unordered_map<std::string, VertexBufferPtr> _cachedVertexBuffersMap;
   /** @hidden */
   WebGLDataBufferPtr _cachedIndexBuffer = nullptr;
   /** @hidden */

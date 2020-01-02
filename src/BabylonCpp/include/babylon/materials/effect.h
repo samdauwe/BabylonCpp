@@ -40,6 +40,9 @@ class IGLProgram;
 class IGLUniformLocation;
 } // end of namespace GL
 
+using WebGLProgramPtr         = std::shared_ptr<GL::IGLProgram>;
+using WebGLUniformLocationPtr = std::shared_ptr<GL::IGLUniformLocation>;
+
 /**
  * @brief Effect containing vertex and fragment shader that can be executed on an object.
  */
@@ -134,7 +137,7 @@ public:
    * @param uniformName of the uniform to look up.
    * @returns the location of the uniform.
    */
-  GL::IGLUniformLocation* getUniform(const std::string& uniformName);
+  WebGLUniformLocationPtr getUniform(const std::string& uniformName);
 
   /**
    * @brief Returns an array of sampler variable names
@@ -636,7 +639,7 @@ private:
   std::string _compilationError;
   std::vector<std::string> _attributesNames;
   Int32Array _attributes;
-  std::unordered_map<std::string, std::unique_ptr<GL::IGLUniformLocation>> _uniforms;
+  std::unordered_map<std::string, WebGLUniformLocationPtr> _uniforms;
   std::unordered_map<std::string, unsigned int> _indexParameters;
   std::unique_ptr<EffectFallbacks> _fallbacks;
   std::string _vertexSourceCode;

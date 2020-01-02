@@ -245,10 +245,10 @@ int Effect::getUniformIndex(const std::string& uniformName)
   return stl_util::index_of(_uniformsNames, uniformName);
 }
 
-GL::IGLUniformLocation* Effect::getUniform(const std::string& uniformName)
+WebGLUniformLocationPtr Effect::getUniform(const std::string& uniformName)
 {
   if (stl_util::contains(_uniforms, uniformName)) {
-    return _uniforms[uniformName].get();
+    return _uniforms[uniformName];
   }
 
   return nullptr;

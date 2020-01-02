@@ -13,12 +13,13 @@ class IGLProgram;
 class IGLRenderingContext;
 class IGLShader;
 class IGLTransformFeedback;
-using IGLProgramPtr           = std::shared_ptr<IGLProgram>;
-using IGLShaderPtr            = std::shared_ptr<IGLShader>;
-using IGLTransformFeedbackPtr = std::shared_ptr<IGLTransformFeedback>;
 } // end of namespace GL
 
-class Engine;
+class ThinEngine;
+using WebGLProgramPtr           = std::shared_ptr<GL::IGLProgram>;
+using WebGLRenderingContext     = std::shared_ptr<GL::IGLRenderingContext>;
+using WebGLShaderPtr            = std::shared_ptr<GL::IGLShader>;
+using WebGLTransformFeedbackPtr = std::shared_ptr<GL::IGLTransformFeedback>;
 
 /**
  * @brief Hidden
@@ -41,17 +42,22 @@ public:
   bool isReady() override;
 
   void _handlesSpectorRebuildCallback(
-    const std::function<void(const GL::IGLProgramPtr& program)>& onCompiled);
+    const std::function<void(const WebGLProgramPtr& program)>& onCompiled);
 
 public:
-  Engine* engine;
-  GL::IGLProgramPtr program;
-  GL::IGLRenderingContext* context;
-  GL::IGLShaderPtr vertexShader;
-  GL::IGLShaderPtr fragmentShader;
+  ThinEngine* engine;
+  WebGLProgramPtr program;
+  WebGLRenderingContext* context;
+  WebGLShaderPtr vertexShader;
+  WebGLShaderPtr fragmentShader;
   bool isParallelCompiled;
   std::function<void()> onCompiled;
-  GL::IGLTransformFeedbackPtr transformFeedback;
+  WebGLTransformFeedbackPtr transformFeedback;
+
+  std::string vertexCompilationError;
+  std::string fragmentCompilationError;
+  std::string programLinkError;
+  std::string programValidationError;
 
 }; // end of class WebGLPipelineContext
 

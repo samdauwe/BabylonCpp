@@ -515,12 +515,14 @@ enum GLEnums : GLenum {
 
 class IGLFramebuffer;
 class IGLProgram;
+class IGLRenderbuffer;
 class IGLShader;
 class IGLTexture;
 class IGLTransformFeedback;
 class IGLVertexArrayObject;
 using IGLFramebufferPtr       = std::shared_ptr<IGLFramebuffer>;
 using IGLProgramPtr           = std::shared_ptr<IGLProgram>;
+using IGLRenderbufferPtr      = std::shared_ptr<IGLRenderbuffer>;
 using IGLShaderPtr            = std::shared_ptr<IGLShader>;
 using IGLTexturePtr           = std::shared_ptr<IGLTexture>;
 using IGLTransformFeedbackPtr = std::shared_ptr<IGLTransformFeedback>;
@@ -838,8 +840,7 @@ public:
    * @param target A GLenum specifying the binding point (target).
    * @param renderbuffer A IGLRenderbuffer object to bind.
    */
-  virtual void bindRenderbuffer(GLenum target, const std::unique_ptr<IGLRenderbuffer>& renderbuffer)
-    = 0;
+  virtual void bindRenderbuffer(GLenum target, IGLRenderbuffer* renderbuffer) = 0;
 
   /**
    * @brief Binds a IGLTexture object to a given target.
@@ -1215,7 +1216,7 @@ public:
    * @return A IGLRenderbuffer object that stores data such an image, or can be
    * source or target of an rendering operation.
    */
-  virtual std::unique_ptr<IGLRenderbuffer> createRenderbuffer() = 0;
+  virtual IGLRenderbufferPtr createRenderbuffer() = 0;
 
   /**
    * @brief Creates a IGLShader that can then be configured further using
