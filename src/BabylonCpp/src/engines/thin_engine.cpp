@@ -156,7 +156,7 @@ ThinEngine::ThinEngine(ICanvas* canvas, const EngineOptions& options)
   }
 
   // Viewport
-  _hardwareScalingLevel = options.adaptToDeviceRatio ? 1 : 1;
+  _hardwareScalingLevel = options.adaptToDeviceRatio ? 1.f : 1.f;
   resize();
 
   _isStencilEnable = options.stencil;
@@ -530,7 +530,7 @@ GL::GLInfo ThinEngine::getGlInfo()
   };
 }
 
-void ThinEngine::setHardwareScalingLevel(int level)
+void ThinEngine::setHardwareScalingLevel(float level)
 {
   _hardwareScalingLevel = level;
   resize();
@@ -1310,14 +1310,15 @@ void ThinEngine::disableInstanceAttributeByName(const std::string& name)
 
 void ThinEngine::disableInstanceAttribute(unsigned int attributeLocation)
 {
-  auto shouldClean = false;
-  auto index       = 0;
-  while ((index = stl_util::index_of(_currentInstanceLocations, attributeLocation)) != -1) {
+  auto shouldClean        = false;
+  auto index              = 0;
+  auto _attributeLocation = static_cast<int>(attributeLocation);
+  while ((index = stl_util::index_of(_currentInstanceLocations, _attributeLocation)) != -1) {
     stl_util::splice(_currentInstanceLocations, index, 1);
     stl_util::splice(_currentInstanceBuffers, index, 1);
 
     shouldClean = true;
-    index       = stl_util::index_of(_currentInstanceLocations, attributeLocation);
+    index       = stl_util::index_of(_currentInstanceLocations, _attributeLocation);
   }
 
   if (shouldClean) {
@@ -3287,7 +3288,8 @@ bool ThinEngine::_canRenderToFramebuffer(unsigned int type)
   auto& gl = *_gl;
 
   // clear existing errors
-  while (gl.getError() != GL::NO_ERROR) {
+  const GL::GLenum GL_NO_ERROR = 0x0000;
+  while (gl.getError() != GL_NO_ERROR) {
   }
 
   auto successful = true;
@@ -3305,12 +3307,12 @@ bool ThinEngine::_canRenderToFramebuffer(unsigned int type)
   auto status = gl.checkFramebufferStatus(GL::FRAMEBUFFER);
 
   successful = successful && (status == GL::FRAMEBUFFER_COMPLETE);
-  successful = successful && (gl.getError() == GL::NO_ERROR);
+  successful = successful && (gl.getError() == GL_NO_ERROR);
 
   // try render by clearing frame buffer's color buffer
   if (successful) {
     gl.clear(GL::COLOR_BUFFER_BIT);
-    successful = successful && (gl.getError() == GL::NO_ERROR);
+    successful = successful && (gl.getError() == GL_NO_ERROR);
   }
 
   // try reading from frame to ensure render occurs (just creating the FBO is not sufficient to
@@ -3323,7 +3325,7 @@ bool ThinEngine::_canRenderToFramebuffer(unsigned int type)
     auto readType   = GL::UNSIGNED_BYTE;
     Uint8Array buffer(4);
     gl.readPixels(0, 0, 1, 1, readFormat, readType, buffer);
-    successful = successful && (gl.getError() == GL::NO_ERROR);
+    successful = successful && (gl.getError() == GL_NO_ERROR);
   }
 
   // clean up
@@ -3332,7 +3334,7 @@ bool ThinEngine::_canRenderToFramebuffer(unsigned int type)
   gl.bindFramebuffer(GL::FRAMEBUFFER, nullptr);
 
   // clear accumulated errors
-  while (!successful && (gl.getError() != GL::NO_ERROR)) {
+  while (!successful && (gl.getError() != GL_NO_ERROR)) {
   }
 
   return successful;

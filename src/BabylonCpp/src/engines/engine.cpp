@@ -385,13 +385,13 @@ void Engine::restoreStencilState()
 
 Viewport Engine::setDirectViewport(int x, int y, int width, int height)
 {
-  auto currentViewport = _cachedViewport;
+  auto iCurrentViewport = _cachedViewport;
   _cachedViewport      = std::nullopt;
 
   _viewport(static_cast<float>(x), static_cast<float>(y), static_cast<float>(width),
             static_cast<float>(height));
 
-  return *currentViewport;
+  return *iCurrentViewport;
 }
 
 void Engine::scissorClear(int x, int y, int width, int height, const Color4& clearColor)

@@ -44,7 +44,7 @@ struct BABYLON_SHARED_EXPORT GLInfo {
 enum GLEnums : GLenum {
   // FALSE = 0x0000,
   // TRUE  = 0x0001,
-  NO_ERROR = 0,
+  // NO_ERROR = 0x0000,
   /* ClearBufferMask */
   DEPTH_BUFFER_BIT   = 0x00000100,
   STENCIL_BUFFER_BIT = 0x00000400,

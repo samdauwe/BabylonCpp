@@ -162,7 +162,7 @@ public:
    * then the engine will render at twice the size of the canvas.
    * @param level defines the level to use
    */
-  void setHardwareScalingLevel(int level);
+  void setHardwareScalingLevel(float level);
 
   /**
    * @brief Gets the current hardware scaling level.
