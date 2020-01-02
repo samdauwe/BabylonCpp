@@ -845,8 +845,6 @@ void ThinEngine::_bindUnboundFramebuffer(const WebGLFramebufferPtr& framebuffer)
 void ThinEngine::unBindFramebuffer(const InternalTexturePtr& texture, bool disableGenerateMipMaps,
                                    const std::function<void()>& onBeforeUnbind)
 {
-  _currentRenderTarget = nullptr;
-
   // If MSAA, we need to bitblt back to main texture
   auto& gl = *_gl;
 
@@ -870,6 +868,8 @@ void ThinEngine::unBindFramebuffer(const InternalTexturePtr& texture, bool disab
     }
     onBeforeUnbind();
   }
+
+  _currentRenderTarget = nullptr;
 
   _bindUnboundFramebuffer(nullptr);
 }
