@@ -202,7 +202,7 @@ void GLRenderingContext::attachShader(IGLProgram* program, IGLShader* shader)
   glAttachShader(program->value, shader ? shader->value : 0);
 }
 
-void GLRenderingContext::beginQuery(GLenum target, const std::unique_ptr<IGLQuery>& query)
+void GLRenderingContext::beginQuery(GLenum target, IGLQuery* query)
 {
   glBeginQuery(target, query ? query->value : 0);
 }
@@ -233,8 +233,7 @@ void GLRenderingContext::bindBufferBase(GLenum target, GLuint index, IGLBuffer* 
   glBindBufferBase(target, index, buffer ? buffer->value : 0);
 }
 
-void GLRenderingContext::bindRenderbuffer(GLenum target,
-                                          const std::unique_ptr<IGLRenderbuffer>& renderbuffer)
+void GLRenderingContext::bindRenderbuffer(GLenum target, IGLRenderbuffer* renderbuffer)
 {
   glBindRenderbuffer(target, renderbuffer ? renderbuffer->value : 0);
 }
@@ -445,11 +444,11 @@ std::unique_ptr<IGLQuery> GLRenderingContext::createQuery()
   return std::make_unique<IGLQuery>(0);
 }
 
-std::unique_ptr<IGLRenderbuffer> GLRenderingContext::createRenderbuffer()
+IGLRenderbufferPtr GLRenderingContext::createRenderbuffer()
 {
   GLuint buffer;
   glGenRenderbuffers(1, &buffer);
-  return std::make_unique<IGLRenderbuffer>(buffer);
+  return std::make_shared<IGLRenderbuffer>(buffer);
 }
 
 IGLShaderPtr GLRenderingContext::createShader(GLenum type)
@@ -457,11 +456,11 @@ IGLShaderPtr GLRenderingContext::createShader(GLenum type)
   return std::make_shared<IGLShader>(glCreateShader(type));
 }
 
-std::unique_ptr<IGLTexture> GLRenderingContext::createTexture()
+IGLTexturePtr GLRenderingContext::createTexture()
 {
   GLuint texture = 0;
   glGenTextures(1, &texture);
-  return std::make_unique<IGLTexture>(texture);
+  return std::make_shared<IGLTexture>(texture);
 }
 
 IGLTransformFeedbackPtr GLRenderingContext::createTransformFeedback()
@@ -471,11 +470,11 @@ IGLTransformFeedbackPtr GLRenderingContext::createTransformFeedback()
   return std::make_shared<IGLTransformFeedback>(transformFeedbackArray);
 }
 
-std::unique_ptr<IGLVertexArrayObject> GLRenderingContext::createVertexArray()
+IGLVertexArrayObjectPtr GLRenderingContext::createVertexArray()
 {
   GLuint vertexArray = 0;
   glGenVertexArrays(1, &vertexArray);
-  return std::make_unique<IGLVertexArrayObject>(vertexArray);
+  return std::make_shared<IGLVertexArrayObject>(vertexArray);
 }
 
 void GLRenderingContext::cullFace(GLenum mode)
@@ -659,6 +658,11 @@ std::vector<IGLShader*> GLRenderingContext::getAttachedShaders(IGLProgram* /*pro
 GLint GLRenderingContext::getAttribLocation(IGLProgram* program, const std::string& name)
 {
   return glGetAttribLocation(program->value, name.c_str());
+}
+
+GL::any GLRenderingContext::getExtension(const std::string& /*name*/)
+{
+  return nullptr;
 }
 
 bool GLRenderingContext::hasExtension(const std::string& /*extension*/)

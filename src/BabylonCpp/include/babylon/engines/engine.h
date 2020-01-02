@@ -313,8 +313,13 @@ public:
   static std::function<PostProcessPtr(Engine* engine)> _RescalePostProcessFactory;
 
 public:
-  Engine();
-  ~Engine() override;
+  template <typename... Ts>
+  static std::unique_ptr<Engine> New(Ts&&... args)
+  {
+    std::unique_ptr<Engine> engine(new Engine(std::forward<Ts>(args)...));
+    return engine;
+  }
+  ~Engine() override; // = default
 
   // Events
 
@@ -355,14 +360,14 @@ public:
    * @see http://doc.babylonjs.com/babylon101/animations#deterministic-lockstep
    * @returns true if engine is in deterministic lock step mode
    */
-  bool isDeterministicLockStep() const;
+  virtual bool isDeterministicLockStep() const;
 
   /**
    * @brief Gets the max steps when engine is running in deterministic lock step.
    * @see http://doc.babylonjs.com/babylon101/animations#deterministic-lockstep
    * @returns the max steps
    */
-  unsigned int getLockstepMaxSteps() const;
+  virtual unsigned int getLockstepMaxSteps() const;
 
   /**
    * @brief Returns the time in ms between steps when using deterministic lock step.
@@ -919,13 +924,13 @@ public:
    * @brief Display the loading screen.
    * @see http://doc.babylonjs.com/how_to/creating_a_custom_loading_screen
    */
-  void displayLoadingUI();
+  virtual void displayLoadingUI();
 
   /**
    * @brief Hide the loading screen.
    * @see http://doc.babylonjs.com/how_to/creating_a_custom_loading_screen
    */
-  void hideLoadingUI();
+  virtual void hideLoadingUI();
 
   /** Pointerlock and fullscreen */
 
@@ -1075,11 +1080,11 @@ public:
    * @param type defines the type fo the data (Engine.TEXTURETYPE_UNSIGNED_INT by default)
    * @returns the raw texture inside an InternalTexture
    */
-  InternalTexturePtr createRawTexture(const Uint8Array& data, int width, int height,
-                                      unsigned int format, bool generateMipMaps, bool invertY,
-                                      unsigned int samplingMode,
-                                      const std::string& compression = "",
-                                      unsigned int type = Constants::TEXTURETYPE_UNSIGNED_INT);
+  InternalTexturePtr
+  createRawTexture(const Uint8Array& data, int width, int height, unsigned int format,
+                   bool generateMipMaps, bool invertY, unsigned int samplingMode,
+                   const std::string& compression = "",
+                   unsigned int type              = Constants::TEXTURETYPE_UNSIGNED_INT) override;
 
   /**
    * @brief Update a raw texture.
@@ -1111,7 +1116,7 @@ public:
                                           unsigned int format, unsigned int type,
                                           bool generateMipMaps, bool invertY,
                                           unsigned int samplingMode,
-                                          const std::string& compression = "");
+                                          const std::string& compression = "") override;
 
   /**
    * @brief Update a raw cube texture.
@@ -1173,7 +1178,7 @@ public:
   createRawTexture3D(const ArrayBufferView& data, int width, int height, int depth,
                      unsigned int format, bool generateMipMaps, bool invertY,
                      unsigned int samplingMode, const std::string& compression = "",
-                     unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT);
+                     unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT) override;
 
   /**
    * @brief Update a raw 3D texture.
@@ -1208,7 +1213,7 @@ public:
   createRawTexture2DArray(const ArrayBufferView& data, int width, int height, int depth,
                           unsigned int format, bool generateMipMaps, bool invertY,
                           unsigned int samplingMode, const std::string& compression = "",
-                          unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT);
+                          unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT) override;
 
   /**
    * @brief Update a raw 2D array texture.
@@ -1274,6 +1279,22 @@ public:
   void bindTransformFeedbackBuffer(const WebGLDataBufferPtr& value);
 
 protected:
+  /**
+   * @brief Creates a new engine.
+   * @param canvasOrContext defines the canvas or WebGL context to use for rendering. If you provide
+   * a WebGL context, Babylon.js will not hook events on the canvas (like pointers, keyboards,
+   * etc...) so no event observables will be available. This is mostly used when Babylon.js is used
+   * as a plugin on a system which alreay used the WebGL context
+   * @param antialias defines enable antialiasing (default: false)
+   * @param options defines further options to be sent to the getContext() function
+   * @param adaptToDeviceRatio defines whether to adapt to the device's viewport characteristics
+   * (default: false)
+   */
+  Engine(ICanvas* canvas, const EngineOptions& options = EngineOptions());
+
+  /**
+   * @brief Hidden
+   */
   bool get__supportsHardwareTextureRescaling() const override;
 
   /**
@@ -1298,13 +1319,13 @@ protected:
    * @brief Sets the current loading screen text.
    * @see http://doc.babylonjs.com/how_to/creating_a_custom_loading_screen
    */
-  void set_loadingUIText(const std::string& text);
+  void set_loadingUIText(std::string text);
 
   /**
    * @brief Sets the current loading screen background color.
    * @see http://doc.babylonjs.com/how_to/creating_a_custom_loading_screen
    */
-  void set_loadingUIBackgroundColor(const std::string& color);
+  void set_loadingUIBackgroundColor(std::string color);
 
   void _reportDrawCall() override;
   void _rebuildBuffers() override;
@@ -1399,7 +1420,7 @@ public:
    * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
    * @ignorenaming
    */
-  static AudioEnginePtr _audioEngine;
+  static AudioEnginePtr audioEngine;
 
   /** @hidden */
   PerfCounter _drawCalls;
@@ -1450,11 +1471,11 @@ private:
   std::unique_ptr<PerformanceMonitor> _performanceMonitor = nullptr;
 
   // Focus
-  std::function<void()> _onFocus            = nullptr;
-  std::function<void()> _onBlur             = nullptr;
-  std::function<void()> _onCanvasPointerOut = nullptr;
-  std::function<void()> _onCanvasBlur       = nullptr;
-  std::function<void()> _onCanvasFocus      = nullptr;
+  std::function<void()> _onFocus                            = nullptr;
+  std::function<void()> _onBlur                             = nullptr;
+  std::function<void(PointerEvent* ev)> _onCanvasPointerOut = nullptr;
+  std::function<void()> _onCanvasBlur                       = nullptr;
+  std::function<void()> _onCanvasFocus                      = nullptr;
 
   std::function<void()> _onFullscreenChange  = nullptr;
   std::function<void()> _onPointerLockChange = nullptr;
@@ -1468,10 +1489,10 @@ private:
   int _cachedStencilReference;
 
   /** Extensions */
-  std::unique_ptr<MultiviewExtension> _multiviewExtension                 = nullptr;
-  std::unique_ptr<OcclusionQueryExtension> _occlusionQueryExtension       = nullptr;
-  std::unique_ptr<RawTextureExtension> _rawTextureExtension               = nullptr;
-  std::unique_ptr<TransformFeedbackExtension> _transformFeedbackExtension = nullptr;
+  std::unique_ptr<MultiviewExtension> _multiviewExtension;
+  std::unique_ptr<OcclusionQueryExtension> _occlusionQueryExtension;
+  std::unique_ptr<RawTextureExtension> _rawTextureExtension;
+  std::unique_ptr<TransformFeedbackExtension> _transformFeedbackExtension;
 
 }; // end of class Engine
 

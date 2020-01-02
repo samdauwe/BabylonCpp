@@ -10,7 +10,7 @@ OcclusionQueryExtension::OcclusionQueryExtension(Engine* engine) : _this{engine}
 
 OcclusionQueryExtension::~OcclusionQueryExtension() = default;
 
-WebGLQueryPtr createQuery()
+WebGLQueryPtr OcclusionQueryExtension::createQuery()
 {
   return _this->_gl->createQuery();
 }

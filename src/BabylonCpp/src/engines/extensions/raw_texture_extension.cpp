@@ -271,7 +271,6 @@ InternalTexturePtr RawTextureExtension::createRawCubeTextureFromUrl(
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
   unsigned int samplingMode, bool invertY)
 {
-  auto& gl = *_this->_gl;
   auto texture
     = _this->createRawCubeTexture({}, size, format, type, !noMipmap, invertY, samplingMode);
   scene->_addPendingData(texture);
@@ -320,11 +319,11 @@ InternalTexturePtr RawTextureExtension::createRawCubeTextureFromUrl(
         for (unsigned int faceIndex = 0; faceIndex < 6; ++faceIndex) {
           auto mipFaceData = mipData[level][faceIndex];
           if (needConversion) {
-            mipFaceData = _convertRGBtoRGBATextureData(mipFaceData, mipSize, mipSize, type);
+            mipFaceData = _this->_convertRGBtoRGBATextureData(mipFaceData, mipSize, mipSize, type);
           }
-          gl.texImage2D(faceIndex, static_cast<int>(level), static_cast<int>(internalSizedFomat),
-                        mipSize, mipSize, 0, internalFormat, textureType,
-                        &mipFaceData.uint8Array());
+          _this->_gl->texImage2D(faceIndex, static_cast<int>(level),
+                                 static_cast<int>(internalSizedFomat), mipSize, mipSize, 0,
+                                 internalFormat, textureType, &mipFaceData.uint8Array());
         }
       }
 

@@ -1,10 +1,12 @@
-#include <babylon/engines/null_engine.h>
+﻿#include <babylon/engines/null_engine.h>
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/irender_target_options.h>
+#include <babylon/materials/textures/render_target_creation_options.h>
+#include <babylon/maths/isize.h>
 #include <babylon/meshes/webgl/webgl_data_buffer.h>
 #include <babylon/states/alpha_state.h>
 #include <babylon/states/depth_culling_state.h>
@@ -17,7 +19,7 @@ bool NullEngine::isDeterministicLockStep() const
   return _options.deterministicLockstep;
 }
 
-bool NullEngine::getLockstepMaxSteps() const
+unsigned int NullEngine::getLockstepMaxSteps() const
 {
   return _options.lockstepMaxSteps;
 }
@@ -34,47 +36,41 @@ NullEngine::NullEngine(const NullEngineOptions& options) : Engine{nullptr}
   // Init caps
   // We consider we are on a webgl1 capable device
 
-  _caps                            = EngineCapabilities();
-  _caps.maxTexturesImageUnits      = 16;
-  _caps.maxVertexTextureImageUnits = 16;
-  _caps.maxTextureSize             = 512;
-  _caps.maxCubemapTextureSize      = 512;
-  _caps.maxRenderTextureSize       = 512;
-  _caps.maxVertexAttribs           = 16;
-  _caps.maxVaryingVectors          = 16;
-  _caps.maxFragmentUniformVectors  = 16;
-  _caps.maxVertexUniformVectors    = 16;
-
-  // Extensions
-  _caps.standardDerivatives = false;
-
-  _caps.astc  = nullptr;
-  _caps.s3tc  = std::nullopt;
-  _caps.pvrtc = nullptr;
-  _caps.etc1  = nullptr;
-  _caps.etc2  = nullptr;
-
-  _caps.textureAnisotropicFilterExtension = std::nullopt;
-  _caps.maxAnisotropy                     = 0;
-  _caps.uintIndices                       = false;
-  _caps.fragmentDepthSupported            = false;
-  _caps.highPrecisionShaderSupported      = true;
-
-  _caps.colorBufferFloat            = false;
-  _caps.textureFloat                = false;
-  _caps.textureFloatLinearFiltering = false;
-  _caps.textureFloatRender          = false;
-
+  _caps                                 = EngineCapabilities();
+  _caps.maxTexturesImageUnits           = 16;
+  _caps.maxVertexTextureImageUnits      = 16;
+  _caps.maxCombinedTexturesImageUnits   = 32;
+  _caps.maxTextureSize                  = 512;
+  _caps.maxCubemapTextureSize           = 512;
+  _caps.maxRenderTextureSize            = 512;
+  _caps.maxVertexAttribs                = 16;
+  _caps.maxVaryingVectors               = 16;
+  _caps.maxFragmentUniformVectors       = 16;
+  _caps.maxVertexUniformVectors         = 16;
+  _caps.standardDerivatives             = false;
+  _caps.astc                            = nullptr;
+  _caps.pvrtc                           = nullptr;
+  _caps.etc1                            = nullptr;
+  _caps.etc2                            = nullptr;
+  _caps.maxAnisotropy                   = 0;
+  _caps.uintIndices                     = false;
+  _caps.fragmentDepthSupported          = false;
+  _caps.highPrecisionShaderSupported    = true;
+  _caps.colorBufferFloat                = false;
+  _caps.textureFloat                    = false;
+  _caps.textureFloatLinearFiltering     = false;
+  _caps.textureFloatRender              = false;
   _caps.textureHalfFloat                = false;
   _caps.textureHalfFloatLinearFiltering = false;
   _caps.textureHalfFloatRender          = false;
-
-  _caps.textureLOD           = false;
-  _caps.drawBuffersExtension = false;
-
-  _caps.depthTextureExtension = false;
-  _caps.vertexArrayObject     = false;
-  _caps.instancedArrays       = false;
+  _caps.textureLOD                      = false;
+  _caps.drawBuffersExtension            = false;
+  _caps.depthTextureExtension           = false;
+  _caps.vertexArrayObject               = false;
+  _caps.instancedArrays                 = false;
+  _caps.canUseTimestampForTimerQuery    = false;
+  _caps.maxMSAASamples                  = 1;
+  _caps.blendMinMax                     = false;
 
   BABYLON_LOGF_INFO("Engine", "Babylon.js v%s - Null engine", Engine::Version().c_str())
 }
@@ -96,7 +92,7 @@ WebGLDataBufferPtr NullEngine::createIndexBuffer(const IndicesArray& /*indices*/
   return buffer;
 }
 
-void NullEngine::clear(const Color4& /*color*/, bool /*backBuffer*/, bool /*depth*/,
+void NullEngine::clear(const std::optional<Color4>& /*color*/, bool /*backBuffer*/, bool /*depth*/,
                        bool /*stencil*/)
 {
 }
@@ -119,7 +115,7 @@ int NullEngine::getRenderHeight(bool useScreen) const
   return _options.renderHeight;
 }
 
-void NullEngine::setViewport(Viewport& viewport, const std::optional<int>& /*requiredWidth*/,
+void NullEngine::setViewport(const Viewport& viewport, const std::optional<int>& /*requiredWidth*/,
                              const std::optional<int>& /*requiredHeight*/
 )
 {
@@ -138,7 +134,7 @@ NullEngine::createShaderProgram(const IPipelineContextPtr& /*pipelineContext*/,
   return program;
 }
 
-std::unordered_map<std::string, Engine::GLUniformLocationPtr>
+std::unordered_map<std::string, WebGLUniformLocationPtr>
 NullEngine::getUniforms(const IPipelineContextPtr& /*pipelineContext*/,
                         const std::vector<std::string>& /*uniformsNames*/)
 {
@@ -172,88 +168,98 @@ void NullEngine::setState(bool /*culling*/, float /*zOffset*/, bool /*force*/, b
 {
 }
 
-void NullEngine::setIntArray(GL::IGLUniformLocation* /*uniform*/, const Int32Array& /*array*/)
+void NullEngine::setIntArray(const WebGLUniformLocationPtr& /*uniform*/,
+                             const Int32Array& /*array*/)
 {
 }
 
-void NullEngine::setIntArray2(GL::IGLUniformLocation* /*uniform*/, const Int32Array& /*array*/)
+void NullEngine::setIntArray2(const WebGLUniformLocationPtr& /*uniform*/,
+                              const Int32Array& /*array*/)
 {
 }
 
-void NullEngine::setIntArray3(GL::IGLUniformLocation* /*uniform*/, const Int32Array& /*array*/)
+void NullEngine::setIntArray3(const WebGLUniformLocationPtr& /*uniform*/,
+                              const Int32Array& /*array*/)
 {
 }
 
-void NullEngine::setIntArray4(GL::IGLUniformLocation* /*uniform*/, const Int32Array& /*array*/)
+void NullEngine::setIntArray4(const WebGLUniformLocationPtr& /*uniform*/,
+                              const Int32Array& /*array*/)
 {
 }
 
-void NullEngine::setFloatArray(GL::IGLUniformLocation* /*uniform*/, const Float32Array& /*array*/)
+void NullEngine::setFloatArray(const WebGLUniformLocationPtr& /*uniform*/,
+                               const Float32Array& /*array*/)
 {
 }
 
-void NullEngine::setFloatArray2(GL::IGLUniformLocation* /*uniform*/, const Float32Array& /*array*/)
+void NullEngine::setFloatArray2(const WebGLUniformLocationPtr& /*uniform*/,
+                                const Float32Array& /*array*/)
 {
 }
 
-void NullEngine::setFloatArray3(GL::IGLUniformLocation* /*uniform*/, const Float32Array& /*array*/)
+void NullEngine::setFloatArray3(const WebGLUniformLocationPtr& /*uniform*/,
+                                const Float32Array& /*array*/)
 {
 }
 
-void NullEngine::setFloatArray4(GL::IGLUniformLocation* /*uniform*/, const Float32Array& /*array*/)
+void NullEngine::setFloatArray4(const WebGLUniformLocationPtr& /*uniform*/,
+                                const Float32Array& /*array*/)
 {
 }
 
-void NullEngine::setArray(GL::IGLUniformLocation* /*uniform*/, const Float32Array& /*array*/)
+void NullEngine::setArray(const WebGLUniformLocationPtr& /*uniform*/, const Float32Array& /*array*/)
 {
 }
 
-void NullEngine::setArray2(GL::IGLUniformLocation* /*uniform*/, const Float32Array& /*array*/)
+void NullEngine::setArray2(const WebGLUniformLocationPtr& /*uniform*/,
+                           const Float32Array& /*array*/)
 {
 }
 
-void NullEngine::setArray3(GL::IGLUniformLocation* /*uniform*/, const Float32Array& /*array*/)
+void NullEngine::setArray3(const WebGLUniformLocationPtr& /*uniform*/,
+                           const Float32Array& /*array*/)
 {
 }
 
-void NullEngine::setArray4(GL::IGLUniformLocation* /*uniform*/, const Float32Array& /*array*/)
+void NullEngine::setArray4(const WebGLUniformLocationPtr& /*uniform*/,
+                           const Float32Array& /*array*/)
 {
 }
 
-void NullEngine::setMatrices(GL::IGLUniformLocation* /*uniform*/, const Float32Array& /*matrices*/)
+void NullEngine::setMatrices(const WebGLUniformLocationPtr& /*uniform*/,
+                             const Float32Array& /*matrices*/)
 {
 }
 
-void NullEngine::setMatrix3x3(GL::IGLUniformLocation* /*uniform*/, const Float32Array& /*matrix*/)
+void NullEngine::setMatrix3x3(const WebGLUniformLocationPtr& /*uniform*/,
+                              const Float32Array& /*matrix*/)
 {
 }
 
-void NullEngine::setMatrix2x2(GL::IGLUniformLocation* /*uniform*/, const Float32Array& /*matrix*/)
+void NullEngine::setMatrix2x2(const WebGLUniformLocationPtr& /*uniform*/,
+                              const Float32Array& /*matrix*/)
 {
 }
 
-void NullEngine::setInt(GL::IGLUniformLocation* /*uniform*/, int /*value*/)
+void NullEngine::setFloat(const WebGLUniformLocationPtr& /*uniform*/, float /*value*/)
 {
 }
 
-void NullEngine::setFloat(GL::IGLUniformLocation* /*uniform*/, float /*value*/)
+void NullEngine::setFloat2(const WebGLUniformLocationPtr& /*uniform*/, float /*x*/, float /*y*/)
 {
 }
 
-void NullEngine::setFloat2(GL::IGLUniformLocation* /*uniform*/, float /*x*/, float /*y*/)
-{
-}
-
-void NullEngine::setFloat3(GL::IGLUniformLocation* /*uniform*/, float /*x*/, float /*y*/,
+void NullEngine::setFloat3(const WebGLUniformLocationPtr& /*uniform*/, float /*x*/, float /*y*/,
                            float /*z*/)
 {
 }
 
-void NullEngine::setBool(GL::IGLUniformLocation* /*uniform*/, int /*value*/)
+void NullEngine::setBool(const WebGLUniformLocationPtr& /*uniform*/, int /*value*/)
 {
 }
 
-void NullEngine::setFloat4(GL::IGLUniformLocation* /*uniform*/, float /*x*/, float /*y*/,
+void NullEngine::setFloat4(const WebGLUniformLocationPtr& /*uniform*/, float /*x*/, float /*y*/,
                            float /*z*/, float /*w*/)
 {
 }
@@ -263,7 +269,7 @@ void NullEngine::setAlphaMode(unsigned int mode, bool noDepthWriteChange)
     return;
   }
 
-  _alphaState->alphaBlend = (mode != Constants::ALPHA_DISABLE);
+  alphaState()->alphaBlend = (mode != Constants::ALPHA_DISABLE);
 
   if (!noDepthWriteChange) {
     setDepthWrite(mode == Constants::ALPHA_DISABLE);
@@ -288,9 +294,9 @@ void NullEngine::wipeCaches(bool bruteForce)
   if (bruteForce) {
     _currentProgram = nullptr;
 
-    _stencilState.reset();
-    _depthCullingState.reset();
-    _alphaState.reset();
+    stencilState()->reset();
+    depthCullingState()->reset();
+    alphaState()->reset();
   }
 
   _cachedVertexBuffers          = nullptr;
@@ -313,12 +319,12 @@ void NullEngine::drawArraysType(unsigned int /*fillMode*/, int /*verticesStart*/
 {
 }
 
-std::unique_ptr<GL::IGLTexture> NullEngine::_createTexture()
+WebGLTexturePtr NullEngine::_createTexture()
 {
-  return std::make_unique<GL::IGLTexture>(0);
+  return std::make_shared<GL::IGLTexture>(0);
 }
 
-void NullEngine::_releaseTexture(InternalTexture* /*texture*/)
+void NullEngine::_releaseTexture(const InternalTexturePtr& /*texture*/)
 {
 }
 
@@ -328,9 +334,10 @@ InternalTexturePtr NullEngine::createTexture(
   const std::function<void(const std::string& message, const std::string& exception)>& /*onError*/,
   const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& /*buffer*/,
   const InternalTexturePtr& /*fallBack*/, const std::optional<unsigned int>& format,
-  const std::string& /*forcedExtension*/)
+  const std::string& /*forcedExtension*/,
+  const std::vector<IInternalTextureLoaderPtr>& /*excludeLoaders*/, const std::string& /*mimeType*/)
 {
-  auto texture    = InternalTexture::New(this, InternalTexture::DATASOURCE_URL);
+  auto texture    = InternalTexture::New(this, InternalTextureSource::Url);
   const auto& url = urlArg;
 
   texture->url             = url;
@@ -372,7 +379,7 @@ InternalTexturePtr NullEngine::createRenderTargetTexture(const std::variant<ISiz
       = options.samplingMode.value_or(Constants::TEXTURE_TRILINEAR_SAMPLINGMODE);
   }
 
-  auto texture = InternalTexture::New(this, InternalTexture::DATASOURCE_RENDERTARGET);
+  auto texture = InternalTexture::New(this, InternalTextureSource::RenderTarget);
 
   int width = 0, height = 0;
   if (std::holds_alternative<ISize>(size)) {
@@ -406,7 +413,8 @@ InternalTexturePtr NullEngine::createRenderTargetTexture(const std::variant<ISiz
 }
 
 void NullEngine::updateTextureSamplingMode(unsigned int samplingMode,
-                                           const InternalTexturePtr& texture)
+                                           const InternalTexturePtr& texture,
+                                           bool /*generateMipMaps*/)
 {
   texture->samplingMode = samplingMode;
 }
@@ -527,7 +535,7 @@ void NullEngine::hideLoadingUI()
 
 void NullEngine::_uploadCompressedDataToTextureDirectly(const InternalTexturePtr& /*texture*/,
                                                         unsigned int /*internalFormat*/,
-                                                        float /*width*/, float /*height*/,
+                                                        int /*width*/, int /*height*/,
                                                         const Uint8Array& /*data*/,
                                                         unsigned int /*faceIndex*/, int /*lod*/)
 {

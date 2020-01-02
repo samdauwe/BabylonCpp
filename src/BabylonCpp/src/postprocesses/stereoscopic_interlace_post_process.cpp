@@ -19,7 +19,7 @@ StereoscopicInterlacePostProcess::StereoscopicInterlacePostProcess(
     _stepSize = Vector2(1.f / static_cast<float>(width), 1.f / static_cast<float>(height));
   });
   onApplyObservable.add([&](Effect* effect, EventState&) {
-    effect->setTextureFromPostProcess("camASampler", _passedProcess.get());
+    effect->setTextureFromPostProcess("camASampler", _passedProcess);
     effect->setFloat2("stepSize", _stepSize.x, _stepSize.y);
   });
 }

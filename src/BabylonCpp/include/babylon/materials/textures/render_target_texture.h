@@ -17,12 +17,11 @@ class PostProcessManager;
 class RenderingManager;
 class RenderTargetTexture;
 class SubMesh;
-using AbstractMeshPtr             = std::shared_ptr<AbstractMesh>;
-using CameraPtr                   = std::shared_ptr<Camera>;
-using PostProcessPtr              = std::shared_ptr<PostProcess>;
-using RenderTargetCreationOptions = IRenderTargetOptions;
-using RenderTargetTexturePtr      = std::shared_ptr<RenderTargetTexture>;
-using SubMeshPtr                  = std::shared_ptr<SubMesh>;
+using AbstractMeshPtr        = std::shared_ptr<AbstractMesh>;
+using CameraPtr              = std::shared_ptr<Camera>;
+using PostProcessPtr         = std::shared_ptr<PostProcess>;
+using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+using SubMeshPtr             = std::shared_ptr<SubMesh>;
 
 /**
  * @brief This Helps creating a texture that will be created from a camera in your scene.
@@ -285,7 +284,7 @@ protected:
   void set_onBeforeRender(const std::function<void(int* faceIndex, EventState&)>& callback);
   void set_onAfterRender(const std::function<void(int* faceIndex, EventState&)>& callback);
   void set_onClear(const std::function<void(Engine* engine, EventState&)>& callback);
-  RenderTargetCreationOptions& get_renderTargetOptions();
+  IRenderTargetOptions& get_renderTargetOptions();
 
   virtual unsigned int get_samples() const;
   virtual void set_samples(unsigned int value);
@@ -428,7 +427,7 @@ public:
    */
   Observable<RenderTargetTexture> onResizeObservable;
 
-  ReadOnlyProperty<RenderTargetTexture, RenderTargetCreationOptions> renderTargetOptions;
+  ReadOnlyProperty<RenderTargetTexture, IRenderTargetOptions> renderTargetOptions;
 
   /**
    * Define the number of samples to use in case of MSAA.
@@ -444,7 +443,7 @@ public:
   Property<RenderTargetTexture, int> refreshRate;
 
 protected:
-  RenderTargetCreationOptions _renderTargetOptions;
+  IRenderTargetOptions _renderTargetOptions;
   ISize _size;
   std::variant<ISize, float> _initialSizeParameter;
   float _sizeRatio;

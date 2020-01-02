@@ -364,7 +364,7 @@ void SSAO2RenderingPipeline::_createSSAOCombinePostProcess(float ratio)
                        TmpVectors::Vector4Array[0].copyFromFloats(
                          static_cast<float>(viewport.x), static_cast<float>(viewport.y),
                          static_cast<float>(viewport.width), static_cast<float>(viewport.height)));
-    effect->setTextureFromPostProcess("originalColor", _originalColorPostProcess.get());
+    effect->setTextureFromPostProcess("originalColor", _originalColorPostProcess);
   };
   _ssaoCombinePostProcess->samples = textureSamples;
 }

@@ -15,6 +15,7 @@
 #include <babylon/interfaces/iloading_screen.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/internal_texture.h>
+#include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/meshes/webgl/webgl_data_buffer.h>
 #include <babylon/postprocesses/post_process.h>
@@ -23,6 +24,8 @@
 #include <babylon/states/stencil_state.h>
 
 namespace BABYLON {
+
+AudioEnginePtr Engine::audioEngine = nullptr;
 
 std::vector<Engine*>& Engine::Instances()
 {
@@ -55,6 +58,56 @@ ILoadingScreenPtr Engine::DefaultLoadingScreenFactory(ICanvas* /*canvas*/)
 }
 
 std::function<PostProcessPtr(Engine* engine)> Engine::_RescalePostProcessFactory = nullptr;
+
+Engine::Engine(ICanvas* canvas, const EngineOptions& options)
+    : ThinEngine{canvas, options}
+    , performanceMonitor{this, &Engine::get_performanceMonitor}
+    , loadingScreen{this, &Engine::get_loadingScreen, &Engine::set_loadingScreen}
+    , loadingUIText{this, &Engine::set_loadingUIText}
+    , loadingUIBackgroundColor{this, &Engine::set_loadingUIBackgroundColor}
+    , _rescalePostProcess{nullptr}
+    , _performanceMonitor{std::make_unique<PerformanceMonitor>()}
+    , _multiviewExtension{std::make_unique<MultiviewExtension>(this)}
+    , _occlusionQueryExtension{std::make_unique<OcclusionQueryExtension>(this)}
+    , _rawTextureExtension{std::make_unique<RawTextureExtension>(this)}
+    , _transformFeedbackExtension{std::make_unique<TransformFeedbackExtension>(this)}
+{
+  Engine::Instances().emplace_back(this);
+
+  if (!canvas) {
+    return;
+  }
+
+  _onCanvasFocus = [this]() { onCanvasFocusObservable.notifyObservers(this); };
+
+  _onCanvasBlur = [this]() { onCanvasBlurObservable.notifyObservers(this); };
+
+  _onBlur = [this]() -> void {
+    if (disablePerformanceMonitorInBackground) {
+      _performanceMonitor->disable();
+    }
+    _windowIsBackground = true;
+  };
+
+  _onFocus = [this]() -> void {
+    if (disablePerformanceMonitorInBackground) {
+      _performanceMonitor->enable();
+    }
+    _windowIsBackground = false;
+  };
+
+  _onCanvasPointerOut
+    = [this](PointerEvent* ev) -> void { onCanvasPointerOutObservable.notifyObservers(ev); };
+
+  _deterministicLockstep = options.deterministicLockstep;
+  _lockstepMaxSteps      = options.lockstepMaxSteps;
+  _timeStep              = options.timeStep.value_or(1.f / 60.f);
+}
+
+Engine::~Engine()
+{
+  stl_util::remove_vector_elements_equal(EngineStore::Instances, this);
+}
 
 bool Engine::get__supportsHardwareTextureRescaling() const
 {
@@ -436,7 +489,7 @@ void Engine::setDepthStencilTexture(int channel, const WebGLUniformLocationPtr& 
     _setTexture(channel, nullptr);
   }
   else {
-    _setTexture(channel, texture, false, true);
+    _setTexture(channel, std::static_pointer_cast<BaseTexture>(texture), false, true);
   }
 }
 
@@ -687,7 +740,7 @@ void Engine::_deletePipelineContext(const IPipelineContextPtr& pipelineContext)
   auto webGLPipelineContext = std::static_pointer_cast<WebGLPipelineContext>(pipelineContext);
   if (webGLPipelineContext && webGLPipelineContext->program) {
     if (webGLPipelineContext->transformFeedback) {
-      deleteTransformFeedback(webGLPipelineContext->transformFeedback.get());
+      deleteTransformFeedback(webGLPipelineContext->transformFeedback);
       webGLPipelineContext->transformFeedback = nullptr;
     }
   }
@@ -700,7 +753,7 @@ Engine::createShaderProgram(const IPipelineContextPtr& pipelineContext,
                             const std::string& defines, WebGLRenderingContext* context,
                             const std::vector<std::string>& transformFeedbackVaryings)
 {
-  context = context ? context _gl;
+  context = context ? context : _gl;
 
   onBeforeShaderCompilationObservable.notifyObservers(this);
 
@@ -715,7 +768,7 @@ WebGLProgramPtr
 Engine::_createShaderProgram(const WebGLPipelineContextPtr& pipelineContext,
                              const WebGLShaderPtr& vertexShader,
                              const WebGLShaderPtr& fragmentShader, WebGLRenderingContext* context,
-                             const std::vector<std::string>& transformFeedbackVaryings = {})
+                             const std::vector<std::string>& transformFeedbackVaryings)
 {
   auto shaderProgram       = context->createProgram();
   pipelineContext->program = shaderProgram;
@@ -730,8 +783,8 @@ Engine::_createShaderProgram(const WebGLPipelineContextPtr& pipelineContext,
   if (webGLVersion() > 1.f && !transformFeedbackVaryings.empty()) {
     auto transformFeedback = createTransformFeedback();
 
-    bindTransformFeedback(transformFeedback.get());
-    setTranformFeedbackVaryings(shaderProgram.get(), transformFeedbackVaryings);
+    bindTransformFeedback(transformFeedback);
+    setTranformFeedbackVaryings(shaderProgram, transformFeedbackVaryings);
     pipelineContext->transformFeedback = transformFeedback;
   }
 
@@ -813,7 +866,7 @@ void Engine::_rescaleTexture(const InternalTexturePtr& source,
                         destination->height, 0);
 
     unBindFramebuffer(rtt);
-    _releaseTexture(rtt.get());
+    _releaseTexture(rtt);
 
     if (onComplete) {
       onComplete();
@@ -957,7 +1010,7 @@ unsigned int Engine::updateRenderTargetTextureSampleCount(const InternalTextureP
       throw std::runtime_error("Unable to create multi sampled framebuffer");
     }
 
-    gl.bindRenderbuffer(GL::RENDERBUFFER, colorRenderbuffer);
+    gl.bindRenderbuffer(GL::RENDERBUFFER, colorRenderbuffer.get());
     gl.renderbufferStorageMultisample(GL::RENDERBUFFER, static_cast<int>(samples),
                                       _getRGBAMultiSampleBufferFormat(texture->type),
                                       texture->width, texture->height);
@@ -965,7 +1018,7 @@ unsigned int Engine::updateRenderTargetTextureSampleCount(const InternalTextureP
     gl.framebufferRenderbuffer(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0, GL::RENDERBUFFER,
                                colorRenderbuffer.get());
 
-    texture->_MSAARenderBuffer = std::move(colorRenderbuffer);
+    texture->_MSAARenderBuffer = colorRenderbuffer;
   }
   else {
     _bindUnboundFramebuffer(texture->_framebuffer);
@@ -1152,17 +1205,17 @@ void Engine::_disableTouchAction()
 
 void Engine::displayLoadingUI()
 {
-  const auto _loadingScreen = loadingScreen();
-  if (_loadingScreen) {
-    _loadingScreen->displayLoadingUI();
+  const auto iLoadingScreen = loadingScreen();
+  if (iLoadingScreen) {
+    iLoadingScreen->displayLoadingUI();
   }
 }
 
 void Engine::hideLoadingUI()
 {
-  const auto _loadingScreen = loadingScreen();
-  if (_loadingScreen) {
-    _loadingScreen->hideLoadingUI();
+  const auto iLoadingScreen = loadingScreen();
+  if (iLoadingScreen) {
+    iLoadingScreen->hideLoadingUI();
   }
 }
 
@@ -1174,17 +1227,17 @@ ILoadingScreenPtr& Engine::get_loadingScreen()
   return _loadingScreen;
 }
 
-void Engine::set_loadingScreen(const ILoadingScreenPtr& loadingScreen)
+void Engine::set_loadingScreen(const ILoadingScreenPtr& iLoadingScreen)
 {
-  _loadingScreen = loadingScreen;
+  _loadingScreen = iLoadingScreen;
 }
 
-void Engine::set_loadingUIText(const std::string& text)
+void Engine::set_loadingUIText(std::string text)
 {
   loadingScreen()->loadingUIText = text;
 }
 
-void Engine::set_loadingUIBackgroundColor(const std::string& color)
+void Engine::set_loadingUIBackgroundColor(std::string color)
 {
   loadingScreen()->loadingUIBackgroundColor = color;
 }

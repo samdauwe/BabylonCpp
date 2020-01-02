@@ -3,6 +3,7 @@
 #include <babylon/core/logging.h>
 #include <babylon/engines/thin_engine.h>
 #include <babylon/materials/textures/internal_texture.h>
+#include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/materials/textures/render_target_creation_options.h>
 #include <babylon/maths/isize.h>
 
@@ -16,7 +17,7 @@ RenderTargetCubeExtension::~RenderTargetCubeExtension() = default;
 
 InternalTexturePtr
 RenderTargetCubeExtension::createRenderTargetCubeTexture(const ISize& size,
-                                                         const RenderTargetCreationOptions& options)
+                                                         const IRenderTargetOptions& options)
 {
   RenderTargetCreationOptions fullOptions;
   fullOptions.generateMipMaps       = options.generateMipMaps.value_or(true);

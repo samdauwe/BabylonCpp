@@ -13,6 +13,10 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
+namespace GL {
+class IGLVertexArrayObject;
+} // end of namespace GL
+
 class BoundingInfo;
 class Effect;
 class Engine;
@@ -22,15 +26,12 @@ class Scene;
 class VertexBuffer;
 class VertexData;
 class WebGLDataBuffer;
-using EffectPtr          = std::shared_ptr<Effect>;
-using GeometryPtr        = std::shared_ptr<Geometry>;
-using MeshPtr            = std::shared_ptr<Mesh>;
-using VertexBufferPtr    = std::shared_ptr<VertexBuffer>;
-using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
-
-namespace GL {
-class IGLVertexArrayObject;
-} // end of namespace GL
+using EffectPtr                 = std::shared_ptr<Effect>;
+using GeometryPtr               = std::shared_ptr<Geometry>;
+using MeshPtr                   = std::shared_ptr<Mesh>;
+using VertexBufferPtr           = std::shared_ptr<VertexBuffer>;
+using WebGLDataBufferPtr        = std::shared_ptr<WebGLDataBuffer>;
+using WebGLVertexArrayObjectPtr = std::shared_ptr<GL::IGLVertexArrayObject>;
 
 /**
  * @brief Class used to store geometry data (vertex buffers + index buffer).
@@ -450,7 +451,7 @@ public:
    */
   Property<Geometry, std::optional<Vector2>> boundingBias;
 
-  std::unordered_map<std::string, std::unique_ptr<GL::IGLVertexArrayObject>> _vertexArrayObjects;
+  std::unordered_map<std::string, WebGLVertexArrayObjectPtr> _vertexArrayObjects;
   bool _updatable;
   std::vector<Vector3> centroids;
 

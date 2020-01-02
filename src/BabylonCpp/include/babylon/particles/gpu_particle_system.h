@@ -8,6 +8,10 @@
 
 namespace BABYLON {
 
+namespace GL {
+class IGLVertexArrayObject;
+} // end of namespace GL
+
 class Buffer;
 class Effect;
 class Engine;
@@ -15,12 +19,9 @@ struct EffectCreationOptions;
 class GPUParticleSystem;
 class Mesh;
 class RawTexture;
-using EffectPtr     = std::shared_ptr<Effect>;
-using RawTexturePtr = std::shared_ptr<RawTexture>;
-
-namespace GL {
-class IGLVertexArrayObject;
-} // end of namespace GL
+using EffectPtr                 = std::shared_ptr<Effect>;
+using RawTexturePtr             = std::shared_ptr<RawTexture>;
+using WebGLVertexArrayObjectPtr = std::shared_ptr<GL::IGLVertexArrayObject>;
 
 /**
  * @brief This represents a GPU particle system in Babylon
@@ -422,8 +423,8 @@ protected:
 private:
   void _addFactorGradient(std::vector<FactorGradient>& factorGradients, float gradient,
                           float factor);
-  std::unique_ptr<GL::IGLVertexArrayObject> _createUpdateVAO(Buffer* source);
-  std::unique_ptr<GL::IGLVertexArrayObject> _createRenderVAO(Buffer* source, Buffer* spriteSource);
+  WebGLVertexArrayObjectPtr _createUpdateVAO(Buffer* source);
+  WebGLVertexArrayObjectPtr _createRenderVAO(Buffer* source, Buffer* spriteSource);
   void _initialize(bool force = false);
   RawTexture* _getRawTextureByName(const std::string& textureName);
   void _setRawTextureByName(const std::string& textureName,
@@ -462,8 +463,8 @@ private:
   std::unique_ptr<Buffer> _buffer0;
   std::unique_ptr<Buffer> _buffer1;
   std::unique_ptr<Buffer> _spriteBuffer;
-  std::vector<std::unique_ptr<GL::IGLVertexArrayObject>> _updateVAO;
-  std::vector<std::unique_ptr<GL::IGLVertexArrayObject>> _renderVAO;
+  std::vector<WebGLVertexArrayObjectPtr> _updateVAO;
+  std::vector<WebGLVertexArrayObjectPtr> _renderVAO;
 
   size_t _targetIndex;
   Buffer* _sourceBuffer;

@@ -4,15 +4,17 @@
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/engines/constants.h>
 #include <babylon/engines/depth_texture_creation_options.h>
-#include <babylon/engines/engine.h>
+#include <babylon/engines/thin_engine.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/iinternal_texture_loader.h>
 #include <babylon/materials/textures/irender_target_options.h>
+#include <babylon/materials/textures/render_target_creation_options.h>
 #include <babylon/maths/spherical_polynomial.h>
 
 namespace BABYLON {
 
-InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource, bool delayAllocation)
+InternalTexture::InternalTexture(ThinEngine* engine, InternalTextureSource source,
+                                 bool delayAllocation)
     : isReady{false}
     , isCube{false}
     , is3D{false}
@@ -30,7 +32,7 @@ InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource, bool d
     , invertY{false}
     , _invertVScale{false}
     , _associatedChannel{-1}
-    , _dataSource{dataSource}
+    , _source{source}
     , _size{0}
     , _extension{""}
     , _workingCanvas{nullptr}
@@ -74,14 +76,14 @@ InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource, bool d
 
 InternalTexture::~InternalTexture() = default;
 
-Engine* InternalTexture::getEngine()
+ThinEngine* InternalTexture::getEngine()
 {
   return _engine;
 }
 
-unsigned int InternalTexture::dataSource() const
+InternalTextureSource InternalTexture::dataSource() const
 {
-  return _dataSource;
+  return _source;
 }
 
 void InternalTexture::incrementReferences()
@@ -112,10 +114,10 @@ void InternalTexture::_rebuild()
   _cachedWrapR                     = -1;
   _cachedAnisotropicFilteringLevel = -1;
 
-  switch (_dataSource) {
-    case InternalTexture::DATASOURCE_TEMP:
+  switch (_source) {
+    case InternalTextureSource::Temp:
       return;
-    case InternalTexture::DATASOURCE_URL: {
+    case InternalTextureSource::Url: {
       proxy = _engine->createTexture(
         url, !generateMipMaps, invertY, nullptr, samplingMode,
         [this](InternalTexture*, EventState&) { isReady = true; }, nullptr, _buffer, nullptr,
@@ -123,32 +125,40 @@ void InternalTexture::_rebuild()
       proxy->_swapAndDie(shared_from_this());
     }
       return;
-    case InternalTexture::DATASOURCE_RAW: {
+    case InternalTextureSource::Raw: {
       proxy = _engine->createRawTexture(_bufferView, baseWidth, baseHeight, format, generateMipMaps,
                                         invertY, samplingMode, _compression);
       proxy->_swapAndDie(shared_from_this());
       isReady = true;
     }
       return;
-    case InternalTexture::DATASOURCE_RAW3D: {
+    case InternalTextureSource::Raw3D: {
       proxy = _engine->createRawTexture3D(_bufferView, baseWidth, baseHeight, baseDepth, format,
                                           generateMipMaps, invertY, samplingMode, _compression);
       proxy->_swapAndDie(shared_from_this());
       isReady = true;
     }
       return;
-    case InternalTexture::DATASOURCE_DYNAMIC: {
+    case InternalTextureSource::Raw2DArray: {
+      proxy
+        = _engine->createRawTexture2DArray(_bufferView, baseWidth, baseHeight, baseDepth, format,
+                                           generateMipMaps, invertY, samplingMode, _compression);
+      proxy->_swapAndDie(shared_from_this());
+
+      isReady = true;
+    }
+      return;
+    case InternalTextureSource::Dynamic: {
       proxy = _engine->createDynamicTexture(baseWidth, baseHeight, generateMipMaps, samplingMode);
       proxy->_swapAndDie(shared_from_this());
       // _engine->updateDynamicTexture(this, _engine->getRenderingCanvas(),
       // invertY, undefined, undefined, true);
 
-      // The engine will make sure to update content so no need to flag it as
-      // isReady = true
+      // The engine will make sure to update content so no need to flag it as isReady = true
     }
       return;
-    case InternalTexture::DATASOURCE_RENDERTARGET: {
-      RenderTargetCreationOptions options;
+    case InternalTextureSource::RenderTarget: {
+      IRenderTargetOptions options;
       options.generateDepthBuffer   = _generateDepthBuffer;
       options.generateMipMaps       = generateMipMaps;
       options.generateStencilBuffer = _generateStencilBuffer;
@@ -168,7 +178,7 @@ void InternalTexture::_rebuild()
       isReady = true;
     }
       return;
-    case InternalTexture::DATASOURCE_DEPTHTEXTURE: {
+    case InternalTextureSource::Depth: {
       DepthTextureCreationOptions depthTextureOptions;
       depthTextureOptions.bilinearFiltering
         = samplingMode != Constants::TEXTURE_BILINEAR_SAMPLINGMODE;
@@ -184,7 +194,7 @@ void InternalTexture::_rebuild()
       isReady = true;
     }
       return;
-    case InternalTexture::DATASOURCE_CUBE: {
+    case InternalTextureSource::Cube: {
       proxy = _engine->createCubeTexture(
         url, nullptr, _files, !generateMipMaps,
         [this](const std::optional<CubeTextureData>& /*data*/) { isReady = true; }, nullptr, format,
@@ -192,14 +202,14 @@ void InternalTexture::_rebuild()
       proxy->_swapAndDie(shared_from_this());
     }
       return;
-    case InternalTexture::DATASOURCE_CUBERAW: {
+    case InternalTextureSource::CubeRaw: {
       proxy = _engine->createRawCubeTexture(_bufferViewArray, width, format, type, generateMipMaps,
                                             invertY, samplingMode, _compression);
       proxy->_swapAndDie(shared_from_this());
       isReady = true;
     }
       return;
-    case InternalTexture::DATASOURCE_CUBERAW_RGBD: {
+    case InternalTextureSource::CubeRawRGBD: {
       proxy = _engine->createRawCubeTexture({}, width, format, type, generateMipMaps, invertY,
                                             samplingMode, _compression);
 #if 0
@@ -211,7 +221,7 @@ void InternalTexture::_rebuild()
       proxy->_swapAndDie(shared_from_this());
     }
       return;
-    case InternalTexture::DATASOURCE_CUBEPREFILTERED: {
+    case InternalTextureSource::CubePrefiltered: {
       proxy = _engine->createPrefilteredCubeTexture(
         url, nullptr, _lodGenerationScale, _lodGenerationOffset,
         [this, &proxy](const std::optional<CubeTextureData>& /*data*/) {
@@ -224,6 +234,8 @@ void InternalTexture::_rebuild()
       proxy->_sphericalPolynomial = std::unique_ptr<SphericalPolynomial>(&*_sphericalPolynomial);
     }
       return;
+    default:
+      break;
   }
 }
 
@@ -285,7 +297,7 @@ void InternalTexture::dispose()
 
   --_references;
   if (_references == 0) {
-    _engine->_releaseTexture(this);
+    _engine->_releaseTexture(shared_from_this());
     _webGLTexture = nullptr;
   }
 }

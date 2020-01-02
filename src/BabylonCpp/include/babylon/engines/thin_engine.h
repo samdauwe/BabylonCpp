@@ -12,6 +12,7 @@
 #include <babylon/engines/engine_capabilities.h>
 #include <babylon/engines/engine_options.h>
 #include <babylon/maths/vector4.h>
+#include <babylon/maths/viewport.h>
 #include <babylon/meshes/buffer_pointer.h>
 #include <babylon/misc/observable.h>
 
@@ -35,12 +36,12 @@ struct IMultiRenderTargetOptions;
 struct InstancingAttributeInfo;
 class InternalTexture;
 class IPipelineContext;
+struct RenderTargetCreationOptions;
 struct IRenderTargetOptions;
 struct IShaderProcessor;
 struct ISize;
 class MultiRenderExtension;
 class ProgressEvent;
-struct RenderTargetCreationOptions;
 class RenderTargetCubeExtension;
 class RenderTargetExtension;
 class Scene;
@@ -170,7 +171,7 @@ public:
    * then the engine will render at twice the size of the canvas.
    * @returns a number indicating the current hardware scaling level
    */
-  float getHardwareScalingLevel() const;
+  virtual float getHardwareScalingLevel() const;
 
   /**
    * @brief Gets the list of loaded textures.
@@ -226,6 +227,12 @@ public:
    * @param renderFunction defines the function to continuously execute
    */
   void runRenderLoop(const std::function<void()>& renderFunction);
+
+  /**
+   * @brief Execute the render funtion.
+   * @param renderFunction defines the function to execute
+   */
+  void renderFunction(const std::function<void()>& renderFunction);
 
   /**
    * @brief Clear the current render buffer or the current render target (if any is set up)
@@ -619,63 +626,63 @@ public:
    * @param uniform defines the webGL uniform location where to store the value
    * @param value defines the int number to store
    */
-  virtual void setInt(GL::IGLUniformLocation* uniform, int value);
+  virtual void setInt(const WebGLUniformLocationPtr& uniform, int value);
 
   /**
    * @brief Set the value of an uniform to an array of int32.
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of int32 to store
    */
-  virtual void setIntArray(GL::IGLUniformLocation* uniform, const Int32Array& array);
+  virtual void setIntArray(const WebGLUniformLocationPtr& uniform, const Int32Array& array);
 
   /**
    * @brief Set the value of an uniform to an array of int32 (stored as vec2).
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of int32 to store
    */
-  virtual void setIntArray2(GL::IGLUniformLocation* uniform, const Int32Array& array);
+  virtual void setIntArray2(const WebGLUniformLocationPtr& uniform, const Int32Array& array);
 
   /**
    * @brief Set the value of an uniform to an array of int32 (stored as vec3).
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of int32 to store
    */
-  virtual void setIntArray3(GL::IGLUniformLocation* uniform, const Int32Array& array);
+  virtual void setIntArray3(const WebGLUniformLocationPtr& uniform, const Int32Array& array);
 
   /**
    * @brief Set the value of an uniform to an array of int32 (stored as vec4).
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of int32 to store
    */
-  virtual void setIntArray4(GL::IGLUniformLocation* uniform, const Int32Array& array);
+  virtual void setIntArray4(const WebGLUniformLocationPtr& uniform, const Int32Array& array);
 
   /**
    * @brief Set the value of an uniform to an array of number.
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of number to store
    */
-  virtual void setArray(GL::IGLUniformLocation* uniform, const Float32Array& array);
+  virtual void setArray(const WebGLUniformLocationPtr& uniform, const Float32Array& array);
 
   /**
    * @brief Set the value of an uniform to an array of number (stored as vec2).
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of number to store
    */
-  virtual void setArray2(GL::IGLUniformLocation* uniform, const Float32Array& array);
+  virtual void setArray2(const WebGLUniformLocationPtr& uniform, const Float32Array& array);
 
   /**
    * @brief Set the value of an uniform to an array of number (stored as vec3).
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of number to store
    */
-  virtual void setArray3(GL::IGLUniformLocation* uniform, const Float32Array& array);
+  virtual void setArray3(const WebGLUniformLocationPtr& uniform, const Float32Array& array);
 
   /**
    * @brief Set the value of an uniform to an array of number (stored as vec4).
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of number to store
    */
-  virtual void setArray4(GL::IGLUniformLocation* uniform, const Float32Array& array);
+  virtual void setArray4(const WebGLUniformLocationPtr& uniform, const Float32Array& array);
 
   /**
    * @brief Set the value of an uniform to an array of float32 (stored as
@@ -683,28 +690,28 @@ public:
    * @param uniform defines the webGL uniform location where to store the value
    * @param matrices defines the array of float32 to store
    */
-  virtual void setMatrices(GL::IGLUniformLocation* uniform, const Float32Array& matrices);
+  virtual void setMatrices(const WebGLUniformLocationPtr& uniform, const Float32Array& matrices);
 
   /**
    * @brief Set the value of an uniform to a matrix (3x3).
    * @param uniform defines the webGL uniform location where to store the value
    * @param matrix defines the Float32Array representing the 3x3 matrix to store
    */
-  virtual void setMatrix3x3(GL::IGLUniformLocation* uniform, const Float32Array& matrix);
+  virtual void setMatrix3x3(const WebGLUniformLocationPtr& uniform, const Float32Array& matrix);
 
   /**
    * @brief Set the value of an uniform to a matrix (2x2).
    * @param uniform defines the webGL uniform location where to store the value
    * @param matrix defines the Float32Array representing the 2x2 matrix to store
    */
-  virtual void setMatrix2x2(GL::IGLUniformLocation* uniform, const Float32Array& matrix);
+  virtual void setMatrix2x2(const WebGLUniformLocationPtr& uniform, const Float32Array& matrix);
 
   /**
    * @brief Set the value of an uniform to a number (float).
    * @param uniform defines the webGL uniform location where to store the value
    * @param value defines the float number to store
    */
-  virtual void setFloat(GL::IGLUniformLocation* uniform, float value);
+  virtual void setFloat(const WebGLUniformLocationPtr& uniform, float value);
 
   /**
    * @brief Set the value of an uniform to a vec2.
@@ -712,7 +719,7 @@ public:
    * @param x defines the 1st component of the value
    * @param y defines the 2nd component of the value
    */
-  virtual void setFloat2(GL::IGLUniformLocation* uniform, float x, float y);
+  virtual void setFloat2(const WebGLUniformLocationPtr& uniform, float x, float y);
 
   /**
    * @brief Set the value of an uniform to a vec3.
@@ -721,7 +728,7 @@ public:
    * @param y defines the 2nd component of the value
    * @param z defines the 3rd component of the value
    */
-  virtual void setFloat3(GL::IGLUniformLocation* uniform, float x, float y, float z);
+  virtual void setFloat3(const WebGLUniformLocationPtr& uniform, float x, float y, float z);
 
   /**
    * @brief Set the value of an uniform to a vec4.
@@ -731,7 +738,8 @@ public:
    * @param z defines the 3rd component of the value
    * @param w defines the 4th component of the value
    */
-  virtual void setFloat4(GL::IGLUniformLocation* uniform, float x, float y, float z, float w);
+  virtual void setFloat4(const WebGLUniformLocationPtr& uniform, float x, float y, float z,
+                         float w);
 
   // States
 
@@ -822,6 +830,28 @@ public:
     const std::string& mimeType                                  = "");
 
   /**
+   * @brief Create a cube texture from prefiltered data (ie. the mipmaps contain ready to use data
+   * for PBR reflection)
+   * @param rootUrl defines the url where the file to load is located
+   * @param scene defines the current scene
+   * @param lodScale defines scale to apply to the mip map selection
+   * @param lodOffset defines offset to apply to the mip map selection
+   * @param onLoad defines an optional callback raised when the texture is loaded
+   * @param onError defines an optional callback raised if there is an issue to load the texture
+   * @param format defines the format of the data
+   * @param forcedExtension defines the extension to use to pick the right loader
+   * @param createPolynomials defines wheter or not to create polynomails harmonics for the texture
+   * @returns the cube texture as an InternalTexture
+   */
+  InternalTexturePtr createPrefilteredCubeTexture(
+    const std::string& rootUrl, Scene* scene, float lodScale, float lodOffset,
+    const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad = nullptr,
+    const std::function<void(const std::string& message, const std::string& exception)>& onError
+    = nullptr,
+    unsigned int format = 0, const std::string& forcedExtension = "",
+    bool createPolynomials = true);
+
+  /**
    * @brief Loads an image as an HTMLImageElement.
    * @param input url string
    * @param onLoad callback called when the image successfully loads
@@ -879,11 +909,11 @@ public:
    * @param type defines the type fo the data (Engine.TEXTURETYPE_UNSIGNED_INT by default)
    * @returns the raw texture inside an InternalTexture
    */
-  InternalTexturePtr createRawTexture(const Uint8Array& data, int width, int height,
-                                      unsigned int format, bool generateMipMaps, bool invertY,
-                                      unsigned int samplingMode,
-                                      const std::string& compression = "",
-                                      unsigned int type = Constants::TEXTURETYPE_UNSIGNED_INT);
+  virtual InternalTexturePtr
+  createRawTexture(const Uint8Array& data, int width, int height, unsigned int format,
+                   bool generateMipMaps, bool invertY, unsigned int samplingMode,
+                   const std::string& compression = "",
+                   unsigned int type              = Constants::TEXTURETYPE_UNSIGNED_INT);
 
   /**
    * @brief Creates a new raw cube texture.
@@ -897,11 +927,11 @@ public:
    * @param compression defines the compression used (null by default)
    * @returns the cube texture as an InternalTexture
    */
-  InternalTexturePtr createRawCubeTexture(const std::vector<ArrayBufferView>& data, int size,
-                                          unsigned int format, unsigned int type,
-                                          bool generateMipMaps, bool invertY,
-                                          unsigned int samplingMode,
-                                          const std::string& compression = "");
+  virtual InternalTexturePtr createRawCubeTexture(const std::vector<ArrayBufferView>& data,
+                                                  int size, unsigned int format, unsigned int type,
+                                                  bool generateMipMaps, bool invertY,
+                                                  unsigned int samplingMode,
+                                                  const std::string& compression = "");
 
   /**
    * @brief Creates a new raw 3D texture.
@@ -917,7 +947,7 @@ public:
    * @param textureType defines the compressed used (can be null)
    * @returns a new raw 3D texture (stored in an InternalTexture)
    */
-  InternalTexturePtr
+  virtual InternalTexturePtr
   createRawTexture3D(const ArrayBufferView& data, int width, int height, int depth,
                      unsigned int format, bool generateMipMaps, bool invertY,
                      unsigned int samplingMode, const std::string& compression = "",
@@ -937,7 +967,7 @@ public:
    * @param textureType defines the compressed used (can be null)
    * @returns a new raw 2D array texture (stored in an InternalTexture)
    */
-  InternalTexturePtr
+  virtual InternalTexturePtr
   createRawTexture2DArray(const ArrayBufferView& data, int width, int height, int depth,
                           unsigned int format, bool generateMipMaps, bool invertY,
                           unsigned int samplingMode, const std::string& compression = "",
@@ -1195,7 +1225,7 @@ public:
    * default)
    * @see http://doc.babylonjs.com/resources/transparency_and_how_meshes_are_rendered
    */
-  void setAlphaMode(unsigned int mode, bool noDepthWriteChange = false);
+  virtual void setAlphaMode(unsigned int mode, bool noDepthWriteChange = false);
 
   /**
    * @brief Gets the current alpha mode.
@@ -1303,10 +1333,10 @@ public:
    * @param forceBindTexture if the texture should be forced to be bound eg. after a graphics
    * context loss (Default: false)
    */
-  void updateDynamicTexture(const InternalTexturePtr& texture, ICanvas* canvas, bool invertY,
-                            bool premulAlpha                   = false,
-                            std::optional<unsigned int> format = std::nullopt,
-                            bool forceBindTexture              = false);
+  virtual void updateDynamicTexture(const InternalTexturePtr& texture, ICanvas* canvas,
+                                    bool invertY, bool premulAlpha = false,
+                                    std::optional<unsigned int> format = std::nullopt,
+                                    bool forceBindTexture              = false);
 
   //------------------------------------------------------------------------------------------------
   //                              Multi Render Extension
@@ -1355,8 +1385,8 @@ public:
    * @param options defines the options used to create the texture
    * @returns a new render target texture stored in an InternalTexture
    */
-  InternalTexturePtr createRenderTargetTexture(const std::variant<ISize, float>& size,
-                                               const IRenderTargetOptions& options);
+  virtual InternalTexturePtr createRenderTargetTexture(const std::variant<ISize, float>& size,
+                                                       const IRenderTargetOptions& options);
 
   /**
    * @brief Creates a depth stencil texture.
@@ -1385,7 +1415,7 @@ public:
    * @returns a new render target cube texture stored in an InternalTexture
    */
   InternalTexturePtr createRenderTargetCubeTexture(const ISize& size,
-                                                   const RenderTargetCreationOptions& options);
+                                                   const IRenderTargetOptions& options);
 
   //------------------------------------------------------------------------------------------------
   //                              Uniform Buffer Extension
@@ -1461,6 +1491,11 @@ protected:
   bool get_supportsUniformBuffers() const;
 
   /**
+   * @brief Hidden
+   */
+  bool get__shouldUseHighPrecisionShader() const;
+
+  /**
    * @brief Gets a boolean indicating that only power of 2 textures are supported.
    * Please note that you can still use non power of 2 textures but in this case the engine will
    * forcefully convert them
@@ -1499,7 +1534,7 @@ protected:
   /**
    * @brief Gets the current viewport.
    */
-  Viewport& get_currentViewport();
+  std::optional<Viewport>& get_currentViewport();
 
   /**.
    * @brief Gets the default empty texture
@@ -1551,6 +1586,7 @@ protected:
   /** VBOs **/
   /** @hidden */
   void _resetVertexBufferBinding();
+  void _resetIndexBufferBinding();
   void _normalizeIndexData(const IndicesArray& indices, Uint16Array& uint16ArrayResult,
                            Uint32Array& uint32ArrayResult);
   void bindIndexBuffer(const WebGLDataBufferPtr& buffer);
@@ -1578,7 +1614,6 @@ private:
   void _rebuildEffects();
   void _initGLContext();
   WebGLDataBufferPtr _createVertexBuffer(const Float32Array& data, unsigned int usage);
-  void _resetIndexBufferBinding();
   void bindBuffer(const WebGLDataBufferPtr& buffer, int target);
   void _vertexAttribPointer(const WebGLDataBufferPtr& buffer, unsigned int indx, int size,
                             unsigned int type, bool normalized, int stride, int offset);
@@ -1676,6 +1711,9 @@ public:
   /** @hidden */
   WebGLRenderingContext* _gl = nullptr;
 
+  /** @hidden */
+  ReadOnlyProperty<ThinEngine, bool> _shouldUseHighPrecisionShader;
+
   /**
    * Gets a boolean indicating that only power of 2 textures are supported
    * Please note that you can still use non power of 2 textures but in this case the engine will
@@ -1758,7 +1796,7 @@ public:
   /**
    * Gets the current viewport
    */
-  ReadOnlyProperty<ThinEngine, Viewport> currentViewport;
+  ReadOnlyProperty<ThinEngine, std::optional<Viewport>> currentViewport;
 
   /**
    * Gets the default empty texture
@@ -1779,6 +1817,16 @@ public:
    * Gets the default empty cube texture
    */
   ReadOnlyProperty<ThinEngine, InternalTexturePtr> emptyCubeTexture;
+
+  /**
+   * Defines whether the engine has been created with the premultipliedAlpha option on or not.
+   */
+  const bool premultipliedAlpha = true;
+
+  /**
+   * Observable event triggered before each texture is initialized
+   */
+  Observable<Texture> onBeforeTextureInitObservable;
 
   /**
    * Gets version of the current webGL context
@@ -1825,7 +1873,7 @@ protected:
 
   bool _highPrecisionShadersAllowed = true;
   bool _renderingQueueLaunched      = false;
-  std::vector<std::function<void()>> _activeRenderLoops;
+  std::vector<SA::delegate<void()>> _activeRenderLoops;
   bool _contextWasLost = false;
 
   // States
@@ -1834,9 +1882,9 @@ protected:
   /** @hidden */
   bool _colorWriteChanged = true;
   /** @hidden */
-  std::unique_ptr<DepthCullingState> _depthCullingState = nullptr;
+  std::unique_ptr<DepthCullingState> _depthCullingState;
   /** @hidden */
-  std::unique_ptr<StencilState> _stencilState = nullptr;
+  std::unique_ptr<StencilState> _stencilState;
   /** @hidden */
   int _activeChannel = 0;
   /** @hidden */
@@ -1863,16 +1911,6 @@ protected:
   std::vector<std::string> _texturesSupported;
   /** @hidden */
   ReadOnlyProperty<ThinEngine, bool> _supportsHardwareTextureRescaling;
-
-  /**
-   * Defines whether the engine has been created with the premultipliedAlpha option on or not.
-   */
-  const bool premultipliedAlpha = true;
-
-  /**
-   * Observable event triggered before each texture is initialized
-   */
-  Observable<Texture> onBeforeTextureInitObservable;
 
   /** @hidden */
   std::unordered_map<int, WebGLUniformLocationPtr> _boundUniforms;
@@ -1916,13 +1954,13 @@ private:
   std::optional<bool> _unpackFlipYCached = std::nullopt;
 
   /** Extensions */
-  std::unique_ptr<AlphaExtension> _alphaExtension                       = nullptr;
-  std::unique_ptr<CubeTextureExtension> _cubeTextureExtension           = nullptr;
-  std::unique_ptr<DynamicTextureExtension> _dynamicTextureExtension     = nullptr;
-  std::unique_ptr<MultiRenderExtension> _multiRenderExtension           = nullptr;
-  std::unique_ptr<RenderTargetExtension> _renderTargetExtension         = nullptr;
-  std::unique_ptr<RenderTargetCubeExtension> _renderTargetCubeExtension = nullptr;
-  std::unique_ptr<UniformBufferExtension> _uniformBufferExtension       = nullptr;
+  std::unique_ptr<AlphaExtension> _alphaExtension;
+  std::unique_ptr<CubeTextureExtension> _cubeTextureExtension;
+  std::unique_ptr<DynamicTextureExtension> _dynamicTextureExtension;
+  std::unique_ptr<MultiRenderExtension> _multiRenderExtension;
+  std::unique_ptr<RenderTargetExtension> _renderTargetExtension;
+  std::unique_ptr<RenderTargetCubeExtension> _renderTargetCubeExtension;
+  std::unique_ptr<UniformBufferExtension> _uniformBufferExtension;
 
   // Friend classes
   friend class RenderTargetExtension;

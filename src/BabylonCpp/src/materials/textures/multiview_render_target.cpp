@@ -8,23 +8,23 @@ namespace BABYLON {
 
 MultiviewRenderTarget::MultiviewRenderTarget(Scene* scene, const ISize& size)
     : RenderTargetTexture{
-      "multiview rtt",                          // name
-      size,                                     // size
-      scene,                                    // scene
-      false,                                    // generateMipMaps
-      true,                                     // doNotChangeAspectRatio
-      InternalTexture::DATASOURCE_UNKNOWN,      // type
-      false,                                    // isCube
-      TextureConstants::TRILINEAR_SAMPLINGMODE, // samplingMode
-      false,                                    // generateDepthBuffer
-      false,                                    // generateStencilBuffer
-      true,                                     // isMulti
-      Constants::TEXTUREFORMAT_RGBA,            // format
-      true                                      // delayAllocation
+      "multiview rtt",                                           // name
+      size,                                                      // size
+      scene,                                                     // scene
+      false,                                                     // generateMipMaps
+      true,                                                      // doNotChangeAspectRatio
+      static_cast<unsigned int>(InternalTextureSource::Unknown), // type
+      false,                                                     // isCube
+      TextureConstants::TRILINEAR_SAMPLINGMODE,                  // samplingMode
+      false,                                                     // generateDepthBuffer
+      false,                                                     // generateStencilBuffer
+      true,                                                      // isMulti
+      Constants::TEXTUREFORMAT_RGBA,                             // format
+      true                                                       // delayAllocation
     }
 {
-  auto internalTexture = scene->getEngine()->createMultiviewRenderTargetTexture(
-    getRenderWidth(), getRenderHeight());
+  auto internalTexture
+    = scene->getEngine()->createMultiviewRenderTargetTexture(getRenderWidth(), getRenderHeight());
   internalTexture->isMultiview = true;
   _texture                     = internalTexture;
 }

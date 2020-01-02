@@ -9,8 +9,8 @@
 namespace BABYLON {
 
 class InternalTexture;
+struct IRenderTargetOptions;
 struct ISize;
-struct RenderTargetCreationOptions;
 class ThinEngine;
 using InternalTexturePtr = std::shared_ptr<InternalTexture>;
 
@@ -30,7 +30,7 @@ public:
    * @returns a new render target cube texture stored in an InternalTexture
    */
   InternalTexturePtr createRenderTargetCubeTexture(const ISize& size,
-                                                   const RenderTargetCreationOptions& options);
+                                                   const IRenderTargetOptions& options);
 
 private:
   ThinEngine* _this;

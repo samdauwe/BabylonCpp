@@ -30,9 +30,11 @@
 #include <babylon/materials/textures/loaders/tga_texture_loader.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/uniform_buffer.h>
+#include <babylon/maths/scalar.h>
 #include <babylon/maths/viewport.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/webgl/webgl_data_buffer.h>
+#include <babylon/misc/dds.h>
 #include <babylon/misc/file_tools.h>
 #include <babylon/states/alpha_state.h>
 #include <babylon/states/depth_culling_state.h>
@@ -79,7 +81,7 @@ void ThinEngine::setShadersRepository(const std::string& value)
 
 std::string
 ThinEngine::excludedCompressedTextureFormats(const std::string& url,
-                                             const std::string& textureFormatInUse) const
+                                             const std::string& iTextureFormatInUse) const
 {
   const auto skipCompression = [this, &url]() -> bool {
     for (const auto& entry : _excludedCompressedTextures) {
@@ -91,15 +93,16 @@ ThinEngine::excludedCompressedTextureFormats(const std::string& url,
           && (url == entry || (std::regex_search(url, match, regex) && !match.empty()))) {
         return true;
       }
-      return false;
     }
+    return false;
   };
 
-  return skipCompression() ? "" : textureFormatInUse;
+  return skipCompression() ? "" : iTextureFormatInUse;
 }
 
 ThinEngine::ThinEngine(ICanvas* canvas, const EngineOptions& options)
     : supportsUniformBuffers{this, &ThinEngine::get_supportsUniformBuffers}
+    , _shouldUseHighPrecisionShader{this, &ThinEngine::get__shouldUseHighPrecisionShader}
     , needPOTTextures{this, &ThinEngine::get_needPOTTextures}
     , doNotHandleContextLost{this, &ThinEngine::get_doNotHandleContextLost,
                              &ThinEngine::set_doNotHandleContextLost}
@@ -180,9 +183,18 @@ ThinEngine::ThinEngine(ICanvas* canvas, const EngineOptions& options)
                     description().c_str())
 }
 
+ThinEngine::~ThinEngine()
+{
+}
+
 bool ThinEngine::get_supportsUniformBuffers() const
 {
   return webGLVersion() > 1.f && !disableUniformBuffers;
+}
+
+bool ThinEngine::get__shouldUseHighPrecisionShader() const
+{
+  return _caps.highPrecisionShaderSupported && _highPrecisionShadersAllowed;
 }
 
 bool ThinEngine::get_needPOTTextures() const
@@ -205,12 +217,17 @@ bool ThinEngine::get__supportsHardwareTextureRescaling() const
   return false;
 }
 
+std::vector<std::string>& ThinEngine::get_texturesSupported()
+{
+  return _texturesSupported;
+}
+
 std::string ThinEngine::get_textureFormatInUse() const
 {
   return _textureFormatInUse;
 }
 
-Viewport& ThinEngine::get_currentViewport()
+std::optional<Viewport>& ThinEngine::get_currentViewport()
 {
   return _cachedViewport;
 }
@@ -609,6 +626,27 @@ void ThinEngine::runRenderLoop(const std::function<void()>& renderFunction)
 
   if (!_renderingQueueLaunched) {
     _renderingQueueLaunched = true;
+  }
+}
+
+void ThinEngine::renderFunction(const std::function<void()>& renderFunction)
+{
+  if (!_contextWasLost) {
+    auto shouldRender = true;
+    if (!renderEvenInBackground && _windowIsBackground) {
+      shouldRender = false;
+    }
+
+    if (shouldRender) {
+      // Start new frame
+      beginFrame();
+
+      // Render
+      renderFunction();
+
+      // Present
+      endFrame();
+    }
   }
 }
 
@@ -1426,7 +1464,7 @@ EffectPtr ThinEngine::createEffect(
       = stl_util::contains(_baseName, "fragmentElement") ?
           _baseName["fragmentElement"] :
           stl_util::contains(_baseName, "fragment") ? _baseName["fragment"] : "fragment";
-    auto name = vertex + "+" + fragment + "@" + options.defines;
+    name = vertex + "+" + fragment + "@" + options.defines;
   }
 
   if (stl_util::contains(_compiledEffects, name)) {
@@ -1708,148 +1746,149 @@ void ThinEngine::enableEffect(const EffectPtr& effect)
   effect->onBindObservable().notifyObservers(effect.get());
 }
 
-void ThinEngine::setInt(GL::IGLUniformLocation* uniform, int value)
+void ThinEngine::setInt(const WebGLUniformLocationPtr& uniform, int value)
 {
   if (!uniform) {
     return;
   }
 
-  _gl->uniform1i(uniform, value);
+  _gl->uniform1i(uniform.get(), value);
 }
 
-void ThinEngine::setIntArray(GL::IGLUniformLocation* uniform, const Int32Array& array)
+void ThinEngine::setIntArray(const WebGLUniformLocationPtr& uniform, const Int32Array& array)
 {
   if (!uniform) {
     return;
   }
 
-  _gl->uniform1iv(uniform, array);
+  _gl->uniform1iv(uniform.get(), array);
 }
 
-void ThinEngine::setIntArray2(GL::IGLUniformLocation* uniform, const Int32Array& array)
+void ThinEngine::setIntArray2(const WebGLUniformLocationPtr& uniform, const Int32Array& array)
 {
   if (!uniform || array.size() % 2 != 0) {
     return;
   }
 
-  _gl->uniform2iv(uniform, array);
+  _gl->uniform2iv(uniform.get(), array);
 }
 
-void ThinEngine::setIntArray3(GL::IGLUniformLocation* uniform, const Int32Array& array)
+void ThinEngine::setIntArray3(const WebGLUniformLocationPtr& uniform, const Int32Array& array)
 {
   if (!uniform || array.size() % 3 != 0) {
     return;
   }
 
-  _gl->uniform3iv(uniform, array);
+  _gl->uniform3iv(uniform.get(), array);
 }
 
-void ThinEngine::setIntArray4(GL::IGLUniformLocation* uniform, const Int32Array& array)
+void ThinEngine::setIntArray4(const WebGLUniformLocationPtr& uniform, const Int32Array& array)
 {
   if (!uniform || array.size() % 4 != 0) {
     return;
   }
 
-  _gl->uniform4iv(uniform, array);
+  _gl->uniform4iv(uniform.get(), array);
 }
 
-void ThinEngine::setArray(GL::IGLUniformLocation* uniform, const Float32Array& array)
+void ThinEngine::setArray(const WebGLUniformLocationPtr& uniform, const Float32Array& array)
 {
   if (!uniform) {
     return;
   }
 
-  _gl->uniform1fv(uniform, array);
+  _gl->uniform1fv(uniform.get(), array);
 }
 
-void ThinEngine::setArray2(GL::IGLUniformLocation* uniform, const Float32Array& array)
+void ThinEngine::setArray2(const WebGLUniformLocationPtr& uniform, const Float32Array& array)
 {
   if (!uniform || array.size() % 2 != 0) {
     return;
   }
 
-  _gl->uniform2fv(uniform, array);
+  _gl->uniform2fv(uniform.get(), array);
 }
 
-void ThinEngine::setArray3(GL::IGLUniformLocation* uniform, const Float32Array& array)
+void ThinEngine::setArray3(const WebGLUniformLocationPtr& uniform, const Float32Array& array)
 {
   if (!uniform || array.size() % 3 != 0) {
     return;
   }
 
-  _gl->uniform3fv(uniform, array);
+  _gl->uniform3fv(uniform.get(), array);
 }
 
-void ThinEngine::setArray4(GL::IGLUniformLocation* uniform, const Float32Array& array)
+void ThinEngine::setArray4(const WebGLUniformLocationPtr& uniform, const Float32Array& array)
 {
   if (!uniform || array.size() % 4 != 0) {
     return;
   }
 
-  _gl->uniform4fv(uniform, array);
+  _gl->uniform4fv(uniform.get(), array);
 }
 
-void ThinEngine::setMatrices(GL::IGLUniformLocation* uniform, const Float32Array& matrices)
+void ThinEngine::setMatrices(const WebGLUniformLocationPtr& uniform, const Float32Array& matrices)
 {
   if (!uniform) {
     return;
   }
 
-  _gl->uniformMatrix4fv(uniform, false, matrices);
+  _gl->uniformMatrix4fv(uniform.get(), false, matrices);
 }
 
-void ThinEngine::setMatrix3x3(GL::IGLUniformLocation* uniform, const Float32Array& matrix)
+void ThinEngine::setMatrix3x3(const WebGLUniformLocationPtr& uniform, const Float32Array& matrix)
 {
   if (!uniform) {
     return;
   }
 
-  _gl->uniformMatrix3fv(uniform, false, matrix);
+  _gl->uniformMatrix3fv(uniform.get(), false, matrix);
 }
 
-void ThinEngine::setMatrix2x2(GL::IGLUniformLocation* uniform, const Float32Array& matrix)
+void ThinEngine::setMatrix2x2(const WebGLUniformLocationPtr& uniform, const Float32Array& matrix)
 {
   if (!uniform) {
     return;
   }
 
-  _gl->uniformMatrix2fv(uniform, false, matrix);
+  _gl->uniformMatrix2fv(uniform.get(), false, matrix);
 }
 
-void ThinEngine::setFloat(GL::IGLUniformLocation* uniform, float value)
+void ThinEngine::setFloat(const WebGLUniformLocationPtr& uniform, float value)
 {
   if (!uniform) {
     return;
   }
 
-  _gl->uniform1f(uniform, value);
+  _gl->uniform1f(uniform.get(), value);
 }
 
-void ThinEngine::setFloat2(GL::IGLUniformLocation* uniform, float x, float y)
+void ThinEngine::setFloat2(const WebGLUniformLocationPtr& uniform, float x, float y)
 {
   if (!uniform) {
     return;
   }
 
-  _gl->uniform2f(uniform, x, y);
+  _gl->uniform2f(uniform.get(), x, y);
 }
 
-void ThinEngine::setFloat3(GL::IGLUniformLocation* uniform, float x, float y, float z)
+void ThinEngine::setFloat3(const WebGLUniformLocationPtr& uniform, float x, float y, float z)
 {
   if (!uniform) {
     return;
   }
 
-  _gl->uniform3f(uniform, x, y, z);
+  _gl->uniform3f(uniform.get(), x, y, z);
 }
 
-void ThinEngine::setFloat4(GL::IGLUniformLocation* uniform, float x, float y, float z, float w)
+void ThinEngine::setFloat4(const WebGLUniformLocationPtr& uniform, float x, float y, float z,
+                           float w)
 {
   if (!uniform) {
     return;
   }
 
-  _gl->uniform4f(uniform, x, y, z, w);
+  _gl->uniform4f(uniform.get(), x, y, z, w);
 }
 
 void ThinEngine::applyStates()
@@ -2072,7 +2111,7 @@ InternalTexturePtr ThinEngine::createTexture(
   auto fromBlob = url.substr(0, 5) == "blob:";
   auto isBase64 = fromData && String::contains(url, ";base64,");
 
-  auto texture = fallback ? fallback : InternalTexture::New(this, InternalTexture::DATASOURCE_URL);
+  auto texture = fallback ? fallback : InternalTexture::New(this, InternalTextureSource::Url);
 
   // establish the file extension, if possible
   auto lastDot = String::lastIndexOf(url, ".");
@@ -2235,7 +2274,7 @@ InternalTexturePtr ThinEngine::createTexture(
           }
           else {
             // Using shaders when possible to rescale because canvas.drawImage is lossy
-            auto source = InternalTexture::New(this, InternalTexture::DATASOURCE_TEMP);
+            auto source = InternalTexture::New(this, InternalTextureSource::Temp);
             _bindTextureDirectly(GL::TEXTURE_2D, source);
             _gl->texImage2D(GL::TEXTURE_2D, 0, static_cast<int>(internalFormat), img.width,
                             img.height, 0, GL::RGBA, GL::UNSIGNED_BYTE, &img.data);
@@ -2272,6 +2311,107 @@ InternalTexturePtr ThinEngine::createTexture(
   return texture;
 }
 
+InternalTexturePtr ThinEngine::createPrefilteredCubeTexture(
+  const std::string& rootUrl, Scene* scene, float lodScale, float lodOffset,
+  const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
+  const std::function<void(const std::string& message, const std::string& exception)>& onError,
+  unsigned int format, const std::string& forcedExtension, bool createPolynomials)
+{
+  const auto callback = [=](const std::optional<CubeTextureData>& loadData) {
+    if (!loadData.has_value()) {
+      if (onLoad) {
+        onLoad(std::nullopt);
+      }
+      return;
+    }
+
+    auto texture = loadData->texture;
+    if (!createPolynomials) {
+      texture->_sphericalPolynomial = std::make_shared<SphericalPolynomial>();
+    }
+    else if (loadData->info.sphericalPolynomial) {
+      texture->_sphericalPolynomial = loadData->info.sphericalPolynomial;
+    }
+    texture->_source = InternalTextureSource::CubePrefiltered;
+
+    if (_caps.textureLOD) {
+      // Do not add extra process if texture lod is supported.
+      if (onLoad) {
+        onLoad(loadData);
+      }
+      return;
+    }
+
+    unsigned int mipSlices = 3;
+
+    auto& gl   = *_gl;
+    auto width = loadData->width;
+    if (!width) {
+      return;
+    }
+
+    std::vector<BaseTexturePtr> textures;
+    for (unsigned int i = 0; i < mipSlices; ++i) {
+      // compute LOD from even spacing in smoothness (matching shader calculation)
+      float smoothness = static_cast<float>(i) / static_cast<float>(mipSlices - 1);
+      float roughness  = 1.f - smoothness;
+
+      float minLODIndex = lodOffset;                                  // roughness = 0
+      float maxLODIndex = Scalar::Log2(width) * lodScale + lodOffset; // roughness = 1
+
+      float lodIndex = minLODIndex + (maxLODIndex - minLODIndex) * roughness;
+      int mipmapIndex
+        = static_cast<int>(std::round(std::min(std::max(lodIndex, 0.f), maxLODIndex)));
+
+      auto glTextureFromLod    = InternalTexture::New(this, InternalTextureSource::Temp);
+      glTextureFromLod->type   = texture->type;
+      glTextureFromLod->format = texture->format;
+      glTextureFromLod->width  = static_cast<int>(
+        std::pow(2.f, std::max(static_cast<float>(Scalar::Log2(width) - mipmapIndex), 0.f)));
+      glTextureFromLod->height = glTextureFromLod->width;
+      glTextureFromLod->isCube = true;
+      _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, glTextureFromLod, true);
+
+      gl.texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MAG_FILTER, GL::LINEAR);
+      gl.texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MIN_FILTER, GL::LINEAR);
+      gl.texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_S, GL::CLAMP_TO_EDGE);
+      gl.texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_T, GL::CLAMP_TO_EDGE);
+
+      if (loadData->isDDS && !loadData->data.empty()) {
+        auto info  = loadData->info;
+        auto& data = loadData->data[0];
+        _unpackFlipY(info.isCompressed);
+
+        DDSTools::UploadDDSLevels(this, glTextureFromLod, data, info, true, 6u, mipmapIndex);
+      }
+      else {
+        BABYLON_LOG_WARN("ThinEngine", "DDS is the only prefiltered cube map supported so far.")
+      }
+
+      _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, nullptr);
+
+      // Wrap in a base texture for easy binding.
+      auto lodTexture      = BaseTexture::New(scene);
+      lodTexture->isCube   = true;
+      lodTexture->_texture = glTextureFromLod;
+
+      glTextureFromLod->isReady = true;
+      textures.emplace_back(lodTexture);
+    }
+
+    texture->_lodTextureHigh = textures[2];
+    texture->_lodTextureMid  = textures[1];
+    texture->_lodTextureLow  = textures[0];
+
+    if (onLoad) {
+      onLoad(loadData);
+    }
+  };
+
+  return createCubeTexture(rootUrl, scene, {}, false, callback, onError, format, forcedExtension,
+                           createPolynomials, lodScale, lodOffset);
+}
+
 void ThinEngine::_FileToolsLoadImageFromUrl(
   std::string url, const std::function<void(const Image& img)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
@@ -2287,6 +2427,50 @@ void ThinEngine::_FileToolsLoadImage(
   const std::string& /*mimeType*/)
 {
   FileTools::LoadImageFromBuffer(input, invertY, onLoad, onError);
+}
+
+void ThinEngine::_rescaleTexture(const InternalTexturePtr& /*source*/,
+                                 const InternalTexturePtr& /*destination*/, Scene* /*scene*/,
+                                 unsigned int /*internalFormat*/,
+                                 const std::function<void()>& /*onComplete*/)
+{
+}
+
+InternalTexturePtr ThinEngine::createRawTexture(const Uint8Array& /*data*/, int /*width*/,
+                                                int /*height*/, unsigned int /*format*/,
+                                                bool /*generateMipMaps*/, bool /*invertY*/,
+                                                unsigned int /*samplingMode*/,
+                                                const std::string& /*compression*/,
+                                                unsigned int /*type*/)
+{
+  return nullptr;
+}
+
+InternalTexturePtr ThinEngine::createRawCubeTexture(const std::vector<ArrayBufferView>& /*data*/,
+                                                    int /*size*/, unsigned int /*format*/,
+                                                    unsigned int /*type*/, bool /*generateMipMaps*/,
+                                                    bool /*invertY*/, unsigned int /*samplingMode*/,
+                                                    const std::string& /*compression*/)
+{
+  return nullptr;
+}
+
+InternalTexturePtr ThinEngine::createRawTexture3D(const ArrayBufferView& /*data*/, int /*width*/,
+                                                  int /*height*/, int /*depth*/,
+                                                  unsigned int /*format*/, bool /*generateMipMaps*/,
+                                                  bool /*invertY*/, unsigned int /*samplingMode*/,
+                                                  const std::string& /*compression*/,
+                                                  unsigned int /*textureType*/)
+{
+  return nullptr;
+}
+
+InternalTexturePtr ThinEngine::createRawTexture2DArray(
+  const ArrayBufferView& /*data*/, int /*width*/, int /*height*/, int /*depth*/,
+  unsigned int /*format*/, bool /*generateMipMaps*/, bool /*invertY*/,
+  unsigned int /*samplingMode*/, const std::string& /*compression*/, unsigned int /*textureType*/)
+{
+  return nullptr;
 }
 
 void ThinEngine::_unpackFlipY(bool value)
@@ -2614,7 +2798,7 @@ void ThinEngine::_releaseFramebufferObjects(const InternalTexturePtr& texture)
 
   if (texture->_MSAARenderBuffer) {
     gl.deleteRenderbuffer(texture->_MSAARenderBuffer.get());
-    texture->_MSAARenderBuffer.reset(nullptr);
+    texture->_MSAARenderBuffer = nullptr;
   }
 }
 
@@ -3652,9 +3836,8 @@ ThinEngine::_createDepthStencilTexture(const std::variant<int, ISize>& size,
 //                              Render Target Cube Extension
 //--------------------------------------------------------------------------------------------------
 
-InternalTexturePtr
-ThinEngine::createRenderTargetCubeTexture(const ISize& size,
-                                          const RenderTargetCreationOptions& options)
+InternalTexturePtr ThinEngine::createRenderTargetCubeTexture(const ISize& size,
+                                                             const IRenderTargetOptions& options)
 {
   return _renderTargetCubeExtension->createRenderTargetCubeTexture(size, options);
 }

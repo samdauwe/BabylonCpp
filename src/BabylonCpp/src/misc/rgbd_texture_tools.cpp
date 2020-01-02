@@ -20,7 +20,7 @@ void RGBDTextureTools::ExpandRGBDTexture(const TexturePtr& texture)
   }
 
   // Gets everything ready.
-  auto engine        = internalTexture->getEngine();
+  auto engine        = static_cast<Engine*>(internalTexture->getEngine());
   auto& caps         = engine->getCaps();
   auto expandTexture = false;
 
@@ -75,8 +75,8 @@ void RGBDTextureTools::ExpandRGBDTexture(const TexturePtr& texture)
 
         // Cleanup
         engine->restoreDefaultFramebuffer();
-        engine->_releaseTexture(internalTexture.get());
-        engine->_releaseFramebufferObjects(expandedTexture.get());
+        engine->_releaseTexture(internalTexture);
+        engine->_releaseFramebufferObjects(expandedTexture);
         if (rgbdPostProcess) {
           rgbdPostProcess->dispose();
         }

@@ -9,12 +9,11 @@
 namespace BABYLON {
 
 class DDSInfo;
-class Engine;
 class InternalTexture;
+class ThinEngine;
 using InternalTexturePtr = std::shared_ptr<InternalTexture>;
 
-// Based on demo done by Brandon Jones -
-// http://media.tojicode.com/webgl-samples/dds.html
+// Based on demo done by Brandon Jones - http://media.tojicode.com/webgl-samples/dds.html
 // All values and structures referenced from:
 // http://msdn.microsoft.com/en-us/library/bb943991.aspx/
 
@@ -31,11 +30,7 @@ enum {
   DDSD_DEPTH       = 0x800000
 };
 
-enum {
-  DDSCAPS_COMPLEX = 0x8,
-  DDSCAPS_MIPMAP  = 0x400000,
-  DDSCAPS_TEXTURE = 0x1000
-};
+enum { DDSCAPS_COMPLEX = 0x8, DDSCAPS_MIPMAP = 0x400000, DDSCAPS_TEXTURE = 0x1000 };
 
 enum {
   DDSCAPS2_CUBEMAP           = 0x200,
@@ -73,11 +68,10 @@ inline std::string Int32ToFourCC(int value)
 }
 
 struct DDS {
-  static constexpr unsigned int FOURCC_DXT1
-    = FourCCToInt32<'D', 'X', 'T', '1'>::value;
-  static constexpr int FOURCC_DXT3 = FourCCToInt32<'D', 'X', 'T', '3'>::value;
-  static constexpr int FOURCC_DXT5 = FourCCToInt32<'D', 'X', 'T', '5'>::value;
-  static constexpr int FOURCC_DX10 = FourCCToInt32<'D', 'X', '1', '0'>::value;
+  static constexpr unsigned int FOURCC_DXT1        = FourCCToInt32<'D', 'X', 'T', '1'>::value;
+  static constexpr int FOURCC_DXT3                 = FourCCToInt32<'D', 'X', 'T', '3'>::value;
+  static constexpr int FOURCC_DXT5                 = FourCCToInt32<'D', 'X', 'T', '5'>::value;
+  static constexpr int FOURCC_DX10                 = FourCCToInt32<'D', 'X', '1', '0'>::value;
   static constexpr int FOURCC_D3DFMT_R16G16B16A16F = 113;
   static constexpr int FOURCC_D3DFMT_R32G32B32A32F = 116;
 
@@ -135,41 +129,30 @@ class BABYLON_SHARED_EXPORT DDSTools {
 private:
   static float _ToHalfFloat(float value);
   static float _FromHalfFloat(uint16_t value);
-  static Float32Array
-  _GetHalfFloatAsFloatRGBAArrayBuffer(float width, float height, int dataOffset,
-                                      size_t dataLength,
-                                      const Uint8Array& arrayBuffer, int lod);
-  static Uint16Array _GetHalfFloatRGBAArrayBuffer(float width, float height,
-                                                  int dataOffset,
-                                                  size_t dataLength,
-                                                  const Uint8Array& arrayBuffer,
+  static Float32Array _GetHalfFloatAsFloatRGBAArrayBuffer(float width, float height, int dataOffset,
+                                                          size_t dataLength,
+                                                          const Uint8Array& arrayBuffer, int lod);
+  static Uint16Array _GetHalfFloatRGBAArrayBuffer(float width, float height, int dataOffset,
+                                                  size_t dataLength, const Uint8Array& arrayBuffer,
                                                   int lod);
-  static Float32Array _GetFloatRGBAArrayBuffer(float width, float height,
-                                               int dataOffset,
-                                               size_t dataLength,
-                                               const Uint8Array& arrayBuffer,
+  static Float32Array _GetFloatRGBAArrayBuffer(float width, float height, int dataOffset,
+                                               size_t dataLength, const Uint8Array& arrayBuffer,
                                                int lod);
-  static Float32Array
-  _GetFloatAsUIntRGBAArrayBuffer(float width, float height, int dataOffset,
-                                 size_t dataLength,
-                                 const Uint8Array& arrayBuffer, int lod);
-  static Float32Array
-  _GetHalfFloatAsUIntRGBAArrayBuffer(float width, float height, int dataOffset,
-                                     size_t dataLength,
-                                     const Uint8Array& arrayBuffer, int lod);
-  static Uint8Array _GetRGBAArrayBuffer(float width, float height,
-                                        int dataOffset, size_t dataLength,
-                                        const Uint8Array& arrayBuffer,
-                                        int rOffset, int gOffset, int bOffset,
-                                        int aOffset);
+  static Float32Array _GetFloatAsUIntRGBAArrayBuffer(float width, float height, int dataOffset,
+                                                     size_t dataLength,
+                                                     const Uint8Array& arrayBuffer, int lod);
+  static Float32Array _GetHalfFloatAsUIntRGBAArrayBuffer(float width, float height, int dataOffset,
+                                                         size_t dataLength,
+                                                         const Uint8Array& arrayBuffer, int lod);
+  static Uint8Array _GetRGBAArrayBuffer(float width, float height, int dataOffset,
+                                        size_t dataLength, const Uint8Array& arrayBuffer,
+                                        int rOffset, int gOffset, int bOffset, int aOffset);
   static int _ExtractLongWordOrder(int value);
-  static Uint8Array _GetRGBArrayBuffer(float width, float height,
-                                       int dataOffset, size_t dataLength,
-                                       const Uint8Array& arrayBuffer,
-                                       int rOffset, int gOffset, int bOffset);
-  static Uint8Array _GetLuminanceArrayBuffer(float width, float height,
-                                             int dataOffset, size_t dataLength,
-                                             const Uint8Array& arrayBuffer);
+  static Uint8Array _GetRGBArrayBuffer(float width, float height, int dataOffset, size_t dataLength,
+                                       const Uint8Array& arrayBuffer, int rOffset, int gOffset,
+                                       int bOffset);
+  static Uint8Array _GetLuminanceArrayBuffer(float width, float height, int dataOffset,
+                                             size_t dataLength, const Uint8Array& arrayBuffer);
 
 public:
   /**
@@ -177,20 +160,17 @@ public:
    * @param arrayBuffer defines the array buffer to read data from
    * @returns the DDS information
    */
-  static DDSInfo
-  GetDDSInfo(const std::variant<std::string, ArrayBuffer>& arrayBuffer);
+  static DDSInfo GetDDSInfo(const std::variant<std::string, ArrayBuffer>& arrayBuffer);
 
   /**
    * @brief Uploads DDS Levels to a Babylon Texture.
    */
-  static void
-  UploadDDSLevels(Engine* engine, const InternalTexturePtr& texture,
-                  const std::variant<std::string, ArrayBuffer>& arrayBuffer,
-                  DDSInfo& info, bool loadMipmaps, unsigned int faces,
-                  int lodIndex = -1, int currentFace = -1);
+  static void UploadDDSLevels(ThinEngine* engine, const InternalTexturePtr& texture,
+                              const std::variant<std::string, ArrayBuffer>& arrayBuffer,
+                              DDSInfo& info, bool loadMipmaps, unsigned int faces,
+                              int lodIndex = -1, int currentFace = -1);
 
-  static ArrayBuffer
-  ToArrayBuffer(const std::variant<std::string, ArrayBuffer>& arrayBuffer);
+  static ArrayBuffer ToArrayBuffer(const std::variant<std::string, ArrayBuffer>& arrayBuffer);
 
 public:
   /**

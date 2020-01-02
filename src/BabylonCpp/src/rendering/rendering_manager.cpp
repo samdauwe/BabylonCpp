@@ -42,19 +42,18 @@ void RenderingManager::_clearDepthStencilBuffer(bool depth, bool stencil)
     return;
   }
 
-  _scene->getEngine()->clear(depth, stencil);
+  _scene->getEngine()->clear(std::nullopt, false, depth, stencil);
   _depthStencilBufferAlreadyCleaned = true;
 }
 
-void RenderingManager::render(
-  std::function<void(const std::vector<SubMesh*>& opaqueSubMeshes,
-                     const std::vector<SubMesh*>& alphaTestSubMeshes,
-                     const std::vector<SubMesh*>& transparentSubMeshes,
-                     const std::vector<SubMesh*>& depthOnlySubMeshes,
-                     const std::function<void()>& beforeTransparents)>
-    customRenderFunction,
-  const std::vector<AbstractMesh*>& activeMeshes, bool renderParticles,
-  bool renderSprites)
+void RenderingManager::render(std::function<void(const std::vector<SubMesh*>& opaqueSubMeshes,
+                                                 const std::vector<SubMesh*>& alphaTestSubMeshes,
+                                                 const std::vector<SubMesh*>& transparentSubMeshes,
+                                                 const std::vector<SubMesh*>& depthOnlySubMeshes,
+                                                 const std::function<void()>& beforeTransparents)>
+                                customRenderFunction,
+                              const std::vector<AbstractMesh*>& activeMeshes, bool renderParticles,
+                              bool renderSprites)
 {
   // Update the observable context (not null as it only goes away on dispose)
   auto& info   = _renderingGroupInfo;
@@ -71,11 +70,9 @@ void RenderingManager::render(
   // Render
   for (unsigned int index = RenderingManager::MIN_RENDERINGGROUPS;
        index < RenderingManager::MAX_RENDERINGGROUPS; ++index) {
-    _depthStencilBufferAlreadyCleaned
-      = (index == RenderingManager::MIN_RENDERINGGROUPS);
-    RenderingGroup* renderingGroup = (index < _renderingGroups.size()) ?
-                                       _renderingGroups[index].get() :
-                                       nullptr;
+    _depthStencilBufferAlreadyCleaned = (index == RenderingManager::MIN_RENDERINGGROUPS);
+    RenderingGroup* renderingGroup
+      = (index < _renderingGroups.size()) ? _renderingGroups[index].get() : nullptr;
     if (!renderingGroup) {
       continue;
     }
@@ -84,8 +81,7 @@ void RenderingManager::render(
     info->renderingGroupId  = index;
 
     // Before Observable
-    _scene->onBeforeRenderingGroupObservable.notifyObservers(
-      info.get(), renderingGroupMask);
+    _scene->onBeforeRenderingGroupObservable.notifyObservers(info.get(), renderingGroupMask);
 
     // Clear depth/stencil if needed
     if (RenderingManager::AUTOCLEAR) {
@@ -111,15 +107,13 @@ void RenderingManager::render(
     for (const auto& step : _scene->_beforeRenderingGroupDrawStage) {
       step.action(iIndex);
     }
-    renderingGroup->render(customRenderFunction, renderSprites, renderParticles,
-                           activeMeshes);
+    renderingGroup->render(customRenderFunction, renderSprites, renderParticles, activeMeshes);
     for (const auto& step : _scene->_afterRenderingGroupDrawStage) {
       step.action(iIndex);
     }
 
     // After Observable
-    _scene->onAfterRenderingGroupObservable.notifyObservers(info.get(),
-                                                            renderingGroupMask);
+    _scene->onAfterRenderingGroupObservable.notifyObservers(info.get(), renderingGroupMask);
   }
 }
 
@@ -191,8 +185,7 @@ void RenderingManager::dispatchParticles(IParticleSystem* particleSystem)
   _renderingGroups[renderingGroupId]->dispatchParticles(particleSystem);
 }
 
-void RenderingManager::dispatch(SubMesh* subMesh, AbstractMesh* mesh,
-                                const MaterialPtr& material)
+void RenderingManager::dispatch(SubMesh* subMesh, AbstractMesh* mesh, const MaterialPtr& material)
 {
   if (!mesh) {
     mesh = subMesh->getMesh().get();
@@ -206,30 +199,25 @@ void RenderingManager::dispatch(SubMesh* subMesh, AbstractMesh* mesh,
 
 void RenderingManager::setRenderingOrder(
   unsigned int renderingGroupId,
-  const std::function<int(const SubMesh* a, const SubMesh* b)>&
-    opaqueSortCompareFn,
-  const std::function<int(const SubMesh* a, const SubMesh* b)>&
-    alphaTestSortCompareFn,
-  const std::function<int(const SubMesh* a, const SubMesh* b)>&
-    transparentSortCompareFn)
+  const std::function<int(const SubMesh* a, const SubMesh* b)>& opaqueSortCompareFn,
+  const std::function<int(const SubMesh* a, const SubMesh* b)>& alphaTestSortCompareFn,
+  const std::function<int(const SubMesh* a, const SubMesh* b)>& transparentSortCompareFn)
 {
   _customOpaqueSortCompareFn[renderingGroupId]      = opaqueSortCompareFn;
   _customAlphaTestSortCompareFn[renderingGroupId]   = alphaTestSortCompareFn;
   _customTransparentSortCompareFn[renderingGroupId] = transparentSortCompareFn;
 
   if (_renderingGroups[renderingGroupId]) {
-    auto& group                = _renderingGroups[renderingGroupId];
-    group->opaqueSortCompareFn = _customOpaqueSortCompareFn[renderingGroupId];
-    group->alphaTestSortCompareFn
-      = _customAlphaTestSortCompareFn[renderingGroupId];
-    group->transparentSortCompareFn
-      = _customTransparentSortCompareFn[renderingGroupId];
+    auto& group                     = _renderingGroups[renderingGroupId];
+    group->opaqueSortCompareFn      = _customOpaqueSortCompareFn[renderingGroupId];
+    group->alphaTestSortCompareFn   = _customAlphaTestSortCompareFn[renderingGroupId];
+    group->transparentSortCompareFn = _customTransparentSortCompareFn[renderingGroupId];
   }
 }
 
-void RenderingManager::setRenderingAutoClearDepthStencil(
-  unsigned int renderingGroupId, bool autoClearDepthStencil, bool depth,
-  bool stencil)
+void RenderingManager::setRenderingAutoClearDepthStencil(unsigned int renderingGroupId,
+                                                         bool autoClearDepthStencil, bool depth,
+                                                         bool stencil)
 {
   _autoClearDepthStencil[renderingGroupId] = {
     autoClearDepthStencil, // autoClear

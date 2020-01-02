@@ -61,7 +61,10 @@ void _DDSTextureLoader::loadCubeData(
   DDSTools::UploadDDSLevels(engine, texture, data, info, loadMipmap, 6);
 
   if (!info.isFourCC && info.mipmapCount == 1) {
-    engine->generateMipMapsForCubemap(texture);
+    auto _engine = static_cast<Engine*>(engine);
+    if (_engine) {
+      _engine->generateMipMapsForCubemap(texture);
+    }
   }
 
   engine->_setCubeMapTextureParams(loadMipmap);
@@ -105,7 +108,10 @@ void _DDSTextureLoader::loadCubeData(
     DDSTools::UploadDDSLevels(engine, texture, data, info, loadMipmap, 6);
 
     if (!info.isFourCC && info.mipmapCount == 1) {
-      engine->generateMipMapsForCubemap(texture);
+      auto _engine = static_cast<Engine*>(engine);
+      if (_engine) {
+        _engine->generateMipMapsForCubemap(texture);
+      }
     }
   }
 

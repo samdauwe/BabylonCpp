@@ -5,15 +5,13 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image/stb_image_write.h>
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
-#include <stb_image//stb_image_resize.h>
+#include <stb_image/stb_image_resize.h>
 
 namespace BABYLON {
 namespace GL {
 
 FramebufferCanvas::FramebufferCanvas()
-  : mFrameBuffer{nullptr}
-  , mTextureColorBuffer{nullptr}
-  , mRenderbuffer{nullptr}
+    : mFrameBuffer{nullptr}, mTextureColorBuffer{nullptr}, mRenderbuffer{nullptr}
 {
   _renderingContext = std::make_unique<GL::GLRenderingContext>();
   _renderingContext->initialize();
@@ -51,7 +49,7 @@ void FramebufferCanvas::initializeFrameBuffer()
 
   // Create a renderbuffer object for depth and stencil attachment
   mRenderbuffer = _renderingContext->createRenderbuffer();
-  _renderingContext->bindRenderbuffer(GL_RENDERBUFFER, mRenderbuffer);
+  _renderingContext->bindRenderbuffer(GL_RENDERBUFFER, mRenderbuffer.get());
   _renderingContext->renderbufferStorage(GL_RENDERBUFFER, DEPTH24_STENCIL8, clientWidth,
                                          clientHeight);
   _renderingContext->framebufferRenderbuffer(GL_FRAMEBUFFER, DEPTH_STENCIL_ATTACHMENT,
@@ -76,8 +74,8 @@ void FramebufferCanvas::initializeFrameBuffer()
 void FramebufferCanvas::resize(int iWidth, int iHeight)
 {
   if (clientWidth != iWidth || clientHeight != iHeight) {
-    clientWidth = iWidth;
-    clientHeight = iHeight;
+    clientWidth                            = iWidth;
+    clientHeight                           = iHeight;
     _renderingContext->drawingBufferWidth  = iWidth;
     _renderingContext->drawingBufferHeight = iHeight;
 
@@ -91,7 +89,7 @@ void FramebufferCanvas::resize(int iWidth, int iHeight)
     _renderingContext->bindFramebuffer(GL_FRAMEBUFFER, mFrameBuffer.get());
 
     // Resize renderbuffer
-    _renderingContext->bindRenderbuffer(GL_RENDERBUFFER, mRenderbuffer);
+    _renderingContext->bindRenderbuffer(GL_RENDERBUFFER, mRenderbuffer.get());
     _renderingContext->renderbufferStorage(GL_RENDERBUFFER, DEPTH24_STENCIL8, clientWidth,
                                            clientHeight);
 
@@ -125,8 +123,7 @@ ICanvasRenderingContext2D* FramebufferCanvas::getContext2d()
   return nullptr;
 }
 
-GL::IGLRenderingContext*
-FramebufferCanvas::getContext3d(const EngineOptions& /*options*/)
+GL::IGLRenderingContext* FramebufferCanvas::getContext3d(const EngineOptions& /*options*/)
 {
   return _renderingContext.get();
 }
@@ -147,8 +144,7 @@ unsigned int FramebufferCanvas::textureId()
   // return mFrameBuffer->value;
 }
 
-Uint8Array reverse_pixels_rows(const Uint8Array& pixels, int width, int height,
-                               int nbChannels)
+Uint8Array reverse_pixels_rows(const Uint8Array& pixels, int width, int height, int nbChannels)
 {
   Uint8Array pixels_reverse_rows;
   pixels_reverse_rows.resize(width * height * 3, 0);
@@ -168,16 +164,13 @@ Uint8Array FramebufferCanvas::readPixelsRgb()
 {
   Uint8Array pixels;
   pixels.resize(clientWidth * clientHeight * 3, 0);
-  _renderingContext->readPixels(0, 0, clientWidth, clientHeight, GL_RGB,
-                                GL_UNSIGNED_BYTE, pixels);
+  _renderingContext->readPixels(0, 0, clientWidth, clientHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
   // rows are inversed in the framebuffer: invert them now
-  auto pixels_reverse_rows
-    = reverse_pixels_rows(pixels, clientWidth, clientHeight, 3);
+  auto pixels_reverse_rows = reverse_pixels_rows(pixels, clientWidth, clientHeight, 3);
   return pixels_reverse_rows;
 }
 
-void FramebufferCanvas::saveScreenshotJpg(const char* filename, int quality,
-                                          int imageWidth)
+void FramebufferCanvas::saveScreenshotJpg(const char* filename, int quality, int imageWidth)
 {
   bind();
   auto pixels = readPixelsRgb();
@@ -185,18 +178,14 @@ void FramebufferCanvas::saveScreenshotJpg(const char* filename, int quality,
   int nbChannels = 3;
 
   if (imageWidth == -1)
-    stbi_write_jpg(filename, clientWidth, clientHeight, nbChannels,
-                   pixels.data(), quality);
+    stbi_write_jpg(filename, clientWidth, clientHeight, nbChannels, pixels.data(), quality);
   else {
     Uint8Array pixels_resized;
-    int imageHeight
-      = (int)((double)clientHeight * (double)imageWidth / (double)clientWidth
-              + 0.5);
+    int imageHeight = (int)((double)clientHeight * (double)imageWidth / (double)clientWidth + 0.5);
     pixels_resized.resize(imageWidth * imageHeight * 3);
-    stbir_resize_uint8(pixels.data(), clientWidth, clientHeight, 0,
-                       pixels_resized.data(), imageWidth, imageHeight, 0, 3);
-    stbi_write_jpg(filename, imageWidth, imageHeight, nbChannels,
-                   pixels_resized.data(), quality);
+    stbir_resize_uint8(pixels.data(), clientWidth, clientHeight, 0, pixels_resized.data(),
+                       imageWidth, imageHeight, 0, 3);
+    stbi_write_jpg(filename, imageWidth, imageHeight, nbChannels, pixels_resized.data(), quality);
   }
 }
 
@@ -207,8 +196,7 @@ void FramebufferCanvas::saveScreenshotPng(const char* filename)
   unbind();
   int nbChannels      = 3;
   int stride_in_bytes = clientWidth * nbChannels;
-  stbi_write_png(filename, clientWidth, clientHeight, nbChannels, pixels.data(),
-                 stride_in_bytes);
+  stbi_write_png(filename, clientWidth, clientHeight, nbChannels, pixels.data(), stride_in_bytes);
 }
 
 } // end of namespace GL

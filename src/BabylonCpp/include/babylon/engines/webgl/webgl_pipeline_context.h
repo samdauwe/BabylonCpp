@@ -17,7 +17,7 @@ class IGLTransformFeedback;
 
 class ThinEngine;
 using WebGLProgramPtr           = std::shared_ptr<GL::IGLProgram>;
-using WebGLRenderingContext     = std::shared_ptr<GL::IGLRenderingContext>;
+using WebGLRenderingContext     = GL::IGLRenderingContext;
 using WebGLShaderPtr            = std::shared_ptr<GL::IGLShader>;
 using WebGLTransformFeedbackPtr = std::shared_ptr<GL::IGLTransformFeedback>;
 

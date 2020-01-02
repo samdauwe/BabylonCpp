@@ -1541,7 +1541,7 @@ public:
    * @return A GL extension object, or null if name does not match (case-insensitive) to one of the
    * strings in WebGLRenderingContext.getSupportedExtensions.
    */
-  virtual GL::any getExtension(const std::string& name);
+  virtual GL::any getExtension(const std::string& name) = 0;
 
   /**
    * @brief Returns true if the specified GL extension is supported.

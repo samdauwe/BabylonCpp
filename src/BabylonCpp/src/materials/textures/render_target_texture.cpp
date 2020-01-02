@@ -181,7 +181,7 @@ void RenderTargetTexture::set_onClear(
   _onClearObserver = onClearObservable.add(callback);
 }
 
-RenderTargetCreationOptions& RenderTargetTexture::get_renderTargetOptions()
+IRenderTargetOptions& RenderTargetTexture::get_renderTargetOptions()
 {
   return _renderTargetOptions;
 }
@@ -201,7 +201,7 @@ void RenderTargetTexture::createDepthStencilTexture(int comparisonFunction, bool
   options.isCube             = isCube;
   depthStencilTexture        = engine->createDepthStencilTexture(_size, options);
 
-  engine->setFrameBufferDepthStencilTexture(this);
+  engine->setFrameBufferDepthStencilTexture(shared_from_base<RenderTargetTexture>());
 }
 
 void RenderTargetTexture::_processSizeParameter(const std::variant<ISize, float>& size)
@@ -721,7 +721,7 @@ void RenderTargetTexture::disposeFramebufferObjects()
   auto objBuffer = getInternalTexture();
   auto scene     = getScene();
   if (objBuffer && scene) {
-    scene->getEngine()->_releaseFramebufferObjects(objBuffer.get());
+    scene->getEngine()->_releaseFramebufferObjects(objBuffer);
   }
 }
 
@@ -762,7 +762,7 @@ void RenderTargetTexture::dispose()
   }
 
   if (depthStencilTexture) {
-    getScene()->getEngine()->_releaseTexture(depthStencilTexture.get());
+    getScene()->getEngine()->_releaseTexture(depthStencilTexture);
   }
 
   Texture::dispose();

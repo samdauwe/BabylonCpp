@@ -131,7 +131,7 @@ void EnvironmentTextureTools::UploadLevels(const InternalTexturePtr& texture,
   const auto mipmapsCount = static_cast<size_t>(std::round(Scalar::Log2(texture->width)) + 1);
 
   // Gets everything ready.
-  auto engine                    = texture->getEngine();
+  auto engine                    = static_cast<Engine*>(texture->getEngine());
   auto expandTexture             = false;
   auto generateNonLODTextures    = false;
   PostProcessPtr rgbdPostProcess = nullptr;
@@ -176,7 +176,7 @@ void EnvironmentTextureTools::UploadLevels(const InternalTexturePtr& texture,
     texture->_isRGBD = false;
     texture->invertY = false;
 
-    RenderTargetCreationOptions options;
+    IRenderTargetOptions options;
     options.generateDepthBuffer   = false;
     options.generateMipMaps       = true;
     options.generateStencilBuffer = false;
@@ -210,7 +210,7 @@ void EnvironmentTextureTools::UploadLevels(const InternalTexturePtr& texture,
         auto mipmapIndex
           = static_cast<size_t>(std::round(std::min(std::max(lodIndex, 0.f), maxLODIndex)));
 
-        auto glTextureFromLod     = InternalTexture::New(engine, InternalTexture::DATASOURCE_TEMP);
+        auto glTextureFromLod     = InternalTexture::New(engine, InternalTextureSource::Temp);
         glTextureFromLod->isCube  = true;
         glTextureFromLod->invertY = true;
         glTextureFromLod->generateMipMaps = false;
@@ -322,8 +322,8 @@ void EnvironmentTextureTools::UploadLevels(const InternalTexturePtr& texture,
 
   // Release temp RTT.
   if (cubeRtt) {
-    engine->_releaseFramebufferObjects(cubeRtt.get());
-    engine->_releaseTexture(texture.get());
+    engine->_releaseFramebufferObjects(cubeRtt);
+    engine->_releaseTexture(texture);
     cubeRtt->_swapAndDie(texture);
   }
   // Release temp Post Process.

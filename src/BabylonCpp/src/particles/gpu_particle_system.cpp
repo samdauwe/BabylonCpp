@@ -38,8 +38,7 @@ bool GPUParticleSystem::IsSupported()
 }
 
 GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
-                                     std::optional<size_t> randomTextureSize,
-                                     Scene* scene,
+                                     std::optional<size_t> randomTextureSize, Scene* scene,
                                      bool iIsAnimationSheetEnabled)
     : BaseParticleSystem{iName}
     , activeParticleCount{this, &GPUParticleSystem::get_activeParticleCount,
@@ -127,8 +126,8 @@ GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
   particleEmitterType = std::make_unique<BoxParticleEmitter>();
 
   // Random data
-  auto maxTextureSize = std::min(
-    static_cast<size_t>(_engine->getCaps().maxTextureSize), *randomTextureSize);
+  auto maxTextureSize
+    = std::min(static_cast<size_t>(_engine->getCaps().maxTextureSize), *randomTextureSize);
   Float32Array d;
   for (size_t i = 0; i < maxTextureSize; ++i) {
     d.emplace_back(Math::random());
@@ -137,9 +136,8 @@ GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
     d.emplace_back(Math::random());
   }
   _randomTexture = std::make_unique<RawTexture>(
-    ArrayBufferView(d), static_cast<int>(maxTextureSize), 1,
-    Constants::TEXTUREFORMAT_RGBA, _scene, false, false,
-    Constants::TEXTURE_NEAREST_SAMPLINGMODE, Constants::TEXTURETYPE_FLOAT);
+    ArrayBufferView(d), static_cast<int>(maxTextureSize), 1, Constants::TEXTUREFORMAT_RGBA, _scene,
+    false, false, Constants::TEXTURE_NEAREST_SAMPLINGMODE, Constants::TEXTURETYPE_FLOAT);
   _randomTexture->wrapU = TextureConstants::WRAP_ADDRESSMODE;
   _randomTexture->wrapV = TextureConstants::WRAP_ADDRESSMODE;
 
@@ -151,9 +149,8 @@ GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
     d.emplace_back(Math::random());
   }
   _randomTexture2 = std::make_unique<RawTexture>(
-    ArrayBufferView(d), static_cast<int>(maxTextureSize), 1,
-    Constants::TEXTUREFORMAT_RGBA, _scene, false, false,
-    Constants::TEXTURE_NEAREST_SAMPLINGMODE, Constants::TEXTURETYPE_FLOAT);
+    ArrayBufferView(d), static_cast<int>(maxTextureSize), 1, Constants::TEXTUREFORMAT_RGBA, _scene,
+    false, false, Constants::TEXTURE_NEAREST_SAMPLINGMODE, Constants::TEXTURETYPE_FLOAT);
   _randomTexture2->wrapU = TextureConstants::WRAP_ADDRESSMODE;
   _randomTexture2->wrapV = TextureConstants::WRAP_ADDRESSMODE;
 
@@ -190,9 +187,8 @@ bool GPUParticleSystem::isReady()
     return false;
   }
 
-  if (!hasEmitter() || !_updateEffect->isReady()
-      || !_imageProcessingConfiguration->isReady() || !_renderEffect->isReady()
-      || !particleTexture || !particleTexture->isReady()) {
+  if (!hasEmitter() || !_updateEffect->isReady() || !_imageProcessingConfiguration->isReady()
+      || !_renderEffect->isReady() || !particleTexture || !particleTexture->isReady()) {
     return false;
   }
 
@@ -243,9 +239,9 @@ const char* GPUParticleSystem::getClassName() const
   return "GPUParticleSystem";
 }
 
-BaseParticleSystem& GPUParticleSystem::_removeGradientAndTexture(
-  float gradient, std::vector<ColorGradient>& gradients,
-  const RawTexturePtr& texture)
+BaseParticleSystem&
+GPUParticleSystem::_removeGradientAndTexture(float gradient, std::vector<ColorGradient>& gradients,
+                                             const RawTexturePtr& texture)
 {
   BaseParticleSystem::_removeGradientAndTexture(gradient, gradients, texture);
 
@@ -254,9 +250,9 @@ BaseParticleSystem& GPUParticleSystem::_removeGradientAndTexture(
   return *this;
 }
 
-BaseParticleSystem& GPUParticleSystem::_removeGradientAndTexture(
-  float gradient, std::vector<Color3Gradient>& gradients,
-  const RawTexturePtr& texture)
+BaseParticleSystem&
+GPUParticleSystem::_removeGradientAndTexture(float gradient, std::vector<Color3Gradient>& gradients,
+                                             const RawTexturePtr& texture)
 {
   BaseParticleSystem::_removeGradientAndTexture(gradient, gradients, texture);
 
@@ -265,9 +261,9 @@ BaseParticleSystem& GPUParticleSystem::_removeGradientAndTexture(
   return *this;
 }
 
-BaseParticleSystem& GPUParticleSystem::_removeGradientAndTexture(
-  float gradient, std::vector<FactorGradient>& gradients,
-  const RawTexturePtr& texture)
+BaseParticleSystem&
+GPUParticleSystem::_removeGradientAndTexture(float gradient, std::vector<FactorGradient>& gradients,
+                                             const RawTexturePtr& texture)
 {
   BaseParticleSystem::_removeGradientAndTexture(gradient, gradients, texture);
 
@@ -276,9 +272,8 @@ BaseParticleSystem& GPUParticleSystem::_removeGradientAndTexture(
   return *this;
 }
 
-GPUParticleSystem&
-GPUParticleSystem::addColorGradient(float gradient, const Color4& iColor1,
-                                    const std::optional<Color4>& /*color2*/)
+GPUParticleSystem& GPUParticleSystem::addColorGradient(float gradient, const Color4& iColor1,
+                                                       const std::optional<Color4>& /*color2*/)
 {
   ColorGradient colorGradient;
   colorGradient.gradient = gradient;
@@ -286,16 +281,16 @@ GPUParticleSystem::addColorGradient(float gradient, const Color4& iColor1,
   _colorGradients.emplace_back(colorGradient);
 
   BABYLON::stl_util::sort_js_style(_colorGradients,
-            [](const ColorGradient& a, const ColorGradient& b) {
-              if (a.gradient < b.gradient) {
-                return -1;
-              }
-              else if (a.gradient > b.gradient) {
-                return 1;
-              }
+                                   [](const ColorGradient& a, const ColorGradient& b) {
+                                     if (a.gradient < b.gradient) {
+                                       return -1;
+                                     }
+                                     else if (a.gradient > b.gradient) {
+                                       return 1;
+                                     }
 
-              return 0;
-            });
+                                     return 0;
+                                   });
 
   if (_colorGradientsTexture) {
     _colorGradientsTexture->dispose();
@@ -315,8 +310,8 @@ GPUParticleSystem& GPUParticleSystem::removeColorGradient(float gradient)
   return *this;
 }
 
-void GPUParticleSystem::_addFactorGradient(
-  std::vector<FactorGradient>& factorGradients, float gradient, float factor)
+void GPUParticleSystem::_addFactorGradient(std::vector<FactorGradient>& factorGradients,
+                                           float gradient, float factor)
 {
   FactorGradient valueGradient;
   valueGradient.gradient = gradient;
@@ -324,23 +319,22 @@ void GPUParticleSystem::_addFactorGradient(
   factorGradients.emplace_back(valueGradient);
 
   BABYLON::stl_util::sort_js_style(factorGradients,
-            [](const FactorGradient& a, const FactorGradient& b) {
-              if (a.gradient < b.gradient) {
-                return -1;
-              }
-              else if (a.gradient > b.gradient) {
-                return 1;
-              }
+                                   [](const FactorGradient& a, const FactorGradient& b) {
+                                     if (a.gradient < b.gradient) {
+                                       return -1;
+                                     }
+                                     else if (a.gradient > b.gradient) {
+                                       return 1;
+                                     }
 
-              return 0;
-            });
+                                     return 0;
+                                   });
 
   _releaseBuffers();
 }
 
-GPUParticleSystem&
-GPUParticleSystem::addSizeGradient(float gradient, float factor,
-                                   const std::optional<float>& /*factor2*/)
+GPUParticleSystem& GPUParticleSystem::addSizeGradient(float gradient, float factor,
+                                                      const std::optional<float>& /*factor2*/)
 {
   _addFactorGradient(_sizeGradients, gradient, factor);
 
@@ -362,8 +356,9 @@ GPUParticleSystem& GPUParticleSystem::removeSizeGradient(float gradient)
   return *this;
 }
 
-GPUParticleSystem& GPUParticleSystem::addAngularSpeedGradient(
-  float gradient, float factor, const std::optional<float>& /*factor2*/)
+GPUParticleSystem&
+GPUParticleSystem::addAngularSpeedGradient(float gradient, float factor,
+                                           const std::optional<float>& /*factor2*/)
 {
   _addFactorGradient(_angularSpeedGradients, gradient, factor);
 
@@ -379,16 +374,14 @@ GPUParticleSystem& GPUParticleSystem::addAngularSpeedGradient(
 
 GPUParticleSystem& GPUParticleSystem::removeAngularSpeedGradient(float gradient)
 {
-  _removeGradientAndTexture(gradient, _angularSpeedGradients,
-                            _angularSpeedGradientsTexture);
+  _removeGradientAndTexture(gradient, _angularSpeedGradients, _angularSpeedGradientsTexture);
   _angularSpeedGradientsTexture = nullptr;
 
   return *this;
 }
 
-GPUParticleSystem&
-GPUParticleSystem::addVelocityGradient(float gradient, float factor,
-                                       const std::optional<float>& /*factor2*/)
+GPUParticleSystem& GPUParticleSystem::addVelocityGradient(float gradient, float factor,
+                                                          const std::optional<float>& /*factor2*/)
 {
   _addFactorGradient(_velocityGradients, gradient, factor);
 
@@ -404,15 +397,15 @@ GPUParticleSystem::addVelocityGradient(float gradient, float factor,
 
 GPUParticleSystem& GPUParticleSystem::removeVelocityGradient(float gradient)
 {
-  _removeGradientAndTexture(gradient, _velocityGradients,
-                            _velocityGradientsTexture);
+  _removeGradientAndTexture(gradient, _velocityGradients, _velocityGradientsTexture);
   _velocityGradientsTexture = nullptr;
 
   return *this;
 }
 
-IParticleSystem& GPUParticleSystem::addLimitVelocityGradient(
-  float gradient, float factor, const std::optional<float>& /*factor2*/)
+IParticleSystem&
+GPUParticleSystem::addLimitVelocityGradient(float gradient, float factor,
+                                            const std::optional<float>& /*factor2*/)
 {
   _addFactorGradient(_limitVelocityGradients, gradient, factor);
 
@@ -428,15 +421,14 @@ IParticleSystem& GPUParticleSystem::addLimitVelocityGradient(
 
 IParticleSystem& GPUParticleSystem::removeLimitVelocityGradient(float gradient)
 {
-  _removeGradientAndTexture(gradient, _limitVelocityGradients,
-                            _limitVelocityGradientsTexture);
+  _removeGradientAndTexture(gradient, _limitVelocityGradients, _limitVelocityGradientsTexture);
   _limitVelocityGradientsTexture = nullptr;
 
   return *this;
 }
 
-IParticleSystem& GPUParticleSystem::addDragGradient(
-  float gradient, float factor, const std::optional<float>& /*factor2*/
+IParticleSystem& GPUParticleSystem::addDragGradient(float gradient, float factor,
+                                                    const std::optional<float>& /*factor2*/
 )
 {
   _addFactorGradient(_dragGradients, gradient, factor);
@@ -459,9 +451,8 @@ IParticleSystem& GPUParticleSystem::removeDragGradient(float gradient)
   return *this;
 }
 
-IParticleSystem&
-GPUParticleSystem::addEmitRateGradient(float /*gradient*/, float /*factor*/,
-                                       const std::optional<float>& /*factor2*/)
+IParticleSystem& GPUParticleSystem::addEmitRateGradient(float /*gradient*/, float /*factor*/,
+                                                        const std::optional<float>& /*factor2*/)
 {
   // Do nothing as emit rate is not supported by GPUParticleSystem
   return *this;
@@ -473,9 +464,8 @@ IParticleSystem& GPUParticleSystem::removeEmitRateGradient(float /*gradient*/)
   return *this;
 }
 
-IParticleSystem&
-GPUParticleSystem::addStartSizeGradient(float /*gradient*/, float /*factor*/,
-                                        const std::optional<float>& /*factor2*/)
+IParticleSystem& GPUParticleSystem::addStartSizeGradient(float /*gradient*/, float /*factor*/,
+                                                         const std::optional<float>& /*factor2*/)
 {
   // Do nothing as start size is not supported by GPUParticleSystem
   return *this;
@@ -487,8 +477,7 @@ IParticleSystem& GPUParticleSystem::removeStartSizeGradient(float /*gradient*/)
   return *this;
 }
 
-IParticleSystem& GPUParticleSystem::addColorRemapGradient(float /*gradient*/,
-                                                          float /*min*/,
+IParticleSystem& GPUParticleSystem::addColorRemapGradient(float /*gradient*/, float /*min*/,
                                                           float /* max*/)
 {
   // Do nothing as start size is not supported by GPUParticleSystem
@@ -501,8 +490,7 @@ IParticleSystem& GPUParticleSystem::removeColorRemapGradient(float /*gradient*/)
   return *this;
 }
 
-IParticleSystem& GPUParticleSystem::addAlphaRemapGradient(float /*gradient*/,
-                                                          float /*min*/,
+IParticleSystem& GPUParticleSystem::addAlphaRemapGradient(float /*gradient*/, float /*min*/,
                                                           float /*max*/)
 {
   // Do nothing as start size is not supported by GPUParticleSystem
@@ -515,8 +503,7 @@ IParticleSystem& GPUParticleSystem::removeAlphaRemapGradient(float /*gradient*/)
   return *this;
 }
 
-IParticleSystem& GPUParticleSystem::addRampGradient(float /*gradient*/,
-                                                    const Color3& /*color*/)
+IParticleSystem& GPUParticleSystem::addRampGradient(float /*gradient*/, const Color3& /*color*/)
 {
   // Not supported by GPUParticleSystem
   return *this;
@@ -544,9 +531,8 @@ void GPUParticleSystem::set_useRampGradients(bool /*value*/)
   // Not supported by GPUParticleSystem
 }
 
-IParticleSystem&
-GPUParticleSystem::addLifeTimeGradient(float /*gradient*/, float /*factor*/,
-                                       const std::optional<float>& /*factor2*/)
+IParticleSystem& GPUParticleSystem::addLifeTimeGradient(float /*gradient*/, float /*factor*/,
+                                                        const std::optional<float>& /*factor2*/)
 {
   // Not supported by GPUParticleSystem
   return *this;
@@ -563,25 +549,18 @@ void GPUParticleSystem::_reset()
   _releaseBuffers();
 }
 
-std::unique_ptr<GL::IGLVertexArrayObject>
-GPUParticleSystem::_createUpdateVAO(Buffer* source)
+WebGLVertexArrayObjectPtr GPUParticleSystem::_createUpdateVAO(Buffer* source)
 {
   std::unordered_map<std::string, VertexBufferPtr> updateVertexBuffers;
-  updateVertexBuffers["position"]
-    = source->createVertexBuffer(VertexBuffer::PositionKind, 0, 3);
-  updateVertexBuffers["age"]
-    = source->createVertexBuffer(VertexBuffer::AgeKind, 3, 1);
-  updateVertexBuffers["life"]
-    = source->createVertexBuffer(VertexBuffer::LifeKind, 4, 1);
-  updateVertexBuffers["seed"]
-    = source->createVertexBuffer(VertexBuffer::SeedKind, 5, 1);
-  updateVertexBuffers["size"]
-    = source->createVertexBuffer(VertexBuffer::SizeKind, 9, 3);
-  size_t offset = 12;
+  updateVertexBuffers["position"] = source->createVertexBuffer(VertexBuffer::PositionKind, 0, 3);
+  updateVertexBuffers["age"]      = source->createVertexBuffer(VertexBuffer::AgeKind, 3, 1);
+  updateVertexBuffers["life"]     = source->createVertexBuffer(VertexBuffer::LifeKind, 4, 1);
+  updateVertexBuffers["seed"]     = source->createVertexBuffer(VertexBuffer::SeedKind, 5, 1);
+  updateVertexBuffers["size"]     = source->createVertexBuffer(VertexBuffer::SizeKind, 9, 3);
+  size_t offset                   = 12;
 
   if (!_colorGradientsTexture) {
-    updateVertexBuffers["color"]
-      = source->createVertexBuffer(VertexBuffer::ColorKind, offset, 4);
+    updateVertexBuffers["color"] = source->createVertexBuffer(VertexBuffer::ColorKind, offset, 4);
     offset += 4;
   }
 
@@ -590,19 +569,17 @@ GPUParticleSystem::_createUpdateVAO(Buffer* source)
   offset += 3;
 
   if (!_isBillboardBased) {
-    updateVertexBuffers["initialDirection"] = source->createVertexBuffer(
-      VertexBuffer::InitialDirectionKind, offset, 3);
+    updateVertexBuffers["initialDirection"]
+      = source->createVertexBuffer(VertexBuffer::InitialDirectionKind, offset, 3);
     offset += 3;
   }
 
   if (_angularSpeedGradientsTexture) {
-    updateVertexBuffers["angle"]
-      = source->createVertexBuffer(VertexBuffer::AngleKind, offset, 1);
+    updateVertexBuffers["angle"] = source->createVertexBuffer(VertexBuffer::AngleKind, offset, 1);
     offset += 1;
   }
   else {
-    updateVertexBuffers["angle"]
-      = source->createVertexBuffer(VertexBuffer::AngleKind, offset, 2);
+    updateVertexBuffers["angle"] = source->createVertexBuffer(VertexBuffer::AngleKind, offset, 2);
     offset += 2;
   }
 
@@ -611,47 +588,45 @@ GPUParticleSystem::_createUpdateVAO(Buffer* source)
       = source->createVertexBuffer(VertexBuffer::CellIndexKind, offset, 1);
     offset += 1;
     if (spriteRandomStartCell) {
-      updateVertexBuffers["cellStartOffset"] = source->createVertexBuffer(
-        VertexBuffer::CellStartOffsetKind, offset, 1);
+      updateVertexBuffers["cellStartOffset"]
+        = source->createVertexBuffer(VertexBuffer::CellStartOffsetKind, offset, 1);
       offset += 1;
     }
   }
 
   if (noiseTexture()) {
-    updateVertexBuffers["noiseCoordinates1"] = source->createVertexBuffer(
-      VertexBuffer::NoiseCoordinates1Kind, offset, 3);
+    updateVertexBuffers["noiseCoordinates1"]
+      = source->createVertexBuffer(VertexBuffer::NoiseCoordinates1Kind, offset, 3);
     offset += 3;
-    updateVertexBuffers["noiseCoordinates2"] = source->createVertexBuffer(
-      VertexBuffer::NoiseCoordinates2Kind, offset, 3);
+    updateVertexBuffers["noiseCoordinates2"]
+      = source->createVertexBuffer(VertexBuffer::NoiseCoordinates2Kind, offset, 3);
     // offset += 3;
   }
 
-  auto vao = _engine->recordVertexArrayObject(updateVertexBuffers, nullptr,
-                                              _updateEffect);
+  auto vao = _engine->recordVertexArrayObject(updateVertexBuffers, nullptr, _updateEffect);
   _engine->bindArrayBuffer(nullptr);
 
   return vao;
 }
 
-std::unique_ptr<GL::IGLVertexArrayObject>
-GPUParticleSystem::_createRenderVAO(Buffer* source, Buffer* spriteSource)
+WebGLVertexArrayObjectPtr GPUParticleSystem::_createRenderVAO(Buffer* source, Buffer* spriteSource)
 {
   std::unordered_map<std::string, VertexBufferPtr> renderVertexBuffers;
-  auto attributesStrideSizeT      = static_cast<size_t>(_attributesStrideSize);
-  renderVertexBuffers["position"] = source->createVertexBuffer(
-    VertexBuffer::PositionKind, 0, 3, attributesStrideSizeT, true);
-  renderVertexBuffers["age"] = source->createVertexBuffer(
-    VertexBuffer::AgeKind, 3, 1, attributesStrideSizeT, true);
-  renderVertexBuffers["life"] = source->createVertexBuffer(
-    VertexBuffer::LifeKind, 4, 1, attributesStrideSizeT, true);
-  renderVertexBuffers["size"] = source->createVertexBuffer(
-    VertexBuffer::SizeKind, 9, 3, attributesStrideSizeT, true);
+  auto attributesStrideSizeT = static_cast<size_t>(_attributesStrideSize);
+  renderVertexBuffers["position"]
+    = source->createVertexBuffer(VertexBuffer::PositionKind, 0, 3, attributesStrideSizeT, true);
+  renderVertexBuffers["age"]
+    = source->createVertexBuffer(VertexBuffer::AgeKind, 3, 1, attributesStrideSizeT, true);
+  renderVertexBuffers["life"]
+    = source->createVertexBuffer(VertexBuffer::LifeKind, 4, 1, attributesStrideSizeT, true);
+  renderVertexBuffers["size"]
+    = source->createVertexBuffer(VertexBuffer::SizeKind, 9, 3, attributesStrideSizeT, true);
 
   size_t offset = 12;
 
   if (!_colorGradientsTexture) {
-    renderVertexBuffers["color"] = source->createVertexBuffer(
-      VertexBuffer::ColorKind, offset, 4, attributesStrideSizeT, true);
+    renderVertexBuffers["color"]
+      = source->createVertexBuffer(VertexBuffer::ColorKind, offset, 4, attributesStrideSizeT, true);
     offset += 4;
   }
 
@@ -662,14 +637,13 @@ GPUParticleSystem::_createRenderVAO(Buffer* source, Buffer* spriteSource)
   offset += 3; // Direction
 
   if (!_isBillboardBased) {
-    renderVertexBuffers["initialDirection"]
-      = source->createVertexBuffer(VertexBuffer::InitialDirectionKind, offset,
-                                   3, attributesStrideSizeT, true);
+    renderVertexBuffers["initialDirection"] = source->createVertexBuffer(
+      VertexBuffer::InitialDirectionKind, offset, 3, attributesStrideSizeT, true);
     offset += 3;
   }
 
-  renderVertexBuffers["angle"] = source->createVertexBuffer(
-    VertexBuffer::AngleKind, offset, 1, attributesStrideSizeT, true);
+  renderVertexBuffers["angle"]
+    = source->createVertexBuffer(VertexBuffer::AngleKind, offset, 1, attributesStrideSizeT, true);
   if (_angularSpeedGradientsTexture) {
     offset++;
   }
@@ -679,35 +653,28 @@ GPUParticleSystem::_createRenderVAO(Buffer* source, Buffer* spriteSource)
 
   if (_isAnimationSheetEnabled) {
     renderVertexBuffers["cellIndex"] = source->createVertexBuffer(
-      VertexBuffer::CellIndexKind, attributesStrideSizeT, 1,
-      _attributesStrideSize, true);
+      VertexBuffer::CellIndexKind, attributesStrideSizeT, 1, _attributesStrideSize, true);
     offset += 1;
     if (spriteRandomStartCell) {
-      renderVertexBuffers["cellStartOffset"]
-        = source->createVertexBuffer(VertexBuffer::CellStartOffsetKind, offset,
-                                     1, _attributesStrideSize, true);
+      renderVertexBuffers["cellStartOffset"] = source->createVertexBuffer(
+        VertexBuffer::CellStartOffsetKind, offset, 1, _attributesStrideSize, true);
       offset += 1;
     }
   }
 
   if (noiseTexture()) {
-    renderVertexBuffers["noiseCoordinates1"]
-      = source->createVertexBuffer(VertexBuffer::NoiseCoordinates1Kind, offset,
-                                   3, _attributesStrideSize, true);
+    renderVertexBuffers["noiseCoordinates1"] = source->createVertexBuffer(
+      VertexBuffer::NoiseCoordinates1Kind, offset, 3, _attributesStrideSize, true);
     offset += 3;
-    renderVertexBuffers["noiseCoordinates2"]
-      = source->createVertexBuffer(VertexBuffer::NoiseCoordinates2Kind, offset,
-                                   3, _attributesStrideSize, true);
+    renderVertexBuffers["noiseCoordinates2"] = source->createVertexBuffer(
+      VertexBuffer::NoiseCoordinates2Kind, offset, 3, _attributesStrideSize, true);
     // offset += 3;
   }
 
-  renderVertexBuffers["offset"]
-    = spriteSource->createVertexBuffer(VertexBuffer::OffsetKind, 0, 2);
-  renderVertexBuffers["uv"]
-    = spriteSource->createVertexBuffer(VertexBuffer::UVKind, 2, 2);
+  renderVertexBuffers["offset"] = spriteSource->createVertexBuffer(VertexBuffer::OffsetKind, 0, 2);
+  renderVertexBuffers["uv"]     = spriteSource->createVertexBuffer(VertexBuffer::UVKind, 2, 2);
 
-  auto vao = _engine->recordVertexArrayObject(renderVertexBuffers, nullptr,
-                                              _renderEffect);
+  auto vao = _engine->recordVertexArrayObject(renderVertexBuffers, nullptr, _renderEffect);
   _engine->bindArrayBuffer(nullptr);
 
   return vao;
@@ -823,10 +790,8 @@ void GPUParticleSystem::_initialize(bool force)
   };
 
   // Buffers
-  _buffer0
-    = std::make_unique<Buffer>(engine, data, false, _attributesStrideSize);
-  _buffer1
-    = std::make_unique<Buffer>(engine, data, false, _attributesStrideSize);
+  _buffer0      = std::make_unique<Buffer>(engine, data, false, _attributesStrideSize);
+  _buffer1      = std::make_unique<Buffer>(engine, data, false, _attributesStrideSize);
   _spriteBuffer = std::make_unique<Buffer>(engine, spriteData, false, 4);
 
   // Update VAO
@@ -836,10 +801,8 @@ void GPUParticleSystem::_initialize(bool force)
 
   // Render VAO
   _renderVAO.clear();
-  _renderVAO.emplace_back(
-    _createRenderVAO(_buffer1.get(), _spriteBuffer.get()));
-  _renderVAO.emplace_back(
-    _createRenderVAO(_buffer0.get(), _spriteBuffer.get()));
+  _renderVAO.emplace_back(_createRenderVAO(_buffer1.get(), _spriteBuffer.get()));
+  _renderVAO.emplace_back(_createRenderVAO(_buffer0.get(), _spriteBuffer.get()));
 
   // Links
   _sourceBuffer = _buffer0.get();
@@ -849,9 +812,7 @@ void GPUParticleSystem::_initialize(bool force)
 void GPUParticleSystem::_recreateUpdateEffect()
 {
   std::ostringstream definesStream;
-  definesStream << (particleEmitterType ?
-                      particleEmitterType->getEffectDefines() :
-                      "");
+  definesStream << (particleEmitterType ? particleEmitterType->getEffectDefines() : "");
 
   if (_isBillboardBased) {
     definesStream << "\n#define BILLBOARD";
@@ -908,31 +869,25 @@ void GPUParticleSystem::_recreateUpdateEffect()
   _updateEffectOptions->transformFeedbackVaryings.emplace_back("outDirection");
 
   if (!_isBillboardBased) {
-    _updateEffectOptions->transformFeedbackVaryings.emplace_back(
-      "outInitialDirection");
+    _updateEffectOptions->transformFeedbackVaryings.emplace_back("outInitialDirection");
   }
 
   _updateEffectOptions->transformFeedbackVaryings.emplace_back("outAngle");
 
   if (isAnimationSheetEnabled) {
-    _updateEffectOptions->transformFeedbackVaryings.emplace_back(
-      "outCellIndex");
+    _updateEffectOptions->transformFeedbackVaryings.emplace_back("outCellIndex");
     if (spriteRandomStartCell) {
-      _updateEffectOptions->transformFeedbackVaryings.emplace_back(
-        "outCellStartOffset");
+      _updateEffectOptions->transformFeedbackVaryings.emplace_back("outCellStartOffset");
     }
   }
 
   if (noiseTexture()) {
-    _updateEffectOptions->transformFeedbackVaryings.emplace_back(
-      "outNoiseCoordinates1");
-    _updateEffectOptions->transformFeedbackVaryings.emplace_back(
-      "outNoiseCoordinates2");
+    _updateEffectOptions->transformFeedbackVaryings.emplace_back("outNoiseCoordinates1");
+    _updateEffectOptions->transformFeedbackVaryings.emplace_back("outNoiseCoordinates2");
   }
 
   _updateEffectOptions->defines = std::move(defines);
-  _updateEffect = Effect::New("gpuUpdateParticles", *_updateEffectOptions,
-                              _scene->getEngine());
+  _updateEffect = Effect::New("gpuUpdateParticles", *_updateEffectOptions, _scene->getEngine());
 }
 
 void GPUParticleSystem::_recreateRenderEffect()
@@ -980,8 +935,7 @@ void GPUParticleSystem::_recreateRenderEffect()
   }
 
   if (_imageProcessingConfiguration) {
-    _imageProcessingConfiguration->prepareDefines(
-      *_imageProcessingConfigurationDefines);
+    _imageProcessingConfiguration->prepareDefines(*_imageProcessingConfigurationDefines);
     definesStream << "\n" << _imageProcessingConfigurationDefines->toString();
   }
 
@@ -991,37 +945,31 @@ void GPUParticleSystem::_recreateRenderEffect()
     return;
   }
 
-  std::vector<std::string> uniforms{
-    "worldOffset", "view",       "projection",       "colorDead",
-    "invView",     "vClipPlane", "vClipPlane2",      "vClipPlane3",
-    "vClipPlane4", "sheetInfos", "translationPivot", "eyePosition"};
+  std::vector<std::string> uniforms{"worldOffset", "view",       "projection",       "colorDead",
+                                    "invView",     "vClipPlane", "vClipPlane2",      "vClipPlane3",
+                                    "vClipPlane4", "sheetInfos", "translationPivot", "eyePosition"};
   std::vector<std::string> samplers{"textureSampler", "colorGradientSampler"};
 
   // if (ImageProcessingConfiguration)
   {
-    ImageProcessingConfiguration::PrepareUniforms(
-      uniforms, *_imageProcessingConfigurationDefines);
-    ImageProcessingConfiguration::PrepareSamplers(
-      samplers, *_imageProcessingConfigurationDefines);
+    ImageProcessingConfiguration::PrepareUniforms(uniforms, *_imageProcessingConfigurationDefines);
+    ImageProcessingConfiguration::PrepareSamplers(samplers, *_imageProcessingConfigurationDefines);
   }
 
   EffectCreationOptions renderEffectOptions;
-  renderEffectOptions.attributes    = {"position", "age",       "life",
-                                    "size",     "color",     "offset",
-                                    "uv",       "direction", "initialDirection",
-                                    "angle",    "cellIndex"};
+  renderEffectOptions.attributes
+    = {"position",         "age",   "life",     "size", "color", "offset", "uv", "direction",
+       "initialDirection", "angle", "cellIndex"};
   renderEffectOptions.uniformsNames = uniforms;
   renderEffectOptions.samplers      = samplers;
   renderEffectOptions.defines       = std::move(defines);
 
-  _renderEffect = Effect::New("gpuRenderParticles", renderEffectOptions,
-                              _scene->getEngine());
+  _renderEffect = Effect::New("gpuRenderParticles", renderEffectOptions, _scene->getEngine());
 }
 
 void GPUParticleSystem::animate(bool preWarm)
 {
-  _timeDelta
-    = updateSpeed * (preWarm ? preWarmStepOffset : _scene->getAnimationRatio());
+  _timeDelta = updateSpeed * (preWarm ? preWarmStepOffset : _scene->getAnimationRatio());
   _actualFrame += static_cast<int>(_timeDelta);
 
   if (!_stopped) {
@@ -1031,8 +979,7 @@ void GPUParticleSystem::animate(bool preWarm)
   }
 }
 
-RawTexture*
-GPUParticleSystem::_getRawTextureByName(const std::string& textureName)
+RawTexture* GPUParticleSystem::_getRawTextureByName(const std::string& textureName)
 {
   RawTexture* rawTexture = nullptr;
 
@@ -1052,8 +999,8 @@ GPUParticleSystem::_getRawTextureByName(const std::string& textureName)
   return rawTexture;
 }
 
-void GPUParticleSystem::_setRawTextureByName(
-  const std::string& textureName, std::unique_ptr<RawTexture>&& rawTexture)
+void GPUParticleSystem::_setRawTextureByName(const std::string& textureName,
+                                             std::unique_ptr<RawTexture>&& rawTexture)
 {
   if (textureName == "_colorGradientsTexture") {
     _colorGradientsTexture = std::move(rawTexture);
@@ -1070,8 +1017,8 @@ void GPUParticleSystem::_setRawTextureByName(
 }
 
 template <typename T>
-void GPUParticleSystem::_createFactorGradientTexture(
-  const std::vector<T>& factorGradients, const std::string& textureName)
+void GPUParticleSystem::_createFactorGradientTexture(const std::vector<T>& factorGradients,
+                                                     const std::string& textureName)
 {
   auto texture = _getRawTextureByName(textureName);
 
@@ -1086,17 +1033,14 @@ void GPUParticleSystem::_createFactorGradientTexture(
 
     GradientHelper::GetCurrentGradient<FactorGradient>(
       ratio, factorGradients,
-      [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
-          float scale) {
-        data[x]
-          = Scalar::Lerp(currentGradient.factor1, nextGradient.factor1, scale);
+      [&](FactorGradient& currentGradient, FactorGradient& nextGradient, float scale) {
+        data[x] = Scalar::Lerp(currentGradient.factor1, nextGradient.factor1, scale);
       });
   }
 
-  _setRawTextureByName(textureName,
-                       RawTexture::CreateRTexture(
-                         data, static_cast<int>(_rawTextureWidth), 1, _scene,
-                         false, false, TextureConstants::NEAREST_SAMPLINGMODE));
+  _setRawTextureByName(
+    textureName, RawTexture::CreateRTexture(data, static_cast<int>(_rawTextureWidth), 1, _scene,
+                                            false, false, TextureConstants::NEAREST_SAMPLINGMODE));
 }
 
 void GPUParticleSystem::_createSizeGradientTexture()
@@ -1106,8 +1050,7 @@ void GPUParticleSystem::_createSizeGradientTexture()
 
 void GPUParticleSystem::_createAngularSpeedGradientTexture()
 {
-  _createFactorGradientTexture(_angularSpeedGradients,
-                               "_angularSpeedGradientsTexture");
+  _createFactorGradientTexture(_angularSpeedGradients, "_angularSpeedGradientsTexture");
 }
 
 void GPUParticleSystem::_createVelocityGradientTexture()
@@ -1117,8 +1060,7 @@ void GPUParticleSystem::_createVelocityGradientTexture()
 
 void GPUParticleSystem::_createLimitVelocityGradientTexture()
 {
-  _createFactorGradientTexture(_limitVelocityGradients,
-                               "_limitVelocityGradientsTexture");
+  _createFactorGradientTexture(_limitVelocityGradients, "_limitVelocityGradientsTexture");
 }
 
 void GPUParticleSystem::_createDragGradientTexture()
@@ -1140,10 +1082,8 @@ void GPUParticleSystem::_createColorGradientTexture()
 
     GradientHelper::GetCurrentGradient<ColorGradient>(
       ratio, _colorGradients,
-      [&](ColorGradient& currentGradient, ColorGradient& nextGradient,
-          float scale) {
-        Color4::LerpToRef(currentGradient.color1, nextGradient.color1, scale,
-                          tmpColor);
+      [&](ColorGradient& currentGradient, ColorGradient& nextGradient, float scale) {
+        Color4::LerpToRef(currentGradient.color1, nextGradient.color1, scale, tmpColor);
         data[x * 4]     = static_cast<uint8_t>(tmpColor.r * 255);
         data[x * 4 + 1] = static_cast<uint8_t>(tmpColor.g * 255);
         data[x * 4 + 2] = static_cast<uint8_t>(tmpColor.b * 255);
@@ -1151,9 +1091,9 @@ void GPUParticleSystem::_createColorGradientTexture()
       });
   }
 
-  _colorGradientsTexture = RawTexture::CreateRGBATexture(
-    data, static_cast<int>(_rawTextureWidth), 1, _scene, false, false,
-    TextureConstants::NEAREST_SAMPLINGMODE);
+  _colorGradientsTexture
+    = RawTexture::CreateRGBATexture(data, static_cast<int>(_rawTextureWidth), 1, _scene, false,
+                                    false, TextureConstants::NEAREST_SAMPLINGMODE);
 }
 
 size_t GPUParticleSystem::render(bool preWarm)
@@ -1211,8 +1151,7 @@ size_t GPUParticleSystem::render(bool preWarm)
   _engine->enableEffect(_updateEffect);
   _engine->setState(false);
 
-  _updateEffect->setFloat("currentCount",
-                          static_cast<float>(_currentActiveCount));
+  _updateEffect->setFloat("currentCount", static_cast<float>(_currentActiveCount));
   _updateEffect->setFloat("timeDelta", _timeDelta);
   _updateEffect->setFloat("stopFactor", _stopped ? 0.f : 1.f);
   _updateEffect->setTexture("randomSampler", _randomTexture);
@@ -1224,10 +1163,9 @@ size_t GPUParticleSystem::render(bool preWarm)
     _updateEffect->setDirectColor4("color2", color2);
   }
   _updateEffect->setFloat2("sizeRange", minSize, maxSize);
-  _updateEffect->setFloat4("scaleRange", minScaleX, maxScaleX, minScaleY,
-                           maxScaleY);
-  _updateEffect->setFloat4("angleRange", minAngularSpeed, maxAngularSpeed,
-                           minInitialRotation, maxInitialRotation);
+  _updateEffect->setFloat4("scaleRange", minScaleX, maxScaleX, minScaleY, maxScaleY);
+  _updateEffect->setFloat4("angleRange", minAngularSpeed, maxAngularSpeed, minInitialRotation,
+                           maxInitialRotation);
   _updateEffect->setVector3("gravity", gravity);
 
   if (_sizeGradientsTexture) {
@@ -1235,18 +1173,15 @@ size_t GPUParticleSystem::render(bool preWarm)
   }
 
   if (_angularSpeedGradientsTexture) {
-    _updateEffect->setTexture("angularSpeedGradientSampler",
-                              _angularSpeedGradientsTexture);
+    _updateEffect->setTexture("angularSpeedGradientSampler", _angularSpeedGradientsTexture);
   }
 
   if (_velocityGradientsTexture) {
-    _updateEffect->setTexture("velocityGradientSampler",
-                              _velocityGradientsTexture);
+    _updateEffect->setTexture("velocityGradientSampler", _velocityGradientsTexture);
   }
 
   if (_limitVelocityGradientsTexture) {
-    _updateEffect->setTexture("limitVelocityGradientSampler",
-                              _limitVelocityGradientsTexture);
+    _updateEffect->setTexture("limitVelocityGradientSampler", _limitVelocityGradientsTexture);
     _updateEffect->setFloat("limitVelocityDamping", limitVelocityDamping);
   }
 
@@ -1259,8 +1194,7 @@ size_t GPUParticleSystem::render(bool preWarm)
   }
   if (_isAnimationSheetEnabled) {
     _updateEffect->setFloat3("cellInfos", static_cast<float>(startSpriteCellID),
-                             static_cast<float>(endSpriteCellID),
-                             spriteCellChangeSpeed);
+                             static_cast<float>(endSpriteCellID), spriteCellChangeSpeed);
   }
 
   if (noiseTexture()) {
@@ -1275,20 +1209,18 @@ size_t GPUParticleSystem::render(bool preWarm)
   }
   else {
     auto emitterPosition = std::get<Vector3>(emitter);
-    emitterWM = Matrix::Translation(emitterPosition.x, emitterPosition.y,
-                                    emitterPosition.z);
+    emitterWM = Matrix::Translation(emitterPosition.x, emitterPosition.y, emitterPosition.z);
   }
   _updateEffect->setMatrix("emitterWM", emitterWM);
 
   // Bind source VAO
-  _engine->bindVertexArrayObject(_updateVAO[_targetIndex].get(), nullptr);
+  _engine->bindVertexArrayObject(_updateVAO[_targetIndex], nullptr);
 
   // Update
   _engine->bindTransformFeedbackBuffer(_targetBuffer->getBuffer());
   _engine->setRasterizerState(false);
   _engine->beginTransformFeedback();
-  _engine->drawArraysType(Material::PointListDrawMode, 0,
-                          static_cast<int>(_currentActiveCount));
+  _engine->drawArraysType(Material::PointListDrawMode, 0, static_cast<int>(_currentActiveCount));
   _engine->endTransformFeedback();
   _engine->setRasterizerState(true);
   _engine->bindTransformFeedbackBuffer(nullptr);
@@ -1311,13 +1243,10 @@ size_t GPUParticleSystem::render(bool preWarm)
 
     if (_isAnimationSheetEnabled && particleTexture) {
       auto baseSize = particleTexture->getBaseSize();
-      _renderEffect->setFloat3("sheetInfos",
-                               static_cast<float>(spriteCellWidth)
-                                 / static_cast<float>(baseSize.width),
-                               static_cast<float>(spriteCellHeight)
-                                 / static_cast<float>(baseSize.height),
-                               static_cast<float>(baseSize.width)
-                                 / static_cast<float>(spriteCellWidth));
+      _renderEffect->setFloat3(
+        "sheetInfos", static_cast<float>(spriteCellWidth) / static_cast<float>(baseSize.width),
+        static_cast<float>(spriteCellHeight) / static_cast<float>(baseSize.height),
+        static_cast<float>(baseSize.width) / static_cast<float>(spriteCellWidth));
     }
 
     if (_isBillboardBased) {
@@ -1335,8 +1264,7 @@ size_t GPUParticleSystem::render(bool preWarm)
     }
 
     // image processing
-    if (_imageProcessingConfiguration
-        && !_imageProcessingConfiguration->applyByPostProcess) {
+    if (_imageProcessingConfiguration && !_imageProcessingConfiguration->applyByPostProcess) {
       _imageProcessingConfiguration->bind(_renderEffect.get());
     }
 
@@ -1361,7 +1289,7 @@ size_t GPUParticleSystem::render(bool preWarm)
     }
 
     // Bind source VAO
-    _engine->bindVertexArrayObject(_renderVAO[_targetIndex].get(), nullptr);
+    _engine->bindVertexArrayObject(_renderVAO[_targetIndex], nullptr);
 
     // Render
     _engine->drawArraysType(Material::TriangleFanDrawMode, 0, 4,
@@ -1409,18 +1337,17 @@ void GPUParticleSystem::_releaseVAOs()
   }
 
   for (auto& _updateVAOItem : _updateVAO) {
-    _engine->releaseVertexArrayObject(_updateVAOItem.get());
+    _engine->releaseVertexArrayObject(_updateVAOItem);
   }
   _updateVAO.clear();
 
   for (auto& _renderVAOItem : _renderVAO) {
-    _engine->releaseVertexArrayObject(_renderVAOItem.get());
+    _engine->releaseVertexArrayObject(_renderVAOItem);
   }
   _renderVAO.clear();
 }
 
-void GPUParticleSystem::dispose(bool disposeTexture,
-                                bool /*disposeMaterialAndTextures*/)
+void GPUParticleSystem::dispose(bool disposeTexture, bool /*disposeMaterialAndTextures*/)
 {
   // Remove from scene
   stl_util::remove_vector_elements_equal_sharedptr(_scene->particleSystems, this);
@@ -1483,8 +1410,7 @@ void GPUParticleSystem::dispose(bool disposeTexture,
   onDisposeObservable.clear();
 }
 
-IParticleSystem* GPUParticleSystem::clone(const std::string& /*name*/,
-                                          Mesh* /*newEmitter*/)
+IParticleSystem* GPUParticleSystem::clone(const std::string& /*name*/, Mesh* /*newEmitter*/)
 {
   return nullptr;
 }
@@ -1494,10 +1420,8 @@ json GPUParticleSystem::serialize() const
   return nullptr;
 }
 
-IParticleSystem* GPUParticleSystem::Parse(const json& /*parsedParticleSystem*/,
-                                          Scene* /*scene*/,
-                                          const std::string& /*rootUrl*/,
-                                          bool /*doNotStart*/)
+IParticleSystem* GPUParticleSystem::Parse(const json& /*parsedParticleSystem*/, Scene* /*scene*/,
+                                          const std::string& /*rootUrl*/, bool /*doNotStart*/)
 {
   return nullptr;
 }

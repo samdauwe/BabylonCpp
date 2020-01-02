@@ -18,14 +18,13 @@ public:
   GLenum operator[](const std::string& name) override;
   void activeTexture(GLenum texture) override;
   void attachShader(IGLProgram* program, IGLShader* shader) override;
-  void beginQuery(GLenum target, const std::unique_ptr<IGLQuery>& query) override;
+  void beginQuery(GLenum target, IGLQuery* query) override;
   void beginTransformFeedback(GLenum primitiveMode) override;
   void bindAttribLocation(IGLProgram* program, GLuint index, const std::string& name) override;
   void bindBuffer(GLenum target, IGLBuffer* buffer) override;
   void bindFramebuffer(GLenum target, IGLFramebuffer* framebuffer) override;
   void bindBufferBase(GLenum target, GLuint index, IGLBuffer* buffer) override;
-  void bindRenderbuffer(GLenum target,
-                        const std::unique_ptr<IGLRenderbuffer>& renderbuffer) override;
+  void bindRenderbuffer(GLenum target, IGLRenderbuffer* renderbuffer) override;
   void bindTexture(GLenum target, IGLTexture* texture) override;
   void bindTransformFeedback(GLenum target, IGLTransformFeedback* transformFeedback) override;
   void blendColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha) override;
@@ -71,11 +70,11 @@ public:
   IGLFramebufferPtr createFramebuffer() override;
   IGLProgramPtr createProgram() override;
   std::unique_ptr<IGLQuery> createQuery() override;
-  std::unique_ptr<IGLRenderbuffer> createRenderbuffer() override;
+  IGLRenderbufferPtr createRenderbuffer() override;
   IGLShaderPtr createShader(GLenum type) override;
-  std::unique_ptr<IGLTexture> createTexture() override;
+  IGLTexturePtr createTexture() override;
   IGLTransformFeedbackPtr createTransformFeedback() override;
-  std::unique_ptr<IGLVertexArrayObject> createVertexArray() override;
+  IGLVertexArrayObjectPtr createVertexArray() override;
   void cullFace(GLenum mode) override;
   void deleteBuffer(IGLBuffer* buffer) override;
   void deleteFramebuffer(IGLFramebuffer* framebuffer) override;
@@ -114,6 +113,7 @@ public:
   void generateMipmap(GLenum target) override;
   std::vector<IGLShader*> getAttachedShaders(IGLProgram* program) override;
   GLint getAttribLocation(IGLProgram* program, const std::string& name) override;
+  GL::any getExtension(const std::string& name) override;
   GLboolean hasExtension(const std::string& extension) override;
   std::array<int, 3> getScissorBoxParameter() override; // GL::SCISSOR_BOX
   GLint getParameteri(GLenum pname) override;

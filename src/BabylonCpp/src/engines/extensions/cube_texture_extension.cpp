@@ -8,7 +8,9 @@
 #include <babylon/engines/thin_engine.h>
 #include <babylon/materials/textures/iinternal_texture_loader.h>
 #include <babylon/materials/textures/internal_texture.h>
+#include <babylon/maths/isize.h>
 #include <babylon/misc/file_tools.h>
+#include <babylon/misc/ifile_request.h>
 
 namespace BABYLON {
 
@@ -70,8 +72,6 @@ InternalTexturePtr CubeTextureExtension::createCubeTexture(
   float lodOffset, const InternalTexturePtr& fallback,
   const std::vector<IInternalTextureLoaderPtr>& excludeLoaders)
 {
-  auto& gl = *_this->_gl;
-
   auto texture    = fallback ? fallback : InternalTexture::New(_this, InternalTextureSource::Cube);
   texture->isCube = true;
   texture->url    = rootUrl;
@@ -158,13 +158,14 @@ InternalTexturePtr CubeTextureExtension::createCubeTexture(
           _gl->texImage2D(faces[index], 0, internalFormat, internalFormat,
                         GL::UNSIGNED_BYTE, _workingCanvas);
 #else
-          gl.texImage2D(faces[index], 0, static_cast<int>(internalFormat), imgs[index].width,
-                        imgs[index].height, 0, GL::RGBA, GL::UNSIGNED_BYTE, &imgs[index].data);
+          _this->_gl->texImage2D(faces[index], 0, static_cast<int>(internalFormat),
+                                 imgs[index].width, imgs[index].height, 0, GL::RGBA,
+                                 GL::UNSIGNED_BYTE, &imgs[index].data);
 #endif
         }
 
         if (!noMipmap) {
-          gl.generateMipmap(GL::TEXTURE_CUBE_MAP);
+          _this->_gl->generateMipmap(GL::TEXTURE_CUBE_MAP);
         }
 
         _setCubeMapTextureParams(!noMipmap);

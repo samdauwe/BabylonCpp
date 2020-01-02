@@ -128,7 +128,7 @@ MultiRenderExtension::createMultipleRenderTarget(ISize size,
         "Float textures are not supported. Render target forced to TEXTURETYPE_UNSIGNED_BYTE type")
     }
 
-    auto texture    = InternalTexture::New(this, InternalTextureSource::MultiRenderTarget);
+    auto texture    = InternalTexture::New(_this, InternalTextureSource::MultiRenderTarget);
     auto attachment = gl[_this->webGLVersion() > 1.f ? "COLOR_ATTACHMENT" + iStr :
                                                        "COLOR_ATTACHMENT" + iStr + "_WEBGL"];
 
@@ -288,7 +288,7 @@ unsigned int MultiRenderExtension::updateMultipleRenderTargetTextureSampleCount(
         throw std::runtime_error("Unable to create multi sampled framebuffer");
       }
 
-      gl.bindRenderbuffer(GL::RENDERBUFFER, colorRenderbuffer);
+      gl.bindRenderbuffer(GL::RENDERBUFFER, colorRenderbuffer.get());
       gl.renderbufferStorageMultisample(GL::RENDERBUFFER, static_cast<int>(samples),
                                         _this->_getRGBAMultiSampleBufferFormat(texture->type),
                                         texture->width, texture->height);
