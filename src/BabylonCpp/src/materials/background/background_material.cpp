@@ -823,6 +823,8 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subM
                                       "vClipPlane2",
                                       "vClipPlane3",
                                       "vClipPlane4",
+                                      "vClipPlane5",
+                                      "vClipPlane6",
                                       "mBones",
                                       "vPrimaryColor",
                                       "vPrimaryColorShadow",
