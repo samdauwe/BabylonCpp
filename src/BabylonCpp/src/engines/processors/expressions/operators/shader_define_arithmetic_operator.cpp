@@ -60,11 +60,7 @@ ShaderDefineArithmeticOperator::~ShaderDefineArithmeticOperator() = default;
 bool ShaderDefineArithmeticOperator::isTrue(
   const std::unordered_map<std::string, std::string>& preprocessors) const
 {
-  if (!stl_util::contains(preprocessors, define)) {
-    return false;
-  }
-
-  auto value = preprocessors.at(define);
+  auto value = !stl_util::contains(preprocessors, define) ? define : preprocessors.at(define);
 
   auto condition   = false;
   const auto left  = String::toNumber<float>(value);

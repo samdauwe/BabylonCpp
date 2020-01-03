@@ -392,21 +392,31 @@ void ShaderProcessor::_ProcessIncludes(const std::string& sourceCode, Processing
     else {
       auto includeShaderUrl = options.shadersRepository + "ShadersInclude/" + includeFile + ".fx";
 
-      FileTools::LoadFile(includeShaderUrl,
-                          [&options, includeFile, returnValue,
-                           callback](const std::variant<std::string, ArrayBuffer>& fileContent,
-                                     const std::string & /*responseURL*/) -> void {
-                            if (std::holds_alternative<std::string>(fileContent)) {
-                              options.includesShadersStore[includeFile]
-                                = std::get<std::string>(fileContent);
-                              _ProcessIncludes(returnValue, options, callback);
-                            }
-                          });
+      ShaderProcessor::_FileToolsLoadFile(
+        includeShaderUrl,
+        [&options, includeFile, returnValue,
+         callback](const std::variant<std::string, ArrayBuffer>& fileContent,
+                   const std::string & /*responseURL*/) -> void {
+          if (std::holds_alternative<std::string>(fileContent)) {
+            options.includesShadersStore[includeFile] = std::get<std::string>(fileContent);
+            _ProcessIncludes(returnValue, options, callback);
+          }
+        });
       return;
     }
   }
 
   callback(returnValue);
+}
+
+void ShaderProcessor::_FileToolsLoadFile(
+  const std::string& url,
+  const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
+                           const std::string& responseURL)>& onSuccess,
+  const std::function<void(const ProgressEvent& event)>& onProgress, bool useArrayBuffer,
+  const std::function<void(const std::string& message, const std::string& exception)>& onError)
+{
+  FileTools::LoadFile(url, onSuccess, onProgress, useArrayBuffer, onError);
 }
 
 } // end of namespace BABYLON
