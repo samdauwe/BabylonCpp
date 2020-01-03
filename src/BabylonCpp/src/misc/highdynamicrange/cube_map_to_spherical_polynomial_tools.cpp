@@ -49,7 +49,8 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapTextureToSphericalPolynomial(Ba
   // Always read as RGBA.
   auto format = Constants::TEXTUREFORMAT_RGBA;
   auto type   = Constants::TEXTURETYPE_UNSIGNED_INT;
-  if (texture.textureType() != Constants::TEXTURETYPE_UNSIGNED_INT) {
+  if (texture.textureType() == Constants::TEXTURETYPE_FLOAT
+      || texture.textureType() == Constants::TEXTURETYPE_HALF_FLOAT) {
     type = Constants::TEXTURETYPE_FLOAT;
   }
 
@@ -87,11 +88,10 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(const Cub
     const auto dataArray = cubeInfo[fileFace.name].float32Array();
     auto v               = minUV;
 
-    // TODO: we could perform the summation directly into a SphericalPolynomial
-    // (SP), which is more efficient than SphericalHarmonic (SH).
-    // This is possible because during the summation we do not need the
-    // SH-specific properties, e.g. orthogonality.
-    // Because SP is still linear, so summation is fine in that basis.
+    // TODO: we could perform the summation directly into a SphericalPolynomial (SP), which is more
+    // efficient than SphericalHarmonic (SH). This is possible because during the summation we do
+    // not need the SH-specific properties, e.g. orthogonality. Because SP is still linear, so
+    // summation is fine in that basis.
     const auto stride = cubeInfo.format == Constants::TEXTUREFORMAT_RGBA ? 4u : 3u;
     for (auto y = 0ull; y < cubeInfo.size; ++y) {
       auto u = minUV;
@@ -161,11 +161,10 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(const Cub
   auto facesProcessed     = 6.f;
   auto expectedSolidAngle = sphereSolidAngle * facesProcessed / 6.f;
 
-  // Adjust the harmonics so that the accumulated solid angle matches the
-  // expected solid angle. This is needed because the numerical integration over
-  // the cube uses a small angle approximation of solid angle for each texel
-  // (see deltaSolidAngle), and also to compensate for accumulative error due to
-  // float precision in the summation.
+  // Adjust the harmonics so that the accumulated solid angle matches the expected solid angle.
+  // This is needed because the numerical integration over the cube uses a
+  // small angle approximation of solid angle for each texel (see deltaSolidAngle),
+  // and also to compensate for accumulative error due to float precision in the summation.
   auto correctionFactor = expectedSolidAngle / totalSolidAngle;
   sphericalHarmonics.scaleInPlace(correctionFactor);
 
