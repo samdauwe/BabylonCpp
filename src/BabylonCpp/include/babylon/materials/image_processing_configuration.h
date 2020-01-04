@@ -21,9 +21,9 @@ using ColorCurvesPtr = std::shared_ptr<ColorCurves>;
 using EffectPtr      = std::shared_ptr<Effect>;
 
 /**
- * @brief This groups together the common properties used for image processing
- * either in direct forward pass or through post processing effect depending on
- * the use of the image processing pipeline in your scene or not.
+ * @brief This groups together the common properties used for image processing either in direct
+ * forward pass or through post processing effect depending on the use of the image processing
+ * pipeline in your scene or not.
  */
 class BABYLON_SHARED_EXPORT ImageProcessingConfiguration {
 
@@ -39,8 +39,8 @@ public:
   static constexpr unsigned int TONEMAPPING_STANDARD = 0;
 
   /**
-   * ACES Tone mapping (used by default in unreal and unity). This can help
-   * getting closer to other engines rendering to increase portability.
+   * ACES Tone mapping (used by default in unreal and unity). This can help getting closer to other
+   * engines rendering to increase portability.
    */
   static constexpr unsigned int TONEMAPPING_ACES = 1;
 
@@ -71,8 +71,7 @@ public:
   [[nodiscard]] std::string getClassName() const;
 
   /**
-   * @brief Prepare the list of uniforms associated with the Image Processing
-   * effects.
+   * @brief Prepare the list of uniforms associated with the Image Processing effects.
    * @param uniforms The list of uniforms used in the effect
    * @param defines the list of defines currently in use
    */
@@ -80,8 +79,7 @@ public:
                               const IImageProcessingConfigurationDefines& defines);
 
   /**
-   * @brief Prepare the list of samplers associated with the Image Processing
-   * effects.
+   * @brief Prepare the list of samplers associated with the Image Processing effects.
    * @param samplersList The list of uniforms used in the effect
    * @param defines the list of defines currently in use
    */
@@ -91,8 +89,7 @@ public:
   /**
    * @brief Prepare the list of defines associated to the shader.
    * @param defines the list of defines to complete
-   * @param forPostProcess Define if we are currently in post process mode or
-   * not
+   * @param forPostProcess Define if we are currently in post process mode or not
    */
   void prepareDefines(IImageProcessingConfigurationDefines& defines, bool forPostProcess = false);
 
@@ -105,9 +102,9 @@ public:
   /**
    * @brief Binds the image processing to the shader.
    * @param effect The effect to bind to
-   * @param aspectRatio Define the current aspect ratio of the effect
+   * @param overrideAspectRatio Override the aspect ratio of the effect
    */
-  void bind(Effect* effect, float aspectRatio = 1.f);
+  void bind(Effect* effect, const std::optional<float>& overrideAspectRatio = std::nullopt);
 
   /**
    * @brief Clones the current image processing instance.
@@ -116,8 +113,7 @@ public:
   std::unique_ptr<ImageProcessingConfiguration> clone();
 
   /**
-   * @brief Serializes the current image processing instance to a json
-   * representation.
+   * @brief Serializes the current image processing instance to a json representation.
    * @return a JSON representation
    */
   [[nodiscard]] json serialize() const;
@@ -141,15 +137,15 @@ protected:
   void set_colorCurvesEnabled(bool value);
 
   /**
-   * @brief Gets the color grading LUT texture used in the effect if
-   * colorGradingEnabled is set to true.
+   * @brief Gets the color grading LUT texture used in the effect if colorGradingEnabled is set to
+   * true.
    */
 
   BaseTexturePtr& get_colorGradingTexture();
 
   /**
-   * @brief Sets the color grading LUT texture used in the effect if
-   * colorGradingEnabled is set to true.
+   * @brief Sets the color grading LUT texture used in the effect if colorGradingEnabled is set to
+   * true.
    */
   void set_colorGradingTexture(const BaseTexturePtr& value);
 
@@ -164,14 +160,12 @@ protected:
   void set_colorGradingEnabled(bool value);
 
   /**
-   * @brief Gets wether the color grading effect is using a green depth for the
-   * 3d Texture.
+   * @brief Gets wether the color grading effect is using a green depth for the 3d Texture.
    */
   [[nodiscard]] bool get_colorGradingWithGreenDepth() const;
 
   /**
-   * @brief Sets wether the color grading effect is using a green depth for the
-   * 3d Texture.
+   * @brief Sets wether the color grading effect is using a green depth for the 3d Texture.
    */
   void set_colorGradingWithGreenDepth(bool value);
 
@@ -267,8 +261,8 @@ protected:
   void set_isEnabled(bool value);
 
   /**
-   * Method called each time the image processing information changes requires
-   * to recompile the effect.
+   * Method called each time the image processing information changes requires to recompile the
+   * effect.
    */
   void _updateParameters();
 
@@ -339,8 +333,7 @@ public:
   ColorCurvesPtr colorCurves;
 
   /**
-   * Color grading LUT texture used in the effect if colorGradingEnabled is set
-   * to true.
+   * Color grading LUT texture used in the effect if colorGradingEnabled is set to true.
    */
   Property<ImageProcessingConfiguration, BaseTexturePtr> colorGradingTexture;
 
@@ -370,8 +363,8 @@ public:
   float vignetteWeight;
 
   /**
-   * Color of the vignette applied on the screen through the chosen blend mode
-   * (vignetteBlendMode) if vignetteEnabled is set to true.
+   * Color of the vignette applied on the screen through the chosen blend mode (vignetteBlendMode)
+   * if vignetteEnabled is set to true.
    */
   Color4 vignetteColor;
 
@@ -381,8 +374,8 @@ public:
   float vignetteCameraFov;
 
   /**
-   * An event triggered when the configuration changes and requires Shader to
-   * Update some parameters.
+   * An event triggered when the configuration changes and requires Shader to Update some
+   * parameters.
    */
   Observable<ImageProcessingConfiguration> onUpdateParameters;
 

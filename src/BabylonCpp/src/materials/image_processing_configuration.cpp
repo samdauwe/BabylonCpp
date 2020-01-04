@@ -14,46 +14,34 @@
 namespace BABYLON {
 
 ImageProcessingConfiguration::ImageProcessingConfiguration()
-    : colorCurvesEnabled{this,
-                         &ImageProcessingConfiguration::get_colorCurvesEnabled,
+    : colorCurvesEnabled{this, &ImageProcessingConfiguration::get_colorCurvesEnabled,
                          &ImageProcessingConfiguration::set_colorCurvesEnabled}
-    , colorGradingEnabled{this,
-                          &ImageProcessingConfiguration::
-                            get_colorGradingEnabled,
-                          &ImageProcessingConfiguration::
-                            set_colorGradingEnabled}
+    , colorGradingEnabled{this, &ImageProcessingConfiguration::get_colorGradingEnabled,
+                          &ImageProcessingConfiguration::set_colorGradingEnabled}
     , colorGradingWithGreenDepth{this,
-                                 &ImageProcessingConfiguration::
-                                   get_colorGradingWithGreenDepth,
-                                 &ImageProcessingConfiguration::
-                                   set_colorGradingWithGreenDepth}
+                                 &ImageProcessingConfiguration::get_colorGradingWithGreenDepth,
+                                 &ImageProcessingConfiguration::set_colorGradingWithGreenDepth}
     , colorGradingBGR{this, &ImageProcessingConfiguration::get_colorGradingBGR,
                       &ImageProcessingConfiguration::set_colorGradingBGR}
     , exposure{this, &ImageProcessingConfiguration::get_exposure,
                &ImageProcessingConfiguration::set_exposure}
-    , toneMappingEnabled{this,
-                         &ImageProcessingConfiguration::get_toneMappingEnabled,
+    , toneMappingEnabled{this, &ImageProcessingConfiguration::get_toneMappingEnabled,
                          &ImageProcessingConfiguration::set_toneMappingEnabled}
     , toneMappingType{this, &ImageProcessingConfiguration::get_toneMappingType,
                       &ImageProcessingConfiguration::set_toneMappingType}
     , contrast{this, &ImageProcessingConfiguration::get_contrast,
                &ImageProcessingConfiguration::set_contrast}
-    , vignetteBlendMode{this,
-                        &ImageProcessingConfiguration::get_vignetteBlendMode,
+    , vignetteBlendMode{this, &ImageProcessingConfiguration::get_vignetteBlendMode,
                         &ImageProcessingConfiguration::set_vignetteBlendMode}
     , vignetteEnabled{this, &ImageProcessingConfiguration::get_vignetteEnabled,
                       &ImageProcessingConfiguration::set_vignetteEnabled}
-    , applyByPostProcess{this,
-                         &ImageProcessingConfiguration::get_applyByPostProcess,
+    , applyByPostProcess{this, &ImageProcessingConfiguration::get_applyByPostProcess,
                          &ImageProcessingConfiguration::set_applyByPostProcess}
     , isEnabled{this, &ImageProcessingConfiguration::get_isEnabled,
                 &ImageProcessingConfiguration::set_isEnabled}
     , colorCurves{std::make_unique<ColorCurves>()}
-    , colorGradingTexture{this,
-                          &ImageProcessingConfiguration::
-                            get_colorGradingTexture,
-                          &ImageProcessingConfiguration::
-                            set_colorGradingTexture}
+    , colorGradingTexture{this, &ImageProcessingConfiguration::get_colorGradingTexture,
+                          &ImageProcessingConfiguration::set_colorGradingTexture}
     , _exposure{1.f}
     , vignetteStretch{0}
     , vignetteCentreX{0}
@@ -98,8 +86,7 @@ BaseTexturePtr& ImageProcessingConfiguration::get_colorGradingTexture()
   return _colorGradingTexture;
 }
 
-void ImageProcessingConfiguration::set_colorGradingTexture(
-  const BaseTexturePtr& value)
+void ImageProcessingConfiguration::set_colorGradingTexture(const BaseTexturePtr& value)
 {
   if (_colorGradingTexture == value) {
     return;
@@ -285,8 +272,7 @@ std::string ImageProcessingConfiguration::getClassName() const
 }
 
 void ImageProcessingConfiguration::PrepareUniforms(
-  std::vector<std::string>& uniforms,
-  const IImageProcessingConfigurationDefines& defines)
+  std::vector<std::string>& uniforms, const IImageProcessingConfigurationDefines& defines)
 {
   if (defines.EXPOSURE) {
     uniforms.emplace_back("exposureLinear");
@@ -308,16 +294,15 @@ void ImageProcessingConfiguration::PrepareUniforms(
 }
 
 void ImageProcessingConfiguration::PrepareSamplers(
-  std::vector<std::string>& samplersList,
-  const IImageProcessingConfigurationDefines& defines)
+  std::vector<std::string>& samplersList, const IImageProcessingConfigurationDefines& defines)
 {
   if (defines.COLORGRADING) {
     samplersList.emplace_back("txColorTransform");
   }
 }
 
-void ImageProcessingConfiguration::prepareDefines(
-  IImageProcessingConfigurationDefines& defines, bool forPostProcess)
+void ImageProcessingConfiguration::prepareDefines(IImageProcessingConfigurationDefines& defines,
+                                                  bool forPostProcess)
 {
   if (forPostProcess != applyByPostProcess() || !_isEnabled) {
     defines.VIGNETTE                   = false;
@@ -334,8 +319,7 @@ void ImageProcessingConfiguration::prepareDefines(
   }
   defines.VIGNETTE = vignetteEnabled();
   defines.VIGNETTEBLENDMODEMULTIPLY
-    = (vignetteBlendMode()
-       == ImageProcessingConfiguration::VIGNETTEMODE_MULTIPLY());
+    = (vignetteBlendMode() == ImageProcessingConfiguration::VIGNETTEMODE_MULTIPLY());
   defines.VIGNETTEBLENDMODEOPAQUE = !defines.VIGNETTEBLENDMODEMULTIPLY;
 
   defines.TONEMAPPING = toneMappingEnabled();
@@ -361,22 +345,20 @@ void ImageProcessingConfiguration::prepareDefines(
   defines.SAMPLER3DGREENDEPTH        = colorGradingWithGreenDepth();
   defines.SAMPLER3DBGRMAP            = colorGradingBGR();
   defines.IMAGEPROCESSINGPOSTPROCESS = applyByPostProcess();
-  defines.IMAGEPROCESSING            = defines.VIGNETTE || defines.TONEMAPPING
-                            || defines.CONTRAST || defines.EXPOSURE
-                            || defines.COLORCURVES || defines.COLORGRADING;
-  defines.IMAGEPROCESSING = defines.VIGNETTE || defines.TONEMAPPING
-                            || defines.CONTRAST || defines.EXPOSURE
-                            || defines.COLORCURVES || defines.COLORGRADING;
+  defines.IMAGEPROCESSING            = defines.VIGNETTE || defines.TONEMAPPING || defines.CONTRAST
+                            || defines.EXPOSURE || defines.COLORCURVES || defines.COLORGRADING;
+  defines.IMAGEPROCESSING = defines.VIGNETTE || defines.TONEMAPPING || defines.CONTRAST
+                            || defines.EXPOSURE || defines.COLORCURVES || defines.COLORGRADING;
 }
 
 bool ImageProcessingConfiguration::isReady() const
 {
   // Color Grading texure can not be none blocking.
-  return !colorGradingEnabled() || !_colorGradingTexture
-         || _colorGradingTexture->isReady();
+  return !colorGradingEnabled() || !_colorGradingTexture || _colorGradingTexture->isReady();
 }
 
-void ImageProcessingConfiguration::bind(Effect* effect, float aspectRatio)
+void ImageProcessingConfiguration::bind(Effect* effect,
+                                        const std::optional<float>& overrideAspectRatio)
 {
   // Color Curves
   if (_colorCurvesEnabled && colorCurves) {
@@ -389,23 +371,21 @@ void ImageProcessingConfiguration::bind(Effect* effect, float aspectRatio)
     auto inverseHeight = 1.f / effect->getEngine()->getRenderHeight();
     effect->setFloat2("vInverseScreenSize", inverseWidth, inverseHeight);
 
+    auto aspectRatio = overrideAspectRatio.value_or(inverseHeight / inverseWidth);
+
     auto vignetteScaleY = std::tan(vignetteCameraFov * 0.5f);
     auto vignetteScaleX = vignetteScaleY * aspectRatio;
 
-    auto vignetteScaleGeometricMean
-      = std::sqrt(vignetteScaleX * vignetteScaleY);
-    vignetteScaleX
-      = Tools::Mix(vignetteScaleX, vignetteScaleGeometricMean, vignetteStretch);
-    vignetteScaleY
-      = Tools::Mix(vignetteScaleY, vignetteScaleGeometricMean, vignetteStretch);
+    auto vignetteScaleGeometricMean = std::sqrt(vignetteScaleX * vignetteScaleY);
+    vignetteScaleX = Tools::Mix(vignetteScaleX, vignetteScaleGeometricMean, vignetteStretch);
+    vignetteScaleY = Tools::Mix(vignetteScaleY, vignetteScaleGeometricMean, vignetteStretch);
 
     effect->setFloat4("vignetteSettings1", vignetteScaleX, vignetteScaleY,
-                      -vignetteScaleX * vignetteCentreX,
-                      -vignetteScaleY * vignetteCentreY);
+                      -vignetteScaleX * vignetteCentreX, -vignetteScaleY * vignetteCentreY);
 
     auto vignettePower = -2.f * vignetteWeight;
-    effect->setFloat4("vignetteSettings2", vignetteColor.r, vignetteColor.g,
-                      vignetteColor.b, vignettePower);
+    effect->setFloat4("vignetteSettings2", vignetteColor.r, vignetteColor.g, vignetteColor.b,
+                      vignettePower);
   }
 
   // Exposure
@@ -417,8 +397,7 @@ void ImageProcessingConfiguration::bind(Effect* effect, float aspectRatio)
   // Color transform settings
   if (_colorGradingTexture) {
     effect->setTexture("txColorTransform", colorGradingTexture);
-    const auto textureSize
-      = static_cast<float>(_colorGradingTexture->getSize().height);
+    const auto textureSize = static_cast<float>(_colorGradingTexture->getSize().height);
 
     const auto weight = static_cast<float>(_colorGradingTexture->level);
     effect->setFloat4("colorTransformSettings",
@@ -430,8 +409,7 @@ void ImageProcessingConfiguration::bind(Effect* effect, float aspectRatio)
   }
 }
 
-std::unique_ptr<ImageProcessingConfiguration>
-ImageProcessingConfiguration::clone()
+std::unique_ptr<ImageProcessingConfiguration> ImageProcessingConfiguration::clone()
 {
   return nullptr;
 }
