@@ -88,6 +88,10 @@ public:
    */
   static constexpr unsigned int ConvexHullImpostor = 10;
   /**
+   * Custom-Imposter type (Ammo.js plugin only)
+   */
+  static constexpr unsigned int CustomImpostor = 100;
+  /**
    * Rope-Imposter type
    */
   static constexpr unsigned int RopeImpostor = 101;

@@ -13,7 +13,7 @@ float PhysicsEngine::Epsilon = 0.001f;
 
 PhysicsEngine::PhysicsEngine(const std::optional<Vector3>& iGravity,
                              IPhysicsEnginePlugin* physicsPlugin)
-    : _initialized{false}, _physicsPlugin{physicsPlugin}
+    : _initialized{false}, _physicsPlugin{physicsPlugin}, _subTimeStep{0.f}
 {
   if (_physicsPlugin && _physicsPlugin->isSupported()) {
     setGravity(iGravity.has_value() ? *iGravity : Vector3(0.f, -9.807f, 0.f));
@@ -45,6 +45,16 @@ void PhysicsEngine::setTimeStep(float newTimeStep)
 float PhysicsEngine::getTimeStep() const
 {
   return _physicsPlugin->getTimeStep();
+}
+
+void PhysicsEngine::setSubTimeStep(float subTimeStep)
+{
+  _subTimeStep = subTimeStep;
+}
+
+float PhysicsEngine::getSubTimeStep() const
+{
+  return _subTimeStep;
 }
 
 void PhysicsEngine::dispose()

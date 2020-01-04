@@ -47,6 +47,20 @@ struct BABYLON_SHARED_EXPORT IPhysicsEngine {
   [[nodiscard]] virtual float getTimeStep() const = 0;
 
   /**
+   * @brief Set the sub time step of the physics engine.
+   * Default is 0 meaning there is no sub steps
+   * To increase physics resolution precision, set a small value (like 1 ms)
+   * @param subTimeStep defines the new sub timestep used for physics resolution.
+   */
+  virtual void setSubTimeStep(float subTimeStep = 0.f) = 0;
+
+  /**
+   * @brief Get the sub time step of the physics engine.
+   * @returns the current sub time step
+   */
+  virtual float getSubTimeStep() const = 0;
+
+  /**
    * @brief Release all resources
    */
   virtual void dispose() = 0;

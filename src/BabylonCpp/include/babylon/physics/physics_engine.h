@@ -57,6 +57,20 @@ public:
   [[nodiscard]] float getTimeStep() const final;
 
   /**
+   * @brief Set the sub time step of the physics engine.
+   * Default is 0 meaning there is no sub steps
+   * To increase physics resolution precision, set a small value (like 1 ms)
+   * @param subTimeStep defines the new sub timestep used for physics resolution.
+   */
+  void setSubTimeStep(float subTimeStep = 0.f) final;
+
+  /**
+   * @brief Get the sub time step of the physics engine.
+   * @returns the current sub time step
+   */
+  float getSubTimeStep() const final;
+
+  /**
    * @brief Release all resources.
    */
   void dispose() final;
@@ -161,6 +175,7 @@ private:
   IPhysicsEnginePlugin* _physicsPlugin;
   std::vector<PhysicsImpostorPtr> _impostors;
   std::vector<PhysicsImpostorJointPtr> _joints;
+  float _subTimeStep;
 
 }; // end of class PhysicsEngine
 

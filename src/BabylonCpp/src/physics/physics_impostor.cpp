@@ -24,20 +24,14 @@ std::array<Vector3, 3> PhysicsImpostor::_tmpVecs
   = {{Vector3::Zero(), Vector3::Zero(), Vector3::Zero()}};
 Quaternion PhysicsImpostor::_tmpQuat = Quaternion::Identity();
 
-PhysicsImpostor::PhysicsImpostor(IPhysicsEnabledObject* iObject,
-                                 unsigned int iType,
-                                 PhysicsImpostorParameters& options,
-                                 Scene* scene)
+PhysicsImpostor::PhysicsImpostor(IPhysicsEnabledObject* iObject, unsigned int iType,
+                                 PhysicsImpostorParameters& options, Scene* scene)
     : isDisposed{this, &PhysicsImpostor::get_isDisposed}
     , mass{this, &PhysicsImpostor::get_mass, &PhysicsImpostor::set_mass}
-    , friction{this, &PhysicsImpostor::get_friction,
-               &PhysicsImpostor::set_friction}
-    , restitution{this, &PhysicsImpostor::get_restitution,
-                  &PhysicsImpostor::set_restitution}
-    , pressure{this, &PhysicsImpostor::get_pressure,
-               &PhysicsImpostor::set_pressure}
-    , stiffness{this, &PhysicsImpostor::get_stiffness,
-                &PhysicsImpostor::set_stiffness}
+    , friction{this, &PhysicsImpostor::get_friction, &PhysicsImpostor::set_friction}
+    , restitution{this, &PhysicsImpostor::get_restitution, &PhysicsImpostor::set_restitution}
+    , pressure{this, &PhysicsImpostor::get_pressure, &PhysicsImpostor::set_pressure}
+    , stiffness{this, &PhysicsImpostor::get_stiffness, &PhysicsImpostor::set_stiffness}
     , velocityIterations{this, &PhysicsImpostor::get_velocityIterations,
                          &PhysicsImpostor::set_velocityIterations}
     , positionIterations{this, &PhysicsImpostor::get_positionIterations,
@@ -46,8 +40,7 @@ PhysicsImpostor::PhysicsImpostor(IPhysicsEnabledObject* iObject,
     , segments{0}
     , object{iObject}
     , physicsImposterType{iType}
-    , physicsBody{this, &PhysicsImpostor::get_physicsBody,
-                  &PhysicsImpostor::set_physicsBody}
+    , physicsBody{this, &PhysicsImpostor::get_physicsBody, &PhysicsImpostor::set_physicsBody}
     , parent{this, &PhysicsImpostor::get_parent, &PhysicsImpostor::set_parent}
     , _options{options}
     , _scene{scene}
@@ -58,8 +51,7 @@ PhysicsImpostor::PhysicsImpostor(IPhysicsEnabledObject* iObject,
 {
   // Sanity check!
   if (!object) {
-    BABYLON_LOG_ERROR("PhysicsImpostor",
-                      "No object was provided. A physics object is obligatory")
+    BABYLON_LOG_ERROR("PhysicsImpostor", "No object was provided. A physics object is obligatory")
     return;
   }
   if (object->parent() && _options.mass != 0.f) {
@@ -169,8 +161,7 @@ void PhysicsImpostor::forceUpdate()
 
 IPhysicsBody*& PhysicsImpostor::get_physicsBody()
 {
-  return (_parent && !_options.ignoreParent) ? _parent->physicsBody() :
-                                               _physicsBody;
+  return (_parent && !_options.ignoreParent) ? _parent->physicsBody() : _physicsBody;
 }
 
 PhysicsImpostor*& PhysicsImpostor::get_parent()
@@ -255,9 +246,7 @@ bool PhysicsImpostor::get_isDisposed() const
 
 float PhysicsImpostor::get_mass() const
 {
-  return _physicsEngine ?
-           _physicsEngine->getPhysicsPlugin()->getBodyMass(*this) :
-           0.f;
+  return _physicsEngine ? _physicsEngine->getPhysicsPlugin()->getBodyMass(*this) : 0.f;
 }
 
 void PhysicsImpostor::set_mass(float value)
@@ -267,9 +256,7 @@ void PhysicsImpostor::set_mass(float value)
 
 float PhysicsImpostor::get_friction() const
 {
-  return _physicsEngine ?
-           _physicsEngine->getPhysicsPlugin()->getBodyFriction(*this) :
-           0;
+  return _physicsEngine ? _physicsEngine->getPhysicsPlugin()->getBodyFriction(*this) : 0;
 }
 
 void PhysicsImpostor::set_friction(float value)
@@ -282,9 +269,7 @@ void PhysicsImpostor::set_friction(float value)
 
 float PhysicsImpostor::get_restitution() const
 {
-  return _physicsEngine ?
-           _physicsEngine->getPhysicsPlugin()->getBodyRestitution(*this) :
-           0;
+  return _physicsEngine ? _physicsEngine->getPhysicsPlugin()->getBodyRestitution(*this) : 0;
 }
 
 void PhysicsImpostor::set_restitution(float value)
@@ -379,9 +364,8 @@ void PhysicsImpostor::setMass(float iMass)
 
 std::optional<Vector3> PhysicsImpostor::getLinearVelocity()
 {
-  return _physicsEngine ?
-           _physicsEngine->getPhysicsPlugin()->getLinearVelocity(*this) :
-           Vector3::Zero();
+  return _physicsEngine ? _physicsEngine->getPhysicsPlugin()->getLinearVelocity(*this) :
+                          Vector3::Zero();
 }
 
 void PhysicsImpostor::setLinearVelocity(const std::optional<Vector3>& velocity)
@@ -393,9 +377,8 @@ void PhysicsImpostor::setLinearVelocity(const std::optional<Vector3>& velocity)
 
 std::optional<Vector3> PhysicsImpostor::getAngularVelocity()
 {
-  return _physicsEngine ?
-           _physicsEngine->getPhysicsPlugin()->getAngularVelocity(*this) :
-           Vector3::Zero();
+  return _physicsEngine ? _physicsEngine->getPhysicsPlugin()->getAngularVelocity(*this) :
+                          Vector3::Zero();
 }
 
 void PhysicsImpostor::setAngularVelocity(const std::optional<Vector3>& velocity)
@@ -424,13 +407,11 @@ void PhysicsImpostor::unregisterBeforePhysicsStep(
 {
   using Function = std::function<void(PhysicsImpostor * impostor)>;
 
-  stl_util::erase_remove_if(_onBeforePhysicsStepCallbacks, 
-    [&func](const Function& f) {
-      auto ptr1 = func.template target<Function>();
-      auto ptr2 = f.template target<Function>();
-      return ptr1 < ptr2;
-    }
-  );
+  stl_util::erase_remove_if(_onBeforePhysicsStepCallbacks, [&func](const Function& f) {
+    auto ptr1 = func.template target<Function>();
+    auto ptr2 = f.template target<Function>();
+    return ptr1 < ptr2;
+  });
 }
 
 void PhysicsImpostor::registerAfterPhysicsStep(
@@ -444,13 +425,11 @@ void PhysicsImpostor::unregisterAfterPhysicsStep(
 {
   using Function = std::function<void(PhysicsImpostor * impostor)>;
 
-  stl_util::erase_remove_if(_onAfterPhysicsStepCallbacks,
-    [&func](const Function& f) {
-      auto ptr1 = func.template target<Function>();
-      auto ptr2 = f.template target<Function>();
-      return ptr1 < ptr2;
-    }
-  );
+  stl_util::erase_remove_if(_onAfterPhysicsStepCallbacks, [&func](const Function& f) {
+    auto ptr1 = func.template target<Function>();
+    auto ptr2 = f.template target<Function>();
+    return ptr1 < ptr2;
+  });
 }
 
 void PhysicsImpostor::registerOnPhysicsCollide()
@@ -483,15 +462,12 @@ void PhysicsImpostor::beforeStep()
     _tmpQuat.multiplyToRef(*object->rotationQuaternion(), _tmpQuat);
   }
   else {
-    _tmpQuat.copyFrom(object->rotationQuaternion() ?
-                        *object->rotationQuaternion() :
-                        Quaternion());
+    _tmpQuat.copyFrom(object->rotationQuaternion() ? *object->rotationQuaternion() : Quaternion());
   }
   if (!_options.disableBidirectionalTransformation) {
     if (object->rotationQuaternion()) {
       _physicsEngine->getPhysicsPlugin()->setPhysicsBodyTransformation(
-        *this, /*bInfo.boundingBox.centerWorld*/ object->getAbsolutePosition(),
-        _tmpQuat);
+        *this, /*bInfo.boundingBox.centerWorld*/ object->getAbsolutePosition(), _tmpQuat);
     }
   }
 
@@ -515,14 +491,12 @@ void PhysicsImpostor::afterStep()
   if (object->parent() && object->rotationQuaternion()) {
     getParentsRotation();
     _tmpQuat.conjugateInPlace();
-    _tmpQuat.multiplyToRef(*object->rotationQuaternion(),
-                           *object->rotationQuaternion());
+    _tmpQuat.multiplyToRef(*object->rotationQuaternion(), *object->rotationQuaternion());
   }
   // take the position set and make it the absolute position of this object.
   object->setAbsolutePosition(object->position());
   if (_deltaRotation && object->rotationQuaternion()) {
-    object->rotationQuaternion()->multiplyToRef(*_deltaRotation,
-                                                *object->rotationQuaternion());
+    object->rotationQuaternion()->multiplyToRef(*_deltaRotation, *object->rotationQuaternion());
   }
   object->translate(_deltaPosition, 1.f);
 }
@@ -531,8 +505,7 @@ void PhysicsImpostor::onCollide(IPhysicsBody* /*body*/)
 {
 }
 
-PhysicsImpostor& PhysicsImpostor::applyForce(const Vector3& force,
-                                             const Vector3& contactPoint)
+PhysicsImpostor& PhysicsImpostor::applyForce(const Vector3& force, const Vector3& contactPoint)
 {
   if (_physicsEngine) {
     _physicsEngine->getPhysicsPlugin()->applyForce(*this, force, contactPoint);
@@ -541,30 +514,26 @@ PhysicsImpostor& PhysicsImpostor::applyForce(const Vector3& force,
   return *this;
 }
 
-PhysicsImpostor& PhysicsImpostor::applyImpulse(const Vector3& force,
-                                               const Vector3& contactPoint)
+PhysicsImpostor& PhysicsImpostor::applyImpulse(const Vector3& force, const Vector3& contactPoint)
 {
   if (_physicsEngine) {
-    _physicsEngine->getPhysicsPlugin()->applyImpulse(*this, force,
-                                                     contactPoint);
+    _physicsEngine->getPhysicsPlugin()->applyImpulse(*this, force, contactPoint);
   }
 
   return *this;
 }
 
-PhysicsImpostor&
-PhysicsImpostor::createJoint(const PhysicsImpostorPtr& otherImpostor,
-                             unsigned int jointType,
-                             const PhysicsJointData& jointData)
+PhysicsImpostor& PhysicsImpostor::createJoint(const PhysicsImpostorPtr& otherImpostor,
+                                              unsigned int jointType,
+                                              const PhysicsJointData& jointData)
 {
   addJoint(otherImpostor, std::make_shared<PhysicsJoint>(jointType, jointData));
 
   return *this;
 }
 
-PhysicsImpostor&
-PhysicsImpostor::addJoint(const PhysicsImpostorPtr& otherImpostor,
-                          const std::shared_ptr<PhysicsJoint>& joint)
+PhysicsImpostor& PhysicsImpostor::addJoint(const PhysicsImpostorPtr& otherImpostor,
+                                           const std::shared_ptr<PhysicsJoint>& joint)
 {
   Joint _joint;
   _joint.otherImpostor = otherImpostor;
@@ -578,10 +547,9 @@ PhysicsImpostor::addJoint(const PhysicsImpostorPtr& otherImpostor,
   return *this;
 }
 
-PhysicsImpostor&
-PhysicsImpostor::addAnchor(const PhysicsImpostorPtr& otherImpostor, int width,
-                           int height, float influence,
-                           bool noCollisionBetweenLinkedBodies)
+PhysicsImpostor& PhysicsImpostor::addAnchor(const PhysicsImpostorPtr& otherImpostor, int width,
+                                            int height, float influence,
+                                            bool noCollisionBetweenLinkedBodies)
 {
   if (!_physicsEngine) {
     return *this;
@@ -594,17 +562,15 @@ PhysicsImpostor::addAnchor(const PhysicsImpostorPtr& otherImpostor, int width,
   return *this;
 }
 
-PhysicsImpostor&
-PhysicsImpostor::addHook(const PhysicsImpostorPtr& otherImpostor, float length,
-                         float influence, bool noCollisionBetweenLinkedBodies)
+PhysicsImpostor& PhysicsImpostor::addHook(const PhysicsImpostorPtr& otherImpostor, float length,
+                                          float influence, bool noCollisionBetweenLinkedBodies)
 {
   if (!_physicsEngine) {
     return *this;
   }
   auto plugin = _physicsEngine->getPhysicsPlugin();
   if (_physicsEngine) {
-    plugin->appendHook(*this, otherImpostor, length, influence,
-                       noCollisionBetweenLinkedBodies);
+    plugin->appendHook(*this, otherImpostor, length, influence, noCollisionBetweenLinkedBodies);
   }
   return *this;
 }
@@ -627,14 +593,12 @@ PhysicsImpostor& PhysicsImpostor::wakeUp()
   return *this;
 }
 
-std::unique_ptr<PhysicsImpostor>
-PhysicsImpostor::clone(IPhysicsEnabledObject* newObject)
+std::unique_ptr<PhysicsImpostor> PhysicsImpostor::clone(IPhysicsEnabledObject* newObject)
 {
   if (!newObject) {
     return nullptr;
   }
-  return std::make_unique<PhysicsImpostor>(newObject, physicsImposterType,
-                                           _options, _scene);
+  return std::make_unique<PhysicsImpostor>(newObject, physicsImposterType, _options, _scene);
 }
 
 void PhysicsImpostor::dispose()
@@ -684,14 +648,13 @@ PhysicsImpostor& PhysicsImpostor::getBoxSizeToRef(Vector3& result)
 
 float PhysicsImpostor::getRadius() const
 {
-  return _physicsEngine ? _physicsEngine->getPhysicsPlugin()->getRadius(*this) :
-                          0.f;
+  return _physicsEngine ? _physicsEngine->getPhysicsPlugin()->getRadius(*this) : 0.f;
 }
 
-void PhysicsImpostor::syncBoneWithImpostor(
-  Bone* bone, AbstractMesh* boneMesh, const std::optional<Vector3>& jointPivot,
-  std::optional<float> distToJoint,
-  const std::optional<Quaternion>& adjustRotation)
+void PhysicsImpostor::syncBoneWithImpostor(Bone* bone, AbstractMesh* boneMesh,
+                                           const std::optional<Vector3>& jointPivot,
+                                           std::optional<float> distToJoint,
+                                           const std::optional<Quaternion>& adjustRotation)
 {
   auto& tempVec = PhysicsImpostor::_tmpVecs[0];
   auto mesh     = static_cast<AbstractMesh*>(object);
@@ -703,8 +666,7 @@ void PhysicsImpostor::syncBoneWithImpostor(
       bone->setRotationQuaternion(tempQuat, Space::WORLD, boneMesh);
     }
     else {
-      bone->setRotationQuaternion(*mesh->rotationQuaternion(), Space::WORLD,
-                                  boneMesh);
+      bone->setRotationQuaternion(*mesh->rotationQuaternion(), Space::WORLD, boneMesh);
     }
   }
 
@@ -741,11 +703,11 @@ void PhysicsImpostor::syncBoneWithImpostor(
   }
 }
 
-void PhysicsImpostor::syncImpostorWithBone(
-  Bone* bone, AbstractMesh* boneMesh, const std::optional<Vector3>& jointPivot,
-  std::optional<float> distToJoint,
-  const std::optional<Quaternion>& adjustRotation,
-  std::optional<Vector3>& boneAxis)
+void PhysicsImpostor::syncImpostorWithBone(Bone* bone, AbstractMesh* boneMesh,
+                                           const std::optional<Vector3>& jointPivot,
+                                           std::optional<float> distToJoint,
+                                           const std::optional<Quaternion>& adjustRotation,
+                                           std::optional<Vector3>& boneAxis)
 {
   auto mesh = static_cast<AbstractMesh*>(object);
 
@@ -756,8 +718,7 @@ void PhysicsImpostor::syncImpostorWithBone(
       tempQuat.multiplyToRef(*adjustRotation, *mesh->rotationQuaternion());
     }
     else {
-      bone->getRotationQuaternionToRef(*mesh->rotationQuaternion(),
-                                       Space::WORLD, boneMesh);
+      bone->getRotationQuaternionToRef(*mesh->rotationQuaternion(), Space::WORLD, boneMesh);
     }
   }
 
