@@ -3378,6 +3378,11 @@ public:
   IPhysicsEnginePtr _physicsEngine;
 
   /**
+   * Hidden
+   */
+  float _physicsTimeAccumulator;
+
+  /**
    * User updatable function that will return a deterministic frame time when
    * engine is in deterministic lock step mode
    */

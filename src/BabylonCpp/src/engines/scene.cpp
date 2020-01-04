@@ -203,6 +203,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , getIntersectingSubMeshCandidates{nullptr}
     , getCollidingSubMeshCandidates{nullptr}
     , _physicsEngine{nullptr}
+    , _physicsTimeAccumulator{0.f}
     , _environmentTexture{nullptr}
     , _environmentIntensity{1.f}
     , _animationPropertiesOverride{nullptr}
@@ -4747,8 +4748,9 @@ bool Scene::enablePhysics(const std::optional<Vector3>& iGravity, IPhysicsEngine
     _addComponent(component);
   }
 
-  _physicsEngine     = PhysicsEngine::New(iGravity, plugin);
-  bool isInitialized = _physicsEngine->isInitialized();
+  _physicsEngine          = PhysicsEngine::New(iGravity, plugin);
+  _physicsTimeAccumulator = 0.f;
+  bool isInitialized      = _physicsEngine->isInitialized();
   if (!isInitialized) {
     _physicsEngine = nullptr;
   }
@@ -4774,9 +4776,21 @@ bool Scene::isPhysicsEnabled()
 void Scene::_advancePhysicsEngineStep(float step)
 {
   if (_physicsEngine) {
-    onBeforePhysicsObservable.notifyObservers(this);
-    _physicsEngine->_step(step / 1000.f);
-    onAfterPhysicsObservable.notifyObservers(this);
+    auto subTime = _physicsEngine->getSubTimeStep();
+    if (subTime > 0.f) {
+      _physicsTimeAccumulator += step;
+      while (_physicsTimeAccumulator > subTime) {
+        onBeforePhysicsObservable.notifyObservers(this);
+        _physicsEngine->_step(subTime / 1000.f);
+        onAfterPhysicsObservable.notifyObservers(this);
+        _physicsTimeAccumulator -= subTime;
+      }
+    }
+    else {
+      onBeforePhysicsObservable.notifyObservers(this);
+      _physicsEngine->_step(step / 1000.f);
+      onAfterPhysicsObservable.notifyObservers(this);
+    }
   }
 }
 
