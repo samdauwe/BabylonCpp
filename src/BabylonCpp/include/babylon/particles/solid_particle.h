@@ -1,6 +1,8 @@
 #ifndef BABYLON_PARTICLES_SOLID_PARTICLE_H
 #define BABYLON_PARTICLES_SOLID_PARTICLE_H
 
+#include <variant>
+
 #include <babylon/babylon_api.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/maths/color4.h>
@@ -22,45 +24,53 @@ class BABYLON_SHARED_EXPORT SolidParticle {
 public:
   /**
    * @brief Creates a Solid Particle object.
-   * Don't create particles manually, use instead the Solid Particle System
-   * internal tools like _addParticle()
-   * @param particleIndex (integer) is the particle index in the Solid Particle
-   * System pool. It's also the particle identifier.
-   * @param positionIndex (integer) is the starting index of the particle
-   * vertices in the SPS "positions" array.
-   * @param indiceIndex (integer) is the starting index of the particle indices
-   * in the SPS "indices" array.
-   * @param model (ModelShape) is a reference to the model shape on what the
-   * particle is designed.
+   * Don't create particles manually, use instead the Solid Particle System internal tools like
+   * _addParticle()
+   * @param particleIndex (integer) is the particle index in the Solid Particle System pool.
+   * @param particleId (integer) is the particle identifier. Unless some particles are removed from
+   * the SPS, it's the same value than the particle idx.
+   * @param positionIndex (integer) is the starting index of the particle vertices in the SPS
+   * "positions" array.
+   * @param indiceIndex (integer) is the starting index of the particle indices in the SPS "indices"
+   * array.
+   * @param model (ModelShape) is a reference to the model shape on what the particle is designed.
    * @param shapeId (integer) is the model shape identifier in the SPS.
-   * @param idxInShape (integer) is the index of the particle in the current
-   * model (ex: the 10th box of addShape(box, 30))
+   * @param idxInShape (integer) is the index of the particle in the current model (ex: the 10th box
+   * of addShape(box, 30))
    * @param sps defines the sps it is associated to
-   * @param modelBoundingInfo is the reference to the model BoundingInfo used
-   * for intersection computations.
+   * @param modelBoundingInfo is the reference to the model BoundingInfo used for intersection
+   * computations.
+   * @param materialIndex is the particle material identifier (integer) when the MultiMaterials are
+   * enabled in the SPS.
    */
-  SolidParticle(unsigned int particleIndex, unsigned int positionIndex,
-                unsigned int indiceIndex, ModelShape* model, int shapeId,
-                unsigned int idxInShape, SolidParticleSystem* sps,
-                const std::optional<BoundingInfo>& modelBoundingInfo
-                = std::nullopt);
+  SolidParticle(unsigned int particleIndex, int particleId, unsigned int positionIndex,
+                unsigned int indiceIndex, ModelShape* model, int shapeId, unsigned int idxInShape,
+                SolidParticleSystem* sps,
+                const std::optional<BoundingInfo>& modelBoundingInfo = std::nullopt,
+                const std::optional<size_t>& materialIndex           = std::nullopt);
   ~SolidParticle(); // = default
 
   /**
-   * @brief Returns a boolean. True if the particle intersects another particle
-   * or another mesh, else false. The intersection is computed on the particle
-   * bounding sphere and Axis Aligned Bounding Box (AABB)
+   * @brief Copies the particle property values into the existing target : position, rotation,
+   * scaling, uvs, colors, pivot, parent, visibility, alive
+   * @param target the particle target
+   * @returns the current particle
+   */
+  SolidParticle& copyToRef(SolidParticle& target);
+
+  /**
+   * @brief Returns a boolean. True if the particle intersects another particle or another mesh,
+   * else false. The intersection is computed on the particle bounding sphere and Axis Aligned
+   * Bounding Box (AABB)
    * @param target is the object (solid particle or mesh) what the intersection
    * is computed against.
    * @returns true if it intersects
    */
-  bool intersectsMesh(Mesh* target) const;
-  bool intersectsMesh(SolidParticle* target) const;
+  bool intersectsMesh(const std::variant<Mesh*, SolidParticle*>& target) const;
 
   /**
-   * @brief Returns `true` if the solid particle is within the frustum defined
-   * by the passed array of planes. A particle is in the frustum if its bounding
-   * box intersects the frustum
+   * @brief Returns `true` if the solid particle is within the frustum defined by the passed array
+   * of planes. A particle is in the frustum if its bounding box intersects the frustum
    * @param frustumPlanes defines the frustum to test
    * @returns true if the particle is in the frustum planes
    */
@@ -78,6 +88,10 @@ public:
    */
   unsigned int idx;
   /**
+   * particle identifier
+   */
+  int id;
+  /**
    * The color of the particle
    */
   std::optional<Color4> color;
@@ -86,8 +100,7 @@ public:
    */
   Vector3 position;
   /**
-   * The world space rotation of the particle. (Not use if rotationQuaternion is
-   * set)
+   * The world space rotation of the particle. (Not use if rotationQuaternion is set)
    */
   Vector3 rotation;
   /**
@@ -112,8 +125,8 @@ public:
   Vector3 pivot;
   /**
    * Must the particle be translated from its pivot point in its local space ?
-   * In this case, the pivot point is set at the origin of the particle local
-   * space and the particle is translated. Default : false
+   * In this case, the pivot point is set at the origin of the particle local space and the particle
+   * is translated. Default : false
    */
   bool translateFromPivot;
   /**
@@ -155,7 +168,7 @@ public:
    * Particle BoundingInfo object (Internal use)
    * Hidden
    */
-  std::unique_ptr<BoundingInfo> _boundingInfo;
+  std::shared_ptr<BoundingInfo> _boundingInfo;
   /**
    * Reference to the SPS what the particle belongs to (Internal use)
    * Hidden
@@ -176,6 +189,10 @@ public:
    * Default null.
    */
   std::optional<unsigned int> parentId;
+  /**
+   * The particle material identifier (integer) when MultiMaterials are enabled in the SPS.
+   */
+  std::optional<size_t> materialIndex;
   /**
    * The culling strategy to use to check whether the solid particle must be
    * culled or not when using isInFrustum(). The possible values are :

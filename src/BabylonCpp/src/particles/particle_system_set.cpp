@@ -11,8 +11,7 @@
 namespace BABYLON {
 
 ParticleSystemSet::ParticleSystemSet()
-    : emitterNode{this, &ParticleSystemSet::get_emitterNode}
-    , _emitterNode{nullptr}
+    : emitterNode{this, &ParticleSystemSet::get_emitterNode}, _emitterNode{nullptr}
 {
 }
 
@@ -23,9 +22,8 @@ TransformNodePtr& ParticleSystemSet::get_emitterNode()
   return _emitterNode;
 }
 
-void ParticleSystemSet::setEmitterAsSphere(
-  const EmitterCreationOptions& options, unsigned int renderingGroupId,
-  Scene* scene)
+void ParticleSystemSet::setEmitterAsSphere(const EmitterCreationOptions& options,
+                                           unsigned int renderingGroupId, Scene* scene)
 {
   if (_emitterNode) {
     _emitterNode->dispose();
@@ -41,11 +39,10 @@ void ParticleSystemSet::setEmitterAsSphere(
   sphereOptions.diameter = options.diameter;
   sphereOptions.segments = options.segments;
 
-  auto emitterMesh
-    = SphereBuilder::CreateSphere("emitterSphere", sphereOptions, scene);
+  auto emitterMesh = SphereBuilder::CreateSphere("emitterSphere", sphereOptions, scene);
   emitterMesh->renderingGroupId = static_cast<int>(renderingGroupId);
 
-  auto material = StandardMaterial::New("emitterSphereMaterial", scene);
+  auto material           = StandardMaterial::New("emitterSphereMaterial", scene);
   material->emissiveColor = options.color;
   emitterMesh->material   = material;
 
@@ -66,8 +63,7 @@ void ParticleSystemSet::start(const AbstractMeshPtr& emitter)
   }
 }
 
-void ParticleSystemSet::dispose(bool doNotRecurse,
-                                bool disposeMaterialAndTextures)
+void ParticleSystemSet::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
   for (const auto& system : systems) {
     system->dispose(doNotRecurse, disposeMaterialAndTextures);
@@ -86,8 +82,8 @@ json ParticleSystemSet::serialize() const
   return nullptr;
 }
 
-std::unique_ptr<ParticleSystemSet>
-ParticleSystemSet::Parse(const json& /*data*/, Scene* /*scene*/, bool /*gpu*/)
+std::unique_ptr<ParticleSystemSet> ParticleSystemSet::Parse(const json& /*data*/, Scene* /*scene*/,
+                                                            bool /*gpu*/)
 {
   return nullptr;
 }

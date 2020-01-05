@@ -1257,8 +1257,8 @@ std::vector<std::string> ParticleSystem::_GetAttributeNamesOrOptions(bool iIsAni
 std::vector<std::string> ParticleSystem::_GetEffectCreationOptions(bool iIsAnimationSheetEnabled)
 {
   std::vector<std::string> effectCreationOption{
-    "invView",     "view",        "projection",  "vClipPlane",       "vClipPlane2",
-    "vClipPlane3", "vClipPlane4", "textureMask", "translationPivot", "eyePosition"};
+    "invView",     "view",        "projection",  "vClipPlane",  "vClipPlane2",      "vClipPlane3",
+    "vClipPlane4", "vClipPlane5", "vClipPlane6", "textureMask", "translationPivot", "eyePosition"};
 
   if (iIsAnimationSheetEnabled) {
     effectCreationOption.emplace_back("particlesInfos");
@@ -1289,6 +1289,14 @@ EffectPtr ParticleSystem::_getEffect(unsigned int iBlendMode)
 
   if (_scene->clipPlane4.has_value()) {
     defines.emplace_back("#define CLIPPLANE4");
+  }
+
+  if (_scene->clipPlane5.has_value()) {
+    defines.emplace_back("#define CLIPPLANE5");
+  }
+
+  if (_scene->clipPlane6.has_value()) {
+    defines.emplace_back("#define CLIPPLANE6");
   }
 
   if (_isAnimationSheetEnabled) {
@@ -1540,7 +1548,8 @@ size_t ParticleSystem::_render(unsigned int iBlendMode)
   }
 
   if (_scene->clipPlane.has_value() || _scene->clipPlane2.has_value()
-      || _scene->clipPlane3.has_value() || _scene->clipPlane4.has_value()) {
+      || _scene->clipPlane3.has_value() || _scene->clipPlane4.has_value()
+      || _scene->clipPlane5.has_value() || _scene->clipPlane6.has_value()) {
     auto invView = viewMatrix;
     invView.invert();
     effect->setMatrix("invView", invView);

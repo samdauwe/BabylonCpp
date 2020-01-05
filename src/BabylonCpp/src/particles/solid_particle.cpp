@@ -6,12 +6,12 @@
 
 namespace BABYLON {
 
-SolidParticle::SolidParticle(
-  unsigned int particleIndex, unsigned int positionIndex,
-  unsigned int iIndiceIndex, ModelShape* model, int iShapeId,
-  unsigned int iIdxInShape, SolidParticleSystem* sps,
-  const std::optional<BoundingInfo>& modelBoundingInfo)
-    : idx{particleIndex}
+SolidParticle::SolidParticle(unsigned int particleIndex, int particleId, unsigned int positionIndex,
+                             unsigned int indiceIndex, ModelShape* model, int iShapeId,
+                             unsigned int iIdxInShape, SolidParticleSystem* sps,
+                             const std::optional<BoundingInfo>& modelBoundingInfo,
+                             const std::optional<size_t>& iMaterialIndex)
+    : id{0}
     , color{Color4(1.f, 1.f, 1.f, 1.f)}
     , position{Vector3::Zero()}
     , rotation{Vector3::Zero()}
@@ -23,56 +23,87 @@ SolidParticle::SolidParticle(
     , translateFromPivot{false}
     , alive{true}
     , isVisible{true}
-    , _pos{positionIndex}
-    , _ind{iIndiceIndex}
-    , _model{model}
-    , shapeId{iShapeId}
-    , idxInShape{iIdxInShape}
-    , _sps{sps}
     , _stillInvisible{false}
     , _rotationMatrix{{1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f}}
     , parentId{std::nullopt}
+    , materialIndex{std::nullopt}
     , cullingStrategy{AbstractMesh::CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY}
     , _globalPosition{Vector3::Zero()}
 {
+  idx        = particleIndex;
+  id         = particleId;
+  _pos       = positionIndex;
+  _ind       = indiceIndex;
+  _model     = model;
+  shapeId    = iShapeId;
+  idxInShape = iIdxInShape;
+  _sps       = sps;
   if (modelBoundingInfo) {
     const auto& mdlInfo = *modelBoundingInfo;
     _modelBoundingInfo  = std::make_unique<BoundingInfo>(mdlInfo);
-    _boundingInfo
-      = std::make_unique<BoundingInfo>(mdlInfo.minimum, mdlInfo.maximum);
+    _boundingInfo       = std::make_unique<BoundingInfo>(mdlInfo.minimum, mdlInfo.maximum);
+  }
+  if (materialIndex.has_value()) {
+    materialIndex = *iMaterialIndex;
   }
 }
 
 SolidParticle::~SolidParticle() = default;
 
-bool SolidParticle::intersectsMesh(Mesh* target) const
+SolidParticle& SolidParticle::copyToRef(SolidParticle& target)
 {
-  if (!_boundingInfo || !target->_boundingInfo) {
-    return false;
+  target.position.copyFrom(position);
+  target.rotation.copyFrom(rotation);
+  if (rotationQuaternion) {
+    if (target.rotationQuaternion) {
+      target.rotationQuaternion->copyFrom(*rotationQuaternion);
+    }
+    else {
+      target.rotationQuaternion = std::make_unique<Quaternion>(*rotationQuaternion);
+    }
   }
-  if (_sps->_bSphereOnly) {
-    return BoundingSphere::Intersects(_boundingInfo->boundingSphere,
-                                      target->_boundingInfo->boundingSphere);
+  target.scaling.copyFrom(scaling);
+  if (color) {
+    if (target.color) {
+      target.color->copyFrom(*color);
+    }
+    else {
+      target.color = *color;
+    }
   }
-  return _boundingInfo->intersects(*target->_boundingInfo, false);
+  target.uvs.copyFrom(uvs);
+  target.velocity.copyFrom(velocity);
+  target.pivot.copyFrom(pivot);
+  target.translateFromPivot = translateFromPivot;
+  target.alive              = alive;
+  target.isVisible          = isVisible;
+  target.parentId           = parentId;
+  target.cullingStrategy    = cullingStrategy;
+  if (materialIndex.has_value()) {
+    target.materialIndex = *materialIndex;
+  }
+  return *this;
 }
 
-bool SolidParticle::intersectsMesh(SolidParticle* target) const
+bool SolidParticle::intersectsMesh(const std::variant<Mesh*, SolidParticle*>& target) const
 {
-  if (!_boundingInfo || !target->_boundingInfo) {
+  std::shared_ptr<BoundingInfo> targetBoundingInfo
+    = std::holds_alternative<Mesh*>(target) ? std::get<Mesh*>(target)->_boundingInfo :
+                                              std::get<SolidParticle*>(target)->_boundingInfo;
+
+  if (!_boundingInfo || !targetBoundingInfo) {
     return false;
   }
   if (_sps->_bSphereOnly) {
     return BoundingSphere::Intersects(_boundingInfo->boundingSphere,
-                                      target->_boundingInfo->boundingSphere);
+                                      targetBoundingInfo->boundingSphere);
   }
-  return _boundingInfo->intersects(*target->_boundingInfo, false);
+  return _boundingInfo->intersects(*targetBoundingInfo, false);
 }
 
 bool SolidParticle::isInFrustum(const std::array<Plane, 6>& frustumPlanes)
 {
-  return _boundingInfo != nullptr
-         && _boundingInfo->isInFrustum(frustumPlanes, cullingStrategy);
+  return _boundingInfo != nullptr && _boundingInfo->isInFrustum(frustumPlanes, cullingStrategy);
 }
 
 void SolidParticle::getRotationMatrix(Matrix& m) const
@@ -84,8 +115,7 @@ void SolidParticle::getRotationMatrix(Matrix& m) const
   else {
     quaternion            = TmpVectors::QuaternionArray[0];
     const auto& _rotation = rotation;
-    Quaternion::RotationYawPitchRollToRef(_rotation.y, _rotation.x, _rotation.z,
-                                          quaternion);
+    Quaternion::RotationYawPitchRollToRef(_rotation.y, _rotation.x, _rotation.z, quaternion);
   }
 
   quaternion.toRotationMatrix(m);

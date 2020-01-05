@@ -25,25 +25,23 @@ using WebGLVertexArrayObjectPtr = std::shared_ptr<GL::IGLVertexArrayObject>;
 
 /**
  * @brief This represents a GPU particle system in Babylon
- * This is the fastest particle system in Babylon as it uses the GPU to update
- * the individual particle data
+ * This is the fastest particle system in Babylon as it uses the GPU to update the individual
+ * particle data
  * @see https://www.babylonjs-playground.com/#PU4WYI#4
  */
 class BABYLON_SHARED_EXPORT GPUParticleSystem : public BaseParticleSystem, public IAnimatable {
 
 public:
   /**
-   * @brief Gets a boolean indicating if the GPU particles can be rendered on
-   * current browser
+   * @brief Gets a boolean indicating if the GPU particles can be rendered on current browser
    */
   static bool IsSupported();
 
 public:
   /**
    * @brief Instantiates a GPU particle system.
-   * Particles are often small sprites used to simulate hard-to-reproduce
-   * phenomena like fire, smoke, water, or abstract visual effects like magic
-   * glitter and faery dust.
+   * Particles are often small sprites used to simulate hard-to-reproduce phenomena like fire,
+   * smoke, water, or abstract visual effects like magic glitter and faery dust.
    * @param name The name of the particle system
    * @param options The options used to create the system
    * @param scene The scene the particle system belongs to
@@ -74,16 +72,15 @@ public:
   bool isReady() override;
 
   /**
-   * @brief Gets if the system has been started. (Note: this will still be true
-   * after stop is called).
+   * @brief Gets if the system has been started. (Note: this will still be true after stop is
+   * called).
    * @returns True if it has been started, otherwise false.
    */
   [[nodiscard]] bool isStarted() const override;
 
   /**
    * @brief Starts the particle system and begins to emit
-   * @param delay defines the delay in milliseconds before starting the system
-   * (0 by default)
+   * @param delay defines the delay in milliseconds before starting the system (0 by default)
    */
   void start(size_t delay = 0) override;
 
@@ -107,8 +104,8 @@ public:
    * @brief Adds a new color gradient.
    * @param gradient defines the gradient to use (between 0 and 1)
    * @param color1 defines the color to affect to the specified gradient
-   * @param color2 defines an additional color used to define a range ([color,
-   * color2]) with main color to pick the final color from
+   * @param color2 defines an additional color used to define a range ([color, color2]) with main
+   * color to pick the final color from
    * @returns the current particle system
    */
   GPUParticleSystem& addColorGradient(float gradient, const Color4& color1,
@@ -183,7 +180,7 @@ public:
                                             = std::nullopt) override;
 
   /**
-   * Remove a specific limit velocity gradient.
+   * @brief Remove a specific limit velocity gradient.
    * @param gradient defines the gradient to remove
    * @returns the current particle system
    */
@@ -208,10 +205,9 @@ public:
   /**
    * @brief Not supported by GPUParticleSystem.
    * @param gradient defines the gradient to use (between 0 and 1)
-   * @param factor defines the emit rate value to affect to the specified
-   * gradient
-   * @param factor2 defines an additional factor used to define a range
-   * ([factor, factor2]) with main value to pick the final value from
+   * @param factor defines the emit rate value to affect to the specified gradient
+   * @param factor2 defines an additional factor used to define a range ([factor, factor2]) with
+   * main value to pick the final value from
    * @returns the current particle system
    */
   IParticleSystem& addEmitRateGradient(float gradient, float factor,
@@ -314,10 +310,9 @@ public:
   /**
    * @brief Not supported by GPUParticleSystem.
    * @param gradient defines the gradient to use (between 0 and 1)
-   * @param factor defines the life time factor to affect to the specified
-   * gradient
-   * @param factor2 defines an additional factor used to define a range
-   * ([factor, factor2]) with main value to pick the final value from
+   * @param factor defines the life time factor to affect to the specified gradient
+   * @param factor2 defines an additional factor used to define a range ([factor, factor2]) with
+   * main value to pick the final value from
    * @returns the current particle system
    */
   IParticleSystem& addLifeTimeGradient(float gradient, float factor,
@@ -341,16 +336,15 @@ public:
   void _recreateRenderEffect();
 
   /**
-   * @brief Animates the particle system for the current frame by emitting new
-   * particles and or animating the living ones.
+   * @brief Animates the particle system for the current frame by emitting new particles and or
+   * animating the living ones.
    * @param preWarm defines if we are in the pre-warmimg phase
    */
   void animate(bool preWarm = false) override;
 
   /**
    * @brief Renders the particle system in its current state
-   * @param preWarm defines if the system should only update the particles but
-   * not render them
+   * @param preWarm defines if the system should only update the particles but not render them
    * @returns the current number of particles
    */
   size_t render(bool preWarm = false) override;
@@ -362,8 +356,8 @@ public:
 
   /**
    * @brief Disposes the particle system and free the associated resources.
-   * @param disposeTexture defines if the particule texture must be disposed as
-   * well (true by default)
+   * @param disposeTexture defines if the particule texture must be disposed as well (true by
+   * default)
    */
   void dispose(bool disposeTexture = true, bool disposeMaterialAndTextures = false) override;
 
@@ -385,8 +379,7 @@ public:
    * @brief Parses a JSON object to create a GPU particle system.
    * @param parsedParticleSystem The JSON object to parse
    * @param scene The scene to create the particle system in
-   * @param rootUrl The root url to use to load external dependencies like
-   * texture
+   * @param rootUrl The root url to use to load external dependencies like texture
    * @param doNotStart Ignore the preventAutoStart attribute and does not start
    * @returns the parsed GPU particle system
    */

@@ -45,8 +45,7 @@ public:
 
   /**
    * @brief Starts all particle systems of the set.
-   * @param emitter defines an optional mesh to use as emitter for the particle
-   * systems
+   * @param emitter defines an optional mesh to use as emitter for the particle systems
    */
   void start(const AbstractMeshPtr& emitter = nullptr);
 

@@ -5,19 +5,23 @@
 namespace BABYLON {
 
 ModelShape::ModelShape(
-  int id, const std::vector<Vector3>& shape, size_t indicesLength,
-  const Float32Array& shapeUV,
-  const std::function<void(SolidParticle* particle, unsigned int i,
-                           unsigned int s)>& posFunction,
-  const std::function<void(SolidParticle* particle, const Vector3& vertex,
-                           unsigned int i)>& vtxFunction)
-    : shapeID{id}
-    , _shape{shape}
-    , _shapeUV{shapeUV}
-    , _indicesLength{indicesLength}
-    , _positionFunction{posFunction}
-    , _vertexFunction{vtxFunction}
+  int id, const std::vector<Vector3>& shape, const IndicesArray& indices,
+  const Float32Array& normals, const Float32Array& colors, const Float32Array& shapeUV,
+  const std::function<void(SolidParticle* particle, unsigned int i, unsigned int s)>& posFunction,
+  const std::function<void(SolidParticle* particle, const Vector3& vertex, unsigned int i)>&
+    vtxFunction,
+  const MaterialPtr& material)
 {
+  shapeID           = id;
+  _shape            = shape;
+  _indices          = indices;
+  _indicesLength    = indices.size();
+  _shapeUV          = shapeUV;
+  _shapeColors      = colors;
+  _normals          = normals;
+  _positionFunction = posFunction;
+  _vertexFunction   = vtxFunction;
+  _material         = material;
 }
 
 ModelShape::~ModelShape() = default;

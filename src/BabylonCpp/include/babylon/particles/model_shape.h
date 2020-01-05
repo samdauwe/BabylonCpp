@@ -2,34 +2,37 @@
 #define BABYLON_PARTICLES_MODEL_SHAPE_H
 
 #include <functional>
+#include <memory>
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
 
 namespace BABYLON {
 
+class Material;
 class SolidParticle;
 class Vector3;
+using MaterialPtr = std::shared_ptr<Material>;
 
 /**
- * @brief Represents the shape of the model used by one particle of a solid
- * particle system. SPS internal tool, don't use it manually.
+ * @brief Represents the shape of the model used by one particle of a solid particle system.
+ * SPS internal tool, don't use it manually.
  */
 class BABYLON_SHARED_EXPORT ModelShape {
 
 public:
   /**
-   * @brief Creates a ModelShape object. This is an internal simplified
-   * reference to a mesh used as for a model to replicate particles from by the
-   * SPS. SPS internal tool, don't use it manually.
+   * @brief Creates a ModelShape object. This is an internal simplified reference to a mesh used as
+   * for a model to replicate particles from by the SPS. SPS internal tool, don't use it manually.
+   * @hidden
    */
   ModelShape(
-    int id, const std::vector<Vector3>& shape, size_t indicesLength,
-    const Float32Array& shapeUV,
-    const std::function<void(SolidParticle* particle, unsigned int i,
-                             unsigned int s)>& posFunction,
-    const std::function<void(SolidParticle* particle, const Vector3& vertex,
-                             unsigned int i)>& vtxFunction);
+    int id, const std::vector<Vector3>& shape, const IndicesArray& indices,
+    const Float32Array& normals, const Float32Array& colors, const Float32Array& shapeUV,
+    const std::function<void(SolidParticle* particle, unsigned int i, unsigned int s)>& posFunction,
+    const std::function<void(SolidParticle* particle, const Vector3& vertex, unsigned int i)>&
+      vtxFunction,
+    const MaterialPtr& material);
   ~ModelShape(); // = default
 
 public:
@@ -49,6 +52,21 @@ public:
    */
   Float32Array _shapeUV;
   /**
+   * color array of the model
+   * @hidden
+   */
+  Float32Array _shapeColors;
+  /**
+   * indices array of the model
+   * @hidden
+   */
+  IndicesArray _indices;
+  /**
+   * normals array of the model
+   * @hidden
+   */
+  Float32Array _normals;
+  /**
    * length of the shape in the model indices array (internal use)
    * Hidden
    */
@@ -57,15 +75,18 @@ public:
    * Custom position function (internal use)
    * Hidden
    */
-  std::function<void(SolidParticle* particle, unsigned int i, unsigned int s)>
-    _positionFunction;
+  std::function<void(SolidParticle* particle, unsigned int i, unsigned int s)> _positionFunction;
   /**
    * Custom vertex function (internal use)
    * Hidden
    */
-  std::function<void(SolidParticle* particle, const Vector3& vertex,
-                     unsigned int i)>
+  std::function<void(SolidParticle* particle, const Vector3& vertex, unsigned int i)>
     _vertexFunction;
+  /**
+   * Model material (internal use)
+   * @hidden
+   */
+  MaterialPtr _material;
 
 }; // end of class ModelShape
 

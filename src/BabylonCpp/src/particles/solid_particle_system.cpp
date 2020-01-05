@@ -22,9 +22,8 @@
 
 namespace BABYLON {
 
-SolidParticleSystem::SolidParticleSystem(
-  const std::string& iName, Scene* scene,
-  const std::optional<SolidParticleSystemOptions>& options)
+SolidParticleSystem::SolidParticleSystem(const std::string& iName, Scene* scene,
+                                         const std::optional<SolidParticleSystemOptions>& options)
     : nbParticles{0}
     , billboard{false}
     , recomputeNormals{true}
@@ -37,9 +36,8 @@ SolidParticleSystem::SolidParticleSystem(
     , _alwaysVisible{false}
     , _depthSort{false}
     , _shapeCounter{0}
-    , _copy{std::make_unique<SolidParticle>(
-        0, 0, 0, nullptr, 0, 0, this,
-        BoundingInfo{Vector3::Zero(), Vector3::Zero()})}
+    //, _copy{std::make_unique<SolidParticle>(0, 0, 0, nullptr, 0, 0, this,
+    //                                        BoundingInfo{Vector3::Zero(), Vector3::Zero()})}
     , _color{std::make_unique<Color4>(0.f, 0.f, 0.f, 0.f)}
     , _computeParticleColor{true}
     , _computeParticleTexture{true}
@@ -52,16 +50,15 @@ SolidParticleSystem::SolidParticleSystem(
     , _translation{TmpVectors::Vector3Array[3]}
     , _needs32Bits{false}
 {
-  name       = iName;
-  _scene     = scene ? scene : Engine::LastCreatedScene();
-  _camera    = std::static_pointer_cast<TargetCamera>(_scene->activeCamera());
-  _pickable  = options ? options->isPickable : false;
-  _depthSort = options ? options->enableDepthSort : false;
-  _particlesIntersect  = options ? options->particleIntersection : false;
-  _bSphereOnly         = options ? options->boundingSphereOnly : false;
-  _bSphereRadiusFactor = (options && options->bSphereRadiusFactor) ?
-                           options->bSphereRadiusFactor.value() :
-                           1.f;
+  name                = iName;
+  _scene              = scene ? scene : Engine::LastCreatedScene();
+  _camera             = std::static_pointer_cast<TargetCamera>(_scene->activeCamera());
+  _pickable           = options ? options->isPickable : false;
+  _depthSort          = options ? options->enableDepthSort : false;
+  _particlesIntersect = options ? options->particleIntersection : false;
+  _bSphereOnly        = options ? options->boundingSphereOnly : false;
+  _bSphereRadiusFactor
+    = (options && options->bSphereRadiusFactor) ? options->bSphereRadiusFactor.value() : 1.f;
   if (options && options->updatable.has_value()) {
     _updatable = options->updatable.value();
   }
@@ -69,10 +66,9 @@ SolidParticleSystem::SolidParticleSystem(
     _updatable = true;
   }
 
-  _depthSortFunction
-    = [](const DepthSortedParticle& p1, const DepthSortedParticle& p2) {
-        return static_cast<int>(p2.sqDistance - p1.sqDistance);
-      };
+  _depthSortFunction = [](const DepthSortedParticle& p1, const DepthSortedParticle& p2) {
+    return static_cast<int>(p2.sqDistance - p1.sqDistance);
+  };
 }
 
 SolidParticleSystem::~SolidParticleSystem() = default;
@@ -135,9 +131,8 @@ MeshPtr SolidParticleSystem::buildMesh()
   return _mesh;
 }
 
-SolidParticleSystem&
-SolidParticleSystem::digest(Mesh* _mesh,
-                            const SolidParticleSystemDigestOptions& options)
+SolidParticleSystem& SolidParticleSystem::digest(Mesh* _mesh,
+                                                 const SolidParticleSystemDigestOptions& options)
 {
   auto size    = options.facetNb;
   auto number  = options.number;
@@ -170,9 +165,8 @@ SolidParticleSystem::digest(Mesh* _mesh,
   auto sizeO      = size;
 
   while (f < totalFacets) {
-    size = sizeO
-           + static_cast<size_t>(
-             std::floor((1.f + static_cast<float>(delta)) * Math::random()));
+    size
+      = sizeO + static_cast<size_t>(std::floor((1.f + static_cast<float>(delta)) * Math::random()));
     if (f > totalFacets - size) {
       size = totalFacets - f;
     }
@@ -187,14 +181,13 @@ SolidParticleSystem::digest(Mesh* _mesh,
     for (size_t j = f * 3; j < (f + size) * 3; ++j) {
       facetInd.emplace_back(fi);
       auto i = static_cast<unsigned int>(meshInd[j]);
-      stl_util::concat(
-        facetPos, {meshPos[i * 3], meshPos[i * 3 + 1], meshPos[i * 3 + 2]});
+      stl_util::concat(facetPos, {meshPos[i * 3], meshPos[i * 3 + 1], meshPos[i * 3 + 2]});
       if (!meshUV.empty()) {
         stl_util::concat(facetUV, {meshUV[i * 2], meshUV[i * 2 + 1]});
       }
       if (!meshCol.empty()) {
-        stl_util::concat(facetCol, {meshCol[i * 4 + 0], meshCol[i * 4 + 1],
-                                    meshCol[i * 4 + 2], meshCol[i * 4 + 3]});
+        stl_util::concat(facetCol, {meshCol[i * 4 + 0], meshCol[i * 4 + 1], meshCol[i * 4 + 2],
+                                    meshCol[i * 4 + 3]});
       }
       ++fi;
     }
@@ -213,11 +206,9 @@ SolidParticleSystem::digest(Mesh* _mesh,
 
     // shift the shape from its barycenter to the origin
     // and compute the BBox required for intersection.
-    Vector3 minimum{std::numeric_limits<float>::max(),
-                    std::numeric_limits<float>::max(),
+    Vector3 minimum{std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
                     std::numeric_limits<float>::max()};
-    Vector3 maximum{std::numeric_limits<float>::lowest(),
-                    std::numeric_limits<float>::lowest(),
+    Vector3 maximum{std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(),
                     std::numeric_limits<float>::lowest()};
     for (auto& iShape : shape) {
       iShape.subtractInPlace(barycenter);
@@ -228,17 +219,16 @@ SolidParticleSystem::digest(Mesh* _mesh,
     if (_particlesIntersect) {
       bInfo = BoundingInfo(minimum, maximum);
     }
-    auto modelShape = std::make_unique<ModelShape>(
-      _shapeCounter, shape, size * 3, shapeUV, nullptr, nullptr);
+    //auto modelShape
+    //  = std::make_unique<ModelShape>(_shapeCounter, shape, size * 3, shapeUV, nullptr, nullptr);
+    std::unique_ptr<ModelShape> modelShape = nullptr;
 
     // add the particle in the SPS
     auto currentPos = static_cast<unsigned int>(_positions.size());
     auto currentInd = static_cast<unsigned int>(_indices.size());
-    _meshBuilder(_index, shape, _positions, facetInd, _indices, facetUV, _uvs,
-                 facetCol, _colors, meshNor, _normals, idx, 0,
-                 {nullptr, nullptr});
-    _addParticle(idx, currentPos, currentInd, std::move(modelShape),
-                 _shapeCounter, 0, bInfo);
+    _meshBuilder(_index, shape, _positions, facetInd, _indices, facetUV, _uvs, facetCol, _colors,
+                 meshNor, _normals, idx, 0, {nullptr, nullptr});
+    _addParticle(idx, currentPos, currentInd, std::move(modelShape), _shapeCounter, 0, bInfo);
     // initialize the particle position
     particles[nbParticles]->position.addInPlace(barycenter);
 
@@ -269,17 +259,15 @@ void SolidParticleSystem::_unrotateFixedNormals()
     }
     else {
       const auto& rotation = particle->rotation;
-      Quaternion::RotationYawPitchRollToRef(rotation.y, rotation.x, rotation.z,
-                                            quaternion);
+      Quaternion::RotationYawPitchRollToRef(rotation.y, rotation.x, rotation.z, quaternion);
       quaternion.conjugateInPlace();
     }
     quaternion.toRotationMatrix(invertedRotMatrix);
 
     for (unsigned int pt = 0; pt < shape.size(); pt++) {
       idx = index + pt * 3;
-      Vector3::TransformNormalFromFloatsToRef(
-        _normals32[idx], _normals32[idx + 1], _normals32[idx + 2],
-        invertedRotMatrix, tmpNormal);
+      Vector3::TransformNormalFromFloatsToRef(_normals32[idx], _normals32[idx + 1],
+                                              _normals32[idx + 2], invertedRotMatrix, tmpNormal);
       tmpNormal.toArray(_fixedNormal32, idx);
     }
     index = idx + 3;
@@ -300,10 +288,9 @@ void SolidParticleSystem::_resetCopy()
 }
 
 SolidParticle* SolidParticleSystem::_meshBuilder(
-  unsigned int p, const std::vector<Vector3>& shape, Float32Array& positions,
-  Uint32Array& meshInd, Uint32Array& indices, const Float32Array& meshUV,
-  Float32Array& uvs, const Float32Array& meshCol, Float32Array& colors,
-  const Float32Array& meshNor, Float32Array& normals, unsigned int idx,
+  unsigned int p, const std::vector<Vector3>& shape, Float32Array& positions, Uint32Array& meshInd,
+  Uint32Array& indices, const Float32Array& meshUV, Float32Array& uvs, const Float32Array& meshCol,
+  Float32Array& colors, const Float32Array& meshNor, Float32Array& normals, unsigned int idx,
   unsigned int idxInShape, const SolidParticleSystemMeshBuilderOptions& options)
 {
   size_t i = 0;
@@ -348,9 +335,8 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
     stl_util::concat(positions, {tmpRotated.x, tmpRotated.y, tmpRotated.z});
     if (!meshUV.empty()) {
       auto copyUvs = copy.uvs;
-      stl_util::concat(uvs,
-                       {(copyUvs.z - copyUvs.x) * meshUV[u] + copyUvs.x,
-                        (copyUvs.w - copyUvs.y) * meshUV[u + 1] + copyUvs.y});
+      stl_util::concat(uvs, {(copyUvs.z - copyUvs.x) * meshUV[u] + copyUvs.x,
+                             (copyUvs.w - copyUvs.y) * meshUV[u + 1] + copyUvs.y});
       u += 2;
     }
 
@@ -403,15 +389,14 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
     }
   }
 
-  if (_depthSort) {
+  /*if (_depthSort) {
     depthSortedParticles.emplace_back(DepthSortedParticle{});
-  }
+  }*/
 
   return &copy;
 }
 
-std::vector<Vector3>
-SolidParticleSystem::_posToShape(const Float32Array& positions)
+std::vector<Vector3> SolidParticleSystem::_posToShape(const Float32Array& positions)
 {
   std::vector<Vector3> shape;
   for (unsigned int i = 0; i < positions.size(); i += 3) {
@@ -431,27 +416,25 @@ Float32Array SolidParticleSystem::_uvsToShapeUV(const Float32Array& uvs)
   return shapeUV;
 }
 
-SolidParticle* SolidParticleSystem::_addParticle(
-  unsigned int idx, unsigned int idxpos, unsigned int idxind,
-  std::unique_ptr<ModelShape>&& model, int shapeId, unsigned int idxInShape,
-  const BoundingInfo& bInfo)
+SolidParticle* SolidParticleSystem::_addParticle(unsigned int /*idx*/, unsigned int /*idxpos*/,
+                                                 unsigned int /*idxind*/,
+                                                 std::unique_ptr<ModelShape>&& /*model*/, int /*shapeId*/,
+                                                 unsigned int /*idxInShape*/, const BoundingInfo& /*bInfo*/)
 {
-  particles.emplace_back(std::make_unique<SolidParticle>(
-    idx, idxpos, idxind, model.get(), shapeId, idxInShape, this, bInfo));
+  //particles.emplace_back(std::make_unique<SolidParticle>(idx, idxpos, idxind, model.get(), shapeId,
+  //                                                       idxInShape, this, bInfo));
   return particles.back().get();
 }
 
-int SolidParticleSystem::addShape(
-  const MeshPtr& iMesh, size_t nb,
-  const SolidParticleSystemMeshBuilderOptions& options)
+int SolidParticleSystem::addShape(const MeshPtr& iMesh, size_t nb,
+                                  const SolidParticleSystemMeshBuilderOptions& options)
 {
   auto meshPos = iMesh->getVerticesData(VertexBuffer::PositionKind);
   auto meshInd = iMesh->getIndices();
   auto meshUV  = iMesh->getVerticesData(VertexBuffer::UVKind);
   auto meshCol = iMesh->getVerticesData(VertexBuffer::ColorKind);
   auto meshNor = iMesh->getVerticesData(VertexBuffer::NormalKind);
-  auto bbInfo
-    = std::make_shared<BoundingInfo>(Vector3::Zero(), Vector3::Zero());
+  auto bbInfo  = std::make_shared<BoundingInfo>(Vector3::Zero(), Vector3::Zero());
   if (_particlesIntersect) {
     bbInfo = iMesh->getBoundingInfo();
   }
@@ -459,24 +442,24 @@ int SolidParticleSystem::addShape(
   auto shape   = _posToShape(meshPos);
   auto shapeUV = _uvsToShapeUV(meshUV);
 
-  auto& posfunc = options.positionFunction;
-  auto& vtxfunc = options.vertexFunction;
+  //auto& posfunc = options.positionFunction;
+  //auto& vtxfunc = options.vertexFunction;
 
-  auto modelShape = std::make_unique<ModelShape>(
-    _shapeCounter, shape, meshInd.size(), shapeUV, posfunc, vtxfunc);
+  // auto modelShape
+  //= std::make_unique<ModelShape>(_shapeCounter, shape, meshInd.size(), shapeUV, posfunc, vtxfunc);
+  std::unique_ptr<ModelShape> modelShape = nullptr;
 
   // particles
   SolidParticle* sp = nullptr;
   auto idx          = nbParticles;
   for (unsigned int i = 0; i < nb; ++i) {
-    auto currentPos = static_cast<unsigned int>(_positions.size());
-    auto currentInd = static_cast<unsigned int>(_indices.size());
-    auto currentCopy
-      = _meshBuilder(_index, shape, _positions, meshInd, _indices, meshUV, _uvs,
-                     meshCol, _colors, meshNor, _normals, idx, i, options);
+    auto currentPos  = static_cast<unsigned int>(_positions.size());
+    auto currentInd  = static_cast<unsigned int>(_indices.size());
+    auto currentCopy = _meshBuilder(_index, shape, _positions, meshInd, _indices, meshUV, _uvs,
+                                    meshCol, _colors, meshNor, _normals, idx, i, options);
     if (_updatable) {
-      sp = _addParticle(idx, currentPos, currentInd, std::move(modelShape),
-                        _shapeCounter, i, *bbInfo);
+      sp = _addParticle(idx, currentPos, currentInd, std::move(modelShape), _shapeCounter, i,
+                        *bbInfo);
       sp->position.copyFrom(currentCopy->position);
       sp->rotation.copyFrom(currentCopy->rotation);
       if (currentCopy->rotationQuaternion) {
@@ -502,10 +485,8 @@ void SolidParticleSystem::_rebuildParticle(SolidParticle* particle)
 {
   _resetCopy();
   auto& copy = *_copy;
-  if (particle->_model
-        ->_positionFunction) { // recall to stored custom positionFunction
-    particle->_model->_positionFunction(&copy, particle->idx,
-                                        particle->idxInShape);
+  if (particle->_model->_positionFunction) { // recall to stored custom positionFunction
+    particle->_model->_positionFunction(&copy, particle->idx, particle->idxInShape);
   }
 
   auto& rotMatrix            = TmpVectors::MatrixArray[0];
@@ -555,13 +536,11 @@ SolidParticleSystem& SolidParticleSystem::rebuildMesh()
   for (const auto& particle : particles) {
     _rebuildParticle(particle.get());
   }
-  mesh->updateVerticesData(VertexBuffer::PositionKind, _positions32, false,
-                           false);
+  mesh->updateVerticesData(VertexBuffer::PositionKind, _positions32, false, false);
   return *this;
 }
 
-SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
-                                                       unsigned int end,
+SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start, unsigned int end,
                                                        bool update)
 {
   if (!_updatable) {
@@ -581,12 +560,12 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
   auto& indices        = _indices;
   auto& fixedNormal32  = _fixedNormal32;
 
-  auto& tempVectors = TmpVectors::Vector3Array;
-  auto& camAxisX    = tempVectors[5].copyFromFloats(1.f, 0.f, 0.f);
-  auto& camAxisY    = tempVectors[6].copyFromFloats(0.f, 1.f, 0.f);
-  auto& camAxisZ    = tempVectors[7].copyFromFloats(0.f, 0.f, 1.f);
-  auto& minimum     = tempVectors[8].setAll(std::numeric_limits<float>::max());
-  auto& maximum     = tempVectors[9].setAll(std::numeric_limits<float>::min());
+  auto& tempVectors         = TmpVectors::Vector3Array;
+  auto& camAxisX            = tempVectors[5].copyFromFloats(1.f, 0.f, 0.f);
+  auto& camAxisY            = tempVectors[6].copyFromFloats(0.f, 1.f, 0.f);
+  auto& camAxisZ            = tempVectors[7].copyFromFloats(0.f, 0.f, 1.f);
+  auto& minimum             = tempVectors[8].setAll(std::numeric_limits<float>::max());
+  auto& maximum             = tempVectors[9].setAll(std::numeric_limits<float>::min());
   auto& camInvertedPosition = tempVectors[10].setAll(0);
 
   // cases when the World Matrix is to be computed first
@@ -604,8 +583,7 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
     // same for camera up vector extracted from the cam view matrix
     auto& view        = _camera->getViewMatrix(true);
     const auto& viewM = view.m();
-    Vector3::TransformNormalFromFloatsToRef(viewM[1], viewM[5], viewM[9],
-                                            invertedMatrix, camAxisY);
+    Vector3::TransformNormalFromFloatsToRef(viewM[1], viewM[5], viewM[9], invertedMatrix, camAxisY);
     Vector3::CrossToRef(camAxisY, camAxisZ, camAxisX);
     camAxisY.normalize();
     camAxisX.normalize();
@@ -613,22 +591,20 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
 
   // if depthSort, compute the camera global position in the mesh local system
   if (_depthSort) {
-    Vector3::TransformCoordinatesToRef(
-      _camera->globalPosition(), invertedMatrix,
-      camInvertedPosition); // then un-rotate the camera
+    Vector3::TransformCoordinatesToRef(_camera->globalPosition(), invertedMatrix,
+                                       camInvertedPosition); // then un-rotate the camera
   }
 
   Matrix::IdentityToRef(rotMatrix);
-  auto idx   = 0ull; // current position index in the global array positions32
-  auto index = 0ull; // position start index in the global array positions32 of
-                     // the current particle
+  auto idx   = 0ull;      // current position index in the global array positions32
+  auto index = 0ull;      // position start index in the global array positions32 of
+                          // the current particle
   auto colidx     = 0ull; // current color index in the global array colors32
   auto colorIndex = 0ull; // color start index in the global array colors32 of
                           // the current particle
-  auto uvidx = 0ull;      // current uv index in the global array uvs32
-  auto uvIndex
-    = 0ull; // uv start index in the global array uvs32 of the current particle
-  auto pt = 0ull; // current index in the particle model shape
+  auto uvidx   = 0ull;    // current uv index in the global array uvs32
+  auto uvIndex = 0ull;    // uv start index in the global array uvs32 of the current particle
+  auto pt      = 0ull;    // current index in the particle model shape
 
   if (mesh->isFacetDataEnabled()) {
     _computeBoundingBox = true;
@@ -636,10 +612,9 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
 
   end = (end >= nbParticles) ? nbParticles - 1 : end;
   if (_computeBoundingBox) {
-    if (start != 0
-        || end != nbParticles - 1) { // only some particles are updated, then
-                                     // use the current existing BBox basis.
-                                     // Note : it can only increase.
+    if (start != 0 || end != nbParticles - 1) { // only some particles are updated, then
+                                                // use the current existing BBox basis.
+                                                // Note : it can only increase.
       auto& boundingInfo = mesh->_boundingInfo;
       if (boundingInfo) {
         minimum.copyFrom(boundingInfo->minimum);
@@ -673,13 +648,11 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
       auto& dsp         = depthSortedParticles[p];
       dsp.ind           = particle->_ind;
       dsp.indicesLength = particle->_model->_indicesLength;
-      dsp.sqDistance
-        = Vector3::DistanceSquared(particle->position, camInvertedPosition);
+      dsp.sqDistance    = Vector3::DistanceSquared(particle->position, camInvertedPosition);
     }
 
     // skip the computations for inactive or already invisible particles
-    if (!particle->alive
-        || (particle->_stillInvisible && !particle->isVisible)) {
+    if (!particle->alive || (particle->_stillInvisible && !particle->isVisible)) {
       // increment indexes for the next particle
       pt = shape.size();
       index += pt * 3;
@@ -725,42 +698,33 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
 
         if (_computeParticleRotation || billboard) {
           const auto& rotMatrixValues = rotMatrix.m();
-          particleRotationMatrix[0]
-            = rotMatrixValues[0] * parentRotationMatrix[0]
-              + rotMatrixValues[1] * parentRotationMatrix[3]
-              + rotMatrixValues[2] * parentRotationMatrix[6];
-          particleRotationMatrix[1]
-            = rotMatrixValues[0] * parentRotationMatrix[1]
-              + rotMatrixValues[1] * parentRotationMatrix[4]
-              + rotMatrixValues[2] * parentRotationMatrix[7];
-          particleRotationMatrix[2]
-            = rotMatrixValues[0] * parentRotationMatrix[2]
-              + rotMatrixValues[1] * parentRotationMatrix[5]
-              + rotMatrixValues[2] * parentRotationMatrix[8];
-          particleRotationMatrix[3]
-            = rotMatrixValues[4] * parentRotationMatrix[0]
-              + rotMatrixValues[5] * parentRotationMatrix[3]
-              + rotMatrixValues[6] * parentRotationMatrix[6];
-          particleRotationMatrix[4]
-            = rotMatrixValues[4] * parentRotationMatrix[1]
-              + rotMatrixValues[5] * parentRotationMatrix[4]
-              + rotMatrixValues[6] * parentRotationMatrix[7];
-          particleRotationMatrix[5]
-            = rotMatrixValues[4] * parentRotationMatrix[2]
-              + rotMatrixValues[5] * parentRotationMatrix[5]
-              + rotMatrixValues[6] * parentRotationMatrix[8];
-          particleRotationMatrix[6]
-            = rotMatrixValues[8] * parentRotationMatrix[0]
-              + rotMatrixValues[9] * parentRotationMatrix[3]
-              + rotMatrixValues[10] * parentRotationMatrix[6];
-          particleRotationMatrix[7]
-            = rotMatrixValues[8] * parentRotationMatrix[1]
-              + rotMatrixValues[9] * parentRotationMatrix[4]
-              + rotMatrixValues[10] * parentRotationMatrix[7];
-          particleRotationMatrix[8]
-            = rotMatrixValues[8] * parentRotationMatrix[2]
-              + rotMatrixValues[9] * parentRotationMatrix[5]
-              + rotMatrixValues[10] * parentRotationMatrix[8];
+          particleRotationMatrix[0]   = rotMatrixValues[0] * parentRotationMatrix[0]
+                                      + rotMatrixValues[1] * parentRotationMatrix[3]
+                                      + rotMatrixValues[2] * parentRotationMatrix[6];
+          particleRotationMatrix[1] = rotMatrixValues[0] * parentRotationMatrix[1]
+                                      + rotMatrixValues[1] * parentRotationMatrix[4]
+                                      + rotMatrixValues[2] * parentRotationMatrix[7];
+          particleRotationMatrix[2] = rotMatrixValues[0] * parentRotationMatrix[2]
+                                      + rotMatrixValues[1] * parentRotationMatrix[5]
+                                      + rotMatrixValues[2] * parentRotationMatrix[8];
+          particleRotationMatrix[3] = rotMatrixValues[4] * parentRotationMatrix[0]
+                                      + rotMatrixValues[5] * parentRotationMatrix[3]
+                                      + rotMatrixValues[6] * parentRotationMatrix[6];
+          particleRotationMatrix[4] = rotMatrixValues[4] * parentRotationMatrix[1]
+                                      + rotMatrixValues[5] * parentRotationMatrix[4]
+                                      + rotMatrixValues[6] * parentRotationMatrix[7];
+          particleRotationMatrix[5] = rotMatrixValues[4] * parentRotationMatrix[2]
+                                      + rotMatrixValues[5] * parentRotationMatrix[5]
+                                      + rotMatrixValues[6] * parentRotationMatrix[8];
+          particleRotationMatrix[6] = rotMatrixValues[8] * parentRotationMatrix[0]
+                                      + rotMatrixValues[9] * parentRotationMatrix[3]
+                                      + rotMatrixValues[10] * parentRotationMatrix[6];
+          particleRotationMatrix[7] = rotMatrixValues[8] * parentRotationMatrix[1]
+                                      + rotMatrixValues[9] * parentRotationMatrix[4]
+                                      + rotMatrixValues[10] * parentRotationMatrix[7];
+          particleRotationMatrix[8] = rotMatrixValues[8] * parentRotationMatrix[2]
+                                      + rotMatrixValues[9] * parentRotationMatrix[5]
+                                      + rotMatrixValues[10] * parentRotationMatrix[8];
         }
       }
       else {
@@ -807,29 +771,23 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
         auto vertexY = tmpVertex.y * particleScaling.y - scaledPivot.y;
         auto vertexZ = tmpVertex.z * particleScaling.z - scaledPivot.z;
 
-        auto rotatedX = vertexX * particleRotationMatrix[0]
-                        + vertexY * particleRotationMatrix[3]
+        auto rotatedX = vertexX * particleRotationMatrix[0] + vertexY * particleRotationMatrix[3]
                         + vertexZ * particleRotationMatrix[6];
-        auto rotatedY = vertexX * particleRotationMatrix[1]
-                        + vertexY * particleRotationMatrix[4]
+        auto rotatedY = vertexX * particleRotationMatrix[1] + vertexY * particleRotationMatrix[4]
                         + vertexZ * particleRotationMatrix[7];
-        auto rotatedZ = vertexX * particleRotationMatrix[2]
-                        + vertexY * particleRotationMatrix[5]
+        auto rotatedZ = vertexX * particleRotationMatrix[2] + vertexY * particleRotationMatrix[5]
                         + vertexZ * particleRotationMatrix[8];
 
         rotatedX += pivotBackTranslation.x;
         rotatedY += pivotBackTranslation.y;
         rotatedZ += pivotBackTranslation.z;
 
-        auto px = positions32[idx]
-          = particleGlobalPosition.x + camAxisX.x * rotatedX
-            + camAxisY.x * rotatedY + camAxisZ.x * rotatedZ;
-        auto py = positions32[idx + 1]
-          = particleGlobalPosition.y + camAxisX.y * rotatedX
-            + camAxisY.y * rotatedY + camAxisZ.y * rotatedZ;
-        auto pz = positions32[idx + 2]
-          = particleGlobalPosition.z + camAxisX.z * rotatedX
-            + camAxisY.z * rotatedY + camAxisZ.z * rotatedZ;
+        auto px = positions32[idx] = particleGlobalPosition.x + camAxisX.x * rotatedX
+                                     + camAxisY.x * rotatedY + camAxisZ.x * rotatedZ;
+        auto py = positions32[idx + 1] = particleGlobalPosition.y + camAxisX.y * rotatedX
+                                         + camAxisY.y * rotatedY + camAxisZ.y * rotatedZ;
+        auto pz = positions32[idx + 2] = particleGlobalPosition.z + camAxisX.z * rotatedX
+                                         + camAxisY.z * rotatedY + camAxisZ.z * rotatedZ;
 
         if (_computeBoundingBox) {
           minimum.minimizeInPlaceFromFloats(px, py, pz);
@@ -853,12 +811,11 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
                                 + normaly * particleRotationMatrix[5]
                                 + normalz * particleRotationMatrix[8];
 
-          normals32[idx] = camAxisX.x * rotatedx + camAxisY.x * rotatedy
-                           + camAxisZ.x * rotatedz;
-          normals32[idx + 1] = camAxisX.y * rotatedx + camAxisY.y * rotatedy
-                               + camAxisZ.y * rotatedz;
-          normals32[idx + 2] = camAxisX.z * rotatedx + camAxisY.z * rotatedy
-                               + camAxisZ.z * rotatedz;
+          normals32[idx] = camAxisX.x * rotatedx + camAxisY.x * rotatedy + camAxisZ.x * rotatedz;
+          normals32[idx + 1]
+            = camAxisX.y * rotatedx + camAxisY.y * rotatedy + camAxisZ.y * rotatedz;
+          normals32[idx + 2]
+            = camAxisX.z * rotatedx + camAxisY.z * rotatedy + camAxisZ.z * rotatedz;
         }
 
         if (_computeParticleColor && particle->color.has_value()) {
@@ -917,12 +874,9 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
         tempMin.setAll(std::numeric_limits<float>::max());
         tempMax.setAll(std::numeric_limits<float>::min());
         for (unsigned int b = 0; b < 8; b++) {
-          const auto scaledX
-            = modelBoundingInfoVectors[b].x * particleScaling.x;
-          const auto scaledY
-            = modelBoundingInfoVectors[b].y * particleScaling.y;
-          const auto scaledZ
-            = modelBoundingInfoVectors[b].z * particleScaling.z;
+          const auto scaledX  = modelBoundingInfoVectors[b].x * particleScaling.x;
+          const auto scaledY  = modelBoundingInfoVectors[b].y * particleScaling.y;
+          const auto scaledZ  = modelBoundingInfoVectors[b].z * particleScaling.z;
           const auto rotatedX = scaledX * particleRotationMatrix[0]
                                 + scaledY * particleRotationMatrix[3]
                                 + scaledZ * particleRotationMatrix[6];
@@ -932,12 +886,12 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
           const auto rotatedZ = scaledX * particleRotationMatrix[2]
                                 + scaledY * particleRotationMatrix[5]
                                 + scaledZ * particleRotationMatrix[8];
-          const auto x = particlePosition.x + camAxisX.x * rotatedX
-                         + camAxisY.x * rotatedY + camAxisZ.x * rotatedZ;
-          const auto y = particlePosition.y + camAxisX.y * rotatedX
-                         + camAxisY.y * rotatedY + camAxisZ.y * rotatedZ;
-          const auto z = particlePosition.z + camAxisX.z * rotatedX
-                         + camAxisY.z * rotatedY + camAxisZ.z * rotatedZ;
+          const auto x = particlePosition.x + camAxisX.x * rotatedX + camAxisY.x * rotatedY
+                         + camAxisZ.x * rotatedZ;
+          const auto y = particlePosition.y + camAxisX.y * rotatedX + camAxisY.y * rotatedY
+                         + camAxisZ.y * rotatedZ;
+          const auto z = particlePosition.z + camAxisX.z * rotatedX + camAxisY.z * rotatedY
+                         + camAxisZ.z * rotatedZ;
           tempMin.minimizeInPlaceFromFloats(x, y, z);
           tempMax.maximizeInPlaceFromFloats(x, y, z);
         }
@@ -947,20 +901,16 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
 
       // place and scale the particle bouding sphere in the SPS local system,
       // then update it
-      auto minBbox = modelBoundingInfo->minimum().multiplyToRef(particleScaling,
-                                                                tempVectors[1]);
-      auto maxBbox = modelBoundingInfo->maximum().multiplyToRef(particleScaling,
-                                                                tempVectors[2]);
+      auto minBbox = modelBoundingInfo->minimum().multiplyToRef(particleScaling, tempVectors[1]);
+      auto maxBbox = modelBoundingInfo->maximum().multiplyToRef(particleScaling, tempVectors[2]);
 
       const auto bSphereCenter = maxBbox.addToRef(minBbox, tempVectors[3])
                                    .scaleInPlace(0.5f)
                                    .addInPlace(particleGlobalPosition);
-      const auto halfDiag = maxBbox.subtractToRef(minBbox, tempVectors[4])
-                              .scaleInPlace(0.5f * _bSphereRadiusFactor);
-      const auto bSphereMinBbox
-        = bSphereCenter.subtractToRef(halfDiag, tempVectors[1]);
-      const auto bSphereMaxBbox
-        = bSphereCenter.addToRef(halfDiag, tempVectors[2]);
+      const auto halfDiag
+        = maxBbox.subtractToRef(minBbox, tempVectors[4]).scaleInPlace(0.5f * _bSphereRadiusFactor);
+      const auto bSphereMinBbox = bSphereCenter.subtractToRef(halfDiag, tempVectors[1]);
+      const auto bSphereMaxBbox = bSphereCenter.addToRef(halfDiag, tempVectors[2]);
       bSphere.reConstruct(bSphereMinBbox, bSphereMaxBbox, mesh->_worldMatrix);
     }
 
@@ -978,8 +928,7 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
     if (_computeParticleTexture) {
       mesh->updateVerticesData(VertexBuffer::UVKind, uvs32, false, false);
     }
-    mesh->updateVerticesData(VertexBuffer::PositionKind, positions32, false,
-                             false);
+    mesh->updateVerticesData(VertexBuffer::PositionKind, positions32, false, false);
     if (!mesh->areNormalsFrozen || mesh->isFacetDataEnabled) {
       if (_computeParticleVertex || mesh->isFacetDataEnabled) {
         // recompute the normals only if the particles can be morphed, update
@@ -989,16 +938,14 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
                                      mesh->getFacetDataParameters());
         }
         else {
-          VertexData::ComputeNormals(positions32, indices32, normals32,
-                                     std::nullopt);
+          VertexData::ComputeNormals(positions32, indices32, normals32, std::nullopt);
         }
         for (size_t i = 0; i < normals32.size(); ++i) {
           fixedNormal32[i] = normals32[i];
         }
       }
       if (!mesh->areNormalsFrozen) {
-        mesh->updateVerticesData(VertexBuffer::NormalKind, normals32, false,
-                                 false);
+        mesh->updateVerticesData(VertexBuffer::NormalKind, normals32, false, false);
       }
     }
     if (_depthSort && _depthSortParticles) {
@@ -1021,16 +968,14 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
       mesh->_boundingInfo->reConstruct(minimum, maximum, mesh->_worldMatrix);
     }
     else {
-      mesh->_boundingInfo
-        = std::make_unique<BoundingInfo>(minimum, maximum, mesh->_worldMatrix);
+      mesh->_boundingInfo = std::make_unique<BoundingInfo>(minimum, maximum, mesh->_worldMatrix);
     }
   }
   afterUpdateParticles(start, end, update);
   return *this;
 }
 
-void SolidParticleSystem::dispose(bool /*doNotRecurse*/,
-                                  bool /*disposeMaterialAndTextures*/)
+void SolidParticleSystem::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextures*/)
 {
   mesh->dispose();
   // drop references to internal big arrays for the GC
@@ -1163,20 +1108,17 @@ SolidParticle* SolidParticleSystem::updateParticle(SolidParticle* particle)
 }
 
 Vector3 SolidParticleSystem::updateParticleVertex(SolidParticle* /*particle*/,
-                                                  const Vector3& vertex,
-                                                  size_t /*pt*/)
+                                                  const Vector3& vertex, size_t /*pt*/)
 {
   return vertex;
 }
 
-void SolidParticleSystem::beforeUpdateParticles(unsigned int /*start*/,
-                                                unsigned int /*stop*/,
+void SolidParticleSystem::beforeUpdateParticles(unsigned int /*start*/, unsigned int /*stop*/,
                                                 bool /*update*/)
 {
 }
 
-void SolidParticleSystem::afterUpdateParticles(unsigned int /*start*/,
-                                               unsigned int /*stop*/,
+void SolidParticleSystem::afterUpdateParticles(unsigned int /*start*/, unsigned int /*stop*/,
                                                bool /*update*/)
 {
 }

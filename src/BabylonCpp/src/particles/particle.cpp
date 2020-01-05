@@ -99,39 +99,28 @@ void Particle::updateCellIndex()
     }
   }
 
-  auto dist = (_initialEndSpriteCellID - _initialStartSpriteCellID);
-  auto ratio
-    = Scalar::Clamp(std::fmod((offsetAge * changeSpeed), lifeTime) / lifeTime);
+  auto dist  = (_initialEndSpriteCellID - _initialStartSpriteCellID);
+  auto ratio = Scalar::Clamp(std::fmod((offsetAge * changeSpeed), lifeTime) / lifeTime);
 
-  cellIndex
-    = static_cast<unsigned int>(_initialStartSpriteCellID + (ratio * dist));
+  cellIndex = static_cast<unsigned int>(_initialStartSpriteCellID + (ratio * dist));
 }
 
 void Particle::_inheritParticleInfoToSubEmitter(const SubEmitterPtr& subEmitter)
 {
-  if (std::holds_alternative<AbstractMeshPtr>(
-        subEmitter->particleSystem->emitter)) {
-    auto emitterMesh
-      = std::get<AbstractMeshPtr>(subEmitter->particleSystem->emitter);
+  if (std::holds_alternative<AbstractMeshPtr>(subEmitter->particleSystem->emitter)) {
+    auto emitterMesh = std::get<AbstractMeshPtr>(subEmitter->particleSystem->emitter);
     emitterMesh->position().copyFrom(position);
     if (subEmitter->inheritDirection) {
-      emitterMesh->position().subtractToRef(direction,
-                                            TmpVectors::Vector3Array[0]);
-      // Look at using Y as forward
-      emitterMesh->lookAt(TmpVectors::Vector3Array[0], 0.f, Math::PI_2);
+      emitterMesh->setDirection(direction.normalize(), 0, Math::PI_2);
     }
   }
-  else if (std::holds_alternative<Vector3>(
-             subEmitter->particleSystem->emitter)) {
-    auto emitterPosition
-      = std::get<Vector3>(subEmitter->particleSystem->emitter);
+  else if (std::holds_alternative<Vector3>(subEmitter->particleSystem->emitter)) {
+    auto emitterPosition = std::get<Vector3>(subEmitter->particleSystem->emitter);
     emitterPosition.copyFrom(position);
   }
   // Set inheritedVelocityOffset to be used when new particles are created
-  direction.scaleToRef(subEmitter->inheritedVelocityAmount / 2.f,
-                       TmpVectors::Vector3Array[0]);
-  subEmitter->particleSystem->_inheritedVelocityOffset.copyFrom(
-    TmpVectors::Vector3Array[0]);
+  direction.scaleToRef(subEmitter->inheritedVelocityAmount / 2.f, TmpVectors::Vector3Array[0]);
+  subEmitter->particleSystem->_inheritedVelocityOffset.copyFrom(TmpVectors::Vector3Array[0]);
 }
 
 void Particle::_inheritParticleInfoToSubEmitters()

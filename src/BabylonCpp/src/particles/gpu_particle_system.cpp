@@ -905,6 +905,12 @@ void GPUParticleSystem::_recreateRenderEffect()
   if (_scene->clipPlane4.has_value()) {
     definesStream << "\n#define CLIPPLANE4";
   }
+  if (_scene->clipPlane5.has_value()) {
+    definesStream << "\n#define CLIPPLANE5";
+  }
+  if (_scene->clipPlane6.has_value()) {
+    definesStream << "\n#define CLIPPLANE6";
+  }
 
   if (blendMode == ParticleSystem::BLENDMODE_MULTIPLY) {
     definesStream << "\n#define BLENDMULTIPLYMODE";
@@ -945,9 +951,10 @@ void GPUParticleSystem::_recreateRenderEffect()
     return;
   }
 
-  std::vector<std::string> uniforms{"worldOffset", "view",       "projection",       "colorDead",
-                                    "invView",     "vClipPlane", "vClipPlane2",      "vClipPlane3",
-                                    "vClipPlane4", "sheetInfos", "translationPivot", "eyePosition"};
+  std::vector<std::string> uniforms{"worldOffset",      "view",        "projection",  "colorDead",
+                                    "invView",          "vClipPlane",  "vClipPlane2", "vClipPlane3",
+                                    "vClipPlane4",      "vClipPlane5", "vClipPlane6", "sheetInfos",
+                                    "translationPivot", "eyePosition"};
   std::vector<std::string> samplers{"textureSampler", "colorGradientSampler"};
 
   // if (ImageProcessingConfiguration)
@@ -1255,7 +1262,8 @@ size_t GPUParticleSystem::render(bool preWarm)
     }
 
     if (_scene->clipPlane.has_value() || _scene->clipPlane2.has_value()
-        || _scene->clipPlane3.has_value() || _scene->clipPlane4.has_value()) {
+        || _scene->clipPlane3.has_value() || _scene->clipPlane4.has_value()
+        || _scene->clipPlane5.has_value() || _scene->clipPlane6.has_value()) {
       auto invView = viewMatrix;
       invView.invert();
       _renderEffect->setMatrix("invView", invView);
