@@ -32,6 +32,7 @@ struct BABYLON_SHARED_EXPORT _InstanceDataStorage {
   _InstancesBatchPtr previousBatch = nullptr;
   bool hardwareInstancedRendering  = false;
   unsigned int sideOrientation     = 0;
+  bool manualUpdate                = false;
 }; // end of struct _InstanceDataStorage
 
 } // end of namespace BABYLON

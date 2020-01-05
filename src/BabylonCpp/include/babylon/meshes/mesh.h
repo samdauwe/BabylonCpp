@@ -31,6 +31,7 @@ class PolyhedronOptions;
 class VertexBuffer;
 using _CreationDataStoragePtr = std::shared_ptr<_CreationDataStorage>;
 using _InstancesBatchPtr      = std::shared_ptr<_InstancesBatch>;
+using BufferPtr               = std::shared_ptr<Buffer>;
 using EffectPtr               = std::shared_ptr<Effect>;
 using GroundMeshPtr           = std::shared_ptr<GroundMesh>;
 using IAnimatablePtr          = std::shared_ptr<IAnimatable>;
@@ -192,7 +193,11 @@ public:
   ~Mesh() override; // = default
 
   // Methods
-  TransformNodePtr instantiateHierarychy(TransformNode* newParent = nullptr);
+  TransformNodePtr instantiateHierarchy(
+    TransformNode* newParent                                   = nullptr,
+    const std::optional<InstantiateHierarychyOptions>& options = std::nullopt,
+    const std::function<void(TransformNode* source, TransformNode* clone)>& onNewNodeCreated
+    = nullptr);
 
   /**
    * @brief Gets the class name.
@@ -501,6 +506,25 @@ public:
                                 const std::optional<size_t>& stride = std::nullopt) override;
 
   /**
+   * @brief Delete a vertex buffer associated with this mesh.
+   * @param kind defines which buffer to delete (positions, indices, normals, etc). Possible `kind`
+   * values :
+   * - VertexBuffer.PositionKind
+   * - VertexBuffer.UVKind
+   * - VertexBuffer.UV2Kind
+   * - VertexBuffer.UV3Kind
+   * - VertexBuffer.UV4Kind
+   * - VertexBuffer.UV5Kind
+   * - VertexBuffer.UV6Kind
+   * - VertexBuffer.ColorKind
+   * - VertexBuffer.MatricesIndicesKind
+   * - VertexBuffer.MatricesIndicesExtraKind
+   * - VertexBuffer.MatricesWeightsKind
+   * - VertexBuffer.MatricesWeightsExtraKind
+   */
+  void removeVerticesData(const std::string& kind);
+
+  /**
    * @brief Flags an associated vertex buffer as updatable.
    * @param kind defines which buffer to use (positions, indices, normals, etc).
    * Possible `kind` values :
@@ -654,7 +678,7 @@ public:
   /**
    * @brief Hidden
    */
-  _InstancesBatchPtr _getInstancesRenderList(size_t subMeshId);
+  _InstancesBatchPtr _getInstancesRenderList(size_t subMeshId, bool isReplacementMode = false);
 
   /**
    * @brief Hidden
@@ -662,6 +686,20 @@ public:
   Mesh& _renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
                              const _InstancesBatchPtr& batch, const EffectPtr& effect,
                              Engine* engine);
+
+  /**
+   * @brief Register a custom buffer that will be instanced.
+   * @see https://doc.babylonjs.com/how_to/how_to_use_instances#custom-buffers
+   * @param kind defines the buffer kind
+   * @param stride defines the stride in floats
+   */
+  void registerInstancedBuffer(const std::string& kind, size_t stride);
+
+  /**
+   * @brief Hidden
+   */
+  void _processInstancedBuffers(const std::vector<InstancedMesh*>& visibleInstances,
+                                bool renderSelf);
 
   /**
    * @brief Hidden
@@ -689,14 +727,15 @@ public:
   void _unFreeze() override;
 
   /**
-   * @brief Triggers the draw call for the mesh. Usually, you don't need to call
-   * this method by your own because the mesh rendering is handled by the scene
-   * rendering manager.
+   * @brief Triggers the draw call for the mesh. Usually, you don't need to call this method by your
+   * own because the mesh rendering is handled by the scene rendering manager
    * @param subMesh defines the subMesh to render
    * @param enableAlphaMode defines if alpha mode can be changed
+   * @param effectiveMeshReplacement defines an optional mesh used to provide info for the rendering
    * @returns the current mesh
    */
-  Mesh& render(SubMesh* subMesh, bool enableAlphaMode);
+  Mesh& render(SubMesh* subMesh, bool enableAlphaMode,
+               const AbstractMeshPtr& effectiveMeshReplacement = nullptr);
 
   /**
    * @brief Returns an array populated with IParticleSystem objects whose the
@@ -821,12 +860,17 @@ public:
 
   /**
    * @brief Releases resources associated with this mesh.
-   * @param doNotRecurse Set to true to not recurse into each children (recurse
-   * into each children by default)
-   * @param disposeMaterialAndTextures Set to true to also dispose referenced
-   * materials and textures (false by default)
+   * @param doNotRecurse Set to true to not recurse into each children (recurse into each children
+   * by default)
+   * @param disposeMaterialAndTextures Set to true to also dispose referenced materials and textures
+   * (false by default)
    */
   void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
+
+  /**
+   * @brief Hidden
+   */
+  void _disposeInstanceSpecificData();
 
   /** Geometric tools **/
 
@@ -851,9 +895,9 @@ public:
    */
   Mesh& applyDisplacementMap(const std::string& url, float minHeight, float maxHeight,
                              std::function<void(Mesh* mesh)> onSuccess = nullptr,
-                             const std::optional<Vector2>& uvOffset          = std::nullopt,
-                             const std::optional<Vector2>& uvScale           = std::nullopt,
-                             bool boolforceUpdate                            = false);
+                             const std::optional<Vector2>& uvOffset    = std::nullopt,
+                             const std::optional<Vector2>& uvScale     = std::nullopt,
+                             bool boolforceUpdate                      = false);
 
   /**
    * @brief Modifies the mesh geometry according to a displacementMap buffer.
@@ -1735,6 +1779,24 @@ protected:
   void set_isUnIndexed(bool value);
 
   /**
+   * @brief Gets the array buffer used to store the instanced buffer used for instances' world
+   * matrices.
+   */
+  Float32Array& get_worldMatrixInstancedBuffer();
+
+  /**
+   * @brief Gets a boolean indicating that the update of the instance buffer of the world matrices
+   * is manual.
+   */
+  bool get_manualUpdateOfWorldMatrixInstancedBuffer() const;
+
+  /**
+   * @brief Sets a boolean indicating that the update of the instance buffer of the world matrices
+   * is manual.
+   */
+  void set_manualUpdateOfWorldMatrixInstancedBuffer(bool value);
+
+  /**
    * @brief Hidden
    */
   bool get__isMesh() const;
@@ -1893,6 +1955,17 @@ public:
   Property<Mesh, bool> isUnIndexed;
 
   /**
+   * Gets the array buffer used to store the instanced buffer used for instances' world matrices
+   */
+  ReadOnlyProperty<Mesh, Float32Array> worldMatrixInstancedBuffer;
+
+  /**
+   * Gets or sets a boolean indicating that the update of the instance buffer of the world matrices
+   * is manual
+   */
+  Property<Mesh, bool> manualUpdateOfWorldMatrixInstancedBuffer;
+
+  /**
    * Hidden
    */
   ReadOnlyProperty<Mesh, bool> _isMesh;
@@ -1929,6 +2002,9 @@ private:
   std::vector<VertexBuffer*> _delayInfo;
   std::unique_ptr<_InstanceDataStorage> _instanceDataStorage;
   MaterialPtr _effectiveMaterial;
+  // Instances
+  /** @hidden */
+  UserInstancedBuffersStorage _userInstancedBuffersStorage;
   // For extrusion and tube
   Path3D _path3D;
   std::vector<std::vector<Vector3>> _pathArray;

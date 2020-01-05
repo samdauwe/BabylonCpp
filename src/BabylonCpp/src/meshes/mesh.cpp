@@ -84,6 +84,10 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
     , overrideMaterialSideOrientation{std::nullopt}
     , _source{this, &Mesh::get_source}
     , isUnIndexed{this, &Mesh::get_isUnIndexed, &Mesh::set_isUnIndexed}
+    , worldMatrixInstancedBuffer{this, &Mesh::get_worldMatrixInstancedBuffer}
+    , manualUpdateOfWorldMatrixInstancedBuffer{this,
+                                               &Mesh::get_manualUpdateOfWorldMatrixInstancedBuffer,
+                                               &Mesh::set_manualUpdateOfWorldMatrixInstancedBuffer}
     , _isMesh{this, &Mesh::get__isMesh}
     , hasLODLevels{this, &Mesh::get_hasLODLevels}
     , geometry{this, &Mesh::get_geometry}
@@ -160,6 +164,11 @@ void Mesh::_initialize(Scene* scene, Node* iParent, Mesh* source, bool doNotClon
       }
     }
 
+    // Morphs
+    if (source->morphTargetManager()) {
+      morphTargetManager = source->morphTargetManager();
+    }
+
     // Physics clone
     if (scene->getPhysicsEngine()) {
       auto physicsEngine = getScene()->getPhysicsEngine();
@@ -225,22 +234,50 @@ void Mesh::set_isUnIndexed(bool value)
   }
 }
 
-TransformNodePtr Mesh::instantiateHierarychy(TransformNode* newParent)
+Float32Array& Mesh::get_worldMatrixInstancedBuffer()
 {
-  auto instance = createInstance("instance of " + (!name.empty() ? name : id));
+  return _instanceDataStorage->instancesData;
+}
 
-  instance->parent   = newParent ? newParent : parent();
-  instance->position = position().copy();
-  instance->scaling  = scaling().copy();
-  if (rotationQuaternion()) {
-    instance->rotationQuaternion = rotationQuaternion()->copy();
-  }
-  else {
-    instance->rotation = rotation().copy();
+bool Mesh::get_manualUpdateOfWorldMatrixInstancedBuffer() const
+{
+  return _instanceDataStorage->manualUpdate;
+}
+
+void Mesh::set_manualUpdateOfWorldMatrixInstancedBuffer(bool value)
+{
+  _instanceDataStorage->manualUpdate = value;
+}
+
+TransformNodePtr Mesh::instantiateHierarchy(
+  TransformNode* newParent, const std::optional<InstantiateHierarychyOptions>& options,
+  const std::function<void(TransformNode* source, TransformNode* clone)>& onNewNodeCreated)
+{
+  auto instance
+    = (getTotalVertices() > 0 && (!options || !options->doNotInstantiate)) ?
+        std::static_pointer_cast<TransformNode>(
+          createInstance("instance of " + (!name.empty() ? name : id))) :
+        std::static_pointer_cast<TransformNode>(
+          clone("Clone of " + (!name.empty() ? name : id), newParent ? newParent : parent(), true));
+
+  if (instance) {
+    instance->parent   = newParent ? newParent : parent();
+    instance->position = position().copy();
+    instance->scaling  = scaling().copy();
+    if (rotationQuaternion()) {
+      instance->rotationQuaternion = rotationQuaternion()->copy();
+    }
+    else {
+      instance->rotation = rotation().copy();
+    }
+
+    if (onNewNodeCreated) {
+      onNewNodeCreated(this, instance.get());
+    }
   }
 
   for (const auto& child : getChildTransformNodes(true)) {
-    child->instantiateHierarychy(instance.get());
+    child->instantiateHierarchy(instance.get(), options, onNewNodeCreated);
   }
 
   return instance;
@@ -792,6 +829,15 @@ AbstractMesh* Mesh::setVerticesData(const std::string& kind, const Float32Array&
   return this;
 }
 
+void Mesh::removeVerticesData(const std::string& kind)
+{
+  if (!_geometry) {
+    return;
+  }
+
+  _geometry->removeVerticesData(kind);
+}
+
 void Mesh::markVerticesDataAsUpdatable(const std::string& kind, bool updatable)
 {
   auto vb = getVertexBuffer(kind);
@@ -999,7 +1045,7 @@ Mesh& Mesh::unregisterAfterRender(const std::function<void(Mesh* mesh, EventStat
   return *this;
 }
 
-_InstancesBatchPtr Mesh::_getInstancesRenderList(size_t subMeshId)
+_InstancesBatchPtr Mesh::_getInstancesRenderList(size_t subMeshId, bool isReplacementMode)
 {
   if (_instanceDataStorage->isFrozen && _instanceDataStorage->previousBatch) {
     return _instanceDataStorage->previousBatch;
@@ -1014,7 +1060,7 @@ _InstancesBatchPtr Mesh::_getInstancesRenderList(size_t subMeshId)
   batchCache->renderSelf[subMeshId]       = !onlyForInstances && isEnabled() && isVisible;
   batchCache->visibleInstances[subMeshId] = std::vector<InstancedMesh*>();
 
-  if (_instanceDataStorage->visibleInstances) {
+  if (_instanceDataStorage->visibleInstances && !isReplacementMode) {
     auto& visibleInstances = _instanceDataStorage->visibleInstances;
     auto currentRenderId   = scene->getRenderId();
     auto defaultRenderId
@@ -1033,7 +1079,7 @@ _InstancesBatchPtr Mesh::_getInstancesRenderList(size_t subMeshId)
   }
 
   batchCache->hardwareInstancedRendering[subMeshId]
-    = _instanceDataStorage->hardwareInstancedRendering
+    = !isReplacementMode && _instanceDataStorage->hardwareInstancedRendering
       && (batchCache->visibleInstances.find(subMeshId) != batchCache->visibleInstances.end())
       && (!batchCache->visibleInstances[subMeshId].empty());
   _instanceDataStorage->previousBatch = batchCache;
@@ -1072,19 +1118,27 @@ Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
   unsigned int offset         = 0;
   unsigned int instancesCount = 0;
 
-  auto world = _effectiveMesh()->getWorldMatrix();
-  if (batch->renderSelf[subMesh->_id]) {
-    world.copyToArray(instanceStorage->instancesData, offset);
-    offset += 16;
-    instancesCount++;
-  }
+  const auto& renderSelf = batch->renderSelf[subMesh->_id];
 
-  if (!visibleInstances.empty()) {
-    for (auto instance : visibleInstances) {
-      instance->getWorldMatrix().copyToArray(instanceStorage->instancesData, offset);
+  if (!_instanceDataStorage->manualUpdate) {
+    auto world = _effectiveMesh()->getWorldMatrix();
+
+    if (renderSelf) {
+      world.copyToArray(instanceStorage->instancesData, offset);
       offset += 16;
-      ++instancesCount;
+      instancesCount++;
     }
+
+    if (!visibleInstances.empty()) {
+      for (auto instance : visibleInstances) {
+        instance->getWorldMatrix().copyToArray(instanceStorage->instancesData, offset);
+        offset += 16;
+        ++instancesCount;
+      }
+    }
+  }
+  else {
+    instancesCount = (renderSelf ? 1 : 0) + static_cast<unsigned int>(visibleInstances.size());
   }
 
   if (!instancesBuffer || currentInstancesBufferSize != instanceStorage->instancesBufferSize) {
@@ -1104,13 +1158,27 @@ Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
     instancesBuffer->updateDirectly(instanceStorage->instancesData, 0, instancesCount);
   }
 
-  _bind(subMesh, effect, fillMode);
+  _processInstancedBuffers(visibleInstances, renderSelf);
 
+  // Stats
+  getScene()->_activeIndices.addCount(subMesh->indexCount * instancesCount, false);
+
+  // Draw
+  _bind(subMesh, effect, fillMode);
   _draw(subMesh, static_cast<int>(fillMode), instancesCount);
 
   engine->unbindInstanceAttributes();
 
   return *this;
+}
+
+void Mesh::registerInstancedBuffer(const std::string& /*kind*/, size_t /*stride*/)
+{
+}
+
+void Mesh::_processInstancedBuffers(const std::vector<InstancedMesh*>& /*visibleInstances*/,
+                                    bool /*renderSelf*/)
+{
 }
 
 Mesh& Mesh::_processRendering(
@@ -1127,18 +1195,26 @@ Mesh& Mesh::_processRendering(
     _renderWithInstances(subMesh, static_cast<unsigned>(fillMode), batch, effect, engine);
   }
   else {
+    size_t instanceCount = 0;
     if (batch->renderSelf[subMesh->_id]) {
       // Draw
       if (iOnBeforeDraw) {
         iOnBeforeDraw(false, _effectiveMesh()->getWorldMatrix(), effectiveMaterial);
       }
+      ++instanceCount;
 
       _draw(subMesh, fillMode, _instanceDataStorage->overridenInstanceCount);
     }
 
     auto& visibleInstancesForSubMesh = batch->visibleInstances[subMesh->_id];
     if (!visibleInstancesForSubMesh.empty()) {
-      for (const auto& instance : visibleInstancesForSubMesh) {
+      const auto visibleInstanceCount = visibleInstancesForSubMesh.size();
+      instanceCount += visibleInstanceCount;
+
+      // Stats
+      for (size_t instanceIndex = 0; instanceIndex < visibleInstanceCount; ++instanceIndex) {
+        const auto& instance = visibleInstancesForSubMesh[instanceIndex];
+
         // World
         auto world = instance->getWorldMatrix();
         if (iOnBeforeDraw) {
@@ -1149,6 +1225,9 @@ Mesh& Mesh::_processRendering(
         _draw(subMesh, fillMode);
       }
     }
+
+    // Stats
+    scene->_activeIndices.addCount(subMesh->indexCount * instanceCount, false);
   }
 
   return *this;
@@ -1186,11 +1265,12 @@ void Mesh::_unFreeze()
   _instanceDataStorage->previousBatch = nullptr;
 }
 
-Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
+Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode,
+                   const AbstractMeshPtr& effectiveMeshReplacement)
 {
   auto& scene = *getScene();
 
-  if (scene._isInIntermediateRendering()) {
+  if (_internalAbstractMeshDataInfo._isActiveIntermediate) {
     _internalAbstractMeshDataInfo._isActiveIntermediate = false;
   }
   else {
@@ -1202,7 +1282,7 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
   }
 
   // Managing instances
-  auto batch = _getInstancesRenderList(subMesh->_id);
+  auto batch = _getInstancesRenderList(subMesh->_id, effectiveMeshReplacement != nullptr);
 
   if (batch->mustReturn) {
     return *this;
@@ -1231,17 +1311,16 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
 
   // Material
   if (!instanceDataStorage.isFrozen || !_effectiveMaterial || _effectiveMaterial != iMaterial) {
-
-    _effectiveMaterial = iMaterial;
-
-    if (_effectiveMaterial->_storeEffectOnSubMeshes) {
-      if (!_effectiveMaterial->isReadyForSubMesh(this, subMesh, hardwareInstancedRendering)) {
+    if (iMaterial->_storeEffectOnSubMeshes) {
+      if (!iMaterial->isReadyForSubMesh(this, subMesh, hardwareInstancedRendering)) {
         return *this;
       }
     }
-    else if (!_effectiveMaterial->isReady(this, hardwareInstancedRendering)) {
+    else if (!iMaterial->isReady(this, hardwareInstancedRendering)) {
       return *this;
     }
+
+    _effectiveMaterial = iMaterial;
   }
 
   // Alpha mode
@@ -1265,16 +1344,17 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
     return *this;
   }
 
-  auto& effectiveMesh = *_effectiveMesh();
+  auto& effectiveMesh = effectiveMeshReplacement ? *effectiveMeshReplacement : *_effectiveMesh();
 
   std::optional<unsigned int> sideOrientation = std::nullopt;
 
-  if (!instanceDataStorage.isFrozen) {
-    sideOrientation = overrideMaterialSideOrientation;
+  if (!instanceDataStorage.isFrozen && _effectiveMaterial->backFaceCulling()) {
+    const auto mainDeterminant = effectiveMesh._getWorldMatrixDeterminant();
+    sideOrientation            = overrideMaterialSideOrientation;
     if (!sideOrientation.has_value()) {
       sideOrientation = static_cast<unsigned>(_effectiveMaterial->sideOrientation);
     }
-    if (effectiveMesh._getWorldMatrixDeterminant() < 0.f) {
+    if (mainDeterminant < 0.f) {
       sideOrientation = (sideOrientation == Material::ClockWiseSideOrientation ?
                            Material::CounterClockWiseSideOrientation :
                            Material::ClockWiseSideOrientation);
@@ -1811,6 +1891,13 @@ void Mesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   internalDataInfo._source = nullptr;
 
   // Instances
+  _disposeInstanceSpecificData();
+
+  AbstractMesh::dispose(doNotRecurse, disposeMaterialAndTextures);
+}
+
+void Mesh::_disposeInstanceSpecificData()
+{
   if (_instanceDataStorage->instancesBuffer) {
     _instanceDataStorage->instancesBuffer->dispose();
     _instanceDataStorage->instancesBuffer = nullptr;
@@ -1820,7 +1907,15 @@ void Mesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
     instance->dispose();
   }
 
-  AbstractMesh::dispose(doNotRecurse, disposeMaterialAndTextures);
+  for (const auto& item : instancedBuffers) {
+    const auto& kind = item.first;
+    if (stl_util::contains(_userInstancedBuffersStorage.vertexBuffers, kind)
+        && _userInstancedBuffersStorage.vertexBuffers[kind]) {
+      _userInstancedBuffersStorage.vertexBuffers[kind]->dispose();
+    }
+  }
+
+  instancedBuffers = {};
 }
 
 Mesh& Mesh::applyDisplacementMap(const std::string& url, float minHeight, float maxHeight,
@@ -2691,6 +2786,8 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene, const std::string& roo
   }
 
   mesh->checkCollisions = json_util::get_bool(parsedMesh, "checkCollisions");
+  mesh->overrideMaterialSideOrientation
+    = json_util::get_bool(parsedMesh, "overrideMaterialSideOrientation");
 
   if (json_util::has_valid_key_value(parsedMesh, "isBlocker")) {
     mesh->isBlocker = json_util::get_bool(parsedMesh, "isBlocker");

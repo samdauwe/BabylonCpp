@@ -178,7 +178,7 @@ public:
    * created
    * @returns an instance (or a clone) of the current node with its hiearchy
    */
-  TransformNodePtr instantiateHierarychy(
+  TransformNodePtr instantiateHierarchy(
     TransformNode* newParent                                   = nullptr,
     const std::optional<InstantiateHierarychyOptions>& options = std::nullopt,
     const std::function<void(TransformNode* source, TransformNode* clone)>& onNewNodeCreated

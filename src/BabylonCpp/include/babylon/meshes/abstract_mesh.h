@@ -41,6 +41,7 @@ class RawTexture;
 class RenderingGroup;
 class Skeleton;
 class SolidParticle;
+class VertexBuffer;
 using _OcclusionDataStoragePtr = std::shared_ptr<_OcclusionDataStorage>;
 using BoundingInfoPtr          = std::shared_ptr<BoundingInfo>;
 using ColliderPtr              = std::shared_ptr<Collider>;
@@ -58,6 +59,18 @@ class IGLQuery;
 
 using WebGLQuery    = GL::IGLQuery;
 using WebGLQueryPtr = std::shared_ptr<WebGLQuery>;
+
+/**
+ * @brief Represents a custom buffer that will be instanced.
+ */
+struct UserInstancedBuffersStorage {
+  std::unordered_map<std::string, Float32Array> data;
+  std::unordered_map<std::string, size_t> sizes;
+  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> vertexBuffers;
+  std::unordered_map<std::string, size_t> strides;
+}; // end of struct UserInstancedBuffersStorage
+
+using UserInstancedBuffersStoragePtr = std::shared_ptr<UserInstancedBuffersStorage>;
 
 /**
  * @brief Class used to store all common mesh properties.
@@ -1857,11 +1870,17 @@ public:
   Property<AbstractMesh, bool> checkCollisions;
 
   /**
-   * @brief Gets Collider object used to compute collisions (not physics).
+   * Gets Collider object used to compute collisions (not physics).
    * @see
    * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
    */
   ReadOnlyProperty<AbstractMesh, ColliderPtr> collider;
+
+  /**
+   * Object used to store instanced buffers defined by user
+   * @see https://doc.babylonjs.com/how_to/how_to_use_instances#custom-buffers
+   */
+  std::unordered_map<std::string, UserInstancedBuffersStoragePtr> instancedBuffers;
 
 private:
   // Collisions

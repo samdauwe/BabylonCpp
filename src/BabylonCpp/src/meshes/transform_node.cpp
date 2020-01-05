@@ -423,7 +423,7 @@ const Matrix& TransformNode::getPivotMatrix() const
   return _pivotMatrix;
 }
 
-TransformNodePtr TransformNode::instantiateHierarychy(
+TransformNodePtr TransformNode::instantiateHierarchy(
   TransformNode* newParent, const std::optional<InstantiateHierarychyOptions>& options,
   const std::function<void(TransformNode* source, TransformNode* clone)>& onNewNodeCreated)
 {
@@ -437,7 +437,7 @@ TransformNodePtr TransformNode::instantiateHierarychy(
   }
 
   for (const auto& child : getChildTransformNodes(true)) {
-    child->instantiateHierarychy(cloneTransformNode.get(), options, onNewNodeCreated);
+    child->instantiateHierarchy(cloneTransformNode.get(), options, onNewNodeCreated);
   }
 
   return cloneTransformNode;
