@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
+#include <babylon/materials/ieffect_fallbacks.h>
 
 namespace BABYLON {
 
@@ -17,7 +18,7 @@ class Effect;
  * when desired to improve performance. (Eg. Start at high quality with reflection and fog, if fps
  * is low, remove reflection, if still low remove fog)
  */
-class BABYLON_SHARED_EXPORT EffectFallbacks {
+class BABYLON_SHARED_EXPORT EffectFallbacks : public IEffectFallbacks {
 
 public:
   EffectFallbacks();
@@ -25,7 +26,7 @@ public:
   EffectFallbacks(EffectFallbacks&& other);
   EffectFallbacks& operator=(const EffectFallbacks& other);
   EffectFallbacks& operator=(EffectFallbacks&& other);
-  ~EffectFallbacks(); // = default
+  ~EffectFallbacks() override; // = default
 
   bool operator==(const EffectFallbacks& other) const;
   bool operator!=(const EffectFallbacks& other) const;
@@ -33,7 +34,7 @@ public:
   /**
    * @brief Removes the fallback from the bound mesh.
    */
-  void unBindMesh();
+  void unBindMesh() override;
 
   /**
    * @brief Adds a fallback on the specified property.
@@ -52,7 +53,7 @@ public:
   /**
    * @brief Checks to see if more fallbacks are still available.
    */
-  [[nodiscard]] bool hasMoreFallbacks() const;
+  [[nodiscard]] bool hasMoreFallbacks() const override;
 
   /**
    * @brief Removes the defines that should be removed when falling back.
@@ -60,7 +61,7 @@ public:
    * @param effect defines the current effect we try to compile
    * @returns The resulting defines with defines of the current rank removed.
    */
-  std::string reduce(std::string currentDefines, Effect* effect);
+  std::string reduce(std::string currentDefines, Effect* effect) override;
 
 private:
   std::unordered_map<unsigned int, std::vector<std::string>> _defines;
