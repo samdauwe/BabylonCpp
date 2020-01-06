@@ -30,8 +30,7 @@ class BABYLON_SHARED_EXPORT PBRSheenConfiguration {
 public:
   /**
    * @brief Instantiate a new istance of clear coat configuration.
-   * @param markAllSubMeshesAsTexturesDirty Callback to flag the material to
-   * dirty
+   * @param markAllSubMeshesAsTexturesDirty Callback to flag the material to dirty
    */
   PBRSheenConfiguration(const std::function<void()>& markAllSubMeshesAsTexturesDirty);
   ~PBRSheenConfiguration(); // = default
@@ -90,8 +89,7 @@ public:
   void dispose(bool forceDisposeTextures = false);
 
   /**
-   * @brief Get the current class name of the texture useful for serialization
-   * or dynamic coding.
+   * @brief Get the current class name of the texture useful for serialization or dynamic coding.
    * @returns "PBRSheenConfiguration"
    */
   [[nodiscard]] std::string getClassName() const;
