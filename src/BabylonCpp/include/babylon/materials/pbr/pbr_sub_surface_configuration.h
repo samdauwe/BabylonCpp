@@ -26,16 +26,14 @@ using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 /**
- * @brief Define the code related to the sub surface parameters of the pbr
- * material.
+ * @brief Define the code related to the sub surface parameters of the pbr material.
  */
 class BABYLON_SHARED_EXPORT PBRSubSurfaceConfiguration {
 
 public:
   /**
    * @brief Instantiate a new istance of sub surface configuration.
-   * @param markAllSubMeshesAsTexturesDirty Callback to flag the material to
-   * dirty
+   * @param markAllSubMeshesAsTexturesDirty Callback to flag the material to dirty
    */
   PBRSubSurfaceConfiguration(const std::function<void()>& markAllSubMeshesAsTexturesDirty);
   ~PBRSubSurfaceConfiguration(); // = default
@@ -66,8 +64,8 @@ public:
    * @param scene defines the scene the material belongs to.
    * @param engine defines the engine the material belongs to.
    * @param isFrozen defines wether the material is frozen or not.
-   * @param lodBasedMicrosurface defines wether the material relies on lod based
-   * microsurface or not.
+   * @param lodBasedMicrosurface defines wether the material relies on lod based microsurface or
+   * not.
    */
   void bindForSubMesh(UniformBuffer& uniformBuffer, Scene* scene, Engine* engine, bool isFrozen,
                       bool lodBasedMicrosurface);
@@ -98,8 +96,7 @@ public:
   [[nodiscard]] bool hasTexture(const BaseTexturePtr& texture) const;
 
   /**
-   * @brief Gets a boolean indicating that current material needs to register
-   * RTT.
+   * @brief Gets a boolean indicating that current material needs to register RTT.
    * @returns true if this uses a render target otherwise false.
    */
   [[nodiscard]] bool hasRenderTargetTextures() const;
@@ -123,8 +120,7 @@ public:
   void dispose(bool forceDisposeTextures = false);
 
   /**
-   * @brief Get the current class name of the texture useful for serialization
-   * or dynamic coding.
+   * @brief Get the current class name of the texture useful for serialization or dynamic coding.
    * @returns "PBRSubSurfaceConfiguration"
    */
   [[nodiscard]] std::string getClassName() const;
@@ -199,9 +195,8 @@ private:
   /**
    * @brief Returns the texture used for refraction or null if none is used.
    * @param scene defines the scene the material belongs to.
-   * @returns - Refraction texture if present.  If no refraction texture and
-   * refraction is linked with transparency, returns environment texture.
-   * Otherwise, returns null.
+   * @returns - Refraction texture if present.  If no refraction texture and refraction is linked
+   * with transparency, returns environment texture. Otherwise, returns null.
    */
   BaseTexturePtr _getRefractionTexture(Scene* scene) const;
 
@@ -225,24 +220,23 @@ public:
 
   /**
    * Defines the translucency intensity of the material.
-   * When translucency has been enabled, this defines how much of the
-   * "translucency" is addded to the diffuse part of the material.
+   * When translucency has been enabled, this defines how much of the "translucency" is addded to
+   * the diffuse part of the material.
    */
   float translucencyIntensity;
 
   /**
    * Defines the scattering intensity of the material.
-   * When scattering has been enabled, this defines how much of the "scattered
-   * light" is addded to the diffuse part of the material.
+   * When scattering has been enabled, this defines how much of the "scattered light" is addded to
+   * the diffuse part of the material.
    */
   float scatteringIntensity;
 
   /**
-   * Stores the average thickness of a mesh in a texture (The texture is holding
-   * the values linearly). The red channel of the texture should contain the
-   * thickness remapped between 0 and 1. 0 would mean minimumThickness 1 would
-   * mean maximumThickness The other channels might be use as a mask to vary the
-   * different effects intensity.
+   * Stores the average thickness of a mesh in a texture (The texture is holding the values
+   * linearly). The red channel of the texture should contain the thickness remapped between 0
+   * and 1. 0 would mean minimumThickness 1 would mean maximumThickness The other channels might be
+   * use as a mask to vary the different effects intensity.
    */
   Property<PBRSubSurfaceConfiguration, BaseTexturePtr> thicknessTexture;
 
@@ -258,22 +252,20 @@ public:
   Property<PBRSubSurfaceConfiguration, float> indexOfRefraction;
 
   /**
-   * Controls if refraction needs to be inverted on Y. This could be useful for
-   * procedural texture.
+   * Controls if refraction needs to be inverted on Y. This could be useful for procedural texture.
    */
   Property<PBRSubSurfaceConfiguration, bool> invertRefractionY;
 
   /**
-   * This parameters will make the material used its opacity to control how much
-   * it is refracting aginst not. Materials half opaque for instance using
-   * refraction could benefit from this control.
+   * This parameters will make the material used its opacity to control how much it is refracting
+   * aginst not. Materials half opaque for instance using refraction could benefit from this
+   * control.
    */
   Property<PBRSubSurfaceConfiguration, bool> linkRefractionWithTransparency;
 
   /**
    * Defines the minimum thickness stored in the thickness map.
-   * If no thickness map is defined, this value will be used to simulate
-   * thickness.
+   * If no thickness map is defined, this value will be used to simulate thickness.
    */
   float minimumThickness;
 
@@ -301,8 +293,7 @@ public:
   Color3 diffusionDistance;
 
   /**
-   * Stores the intensity of the different subsurface effects in the thickness
-   * texture.
+   * Stores the intensity of the different subsurface effects in the thickness texture.
    * * the green channel is the translucency intensity.
    * * the blue channel is the scattering intensity.
    * * the alpha channel is the refraction intensity.
