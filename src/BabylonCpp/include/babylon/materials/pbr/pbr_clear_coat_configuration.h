@@ -27,16 +27,14 @@ using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 /**
- * @brief Define the code related to the clear coat parameters of the pbr
- * material.
+ * @brief Define the code related to the clear coat parameters of the pbr material.
  */
 class BABYLON_SHARED_EXPORT PBRClearCoatConfiguration {
 
 public:
   /**
    * @brief Instantiate a new istance of clear coat configuration.
-   * @param markAllSubMeshesAsTexturesDirty Callback to flag the material to
-   * dirty
+   * @param markAllSubMeshesAsTexturesDirty Callback to flag the material to dirty
    */
   PBRClearCoatConfiguration(const std::function<void()>& markAllSubMeshesAsTexturesDirty);
   ~PBRClearCoatConfiguration(); // = default
@@ -71,10 +69,10 @@ public:
    * @param engine defines the engine the material belongs to.
    * @param disableBumpMap defines wether the material disables bump or not.
    * @param isFrozen defines wether the material is frozen or not.
-   * @param invertNormalMapX If sets to true, x component of normal map value
-   * will be inverted (x = 1.0 - x).
-   * @param invertNormalMapY If sets to true, y component of normal map value
-   * will be inverted (y = 1.0 - y).
+   * @param invertNormalMapX If sets to true, x component of normal map value will be inverted (x
+   * = 1.0 - x).
+   * @param invertNormalMapY If sets to true, y component of normal map value will be inverted (y
+   * = 1.0 - y).
    */
   void bindForSubMesh(UniformBuffer& uniformBuffer, Scene* scene, Engine* engine,
                       bool disableBumpMap, bool isFrozen, bool invertNormalMapX,
@@ -100,20 +98,19 @@ public:
   void getAnimatables(std::vector<IAnimatablePtr>& animatables);
 
   /**
-   * @brief  Disposes the resources of the material.
+   * @brief Disposes the resources of the material.
    * @param forceDisposeTextures - Forces the disposal of all textures.
    */
   void dispose(bool forceDisposeTextures = false);
 
   /**
-   * @brief Get the current class name of the texture useful for serialization
-   * or dynamic coding.
+   * @brief Get the current class name of the texture useful for serialization or dynamic coding.
    * @returns "PBRClearCoatConfiguration"
    */
   [[nodiscard]] std::string getClassName() const;
 
   /**
-   * @briefAdd fallbacks to the effect fallbacks list.
+   * @brief Add fallbacks to the effect fallbacks list.
    * @param defines defines the Base texture to use.
    * @param fallbacks defines the current fallback list.
    * @param currentRank defines the current fallback rank.
@@ -192,9 +189,9 @@ public:
 
   /**
    * Defines the index of refraction of the clear coat.
-   * This defaults to 1.5 corresponding to a 0.04 f0 or a 4% reflectance at
-   * normal incidence The default fits with a polyurethane material. Changing
-   * the default value is more performance intensive.
+   * This defaults to 1.5 corresponding to a 0.04 f0 or a 4% reflectance at normal incidence The
+   * default fits with a polyurethane material. Changing the default value is more performance
+   * intensive.
    */
   Property<PBRClearCoatConfiguration, float> indexOfRefraction;
 
@@ -220,8 +217,7 @@ public:
   Color3 tintColor;
 
   /**
-   * Defines the distance at which the tint color should be found in the
-   * clear coat media.
+   * Defines the distance at which the tint color should be found in the clear coat media.
    * This is only use if tint is enabled
    */
   float tintColorAtDistance;
