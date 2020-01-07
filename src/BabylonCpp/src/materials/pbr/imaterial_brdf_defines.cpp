@@ -7,9 +7,10 @@ namespace BABYLON {
 IMaterialBRDFDefines::IMaterialBRDFDefines()
 {
   boolDef = {
-    {"BRDF_V_HEIGHT_CORRELATED", false},    //
-    {"MS_BRDF_ENERGY_CONSERVATION", false}, //
-    {"SPHERICAL_HARMONICS", false},         //
+    {"BRDF_V_HEIGHT_CORRELATED", false},                //
+    {"MS_BRDF_ENERGY_CONSERVATION", false},             //
+    {"SPHERICAL_HARMONICS", false},                     //
+    {"SPECULAR_GLOSSINESS_ENERGY_CONSERVATION", false}, //
   };
 }
 

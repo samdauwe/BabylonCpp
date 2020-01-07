@@ -23,24 +23,30 @@ class BABYLON_SHARED_EXPORT PBRBRDFConfiguration {
 public:
   /**
    * Default value used for the energy conservation.
-   * This should only be changed to adapt to the type of texture in
-   * scene.environmentBRDFTexture.
+   * This should only be changed to adapt to the type of texture in scene.environmentBRDFTexture.
    */
   static bool DEFAULT_USE_ENERGY_CONSERVATION;
 
   /**
    * Default value used for the Smith Visibility Height Correlated mode.
-   * This should only be changed to adapt to the type of texture in
-   * scene.environmentBRDFTexture.
+   * This should only be changed to adapt to the type of texture in scene.environmentBRDFTexture.
    */
   static bool DEFAULT_USE_SMITH_VISIBILITY_HEIGHT_CORRELATED;
 
   /**
    * Default value used for the IBL diffuse part.
-   * This can help switching back to the polynomials mode globally which is a
-   * tiny bit less GPU intensive at the drawback of a lower quality.
+   * This can help switching back to the polynomials mode globally which is a tiny bit
+   * less GPU intensive at the drawback of a lower quality.
    */
   static bool DEFAULT_USE_SPHERICAL_HARMONICS;
+
+  /**
+   * Default value used for activating energy conservation for the specular workflow.
+   * If activated, the albedo color is multiplied with (1. - maxChannel(specular color)).
+   * If deactivated, a material is only physically plausible, when (albedo color + specular color)
+   * < 1.
+   */
+  static bool DEFAULT_USE_SPECULAR_GLOSSINESS_INPUT_ENERGY_CONSERVATION;
 
 public:
   /**
@@ -95,6 +101,8 @@ protected:
   void set_useSmithVisibilityHeightCorrelated(bool value);
   [[nodiscard]] bool get_useSphericalHarmonics() const;
   void set_useSphericalHarmonics(bool value);
+  [[nodiscard]] bool get_useSpecularGlossinessInputEnergyConservation() const;
+  void set_useSpecularGlossinessInputEnergyConservation(bool value);
 
 public:
   /**
@@ -122,10 +130,20 @@ public:
    */
   Property<PBRBRDFConfiguration, bool> useSphericalHarmonics;
 
+  /**
+   * Defines if the material uses energy conservation, when the specular workflow is active.
+   * If activated, the albedo color is multiplied with (1. - maxChannel(specular color)).
+   * If deactivated, a material is only physically plausible, when (albedo color + specular color)
+   * < 1. In the deactivated case, the material author has to ensure energy conservation, for a
+   * physically plausible rendering.
+   */
+  Property<PBRBRDFConfiguration, bool> useSpecularGlossinessInputEnergyConservation;
+
 private:
   bool _useEnergyConservation;
   bool _useSmithVisibilityHeightCorrelated;
   bool _useSphericalHarmonics;
+  bool _useSpecularGlossinessInputEnergyConservation;
   /** Hidden */
   std::function<void()> _internalMarkAllSubMeshesAsMiscDirty;
 
