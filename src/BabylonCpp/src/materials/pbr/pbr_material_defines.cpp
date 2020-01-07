@@ -43,13 +43,15 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"LODBASEDMICROSFURACE", false},            //
     {"MICROSURFACEMAP", false},                 //
 
-    {"METALLICWORKFLOW", false},              //
-    {"ROUGHNESSSTOREINMETALMAPALPHA", false}, //
-    {"ROUGHNESSSTOREINMETALMAPGREEN", false}, //
-    {"METALLNESSSTOREINMETALMAPBLUE", false}, //
-    {"AOSTOREINMETALMAPRED", false},          //
-    {"ENVIRONMENTBRDF", false},               //
-    {"ENVIRONMENTBRDF_RGBD", false},          //
+    {"METALLICWORKFLOW", false},                //
+    {"ROUGHNESSSTOREINMETALMAPALPHA", false},   //
+    {"ROUGHNESSSTOREINMETALMAPGREEN", false},   //
+    {"METALLNESSSTOREINMETALMAPBLUE", false},   //
+    {"AOSTOREINMETALMAPRED", false},            //
+    {"METALLICF0FACTORFROMMETALLICMAP", false}, //
+
+    {"ENVIRONMENTBRDF", false},      //
+    {"ENVIRONMENTBRDF_RGBD", false}, //
 
     {"NORMAL", false},                //
     {"TANGENT", false},               //
@@ -125,6 +127,8 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"CLIPPLANE2", false},              //
     {"CLIPPLANE3", false},              //
     {"CLIPPLANE4", false},              //
+    {"CLIPPLANE5", false},              //
+    {"CLIPPLANE6", false},              //
     {"POINTSIZE", false},               //
     {"FOG", false},                     //
     {"LOGARITHMICDEPTH", false},        //
@@ -143,8 +147,9 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"ANISOTROPIC", false},         //
     {"ANISOTROPIC_TEXTURE", false}, //
 
-    {"BRDF_V_HEIGHT_CORRELATED", false},    //
-    {"MS_BRDF_ENERGY_CONSERVATION", false}, //
+    {"BRDF_V_HEIGHT_CORRELATED", false},                //
+    {"MS_BRDF_ENERGY_CONSERVATION", false},             //
+    {"SPECULAR_GLOSSINESS_ENERGY_CONSERVATION", false}, //
 
     {"SHEEN", false},                //
     {"SHEEN_TEXTURE", false},        //

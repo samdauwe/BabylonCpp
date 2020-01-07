@@ -22,34 +22,33 @@ class BABYLON_SHARED_EXPORT PBRMaterial : public PBRBaseMaterial {
 
 public:
   /**
-   * PBRMaterialTransparencyMode: No transparency mode, Alpha channel is not
-   * use.
+   * PBRMaterialTransparencyMode: No transparency mode, Alpha channel is not use.
    */
   static constexpr unsigned int PBRMATERIAL_OPAQUE = PBRBaseMaterial::PBRMATERIAL_OPAQUE;
 
   /**
-   * PBRMaterialTransparencyMode: Alpha Test mode, pixel are discarded below a
-   * certain threshold defined by the alpha cutoff value.
+   * PBRMaterialTransparencyMode: Alpha Test mode, pixel are discarded below a certain threshold
+   * defined by the alpha cutoff value.
    */
   static constexpr unsigned int PBRMATERIAL_ALPHATEST = PBRBaseMaterial::PBRMATERIAL_ALPHATEST;
 
   /**
-   * PBRMaterialTransparencyMode: Pixels are blended (according to the alpha
-   * mode) with the already drawn pixels in the current frame buffer.
+   * PBRMaterialTransparencyMode: Pixels are blended (according to the alpha mode) with the already
+   * drawn pixels in the current frame buffer.
    */
   static constexpr unsigned int PBRMATERIAL_ALPHABLEND = PBRBaseMaterial::PBRMATERIAL_ALPHABLEND;
 
   /**
-   * PBRMaterialTransparencyMode: Pixels are blended (according to the alpha
-   * mode) with the already drawn pixels in the current frame buffer. They are
-   * also discarded below the alpha cutoff threshold to improve performances.
+   * PBRMaterialTransparencyMode: Pixels are blended (according to the alpha mode) with the already
+   * drawn pixels in the current frame buffer. They are also discarded below the alpha cutoff
+   * threshold to improve performances.
    */
   static constexpr unsigned int PBRMATERIAL_ALPHATESTANDBLEND
     = PBRBaseMaterial::PBRMATERIAL_ALPHATESTANDBLEND;
 
   /**
-   * Defines the default value of how much AO map is occluding the analytical
-   * lights (point spot...).
+   * Defines the default value of how much AO map is occluding the analytical lights (point
+   * spot...).
    */
   static constexpr unsigned int DEFAULT_AO_ON_ANALYTICAL_LIGHTS
     = PBRBaseMaterial::DEFAULT_AO_ON_ANALYTICAL_LIGHTS;
@@ -103,8 +102,7 @@ protected:
   PBRMaterial(const std::string& name, Scene* scene);
 
   /**
-   * Intensity of the direct lights e.g. the four lights available in your
-   * scene.
+   * Intensity of the direct lights e.g. the four lights available in your scene.
    * This impacts both the direct diffuse and specular highlights.
    */
   [[nodiscard]] float get_directIntensity() const;
@@ -112,26 +110,21 @@ protected:
 
   /**
    * Intensity of the emissive part of the material.
-   * This helps controlling the emissive effect without modifying the emissive
-   * color.
+   * This helps controlling the emissive effect without modifying the emissive color.
    */
   [[nodiscard]] float get_emissiveIntensity() const;
   void set_emissiveIntensity(float value);
 
   /**
-   * Intensity of the environment e.g. how much the environment will light the
-   * object
-   * either through harmonics for rough material or through the refelction for
-   * shiny ones.
+   * Intensity of the environment e.g. how much the environment will light the object
+   * either through harmonics for rough material or through the refelction for shiny ones.
    */
   [[nodiscard]] float get_environmentIntensity() const;
   void set_environmentIntensity(float value);
 
   /**
-   * This is a special control allowing the reduction of the specular highlights
-   * coming from the
-   * four lights of the scene. Those highlights may not be needed in full
-   * environment lighting.
+   * This is a special control allowing the reduction of the specular highlights coming from the
+   * four lights of the scene. Those highlights may not be needed in full environment lighting.
    */
   [[nodiscard]] float get_specularIntensity() const;
   void set_specularIntensity(float value);
@@ -161,14 +154,14 @@ protected:
   void set_ambientTextureStrength(float value);
 
   /**
-   * Defines how much the AO map is occluding the analytical lights (point
-   * spot...). 1 means it completely occludes it 0 mean it has no impact
+   * Defines how much the AO map is occluding the analytical lights (point spot...). 1 means it
+   * completely occludes it 0 mean it has no impact
    */
   [[nodiscard]] unsigned int get_ambientTextureImpactOnAnalyticalLights() const;
   void set_ambientTextureImpactOnAnalyticalLights(unsigned int value);
 
   /**
-   * Stores the alpha values in a texture.
+   * Stores the alpha values in a texture. Use luminance if texture.getAlphaFromRGB is true.
    */
   BaseTexturePtr& get_opacityTexture();
   void set_opacityTexture(const BaseTexturePtr& value);
@@ -212,9 +205,25 @@ protected:
   void set_roughness(const std::optional<float>& value);
 
   /**
-   * Used to enable roughness/glossiness fetch from a separate channel depending
-   * on the current mode. Gray Scale represents roughness in metallic mode and
-   * glossiness in specular mode.
+   * Specifies the an F0 factor to help configuring the material F0.
+   * Instead of the default 4%, 8% * factor will be used. As the factor is defaulting
+   * to 0.5 the previously hard coded value stays the same.
+   * Can also be used to scale the F0 values of the metallic texture.
+   */
+  float get_metallicF0Factor() const;
+  void set_metallicF0Factor(float value);
+
+  /**
+   * Specifies whether the F0 factor can be fetched from the mettalic texture.
+   * If set to true, please adapt the metallicF0Factor to ensure it fits with
+   * your expectation as it multiplies with the texture data.
+   */
+  bool get_useMetallicF0FactorFromMetallicTexture() const;
+  void set_useMetallicF0FactorFromMetallicTexture(bool value);
+
+  /**
+   * Used to enable roughness/glossiness fetch from a separate channel depending on the current
+   * mode. Gray Scale represents roughness in metallic mode and glossiness in specular mode.
    */
   BaseTexturePtr& get_microSurfaceTexture();
   void set_microSurfaceTexture(const BaseTexturePtr& value);
@@ -280,38 +289,34 @@ protected:
   void set_indexOfRefraction(float value);
 
   /**
-   * Controls if refraction needs to be inverted on Y. This could be useful for
-   * procedural texture.
+   * Controls if refraction needs to be inverted on Y. This could be useful for procedural texture.
    */
   [[nodiscard]] bool get_invertRefractionY() const;
   void set_invertRefractionY(bool value);
 
   /**
-   * This parameters will make the material used its opacity to control how much
-   * it is refracting aginst not.
-   * Materials half opaque for instance using refraction could benefit from this
+   * This parameters will make the material used its opacity to control how much it is refracting
+   * aginst not. Materials half opaque for instance using refraction could benefit from this
    * control.
    */
   [[nodiscard]] bool get_linkRefractionWithTransparency() const;
   void set_linkRefractionWithTransparency(bool value);
 
   /**
-   * If true, the light map contains occlusion information instead of lighting
-   * info.
+   * If true, the light map contains occlusion information instead of lighting info.
    */
   [[nodiscard]] bool get_useLightmapAsShadowmap() const;
   void set_useLightmapAsShadowmap(bool value);
 
   /**
-   * Specifies that the alpha is coming form the albedo channel alpha channel
-   * for alpha blending.
+   * Specifies that the alpha is coming form the albedo channel alpha channel for alpha blending.
    */
   [[nodiscard]] bool get_useAlphaFromAlbedoTexture() const;
   void set_useAlphaFromAlbedoTexture(bool value);
 
   /**
-   * Enforces alpha test in opaque or blend mode in order to improve the
-   * performances of some situations.
+   * Enforces alpha test in opaque or blend mode in order to improve the performances of some
+   * situations.
    */
   [[nodiscard]] bool get_forceAlphaTest() const;
   void set_forceAlphaTest(bool value);
@@ -323,59 +328,54 @@ protected:
   void set_alphaCutOff(float value);
 
   /**
-   * Specifies that the material will keep the specular highlights over a
-   * transparent surface (only the most limunous ones). A car glass is a good
-   * exemple of that. When sun reflects on it you can not see what is behind.
+   * Specifies that the material will keep the specular highlights over a transparent surface (only
+   * the most limunous ones). A car glass is a good exemple of that. When sun reflects on it you can
+   * not see what is behind.
    */
   [[nodiscard]] bool get_useSpecularOverAlpha() const;
   void set_useSpecularOverAlpha(bool value);
 
   /**
-   * Specifies if the reflectivity texture contains the glossiness information
-   * in its alpha channel.
+   * Specifies if the reflectivity texture contains the glossiness information in its alpha channel.
    */
   [[nodiscard]] bool get_useMicroSurfaceFromReflectivityMapAlpha() const;
   void set_useMicroSurfaceFromReflectivityMapAlpha(bool value);
 
   /**
-   * Specifies if the metallic texture contains the roughness information in its
-   * alpha channel.
+   * Specifies if the metallic texture contains the roughness information in its alpha channel.
    */
   [[nodiscard]] bool get_useRoughnessFromMetallicTextureAlpha() const;
   void set_useRoughnessFromMetallicTextureAlpha(bool value);
 
   /**
-   * Specifies if the metallic texture contains the roughness information in its
-   * green channel.
+   * Specifies if the metallic texture contains the roughness information in its green channel.
    */
   [[nodiscard]] bool get_useRoughnessFromMetallicTextureGreen() const;
   void set_useRoughnessFromMetallicTextureGreen(bool value);
 
   /**
-   * Specifies if the metallic texture contains the metallness information in
-   * its blue channel.
+   * Specifies if the metallic texture contains the metallness information in its blue channel.
    */
   [[nodiscard]] bool get_useMetallnessFromMetallicTextureBlue() const;
   void set_useMetallnessFromMetallicTextureBlue(bool value);
 
   /**
-   * Specifies if the metallic texture contains the ambient occlusion
-   * information in its red channel.
+   * Specifies if the metallic texture contains the ambient occlusion information in its red
+   * channel.
    */
   [[nodiscard]] bool get_useAmbientOcclusionFromMetallicTextureRed() const;
   void set_useAmbientOcclusionFromMetallicTextureRed(bool value);
 
   /**
-   * Specifies if the ambient texture contains the ambient occlusion information
-   * in its red channel only.
+   * Specifies if the ambient texture contains the ambient occlusion information in its red channel
+   * only.
    */
   [[nodiscard]] bool get_useAmbientInGrayScale() const;
   void set_useAmbientInGrayScale(bool value);
 
   /**
-   * In case the reflectivity map does not contain the microsurface information
-   * in its alpha channel,
-   * The material will try to infer what glossiness each pixel should be.
+   * In case the reflectivity map does not contain the microsurface information in its alpha
+   * channel, The material will try to infer what glossiness each pixel should be.
    */
   [[nodiscard]] bool get_useAutoMicroSurfaceFromReflectivityMap() const;
   void set_useAutoMicroSurfaceFromReflectivityMap(bool value);
@@ -717,7 +717,7 @@ public:
   Property<PBRMaterial, unsigned int> ambientTextureImpactOnAnalyticalLights;
 
   /**
-   * Stores the alpha values in a texture.
+   * Stores the alpha values in a texture. Use luminance if texture.getAlphaFromRGB is true.
    */
   Property<PBRMaterial, BaseTexturePtr> opacityTexture;
 
@@ -752,6 +752,21 @@ public:
    * Can also be used to scale the roughness values of the metallic texture.
    */
   Property<PBRMaterial, std::optional<float>> roughness;
+
+  /**
+   * Specifies the an F0 factor to help configuring the material F0.
+   * Instead of the default 4%, 8% * factor will be used. As the factor is defaulting
+   * to 0.5 the previously hard coded value stays the same.
+   * Can also be used to scale the F0 values of the metallic texture.
+   */
+  Property<PBRMaterial, float> metallicF0Factor;
+
+  /**
+   * Specifies whether the F0 factor can be fetched from the mettalic texture.
+   * If set to true, please adapt the metallicF0Factor to ensure it fits with
+   * your expectation as it multiplies with the texture data.
+   */
+  Property<PBRMaterial, bool> useMetallicF0FactorFromMetallicTexture;
 
   /**
    * Used to enable roughness/glossiness fetch from a separate channel depending

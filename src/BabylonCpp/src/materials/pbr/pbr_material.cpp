@@ -12,20 +12,16 @@ namespace BABYLON {
 
 PBRMaterial::PBRMaterial(const std::string& iName, Scene* scene)
     : PBRBaseMaterial{iName, scene}
-    , directIntensity{this, &PBRMaterial::get_directIntensity,
-                      &PBRMaterial::set_directIntensity}
+    , directIntensity{this, &PBRMaterial::get_directIntensity, &PBRMaterial::set_directIntensity}
     , emissiveIntensity{this, &PBRMaterial::get_emissiveIntensity,
                         &PBRMaterial::set_emissiveIntensity}
     , environmentIntensity{this, &PBRMaterial::get_environmentIntensity,
                            &PBRMaterial::set_environmentIntensity}
     , specularIntensity{this, &PBRMaterial::get_specularIntensity,
                         &PBRMaterial::set_specularIntensity}
-    , disableBumpMap{this, &PBRMaterial::get_disableBumpMap,
-                     &PBRMaterial::set_disableBumpMap}
-    , albedoTexture{this, &PBRMaterial::get_albedoTexture,
-                    &PBRMaterial::set_albedoTexture}
-    , ambientTexture{this, &PBRMaterial::get_ambientTexture,
-                     &PBRMaterial::set_ambientTexture}
+    , disableBumpMap{this, &PBRMaterial::get_disableBumpMap, &PBRMaterial::set_disableBumpMap}
+    , albedoTexture{this, &PBRMaterial::get_albedoTexture, &PBRMaterial::set_albedoTexture}
+    , ambientTexture{this, &PBRMaterial::get_ambientTexture, &PBRMaterial::set_ambientTexture}
     , ambientTextureStrength{this, &PBRMaterial::get_ambientTextureStrength,
                              &PBRMaterial::set_ambientTextureStrength}
     , ambientTextureImpactOnAnalyticalLights{this,
@@ -33,56 +29,46 @@ PBRMaterial::PBRMaterial(const std::string& iName, Scene* scene)
                                                get_ambientTextureImpactOnAnalyticalLights,
                                              &PBRMaterial::
                                                set_ambientTextureImpactOnAnalyticalLights}
-    , opacityTexture{this, &PBRMaterial::get_opacityTexture,
-                     &PBRMaterial::set_opacityTexture}
+    , opacityTexture{this, &PBRMaterial::get_opacityTexture, &PBRMaterial::set_opacityTexture}
     , reflectionTexture{this, &PBRMaterial::get_reflectionTexture,
                         &PBRMaterial::set_reflectionTexture}
-    , emissiveTexture{this, &PBRMaterial::get_emissiveTexture,
-                      &PBRMaterial::set_emissiveTexture}
+    , emissiveTexture{this, &PBRMaterial::get_emissiveTexture, &PBRMaterial::set_emissiveTexture}
     , reflectivityTexture{this, &PBRMaterial::get_reflectivityTexture,
                           &PBRMaterial::set_reflectivityTexture}
-    , metallicTexture{this, &PBRMaterial::get_metallicTexture,
-                      &PBRMaterial::set_metallicTexture}
+    , metallicTexture{this, &PBRMaterial::get_metallicTexture, &PBRMaterial::set_metallicTexture}
     , metallic{this, &PBRMaterial::get_metallic, &PBRMaterial::set_metallic}
     , roughness{this, &PBRMaterial::get_roughness, &PBRMaterial::set_roughness}
+    , metallicF0Factor{this, &PBRMaterial::get_metallicF0Factor, &PBRMaterial::set_metallicF0Factor}
+    , useMetallicF0FactorFromMetallicTexture{this,
+                                             &PBRMaterial::
+                                               get_useMetallicF0FactorFromMetallicTexture,
+                                             &PBRMaterial::
+                                               set_useMetallicF0FactorFromMetallicTexture}
     , microSurfaceTexture{this, &PBRMaterial::get_microSurfaceTexture,
                           &PBRMaterial::set_microSurfaceTexture}
-    , bumpTexture{this, &PBRMaterial::get_bumpTexture,
-                  &PBRMaterial::set_bumpTexture}
-    , lightmapTexture{this, &PBRMaterial::get_lightmapTexture,
-                      &PBRMaterial::set_lightmapTexture}
+    , bumpTexture{this, &PBRMaterial::get_bumpTexture, &PBRMaterial::set_bumpTexture}
+    , lightmapTexture{this, &PBRMaterial::get_lightmapTexture, &PBRMaterial::set_lightmapTexture}
     , refractionTexture{this, &PBRMaterial::get_refractionTexture,
                         &PBRMaterial::set_refractionTexture}
-    , ambientColor{this, &PBRMaterial::get_ambientColor,
-                   &PBRMaterial::set_ambientColor}
-    , albedoColor{this, &PBRMaterial::get_albedoColor,
-                  &PBRMaterial::set_albedoColor}
+    , ambientColor{this, &PBRMaterial::get_ambientColor, &PBRMaterial::set_ambientColor}
+    , albedoColor{this, &PBRMaterial::get_albedoColor, &PBRMaterial::set_albedoColor}
     , reflectivityColor{this, &PBRMaterial::get_reflectivityColor,
                         &PBRMaterial::set_reflectivityColor}
-    , reflectionColor{this, &PBRMaterial::get_reflectionColor,
-                      &PBRMaterial::set_reflectionColor}
-    , emissiveColor{this, &PBRMaterial::get_emissiveColor,
-                    &PBRMaterial::set_emissiveColor}
-    , microSurface{this, &PBRMaterial::get_microSurface,
-                   &PBRMaterial::set_microSurface}
+    , reflectionColor{this, &PBRMaterial::get_reflectionColor, &PBRMaterial::set_reflectionColor}
+    , emissiveColor{this, &PBRMaterial::get_emissiveColor, &PBRMaterial::set_emissiveColor}
+    , microSurface{this, &PBRMaterial::get_microSurface, &PBRMaterial::set_microSurface}
     , indexOfRefraction{this, &PBRMaterial::get_indexOfRefraction,
                         &PBRMaterial::set_indexOfRefraction}
     , invertRefractionY{this, &PBRMaterial::get_invertRefractionY,
                         &PBRMaterial::set_invertRefractionY}
-    , linkRefractionWithTransparency{this,
-                                     &PBRMaterial::
-                                       get_linkRefractionWithTransparency,
-                                     &PBRMaterial::
-                                       set_linkRefractionWithTransparency}
+    , linkRefractionWithTransparency{this, &PBRMaterial::get_linkRefractionWithTransparency,
+                                     &PBRMaterial::set_linkRefractionWithTransparency}
     , useLightmapAsShadowmap{this, &PBRMaterial::get_useLightmapAsShadowmap,
                              &PBRMaterial::set_useLightmapAsShadowmap}
-    , useAlphaFromAlbedoTexture{this,
-                                &PBRMaterial::get_useAlphaFromAlbedoTexture,
+    , useAlphaFromAlbedoTexture{this, &PBRMaterial::get_useAlphaFromAlbedoTexture,
                                 &PBRMaterial::set_useAlphaFromAlbedoTexture}
-    , forceAlphaTest{this, &PBRMaterial::get_forceAlphaTest,
-                     &PBRMaterial::set_forceAlphaTest}
-    , alphaCutOff{this, &PBRMaterial::get_alphaCutOff,
-                  &PBRMaterial::set_alphaCutOff}
+    , forceAlphaTest{this, &PBRMaterial::get_forceAlphaTest, &PBRMaterial::set_forceAlphaTest}
+    , alphaCutOff{this, &PBRMaterial::get_alphaCutOff, &PBRMaterial::set_alphaCutOff}
     , useSpecularOverAlpha{this, &PBRMaterial::get_useSpecularOverAlpha,
                            &PBRMaterial::set_useSpecularOverAlpha}
     , useMicroSurfaceFromReflectivityMapAlpha{this,
@@ -91,20 +77,14 @@ PBRMaterial::PBRMaterial(const std::string& iName, Scene* scene)
                                               &PBRMaterial::
                                                 set_useMicroSurfaceFromReflectivityMapAlpha}
     , useRoughnessFromMetallicTextureAlpha{this,
-                                           &PBRMaterial::
-                                             get_useRoughnessFromMetallicTextureAlpha,
-                                           &PBRMaterial::
-                                             set_useRoughnessFromMetallicTextureAlpha}
+                                           &PBRMaterial::get_useRoughnessFromMetallicTextureAlpha,
+                                           &PBRMaterial::set_useRoughnessFromMetallicTextureAlpha}
     , useRoughnessFromMetallicTextureGreen{this,
-                                           &PBRMaterial::
-                                             get_useRoughnessFromMetallicTextureGreen,
-                                           &PBRMaterial::
-                                             set_useRoughnessFromMetallicTextureGreen}
+                                           &PBRMaterial::get_useRoughnessFromMetallicTextureGreen,
+                                           &PBRMaterial::set_useRoughnessFromMetallicTextureGreen}
     , useMetallnessFromMetallicTextureBlue{this,
-                                           &PBRMaterial::
-                                             get_useMetallnessFromMetallicTextureBlue,
-                                           &PBRMaterial::
-                                             set_useMetallnessFromMetallicTextureBlue}
+                                           &PBRMaterial::get_useMetallnessFromMetallicTextureBlue,
+                                           &PBRMaterial::set_useMetallnessFromMetallicTextureBlue}
     , useAmbientOcclusionFromMetallicTextureRed{this,
                                                 &PBRMaterial::
                                                   get_useAmbientOcclusionFromMetallicTextureRed,
@@ -125,75 +105,59 @@ PBRMaterial::PBRMaterial(const std::string& iName, Scene* scene)
                            &PBRMaterial::set_useRadianceOverAlpha}
     , useObjectSpaceNormalMap{this, &PBRMaterial::get_useObjectSpaceNormalMap,
                               &PBRMaterial::set_useObjectSpaceNormalMap}
-    , useParallax{this, &PBRMaterial::get_useParallax,
-                  &PBRMaterial::set_useParallax}
+    , useParallax{this, &PBRMaterial::get_useParallax, &PBRMaterial::set_useParallax}
     , useParallaxOcclusion{this, &PBRMaterial::get_useParallaxOcclusion,
                            &PBRMaterial::set_useParallaxOcclusion}
     , parallaxScaleBias{this, &PBRMaterial::get_parallaxScaleBias,
                         &PBRMaterial::set_parallaxScaleBias}
-    , disableLighting{this, &PBRMaterial::get_disableLighting,
-                      &PBRMaterial::set_disableLighting}
-    , forceIrradianceInFragment{this,
-                                &PBRMaterial::get_forceIrradianceInFragment,
+    , disableLighting{this, &PBRMaterial::get_disableLighting, &PBRMaterial::set_disableLighting}
+    , forceIrradianceInFragment{this, &PBRMaterial::get_forceIrradianceInFragment,
                                 &PBRMaterial::set_forceIrradianceInFragment}
     , maxSimultaneousLights{this, &PBRMaterial::get_maxSimultaneousLights,
                             &PBRMaterial::set_maxSimultaneousLights}
-    , invertNormalMapX{this, &PBRMaterial::get_invertNormalMapX,
-                       &PBRMaterial::set_invertNormalMapX}
-    , invertNormalMapY{this, &PBRMaterial::get_invertNormalMapY,
-                       &PBRMaterial::set_invertNormalMapY}
-    , twoSidedLighting{this, &PBRMaterial::get_twoSidedLighting,
-                       &PBRMaterial::set_twoSidedLighting}
-    , useAlphaFresnel{this, &PBRMaterial::get_useAlphaFresnel,
-                      &PBRMaterial::set_useAlphaFresnel}
+    , invertNormalMapX{this, &PBRMaterial::get_invertNormalMapX, &PBRMaterial::set_invertNormalMapX}
+    , invertNormalMapY{this, &PBRMaterial::get_invertNormalMapY, &PBRMaterial::set_invertNormalMapY}
+    , twoSidedLighting{this, &PBRMaterial::get_twoSidedLighting, &PBRMaterial::set_twoSidedLighting}
+    , useAlphaFresnel{this, &PBRMaterial::get_useAlphaFresnel, &PBRMaterial::set_useAlphaFresnel}
     , useLinearAlphaFresnel{this, &PBRMaterial::get_useLinearAlphaFresnel,
                             &PBRMaterial::set_useLinearAlphaFresnel}
     , environmentBRDFTexture{this, &PBRMaterial::get_environmentBRDFTexture,
                              &PBRMaterial::set_environmentBRDFTexture}
     , forceNormalForward{this, &PBRMaterial::get_forceNormalForward,
                          &PBRMaterial::set_forceNormalForward}
-    , enableSpecularAntiAliasing{this,
-                                 &PBRMaterial::get_enableSpecularAntiAliasing,
+    , enableSpecularAntiAliasing{this, &PBRMaterial::get_enableSpecularAntiAliasing,
                                  &PBRMaterial::set_enableSpecularAntiAliasing}
     , useHorizonOcclusion{this, &PBRMaterial::get_useHorizonOcclusion,
                           &PBRMaterial::set_useHorizonOcclusion}
     , useRadianceOcclusion{this, &PBRMaterial::get_useRadianceOcclusion,
                            &PBRMaterial::set_useRadianceOcclusion}
     , unlit{this, &PBRMaterial::get_unlit, &PBRMaterial::set_unlit}
-    , imageProcessingConfiguration{this,
-                                   &PBRMaterial::
-                                     get_imageProcessingConfiguration,
-                                   &PBRMaterial::
-                                     set_imageProcessingConfiguration}
+    , imageProcessingConfiguration{this, &PBRMaterial::get_imageProcessingConfiguration,
+                                   &PBRMaterial::set_imageProcessingConfiguration}
     , cameraColorCurvesEnabled{this, &PBRMaterial::get_cameraColorCurvesEnabled,
                                &PBRMaterial::set_cameraColorCurvesEnabled}
-    , cameraColorGradingEnabled{this,
-                                &PBRMaterial::get_cameraColorGradingEnabled,
+    , cameraColorGradingEnabled{this, &PBRMaterial::get_cameraColorGradingEnabled,
                                 &PBRMaterial::set_cameraColorGradingEnabled}
     , cameraToneMappingEnabled{this, &PBRMaterial::get_cameraToneMappingEnabled,
                                &PBRMaterial::set_cameraToneMappingEnabled}
-    , cameraExposure{this, &PBRMaterial::get_cameraExposure,
-                     &PBRMaterial::set_cameraExposure}
-    , cameraContrast{this, &PBRMaterial::get_cameraContrast,
-                     &PBRMaterial::set_cameraContrast}
-    , cameraColorGradingTexture{this,
-                                &PBRMaterial::get_cameraColorGradingTexture,
+    , cameraExposure{this, &PBRMaterial::get_cameraExposure, &PBRMaterial::set_cameraExposure}
+    , cameraContrast{this, &PBRMaterial::get_cameraContrast, &PBRMaterial::set_cameraContrast}
+    , cameraColorGradingTexture{this, &PBRMaterial::get_cameraColorGradingTexture,
                                 &PBRMaterial::set_cameraColorGradingTexture}
     , cameraColorCurves{this, &PBRMaterial::get_cameraColorCurves,
                         &PBRMaterial::set_cameraColorCurves}
 {
   // Properties
   {
-    directIntensity        = 1.f;
-    emissiveIntensity      = 1.f;
-    environmentIntensity   = 1.f;
-    specularIntensity      = 1.f;
-    disableBumpMap         = false;
-    albedoTexture          = nullptr;
-    ambientTexture         = nullptr;
-    ambientTextureStrength = 1.f;
-    ambientTextureImpactOnAnalyticalLights
-      = PBRMaterial::DEFAULT_AO_ON_ANALYTICAL_LIGHTS;
+    directIntensity                           = 1.f;
+    emissiveIntensity                         = 1.f;
+    environmentIntensity                      = 1.f;
+    specularIntensity                         = 1.f;
+    disableBumpMap                            = false;
+    albedoTexture                             = nullptr;
+    ambientTexture                            = nullptr;
+    ambientTextureStrength                    = 1.f;
+    ambientTextureImpactOnAnalyticalLights    = PBRMaterial::DEFAULT_AO_ON_ANALYTICAL_LIGHTS;
     opacityTexture                            = nullptr;
     reflectionTexture                         = nullptr;
     emissiveTexture                           = nullptr;
@@ -201,6 +165,8 @@ PBRMaterial::PBRMaterial(const std::string& iName, Scene* scene)
     metallicTexture                           = nullptr;
     metallic                                  = 0.f;
     roughness                                 = 0.f;
+    metallicF0Factor                          = 0.5f;
+    useMetallicF0FactorFromMetallicTexture    = false;
     microSurfaceTexture                       = nullptr;
     bumpTexture                               = nullptr;
     lightmapTexture                           = nullptr;
@@ -487,6 +453,36 @@ void PBRMaterial::set_roughness(const std::optional<float>& value)
   }
 
   _roughness = value;
+  _markAllSubMeshesAsTexturesDirty();
+}
+
+float PBRMaterial::get_metallicF0Factor() const
+{
+  return _metallicF0Factor;
+}
+
+void PBRMaterial::set_metallicF0Factor(float value)
+{
+  if (stl_util::almost_equal(_metallicF0Factor, value)) {
+    return;
+  }
+
+  _metallicF0Factor = value;
+  _markAllSubMeshesAsTexturesDirty();
+}
+
+bool PBRMaterial::get_useMetallicF0FactorFromMetallicTexture() const
+{
+  return _useMetallicF0FactorFromMetallicTexture;
+}
+
+void PBRMaterial::set_useMetallicF0FactorFromMetallicTexture(bool value)
+{
+  if (_useMetallicF0FactorFromMetallicTexture == value) {
+    return;
+  }
+
+  _useMetallicF0FactorFromMetallicTexture = value;
   _markAllSubMeshesAsTexturesDirty();
 }
 
@@ -1184,8 +1180,7 @@ ImageProcessingConfigurationPtr& PBRMaterial::get_imageProcessingConfiguration()
   return _imageProcessingConfiguration;
 }
 
-void PBRMaterial::set_imageProcessingConfiguration(
-  const ImageProcessingConfigurationPtr& value)
+void PBRMaterial::set_imageProcessingConfiguration(const ImageProcessingConfigurationPtr& value)
 {
   _attachImageProcessingConfiguration(value);
 
@@ -1268,8 +1263,7 @@ std::string PBRMaterial::getClassName() const
   return "PBRMaterial";
 }
 
-MaterialPtr PBRMaterial::clone(const std::string& /*name*/,
-                               bool /*cloneChildren*/) const
+MaterialPtr PBRMaterial::clone(const std::string& /*name*/, bool /*cloneChildren*/) const
 {
   return nullptr;
 }
