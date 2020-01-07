@@ -24,16 +24,14 @@ using IAnimatablePtr  = std::shared_ptr<IAnimatable>;
 using BaseTexturePtr  = std::shared_ptr<BaseTexture>;
 
 /**
- * @brief Define the code related to the anisotropic parameters of the pbr
- * material.
+ * @brief Define the code related to the anisotropic parameters of the pbr material.
  */
 class BABYLON_SHARED_EXPORT PBRAnisotropicConfiguration {
 
 public:
   /**
    * @brief Instantiate a new istance of anisotropy configuration.
-   * @param markAllSubMeshesAsTexturesDirty Callback to flag the material to
-   * dirty
+   * @param markAllSubMeshesAsTexturesDirty Callback to flag the material to dirty
    */
   PBRAnisotropicConfiguration(const std::function<void()>& markAllSubMeshesAsTexturesDirty);
   ~PBRAnisotropicConfiguration(); // = default
@@ -93,8 +91,7 @@ public:
   void dispose(bool forceDisposeTextures = false);
 
   /**
-   * @brief Get the current class name of the texture useful for serialization
-   * or dynamic coding.
+   * @brief Get the current class name of the texture useful for serialization or dynamic coding.
    * @returns "PBRAnisotropicConfiguration"
    */
   [[nodiscard]] std::string getClassName() const;

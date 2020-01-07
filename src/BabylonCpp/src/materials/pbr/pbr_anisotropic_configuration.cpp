@@ -64,8 +64,8 @@ void PBRAnisotropicConfiguration::_markAllSubMeshesAsTexturesDirty()
   _internalMarkAllSubMeshesAsTexturesDirty();
 }
 
-bool PBRAnisotropicConfiguration::isReadyForSubMesh(
-  const MaterialDefines& defines, Scene* scene) const
+bool PBRAnisotropicConfiguration::isReadyForSubMesh(const MaterialDefines& defines,
+                                                    Scene* scene) const
 {
   if (defines._areTexturesDirty) {
     if (scene->texturesEnabled()) {
@@ -80,8 +80,7 @@ bool PBRAnisotropicConfiguration::isReadyForSubMesh(
   return true;
 }
 
-void PBRAnisotropicConfiguration::prepareDefines(MaterialDefines& defines,
-                                                 AbstractMesh& mesh,
+void PBRAnisotropicConfiguration::prepareDefines(MaterialDefines& defines, AbstractMesh& mesh,
                                                  Scene* scene)
 {
   if (_isEnabled) {
@@ -94,8 +93,7 @@ void PBRAnisotropicConfiguration::prepareDefines(MaterialDefines& defines,
     if (defines._areTexturesDirty) {
       if (scene->texturesEnabled) {
         if (_texture && MaterialFlags::AnisotropicTextureEnabled()) {
-          MaterialHelper::PrepareDefinesForMergedUV(_texture, defines,
-                                                    "ANISOTROPIC_TEXTURE");
+          MaterialHelper::PrepareDefinesForMergedUV(_texture, defines, "ANISOTROPIC_TEXTURE");
         }
         else {
           defines.boolDef["ANISOTROPIC_TEXTURE"] = false;
@@ -109,20 +107,18 @@ void PBRAnisotropicConfiguration::prepareDefines(MaterialDefines& defines,
   }
 }
 
-void PBRAnisotropicConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer,
-                                                 Scene* scene, bool isFrozen)
+void PBRAnisotropicConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer, Scene* scene,
+                                                 bool isFrozen)
 {
   if (!uniformBuffer.useUbo() || !isFrozen || !uniformBuffer.isSync()) {
     if (_texture && MaterialFlags::AnisotropicTextureEnabled()) {
-      uniformBuffer.updateFloat2("vAnisotropyInfos",
-                                 static_cast<float>(_texture->coordinatesIndex),
+      uniformBuffer.updateFloat2("vAnisotropyInfos", static_cast<float>(_texture->coordinatesIndex),
                                  _texture->level, "");
       MaterialHelper::BindTextureMatrix(*_texture, uniformBuffer, "anisotropy");
     }
 
     // Anisotropy
-    uniformBuffer.updateFloat3("vAnisotropy", direction.x, direction.y,
-                               intensity, "");
+    uniformBuffer.updateFloat3("vAnisotropy", direction.x, direction.y, intensity, "");
   }
 
   // Textures
@@ -133,22 +129,19 @@ void PBRAnisotropicConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer,
   }
 }
 
-bool PBRAnisotropicConfiguration::hasTexture(
-  const BaseTexturePtr& iTexture) const
+bool PBRAnisotropicConfiguration::hasTexture(const BaseTexturePtr& iTexture) const
 {
   return _texture == iTexture;
 }
 
-void PBRAnisotropicConfiguration::getActiveTextures(
-  std::vector<BaseTexturePtr>& activeTextures)
+void PBRAnisotropicConfiguration::getActiveTextures(std::vector<BaseTexturePtr>& activeTextures)
 {
   if (_texture) {
     activeTextures.emplace_back(_texture);
   }
 }
 
-void PBRAnisotropicConfiguration::getAnimatables(
-  std::vector<IAnimatablePtr>& animatables)
+void PBRAnisotropicConfiguration::getAnimatables(std::vector<IAnimatablePtr>& animatables)
 {
   if (_texture && !_texture->animations.empty()) {
     animatables.emplace_back(_texture);
@@ -169,10 +162,9 @@ std::string PBRAnisotropicConfiguration::getClassName() const
   return "PBRAnisotropicConfiguration";
 }
 
-unsigned int
-PBRAnisotropicConfiguration::AddFallbacks(const MaterialDefines& defines,
-                                          EffectFallbacks& fallbacks,
-                                          unsigned int currentRank)
+unsigned int PBRAnisotropicConfiguration::AddFallbacks(const MaterialDefines& defines,
+                                                       EffectFallbacks& fallbacks,
+                                                       unsigned int currentRank)
 {
   if (defines["ANISOTROPIC"]) {
     fallbacks.addFallback(currentRank++, "ANISOTROPIC");
@@ -180,29 +172,24 @@ PBRAnisotropicConfiguration::AddFallbacks(const MaterialDefines& defines,
   return currentRank;
 }
 
-void PBRAnisotropicConfiguration::AddUniforms(
-  std::vector<std::string>& uniforms)
+void PBRAnisotropicConfiguration::AddUniforms(std::vector<std::string>& uniforms)
 {
-  stl_util::concat(uniforms,
-                   {"vAnisotropy", "vAnisotropyInfos", "anisotropyMatrix"});
+  stl_util::concat(uniforms, {"vAnisotropy", "vAnisotropyInfos", "anisotropyMatrix"});
 }
 
-void PBRAnisotropicConfiguration::PrepareUniformBuffer(
-  UniformBuffer& uniformBuffer)
+void PBRAnisotropicConfiguration::PrepareUniformBuffer(UniformBuffer& uniformBuffer)
 {
   uniformBuffer.addUniform("vAnisotropy", 3);
   uniformBuffer.addUniform("vAnisotropyInfos", 2);
   uniformBuffer.addUniform("anisotropyMatrix", 16);
 }
 
-void PBRAnisotropicConfiguration::AddSamplers(
-  std::vector<std::string>& samplers)
+void PBRAnisotropicConfiguration::AddSamplers(std::vector<std::string>& samplers)
 {
   samplers.emplace_back("anisotropySampler");
 }
 
-void PBRAnisotropicConfiguration::copyTo(
-  PBRAnisotropicConfiguration& /*anisotropicConfiguration*/)
+void PBRAnisotropicConfiguration::copyTo(PBRAnisotropicConfiguration& /*anisotropicConfiguration*/)
 {
 }
 
@@ -211,8 +198,7 @@ json PBRAnisotropicConfiguration::serialize() const
   return nullptr;
 }
 
-void PBRAnisotropicConfiguration::parse(const json& /*source*/,
-                                        Scene* /*scene*/,
+void PBRAnisotropicConfiguration::parse(const json& /*source*/, Scene* /*scene*/,
                                         const std::string& /*rootUrl*/)
 {
 }
