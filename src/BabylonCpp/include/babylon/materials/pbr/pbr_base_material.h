@@ -23,6 +23,11 @@ using PBRClearCoatConfigurationPtr    = std::shared_ptr<PBRClearCoatConfiguratio
 using PBRSheenConfigurationPtr        = std::shared_ptr<PBRSheenConfiguration>;
 using PBRSubSurfaceConfigurationPtr   = std::shared_ptr<PBRSubSurfaceConfiguration>;
 
+struct IMaterialCompilationOptions {
+  bool clipPlane    = false;
+  bool useInstances = false;
+}; // end of struct IMaterialCompilationOptions
+
 /**
  * @brief The Physically based material base class of BJS.
  *
@@ -148,7 +153,7 @@ public:
    * @brief Force shader compilation
    */
   void forceCompilation(AbstractMesh* mesh, std::function<void(Material* material)>& onCompiled,
-                        bool clipPlane = false);
+                        const IMaterialCompilationOptions& options = {});
 
   /**
    * @brief Initializes the uniform buffer layout for the shader.
@@ -409,6 +414,21 @@ protected:
    * Can also be used to scale the roughness values of the metallic texture.
    */
   std::optional<float> _roughness;
+
+  /**
+   * Specifies the an F0 factor to help configuring the material F0.
+   * Instead of the default 4%, 8% * factor will be used. As the factor is defaulting
+   * to 0.5 the previously hard coded value stays the same.
+   * Can also be used to scale the F0 values of the metallic texture.
+   */
+  float _metallicF0Factor;
+
+  /**
+   * Specifies whether the F0 factor can be fetched from the mettalic texture.
+   * If set to true, please adapt the metallicF0Factor to ensure it fits with
+   * your expectation as it multiplies with the texture data.
+   */
+  bool _useMetallicF0FactorFromMetallicTexture;
 
   /**
    * Used to enable roughness/glossiness fetch from a separate channel depending

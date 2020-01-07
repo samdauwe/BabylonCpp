@@ -71,6 +71,8 @@ PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
     , _metallicTexture{nullptr}
     , _metallic{std::nullopt}
     , _roughness{std::nullopt}
+    , _metallicF0Factor{0.f}
+    , _useMetallicF0FactorFromMetallicTexture{false}
     , _microSurfaceTexture{nullptr}
     , _bumpTexture{nullptr}
     , _lightmapTexture{nullptr}
@@ -610,6 +612,8 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
                                     "vClipPlane2",
                                     "vClipPlane3",
                                     "vClipPlane4",
+                                    "vClipPlane5",
+                                    "vClipPlane6",
                                     "albedoMatrix",
                                     "ambientMatrix",
                                     "opacityMatrix",
@@ -813,7 +817,8 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& de
             defines.boolDef["USEIRRADIANCEMAP"]              = true;
             defines.boolDef["USESPHERICALFROMREFLECTIONMAP"] = false;
           }
-          else if (reflectionTexture->sphericalPolynomial()) {
+          // Assume using spherical polynomial if the reflection texture is a cube map
+          else if (reflectionTexture->isCube()) {
             defines.boolDef["USESPHERICALFROMREFLECTIONMAP"] = true;
             defines.boolDef["USEIRRADIANCEMAP"]              = false;
             if (_forceIrradianceInFragment
@@ -880,6 +885,8 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& de
             = !_useRoughnessFromMetallicTextureAlpha && _useRoughnessFromMetallicTextureGreen;
           defines.boolDef["METALLNESSSTOREINMETALMAPBLUE"] = _useMetallnessFromMetallicTextureBlue;
           defines.boolDef["AOSTOREINMETALMAPRED"] = _useAmbientOcclusionFromMetallicTextureRed;
+          defines.boolDef["METALLICF0FACTORFROMMETALLICMAP"]
+            = _useMetallicF0FactorFromMetallicTexture;
         }
         else if (_reflectivityTexture) {
           MaterialHelper::PrepareDefinesForMergedUV(_reflectivityTexture, defines, "REFLECTIVITY");
@@ -1017,10 +1024,12 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& de
 
 void PBRBaseMaterial::forceCompilation(AbstractMesh* mesh,
                                        std::function<void(Material* material)>& iOnCompiled,
-                                       bool clipPlane)
+                                       const IMaterialCompilationOptions& options)
 {
+  const auto& localOptions = options;
   PBRMaterialDefines defines;
-  auto effect = _prepareEffect(mesh, defines, nullptr, nullptr, std::nullopt, clipPlane);
+  auto effect = _prepareEffect(mesh, defines, nullptr, nullptr, localOptions.useInstances,
+                               localOptions.clipPlane);
   if (effect->isReady()) {
     if (iOnCompiled) {
       iOnCompiled(this);
@@ -1283,7 +1292,13 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
       if (defines["METALLICWORKFLOW"]) {
         TmpVectors::Color3Array[0].r = !_metallic.has_value() ? 1.f : *_metallic;
         TmpVectors::Color3Array[0].g = !_roughness.has_value() ? 1.f : *_roughness;
-        ubo.updateColor4("vReflectivityColor", TmpVectors::Color3Array[0], 0, "");
+
+        // We are here deriving our default reflectance from a common value for none metallic
+        // surface. Default specular reflectance at normal incidence. 4% corresponds to index of
+        // refraction (IOR) of 1.50, approximately equal to glass. We then use 8% combined with a
+        // factor of 0.5 to allow some variations around the 0.04 default value.
+        const auto metallicF0 = 0.08f * _metallicF0Factor;
+        ubo.updateColor4("vReflectivityColor", TmpVectors::Color3Array[0], metallicF0, "");
       }
       else {
         ubo.updateColor4("vReflectivityColor", _reflectivityColor, _microSurface, "");
