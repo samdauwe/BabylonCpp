@@ -9,10 +9,8 @@ namespace BABYLON {
 /**
  * @brief The Physically based simple base material of BJS.
  *
- * This enables better naming and convention enforcements on top of the
- * pbrMaterial.
- * It is used as the base class for both the specGloss and metalRough
- * conventions.
+ * This enables better naming and convention enforcements on top of the pbrMaterial.
+ * It is used as the base class for both the specGloss and metalRough conventions.
  */
 class BABYLON_SHARED_EXPORT PBRBaseSimpleMaterial : public PBRBaseMaterial {
 
@@ -124,8 +122,8 @@ protected:
   void set_disableLighting(bool value);
 
   /**
-   * Environment Texture used in the material (this is use for both reflection
-   * and environment lighting).
+   * Environment Texture used in the material (this is use for both reflection and environment
+   * lighting).
    */
   BaseTexturePtr& get_environmentTexture();
   void set_environmentTexture(const BaseTexturePtr& value);
@@ -184,8 +182,7 @@ protected:
   [[nodiscard]] bool get_doubleSided() const;
 
   /**
-   * @brief If sets to true and backfaceCulling is false, normals will be
-   * flipped on the backside.
+   * @brief If sets to true and backfaceCulling is false, normals will be flipped on the backside.
    */
   void set_doubleSided(bool value);
 
@@ -196,8 +193,7 @@ protected:
   void set_lightmapTexture(const BaseTexturePtr& value);
 
   /**
-   * If true, the light map contains occlusion information instead of lighting
-   * info.
+   * If true, the light map contains occlusion information instead of lighting info.
    */
   [[nodiscard]] bool get_useLightmapAsShadowmap() const;
   void set_useLightmapAsShadowmap(bool value);

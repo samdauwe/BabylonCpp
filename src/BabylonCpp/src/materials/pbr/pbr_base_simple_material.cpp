@@ -6,11 +6,9 @@
 
 namespace BABYLON {
 
-PBRBaseSimpleMaterial::PBRBaseSimpleMaterial(const std::string& iName,
-                                             Scene* scene)
+PBRBaseSimpleMaterial::PBRBaseSimpleMaterial(const std::string& iName, Scene* scene)
     : PBRBaseMaterial{iName, scene}
-    , maxSimultaneousLights{this,
-                            &PBRBaseSimpleMaterial::get_maxSimultaneousLights,
+    , maxSimultaneousLights{this, &PBRBaseSimpleMaterial::get_maxSimultaneousLights,
                             &PBRBaseSimpleMaterial::set_maxSimultaneousLights}
     , disableLighting{this, &PBRBaseSimpleMaterial::get_disableLighting,
                       &PBRBaseSimpleMaterial::set_disableLighting}
@@ -36,8 +34,7 @@ PBRBaseSimpleMaterial::PBRBaseSimpleMaterial(const std::string& iName,
                   &PBRBaseSimpleMaterial::set_doubleSided}
     , lightmapTexture{this, &PBRBaseSimpleMaterial::get_lightmapTexture,
                       &PBRBaseSimpleMaterial::set_lightmapTexture}
-    , useLightmapAsShadowmap{this,
-                             &PBRBaseSimpleMaterial::get_useLightmapAsShadowmap,
+    , useLightmapAsShadowmap{this, &PBRBaseSimpleMaterial::get_useLightmapAsShadowmap,
                              &PBRBaseSimpleMaterial::set_useLightmapAsShadowmap}
 {
   // Properties
