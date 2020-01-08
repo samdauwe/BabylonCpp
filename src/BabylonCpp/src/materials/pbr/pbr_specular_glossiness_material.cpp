@@ -6,8 +6,7 @@
 
 namespace BABYLON {
 
-PBRSpecularGlossinessMaterial::PBRSpecularGlossinessMaterial(
-  const std::string& iName, Scene* scene)
+PBRSpecularGlossinessMaterial::PBRSpecularGlossinessMaterial(const std::string& iName, Scene* scene)
     : PBRBaseSimpleMaterial{iName, scene}
     , diffuseColor{this, &PBRSpecularGlossinessMaterial::get_diffuseColor,
                    &PBRSpecularGlossinessMaterial::set_diffuseColor}
@@ -17,9 +16,8 @@ PBRSpecularGlossinessMaterial::PBRSpecularGlossinessMaterial(
                     &PBRSpecularGlossinessMaterial::set_specularColor}
     , glossiness{this, &PBRSpecularGlossinessMaterial::get_glossiness,
                  &PBRSpecularGlossinessMaterial::set_glossiness}
-    , specularGlossinessTexture{
-        this, &PBRSpecularGlossinessMaterial::get_specularGlossinessTexture,
-        &PBRSpecularGlossinessMaterial::set_specularGlossinessTexture}
+    , specularGlossinessTexture{this, &PBRSpecularGlossinessMaterial::get_specularGlossinessTexture,
+                                &PBRSpecularGlossinessMaterial::set_specularGlossinessTexture}
 {
   _useMicroSurfaceFromReflectivityMapAlpha = true;
 }
@@ -51,8 +49,7 @@ BaseTexturePtr& PBRSpecularGlossinessMaterial::get_diffuseTexture()
   return _albedoTexture;
 }
 
-void PBRSpecularGlossinessMaterial::set_diffuseTexture(
-  const BaseTexturePtr& value)
+void PBRSpecularGlossinessMaterial::set_diffuseTexture(const BaseTexturePtr& value)
 {
   if (_albedoTexture == value) {
     return;
@@ -97,8 +94,7 @@ BaseTexturePtr& PBRSpecularGlossinessMaterial::get_specularGlossinessTexture()
   return _reflectivityTexture;
 }
 
-void PBRSpecularGlossinessMaterial::set_specularGlossinessTexture(
-  const BaseTexturePtr& value)
+void PBRSpecularGlossinessMaterial::set_specularGlossinessTexture(const BaseTexturePtr& value)
 {
   if (_reflectivityTexture == value) {
     return;
@@ -119,9 +115,9 @@ json PBRSpecularGlossinessMaterial::serialize() const
   return nullptr;
 }
 
-PBRSpecularGlossinessMaterial*
-PBRSpecularGlossinessMaterial::Parse(const json& /*source*/, Scene* /*scene*/,
-                                     const std::string& /*rootUrl*/)
+PBRSpecularGlossinessMaterial* PBRSpecularGlossinessMaterial::Parse(const json& /*source*/,
+                                                                    Scene* /*scene*/,
+                                                                    const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

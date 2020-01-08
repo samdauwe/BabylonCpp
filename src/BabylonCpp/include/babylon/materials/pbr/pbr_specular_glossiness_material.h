@@ -68,29 +68,27 @@ protected:
   void set_diffuseColor(const Color3& value);
 
   /**
-   * @brief Specifies the diffuse texture of the material. This can also
-   * contains the opcity value in its alpha channel.
+   * @brief Specifies the diffuse texture of the material. This can also contains the opcity value
+   * in its alpha channel.
    */
   BaseTexturePtr& get_diffuseTexture();
   void set_diffuseTexture(const BaseTexturePtr& value);
 
   /**
-   * @brief Specifies the specular color of the material. This indicates how
-   * reflective is the material (none to mirror).
+   * @brief Specifies the specular color of the material. This indicates how reflective is the
+   * material (none to mirror).
    */
   Color3& get_specularColor();
   void set_specularColor(const Color3& value);
 
   /**
-   * @brief Specifies the glossiness of the material. This indicates "how sharp
-   * is the reflection".
+   * @brief Specifies the glossiness of the material. This indicates "how sharp is the reflection".
    */
   [[nodiscard]] float get_glossiness() const;
   void set_glossiness(float value);
 
   /**
-   * @brief Specifies both the specular color RGB and the glossiness A of the
-   * material per pixels.
+   * @brief Specifies both the specular color RGB and the glossiness A of the material per pixels.
    */
   BaseTexturePtr& get_specularGlossinessTexture();
   void set_specularGlossinessTexture(const BaseTexturePtr& value);
@@ -102,26 +100,24 @@ public:
   Property<PBRSpecularGlossinessMaterial, Color3> diffuseColor;
 
   /**
-   * Specifies the diffuse texture of the material. This can also contains the
-   * opcity value in its alpha channel.
+   * Specifies the diffuse texture of the material. This can also contains the opcity value in its
+   * alpha channel.
    */
   Property<PBRSpecularGlossinessMaterial, BaseTexturePtr> diffuseTexture;
 
   /**
-   * Specifies the specular color of the material. This indicates how reflective
-   * is the material (none to mirror).
+   * Specifies the specular color of the material. This indicates how reflective is the material
+   * (none to mirror).
    */
   Property<PBRSpecularGlossinessMaterial, Color3> specularColor;
 
   /**
-   * Specifies the glossiness of the material. This indicates "how sharp is the
-   * reflection".
+   * Specifies the glossiness of the material. This indicates "how sharp is the reflection".
    */
   Property<PBRSpecularGlossinessMaterial, float> glossiness;
 
   /**
-   * Specifies both the specular color RGB and the glossiness A of the material
-   * per pixels.
+   * Specifies both the specular color RGB and the glossiness A of the material per pixels.
    */
   Property<PBRSpecularGlossinessMaterial, BaseTexturePtr> specularGlossinessTexture;
 
