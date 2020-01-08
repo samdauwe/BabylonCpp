@@ -73,19 +73,17 @@ protected:
   PBRMetallicRoughnessMaterial(const std::string& name, Scene* scene);
 
   /**
-   * @brief The base color has two different interpretations depending on the
-   * value of metalness. When the material is a metal, the base color is the
-   * specific measured reflectance value at normal incidence (F0). For a
-   * non-metal the base color represents the reflected diffuse color of the
-   * material.
+   * @brief The base color has two different interpretations depending on the value of metalness.
+   * When the material is a metal, the base color is the specific measured reflectance value at
+   * normal incidence (F0). For a non-metal the base color represents the reflected diffuse color of
+   * the material.
    */
   Color3& get_baseColor();
   void set_baseColor(const Color3& value);
 
   /**
-   * @brief Base texture of the metallic workflow. It contains both the
-   * baseColor information in RGB as well as opacity information in the alpha
-   * channel.
+   * @brief Base texture of the metallic workflow. It contains both the baseColor information in RGB
+   * as well as opacity information in the alpha channel.
    */
   BaseTexturePtr& get_baseTexture();
   void set_baseTexture(const BaseTexturePtr& value);
@@ -105,19 +103,18 @@ protected:
   void set_roughness(float value);
 
   /**
-   * @brief Texture containing both the metallic value in the B channel and the
-   * roughness value in the G channel to keep better precision.
+   * @brief Texture containing both the metallic value in the B channel and the roughness value in
+   * the G channel to keep better precision.
    */
   BaseTexturePtr& get_metallicRoughnessTexture();
   void set_metallicRoughnessTexture(const BaseTexturePtr& value);
 
 public:
   /**
-   * The base color has two different interpretations depending on the value of
-   * metalness.
-   * When the material is a metal, the base color is the specific measured
-   * reflectance value at normal incidence (F0). For a non-metal the base color
-   * represents the reflected diffuse color of the material.
+   * The base color has two different interpretations depending on the value of metalness.
+   * When the material is a metal, the base color is the specific measured reflectance value at
+   * normal incidence (F0). For a non-metal the base color represents the reflected diffuse color of
+   * the material.
    */
   Property<PBRMetallicRoughnessMaterial, Color3> baseColor;
 
