@@ -96,12 +96,6 @@ if (BABYLON_BUILD_PLAYGROUND)
     target_compile_definitions(${TARGET} PRIVATE -DBABYLON_BUILD_PLAYGROUND)
 endif()
 
-# Compile options
-target_compile_options(${TARGET}
-    PRIVATE
-    PUBLIC
-)
-
 # Set library ouput name
 set_target_properties(${TARGET}
     PROPERTIES  PREFIX "${CMAKE_SHARED_LIBRARY_PREFIX}"
