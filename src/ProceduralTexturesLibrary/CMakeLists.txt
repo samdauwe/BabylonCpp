@@ -67,13 +67,8 @@ set(BABYLON_PROCEDURALS_SOURCES
     ${PROCEDURALS_SRC_FILES}
 )
 
-# Group source files
-set(HEADER_GROUP "Header Files (API)")
-set(SOURCE_GROUP "Source Files")
-source_group_by_path(${INCLUDE_PATH} "\\\\.h$|\\\\.hpp$"
-    ${HEADER_GROUP} ${BABYLON_PROCEDURALS_HEADERS})
-source_group_by_path(${SOURCE_PATH}  "\\\\.cpp$|\\\\.c$|\\\\.h$|\\\\.hpp$"
-    ${SOURCE_GROUP} ${BABYLON_PROCEDURALS_SOURCES})
+source_group_by_path_all(${CMAKE_CURRENT_SOURCE_DIR} ${BABYLON_PROCEDURALS_HEADERS} ${BABYLON_PROCEDURALS_SOURCES})
+
 
 # ============================================================================ #
 #                       Create library                                         #
