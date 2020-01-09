@@ -7,6 +7,8 @@ option(OPTION_BUILD_IMGUI_BABYLON "Build the inspector debugging tool."  ON)
 #                            Sub-projects                                      #
 # ============================================================================ #
 
+set(BABYLON_NAMESPACE babylon)
+
 #-- Libraries --##
 add_subdirectory(imgui_utils)
 add_subdirectory(BabylonCpp)

@@ -14,9 +14,6 @@ project(${TARGET} C CXX)
 # Print status message
 message(STATUS "Lib ${TARGET}")
 
-# Namespace
-set(BABYLON_NAMESPACE babylon)
-
 # Set API export file and macro
 string(TOUPPER ${BABYLON_NAMESPACE} TARGET_UPPER)
 set(FEATURE_FILE "include/${BABYLON_NAMESPACE}/${BABYLON_NAMESPACE}_features.h")
