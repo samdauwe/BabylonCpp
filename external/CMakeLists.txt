@@ -24,15 +24,6 @@ if(OPTION_BUILD_TESTS)
         gmock_build_tests gtest_build_samples gtest_build_tests
         gtest_disable_pthreads gtest_force_shared_crt gtest_hide_internal_symbols
     )
-    macro(babylon_add_test TESTNAME)
-        message("babylon_add_test ${TESTNAME}")
-        add_executable(${TESTNAME} ${ARGN})
-        # Create namespaced alias
-        add_executable(${META_PROJECT_NAME}::${TESTNAME} ALIAS ${TESTNAME})
-
-        target_link_libraries(${TESTNAME} PRIVATE gtest gmock gtest_main)
-        add_test(NAME ${TESTNAME} COMMAND ${TESTNAME})
-    endmacro()
     add_subdirectory(googletest)
 endif(OPTION_BUILD_TESTS)
 
