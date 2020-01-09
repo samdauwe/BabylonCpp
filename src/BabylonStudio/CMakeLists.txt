@@ -39,9 +39,6 @@ include_directories(${OPENGL_INCLUDE_DIRS})
 # Target name
 set(TARGET BabylonStudio)
 
-# Project name
-project(${TARGET} C CXX)
-
 # Print status message
 message(STATUS "App ${TARGET}")
 
@@ -56,15 +53,13 @@ file(GLOB_RECURSE SOURCES_H_CPP
     ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/*.md
     )
-source_group_by_path_all(${CMAKE_CURRENT_SOURCE_DIR} ${SOURCES_H_CPP})
 
 # ============================================================================ #
 #                       Create executable                                      #
 # ============================================================================ #
 
 # Build executable
-add_executable(${TARGET} ${SOURCES_H_CPP})
-babylon_target_clang_tidy(${TARGET})
+babylon_add_executable(${TARGET} ${SOURCES_H_CPP})
 
 # Libraries
 target_link_libraries(${TARGET}

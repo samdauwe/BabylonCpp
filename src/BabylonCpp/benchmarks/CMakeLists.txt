@@ -6,7 +6,6 @@ if (BABYLON_BUILD_BENCHMARK)
 
     file(GLOB_RECURSE SRC_FILES *.cpp)
     babylon_add_test(${TARGET} ${SRC_FILES})
-    babylon_target_clang_tidy(${TARGET})
 
     # Libraries
     target_link_libraries(${TARGET} PRIVATE BabylonCpp)

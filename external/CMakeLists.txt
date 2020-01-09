@@ -24,15 +24,6 @@ if(OPTION_BUILD_TESTS)
         gmock_build_tests gtest_build_samples gtest_build_tests
         gtest_disable_pthreads gtest_force_shared_crt gtest_hide_internal_symbols
     )
-    macro(babylon_add_test TESTNAME)
-        message("babylon_add_test ${TESTNAME}")
-        add_executable(${TESTNAME} ${ARGN})
-        # Create namespaced alias
-        add_executable(${META_PROJECT_NAME}::${TESTNAME} ALIAS ${TESTNAME})
-
-        target_link_libraries(${TESTNAME} PRIVATE gtest gmock gtest_main)
-        add_test(NAME ${TESTNAME} COMMAND ${TESTNAME})
-    endmacro()
     add_subdirectory(googletest)
 endif(OPTION_BUILD_TESTS)
 
@@ -42,7 +33,8 @@ include_directories(SYSTEM "earcut.hpp")
 set(EARCUT_HPP_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/earcut.hpp/include/mapbox
     CACHE INTERNAL "Include directories of Earcut hpp")
-
+add_library(earcut_hpp INTERFACE)
+target_include_directories(earcut_hpp INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/earcut.hpp/include/mapbox)
 
 # json.hpp (JSON for Modern C++)
 include_directories("json.hpp")

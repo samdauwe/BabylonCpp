@@ -6,17 +6,18 @@
 #include <functional>
 #include <imgui_utils/imgui_runner_babylon/runner_babylon.h>
 #include <imgui_utils/code_editor.h>
+#include <babylon/babylon_api.h>
 #include <map>
 
 namespace BABYLON {
 
-  struct PlaygroundCompilerStatus
+  struct BABYLON_SHARED_EXPORT PlaygroundCompilerStatus
   {
     std::shared_ptr<IRenderableScene> _renderableScene = nullptr;
     bool _isCompiling = false;
   };
 
-  struct BabylonStudioOptions
+  struct BABYLON_SHARED_EXPORT BabylonStudioOptions
   {
     inline BabylonStudioOptions() {
       _appWindowParams.Title = "BabylonCpp";
@@ -36,7 +37,7 @@ namespace BABYLON {
     PlaygroundCompilerCallback _playgroundCompilerCallback;
   };
 
-  void runBabylonStudio(
+  void BABYLON_SHARED_EXPORT runBabylonStudio(
     const std::shared_ptr<BABYLON::IRenderableScene>& scene = nullptr,
     BabylonStudioOptions options = BabylonStudioOptions()
   );

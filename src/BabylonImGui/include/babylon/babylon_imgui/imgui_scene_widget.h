@@ -6,7 +6,7 @@
 #include <babylon/babylon_api.h>
 
 namespace BABYLON {
-  class ImGuiSceneWidget
+  class BABYLON_SHARED_EXPORT ImGuiSceneWidget
   {
   public:
     ImGuiSceneWidget(ImVec2 size);
