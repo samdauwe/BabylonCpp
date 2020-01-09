@@ -52,8 +52,6 @@ file(GLOB_RECURSE BABYLON_SOURCES
     ${SOURCE_PATH}/*.c
     )
 
-source_group_by_path_all(${CMAKE_CURRENT_SOURCE_DIR} ${BABYLON_HEADERS} ${BABYLON_SOURCES})
-
 # ============================================================================ #
 #                       Create library                                         #
 # ============================================================================ #

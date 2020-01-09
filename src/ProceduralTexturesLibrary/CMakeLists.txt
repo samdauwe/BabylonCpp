@@ -34,7 +34,6 @@ set(SOURCE_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 file(GLOB_RECURSE BABYLON_PROCEDURALS_HEADERS ${INCLUDE_PATH}/*.h)
 file(GLOB_RECURSE BABYLON_PROCEDURALS_SOURCES ${SOURCE_PATH}/proceduraltextureslibrary/*.cpp)
-source_group_by_path_all(${CMAKE_CURRENT_SOURCE_DIR} ${BABYLON_PROCEDURALS_HEADERS} ${BABYLON_PROCEDURALS_SOURCES})
 
 
 # ============================================================================ #

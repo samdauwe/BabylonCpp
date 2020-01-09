@@ -34,7 +34,6 @@ set(SOURCE_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/src")
 # Header files
 file(GLOB_RECURSE BABYLON_EXTENSIONS_HEADERS  ${INCLUDE_PATH}/*.h)
 file(GLOB_RECURSE BABYLON_EXTENSIONS_SOURCES  ${SOURCE_PATH}/*.cpp)
-source_group_by_path_all(${CMAKE_CURRENT_SOURCE_DIR} ${BABYLON_EXTENSIONS_HEADERS} ${BABYLON_EXTENSIONS_SOURCES})
 
 # ============================================================================ #
 #                       Create library                                         #

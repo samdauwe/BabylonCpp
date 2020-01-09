@@ -27,6 +27,10 @@ function(babylon_add_library TARGET)
         $<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:${BABYLON_UPPER}_STATIC_DEFINE>
         )
 
+    # group sources
+    get_target_property(sources ${TARGET} SOURCES)
+    source_group_by_path_all(${CMAKE_CURRENT_SOURCE_DIR} ${sources})
+
 endfunction()
 
 

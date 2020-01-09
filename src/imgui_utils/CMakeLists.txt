@@ -27,7 +27,6 @@ file(GLOB_RECURSE SOURCES_H_CPP
     ${CMAKE_CURRENT_SOURCE_DIR}/*.h
     ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
     )
-source_group_by_path_all(${CMAKE_CURRENT_SOURCE_DIR} ${SOURCES_H_CPP})
 
 # ============================================================================ #
 #                       Create Library                                         #

@@ -36,8 +36,6 @@ file(GLOB_RECURSE BABYLON_MATERIALS_HEADERS   ${INCLUDE_PATH}/*.h)
 # Source files
 file(GLOB_RECURSE BABYLON_MATERIALS_SOURCES ${SOURCE_PATH}/*.cpp)
 
-source_group_by_path_all(${CMAKE_CURRENT_SOURCE_DIR} ${BABYLON_MATERIALS_HEADERS} ${BABYLON_MATERIALS_SOURCES})
-
 # ============================================================================ #
 #                       Create library                                         #
 # ============================================================================ #
