@@ -315,7 +315,8 @@ bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh
       "world",         "view",           "viewProjection", "vEyePosition",  "vLightsType",
       "vDiffuseColor", "vSpecularColor", "vFogInfos",      "vFogColor",     "pointSize",
       "vTextureInfos", "mBones",         "vClipPlane",     "vClipPlane2",   "vClipPlane3",
-      "vClipPlane4",   "textureMatrix",  "diffuse1Infos",  "diffuse2Infos", "diffuse3Infos"};
+      "vClipPlane4",   "vClipPlane5",    "vClipPlane6",    "textureMatrix", "diffuse1Infos",
+      "diffuse2Infos", "diffuse3Infos"};
 
     const std::vector<std::string> samplers{"textureSampler",  "diffuse1Sampler", "diffuse2Sampler",
                                             "diffuse3Sampler", "bump1Sampler",    "bump2Sampler",
