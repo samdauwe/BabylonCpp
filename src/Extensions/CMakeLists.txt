@@ -105,17 +105,16 @@ generate_export_header(${TARGET}
 # Include directories
 target_include_directories(${TARGET}
     PRIVATE
-    ${INCLUDE_PATH}/../recastnavigation/Detour/Include
-    ${INCLUDE_PATH}/../recastnavigation/DetourCrowd/Include
-    ${INCLUDE_PATH}/../recastnavigation/DetourTileCache/Include
-    ${INCLUDE_PATH}/../recastnavigation/Recast/Include
     ${CMAKE_CURRENT_BINARY_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../BabylonCpp/include
     ${CMAKE_CURRENT_BINARY_DIR}/../BabylonCpp/include
     PUBLIC
-    INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${INCLUDE_PATH}/../recastnavigation/Detour/Include>
+    $<BUILD_INTERFACE:${INCLUDE_PATH}/../recastnavigation/DetourCrowd/Include>
+    $<BUILD_INTERFACE:${INCLUDE_PATH}/../recastnavigation/DetourTileCache/Include>
+    $<BUILD_INTERFACE:${INCLUDE_PATH}/../recastnavigation/Recast/Include>
 )
 
 # Libraries

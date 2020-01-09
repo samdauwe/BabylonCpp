@@ -109,36 +109,18 @@ generate_export_header(${TARGET}
     EXPORT_MACRO_NAME ${EXPORT_MACRO}
 )
 
-# Include directories
-target_include_directories(${TARGET}
-    PRIVATE
-    ${JSON_HPP_INCLUDE_DIRS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../BabylonCpp/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../Extensions/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../Extensions/include/recastnavigation/Detour/Include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../Extensions/include/recastnavigation/DetourCrowd/Include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../Extensions/include/recastnavigation/DetourTileCache/Include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../Extensions/include/recastnavigation/Recast/Include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../MaterialsLibrary/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../ProceduralTexturesLibrary/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../Loaders/include
-    ${CMAKE_CURRENT_BINARY_DIR}/../Loaders/include
-    PUBLIC
-    INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-)
+target_include_directories(${TARGET} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
 # Libraries
 target_link_libraries(${TARGET}
     PRIVATE
-    #imgui
     imgui_utils
     BabylonCpp
     Extensions
     MaterialsLibrary
     ProceduralTexturesLibrary
     Loaders
+    json_hpp
 )
 
 # Compile definitions
