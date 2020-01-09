@@ -2,7 +2,6 @@
 #                            Configuration options                             #
 # ============================================================================ #
 option(OPTION_BUILD_IMGUI_BABYLON "Build the inspector debugging tool."  ON)
-option(OPTION_BUILD_LOADERS       "Build the loader plugins."            ON)
 
 # ============================================================================ #
 #                            Sub-projects                                      #
@@ -15,9 +14,7 @@ add_subdirectory(Extensions)
 add_subdirectory(MaterialsLibrary)
 add_subdirectory(ProceduralTexturesLibrary)
 add_subdirectory(Samples)
-if (OPTION_BUILD_LOADERS)
-    add_subdirectory(Loaders)
-endif()
+add_subdirectory(Loaders)
 if (OPTION_BUILD_IMGUI_BABYLON)
     add_subdirectory(BabylonImGui)
 endif()
