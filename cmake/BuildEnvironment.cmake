@@ -10,17 +10,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # Include cmake modules
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-set(WriterCompilerDetectionHeaderFound NOTFOUND)
 
 include(GenerateExportHeader)
 include(ExternalProject)
 
-# This module is only available with CMake >=3.1, so check whether it could be found
-include(WriteCompilerDetectionHeader OPTIONAL RESULT_VARIABLE WriterCompilerDetectionHeaderFound)
-# BUT in CMake 3.1 this module doesn't recognize AppleClang as compiler, so disable it
-if (${CMAKE_VERSION} VERSION_LESS "3.2")
-    set(WriterCompilerDetectionHeaderFound NOTFOUND)
-endif()
+include(WriteCompilerDetectionHeader)
 
 # Git version
 include(${CMAKE_CURRENT_LIST_DIR}/GetGitRevisionDescription.cmake)

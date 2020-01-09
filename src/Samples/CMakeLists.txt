@@ -65,21 +65,13 @@ babylon_target_clang_tidy(${TARGET})
 # Feature: https://cmake.org/cmake/help/v3.1/prop_gbl/CMAKE_CXX_KNOWN_FEATURES.html
 
 # Check for availability of module; use pre-generated version if not found
-if (WriterCompilerDetectionHeaderFound)
-    write_compiler_detection_header(
-        FILE ${FEATURE_FILE}
-        PREFIX ${BABYLON_UPPER}
-        COMPILERS AppleClang Clang GNU MSVC
-        FEATURES cxx_alignas cxx_alignof cxx_constexpr cxx_final cxx_noexcept cxx_nullptr cxx_sizeof_member cxx_thread_local
-        VERSION 3.2
-    )
-else()
-    file(
-        COPY ${PROJECT_SOURCE_DIR}/codegeneration/${TARGET}_features.h
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/${TARGET}
-        USE_SOURCE_PERMISSIONS
-    )
-endif()
+write_compiler_detection_header(
+    FILE ${FEATURE_FILE}
+    PREFIX ${BABYLON_UPPER}
+    COMPILERS AppleClang Clang GNU MSVC
+    FEATURES cxx_alignas cxx_alignof cxx_constexpr cxx_final cxx_noexcept cxx_nullptr cxx_sizeof_member cxx_thread_local
+    VERSION 3.2
+)
 
 # Create API export header
 generate_export_header(${TARGET}
