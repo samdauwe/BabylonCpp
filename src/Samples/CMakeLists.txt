@@ -48,12 +48,6 @@ set(META_NAME_VERSION        "${META_PROJECT_NAME} v${META_VERSION} (${META_VERS
 string(TOUPPER ${META_PROJECT_NAME} META_PROJECT_NAME_UPPER)
 configure_file(version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/${BABYLON_NAMESPACE}/${BABYLON_NAMESPACE}_version.h)
 
-# Loader plugins
-if (OPTION_BUILD_LOADERS)
-    # Set define for usage in source code
-    add_definitions(-DWITH_LOADERS)
-endif()
-
 # ============================================================================ #
 #                       Sources                                                #
 # ============================================================================ #
