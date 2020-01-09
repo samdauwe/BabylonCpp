@@ -15,10 +15,10 @@ project(${TARGET} C CXX)
 message(STATUS "Lib ${TARGET}")
 
 # Set API export file and macro
-string(TOUPPER ${BABYLON_NAMESPACE} TARGET_UPPER)
+string(TOUPPER ${BABYLON_NAMESPACE} BABYLON_UPPER)
 set(FEATURE_FILE "include/${BABYLON_NAMESPACE}/${BABYLON_NAMESPACE}_features.h")
 set(EXPORT_FILE  "include/${BABYLON_NAMESPACE}/${BABYLON_NAMESPACE}_api.h")
-set(EXPORT_MACRO "${TARGET_UPPER}_SHARED_EXPORT")
+set(EXPORT_MACRO "${BABYLON_UPPER}_SHARED_EXPORT")
 
 # ============================================================================ #
 #                       Project description and (meta) information             #
@@ -115,7 +115,7 @@ add_library(${META_PROJECT_NAME}::${TARGET} ALIAS ${TARGET})
 if (WriterCompilerDetectionHeaderFound)
     write_compiler_detection_header(
         FILE ${FEATURE_FILE}
-        PREFIX ${TARGET_UPPER}
+        PREFIX ${BABYLON_UPPER}
         COMPILERS AppleClang Clang GNU MSVC
         FEATURES cxx_alignas cxx_alignof cxx_constexpr cxx_final cxx_noexcept cxx_nullptr cxx_sizeof_member cxx_thread_local
         VERSION 3.2
@@ -152,7 +152,7 @@ target_link_libraries(${TARGET} PRIVATE BabylonCpp json_hpp)
 # Compile definitions
 target_compile_definitions(${TARGET}
     PUBLIC
-    $<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:${TARGET_UPPER}_STATIC_DEFINE>
+    $<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:${BABYLON_UPPER}_STATIC_DEFINE>
 )
 
 # Compile options
