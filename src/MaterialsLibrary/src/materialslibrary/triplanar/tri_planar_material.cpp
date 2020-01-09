@@ -309,10 +309,10 @@ bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMe
     auto join = defines.toString();
 
     const std::vector<std::string> uniforms{
-      "world",       "view",          "viewProjection", "vEyePosition",
-      "vLightsType", "vDiffuseColor", "vSpecularColor", "vFogInfos",
-      "vFogColor",   "pointSize",     "mBones",         "vClipPlane",
-      "vClipPlane2", "vClipPlane3",   "vClipPlane4",    "tileSize"};
+      "world",         "view",           "viewProjection", "vEyePosition", "vLightsType",
+      "vDiffuseColor", "vSpecularColor", "vFogInfos",      "vFogColor",    "pointSize",
+      "mBones",        "vClipPlane",     "vClipPlane2",    "vClipPlane3",  "vClipPlane4",
+      "vClipPlane5",   "vClipPlane6",    "tileSize"};
 
     const std::vector<std::string> samplers{"diffuseSamplerX", "diffuseSamplerY", "diffuseSamplerZ",
                                             "normalSamplerX",  "normalSamplerY",  "normalSamplerZ"};
