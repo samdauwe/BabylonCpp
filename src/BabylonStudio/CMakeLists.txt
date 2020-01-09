@@ -60,8 +60,7 @@ source_group_by_path_all(${CMAKE_CURRENT_SOURCE_DIR} ${SOURCES_H_CPP})
 # ============================================================================ #
 
 # Build executable
-add_executable(${TARGET} ${SOURCES_H_CPP})
-babylon_target_clang_tidy(${TARGET})
+babylon_add_executable(${TARGET} ${SOURCES_H_CPP})
 
 # Libraries
 target_link_libraries(${TARGET}

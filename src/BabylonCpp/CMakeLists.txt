@@ -59,29 +59,17 @@ source_group_by_path_all(${CMAKE_CURRENT_SOURCE_DIR} ${BABYLON_HEADERS} ${BABYLO
 # ============================================================================ #
 
 # Build library
-add_library(${TARGET}
+babylon_add_library(${TARGET}
     ${BABYLON_SOURCES}
     ${BABYLON_HEADERS}
 )
-babylon_target_clang_tidy(${TARGET})
-
 
 if (OPTION_ENABLE_SIMD)
     target_compile_definitions(${TARGET} PRIVATE OPTION_ENABLE_SIMD)
 endif()
 
-
-# Create namespaced alias
-add_library(${META_PROJECT_NAME}::${TARGET} ALIAS ${TARGET})
-
 # Export library for downstream projects
 export(TARGETS ${TARGET} NAMESPACE ${META_PROJECT_NAME}:: FILE ${CMAKE_OUTPUT_PATH}/${TARGET}-export.cmake)
-
-# Create API export header
-generate_export_header(${TARGET}
-    EXPORT_FILE_NAME  ${EXPORT_FILE}
-    EXPORT_MACRO_NAME ${EXPORT_MACRO}
-)
 
 # Include directories
 target_include_directories(${TARGET}
@@ -104,24 +92,7 @@ target_include_directories(${TARGET}
     $<BUILD_INTERFACE:${PROMISE_CPP_INCLUDE_DIR}>
 )
 
-# Compile definitions
-target_compile_definitions(${TARGET}
-    PUBLIC
-    $<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:${BABYLON_UPPER}_STATIC_DEFINE>
-    BABYLON_REPO_FOLDER="${CMAKE_SOURCE_DIR}"
-)
-# Compile options
-target_compile_options(${TARGET}
-    PUBLIC
-)
-
-# Set library ouput name
-set_target_properties(${TARGET}
-    PROPERTIES  PREFIX "${CMAKE_SHARED_LIBRARY_PREFIX}"
-                OUTPUT_NAME $<LOWER_CASE:${TARGET}>
-                VERSION ${META_VERSION}
-                SOVERSION ${META_VERSION}
-)
+target_compile_definitions(${TARGET} PUBLIC BABYLON_REPO_FOLDER="${CMAKE_SOURCE_DIR}")
 
 # ============================================================================ #
 #                        Include What You Use                                  #

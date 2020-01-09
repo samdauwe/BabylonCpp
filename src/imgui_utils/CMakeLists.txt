@@ -34,8 +34,7 @@ source_group_by_path_all(${CMAKE_CURRENT_SOURCE_DIR} ${SOURCES_H_CPP})
 # ============================================================================ #
 
 # Build executable
-add_library(${TARGET} STATIC ${SOURCES_H_CPP} $<TARGET_OBJECTS:ImGuiColorTextEdit>)
-babylon_target_clang_tidy(${TARGET})
+babylon_add_library(${TARGET} STATIC ${SOURCES_H_CPP} $<TARGET_OBJECTS:ImGuiColorTextEdit>)
 
 # Include directories
 target_include_directories(${TARGET} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)

@@ -9,6 +9,7 @@ option(OPTION_BUILD_IMGUI_BABYLON "Build the inspector debugging tool."  ON)
 # ============================================================================ #
 include(../cmake/BuildEnvironment.cmake)
 include(../cmake/BabylonAddTest.cmake)
+include(../cmake/BabylonAddLibrary.cmake)
 
 set(BABYLON_NAMESPACE babylon)
 string(TOUPPER ${BABYLON_NAMESPACE} BABYLON_UPPER)
