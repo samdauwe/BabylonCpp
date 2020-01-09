@@ -39,9 +39,6 @@ include_directories(${OPENGL_INCLUDE_DIRS})
 # Target name
 set(TARGET BabylonStudio)
 
-# Project name
-project(${TARGET} C CXX)
-
 # Print status message
 message(STATUS "App ${TARGET}")
 

@@ -8,9 +8,6 @@ include(../../cmake/BuildEnvironment.cmake)
 # Target name
 set(TARGET Samples)
 
-# Project name
-project(${TARGET} C CXX)
-
 # Print status message
 message(STATUS "Lib ${TARGET}")
 

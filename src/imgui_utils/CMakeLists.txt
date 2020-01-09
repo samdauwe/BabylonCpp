@@ -15,12 +15,8 @@ include_directories(${OPENGL_INCLUDE_DIRS})
 # Target name
 set(TARGET imgui_utils)
 
-# Project name
-project(${TARGET} C CXX)
-
 # Print status message
 message(STATUS "App ${TARGET}")
-
 
 # ============================================================================ #
 #                       Sources                                                #
