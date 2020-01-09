@@ -130,7 +130,7 @@ std::string GlErrorCodeStr(GLenum error_code)
 void glad_post_call_callback(const char* name, void* /*funcptr*/, int /*len_args*/, ...)
 {
   GLenum error_code;
-  error_code = glad_glGetError();
+  error_code = glGetError();
 
   std::stringstream msg_str;
   msg_str << "ERROR " << GlErrorCodeStr(error_code) << "(" << error_code << ") in " << name << "\n";
