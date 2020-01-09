@@ -34,6 +34,20 @@ set(META_NAME_VERSION        "${META_PROJECT_NAME} v${META_VERSION} (${META_VERS
 #set(META_PROJECT_DESCRIPTION "")
 
 
+# Create feature detection header
+# Compilers: https://cmake.org/cmake/help/v3.1/variable/CMAKE_LANG_COMPILER_ID.html#variable:CMAKE_%3CLANG%3E_COMPILER_ID
+# Feature: https://cmake.org/cmake/help/v3.1/prop_gbl/CMAKE_CXX_KNOWN_FEATURES.html
+
+# Check for availability of module; use pre-generated version if not found
+write_compiler_detection_header(
+    FILE ${FEATURE_FILE}
+    PREFIX ${BABYLON_UPPER}
+    COMPILERS AppleClang Clang GNU MSVC
+    FEATURES cxx_alignas cxx_alignof cxx_constexpr cxx_final cxx_noexcept cxx_nullptr cxx_sizeof_member cxx_thread_local
+    VERSION 3.2
+)
+
+
 # ============================================================================ #
 #                            Sub-projects                                      #
 # ============================================================================ #
