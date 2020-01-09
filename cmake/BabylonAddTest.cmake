@@ -6,4 +6,5 @@ macro(babylon_add_test TESTNAME)
 
     target_link_libraries(${TESTNAME} PRIVATE gtest gmock gtest_main)
     add_test(NAME ${TESTNAME} COMMAND ${TESTNAME})
+    babylon_target_clang_tidy(${TESTNAME})
 endmacro()
