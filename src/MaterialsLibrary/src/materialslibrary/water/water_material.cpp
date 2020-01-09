@@ -400,8 +400,8 @@ bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, 
     std::vector<std::string> uniforms{
       "world", "view", "viewProjection", "vEyePosition", "vLightsType", "vDiffuseColor",
       "vSpecularColor", "vFogInfos", "vFogColor", "pointSize", "vNormalInfos", "mBones",
-      "vClipPlane", "vClipPlane2", "vClipPlane3", "vClipPlane4", "normalMatrix",
-      "logarithmicDepthConstant",
+      "vClipPlane", "vClipPlane2", "vClipPlane3", "vClipPlane4", "vClipPlane5", "vClipPlane6",
+      "normalMatrix", "logarithmicDepthConstant",
       // Water
       "worldReflectionViewProjection", "windDirection", "waveLength", "time", "windForce",
       "cameraPosition", "bumpHeight", "waveHeight", "waterColor", "waterColor2", "colorBlendFactor",
