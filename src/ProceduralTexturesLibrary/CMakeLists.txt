@@ -25,26 +25,11 @@ string(TOUPPER ${META_PROJECT_NAME} META_PROJECT_NAME_UPPER)
 configure_file(version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/${BABYLON_NAMESPACE}/${BABYLON_NAMESPACE}_version.h)
 
 # ============================================================================ #
-#                       Sources                                                #
-# ============================================================================ #
-
-# Include, Source
-set(INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include/${BABYLON_NAMESPACE}")
-set(SOURCE_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/src")
-
-file(GLOB_RECURSE BABYLON_PROCEDURALS_HEADERS ${INCLUDE_PATH}/*.h)
-file(GLOB_RECURSE BABYLON_PROCEDURALS_SOURCES ${SOURCE_PATH}/proceduraltextureslibrary/*.cpp)
-
-
-# ============================================================================ #
 #                       Create library                                         #
 # ============================================================================ #
 
 # Build library
-babylon_add_library(${TARGET}
-    ${BABYLON_PROCEDURALS_SOURCES}
-    ${BABYLON_PROCEDURALS_HEADERS}
-)
+babylon_add_library_glob(${TARGET})
 
 # Include directories
 target_include_directories(${TARGET}

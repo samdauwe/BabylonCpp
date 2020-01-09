@@ -24,28 +24,11 @@ string(TOUPPER ${META_PROJECT_NAME} META_PROJECT_NAME_UPPER)
 configure_file(version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/${BABYLON_NAMESPACE}/${BABYLON_NAMESPACE}_version.h)
 
 # ============================================================================ #
-#                       Sources                                                #
-# ============================================================================ #
-
-# Include, Source
-set(INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include/${BABYLON_NAMESPACE}")
-set(SOURCE_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/src")
-
-# Header files
-file(GLOB_RECURSE BABYLON_INSPECTOR_HEADERS ${INCLUDE_PATH}/*.h)
-file(GLOB_RECURSE BABYLON_INSPECTOR_SOURCES ${SOURCE_PATH}/*.cpp)
-
-# ============================================================================ #
 #                       Create library                                         #
 # ============================================================================ #
 
 # Build library
-babylon_add_library(${TARGET}
-    STATIC
-    ${BABYLON_INSPECTOR_SOURCES}
-    ${BABYLON_INSPECTOR_HEADERS}
-    Readme.md
-)
+babylon_add_library_glob(${TARGET})
 
 # Include directories
 target_include_directories(${TARGET}

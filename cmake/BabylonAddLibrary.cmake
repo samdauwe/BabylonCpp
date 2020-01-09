@@ -40,3 +40,23 @@ function(babylon_add_executable TARGET)
     add_executable(${TARGET} ${ARGN})
     babylon_target_clang_tidy(${TARGET})
 endfunction()
+
+
+function(babylon_add_library_glob TARGET)
+    set(include_path "${CMAKE_CURRENT_SOURCE_DIR}/include/")
+    set(source_path  "${CMAKE_CURRENT_SOURCE_DIR}/src")
+    file(GLOB_RECURSE headers
+        ${include_path}/*.h
+        ${include_path}/*.hpp
+        )
+    file(GLOB_RECURSE sources
+        ${source_path}/*.cpp
+        ${source_path}/*.c
+        )
+    file(GLOB_RECURSE misc
+        ${CMAKE_CURRENT_SOURCE_DIR}/*.md
+        ${CMAKE_CURRENT_SOURCE_DIR}/*.txt
+        ${CMAKE_CURRENT_SOURCE_DIR}/*.json
+        )
+    babylon_add_library(${TARGET} ${sources} ${headers} ${misc})
+endfunction()

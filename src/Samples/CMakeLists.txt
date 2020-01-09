@@ -23,32 +23,13 @@ set(META_PROJECT_DESCRIPTION "")
 string(TOUPPER ${META_PROJECT_NAME} META_PROJECT_NAME_UPPER)
 configure_file(version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/${BABYLON_NAMESPACE}/${BABYLON_NAMESPACE}_version.h)
 
-# ============================================================================ #
-#                       Sources                                                #
-# ============================================================================ #
-
-# Include, Source
-set(INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include/${BABYLON_NAMESPACE}/samples")
-set(SOURCE_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/src/samples")
-
-file(GLOB_RECURSE BABYLON_SAMPLES_HEADERS
-    ${INCLUDE_PATH}/*.h
-    ${INCLUDE_PATH}/*.hpp
-    )
-file(GLOB_RECURSE BABYLON_SAMPLES_SOURCES
-    ${SOURCE_PATH}/*.cpp
-    ${SOURCE_PATH}/*.c
-    )
 
 # ============================================================================ #
 #                       Create library                                         #
 # ============================================================================ #
 
 # Build library
-babylon_add_library(${TARGET}
-    ${BABYLON_SAMPLES_SOURCES}
-    ${BABYLON_SAMPLES_HEADERS}
-)
+babylon_add_library_glob(${TARGET})
 
 target_include_directories(${TARGET} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 

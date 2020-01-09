@@ -24,26 +24,11 @@ string(TOUPPER ${META_PROJECT_NAME} META_PROJECT_NAME_UPPER)
 configure_file(version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/${BABYLON_NAMESPACE}/${BABYLON_NAMESPACE}_version.h)
 
 # ============================================================================ #
-#                       Sources                                                #
-# ============================================================================ #
-
-# Include, Source and Tests path
-set(INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include/${BABYLON_NAMESPACE}")
-set(SOURCE_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/src")
-
-# Header files
-file(GLOB_RECURSE BABYLON_EXTENSIONS_HEADERS  ${INCLUDE_PATH}/*.h)
-file(GLOB_RECURSE BABYLON_EXTENSIONS_SOURCES  ${SOURCE_PATH}/*.cpp)
-
-# ============================================================================ #
 #                       Create library                                         #
 # ============================================================================ #
 
 # Build library
-babylon_add_library(${TARGET}
-    ${BABYLON_EXTENSIONS_SOURCES}
-    ${BABYLON_EXTENSIONS_HEADERS}
-)
+babylon_add_library_glob(${TARGET})
 
 # Include directories
 target_include_directories(${TARGET}
@@ -54,10 +39,10 @@ target_include_directories(${TARGET}
     ${CMAKE_CURRENT_BINARY_DIR}/../BabylonCpp/include
     PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<BUILD_INTERFACE:${INCLUDE_PATH}/../recastnavigation/Detour/Include>
-    $<BUILD_INTERFACE:${INCLUDE_PATH}/../recastnavigation/DetourCrowd/Include>
-    $<BUILD_INTERFACE:${INCLUDE_PATH}/../recastnavigation/DetourTileCache/Include>
-    $<BUILD_INTERFACE:${INCLUDE_PATH}/../recastnavigation/Recast/Include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/recastnavigation/Detour/Include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/recastnavigation/DetourCrowd/Include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/recastnavigation/DetourTileCache/Include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/recastnavigation/Recast/Include>
 )
 
 # Libraries
