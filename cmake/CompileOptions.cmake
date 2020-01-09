@@ -21,6 +21,9 @@ else()
     set(CMAKE_RELEASE_POSTFIX "_s")
 endif()
 
+# Enable position independent code property
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 # Check if compiler support the c++17 standard
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++17" COMPILER_SUPPORTS_CXX17)
