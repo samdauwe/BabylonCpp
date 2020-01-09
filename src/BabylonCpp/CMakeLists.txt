@@ -35,32 +35,11 @@ set(OPTION_ENABLE_SIMD        false)
 configure_file(options.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/${BABYLON_NAMESPACE}/${BABYLON_NAMESPACE}_options.h)
 
 # ============================================================================ #
-#                       Sources                                                #
-# ============================================================================ #
-
-# Include, Source
-set(INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include/${BABYLON_NAMESPACE}")
-set(SOURCE_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/src")
-
-
-file(GLOB_RECURSE BABYLON_HEADERS
-    ${INCLUDE_PATH}/*.h
-    ${INCLUDE_PATH}/*.hpp
-    )
-file(GLOB_RECURSE BABYLON_SOURCES
-    ${SOURCE_PATH}/*.cpp
-    ${SOURCE_PATH}/*.c
-    )
-
-# ============================================================================ #
 #                       Create library                                         #
 # ============================================================================ #
 
 # Build library
-babylon_add_library(${TARGET}
-    ${BABYLON_SOURCES}
-    ${BABYLON_HEADERS}
-)
+babylon_add_library_glob(${TARGET})
 
 if (OPTION_ENABLE_SIMD)
     target_compile_definitions(${TARGET} PRIVATE OPTION_ENABLE_SIMD)
@@ -71,23 +50,16 @@ export(TARGETS ${TARGET} NAMESPACE ${META_PROJECT_NAME}:: FILE ${CMAKE_OUTPUT_PA
 
 # Include directories
 target_include_directories(${TARGET}
-    PRIVATE
-    ${CMAKE_CURRENT_BINARY_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-    PUBLIC
-    INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-    $<INSTALL_INTERFACE:include>
-)
-
-# Libraries
-target_include_directories(${TARGET}
     PRIVATE SYSTEM
-    ${EARCUT_HPP_INCLUDE_DIRS}
-    ${JSON_HPP_INCLUDE_DIRS}
+        ${EARCUT_HPP_INCLUDE_DIRS}
+        ${JSON_HPP_INCLUDE_DIRS}
     PUBLIC
-    $<BUILD_INTERFACE:${STB_IMAGE_INCLUDE_DIR}>
-    $<BUILD_INTERFACE:${PROMISE_CPP_INCLUDE_DIR}>
+        $<BUILD_INTERFACE:${STB_IMAGE_INCLUDE_DIR}>
+        $<BUILD_INTERFACE:${PROMISE_CPP_INCLUDE_DIR}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+    INTERFACE
+        $<INSTALL_INTERFACE:include>
 )
 
 target_compile_definitions(${TARGET} PUBLIC BABYLON_REPO_FOLDER="${CMAKE_SOURCE_DIR}")

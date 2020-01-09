@@ -33,7 +33,8 @@ include_directories(SYSTEM "earcut.hpp")
 set(EARCUT_HPP_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/earcut.hpp/include/mapbox
     CACHE INTERNAL "Include directories of Earcut hpp")
-
+add_library(earcut_hpp INTERFACE)
+target_include_directories(earcut_hpp INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/earcut.hpp/include/mapbox)
 
 # json.hpp (JSON for Modern C++)
 include_directories("json.hpp")
