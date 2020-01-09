@@ -14,11 +14,6 @@ project(${TARGET} C CXX)
 # Print status message
 message(STATUS "Lib ${TARGET}")
 
-# Set API export file and macro
-string(TOUPPER ${BABYLON_NAMESPACE} BABYLON_UPPER)
-set(FEATURE_FILE "include/${BABYLON_NAMESPACE}/${BABYLON_NAMESPACE}_features.h")
-set(EXPORT_FILE  "include/${BABYLON_NAMESPACE}/${BABYLON_NAMESPACE}_api.h")
-set(EXPORT_MACRO "${BABYLON_UPPER}_SHARED_EXPORT")
 
 # ============================================================================ #
 #                       Project description and (meta) information             #

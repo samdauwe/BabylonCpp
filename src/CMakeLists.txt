@@ -7,7 +7,13 @@ option(OPTION_BUILD_IMGUI_BABYLON "Build the inspector debugging tool."  ON)
 #                            Sub-projects                                      #
 # ============================================================================ #
 
+# Common variables used by all sub libraries
 set(BABYLON_NAMESPACE babylon)
+string(TOUPPER ${BABYLON_NAMESPACE} BABYLON_UPPER)
+set(FEATURE_FILE "include/${BABYLON_NAMESPACE}/${BABYLON_NAMESPACE}_features.h")
+set(EXPORT_FILE  "include/${BABYLON_NAMESPACE}/${BABYLON_NAMESPACE}_api.h")
+set(EXPORT_MACRO "${BABYLON_UPPER}_SHARED_EXPORT")
+
 
 #-- Libraries --##
 add_subdirectory(imgui_utils)
