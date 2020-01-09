@@ -35,38 +35,8 @@ configure_file(version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/${BABYLON_NAMESP
 set(INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include/${BABYLON_NAMESPACE}")
 set(SOURCE_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
-# Header files
-file(GLOB PROCEDURALS_HDR_FILES ${INCLUDE_PATH}/proceduraltextureslibrary/brick/*.h
-                                ${INCLUDE_PATH}/proceduraltextureslibrary/cloud/*.h
-                                ${INCLUDE_PATH}/proceduraltextureslibrary/fire/*.h
-                                ${INCLUDE_PATH}/proceduraltextureslibrary/grass/*.h
-                                ${INCLUDE_PATH}/proceduraltextureslibrary/marble/*.h
-                                ${INCLUDE_PATH}/proceduraltextureslibrary/normalmap/*.h
-                                ${INCLUDE_PATH}/proceduraltextureslibrary/perlinnoise/*.h
-                                ${INCLUDE_PATH}/proceduraltextureslibrary/road/*.h
-                                ${INCLUDE_PATH}/proceduraltextureslibrary/starfield/*.h
-                                ${INCLUDE_PATH}/proceduraltextureslibrary/wood/*.h)
-
-set(BABYLON_PROCEDURALS_HEADERS
-    ${PROCEDURALS_HDR_FILES}
-)
-
-# Source files
-file(GLOB PROCEDURALS_SRC_FILES ${SOURCE_PATH}/proceduraltextureslibrary/brick/*.cpp
-                                ${SOURCE_PATH}/proceduraltextureslibrary/cloud/*.cpp
-                                ${SOURCE_PATH}/proceduraltextureslibrary/fire/*.cpp
-                                ${SOURCE_PATH}/proceduraltextureslibrary/grass/*.cpp
-                                ${SOURCE_PATH}/proceduraltextureslibrary/marble/*.cpp
-                                ${SOURCE_PATH}/proceduraltextureslibrary/normalmap/*.cpp
-                                ${SOURCE_PATH}/proceduraltextureslibrary/perlinnoise/*.cpp
-                                ${SOURCE_PATH}/proceduraltextureslibrary/road/*.cpp
-                                ${SOURCE_PATH}/proceduraltextureslibrary/starfield/*.cpp
-                                ${SOURCE_PATH}/proceduraltextureslibrary/wood/*.cpp)
-
-set(BABYLON_PROCEDURALS_SOURCES
-    ${PROCEDURALS_SRC_FILES}
-)
-
+file(GLOB_RECURSE BABYLON_PROCEDURALS_HEADERS ${INCLUDE_PATH}/*.h)
+file(GLOB_RECURSE BABYLON_PROCEDURALS_SOURCES ${SOURCE_PATH}/proceduraltextureslibrary/*.cpp)
 source_group_by_path_all(${CMAKE_CURRENT_SOURCE_DIR} ${BABYLON_PROCEDURALS_HEADERS} ${BABYLON_PROCEDURALS_SOURCES})
 
 
