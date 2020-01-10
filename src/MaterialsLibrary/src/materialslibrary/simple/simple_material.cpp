@@ -193,10 +193,10 @@ bool SimpleMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     const std::string shaderName{"simple"};
     auto join = defines.toString();
     const std::vector<std::string> uniforms{
-      "world",       "view",          "viewProjection", "vEyePosition",
-      "vLightsType", "vDiffuseColor", "vFogInfos",      "vFogColor",
-      "pointSize",   "vDiffuseInfos", "mBones",         "vClipPlane",
-      "vClipPlane2", "vClipPlane3",   "vClipPlane4",    "diffuseMatrix"};
+      "world",         "view",        "viewProjection", "vEyePosition", "vLightsType",
+      "vDiffuseColor", "vFogInfos",   "vFogColor",      "pointSize",    "vDiffuseInfos",
+      "mBones",        "vClipPlane",  "vClipPlane2",    "vClipPlane3",  "vClipPlane4",
+      "vClipPlane5",   "vClipPlane6", "diffuseMatrix"};
     const std::vector<std::string> samplers{"diffuseSampler"};
     const std::vector<std::string> uniformBuffers{};
 
