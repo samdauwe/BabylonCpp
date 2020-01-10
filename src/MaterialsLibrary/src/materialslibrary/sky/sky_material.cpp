@@ -111,10 +111,10 @@ bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bo
     const std::string shaderName{"sky"};
     auto join = defines.toString();
     const std::vector<std::string> uniforms{
-      "world",       "viewProjection", "view",        "vFogInfos",      "vFogColor",
-      "pointSize",   "vClipPlane",     "vClipPlane2", "vClipPlane3",    "vClipPlane4",
-      "luminance",   "turbidity",      "rayleigh",    "mieCoefficient", "mieDirectionalG",
-      "sunPosition", "cameraPosition", "cameraOffset"};
+      "world",          "viewProjection",  "view",        "vFogInfos",      "vFogColor",
+      "pointSize",      "vClipPlane",      "vClipPlane2", "vClipPlane3",    "vClipPlane4",
+      "vClipPlane5",    "vClipPlane6",     "luminance",   "turbidity",      "rayleigh",
+      "mieCoefficient", "mieDirectionalG", "sunPosition", "cameraPosition", "cameraOffset"};
     const std::vector<std::string> samplers{};
     const std::vector<std::string> uniformBuffers{};
 
