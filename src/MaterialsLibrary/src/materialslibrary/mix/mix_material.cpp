@@ -360,8 +360,9 @@ bool MixMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bo
       "world",         "view",           "viewProjection", "vEyePosition",  "vLightsType",
       "vDiffuseColor", "vSpecularColor", "vFogInfos",      "vFogColor",     "pointSize",
       "vTextureInfos", "mBones",         "vClipPlane",     "vClipPlane2",   "vClipPlane3",
-      "vClipPlane4",   "textureMatrix",  "diffuse1Infos",  "diffuse2Infos", "diffuse3Infos",
-      "diffuse4Infos", "diffuse5Infos",  "diffuse6Infos",  "diffuse7Infos", "diffuse8Infos"};
+      "vClipPlane4",   "vClipPlane5",    "vClipPlane6",    "textureMatrix", "diffuse1Infos",
+      "diffuse2Infos", "diffuse3Infos",  "diffuse4Infos",  "diffuse5Infos", "diffuse6Infos",
+      "diffuse7Infos", "diffuse8Infos"};
 
     const std::vector<std::string> samplers{"mixMap1Sampler",  "mixMap2Sampler",  "diffuse1Sampler",
                                             "diffuse2Sampler", "diffuse3Sampler", "diffuse4Sampler",
