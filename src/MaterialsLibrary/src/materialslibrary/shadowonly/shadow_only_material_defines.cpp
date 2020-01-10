@@ -10,6 +10,8 @@ ShadowOnlyMaterialDefines::ShadowOnlyMaterialDefines()
     {"CLIPPLANE2", false}, //
     {"CLIPPLANE3", false}, //
     {"CLIPPLANE4", false}, //
+    {"CLIPPLANE5", false}, //
+    {"CLIPPLANE6", false}, //
     {"POINTSIZE", false},  //
     {"FOG", false},        //
     {"NORMAL", false},     //

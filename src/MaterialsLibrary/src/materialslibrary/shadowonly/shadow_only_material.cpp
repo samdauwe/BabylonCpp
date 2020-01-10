@@ -147,11 +147,11 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subM
     const std::string shaderName{"shadowOnly"};
     auto join = defines.toString();
     IEffectCreationOptions options;
-    options.attributes = std::move(attribs);
-    options.uniformsNames
-      = {"world",     "view",       "viewProjection", "vEyePosition", "vLightsType",
-         "vFogInfos", "vFogColor",  "pointSize",      "alpha",        "shadowColor",
-         "mBones",    "vClipPlane", "vClipPlane2",    "vClipPlane3",  "vClipPlane4"};
+    options.attributes    = std::move(attribs);
+    options.uniformsNames = {
+      "world",       "view",        "viewProjection", "vEyePosition", "vLightsType", "vFogInfos",
+      "vFogColor",   "pointSize",   "alpha",          "shadowColor",  "mBones",      "vClipPlane",
+      "vClipPlane2", "vClipPlane3", "vClipPlane4",    "vClipPlane5",  "vClipPlane6"};
     options.uniformBuffersNames   = {};
     options.samplers              = {};
     options.defines               = std::move(join);
