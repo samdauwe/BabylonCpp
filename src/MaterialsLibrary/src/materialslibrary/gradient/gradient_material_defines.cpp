@@ -11,6 +11,8 @@ GradientMaterialDefines::GradientMaterialDefines()
     {"CLIPPLANE2", false},   //
     {"CLIPPLANE3", false},   //
     {"CLIPPLANE4", false},   //
+    {"CLIPPLANE5", false},   //
+    {"CLIPPLANE6", false},   //
     {"ALPHATEST", false},    //
     {"DEPTHPREPASS", false}, //
     {"POINTSIZE", false},    //

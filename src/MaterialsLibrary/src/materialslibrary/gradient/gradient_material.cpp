@@ -168,9 +168,10 @@ bool GradientMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMes
     const std::string shaderName{"gradient"};
     auto join = defines.toString();
     const std::vector<std::string> uniforms{
-      "world",       "view",      "viewProjection", "vEyePosition", "vLightsType", "vFogInfos",
-      "vFogColor",   "pointSize", "mBones",         "vClipPlane",   "vClipPlane2", "vClipPlane3",
-      "vClipPlane4", "topColor",  "bottomColor",    "offset",       "smoothness",  "scale"};
+      "world",       "view",        "viewProjection", "vEyePosition", "vLightsType",
+      "vFogInfos",   "vFogColor",   "pointSize",      "mBones",       "vClipPlane",
+      "vClipPlane2", "vClipPlane3", "vClipPlane4",    "vClipPlane5",  "vClipPlane6",
+      "topColor",    "bottomColor", "offset",         "smoothness",   "scale"};
     const std::vector<std::string> samplers{"diffuseSampler"};
     const std::vector<std::string> uniformBuffers{};
 
