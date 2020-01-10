@@ -266,11 +266,12 @@ bool FurMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bo
     const std::string shaderName{"fur"};
     auto join = defines.toString();
     const std::vector<std::string> uniforms{
-      "world",         "view",       "viewProjection", "vEyePosition", "vLightsType",
-      "vDiffuseColor", "vFogInfos",  "vFogColor",      "pointSize",    "vDiffuseInfos",
-      "mBones",        "vClipPlane", "vClipPlane2",    "vClipPlane3",  "vClipPlane4",
-      "diffuseMatrix", "furLength",  "furAngle",       "furColor",     "furOffset",
-      "furGravity",    "furTime",    "furSpacing",     "furDensity",   "furOcclusion"};
+      "world",         "view",        "viewProjection", "vEyePosition", "vLightsType",
+      "vDiffuseColor", "vFogInfos",   "vFogColor",      "pointSize",    "vDiffuseInfos",
+      "mBones",        "vClipPlane",  "vClipPlane2",    "vClipPlane3",  "vClipPlane4",
+      "vClipPlane5",   "vClipPlane6", "diffuseMatrix",  "furLength",    "furAngle",
+      "furColor",      "furOffset",   "furGravity",     "furTime",      "furSpacing",
+      "furDensity",    "furOcclusion"};
     const std::vector<std::string> samplers{"diffuseSampler", "heightTexture", "furTexture"};
     const std::vector<std::string> uniformBuffers{};
 
