@@ -187,12 +187,13 @@ bool FireMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, b
     const std::string shaderName{"fire"};
     auto join = defines.toString();
     IEffectCreationOptions options;
-    options.attributes            = std::move(attribs);
-    options.uniformsNames         = {"world", "view", "viewProjection", "vEyePosition", "vFogInfos",
-                             "vFogColor", "pointSize", "vDiffuseInfos", "mBones", "vClipPlane",
-                             "vClipPlane2", "vClipPlane3", "vClipPlane4", "diffuseMatrix",
-                             // Fire
-                             "time", "speed"};
+    options.attributes = std::move(attribs);
+    options.uniformsNames
+      = {"world", "view", "viewProjection", "vEyePosition", "vFogInfos", "vFogColor", "pointSize",
+         "vDiffuseInfos", "mBones", "vClipPlane", "vClipPlane2", "vClipPlane3", "vClipPlane4",
+         "vClipPlane5", "vClipPlane6", "diffuseMatrix",
+         // Fire
+         "time", "speed"};
     options.samplers              = {"diffuseSampler",
                         // Fire
                         "distortionSampler", "opacitySampler"};
