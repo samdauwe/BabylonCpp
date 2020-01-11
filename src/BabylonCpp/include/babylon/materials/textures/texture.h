@@ -29,6 +29,19 @@ class BABYLON_SHARED_EXPORT Texture : public BaseTexture {
 
 public:
   /**
+   * Gets or sets a general boolean used to indicate that textures containing direct data (buffers)
+   * must be saved as part of the serialization process
+   */
+  static bool SerializeBuffers;
+
+  /**
+   * @brief Hidden
+   */
+  static MirrorTexturePtr _CreateMirror(const std::string& name,
+                                        const std::variant<ISize, float>& renderTargetSize,
+                                        Scene* scene, bool generateMipMaps);
+
+  /**
    * Gets or sets a boolean which defines if the texture url must be build from the serialized URL
    * instead of just using the name and loading them side by side with the scene file
    */
@@ -168,33 +181,27 @@ public:
     = nullptr,
     unsigned int format = Constants::TEXTUREFORMAT_RGBA);
 
-  /**
-   * @brief Hidden
-   */
-  static MirrorTexturePtr _CreateMirror(const std::string& name,
-                                        const std::variant<ISize, float>& renderTargetSize,
-                                        Scene* scene, bool generateMipMaps);
-
 protected:
   /**
    * @brief Instantiates a new texture.
    * This represents a texture in babylon. It can be easily loaded from a network, base64 or html
    * input.
    * @see http://doc.babylonjs.com/babylon101/materials#texture
-   * @param url define the url of the picture to load as a texture
-   * @param scene define the scene or engine the texture will belong to
-   * @param noMipmap define if the texture will require mip maps or not
-   * @param invertY define if the texture needs to be inverted on the y axis during loading
-   * @param samplingMode define the sampling mode we want for the texture while fectching from it
+   * @param url defines the url of the picture to load as a texture
+   * @param scene defines the scene or engine the texture will belong to
+   * @param noMipmap defines if the texture will require mip maps or not
+   * @param invertY defines if the texture needs to be inverted on the y axis during loading
+   * @param samplingMode defines the sampling mode we want for the texture while fectching from it
    * (Texture.NEAREST_SAMPLINGMODE...)
-   * @param onLoad define a callback triggered when the texture has been loaded
-   * @param onError define a callback triggered when an error occurred during the loading session
-   * @param buffer define the buffer to load the texture from in case the texture is loaded from a
+   * @param onLoad defines a callback triggered when the texture has been loaded
+   * @param onError defines a callback triggered when an error occurred during the loading session
+   * @param buffer defines the buffer to load the texture from in case the texture is loaded from a
    * buffer representation
-   * @param deleteBuffer define if the buffer we are loading the texture from should be deleted
+   * @param deleteBuffer defines if the buffer we are loading the texture from should be deleted
    * after load
-   * @param format define the format of the texture we are trying to load
+   * @param format defines the format of the texture we are trying to load
    * (Engine.TEXTUREFORMAT_RGBA...)
+   * @param mimeType defines an optional mime type information
    */
   Texture(
     const std::string& url, Scene* scene, bool noMipmap = false, bool invertY = true,
@@ -204,7 +211,8 @@ protected:
     = nullptr,
     const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer
     = std::nullopt,
-    bool deleteBuffer = false, const std::optional<unsigned int>& format = std::nullopt);
+    bool deleteBuffer = false, const std::optional<unsigned int>& format = std::nullopt,
+    const std::string& mimeType = "");
 
   bool get_noMipmap() const override;
 
@@ -354,6 +362,7 @@ private:
   bool _deleteBuffer;
   std::function<void(InternalTexture*, EventState&)> _delayedOnLoad;
   std::function<void(const std::string& message, const std::string& exception)> _delayedOnError;
+  std::string _mimeType;
 
   std::function<void()> _onLoad;
   std::function<void(InternalTexture*, EventState&)> _load;

@@ -2,6 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/json_util.h>
+#include <babylon/core/string.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/material.h>
@@ -14,6 +15,7 @@
 
 namespace BABYLON {
 
+bool Texture::SerializeBuffers      = true;
 bool Texture::UseSerializedUrlIfAny = false;
 
 Texture::Texture(
@@ -21,7 +23,7 @@ Texture::Texture(
   const std::function<void()>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
   const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer,
-  bool deleteBuffer, const std::optional<unsigned int>& format)
+  bool deleteBuffer, const std::optional<unsigned int>& format, const std::string& mimeType)
     : BaseTexture{scene}
     , uOffset{0.f}
     , vOffset{0.f}
@@ -64,6 +66,7 @@ Texture::Texture(
   _initialSamplingMode = samplingMode;
   _buffer              = buffer;
   _deleteBuffer        = deleteBuffer;
+  _mimeType            = mimeType;
   if (format) {
     _format = format;
   }
@@ -122,7 +125,7 @@ Texture::Texture(
   if (!_texture) {
     if (!scene || !scene->useDelayedTextureLoading) {
       _texture = engine->createTexture(url, noMipmap, invertY, scene, samplingMode, _load, onError,
-                                       _buffer, nullptr, _format);
+                                       _buffer, nullptr, _format, "", {}, mimeType);
       if (deleteBuffer) {
         _buffer = std::nullopt;
       }
@@ -198,7 +201,9 @@ void Texture::updateURL(
     getScene()->markAllMaterialsAsDirty(Constants::MATERIAL_TextureDirtyFlag);
   }
 
-  name           = iUrl;
+  if (name.empty() || String::startsWith(name, "data:")) {
+    name = iUrl;
+  }
   url            = iUrl;
   _buffer        = buffer;
   delayLoadState = Constants::DELAYLOADSTATE_NOTLOADED;
@@ -227,7 +232,7 @@ void Texture::delayLoad(const std::string& /*forcedExtension*/)
   if (!_texture) {
     _texture = scene->getEngine()->createTexture(url, _noMipmap, _invertY, getScene(), samplingMode,
                                                  _delayedOnLoad, _delayedOnError, _buffer, nullptr,
-                                                 _format);
+                                                 _format, "", {}, _mimeType);
     if (_deleteBuffer) {
       // delete _buffer;
     }
@@ -252,25 +257,25 @@ void Texture::delayLoad(const std::string& /*forcedExtension*/)
 
 void Texture::_prepareRowForTextureGeneration(float x, float y, float z, Vector3& t)
 {
-  x *= uScale;
-  y *= vScale;
+  x *= _cachedUScale;
+  y *= _cachedVScale;
 
-  x -= uRotationCenter * uScale;
-  y -= vRotationCenter * vScale;
+  x -= uRotationCenter * _cachedUScale;
+  y -= vRotationCenter * _cachedVScale;
   z -= wRotationCenter;
 
   Vector3::TransformCoordinatesFromFloatsToRef(x, y, z, *_rowGenerationMatrix, t);
 
-  t.x += uRotationCenter * uScale + uOffset;
-  t.y += vRotationCenter * vScale + vOffset;
+  t.x += uRotationCenter * _cachedUScale + _cachedUOffset;
+  t.y += vRotationCenter * _cachedVScale + _cachedVOffset;
   t.z += wRotationCenter;
 }
 
-Matrix* Texture::getTextureMatrix(int /*uBase*/)
+Matrix* Texture::getTextureMatrix(int uBase)
 {
   if (stl_util::almost_equal(uOffset, _cachedUOffset)
       && stl_util::almost_equal(vOffset, _cachedVOffset)
-      && stl_util::almost_equal(uScale, _cachedUScale)
+      && stl_util::almost_equal(uScale * uBase, _cachedUScale)
       && stl_util::almost_equal(vScale, _cachedVScale) && stl_util::almost_equal(uAng, _cachedUAng)
       && stl_util::almost_equal(vAng, _cachedVAng) && stl_util::almost_equal(wAng, _cachedWAng)) {
     return _cachedTextureMatrix.get();
@@ -278,7 +283,7 @@ Matrix* Texture::getTextureMatrix(int /*uBase*/)
 
   _cachedUOffset = uOffset;
   _cachedVOffset = vOffset;
-  _cachedUScale  = uScale;
+  _cachedUScale  = uScale * uBase;
   _cachedVScale  = vScale;
   _cachedUAng    = uAng;
   _cachedVAng    = vAng;
@@ -494,7 +499,8 @@ BaseTexturePtr Texture::Parse(const json& parsedTexture, Scene* scene, const std
         if (json_util::has_valid_key_value(parsedTexture, "base64String")) {
           texture = Texture::CreateFromBase64String(
             json_util::get_string(parsedTexture, "base64String"),
-            json_util::get_string(parsedTexture, "name"), scene, !generateMipMaps);
+            json_util::get_string(parsedTexture, "name"), scene, !generateMipMaps,
+            json_util::get_bool(parsedTexture, "invertY", true));
         }
         else {
           auto url2 = rootUrl + json_util::get_string(parsedTexture, "name");
@@ -511,6 +517,13 @@ BaseTexturePtr Texture::Parse(const json& parsedTexture, Scene* scene, const std
       }
     },
     parsedTexture, scene);
+
+  // Clear cache
+  if (texture && texture->_texture) {
+    texture->_texture->_cachedWrapU = -1;
+    texture->_texture->_cachedWrapV = -1;
+    texture->_texture->_cachedWrapR = -1;
+  }
 
   // Update Sampling Mode
   if (json_util::has_valid_key_value(parsedTexture, "samplingMode")) {
