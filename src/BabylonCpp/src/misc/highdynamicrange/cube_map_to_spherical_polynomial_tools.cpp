@@ -45,7 +45,7 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapTextureToSphericalPolynomial(Ba
   auto front = texture.readPixels(4);
   auto back  = texture.readPixels(5);
 
-  auto gammaSpace = texture.gammaSpace;
+  auto gammaSpace = texture.gammaSpace();
   // Always read as RGBA.
   auto format = Constants::TEXTUREFORMAT_RGBA;
   auto type   = Constants::TEXTURETYPE_UNSIGNED_INT;

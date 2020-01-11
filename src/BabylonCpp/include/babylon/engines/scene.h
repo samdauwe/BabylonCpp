@@ -2660,6 +2660,11 @@ public:
   std::string defaultCursor;
 
   /**
+   * Defines wether cursors are handled by the scene.
+   */
+  bool doNotHandleCursors;
+
+  /**
    * This is used to call preventDefault() on pointer down
    * in order to block unwanted artifacts like system double clicks
    */

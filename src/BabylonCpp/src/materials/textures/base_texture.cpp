@@ -28,7 +28,7 @@ BaseTexture::BaseTexture(Scene* scene)
     , isCube{this, &BaseTexture::get_isCube, &BaseTexture::set_isCube}
     , is3D{this, &BaseTexture::get_is3D, &BaseTexture::set_is3D}
     , is2DArray{this, &BaseTexture::get_is2DArray, &BaseTexture::set_is2DArray}
-    , gammaSpace{true}
+    , gammaSpace{this, &BaseTexture::get_gammaSpace, &BaseTexture::set_gammaSpace}
     , isRGBD{this, &BaseTexture::get_isRGBD, &BaseTexture::set_isRGBD}
     , invertZ{false}
     , noMipmap{this, &BaseTexture::get_noMipmap}
@@ -57,6 +57,7 @@ BaseTexture::BaseTexture(Scene* scene)
     , _lodTextureLow{this, &BaseTexture::get__lodTextureLow}
     , _hasAlpha{false}
     , _coordinatesMode{Constants::TEXTURE_EXPLICIT_MODE}
+    , _gammaSpace{true}
     , _scene{scene ? scene : Engine::LastCreatedScene()}
     , _uid{GUID::RandomId()}
     , _onDisposeObserver{nullptr}
@@ -169,6 +170,21 @@ void BaseTexture::set_is2DArray(bool value)
   }
 
   _texture->is2DArray = value;
+}
+
+bool BaseTexture::get_gammaSpace() const
+{
+  return _gammaSpace;
+}
+
+void BaseTexture::set_gammaSpace(bool value)
+{
+  if (_gammaSpace == value) {
+    return;
+  }
+
+  _gammaSpace = value;
+  _markAllSubMeshesAsTexturesDirty();
 }
 
 bool BaseTexture::get_noMipmap() const
@@ -445,6 +461,17 @@ unsigned int BaseTexture::get_textureFormat() const
   }
 
   return _texture->format ? _texture->format : Constants::TEXTUREFORMAT_RGBA;
+}
+
+void BaseTexture::_markAllSubMeshesAsTexturesDirty()
+{
+  auto scene = getScene();
+
+  if (!scene) {
+    return;
+  }
+
+  scene->markAllMaterialsAsDirty(Constants::MATERIAL_TextureDirtyFlag);
 }
 
 ArrayBufferView BaseTexture::readPixels(unsigned int faceIndex, int iLevel,

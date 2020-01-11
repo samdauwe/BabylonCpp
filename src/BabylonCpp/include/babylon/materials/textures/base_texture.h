@@ -227,6 +227,8 @@ protected:
   void set_is3D(bool value);
   bool get_is2DArray() const;
   void set_is2DArray(bool value);
+  bool get_gammaSpace() const;
+  void set_gammaSpace(bool value);
   virtual bool get_noMipmap() const;
 
   /**
@@ -260,6 +262,11 @@ protected:
   BaseTexturePtr& get__lodTextureHigh();
   BaseTexturePtr& get__lodTextureMid();
   BaseTexturePtr& get__lodTextureLow();
+
+  /**
+   * @brief Indicates that textures need to be re-calculated for all materials.
+   */
+  void _markAllSubMeshesAsTexturesDirty();
 
 public:
   /**
@@ -368,7 +375,7 @@ public:
    * Define if the texture contains data in gamma space (most of the png/jpg aside bump). HDR
    * texture are usually stored in linear space. This only impacts the PBR and Background materials
    */
-  bool gammaSpace;
+  Property<BaseTexture, bool> gammaSpace;
 
   /**
    * Gets or sets whether or not the texture contains RGBD data.
@@ -489,6 +496,7 @@ public:
 private:
   bool _hasAlpha;
   unsigned int _coordinatesMode;
+  bool _gammaSpace;
   Scene* _scene;
   std::string _uid;
   Observer<BaseTexture>::Ptr _onDisposeObserver;

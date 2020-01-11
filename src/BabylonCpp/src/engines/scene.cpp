@@ -127,6 +127,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , constantlyUpdateMeshUnderPointer{false}
     , hoverCursor{"pointer"}
     , defaultCursor{""}
+    , doNotHandleCursors{false}
     , preventDefaultOnPointerDown{true}
     , preventDefaultOnPointerUp{true}
     , gamepadManager{this, &Scene::get_gamepadManager}

@@ -444,7 +444,7 @@ std::string TextureBlock::_dumpPropertiesCode()
   codeString
     += String::printf("%s.texture.vScale = %f;\r\n", _codeVariableName.c_str(), texture->vScale);
   codeString += String::printf("%s.texture.gammaSpace = %d;\r\n", _codeVariableName.c_str(),
-                               texture->gammaSpace);
+                               texture->gammaSpace());
 
   return codeString;
 }
