@@ -57,6 +57,8 @@ void _ENVTextureLoader::loadCubeData(
     EnvironmentTextureTools::UploadEnvLevels(texture, data, *info);
     {
       texture->isReady = true;
+      texture->onLoadedObservable.notifyObservers(texture.get());
+      texture->onLoadedObservable.clear();
       if (onLoad) {
         onLoad(std::nullopt);
       }

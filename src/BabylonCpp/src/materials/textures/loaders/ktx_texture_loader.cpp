@@ -38,8 +38,7 @@ std::string _KTXTextureLoader::transformUrl(const std::string& rootUrl,
 std::string _KTXTextureLoader::getFallbackTextureUrl(const std::string& rootUrl,
                                                      const std::string& textureFormatInUse)
 {
-  // remove the format appended to the rootUrl in the original createCubeTexture
-  // call.
+  // remove the format appended to the rootUrl in the original createCubeTexture call.
   const std::regex regex(textureFormatInUse, std::regex::optimize);
   return String::regexReplace(rootUrl, regex, [](const std::smatch& /*m*/) { return ""; });
 }
@@ -47,7 +46,7 @@ std::string _KTXTextureLoader::getFallbackTextureUrl(const std::string& rootUrl,
 void _KTXTextureLoader::loadCubeData(
   const std::variant<std::string, ArrayBuffer>& iData, const InternalTexturePtr& texture,
   bool /*createPolynomials*/,
-  const std::function<void(const std::optional<CubeTextureData>& data)>& /*onLoad*/,
+  const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& /*onError*/)
 {
   if (!std::holds_alternative<ArrayBuffer>(iData)) {
@@ -55,8 +54,7 @@ void _KTXTextureLoader::loadCubeData(
   }
   auto data = std::get<ArrayBuffer>(iData);
 
-  // Need to invert vScale as invertY via UNPACK_FLIP_Y_WEBGL is not supported
-  // by compressed texture
+  // Need to invert vScale as invertY via UNPACK_FLIP_Y_WEBGL is not supported by compressed texture
   texture->_invertVScale = !texture->invertY;
   auto engine            = texture->getEngine();
   KhronosTextureContainer ktx(data, 6);
@@ -72,6 +70,12 @@ void _KTXTextureLoader::loadCubeData(
 
   engine->_setCubeMapTextureParams(loadMipmap);
   texture->isReady = true;
+  texture->onLoadedObservable.notifyObservers(texture.get());
+  texture->onLoadedObservable.clear();
+
+  if (onLoad) {
+    onLoad(std::nullopt);
+  }
 }
 
 void _KTXTextureLoader::loadCubeData(
@@ -87,14 +91,13 @@ void _KTXTextureLoader::loadData(
   const std::function<void(int width, int height, bool loadMipmap, bool isCompressed,
                            const std::function<void()>& done, bool loadFailed)>& callback)
 {
-  // Need to invert vScale as invertY via UNPACK_FLIP_Y_WEBGL is not supported
-  // by compressed texture
+  // Need to invert vScale as invertY via UNPACK_FLIP_Y_WEBGL is not supported by compressed texture
   texture->_invertVScale = !texture->invertY;
   KhronosTextureContainer ktx(data, 1);
 
   callback(
-    static_cast<int>(ktx.pixelWidth), static_cast<int>(ktx.pixelHeight), false, true,
-    [&ktx, &texture]() -> void { ktx.uploadLevels(texture, texture->generateMipMaps); },
+    static_cast<int>(ktx.pixelWidth), static_cast<int>(ktx.pixelHeight), texture->generateMipMaps,
+    true, [&ktx, &texture]() -> void { ktx.uploadLevels(texture, texture->generateMipMaps); },
     ktx.isInvalid);
 }
 

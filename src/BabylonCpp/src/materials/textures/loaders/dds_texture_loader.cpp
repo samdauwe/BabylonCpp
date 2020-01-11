@@ -87,7 +87,10 @@ void _DDSTextureLoader::loadCubeData(
   const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& /*onError*/)
 {
-  auto engine = texture->getEngine();
+  auto engine = static_cast<Engine*>(texture->getEngine());
+  if (!engine) {
+    return;
+  }
   DDSInfo info;
   bool loadMipmap = false;
   for (const auto& img : imgs) {
@@ -108,15 +111,15 @@ void _DDSTextureLoader::loadCubeData(
     DDSTools::UploadDDSLevels(engine, texture, data, info, loadMipmap, 6);
 
     if (!info.isFourCC && info.mipmapCount == 1) {
-      auto _engine = static_cast<Engine*>(engine);
-      if (_engine) {
-        _engine->generateMipMapsForCubemap(texture);
-      }
+      // Do not unbind as we still need to set the parameters.
+      engine->generateMipMapsForCubemap(texture, false);
     }
   }
 
   engine->_setCubeMapTextureParams(loadMipmap);
   texture->isReady = true;
+  texture->onLoadedObservable.notifyObservers(texture.get());
+  texture->onLoadedObservable.clear();
 
   if (onLoad) {
     onLoad(CubeTextureData{

@@ -22,8 +22,7 @@ struct BABYLON_SHARED_EXPORT _DDSTextureLoader : public IInternalTextureLoader {
   /**
    * @brief This returns if the loader support the current file information.
    * @param extension defines the file extension of the file being loaded
-   * @param textureFormatInUse defines the current compressed format in use iun
-   * the engine
+   * @param textureFormatInUse defines the current compressed format in use iun the engine
    * @param fallback defines the fallback internal texture if any
    * @param isBase64 defines whether the texture is encoded as a base64
    * @param isBuffer defines whether the texture data are stored as a buffer
@@ -35,27 +34,24 @@ struct BABYLON_SHARED_EXPORT _DDSTextureLoader : public IInternalTextureLoader {
   /**
    * @brief Transform the url before loading if required.
    * @param rootUrl the url of the texture
-   * @param textureFormatInUse defines the current compressed format in use iun
-   * the engine
+   * @param textureFormatInUse defines the current compressed format in use iun the engine
    * @returns the transformed texture
    */
   std::string transformUrl(const std::string& rootUrl,
                            const std::string& textureFormatInUse) override;
 
   /**
-   * @brief Gets the fallback url in case the load fail. This can return null to
-   * allow the default fallback mecanism to work
+   * @brief Gets the fallback url in case the load fail. This can return null to allow the default
+   * fallback mecanism to work
    * @param rootUrl the url of the texture
-   * @param textureFormatInUse defines the current compressed format in use iun
-   * the engine
+   * @param textureFormatInUse defines the current compressed format in use iun the engine
    * @returns the fallback texture
    */
   std::string getFallbackTextureUrl(const std::string& rootUrl,
                                     const std::string& textureFormatInUse) override;
 
   /**
-   * @brief Uploads the cube texture data to the WebGl Texture. It has alreday
-   * been bound.
+   * @brief Uploads the cube texture data to the WebGl Texture. It has alreday been bound.
    * @param data contains the texture data
    * @param texture defines the BabylonJS internal texture
    * @param createPolynomials will be true if polynomials have been requested
@@ -69,9 +65,8 @@ struct BABYLON_SHARED_EXPORT _DDSTextureLoader : public IInternalTextureLoader {
                                              const std::string& exception)>& onError) override;
 
   /**
-   * @brief Uploads the cube texture data to the WebGl Texture. It has alreday
-   * been bound.
-   * @param img contains the texture data
+   * @brief Uploads the cube texture data to the WebGl Texture. It has alreday been bound.
+   * @param data contains the texture data
    * @param texture defines the BabylonJS internal texture
    * @param createPolynomials will be true if polynomials have been requested
    * @param onLoad defines the callback to trigger once the texture is ready
@@ -84,8 +79,8 @@ struct BABYLON_SHARED_EXPORT _DDSTextureLoader : public IInternalTextureLoader {
                                              const std::string& exception)>& onError) override;
 
   /**
-   * @brief Uploads the 2D texture data to the WebGl Texture. It has alreday
-   * been bound once in the callback.
+   * @brief Uploads the 2D texture data to the WebGl Texture. It has already been bound once in the
+   * callback.
    * @param data contains the texture data
    * @param texture defines the BabylonJS internal texture
    * @param callback defines the method to call once ready to upload
