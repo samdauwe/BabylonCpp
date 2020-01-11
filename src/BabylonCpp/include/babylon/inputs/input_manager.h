@@ -30,18 +30,16 @@ public:
    */
   static unsigned int DragMovementThreshold;
   /**
-   * Time in milliseconds to wait to raise long press events if button is still
-   * pressed.
+   * Time in milliseconds to wait to raise long press events if button is still pressed.
    */
   static milliseconds_t LongPressDelay;
   /**
-   * Time in milliseconds with two consecutive clicks will be considered as a
-   * double click.
+   * Time in milliseconds with two consecutive clicks will be considered as a double click.
    */
   static milliseconds_t DoubleClickDelay;
   /**
-   * If you need to check double click without raising a single click at first
-   * click, enable this flag.
+   * If you need to check double click without raising a single click at first click, enable this
+   * flag.
    */
   static bool ExclusiveDoubleClickMode;
 
@@ -57,23 +55,19 @@ public:
 
   /**
    * @brief Use this method to simulate a pointer move on a mesh.
-   * The pickResult parameter can be obtained from a scene.pick or
-   * scene.pickWithRay
-   * @param pickResult pickingInfo of the object wished to simulate pointer
-   * event on
-   * @param pointerEventInit pointer event state to be used when simulating the
-   * pointer event (eg. pointer id for multitouch)
+   * The pickResult parameter can be obtained from a scene.pick or scene.pickWithRay
+   * @param pickResult pickingInfo of the object wished to simulate pointer event on
+   * @param pointerEventInit pointer event state to be used when simulating the pointer event (eg.
+   * pointer id for multitouch)
    */
   void simulatePointerMove(std::optional<PickingInfo>& pickResult);
 
   /**
    * @brief Use this method to simulate a pointer down on a mesh.
-   * The pickResult parameter can be obtained from a scene.pick or
-   * scene.pickWithRay
-   * @param pickResult pickingInfo of the object wished to simulate pointer
-   * event on
-   * @param pointerEventInit pointer event state to be used when simulating the
-   * pointer event (eg. pointer id for multitouch)
+   * The pickResult parameter can be obtained from a scene.pick or scene.pickWithRay
+   * @param pickResult pickingInfo of the object wished to simulate pointer event on
+   * @param pointerEventInit pointer event state to be used when simulating the pointer event (eg.
+   * pointer id for multitouch)
    */
   void simulatePointerDown(std::optional<PickingInfo>& pickResult);
 
@@ -84,29 +78,26 @@ public:
 
   /**
    * @brief Use this method to simulate a pointer up on a mesh.
-   * The pickResult parameter can be obtained from a scene.pick or
-   * scene.pickWithRay
-   * @param pickResult pickingInfo of the object wished to simulate pointer
-   * event on
-   * @param pointerEventInit pointer event state to be used when simulating the
-   * pointer event (eg. pointer id for multitouch)
-   * @param doubleTap indicates that the pointer up event should be considered
-   * as part of a double click (false by default)
+   * The pickResult parameter can be obtained from a scene.pick or scene.pickWithRay
+   * @param pickResult pickingInfo of the object wished to simulate pointer event on
+   * @param pointerEventInit pointer event state to be used when simulating the pointer event (eg.
+   * pointer id for multitouch)
+   * @param doubleTap indicates that the pointer up event should be considered as part of a double
+   * click (false by default)
    */
   void simulatePointerUp(std::optional<PickingInfo>& pickResult, bool doubleTap = false);
 
   /**
    * @brief Gets a boolean indicating if the current pointer event is captured
    * (meaning that the scene has already handled the pointer down).
-   * @param pointerId defines the pointer id to use in a multi-touch scenario (0
-   * by default)
+   * @param pointerId defines the pointer id to use in a multi-touch scenario (0 by default)
    * @returns true if the pointer was captured
    */
   bool isPointerCaptured(int pointerId = 0);
 
   /**
-   * @brief Attach events to the canvas (To handle actionManagers triggers and
-   * raise onPointerMove, onPointerDown and onPointerUp
+   * @brief Attach events to the canvas (To handle actionManagers triggers and raise onPointerMove,
+   * onPointerDown and onPointerUp
    * @param attachUp defines if you want to attach events to pointerup
    * @param attachDown defines if you want to attach events to pointerdown
    * @param attachMove defines if you want to attach events to pointermove

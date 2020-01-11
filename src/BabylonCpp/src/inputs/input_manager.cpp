@@ -15,9 +15,9 @@
 namespace BABYLON {
 
 unsigned int InputManager::DragMovementThreshold = 10;
-milliseconds_t InputManager::LongPressDelay   = std::chrono::milliseconds(500);
-milliseconds_t InputManager::DoubleClickDelay = std::chrono::milliseconds(300);
-bool InputManager::ExclusiveDoubleClickMode   = false;
+milliseconds_t InputManager::LongPressDelay      = std::chrono::milliseconds(500);
+milliseconds_t InputManager::DoubleClickDelay    = std::chrono::milliseconds(300);
+bool InputManager::ExclusiveDoubleClickMode      = false;
 
 InputManager::InputManager(Scene* scene)
     : meshUnderPointer{this, &InputManager::get_meshUnderPointer}
@@ -93,7 +93,7 @@ void InputManager::set_pointerY(int value)
 
 void InputManager::_updatePointerPosition(const PointerEvent& evt)
 {
-  auto canvasRect = _scene->getEngine()->getRenderingCanvasClientRect();
+  auto canvasRect = _scene->getEngine()->getInputElementClientRect();
 
   if (!canvasRect) {
     return;
@@ -110,7 +110,7 @@ void InputManager::_processPointerMove(std::optional<PickingInfo>& pickResult,
                                        const PointerEvent& evt)
 {
   auto& scene = *_scene;
-  auto canvas = scene.getEngine()->getRenderingCanvas();
+  auto canvas = scene.getEngine()->getInputElement();
 
   if (!canvas) {
     return;
@@ -119,7 +119,9 @@ void InputManager::_processPointerMove(std::optional<PickingInfo>& pickResult,
   canvas->tabIndex = 1;
 
   // Restore pointer
-  canvas->style.cursor = scene.defaultCursor;
+  if (!scene.doNotHandleCursors) {
+    canvas->style.cursor = scene.defaultCursor;
+  }
 
   auto isMeshPicked = pickResult && pickResult->hit && pickResult->pickedMesh;
   if (isMeshPicked) {
@@ -127,11 +129,13 @@ void InputManager::_processPointerMove(std::optional<PickingInfo>& pickResult,
 
     if (_pointerOverMesh && _pointerOverMesh->actionManager
         && _pointerOverMesh->actionManager->hasPointerTriggers()) {
-      if (!_pointerOverMesh->actionManager->hoverCursor.empty()) {
-        canvas->style.cursor = _pointerOverMesh->actionManager->hoverCursor;
-      }
-      else {
-        canvas->style.cursor = scene.hoverCursor;
+      if (!scene.doNotHandleCursors) {
+        if (!_pointerOverMesh->actionManager->hoverCursor.empty()) {
+          canvas->style.cursor = _pointerOverMesh->actionManager->hoverCursor;
+        }
+        else {
+          canvas->style.cursor = scene.hoverCursor;
+        }
       }
     }
   }
@@ -140,23 +144,22 @@ void InputManager::_processPointerMove(std::optional<PickingInfo>& pickResult,
   }
 
   for (const auto& step : scene._pointerMoveStage) {
-    pickResult = step.action(_unTranslatedPointerX, _unTranslatedPointerY,
-                             pickResult, isMeshPicked, canvas);
+    pickResult
+      = step.action(_unTranslatedPointerX, _unTranslatedPointerY, pickResult, isMeshPicked, canvas);
   }
 
   if (pickResult) {
-    const auto type = (evt.type == EventType::MOUSE_WHEEL
-                       || evt.type == EventType::DOM_MOUSE_SCROLL) ?
-                        PointerEventTypes::POINTERWHEEL :
-                        PointerEventTypes::POINTERMOVE;
+    const auto type
+      = (evt.type == EventType::MOUSE_WHEEL || evt.type == EventType::DOM_MOUSE_SCROLL) ?
+          PointerEventTypes::POINTERWHEEL :
+          PointerEventTypes::POINTERMOVE;
 
     if (scene.onPointerMove) {
       scene.onPointerMove(evt, pickResult, type);
     }
 
     if (scene.onPointerObservable.hasObservers()) {
-      PointerInfo pi(type, *static_cast<MouseWheelEvent const*>(&evt),
-                     *pickResult);
+      PointerInfo pi(type, *static_cast<MouseWheelEvent const*>(&evt), *pickResult);
       _setRayOnPointerInfo(pi);
       scene.onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
     }
@@ -170,23 +173,21 @@ void InputManager::_setRayOnPointerInfo(PointerInfo& pointerInfo)
     if (!pointerInfo.pickInfo.ray.has_value()) {
       auto identityMatrix = Matrix::Identity();
       if (pointerInfo.type == PointerEventTypes::POINTERWHEEL) {
-        pointerInfo.pickInfo.ray
-          = scene.createPickingRay(pointerInfo.mouseWheelEvent.offsetX,
-                                   pointerInfo.mouseWheelEvent.offsetY,
-                                   identityMatrix, scene.activeCamera);
+        pointerInfo.pickInfo.ray = scene.createPickingRay(pointerInfo.mouseWheelEvent.offsetX,
+                                                          pointerInfo.mouseWheelEvent.offsetY,
+                                                          identityMatrix, scene.activeCamera);
       }
       else if (pointerInfo.type == PointerEventTypes::POINTERMOVE) {
-        pointerInfo.pickInfo.ray = scene.createPickingRay(
-          pointerInfo.pointerEvent.offsetX, pointerInfo.pointerEvent.offsetY,
-          identityMatrix, scene.activeCamera);
+        pointerInfo.pickInfo.ray = scene.createPickingRay(pointerInfo.pointerEvent.offsetX,
+                                                          pointerInfo.pointerEvent.offsetY,
+                                                          identityMatrix, scene.activeCamera);
       }
     }
   }
 }
 
-bool InputManager::_checkPrePointerObservable(
-  const std::optional<PickingInfo>& pickResult, const PointerEvent& evt,
-  PointerEventTypes type)
+bool InputManager::_checkPrePointerObservable(const std::optional<PickingInfo>& pickResult,
+                                              const PointerEvent& evt, PointerEventTypes type)
 {
   auto& scene = *_scene;
   PointerInfoPre pi(type, evt, static_cast<float>(_unTranslatedPointerX),
@@ -202,8 +203,7 @@ void InputManager::simulatePointerMove(std::optional<PickingInfo>& pickResult)
 {
   PointerEvent evt("pointermove");
 
-  if (_checkPrePointerObservable(pickResult, evt,
-                                 PointerEventTypes::POINTERMOVE)) {
+  if (_checkPrePointerObservable(pickResult, evt, PointerEventTypes::POINTERMOVE)) {
     return;
   }
   _processPointerMove(pickResult, evt);
@@ -213,8 +213,7 @@ void InputManager::simulatePointerDown(std::optional<PickingInfo>& pickResult)
 {
   PointerEvent evt("pointerdown");
 
-  if (_checkPrePointerObservable(pickResult, evt,
-                                 PointerEventTypes::POINTERDOWN)) {
+  if (_checkPrePointerObservable(pickResult, evt, PointerEventTypes::POINTERDOWN)) {
     return;
   }
 
@@ -230,32 +229,27 @@ void InputManager::_processPointerDown(std::optional<PickingInfo>& pickResult,
     auto iActionManager = _pickedDownMesh->_getActionManagerForTrigger();
     if (iActionManager) {
       if (iActionManager->hasPickTriggers()) {
-        iActionManager->processTrigger(
-          Constants::ACTION_OnPickDownTrigger,
-          ActionEvent::CreateNew(_pickedDownMesh, evt));
+        iActionManager->processTrigger(Constants::ACTION_OnPickDownTrigger,
+                                       ActionEvent::CreateNew(_pickedDownMesh, evt));
         switch (evt.button) {
           case MouseButtonType::LEFT:
-            iActionManager->processTrigger(
-              Constants::ACTION_OnLeftPickTrigger,
-              ActionEvent::CreateNew(_pickedDownMesh, evt));
+            iActionManager->processTrigger(Constants::ACTION_OnLeftPickTrigger,
+                                           ActionEvent::CreateNew(_pickedDownMesh, evt));
             break;
           case MouseButtonType::MIDDLE:
-            iActionManager->processTrigger(
-              Constants::ACTION_OnCenterPickTrigger,
-              ActionEvent::CreateNew(_pickedDownMesh, evt));
+            iActionManager->processTrigger(Constants::ACTION_OnCenterPickTrigger,
+                                           ActionEvent::CreateNew(_pickedDownMesh, evt));
             break;
           case MouseButtonType::RIGHT:
-            iActionManager->processTrigger(
-              Constants::ACTION_OnRightPickTrigger,
-              ActionEvent::CreateNew(_pickedDownMesh, evt));
+            iActionManager->processTrigger(Constants::ACTION_OnRightPickTrigger,
+                                           ActionEvent::CreateNew(_pickedDownMesh, evt));
             break;
           default:
             break;
         }
       }
 
-      if (iActionManager->hasSpecificTrigger(
-            Constants::ACTION_OnLongPressTrigger)) {
+      if (iActionManager->hasSpecificTrigger(Constants::ACTION_OnLongPressTrigger)) {
 #if 0
         window.setTimeout(
           (function() {
@@ -288,8 +282,7 @@ void InputManager::_processPointerDown(std::optional<PickingInfo>& pickResult,
   }
   else {
     for (auto& step : scene._pointerDownStage) {
-      pickResult = step.action(_unTranslatedPointerX, _unTranslatedPointerY,
-                               pickResult, evt);
+      pickResult = step.action(_unTranslatedPointerX, _unTranslatedPointerY, pickResult, evt);
     }
   }
 
@@ -310,14 +303,11 @@ void InputManager::_processPointerDown(std::optional<PickingInfo>& pickResult,
 
 bool InputManager::_isPointerSwiping() const
 {
-  return std::abs(_startingPointerPosition.x - _pointerX)
-           > InputManager::DragMovementThreshold
-         || std::abs(_startingPointerPosition.y - _pointerY)
-              > InputManager::DragMovementThreshold;
+  return std::abs(_startingPointerPosition.x - _pointerX) > InputManager::DragMovementThreshold
+         || std::abs(_startingPointerPosition.y - _pointerY) > InputManager::DragMovementThreshold;
 }
 
-void InputManager::simulatePointerUp(std::optional<PickingInfo>& pickResult,
-                                     bool doubleTap)
+void InputManager::simulatePointerUp(std::optional<PickingInfo>& pickResult, bool doubleTap)
 {
   PointerEvent evt("pointerup");
 
@@ -330,8 +320,7 @@ void InputManager::simulatePointerUp(std::optional<PickingInfo>& pickResult,
     clickInfo.singleClick = true;
   }
 
-  if (_checkPrePointerObservable(pickResult, evt,
-                                 PointerEventTypes::POINTERUP)) {
+  if (_checkPrePointerObservable(pickResult, evt, PointerEventTypes::POINTERUP)) {
     return;
   }
 
@@ -339,8 +328,7 @@ void InputManager::simulatePointerUp(std::optional<PickingInfo>& pickResult,
 }
 
 void InputManager::_processPointerUp(std::optional<PickingInfo>& pickResult,
-                                     const PointerEvent& evt,
-                                     const ClickInfo& clickInfo)
+                                     const PointerEvent& evt, const ClickInfo& clickInfo)
 {
   auto& scene = *_scene;
   if (pickResult && pickResult && (*pickResult).pickedMesh) {
@@ -364,37 +352,32 @@ void InputManager::_processPointerUp(std::optional<PickingInfo>& pickResult,
                                     ActionEvent::CreateNew(_pickedUpMesh, evt));
 
       if (!clickInfo.hasSwiped() && clickInfo.singleClick()) {
-        actionManager->processTrigger(
-          Constants::ACTION_OnPickTrigger,
-          ActionEvent::CreateNew(pickResult->pickedMesh, evt));
+        actionManager->processTrigger(Constants::ACTION_OnPickTrigger,
+                                      ActionEvent::CreateNew(pickResult->pickedMesh, evt));
       }
 
       auto doubleClickActionManager
-        = _pickedUpMesh->_getActionManagerForTrigger(
-          Constants::ACTION_OnDoublePickTrigger);
+        = _pickedUpMesh->_getActionManagerForTrigger(Constants::ACTION_OnDoublePickTrigger);
       if (clickInfo.doubleClick() && doubleClickActionManager) {
-        doubleClickActionManager->processTrigger(
-          Constants::ACTION_OnDoublePickTrigger,
-          ActionEvent::CreateNew(_pickedUpMesh, evt));
+        doubleClickActionManager->processTrigger(Constants::ACTION_OnDoublePickTrigger,
+                                                 ActionEvent::CreateNew(_pickedUpMesh, evt));
       }
     }
   }
   else {
     if (!clickInfo.ignore()) {
       for (auto& step : scene._pointerUpStage) {
-        pickResult = step.action(_unTranslatedPointerX, _unTranslatedPointerY,
-                                 pickResult, evt);
+        pickResult = step.action(_unTranslatedPointerX, _unTranslatedPointerY, pickResult, evt);
       }
     }
   }
 
   if (_pickedDownMesh && _pickedDownMesh != _pickedUpMesh) {
-    auto pickedDownActionManager = _pickedDownMesh->_getActionManagerForTrigger(
-      Constants::ACTION_OnPickOutTrigger);
+    auto pickedDownActionManager
+      = _pickedDownMesh->_getActionManagerForTrigger(Constants::ACTION_OnPickOutTrigger);
     if (pickedDownActionManager) {
-      pickedDownActionManager->processTrigger(
-        Constants::ACTION_OnPickOutTrigger,
-        ActionEvent::CreateNew(_pickedDownMesh, evt));
+      pickedDownActionManager->processTrigger(Constants::ACTION_OnPickOutTrigger,
+                                              ActionEvent::CreateNew(_pickedDownMesh, evt));
     }
   }
 
@@ -434,21 +417,17 @@ void InputManager::_processPointerUp(std::optional<PickingInfo>& pickResult,
 
 bool InputManager::isPointerCaptured(int pointerId)
 {
-  return stl_util::contains(_pointerCaptures, pointerId)
-         && _pointerCaptures[pointerId];
+  return stl_util::contains(_pointerCaptures, pointerId) && _pointerCaptures[pointerId];
 }
 
-void InputManager::attachControl(bool attachUp, bool attachDown,
-                                 bool attachMove)
+void InputManager::attachControl(bool attachUp, bool attachDown, bool attachMove)
 {
-  _initActionManager
-    = [this](AbstractActionManagerPtr act,
-             const ClickInfo & /*clickInfo*/) -> AbstractActionManagerPtr {
+  _initActionManager = [this](AbstractActionManagerPtr act,
+                              const ClickInfo & /*clickInfo*/) -> AbstractActionManagerPtr {
     if (!_meshPickProceed) {
       auto& scene     = *_scene;
       auto pickResult = scene.pick(_unTranslatedPointerX, _unTranslatedPointerY,
-                                   scene.pointerDownPredicate, false,
-                                   scene.cameraToUseForPointers);
+                                   scene.pointerDownPredicate, false, scene.cameraToUseForPointers);
       if (pickResult) {
         _currentPickResult = *pickResult;
       }
@@ -457,9 +436,8 @@ void InputManager::attachControl(bool attachUp, bool attachDown,
       }
       if (pickResult.has_value()) {
         const auto _pickResult = *pickResult;
-        act                    = (_pickResult.hit && _pickResult.pickedMesh) ?
-                _pickResult.pickedMesh->actionManager :
-                nullptr;
+        act = (_pickResult.hit && _pickResult.pickedMesh) ? _pickResult.pickedMesh->actionManager :
+                                                            nullptr;
       }
       _meshPickProceed = true;
     }
@@ -467,11 +445,9 @@ void InputManager::attachControl(bool attachUp, bool attachDown,
   };
 
   _delayedSimpleClick
-    = [this](
-        MouseButtonType btn, ClickInfo& clickInfo,
-        const std::function<void(const ClickInfo& clickInfo,
-                                 const std::optional<PickingInfo>& pickResult)>&
-          cb) -> void {
+    = [this](MouseButtonType btn, ClickInfo& clickInfo,
+             const std::function<void(const ClickInfo& clickInfo,
+                                      const std::optional<PickingInfo>& pickResult)>& cb) -> void {
     // double click delay is over and that no double click has been raised
     // since, or the 2 consecutive keys pressed are different
     if (((Time::fpTimeSince<float, std::milli>(_previousStartingPointerTime)
@@ -485,26 +461,21 @@ void InputManager::attachControl(bool attachUp, bool attachDown,
     }
   };
 
-  _initClickEvent = [this](Observable<PointerInfoPre>& obs1,
-                           Observable<PointerInfo>& obs2,
+  _initClickEvent = [this](Observable<PointerInfoPre>& obs1, Observable<PointerInfo>& obs2,
                            const PointerEvent& evt,
-                           const std::function<void(
-                             const ClickInfo& clickInfo,
-                             std::optional<PickingInfo>& pickResult)>& cb) {
+                           const std::function<void(const ClickInfo& clickInfo,
+                                                    std::optional<PickingInfo>& pickResult)>& cb) {
     ClickInfo clickInfo;
     _currentPickResult           = std::nullopt;
     AbstractActionManagerPtr act = nullptr;
 
     auto checkPicking
       = obs1.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERPICK))
-        || obs2.hasSpecificMask(
-          static_cast<int>(PointerEventTypes::POINTERPICK))
+        || obs2.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERPICK))
         || obs1.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERTAP))
         || obs2.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERTAP))
-        || obs1.hasSpecificMask(
-          static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))
-        || obs2.hasSpecificMask(
-          static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
+        || obs1.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))
+        || obs2.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
     if (!checkPicking) {
       act = _initActionManager(act, clickInfo);
       if (act) {
@@ -519,31 +490,27 @@ void InputManager::attachControl(bool attachUp, bool attachDown,
       clickInfo.hasSwiped = _isPointerSwiping();
 
       if (!clickInfo.hasSwiped()) {
-        auto checkSingleClickImmediately
-          = !InputManager::ExclusiveDoubleClickMode;
+        auto checkSingleClickImmediately = !InputManager::ExclusiveDoubleClickMode;
 
         if (!checkSingleClickImmediately) {
           checkSingleClickImmediately
-            = !obs1.hasSpecificMask(
-                static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))
-              && !obs2.hasSpecificMask(
-                static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
+            = !obs1.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))
+              && !obs2.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
 
           if (checkSingleClickImmediately
               && !AbstractActionManager::HasSpecificTrigger(
                 Constants::ACTION_OnDoublePickTrigger)) {
             act = _initActionManager(act, clickInfo);
             if (act) {
-              checkSingleClickImmediately = !act->hasSpecificTrigger(
-                Constants::ACTION_OnDoublePickTrigger);
+              checkSingleClickImmediately
+                = !act->hasSpecificTrigger(Constants::ACTION_OnDoublePickTrigger);
             }
           }
         }
 
         if (checkSingleClickImmediately) {
-          // single click detected if double click delay is over or two
-          // different successive keys pressed without exclusive double click
-          // or no double click required
+          // single click detected if double click delay is over or two different successive keys
+          // pressed without exclusive double click or no double click required
           if (Time::fpTimeSince<long, std::milli>(_previousStartingPointerTime)
                 > Scene::DoubleClickDelay.count()
               || btn != _previousButtonPressed) {
@@ -552,34 +519,27 @@ void InputManager::attachControl(bool attachUp, bool attachDown,
             needToIgnoreNext = true;
           }
         }
-        // at least one double click is required to be check and exclusive
-        // double click is enabled
+        // at least one double click is required to be check and exclusive double click is enabled
         else {
-          // wait that no double click has been raised during the double click
-          // delay
+          // wait that no double click has been raised during the double click delay
           _previousDelayedSimpleClickTimeout = _delayedSimpleClickTimeout;
         }
 
         auto checkDoubleClick
-          = obs1.hasSpecificMask(
-              static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))
-            || obs2.hasSpecificMask(
-              static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
+          = obs1.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))
+            || obs2.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
         if (!checkDoubleClick
-            && AbstractActionManager::HasSpecificTrigger(
-              Constants::ACTION_OnDoublePickTrigger)) {
+            && AbstractActionManager::HasSpecificTrigger(Constants::ACTION_OnDoublePickTrigger)) {
           act = _initActionManager(act, clickInfo);
           if (act) {
-            checkDoubleClick
-              = act->hasSpecificTrigger(Constants::ACTION_OnDoublePickTrigger);
+            checkDoubleClick = act->hasSpecificTrigger(Constants::ACTION_OnDoublePickTrigger);
           }
         }
         if (checkDoubleClick) {
-          // two successive keys pressed are equal, double click delay is not
-          // over and double click has not just occurred
+          // two successive keys pressed are equal, double click delay is not over and double click
+          // has not just occurred
           if (btn == _previousButtonPressed
-              && Time::fpTimeSince<long, std::milli>(
-                   _previousStartingPointerTime)
+              && Time::fpTimeSince<long, std::milli>(_previousStartingPointerTime)
                    < Scene::DoubleClickDelay.count()
               && !_doubleClickOccured) {
             // pointer has not moved for 2 clicks, it's a double click
@@ -640,8 +600,7 @@ void InputManager::attachControl(bool attachUp, bool attachDown,
     // PreObservable support
     if (_checkPrePointerObservable(
           std::nullopt, evt,
-          (evt.type == EventType::MOUSE_WHEEL
-           || evt.type == EventType::DOM_MOUSE_SCROLL) ?
+          (evt.type == EventType::MOUSE_WHEEL || evt.type == EventType::DOM_MOUSE_SCROLL) ?
             PointerEventTypes::POINTERWHEEL :
             PointerEventTypes::POINTERMOVE)) {
       return;
@@ -655,22 +614,17 @@ void InputManager::attachControl(bool attachUp, bool attachDown,
     if (!scene.pointerMovePredicate) {
       scene.pointerMovePredicate = [this](const AbstractMeshPtr& mesh) -> bool {
         auto& scene = *_scene;
-        return mesh->isPickable && mesh->isVisible && mesh->isReady()
-               && mesh->isEnabled()
-               && (mesh->enablePointerMoveEvents
-                   || scene.constantlyUpdateMeshUnderPointer
+        return mesh->isPickable && mesh->isVisible && mesh->isReady() && mesh->isEnabled()
+               && (mesh->enablePointerMoveEvents || scene.constantlyUpdateMeshUnderPointer
                    || mesh->actionManager != nullptr)
                && (!scene.cameraToUseForPointers
-                   || (scene.cameraToUseForPointers->layerMask
-                       & mesh->layerMask())
-                        != 0);
+                   || (scene.cameraToUseForPointers->layerMask & mesh->layerMask()) != 0);
       };
     }
 
     // Meshes
     auto pickResult = scene.pick(_unTranslatedPointerX, _unTranslatedPointerY,
-                                 scene.pointerMovePredicate, false,
-                                 scene.cameraToUseForPointers);
+                                 scene.pointerMovePredicate, false, scene.cameraToUseForPointers);
 
     _processPointerMove(pickResult, evt);
   };
@@ -678,7 +632,11 @@ void InputManager::attachControl(bool attachUp, bool attachDown,
   _onPointerDown = [this](PointerEvent&& evt) {
     auto& scene = *_scene;
     auto engine = scene.getEngine();
-    auto canvas = engine->getRenderingCanvas();
+    auto canvas = engine->getInputElement();
+
+    if (!canvas) {
+      return;
+    }
 
     ++_totalPointersPressed;
     _pickedDownMesh  = nullptr;
@@ -696,8 +654,7 @@ void InputManager::attachControl(bool attachUp, bool attachDown,
     _startingPointerTime       = Time::highresTimepointNow();
 
     // PreObservable support
-    if (_checkPrePointerObservable(std::nullopt, evt,
-                                   PointerEventTypes::POINTERDOWN)) {
+    if (_checkPrePointerObservable(std::nullopt, evt, PointerEventTypes::POINTERDOWN)) {
       return;
     }
 
@@ -709,16 +666,14 @@ void InputManager::attachControl(bool attachUp, bool attachDown,
 
     if (!scene.pointerDownPredicate) {
       scene.pointerDownPredicate = [](const AbstractMeshPtr& mesh) -> bool {
-        return mesh->isPickable && mesh->isVisible && mesh->isReady()
-               && mesh->isEnabled();
+        return mesh->isPickable && mesh->isVisible && mesh->isReady() && mesh->isEnabled();
       };
     }
 
     // Meshes
     _pickedDownMesh = nullptr;
     auto pickResult = scene.pick(_unTranslatedPointerX, _unTranslatedPointerY,
-                                 scene.pointerDownPredicate, false,
-                                 scene.cameraToUseForPointers);
+                                 scene.pointerDownPredicate, false, scene.cameraToUseForPointers);
 
     _processPointerDown(pickResult, evt);
   };
@@ -726,12 +681,16 @@ void InputManager::attachControl(bool attachUp, bool attachDown,
   _onPointerUp = [this](PointerEvent&& evt) {
     if (_totalPointersPressed == 0) { // We are attaching the pointer up to
                                       // windows because of a bug in FF
-      return; // So we need to test it the pointer down was pressed before.
+      return;                         // So we need to test it the pointer down was pressed before.
     }
 
     auto& scene = *_scene;
     auto engine = scene.getEngine();
-    auto canvas = engine->getRenderingCanvas();
+    auto canvas = engine->getInputElement();
+
+    if (!canvas) {
+      return;
+    }
 
     --_totalPointersPressed;
     _pickedUpMesh    = nullptr;
@@ -746,8 +705,7 @@ void InputManager::attachControl(bool attachUp, bool attachDown,
 
     _initClickEvent(
       scene.onPrePointerObservable, scene.onPointerObservable, evt,
-      [this, evt](const ClickInfo& clickInfo,
-                  std::optional<PickingInfo> pickResult) {
+      [this, evt](const ClickInfo& clickInfo, std::optional<PickingInfo> pickResult) {
         auto& scene = *_scene;
         // PreObservable support
         if (scene.onPrePointerObservable.hasObservers()) {
@@ -756,24 +714,22 @@ void InputManager::attachControl(bool attachUp, bool attachDown,
               if (clickInfo.singleClick()
                   && scene.onPrePointerObservable.hasSpecificMask(
                     static_cast<int>(PointerEventTypes::POINTERTAP))) {
-                if (_checkPrePointerObservable(std::nullopt, evt,
-                                               PointerEventTypes::POINTERTAP)) {
+                if (_checkPrePointerObservable(std::nullopt, evt, PointerEventTypes::POINTERTAP)) {
                   return;
                 }
               }
               if (clickInfo.doubleClick
                   && scene.onPrePointerObservable.hasSpecificMask(
                     static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
-                if (_checkPrePointerObservable(
-                      std::nullopt, evt, PointerEventTypes::POINTERDOUBLETAP)) {
+                if (_checkPrePointerObservable(std::nullopt, evt,
+                                               PointerEventTypes::POINTERDOUBLETAP)) {
                   return;
                 }
               }
             }
           }
           else {
-            if (_checkPrePointerObservable(std::nullopt, evt,
-                                           PointerEventTypes::POINTERUP)) {
+            if (_checkPrePointerObservable(std::nullopt, evt, PointerEventTypes::POINTERUP)) {
               return;
             }
           }
@@ -790,21 +746,16 @@ void InputManager::attachControl(bool attachUp, bool attachDown,
         }
 
         if (!scene.pointerUpPredicate) {
-          scene.pointerUpPredicate
-            = [&scene](const AbstractMeshPtr& mesh) -> bool {
-            return mesh->isPickable && mesh->isVisible && mesh->isReady()
-                   && mesh->isEnabled()
+          scene.pointerUpPredicate = [&scene](const AbstractMeshPtr& mesh) -> bool {
+            return mesh->isPickable && mesh->isVisible && mesh->isReady() && mesh->isEnabled()
                    && (!scene.cameraToUseForPointers
-                       || (scene.cameraToUseForPointers->layerMask
-                           & mesh->layerMask)
-                            != 0);
+                       || (scene.cameraToUseForPointers->layerMask & mesh->layerMask) != 0);
           };
         }
 
         // Meshes
         if (!_meshPickProceed
-            && (AbstractActionManager::HasTriggers()
-                || scene.onPointerObservable.hasObservers())) {
+            && (AbstractActionManager::HasTriggers() || scene.onPointerObservable.hasObservers())) {
           _initActionManager(nullptr, clickInfo);
         }
         if (!pickResult) {
@@ -822,8 +773,7 @@ void InputManager::attachControl(bool attachUp, bool attachDown,
     auto type   = KeyboardEventTypes::KEYDOWN;
     if (scene.onPreKeyboardObservable.hasObservers()) {
       KeyboardInfoPre pi(type, evt);
-      scene.onPreKeyboardObservable.notifyObservers(&pi,
-                                                    static_cast<int>(type));
+      scene.onPreKeyboardObservable.notifyObservers(&pi, static_cast<int>(type));
       if (pi.skipOnPointerObservable) {
         return;
       }
@@ -835,9 +785,8 @@ void InputManager::attachControl(bool attachUp, bool attachDown,
     }
 
     if (scene.actionManager) {
-      scene.actionManager->processTrigger(
-        Constants::ACTION_OnKeyDownTrigger,
-        ActionEvent::CreateNewFromScene(_scene, evt));
+      scene.actionManager->processTrigger(Constants::ACTION_OnKeyDownTrigger,
+                                          ActionEvent::CreateNewFromScene(_scene, evt));
     }
   };
 
@@ -846,8 +795,7 @@ void InputManager::attachControl(bool attachUp, bool attachDown,
     auto type   = KeyboardEventTypes::KEYUP;
     if (scene.onPreKeyboardObservable.hasObservers()) {
       KeyboardInfoPre pi(type, evt);
-      scene.onPreKeyboardObservable.notifyObservers(&pi,
-                                                    static_cast<int>(type));
+      scene.onPreKeyboardObservable.notifyObservers(&pi, static_cast<int>(type));
       if (pi.skipOnPointerObservable) {
         return;
       }
@@ -859,14 +807,13 @@ void InputManager::attachControl(bool attachUp, bool attachDown,
     }
 
     if (scene.actionManager) {
-      scene.actionManager->processTrigger(
-        Constants::ACTION_OnKeyUpTrigger,
-        ActionEvent::CreateNewFromScene(_scene, evt));
+      scene.actionManager->processTrigger(Constants::ACTION_OnKeyUpTrigger,
+                                          ActionEvent::CreateNewFromScene(_scene, evt));
     }
   };
 
   auto engine = _scene->getEngine();
-  auto canvas = engine->getRenderingCanvas();
+  auto canvas = engine->getInputElement();
 
   if (!canvas) {
     return;
@@ -878,18 +825,15 @@ void InputManager::attachControl(bool attachUp, bool attachDown,
   if (attachMove) {
     canvas->addMouseEventListener(EventType::MOUSE_MOVE, _onPointerMove, false);
     // Wheel
-    canvas->addMouseEventListener(EventType::MOUSE_WHEEL, _onPointerMove,
-                                  false);
+    canvas->addMouseEventListener(EventType::MOUSE_WHEEL, _onPointerMove, false);
   }
 
   if (attachDown) {
-    canvas->addMouseEventListener(EventType::MOUSE_BUTTON_DOWN, _onPointerDown,
-                                  false);
+    canvas->addMouseEventListener(EventType::MOUSE_BUTTON_DOWN, _onPointerDown, false);
   }
 
   if (attachUp) {
-    canvas->addMouseEventListener(EventType::MOUSE_BUTTON_UP, _onPointerUp,
-                                  false);
+    canvas->addMouseEventListener(EventType::MOUSE_BUTTON_UP, _onPointerUp, false);
   }
 
   canvas->tabIndex = 1;
@@ -897,7 +841,7 @@ void InputManager::attachControl(bool attachUp, bool attachDown,
 
 void InputManager::detachControl()
 {
-  auto canvas = _scene->getEngine()->getRenderingCanvas();
+  auto canvas = _scene->getEngine()->getInputElement();
   auto engine = _scene->getEngine();
 
   if (!canvas) {
@@ -906,8 +850,7 @@ void InputManager::detachControl()
 
   // Pointer
   canvas->removeMouseEventListener(EventType::MOUSE_MOVE, _onPointerMove);
-  canvas->removeMouseEventListener(EventType::MOUSE_BUTTON_DOWN,
-                                   _onPointerDown);
+  canvas->removeMouseEventListener(EventType::MOUSE_BUTTON_DOWN, _onPointerDown);
   canvas->removeMouseEventListener(EventType::MOUSE_BUTTON_UP, _onPointerUp);
 
   // Blur / Focus
@@ -936,8 +879,8 @@ void InputManager::setPointerOverMesh(const AbstractMeshPtr& mesh)
 
   AbstractActionManagerPtr actionManager = nullptr;
   if (_pointerOverMesh) {
-    actionManager = _pointerOverMesh->_getActionManagerForTrigger(
-      Constants::ACTION_OnPointerOutTrigger);
+    actionManager
+      = _pointerOverMesh->_getActionManagerForTrigger(Constants::ACTION_OnPointerOutTrigger);
     if (actionManager) {
       actionManager->processTrigger(Constants::ACTION_OnPointerOutTrigger,
                                     ActionEvent::CreateNew(_pointerOverMesh));
@@ -946,8 +889,8 @@ void InputManager::setPointerOverMesh(const AbstractMeshPtr& mesh)
 
   _pointerOverMesh = mesh;
   if (_pointerOverMesh) {
-    actionManager = _pointerOverMesh->_getActionManagerForTrigger(
-      Constants::ACTION_OnPointerOverTrigger);
+    actionManager
+      = _pointerOverMesh->_getActionManagerForTrigger(Constants::ACTION_OnPointerOverTrigger);
     if (actionManager) {
       actionManager->processTrigger(Constants::ACTION_OnPointerOverTrigger,
                                     ActionEvent::CreateNew(_pointerOverMesh));
