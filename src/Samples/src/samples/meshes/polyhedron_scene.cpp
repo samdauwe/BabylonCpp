@@ -1,6 +1,5 @@
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/core/random.h>
-#include <babylon/core/string.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/icanvas.h>
@@ -11,6 +10,7 @@
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/samples/babylon_register_sample.h>
 #include <vector>
 
@@ -63,7 +63,7 @@ public:
       options.size = 2.f;
       options.type = type;
       auto polygon
-        = MeshBuilder::CreatePolyhedron(String::concat("Polyhedron", type), options, scene);
+        = MeshBuilder::CreatePolyhedron(StringTools::concat("Polyhedron", type), options, scene);
       polygon->material = mat;
       col               = type % 5;
       if (col == 0) {

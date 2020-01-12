@@ -1,8 +1,8 @@
 #include <babylon/materials/node/blocks/length_block.h>
 
-#include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -45,7 +45,7 @@ LengthBlock& LengthBlock::_buildBlock(NodeMaterialBuildState& state)
 
   state.compilationString
     += _declareOutput(iOutput, state)
-       + String::printf(" = length(%s);\r\n", value()->associatedVariableName().c_str());
+       + StringTools::printf(" = length(%s);\r\n", value()->associatedVariableName().c_str());
 
   return *this;
 }

@@ -1,6 +1,5 @@
 #include <babylon/materials/node/blocks/dual/fog_block.h>
 
-#include <babylon/core/string.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/material_helper.h>
@@ -13,6 +12,7 @@
 #include <babylon/materials/node/node_material_defines.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -130,7 +130,7 @@ FogBlock& FogBlock::_buildBlock(NodeMaterialBuildState& state)
     state.sharedData->bindableBlocks.emplace_back(shared_from_this());
 
     state._emitFunctionFromInclude(
-      "fogFragmentDeclaration", String::printf("//%s", name.c_str()),
+      "fogFragmentDeclaration", StringTools::printf("//%s", name.c_str()),
       EmitFunctionFromIncludeOptions{
         "",           // repeatKey
         std::nullopt, // removeAttributes
@@ -153,16 +153,17 @@ FogBlock& FogBlock::_buildBlock(NodeMaterialBuildState& state)
 
     state.compilationString += "#ifdef FOG\r\n";
     state.compilationString
-      += String::printf("float %s = CalcFogFactor(%s, %s);\r\n", tempFogVariablename.c_str(),
-                        _fogDistanceName.c_str(), _fogParameters.c_str());
+      += StringTools::printf("float %s = CalcFogFactor(%s, %s);\r\n", tempFogVariablename.c_str(),
+                             _fogDistanceName.c_str(), _fogParameters.c_str());
     state.compilationString
       += _declareOutput(iOutput, state)
-         + String::printf(" = %s * %s.rgb + (1.0 - %s) * %s..rgb;\r\n", tempFogVariablename.c_str(),
-                          color->associatedVariableName().c_str(), tempFogVariablename.c_str(),
-                          _fogColor->associatedVariableName().c_str());
+         + StringTools::printf(" = %s * %s.rgb + (1.0 - %s) * %s..rgb;\r\n",
+                               tempFogVariablename.c_str(), color->associatedVariableName().c_str(),
+                               tempFogVariablename.c_str(),
+                               _fogColor->associatedVariableName().c_str());
     state.compilationString
-      += String::printf("#else\r\n%s = %s.rgb;\r\n", _declareOutput(iOutput, state).c_str(),
-                        color->associatedVariableName().c_str());
+      += StringTools::printf("#else\r\n%s = %s.rgb;\r\n", _declareOutput(iOutput, state).c_str(),
+                             color->associatedVariableName().c_str());
     state.compilationString += "#endif\r\n";
   }
   else {
@@ -171,8 +172,8 @@ FogBlock& FogBlock::_buildBlock(NodeMaterialBuildState& state)
     _fogDistanceName     = state._getFreeVariableName("vFogDistance");
     state._emitVaryingFromString(_fogDistanceName, "vec3");
     state.compilationString
-      += String::printf("%s = (%s * %s).xyz;\r\n", _view->associatedVariableName().c_str(),
-                        worldPos->associatedVariableName().c_str());
+      += StringTools::printf("%s = (%s * %s).xyz;\r\n", _view->associatedVariableName().c_str(),
+                             worldPos->associatedVariableName().c_str());
   }
 
   return *this;

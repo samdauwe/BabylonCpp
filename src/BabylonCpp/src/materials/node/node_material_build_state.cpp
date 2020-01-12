@@ -3,9 +3,9 @@
 #include <sstream>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/core/string.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/node/node_material_build_state_shared_data.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -25,52 +25,55 @@ void NodeMaterialBuildState::finalize(const NodeMaterialBuildState& state)
   auto isFragmentMode = (target == NodeMaterialBlockTargets::Fragment);
 
   compilationString
-    = String::printf("\r\n%svoid main(void) {\r\n%s", emitComments ? "//Entry point\r\n" : "",
-                     compilationString.c_str());
+    = StringTools::printf("\r\n%svoid main(void) {\r\n%s", emitComments ? "//Entry point\r\n" : "",
+                          compilationString.c_str());
 
   if (!_constantDeclaration.empty()) {
-    compilationString = String::printf("\r\n%s%s\r\n%s", emitComments ? "//Constants\r\n" : "",
-                                       _constantDeclaration.c_str(), compilationString.c_str());
+    compilationString
+      = StringTools::printf("\r\n%s%s\r\n%s", emitComments ? "//Constants\r\n" : "",
+                            _constantDeclaration.c_str(), compilationString.c_str());
   }
 
   std::string functionCode = "";
   for (const auto& functionItem : functions) {
     functionCode += functionItem.second + "\r\n";
   }
-  compilationString = String::printf("\r\n\r\n%s", functionCode.c_str(), compilationString.c_str());
+  compilationString
+    = StringTools::printf("\r\n\r\n%s", functionCode.c_str(), compilationString.c_str());
 
   if (!isFragmentMode && !_varyingTransfer.empty()) {
     compilationString
-      = String::printf("%s\r\n%s", compilationString.c_str(), _varyingTransfer.c_str());
+      = StringTools::printf("%s\r\n%s", compilationString.c_str(), _varyingTransfer.c_str());
   }
 
-  compilationString = String::printf("%s\r\n}", compilationString.c_str());
+  compilationString = StringTools::printf("%s\r\n}", compilationString.c_str());
 
   if (!sharedData->varyingDeclaration.empty()) {
     compilationString
-      = String::printf("\r\n%s%s\r\n%s", emitComments ? "//Varyings\r\n" : "",
-                       sharedData->varyingDeclaration.c_str(), compilationString.c_str());
+      = StringTools::printf("\r\n%s%s\r\n%s", emitComments ? "//Varyings\r\n" : "",
+                            sharedData->varyingDeclaration.c_str(), compilationString.c_str());
   }
 
   if (!_samplerDeclaration.empty()) {
-    compilationString = String::printf("\r\n%s%s\r\n%s)", emitComments ? "//Samplers\r\n" : "",
-                                       _samplerDeclaration.c_str(), compilationString.c_str());
+    compilationString = StringTools::printf("\r\n%s%s\r\n%s)", emitComments ? "//Samplers\r\n" : "",
+                                            _samplerDeclaration.c_str(), compilationString.c_str());
   }
 
   if (!_uniformDeclaration.empty()) {
-    compilationString = String::printf("\r\n%s%s\r\n%s)", emitComments ? "//Uniforms\r\n" : "",
-                                       _uniformDeclaration.c_str(), compilationString.c_str());
+    compilationString = StringTools::printf("\r\n%s%s\r\n%s)", emitComments ? "//Uniforms\r\n" : "",
+                                            _uniformDeclaration.c_str(), compilationString.c_str());
   }
 
   if (!_attributeDeclaration.empty() && !isFragmentMode) {
-    compilationString = String::printf("\r\n%s%s\r\n%s)", emitComments ? "//Attributes\r\n" : "",
-                                       _attributeDeclaration.c_str(), compilationString.c_str());
+    compilationString
+      = StringTools::printf("\r\n%s%s\r\n%s)", emitComments ? "//Attributes\r\n" : "",
+                            _attributeDeclaration.c_str(), compilationString.c_str());
   }
 
   for (const auto& extensionsItem : extensions) {
     const auto& extension = extensionsItem.second;
     compilationString
-      = String::printf("\r\n%s\r\n%s", extension.c_str(), compilationString.c_str());
+      = StringTools::printf("\r\n%s\r\n%s", extension.c_str(), compilationString.c_str());
   }
 
   _builtCompilationString = compilationString;
@@ -78,12 +81,12 @@ void NodeMaterialBuildState::finalize(const NodeMaterialBuildState& state)
 
 std::string NodeMaterialBuildState::get__repeatableContentAnchor()
 {
-  return String::printf("###___ANCHOR$%d___###", _repeatableContentAnchorIndex++);
+  return StringTools::printf("###___ANCHOR$%d___###", _repeatableContentAnchorIndex++);
 }
 
 std::string NodeMaterialBuildState::_getFreeVariableName(std::string prefix)
 {
-  prefix = String::regexReplace(prefix, "[^a-zA-Z_]+", "");
+  prefix = StringTools::regexReplace(prefix, "[^a-zA-Z_]+", "");
 
   if (!stl_util::contains(sharedData->variableNames, prefix)) {
     sharedData->variableNames[prefix] = 0;
@@ -121,7 +124,7 @@ void NodeMaterialBuildState::_excludeVariableName(const std::string& name)
 
 void NodeMaterialBuildState::_emit2DSampler(const std::string& name)
 {
-  _samplerDeclaration += String::printf("uniform sampler2D %s;\r\n", name.c_str());
+  _samplerDeclaration += StringTools::printf("uniform sampler2D %s;\r\n", name.c_str());
   samplers.emplace_back(name);
 }
 
@@ -177,8 +180,8 @@ std::string NodeMaterialBuildState::_emitCodeFromInclude(
   const std::optional<EmitCodeFromIncludeOptions>& options)
 {
   if (options && !options->repeatKey.empty()) {
-    return String::printf("#include<%s>[0..%s]\r\n", includeName.c_str(),
-                          options->repeatKey.c_str());
+    return StringTools::printf("#include<%s>[0..%s]\r\n", includeName.c_str(),
+                               options->repeatKey.c_str());
   }
 
   auto code = (stl_util::contains(Effect::IncludesShadersStore(), includeName) ?
@@ -196,7 +199,7 @@ std::string NodeMaterialBuildState::_emitCodeFromInclude(
 
   if (!options->replaceStrings.empty()) {
     for (const auto& replaceString : options->replaceStrings) {
-      code = String::regexReplace(code, replaceString.search, replaceString.replace);
+      code = StringTools::regexReplace(code, replaceString.search, replaceString.replace);
     }
   }
 
@@ -217,11 +220,11 @@ void NodeMaterialBuildState::_emitFunctionFromInclude(
           && !options->removeIfDef && options->replaceStrings.empty())) {
 
     if (options && !options->repeatKey.empty()) {
-      functions[key] = String::printf("#include<%s>[0..%s]\r\n", includeName.c_str(),
-                                      options->repeatKey.c_str());
+      functions[key] = StringTools::printf("#include<%s>[0..%s]\r\n", includeName.c_str(),
+                                           options->repeatKey.c_str());
     }
     else {
-      functions[key] = String::printf("#include<%s>\r\n", includeName.c_str());
+      functions[key] = StringTools::printf("#include<%s>\r\n", includeName.c_str());
     }
 
     if (sharedData->emitComments) {
@@ -240,28 +243,28 @@ void NodeMaterialBuildState::_emitFunctionFromInclude(
   }
 
   if (options->removeIfDef) {
-    functions[key] = String::regexReplace(functions[key], "^\\s*?#ifdef.+$", "");
-    functions[key] = String::regexReplace(functions[key], "^\\s*?#endif.*$", "");
-    functions[key] = String::regexReplace(functions[key], "^\\s*?#else.*$", "");
-    functions[key] = String::regexReplace(functions[key], "/^\\s*?#elif.*$", "");
+    functions[key] = StringTools::regexReplace(functions[key], "^\\s*?#ifdef.+$", "");
+    functions[key] = StringTools::regexReplace(functions[key], "^\\s*?#endif.*$", "");
+    functions[key] = StringTools::regexReplace(functions[key], "^\\s*?#else.*$", "");
+    functions[key] = StringTools::regexReplace(functions[key], "/^\\s*?#elif.*$", "");
   }
 
   if (options->removeAttributes) {
-    functions[key] = String::regexReplace(functions[key], "^\\s*?attribute.+$", "");
+    functions[key] = StringTools::regexReplace(functions[key], "^\\s*?attribute.+$", "");
   }
 
   if (options->removeUniforms) {
-    functions[key] = String::regexReplace(functions[key], "^\\s*?uniform.+$", "");
+    functions[key] = StringTools::regexReplace(functions[key], "^\\s*?uniform.+$", "");
   }
 
   if (options->removeVaryings) {
-    functions[key] = String::regexReplace(functions[key], "^\\s*?varying.+$", "");
+    functions[key] = StringTools::regexReplace(functions[key], "^\\s*?varying.+$", "");
   }
 
   if (!options->replaceStrings.empty()) {
     for (const auto& replaceString : options->replaceStrings) {
       functions[key]
-        = String::regexReplace(functions[key], replaceString.search, replaceString.replace);
+        = StringTools::regexReplace(functions[key], replaceString.search, replaceString.replace);
     }
   }
 }
@@ -287,16 +290,16 @@ bool NodeMaterialBuildState::_emitVaryingFromString(const std::string& name,
   sharedData->varyings.emplace_back(name);
 
   if (!define.empty()) {
-    if (String::startsWith(define, "defined(")) {
-      sharedData->varyingDeclaration += String::printf("#if %s\r\n", define.c_str());
+    if (StringTools::startsWith(define, "defined(")) {
+      sharedData->varyingDeclaration += StringTools::printf("#if %s\r\n", define.c_str());
     }
     else {
       sharedData->varyingDeclaration
-        += String::printf("%s %s\r\n", notDefine ? "#ifndef" : "#ifdef", define.c_str());
+        += StringTools::printf("%s %s\r\n", notDefine ? "#ifndef" : "#ifdef", define.c_str());
     }
   }
   sharedData->varyingDeclaration
-    += String::printf("varying %s %s;\r\n", type.c_str(), name.c_str());
+    += StringTools::printf("varying %s %s;\r\n", type.c_str(), name.c_str());
   if (!define.empty()) {
     sharedData->varyingDeclaration += "#endif\r\n";
   }
@@ -316,9 +319,9 @@ void NodeMaterialBuildState::_emitUniformFromString(const std::string& name,
 
   if (!define.empty()) {
     _uniformDeclaration
-      += String::printf("%s %s\r\n", notDefine ? "#ifndef" : "#ifdef", define.c_str());
+      += StringTools::printf("%s %s\r\n", notDefine ? "#ifndef" : "#ifdef", define.c_str());
   }
-  _uniformDeclaration += String::printf("uniform %s %s;\r\n", type.c_str(), name.c_str());
+  _uniformDeclaration += StringTools::printf("uniform %s %s;\r\n", type.c_str(), name.c_str());
   if (!define.empty()) {
     _uniformDeclaration += "#endif\r\n";
   }
@@ -327,7 +330,7 @@ void NodeMaterialBuildState::_emitUniformFromString(const std::string& name,
 std::string NodeMaterialBuildState::_emitFloat(float value)
 {
   if (fabsf(roundf(value) - value) <= 0.00001f) {
-    return String::printf("%d.0", static_cast<int>(value));
+    return StringTools::printf("%d.0", static_cast<int>(value));
   }
 
   return std::to_string(value);

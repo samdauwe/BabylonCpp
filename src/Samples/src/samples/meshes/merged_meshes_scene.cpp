@@ -1,14 +1,13 @@
-#include <babylon/samples/babylon_register_sample.h>
 #include <babylon/cameras/free_camera.h>
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
-#include <babylon/core/string.h>
+#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
-#include <babylon/interfaces/irenderable_scene.h>
-
+#include <babylon/misc/string_tools.h>
+#include <babylon/samples/babylon_register_sample.h>
 
 namespace BABYLON {
 namespace Samples {
@@ -25,8 +24,7 @@ struct MergedMeshesScene : public IRenderableScene {
   // json representation of the world
   static const char* world_json;
 
-  MergedMeshesScene(ICanvas* iCanvas)
-      : IRenderableScene(iCanvas)
+  MergedMeshesScene(ICanvas* iCanvas) : IRenderableScene(iCanvas)
   {
   }
 
@@ -41,58 +39,56 @@ struct MergedMeshesScene : public IRenderableScene {
   {
     // Create a Camera
     auto camera = FreeCamera::New("camera1", Vector3(-100, 0, 100), scene);
-  
+
     // Target the camera to scene origin
     camera->setTarget(Vector3::Zero());
-  
+
     // Attach the camera to the canvas
     camera->attachControl(canvas, true);
-  
+
     // Create a basic light, aiming 0,1,0 - meaning, to the sky
     auto light = HemisphericLight::New("light1", Vector3(0, 1, 0), scene);
-  
+
     // Default intensity is 1. Let's dim the light a small amount
     light->intensity = 0.8f;
-  
+
     // Parse the json representation of the world
     auto world = json::parse(world_json);
-  
+
     // Create map with default block name to color mapping
     std::unordered_map<std::string, Block> defaultBlocks;
-    for (auto& defaultBlock :
-         json_util::get_array<json>(world, "defaultBlocks")) {
+    for (auto& defaultBlock : json_util::get_array<json>(world, "defaultBlocks")) {
       defaultBlocks[json_util::get_string(defaultBlock, "terrain")]
         = {json_util::get_number(defaultBlock, "r", 0.f),
            json_util::get_number(defaultBlock, "g", 0.f),
            json_util::get_number(defaultBlock, "b", 0.f),
            json_util::get_number(defaultBlock, "a", 0.f)};
     }
-  
+
     // Block factory method
-    const auto createBlock
-      = [&scene](const std::string& name, const Block& block) {
-          // Set the face colors
-          std::array<Color4, 6> faceColors{{
-            Color4(),                                   // Face 1
-            Color4(),                                   // Face 2
-            Color4(),                                   // Face 3
-            Color4(),                                   // Face 4
-            Color4(block.r, block.g, block.b, block.a), // Face 5
-            Color4(),                                   // Face 6
-          }};
-          // Create the box with height, width and depth of 5
-          BoxOptions options;
-          options.size       = 5.f;
-          options.faceColors = std::move(faceColors);
-          return MeshBuilder::CreateBox(name, options, scene);
-        };
-  
+    const auto createBlock = [&scene](const std::string& name, const Block& block) {
+      // Set the face colors
+      std::array<Color4, 6> faceColors{{
+        Color4(),                                   // Face 1
+        Color4(),                                   // Face 2
+        Color4(),                                   // Face 3
+        Color4(),                                   // Face 4
+        Color4(block.r, block.g, block.b, block.a), // Face 5
+        Color4(),                                   // Face 6
+      }};
+      // Create the box with height, width and depth of 5
+      BoxOptions options;
+      options.size       = 5.f;
+      options.faceColors = std::move(faceColors);
+      return MeshBuilder::CreateBox(name, options, scene);
+    };
+
     // Create map
     std::vector<MeshPtr> arrayOfMeshes;
     unsigned int blockNr = 0;
     for (auto& blockOfMap : json_util::get_array<json>(world, "map")) {
       const auto blockType = json_util::get_string(blockOfMap, "terrain");
-      const auto blockName = String::concat("Block_", blockNr++);
+      const auto blockName = StringTools::concat("Block_", blockNr++);
       const float y        = json_util::get_number(blockOfMap, "y", 0.f);
       const float x        = json_util::get_number(blockOfMap, "x", 0.f);
       const float z        = json_util::get_number(blockOfMap, "z", 0.f);
@@ -102,7 +98,7 @@ struct MergedMeshesScene : public IRenderableScene {
       block->position().z  = z * 5.f;
       arrayOfMeshes.emplace_back(block);
     }
-  
+
     // Merge meshes
     auto mergedMesh = Mesh::MergeMeshes(arrayOfMeshes);
     mergedMesh->enableEdgesRendering();

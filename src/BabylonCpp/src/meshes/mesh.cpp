@@ -6,7 +6,6 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
-#include <babylon/core/string.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/bounding_sphere.h>
@@ -57,6 +56,7 @@
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 #include <babylon/misc/file_tools.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/morph/morph_target.h>
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/particles/particle_system.h>
@@ -1673,7 +1673,7 @@ Mesh& Mesh::_queueLoad(Scene* scene)
 {
   scene->_addPendingData(this);
 
-  const auto getBinaryData = String::contains(delayLoadingFile, ".babylonbinarymeshdata");
+  const auto getBinaryData = StringTools::contains(delayLoadingFile, ".babylonbinarymeshdata");
 
   FileTools::LoadFile(
     delayLoadingFile,

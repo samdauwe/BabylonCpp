@@ -4,7 +4,7 @@
 #include <babylon/babylon_common.h>
 #include <babylon/samples/babylon_register_sample.h>
 #include <babylon/babylon_stl_util.h>
-#include <babylon/core/string.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/core/logging.h>
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/babylon_common.h>

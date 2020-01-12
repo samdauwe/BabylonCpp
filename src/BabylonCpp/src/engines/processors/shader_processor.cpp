@@ -1,7 +1,6 @@
 #include <babylon/engines/processors/shader_processor.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/core/string.h>
 #include <babylon/engines/processors/expressions/operators/shader_define_and_operator.h>
 #include <babylon/engines/processors/expressions/operators/shader_define_arithmetic_operator.h>
 #include <babylon/engines/processors/expressions/operators/shader_define_is_defined_operator.h>
@@ -14,6 +13,7 @@
 #include <babylon/engines/processors/shader_code_node.h>
 #include <babylon/engines/processors/shader_code_test_node.h>
 #include <babylon/misc/file_tools.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -31,7 +31,7 @@ std::string ShaderProcessor::_ProcessPrecision(std::string source, const Process
 {
   const auto shouldUseHighPrecisionShader = options.shouldUseHighPrecisionShader;
 
-  if (String::indexOf(source, "precision highp float") == -1) {
+  if (StringTools::indexOf(source, "precision highp float") == -1) {
     if (!shouldUseHighPrecisionShader) {
       source = "precision mediump float;\n" + source;
     }
@@ -41,7 +41,7 @@ std::string ShaderProcessor::_ProcessPrecision(std::string source, const Process
   }
   else {
     if (!shouldUseHighPrecisionShader) { // Moving highp to mediump
-      source = String::replace(source, "precision highp float", "precision mediump float");
+      source = StringTools::replace(source, "precision highp float", "precision mediump float");
     }
   }
 
@@ -55,7 +55,7 @@ ShaderDefineExpressionPtr ShaderProcessor::_ExtractOperation(const std::string& 
   std::smatch match;
 
   if (std::regex_search(expression, match, regex) && !match.empty()) {
-    return std::make_shared<ShaderDefineIsDefinedOperator>(String::trimCopy(match[1]),
+    return std::make_shared<ShaderDefineIsDefinedOperator>(StringTools::trimCopy(match[1]),
                                                            expression[0] == '!');
   }
 
@@ -65,7 +65,7 @@ ShaderDefineExpressionPtr ShaderProcessor::_ExtractOperation(const std::string& 
 
   for (const auto& _operator : operators) {
     matchedOperator = _operator;
-    indexOperator   = String::indexOf(expression, _operator);
+    indexOperator   = StringTools::indexOf(expression, _operator);
 
     if (indexOperator > -1) {
       break;
@@ -77,22 +77,22 @@ ShaderDefineExpressionPtr ShaderProcessor::_ExtractOperation(const std::string& 
   }
 
   auto _indexOperator = static_cast<size_t>(indexOperator);
-  auto define         = String::trimCopy(expression.substr(0, _indexOperator));
-  auto value = String::trimCopy(expression.substr(_indexOperator + matchedOperator.size()));
+  auto define         = StringTools::trimCopy(expression.substr(0, _indexOperator));
+  auto value = StringTools::trimCopy(expression.substr(_indexOperator + matchedOperator.size()));
 
   return std::make_shared<ShaderDefineArithmeticOperator>(define, matchedOperator, value);
 }
 
 ShaderDefineExpressionPtr ShaderProcessor::_BuildSubExpression(const std::string& expression)
 {
-  auto indexOr = String::indexOf(expression, "||");
+  auto indexOr = StringTools::indexOf(expression, "||");
   if (indexOr == -1) {
-    auto indexAnd = String::indexOf(expression, "&&");
+    auto indexAnd = StringTools::indexOf(expression, "&&");
     if (indexAnd > -1) {
       auto _indexAnd   = static_cast<size_t>(indexAnd);
       auto andOperator = std::make_shared<ShaderDefineAndOperator>();
-      auto leftPart    = String::trimCopy(expression.substr(0, _indexAnd));
-      auto rightPart   = String::trimCopy(expression.substr(_indexAnd + 2));
+      auto leftPart    = StringTools::trimCopy(expression.substr(0, _indexAnd));
+      auto rightPart   = StringTools::trimCopy(expression.substr(_indexAnd + 2));
 
       andOperator->leftOperand  = _BuildSubExpression(leftPart);
       andOperator->rightOperand = _BuildSubExpression(rightPart);
@@ -106,8 +106,8 @@ ShaderDefineExpressionPtr ShaderProcessor::_BuildSubExpression(const std::string
   else {
     auto _indexOr   = static_cast<size_t>(indexOr);
     auto orOperator = std::make_shared<ShaderDefineOrOperator>();
-    auto leftPart   = String::trimCopy(expression.substr(0, _indexOr));
-    auto rightPart  = String::trimCopy(expression.substr(_indexOr + 2));
+    auto leftPart   = StringTools::trimCopy(expression.substr(0, _indexOr));
+    auto rightPart  = StringTools::trimCopy(expression.substr(_indexOr + 2));
 
     orOperator->leftOperand  = _BuildSubExpression(leftPart);
     orOperator->rightOperand = _BuildSubExpression(rightPart);
@@ -120,7 +120,7 @@ ShaderCodeTestNodePtr ShaderProcessor::_BuildExpression(const std::string& line,
 {
   auto node       = std::make_shared<ShaderCodeTestNode>();
   auto command    = line.substr(0, start);
-  auto expression = String::trimCopy(line.substr(start));
+  auto expression = StringTools::trimCopy(line.substr(start));
 
   if (command == "#ifdef") {
     node->testExpression = std::make_shared<ShaderDefineIsDefinedOperator>(expression);
@@ -142,7 +142,7 @@ void ShaderProcessor::_MoveCursorWithinIf(ShaderCodeCursor& cursor,
   auto line = cursor.currentLine();
   while (_MoveCursor(cursor, ifNode)) {
     line        = cursor.currentLine();
-    auto first5 = String::toLowerCase(line.substr(0, 5));
+    auto first5 = StringTools::toLowerCase(line.substr(0, 5));
 
     if (first5 == "#else") {
       auto elseNode = std::make_shared<ShaderCodeNode>();
@@ -209,7 +209,7 @@ bool ShaderProcessor::_MoveCursor(ShaderCodeCursor& cursor, const ShaderCodeNode
 
       // Detect additional defines
       if (line.size() >= 2 && line[0] == '#' && line[1] == 'd') {
-        auto split                   = String::split(String::replace(line, ";", ""), ' ');
+        auto split                   = StringTools::split(StringTools::replace(line, ";", ""), ' ');
         newNode->additionalDefineKey = split[1];
 
         if (split.size() == 3) {
@@ -226,7 +226,7 @@ ShaderProcessor::_removeCommentsAndEmptyLines(const std::vector<std::string>& so
 {
   std::vector<std::string> result;
   for (const auto& sourceCodeLine : sourceCodeLines) {
-    const auto line = String::stripComments(sourceCodeLine, "//");
+    const auto line = StringTools::stripComments(sourceCodeLine, "//");
 
     // Ignore empty lines
     if (!line.empty()) {
@@ -246,7 +246,7 @@ ShaderProcessor::_EvaluatePreProcessors(const std::string& sourceCode,
   ShaderCodeCursor cursor;
 
   cursor.lineIndex = -1;
-  cursor.lines     = _removeCommentsAndEmptyLines(String::split(sourceCode, '\n'));
+  cursor.lines     = _removeCommentsAndEmptyLines(StringTools::split(sourceCode, '\n'));
 
   // Decompose (We keep it in 2 steps so it is easier to maintain and perf hit is insignificant)
   _MoveCursor(cursor, rootNode);
@@ -262,9 +262,9 @@ ShaderProcessor::_PreparePreProcessors(const ProcessingOptions& options)
   std::unordered_map<std::string, std::string> preprocessors;
 
   for (const auto& define : defines) {
-    auto keyValue           = String::replace(String::replace(define, "#define", ""), ";", "");
-    keyValue                = String::trim(keyValue);
-    auto split              = String::split(keyValue, ' ');
+    auto keyValue = StringTools::replace(StringTools::replace(define, "#define", ""), ";", "");
+    keyValue      = StringTools::trim(keyValue);
+    auto split    = StringTools::split(keyValue, ' ');
     preprocessors[split[0]] = split.size() > 1 ? split[1] : "";
   }
 
@@ -285,8 +285,8 @@ std::string ShaderProcessor::_ProcessShaderConversion(const std::string& sourceC
   }
 
   // Already converted
-  if (String::indexOf(preparedSourceCode, "#version 3") != -1) {
-    return String::replace(preparedSourceCode, "#version 300 es", "");
+  if (StringTools::indexOf(preparedSourceCode, "#version 3") != -1) {
+    return StringTools::replace(preparedSourceCode, "#version 300 es", "");
   }
 
   const auto& defines = options.defines;
@@ -325,11 +325,11 @@ void ShaderProcessor::_ProcessIncludes(const std::string& sourceCode, Processing
     auto includeFile = match[1].str();
 
     // Uniform declaration
-    if (String::indexOf(includeFile, "__decl__") != -1) {
-      includeFile = String::replace(includeFile, "__decl__", "");
+    if (StringTools::indexOf(includeFile, "__decl__") != -1) {
+      includeFile = StringTools::replace(includeFile, "__decl__", "");
       if (options.supportsUniformBuffers) {
-        includeFile = String::replace(includeFile, "Vertex", "Ubo");
-        includeFile = String::replace(includeFile, "Fragment", "Ubo");
+        includeFile = StringTools::replace(includeFile, "Vertex", "Ubo");
+        includeFile = StringTools::replace(includeFile, "Fragment", "Ubo");
       }
       includeFile = includeFile + "Declaration";
     }
@@ -339,25 +339,26 @@ void ShaderProcessor::_ProcessIncludes(const std::string& sourceCode, Processing
       // Substitution
       auto includeContent = options.includesShadersStore[includeFile];
       if (match.size() > 2 && !match[2].str().empty()) {
-        auto splits = String::split(match[3].str(), ',');
+        auto splits = StringTools::split(match[3].str(), ',');
 
         for (size_t index = 0; index < splits.size(); index += 2) {
           auto dest = splits[index + 1];
 
-          includeContent = String::regexReplace(includeContent, splits[index], dest);
+          includeContent = StringTools::regexReplace(includeContent, splits[index], dest);
         }
       }
 
       if (match.size() > 4 && !match[4].str().empty()) {
         auto indexString = match[5].str();
 
-        if (String::indexOf(indexString, "..") != -1) {
-          String::replaceInPlace(indexString, "..", "@");
-          auto indexSplits = String::split(indexString, '@');
-          auto minIndex    = String::toNumber<int>(indexSplits[0]);
-          auto maxIndex
-            = String::isDigit(indexSplits[1]) ? String::toNumber<int>(indexSplits[1]) : -1;
-          auto sourceIncludeContent = String::slice(includeContent, 0);
+        if (StringTools::indexOf(indexString, "..") != -1) {
+          StringTools::replaceInPlace(indexString, "..", "@");
+          auto indexSplits = StringTools::split(indexString, '@');
+          auto minIndex    = StringTools::toNumber<int>(indexSplits[0]);
+          auto maxIndex    = StringTools::isDigit(indexSplits[1]) ?
+                            StringTools::toNumber<int>(indexSplits[1]) :
+                            -1;
+          auto sourceIncludeContent = StringTools::slice(includeContent, 0);
           includeContent            = "";
 
           if (maxIndex <= 0) {
@@ -372,7 +373,8 @@ void ShaderProcessor::_ProcessIncludes(const std::string& sourceCode, Processing
              });*/
             }
             includeContent
-              += String::regexReplace(sourceIncludeContent, R"(\{X\})", std::to_string(i)) + "\n";
+              += StringTools::regexReplace(sourceIncludeContent, R"(\{X\})", std::to_string(i))
+                 + "\n";
           }
         }
         else {
@@ -382,12 +384,12 @@ void ShaderProcessor::_ProcessIncludes(const std::string& sourceCode, Processing
             => { return p1 + "{X}";
             });*/
           }
-          includeContent = String::regexReplace(includeContent, R"(\{X\})", indexString);
+          includeContent = StringTools::regexReplace(includeContent, R"(\{X\})", indexString);
         }
       }
 
       // Replace
-      returnValue = String::replace(returnValue, match[0].str(), includeContent);
+      returnValue = StringTools::replace(returnValue, match[0].str(), includeContent);
     }
     else {
       auto includeShaderUrl = options.shadersRepository + "ShadersInclude/" + includeFile + ".fx";

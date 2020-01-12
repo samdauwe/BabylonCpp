@@ -1,7 +1,7 @@
 #include <babylon/materials/textures/loaders/tga_texture_loader.h>
 
-#include <babylon/core/string.h>
 #include <babylon/materials/textures/internal_texture.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/misc/tga.h>
 
 namespace BABYLON {
@@ -20,7 +20,7 @@ bool _TGATextureLoader::canLoad(const std::string& extension,
                                 const InternalTexturePtr& /*fallback*/, bool /*isBase64*/,
                                 bool /*isBuffer*/)
 {
-  return String::startsWith(extension, ".tga");
+  return StringTools::startsWith(extension, ".tga");
 }
 
 std::string _TGATextureLoader::transformUrl(const std::string& rootUrl,

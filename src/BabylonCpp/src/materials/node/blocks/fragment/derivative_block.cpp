@@ -1,8 +1,8 @@
 #include <babylon/materials/node/blocks/fragment/derivative_block.h>
 
-#include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -54,13 +54,13 @@ DerivativeBlock& DerivativeBlock::_buildBlock(NodeMaterialBuildState& state)
   if (iDx->hasEndpoints()) {
     state.compilationString
       += _declareOutput(iDx, state)
-         + String::printf(" = dFdx(%s);\r\n", input()->associatedVariableName().c_str());
+         + StringTools::printf(" = dFdx(%s);\r\n", input()->associatedVariableName().c_str());
   }
 
   if (iDy->hasEndpoints()) {
     state.compilationString
       += _declareOutput(iDy, state)
-         + String::printf(" = dFdy(%s);\r\n", input()->associatedVariableName().c_str());
+         + StringTools::printf(" = dFdy(%s);\r\n", input()->associatedVariableName().c_str());
   }
 
   return *this;

@@ -1,7 +1,6 @@
 #include <babylon/materials/node/blocks/fragment/perturb_normal_block.h>
 
 #include <babylon/core/json_util.h>
-#include <babylon/core/string.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/node/blocks/input/input_block.h>
@@ -10,6 +9,7 @@
 #include <babylon/materials/node/node_material_build_state_shared_data.h>
 #include <babylon/materials/node/node_material_connection_point.h>
 #include <babylon/materials/node/node_material_defines.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -114,7 +114,7 @@ PerturbNormalBlock& PerturbNormalBlock::_buildBlock(NodeMaterialBuildState& stat
 {
   NodeMaterialBlock::_buildBlock(state);
 
-  const auto comments        = String::printf("//%s", name.c_str());
+  const auto comments        = StringTools::printf("//%s", name.c_str());
   const auto& _uv            = uv();
   const auto& _worldPosition = worldPosition();
   const auto& _worldNormal   = worldNormal();
@@ -129,7 +129,7 @@ PerturbNormalBlock& PerturbNormalBlock::_buildBlock(NodeMaterialBuildState& stat
   const auto replaceForBumpInfos
     = strength()->isConnectedToInputBlock() && strength()->connectInputBlock()->isConstant ?
         state._emitFloat(1.f / strength()->connectInputBlock()->value()->get<float>()).c_str() :
-        String::printf("1.0 / %s", strength()->associatedVariableName().c_str());
+        StringTools::printf("1.0 / %s", strength()->associatedVariableName().c_str());
 
   state._emitExtension("derivatives", "#extension GL_OES_standard_derivatives : enable");
   EmitFunctionFromIncludeOptions emitFunctionFromIncludeOptions;
@@ -141,15 +141,16 @@ PerturbNormalBlock& PerturbNormalBlock::_buildBlock(NodeMaterialBuildState& stat
   state._emitFunctionFromInclude("bumpFragmentFunctions", comments, emitFunctionFromIncludeOptions);
   state.compilationString += _declareOutput(output, state) + " = vec4(0.);\r\n";
   EmitCodeFromIncludeOptions emitCodeFromIncludeOptions;
-  emitCodeFromIncludeOptions.replaceStrings = {
-    {"perturbNormal\\(TBN,vBumpUV\\+uvOffset\\)",
-     String::printf("perturbNormal(TBN, %s)", normalMapColor()->associatedVariableName().c_str())},
-    {"vBumpInfos.y", replaceForBumpInfos},
-    {"vBumpUV", _uv->associatedVariableName()},
-    {"vPositionW", _worldPosition->associatedVariableName() + ".xyz"},
-    {"normalW=", output()->associatedVariableName() + ".xyz = "},
-    {"normalW", _worldNormal->associatedVariableName() + ".xyz"},
-    {"defined\\(TANGENT\\)", "defined(IGNORE)"}};
+  emitCodeFromIncludeOptions.replaceStrings
+    = {{"perturbNormal\\(TBN,vBumpUV\\+uvOffset\\)",
+        StringTools::printf("perturbNormal(TBN, %s)",
+                            normalMapColor()->associatedVariableName().c_str())},
+       {"vBumpInfos.y", replaceForBumpInfos},
+       {"vBumpUV", _uv->associatedVariableName()},
+       {"vPositionW", _worldPosition->associatedVariableName() + ".xyz"},
+       {"normalW=", output()->associatedVariableName() + ".xyz = "},
+       {"normalW", _worldNormal->associatedVariableName() + ".xyz"},
+       {"defined\\(TANGENT\\)", "defined(IGNORE)"}};
   state.compilationString
     += state._emitCodeFromInclude("bumpFragment", comments, emitCodeFromIncludeOptions);
 
@@ -158,11 +159,11 @@ PerturbNormalBlock& PerturbNormalBlock::_buildBlock(NodeMaterialBuildState& stat
 
 std::string PerturbNormalBlock::_dumpPropertiesCode()
 {
-  auto codeString
-    = String::printf("%s.invertX = %s;\r\n", _codeVariableName.c_str(), invertX ? "true" : "false");
+  auto codeString = StringTools::printf("%s.invertX = %s;\r\n", _codeVariableName.c_str(),
+                                        invertX ? "true" : "false");
 
-  codeString += String::printf("%s.invertY = %s;\r\n", _codeVariableName.c_str(),
-                               invertY ? "true" : "false");
+  codeString += StringTools::printf("%s.invertY = %s;\r\n", _codeVariableName.c_str(),
+                                    invertY ? "true" : "false");
 
   return codeString;
 }

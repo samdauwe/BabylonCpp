@@ -1,15 +1,14 @@
 #include <babylon/inspector/components/sceneexplorer/entities/light_tree_item_component.h>
 
-#include <babylon/core/string.h>
-#include <imgui_utils/imgui_utils.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_icon_component.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_label_component.h>
 #include <babylon/lights/light.h>
+#include <babylon/misc/string_tools.h>
+#include <imgui_utils/imgui_utils.h>
 
 namespace BABYLON {
 
-LightTreeItemComponent::LightTreeItemComponent(
-  const ILightTreeItemComponentProps& iProps)
+LightTreeItemComponent::LightTreeItemComponent(const ILightTreeItemComponentProps& iProps)
     : props{iProps}
 {
   const auto& light = props.light;
@@ -21,16 +20,16 @@ LightTreeItemComponent::LightTreeItemComponent(
   // Set the entity info
   entityInfo.uniqueId  = light->uniqueId;
   const auto className = light->getClassName();
-  if (String::contains(className, "DirectionalLight")) {
+  if (StringTools::contains(className, "DirectionalLight")) {
     entityInfo.type = EntityType::DirectionalLight;
   }
-  else if (String::contains(className, "HemisphericLight")) {
+  else if (StringTools::contains(className, "HemisphericLight")) {
     entityInfo.type = EntityType::HemisphericLight;
   }
-  else if (String::contains(className, "PointLight")) {
+  else if (StringTools::contains(className, "PointLight")) {
     entityInfo.type = EntityType::PointLight;
   }
-  else if (String::contains(className, "SpotLight")) {
+  else if (StringTools::contains(className, "SpotLight")) {
     entityInfo.type = EntityType::SpotLight;
   }
 }
@@ -57,16 +56,14 @@ void LightTreeItemComponent::render()
 
   // Visibility icon
   if (TreeItemIconComponent::render(faLightbubRegular, "Turn on/off the light",
-                                    ImGui::GetWindowContentRegionWidth()
-                                      - 3.f * ImGui::IconSize,
+                                    ImGui::GetWindowContentRegionWidth() - 3.f * ImGui::IconSize,
                                     state.isEnabled)) {
     switchIsEnabled();
   }
 
   // Enable gizmo icon
   if (TreeItemIconComponent::render(faEye, "Turn on/off the light's gizmo",
-                                    ImGui::GetWindowContentRegionWidth()
-                                      - ImGui::IconSize,
+                                    ImGui::GetWindowContentRegionWidth() - ImGui::IconSize,
                                     state.isGizmoEnabled)) {
     toggleGizmo();
   }

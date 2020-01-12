@@ -3,7 +3,6 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/babylon_version.h>
 #include <babylon/core/logging.h>
-#include <babylon/core/string.h>
 #include <babylon/engines/engine_store.h>
 #include <babylon/engines/extensions/alpha_extension.h>
 #include <babylon/engines/extensions/cube_texture_extension.h>
@@ -36,6 +35,7 @@
 #include <babylon/meshes/webgl/webgl_data_buffer.h>
 #include <babylon/misc/dds.h>
 #include <babylon/misc/file_tools.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/states/alpha_state.h>
 #include <babylon/states/depth_culling_state.h>
 #include <babylon/states/stencil_state.h>
@@ -438,7 +438,7 @@ void ThinEngine::_initGLContext()
   }
 
   // Extensions
-  auto extensionList = String::split(_gl->getString(GL::EXTENSIONS), ' ');
+  auto extensionList = StringTools::split(_gl->getString(GL::EXTENSIONS), ' ');
   std::set<std::string> extensions;
   for (const auto& extension : extensionList) {
     extensions.insert(extension);
@@ -2143,16 +2143,16 @@ InternalTexturePtr ThinEngine::createTexture(
   auto url      = urlArg;
   auto fromData = url.substr(0, 5) == "data:";
   auto fromBlob = url.substr(0, 5) == "blob:";
-  auto isBase64 = fromData && String::contains(url, ";base64,");
+  auto isBase64 = fromData && StringTools::contains(url, ";base64,");
 
   auto texture = fallback ? fallback : InternalTexture::New(this, InternalTextureSource::Url);
 
   // establish the file extension, if possible
-  auto lastDot = String::lastIndexOf(url, ".");
+  auto lastDot = StringTools::lastIndexOf(url, ".");
   auto extension
     = !forcedExtension.empty() ?
         forcedExtension :
-        (lastDot > -1 ? String::toLowerCase(url.substr(static_cast<size_t>(lastDot))) : "");
+        (lastDot > -1 ? StringTools::toLowerCase(url.substr(static_cast<size_t>(lastDot))) : "");
   auto filteredFormat = excludedCompressedTextureFormats(url, _textureFormatInUse);
 
   IInternalTextureLoaderPtr loader = nullptr;

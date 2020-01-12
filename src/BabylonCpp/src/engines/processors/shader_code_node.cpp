@@ -1,8 +1,8 @@
 #include <babylon/engines/processors/shader_code_node.h>
 
-#include <babylon/core/string.h>
 #include <babylon/engines/processors/ishader_processor.h>
 #include <babylon/engines/processors/processing_options.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -26,14 +26,14 @@ std::string ShaderCodeNode::process(std::unordered_map<std::string, std::string>
         value = processor->lineProcessor(value, options.isFragment);
       }
 
-      if (/* processor->attributeProcessor && */ String::startsWith(line, "attribute")) {
+      if (/* processor->attributeProcessor && */ StringTools::startsWith(line, "attribute")) {
         value = processor->attributeProcessor(line);
       }
-      else if (/* processor->varyingProcessor && */ String::startsWith(line, "varying")) {
+      else if (/* processor->varyingProcessor && */ StringTools::startsWith(line, "varying")) {
         value = processor->varyingProcessor(line, options.isFragment);
       }
-      else if (/* (processor->uniformProcessor || processor->uniformBufferProcessor) && */ String::
-                 startsWith(line, "uniform")) {
+      else if (/* (processor->uniformProcessor || processor->uniformBufferProcessor) && */
+               StringTools::startsWith(line, "uniform")) {
         auto reSearch = "uniform (.+) (.+)";
         std::regex regex(reSearch, std::regex::optimize);
 
@@ -51,7 +51,8 @@ std::string ShaderCodeNode::process(std::unordered_map<std::string, std::string>
       }
 
       /* if (processor->endOfUniformBufferProcessor) */ {
-        if (options.lookForClosingBracketForUniformBuffer && String::indexOf(line, "}") != -1) {
+        if (options.lookForClosingBracketForUniformBuffer
+            && StringTools::indexOf(line, "}") != -1) {
           options.lookForClosingBracketForUniformBuffer = false;
           value = processor->endOfUniformBufferProcessor(line, options.isFragment);
         }

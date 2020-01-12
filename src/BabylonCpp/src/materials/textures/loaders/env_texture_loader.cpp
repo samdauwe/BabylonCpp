@@ -1,10 +1,10 @@
 #include <babylon/materials/textures/loaders/env_texture_loader.h>
 
-#include <babylon/core/string.h>
 #include <babylon/engines/engine.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/misc/environment_texture_info.h>
 #include <babylon/misc/environment_texture_tools.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -22,7 +22,7 @@ bool _ENVTextureLoader::canLoad(const std::string& extension,
                                 const InternalTexturePtr& /*fallback*/, bool /*isBase64*/,
                                 bool /*isBuffer*/)
 {
-  return String::startsWith(extension, ".env");
+  return StringTools::startsWith(extension, ".env");
 }
 
 std::string _ENVTextureLoader::transformUrl(const std::string& rootUrl,

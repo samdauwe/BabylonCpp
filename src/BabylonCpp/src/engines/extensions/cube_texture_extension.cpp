@@ -3,7 +3,6 @@
 #include <babylon/asio/asio.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
-#include <babylon/core/string.h>
 #include <babylon/engines/depth_texture_creation_options.h>
 #include <babylon/engines/thin_engine.h>
 #include <babylon/materials/textures/iinternal_texture_loader.h>
@@ -11,6 +10,7 @@
 #include <babylon/maths/isize.h>
 #include <babylon/misc/file_tools.h>
 #include <babylon/misc/ifile_request.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -84,12 +84,13 @@ InternalTexturePtr CubeTextureExtension::createCubeTexture(
     texture->_files     = files;
   }
 
-  auto lastDot = String::lastIndexOf(rootUrl, ".");
+  auto lastDot = StringTools::lastIndexOf(rootUrl, ".");
   auto extension
     = !forcedExtension.empty() ?
         forcedExtension :
-        (lastDot > -1 ? String::toLowerCase(rootUrl.substr(static_cast<unsigned long>(lastDot))) :
-                        "");
+        (lastDot > -1 ?
+           StringTools::toLowerCase(rootUrl.substr(static_cast<unsigned long>(lastDot))) :
+           "");
   const auto filteredFormat
     = _this->excludedCompressedTextureFormats(rootUrl, _this->_textureFormatInUse);
 

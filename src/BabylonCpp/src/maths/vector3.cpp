@@ -459,7 +459,7 @@ Vector3& Vector3::normalize()
 
 Vector3& Vector3::reorderInPlace(std::string order)
 {
-  order = String::toLowerCase(order);
+  order = StringTools::toLowerCase(order);
   if (order == "xyz") {
     return *this;
   }

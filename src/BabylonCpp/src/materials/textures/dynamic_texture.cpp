@@ -2,18 +2,17 @@
 
 #include <nlohmann/json.hpp>
 
-#include <babylon/core/string.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/interfaces/icanvas_rendering_context2D.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
-DynamicTexture::DynamicTexture(const std::string& iName,
-                               const DynamicTextureOptions& options,
-                               Scene* scene, bool generateMipMaps,
-                               unsigned int iSamplingMode, unsigned int format)
+DynamicTexture::DynamicTexture(const std::string& iName, const DynamicTextureOptions& options,
+                               Scene* scene, bool generateMipMaps, unsigned int iSamplingMode,
+                               unsigned int format)
     : Texture{nullptr, scene,   !generateMipMaps, true,  iSamplingMode,
               nullptr, nullptr, std::nullopt,     false, format}
     , canRescale{this, &DynamicTexture::get_canRescale}
@@ -27,13 +26,13 @@ DynamicTexture::DynamicTexture(const std::string& iName,
   _generateMipMaps = generateMipMaps;
 
   if (options.canvas) {
-    _canvas  = options.canvas;
-    _texture = _engine->createDynamicTexture(options.width, options.height,
-                                             generateMipMaps, samplingMode);
+    _canvas = options.canvas;
+    _texture
+      = _engine->createDynamicTexture(options.width, options.height, generateMipMaps, samplingMode);
   }
   else {
-    _texture = _engine->createDynamicTexture(options.width, options.height,
-                                             generateMipMaps, samplingMode);
+    _texture
+      = _engine->createDynamicTexture(options.width, options.height, generateMipMaps, samplingMode);
   }
 
   if (_canvas) {
@@ -63,8 +62,8 @@ void DynamicTexture::_recreate(const ISize& textureSize)
 
   releaseInternalTexture();
 
-  _texture = _engine->createDynamicTexture(
-    textureSize.width, textureSize.height, _generateMipMaps, samplingMode());
+  _texture = _engine->createDynamicTexture(textureSize.width, textureSize.height, _generateMipMaps,
+                                           samplingMode());
 }
 
 void DynamicTexture::scale(float ratio)
@@ -99,14 +98,12 @@ void DynamicTexture::clear()
 
 void DynamicTexture::update(bool iInvertY, bool premulAlpha)
 {
-  _engine->updateDynamicTexture(_texture, _canvas, iInvertY, premulAlpha,
-                                *_format);
+  _engine->updateDynamicTexture(_texture, _canvas, iInvertY, premulAlpha, *_format);
 }
 
-void DynamicTexture::drawText(const std::string& text, int x, int y,
-                              const std::string& font, const std::string& color,
-                              const std::string& clearColor, bool iInvertY,
-                              bool _update)
+void DynamicTexture::drawText(const std::string& text, int x, int y, const std::string& font,
+                              const std::string& color, const std::string& clearColor,
+                              bool iInvertY, bool _update)
 {
   auto size = getSize();
   if (!clearColor.empty()) {
@@ -123,10 +120,9 @@ void DynamicTexture::drawText(const std::string& text, int x, int y,
 
   if (y == 0) {
     auto _font = font;
-    String::replaceInPlace(_font, "/\\D/g", "");
-    auto fontSize  = static_cast<float>(std::stoi(_font));
-    y              = static_cast<int>((static_cast<float>(size.height) / 2.f)
-                         + (fontSize / 3.65f));
+    StringTools::replaceInPlace(_font, "/\\D/g", "");
+    auto fontSize = static_cast<float>(std::stoi(_font));
+    y             = static_cast<int>((static_cast<float>(size.height) / 2.f) + (fontSize / 3.65f));
   }
 
   _context->fillStyle = color;

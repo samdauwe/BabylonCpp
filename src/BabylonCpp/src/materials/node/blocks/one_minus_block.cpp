@@ -1,8 +1,8 @@
 #include <babylon/materials/node/blocks/one_minus_block.h>
 
-#include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -44,7 +44,7 @@ OneMinusBlock& OneMinusBlock::_buildBlock(NodeMaterialBuildState& state)
 
   state.compilationString
     += _declareOutput(iOutput, state)
-       + String::printf(" = 1. - %s;\r\n", input()->associatedVariableName().c_str());
+       + StringTools::printf(" = 1. - %s;\r\n", input()->associatedVariableName().c_str());
 
   return *this;
 }

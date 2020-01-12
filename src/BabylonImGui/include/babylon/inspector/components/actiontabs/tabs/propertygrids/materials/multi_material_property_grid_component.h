@@ -4,10 +4,10 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
-#include <babylon/core/string.h>
 #include <babylon/inspector/components/actiontabs/lines/text_line_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/materials/common_material_property_grid_component.h>
 #include <babylon/materials/multi_material.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -25,8 +25,7 @@ struct BABYLON_SHARED_EXPORT MultiMaterialPropertyGridComponent {
       int i = 0;
       for (const auto& mat : material->subMaterials()) {
         if (mat) {
-          TextLineComponent::render(String::printf("Material #%d", i).c_str(),
-                                    mat->name);
+          TextLineComponent::render(StringTools::printf("Material #%d", i).c_str(), mat->name);
         }
         ++i;
       }

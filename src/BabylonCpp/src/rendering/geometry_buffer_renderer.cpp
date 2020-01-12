@@ -2,7 +2,6 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
-#include <babylon/core/string.h>
 #include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
@@ -16,6 +15,7 @@
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/rendering/geometry_buffer_renderer_scene_component.h>
 
@@ -206,7 +206,7 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
                        + std::to_string(_multiRenderTarget->textures().size()));
 
   // Get correct effect
-  auto join = String::join(defines, '\n');
+  auto join = StringTools::join(defines, '\n');
   if (_cachedDefines != join) {
     _cachedDefines = join;
 

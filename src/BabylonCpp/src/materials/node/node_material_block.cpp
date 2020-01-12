@@ -3,11 +3,11 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
-#include <babylon/core/string.h>
 #include <babylon/materials/node/blocks/input/input_block.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_build_state_shared_data.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/misc/unique_id_generator.h>
 
 namespace BABYLON {
@@ -113,8 +113,8 @@ void NodeMaterialBlock::bind(const EffectPtr& /*effect*/, const NodeMaterialPtr&
 std::string NodeMaterialBlock::_declareOutput(const NodeMaterialConnectionPointPtr& output,
                                               const NodeMaterialBuildState& state) const
 {
-  return String::printf("%s %s", state._getGLType(output->type()).c_str(),
-                        output->associatedVariableName().c_str());
+  return StringTools::printf("%s %s", state._getGLType(output->type()).c_str(),
+                             output->associatedVariableName().c_str());
 }
 
 std::string
@@ -133,7 +133,7 @@ std::string NodeMaterialBlock::_writeFloat(float value) const
 {
   auto stringVersion = std::to_string(value);
 
-  if (!String::contains(stringVersion, ".")) {
+  if (!StringTools::contains(stringVersion, ".")) {
     stringVersion += ".0";
   }
   return stringVersion;
@@ -336,11 +336,11 @@ void NodeMaterialBlock::_processBuild(const NodeMaterialBlockPtr& block,
                                                        + connectedPoint->associatedVariableName(),
                                                      state._getGLType(connectedPoint->type))) {
         state._vertexState->compilationString
-          += String::printf("v_%s = %s;\r\n", connectedPoint->associatedVariableName().c_str(),
-                            connectedPoint->associatedVariableName().c_str());
+          += StringTools::printf("v_%s = %s;\r\n", connectedPoint->associatedVariableName().c_str(),
+                                 connectedPoint->associatedVariableName().c_str());
       }
       input->associatedVariableName
-        = String::printf("v_%s", connectedPoint->associatedVariableName().c_str());
+        = StringTools::printf("v_%s", connectedPoint->associatedVariableName().c_str());
       input->_enforceAssociatedVariableName = true;
     }
   }
@@ -384,7 +384,7 @@ bool NodeMaterialBlock::build(NodeMaterialBuildState& state,
 
   // Logs
   if (state.sharedData->verbose) {
-    const auto logStr = String::printf(
+    const auto logStr = StringTools::printf(
       "%s: Building %s [%s]",
       state.target == NodeMaterialBlockTargets::Vertex ? "Vertex shader" : "Fragment shader",
       name.c_str(), getClassName().c_str());
@@ -424,7 +424,7 @@ bool NodeMaterialBlock::build(NodeMaterialBuildState& state,
   }
 
   if (!isInput && state.sharedData->emitComments) {
-    state.compilationString += String::printf("\r\n//%s\r\n", name.c_str());
+    state.compilationString += StringTools::printf("\r\n//%s\r\n", name.c_str());
   }
 
   _buildBlock(state);
@@ -472,7 +472,7 @@ std::string NodeMaterialBlock::_dumpCode(std::vector<std::string>& uniqueNames,
   std::string codeString;
 
   // Get unique name
-  auto nameAsVariableName = String::regexReplace(name, "[^A-Za-z_]+", "");
+  auto nameAsVariableName = StringTools::regexReplace(name, "[^A-Za-z_]+", "");
   _codeVariableName       = nameAsVariableName;
 
   if (stl_util::contains(uniqueNames, _codeVariableName)) {
@@ -486,8 +486,8 @@ std::string NodeMaterialBlock::_dumpCode(std::vector<std::string>& uniqueNames,
   uniqueNames.emplace_back(_codeVariableName);
 
   // Declaration
-  codeString = String::printf("\r\nauto %s = %s::New(\"%s\");\r\n", _codeVariableName.c_str(),
-                              getClassName().c_str(), name.c_str());
+  codeString = StringTools::printf("\r\nauto %s = %s::New(\"%s\");\r\n", _codeVariableName.c_str(),
+                                   getClassName().c_str(), name.c_str());
 
   // Properties
   codeString += _dumpPropertiesCode();
@@ -505,10 +505,10 @@ std::string NodeMaterialBlock::_dumpCode(std::vector<std::string>& uniqueNames,
       codeString += connectedBlock->_dumpCode(uniqueNames, alreadyDumped);
     }
 
-    codeString
-      += String::printf("%s.%s.connectTo(%s.%s);\r\n", connectedBlock->_codeVariableName.c_str(),
-                        connectedBlock->_outputRename(connectedOutput->name).c_str(),
-                        _codeVariableName.c_str(), _inputRename(input->name).c_str());
+    codeString += StringTools::printf("%s.%s.connectTo(%s.%s);\r\n",
+                                      connectedBlock->_codeVariableName.c_str(),
+                                      connectedBlock->_outputRename(connectedOutput->name).c_str(),
+                                      _codeVariableName.c_str(), _inputRename(input->name).c_str());
   }
 
   // Outputs

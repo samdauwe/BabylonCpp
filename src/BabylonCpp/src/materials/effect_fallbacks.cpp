@@ -1,12 +1,12 @@
 #include <babylon/materials/effect_fallbacks.h>
 
 #include <babylon/core/logging.h>
-#include <babylon/core/string.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/material.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/misc/tools.h>
 
 namespace BABYLON {
@@ -83,7 +83,7 @@ std::string EffectFallbacks::reduce(std::string currentDefines, Effect* effect)
     _mesh->computeBonesUsingShaders = false;
     const std::string toReplace
       = std::string("#define NUM_BONE_INFLUENCERS ") + std::to_string(_mesh->numBoneInfluencers());
-    String::replaceInPlace(currentDefines, toReplace, "#define NUM_BONE_INFLUENCERS 0");
+    StringTools::replaceInPlace(currentDefines, toReplace, "#define NUM_BONE_INFLUENCERS 0");
     effect->_bonesComputationForcedToCPU = true;
 
     auto scene = _mesh->getScene();
@@ -118,7 +118,7 @@ std::string EffectFallbacks::reduce(std::string currentDefines, Effect* effect)
   else {
     if (_defines.find(_currentRank) != _defines.end() && !_defines[_currentRank].empty()) {
       for (const auto& currentFallback : _defines[_currentRank]) {
-        String::replaceInPlace(currentDefines, "#define " + currentFallback, "");
+        StringTools::replaceInPlace(currentDefines, "#define " + currentFallback, "");
       }
     }
     ++_currentRank;

@@ -1,8 +1,8 @@
 ﻿#include <babylon/materials/node/blocks/add_block.h>
 
-#include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -50,8 +50,8 @@ AddBlock& AddBlock::_buildBlock(NodeMaterialBuildState& state)
 
   state.compilationString
     += _declareOutput(iOutput, state)
-       + String::printf(" = %s + %s;\r\n", left()->associatedVariableName().c_str(),
-                        right()->associatedVariableName().c_str());
+       + StringTools::printf(" = %s + %s;\r\n", left()->associatedVariableName().c_str(),
+                             right()->associatedVariableName().c_str());
 
   return *this;
 }

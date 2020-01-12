@@ -1,5 +1,5 @@
 #include <babylon/cameras/arc_rotate_camera.h>
-#include <babylon/core/string.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/directional_light.h>

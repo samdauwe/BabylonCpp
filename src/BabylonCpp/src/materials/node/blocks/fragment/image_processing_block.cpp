@@ -1,12 +1,12 @@
 #include <babylon/materials/node/blocks/fragment/image_processing_block.h>
 
-#include <babylon/core/string.h>
 #include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/node/node_material.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_build_state_shared_data.h>
 #include <babylon/materials/node/node_material_connection_point.h>
 #include <babylon/materials/node/node_material_defines.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -115,7 +115,7 @@ ImageProcessingBlock& ImageProcessingBlock::_buildBlock(NodeMaterialBuildState& 
   // Emit code
   const auto& iColor  = color();
   const auto& iOutput = _outputs[0];
-  const auto comments = String::printf("//%s", name.c_str());
+  const auto comments = StringTools::printf("//%s", name.c_str());
 
   state._emitFunctionFromInclude("helperFunctions", comments);
   state._emitFunctionFromInclude("imageProcessingDeclaration", comments);
@@ -123,26 +123,26 @@ ImageProcessingBlock& ImageProcessingBlock::_buildBlock(NodeMaterialBuildState& 
 
   if (iColor->connectedPoint()->type() == NodeMaterialBlockConnectionPointTypes::Color4) {
     state.compilationString
-      += String::printf("%s = %s;\r\n", _declareOutput(iOutput, state).c_str(),
-                        iColor->associatedVariableName().c_str());
+      += StringTools::printf("%s = %s;\r\n", _declareOutput(iOutput, state).c_str(),
+                             iColor->associatedVariableName().c_str());
   }
   else {
     state.compilationString
-      += String::printf("%s = vec4(%s, 1.0);\r\n", _declareOutput(iOutput, state).c_str(),
-                        iColor->associatedVariableName().c_str());
+      += StringTools::printf("%s = vec4(%s, 1.0);\r\n", _declareOutput(iOutput, state).c_str(),
+                             iColor->associatedVariableName().c_str());
   }
   state.compilationString += "#ifdef IMAGEPROCESSINGPOSTPROCESS\r\n";
-  state.compilationString += String::printf("%s.rgb = toLinearSpace(%s.rgb);\r\n",
-                                            iOutput->associatedVariableName().c_str(),
-                                            iColor->associatedVariableName().c_str());
+  state.compilationString += StringTools::printf("%s.rgb = toLinearSpace(%s.rgb);\r\n",
+                                                 iOutput->associatedVariableName().c_str(),
+                                                 iColor->associatedVariableName().c_str());
   state.compilationString += "#else\r\n";
   state.compilationString += "#ifdef IMAGEPROCESSING\r\n";
-  state.compilationString += String::printf("%s.rgb = toLinearSpace(%s.rgb);\r\n",
-                                            iOutput->associatedVariableName().c_str(),
-                                            iColor->associatedVariableName().c_str());
-  state.compilationString += String::printf("%s = applyImageProcessing(%s);\r\n",
-                                            iOutput->associatedVariableName().c_str(),
-                                            iOutput->associatedVariableName().c_str());
+  state.compilationString += StringTools::printf("%s.rgb = toLinearSpace(%s.rgb);\r\n",
+                                                 iOutput->associatedVariableName().c_str(),
+                                                 iColor->associatedVariableName().c_str());
+  state.compilationString += StringTools::printf("%s = applyImageProcessing(%s);\r\n",
+                                                 iOutput->associatedVariableName().c_str(),
+                                                 iOutput->associatedVariableName().c_str());
   state.compilationString += "#endif\r\n";
   state.compilationString += "#endif\r\n";
 

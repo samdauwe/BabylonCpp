@@ -33,9 +33,9 @@
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/core/filesystem.h>
 #include <babylon/core/logging.h>
-#include <babylon/core/string.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/loading/progress_event.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/utils/base64.h>
 
 #include <stdexcept>
@@ -49,7 +49,7 @@ std::string FileTools::PreprocessUrl(const std::string& url)
 
 std::string FileTools::_CleanUrl(std::string url)
 {
-  String::replaceInPlace(url, "#", "%23");
+  StringTools::replaceInPlace(url, "#", "%23");
   return url;
 }
 

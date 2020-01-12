@@ -1,8 +1,8 @@
 #include <babylon/materials/node/blocks/replace_color_block.h>
 
-#include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -77,16 +77,16 @@ ReplaceColorBlock& ReplaceColorBlock::_buildBlock(NodeMaterialBuildState& state)
   const auto& iOutput = _outputs[0];
 
   state.compilationString += _declareOutput(iOutput, state) + ";\r\n";
-  state.compilationString += String::printf(
+  state.compilationString += StringTools::printf(
     "if (length(%s - %s) < %s) {\r\n", value()->associatedVariableName().c_str(),
     reference()->associatedVariableName().c_str(), distance()->associatedVariableName().c_str());
   state.compilationString
-    += String::printf("%s = %s;\r\n", iOutput->associatedVariableName().c_str(),
-                      replacement()->associatedVariableName().c_str());
+    += StringTools::printf("%s = %s;\r\n", iOutput->associatedVariableName().c_str(),
+                           replacement()->associatedVariableName().c_str());
   state.compilationString += "} else {\r\n";
   state.compilationString
-    += String::printf("%s =  %s;\r\n", iOutput->associatedVariableName().c_str(),
-                      value()->associatedVariableName().c_str());
+    += StringTools::printf("%s =  %s;\r\n", iOutput->associatedVariableName().c_str(),
+                           value()->associatedVariableName().c_str());
   state.compilationString += "}\r\n";
 
   return *this;

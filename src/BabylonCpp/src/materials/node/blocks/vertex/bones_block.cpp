@@ -1,6 +1,5 @@
 #include <babylon/materials/node/blocks/vertex/bones_block.h>
 
-#include <babylon/core/string.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/node/blocks/input/input_block.h>
@@ -11,6 +10,7 @@
 #include <babylon/materials/node/node_material_defines.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -158,7 +158,7 @@ BonesBlock& BonesBlock::_buildBlock(NodeMaterialBuildState& state)
   state.samplers.emplace_back("boneSampler");
 
   // Emit code
-  auto comments = String::printf("//%s", name.c_str());
+  auto comments = StringTools::printf("//%s", name.c_str());
   state._emitFunctionFromInclude("bonesDeclaration", comments,
                                  EmitFunctionFromIncludeOptions{
                                    "",    // repeatKey
@@ -184,18 +184,18 @@ BonesBlock& BonesBlock::_buildBlock(NodeMaterialBuildState& state)
                                      }}                      // replaceStrings
                                   });
 
-  const auto& iOutput     = _outputs[0];
+  const auto& iOutput    = _outputs[0];
   const auto& worldInput = world();
 
   state.compilationString += "#if NUM_BONE_INFLUENCERS>0\r\n";
   state.compilationString
     += _declareOutput(iOutput, state)
-       + String::printf(" = %s * %s;\r\n", worldInput->associatedVariableName().c_str(),
-                        influenceVariablename.c_str());
+       + StringTools::printf(" = %s * %s;\r\n", worldInput->associatedVariableName().c_str(),
+                             influenceVariablename.c_str());
   state.compilationString += "#else\r\n";
   state.compilationString
     += _declareOutput(iOutput, state)
-       + String::printf(" = %s;\r\n", worldInput->associatedVariableName().c_str());
+       + StringTools::printf(" = %s;\r\n", worldInput->associatedVariableName().c_str());
   state.compilationString += "#endif\r\n";
 
   return *this;

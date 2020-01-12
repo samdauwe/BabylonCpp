@@ -1,13 +1,12 @@
 #include <babylon/meshes/polygonmesh/polygon.h>
 
-#include <babylon/core/string.h>
 #include <babylon/maths/path2.h>
 #include <babylon/maths/vector2.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
-std::vector<Vector2> Polygon::Rectangle(float xmin, float ymin, float xmax,
-                                        float ymax)
+std::vector<Vector2> Polygon::Rectangle(float xmin, float ymin, float xmax, float ymax)
 {
   return {
     Vector2(xmin, ymin), //
@@ -17,8 +16,7 @@ std::vector<Vector2> Polygon::Rectangle(float xmin, float ymin, float xmax,
   };
 }
 
-std::vector<Vector2> Polygon::Circle(float radius, float cx, float cy,
-                                     size_t numberOfSides)
+std::vector<Vector2> Polygon::Circle(float radius, float cx, float cy, size_t numberOfSides)
 {
   std::vector<Vector2> result;
 
@@ -26,8 +24,7 @@ std::vector<Vector2> Polygon::Circle(float radius, float cx, float cy,
   float increment = Math::PI2 / static_cast<float>(numberOfSides);
 
   for (size_t i = 0; i < numberOfSides; ++i) {
-    result.emplace_back(Vector2(cx + std::cos(angle) * radius,
-                                cy + std::sin(angle) * radius));
+    result.emplace_back(Vector2(cx + std::cos(angle) * radius, cy + std::sin(angle) * radius));
     angle -= increment;
   }
 
@@ -38,14 +35,13 @@ std::vector<Vector2> Polygon::Parse(const std::string& input)
 {
   std::vector<Vector2> result;
   std::string inputCpy = input;
-  String::replaceInPlace(inputCpy, "\\", "");
-  String::replaceInPlace(inputCpy, "  ", " ");
-  std::vector<std::string> floats = String::split(inputCpy, ' ');
+  StringTools::replaceInPlace(inputCpy, "\\", "");
+  StringTools::replaceInPlace(inputCpy, "  ", " ");
+  std::vector<std::string> floats = StringTools::split(inputCpy, ' ');
   size_t floatsSize               = floats.size() - (floats.size() % 2);
   result.reserve(floatsSize / 2);
   for (size_t i = 0; i < floatsSize; i += 2) {
-    result.emplace_back(
-      Vector2(std::stof(floats[i]), std::stof(floats[i + 1])));
+    result.emplace_back(Vector2(std::stof(floats[i]), std::stof(floats[i + 1])));
   }
 
   return result;

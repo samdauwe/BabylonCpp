@@ -3,7 +3,6 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
-#include <babylon/core/string.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
@@ -27,6 +26,7 @@
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/file_tools.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -621,9 +621,9 @@ bool NodeMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, b
 
 std::string NodeMaterial::compiledShaders() const
 {
-  return String::printf("// Vertex shader\r\n%s\r\n\r\n// Fragment shader\r\n%s",
-                        _vertexCompilationState->compilationString.c_str(),
-                        _fragmentCompilationState->compilationString.c_str());
+  return StringTools::printf("// Vertex shader\r\n%s\r\n\r\n// Fragment shader\r\n%s",
+                             _vertexCompilationState->compilationString.c_str(),
+                             _fragmentCompilationState->compilationString.c_str());
 }
 
 void NodeMaterial::bindOnlyWorldMatrix(Matrix& world)
@@ -862,13 +862,13 @@ std::string NodeMaterial::generateCode()
   }
 
   for (const auto& node : _vertexOutputNodes) {
-    codeString
-      += String::printf("nodeMaterial->addOutputNode(%s);\r\n", node->_codeVariableName.c_str());
+    codeString += StringTools::printf("nodeMaterial->addOutputNode(%s);\r\n",
+                                      node->_codeVariableName.c_str());
   }
 
   for (const auto& node : _fragmentOutputNodes) {
-    codeString
-      += String::printf("nodeMaterial->addOutputNode(%s);\r\n", node->_codeVariableName.c_str());
+    codeString += StringTools::printf("nodeMaterial->addOutputNode(%s);\r\n",
+                                      node->_codeVariableName.c_str());
   }
 
   codeString += "nodeMaterial->build();\r\n";

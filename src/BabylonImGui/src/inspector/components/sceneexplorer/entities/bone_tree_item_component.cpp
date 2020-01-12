@@ -1,7 +1,7 @@
 #include <babylon/inspector/components/sceneexplorer/entities/bone_tree_item_component.h>
 
 #include <babylon/bones/bone.h>
-#include <babylon/core/string.h>
+#include <babylon/misc/string_tools.h>
 #include <imgui_utils/imgui_utils.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_label_component.h>
 

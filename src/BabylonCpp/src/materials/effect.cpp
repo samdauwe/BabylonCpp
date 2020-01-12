@@ -4,7 +4,6 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
-#include <babylon/core/string.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/ipipeline_context.h>
 #include <babylon/engines/processors/processing_options.h>
@@ -18,6 +17,7 @@
 #include <babylon/maths/color3.h>
 #include <babylon/maths/vector2.h>
 #include <babylon/maths/vector4.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/misc/tools.h>
 #include <babylon/utils/base64.h>
 
@@ -101,7 +101,7 @@ Effect::Effect(
   }
 
   ProcessingOptions processorOptions;
-  processorOptions.defines                      = String::split(defines, '\n');
+  processorOptions.defines                      = StringTools::split(defines, '\n');
   processorOptions.indexParameters              = _indexParameters;
   processorOptions.isFragment                   = false;
   processorOptions.shouldUseHighPrecisionShader = _engine->_shouldUseHighPrecisionShader();
@@ -388,12 +388,12 @@ void Effect::_dumpShadersSource(std::string vertexCode, std::string fragmentCode
   unsigned int i = 2;
   const std::regex regex("\n", std::regex::optimize);
   auto formattedVertexCode
-    = "\n1\t" + String::regexReplace(vertexCode, regex, [&i](const std::smatch& /*m*/) {
+    = "\n1\t" + StringTools::regexReplace(vertexCode, regex, [&i](const std::smatch& /*m*/) {
         return "\n" + std::to_string(i++) + "\t";
       });
   i = 2;
   auto formattedFragmentCode
-    = "\n1\t" + String::regexReplace(fragmentCode, regex, [&i](const std::smatch& /*m*/) {
+    = "\n1\t" + StringTools::regexReplace(fragmentCode, regex, [&i](const std::smatch& /*m*/) {
         return "\n" + std::to_string(i++) + "\t";
       });
 
@@ -548,8 +548,8 @@ void Effect::_processCompilationErrors(const std::exception& e,
 
   // Let's go through fallbacks then
   BABYLON_LOG_ERROR("Effect", "Unable to compile effect: ")
-  BABYLON_LOGF_ERROR("Effect", "Uniforms: %s", String::join(_uniformsNames, ' ').c_str())
-  BABYLON_LOGF_ERROR("Effect", "Attributes: %s", String::join(attributesNames, ' ').c_str())
+  BABYLON_LOGF_ERROR("Effect", "Uniforms: %s", StringTools::join(_uniformsNames, ' ').c_str())
+  BABYLON_LOGF_ERROR("Effect", "Attributes: %s", StringTools::join(attributesNames, ' ').c_str())
   BABYLON_LOGF_ERROR("Effect", "Defines: %s", defines.c_str())
   BABYLON_LOGF_ERROR("Effect", "Error: %s", _compilationError.c_str())
 
@@ -1034,11 +1034,11 @@ void Effect::RegisterShader(const std::string& name, const std::optional<std::st
                             const std::optional<std::string>& vertexShader)
 {
   if (pixelShader.has_value()) {
-    Effect::ShadersStore()[String::concat(name, "PixelShader")] = *pixelShader;
+    Effect::ShadersStore()[StringTools::concat(name, "PixelShader")] = *pixelShader;
   }
 
   if (vertexShader) {
-    Effect::ShadersStore()[String::concat(name, "VertexShader")] = *vertexShader;
+    Effect::ShadersStore()[StringTools::concat(name, "VertexShader")] = *vertexShader;
   }
 }
 

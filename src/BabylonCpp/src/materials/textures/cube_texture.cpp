@@ -1,22 +1,21 @@
 #include <babylon/materials/textures/cube_texture.h>
 
 #include <babylon/core/json_util.h>
-#include <babylon/core/string.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/material.h>
-#include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/iinternal_texture_loader.h>
+#include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/maths/matrix.h>
 #include <babylon/misc/serialization_helper.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/misc/tools.h>
 
 namespace BABYLON {
 
-CubeTexturePtr
-CubeTexture::CreateFromImages(const std::vector<std::string>& iFiles,
-                              Scene* scene, bool iNoMipmap)
+CubeTexturePtr CubeTexture::CreateFromImages(const std::vector<std::string>& iFiles, Scene* scene,
+                                             bool iNoMipmap)
 {
   std::string rootUrlKey;
 
@@ -25,30 +24,25 @@ CubeTexture::CreateFromImages(const std::vector<std::string>& iFiles,
   }
 
   const std::vector<std::string> emptyStringList;
-  return CubeTexture::New(rootUrlKey, scene, emptyStringList, iNoMipmap,
-                          iFiles);
+  return CubeTexture::New(rootUrlKey, scene, emptyStringList, iNoMipmap, iFiles);
 }
 
-CubeTexturePtr
-CubeTexture::CreateFromPrefilteredData(const std::string& url, Scene* scene,
-                                       const std::string& forcedExtension,
-                                       bool createPolynomials)
+CubeTexturePtr CubeTexture::CreateFromPrefilteredData(const std::string& url, Scene* scene,
+                                                      const std::string& forcedExtension,
+                                                      bool createPolynomials)
 {
   const std::vector<std::string> emptyStringList;
-  return CubeTexture::New(url, scene, emptyStringList, false, emptyStringList,
-                          nullptr, nullptr, Constants::TEXTUREFORMAT_RGBA, true,
-                          forcedExtension, createPolynomials);
+  return CubeTexture::New(url, scene, emptyStringList, false, emptyStringList, nullptr, nullptr,
+                          Constants::TEXTUREFORMAT_RGBA, true, forcedExtension, createPolynomials);
 }
 
 CubeTexture::CubeTexture(
-  const std::string& rootUrl, Scene* scene,
-  const std::vector<std::string>& extensions, bool iNoMipmap,
-  const std::vector<std::string>& iFiles,
+  const std::string& rootUrl, Scene* scene, const std::vector<std::string>& extensions,
+  bool iNoMipmap, const std::vector<std::string>& iFiles,
   const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
-  const std::function<void(const std::string& message,
-                           const std::string& exception)>& onError,
-  unsigned int format, bool prefiltered, const std::string& forcedExtension,
-  bool createPolynomials, float lodScale, float lodOffset)
+  const std::function<void(const std::string& message, const std::string& exception)>& onError,
+  unsigned int format, bool prefiltered, const std::string& forcedExtension, bool createPolynomials,
+  float lodScale, float lodOffset)
     : BaseTexture{scene}
     , url{rootUrl}
     , boundingBoxPosition{Vector3::Zero()}
@@ -77,13 +71,12 @@ CubeTexture::CubeTexture(
     return;
   }
 
-  const auto lastDot = String::lastIndexOf(rootUrl, ".");
+  const auto lastDot = StringTools::lastIndexOf(rootUrl, ".");
   const auto extension
     = (!forcedExtension.empty()) ?
         forcedExtension :
-        (lastDot > -1 ?
-           String::toLowerCase(rootUrl.substr(static_cast<size_t>(lastDot))) :
-           "");
+        (lastDot > -1 ? StringTools::toLowerCase(rootUrl.substr(static_cast<size_t>(lastDot))) :
+                        "");
   const auto isDDS = (extension == ".dds");
   const auto isEnv = (extension == ".env");
 
@@ -107,8 +100,7 @@ CubeTexture::CubeTexture(
     _extensions = extensions;
 
     if (!isEnv && !isDDS && _extensions.empty()) {
-      _extensions
-        = {"_px.jpg", "_py.jpg", "_pz.jpg", "_nx.jpg", "_ny.jpg", "_nz.jpg"};
+      _extensions = {"_px.jpg", "_py.jpg", "_pz.jpg", "_nx.jpg", "_ny.jpg", "_nz.jpg"};
     }
 
     _files.clear();
@@ -124,13 +116,13 @@ CubeTexture::CubeTexture(
     if (!scene->useDelayedTextureLoading) {
       if (prefiltered) {
         _texture = scene->getEngine()->createPrefilteredCubeTexture(
-          rootUrl, scene, lodScale, lodOffset, onLoad, onError, format,
-          forcedExtension, _createPolynomials);
+          rootUrl, scene, lodScale, lodOffset, onLoad, onError, format, forcedExtension,
+          _createPolynomials);
       }
       else {
-        _texture = scene->getEngine()->createCubeTexture(
-          rootUrl, scene, _files, noMipmap, onLoad, onError, _format,
-          forcedExtension, false, lodScale, lodOffset);
+        _texture = scene->getEngine()->createCubeTexture(rootUrl, scene, _files, noMipmap, onLoad,
+                                                         onError, _format, forcedExtension, false,
+                                                         lodScale, lodOffset);
       }
     }
     else {
@@ -234,14 +226,13 @@ void CubeTexture::delayLoad(const std::string& forcedExtension)
   if (!_texture) {
     if (_prefiltered) {
       _texture = scene->getEngine()->createPrefilteredCubeTexture(
-        url, scene, lodGenerationScale, lodGenerationOffset, _delayedOnLoad,
-        nullptr, _format, "", _createPolynomials);
+        url, scene, lodGenerationScale, lodGenerationOffset, _delayedOnLoad, nullptr, _format, "",
+        _createPolynomials);
     }
     else {
 
       _texture = scene->getEngine()->createCubeTexture(
-        url, scene, _files, _noMipmap, _delayedOnLoad, nullptr, _format,
-        forcedExtension);
+        url, scene, _files, _noMipmap, _delayedOnLoad, nullptr, _format, forcedExtension);
     }
   }
 }
@@ -261,10 +252,9 @@ void CubeTexture::setReflectionTextureMatrix(Matrix value)
     getScene()->markAllMaterialsAsDirty(
       Constants::MATERIAL_TextureDirtyFlag, [this](Material* mat) -> bool {
         auto activeTextures = mat->getActiveTextures();
-        auto it = std::find_if(activeTextures.begin(), activeTextures.end(),
-                               [this](const BaseTexturePtr& baseTexture) {
-                                 return baseTexture.get() == this;
-                               });
+        auto it             = std::find_if(
+          activeTextures.begin(), activeTextures.end(),
+          [this](const BaseTexturePtr& baseTexture) { return baseTexture.get() == this; });
         return it != activeTextures.end();
       });
   }
@@ -282,30 +272,28 @@ CubeTexturePtr CubeTexture::Parse(const json& parsedTexture, Scene* scene,
       if (json_util::get_bool(parsedTexture, "prefiltered")) {
         prefiltered = true;
       }
-      return CubeTexture::New(
-        rootUrl + json_util::get_string(parsedTexture, "name"), scene,
-        json_util::get_array<std::string>(parsedTexture, "extensions"), false,
-        std::vector<std::string>{}, nullptr, nullptr,
-        Constants::TEXTUREFORMAT_RGBA, prefiltered);
+      return CubeTexture::New(rootUrl + json_util::get_string(parsedTexture, "name"), scene,
+                              json_util::get_array<std::string>(parsedTexture, "extensions"), false,
+                              std::vector<std::string>{}, nullptr, nullptr,
+                              Constants::TEXTUREFORMAT_RGBA, prefiltered);
     },
     parsedTexture, scene);
 
   // Local Cubemaps
   if (json_util::has_key(parsedTexture, "boundingBoxPosition")
       && !json_util::is_null(parsedTexture["boundingBoxPosition"])) {
-    texture->boundingBoxPosition = Vector3::FromArray(
-      json_util::get_array<float>(parsedTexture, "boundingBoxPosition"));
+    texture->boundingBoxPosition
+      = Vector3::FromArray(json_util::get_array<float>(parsedTexture, "boundingBoxPosition"));
   }
   if (json_util::has_key(parsedTexture, "boundingBoxSize")
       && !json_util::is_null(parsedTexture["boundingBoxSize"])) {
-    texture->boundingBoxSize = Vector3::FromArray(
-      json_util::get_array<float>(parsedTexture, "boundingBoxSize"));
+    texture->boundingBoxSize
+      = Vector3::FromArray(json_util::get_array<float>(parsedTexture, "boundingBoxSize"));
   }
 
   // Animations
   if (json_util::has_key(parsedTexture, "animations")) {
-    for (auto& parsedAnimation :
-         json_util::get_array<json>(parsedTexture, "animations"))
+    for (auto& parsedAnimation : json_util::get_array<json>(parsedTexture, "animations"))
       texture->animations.emplace_back(Animation::Parse(parsedAnimation));
   }
 
@@ -320,9 +308,9 @@ CubeTexturePtr CubeTexture::clone() const
     return nullptr;
   }
 
-  auto newCubeTexture = CubeTexture::New(
-    url, scene, _extensions, _noMipmap, _files, nullptr, nullptr, _format,
-    _prefiltered, _forcedExtension, _createPolynomials, _lodScale, _lodOffset);
+  auto newCubeTexture
+    = CubeTexture::New(url, scene, _extensions, _noMipmap, _files, nullptr, nullptr, _format,
+                       _prefiltered, _forcedExtension, _createPolynomials, _lodScale, _lodOffset);
 
   return newCubeTexture;
 }

@@ -1,9 +1,9 @@
 #include <babylon/postprocesses/fxaa_post_process.h>
 
-#include <babylon/core/string.h>
 #include <babylon/engines/engine.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/texture_constants.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -44,7 +44,8 @@ std::string FxaaPostProcess::_getDefines()
   }
 
   auto glInfo = engine->getGlInfo();
-  if (!glInfo.renderer.empty() && String::contains(String::toLowerCase(glInfo.renderer), "mali")) {
+  if (!glInfo.renderer.empty()
+      && StringTools::contains(StringTools::toLowerCase(glInfo.renderer), "mali")) {
     return "#define MALI 1\n";
   }
 

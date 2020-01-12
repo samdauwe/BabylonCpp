@@ -1,9 +1,9 @@
 #include <babylon/materials/node/blocks/fragment/discard_block.h>
 
-#include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_build_state_shared_data.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -40,8 +40,8 @@ DiscardBlock& DiscardBlock::_buildBlock(NodeMaterialBuildState& state)
   state.sharedData->hints.needAlphaTesting = true;
 
   state.compilationString
-    += String::printf("if (%s < %s) discard;\r\n", value()->associatedVariableName().c_str(),
-                      cutoff()->associatedVariableName().c_str());
+    += StringTools::printf("if (%s < %s) discard;\r\n", value()->associatedVariableName().c_str(),
+                           cutoff()->associatedVariableName().c_str());
 
   return *this;
 }

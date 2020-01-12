@@ -5,7 +5,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/core/logging.h>
-#include <babylon/core/string.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/icanvas.h>

@@ -1,5 +1,5 @@
-#ifndef BABYLON_CORE_STRING_H
-#define BABYLON_CORE_STRING_H
+#ifndef BABYLON_MISC_STRING_H
+#define BABYLON_MISC_STRING_H
 
 #include <algorithm>
 #include <cctype>
@@ -16,7 +16,7 @@ namespace BABYLON {
 /**
  * @brief Helper functions to manipulate strings.
  */
-namespace String {
+namespace StringTools {
 
 /**
  * Variadic template for concatenating a string.
@@ -446,23 +446,20 @@ inline std::string regexReplace(const std::string& source, const std::string& re
  * Performs a regex and stores the std::regex in a static cache.
  * Use it for commonly used replacements.
  */
-inline std::string regexReplace_Cached(
-  const std::string& source,
-  const std::string& reSearch,
-  const std::string& replacement)
+inline std::string regexReplace_Cached(const std::string& source, const std::string& reSearch,
+                                       const std::string& replacement)
 {
   std::string result;
-  std::regex * regex;
+  std::regex* regex;
   {
     static std::unordered_map<std::string, std::regex> preparedRegexes;
     if (preparedRegexes.find(reSearch) == preparedRegexes.end())
       preparedRegexes[reSearch] = std::regex(reSearch, std::regex::optimize);
 
-    regex = & preparedRegexes.at(reSearch);
+    regex = &preparedRegexes.at(reSearch);
   }
 
-  std::regex_replace(std::back_inserter(result), source.begin(), source.end(),
-                     *regex, replacement);
+  std::regex_replace(std::back_inserter(result), source.begin(), source.end(), *regex, replacement);
   return result;
 }
 
@@ -586,7 +583,7 @@ inline std::string stripWhite(const std::string& input)
  */
 inline std::string stripComments(const std::string& input, const std::string& delimiters = "//")
 {
-  int delimitersIndex = String::indexOf(input, delimiters);
+  int delimitersIndex = StringTools::indexOf(input, delimiters);
   return delimitersIndex >= 0 ? stripWhite(input.substr(0, static_cast<size_t>(delimitersIndex))) :
                                 input;
 }
@@ -716,7 +713,7 @@ inline std::string trimCopy(const std::string& str)
   return trimLeft(trimRight(s));
 }
 
-} // end of namespace String
+} // end of namespace StringTools
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_CORE_STRING_H
+#endif // end of BABYLON_MISC_STRING_H

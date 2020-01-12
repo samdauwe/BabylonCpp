@@ -1,9 +1,9 @@
 #include <babylon/materials/node/blocks/fragment/fragment_output_block.h>
 
-#include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_build_state_shared_data.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -53,13 +53,13 @@ FragmentOutputBlock& FragmentOutputBlock::_buildBlock(NodeMaterialBuildState& st
 
   if (_rgba->connectedPoint()) {
     if (_a->isConnected()) {
-      state.compilationString += String::printf("gl_FragColor = vec4(%s.rgb, %s);\r\n",
-                                                _rgba->associatedVariableName().c_str(),
-                                                _a->associatedVariableName().c_str());
+      state.compilationString += StringTools::printf("gl_FragColor = vec4(%s.rgb, %s);\r\n",
+                                                     _rgba->associatedVariableName().c_str(),
+                                                     _a->associatedVariableName().c_str());
     }
     else {
       state.compilationString
-        += String::printf("gl_FragColor = %s;\r\n", _rgba->associatedVariableName().c_str());
+        += StringTools::printf("gl_FragColor = %s;\r\n", _rgba->associatedVariableName().c_str());
     }
   }
   else if (_rgb->connectedPoint()) {
@@ -70,13 +70,13 @@ FragmentOutputBlock& FragmentOutputBlock::_buildBlock(NodeMaterialBuildState& st
     }
 
     if (_rgb->connectedPoint()->type() == NodeMaterialBlockConnectionPointTypes::Float) {
-      state.compilationString += String::printf(
+      state.compilationString += StringTools::printf(
         "gl_FragColor = vec4(%s, %s, %s, %s);\r\n", _rgb->associatedVariableName().c_str(),
         _rgb->associatedVariableName().c_str(), _rgb->associatedVariableName().c_str(),
         aValue.c_str());
     }
     else {
-      state.compilationString += String::printf(
+      state.compilationString += StringTools::printf(
         "gl_FragColor = vec4(%s, %s);\r\n", _rgb->associatedVariableName().c_str(), aValue.c_str());
     }
   }

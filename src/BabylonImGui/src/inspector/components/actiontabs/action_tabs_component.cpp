@@ -1,7 +1,7 @@
 #include <babylon/inspector/components/actiontabs/action_tabs_component.h>
 
 #include <imgui.h>
-#include <babylon/core/string.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/inspector/components/actiontabs/tabs/debug_tab_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/property_grid_tab_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/statistics_tab_component.h>

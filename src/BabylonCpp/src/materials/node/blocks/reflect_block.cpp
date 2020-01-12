@@ -1,8 +1,8 @@
 #include <babylon/materials/node/blocks/reflect_block.h>
 
-#include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -59,9 +59,9 @@ ReflectBlock& ReflectBlock::_buildBlock(NodeMaterialBuildState& state)
   const auto& iOutput = _outputs[0];
 
   state.compilationString += _declareOutput(iOutput, state)
-                             + String::printf(" = reflect(%s.xyz, %s.xyz);\r\n",
-                                              incident()->associatedVariableName().c_str(),
-                                              normal()->associatedVariableName().c_str());
+                             + StringTools::printf(" = reflect(%s.xyz, %s.xyz);\r\n",
+                                                   incident()->associatedVariableName().c_str(),
+                                                   normal()->associatedVariableName().c_str());
 
   return *this;
 }

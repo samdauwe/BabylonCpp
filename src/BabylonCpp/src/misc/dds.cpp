@@ -595,7 +595,7 @@ ArrayBuffer DDSTools::ToArrayBuffer(const std::variant<std::string, ArrayBuffer>
 {
   ArrayBuffer byteArray;
   if (std::holds_alternative<std::string>(arrayBuffer)) {
-    auto charArray = String::toCharArray(std::get<std::string>(arrayBuffer));
+    auto charArray = StringTools::toCharArray(std::get<std::string>(arrayBuffer));
     byteArray      = stl_util::to_array<uint8_t>(charArray);
   }
   else {

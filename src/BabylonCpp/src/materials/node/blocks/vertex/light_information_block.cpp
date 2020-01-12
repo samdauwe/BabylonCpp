@@ -1,7 +1,6 @@
 ﻿#include <babylon/materials/node/blocks/vertex/light_information_block.h>
 
 #include <babylon/core/json_util.h>
-#include <babylon/core/string.h>
 #include <babylon/engines/scene.h>
 #include <babylon/lights/light.h>
 #include <babylon/materials/effect.h>
@@ -10,6 +9,7 @@
 #include <babylon/materials/node/node_material_build_state_shared_data.h>
 #include <babylon/materials/node/node_material_connection_point.h>
 #include <babylon/materials/node/node_material_defines.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -112,20 +112,21 @@ LightInformationBlock& LightInformationBlock::_buildBlock(NodeMaterialBuildState
   state._emitUniformFromString(_lightDataUniformName, "vec3");
   state._emitUniformFromString(_lightColorUniformName, "vec4");
 
-  state.compilationString += String::printf("#if %s\r\n", _lightTypeDefineName.c_str());
+  state.compilationString += StringTools::printf("#if %s\r\n", _lightTypeDefineName.c_str());
   state.compilationString
     += _declareOutput(_direction, state)
-       + String::printf(" = normalize(%s - %s.xyz);\r\n", _lightDataUniformName.c_str(),
-                        worldPosition()->associatedVariableName().c_str());
+       + StringTools::printf(" = normalize(%s - %s.xyz);\r\n", _lightDataUniformName.c_str(),
+                             worldPosition()->associatedVariableName().c_str());
   state.compilationString += "#else\r\n";
   state.compilationString += _declareOutput(_direction, state)
-                             + String::printf(" = %s;\r\n", _lightDataUniformName.c_str());
+                             + StringTools::printf(" = %s;\r\n", _lightDataUniformName.c_str());
   state.compilationString += "#endif\r\n";
 
-  state.compilationString += _declareOutput(_color, state)
-                             + String::printf(" = %s.rgb;\r\n", _lightColorUniformName.c_str());
+  state.compilationString
+    += _declareOutput(_color, state)
+       + StringTools::printf(" = %s.rgb;\r\n", _lightColorUniformName.c_str());
   state.compilationString += _declareOutput(_intensity, state)
-                             + String::printf(" = %s.a;\r\n", _lightColorUniformName.c_str());
+                             + StringTools::printf(" = %s.a;\r\n", _lightColorUniformName.c_str());
 
   return *this;
 }

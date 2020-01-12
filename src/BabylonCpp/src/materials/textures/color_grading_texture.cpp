@@ -2,13 +2,13 @@
 
 #include <nlohmann/json.hpp>
 
-#include <babylon/core/string.h>
 #include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/texture.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/misc/tools.h>
 
 namespace BABYLON {
@@ -78,7 +78,7 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
     Uint8Array data;
     Float32Array tempData;
 
-    auto lines  = String::split(text, '\n');
+    auto lines  = StringTools::split(text, '\n');
     size_t size = 0, pixelIndexW = 0, pixelIndexH = 0, pixelIndexSlice = 0;
     int maxColor = 0;
 
@@ -92,7 +92,7 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
         continue;
       }
 
-      auto words = String::split(line, ' ');
+      auto words = StringTools::split(line, ' ');
       if (size == 0) {
         // Number of space + one
         size = words.size();
@@ -170,7 +170,7 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
 
 void ColorGradingTexture::loadTexture()
 {
-  if (!url.empty() && String::endsWith(String::toLowerCase(url), ".3dl")) {
+  if (!url.empty() && StringTools::endsWith(StringTools::toLowerCase(url), ".3dl")) {
     load3dlTexture();
   }
 }

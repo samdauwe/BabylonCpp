@@ -4,7 +4,7 @@
 
 #include <babylon/animations/animation.h>
 #include <babylon/babylon_stl_util.h>
-#include <babylon/core/string.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/core/time.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>

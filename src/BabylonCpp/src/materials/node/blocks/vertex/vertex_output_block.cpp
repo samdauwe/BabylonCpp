@@ -1,8 +1,8 @@
 #include <babylon/materials/node/blocks/vertex/vertex_output_block.h>
 
-#include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -32,7 +32,7 @@ VertexOutputBlock& VertexOutputBlock::_buildBlock(NodeMaterialBuildState& state)
   const auto& input = vector();
 
   state.compilationString
-    += String::printf("gl_Position = %s;\r\n", input->associatedVariableName().c_str());
+    += StringTools::printf("gl_Position = %s;\r\n", input->associatedVariableName().c_str());
 
   return *this;
 }

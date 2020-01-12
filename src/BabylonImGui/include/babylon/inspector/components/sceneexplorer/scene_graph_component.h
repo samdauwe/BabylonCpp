@@ -2,7 +2,7 @@
 #define BABYLON_INSPECTOR_COMPONENTS_SCENE_EXPLORER_SCENE_GRAPH_COMPONENT_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/core/string.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/core/tree.h>
 #include <imgui_utils/icons_font_awesome_5.h>
 

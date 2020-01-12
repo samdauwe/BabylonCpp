@@ -7,7 +7,7 @@
 #include <babylon/babylon_constants.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/random.h>
-#include <babylon/core/string.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -41,8 +41,7 @@ constexpr bool WithinEpsilon(T a, T b, T epsilon = 1.401298E-45f)
 }
 
 /**
- * @brief Returns a string : the upper case translation of the number i to
- * hexadecimal.
+ * @brief Returns a string : the upper case translation of the number i to hexadecimal.
  * @param i number
  * @returns the upper case translation of the number i to hexadecimal.
  */
@@ -50,7 +49,7 @@ inline std::string ToHex(int i)
 {
   std::ostringstream stream;
   stream << std::setfill('0') << std::setw(2) << std::hex << i;
-  return String::toUpperCase(stream.str());
+  return StringTools::toUpperCase(stream.str());
 }
 
 /**
@@ -116,23 +115,19 @@ constexpr int IMul(int a, int b)
 {
   // the shift by 0 fixes the sign on the high part
   // the final |0 converts the unsigned value into a signed value
-  return ((((a & 0xffff) * (b & 0xffff))
-           + (((((a >> 16) & 0xffff) * (b & 0xffff)
-                + (a & 0xffff) * ((b >> 16) & 0xffff))
-               << 16)
-              >> 0))
-          | 0);
+  return (
+    (((a & 0xffff) * (b & 0xffff))
+     + (((((a >> 16) & 0xffff) * (b & 0xffff) + (a & 0xffff) * ((b >> 16) & 0xffff)) << 16) >> 0))
+    | 0);
 }
 
 /**
- * @brief Loops the value, so that it is never larger than length and never
- * smaller than 0.
+ * @brief Loops the value, so that it is never larger than length and never smaller than 0.
  *
- * This is similar to the modulo operator but it works with floating point
- * numbers. For example, using 3.0 for t and 2.5 for length, the result would be
- * 0.5. With t = 5 and length = 2.5, the result would be 0.0. Note, however,
- * that the behaviour is not defined for negative numbers as it is for the
- * modulo operator
+ * This is similar to the modulo operator but it works with floating point numbers. For example,
+ * using 3.0 for t and 2.5 for length, the result would be 0.5. With t = 5 and length = 2.5, the
+ * result would be 0.0. Note, however, that the behaviour is not defined for negative numbers as it
+ * is for the modulo operator
  * @param value the value
  * @param length the length
  * @returns the looped value
@@ -327,8 +322,7 @@ constexpr float InverseLerp(float a, float b, float value)
  * @param amount input value
  * @returns hermite result
  */
-constexpr float Hermite(float value1, float tangent1, float value2,
-                        float tangent2, float amount)
+constexpr float Hermite(float value1, float tangent1, float value2, float tangent2, float amount)
 {
   const float squared = amount * amount;
   const float cubed   = amount * squared;
@@ -337,8 +331,7 @@ constexpr float Hermite(float value1, float tangent1, float value2,
   const float part3   = (cubed - (2.f * squared)) + amount;
   const float part4   = cubed - squared;
 
-  return (((value1 * part1) + (value2 * part2)) + (tangent1 * part3))
-         + (tangent2 * part4);
+  return (((value1 * part1) + (value2 * part2)) + (tangent1 * part3)) + (tangent2 * part4);
 }
 
 /**

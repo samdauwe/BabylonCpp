@@ -1,8 +1,8 @@
 #include <babylon/misc/highdynamicrange/hdr_tools.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/core/string.h>
 #include <babylon/misc/highdynamicrange/panorama_to_cube_map_tools.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -42,7 +42,7 @@ std::string HDRTools::readStringLine(const Uint8Array& uint8array, size_t startI
   std::string character;
 
   for (size_t i = startIndex; i < uint8array.size() - startIndex; ++i) {
-    character = String::fromCharCode(uint8array[i]);
+    character = StringTools::fromCharCode(uint8array[i]);
 
     if (character == "\n") {
       break;

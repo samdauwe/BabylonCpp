@@ -3,15 +3,14 @@
 #include <nlohmann/json.hpp>
 #include <numeric>
 
-#include <babylon/babylon_stl_util.h>
 #include <babylon/actions/action.h>
 #include <babylon/actions/action_event.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
-#include <babylon/core/string.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/meshes/abstract_mesh.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/misc/tools.h>
 
 namespace BABYLON {
@@ -27,8 +26,7 @@ void ActionManager::addToScene(const ActionManagerPtr& newActionManager)
   _scene->actionManagers.emplace_back(newActionManager);
 }
 
-void ActionManager::dispose(bool /*doNotRecurse*/,
-                            bool /*disposeMaterialAndTextures*/)
+void ActionManager::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextures*/)
 {
   for (const auto& action : actions) {
     if ((action->trigger < ActionManager::Triggers.size())
@@ -48,15 +46,13 @@ bool ActionManager::hasSpecificTriggers(const Uint32Array& triggers) const
 {
   return std::find_if(actions.begin(), actions.end(),
                       [&triggers](const IActionPtr& action) {
-                        return std::find(triggers.begin(), triggers.end(),
-                                         action->trigger)
+                        return std::find(triggers.begin(), triggers.end(), action->trigger)
                                != triggers.end();
                       })
          != actions.end();
 }
 
-bool ActionManager::hasSpecificTriggers2(unsigned int triggerA,
-                                         unsigned int triggerB) const
+bool ActionManager::hasSpecificTriggers2(unsigned int triggerA, unsigned int triggerB) const
 {
   for (const auto& action : actions) {
     if (triggerA == action->trigger || triggerB == action->trigger) {
@@ -69,24 +65,22 @@ bool ActionManager::hasSpecificTriggers2(unsigned int triggerA,
 
 bool ActionManager::hasSpecificTrigger(
   unsigned int trigger,
-  const std::function<bool(const std::string& parameter)>& parameterPredicate)
-  const
+  const std::function<bool(const std::string& parameter)>& parameterPredicate) const
 {
-  return std::find_if(
-           actions.begin(), actions.end(),
-           [&trigger, &parameterPredicate](const IActionPtr& action) {
-             if (action->trigger == trigger) {
-               if (parameterPredicate) {
-                 if (parameterPredicate(action->getTriggerParameter())) {
-                   return true;
-                 }
-               }
-               else {
-                 return true;
-               }
-             }
-             return false;
-           })
+  return std::find_if(actions.begin(), actions.end(),
+                      [&trigger, &parameterPredicate](const IActionPtr& action) {
+                        if (action->trigger == trigger) {
+                          if (parameterPredicate) {
+                            if (parameterPredicate(action->getTriggerParameter())) {
+                              return true;
+                            }
+                          }
+                          else {
+                            return true;
+                          }
+                        }
+                        return false;
+                      })
          != actions.end();
 }
 
@@ -96,8 +90,7 @@ bool ActionManager::get_hasPointerTriggers() const
   return std::find_if(actions.begin(), actions.end(),
                       [](const IActionPtr& action) {
                         return action->trigger >= ActionManager::OnPickTrigger
-                               && action->trigger
-                                    <= ActionManager::OnPointerOutTrigger;
+                               && action->trigger <= ActionManager::OnPointerOutTrigger;
                       })
          != actions.end();
 }
@@ -107,17 +100,14 @@ bool ActionManager::get_hasPickTriggers() const
   return std::find_if(actions.begin(), actions.end(),
                       [](const IActionPtr& action) {
                         return action->trigger >= ActionManager::OnPickTrigger
-                               && action->trigger
-                                    <= ActionManager::OnPickUpTrigger;
+                               && action->trigger <= ActionManager::OnPickUpTrigger;
                       })
          != actions.end();
 }
 
 bool ActionManager::HasTriggers()
 {
-  return std::accumulate(ActionManager::Triggers.begin(),
-                         ActionManager::Triggers.end(), 0u)
-         != 0;
+  return std::accumulate(ActionManager::Triggers.begin(), ActionManager::Triggers.end(), 0u) != 0;
 }
 
 bool ActionManager::HasPickTriggers()
@@ -132,17 +122,15 @@ bool ActionManager::HasPickTriggers()
 
 bool ActionManager::HasSpecificTrigger(unsigned int trigger)
 {
-  return (trigger < ActionManager::Triggers.size())
-         && (ActionManager::Triggers[trigger] > 0);
+  return (trigger < ActionManager::Triggers.size()) && (ActionManager::Triggers[trigger] > 0);
 }
 
 IActionPtr ActionManager::registerAction(const IActionPtr& action)
 {
   if (action->trigger == ActionManager::OnEveryFrameTrigger) {
     if (!getScene()->actionManager && getScene()->actionManager.get() != this) {
-      BABYLON_LOG_WARN(
-        "ActionManager",
-        "OnEveryFrameTrigger can only be used with scene.actionManager")
+      BABYLON_LOG_WARN("ActionManager",
+                       "OnEveryFrameTrigger can only be used with scene.actionManager")
       return nullptr;
     }
   }
@@ -174,8 +162,7 @@ bool ActionManager::unregisterAction(const IActionPtr& action)
   return false;
 }
 
-void ActionManager::processTrigger(unsigned int trigger,
-                                   const std::optional<IActionEvent>& evt)
+void ActionManager::processTrigger(unsigned int trigger, const std::optional<IActionEvent>& evt)
 {
   for (const auto& action : actions) {
     if (action->trigger == trigger) {
@@ -185,19 +172,15 @@ void ActionManager::processTrigger(unsigned int trigger,
           const auto parameter   = action->getTriggerParameter();
           const auto sourceEvent = *evt->sourceEvent;
           if (!parameter.empty()
-              && parameter
-                   != std::to_string(static_cast<char>(sourceEvent.keyCode))) {
-            auto lowerCase = String::toLowerCase(parameter);
+              && parameter != std::to_string(static_cast<char>(sourceEvent.keyCode))) {
+            auto lowerCase = StringTools::toLowerCase(parameter);
             if (lowerCase.empty()) {
               continue;
             }
 
-            if (lowerCase
-                != std::to_string(static_cast<char>(sourceEvent.keyCode))) {
-              auto unicode = sourceEvent.charCode ? sourceEvent.charCode :
-                                                    sourceEvent.keyCode;
-              auto actualkey = String::toLowerCase(
-                std::to_string(static_cast<char>(unicode)));
+            if (lowerCase != std::to_string(static_cast<char>(sourceEvent.keyCode))) {
+              auto unicode   = sourceEvent.charCode ? sourceEvent.charCode : sourceEvent.keyCode;
+              auto actualkey = StringTools::toLowerCase(std::to_string(static_cast<char>(unicode)));
               if (actualkey != lowerCase) {
                 continue;
               }
@@ -210,11 +193,10 @@ void ActionManager::processTrigger(unsigned int trigger,
   }
 }
 
-IAnimatablePtr
-ActionManager::_getEffectiveTarget(const IAnimatablePtr& target,
-                                   const std::string& propertyPath) const
+IAnimatablePtr ActionManager::_getEffectiveTarget(const IAnimatablePtr& target,
+                                                  const std::string& propertyPath) const
 {
-  std::vector<std::string> properties = String::split(propertyPath, '.');
+  std::vector<std::string> properties = StringTools::split(propertyPath, '.');
 
   for (unsigned int index = 0; index < properties.size() - 1; ++index) {
     // target = (*target)[properties[index]];
@@ -225,7 +207,7 @@ ActionManager::_getEffectiveTarget(const IAnimatablePtr& target,
 
 std::string ActionManager::_getProperty(const std::string& propertyPath) const
 {
-  std::vector<std::string> properties = String::split(propertyPath, '.');
+  std::vector<std::string> properties = StringTools::split(propertyPath, '.');
 
   return properties.back();
 }

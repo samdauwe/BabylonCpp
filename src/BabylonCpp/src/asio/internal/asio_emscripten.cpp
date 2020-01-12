@@ -2,7 +2,7 @@
 
 #include <babylon/asio/asio.h>
 #include <babylon/core/logging.h>
-#include <babylon/core/string.h>
+#include <babylon/misc/string_tools.h>
 #include <iostream>
 #include <emscripten.h>
 #include <unordered_map>
@@ -23,7 +23,7 @@ static std::string ArrayBufferToString(const ArrayBuffer & dataUint8)
   dataString.resize(dataUint8.size());
   for (size_t i = 0; i < dataUint8.size(); ++i)
     dataString[i] = static_cast<char>(dataUint8[i]);
-  dataString = BABYLON::String::replace(dataString, "\r\n", "\n");
+  dataString = BABYLON::StringTools::replace(dataString, "\r\n", "\n");
   return dataString;
 }
 

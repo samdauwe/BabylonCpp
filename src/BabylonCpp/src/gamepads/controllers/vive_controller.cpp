@@ -1,15 +1,15 @@
 #include <babylon/gamepads/controllers/vive_controller.h>
 
-#include <babylon/core/string.h>
 #include <babylon/gamepads/controllers/extended_gamepad_button.h>
 #include <babylon/loading/scene_loader.h>
 #include <babylon/meshes/abstract_mesh.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
 bool ViveControllerFactory::canCreate(const IBrowserGamepadPtr& gamepadInfo) const
 {
-  return String::contains(String::toLowerCase(gamepadInfo->id), "openvr");
+  return StringTools::contains(StringTools::toLowerCase(gamepadInfo->id), "openvr");
 }
 
 WebVRControllerPtr ViveControllerFactory::create(const IBrowserGamepadPtr& gamepadInfo) const

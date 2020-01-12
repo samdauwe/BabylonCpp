@@ -1,8 +1,8 @@
 #include <babylon/materials/node/blocks/pow_block.h>
 
-#include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -47,8 +47,8 @@ PowBlock& PowBlock::_buildBlock(NodeMaterialBuildState& state)
 
   state.compilationString
     += _declareOutput(iOutput, state)
-       + String::printf(" = pow(%s, %s);\r\n", value()->associatedVariableName().c_str(),
-                        power()->associatedVariableName().c_str());
+       + StringTools::printf(" = pow(%s, %s);\r\n", value()->associatedVariableName().c_str(),
+                             power()->associatedVariableName().c_str());
 
   return *this;
 }

@@ -1,7 +1,6 @@
 #include <babylon/materials/node/blocks/dual/texture_block.h>
 
 #include <babylon/core/json_util.h>
-#include <babylon/core/string.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/node/blocks/input/input_block.h>
 #include <babylon/materials/node/node_material.h>
@@ -11,6 +10,7 @@
 #include <babylon/materials/node/node_material_defines.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -241,7 +241,7 @@ void TextureBlock::_injectVertexCode(NodeMaterialBuildState& state)
 
   // Inject code in vertex
   _defineName       = state._getFreeDefineName("UVTRANSFORM");
-  _mainUVDefineName = "VMAIN" + String::toUpperCase(uvInput->associatedVariableName());
+  _mainUVDefineName = "VMAIN" + StringTools::toUpperCase(uvInput->associatedVariableName());
 
   if (uvInput->connectedPoint()->ownerBlock()->isInput) {
     auto uvInputOwnerBlock
@@ -252,7 +252,7 @@ void TextureBlock::_injectVertexCode(NodeMaterialBuildState& state)
     }
   }
 
-  _mainUVName           = String::printf("vMain%s", uvInput->associatedVariableName().c_str());
+  _mainUVName           = StringTools::printf("vMain%s", uvInput->associatedVariableName().c_str());
   _transformedUVName    = state._getFreeVariableName("transformedUV");
   _textureTransformName = state._getFreeVariableName("textureTransform");
   _textureInfoName      = state._getFreeVariableName("textureInfoName");
@@ -262,14 +262,14 @@ void TextureBlock::_injectVertexCode(NodeMaterialBuildState& state)
 
   state._emitUniformFromString(_textureTransformName, "mat4", _defineName);
 
-  state.compilationString += String::printf("#ifdef %s\r\n", _defineName.c_str());
-  state.compilationString
-    += String::printf("%s = vec2(%s * vec4(%s.xy, 1.0, 0.0));\r\n", _transformedUVName.c_str(),
-                      _textureTransformName.c_str(), uvInput->associatedVariableName().c_str());
+  state.compilationString += StringTools::printf("#ifdef %s\r\n", _defineName.c_str());
+  state.compilationString += StringTools::printf(
+    "%s = vec2(%s * vec4(%s.xy, 1.0, 0.0));\r\n", _transformedUVName.c_str(),
+    _textureTransformName.c_str(), uvInput->associatedVariableName().c_str());
   state.compilationString += "#endif\r\n";
-  state.compilationString += String::printf("#ifdef %s\r\n", _mainUVDefineName.c_str());
-  state.compilationString += String::printf("%s = %s.xy;\r\n", _mainUVName.c_str(),
-                                            uvInput->associatedVariableName().c_str());
+  state.compilationString += StringTools::printf("#ifdef %s\r\n", _mainUVDefineName.c_str());
+  state.compilationString += StringTools::printf("%s = %s.xy;\r\n", _mainUVName.c_str(),
+                                                 uvInput->associatedVariableName().c_str());
   state.compilationString += "#endif\r\n";
 
   for (const auto& o : _outputs) {
@@ -297,27 +297,27 @@ void TextureBlock::_writeTextureRead(NodeMaterialBuildState& state, bool vertexM
     }
 
     state.compilationString
-      += String::printf("vec4 %s = texture2D(%s, %s);\r\n", _tempTextureRead.c_str(),
-                        _samplerName.c_str(), uvInput->associatedVariableName().c_str());
+      += StringTools::printf("vec4 %s = texture2D(%s, %s);\r\n", _tempTextureRead.c_str(),
+                             _samplerName.c_str(), uvInput->associatedVariableName().c_str());
     return;
   }
 
   if (uv()->ownerBlock()->target() == NodeMaterialBlockTargets::Fragment) {
     state.compilationString
-      += String::printf("vec4 %s = texture2D(%s, %s);\r\n", _tempTextureRead.c_str(),
-                        _samplerName.c_str(), uvInput->associatedVariableName().c_str());
+      += StringTools::printf("vec4 %s = texture2D(%s, %s);\r\n", _tempTextureRead.c_str(),
+                             _samplerName.c_str(), uvInput->associatedVariableName().c_str());
     return;
   }
 
-  state.compilationString += String::printf("#ifdef %s\r\n", _defineName.c_str());
+  state.compilationString += StringTools::printf("#ifdef %s\r\n", _defineName.c_str());
   state.compilationString
-    += String::printf("vec4 %s = texture2D(%s, %s);\r\n", _tempTextureRead.c_str(),
-                      _samplerName.c_str(), _transformedUVName.c_str());
+    += StringTools::printf("vec4 %s = texture2D(%s, %s);\r\n", _tempTextureRead.c_str(),
+                           _samplerName.c_str(), _transformedUVName.c_str());
   state.compilationString += "#endif\r\n";
-  state.compilationString += String::printf("#ifdef %s\r\n", _mainUVDefineName.c_str());
+  state.compilationString += StringTools::printf("#ifdef %s\r\n", _mainUVDefineName.c_str());
   state.compilationString
-    += String::printf("vec4 %s = texture2D(%s, %s);\r\n", _tempTextureRead.c_str(),
-                      _samplerName.c_str(), _mainUVName.c_str());
+    += StringTools::printf("vec4 %s = texture2D(%s, %s);\r\n", _tempTextureRead.c_str(),
+                           _samplerName.c_str(), _mainUVName.c_str());
   state.compilationString += "#endif\r\n";
 }
 
@@ -331,29 +331,29 @@ void TextureBlock::_writeOutput(NodeMaterialBuildState& state,
     }
 
     state.compilationString
-      += String::printf("%s = %s.%s;\r\n", _declareOutput(output, state).c_str(),
-                        _tempTextureRead.c_str(), swizzle.c_str());
+      += StringTools::printf("%s = %s.%s;\r\n", _declareOutput(output, state).c_str(),
+                             _tempTextureRead.c_str(), swizzle.c_str());
 
     return;
   }
 
   if (uv()->ownerBlock()->target() == NodeMaterialBlockTargets::Fragment) {
     state.compilationString
-      += String::printf("%s = %s.%s;\r\n", _declareOutput(output, state).c_str(),
-                        _tempTextureRead.c_str(), swizzle.c_str());
+      += StringTools::printf("%s = %s.%s;\r\n", _declareOutput(output, state).c_str(),
+                             _tempTextureRead.c_str(), swizzle.c_str());
     return;
   }
 
-  const auto complement = String::printf(" * %s", _textureInfoName.c_str());
+  const auto complement = StringTools::printf(" * %s", _textureInfoName.c_str());
 
   state.compilationString
-    += String::printf("%s = %s.%s%s;\r\n", _declareOutput(output, state).c_str(),
-                      _tempTextureRead.c_str(), swizzle.c_str(), complement.c_str());
+    += StringTools::printf("%s = %s.%s%s;\r\n", _declareOutput(output, state).c_str(),
+                           _tempTextureRead.c_str(), swizzle.c_str(), complement.c_str());
 
-  state.compilationString += String::printf("#ifdef %s\r\n", _linearDefineName.c_str());
+  state.compilationString += StringTools::printf("#ifdef %s\r\n", _linearDefineName.c_str());
   state.compilationString
-    += String::printf("%s = toGammaSpace(%s);\r\n", output->associatedVariableName().c_str(),
-                      output->associatedVariableName().c_str());
+    += StringTools::printf("%s = toGammaSpace(%s);\r\n", output->associatedVariableName().c_str(),
+                           output->associatedVariableName().c_str());
   state.compilationString += "#endif\r\n";
 }
 
@@ -399,7 +399,7 @@ TextureBlock& TextureBlock::_buildBlock(NodeMaterialBuildState& state)
 
   _linearDefineName = state._getFreeDefineName("ISLINEAR");
 
-  auto comments = String::printf("//%s", name.c_str());
+  auto comments = StringTools::printf("//%s", name.c_str());
   state._emitFunctionFromInclude("helperFunctions", comments);
 
   if (_isMixed) {
@@ -423,28 +423,28 @@ std::string TextureBlock::_dumpPropertiesCode()
     return "";
   }
 
-  auto codeString = String::printf("%s.texture = Texture::New(\"%s\");\r\n",
-                                   _codeVariableName.c_str(), texture->name.c_str());
+  auto codeString = StringTools::printf("%s.texture = Texture::New(\"%s\");\r\n",
+                                        _codeVariableName.c_str(), texture->name.c_str());
   codeString
-    += String::printf("%s.texture.wrapU = %u;\r\n", _codeVariableName.c_str(), texture->wrapU);
+    += StringTools::printf("%s.texture.wrapU = %u;\r\n", _codeVariableName.c_str(), texture->wrapU);
   codeString
-    += String::printf("%s.texture.wrapV = %u;\r\n", _codeVariableName.c_str(), texture->wrapV);
+    += StringTools::printf("%s.texture.wrapV = %u;\r\n", _codeVariableName.c_str(), texture->wrapV);
   codeString
-    += String::printf("%s.texture.uAng = %f;\r\n", _codeVariableName.c_str(), texture->uAng);
+    += StringTools::printf("%s.texture.uAng = %f;\r\n", _codeVariableName.c_str(), texture->uAng);
   codeString
-    += String::printf("%s.texture.vAng = %f;\r\n", _codeVariableName.c_str(), texture->vAng);
+    += StringTools::printf("%s.texture.vAng = %f;\r\n", _codeVariableName.c_str(), texture->vAng);
   codeString
-    += String::printf("%s.texture.wAng = %f;\r\n", _codeVariableName.c_str(), texture->wAng);
-  codeString
-    += String::printf("%s.texture.uOffset = %f;\r\n", _codeVariableName.c_str(), texture->uOffset);
-  codeString
-    += String::printf("%s.texture.vOffset = %f;\r\n", _codeVariableName.c_str(), texture->vOffset);
-  codeString
-    += String::printf("%s.texture.uScale = %f;\r\n", _codeVariableName.c_str(), texture->uScale);
-  codeString
-    += String::printf("%s.texture.vScale = %f;\r\n", _codeVariableName.c_str(), texture->vScale);
-  codeString += String::printf("%s.texture.gammaSpace = %d;\r\n", _codeVariableName.c_str(),
-                               texture->gammaSpace());
+    += StringTools::printf("%s.texture.wAng = %f;\r\n", _codeVariableName.c_str(), texture->wAng);
+  codeString += StringTools::printf("%s.texture.uOffset = %f;\r\n", _codeVariableName.c_str(),
+                                    texture->uOffset);
+  codeString += StringTools::printf("%s.texture.vOffset = %f;\r\n", _codeVariableName.c_str(),
+                                    texture->vOffset);
+  codeString += StringTools::printf("%s.texture.uScale = %f;\r\n", _codeVariableName.c_str(),
+                                    texture->uScale);
+  codeString += StringTools::printf("%s.texture.vScale = %f;\r\n", _codeVariableName.c_str(),
+                                    texture->vScale);
+  codeString += StringTools::printf("%s.texture.gammaSpace = %d;\r\n", _codeVariableName.c_str(),
+                                    texture->gammaSpace());
 
   return codeString;
 }

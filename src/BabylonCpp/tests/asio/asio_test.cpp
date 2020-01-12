@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <babylon/asio/asio.h>
-#include <babylon/core/string.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/core/filesystem.h>
 #include <babylon/babylon_common.h>
 

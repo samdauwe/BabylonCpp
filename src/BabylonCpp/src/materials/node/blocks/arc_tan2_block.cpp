@@ -1,8 +1,8 @@
 #include <babylon/materials/node/blocks/arc_tan2_block.h>
 
-#include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -49,8 +49,8 @@ ArcTan2Block& ArcTan2Block::_buildBlock(NodeMaterialBuildState& state)
 
   state.compilationString
     += _declareOutput(iOutput, state)
-       + String::printf(" = atan(%s, %s);\r\n", x()->associatedVariableName().c_str(),
-                        y()->associatedVariableName().c_str());
+       + StringTools::printf(" = atan(%s, %s);\r\n", x()->associatedVariableName().c_str(),
+                             y()->associatedVariableName().c_str());
 
   return *this;
 }

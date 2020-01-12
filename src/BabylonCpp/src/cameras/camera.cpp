@@ -13,7 +13,7 @@
 #include <babylon/cameras/virtual_joysticks_camera.h>
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
-#include <babylon/core/string.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/culling/icullable.h>
 #include <babylon/culling/ray.h>
 #include <babylon/engines/engine.h>

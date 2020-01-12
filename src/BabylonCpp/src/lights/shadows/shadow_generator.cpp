@@ -6,7 +6,6 @@
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/logging.h>
-#include <babylon/core/string.h>
 #include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
@@ -28,6 +27,7 @@
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/misc/tools.h>
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/postprocesses/blur_post_process.h>
@@ -940,8 +940,8 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
       defines.emplace_back("#define BONETEXTURE");
     }
     else {
-      defines.emplace_back(String::concat("#define BonesPerMesh "
-                                          + std::to_string(mesh->skeleton()->bones.size() + 1)));
+      defines.emplace_back(StringTools::concat(
+        "#define BonesPerMesh " + std::to_string(mesh->skeleton()->bones.size() + 1)));
     }
   }
   else {
@@ -980,7 +980,7 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
   }
 
   // Get correct effect
-  auto join = String::join(defines, '\n');
+  auto join = StringTools::join(defines, '\n');
   if (_cachedDefines != join) {
     _cachedDefines = join;
 

@@ -1,9 +1,9 @@
 #include <babylon/materials/textures/loaders/dds_texture_loader.h>
 
-#include <babylon/core/string.h>
 #include <babylon/engines/engine.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/misc/dds.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -21,7 +21,7 @@ bool _DDSTextureLoader::canLoad(const std::string& extension,
                                 const InternalTexturePtr& /*fallback*/, bool /*isBase64*/,
                                 bool /*isBuffer*/)
 {
-  return String::startsWith(extension, ".dds");
+  return StringTools::startsWith(extension, ".dds");
 }
 
 std::string _DDSTextureLoader::transformUrl(const std::string& rootUrl,

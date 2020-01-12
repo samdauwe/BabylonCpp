@@ -2,7 +2,6 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
-#include <babylon/core/string.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/loading/ifileInfo.h>
@@ -14,6 +13,7 @@
 #include <babylon/loading/scene_loader_flags.h>
 #include <babylon/loading/scene_loader_progress_event.h>
 #include <babylon/misc/file_tools.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/misc/tools.h>
 
 namespace BABYLON {
@@ -136,13 +136,14 @@ IRegisteredPlugin SceneLoader::_getPluginForFilename(std::string sceneFilename)
 
   auto dotPosition = sceneFilename.find_last_of(".");
 
-  auto extension = String::toLowerCase(sceneFilename.substr(dotPosition, sceneFilename.size()));
+  auto extension
+    = StringTools::toLowerCase(sceneFilename.substr(dotPosition, sceneFilename.size()));
   return SceneLoader::_getPluginForExtension(extension);
 }
 
 std::string SceneLoader::_getDirectLoad(const std::string& sceneFilename)
 {
-  if (String::startsWith(sceneFilename, "data:")) {
+  if (StringTools::startsWith(sceneFilename, "data:")) {
     return sceneFilename.substr(5);
   }
 
@@ -233,7 +234,7 @@ std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr> SceneLoader::_lo
 }
 
 std::shared_ptr<IFileInfo> SceneLoader::_getFileInfo(std::string rootUrl,
-                                                   const std::string& sceneFilename)
+                                                     const std::string& sceneFilename)
 {
   std::string url;
   std::string name;
@@ -253,12 +254,11 @@ std::shared_ptr<IFileInfo> SceneLoader::_getFileInfo(std::string rootUrl,
     name = sceneFilename;
   }
 
-
-  auto r = std::make_shared<IFileInfo>();
-  r->url = url;
+  auto r     = std::make_shared<IFileInfo>();
+  r->url     = url;
   r->rootUrl = rootUrl;
-  r->name = name;
-  r->file = std::nullopt;
+  r->name    = name;
+  r->file    = std::nullopt;
   return r;
 }
 
@@ -292,7 +292,7 @@ void SceneLoader::RegisterPlugin(
   auto extensions = syncedPlugin ? syncedPlugin->extensions : asyncedPlugin->extensions;
   if (std::holds_alternative<std::string>(extensions)) {
     auto extension = std::get<std::string>(extensions);
-    SceneLoader::_registeredPlugins[String::toLowerCase(extension)] = {
+    SceneLoader::_registeredPlugins[StringTools::toLowerCase(extension)] = {
       plugin, // plugin
       false   // isBinary
     };
@@ -300,7 +300,7 @@ void SceneLoader::RegisterPlugin(
   else {
     auto extensionList = std::get<ISceneLoaderPluginExtensions>(extensions);
     for (auto& item : extensionList.mapping) {
-      SceneLoader::_registeredPlugins[String::toLowerCase(item.first)] = {
+      SceneLoader::_registeredPlugins[StringTools::toLowerCase(item.first)] = {
         plugin,     // plugin
         item.second // isBinary
       };
@@ -336,8 +336,8 @@ SceneLoader::ImportMesh(
   const auto disposeHandler = []() {};
 
   const auto errorHandler = [=](const std::string& message, const std::string& exception) {
-    const auto errorMessage = String::concat("Unable to import meshes from ", fileInfo->url,
-                                             (!message.empty() ? ": " + message : ""));
+    const auto errorMessage = StringTools::concat("Unable to import meshes from ", fileInfo->url,
+                                                  (!message.empty() ? ": " + message : ""));
 
     if (onError) {
       onError(scene, errorMessage, exception);
@@ -357,7 +357,7 @@ SceneLoader::ImportMesh(
         onProgress(event);
       }
       catch (const std::exception& e) {
-        errorHandler(String::printf("Error in onProgress callback: %s", e.what()), e.what());
+        errorHandler(StringTools::printf("Error in onProgress callback: %s", e.what()), e.what());
       }
     };
   }
@@ -373,7 +373,7 @@ SceneLoader::ImportMesh(
         onSuccess(meshes, particleSystems, skeletons, animationGroups);
       }
       catch (const std::exception& e) {
-        errorHandler(String::printf("Error in onSuccess callback", e.what()), e.what());
+        errorHandler(StringTools::printf("Error in onSuccess callback", e.what()), e.what());
       }
     }
   };
@@ -464,8 +464,8 @@ std::optional<std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>> S
   const auto disposeHandler = [&scene]() { scene->getEngine()->hideLoadingUI(); };
 
   const auto errorHandler = [=](const std::string& message, const std::string& exception) {
-    const auto errorMessage = String::concat("Unable to load from ", fileInfo->url,
-                                             (!message.empty() ? ": " + message : ""));
+    const auto errorMessage = StringTools::concat("Unable to load from ", fileInfo->url,
+                                                  (!message.empty() ? ": " + message : ""));
     if (onError) {
       onError(scene, errorMessage, exception);
     }

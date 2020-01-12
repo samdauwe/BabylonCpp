@@ -1,11 +1,11 @@
 #include <babylon/cameras/arc_rotate_camera.h>
-#include <babylon/core/string.h>
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/directional_light.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/samples/babylon_register_sample.h>
 #include <vector>
 
@@ -43,7 +43,8 @@ public:
     // Light generator
     auto generateLight = [this](const Vector3& position, const Color3& color) {
       // Create light
-      auto light = PointLight::New(String::concat("Omni", _lights.size()), position, _scene.get());
+      auto light
+        = PointLight::New(StringTools::concat("Omni", _lights.size()), position, _scene.get());
       // Light colors
       light->diffuse  = color;
       light->specular = color;
@@ -54,10 +55,10 @@ public:
     // Light sphere generator
     auto generateLightSphere = [this](const Color3& color) {
       // Create light sphere
-      auto lightSphere = Mesh::CreateSphere(String::concat("Sphere", _lightSpheres.size()), 16,
+      auto lightSphere = Mesh::CreateSphere(StringTools::concat("Sphere", _lightSpheres.size()), 16,
                                             0.5f, _scene.get());
       auto lightSphereMaterial
-        = StandardMaterial::New(String::concat("mat", _lightSpheres.size()), _scene.get());
+        = StandardMaterial::New(StringTools::concat("mat", _lightSpheres.size()), _scene.get());
       lightSphereMaterial->diffuseColor  = Color3::Black();
       lightSphereMaterial->specularColor = Color3::Black();
       lightSphereMaterial->emissiveColor = color;

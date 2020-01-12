@@ -1,14 +1,13 @@
 #include <babylon/inspector/components/sceneexplorer/entities/material_tree_item_component.h>
 
-#include <babylon/core/string.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_label_component.h>
 #include <babylon/materials/material.h>
+#include <babylon/misc/string_tools.h>
 #include <imgui_utils/imgui_utils.h>
 
 namespace BABYLON {
 
-MaterialTreeItemComponent::MaterialTreeItemComponent(
-  const IMaterialTreeItemComponentProps& iProps)
+MaterialTreeItemComponent::MaterialTreeItemComponent(const IMaterialTreeItemComponentProps& iProps)
     : props{iProps}
 {
   const auto& material = props.material;
@@ -18,22 +17,22 @@ MaterialTreeItemComponent::MaterialTreeItemComponent(
   // Set the entity info
   entityInfo.uniqueId  = material->uniqueId;
   const auto className = material->getClassName();
-  if (String::contains(className, "BackgroundMaterial")) {
+  if (StringTools::contains(className, "BackgroundMaterial")) {
     entityInfo.type = EntityType::BackgroundMaterial;
   }
-  else if (String::contains(className, "PBRMaterial")) {
+  else if (StringTools::contains(className, "PBRMaterial")) {
     entityInfo.type = EntityType::PBRMaterial;
   }
-  else if (String::contains(className, "PBRMetallicRoughnessMaterial")) {
+  else if (StringTools::contains(className, "PBRMetallicRoughnessMaterial")) {
     entityInfo.type = EntityType::PBRMetallicRoughnessMaterial;
   }
-  else if (String::contains(className, "PBRSpecularGlossinessMaterial")) {
+  else if (StringTools::contains(className, "PBRSpecularGlossinessMaterial")) {
     entityInfo.type = EntityType::PBRSpecularGlossinessMaterial;
   }
-  else if (String::contains(className, "StandardMaterial")) {
+  else if (StringTools::contains(className, "StandardMaterial")) {
     entityInfo.type = EntityType::StandardMaterial;
   }
-  else if (String::contains(className, "Material")) {
+  else if (StringTools::contains(className, "Material")) {
     entityInfo.type = EntityType::Material;
   }
 }

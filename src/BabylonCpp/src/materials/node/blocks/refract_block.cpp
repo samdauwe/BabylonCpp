@@ -1,8 +1,8 @@
 #include <babylon/materials/node/blocks/refract_block.h>
 
-#include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -66,10 +66,10 @@ RefractBlock& RefractBlock::_buildBlock(NodeMaterialBuildState& state)
   const auto& iOutput = _outputs[0];
 
   state.compilationString += _declareOutput(iOutput, state)
-                             + String::printf(" = refract(%s.xyz, %s.xyz, %s);\r\n",
-                                              incident()->associatedVariableName().c_str(),
-                                              normal()->associatedVariableName().c_str(),
-                                              ior()->associatedVariableName().c_str());
+                             + StringTools::printf(" = refract(%s.xyz, %s.xyz, %s);\r\n",
+                                                   incident()->associatedVariableName().c_str(),
+                                                   normal()->associatedVariableName().c_str(),
+                                                   ior()->associatedVariableName().c_str());
 
   return *this;
 }

@@ -2,7 +2,6 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/json_util.h>
-#include <babylon/core/string.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/node/blocks/input/input_block.h>
 #include <babylon/materials/node/node_material.h>
@@ -12,6 +11,7 @@
 #include <babylon/materials/node/node_material_defines.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -191,7 +191,7 @@ void LightBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMateri
 void LightBlock::_injectVertexCode(NodeMaterialBuildState& state)
 {
   const auto& worldPos = worldPosition();
-  auto comments        = String::printf("//%s", name.c_str());
+  auto comments        = StringTools::printf("//%s", name.c_str());
 
   // Declaration
   if (!light) { // Emit for all lights
@@ -223,10 +223,11 @@ void LightBlock::_injectVertexCode(NodeMaterialBuildState& state)
   }
 
   // Inject code in vertex
-  auto worldPosVaryingName = String::printf("v_%s", worldPos->associatedVariableName().c_str());
+  auto worldPosVaryingName
+    = StringTools::printf("v_%s", worldPos->associatedVariableName().c_str());
   if (state._emitVaryingFromString(worldPosVaryingName, "vec4")) {
-    state.compilationString += String::printf("%s = %s;\r\n", worldPosVaryingName.c_str(),
-                                              worldPos->associatedVariableName().c_str());
+    state.compilationString += StringTools::printf("%s = %s;\r\n", worldPosVaryingName.c_str(),
+                                                   worldPos->associatedVariableName().c_str());
   }
 
   if (light) {
@@ -243,7 +244,7 @@ void LightBlock::_injectVertexCode(NodeMaterialBuildState& state)
   }
   else {
     state.compilationString
-      += String::printf("vec4 worldPos = %s;\r\n", worldPos->associatedVariableName().c_str());
+      += StringTools::printf("vec4 worldPos = %s;\r\n", worldPos->associatedVariableName().c_str());
     EmitCodeFromIncludeOptions options;
     options.repeatKey = "maxSimultaneousLights";
     state.compilationString += state._emitCodeFromInclude("shadowsVertex", comments, options);
@@ -265,15 +266,15 @@ LightBlock& LightBlock::_buildBlock(NodeMaterialBuildState& state)
   state.sharedData->bindableBlocks.emplace_back(shared_from_this());
   state.sharedData->blocksWithDefines.emplace_back(shared_from_this());
 
-  auto comments        = String::printf("//%s", name.c_str());
+  auto comments        = StringTools::printf("//%s", name.c_str());
   const auto& worldPos = worldPosition();
 
   state._emitFunctionFromInclude("helperFunctions", comments);
 
   EmitFunctionFromIncludeOptions options;
   options.replaceStrings = {StringsReplacement{
-    "vPositionW",                                                          // search
-    String::printf("v_%s.xyz", worldPos->associatedVariableName().c_str()) // replace
+    "vPositionW",                                                               // search
+    StringTools::printf("v_%s.xyz", worldPos->associatedVariableName().c_str()) // replace
   }};
   state._emitFunctionFromInclude("lightsFragmentFunctions", comments, options);
 
@@ -300,21 +301,21 @@ LightBlock& LightBlock::_buildBlock(NodeMaterialBuildState& state)
   // Code
   if (_lightId == 0) {
     if (state._registerTempVariable("viewDirectionW")) {
-      state.compilationString += String::printf(
+      state.compilationString += StringTools::printf(
         "vec3 viewDirectionW = normalize(%s - %s);\r\n",
         cameraPosition()->associatedVariableName().c_str(),
-        String::printf("v_%s.xyz", worldPos->associatedVariableName().c_str()).c_str());
+        StringTools::printf("v_%s.xyz", worldPos->associatedVariableName().c_str()).c_str());
     }
     state.compilationString += "lightingInfo info;\r\n";
     state.compilationString += "float shadow = 1.;\r\n";
-    state.compilationString += String::printf(
+    state.compilationString += StringTools::printf(
       "float glossiness = %s * %s;\r\n",
       glossiness()->isConnected() ? glossiness()->associatedVariableName().c_str() : "1.0",
       glossPower()->isConnected ? glossPower()->associatedVariableName().c_str() : "1024.0");
     state.compilationString += "vec3 diffuseBase = vec3(0., 0., 0.);\r\n";
     state.compilationString += "vec3 specularBase = vec3(0., 0., 0.);\r\n";
-    state.compilationString += String::printf("vec3 normalW = %s.xyz;\r\n",
-                                              worldNormal()->associatedVariableName().c_str());
+    state.compilationString += StringTools::printf("vec3 normalW = %s.xyz;\r\n",
+                                                   worldNormal()->associatedVariableName().c_str());
   }
 
   if (light) {
@@ -335,18 +336,19 @@ LightBlock& LightBlock::_buildBlock(NodeMaterialBuildState& state)
 
   state.compilationString
     += _declareOutput(_diffuseOutput, state)
-       + String::printf(
+       + StringTools::printf(
          " = diffuseBase%s;\r\n",
          diffuseColor()->isConnected() ?
-           String::printf(" * %s", diffuseColor()->associatedVariableName().c_str()).c_str() :
+           StringTools::printf(" * %s", diffuseColor()->associatedVariableName().c_str()).c_str() :
            "");
   if (_specularOutput->hasEndpoints()) {
     state.compilationString
       += _declareOutput(_specularOutput, state)
-         + String::printf(
+         + StringTools::printf(
            " = specularBase%s;\r\n",
            specularColor()->isConnected() ?
-             String::printf(" * %s", specularColor()->associatedVariableName().c_str()).c_str() :
+             StringTools::printf(" * %s", specularColor()->associatedVariableName().c_str())
+               .c_str() :
              "");
   }
 

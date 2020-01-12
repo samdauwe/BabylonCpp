@@ -2,10 +2,10 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
-#include <babylon/core/string.h>
 #include <babylon/culling/ray.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -20,7 +20,7 @@ const std::string WindowsMotionController::GAMEPAD_ID_PATTERN = "([0-9a-zA-Z]+-[
 
 bool WindowsMotionControllerFactory::canCreate(const IBrowserGamepadPtr& gamepadInfo) const
 {
-  return String::startsWith(gamepadInfo->id, WindowsMotionController::GAMEPAD_ID_PREFIX);
+  return StringTools::startsWith(gamepadInfo->id, WindowsMotionController::GAMEPAD_ID_PREFIX);
 }
 
 WebVRControllerPtr

@@ -1,10 +1,10 @@
 #include <babylon/postprocesses/blur_post_process.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/core/string.h>
 #include <babylon/engines/engine.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/internal_texture.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -177,7 +177,7 @@ void BlurPostProcess::_updateParameters(
 
   // The DOF fragment should ignore the center pixel when looping as it is
   // handled manualy in the fragment shader.
-  if (String::contains(_staticDefines, "DOF")) {
+  if (StringTools::contains(_staticDefines, "DOF")) {
     defines << "#define CENTER_WEIGHT "
             << _glslFloat(weights[static_cast<unsigned>(varyingCount) - 1]) << "\r\n";
     --varyingCount;

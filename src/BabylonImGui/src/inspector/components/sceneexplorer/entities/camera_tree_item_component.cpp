@@ -1,17 +1,16 @@
 #include <babylon/inspector/components/sceneexplorer/entities/camera_tree_item_component.h>
 
 #include <babylon/cameras/camera.h>
-#include <babylon/core/string.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_icon_component.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_label_component.h>
+#include <babylon/misc/string_tools.h>
 #include <imgui_utils/imgui_utils.h>
 
 namespace BABYLON {
 
-CameraTreeItemComponent::CameraTreeItemComponent(
-  const ICameraTreeItemComponentProps& iProps)
+CameraTreeItemComponent::CameraTreeItemComponent(const ICameraTreeItemComponentProps& iProps)
     : props{iProps}, _onActiveCameraObserver{nullptr}
 {
   const auto& camera = props.camera;
@@ -23,13 +22,13 @@ CameraTreeItemComponent::CameraTreeItemComponent(
   // Set the entity info
   entityInfo.uniqueId  = camera->uniqueId;
   const auto className = camera->getClassName();
-  if (String::contains(className, "ArcRotateCamera")) {
+  if (StringTools::contains(className, "ArcRotateCamera")) {
     entityInfo.type = EntityType::ArcRotateCamera;
   }
-  else if (String::contains(className, "FreeCamera")) {
+  else if (StringTools::contains(className, "FreeCamera")) {
     entityInfo.type = EntityType::FreeCamera;
   }
-  else if (String::contains(className, "UniversalCamera")) {
+  else if (StringTools::contains(className, "UniversalCamera")) {
     entityInfo.type = EntityType::UniversalCamera;
   }
 }
@@ -49,17 +48,17 @@ void CameraTreeItemComponent::setActive()
 
 void CameraTreeItemComponent::componentWillMount()
 {
-  const auto& camera      = props.camera;
-  const auto& scene       = camera->getScene();
-  _onActiveCameraObserver = scene->onActiveCameraChanged.add(
-    [this, &camera, &scene](Scene*, EventState&) -> void {
-      // This will deactivate the previous camera when the camera is changed.
-      // Multiple camera's cycle frequently so only do this for single cameras
-      if (state.isActive && scene->activeCameras.size() <= 1) {
-        camera->detachControl(scene->getEngine()->getRenderingCanvas());
-      }
-      state.isActive = scene->activeCamera() == camera;
-    });
+  const auto& camera = props.camera;
+  const auto& scene  = camera->getScene();
+  _onActiveCameraObserver
+    = scene->onActiveCameraChanged.add([this, &camera, &scene](Scene*, EventState&) -> void {
+        // This will deactivate the previous camera when the camera is changed.
+        // Multiple camera's cycle frequently so only do this for single cameras
+        if (state.isActive && scene->activeCameras.size() <= 1) {
+          camera->detachControl(scene->getEngine()->getRenderingCanvas());
+        }
+        state.isActive = scene->activeCamera() == camera;
+      });
 }
 
 void CameraTreeItemComponent::componentWillUnmount()
@@ -82,8 +81,7 @@ void CameraTreeItemComponent::render()
   // Active camera icon
   if (scene->activeCameras.empty()) {
     if (TreeItemIconComponent::render(faVideo, "Set as main camera",
-                                      ImGui::GetWindowContentRegionWidth()
-                                        - ImGui::IconSize,
+                                      ImGui::GetWindowContentRegionWidth() - ImGui::IconSize,
                                       state.isActive)) {
       setActive();
     }

@@ -1,8 +1,8 @@
 #include <babylon/materials/node/blocks/normal_blend_block.h>
 
-#include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -63,24 +63,24 @@ NormalBlendBlock& NormalBlendBlock::_buildBlock(NodeMaterialBuildState& state)
   const auto stepR    = state._getFreeVariableName("stepR");
   const auto stepG    = state._getFreeVariableName("stepG");
 
-  state.compilationString += String::printf("float %s = step(0.5, %s.r);\r\n", stepR.c_str(),
-                                            input0->associatedVariableName().c_str());
-  state.compilationString += String::printf("float %s = step(0.5, %s.g);\r\n", stepG.c_str(),
-                                            input0->associatedVariableName().c_str());
+  state.compilationString += StringTools::printf("float %s = step(0.5, %s.r);\r\n", stepR.c_str(),
+                                                 input0->associatedVariableName().c_str());
+  state.compilationString += StringTools::printf("float %s = step(0.5, %s.g);\r\n", stepG.c_str(),
+                                                 input0->associatedVariableName().c_str());
   state.compilationString += _declareOutput(iOutput, state) + ";\r\n";
-  state.compilationString += String::printf(
+  state.compilationString += StringTools::printf(
     "%s.r = (1.0 - %s) * %s.r * %s.r * 2.0 + %s * (1.0 - %s.r) * (1.0 - %s.r) * 2.0;\r\n",
     iOutput->associatedVariableName().c_str(), stepR.c_str(),
     input0->associatedVariableName().c_str(), input1->associatedVariableName().c_str(),
     stepR.c_str(), input0->associatedVariableName().c_str(),
     input1->associatedVariableName().c_str());
-  state.compilationString += String::printf(
+  state.compilationString += StringTools::printf(
     "%s.g = (1.0 - %s) * %s.g * %s.g * 2.0 + %s * (1.0 - %s.g) * (1.0 - %s.g) * 2.0;\r\n",
     iOutput->associatedVariableName().c_str(), stepG.c_str(),
     input0->associatedVariableName().c_str(), input1->associatedVariableName().c_str(),
     stepG.c_str(), input0->associatedVariableName().c_str(),
     input1->associatedVariableName().c_str());
-  state.compilationString += String::printf(
+  state.compilationString += StringTools::printf(
     "%s.b = %s.b * %s.b;\r\n", iOutput->associatedVariableName().c_str(),
     input0->associatedVariableName().c_str(), input1->associatedVariableName().c_str());
 

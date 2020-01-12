@@ -1,7 +1,7 @@
 #include <babylon/inspector/components/sceneexplorer/entities/rendering_pipeline_tree_item_component.h>
 
-#include <babylon/core/string.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_label_component.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/postprocesses/renderpipeline/post_process_render_pipeline.h>
 #include <imgui_utils/imgui_utils.h>
 
@@ -17,19 +17,19 @@ RenderingPipelineTreeItemComponent::RenderingPipelineTreeItemComponent(
 
   // Set the entity info
   const auto className = renderPipeline->getClassName();
-  if (String::contains(className, "DefaultRenderingPipeline")) {
+  if (StringTools::contains(className, "DefaultRenderingPipeline")) {
     entityInfo.type = EntityType::DefaultRenderingPipeline;
   }
-  else if (String::contains(className, "LensRenderingPipeline")) {
+  else if (StringTools::contains(className, "LensRenderingPipeline")) {
     entityInfo.type = EntityType::LensRenderingPipeline;
   }
-  else if (String::contains(className, "SSAORenderingPipeline")) {
+  else if (StringTools::contains(className, "SSAORenderingPipeline")) {
     entityInfo.type = EntityType::SSAORenderingPipeline;
   }
-  else if (String::contains(className, "Texture")) {
+  else if (StringTools::contains(className, "Texture")) {
     entityInfo.type = EntityType::Texture;
   }
-  else if (String::contains(className, "RenderingPipeline")) {
+  else if (StringTools::contains(className, "RenderingPipeline")) {
     entityInfo.type = EntityType::RenderingPipeline;
   }
 }

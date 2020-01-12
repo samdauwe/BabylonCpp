@@ -1,13 +1,13 @@
 #include <babylon/gamepads/dual_shock_pad.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/core/string.h>
 #include <babylon/interfaces/ibrowser_gamepad.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
 DualShockPad::DualShockPad(const std::string& iId, int iIndex, const IBrowserGamepadPtr& gamepad)
-    : Gamepad{String::replace(iId, "STANDARD GAMEPAD", "SONY PLAYSTATION DUALSHOCK"),
+    : Gamepad{StringTools::replace(iId, "STANDARD GAMEPAD", "SONY PLAYSTATION DUALSHOCK"),
               iIndex,
               gamepad,
               0,

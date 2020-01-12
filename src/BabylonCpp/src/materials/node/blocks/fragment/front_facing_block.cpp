@@ -1,6 +1,5 @@
 #include <babylon/materials/node/blocks/fragment/front_facing_block.h>
 
-#include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
 

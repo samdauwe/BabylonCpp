@@ -1,8 +1,8 @@
 #include <babylon/materials/node/blocks/color_merger_block.h>
 
-#include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -85,32 +85,32 @@ ColorMergerBlock& ColorMergerBlock::_buildBlock(NodeMaterialBuildState& state)
     if (color4Output->hasEndpoints()) {
       state.compilationString
         += _declareOutput(color4Output, state)
-           + String::printf(" = vec4(%s, %s);\r\n", rgbInput->associatedVariableName().c_str(),
-                            aInput->isConnected() ? _writeVariable(aInput).c_str() : "0.0");
+           + StringTools::printf(" = vec4(%s, %s);\r\n", rgbInput->associatedVariableName().c_str(),
+                                 aInput->isConnected() ? _writeVariable(aInput).c_str() : "0.0");
     }
     else if (color3Output->hasEndpoints()) {
       state.compilationString
         += _declareOutput(color3Output, state)
-           + String::printf(" = %s;\r\n", rgbInput->associatedVariableName().c_str());
+           + StringTools::printf(" = %s;\r\n", rgbInput->associatedVariableName().c_str());
     }
   }
   else {
     if (color4Output->hasEndpoints()) {
       state.compilationString
         += _declareOutput(color4Output, state)
-           + String::printf(" = vec4(%s, %s, %s, %s);\r\n",
-                            rInput->isConnected ? _writeVariable(rInput).c_str() : "0.0",
-                            gInput->isConnected ? _writeVariable(gInput).c_str() : "0.0",
-                            bInput->isConnected ? _writeVariable(bInput).c_str() : "0.0",
-                            aInput->isConnected ? _writeVariable(aInput).c_str() : "0.0");
+           + StringTools::printf(" = vec4(%s, %s, %s, %s);\r\n",
+                                 rInput->isConnected ? _writeVariable(rInput).c_str() : "0.0",
+                                 gInput->isConnected ? _writeVariable(gInput).c_str() : "0.0",
+                                 bInput->isConnected ? _writeVariable(bInput).c_str() : "0.0",
+                                 aInput->isConnected ? _writeVariable(aInput).c_str() : "0.0");
     }
     else if (color3Output->hasEndpoints()) {
       state.compilationString
         += _declareOutput(color3Output, state)
-           + String::printf(" = vec3(%s, %s, %s);\r\n",
-                            rInput->isConnected ? _writeVariable(rInput).c_str() : "0.0",
-                            gInput->isConnected ? _writeVariable(gInput).c_str() : "0.0",
-                            bInput->isConnected ? _writeVariable(bInput).c_str() : "0.0");
+           + StringTools::printf(" = vec3(%s, %s, %s);\r\n",
+                                 rInput->isConnected ? _writeVariable(rInput).c_str() : "0.0",
+                                 gInput->isConnected ? _writeVariable(gInput).c_str() : "0.0",
+                                 bInput->isConnected ? _writeVariable(bInput).c_str() : "0.0");
     }
   }
 

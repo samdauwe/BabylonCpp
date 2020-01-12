@@ -1,10 +1,10 @@
 #include <babylon/materials/node/blocks/fresnel_block.h>
 
-#include <babylon/core/string.h>
 #include <babylon/materials/node/blocks/input/input_block.h>
 #include <babylon/materials/node/blocks/view_direction_block.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -81,18 +81,19 @@ FresnelBlock& FresnelBlock::_buildBlock(NodeMaterialBuildState& state)
 {
   NodeMaterialBlock::_buildBlock(state);
 
-  const auto comments = String::printf("//%s", name.c_str());
+  const auto comments = StringTools::printf("//%s", name.c_str());
 
   EmitFunctionFromIncludeOptions options;
   options.removeIfDef = true;
   state._emitFunctionFromInclude("fresnelFunction", comments, options);
 
-  state.compilationString += _declareOutput(fresnel, state)
-                             + String::printf(" = computeFresnelTerm(%s.xyz, %s.xyz, %s, %s);\r\n",
-                                              viewDirection()->associatedVariableName().c_str(),
-                                              worldNormal()->associatedVariableName().c_str(),
-                                              bias()->associatedVariableName().c_str(),
-                                              power()->associatedVariableName().c_str());
+  state.compilationString
+    += _declareOutput(fresnel, state)
+       + StringTools::printf(" = computeFresnelTerm(%s.xyz, %s.xyz, %s, %s);\r\n",
+                             viewDirection()->associatedVariableName().c_str(),
+                             worldNormal()->associatedVariableName().c_str(),
+                             bias()->associatedVariableName().c_str(),
+                             power()->associatedVariableName().c_str());
 
   return *this;
 }

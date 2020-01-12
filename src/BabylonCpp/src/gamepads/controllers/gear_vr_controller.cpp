@@ -1,18 +1,18 @@
 #include <babylon/gamepads/controllers/gear_vr_controller.h>
 
-#include <babylon/core/string.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/loading/scene_loader.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
 bool GearVRControllerFactory::canCreate(const IBrowserGamepadPtr& gamepadInfo) const
 {
-  return String::startsWith(gamepadInfo->id, GearVRController::GAMEPAD_ID_PREFIX)
-         || String::contains(gamepadInfo->id, "Oculus Go")
-         || String::contains(gamepadInfo->id, "Vive Focus");
+  return StringTools::startsWith(gamepadInfo->id, GearVRController::GAMEPAD_ID_PREFIX)
+         || StringTools::contains(gamepadInfo->id, "Oculus Go")
+         || StringTools::contains(gamepadInfo->id, "Vive Focus");
 }
 
 WebVRControllerPtr GearVRControllerFactory::create(const IBrowserGamepadPtr& gamepadInfo) const

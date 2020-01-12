@@ -1,7 +1,7 @@
 #include <babylon/postprocesses/sharpen_post_process.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/core/string.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/engines/engine.h>
 #include <babylon/materials/effect.h>
 

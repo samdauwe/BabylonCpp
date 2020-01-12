@@ -1,8 +1,8 @@
 #include <babylon/materials/node/blocks/random_number_block.h>
 
-#include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -48,12 +48,12 @@ RandomNumberBlock& RandomNumberBlock::_buildBlock(NodeMaterialBuildState& state)
 
   const auto& iOutput = _outputs[0];
 
-  const auto comments = String::printf("//%s", name.c_str());
+  const auto comments = StringTools::printf("//%s", name.c_str());
   state._emitFunctionFromInclude("helperFunctions", comments);
 
   state.compilationString
     += _declareOutput(iOutput, state)
-       + String::printf(" = getRand(%s.xy);\r\n", seed()->associatedVariableName().c_str());
+       + StringTools::printf(" = getRand(%s.xy);\r\n", seed()->associatedVariableName().c_str());
 
   return *this;
 }

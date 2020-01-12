@@ -1,13 +1,13 @@
 #include <babylon/meshes/csg/csg.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/core/string.h>
 #include <babylon/meshes/csg/node.h>
 #include <babylon/meshes/csg/polygon.h>
 #include <babylon/meshes/csg/vertex.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -48,17 +48,14 @@ std::unique_ptr<BABYLON::CSG::CSG> CSG::CSG::FromMesh(const MeshPtr& mesh)
 
   unsigned int sm = 0;
   for (auto& subMesh : mesh->subMeshes) {
-    for (size_t i  = subMesh->indexStart,
-                il = subMesh->indexCount + subMesh->indexStart;
-         i < il; i += 3) {
+    for (size_t i = subMesh->indexStart, il = subMesh->indexCount + subMesh->indexStart; i < il;
+         i += 3) {
       std::vector<Vertex> vertices;
       for (unsigned int j = 0; j < 3; ++j) {
-        Vector3 sourceNormal(normals[indices[i + j] * 3],
-                             normals[indices[i + j] * 3 + 1],
+        Vector3 sourceNormal(normals[indices[i + j] * 3], normals[indices[i + j] * 3 + 1],
                              normals[indices[i + j] * 3 + 2]);
         Vector2 _uv(uvs[indices[i + j] * 2], uvs[indices[i + j] * 2 + 1]);
-        Vector3 sourcePosition(positions[indices[i + j] * 3],
-                               positions[indices[i + j] * 3 + 1],
+        Vector3 sourcePosition(positions[indices[i + j] * 3], positions[indices[i + j] * 3 + 1],
                                positions[indices[i + j] * 3 + 2]);
         position = Vector3::TransformCoordinates(sourcePosition, matrix);
         normal   = Vector3::TransformNormal(sourceNormal, matrix);
@@ -72,8 +69,7 @@ std::unique_ptr<BABYLON::CSG::CSG> CSG::CSG::FromMesh(const MeshPtr& mesh)
       shared.materialIndex = subMesh->materialIndex;
 
       Polygon polygon(vertices, shared);
-      polygon.plane
-        = Plane::FromPoints(vertices[0].pos, vertices[1].pos, vertices[2].pos);
+      polygon.plane = Plane::FromPoints(vertices[0].pos, vertices[1].pos, vertices[2].pos);
 
       // To handle the case of degenerated triangle
       // polygon.plane == null <=> the polygon does not represent 1 single plane
@@ -235,8 +231,7 @@ CSG::CSG& CSG::CSG::copyTransformAttributes(const BABYLON::CSG::CSG& csg)
   return *this;
 }
 
-MeshPtr CSG::CSG::buildMeshGeometry(const std::string& name, Scene* scene,
-                                    bool keepSubMeshes)
+MeshPtr CSG::CSG::buildMeshGeometry(const std::string& name, Scene* scene, bool keepSubMeshes)
 {
   Matrix _matrix = matrix;
   _matrix.invert();
@@ -257,28 +252,25 @@ MeshPtr CSG::CSG::buildMeshGeometry(const std::string& name, Scene* scene,
   bool vertexIdxDefined     = false;
   size_t vertex_idx         = 0;
   unsigned int currentIndex = 0;
-  std::unordered_map<unsigned int, std::unordered_map<unsigned int, SubMeshObj>>
-    subMesh_dict;
+  std::unordered_map<unsigned int, std::unordered_map<unsigned int, SubMeshObj>> subMesh_dict;
   SubMeshObj subMesh_obj;
 
   if (keepSubMeshes) {
     // Sort Polygons, since subMeshes are indices range
-    BABYLON::stl_util::sort_js_style(polygons,
-              [](const Polygon& a, const Polygon& b) {
-                if (a.shared.meshId == b.shared.meshId) {
-                  return a.shared.subMeshId - b.shared.subMeshId;
-                }
-                else {
-                  return a.shared.meshId - b.shared.meshId;
-                }
-              });
+    BABYLON::stl_util::sort_js_style(polygons, [](const Polygon& a, const Polygon& b) {
+      if (a.shared.meshId == b.shared.meshId) {
+        return a.shared.subMeshId - b.shared.subMeshId;
+      }
+      else {
+        return a.shared.meshId - b.shared.meshId;
+      }
+    });
   }
 
   for (auto& polygon : polygons) {
     // Building SubMeshes
     if (subMesh_dict.find(polygon.shared.meshId) == subMesh_dict.end()) {
-      subMesh_dict[polygon.shared.meshId]
-        = std::unordered_map<unsigned int, SubMeshObj>();
+      subMesh_dict[polygon.shared.meshId] = std::unordered_map<unsigned int, SubMeshObj>();
     }
     if (subMesh_dict[polygon.shared.meshId].find(polygon.shared.subMeshId)
         == subMesh_dict[polygon.shared.meshId].end()) {
@@ -307,8 +299,8 @@ MeshPtr CSG::CSG::buildMeshGeometry(const std::string& name, Scene* scene,
         Vector3 localVertex = Vector3::TransformCoordinates(vertex, _matrix);
         Vector3 localNormal = Vector3::TransformNormal(normal, _matrix);
 
-        std::string vertexId = String::concat(localVertex.x, ",", localVertex.y,
-                                              ",", localVertex.z);
+        std::string vertexId
+          = StringTools::concat(localVertex.x, ",", localVertex.y, ",", localVertex.z);
 
         if (stl_util::contains(vertice_dict, vertexId)) {
           vertex_idx       = vertice_dict[vertexId];
@@ -316,16 +308,12 @@ MeshPtr CSG::CSG::buildMeshGeometry(const std::string& name, Scene* scene,
         }
 
         // Check if 2 points can be merged
-        if (!(vertexIdxDefined
-              && stl_util::almost_equal(normals[vertex_idx * 3], localNormal.x)
-              && stl_util::almost_equal(normals[vertex_idx * 3 + 1],
-                                        localNormal.y)
-              && stl_util::almost_equal(normals[vertex_idx * 3 + 2],
-                                        localNormal.z)
+        if (!(vertexIdxDefined && stl_util::almost_equal(normals[vertex_idx * 3], localNormal.x)
+              && stl_util::almost_equal(normals[vertex_idx * 3 + 1], localNormal.y)
+              && stl_util::almost_equal(normals[vertex_idx * 3 + 2], localNormal.z)
               && stl_util::almost_equal(uvs[vertex_idx * 2], uv.x)
               && stl_util::almost_equal(uvs[vertex_idx * 2 + 1], uv.y))) {
-          stl_util::concat(vertices,
-                           {localVertex.x, localVertex.y, localVertex.z});
+          stl_util::concat(vertices, {localVertex.x, localVertex.y, localVertex.z});
           stl_util::concat(uvs, {uv.x, uv.y});
           stl_util::concat(normals, {normal.x, normal.y, normal.z});
           vertex_idx             = (vertices.size() / 3) - 1;
@@ -338,8 +326,7 @@ MeshPtr CSG::CSG::buildMeshGeometry(const std::string& name, Scene* scene,
         // indexStart
         subMesh_obj[0] = std::min(currentIndex, subMesh_obj[0]);
         subMesh_obj[1] = std::max(currentIndex, subMesh_obj[1]);
-        subMesh_dict[polygon.shared.meshId][polygon.shared.subMeshId]
-          = subMesh_obj;
+        subMesh_dict[polygon.shared.meshId][polygon.shared.subMeshId] = subMesh_obj;
         ++currentIndex;
       }
     }
@@ -362,11 +349,9 @@ MeshPtr CSG::CSG::buildMeshGeometry(const std::string& name, Scene* scene,
       materialMaxIndex = -1;
       for (auto& sm : m.second) {
         subMesh_obj = sm.second;
-        SubMesh::CreateFromIndices(subMesh_obj[2] + materialIndexOffset,
-                                   subMesh_obj[0],
+        SubMesh::CreateFromIndices(subMesh_obj[2] + materialIndexOffset, subMesh_obj[0],
                                    subMesh_obj[1] - subMesh_obj[0] + 1, mesh);
-        materialMaxIndex
-          = std::max(static_cast<int>(subMesh_obj[2]), materialMaxIndex);
+        materialMaxIndex = std::max(static_cast<int>(subMesh_obj[2]), materialMaxIndex);
       }
       materialIndexOffset += static_cast<unsigned>(++materialMaxIndex);
     }
@@ -375,8 +360,8 @@ MeshPtr CSG::CSG::buildMeshGeometry(const std::string& name, Scene* scene,
   return mesh;
 }
 
-MeshPtr CSG::CSG::toMesh(const std::string& name, const MaterialPtr& material,
-                         Scene* scene, bool keepSubMeshes)
+MeshPtr CSG::CSG::toMesh(const std::string& name, const MaterialPtr& material, Scene* scene,
+                         bool keepSubMeshes)
 {
   auto mesh = buildMeshGeometry(name, scene, keepSubMeshes);
 

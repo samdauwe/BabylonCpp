@@ -2,11 +2,11 @@
 
 #include <babylon/core/logging.h>
 #include <babylon/core/random.h>
-#include <babylon/core/string.h>
 #include <babylon/engines/engine_store.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/maths/color4.h>
 #include <babylon/maths/vector3.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/utils/base64.h>
 
 namespace BABYLON {
@@ -61,7 +61,7 @@ bool Tools::IsExponentOfTwo(size_t value)
 
 std::string Tools::GetFilename(const std::string& path)
 {
-  const auto index = String::lastIndexOf(path, "/");
+  const auto index = StringTools::lastIndexOf(path, "/");
   if (index < 0) {
     return path;
   }
@@ -71,7 +71,7 @@ std::string Tools::GetFilename(const std::string& path)
 
 std::string Tools::GetFolderPath(const std::string& uri, bool returnUnchangedIfNoSlash)
 {
-  const auto index = String::lastIndexOf(uri, "/");
+  const auto index = StringTools::lastIndexOf(uri, "/");
   if (index < 0) {
     if (returnUnchangedIfNoSlash) {
       return uri;
@@ -167,7 +167,7 @@ bool Tools::IsBase64(const std::string& uri)
 
 ArrayBuffer Tools::DecodeBase64(const std::string& uri)
 {
-  auto uriSplit = String::split(uri, ',');
+  auto uriSplit = StringTools::split(uri, ',');
   if (uriSplit.size() < 2) {
     return ArrayBuffer();
   }
@@ -177,7 +177,7 @@ ArrayBuffer Tools::DecodeBase64(const std::string& uri)
   Uint8Array bufferView(bufferLength);
 
   for (size_t i = 0; i < bufferLength; ++i) {
-    bufferView[i] = String::charCodeAt(decodedString, i);
+    bufferView[i] = StringTools::charCodeAt(decodedString, i);
   }
 
   return bufferView;

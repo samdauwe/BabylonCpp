@@ -8,9 +8,9 @@
 #include <babylon/animations/animation.h>
 #include <babylon/animations/animation_value.h>
 #include <babylon/animations/ianimatable.h>
-#include <babylon/core/string.h>
 #include <babylon/engines/node.h>
 #include <babylon/engines/scene.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -136,19 +136,19 @@ std::string Action::_SerializeValueAsString(const AnimationValue& value)
       return value.get<std::string>();
     case Animation::ANIMATIONTYPE_COLOR3(): {
       const auto& _value = value.get<Color3>();
-      return String::concat(_value.r, ", ", _value.g, ", ", _value.b);
+      return StringTools::concat(_value.r, ", ", _value.g, ", ", _value.b);
     }
     case Animation::ANIMATIONTYPE_COLOR4(): {
       const auto& _value = value.get<Color4>();
-      return String::concat(_value.r, ", ", _value.g, ", ", _value.b, ", ", _value.a);
+      return StringTools::concat(_value.r, ", ", _value.g, ", ", _value.b, ", ", _value.a);
     }
     case Animation::ANIMATIONTYPE_VECTOR2(): {
       const auto& _value = value.get<Vector2>();
-      return String::concat(_value.x, ", ", _value.y);
+      return StringTools::concat(_value.x, ", ", _value.y);
     }
     case Animation::ANIMATIONTYPE_VECTOR3(): {
       const auto& _value = value.get<Vector3>();
-      return String::concat(_value.x, ", ", _value.y, ", ", _value.z);
+      return StringTools::concat(_value.x, ", ", _value.y, ", ", _value.z);
     }
     default:
       return "";

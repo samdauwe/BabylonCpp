@@ -9,7 +9,6 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
-#include <babylon/core/string.h>
 #include <babylon/engines/asset_container.h>
 #include <babylon/engines/scene.h>
 #include <babylon/engines/scene_component_constants.h>
@@ -23,6 +22,7 @@
 #include <babylon/materials/textures/hdr_cube_texture.h>
 #include <babylon/meshes/geometry.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/misc/tools.h>
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/particles/particle_system.h>
@@ -36,7 +36,7 @@ BabylonFileLoader::BabylonFileLoader()
   extensions    = ".babylon";
   canDirectLoad = [](const std::string& data) {
     // We consider that the producer string is filled
-    return String::endsWith(data, "babylon");
+    return StringTools::endsWith(data, "babylon");
   };
 }
 
@@ -480,7 +480,7 @@ bool BabylonFileLoader::load(Scene* scene, const std::string& data, const std::s
         scene->environmentTexture = hdrTexture;
       }
       else {
-        if (String::endsWith(environmentTextureStr, ".env")) {
+        if (StringTools::endsWith(environmentTextureStr, ".env")) {
           auto compressedTexture = CubeTexture::New(rootUrl + environmentTextureStr, scene);
           if (json_util::has_valid_key_value(parsedData, "environmentTextureRotationY")) {
             compressedTexture->rotationY
@@ -568,7 +568,7 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
         const auto hdrSize
           = json_util::get_number<size_t>(parsedData, "environmentTextureSize", 128);
         const std::regex re("https?://", std::regex::optimize);
-        const auto regexMatch = String::regexMatch(environmentTextureStr, re);
+        const auto regexMatch = StringTools::regexMatch(environmentTextureStr, re);
         auto hdrTexture
           = HDRCubeTexture::New((!regexMatch.empty() ? "" : rootUrl) + environmentTextureStr, scene,
                                 hdrSize, true, !isPBR);
@@ -579,9 +579,9 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
         scene->environmentTexture = hdrTexture;
       }
       else {
-        if (String::endsWith(environmentTextureStr, ".env")) {
+        if (StringTools::endsWith(environmentTextureStr, ".env")) {
           const std::regex re("https?://", std::regex::optimize);
-          const auto regexMatch = String::regexMatch(environmentTextureStr, re);
+          const auto regexMatch = StringTools::regexMatch(environmentTextureStr, re);
           auto compressedTexture
             = CubeTexture::New((!regexMatch.empty() ? "" : rootUrl) + environmentTextureStr, scene);
           if (json_util::has_valid_key_value(parsedData, "environmentTextureRotationY")) {
@@ -592,7 +592,7 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
         }
         else {
           const std::regex re("https?://", std::regex::optimize);
-          const auto regexMatch = String::regexMatch(environmentTextureStr, re);
+          const auto regexMatch = StringTools::regexMatch(environmentTextureStr, re);
           auto cubeTexture      = CubeTexture::CreateFromPrefilteredData(
             (!regexMatch.empty() ? "" : rootUrl) + environmentTextureStr, scene);
           if (json_util::has_valid_key_value(parsedData, "environmentTextureRotationY")) {

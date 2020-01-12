@@ -1,8 +1,8 @@
 #include <babylon/materials/node/blocks/dot_block.h>
 
-#include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -57,8 +57,8 @@ DotBlock& DotBlock::_buildBlock(NodeMaterialBuildState& state)
 
   state.compilationString
     += _declareOutput(iOutput, state)
-       + String::printf(" = dot(%s, %s);\r\n", left()->associatedVariableName().c_str(),
-                        right()->associatedVariableName().c_str());
+       + StringTools::printf(" = dot(%s, %s);\r\n", left()->associatedVariableName().c_str(),
+                             right()->associatedVariableName().c_str());
 
   return *this;
 }

@@ -1,11 +1,11 @@
 #include <ImGuiColorTextEdit/TextEditor.h>
 #include <babylon/core/filesystem.h>
-#include <babylon/core/string.h>
 #include <babylon/core/system.h>
+#include <babylon/misc/string_tools.h>
 #include <functional>
-#include <imgui_utils/imgui_runner_babylon/runner_babylon.h>
 #include <imgui_utils/code_editor.h>
 #include <imgui_utils/icons_font_awesome_5.h>
+#include <imgui_utils/imgui_runner_babylon/runner_babylon.h>
 #include <imgui_utils/imgui_utils.h>
 #include <iostream>
 #include <string>
@@ -18,7 +18,7 @@ namespace {
 std::string readFileContents_standard_eof(const std::string& filePath)
 {
   std::string s = BABYLON::Filesystem::readFileContents(filePath.c_str());
-  s             = BABYLON::String::replace(s, "\r\n", "\n");
+  s             = BABYLON::StringTools::replace(s, "\r\n", "\n");
   return s;
 }
 
@@ -351,13 +351,15 @@ void demoCodeEditor()
        "../../../src/imgui_babylon/include/babylon/imgui_babylon/sample_list_page.h"};
   ImGuiUtils::CodeEditor codeEditor(true);
   codeEditor.setFiles(path);
-  auto demoGui = [&]() { codeEditor.render(); return false;};
+  auto demoGui = [&]() {
+    codeEditor.render();
+    return false;
+  };
 
   ImGuiUtils::ImGuiRunner::AppWindowParams params;
   // params.FullScreen = true;
   params.Title       = "Hello World";
   params.ShowMenuBar = true;
-
 
   ImGuiUtils::ImGuiRunner::InvokeRunnerBabylon(params, demoGui);
 }

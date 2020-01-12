@@ -1,8 +1,8 @@
 #include <babylon/materials/node/blocks/desaturate_block.h>
 
-#include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -51,18 +51,18 @@ DesaturateBlock& DesaturateBlock::_buildBlock(NodeMaterialBuildState& state)
   const auto tempMerge = state._getFreeVariableName("colorMerge");
 
   state.compilationString
-    += String::printf("float %s = min(min(%s.x, %s.y), %s.z);\r\n", tempMin.c_str(),
-                      colorName.c_str(), colorName.c_str(), colorName.c_str());
+    += StringTools::printf("float %s = min(min(%s.x, %s.y), %s.z);\r\n", tempMin.c_str(),
+                           colorName.c_str(), colorName.c_str(), colorName.c_str());
   state.compilationString
-    += String::printf("float %s = max(max(%s.x, %s.y), %s.z);\r\n", tempMax.c_str(),
-                      colorName.c_str(), colorName.c_str(), colorName.c_str());
-  state.compilationString += String::printf("float %s = 0.5 * (%s + %s);\r\n", tempMerge.c_str(),
-                                            tempMin.c_str(), tempMax.c_str());
+    += StringTools::printf("float %s = max(max(%s.x, %s.y), %s.z);\r\n", tempMax.c_str(),
+                           colorName.c_str(), colorName.c_str(), colorName.c_str());
+  state.compilationString += StringTools::printf(
+    "float %s = 0.5 * (%s + %s);\r\n", tempMerge.c_str(), tempMin.c_str(), tempMax.c_str());
   state.compilationString
     += _declareOutput(iOutput, state)
-       + String::printf(" = mix(%s, vec3(%s, %s, %s), %s);\r\n", colorName.c_str(),
-                        tempMerge.c_str(), tempMerge.c_str(), tempMerge.c_str(),
-                        level()->associatedVariableName().c_str());
+       + StringTools::printf(" = mix(%s, vec3(%s, %s, %s), %s);\r\n", colorName.c_str(),
+                             tempMerge.c_str(), tempMerge.c_str(), tempMerge.c_str(),
+                             level()->associatedVariableName().c_str());
 
   return *this;
 }

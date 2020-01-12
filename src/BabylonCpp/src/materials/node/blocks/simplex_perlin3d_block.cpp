@@ -1,7 +1,7 @@
-#include <babylon/core/string.h>
 #include <babylon/materials/node/blocks/simplex_perlin3d_block.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -89,9 +89,9 @@ SimplexPerlin3DBlock& SimplexPerlin3DBlock::_buildBlock(NodeMaterialBuildState& 
           )ShaderCode";
 
   state._emitFunction("SimplexPerlin3D", functionString, "SimplexPerlin3D");
-  state.compilationString
-    += _declareOutput(_outputs[0], state)
-       + String::printf(" = SimplexPerlin3D(%s);\r\n", seed()->associatedVariableName().c_str());
+  state.compilationString += _declareOutput(_outputs[0], state)
+                             + StringTools::printf(" = SimplexPerlin3D(%s);\r\n",
+                                                   seed()->associatedVariableName().c_str());
 
   return *this;
 }

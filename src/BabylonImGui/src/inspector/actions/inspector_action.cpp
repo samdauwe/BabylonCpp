@@ -1,6 +1,6 @@
 #include <babylon/inspector/actions/inspector_action.h>
 
-#include <babylon/core/string.h>
+#include <babylon/misc/string_tools.h>
 
 #include <iostream>
 
@@ -11,13 +11,12 @@ InspectorAction::InspectorAction()
 {
 }
 
-InspectorAction::InspectorAction(const char* iId, const char* iIcon,
-                                 const char* iLabel, const char* iShortcut,
-                                 const SA::delegate<void()>& iCallback)
+InspectorAction::InspectorAction(const char* iId, const char* iIcon, const char* iLabel,
+                                 const char* iShortcut, const SA::delegate<void()>& iCallback)
     : id{iId}
     , icon{iIcon}
     , label{iLabel}
-    , iconWithLabel{String::printf("%s %s", iIcon, iLabel)}
+    , iconWithLabel{StringTools::printf("%s %s", iIcon, iLabel)}
     , shortcut{iShortcut}
     , callback{iCallback}
     , isSelected{SA::delegate<bool()>::create<&InspectorAction::FalseConst>()}

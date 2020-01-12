@@ -1,6 +1,6 @@
 #include <babylon/engines/processors/shader_code_cursor.h>
 
-#include <babylon/core/string.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -77,11 +77,11 @@ void ShaderCodeCursor::set_lines(const std::vector<std::string>& value)
       continue;
     }
 
-    auto split = String::split(line, ';');
+    auto split = StringTools::split(line, ';');
 
     for (size_t index = 0; index < split.size(); ++index) {
       auto& subLine = split[index];
-      subLine       = String::trim(subLine);
+      subLine       = StringTools::trim(subLine);
 
       if (subLine.empty()) {
         continue;

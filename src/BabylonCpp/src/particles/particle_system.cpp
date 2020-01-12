@@ -5,7 +5,6 @@
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/core/json_util.h>
 #include <babylon/core/random.h>
-#include <babylon/core/string.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
@@ -25,6 +24,7 @@
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/color3_gradient.h>
 #include <babylon/misc/gradient_helper.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/particles/emittertypes/box_particle_emitter.h>
 #include <babylon/particles/emittertypes/cone_particle_emitter.h>
 #include <babylon/particles/emittertypes/hemispheric_particle_emitter.h>
@@ -1333,7 +1333,7 @@ EffectPtr ParticleSystem::_getEffect(unsigned int iBlendMode)
   }
 
   // Effect
-  std::string join = String::join(defines, '\n');
+  std::string join = StringTools::join(defines, '\n');
   if (_cachedDefines != join) {
     _cachedDefines = join;
 

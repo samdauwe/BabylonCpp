@@ -1,8 +1,8 @@
 #include <babylon/materials/node/blocks/vector_merger_block.h>
 
-#include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -101,64 +101,65 @@ VectorMergerBlock& VectorMergerBlock::_buildBlock(NodeMaterialBuildState& state)
     if (v4Output->hasEndpoints()) {
       state.compilationString
         += _declareOutput(v4Output, state)
-           + String::printf(" = vec4(%s, %s, %s);\r\n", xyInput->associatedVariableName().c_str(),
-                            zInput->isConnected() ? _writeVariable(zInput).c_str() : "0.0",
-                            wInput->isConnected() ? _writeVariable(wInput).c_str() : "0.0");
+           + StringTools::printf(" = vec4(%s, %s, %s);\r\n",
+                                 xyInput->associatedVariableName().c_str(),
+                                 zInput->isConnected() ? _writeVariable(zInput).c_str() : "0.0",
+                                 wInput->isConnected() ? _writeVariable(wInput).c_str() : "0.0");
     }
     else if (v3Output->hasEndpoints()) {
       state.compilationString
         += _declareOutput(v3Output, state)
-           + String::printf(" = vec3(%s, %s);\r\n", xyInput->associatedVariableName().c_str(),
-                            zInput->isConnected() ? _writeVariable(zInput).c_str() : "0.0");
+           + StringTools::printf(" = vec3(%s, %s);\r\n", xyInput->associatedVariableName().c_str(),
+                                 zInput->isConnected() ? _writeVariable(zInput).c_str() : "0.0");
     }
     else if (v2Output->hasEndpoints()) {
       state.compilationString
         += _declareOutput(v2Output, state)
-           + String::printf(" = %s;\r\n", xyInput->associatedVariableName().c_str());
+           + StringTools::printf(" = %s;\r\n", xyInput->associatedVariableName().c_str());
     }
   }
   else if (xyzInput->isConnected()) {
     if (v4Output->hasEndpoints()) {
       state.compilationString
         += _declareOutput(v4Output, state)
-           + String::printf(" = vec4(%s, %s);\r\n", xyzInput->associatedVariableName().c_str(),
-                            wInput->isConnected() ? _writeVariable(wInput).c_str() : "0.0");
+           + StringTools::printf(" = vec4(%s, %s);\r\n", xyzInput->associatedVariableName().c_str(),
+                                 wInput->isConnected() ? _writeVariable(wInput).c_str() : "0.0");
     }
     else if (v3Output->hasEndpoints()) {
       state.compilationString
         += _declareOutput(v3Output, state)
-           + String::printf(" = %s;\r\n", xyzInput->associatedVariableName().c_str());
+           + StringTools::printf(" = %s;\r\n", xyzInput->associatedVariableName().c_str());
     }
     else if (v2Output->hasEndpoints()) {
       state.compilationString
         += _declareOutput(v2Output, state)
-           + String::printf(" = %s.xy;\r\n", xyzInput->associatedVariableName().c_str());
+           + StringTools::printf(" = %s.xy;\r\n", xyzInput->associatedVariableName().c_str());
     }
   }
   else {
     if (v4Output->hasEndpoints()) {
       state.compilationString
         += _declareOutput(v4Output, state)
-           + String::printf(" = vec4(%s, %s, %s, %s);\r\n",
-                            xInput->isConnected() ? _writeVariable(xInput).c_str() : "0.0",
-                            yInput->isConnected() ? _writeVariable(yInput).c_str() : "0.0",
-                            zInput->isConnected() ? _writeVariable(zInput).c_str() : "0.0",
-                            wInput->isConnected() ? _writeVariable(wInput).c_str() : "0.0");
+           + StringTools::printf(" = vec4(%s, %s, %s, %s);\r\n",
+                                 xInput->isConnected() ? _writeVariable(xInput).c_str() : "0.0",
+                                 yInput->isConnected() ? _writeVariable(yInput).c_str() : "0.0",
+                                 zInput->isConnected() ? _writeVariable(zInput).c_str() : "0.0",
+                                 wInput->isConnected() ? _writeVariable(wInput).c_str() : "0.0");
     }
     else if (v3Output->hasEndpoints()) {
       state.compilationString
         += _declareOutput(v3Output, state)
-           + String::printf(" = vec3(%s, %s, %s);\r\n",
-                            xInput->isConnected() ? _writeVariable(xInput).c_str() : "0.0",
-                            yInput->isConnected() ? _writeVariable(yInput).c_str() : "0.0",
-                            zInput->isConnected() ? _writeVariable(zInput).c_str() : "0.0");
+           + StringTools::printf(" = vec3(%s, %s, %s);\r\n",
+                                 xInput->isConnected() ? _writeVariable(xInput).c_str() : "0.0",
+                                 yInput->isConnected() ? _writeVariable(yInput).c_str() : "0.0",
+                                 zInput->isConnected() ? _writeVariable(zInput).c_str() : "0.0");
     }
     else if (v2Output->hasEndpoints()) {
       state.compilationString
         += _declareOutput(v2Output, state)
-           + String::printf(" = vec2(%s, %s);\r\n",
-                            xInput->isConnected() ? _writeVariable(xInput).c_str() : "0.0",
-                            yInput->isConnected() ? _writeVariable(yInput).c_str() : "0.0");
+           + StringTools::printf(" = vec2(%s, %s);\r\n",
+                                 xInput->isConnected() ? _writeVariable(xInput).c_str() : "0.0",
+                                 yInput->isConnected() ? _writeVariable(yInput).c_str() : "0.0");
     }
   }
 

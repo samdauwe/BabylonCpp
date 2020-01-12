@@ -1,8 +1,8 @@
 #include <babylon/materials/node/blocks/nlerp_block.h>
 
-#include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -58,10 +58,10 @@ NLerpBlock& NLerpBlock::_buildBlock(NodeMaterialBuildState& state)
   const auto& iOutput = _outputs[0];
 
   state.compilationString += _declareOutput(iOutput, state)
-                             + String::printf(" = normalize(mix(%s, %s, %s));\r\n",
-                                              left()->associatedVariableName().c_str(),
-                                              right()->associatedVariableName().c_str(),
-                                              gradient()->associatedVariableName().c_str());
+                             + StringTools::printf(" = normalize(mix(%s, %s, %s));\r\n",
+                                                   left()->associatedVariableName().c_str(),
+                                                   right()->associatedVariableName().c_str(),
+                                                   gradient()->associatedVariableName().c_str());
 
   return *this;
 }

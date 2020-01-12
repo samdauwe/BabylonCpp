@@ -1,9 +1,9 @@
 ﻿#include <babylon/materials/node/blocks/clamp_block.h>
 
 #include <babylon/core/json_util.h>
-#include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -43,17 +43,18 @@ ClampBlock& ClampBlock::_buildBlock(NodeMaterialBuildState& state)
 
   state.compilationString
     += _declareOutput(iOutput, state)
-       + String::printf(" = clamp(%s , %s, %s);\r\n", value()->associatedVariableName().c_str(),
-                        _writeFloat(minimum).c_str(), _writeFloat(maximum).c_str());
+       + StringTools::printf(" = clamp(%s , %s, %s);\r\n",
+                             value()->associatedVariableName().c_str(),
+                             _writeFloat(minimum).c_str(), _writeFloat(maximum).c_str());
 
   return *this;
 }
 
 std::string ClampBlock::_dumpPropertiesCode()
 {
-  auto codeString = String::printf("%s.minimum = %f;\r\n", _codeVariableName.c_str(), minimum);
+  auto codeString = StringTools::printf("%s.minimum = %f;\r\n", _codeVariableName.c_str(), minimum);
 
-  codeString += String::printf("%s.maximum = %f;\r\n", _codeVariableName.c_str(), maximum);
+  codeString += StringTools::printf("%s.maximum = %f;\r\n", _codeVariableName.c_str(), maximum);
 
   return codeString;
 }

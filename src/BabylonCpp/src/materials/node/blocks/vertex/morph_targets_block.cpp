@@ -1,6 +1,5 @@
 #include <babylon/materials/node/blocks/vertex/morph_targets_block.h>
 
-#include <babylon/core/string.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/node/blocks/input/input_block.h>
 #include <babylon/materials/node/node_material.h>
@@ -11,6 +10,7 @@
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/morph/morph_target_manager.h>
 
 namespace BABYLON {
@@ -177,33 +177,35 @@ void MorphTargetsBlock::replaceRepeatableContent(
 
   for (size_t index = 0; index < repeatCount; index++) {
     injectionCode += "#ifdef MORPHTARGETS\r\n";
-    injectionCode += String::printf("%s += (position%zu - %s) * morphTargetInfluences[%zu];\r\n",
-                                    _positionOutput->associatedVariableName().c_str(), index,
-                                    _position->associatedVariableName().c_str(), index);
+    injectionCode
+      += StringTools::printf("%s += (position%zu - %s) * morphTargetInfluences[%zu];\r\n",
+                             _positionOutput->associatedVariableName().c_str(), index,
+                             _position->associatedVariableName().c_str(), index);
 
     if (hasNormals) {
       injectionCode += "#ifdef MORPHTARGETS_NORMAL\r\n";
-      injectionCode += String::printf("%s += (normal%zu - %s) * morphTargetInfluences[%zu];\r\n",
-                                      _normalOutput->associatedVariableName().c_str(), index,
-                                      _normal->associatedVariableName().c_str(), index);
+      injectionCode
+        += StringTools::printf("%s += (normal%zu - %s) * morphTargetInfluences[%zu];\r\n",
+                               _normalOutput->associatedVariableName().c_str(), index,
+                               _normal->associatedVariableName().c_str(), index);
       injectionCode += "#endif\r\n";
     }
 
     if (hasTangents) {
       injectionCode += "#ifdef MORPHTARGETS_TANGENT\r\n";
       injectionCode
-        += String::printf("%s.xyz += (tangent%zu - %s.xyz) * morphTargetInfluences[%zu];\r\n",
-                          _tangentOutput->associatedVariableName().c_str(), index,
-                          _tangent->associatedVariableName().c_str(), index);
+        += StringTools::printf("%s.xyz += (tangent%zu - %s.xyz) * morphTargetInfluences[%zu];\r\n",
+                               _tangentOutput->associatedVariableName().c_str(), index,
+                               _tangent->associatedVariableName().c_str(), index);
       injectionCode += "#endif\r\n";
     }
 
     if (hasUVs) {
       injectionCode += "#ifdef MORPHTARGETS_UV\r\n";
       injectionCode
-        += String::printf("%s.xyz += (uv_%zu - %s.xyz) * morphTargetInfluences[%zu];\r\n",
-                          _uvOutput->associatedVariableName().c_str(), index,
-                          _uv->associatedVariableName().c_str(), index);
+        += StringTools::printf("%s.xyz += (uv_%zu - %s.xyz) * morphTargetInfluences[%zu];\r\n",
+                               _uvOutput->associatedVariableName().c_str(), index,
+                               _uv->associatedVariableName().c_str(), index);
       injectionCode += "#endif\r\n";
     }
 
@@ -211,18 +213,21 @@ void MorphTargetsBlock::replaceRepeatableContent(
   }
 
   _state.compilationString
-    = String::replace(_state.compilationString, _repeatableContentAnchor, injectionCode);
+    = StringTools::replace(_state.compilationString, _repeatableContentAnchor, injectionCode);
 
   if (repeatCount > 0) {
     for (size_t index = 0; index < repeatCount; index++) {
-      _state.attributes.emplace_back(String::printf("%s%zu", VertexBuffer::PositionKind, index));
+      _state.attributes.emplace_back(
+        StringTools::printf("%s%zu", VertexBuffer::PositionKind, index));
 
       if (hasNormals) {
-        _state.attributes.emplace_back(String::printf("%s%zu", VertexBuffer::NormalKind, index));
+        _state.attributes.emplace_back(
+          StringTools::printf("%s%zu", VertexBuffer::NormalKind, index));
       }
 
       if (hasTangents) {
-        _state.attributes.emplace_back(String::printf("%s%zu", VertexBuffer::TangentKind, index));
+        _state.attributes.emplace_back(
+          StringTools::printf("%s%zu", VertexBuffer::TangentKind, index));
       }
     }
   }
@@ -250,7 +255,7 @@ MorphTargetsBlock& MorphTargetsBlock::_buildBlock(NodeMaterialBuildState& state)
   const auto& _normalOutput   = normalOutput();
   const auto& _tangentOutput  = tangentOutput();
   const auto& _uvOutput       = uvOutput;
-  auto comments               = String::printf("//%s", name.c_str());
+  auto comments               = StringTools::printf("//%s", name.c_str());
 
   state.uniforms.emplace_back("morphTargetInfluences");
 
@@ -261,22 +266,22 @@ MorphTargetsBlock& MorphTargetsBlock::_buildBlock(NodeMaterialBuildState& state)
                                  });
 
   state.compilationString
-    += String::printf("%s = %s;\r\n", _declareOutput(_positionOutput, state).c_str(),
-                      _position->associatedVariableName().c_str());
+    += StringTools::printf("%s = %s;\r\n", _declareOutput(_positionOutput, state).c_str(),
+                           _position->associatedVariableName().c_str());
   state.compilationString += "#ifdef NORMAL\r\n";
   state.compilationString
-    += String::printf("%s = %s;\r\n", _declareOutput(_normalOutput, state).c_str(),
-                      _normal->associatedVariableName().c_str());
+    += StringTools::printf("%s = %s;\r\n", _declareOutput(_normalOutput, state).c_str(),
+                           _normal->associatedVariableName().c_str());
   state.compilationString += "#endif\r\n";
   state.compilationString += "#ifdef TANGENT\r\n";
   state.compilationString
-    += String::printf("%s = %s;\r\n", _declareOutput(_tangentOutput, state).c_str(),
-                      _tangent->associatedVariableName().c_str());
+    += StringTools::printf("%s = %s;\r\n", _declareOutput(_tangentOutput, state).c_str(),
+                           _tangent->associatedVariableName().c_str());
   state.compilationString += "#endif\r\n";
   state.compilationString += "#ifdef UV1\r\n";
   state.compilationString
-    += String::printf("%s = %s;\r\n", _declareOutput(_uvOutput, state).c_str(),
-                      _uv->associatedVariableName().c_str());
+    += StringTools::printf("%s = %s;\r\n", _declareOutput(_uvOutput, state).c_str(),
+                           _uv->associatedVariableName().c_str());
   state.compilationString += "#endif\r\n";
 
   // Repeatable content

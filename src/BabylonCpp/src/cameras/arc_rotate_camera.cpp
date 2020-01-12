@@ -5,7 +5,7 @@
 #include <babylon/behaviors/cameras/bouncing_behavior.h>
 #include <babylon/behaviors/cameras/framing_behavior.h>
 #include <babylon/collisions/icollision_coordinator.h>
-#include <babylon/core/string.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/icanvas.h>

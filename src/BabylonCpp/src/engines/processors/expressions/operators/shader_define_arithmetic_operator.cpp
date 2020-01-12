@@ -1,7 +1,7 @@
 #include <babylon/engines/processors/expressions/operators/shader_define_arithmetic_operator.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/core/string.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -63,8 +63,8 @@ bool ShaderDefineArithmeticOperator::isTrue(
   auto value = !stl_util::contains(preprocessors, define) ? define : preprocessors.at(define);
 
   auto condition   = false;
-  const auto left  = String::toNumber<float>(value);
-  const auto right = String::toNumber<float>(testValue);
+  const auto left  = StringTools::toNumber<float>(value);
+  const auto right = StringTools::toNumber<float>(testValue);
 
   if (operand == ">") {
     condition = left > right;

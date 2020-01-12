@@ -6,7 +6,7 @@
 #include <babylon/babylon_common.h>
 #include <babylon/babylon_constants.h>
 #include <babylon/babylon_stl_util.h>
-#include <babylon/core/string.h>
+#include <babylon/misc/string_tools.h>
 
 TEST(TestStdUtil, to_bitset)
 {
@@ -47,7 +47,7 @@ TEST(TestStdUtil, to_bytes__from_bytes)
     for (byte b : bytes) {
       oss << std::setw(2) << int(b) << ' ';
     }
-    EXPECT_EQ(String::trimCopy(oss.str()), "0b 0b ee 07 3c dd 5e 40");
+    EXPECT_EQ(StringTools::trimCopy(oss.str()), "0b 0b ee 07 3c dd 5e 40");
 
     // from_bytes
     oss.str("");
@@ -67,7 +67,7 @@ TEST(TestStdUtil, to_bytes__from_bytes)
     for (byte b : array_bytes) {
       oss << std::setw(2) << int(b) << ' ';
     }
-    EXPECT_EQ(String::trimCopy(oss.str()),
+    EXPECT_EQ(StringTools::trimCopy(oss.str()),
               "01 00 00 00 3f 00 00 00 00 01 00 00 ff 01 00 00 00 04 00 00");
 
     // from_bytes
@@ -79,7 +79,7 @@ TEST(TestStdUtil, to_bytes__from_bytes)
     for (int v : arr) {
       oss << std::dec << v << ' ';
     }
-    EXPECT_EQ(String::trimCopy(oss.str()), "1 63 256 511 1024");
+    EXPECT_EQ(StringTools::trimCopy(oss.str()), "1 63 256 511 1024");
   }
 }
 
@@ -199,19 +199,17 @@ TEST(TestStdUtil, insert_at)
   using namespace BABYLON;
 
   std::vector<std::string> v{"DIFFUSE", "CLIPPLANE", "POINTSIZE", "FOG"};
-  const std::vector<std::string> expected{"DIFFUSE", "CLIPPLANE", "ALPHATEST",
-                                          "POINTSIZE", "FOG"};
-  EXPECT_THAT(stl_util::insert_at(v, 2, "ALPHATEST"),
-              ::testing::ContainerEq(expected));
+  const std::vector<std::string> expected{"DIFFUSE", "CLIPPLANE", "ALPHATEST", "POINTSIZE", "FOG"};
+  EXPECT_THAT(stl_util::insert_at(v, 2, "ALPHATEST"), ::testing::ContainerEq(expected));
 }
 
 TEST(TestStdUtil, unordered_map_contains)
 {
   using namespace BABYLON;
 
-  const std::unordered_map<std::string, int> c{
-    {"DIFFUSE", 0},   {"CLIPPLANE", 2}, {"VERTEXALPHA", 4},
-    {"ALPHATEST", 6}, {"POINTSIZE", 8}, {"FOG", 10}};
+  const std::unordered_map<std::string, int> c{{"DIFFUSE", 0},     {"CLIPPLANE", 2},
+                                               {"VERTEXALPHA", 4}, {"ALPHATEST", 6},
+                                               {"POINTSIZE", 8},   {"FOG", 10}};
   EXPECT_TRUE(stl_util::contains(c, "DIFFUSE"));
   EXPECT_TRUE(stl_util::contains(c, "CLIPPLANE"));
   EXPECT_FALSE(stl_util::contains(c, "SHADOWS"));
@@ -221,9 +219,9 @@ TEST(TestStdUtil, extract_keys)
 {
   using namespace BABYLON;
 
-  const std::unordered_map<std::string, int> c{
-    {"DIFFUSE", 0},   {"CLIPPLANE", 2}, {"VERTEXALPHA", 4},
-    {"ALPHATEST", 6}, {"POINTSIZE", 8}, {"FOG", 10}};
+  const std::unordered_map<std::string, int> c{{"DIFFUSE", 0},     {"CLIPPLANE", 2},
+                                               {"VERTEXALPHA", 4}, {"ALPHATEST", 6},
+                                               {"POINTSIZE", 8},   {"FOG", 10}};
   const std::vector<std::string> keys = stl_util::extract_keys(c);
   EXPECT_TRUE(stl_util::contains(keys, "DIFFUSE"));
   EXPECT_TRUE(stl_util::contains(keys, "CLIPPLANE"));
@@ -238,9 +236,9 @@ TEST(TestStdUtil, extract_values)
 {
   using namespace BABYLON;
 
-  const std::unordered_map<std::string, int> c{
-    {"DIFFUSE", 0},   {"CLIPPLANE", 2}, {"VERTEXALPHA", 4},
-    {"ALPHATEST", 6}, {"POINTSIZE", 8}, {"FOG", 10}};
+  const std::unordered_map<std::string, int> c{{"DIFFUSE", 0},     {"CLIPPLANE", 2},
+                                               {"VERTEXALPHA", 4}, {"ALPHATEST", 6},
+                                               {"POINTSIZE", 8},   {"FOG", 10}};
   const Int32Array values = stl_util::extract_values(c);
   EXPECT_TRUE(stl_util::contains(values, 0));
   EXPECT_FALSE(stl_util::contains(values, 1));
@@ -327,9 +325,7 @@ TEST(TestStdUtil, max)
   EXPECT_EQ(stl_util::max(10, 5.5), 10);
   EXPECT_EQ(stl_util::max(0.5, -10.1, -200), 0.5);
   EXPECT_EQ(stl_util::max(std::string{"var1"}, std::string{"var2"}), "var2");
-  EXPECT_EQ(
-    stl_util::max(std::string{"var1"}, static_cast<char const*>("var2")),
-    "var2");
+  EXPECT_EQ(stl_util::max(std::string{"var1"}, static_cast<char const*>("var2")), "var2");
   EXPECT_EQ(stl_util::max("var1", std::string{"var2"}), "var2");
 }
 
@@ -496,8 +492,7 @@ TEST(TestStdUtil, splice)
     std::vector<std::string> v{"0", "1", "2", "3"};
     std::vector<std::string> expected{"0", "1", "4", "5", "3"};
     std::vector<std::string> expectedRemovedItem{"2"};
-    std::vector<std::string> r
-      = stl_util::splice(v, 2, 1, {"4", "5"});
+    std::vector<std::string> r = stl_util::splice(v, 2, 1, {"4", "5"});
     EXPECT_THAT(v, ::testing::ContainerEq(expected));
     EXPECT_THAT(r, ::testing::ContainerEq(expectedRemovedItem));
   }
@@ -523,9 +518,9 @@ TEST(TestStdUtil, splice)
   }
   // Remove item n-2 & insert
   {
-    std::vector<std::string> v{ "0", "1", "2", "3" };
-    std::vector<std::string> expected{ "0", "1", "4", "5", "3" };
-    std::vector<std::string> expectedRemovedItem{ "2" };
+    std::vector<std::string> v{"0", "1", "2", "3"};
+    std::vector<std::string> expected{"0", "1", "4", "5", "3"};
+    std::vector<std::string> expectedRemovedItem{"2"};
     std::vector<std::string> r = stl_util::splice(v, -2, 1, {"4", "5"});
     EXPECT_THAT(v, ::testing::ContainerEq(expected));
     EXPECT_THAT(r, ::testing::ContainerEq(expectedRemovedItem));

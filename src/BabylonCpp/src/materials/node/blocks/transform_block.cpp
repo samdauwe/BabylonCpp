@@ -1,10 +1,10 @@
 #include <babylon/materials/node/blocks/transform_block.h>
 
 #include <babylon/core/json_util.h>
-#include <babylon/core/string.h>
 #include <babylon/materials/node/blocks/input/input_block.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -64,24 +64,24 @@ TransformBlock& TransformBlock::_buildBlock(NodeMaterialBuildState& state)
     case NodeMaterialBlockConnectionPointTypes::Vector2:
       state.compilationString
         += _declareOutput(iOutput, state)
-           + String::printf(" = %s * vec4(%s, %s, %s);\r\n",
-                            transform()->associatedVariableName().c_str(),
-                            vector()->associatedVariableName().c_str(),
-                            _writeFloat(complementZ).c_str(), _writeFloat(complementW).c_str());
+           + StringTools::printf(
+             " = %s * vec4(%s, %s, %s);\r\n", transform()->associatedVariableName().c_str(),
+             vector()->associatedVariableName().c_str(), _writeFloat(complementZ).c_str(),
+             _writeFloat(complementW).c_str());
       break;
     case NodeMaterialBlockConnectionPointTypes::Vector3:
     case NodeMaterialBlockConnectionPointTypes::Color3:
-      state.compilationString += _declareOutput(iOutput, state)
-                                 + String::printf(" = %s * vec4(%s, %s);\r\n",
-                                                  transform()->associatedVariableName().c_str(),
-                                                  vector()->associatedVariableName().c_str(),
-                                                  _writeFloat(complementW).c_str());
+      state.compilationString
+        += _declareOutput(iOutput, state)
+           + StringTools::printf(
+             " = %s * vec4(%s, %s);\r\n", transform()->associatedVariableName().c_str(),
+             vector()->associatedVariableName().c_str(), _writeFloat(complementW).c_str());
       break;
     default:
       state.compilationString
         += _declareOutput(iOutput, state)
-           + String::printf(" = %s * %s;\r\n", transform()->associatedVariableName().c_str(),
-                            vector()->associatedVariableName().c_str());
+           + StringTools::printf(" = %s * %s;\r\n", transform()->associatedVariableName().c_str(),
+                                 vector()->associatedVariableName().c_str());
       break;
   }
 
@@ -101,9 +101,10 @@ void TransformBlock::_deserialize(const json& /*serializationObject*/, Scene* /*
 std::string TransformBlock::_dumpPropertiesCode()
 {
   auto codeString
-    = String::printf("%s.complementZ = %f;\r\n", _codeVariableName.c_str(), complementZ);
+    = StringTools::printf("%s.complementZ = %f;\r\n", _codeVariableName.c_str(), complementZ);
 
-  codeString += String::printf("%s.complementW = %f;\r\n", _codeVariableName.c_str(), complementW);
+  codeString
+    += StringTools::printf("%s.complementW = %f;\r\n", _codeVariableName.c_str(), complementW);
 
   return codeString;
 }

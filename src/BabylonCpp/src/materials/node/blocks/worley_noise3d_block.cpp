@@ -1,9 +1,9 @@
 #include <babylon/materials/node/blocks/worley_noise3d_block.h>
 
 #include <babylon/core/json_util.h>
-#include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -213,16 +213,16 @@ WorleyNoise3DBlock& WorleyNoise3DBlock::_buildBlock(NodeMaterialBuildState& stat
   state._emitFunction("worley3D", functionString, "worley3D");
   state.compilationString
     += _declareOutput(_outputs[0], state)
-       + String::printf(" = worley(%s, %s, %d);\r\n", seed()->associatedVariableName().c_str(),
-                        jitter()->associatedVariableName().c_str(), manhattanDistance);
+       + StringTools::printf(" = worley(%s, %s, %d);\r\n", seed()->associatedVariableName().c_str(),
+                             jitter()->associatedVariableName().c_str(), manhattanDistance);
 
   return *this;
 }
 
 std::string WorleyNoise3DBlock::_dumpPropertiesCode()
 {
-  auto codeString = String::printf("%s.manhattanDistance = %d;\r\n", _codeVariableName.c_str(),
-                                   manhattanDistance);
+  auto codeString = StringTools::printf("%s.manhattanDistance = %d;\r\n", _codeVariableName.c_str(),
+                                        manhattanDistance);
 
   return codeString;
 }

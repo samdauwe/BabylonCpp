@@ -1,10 +1,10 @@
 #include <babylon/gamepads/controllers/oculus_touch_controller.h>
 
-#include <babylon/core/string.h>
 #include <babylon/engines/node.h>
 #include <babylon/gamepads/controllers/extended_gamepad_button.h>
 #include <babylon/loading/scene_loader.h>
 #include <babylon/meshes/abstract_mesh.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -12,7 +12,7 @@ bool OculusTouchController::_IsQuest = false;
 
 bool OculusTouchControllerFactory::canCreate(const IBrowserGamepadPtr& gamepadInfo) const
 {
-  return String::contains(gamepadInfo->id, "Oculus Touch");
+  return StringTools::contains(gamepadInfo->id, "Oculus Touch");
 }
 
 WebVRControllerPtr OculusTouchControllerFactory::create(const IBrowserGamepadPtr& gamepadInfo) const

@@ -2,7 +2,6 @@
 
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/cameras/camera.h>
-#include <babylon/core/string.h>
 #include <babylon/engines/scene.h>
 #include <babylon/helpers/iscene_size.h>
 #include <babylon/materials/background/background_material.h>
@@ -12,6 +11,7 @@
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -171,9 +171,9 @@ IEnvironmentHelperOptions EnvironmentHelper::_getDefaultOptions()
 {
   const auto preprocessCDNUrl = [](const char* textureCDNUrl) -> std::string {
     std::string textureCDNUrlStr(textureCDNUrl);
-    if (String::startsWith(textureCDNUrlStr, "https://assets.babylonjs.com")) {
+    if (StringTools::startsWith(textureCDNUrlStr, "https://assets.babylonjs.com")) {
       textureCDNUrlStr
-        = String::replace(textureCDNUrlStr, "https://assets.babylonjs.com", "textures");
+        = StringTools::replace(textureCDNUrlStr, "https://assets.babylonjs.com", "textures");
     }
     return textureCDNUrlStr;
   };

@@ -1,9 +1,9 @@
 #include <babylon/materials/node/blocks/remap_block.h>
 
 #include <babylon/core/json_util.h>
-#include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -84,21 +84,21 @@ RemapBlock& RemapBlock::_buildBlock(NodeMaterialBuildState& state)
 
   state.compilationString
     += _declareOutput(iOutput, state)
-       + String::printf(" = %s + (%s - %s) * (%s - %s) / (%s - %s);\r\n", iTargetMin.c_str(),
-                        _inputs[0]->associatedVariableName().c_str(), iSourceMin.c_str(),
-                        iTargetMax.c_str(), iTargetMin.c_str(), iSourceMax.c_str(),
-                        iSourceMin.c_str());
+       + StringTools::printf(" = %s + (%s - %s) * (%s - %s) / (%s - %s);\r\n", iTargetMin.c_str(),
+                             _inputs[0]->associatedVariableName().c_str(), iSourceMin.c_str(),
+                             iTargetMax.c_str(), iTargetMin.c_str(), iSourceMax.c_str(),
+                             iSourceMin.c_str());
 
   return *this;
 }
 
 std::string RemapBlock::_dumpPropertiesCode()
 {
-  auto codeString = String::printf("%s.sourceRange = Vector2(%f, %f);\r\n",
-                                   _codeVariableName.c_str(), sourceRange.x, sourceRange.y);
+  auto codeString = StringTools::printf("%s.sourceRange = Vector2(%f, %f);\r\n",
+                                        _codeVariableName.c_str(), sourceRange.x, sourceRange.y);
 
-  codeString += String::printf("%s.targetRange = Vector2(%f, %f);\r\n", _codeVariableName.c_str(),
-                               targetRange.x, targetRange.y);
+  codeString += StringTools::printf("%s.targetRange = Vector2(%f, %f);\r\n",
+                                    _codeVariableName.c_str(), targetRange.x, targetRange.y);
 
   return codeString;
 }

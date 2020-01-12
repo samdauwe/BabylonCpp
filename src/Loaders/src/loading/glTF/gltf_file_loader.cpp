@@ -4,7 +4,6 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
-#include <babylon/core/string.h>
 #include <babylon/engines/asset_container.h>
 #include <babylon/engines/scene.h>
 #include <babylon/loading/glTF/2.0/gltf_loader.h>
@@ -13,6 +12,7 @@
 #include <babylon/loading/scene_loader.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/base_texture.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/misc/tools.h>
 
 namespace BABYLON {
@@ -80,7 +80,7 @@ GLTFFileLoader::GLTFFileLoader()
   extensions = supportedFileExtensions;
   // If the data string can be loaded directly
   factoryCanDirectLoad = canDirectLoad = [](const std::string& data) {
-    return String::contains(data, "scene") && String::contains(data, "node");
+    return StringTools::contains(data, "scene") && StringTools::contains(data, "node");
   };
 
   preprocessUrlAsync = [](const std::string& url) -> std::string { return url; };
@@ -266,7 +266,7 @@ ImportedMeshes GLTFFileLoader::importMeshAsync(
   BABYLON::asio::set_HACK_DISABLE_ASYNC(true);
 
   auto loaderData = _parseAsync(scene, data, rootUrl, fileName);
-  _log(String::printf("Loading %s", fileName.c_str()));
+  _log(StringTools::printf("Loading %s", fileName.c_str()));
   _loader = _getLoader(loaderData);
   return _loader->importMeshAsync(meshesNames, scene, loaderData, rootUrl, onProgress, fileName);
 
@@ -280,7 +280,7 @@ void GLTFFileLoader::loadAsync(
   const std::string& fileName)
 {
   auto loaderData = _parseAsync(scene, data, rootUrl, fileName);
-  _log(String::printf("Loading %s", fileName.c_str()));
+  _log(StringTools::printf("Loading %s", fileName.c_str()));
   _loader = _getLoader(loaderData);
   _loader->loadAsync(scene, loaderData, rootUrl, onProgress, fileName);
 }
@@ -291,7 +291,7 @@ AssetContainerPtr GLTFFileLoader::loadAssetContainerAsync(
   const std::string& fileName)
 {
   auto loaderData = _parseAsync(scene, data, rootUrl, fileName);
-  _log(String::printf("Loading %s", fileName.c_str()));
+  _log(StringTools::printf("Loading %s", fileName.c_str()));
   _loader = _getLoader(loaderData);
 
   // Get materials/textures when loading to add to container
@@ -347,7 +347,7 @@ IGLTFLoaderData GLTFFileLoader::_parseAsync(Scene* scene,
 
   _validateAsync(scene, unpacked.json, rootUrl, fileName);
   _startPerformanceCounter("Parse JSON");
-  _log(String::printf("JSON length: %ld", unpacked.json.size()));
+  _log(StringTools::printf("JSON length: %ld", unpacked.json.size()));
 
   IGLTFLoaderData loaderData{
     json::parse(unpacked.json), // json
@@ -377,11 +377,11 @@ IGLTFLoaderPtr GLTFFileLoader::_getLoader(const IGLTFLoaderData& loaderData)
   auto assetVersion    = json_util::get_string(asset, "version");
   auto assetMinVersion = json_util::get_string(asset, "minVersion");
   if (!assetMinVersion.empty()) {
-    _log(String::printf("Asset minimum version: %s", assetMinVersion.c_str()));
+    _log(StringTools::printf("Asset minimum version: %s", assetMinVersion.c_str()));
   }
   auto assetGenerator = json_util::get_string(asset, "generator");
   if (!assetGenerator.empty()) {
-    _log(String::printf("Asset generator: %s", assetGenerator.c_str()));
+    _log(StringTools::printf("Asset generator: %s", assetGenerator.c_str()));
   }
 
   auto version = GLTFFileLoader::_parseVersion(assetVersion);
@@ -421,7 +421,7 @@ IGLTFLoaderPtr GLTFFileLoader::_getLoader(const IGLTFLoaderData& loaderData)
 UnpackedBinary GLTFFileLoader::_unpackBinary(const ArrayBuffer& data)
 {
   _startPerformanceCounter("Unpack binary");
-  _log(String::printf("Binary length: %ld", data.size()));
+  _log(StringTools::printf("Binary length: %ld", data.size()));
 
   static const unsigned int Binary_Magic = 0x46546C67;
 
@@ -429,13 +429,13 @@ UnpackedBinary GLTFFileLoader::_unpackBinary(const ArrayBuffer& data)
 
   const auto magic = binaryReader.readUint32();
   if (magic != Binary_Magic) {
-    throw std::runtime_error(String::printf("Unexpected magic: %d", magic));
+    throw std::runtime_error(StringTools::printf("Unexpected magic: %d", magic));
   }
 
   const auto version = binaryReader.readUint32();
 
   if (loggingEnabled) {
-    _log(String::printf("Binary version", version));
+    _log(StringTools::printf("Binary version", version));
   }
 
   UnpackedBinary unpacked;
@@ -449,7 +449,7 @@ UnpackedBinary GLTFFileLoader::_unpackBinary(const ArrayBuffer& data)
       break;
     }
     default: {
-      throw std::runtime_error(String::printf("Unsupported version:: %d", version));
+      throw std::runtime_error(StringTools::printf("Unsupported version:: %d", version));
     }
   }
 
@@ -464,8 +464,8 @@ UnpackedBinary GLTFFileLoader::_unpackBinaryV1(BinaryReader& binaryReader) const
   const auto length = binaryReader.readUint32();
   if (length != binaryReader.getLength()) {
     auto errorMessage
-      = String::printf("Length in header does not match actual data length: %ld != %ld", length,
-                       binaryReader.getLength());
+      = StringTools::printf("Length in header does not match actual data length: %ld != %ld",
+                            length, binaryReader.getLength());
     throw std::runtime_error(errorMessage);
   }
 
@@ -500,8 +500,8 @@ UnpackedBinary GLTFFileLoader::_unpackBinaryV2(BinaryReader& binaryReader) const
   const auto length = binaryReader.readUint32();
   if (length != binaryReader.getLength()) {
     auto errorMessage
-      = String::printf("Length in header does not match actual data length: %ld != %ld", length,
-                       binaryReader.getLength());
+      = StringTools::printf("Length in header does not match actual data length: %ld != %ld",
+                            length, binaryReader.getLength());
     throw std::runtime_error(errorMessage);
   }
 
@@ -550,14 +550,14 @@ std::optional<Version> GLTFFileLoader::_parseVersion(const std::string& version)
   }
 
   static std::regex regex(R"((\d+)\.(\d+))", std::regex::optimize);
-  auto match = String::regexMatch(version, regex);
+  auto match = StringTools::regexMatch(version, regex);
   if (match.size() < 2) {
     return std::nullopt;
   }
 
   return Version{
-    String::toNumber<unsigned int>(match[0]), // major
-    String::toNumber<unsigned int>(match[1])  // minor
+    StringTools::toNumber<unsigned int>(match[0]), // major
+    StringTools::toNumber<unsigned int>(match[1])  // minor
   };
 }
 
@@ -584,7 +584,7 @@ std::string GLTFFileLoader::_decodeBufferToText(const Uint8Array& buffer)
   const auto length = buffer.size();
 
   for (size_t i = 0; i < length; ++i) {
-    result << String::fromCharCode(buffer[i]);
+    result << StringTools::fromCharCode(buffer[i]);
   }
 
   return result.str();

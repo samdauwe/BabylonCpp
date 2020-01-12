@@ -231,7 +231,7 @@ void StandardRenderingPipeline::set_hdrAutoExposure(bool value)
     if (value) {
       defines.emplace_back("#define AUTO_EXPOSURE");
     }
-    auto joinedDefines = String::join(defines, '\n');
+    auto joinedDefines = StringTools::join(defines, '\n');
     hdrPostProcess->updateEffect(joinedDefines);
   }
 }
@@ -858,7 +858,7 @@ void StandardRenderingPipeline::_createHdrPostProcess(Scene* scene, float ratio)
   if (_hdrAutoExposure) {
     defines.emplace_back("#define AUTO_EXPOSURE");
   }
-  auto joinedDefines = String::join(defines, '\n');
+  auto joinedDefines = StringTools::join(defines, '\n');
   hdrPostProcess
     = PostProcess::New("HDR", "standard", {"averageLuminance"}, {"textureAdderSampler"}, ratio,
                        nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,

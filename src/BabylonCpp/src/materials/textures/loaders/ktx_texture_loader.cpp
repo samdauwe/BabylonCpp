@@ -1,9 +1,9 @@
 #include <babylon/materials/textures/loaders/ktx_texture_loader.h>
 
-#include <babylon/core/string.h>
 #include <babylon/engines/engine.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/misc/khronos_texture_container.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -26,7 +26,7 @@ bool _KTXTextureLoader::canLoad(const std::string& /*extension*/,
 std::string _KTXTextureLoader::transformUrl(const std::string& rootUrl,
                                             const std::string& textureFormatInUse)
 {
-  auto lastDot = String::lastIndexOf(rootUrl, ".");
+  auto lastDot = StringTools::lastIndexOf(rootUrl, ".");
   if (lastDot != -1 && rootUrl.substr(static_cast<size_t>(lastDot + 1)) == "ktx") {
     // Already transformed
     return rootUrl;
@@ -40,7 +40,7 @@ std::string _KTXTextureLoader::getFallbackTextureUrl(const std::string& rootUrl,
 {
   // remove the format appended to the rootUrl in the original createCubeTexture call.
   const std::regex regex(textureFormatInUse, std::regex::optimize);
-  return String::regexReplace(rootUrl, regex, [](const std::smatch& /*m*/) { return ""; });
+  return StringTools::regexReplace(rootUrl, regex, [](const std::smatch& /*m*/) { return ""; });
 }
 
 void _KTXTextureLoader::loadCubeData(

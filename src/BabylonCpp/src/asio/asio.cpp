@@ -5,8 +5,8 @@
 #include <babylon/asio/internal/file_loader_sync.h>
 #include <babylon/asio/internal/future_utils.h>
 #include <babylon/core/filesystem.h>
-#include <babylon/core/string.h>
 #include <babylon/asio/internal/sync_callback_runner.h>
+#include <babylon/misc/string_tools.h>
 #include <iostream>
 
 #if defined(__linux__) || defined(__APPLE__)
@@ -180,7 +180,7 @@ static std::string ArrayBufferToString(const ArrayBuffer & dataUint8)
   dataString.resize(dataUint8.size());
   for (size_t i = 0; i < dataUint8.size(); ++i)
     dataString[i] = static_cast<char>(dataUint8[i]);
-  dataString = BABYLON::String::replace(dataString, "\r\n", "\n");
+  dataString = BABYLON::StringTools::replace(dataString, "\r\n", "\n");
   return dataString;
 }
 
@@ -268,11 +268,11 @@ void LoadUrlAsync_Text(
 {
   std::string url = url_;
 
-  if (String::startsWith(url, "http://"))
+  if (StringTools::startsWith(url, "http://"))
     throw std::runtime_error("LoadUrlAsync_Text only support files for the moment");
 
   // Add automatically "file:/"
-  if (!String::startsWith(url, "file:/"))
+  if (!StringTools::startsWith(url, "file:/"))
     url = std::string("file:/") + url;
 
   std::string filename = url.substr(6);
@@ -287,11 +287,11 @@ void LoadUrlAsync_Binary(
 )
 {
   std::string url = url_;
-  if (String::startsWith(url, "http://"))
+  if (StringTools::startsWith(url, "http://"))
     throw std::runtime_error("LoadUrlAsync_Text only support files for the moment");
 
   // Add automatically "file:/"
-  if (!String::startsWith(url, "file:/"))
+  if (!StringTools::startsWith(url, "file:/"))
     url = std::string("file:/") + url;
 
   std::string filename = url.substr(6);

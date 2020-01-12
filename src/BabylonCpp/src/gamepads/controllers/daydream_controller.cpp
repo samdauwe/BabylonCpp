@@ -1,14 +1,14 @@
 #include <babylon/gamepads/controllers/daydream_controller.h>
 
 #include <babylon/core/logging.h>
-#include <babylon/core/string.h>
 #include <babylon/loading/scene_loader.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
 bool DaydreamControllerFactory::canCreate(const IBrowserGamepadPtr& gamepadInfo) const
 {
-  return String::startsWith(gamepadInfo->id, DaydreamController::GAMEPAD_ID_PREFIX);
+  return StringTools::startsWith(gamepadInfo->id, DaydreamController::GAMEPAD_ID_PREFIX);
 }
 
 WebVRControllerPtr DaydreamControllerFactory::create(const IBrowserGamepadPtr& gamepadInfo) const

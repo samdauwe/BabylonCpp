@@ -1,8 +1,8 @@
 #include <babylon/materials/node/blocks/color_splitter_block.h>
 
-#include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -103,27 +103,27 @@ ColorSplitterBlock& ColorSplitterBlock::_buildBlock(NodeMaterialBuildState& stat
   if (rgbOutput->hasEndpoints()) {
     state.compilationString
       += _declareOutput(rgbOutput, state)
-         + String::printf(" = %s.rgb;\r\n", input->associatedVariableName().c_str());
+         + StringTools::printf(" = %s.rgb;\r\n", input->associatedVariableName().c_str());
   }
   if (rOutput->hasEndpoints()) {
     state.compilationString
       += _declareOutput(rOutput, state)
-         + String::printf(" = %s.r;\r\n", input->associatedVariableName().c_str());
+         + StringTools::printf(" = %s.r;\r\n", input->associatedVariableName().c_str());
   }
   if (gOutput->hasEndpoints()) {
     state.compilationString
       += _declareOutput(gOutput, state)
-         + String::printf(" = %s.g;\r\n", input->associatedVariableName().c_str());
+         + StringTools::printf(" = %s.g;\r\n", input->associatedVariableName().c_str());
   }
   if (bOutput->hasEndpoints()) {
     state.compilationString
       += _declareOutput(bOutput, state)
-         + String::printf(" = %s.b;\r\n", input->associatedVariableName().c_str());
+         + StringTools::printf(" = %s.b;\r\n", input->associatedVariableName().c_str());
   }
   if (aOutput->hasEndpoints()) {
     state.compilationString
       += _declareOutput(aOutput, state)
-         + String::printf(" = %s.a;\r\n", input->associatedVariableName().c_str());
+         + StringTools::printf(" = %s.a;\r\n", input->associatedVariableName().c_str());
   }
 
   return *this;

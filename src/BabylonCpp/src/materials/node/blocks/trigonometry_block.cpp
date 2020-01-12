@@ -1,9 +1,9 @@
 #include <babylon/materials/node/blocks/trigonometry_block.h>
 
 #include <babylon/core/json_util.h>
-#include <babylon/core/string.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -119,8 +119,8 @@ TrigonometryBlock& TrigonometryBlock::_buildBlock(NodeMaterialBuildState& state)
   }
 
   state.compilationString += _declareOutput(iOutput, state)
-                             + String::printf(" = %s(%s);\r\n", _operation.c_str(),
-                                              input()->associatedVariableName().c_str());
+                             + StringTools::printf(" = %s(%s);\r\n", _operation.c_str(),
+                                                   input()->associatedVariableName().c_str());
 
   return *this;
 }
@@ -138,8 +138,8 @@ void TrigonometryBlock::_deserialize(const json& /*serializationObject*/, Scene*
 std::string TrigonometryBlock::_dumpPropertiesCode()
 {
   const auto codeString
-    = String::printf("%s.operation = static_cast<TrigonometryBlockOperations>(%d);\r\n",
-                     _codeVariableName.c_str(), operation);
+    = StringTools::printf("%s.operation = static_cast<TrigonometryBlockOperations>(%d);\r\n",
+                          _codeVariableName.c_str(), operation);
   return codeString;
 }
 

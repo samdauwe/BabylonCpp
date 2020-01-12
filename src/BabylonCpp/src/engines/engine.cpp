@@ -3,7 +3,6 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/logging.h>
-#include <babylon/core/string.h>
 #include <babylon/engines/engine_store.h>
 #include <babylon/engines/extensions/multiview_extension.h>
 #include <babylon/engines/extensions/occlusion_query_extension.h>
@@ -18,6 +17,7 @@
 #include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/meshes/webgl/webgl_data_buffer.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/postprocesses/post_process.h>
 #include <babylon/postprocesses/post_process_manager.h>
 #include <babylon/states/depth_culling_state.h>
@@ -386,7 +386,7 @@ void Engine::restoreStencilState()
 Viewport Engine::setDirectViewport(int x, int y, int width, int height)
 {
   auto iCurrentViewport = _cachedViewport;
-  _cachedViewport      = std::nullopt;
+  _cachedViewport       = std::nullopt;
 
   _viewport(static_cast<float>(x), static_cast<float>(y), static_cast<float>(width),
             static_cast<float>(height));
@@ -674,7 +674,7 @@ std::string& Engine::setTextureFormatToUse(const std::vector<std::string>& forma
 {
   for (const auto& textureSupported1 : _texturesSupported) {
     for (const auto& formatAvailable : formatsAvailable) {
-      if (textureSupported1 == String::toLowerCase(formatAvailable)) {
+      if (textureSupported1 == StringTools::toLowerCase(formatAvailable)) {
         _textureFormatInUse = textureSupported1;
         return _textureFormatInUse;
       }

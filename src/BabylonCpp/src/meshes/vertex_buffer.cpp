@@ -1,9 +1,9 @@
 ﻿#include <babylon/meshes/vertex_buffer.h>
 
 #include <babylon/core/data_view.h>
-#include <babylon/core/string.h>
 #include <babylon/engines/engine.h>
 #include <babylon/meshes/buffer.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -197,7 +197,7 @@ size_t VertexBuffer::DeduceStride(const std::string& kind)
     return 4;
   }
   else {
-    throw std::runtime_error(String::printf("Invalid kind '%s'", kind.c_str()));
+    throw std::runtime_error(StringTools::printf("Invalid kind '%s'", kind.c_str()));
   }
 }
 

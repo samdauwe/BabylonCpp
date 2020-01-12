@@ -6,7 +6,6 @@
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
-#include <babylon/core/string.h>
 #include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
@@ -19,6 +18,7 @@
 #include <babylon/maths/vector3.h>
 #include <babylon/misc/environment_texture_info.h>
 #include <babylon/misc/file_tools.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/misc/tools.h>
 #include <babylon/postprocesses/post_process.h>
 #include <babylon/postprocesses/post_process_manager.h>
@@ -48,7 +48,7 @@ EnvironmentTextureInfoPtr EnvironmentTextureTools::GetEnvInfo(const ArrayBuffer&
   std::ostringstream manifestString;
   auto charCode = static_cast<char>(dataView[pos++]);
   while (charCode) {
-    manifestString << String::fromCharCode(charCode);
+    manifestString << StringTools::fromCharCode(charCode);
     charCode = static_cast<char>(dataView[pos++]);
   }
 

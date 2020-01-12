@@ -1,15 +1,14 @@
 #include <babylon/inspector/components/sceneexplorer/entities/mesh_tree_item_component.h>
 
-#include <babylon/core/string.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_icon_component.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_label_component.h>
 #include <babylon/meshes/abstract_mesh.h>
+#include <babylon/misc/string_tools.h>
 #include <imgui_utils/imgui_utils.h>
 
 namespace BABYLON {
 
-MeshTreeItemComponent::MeshTreeItemComponent(
-  const IMeshTreeItemComponentProps& iProps)
+MeshTreeItemComponent::MeshTreeItemComponent(const IMeshTreeItemComponentProps& iProps)
     : props{iProps}
 {
   const auto& mesh = props.mesh;
@@ -21,10 +20,10 @@ MeshTreeItemComponent::MeshTreeItemComponent(
   // Set the entity info
   entityInfo.uniqueId  = mesh->uniqueId;
   const auto className = mesh->getClassName();
-  if (String::contains(className, "Mesh")) {
+  if (StringTools::contains(className, "Mesh")) {
     entityInfo.type = EntityType::Mesh;
   }
-  else if (String::contains(className, "TransformNode")) {
+  else if (StringTools::contains(className, "TransformNode")) {
     entityInfo.type = EntityType::TransformNode;
   }
 }
@@ -52,17 +51,15 @@ void MeshTreeItemComponent::render()
 
   // Enable bounding box icon
   if (TreeItemIconComponent::render(faSquare, "Show/Hide bounding box",
-                                    ImGui::GetWindowContentRegionWidth()
-                                      - 3.f * ImGui::IconSize,
+                                    ImGui::GetWindowContentRegionWidth() - 3.f * ImGui::IconSize,
                                     state.isBoundingBoxEnabled)) {
     showBoundingBox();
   }
 
   // Visibility icon
-  if (TreeItemIconComponent::render(
-        state.isVisible ? faEye : faEyeSlash, "Show/Hide mesh",
-        ImGui::GetWindowContentRegionWidth() - ImGui::IconSize,
-        state.isVisible)) {
+  if (TreeItemIconComponent::render(state.isVisible ? faEye : faEyeSlash, "Show/Hide mesh",
+                                    ImGui::GetWindowContentRegionWidth() - ImGui::IconSize,
+                                    state.isVisible)) {
     switchVisibility();
   }
 }

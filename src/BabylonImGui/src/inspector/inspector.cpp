@@ -28,7 +28,7 @@
 #include <imgui_utils/imgui_utils.h>
 
 // BabylonCpp
-#include <babylon/core/string.h>
+#include <babylon/misc/string_tools.h>
 
 // Inspector
 #include <babylon/inspector/actions/action_store.h>

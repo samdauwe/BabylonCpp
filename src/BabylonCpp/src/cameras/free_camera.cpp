@@ -8,7 +8,7 @@
 #include <babylon/cameras/universal_camera.h>
 #include <babylon/collisions/collider.h>
 #include <babylon/collisions/icollision_coordinator.h>
-#include <babylon/core/string.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/icanvas.h>

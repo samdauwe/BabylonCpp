@@ -3,7 +3,6 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
-#include <babylon/core/string.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/bounding_sphere.h>
 #include <babylon/engines/constants.h>
@@ -20,6 +19,7 @@
 #include <babylon/meshes/_instances_batch.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -138,7 +138,7 @@ bool VolumetricLightScatteringPostProcess::_isReady(SubMesh* subMesh, bool useIn
   }
 
   // Get correct effect
-  std::string join = String::join(defines, '\n');
+  std::string join = StringTools::join(defines, '\n');
   if (_cachedDefines != join) {
     _cachedDefines = join;
 

@@ -1,14 +1,13 @@
 #include <babylon/inspector/components/sceneexplorer/entities/texture_tree_item_component.h>
 
-#include <babylon/core/string.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_label_component.h>
 #include <babylon/materials/textures/texture.h>
+#include <babylon/misc/string_tools.h>
 #include <imgui_utils/imgui_utils.h>
 
 namespace BABYLON {
 
-TextureTreeItemComponent::TextureTreeItemComponent(
-  const ITextureTreeItemComponentProps& iProps)
+TextureTreeItemComponent::TextureTreeItemComponent(const ITextureTreeItemComponentProps& iProps)
     : props{iProps}
 {
   const auto& texture = props.texture;
@@ -18,7 +17,7 @@ TextureTreeItemComponent::TextureTreeItemComponent(
   // Set the entity info
   const auto& className = texture->getClassName();
   entityInfo.name       = texture->name;
-  if (String::contains(className, "Texture")) {
+  if (StringTools::contains(className, "Texture")) {
     entityInfo.type = EntityType::Texture;
   }
 }

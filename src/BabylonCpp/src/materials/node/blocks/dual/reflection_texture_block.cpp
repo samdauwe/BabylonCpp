@@ -1,7 +1,6 @@
 #include <babylon/materials/node/blocks/dual/reflection_texture_block.h>
 
 #include <babylon/core/json_util.h>
-#include <babylon/core/string.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/node/blocks/input/input_block.h>
 #include <babylon/materials/node/node_material.h>
@@ -10,6 +9,7 @@
 #include <babylon/materials/node/node_material_connection_point.h>
 #include <babylon/materials/node/node_material_defines.h>
 #include <babylon/materials/textures/base_texture.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -226,37 +226,38 @@ void ReflectionTextureBlock::bind(const EffectPtr& effect, const NodeMaterialPtr
 void ReflectionTextureBlock::_injectVertexCode(NodeMaterialBuildState& state)
 {
   auto worldPosVaryingName
-    = String::printf("v_%s", worldPosition()->associatedVariableName().c_str());
+    = StringTools::printf("v_%s", worldPosition()->associatedVariableName().c_str());
   if (state._emitVaryingFromString(worldPosVaryingName, "vec4")) {
-    state.compilationString += String::printf("%s = %s;\r\n", worldPosVaryingName.c_str(),
-                                              worldPosition()->associatedVariableName().c_str());
+    state.compilationString
+      += StringTools::printf("%s = %s;\r\n", worldPosVaryingName.c_str(),
+                             worldPosition()->associatedVariableName().c_str());
   }
 
   auto worldNormalVaryingName
-    = String::printf("v_%s", worldNormal()->associatedVariableName().c_str());
+    = StringTools::printf("v_%s", worldNormal()->associatedVariableName().c_str());
   if (state._emitVaryingFromString(worldNormalVaryingName, "vec4")) {
-    state.compilationString += String::printf("%s = %s;\r\n", worldNormalVaryingName.c_str(),
-                                              worldNormal()->associatedVariableName().c_str());
+    state.compilationString += StringTools::printf("%s = %s;\r\n", worldNormalVaryingName.c_str(),
+                                                   worldNormal()->associatedVariableName().c_str());
   }
 
   _positionUVWName = state._getFreeVariableName("positionUVW");
   _directionWName  = state._getFreeVariableName("directionW");
 
   if (state._emitVaryingFromString(_positionUVWName, "vec3", _defineSkyboxName)) {
-    state.compilationString += String::printf("#ifdef %s\r\n", _defineSkyboxName.c_str());
-    state.compilationString += String::printf("%s = %s;\r\n", _positionUVWName.c_str(),
-                                              position()->associatedVariableName().c_str());
+    state.compilationString += StringTools::printf("#ifdef %s\r\n", _defineSkyboxName.c_str());
+    state.compilationString += StringTools::printf("%s = %s;\r\n", _positionUVWName.c_str(),
+                                                   position()->associatedVariableName().c_str());
     state.compilationString += "#endif\r\n";
   }
 
   if (state._emitVaryingFromString(
         _directionWName, "vec3",
-        String::printf("defined(%s) || defined(%s)", _defineEquirectangularFixedName.c_str(),
-                       _defineMirroredEquirectangularFixedName.c_str()))) {
-    state.compilationString += String::printf("#if defined(%s) || defined(%s)\r\n",
-                                              _defineEquirectangularFixedName.c_str(),
-                                              _defineMirroredEquirectangularFixedName.c_str());
-    state.compilationString += String::printf(
+        StringTools::printf("defined(%s) || defined(%s)", _defineEquirectangularFixedName.c_str(),
+                            _defineMirroredEquirectangularFixedName.c_str()))) {
+    state.compilationString += StringTools::printf("#if defined(%s) || defined(%s)\r\n",
+                                                   _defineEquirectangularFixedName.c_str(),
+                                                   _defineMirroredEquirectangularFixedName.c_str());
+    state.compilationString += StringTools::printf(
       "%s = normalize(vec3(%s * vec4(%s, 0.0)));\r\n", _directionWName.c_str(),
       world()->associatedVariableName().c_str(), position()->associatedVariableName().c_str());
     state.compilationString += "#endif\r\n";
@@ -268,8 +269,8 @@ void ReflectionTextureBlock::_writeOutput(NodeMaterialBuildState& state,
                                           const std::string& swizzle)
 {
   state.compilationString
-    += String::printf("%s = %s.%s;\r\n", _declareOutput(output, state).c_str(),
-                      _reflectionColorName.c_str(), swizzle.c_str());
+    += StringTools::printf("%s = %s.%s;\r\n", _declareOutput(output, state).c_str(),
+                           _reflectionColorName.c_str(), swizzle.c_str());
 }
 
 ReflectionTextureBlock& ReflectionTextureBlock::_buildBlock(NodeMaterialBuildState& state)
@@ -280,7 +281,7 @@ ReflectionTextureBlock& ReflectionTextureBlock::_buildBlock(NodeMaterialBuildSta
     if (state.target == NodeMaterialBlockTargets::Fragment) {
       for (const auto& output : _outputs) {
         if (output->hasEndpoints()) {
-          state.compilationString += String::printf(
+          state.compilationString += StringTools::printf(
             "%s = vec3(0.).%s;\r\n", _declareOutput(output, state).c_str(), output->name.c_str());
         }
       }
@@ -320,18 +321,19 @@ ReflectionTextureBlock& ReflectionTextureBlock::_buildBlock(NodeMaterialBuildSta
   _2DSamplerName = state._getFreeVariableName(name + "2DSampler");
   state.samplers.emplace_back(_2DSamplerName);
 
-  state._samplerDeclaration += String::printf("#ifdef %s\r\n", _define3DName.c_str());
+  state._samplerDeclaration += StringTools::printf("#ifdef %s\r\n", _define3DName.c_str());
   state._samplerDeclaration
-    += String::printf("uniform samplerCube %s;\r\n", _cubeSamplerName.c_str());
+    += StringTools::printf("uniform samplerCube %s;\r\n", _cubeSamplerName.c_str());
   state._samplerDeclaration += "#else\r\n";
-  state._samplerDeclaration += String::printf("uniform sampler2D %s;\r\n", _2DSamplerName.c_str());
+  state._samplerDeclaration
+    += StringTools::printf("uniform sampler2D %s;\r\n", _2DSamplerName.c_str());
   state._samplerDeclaration += "#endif\r\n";
 
   // Fragment
   state.sharedData->blocksWithDefines.emplace_back(shared_from_this());
   state.sharedData->bindableBlocks.emplace_back(shared_from_this());
 
-  auto comments = String::printf("//%s", name.c_str());
+  auto comments = StringTools::printf("//%s", name.c_str());
   state._emitFunction("ReciprocalPI", "#define RECIPROCAL_PI2 0.15915494", "");
   state._emitFunctionFromInclude("reflectionFunction", comments);
 
@@ -343,97 +345,100 @@ ReflectionTextureBlock& ReflectionTextureBlock::_buildBlock(NodeMaterialBuildSta
   state._emitUniformFromString(_reflectionMatrixName, "mat4");
 
   // Code
-  auto worldPos     = String::printf("v_%s", worldPosition()->associatedVariableName().c_str());
-  auto _worldNormal = String::printf("v_%s.xyz", worldNormal()->associatedVariableName().c_str());
+  auto worldPos = StringTools::printf("v_%s", worldPosition()->associatedVariableName().c_str());
+  auto _worldNormal
+    = StringTools::printf("v_%s.xyz", worldNormal()->associatedVariableName().c_str());
   auto reflectionMatrix = _reflectionMatrixName;
-  auto direction        = String::printf("normalize(%s)", _directionWName.c_str());
+  auto direction        = StringTools::printf("normalize(%s)", _directionWName.c_str());
   auto _positionUVW     = _positionUVWName;
   auto vEyePosition     = cameraPosition()->associatedVariableName();
   auto _view            = view()->associatedVariableName();
 
-  state.compilationString += String::printf("vec3 %s;\r\n", _reflectionColorName.c_str());
+  state.compilationString += StringTools::printf("vec3 %s;\r\n", _reflectionColorName.c_str());
   state.compilationString
-    += String::printf("#ifdef %s \r\n", _defineMirroredEquirectangularFixedName.c_str());
-  state.compilationString += String::printf(
+    += StringTools::printf("#ifdef %s \r\n", _defineMirroredEquirectangularFixedName.c_str());
+  state.compilationString += StringTools::printf(
     "    vec3 %s = computeMirroredFixedEquirectangularCoords(%s, %s, %s);\r\n",
     _reflectionCoordsName.c_str(), worldPos.c_str(), _worldNormal.c_str(), direction.c_str());
   state.compilationString += "#endif\r\n";
 
   state.compilationString
-    += String::printf("#ifdef %s\r\n", _defineEquirectangularFixedName.c_str());
-  state.compilationString += String::printf(
+    += StringTools::printf("#ifdef %s\r\n", _defineEquirectangularFixedName.c_str());
+  state.compilationString += StringTools::printf(
     "    vec3 %s = computeFixedEquirectangularCoords(%s, %s, %s);\r\n",
     _reflectionCoordsName.c_str(), worldPos.c_str(), _worldNormal.c_str(), direction.c_str());
   state.compilationString += "#endif\r\n";
 
-  state.compilationString += String::printf("#ifdef %s\r\n", _defineEquirectangularName.c_str());
   state.compilationString
-    += String::printf("    vec3 %s = computeEquirectangularCoords(%s, %s, %s, %s);\r\n",
-                      _reflectionCoordsName.c_str(), worldPos.c_str(), _worldNormal.c_str(),
-                      vEyePosition.c_str(), reflectionMatrix.c_str());
+    += StringTools::printf("#ifdef %s\r\n", _defineEquirectangularName.c_str());
+  state.compilationString
+    += StringTools::printf("    vec3 %s = computeEquirectangularCoords(%s, %s, %s, %s);\r\n",
+                           _reflectionCoordsName.c_str(), worldPos.c_str(), _worldNormal.c_str(),
+                           vEyePosition.c_str(), reflectionMatrix.c_str());
   state.compilationString += "#endif\r\n";
 
-  state.compilationString += String::printf("#ifdef %s\r\n", _defineSphericalName.c_str());
-  state.compilationString += String::printf(
+  state.compilationString += StringTools::printf("#ifdef %s\r\n", _defineSphericalName.c_str());
+  state.compilationString += StringTools::printf(
     "    vec3 %s = computeSphericalCoords(%s, %s, %s, %s);\r\n", _reflectionCoordsName.c_str(),
     worldPos.c_str(), _worldNormal.c_str(), _view.c_str(), reflectionMatrix.c_str());
   state.compilationString += "#endif\r\n";
 
-  state.compilationString += String::printf("#ifdef %s\r\n", _definePlanarName.c_str());
-  state.compilationString += String::printf(
+  state.compilationString += StringTools::printf("#ifdef %s\r\n", _definePlanarName.c_str());
+  state.compilationString += StringTools::printf(
     "    vec3 %s = computePlanarCoords(%s, %s, %s, %s);\r\n", _reflectionCoordsName.c_str(),
     worldPos.c_str(), _worldNormal.c_str(), vEyePosition.c_str(), reflectionMatrix.c_str());
   state.compilationString += "#endif\r\n";
 
-  state.compilationString += String::printf("#ifdef %s\r\n", _defineCubicName.c_str());
-  state.compilationString += String::printf("    #ifdef %s\r\n", _defineLocalCubicName.c_str());
-  state.compilationString += String::printf(
+  state.compilationString += StringTools::printf("#ifdef %s\r\n", _defineCubicName.c_str());
+  state.compilationString
+    += StringTools::printf("    #ifdef %s\r\n", _defineLocalCubicName.c_str());
+  state.compilationString += StringTools::printf(
     "        vec3 %s = computeCubicLocalCoords(%s, %s, %s, %s, vReflectionSize, "
     "vReflectionPosition);\r\n",
     _reflectionCoordsName.c_str(), worldPos.c_str(), _worldNormal.c_str(), vEyePosition.c_str(),
     reflectionMatrix.c_str());
   state.compilationString += "    #else\r\n";
-  state.compilationString += String::printf(
+  state.compilationString += StringTools::printf(
     "       vec3 %s = computeCubicCoords(%s, %s, %s.xyz, %s);\r\n", _reflectionCoordsName.c_str(),
     worldPos.c_str(), _worldNormal.c_str(), vEyePosition.c_str(), reflectionMatrix.c_str());
   state.compilationString += "    #endif\r\n";
   state.compilationString += "#endif\r\n";
 
-  state.compilationString += String::printf("#ifdef %s\r\n", _defineProjectionName.c_str());
-  state.compilationString += String::printf(
+  state.compilationString += StringTools::printf("#ifdef %s\r\n", _defineProjectionName.c_str());
+  state.compilationString += StringTools::printf(
     "    vec3 %s = computeProjectionCoords(%s, %s, %s);\r\n", _reflectionCoordsName.c_str(),
     worldPos.c_str(), _view.c_str(), reflectionMatrix.c_str());
   state.compilationString += "#endif\r\n";
 
-  state.compilationString += String::printf("#ifdef %s\r\n", _defineSkyboxName.c_str());
-  state.compilationString += String::printf("    vec3 %s = computeSkyBoxCoords(%s, %s);\r\n",
-                                            _reflectionCoordsName.c_str(), _positionUVW.c_str(),
-                                            reflectionMatrix.c_str());
+  state.compilationString += StringTools::printf("#ifdef %s\r\n", _defineSkyboxName.c_str());
+  state.compilationString += StringTools::printf("    vec3 %s = computeSkyBoxCoords(%s, %s);\r\n",
+                                                 _reflectionCoordsName.c_str(),
+                                                 _positionUVW.c_str(), reflectionMatrix.c_str());
   state.compilationString += "#endif\r\n";
 
-  state.compilationString += String::printf("#ifdef %s\r\n", _defineExplicitName.c_str());
+  state.compilationString += StringTools::printf("#ifdef %s\r\n", _defineExplicitName.c_str());
   state.compilationString
-    += String::printf("    vec3 %s = vec3(0, 0, 0);\r\n", _reflectionCoordsName.c_str());
+    += StringTools::printf("    vec3 %s = vec3(0, 0, 0);\r\n", _reflectionCoordsName.c_str());
   state.compilationString += "#endif\r\n";
 
-  state.compilationString += String::printf("#ifdef %s\r\n", _define3DName.c_str());
+  state.compilationString += StringTools::printf("#ifdef %s\r\n", _define3DName.c_str());
   state.compilationString
-    += String::printf("%s = textureCube(%s, %s).rgb;\r\n", _reflectionColorName.c_str(),
-                      _cubeSamplerName.c_str(), _reflectionCoordsName.c_str());
+    += StringTools::printf("%s = textureCube(%s, %s).rgb;\r\n", _reflectionColorName.c_str(),
+                           _cubeSamplerName.c_str(), _reflectionCoordsName.c_str());
   state.compilationString += "#else\r\n";
-  state.compilationString += String::printf("vec2 %s = %s.xy;\r\n", _reflection2DCoordsName.c_str(),
-                                            _reflectionCoordsName.c_str());
+  state.compilationString += StringTools::printf(
+    "vec2 %s = %s.xy;\r\n", _reflection2DCoordsName.c_str(), _reflectionCoordsName.c_str());
 
-  state.compilationString += String::printf("#ifdef %s\r\n", _defineProjectionName.c_str());
-  state.compilationString += String::printf("%s /= %s.z;\r\n", _reflection2DCoordsName.c_str(),
-                                            _reflectionCoordsName.c_str());
+  state.compilationString += StringTools::printf("#ifdef %s\r\n", _defineProjectionName.c_str());
+  state.compilationString += StringTools::printf("%s /= %s.z;\r\n", _reflection2DCoordsName.c_str(),
+                                                 _reflectionCoordsName.c_str());
   state.compilationString += "#endif\r\n";
 
-  state.compilationString += String::printf(
+  state.compilationString += StringTools::printf(
     "%s.y = 1.0 - %s.y;\r\n", _reflection2DCoordsName.c_str(), _reflection2DCoordsName.c_str());
   state.compilationString
-    += String::printf("%s = texture2D(%s, %s).rgb;\r\n", _reflectionColorName.c_str(),
-                      _2DSamplerName.c_str(), _reflection2DCoordsName.c_str());
+    += StringTools::printf("%s = texture2D(%s, %s).rgb;\r\n", _reflectionColorName.c_str(),
+                           _2DSamplerName.c_str(), _reflection2DCoordsName.c_str());
   state.compilationString += "#endif\r\n";
 
   for (const auto& output : _outputs) {
@@ -454,15 +459,15 @@ std::string ReflectionTextureBlock::_dumpPropertiesCode()
   std::string codeString;
 
   if (texture->isCube()) {
-    codeString = String::printf("%s.texture = CubeTexture::New(\"%s\");\r\n",
-                                _codeVariableName.c_str(), texture->name.c_str());
+    codeString = StringTools::printf("%s.texture = CubeTexture::New(\"%s\");\r\n",
+                                     _codeVariableName.c_str(), texture->name.c_str());
   }
   else {
-    codeString = String::printf("%s.texture = Texture::New(\"%s\");\r\n", _codeVariableName.c_str(),
-                                texture->name.c_str());
+    codeString = StringTools::printf("%s.texture = Texture::New(\"%s\");\r\n",
+                                     _codeVariableName.c_str(), texture->name.c_str());
   }
-  codeString += String::printf("%s.texture.coordinatesMode = %u;\r\n", _codeVariableName.c_str(),
-                               texture->coordinatesMode());
+  codeString += StringTools::printf("%s.texture.coordinatesMode = %u;\r\n",
+                                    _codeVariableName.c_str(), texture->coordinatesMode());
 
   return codeString;
 }

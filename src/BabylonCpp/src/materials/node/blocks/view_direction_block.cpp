@@ -1,11 +1,11 @@
 #include <babylon/materials/node/blocks/view_direction_block.h>
 
-#include <babylon/core/string.h>
 #include <babylon/materials/node/blocks/input/input_block.h>
 #include <babylon/materials/node/enums/node_material_system_values.h>
 #include <babylon/materials/node/node_material.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_connection_point.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -66,10 +66,11 @@ ViewDirectionBlock& ViewDirectionBlock::_buildBlock(NodeMaterialBuildState& stat
 
   const auto& iOutput = _outputs[0];
 
-  state.compilationString += _declareOutput(iOutput, state)
-                             + String::printf(" = normalize(%s - %s).xyz);\r\n",
-                                              cameraPosition()->associatedVariableName().c_str(),
-                                              worldPosition()->associatedVariableName().c_str());
+  state.compilationString
+    += _declareOutput(iOutput, state)
+       + StringTools::printf(" = normalize(%s - %s).xyz);\r\n",
+                             cameraPosition()->associatedVariableName().c_str(),
+                             worldPosition()->associatedVariableName().c_str());
 
   return *this;
 }

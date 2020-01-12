@@ -1,8 +1,8 @@
 #include <babylon/inspector/components/sceneexplorer/entities/transform_node_tree_item_component.h>
 
-#include <babylon/core/string.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_label_component.h>
 #include <babylon/meshes/transform_node.h>
+#include <babylon/misc/string_tools.h>
 #include <imgui_utils/imgui_utils.h>
 
 namespace BABYLON {
@@ -18,10 +18,10 @@ TransformNodeTreeItemComponent::TransformNodeTreeItemComponent(
   // Set the entity info
   entityInfo.uniqueId  = transformNode->uniqueId;
   const auto className = transformNode->getClassName();
-  if (String::contains(className, "TransformNode")) {
+  if (StringTools::contains(className, "TransformNode")) {
     entityInfo.type = EntityType::TransformNode;
   }
-  else if (String::contains(className, "Mesh")) {
+  else if (StringTools::contains(className, "Mesh")) {
     entityInfo.type = EntityType::Mesh;
   }
 }

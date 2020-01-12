@@ -3,7 +3,7 @@
 #include <babylon/animations/ianimation_key.h>
 #include <babylon/babylon_common.h>
 #include <babylon/cameras/arc_rotate_camera.h>
-#include <babylon/core/string.h>
+#include <babylon/core/logging.h>
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/shadows/shadow_generator.h>
@@ -13,8 +13,8 @@
 #include <babylon/meshes/ground_mesh.h>
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/transform_node.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/samples/babylon_register_sample.h>
-#include <babylon/core/logging.h>
 
 namespace BABYLON {
 
@@ -192,7 +192,7 @@ public:
       auto result = _scene->pick(_scene->pointerX, _scene->pointerY);
       if (result && result->hit) {
         // if (mesh0.getChildren().includes(result.pickedMesh)) {
-        if (String::startsWith(result->pickedMesh->name, "mesh")) {
+        if (StringTools::startsWith(result->pickedMesh->name, "mesh")) {
           _anim0->pause();
           _animYEnabled = false;
           // _scene->unregisterAfterRender(_animY);
