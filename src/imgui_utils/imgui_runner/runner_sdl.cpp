@@ -62,15 +62,15 @@ void RunnerSdl::CreateWindowAndContext()
   SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
   int xPos = SDL_WINDOWPOS_CENTERED, yPos = SDL_WINDOWPOS_CENTERED;
   if (mBackendWindowPosition.x >= 0.f)
-    xPos = (int)mBackendWindowPosition.x;
+    xPos = static_cast<int>(mBackendWindowPosition.x);
   if (mBackendWindowPosition.y >= 0.f)
-    xPos = (int)mBackendWindowPosition.y;
+    xPos = static_cast<int>(mBackendWindowPosition.y);
   mWindow = SDL_CreateWindow(
     mBackendWindowTitle.c_str(),
     xPos,
     yPos,
-    (int)mBackendWindowSize.x,
-    (int)mBackendWindowSize.y,
+    static_cast<int>(mBackendWindowSize.x),
+    static_cast<int>(mBackendWindowSize.y),
     window_flags);
 
   if (mBackendFullScreen)
@@ -109,7 +109,7 @@ void RunnerSdl::InitGlLoader()
 #elif defined(IMGUI_IMPL_OPENGL_LOADER_GLEW)
   bool err = glewInit() != GLEW_OK;
 #elif defined(IMGUI_IMPL_OPENGL_LOADER_GLAD)
-  bool err = gladLoadGLES2Loader((GLADloadproc)SDL_GL_GetProcAddress) == 0;
+  bool err = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(SDL_GL_GetProcAddress)) == 0;
 #else
   bool err = false; // If you use IMGUI_IMPL_OPENGL_LOADER_CUSTOM, your loader is likely to requires some form of initialization.
 #endif
@@ -161,7 +161,7 @@ void RunnerSdl::NewFrame_Backend()
 void RunnerSdl::Frame_OpenGl_ClearColor()
 {
   auto & io = ImGui::GetIO();
-  glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
+  glViewport(0, 0, static_cast<int>(io.DisplaySize.x), static_cast<int>(io.DisplaySize.y));
   ImVec4 clear_color = mClearColor;
   glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
   glClear(GL_COLOR_BUFFER_BIT);
