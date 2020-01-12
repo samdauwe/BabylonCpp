@@ -1,4 +1,4 @@
-#include <babylon/meshes/vertex_buffer.h>
+﻿#include <babylon/meshes/vertex_buffer.h>
 
 #include <babylon/core/data_view.h>
 #include <babylon/core/string.h>
@@ -12,7 +12,8 @@ VertexBuffer::VertexBuffer(Engine* engine, const std::variant<Float32Array, Buff
                            const std::optional<bool>& postponeInternalCreation,
                            std::optional<size_t> stride, const std::optional<bool>& instanced,
                            const std::optional<size_t>& offset, const std::optional<size_t>& size,
-                           std::optional<unsigned int> iType, bool iNormalized, bool useBytes)
+                           std::optional<unsigned int> iType, bool iNormalized, bool useBytes,
+                           unsigned int divisor)
     : instanceDivisor{this, &VertexBuffer::get_instanceDivisor, &VertexBuffer::set_instanceDivisor}
 {
   if (std::holds_alternative<Buffer*>(data)) {
@@ -61,7 +62,7 @@ VertexBuffer::VertexBuffer(Engine* engine, const std::variant<Float32Array, Buff
   normalized = iNormalized;
 
   _instanced       = instanced.has_value() ? *instanced : false;
-  _instanceDivisor = _instanced ? 1 : 0;
+  _instanceDivisor = _instanced ? divisor : 0;
 }
 
 VertexBuffer::~VertexBuffer() = default;

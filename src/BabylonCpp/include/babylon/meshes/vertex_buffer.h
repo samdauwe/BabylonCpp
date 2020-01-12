@@ -156,6 +156,7 @@ public:
    * @param type the type of the component (optional)
    * @param normalized whether the data contains normalized data (optional)
    * @param useBytes set to true if stride and offset are in bytes (optional)
+   * @param divisor defines the instance divisor to use (1 by default)
    */
   VertexBuffer(Engine* engine, const std::variant<Float32Array, Buffer*>& data,
                const std::string& kind, bool updatable,
@@ -165,7 +166,7 @@ public:
                const std::optional<size_t>& offset                 = std::nullopt,
                const std::optional<size_t>& size                   = std::nullopt,
                std::optional<unsigned int> type = std::nullopt, bool normalized = false,
-               bool useBytes = false);
+               bool useBytes = false, unsigned int divisor = 1);
   virtual ~VertexBuffer(); // = default
 
   /**
@@ -209,15 +210,15 @@ public:
   /**
    * @brief Gets the stride in float32 units (i.e. byte stride / 4).
    * May not be an integer if the byte stride is not divisible by 4.
-   * DEPRECATED. Use byteStride instead.
    * @returns the stride in float32 units
+   * @deprecated Please use byteStride instead.
    */
   [[nodiscard]] size_t getStrideSize() const;
 
   /**
    * @brief Returns the offset as a multiple of the type byte length.
-   * DEPRECATED. Use byteOffset instead.
    * @returns the offset in bytes
+   * @deprecated Please use byteOffset instead.
    */
   [[nodiscard]] size_t getOffset() const;
 
@@ -228,8 +229,7 @@ public:
   [[nodiscard]] size_t getSize() const;
 
   /**
-   * @brief Gets a boolean indicating is the internal buffer of the VertexBuffer
-   * is instanced.
+   * @brief Gets a boolean indicating is the internal buffer of the VertexBuffer is instanced.
    * @returns true if this buffer is instanced
    */
   [[nodiscard]] bool getIsInstanced() const;
