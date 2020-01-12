@@ -10,13 +10,16 @@ namespace BABYLON {
 
 Buffer::Buffer(Engine* engine, const Float32Array& data, bool updatable,
                std::optional<size_t> stride, bool postponeInternalCreation, bool instanced,
-               bool useBytes)
-    : _data{data}
-    , _engine{engine ? engine : Engine::LastCreatedEngine()}
-    , _buffer{nullptr}
-    , _updatable{updatable}
-    , _instanced{instanced}
+               bool useBytes, const std::optional<unsigned int>& divisor)
+    : _buffer{nullptr}
 {
+  _engine    = engine ? engine : Engine::LastCreatedEngine();
+  _updatable = updatable;
+  _instanced = instanced;
+  _divisor   = divisor.value_or(1);
+
+  _data = data;
+
   if (!stride.has_value()) {
     stride = 0ull;
   }
@@ -29,13 +32,17 @@ Buffer::Buffer(Engine* engine, const Float32Array& data, bool updatable,
 }
 
 Buffer::Buffer(Mesh* mesh, const Float32Array& data, bool updatable, std::optional<size_t> stride,
-               bool postponeInternalCreation, bool instanced, bool useBytes)
-    : _data{data}
-    , _engine{mesh->getScene()->getEngine()}
-    , _buffer{nullptr}
-    , _updatable{updatable}
-    , _instanced{instanced}
+               bool postponeInternalCreation, bool instanced, bool useBytes,
+               const std::optional<unsigned int>& divisor)
+    : _buffer{nullptr}
 {
+  _engine    = mesh->getScene()->getEngine();
+  _updatable = updatable;
+  _instanced = instanced;
+  _divisor   = divisor.value_or(1);
+
+  _data = data;
+
   if (!stride.has_value()) {
     stride = 0ull;
   }
@@ -52,7 +59,8 @@ Buffer::~Buffer() = default;
 std::unique_ptr<VertexBuffer> Buffer::createVertexBuffer(const std::string& kind, size_t offset,
                                                          size_t size, std::optional<size_t> stride,
                                                          std::optional<bool> instanced,
-                                                         bool useBytes)
+                                                         bool useBytes,
+                                                         const std::optional<unsigned int>& divisor)
 {
   const auto _byteOffset = useBytes ? offset : offset * sizeof(float);
   const auto _byteStride
@@ -61,7 +69,8 @@ std::unique_ptr<VertexBuffer> Buffer::createVertexBuffer(const std::string& kind
   // a lot of these parameters are ignored as they are overriden by the buffer
   return std::make_unique<VertexBuffer>(_engine, this, kind, _updatable, true, _byteStride,
                                         !instanced.has_value() ? _instanced : *instanced,
-                                        _byteOffset, size, std::nullopt, false, true);
+                                        _byteOffset, size, std::nullopt, false, true,
+                                        divisor.value_or(_divisor));
 }
 
 // Properties

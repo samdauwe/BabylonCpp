@@ -30,14 +30,16 @@ public:
    * (optional)
    * @param instanced whether the buffer is instanced (optional)
    * @param useBytes set to true if the stride in in bytes (optional)
+   * @param divisor sets an optional divisor for instances (1 by default)
    */
   Buffer(Engine* engine, const Float32Array& data, bool updatable,
          std::optional<size_t> stride = std::nullopt, bool postponeInternalCreation = false,
-         bool instanced = false, bool useBytes = false);
+         bool instanced = false, bool useBytes = false,
+         const std::optional<unsigned int>& divisor = std::nullopt);
 
   /**
    * @brief Constructor
-   * @param mesh the mesh
+   * @param engine the engine
    * @param data the data to use for this buffer
    * @param updatable whether the data is updatable
    * @param stride the stride (optional)
@@ -45,10 +47,12 @@ public:
    * (optional)
    * @param instanced whether the buffer is instanced (optional)
    * @param useBytes set to true if the stride in in bytes (optional)
+   * @param divisor sets an optional divisor for instances (1 by default)
    */
   Buffer(Mesh* mesh, const Float32Array& data, bool updatable,
          std::optional<size_t> stride = std::nullopt, bool postponeInternalCreation = false,
-         bool instanced = false, bool useBytes = false);
+         bool instanced = false, bool useBytes = false,
+         const std::optional<unsigned int>& divisor = std::nullopt);
 
   virtual ~Buffer(); // = default
 
@@ -60,14 +64,15 @@ public:
    * @param stride defines the stride size in floats in the buffer (the offset to apply to reach
    * next value when data is interleaved)
    * @param instanced defines if the vertex buffer contains indexed data
-   * @param useBytes defines if the offset and stride are in bytes
+   * @param useBytes defines if the offset and stride are in bytes     *
+   * @param divisor sets an optional divisor for instances (1 by default)
    * @returns the new vertex buffer
    */
-  std::unique_ptr<VertexBuffer> createVertexBuffer(const std::string& kind, size_t offset,
-                                                   size_t size,
-                                                   std::optional<size_t> stride  = std::nullopt,
-                                                   std::optional<bool> instanced = std::nullopt,
-                                                   bool useBytes                 = false);
+  std::unique_ptr<VertexBuffer>
+  createVertexBuffer(const std::string& kind, size_t offset, size_t size,
+                     std::optional<size_t> stride  = std::nullopt,
+                     std::optional<bool> instanced = std::nullopt, bool useBytes = false,
+                     const std::optional<unsigned int>& divisor = std::nullopt);
 
   // Properties
 
@@ -92,8 +97,8 @@ public:
   /**
    * @brief Gets the stride in float32 units (i.e. byte stride / 4).
    * May not be an integer if the byte stride is not divisible by 4.
-   * DEPRECATED. Use byteStride instead.
    * @returns the stride in float32 units
+   * @deprecated Please use byteStride instead.
    */
   [[nodiscard]] size_t getStrideSize() const;
 
@@ -149,6 +154,7 @@ private:
   WebGLDataBufferPtr _buffer;
   bool _updatable;
   bool _instanced;
+  unsigned int _divisor;
 
 }; // end of class Buffer
 
