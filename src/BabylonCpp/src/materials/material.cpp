@@ -21,9 +21,7 @@ namespace BABYLON {
 const Material::MaterialDefinesCallback Material::_AllDirtyCallBack
   = [](MaterialDefines& defines) -> void { defines.markAllAsDirty(); };
 const Material::MaterialDefinesCallback Material::_ImageProcessingDirtyCallBack
-  = [](MaterialDefines& defines) -> void {
-  defines.markAsImageProcessingDirty();
-};
+  = [](MaterialDefines& defines) -> void { defines.markAsImageProcessingDirty(); };
 const Material::MaterialDefinesCallback Material::_TextureDirtyCallBack
   = [](MaterialDefines& defines) -> void { defines.markAsTexturesDirty(); };
 const Material::MaterialDefinesCallback Material::_FresnelDirtyCallBack
@@ -60,8 +58,7 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     , checkReadyOnEveryCall{false}
     , checkReadyOnlyOnce{false}
     , alpha{this, &Material::get_alpha, &Material::set_alpha}
-    , backFaceCulling{this, &Material::get_backFaceCulling,
-                      &Material::set_backFaceCulling}
+    , backFaceCulling{this, &Material::get_backFaceCulling, &Material::set_backFaceCulling}
     , hasRenderTargetTextures{this, &Material::get_hasRenderTargetTextures}
     , onCompiled{nullptr}
     , onError{nullptr}
@@ -73,10 +70,10 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     , onBind{this, &Material::set_onBind}
     , onUnBindObservable{this, &Material::get_onUnBindObservable}
     , alphaMode{this, &Material::get_alphaMode, &Material::set_alphaMode}
-    , needDepthPrePass{this, &Material::get_needDepthPrePass,
-                       &Material::set_needDepthPrePass}
+    , needDepthPrePass{this, &Material::get_needDepthPrePass, &Material::set_needDepthPrePass}
     , disableDepthWrite{false}
     , forceDepthWrite{false}
+    , depthFunction{0}
     , separateCullingPass{false}
     , fogEnabled{this, &Material::get_fogEnabled, &Material::set_fogEnabled}
     , pointSize{1.f}
@@ -102,6 +99,7 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     , _scene{scene ? scene : Engine::LastCreatedScene()}
     , _fillMode{Material::TriangleFillMode}
     , _cachedDepthWriteState{false}
+    , _cachedDepthFunctionState{0}
 {
   uniqueId = _scene->getUniqueId();
 
@@ -163,15 +161,13 @@ Type Material::type() const
   return Type::MATERIAL;
 }
 
-AnimationValue
-Material::getProperty(const std::vector<std::string>& /*targetPropertyPath*/)
+AnimationValue Material::getProperty(const std::vector<std::string>& /*targetPropertyPath*/)
 {
   return AnimationValue();
 }
 
-void Material::setProperty(
-  const std::vector<std::string>& /*targetPropertyPath*/,
-  const AnimationValue& /*value*/)
+void Material::setProperty(const std::vector<std::string>& /*targetPropertyPath*/,
+                           const AnimationValue& /*value*/)
 {
 }
 
@@ -246,8 +242,7 @@ std::vector<AnimationPtr> Material::getAnimations()
 }
 
 // Events
-void Material::set_onDispose(
-  const std::function<void(Material*, EventState&)>& callback)
+void Material::set_onDispose(const std::function<void(Material*, EventState&)>& callback)
 {
   if (_onDisposeObserver) {
     onDisposeObservable.remove(_onDisposeObserver);
@@ -260,8 +255,7 @@ Observable<AbstractMesh>& Material::get_onBindObservable()
   return _onBindObservable;
 }
 
-void Material::set_onBind(
-  const std::function<void(AbstractMesh*, EventState&)>& callback)
+void Material::set_onBind(const std::function<void(AbstractMesh*, EventState&)>& callback)
 {
   if (_onBindObserver) {
     onBindObservable().remove(_onBindObserver);
@@ -344,12 +338,14 @@ bool Material::isFrozen() const
 
 void Material::freeze()
 {
-  checkReadyOnlyOnce = true;
+  _wasPreviouslyReady = false;
+  checkReadyOnlyOnce  = true;
 }
 
 void Material::unfreeze()
 {
-  checkReadyOnlyOnce = false;
+  _wasPreviouslyReady = false;
+  checkReadyOnlyOnce  = false;
 }
 
 bool Material::isReady(AbstractMesh* /*mesh*/, bool /*useInstances*/)
@@ -357,8 +353,7 @@ bool Material::isReady(AbstractMesh* /*mesh*/, bool /*useInstances*/)
   return true;
 }
 
-bool Material::isReadyForSubMesh(AbstractMesh* /*mesh*/,
-                                 BaseSubMesh* /*subMesh*/,
+bool Material::isReadyForSubMesh(AbstractMesh* /*mesh*/, BaseSubMesh* /*subMesh*/,
                                  bool /*useInstances*/)
 {
   return false;
@@ -381,8 +376,7 @@ bool Material::needAlphaBlending() const
 
 bool Material::needAlphaBlendingForMesh(const AbstractMesh& mesh) const
 {
-  return needAlphaBlending() || (mesh.visibility() < 1.f)
-         || mesh.hasVertexAlpha();
+  return needAlphaBlending() || (mesh.visibility() < 1.f) || mesh.hasVertexAlpha();
 }
 
 bool Material::needAlphaTesting() const
@@ -407,14 +401,12 @@ void Material::markDirty()
   _wasPreviouslyReady = false;
 }
 
-bool Material::_preBind(const EffectPtr& effect,
-                        std::optional<unsigned int> overrideOrientation)
+bool Material::_preBind(const EffectPtr& effect, std::optional<unsigned int> overrideOrientation)
 {
   auto engine = _scene->getEngine();
 
-  auto orientation = (!overrideOrientation.has_value()) ?
-                       static_cast<unsigned>(sideOrientation) :
-                       *overrideOrientation;
+  auto orientation = (!overrideOrientation.has_value()) ? static_cast<unsigned>(sideOrientation) :
+                                                          *overrideOrientation;
   const bool reverse = orientation == Material::ClockWiseSideOrientation;
 
   engine->enableEffect(effect ? effect : _effect);
@@ -427,8 +419,7 @@ void Material::bind(Matrix& /*world*/, Mesh* /*mesh*/)
 {
 }
 
-void Material::bindForSubMesh(Matrix& /*world*/, Mesh* /*mesh*/,
-                              SubMesh* /*subMesh*/)
+void Material::bindForSubMesh(Matrix& /*world*/, Mesh* /*mesh*/, SubMesh* /*subMesh*/)
 {
 }
 
@@ -485,11 +476,22 @@ void Material::_afterBind(Mesh* mesh)
     _cachedDepthWriteState = engine->getDepthWrite();
     engine->setDepthWrite(false);
   }
+
+  if (depthFunction != 0) {
+    auto engine               = _scene->getEngine();
+    _cachedDepthFunctionState = engine->getDepthFunction();
+    engine->setDepthFunction(depthFunction);
+  }
 }
 
 void Material::unbind()
 {
   onUnBindObservable().notifyObservers(this);
+
+  if (depthFunction != 0) {
+    auto engine = _scene->getEngine();
+    engine->setDepthFunction(_cachedDepthFunctionState);
+  }
 
   if (disableDepthWrite) {
     auto engine = _scene->getEngine();
@@ -507,8 +509,7 @@ bool Material::hasTexture(const BaseTexturePtr& /*texture*/) const
   return false;
 }
 
-MaterialPtr Material::clone(const std::string& /*name*/,
-                            bool /*cloneChildren*/) const
+MaterialPtr Material::clone(const std::string& /*name*/, bool /*cloneChildren*/) const
 {
   return nullptr;
 }
@@ -536,11 +537,20 @@ std::vector<AbstractMeshPtr> Material::getBindedMeshes()
   return result;
 }
 
-void Material::forceCompilation(
-  AbstractMesh* mesh,
-  const std::function<void(Material* material)>& iOnCompiled,
-  std::optional<bool> clipPlane)
+void Material::forceCompilation(AbstractMesh* mesh,
+                                const std::function<void(Material* material)>& iOnCompiled,
+                                const std::optional<IMaterialCompilationOptions>& options,
+                                const std::function<void(const std::string& reason)>& onError)
 {
+  auto localOptions = IMaterialCompilationOptions{
+    false, // clipPlane
+    false, // useInstances
+  };
+  if (options) {
+    localOptions.clipPlane    = options->clipPlane;
+    localOptions.useInstances = options->useInstances;
+  }
+
   auto subMesh = std::make_unique<BaseSubMesh>();
   auto scene   = getScene();
 
@@ -555,18 +565,26 @@ void Material::forceCompilation(
 
     auto clipPlaneState = scene->clipPlane;
 
-    if (clipPlane) {
+    if (localOptions.clipPlane) {
       scene->clipPlane = Plane(0.f, 0.f, 0.f, 1.f);
     }
 
     if (_storeEffectOnSubMeshes) {
-      if (isReadyForSubMesh(mesh, subMesh.get())) {
+      if (isReadyForSubMesh(mesh, subMesh.get(), localOptions.useInstances)) {
         if (iOnCompiled) {
           iOnCompiled(this);
         }
       }
       else {
-        // setTimeout(checkReady, 16);
+        if (subMesh->effect() && !subMesh->effect()->getCompilationError().empty()
+            && subMesh->effect()->allFallbacksProcessed()) {
+          if (onError) {
+            onError(subMesh->effect()->getCompilationError());
+          }
+        }
+        else {
+          // setTimeout(checkReady, 16);
+        }
       }
     }
     else {
@@ -580,7 +598,7 @@ void Material::forceCompilation(
       }
     }
 
-    if (clipPlane.has_value()) {
+    if (localOptions.clipPlane) {
       scene->clipPlane = clipPlaneState;
     }
   };
@@ -609,8 +627,7 @@ void Material::markAsDirty(unsigned int flag)
   }
 
   if (flag & Material::AttributesDirtyFlag) {
-    Material::_DirtyCallbackArray.emplace_back(
-      Material::_AttributeDirtyCallBack);
+    Material::_DirtyCallbackArray.emplace_back(Material::_AttributeDirtyCallBack);
   }
 
   if (flag & Material::MiscDirtyFlag) {
@@ -624,8 +641,7 @@ void Material::markAsDirty(unsigned int flag)
   getScene()->resetCachedMaterial();
 }
 
-void Material::_markAllSubMeshesAsDirty(
-  const Material::MaterialDefinesCallback& func)
+void Material::_markAllSubMeshesAsDirty(const Material::MaterialDefinesCallback& func)
 {
   if (getScene()->blockMaterialDirtyMechanism()) {
     return;
@@ -695,8 +711,7 @@ void Material::_markAllSubMeshesAsTexturesAndMiscDirty()
   _markAllSubMeshesAsDirty(Material::_TextureAndMiscDirtyCallBack);
 }
 
-void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/,
-                       bool notBoundToMesh)
+void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/, bool notBoundToMesh)
 {
   auto& scene = *getScene();
   // Animations
@@ -712,8 +727,7 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/,
       for (const auto& meshItem : meshMap) {
         const auto& mesh = meshItem.second;
         if (mesh) {
-          mesh->material
-            = nullptr; // will set the entry in the map to undefined
+          mesh->material = nullptr; // will set the entry in the map to undefined
           releaseVertexArrayObject(mesh, forceDisposeEffect);
         }
       }
@@ -752,8 +766,7 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/,
   _onUnBindObservable.clear();
 }
 
-void Material::releaseVertexArrayObject(const AbstractMeshPtr& iMesh,
-                                        bool forceDisposeEffect)
+void Material::releaseVertexArrayObject(const AbstractMeshPtr& iMesh, bool forceDisposeEffect)
 {
   auto mesh = std::static_pointer_cast<Mesh>(iMesh);
   if (mesh && mesh->geometry()) {
@@ -794,19 +807,16 @@ json Material::serialize() const
   return nullptr;
 }
 
-MultiMaterialPtr Material::ParseMultiMaterial(const json& parsedMultiMaterial,
-                                              Scene* scene)
+MultiMaterialPtr Material::ParseMultiMaterial(const json& parsedMultiMaterial, Scene* scene)
 {
-  auto multiMaterial = MultiMaterial::New(
-    json_util::get_string(parsedMultiMaterial, "name"), scene);
+  auto multiMaterial
+    = MultiMaterial::New(json_util::get_string(parsedMultiMaterial, "name"), scene);
 
   multiMaterial->id = json_util::get_string(parsedMultiMaterial, "id");
 
-  for (const auto& subMatId :
-       json_util::get_array<json>(parsedMultiMaterial, "materials")) {
+  for (const auto& subMatId : json_util::get_array<json>(parsedMultiMaterial, "materials")) {
     if (!subMatId.is_null()) {
-      multiMaterial->subMaterials().emplace_back(
-        scene->getMaterialByID(subMatId));
+      multiMaterial->subMaterials().emplace_back(scene->getMaterialByID(subMatId));
     }
     else {
       multiMaterial->subMaterials().emplace_back(nullptr);
@@ -816,12 +826,10 @@ MultiMaterialPtr Material::ParseMultiMaterial(const json& parsedMultiMaterial,
   return multiMaterial;
 }
 
-MaterialPtr Material::Parse(const json& parsedMaterial, Scene* scene,
-                            const std::string& rootUrl)
+MaterialPtr Material::Parse(const json& parsedMaterial, Scene* scene, const std::string& rootUrl)
 {
   if (!json_util::has_key(parsedMaterial, "customType")
-      || json_util::get_string(parsedMaterial, "customType")
-           == "BABYLON.StandardMaterial") {
+      || json_util::get_string(parsedMaterial, "customType") == "BABYLON.StandardMaterial") {
     return StandardMaterial::Parse(parsedMaterial, scene, rootUrl);
   }
 

@@ -23,11 +23,6 @@ using PBRClearCoatConfigurationPtr    = std::shared_ptr<PBRClearCoatConfiguratio
 using PBRSheenConfigurationPtr        = std::shared_ptr<PBRSheenConfiguration>;
 using PBRSubSurfaceConfigurationPtr   = std::shared_ptr<PBRSubSurfaceConfiguration>;
 
-struct IMaterialCompilationOptions {
-  bool clipPlane    = false;
-  bool useInstances = false;
-}; // end of struct IMaterialCompilationOptions
-
 /**
  * @brief The Physically based material base class of BJS.
  *

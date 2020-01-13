@@ -152,6 +152,12 @@ public:
    */
   std::string getCompilationError();
 
+  /**
+   * @brief Gets a boolean indicating that all fallbacks were used during compilation
+   * @returns true if all fallbacks were used
+   */
+  bool allFallbacksProcessed() const;
+
   /** Methods **/
 
   /**
@@ -639,6 +645,7 @@ private:
   std::unordered_map<std::string, int> _samplers;
   bool _isReady;
   std::string _compilationError;
+  bool _allFallbacksProcessed;
   std::vector<std::string> _attributesNames;
   Int32Array _attributes;
   std::unordered_map<std::string, WebGLUniformLocationPtr> _uniforms;

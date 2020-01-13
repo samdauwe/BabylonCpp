@@ -37,6 +37,21 @@ using MultiMaterialPtr       = std::shared_ptr<MultiMaterial>;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 /**
+ * @brief Options for compiling materials.
+ */
+struct BABYLON_SHARED_EXPORT IMaterialCompilationOptions {
+  /**
+   * Defines whether clip planes are enabled.
+   */
+  bool clipPlane = false;
+
+  /**
+   * Defines whether instances are enabled.
+   */
+  bool useInstances = false;
+};
+
+/**
  * @brief Base class for the main features of a material in Babylon.js.
  */
 class BABYLON_SHARED_EXPORT Material : public IAnimatable {
@@ -315,15 +330,16 @@ public:
   std::vector<AbstractMeshPtr> getBindedMeshes();
 
   /**
-   * @brief Force shader compilation
+   * @brief Force shader compilation.
    * @param mesh defines the mesh associated with this material
-   * @param onCompiled defines a function to execute once the material is
-   * compiled
+   * @param onCompiled defines a function to execute once the material is compiled
    * @param options defines the options to configure the compilation
+   * @param onError defines a function to execute if the material fails compiling
    */
   void forceCompilation(AbstractMesh* mesh,
                         const std::function<void(Material* material)>& onCompiled,
-                        std::optional<bool> clipPlane = false);
+                        const std::optional<IMaterialCompilationOptions>& options = std::nullopt,
+                        const std::function<void(const std::string& reason)>& onError = nullptr);
 
   /**
    * @brief Marks a define in the material to indicate that it needs to be
@@ -721,6 +737,11 @@ public:
   bool forceDepthWrite;
 
   /**
+   * Specifies the depth function that should be used. 0 means the default engine function
+   */
+  int depthFunction;
+
+  /**
    * Specifies if there should be a separate pass for culling
    */
   bool separateCullingPass;
@@ -848,6 +869,11 @@ private:
    * Specifies if the depth write state should be cached
    */
   bool _cachedDepthWriteState;
+
+  /**
+   * Specifies if the depth function state should be cached
+   */
+  int _cachedDepthFunctionState;
 
   static const MaterialDefinesCallback _AllDirtyCallBack;
   static const MaterialDefinesCallback _ImageProcessingDirtyCallBack;

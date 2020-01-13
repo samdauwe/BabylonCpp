@@ -55,6 +55,7 @@ Effect::Effect(
     , _samplerList{options.samplers}
     , _isReady{false}
     , _compilationError{""}
+    , _allFallbacksProcessed{false}
     , _attributesNames{options.attributes}
     , _indexParameters{options.indexParameters}
     , _fallbacks{std::move(options.fallbacks)}
@@ -262,6 +263,11 @@ std::vector<std::string>& Effect::getSamplers()
 std::string Effect::getCompilationError()
 {
   return _compilationError;
+}
+
+bool Effect::allFallbacksProcessed() const
+{
+  return _allFallbacksProcessed;
 }
 
 void Effect::executeWhenCompiled(const std::function<void(Effect* effect)>& func)
