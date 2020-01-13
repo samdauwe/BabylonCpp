@@ -31,20 +31,27 @@ CubeTexturePtr CubeTexture::CreateFromPrefilteredData(const std::string& url, Sc
                                                       const std::string& forcedExtension,
                                                       bool createPolynomials)
 {
+  const auto oldValue             = scene->useDelayedTextureLoading;
+  scene->useDelayedTextureLoading = false;
+
   const std::vector<std::string> emptyStringList;
-  return CubeTexture::New(url, scene, emptyStringList, false, emptyStringList, nullptr, nullptr,
-                          Constants::TEXTUREFORMAT_RGBA, true, forcedExtension, createPolynomials);
+  auto result
+    = CubeTexture::New(url, scene, emptyStringList, false, emptyStringList, nullptr, nullptr,
+                       Constants::TEXTUREFORMAT_RGBA, true, forcedExtension, createPolynomials);
+
+  scene->useDelayedTextureLoading = oldValue;
+
+  return result;
 }
 
 CubeTexture::CubeTexture(
   const std::string& rootUrl, Scene* scene, const std::vector<std::string>& extensions,
-  bool iNoMipmap, const std::vector<std::string>& iFiles,
+  bool iNoMipmap, std::vector<std::string> iFiles,
   const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
   unsigned int format, bool prefiltered, const std::string& forcedExtension, bool createPolynomials,
   float lodScale, float lodOffset)
     : BaseTexture{scene}
-    , url{rootUrl}
     , boundingBoxPosition{Vector3::Zero()}
     , rotationY{this, &CubeTexture::get_rotationY, &CubeTexture::set_rotationY}
     , noMipmap{this, &CubeTexture::get_noMipmap}
@@ -53,19 +60,21 @@ CubeTexture::CubeTexture(
     , _delayedOnLoad{nullptr}
     , _boundingBoxSize{std::nullopt}
     , _rotationY{0.f}
-    , _noMipmap{iNoMipmap}
-    , _textureMatrix{std::make_unique<Matrix>(Matrix::Identity())}
-    , _format{format}
-    , _forcedExtension{forcedExtension}
-    , _createPolynomials{createPolynomials}
     , _lodScale{lodScale}
     , _lodOffset{lodOffset}
 {
-  isCube = true;
-
-  name            = rootUrl;
-  hasAlpha        = false;
-  coordinatesMode = TextureConstants::CUBIC_MODE;
+  name               = rootUrl;
+  url                = rootUrl;
+  _noMipmap          = iNoMipmap;
+  hasAlpha           = false;
+  _format            = format;
+  isCube             = true;
+  _textureMatrix     = std::make_unique<Matrix>(Matrix::Identity());
+  _createPolynomials = createPolynomials;
+  coordinatesMode    = TextureConstants::CUBIC_MODE;
+  _extensions        = extensions;
+  _files             = iFiles;
+  _forcedExtension   = forcedExtension;
 
   if (rootUrl.empty() && iFiles.empty()) {
     return;
@@ -81,20 +90,20 @@ CubeTexture::CubeTexture(
   const auto isEnv = (extension == ".env");
 
   if (isEnv) {
-    gammaSpace   = false;
-    _prefiltered = false;
+    gammaSpace                = false;
+    _prefiltered              = false;
+    anisotropicFilteringLevel = 1;
   }
   else {
     _prefiltered = prefiltered;
 
     if (prefiltered) {
-      gammaSpace = false;
+      gammaSpace                = false;
+      anisotropicFilteringLevel = 1;
     }
   }
 
   _texture = _getFromCache(rootUrl, noMipmap);
-
-  _files = iFiles;
 
   if (iFiles.empty()) {
     _extensions = extensions;
@@ -103,14 +112,16 @@ CubeTexture::CubeTexture(
       _extensions = {"_px.jpg", "_py.jpg", "_pz.jpg", "_nx.jpg", "_ny.jpg", "_nz.jpg"};
     }
 
-    _files.clear();
+    iFiles.clear();
 
     if (!_extensions.empty()) {
       for (const auto& iExtension : _extensions) {
-        _files.emplace_back(rootUrl + iExtension);
+        iFiles.emplace_back(rootUrl + iExtension);
       }
     }
   }
+
+  _files = iFiles;
 
   if (!_texture) {
     if (!scene->useDelayedTextureLoading) {
@@ -196,10 +207,13 @@ void CubeTexture::updateURL(
     getScene()->markAllMaterialsAsDirty(Constants::MATERIAL_TextureDirtyFlag);
   }
 
-  name           = iUrl;
-  url            = iUrl;
-  delayLoadState = Constants::DELAYLOADSTATE_NOTLOADED;
-  _prefiltered   = false;
+  if (name.empty() || StringTools::startsWith(name, "data:")) {
+    name = iUrl;
+  }
+  url              = iUrl;
+  delayLoadState   = Constants::DELAYLOADSTATE_NOTLOADED;
+  _prefiltered     = false;
+  _forcedExtension = forcedExtension;
 
   if (onLoad) {
     _delayedOnLoad = onLoad;
