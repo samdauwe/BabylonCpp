@@ -184,7 +184,7 @@ void LightBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMateri
                                false);
   }
   else {
-    MaterialHelper::BindLight(light, _lightId, scene, nullptr, effect, true, false);
+    MaterialHelper::BindLight(light, _lightId, scene, effect, true, false);
   }
 }
 

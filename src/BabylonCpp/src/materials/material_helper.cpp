@@ -98,6 +98,8 @@ void MaterialHelper::PrepareDefinesForFrameBoundValues(Scene* scene, Engine* eng
   auto useClipPlane2 = false;
   auto useClipPlane3 = false;
   auto useClipPlane4 = false;
+  auto useClipPlane5 = false;
+  auto useClipPlane6 = false;
 
   useClipPlane1 = useClipPlane == std::nullopt ? (scene->clipPlane != std::nullopt) : *useClipPlane;
   useClipPlane2
@@ -106,6 +108,10 @@ void MaterialHelper::PrepareDefinesForFrameBoundValues(Scene* scene, Engine* eng
     = useClipPlane == std::nullopt ? (scene->clipPlane3 != std::nullopt) : *useClipPlane;
   useClipPlane4
     = useClipPlane == std::nullopt ? (scene->clipPlane4 != std::nullopt) : *useClipPlane;
+  useClipPlane5
+    = useClipPlane == std::nullopt ? (scene->clipPlane5 != std::nullopt) : *useClipPlane;
+  useClipPlane6
+    = useClipPlane == std::nullopt ? (scene->clipPlane6 != std::nullopt) : *useClipPlane;
 
   if (defines["CLIPPLANE"] != useClipPlane1) {
     defines.boolDef["CLIPPLANE"] = useClipPlane1;
@@ -124,6 +130,16 @@ void MaterialHelper::PrepareDefinesForFrameBoundValues(Scene* scene, Engine* eng
 
   if (defines["CLIPPLANE4"] != useClipPlane4) {
     defines.boolDef["CLIPPLANE4"] = useClipPlane4;
+    changed                       = true;
+  }
+
+  if (defines["CLIPPLANE5"] != useClipPlane5) {
+    defines.boolDef["CLIPPLANE5"] = useClipPlane5;
+    changed                       = true;
+  }
+
+  if (defines["CLIPPLANE6"] != useClipPlane6) {
+    defines.boolDef["CLIPPLANE6"] = useClipPlane6;
     changed                       = true;
   }
 
@@ -610,17 +626,6 @@ void MaterialHelper::PushAttributesForInstances(std::vector<std::string>& attrib
   attribs.emplace_back(VertexBuffer::World3Kind);
 }
 
-void MaterialHelper::BindLightShadow(Light& light, AbstractMesh& mesh,
-                                     const std::string& lightIndex, const EffectPtr& effect)
-{
-  if (light.shadowEnabled && mesh.receiveShadows()) {
-    auto shadowGenerator = light.getShadowGenerator();
-    if (shadowGenerator) {
-      shadowGenerator->bindShadowLight(lightIndex, effect);
-    }
-  }
-}
-
 void MaterialHelper::BindLightProperties(Light& light, const EffectPtr& effect,
                                          unsigned int lightIndex)
 {
@@ -628,32 +633,11 @@ void MaterialHelper::BindLightProperties(Light& light, const EffectPtr& effect,
 }
 
 void MaterialHelper::BindLight(const LightPtr& light, unsigned int lightIndex, Scene* scene,
-                               AbstractMesh* mesh, const EffectPtr& effect, bool useSpecular,
+                               const EffectPtr& effect, bool useSpecular,
                                bool usePhysicalLightFalloff, bool rebuildInParallel)
 {
-  auto iAsString = std::to_string(lightIndex);
-
-  auto scaledIntensity = light->getScaledIntensity();
-  if (!rebuildInParallel) {
-    light->_uniformBuffer->bindToEffect(effect.get(), "Light" + iAsString);
-  }
-
-  MaterialHelper::BindLightProperties(*light, effect, lightIndex);
-
-  light->diffuse.scaleToRef(scaledIntensity, TmpVectors::Color3Array[0]);
-  light->_uniformBuffer->updateColor4("vLightDiffuse", TmpVectors::Color3Array[0],
-                                      usePhysicalLightFalloff ? light->radius() : light->range,
-                                      iAsString);
-  if (useSpecular) {
-    light->specular.scaleToRef(scaledIntensity, TmpVectors::Color3Array[1]);
-    light->_uniformBuffer->updateColor3("vLightSpecular", TmpVectors::Color3Array[1], iAsString);
-  }
-
-  // Shadows
-  if (scene->shadowsEnabled()) {
-    BindLightShadow(*light, *mesh, iAsString, effect);
-  }
-  light->_uniformBuffer->update();
+  light->bindLight(lightIndex, scene, effect, useSpecular, usePhysicalLightFalloff,
+                   rebuildInParallel);
 }
 
 void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh, const EffectPtr& effect,
@@ -665,7 +649,7 @@ void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh, const EffectPt
   for (unsigned i = 0u; i < len; ++i) {
 
     auto& light = mesh->lightSources()[i];
-    BindLight(light, i, scene, mesh, effect, defines, usePhysicalLightFalloff, rebuildInParallel);
+    BindLight(light, i, scene, effect, defines, usePhysicalLightFalloff, rebuildInParallel);
   }
 }
 
@@ -678,7 +662,7 @@ void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh, const EffectPt
   for (unsigned i = 0u; i < len; ++i) {
 
     auto& light = mesh->lightSources()[i];
-    BindLight(light, i, scene, mesh, effect, defines["SPECULARTERM"], usePhysicalLightFalloff,
+    BindLight(light, i, scene, effect, defines["SPECULARTERM"], usePhysicalLightFalloff,
               rebuildInParallel);
   }
 }
@@ -689,8 +673,7 @@ void MaterialHelper::BindFogParameters(Scene* scene, AbstractMesh* mesh, const E
   if (scene->fogEnabled() && mesh->applyFog() && scene->fogMode() != Scene::FOGMODE_NONE) {
     effect->setFloat4("vFogInfos", static_cast<float>(scene->fogMode()), scene->fogStart,
                       scene->fogEnd, scene->fogDensity);
-    // Convert fog color to linear space if used in a linear space computed
-    // shader.
+    // Convert fog color to linear space if used in a linear space computed shader.
     if (linearSpace) {
       scene->fogColor.toLinearSpaceToRef(MaterialHelper::_tempFogColor);
       effect->setColor3("vFogColor", MaterialHelper::_tempFogColor);
@@ -770,6 +753,16 @@ void MaterialHelper::BindClipPlane(const EffectPtr& effect, Scene* scene)
     const auto& clipPlane = *scene->clipPlane4;
     effect->setFloat4("vClipPlane4", clipPlane.normal.x, clipPlane.normal.y, clipPlane.normal.z,
                       clipPlane.d);
+  }
+  if (scene->clipPlane5) {
+    const auto& clipPlane = scene->clipPlane5;
+    effect->setFloat4("vClipPlane5", clipPlane->normal.x, clipPlane->normal.y, clipPlane->normal.z,
+                      clipPlane->d);
+  }
+  if (scene->clipPlane6) {
+    const auto& clipPlane = scene->clipPlane6;
+    effect->setFloat4("vClipPlane6", clipPlane->normal.x, clipPlane->normal.y, clipPlane->normal.z,
+                      clipPlane->d);
   }
 }
 

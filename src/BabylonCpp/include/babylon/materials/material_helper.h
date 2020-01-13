@@ -203,7 +203,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
   /**
    * @brief Prepares the uniforms and samplers list to be used in the effect.
    * @param uniformsListOrOptions The uniform names to prepare or an EffectCreationOptions
-   * containing the liist and extra information
+   * containing the list and extra information
    * @param samplersList The sampler list
    * @param defines The defines helping in the list generation
    * @param maxSimultaneousLights The maximum number of simultanous light allowed in the effect
@@ -217,7 +217,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @brief Prepares the uniforms and samplers list to be used in the effect. This can automatically
    * remove from the list uniforms that won t be acctive due to defines being turned off.
    * @param uniformsListOrOptions The uniform names to prepare or an EffectCreationOptions
-   * containing the liist and extra information
+   * containing the list and extra information
    * @param samplersList The samplers list
    * @param defines The defines helping in the list generation
    * @param maxSimultaneousLights The maximum number of simultanous light allowed in the effect
@@ -285,16 +285,6 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
   static void PushAttributesForInstances(std::vector<std::string>& attribs);
 
   /**
-   * @brief Binds the light shadow information to the effect for the given mesh.
-   * @param light The light containing the generator
-   * @param mesh The mesh we are binding the information to render
-   * @param lightIndex The light index in the effect used to render the mesh
-   * @param effect The effect we are binding the data to
-   */
-  static void BindLightShadow(Light& light, AbstractMesh& mesh, const std::string& lightIndex,
-                              const EffectPtr& effect);
-
-  /**
    * @brief Binds the light information to the effect.
    * @param light The light containing the generator
    * @param effect The effect we are binding the data to
@@ -307,14 +297,13 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param light Light to bind
    * @param lightIndex Light index
    * @param scene The scene where the light belongs to
-   * @param mesh The mesh we are binding the information to render
    * @param effect The effect we are binding the data to
    * @param useSpecular Defines if specular is supported
    * @param usePhysicalLightFalloff Specifies whether the light falloff is defined physically or not
    * @param rebuildInParallel Specifies whether the shader is rebuilding in parallel
    */
   static void BindLight(const LightPtr& light, unsigned int lightIndex, Scene* scene,
-                        AbstractMesh* mesh, const EffectPtr& effect, bool useSpecular,
+                        const EffectPtr& effect, bool useSpecular,
                         bool usePhysicalLightFalloff = false, bool rebuildInParallel = false);
 
   /**
