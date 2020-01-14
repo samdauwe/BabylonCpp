@@ -1566,7 +1566,11 @@ ThinEngine::createShaderProgram(const IPipelineContextPtr& pipelineContext,
 {
   context = context ? context : _gl;
 
-  auto shaderVersion  = (_webGLVersion > 1.f) ? "#version 300 es\n#define WEBGL2 \n" : "";
+#ifdef GLES3
+  auto shaderVersion = (_webGLVersion > 1.f) ? "#version 300 es\n#define WEBGL2 \n" : "";
+#else
+  auto shaderVersion = (_webGLVersion > 1.f) ? "#version 330\n#define WEBGL2 \n" : "";
+#endif
   auto vertexShader   = _compileShader(vertexCode, "vertex", defines, shaderVersion);
   auto fragmentShader = _compileShader(fragmentCode, "fragment", defines, shaderVersion);
 

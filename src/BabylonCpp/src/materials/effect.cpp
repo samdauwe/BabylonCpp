@@ -385,10 +385,14 @@ void Effect::_dumpShadersSource(std::string vertexCode, std::string fragmentCode
                                 const std::string& iDefines)
 {
   // Rebuild shaders source code
+#ifdef GLES3
   auto shaderVersion = (_engine->webGLVersion() > 1.f) ? "#version 300 es\n#define WEBGL2 \n" : "";
-  auto prefix        = shaderVersion + (!iDefines.empty() ? iDefines + "\n" : "");
-  vertexCode         = prefix + vertexCode;
-  fragmentCode       = prefix + fragmentCode;
+#else
+  auto shaderVersion = (_engine->webGLVersion() > 1.f) ? "#version 330\n#define WEBGL2 \n" : "";
+#endif
+  auto prefix  = shaderVersion + (!iDefines.empty() ? iDefines + "\n" : "");
+  vertexCode   = prefix + vertexCode;
+  fragmentCode = prefix + fragmentCode;
 
   // Number lines of shaders source code
   unsigned int i = 2;
