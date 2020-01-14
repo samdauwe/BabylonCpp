@@ -27,6 +27,7 @@ MultiviewRenderTarget::MultiviewRenderTarget(Scene* scene, const ISize& size)
     = scene->getEngine()->createMultiviewRenderTargetTexture(getRenderWidth(), getRenderHeight());
   internalTexture->isMultiview = true;
   _texture                     = internalTexture;
+  samples = std::min(static_cast<unsigned int>(_engine->getCaps().maxSamples), samples());
 }
 
 MultiviewRenderTarget::~MultiviewRenderTarget() = default;
