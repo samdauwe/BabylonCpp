@@ -540,7 +540,7 @@ std::vector<AbstractMeshPtr> Material::getBindedMeshes()
 void Material::forceCompilation(AbstractMesh* mesh,
                                 const std::function<void(Material* material)>& iOnCompiled,
                                 const std::optional<IMaterialCompilationOptions>& options,
-                                const std::function<void(const std::string& reason)>& onError)
+                                const std::function<void(const std::string& reason)>& iOnError)
 {
   auto localOptions = IMaterialCompilationOptions{
     false, // clipPlane
@@ -578,8 +578,8 @@ void Material::forceCompilation(AbstractMesh* mesh,
       else {
         if (subMesh->effect() && !subMesh->effect()->getCompilationError().empty()
             && subMesh->effect()->allFallbacksProcessed()) {
-          if (onError) {
-            onError(subMesh->effect()->getCompilationError());
+          if (iOnError) {
+            iOnError(subMesh->effect()->getCompilationError());
           }
         }
         else {

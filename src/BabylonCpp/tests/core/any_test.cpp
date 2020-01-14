@@ -12,7 +12,7 @@ struct E {
   E(int a) : _a{a}
   {
   }
-  E(E&& e) = default;
+  E(E&& e)      = default;
   E(E const& e) = default;
   E& operator=(E&&) = delete;
   E& operator=(E const&) = delete;
@@ -217,9 +217,9 @@ TEST(TestAny, MoveToVectorElements)
   EXPECT_EQ(a[6]._<double>(), 2.71);
   EXPECT_EQ(a[7]._<std::string>(), "world!");
 
+#ifndef SKIP_WIN_FAILING_TESTS
   auto is_double = [](const any& s) { return s.is<double>(); };
   auto cnt       = std::count_if(a.begin(), a.end(), is_double);
-#ifndef SKIP_WIN_FAILING_TESTS
   EXPECT_EQ(cnt, 2);
 #endif
 }
