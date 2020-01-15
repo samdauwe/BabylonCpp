@@ -27,10 +27,19 @@ public:
    * @param effect defines the effect to associate with
    * @param defines defines the set of defines used to compile this effect
    */
-  void setEffect(const EffectPtr& effect,
-                 const MaterialDefinesPtr& defines = nullptr);
+  void setEffect(const EffectPtr& effect, const MaterialDefinesPtr& defines = nullptr);
 
 protected:
+  /**
+   * @brief Gets material defines used by the effect associated to the sub mesh.
+   */
+  MaterialDefinesPtr& get_materialDefines();
+
+  /**
+   * @brief Sets material defines used by the effect associated to the sub mesh.
+   */
+  void set_materialDefines(const MaterialDefinesPtr& defines);
+
   /**
    * @brief Gets the associated effect.
    */
@@ -46,6 +55,11 @@ public:
    * Hidden
    */
   EffectPtr _materialEffect;
+
+  /**
+   * Gets or sets material defines used by the effect associated to the sub mesh
+   */
+  Property<BaseSubMesh, MaterialDefinesPtr> materialDefines;
 
   /**
    * Gets associated effect
