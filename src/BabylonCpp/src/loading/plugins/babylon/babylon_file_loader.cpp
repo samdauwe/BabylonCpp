@@ -88,10 +88,9 @@ void BabylonFileLoader::loadDetailLevels(Scene* scene, const AbstractMeshPtr& me
 {
   auto mastermesh = std::static_pointer_cast<Mesh>(mesh);
 
-  // Every value specified in the ids array of the lod data points to another
-  // mesh which should be used as the lower LOD level. The distances (or
-  // coverages) array values specified are used along with the lod mesh ids as a
-  // hint to determine the switching threshold for the various LODs.
+  // Every value specified in the ids array of the lod data points to another mesh which should be
+  // used as the lower LOD level. The distances (or coverages) array values specified are used along
+  // with the lod mesh ids as a hint to determine the switching threshold for the various LODs.
   if (mesh->_waitingData.lods.has_value()) {
     if (!mesh->_waitingData.lods->ids.empty()) {
       const auto& lodmeshes = mesh->_waitingData.lods->ids;
@@ -132,11 +131,10 @@ bool BabylonFileLoader::importMesh(
   const std::function<void(const std::string& message, const std::string& exception)>& onError)
   const
 {
-  // Entire method running in try block, so ALWAYS logs as far as it got, only
-  // actually writes details when SceneLoader.debugLogging = true (default), or
-  // exception encountered. Everything stored in var log instead of writing
-  // separate lines to support only writing in exception, and avoid problems
-  // with multiple concurrent .babylon loads.
+  // Entire method running in try block, so ALWAYS logs as far as it got, only actually writes
+  // details when SceneLoader.debugLogging = true (default), or exception encountered. Everything
+  // stored in var log instead of writing separate lines to support only writing in exception, and
+  // avoid problems with multiple concurrent .babylon loads.
   std::ostringstream log;
   log << "importMesh has failed JSON parse";
   json parsedData;
@@ -370,11 +368,10 @@ bool BabylonFileLoader::load(Scene* scene, const std::string& data, const std::s
                              const std::function<void(const std::string& message,
                                                       const std::string& exception)>& onError) const
 {
-  // Entire method running in try block, so ALWAYS logs as far as it got, only
-  // actually writes details when SceneLoader.debugLogging = true (default), or
-  // exception encountered. Everything stored in var log instead of writing
-  // separate lines to support only writing in exception, and avoid problems
-  // with multiple concurrent .babylon loads.
+  // Entire method running in try block, so ALWAYS logs as far as it got, only actually writes
+  // details when SceneLoader.debugLogging = true (default), or exception encountered. Everything
+  // stored in var log instead of writing separate lines to support only writing in exception, and
+  // avoid problems with multiple concurrent .babylon loads.
   std::ostringstream log;
   log << "importMesh has failed JSON parse";
   json parsedData;
@@ -541,11 +538,10 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
 {
   auto container = AssetContainer::New(scene);
 
-  // Entire method running in try block, so ALWAYS logs as far as it got, only
-  // actually writes details when SceneLoader.debugLogging = true (default), or
-  // exception encountered. Everything stored in var log instead of writing
-  // separate lines to support only writing in exception, and avoid problems
-  // with multiple concurrent .babylon loads.
+  // Entire method running in try block, so ALWAYS logs as far as it got, only actually writes
+  // details when SceneLoader.debugLogging = true (default), or exception encountered. Everything
+  // stored in var log instead of writing separate lines to support only writing in exception, and
+  // avoid problems with multiple concurrent .babylon loads.
   std::ostringstream log;
   log << "importMesh has failed JSON parse";
   json parsedData;
