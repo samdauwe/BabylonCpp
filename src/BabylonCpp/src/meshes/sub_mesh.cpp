@@ -179,7 +179,9 @@ SubMesh& SubMesh::updateBoundingInfo(const Matrix& world)
     refreshBoundingInfo();
     boundingInfo = getBoundingInfo();
   }
-  boundingInfo->update(world);
+  if (boundingInfo) {
+    boundingInfo->update(world);
+  }
 
   return *this;
 }
@@ -208,7 +210,8 @@ bool SubMesh::isCompletelyInFrustum(const std::array<Plane, 6>& frustumPlanes)
 
 SubMesh& SubMesh::render(bool enableAlphaMode)
 {
-  _renderingMesh->render(this, enableAlphaMode);
+  _renderingMesh->render(this, enableAlphaMode,
+                         _mesh->_internalAbstractMeshDataInfo._actAsRegularMesh ? _mesh : nullptr);
   return *this;
 }
 
