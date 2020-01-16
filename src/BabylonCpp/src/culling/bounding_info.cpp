@@ -7,8 +7,7 @@
 
 namespace BABYLON {
 
-std::array<Vector3, 2> BoundingInfo::TmpVector3{Vector3::Zero(),
-                                                Vector3::Zero()};
+std::array<Vector3, 2> BoundingInfo::TmpVector3{Vector3::Zero(), Vector3::Zero()};
 
 BoundingInfo::BoundingInfo(const Vector3& iMinimum, const Vector3& iMaximum,
                            const std::optional<Matrix>& worldMatrix)
@@ -101,13 +100,10 @@ void BoundingInfo::update(const Matrix& world)
   boundingSphere._update(world);
 }
 
-BoundingInfo& BoundingInfo::centerOn(const Vector3& center,
-                                     const Vector3& extend)
+BoundingInfo& BoundingInfo::centerOn(const Vector3& center, const Vector3& extend)
 {
-  auto& iMinimum
-    = BoundingInfo::TmpVector3[0].copyFrom(center).subtractInPlace(extend);
-  auto& iMaximum
-    = BoundingInfo::TmpVector3[1].copyFrom(center).addInPlace(extend);
+  auto& iMinimum = BoundingInfo::TmpVector3[0].copyFrom(center).subtractInPlace(extend);
+  auto& iMaximum = BoundingInfo::TmpVector3[1].copyFrom(center).addInPlace(extend);
 
   boundingBox.reConstruct(iMinimum, iMaximum, boundingBox.getWorldMatrix());
   boundingSphere.reConstruct(iMinimum, iMaximum, boundingBox.getWorldMatrix());
@@ -123,14 +119,11 @@ BoundingInfo& BoundingInfo::scale(float factor)
   return *this;
 }
 
-bool BoundingInfo::isInFrustum(const std::array<Plane, 6>& frustumPlanes,
-                               unsigned int strategy)
+bool BoundingInfo::isInFrustum(const std::array<Plane, 6>& frustumPlanes, unsigned int strategy)
 {
   const auto inclusionTest
     = (strategy == Constants::MESHES_CULLINGSTRATEGY_OPTIMISTIC_INCLUSION
-       || strategy
-            == Constants::
-                 MESHES_CULLINGSTRATEGY_OPTIMISTIC_INCLUSION_THEN_BSPHERE_ONLY);
+       || strategy == Constants::MESHES_CULLINGSTRATEGY_OPTIMISTIC_INCLUSION_THEN_BSPHERE_ONLY);
   if (inclusionTest) {
     if (boundingSphere.isCenterInFrustum(frustumPlanes)) {
       return true;
@@ -143,9 +136,7 @@ bool BoundingInfo::isInFrustum(const std::array<Plane, 6>& frustumPlanes,
 
   const auto bSphereOnlyTest
     = (strategy == Constants::MESHES_CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY
-       || strategy
-            == Constants::
-                 MESHES_CULLINGSTRATEGY_OPTIMISTIC_INCLUSION_THEN_BSPHERE_ONLY);
+       || strategy == Constants::MESHES_CULLINGSTRATEGY_OPTIMISTIC_INCLUSION_THEN_BSPHERE_ONLY);
   if (bSphereOnlyTest) {
     return true;
   }
@@ -155,22 +146,20 @@ bool BoundingInfo::isInFrustum(const std::array<Plane, 6>& frustumPlanes,
 
 float BoundingInfo::diagonalLength() const
 {
-  const auto& diag = boundingBox.maximumWorld.subtractToRef(
-    boundingBox.minimumWorld, BoundingInfo::TmpVector3[0]);
+  const auto& diag
+    = boundingBox.maximumWorld.subtractToRef(boundingBox.minimumWorld, BoundingInfo::TmpVector3[0]);
   return diag.length();
 }
 
-bool BoundingInfo::isCompletelyInFrustum(
-  const std::array<Plane, 6>& frustumPlanes)
+bool BoundingInfo::isCompletelyInFrustum(const std::array<Plane, 6>& frustumPlanes)
 {
   return boundingBox.isCompletelyInFrustum(frustumPlanes);
 }
 
 bool BoundingInfo::_checkCollision(const Collider& collider) const
 {
-  return collider._canDoCollision(
-    boundingSphere.centerWorld, boundingSphere.radiusWorld,
-    boundingBox.minimumWorld, boundingBox.maximumWorld);
+  return collider._canDoCollision(boundingSphere.centerWorld, boundingSphere.radiusWorld,
+                                  boundingBox.minimumWorld, boundingBox.maximumWorld);
 }
 
 bool BoundingInfo::intersectsPoint(const Vector3& point)
@@ -188,8 +177,7 @@ bool BoundingInfo::intersectsPoint(const Vector3& point)
 
 bool BoundingInfo::intersects(const BoundingInfo& boundingInfo, bool precise)
 {
-  if (!BoundingSphere::Intersects(boundingSphere,
-                                  boundingInfo.boundingSphere)) {
+  if (!BoundingSphere::Intersects(boundingSphere, boundingInfo.boundingSphere)) {
     return false;
   }
 
@@ -222,57 +210,44 @@ bool BoundingInfo::intersects(const BoundingInfo& boundingInfo, bool precise)
   if (!axisOverlap(box1.directions[2], box0, box1)) {
     return false;
   }
-  if (!axisOverlap(Vector3::Cross(box0.directions[0], box1.directions[0]), box0,
-                   box1)) {
+  if (!axisOverlap(Vector3::Cross(box0.directions[0], box1.directions[0]), box0, box1)) {
     return false;
   }
-  if (!axisOverlap(Vector3::Cross(box0.directions[0], box1.directions[1]), box0,
-                   box1)) {
+  if (!axisOverlap(Vector3::Cross(box0.directions[0], box1.directions[1]), box0, box1)) {
     return false;
   }
-  if (!axisOverlap(Vector3::Cross(box0.directions[0], box1.directions[2]), box0,
-                   box1)) {
+  if (!axisOverlap(Vector3::Cross(box0.directions[0], box1.directions[2]), box0, box1)) {
     return false;
   }
-  if (!axisOverlap(Vector3::Cross(box0.directions[1], box1.directions[0]), box0,
-                   box1)) {
+  if (!axisOverlap(Vector3::Cross(box0.directions[1], box1.directions[0]), box0, box1)) {
     return false;
   }
-  if (!axisOverlap(Vector3::Cross(box0.directions[1], box1.directions[1]), box0,
-                   box1)) {
+  if (!axisOverlap(Vector3::Cross(box0.directions[1], box1.directions[1]), box0, box1)) {
     return false;
   }
-  if (!axisOverlap(Vector3::Cross(box0.directions[1], box1.directions[2]), box0,
-                   box1)) {
+  if (!axisOverlap(Vector3::Cross(box0.directions[1], box1.directions[2]), box0, box1)) {
     return false;
   }
-  if (!axisOverlap(Vector3::Cross(box0.directions[2], box1.directions[0]), box0,
-                   box1)) {
+  if (!axisOverlap(Vector3::Cross(box0.directions[2], box1.directions[0]), box0, box1)) {
     return false;
   }
-  if (!axisOverlap(Vector3::Cross(box0.directions[2], box1.directions[1]), box0,
-                   box1)) {
+  if (!axisOverlap(Vector3::Cross(box0.directions[2], box1.directions[1]), box0, box1)) {
     return false;
   }
-  if (!axisOverlap(Vector3::Cross(box0.directions[2], box1.directions[2]), box0,
-                   box1)) {
+  if (!axisOverlap(Vector3::Cross(box0.directions[2], box1.directions[2]), box0, box1)) {
     return false;
   }
 
   return true;
 }
 
-void BoundingInfo::computeBoxExtents(const Vector3& axis,
-                                     const BoundingBox& box, Extents& result)
+void BoundingInfo::computeBoxExtents(const Vector3& axis, const BoundingBox& box, Extents& result)
 {
   const auto p = Vector3::Dot(box.centerWorld, axis);
 
-  const auto r0
-    = std::abs(Vector3::Dot(box.directions[0], axis)) * box.extendSize.x;
-  const auto r1
-    = std::abs(Vector3::Dot(box.directions[1], axis)) * box.extendSize.y;
-  const auto r2
-    = std::abs(Vector3::Dot(box.directions[2], axis)) * box.extendSize.z;
+  const auto r0 = std::abs(Vector3::Dot(box.directions[0], axis)) * box.extendSize.x;
+  const auto r1 = std::abs(Vector3::Dot(box.directions[1], axis)) * box.extendSize.y;
+  const auto r2 = std::abs(Vector3::Dot(box.directions[2], axis)) * box.extendSize.z;
 
   const auto r = r0 + r1 + r2;
   result.min   = p - r;

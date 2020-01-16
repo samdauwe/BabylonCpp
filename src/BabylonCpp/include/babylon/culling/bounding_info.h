@@ -33,8 +33,7 @@ public:
   ~BoundingInfo() override; // = default
 
   /**
-   * @brief Recreates the entire bounding info from scratch as if we call the
-   * constructor in place.
+   * @brief Recreates the entire bounding info from scratch as if we call the constructor in place.
    * @param min defines the new minimum vector (in local space)
    * @param max defines the new maximum vector (in local space)
    * @param worldMatrix defines the new world matrix
@@ -49,8 +48,8 @@ public:
   void update(const Matrix& world);
 
   /**
-   * @brief Recreate the bounding info to be centered around a specific point
-   * given a specific extend.
+   * @brief Recreate the bounding info to be centered around a specific point given a specific
+   * extend.
    * @param center New center of the bounding info
    * @param extend New extend of the bounding info
    * @returns the current bounding info
@@ -65,8 +64,8 @@ public:
   BoundingInfo& scale(float factor);
 
   /**
-   * @brief Returns `true` if the bounding info is within the frustum defined by
-   * the passed array of planes.
+   * @brief Returns `true` if the bounding info is within the frustum defined by the passed array of
+   * planes.
    * @param frustumPlanes defines the frustum to test
    * @param strategy defines the strategy to use for the culling (default is
    * BABYLON.AbstractMesh.CULLINGSTRATEGY_STANDARD)
@@ -76,8 +75,7 @@ public:
                    unsigned int strategy = Constants::MESHES_CULLINGSTRATEGY_STANDARD) override;
 
   /**
-   * @brief Gets the world distance between the min and max points of the
-   * bounding box.
+   * @brief Gets the world distance between the min and max points of the bounding box.
    */
   [[nodiscard]] float diagonalLength() const;
 
@@ -95,8 +93,7 @@ public:
   [[nodiscard]] bool _checkCollision(const Collider& collider) const;
 
   /**
-   * @brief Checks if a point is inside the bounding box and bounding sphere or
-   * the mesh.
+   * @brief Checks if a point is inside the bounding box and bounding sphere or the mesh.
    * @see https://doc.babylonjs.com/babylon101/intersect_collisions_-_mesh
    * @param point the point to check intersection with
    * @returns if the point intersects
@@ -104,8 +101,8 @@ public:
   bool intersectsPoint(const Vector3& point);
 
   /**
-   * @brief Checks if another bounding info intersects the bounding box and
-   * bounding sphere or the mesh.
+   * @brief Checks if another bounding info intersects the bounding box and bounding sphere or the
+   * mesh.
    * @see https://doc.babylonjs.com/babylon101/intersect_collisions_-_mesh
    * @param boundingInfo the bounding info to check intersection with
    * @param precise if the intersection should be done using OBB
