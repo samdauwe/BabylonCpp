@@ -8,12 +8,10 @@
 
 namespace BABYLON {
 
-LensFlare::LensFlare(float iSize, float iPosition, const Color3& iColor,
-                     const std::string& imgUrl,
+LensFlare::LensFlare(float iSize, float iPosition, const Color3& iColor, const std::string& imgUrl,
                      const LensFlareSystemPtr& system)
     : color{iColor}
-    , texture{!imgUrl.empty() ? Texture::New(imgUrl, system->getScene(), true) :
-                                nullptr}
+    , texture{!imgUrl.empty() ? Texture::New(imgUrl, system->getScene(), true) : nullptr}
     , alphaMode{Constants::ALPHA_ONEONE}
     , size{iSize}
     , position{iPosition}
@@ -28,9 +26,8 @@ void LensFlare::addToLensFlareSystem(const LensFlarePtr& lensFlare)
   _system->lensFlares.emplace_back(lensFlare);
 }
 
-LensFlarePtr LensFlare::AddFlare(float size, float position,
-                                 const Color3& color, const std::string& imgUrl,
-                                 const LensFlareSystemPtr& system)
+LensFlarePtr LensFlare::AddFlare(float size, float position, const Color3& color,
+                                 const std::string& imgUrl, const LensFlareSystemPtr& system)
 {
   return LensFlare::New(size, position, color, imgUrl, system);
 }

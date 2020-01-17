@@ -25,8 +25,7 @@ public:
   template <typename... Ts>
   static LensFlarePtr New(Ts&&... args)
   {
-    auto lensFlare
-      = std::shared_ptr<LensFlare>(new LensFlare(std::forward<Ts>(args)...));
+    auto lensFlare = std::shared_ptr<LensFlare>(new LensFlare(std::forward<Ts>(args)...));
     lensFlare->addToLensFlareSystem(lensFlare);
 
     return lensFlare;
@@ -43,20 +42,17 @@ public:
    * This represents one of the lens effect in a `lensFlareSystem`.
    * It controls one of the indiviual texture used in the effect.
    * @see http://doc.babylonjs.com/how_to/how_to_use_lens_flares
-   * @param size Define the size of the lens flare (a floating value between 0
-   * and 1)
-   * @param position Define the position of the lens flare in the system. (a
-   * floating value between -1 and 1). A value of 0 is located on the emitter. A
-   * value greater than 0 is beyond the emitter and a value lesser than 0 is
-   * behind.
+   * @param size Define the size of the lens flare (a floating value between 0 and 1)
+   * @param position Define the position of the lens flare in the system. (a floating value between
+   * -1 and 1). A value of 0 is located on the emitter. A value greater than 0 is beyond the emitter
+   * and a value lesser than 0 is behind.
    * @param color Define the lens color
    * @param imgUrl Define the lens texture url
    * @param system Define the `lensFlareSystem` this flare is part of
    * @returns The newly created Lens Flare
    */
   static LensFlarePtr AddFlare(float size, float position, const Color3& color,
-                               const std::string& imgUrl,
-                               const LensFlareSystemPtr& system);
+                               const std::string& imgUrl, const LensFlareSystemPtr& system);
 
   /**
    * @brief Dispose and release the lens flare with its associated resources.
@@ -69,20 +65,16 @@ protected:
    * This represents one of the lens effect in a `lensFlareSystem`.
    * It controls one of the indiviual texture used in the effect.
    * @see http://doc.babylonjs.com/how_to/how_to_use_lens_flares
-   * @param size Define the size of the lens flare in the system (a floating
-   * value between 0 and 1)
-   * @param position Define the position of the lens flare in the system. (a
-   * floating value between -1 and 1). A value of 0 is located on the emitter. A
-   * value greater than 0 is beyond the emitter and a value lesser than 0 is
-   * behind.
+   * @param size Define the size of the lens flare in the system (a floating value between 0 and 1)
+   * @param position Define the position of the lens flare in the system. (a floating value between
+   * -1 and 1). A value of 0 is located on the emitter. A value greater than 0 is beyond the emitter
+   * and a value lesser than 0 is behind.
    * @param color Define the lens color
    * @param imgUrl Define the lens texture url
    * @param system Define the `lensFlareSystem` this flare is part of
    */
-  LensFlare(float size, float position,
-            const Color3& color              = Color3(1.f, 1.f, 1.f),
-            const std::string& imgUrl        = "",
-            const LensFlareSystemPtr& system = nullptr);
+  LensFlare(float size, float position, const Color3& color = Color3(1.f, 1.f, 1.f),
+            const std::string& imgUrl = "", const LensFlareSystemPtr& system = nullptr);
 
 public:
   /**
@@ -101,15 +93,14 @@ public:
   unsigned int alphaMode;
 
   /**
-   * Define the size of the lens flare in the system (a floating value between 0
-   * and 1)
+   * Define the size of the lens flare in the system (a floating value between 0 and 1)
    */
   float size;
 
   /**
-   * Define the position of the lens flare in the system. (a floating value
-   * between -1 and 1). A value of 0 is located on the emitter. A value greater
-   * than 0 is beyond the emitter and a value lesser than 0 is behind.
+   * Define the position of the lens flare in the system. (a floating value between -1 and 1). A
+   * value of 0 is located on the emitter. A value greater than 0 is beyond the emitter and a value
+   * lesser than 0 is behind.
    */
   float position;
 
