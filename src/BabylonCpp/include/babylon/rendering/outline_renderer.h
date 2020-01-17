@@ -10,10 +10,10 @@
 namespace BABYLON {
 
 struct _InstancesBatch;
-class AbstractMesh;
 class OutlineRenderer;
 class Effect;
 class Engine;
+class Mesh;
 class Scene;
 class SubMesh;
 using _InstancesBatchPtr = std::shared_ptr<_InstancesBatch>;
@@ -98,8 +98,8 @@ protected:
   OutlineRenderer(Scene* scene);
 
 private:
-  void _beforeRenderingMesh(AbstractMesh* mesh, SubMesh* subMesh, const _InstancesBatchPtr& batch);
-  void _afterRenderingMesh(AbstractMesh* mesh, SubMesh* subMesh, const _InstancesBatchPtr& batch);
+  void _beforeRenderingMesh(Mesh* mesh, SubMesh* subMesh, const _InstancesBatchPtr& batch);
+  void _afterRenderingMesh(Mesh* mesh, SubMesh* subMesh, const _InstancesBatchPtr& batch);
 
 public:
   /**

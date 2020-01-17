@@ -13,6 +13,7 @@ class AbstractMesh;
 class Camera;
 class ICanvas;
 struct ISceneComponent;
+class Mesh;
 class PickingInfo;
 struct PointerEvent;
 class RenderTargetTexture;
@@ -23,20 +24,17 @@ using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 /**
  * Strong typing of a Mesh related stage step action
  */
-using MeshStageAction
-  = std::function<bool(AbstractMesh* mesh, bool hardwareInstancedRendering)>;
+using MeshStageAction = std::function<bool(AbstractMesh* mesh, bool hardwareInstancedRendering)>;
 
 /**
  * Strong typing of a Evaluate Sub Mesh related stage step action
  */
-using EvaluateSubMeshStageAction
-  = std::function<void(AbstractMesh* mesh, SubMesh* subMesh)>;
+using EvaluateSubMeshStageAction = std::function<void(AbstractMesh* mesh, SubMesh* subMesh)>;
 
 /**
  * Strong typing of a Active Mesh related stage step action
  */
-using ActiveMeshStageAction
-  = std::function<void(AbstractMesh* sourceMesh, AbstractMesh* mesh)>;
+using ActiveMeshStageAction = std::function<void(AbstractMesh* sourceMesh, AbstractMesh* mesh)>;
 
 /**
  * Strong typing of a Camera related stage step action
@@ -51,8 +49,7 @@ using CameraStageFrameBufferAction = std::function<bool(Camera* camera)>;
 /**
  * Strong typing of a Render Target related stage step action
  */
-using RenderTargetStageAction
-  = std::function<void(const RenderTargetTexturePtr& renderTarget)>;
+using RenderTargetStageAction = std::function<void(const RenderTargetTexturePtr& renderTarget)>;
 
 /**
  * Strong typing of a RenderingGroup related stage step action
@@ -62,8 +59,8 @@ using RenderingGroupStageAction = std::function<void(int renderingGroupId)>;
 /**
  * Strong typing of a Mesh Render related stage step action
  */
-using RenderingMeshStageAction = std::function<void(
-  AbstractMesh* mesh, SubMesh* subMesh, const _InstancesBatchPtr& batch)>;
+using RenderingMeshStageAction
+  = std::function<void(Mesh* mesh, SubMesh* subMesh, const _InstancesBatchPtr& batch)>;
 
 /**
  * Strong typing of a simple stage step action
@@ -80,15 +77,15 @@ using RenderTargetsStageAction
  * Strong typing of a pointer move action.
  */
 using PointerMoveStageAction = std::function<std::optional<PickingInfo>(
-  int unTranslatedPointerX, int unTranslatedPointerY,
-  std::optional<PickingInfo> pickResult, bool isMeshPicked, ICanvas* canvas)>;
+  int unTranslatedPointerX, int unTranslatedPointerY, std::optional<PickingInfo> pickResult,
+  bool isMeshPicked, ICanvas* canvas)>;
 
 /**
  * Strong typing of a pointer up/down action.
  */
 using PointerUpDownStageAction = std::function<std::optional<PickingInfo>(
-  int unTranslatedPointerX, int unTranslatedPointerY,
-  std::optional<PickingInfo> pickResult, const PointerEvent& evt)>;
+  int unTranslatedPointerX, int unTranslatedPointerY, std::optional<PickingInfo> pickResult,
+  const PointerEvent& evt)>;
 
 /**
  * @brief Representation of a step.
@@ -121,7 +118,7 @@ public:
   }
 
 public:
-  Stage() = default;
+  Stage()  = default;
   ~Stage() = default;
 
   std::vector<Step<T>> splice(std::vector<Step<T>>& v, int index, int howmany,
@@ -131,8 +128,7 @@ public:
     const auto end   = std::min(v.end(), start + howmany);
     std::vector<Step<T>> removedItems(start, end);
     v.erase(start, end);
-    v.insert(end - static_cast<int>(removedItems.size()), itemsToAdd.begin(),
-             itemsToAdd.end());
+    v.insert(end - static_cast<int>(removedItems.size()), itemsToAdd.begin(), itemsToAdd.end());
     return removedItems;
   }
 
@@ -142,8 +138,7 @@ public:
    * @param component Defines the component attached to the step
    * @param action Defines the action to launch during the step
    */
-  void registerStep(unsigned int index, ISceneComponent* component,
-                    const T& action)
+  void registerStep(unsigned int index, ISceneComponent* component, const T& action)
   {
     size_t i = 0;
     // Additional parenthesis below are here in order to defeat WinDef.h's "max"

@@ -16,6 +16,7 @@
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/morph/morph_target_manager.h>
+#include <babylon/states/alpha_state.h>
 
 namespace BABYLON {
 
@@ -37,12 +38,12 @@ void OutlineRenderer::_register()
 {
   scene->_beforeRenderingMeshStage.registerStep(
     SceneComponentConstants::STEP_BEFORERENDERINGMESH_OUTLINE, this,
-    [this](AbstractMesh* mesh, SubMesh* subMesh, const _InstancesBatchPtr& batch) {
+    [this](Mesh* mesh, SubMesh* subMesh, const _InstancesBatchPtr& batch) {
       _beforeRenderingMesh(mesh, subMesh, batch);
     });
   scene->_afterRenderingMeshStage.registerStep(
     SceneComponentConstants::STEP_AFTERRENDERINGMESH_OUTLINE, this,
-    [this](AbstractMesh* mesh, SubMesh* subMesh, const _InstancesBatchPtr& batch) {
+    [this](Mesh* mesh, SubMesh* subMesh, const _InstancesBatchPtr& batch) {
       _afterRenderingMesh(mesh, subMesh, batch);
     });
 }
@@ -206,7 +207,7 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
   return _effect->isReady();
 }
 
-void OutlineRenderer::_beforeRenderingMesh(AbstractMesh* mesh, SubMesh* subMesh,
+void OutlineRenderer::_beforeRenderingMesh(Mesh* mesh, SubMesh* subMesh,
                                            const _InstancesBatchPtr& batch)
 {
   // Outline - step 1
@@ -216,8 +217,8 @@ void OutlineRenderer::_beforeRenderingMesh(AbstractMesh* mesh, SubMesh* subMesh,
     if (material && material->needAlphaBlending()) {
       _engine->cacheStencilState();
       // Draw only to stencil buffer for the original mesh
-      // The resulting stencil buffer will be used so the outline is not visible
-      // inside the mesh when the mesh is transparent
+      // The resulting stencil buffer will be used so the outline is not visible inside the mesh
+      // when the mesh is transparent
       _engine->setDepthWrite(false);
       _engine->setColorWrite(false);
       _engine->setStencilBuffer(true);
@@ -231,8 +232,7 @@ void OutlineRenderer::_beforeRenderingMesh(AbstractMesh* mesh, SubMesh* subMesh,
       _engine->setStencilFunction(Constants::NOTEQUAL);
     }
 
-    // Draw the outline using the above stencil if needed to avoid drawing
-    // within the mesh
+    // Draw the outline using the above stencil if needed to avoid drawing within the mesh
     _engine->setDepthWrite(false);
     render(subMesh, batch);
     _engine->setDepthWrite(_savedDepthWrite);
@@ -243,15 +243,18 @@ void OutlineRenderer::_beforeRenderingMesh(AbstractMesh* mesh, SubMesh* subMesh,
   }
 }
 
-void OutlineRenderer::_afterRenderingMesh(AbstractMesh* mesh, SubMesh* subMesh,
+void OutlineRenderer::_afterRenderingMesh(Mesh* mesh, SubMesh* subMesh,
                                           const _InstancesBatchPtr& batch)
 {
   // Overlay
   if (mesh->renderOverlay) {
-    auto currentMode = _engine->getAlphaMode();
+    auto currentMode     = _engine->getAlphaMode();
+    auto alphaBlendState = _engine->alphaState()->alphaBlend();
     _engine->setAlphaMode(Constants::ALPHA_COMBINE);
     render(subMesh, batch, true);
     _engine->setAlphaMode(currentMode);
+    _engine->setDepthWrite(_savedDepthWrite);
+    _engine->alphaState()->alphaBlend = alphaBlendState;
   }
 
   // Outline - step 2
