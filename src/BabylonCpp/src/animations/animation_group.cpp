@@ -1,4 +1,4 @@
-#include <babylon/animations/animation_group.h>
+﻿#include <babylon/animations/animation_group.h>
 
 #include <babylon/animations/animatable.h>
 #include <babylon/animations/animation.h>
@@ -16,10 +16,8 @@ AnimationGroup::AnimationGroup(const std::string& iName, Scene* scene)
     , to{this, &AnimationGroup::get_to}
     , isStarted{this, &AnimationGroup::get_isStarted}
     , isPlaying{this, &AnimationGroup::get_isPlaying}
-    , speedRatio{this, &AnimationGroup::get_speedRatio,
-                 &AnimationGroup::set_speedRatio}
-    , loopAnimation{this, &AnimationGroup::get_loopAnimation,
-                    &AnimationGroup::set_loopAnimation}
+    , speedRatio{this, &AnimationGroup::get_speedRatio, &AnimationGroup::set_speedRatio}
+    , loopAnimation{this, &AnimationGroup::get_loopAnimation, &AnimationGroup::set_loopAnimation}
     , targetedAnimations{this, &AnimationGroup::get_targetedAnimations}
     , animatables{this, &AnimationGroup::get_animatables}
     , _from{std::numeric_limits<float>::max()}
@@ -28,6 +26,7 @@ AnimationGroup::AnimationGroup(const std::string& iName, Scene* scene)
     , _isPaused{false}
     , _speedRatio{1.f}
     , _loopAnimation{false}
+    , _animationLoopCount{0}
 {
   _scene   = scene ? scene : Engine::LastCreatedScene();
   uniqueId = _scene->getUniqueId();
@@ -96,8 +95,7 @@ void AnimationGroup::set_loopAnimation(bool value)
   }
 }
 
-std::vector<std::unique_ptr<TargetedAnimation>>&
-AnimationGroup::get_targetedAnimations()
+std::vector<std::unique_ptr<TargetedAnimation>>& AnimationGroup::get_targetedAnimations()
 {
   return _targetedAnimations;
 }
@@ -107,9 +105,8 @@ std::vector<AnimatablePtr>& AnimationGroup::get_animatables()
   return _animatables;
 }
 
-TargetedAnimation
-AnimationGroup::addTargetedAnimation(const AnimationPtr& animation,
-                                     const IAnimatablePtr& target)
+TargetedAnimation AnimationGroup::addTargetedAnimation(const AnimationPtr& animation,
+                                                       const IAnimatablePtr& target)
 {
   TargetedAnimation targetedAnimation{
     animation, // animation,
@@ -125,8 +122,7 @@ AnimationGroup::addTargetedAnimation(const AnimationPtr& animation,
     _to = keys.back().frame;
   }
 
-  _targetedAnimations.emplace_back(
-    std::make_unique<TargetedAnimation>(targetedAnimation));
+  _targetedAnimations.emplace_back(std::make_unique<TargetedAnimation>(targetedAnimation));
 
   return targetedAnimation;
 }
@@ -165,8 +161,32 @@ AnimationGroup& AnimationGroup::normalize(const std::optional<int>& iBeginFrame,
   return *this;
 }
 
-AnimationGroup& AnimationGroup::start(bool loop, float iSpeedRatio,
-                                      std::optional<float> iFrom,
+void AnimationGroup::_processLoop(const AnimatablePtr& animatable,
+                                  TargetedAnimation* targetedAnimation, size_t index)
+{
+  animatable->onAnimationLoop = [this, targetedAnimation, index]() -> void {
+    onAnimationLoopObservable.notifyObservers(targetedAnimation);
+
+    if (index < _animationLoopFlags.size() && _animationLoopFlags[index]) {
+      return;
+    }
+
+    if (index >= _animationLoopFlags.size()) {
+      _animationLoopFlags.resize(index + 1);
+    }
+
+    _animationLoopFlags[index] = true;
+
+    _animationLoopCount++;
+    if (_animationLoopCount == _targetedAnimations.size()) {
+      onAnimationGroupLoopObservable.notifyObservers(this);
+      _animationLoopCount = 0;
+      _animationLoopFlags = {};
+    }
+  };
+}
+
+AnimationGroup& AnimationGroup::start(bool loop, float iSpeedRatio, std::optional<float> iFrom,
                                       std::optional<float> iTo)
 {
   if (_isStarted || _targetedAnimations.empty()) {
@@ -175,19 +195,21 @@ AnimationGroup& AnimationGroup::start(bool loop, float iSpeedRatio,
 
   _loopAnimation = loop;
 
+  _animationLoopCount = 0;
+  _animationLoopFlags = {};
+
+  size_t index = 0;
   for (auto& targetedAnimation : _targetedAnimations) {
     auto animatable = _scene->beginDirectAnimation(
-      targetedAnimation->target, {targetedAnimation->animation},
-      iFrom.has_value() ? *iFrom : _from, iTo.has_value() ? *iTo : _to, loop,
-      iSpeedRatio);
+      targetedAnimation->target, {targetedAnimation->animation}, iFrom.has_value() ? *iFrom : _from,
+      iTo.has_value() ? *iTo : _to, loop, iSpeedRatio);
     animatable->onAnimationEnd = [&]() -> void {
       onAnimationEndObservable.notifyObservers(targetedAnimation.get());
       _checkAnimationGroupEnded(animatable);
     };
-    animatable->onAnimationLoop = [this, &targetedAnimation]() -> void {
-      onAnimationLoopObservable.notifyObservers(targetedAnimation.get());
-    };
+    _processLoop(animatable, targetedAnimation.get(), index);
     _animatables.emplace_back(animatable);
+    ++index;
   }
 
   _speedRatio = iSpeedRatio;
@@ -321,8 +343,7 @@ AnimationGroup& AnimationGroup::goToFrame(float frame)
   return *this;
 }
 
-void AnimationGroup::dispose(bool /*doNotRecurse*/,
-                             bool /*disposeMaterialAndTextures*/)
+void AnimationGroup::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextures*/)
 {
   _targetedAnimations.clear();
   _animatables.clear();
@@ -333,14 +354,14 @@ void AnimationGroup::dispose(bool /*doNotRecurse*/,
   onAnimationGroupPauseObservable.clear();
   onAnimationGroupPlayObservable.clear();
   onAnimationLoopObservable.clear();
+  onAnimationGroupLoopObservable.clear();
 }
 
 void AnimationGroup::_checkAnimationGroupEnded(const AnimatablePtr& animatable)
 {
   // animatable should be taken out of the array
-  _animatables.erase(
-    std::remove(_animatables.begin(), _animatables.end(), animatable),
-    _animatables.end());
+  _animatables.erase(std::remove(_animatables.begin(), _animatables.end(), animatable),
+                     _animatables.end());
 
   // all animatables were removed? animation group ended!
   if (_animatables.empty()) {
@@ -351,16 +372,14 @@ void AnimationGroup::_checkAnimationGroupEnded(const AnimatablePtr& animatable)
 
 AnimationGroupPtr AnimationGroup::clone(
   const std::string& newName,
-  const std::function<IAnimatablePtr(const IAnimatablePtr& animatible)>&
-    targetConverter)
+  const std::function<IAnimatablePtr(const IAnimatablePtr& animatible)>& targetConverter)
 {
   auto newGroup = AnimationGroup::New(newName.empty() ? name : newName, _scene);
 
   for (const auto& targetAnimation : _targetedAnimations) {
     newGroup->addTargetedAnimation(targetAnimation->animation->clone(),
-                                   targetConverter ?
-                                     targetConverter(targetAnimation->target) :
-                                     targetAnimation->target);
+                                   targetConverter ? targetConverter(targetAnimation->target) :
+                                                     targetAnimation->target);
   }
 
   return newGroup;
@@ -371,8 +390,7 @@ json AnimationGroup::serialize() const
   return nullptr;
 }
 
-AnimationGroupPtr AnimationGroup::Parse(const json& /*parsedAnimationGroup*/,
-                                        Scene* /*scene*/)
+AnimationGroupPtr AnimationGroup::Parse(const json& /*parsedAnimationGroup*/, Scene* /*scene*/)
 {
   return nullptr;
 }

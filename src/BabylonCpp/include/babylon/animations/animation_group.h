@@ -52,13 +52,12 @@ public:
                                          const IAnimatablePtr& target);
 
   /**
-   * @brief This function will normalize every animation in the group to make
-   * sure they all go from beginFrame to endFrame It can add constant keys at
-   * begin or end
-   * @param beginFrame defines the new begin frame for all animations or the
-   * smallest begin frame of all animations if null (defaults to null)
-   * @param endFrame defines the new end frame for all animations or the largest
-   * end frame of all animations if null (defaults to null)
+   * @brief This function will normalize every animation in the group to make sure they all go from
+   * beginFrame to endFrame It can add constant keys at begin or end
+   * @param beginFrame defines the new begin frame for all animations or the smallest begin frame of
+   * all animations if null (defaults to null)
+   * @param endFrame defines the new end frame for all animations or the largest end frame of all
+   * animations if null (defaults to null)
    * @returns the animation group
    */
   AnimationGroup& normalize(const std::optional<int>& beginFrame = std::nullopt,
@@ -67,8 +66,7 @@ public:
   /**
    * @brief Start all animations on given targets.
    * @param loop defines if animations must loop
-   * @param speedRatio defines the ratio to apply to animation speed (1 by
-   * default)
+   * @param speedRatio defines the ratio to apply to animation speed (1 by default)
    * @param from defines the from key (optional)
    * @param to defines the to key (optional)
    * @returns the current animation group
@@ -85,8 +83,8 @@ public:
 
   /**
    * @brief Play all animations to initial state.
-   * This function will start() the animations if they were not started or will
-   * restart() them if they were paused
+   * This function will start() the animations if they were not started or will restart() them if
+   * they were paused
    * @param loop defines if animations must loop
    * @returns the animation group
    */
@@ -141,8 +139,8 @@ public:
   /**
    * @brief Clone the current animation group and returns a copy
    * @param newName defines the name of the new group
-   * @param targetConverter defines an optional function used to convert current
-   * animation targets to new ones
+   * @param targetConverter defines an optional function used to convert current animation targets
+   * to new ones
    * @returns the new aniamtion group
    */
   AnimationGroupPtr
@@ -190,7 +188,6 @@ protected:
    */
   AnimationGroup(const std::string& name, Scene* scene = nullptr);
 
-private:
   /**
    * @brief Gets the first frame.
    */
@@ -237,11 +234,13 @@ private:
   std::vector<std::unique_ptr<TargetedAnimation>>& get_targetedAnimations();
 
   /**
-   * @brief Returning the list of animatables controlled by this animation
-   * group.
+   * @brief Returning the list of animatables controlled by this animation group.
    */
   std::vector<AnimatablePtr>& get_animatables();
 
+private:
+  void _processLoop(const AnimatablePtr& animatable, TargetedAnimation* targetedAnimation,
+                    size_t index);
   void _checkAnimationGroupEnded(const AnimatablePtr& animatable);
 
 public:
@@ -264,6 +263,11 @@ public:
    * Observer raised when one animation loops
    */
   Observable<TargetedAnimation> onAnimationLoopObservable;
+
+  /**
+   * Observer raised when all animations have looped
+   */
+  Observable<AnimationGroup> onAnimationGroupLoopObservable;
 
   /**
    * This observable will notify when all animations have ended.
@@ -331,6 +335,8 @@ private:
   bool _isPaused;
   float _speedRatio;
   bool _loopAnimation;
+  size_t _animationLoopCount;
+  std::vector<bool> _animationLoopFlags;
 
 }; // end of class AnimationGroup
 
