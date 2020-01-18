@@ -2001,6 +2001,10 @@ AnimatablePtr Scene::beginDirectAnimation(const IAnimatablePtr& target,
                                           const std::function<void()>& onAnimationEnd,
                                           const std::function<void()>& onAnimationLoop)
 {
+  if (from > to && speedRatio > 0.f) {
+    speedRatio *= -1.f;
+  }
+
   return Animatable::New(this, target, from, to, loop, speedRatio, onAnimationEnd, _animations,
                          onAnimationLoop);
 }
@@ -2084,14 +2088,6 @@ void Scene::_animate()
     return;
   }
 
-  // Animatable::_animate can remove elements from _activeAnimatables
-  // we need to make a copy of it in order to iterate on a vector that
-  // will not be modified during the loop!
-  const auto animatables = _activeAnimatables;
-  if (animatables.empty()) {
-    return;
-  }
-
   // Getting time
   auto now = Time::highresTimepointNow();
   if (!_animationTimeLast.has_value()) {
@@ -2100,13 +2096,20 @@ void Scene::_animate()
     }
     _animationTimeLast = now;
   }
-  const auto iDeltaTime
-    = useConstantAnimationDeltaTime ?
-        16.f :
-        Time::fpTimeSince<size_t, std::milli>(*_animationTimeLast) * animationTimeScale;
-  _animationTime += static_cast<int>(iDeltaTime);
+  deltaTime = useConstantAnimationDeltaTime ?
+                16.f :
+                Time::fpTimeSince<size_t, std::milli>(*_animationTimeLast) * animationTimeScale;
+  _animationTimeLast = now;
+
+  // Animatable::_animate can remove elements from _activeAnimatables we need to make a copy of it
+  // in order to iterate on a vector that will not be modified during the loop!
+  const auto& animatables = _activeAnimatables;
+  if (animatables.empty()) {
+    return;
+  }
+
+  _animationTime += static_cast<int>(deltaTime);
   const auto& animationTime = _animationTime;
-  _animationTimeLast        = now;
 
   for (const auto& animatable : animatables) {
     if (animatable) {
