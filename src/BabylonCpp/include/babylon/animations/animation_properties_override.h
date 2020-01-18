@@ -24,7 +24,7 @@ struct BABYLON_SHARED_EXPORT AnimationPropertiesOverride {
   /**
    * Gets or sets the default loop mode to use.
    */
-  unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE();
+  unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE;
 
 }; // end of class AnimationPropertiesOverride
 

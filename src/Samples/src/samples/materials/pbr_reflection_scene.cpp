@@ -176,7 +176,7 @@ struct PbrReflectionScene : public IRenderableScene {
     // animations
     //
     Animation::CreateAndStartAnimation("anim0", mesh0, "rotation.y", 5, 30.f, 0.f, Math::PI2,
-                                       Animation::ANIMATIONLOOPMODE_CYCLE());
+                                       Animation::ANIMATIONLOOPMODE_CYCLE);
   }
 
 }; // end of struct PBRReflectionScene

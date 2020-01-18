@@ -75,7 +75,7 @@ void Bone::setProperty(const std::vector<std::string>& targetPropertyPath,
   if (animationType.has_value()) {
     if (targetPropertyPath.size() == 1) {
       const auto& target = targetPropertyPath[0];
-      if (*animationType == Animation::ANIMATIONTYPE_MATRIX()) {
+      if (*animationType == Animation::ANIMATIONTYPE_MATRIX) {
         auto matrixValue = value.get<Matrix>();
         if (target == "_matrix") {
           _matrix = matrixValue;
@@ -366,7 +366,7 @@ bool Bone::copyAnimationRange(Bone* source, const std::string& rangeName, int fr
   // animation
   if (animations.empty()) {
     animations.emplace_back(Animation::New(name, "_matrix", source->animations[0]->framePerSecond,
-                                           Animation::ANIMATIONTYPE_MATRIX(), 0));
+                                           Animation::ANIMATIONTYPE_MATRIX, 0));
     animations[0]->setKeys({});
   }
 

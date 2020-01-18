@@ -9,7 +9,7 @@
 namespace BABYLON {
 
 BackEasePtr BouncingBehavior::_EasingFunction = BackEase::New(0.3f);
-unsigned int BouncingBehavior::EasingMode = EasingFunction::EASINGMODE_EASEOUT;
+unsigned int BouncingBehavior::EasingMode     = EasingFunction::EASINGMODE_EASEOUT;
 
 BouncingBehavior::BouncingBehavior()
     : transitionDuration{450.f}
@@ -52,18 +52,18 @@ void BouncingBehavior::set_autoTransitionRange(bool value)
   }
 
   if (value) {
-    _onMeshTargetChangedObserver = camera->onMeshTargetChangedObservable.add(
-      [this](AbstractMesh* mesh, EventState&) {
-        if (!mesh) {
-          return;
-        }
+    _onMeshTargetChangedObserver
+      = camera->onMeshTargetChangedObservable.add([this](AbstractMesh* mesh, EventState&) {
+          if (!mesh) {
+            return;
+          }
 
-        mesh->computeWorldMatrix(true);
-        auto diagonal = mesh->getBoundingInfo()->diagonalLength();
+          mesh->computeWorldMatrix(true);
+          auto diagonal = mesh->getBoundingInfo()->diagonalLength();
 
-        lowerRadiusTransitionRange = diagonal * 0.05f;
-        upperRadiusTransitionRange = diagonal * 0.05f;
-      });
+          lowerRadiusTransitionRange = diagonal * 0.05f;
+          upperRadiusTransitionRange = diagonal * 0.05f;
+        });
   }
   else if (_onMeshTargetChangedObserver) {
     camera->onMeshTargetChangedObservable.remove(_onMeshTargetChangedObserver);
@@ -75,9 +75,8 @@ void BouncingBehavior::init()
   // Do nothing
 }
 
-void BouncingBehavior::attach(
-  const ArcRotateCameraPtr& camera,
-  const std::function<bool(const AbstractMeshPtr& m)>& /*predicate*/)
+void BouncingBehavior::attach(const ArcRotateCameraPtr& camera,
+                              const std::function<bool(const AbstractMeshPtr& m)>& /*predicate*/)
 {
   _attachedCamera = camera;
   _onAfterCheckInputsObserver
@@ -104,12 +103,10 @@ void BouncingBehavior::detach()
     return;
   }
   if (_onAfterCheckInputsObserver) {
-    _attachedCamera->onAfterCheckInputsObservable.remove(
-      _onAfterCheckInputsObserver);
+    _attachedCamera->onAfterCheckInputsObservable.remove(_onAfterCheckInputsObserver);
   }
   if (_onMeshTargetChangedObserver) {
-    _attachedCamera->onMeshTargetChangedObservable.remove(
-      _onMeshTargetChangedObserver);
+    _attachedCamera->onMeshTargetChangedObservable.remove(_onMeshTargetChangedObserver);
   }
   _attachedCamera = nullptr;
 }
@@ -132,24 +129,22 @@ void BouncingBehavior::_applyBoundRadiusAnimation(float radiusDelta)
   }
 
   if (!_radiusBounceTransition) {
-    BouncingBehavior::_EasingFunction->setEasingMode(
-      BouncingBehavior::EasingMode);
-    _radiusBounceTransition
-      = Animation::CreateAnimation("radius", Animation::ANIMATIONTYPE_FLOAT(),
-                                   60, BouncingBehavior::_EasingFunction);
+    BouncingBehavior::_EasingFunction->setEasingMode(BouncingBehavior::EasingMode);
+    _radiusBounceTransition = Animation::CreateAnimation("radius", Animation::ANIMATIONTYPE_FLOAT,
+                                                         60, BouncingBehavior::_EasingFunction);
   }
   // Prevent zoom until bounce has completed
-  _cachedWheelPrecision           = _attachedCamera->wheelPrecision;
-  _attachedCamera->wheelPrecision = std::numeric_limits<float>::infinity();
+  _cachedWheelPrecision                 = _attachedCamera->wheelPrecision;
+  _attachedCamera->wheelPrecision       = std::numeric_limits<float>::infinity();
   _attachedCamera->inertialRadiusOffset = 0.f;
 
   // Animate to the radius limit
   stopAllAnimations();
   _radiusIsAnimating = true;
-  auto animatable    = Animation::TransitionTo(
-    "radius", _attachedCamera->radius + radiusDelta, _attachedCamera.get(),
-    _attachedCamera->getScene(), 60, _radiusBounceTransition,
-    transitionDuration, [this]() { _clearAnimationLocks(); });
+  auto animatable    = Animation::TransitionTo("radius", _attachedCamera->radius + radiusDelta,
+                                            _attachedCamera.get(), _attachedCamera->getScene(), 60,
+                                            _radiusBounceTransition, transitionDuration,
+                                            [this]() { _clearAnimationLocks(); });
 
   if (animatable) {
     _animatables.emplace_back(animatable);

@@ -146,18 +146,18 @@ public:
     };
 
     // Create 8 animations
-    auto a1 = Animation::New("at", "position.y", 30, Animation::ANIMATIONTYPE_FLOAT(),
-                             Animation::ANIMATIONLOOPMODE_CYCLE());
-    auto a2 = Animation::New("a2", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT(),
-                             Animation::ANIMATIONLOOPMODE_CYCLE());
-    auto a3 = Animation::New("a3", "rotation.x", 30, Animation::ANIMATIONTYPE_FLOAT(),
-                             Animation::ANIMATIONLOOPMODE_CYCLE());
-    auto a4 = Animation::New("a4", "material.diffuseColor", 30, Animation::ANIMATIONTYPE_COLOR3(),
-                             Animation::ANIMATIONLOOPMODE_CYCLE());
-    auto a5 = Animation::New("a5", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT(),
-                             Animation::ANIMATIONLOOPMODE_CYCLE());
-    auto a6 = Animation::New("a6", "rotation.y", 30, Animation::ANIMATIONTYPE_FLOAT(),
-                             Animation::ANIMATIONLOOPMODE_CYCLE());
+    auto a1 = Animation::New("at", "position.y", 30, Animation::ANIMATIONTYPE_FLOAT,
+                             Animation::ANIMATIONLOOPMODE_CYCLE);
+    auto a2 = Animation::New("a2", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT,
+                             Animation::ANIMATIONLOOPMODE_CYCLE);
+    auto a3 = Animation::New("a3", "rotation.x", 30, Animation::ANIMATIONTYPE_FLOAT,
+                             Animation::ANIMATIONLOOPMODE_CYCLE);
+    auto a4 = Animation::New("a4", "material.diffuseColor", 30, Animation::ANIMATIONTYPE_COLOR3,
+                             Animation::ANIMATIONLOOPMODE_CYCLE);
+    auto a5 = Animation::New("a5", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT,
+                             Animation::ANIMATIONLOOPMODE_CYCLE);
+    auto a6 = Animation::New("a6", "rotation.y", 30, Animation::ANIMATIONTYPE_FLOAT,
+                             Animation::ANIMATIONLOOPMODE_CYCLE);
 
     // Set the animation keys
     a1->setKeys(keys1);
@@ -201,13 +201,11 @@ public:
     /** a7a - a7b - easing animations on shape 7 **/
 
     // Create animations at7 and at7b
-    auto a7a
-      = Animation::New("shape7EasingAnimation", "position", 30, Animation::ANIMATIONTYPE_VECTOR3(),
-                       Animation::ANIMATIONLOOPMODE_CYCLE());
+    auto a7a = Animation::New("shape7EasingAnimation", "position", 30,
+                              Animation::ANIMATIONTYPE_VECTOR3, Animation::ANIMATIONLOOPMODE_CYCLE);
 
-    auto a7b
-      = Animation::New("shape7EasingAnimationb", "rotation", 30, Animation::ANIMATIONTYPE_VECTOR3(),
-                       Animation::ANIMATIONLOOPMODE_CYCLE());
+    auto a7b = Animation::New("shape7EasingAnimationb", "rotation", 30,
+                              Animation::ANIMATIONTYPE_VECTOR3, Animation::ANIMATIONLOOPMODE_CYCLE);
 
     // Animation keys
     std::vector<IAnimationKey> keys7{

@@ -4,12 +4,12 @@
 
 #include <babylon/animations/animation.h>
 #include <babylon/babylon_stl_util.h>
-#include <babylon/misc/string_tools.h>
 #include <babylon/core/time.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/maths/axis.h>
 #include <babylon/maths/tmp_vectors.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -89,7 +89,7 @@ void TargetCamera::setProperty(const std::vector<std::string>& targetPropertyPat
   if (animationType.has_value()) {
     if (targetPropertyPath.size() == 1) {
       const auto& target = targetPropertyPath[0];
-      if (*animationType == Animation::ANIMATIONTYPE_VECTOR3()) {
+      if (*animationType == Animation::ANIMATIONTYPE_VECTOR3) {
         auto vector3Value = value.get<Vector3>();
         // Position
         if (target == "position") {
@@ -104,7 +104,7 @@ void TargetCamera::setProperty(const std::vector<std::string>& targetPropertyPat
     if (targetPropertyPath.size() == 2) {
       const auto& target = targetPropertyPath[0];
       const auto& key    = targetPropertyPath[1];
-      if (*animationType == Animation::ANIMATIONTYPE_FLOAT()) {
+      if (*animationType == Animation::ANIMATIONTYPE_FLOAT) {
         const auto& floatValue = value.get<float>();
         // Position
         if (target == "position") {

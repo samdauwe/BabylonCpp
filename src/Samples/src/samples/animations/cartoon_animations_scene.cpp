@@ -99,9 +99,8 @@ public:
     /********* Animations *************/
 
     // -- For camera to sweep round --
-    auto rotate
-      = Animation::New("rotate", "rotation.y", frameRate, Animation::ANIMATIONTYPE_FLOAT(),
-                       Animation::ANIMATIONLOOPMODE_CONSTANT());
+    auto rotate = Animation::New("rotate", "rotation.y", frameRate, Animation::ANIMATIONTYPE_FLOAT,
+                                 Animation::ANIMATIONLOOPMODE_CONSTANT);
 
     // Create rotate animation keys
     std::vector<IAnimationKey> rotateKeys{
@@ -115,9 +114,8 @@ public:
     rotate->setKeys(rotateKeys);
 
     // -- For camera move forward --
-    auto movein
-      = Animation::New("movein", "position", frameRate, Animation::ANIMATIONTYPE_VECTOR3(),
-                       Animation::ANIMATIONLOOPMODE_CONSTANT());
+    auto movein = Animation::New("movein", "position", frameRate, Animation::ANIMATIONTYPE_VECTOR3,
+                                 Animation::ANIMATIONLOOPMODE_CONSTANT);
 
     // Create movein animation keys
     std::vector<IAnimationKey> moveinKeys{
@@ -131,8 +129,8 @@ public:
     movein->setKeys(moveinKeys);
 
     // -- For door to open and close --
-    auto sweep = Animation::New("sweep", "rotation.y", frameRate, Animation::ANIMATIONTYPE_FLOAT(),
-                                Animation::ANIMATIONLOOPMODE_CONSTANT());
+    auto sweep = Animation::New("sweep", "rotation.y", frameRate, Animation::ANIMATIONTYPE_FLOAT,
+                                Animation::ANIMATIONLOOPMODE_CONSTANT);
 
     // Create sweep animation keys
     std::vector<IAnimationKey> sweepKeys{
@@ -148,8 +146,8 @@ public:
 
     // -- For light to brighten and dim --
     auto lightDimmer
-      = Animation::New("dimmer", "intensity", frameRate, Animation::ANIMATIONTYPE_FLOAT(),
-                       Animation::ANIMATIONLOOPMODE_CONSTANT());
+      = Animation::New("dimmer", "intensity", frameRate, Animation::ANIMATIONTYPE_FLOAT,
+                       Animation::ANIMATIONLOOPMODE_CONSTANT);
 
     // Create light dimmer animation keys
     std::vector<IAnimationKey> lightKeys{

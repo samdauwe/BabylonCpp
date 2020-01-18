@@ -13,25 +13,21 @@
 namespace BABYLON {
 
 ExponentialEasePtr FramingBehavior::_EasingFunction = ExponentialEase::New();
-unsigned int FramingBehavior::EasingMode = EasingFunction::EASINGMODE_EASEINOUT;
+unsigned int FramingBehavior::EasingMode            = EasingFunction::EASINGMODE_EASEINOUT;
 
 FramingBehavior::FramingBehavior()
     : mode{this, &FramingBehavior::get_mode, &FramingBehavior::set_mode}
-    , radiusScale{this, &FramingBehavior::get_radiusScale,
-                  &FramingBehavior::set_radiusScale}
-    , positionScale{this, &FramingBehavior::get_positionScale,
-                    &FramingBehavior::set_positionScale}
+    , radiusScale{this, &FramingBehavior::get_radiusScale, &FramingBehavior::set_radiusScale}
+    , positionScale{this, &FramingBehavior::get_positionScale, &FramingBehavior::set_positionScale}
     , defaultElevation{this, &FramingBehavior::get_defaultElevation,
                        &FramingBehavior::set_defaultElevation}
     , elevationReturnTime{this, &FramingBehavior::get_elevationReturnTime,
                           &FramingBehavior::set_elevationReturnTime}
-    , elevationReturnWaitTime{this,
-                              &FramingBehavior::get_elevationReturnWaitTime,
+    , elevationReturnWaitTime{this, &FramingBehavior::get_elevationReturnWaitTime,
                               &FramingBehavior::set_elevationReturnWaitTime}
     , zoomStopsAnimation{this, &FramingBehavior::get_zoomStopsAnimation,
                          &FramingBehavior::set_zoomStopsAnimation}
-    , framingTime{this, &FramingBehavior::get_framingTime,
-                  &FramingBehavior::set_framingTime}
+    , framingTime{this, &FramingBehavior::get_framingTime, &FramingBehavior::set_framingTime}
     , autoCorrectCameraLimitsAndSensibility{true}
     , _mode{FramingBehavior::FitFrustumSidesMode}
     , _radiusScale{1.f}
@@ -145,33 +141,32 @@ void FramingBehavior::init()
   // Do nothing
 }
 
-void FramingBehavior::attach(
-  const ArcRotateCameraPtr& camera,
-  const std::function<bool(const AbstractMeshPtr& m)>& /*predicate*/)
+void FramingBehavior::attach(const ArcRotateCameraPtr& camera,
+                             const std::function<bool(const AbstractMeshPtr& m)>& /*predicate*/)
 {
   _attachedCamera = camera;
   auto scene      = _attachedCamera->getScene();
 
   FramingBehavior::_EasingFunction->setEasingMode(FramingBehavior::EasingMode);
 
-  _onPrePointerObservableObserver = scene->onPrePointerObservable.add(
-    [this](PointerInfoPre* pointerInfoPre, EventState&) {
-      if (pointerInfoPre->type == PointerEventTypes::POINTERDOWN) {
-        _isPointerDown = true;
-        return;
-      }
+  _onPrePointerObservableObserver
+    = scene->onPrePointerObservable.add([this](PointerInfoPre* pointerInfoPre, EventState&) {
+        if (pointerInfoPre->type == PointerEventTypes::POINTERDOWN) {
+          _isPointerDown = true;
+          return;
+        }
 
-      if (pointerInfoPre->type == PointerEventTypes::POINTERUP) {
-        _isPointerDown = false;
-      }
-    });
+        if (pointerInfoPre->type == PointerEventTypes::POINTERUP) {
+          _isPointerDown = false;
+        }
+      });
 
-  _onMeshTargetChangedObserver = camera->onMeshTargetChangedObservable.add(
-    [this](AbstractMesh* mesh, EventState&) {
-      if (mesh) {
-        zoomOnMesh(mesh);
-      }
-    });
+  _onMeshTargetChangedObserver
+    = camera->onMeshTargetChangedObservable.add([this](AbstractMesh* mesh, EventState&) {
+        if (mesh) {
+          zoomOnMesh(mesh);
+        }
+      });
 
   _onAfterCheckInputsObserver
     = camera->onAfterCheckInputsObservable.add([this](Camera*, EventState&) {
@@ -199,13 +194,11 @@ void FramingBehavior::detach()
   }
 
   if (_onAfterCheckInputsObserver) {
-    _attachedCamera->onAfterCheckInputsObservable.remove(
-      _onAfterCheckInputsObserver);
+    _attachedCamera->onAfterCheckInputsObservable.remove(_onAfterCheckInputsObserver);
   }
 
   if (_onMeshTargetChangedObserver) {
-    _attachedCamera->onMeshTargetChangedObservable.remove(
-      _onMeshTargetChangedObserver);
+    _attachedCamera->onMeshTargetChangedObservable.remove(_onMeshTargetChangedObserver);
   }
 
   _attachedCamera = nullptr;
@@ -217,30 +210,26 @@ void FramingBehavior::zoomOnMesh(AbstractMesh* mesh, bool focusOnOriginXZ,
   mesh->computeWorldMatrix(true);
 
   const auto& boundingBox = mesh->getBoundingInfo()->boundingBox;
-  zoomOnBoundingInfo(boundingBox.minimumWorld, boundingBox.maximumWorld,
-                     focusOnOriginXZ, onAnimationEnd);
+  zoomOnBoundingInfo(boundingBox.minimumWorld, boundingBox.maximumWorld, focusOnOriginXZ,
+                     onAnimationEnd);
 }
 
-void FramingBehavior::zoomOnMeshHierarchy(
-  AbstractMesh* mesh, bool focusOnOriginXZ,
-  const std::function<void()>& onAnimationEnd)
+void FramingBehavior::zoomOnMeshHierarchy(AbstractMesh* mesh, bool focusOnOriginXZ,
+                                          const std::function<void()>& onAnimationEnd)
 {
   mesh->computeWorldMatrix(true);
 
   auto boundingBox = mesh->getHierarchyBoundingVectors(true);
-  zoomOnBoundingInfo(boundingBox.min, boundingBox.max, focusOnOriginXZ,
-                     onAnimationEnd);
+  zoomOnBoundingInfo(boundingBox.min, boundingBox.max, focusOnOriginXZ, onAnimationEnd);
 }
 
-void FramingBehavior::zoomOnMeshesHierarchy(
-  const std::vector<AbstractMesh*>& meshes, bool focusOnOriginXZ,
-  const std::function<void()>& onAnimationEnd)
+void FramingBehavior::zoomOnMeshesHierarchy(const std::vector<AbstractMesh*>& meshes,
+                                            bool focusOnOriginXZ,
+                                            const std::function<void()>& onAnimationEnd)
 {
-  Vector3 min(std::numeric_limits<float>::max(),
-              std::numeric_limits<float>::max(),
+  Vector3 min(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
               std::numeric_limits<float>::max());
-  Vector3 max(std::numeric_limits<float>::lowest(),
-              std::numeric_limits<float>::lowest(),
+  Vector3 max(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(),
               std::numeric_limits<float>::lowest());
 
   for (auto& mesh : meshes) {
@@ -252,9 +241,9 @@ void FramingBehavior::zoomOnMeshesHierarchy(
   zoomOnBoundingInfo(min, max, focusOnOriginXZ, onAnimationEnd);
 }
 
-void FramingBehavior::zoomOnBoundingInfo(
-  const Vector3& minimumWorld, const Vector3& maximumWorld,
-  bool focusOnOriginXZ, const std::function<void()>& onAnimationEnd)
+void FramingBehavior::zoomOnBoundingInfo(const Vector3& minimumWorld, const Vector3& maximumWorld,
+                                         bool focusOnOriginXZ,
+                                         const std::function<void()>& onAnimationEnd)
 {
   Vector3 zoomTarget;
 
@@ -278,15 +267,14 @@ void FramingBehavior::zoomOnBoundingInfo(
   }
 
   if (!_vectorTransition) {
-    _vectorTransition
-      = Animation::CreateAnimation("target", Animation::ANIMATIONTYPE_VECTOR3(),
-                                   60, FramingBehavior::_EasingFunction);
+    _vectorTransition = Animation::CreateAnimation("target", Animation::ANIMATIONTYPE_VECTOR3, 60,
+                                                   FramingBehavior::_EasingFunction);
   }
 
   _betaIsAnimating = true;
-  auto animatable  = Animation::TransitionTo(
-    "target", zoomTarget, _attachedCamera.get(), _attachedCamera->getScene(),
-    60, _vectorTransition, _framingTime);
+  auto animatable
+    = Animation::TransitionTo("target", zoomTarget, _attachedCamera.get(),
+                              _attachedCamera->getScene(), 60, _vectorTransition, _framingTime);
 
   if (animatable) {
     _animatables.emplace_back(animatable);
@@ -296,19 +284,15 @@ void FramingBehavior::zoomOnBoundingInfo(
   // Small delta ensures camera is not always at lower zoom limit.
   auto radius = 0.f;
   if (_mode == FramingBehavior::FitFrustumSidesMode) {
-    auto position = _calculateLowerRadiusFromModelBoundingSphere(minimumWorld,
-                                                                 maximumWorld);
+    auto position = _calculateLowerRadiusFromModelBoundingSphere(minimumWorld, maximumWorld);
     if (autoCorrectCameraLimitsAndSensibility) {
-      _attachedCamera->lowerRadiusLimit
-        = radiusWorld.length() + _attachedCamera->minZ;
+      _attachedCamera->lowerRadiusLimit = radiusWorld.length() + _attachedCamera->minZ;
     }
     radius = position;
   }
   else if (_mode == FramingBehavior::IgnoreBoundsSizeMode) {
-    radius = _calculateLowerRadiusFromModelBoundingSphere(minimumWorld,
-                                                          maximumWorld);
-    if (autoCorrectCameraLimitsAndSensibility
-        && _attachedCamera->lowerRadiusLimit == 0.f) {
+    radius = _calculateLowerRadiusFromModelBoundingSphere(minimumWorld, maximumWorld);
+    if (autoCorrectCameraLimitsAndSensibility && _attachedCamera->lowerRadiusLimit == 0.f) {
       _attachedCamera->lowerRadiusLimit = _attachedCamera->minZ;
     }
   }
@@ -323,31 +307,30 @@ void FramingBehavior::zoomOnBoundingInfo(
 
   // transition to new radius
   if (!_radiusTransition) {
-    _radiusTransition
-      = Animation::CreateAnimation("radius", Animation::ANIMATIONTYPE_FLOAT(),
-                                   60, FramingBehavior::_EasingFunction);
+    _radiusTransition = Animation::CreateAnimation("radius", Animation::ANIMATIONTYPE_FLOAT, 60,
+                                                   FramingBehavior::_EasingFunction);
   }
 
-  animatable = Animation::TransitionTo(
-    "radius", radius, _attachedCamera.get(), _attachedCamera->getScene(), 60,
-    _radiusTransition, _framingTime, [this, &onAnimationEnd]() {
-      stopAllAnimations();
-      if (onAnimationEnd) {
-        onAnimationEnd();
-      }
+  animatable
+    = Animation::TransitionTo("radius", radius, _attachedCamera.get(), _attachedCamera->getScene(),
+                              60, _radiusTransition, _framingTime, [this, &onAnimationEnd]() {
+                                stopAllAnimations();
+                                if (onAnimationEnd) {
+                                  onAnimationEnd();
+                                }
 
-      if (_attachedCamera && _attachedCamera->useInputToRestoreState) {
-        _attachedCamera->storeState();
-      }
-    });
+                                if (_attachedCamera && _attachedCamera->useInputToRestoreState) {
+                                  _attachedCamera->storeState();
+                                }
+                              });
 
   if (animatable) {
     _animatables.emplace_back(animatable);
   }
 }
 
-float FramingBehavior::_calculateLowerRadiusFromModelBoundingSphere(
-  const Vector3& minimumWorld, const Vector3& maximumWorld)
+float FramingBehavior::_calculateLowerRadiusFromModelBoundingSphere(const Vector3& minimumWorld,
+                                                                    const Vector3& maximumWorld)
 {
   auto size                    = maximumWorld.subtract(minimumWorld);
   auto boxVectorGlobalDiagonal = size.length();
@@ -364,27 +347,21 @@ float FramingBehavior::_calculateLowerRadiusFromModelBoundingSphere(
     = radius * std::sqrt(1.f + 1.f / (frustumSlope.x * frustumSlope.x));
   auto distanceForVerticalFrustum
     = radius * std::sqrt(1.f + 1.f / (frustumSlope.y * frustumSlope.y));
-  auto distance
-    = std::max(distanceForHorizontalFrustum, distanceForVerticalFrustum);
-  auto camera = _attachedCamera;
+  auto distance = std::max(distanceForHorizontalFrustum, distanceForVerticalFrustum);
+  auto camera   = _attachedCamera;
 
   if (!camera) {
     return 0.f;
   }
 
-  if (camera->lowerRadiusLimit.has_value()
-      && _mode == FramingBehavior::IgnoreBoundsSizeMode) {
+  if (camera->lowerRadiusLimit.has_value() && _mode == FramingBehavior::IgnoreBoundsSizeMode) {
     // Don't exceed the requested limit
-    distance = distance < *camera->lowerRadiusLimit ?
-                 *camera->lowerRadiusLimit :
-                 distance;
+    distance = distance < *camera->lowerRadiusLimit ? *camera->lowerRadiusLimit : distance;
   }
 
   // Don't exceed the upper radius limit
   if (camera->upperRadiusLimit.has_value()) {
-    distance = distance > *camera->upperRadiusLimit ?
-                 *camera->upperRadiusLimit :
-                 distance;
+    distance = distance > *camera->upperRadiusLimit ? *camera->upperRadiusLimit : distance;
   }
 
   return distance;
@@ -396,11 +373,10 @@ void FramingBehavior::_maintainCameraAboveGround()
     return;
   }
 
-  auto now = Time::highresTimepointNow();
-  auto timeSinceInteraction
-    = Time::fpTimeDiff<float, std::milli>(now, _lastInteractionTime);
-  auto defaultBeta = Math::PI * 0.5f - _defaultElevation;
-  auto limitBeta   = Math::PI * 0.5f;
+  auto now                  = Time::highresTimepointNow();
+  auto timeSinceInteraction = Time::fpTimeDiff<float, std::milli>(now, _lastInteractionTime);
+  auto defaultBeta          = Math::PI * 0.5f - _defaultElevation;
+  auto limitBeta            = Math::PI * 0.5f;
 
   // Bring the camera back up if below the ground plane
   if (_attachedCamera && !_betaIsAnimating && _attachedCamera->beta > limitBeta
@@ -411,17 +387,16 @@ void FramingBehavior::_maintainCameraAboveGround()
     stopAllAnimations();
 
     if (!_betaTransition) {
-      _betaTransition
-        = Animation::CreateAnimation("beta", Animation::ANIMATIONTYPE_FLOAT(),
-                                     60, FramingBehavior::_EasingFunction);
+      _betaTransition = Animation::CreateAnimation("beta", Animation::ANIMATIONTYPE_FLOAT, 60,
+                                                   FramingBehavior::_EasingFunction);
     }
 
-    auto animatabe = Animation::TransitionTo(
-      "beta", defaultBeta, _attachedCamera.get(), _attachedCamera->getScene(),
-      60, _betaTransition, _elevationReturnTime, [this]() {
-        _clearAnimationLocks();
-        stopAllAnimations();
-      });
+    auto animatabe = Animation::TransitionTo("beta", defaultBeta, _attachedCamera.get(),
+                                             _attachedCamera->getScene(), 60, _betaTransition,
+                                             _elevationReturnTime, [this]() {
+                                               _clearAnimationLocks();
+                                               stopAllAnimations();
+                                             });
 
     if (animatabe) {
       _animatables.emplace_back();
@@ -492,8 +467,7 @@ bool FramingBehavior::isUserIsMoving() const
          || !stl_util::almost_equal(_attachedCamera->inertialBetaOffset, 0.f)
          || !stl_util::almost_equal(_attachedCamera->inertialRadiusOffset, 0.f)
          || !stl_util::almost_equal(_attachedCamera->inertialPanningX, 0.f)
-         || !stl_util::almost_equal(_attachedCamera->inertialPanningY, 0.f)
-         || _isPointerDown;
+         || !stl_util::almost_equal(_attachedCamera->inertialPanningY, 0.f) || _isPointerDown;
 }
 
 } // end of namespace BABYLON

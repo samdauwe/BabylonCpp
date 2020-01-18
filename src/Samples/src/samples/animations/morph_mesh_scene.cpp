@@ -73,8 +73,8 @@ public:
          * Animations
          */
         auto anim
-          = Animation::New("InfluenceAnimation", "influence", 10, Animation::ANIMATIONTYPE_FLOAT(),
-                           Animation::ANIMATIONLOOPMODE_RELATIVE());
+          = Animation::New("InfluenceAnimation", "influence", 10, Animation::ANIMATIONTYPE_FLOAT,
+                           Animation::ANIMATIONLOOPMODE_RELATIVE);
         std::vector<IAnimationKey> keyframes{
           IAnimationKey(0, AnimationValue(0.f)),
           IAnimationKey(10, AnimationValue(1.f)),

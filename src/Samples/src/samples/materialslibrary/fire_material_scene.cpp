@@ -84,8 +84,8 @@ public:
                                       ));
     }
 
-    auto anim = Animation::New("anim", "intensity", 1, Animation::ANIMATIONTYPE_FLOAT(),
-                               Animation::ANIMATIONLOOPMODE_CYCLE());
+    auto anim = Animation::New("anim", "intensity", 1, Animation::ANIMATIONTYPE_FLOAT,
+                               Animation::ANIMATIONLOOPMODE_CYCLE);
     anim->setKeys(keys);
 
     light2->animations.emplace_back(anim);

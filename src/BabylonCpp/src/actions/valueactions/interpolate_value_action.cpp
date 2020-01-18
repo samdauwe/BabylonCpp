@@ -13,11 +13,12 @@
 
 namespace BABYLON {
 
-InterpolateValueAction::InterpolateValueAction(
-  unsigned int iTriggerOptions, const IAnimatablePtr& target,
-  const std::string& iPropertyPath, AnimationValue* iValue, int iDuration,
-  Condition* condition, bool iStopOtherAnimations,
-  const std::function<void()>& iOnInterpolationDone)
+InterpolateValueAction::InterpolateValueAction(unsigned int iTriggerOptions,
+                                               const IAnimatablePtr& target,
+                                               const std::string& iPropertyPath,
+                                               AnimationValue* iValue, int iDuration,
+                                               Condition* condition, bool iStopOtherAnimations,
+                                               const std::function<void()>& iOnInterpolationDone)
     : Action(iTriggerOptions, condition)
     , propertyPath{iPropertyPath}
     , value{iValue}
@@ -40,20 +41,17 @@ void InterpolateValueAction::_prepare()
 void InterpolateValueAction::execute(const std::optional<IActionEvent>& /*evt*/)
 {
   auto scene = _actionManager->getScene();
-  std::vector<IAnimationKey> keys{
-    IAnimationKey(0, _effectiveTarget->getProperty({_property})), //
-    IAnimationKey(100, *value)};
+  std::vector<IAnimationKey> keys{IAnimationKey(0, _effectiveTarget->getProperty({_property})), //
+                                  IAnimationKey(100, *value)};
 
   auto dataType = value->animationType();
   if (!dataType.has_value()) {
-    BABYLON_LOG_WARN("InterpolateValueAction",
-                     "InterpolateValueAction: Unsupported type")
+    BABYLON_LOG_WARN("InterpolateValueAction", "InterpolateValueAction: Unsupported type")
   }
 
-  auto animation
-    = Animation::New("InterpolateValueAction", _property,
-                     static_cast<size_t>(100 * (1000.f / float(duration))),
-                     dataType.value(), Animation::ANIMATIONLOOPMODE_CONSTANT());
+  auto animation = Animation::New("InterpolateValueAction", _property,
+                                  static_cast<size_t>(100 * (1000.f / float(duration))),
+                                  dataType.value(), Animation::ANIMATIONLOOPMODE_CONSTANT);
 
   animation->setKeys(keys);
 
@@ -68,8 +66,7 @@ void InterpolateValueAction::execute(const std::optional<IActionEvent>& /*evt*/)
     }
   };
 
-  scene->beginDirectAnimation(_effectiveTarget, {animation}, 0, 100, false, 1,
-                              wrapper);
+  scene->beginDirectAnimation(_effectiveTarget, {animation}, 0, 100, false, 1, wrapper);
 }
 
 json InterpolateValueAction::serialize(json& /*parent*/) const

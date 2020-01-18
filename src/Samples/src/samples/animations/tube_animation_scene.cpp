@@ -83,8 +83,8 @@ struct TubeAnimationScene : public IRenderableScene {
 
     // Animation on position
     auto cubeAnimation
-      = Animation::New("myAnimation", "position", 30, Animation::ANIMATIONTYPE_VECTOR3(),
-                       Animation::ANIMATIONLOOPMODE_CYCLE());
+      = Animation::New("myAnimation", "position", 30, Animation::ANIMATIONTYPE_VECTOR3,
+                       Animation::ANIMATIONLOOPMODE_CYCLE);
 
     // Animation keys
     std::vector<IAnimationKey> keys;
@@ -100,7 +100,7 @@ struct TubeAnimationScene : public IRenderableScene {
     // Animation on rotation
     auto cubeRotationAnimation
       = Animation::New("rotateAnimation", "rotationQuaternion", 30,
-                       Animation::ANIMATIONTYPE_QUATERNION(), Animation::ANIMATIONLOOPMODE_CYCLE());
+                       Animation::ANIMATIONTYPE_QUATERNION, Animation::ANIMATIONLOOPMODE_CYCLE);
 
     // Animation keys
     std::vector<IAnimationKey> rotationKeys;

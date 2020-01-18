@@ -13,9 +13,8 @@
 
 namespace BABYLON {
 
-RuntimeAnimation::RuntimeAnimation(const IAnimatablePtr& iTarget,
-                                   const AnimationPtr& animation, Scene* scene,
-                                   Animatable* host)
+RuntimeAnimation::RuntimeAnimation(const IAnimatablePtr& iTarget, const AnimationPtr& animation,
+                                   Scene* scene, Animatable* host)
     : currentFrame{this, &RuntimeAnimation::get_currentFrame}
     , weight{this, &RuntimeAnimation::get_weight}
     , currentValue{this, &RuntimeAnimation::get_currentValue}
@@ -47,8 +46,7 @@ RuntimeAnimation::RuntimeAnimation(const IAnimatablePtr& iTarget,
   _animationState.repeatCount = 0;
   _animationState.loopMode    = _getCorrectLoopMode();
 
-  if (_animation->dataType
-      == static_cast<int>(Animation::ANIMATIONTYPE_MATRIX())) {
+  if (_animation->dataType == static_cast<int>(Animation::ANIMATIONTYPE_MATRIX)) {
     _animationState.workValue = Matrix::Zero();
   }
 
@@ -91,8 +89,7 @@ RuntimeAnimation::RuntimeAnimation(const IAnimatablePtr& iTarget,
 
 RuntimeAnimation::~RuntimeAnimation() = default;
 
-void RuntimeAnimation::addToRuntimeAnimations(
-  const RuntimeAnimationPtr& animation)
+void RuntimeAnimation::addToRuntimeAnimations(const RuntimeAnimationPtr& animation)
 {
   _animation->_runtimeAnimations.emplace_back(animation);
 }
@@ -122,8 +119,7 @@ IAnimatablePtr& RuntimeAnimation::get_target()
   return _currentActiveTarget;
 }
 
-void RuntimeAnimation::_preparePath(const IAnimatablePtr& iTarget,
-                                    unsigned int targetIndex)
+void RuntimeAnimation::_preparePath(const IAnimatablePtr& iTarget, unsigned int targetIndex)
 {
   const auto& targetPropertyPath = _animation->targetPropertyPath;
 
@@ -176,8 +172,7 @@ void RuntimeAnimation::dispose()
   stl_util::remove_vector_elements_equal_sharedptr(_animation->runtimeAnimations(), this);
 }
 
-void RuntimeAnimation::setValue(const AnimationValue& iCurrentValue,
-                                float iWeight)
+void RuntimeAnimation::setValue(const AnimationValue& iCurrentValue, float iWeight)
 {
   _setValue(_target, _directTarget, iCurrentValue, iWeight);
 }
@@ -195,8 +190,7 @@ void RuntimeAnimation::_getOriginalValues(unsigned int targetIndex)
   AnimationValue originalValue;
   auto& iTarget = _activeTargets[targetIndex];
 
-  if (iTarget->getRestPose().has_value()
-      && _targetPath == "_matrix") { // For bones
+  if (iTarget->getRestPose().has_value() && _targetPath == "_matrix") { // For bones
     originalValue = *iTarget->getRestPose();
   }
   else {
@@ -211,10 +205,9 @@ void RuntimeAnimation::_getOriginalValues(unsigned int targetIndex)
   }
 }
 
-void RuntimeAnimation::_setValue(const IAnimatablePtr& iTarget,
-                                 const IAnimatablePtr& destination,
-                                 const AnimationValue& iCurrentValue,
-                                 float iWeight, unsigned int targetIndex)
+void RuntimeAnimation::_setValue(const IAnimatablePtr& iTarget, const IAnimatablePtr& destination,
+                                 const AnimationValue& iCurrentValue, float iWeight,
+                                 unsigned int targetIndex)
 {
   // Set value
   _currentActiveTarget = destination;
@@ -287,13 +280,12 @@ void RuntimeAnimation::goToFrame(float frame)
 
 void RuntimeAnimation::_prepareForSpeedRatioChange(float newSpeedRatio)
 {
-  auto newRatio = _previousDelay.count()
-                  * (_animation->framePerSecond * newSpeedRatio) / 1000.f;
-  _ratioOffset = _previousRatio - newRatio;
+  auto newRatio = _previousDelay.count() * (_animation->framePerSecond * newSpeedRatio) / 1000.f;
+  _ratioOffset  = _previousRatio - newRatio;
 }
 
-bool RuntimeAnimation::animate(millisecond_t delay, float from, float to,
-                               bool loop, float speedRatio, float iWeight)
+bool RuntimeAnimation::animate(millisecond_t delay, float from, float to, bool loop,
+                               float speedRatio, float iWeight)
 {
   auto& animation                = *_animation;
   const auto& targetPropertyPath = animation.targetPropertyPath;
@@ -317,9 +309,9 @@ bool RuntimeAnimation::animate(millisecond_t delay, float from, float to,
   AnimationValue offsetValue;
 
   // Compute ratio which represents the frame delta between from and to
-  const auto ratio = (static_cast<float>(delay.count())
-                      * (animation.framePerSecond * speedRatio) / 1000.f)
-                     + _ratioOffset;
+  const auto ratio
+    = (static_cast<float>(delay.count()) * (animation.framePerSecond * speedRatio) / 1000.f)
+      + _ratioOffset;
   AnimationValue highLimitValue(0.f);
 
   _previousDelay = delay;
@@ -334,38 +326,38 @@ bool RuntimeAnimation::animate(millisecond_t delay, float from, float to,
     returnValue    = false;
     highLimitValue = animation._getKeyValue(_minValue);
   }
-  else if (_animationState.loopMode != Animation::ANIMATIONLOOPMODE_CYCLE()) {
+  else if (_animationState.loopMode != Animation::ANIMATIONLOOPMODE_CYCLE) {
     std::string keyOffset = std::to_string(to) + std::to_string(from);
     if (!_offsetsCache.count(keyOffset)) {
       _animationState.repeatCount = 0;
-      _animationState.loopMode    = Animation::ANIMATIONLOOPMODE_CYCLE();
-      auto fromValue = animation._interpolate(from, _animationState);
-      auto toValue   = animation._interpolate(to, _animationState);
+      _animationState.loopMode    = Animation::ANIMATIONLOOPMODE_CYCLE;
+      auto fromValue              = animation._interpolate(from, _animationState);
+      auto toValue                = animation._interpolate(to, _animationState);
 
       _animationState.loopMode = _getCorrectLoopMode();
       switch (_animation->dataType) {
         // Float
-        case Animation::ANIMATIONTYPE_FLOAT():
+        case Animation::ANIMATIONTYPE_FLOAT:
           _offsetsCache[keyOffset] = toValue - fromValue;
           break;
         // Quaternion
-        case Animation::ANIMATIONTYPE_QUATERNION():
+        case Animation::ANIMATIONTYPE_QUATERNION:
           _offsetsCache[keyOffset] = toValue.subtract(fromValue);
           break;
         // Vector3
-        case Animation::ANIMATIONTYPE_VECTOR3():
+        case Animation::ANIMATIONTYPE_VECTOR3:
           _offsetsCache[keyOffset] = toValue.subtract(fromValue);
           break;
         // Vector2
-        case Animation::ANIMATIONTYPE_VECTOR2():
+        case Animation::ANIMATIONTYPE_VECTOR2:
           _offsetsCache[keyOffset] = toValue.subtract(fromValue);
           break;
         // Size
-        case Animation::ANIMATIONTYPE_SIZE():
+        case Animation::ANIMATIONTYPE_SIZE:
           _offsetsCache[keyOffset] = toValue.subtract(fromValue);
           break;
         // Color3
-        case Animation::ANIMATIONTYPE_COLOR3():
+        case Animation::ANIMATIONTYPE_COLOR3:
           _offsetsCache[keyOffset] = toValue.subtract(fromValue);
           break;
         default:
@@ -383,27 +375,27 @@ bool RuntimeAnimation::animate(millisecond_t delay, float from, float to,
   if (!animationType.has_value()) {
     switch (_animation->dataType) {
       // Float
-      case Animation::ANIMATIONTYPE_FLOAT():
+      case Animation::ANIMATIONTYPE_FLOAT:
         offsetValue = AnimationValue(0.f);
         break;
       // Quaternion
-      case Animation::ANIMATIONTYPE_QUATERNION():
+      case Animation::ANIMATIONTYPE_QUATERNION:
         offsetValue = AnimationValue(Quaternion(0.f, 0.f, 0.f, 0.f));
         break;
       // Vector3
-      case Animation::ANIMATIONTYPE_VECTOR3():
+      case Animation::ANIMATIONTYPE_VECTOR3:
         offsetValue = AnimationValue(Vector3::Zero());
         break;
       // Vector2
-      case Animation::ANIMATIONTYPE_VECTOR2():
+      case Animation::ANIMATIONTYPE_VECTOR2:
         offsetValue = AnimationValue(Vector2::Zero());
         break;
       // Size
-      case Animation::ANIMATIONTYPE_SIZE():
+      case Animation::ANIMATIONTYPE_SIZE:
         offsetValue = Size::Zero();
         break;
       // Color3
-      case Animation::ANIMATIONTYPE_COLOR3():
+      case Animation::ANIMATIONTYPE_COLOR3:
         offsetValue = AnimationValue(Color3::Black());
         break;
       default:
@@ -416,14 +408,13 @@ bool RuntimeAnimation::animate(millisecond_t delay, float from, float to,
 
   // Need to normalize?
   if (_host && _host->syncRoot()) {
-    auto syncRoot            = _host->syncRoot();
-    auto hostNormalizedFrame = (syncRoot->masterFrame - syncRoot->fromFrame)
-                               / (syncRoot->toFrame - syncRoot->fromFrame);
+    auto syncRoot = _host->syncRoot();
+    auto hostNormalizedFrame
+      = (syncRoot->masterFrame - syncRoot->fromFrame) / (syncRoot->toFrame - syncRoot->fromFrame);
     iCurrentFrame = from + (to - from) * hostNormalizedFrame;
   }
   else {
-    iCurrentFrame
-      = (returnValue && range != 0.f) ? from + std::fmod(ratio, range) : to;
+    iCurrentFrame = (returnValue && range != 0.f) ? from + std::fmod(ratio, range) : to;
   }
 
   // Reset events if looping
@@ -442,9 +433,8 @@ bool RuntimeAnimation::animate(millisecond_t delay, float from, float to,
       }
     }
   }
-  _currentFrame = iCurrentFrame;
-  _animationState.repeatCount
-    = range == 0.f ? 0 : static_cast<int>(ratio / range) >> 0;
+  _currentFrame                  = iCurrentFrame;
+  _animationState.repeatCount    = range == 0.f ? 0 : static_cast<int>(ratio / range) >> 0;
   _animationState.highLimitValue = highLimitValue;
   _animationState.offsetValue    = offsetValue;
 
@@ -459,10 +449,8 @@ bool RuntimeAnimation::animate(millisecond_t delay, float from, float to,
       // Make sure current frame has passed event frame and that event frame is
       // within the current range
       // Also, handle both forward and reverse animations
-      if ((range > 0.f && iCurrentFrame >= events[index].frame
-           && events[index].frame >= from)
-          || (range < 0.f && iCurrentFrame <= events[index].frame
-              && events[index].frame <= from)) {
+      if ((range > 0.f && iCurrentFrame >= events[index].frame && events[index].frame >= from)
+          || (range < 0.f && iCurrentFrame <= events[index].frame && events[index].frame <= from)) {
         auto& event = events[index];
         if (!event.isDone) {
           // If event should be done only once, remove it.

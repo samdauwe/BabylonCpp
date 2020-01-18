@@ -14,8 +14,8 @@ namespace BABYLON {
 namespace Samples {
 
 /**
- * @brief Easing Functions Scene. Example demonstarting how to create animations
- * with different easing functions.
+ * @brief Easing Functions Scene. Example demonstarting how to create animations with different
+ * easing functions.
  * @see https://www.babylonjs-playground.com/#8ZNVGR#0
  * @see https://doc.babylonjs.com/babylon101/animations#easing-functions
  */
@@ -53,8 +53,8 @@ struct EasingFunctionsScene : public IRenderableScene {
 
     // Create a Vector3 animation at 30 FPS
     auto animationTorus
-      = Animation::New("torusEasingAnimation", "position", 30, Animation::ANIMATIONTYPE_VECTOR3(),
-                       Animation::ANIMATIONLOOPMODE_CYCLE());
+      = Animation::New("torusEasingAnimation", "position", 30, Animation::ANIMATIONTYPE_VECTOR3,
+                       Animation::ANIMATIONLOOPMODE_CYCLE);
 
     // the torus destination position
     auto nextPos = torus->position().add(Vector3(-80.f, 0.f, 0.f));
@@ -108,8 +108,8 @@ struct EasingFunctionsScene : public IRenderableScene {
 
     // Create the animation
     auto animationBezierTorus
-      = Animation::New("animationBezierTorus", "position", 30, Animation::ANIMATIONTYPE_VECTOR3(),
-                       Animation::ANIMATIONLOOPMODE_CYCLE());
+      = Animation::New("animationBezierTorus", "position", 30, Animation::ANIMATIONTYPE_VECTOR3,
+                       Animation::ANIMATIONLOOPMODE_CYCLE);
     std::vector<IAnimationKey> keysBezierTorus{
       IAnimationKey(0, AnimationValue(bezierTorus->position())),
       IAnimationKey(120, AnimationValue(bezierTorus->position().add(Vector3(-80, 0, 0))))};

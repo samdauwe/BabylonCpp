@@ -79,8 +79,8 @@ public:
     motorAxis->rotation().x = Math::PI_2;
     motorAxis->parent       = parentObject.get();
 
-    auto motorAnimation = Animation::New("anim", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT(),
-                                         Animation::ANIMATIONLOOPMODE_CYCLE());
+    auto motorAnimation = Animation::New("anim", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT,
+                                         Animation::ANIMATIONLOOPMODE_CYCLE);
 
     // Animation keys
     std::vector<IAnimationKey> motorIAnimationKeys{
@@ -121,9 +121,8 @@ public:
     frontStick->position().z = -0.3f;
     frontStick->scaling      = Vector3(lengthOfStick, 0.2f, 0.2f);
 
-    auto frontStickAnimation
-      = Animation::New("anim", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT(),
-                       Animation::ANIMATIONLOOPMODE_CYCLE());
+    auto frontStickAnimation = Animation::New(
+      "anim", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT, Animation::ANIMATIONLOOPMODE_CYCLE);
 
     // Animation keys
     std::vector<IAnimationKey> frontStickIAnimationKeys{
@@ -166,9 +165,8 @@ public:
     backStick->position().z = 0.3f;
     backStick->scaling      = Vector3(lengthOfStick, 0.2f, 0.2f);
 
-    auto backStickAnimation
-      = Animation::New("anim", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT(),
-                       Animation::ANIMATIONLOOPMODE_CYCLE());
+    auto backStickAnimation = Animation::New(
+      "anim", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT, Animation::ANIMATIONLOOPMODE_CYCLE);
 
     // Animation keys
     std::vector<IAnimationKey> backStickIAnimationKeys{
@@ -191,9 +189,8 @@ public:
     topStick->position().x = -lengthOfTopStick / 2.f;
     topStick->position().y = lengthOfStick;
 
-    auto topStickAnimation
-      = Animation::New("anim", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT(),
-                       Animation::ANIMATIONLOOPMODE_CYCLE());
+    auto topStickAnimation = Animation::New(
+      "anim", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT, Animation::ANIMATIONLOOPMODE_CYCLE);
 
     float moveAngle = std::asin((2.f * distanceOfStick) / lengthOfTopStick);
 
@@ -228,9 +225,8 @@ public:
     pumpStick->position().x = -lengthOfTopStick;
     pumpStick->scaling      = Vector3(0.2f, lengthOfPumpStick, 0.2f);
 
-    auto pumpStickAnimation
-      = Animation::New("anim", "position.y", 30, Animation::ANIMATIONTYPE_FLOAT(),
-                       Animation::ANIMATIONLOOPMODE_CYCLE());
+    auto pumpStickAnimation = Animation::New(
+      "anim", "position.y", 30, Animation::ANIMATIONTYPE_FLOAT, Animation::ANIMATIONLOOPMODE_CYCLE);
 
     // Animation keys
     std::vector<IAnimationKey> pumpStickIAnimationKeys{

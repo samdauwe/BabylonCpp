@@ -1181,22 +1181,22 @@ void GLTFLoader::_loadAnimationChannelAsync(const std::string& context,
   switch (channel.target.path) {
     case IGLTF2::AnimationChannelTargetPath::TRANSLATION: {
       targetPath    = "position";
-      animationType = Animation::ANIMATIONTYPE_VECTOR3();
+      animationType = Animation::ANIMATIONTYPE_VECTOR3;
       break;
     }
     case IGLTF2::AnimationChannelTargetPath::ROTATION: {
       targetPath    = "rotationQuaternion";
-      animationType = Animation::ANIMATIONTYPE_QUATERNION();
+      animationType = Animation::ANIMATIONTYPE_QUATERNION;
       break;
     }
     case IGLTF2::AnimationChannelTargetPath::SCALE: {
       targetPath    = "scaling";
-      animationType = Animation::ANIMATIONTYPE_VECTOR3();
+      animationType = Animation::ANIMATIONTYPE_VECTOR3;
       break;
     }
     case IGLTF2::AnimationChannelTargetPath::WEIGHTS: {
       targetPath    = "influence";
-      animationType = Animation::ANIMATIONTYPE_FLOAT();
+      animationType = Animation::ANIMATIONTYPE_FLOAT;
       break;
     }
     default: {

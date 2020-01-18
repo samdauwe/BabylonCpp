@@ -34,218 +34,90 @@ using RuntimeAnimationPtr = std::shared_ptr<RuntimeAnimation>;
  */
 class BABYLON_SHARED_EXPORT Animation {
 
-private:
+public:
   /** Statics **/
 
   /**
    * Float animation type
    */
-  static constexpr unsigned int _ANIMATIONTYPE_FLOAT = 0;
+  static constexpr unsigned int ANIMATIONTYPE_FLOAT = 0;
 
   /**
    * Vector3 animation type
    */
-  static constexpr unsigned int _ANIMATIONTYPE_VECTOR3 = 1;
+  static constexpr unsigned int ANIMATIONTYPE_VECTOR3 = 1;
 
   /**
    * Quaternion animation type
    */
-  static constexpr unsigned int _ANIMATIONTYPE_QUATERNION = 2;
+  static constexpr unsigned int ANIMATIONTYPE_QUATERNION = 2;
 
   /**
    * Matrix animation type
    */
-  static constexpr unsigned int _ANIMATIONTYPE_MATRIX = 3;
+  static constexpr unsigned int ANIMATIONTYPE_MATRIX = 3;
 
   /**
    * Color3 animation type
    */
-  static constexpr unsigned int _ANIMATIONTYPE_COLOR3 = 4;
-
-  /**
-   * Vector2 animation type
-   */
-  static constexpr unsigned int _ANIMATIONTYPE_VECTOR2 = 5;
-
-  /**
-   * Size animation type
-   */
-  static constexpr unsigned int _ANIMATIONTYPE_SIZE = 6;
-
-  /**
-   * Boolean animation type
-   */
-  static constexpr unsigned int _ANIMATIONTYPE_BOOL = 20;
-
-  /**
-   * Integer animation type
-   */
-  static constexpr unsigned int _ANIMATIONTYPE_INT = 21;
-
-  /**
-   * String animation type
-   */
-  static constexpr unsigned int _ANIMATIONTYPE_STRING = 22;
+  static constexpr unsigned int ANIMATIONTYPE_COLOR3 = 4;
 
   /**
    * Color4 animation type
    */
-  static constexpr unsigned int _ANIMATIONTYPE_COLOR4 = 23;
+  static constexpr unsigned int ANIMATIONTYPE_COLOR4 = 7;
+
+  /**
+   * Vector2 animation type
+   */
+  static constexpr unsigned int ANIMATIONTYPE_VECTOR2 = 5;
+
+  /**
+   * Size animation type
+   */
+  static constexpr unsigned int ANIMATIONTYPE_SIZE = 6;
+
+  /**
+   * Boolean animation type
+   */
+  static constexpr unsigned int ANIMATIONTYPE_BOOL = 20;
+
+  /**
+   * Integer animation type
+   */
+  static constexpr unsigned int ANIMATIONTYPE_INT = 21;
+
+  /**
+   * String animation type
+   */
+  static constexpr unsigned int ANIMATIONTYPE_STRING = 22;
 
   /**
    * Float32Array animation type
    */
-  static constexpr unsigned int _ANIMATIONTYPE_FLOAT32ARRAY = 30;
+  static constexpr unsigned int ANIMATIONTYPE_FLOAT32ARRAY = 30;
 
   /**
    * Vector4 animation type
    */
-  static constexpr unsigned int _ANIMATIONTYPE_VECTOR4 = 40;
+  static constexpr unsigned int ANIMATIONTYPE_VECTOR4 = 40;
 
   /**
    * Relative Loop Mode
    */
-  static constexpr unsigned int _ANIMATIONLOOPMODE_RELATIVE = 0;
+  static constexpr unsigned int ANIMATIONLOOPMODE_RELATIVE = 0;
 
   /**
    * Cycle Loop Mode
    */
-  static constexpr unsigned int _ANIMATIONLOOPMODE_CYCLE = 1;
+  static constexpr unsigned int ANIMATIONLOOPMODE_CYCLE = 1;
 
   /**
    * Constant Loop Mode
    */
-  static constexpr unsigned int _ANIMATIONLOOPMODE_CONSTANT = 2;
+  static constexpr unsigned int ANIMATIONLOOPMODE_CONSTANT = 2;
 
 public:
-  /**
-   * @brief Get the float animation type.
-   */
-  static constexpr unsigned int ANIMATIONTYPE_FLOAT()
-  {
-    return Animation::_ANIMATIONTYPE_FLOAT;
-  }
-
-  /**
-   * @brief Get the Vector3 animation type.
-   */
-  static constexpr unsigned int ANIMATIONTYPE_VECTOR3()
-  {
-    return Animation::_ANIMATIONTYPE_VECTOR3;
-  }
-
-  /**
-   * @brief Get the Quaternion animation type.
-   */
-  static constexpr unsigned int ANIMATIONTYPE_QUATERNION()
-  {
-    return Animation::_ANIMATIONTYPE_QUATERNION;
-  }
-
-  /**
-   * @brief Get the Matrix animation type.
-   */
-  static constexpr unsigned int ANIMATIONTYPE_MATRIX()
-  {
-    return Animation::_ANIMATIONTYPE_MATRIX;
-  }
-
-  /**
-   * @brief Get the Color3 animation type.
-   */
-  static constexpr unsigned int ANIMATIONTYPE_COLOR3()
-  {
-    return Animation::_ANIMATIONTYPE_COLOR3;
-  }
-
-  /**
-   *@brief  Get the Vector2 animation type.
-   */
-  static constexpr unsigned int ANIMATIONTYPE_VECTOR2()
-  {
-    return Animation::_ANIMATIONTYPE_VECTOR2;
-  }
-
-  /**
-   *@brief Get the Size animation type.
-   */
-  static constexpr unsigned int ANIMATIONTYPE_SIZE()
-  {
-    return Animation::_ANIMATIONTYPE_SIZE;
-  }
-
-  /**
-   * @brief Get the Boolean animation type.
-   */
-  static constexpr unsigned int ANIMATIONTYPE_BOOL()
-  {
-    return Animation::_ANIMATIONTYPE_BOOL;
-  }
-
-  /**
-   * @brief Get the Integer animation type.
-   */
-  static constexpr unsigned int ANIMATIONTYPE_INT()
-  {
-    return Animation::_ANIMATIONTYPE_INT;
-  }
-
-  /**
-   * @brief Get the String animation type.
-   */
-  static constexpr unsigned int ANIMATIONTYPE_STRING()
-  {
-    return Animation::_ANIMATIONTYPE_STRING;
-  }
-
-  /**
-   * @brief Get the Color4 animation type.
-   */
-  static constexpr unsigned int ANIMATIONTYPE_COLOR4()
-  {
-    return Animation::_ANIMATIONTYPE_COLOR4;
-  }
-
-  /**
-   * @brief Get the Float32Array animation type.
-   */
-  static constexpr unsigned int ANIMATIONTYPE_FLOAT32ARRAY()
-  {
-    return Animation::_ANIMATIONTYPE_FLOAT32ARRAY;
-  }
-
-  /**
-   * @brief Get the Vector4 animation type.
-   */
-  static constexpr unsigned int ANIMATIONTYPE_VECTOR4()
-  {
-    return Animation::_ANIMATIONTYPE_VECTOR4;
-  }
-
-  /**
-   * @brief Get the Relative Loop Mode.
-   */
-  static constexpr unsigned int ANIMATIONLOOPMODE_RELATIVE()
-  {
-    return Animation::_ANIMATIONLOOPMODE_RELATIVE;
-  }
-
-  /**
-   * @brief Get the Cycle Loop Mode.
-   */
-  static constexpr unsigned int ANIMATIONLOOPMODE_CYCLE()
-  {
-    return Animation::_ANIMATIONLOOPMODE_CYCLE;
-  }
-
-  /**
-   * @brief Get the Constant Loop Mode.
-   */
-  static constexpr unsigned int ANIMATIONLOOPMODE_CONSTANT()
-  {
-    return Animation::_ANIMATIONLOOPMODE_CONSTANT;
-  }
-
   /**
    * @brief Use matrix interpolation instead of using direct key value when
    * animating matrices.
@@ -265,8 +137,7 @@ public:
   static AnimationPtr _PrepareAnimation(const std::string& name, const std::string& targetProperty,
                                         size_t framePerSecond, float totalFrame,
                                         const AnimationValue& from, const AnimationValue& to,
-                                        unsigned int loopMode
-                                        = Animation::ANIMATIONLOOPMODE_CYCLE(),
+                                        unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE,
                                         const IEasingFunctionPtr& easingFunction = nullptr);
 
   /**
@@ -283,8 +154,7 @@ public:
 
   /**
    * @brief Create and start an animation on a node.
-   * @param name defines the name of the global animation that will be run on
-   * all nodes
+   * @param name defines the name of the global animation that will be run on all nodes
    * @param node defines the root node where the animation will take place
    * @param targetProperty defines property to animate
    * @param framePerSecond defines the number of frame per second yo use
@@ -292,8 +162,7 @@ public:
    * @param from defines the initial value
    * @param to defines the final value
    * @param loopMode defines which loop mode you want to use (off by default)
-   * @param easingFunction defines the easing function to use (linear by
-   * default)
+   * @param easingFunction defines the easing function to use (linear by default)
    * @param onAnimationEnd defines the callback to call when animation end
    * @returns the animatable created for this animation
    */
@@ -301,43 +170,39 @@ public:
   CreateAndStartAnimation(const std::string& name, const NodePtr& node,
                           const std::string& targetProperty, size_t framePerSecond,
                           float totalFrame, const AnimationValue& from, const AnimationValue& to,
-                          unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE(),
+                          unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE,
                           const IEasingFunctionPtr& easingFunction    = nullptr,
                           const std::function<void()>& onAnimationEnd = nullptr);
 
   /**
    * @brief Create and start an animation on a node and its descendants.
-   * @param name defines the name of the global animation that will be run on
-   * all nodes
+   * @param name defines the name of the global animation that will be run on all nodes
    * @param node defines the root node where the animation will take place
-   * @param directDescendantsOnly if true only direct descendants will be used,
-   * if false direct and also indirect (children of children, an so on in a
-   * recursive manner) descendants will be used
+   * @param directDescendantsOnly if true only direct descendants will be used, if false direct and
+   * also indirect (children of children, an so on in a recursive manner) descendants will be used
    * @param targetProperty defines property to animate
    * @param framePerSecond defines the number of frame per second to use
    * @param totalFrame defines the number of frames in total
    * @param from defines the initial value
    * @param to defines the final value
    * @param loopMode defines which loop mode you want to use (off by default)
-   * @param easingFunction defines the easing function to use (linear by
-   * default)
-   * @param onAnimationEnd defines the callback to call when an animation ends
-   * (will be called once per node)
+   * @param easingFunction defines the easing function to use (linear by default)
+   * @param onAnimationEnd defines the callback to call when an animation ends (will be called once
+   * per node)
    * @returns the list of animatables created for all nodes
-   * Example https://www.babylonjs-playground.com/#MH0VLI
+   * @example https://www.babylonjs-playground.com/#MH0VLI
    */
   static std::vector<AnimatablePtr>
   CreateAndStartHierarchyAnimation(const std::string& name, const NodePtr& node,
                                    bool directDescendantsOnly, const std::string& targetProperty,
                                    size_t framePerSecond, float totalFrame,
                                    const AnimationValue& from, const AnimationValue& to,
-                                   unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE(),
+                                   unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE,
                                    const IEasingFunctionPtr& easingFunction    = nullptr,
                                    const std::function<void()>& onAnimationEnd = nullptr);
 
   /**
-   * @brief Creates a new animation, merges it with the existing animations and
-   * starts it.
+   * @brief Creates a new animation, merges it with the existing animations and starts it
    * @param name Name of the animation
    * @param node Node which contains the scene that begins the animations
    * @param targetProperty Specifies which property to animate
@@ -346,15 +211,15 @@ public:
    * @param from The frame at the beginning of the animation
    * @param to The frame at the end of the animation
    * @param loopMode Specifies the loop mode of the animation
-   * @param easingFunction (Optional) The easing function of the animation,
-   * which allow custom mathematical formulas for animations
+   * @param easingFunction (Optional) The easing function of the animation, which allow custom
+   * mathematical formulas for animations
    * @param onAnimationEnd Callback to run once the animation is complete
    * @returns Nullable animation
    */
   static AnimatablePtr CreateMergeAndStartAnimation(
     const std::string& name, const NodePtr& node, const std::string& targetProperty,
     size_t framePerSecond, float totalFrame, const AnimationValue& from, const AnimationValue& to,
-    unsigned int loopMode                       = Animation::ANIMATIONLOOPMODE_CYCLE(),
+    unsigned int loopMode                       = Animation::ANIMATIONLOOPMODE_CYCLE,
     const IEasingFunctionPtr& easingFunction    = nullptr,
     const std::function<void()>& onAnimationEnd = nullptr);
 
@@ -389,8 +254,7 @@ public:
 
   /**
    * @param Converts the animation to a string.
-   * @param fullDetails support for multiple levels of logging within scene
-   * loading
+   * @param fullDetails support for multiple levels of logging within scene loading
    * @returns String form of the animation
    */
   [[nodiscard]] std::string toString(bool fullDetails = false) const;
@@ -402,8 +266,7 @@ public:
   void addEvent(const AnimationEvent& event);
 
   /**
-   * @brief Return the array of runtime animations currently using this
-   * animation.
+   * @brief Return the array of runtime animations currently using this animation.
    */
   std::vector<RuntimeAnimationPtr>& runtimeAnimations();
 
@@ -430,8 +293,8 @@ public:
   /**
    * @brief Deletes an animation range by name.
    * @param name Name of the animation range to delete
-   * @param deleteFrames Specifies if the key frames for the range should also
-   * be deleted (true) or not (false)
+   * @param deleteFrames Specifies if the key frames for the range should also be deleted (true) or
+   * not (false)
    */
   void deleteRange(const std::string& name, bool deleteFrames = true);
 
@@ -589,6 +452,16 @@ public:
                                                  float gradient) const;
 
   /**
+   * @brief Interpolates a Color4 linearly.
+   * @param startValue Start value of the animation curve
+   * @param endValue End value of the animation curve
+   * @param gradient Scalar amount to interpolate
+   * @returns Interpolated Color3 value
+   */
+  Color4 color4InterpolateFunction(const Color4& startValue, const Color4& endValue,
+                                   float gradient) const;
+
+  /**
    * @brief Hidden Internal use only.
    */
   [[nodiscard]] AnimationValue _getKeyValue(const AnimationValue& value) const;
@@ -662,7 +535,7 @@ protected:
    * @param enableBlending Specifies if blending should be enabled
    */
   Animation(const std::string& name, const std::string& targetProperty, size_t framePerSecond,
-            int dataType, unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE(),
+            int dataType, unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE,
             bool enableBlending = false);
 
 private:

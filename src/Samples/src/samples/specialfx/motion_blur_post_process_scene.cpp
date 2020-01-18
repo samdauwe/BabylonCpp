@@ -78,8 +78,8 @@ public:
       auto ease = SineEase::New();
       ease->setEasingMode(EasingFunction::EASINGMODE_EASEINOUT);
 
-      auto anim = Animation::New("animation", "position.y", 60, Animation::ANIMATIONTYPE_FLOAT(),
-                                 Animation::ANIMATIONLOOPMODE_RELATIVE(), false);
+      auto anim = Animation::New("animation", "position.y", 60, Animation::ANIMATIONTYPE_FLOAT,
+                                 Animation::ANIMATIONLOOPMODE_RELATIVE, false);
       std::vector<IAnimationKey> animationKeys{
         IAnimationKey(0, AnimationValue(y)),
         IAnimationKey(30, AnimationValue(y + Math::random() * (250.f - (-250.f)) - 250.f)),

@@ -111,7 +111,7 @@ public:
       mesh->material = _mat1;
       auto anim
         = Animation::CreateAndStartAnimation("anim" + istr, mesh, "rotation.y", 30, 180.f, 0.f,
-                                             -2.f * Math::PI, Animation::ANIMATIONLOOPMODE_CYCLE());
+                                             -2.f * Math::PI, Animation::ANIMATIONLOOPMODE_CYCLE);
     }
 
     //
@@ -134,11 +134,11 @@ public:
     // kind #2 ---- helper-function -> Animatable{}
     _anim0 = Animation::CreateAndStartAnimation("anim0", _mesh0, "rotation.y", 10 /*fps*/,
                                                 180.f /*totalFrame*/, 0.f, 2.f * Math::PI,
-                                                Animation::ANIMATIONLOOPMODE_CYCLE());
+                                                Animation::ANIMATIONLOOPMODE_CYCLE);
 
     // kind #3 ---- Animation{}
-    auto animColor = Animation::New("anim", "baseColor", 60, Animation::ANIMATIONTYPE_COLOR3(),
-                                    Animation::ANIMATIONLOOPMODE_CYCLE());
+    auto animColor = Animation::New("anim", "baseColor", 60, Animation::ANIMATIONTYPE_COLOR3,
+                                    Animation::ANIMATIONLOOPMODE_CYCLE);
     std::vector<IAnimationKey> colorAnimation{// yoyo
                                               IAnimationKey(0, AnimationValue(Color3(1, 0, 0))),
                                               IAnimationKey(45, AnimationValue(Color3(0, 1, 0))),

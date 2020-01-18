@@ -55,7 +55,7 @@ void PBRMetallicRoughnessMaterial::setProperty(const std::vector<std::string>& t
   if (animationType.has_value()) {
     if (targetPropertyPath.size() == 1) {
       const auto& target = targetPropertyPath[0];
-      if (*animationType == Animation::ANIMATIONTYPE_COLOR3()) {
+      if (*animationType == Animation::ANIMATIONTYPE_COLOR3) {
         auto color3Value = value.get<Color3>();
         if (target == "baseColor") {
           baseColor = color3Value;

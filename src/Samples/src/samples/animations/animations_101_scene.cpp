@@ -74,8 +74,8 @@ public:
     //-------------------------------------------
     // Create a scaling animation at 30 FPS
     auto animationBox
-      = Animation::New("tutoAnimation", "scaling.x", 30, Animation::ANIMATIONTYPE_FLOAT(),
-                       Animation::ANIMATIONLOOPMODE_CYCLE());
+      = Animation::New("tutoAnimation", "scaling.x", 30, Animation::ANIMATIONTYPE_FLOAT,
+                       Animation::ANIMATIONLOOPMODE_CYCLE);
 
     // Here we have chosen a loop mode, but you can change to :
     //  Use previous values and increment it
@@ -115,6 +115,7 @@ public:
       }
     });
   }
+
 private:
   high_res_time_point_t _previousTimestamp;
   StandardMaterialPtr _materialBox2;

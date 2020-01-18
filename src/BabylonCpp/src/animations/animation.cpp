@@ -66,7 +66,7 @@ AnimationPtr Animation::CreateAnimation(const std::string& property, int animati
                                         const IEasingFunctionPtr& easingFunction)
 {
   auto animation = Animation::New(property + "Animation", property, framePerSecond, animationType,
-                                  Animation::ANIMATIONLOOPMODE_CONSTANT());
+                                  Animation::ANIMATIONLOOPMODE_CONSTANT);
 
   animation->setEasingFunction(easingFunction);
 
@@ -180,7 +180,7 @@ std::string Animation::toString(bool fullDetails) const
 {
   std::ostringstream oss;
   oss << "Name: " << name << ", property: " << targetProperty;
-  if (dataType >= 0 && static_cast<unsigned int>(dataType) <= ANIMATIONTYPE_BOOL()) {
+  if (dataType >= 0 && static_cast<unsigned int>(dataType) <= ANIMATIONTYPE_BOOL) {
     auto _dataType = static_cast<size_t>(dataType);
     oss << ", datatype: "
         << std::vector<std::string>{"Float",  "Vector3", "Quaternion", "Matrix",
@@ -344,6 +344,12 @@ Color3 Animation::color3InterpolateFunction(const Color3& startValue, const Colo
   return Color3::Lerp(startValue, endValue, gradient);
 }
 
+Color4 Animation::color4InterpolateFunction(const Color4& startValue, const Color4& endValue,
+                                            float gradient) const
+{
+  return Color4::Lerp(startValue, endValue, gradient);
+}
+
 AnimationValue Animation::_getKeyValue(const AnimationValue& value) const
 {
   return value;
@@ -351,7 +357,7 @@ AnimationValue Animation::_getKeyValue(const AnimationValue& value) const
 
 AnimationValue Animation::_interpolate(float currentFrame, _IAnimationState& state)
 {
-  if (state.loopMode == Animation::ANIMATIONLOOPMODE_CONSTANT() && state.repeatCount > 0) {
+  if (state.loopMode == Animation::ANIMATIONLOOPMODE_CONSTANT && state.repeatCount > 0) {
     return state.highLimitValue.copy();
   }
 
@@ -397,8 +403,7 @@ AnimationValue Animation::_interpolate(float currentFrame, _IAnimationState& sta
       bool useTangent  = startKey.outTangent && endKey.inTangent;
       float frameDelta = endKey.frame - startKey.frame;
 
-      // gradient : percent of currentFrame between the frame inf and the frame
-      // sup
+      // gradient : percent of currentFrame between the frame inf and the frame sup
       float gradient = (currentFrame - startKey.frame) / frameDelta;
 
       // check for easingFunction and correction of gradient
@@ -411,7 +416,7 @@ AnimationValue Animation::_interpolate(float currentFrame, _IAnimationState& sta
 
       switch (dataType) {
         // Float
-        case Animation::ANIMATIONTYPE_FLOAT(): {
+        case Animation::ANIMATIONTYPE_FLOAT: {
           const auto floatValue
             = useTangent ?
                 floatInterpolateFunctionWithTangents(
@@ -419,11 +424,11 @@ AnimationValue Animation::_interpolate(float currentFrame, _IAnimationState& sta
                   *endKey.inTangent * frameDelta, gradient) :
                 floatInterpolateFunction(startValue.get<float>(), endValue.get<float>(), gradient);
           switch (state.loopMode.value()) {
-            case Animation::ANIMATIONLOOPMODE_CYCLE():
-            case Animation::ANIMATIONLOOPMODE_CONSTANT():
+            case Animation::ANIMATIONLOOPMODE_CYCLE:
+            case Animation::ANIMATIONLOOPMODE_CONSTANT:
               newVale = floatValue;
               return newVale;
-            case Animation::ANIMATIONLOOPMODE_RELATIVE():
+            case Animation::ANIMATIONLOOPMODE_RELATIVE:
               newVale = state.offsetValue.get<float>() * state.repeatCount + floatValue;
               return newVale;
             default:
@@ -431,7 +436,7 @@ AnimationValue Animation::_interpolate(float currentFrame, _IAnimationState& sta
           }
         } break;
         // Quaternion
-        case Animation::ANIMATIONTYPE_QUATERNION(): {
+        case Animation::ANIMATIONTYPE_QUATERNION: {
           const auto quatValue
             = useTangent ? quaternionInterpolateFunctionWithTangents(
                 startValue.get<Quaternion>(),
@@ -441,11 +446,11 @@ AnimationValue Animation::_interpolate(float currentFrame, _IAnimationState& sta
                            quaternionInterpolateFunction(startValue.get<Quaternion>(),
                                                          endValue.get<Quaternion>(), gradient);
           switch (state.loopMode.value()) {
-            case Animation::ANIMATIONLOOPMODE_CYCLE():
-            case Animation::ANIMATIONLOOPMODE_CONSTANT():
+            case Animation::ANIMATIONLOOPMODE_CYCLE:
+            case Animation::ANIMATIONLOOPMODE_CONSTANT:
               newVale = quatValue;
               return newVale;
-            case Animation::ANIMATIONLOOPMODE_RELATIVE():
+            case Animation::ANIMATIONLOOPMODE_RELATIVE:
               newVale = quatValue.add(
                 state.offsetValue.get<Quaternion>().scale(static_cast<float>(state.repeatCount)));
               return newVale;
@@ -454,7 +459,7 @@ AnimationValue Animation::_interpolate(float currentFrame, _IAnimationState& sta
           }
         } break;
         // Vector3
-        case Animation::ANIMATIONTYPE_VECTOR3(): {
+        case Animation::ANIMATIONTYPE_VECTOR3: {
           const auto vec3Value
             = useTangent ? vector3InterpolateFunctionWithTangents(
                 startValue.get<Vector3>(), (*startKey.outTangent).get<Vector3>().scale(frameDelta),
@@ -463,11 +468,11 @@ AnimationValue Animation::_interpolate(float currentFrame, _IAnimationState& sta
                            vector3InterpolateFunction(startValue.get<Vector3>(),
                                                       endValue.get<Vector3>(), gradient);
           switch (state.loopMode.value()) {
-            case Animation::ANIMATIONLOOPMODE_CYCLE():
-            case Animation::ANIMATIONLOOPMODE_CONSTANT():
+            case Animation::ANIMATIONLOOPMODE_CYCLE:
+            case Animation::ANIMATIONLOOPMODE_CONSTANT:
               newVale = vec3Value;
               return newVale;
-            case Animation::ANIMATIONLOOPMODE_RELATIVE():
+            case Animation::ANIMATIONLOOPMODE_RELATIVE:
               newVale = vec3Value.add(
                 state.offsetValue.get<Vector3>().scale(static_cast<float>(state.repeatCount)));
               return newVale;
@@ -476,7 +481,7 @@ AnimationValue Animation::_interpolate(float currentFrame, _IAnimationState& sta
           }
         } break;
         // Vector2
-        case Animation::ANIMATIONTYPE_VECTOR2(): {
+        case Animation::ANIMATIONTYPE_VECTOR2: {
           const auto vec2Value
             = useTangent ? vector2InterpolateFunctionWithTangents(
                 startValue.get<Vector2>(), (*startKey.outTangent).get<Vector2>().scale(frameDelta),
@@ -485,11 +490,11 @@ AnimationValue Animation::_interpolate(float currentFrame, _IAnimationState& sta
                            vector2InterpolateFunction(startValue.get<Vector2>(),
                                                       endValue.get<Vector2>(), gradient);
           switch (state.loopMode.value()) {
-            case Animation::ANIMATIONLOOPMODE_CYCLE():
-            case Animation::ANIMATIONLOOPMODE_CONSTANT():
+            case Animation::ANIMATIONLOOPMODE_CYCLE:
+            case Animation::ANIMATIONLOOPMODE_CONSTANT:
               newVale = vec2Value;
               return newVale;
-            case Animation::ANIMATIONLOOPMODE_RELATIVE():
+            case Animation::ANIMATIONLOOPMODE_RELATIVE:
               newVale = vec2Value.add(
                 state.offsetValue.get<Vector2>().scale(static_cast<float>(state.repeatCount)));
               return newVale;
@@ -498,14 +503,14 @@ AnimationValue Animation::_interpolate(float currentFrame, _IAnimationState& sta
           }
         } break;
         // Size
-        case Animation::ANIMATIONTYPE_SIZE():
+        case Animation::ANIMATIONTYPE_SIZE:
           switch (state.loopMode.value()) {
-            case Animation::ANIMATIONLOOPMODE_CYCLE():
-            case Animation::ANIMATIONLOOPMODE_CONSTANT():
+            case Animation::ANIMATIONLOOPMODE_CYCLE:
+            case Animation::ANIMATIONLOOPMODE_CONSTANT:
               newVale
                 = sizeInterpolateFunction(startValue.get<Size>(), endValue.get<Size>(), gradient);
               return newVale;
-            case Animation::ANIMATIONLOOPMODE_RELATIVE():
+            case Animation::ANIMATIONLOOPMODE_RELATIVE:
               newVale
                 = sizeInterpolateFunction(startValue.get<Size>(), endValue.get<Size>(), gradient)
                     .add(
@@ -516,14 +521,14 @@ AnimationValue Animation::_interpolate(float currentFrame, _IAnimationState& sta
           }
           break;
         // Color3
-        case Animation::ANIMATIONTYPE_COLOR3():
+        case Animation::ANIMATIONTYPE_COLOR3:
           switch (state.loopMode.value()) {
-            case Animation::ANIMATIONLOOPMODE_CYCLE():
-            case Animation::ANIMATIONLOOPMODE_CONSTANT():
+            case Animation::ANIMATIONLOOPMODE_CYCLE:
+            case Animation::ANIMATIONLOOPMODE_CONSTANT:
               newVale = color3InterpolateFunction(startValue.get<Color3>(), endValue.get<Color3>(),
                                                   gradient);
               return newVale;
-            case Animation::ANIMATIONLOOPMODE_RELATIVE():
+            case Animation::ANIMATIONLOOPMODE_RELATIVE:
               newVale = color3InterpolateFunction(startValue.get<Color3>(), endValue.get<Color3>(),
                                                   gradient)
                           .add(state.offsetValue.get<Color3>().scale(
@@ -533,11 +538,29 @@ AnimationValue Animation::_interpolate(float currentFrame, _IAnimationState& sta
               break;
           }
           break;
-        // Matrix
-        case Animation::ANIMATIONTYPE_MATRIX():
+        // Color4
+        case Animation::ANIMATIONTYPE_COLOR4:
           switch (state.loopMode.value()) {
-            case Animation::ANIMATIONLOOPMODE_CYCLE():
-            case Animation::ANIMATIONLOOPMODE_CONSTANT():
+            case Animation::ANIMATIONLOOPMODE_CYCLE:
+            case Animation::ANIMATIONLOOPMODE_CONSTANT:
+              newVale = color4InterpolateFunction(startValue.get<Color4>(), endValue.get<Color4>(),
+                                                  gradient);
+              return newVale;
+            case Animation::ANIMATIONLOOPMODE_RELATIVE:
+              newVale = color4InterpolateFunction(startValue.get<Color4>(), endValue.get<Color4>(),
+                                                  gradient)
+                          .add(state.offsetValue.get<Color4>().scale(
+                            static_cast<float>(state.repeatCount)));
+              return newVale;
+            default:
+              break;
+          }
+          break;
+        // Matrix
+        case Animation::ANIMATIONTYPE_MATRIX:
+          switch (state.loopMode.value()) {
+            case Animation::ANIMATIONLOOPMODE_CYCLE:
+            case Animation::ANIMATIONLOOPMODE_CONSTANT:
               if (Animation::AllowMatricesInterpolation()) {
                 if (state.workValue) {
                   auto& _workValue = *state.workValue;
@@ -550,7 +573,7 @@ AnimationValue Animation::_interpolate(float currentFrame, _IAnimationState& sta
               }
               newVale = startValue.get<Matrix>();
               return newVale;
-            case Animation::ANIMATIONLOOPMODE_RELATIVE():
+            case Animation::ANIMATIONLOOPMODE_RELATIVE:
               newVale = startValue.get<Matrix>();
               return newVale;
             default:
@@ -625,7 +648,7 @@ AnimationPtr Animation::Parse(const json& parsedAnimation)
     json_util::get_string(parsedAnimation, "property"),
     json_util::get_number(parsedAnimation, "framePerSecond", 30ull),
     json_util::get_number(parsedAnimation, "dataType", 0),
-    json_util::get_number(parsedAnimation, "loopBehavior", Animation::ANIMATIONLOOPMODE_CYCLE()));
+    json_util::get_number(parsedAnimation, "loopBehavior", Animation::ANIMATIONLOOPMODE_CYCLE));
 
   auto dataType = json_util::get_number(parsedAnimation, "dataType", 0u);
   std::vector<IAnimationKey> keys;
@@ -644,7 +667,7 @@ AnimationPtr Animation::Parse(const json& parsedAnimation)
     AnimationValue data;
 
     switch (dataType) {
-      case Animation::ANIMATIONTYPE_FLOAT(): {
+      case Animation::ANIMATIONTYPE_FLOAT: {
         auto values = json_util::get_array<float>(key, "values");
         data        = AnimationValue(values[0]);
         if (values.size() > 1) {
@@ -654,7 +677,7 @@ AnimationPtr Animation::Parse(const json& parsedAnimation)
           outTangent = values[2];
         }
       } break;
-      case Animation::ANIMATIONTYPE_QUATERNION(): {
+      case Animation::ANIMATIONTYPE_QUATERNION: {
         auto values = json_util::get_array<float>(key, "values");
         data        = AnimationValue(Quaternion::FromArray(values));
         if (values.size() >= 8) {
@@ -670,13 +693,16 @@ AnimationPtr Animation::Parse(const json& parsedAnimation)
           }
         }
       } break;
-      case Animation::ANIMATIONTYPE_MATRIX():
+      case Animation::ANIMATIONTYPE_MATRIX:
         data = AnimationValue(Matrix::FromArray(json_util::get_array<float>(key, "values")));
         break;
-      case Animation::ANIMATIONTYPE_COLOR3():
+      case Animation::ANIMATIONTYPE_COLOR3:
         data = AnimationValue(Color3::FromArray(json_util::get_array<float>(key, "values")));
         break;
-      case Animation::ANIMATIONTYPE_VECTOR3():
+      case Animation::ANIMATIONTYPE_COLOR4:
+        data = AnimationValue(Color4::FromArray(json_util::get_array<float>(key, "values")));
+        break;
+      case Animation::ANIMATIONTYPE_VECTOR3:
       default:
         data = AnimationValue(Vector3::FromArray(json_util::get_array<float>(key, "values")));
         break;

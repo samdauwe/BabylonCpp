@@ -10,8 +10,7 @@ namespace BABYLON {
 
 SwitchBooleanAction::SwitchBooleanAction(unsigned int iTtriggerOptions,
                                          const IAnimatablePtr& target,
-                                         const std::string& iPropertyPath,
-                                         Condition* condition)
+                                         const std::string& iPropertyPath, Condition* condition)
     : Action(iTtriggerOptions, condition)
     , propertyPath{iPropertyPath}
     , _target{target}
@@ -30,7 +29,7 @@ void SwitchBooleanAction::_prepare()
 void SwitchBooleanAction::execute(const std::optional<IActionEvent>& /*evt*/)
 {
   auto prop = _effectiveTarget->getProperty({_property});
-  if (prop && (prop.animationType() == Animation::ANIMATIONTYPE_BOOL())) {
+  if (prop && (prop.animationType() == Animation::ANIMATIONTYPE_BOOL)) {
     prop = !prop.get<bool>();
     _effectiveTarget->setProperty({_property}, prop);
   }

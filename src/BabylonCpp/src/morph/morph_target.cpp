@@ -56,7 +56,7 @@ void MorphTarget::setProperty(const std::vector<std::string>& targetPropertyPath
   if (animationType.has_value()) {
     if (targetPropertyPath.size() == 1) {
       const auto& target = targetPropertyPath[0];
-      if (*animationType == Animation::ANIMATIONTYPE_FLOAT()) {
+      if (*animationType == Animation::ANIMATIONTYPE_FLOAT) {
         auto floatValue = value.get<float>();
         if (target == "influence") {
           influence = floatValue;

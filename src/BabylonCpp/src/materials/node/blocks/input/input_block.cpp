@@ -57,25 +57,25 @@ NodeMaterialBlockConnectionPointTypes& InputBlock::get_type()
       const auto valueType = value()->animationType();
       if (valueType.has_value()) {
         switch (*valueType) {
-          case Animation::ANIMATIONTYPE_FLOAT():
+          case Animation::ANIMATIONTYPE_FLOAT:
             _type = NodeMaterialBlockConnectionPointTypes::Float;
             return _type;
-          case Animation::ANIMATIONTYPE_INT():
+          case Animation::ANIMATIONTYPE_INT:
             _type = NodeMaterialBlockConnectionPointTypes::Int;
             return _type;
-          case Animation::ANIMATIONTYPE_VECTOR2():
+          case Animation::ANIMATIONTYPE_VECTOR2:
             _type = NodeMaterialBlockConnectionPointTypes::Vector2;
             return _type;
-          case Animation::ANIMATIONTYPE_VECTOR3():
+          case Animation::ANIMATIONTYPE_VECTOR3:
             _type = NodeMaterialBlockConnectionPointTypes::Vector3;
             return _type;
-          case Animation::ANIMATIONTYPE_VECTOR4():
+          case Animation::ANIMATIONTYPE_VECTOR4:
             _type = NodeMaterialBlockConnectionPointTypes::Vector4;
             return _type;
-          case Animation::ANIMATIONTYPE_COLOR3():
+          case Animation::ANIMATIONTYPE_COLOR3:
             _type = NodeMaterialBlockConnectionPointTypes::Color3;
             return _type;
-          case Animation::ANIMATIONTYPE_COLOR4():
+          case Animation::ANIMATIONTYPE_COLOR4:
             _type = NodeMaterialBlockConnectionPointTypes::Color4;
             return _type;
           default:
