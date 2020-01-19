@@ -11,9 +11,9 @@ namespace BABYLON {
 
 class Effect;
 struct EffectWrapper;
-class Engine;
 struct IEffectRendererOptions;
 class Texture;
+class ThinEngine;
 class VertexBuffer;
 class Viewport;
 class WebGLDataBuffer;
@@ -38,7 +38,7 @@ public:
    * @param engine the engine to use for rendering
    * @param options defines the options of the effect renderer
    */
-  EffectRenderer(Engine* engine,
+  EffectRenderer(ThinEngine* engine,
                  const IEffectRendererOptions& options = EffectRenderer::_DefaultOptions);
   ~EffectRenderer();
 
@@ -89,7 +89,7 @@ private:
   TexturePtr _getNextFrameBuffer(bool incrementIndex = true);
 
 public:
-  Engine* engine;
+  ThinEngine* engine;
 
 private:
   std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;

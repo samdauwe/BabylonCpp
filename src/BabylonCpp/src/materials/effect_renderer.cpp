@@ -8,6 +8,8 @@
 #include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/meshes/vertex_buffer.h>
+#include <babylon/states/depth_culling_state.h>
+#include <babylon/states/stencil_state.h>
 
 namespace BABYLON {
 
@@ -46,19 +48,19 @@ TexturePtr EffectRenderer::_getNextFrameBuffer(bool incrementIndex)
   return ret;
 }
 
-EffectRenderer::EffectRenderer(Engine* iEngine, const IEffectRendererOptions& options)
+EffectRenderer::EffectRenderer(ThinEngine* iEngine, const IEffectRendererOptions& options)
     : engine{iEngine}, _fullscreenViewport{std::make_unique<Viewport>(0.f, 0.f, 1.f, 1.f)}
 {
   _vertexBuffers = {
     {VertexBuffer::PositionKind,
-     std::make_unique<VertexBuffer>(engine, options.positions, VertexBuffer::PositionKind, false,
-                                    false, 2)},
+     std::make_unique<VertexBuffer>(static_cast<Engine*>(engine), options.positions,
+                                    VertexBuffer::PositionKind, false, false, 2)},
   };
   _indexBuffer = engine->createIndexBuffer(options.indices);
 
   // No need here for full screen render.
-  engine->setDepthBuffer(false);
-  engine->setStencilBuffer(false);
+  iEngine->depthCullingState()->depthTest = false;
+  iEngine->stencilState()->stencilTest    = false;
 }
 
 EffectRenderer::~EffectRenderer() = default;
