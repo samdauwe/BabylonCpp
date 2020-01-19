@@ -8,7 +8,7 @@
 
 namespace BABYLON {
 
-class Engine;
+class ThinEngine;
 
 /**
  * @brief Options to create an EffectWrapper.
@@ -17,7 +17,7 @@ struct BABYLON_SHARED_EXPORT EffectWrapperCreationOptions {
   /**
    * Engine to use to create the effect
    */
-  Engine* engine = nullptr;
+  ThinEngine* engine = nullptr;
   /**
    * Fragment shader for the effect
    */
