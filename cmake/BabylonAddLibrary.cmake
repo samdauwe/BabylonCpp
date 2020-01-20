@@ -36,9 +36,19 @@ endfunction()
 
 function(babylon_add_executable TARGET)
     message("babylon_add_executable ${TARGET}")
+    set(sources ${ARGN})
 
-    add_executable(${TARGET} ${ARGN})
+    # Enable backward-cpp stack trace for linux
+    if(UNIX AND NOT APPLE)
+        message("babylon_add_executable => with backward-cpp stack trace on failures")
+        set(sources ${sources} ${BACKWARD_ENABLE})
+    endif()
+
+    add_executable(${TARGET} ${sources})
     babylon_target_clang_tidy(${TARGET})
+
+    # Enable backward-cpp stack trace for linux
+    add_backward(${TARGET})
 endfunction()
 
 
