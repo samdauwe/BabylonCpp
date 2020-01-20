@@ -3,7 +3,7 @@
 #include <babylon/core/logging/init_console_logger.h>
 #include <babylon/utils/CLI11.h>
 
-#include "spawn_screenshots.h"
+#include "BabylonStudio/screenshoter/spawn_screenshots.h"
 
 #ifdef BABYLON_BUILD_PLAYGROUND
 #include <BabylonStudio/rtc/rtc_manager.h>

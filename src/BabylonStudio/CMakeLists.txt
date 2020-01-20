@@ -70,6 +70,7 @@ target_link_libraries(${TARGET}
     BabylonCpp
     Samples
     json_hpp
+    subprocess_h
 )
 if (NOT EMSCRIPTEN)
     target_link_libraries(${TARGET} PRIVATE ${OPENGL_LIBRARIES})

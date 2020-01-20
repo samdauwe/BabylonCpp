@@ -23,6 +23,11 @@
 namespace BABYLON {
 
 
+const std::string screenshotsDirectory()
+{
+  return "ScreenShots/";
+}
+
 struct EmptyScene : public BABYLON::IRenderableScene {
   const char* getName() override
   {
@@ -239,8 +244,12 @@ private:
 
   void saveScreenshot(std::string filename = "")
   {
+    if (!BABYLON::Filesystem::isDirectory(screenshotsDirectory()))
+      BABYLON::Filesystem::createDirectory(screenshotsDirectory());
     if (filename.empty())
       filename = std::string(_appContext._sceneWidget->getRenderableScene()->getName()) + ".jpg";
+
+    filename = screenshotsDirectory() + "/" + filename;
     int imageWidth = 200;
     int jpgQuality = 75;
     this->_appContext._sceneWidget->getCanvas()->saveScreenshotJpg(
