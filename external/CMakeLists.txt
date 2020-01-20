@@ -105,3 +105,8 @@ set(PROMISE_CPP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/promise-cpp
 if(UNIX AND NOT APPLE)
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/backward-cpp)
 endif()
+
+# subprocess_h: A simple one header solution to launching processes and interacting with them for C and C++
+# https://github.com/sheredom/subprocess.h
+add_library(subprocess_h INTERFACE)
+target_include_directories(subprocess_h INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/subprocess_h)
