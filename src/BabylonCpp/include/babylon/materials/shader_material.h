@@ -175,6 +175,14 @@ public:
   ShaderMaterial& setMatrix(const std::string& name, const Matrix& value);
 
   /**
+   * @brief Set a float32Array in the shader from a matrix array.
+   * @param name Define the name of the uniform as defined in the shader
+   * @param value Define the value to give to the uniform
+   * @return the material itself allowing "fluent" like uniform updates
+   */
+  ShaderMaterial& setMatrices(const std::string& name, const std::vector<Matrix>& value);
+
+  /**
    * @brief Set a mat3 in the shader from a Float32Array.
    * @param name Define the name of the uniform as defined in the shader
    * @param value Define the value to give to the uniform
@@ -319,9 +327,28 @@ protected:
   ShaderMaterial(const std::string& name, Scene* scene, const std::string& shaderPath,
                  const IShaderMaterialOptions& options);
 
+  /**
+   * @brief Gets the shader path used to define the shader code.
+   * It can be modified to trigger a new compilation
+   */
+  std::string get_shaderPath() const;
+
+  /**
+   * @brief Sets the shader path used to define the shader code.
+   * It can be modified to trigger a new compilation
+   */
+  void set_shaderPath(const std::string shaderPath);
+
 private:
   bool _checkCache(AbstractMesh* mesh, bool useInstances = false);
   void _checkUniform(const std::string& uniformName);
+
+public:
+  /**
+   * @brief Gets or sets the shader path used to define the shader code.
+   * It can be modified to trigger a new compilation
+   */
+  Property<ShaderMaterial, std::string> shaderPath;
 
 private:
   std::string _shaderPath;
@@ -339,6 +366,7 @@ private:
   std::unordered_map<std::string, Vector3> _vectors3;
   std::unordered_map<std::string, Vector4> _vectors4;
   std::unordered_map<std::string, Matrix> _matrices;
+  std::unordered_map<std::string, Float32Array> _matrixArrays;
   std::unordered_map<std::string, Float32Array> _matrices3x3;
   std::unordered_map<std::string, Float32Array> _matrices2x2;
   std::unordered_map<std::string, Float32Array> _vectors2Arrays;
@@ -347,6 +375,7 @@ private:
   Matrix _cachedWorldViewMatrix;
   Matrix _cachedWorldViewProjectionMatrix;
   int _renderId;
+  bool _multiview;
 
 }; // end of class ShaderMaterial
 

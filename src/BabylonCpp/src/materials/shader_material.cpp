@@ -2,12 +2,14 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
+#include <babylon/cameras/camera.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material_helper.h>
+#include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/maths/color3.h>
 #include <babylon/maths/color4.h>
@@ -24,7 +26,11 @@ namespace BABYLON {
 
 ShaderMaterial::ShaderMaterial(const std::string& iName, Scene* scene,
                                const std::string& shaderPath, const IShaderMaterialOptions& options)
-    : Material{iName, scene}, _shaderPath{shaderPath}, _renderId{-1}
+    : Material{iName, scene}
+    , shaderPath{this, &ShaderMaterial::get_shaderPath, &ShaderMaterial::set_shaderPath}
+    , _shaderPath{shaderPath}
+    , _renderId{-1}
+    , _multiview{false}
 {
   _options.needAlphaBlending = options.needAlphaBlending;
   _options.needAlphaTesting  = options.needAlphaTesting;
@@ -36,6 +42,16 @@ ShaderMaterial::ShaderMaterial(const std::string& iName, Scene* scene,
 }
 
 ShaderMaterial::~ShaderMaterial() = default;
+
+std::string ShaderMaterial::get_shaderPath() const
+{
+  return _shaderPath;
+}
+
+void ShaderMaterial::set_shaderPath(const std::string iShaderPath)
+{
+  _shaderPath = iShaderPath;
+}
 
 IShaderMaterialOptions& ShaderMaterial::options()
 {
@@ -193,6 +209,24 @@ ShaderMaterial& ShaderMaterial::setMatrix(const std::string& iName, const Matrix
   return *this;
 }
 
+ShaderMaterial& ShaderMaterial::setMatrices(const std::string& iName,
+                                            const std::vector<Matrix>& value)
+{
+  _checkUniform(iName);
+
+  auto float32Array = Float32Array(value.size() * 16, 0.f);
+
+  for (unsigned int index = 0; index < value.size(); ++index) {
+    const auto& matrix = value[index];
+
+    matrix.copyToArray(float32Array, index * 16);
+  }
+
+  _matrixArrays[name] = float32Array;
+
+  return *this;
+}
+
 ShaderMaterial& ShaderMaterial::setMatrix3x3(const std::string& iName, const Float32Array& value)
 {
   _checkUniform(iName);
@@ -244,7 +278,7 @@ bool ShaderMaterial::_checkCache(AbstractMesh* mesh, bool useInstances)
     return false;
   }
 
-  return false;
+  return true;
 }
 
 bool ShaderMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* /*subMesh*/,
@@ -255,6 +289,12 @@ bool ShaderMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* /*subMes
 
 bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
 {
+  if (_effect && isFrozen()) {
+    if (_wasPreviouslyReady) {
+      return true;
+    }
+  }
+
   auto scene  = getScene();
   auto engine = scene->getEngine();
 
@@ -270,6 +310,18 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   std::vector<std::string> defines;
   std::vector<std::string> attribs;
   auto fallbacks = std::make_unique<EffectFallbacks>();
+
+  // global multiview
+  if (engine->getCaps().multiview && scene->activeCamera()
+      && scene->activeCamera()->outputRenderTarget
+      && scene->activeCamera()->outputRenderTarget->getViewCount() > 1) {
+    _multiview = true;
+    defines.emplace_back("#define MULTIVIEW");
+    if (stl_util::index_of(_options.uniforms, "viewProjection") != -1
+        && stl_util::index_of(_options.uniforms, "viewProjectionR") == -1) {
+      _options.uniforms.emplace_back("viewProjectionR");
+    }
+  }
 
   for (const auto& _define : _options.defines) {
     defines.emplace_back(_define);
@@ -362,7 +414,8 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
     scene->resetCachedMaterial();
   }
 
-  _renderId = scene->getRenderId();
+  _renderId           = scene->getRenderId();
+  _wasPreviouslyReady = true;
 
   return true;
 }
@@ -406,100 +459,107 @@ void ShaderMaterial::bind(Matrix& world, Mesh* mesh)
 
     if (stl_util::contains(_options.uniforms, "viewProjection")) {
       _effect->setMatrix("viewProjection", getScene()->getTransformMatrix());
+      if (_multiview) {
+        _effect->setMatrix("viewProjectionR", getScene()->_transformMatrixR);
+      }
     }
 
     // Bones
     MaterialHelper::BindBonesParameters(mesh, _effect);
 
     // Texture
-    for (const auto& kv : _textures) {
-      _effect->setTexture(kv.first, kv.second);
+    for (const auto& [name, texture] : _textures) {
+      _effect->setTexture(name, texture);
     }
 
     // Texture arrays
-    for (const auto& kv : _textureArrays) {
-      _effect->setTextureArray(kv.first, kv.second);
+    for (const auto& [name, textureArray] : _textureArrays) {
+      _effect->setTextureArray(name, textureArray);
     }
 
     // Int
-    for (const auto& kv : _ints) {
-      _effect->setInt(kv.first, kv.second);
+    for (const auto& [name, intValue] : _ints) {
+      _effect->setInt(name, intValue);
     }
 
     // Float
-    for (const auto& kv : _floats) {
-      _effect->setFloat(kv.first, kv.second);
+    for (const auto& [name, floatValue] : _floats) {
+      _effect->setFloat(name, floatValue);
     }
 
     // Floats
-    for (const auto& kv : _floatsArrays) {
-      _effect->setArray(kv.first, kv.second);
+    for (const auto& [name, floatsArray] : _floatsArrays) {
+      _effect->setArray(name, floatsArray);
     }
 
     // Color3
-    for (const auto& kv : _colors3) {
-      _effect->setColor3(kv.first, kv.second);
+    for (const auto& [name, colors3] : _colors3) {
+      _effect->setColor3(name, colors3);
     }
 
     // Color3Array
-    for (const auto& kv : _colors3Arrays) {
-      _effect->setArray3(kv.first, kv.second);
+    for (const auto& [name, array3] : _colors3Arrays) {
+      _effect->setArray3(name, array3);
     }
 
     // Color4
-    for (const auto& kv : _colors4) {
-      const Color4& color = kv.second;
-      _effect->setFloat4(kv.first, color.r, color.g, color.b, color.a);
+    for (const auto& [name, color] : _colors4) {
+      _effect->setFloat4(name, color.r, color.g, color.b, color.a);
     }
 
     // Color4Array
-    for (const auto& kv : _colors4Arrays) {
-      _effect->setArray4(kv.first, kv.second);
+    for (const auto& [name, array4] : _colors4Arrays) {
+      _effect->setArray4(name, array4);
     }
 
     // Vector2
-    for (const auto& kv : _vectors2) {
-      _effect->setVector2(kv.first, kv.second);
+    for (const auto& [name, vectors2] : _vectors2) {
+      _effect->setVector2(name, vectors2);
     }
 
     // Vector3
-    for (const auto& kv : _vectors3) {
-      _effect->setVector3(kv.first, kv.second);
+    for (const auto& [name, vector3] : _vectors3) {
+      _effect->setVector3(name, vector3);
     }
 
     // Vector4
-    for (const auto& kv : _vectors4) {
-      _effect->setVector4(kv.first, kv.second);
+    for (const auto& [name, vector4] : _vectors4) {
+      _effect->setVector4(name, vector4);
     }
 
     // Matrix
-    for (const auto& kv : _matrices) {
-      _effect->setMatrix(kv.first, kv.second);
+    for (const auto& [name, matrix] : _matrices) {
+      _effect->setMatrix(name, matrix);
+    }
+
+    // MatrixArray
+    for (const auto& [name, matrixArray] : _matrixArrays) {
+      _effect->setMatrices(name, matrixArray);
     }
 
     // Matrix 3x3
-    for (const auto& kv : _matrices3x3) {
-      _effect->setMatrix3x3(kv.first, kv.second);
+    for (const auto& [name, matrices3x3] : _matrices3x3) {
+      _effect->setMatrix3x3(name, matrices3x3);
     }
 
     // Matrix 2x2
-    for (const auto& kv : _matrices2x2) {
-      _effect->setMatrix2x2(kv.first, kv.second);
+    for (const auto& [name, matrix2x2] : _matrices2x2) {
+      _effect->setMatrix2x2(name, matrix2x2);
     }
 
     // Vector2Array
-    for (const auto& kv : _vectors2Arrays) {
-      _effect->setArray2(kv.first, kv.second);
+    for (const auto& [name, array2] : _vectors2Arrays) {
+      _effect->setArray2(name, array2);
     }
 
     // Vector3Array
-    for (const auto& kv : _vectors3Arrays) {
-      _effect->setArray3(kv.first, kv.second);
+    for (const auto& [name, array3] : _vectors3Arrays) {
+      _effect->setArray3(name, array3);
     }
 
     // Vector4Array
-    for (const auto& kv : _vectors4Arrays) {
-      _effect->setArray4(kv.first, kv.second);
+    for (const auto& [name, array4] : _vectors4Arrays) {
+      _effect->setArray4(name, array4);
     }
   }
 
@@ -547,7 +607,67 @@ bool ShaderMaterial::hasTexture(const BaseTexturePtr& texture) const
 
 MaterialPtr ShaderMaterial::clone(const std::string& iName, bool /*cloneChildren*/) const
 {
-  return ShaderMaterial::New(iName, getScene(), _shaderPath, _options);
+  auto result = ShaderMaterial::New(iName, getScene(), _shaderPath, _options);
+
+  result->name = name;
+  result->id   = name;
+
+  // Texture
+  for (const auto& [name, texture] : _textures) {
+    result->setTexture(name, texture);
+  }
+
+  // Float
+  for (const auto& [name, floatValue] : _floats) {
+    result->setFloat(name, floatValue);
+  }
+
+  // Floats
+  for (const auto& [name, floatsArray] : _floatsArrays) {
+    result->setFloats(name, floatsArray);
+  }
+
+  // Color3
+  for (const auto& [name, colors3] : _colors3) {
+    result->setColor3(name, colors3);
+  }
+
+  // Color4
+  for (const auto& [name, colors4] : _colors4) {
+    result->setColor4(name, colors4);
+  }
+
+  // Vector2
+  for (const auto& [name, vectors2] : _vectors2) {
+    result->setVector2(name, vectors2);
+  }
+
+  // Vector3
+  for (const auto& [name, vector3] : _vectors3) {
+    result->setVector3(name, vector3);
+  }
+
+  // Vector4
+  for (const auto& [name, vector4] : _vectors4) {
+    result->setVector4(name, vector4);
+  }
+
+  // Matrix
+  for (const auto& [name, matrix] : _matrices) {
+    result->setMatrix(name, matrix);
+  }
+
+  // Matrix 3x3
+  for (const auto& [name, matrix3x3] : _matrices3x3) {
+    result->setMatrix3x3(name, matrix3x3);
+  }
+
+  // Matrix 2x2
+  for (const auto& [name, matrix2x2] : _matrices2x2) {
+    result->setMatrix2x2(name, matrix2x2);
+  }
+
+  return result;
 }
 
 void ShaderMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
