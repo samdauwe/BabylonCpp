@@ -24,6 +24,19 @@ if (NOT BABYLON_WASM)
     option(BUILD_SHARED_LIBS     "Build shared instead of static libraries."     ON)
 endif()
 
+option(BABYLON_SANITIZE_ASAN "Use clang address sanitizer" OFF)
+if (BABYLON_SANITIZE_ASAN)
+    add_compile_options("-fsanitize=address")
+    link_libraries("-fsanitize=address")
+    link_libraries(-shared-libasan)
+endif()
+option(BABYLON_SANITIZE_UB "Use clang UB (undefined behavior) sanitizer" OFF)
+if (BABYLON_SANITIZE_UB)
+    add_compile_options("-fsanitize=undefined")
+    link_libraries("-fsanitize=undefined")
+endif()
+
+
 # use ccache if present
 find_program(CCACHE_PROGRAM ccache)
 if(CCACHE_PROGRAM)
