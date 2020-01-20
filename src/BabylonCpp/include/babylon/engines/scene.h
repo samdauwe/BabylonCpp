@@ -3393,6 +3393,11 @@ public:
    */
   std::function<float()> getDeterministicFrameTime;
 
+  /**
+   * Hidden
+   */
+  Matrix _transformMatrixR;
+
 protected:
   /** Hidden */
   BaseTexturePtr _environmentTexture;
@@ -3582,8 +3587,6 @@ private:
   std::optional<bool> _audioEnabled;
   std::optional<bool> _headphone;
 
-  /** Hidden */
-  Matrix _transformMatrixR;
   /** Hidden */
   std::unique_ptr<UniformBuffer> _multiviewSceneUbo;
 

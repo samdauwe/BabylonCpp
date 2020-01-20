@@ -205,6 +205,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , getCollidingSubMeshCandidates{nullptr}
     , _physicsEngine{nullptr}
     , _physicsTimeAccumulator{0.f}
+    , _transformMatrixR{Matrix::Zero()}
     , _environmentTexture{nullptr}
     , _environmentIntensity{1.f}
     , _animationPropertiesOverride{nullptr}
@@ -293,7 +294,6 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , _cachedRayForTransform{nullptr}
     , _audioEnabled{std::nullopt}
     , _headphone{std::nullopt}
-    , _transformMatrixR{Matrix::Zero()}
     , _multiviewSceneUbo{nullptr}
 {
   _engine = engine ? engine : Engine::LastCreatedEngine();
