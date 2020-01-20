@@ -119,6 +119,7 @@ std::shared_ptr<IRenderableScene> make_PbrSpecularGlossinessTextureMaterialScene
 std::shared_ptr<IRenderableScene> make_ShaderMaterialBoxScene(ICanvas* canvas);
 std::shared_ptr<IRenderableScene> make_ShaderMaterialBoxesScene(ICanvas* canvas);
 std::shared_ptr<IRenderableScene> make_ShaderMaterialCarvedTreesScene(ICanvas* canvas);
+std::shared_ptr<IRenderableScene> make_ShaderMaterialCelebrationOfNewYear2020(ICanvas* canvas);
 std::shared_ptr<IRenderableScene> make_ShaderMaterialChainsAndGearsScene(ICanvas* canvas);
 std::shared_ptr<IRenderableScene> make_ShaderMaterialCloudsScene(ICanvas* canvas);
 std::shared_ptr<IRenderableScene> make_ShaderMaterialCylindersScene(ICanvas* canvas);
@@ -392,6 +393,7 @@ inline void auto_populate_samples(SamplesIndex & samplesIndex)
   samplesIndex.RegisterSample("Shader Material", "ShaderMaterialBoxScene", make_ShaderMaterialBoxScene);
   samplesIndex.RegisterSample("Shader Material", "ShaderMaterialBoxesScene", make_ShaderMaterialBoxesScene);
   samplesIndex.RegisterSample("Shader Material", "ShaderMaterialCarvedTreesScene", make_ShaderMaterialCarvedTreesScene);
+  samplesIndex.RegisterSample("Shader Material", "ShaderMaterialCelebrationOfNewYear2020", make_ShaderMaterialCelebrationOfNewYear2020);
   samplesIndex.RegisterSample("Shader Material", "ShaderMaterialChainsAndGearsScene", make_ShaderMaterialChainsAndGearsScene);
   samplesIndex.RegisterSample("Shader Material", "ShaderMaterialCloudsScene", make_ShaderMaterialCloudsScene);
   samplesIndex.RegisterSample("Shader Material", "ShaderMaterialCylindersScene", make_ShaderMaterialCylindersScene);
