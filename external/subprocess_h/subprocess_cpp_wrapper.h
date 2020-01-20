@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-inline subprocess_weak int subprocess_create_cpp(const std::vector<std::string> command_line_vector,
+subprocess_weak int subprocess_create_cpp(const std::vector<std::string> command_line_vector,
                                       int options,
                                       struct subprocess_s *const out_process)
 {

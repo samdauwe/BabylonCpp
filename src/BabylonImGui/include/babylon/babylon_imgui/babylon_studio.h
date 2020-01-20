@@ -11,7 +11,7 @@
 
 
 namespace BABYLON {
-  const std::string screenshotsDirectory();
+  const BABYLON_SHARED_EXPORT std::string screenshotsDirectory();
 
   struct BABYLON_SHARED_EXPORT PlaygroundCompilerStatus
   {

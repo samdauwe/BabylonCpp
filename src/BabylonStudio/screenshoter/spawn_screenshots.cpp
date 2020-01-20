@@ -16,6 +16,9 @@
 #include <signal.h>
 #endif
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4996)
+#endif
 
 namespace BABYLON {
 namespace impl {
@@ -109,6 +112,10 @@ SpawnResult SpawnWaitSubProcess(
 
 void spawnScreenshots(const std::string & exeName, bool skipFailing)
 {
+#ifdef _WIN32
+  BABYLON_LOG_ERROR("spawnScreenshots", " needs fix under windows...");
+  return;
+#endif
   if (!BABYLON::Filesystem::isDirectory(screenshotsDirectory()))
     BABYLON::Filesystem::createDirectory(screenshotsDirectory());
 
