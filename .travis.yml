@@ -108,10 +108,10 @@ before_script:
 script:
   - make all -j 4 -k
   - ctest . --output-on-failure
-  - cd build/bin
-  - Xvfb :5 -screen 0 1280x1024x24 &
-  - sleep 3
-  - DISPLAY=:5 ./BabylonStudio -a
+#  - cd build/bin
+#  - Xvfb :5 -screen 0 1280x1024x24 &
+#  - sleep 3
+#  - DISPLAY=:5 ./BabylonStudio -a
 
 # Notifications settings
 notifications:
