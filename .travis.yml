@@ -112,7 +112,6 @@ script:
   - Xvfb :5 -screen 0 1280x1024x24 &
   - sleep 3
   - DISPLAY=:5 ./BabylonStudio -a
-  - cat Screenshots/_stats.txt
 
 # Notifications settings
 notifications:
