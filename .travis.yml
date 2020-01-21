@@ -40,6 +40,7 @@ matrix:
             - libgl1-mesa-dev
             - mesa-common-dev
             - clang-5.0
+            - xvfb
       env: CC_VERSION=clang-5.0 CXX_VERSION=clang++-5.0
 
     # OSX
@@ -108,7 +109,9 @@ script:
   - make all -j 4 -k
   - ctest . --output-on-failure
   - cd build/bin
-  - ./BabylonStudio -a
+  - Xvfb :5 -screen 0 1280x1024x24 &
+  - sleep 3
+  - DISPLAY=:5 ./BabylonStudio -a
   - cat Screenshots/_stats.txt
 
 # Notifications settings
