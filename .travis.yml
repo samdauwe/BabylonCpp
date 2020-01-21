@@ -103,9 +103,12 @@ before_script:
   - cd "${TRAVIS_BUILD_DIR}"
   - cmake --version
   - mkdir build && cd build && cmake ../
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
-  - sleep 3 # give xvfb some time to start
+  - |
+    if [[ $(uname) == "Linux" ]]; then
+      export DISPLAY=:99.0
+      sh -e /etc/init.d/xvfb start
+      sleep 3
+    fi
 
 # Build steps
 # See https://docs.travis-ci.com/user/gui-and-headless-browsers/#using-xvfb-to-run-tests-that-require-a-gui
@@ -113,9 +116,7 @@ script:
   - make all -j 4 -k
   - ctest . --output-on-failure
   - cd build/bin
-#  - Xvfb :5 -screen 0 1280x1024x24 &
-#  - sleep 3
-  - DISPLAY=:5 ./BabylonStudio -a
+  - ./BabylonStudio -a
 
 # Notifications settings
 notifications:
