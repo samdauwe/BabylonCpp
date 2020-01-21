@@ -100,10 +100,12 @@ public:
         }
         switch (_currentAnim) {
           case 0:
-            _scene->beginAnimation(_testMorphTarget, 10, 0);
+            if (_testMorphTarget)
+              _scene->beginAnimation(_testMorphTarget, 10, 0);
             break;
           case 1:
-            _scene->beginAnimation(_testMorphTarget, 0, 10);
+            if (_testMorphTarget)
+              _scene->beginAnimation(_testMorphTarget, 0, 10);
             break;
           default:
             break;
