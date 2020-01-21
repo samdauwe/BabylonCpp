@@ -9,7 +9,9 @@
 #include <babylon/babylon_api.h>
 #include <map>
 
+
 namespace BABYLON {
+  const BABYLON_SHARED_EXPORT std::string screenshotsDirectory();
 
   struct BABYLON_SHARED_EXPORT PlaygroundCompilerStatus
   {

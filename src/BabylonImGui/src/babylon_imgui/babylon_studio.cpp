@@ -23,6 +23,11 @@
 namespace BABYLON {
 
 
+const std::string screenshotsDirectory()
+{
+  return "ScreenShots/";
+}
+
 struct EmptyScene : public BABYLON::IRenderableScene {
   const char* getName() override
   {
@@ -126,33 +131,27 @@ private:
 
   void initScene()
   {
-    std::cout << "initScene 1 \n";
     _appContext.sampleListComponent().OnNewRenderableScene
       = [&](std::shared_ptr<IRenderableScene> scene) {
           this->setRenderableScene(scene);
           _studioLayout.FocusWindow(DockableWindowId::Scene3d);
         };
-    std::cout << "initScene 2 \n";
 
     _appContext.sampleListComponent().OnEditFiles = [&](const std::vector<std::string>& files) {
       _samplesCodeEditor.setFiles(files);
       _studioLayout.setVisible(DockableWindowId::SamplesCodeViewer, true);
       _studioLayout.FocusWindow(DockableWindowId::SamplesCodeViewer);
     };
-    std::cout << "initScene 3 \n";
 
     _appContext.sampleListComponent().OnLoopSamples = [&](const std::vector<std::string>& samples) {
       _appContext._loopSamples.flagLoop      = true;
       _appContext._loopSamples.samplesToLoop = samples;
       _appContext._loopSamples.currentIdx    = 0;
     };
-    std::cout << "initScene 4 \n";
 
     _appContext._sceneWidget = std::make_unique<BABYLON::ImGuiSceneWidget>(ImVec2(640.f, 480.f));
-    std::cout << "initScene 5 \n";
     _appContext._sceneWidget->OnBeforeResize.push_back(
       [this]() { _appContext._inspector.release(); });
-    std::cout << "initScene 6 \n";
   }
 
   void prepareSceneInspector()
@@ -245,8 +244,12 @@ private:
 
   void saveScreenshot(std::string filename = "")
   {
+    if (!BABYLON::Filesystem::isDirectory(screenshotsDirectory()))
+      BABYLON::Filesystem::createDirectory(screenshotsDirectory());
     if (filename.empty())
       filename = std::string(_appContext._sceneWidget->getRenderableScene()->getName()) + ".jpg";
+
+    filename = screenshotsDirectory() + "/" + filename;
     int imageWidth = 200;
     int jpgQuality = 75;
     this->_appContext._sceneWidget->getCanvas()->saveScreenshotJpg(

@@ -22,3 +22,6 @@
 [submodule "external/promise-cpp"]
 	path = external/promise-cpp
 	url = https://github.com/xhawk18/promise-cpp.git
+[submodule "external/backward-cpp"]
+	path = external/backward-cpp
+	url = https://github.com/bombela/backward-cpp.git

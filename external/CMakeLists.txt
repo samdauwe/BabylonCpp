@@ -97,3 +97,16 @@ add_library(promise_cpp INTERFACE)
 target_include_directories(promise_cpp INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/promise-cpp)
 set(PROMISE_CPP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/promise-cpp
     CACHE INTERNAL "Include directories of promise-cpp")
+
+# backward-cpp: A beautiful stack trace pretty printer for C++
+# Will print a nice stack trace in case of failure (linux only)
+# Advice: install binutils-dev for even more useful stack trace
+# (sudo apt-get install binutils-dev)
+if(UNIX AND NOT APPLE)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/backward-cpp)
+endif()
+
+# subprocess_h: A simple one header solution to launching processes and interacting with them for C and C++
+# https://github.com/sheredom/subprocess.h
+add_library(subprocess_h INTERFACE)
+target_include_directories(subprocess_h INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/subprocess_h)

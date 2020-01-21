@@ -99,16 +99,13 @@ public:
 private:
   SamplesInfoCache()
   {
-    std::cout << "SamplesInfoCache() 1 \n";
     auto onSuccessLoad = [this](const std::string& jsonString) {
       this->onJsonLoaded(jsonString);
     };
     auto onErrorLoad = [this](const std::string& errorMessage) {
       this->onJsonErrorLoad(errorMessage);
     };
-    std::cout << "SamplesInfoCache() 2 \n";
     BABYLON::asio::LoadUrlAsync_Text("samples_info.json", onSuccessLoad, onErrorLoad);
-    std::cout << "SamplesInfoCache() 3 \n";
   }
 
   std::string lowerCaseName(const std::string & sampleNameMixedCase)
