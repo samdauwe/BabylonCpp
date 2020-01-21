@@ -42,8 +42,7 @@ int main(int argc, char** argv)
     BABYLON::initConsoleLogger();
 
   if (flagSpawnScreenshots) {
-    bool skipFailingSamples = false;
-    BABYLON::impl::spawnScreenshots(argv[0], skipFailingSamples); exit(0);
+    BABYLON::impl::spawnScreenshots(argv[0]); exit(0);
   }
 
   if (listSamples) {
