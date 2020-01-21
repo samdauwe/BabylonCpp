@@ -107,6 +107,9 @@ before_script:
 script:
   - make all -j 4 -k
   - ctest . --output-on-failure
+  - cd build/bin
+  - ./BabylonStudio -a
+  - cat Screenshots/_stats.txt
 
 # Notifications settings
 notifications:
