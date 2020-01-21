@@ -179,7 +179,7 @@ void spawnScreenshots(const std::string & exeName)
 
     std::vector<std::string> command =  { exeName, "-s", sampleName, "-p"};
     SpawnOptions spawnOptions;
-    spawnOptions.MaxExecutionTimeSeconds = 5.;
+    spawnOptions.MaxExecutionTimeSeconds = 15.;
     spawnOptions.CopyOutputToMainProgramOutput = false;
     auto spawnResult = SpawnWaitSubProcess(command, spawnOptions);
 
