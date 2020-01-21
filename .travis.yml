@@ -103,6 +103,9 @@ before_script:
   - cd "${TRAVIS_BUILD_DIR}"
   - cmake --version
   - mkdir build && cd build && cmake ../
+#  -
+#  - Setup virtual X server in order to run the examples:
+#  - See https://docs.travis-ci.com/user/gui-and-headless-browsers/#using-xvfb-to-run-tests-that-require-a-gui
   - |
     if [[ $(uname) == "Linux" ]]; then
       export DISPLAY=:99.0
@@ -111,12 +114,13 @@ before_script:
     fi
 
 # Build steps
-# See https://docs.travis-ci.com/user/gui-and-headless-browsers/#using-xvfb-to-run-tests-that-require-a-gui
 script:
   - make all -j 4 -k
   - ctest . --output-on-failure
-  - cd build/bin
-  - ./BabylonStudio -a
+#  -
+#  - BabylonStudio -a will run all the example and take screenshot (this is disabled for now)
+#  - cd build/bin
+#  - ./BabylonStudio -a
 
 # Notifications settings
 notifications:
