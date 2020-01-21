@@ -71,12 +71,14 @@ GroundMeshPtr GroundBuilder::CreateGroundFromHeightMap(const std::string& name,
 
   ground->_setReady(false);
 
-  const auto onload = [&](const Image& img) {
+  const auto onload = [scene, width, height, subdivisions, minHeight, maxHeight, filter,
+                       alphaFilter, ground, updatable, onReady](const Image& img) {
     if (scene->isDisposed()) {
       return;
     }
 
     // Create VertexData from map data
+    GroundFromHeightMapOptions options;
     options.width        = width;
     options.height       = height;
     options.subdivisions = subdivisions;
