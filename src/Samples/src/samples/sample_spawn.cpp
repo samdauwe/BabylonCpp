@@ -66,12 +66,8 @@ SpawnResult SpawnWaitSubProcess(
     if ((spawnOptions.MaxExecutionTimeSeconds > 0.) && (elapsedSeconds > spawnOptions.MaxExecutionTimeSeconds))
     {
       wasProcessKilled = true;
-#ifdef __linux__
-      int resultKillSubprocess = kill(subProcess.child, 9);
-#else
-      int resultKillSubprocess = subprocess_destroy(&subProcess);
-#endif
-      if (0 != resultKillSubprocess)
+      int resultTerminateSubprocess = subprocess_terminate(&subProcess);
+      if (0 != resultTerminateSubprocess)
         throw std::runtime_error("spawnScreenshots: Error while killing subprocess after timeeout");
       done = true;
       spawnResult.MaxExecutionTimePassed = true;
