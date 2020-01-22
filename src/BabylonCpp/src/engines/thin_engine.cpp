@@ -834,10 +834,28 @@ void ThinEngine::bindFramebuffer(const InternalTexturePtr& texture,
   wipeCaches();
 }
 
+WebGLFramebufferPtr ThinEngine::_getRealFrameBuffer(const WebGLFramebufferPtr& framebuffer)
+{
+  WebGLFramebufferPtr realFrameBuffer = nullptr;
+  if (framebuffer) {
+    realFrameBuffer      = framebuffer;
+    auto previousId      = _gl->getParameteri(GL::FRAMEBUFFER_BINDING);
+    _previousFrameBuffer = std::make_unique<GL::IGLFramebuffer>(previousId);
+  }
+  else {
+    if (_previousFrameBuffer) {
+      realFrameBuffer = std::move(_previousFrameBuffer);
+      _previousFrameBuffer.reset();
+    }
+  }
+  return realFrameBuffer;
+}
+
 void ThinEngine::_bindUnboundFramebuffer(const WebGLFramebufferPtr& framebuffer)
 {
   if (_currentFramebuffer != framebuffer) {
-    _gl->bindFramebuffer(GL::FRAMEBUFFER, framebuffer.get());
+    auto realFrameBuffer = _getRealFrameBuffer(framebuffer);
+    _gl->bindFramebuffer(GL::FRAMEBUFFER, realFrameBuffer.get());
     _currentFramebuffer = framebuffer;
   }
 }

@@ -1613,6 +1613,7 @@ private:
   void _rebuildInternalTextures();
   void _rebuildEffects();
   void _initGLContext();
+  WebGLFramebufferPtr _getRealFrameBuffer(const WebGLFramebufferPtr& framebuffer);
   WebGLDataBufferPtr _createVertexBuffer(const Float32Array& data, unsigned int usage);
   void bindBuffer(const WebGLDataBufferPtr& buffer, int target);
   void _vertexAttribPointer(const WebGLDataBufferPtr& buffer, unsigned int indx, int size,
@@ -1859,6 +1860,12 @@ public:
    * value would be set.
    */
   bool enableUnpackFlipYCached = true;
+
+  /**
+   * Stores the previous frameBuffer during calls to bindFrameBuffer(), so that unBindFrameBuffer
+   * can restore it
+   */
+  std::unique_ptr<GL::IGLFramebuffer> _previousFrameBuffer = nullptr;
 
 protected:
   /**
