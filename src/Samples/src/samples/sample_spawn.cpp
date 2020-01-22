@@ -115,7 +115,7 @@ bool ReadImage_IsUniformColor_Sync(const std::string &imageFileName)
 
 bool ReadScreenshot_IsImageEmpty(const std::string & sampleName)
 {
-  std::string filename = BABYLON::Samples::screenshotsDirectory() + "/" + sampleName + ".jpg";
+  std::string filename = BABYLON::SamplesInfo::screenshotsDirectory() + "/" + sampleName + ".jpg";
   return ReadImage_IsUniformColor_Sync(filename);
 }
 

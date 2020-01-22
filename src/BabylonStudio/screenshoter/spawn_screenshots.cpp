@@ -3,16 +3,10 @@
 #include <iostream>
 #include <string>
 #include <babylon/core/filesystem.h>
-#include <babylon/core/timer.h>
 #include <babylon/babylon_imgui/babylon_studio.h>
 #include <babylon/samples/sample_spawn.h>
 #include <babylon/samples/samples_info.h>
 #include <nlohmann/json.hpp>
-
-#ifdef __linux__
-#include <sys/types.h>
-#include <signal.h>
-#endif
 
 #ifdef _MSC_VER
 #pragma warning(disable: 4996)
@@ -36,6 +30,8 @@ SpawnScreenshotsStats MakeEmptySpawnScreenshotsStats()
 
 void spawnScreenshots(const std::string & exeName, bool flagAsync)
 {
+  using namespace BABYLON::SamplesInfo;
+
 #ifdef _WIN32
   BABYLON_LOG_ERROR("spawnScreenshots", " needs fix under windows...");
   return;
@@ -62,7 +58,7 @@ void spawnScreenshots(const std::string & exeName, bool flagAsync)
     if (spawnResult.ExitStatus != 0)
     {
       BABYLON_LOG_WARN("ScreenshotAllSamples", "Subprocess has failed for sample ", sampleName);
-      std::string outputFilename = BABYLON::Samples::screenshotsDirectory() + "/" + sampleName + ".Fail.txt";
+      std::string outputFilename = screenshotsDirectory() + "/" + sampleName + ".Fail.txt";
       FILE* f                    = fopen(outputFilename.c_str(), "w");
       fprintf(f, "%s", spawnResult.StdOutErr.c_str());
       fclose(f);
@@ -73,7 +69,7 @@ void spawnScreenshots(const std::string & exeName, bool flagAsync)
     {
       BABYLON_LOG_WARN("ScreenshotAllSamples", "Subprocess MaxExecutionTimePassed for sample ",
                        sampleName);
-      std::string outputFilename = BABYLON::Samples::screenshotsDirectory() + "/" + sampleName + ".TooSlow.txt";
+      std::string outputFilename = screenshotsDirectory() + "/" + sampleName + ".TooSlow.txt";
       FILE * f = fopen(outputFilename.c_str(), "w");
       fprintf(f, "Process was killed because it took too long");
       fclose(f);
@@ -88,10 +84,10 @@ void spawnScreenshots(const std::string & exeName, bool flagAsync)
                          sampleName);
         ++spawnScreenshotsStats["nbEmptyRendering"];
 
-        std::string imageFilename = BABYLON::Samples::screenshotsDirectory() + "/" + sampleName + ".jpg";
+        std::string imageFilename = screenshotsDirectory() + "/" + sampleName + ".jpg";
         Filesystem::removeFile(imageFilename);
 
-        std::string outputFilename = BABYLON::Samples::screenshotsDirectory() + "/" + sampleName + ".EmptyRendering.txt";
+        std::string outputFilename = screenshotsDirectory() + "/" + sampleName + ".EmptyRendering.txt";
         FILE * f = fopen(outputFilename.c_str(), "w");
         fprintf(f, "3D Rendering is empty");
         fclose(f);
@@ -105,7 +101,7 @@ void spawnScreenshots(const std::string & exeName, bool flagAsync)
   {
     nlohmann::json jsonData;
     jsonData = spawnScreenshotsStats;
-    std::string outputFilename = BABYLON::Samples::screenshotsDirectory() + "/_stats.txt";
+    std::string outputFilename = screenshotsDirectory() + "/_stats.txt";
     FILE * f = fopen(outputFilename.c_str(), "w");
     std::string jsonString = jsonData.dump(4);
     fprintf(f, "%s", jsonString.c_str());

@@ -15,12 +15,10 @@ using IRenderableScenePtr = std::shared_ptr<IRenderableScene>;
 
 namespace Samples {
 
-
 using CategoryName = std::string;
 using SampleName = std::string;
 using SampleFactoryFunction = std::function<IRenderableScenePtr(ICanvas* iCanvas)>;
 using SamplesInCategory = std::unordered_map<std::string, SampleFactoryFunction>;
-
 
 
 // These informations are extracted from to source file
@@ -30,28 +28,6 @@ struct SampleSourceInfo {
   std::string Brief;
   std::vector<std::string> Links;
 };
-
-enum class SampleRunStatus {
-  success,
-  unhandledException,
-  processHung,
-  empty3d,
-  broken3d,
-  unknown
-};
-
-struct SampleRunInfo {
-  SampleRunStatus sampleRunStatus = SampleRunStatus::unknown;
-  std::string unhandledExceptionStackTrace = "";
-  std::string broken3dComment;
-  std::string screenshotFile;
-};
-
-struct SampleInfo {
-  SampleSourceInfo sourceInfo;
-  SampleRunInfo runInfo;
-};
-
 
 enum class SampleFailureReasonKind {
   segFault,

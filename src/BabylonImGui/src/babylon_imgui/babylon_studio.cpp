@@ -242,7 +242,7 @@ private:
     if (filename.empty())
       filename = std::string(_appContext._sceneWidget->getRenderableScene()->getName()) + ".jpg";
 
-    filename = BABYLON::Samples::screenshotsDirectory() + "/" + filename;
+    filename = BABYLON::SamplesInfo::screenshotsDirectory() + "/" + filename;
     int imageWidth = 200;
     int jpgQuality = 75;
     this->_appContext._sceneWidget->getCanvas()->saveScreenshotJpg(
