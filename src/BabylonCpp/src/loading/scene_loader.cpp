@@ -192,7 +192,8 @@ std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr> SceneLoader::_lo
   }
 
   const auto dataCallback
-    = [=](const std::variant<std::string, ArrayBuffer>& data, const std::string& responseURL) {
+    = [scene, onError, onSuccess, plugin](const std::variant<std::string, ArrayBuffer>& data,
+                                          const std::string& responseURL) {
         if (scene->isDisposed()) {
           onError("Scene has been disposed", "");
           return;
@@ -201,16 +202,16 @@ std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr> SceneLoader::_lo
         onSuccess(plugin, std::get<std::string>(data), responseURL);
       };
 
-  const auto manifestChecked = [=]() {
+  const auto manifestChecked = [fileInfo, dataCallback, useArrayBuffer, onError, onProgress]() {
     std::function<void(const ProgressEvent& event)> progressCallback = nullptr;
     if (onProgress) {
-      progressCallback = [=](const ProgressEvent& event) {
+      progressCallback = [onProgress](const ProgressEvent& event) {
         onProgress(SceneLoaderProgressEvent::FromProgressEvent(event));
       };
     }
 
     FileTools::LoadFile(fileInfo.url, dataCallback, progressCallback, useArrayBuffer,
-                        [=](const std::string& message, const std::string& exception) {
+                        [onError](const std::string& message, const std::string& exception) {
                           onError("Failed to load scene." + (message.empty() ? "" : " " + message),
                                   exception);
                         });

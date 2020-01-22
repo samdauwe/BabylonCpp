@@ -2286,7 +2286,8 @@ InternalTexturePtr ThinEngine::createTexture(
     }
   }
   else {
-    auto onload = [=](const Image& img) {
+    auto onload = [this, fromBlob, texture, scene, noMipmap, format, extension,
+                   samplingMode](const Image& img) {
       if (fromBlob && !_doNotHandleContextLost) {
         // We need to store the image if we need to rebuild the texture in case of a webgl context
         // lost
@@ -2295,7 +2296,8 @@ InternalTexturePtr ThinEngine::createTexture(
 
       _prepareWebGLTexture(
         texture, scene, img.width, img.height, texture->invertY, noMipmap, false,
-        [&](int potWidth, int potHeight, const std::function<void()>& continuationCallback) {
+        [this, scene, img, format, extension,
+         texture](int potWidth, int potHeight, const std::function<void()>& continuationCallback) {
           auto isPot = (img.width == potWidth && img.height == potHeight);
           auto internalFormat
             = (format ? _getInternalFormat(*format) : ((extension == ".jpg") ? GL::RGB : GL::RGBA));
@@ -2335,12 +2337,13 @@ InternalTexturePtr ThinEngine::createTexture(
             _gl->texImage2D(GL::TEXTURE_2D, 0, static_cast<int>(internalFormat), img.width,
                             img.height, 0, GL::RGBA, GL::UNSIGNED_BYTE, &img.data);
 
-            _rescaleTexture(source, texture, scene, internalFormat, [&]() {
-              _releaseTexture(source);
-              _bindTextureDirectly(GL::TEXTURE_2D, texture);
+            _rescaleTexture(source, texture, scene, internalFormat,
+                            [this, texture, source, continuationCallback]() {
+                              _releaseTexture(source);
+                              _bindTextureDirectly(GL::TEXTURE_2D, texture);
 
-              continuationCallback();
-            });
+                              continuationCallback();
+                            });
           }
 
           return true;
