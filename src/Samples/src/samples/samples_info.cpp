@@ -3,8 +3,12 @@
 namespace BABYLON {
 
 
-namespace Samples {
+namespace SamplesInfo {
 
+std::string screenshotsDirectory()
+{
+  return "ScreenShots/";
+}
 
 
 } // namespace Samples
