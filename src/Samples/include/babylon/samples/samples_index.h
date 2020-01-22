@@ -9,7 +9,7 @@
 namespace BABYLON {
 namespace Samples {
 
-struct SampleInfo {
+struct SampleSourceInfo {
   std::string HeaderFile;
   std::string SourceFile;
   std::string Brief;
@@ -66,9 +66,9 @@ public:
   /**
    * @brief Returns info about the sample, by parsing the source file tree.
    * @param sampleName the name of the sample to check
-   * @return SampleInfo struct. May throw if sample was not found.
+   * @return SampleSourceInfo struct. May throw if sample was not found.
    */
-  std::shared_ptr<SampleInfo> getSampleInfo(const std::string& sampleName) const;
+  std::shared_ptr<SampleSourceInfo> getSampleSourceInfo(const std::string& sampleName) const;
 
   /**
    * @brief Returns a sorted list containing the enabled examples.

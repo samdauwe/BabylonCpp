@@ -50,7 +50,7 @@ public:
   SamplesBrowserImpl() : _samplesIndex(Samples::SamplesIndex::Instance())
   {
     for (const std::string& sample : _samplesIndex.getSampleNames())
-      _samplesInfos[sample] = _samplesIndex.getSampleInfo(sample);
+      _samplesInfos[sample] = _samplesIndex.getSampleSourceInfo(sample);
     fillMatchingSamples();
   }
 
@@ -252,7 +252,7 @@ private:
     return r;
   }
 
-  std::map<SampleName, std::shared_ptr<SampleInfo>> _samplesInfos;
+  std::map<SampleName, std::shared_ptr<SampleSourceInfo>> _samplesInfos;
   SamplesIndex& _samplesIndex;
   std::map<CategoryName, std::vector<SampleName>> _matchingSamples;
 

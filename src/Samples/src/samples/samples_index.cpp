@@ -82,11 +82,11 @@ bool SamplesIndex::sampleExists(const std::string& sampleName) const
 class SamplesInfoCache
 {
 public:
-  std::shared_ptr<SampleInfo> getSampleInfo(const std::string& sampleNameMixedCase)
+  std::shared_ptr<SampleSourceInfo> getSampleInfo(const std::string& sampleNameMixedCase)
   {
     std::string name = lowerCaseName(sampleNameMixedCase);
     if (cacheSampleInfo_.find(name) == cacheSampleInfo_.end())
-      cacheSampleInfo_[name] = std::make_shared<SampleInfo>();
+      cacheSampleInfo_[name] = std::make_shared<SampleSourceInfo>();
     return cacheSampleInfo_.at(name);
   }
 
@@ -127,7 +127,7 @@ private:
     for (const auto& element : json_all_samples_info)
     {
       std::string name = element["sample_name"];
-      std::shared_ptr<SampleInfo> sampleInfo = getSampleInfo(name);
+      std::shared_ptr<SampleSourceInfo> sampleInfo = getSampleInfo(name);
       sampleInfo->Brief      = element["brief"];
       sampleInfo->HeaderFile = element["header_file"];
       sampleInfo->SourceFile = element["source_file"];
@@ -137,11 +137,11 @@ private:
     }
   }
 
-  std::map<std::string, std::shared_ptr<SampleInfo>> cacheSampleInfo_;
+  std::map<std::string, std::shared_ptr<SampleSourceInfo>> cacheSampleInfo_;
   bool wasJsonLoadStarted = false;
 };
 
-std::shared_ptr<SampleInfo> SamplesIndex::getSampleInfo(const std::string& sampleName) const
+std::shared_ptr<SampleSourceInfo> SamplesIndex::getSampleSourceInfo(const std::string& sampleName) const
 {
   return SamplesInfoCache::instance().getSampleInfo(sampleName);
 }
