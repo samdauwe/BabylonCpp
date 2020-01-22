@@ -112,13 +112,6 @@ public:
   std::vector<std::string> getCategoryNames() const;
 
   /**
-   * @brief Returns whether or not the category exists.
-   * @param categoryNameToSearch the name of the category to check
-   * @return whether or not the category exists
-   */
-  bool categoryExists(const std::string& categoryNameToSearch) const;
-
-  /**
    * @brief Returns a sorted list containing the enabled examples in the
    * specified category.
    * @return a sorted list containing the enabled examples in the specified
@@ -135,11 +128,6 @@ public:
    */
   IRenderableScenePtr
   createRenderableScene(const std::string& sampleName, ICanvas* iCanvas) const;
-
-  /**
-  * @ brief Output the list of samples to stdout
-  **/
-  void listSamples();
 
 private:
   void fillSamplesFailures() const;

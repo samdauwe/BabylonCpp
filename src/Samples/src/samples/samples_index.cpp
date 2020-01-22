@@ -173,23 +173,6 @@ std::vector<std::string> SamplesIndex::getCategoryNames() const
   return categoryNames;
 }
 
-bool SamplesIndex::categoryExists(const std::string& categoryNameToSearch) const
-{
-  bool _categoryExists = false;
-
-  // Extract the category names
-  auto categoryNames = stl_util::extract_keys(_samplesIndex);
-
-  // Search for sample
-  for (const auto& categoryName : categoryNames) {
-    if (categoryName == categoryNameToSearch) {
-      _categoryExists = true;
-      break;
-    }
-  }
-
-  return _categoryExists;
-}
 
 std::vector<std::string>
 SamplesIndex::getSampleNamesInCategory(const std::string& categoryName) const
@@ -219,22 +202,6 @@ IRenderableScenePtr SamplesIndex::createRenderableScene(const std::string& sampl
   }
 
   return nullptr;
-}
-
-void SamplesIndex::listSamples()
-{
-  auto categories = getCategoryNames();
-  for (const auto& category : categories) {
-    std::cout << "********************************************"
-              << "\n";
-    std::cout << "Category: " << category << "\n";
-    std::cout << "********************************************"
-              << "\n";
-    auto samples = getSampleNamesInCategory(category);
-    for (const auto& sample : samples) {
-      std::cout << sample << "\n";
-    }
-  }
 }
 
 std::string SampleFailureReason_Str(SampleFailureReasonKind s)
