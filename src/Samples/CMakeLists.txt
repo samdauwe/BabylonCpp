@@ -43,6 +43,7 @@ target_link_libraries(${TARGET}
     ProceduralTexturesLibrary
     Loaders
     json_hpp
+    subprocess_h
 )
 
 if (WIN32)
