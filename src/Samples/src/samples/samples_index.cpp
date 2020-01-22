@@ -44,7 +44,10 @@ SamplesIndex& SamplesIndex::Instance()
   static bool wasPopulated = false;
   if (!wasPopulated) {
     wasPopulated = true;
-    auto_populate_samples(instance);
+    auto registerFunction = [](const CategoryName &c, const SampleName &s, SampleFactoryFunction f) {
+      instance.RegisterSample(c, s, f);
+    };
+    auto_populate_samples(registerFunction);
   }
   return instance;
 }

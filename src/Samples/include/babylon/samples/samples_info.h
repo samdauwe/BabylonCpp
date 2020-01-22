@@ -32,11 +32,12 @@ struct BABYLON_SHARED_EXPORT SampleSourceInfo {
 enum class BABYLON_SHARED_EXPORT SampleRunStatus {
   success,
   unhandledException,
-  processHung,
+  tooSlowOrHung,
   empty3d,
   broken3d,
   unknown
 };
+std::string SampleRunStatusName(SampleRunStatus &s);
 
 struct BABYLON_SHARED_EXPORT SampleSearchQuery {
   std::string QueryString = "";
@@ -44,7 +45,7 @@ struct BABYLON_SHARED_EXPORT SampleSearchQuery {
   std::map<SampleRunStatus, bool> IncludeStatus = {
     { SampleRunStatus::success, true },
     { SampleRunStatus::unhandledException, true },
-    { SampleRunStatus::processHung, true },
+    { SampleRunStatus::tooSlowOrHung, true },
     { SampleRunStatus::empty3d, true },
     { SampleRunStatus::broken3d, true },
     { SampleRunStatus::unknown, true },
@@ -65,12 +66,11 @@ struct BABYLON_SHARED_EXPORT SampleData {
 };
 
 using SamplesInCategory = std::unordered_map<SampleName, SampleData>;
-using SamplesByCategory = std::unordered_map<CategoryName, SampleData>;
+using SamplesByCategory = std::unordered_map<CategoryName, SamplesInCategory >;
 
 
 BABYLON_SHARED_EXPORT const SamplesByCategory & AllSamples();
 BABYLON_SHARED_EXPORT SamplesByCategory SearchSamplesByCategory(const SampleSearchQuery & query = {});
-
 BABYLON_SHARED_EXPORT std::string screenshotsDirectory();
 
 } // namespace SamplesInfo
