@@ -33,7 +33,7 @@ void IRenderableScene::initialize(ICanvas* canvas)
   // Creates the basic Babylon Scene object
   _scene = Scene::New(_engine.get());
   // Set the render function
-  _renderFunction = [&]() { _scene->render(); };
+  _renderFunction = [=]() { _scene->render(); };
   // Initialize the scene
   initializeScene(_canvas, _scene.get());
   _initialized = true;

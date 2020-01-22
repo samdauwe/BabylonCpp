@@ -2111,7 +2111,10 @@ void Scene::_animate()
   _animationTime += static_cast<int>(deltaTime);
   const auto& animationTime = _animationTime;
 
-  for (const auto& animatable : animatables) {
+  // We make a copy of "animatables" because animatable->_animate can suppress
+  // elements from "animatables"
+  auto animatables_copy = animatables;
+  for (const auto& animatable : animatables_copy) {
     if (animatable) {
       if (!animatable->_animate(std::chrono::milliseconds(animationTime))
           && animatable->disposeOnEnd) {
