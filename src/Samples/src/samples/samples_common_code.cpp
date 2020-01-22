@@ -1,4 +1,4 @@
-#include <babylon/samples/samples_utils.h>
+#include <babylon/samples/samples_common_code.h>
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/materials/standard_material.h>

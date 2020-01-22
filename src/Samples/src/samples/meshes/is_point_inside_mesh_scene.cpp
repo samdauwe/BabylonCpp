@@ -7,7 +7,7 @@
 #include <babylon/meshes/instanced_mesh.h>
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/samples/babylon_register_sample.h>
-#include <babylon/samples/samples_utils.h>
+#include <babylon/samples/samples_common_code.h>
 
 namespace BABYLON {
 namespace Samples {

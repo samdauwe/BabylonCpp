@@ -12,7 +12,7 @@
 #include <babylon/navigation/icrowd.h>
 #include <babylon/navigation/inav_mesh_parameters.h>
 #include <babylon/samples/babylon_register_sample.h>
-#include <babylon/samples/samples_utils.h>
+#include <babylon/samples/samples_common_code.h>
 
 namespace BABYLON {
 namespace Samples {

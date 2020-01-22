@@ -13,7 +13,7 @@
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/samples/babylon_register_sample.h>
-#include <babylon/samples/samples_utils.h>
+#include <babylon/samples/samples_common_code.h>
 
 namespace BABYLON {
 
