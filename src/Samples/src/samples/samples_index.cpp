@@ -54,7 +54,7 @@ SamplesIndex::~SamplesIndex() = default;
 void SamplesIndex::RegisterSample(const std::string& categoryName, const std::string& sampleName,
                                   SampleFactoryFunction fn)
 {
-  _samplesIndex[categoryName].addSample(sampleName, fn);
+  _samplesByCategory[categoryName][sampleName] = fn;
 }
 
 std::optional<BABYLON::Samples::SampleFailureReason>
@@ -70,8 +70,8 @@ SamplesIndex::doesSampleFail(const std::string& sampleName) const
 
 bool SamplesIndex::sampleExists(const std::string& sampleName) const
 {
-  for (const auto& item : _samplesIndex) {
-    if (stl_util::contains(item.second.samples(), sampleName)) {
+  for (const auto& samplesInCategory : _samplesByCategory) {
+    if (stl_util::contains(samplesInCategory.second, sampleName)) {
       return true;
     }
   }
@@ -150,8 +150,8 @@ std::vector<std::string> SamplesIndex::getSampleNames() const
 {
   // Extract the enabled sample names from the map
   std::vector<std::string> sampleNames;
-  for (const auto& samplesCategory : _samplesIndex) {
-    for (const auto& element : samplesCategory.second.samples()) {
+  for (const auto& samplesCategory : _samplesByCategory) {
+    for (const auto& element : samplesCategory.second) {
       sampleNames.emplace_back(element.first);
     }
   }
@@ -165,7 +165,7 @@ std::vector<std::string> SamplesIndex::getSampleNames() const
 std::vector<std::string> SamplesIndex::getCategoryNames() const
 {
   // Extract the category names
-  auto categoryNames = stl_util::extract_keys(_samplesIndex);
+  auto categoryNames = stl_util::extract_keys(_samplesByCategory);
 
   // Sort the vector with category names in ascending order
   std::sort(categoryNames.begin(), categoryNames.end());
@@ -179,9 +179,9 @@ SamplesIndex::getSampleNamesInCategory(const std::string& categoryName) const
 {
   // Extract the enabled sample names for the given category from the map
   std::vector<std::string> sampleNames;
-  if (stl_util::contains(_samplesIndex, categoryName)) {
-    const auto& samplesCategory = _samplesIndex.at(categoryName);
-    for (const auto& element : samplesCategory.samples()) {
+  if (stl_util::contains(_samplesByCategory, categoryName)) {
+    const auto& samplesCategory = _samplesByCategory.at(categoryName);
+    for (const auto& element : samplesCategory) {
       sampleNames.emplace_back(element.first);
     }
   }
@@ -195,9 +195,9 @@ SamplesIndex::getSampleNamesInCategory(const std::string& categoryName) const
 IRenderableScenePtr SamplesIndex::createRenderableScene(const std::string& sampleName,
                                                         ICanvas* iCanvas) const
 {
-  for (const auto& item : _samplesIndex) {
-    if (stl_util::contains(item.second.samples(), sampleName)) {
-      return item.second.samples().at(sampleName)(iCanvas);
+  for (const auto& item : _samplesByCategory) {
+    if (stl_util::contains(item.second, sampleName)) {
+      return item.second.at(sampleName)(iCanvas);
     }
   }
 

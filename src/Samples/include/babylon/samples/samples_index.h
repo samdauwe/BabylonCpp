@@ -1,14 +1,26 @@
 #ifndef BABYLON_SAMPLES_SAMPLES_INDEX_H
 #define BABYLON_SAMPLES_SAMPLES_INDEX_H
 #include <babylon/babylon_api.h>
-#include <babylon/samples/samples_common.h>
 #include <memory>
 #include <optional>
+#include <functional>
 #include <vector>
 #include <string>
 
 namespace BABYLON {
+
+class ICanvas;
+class IRenderableScene;
+using IRenderableScenePtr = std::shared_ptr<IRenderableScene>;
+
 namespace Samples {
+
+
+using CategoryName = std::string;
+using SampleName = std::string;
+using SampleFactoryFunction = std::function<IRenderableScenePtr(ICanvas* iCanvas)>;
+using SamplesInCategory = std::unordered_map<std::string, SampleFactoryFunction>;
+
 
 inline std::string screenshotsDirectory()
 {
@@ -133,10 +145,10 @@ private:
   void fillSamplesFailures() const;
 
   // Contains the mapping from category to samples index
-  std::unordered_map<std::string, _ISamplesIndex> _samplesIndex;
+  std::unordered_map<CategoryName, SamplesInCategory> _samplesByCategory;
 
   // Contains the failing examples.
-  mutable std::unordered_map<std::string, SampleFailureReason> _samplesFailures;
+  mutable std::unordered_map<SampleName, SampleFailureReason> _samplesFailures;
 
 }; // end of class SamplesIndex
 
