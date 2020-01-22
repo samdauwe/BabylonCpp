@@ -1,5 +1,7 @@
 #include <babylon/core/timer.h>
 #include <babylon/asio/internal/future_utils.h>
+#include <stb_image/stb_image.h>
+#include <babylon/samples/samples_info.h>
 
 #include "subprocess_cpp_wrapper.h"
 #include <stdexcept>
@@ -80,5 +82,43 @@ SpawnResult SpawnWaitSubProcess(
 }
 
 
+bool ReadImage_IsUniformColor_Sync(const std::string &imageFileName)
+{
+  int w,h,n;
+  int force_4_channels = 4;
+  unsigned char *data = stbi_load(imageFileName.c_str(), &w, &h, &n, force_4_channels);
+  if (data == NULL)
+    return true;
+
+  auto are_pixels_4_channels_equal = [](const unsigned char *v1, const unsigned char *v2) {
+    for (int i = 0; i < 4; i++)
+      if (v1[i] != v2[i])
+        return false;
+    return true;
+  };
+
+  bool are_all_pixels_equal    = true;
+  unsigned char * firstPixel = data;
+  unsigned char * currentPixel = data;
+  for (int y = 0; y < h; ++y) {
+    for (int x = 0; x < w; ++x) {
+      if (!are_pixels_4_channels_equal(firstPixel, currentPixel)) {
+        are_all_pixels_equal = false;
+      }
+      currentPixel += 4;
+    }
+  }
+  stbi_image_free(data);
+  return are_all_pixels_equal;
 }
+
+
+bool ReadScreenshot_IsImageEmpty(const std::string & sampleName)
+{
+  std::string filename = BABYLON::Samples::screenshotsDirectory() + "/" + sampleName + ".jpg";
+  return ReadImage_IsUniformColor_Sync(filename);
 }
+
+
+} // namespace Samples
+} // namespace BABYLON

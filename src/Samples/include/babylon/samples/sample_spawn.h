@@ -27,7 +27,10 @@ SpawnResult SpawnWaitSubProcess(
   const SpawnOptions& spawnOptions
 );
 
-}
-}
+
+bool ReadScreenshot_IsImageEmpty(const std::string & sampleName);
+
+} // namespace Samples
+} // namespace BABYLON
 
 #endif // BABYLONCPP_SAMPLE_SPAWN_H

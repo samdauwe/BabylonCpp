@@ -4,6 +4,7 @@
 #include <babylon/cameras/free_camera.h>
 #include <babylon/core/filesystem.h>
 #include <babylon/core/system.h>
+#include <babylon/samples/samples_info.h>
 #include <babylon/inspector/components/actiontabs/action_tabs_component.h>
 #include <babylon/interfaces/irenderable_scene_with_hud.h>
 #include <imgui.h>

@@ -22,10 +22,6 @@ using SampleFactoryFunction = std::function<IRenderableScenePtr(ICanvas* iCanvas
 using SamplesInCategory = std::unordered_map<std::string, SampleFactoryFunction>;
 
 
-inline std::string screenshotsDirectory()
-{
-  return "ScreenShots/";
-}
 
 // These informations are extracted from to source file
 struct SampleSourceInfo {
