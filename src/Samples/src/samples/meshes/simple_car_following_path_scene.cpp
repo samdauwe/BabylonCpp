@@ -99,9 +99,13 @@ public:
           cylinderOptions.height       = 1.f;
           cylinderOptions.tessellation = 24;
           // - Set color for wheel tread as black
+          cylinderOptions.faceColors.resize(2);
+          cylinderOptions.faceColors[0] = Color4(0.f, 0.f, 0.f);
           cylinderOptions.faceColors[1] = Color4(0.f, 0.f, 0.f);
           // - Set texture for flat face of wheel
+          cylinderOptions.faceUV.resize(3);
           cylinderOptions.faceUV[0] = Vector4(0.f, 0.f, 1.f, 1.f);
+          cylinderOptions.faceUV[1] = Vector4(0.f, 0.f, 1.f, 1.f);
           cylinderOptions.faceUV[2] = Vector4(0.f, 0.f, 1.f, 1.f);
           auto wheel      = MeshBuilder::CreateCylinder(wheelName, cylinderOptions, scene);
           wheel->material = wheelMaterial;
