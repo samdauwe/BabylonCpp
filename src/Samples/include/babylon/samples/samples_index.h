@@ -5,16 +5,45 @@
 #include <memory>
 #include <optional>
 #include <vector>
+#include <string>
 
 namespace BABYLON {
 namespace Samples {
 
+inline std::string screenshotsDirectory()
+{
+  return "ScreenShots/";
+}
+
+// These informations are extracted from to source file
 struct SampleSourceInfo {
   std::string HeaderFile;
   std::string SourceFile;
   std::string Brief;
   std::vector<std::string> Links;
 };
+
+enum class SampleRunStatus {
+  success,
+  unhandledException,
+  processHung,
+  empty3d,
+  broken3d,
+  unknown
+};
+
+struct SampleRunInfo {
+  SampleRunStatus sampleRunStatus = SampleRunStatus::unknown;
+  std::string unhandledExceptionStackTrace = "";
+  std::string broken3dComment;
+  std::string screenshotFile;
+};
+
+struct SampleInfo {
+  SampleSourceInfo sourceInfo;
+  SampleRunInfo runInfo;
+};
+
 
 enum class SampleFailureReasonKind {
   segFault,
