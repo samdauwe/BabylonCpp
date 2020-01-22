@@ -13,7 +13,7 @@ namespace Samples {
 
 SpawnResult SpawnWaitSubProcess(
   const std::vector<std::string> & command,
-  const SpawnOptions&spawnOptions
+  const SpawnOptions& spawnOptions
 )
 {
   SpawnResult spawnResult;
