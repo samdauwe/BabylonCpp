@@ -84,10 +84,12 @@ public:
   //  SamplesByCategory SearchSamplesByCategory(const SampleSearchQuery & query = {});
 //
   void SetSampleRunInfo(const SampleName& sampleName, const SampleRunInfo& sampleRunInfo);
-  void SaveAllSamplesRunInfo();
+  void SaveAllSamplesRunStatuses();
+  void ReadAllSampleStatues(const std::string& jsonString);
 
 private:
   SamplesCollection();
+  void ReadSamplesSourceInfos();
 
   std::vector<SampleData> _allSamples;
 };

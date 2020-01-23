@@ -316,19 +316,18 @@ private:
   TSetter const _setter;
 };
 
-inline std::string assets_folder() {
-#ifndef __EMSCRIPTEN__
-  return "../assets/";
-#else
-  return "assets/";
-#endif
-}
-
 inline std::string babylon_repo_folder() {
   static std::string repo_dir = BABYLON_REPO_FOLDER;
   return repo_dir;
 }
 
+inline std::string assets_folder() {
+#ifndef __EMSCRIPTEN__
+  return babylon_repo_folder() + "/assets/";
+#else
+  return "assets/";
+#endif
+}
 
 } // end of namespace BABYLON
 

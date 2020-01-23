@@ -16,16 +16,15 @@ namespace BABYLON {
 namespace impl {
 using namespace BABYLON::SamplesInfo;
 
-SampleRunInfo runOneSample(const std::string & exeName, const std::string &sampleName)
+SampleRunInfo runOneSample(const std::string & exeName, const std::string &sampleName, bool flagAsync)
 {
   SampleRunInfo sampleRunInfo;
 
   std::vector<std::string> command = {exeName, "-s", sampleName, "-p"};
-    if (flagAsync)
-      command.push_back("-A");
+  if (flagAsync)
+    command.push_back("-A");
 
-      
-    SpawnOptions spawnOptions;
+  Samples::SpawnOptions spawnOptions;
   spawnOptions.MaxExecutionTimeSeconds       = 15.;
   spawnOptions.CopyOutputToMainProgramOutput = false;
   auto spawnResult                           = SpawnWaitSubProcess(command, spawnOptions);
@@ -56,7 +55,7 @@ SampleRunInfo runOneSample(const std::string & exeName, const std::string &sampl
 }
 
 
-void spawnScreenshots(const std::string & exeName)
+void spawnScreenshots(const std::string & exeName, bool flagAsync)
 {
 
 #ifdef _WIN32
@@ -70,12 +69,12 @@ void spawnScreenshots(const std::string & exeName)
   {
     const auto& sampleData = allSamples[i];
     BABYLON_LOG_INFO("spawnScreenshots ", i+1, "/", allSamples.size(), ": ", sampleData.categoryName, "/", sampleData.sampleName);
-    auto sampleRunInfo = runOneSample(exeName, sampleData.sampleName);
+    auto sampleRunInfo = runOneSample(exeName, sampleData.sampleName, flagAsync);
     samplesCollection.SetSampleRunInfo(sampleData.sampleName, sampleRunInfo);
     if (i >= 5)
       break;
   }
-  samplesCollection.SaveAllSamplesRunInfo();
+  samplesCollection.SaveAllSamplesRunStatuses();
 }
 
 

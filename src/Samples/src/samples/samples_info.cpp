@@ -2,6 +2,7 @@
 #include <babylon/samples/samples_auto_declarations.h>
 #include <babylon/babylon_common.h>
 #include <babylon/core/logging.h>
+#include <babylon/asio/asio.h>
 #include <magic_enum.hpp>
 #include <nlohmann/json.hpp>
 #include <iostream>
@@ -40,7 +41,7 @@ void from_json(const nlohmann::json& j, SampleRunStatus& v) {
 
 
 std::string screenshotsDirectory() {
-  std::string directory = babylon_repo_folder() + "/assets/screenshots/ScreenshotsData";
+  std::string directory = assets_folder() + "/screenshots/ScreenshotsData";
   if (!Filesystem::isDirectory(directory))
     Filesystem::createDirectory(directory);
   return directory;
@@ -54,12 +55,6 @@ std::string SampleScreenshotFilename(const SampleName& sampleName) {
   return SampleRunInfoFilePrefix(sampleName) + ".jpg";
 }
 
-std::string SampleRunInfoStatusFile(const SampleName& sampleName, SampleRunStatus sampleRunStatus)
-{
-  std::string_view statusName = magic_enum::enum_name(sampleRunStatus);
-  std::string filename = SampleRunInfoFilePrefix(sampleName) + "." + std::string(statusName) + ".txt";
-  return filename;
-}
 
 SamplesCollection& SamplesCollection::Instance() {
   static SamplesCollection instance;
@@ -93,18 +88,82 @@ SamplesCollection::SamplesCollection()
   std::sort(_allSamples.begin(), _allSamples.end(), compareSampleData_CategoryThenName);
 
   // 3. Read Run status
-//  for (auto & sampleData: _allSamples)
-//    sampleData.runInfo = SampleRunInfo_ReadFromDisk(sampleData.sampleName);
+  {
+    auto onStatusesLoaded = [this](const std::string& fileContent) {
+      this->ReadAllSampleStatues(fileContent);
+    };
+    auto onError = [](const std::string &msg) {
+      BABYLON_LOG_ERROR("SamplesCollection", "Could not read statuses: ", msg.c_str());
+    };
+    asio::LoadUrlAsync_Text(screenshotsDirectory() + "/aa_runStatus.json",
+                            onStatusesLoaded, onError);
+    asio::Service_WaitAll_Sync(); // Because we want to display stats right after the start
+  }
 
   // 4. Read source info
-  {
-
-  }
+  ReadSamplesSourceInfos();
 
   BABYLON_LOG_INFO("SamplesCollection", "found", _allSamples.size(), " samples");
   BABYLON_LOG_INFO("SamplesCollection", "stats", GetSampleStatsString().c_str());
 }
 
+void SamplesCollection::ReadSamplesSourceInfos()
+{
+  auto lowerCaseName = [](const std::string & sampleNameMixedCase) -> std::string
+  {
+    std::string sampleNameLowerCase;
+    for (auto c : sampleNameMixedCase)
+      sampleNameLowerCase += static_cast<char>(std::tolower(c));
+    return sampleNameLowerCase;
+  };
+
+  auto onJsonErrorLoad = [](const std::string &errorMessage)
+  {
+    BABYLON_LOG_ERROR("SamplesInfoCache", "Error while reading samples_info.json ==>", errorMessage.c_str());
+  };
+
+  auto onJsonLoaded = [=](const std::string &jsonString)
+  {
+    auto json_all_samples_info = nlohmann::json::parse(jsonString);
+    for (const auto& element : json_all_samples_info)
+    {
+      std::string sampleName = element["sample_name"];
+      SampleSourceInfo sampleInfo;
+      {
+        sampleInfo.Brief      = element["brief"];
+        sampleInfo.HeaderFile = element["header_file"];
+        sampleInfo.SourceFile = element["source_file"];
+        for (const auto& link : element["links"])
+          sampleInfo.Links.push_back(link);
+      }
+
+      for (auto & sampleData: _allSamples)
+      {
+        if (lowerCaseName(sampleData.sampleName) == lowerCaseName(sampleName))
+          sampleData.sourceInfo = sampleInfo;
+      }
+    }
+  };
+
+  BABYLON::asio::LoadUrlAsync_Text("samples_info.json", onJsonLoaded, onJsonErrorLoad);
+
+}
+
+
+
+void SamplesCollection::ReadAllSampleStatues(const std::string& jsonString)
+{
+  using namespace nlohmann;
+  auto jsonData = json::parse(jsonString);
+  auto allRunStatuses =  jsonData.get<std::map<SampleName, SampleRunStatus>>();
+  for (const auto &[sampleName, sampleRunStatus] : allRunStatuses)
+  {
+    SampleData * data = GetSampleByName(sampleName);
+    //assert(data != nullptr);
+    if (data)
+      data->runInfo.sampleRunStatus = sampleRunStatus;
+  }
+}
 
 void SamplesCollection::SetSampleRunInfo(
   const SampleName& sampleName,
@@ -118,13 +177,13 @@ void SamplesCollection::SetSampleRunInfo(
   }
 }
 
-void SamplesCollection::SaveAllSamplesRunInfo()
+void SamplesCollection::SaveAllSamplesRunStatuses()
 {
   std::map<SampleName, SampleRunStatus> allRunStatuses;
   for (const auto & sampleData : _allSamples)
     allRunStatuses[sampleData.sampleName] = sampleData.runInfo.sampleRunStatus;
 
-  std::ofstream ofs(screenshotsDirectory() + "/aa_runInfo.json");
+  std::ofstream ofs(screenshotsDirectory() + "/aa_runStatus.json");
   nlohmann::json j = allRunStatuses;
   ofs << std::setw(4) << j << std::endl;
   ofs.close();
