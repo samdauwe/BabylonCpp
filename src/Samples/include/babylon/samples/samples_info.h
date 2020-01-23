@@ -73,15 +73,21 @@ public:
 
   const std::vector<SampleData>& AllSamples() const { return _allSamples; }
 
-  void SaveSampleRunInfo(const SampleName& sampleName, const SampleRunInfo& sampleRunInfo);
+  void SampleRunInfo_Save(const SampleName& sampleName, const SampleRunInfo& sampleRunInfo);
 
   SampleData* GetSampleByName(const SampleName& sampleName); // returns nullptr if not found
+
+  SampleStats GetSampleStats();
+  std::string GetSampleStatsString();
 
   //  SamplesByCategory SearchSamplesByCategory(const SampleSearchQuery & query = {});
 //
 
 private:
   SamplesCollection();
+  SampleRunInfo SampleRunInfo_ReadFromDisk(const SampleName& sampleName);
+  void SampleRunInfo_RemoveStatusFromDisk(const SampleName& sampleName);
+
   std::vector<SampleData> _allSamples;
 };
 

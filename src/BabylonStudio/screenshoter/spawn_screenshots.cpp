@@ -71,7 +71,7 @@ void spawnScreenshots(const std::string & exeName)
     const auto& sampleData = allSamples[i];
     BABYLON_LOG_INFO("spawnScreenshots ", i+1, "/", allSamples.size(), ": ", sampleData.categoryName, "/", sampleData.sampleName);
     auto sampleRunInfo = runOneSample(exeName, sampleData.sampleName);
-    samplesCollection.SaveSampleRunInfo(sampleData.sampleName, sampleRunInfo);
+    samplesCollection.SampleRunInfo_Save(sampleData.sampleName, sampleRunInfo);
   }
 
 
