@@ -10,7 +10,8 @@
 
 namespace BABYLON {
 namespace asio {
-  
+
+
 
 /**
  * @brief LoadUrlAsync_Text will load a text resource *asynchronously*
@@ -61,7 +62,8 @@ BABYLON_SHARED_EXPORT void Service_Stop();
 /**
  * Desesperate patch for glTF loading
  */
-BABYLON_SHARED_EXPORT void set_HACK_DISABLE_ASYNC(bool v);
+BABYLON_SHARED_EXPORT void push_HACK_DISABLE_ASYNC();
+BABYLON_SHARED_EXPORT void pop_HACK_DISABLE_ASYNC();
 
 } // namespace asio
 } // namespace BABYLON

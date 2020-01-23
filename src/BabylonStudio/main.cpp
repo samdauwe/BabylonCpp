@@ -2,6 +2,8 @@
 #include <babylon/babylon_imgui/babylon_studio.h>
 #include <babylon/core/logging/init_console_logger.h>
 #include <babylon/utils/CLI11.h>
+#include <babylon/asio/asio.h>
+#include <babylon/core/logging.h>
 
 #include "BabylonStudio/screenshoter/spawn_screenshots.h"
 
@@ -22,6 +24,7 @@ int main(int argc, char** argv)
    
   bool flagQuiet = false;
   bool flagFullscreen = false;
+  bool flagAsync = false;
   bool flagSpawnScreenshots = false;
   bool flagScreenshotOneSampleAndExit = false;
   bool listSamples = false;
@@ -32,6 +35,7 @@ int main(int argc, char** argv)
     arg_cli.add_option("-s,--sample", sampleName, "Which sample to run");
     arg_cli.add_flag("-l,--list", listSamples, "List samples");
     arg_cli.add_flag("-f,--fullscreen", flagFullscreen, "run in fullscreen");
+    arg_cli.add_flag("-A,--async", flagAsync, "Use asynchronous loading");
 
     arg_cli.add_flag("-a,--shot-all-samples", flagSpawnScreenshots, "run all samples and save a screenshot");
     arg_cli.add_flag("-p,--shot-one-sample", flagScreenshotOneSampleAndExit, "run one sample, save a screenshot and exit");
@@ -41,8 +45,14 @@ int main(int argc, char** argv)
   if (!flagQuiet)
     BABYLON::initConsoleLogger();
 
+  if (!flagAsync) {
+    BABYLON::asio::push_HACK_DISABLE_ASYNC();
+    BABYLON_LOG_WARN("BabylonStudio", "Forcing synchronous loading mode!")
+  }
+
   if (flagSpawnScreenshots) {
-    BABYLON::impl::spawnScreenshots(argv[0]); exit(0);
+    BABYLON::impl::spawnScreenshots(argv[0], flagAsync);
+    exit(0);
   }
 
   if (listSamples) {

@@ -160,7 +160,7 @@ SpawnScreenshotsStats MakeEmptySpawnScreenshotsStats()
 }
 
 
-void spawnScreenshots(const std::string & exeName)
+void spawnScreenshots(const std::string & exeName, bool flagAsync)
 {
 #ifdef _WIN32
   BABYLON_LOG_ERROR("spawnScreenshots", " needs fix under windows...");
@@ -178,6 +178,9 @@ void spawnScreenshots(const std::string & exeName)
     BABYLON_LOG_INFO("ScreenshotAllSamples", sampleName);
 
     std::vector<std::string> command =  { exeName, "-s", sampleName, "-p"};
+    if (flagAsync)
+      command.push_back("-A");
+
     SpawnOptions spawnOptions;
     spawnOptions.MaxExecutionTimeSeconds = 15.;
     spawnOptions.CopyOutputToMainProgramOutput = false;

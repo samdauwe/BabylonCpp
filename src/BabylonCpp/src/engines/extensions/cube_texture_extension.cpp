@@ -205,10 +205,6 @@ void CubeTextureExtension::_cascadeLoadImgs(
       files[index], [&images](const Image& img) { images.emplace_back(img); }, onError, false);
   }
 
-  // ASYNC_FIXME: Force sync because the code before seems deprecated, and is difficult to make it
-  // async
-  BABYLON::asio::Service_WaitAll_Sync();
-
   if (images.size() == 6) {
     onfinish(images);
   }
