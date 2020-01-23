@@ -6,6 +6,6 @@ using namespace BABYLON;
 
 TEST(SamplesInfo, AllSamples)
 {
-  auto allSamples = SamplesInfo::AllSamples();
+  auto allSamples = SamplesInfo::SamplesCollection::Instance().AllSamples();
   EXPECT_GT(allSamples.size(), 0);
 }

@@ -44,6 +44,7 @@ target_link_libraries(${TARGET}
     Loaders
     json_hpp
     subprocess_h
+    magic_enum
 )
 
 if (WIN32)

@@ -6,6 +6,7 @@
 #include <map>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <babylon/babylon_api.h>
 
 namespace BABYLON {
@@ -34,10 +35,8 @@ enum class BABYLON_SHARED_EXPORT SampleRunStatus {
   unhandledException,
   tooSlowOrHung,
   empty3d,
-  broken3d,
   unknown
 };
-std::string SampleRunStatusName(SampleRunStatus &s);
 
 struct BABYLON_SHARED_EXPORT SampleSearchQuery {
   std::string QueryString = "";
@@ -47,7 +46,6 @@ struct BABYLON_SHARED_EXPORT SampleSearchQuery {
     { SampleRunStatus::unhandledException, true },
     { SampleRunStatus::tooSlowOrHung, true },
     { SampleRunStatus::empty3d, true },
-    { SampleRunStatus::broken3d, true },
     { SampleRunStatus::unknown, true },
   };
 };
@@ -55,22 +53,41 @@ struct BABYLON_SHARED_EXPORT SampleSearchQuery {
 struct BABYLON_SHARED_EXPORT SampleRunInfo {
   SampleRunStatus sampleRunStatus = SampleRunStatus::unknown;
   std::string unhandledExceptionStackTrace = "";
-  std::string broken3dComment;
   std::string screenshotFile;
 };
 
 struct BABYLON_SHARED_EXPORT SampleData {
   SampleSourceInfo sourceInfo;
   SampleRunInfo runInfo;
-  SampleFactoryFunction factoryFunction;
+  SampleFactoryFunction factoryFunction = {};
 };
+
+using SampleStats = std::map<SampleRunStatus, std::size_t>;
 
 using SamplesInCategory = std::unordered_map<SampleName, SampleData>;
 using SamplesByCategory = std::unordered_map<CategoryName, SamplesInCategory >;
 
 
-BABYLON_SHARED_EXPORT const SamplesByCategory & AllSamples();
-BABYLON_SHARED_EXPORT SamplesByCategory SearchSamplesByCategory(const SampleSearchQuery & query = {});
+class BABYLON_SHARED_EXPORT SamplesCollection
+{
+public:
+  static SamplesCollection& Instance();
+
+  const SamplesByCategory& AllSamples() const { return _allSamples; }
+
+  void SaveSampleRunInfo(const SampleName& sampleName, const SampleRunInfo& sampleRunInfo);
+
+  SampleData* GetSampleByName(const SampleName& sampleName); // returns nullptr if not found
+
+  //  SamplesByCategory SearchSamplesByCategory(const SampleSearchQuery & query = {});
+//
+
+private:
+  SamplesCollection();
+  SamplesByCategory _allSamples;
+};
+
+
 BABYLON_SHARED_EXPORT std::string screenshotsDirectory();
 
 } // namespace SamplesInfo
