@@ -24,7 +24,7 @@ int main(int argc, char** argv)
    
   bool flagQuiet = false;
   bool flagFullscreen = false;
-  bool flagForceSync = false;
+  bool flagAsync = false;
   bool flagSpawnScreenshots = false;
   bool flagScreenshotOneSampleAndExit = false;
   bool listSamples = false;
@@ -35,7 +35,7 @@ int main(int argc, char** argv)
     arg_cli.add_option("-s,--sample", sampleName, "Which sample to run");
     arg_cli.add_flag("-l,--list", listSamples, "List samples");
     arg_cli.add_flag("-f,--fullscreen", flagFullscreen, "run in fullscreen");
-    arg_cli.add_flag("-S,--force-sync", flagForceSync, "Force synchronous loading");
+    arg_cli.add_flag("-A,--async", flagAsync, "Use asynchronous loading");
 
     arg_cli.add_flag("-a,--shot-all-samples", flagSpawnScreenshots, "run all samples and save a screenshot");
     arg_cli.add_flag("-p,--shot-one-sample", flagScreenshotOneSampleAndExit, "run one sample, save a screenshot and exit");
@@ -45,13 +45,13 @@ int main(int argc, char** argv)
   if (!flagQuiet)
     BABYLON::initConsoleLogger();
 
-  if (flagForceSync) {
+  if (!flagAsync) {
     BABYLON::asio::push_HACK_DISABLE_ASYNC();
-    BABYLON_LOG_WARN("BabylonStudio", "Running with force-sync mode!")
+    BABYLON_LOG_WARN("BabylonStudio", "Forcing synchronous loading mode!")
   }
 
   if (flagSpawnScreenshots) {
-    BABYLON::impl::spawnScreenshots(argv[0], flagForceSync);
+    BABYLON::impl::spawnScreenshots(argv[0], flagAsync);
     exit(0);
   }
 
