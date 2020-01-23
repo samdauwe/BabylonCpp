@@ -55,6 +55,15 @@ std::string SampleScreenshotFilename(const SampleName& sampleName) {
   return SampleRunInfoFilePrefix(sampleName) + ".jpg";
 }
 
+std::string SamplesProjectFolder()
+{
+#ifndef __EMSCRIPTEN__
+  std::string folder = babylon_repo_folder() + "/src/Samples/";
+#else
+  std::string folder = "/emscripten_static_assets_folder/Samples/";
+#endif
+  return folder;
+}
 
 SamplesCollection& SamplesCollection::Instance() {
   static SamplesCollection instance;
@@ -198,6 +207,14 @@ SampleData* SamplesCollection::GetSampleByName(const SampleName& sampleName)
   return nullptr;
 }
 
+const SampleData* SamplesCollection::GetSampleByName(const SampleName& sampleName) const
+{
+  for (auto& sampleData : _allSamples)
+    if (sampleData.sampleName == sampleName)
+      return &sampleData;
+  return nullptr;
+}
+
 SampleStats SamplesCollection::GetSampleStats()
 {
   BABYLON::SamplesInfo::SampleStats stats;
@@ -220,6 +237,16 @@ std::string SamplesCollection::GetSampleStatsString()
   }
   return j.dump();
 }
+
+IRenderableScenePtr SamplesCollection::createRenderableScene(
+  const std::string& sampleName, ICanvas* iCanvas) const
+{
+  const SampleData * sampleData = GetSampleByName(sampleName);
+  assert(sampleData != nullptr);
+  auto r = sampleData->factoryFunction(iCanvas);
+  return r;
+}
+
 
 } // namespace Samples
 

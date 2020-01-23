@@ -4,7 +4,7 @@
 #include <babylon/utils/CLI11.h>
 #include <babylon/asio/asio.h>
 #include <babylon/core/logging.h>
-
+#include <babylon/samples/samples_info.h>
 #include "BabylonStudio/screenshoter/spawn_screenshots.h"
 
 #ifdef BABYLON_BUILD_PLAYGROUND
@@ -55,7 +55,7 @@ int main(int argc, char** argv)
 
   std::shared_ptr<BABYLON::IRenderableScene> scene;
   if (! sampleName.empty())
-    scene = BABYLON::Samples::SamplesIndex::Instance().createRenderableScene(sampleName, nullptr);
+    scene = BABYLON::SamplesInfo::SamplesCollection::Instance().createRenderableScene(sampleName, nullptr);
 
   BABYLON::BabylonStudioOptions options;
   options._flagScreenshotOneSampleAndExit = flagScreenshotOneSampleAndExit;

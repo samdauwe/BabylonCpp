@@ -68,6 +68,8 @@ struct BABYLON_SHARED_EXPORT SampleData {
 
 using SampleStats = std::map<SampleRunStatus, std::size_t>;
 
+std::string SamplesProjectFolder();
+
 class BABYLON_SHARED_EXPORT SamplesCollection
 {
 public:
@@ -77,6 +79,7 @@ public:
 
 
   SampleData* GetSampleByName(const SampleName& sampleName); // returns nullptr if not found
+  const SampleData* GetSampleByName(const SampleName& sampleName) const; // returns nullptr if not found
 
   SampleStats GetSampleStats();
   std::string GetSampleStatsString();
@@ -86,6 +89,8 @@ public:
   void SetSampleRunInfo(const SampleName& sampleName, const SampleRunInfo& sampleRunInfo);
   void SaveAllSamplesRunStatuses();
   void ReadAllSampleStatues(const std::string& jsonString);
+
+  IRenderableScenePtr createRenderableScene(const std::string& sampleName, ICanvas* iCanvas) const;
 
 private:
   SamplesCollection();

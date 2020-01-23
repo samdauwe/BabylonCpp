@@ -340,7 +340,7 @@ private:
       std::string sampleName
         = _appContext._loopSamples.samplesToLoop[_appContext._loopSamples.currentIdx];
       BABYLON_LOG_ERROR("LoopSample", sampleName)
-      auto scene = Samples::SamplesIndex::Instance().createRenderableScene(sampleName, nullptr);
+      auto scene = SamplesInfo::SamplesCollection::Instance().createRenderableScene(sampleName, nullptr);
       this->setRenderableScene(scene);
 
       if (_appContext._loopSamples.currentIdx < _appContext._loopSamples.samplesToLoop.size() - 2)

@@ -1,7 +1,11 @@
 #ifndef BABYLON_INSPECTOR_SAMPLES_BROWSER_H
 #define BABYLON_INSPECTOR_SAMPLES_BROWSER_H
 
-#include <babylon/samples/samples_index.h>
+#include <functional>
+#include <memory>
+#include <string>
+#include <vector>
+#include <babylon/samples/samples_info.h>
 
 namespace BABYLON {
 
