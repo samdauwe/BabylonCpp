@@ -11,6 +11,7 @@
 #include <imgui_utils/icons_font_awesome_5.h>
 #include <imgui_utils/imgui_utils.h>
 #include <map>
+#include <magic_enum.hpp>
 
 #include <imgui.h>
 
@@ -68,19 +69,21 @@ private:
   {
     bool changed = false;
     ImGui::PushItemWidth(200);
-    if (ImGui::InputText_String("Filter", _query.query))
+    if (ImGui::InputText_String("Filter by name", _sampleSearchQuery.QueryName))
+      changed = true;
+    if (ImGui::InputText_String("Filter by category", _sampleSearchQuery.QueryCategory))
       changed = true;
 
     ImGui::SameLine();
-    if (ImGui::Checkbox(ICON_FA_WRENCH "Experimental", &_query.onlyFailures))
+    if (ImGui::Checkbox(ICON_FA_WRENCH "Experimental", &_queryExperimental))
       changed = true;
 
     if (OnLoopSamples) {
       if (ImGui::Button("Loop filtered samples")) {
         std::vector<std::string> filteredSamples;
-        for (const auto& kv : _matchingSamples) {
-          for (auto sampleName : kv.second)
-            filteredSamples.push_back(sampleName);
+        for (const auto& [categoryName, samples] : _matchingSamples) {
+          for (const auto & sample: samples)
+            filteredSamples.push_back(sample->sampleName);
         }
         OnLoopSamples(filteredSamples);
       }
@@ -105,19 +108,20 @@ private:
     ImGui::Separator();
 
     ImGui::BeginChild("Child1");
-    for (const auto& kv : _matchingSamples) {
-      CategoryName category = kv.first;
-      auto samples          = kv.second;
-      if (!samples.empty()) {
-        std::string header = category + " (" + std::to_string(samples.size()) + ")";
+    for (const auto& [categoryName, samples] : _matchingSamples)
+    {
+      if (!samples.empty())
+      {
+        std::string header = categoryName + " (" + std::to_string(samples.size()) + ")";
         if (collapseMode == CollapseMode::CollapseAll)
           ImGui::SetNextItemOpen(false);
         if (collapseMode == CollapseMode::ExpandAll)
           ImGui::SetNextItemOpen(true);
         if (ImGui::CollapsingHeader(header.c_str())) // ImGuiTreeNodeFlags_DefaultOpen))
         {
-          for (const std::string& sample : samples) {
-            guiOneSample(sample);
+          for (const SampleData* sample : samples)
+          {
+            guiOneSample(*sample);
             ImGui::Separator();
           }
         }
@@ -126,9 +130,9 @@ private:
     ImGui::EndChild();
   }
 
-  void guiOneSampleLinks(const std::string& sampleName)
+  void guiOneSampleLinks(const SampleData& sampleData)
   {
-    const auto& sampleInfo = _samplesCollection.GetSampleByName(sampleName)->sourceInfo;
+    const auto& sampleInfo = sampleData.sourceInfo;
 
     if (!sampleInfo.Links.empty()) {
       for (auto link : sampleInfo.Links) {
@@ -145,24 +149,24 @@ private:
     }
   }
 
-  void guiOneSampleInfos(const std::string& sampleName)
+  void guiOneSampleInfos(const SamplesInfo::SampleData& sampleData)
   {
-    const auto& sampleInfo = _samplesCollection.GetSampleByName(sampleName)->sourceInfo;
+    const auto& sampleInfo = sampleData.sourceInfo;
 
-    std::string runLabel = std::string(ICON_FA_PLAY_CIRCLE " Run##") + sampleName;
+    std::string runLabel = std::string(ICON_FA_PLAY_CIRCLE " Run##") + sampleData.sampleName;
     if (ImGui::Button(runLabel.c_str())) {
       if (OnNewRenderableScene) {
         BABYLON::ICanvas* dummyCanvas = nullptr;
-        auto scene = _samplesCollection.createRenderableScene(sampleName, dummyCanvas);
+        auto scene = _samplesCollection.createRenderableScene(sampleData.sampleName, dummyCanvas);
         OnNewRenderableScene(std::move(scene));
       }
       if (Inspector::OnSampleChanged)
-        Inspector::OnSampleChanged(sampleName);
+        Inspector::OnSampleChanged(sampleData.sampleName);
     }
 
     if (OnEditFiles) {
       ImGui::SameLine();
-      std::string viewCodeLabel = ICON_FA_EDIT " View code##" + sampleName;
+      std::string viewCodeLabel = ICON_FA_EDIT " View code##" + sampleData.sampleName;
       if (ImGui::Button(viewCodeLabel.c_str())) {
         std::string sample_cpp_file
           = SamplesInfo::SamplesProjectFolder() + "/" + sampleInfo.SourceFile;
@@ -171,13 +175,14 @@ private:
     }
   }
 
-  void guiOneSample(const std::string& sampleName)
+  void guiOneSample(const SamplesInfo::SampleData& sampleData)
   {
-    const auto& sampleInfo = _samplesCollection.GetSampleByName(sampleName)->sourceInfo;
-    std::string currentScreenshotFile = screenshotsFolderCurrent + sampleName + ".jpg";
-    std::string sample_snake          = to_snake_case(sampleName);
+    const auto& sampleInfo =  sampleData.sourceInfo;
+    std::string currentScreenshotFile = screenshotsFolderCurrent + sampleData.sampleName + ".jpg";
+    std::string sample_snake          = to_snake_case(sampleData.sampleName);
 
-    if (_showCurrentScreenshots) {
+    // Screenshot
+    {
       ImGui::BeginGroup();
       ImVec2 imageSize(ImGui::GetWindowWidth() / 3.f, 0.f);
       ImGuiUtils::ImageFromFile(currentScreenshotFile, imageSize);
@@ -186,63 +191,28 @@ private:
     }
 
     ImGui::BeginGroup();
-    ImGui::Text("%s", sampleName.c_str());
+    ImGui::Text("%s", sampleData.sampleName.c_str());
     ImGui::TextWrapped("%s", sampleInfo.Brief.c_str());
 
-//    bool failure = false;
-//    if (failure) {
-//      ImGui::TextColored(ImVec4(0.9f, 0.4f, 0.3f, 1.f), "Failure: %s",
-//                         SampleFailureReason_Str(failure.value().Kind).c_str());
-//      if (!failure.value().Info.empty())
-//        ImGui::TextColored(ImVec4(0.4f, 0.9f, 0.6f, 1.f), "More details: %s",
-//                           failure.value().Info.c_str());
-//    }
-    guiOneSampleInfos(sampleName);
+    if (sampleData.runInfo.sampleRunStatus != SamplesInfo::SampleRunStatus::success)
+    {
+      std::string_view status = magic_enum::enum_name(sampleData.runInfo.sampleRunStatus);
+      std::string statusStr(status);
+      ImGui::TextColored(ImVec4(0.9f, 0.4f, 0.3f, 1.f), "Failure: %s",
+                         statusStr.c_str());
+    }
+
+    guiOneSampleInfos(sampleData);
     ImGui::EndGroup();
     // ImGui::SameLine();
 
-    guiOneSampleLinks(sampleName);
+    guiOneSampleLinks(sampleData);
   }
 
-  bool doesSampleMatchQuery(const CategoryName& categoryName, const SampleName& sampleName)
-  {
-    std::vector<std::string> search_items = BABYLON::StringTools::split(_query.query, ' ');
-
-    bool doesMatch = true;
-
-    {
-      std::string all = BABYLON::StringTools::toLowerCase(categoryName + " / " + sampleName);
-      for (const auto& item : search_items)
-        if (!BABYLON::StringTools::contains(all, BABYLON::StringTools::toLowerCase(item)))
-          doesMatch = false;
-    }
-
-//    if (_query.onlyFailures) {
-//      if (!samplesCollection.doesSampleFail(sampleName))
-//        doesMatch = false;
-//    }
-//    else {
-//      if (samplesCollection.doesSampleFail(sampleName))
-//        doesMatch = false;
-//    }
-
-    return doesMatch;
-  }
 
   void fillMatchingSamples()
   {
-    _matchingSamples.clear();
-    for (const auto & sampleData: _samplesCollection.AllSamples())
-      _matchingSamples[sampleData.categoryName].push_back(sampleData.sampleName);
-
-//    for (CategoryName category : samplesCollection.getCategoryNames()) {
-//      std::vector<SampleName> s;
-//      for (SampleName sample : samplesCollection.getSampleNamesInCategory(category)) {
-//        if (doesSampleMatchQuery(category, sample))
-//          s.push_back(sample);
-//        _matchingSamples[category] = s;
-//      }
-//    }
+    _matchingSamples = _samplesCollection.SearchSamples(_sampleSearchQuery);
   }
 
   size_t nbMatchingSamples()
@@ -254,14 +224,10 @@ private:
   }
 
   SamplesInfo::SamplesCollection& _samplesCollection;
-  std::map<CategoryName, std::vector<SampleName>> _matchingSamples;
+  std::map<SamplesInfo::CategoryName, std::vector<const SampleData *>> _matchingSamples;
 
-  struct {
-    std::string query = "";
-    bool onlyFailures = false;
-  } _query;
-
-  bool _showCurrentScreenshots = true;
+  SamplesInfo::SampleSearchQuery _sampleSearchQuery;
+  bool _queryExperimental = false;
 };
 
 SamplesBrowser::SamplesBrowser()

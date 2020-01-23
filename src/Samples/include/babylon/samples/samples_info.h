@@ -42,14 +42,14 @@ void to_json(nlohmann::json& j, const SampleRunStatus& v);
 void from_json(const nlohmann::json& j, SampleRunStatus& v);
 
 struct BABYLON_SHARED_EXPORT SampleSearchQuery {
-  std::string QueryString = "";
+  std::string QueryName = "";
   std::string QueryCategory = "";
   std::map<SampleRunStatus, bool> IncludeStatus = {
     { SampleRunStatus::success, true },
-    { SampleRunStatus::unhandledException, true },
-    { SampleRunStatus::tooSlowOrHung, true },
-    { SampleRunStatus::empty3d, true },
-    { SampleRunStatus::unknown, true },
+    { SampleRunStatus::unhandledException, false },
+    { SampleRunStatus::tooSlowOrHung, false },
+    { SampleRunStatus::empty3d, false },
+    { SampleRunStatus::unknown, false },
   };
 };
 
@@ -77,6 +77,9 @@ public:
 
   const std::vector<SampleData>& AllSamples() const { return _allSamples; }
 
+  std::map<SamplesInfo::CategoryName, std::vector<const SampleData *>>
+    SearchSamples(const SampleSearchQuery& query);
+
 
   SampleData* GetSampleByName(const SampleName& sampleName); // returns nullptr if not found
   const SampleData* GetSampleByName(const SampleName& sampleName) const; // returns nullptr if not found
@@ -84,17 +87,15 @@ public:
   SampleStats GetSampleStats();
   std::string GetSampleStatsString();
 
-  //  SamplesByCategory SearchSamplesByCategory(const SampleSearchQuery & query = {});
-//
   void SetSampleRunInfo(const SampleName& sampleName, const SampleRunInfo& sampleRunInfo);
   void SaveAllSamplesRunStatuses();
-  void ReadAllSampleStatues(const std::string& jsonString);
 
   IRenderableScenePtr createRenderableScene(const std::string& sampleName, ICanvas* iCanvas) const;
 
 private:
   SamplesCollection();
   void ReadSamplesSourceInfos();
+  void ReadAllSampleStatuses();
 
   std::vector<SampleData> _allSamples;
 };

@@ -71,8 +71,8 @@ void spawnScreenshots(const std::string & exeName, bool flagAsync)
     BABYLON_LOG_INFO("spawnScreenshots ", i+1, "/", allSamples.size(), ": ", sampleData.categoryName, "/", sampleData.sampleName);
     auto sampleRunInfo = runOneSample(exeName, sampleData.sampleName, flagAsync);
     samplesCollection.SetSampleRunInfo(sampleData.sampleName, sampleRunInfo);
-    if (i >= 5)
-      break;
+//    if (i >= 5)
+//      break;
   }
   samplesCollection.SaveAllSamplesRunStatuses();
 }
