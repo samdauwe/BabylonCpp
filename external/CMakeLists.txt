@@ -110,3 +110,8 @@ endif()
 # https://github.com/sheredom/subprocess.h
 add_library(subprocess_h INTERFACE)
 target_include_directories(subprocess_h INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/subprocess_h)
+
+# magic_enum: Static reflection for enums
+# https://github.com/Neargye/magic_enum
+add_library(magic_enum INTERFACE)
+target_include_directories(magic_enum INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/magic_enum/include)
