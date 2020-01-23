@@ -263,7 +263,7 @@ ImportedMeshes GLTFFileLoader::importMeshAsync(
   const std::string& fileName)
 {
   // ASYNC_FIXME: GLTF loading is decidely incompatible with async loading
-  BABYLON::asio::set_HACK_DISABLE_ASYNC(true);
+  BABYLON::asio::push_HACK_DISABLE_ASYNC();
 
   auto loaderData = _parseAsync(scene, data, rootUrl, fileName);
   _log(StringTools::printf("Loading %s", fileName.c_str()));
@@ -271,7 +271,7 @@ ImportedMeshes GLTFFileLoader::importMeshAsync(
   return _loader->importMeshAsync(meshesNames, scene, loaderData, rootUrl, onProgress, fileName);
 
   // ASYNC_FIXME: GLTF loading is decidely incompatible with async loading
-  BABYLON::asio::set_HACK_DISABLE_ASYNC(false);
+  BABYLON::asio::pop_HACK_DISABLE_ASYNC();
 }
 
 void GLTFFileLoader::loadAsync(

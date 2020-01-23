@@ -27,6 +27,7 @@
 #include <future>
 #include <atomic>
 #include <chrono>
+#include <cassert>
 
 
 
@@ -184,10 +185,15 @@ static std::string ArrayBufferToString(const ArrayBuffer & dataUint8)
   return dataString;
 }
 
-bool HACK_DISABLE_ASYNC = false;
-void set_HACK_DISABLE_ASYNC(bool v)
+unsigned int HACK_DISABLE_ASYNC = 0;
+void push_HACK_DISABLE_ASYNC()
 {
-  HACK_DISABLE_ASYNC = v;
+  ++HACK_DISABLE_ASYNC;
+}
+void pop_HACK_DISABLE_ASYNC()
+{
+  --HACK_DISABLE_ASYNC;
+  assert(HACK_DISABLE_ASYNC >= 0);
 }
 
 
@@ -197,7 +203,7 @@ void LoadFileAsync_Text(const std::string& filename,
                        const OnProgressFunction& onProgressFunction
                        )
 {
-  if (!HACK_DISABLE_ASYNC)
+  if (HACK_DISABLE_ASYNC == 0)
   {
     auto& service   = AsyncLoadService::Instance();
     auto syncLoader = [filename, onProgressFunction]() {
@@ -235,7 +241,7 @@ void LoadFileAsync_Binary(
   const OnProgressFunction& onProgressFunction
   )
 {
-  if (!HACK_DISABLE_ASYNC) {
+  if (HACK_DISABLE_ASYNC == 0) {
     auto & service = AsyncLoadService::Instance();
     auto syncLoader = [filename, onProgressFunction]() {
 #ifdef CAN_NAME_THREAD
