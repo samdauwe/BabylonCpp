@@ -65,16 +65,13 @@ void spawnScreenshots(const std::string & exeName)
 #endif
 
   auto &samplesCollection = SamplesCollection::Instance();
-  for (const auto& [categoryName, samplesInCategory] : samplesCollection.AllSamples())
+  const auto &allSamples = samplesCollection.AllSamples();
+  for (size_t i = 0; i < allSamples.size(); ++i)
   {
-    BABYLON_LOG_INFO("spawnScreenshots", "Category", categoryName);
-    BABYLON_LOG_INFO("spawnScreenshots", "*******************************************************");
-    for (const auto& [sampleName, sampleData] : samplesInCategory)
-    {
-      BABYLON_LOG_INFO("spawnScreenshots", "Sample", sampleName);
-      auto sampleRunInfo = runOneSample(exeName, sampleName);
-      samplesCollection.SaveSampleRunInfo(sampleName, sampleRunInfo);
-    }
+    const auto& sampleData = allSamples[i];
+    BABYLON_LOG_INFO("spawnScreenshots ", i+1, "/", allSamples.size(), ": ", sampleData.categoryName, "/", sampleData.sampleName);
+    auto sampleRunInfo = runOneSample(exeName, sampleData.sampleName);
+    samplesCollection.SaveSampleRunInfo(sampleData.sampleName, sampleRunInfo);
   }
 
 

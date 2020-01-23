@@ -57,6 +57,8 @@ struct BABYLON_SHARED_EXPORT SampleRunInfo {
 };
 
 struct BABYLON_SHARED_EXPORT SampleData {
+  CategoryName categoryName;
+  SampleName sampleName;
   SampleSourceInfo sourceInfo;
   SampleRunInfo runInfo;
   SampleFactoryFunction factoryFunction = {};
@@ -64,16 +66,12 @@ struct BABYLON_SHARED_EXPORT SampleData {
 
 using SampleStats = std::map<SampleRunStatus, std::size_t>;
 
-using SamplesInCategory = std::unordered_map<SampleName, SampleData>;
-using SamplesByCategory = std::unordered_map<CategoryName, SamplesInCategory >;
-
-
 class BABYLON_SHARED_EXPORT SamplesCollection
 {
 public:
   static SamplesCollection& Instance();
 
-  const SamplesByCategory& AllSamples() const { return _allSamples; }
+  const std::vector<SampleData>& AllSamples() const { return _allSamples; }
 
   void SaveSampleRunInfo(const SampleName& sampleName, const SampleRunInfo& sampleRunInfo);
 
@@ -84,7 +82,7 @@ public:
 
 private:
   SamplesCollection();
-  SamplesByCategory _allSamples;
+  std::vector<SampleData> _allSamples;
 };
 
 

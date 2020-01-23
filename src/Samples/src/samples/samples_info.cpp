@@ -32,15 +32,26 @@ SamplesCollection& SamplesCollection::Instance() {
   return instance;
 }
 
+bool compareSampleData_CategoryThenName(const SampleData & s1, const SampleData & s2)
+{
+  if (s1.categoryName.compare(s2.categoryName) == 0)
+    return (s1.sampleName.compare(s2.sampleName) < 0);
+  else
+    return s1.categoryName.compare(s2.categoryName) < 0;
+}
+
 SamplesCollection::SamplesCollection()
 {
   auto registerSample = [this](const CategoryName & c, const SampleName & s, SampleFactoryFunction f) {
     SampleData sampleData;
+    sampleData.categoryName = c;
+    sampleData.sampleName = s;
     sampleData.factoryFunction = f;
-    _allSamples[c][s] = sampleData;
+    _allSamples.push_back(sampleData);
   };
 
   BABYLON::Samples::auto_populate_samples(registerSample);
+  std::sort(_allSamples.begin(), _allSamples.end(), compareSampleData_CategoryThenName);
 }
 
 void SamplesCollection::SaveSampleRunInfo(
@@ -59,8 +70,6 @@ void SamplesCollection::SaveSampleRunInfo(
     std::string content;
     if (sampleRunInfo.sampleRunStatus == SampleRunStatus::unhandledException)
       content = sampleRunInfo.unhandledExceptionStackTrace;
-    if (sampleRunInfo.sampleRunStatus == SampleRunStatus::broken3d)
-      content = sampleRunInfo.broken3dComment;
     std::string filename = SampleRunInfoFilePrefix(sampleName) + "." + std::string(statusName) + ".txt";
     Filesystem::writeFileContents(filename.c_str(), content);
   }
@@ -69,14 +78,9 @@ void SamplesCollection::SaveSampleRunInfo(
 
 SampleData* SamplesCollection::GetSampleByName(const SampleName& sampleName)
 {
-  for (auto& [categoryName, samplesInCategory] : _allSamples)
-  {
-    for (auto& [currentSampleName, sampleData] : samplesInCategory)
-    {
-      if (currentSampleName == sampleName)
+  for (auto& sampleData : _allSamples)
+      if (sampleData.sampleName == sampleName)
         return &sampleData;
-    }
-  }
   return nullptr;
 }
 
