@@ -71,21 +71,11 @@ void spawnScreenshots(const std::string & exeName)
     const auto& sampleData = allSamples[i];
     BABYLON_LOG_INFO("spawnScreenshots ", i+1, "/", allSamples.size(), ": ", sampleData.categoryName, "/", sampleData.sampleName);
     auto sampleRunInfo = runOneSample(exeName, sampleData.sampleName);
-    samplesCollection.SampleRunInfo_Save(sampleData.sampleName, sampleRunInfo);
+    samplesCollection.SetSampleRunInfo(sampleData.sampleName, sampleRunInfo);
+    if (i >= 5)
+      break;
   }
-
-
-//  // Write Stats file
-//  {
-//    nlohmann::json jsonData;
-//    jsonData = spawnScreenshotsStats;
-//    std::string outputFilename = screenshotsDirectory() + "/_stats.txt";
-//    FILE * f = fopen(outputFilename.c_str(), "w");
-//    std::string jsonString = jsonData.dump(4);
-//    fprintf(f, "%s", jsonString.c_str());
-//    fclose(f);
-//    BABYLON_LOG_INFO("spawnScreenshots", "stats: ", jsonData.dump());
-//  }
+  samplesCollection.SaveAllSamplesRunInfo();
 }
 
 

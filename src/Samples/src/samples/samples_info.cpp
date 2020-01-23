@@ -4,6 +4,8 @@
 #include <babylon/core/logging.h>
 #include <magic_enum.hpp>
 #include <nlohmann/json.hpp>
+#include <iostream>
+#include <iomanip>
 #include <cassert>
 
 
@@ -13,6 +15,29 @@ namespace BABYLON {
 
 
 namespace SamplesInfo {
+
+template<typename EnumClass>
+void to_json_enum(nlohmann::json& j, const EnumClass& v) {
+  std::string_view sv = magic_enum::enum_name(v);
+  //std::string statusName(sv);
+  j = sv;
+}
+
+template<typename EnumClass>
+void from_json_enum(const nlohmann::json& j, EnumClass& v) {
+  std::string enumName = j.get<std::string>();
+  std::optional<SampleRunStatus> optionalStatus = magic_enum::enum_cast<EnumClass>(enumName);
+  assert(optionalStatus.has_value());
+  v = *optionalStatus;
+}
+
+void to_json(nlohmann::json& j, const SampleRunStatus& v) {
+  to_json_enum(j, v);
+}
+void from_json(const nlohmann::json& j, SampleRunStatus& v) {
+  from_json_enum(j, v);
+}
+
 
 std::string screenshotsDirectory() {
   std::string directory = babylon_repo_folder() + "/assets/screenshots/ScreenshotsData";
@@ -51,86 +76,60 @@ bool compareSampleData_CategoryThenName(const SampleData & s1, const SampleData 
 
 SamplesCollection::SamplesCollection()
 {
-  auto registerSample = [this](const CategoryName & c, const SampleName & s, SampleFactoryFunction f) {
-    SampleData sampleData;
-    sampleData.categoryName = c;
-    sampleData.sampleName = s;
-    sampleData.factoryFunction = f;
-    _allSamples.push_back(sampleData);
-  };
+  // 1. Call auto_populate
+  {
+    auto registerSample = [this](const CategoryName & c, const SampleName & s, SampleFactoryFunction f) {
+      SampleData sampleData;
+      sampleData.categoryName = c;
+      sampleData.sampleName = s;
+      sampleData.factoryFunction = f;
+      _allSamples.push_back(sampleData);
+    };
 
-  BABYLON::Samples::auto_populate_samples(registerSample);
+    BABYLON::Samples::auto_populate_samples(registerSample);
+  }
+
+  // 2. Sort by catgory, then name
   std::sort(_allSamples.begin(), _allSamples.end(), compareSampleData_CategoryThenName);
 
-  for (auto & sampleData: _allSamples)
-    sampleData.runInfo = SampleRunInfo_ReadFromDisk(sampleData.sampleName);
+  // 3. Read Run status
+//  for (auto & sampleData: _allSamples)
+//    sampleData.runInfo = SampleRunInfo_ReadFromDisk(sampleData.sampleName);
+
+  // 4. Read source info
+  {
+
+  }
 
   BABYLON_LOG_INFO("SamplesCollection", "found", _allSamples.size(), " samples");
   BABYLON_LOG_INFO("SamplesCollection", "stats", GetSampleStatsString().c_str());
 }
 
 
-void SamplesCollection::SampleRunInfo_RemoveStatusFromDisk(const SampleName& sampleName)
-{
-  constexpr auto allRunStatuses = magic_enum::enum_values<SampleRunStatus>();
-  for (const auto & runStatus: allRunStatuses)
-  {
-    std::string filename = SampleRunInfoStatusFile(sampleName, runStatus);
-    Filesystem::removeFile(filename);
-  }
-}
-
-SampleRunInfo SamplesCollection::SampleRunInfo_ReadFromDisk(const SampleName& sampleName)
-{
-  assert(GetSampleByName(sampleName) != nullptr);
-
-  SampleRunInfo result;
-  constexpr auto allRunStatuses = magic_enum::enum_values<SampleRunStatus>();
-  for (const auto & runStatus: allRunStatuses)
-  {
-    std::string filename = SampleRunInfoStatusFile(sampleName, runStatus);
-    if (Filesystem::isFile(filename)) {
-      result.sampleRunStatus = runStatus;
-      if (runStatus == SampleRunStatus::unhandledException) {
-        result.unhandledExceptionStackTrace = Filesystem::readFileContents(filename.c_str());
-      }
-    }
-  }
-
-  if (result.sampleRunStatus == SampleRunStatus::unknown) {
-    auto screenshotFile = SampleScreenshotFilename(sampleName);
-    if (Filesystem::isFile(screenshotFile)) {
-      result.screenshotFile = screenshotFile;
-      result.sampleRunStatus = SampleRunStatus::success;
-    }
-  }
-  return result;
-}
-
-void SamplesCollection::SampleRunInfo_Save(
+void SamplesCollection::SetSampleRunInfo(
   const SampleName& sampleName,
   const SampleRunInfo& sampleRunInfo)
 {
-
   SampleData *sampleData = GetSampleByName(sampleName);
   assert(sampleData != nullptr);
-
-  SampleRunInfo_RemoveStatusFromDisk(sampleName);
   sampleData->runInfo = sampleRunInfo;
-
-  if (sampleRunInfo.sampleRunStatus != SampleRunStatus::success)
-  {
+  if (sampleRunInfo.sampleRunStatus != SampleRunStatus::success) {
     Filesystem::removeFile(SampleScreenshotFilename(sampleName));
-
-    std::string_view statusName = magic_enum::enum_name(sampleRunInfo.sampleRunStatus);
-    std::string content;
-    if (sampleRunInfo.sampleRunStatus == SampleRunStatus::unhandledException)
-      content = sampleRunInfo.unhandledExceptionStackTrace;
-    std::string filename = SampleRunInfoFilePrefix(sampleName) + "." + std::string(statusName) + ".txt";
-    Filesystem::writeFileContents(filename.c_str(), content);
   }
-  //sampleRunInfo.sampleRunStatus
 }
+
+void SamplesCollection::SaveAllSamplesRunInfo()
+{
+  std::map<SampleName, SampleRunStatus> allRunStatuses;
+  for (const auto & sampleData : _allSamples)
+    allRunStatuses[sampleData.sampleName] = sampleData.runInfo.sampleRunStatus;
+
+  std::ofstream ofs(screenshotsDirectory() + "/aa_runInfo.json");
+  nlohmann::json j = allRunStatuses;
+  ofs << std::setw(4) << j << std::endl;
+  ofs.close();
+}
+
 
 SampleData* SamplesCollection::GetSampleByName(const SampleName& sampleName)
 {
@@ -139,7 +138,6 @@ SampleData* SamplesCollection::GetSampleByName(const SampleName& sampleName)
         return &sampleData;
   return nullptr;
 }
-
 
 SampleStats SamplesCollection::GetSampleStats()
 {

@@ -8,6 +8,7 @@
 #include <memory>
 #include <optional>
 #include <babylon/babylon_api.h>
+#include <nlohmann/json.hpp>
 
 namespace BABYLON {
 
@@ -37,6 +38,8 @@ enum class BABYLON_SHARED_EXPORT SampleRunStatus {
   empty3d,
   unknown
 };
+void to_json(nlohmann::json& j, const SampleRunStatus& v);
+void from_json(const nlohmann::json& j, SampleRunStatus& v);
 
 struct BABYLON_SHARED_EXPORT SampleSearchQuery {
   std::string QueryString = "";
@@ -53,7 +56,6 @@ struct BABYLON_SHARED_EXPORT SampleSearchQuery {
 struct BABYLON_SHARED_EXPORT SampleRunInfo {
   SampleRunStatus sampleRunStatus = SampleRunStatus::unknown;
   std::string unhandledExceptionStackTrace = "";
-  std::string screenshotFile;
 };
 
 struct BABYLON_SHARED_EXPORT SampleData {
@@ -73,7 +75,6 @@ public:
 
   const std::vector<SampleData>& AllSamples() const { return _allSamples; }
 
-  void SampleRunInfo_Save(const SampleName& sampleName, const SampleRunInfo& sampleRunInfo);
 
   SampleData* GetSampleByName(const SampleName& sampleName); // returns nullptr if not found
 
@@ -82,11 +83,11 @@ public:
 
   //  SamplesByCategory SearchSamplesByCategory(const SampleSearchQuery & query = {});
 //
+  void SetSampleRunInfo(const SampleName& sampleName, const SampleRunInfo& sampleRunInfo);
+  void SaveAllSamplesRunInfo();
 
 private:
   SamplesCollection();
-  SampleRunInfo SampleRunInfo_ReadFromDisk(const SampleName& sampleName);
-  void SampleRunInfo_RemoveStatusFromDisk(const SampleName& sampleName);
 
   std::vector<SampleData> _allSamples;
 };
