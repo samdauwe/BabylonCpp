@@ -192,8 +192,8 @@ void push_HACK_DISABLE_ASYNC()
 }
 void pop_HACK_DISABLE_ASYNC()
 {
+  assert(HACK_DISABLE_ASYNC > 0);
   --HACK_DISABLE_ASYNC;
-  assert(HACK_DISABLE_ASYNC >= 0);
 }
 
 
