@@ -43,7 +43,7 @@ void BABYLON_SHARED_EXPORT from_json(const nlohmann::json& j, SampleAutoRunStatu
 
 struct BABYLON_SHARED_EXPORT SampleSearchQuery {
   std::string Query = "";
-  bool IncludeManualRunFailure = false;
+  bool OnlyManualRunFailure                         = false;
   std::map<SampleAutoRunStatus, bool> IncludeStatus = {
     {SampleAutoRunStatus::success, true },
     {SampleAutoRunStatus::unhandledException, false },

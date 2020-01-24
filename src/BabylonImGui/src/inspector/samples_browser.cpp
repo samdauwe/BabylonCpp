@@ -87,8 +87,9 @@ private:
           changed = true;
         }
       }
+      ImGui::Separator();
 
-      if (ImGui::Checkbox("Include manual run failures", &_sampleSearchQuery.IncludeManualRunFailure))
+      if (ImGui::Checkbox("With manual run failures", &_sampleSearchQuery.OnlyManualRunFailure))
         changed = true;
     }
 
@@ -178,7 +179,7 @@ private:
         Inspector::OnSampleChanged(sampleData.sampleName);
     }
 
-    if (OnEditFiles) {
+    if (OnEditFiles && !sampleInfo.SourceFile.empty()) {
       ImGui::SameLine();
       std::string viewCodeLabel = ICON_FA_EDIT " View code##" + sampleData.sampleName;
       if (ImGui::Button(viewCodeLabel.c_str())) {
@@ -219,7 +220,7 @@ private:
     if (_queryExperimental)
     {
       ImGui::Separator();
-      ImGui::Text("Manual details");
+      ImGui::Text("Manual run details");
       auto sampleManualRunInfoCopy = sampleData.sampleManualRunInfo;
       std::string checkboxLabel = std::string("ManualRun Fail##") + sampleData.sampleName;
       if (ImGui::Checkbox(checkboxLabel.c_str(), &sampleManualRunInfoCopy.failing))

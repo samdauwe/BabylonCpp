@@ -159,7 +159,7 @@ void SamplesCollection::ReadSamplesSourceInfos()
     }
   };
 
-  BABYLON::asio::LoadUrlAsync_Text("samples_info.json", onJsonLoaded, onJsonErrorLoad);
+  BABYLON::asio::LoadUrlAsync_Text(assets_folder() + "/samples_info.json", onJsonLoaded, onJsonErrorLoad);
 
 }
 
@@ -334,13 +334,18 @@ std::map<SamplesInfo::CategoryName, std::vector<const SampleData *>>
       sampleData.sampleName + " " + sampleData.categoryName + " " + sampleData.sampleManualRunInfo.detail))
       match = false;
 
-    for (const auto & [sampleRunStatus, flagInclude] : query.IncludeStatus)
+    if (!query.OnlyManualRunFailure)
     {
-      if ((sampleData.autoRunInfo.sampleRunStatus == sampleRunStatus)  && (!flagInclude))
+      if (sampleData.sampleManualRunInfo.failing)
+        match = false;
+      for (const auto & [sampleRunStatus, flagInclude] : query.IncludeStatus)
+      {
+        if ((sampleData.autoRunInfo.sampleRunStatus == sampleRunStatus)  && (!flagInclude))
           match = false;
+      }
     }
 
-    if (sampleData.sampleManualRunInfo.failing && !query.IncludeManualRunFailure)
+    if (query.OnlyManualRunFailure && !sampleData.sampleManualRunInfo.failing)
       match = false;
 
     if (match)
