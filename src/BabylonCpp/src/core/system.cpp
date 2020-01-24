@@ -51,8 +51,13 @@ void openBrowser(const std::string& url)
   std::string jsCode = "window.open('url','_blank');";
   jsCode             = StringTools::replace(jsCode, "url", url);
   emscripten_run_script(jsCode.c_str());
-#else
+#elif defined(__APPLE__)
   std::string cmd = std::string("open ") + url;
+  int result      = system(cmd.c_str());
+  if (result != 0)
+    BABYLON_LOG_WARN("system.cpp", "system(%S) failed", cmd.c_str())
+#elif defined(__linux__)
+  std::string cmd = std::string("xdg-open ") + url;
   int result      = system(cmd.c_str());
   if (result != 0)
     BABYLON_LOG_WARN("system.cpp", "system(%S) failed", cmd.c_str())
