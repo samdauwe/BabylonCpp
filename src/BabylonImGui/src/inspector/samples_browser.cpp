@@ -37,8 +37,6 @@ std::string to_snake_case(const std::string& sPascalCase)
   return ss.str();
 }
 
-const std::string screenshotsFolderCurrent = "screenshots/samples_current/";
-
 } // end anonymous namespace
 
 namespace BABYLON {
@@ -193,7 +191,7 @@ private:
   void guiOneSample(const SamplesInfo::SampleData& sampleData)
   {
     const auto& sampleInfo =  sampleData.sourceInfo;
-    std::string currentScreenshotFile = screenshotsFolderCurrent + sampleData.sampleName + ".jpg";
+    std::string currentScreenshotFile = screenshotsDirectory() + "/" + sampleData.sampleName + ".jpg";
     std::string sample_snake          = to_snake_case(sampleData.sampleName);
 
     // Screenshot
