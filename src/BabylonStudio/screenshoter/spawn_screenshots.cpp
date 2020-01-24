@@ -1,4 +1,3 @@
-#include <babylon/samples/samples_index.h>
 #include <babylon/core/logging.h>
 #include <iostream>
 #include <string>

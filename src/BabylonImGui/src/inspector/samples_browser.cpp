@@ -7,7 +7,6 @@
 #include <babylon/inspector/samples_browser.h>
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/misc/string_tools.h>
-#include <babylon/samples/samples_index.h>
 #include <imgui_utils/icons_font_awesome_5.h>
 #include <imgui_utils/imgui_utils.h>
 #include <map>

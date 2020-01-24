@@ -167,9 +167,6 @@ def move_header_code_to_cpp(header_full_path, cpp_full_path):
 
 def add_include_samples_index_to_cpp(cpp_full_path):
     lines_cpp = read_file_lines_no_eol(cpp_full_path)
-    samples_index_h = "#include <babylon/samples/samples_index.h>"
-    if samples_index_h not in lines_cpp:
-        lines_cpp = [ samples_index_h ] + lines_cpp
     write_file_lines_no_eol(cpp_full_path, lines_cpp)
 
 def SampleClassName_from_cpp_full_path(cpp_full_path):

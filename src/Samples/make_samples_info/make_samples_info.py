@@ -121,7 +121,6 @@ def make_samples_auto_declarations_code():
 // This file is generated automatically at each build. Do not modify it manually.
 
 #include <babylon/interfaces/irenderable_scene.h>
-#include <babylon/samples/samples_index.h>
 
 #include <memory>
 
