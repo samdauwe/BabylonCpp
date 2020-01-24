@@ -1,0 +1,155 @@
+Stack trace (most recent call last):
+#17   Object "", at 0xffffffffffffffff, in 
+#16   Object "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/build/bin/BabylonStudio", at 0x409069, in _start
+#15   Source "/build/glibc-OTsEL5/glibc-2.27/csu/../csu/libc-start.c", line 310, in __libc_start_main [0x7fc6bd429b96]
+#14   Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/BabylonStudio/main.cpp", line 62, in main [0x40e1fc]
+         59:   };
+         60: #endif
+         61: 
+      >  62:   runBabylonStudio(scene, options);
+         63:   return 0;
+         64: }
+#13   Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/BabylonImGui/src/babylon_imgui/babylon_studio.cpp", line 405, in BABYLON::runBabylonStudio(std::shared_ptr<BABYLON::IRenderableScene> const&, BABYLON::BabylonStudioOptions) [0x7fc6c0fa6c8c]
+        402: #endif
+        403:   std::shared_ptr<BABYLON::IRenderableScene> sceneNotNull =
+        404:     scene ? scene : std::make_shared<EmptyScene>();
+      > 405:   app.RunApp(sceneNotNull, options);
+        406: }
+        407: 
+        408: } // namespace BABYLON
+#12   Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/BabylonImGui/src/babylon_imgui/babylon_studio.cpp", line 78, in BABYLON::BabylonStudioApp::RunApp(std::shared_ptr<BABYLON::IRenderableScene> const&, BABYLON::BabylonStudioOptions const&) [0x7fc6c0fa7769]
+         75:     _appContext._options._appWindowParams.InitialDockLayoutFunction = [this](ImGuiID mainDockId) {
+         76:       _studioLayout.PrepareLayout(mainDockId);
+         77:     };
+      >  78:     ImGuiUtils::ImGuiRunner::InvokeRunnerBabylon(
+         79:       _appContext._options._appWindowParams,
+         80:       showGuiLambda,
+         81:       initSceneLambda
+#11   Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/imgui_utils/imgui_runner_babylon/runner_babylon.cpp", line 284, in ImGuiUtils::ImGuiRunner::InvokeRunnerBabylon(ImGuiUtils::ImGuiRunner::AppWindowParams const&, std::function<bool ()>, std::function<void ()>) [0x7fc6c0fea4f5]
+        281: #ifdef EMSCRIPTEN
+        282:   InvokeRunnerBabylonEmscripten(appWindowParams, guiFunctionWithExit, postInitFunction);
+        283: #elif defined(IMGUI_RUNNER_USE_SDL)
+      > 284:   InvokeRunnerBabylonSdl(appWindowParams, guiFunctionWithExit, postInitFunction);
+        285: #elif defined(IMGUI_RUNNER_USE_GLFW)
+        286:   InvokeRunnerBabylonGlfw(appWindowParams, guiFunctionWithExit, postInitFunction);
+        287: #else
+#10 | Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/imgui_utils/imgui_runner_babylon/runner_babylon.cpp", line 252, in ImGuiUtils::ImGuiRunner::InvokeRunnerBabylonSdl(ImGuiUtils::ImGuiRunner::AppWindowParams const&, std::function<bool ()>, std::function<void ()>)
+    |   250:     postInitFunction
+    |   251:   );
+    | > 252:   runner_babylon.Run();
+    |   253:   BABYLON::asio::Service_Stop();
+    |   254: }
+      Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/imgui_utils/imgui_runner_babylon/runner_babylon.cpp", line 215, in ImGuiUtils::ImGuiRunner::InvokeRunnerBabylonSdl(ImGuiUtils::ImGuiRunner::AppWindowParams const&, std::function<bool ()>, std::function<void ()>) [0x7fc6c0fea258]
+        213: void RunnerBabylon::Run()
+        214: {
+      > 215:   mAbstractRunner->Run();
+        216: }
+        217: 
+        218: void RunnerBabylon::ResetDockLayout()
+#9    Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/imgui_utils/imgui_runner/abstract_runner.cpp", line 194, in ImGui::ImGuiRunner::AbstractRunner::Run() [0x7fc6c1018447]
+        191: {
+        192:   FullInit();
+        193:   while(!mExitRequired)
+      > 194:     LoopProc();
+        195:   Cleanup();
+        196: }
+#8  | Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/imgui_utils/imgui_runner/abstract_runner.cpp", line 176, in ImGui::ImGuiRunner::AbstractRunner::LoopProc()
+    |   174:   ImGui::NewFrame();
+    |   175: 
+    | > 176:   bool exitRequired = ShowGui();
+    |   177:   if (exitRequired)
+    |   178:     mExitRequired = true;
+      Source "/usr/lib/gcc/x86_64-linux-gnu/7.4.0/../../../../include/c++/7.4.0/bits/std_function.h", line 706, in ImGui::ImGuiRunner::AbstractRunner::LoopProc() [0x7fc6c10183ce]
+        703:     {
+        704:       if (_M_empty())
+        705: 	__throw_bad_function_call();
+      > 706:       return _M_invoker(_M_functor, std::forward<_ArgTypes>(__args)...);
+        707:     }
+        708: 
+        709: #if __cpp_rtti
+#7  | Source "/usr/lib/gcc/x86_64-linux-gnu/7.4.0/../../../../include/c++/7.4.0/bits/std_function.h", line 301, in std::_Function_handler<bool (), ImGuiUtils::ImGuiRunner::RunnerBabylon::DoInit()::$_2>::_M_invoke(std::_Any_data const&)
+    |   299:       _M_invoke(const _Any_data& __functor, _ArgTypes&&... __args)
+    |   300:       {
+    | > 301: 	return (*_Base::_M_get_pointer(__functor))(
+    |   302: 	    std::forward<_ArgTypes>(__args)...);
+    |   303:       }
+    | Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/imgui_utils/imgui_runner_babylon/runner_babylon.cpp", line 199, in ImGuiUtils::ImGuiRunner::RunnerBabylon::DoInit()::$_2::operator()() const
+    |   197:     {
+    |   198:       postInited = true;
+    | > 199:       postInit();
+    |   200:     }
+    |   201:     provideWindowOrDock();
+      Source "/usr/lib/gcc/x86_64-linux-gnu/7.4.0/../../../../include/c++/7.4.0/bits/std_function.h", line 706, in std::_Function_handler<bool (), ImGuiUtils::ImGuiRunner::RunnerBabylon::DoInit()::$_2>::_M_invoke(std::_Any_data const&) [0x7fc6c0fea7d7]
+        703:     {
+        704:       if (_M_empty())
+        705: 	__throw_bad_function_call();
+      > 706:       return _M_invoker(_M_functor, std::forward<_ArgTypes>(__args)...);
+        707:     }
+        708: 
+        709: #if __cpp_rtti
+#6  | Source "/usr/lib/gcc/x86_64-linux-gnu/7.4.0/../../../../include/c++/7.4.0/bits/std_function.h", line 316, in std::_Function_handler<void (), ImGuiUtils::ImGuiRunner::RunnerBabylon::DoInit()::$_0>::_M_invoke(std::_Any_data const&)
+    |   314:       _M_invoke(const _Any_data& __functor, _ArgTypes&&... __args)
+    |   315:       {
+    | > 316: 	(*_Base::_M_get_pointer(__functor))(
+    |   317: 	    std::forward<_ArgTypes>(__args)...);
+    |   318:       }
+    | Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/imgui_utils/imgui_runner_babylon/runner_babylon.cpp", line 171, in ImGuiUtils::ImGuiRunner::RunnerBabylon::DoInit()::$_0::operator()() const
+    |   169:     if (mAppWindowParams.DefaultWindowType == DefaultWindowTypeOption::ProvideFullScreenDockSpace)
+    |   170:       ImGui::GetIO().ConfigFlags = ImGui::GetIO().ConfigFlags | ImGuiConfigFlags_DockingEnable;
+    | > 171:     mPostInitFunction();
+    |   172:     ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = mAppWindowParams.ConfigWindowsMoveFromTitleBarOnly;
+    |   173:   };
+      Source "/usr/lib/gcc/x86_64-linux-gnu/7.4.0/../../../../include/c++/7.4.0/bits/std_function.h", line 706, in std::_Function_handler<void (), ImGuiUtils::ImGuiRunner::RunnerBabylon::DoInit()::$_0>::_M_invoke(std::_Any_data const&) [0x7fc6c0fea613]
+        703:     {
+        704:       if (_M_empty())
+        705: 	__throw_bad_function_call();
+      > 706:       return _M_invoker(_M_functor, std::forward<_ArgTypes>(__args)...);
+        707:     }
+        708: 
+        709: #if __cpp_rtti
+#5    Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/BabylonImGui/src/babylon_imgui/babylon_studio.cpp", line 72, in operator() [0x7fc6c0faa62b]
+         70:     auto initSceneLambda = [=]() {
+         71:       this->initScene();
+      >  72:       this->setRenderableScene(initialScene);
+         73:     };
+         74: 
+         75:     _appContext._options._appWindowParams.InitialDockLayoutFunction = [this](ImGuiID mainDockId) {
+#4    Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/BabylonImGui/src/babylon_imgui/babylon_studio.cpp", line 235, in BABYLON::BabylonStudioApp::setRenderableScene(std::shared_ptr<BABYLON::IRenderableScene>) [0x7fc6c0fa8e72]
+        232:   {
+        233:     if (_appContext._inspector)
+        234:       _appContext._inspector->setScene(nullptr);
+      > 235:     _appContext._sceneWidget->setRenderableScene(scene);
+        236:     if (_appContext._inspector)
+        237:       _appContext._inspector->setScene(_appContext._sceneWidget->getScene());
+        238:   }
+#3    Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/BabylonCpp/src/interfaces/irenderable_scene.cpp", line 38, in BABYLON::IRenderableScene::initialize(BABYLON::ICanvas*) [0x7fc6c0749361]
+         35:   // Set the render function
+         36:   _renderFunction = [=]() { _scene->render(); };
+         37:   // Initialize the scene
+      >  38:   initializeScene(_canvas, _scene.get());
+         39:   _initialized = true;
+         40: }
+#2    Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/Samples/src/samples/meshes/simple_car_following_path_scene.cpp", line 117, in BABYLON::Samples::SimpleCarFollowingPathScene::initializeScene(BABYLON::ICanvas*, BABYLON::Scene*) [0x7fc6bfeaed57]
+        114:         };
+        115: 
+        116:     // Create the 4 wheels of the car
+      > 117:     _wheelFI = createWheel("wheelFI", Vector3(-4.5f, -2.f, -2.8f));
+        118:     _wheelFO = createWheel("wheelFO", Vector3(-4.5f, -2.f, 2.8f));
+        119:     _wheelRI = createWheel("wheelRI", Vector3(2.5f, -2.f, -2.8f));
+        120:     _wheelRO = createWheel("wheelRO", Vector3(2.5f, -2.f, 2.8f));
+#1    Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/Samples/src/samples/meshes/simple_car_following_path_scene.cpp", line 102, in operator() [0x7fc6bfeb0313]
+         99:           cylinderOptions.height       = 1.f;
+        100:           cylinderOptions.tessellation = 24;
+        101:           // - Set color for wheel tread as black
+      > 102:           cylinderOptions.faceColors[1] = Color4(0.f, 0.f, 0.f);
+        103:           // - Set texture for flat face of wheel
+        104:           cylinderOptions.faceUV[0] = Vector4(0.f, 0.f, 1.f, 1.f);
+        105:           cylinderOptions.faceUV[2] = Vector4(0.f, 0.f, 1.f, 1.f);
+#0    Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/BabylonCpp/src/maths/color4.cpp", line 54, in BABYLON::Color4::operator=(BABYLON::Color4&&) [0x7fc6c0901dc7]
+         51:   return *this;
+         52: }
+         53: 
+      >  54: Color4& Color4::operator=(Color4&& otherColor) = default;
+         55: 
+         56: Color4::~Color4() = default;
+Segmentation fault (Address not mapped to object [0x10])

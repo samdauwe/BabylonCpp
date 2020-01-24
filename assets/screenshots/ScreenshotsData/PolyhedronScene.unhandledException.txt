@@ -1,0 +1,200 @@
+LLVM ERROR: out of memory
+Stack trace (most recent call last):
+#24   Object "", at 0xffffffffffffffff, in 
+#23   Object "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/build/bin/BabylonStudio", at 0x409069, in _start
+#22   Source "/build/glibc-OTsEL5/glibc-2.27/csu/../csu/libc-start.c", line 310, in __libc_start_main [0x7fcbc7ad9b96]
+#21   Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/BabylonStudio/main.cpp", line 62, in main [0x40e1fc]
+         59:   };
+         60: #endif
+         61: 
+      >  62:   runBabylonStudio(scene, options);
+         63:   return 0;
+         64: }
+#20   Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/BabylonImGui/src/babylon_imgui/babylon_studio.cpp", line 405, in BABYLON::runBabylonStudio(std::shared_ptr<BABYLON::IRenderableScene> const&, BABYLON::BabylonStudioOptions) [0x7fcbcb656c8c]
+        402: #endif
+        403:   std::shared_ptr<BABYLON::IRenderableScene> sceneNotNull =
+        404:     scene ? scene : std::make_shared<EmptyScene>();
+      > 405:   app.RunApp(sceneNotNull, options);
+        406: }
+        407: 
+        408: } // namespace BABYLON
+#19   Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/BabylonImGui/src/babylon_imgui/babylon_studio.cpp", line 78, in BABYLON::BabylonStudioApp::RunApp(std::shared_ptr<BABYLON::IRenderableScene> const&, BABYLON::BabylonStudioOptions const&) [0x7fcbcb657769]
+         75:     _appContext._options._appWindowParams.InitialDockLayoutFunction = [this](ImGuiID mainDockId) {
+         76:       _studioLayout.PrepareLayout(mainDockId);
+         77:     };
+      >  78:     ImGuiUtils::ImGuiRunner::InvokeRunnerBabylon(
+         79:       _appContext._options._appWindowParams,
+         80:       showGuiLambda,
+         81:       initSceneLambda
+#18   Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/imgui_utils/imgui_runner_babylon/runner_babylon.cpp", line 284, in ImGuiUtils::ImGuiRunner::InvokeRunnerBabylon(ImGuiUtils::ImGuiRunner::AppWindowParams const&, std::function<bool ()>, std::function<void ()>) [0x7fcbcb69a4f5]
+        281: #ifdef EMSCRIPTEN
+        282:   InvokeRunnerBabylonEmscripten(appWindowParams, guiFunctionWithExit, postInitFunction);
+        283: #elif defined(IMGUI_RUNNER_USE_SDL)
+      > 284:   InvokeRunnerBabylonSdl(appWindowParams, guiFunctionWithExit, postInitFunction);
+        285: #elif defined(IMGUI_RUNNER_USE_GLFW)
+        286:   InvokeRunnerBabylonGlfw(appWindowParams, guiFunctionWithExit, postInitFunction);
+        287: #else
+#17 | Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/imgui_utils/imgui_runner_babylon/runner_babylon.cpp", line 252, in ImGuiUtils::ImGuiRunner::InvokeRunnerBabylonSdl(ImGuiUtils::ImGuiRunner::AppWindowParams const&, std::function<bool ()>, std::function<void ()>)
+    |   250:     postInitFunction
+    |   251:   );
+    | > 252:   runner_babylon.Run();
+    |   253:   BABYLON::asio::Service_Stop();
+    |   254: }
+      Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/imgui_utils/imgui_runner_babylon/runner_babylon.cpp", line 215, in ImGuiUtils::ImGuiRunner::InvokeRunnerBabylonSdl(ImGuiUtils::ImGuiRunner::AppWindowParams const&, std::function<bool ()>, std::function<void ()>) [0x7fcbcb69a258]
+        213: void RunnerBabylon::Run()
+        214: {
+      > 215:   mAbstractRunner->Run();
+        216: }
+        217: 
+        218: void RunnerBabylon::ResetDockLayout()
+#16   Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/imgui_utils/imgui_runner/abstract_runner.cpp", line 194, in ImGui::ImGuiRunner::AbstractRunner::Run() [0x7fcbcb6c8447]
+        191: {
+        192:   FullInit();
+        193:   while(!mExitRequired)
+      > 194:     LoopProc();
+        195:   Cleanup();
+        196: }
+#15 | Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/imgui_utils/imgui_runner/abstract_runner.cpp", line 176, in ImGui::ImGuiRunner::AbstractRunner::LoopProc()
+    |   174:   ImGui::NewFrame();
+    |   175: 
+    | > 176:   bool exitRequired = ShowGui();
+    |   177:   if (exitRequired)
+    |   178:     mExitRequired = true;
+      Source "/usr/lib/gcc/x86_64-linux-gnu/7.4.0/../../../../include/c++/7.4.0/bits/std_function.h", line 706, in ImGui::ImGuiRunner::AbstractRunner::LoopProc() [0x7fcbcb6c83ce]
+        703:     {
+        704:       if (_M_empty())
+        705: 	__throw_bad_function_call();
+      > 706:       return _M_invoker(_M_functor, std::forward<_ArgTypes>(__args)...);
+        707:     }
+        708: 
+        709: #if __cpp_rtti
+#14 | Source "/usr/lib/gcc/x86_64-linux-gnu/7.4.0/../../../../include/c++/7.4.0/bits/std_function.h", line 301, in std::_Function_handler<bool (), ImGuiUtils::ImGuiRunner::RunnerBabylon::DoInit()::$_2>::_M_invoke(std::_Any_data const&)
+    |   299:       _M_invoke(const _Any_data& __functor, _ArgTypes&&... __args)
+    |   300:       {
+    | > 301: 	return (*_Base::_M_get_pointer(__functor))(
+    |   302: 	    std::forward<_ArgTypes>(__args)...);
+    |   303:       }
+    | Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/imgui_utils/imgui_runner_babylon/runner_babylon.cpp", line 199, in ImGuiUtils::ImGuiRunner::RunnerBabylon::DoInit()::$_2::operator()() const
+    |   197:     {
+    |   198:       postInited = true;
+    | > 199:       postInit();
+    |   200:     }
+    |   201:     provideWindowOrDock();
+      Source "/usr/lib/gcc/x86_64-linux-gnu/7.4.0/../../../../include/c++/7.4.0/bits/std_function.h", line 706, in std::_Function_handler<bool (), ImGuiUtils::ImGuiRunner::RunnerBabylon::DoInit()::$_2>::_M_invoke(std::_Any_data const&) [0x7fcbcb69a7d7]
+        703:     {
+        704:       if (_M_empty())
+        705: 	__throw_bad_function_call();
+      > 706:       return _M_invoker(_M_functor, std::forward<_ArgTypes>(__args)...);
+        707:     }
+        708: 
+        709: #if __cpp_rtti
+#13 | Source "/usr/lib/gcc/x86_64-linux-gnu/7.4.0/../../../../include/c++/7.4.0/bits/std_function.h", line 316, in std::_Function_handler<void (), ImGuiUtils::ImGuiRunner::RunnerBabylon::DoInit()::$_0>::_M_invoke(std::_Any_data const&)
+    |   314:       _M_invoke(const _Any_data& __functor, _ArgTypes&&... __args)
+    |   315:       {
+    | > 316: 	(*_Base::_M_get_pointer(__functor))(
+    |   317: 	    std::forward<_ArgTypes>(__args)...);
+    |   318:       }
+    | Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/imgui_utils/imgui_runner_babylon/runner_babylon.cpp", line 171, in ImGuiUtils::ImGuiRunner::RunnerBabylon::DoInit()::$_0::operator()() const
+    |   169:     if (mAppWindowParams.DefaultWindowType == DefaultWindowTypeOption::ProvideFullScreenDockSpace)
+    |   170:       ImGui::GetIO().ConfigFlags = ImGui::GetIO().ConfigFlags | ImGuiConfigFlags_DockingEnable;
+    | > 171:     mPostInitFunction();
+    |   172:     ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = mAppWindowParams.ConfigWindowsMoveFromTitleBarOnly;
+    |   173:   };
+      Source "/usr/lib/gcc/x86_64-linux-gnu/7.4.0/../../../../include/c++/7.4.0/bits/std_function.h", line 706, in std::_Function_handler<void (), ImGuiUtils::ImGuiRunner::RunnerBabylon::DoInit()::$_0>::_M_invoke(std::_Any_data const&) [0x7fcbcb69a613]
+        703:     {
+        704:       if (_M_empty())
+        705: 	__throw_bad_function_call();
+      > 706:       return _M_invoker(_M_functor, std::forward<_ArgTypes>(__args)...);
+        707:     }
+        708: 
+        709: #if __cpp_rtti
+#12   Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/BabylonImGui/src/babylon_imgui/babylon_studio.cpp", line 72, in operator() [0x7fcbcb65a62b]
+         70:     auto initSceneLambda = [=]() {
+         71:       this->initScene();
+      >  72:       this->setRenderableScene(initialScene);
+         73:     };
+         74: 
+         75:     _appContext._options._appWindowParams.InitialDockLayoutFunction = [this](ImGuiID mainDockId) {
+#11   Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/BabylonImGui/src/babylon_imgui/babylon_studio.cpp", line 235, in BABYLON::BabylonStudioApp::setRenderableScene(std::shared_ptr<BABYLON::IRenderableScene>) [0x7fcbcb658e72]
+        232:   {
+        233:     if (_appContext._inspector)
+        234:       _appContext._inspector->setScene(nullptr);
+      > 235:     _appContext._sceneWidget->setRenderableScene(scene);
+        236:     if (_appContext._inspector)
+        237:       _appContext._inspector->setScene(_appContext._sceneWidget->getScene());
+        238:   }
+#10   Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/BabylonCpp/src/interfaces/irenderable_scene.cpp", line 38, in BABYLON::IRenderableScene::initialize(BABYLON::ICanvas*) [0x7fcbcadf9361]
+         35:   // Set the render function
+         36:   _renderFunction = [=]() { _scene->render(); };
+         37:   // Initialize the scene
+      >  38:   initializeScene(_canvas, _scene.get());
+         39:   _initialized = true;
+         40: }
+#9    Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/Samples/src/samples/meshes/polyhedron_scene.cpp", line 66, in BABYLON::Samples::PolyhedronScene::initializeScene(BABYLON::ICanvas*, BABYLON::Scene*) [0x7fcbca5581ed]
+         63:       options.size = 2.f;
+         64:       options.type = type;
+         65:       auto polygon
+      >  66:         = MeshBuilder::CreatePolyhedron(StringTools::concat("Polyhedron", type), options, scene);
+         67:       polygon->material = mat;
+         68:       col               = type % 5;
+         69:       if (col == 0) {
+#8    Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/BabylonCpp/src/meshes/mesh_builder.cpp", line 173, in BABYLON::MeshBuilder::CreatePolyhedron(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, BABYLON::PolyhedronOptions&, BABYLON::Scene*) [0x7fcbcb0345f8]
+        170: MeshPtr MeshBuilder::CreatePolyhedron(const std::string& name,
+        171:                                       PolyhedronOptions& options, Scene* scene)
+        172: {
+      > 173:   return PolyhedronBuilder::CreatePolyhedron(name, options, scene);
+        174: }
+        175: 
+        176: MeshPtr MeshBuilder::CreateDecal(const std::string& name,
+#7    Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/BabylonCpp/src/meshes/builders/polyhedron_builder.cpp", line 18, in BABYLON::PolyhedronBuilder::CreatePolyhedron(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, BABYLON::PolyhedronOptions&, BABYLON::Scene*) [0x7fcbcafe8566]
+         15:     = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
+         16:   polyhedron->_originalBuilderSideOrientation = *options.sideOrientation;
+         17: 
+      >  18:   auto vertexData = VertexData::CreatePolyhedron(options);
+         19: 
+         20:   vertexData->applyToMesh(*polyhedron, options.updatable);
+#6  | Source "/home/pascal/dvp/BabylonCpp/cmake-build-relwithdebinfo/../src/BabylonCpp/src/meshes/vertex_data.cpp", line 3073, in BABYLON::VertexData::CreatePolyhedron(BABYLON::PolyhedronOptions&)
+    |  3071:     for (f = 1; f <= nbfaces; ++f) {
+    |  3072:       if (f > faceColors.size()) {
+    | >3073:         faceColors.emplace_back(Color4(1.f, 1.f, 1.f, 1.f));
+    |  3074:       }
+    |  3075:       if (f > faceUV.size())
+      Source "/usr/lib/gcc/x86_64-linux-gnu/7.4.0/../../../../include/c++/7.4.0/bits/vector.tcc", line 105, in BABYLON::VertexData::CreatePolyhedron(BABYLON::PolyhedronOptions&) [0x7fcbcb074721]
+        102: 	    ++this->_M_impl._M_finish;
+        103: 	  }
+        104: 	else
+      > 105: 	  _M_realloc_insert(end(), std::forward<_Args>(__args)...);
+        106: #if __cplusplus > 201402L
+        107: 	return back();
+        108: #endif
+#5  | Source "/usr/lib/gcc/x86_64-linux-gnu/7.4.0/../../../../include/c++/7.4.0/bits/vector.tcc", line 406, in void std::vector<BABYLON::Color4, std::allocator<BABYLON::Color4> >::_M_realloc_insert<BABYLON::Color4>(__gnu_cxx::__normal_iterator<BABYLON::Color4*, std::vector<BABYLON::Color4, std::allocator<BABYLON::Color4> > >, BABYLON::Color4&&)
+    |   404: 	_M_check_len(size_type(1), "vector::_M_realloc_insert");
+    |   405:       const size_type __elems_before = __position - begin();
+    | > 406:       pointer __new_start(this->_M_allocate(__len));
+    |   407:       pointer __new_finish(__new_start);
+    |   408:       __try
+    | Source "/usr/lib/gcc/x86_64-linux-gnu/7.4.0/../../../../include/c++/7.4.0/bits/stl_vector.h", line 172, in 
+    |   170:       {
+    |   171: 	typedef __gnu_cxx::__alloc_traits<_Tp_alloc_type> _Tr;
+    | > 172: 	return __n != 0 ? _Tr::allocate(_M_impl, __n) : pointer();
+    |   173:       }
+    | Source "/usr/lib/gcc/x86_64-linux-gnu/7.4.0/../../../../include/c++/7.4.0/bits/alloc_traits.h", line 436, in 
+    |   434:       static pointer
+    |   435:       allocate(allocator_type& __a, size_type __n)
+    | > 436:       { return __a.allocate(__n); }
+    |   437: 
+    |   438:       /**
+      Source "/usr/lib/gcc/x86_64-linux-gnu/7.4.0/../../../../include/c++/7.4.0/ext/new_allocator.h", line 111, in void std::vector<BABYLON::Color4, std::allocator<BABYLON::Color4> >::_M_realloc_insert<BABYLON::Color4>(__gnu_cxx::__normal_iterator<BABYLON::Color4*, std::vector<BABYLON::Color4, std::allocator<BABYLON::Color4> > >, BABYLON::Color4&&) [0x7fcbcb07dafe]
+        108: 	    return static_cast<_Tp*>(::operator new(__n * sizeof(_Tp), __al));
+        109: 	  }
+        110: #endif
+      > 111: 	return static_cast<_Tp*>(::operator new(__n * sizeof(_Tp)));
+        112:       }
+        113: 
+        114:       // __p is not permitted to be a null pointer.
+#4    Object "/usr/lib/x86_64-linux-gnu/libstdc++.so.6", at 0x7fcbc837326b, in operator new(unsigned long)
+#3    Object "/usr/lib/x86_64-linux-gnu/libLLVM-8.so.1", at 0x7fcbbdcbf5c1, in llvm::install_out_of_memory_new_handler()
+#2    Object "/usr/lib/x86_64-linux-gnu/libLLVM-8.so.1", at 0x7fcbbdcbf542, in llvm::report_bad_alloc_error(char const*, bool)
+#1    Source "/build/glibc-OTsEL5/glibc-2.27/stdlib/abort.c", line 79, in __GI_abort [0x7fcbc7af8800]
+#0    Source "/build/glibc-OTsEL5/glibc-2.27/signal/../sysdeps/unix/sysv/linux/raise.c", line 51, in __GI_raise [0x7fcbc7af6e97]
+Aborted (Signal sent by tkill() 25485 1000)

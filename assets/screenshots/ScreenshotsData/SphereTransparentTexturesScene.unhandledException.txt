@@ -1,0 +1,3 @@
+Stack trace (most recent call last):
+#0    Object "", at 0x1ad2880, in 
+Segmentation fault (Invalid permissions for mapped object [0x1ad2880])
