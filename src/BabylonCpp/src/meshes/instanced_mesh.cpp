@@ -66,8 +66,7 @@ void InstancedMesh::_resyncLighSource(const LightPtr& /*light*/)
   // Do nothing as all the work will be done by source mesh
 }
 
-void InstancedMesh::_removeLightSource(const LightPtr& /*light*/,
-                                       bool /*dispose*/)
+void InstancedMesh::_removeLightSource(const LightPtr& /*light*/, bool /*dispose*/)
 {
   // Do nothing as all the work will be done by source mesh
 }
@@ -129,16 +128,14 @@ bool InstancedMesh::isReady(bool completeCheck, bool /*forceInstanceSupport*/)
   return _sourceMesh->isReady(completeCheck, true);
 }
 
-Float32Array InstancedMesh::getVerticesData(const std::string& kind,
-                                            bool copyWhenShared, bool forceCopy)
+Float32Array InstancedMesh::getVerticesData(const std::string& kind, bool copyWhenShared,
+                                            bool forceCopy)
 {
   return _sourceMesh->getVerticesData(kind, copyWhenShared, forceCopy);
 }
 
-AbstractMesh*
-InstancedMesh::setVerticesData(const std::string& kind,
-                               const Float32Array& data, bool updatable,
-                               const std::optional<size_t>& stride)
+AbstractMesh* InstancedMesh::setVerticesData(const std::string& kind, const Float32Array& data,
+                                             bool updatable, const std::optional<size_t>& stride)
 {
   if (sourceMesh()) {
     sourceMesh()->setVerticesData(kind, data, updatable, stride);
@@ -146,10 +143,8 @@ InstancedMesh::setVerticesData(const std::string& kind,
   return sourceMesh().get();
 }
 
-AbstractMesh* InstancedMesh::updateVerticesData(const std::string& kind,
-                                                const Float32Array& data,
-                                                bool updateExtends,
-                                                bool makeItUnique)
+AbstractMesh* InstancedMesh::updateVerticesData(const std::string& kind, const Float32Array& data,
+                                                bool updateExtends, bool makeItUnique)
 {
   if (sourceMesh()) {
     sourceMesh()->updateVerticesData(kind, data, updateExtends, makeItUnique);
@@ -157,8 +152,7 @@ AbstractMesh* InstancedMesh::updateVerticesData(const std::string& kind,
   return sourceMesh().get();
 }
 
-AbstractMesh* InstancedMesh::setIndices(const IndicesArray& indices,
-                                        size_t totalVertices,
+AbstractMesh* InstancedMesh::setIndices(const IndicesArray& indices, size_t totalVertices,
                                         bool /*updatable*/)
 {
   if (sourceMesh()) {
@@ -172,8 +166,7 @@ bool InstancedMesh::isVerticesDataPresent(const std::string& kind) const
   return _sourceMesh->isVerticesDataPresent(kind);
 }
 
-IndicesArray InstancedMesh::getIndices(bool /*copyWhenShared*/,
-                                       bool /*forceCopy*/)
+IndicesArray InstancedMesh::getIndices(bool /*copyWhenShared*/, bool /*forceCopy*/)
 {
   return _sourceMesh->getIndices();
 }
@@ -189,9 +182,8 @@ InstancedMesh& InstancedMesh::refreshBoundingInfo(bool applySkeleton)
     return *this;
   }
 
-  const auto bias = _sourceMesh->geometry() ?
-                      _sourceMesh->geometry()->boundingBias() :
-                      std::nullopt;
+  const auto bias
+    = _sourceMesh->geometry() ? _sourceMesh->geometry()->boundingBias() : std::nullopt;
   _refreshBoundingInfo(_sourceMesh->_getPositionData(applySkeleton), bias);
   return *this;
 }
@@ -206,18 +198,23 @@ void InstancedMesh::_preActivate()
 bool InstancedMesh::_activate(int renderId, bool intermediateRendering)
 {
   if (_sourceMesh->subMeshes.empty()) {
-    BABYLON_LOG_WARN(
-      "InstancedMesh",
-      "Instances should only be created for meshes with geometry.")
+    BABYLON_LOG_WARN("InstancedMesh", "Instances should only be created for meshes with geometry.")
   }
 
   if (_currentLOD) {
+    auto differentSign
+      = (_currentLOD->_getWorldMatrixDeterminant() > 0.f) != (_getWorldMatrixDeterminant() > 0.f);
+    if (differentSign) {
+      _internalAbstractMeshDataInfo._actAsRegularMesh = true;
+      return true;
+    }
+    _internalAbstractMeshDataInfo._actAsRegularMesh = false;
+
     _currentLOD->_registerInstanceForRenderId(this, renderId);
 
     if (intermediateRendering) {
       if (!_currentLOD->_internalAbstractMeshDataInfo._isActiveIntermediate) {
-        _currentLOD->_internalAbstractMeshDataInfo._onlyForInstancesIntermediate
-          = true;
+        _currentLOD->_internalAbstractMeshDataInfo._onlyForInstancesIntermediate = true;
         return true;
       }
     }
@@ -233,16 +230,14 @@ bool InstancedMesh::_activate(int renderId, bool intermediateRendering)
 
 void InstancedMesh::_postActivate()
 {
-  if (_edgesRenderer && _edgesRenderer->isEnabled
-      && _sourceMesh->_renderingGroup) {
+  if (_edgesRenderer && _edgesRenderer->isEnabled && _sourceMesh->_renderingGroup) {
     _sourceMesh->_renderingGroup->_edgesRenderers.emplace_back(_edgesRenderer);
   }
 }
 
 Matrix& InstancedMesh::getWorldMatrix()
 {
-  if (_currentLOD
-      && _currentLOD->billboardMode() != TransformNode::BILLBOARDMODE_NONE
+  if (_currentLOD && _currentLOD->billboardMode() != TransformNode::BILLBOARDMODE_NONE
       && _currentLOD->_masterMesh != this) {
     const auto& tempMaster   = _currentLOD->_masterMesh;
     _currentLOD->_masterMesh = this;
@@ -259,8 +254,7 @@ bool InstancedMesh::isAnInstance() const
   return true;
 }
 
-AbstractMesh* InstancedMesh::getLOD(const CameraPtr& camera,
-                                    BoundingSphere* /*boundingSphere*/)
+AbstractMesh* InstancedMesh::getLOD(const CameraPtr& camera, BoundingSphere* /*boundingSphere*/)
 {
   if (!camera) {
     return this;
@@ -268,8 +262,7 @@ AbstractMesh* InstancedMesh::getLOD(const CameraPtr& camera,
 
   const auto& boundingInfo = getBoundingInfo();
 
-  auto currentLOD = sourceMesh()->getLOD(getScene()->activeCamera,
-                                         &boundingInfo->boundingSphere);
+  auto currentLOD = sourceMesh()->getLOD(getScene()->activeCamera, &boundingInfo->boundingSphere);
   _currentLOD     = dynamic_cast<Mesh*>(currentLOD);
 
   if (_currentLOD == sourceMesh().get()) {
@@ -296,8 +289,8 @@ bool InstancedMesh::_generatePointsArray()
   return _sourceMesh->_generatePointsArray();
 }
 
-InstancedMeshPtr InstancedMesh::clone(const std::string& /*iNname*/,
-                                      Node* newParent, bool doNotCloneChildren)
+InstancedMeshPtr InstancedMesh::clone(const std::string& /*iNname*/, Node* newParent,
+                                      bool doNotCloneChildren)
 {
   auto result = _sourceMesh->createInstance(name);
 
