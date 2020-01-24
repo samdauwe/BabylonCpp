@@ -90,11 +90,3 @@ if (NOT BABYLON_DISABLE_INSTALL)
         FILE ${TARGET}Config.cmake
     )
 endif()
-
-# Copy asset directories
-copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/glTF-Sample-Models")
-copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/scenes")
-copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/textures")
-if (EXISTS "${CMAKE_SOURCE_DIR}/assets/samples_info.json")
-    copy_resource_files("${CMAKE_SOURCE_DIR}/assets/samples_info.json")
-endif()
