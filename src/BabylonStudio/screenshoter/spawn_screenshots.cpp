@@ -16,9 +16,9 @@ namespace BABYLON {
 namespace impl {
 using namespace BABYLON::SamplesInfo;
 
-SampleRunInfo runOneSample(const std::string & exeName, const std::string &sampleName, bool flagAsync)
+SampleAutoRunInfo runOneSample(const std::string & exeName, const std::string &sampleName, bool flagAsync)
 {
-  SampleRunInfo sampleRunInfo;
+  SampleAutoRunInfo sampleRunInfo;
 
   std::vector<std::string> command = {exeName, "-s", sampleName, "-p"};
   if (flagAsync)
@@ -32,23 +32,23 @@ SampleRunInfo runOneSample(const std::string & exeName, const std::string &sampl
   if (spawnResult.ExitStatus != 0) {
     BABYLON_LOG_WARN("ScreenshotAllSamples", "Subprocess has failed for sample ", sampleName);
     sampleRunInfo.unhandledExceptionStackTrace = spawnResult.StdOutErr;
-    sampleRunInfo.sampleRunStatus              = SampleRunStatus::unhandledException;
+    sampleRunInfo.sampleRunStatus              = SampleAutoRunStatus::unhandledException;
   }
 
   if (spawnResult.MaxExecutionTimePassed) {
     BABYLON_LOG_WARN("ScreenshotAllSamples", "Subprocess MaxExecutionTimePassed for sample ",
                      sampleName);
-    sampleRunInfo.sampleRunStatus              = SampleRunStatus::tooSlowOrHung;
+    sampleRunInfo.sampleRunStatus              = SampleAutoRunStatus::tooSlowOrHung;
   }
 
   if ((spawnResult.ExitStatus == 0) && (!spawnResult.MaxExecutionTimePassed)) {
     bool isRenderingEmpty = BABYLON::Samples::ReadScreenshot_IsImageEmpty(sampleName);
     if (isRenderingEmpty) {
       BABYLON_LOG_WARN("ScreenshotAllSamples", "Empty 3D rendering for sample ", sampleName);
-      sampleRunInfo.sampleRunStatus              = SampleRunStatus::empty3d;
+      sampleRunInfo.sampleRunStatus              = SampleAutoRunStatus::empty3d;
     }
     else {
-      sampleRunInfo.sampleRunStatus = SampleRunStatus::success;
+      sampleRunInfo.sampleRunStatus = SampleAutoRunStatus::success;
     }
   }
   return sampleRunInfo;

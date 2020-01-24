@@ -31,77 +31,94 @@ struct BABYLON_SHARED_EXPORT SampleSourceInfo {
   std::vector<std::string> Links;
 };
 
-enum class BABYLON_SHARED_EXPORT SampleRunStatus {
+enum class BABYLON_SHARED_EXPORT SampleAutoRunStatus {
   success,
   unhandledException,
   tooSlowOrHung,
   empty3d,
   unknown
 };
-void to_json(nlohmann::json& j, const SampleRunStatus& v);
-void from_json(const nlohmann::json& j, SampleRunStatus& v);
+void BABYLON_SHARED_EXPORT to_json(nlohmann::json& j, const SampleAutoRunStatus& v);
+void BABYLON_SHARED_EXPORT from_json(const nlohmann::json& j, SampleAutoRunStatus& v);
 
 struct BABYLON_SHARED_EXPORT SampleSearchQuery {
-  std::string QueryName = "";
-  std::string QueryCategory = "";
-  std::map<SampleRunStatus, bool> IncludeStatus = {
-    { SampleRunStatus::success, true },
-    { SampleRunStatus::unhandledException, false },
-    { SampleRunStatus::tooSlowOrHung, false },
-    { SampleRunStatus::empty3d, false },
-    { SampleRunStatus::unknown, false },
+  std::string Query = "";
+  bool IncludeManualRunFailure = false;
+  std::map<SampleAutoRunStatus, bool> IncludeStatus = {
+    {SampleAutoRunStatus::success, true },
+    {SampleAutoRunStatus::unhandledException, false },
+    {SampleAutoRunStatus::tooSlowOrHung, false },
+    {SampleAutoRunStatus::empty3d, false },
+    {SampleAutoRunStatus::unknown, false },
   };
 };
 
-struct BABYLON_SHARED_EXPORT SampleRunInfo {
-  SampleRunStatus sampleRunStatus = SampleRunStatus::unknown;
+struct BABYLON_SHARED_EXPORT SampleAutoRunInfo {
+  SampleAutoRunStatus sampleRunStatus = SampleAutoRunStatus::unknown;
   std::string unhandledExceptionStackTrace = "";
 };
+
+struct BABYLON_SHARED_EXPORT SampleManualRunInfo {
+  bool failing = false;
+  std::string detail = "";
+};
+void BABYLON_SHARED_EXPORT to_json(nlohmann::json& j, const SampleManualRunInfo& v);
+void BABYLON_SHARED_EXPORT from_json(const nlohmann::json& j, SampleManualRunInfo& v);
+
 
 struct BABYLON_SHARED_EXPORT SampleData {
   CategoryName categoryName;
   SampleName sampleName;
   SampleSourceInfo sourceInfo;
-  SampleRunInfo runInfo;
+  SampleAutoRunInfo autoRunInfo;
+  SampleManualRunInfo sampleManualRunInfo;
   SampleFactoryFunction factoryFunction = {};
 };
 
-using SampleStats = std::map<SampleRunStatus, std::size_t>;
+using SampleStats = std::map<SampleAutoRunStatus, std::size_t>;
 
-std::string SamplesProjectFolder();
 
 class BABYLON_SHARED_EXPORT SamplesCollection
 {
 public:
   static SamplesCollection& Instance();
 
+  //
+  // Browsing API
+  //
   const std::vector<SampleData>& AllSamples() const { return _allSamples; }
-
-  std::map<SamplesInfo::CategoryName, std::vector<const SampleData *>>
-    SearchSamples(const SampleSearchQuery& query);
-
+  std::map<SamplesInfo::CategoryName, std::vector<const SampleData *>> SearchSamples(
+    const SampleSearchQuery& query);
 
   SampleData* GetSampleByName(const SampleName& sampleName); // returns nullptr if not found
   const SampleData* GetSampleByName(const SampleName& sampleName) const; // returns nullptr if not found
 
-  SampleStats GetSampleStats();
-  std::string GetSampleStatsString();
-
-  void SetSampleRunInfo(const SampleName& sampleName, const SampleRunInfo& sampleRunInfo);
-  void SaveAllSamplesRunStatuses();
-
   IRenderableScenePtr createRenderableScene(const std::string& sampleName, ICanvas* iCanvas) const;
+
+  //
+  // SpawnScreenshot API
+  //
+  void SetSampleRunInfo(const SampleName& sampleName, const SampleAutoRunInfo& sampleRunInfo);
+  void SetSampleManualRunInfo(const SampleName& sampleName, const SampleManualRunInfo& sampleManualRunInfo);
+  void SaveAllSamplesRunStatuses();
 
 private:
   SamplesCollection();
+
+  SampleStats GetSampleStats();
+  std::string GetSampleStatsString();
+
   void ReadSamplesSourceInfos();
   void ReadAllSampleStatuses();
+  void ReadSampleManualRunInfo();
+  void SaveSampleManualRunInfo();
 
   std::vector<SampleData> _allSamples;
 };
 
 
 BABYLON_SHARED_EXPORT std::string screenshotsDirectory();
+BABYLON_SHARED_EXPORT std::string SamplesProjectFolder();
 
 } // namespace SamplesInfo
 

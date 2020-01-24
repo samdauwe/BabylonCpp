@@ -17,6 +17,8 @@
 
 #include <babylon/inspector/inspector.h>
 
+using namespace BABYLON::SamplesInfo;
+
 namespace {
 std::string to_snake_case(const std::string& sPascalCase)
 {
@@ -41,7 +43,6 @@ const std::string screenshotsFolderCurrent = "screenshots/samples_current/";
 
 namespace BABYLON {
 
-using namespace BABYLON::SamplesInfo;
 
 class SamplesBrowserImpl {
 public:
@@ -69,14 +70,27 @@ private:
   {
     bool changed = false;
     ImGui::PushItemWidth(200);
-    if (ImGui::InputText_String("Filter by name", _sampleSearchQuery.QueryName))
+    if (ImGui::InputText_String("Search " ICON_FA_SEARCH, _sampleSearchQuery.Query))
       changed = true;
-    if (ImGui::InputText_String("Filter by category", _sampleSearchQuery.QueryCategory))
-      changed = true;
-
     ImGui::SameLine();
-    if (ImGui::Checkbox(ICON_FA_WRENCH "Experimental", &_queryExperimental))
-      changed = true;
+    ImGui::Checkbox(ICON_FA_WRENCH "Experimental", &_queryExperimental);
+
+    if (_queryExperimental)
+    {
+      for (auto status: magic_enum::enum_values<SamplesInfo::SampleAutoRunStatus>())
+      {
+       bool v = this->_sampleSearchQuery.IncludeStatus[status];
+        std::string statusName(magic_enum::enum_name(status));
+        if (ImGui::Checkbox(statusName.c_str(), &v))
+        {
+          this->_sampleSearchQuery.IncludeStatus[status] = v;
+          changed = true;
+        }
+      }
+
+      if (ImGui::Checkbox("Include manual run failures", &_sampleSearchQuery.IncludeManualRunFailure))
+        changed = true;
+    }
 
     if (OnLoopSamples) {
       if (ImGui::Button("Loop filtered samples")) {
@@ -194,12 +208,25 @@ private:
     ImGui::Text("%s", sampleData.sampleName.c_str());
     ImGui::TextWrapped("%s", sampleInfo.Brief.c_str());
 
-    if (sampleData.runInfo.sampleRunStatus != SamplesInfo::SampleRunStatus::success)
+    if (sampleData.autoRunInfo.sampleRunStatus != SamplesInfo::SampleAutoRunStatus::success)
     {
-      std::string_view status = magic_enum::enum_name(sampleData.runInfo.sampleRunStatus);
+      std::string_view status = magic_enum::enum_name(sampleData.autoRunInfo.sampleRunStatus);
       std::string statusStr(status);
       ImGui::TextColored(ImVec4(0.9f, 0.4f, 0.3f, 1.f), "Failure: %s",
                          statusStr.c_str());
+    }
+
+    if (_queryExperimental)
+    {
+      ImGui::Separator();
+      ImGui::Text("Manual details");
+      auto sampleManualRunInfoCopy = sampleData.sampleManualRunInfo;
+      std::string checkboxLabel = std::string("ManualRun Fail##") + sampleData.sampleName;
+      if (ImGui::Checkbox(checkboxLabel.c_str(), &sampleManualRunInfoCopy.failing))
+        this->_samplesCollection.SetSampleManualRunInfo(sampleData.sampleName, sampleManualRunInfoCopy);
+      if (ImGui::InputText_String(std::string("Detail ##") + sampleData.sampleName , sampleManualRunInfoCopy.detail))
+        this->_samplesCollection.SetSampleManualRunInfo(sampleData.sampleName, sampleManualRunInfoCopy);
+      ImGui::Separator();
     }
 
     guiOneSampleInfos(sampleData);
