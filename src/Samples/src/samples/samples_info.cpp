@@ -225,6 +225,7 @@ void SamplesCollection::ReadSampleManualRunInfo()
 
   asio::LoadUrlAsync_Text(screenshotsDirectory() + "/aa_sampleRunManualInfo.json",
                           onLoaded, onError);
+  BABYLON::asio::Service_WaitAll_Sync();
 }
 
 void SamplesCollection::SetSampleManualRunInfo(
@@ -297,7 +298,14 @@ std::string SamplesCollection::GetSampleStatsString()
     std::string_view status_name = magic_enum::enum_name(runStatus);
     j[std::string(status_name)] = stats[runStatus];
   }
-  return j.dump();
+
+  int nbManualFailures = 0;
+  for (auto sampleData: _allSamples)
+    if (sampleData.sampleManualRunInfo.failing)
+      ++ nbManualFailures;
+
+  std::string r = j.dump() + " / Nb Manual Failure:" + std::to_string(nbManualFailures);
+  return r;
 }
 
 IRenderableScenePtr SamplesCollection::createRenderableScene(
