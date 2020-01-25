@@ -222,8 +222,20 @@ private:
       std::string checkboxLabel = std::string("ManualRun Fail##") + sampleData.sampleName;
       if (ImGui::Checkbox(checkboxLabel.c_str(), &sampleManualRunInfoCopy.failing))
         this->_samplesCollection.SetSampleManualRunInfo(sampleData.sampleName, sampleManualRunInfoCopy);
-      if (ImGui::InputText_String(std::string("Detail ##") + sampleData.sampleName , sampleManualRunInfoCopy.detail))
+
+      char detail[1000];
+      strncpy(detail, sampleManualRunInfoCopy.detail.c_str(), 1000);
+      if (ImGui::InputTextMultiline(
+        (std::string("##Detail") + sampleData.sampleName).c_str(),
+        detail,
+        1000,
+        ImVec2(230.f,40.f)
+        )
+        )
+      {
+        sampleManualRunInfoCopy.detail = detail;
         this->_samplesCollection.SetSampleManualRunInfo(sampleData.sampleName, sampleManualRunInfoCopy);
+      }
       ImGui::Separator();
     }
 
