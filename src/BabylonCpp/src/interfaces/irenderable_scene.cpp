@@ -17,10 +17,9 @@ IRenderableScene::~IRenderableScene() = default;
 
 void IRenderableScene::initialize(ICanvas* canvas)
 {
-  if (canvas && (canvas != _canvas))
-  {
+  if (canvas && (canvas != _canvas)) {
     _initialized = false;
-    _canvas = canvas;
+    _canvas      = canvas;
   }
   if (!_canvas)
     throw std::runtime_error("IRenderableScene::initialize without any canvas set");
