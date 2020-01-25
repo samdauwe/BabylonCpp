@@ -19,27 +19,23 @@ BoxParticleEmitter::BoxParticleEmitter()
 BoxParticleEmitter::~BoxParticleEmitter() = default;
 
 void BoxParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
-                                                Vector3& directionToUpdate,
-                                                Particle* /*particle*/)
+                                                Vector3& directionToUpdate, Particle* /*particle*/)
 {
   const auto randX = Scalar::RandomRange(direction1.x, direction2.x);
   const auto randY = Scalar::RandomRange(direction1.y, direction2.y);
   const auto randZ = Scalar::RandomRange(direction1.z, direction2.z);
 
-  Vector3::TransformNormalFromFloatsToRef(randX, randY, randZ, worldMatrix,
-                                          directionToUpdate);
+  Vector3::TransformNormalFromFloatsToRef(randX, randY, randZ, worldMatrix, directionToUpdate);
 }
 
-void BoxParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
-                                               Vector3& positionToUpdate,
+void BoxParticleEmitter::startPositionFunction(const Matrix& worldMatrix, Vector3& positionToUpdate,
                                                Particle* /*particle*/)
 {
   const auto randX = Scalar::RandomRange(minEmitBox.x, maxEmitBox.x);
   const auto randY = Scalar::RandomRange(minEmitBox.y, maxEmitBox.y);
   const auto randZ = Scalar::RandomRange(minEmitBox.z, maxEmitBox.z);
 
-  Vector3::TransformCoordinatesFromFloatsToRef(randX, randY, randZ, worldMatrix,
-                                               positionToUpdate);
+  Vector3::TransformCoordinatesFromFloatsToRef(randX, randY, randZ, worldMatrix, positionToUpdate);
 }
 
 std::unique_ptr<IParticleEmitterType> BoxParticleEmitter::clone() const
@@ -75,24 +71,20 @@ json BoxParticleEmitter::serialize() const
 void BoxParticleEmitter::parse(const json& serializationObject)
 {
   if (json_util::has_key(serializationObject, "direction1")) {
-    Vector3::FromArrayToRef(
-      json_util::get_array<float>(serializationObject, "direction1"), 0,
-      direction1);
+    Vector3::FromArrayToRef(json_util::get_array<float>(serializationObject, "direction1"), 0,
+                            direction1);
   }
   if (json_util::has_key(serializationObject, "direction2")) {
-    Vector3::FromArrayToRef(
-      json_util::get_array<float>(serializationObject, "direction2"), 0,
-      direction2);
+    Vector3::FromArrayToRef(json_util::get_array<float>(serializationObject, "direction2"), 0,
+                            direction2);
   }
   if (json_util::has_key(serializationObject, "minEmitBox")) {
-    Vector3::FromArrayToRef(
-      json_util::get_array<float>(serializationObject, "minEmitBox"), 0,
-      minEmitBox);
+    Vector3::FromArrayToRef(json_util::get_array<float>(serializationObject, "minEmitBox"), 0,
+                            minEmitBox);
   }
   if (json_util::has_key(serializationObject, "maxEmitBox")) {
-    Vector3::FromArrayToRef(
-      json_util::get_array<float>(serializationObject, "maxEmitBox"), 0,
-      maxEmitBox);
+    Vector3::FromArrayToRef(json_util::get_array<float>(serializationObject, "maxEmitBox"), 0,
+                            maxEmitBox);
   }
 }
 
