@@ -1867,6 +1867,12 @@ public:
    */
   std::unique_ptr<GL::IGLFramebuffer> _previousFrameBuffer = nullptr;
 
+  /**
+   * You must have a non-zero Vertex Array Object bound in an OpenGL 3.1 context without the
+   * extension GL_ARB_compatibility or a core profile context
+   */
+  WebGLVertexArrayObjectPtr _coreContextVAO = nullptr;
+
 protected:
   /**
    * Gets or sets the textures that the engine should not attempt to load as compressed
