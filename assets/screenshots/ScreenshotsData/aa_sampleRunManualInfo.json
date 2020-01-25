@@ -112,8 +112,8 @@
         "failing": false
     },
     "BulbSelfShadowScene": {
-        "detail": "",
-        "failing": false
+        "detail": "Missing elements vs\njs version",
+        "failing": true
     },
     "BumpTextureScene": {
         "detail": "",
@@ -444,8 +444,8 @@
         "failing": false
     },
     "ImportHillValleyScene": {
-        "detail": "",
-        "failing": false
+        "detail": "Scene loads incompletely\n(parts of road missing)",
+        "failing": true
     },
     "ImportMeshesSkullScene": {
         "detail": "Black texture (inverted faces?)",
