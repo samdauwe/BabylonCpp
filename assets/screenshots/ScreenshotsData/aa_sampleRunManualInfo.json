@@ -236,7 +236,7 @@
         "failing": false
     },
     "CubeChaosScene": {
-        "detail": "slow! 2 fps vs 30fps in js version",
+        "detail": "slow! 2 fps vs 30fps in \njs version",
         "failing": true
     },
     "CubeScene": {
@@ -428,7 +428,7 @@
         "failing": false
     },
     "ImportBabylonJSLogoScene": {
-        "detail": "inverted faces? Texture on bad side",
+        "detail": "inverted faces? Texture \non bad side?",
         "failing": true
     },
     "ImportCandleScene": {
@@ -452,7 +452,7 @@
         "failing": true
     },
     "ImportRabbitScene": {
-        "detail": "Inverted faces? Inverted texture UV? ",
+        "detail": "Inverted faces? \nInverted texture UV? ",
         "failing": true
     },
     "ImportSuzanneScene": {
