@@ -24,6 +24,14 @@ const char* clipPlaneVertex
     fClipDistance4 = dot(worldPos, vClipPlane4);
 #endif
 
+#ifdef CLIPPLANE5
+    fClipDistance5 = dot(worldPos, vClipPlane5);
+#endif
+
+#ifdef CLIPPLANE6
+    fClipDistance6 = dot(worldPos, vClipPlane6);
+#endif
+
 )ShaderCode";
 
 } // end of namespace BABYLON

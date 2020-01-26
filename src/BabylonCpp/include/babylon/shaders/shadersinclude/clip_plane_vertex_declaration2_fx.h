@@ -28,6 +28,16 @@ const char* clipPlaneVertexDeclaration2
     out float fClipDistance4;
 #endif
 
+#ifdef CLIPPLANE5
+    uniform vec4 vClipPlane5;
+    out float fClipDistance5;
+#endif
+
+#ifdef CLIPPLANE6
+    uniform vec4 vClipPlane6;
+    out float fClipDistance6;
+#endif
+
 )ShaderCode";
 
 } // end of namespace BABYLON

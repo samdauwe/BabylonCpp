@@ -44,7 +44,7 @@ varying vec4 vColor;
 varying vec4 remapRanges;
 #endif
 
-#if defined(CLIPPLANE) || defined(CLIPPLANE2) || defined(CLIPPLANE3) || defined(CLIPPLANE4)
+#if defined(CLIPPLANE) || defined(CLIPPLANE2) || defined(CLIPPLANE3) || defined(CLIPPLANE4) || defined(CLIPPLANE5) || defined(CLIPPLANE6)
 uniform mat4 invView;
 #endif
 #include<clipPlaneVertexDeclaration>
@@ -153,7 +153,7 @@ void main(void) {
     #endif
 
     // Clip plane
-#if defined(CLIPPLANE) || defined(CLIPPLANE2) || defined(CLIPPLANE3) || defined(CLIPPLANE4)
+#if defined(CLIPPLANE) || defined(CLIPPLANE2) || defined(CLIPPLANE3) || defined(CLIPPLANE4) || defined(CLIPPLANE5) || defined(CLIPPLANE6)
     vec4 worldPos = invView * vec4(viewPos, 1.0);
 #endif
     #include<clipPlaneVertex>

@@ -223,17 +223,18 @@ void main(void) {
             // Compute the converted reflectivity.
             surfaceReflectivityColor = mix(0.16 * reflectance * reflectance, baseColor, metallicRoughness.r);
         #else
-            // we are here fixing our default reflectance to a common value for none metallic surface.
-
-            // Default specular reflectance at normal incidence.
-            // 4% corresponds to index of refraction (IOR) of 1.50, approximately equal to glass.
-            const vec3 DefaultSpecularReflectanceDielectric = vec3(0.04, 0.04, 0.04);
+            vec3 metallicF0 = vec3(vReflectivityColor.a, vReflectivityColor.a, vReflectivityColor.a);
+            #ifdef METALLICF0FACTORFROMMETALLICMAP
+                #ifdef REFLECTIVITY
+                    metallicF0 *= surfaceMetallicColorMap.a;
+                #endif
+            #endif
 
             // Compute the converted diffuse.
-            surfaceAlbedo = mix(baseColor.rgb * (1.0 - DefaultSpecularReflectanceDielectric.r), vec3(0., 0., 0.), metallicRoughness.r);
+            surfaceAlbedo = mix(baseColor.rgb * (1.0 - metallicF0.r), vec3(0., 0., 0.), metallicRoughness.r);
 
             // Compute the converted reflectivity.
-            surfaceReflectivityColor = mix(DefaultSpecularReflectanceDielectric, baseColor, metallicRoughness.r);
+            surfaceReflectivityColor = mix(metallicF0, baseColor, metallicRoughness.r);
         #endif
     #else
         #ifdef REFLECTIVITY
@@ -977,10 +978,10 @@ R"ShaderCode(
         #endif
 
         #ifdef SHEEN
-            sheenEnvironmentReflectance *= (conservationFactor * conservationFactor);
+            sheenEnvironmentReflectance *= conservationFactor;
         #endif
 
-        specularEnvironmentReflectance *= (conservationFactor * conservationFactor);
+        specularEnvironmentReflectance *= conservationFactor;
     #endif
 
     // _____________________________ Transmittance + Tint ________________________________
@@ -992,11 +993,11 @@ R"ShaderCode(
             // // Simulate Flat Surface
             // thickness /=  dot(refractionVector, -normalW);
 
+            // // Simulate Curved Surface
+
 )ShaderCode"
 R"ShaderCode(
 
-
-            // // Simulate Curved Surface
             // float NdotRefract = dot(normalW, refractionVector);
             // thickness *= -NdotRefract;
 
@@ -1061,7 +1062,9 @@ R"ShaderCode(
     // _____________________________ Energy Conservation  ___________________________
     // Apply Energy Conservation.
     #ifndef METALLICWORKFLOW
-        surfaceAlbedo.rgb = (1. - reflectance) * surfaceAlbedo.rgb;
+        #ifdef SPECULAR_GLOSSINESS_ENERGY_CONSERVATION
+            surfaceAlbedo.rgb = (1. - reflectance) * surfaceAlbedo.rgb;
+        #endif
     #endif
 
     // _____________________________ Irradiance ______________________________________
@@ -1124,7 +1127,7 @@ R"ShaderCode(
         #endif
 
         #ifdef SS_REFRACTION
-            finalRefraction *= (conservationFactor * conservationFactor);
+            finalRefraction *= conservationFactor;
             #ifdef CLEARCOAT_TINT
                 finalRefraction *= absorption;
             #endif
@@ -1191,11 +1194,11 @@ R"ShaderCode(
 #ifdef EMISSIVE
     vec3 emissiveColorTex = texture2D(emissiveSampler, vEmissiveUV + uvOffset).rgb;
     finalEmissive *= toLinearSpace(emissiveColorTex.rgb);
-    finalEmissive *=  vEmissiveInfos.y;
 
 )ShaderCode"
 R"ShaderCode(
 
+    finalEmissive *=  vEmissiveInfos.y;
 #endif
 
 // ______________________________ Ambient ________________________________________

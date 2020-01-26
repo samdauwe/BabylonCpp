@@ -424,7 +424,7 @@ R"ShaderCode(
     offsetAge += cellStartOffset;
 #endif
 
-    float ratio = clamp(mod(offsetAge * cellInfos.z, life) / life, 0., 1.0);
+    float ratio = clamp(mod(cellStartOffset + cellInfos.z * offsetAge, life) / life, 0., 1.0);
 
     outCellIndex = float(int(cellInfos.x + ratio * dist));
 #endif

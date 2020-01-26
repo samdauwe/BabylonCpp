@@ -65,6 +65,8 @@
 #include <babylon/shaders/shadow_map_fragment_fx.h>
 #include <babylon/shaders/shadow_map_vertex_fx.h>
 #include <babylon/shaders/sharpen_fragment_fx.h>
+#include <babylon/shaders/sprite_map_fragment_fx.h>
+#include <babylon/shaders/sprite_map_vertex_fx.h>
 #include <babylon/shaders/sprites_fragment_fx.h>
 #include <babylon/shaders/sprites_vertex_fx.h>
 #include <babylon/shaders/ssao_fragment_fx.h>
@@ -162,6 +164,8 @@ std::unordered_map<std::string, std::string> EffectShadersStore::_shaders = {
   {"shadowMapPixelShader", shadowMapPixelShader},
   {"shadowMapVertexShader", shadowMapVertexShader},
   {"sharpenPixelShader", sharpenPixelShader},
+  {"spriteMapPixelShader", spriteMapPixelShader},
+  {"spriteMapVertexShader", spriteMapVertexShader},
   {"spritesPixelShader", spritesPixelShader},
   {"spritesVertexShader", spritesVertexShader},
   {"ssaoPixelShader", ssaoPixelShader},

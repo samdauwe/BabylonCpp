@@ -24,6 +24,14 @@ const char* clipPlaneFragmentDeclaration
     varying float fClipDistance4;
 #endif
 
+#ifdef CLIPPLANE5
+    varying float fClipDistance5;
+#endif
+
+#ifdef CLIPPLANE6
+    varying float fClipDistance6;
+#endif
+
 )ShaderCode";
 
 } // end of namespace BABYLON

@@ -37,7 +37,7 @@ in vec2 uv;
 out vec2 vUV;
 out vec4 vColor;
 
-#if defined(CLIPPLANE) || defined(CLIPPLANE2) || defined(CLIPPLANE3) || defined(CLIPPLANE4)
+#if defined(CLIPPLANE) || defined(CLIPPLANE2) || defined(CLIPPLANE3) || defined(CLIPPLANE4) || defined(CLIPPLANE5) || defined(CLIPPLANE6)
 uniform mat4 invView;
 #endif
 
@@ -160,7 +160,7 @@ void main() {
     gl_Position = projection * viewPosition;
 
     // Clip plane
-#if defined(CLIPPLANE) || defined(CLIPPLANE2) || defined(CLIPPLANE3) || defined(CLIPPLANE4)
+#if defined(CLIPPLANE) || defined(CLIPPLANE2) || defined(CLIPPLANE3) || defined(CLIPPLANE4) || defined(CLIPPLANE5) || defined(CLIPPLANE6)
     vec4 worldPos = invView * viewPosition;
 #endif
     #include<clipPlaneVertex>
