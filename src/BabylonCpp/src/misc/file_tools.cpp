@@ -58,6 +58,7 @@ void FileTools::LoadImageFromUrl(
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
   bool flipVertically)
 {
+#if defined(__EMSCRIPTEN__)
   url = FileTools::_CleanUrl(url);
   url = FileTools::PreprocessUrl(url);
 
@@ -70,6 +71,33 @@ void FileTools::LoadImageFromUrl(
   auto onErrorWrapper = [=](const std::string& errorMessage) { onError(errorMessage, ""); };
 
   asio::LoadUrlAsync_Binary(url, onArrayBufferReceived, onErrorWrapper);
+#else
+  url = FileTools::_CleanUrl(url);
+
+  url = FileTools::_PreprocessUrl(url);
+
+  if (StringTools::startsWith(url, "file:")) {
+    using stbi_ptr = std::unique_ptr<unsigned char, std::function<void(unsigned char*)>>;
+
+    int w = -1, h = -1, n = -1;
+    stbi_set_flip_vertically_on_load(flipVertically);
+    stbi_ptr data(stbi_load(url.substr(5).c_str(), &w, &h, &n, STBI_rgb_alpha),
+                  [](unsigned char* _data) {
+                    if (_data) {
+                      stbi_image_free(_data);
+                    }
+                  });
+
+    if (!data && onError) {
+      onError("Error loading image from file " + url, "");
+      return;
+    }
+
+    n = STBI_rgb_alpha;
+    Image image(data.get(), w * h * n, w, h, n, (n == 3) ? GL::RGB : GL::RGBA);
+    onLoad(image);
+  }
+#endif
 }
 
 void FileTools::LoadImageFromBuffer(
@@ -333,9 +361,11 @@ Image FileTools::StringToImage(const std::string& uri, bool flipVertically)
 }
 
 // Superfluous params?
+#if defined(__EMSCRIPTEN__)
 constexpr const char* dummyResponseUrl     = "";
 constexpr const char* dummyExceptionString = "";
 constexpr const char* dummyProgressType    = "";
+#endif
 
 void FileTools::LoadFile(
   const std::string& url,
@@ -344,6 +374,7 @@ void FileTools::LoadFile(
   const std::function<void(const ProgressEvent& event)>& onProgress, bool useArrayBuffer,
   const std::function<void(const std::string& message, const std::string& exception)>& onError)
 {
+#if defined(__EMSCRIPTEN__)
   // LoadFile's signature is extremely complicated for no good reason
   // Let's write some wrappers from the simple callbacks of BABYLON::asio
   // We will need to refactor this later
@@ -378,6 +409,93 @@ void FileTools::LoadFile(
 
   // asio::Service_WaitAll_Sync();
   // std::cout << "WaitAll finished\n";
+#else
+  _LoadFile(url, onSuccess, onProgress, useArrayBuffer, onError);
+#endif
+}
+
+std::string FileTools::_PreprocessUrl(std::string url)
+{
+  if (StringTools::startsWith(url, "file:")) {
+    url = url.substr(5);
+  }
+  // Check if the file is locally available
+  // - Check in local folder
+  auto absolutePath = Filesystem::absolutePath(url);
+  if (Filesystem::exists(absolutePath)) {
+    return StringTools::concat("file:", absolutePath);
+  }
+  // - Check in assets folder
+  absolutePath = Filesystem::absolutePath("../assets/" + url);
+  if (Filesystem::exists(absolutePath)) {
+    return StringTools::concat("file:", absolutePath);
+  }
+  return url;
+}
+
+void FileTools::_LoadFile(
+  std::string url,
+  const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
+                           const std::string& responseURL)>& onSuccess,
+  const std::function<void(const ProgressEvent& event)>& onProgress, bool useArrayBuffer,
+  const std::function<void(const std::string& message, const std::string& exception)>& onError)
+{
+  url = FileTools::_CleanUrl(url);
+
+  url = FileTools::_PreprocessUrl(url);
+
+  // If file and file input are set
+  if (StringTools::startsWith(url, "file:")) {
+    const auto fileName = url.substr(5);
+    if (!fileName.empty()) {
+      FileTools::_ReadFile(fileName, onSuccess, onProgress, useArrayBuffer);
+      return;
+    }
+  }
+
+  // Report error
+  if (onError) {
+    onError("Unable to load file from location " + url, "");
+  }
+}
+
+void FileTools::_ReadFile(
+  std::string fileToLoad,
+  const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
+                           const std::string& responseURL)>& callback,
+  const std::function<void(const ProgressEvent& event)>& onProgress, bool useArrayBuffer)
+{
+  if (!Filesystem::exists(fileToLoad)) {
+    BABYLON_LOGF_ERROR("Tools", "Error while reading file: %s", fileToLoad.c_str())
+    if (callback) {
+      callback("", "");
+    }
+    if (onProgress) {
+      onProgress(ProgressEvent{"ReadFileEvent", true, 100, 100});
+    }
+    return;
+  }
+
+  if (!useArrayBuffer) {
+    // Read file contents
+    if (callback) {
+      callback(Filesystem::readFileContents(fileToLoad.c_str()), "");
+    }
+    if (onProgress) {
+      onProgress(ProgressEvent{"ReadFileEvent", true, 100, 100});
+    }
+    return;
+  }
+  else {
+    // Read file contents
+    if (callback) {
+      callback(Filesystem::readBinaryFile(fileToLoad.c_str()), "");
+    }
+    if (onProgress) {
+      onProgress(ProgressEvent{"ReadFileEvent", true, 100, 100});
+    }
+    return;
+  }
 }
 
 } // end of namespace BABYLON

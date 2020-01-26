@@ -87,6 +87,45 @@ private:
    */
   static std::string _CleanUrl(std::string url);
 
+  /** Helper functions added to get back the synchronous asset loading */
+
+  /**
+   * @brief Gets or sets a function used to pre-process url before using them to load assets.
+   */
+  static std::string _PreprocessUrl(std::string url);
+
+  /**
+   * @brief Loads a file.
+   * @param url url string, ArrayBuffer, or Blob to load
+   * @param onSuccess callback called when the file successfully loads
+   * @param onProgress callback called while file is loading (if the server supports this mode)
+   * @param database  database for caching
+   * @param useArrayBuffer defines a boolean indicating that date must be returned as ArrayBuffer
+   * @param onError callback called when the file fails to load
+   */
+  static void _LoadFile(
+    std::string url,
+    const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
+                             const std::string& responseURL)>& callback,
+    const std::function<void(const ProgressEvent& event)>& progressCallBack = nullptr,
+    bool useArrayBuffer                                                     = false,
+    const std::function<void(const std::string& message, const std::string& exception)>& onError
+    = nullptr);
+
+  /**
+   * @brief Loads a file.
+   * @param fileToLoad defines the file to load
+   * @param callback defines the callback to call when data is loaded
+   * @param progressCallBack defines the callback to call during loading process
+   * @param useArrayBuffer defines a boolean indicating that data must be returned as an ArrayBuffer
+   * @returns a file request object
+   */
+  static void _ReadFile(std::string fileToLoad,
+                        const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
+                                                 const std::string& responseURL)>& callback,
+                        const std::function<void(const ProgressEvent& event)>& onProgress,
+                        bool useArrayBuffer);
+
 }; // end of class FileTools
 
 } // end of namespace BABYLON
