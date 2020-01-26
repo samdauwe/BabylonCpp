@@ -26,7 +26,7 @@ struct BABYLON_SHARED_EXPORT IEffectCreationOptions {
    */
   std::vector<std::string> uniformsNames{};
   /**
-   * Uniform buffer varible names that will be set in the shader.
+   * Uniform buffer variable names that will be set in the shader.
    */
   std::vector<std::string> uniformBuffersNames{};
   /**
@@ -44,7 +44,7 @@ struct BABYLON_SHARED_EXPORT IEffectCreationOptions {
   /**
    * Possible fallbacks for this effect to improve performance when needed.
    */
-  std::unique_ptr<EffectFallbacks> fallbacks{nullptr};
+  std::unique_ptr<IEffectFallbacks> fallbacks{nullptr};
   /**
    * Callback that will be called when the shader is compiled.
    */
