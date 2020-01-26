@@ -42,30 +42,35 @@ Effect::Effect(
   const std::variant<std::string, std::unordered_map<std::string, std::string>>& baseName,
   IEffectCreationOptions& options, ThinEngine* engine)
     : name{baseName}
-    , defines{options.defines}
-    , onCompiled{options.onCompiled}
-    , onError{options.onError}
     , onBind{nullptr}
     , _bonesComputationForcedToCPU{false}
     , onBindObservable{this, &Effect::get_onBindObservable}
     , _pipelineContext{nullptr}
     , _onCompileObserver{nullptr}
-    , _engine{engine}
-    , _uniformsNames{options.uniformsNames}
-    , _samplerList{options.samplers}
     , _isReady{false}
     , _compilationError{""}
     , _allFallbacksProcessed{false}
-    , _attributesNames{options.attributes}
-    , _indexParameters{options.indexParameters}
-    , _fallbacks{std::move(options.fallbacks)}
-    , _transformFeedbackVaryings{options.transformFeedbackVaryings}
-{
-  stl_util::concat(_uniformsNames, options.samplers);
 
-  if (!options.uniformBuffersNames.empty()) {
-    for (unsigned int i = 0; i < options.uniformBuffersNames.size(); ++i) {
-      _uniformBuffersNames[options.uniformBuffersNames[i]] = i;
+{
+  {
+    _engine = engine;
+
+    _attributesNames           = options.attributes;
+    _uniformsNames             = options.uniformsNames;
+    _samplerList               = options.samplers;
+    defines                    = options.defines;
+    onError                    = options.onError;
+    onCompiled                 = options.onCompiled;
+    _fallbacks                 = std::move(options.fallbacks);
+    _indexParameters           = options.indexParameters;
+    _transformFeedbackVaryings = options.transformFeedbackVaryings;
+
+    stl_util::concat(_uniformsNames, options.samplers);
+
+    if (!options.uniformBuffersNames.empty()) {
+      for (unsigned int i = 0; i < options.uniformBuffersNames.size(); ++i) {
+        _uniformBuffersNames[options.uniformBuffersNames[i]] = i;
+      }
     }
   }
 
@@ -113,11 +118,11 @@ Effect::Effect(
   processorOptions.version      = std::to_string(static_cast<int>(_engine->webGLVersion() * 100));
   processorOptions.platformName = _engine->webGLVersion() >= 2 ? "WEBGL2" : "WEBGL1";
 
-  _loadVertexShader(
-    vertexSource,
+  _loadShader(
+    vertexSource, "Vertex", "",
     [this, &fragmentSource, &processorOptions, &baseName](const std::string& vertexCode) -> void {
-      _loadFragmentShader(
-        fragmentSource,
+      _loadShader(
+        fragmentSource, "Fragment", "Pixel",
         [this, &vertexCode, &processorOptions, &baseName](const std::string& fragmentCode) -> void {
           ShaderProcessor::Process(
             vertexCode, processorOptions,
@@ -131,7 +136,7 @@ Effect::Effect(
             });
         });
     });
-}
+} // namespace BABYLON
 
 Effect::~Effect() = default;
 
@@ -231,9 +236,7 @@ int Effect::getAttributeLocation(unsigned int index)
 
 int Effect::getAttributeLocationByName(const std::string& _name)
 {
-  int index = stl_util::index_of(_attributesNames, _name);
-
-  return (index != -1) ? _attributes[static_cast<size_t>(index)] : -1;
+  return stl_util::contains(_attributeLocationByName, _name) ? _attributeLocationByName[_name] : -1;
 }
 
 size_t Effect::getAttributesCount()
@@ -280,162 +283,74 @@ void Effect::executeWhenCompiled(const std::function<void(Effect* effect)>& func
   onCompileObservable.add([&](Effect* effect, EventState&) { func(effect); });
 
   if (!_pipelineContext || _pipelineContext->isAsync()) {
-    _checkIsReady();
+    _checkIsReady(nullptr);
   }
 }
 
-void Effect::_checkIsReady()
+void Effect::_checkIsReady(const IPipelineContextPtr& previousPipelineContext)
 {
-  _isReadyInternal();
+  try {
+    if (_isReadyInternal()) {
+      return;
+    }
+  }
+  catch (const std::exception& e) {
+    _processCompilationErrors(e, previousPipelineContext);
+    return;
+  }
+
+  _checkIsReady(previousPipelineContext);
 }
 
-void Effect::_loadVertexShader(const std::string& vertex,
-                               const std::function<void(const std::string&)>& callback)
+void Effect::_loadShader(const std::string& shader, const std::string& key,
+                         const std::string& optionalKey,
+                         const std::function<void(const std::string&)>& callback)
 {
   // Direct source ?
-  if (vertex.substr(0, 7) == "source:") {
-    callback(vertex.substr(7));
+  if (shader.substr(0, 7) == "source:") {
+    callback(shader.substr(7));
     return;
   }
 
   // Base64 encoded ?
-  if (vertex.substr(0, 7) == "base64:") {
-    auto vertexBinary = Base64::atob(vertex.substr(7));
-    callback(vertexBinary);
+  if (shader.substr(0, 7) == "base64:") {
+    const auto shaderBinary = Base64::atob(shader.substr(7));
+    callback(shaderBinary);
     return;
   }
 
   // Is in local store ?
-  const std::string vertexShaderName = vertex + "VertexShader";
-  if (stl_util::contains(Effect::ShadersStore(), vertexShaderName)) {
-    callback(Effect::ShadersStore()[vertexShaderName]);
+  auto shaderName = shader + key + "Shader";
+  if (stl_util::contains(Effect::ShadersStore(), shaderName)) {
+    callback(Effect::ShadersStore()[shaderName]);
     return;
   }
 
-  std::string vertexShaderUrl;
+  shaderName = shader + optionalKey + "Shader";
+  if (!optionalKey.empty() && stl_util::contains(Effect::ShadersStore(), shaderName)) {
+    callback(Effect::ShadersStore()[shaderName]);
+    return;
+  }
 
-  if ((vertex.at(0) == '.') || (vertex.at(0) == '/')
-      || ((vertex.find("http") != std::string::npos))) {
-    vertexShaderUrl = vertex;
+  std::string shaderUrl;
+
+  if ((shader.at(0) == '.') || (shader.at(0) == '/')
+      || ((shader.find("http") != std::string::npos))) {
+    shaderUrl = shader;
   }
   else {
-    vertexShaderUrl = Effect::ShadersRepository + vertex;
+    shaderUrl = Effect::ShadersRepository + shader;
   }
 
   // Vertex shader
-  _engine->_loadFile(vertexShaderUrl + ".vertex.fx",
-                     [callback](const std::variant<std::string, ArrayBuffer>& data,
-                                const std::string& /*responseURL*/) {
-                       if (std::holds_alternative<std::string>(data)) {
-                         callback(std::get<std::string>(data));
-                       }
-                     });
-}
-
-void Effect::_loadFragmentShader(const std::string& fragment,
-                                 const std::function<void(const std::string&)>& callback)
-{
-  // Direct source ?
-  if (fragment.substr(0, 7) == "source:") {
-    callback(fragment.substr(7));
-    return;
-  }
-
-  // Base64 encoded ?
-  if (fragment.substr(0, 7) == "base64:") {
-    auto fragmentBinary = Base64::atob(fragment.substr(7));
-    callback(fragmentBinary);
-    return;
-  }
-
-  // Is in local store ?
-  std::string fragmentShaderName = fragment + "PixelShader";
-  if (stl_util::contains(Effect::ShadersStore(), fragmentShaderName)) {
-    callback(Effect::ShadersStore()[fragmentShaderName]);
-    return;
-  }
-
-  fragmentShaderName = fragment + "FragmentShader";
-  if (stl_util::contains(Effect::ShadersStore(), fragmentShaderName)) {
-    callback(Effect::ShadersStore()[fragmentShaderName]);
-    return;
-  }
-
-  std::string fragmentShaderUrl;
-
-  if ((fragment.at(0) == '.') || (fragment.at(0) == '/')
-      || ((fragment.find("http") != std::string::npos))) {
-    fragmentShaderUrl = fragment;
-  }
-  else {
-    fragmentShaderUrl = Effect::ShadersRepository + fragment;
-  }
-
-  // Fragment shader
-  _engine->_loadFile(fragmentShaderUrl + ".fragment.fx",
-                     [callback](const std::variant<std::string, ArrayBuffer>& data,
-                                const std::string& /*responseURL*/) {
-                       if (std::holds_alternative<std::string>(data)) {
-                         callback(std::get<std::string>(data));
-                       }
-                     });
-}
-
-void Effect::_dumpShadersSource(std::string vertexCode, std::string fragmentCode,
-                                const std::string& iDefines)
-{
-  // Rebuild shaders source code
-#ifdef GLES3
-  auto shaderVersion = (_engine->webGLVersion() > 1.f) ? "#version 300 es\n#define WEBGL2 \n" : "";
-#else
-  auto shaderVersion = (_engine->webGLVersion() > 1.f) ? "#version 330\n#define WEBGL2 \n" : "";
-#endif
-  auto prefix  = shaderVersion + (!iDefines.empty() ? iDefines + "\n" : "");
-  vertexCode   = prefix + vertexCode;
-  fragmentCode = prefix + fragmentCode;
-
-  // Number lines of shaders source code
-  unsigned int i = 2;
-  const std::regex regex("\n", std::regex::optimize);
-  auto formattedVertexCode
-    = "\n1\t" + StringTools::regexReplace(vertexCode, regex, [&i](const std::smatch& /*m*/) {
-        return "\n" + std::to_string(i++) + "\t";
-      });
-  i = 2;
-  auto formattedFragmentCode
-    = "\n1\t" + StringTools::regexReplace(fragmentCode, regex, [&i](const std::smatch& /*m*/) {
-        return "\n" + std::to_string(i++) + "\t";
-      });
-
-  // Dump shaders name and formatted source code
-  std::string vertexShaderName;
-  std::string fragmentShaderName;
-  if (std::holds_alternative<std::unordered_map<std::string, std::string>>(name)) {
-    const auto& iName = std::get<std::unordered_map<std::string, std::string>>(name);
-    // Vertex shader
-    if (stl_util::contains(iName, "vertexElement")) {
-      vertexShaderName = iName.at("vertexElement");
-    }
-    else if (stl_util::contains(iName, "vertex")) {
-      vertexShaderName = iName.at("vertex");
-    }
-    // Fragment shader
-    if (stl_util::contains(iName, "fragmentElement")) {
-      fragmentShaderName = iName.at("fragmentElement");
-    }
-    else if (stl_util::contains(iName, "fragment")) {
-      fragmentShaderName = iName.at("fragment");
-    }
-  }
-  else if (std::holds_alternative<std::string>(name)) {
-    vertexShaderName   = std::get<std::string>(name);
-    fragmentShaderName = std::get<std::string>(name);
-  }
-
-  BABYLON_LOGF_ERROR("Effect", "Vertex shader: %s%s", vertexShaderName.c_str(),
-                     formattedVertexCode.c_str())
-  BABYLON_LOGF_ERROR("Effect", "Fragment shader: %s%s", fragmentShaderName.c_str(),
-                     formattedFragmentCode.c_str())
+  _engine->_loadFile(
+    StringTools::printf("%s.%s.fx", shaderUrl.c_str(), StringTools::toLowerCase(key).c_str()),
+    [callback](const std::variant<std::string, ArrayBuffer>& data,
+               const std::string& /*responseURL*/) {
+      if (std::holds_alternative<std::string>(data)) {
+        callback(std::get<std::string>(data));
+      }
+    });
 }
 
 void Effect::_rebuildProgram(
@@ -447,14 +362,14 @@ void Effect::_rebuildProgram(
 
   _vertexSourceCodeOverride   = vertexSourceCode;
   _fragmentSourceCodeOverride = fragmentSourceCode;
-  onError                     = [&](const Effect* /*effect*/, const std::string& error) {
+  onError                     = [=](const Effect* /*effect*/, const std::string& error) {
     if (iOnError) {
       iOnError(error);
     }
   };
-  this->onCompiled = [&](const Effect* /*effect*/) {
+  this->onCompiled = [=](const Effect* /*effect*/) {
     auto engine = static_cast<Engine*>(getEngine());
-    if (engine) {
+    if (engine && !engine->scenes.empty()) {
       for (const auto& scene : engine->scenes) {
         scene->markAllMaterialsAsDirty(Constants::MATERIAL_AllDirtyFlag);
       }
@@ -506,6 +421,11 @@ void Effect::_prepareEffect()
         }
 
         _attributes = engine->getAttributes(_pipelineContext, attributesNames);
+        if (!attributesNames.empty()) {
+          for (size_t i = 0; i < attributesNames.size(); ++i) {
+            _attributeLocationByName[attributesNames[i]] = _attributes[i];
+          }
+        }
 
         for (unsigned int index = 0; index < _samplerList.size(); ++index) {
           auto sampler = getUniform(_samplerList[index]);
@@ -541,7 +461,7 @@ void Effect::_prepareEffect()
       });
 
     if (_pipelineContext->isAsync()) {
-      _checkIsReady();
+      _checkIsReady(previousPipelineContext);
     }
   }
   catch (const std::exception& e) {
@@ -575,11 +495,13 @@ void Effect::_processCompilationErrors(const std::exception& e,
   if (fallbacks) {
     _pipelineContext = nullptr;
     if (fallbacks->hasMoreFallbacks()) {
+      _allFallbacksProcessed = false;
       BABYLON_LOG_ERROR("Effect", "Trying next fallback.")
       defines = fallbacks->reduce(defines, this);
       _prepareEffect();
     }
     else { // Sorry we did everything we can
+      _allFallbacksProcessed = true;
       if (onError) {
         onError(this, _compilationError);
       }
@@ -591,6 +513,9 @@ void Effect::_processCompilationErrors(const std::exception& e,
         _fallbacks->unBindMesh();
       }
     }
+  }
+  else {
+    _allFallbacksProcessed = true;
   }
 }
 

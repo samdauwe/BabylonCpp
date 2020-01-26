@@ -18,6 +18,7 @@ class Color4;
 class Effect;
 struct IEffectCreationOptions;
 class EffectFallbacks;
+struct IEffectFallbacks;
 class InternalTexture;
 class IPipelineContext;
 class Matrix;
@@ -170,20 +171,9 @@ public:
   /**
    * @brief Hidden
    */
-  void _loadVertexShader(const std::string& vertex,
-                         const std::function<void(const std::string&)>& callback);
-
-  /**
-   * @brief Hidden
-   */
-  void _loadFragmentShader(const std::string& fragment,
-                           const std::function<void(const std::string&)>& callback);
-
-  /**
-   * @brief Hidden
-   */
-  void _dumpShadersSource(std::string vertexCode, std::string fragmentCode,
-                          const std::string& defines);
+  void _loadShader(const std::string& shader, const std::string& key,
+                   const std::string& optionalKey,
+                   const std::function<void(const std::string&)>& callback);
 
   /**
    * @brief Recompiles the webGL program
@@ -572,7 +562,7 @@ private:
     const std::string& migratedVertexCode, const std::string& migratedFragmentCode,
     const std::variant<std::string, std::unordered_map<std::string, std::string>>& baseName);
   bool _isReadyInternal() const;
-  void _checkIsReady();
+  void _checkIsReady(const IPipelineContextPtr& previousPipelineContext);
   void _processCompilationErrors(const std::exception& e,
                                  const IPipelineContextPtr& previousPipelineContext);
   int _getChannel(const std::string& channel);
@@ -648,9 +638,10 @@ private:
   bool _allFallbacksProcessed;
   std::vector<std::string> _attributesNames;
   Int32Array _attributes;
+  std::unordered_map<std::string, int> _attributeLocationByName;
   std::unordered_map<std::string, WebGLUniformLocationPtr> _uniforms;
   std::unordered_map<std::string, unsigned int> _indexParameters;
-  std::unique_ptr<EffectFallbacks> _fallbacks;
+  std::unique_ptr<IEffectFallbacks> _fallbacks;
   std::string _vertexSourceCode;
   std::string _fragmentSourceCode;
   std::string _vertexSourceCodeOverride;
