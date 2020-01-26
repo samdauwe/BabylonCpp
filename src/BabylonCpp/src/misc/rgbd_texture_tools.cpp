@@ -19,6 +19,21 @@ void RGBDTextureTools::ExpandRGBDTexture(const TexturePtr& texture)
     return;
   }
 
+  if (internalTexture->isReady) {
+    RGBDTextureTools::runRgbdDecodePostProcess(texture.get());
+  }
+  else {
+    texture->onLoadObservable().addOnce(
+      [internalTexture](Texture* iTtexture, EventState & /*es*/) -> void {
+        RGBDTextureTools::runRgbdDecodePostProcess(iTtexture);
+      });
+  }
+}
+
+void RGBDTextureTools::runRgbdDecodePostProcess(Texture* texture)
+{
+  auto& internalTexture = texture->_texture;
+
   // Gets everything ready.
   auto engine        = static_cast<Engine*>(internalTexture->getEngine());
   auto& caps         = engine->getCaps();
@@ -35,60 +50,55 @@ void RGBDTextureTools::ExpandRGBDTexture(const TexturePtr& texture)
     internalTexture->type = Constants::TEXTURETYPE_FLOAT;
   }
 
+  // Expand the texture if possible
   if (expandTexture) {
     // Do not use during decode.
     internalTexture->isReady = false;
+
+    // Simply run through the decode PP.
+    auto rgbdPostProcess     = PostProcess::New("rgbdDecode", "rgbdDecode", {}, {}, 1.f, nullptr,
+                                            Constants::TEXTURE_TRILINEAR_SAMPLINGMODE, engine,
+                                            false, "", internalTexture->type, "", {}, false);
     internalTexture->_isRGBD = false;
     internalTexture->invertY = false;
+
+    // Hold the output of the decoding.
+    IRenderTargetOptions options;
+    options.generateDepthBuffer   = false;
+    options.generateMipMaps       = false;
+    options.generateStencilBuffer = false;
+    options.samplingMode          = internalTexture->samplingMode;
+    options.type                  = internalTexture->type;
+    options.format                = Constants::TEXTUREFORMAT_RGBA;
+    auto expandedTexture
+      = engine->createRenderTargetTexture(static_cast<float>(internalTexture->width), options);
+
+    rgbdPostProcess->getEffect()->executeWhenCompiled([internalTexture, texture, expandedTexture,
+                                                       rgbdPostProcess,
+                                                       engine](Effect * /*effect*/) -> void {
+      // PP Render Pass
+      rgbdPostProcess->onApply = [internalTexture](Effect* effect, EventState & /*es*/) -> void {
+        effect->_bindTexture("textureSampler", internalTexture);
+        effect->setFloat2("scale", 1.f, 1.f);
+      };
+      texture->getScene()->postProcessManager->directRender({rgbdPostProcess}, expandedTexture,
+                                                            true);
+
+      // Cleanup
+      engine->restoreDefaultFramebuffer();
+      engine->_releaseTexture(internalTexture);
+      engine->_releaseFramebufferObjects(expandedTexture);
+      if (rgbdPostProcess) {
+        rgbdPostProcess->dispose();
+      }
+
+      // Internal Swap
+      expandedTexture->_swapAndDie(internalTexture);
+
+      // Ready to get rolling again.
+      internalTexture->isReady = true;
+    });
   }
-
-  texture->onLoadObservable().addOnce([expandTexture, internalTexture,
-                                       engine](Texture* iTtexture, EventState & /*es*/) -> void {
-    // Expand the texture if possible
-    if (expandTexture) {
-      // Simply run through the decode PP.
-      auto rgbdPostProcess = PostProcess::New("rgbdDecode", "rgbdDecode", {}, {}, 1.f, nullptr,
-                                              Constants::TEXTURE_TRILINEAR_SAMPLINGMODE, engine,
-                                              false, "", internalTexture->type, "", {}, false);
-
-      // Hold the output of the decoding.
-      IRenderTargetOptions options;
-      options.generateDepthBuffer   = false;
-      options.generateMipMaps       = false;
-      options.generateStencilBuffer = false;
-      options.samplingMode          = Constants::TEXTURE_BILINEAR_SAMPLINGMODE;
-      options.type                  = internalTexture->type;
-      options.format                = Constants::TEXTUREFORMAT_RGBA;
-      auto expandedTexture
-        = engine->createRenderTargetTexture(static_cast<float>(internalTexture->width), options);
-
-      rgbdPostProcess->getEffect()->executeWhenCompiled([&internalTexture, &expandedTexture,
-                                                         &rgbdPostProcess, &engine,
-                                                         &iTtexture](Effect * /*effect*/) -> void {
-        // PP Render Pass
-        rgbdPostProcess->onApply = [&internalTexture](Effect* effect, EventState & /*es*/) -> void {
-          effect->_bindTexture("textureSampler", internalTexture);
-          effect->setFloat2("scale", 1.f, 1.f);
-        };
-        iTtexture->getScene()->postProcessManager->directRender({rgbdPostProcess}, expandedTexture,
-                                                                true);
-
-        // Cleanup
-        engine->restoreDefaultFramebuffer();
-        engine->_releaseTexture(internalTexture);
-        engine->_releaseFramebufferObjects(expandedTexture);
-        if (rgbdPostProcess) {
-          rgbdPostProcess->dispose();
-        }
-
-        // Internal Swap
-        expandedTexture->_swapAndDie(internalTexture);
-
-        // Ready to get rolling again.
-        internalTexture->isReady = true;
-      });
-    }
-  });
 }
 
 } // end of namespace BABYLON

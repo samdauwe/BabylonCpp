@@ -8,8 +8,11 @@
 
 namespace BABYLON {
 
+class Engine;
+class InternalTexture;
 class Texture;
-using TexturePtr = std::shared_ptr<Texture>;
+using InternalTexturePtr = std::shared_ptr<InternalTexture>;
+using TexturePtr         = std::shared_ptr<Texture>;
 
 /**
  * @brief Class used to host RGBD texture specific utilities.
@@ -21,6 +24,12 @@ struct BABYLON_SHARED_EXPORT RGBDTextureTools {
    * @param texture the texture to expand.
    */
   static void ExpandRGBDTexture(const TexturePtr& texture);
+
+  /**
+   * @brief Expand the texture if possible by running the texture through the decode PP.
+   * @param texture the texture to expand.
+   */
+  static void runRgbdDecodePostProcess(Texture* texture);
 
 }; // end of struct RGBDTextureTools
 
