@@ -514,6 +514,13 @@ void ThinEngine::_initGLContext()
   for (unsigned int slot = 0; slot < _maxSimultaneousTextures; ++slot) {
     _nextFreeTextureSlots.emplace_back(slot);
   }
+
+  // Create the core context VAO
+#if !defined(__EMSCRIPTEN__)
+  if (!_coreContextVAO) {
+    _coreContextVAO = _gl->createVertexArray();
+  }
+#endif
 }
 
 float ThinEngine::get_webGLVersion() const
@@ -1228,6 +1235,11 @@ void ThinEngine::_unbindVertexArrayObject()
 
   _cachedVertexArrayObject = nullptr;
   _gl->bindVertexArray(nullptr);
+
+  // Make sure that the core context VAO is bound
+#if !defined(__EMSCRIPTEN__)
+  _gl->bindVertexArray(_coreContextVAO.get());
+#endif
 }
 
 void ThinEngine::bindBuffers(const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers,

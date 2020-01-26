@@ -650,23 +650,10 @@ void Engine::beginFrame()
 
   onBeginFrameObservable.notifyObservers(this);
   ThinEngine::beginFrame();
-
-#if !defined(__EMSCRIPTEN__)
-  // Bind the core context VAO
-  if (!_coreContextVAO) {
-    _coreContextVAO = _gl->createVertexArray();
-  }
-  _gl->bindVertexArray(_coreContextVAO.get());
-#endif
 }
 
 void Engine::endFrame()
 {
-#if !defined(__EMSCRIPTEN__)
-  // Unbind the core context VAO
-  _gl->bindVertexArray(nullptr);
-#endif
-
   ThinEngine::endFrame();
   _submitVRFrame();
 
