@@ -1,6 +1,25 @@
+"""
+This script should be run after having generated new screenshot images
+with `BabylonStudio -a`
+It will proocess all images inside assets/screenshots/ScreenshotsData/
+and compare them with the previous git version.
 
-# pip3 install --upgrade opencv-python scikit-image imutils
+Only the images with significant differences will be kept with their new version.
+The other ones will be replaced by the previous version.
 
+This helps creating commits that contain only the relevant screenshot modifications.
+
+How to run it:
+
+- First make sure to use python >= 3.6
+- Install the required modules:
+> pip3 install --upgrade opencv-python scikit-image imutils
+- Run it:
+From the main repo folder, run
+
+> python3 codegeneration/compare_screenshots_git.py
+
+"""
 
 from skimage.metrics import structural_similarity
 import argparse
@@ -13,7 +32,7 @@ import shutil
 import subprocess
 
 THIS_SCRIPT_DIR=os.path.dirname(os.path.abspath(__file__))
-SCREENSHOTS_FOLDER = THIS_SCRIPT_DIR + "/../ScreenshotsData/"
+SCREENSHOTS_FOLDER = THIS_SCRIPT_DIR + "/../assets/screenshots/ScreenshotsData/"
 
 def compare_image(image_file1, image_file2) -> (float, np.array):
     imageA = cv2.imread(image_file1)
@@ -27,6 +46,7 @@ def compare_image(image_file1, image_file2) -> (float, np.array):
     (score, diff) = structural_similarity(grayA, grayB, full=True)
     diff = (diff * 255).astype("uint8")
     return score, diff
+
 
 def list_images(folder):
     r = []
@@ -62,5 +82,6 @@ def do_compare():
         else:
             # print(f"{image_file} is similar")
             os.remove(image_temp_filename)
+
 
 do_compare()
