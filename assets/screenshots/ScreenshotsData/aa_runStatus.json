@@ -233,7 +233,7 @@
     "SimpleMaterialGLTFScene": "success",
     "SimpleMaterialScene": "success",
     "SimpleMeshesScene": "success",
-    "SimpleMorphScene": "empty3d",
+    "SimpleMorphScene": "success",
     "SimpleOakTreeScene": "success",
     "SimplePineScene": "success",
     "SimplePostProcessRenderPipelineScene": "success",
