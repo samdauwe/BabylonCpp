@@ -11,8 +11,6 @@
 
 
 namespace BABYLON {
-  const BABYLON_SHARED_EXPORT std::string screenshotsDirectory();
-
   struct BABYLON_SHARED_EXPORT PlaygroundCompilerStatus
   {
     std::shared_ptr<IRenderableScene> _renderableScene = nullptr;

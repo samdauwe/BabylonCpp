@@ -121,7 +121,6 @@ def make_samples_auto_declarations_code():
 // This file is generated automatically at each build. Do not modify it manually.
 
 #include <babylon/interfaces/irenderable_scene.h>
-#include <babylon/samples/samples_index.h>
 
 #include <memory>
 
@@ -152,7 +151,8 @@ namespace Samples
 def make_auto_populate_samples_code():
     category_samplename_pairs = collect_category_samplename_pairs()
     intro = """
-inline void auto_populate_samples(SamplesIndex & samplesIndex)
+template<typename RegisterFunction>
+inline void auto_populate_samples(RegisterFunction& registerFunction)
 {
 """
     end = """
@@ -164,7 +164,7 @@ inline void auto_populate_samples(SamplesIndex & samplesIndex)
 #endif // #ifndef BABYLON_SAMPLES_AUTO_DECL_H"
     """
 
-    stub = "  samplesIndex.RegisterSample(\"categoryName\", \"sampleClassName\", make_sampleClassName);\n"
+    stub = "  registerFunction(\"categoryName\", \"sampleClassName\", make_sampleClassName);\n"
 
     code = intro
     for category_samplename_pair in category_samplename_pairs:

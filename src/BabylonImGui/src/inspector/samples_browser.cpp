@@ -7,14 +7,16 @@
 #include <babylon/inspector/samples_browser.h>
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/misc/string_tools.h>
-#include <babylon/samples/samples_index.h>
 #include <imgui_utils/icons_font_awesome_5.h>
 #include <imgui_utils/imgui_utils.h>
 #include <map>
+#include <magic_enum.hpp>
 
 #include <imgui.h>
 
 #include <babylon/inspector/inspector.h>
+
+using namespace BABYLON::SamplesInfo;
 
 namespace {
 std::string to_snake_case(const std::string& sPascalCase)
@@ -34,23 +36,18 @@ std::string to_snake_case(const std::string& sPascalCase)
   return ss.str();
 }
 
-const std::string screenshotsFolderCurrent = "screenshots/samples_current/";
-
 } // end anonymous namespace
 
 namespace BABYLON {
 
-using namespace BABYLON::Samples;
 
 class SamplesBrowserImpl {
 public:
   using CategoryName = std::string;
   using SampleName   = std::string;
 
-  SamplesBrowserImpl() : _samplesIndex(Samples::SamplesIndex::Instance())
+  SamplesBrowserImpl() : _samplesCollection(SamplesCollection::Instance())
   {
-    for (const std::string& sample : _samplesIndex.getSampleNames())
-      _samplesInfos[sample] = _samplesIndex.getSampleInfo(sample);
     fillMatchingSamples();
   }
 
@@ -70,19 +67,35 @@ private:
   {
     bool changed = false;
     ImGui::PushItemWidth(200);
-    if (ImGui::InputText_String("Filter", _query.query))
+    if (ImGui::InputText_String("Search " ICON_FA_SEARCH, _sampleSearchQuery.Query))
       changed = true;
-
     ImGui::SameLine();
-    if (ImGui::Checkbox(ICON_FA_WRENCH "Experimental", &_query.onlyFailures))
-      changed = true;
+    ImGui::Checkbox(ICON_FA_WRENCH "Experimental", &_queryExperimental);
+
+    if (_queryExperimental)
+    {
+      for (auto status: magic_enum::enum_values<SamplesInfo::SampleAutoRunStatus>())
+      {
+       bool v = this->_sampleSearchQuery.IncludeStatus[status];
+        std::string statusName(magic_enum::enum_name(status));
+        if (ImGui::Checkbox(statusName.c_str(), &v))
+        {
+          this->_sampleSearchQuery.IncludeStatus[status] = v;
+          changed = true;
+        }
+      }
+      ImGui::Separator();
+
+      if (ImGui::Checkbox("With manual run failures", &_sampleSearchQuery.OnlyManualRunFailure))
+        changed = true;
+    }
 
     if (OnLoopSamples) {
       if (ImGui::Button("Loop filtered samples")) {
         std::vector<std::string> filteredSamples;
-        for (const auto& kv : _matchingSamples) {
-          for (auto sampleName : kv.second)
-            filteredSamples.push_back(sampleName);
+        for (const auto& [categoryName, samples] : _matchingSamples) {
+          for (const auto & sample: samples)
+            filteredSamples.push_back(sample->sampleName);
         }
         OnLoopSamples(filteredSamples);
       }
@@ -107,19 +120,20 @@ private:
     ImGui::Separator();
 
     ImGui::BeginChild("Child1");
-    for (const auto& kv : _matchingSamples) {
-      CategoryName category = kv.first;
-      auto samples          = kv.second;
-      if (!samples.empty()) {
-        std::string header = category + " (" + std::to_string(samples.size()) + ")";
+    for (const auto& [categoryName, samples] : _matchingSamples)
+    {
+      if (!samples.empty())
+      {
+        std::string header = categoryName + " (" + std::to_string(samples.size()) + ")";
         if (collapseMode == CollapseMode::CollapseAll)
           ImGui::SetNextItemOpen(false);
         if (collapseMode == CollapseMode::ExpandAll)
           ImGui::SetNextItemOpen(true);
         if (ImGui::CollapsingHeader(header.c_str())) // ImGuiTreeNodeFlags_DefaultOpen))
         {
-          for (const std::string& sample : samples) {
-            guiOneSample(sample);
+          for (const SampleData* sample : samples)
+          {
+            guiOneSample(*sample);
             ImGui::Separator();
           }
         }
@@ -128,12 +142,12 @@ private:
     ImGui::EndChild();
   }
 
-  void guiOneSampleLinks(const std::string& sampleName)
+  void guiOneSampleLinks(const SampleData& sampleData)
   {
-    const auto& sampleInfo = _samplesInfos.at(sampleName);
+    const auto& sampleInfo = sampleData.sourceInfo;
 
-    if (!sampleInfo->Links.empty()) {
-      for (auto link : sampleInfo->Links) {
+    if (!sampleInfo.Links.empty()) {
+      for (auto link : sampleInfo.Links) {
         std::string btnUrlString = std::string(ICON_FA_EXTERNAL_LINK_ALT "##") + link;
         if (ImGui::Button(btnUrlString.c_str()))
           BABYLON::System::openBrowser(link);
@@ -147,39 +161,40 @@ private:
     }
   }
 
-  void guiOneSampleInfos(const std::string& sampleName)
+  void guiOneSampleInfos(const SamplesInfo::SampleData& sampleData)
   {
-    const auto& sampleInfo = _samplesInfos.at(sampleName);
+    const auto& sampleInfo = sampleData.sourceInfo;
 
-    std::string runLabel = std::string(ICON_FA_PLAY_CIRCLE " Run##") + sampleName;
+    std::string runLabel = std::string(ICON_FA_PLAY_CIRCLE " Run##") + sampleData.sampleName;
     if (ImGui::Button(runLabel.c_str())) {
       if (OnNewRenderableScene) {
         BABYLON::ICanvas* dummyCanvas = nullptr;
-        auto scene = _samplesIndex.createRenderableScene(sampleName, dummyCanvas);
+        auto scene = _samplesCollection.createRenderableScene(sampleData.sampleName, dummyCanvas);
         OnNewRenderableScene(std::move(scene));
       }
       if (Inspector::OnSampleChanged)
-        Inspector::OnSampleChanged(sampleName);
+        Inspector::OnSampleChanged(sampleData.sampleName);
     }
 
-    if (OnEditFiles) {
+    if (OnEditFiles && !sampleInfo.SourceFile.empty()) {
       ImGui::SameLine();
-      std::string viewCodeLabel = ICON_FA_EDIT " View code##" + sampleName;
+      std::string viewCodeLabel = ICON_FA_EDIT " View code##" + sampleData.sampleName;
       if (ImGui::Button(viewCodeLabel.c_str())) {
         std::string sample_cpp_file
-          = Samples::SamplesProjectFolder() + "/" + sampleInfo->SourceFile;
+          = SamplesInfo::SamplesProjectFolder() + "/" + sampleInfo.SourceFile;
         OnEditFiles({sample_cpp_file});
       }
     }
   }
 
-  void guiOneSample(const std::string& sampleName)
+  void guiOneSample(const SamplesInfo::SampleData& sampleData)
   {
-    const auto& sampleInfo            = _samplesInfos[sampleName];
-    std::string currentScreenshotFile = screenshotsFolderCurrent + sampleName + ".jpg";
-    std::string sample_snake          = to_snake_case(sampleName);
+    const auto& sampleInfo =  sampleData.sourceInfo;
+    std::string currentScreenshotFile = screenshotsDirectory() + "/" + sampleData.sampleName + ".jpg";
+    std::string sample_snake          = to_snake_case(sampleData.sampleName);
 
-    if (_showCurrentScreenshots) {
+    // Screenshot
+    {
       ImGui::BeginGroup();
       ImVec2 imageSize(ImGui::GetWindowWidth() / 3.f, 0.f);
       ImGuiUtils::ImageFromFile(currentScreenshotFile, imageSize);
@@ -188,60 +203,64 @@ private:
     }
 
     ImGui::BeginGroup();
-    ImGui::Text("%s", sampleName.c_str());
-    ImGui::TextWrapped("%s", sampleInfo->Brief.c_str());
-    auto failure = _samplesIndex.doesSampleFail(sampleName);
-    if (failure) {
+    ImGui::Text("%s", sampleData.sampleName.c_str());
+    ImGui::TextWrapped("%s", sampleInfo.Brief.c_str());
+
+    if (sampleData.autoRunInfo.sampleRunStatus != SamplesInfo::SampleAutoRunStatus::success)
+    {
+      std::string_view status = magic_enum::enum_name(sampleData.autoRunInfo.sampleRunStatus);
+      std::string statusStr(status);
       ImGui::TextColored(ImVec4(0.9f, 0.4f, 0.3f, 1.f), "Failure: %s",
-                         SampleFailureReason_Str(failure.value().Kind).c_str());
-      if (!failure.value().Info.empty())
-        ImGui::TextColored(ImVec4(0.4f, 0.9f, 0.6f, 1.f), "More details: %s",
-                           failure.value().Info.c_str());
+                         statusStr.c_str());
     }
-    guiOneSampleInfos(sampleName);
+
+    if (_queryExperimental)
+    {
+      ImGui::Separator();
+      ImGui::Text("Manual run details");
+      auto sampleManualRunInfoCopy = sampleData.sampleManualRunInfo;
+      std::string checkboxLabel = std::string("ManualRun Fail##") + sampleData.sampleName;
+      if (ImGui::Checkbox(checkboxLabel.c_str(), &sampleManualRunInfoCopy.failing))
+        this->_samplesCollection.SetSampleManualRunInfo(sampleData.sampleName, sampleManualRunInfoCopy);
+      if (sampleManualRunInfoCopy.failing)
+      {
+        ImGui::SameLine();
+        std::string lblSetAsSuccess = std::string("Set as success##") + sampleData.sampleName;
+        if (ImGui::Button(lblSetAsSuccess.c_str()))
+        {
+          sampleManualRunInfoCopy.failing = false;
+          sampleManualRunInfoCopy.detail = "";
+          this->_samplesCollection.SetSampleManualRunInfo(sampleData.sampleName, sampleManualRunInfoCopy);
+        }
+      }
+
+      char detail[1000];
+      strncpy(detail, sampleManualRunInfoCopy.detail.c_str(), 1000);
+      if (ImGui::InputTextMultiline(
+        (std::string("##Detail") + sampleData.sampleName).c_str(),
+        detail,
+        1000,
+        ImVec2(230.f,40.f)
+        )
+        )
+      {
+        sampleManualRunInfoCopy.detail = detail;
+        this->_samplesCollection.SetSampleManualRunInfo(sampleData.sampleName, sampleManualRunInfoCopy);
+      }
+      ImGui::Separator();
+    }
+
+    guiOneSampleInfos(sampleData);
     ImGui::EndGroup();
     // ImGui::SameLine();
 
-    guiOneSampleLinks(sampleName);
+    guiOneSampleLinks(sampleData);
   }
 
-  bool doesSampleMatchQuery(const CategoryName& categoryName, const SampleName& sampleName)
-  {
-    std::vector<std::string> search_items = BABYLON::StringTools::split(_query.query, ' ');
-
-    bool doesMatch = true;
-
-    {
-      std::string all = BABYLON::StringTools::toLowerCase(categoryName + " / " + sampleName);
-      for (const auto& item : search_items)
-        if (!BABYLON::StringTools::contains(all, BABYLON::StringTools::toLowerCase(item)))
-          doesMatch = false;
-    }
-
-    if (_query.onlyFailures) {
-      if (!_samplesIndex.doesSampleFail(sampleName))
-        doesMatch = false;
-    }
-    else {
-      if (_samplesIndex.doesSampleFail(sampleName))
-        doesMatch = false;
-    }
-
-    return doesMatch;
-  }
 
   void fillMatchingSamples()
   {
-    _matchingSamples.clear();
-
-    for (CategoryName category : _samplesIndex.getCategoryNames()) {
-      std::vector<SampleName> s;
-      for (SampleName sample : _samplesIndex.getSampleNamesInCategory(category)) {
-        if (doesSampleMatchQuery(category, sample))
-          s.push_back(sample);
-        _matchingSamples[category] = s;
-      }
-    }
+    _matchingSamples = _samplesCollection.SearchSamples(_sampleSearchQuery);
   }
 
   size_t nbMatchingSamples()
@@ -252,16 +271,11 @@ private:
     return r;
   }
 
-  std::map<SampleName, std::shared_ptr<SampleInfo>> _samplesInfos;
-  SamplesIndex& _samplesIndex;
-  std::map<CategoryName, std::vector<SampleName>> _matchingSamples;
+  SamplesInfo::SamplesCollection& _samplesCollection;
+  std::map<SamplesInfo::CategoryName, std::vector<const SampleData *>> _matchingSamples;
 
-  struct {
-    std::string query = "";
-    bool onlyFailures = false;
-  } _query;
-
-  bool _showCurrentScreenshots = true;
+  SamplesInfo::SampleSearchQuery _sampleSearchQuery;
+  bool _queryExperimental = false;
 };
 
 SamplesBrowser::SamplesBrowser()

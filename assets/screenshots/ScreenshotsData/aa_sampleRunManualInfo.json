@@ -1,0 +1,1082 @@
+{
+    "AirplaneModelScene": {
+        "detail": "",
+        "failing": false
+    },
+    "AlphaBlendModeTestScene": {
+        "detail": "",
+        "failing": false
+    },
+    "AnimatedCubeScene": {
+        "detail": "",
+        "failing": false
+    },
+    "AnimatedMorphCubeScene": {
+        "detail": "",
+        "failing": false
+    },
+    "AnimatedMorphSphereScene": {
+        "detail": "",
+        "failing": false
+    },
+    "AnimatedMorphTargetScene": {
+        "detail": "",
+        "failing": false
+    },
+    "AnimatedTriangleScene": {
+        "detail": "",
+        "failing": false
+    },
+    "Animations101Scene": {
+        "detail": "",
+        "failing": false
+    },
+    "AnimationsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "AntiqueCameraScene": {
+        "detail": "",
+        "failing": false
+    },
+    "AvocadoScene": {
+        "detail": "",
+        "failing": false
+    },
+    "BarramundiFishScene": {
+        "detail": "",
+        "failing": false
+    },
+    "BasicElementsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "BasicScene": {
+        "detail": "",
+        "failing": false
+    },
+    "BlurModeForMirrorsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "BoneRotationInWorldSpaceScene": {
+        "detail": "",
+        "failing": false
+    },
+    "BoomBoxScene": {
+        "detail": "",
+        "failing": false
+    },
+    "BouncingCubeScene": {
+        "detail": "",
+        "failing": false
+    },
+    "BoxInstancesScene": {
+        "detail": "",
+        "failing": false
+    },
+    "BoxInterleavedScene": {
+        "detail": "",
+        "failing": false
+    },
+    "BoxScene": {
+        "detail": "",
+        "failing": false
+    },
+    "BoxShadowScene": {
+        "detail": "",
+        "failing": false
+    },
+    "BoxTexturedNonPowerOfTwoScene": {
+        "detail": "",
+        "failing": false
+    },
+    "BoxTexturedScene": {
+        "detail": "",
+        "failing": false
+    },
+    "BoxVertexColorsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "BrickProceduralTextureScene": {
+        "detail": "",
+        "failing": false
+    },
+    "BuildingInstancesGridScene": {
+        "detail": "",
+        "failing": false
+    },
+    "BuildingsSpsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "BulbSelfShadowScene": {
+        "detail": "",
+        "failing": false
+    },
+    "BumpTextureScene": {
+        "detail": "",
+        "failing": false
+    },
+    "BumpTextureSpheresScene": {
+        "detail": "",
+        "failing": false
+    },
+    "CamerasSceneGltf": {
+        "detail": "",
+        "failing": false
+    },
+    "CamerasTypesScene": {
+        "detail": "",
+        "failing": false
+    },
+    "CannonBallScene": {
+        "detail": "",
+        "failing": false
+    },
+    "CartoonAnimationsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "CellMaterialScene": {
+        "detail": "",
+        "failing": false
+    },
+    "CellShadingMaterialScene": {
+        "detail": "",
+        "failing": false
+    },
+    "CircleCurvesFromBeziersScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ClipPlanesScene": {
+        "detail": "",
+        "failing": false
+    },
+    "CloudProceduralTextureScene": {
+        "detail": "Clouds are too white \nvs js version",
+        "failing": true
+    },
+    "CollisionsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ColoredCubeFacesScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ColoredRibbonScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ColoredTriangleScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ConstructiveSolidGeometriesScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ConvolutionPostProcessScene": {
+        "detail": "",
+        "failing": false
+    },
+    "CorsetScene": {
+        "detail": "",
+        "failing": false
+    },
+    "CrowdSimulationScene01": {
+        "detail": "",
+        "failing": false
+    },
+    "CrowdSimulationScene02": {
+        "detail": "",
+        "failing": false
+    },
+    "CrowdSimulationScene03": {
+        "detail": "",
+        "failing": false
+    },
+    "CrowdSimulationScene04": {
+        "detail": "",
+        "failing": false
+    },
+    "CrowdSimulationScene05": {
+        "detail": "",
+        "failing": false
+    },
+    "CrowdSimulationScene06": {
+        "detail": "",
+        "failing": false
+    },
+    "CrowdSimulationScene07": {
+        "detail": "",
+        "failing": false
+    },
+    "CrowdSimulationScene08": {
+        "detail": "",
+        "failing": false
+    },
+    "CrowdSimulationScene09": {
+        "detail": "",
+        "failing": false
+    },
+    "CrowdSimulationScene10": {
+        "detail": "",
+        "failing": false
+    },
+    "CrowdSimulationScene11": {
+        "detail": "",
+        "failing": false
+    },
+    "CrowdsAndNavigationAgents": {
+        "detail": "",
+        "failing": false
+    },
+    "CubeChaosScene": {
+        "detail": "slow! 2 fps vs 30fps in \njs version. Rendering incomplete (see js)",
+        "failing": true
+    },
+    "CubeScene": {
+        "detail": "",
+        "failing": false
+    },
+    "CubeTextureDifferentFacesScene": {
+        "detail": "",
+        "failing": false
+    },
+    "CubesScene": {
+        "detail": "",
+        "failing": false
+    },
+    "CuboidScene": {
+        "detail": "",
+        "failing": false
+    },
+    "CurvedHelixMeshesScene": {
+        "detail": "",
+        "failing": false
+    },
+    "CustomRenderTargetsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "CylinderWithTextureScene": {
+        "detail": "",
+        "failing": false
+    },
+    "DamagedHelmetScene": {
+        "detail": "",
+        "failing": false
+    },
+    "DawnBringerScene": {
+        "detail": "",
+        "failing": false
+    },
+    "DecalsScene": {
+        "detail": "inverted faces?",
+        "failing": true
+    },
+    "DirectionalLightScene": {
+        "detail": "",
+        "failing": false
+    },
+    "DisplacementMapCpuScene": {
+        "detail": "",
+        "failing": false
+    },
+    "DuckScene": {
+        "detail": "",
+        "failing": false
+    },
+    "EasingFunctionsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "EdgesRendererScene": {
+        "detail": "",
+        "failing": false
+    },
+    "EnvironmentScene": {
+        "detail": "",
+        "failing": false
+    },
+    "EnvironmentTextureScene": {
+        "detail": "",
+        "failing": false
+    },
+    "EquirectangularMapAsReflectionTextureScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ExtrudePolygonScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ExtrudedPolygonScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ExtrusionScene": {
+        "detail": "",
+        "failing": false
+    },
+    "FadeInOutScene": {
+        "detail": "",
+        "failing": false
+    },
+    "FireMaterialScene": {
+        "detail": "Bad rendering of the flame.\nTable texture facing down\n(inverted?)",
+        "failing": true
+    },
+    "FireProceduralTextureScene": {
+        "detail": "",
+        "failing": false
+    },
+    "FireworksWithShaderCodeScene": {
+        "detail": "",
+        "failing": false
+    },
+    "FlightHelmetScene": {
+        "detail": "",
+        "failing": false
+    },
+    "FloatOnWaterMaterialScene": {
+        "detail": "",
+        "failing": false
+    },
+    "FogScene": {
+        "detail": "",
+        "failing": false
+    },
+    "FollowCameraScene": {
+        "detail": "",
+        "failing": false
+    },
+    "FresnelParametersTorusKnotScene": {
+        "detail": "",
+        "failing": false
+    },
+    "FresnelScene": {
+        "detail": "",
+        "failing": false
+    },
+    "FurMaterialScene": {
+        "detail": "Black texture",
+        "failing": true
+    },
+    "GlassWubbleBallScene": {
+        "detail": "",
+        "failing": false
+    },
+    "GlossinessAndRoughnessScene": {
+        "detail": "",
+        "failing": false
+    },
+    "GradientMaterialScene": {
+        "detail": "",
+        "failing": false
+    },
+    "GradientMaterialSphereScene": {
+        "detail": "",
+        "failing": false
+    },
+    "GrassProceduralTextureScene": {
+        "detail": "",
+        "failing": false
+    },
+    "GridMaterialScene": {
+        "detail": "",
+        "failing": false
+    },
+    "HdrCubeTextureScene": {
+        "detail": "",
+        "failing": false
+    },
+    "HeatWaveScene": {
+        "detail": "",
+        "failing": false
+    },
+    "HeightMapScene": {
+        "detail": "",
+        "failing": false
+    },
+    "HemisphericLightScene": {
+        "detail": "",
+        "failing": false
+    },
+    "HexIcoSphereScene": {
+        "detail": "",
+        "failing": false
+    },
+    "HighlightLayerScene": {
+        "detail": "",
+        "failing": false
+    },
+    "HouseFromFloorplanScene": {
+        "detail": "",
+        "failing": false
+    },
+    "IcoSphereScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ImageTextureScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ImportBabylonJSLogoScene": {
+        "detail": "inverted faces? Texture \non bad side?",
+        "failing": true
+    },
+    "ImportCandleScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ImportDudeScene": {
+        "detail": "Strange spikes / inverted faces UV texture?",
+        "failing": true
+    },
+    "ImportDummy3Scene": {
+        "detail": "",
+        "failing": false
+    },
+    "ImportHillValleyScene": {
+        "detail": "Scene loads incompletely\n(parts of road missing)",
+        "failing": true
+    },
+    "ImportMeshesSkullScene": {
+        "detail": "Black texture (inverted faces?)",
+        "failing": true
+    },
+    "ImportRabbitScene": {
+        "detail": "Inverted faces? \nInverted texture UV? ",
+        "failing": true
+    },
+    "ImportSuzanneScene": {
+        "detail": "",
+        "failing": false
+    },
+    "InfiniteLoaderScene": {
+        "detail": "",
+        "failing": false
+    },
+    "InnerMeshPointsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "InterpolationTestScene": {
+        "detail": "",
+        "failing": false
+    },
+    "IntersectingLightsColorsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "IntersectionsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "IsPointInsideMeshScene": {
+        "detail": "",
+        "failing": false
+    },
+    "KernelBasedBlurScene": {
+        "detail": "",
+        "failing": false
+    },
+    "KeyboardAndGameLoopScene": {
+        "detail": "Keyboard events do not move the sphere\nCode not clear compared to js",
+        "failing": true
+    },
+    "LanternScene": {
+        "detail": "",
+        "failing": false
+    },
+    "LatheScene": {
+        "detail": "",
+        "failing": false
+    },
+    "LavaMaterialScene": {
+        "detail": "",
+        "failing": false
+    },
+    "LensFlaresScene": {
+        "detail": "",
+        "failing": false
+    },
+    "LevelOfDetailScene": {
+        "detail": "",
+        "failing": false
+    },
+    "LightProjectedTextureScene": {
+        "detail": "",
+        "failing": false
+    },
+    "LightedSpsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "LightsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "LinesMeshSpiralScene": {
+        "detail": "",
+        "failing": false
+    },
+    "LocalCubemapsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "LookAtScene": {
+        "detail": "very slow compared to js version",
+        "failing": true
+    },
+    "LorenzAttractorScene": {
+        "detail": "",
+        "failing": false
+    },
+    "MandelbrotFractalScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ManyBoxInstancesScene": {
+        "detail": "Slow! 1fps",
+        "failing": true
+    },
+    "MarbleProceduralTextureScene": {
+        "detail": "",
+        "failing": false
+    },
+    "MaterialsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "MergedMeshesScene": {
+        "detail": "",
+        "failing": false
+    },
+    "MeshNormalsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "MirrorTextureScene": {
+        "detail": "",
+        "failing": false
+    },
+    "MirrorsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "MixMaterialScene": {
+        "detail": "",
+        "failing": false
+    },
+    "MorphMeshScene": {
+        "detail": "",
+        "failing": false
+    },
+    "MorphTargetsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "MotionBlurPostProcessScene": {
+        "detail": "",
+        "failing": false
+    },
+    "MultiMaterialScene": {
+        "detail": "",
+        "failing": false
+    },
+    "MultiSampleRenderTargetsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "MultiViewsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "NormalMaterialScene": {
+        "detail": "",
+        "failing": false
+    },
+    "OpacityTextureScene": {
+        "detail": "",
+        "failing": false
+    },
+    "PbrMaterialCheckerOrmScene": {
+        "detail": "",
+        "failing": false
+    },
+    "PbrMaterialOrmWoodScene": {
+        "detail": "",
+        "failing": false
+    },
+    "PbrMaterialScene": {
+        "detail": "",
+        "failing": false
+    },
+    "PbrMetallicRoughnessGoldMaterialScene": {
+        "detail": "",
+        "failing": false
+    },
+    "PbrMetallicRoughnessMaterialScene": {
+        "detail": "",
+        "failing": false
+    },
+    "PbrMetallicRoughnessTextureMaterialScene": {
+        "detail": "",
+        "failing": false
+    },
+    "PbrReflectionScene": {
+        "detail": "",
+        "failing": false
+    },
+    "PbrSpecularGlossinessMaterialScene": {
+        "detail": "",
+        "failing": false
+    },
+    "PbrSpecularGlossinessTextureMaterialScene": {
+        "detail": "",
+        "failing": false
+    },
+    "PerlinNoiseProceduralTextureScene": {
+        "detail": "",
+        "failing": false
+    },
+    "PerlinNoiseWavesScene": {
+        "detail": "",
+        "failing": false
+    },
+    "PhotoDomeScene": {
+        "detail": "",
+        "failing": false
+    },
+    "PickAndPlayAnimationScene": {
+        "detail": "",
+        "failing": false
+    },
+    "PickingScene": {
+        "detail": "",
+        "failing": false
+    },
+    "PointLightScene": {
+        "detail": "",
+        "failing": false
+    },
+    "PointsCloudScene": {
+        "detail": "",
+        "failing": false
+    },
+    "PolygonMeshBirdScene": {
+        "detail": "",
+        "failing": false
+    },
+    "PolygonMeshMonkeyScene": {
+        "detail": "",
+        "failing": false
+    },
+    "PolygonMeshPuzzlePieceScene": {
+        "detail": "",
+        "failing": false
+    },
+    "PolygonMeshStarsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "PolygonMeshStarsWithHolesScene": {
+        "detail": "",
+        "failing": false
+    },
+    "PolyhedraScene": {
+        "detail": "",
+        "failing": false
+    },
+    "PolyhedronScene": {
+        "detail": "",
+        "failing": false
+    },
+    "PortalsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ProceduralTexturesScene": {
+        "detail": "",
+        "failing": false
+    },
+    "PumpJackScene": {
+        "detail": "",
+        "failing": false
+    },
+    "RayHelperScene": {
+        "detail": "",
+        "failing": false
+    },
+    "RaycastOnHeightMapScene": {
+        "detail": "",
+        "failing": false
+    },
+    "RealtimeReflectionScene": {
+        "detail": "",
+        "failing": false
+    },
+    "RealtimeRefractionScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ReciprocatingSawScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ReflectingOneFaceSpriteTextureScene": {
+        "detail": "",
+        "failing": false
+    },
+    "RefractionAndReflectionDdsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "RefractionAndReflectionScene": {
+        "detail": "",
+        "failing": false
+    },
+    "RenderTargetTextureScene": {
+        "detail": "",
+        "failing": false
+    },
+    "RgbShiftGlitchScene": {
+        "detail": "",
+        "failing": false
+    },
+    "RibbonScene": {
+        "detail": "",
+        "failing": false
+    },
+    "RoadProceduralTextureScene": {
+        "detail": "",
+        "failing": false
+    },
+    "RollercoasterScene": {
+        "detail": "",
+        "failing": false
+    },
+    "RotationAndScalingScene": {
+        "detail": "",
+        "failing": false
+    },
+    "SciFiHelmetScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialBoxScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialBoxesScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialCarvedTreesScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialCelebrationOfNewYear2020": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialChainsAndGearsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialCloudsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialCylindersScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialDoubleHelixScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialGeneratorsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialKifsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialLuminescenceScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialMengerSpongeScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialMorningCityScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialOperaIslandScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialPbrTestScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialPegasusGalaxyScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialPhysicallyBasedSdfScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialPlanetShadertoyScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialSeascapeScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialServerRoomScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialSimplicityScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialSkyboxCloudsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialSkyboxScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialSparseGridMarchingScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialSpeedTracerScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialStarNestScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialTheDriveHomeScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialTilesScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialVoronoianWaterwayScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialWarpSpeedScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialWithFogScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialWolfenstein3dScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShaderMaterialXyptonjtrozScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShadowOnlyMaterialScene": {
+        "detail": "Bad rendering (compare to js version)",
+        "failing": true
+    },
+    "ShadowsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "ShapeEasingsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "SimpleCarFollowingPathScene": {
+        "detail": "",
+        "failing": false
+    },
+    "SimpleMaterialGLTFScene": {
+        "detail": "",
+        "failing": false
+    },
+    "SimpleMaterialScene": {
+        "detail": "",
+        "failing": false
+    },
+    "SimpleMeshesScene": {
+        "detail": "",
+        "failing": false
+    },
+    "SimpleMorphScene": {
+        "detail": "",
+        "failing": false
+    },
+    "SimpleOakTreeScene": {
+        "detail": "",
+        "failing": false
+    },
+    "SimplePineScene": {
+        "detail": "",
+        "failing": false
+    },
+    "SimplePostProcessRenderPipelineScene": {
+        "detail": "",
+        "failing": false
+    },
+    "SimpleSkinScene": {
+        "detail": "",
+        "failing": false
+    },
+    "SimpleSparseAccessorScene": {
+        "detail": "",
+        "failing": false
+    },
+    "SimpleTextureScene": {
+        "detail": "",
+        "failing": false
+    },
+    "SimultaneousLightsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "SkyMaterialScene": {
+        "detail": "",
+        "failing": false
+    },
+    "SphereTexturesScene": {
+        "detail": "",
+        "failing": false
+    },
+    "SphereTransparentTexturesScene": {
+        "detail": "",
+        "failing": false
+    },
+    "SphericalPanningScene": {
+        "detail": "",
+        "failing": false
+    },
+    "SphericalReflectionTextureScene": {
+        "detail": "",
+        "failing": false
+    },
+    "SpotLightScene": {
+        "detail": "",
+        "failing": false
+    },
+    "SpritesScene": {
+        "detail": "",
+        "failing": false
+    },
+    "StarfieldProceduralTextureScene": {
+        "detail": "",
+        "failing": false
+    },
+    "SuperEllipsoidScene": {
+        "detail": "",
+        "failing": false
+    },
+    "SuzanneScene": {
+        "detail": "",
+        "failing": false
+    },
+    "TerrainMaterialScene": {
+        "detail": "",
+        "failing": false
+    },
+    "TiledGroundScene": {
+        "detail": "",
+        "failing": false
+    },
+    "TriPlanarMaterialScene": {
+        "detail": "",
+        "failing": false
+    },
+    "TriangleScene": {
+        "detail": "",
+        "failing": false
+    },
+    "TriangleWithoutIndicesScene": {
+        "detail": "",
+        "failing": false
+    },
+    "TrianglesSpsScene": {
+        "detail": "",
+        "failing": false
+    },
+    "TubeAnimationScene": {
+        "detail": "",
+        "failing": false
+    },
+    "TubeScene": {
+        "detail": "",
+        "failing": false
+    },
+    "TwoCylinderEngineScene": {
+        "detail": "",
+        "failing": false
+    },
+    "TwoSidedPlaneScene": {
+        "detail": "",
+        "failing": false
+    },
+    "TwoSidedTextureScene": {
+        "detail": "",
+        "failing": false
+    },
+    "VolumetricLightScatteringScene": {
+        "detail": "",
+        "failing": false
+    },
+    "WaterBottleScene": {
+        "detail": "",
+        "failing": false
+    },
+    "WaterMaterialScene": {
+        "detail": "",
+        "failing": false
+    },
+    "WaveOfSpritesScene": {
+        "detail": "",
+        "failing": false
+    },
+    "WavesScene": {
+        "detail": "",
+        "failing": false
+    },
+    "WoodProceduralTextureScene": {
+        "detail": "",
+        "failing": false
+    },
+    "XRayMaterialWithFresnelSkullScene": {
+        "detail": "",
+        "failing": false
+    }
+}

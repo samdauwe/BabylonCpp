@@ -4,6 +4,7 @@
 #include <babylon/cameras/free_camera.h>
 #include <babylon/core/filesystem.h>
 #include <babylon/core/system.h>
+#include <babylon/samples/samples_info.h>
 #include <babylon/inspector/components/actiontabs/action_tabs_component.h>
 #include <babylon/interfaces/irenderable_scene_with_hud.h>
 #include <imgui.h>
@@ -21,12 +22,6 @@
 #include <iostream>
 
 namespace BABYLON {
-
-
-const std::string screenshotsDirectory()
-{
-  return "ScreenShots/";
-}
 
 struct EmptyScene : public BABYLON::IRenderableScene {
   const char* getName() override
@@ -244,12 +239,10 @@ private:
 
   void saveScreenshot(std::string filename = "")
   {
-    if (!BABYLON::Filesystem::isDirectory(screenshotsDirectory()))
-      BABYLON::Filesystem::createDirectory(screenshotsDirectory());
     if (filename.empty())
       filename = std::string(_appContext._sceneWidget->getRenderableScene()->getName()) + ".jpg";
 
-    filename = screenshotsDirectory() + "/" + filename;
+    filename = BABYLON::SamplesInfo::screenshotsDirectory() + "/" + filename;
     int imageWidth = 200;
     int jpgQuality = 75;
     this->_appContext._sceneWidget->getCanvas()->saveScreenshotJpg(
@@ -347,7 +340,7 @@ private:
       std::string sampleName
         = _appContext._loopSamples.samplesToLoop[_appContext._loopSamples.currentIdx];
       BABYLON_LOG_ERROR("LoopSample", sampleName)
-      auto scene = Samples::SamplesIndex::Instance().createRenderableScene(sampleName, nullptr);
+      auto scene = SamplesInfo::SamplesCollection::Instance().createRenderableScene(sampleName, nullptr);
       this->setRenderableScene(scene);
 
       if (_appContext._loopSamples.currentIdx < _appContext._loopSamples.samplesToLoop.size() - 2)

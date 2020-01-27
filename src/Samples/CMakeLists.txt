@@ -43,6 +43,8 @@ target_link_libraries(${TARGET}
     ProceduralTexturesLibrary
     Loaders
     json_hpp
+    subprocess_h
+    magic_enum
 )
 
 if (WIN32)
@@ -53,7 +55,7 @@ endif()
 # ============================================================================ #
 #                       Setup test environment                                 #
 # ============================================================================ #
-# No Test here
+add_subdirectory(tests)
 
 # ============================================================================ #
 #                       make samples info                                      #
@@ -87,12 +89,4 @@ if (NOT BABYLON_DISABLE_INSTALL)
     export(TARGETS ${TARGET}
         FILE ${TARGET}Config.cmake
     )
-endif()
-
-# Copy asset directories
-copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/glTF-Sample-Models")
-copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/scenes")
-copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/textures")
-if (EXISTS "${CMAKE_SOURCE_DIR}/assets/samples_info.json")
-    copy_resource_files("${CMAKE_SOURCE_DIR}/assets/samples_info.json")
 endif()

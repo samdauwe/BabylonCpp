@@ -51,6 +51,7 @@ target_link_libraries(${TARGET}
     Samples
     imgui
     imgui_utils
+    magic_enum
 )
 
 if (APPLE AND NOT EMSCRIPTEN) # Special case for Apple OpenGL framework
