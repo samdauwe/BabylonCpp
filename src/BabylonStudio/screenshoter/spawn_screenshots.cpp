@@ -6,6 +6,7 @@
 #include <babylon/samples/sample_spawn.h>
 #include <babylon/samples/samples_info.h>
 #include <nlohmann/json.hpp>
+#include <babylon/asio/asio.h>
 
 #ifdef _MSC_VER
 #pragma warning(disable: 4996)
@@ -54,6 +55,27 @@ SampleAutoRunInfo runOneSample(const std::string & exeName, const std::string &s
 }
 
 
+void run_compare_screenshots_git()
+{
+  BABYLON_LOG_INFO("spawnScreenshots ", "Running compare_screenshots_git.py ...");
+  std::vector<std::string> command = {
+    "python3",
+    babylon_repo_folder() + "/codegeneration/compare_screenshots_git.py"
+  };
+  Samples::SpawnOptions spawnOptions;
+  spawnOptions.CopyOutputToMainProgramOutput = true;
+  spawnOptions.MixStdOutStdErr = true;
+  auto spawnResult = SpawnWaitSubProcess(command, spawnOptions);
+  if (spawnResult.ExitStatus != 0)
+  {
+    std::string msg = "Error while running compare_screenshots_git.py!";
+    BABYLON_LOG_ERROR("spawnScreenshots", msg.c_str());
+    throw std::runtime_error(msg.c_str());
+  }
+  BABYLON_LOG_INFO("spawnScreenshots ", "compare_screenshots_git.py ended successfully");
+}
+
+
 void spawnScreenshots(const std::string & exeName, bool flagAsync)
 {
 
@@ -74,6 +96,8 @@ void spawnScreenshots(const std::string & exeName, bool flagAsync)
 //      break;
   }
   samplesCollection.SaveAllSamplesRunStatuses();
+  run_compare_screenshots_git();
+  BABYLON::asio::Service_Stop();
   BABYLON_LOG_INFO("spawnScreenshots", "End, stats:", samplesCollection.GetSampleStatsString().c_str());
 }
 
