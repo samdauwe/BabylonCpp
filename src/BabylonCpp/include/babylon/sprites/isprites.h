@@ -19,13 +19,13 @@ struct BABYLON_SHARED_EXPORT ISpriteJSONSpriteSourceSize {
   /**
    * number of the original width of the Frame
    */
-  size_t w;
+  uint32_t w;
 
   /**
    * number of the original height of the Frame
    */
-  size_t h;
-};
+  uint32_t h;
+}; // end of struct ISpriteJSONSpriteSourceSize
 
 /**
  * @brief Defines the basic options interface of a Sprite Frame Data.
@@ -50,7 +50,7 @@ struct BABYLON_SHARED_EXPORT ISpriteJSONSpriteFrameData {
    * number of the height of the Frame
    */
   float h;
-};
+}; // end of struct ISpriteJSONSpriteFrameData
 
 /**
  * @brief Defines the basic options interface of a JSON Sprite.
@@ -85,13 +85,12 @@ struct BABYLON_SHARED_EXPORT ISpriteJSONSprite {
    * ISpriteJSONSpriteFrame basic object of the source data
    */
   ISpriteJSONSpriteSourceSize sourceSize;
-};
+}; // end of struct ISpriteJSONSprite
 
 /**
  * @brief Defines the basic options interface of a JSON atlas.
  */
 struct BABYLON_SHARED_EXPORT ISpriteJSONAtlas {
-
   /**
    * Array of objects that contain the frame data.
    */
@@ -101,7 +100,7 @@ struct BABYLON_SHARED_EXPORT ISpriteJSONAtlas {
    * object basic object containing the sprite meta data.
    */
   std::optional<json> meta = std::nullopt;
-};
+}; // end of struct ISpriteJSONAtlas
 
 } // end of namespace BABYLON
 
