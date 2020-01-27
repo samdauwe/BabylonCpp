@@ -41,7 +41,7 @@ def do_compare():
     images_files = list_images(SCREENSHOTS_FOLDER)
 
     for image_file in images_files:
-        print("processing {}".format(image_file))
+        # print("processing {}".format(image_file))
 
         image_filename = SCREENSHOTS_FOLDER + "/" + image_file
         image_temp_filename = SCREENSHOTS_FOLDER + "/" + image_file + ".new.jpg"
@@ -54,13 +54,13 @@ def do_compare():
             continue
 
         similarity_score, diff = compare_image(image_filename, image_temp_filename)
-        print("{} : similarity_score {}".format(image_file, similarity_score))
-        if similarity_score < 0.7:
-            print(f"{image_file} has new version")
+        # print("{} : similarity_score {}".format(image_file, similarity_score))
+        if similarity_score < 0.65:
+            print(f"{image_file} has new version, similarity_score={similarity_score}")
             os.remove(image_filename)
             os.rename(image_temp_filename, image_filename)
         else:
-            print(f"{image_file} is similar")
+            # print(f"{image_file} is similar")
             os.remove(image_temp_filename)
 
 do_compare()
