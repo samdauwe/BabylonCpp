@@ -74,6 +74,7 @@ void spawnScreenshots(const std::string & exeName, bool flagAsync)
 //      break;
   }
   samplesCollection.SaveAllSamplesRunStatuses();
+  BABYLON_LOG_INFO("spawnScreenshots", "End, stats:", samplesCollection.GetSampleStatsString().c_str());
 }
 
 

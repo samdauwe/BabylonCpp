@@ -101,12 +101,12 @@ public:
   void SetSampleRunInfo(const SampleName& sampleName, const SampleAutoRunInfo& sampleRunInfo);
   void SetSampleManualRunInfo(const SampleName& sampleName, const SampleManualRunInfo& sampleManualRunInfo);
   void SaveAllSamplesRunStatuses();
+  std::string GetSampleStatsString();
 
 private:
   SamplesCollection();
 
   SampleStats GetSampleStats();
-  std::string GetSampleStatsString();
 
   void ReadSamplesSourceInfos();
   void ReadAllSampleStatuses();
