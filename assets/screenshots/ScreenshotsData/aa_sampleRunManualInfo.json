@@ -488,8 +488,8 @@
         "failing": false
     },
     "KeyboardAndGameLoopScene": {
-        "detail": "",
-        "failing": false
+        "detail": "Keyboard events do not move the sphere\nCode not clear compared to js",
+        "failing": true
     },
     "LanternScene": {
         "detail": "",
