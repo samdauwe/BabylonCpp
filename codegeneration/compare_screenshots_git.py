@@ -13,7 +13,7 @@ How to run it:
 
 - First make sure to use python >= 3.6
 - Install the required modules:
-> pip3 install --upgrade opencv-python scikit-image imutils
+> pip3 install opencv-python scikit-image imutils
 - Run it:
 From the main repo folder, run
 
@@ -21,15 +21,21 @@ From the main repo folder, run
 
 """
 
-from skimage.metrics import structural_similarity
-import argparse
-import imutils
-import cv2
-import os
-import os.path
-import numpy as np
-import shutil
-import subprocess
+try:
+    from skimage.metrics import structural_similarity
+    import argparse
+    import imutils
+    import cv2
+    import os
+    import os.path
+    import numpy as np
+    import shutil
+    import subprocess
+except ImportError as e:
+    print(f"{__file__} => ERROR")
+    print("Please install the required modules with:   pip3 install opencv-python scikit-image imutils")
+    exit(1)
+
 
 THIS_SCRIPT_DIR=os.path.dirname(os.path.abspath(__file__))
 SCREENSHOTS_FOLDER = THIS_SCRIPT_DIR + "/../assets/screenshots/ScreenshotsData/"
