@@ -100,8 +100,8 @@
         "failing": false
     },
     "BrickProceduralTextureScene": {
-        "detail": "No brick on the wall",
-        "failing": true
+        "detail": "",
+        "failing": false
     },
     "BuildingInstancesGridScene": {
         "detail": "",
@@ -112,8 +112,8 @@
         "failing": false
     },
     "BulbSelfShadowScene": {
-        "detail": "Missing elements vs\njs version",
-        "failing": true
+        "detail": "",
+        "failing": false
     },
     "BumpTextureScene": {
         "detail": "",
@@ -156,7 +156,7 @@
         "failing": false
     },
     "CloudProceduralTextureScene": {
-        "detail": "Clouds badly rendered",
+        "detail": "Clouds are too white \nvs js version",
         "failing": true
     },
     "CollisionsScene": {
@@ -236,7 +236,7 @@
         "failing": false
     },
     "CubeChaosScene": {
-        "detail": "slow! 2 fps vs 30fps in \njs version",
+        "detail": "slow! 2 fps vs 30fps in \njs version. Rendering incomplete (see js)",
         "failing": true
     },
     "CubeScene": {
@@ -296,8 +296,8 @@
         "failing": false
     },
     "EdgesRendererScene": {
-        "detail": "Edges are invisible",
-        "failing": true
+        "detail": "",
+        "failing": false
     },
     "EnvironmentScene": {
         "detail": "",
@@ -328,12 +328,12 @@
         "failing": false
     },
     "FireMaterialScene": {
-        "detail": "Bad rendering of the flame",
+        "detail": "Bad rendering of the flame.\nTable texture facing down\n(inverted?)",
         "failing": true
     },
     "FireProceduralTextureScene": {
-        "detail": "No texture",
-        "failing": true
+        "detail": "",
+        "failing": false
     },
     "FireworksWithShaderCodeScene": {
         "detail": "",
@@ -384,8 +384,8 @@
         "failing": false
     },
     "GrassProceduralTextureScene": {
-        "detail": "Bad texture rendering",
-        "failing": true
+        "detail": "",
+        "failing": false
     },
     "GridMaterialScene": {
         "detail": "",
@@ -496,8 +496,8 @@
         "failing": false
     },
     "LatheScene": {
-        "detail": "Vase is invisible",
-        "failing": true
+        "detail": "",
+        "failing": false
     },
     "LavaMaterialScene": {
         "detail": "",
@@ -548,8 +548,8 @@
         "failing": true
     },
     "MarbleProceduralTextureScene": {
-        "detail": "Bad texture rendering",
-        "failing": true
+        "detail": "",
+        "failing": false
     },
     "MaterialsScene": {
         "detail": "",
@@ -644,8 +644,8 @@
         "failing": false
     },
     "PerlinNoiseProceduralTextureScene": {
-        "detail": "Bad texture rendering",
-        "failing": true
+        "detail": "",
+        "failing": false
     },
     "PerlinNoiseWavesScene": {
         "detail": "",
@@ -756,12 +756,12 @@
         "failing": false
     },
     "RoadProceduralTextureScene": {
-        "detail": "Bad texture rendering",
-        "failing": true
+        "detail": "",
+        "failing": false
     },
     "RollercoasterScene": {
-        "detail": "Rails are missing",
-        "failing": true
+        "detail": "",
+        "failing": false
     },
     "RotationAndScalingScene": {
         "detail": "",
@@ -920,8 +920,8 @@
         "failing": false
     },
     "SimpleCarFollowingPathScene": {
-        "detail": "The path is only visible from the bottom (inverted face ?",
-        "failing": true
+        "detail": "",
+        "failing": false
     },
     "SimpleMaterialGLTFScene": {
         "detail": "",
@@ -1032,8 +1032,8 @@
         "failing": false
     },
     "TubeAnimationScene": {
-        "detail": "Tube missing under linux",
-        "failing": true
+        "detail": "",
+        "failing": false
     },
     "TubeScene": {
         "detail": "",
@@ -1072,8 +1072,8 @@
         "failing": false
     },
     "WoodProceduralTextureScene": {
-        "detail": "Bad texture rendering",
-        "failing": true
+        "detail": "",
+        "failing": false
     },
     "XRayMaterialWithFresnelSkullScene": {
         "detail": "",
