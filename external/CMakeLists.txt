@@ -102,7 +102,7 @@ set(PROMISE_CPP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/promise-cpp
 # Will print a nice stack trace in case of failure (linux only)
 # Advice: install binutils-dev for even more useful stack trace
 # (sudo apt-get install binutils-dev)
-if(UNIX AND NOT APPLE)
+if(UNIX AND NOT APPLE AND NOT EMSCRIPTEN)
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/backward-cpp)
 endif()
 

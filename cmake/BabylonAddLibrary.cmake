@@ -48,7 +48,7 @@ function(babylon_add_executable TARGET)
     babylon_target_clang_tidy(${TARGET})
 
     # Enable backward-cpp stack trace for linux
-    if(UNIX AND NOT APPLE)
+    if(UNIX AND NOT APPLE AND NOT EMSCRIPTEN)
         add_backward(${TARGET})
     endif()
 endfunction()
