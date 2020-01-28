@@ -10,6 +10,9 @@
 #include <chrono>
 #include <sstream>
 
+#define BABYLON_LOG_TRACE_ON
+#include <babylon/core/log_trace.h>
+
 namespace BABYLON {
 namespace asio {
 
@@ -43,6 +46,7 @@ DownloadId storeDownloadInfo(
   std::function<void(const ArrayBuffer& data)> onSuccessFunction,
   std::function<void(const std::string& message)> onErrorFunction)
 {
+  TRACE_WHERE_VAR(url);
   static int id = 0;
   ++id;
   DownloadInfo info {url, onSuccessFunction, onErrorFunction};
@@ -59,6 +63,7 @@ DownloadInfo consumeDownloadInfo(DownloadId id)
     throw std::runtime_error(msg.str().c_str());
   }
   DownloadInfo r = gDownloadInfos.at(id);
+  TRACE_WHERE_VAR(r.url);
   gDownloadInfos.erase(id);
   return r;
 }
