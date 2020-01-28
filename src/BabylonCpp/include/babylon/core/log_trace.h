@@ -9,10 +9,16 @@
 // TRACE_BEFORE_AFTER : run any (even complicated) expression, and log before / after
 #ifdef BABYLON_LOG_TRACE_ON
 
+#define CONCAT_IMPL( x, y ) x##y
+#define MACRO_CONCAT( x, y ) CONCAT_IMPL( x, y )
+
+#define TRACE_WHERE(msg) \
+  std::cout << "LOG_TRACE TRACE_WHERE: " << msg << " in " << __FUNCTION__ <<  "() in " << __FILE__ << ":" << __LINE__ << std::endl;
+
 #define TRACE_BEFORE_AFTER(...)                   \
-    std::cout << "LOG_TRACE: " << "Before " << #__VA_ARGS__ << "\n";  \
+    std::cout << "LOG_TRACE TRACE_BEFORE_AFTER: " << "Before " << #__VA_ARGS__ << "\n";  \
     __VA_ARGS__; \
-    std::cout << "LOG_TRACE: "<< "After " << #__VA_ARGS__ << "\n";
+    std::cout << "LOG_TRACE TRACE_BEFORE_AFTER: "<< "After " << #__VA_ARGS__ << "\n";
 
 #define TRACE_VARIABLE(variable) \
 { \
@@ -31,6 +37,7 @@
 
 #else //BABYLON_LOG_TRACE_ON
 
+#define TRACE_WHERE(msg)
 #define TRACE_BEFORE_AFTER(...)  __VA_ARGS__
 #define TRACE_VARIABLE_POINTER(variable)
 #define TRACE_VARIABLE(variable)
