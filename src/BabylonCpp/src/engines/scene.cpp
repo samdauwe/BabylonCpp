@@ -2373,6 +2373,10 @@ void Scene::addMesh(const AbstractMeshPtr& newMesh, bool recursive)
 
   newMesh->_resyncLightSources();
 
+  if (!newMesh->parent()) {
+    newMesh->_addToSceneRootNodes();
+  }
+
   onNewMeshAddedObservable.notifyObservers(newMesh.get());
 
   if (recursive) {
@@ -2411,7 +2415,12 @@ int Scene::removeMesh(AbstractMesh* toRemove, bool recursive)
 
 void Scene::addTransformNode(const TransformNodePtr& newTransformNode)
 {
+  newTransformNode->_indexInSceneTransformNodesArray = static_cast<int>(transformNodes.size());
   transformNodes.emplace_back(newTransformNode);
+
+  if (!newTransformNode->parent()) {
+    newTransformNode->_addToSceneRootNodes();
+  }
 
   onNewTransformNodeAddedObservable.notifyObservers(newTransformNode.get());
 }
@@ -2634,6 +2643,10 @@ void Scene::addLight(const LightPtr& newLight)
   lights.emplace_back(newLight);
   sortLightsByPriority();
 
+  if (!newLight->parent()) {
+    newLight->_addToSceneRootNodes();
+  }
+
   // Add light to all meshes (To support if the light is removed and then
   // readded)
   for (const auto& mesh : meshes) {
@@ -2659,6 +2672,10 @@ void Scene::addCamera(const CameraPtr& newCamera)
 {
   cameras.emplace_back(newCamera);
   onNewCameraAddedObservable.notifyObservers(newCamera.get());
+
+  if (!newCamera->parent()) {
+    newCamera->_addToSceneRootNodes();
+  }
 }
 
 void Scene::addSkeleton(const SkeletonPtr& newSkeleton)
