@@ -115,3 +115,10 @@ target_include_directories(subprocess_h INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/su
 # https://github.com/Neargye/magic_enum
 add_library(magic_enum INTERFACE)
 target_include_directories(magic_enum INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/magic_enum/include)
+
+# FunctionalPlus: header only Functional Programming Library for C++
+# https://github.com/Dobiasd/FunctionalPlus
+add_library(FunctionalPlus INTERFACE)
+target_include_directories(magic_enum INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/FunctionalPlus/include)
+set(FunctionalPlus_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/FunctionalPlus/include
+    CACHE INTERNAL "Include directories of FunctionalPlus")
