@@ -39,7 +39,7 @@ function(babylon_add_executable TARGET)
     set(sources ${ARGN})
 
     # Enable backward-cpp stack trace for linux
-    if(UNIX AND NOT APPLE)
+    if(UNIX AND NOT APPLE AND NOT EMSCRIPTEN)
         message("babylon_add_executable => with backward-cpp stack trace on failures")
         set(sources ${sources} ${BACKWARD_ENABLE})
     endif()
