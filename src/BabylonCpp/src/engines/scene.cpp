@@ -113,6 +113,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , pointerUpPredicate{nullptr}
     , pointerMovePredicate{nullptr}
     , forceWireframe{this, &Scene::get_forceWireframe, &Scene::set_forceWireframe}
+    , skipFrustumClipping{this, &Scene::get_skipFrustumClipping, &Scene::set_skipFrustumClipping}
     , forcePointsCloud{this, &Scene::get_forcePointsCloud, &Scene::set_forcePointsCloud}
     , clipPlane{std::nullopt}
     , clipPlane2{std::nullopt}
@@ -242,6 +243,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , _onCanvasBlurObserver{nullptr}
     , _useRightHandedSystem{false}
     , _forceWireframe{false}
+    , _skipFrustumClipping{false}
     , _forcePointsCloud{false}
     , _fogEnabled{true}
     , _fogMode{Scene::FOGMODE_NONE}
@@ -268,6 +270,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , _isDisposed{false}
     , _activeMeshCandidateProvider{nullptr}
     , _activeMeshesFrozen{false}
+    , _skipEvaluateActiveMeshesCompletely{false}
     , _renderingManager{nullptr}
     , _transformMatrix{Matrix::Zero()}
     , _sceneUbo{nullptr}
@@ -320,9 +323,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     _imageProcessingConfiguration = std::make_shared<ImageProcessingConfiguration>();
   }
 
-  getDeterministicFrameTime = []() -> float {
-    return 1000.f / 60.f; // frame time in ms
-  };
+  getDeterministicFrameTime = [this]() -> float { return _engine->getTimeStep(); };
 
   setDefaultCandidateProviders();
 
@@ -524,6 +525,19 @@ void Scene::set_forceWireframe(bool value)
 bool Scene::get_forceWireframe() const
 {
   return _forceWireframe;
+}
+
+void Scene::set_skipFrustumClipping(bool value)
+{
+  if (_skipFrustumClipping == value) {
+    return;
+  }
+  _skipFrustumClipping = value;
+}
+
+bool Scene::get_skipFrustumClipping() const
+{
+  return _skipFrustumClipping;
 }
 
 bool Scene::get_forcePointsCloud() const
@@ -2393,23 +2407,25 @@ int Scene::removeMesh(const AbstractMeshPtr& toRemove, bool recursive)
 
 int Scene::removeMesh(AbstractMesh* toRemove, bool recursive)
 {
-  auto it   = std::find_if(meshes.begin(), meshes.end(), [toRemove](const AbstractMeshPtr& mesh) {
+  auto it    = std::find_if(meshes.begin(), meshes.end(), [toRemove](const AbstractMeshPtr& mesh) {
     return mesh.get() == toRemove;
   });
-  int index = static_cast<int>(it - meshes.begin());
+  auto index = static_cast<int>(it - meshes.begin());
   if (it != meshes.end()) {
     // Remove from the scene if mesh found
     meshes.erase(it);
+
+    if (!toRemove->parent()) {
+      toRemove->_removeFromSceneRootNodes();
+    }
   }
 
   onMeshRemovedObservable.notifyObservers(toRemove);
-
   if (recursive) {
     for (const auto& m : toRemove->getChildMeshes()) {
       removeMesh(m);
     }
   }
-
   return index;
 }
 
@@ -2435,10 +2451,13 @@ int Scene::removeTransformNode(TransformNode* toRemove)
   auto it = std::find_if(
     transformNodes.begin(), transformNodes.end(),
     [toRemove](const TransformNodePtr& transformNode) { return transformNode.get() == toRemove; });
-  int index = static_cast<int>(it - transformNodes.begin());
+  auto index = static_cast<int>(it - transformNodes.begin());
   if (it != transformNodes.end()) {
     // Remove from the scene if found
     transformNodes.erase(it);
+    if (!toRemove->parent()) {
+      toRemove->_removeFromSceneRootNodes();
+    }
   }
 
   onTransformNodeRemovedObservable.notifyObservers(toRemove);
@@ -2484,21 +2503,25 @@ int Scene::removeLight(const LightPtr& toRemove)
 
 int Scene::removeLight(Light* toRemove)
 {
-  auto it   = std::find_if(lights.begin(), lights.end(),
+  auto it    = std::find_if(lights.begin(), lights.end(),
                          [&toRemove](const LightPtr& light) { return light.get() == toRemove; });
-  int index = static_cast<int>(it - lights.begin());
+  auto index = static_cast<int>(it - lights.begin());
   if (it != lights.end()) {
     // Remove from meshes
     for (const auto& mesh : meshes) {
       mesh->_removeLightSource(toRemove, false);
     }
+
     // Remove from the scene if mesh found
     lights.erase(it);
     sortLightsByPriority();
+
+    if (!toRemove->parent()) {
+      toRemove->_removeFromSceneRootNodes();
+    }
   }
 
   onLightRemovedObservable.notifyObservers(toRemove);
-
   return index;
 }
 
@@ -2509,13 +2532,16 @@ int Scene::removeCamera(const CameraPtr& toRemove)
 
 int Scene::removeCamera(Camera* toRemove)
 {
-  auto it1  = std::find_if(cameras.begin(), cameras.end(), [&toRemove](const CameraPtr& camera) {
+  auto it1   = std::find_if(cameras.begin(), cameras.end(), [&toRemove](const CameraPtr& camera) {
     return camera.get() == toRemove;
   });
-  int index = static_cast<int>(it1 - cameras.begin());
+  auto index = static_cast<int>(it1 - cameras.begin());
   if (it1 != cameras.end()) {
     // Remove from the scene if camera found
     cameras.erase(it1);
+    if (!toRemove->parent()) {
+      toRemove->_removeFromSceneRootNodes();
+    }
   }
   // Remove from activeCameras
   auto it2 = std::find_if(activeCameras.begin(), activeCameras.end(),
@@ -2647,8 +2673,7 @@ void Scene::addLight(const LightPtr& newLight)
     newLight->_addToSceneRootNodes();
   }
 
-  // Add light to all meshes (To support if the light is removed and then
-  // readded)
+  // Add light to all meshes (To support if the light is removed and then readded)
   for (const auto& mesh : meshes) {
     if (!stl_util::contains(mesh->_lightSources, newLight)) {
       mesh->_lightSources.emplace_back(newLight);
@@ -2733,7 +2758,7 @@ void Scene::addTexture(const BaseTexturePtr& newTexture)
 
 void Scene::switchActiveCamera(const CameraPtr& newCamera, bool attachControl)
 {
-  auto canvas = _engine->getRenderingCanvas();
+  auto canvas = _engine->getInputElement();
 
   if (!canvas) {
     return;
@@ -3300,10 +3325,12 @@ void Scene::freeRenderingGroups()
   }
 }
 
-void Scene::_evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh)
+void Scene::_evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh, AbstractMesh* initialMesh)
 {
-  if (dispatchAllSubMeshesOfActiveMeshes || mesh->alwaysSelectAsActiveMesh
-      || mesh->subMeshes.size() == 1 || subMesh->isInFrustum(_frustumPlanes)) {
+  if (initialMesh->hasInstances() || initialMesh->isAnInstance()
+      || dispatchAllSubMeshesOfActiveMeshes || _skipFrustumClipping
+      || mesh->alwaysSelectAsActiveMesh || mesh->subMeshes.size() == 1
+      || subMesh->isInFrustum(_frustumPlanes)) {
 
     for (const auto& step : _evaluateSubMeshStage) {
       step.action(mesh, subMesh);
@@ -3326,7 +3353,6 @@ void Scene::_evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh)
       }
 
       // Dispatch
-      _activeIndices.addCount(subMesh->indexCount, false);
       _renderingManager->dispatch(subMesh, mesh, material);
     }
   }
@@ -3347,7 +3373,7 @@ IActiveMeshCandidateProvider* Scene::getActiveMeshCandidateProvider() const
   return _activeMeshCandidateProvider;
 }
 
-Scene& Scene::freezeActiveMeshes()
+Scene& Scene::freezeActiveMeshes(bool skipEvaluateActiveMeshes)
 {
   if (!_activeCamera) {
     return *this;
@@ -3358,7 +3384,8 @@ Scene& Scene::freezeActiveMeshes()
   }
 
   _evaluateActiveMeshes();
-  _activeMeshesFrozen = true;
+  _activeMeshesFrozen                 = true;
+  _skipEvaluateActiveMeshesCompletely = skipEvaluateActiveMeshes;
   return *this;
 }
 
@@ -3371,6 +3398,13 @@ Scene& Scene::unfreezeActiveMeshes()
 void Scene::_evaluateActiveMeshes()
 {
   if (_activeMeshesFrozen && !_activeMeshes.empty()) {
+
+    if (!_skipEvaluateActiveMeshesCompletely) {
+      for (const auto& mesh : _activeMeshes) {
+        mesh->computeWorldMatrix();
+      }
+    }
+
     return;
   }
 
@@ -3490,7 +3524,7 @@ void Scene::_activeMesh(AbstractMesh* sourceMesh, AbstractMesh* mesh)
   if (mesh && !mesh->subMeshes.empty()) {
     auto subMeshes = getActiveSubMeshCandidates(mesh);
     for (const auto& subMesh : subMeshes) {
-      _evaluateSubMesh(subMesh, mesh);
+      _evaluateSubMesh(subMesh, mesh, sourceMesh);
     }
   }
 }
@@ -3683,19 +3717,18 @@ void Scene::animate()
                        / 1000.f)
                       + _timeAccumulator;
 
-    auto defaultFPS = (60.f / 1000.f);
-
-    auto defaultFrameTime = getDeterministicFrameTime();
+    auto defaultFrameTime = _engine->getTimeStep();
+    auto defaultFPS       = (1000.f / defaultFrameTime) / 1000.f;
 
     auto stepsTaken = 0u;
 
     auto maxSubSteps = _engine->getLockstepMaxSteps();
 
     // compute the amount of fixed steps we should have taken since the last step
-    auto internalSteps = static_cast<unsigned int>(std::floor(iDeltaTime / (1000.f * defaultFPS)));
+    auto internalSteps = static_cast<unsigned int>(std::floor(iDeltaTime / defaultFrameTime));
     internalSteps      = std::min(internalSteps, maxSubSteps);
 
-    do {
+    while (iDeltaTime > 0.f && stepsTaken < internalSteps) {
       onBeforeStepObservable.notifyObservers(this);
 
       // Animations
@@ -3711,8 +3744,7 @@ void Scene::animate()
 
       ++stepsTaken;
       iDeltaTime -= defaultFrameTime;
-
-    } while (iDeltaTime > 0.f && stepsTaken < internalSteps);
+    }
 
     _timeAccumulator = iDeltaTime < 0.f ? 0.f : iDeltaTime;
   }
@@ -4151,7 +4183,7 @@ void Scene::dispose()
   detachControl();
 
   // Detach cameras
-  auto canvas = _engine->getRenderingCanvas();
+  auto canvas = _engine->getInputElement();
   if (canvas) {
     for (const auto& camera : cameras) {
       camera->detachControl(canvas);

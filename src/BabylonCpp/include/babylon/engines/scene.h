@@ -1217,9 +1217,11 @@ public:
   /**
    * @brief Use this function to stop evaluating active meshes. The current list will be keep alive
    * between frames.
+   * @param skipEvaluateActiveMeshes defines an optional boolean indicating that the evaluate active
+   * meshes step must be completely skipped
    * @returns the current scene
    */
-  Scene& freezeActiveMeshes();
+  Scene& freezeActiveMeshes(bool skipEvaluateActiveMeshes);
 
   /**
    * @brief Use this function to restart evaluating active meshes on every frame.
@@ -1800,7 +1802,7 @@ private:
    * @brief Hidden
    */
   void _processLateAnimationBindings();
-  void _evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh);
+  void _evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh, AbstractMesh* initialMesh);
   void _evaluateActiveMeshes();
   void _activeMesh(AbstractMesh* sourceMesh, AbstractMesh* mesh);
   void _renderForCamera(const CameraPtr& camera, const CameraPtr& rigParent = nullptr);
@@ -1878,16 +1880,26 @@ protected:
   ImageProcessingConfigurationPtr& get_imageProcessingConfiguration();
 
   /**
-   * @brief Sets a boolean indicating if all rendering must be done in
-   * wireframe.
+   * @brief Sets a boolean indicating if all rendering must be done in wireframe.
    */
   void set_forceWireframe(bool value);
 
   /**
-   * @brief Gets a boolean indicating if all rendering must be done in
-   * wireframe.
+   * @brief Gets a boolean indicating if all rendering must be done in wireframe.
    */
   bool get_forceWireframe() const;
+
+  /**
+   * @brief Sets a boolean indicating if we should skip the frustum clipping part of the active
+   * meshes selection.
+   */
+  void set_skipFrustumClipping(bool value);
+
+  /**
+   * @brief Gets a boolean indicating if we should skip the frustum clipping part of the active
+   * meshes selection.
+   */
+  bool get_skipFrustumClipping() const;
 
   /**
    * @brief Sets a boolean indicating if all rendering must be done in point
@@ -2544,6 +2556,11 @@ public:
    */
   Observable<AbstractMesh> onMeshImportedObservable;
 
+  /**
+   * This Observable will when an animation file has been imported into the scene.
+   */
+  Observable<Scene> onAnimationFileImportedObservable;
+
   // Pointers
 
   /**
@@ -2579,14 +2596,18 @@ public:
     onPointerPick;
 
   /**
-   * Gets a boolean indicating if all rendering must be done in
-   * wireframe.
+   * Gets a boolean indicating if all rendering must be done in wireframe.
    */
   Property<Scene, bool> forceWireframe;
 
   /**
-   * Gets a boolean indicating if all rendering must be done in point
-   * cloud
+   * Gets or sets a boolean indicating if we should skip the frustum clipping part of the active
+   * meshes selection.
+   */
+  Property<Scene, bool> skipFrustumClipping;
+
+  /**
+   * Gets a boolean indicating if all rendering must be done in point cloud
    */
   Property<Scene, bool> forcePointsCloud;
 
@@ -3469,6 +3490,7 @@ private:
   bool _useRightHandedSystem;
   // Members
   bool _forceWireframe;
+  bool _skipFrustumClipping;
   bool _forcePointsCloud;
   // Fog
   /**
@@ -3523,6 +3545,7 @@ private:
   std::vector<AbstractMesh*> _activeMeshes;
   IActiveMeshCandidateProvider* _activeMeshCandidateProvider;
   bool _activeMeshesFrozen;
+  bool _skipEvaluateActiveMeshesCompletely;
   std::vector<MaterialPtr> _processedMaterials;
   std::vector<RenderTargetTexturePtr> _renderTargets;
   std::vector<SkeletonPtr> _activeSkeletons;
