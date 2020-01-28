@@ -83,7 +83,7 @@ void babylon_emscripten_onError(void *arg_downloadId)
 }
 
 static std::string BaseUrl() {
-  return "./emscripten_http_assets/assets/";
+  return "./emscripten_http_assets/";
 }
 
 } // anonymous namespace
