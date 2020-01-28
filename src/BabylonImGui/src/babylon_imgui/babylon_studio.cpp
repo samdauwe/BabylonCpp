@@ -19,6 +19,9 @@
 #include <windows.h>
 #endif
 
+// #define BABYLON_LOG_TRACE_ON
+#include <babylon/core/log_trace.h>
+
 #include <iostream>
 
 namespace BABYLON {
@@ -127,18 +130,18 @@ private:
   void initScene()
   {
     _appContext.sampleListComponent().OnNewRenderableScene
-      = [&](std::shared_ptr<IRenderableScene> scene) {
-          this->setRenderableScene(scene);
-          _studioLayout.FocusWindow(DockableWindowId::Scene3d);
-        };
+    = [=](std::shared_ptr<IRenderableScene> scene) {
+        this->setRenderableScene(scene);
+        _studioLayout.FocusWindow(DockableWindowId::Scene3d);
+      };
 
-    _appContext.sampleListComponent().OnEditFiles = [&](const std::vector<std::string>& files) {
+    _appContext.sampleListComponent().OnEditFiles = [=](const std::vector<std::string>& files) {
       _samplesCodeEditor.setFiles(files);
       _studioLayout.setVisible(DockableWindowId::SamplesCodeViewer, true);
       _studioLayout.FocusWindow(DockableWindowId::SamplesCodeViewer);
     };
 
-    _appContext.sampleListComponent().OnLoopSamples = [&](const std::vector<std::string>& samples) {
+    _appContext.sampleListComponent().OnLoopSamples = [=](const std::vector<std::string>& samples) {
       _appContext._loopSamples.flagLoop      = true;
       _appContext._loopSamples.samplesToLoop = samples;
       _appContext._loopSamples.currentIdx    = 0;
