@@ -373,7 +373,7 @@ void GLRenderingContext::clearColor(GLclampf red, GLclampf green, GLclampf blue,
 
 void GLRenderingContext::clearDepth(GLclampf depth)
 {
-  glClearDepth(depth);
+  glClearDepthf(depth);
 }
 
 void GLRenderingContext::clearStencil(GLint stencil)
