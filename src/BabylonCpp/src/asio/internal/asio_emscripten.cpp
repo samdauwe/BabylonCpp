@@ -138,9 +138,7 @@ void HeartBeat_Sync()
 
 void Service_WaitAll_Sync()
 {
-  using namespace std::literals;
-  while(!gDownloadInfos.empty())
-    std::this_thread::sleep_for(30ms);
+  BABYLON_LOG_WARN("asio", "Service_WaitAll_Sync disabled for emscripten");
 }
 
 BABYLON_SHARED_EXPORT void Service_Stop()
