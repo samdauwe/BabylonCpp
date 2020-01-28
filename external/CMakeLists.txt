@@ -122,3 +122,7 @@ add_library(FunctionalPlus INTERFACE)
 target_include_directories(magic_enum INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/FunctionalPlus/include)
 set(FunctionalPlus_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/FunctionalPlus/include
     CACHE INTERNAL "Include directories of FunctionalPlus")
+
+# fmt: A modern formatting library https://fmt.dev
+# (was adopted for inclusion in C++20)
+add_subdirectory(fmt)
