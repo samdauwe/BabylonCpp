@@ -88,10 +88,13 @@ static std::string BaseUrl() {
 
 } // anonymous namespace
 
-
-void set_HACK_DISABLE_ASYNC(bool v)
+void push_HACK_DISABLE_ASYNC()
 {
-  BABYLON_LOG_WARN("asio", "set_HACK_DISABLE_ASYNC does not work under emscripten", "");
+  BABYLON_LOG_WARN("asio", "push_HACK_DISABLE_ASYNC does not work under emscripten", "");
+}
+void pop_HACK_DISABLE_ASYNC()
+{
+  BABYLON_LOG_WARN("asio", "pop_HACK_DISABLE_ASYNC does not work under emscripten", "");
 }
 
 void LoadUrlAsync_Text(
