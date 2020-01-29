@@ -1,6 +1,7 @@
 #ifdef __EMSCRIPTEN__
 
 #include <babylon/asio/asio.h>
+#include <babylon/asio/internal/decode_data_uri.h>
 #include <babylon/core/logging.h>
 #include <babylon/misc/string_tools.h>
 #include <iostream>
@@ -134,6 +135,12 @@ void LoadAssetAsync_Binary(
   const OnProgressFunction& onProgressFunction
 )
 {
+  if (IsBase64JpgDataUri(assetPath)) {
+    TRACE_WHERE("LoadAssetAsync_Binary with data uri");
+    onSuccessFunction(DecodeBase64JpgDataUri(assetPath));
+    return;
+  }
+
   std::string fullUrl = AssetsBaseUrl() + assetPath;
   TRACE_WHERE_VAR(ShortenedUrl(fullUrl));
   auto downloadId = storeDownloadInfo(fullUrl.c_str(), onSuccessFunction, onErrorFunction);

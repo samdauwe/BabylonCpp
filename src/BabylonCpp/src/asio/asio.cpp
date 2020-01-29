@@ -1,7 +1,7 @@
 #ifndef __EMSCRIPTEN__
 
 #include <babylon/asio/asio.h>
-
+#include <babylon/asio/internal/decode_data_uri.h>
 #include <babylon/asio/internal/file_loader_sync.h>
 #include <babylon/asio/internal/future_utils.h>
 #include <babylon/core/filesystem.h>
@@ -23,7 +23,6 @@
 #endif
 
 
-#include <deque>
 #include <future>
 #include <atomic>
 #include <chrono>
@@ -284,6 +283,11 @@ void LoadAssetAsync_Binary(
   const OnProgressFunction& onProgressFunction
 )
 {
+  if (IsBase64JpgDataUri(assetPath)) {
+    onSuccessFunction(DecodeBase64JpgDataUri(assetPath));
+    return;
+  }
+
   std::string filename = assets_folder() + assetPath;
   LoadFileAsync_Binary(filename, onSuccessFunction, onErrorFunction, onProgressFunction);
 }
