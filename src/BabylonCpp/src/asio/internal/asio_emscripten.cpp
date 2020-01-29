@@ -11,7 +11,7 @@
 #include <chrono>
 #include <sstream>
 
-#define BABYLON_LOG_TRACE_ON
+//#define BABYLON_LOG_TRACE_ON // define this in order to get more traces
 #include <babylon/core/log_trace.h>
 
 namespace BABYLON {
