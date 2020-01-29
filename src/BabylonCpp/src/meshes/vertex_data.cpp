@@ -3042,12 +3042,12 @@ std::unique_ptr<VertexData> VertexData::CreatePolyhedron(PolyhedronOptions& opti
   const auto sizeX         = options.sizeX.value_or(size);
   const auto sizeY         = options.sizeY.value_or(size);
   const auto sizeZ         = options.sizeZ.value_or(size);
-  const auto& dataVertices = (!options.custom.has_value() && options.custom->vertices.empty()) ?
-                               polyhedraVertices[type] :
-                               options.custom->vertices;
-  const auto& dataFaces = (!options.custom.has_value() && options.custom->faces.empty()) ?
-                            polyhedraFaces[type] :
-                            options.custom->faces;
+  const auto& dataVertices = (options.custom.has_value() && !options.custom->vertices.empty()) ?
+                               options.custom->vertices :
+                               polyhedraVertices[type];
+  const auto& dataFaces = (options.custom.has_value() && !options.custom->faces.empty()) ?
+                            options.custom->faces :
+                            polyhedraFaces[type];
   const auto nbfaces         = dataFaces.size();
   const auto flat            = options.flat.value_or(true);
   const auto sideOrientation = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
