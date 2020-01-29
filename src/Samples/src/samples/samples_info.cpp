@@ -194,7 +194,7 @@ void SamplesCollection::ReadSamplesSourceInfos(VoidFunction then)
     then();
   };
 
-  BABYLON::asio::LoadUrlAsync_Text("samples_info.json", onJsonLoaded, onJsonErrorLoad);
+  BABYLON::asio::LoadAssetAsync_Text("samples_info.json", onJsonLoaded, onJsonErrorLoad);
 }
 
 
@@ -219,8 +219,8 @@ void SamplesCollection::ReadAllSampleStatuses(VoidFunction then)
     BABYLON_LOG_ERROR("SamplesCollection", "Could not read statuses: ", msg.c_str());
   };
 
-  asio::LoadUrlAsync_Text(screenshotsDirectory_RelativeToAssets() + "/aa_runStatus.json",
-                          onStatusesLoaded, onError);
+  asio::LoadAssetAsync_Text(screenshotsDirectory_RelativeToAssets() + "/aa_runStatus.json",
+                            onStatusesLoaded, onError);
 }
 
 
@@ -258,8 +258,8 @@ void SamplesCollection::ReadSampleManualRunInfo(VoidFunction then)
     BABYLON_LOG_ERROR("SamplesCollection", "Could not read sampleRunManualInfo: ", msg.c_str());
   };
 
-  asio::LoadUrlAsync_Text(screenshotsDirectory_RelativeToAssets() + "/aa_sampleRunManualInfo.json",
-                          onLoaded, onError);
+  asio::LoadAssetAsync_Text(
+    screenshotsDirectory_RelativeToAssets() + "/aa_sampleRunManualInfo.json", onLoaded, onError);
 }
 
 void SamplesCollection::SetSampleManualRunInfo(

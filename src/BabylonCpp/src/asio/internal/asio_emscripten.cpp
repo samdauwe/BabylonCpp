@@ -96,7 +96,7 @@ void babylon_emscripten_onError(void *arg_downloadId)
   info.onErrorFunction(errorMessage);
 }
 
-static std::string BaseUrl() {
+static std::string AssetsBaseUrl() {
   return "./emscripten_http_assets/assets/";
 }
 
@@ -111,14 +111,14 @@ void pop_HACK_DISABLE_ASYNC()
   BABYLON_LOG_WARN("asio", "pop_HACK_DISABLE_ASYNC does not work under emscripten", "");
 }
 
-void LoadUrlAsync_Text(
-  const std::string& url,
+void LoadAssetAsync_Text(
+  const std::string& assetPath,
   const std::function<void(const std::string& data)>& onSuccessFunction,
   const OnErrorFunction& onErrorFunction,
   const OnProgressFunction& onProgressFunction
 )
 {
-  std::string fullUrl = BaseUrl() + url;
+  std::string fullUrl = AssetsBaseUrl() + assetPath;
   TRACE_WHERE_VAR(ShortenedUrl(fullUrl));
   auto onSuccessFunctionArrayBuffer = [onSuccessFunction](const ArrayBuffer& dataUint8) {
     onSuccessFunction(ArrayBufferToString(dataUint8));
@@ -127,14 +127,14 @@ void LoadUrlAsync_Text(
   emscripten_async_wget_data(fullUrl.c_str(), (void*)downloadId, babylon_emscripten_onLoad, babylon_emscripten_onError);
 }
 
-void LoadUrlAsync_Binary(
-  const std::string& url,
+void LoadAssetAsync_Binary(
+  const std::string& assetPath,
   const std::function<void(const ArrayBuffer& data)>& onSuccessFunction,
   const OnErrorFunction& onErrorFunction,
   const OnProgressFunction& onProgressFunction
 )
 {
-  std::string fullUrl = BaseUrl() + url;
+  std::string fullUrl = AssetsBaseUrl() + assetPath;
   TRACE_WHERE_VAR(ShortenedUrl(fullUrl));
   auto downloadId = storeDownloadInfo(fullUrl.c_str(), onSuccessFunction, onErrorFunction);
   emscripten_async_wget_data(fullUrl.c_str(), (void*)downloadId, babylon_emscripten_onLoad, babylon_emscripten_onError);

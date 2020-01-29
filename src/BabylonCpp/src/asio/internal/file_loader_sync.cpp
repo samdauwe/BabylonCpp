@@ -10,11 +10,10 @@ namespace sync_io_impl
 {
 
 ArrayBufferOrErrorMessage LoadFileSync_Binary(
-  const std::string& filenameRelativeToAssetsDir,
+  const std::string& filename,
   const OnProgressFunction& onProgressFunction
 )
 {
-  std::string filename = assets_folder() + filenameRelativeToAssetsDir;
   std::ifstream ifs(filename.c_str(), std::ios::binary | std::ios::ate);
   if (!ifs.good()) {
     std::string message = "LoadFileSync_Binary: Could not open file " + std::string(filename);

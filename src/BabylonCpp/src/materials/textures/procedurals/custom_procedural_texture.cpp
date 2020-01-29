@@ -63,7 +63,7 @@ void CustomProceduralTexture::_loadJson(const std::string& jsonUrl)
   };
 
   const auto configFileUrl = jsonUrl + "/config.json";
-  asio::LoadUrlAsync_Text(configFileUrl, onSuccessLoadJson, noConfigFile);
+  asio::LoadAssetAsync_Text(configFileUrl, onSuccessLoadJson, noConfigFile);
 }
 
 bool CustomProceduralTexture::isReady()

@@ -15,7 +15,7 @@ namespace asio {
 namespace sync_io_impl
 {
 ArrayBufferOrErrorMessage LoadFileSync_Binary(
-  const std::string& filenameRelativeToAssetsDir,
+  const std::string& filename,
   const OnProgressFunction& onProgressFunction
   );
 
