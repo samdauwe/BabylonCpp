@@ -240,12 +240,12 @@ private:
       _appContext._inspector->setScene(_appContext._sceneWidget->getScene());
   }
 
-  void saveScreenshot(std::string filename = "")
+  void saveScreenshot(std::string sampleName = "")
   {
-    if (filename.empty())
-      filename = std::string(_appContext._sceneWidget->getRenderableScene()->getName()) + ".jpg";
+    if (sampleName.empty())
+      sampleName = std::string(_appContext._sceneWidget->getRenderableScene()->getName());
 
-    filename = BABYLON::SamplesInfo::screenshotsDirectory() + "/" + filename;
+    std::string filename = SamplesInfo::SampleScreenshotFile_Absolute(sampleName);
     int imageWidth = 200;
     int jpgQuality = 75;
     this->_appContext._sceneWidget->getCanvas()->saveScreenshotJpg(
@@ -258,7 +258,7 @@ private:
     _appContext._frameCounter++;
     if (_appContext._frameCounter < 30)
       return false;
-    saveScreenshot(_appContext._options._sceneName + ".jpg");
+    saveScreenshot(_appContext._options._sceneName);
     return true;
   }
 

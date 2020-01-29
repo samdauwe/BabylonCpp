@@ -18,26 +18,6 @@
 
 using namespace BABYLON::SamplesInfo;
 
-namespace {
-std::string to_snake_case(const std::string& sPascalCase)
-{
-  std::stringstream ss;
-  bool first = true;
-  for (auto c : sPascalCase) {
-    if (std::tolower(c) != c) {
-      if (!first)
-        ss << "_";
-      ss << static_cast<unsigned char>(std::tolower(c));
-    }
-    else
-      ss << c;
-    first = false;
-  }
-  return ss.str();
-}
-
-} // end anonymous namespace
-
 namespace BABYLON {
 
 
@@ -197,9 +177,7 @@ private:
   void guiOneSample(const SamplesInfo::SampleData& sampleData)
   {
     const auto& sampleInfo =  sampleData.sourceInfo;
-    std::string currentScreenshotFile = screenshotsDirectory() + "/" + sampleData.sampleName + ".jpg";
-    std::string sample_snake          = to_snake_case(sampleData.sampleName);
-
+    std::string currentScreenshotFile = SamplesInfo::SampleScreenshotFile_RelativeToAssets(sampleData.sampleName);
     // Screenshot
     {
       ImGui::BeginGroup();

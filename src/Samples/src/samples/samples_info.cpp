@@ -52,20 +52,21 @@ void from_json(const nlohmann::json& j, SampleManualRunInfo& v)
 }
 
 
-std::string screenshotsDirectory() {
-  std::string directory = assets_folder() + "/screenshots/ScreenshotsData";
-  if (!Filesystem::isDirectory(directory))
-    Filesystem::createDirectory(directory);
+std::string screenshotsDirectory_RelativeToAssets() {
+  std::string directory = "screenshots/ScreenshotsData/";
   return directory;
 }
 
-std::string SampleRunInfoFilePrefix(const SampleName& sampleName) {
-  return screenshotsDirectory() + "/" + sampleName;
+std::string SampleScreenshotFile_RelativeToAssets(const std::string& sampleName)
+{
+  return screenshotsDirectory_RelativeToAssets() + sampleName + ".jpg";
 }
 
-std::string SampleScreenshotFilename(const SampleName& sampleName) {
-  return SampleRunInfoFilePrefix(sampleName) + ".jpg";
+std::string SampleScreenshotFile_Absolute(const std::string& sampleName)
+{
+  return assets_folder() + SampleScreenshotFile_RelativeToAssets(sampleName);
 }
+
 
 std::string SamplesProjectFolder()
 {
@@ -193,7 +194,7 @@ void SamplesCollection::ReadSamplesSourceInfos(VoidFunction then)
     then();
   };
 
-  BABYLON::asio::LoadUrlAsync_Text(assets_folder() + "/samples_info.json", onJsonLoaded, onJsonErrorLoad);
+  BABYLON::asio::LoadUrlAsync_Text("samples_info.json", onJsonLoaded, onJsonErrorLoad);
 }
 
 
@@ -218,7 +219,7 @@ void SamplesCollection::ReadAllSampleStatuses(VoidFunction then)
     BABYLON_LOG_ERROR("SamplesCollection", "Could not read statuses: ", msg.c_str());
   };
 
-  asio::LoadUrlAsync_Text(screenshotsDirectory() + "/aa_runStatus.json",
+  asio::LoadUrlAsync_Text(screenshotsDirectory_RelativeToAssets() + "/aa_runStatus.json",
                           onStatusesLoaded, onError);
 }
 
@@ -230,7 +231,7 @@ void SamplesCollection::SaveSampleManualRunInfo()
   for (const auto& sampleData : _allSamples)
     allRunManualInfo[sampleData.sampleName] = sampleData.sampleManualRunInfo;
 
-  std::ofstream ofs(screenshotsDirectory() + "/aa_sampleRunManualInfo.json");
+  std::ofstream ofs(assets_folder() + screenshotsDirectory_RelativeToAssets() + "/aa_sampleRunManualInfo.json");
   nlohmann::json j = allRunManualInfo;
   ofs << std::setw(4) << j << std::endl;
   ofs.close();
@@ -257,7 +258,7 @@ void SamplesCollection::ReadSampleManualRunInfo(VoidFunction then)
     BABYLON_LOG_ERROR("SamplesCollection", "Could not read sampleRunManualInfo: ", msg.c_str());
   };
 
-  asio::LoadUrlAsync_Text(screenshotsDirectory() + "/aa_sampleRunManualInfo.json",
+  asio::LoadUrlAsync_Text(screenshotsDirectory_RelativeToAssets() + "/aa_sampleRunManualInfo.json",
                           onLoaded, onError);
 }
 
@@ -277,8 +278,10 @@ void SamplesCollection::SetSampleRunInfo(
   SampleData *sampleData = GetSampleByName(sampleName);
   assert(sampleData != nullptr);
   sampleData->autoRunInfo = sampleRunInfo;
-  if (sampleRunInfo.sampleRunStatus != SampleAutoRunStatus::success) {
-    Filesystem::removeFile(SampleScreenshotFilename(sampleName));
+  if (sampleRunInfo.sampleRunStatus != SampleAutoRunStatus::success)
+  {
+    std::string screenshotFile = SampleScreenshotFile_Absolute(sampleName);
+    Filesystem::removeFile(screenshotFile);
   }
 }
 
@@ -288,7 +291,7 @@ void SamplesCollection::SaveAllSamplesRunStatuses()
   for (const auto & sampleData : _allSamples)
     allRunStatuses[sampleData.sampleName] = sampleData.autoRunInfo.sampleRunStatus;
 
-  std::ofstream ofs(screenshotsDirectory() + "/aa_runStatus.json");
+  std::ofstream ofs( assets_folder() + screenshotsDirectory_RelativeToAssets() + "/aa_runStatus.json");
   nlohmann::json j = allRunStatuses;
   ofs << std::setw(4) << j << std::endl;
   ofs.close();

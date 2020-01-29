@@ -124,8 +124,10 @@ private:
 };
 
 
-BABYLON_SHARED_EXPORT std::string screenshotsDirectory();
+BABYLON_SHARED_EXPORT std::string screenshotsDirectory_RelativeToAssets();
 BABYLON_SHARED_EXPORT std::string SamplesProjectFolder();
+BABYLON_SHARED_EXPORT std::string SampleScreenshotFile_RelativeToAssets(const std::string& sampleName);
+BABYLON_SHARED_EXPORT std::string SampleScreenshotFile_Absolute(const std::string& sampleName);
 
 } // namespace SamplesInfo
 
