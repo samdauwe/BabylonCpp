@@ -20,6 +20,15 @@ namespace asio {
 namespace
 {
 
+std::string ShortenedUrl(const std::string& url)
+{
+  const std::size_t maxLength = 100;
+  if (url.size() < maxLength)
+    return url;
+  else
+    return url.substr(0, maxLength) + "...";
+}
+
 static std::string ArrayBufferToString(const ArrayBuffer & dataUint8)
 {
   std::string dataString;
@@ -46,7 +55,7 @@ DownloadId storeDownloadInfo(
   std::function<void(const ArrayBuffer& data)> onSuccessFunction,
   std::function<void(const std::string& message)> onErrorFunction)
 {
-  TRACE_WHERE_VAR(url);
+  TRACE_WHERE_VAR(ShortenedUrl(url));
   static int id = 0;
   ++id;
   DownloadInfo info {url, onSuccessFunction, onErrorFunction};
@@ -63,7 +72,7 @@ DownloadInfo consumeDownloadInfo(DownloadId id)
     throw std::runtime_error(msg.str().c_str());
   }
   DownloadInfo r = gDownloadInfos.at(id);
-  TRACE_WHERE_VAR(r.url);
+  TRACE_WHERE_VAR(ShortenedUrl(r.url));
   gDownloadInfos.erase(id);
   return r;
 }
@@ -75,20 +84,20 @@ void babylon_emscripten_onLoad(void *arg_downloadId, void *bufferData, int buffe
   ArrayBuffer arrayBuffer(bufferDataAsUint8, bufferDataAsUint8 + bufferSize); // this makes a copy
 
   DownloadInfo info = consumeDownloadInfo((DownloadId)arg_downloadId);
-  BABYLON_LOG_DEBUG("babylon_emscripten_onLoad", info.url.c_str(), " Success!");
+  BABYLON_LOG_DEBUG("babylon_emscripten_onLoad", ShortenedUrl(info.url).c_str(), " Success!");
   info.onSuccessFunction(arrayBuffer);
 }
 
 void babylon_emscripten_onError(void *arg_downloadId)
 {
   DownloadInfo info = consumeDownloadInfo((DownloadId)arg_downloadId);
-  std::string errorMessage = std::string("Error while downloading ") + info.url;
-  BABYLON_LOG_DEBUG("babylon_emscripten_onError", info.url.c_str(), " Failure!");
+  std::string errorMessage = std::string("Error while downloading ") + ShortenedUrl(info.url);
+  BABYLON_LOG_DEBUG("babylon_emscripten_onError", ShortenedUrl(info.url).c_str(), " Failure!");
   info.onErrorFunction(errorMessage);
 }
 
 static std::string BaseUrl() {
-  return "./emscripten_http_assets/";
+  return "./emscripten_http_assets/assets/";
 }
 
 } // anonymous namespace
@@ -110,6 +119,7 @@ void LoadUrlAsync_Text(
 )
 {
   std::string fullUrl = BaseUrl() + url;
+  TRACE_WHERE_VAR(ShortenedUrl(fullUrl));
   auto onSuccessFunctionArrayBuffer = [onSuccessFunction](const ArrayBuffer& dataUint8) {
     onSuccessFunction(ArrayBufferToString(dataUint8));
   };
@@ -125,6 +135,7 @@ void LoadUrlAsync_Binary(
 )
 {
   std::string fullUrl = BaseUrl() + url;
+  TRACE_WHERE_VAR(ShortenedUrl(fullUrl));
   auto downloadId = storeDownloadInfo(fullUrl.c_str(), onSuccessFunction, onErrorFunction);
   emscripten_async_wget_data(fullUrl.c_str(), (void*)downloadId, babylon_emscripten_onLoad, babylon_emscripten_onError);
 }

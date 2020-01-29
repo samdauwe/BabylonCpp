@@ -16,7 +16,7 @@
   std::cout << "LOG_TRACE TRACE_WHERE: " << msg << " in " << __FUNCTION__ <<  "() in " << __FILE__ << ":" << __LINE__ << std::endl;
 
 #define TRACE_WHERE_VAR(var) \
-  std::cout << "LOG_TRACE TRACE_WHERE_VAR: " << #var << "=" << var << "  in " << __FUNCTION__ <<  "() in " << __FILE__ << ":" << __LINE__ << std::endl;
+  std::cout << "LOG_TRACE TRACE_WHERE_VAR: " << "  in " << __FUNCTION__ <<  "() in " << __FILE__ << ":" << __LINE__ << " with " << #var << "=" << var << std::endl;
 
 
 #define TRACE_BEFORE_AFTER(...)                   \
