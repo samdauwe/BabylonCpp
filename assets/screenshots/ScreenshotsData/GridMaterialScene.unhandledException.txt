@@ -1,3 +1,0 @@
-Stack trace (most recent call last):
-#0    Object "/usr/lib/x86_64-linux-gnu/dri/vmwgfx_dri.so", at 0x7fdd011eda00, in 
-Segmentation fault (Invalid permissions for mapped object [0x7fdd011eda00])
