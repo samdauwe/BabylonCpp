@@ -8,8 +8,7 @@ option(OPTION_BUILD_IMGUI_BABYLON "Build the inspector debugging tool."  ON)
 # Common variables used by all sub projects                                    #
 # ============================================================================ #
 include(../cmake/BuildEnvironment.cmake)
-include(../cmake/BabylonAddTest.cmake)
-include(../cmake/BabylonAddLibrary.cmake)
+include(../cmake/BabylonAddTarget.cmake)
 
 set(BABYLON_NAMESPACE babylon)
 string(TOUPPER ${BABYLON_NAMESPACE} BABYLON_UPPER)

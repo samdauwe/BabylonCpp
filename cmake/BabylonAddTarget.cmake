@@ -72,3 +72,18 @@ function(babylon_add_library_glob TARGET)
         )
     babylon_add_library(${TARGET} ${sources} ${headers} ${misc})
 endfunction()
+
+macro(babylon_add_test TARGET)
+    message("babylon_add_test ${TARGET}")
+    add_executable(${TARGET} ${ARGN})
+    # Create namespaced alias
+    add_executable(${META_PROJECT_NAME}::${TARGET} ALIAS ${TARGET})
+
+    target_link_libraries(${TARGET} PRIVATE gtest gmock gtest_main)
+    add_test(NAME ${TARGET} COMMAND ${TARGET})
+    babylon_target_clang_tidy(${TARGET})
+
+    # group sources
+    get_target_property(sources ${TARGET} SOURCES)
+    source_group_by_path_all(${CMAKE_CURRENT_SOURCE_DIR} ${sources})
+endmacro()
