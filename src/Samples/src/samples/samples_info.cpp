@@ -108,20 +108,53 @@ SamplesCollection::SamplesCollection()
   // 2. Sort by catgory, then name
   std::sort(_allSamples.begin(), _allSamples.end(), compareSampleData_CategoryThenName);
 
-  // 3. Read Run status
-  ReadAllSampleStatuses();
-
-  // 4. Read source info
-  ReadSamplesSourceInfos();
-
-  // 5. Read Manual Run Status
-  ReadSampleManualRunInfo();
-
-  BABYLON_LOG_INFO("SamplesCollection", "found", _allSamples.size(), " samples");
-  BABYLON_LOG_INFO("SamplesCollection", "stats", GetSampleStatsString().c_str());
+  ReadAllDataThenDisplayStats();
 }
 
-void SamplesCollection::ReadSamplesSourceInfos()
+
+void SamplesCollection::ReadAllDataThenDisplayStats()
+{
+#define USING_CHAINED_LAMBDAS
+//#define USING_NAMED_LAMBDAS
+
+  auto onLoadEnd = [this]() {
+    BABYLON_LOG_INFO("SamplesCollection", "found", _allSamples.size(), " samples");
+    BABYLON_LOG_INFO("SamplesCollection", "stats", GetSampleStatsString().c_str());
+    this->_isLoaded = true;
+  };
+
+  #ifdef USING_NAMED_LAMBDAS
+  auto readSampleManualRunInfo = [=]() {
+    ReadSampleManualRunInfo(displayStats);
+  };
+  auto readAllSampleStatuses = [=]() {
+    ReadAllSampleStatuses(readSampleManualRunInfo);
+  };
+  auto readSampleSourcesInfos = [=]() {
+    ReadSamplesSourceInfos(readAllSampleStatuses);
+  };
+
+  // readSampleSourcesInfos will run the following chain
+  //
+  //  ReadSamplesSourceInfos
+  // .then(ReadAllSampleStatuses)
+  // .then(ReadSampleManualRunInfo)
+  // .then(onLoadEnd)
+  readSampleSourcesInfos();
+  #endif
+
+#ifdef USING_CHAINED_LAMBDAS
+  ReadSamplesSourceInfos([=](){
+    ReadAllSampleStatuses([=](){
+      ReadSampleManualRunInfo([=](){ onLoadEnd();
+      });
+    });
+  });
+#endif
+}
+
+
+void SamplesCollection::ReadSamplesSourceInfos(VoidFunction then)
 {
   auto lowerCaseName = [](const std::string & sampleNameMixedCase) -> std::string
   {
@@ -157,16 +190,16 @@ void SamplesCollection::ReadSamplesSourceInfos()
           sampleData.sourceInfo = sampleInfo;
       }
     }
+    then();
   };
 
   BABYLON::asio::LoadUrlAsync_Text(assets_folder() + "/samples_info.json", onJsonLoaded, onJsonErrorLoad);
-
 }
 
 
-void SamplesCollection::ReadAllSampleStatuses()
+void SamplesCollection::ReadAllSampleStatuses(VoidFunction then)
 {
-  auto onStatusesLoaded = [this](const std::string& jsonString) {
+  auto onStatusesLoaded = [this, then](const std::string& jsonString) {
     using namespace nlohmann;
     auto jsonData = json::parse(jsonString);
     auto allRunStatuses =  jsonData.get<std::map<SampleName, SampleAutoRunStatus>>();
@@ -177,6 +210,8 @@ void SamplesCollection::ReadAllSampleStatuses()
       if (data)
         data->autoRunInfo.sampleRunStatus = sampleRunStatus;
     }
+
+    then();
   };
 
   auto onError = [](const std::string &msg) {
@@ -185,8 +220,6 @@ void SamplesCollection::ReadAllSampleStatuses()
 
   asio::LoadUrlAsync_Text(screenshotsDirectory() + "/aa_runStatus.json",
                           onStatusesLoaded, onError);
-
-  asio::Service_WaitAll_Sync(); // Because we want to display stats right after the start
 }
 
 
@@ -203,9 +236,9 @@ void SamplesCollection::SaveSampleManualRunInfo()
   ofs.close();
 }
 
-void SamplesCollection::ReadSampleManualRunInfo()
+void SamplesCollection::ReadSampleManualRunInfo(VoidFunction then)
 {
-  auto onLoaded = [this](const std::string& jsonString) {
+  auto onLoaded = [this, then](const std::string& jsonString) {
     using namespace nlohmann;
     auto jsonData = json::parse(jsonString);
 
@@ -217,6 +250,7 @@ void SamplesCollection::ReadSampleManualRunInfo()
       if (data)
         data->sampleManualRunInfo = sampleRunManualInfo;
     }
+    then();
   };
 
   auto onError = [](const std::string &msg) {
@@ -225,7 +259,6 @@ void SamplesCollection::ReadSampleManualRunInfo()
 
   asio::LoadUrlAsync_Text(screenshotsDirectory() + "/aa_sampleRunManualInfo.json",
                           onLoaded, onError);
-  BABYLON::asio::Service_WaitAll_Sync();
 }
 
 void SamplesCollection::SetSampleManualRunInfo(

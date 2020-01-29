@@ -65,10 +65,10 @@ public:
 private:
   void render_filter()
   {
-    bool changed = false;
+    bool needSearch = false;
     ImGui::PushItemWidth(200);
     if (ImGui::InputText_String("Search " ICON_FA_SEARCH, _sampleSearchQuery.Query))
-      changed = true;
+      needSearch = true;
     ImGui::SameLine();
     ImGui::Checkbox(ICON_FA_WRENCH "Experimental", &_queryExperimental);
 
@@ -81,13 +81,13 @@ private:
         if (ImGui::Checkbox(statusName.c_str(), &v))
         {
           this->_sampleSearchQuery.IncludeStatus[status] = v;
-          changed = true;
+          needSearch                                     = true;
         }
       }
       ImGui::Separator();
 
       if (ImGui::Checkbox("With manual run failures", &_sampleSearchQuery.OnlyManualRunFailure))
-        changed = true;
+        needSearch = true;
     }
 
     if (OnLoopSamples) {
@@ -101,7 +101,14 @@ private:
       }
     }
 
-    if (changed)
+    static bool wasQueriedAfterLoad = false;
+    if (!wasQueriedAfterLoad and _samplesCollection.IsLoaded())
+    {
+      wasQueriedAfterLoad = true;
+      needSearch          = true;
+    }
+
+    if (needSearch)
       fillMatchingSamples();
 
     ImGui::Text("Matching samples : %zi", nbMatchingSamples());

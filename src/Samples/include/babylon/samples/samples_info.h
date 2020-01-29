@@ -95,6 +95,8 @@ public:
 
   IRenderableScenePtr createRenderableScene(const std::string& sampleName, ICanvas* iCanvas) const;
 
+  bool IsLoaded() const { return _isLoaded; }
+
   //
   // SpawnScreenshot API
   //
@@ -108,12 +110,17 @@ private:
 
   SampleStats GetSampleStats();
 
-  void ReadSamplesSourceInfos();
-  void ReadAllSampleStatuses();
-  void ReadSampleManualRunInfo();
+  using VoidFunction = std::function<void()>;
+
+  void ReadSamplesSourceInfos(VoidFunction then);
+  void ReadAllSampleStatuses(VoidFunction then);
+  void ReadSampleManualRunInfo(VoidFunction then);
+  void ReadAllDataThenDisplayStats();
+
   void SaveSampleManualRunInfo();
 
   std::vector<SampleData> _allSamples;
+  bool _isLoaded = false;
 };
 
 
