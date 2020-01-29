@@ -819,9 +819,17 @@ std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
 
   auto sideOrientation = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
 
-  const auto& faceUV     = options.faceUV;
-  const auto& faceColors = options.faceColors;
+  const auto& faceUV = options.faceUV;
+  auto& faceColors   = options.faceColors;
   Float32Array colors;
+
+  // default face colors
+  if (!faceColors.has_value()) {
+    faceColors = {
+      Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f),
+      Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f),
+    };
+  }
 
   // Create each face in turn.
   for (auto index = 0u; index < nbFaces; index++) {
