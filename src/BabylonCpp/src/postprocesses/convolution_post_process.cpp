@@ -1,15 +1,22 @@
 #include <babylon/postprocesses/convolution_post_process.h>
-
+#include <babylon/babylon_api.h>
 #include <babylon/materials/effect.h>
 
 namespace BABYLON {
 
-const Float32Array ConvolutionPostProcess::EdgeDetect0Kernel = {1, 0, -1, 0, 0, 0, -1, 0, 1};
-const Float32Array ConvolutionPostProcess::EdgeDetect1Kernel = {0, 1, 0, 1, -4, 1, 0, 1, 0};
-const Float32Array ConvolutionPostProcess::EdgeDetect2Kernel = {-1, -1, -1, -1, 8, -1, -1, -1, -1};
-const Float32Array ConvolutionPostProcess::SharpenKernel     = {0, -1, 0, -1, 5, -1, 0, -1, 0};
-const Float32Array ConvolutionPostProcess::EmbossKernel      = {-2, -1, 0, -1, 1, 1, 0, 1, 2};
-const Float32Array ConvolutionPostProcess::GaussianKernel    = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+const Float32Array gEdgeDetect0Kernel = {1, 0, -1, 0, 0, 0, -1, 0, 1};
+const Float32Array gEdgeDetect1Kernel = {0, 1, 0, 1, -4, 1, 0, 1, 0};
+const Float32Array gEdgeDetect2Kernel = {-1, -1, -1, -1, 8, -1, -1, -1, -1};
+const Float32Array gSharpenKernel     = {0, -1, 0, -1, 5, -1, 0, -1, 0};
+const Float32Array gEmbossKernel = { -2, -1, 0, -1, 1, 1, 0, 1, 2 };
+const Float32Array gGaussianKernel    = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+
+const Float32Array ConvolutionPostProcess::EdgeDetect0Kernel() { return gEdgeDetect0Kernel; }
+const Float32Array ConvolutionPostProcess::EdgeDetect1Kernel(){ return gEdgeDetect1Kernel; }
+const Float32Array ConvolutionPostProcess::EdgeDetect2Kernel() { return gEdgeDetect2Kernel; }
+const Float32Array ConvolutionPostProcess::SharpenKernel() { return gSharpenKernel; }
+const Float32Array ConvolutionPostProcess::EmbossKernel() { return gEmbossKernel; }
+const Float32Array ConvolutionPostProcess::GaussianKernel() { return gGaussianKernel; }
 
 ConvolutionPostProcess::ConvolutionPostProcess(const std::string& iName,
                                                const Float32Array& iKernel, float ratio,
